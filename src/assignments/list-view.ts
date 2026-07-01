@@ -34,6 +34,7 @@ import {
   type AssignmentListSummary,
   type AssignmentListSummaryMetric,
   type AssignmentListStatusMetric,
+  normalizeAssignmentListSummaryCount,
 } from '@/assignments/list-summary';
 import {
   type AssignmentStatusAction,
@@ -69,6 +70,25 @@ type AssignmentListControlOption = {
   description: string;
   label: string;
   value: AssignmentStatusFilter;
+};
+
+export type AssignmentListPageScopeItemId =
+  | 'page'
+  | 'range'
+  | 'search'
+  | 'status';
+
+export type AssignmentListPageScopeItem = {
+  description: string;
+  id: AssignmentListPageScopeItemId;
+  label: string;
+  value: string;
+};
+
+export type AssignmentListPageScopeView = {
+  items: AssignmentListPageScopeItem[];
+  label: string;
+  summary: string;
 };
 
 export type AssignmentListSearchPanelView = {
@@ -238,6 +258,7 @@ type AssignmentListPageViewModel<TItem extends AssignmentListPageItem> = {
   loadErrorMessage: string;
   publishedPanelContext?: PublishedAssignmentPanelContext;
   resolvedSearch: AssignmentListPageResolvedSearch;
+  scopeView: AssignmentListPageScopeView;
   starterPreview: AssignmentListStarterPreview;
   summaryMetrics: AssignmentListSummaryMetric[];
   title: string;
@@ -453,6 +474,128 @@ export function buildAssignmentListSearchPanelView({
   };
 }
 
+export function buildAssignmentListPageScopeView({
+  currentPage,
+  pageSize = ASSIGNMENT_LIST_PAGE_SIZE,
+  search,
+  status,
+  total,
+  totalPages,
+  visibleCount,
+}: {
+  currentPage: number;
+  pageSize?: number;
+  search?: string;
+  status: AssignmentStatusFilter;
+  total: number;
+  totalPages: number;
+  visibleCount: number;
+}): AssignmentListPageScopeView {
+  const normalizedCurrentPage = normalizeAssignmentListScopePage(currentPage);
+  const normalizedPageSize = normalizeAssignmentListScopePageSize(pageSize);
+  const normalizedSearch = normalizeAssignmentListSearch(search);
+  const normalizedTotal = normalizeAssignmentListSummaryCount(total);
+  const normalizedTotalPages = Math.max(
+    1,
+    normalizeAssignmentListSummaryCount(totalPages)
+  );
+  const normalizedVisibleCount = Math.min(
+    normalizeAssignmentListSummaryCount(visibleCount),
+    normalizedTotal
+  );
+  const firstVisible =
+    normalizedTotal > 0 && normalizedVisibleCount > 0
+      ? (normalizedCurrentPage - 1) * normalizedPageSize + 1
+      : 0;
+  const lastVisible =
+    firstVisible > 0
+      ? Math.min(normalizedTotal, firstVisible + normalizedVisibleCount - 1)
+      : 0;
+  const statusView = getAssignmentListStatusFilterView(status);
+  const isOutOfRange =
+    normalizedTotal > 0 && normalizedCurrentPage > normalizedTotalPages;
+  const hasResults =
+    normalizedTotal > 0 && normalizedVisibleCount > 0 && !isOutOfRange;
+
+  return {
+    items: [
+      {
+        description: m.assignment_list_scope_range_description(),
+        id: 'range',
+        label: m.assignment_list_scope_range_label(),
+        value: hasResults
+          ? m.assignment_list_scope_range_value({
+              firstItem: formatAssignmentResultNumber(firstVisible, {
+                min: 0,
+              }),
+              lastItem: formatAssignmentResultNumber(lastVisible, { min: 0 }),
+              total: formatAssignmentResultNumber(normalizedTotal, { min: 0 }),
+            })
+          : m.assignment_list_scope_range_empty_value(),
+      },
+      {
+        description: isOutOfRange
+          ? m.assignment_list_scope_page_out_of_range_description({
+              totalPages: formatAssignmentResultNumber(normalizedTotalPages, {
+                min: 1,
+              }),
+            })
+          : m.assignment_list_scope_page_description(),
+        id: 'page',
+        label: m.assignment_list_scope_page_label(),
+        value: m.assignment_list_scope_page_value({
+          currentPage: formatAssignmentResultNumber(normalizedCurrentPage, {
+            min: 1,
+          }),
+          totalPages: formatAssignmentResultNumber(normalizedTotalPages, {
+            min: 1,
+          }),
+        }),
+      },
+      {
+        description:
+          status === 'all'
+            ? m.assignment_list_scope_status_all_description()
+            : statusView.description,
+        id: 'status',
+        label: m.assignment_list_scope_status_label(),
+        value: statusView.label,
+      },
+      {
+        description: normalizedSearch
+          ? m.assignment_list_scope_search_filtered_description()
+          : m.assignment_list_scope_search_all_description(),
+        id: 'search',
+        label: m.assignment_list_scope_search_label(),
+        value: normalizedSearch ?? m.assignment_list_scope_search_all_value(),
+      },
+    ],
+    label: m.assignment_list_scope_label(),
+    summary: isOutOfRange
+      ? m.assignment_list_scope_summary_out_of_range({
+          currentPage: formatAssignmentResultNumber(normalizedCurrentPage, {
+            min: 1,
+          }),
+          totalPages: formatAssignmentResultNumber(normalizedTotalPages, {
+            min: 1,
+          }),
+        })
+      : hasResults
+        ? m.assignment_list_scope_summary({
+            currentPage: formatAssignmentResultNumber(normalizedCurrentPage, {
+              min: 1,
+            }),
+            firstItem: formatAssignmentResultNumber(firstVisible, { min: 0 }),
+            lastItem: formatAssignmentResultNumber(lastVisible, { min: 0 }),
+            total: formatAssignmentResultNumber(normalizedTotal, { min: 0 }),
+            totalPages: formatAssignmentResultNumber(normalizedTotalPages, {
+              min: 1,
+            }),
+          })
+        : m.assignment_list_scope_summary_empty(),
+  };
+}
+
 function getAssignmentListStatusFilterView(status: AssignmentStatusFilter) {
   return (
     assignmentStatusFilterOptions.find((option) => option.value === status) ??
@@ -511,7 +654,9 @@ export function buildAssignmentListPageViewModel<
 }): AssignmentListPageViewModel<TItem> {
   const resolvedSearch = resolveAssignmentListPageSearch(search);
   const assignments = data?.items ?? [];
-  const totalAssignments = data?.total ?? 0;
+  const totalAssignments = normalizeAssignmentListSummaryCount(
+    data?.total ?? 0
+  );
   const totalPages = getAssignmentListTotalPages({
     pageSize: ASSIGNMENT_LIST_PAGE_SIZE,
     total: totalAssignments,
@@ -559,6 +704,15 @@ export function buildAssignmentListPageViewModel<
     loadErrorMessage: assignmentListPageCopy.loadErrorMessage,
     publishedPanelContext,
     resolvedSearch,
+    scopeView: buildAssignmentListPageScopeView({
+      currentPage: resolvedSearch.currentPage,
+      pageSize: ASSIGNMENT_LIST_PAGE_SIZE,
+      search: resolvedSearch.searchQuery,
+      status: resolvedSearch.statusFilter,
+      total: totalAssignments,
+      totalPages,
+      visibleCount: assignments.length,
+    }),
     starterPreview: resolvedStarterPreview,
     summaryMetrics: buildAssignmentListSummaryMetrics({
       hasFilters: resolvedSearch.hasFilters,
@@ -827,6 +981,16 @@ function getAssignmentListCardStatusLabel({
   }
 
   return getAssignmentStatusLabel(status, expiresAt, now);
+}
+
+function normalizeAssignmentListScopePage(value: number) {
+  return Number.isInteger(value) && value > 0 ? value : 1;
+}
+
+function normalizeAssignmentListScopePageSize(value: number) {
+  return Number.isInteger(value) && value > 0
+    ? value
+    : ASSIGNMENT_LIST_PAGE_SIZE;
 }
 
 export function getAssignmentListCardActionState({

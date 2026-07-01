@@ -15,6 +15,7 @@ import {
 } from '@/assignments/list-view';
 import { AssignmentListCard } from '@/components/assignments/assignment-list-card';
 import { AssignmentListFilters } from '@/components/assignments/assignment-list-filters';
+import { AssignmentListScopePanel } from '@/components/assignments/assignment-list-scope-panel';
 import { AssignmentListSummaryCard } from '@/components/assignments/assignment-list-summary-card';
 import { PublishedAssignmentPanel } from '@/components/assignments/published-assignment-panel';
 import { DashboardPagination } from '@/components/dashboard/dashboard-pagination';
@@ -171,6 +172,10 @@ function DashboardAssignmentsPage() {
           summary={data?.summary}
           total={activePageView.totalAssignments}
         />
+
+        {routeState.status !== 'loading' ? (
+          <AssignmentListScopePanel view={activePageView.scopeView} />
+        ) : null}
 
         {routeState.showLoadError ? (
           <div className="rounded-lg border border-destructive/30 bg-destructive/5 p-4 text-sm text-destructive">

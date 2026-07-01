@@ -570,6 +570,7 @@ import {
   buildAssignmentListCardStats,
   buildAssignmentListCardViewModel,
   buildAssignmentListEmptyStateView,
+  buildAssignmentListPageScopeView,
   buildAssignmentListPageViewModel,
   buildAssignmentListRouteState,
   buildAssignmentListSearchPanelView,
@@ -23300,6 +23301,10 @@ const assignmentListFiltersComponentSource = readFileSync(
   'src/components/assignments/assignment-list-filters.tsx',
   'utf8'
 );
+const assignmentListScopePanelComponentSource = readFileSync(
+  'src/components/assignments/assignment-list-scope-panel.tsx',
+  'utf8'
+);
 const assignmentListCardComponentSource = readFileSync(
   'src/components/assignments/assignment-list-card.tsx',
   'utf8'
@@ -23773,6 +23778,11 @@ assert.match(
 );
 assert.match(
   dashboardAssignmentsRouteSource,
+  /AssignmentListScopePanel[\s\S]*view=\{activePageView\.scopeView\}/,
+  'Assignment dashboard route should render the prepared assignment-list scope panel from the page view-model.'
+);
+assert.match(
+  dashboardAssignmentsRouteSource,
   /AssignmentListCard/,
   'Assignment dashboard route should delegate assignment card rendering to the assignment list card component.'
 );
@@ -23801,10 +23811,40 @@ assert.match(
   /searchPanelView\.statusLabel[\s\S]*searchPanelView\.statusDescription[\s\S]*searchPanelView\.statusMetrics\.map/,
   'Assignment list filters component should explain the selected status filter and status counts from the domain view.'
 );
+assert.match(
+  assignmentListViewSource,
+  /export type AssignmentListPageScopeItemId =[\s\S]*'page'[\s\S]*'range'[\s\S]*'search'[\s\S]*'status'[\s\S]*export type AssignmentListPageScopeItem = \{[\s\S]*description: string;[\s\S]*id: AssignmentListPageScopeItemId;[\s\S]*label: string;[\s\S]*value: string;[\s\S]*export type AssignmentListPageScopeView = \{[\s\S]*items: AssignmentListPageScopeItem\[\];[\s\S]*label: string;[\s\S]*summary: string;/,
+  'Assignment list view domain should expose explicit current-view scope contracts with stable item ids.'
+);
+assert.match(
+  assignmentListViewSource,
+  /export function buildAssignmentListPageScopeView[\s\S]*normalizeAssignmentListSummaryCount\(total\)[\s\S]*normalizeAssignmentListSummaryCount\(visibleCount\)[\s\S]*getAssignmentListStatusFilterView\(status\)[\s\S]*assignment_list_scope_range_value[\s\S]*assignment_list_scope_page_value[\s\S]*assignment_list_scope_summary/,
+  'Assignment list scope view should normalize counts, reuse status-filter copy, and prepare localized range, page, and summary text.'
+);
+assert.match(
+  assignmentListViewSource,
+  /scopeView: buildAssignmentListPageScopeView\(\{[\s\S]*currentPage: resolvedSearch\.currentPage,[\s\S]*pageSize: ASSIGNMENT_LIST_PAGE_SIZE,[\s\S]*search: resolvedSearch\.searchQuery,[\s\S]*status: resolvedSearch\.statusFilter,[\s\S]*total: totalAssignments,[\s\S]*totalPages,[\s\S]*visibleCount: assignments\.length/,
+  'Assignment list page view-model should prepare a current-view scope from resolved search, total pages, and visible item count.'
+);
+assert.match(
+  assignmentListScopePanelComponentSource,
+  /AssignmentListPageScopeItem[\s\S]*AssignmentListPageScopeView[\s\S]*aria-label=\{view\.label\}[\s\S]*view\.summary[\s\S]*view\.items\.map[\s\S]*key=\{item\.id\}/,
+  'Assignment list scope panel should render prepared scope text and key items by stable ids.'
+);
+assert.match(
+  assignmentListScopePanelComponentSource,
+  /function AssignmentListScopeItem[\s\S]*item\.label[\s\S]*item\.value[\s\S]*item\.description/,
+  'Assignment list scope panel items should render prepared labels, values, and descriptions.'
+);
 assert.doesNotMatch(
   assignmentListFiltersComponentSource,
   /student work|homework windows|已过期作业|开放链接/,
   'Assignment list filters component should not hardcode status-filter explanatory copy.'
+);
+assert.doesNotMatch(
+  `${assignmentListScopePanelComponentSource}\n${dashboardAssignmentsRouteSource}`,
+  /Current view|Visible assignments|Search scope|Status scope|当前视图|可见作业|搜索范围|状态范围/,
+  'Assignment list route and scope panel component should not hard-code current-view scope copy.'
 );
 assert.match(
   assignmentListSummaryCardComponentSource,
@@ -28772,6 +28812,134 @@ assert.equal(
   false
 );
 assert.deepEqual(
+  buildAssignmentListPageScopeView({
+    currentPage: 2,
+    pageSize: 12,
+    search: '  Week   1 ',
+    status: 'open',
+    total: 31,
+    totalPages: 3,
+    visibleCount: 12,
+  }),
+  {
+    items: [
+      {
+        description: 'Assignments currently visible on this page.',
+        id: 'range',
+        label: 'Visible assignments',
+        value: '13-24 of 31',
+      },
+      {
+        description:
+          'The page currently shown from this filtered assignment list.',
+        id: 'page',
+        label: 'Page',
+        value: 'Page 2 of 3',
+      },
+      {
+        description:
+          'Show published links that students can still open and submit.',
+        id: 'status',
+        label: 'Status scope',
+        value: 'Open',
+      },
+      {
+        description:
+          'Only assignment links matching this search text are included.',
+        id: 'search',
+        label: 'Search scope',
+        value: 'Week 1',
+      },
+    ],
+    label: 'Current view',
+    summary: 'Showing 13-24 of 31 assignments on page 2 of 3.',
+  }
+);
+assert.deepEqual(
+  buildAssignmentListPageScopeView({
+    currentPage: 4,
+    pageSize: 12,
+    search: undefined,
+    status: 'all',
+    total: 31,
+    totalPages: 3,
+    visibleCount: 0,
+  }),
+  {
+    items: [
+      {
+        description: 'Assignments currently visible on this page.',
+        id: 'range',
+        label: 'Visible assignments',
+        value: 'No visible assignments',
+      },
+      {
+        description:
+          'This page is past the available results. The list will return to page 3.',
+        id: 'page',
+        label: 'Page',
+        value: 'Page 4 of 3',
+      },
+      {
+        description: 'All assignment lifecycle states are included.',
+        id: 'status',
+        label: 'Status scope',
+        value: 'All statuses',
+      },
+      {
+        description: 'No search text is narrowing the assignment list.',
+        id: 'search',
+        label: 'Search scope',
+        value: 'All assignment links',
+      },
+    ],
+    label: 'Current view',
+    summary: 'Page 4 is beyond the available 3 pages.',
+  }
+);
+assert.deepEqual(
+  buildAssignmentListPageScopeView({
+    currentPage: Number.NaN,
+    pageSize: 0,
+    search: '',
+    status: 'all',
+    total: Number.POSITIVE_INFINITY,
+    totalPages: Number.NaN,
+    visibleCount: -2,
+  }),
+  {
+    items: [
+      {
+        description: 'Assignments currently visible on this page.',
+        id: 'range',
+        label: 'Visible assignments',
+        value: 'No visible assignments',
+      },
+      {
+        description:
+          'The page currently shown from this filtered assignment list.',
+        id: 'page',
+        label: 'Page',
+        value: 'Page 1 of 1',
+      },
+      {
+        description: 'All assignment lifecycle states are included.',
+        id: 'status',
+        label: 'Status scope',
+        value: 'All statuses',
+      },
+      {
+        description: 'No search text is narrowing the assignment list.',
+        id: 'search',
+        label: 'Search scope',
+        value: 'All assignment links',
+      },
+    ],
+    label: 'Current view',
+    summary: 'No assignments are visible in the current list view.',
+  }
+);
+assert.deepEqual(
   buildAssignmentListSummary({
     assignments: [
       {
@@ -29133,6 +29301,7 @@ assert.deepEqual(
     hasAssignments: emptyAssignmentListPageView.hasAssignments,
     publishedPanelContext: emptyAssignmentListPageView.publishedPanelContext,
     resolvedSearch: emptyAssignmentListPageView.resolvedSearch,
+    scopeView: emptyAssignmentListPageView.scopeView,
     starterPreview: {
       assignmentIds: emptyAssignmentListPageView.starterPreview.assignments.map(
         (item) => item.assignment.id
@@ -29164,6 +29333,37 @@ assert.deepEqual(
       normalizedSearchQuery: undefined,
       searchQuery: '',
       statusFilter: 'all',
+    },
+    scopeView: {
+      items: [
+        {
+          description: 'Assignments currently visible on this page.',
+          id: 'range',
+          label: 'Visible assignments',
+          value: 'No visible assignments',
+        },
+        {
+          description:
+            'The page currently shown from this filtered assignment list.',
+          id: 'page',
+          label: 'Page',
+          value: 'Page 1 of 1',
+        },
+        {
+          description: 'All assignment lifecycle states are included.',
+          id: 'status',
+          label: 'Status scope',
+          value: 'All statuses',
+        },
+        {
+          description: 'No search text is narrowing the assignment list.',
+          id: 'search',
+          label: 'Search scope',
+          value: 'All assignment links',
+        },
+      ],
+      label: 'Current view',
+      summary: 'No assignments are visible in the current list view.',
     },
     starterPreview: {
       assignmentIds: ['assignment-food-demo'],
@@ -29416,6 +29616,7 @@ assert.deepEqual(
     hasAssignments: filteredAssignmentListPageView.hasAssignments,
     publishedPanelContext: filteredAssignmentListPageView.publishedPanelContext,
     resolvedSearch: filteredAssignmentListPageView.resolvedSearch,
+    scopeView: filteredAssignmentListPageView.scopeView,
     starterPreviewAssignmentIds:
       filteredAssignmentListPageView.starterPreview.assignments.map(
         (item) => item.assignment.id
@@ -29496,6 +29697,39 @@ assert.deepEqual(
       normalizedSearchQuery: 'Week 1',
       searchQuery: '  Week   1 ',
       statusFilter: 'open',
+    },
+    scopeView: {
+      items: [
+        {
+          description: 'Assignments currently visible on this page.',
+          id: 'range',
+          label: 'Visible assignments',
+          value: '25-25 of 31',
+        },
+        {
+          description:
+            'The page currently shown from this filtered assignment list.',
+          id: 'page',
+          label: 'Page',
+          value: 'Page 3 of 3',
+        },
+        {
+          description:
+            'Show published links that students can still open and submit.',
+          id: 'status',
+          label: 'Status scope',
+          value: 'Open',
+        },
+        {
+          description:
+            'Only assignment links matching this search text are included.',
+          id: 'search',
+          label: 'Search scope',
+          value: 'Week 1',
+        },
+      ],
+      label: 'Current view',
+      summary: 'Showing 25-25 of 31 assignments on page 3 of 3.',
     },
     starterPreviewAssignmentIds: [],
     summaryMetrics: [
