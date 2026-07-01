@@ -11,6 +11,7 @@ import {
 import { websiteConfig } from '@/config/website';
 import { m } from '@/locale/paraglide/messages';
 import { Routes } from '@/lib/routes';
+import { getPathWithLocale } from '@/lib/urls';
 import { seo } from '@/lib/seo';
 import { cn } from '@/lib/utils';
 import {
@@ -111,7 +112,7 @@ function WorksheetsPage() {
             </p>
           </div>
           <Link
-            to={pageView.templatesCta.action.to}
+            to={getPathWithLocale(pageView.templatesCta.action.to)}
             className={cn(buttonVariants(), 'w-full md:w-auto')}
           >
             {pageView.templatesCta.action.label}
@@ -130,7 +131,7 @@ function WorksheetHeroActionLink({
 }) {
   return (
     <Link
-      to={action.to}
+      to={getPathWithLocale(action.to)}
       search={action.search}
       className={cn(
         buttonVariants({

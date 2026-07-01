@@ -4780,8 +4780,8 @@ assert.match(
 );
 assert.match(
   templateDirectoryCardSource,
-  /template\.contentRequirements\.map[\s\S]*key=\{requirement\.id\}[\s\S]*requirement\.label[\s\S]*to=\{template\.action\.to\}[\s\S]*template\.action\.search/,
-  'Template directory cards should own structured requirement badges and create actions.'
+  /template\.contentRequirements\.map[\s\S]*key=\{requirement\.id\}[\s\S]*requirement\.label[\s\S]*to=\{getPathWithLocale\(template\.action\.to\)\}[\s\S]*template\.action\.search/,
+  'Template directory cards should own structured requirement badges and locale-aware create actions.'
 );
 assert.doesNotMatch(
   templateDirectoryCardSource,
@@ -4797,6 +4797,11 @@ assert.doesNotMatch(
   templatesRouteSource,
   /IconDeviceGamepad2|CardHeader|CardContent|contentRequirements\.map|template\.bestForLabel|template\.classroomModeLabel/,
   'Templates route should not rebuild low-level template card presentation locally.'
+);
+assert.match(
+  templatesRouteSource,
+  /to=\{getPathWithLocale\(pageView\.hero\.createAction\.to\)\}[\s\S]*pageView\.hero\.createAction\.search[\s\S]*to=\{pageView\.hero\.studentPreviewAction\.to\}[\s\S]*to=\{getPathWithLocale\(pageView\.footer\.createAction\.to\)\}/,
+  'Templates route should preserve locale for public create CTAs while keeping the student preview share link raw.'
 );
 assert.match(
   worksheetsRouteSource,
@@ -4840,8 +4845,8 @@ assert.doesNotMatch(
 );
 assert.match(
   worksheetsRouteSource,
-  /pageView\.templatesCta\.action\.to[\s\S]*pageView\.templatesCta\.action\.label/,
-  'Worksheets route should render the prepared templates CTA action.'
+  /to=\{getPathWithLocale\(pageView\.templatesCta\.action\.to\)\}[\s\S]*pageView\.templatesCta\.action\.label/,
+  'Worksheets route should render the prepared templates CTA action with the current locale.'
 );
 assert.doesNotMatch(
   worksheetsRouteSource,
@@ -4875,8 +4880,8 @@ assert.match(
 );
 assert.match(
   worksheetsRouteSource,
-  /function WorksheetHeroActionLink[\s\S]*to=\{action\.to\}[\s\S]*action\.search[\s\S]*action\.isPrimary[\s\S]*action\.label/,
-  'Worksheet hero action links should render prepared create-entry actions.'
+  /function WorksheetHeroActionLink[\s\S]*to=\{getPathWithLocale\(action\.to\)\}[\s\S]*action\.search[\s\S]*action\.isPrimary[\s\S]*action\.label/,
+  'Worksheet hero action links should render prepared locale-aware create-entry actions.'
 );
 assert.match(
   worksheetsRouteSource,
@@ -4895,8 +4900,8 @@ assert.match(
 );
 assert.match(
   worksheetModeCardSource,
-  /mode\.contentRequirements\.map[\s\S]*key=\{requirement\.id\}[\s\S]*requirement\.label[\s\S]*to=\{mode\.action\.to\}[\s\S]*mode\.action\.search/,
-  'Worksheet mode cards should render structured content requirement badges before the create action.'
+  /mode\.contentRequirements\.map[\s\S]*key=\{requirement\.id\}[\s\S]*requirement\.label[\s\S]*to=\{getPathWithLocale\(mode\.action\.to\)\}[\s\S]*mode\.action\.search/,
+  'Worksheet mode cards should render structured content requirement badges before the locale-aware create action.'
 );
 assert.doesNotMatch(
   worksheetModeCardSource,
@@ -8123,6 +8128,10 @@ const retiredRouteDocumentationText = [
   .map((filePath) => readFileSync(filePath, 'utf8'))
   .join('\n');
 const e2eTestCatalogText = readFileSync('tests/e2e/TEST-CATALOG.md', 'utf8');
+const publicPagesSpecSource = readFileSync(
+  'tests/e2e/specs/public-pages.spec.ts',
+  'utf8'
+);
 const localeMessageText = [
   'project.inlang/messages/en.json',
   'project.inlang/messages/zh.json',
@@ -8181,6 +8190,31 @@ assert.doesNotMatch(
   'Retired legacy routes should not be documented as active migration pages.'
 );
 assert.match(e2eTestCatalogText, /retired legacy learning routes/);
+assert.match(
+  publicPagesSpecSource,
+  /readLocaleMessages\('en'\)[\s\S]*readLocaleMessages\('zh'\)/,
+  'Public entry E2E tests should load expected copy from locale message files for both supported locales.'
+);
+assert.match(
+  publicPagesSpecSource,
+  /for \(const locale of \['en', 'zh'\] as const\)[\s\S]*worksheets page enters template-specific creation flows in \$\{locale\}[\s\S]*templates page enters template-specific creation flows in \$\{locale\}/,
+  'Public entry E2E tests should exercise template and worksheet creation flows in English and Chinese.'
+);
+assert.match(
+  publicPagesSpecSource,
+  /getLocaleMessage\(locale, 'worksheets_page_title'\)[\s\S]*getLocaleMessage\(locale, mode\.titleKey\)[\s\S]*getLocaleMessage\(locale, mode\.actionKey\)[\s\S]*getLocaleMessage\(locale, 'templates_page_title'\)[\s\S]*getTemplateEntryActionLabel\(locale, action\.shortNameKey\)/,
+  'Public entry E2E tests should assert localized headings, worksheet mode titles, and create actions through locale keys.'
+);
+assert.match(
+  publicPagesSpecSource,
+  /localizedPath\(`\/create\?template=\$\{mode\.template\}`, locale\)[\s\S]*localizedPath\(`\/create\?template=\$\{action\.template\}`, locale\)[\s\S]*expectedLocalizedUrlPattern\('\/create\?template=line-match', locale\)/,
+  'Public entry E2E tests should verify locale-aware template creation URLs.'
+);
+assert.doesNotMatch(
+  publicPagesSpecSource,
+  /worksheet modes for the same activity content|pick a game format for the same lesson content|Draw lines for food words|Primary template/,
+  'Public entry E2E tests should not hard-code localized public template copy.'
+);
 assert.doesNotMatch(
   localeMessageText,
   /settings_api_keys_|latest news and updates|Join the community|Manage your account information|Manage your security settings|Manage your notification preferences|管理您的账户信息|管理您的安全设置|管理您的通知偏好|加入我们的社区|最新资讯与更新/,

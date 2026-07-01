@@ -1,3 +1,4 @@
+import { readFileSync } from 'node:fs';
 import { expect, test } from '@playwright/test';
 import {
   expectHealthyPage,
@@ -52,6 +53,107 @@ const classroomContactCases = [
     locale: 'zh',
   },
 ] as const;
+type LocaleMessages = Record<string, string>;
+
+const localeMessages: Record<LocaleMode, LocaleMessages> = {
+  en: readLocaleMessages('en'),
+  zh: readLocaleMessages('zh'),
+};
+
+const worksheetEntryCases = [
+  {
+    actionKey: 'worksheets_page_mode_fill_blank_action',
+    template: 'fill-blank',
+    titleKey: 'worksheets_page_mode_fill_blank_title',
+  },
+  {
+    actionKey: 'worksheets_page_mode_line_match_action',
+    template: 'line-match',
+    titleKey: 'worksheets_page_mode_line_match_title',
+  },
+  {
+    actionKey: 'worksheets_page_mode_listening_action',
+    template: 'listening',
+    titleKey: 'worksheets_page_mode_listening_title',
+  },
+  {
+    actionKey: 'worksheets_page_mode_group_sort_action',
+    template: 'group-sort',
+    titleKey: 'worksheets_page_mode_group_sort_title',
+  },
+] as const;
+
+const templateEntryCases = [
+  { shortNameKey: 'activity_template_quiz_short_name', template: 'quiz' },
+  {
+    shortNameKey: 'activity_template_match_up_short_name',
+    template: 'match-up',
+  },
+  {
+    shortNameKey: 'activity_template_line_match_short_name',
+    template: 'line-match',
+  },
+  {
+    shortNameKey: 'activity_template_group_sort_short_name',
+    template: 'group-sort',
+  },
+  {
+    shortNameKey: 'activity_template_fill_blank_short_name',
+    template: 'fill-blank',
+  },
+  {
+    shortNameKey: 'activity_template_listening_short_name',
+    template: 'listening',
+  },
+  {
+    shortNameKey: 'activity_template_matching_pairs_short_name',
+    template: 'matching-pairs',
+  },
+  {
+    shortNameKey: 'activity_template_open_box_short_name',
+    template: 'open-box',
+  },
+] as const;
+
+function readLocaleMessages(locale: LocaleMode): LocaleMessages {
+  return JSON.parse(
+    readFileSync(
+      new URL(
+        `../../../project.inlang/messages/${locale}.json`,
+        import.meta.url
+      ),
+      'utf8'
+    )
+  ) as LocaleMessages;
+}
+
+function getLocaleMessage(locale: LocaleMode, key: string) {
+  const value = localeMessages[locale][key];
+  if (!value) throw new Error(`Missing locale message ${locale}:${key}`);
+
+  return value;
+}
+
+function formatLocaleMessage(message: string, values: Record<string, string>) {
+  return message.replace(/\{(\w+)\}/g, (placeholder, key) => {
+    return values[key] ?? placeholder;
+  });
+}
+
+function getTemplateEntryActionLabel(locale: LocaleMode, shortNameKey: string) {
+  return formatLocaleMessage(
+    getLocaleMessage(locale, 'activity_template_start_action'),
+    { template: getLocaleMessage(locale, shortNameKey) }
+  );
+}
+
+function expectedLocalizedUrlPattern(path: string, locale: LocaleMode) {
+  return new RegExp(`${escapeRegExp(localizedPath(path, locale))}$`);
+}
+
+function escapeRegExp(value: string) {
+  return value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
 
 test.describe('public page smoke coverage', () => {
   for (const { locale, theme } of smokeMatrix) {
@@ -109,122 +211,113 @@ test.describe('public page smoke coverage', () => {
     });
   }
 
-  test('worksheets page enters template-specific creation flows', async ({
-    page,
-  }) => {
-    await setTheme(page, 'light');
-    const monitor = installPageHealthMonitor(page);
+  for (const locale of ['en', 'zh'] as const) {
+    test(`worksheets page enters template-specific creation flows in ${locale}`, async ({
+      page,
+    }) => {
+      await setTheme(page, 'light');
+      const monitor = installPageHealthMonitor(page);
 
-    await expectHealthyPage(page, monitor, '/worksheets', { theme: 'light' });
-
-    await expect(
-      page.getByRole('heading', {
-        name: /worksheet modes for the same activity content/i,
-      })
-    ).toBeVisible();
-
-    for (const text of [
-      'Fill blanks',
-      'Line matching',
-      'Listening prompts',
-      'Drag sorting',
-    ]) {
-      await expect(page.getByText(text)).toBeVisible();
-    }
-
-    const actions = [
-      { name: /create fill blanks/i, template: 'fill-blank' },
-      { name: /start line match/i, template: 'line-match' },
-      { name: /create listening/i, template: 'listening' },
-      { name: /create sort/i, template: 'group-sort' },
-    ] as const;
-
-    for (const action of actions) {
-      const link = page.getByRole('link', { name: action.name }).first();
-
-      await expect(link).toHaveAttribute(
-        'href',
-        `/create?template=${action.template}`
+      await expectHealthyPage(
+        page,
+        monitor,
+        localizedPath('/worksheets', locale),
+        { theme: 'light' }
       );
-    }
 
-    const bodyText = (await page.locator('body').innerText()).trim();
-    expect(bodyText).not.toMatch(/HSK|Hanzi|Lang Study|getlangstudy/i);
-    monitor.expectNoErrors('worksheets template entry');
-  });
+      await expect(
+        page.getByRole('heading', {
+          name: getLocaleMessage(locale, 'worksheets_page_title'),
+        })
+      ).toBeVisible();
 
-  test('templates page enters template-specific creation flows', async ({
-    page,
-  }) => {
-    await setTheme(page, 'light');
-    const monitor = installPageHealthMonitor(page);
+      for (const mode of worksheetEntryCases) {
+        await expect(
+          page.getByText(getLocaleMessage(locale, mode.titleKey))
+        ).toBeVisible();
 
-    await expectHealthyPage(page, monitor, '/templates', { theme: 'light' });
+        const link = page
+          .getByRole('link', {
+            name: getLocaleMessage(locale, mode.actionKey),
+          })
+          .first();
 
-    await expect(
-      page.getByRole('heading', {
-        name: /pick a game format for the same lesson content/i,
-      })
-    ).toBeVisible();
+        await expect(link).toHaveAttribute(
+          'href',
+          localizedPath(`/create?template=${mode.template}`, locale)
+        );
+      }
 
-    const actions = [
-      {
-        name: /start quiz/i,
-        template: 'quiz',
-      },
-      {
-        name: /start match/i,
-        template: 'match-up',
-      },
-      {
-        name: /start lines/i,
-        template: 'line-match',
-      },
-      {
-        name: /start sort/i,
-        template: 'group-sort',
-      },
-      {
-        name: /start fill/i,
-        template: 'fill-blank',
-      },
-      {
-        name: /start listen/i,
-        template: 'listening',
-      },
-      {
-        name: /start pairs/i,
-        template: 'matching-pairs',
-      },
-      {
-        name: /start box/i,
-        template: 'open-box',
-      },
-    ] as const;
+      const bodyText = (await page.locator('body').innerText()).trim();
+      expect(bodyText).not.toMatch(/HSK|Hanzi|Lang Study|getlangstudy/i);
+      monitor.expectNoErrors(`worksheets template entry ${locale}`);
+    });
 
-    for (const action of actions) {
-      const link = page.getByRole('link', { name: action.name }).first();
+    test(`templates page enters template-specific creation flows in ${locale}`, async ({
+      page,
+    }) => {
+      await setTheme(page, 'light');
+      const monitor = installPageHealthMonitor(page);
 
-      await expect(link).toHaveAttribute(
-        'href',
-        `/create?template=${action.template}`
+      await expectHealthyPage(
+        page,
+        monitor,
+        localizedPath('/templates', locale),
+        { theme: 'light' }
       );
-    }
 
-    await page
-      .getByRole('link', { name: /start lines/i })
-      .first()
-      .click();
-    await expect(page).toHaveURL(/\/create\?template=line-match$/);
-    await expect(
-      page.getByDisplayValue('Draw lines for food words')
-    ).toBeVisible();
-    await expect(page.getByLabel('Primary template')).toHaveValue('line-match');
+      await expect(
+        page.getByRole('heading', {
+          name: getLocaleMessage(locale, 'templates_page_title'),
+        })
+      ).toBeVisible();
 
-    const bodyText = (await page.locator('body').innerText()).trim();
-    expect(bodyText).not.toMatch(/HSK|Hanzi|Lang Study|getlangstudy/i);
-    monitor.expectNoErrors('templates template entry');
-  });
+      for (const action of templateEntryCases) {
+        const link = page
+          .getByRole('link', {
+            name: getTemplateEntryActionLabel(locale, action.shortNameKey),
+          })
+          .first();
+
+        await expect(link).toHaveAttribute(
+          'href',
+          localizedPath(`/create?template=${action.template}`, locale)
+        );
+      }
+
+      const lineMatchAction = templateEntryCases.find(
+        (action) => action.template === 'line-match'
+      );
+      if (!lineMatchAction) throw new Error('Missing line-match action case.');
+
+      await page
+        .getByRole('link', {
+          name: getTemplateEntryActionLabel(
+            locale,
+            lineMatchAction.shortNameKey
+          ),
+        })
+        .first()
+        .click();
+      await expect(page).toHaveURL(
+        expectedLocalizedUrlPattern('/create?template=line-match', locale)
+      );
+      await expect(
+        page.getByDisplayValue(
+          getLocaleMessage(locale, 'activity_scaffold_line_match_title')
+        )
+      ).toBeVisible();
+      await expect(
+        page.getByLabel(
+          getLocaleMessage(locale, 'activity_form_field_primary_template')
+        )
+      ).toHaveValue('line-match');
+
+      const bodyText = (await page.locator('body').innerText()).trim();
+      expect(bodyText).not.toMatch(/HSK|Hanzi|Lang Study|getlangstudy/i);
+      monitor.expectNoErrors(`templates template entry ${locale}`);
+    });
+  }
 
   test('health check responds with pong', async ({ request }) => {
     const response = await request.get('/api/ping');

@@ -3,6 +3,7 @@ import type { WorksheetModeTemplate } from '@/activities/worksheet-modes';
 import { Badge } from '@/components/ui/badge';
 import { buttonVariants } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
+import { getPathWithLocale } from '@/lib/urls';
 import {
   IconCategory2,
   IconClipboardText,
@@ -42,7 +43,7 @@ export function WorksheetModeCard({ mode }: WorksheetModeCardProps) {
         </div>
       ) : null}
       <Link
-        to={mode.action.to}
+        to={getPathWithLocale(mode.action.to)}
         search={mode.action.search}
         className={cn(
           buttonVariants({ variant: 'outline' }),

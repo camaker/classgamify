@@ -3,6 +3,7 @@ import { TemplateDirectoryCard } from '@/components/activities/template-director
 import { Badge } from '@/components/ui/badge';
 import { buildTemplatesPageViewModel } from '@/activities/entry-page-view';
 import { websiteConfig } from '@/config/website';
+import { getPathWithLocale } from '@/lib/urls';
 import { m } from '@/locale/paraglide/messages';
 import { seo } from '@/lib/seo';
 import { buttonVariants } from '@/components/ui/button';
@@ -38,7 +39,7 @@ function TemplatesPage() {
           </p>
           <div className="flex flex-col gap-3 sm:flex-row">
             <Link
-              to={pageView.hero.createAction.to}
+              to={getPathWithLocale(pageView.hero.createAction.to)}
               search={pageView.hero.createAction.search}
               className={cn(buttonVariants(), 'w-fit')}
             >
@@ -76,7 +77,7 @@ function TemplatesPage() {
               </p>
             </div>
             <Link
-              to={pageView.footer.createAction.to}
+              to={getPathWithLocale(pageView.footer.createAction.to)}
               className={cn(buttonVariants(), 'w-fit')}
             >
               <IconPlus className="size-4" />
