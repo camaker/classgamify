@@ -126,6 +126,7 @@ export type StudentRunnerMissingPageView = {
 
 export type StudentRunnerIdentityView =
   | {
+      description: string;
       disabled: boolean;
       label: string;
       mode: 'student-name';
@@ -822,11 +823,15 @@ function buildStudentRunnerIdentityView({
 }): StudentRunnerIdentityView {
   if (collectStudentName) {
     const runnerCopy = getStudentRunnerCopy();
+    const disabled =
+      isSubmitting ||
+      normalizeStudentRunnerSubmittedAttemptCount(submittedAttemptCount) > 0;
 
     return {
-      disabled:
-        isSubmitting ||
-        normalizeStudentRunnerSubmittedAttemptCount(submittedAttemptCount) > 0,
+      description: disabled
+        ? runnerCopy.studentNameLockedDescription
+        : runnerCopy.studentNameDescription,
+      disabled,
       label: runnerCopy.studentNameLabel,
       mode: 'student-name',
       placeholder: runnerCopy.studentNamePlaceholder,

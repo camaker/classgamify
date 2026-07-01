@@ -8132,6 +8132,10 @@ const publicPagesSpecSource = readFileSync(
   'tests/e2e/specs/public-pages.spec.ts',
   'utf8'
 );
+const studentRunnerSpecSource = readFileSync(
+  'tests/e2e/specs/student-runner.spec.ts',
+  'utf8'
+);
 const localeMessageText = [
   'project.inlang/messages/en.json',
   'project.inlang/messages/zh.json',
@@ -8215,6 +8219,26 @@ assert.doesNotMatch(
   /worksheet modes for the same activity content|pick a game format for the same lesson content|Draw lines for food words|Primary template/,
   'Public entry E2E tests should not hard-code localized public template copy.'
 );
+assert.match(
+  studentRunnerSpecSource,
+  /readLocaleMessages\('en'\)[\s\S]*readLocaleMessages\('zh'\)/,
+  'Student runner E2E tests should load expected copy from locale message files for both supported locales.'
+);
+assert.match(
+  studentRunnerSpecSource,
+  /getLocaleMessage\('en', 'activity_starter_assignment_food_title'\)[\s\S]*getLocaleMessage\('en', 'student_runner_student_name_label'\)[\s\S]*getLocaleMessage\('en', 'student_runner_student_name_description'\)[\s\S]*getLocaleMessage\('en', 'student_attempt_submit_answers'\)[\s\S]*getLocaleMessage\('en', 'student_runner_read_only_preview'\)/,
+  'Student runner E2E tests should assert starter runner copy through locale keys.'
+);
+assert.match(
+  studentRunnerSpecSource,
+  /formatLocaleMessage\([\s\S]*getLocaleMessage\('en', 'student_attempt_progress_label'\)[\s\S]*answeredCount: '0'[\s\S]*answeredCount: '1'[\s\S]*answeredCount: '2'/,
+  'Student runner E2E tests should build progress labels from localized message templates.'
+);
+assert.doesNotMatch(
+  studentRunnerSpecSource,
+  /Food words homework|Student name|Preview assignments are read-only|Submit answers|Create activity|0\/3 answered|1\/3 answered|2\/3 answered/,
+  'Student runner E2E tests should not hard-code visible English runner copy.'
+);
 assert.doesNotMatch(
   localeMessageText,
   /settings_api_keys_|latest news and updates|Join the community|Manage your account information|Manage your security settings|Manage your notification preferences|管理您的账户信息|管理您的安全设置|管理您的通知偏好|加入我们的社区|最新资讯与更新/,
@@ -8231,6 +8255,8 @@ for (const key of [
   'student_runner_review_summary_title',
   'student_runner_review_summary_unanswered_label',
   'student_runner_review_summary_visible_description',
+  'student_runner_student_name_description',
+  'student_runner_student_name_locked_description',
 ]) {
   assert.ok(enLocaleMessages[key], `Missing English locale key: ${key}`);
   assert.ok(zhLocaleMessages[key], `Missing Chinese locale key: ${key}`);
@@ -8968,13 +8994,13 @@ assert.match(
 );
 assert.match(
   studentRunnerStateSource,
-  /export type StudentRunnerLoadingView = \{[\s\S]*export type StudentRunnerMissingPageView = \{[\s\S]*export type StudentRunnerIdentityView =[\s\S]*export type StudentRunnerControlView = \{[\s\S]*export type StudentRunnerResultPanelView =[\s\S]*export type StudentRunnerActivityPreviewView = \{[\s\S]*export type StudentRunnerRuntimeListView = \{[\s\S]*export type StudentRunnerPageViewModel = \{/,
+  /export type StudentRunnerLoadingView = \{[\s\S]*export type StudentRunnerMissingPageView = \{[\s\S]*export type StudentRunnerIdentityView =[\s\S]*description: string;[\s\S]*disabled: boolean;[\s\S]*export type StudentRunnerControlView = \{[\s\S]*export type StudentRunnerResultPanelView =[\s\S]*export type StudentRunnerActivityPreviewView = \{[\s\S]*export type StudentRunnerRuntimeListView = \{[\s\S]*export type StudentRunnerPageViewModel = \{/,
   'Student runner state domain should export focused route-facing page and sub-view contracts.'
 );
 assert.match(
   studentRunnerSubmissionSource,
-  /export type AnonymousAttemptCopy = \{[\s\S]*export type StudentAttemptResultDisplay = \{[\s\S]*export type StudentAttemptControlState = \{[\s\S]*export type StudentAttemptTimerBadge = \{/,
-  'Student submission domain should expose explicit anonymous copy, control, result, and timer badge contracts.'
+  /type StudentRunnerCopy = \{[\s\S]*studentNameDescription: string;[\s\S]*studentNameLockedDescription: string;[\s\S]*export type AnonymousAttemptCopy = \{[\s\S]*export type StudentAttemptResultDisplay = \{[\s\S]*export type StudentAttemptControlState = \{[\s\S]*export type StudentAttemptTimerBadge = \{/,
+  'Student submission domain should expose explicit identity copy, control, result, and timer badge contracts.'
 );
 assert.match(
   pureAttemptDurationSource,
@@ -9142,8 +9168,17 @@ assert.match(
 );
 assert.match(
   studentRunnerAttemptShellSource,
-  /function StudentRunnerIdentityPanel[\s\S]*identityView\.mode === 'student-name'[\s\S]*id="student-name"[\s\S]*disabled=\{identityView\.disabled\}[\s\S]*identityView\.copy\.description/,
+  /function StudentRunnerIdentityPanel[\s\S]*identityView\.mode === 'student-name'[\s\S]*id="student-name"[\s\S]*disabled=\{identityView\.disabled\}[\s\S]*identityView\.description[\s\S]*identityView\.copy\.description/,
   'Student runner identity panel should render prepared named-student lock state and anonymous browser identity views.'
+);
+assert.doesNotMatch(
+  getSourceSlice(
+    studentRunnerAttemptShellSource,
+    "if (identityView.mode === 'student-name')",
+    'return ('
+  ),
+  /identityView\.copy/,
+  'Named-student identity panel should not read anonymous-only copy fields.'
 );
 assert.match(
   studentRunnerAttemptShellSource,
@@ -10151,7 +10186,10 @@ assert.deepEqual(getStudentRunnerCopy(), {
   seoTitlePrefix: 'Student activity',
   startAnotherAttemptLabel: 'Start another attempt',
   missingStudentNameMessage: 'Type your name before submitting.',
+  studentNameDescription: 'Type the name your teacher should see in results.',
   studentNameLabel: 'Student name',
+  studentNameLockedDescription:
+    'This name is saved for this assignment link and stays locked for the next attempt.',
   studentNamePlaceholder: 'Type your name',
   submissionFailureMessage: 'Attempt could not be saved.',
   submissionPendingLabel: 'Submitting...',
@@ -18841,6 +18879,7 @@ const namedStudentRunnerPageView = buildStudentRunnerPageViewModel({
   submittedAttemptCount: 0,
 });
 assert.deepEqual(namedStudentRunnerPageView.identityView, {
+  description: 'Type the name your teacher should see in results.',
   disabled: false,
   label: 'Student name',
   mode: 'student-name',
@@ -18882,6 +18921,8 @@ const submittedNamedStudentRunnerPageView = buildStudentRunnerPageViewModel({
 assert.deepEqual(
   submittedNamedStudentRunnerPageView.identityView,
   {
+    description:
+      'This name is saved for this assignment link and stays locked for the next attempt.',
     disabled: true,
     label: 'Student name',
     mode: 'student-name',

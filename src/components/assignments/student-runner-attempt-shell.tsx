@@ -125,7 +125,7 @@ function StudentRunnerIdentityPanel({
           id={studentNameDescriptionId}
           className="mt-1 text-xs leading-5 text-muted-foreground"
         >
-          {identityView.copy.description}
+          {identityView.description}
         </p>
       </div>
     );

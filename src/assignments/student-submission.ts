@@ -189,7 +189,9 @@ type StudentRunnerCopy = {
   seoTitlePrefix: string;
   startAnotherAttemptLabel: string;
   missingStudentNameMessage: string;
+  studentNameDescription: string;
   studentNameLabel: string;
+  studentNameLockedDescription: string;
   studentNamePlaceholder: string;
   submissionFailureMessage: string;
   submissionPendingLabel: string;
@@ -373,8 +375,14 @@ const STUDENT_RUNNER_COPY = {
   get missingStudentNameMessage() {
     return m.student_runner_missing_student_name();
   },
+  get studentNameDescription() {
+    return m.student_runner_student_name_description();
+  },
   get studentNameLabel() {
     return m.student_runner_student_name_label();
+  },
+  get studentNameLockedDescription() {
+    return m.student_runner_student_name_locked_description();
   },
   get studentNamePlaceholder() {
     return m.student_runner_student_name_placeholder();
