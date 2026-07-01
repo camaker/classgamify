@@ -19,6 +19,7 @@ import { AssignmentResultsItemAnalysisCard } from '@/components/assignments/assi
 import { AssignmentResultsItemPerformanceSortControl } from '@/components/assignments/assignment-results-item-performance-sort-control';
 import { AssignmentResultsItemPerformanceTable } from '@/components/assignments/assignment-results-item-performance-table';
 import { AssignmentResultsMetricCard } from '@/components/assignments/assignment-results-metric-card';
+import { AssignmentResultsReviewScopePanel } from '@/components/assignments/assignment-results-review-scope-panel';
 import { AssignmentResultsStudentSearch } from '@/components/assignments/assignment-results-student-search';
 import { AssignmentResultsStudentSummaryTable } from '@/components/assignments/assignment-results-student-summary-table';
 import { DashboardLayout } from '@/components/layout/dashboard-layout';
@@ -162,6 +163,7 @@ function LoadedAssignmentResultsPage({
               sectionViews={sectionViews}
             />
           ) : null}
+          <AssignmentResultsReviewScopePanel view={pageView.reviewScopeView} />
           <AssignmentResultsStudentSearch
             onClear={() =>
               onControlChange({ control: 'student-search', value: '' })

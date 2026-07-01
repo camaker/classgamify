@@ -644,6 +644,7 @@ import {
   buildAssignmentResultSectionViews,
   buildAssignmentResultControlViews,
   buildAssignmentResultCopyScopeView,
+  buildAssignmentResultReviewScopeView,
   buildAssignmentResultReviewScopeSummary,
   buildAssignmentResultViewModel,
   buildAssignmentResultsPageViewModel,
@@ -5075,6 +5076,10 @@ const assignmentResultsClassroomBriefCardSource = readFileSync(
   'src/components/assignments/assignment-results-classroom-brief-card.tsx',
   'utf8'
 );
+const assignmentResultsReviewScopePanelSource = readFileSync(
+  'src/components/assignments/assignment-results-review-scope-panel.tsx',
+  'utf8'
+);
 const assignmentResultsStudentSearchSource = readFileSync(
   'src/components/assignments/assignment-results-student-search.tsx',
   'utf8'
@@ -5390,6 +5395,36 @@ assert.match(
   assignmentResultRouteSource,
   /<AssignmentResultsClassroomBriefCard[\s\S]*brief=\{pageView\.classroomBrief\}[\s\S]*copyArtifactPreviews=\{pageView\.copyArtifactPreviews\}[\s\S]*copyScopeView=\{pageView\.copyScopeView\}[\s\S]*onResultAction=\{\(actionButton\) =>[\s\S]*void onResultAction\(actionButton\)[\s\S]*sectionViews=\{sectionViews\}/,
   'Assignment result route should pass prepared copy artifact previews, copy scope, section views, and the result action handler into the classroom brief card.'
+);
+assert.match(
+  assignmentResultRouteSource,
+  /AssignmentResultsReviewScopePanel[\s\S]*view=\{pageView\.reviewScopeView\}/,
+  'Assignment result route should render the prepared current review-scope panel from the page view-model.'
+);
+assert.match(
+  assignmentResultViewSource,
+  /export type AssignmentResultReviewScopeItemView = \{[\s\S]*description: string;[\s\S]*id: AssignmentResultReviewScopeItemId;[\s\S]*label: string;[\s\S]*value: string;[\s\S]*export type AssignmentResultReviewScopeSummaryItemView = \{[\s\S]*id: AssignmentResultReviewScopeSummaryItemId;[\s\S]*label: string;[\s\S]*value: string;[\s\S]*export type AssignmentResultReviewScopeView = \{[\s\S]*description: string;[\s\S]*itemViews: AssignmentResultReviewScopeItemView\[\];[\s\S]*summaryItems: AssignmentResultReviewScopeSummaryItemView\[\];[\s\S]*summaryLabel: string;[\s\S]*title: string;/,
+  'Assignment result view domain should expose explicit current review-scope panel contracts.'
+);
+assert.match(
+  assignmentResultViewSource,
+  /export function buildAssignmentResultReviewScopeView\(\{[\s\S]*controlViews,[\s\S]*summary,[\s\S]*\}\)[\s\S]*controlViews\.studentSearch\.value[\s\S]*controlViews\.studentSearch\.selectedSortOption[\s\S]*controlViews\.itemPerformanceSort\.selectedSortOption[\s\S]*controlViews\.attemptReviewFilter\.selectedFilterOption[\s\S]*buildAssignmentResultReviewScopeSummaryItems\(summary\)/,
+  'Assignment result review scope should derive student search, student sort, item sort, review filter, and matched counts from prepared control views and shared scope summary.'
+);
+assert.match(
+  assignmentResultViewSource,
+  /const reviewScopeView = buildAssignmentResultReviewScopeView\(\{[\s\S]*controlViews,[\s\S]*summary: resultView\.reviewScope\.summary,[\s\S]*\}\)[\s\S]*reviewScopeView,/,
+  'Assignment result page view-model should prepare current review-scope text from the same shared review scope summary used by copy artifacts.'
+);
+assert.match(
+  assignmentResultsReviewScopePanelSource,
+  /AssignmentResultReviewScopeItemView[\s\S]*AssignmentResultReviewScopeSummaryItemView[\s\S]*AssignmentResultReviewScopeView[\s\S]*aria-label=\{view\.title\}[\s\S]*view\.itemViews\.map[\s\S]*key=\{itemView\.id\}[\s\S]*view\.summaryItems\.map[\s\S]*key=\{summaryItem\.id\}/,
+  'Assignment result review-scope panel should render prepared scope and summary items keyed by stable ids.'
+);
+assert.doesNotMatch(
+  `${assignmentResultsReviewScopePanelSource}\n${assignmentResultRouteSource}`,
+  /Current review scope|Matched records|Student search|学生搜索|当前复盘范围|匹配记录/,
+  'Assignment result route and review-scope panel component should not hard-code current review-scope copy.'
 );
 assert.doesNotMatch(
   assignmentResultRouteSource,
@@ -38656,6 +38691,67 @@ const expectedScoredCopyPreviewScope = {
   title: 'Copy scope',
 };
 assert.deepEqual(
+  buildAssignmentResultReviewScopeView({
+    controlViews: scoredResultsPageView.controlViews,
+    summary: scoredResultsPageView.resultView.reviewScope.summary,
+  }),
+  {
+    description:
+      'Tables, answer cards, and copied classroom artifacts follow this current review scope.',
+    itemViews: [
+      {
+        description:
+          'Which students and attempts are included in the visible result tables.',
+        id: 'student-search',
+        label: 'Student search',
+        value: 'Alice',
+      },
+      {
+        description: 'Use alphabetical order for grading or roster checks.',
+        id: 'student-sort',
+        label: 'Student sort',
+        value: 'Student name',
+      },
+      {
+        description: 'Surface the prompts with the lowest correct rate first.',
+        id: 'item-sort',
+        label: 'Sort items',
+        value: 'Lowest accuracy',
+      },
+      {
+        description:
+          'Focus the answer review on submissions with at least one missed or unanswered item.',
+        id: 'answer-review',
+        label: 'Answer review',
+        value: 'Needs review only',
+      },
+    ],
+    summaryItems: [
+      { id: 'students', label: 'Students', value: '1/1' },
+      { id: 'attempts', label: 'Attempts', value: '1/1' },
+      { id: 'items', label: 'Items', value: '2/2' },
+      { id: 'answer-reviews', label: 'Answer review', value: '1/1' },
+    ],
+    summaryLabel: 'Matched records',
+    title: 'Current review scope',
+  }
+);
+assert.equal(
+  buildAssignmentResultReviewScopeView({
+    controlViews: buildAssignmentResultControlViews({
+      resultSearchSummary: 'All students',
+      viewState: {
+        attemptReviewFilter: 'all',
+        itemPerformanceSort: 'original',
+        studentSearch: '',
+        studentSort: 'needs-review',
+      },
+    }),
+    summary: scoredResultsPageView.resultView.reviewScope.summary,
+  }).itemViews[0]?.value,
+  'All students'
+);
+assert.deepEqual(
   {
     actionDisabled: scoredResultsPageView.actionButtons.map((button) => [
       button.id,
@@ -38837,6 +38933,26 @@ assert.deepEqual(
       metric.key,
       metric.value,
     ]),
+    reviewScopeView: {
+      description: scoredResultsPageView.reviewScopeView.description,
+      itemViews: scoredResultsPageView.reviewScopeView.itemViews.map(
+        (itemView) => [
+          itemView.id,
+          itemView.label,
+          itemView.value,
+          itemView.description,
+        ]
+      ),
+      summaryItems: scoredResultsPageView.reviewScopeView.summaryItems.map(
+        (summaryItem) => [
+          summaryItem.id,
+          summaryItem.label,
+          summaryItem.value,
+        ]
+      ),
+      summaryLabel: scoredResultsPageView.reviewScopeView.summaryLabel,
+      title: scoredResultsPageView.reviewScopeView.title,
+    },
     sectionState: scoredResultsPageView.sectionState,
     sectionViews: {
       answerReview: {
@@ -39148,6 +39264,44 @@ assert.deepEqual(
       ['average-time', '30s'],
       ['closes', 'No close time'],
     ],
+    reviewScopeView: {
+      description:
+        'Tables, answer cards, and copied classroom artifacts follow this current review scope.',
+      itemViews: [
+        [
+          'student-search',
+          'Student search',
+          'Alice',
+          'Which students and attempts are included in the visible result tables.',
+        ],
+        [
+          'student-sort',
+          'Student sort',
+          'Student name',
+          'Use alphabetical order for grading or roster checks.',
+        ],
+        [
+          'item-sort',
+          'Sort items',
+          'Lowest accuracy',
+          'Surface the prompts with the lowest correct rate first.',
+        ],
+        [
+          'answer-review',
+          'Answer review',
+          'Needs review only',
+          'Focus the answer review on submissions with at least one missed or unanswered item.',
+        ],
+      ],
+      summaryItems: [
+        ['students', 'Students', '1/1'],
+        ['attempts', 'Attempts', '1/1'],
+        ['items', 'Items', '2/2'],
+        ['answer-reviews', 'Answer review', '1/1'],
+      ],
+      summaryLabel: 'Matched records',
+      title: 'Current review scope',
+    },
     sectionState: {
       showAnswerReview: true,
       showClassroomBrief: true,

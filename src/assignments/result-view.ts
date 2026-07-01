@@ -462,6 +462,39 @@ export type AssignmentResultCopyScopeView = {
   title: string;
 };
 
+type AssignmentResultReviewScopeItemId =
+  | 'answer-review'
+  | 'item-sort'
+  | 'student-search'
+  | 'student-sort';
+
+export type AssignmentResultReviewScopeItemView = {
+  description: string;
+  id: AssignmentResultReviewScopeItemId;
+  label: string;
+  value: string;
+};
+
+type AssignmentResultReviewScopeSummaryItemId =
+  | 'answer-reviews'
+  | 'attempts'
+  | 'items'
+  | 'students';
+
+export type AssignmentResultReviewScopeSummaryItemView = {
+  id: AssignmentResultReviewScopeSummaryItemId;
+  label: string;
+  value: string;
+};
+
+export type AssignmentResultReviewScopeView = {
+  description: string;
+  itemViews: AssignmentResultReviewScopeItemView[];
+  summaryItems: AssignmentResultReviewScopeSummaryItemView[];
+  summaryLabel: string;
+  title: string;
+};
+
 export type AssignmentAttemptRowDisplayInput = AssignmentAttemptRowInput & {
   completedAt: Date | string | null;
   maxScore: number | null;
@@ -564,6 +597,7 @@ export type AssignmentResultsPageViewModel<
   itemPerformanceTableView: AssignmentResultItemPerformanceTableView;
   metricItems: AssignmentResultMetricItem[];
   resultView: AssignmentResultViewModel<TAttempt>;
+  reviewScopeView: AssignmentResultReviewScopeView;
   sectionState: AssignmentResultSectionState;
   sectionViews: AssignmentResultSectionViews;
   studentSummaryRowViews: AssignmentResultStudentSummaryRowView[];
@@ -673,6 +707,45 @@ export const assignmentResultCopyScopeCopy = {
   },
   get title() {
     return m.assignment_result_copy_scope_title();
+  },
+} as const;
+
+export const assignmentResultReviewScopeCopy = {
+  get attemptsLabel() {
+    return m.assignment_result_review_scope_attempts_label();
+  },
+  get answerReviewsLabel() {
+    return m.assignment_result_review_scope_review_label();
+  },
+  get description() {
+    return m.assignment_result_review_scope_description();
+  },
+  get itemSortLabel() {
+    return m.assignment_result_search_sort_items();
+  },
+  get itemsLabel() {
+    return m.assignment_result_review_scope_items_label();
+  },
+  get matchedRecordsLabel() {
+    return m.assignment_result_review_scope_summary_label();
+  },
+  get searchAllValue() {
+    return m.assignment_result_review_scope_search_all();
+  },
+  get searchDescription() {
+    return m.assignment_result_review_scope_search_description();
+  },
+  get searchLabel() {
+    return m.assignment_result_review_scope_search_label();
+  },
+  get studentSortLabel() {
+    return m.assignment_result_review_scope_student_sort_label();
+  },
+  get studentsLabel() {
+    return m.assignment_result_review_scope_students_label();
+  },
+  get title() {
+    return m.assignment_result_review_scope_title();
   },
 } as const;
 
@@ -1999,6 +2072,10 @@ export function buildAssignmentResultsPageViewModel<
     controlViews,
     summary: resultView.reviewScope.summary,
   });
+  const reviewScopeView = buildAssignmentResultReviewScopeView({
+    controlViews,
+    summary: resultView.reviewScope.summary,
+  });
   const attemptTableView = data
     ? buildAssignmentAttemptTableView({
         rows: resultView.filteredAttemptRows,
@@ -2138,6 +2215,7 @@ export function buildAssignmentResultsPageViewModel<
         })
       : [],
     resultView,
+    reviewScopeView,
     sectionState,
     sectionViews,
     studentSummaryRowViews,
@@ -2291,6 +2369,51 @@ export function buildAssignmentResultCopyScopeView({
   };
 }
 
+export function buildAssignmentResultReviewScopeView({
+  controlViews,
+  summary,
+}: {
+  controlViews: AssignmentResultControlViews;
+  summary: AssignmentResultReviewScopeSummary;
+}): AssignmentResultReviewScopeView {
+  return {
+    description: assignmentResultReviewScopeCopy.description,
+    itemViews: [
+      {
+        description: assignmentResultReviewScopeCopy.searchDescription,
+        id: 'student-search',
+        label: assignmentResultReviewScopeCopy.searchLabel,
+        value:
+          controlViews.studentSearch.value ||
+          assignmentResultReviewScopeCopy.searchAllValue,
+      },
+      {
+        description: controlViews.studentSearch.selectedSortOption.description,
+        id: 'student-sort',
+        label: assignmentResultReviewScopeCopy.studentSortLabel,
+        value: controlViews.studentSearch.selectedSortOption.label,
+      },
+      {
+        description:
+          controlViews.itemPerformanceSort.selectedSortOption.description,
+        id: 'item-sort',
+        label: assignmentResultReviewScopeCopy.itemSortLabel,
+        value: controlViews.itemPerformanceSort.selectedSortOption.label,
+      },
+      {
+        description:
+          controlViews.attemptReviewFilter.selectedFilterOption.description,
+        id: 'answer-review',
+        label: assignmentResultReviewScopeCopy.answerReviewsLabel,
+        value: controlViews.attemptReviewFilter.selectedFilterOption.label,
+      },
+    ],
+    summaryItems: buildAssignmentResultReviewScopeSummaryItems(summary),
+    summaryLabel: assignmentResultReviewScopeCopy.matchedRecordsLabel,
+    title: assignmentResultReviewScopeCopy.title,
+  };
+}
+
 function buildAssignmentResultCopyScopeSummaryItems(
   summary: AssignmentResultReviewScopeSummary
 ): AssignmentResultCopyScopeSummaryItemView[] {
@@ -2315,6 +2438,37 @@ function buildAssignmentResultCopyScopeSummaryItems(
     {
       id: 'answer-reviews',
       label: assignmentResultCopyScopeCopy.answerReviewsLabel,
+      value: formatAssignmentResultCopyScopeSummaryCount(
+        summary.attemptReviews
+      ),
+    },
+  ];
+}
+
+function buildAssignmentResultReviewScopeSummaryItems(
+  summary: AssignmentResultReviewScopeSummary
+): AssignmentResultReviewScopeSummaryItemView[] {
+  return [
+    {
+      id: 'students',
+      label: assignmentResultReviewScopeCopy.studentsLabel,
+      value: formatAssignmentResultCopyScopeSummaryCount(summary.students),
+    },
+    {
+      id: 'attempts',
+      label: assignmentResultReviewScopeCopy.attemptsLabel,
+      value: formatAssignmentResultCopyScopeSummaryCount(summary.attemptRows),
+    },
+    {
+      id: 'items',
+      label: assignmentResultReviewScopeCopy.itemsLabel,
+      value: formatAssignmentResultCopyScopeSummaryCount(
+        summary.itemPerformance
+      ),
+    },
+    {
+      id: 'answer-reviews',
+      label: assignmentResultReviewScopeCopy.answerReviewsLabel,
       value: formatAssignmentResultCopyScopeSummaryCount(
         summary.attemptReviews
       ),
