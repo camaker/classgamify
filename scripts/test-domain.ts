@@ -29,6 +29,8 @@ import {
   buildAssignmentClassroomBrief,
   buildAssignmentClassroomBriefFocusItemView,
   buildAssignmentClassroomBriefFollowUpStudentView,
+  buildAssignmentClassroomBriefScopeSummary,
+  buildAssignmentClassroomBriefScopeViews,
   buildAssignmentClassroomBriefStatViews,
   formatAssignmentBriefStudentAccuracy,
 } from '@/assignments/classroom-brief';
@@ -2128,6 +2130,26 @@ assert.match(
 );
 assert.match(
   assignmentClassroomBriefSource,
+  /scopeSummary = buildAssignmentClassroomBriefScopeSummary\(\{[\s\S]*attempts,[\s\S]*focusItems,[\s\S]*items,[\s\S]*followUpStudents,[\s\S]*\}\)[\s\S]*scopeViews =[\s\S]*buildAssignmentClassroomBriefScopeViews\(scopeSummary\)[\s\S]*scopeLabel: m\.assignment_classroom_brief_scope_label\(\)[\s\S]*scopeSummary,[\s\S]*scopeViews,/,
+  'Classroom brief should expose prepared scope summary and scope views from the same attempts, focus items, items, and follow-up students used in the brief.'
+);
+assert.match(
+  assignmentClassroomBriefSource,
+  /export function buildAssignmentClassroomBriefScopeSummary[\s\S]*attemptCount: normalizeAssignmentClassroomBriefScopeCount\(attempts\.length\)[\s\S]*focusItemCount: normalizeAssignmentClassroomBriefScopeCount\([\s\S]*focusItems\.length[\s\S]*followUpStudentCount: normalizeAssignmentClassroomBriefScopeCount\([\s\S]*followUpStudents\.length[\s\S]*totalItemCount: normalizeAssignmentClassroomBriefScopeCount\(items\.length\)/,
+  'Classroom brief scope summary should normalize attempts, focus items, follow-up students, and total item counts.'
+);
+assert.match(
+  assignmentClassroomBriefSource,
+  /buildAssignmentClassroomBriefScopeViews[\s\S]*assignment_classroom_brief_scope_attempts_description[\s\S]*id: 'attempts'[\s\S]*assignment_classroom_brief_scope_attempts_label[\s\S]*assignment_classroom_brief_scope_students_description[\s\S]*id: 'students'[\s\S]*assignment_classroom_brief_scope_students_label[\s\S]*assignment_classroom_brief_scope_focus_items_description[\s\S]*id: 'focus-items'[\s\S]*assignment_classroom_brief_scope_focus_items_label[\s\S]*assignment_classroom_brief_scope_total_items_description[\s\S]*id: 'total-items'[\s\S]*assignment_classroom_brief_scope_total_items_label/,
+  'Classroom brief scope views should expose stable ids and localized scope labels and descriptions.'
+);
+assert.match(
+  assignmentClassroomBriefSource,
+  /formatAssignmentResultNumber\(summary\.attemptCount[\s\S]*formatAssignmentResultNumber\(summary\.followUpStudentCount[\s\S]*formatAssignmentResultNumber\(summary\.focusItemCount[\s\S]*formatAssignmentResultNumber\(summary\.totalItemCount/,
+  'Classroom brief scope view counts should use the shared assignment result number formatter.'
+);
+assert.match(
+  assignmentClassroomBriefSource,
   /label: m\.assignment_result_metric_completions\(\)[\s\S]*value: formatAssignmentResultNumber/,
   'Classroom brief stat views should expose metric labels and values for visual result-page cards.'
 );
@@ -2218,8 +2240,8 @@ assert.match(
 );
 assert.doesNotMatch(
   assignmentClassroomBriefSource,
-  /lines\.join\('\\n'\)|index \+ 1|student: student\.studentLabel/,
-  'Classroom brief should not hand-compose copy line breaks, ordinals, or raw student labels.'
+  /lines\.join\('\\n'\)|index \+ 1|student: student\.studentLabel|Attempts reviewed|Follow-up students|Brief coverage|已复盘作答|简报覆盖范围/,
+  'Classroom brief should not hand-compose copy line breaks, ordinals, raw student labels, or scope copy.'
 );
 const assignmentReteachPlanSource = readFileSync(
   'src/assignments/reteach-plan.ts',
@@ -5589,8 +5611,8 @@ assert.doesNotMatch(
 );
 assert.match(
   assignmentResultsClassroomBriefCardSource,
-  /AssignmentResultsClassroomBriefStats[\s\S]*brief=\{brief\}[\s\S]*AssignmentResultsClassFocusPanel[\s\S]*focusItemViews=\{brief\.focusItemViews\}[\s\S]*sectionView=\{sectionViews\.classReviewFocus\}[\s\S]*AssignmentResultsFollowUpPanel[\s\S]*followUpStudentViews=\{brief\.followUpStudentViews\}[\s\S]*sectionView=\{sectionViews\.studentFollowUp\}[\s\S]*AssignmentResultsClassroomBriefCopyPreview[\s\S]*copyArtifactPreviews=\{copyArtifactPreviews\}[\s\S]*copyScopeView=\{copyScopeView\}[\s\S]*onResultAction=\{onResultAction\}/,
-  'Assignment classroom brief card should delegate prepared stats, focus item, follow-up student, copy-scope, and copy-preview views to focused panels.'
+  /AssignmentResultsClassroomBriefScope[\s\S]*brief=\{brief\}[\s\S]*AssignmentResultsClassroomBriefStats[\s\S]*brief=\{brief\}[\s\S]*AssignmentResultsClassFocusPanel[\s\S]*focusItemViews=\{brief\.focusItemViews\}[\s\S]*sectionView=\{sectionViews\.classReviewFocus\}[\s\S]*AssignmentResultsFollowUpPanel[\s\S]*followUpStudentViews=\{brief\.followUpStudentViews\}[\s\S]*sectionView=\{sectionViews\.studentFollowUp\}[\s\S]*AssignmentResultsClassroomBriefCopyPreview[\s\S]*copyArtifactPreviews=\{copyArtifactPreviews\}[\s\S]*copyScopeView=\{copyScopeView\}[\s\S]*onResultAction=\{onResultAction\}/,
+  'Assignment classroom brief card should delegate prepared scope, stats, focus item, follow-up student, copy-scope, and copy-preview views to focused panels.'
 );
 assert.match(
   assignmentResultsClassroomBriefCardSource,
@@ -5604,13 +5626,13 @@ assert.doesNotMatch(
 );
 assert.match(
   assignmentClassroomBriefSource,
-  /export type AssignmentClassroomBrief = \{[\s\S]*export type AssignmentClassroomBriefStatView = \{[\s\S]*export type AssignmentClassroomBriefCopyPreview = \{[\s\S]*export type AssignmentClassroomBriefFocusItemView = \{[\s\S]*export type AssignmentClassroomBriefFollowUpStudentView = \{/,
-  'Assignment classroom brief should expose explicit aggregate, stat, copy-preview, focus-item, and follow-up student view contracts.'
+  /export type AssignmentClassroomBrief = \{[\s\S]*scopeLabel: string;[\s\S]*scopeSummary: AssignmentClassroomBriefScopeSummary;[\s\S]*scopeViews: AssignmentClassroomBriefScopeView\[\];[\s\S]*export type AssignmentClassroomBriefStatView = \{[\s\S]*export type AssignmentClassroomBriefCopyPreview = \{[\s\S]*export type AssignmentClassroomBriefScopeId =[\s\S]*'attempts'[\s\S]*'focus-items'[\s\S]*'students'[\s\S]*'total-items'[\s\S]*export type AssignmentClassroomBriefScopeSummary = \{[\s\S]*attemptCount: number;[\s\S]*focusItemCount: number;[\s\S]*followUpStudentCount: number;[\s\S]*totalItemCount: number;[\s\S]*export type AssignmentClassroomBriefScopeView = \{[\s\S]*description: string;[\s\S]*id: AssignmentClassroomBriefScopeId;[\s\S]*label: string;[\s\S]*value: string;[\s\S]*export type AssignmentClassroomBriefFocusItemView = \{[\s\S]*export type AssignmentClassroomBriefFollowUpStudentView = \{/,
+  'Assignment classroom brief should expose explicit aggregate, scope, stat, copy-preview, focus-item, and follow-up student view contracts.'
 );
 assert.match(
   assignmentResultsClassroomBriefCardSource,
-  /AssignmentClassroomBrief,[\s\S]*AssignmentClassroomBriefCopyPreview,[\s\S]*AssignmentClassroomBriefFocusItemView,[\s\S]*AssignmentClassroomBriefFollowUpStudentView,[\s\S]*AssignmentClassroomBriefStatView/,
-  'Assignment classroom brief card should import explicit classroom brief aggregate and child view contracts.'
+  /AssignmentClassroomBrief,[\s\S]*AssignmentClassroomBriefCopyPreview,[\s\S]*AssignmentClassroomBriefFocusItemView,[\s\S]*AssignmentClassroomBriefFollowUpStudentView,[\s\S]*AssignmentClassroomBriefScopeView,[\s\S]*AssignmentClassroomBriefStatView/,
+  'Assignment classroom brief card should import explicit classroom brief aggregate, scope, and child view contracts.'
 );
 assert.match(
   assignmentResultsClassroomBriefCardSource,
@@ -5621,6 +5643,16 @@ assert.doesNotMatch(
   assignmentResultsClassroomBriefCardSource,
   /ReturnType<typeof buildAssignmentResultsPageViewModel>/,
   'Assignment classroom brief card should not infer its brief contract from the full result page view-model ReturnType.'
+);
+assert.match(
+  assignmentResultsClassroomBriefCardSource,
+  /function AssignmentResultsClassroomBriefScope[\s\S]*brief\.scopeLabel[\s\S]*brief\.scopeViews\.map[\s\S]*key=\{scopeView\.id\}[\s\S]*AssignmentResultsClassroomBriefScopeItem/,
+  'Assignment classroom brief scope panel should render prepared scope labels and key scope items by stable ids.'
+);
+assert.match(
+  assignmentResultsClassroomBriefCardSource,
+  /function AssignmentResultsClassroomBriefScopeItem[\s\S]*scopeView\.label[\s\S]*scopeView\.value[\s\S]*scopeView\.description/,
+  'Assignment classroom brief scope items should render prepared labels, values, and descriptions.'
 );
 assert.match(
   assignmentResultsClassroomBriefCardSource,
@@ -5679,7 +5711,7 @@ assert.doesNotMatch(
 );
 assert.doesNotMatch(
   assignmentResultsClassroomBriefCardSource,
-  /AssignmentClassroomBrief\['(?:statViews|focusItemViews|followUpStudentViews)'\]|AssignmentResultsClassroomBriefCardProps\['sectionViews'\]/,
+  /AssignmentClassroomBrief\['(?:scopeViews|statViews|focusItemViews|followUpStudentViews)'\]|AssignmentResultsClassroomBriefCardProps\['sectionViews'\]/,
   'Assignment classroom brief card child components should not infer props from aggregate classroom brief or card prop indexes.'
 );
 assert.match(
@@ -5714,8 +5746,8 @@ assert.match(
 );
 assert.doesNotMatch(
   assignmentResultsClassroomBriefCardSource,
-  /assignment_classroom_brief_|assignment_result_metric_|assignment_result_action_copy_|brief\.text/,
-  'Assignment classroom brief component should not call locale messages or raw copied-text fields directly.'
+  /assignment_classroom_brief_|assignment_result_metric_|assignment_result_action_copy_|brief\.text|Attempts reviewed|Follow-up students|Brief coverage|已复盘作答|简报覆盖范围/,
+  'Assignment classroom brief component should not call locale messages, raw copied-text fields, or hard-code scope copy directly.'
 );
 assert.match(
   assignmentResultsStudentSearchSource,
@@ -43547,6 +43579,101 @@ assert.deepEqual(classroomBrief.statViews, [
     label: 'Average time',
     text: 'Average time: 45s',
     value: '45s',
+  },
+]);
+assert.equal(classroomBrief.scopeLabel, 'Brief coverage');
+assert.deepEqual(
+  buildAssignmentClassroomBriefScopeSummary({
+    attempts: resultAnalysis.attempts,
+    focusItems: classroomBrief.focusItems,
+    followUpStudents: classroomBrief.followUpStudents,
+    items: resultAnalysis.perItem,
+  }),
+  {
+    attemptCount: 3,
+    focusItemCount: 2,
+    followUpStudentCount: 1,
+    totalItemCount: 2,
+  }
+);
+assert.deepEqual(classroomBrief.scopeSummary, {
+  attemptCount: 0,
+  focusItemCount: 2,
+  followUpStudentCount: 1,
+  totalItemCount: 2,
+});
+assert.deepEqual(classroomBriefWithAttempts.scopeSummary, {
+  attemptCount: 3,
+  focusItemCount: 2,
+  followUpStudentCount: 1,
+  totalItemCount: 2,
+});
+assert.deepEqual(
+  buildAssignmentClassroomBriefScopeSummary({
+    attempts: { length: Number.POSITIVE_INFINITY } as never,
+    focusItems: { length: Number.NaN } as never,
+    followUpStudents: { length: -2 } as never,
+    items: { length: 1.9 } as never,
+  }),
+  {
+    attemptCount: 0,
+    focusItemCount: 0,
+    followUpStudentCount: 0,
+    totalItemCount: 1,
+  }
+);
+assert.deepEqual(buildAssignmentClassroomBriefScopeViews(classroomBrief.scopeSummary), [
+  {
+    description: 'Completed attempts included in this brief.',
+    id: 'attempts',
+    label: 'Attempts reviewed',
+    value: '0',
+  },
+  {
+    description: 'Students selected for individual follow-up.',
+    id: 'students',
+    label: 'Follow-up students',
+    value: '1',
+  },
+  {
+    description:
+      'Lowest-performing submitted items selected for class review.',
+    id: 'focus-items',
+    label: 'Focus items',
+    value: '2',
+  },
+  {
+    description: 'Submitted runtime items available for analysis.',
+    id: 'total-items',
+    label: 'Analyzed items',
+    value: '2',
+  },
+]);
+assert.deepEqual(classroomBrief.scopeViews, [
+  {
+    description: 'Completed attempts included in this brief.',
+    id: 'attempts',
+    label: 'Attempts reviewed',
+    value: '0',
+  },
+  {
+    description: 'Students selected for individual follow-up.',
+    id: 'students',
+    label: 'Follow-up students',
+    value: '1',
+  },
+  {
+    description:
+      'Lowest-performing submitted items selected for class review.',
+    id: 'focus-items',
+    label: 'Focus items',
+    value: '2',
+  },
+  {
+    description: 'Submitted runtime items available for analysis.',
+    id: 'total-items',
+    label: 'Analyzed items',
+    value: '2',
   },
 ]);
 assert.equal(classroomBrief.statSummaryLabel, 'Class snapshot');

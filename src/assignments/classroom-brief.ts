@@ -58,6 +58,9 @@ export type AssignmentClassroomBrief = {
   focusItems: AssignmentItemAnalysis[];
   followUpStudentViews: AssignmentClassroomBriefFollowUpStudentView[];
   followUpStudents: AssignmentStudentSummary[];
+  scopeLabel: string;
+  scopeSummary: AssignmentClassroomBriefScopeSummary;
+  scopeViews: AssignmentClassroomBriefScopeView[];
   statSummaryLabel: string;
   statViews: AssignmentClassroomBriefStatView[];
   text: string;
@@ -73,6 +76,26 @@ export type AssignmentClassroomBriefStatView = {
 export type AssignmentClassroomBriefCopyPreview = {
   label: string;
   text: string;
+};
+
+export type AssignmentClassroomBriefScopeId =
+  | 'attempts'
+  | 'focus-items'
+  | 'students'
+  | 'total-items';
+
+export type AssignmentClassroomBriefScopeSummary = {
+  attemptCount: number;
+  focusItemCount: number;
+  followUpStudentCount: number;
+  totalItemCount: number;
+};
+
+export type AssignmentClassroomBriefScopeView = {
+  description: string;
+  id: AssignmentClassroomBriefScopeId;
+  label: string;
+  value: string;
 };
 
 export type AssignmentClassroomBriefFocusItemView = {
@@ -123,6 +146,13 @@ export function buildAssignmentClassroomBrief({
     buildAssignmentClassroomBriefFollowUpStudentViews(followUpStudents, {
       attempts,
     });
+  const scopeSummary = buildAssignmentClassroomBriefScopeSummary({
+    attempts,
+    focusItems,
+    items,
+    followUpStudents,
+  });
+  const scopeViews = buildAssignmentClassroomBriefScopeViews(scopeSummary);
   const copyTitle = formatAssignmentResultCopyTitle(assignmentTitle);
   const lines = [
     m.assignment_classroom_brief_title({ title: copyTitle }),
@@ -146,10 +176,73 @@ export function buildAssignmentClassroomBrief({
     focusItems,
     followUpStudentViews,
     followUpStudents,
+    scopeLabel: m.assignment_classroom_brief_scope_label(),
+    scopeSummary,
+    scopeViews,
     statSummaryLabel: m.assignment_classroom_brief_stats_label(),
     statViews,
     text,
   };
+}
+
+export function buildAssignmentClassroomBriefScopeSummary({
+  attempts,
+  focusItems,
+  followUpStudents,
+  items,
+}: {
+  attempts: AssignmentAttemptReview[];
+  focusItems: AssignmentItemAnalysis[];
+  followUpStudents: AssignmentStudentSummary[];
+  items: AssignmentItemAnalysis[];
+}): AssignmentClassroomBriefScopeSummary {
+  return {
+    attemptCount: normalizeAssignmentClassroomBriefScopeCount(attempts.length),
+    focusItemCount: normalizeAssignmentClassroomBriefScopeCount(
+      focusItems.length
+    ),
+    followUpStudentCount: normalizeAssignmentClassroomBriefScopeCount(
+      followUpStudents.length
+    ),
+    totalItemCount: normalizeAssignmentClassroomBriefScopeCount(items.length),
+  };
+}
+
+export function buildAssignmentClassroomBriefScopeViews(
+  summary: AssignmentClassroomBriefScopeSummary
+): AssignmentClassroomBriefScopeView[] {
+  return [
+    {
+      description: m.assignment_classroom_brief_scope_attempts_description(),
+      id: 'attempts',
+      label: m.assignment_classroom_brief_scope_attempts_label(),
+      value: formatAssignmentResultNumber(summary.attemptCount, { min: 0 }),
+    },
+    {
+      description: m.assignment_classroom_brief_scope_students_description(),
+      id: 'students',
+      label: m.assignment_classroom_brief_scope_students_label(),
+      value: formatAssignmentResultNumber(summary.followUpStudentCount, {
+        min: 0,
+      }),
+    },
+    {
+      description: m.assignment_classroom_brief_scope_focus_items_description(),
+      id: 'focus-items',
+      label: m.assignment_classroom_brief_scope_focus_items_label(),
+      value: formatAssignmentResultNumber(summary.focusItemCount, { min: 0 }),
+    },
+    {
+      description: m.assignment_classroom_brief_scope_total_items_description(),
+      id: 'total-items',
+      label: m.assignment_classroom_brief_scope_total_items_label(),
+      value: formatAssignmentResultNumber(summary.totalItemCount, { min: 0 }),
+    },
+  ];
+}
+
+function normalizeAssignmentClassroomBriefScopeCount(value: number) {
+  return Number.isFinite(value) ? Math.max(0, Math.floor(value)) : 0;
 }
 
 export function buildAssignmentClassroomBriefStatViews(

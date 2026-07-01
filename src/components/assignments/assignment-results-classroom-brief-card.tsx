@@ -3,6 +3,7 @@ import type {
   AssignmentClassroomBriefCopyPreview,
   AssignmentClassroomBriefFocusItemView,
   AssignmentClassroomBriefFollowUpStudentView,
+  AssignmentClassroomBriefScopeView,
   AssignmentClassroomBriefStatView,
 } from '@/assignments/classroom-brief';
 import type {
@@ -61,6 +62,7 @@ export function AssignmentResultsClassroomBriefCard({
         ) : null}
       </CardHeader>
       <CardContent className="grid gap-4">
+        <AssignmentResultsClassroomBriefScope brief={brief} />
         <AssignmentResultsClassroomBriefStats brief={brief} />
         <div className="grid gap-4 lg:grid-cols-2">
           <AssignmentResultsClassFocusPanel
@@ -80,6 +82,42 @@ export function AssignmentResultsClassroomBriefCard({
         />
       </CardContent>
     </Card>
+  );
+}
+
+function AssignmentResultsClassroomBriefScope({
+  brief,
+}: {
+  brief: AssignmentClassroomBrief;
+}) {
+  return (
+    <section className="grid gap-3 rounded-lg border bg-background p-4">
+      <h3 className="font-medium text-sm">{brief.scopeLabel}</h3>
+      <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+        {brief.scopeViews.map((scopeView) => (
+          <AssignmentResultsClassroomBriefScopeItem
+            key={scopeView.id}
+            scopeView={scopeView}
+          />
+        ))}
+      </div>
+    </section>
+  );
+}
+
+function AssignmentResultsClassroomBriefScopeItem({
+  scopeView,
+}: {
+  scopeView: AssignmentClassroomBriefScopeView;
+}) {
+  return (
+    <div className="rounded-md border bg-muted/20 p-3">
+      <p className="text-muted-foreground text-xs">{scopeView.label}</p>
+      <p className="mt-1 font-semibold text-lg">{scopeView.value}</p>
+      <p className="mt-1 text-muted-foreground text-xs">
+        {scopeView.description}
+      </p>
+    </div>
   );
 }
 
