@@ -287,8 +287,23 @@ export type StudentRunnerMissingReason =
   | 'expired'
   | 'not-found';
 
-type StudentRunnerMissingView = {
+export type StudentRunnerMissingScopeItemId =
+  | 'activity-content'
+  | 'link-status'
+  | 'next-step'
+  | 'submissions';
+
+export type StudentRunnerMissingScopeItem = {
   description: string;
+  id: StudentRunnerMissingScopeItemId;
+  label: string;
+  value: string;
+};
+
+export type StudentRunnerMissingView = {
+  description: string;
+  reason: StudentRunnerMissingReason;
+  scopeItems: StudentRunnerMissingScopeItem[];
   title: string;
 };
 
@@ -546,6 +561,16 @@ function getSafeStudentAttemptSubmissionFailureEntries(): Array<{
 export function buildStudentRunnerMissingView(
   reason: StudentRunnerMissingReason
 ): StudentRunnerMissingView {
+  const reasonView = getStudentRunnerMissingReasonView(reason);
+
+  return {
+    ...reasonView,
+    reason,
+    scopeItems: buildStudentRunnerMissingScopeItems(reason),
+  };
+}
+
+function getStudentRunnerMissingReasonView(reason: StudentRunnerMissingReason) {
   if (reason === 'closed') {
     return {
       description: m.student_runner_missing_assignment_closed_description(),
@@ -571,6 +596,88 @@ export function buildStudentRunnerMissingView(
     description: STUDENT_RUNNER_COPY.missingAssignmentDescription,
     title: STUDENT_RUNNER_COPY.missingAssignmentTitle,
   };
+}
+
+function buildStudentRunnerMissingScopeItems(
+  reason: StudentRunnerMissingReason
+): StudentRunnerMissingScopeItem[] {
+  const statusView = getStudentRunnerMissingStatusScopeItem(reason);
+
+  return [
+    {
+      description: statusView.description,
+      id: 'link-status',
+      label: m.student_runner_missing_scope_status_label(),
+      value: statusView.value,
+    },
+    {
+      description:
+        m.student_runner_missing_scope_activity_content_description(),
+      id: 'activity-content',
+      label: m.student_runner_missing_scope_activity_content_label(),
+      value: m.student_runner_missing_scope_activity_content_value(),
+    },
+    {
+      description: m.student_runner_missing_scope_submissions_description(),
+      id: 'submissions',
+      label: m.student_runner_missing_scope_submissions_label(),
+      value: m.student_runner_missing_scope_submissions_value(),
+    },
+    {
+      description: getStudentRunnerMissingNextStepDescription(reason),
+      id: 'next-step',
+      label: m.student_runner_missing_scope_next_step_label(),
+      value: m.student_runner_missing_scope_next_step_value(),
+    },
+  ];
+}
+
+function getStudentRunnerMissingStatusScopeItem(
+  reason: StudentRunnerMissingReason
+) {
+  if (reason === 'closed') {
+    return {
+      description: m.student_runner_missing_scope_status_closed_description(),
+      value: m.student_runner_missing_scope_status_closed_value(),
+    };
+  }
+
+  if (reason === 'expired') {
+    return {
+      description: m.student_runner_missing_scope_status_expired_description(),
+      value: m.student_runner_missing_scope_status_expired_value(),
+    };
+  }
+
+  if (reason === 'draft') {
+    return {
+      description: m.student_runner_missing_scope_status_draft_description(),
+      value: m.student_runner_missing_scope_status_draft_value(),
+    };
+  }
+
+  return {
+    description: m.student_runner_missing_scope_status_not_found_description(),
+    value: m.student_runner_missing_scope_status_not_found_value(),
+  };
+}
+
+function getStudentRunnerMissingNextStepDescription(
+  reason: StudentRunnerMissingReason
+) {
+  if (reason === 'closed') {
+    return m.student_runner_missing_scope_next_step_closed_description();
+  }
+
+  if (reason === 'expired') {
+    return m.student_runner_missing_scope_next_step_expired_description();
+  }
+
+  if (reason === 'draft') {
+    return m.student_runner_missing_scope_next_step_draft_description();
+  }
+
+  return m.student_runner_missing_scope_next_step_not_found_description();
 }
 
 export function buildAnonymousAttemptCopy({

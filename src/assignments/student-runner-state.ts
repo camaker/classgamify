@@ -46,6 +46,7 @@ import {
   type StudentAttemptSubmissionPlan,
   type StudentAttemptSubmissionSubmitReason,
   type StudentAttemptTimerBadge,
+  type StudentRunnerMissingScopeItem,
   type StudentAnswerMap,
   type StudentAnswerChange,
   type StudentRunnerMissingReason,
@@ -122,6 +123,8 @@ export type StudentRunnerMissingPageView = {
   badgeLabel: string;
   browseTemplatesLabel: string;
   description: string;
+  reason: StudentRunnerMissingReason;
+  scopeItems: StudentRunnerMissingScopeItem[];
   title: string;
 };
 
@@ -811,6 +814,8 @@ function buildStudentRunnerMissingPageView(
     badgeLabel: runnerCopy.publicRouteBadgeLabel,
     browseTemplatesLabel: runnerCopy.browseTemplatesLabel,
     description: missingView.description,
+    reason: missingView.reason,
+    scopeItems: missingView.scopeItems,
     title: missingView.title,
   };
 }

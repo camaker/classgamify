@@ -9351,13 +9351,23 @@ assert.match(
 );
 assert.match(
   studentRunnerStateSource,
-  /export type StudentRunnerLoadingView = \{[\s\S]*export type StudentRunnerMissingPageView = \{[\s\S]*export type StudentRunnerIdentityView =[\s\S]*description: string;[\s\S]*disabled: boolean;[\s\S]*export type StudentRunnerControlView = \{[\s\S]*export type StudentRunnerResultPanelView =[\s\S]*export type StudentRunnerActivityPreviewView = \{[\s\S]*export type StudentRunnerRuntimeListView = \{[\s\S]*export type StudentRunnerPageViewModel = \{/,
+  /export type StudentRunnerLoadingView = \{[\s\S]*export type StudentRunnerMissingPageView = \{[\s\S]*reason: StudentRunnerMissingReason;[\s\S]*scopeItems: StudentRunnerMissingScopeItem\[\];[\s\S]*export type StudentRunnerIdentityView =[\s\S]*description: string;[\s\S]*disabled: boolean;[\s\S]*export type StudentRunnerControlView = \{[\s\S]*export type StudentRunnerResultPanelView =[\s\S]*export type StudentRunnerActivityPreviewView = \{[\s\S]*export type StudentRunnerRuntimeListView = \{[\s\S]*export type StudentRunnerPageViewModel = \{/,
   'Student runner state domain should export focused route-facing page and sub-view contracts.'
 );
 assert.match(
   studentRunnerSubmissionSource,
   /type StudentRunnerCopy = \{[\s\S]*studentNameDescription: string;[\s\S]*studentNameLockedDescription: string;[\s\S]*export type AnonymousAttemptCopy = \{[\s\S]*browserLabelAriaLabel: string;[\s\S]*browserLabel: string;[\s\S]*browserLabelCaption: string;[\s\S]*retryDescription: string;[\s\S]*summary: \{[\s\S]*hidesRawToken: boolean;[\s\S]*showsBrowserLabel: boolean;[\s\S]*export type StudentAttemptResultDisplay = \{/,
   'Student submission domain should expose explicit identity copy, control, result, and timer badge contracts.'
+);
+assert.match(
+  studentRunnerSubmissionSource,
+  /export type StudentRunnerMissingScopeItemId =[\s\S]*'activity-content'[\s\S]*'link-status'[\s\S]*'next-step'[\s\S]*'submissions'[\s\S]*export type StudentRunnerMissingScopeItem = \{[\s\S]*description: string;[\s\S]*id: StudentRunnerMissingScopeItemId;[\s\S]*label: string;[\s\S]*value: string;[\s\S]*export type StudentRunnerMissingView = \{[\s\S]*reason: StudentRunnerMissingReason;[\s\S]*scopeItems: StudentRunnerMissingScopeItem\[\];/,
+  'Student submission domain should expose explicit missing-link scope item and view contracts.'
+);
+assert.match(
+  studentRunnerSubmissionSource,
+  /buildStudentRunnerMissingScopeItems[\s\S]*student_runner_missing_scope_status_label[\s\S]*student_runner_missing_scope_activity_content_label[\s\S]*student_runner_missing_scope_submissions_label[\s\S]*student_runner_missing_scope_next_step_label/,
+  'Student missing-link scope items should be prepared from localized assignment-domain messages.'
 );
 assert.match(
   pureAttemptDurationSource,
@@ -9484,6 +9494,21 @@ assert.match(
   'Student runner missing panel should consume the missing view call to action.'
 );
 assert.match(
+  studentRunnerMissingPanelSource,
+  /view\.scopeItems\.map[\s\S]*key=\{item\.id\}[\s\S]*StudentRunnerMissingScopeIcon[\s\S]*item\.label[\s\S]*item\.value[\s\S]*item\.description/,
+  'Student runner missing panel should render prepared missing-link scope labels, values, and descriptions.'
+);
+assert.match(
+  studentRunnerMissingPanelSource,
+  /studentRunnerMissingScopeIcons[\s\S]*'activity-content': IconEyeOff[\s\S]*'link-status': IconCircleOff[\s\S]*'next-step': IconRoute[\s\S]*submissions: IconSendOff[\s\S]*satisfies Record/,
+  'Student runner missing panel should map every missing-link scope item to a typed icon.'
+);
+assert.doesNotMatch(
+  studentRunnerMissingPanelSource,
+  /Assignment closed|Assignment expired|Assignment not found|Assignment not published|Link status|Activity content|Submissions|Contact teacher|Hidden|Blocked|作业已关闭|作业已过期|未找到作业|作业尚未发布|链接状态|活动内容|提交状态|联系老师|已隐藏|已阻止/,
+  'Student runner missing panel should not hard-code unavailable-link copy.'
+);
+assert.match(
   studentRunnerHeaderCardSource,
   /view\.instructions[\s\S]*summaryView=\{view\.ruleSummaryView\}[\s\S]*StudentRunnerTeacherActionLink[\s\S]*action=\{view\.teacherAction\}/,
   'Student runner header card should consume header instructions, prepared public rule summary, and teacher action view fields.'
@@ -9579,7 +9604,7 @@ assert.match(
 );
 assert.doesNotMatch(
   playRouteSource,
-  /runnerPageView\.loadingView\.message|missingView\.browseTemplatesLabel|headerView\.ruleItems|headerView\.ruleSummaryView|identityView\.mode|resultPanelView\.scoreLabel|controlView\.timerBadge\.label|controlView\.submitButtonLabel|controlView\.unansweredLabel|controlView\.requiresIncompleteSubmitConfirmation|controlView\.submitConfirmationMessage|controlView\.readOnlyMessage|pageState\.hidePreviewAnswers/,
+  /runnerPageView\.loadingView\.message|missingView\.browseTemplatesLabel|missingView\.scopeItems|headerView\.ruleItems|headerView\.ruleSummaryView|identityView\.mode|resultPanelView\.scoreLabel|controlView\.timerBadge\.label|controlView\.submitButtonLabel|controlView\.unansweredLabel|controlView\.requiresIncompleteSubmitConfirmation|controlView\.submitConfirmationMessage|controlView\.readOnlyMessage|pageState\.hidePreviewAnswers/,
   'Student play route should not render low-level student-runner display fields directly.'
 );
 assert.match(
@@ -10788,23 +10813,182 @@ assert.equal(
 assert.deepEqual(buildStudentRunnerMissingView('not-found'), {
   description:
     'This link may have been unpublished, closed, or typed incorrectly.',
+  reason: 'not-found',
+  scopeItems: [
+    {
+      description:
+        'ClassGamify could not find an open assignment for this share link.',
+      id: 'link-status',
+      label: 'Link status',
+      value: 'Not found',
+    },
+    {
+      description:
+        'Questions, choices, answer keys, accepted alternatives, explanations, and teacher materials stay hidden on unavailable links.',
+      id: 'activity-content',
+      label: 'Activity content',
+      value: 'Hidden',
+    },
+    {
+      description:
+        'Student answers cannot be started or saved while this link is unavailable.',
+      id: 'submissions',
+      label: 'Submissions',
+      value: 'Blocked',
+    },
+    {
+      description:
+        'Check the link spelling or ask your teacher to resend the assignment link.',
+      id: 'next-step',
+      label: 'Next step',
+      value: 'Contact teacher',
+    },
+  ],
   title: 'Assignment not found',
 });
 assert.deepEqual(buildStudentRunnerMissingView('closed'), {
   description:
     'This assignment link has been closed by the teacher. Ask your teacher for a reopened or new link.',
+  reason: 'closed',
+  scopeItems: [
+    {
+      description: 'The teacher closed this published assignment link.',
+      id: 'link-status',
+      label: 'Link status',
+      value: 'Closed',
+    },
+    {
+      description:
+        'Questions, choices, answer keys, accepted alternatives, explanations, and teacher materials stay hidden on unavailable links.',
+      id: 'activity-content',
+      label: 'Activity content',
+      value: 'Hidden',
+    },
+    {
+      description:
+        'Student answers cannot be started or saved while this link is unavailable.',
+      id: 'submissions',
+      label: 'Submissions',
+      value: 'Blocked',
+    },
+    {
+      description:
+        'Ask your teacher to reopen this link or send a new assignment link.',
+      id: 'next-step',
+      label: 'Next step',
+      value: 'Contact teacher',
+    },
+  ],
   title: 'Assignment closed',
 });
 assert.deepEqual(buildStudentRunnerMissingView('expired'), {
   description:
     'This assignment link has expired. Students can no longer open the activity from this link.',
+  reason: 'expired',
+  scopeItems: [
+    {
+      description:
+        'The homework close time has passed for this assignment link.',
+      id: 'link-status',
+      label: 'Link status',
+      value: 'Expired',
+    },
+    {
+      description:
+        'Questions, choices, answer keys, accepted alternatives, explanations, and teacher materials stay hidden on unavailable links.',
+      id: 'activity-content',
+      label: 'Activity content',
+      value: 'Hidden',
+    },
+    {
+      description:
+        'Student answers cannot be started or saved while this link is unavailable.',
+      id: 'submissions',
+      label: 'Submissions',
+      value: 'Blocked',
+    },
+    {
+      description:
+        'Ask your teacher whether there is a new homework window or replacement link.',
+      id: 'next-step',
+      label: 'Next step',
+      value: 'Contact teacher',
+    },
+  ],
   title: 'Assignment expired',
 });
 assert.deepEqual(buildStudentRunnerMissingView('draft'), {
   description:
     'This assignment has not been published for students yet. Ask your teacher to share the published link.',
+  reason: 'draft',
+  scopeItems: [
+    {
+      description: 'This assignment has not been published to students yet.',
+      id: 'link-status',
+      label: 'Link status',
+      value: 'Not published',
+    },
+    {
+      description:
+        'Questions, choices, answer keys, accepted alternatives, explanations, and teacher materials stay hidden on unavailable links.',
+      id: 'activity-content',
+      label: 'Activity content',
+      value: 'Hidden',
+    },
+    {
+      description:
+        'Student answers cannot be started or saved while this link is unavailable.',
+      id: 'submissions',
+      label: 'Submissions',
+      value: 'Blocked',
+    },
+    {
+      description: 'Ask your teacher for the published student link.',
+      id: 'next-step',
+      label: 'Next step',
+      value: 'Contact teacher',
+    },
+  ],
   title: 'Assignment not published',
 });
+overwriteGetLocale(() => 'zh');
+try {
+  assert.deepEqual(buildStudentRunnerMissingView('closed'), {
+    description:
+      '这份作业链接已由老师关闭。请向老师确认是否重新开放，或获取新的链接。',
+    reason: 'closed',
+    scopeItems: [
+      {
+        description: '老师已关闭这个已发布作业链接。',
+        id: 'link-status',
+        label: '链接状态',
+        value: '已关闭',
+      },
+      {
+        description:
+          '不可用链接不会显示题目、选项、答案、可接受答案、解析或老师素材。',
+        id: 'activity-content',
+        label: '活动内容',
+        value: '已隐藏',
+      },
+      {
+        description: '链接不可用时，学生无法开始或保存答案。',
+        id: 'submissions',
+        label: '提交状态',
+        value: '已阻止',
+      },
+      {
+        description: '请让老师重新开放这个链接，或发送新的作业链接。',
+        id: 'next-step',
+        label: '下一步',
+        value: '联系老师',
+      },
+    ],
+    title: '作业已关闭',
+  });
+} finally {
+  overwriteGetLocale(() => 'en');
+}
 assert.deepEqual(getActivityRunnerKindCopy('line-match'), {
   correctAnswerLabel: 'Correct match',
   helpText: 'Select a prompt on the left, then select its match on the right.',
@@ -19797,6 +19981,36 @@ assert.deepEqual(missingStudentRunnerPageView.missingView, {
   browseTemplatesLabel: 'Browse templates',
   description:
     'This assignment link has been closed by the teacher. Ask your teacher for a reopened or new link.',
+  reason: 'closed',
+  scopeItems: [
+    {
+      description: 'The teacher closed this published assignment link.',
+      id: 'link-status',
+      label: 'Link status',
+      value: 'Closed',
+    },
+    {
+      description:
+        'Questions, choices, answer keys, accepted alternatives, explanations, and teacher materials stay hidden on unavailable links.',
+      id: 'activity-content',
+      label: 'Activity content',
+      value: 'Hidden',
+    },
+    {
+      description:
+        'Student answers cannot be started or saved while this link is unavailable.',
+      id: 'submissions',
+      label: 'Submissions',
+      value: 'Blocked',
+    },
+    {
+      description:
+        'Ask your teacher to reopen this link or send a new assignment link.',
+      id: 'next-step',
+      label: 'Next step',
+      value: 'Contact teacher',
+    },
+  ],
   title: 'Assignment closed',
 });
 assert.deepEqual(missingStudentRunnerPageView.resultPanelView, {
