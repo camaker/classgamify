@@ -244,6 +244,27 @@ type ActivityLibrarySearchPanelView = {
   templateOptions: ActivityLibraryTemplateFilterOption[];
 };
 
+export type ActivityLibraryPageScopeItemId =
+  | 'page'
+  | 'range'
+  | 'search'
+  | 'source'
+  | 'status'
+  | 'template';
+
+export type ActivityLibraryPageScopeItem = {
+  description: string;
+  id: ActivityLibraryPageScopeItemId;
+  label: string;
+  value: string;
+};
+
+export type ActivityLibraryPageScopeView = {
+  items: ActivityLibraryPageScopeItem[];
+  label: string;
+  summary: string;
+};
+
 export type ActivityLibraryCardActionButtonView =
   ActivityLifecycleActionCopy & {
     label: string;
@@ -298,6 +319,7 @@ type ActivityLibraryPageViewModel<TItem extends ActivityLibraryPageItem> = {
   hero: typeof activityLibraryHeroCopy;
   loadErrorMessage: string;
   resolvedSearch: ActivityLibraryPageResolvedSearch;
+  scopeView: ActivityLibraryPageScopeView;
   starterPreview: ActivityLibraryStarterPreview;
   summaryMetrics: ActivityLibrarySummaryMetric[];
   title: string;
@@ -631,6 +653,17 @@ export function buildActivityLibraryPageViewModel<
     hero: activityLibraryHeroCopy,
     loadErrorMessage: activityLibraryPageCopy.loadErrorMessage,
     resolvedSearch,
+    scopeView: buildActivityLibraryPageScopeView({
+      currentPage: resolvedSearch.currentPage,
+      pageSize: ACTIVITY_LIBRARY_PAGE_SIZE,
+      search: resolvedSearch.searchQuery,
+      source: resolvedSearch.sourceFilter,
+      status: resolvedSearch.libraryStatus,
+      template: resolvedSearch.templateFilter,
+      total: totalActivities,
+      totalPages,
+      visibleCount: activities.length,
+    }),
     starterPreview: resolvedStarterPreview,
     summaryMetrics: buildActivityLibrarySummaryMetrics({
       hasFilters: resolvedSearch.hasFilters,
@@ -784,6 +817,141 @@ export function buildActivityLibrarySearchPanelView({
   };
 }
 
+export function buildActivityLibraryPageScopeView({
+  currentPage,
+  pageSize = ACTIVITY_LIBRARY_PAGE_SIZE,
+  search,
+  source,
+  status,
+  template,
+  total,
+  totalPages,
+  visibleCount,
+}: {
+  currentPage: number;
+  pageSize?: number;
+  search?: string;
+  source: ActivitySourceMaterialFilter;
+  status: ActivityLibraryStatus;
+  template: ActivityTemplateFilter;
+  total: number;
+  totalPages: number;
+  visibleCount: number;
+}): ActivityLibraryPageScopeView {
+  const normalizedCurrentPage = normalizeActivityLibraryScopePage(currentPage);
+  const normalizedPageSize = normalizeActivityLibraryScopePageSize(pageSize);
+  const normalizedSearch = normalizeActivityLibrarySearch(search);
+  const normalizedTotal = normalizeActivityLibraryListCount(total);
+  const normalizedTotalPages = Math.max(
+    1,
+    normalizeActivityLibraryListCount(totalPages)
+  );
+  const normalizedVisibleCount = Math.min(
+    normalizeActivityLibraryListCount(visibleCount),
+    normalizedTotal
+  );
+  const firstVisible =
+    normalizedTotal > 0 && normalizedVisibleCount > 0
+      ? (normalizedCurrentPage - 1) * normalizedPageSize + 1
+      : 0;
+  const lastVisible =
+    firstVisible > 0
+      ? Math.min(normalizedTotal, firstVisible + normalizedVisibleCount - 1)
+      : 0;
+  const sourceFilterView = buildActivityLibrarySourceFilterView(source);
+  const statusFilterView = buildActivityLibraryStatusFilterView(status);
+  const templateFilterView = buildActivityLibraryTemplateScopeView(template);
+  const isOutOfRange =
+    normalizedTotal > 0 && normalizedCurrentPage > normalizedTotalPages;
+  const hasResults =
+    normalizedTotal > 0 && normalizedVisibleCount > 0 && !isOutOfRange;
+
+  return {
+    items: [
+      {
+        description: m.activity_library_scope_range_description(),
+        id: 'range',
+        label: m.activity_library_scope_range_label(),
+        value: hasResults
+          ? m.activity_library_scope_range_value({
+              firstItem: formatActivityLibraryScopeNumber(firstVisible),
+              lastItem: formatActivityLibraryScopeNumber(lastVisible),
+              total: formatActivityLibraryScopeNumber(normalizedTotal),
+            })
+          : m.activity_library_scope_range_empty_value(),
+      },
+      {
+        description: isOutOfRange
+          ? m.activity_library_scope_page_out_of_range_description({
+              totalPages:
+                formatActivityLibraryScopeNumber(normalizedTotalPages),
+            })
+          : m.activity_library_scope_page_description(),
+        id: 'page',
+        label: m.activity_library_scope_page_label(),
+        value: m.activity_library_scope_page_value({
+          currentPage: formatActivityLibraryScopeNumber(normalizedCurrentPage, {
+            min: 1,
+          }),
+          totalPages: formatActivityLibraryScopeNumber(normalizedTotalPages, {
+            min: 1,
+          }),
+        }),
+      },
+      {
+        description: statusFilterView.description,
+        id: 'status',
+        label: m.activity_library_scope_status_label(),
+        value: statusFilterView.label,
+      },
+      {
+        description: templateFilterView.description,
+        id: 'template',
+        label: m.activity_library_scope_template_label(),
+        value: templateFilterView.label,
+      },
+      {
+        description: sourceFilterView.description,
+        id: 'source',
+        label: m.activity_library_scope_source_label(),
+        value: sourceFilterView.label,
+      },
+      {
+        description: normalizedSearch
+          ? m.activity_library_scope_search_filtered_description()
+          : m.activity_library_scope_search_all_description(),
+        id: 'search',
+        label: m.activity_library_scope_search_label(),
+        value: normalizedSearch ?? m.activity_library_scope_search_all_value(),
+      },
+    ],
+    label: m.activity_library_scope_label(),
+    summary: isOutOfRange
+      ? m.activity_library_scope_summary_out_of_range({
+          currentPage: formatActivityLibraryScopeNumber(normalizedCurrentPage, {
+            min: 1,
+          }),
+          totalPages: formatActivityLibraryScopeNumber(normalizedTotalPages, {
+            min: 1,
+          }),
+        })
+      : hasResults
+        ? m.activity_library_scope_summary({
+            currentPage: formatActivityLibraryScopeNumber(
+              normalizedCurrentPage,
+              { min: 1 }
+            ),
+            firstItem: formatActivityLibraryScopeNumber(firstVisible),
+            lastItem: formatActivityLibraryScopeNumber(lastVisible),
+            total: formatActivityLibraryScopeNumber(normalizedTotal),
+            totalPages: formatActivityLibraryScopeNumber(normalizedTotalPages, {
+              min: 1,
+            }),
+          })
+        : m.activity_library_scope_summary_empty(),
+  };
+}
+
 function buildActivityLibraryStatusFilterView(status: ActivityLibraryStatus) {
   const option =
     activityLibrarySearchCopy.statusOptions.find(
@@ -793,6 +961,22 @@ function buildActivityLibraryStatusFilterView(status: ActivityLibraryStatus) {
   return {
     description: activityLibrarySearchCopy.statusDescription,
     label: option.label,
+  };
+}
+
+function buildActivityLibraryTemplateScopeView(
+  template: ActivityTemplateFilter
+) {
+  if (template === 'all') {
+    return {
+      description: m.activity_library_scope_template_all_description(),
+      label: activityLibrarySearchCopy.templatePlaceholder,
+    };
+  }
+
+  return {
+    description: m.activity_library_scope_template_filtered_description(),
+    label: getTemplateByType(template).name,
   };
 }
 
@@ -867,6 +1051,28 @@ export function resolveActivityLibraryPageSearch(
     sourceFilter,
     templateFilter,
   };
+}
+
+function normalizeActivityLibraryScopePage(value: number) {
+  return Number.isInteger(value) && value > 0 ? value : 1;
+}
+
+function normalizeActivityLibraryScopePageSize(value: number) {
+  return Number.isInteger(value) && value > 0
+    ? value
+    : ACTIVITY_LIBRARY_PAGE_SIZE;
+}
+
+function formatActivityLibraryScopeNumber(
+  value: number,
+  options?: { min?: number }
+) {
+  const normalizedValue = normalizeActivityLibraryListCount(value);
+  return String(
+    options?.min === undefined
+      ? normalizedValue
+      : Math.max(options.min, normalizedValue)
+  );
 }
 
 export function findCreatedActivityInList<

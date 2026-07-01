@@ -17,6 +17,7 @@ import {
 } from '@/activities/library-view';
 import { ActivityLibraryCard } from '@/components/activities/activity-library-card';
 import { ActivityLibrarySearch } from '@/components/activities/activity-library-search';
+import { ActivityLibraryScopePanel } from '@/components/activities/activity-library-scope-panel';
 import { ActivityLibrarySummaryCard } from '@/components/activities/activity-library-summary-card';
 import { CreatedActivityPanel } from '@/components/activities/created-activity-panel';
 import { DashboardPagination } from '@/components/dashboard/dashboard-pagination';
@@ -221,6 +222,10 @@ function DashboardActivitiesPage() {
           total={activePageView.totalActivities}
           value={searchQuery}
         />
+
+        {routeState.status !== 'loading' ? (
+          <ActivityLibraryScopePanel view={activePageView.scopeView} />
+        ) : null}
 
         {routeState.showLoadError ? (
           <div className="rounded-lg border border-destructive/30 bg-destructive/5 p-4 text-sm text-destructive">

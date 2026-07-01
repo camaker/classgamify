@@ -83,6 +83,7 @@ import {
   buildActivityLibraryCompatibilityView,
   buildCreatedActivityPanelContext,
   buildActivityLibraryEmptyStateView,
+  buildActivityLibraryPageScopeView,
   buildActivityLibraryPageViewModel,
   buildActivityLibraryRouteState,
   buildActivityLibraryRemixActionLabel,
@@ -22754,6 +22755,10 @@ const activityLibrarySearchComponentSource = readFileSync(
   'src/components/activities/activity-library-search.tsx',
   'utf8'
 );
+const activityLibraryScopePanelComponentSource = readFileSync(
+  'src/components/activities/activity-library-scope-panel.tsx',
+  'utf8'
+);
 const activityLibraryCompatibilityPanelSource = readFileSync(
   'src/components/activities/activity-library-compatibility-panel.tsx',
   'utf8'
@@ -22875,6 +22880,11 @@ assert.match(
 );
 assert.match(
   dashboardActivitiesRouteSource,
+  /ActivityLibraryScopePanel[\s\S]*view=\{activePageView\.scopeView\}/,
+  'Activity dashboard route should render the prepared activity-library scope panel from the page view-model.'
+);
+assert.match(
+  dashboardActivitiesRouteSource,
   /ActivityLibraryCard/,
   'Activity dashboard route should delegate activity card rendering to the activity library card component.'
 );
@@ -22903,10 +22913,40 @@ assert.match(
   /searchPanelView\.statusLabel[\s\S]*searchPanelView\.statusDescription[\s\S]*searchPanelView\.statusMetrics\.map/,
   'Activity library search component should explain the selected status filter and status counts from the domain view.'
 );
+assert.match(
+  activityLibraryViewSource,
+  /export type ActivityLibraryPageScopeItemId =[\s\S]*'page'[\s\S]*'range'[\s\S]*'search'[\s\S]*'source'[\s\S]*'status'[\s\S]*'template'[\s\S]*export type ActivityLibraryPageScopeItem = \{[\s\S]*description: string;[\s\S]*id: ActivityLibraryPageScopeItemId;[\s\S]*label: string;[\s\S]*value: string;[\s\S]*export type ActivityLibraryPageScopeView = \{[\s\S]*items: ActivityLibraryPageScopeItem\[\];[\s\S]*label: string;[\s\S]*summary: string;/,
+  'Activity library view domain should expose explicit current-view scope contracts with stable item ids.'
+);
+assert.match(
+  activityLibraryViewSource,
+  /export function buildActivityLibraryPageScopeView[\s\S]*normalizeActivityLibraryListCount\(total\)[\s\S]*normalizeActivityLibraryListCount\(visibleCount\)[\s\S]*buildActivityLibrarySourceFilterView\(source\)[\s\S]*buildActivityLibraryStatusFilterView\(status\)[\s\S]*buildActivityLibraryTemplateScopeView\(template\)[\s\S]*activity_library_scope_range_value[\s\S]*activity_library_scope_page_value[\s\S]*activity_library_scope_summary/,
+  'Activity library scope view should normalize counts, reuse filter copy, and prepare localized range, page, source, template, and summary text.'
+);
+assert.match(
+  activityLibraryViewSource,
+  /scopeView: buildActivityLibraryPageScopeView\(\{[\s\S]*currentPage: resolvedSearch\.currentPage,[\s\S]*pageSize: ACTIVITY_LIBRARY_PAGE_SIZE,[\s\S]*search: resolvedSearch\.searchQuery,[\s\S]*source: resolvedSearch\.sourceFilter,[\s\S]*status: resolvedSearch\.libraryStatus,[\s\S]*template: resolvedSearch\.templateFilter,[\s\S]*total: totalActivities,[\s\S]*totalPages,[\s\S]*visibleCount: activities\.length/,
+  'Activity library page view-model should prepare a current-view scope from resolved search, source, template, total pages, and visible item count.'
+);
+assert.match(
+  activityLibraryScopePanelComponentSource,
+  /ActivityLibraryPageScopeItem[\s\S]*ActivityLibraryPageScopeView[\s\S]*aria-label=\{view\.label\}[\s\S]*view\.summary[\s\S]*view\.items\.map[\s\S]*key=\{item\.id\}/,
+  'Activity library scope panel should render prepared scope text and key items by stable ids.'
+);
+assert.match(
+  activityLibraryScopePanelComponentSource,
+  /function ActivityLibraryScopeItem[\s\S]*item\.label[\s\S]*item\.value[\s\S]*item\.description/,
+  'Activity library scope panel items should render prepared labels, values, and descriptions.'
+);
 assert.doesNotMatch(
   activityLibrarySearchComponentSource,
   /audio-ready|worksheet-ready|spreadsheet-ready|future AI extraction|activity status|练习纸提取|活动状态/,
   'Activity library search component should not hardcode filter explanatory copy.'
+);
+assert.doesNotMatch(
+  `${activityLibraryScopePanelComponentSource}\n${dashboardActivitiesRouteSource}`,
+  /Current view|Visible activities|Search scope|Status scope|Template scope|Source scope|当前视图|可见活动|搜索范围|状态范围|模板范围|来源范围/,
+  'Activity library route and scope panel component should not hard-code current-view scope copy.'
 );
 assert.match(
   activityLibrarySummaryCardComponentSource,
@@ -32892,6 +32932,181 @@ assert.deepEqual(
     { label: 'Archived', status: 'archived', value: '9' },
   ]
 );
+assert.deepEqual(
+  buildActivityLibraryPageScopeView({
+    currentPage: 2,
+    pageSize: 12,
+    search: '  Food   words ',
+    source: 'worksheet',
+    status: 'archived',
+    template: 'quiz',
+    total: 31,
+    totalPages: 3,
+    visibleCount: 12,
+  }),
+  {
+    items: [
+      {
+        description: 'Activities currently visible on this page.',
+        id: 'range',
+        label: 'Visible activities',
+        value: '13-24 of 31',
+      },
+      {
+        description:
+          'The page currently shown from this filtered activity library.',
+        id: 'page',
+        label: 'Page',
+        value: 'Page 2 of 3',
+      },
+      {
+        description:
+          'Switch between active and archived activity views without widening beyond your own saved activities.',
+        id: 'status',
+        label: 'Status scope',
+        value: 'Archived',
+      },
+      {
+        description:
+          'Only activities using this exact template family are included.',
+        id: 'template',
+        label: 'Template scope',
+        value: 'Quiz',
+      },
+      {
+        description:
+          'Show activities with worksheet images or documents ready for worksheet extraction.',
+        id: 'source',
+        label: 'Source scope',
+        value: 'Worksheet',
+      },
+      {
+        description: 'Only activities matching this search text are included.',
+        id: 'search',
+        label: 'Search scope',
+        value: 'Food words',
+      },
+    ],
+    label: 'Current view',
+    summary: 'Showing 13-24 of 31 activities on page 2 of 3.',
+  }
+);
+assert.deepEqual(
+  buildActivityLibraryPageScopeView({
+    currentPage: 4,
+    pageSize: 12,
+    search: undefined,
+    source: 'all',
+    status: 'active',
+    template: 'all',
+    total: 31,
+    totalPages: 3,
+    visibleCount: 0,
+  }),
+  {
+    items: [
+      {
+        description: 'Activities currently visible on this page.',
+        id: 'range',
+        label: 'Visible activities',
+        value: 'No visible activities',
+      },
+      {
+        description:
+          'This page is past the available activities. The library will return to page 3.',
+        id: 'page',
+        label: 'Page',
+        value: 'Page 4 of 3',
+      },
+      {
+        description:
+          'Switch between active and archived activity views without widening beyond your own saved activities.',
+        id: 'status',
+        label: 'Status scope',
+        value: 'Active',
+      },
+      {
+        description: 'Every activity template family is included.',
+        id: 'template',
+        label: 'Template scope',
+        value: 'All templates',
+      },
+      {
+        description:
+          'Show every saved activity, whether or not it has classroom files attached.',
+        id: 'source',
+        label: 'Source scope',
+        value: 'All source materials',
+      },
+      {
+        description: 'No search text is narrowing the activity library.',
+        id: 'search',
+        label: 'Search scope',
+        value: 'All saved activities',
+      },
+    ],
+    label: 'Current view',
+    summary: 'Page 4 is beyond the available 3 pages.',
+  }
+);
+assert.deepEqual(
+  buildActivityLibraryPageScopeView({
+    currentPage: Number.NaN,
+    pageSize: 0,
+    search: '',
+    source: 'all',
+    status: 'active',
+    template: 'all',
+    total: Number.POSITIVE_INFINITY,
+    totalPages: Number.NaN,
+    visibleCount: -2,
+  }),
+  {
+    items: [
+      {
+        description: 'Activities currently visible on this page.',
+        id: 'range',
+        label: 'Visible activities',
+        value: 'No visible activities',
+      },
+      {
+        description:
+          'The page currently shown from this filtered activity library.',
+        id: 'page',
+        label: 'Page',
+        value: 'Page 1 of 1',
+      },
+      {
+        description:
+          'Switch between active and archived activity views without widening beyond your own saved activities.',
+        id: 'status',
+        label: 'Status scope',
+        value: 'Active',
+      },
+      {
+        description: 'Every activity template family is included.',
+        id: 'template',
+        label: 'Template scope',
+        value: 'All templates',
+      },
+      {
+        description:
+          'Show every saved activity, whether or not it has classroom files attached.',
+        id: 'source',
+        label: 'Source scope',
+        value: 'All source materials',
+      },
+      {
+        description: 'No search text is narrowing the activity library.',
+        id: 'search',
+        label: 'Search scope',
+        value: 'All saved activities',
+      },
+    ],
+    label: 'Current view',
+    summary: 'No activities are visible in the current library view.',
+  }
+);
 const emptyActivityLibraryPageView = buildActivityLibraryPageViewModel({
   data: null,
   isLoading: false,
@@ -32918,6 +33133,7 @@ assert.deepEqual(
     emptyState: emptyActivityLibraryPageView.emptyState,
     hasActivities: emptyActivityLibraryPageView.hasActivities,
     resolvedSearch: emptyActivityLibraryPageView.resolvedSearch,
+    scopeView: emptyActivityLibraryPageView.scopeView,
     starterPreview: {
       activityIds: emptyActivityLibraryPageView.starterPreview.activities.map(
         (item) => item.id
@@ -32952,6 +33168,51 @@ assert.deepEqual(
       searchQuery: '',
       sourceFilter: 'all',
       templateFilter: 'all',
+    },
+    scopeView: {
+      items: [
+        {
+          description: 'Activities currently visible on this page.',
+          id: 'range',
+          label: 'Visible activities',
+          value: 'No visible activities',
+        },
+        {
+          description:
+            'The page currently shown from this filtered activity library.',
+          id: 'page',
+          label: 'Page',
+          value: 'Page 1 of 1',
+        },
+        {
+          description:
+            'Switch between active and archived activity views without widening beyond your own saved activities.',
+          id: 'status',
+          label: 'Status scope',
+          value: 'Active',
+        },
+        {
+          description: 'Every activity template family is included.',
+          id: 'template',
+          label: 'Template scope',
+          value: 'All templates',
+        },
+        {
+          description:
+            'Show every saved activity, whether or not it has classroom files attached.',
+          id: 'source',
+          label: 'Source scope',
+          value: 'All source materials',
+        },
+        {
+          description: 'No search text is narrowing the activity library.',
+          id: 'search',
+          label: 'Search scope',
+          value: 'All saved activities',
+        },
+      ],
+      label: 'Current view',
+      summary: 'No activities are visible in the current library view.',
     },
     starterPreview: {
       activityIds: ['english-food-quiz', 'science-materials-sort'],
@@ -33242,6 +33503,7 @@ assert.deepEqual(
     emptyState: filteredActivityLibraryPageView.emptyState,
     hasActivities: filteredActivityLibraryPageView.hasActivities,
     resolvedSearch: filteredActivityLibraryPageView.resolvedSearch,
+    scopeView: filteredActivityLibraryPageView.scopeView,
     starterPreviewActivityIds:
       filteredActivityLibraryPageView.starterPreview.activities.map(
         (item) => item.id
@@ -33304,6 +33566,52 @@ assert.deepEqual(
       searchQuery: '  Food   words ',
       sourceFilter: 'worksheet',
       templateFilter: 'quiz',
+    },
+    scopeView: {
+      items: [
+        {
+          description: 'Activities currently visible on this page.',
+          id: 'range',
+          label: 'Visible activities',
+          value: '25-25 of 31',
+        },
+        {
+          description:
+            'The page currently shown from this filtered activity library.',
+          id: 'page',
+          label: 'Page',
+          value: 'Page 3 of 3',
+        },
+        {
+          description:
+            'Switch between active and archived activity views without widening beyond your own saved activities.',
+          id: 'status',
+          label: 'Status scope',
+          value: 'Archived',
+        },
+        {
+          description:
+            'Only activities using this exact template family are included.',
+          id: 'template',
+          label: 'Template scope',
+          value: 'Quiz',
+        },
+        {
+          description:
+            'Show activities with worksheet images or documents ready for worksheet extraction.',
+          id: 'source',
+          label: 'Source scope',
+          value: 'Worksheet',
+        },
+        {
+          description: 'Only activities matching this search text are included.',
+          id: 'search',
+          label: 'Search scope',
+          value: 'Food words',
+        },
+      ],
+      label: 'Current view',
+      summary: 'Showing 25-25 of 31 activities on page 3 of 3.',
     },
     starterPreviewActivityIds: [],
     summaryMetrics: [
