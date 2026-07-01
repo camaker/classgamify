@@ -4078,6 +4078,11 @@ assert.match(
 );
 assert.match(
   activityDraftMetaSource,
+  /export type ActivityDraftMetaSummaryTrustItemId =[\s\S]*'model'[\s\S]*'notice'[\s\S]*'provider'[\s\S]*'review'[\s\S]*'source-materials'[\s\S]*export type ActivityDraftMetaSummaryTrustItemView[\s\S]*id: ActivityDraftMetaSummaryTrustItemId;[\s\S]*label: string;[\s\S]*value: string;[\s\S]*export type ActivityDraftMetaSummaryTrustView[\s\S]*items: ActivityDraftMetaSummaryTrustItemView\[\]/,
+  'AI draft meta domain should expose a structured trust view with stable provenance ids.'
+);
+assert.match(
+  activityDraftMetaSource,
   /export type ActivityDraftMetaSummaryCoverageStatId =[\s\S]*'groups'[\s\S]*'pairs'[\s\S]*'questions'[\s\S]*'teacher-notes'[\s\S]*'vocabulary'[\s\S]*export type ActivityDraftMetaSummaryCoverageStatView = \{[\s\S]*id: ActivityDraftMetaSummaryCoverageStatId;[\s\S]*label: string;[\s\S]*value: number;/,
   'AI draft coverage stats should expose stable ids separately from localized labels.'
 );
@@ -4110,6 +4115,11 @@ assert.match(
   activityDraftMetaSummarySource,
   /ActivityDraftMetaSummaryView[\s\S]*ActivityDraftMetaSummaryCoverageStatView[\s\S]*ActivityDraftMetaSummaryReadinessOption[\s\S]*ActivityDraftMetaSummarySourceMaterialCapabilityView[\s\S]*ActivityDraftReviewChecklistItemView[\s\S]*ActivityDraftMetaSummaryQuestionChoiceReadinessView[\s\S]*ActivityDraftMetaSummaryQuestionChoiceReadinessItemView/,
   'AI draft summary component should import explicit draft-meta subview contracts.'
+);
+assert.match(
+  activityDraftMetaSummarySource,
+  /ActivityDraftMetaSummaryTrustItemView[\s\S]*ActivityDraftMetaSummaryTrustView/,
+  'AI draft summary component should import explicit trust subview contracts.'
 );
 assert.doesNotMatch(
   activityDraftMetaSummarySource,
@@ -4183,8 +4193,28 @@ assert.doesNotMatch(
 );
 assert.match(
   activityDraftMetaSummarySource,
-  /summaryView\.modelLineText[\s\S]*summaryView\.draftFocusLineText[\s\S]*summaryView\.draftFocusDescription[\s\S]*summaryView\.noticeLineText[\s\S]*summaryView\.appliedLabel[\s\S]*summaryView\.nextStepLabel/,
-  'AI draft summary component should render prepared model, draft-focus, and notice text lines.'
+  /ActivityDraftTrustPanel[\s\S]*trustView=\{summaryView\.trustView\}/,
+  'AI draft summary component should delegate provider, model, notice, review-gate, and source-safety provenance to the trust panel.'
+);
+assert.match(
+  activityDraftMetaSummarySource,
+  /function ActivityDraftTrustPanel[\s\S]*trustView\.title[\s\S]*trustView\.description[\s\S]*trustView\.items\.map[\s\S]*ActivityDraftTrustItem[\s\S]*key=\{item\.id\}/,
+  'AI draft trust panel should render prepared trust copy and key items by stable trust ids.'
+);
+assert.match(
+  activityDraftMetaSummarySource,
+  /function ActivityDraftTrustItem[\s\S]*item\.label[\s\S]*item\.value[\s\S]*item\.description/,
+  'AI draft trust items should render prepared label, value, and description fields.'
+);
+assert.doesNotMatch(
+  activityDraftMetaSummarySource,
+  /Draft trust check|Teacher review required|safe sources|No generation notice|草稿信任检查|需要老师检查|安全来源|无生成说明/,
+  'AI draft summary component should not hard-code visible trust provenance copy.'
+);
+assert.match(
+  activityDraftMetaSummarySource,
+  /summaryView\.draftFocusLineText[\s\S]*summaryView\.draftFocusDescription[\s\S]*summaryView\.appliedLabel[\s\S]*summaryView\.nextStepLabel/,
+  'AI draft summary component should still render prepared draft-focus and next-step text lines.'
 );
 assert.match(
   activityDraftMetaSummarySource,
@@ -4284,6 +4314,16 @@ assert.match(
   activityDraftMetaSource,
   /normalizeOptionalRuntimeDisplayText\(notice\)/,
   'AI draft meta should normalize optional generation notices with the shared runtime display helper.'
+);
+assert.match(
+  activityDraftMetaSource,
+  /buildActivityDraftMetaSummaryTrustView[\s\S]*activity_draft_meta_trust_provider_label[\s\S]*activity_draft_meta_trust_model_label[\s\S]*activity_draft_meta_trust_review_label[\s\S]*activity_draft_meta_trust_source_label[\s\S]*activity_draft_meta_trust_notice_label/,
+  'AI draft trust provenance should be assembled in the activity-domain layer from localized copy.'
+);
+assert.match(
+  activityDraftMetaSource,
+  /buildActivityDraftMetaTrustSourceValue[\s\S]*activity_draft_meta_trust_source_none_value[\s\S]*activity_draft_meta_trust_source_one_value[\s\S]*activity_draft_meta_trust_source_many_value/,
+  'AI draft trust source counts should use localized empty, singular, and plural labels.'
 );
 assert.match(
   activityDraftMetaSource,
@@ -35037,6 +35077,48 @@ assert.equal(
   'Generated locally from the source notes, so treat it like a scaffold before assigning.'
 );
 assert.equal(fallbackDraftMetaSummary.providerLabel, 'Fallback');
+assert.deepEqual(fallbackDraftMetaSummary.trustView, {
+  description:
+    'Use this provenance before trusting the generated draft or publishing an assignment link.',
+  items: [
+    {
+      description:
+        'Generated locally from the source notes, so treat it like a scaffold before assigning.',
+      id: 'provider',
+      label: 'Provider',
+      value: 'Fallback',
+    },
+    {
+      description:
+        'Model names are shown for review context only; teachers still approve the final activity.',
+      id: 'model',
+      label: 'Model',
+      value: 'test-model',
+    },
+    {
+      description:
+        'The draft fills the editor only; saving and publishing still require teacher action.',
+      id: 'review',
+      label: 'Review gate',
+      value: 'Teacher review required',
+    },
+    {
+      description:
+        'Only material kind and safe filename basenames are counted here.',
+      id: 'source-materials',
+      label: 'Safe sources',
+      value: '2 safe sources',
+    },
+    {
+      description:
+        'Fallback or completion notes explain when local deterministic drafting changed the result.',
+      id: 'notice',
+      label: 'Notice',
+      value: 'Fallback used for testing.',
+    },
+  ],
+  title: 'Draft trust check',
+});
 assert.equal(
   fallbackDraftMetaSummary.readyTemplateLabel,
   `${fallbackDraftMeta.readyTemplateCount} ready templates`
@@ -35166,6 +35248,7 @@ assert.deepEqual(fallbackDraftMetaSummary.sourceMaterialCapabilityViews, [
 ]);
 assert.doesNotMatch(
   JSON.stringify({
+    trustView: fallbackDraftMetaSummary.trustView,
     noteViews: fallbackDraftMetaSummary.sourceMaterialNoteViews,
     capabilityViews: fallbackDraftMetaSummary.sourceMaterialCapabilityViews,
   }),
@@ -35234,8 +35317,17 @@ assert.deepEqual(
     },
   ]
 );
+assert.equal(
+  dedupedMaterialDraftMetaSummary.trustView.items.find(
+    (item) => item.id === 'source-materials'
+  )?.value,
+  '1 safe source'
+);
 assert.doesNotMatch(
-  JSON.stringify(dedupedMaterialDraftMetaSummary.sourceMaterialNoteViews),
+  JSON.stringify({
+    trustView: dedupedMaterialDraftMetaSummary.trustView,
+    noteViews: dedupedMaterialDraftMetaSummary.sourceMaterialNoteViews,
+  }),
   /https?:|files\.example|private|token|signature|sig=|#page|teacher\\/i
 );
 assert.deepEqual(
@@ -35266,9 +35358,19 @@ assert.deepEqual(
 );
 assert.doesNotMatch(
   JSON.stringify(
-    allMaterialCapabilityDraftMetaSummary.sourceMaterialCapabilityViews
+    {
+      trustView: allMaterialCapabilityDraftMetaSummary.trustView,
+      capabilityViews:
+        allMaterialCapabilityDraftMetaSummary.sourceMaterialCapabilityViews,
+    }
   ),
   /class-demo|video|storageKey|fileId|contentType|owner|permission/i
+);
+assert.equal(
+  allMaterialCapabilityDraftMetaSummary.trustView.items.find(
+    (item) => item.id === 'source-materials'
+  )?.value,
+  '4 safe sources'
 );
 assert.equal(
   fallbackDraftMetaSummary.suggestedTemplateOptions,
@@ -35375,6 +35477,18 @@ assert.equal(
   questionOnlyDraftMetaSummary.providerDescription,
   'Generated by Workers AI and converted into the teacher-reviewable activity editor contract.'
 );
+assert.equal(
+  questionOnlyDraftMetaSummary.trustView.items.find(
+    (item) => item.id === 'source-materials'
+  )?.value,
+  'No attached safe sources'
+);
+assert.equal(
+  questionOnlyDraftMetaSummary.trustView.items.find(
+    (item) => item.id === 'notice'
+  )?.value,
+  'No generation notice'
+);
 assert.ok(
   questionOnlyDraftMetaSummary.templateReadinessOptions.some(
     (option) =>
@@ -35474,6 +35588,18 @@ assert.equal(
   normalizedDraftMetaSummary.providerDescription,
   'Drafted by Workers AI, then completed locally where required classroom structures were missing.'
 );
+assert.equal(
+  normalizedDraftMetaSummary.trustView.items.find(
+    (item) => item.id === 'model'
+  )?.value,
+  'Workers AI'
+);
+assert.equal(
+  normalizedDraftMetaSummary.trustView.items.find(
+    (item) => item.id === 'notice'
+  )?.value,
+  'Local completion used.'
+);
 const blankNoticeDraftMetaSummary = buildActivityDraftMetaSummaryView({
   meta: fallbackDraftMeta,
   model: 'test-model',
@@ -35485,6 +35611,12 @@ assert.equal(blankNoticeDraftMetaSummary.noticeLineText, undefined);
 assert.equal(
   blankNoticeDraftMetaSummary.providerDescription,
   'Generated by Workers AI and converted into the teacher-reviewable activity editor contract.'
+);
+assert.equal(
+  blankNoticeDraftMetaSummary.trustView.items.find(
+    (item) => item.id === 'notice'
+  )?.value,
+  'No generation notice'
 );
 try {
   overwriteGetLocale(() => 'zh');
@@ -35509,6 +35641,42 @@ try {
     zhFallbackDraftMetaSummary.providerDescription,
     '已根据素材备注在本地生成，请把它当作脚手架检查后再发布。'
   );
+  assert.deepEqual(zhFallbackDraftMetaSummary.trustView, {
+    description: '信任这份生成草稿或发布作业链接前，请先查看这些来源信息。',
+    items: [
+      {
+        description: '已根据素材备注在本地生成，请把它当作脚手架检查后再发布。',
+        id: 'provider',
+        label: '生成来源',
+        value: '本地兜底',
+      },
+      {
+        description: '模型名称仅用于检查生成背景；最终活动仍需老师确认。',
+        id: 'model',
+        label: '模型',
+        value: 'test-model',
+      },
+      {
+        description: '草稿只会填入编辑器；保存和发布仍必须由老师操作。',
+        id: 'review',
+        label: '检查门槛',
+        value: '需要老师检查',
+      },
+      {
+        description: '这里仅统计素材类型和安全文件名。',
+        id: 'source-materials',
+        label: '安全来源',
+        value: '无附加安全来源',
+      },
+      {
+        description: '兜底或补齐说明会解释本地确定性生成是否改变了结果。',
+        id: 'notice',
+        label: '说明',
+        value: '无生成说明',
+      },
+    ],
+    title: '草稿信任检查',
+  });
   assert.equal(zhFallbackDraftMetaSummary.appliedLabel, '已填入编辑器');
   assert.equal(zhFallbackDraftMetaSummary.nextStepLabel, '下一步');
   assert.equal(
@@ -35573,6 +35741,12 @@ try {
         value: '1',
       },
     ]
+  );
+  assert.equal(
+    zhMaterialCapabilityDraftMetaSummary.trustView.items.find(
+      (item) => item.id === 'source-materials'
+    )?.value,
+    '3 个安全来源'
   );
   assert.equal(zhFallbackDraftMetaSummary.lockedTemplatesTitle, '暂不可用模板');
   assert.match(

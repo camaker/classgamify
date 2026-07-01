@@ -168,6 +168,26 @@ export type ActivityDraftMetaSummarySourceMaterialCapabilityView =
     label: string;
   }>;
 
+export type ActivityDraftMetaSummaryTrustItemId =
+  | 'model'
+  | 'notice'
+  | 'provider'
+  | 'review'
+  | 'source-materials';
+
+export type ActivityDraftMetaSummaryTrustItemView = {
+  description: string;
+  id: ActivityDraftMetaSummaryTrustItemId;
+  label: string;
+  value: string;
+};
+
+export type ActivityDraftMetaSummaryTrustView = {
+  description: string;
+  items: ActivityDraftMetaSummaryTrustItemView[];
+  title: string;
+};
+
 export type ActivityDraftMetaSummaryView = {
   appliedDescription: string;
   appliedLabel: string;
@@ -208,6 +228,7 @@ export type ActivityDraftMetaSummaryView = {
   suggestedTemplatesTitle: string;
   templateReadinessOptions: ActivityDraftMetaSummaryReadinessOption[];
   title: string;
+  trustView: ActivityDraftMetaSummaryTrustView;
 };
 
 export type ActivityDraftReviewChecklistItemView =
@@ -333,6 +354,14 @@ export function buildActivityDraftMetaSummaryView({
     checklist: meta.reviewChecklist,
     items: meta.reviewChecklistItems,
   });
+  const providerDescription = buildActivityDraftProviderDescription({
+    notice: normalizedNotice,
+    provider,
+  });
+  const providerLabel =
+    provider === 'workers-ai'
+      ? m.activity_draft_meta_provider_workers_ai()
+      : m.activity_draft_meta_provider_fallback();
 
   return {
     appliedDescription: m.activity_draft_meta_applied_description(),
@@ -401,14 +430,8 @@ export function buildActivityDraftMetaSummaryView({
           value: normalizedNotice,
         })
       : undefined,
-    providerDescription: buildActivityDraftProviderDescription({
-      notice: normalizedNotice,
-      provider,
-    }),
-    providerLabel:
-      provider === 'workers-ai'
-        ? m.activity_draft_meta_provider_workers_ai()
-        : m.activity_draft_meta_provider_fallback(),
+    providerDescription,
+    providerLabel,
     questionChoiceReadiness:
       buildActivityDraftMetaSummaryQuestionChoiceReadinessView(
         meta.questionChoiceReadiness
@@ -450,7 +473,77 @@ export function buildActivityDraftMetaSummaryView({
     suggestedTemplatesTitle: m.activity_draft_meta_suggested_templates_title(),
     templateReadinessOptions: normalizedTemplateReadinessOptions,
     title: m.activity_draft_meta_title(),
+    trustView: buildActivityDraftMetaSummaryTrustView({
+      modelName,
+      notice: normalizedNotice,
+      providerDescription,
+      providerLabel,
+      sourceMaterialCount: normalizedSourceMaterialNoteViews.length,
+    }),
   };
+}
+
+function buildActivityDraftMetaSummaryTrustView({
+  modelName,
+  notice,
+  providerDescription,
+  providerLabel,
+  sourceMaterialCount,
+}: {
+  modelName: string;
+  notice?: string;
+  providerDescription: string;
+  providerLabel: string;
+  sourceMaterialCount: number;
+}): ActivityDraftMetaSummaryTrustView {
+  const safeSourceCount = normalizeActivityDraftMetaCount(sourceMaterialCount);
+
+  return {
+    description: m.activity_draft_meta_trust_description(),
+    items: [
+      {
+        description: providerDescription,
+        id: 'provider',
+        label: m.activity_draft_meta_trust_provider_label(),
+        value: providerLabel,
+      },
+      {
+        description: m.activity_draft_meta_trust_model_description(),
+        id: 'model',
+        label: m.activity_draft_meta_trust_model_label(),
+        value: modelName,
+      },
+      {
+        description: m.activity_draft_meta_trust_review_description(),
+        id: 'review',
+        label: m.activity_draft_meta_trust_review_label(),
+        value: m.activity_draft_meta_trust_review_value(),
+      },
+      {
+        description: m.activity_draft_meta_trust_source_description(),
+        id: 'source-materials',
+        label: m.activity_draft_meta_trust_source_label(),
+        value: buildActivityDraftMetaTrustSourceValue(safeSourceCount),
+      },
+      {
+        description: m.activity_draft_meta_trust_notice_description(),
+        id: 'notice',
+        label: m.activity_draft_meta_trust_notice_label(),
+        value: notice ?? m.activity_draft_meta_trust_notice_none_value(),
+      },
+    ],
+    title: m.activity_draft_meta_trust_title(),
+  };
+}
+
+function buildActivityDraftMetaTrustSourceValue(count: number) {
+  if (count === 0) {
+    return m.activity_draft_meta_trust_source_none_value();
+  }
+
+  return count === 1
+    ? m.activity_draft_meta_trust_source_one_value({ count })
+    : m.activity_draft_meta_trust_source_many_value({ count });
 }
 
 function buildActivityDraftMetaSummaryQuestionChoiceReadinessView(

@@ -7,6 +7,8 @@ import {
   type ActivityDraftMetaSummaryQuestionChoiceReadinessView,
   type ActivityDraftMetaSummaryReadinessOption,
   type ActivityDraftMetaSummarySourceMaterialCapabilityView,
+  type ActivityDraftMetaSummaryTrustItemView,
+  type ActivityDraftMetaSummaryTrustView,
   type ActivityDraftMetaSummaryView,
   type ActivityDraftReviewChecklistItemView,
 } from '@/activities/draft-meta';
@@ -52,14 +54,10 @@ export function ActivityDraftMetaSummary({
           </Badge>
         </div>
       </div>
+      <ActivityDraftTrustPanel trustView={summaryView.trustView} />
       <div className="mt-3 rounded-lg border bg-background p-3 text-xs leading-5 text-muted-foreground">
-        <p className="font-medium">{summaryView.modelLineText}</p>
-        <p className="mt-1 font-medium">{summaryView.draftFocusLineText}</p>
+        <p className="font-medium">{summaryView.draftFocusLineText}</p>
         <p className="mt-1">{summaryView.draftFocusDescription}</p>
-        <p className="mt-1">{summaryView.providerDescription}</p>
-        {summaryView.noticeLineText ? (
-          <p className="mt-1 font-medium">{summaryView.noticeLineText}</p>
-        ) : null}
       </div>
       <div className="mt-3 rounded-lg border bg-background p-3 text-xs leading-5 text-muted-foreground">
         <p className="font-medium text-foreground">
@@ -185,6 +183,44 @@ export function ActivityDraftMetaSummary({
           />
         ))}
       </div>
+    </div>
+  );
+}
+
+function ActivityDraftTrustPanel({
+  trustView,
+}: {
+  trustView: ActivityDraftMetaSummaryTrustView;
+}) {
+  return (
+    <div className="mt-4 rounded-lg border bg-background p-3">
+      <p className="font-medium text-sm">{trustView.title}</p>
+      <p className="mt-1 text-muted-foreground text-xs leading-5">
+        {trustView.description}
+      </p>
+      <div className="mt-3 grid gap-2 md:grid-cols-5">
+        {trustView.items.map((item) => (
+          <ActivityDraftTrustItem item={item} key={item.id} />
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function ActivityDraftTrustItem({
+  item,
+}: {
+  item: ActivityDraftMetaSummaryTrustItemView;
+}) {
+  return (
+    <div className="rounded-md border bg-muted/20 p-2.5">
+      <p className="text-muted-foreground text-xs leading-5">{item.label}</p>
+      <p className="mt-1 break-words font-medium text-xs leading-5">
+        {item.value}
+      </p>
+      <p className="mt-1 text-muted-foreground text-xs leading-5">
+        {item.description}
+      </p>
     </div>
   );
 }
