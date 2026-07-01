@@ -224,6 +224,7 @@ function AssignmentListShareActions({
         disabled={!action.isAvailable}
         disabledReasonCode={action.disabledReasonCode}
         disabledMessage={action.disabledReason}
+        disabledReasonId={disabledReasonId}
         label={action.copyLabel}
         shareSlug={action.shareSlug}
         className="w-full bg-background lg:w-auto"

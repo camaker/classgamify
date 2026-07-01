@@ -12,6 +12,7 @@ export function CopyAssignmentShareLinkButton({
   disabled,
   disabledReasonCode,
   disabledMessage,
+  disabledReasonId,
   label,
   shareSlug,
 }: {
@@ -19,6 +20,7 @@ export function CopyAssignmentShareLinkButton({
   disabled?: boolean;
   disabledReasonCode?: AssignmentShareLinkDisabledReasonCode;
   disabledMessage?: string;
+  disabledReasonId?: string;
   label: string;
   shareSlug: string;
 }) {
@@ -48,6 +50,7 @@ export function CopyAssignmentShareLinkButton({
       variant="outline"
       className={className}
       disabled={disabled}
+      aria-describedby={disabled ? disabledReasonId : undefined}
       onClick={copyShareLink}
     >
       <IconCopy className="size-4" />

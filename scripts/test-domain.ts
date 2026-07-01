@@ -1694,6 +1694,11 @@ assert.match(
 );
 assert.match(
   copyAssignmentShareLinkButtonSource,
+  /disabledReasonId,[\s\S]*disabledReasonId\?: string;[\s\S]*aria-describedby=\{disabled \? disabledReasonId : undefined\}/,
+  'Share-link copy button should associate disabled copy controls with the prepared disabled reason text when available.'
+);
+assert.match(
+  copyAssignmentShareLinkButtonSource,
   /label,[\s\S]*label: string;[\s\S]*\{label\}/,
   'Share-link copy button should require prepared copy labels from assignment-domain action views.'
 );
@@ -5412,6 +5417,16 @@ assert.match(
   assignmentResultsHeaderActionsSource,
   /function AssignmentResultsHeaderCopyShareAction[\s\S]*disabled=\{!shareAction\.isAvailable\}[\s\S]*disabledReasonCode=\{shareAction\.disabledReasonCode\}[\s\S]*disabledMessage=\{shareAction\.disabledReason\}[\s\S]*shareSlug=\{shareAction\.shareSlug\}/,
   'Assignment result copy-share action should render prepared disabled state, reason code, and share slug.'
+);
+assert.match(
+  assignmentResultsHeaderActionsSource,
+  /const shareDisabledReasonId =\s*getAssignmentResultHeaderShareDisabledReasonId\(shareAction\)[\s\S]*AssignmentResultsHeaderSharePreviewLink[\s\S]*disabledReasonId=\{shareDisabledReasonId\}[\s\S]*AssignmentResultsHeaderCopyShareAction[\s\S]*disabledReasonId=\{shareDisabledReasonId\}[\s\S]*AssignmentResultsHeaderShareDisabledReason[\s\S]*disabledReasonId=\{shareDisabledReasonId\}/,
+  'Assignment result share controls should pass the same prepared disabled reason id to preview, copy, and disabled reason text.'
+);
+assert.match(
+  assignmentResultsHeaderActionsSource,
+  /function getAssignmentResultHeaderShareDisabledReasonId\(\{[\s\S]*disabledReason,[\s\S]*shareSlug,[\s\S]*\}: AssignmentResultHeaderShareAction\)[\s\S]*`assignment-result-share-\$\{shareSlug\}-disabled-reason`/,
+  'Assignment result share disabled reason ids should be stable per student-link share slug.'
 );
 assert.match(
   assignmentResultsHeaderActionsSource,
@@ -23185,6 +23200,11 @@ assert.match(
   /function AssignmentListShareDisabledReason[\s\S]*action\.disabledReason[\s\S]*id=\{disabledReasonId\}/,
   'Assignment list share disabled reason should render prepared lifecycle copy.'
 );
+assert.match(
+  assignmentListCardComponentSource,
+  /function AssignmentListShareActions[\s\S]*const disabledReasonId = getAssignmentListShareDisabledReasonId\(action\)[\s\S]*CopyAssignmentShareLinkButton[\s\S]*disabledReasonId=\{disabledReasonId\}[\s\S]*AssignmentListShareDisabledReason[\s\S]*disabledReasonId=\{disabledReasonId\}/,
+  'Assignment list share copy button should reference the same prepared disabled reason text as the preview action.'
+);
 assert.doesNotMatch(
   assignmentListCardComponentSource,
   /assignment_list_share_link_|assignment_list_action_share_link_unavailable|status ===|expiresAt|isAssignmentOpen|getAssignmentLifecycleStatus/,
@@ -23371,6 +23391,11 @@ assert.match(
   publishedAssignmentPanelComponentSource,
   /function PublishedAssignmentShareDisabledReason[\s\S]*if \(!action\.disabledReason\) return null;[\s\S]*id=\{disabledReasonId\}[\s\S]*action\.disabledReason/,
   'Published assignment panel should render prepared share-link disabled reasons when the student link is unavailable.'
+);
+assert.match(
+  publishedAssignmentPanelComponentSource,
+  /function PublishedAssignmentShareActions[\s\S]*const disabledReasonId = getPublishedAssignmentShareDisabledReasonId\(action\)[\s\S]*CopyAssignmentShareLinkButton[\s\S]*disabledReasonId=\{disabledReasonId\}[\s\S]*PublishedAssignmentShareDisabledReason[\s\S]*disabledReasonId=\{disabledReasonId\}/,
+  'Published assignment panel copy action should reference the same prepared disabled reason text as the preview action.'
 );
 assert.doesNotMatch(
   publishedAssignmentPanelComponentSource,

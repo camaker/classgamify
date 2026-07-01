@@ -32,13 +32,25 @@ export function AssignmentResultsHeaderActions({
   resultActions,
   shareAction,
 }: AssignmentResultsHeaderActionsProps) {
+  const shareDisabledReasonId =
+    getAssignmentResultHeaderShareDisabledReasonId(shareAction);
+
   return (
     <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap">
-      <AssignmentResultsHeaderSharePreviewLink shareAction={shareAction} />
+      <AssignmentResultsHeaderSharePreviewLink
+        disabledReasonId={shareDisabledReasonId}
+        shareAction={shareAction}
+      />
       <AssignmentResultsHeaderSharePath shareAction={shareAction} />
-      <AssignmentResultsHeaderCopyShareAction shareAction={shareAction} />
+      <AssignmentResultsHeaderCopyShareAction
+        disabledReasonId={shareDisabledReasonId}
+        shareAction={shareAction}
+      />
       <AssignmentResultsHeaderPrintActionLink printAction={printAction} />
-      <AssignmentResultsHeaderShareDisabledReason shareAction={shareAction} />
+      <AssignmentResultsHeaderShareDisabledReason
+        disabledReasonId={shareDisabledReasonId}
+        shareAction={shareAction}
+      />
       <AssignmentResultsHeaderResultActions
         onResultAction={onResultAction}
         resultActions={resultActions}
@@ -48,13 +60,20 @@ export function AssignmentResultsHeaderActions({
 }
 
 function AssignmentResultsHeaderSharePreviewLink({
+  disabledReasonId,
   shareAction,
 }: {
+  disabledReasonId: string | undefined;
   shareAction: AssignmentResultHeaderShareAction;
 }) {
   if (!shareAction.isAvailable) {
     return (
-      <Button type="button" className="w-full sm:w-auto" disabled>
+      <Button
+        type="button"
+        className="w-full sm:w-auto"
+        disabled
+        aria-describedby={disabledReasonId}
+      >
         <IconPlayerPlay className="size-4" />
         {shareAction.label}
       </Button>
@@ -90,8 +109,10 @@ function AssignmentResultsHeaderSharePath({
 }
 
 function AssignmentResultsHeaderCopyShareAction({
+  disabledReasonId,
   shareAction,
 }: {
+  disabledReasonId: string | undefined;
   shareAction: AssignmentResultHeaderShareAction;
 }) {
   return (
@@ -99,6 +120,7 @@ function AssignmentResultsHeaderCopyShareAction({
       disabled={!shareAction.isAvailable}
       disabledReasonCode={shareAction.disabledReasonCode}
       disabledMessage={shareAction.disabledReason}
+      disabledReasonId={disabledReasonId}
       label={shareAction.copyLabel}
       shareSlug={shareAction.shareSlug}
       className="w-full bg-background sm:w-auto"
@@ -128,17 +150,31 @@ function AssignmentResultsHeaderPrintActionLink({
 }
 
 function AssignmentResultsHeaderShareDisabledReason({
+  disabledReasonId,
   shareAction,
 }: {
+  disabledReasonId: string | undefined;
   shareAction: AssignmentResultHeaderShareAction;
 }) {
   if (!shareAction.disabledReason) return null;
 
   return (
-    <p className="basis-full text-sm text-muted-foreground">
+    <p
+      id={disabledReasonId}
+      className="basis-full text-sm text-muted-foreground"
+    >
       {shareAction.disabledReason}
     </p>
   );
+}
+
+function getAssignmentResultHeaderShareDisabledReasonId({
+  disabledReason,
+  shareSlug,
+}: AssignmentResultHeaderShareAction) {
+  return disabledReason
+    ? `assignment-result-share-${shareSlug}-disabled-reason`
+    : undefined;
 }
 
 function AssignmentResultsHeaderResultActions({
