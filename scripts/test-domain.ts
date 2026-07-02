@@ -7,6 +7,15 @@ import { Routes } from '@/lib/routes';
 import { getPricePlans } from '@/lib/price-plan';
 import { buildSqlLikeContainsPattern } from '@/lib/sql-like';
 import { APP_ENTITY_ID_LENGTH } from '@/lib/entity-id';
+import {
+  buildContactClassroomInquiryPayload,
+  CONTACT_CLASSROOM_INQUIRY_FIELD_IDS,
+  CONTACT_CLASSROOM_INQUIRY_FIELD_LIMITS,
+  CONTACT_MESSAGE_LIMITS,
+  hasContactClassroomInquiryPayload,
+  normalizeContactClassroomInquiryFields,
+  normalizeContactInquiryIntent,
+} from '@/contact/inquiry';
 import { getAvatarLinks } from '@/config/avatar-config';
 import { getFooterLinks } from '@/config/footer-config';
 import { getNavbarLinks } from '@/config/navbar-config';
@@ -1561,7 +1570,42 @@ for (const filePath of environmentTemplateFiles) {
     /885df2bc-1419-458c-b8b6-0821eddfb399|G-QH46LZCPE3|367bc1f5-9e17-46c5-af53-661b08883331|xa8pgti8e4/,
     `${filePath} should not carry copied Cloudflare or analytics identifiers.`
   );
+  assert.doesNotMatch(
+    fileText,
+    /FAL_KEY|fal\.ai/i,
+    `${filePath} should not document an unused AI image-generation provider for ClassGamify activity drafts.`
+  );
 }
+const productionEnvTemplateSource = readFileSync(
+  '.env.production.example',
+  'utf8'
+);
+assert.match(
+  productionEnvTemplateSource,
+  /Cloudflare Git integration owns production builds and deploys/,
+  'Production env example should describe the Cloudflare-owned deploy path.'
+);
+assert.doesNotMatch(
+  productionEnvTemplateSource,
+  /GitHub Actions deployment needs|repository secrets/i,
+  'Production env example should not reintroduce a GitHub Actions deploy path.'
+);
+const mailDocumentationSource = readFileSync('docs/mail.md', 'utf8');
+assert.doesNotMatch(
+  mailDocumentationSource,
+  /MyApp <support@example\.com>|Contact Message from Website/,
+  'Mail docs should not keep copied app placeholder contact examples.'
+);
+assert.match(
+  mailDocumentationSource,
+  /ClassGamify <support@classgamify\.com>[\s\S]*supportEmail: 'ClassGamify <support@classgamify\.com>'/,
+  'Mail docs should show ClassGamify sender and support email examples.'
+);
+assert.match(
+  mailDocumentationSource,
+  /\{ name, email, message, intent\?, classroomInquiry\? \}[\s\S]*ClassGamify classroom and product inquiry/,
+  'Mail docs should document structured classroom inquiry template context.'
+);
 assert.doesNotMatch(
   blogPostVisualSource,
   />ClassGamify</,
@@ -6746,6 +6790,12 @@ const contactFormCardSource = readFileSync(
   'src/components/contact/contact-form-card.tsx',
   'utf8'
 );
+const contactApiSource = readFileSync('src/api/contact.ts', 'utf8');
+const contactInquirySource = readFileSync('src/contact/inquiry.ts', 'utf8');
+const contactEmailTemplateSource = readFileSync(
+  'src/mail/templates/contact-message.tsx',
+  'utf8'
+);
 assert.doesNotMatch(
   contactFormCardSource,
   /err\.message|error\.message|err instanceof Error|error instanceof Error/,
@@ -6755,6 +6805,41 @@ assert.match(
   contactFormCardSource,
   /const msg = m\.contact_error\(\);/,
   'Contact form failures should show the localized contact failure message.'
+);
+assert.match(
+  contactFormCardSource,
+  /buildContactClassroomInquiryPayload\(\{[\s\S]*learners: values\.classroomLearners[\s\S]*grade: values\.classroomGrade[\s\S]*material: values\.classroomMaterial[\s\S]*routine: values\.classroomRoutine[\s\S]*need: values\.classroomNeed/,
+  'Contact classroom form should send structured inquiry fields instead of folding them into the message body.'
+);
+assert.doesNotMatch(
+  contactFormCardSource,
+  /buildClassroomInquiryMessage|structuredLines|emailHeading[\s\S]*join\('\\n'\)/,
+  'Contact form should not build classroom email text locally.'
+);
+assert.match(
+  contactApiSource,
+  /normalizeContactInquiryIntent\(data\.intent\)[\s\S]*buildContactClassroomInquiryPayload/,
+  'Contact API should normalize inquiry intent and classroom fields at the server boundary.'
+);
+assert.match(
+  contactApiSource,
+  /context: \{[\s\S]*intent,[\s\S]*classroomInquiry,/,
+  'Contact API should pass structured classroom inquiry context into the mail template.'
+);
+assert.match(
+  contactInquirySource,
+  /CONTACT_CLASSROOM_INQUIRY_FIELD_IDS[\s\S]*'learners'[\s\S]*'grade'[\s\S]*'material'[\s\S]*'routine'[\s\S]*'need'/,
+  'Contact inquiry domain should own the classroom field order.'
+);
+assert.match(
+  contactEmailTemplateSource,
+  /hasContactClassroomInquiryPayload[\s\S]*mail_contact_message_classroom_heading[\s\S]*CONTACT_CLASSROOM_INQUIRY_FIELD_IDS\.map/,
+  'Contact email template should render structured classroom fields through prepared labels.'
+);
+assert.match(
+  contactEmailTemplateSource,
+  /mail_contact_message_type_classroom[\s\S]*mail_contact_message_type_general/,
+  'Contact email template should label classroom versus general product inquiries.'
 );
 const newsletterFormCardSource = readFileSync(
   'src/components/settings/notification/newsletter-form-card.tsx',
@@ -8856,6 +8941,43 @@ const enLocaleMessages = JSON.parse(
 const zhLocaleMessages = JSON.parse(
   readFileSync('project.inlang/messages/zh.json', 'utf8')
 ) as Record<string, string>;
+const contactMessageBoundaryRequirements = [
+  [
+    enLocaleMessages,
+    'en',
+    [
+      ['mail_contact_message_subject', /ClassGamify classroom and product inquiry/],
+      ['mail_contact_message_intro', /teacher, tutor, parent, or school team/],
+      ['mail_contact_message_type_classroom', /Classroom workflow/],
+      ['mail_contact_message_classroom_heading', /Classroom workflow details/],
+      ['mail_contact_message_classroom_need', /Template, worksheet, or result need/],
+    ],
+  ],
+  [
+    zhLocaleMessages,
+    'zh',
+    [
+      ['mail_contact_message_subject', /ClassGamify 课堂与产品咨询/],
+      ['mail_contact_message_intro', /老师、辅导者、家长或学校团队/],
+      ['mail_contact_message_type_classroom', /课堂工作流/],
+      ['mail_contact_message_classroom_heading', /课堂工作流信息/],
+      ['mail_contact_message_classroom_need', /模板、练习纸或结果需求/],
+    ],
+  ],
+] as const;
+for (const [
+  messages,
+  locale,
+  requirements,
+] of contactMessageBoundaryRequirements) {
+  for (const [key, pattern] of requirements) {
+    assert.match(
+      messages[key] ?? '',
+      pattern,
+      `${locale} ${key} should describe ClassGamify classroom contact boundaries.`
+    );
+  }
+}
 const authWorkspaceBoundaryRequirements = [
   [
     enLocaleMessages,
@@ -27607,6 +27729,52 @@ assert.deepEqual(
     (item) => item.id
   ),
   ['students', 'materials', 'rollout']
+);
+assert.equal(normalizeContactInquiryIntent('classroom'), 'classroom');
+assert.equal(normalizeContactInquiryIntent('support'), 'general');
+assert.deepEqual(
+  normalizeContactClassroomInquiryFields({
+    grade: ' Grade 3 ',
+    learners: ' 28   students ',
+    material: 'Ｅｎｇｌｉｓｈ   vocabulary',
+    need: '',
+    routine: ' Two lessons\nper week ',
+  }),
+  [
+    { id: 'learners', value: '28 students' },
+    { id: 'grade', value: 'Grade 3' },
+    { id: 'material', value: 'English vocabulary' },
+    { id: 'routine', value: 'Two lessons per week' },
+  ]
+);
+const longClassroomNeed = 'x'.repeat(
+  CONTACT_CLASSROOM_INQUIRY_FIELD_LIMITS.need + 10
+);
+assert.equal(
+  buildContactClassroomInquiryPayload({ need: longClassroomNeed }).fields[0]
+    ?.value.length,
+  CONTACT_CLASSROOM_INQUIRY_FIELD_LIMITS.need
+);
+assert.deepEqual(CONTACT_CLASSROOM_INQUIRY_FIELD_IDS, [
+  'learners',
+  'grade',
+  'material',
+  'routine',
+  'need',
+]);
+assert.equal(CONTACT_MESSAGE_LIMITS.message.max, 1500);
+assert.equal(
+  hasContactClassroomInquiryPayload(
+    buildContactClassroomInquiryPayload({ learners: '10 students' })
+  ),
+  true
+);
+assert.equal(
+  hasContactClassroomInquiryPayload({
+    fields: [{ id: 'storageKey', value: 'secret' }],
+    intent: 'classroom',
+  }),
+  false
 );
 assert.deepEqual(buildPricingPageViewModel().hero, {
   eyebrow: 'ClassGamify plans',

@@ -39,17 +39,23 @@ const smokeMatrix: Array<{ locale: LocaleMode; theme: ThemeMode }> = [
 
 const classroomContactCases = [
   {
-    fields: [
-      'Learners',
-      'Class or grade',
-      'Activity material',
-      'Weekly routine',
-      'Main need',
+    fieldKeys: [
+      'contact_classroom_learners_label',
+      'contact_classroom_grade_label',
+      'contact_classroom_material_label',
+      'contact_classroom_routine_label',
+      'contact_classroom_need_label',
     ],
     locale: 'en',
   },
   {
-    fields: ['学习者', '班级或年级', '活动材料', '每周节奏', '主要需求'],
+    fieldKeys: [
+      'contact_classroom_learners_label',
+      'contact_classroom_grade_label',
+      'contact_classroom_material_label',
+      'contact_classroom_routine_label',
+      'contact_classroom_need_label',
+    ],
     locale: 'zh',
   },
 ] as const;
@@ -189,7 +195,7 @@ test.describe('public page smoke coverage', () => {
     monitor.expectNoErrors('home login modal');
   });
 
-  for (const { fields, locale } of classroomContactCases) {
+  for (const { fieldKeys, locale } of classroomContactCases) {
     test(`shows classroom inquiry fields in ${locale}`, async ({ page }) => {
       await setTheme(page, 'light');
       const monitor = installPageHealthMonitor(page);
@@ -201,9 +207,23 @@ test.describe('public page smoke coverage', () => {
         { theme: 'light' }
       );
 
-      for (const field of fields) {
-        await expect(page.getByLabel(field)).toBeVisible();
+      for (const fieldKey of fieldKeys) {
+        await expect(
+          page.getByLabel(getLocaleMessage(locale, fieldKey))
+        ).toBeVisible();
       }
+
+      await expect(
+        page.getByLabel(getLocaleMessage(locale, 'contact_message'))
+      ).toHaveValue(
+        getLocaleMessage(locale, 'contact_classroom_message_template')
+      );
+
+      await expect(
+        page.getByText(
+          getLocaleMessage(locale, 'contact_classroom_details_description')
+        )
+      ).toBeVisible();
 
       const bodyText = (await page.locator('body').innerText()).trim();
       expect(bodyText).not.toMatch(/HSK|Hanzi|Lang Study|getlangstudy/i);

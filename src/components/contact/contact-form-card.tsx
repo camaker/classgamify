@@ -3,6 +3,12 @@ import { sendContactMessage } from '@/api/contact';
 import { FormError } from '@/components/shared/form-error';
 import { Button } from '@/components/ui/button';
 import {
+  buildContactClassroomInquiryPayload,
+  CONTACT_CLASSROOM_INQUIRY_FIELD_LIMITS,
+  CONTACT_MESSAGE_LIMITS,
+  type ContactInquiryIntent,
+} from '@/contact/inquiry';
+import {
   Card,
   CardContent,
   CardFooter,
@@ -25,26 +31,42 @@ import { useForm, type Control } from 'react-hook-form';
 import { toast } from 'sonner';
 import { z } from 'zod';
 const schema = z.object({
-  name: z.string().min(3, m.contact_name_min()).max(30, m.contact_name_max()),
+  name: z
+    .string()
+    .min(CONTACT_MESSAGE_LIMITS.name.min, m.contact_name_min())
+    .max(CONTACT_MESSAGE_LIMITS.name.max, m.contact_name_max()),
   email: z.email(m.contact_email_invalid()),
   message: z
     .string()
-    .min(10, m.contact_message_min())
-    .max(1500, m.contact_message_max()),
-  classroomGrade: z.string().max(80).optional(),
-  classroomLearners: z.string().max(80).optional(),
-  classroomMaterial: z.string().max(120).optional(),
-  classroomRoutine: z.string().max(120).optional(),
-  classroomNeed: z.string().max(120).optional(),
+    .min(CONTACT_MESSAGE_LIMITS.message.min, m.contact_message_min())
+    .max(CONTACT_MESSAGE_LIMITS.message.max, m.contact_message_max()),
+  classroomGrade: z
+    .string()
+    .max(CONTACT_CLASSROOM_INQUIRY_FIELD_LIMITS.grade)
+    .optional(),
+  classroomLearners: z
+    .string()
+    .max(CONTACT_CLASSROOM_INQUIRY_FIELD_LIMITS.learners)
+    .optional(),
+  classroomMaterial: z
+    .string()
+    .max(CONTACT_CLASSROOM_INQUIRY_FIELD_LIMITS.material)
+    .optional(),
+  classroomRoutine: z
+    .string()
+    .max(CONTACT_CLASSROOM_INQUIRY_FIELD_LIMITS.routine)
+    .optional(),
+  classroomNeed: z
+    .string()
+    .max(CONTACT_CLASSROOM_INQUIRY_FIELD_LIMITS.need)
+    .optional(),
 });
 type FormValues = z.infer<typeof schema>;
-
-type ContactIntent = 'general' | 'classroom';
 
 export function ContactFormCard({
   intent = 'general',
 }: {
-  intent?: ContactIntent;
+  intent?: ContactInquiryIntent;
 }) {
   const [error, setError] = useState<string | undefined>();
   const classroomCopy = getClassroomInquiryCopy();
@@ -78,11 +100,20 @@ export function ContactFormCard({
       await sendContactMessage({
         data: {
           email: values.email,
-          message:
-            intent === 'classroom'
-              ? buildClassroomInquiryMessage(values, classroomCopy)
-              : values.message,
+          intent,
+          message: values.message,
           name: values.name,
+          ...(intent === 'classroom'
+            ? {
+                classroomInquiry: buildContactClassroomInquiryPayload({
+                  learners: values.classroomLearners,
+                  grade: values.classroomGrade,
+                  material: values.classroomMaterial,
+                  routine: values.classroomRoutine,
+                  need: values.classroomNeed,
+                }),
+              }
+            : {}),
         },
       });
       toast.success(m.contact_success());
@@ -287,31 +318,6 @@ function ClassroomInquiryFields({
       </div>
     </div>
   );
-}
-
-function buildClassroomInquiryMessage(
-  values: FormValues,
-  copy: ClassroomInquiryCopy
-) {
-  const structuredLines = [
-    [copy.learnersLabel, values.classroomLearners],
-    [copy.gradeLabel, values.classroomGrade],
-    [copy.materialLabel, values.classroomMaterial],
-    [copy.routineLabel, values.classroomRoutine],
-    [copy.needLabel, values.classroomNeed],
-  ]
-    .filter((item): item is [string, string] => Boolean(item[1]?.trim()))
-    .map(([label, value]) => `${label}: ${value.trim()}`);
-  const message = values.message.trim();
-
-  return [
-    copy.emailHeading,
-    ...structuredLines,
-    structuredLines.length > 0 ? '' : undefined,
-    message,
-  ]
-    .filter(Boolean)
-    .join('\n');
 }
 
 function getClassroomInquiryCopy() {
