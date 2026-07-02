@@ -7,9 +7,11 @@ import type {
   ActivityLibraryRemixActionOptionView,
 } from '@/activities/library-view';
 import { activityLibraryCardCopy } from '@/activities/library-view';
+import { ActivityLibraryActionStatusBadge } from '@/components/activities/activity-library-action-status-badge';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { IconLayoutGrid, IconSwitchHorizontal } from '@tabler/icons-react';
+import { useId } from 'react';
 
 type ActivityLibraryCompatibilityPanelProps = {
   actionState: ActivityLibraryCardActionState;
@@ -26,11 +28,19 @@ export function ActivityLibraryCompatibilityPanel({
   label,
   onRemix,
 }: ActivityLibraryCompatibilityPanelProps) {
+  const remixStatusDescriptionId = useId();
+
   return (
     <section aria-label={label} className="rounded-lg border bg-muted/30 p-3">
-      <div className="flex items-center gap-2 text-sm font-medium">
-        <IconLayoutGrid aria-hidden="true" className="size-4 text-primary" />
-        {activityLibraryCardCopy.compatibleTemplatesLabel}
+      <div className="flex min-w-0 flex-wrap items-center justify-between gap-2">
+        <div className="flex min-w-0 items-center gap-2 text-sm font-medium">
+          <IconLayoutGrid aria-hidden="true" className="size-4 text-primary" />
+          {activityLibraryCardCopy.compatibleTemplatesLabel}
+        </div>
+        <ActivityLibraryActionStatusBadge
+          descriptionId={remixStatusDescriptionId}
+          view={compatibility.remixStatusView}
+        />
       </div>
       <div className="mt-3 flex flex-wrap gap-1.5">
         {compatibility.readyTemplateOptions.map((option) => (

@@ -13,8 +13,10 @@ import {
   normalizeActivityLibrarySearch,
 } from '@/activities/library-filters';
 import {
+  canArchiveActivity,
   canEditActivity,
   canDeriveActivityWork,
+  canRestoreActivity,
   type ActivityDerivativeAction,
   type ActivityLifecycleAction,
   buildActivityLifecycleActionView,
@@ -95,6 +97,16 @@ export type ActivityLibraryRemixActionOptionView =
     actionLabel: string;
   };
 
+export type ActivityLibraryActionStatusTone = 'blocked' | 'ready';
+
+export type ActivityLibraryActionStatusView = {
+  ariaLabel: string;
+  description: string;
+  label: string;
+  tone: ActivityLibraryActionStatusTone;
+  value: string;
+};
+
 export type ActivityLibraryLockedTemplateDiagnosticView = {
   diagnosis: string;
   id: ActivityTemplateType;
@@ -103,6 +115,7 @@ export type ActivityLibraryLockedTemplateDiagnosticView = {
 export type ActivityLibraryCompatibilityView = {
   lockedTemplateDiagnostics: ActivityLibraryLockedTemplateDiagnosticView[];
   readyTemplateOptions: ActivityLibraryReadyTemplateOptionView[];
+  remixStatusView: ActivityLibraryActionStatusView;
   remixActionOptions: ActivityLibraryRemixActionOptionView[];
   restoreRequiredMessage?: string;
   remixHint?: string;
@@ -276,12 +289,16 @@ export type ActivityLibraryPageScopeView = {
 
 export type ActivityLibraryCardActionButtonView =
   ActivityLifecycleActionCopy & {
+    ariaLabel: string;
     label: string;
+    statusView: ActivityLibraryActionStatusView;
   };
 
 export type ActivityLibraryCardDerivativeActionView =
   ActivityLifecycleActionView & {
+    ariaLabel: string;
     label: string;
+    statusView: ActivityLibraryActionStatusView;
   };
 
 export type ActivityLibraryCardRestoreActionView =
@@ -289,11 +306,15 @@ export type ActivityLibraryCardRestoreActionView =
     requiredMessage: string;
   };
 
+export type ActivityLibraryCardRemixActionView = ActivityLifecycleActionView & {
+  statusView: ActivityLibraryActionStatusView;
+};
+
 export type ActivityLibraryCardActionView = {
   archive: ActivityLibraryCardActionButtonView;
   duplicate: ActivityLibraryCardDerivativeActionView;
   publish: ActivityLibraryCardDerivativeActionView;
-  remix: ActivityLifecycleActionView;
+  remix: ActivityLibraryCardRemixActionView;
   restore: ActivityLibraryCardRestoreActionView;
 };
 
@@ -508,6 +529,9 @@ export const activityLibraryCardCopy = {
   },
   get remixRestoreRequiredMessage() {
     return m.activity_library_card_remix_restore_required();
+  },
+  get remixActionLabel() {
+    return m.activity_library_action_remix();
   },
   get sourceMaterialEditActionLabel() {
     return m.activity_library_card_source_material_edit_action();
@@ -1402,7 +1426,10 @@ export function buildActivityLibraryCardActionView(
   visibility: ActivityVisibility
 ): ActivityLibraryCardActionView {
   return {
-    archive: buildActivityLibraryCardActionButtonView('archive'),
+    archive: buildActivityLibraryCardActionButtonView({
+      action: 'archive',
+      visibility,
+    }),
     duplicate: buildActivityLibraryCardDerivativeActionView({
       action: 'duplicate',
       visibility,
@@ -1411,23 +1438,38 @@ export function buildActivityLibraryCardActionView(
       action: 'publish',
       visibility,
     }),
-    remix: buildActivityLifecycleActionView({
-      action: 'remix',
+    remix: buildActivityLibraryCardRemixActionView({
       visibility,
     }),
     restore: {
-      ...buildActivityLibraryCardActionButtonView('restore'),
+      ...buildActivityLibraryCardActionButtonView({
+        action: 'restore',
+        visibility,
+      }),
       requiredMessage: activityLibraryCardCopy.restoreRequiredMessage,
     },
   };
 }
 
-function buildActivityLibraryCardActionButtonView(
-  action: Extract<ActivityLifecycleAction, 'archive' | 'restore'>
-): ActivityLibraryCardActionButtonView {
+function buildActivityLibraryCardActionButtonView({
+  action,
+  visibility,
+}: {
+  action: Extract<ActivityLifecycleAction, 'archive' | 'restore'>;
+  visibility: ActivityVisibility;
+}): ActivityLibraryCardActionButtonView {
+  const label = getActivityLibraryCardActionLabel(action);
+  const statusView = buildActivityLibraryVisibilityActionStatusView({
+    action,
+    label,
+    visibility,
+  });
+
   return {
     ...getActivityLifecycleActionCopy(action),
-    label: getActivityLibraryCardActionLabel(action),
+    ariaLabel: buildActivityLibraryActionAriaLabel({ label, statusView }),
+    label,
+    statusView,
   };
 }
 
@@ -1438,12 +1480,44 @@ function buildActivityLibraryCardDerivativeActionView({
   action: Exclude<ActivityDerivativeAction, 'remix'>;
   visibility: ActivityVisibility;
 }): ActivityLibraryCardDerivativeActionView {
+  const actionView = buildActivityLifecycleActionView({
+    action,
+    visibility,
+  });
+  const label = getActivityLibraryCardActionLabel(action);
+  const statusView = buildActivityLibraryActionStatusView({
+    actionLabel: label,
+    blockedMessage:
+      actionView.gate.type === 'blocked' ? actionView.gate.message : undefined,
+  });
+
   return {
-    ...buildActivityLifecycleActionView({
-      action,
-      visibility,
+    ...actionView,
+    ariaLabel: buildActivityLibraryActionAriaLabel({ label, statusView }),
+    label,
+    statusView,
+  };
+}
+
+function buildActivityLibraryCardRemixActionView({
+  visibility,
+}: {
+  visibility: ActivityVisibility;
+}): ActivityLibraryCardRemixActionView {
+  const actionView = buildActivityLifecycleActionView({
+    action: 'remix',
+    visibility,
+  });
+
+  return {
+    ...actionView,
+    statusView: buildActivityLibraryActionStatusView({
+      actionLabel: activityLibraryCardCopy.remixActionLabel,
+      blockedMessage:
+        actionView.gate.type === 'blocked'
+          ? actionView.gate.message
+          : undefined,
     }),
-    label: getActivityLibraryCardActionLabel(action),
   };
 }
 
@@ -1451,6 +1525,74 @@ function getActivityLibraryCardActionLabel(
   action: Exclude<ActivityLifecycleAction, 'remix'>
 ) {
   return activityLibraryCardCopy.actionLabels[action];
+}
+
+export function buildActivityLibraryActionStatusView({
+  actionLabel,
+  blockedMessage,
+}: {
+  actionLabel: string;
+  blockedMessage?: string;
+}): ActivityLibraryActionStatusView {
+  const blocked = Boolean(blockedMessage);
+  const label = m.activity_library_action_status_label();
+  const value = blocked
+    ? m.activity_library_action_status_blocked_value()
+    : m.activity_library_action_status_ready_value();
+  const description = blocked
+    ? m.activity_library_action_status_blocked_description({
+        reason: blockedMessage ?? '',
+      })
+    : m.activity_library_action_status_ready_description({
+        action: actionLabel,
+      });
+
+  return {
+    ariaLabel: m.activity_library_action_status_aria_label({
+      description,
+      label,
+      value,
+    }),
+    description,
+    label,
+    tone: blocked ? 'blocked' : 'ready',
+    value,
+  };
+}
+
+function buildActivityLibraryActionAriaLabel({
+  label,
+  statusView,
+}: {
+  label: string;
+  statusView: ActivityLibraryActionStatusView;
+}) {
+  return m.activity_library_action_aria_label({
+    label,
+    status: statusView.ariaLabel,
+  });
+}
+
+function buildActivityLibraryVisibilityActionStatusView({
+  action,
+  label,
+  visibility,
+}: {
+  action: Extract<ActivityLifecycleAction, 'archive' | 'restore'>;
+  label: string;
+  visibility: ActivityVisibility;
+}) {
+  const blockedMessage =
+    action === 'archive' && !canArchiveActivity(visibility)
+      ? m.activity_lifecycle_archive_blocked()
+      : action === 'restore' && !canRestoreActivity(visibility)
+        ? m.activity_lifecycle_restore_blocked()
+        : undefined;
+
+  return buildActivityLibraryActionStatusView({
+    actionLabel: label,
+    blockedMessage,
+  });
 }
 
 function formatActivityLibraryCardStatusLabel({
@@ -1519,6 +1661,11 @@ export function buildActivityLibraryCompatibilityView({
     action: 'remix',
     visibility,
   });
+  const remixStatusView = buildActivityLibraryActionStatusView({
+    actionLabel: activityLibraryCardCopy.remixActionLabel,
+    blockedMessage:
+      remixGate.type === 'blocked' ? remixGate.message : undefined,
+  });
 
   return {
     lockedTemplateDiagnostics: summary.lockedTemplateOptions
@@ -1531,6 +1678,7 @@ export function buildActivityLibraryCompatibilityView({
       ...option,
       isCurrent: option.template === currentTemplateType,
     })),
+    remixStatusView,
     remixActionOptions: summary.suggestedTemplateOptions
       .slice(0, ACTIVITY_LIBRARY_COMPATIBILITY_LIMITS.remixActionOptions)
       .map((option) => ({

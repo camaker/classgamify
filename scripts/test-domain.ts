@@ -84,6 +84,7 @@ import {
   activityLibraryHeroCopy,
   activityLibraryPageCopy,
   activityLibrarySearchCopy,
+  buildActivityLibraryActionStatusView,
   buildActivityLibraryCardActionView,
   buildActivityLibraryCardActionState,
   buildActivityLibraryCardDisplayView,
@@ -3899,8 +3900,18 @@ assert.match(
 );
 assert.match(
   activityLibraryViewSource,
-  /export type ActivityLibraryCardActionButtonView =[\s\S]*ActivityLifecycleActionCopy & \{[\s\S]*label: string;[\s\S]*export type ActivityLibraryCardDerivativeActionView =[\s\S]*ActivityLifecycleActionView & \{[\s\S]*label: string;[\s\S]*export type ActivityLibraryCardRestoreActionView =[\s\S]*ActivityLibraryCardActionButtonView & \{[\s\S]*requiredMessage: string;[\s\S]*export type ActivityLibraryCardActionView = \{[\s\S]*archive: ActivityLibraryCardActionButtonView;[\s\S]*duplicate: ActivityLibraryCardDerivativeActionView;[\s\S]*publish: ActivityLibraryCardDerivativeActionView;[\s\S]*remix: ActivityLifecycleActionView;[\s\S]*restore: ActivityLibraryCardRestoreActionView;/,
-  'Activity library card actions should compose explicit lifecycle action view contracts with prepared labels and restore guidance.'
+  /export type ActivityLibraryActionStatusView = \{[\s\S]*ariaLabel: string;[\s\S]*description: string;[\s\S]*tone: ActivityLibraryActionStatusTone;[\s\S]*export type ActivityLibraryCardActionButtonView =[\s\S]*ariaLabel: string;[\s\S]*label: string;[\s\S]*statusView: ActivityLibraryActionStatusView;[\s\S]*export type ActivityLibraryCardDerivativeActionView =[\s\S]*ariaLabel: string;[\s\S]*label: string;[\s\S]*statusView: ActivityLibraryActionStatusView;[\s\S]*export type ActivityLibraryCardRestoreActionView =[\s\S]*requiredMessage: string;[\s\S]*export type ActivityLibraryCardRemixActionView =[\s\S]*statusView: ActivityLibraryActionStatusView;[\s\S]*export type ActivityLibraryCardActionView = \{[\s\S]*archive: ActivityLibraryCardActionButtonView;[\s\S]*duplicate: ActivityLibraryCardDerivativeActionView;[\s\S]*publish: ActivityLibraryCardDerivativeActionView;[\s\S]*remix: ActivityLibraryCardRemixActionView;[\s\S]*restore: ActivityLibraryCardRestoreActionView;/,
+  'Activity library card actions should compose explicit lifecycle action view contracts with prepared labels, status views, aria labels, and restore guidance.'
+);
+assert.match(
+  activityLibraryViewSource,
+  /buildActivityLibraryActionStatusView[\s\S]*activity_library_action_status_label[\s\S]*activity_library_action_status_blocked_value[\s\S]*activity_library_action_status_ready_value[\s\S]*activity_library_action_status_aria_label/,
+  'Activity library action status views should come from localized activity-domain copy.'
+);
+assert.match(
+  activityLibraryViewSource,
+  /buildActivityLibraryCardActionButtonView[\s\S]*buildActivityLibraryVisibilityActionStatusView[\s\S]*ariaLabel: buildActivityLibraryActionAriaLabel[\s\S]*buildActivityLibraryCardDerivativeActionView[\s\S]*buildActivityLibraryActionStatusView[\s\S]*ariaLabel: buildActivityLibraryActionAriaLabel[\s\S]*buildActivityLibraryCardRemixActionView[\s\S]*buildActivityLibraryActionStatusView/,
+  'Activity library action builders should derive status and aria labels inside the activity-domain view model.'
 );
 assert.doesNotMatch(
   activityLibraryViewSource,
@@ -23404,6 +23415,36 @@ const archivedCreatedActivity = {
   title: 'Archived words',
   visibility: 'archived',
 } as const;
+const buildExpectedActivityLibraryReadyActionStatus = (
+  actionLabel: string
+) => {
+  const description = `${actionLabel} is available for this activity.`;
+
+  return {
+    ariaLabel: `Action status: Available. ${description}`,
+    description,
+    label: 'Action status',
+    tone: 'ready' as const,
+    value: 'Available',
+  };
+};
+const buildExpectedActivityLibraryActionAriaLabel = ({
+  label,
+  statusView,
+}: {
+  label: string;
+  statusView: { ariaLabel: string };
+}) => `${label}. ${statusView.ariaLabel}`;
+const duplicateActivityReadyStatus =
+  buildExpectedActivityLibraryReadyActionStatus('Duplicate');
+const publishActivityReadyStatus =
+  buildExpectedActivityLibraryReadyActionStatus('Publish assignment');
+const archiveActivityReadyStatus =
+  buildExpectedActivityLibraryReadyActionStatus('Archive');
+const restoreActivityReadyStatus =
+  buildExpectedActivityLibraryReadyActionStatus('Restore');
+const remixActivityReadyStatus =
+  buildExpectedActivityLibraryReadyActionStatus('Remix');
 assert.deepEqual(
   resolveCreatedActivityPanelActivity({
     activity: createdActivityFromLookup,
@@ -23449,9 +23490,14 @@ assert.deepEqual(
         to: Routes.DashboardActivityEdit,
       },
       publish: {
+        ariaLabel: buildExpectedActivityLibraryActionAriaLabel({
+          label: 'Publish assignment',
+          statusView: publishActivityReadyStatus,
+        }),
         failureMessage: 'Assignment could not be published.',
         gate: { type: 'ready' },
         label: 'Publish assignment',
+        statusView: publishActivityReadyStatus,
         successMessage: 'Assignment link published.',
       },
     },
@@ -24680,6 +24726,10 @@ const activityLibraryCardComponentSource = readFileSync(
   'src/components/activities/activity-library-card.tsx',
   'utf8'
 );
+const activityLibraryActionStatusBadgeSource = readFileSync(
+  'src/components/activities/activity-library-action-status-badge.tsx',
+  'utf8'
+);
 const activityLibrarySummaryCardComponentSource = readFileSync(
   'src/components/activities/activity-library-summary-card.tsx',
   'utf8'
@@ -24898,7 +24948,7 @@ assert.match(
 );
 assert.match(
   activityLibraryViewSource,
-  /export type ActivityLibraryCardStat[\s\S]*export type ActivityLibraryReadyTemplateOptionView[\s\S]*isCurrent: boolean;[\s\S]*export type ActivityLibraryRemixActionOptionView[\s\S]*actionLabel: string;[\s\S]*export type ActivityLibraryCompatibilityView[\s\S]*readyTemplateOptions: ActivityLibraryReadyTemplateOptionView\[\];[\s\S]*remixActionOptions: ActivityLibraryRemixActionOptionView\[\];[\s\S]*export type ActivityLibraryCardActionState[\s\S]*export type ActivityLibraryCardViewModel[\s\S]*export type ActivityLibraryCardDisplayView[\s\S]*export type ActivityLibraryCardTemplateType = ActivityTemplateType;[\s\S]*export type ActivityLibraryCardActionView[\s\S]*export type ActivityLibraryEditorActionView/,
+  /export type ActivityLibraryCardStat[\s\S]*export type ActivityLibraryReadyTemplateOptionView[\s\S]*isCurrent: boolean;[\s\S]*export type ActivityLibraryRemixActionOptionView[\s\S]*actionLabel: string;[\s\S]*export type ActivityLibraryCompatibilityView[\s\S]*readyTemplateOptions: ActivityLibraryReadyTemplateOptionView\[\];[\s\S]*remixStatusView: ActivityLibraryActionStatusView;[\s\S]*remixActionOptions: ActivityLibraryRemixActionOptionView\[\];[\s\S]*export type ActivityLibraryCardActionState[\s\S]*export type ActivityLibraryCardViewModel[\s\S]*export type ActivityLibraryCardDisplayView[\s\S]*export type ActivityLibraryCardTemplateType = ActivityTemplateType;[\s\S]*export type ActivityLibraryCardActionView[\s\S]*export type ActivityLibraryEditorActionView/,
   'Activity library domain should expose explicit card, compatibility, action, and stat view contracts.'
 );
 assert.match(
@@ -24913,8 +24963,8 @@ assert.match(
 );
 assert.match(
   activityLibraryViewSource,
-  /export type ActivityLibraryCompatibilityView = \{[\s\S]*restoreRequiredMessage\?: string;[\s\S]*buildActivityLibraryCompatibilityView\(\{[\s\S]*visibility = 'draft'[\s\S]*buildActivityDerivativeActionGate\(\{[\s\S]*action: 'remix'[\s\S]*visibility,[\s\S]*restoreRequiredMessage/,
-  'Activity library compatibility view should expose restore guidance from the remix lifecycle gate.'
+  /export type ActivityLibraryCompatibilityView = \{[\s\S]*remixStatusView: ActivityLibraryActionStatusView;[\s\S]*restoreRequiredMessage\?: string;[\s\S]*buildActivityLibraryCompatibilityView\(\{[\s\S]*visibility = 'draft'[\s\S]*buildActivityDerivativeActionGate\(\{[\s\S]*action: 'remix'[\s\S]*visibility,[\s\S]*remixStatusView[\s\S]*restoreRequiredMessage/,
+  'Activity library compatibility view should expose remix status and restore guidance from the remix lifecycle gate.'
 );
 assert.match(
   activityLibraryViewSource,
@@ -25078,8 +25128,8 @@ assert.doesNotMatch(
 );
 assert.match(
   activityLibraryCardComponentSource,
-  /function ActivityLibraryEditActionLink[\s\S]*to=\{action\.to\}[\s\S]*params=\{\{ activityId: action\.activityId \}\}[\s\S]*\{action\.label\}[\s\S]*function ActivityLibraryDuplicateActionButton[\s\S]*action: ActivityLibraryCardDerivativeActionView[\s\S]*\{action\.label\}[\s\S]*function ActivityLibraryArchiveActionButton[\s\S]*action: ActivityLibraryCardActionButtonView[\s\S]*\{action\.label\}[\s\S]*function ActivityLibraryPublishActionButton[\s\S]*action: ActivityLibraryCardDerivativeActionView[\s\S]*\{action\.label\}/,
-  'Activity library action subcomponents should render prepared action labels from the activity-domain action view.'
+  /function ActivityLibraryEditActionLink[\s\S]*to=\{action\.to\}[\s\S]*params=\{\{ activityId: action\.activityId \}\}[\s\S]*\{action\.label\}[\s\S]*function ActivityLibraryDuplicateActionButton[\s\S]*action: ActivityLibraryCardDerivativeActionView[\s\S]*aria-label=\{action\.ariaLabel\}[\s\S]*\{action\.label\}[\s\S]*function ActivityLibraryArchiveActionButton[\s\S]*action: ActivityLibraryCardActionButtonView[\s\S]*aria-label=\{action\.ariaLabel\}[\s\S]*\{action\.label\}[\s\S]*function ActivityLibraryPublishActionButton[\s\S]*action: ActivityLibraryCardDerivativeActionView[\s\S]*aria-label=\{action\.ariaLabel\}[\s\S]*\{action\.label\}/,
+  'Activity library action subcomponents should render prepared action labels and aria labels from the activity-domain action view.'
 );
 assert.doesNotMatch(
   activityLibraryCardComponentSource,
@@ -25098,8 +25148,13 @@ assert.match(
 );
 assert.match(
   activityLibraryCardComponentSource,
-  /function ActivityLibraryRestoreAction[\s\S]*action: ActivityLibraryCardRestoreActionView[\s\S]*message=\{action\.requiredMessage\}[\s\S]*ActivityLibraryRestoreActionButton[\s\S]*action=\{action\}[\s\S]*function ActivityLibraryRestoreRequiredMessage[\s\S]*message: string;[\s\S]*\{message\}[\s\S]*function ActivityLibraryRestoreActionButton[\s\S]*action: ActivityLibraryCardRestoreActionView[\s\S]*\{action\.label\}/,
-  'Activity library restore action components should render prepared restore guidance and labels from the activity-domain action view.'
+  /function ActivityLibraryRestoreAction[\s\S]*action: ActivityLibraryCardRestoreActionView[\s\S]*message=\{action\.requiredMessage\}[\s\S]*statusView=\{action\.statusView\}[\s\S]*ActivityLibraryRestoreActionButton[\s\S]*action=\{action\}[\s\S]*function ActivityLibraryRestoreRequiredMessage[\s\S]*statusView: ActivityLibraryCardRestoreActionView\['statusView'\][\s\S]*ActivityLibraryActionStatusBadge[\s\S]*view=\{statusView\}[\s\S]*function ActivityLibraryRestoreActionButton[\s\S]*action: ActivityLibraryCardRestoreActionView[\s\S]*aria-label=\{action\.ariaLabel\}[\s\S]*\{action\.label\}/,
+  'Activity library restore action components should render prepared restore guidance, status, labels, and aria labels from the activity-domain action view.'
+);
+assert.match(
+  activityLibraryActionStatusBadgeSource,
+  /ActivityLibraryActionStatusView[\s\S]*data-tone=\{view\.tone\}[\s\S]*variant=\{view\.tone === 'blocked' \? 'destructive' : 'outline'\}[\s\S]*aria-label=\{view\.ariaLabel\}[\s\S]*view\.description/,
+  'Activity library action status badge should render prepared status tone, accessible label, and hidden description from the domain view.'
 );
 assert.doesNotMatch(
   activityLibraryCardComponentSource,
@@ -25118,8 +25173,8 @@ assert.match(
 );
 assert.match(
   activityLibraryCompatibilityPanelSource,
-  /label: string;[\s\S]*<section aria-label=\{label\}/,
-  'Activity library compatibility panel should expose the prepared compatibility label on its section.'
+  /label: string;[\s\S]*const remixStatusDescriptionId = useId\(\)[\s\S]*<section aria-label=\{label\}[\s\S]*ActivityLibraryActionStatusBadge[\s\S]*view=\{compatibility\.remixStatusView\}/,
+  'Activity library compatibility panel should expose the prepared compatibility label and remix status on its section.'
 );
 assert.doesNotMatch(
   activityLibraryCompatibilityPanelSource,
@@ -29674,6 +29729,24 @@ assert.equal(canEditActivity('draft'), true);
 assert.equal(canEditActivity('public'), true);
 assert.equal(canEditActivity('archived'), false);
 const archivedActivityDerivationError = getArchivedActivityDerivationError();
+const expectedActivityLibraryBlockedActionStatus = {
+  ariaLabel: `Action status: Restore required. ${archivedActivityDerivationError}`,
+  description: archivedActivityDerivationError,
+  label: 'Action status',
+  tone: 'blocked' as const,
+  value: 'Restore required',
+};
+assert.deepEqual(
+  buildActivityLibraryActionStatusView({ actionLabel: 'Duplicate' }),
+  duplicateActivityReadyStatus
+);
+assert.deepEqual(
+  buildActivityLibraryActionStatusView({
+    actionLabel: 'Duplicate',
+    blockedMessage: archivedActivityDerivationError,
+  }),
+  expectedActivityLibraryBlockedActionStatus
+);
 assert.deepEqual(
   buildActivityDerivativeActionGate({
     action: 'publish',
@@ -30591,6 +30664,10 @@ assert.equal(
   'Preview'
 );
 assert.deepEqual(buildActivityLibraryCardActionView('archived').duplicate, {
+  ariaLabel: buildExpectedActivityLibraryActionAriaLabel({
+    label: 'Duplicate',
+    statusView: expectedActivityLibraryBlockedActionStatus,
+  }),
   failureMessage: 'Activity could not be duplicated.',
   gate: {
     action: 'duplicate',
@@ -30599,9 +30676,14 @@ assert.deepEqual(buildActivityLibraryCardActionView('archived').duplicate, {
     type: 'blocked',
   },
   label: 'Duplicate',
+  statusView: expectedActivityLibraryBlockedActionStatus,
   successMessage: 'Activity duplicated.',
 });
 assert.deepEqual(buildActivityLibraryCardActionView('archived').publish, {
+  ariaLabel: buildExpectedActivityLibraryActionAriaLabel({
+    label: 'Publish assignment',
+    statusView: expectedActivityLibraryBlockedActionStatus,
+  }),
   failureMessage: 'Assignment could not be published.',
   gate: {
     action: 'publish',
@@ -30610,22 +30692,34 @@ assert.deepEqual(buildActivityLibraryCardActionView('archived').publish, {
     type: 'blocked',
   },
   label: 'Publish assignment',
+  statusView: expectedActivityLibraryBlockedActionStatus,
   successMessage: 'Assignment link published.',
 });
 assert.deepEqual(buildActivityLibraryCardActionView('draft').remix, {
   failureMessage: 'Activity could not be remixed.',
   gate: { type: 'ready' },
+  statusView: remixActivityReadyStatus,
   successMessage: 'Template remix created.',
 });
 assert.deepEqual(buildActivityLibraryCardActionView('private').archive, {
+  ariaLabel: buildExpectedActivityLibraryActionAriaLabel({
+    label: 'Archive',
+    statusView: archiveActivityReadyStatus,
+  }),
   failureMessage: 'Activity could not be archived.',
   label: 'Archive',
+  statusView: archiveActivityReadyStatus,
   successMessage: 'Activity archived.',
 });
 assert.deepEqual(buildActivityLibraryCardActionView('archived').restore, {
+  ariaLabel: buildExpectedActivityLibraryActionAriaLabel({
+    label: 'Restore',
+    statusView: restoreActivityReadyStatus,
+  }),
   failureMessage: 'Activity could not be restored.',
   label: 'Restore',
   requiredMessage: archivedActivityDerivationError,
+  statusView: restoreActivityReadyStatus,
   successMessage: 'Activity restored to drafts.',
 });
 assert.equal(
@@ -35031,6 +35125,7 @@ assert.deepEqual(
       },
     ],
     remixHint: 'Ready to remix into Fill, Listen, Box.',
+    remixStatusView: remixActivityReadyStatus,
   }
 );
 assert.deepEqual(
@@ -35076,6 +35171,7 @@ assert.deepEqual(
     restoreRequiredMessage:
       'Ready template modes are preserved, but remix actions unlock only after restore.',
     remixHint: 'Ready to remix into Fill, Listen, Box.',
+    remixStatusView: expectedActivityLibraryBlockedActionStatus,
   }
 );
 const questionOnlyCompatibilityView = buildActivityLibraryCompatibilityView({
@@ -36266,9 +36362,14 @@ assert.deepEqual(
           to: Routes.DashboardActivityEdit,
         },
         publish: {
+          ariaLabel: buildExpectedActivityLibraryActionAriaLabel({
+            label: 'Publish assignment',
+            statusView: publishActivityReadyStatus,
+          }),
           failureMessage: 'Assignment could not be published.',
           gate: { type: 'ready' },
           label: 'Publish assignment',
+          statusView: publishActivityReadyStatus,
           successMessage: 'Assignment link published.',
         },
       },

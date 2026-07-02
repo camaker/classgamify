@@ -16,6 +16,7 @@ import {
   buildActivityDerivativeActionExecutionPlan,
   buildActivityVisibilityActionExecutionPlan,
 } from '@/activities/lifecycle';
+import { ActivityLibraryActionStatusBadge } from '@/components/activities/activity-library-action-status-badge';
 import { ActivityLibraryCompatibilityPanel } from '@/components/activities/activity-library-compatibility-panel';
 import { ActivityLibraryStats } from '@/components/activities/activity-library-stats';
 import { ActivityPublishDialog } from '@/components/activities/activity-publish-dialog';
@@ -46,7 +47,7 @@ import {
   IconRotateClockwise,
 } from '@tabler/icons-react';
 import { Link, useNavigate } from '@tanstack/react-router';
-import { useState } from 'react';
+import { useId, useState } from 'react';
 import { toast } from 'sonner';
 
 type ActivityLibraryCardProps = {
@@ -369,6 +370,7 @@ function ActivityLibraryDuplicateActionButton({
       type="button"
       variant="outline"
       className="w-full bg-background sm:w-fit"
+      aria-label={action.ariaLabel}
       disabled={disabled}
       onClick={onClick}
     >
@@ -392,6 +394,7 @@ function ActivityLibraryArchiveActionButton({
       type="button"
       variant="outline"
       className="w-full bg-background sm:w-fit"
+      aria-label={action.ariaLabel}
       disabled={disabled}
       onClick={onClick}
     >
@@ -409,7 +412,12 @@ function ActivityLibraryPublishActionButton({
   onClick: () => void;
 }) {
   return (
-    <Button type="button" className="w-full sm:w-fit" onClick={onClick}>
+    <Button
+      type="button"
+      className="w-full sm:w-fit"
+      aria-label={action.ariaLabel}
+      onClick={onClick}
+    >
       <IconPlus aria-hidden="true" className="size-4" />
       {action.label}
     </Button>
@@ -435,6 +443,7 @@ function ActivityLibraryRestoreAction({
         <ActivityLibraryRestoreRequiredMessage
           message={action.requiredMessage}
           label={requiredLabel}
+          statusView={action.statusView}
         />
       ) : null}
       {actionState.showRestoreAction ? (
@@ -451,16 +460,27 @@ function ActivityLibraryRestoreAction({
 function ActivityLibraryRestoreRequiredMessage({
   label,
   message,
+  statusView,
 }: {
   label: string;
   message: string;
+  statusView: ActivityLibraryCardRestoreActionView['statusView'];
 }) {
+  const statusDescriptionId = useId();
+
   return (
     <section
       aria-label={label}
+      aria-describedby={statusDescriptionId}
       className="text-sm text-muted-foreground sm:mr-auto"
     >
-      <p>{message}</p>
+      <div className="flex min-w-0 flex-wrap items-center gap-2">
+        <p>{message}</p>
+        <ActivityLibraryActionStatusBadge
+          descriptionId={statusDescriptionId}
+          view={statusView}
+        />
+      </div>
     </section>
   );
 }
@@ -478,6 +498,7 @@ function ActivityLibraryRestoreActionButton({
     <Button
       type="button"
       className="w-full sm:w-fit"
+      aria-label={action.ariaLabel}
       disabled={disabled}
       onClick={onClick}
     >
