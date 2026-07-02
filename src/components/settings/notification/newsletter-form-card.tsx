@@ -16,7 +16,6 @@ import {
   FormLabel,
 } from '@/components/ui/form';
 import { Switch } from '@/components/ui/switch';
-import { websiteConfig } from '@/config/website';
 import {
   useNewsletterStatus,
   useSubscribeNewsletter,
@@ -24,6 +23,7 @@ import {
 } from '@/hooks/use-newsletter';
 import { authClient } from '@/auth/client';
 import { cn } from '@/lib/utils';
+import { isSettingsNotificationsEnabled } from '@/settings/notifications-view';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { IconLoader2 } from '@tabler/icons-react';
 import { useEffect } from 'react';
@@ -35,7 +35,7 @@ interface NewsletterFormCardProps {
 }
 const formSchema = z.object({ subscribed: z.boolean() });
 export function NewsletterFormCard({ className }: NewsletterFormCardProps) {
-  if (!websiteConfig.newsletter?.enable) return null;
+  if (!isSettingsNotificationsEnabled()) return null;
   const { data: session } = authClient.useSession();
   const currentUser = session?.user;
   const {

@@ -1,12 +1,15 @@
-import { m } from '@/locale/paraglide/messages';
 import { DashboardLayout } from '@/components/layout/dashboard-layout';
+import { NotificationWorkspaceSummary } from '@/components/settings/notification/notification-workspace-summary';
 import { NewsletterFormCard } from '@/components/settings/notification/newsletter-form-card';
-import { websiteConfig } from '@/config/website';
+import {
+  buildSettingsNotificationPageViewModel,
+  isSettingsNotificationsEnabled,
+} from '@/settings/notifications-view';
 import { createFileRoute, notFound, rootRouteId } from '@tanstack/react-router';
 
 export const Route = createFileRoute('/settings/notifications')({
   beforeLoad: () => {
-    if (websiteConfig.newsletter?.enable !== true) {
+    if (!isSettingsNotificationsEnabled()) {
       throw notFound({ routeId: rootRouteId });
     }
   },
@@ -14,21 +17,16 @@ export const Route = createFileRoute('/settings/notifications')({
 });
 
 function NotificationsPage() {
-  const breadcrumbs = [
-    { id: 'settings', label: m.common_settings(), isCurrentPage: false },
-    {
-      id: 'notifications',
-      label: m.settings_notification_title(),
-      isCurrentPage: true,
-    },
-  ];
+  const pageView = buildSettingsNotificationPageViewModel();
+
   return (
     <DashboardLayout
-      breadcrumbs={breadcrumbs}
-      title={m.settings_notification_title()}
-      description={m.settings_notification_description()}
+      breadcrumbs={pageView.breadcrumbs}
+      title={pageView.title}
+      description={pageView.description}
     >
       <div className="flex flex-col gap-8">
+        <NotificationWorkspaceSummary view={pageView.workspaceSummaryView} />
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
           <NewsletterFormCard />
         </div>

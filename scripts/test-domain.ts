@@ -409,6 +409,10 @@ import {
   buildSettingsFilesPageViewModel,
   buildSettingsFilesWorkspaceSummaryView,
 } from '@/settings/files-view';
+import {
+  buildSettingsNotificationPageViewModel,
+  buildSettingsNotificationWorkspaceSummaryView,
+} from '@/settings/notifications-view';
 import type { PricePlan, Subscription } from '@/payment/types';
 import {
   AssignmentAttemptAnswerValidationError,
@@ -7473,10 +7477,27 @@ const newsletterFormCardSource = readFileSync(
   'src/components/settings/notification/newsletter-form-card.tsx',
   'utf8'
 );
+const settingsNotificationRouteProductSource = readFileSync(
+  'src/routes/settings/notifications.tsx',
+  'utf8'
+);
+const settingsNotificationViewSource = readFileSync(
+  'src/settings/notifications-view.ts',
+  'utf8'
+);
+const notificationWorkspaceSummarySource = readFileSync(
+  'src/components/settings/notification/notification-workspace-summary.tsx',
+  'utf8'
+);
 assert.doesNotMatch(
   newsletterFormCardSource,
   /err\.message|error\.message|statusError\?\.message|subscribeMutation\.error\?\.message|unsubscribeMutation\.error\?\.message|err instanceof Error|error instanceof Error/,
   'Newsletter settings failures should use localized notification copy instead of raw status or mutation errors.'
+);
+assert.match(
+  newsletterFormCardSource,
+  /isSettingsNotificationsEnabled\(\)/,
+  'Newsletter settings card should use the shared settings notification feature helper.'
 );
 assert.match(
   newsletterFormCardSource,
@@ -7487,6 +7508,46 @@ assert.match(
   newsletterFormCardSource,
   /toast\.error\(m\.settings_notification_newsletter_error\(\)\)/,
   'Newsletter settings toast failures should show the localized settings failure message.'
+);
+assert.match(
+  settingsNotificationViewSource,
+  /export type SettingsNotificationWorkspaceSummaryItemId =[\s\S]*'assignment-review'[\s\S]*'teacher-control'[\s\S]*'template-updates'[\s\S]*'worksheet-workflows'/,
+  'Notification settings view model should expose stable classroom update boundary item ids.'
+);
+assert.match(
+  settingsNotificationViewSource,
+  /export function isSettingsNotificationsEnabled\(\)[\s\S]*websiteConfig\.newsletter\?\.enable === true/,
+  'Notification settings feature visibility should be centralized in the settings notification view helper.'
+);
+assert.match(
+  settingsNotificationViewSource,
+  /export function buildSettingsNotificationPageViewModel\(\)[\s\S]*breadcrumbs:[\s\S]*id: 'settings'[\s\S]*id: 'notifications'[\s\S]*workspaceSummaryView: buildSettingsNotificationWorkspaceSummaryView/,
+  'Notification settings view model should own localized page state, breadcrumbs, and workspace summary.'
+);
+assert.match(
+  settingsNotificationViewSource,
+  /settings_notification_workspace_summary_title[\s\S]*settings_notification_workspace_summary_description[\s\S]*settings_notification_workspace_summary_templates_description[\s\S]*settings_notification_workspace_summary_worksheets_description[\s\S]*settings_notification_workspace_summary_review_description[\s\S]*settings_notification_workspace_summary_control_description/,
+  'Notification settings view model should prepare localized classroom update boundary copy.'
+);
+assert.match(
+  settingsNotificationRouteProductSource,
+  /const pageView = buildSettingsNotificationPageViewModel\(\);[\s\S]*breadcrumbs=\{pageView\.breadcrumbs\}[\s\S]*title=\{pageView\.title\}[\s\S]*NotificationWorkspaceSummary[\s\S]*view=\{pageView\.workspaceSummaryView\}[\s\S]*NewsletterFormCard/,
+  'Notification settings route should consume the notification page view model and render the prepared classroom update summary.'
+);
+assert.doesNotMatch(
+  settingsNotificationRouteProductSource,
+  /m\.settings_notification_|m\.common_settings|websiteConfig\.newsletter/,
+  'Notification settings route should not rebuild localized update page copy or feature visibility directly.'
+);
+assert.match(
+  notificationWorkspaceSummarySource,
+  /view\.itemViews\.map\(\(itemView\) =>[\s\S]*key=\{itemView\.id\}[\s\S]*function NotificationWorkspaceSummaryItem[\s\S]*itemView\.label[\s\S]*itemView\.description/,
+  'Notification workspace summary component should render prepared boundary views keyed by stable ids.'
+);
+assert.doesNotMatch(
+  notificationWorkspaceSummarySource,
+  /Classroom update boundary|Template updates|Worksheet workflows|Assignment review|Teacher control|课堂更新边界|模板更新|练习纸工作流|作业复盘|教师控制/,
+  'Notification workspace summary component should not hard-code visible update boundary copy.'
 );
 const billingCardSource = readFileSync(
   'src/components/settings/billing/billing-card.tsx',
@@ -7616,6 +7677,24 @@ assert.match(
 );
 const filesWorkspaceSummaryView = buildSettingsFilesWorkspaceSummaryView();
 assert.equal(filesWorkspaceSummaryView.itemViews.length, 4);
+const notificationPageView = buildSettingsNotificationPageViewModel();
+assert.equal(notificationPageView.breadcrumbs.at(-1)?.id, 'notifications');
+assert.equal(notificationPageView.title, 'Updates');
+const notificationWorkspaceSummaryItemIds =
+  notificationPageView.workspaceSummaryView.itemViews
+    .map((item) => item.id)
+    .join(',');
+assert.equal(
+  notificationWorkspaceSummaryItemIds,
+  'template-updates,worksheet-workflows,assignment-review,teacher-control'
+);
+assert.match(
+  notificationPageView.workspaceSummaryView.description,
+  /teacher workspace/
+);
+const notificationWorkspaceSummaryView =
+  buildSettingsNotificationWorkspaceSummaryView();
+assert.equal(notificationWorkspaceSummaryView.itemViews.length, 4);
 const billingPageView = buildSettingsBillingPageViewModel();
 assert.equal(billingPageView.breadcrumbs.at(-1)?.id, 'billing');
 assert.equal(billingPageView.title, 'Billing');
@@ -9694,15 +9773,19 @@ assert.match(
   /isSettingsBillingEnabled\(\)/
 );
 assert.match(
+  settingsNotificationViewSource,
+  /websiteConfig\.newsletter\?\.enable === true/
+);
+assert.match(
   settingsNotificationsRouteSource,
-  /websiteConfig\.newsletter\?\.enable !== true/
+  /isSettingsNotificationsEnabled\(\)/
 );
 for (const [source, breadcrumbId] of [
   [settingsProfileViewSource, 'profile'],
   [settingsSecurityViewSource, 'security'],
   [settingsFilesViewSource, 'files'],
   [settingsBillingViewSource, 'billing'],
-  [settingsNotificationsRouteSource, 'notifications'],
+  [settingsNotificationViewSource, 'notifications'],
   [settingsBillingViewSource, 'payment'],
 ] as const) {
   assert.match(
@@ -9933,6 +10016,11 @@ const authWorkspaceBoundaryRequirements = [
       ['settings_files_workspace_summary_attachments_description', /published assignment snapshots/],
       ['settings_files_workspace_summary_ai_description', /storage keys, URLs, and permissions/],
       ['settings_files_workspace_summary_privacy_description', /sanitized runtime prompts and choices/],
+      ['settings_notification_workspace_summary_description', /teacher workspace/],
+      ['settings_notification_workspace_summary_templates_description', /remix readiness/],
+      ['settings_notification_workspace_summary_worksheets_description', /source-material workflows/],
+      ['settings_notification_workspace_summary_review_description', /classroom briefs, reteach plans/],
+      ['settings_notification_workspace_summary_control_description', /account access, activities, assignments, or results/],
       ['settings_security_workspace_summary_description', /reusable activities, source materials, assignment links/],
       ['settings_security_workspace_summary_access_description', /teacher workspace/],
       ['settings_security_workspace_summary_activities_description', /source-material references/],
@@ -9987,6 +10075,11 @@ const authWorkspaceBoundaryRequirements = [
       ['settings_files_workspace_summary_attachments_description', /已发布作业快照/],
       ['settings_files_workspace_summary_ai_description', /存储 key、URL 和权限信息/],
       ['settings_files_workspace_summary_privacy_description', /运行时题目和选项/],
+      ['settings_notification_workspace_summary_description', /教师工作区/],
+      ['settings_notification_workspace_summary_templates_description', /改编就绪能力/],
+      ['settings_notification_workspace_summary_worksheets_description', /来源素材工作流/],
+      ['settings_notification_workspace_summary_review_description', /课堂简报、再讲计划/],
+      ['settings_notification_workspace_summary_control_description', /账号访问、活动、作业或结果记录/],
       ['settings_security_workspace_summary_description', /可复用活动、来源素材、作业链接/],
       ['settings_security_workspace_summary_access_description', /教师工作区/],
       ['settings_security_workspace_summary_activities_description', /来源素材引用/],
