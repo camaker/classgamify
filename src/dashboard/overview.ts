@@ -9,6 +9,7 @@ import {
   formatAssignmentResultPercent,
 } from '@/assignments/result-format';
 import { m } from '@/locale/paraglide/messages';
+import { Routes } from '@/lib/routes';
 
 export type DashboardOverviewOwnerActivitySummary = {
   draftActivities: number;
@@ -36,8 +37,43 @@ export type DashboardOverviewMetric = {
   value: string;
 };
 
+export type DashboardOverviewLoopStatus =
+  | 'empty'
+  | 'publishing'
+  | 'distribution'
+  | 'collecting-results'
+  | 'reviewing';
+
+export type DashboardOverviewNextActionId =
+  | 'create-activity'
+  | 'publish-assignment'
+  | 'share-assignment'
+  | 'review-results';
+
+export type DashboardOverviewNextActionStatus = 'blocked' | 'done' | 'ready';
+
+export type DashboardOverviewNextActionView = {
+  ariaLabel: string;
+  cta: string;
+  description: string;
+  id: DashboardOverviewNextActionId;
+  label: string;
+  status: DashboardOverviewNextActionStatus;
+  statusLabel: string;
+  to: string;
+};
+
+export type DashboardOverviewLoopStatusView = {
+  description: string;
+  nextActions: DashboardOverviewNextActionView[];
+  status: DashboardOverviewLoopStatus;
+  statusLabel: string;
+  title: string;
+};
+
 type DashboardOverviewPageViewModel = {
   actionCards: DashboardOverviewActionCard[];
+  loopStatus: DashboardOverviewLoopStatusView;
   metrics: DashboardOverviewMetric[];
   preview: DashboardOverviewPreview;
   readinessRows: DashboardCoreLoopReadinessRow[];
@@ -158,6 +194,10 @@ export function buildDashboardOverviewPageViewModel({
 
   return {
     actionCards: getDashboardOverviewActionCards(),
+    loopStatus: buildDashboardOverviewLoopStatus({
+      activitySummary,
+      assignmentSummary,
+    }),
     metrics: buildDashboardOverviewMetrics({
       activitySummary,
       activitiesLoading: resolvedActivitiesLoading,
@@ -317,9 +357,7 @@ export function buildDashboardCoreLoopReadiness({
     {
       description:
         totalActivities > 0
-          ? m.dashboard_overview_readiness_activity_authoring_ready({
-              count: totalActivities,
-            })
+          ? getDashboardActivityAuthoringReadinessDescription(totalActivities)
           : m.dashboard_overview_readiness_activity_authoring_empty(),
       id: 'activity-authoring',
       label: m.dashboard_overview_readiness_activity_authoring(),
@@ -363,6 +401,44 @@ export function buildDashboardCoreLoopReadiness({
       value: completions > 0 ? 100 : 0,
     },
   ];
+}
+
+export function buildDashboardOverviewLoopStatus({
+  activitySummary,
+  assignmentSummary,
+}: {
+  activitySummary?: DashboardOverviewOwnerActivitySummary;
+  assignmentSummary?: DashboardOverviewOwnerAssignmentSummary;
+} = {}): DashboardOverviewLoopStatusView {
+  const totalActivities = normalizeDashboardSummaryCount(
+    activitySummary?.totalActivities
+  );
+  const totalAssignments = normalizeDashboardSummaryCount(
+    assignmentSummary?.totalAssignments
+  );
+  const openAssignments = normalizeDashboardSummaryCount(
+    assignmentSummary?.openAssignments
+  );
+  const completions = normalizeDashboardSummaryCount(
+    assignmentSummary?.completions
+  );
+  const status = resolveDashboardOverviewLoopStatus({
+    completions,
+    openAssignments,
+    totalActivities,
+    totalAssignments,
+  });
+
+  return {
+    ...getDashboardOverviewLoopStatusCopy(status),
+    nextActions: buildDashboardOverviewNextActions({
+      completions,
+      openAssignments,
+      totalActivities,
+      totalAssignments,
+    }),
+    status,
+  };
 }
 
 export function formatDashboardMetricValue(value: number | undefined) {
@@ -430,6 +506,186 @@ function formatDashboardAssignmentDescription({
 function normalizeDashboardSummaryCount(value: number | undefined) {
   if (value === undefined || !Number.isFinite(value)) return 0;
   return Math.max(0, Math.round(value));
+}
+
+function resolveDashboardOverviewLoopStatus({
+  completions,
+  openAssignments,
+  totalActivities,
+  totalAssignments,
+}: {
+  completions: number;
+  openAssignments: number;
+  totalActivities: number;
+  totalAssignments: number;
+}): DashboardOverviewLoopStatus {
+  if (completions > 0) return 'reviewing';
+  if (openAssignments > 0) return 'collecting-results';
+  if (totalAssignments > 0) return 'distribution';
+  if (totalActivities > 0) return 'publishing';
+
+  return 'empty';
+}
+
+function buildDashboardOverviewNextActions({
+  completions,
+  openAssignments,
+  totalActivities,
+  totalAssignments,
+}: {
+  completions: number;
+  openAssignments: number;
+  totalActivities: number;
+  totalAssignments: number;
+}): DashboardOverviewNextActionView[] {
+  const hasActivities = totalActivities > 0;
+  const hasAssignments = totalAssignments > 0;
+  const hasOpenAssignments = openAssignments > 0;
+  const hasCompletions = completions > 0;
+
+  return [
+    buildDashboardOverviewNextActionView({
+      id: 'create-activity',
+      status: hasActivities ? 'done' : 'ready',
+    }),
+    buildDashboardOverviewNextActionView({
+      id: 'publish-assignment',
+      status: hasActivities ? (hasAssignments ? 'done' : 'ready') : 'blocked',
+    }),
+    buildDashboardOverviewNextActionView({
+      id: 'share-assignment',
+      status: hasAssignments
+        ? hasOpenAssignments && hasCompletions
+          ? 'done'
+          : 'ready'
+        : 'blocked',
+    }),
+    buildDashboardOverviewNextActionView({
+      id: 'review-results',
+      status: hasCompletions ? 'ready' : 'blocked',
+    }),
+  ];
+}
+
+function buildDashboardOverviewNextActionView({
+  id,
+  status,
+}: {
+  id: DashboardOverviewNextActionId;
+  status: DashboardOverviewNextActionStatus;
+}): DashboardOverviewNextActionView {
+  const copy = getDashboardOverviewNextActionCopy(id);
+  const statusLabel = getDashboardOverviewNextActionStatusLabel(status);
+
+  return {
+    ...copy,
+    ariaLabel: m.dashboard_overview_next_action_aria_label({
+      label: copy.label,
+      status: statusLabel,
+    }),
+    id,
+    status,
+    statusLabel,
+    to: dashboardOverviewNextActionRoutes[id],
+  };
+}
+
+function getDashboardOverviewLoopStatusCopy(
+  status: DashboardOverviewLoopStatus
+) {
+  switch (status) {
+    case 'collecting-results':
+      return {
+        description:
+          m.dashboard_overview_loop_status_collecting_results_description(),
+        statusLabel:
+          m.dashboard_overview_loop_status_collecting_results_label(),
+        title: m.dashboard_overview_loop_status_collecting_results_title(),
+      };
+    case 'distribution':
+      return {
+        description:
+          m.dashboard_overview_loop_status_distribution_description(),
+        statusLabel: m.dashboard_overview_loop_status_distribution_label(),
+        title: m.dashboard_overview_loop_status_distribution_title(),
+      };
+    case 'publishing':
+      return {
+        description: m.dashboard_overview_loop_status_publishing_description(),
+        statusLabel: m.dashboard_overview_loop_status_publishing_label(),
+        title: m.dashboard_overview_loop_status_publishing_title(),
+      };
+    case 'reviewing':
+      return {
+        description: m.dashboard_overview_loop_status_reviewing_description(),
+        statusLabel: m.dashboard_overview_loop_status_reviewing_label(),
+        title: m.dashboard_overview_loop_status_reviewing_title(),
+      };
+    case 'empty':
+      return {
+        description: m.dashboard_overview_loop_status_empty_description(),
+        statusLabel: m.dashboard_overview_loop_status_empty_label(),
+        title: m.dashboard_overview_loop_status_empty_title(),
+      };
+  }
+}
+
+function getDashboardOverviewNextActionCopy(id: DashboardOverviewNextActionId) {
+  switch (id) {
+    case 'create-activity':
+      return {
+        cta: m.dashboard_overview_next_action_create_activity_cta(),
+        description:
+          m.dashboard_overview_next_action_create_activity_description(),
+        label: m.dashboard_overview_next_action_create_activity_label(),
+      };
+    case 'publish-assignment':
+      return {
+        cta: m.dashboard_overview_next_action_publish_assignment_cta(),
+        description:
+          m.dashboard_overview_next_action_publish_assignment_description(),
+        label: m.dashboard_overview_next_action_publish_assignment_label(),
+      };
+    case 'review-results':
+      return {
+        cta: m.dashboard_overview_next_action_review_results_cta(),
+        description:
+          m.dashboard_overview_next_action_review_results_description(),
+        label: m.dashboard_overview_next_action_review_results_label(),
+      };
+    case 'share-assignment':
+      return {
+        cta: m.dashboard_overview_next_action_share_assignment_cta(),
+        description:
+          m.dashboard_overview_next_action_share_assignment_description(),
+        label: m.dashboard_overview_next_action_share_assignment_label(),
+      };
+  }
+}
+
+function getDashboardOverviewNextActionStatusLabel(
+  status: DashboardOverviewNextActionStatus
+) {
+  switch (status) {
+    case 'blocked':
+      return m.dashboard_overview_next_action_status_blocked();
+    case 'done':
+      return m.dashboard_overview_next_action_status_done();
+    case 'ready':
+      return m.dashboard_overview_next_action_status_ready();
+  }
+}
+
+function getDashboardActivityAuthoringReadinessDescription(count: number) {
+  if (count === 1) {
+    return m.dashboard_overview_readiness_activity_authoring_ready_one({
+      count,
+    });
+  }
+
+  return m.dashboard_overview_readiness_activity_authoring_ready_many({
+    count,
+  });
 }
 
 function getDashboardAssignmentLinkReadiness({
@@ -529,3 +785,13 @@ function getDashboardStudentRunnerReadinessDescription({
 
   return m.dashboard_overview_readiness_student_runner_empty();
 }
+
+const dashboardOverviewNextActionRoutes: Record<
+  DashboardOverviewNextActionId,
+  string
+> = {
+  'create-activity': Routes.Create,
+  'publish-assignment': Routes.DashboardActivities,
+  'review-results': Routes.DashboardAssignments,
+  'share-assignment': Routes.DashboardAssignments,
+};

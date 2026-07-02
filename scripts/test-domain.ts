@@ -374,6 +374,7 @@ import { STARTER_FOOD_ASSIGNMENT_SHARE_ID } from '@/activities/starter-ids';
 import { getAcceptedAnswers, matchAnswer } from '@/activities/answer-matching';
 import {
   buildDashboardCoreLoopReadiness,
+  buildDashboardOverviewLoopStatus,
   buildDashboardOverviewMetrics,
   buildDashboardOverviewPageViewModel,
   buildDashboardOverviewRouteViewModel,
@@ -30939,6 +30940,21 @@ assert.deepEqual(
       metric.value,
       metric.description,
     ]),
+    loopStatus: {
+      nextActions: dashboardStarterPreviewOnlyPageView.loopStatus.nextActions.map(
+        (action) => [
+          action.id,
+          action.label,
+          action.status,
+          action.statusLabel,
+          action.to,
+          action.ariaLabel,
+        ]
+      ),
+      status: dashboardStarterPreviewOnlyPageView.loopStatus.status,
+      statusLabel: dashboardStarterPreviewOnlyPageView.loopStatus.statusLabel,
+      title: dashboardStarterPreviewOnlyPageView.loopStatus.title,
+    },
     previewAssignmentId:
       dashboardStarterPreviewOnlyPageView.preview.assignment.id,
     readinessValues: dashboardStarterPreviewOnlyPageView.readinessRows.map(
@@ -30946,6 +30962,45 @@ assert.deepEqual(
     ),
   },
   {
+    loopStatus: {
+      nextActions: [
+        [
+          'create-activity',
+          'Create activity',
+          'ready',
+          'Next',
+          Routes.Create,
+          'Create activity: Next',
+        ],
+        [
+          'publish-assignment',
+          'Publish assignment',
+          'blocked',
+          'Locked',
+          Routes.DashboardActivities,
+          'Publish assignment: Locked',
+        ],
+        [
+          'share-assignment',
+          'Share student link',
+          'blocked',
+          'Locked',
+          Routes.DashboardAssignments,
+          'Share student link: Locked',
+        ],
+        [
+          'review-results',
+          'Review results',
+          'blocked',
+          'Locked',
+          Routes.DashboardAssignments,
+          'Review results: Locked',
+        ],
+      ],
+      status: 'empty',
+      statusLabel: 'Start here',
+      title: 'Start by creating a reusable activity.',
+    },
     metricValues: [
       ['activities', '0', '0 drafts across 0 active activities'],
       [
@@ -31001,6 +31056,16 @@ assert.deepEqual(
       partiallyLoadedDashboardOverviewRouteView.metrics[2],
     partialResultMetric: partiallyLoadedDashboardOverviewRouteView.metrics[3],
     metricIds: dashboardOverviewRouteView.metrics.map((metric) => metric.id),
+    loopStatus: {
+      nextActionStatuses:
+        dashboardOverviewRouteView.loopStatus.nextActions.map((action) => [
+          action.id,
+          action.status,
+          action.statusLabel,
+        ]),
+      status: dashboardOverviewRouteView.loopStatus.status,
+      title: dashboardOverviewRouteView.loopStatus.title,
+    },
     readinessValues: dashboardOverviewRouteView.readinessRows.map((row) => [
       row.id,
       row.value,
@@ -31023,6 +31088,16 @@ assert.deepEqual(
       value: '90%',
     },
     metricIds: ['activities', 'templates', 'assignments', 'results'],
+    loopStatus: {
+      nextActionStatuses: [
+        ['create-activity', 'done', 'Done'],
+        ['publish-assignment', 'done', 'Done'],
+        ['share-assignment', 'done', 'Done'],
+        ['review-results', 'ready', 'Next'],
+      ],
+      status: 'reviewing',
+      title: 'Review submitted attempts.',
+    },
     readinessValues: [
       [
         'activity-authoring',
@@ -31085,6 +31160,160 @@ assert.deepEqual(
     ],
   }
 );
+assert.deepEqual(
+  buildDashboardOverviewLoopStatus({
+    activitySummary: {
+      draftActivities: 1,
+      templateCoverage: 1,
+      totalActivities: 1,
+    },
+    assignmentSummary: {
+      averageScore: 0,
+      completions: 0,
+      openAssignments: 0,
+      totalAssignments: 0,
+    },
+  }).nextActions.map((action) => [action.id, action.status, action.to]),
+  [
+    ['create-activity', 'done', Routes.Create],
+    ['publish-assignment', 'ready', Routes.DashboardActivities],
+    ['share-assignment', 'blocked', Routes.DashboardAssignments],
+    ['review-results', 'blocked', Routes.DashboardAssignments],
+  ]
+);
+assert.deepEqual(
+  {
+    actions: buildDashboardOverviewLoopStatus({
+      activitySummary: {
+        draftActivities: 0,
+        templateCoverage: 2,
+        totalActivities: 2,
+      },
+      assignmentSummary: {
+        averageScore: 0,
+        completions: 0,
+        openAssignments: 0,
+        totalAssignments: 2,
+      },
+    }).nextActions.map((action) => [action.id, action.status]),
+    status: buildDashboardOverviewLoopStatus({
+      activitySummary: {
+        draftActivities: 0,
+        templateCoverage: 2,
+        totalActivities: 2,
+      },
+      assignmentSummary: {
+        averageScore: 0,
+        completions: 0,
+        openAssignments: 0,
+        totalAssignments: 2,
+      },
+    }).status,
+  },
+  {
+    actions: [
+      ['create-activity', 'done'],
+      ['publish-assignment', 'done'],
+      ['share-assignment', 'ready'],
+      ['review-results', 'blocked'],
+    ],
+    status: 'distribution',
+  }
+);
+assert.deepEqual(
+  {
+    actions: buildDashboardOverviewLoopStatus({
+      activitySummary: {
+        draftActivities: 0,
+        templateCoverage: 2,
+        totalActivities: 2,
+      },
+      assignmentSummary: {
+        averageScore: 0,
+        completions: 0,
+        openAssignments: 1,
+        totalAssignments: 1,
+      },
+    }).nextActions.map((action) => [action.id, action.status]),
+    status: buildDashboardOverviewLoopStatus({
+      activitySummary: {
+        draftActivities: 0,
+        templateCoverage: 2,
+        totalActivities: 2,
+      },
+      assignmentSummary: {
+        averageScore: 0,
+        completions: 0,
+        openAssignments: 1,
+        totalAssignments: 1,
+      },
+    }).status,
+  },
+  {
+    actions: [
+      ['create-activity', 'done'],
+      ['publish-assignment', 'done'],
+      ['share-assignment', 'ready'],
+      ['review-results', 'blocked'],
+    ],
+    status: 'collecting-results',
+  }
+);
+assert.deepEqual(
+  {
+    actions: buildDashboardOverviewLoopStatus({
+      activitySummary: {
+        draftActivities: 0,
+        templateCoverage: 3,
+        totalActivities: 3,
+      },
+      assignmentSummary: {
+        averageScore: 86,
+        completions: 8,
+        openAssignments: 0,
+        totalAssignments: 2,
+      },
+    }).nextActions.map((action) => [action.id, action.status]),
+    status: buildDashboardOverviewLoopStatus({
+      activitySummary: {
+        draftActivities: 0,
+        templateCoverage: 3,
+        totalActivities: 3,
+      },
+      assignmentSummary: {
+        averageScore: 86,
+        completions: 8,
+        openAssignments: 0,
+        totalAssignments: 2,
+      },
+    }).status,
+  },
+  {
+    actions: [
+      ['create-activity', 'done'],
+      ['publish-assignment', 'done'],
+      ['share-assignment', 'ready'],
+      ['review-results', 'ready'],
+    ],
+    status: 'reviewing',
+  }
+);
+assert.deepEqual(
+  buildDashboardOverviewLoopStatus({
+    activitySummary: {
+      draftActivities: Number.NaN,
+      templateCoverage: Number.NaN,
+      totalActivities: Number.NaN,
+    },
+    assignmentSummary: {
+      averageScore: Number.NaN,
+      completions: Number.POSITIVE_INFINITY,
+      openAssignments: -1,
+      totalAssignments: 1.4,
+    },
+  }).status,
+  'distribution'
+);
 assert.deepEqual(buildDashboardCoreLoopReadiness(), [
   {
     description: 'Create a reusable activity before publishing a class link.',
@@ -31129,7 +31358,7 @@ assert.deepEqual(
   [
     {
       description:
-        '1 active activities are ready for editing, duplication, or publishing.',
+        '1 active activity is ready for editing, duplication, or publishing.',
       id: 'activity-authoring',
       label: 'Activity authoring',
       value: 100,
@@ -31309,6 +31538,10 @@ const dashboardOverviewMetricCardSource = readFileSync(
   'src/components/dashboard/dashboard-overview-metric-card.tsx',
   'utf8'
 );
+const dashboardOverviewLoopStatusPanelSource = readFileSync(
+  'src/components/dashboard/dashboard-overview-loop-status-panel.tsx',
+  'utf8'
+);
 const dashboardOverviewReadinessRowSource = readFileSync(
   'src/components/dashboard/dashboard-overview-readiness-row.tsx',
   'utf8'
@@ -31340,13 +31573,18 @@ assert.doesNotMatch(
 );
 assert.doesNotMatch(
   dashboardOverviewRouteSource,
-  /buildDashboardOverviewMetrics|buildDashboardCoreLoopReadiness|getDashboardOverviewActionCards/,
-  'Dashboard overview route should not directly rebuild metrics, readiness rows, or action cards.'
+  /buildDashboardOverviewMetrics|buildDashboardCoreLoopReadiness|buildDashboardOverviewLoopStatus|getDashboardOverviewActionCards/,
+  'Dashboard overview route should not directly rebuild metrics, loop status, readiness rows, or action cards.'
 );
 assert.match(
   dashboardOverviewRouteSource,
   /DashboardOverviewMetricCard/,
   'Dashboard overview route should delegate metric card rendering to the dashboard overview metric component.'
+);
+assert.match(
+  dashboardOverviewRouteSource,
+  /DashboardOverviewLoopStatusPanel[\s\S]*view=\{pageView\.loopStatus\}/,
+  'Dashboard overview route should delegate loop-status rendering to the dashboard overview loop-status component.'
 );
 assert.match(
   dashboardOverviewRouteSource,
@@ -31372,6 +31610,16 @@ assert.match(
   dashboardOverviewReadinessRowSource,
   /row\.description[\s\S]*Progress/,
   'Dashboard overview readiness component should render prepared row descriptions and own progress rendering.'
+);
+assert.match(
+  dashboardOverviewLoopStatusPanelSource,
+  /view\.nextActions\.map[\s\S]*action\.status === 'ready'[\s\S]*action\.cta[\s\S]*dashboardNextActionIcons[\s\S]*dashboardNextActionStatusIcons/,
+  'Dashboard overview loop-status component should render prepared next-action copy and own icon/status presentation.'
+);
+assert.doesNotMatch(
+  dashboardOverviewLoopStatusPanelSource,
+  /Create activity|Publish assignment|Share student link|Review results|Start here|Review submitted attempts/,
+  'Dashboard overview loop-status component should not hardcode visible next-action or loop-status copy.'
 );
 assert.match(
   dashboardOverviewActionCardSource,
@@ -31400,6 +31648,11 @@ const dashboardOverviewMetricsSource = getSourceSlice(
 const dashboardOverviewReadinessSource = getSourceSlice(
   dashboardOverviewDomainSource,
   'export function buildDashboardCoreLoopReadiness',
+  'export function buildDashboardOverviewLoopStatus'
+);
+const dashboardOverviewLoopStatusSource = getSourceSlice(
+  dashboardOverviewDomainSource,
+  'export function buildDashboardOverviewLoopStatus',
   'export function formatDashboardMetricValue'
 );
 assert.match(
@@ -31413,9 +31666,9 @@ assert.match(
   'Dashboard overview should isolate starter catalog reads inside the preview builder.'
 );
 assert.doesNotMatch(
-  `${dashboardOverviewMetricsSource}\n${dashboardOverviewReadinessSource}`,
+  `${dashboardOverviewMetricsSource}\n${dashboardOverviewReadinessSource}\n${dashboardOverviewLoopStatusSource}`,
   /preview|starter|getStarterActivity|getStarterAssignment|getStarterActivities|getStarterAssignments/,
-  'Dashboard metrics and readiness should not consume starter-preview data.'
+  'Dashboard metrics, readiness, and loop status should not consume starter-preview data.'
 );
 assert.match(
   dashboardOverviewMetricsSource,
@@ -31426,6 +31679,11 @@ assert.match(
   dashboardOverviewReadinessSource,
   /description:[\s\S]*dashboard_overview_readiness_activity_authoring[\s\S]*description: getDashboardAssignmentLinkReadinessDescription[\s\S]*description: getDashboardStudentRunnerReadinessDescription[\s\S]*dashboard_overview_readiness_teacher_results/,
   'Dashboard readiness rows should expose localized next-step descriptions from the dashboard domain.'
+);
+assert.match(
+  dashboardOverviewDomainSource,
+  /resolveDashboardOverviewLoopStatus[\s\S]*buildDashboardOverviewNextActions[\s\S]*dashboardOverviewNextActionRoutes[\s\S]*Routes\.Create[\s\S]*Routes\.DashboardAssignments/,
+  'Dashboard loop status should resolve owner-scoped next actions and route targets inside the dashboard domain.'
 );
 assert.doesNotMatch(
   dashboardOverviewRouteSource,
