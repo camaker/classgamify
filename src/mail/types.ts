@@ -1,11 +1,10 @@
-import type { MailConfig } from "@/types";
+import type { MailLocale } from '@/mail/locale';
+import type { MailConfig } from '@/types';
 
 /**
  * Supported mail provider names
  **/
-export type MailProviderName = NonNullable<
-  MailConfig['provider']
->;
+export type MailProviderName = NonNullable<MailConfig['provider']>;
 
 /**
  * Email template names
@@ -25,7 +24,9 @@ export interface SendEmailResult {
 export interface SendTemplateParams {
   to: string;
   template: EmailTemplate;
-  context: Record<string, unknown>;
+  context: Record<string, unknown> & {
+    locale?: MailLocale;
+  };
 }
 
 export interface SendRawEmailParams {
@@ -48,7 +49,7 @@ export interface MailProvider {
    * Send an email using a template
    */
   sendTemplate(params: SendTemplateParams): Promise<SendEmailResult>;
-  
+
   /**
    * Send a raw email
    */

@@ -5,6 +5,7 @@ import { tanstackStartCookies } from 'better-auth/tanstack-start';
 import { getDb } from '@/db';
 import { sendEmail } from '@/mail';
 import { subscribe } from '@/newsletter';
+import { getLocale } from '@/lib/locale';
 import { getBaseUrl } from '@/lib/urls';
 import { serverEnv } from '@/env/server';
 import { websiteConfig } from '@/config/website';
@@ -52,7 +53,7 @@ export const auth = betterAuth({
       await sendEmail({
         to: user.email,
         template: 'forgotPassword',
-        context: { url, name: user.name ?? '' },
+        context: { url, name: user.name ?? '', locale: getLocale() },
       });
     },
   },
@@ -64,7 +65,7 @@ export const auth = betterAuth({
       await sendEmail({
         to: user.email,
         template: 'verifyEmail',
-        context: { url, name: user.name ?? '' },
+        context: { url, name: user.name ?? '', locale: getLocale() },
       });
     },
     sendOnSignIn: true,

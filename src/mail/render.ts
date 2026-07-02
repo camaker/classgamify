@@ -1,6 +1,11 @@
 import { m } from '@/locale/paraglide/messages';
 import React, { type ReactElement } from 'react';
-import type { EmailTemplate } from './types';
+import {
+  getMailLocaleMessageOptions,
+  normalizeMailLocale,
+  type MailLocale,
+} from '@/mail/locale';
+import type { EmailTemplate, SendTemplateParams } from './types';
 import ContactMessage from './templates/contact-message';
 import ForgotPassword from './templates/forgot-password';
 import SubscribeNewsletter from './templates/subscribe-newsletter';
@@ -12,14 +17,6 @@ const EmailTemplates = {
   subscribeNewsletter: SubscribeNewsletter,
   contactMessage: ContactMessage,
 } as const;
-
-const en = { locale: 'en' as const };
-const EmailSubjects: Record<EmailTemplate, string> = {
-  forgotPassword: m.mail_forgot_password_subject(undefined, en),
-  verifyEmail: m.mail_verify_email_subject(undefined, en),
-  subscribeNewsletter: m.mail_subscribe_newsletter_subject(undefined, en),
-  contactMessage: m.mail_contact_message_subject(undefined, en),
-};
 
 export async function renderEmailHtml(email: ReactElement): Promise<string> {
   const reactDomServer = (await import('react-dom/server')) as {
@@ -88,17 +85,42 @@ export function toPlainText(html: string): string {
 export async function getTemplate({
   template,
   context,
-}: {
-  template: EmailTemplate;
-  context: Record<string, unknown>;
-}) {
+}: Pick<SendTemplateParams, 'context' | 'template'>) {
   const Component = EmailTemplates[template];
+  const locale = normalizeMailLocale(context.locale);
   const email = React.createElement(
     Component as React.ComponentType<Record<string, unknown>>,
-    context
+    {
+      ...context,
+      locale,
+    }
   );
   const html = await renderEmailHtml(email);
   const text = toPlainText(html);
-  const subject = EmailSubjects[template];
+  const subject = getEmailSubject({
+    locale,
+    template,
+  });
   return { html, text, subject };
+}
+
+export function getEmailSubject({
+  locale,
+  template,
+}: {
+  locale?: MailLocale;
+  template: EmailTemplate;
+}) {
+  const localeOptions = getMailLocaleMessageOptions({ locale });
+
+  switch (template) {
+    case 'forgotPassword':
+      return m.mail_forgot_password_subject(undefined, localeOptions);
+    case 'verifyEmail':
+      return m.mail_verify_email_subject(undefined, localeOptions);
+    case 'subscribeNewsletter':
+      return m.mail_subscribe_newsletter_subject(undefined, localeOptions);
+    case 'contactMessage':
+      return m.mail_contact_message_subject(undefined, localeOptions);
+  }
 }

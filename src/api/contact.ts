@@ -2,6 +2,7 @@ import { m } from '@/locale/paraglide/messages';
 import { createServerFn } from '@tanstack/react-start';
 import { websiteConfig } from '@/config/website';
 import { sendEmail } from '@/mail';
+import { getLocale } from '@/lib/locale';
 import {
   buildContactClassroomInquiryPayload,
   CONTACT_CLASSROOM_INQUIRY_FIELD_IDS,
@@ -63,6 +64,7 @@ export const sendContactMessage = createServerFn({ method: 'POST' })
         message: data.message.trim(),
         intent,
         classroomInquiry,
+        locale: getLocale(),
       },
     });
     if (!result.success) {

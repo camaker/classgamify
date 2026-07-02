@@ -1,6 +1,9 @@
 import assert from 'node:assert/strict';
 import { existsSync, readdirSync, readFileSync } from 'node:fs';
-import { overwriteGetLocale } from '@/locale/paraglide/runtime';
+import {
+  baseLocale,
+  overwriteGetLocale,
+} from '@/locale/paraglide/runtime';
 import { isLocalizedPath } from '@/lib/locale';
 import { isLinkActive, isLinkSectionActive } from '@/lib/urls';
 import { Routes } from '@/lib/routes';
@@ -30,6 +33,8 @@ import {
   buildAuthErrorRecoveryView,
 } from '@/auth/error-recovery';
 import { buildMailWorkspaceBoundaryView } from '@/mail/workspace-boundary';
+import { normalizeMailLocale } from '@/mail/locale';
+import { getEmailSubject } from '@/mail/render';
 import { getAvatarLinks } from '@/config/avatar-config';
 import { getFooterLinks } from '@/config/footer-config';
 import { getNavbarLinks } from '@/config/navbar-config';
@@ -1727,13 +1732,18 @@ assert.match(
 );
 assert.match(
   mailDocumentationSource,
-  /\{ name, email, message, intent\?, classroomInquiry\? \}[\s\S]*ClassGamify classroom and product inquiry/,
-  'Mail docs should document structured classroom inquiry template context.'
+  /\{ name, email, message, intent\?, classroomInquiry\?, locale\? \}[\s\S]*mail_contact_message_subject/,
+  'Mail docs should document structured classroom inquiry context and localized subject keys.'
 );
 assert.match(
   mailDocumentationSource,
-  /forgotPassword[\s\S]*ClassGamify teacher workspace password[\s\S]*verifyEmail[\s\S]*ClassGamify teacher workspace email[\s\S]*subscribeNewsletter[\s\S]*ClassGamify classroom updates enabled/,
-  'Mail docs should describe transactional email subjects in ClassGamify teacher-workspace terms.'
+  /context\.locale[\s\S]*`en`, `zh`[\s\S]*base locale[\s\S]*forgotPassword[\s\S]*mail_forgot_password_subject[\s\S]*verifyEmail[\s\S]*mail_verify_email_subject[\s\S]*subscribeNewsletter[\s\S]*mail_subscribe_newsletter_subject/,
+  'Mail docs should describe locale-aware transactional email rendering and subject keys.'
+);
+assert.doesNotMatch(
+  mailDocumentationSource,
+  /subjectByTemplate/,
+  'Mail docs should refer to getEmailSubject instead of the retired subjectByTemplate map.'
 );
 assert.match(
   mailDocumentationSource,
@@ -7643,9 +7653,21 @@ const contactFormCardSource = readFileSync(
   'utf8'
 );
 const contactApiSource = readFileSync('src/api/contact.ts', 'utf8');
+const newsletterMailLocaleApiSource = readFileSync(
+  'src/api/newsletter.ts',
+  'utf8'
+);
+const authMailLocaleSource = readFileSync('src/auth/auth.ts', 'utf8');
 const contactInquirySource = readFileSync('src/contact/inquiry.ts', 'utf8');
 const contactInquiryViewSource = readFileSync(
   'src/contact/inquiry-view.ts',
+  'utf8'
+);
+const mailLocaleSource = readFileSync('src/mail/locale.ts', 'utf8');
+const mailRenderSource = readFileSync('src/mail/render.ts', 'utf8');
+const mailTypesSource = readFileSync('src/mail/types.ts', 'utf8');
+const emailLayoutSource = readFileSync(
+  'src/mail/components/email-layout.tsx',
   'utf8'
 );
 const contactEmailTemplateSource = readFileSync(
@@ -7671,6 +7693,69 @@ const mailWorkspaceBoundarySource = readFileSync(
 const emailWorkspaceBoundaryComponentSource = readFileSync(
   'src/mail/components/email-workspace-boundary.tsx',
   'utf8'
+);
+const mailTemplateSourceText = [
+  contactEmailTemplateSource,
+  forgotPasswordEmailTemplateSource,
+  verifyEmailTemplateSource,
+  subscribeNewsletterEmailTemplateSource,
+  emailLayoutSource,
+  mailRenderSource,
+  mailWorkspaceBoundarySource,
+].join('\n');
+assert.match(
+  mailLocaleSource,
+  /baseLocale[\s\S]*isLocale[\s\S]*export type MailLocale = Locale[\s\S]*normalizeMailLocale\(value: unknown\)[\s\S]*isLocale\(value\) \? value : baseLocale/,
+  'Mail locale helper should normalize configured locales and fall back to the base locale.'
+);
+assert.equal(normalizeMailLocale('zh'), 'zh');
+assert.equal(normalizeMailLocale('not-supported'), baseLocale);
+assert.match(
+  mailTypesSource,
+  /context: Record<string, unknown> & \{[\s\S]*locale\?: MailLocale;[\s\S]*\};/,
+  'SendTemplateParams context should allow an optional normalized mail locale.'
+);
+assert.match(
+  mailRenderSource,
+  /normalizeMailLocale\(context\.locale\)[\s\S]*\.\.\.context,[\s\S]*locale,[\s\S]*getEmailSubject\(\{[\s\S]*locale,[\s\S]*template/,
+  'Mail renderer should normalize context locale, pass it into templates, and resolve the subject with the same locale.'
+);
+assert.match(
+  mailRenderSource,
+  /export function getEmailSubject[\s\S]*mail_forgot_password_subject[\s\S]*mail_verify_email_subject[\s\S]*mail_subscribe_newsletter_subject[\s\S]*mail_contact_message_subject/,
+  'Mail renderer should resolve every transactional subject from locale messages.'
+);
+assert.doesNotMatch(
+  mailTemplateSourceText,
+  /const en = \{ locale: 'en'/,
+  'Mail rendering should not pin shared templates or subjects to the English locale.'
+);
+assert.match(
+  emailLayoutSource,
+  /locale\?: MailLocale[\s\S]*getMailLocaleMessageOptions\(\{ locale \}\)[\s\S]*<Html lang=\{localeOptions\.locale\}>[\s\S]*mail_layout_team[\s\S]*mail_layout_copyright/,
+  'Email layout should set the HTML language and footer copy from the normalized mail locale.'
+);
+assert.match(
+  getEmailSubject({ template: 'verifyEmail', locale: 'zh' }),
+  /验证你的 ClassGamify 教师工作区邮箱/
+);
+assert.match(
+  getEmailSubject({ template: 'contactMessage', locale: 'en' }),
+  /ClassGamify classroom and product inquiry/
+);
+const zhMailWorkspaceBoundaryView = buildMailWorkspaceBoundaryView({
+  locale: 'zh',
+});
+assert.match(zhMailWorkspaceBoundaryView.title, /工作区边界/);
+assert.match(
+  zhMailWorkspaceBoundaryView.items.map((item) => item.line).join('\n'),
+  /活动|作业|结果|来源素材/
+);
+assert.equal(
+  buildMailWorkspaceBoundaryView({
+    locale: 'not-supported',
+  }).title,
+  buildMailWorkspaceBoundaryView({ locale: baseLocale }).title
 );
 assert.doesNotMatch(
   contactFormCardSource,
@@ -7701,6 +7786,21 @@ assert.match(
   contactApiSource,
   /context: \{[\s\S]*intent,[\s\S]*classroomInquiry,/,
   'Contact API should pass structured classroom inquiry context into the mail template.'
+);
+assert.match(
+  contactApiSource,
+  /import \{ getLocale \} from '@\/lib\/locale';[\s\S]*context: \{[\s\S]*locale: getLocale\(\)/,
+  'Contact API should pass the current request locale into contact transactional mail.'
+);
+assert.match(
+  newsletterMailLocaleApiSource,
+  /import \{ getLocale \} from '@\/lib\/locale';[\s\S]*template: 'subscribeNewsletter'[\s\S]*context: \{ email: data\.email, locale: getLocale\(\) \}/,
+  'Newsletter API should pass the current request locale into the welcome email.'
+);
+assert.match(
+  authMailLocaleSource,
+  /import \{ getLocale \} from '@\/lib\/locale';[\s\S]*template: 'forgotPassword'[\s\S]*context: \{ url, name: user\.name \?\? '', locale: getLocale\(\) \}[\s\S]*template: 'verifyEmail'[\s\S]*context: \{ url, name: user\.name \?\? '', locale: getLocale\(\) \}/,
+  'Auth email hooks should pass the current request locale into reset and verification mail.'
 );
 assert.match(
   contactInquirySource,
@@ -7744,27 +7844,27 @@ assert.match(
 );
 assert.match(
   emailWorkspaceBoundaryComponentSource,
-  /buildMailWorkspaceBoundaryView[\s\S]*<Section[\s\S]*aria-label=\{view\.title\}[\s\S]*view\.items\.map\(\(item\) =>[\s\S]*key=\{item\.id\}[\s\S]*item\.line/,
+  /buildMailWorkspaceBoundaryView\(\{ locale \}\)[\s\S]*<Section[\s\S]*aria-label=\{view\.title\}[\s\S]*view\.items\.map\(\(item\) =>[\s\S]*key=\{item\.id\}[\s\S]*item\.line/,
   'Email workspace-boundary component should render prepared panel and item lines from the mail-domain view.'
 );
 assert.match(
   forgotPasswordEmailTemplateSource,
-  /EmailWorkspaceBoundary[\s\S]*mail_forgot_password_body[\s\S]*mail_forgot_password_security_note[\s\S]*<EmailWorkspaceBoundary \/>[\s\S]*mail_forgot_password_button/,
+  /EmailWorkspaceBoundary[\s\S]*mail_forgot_password_body[\s\S]*mail_forgot_password_security_note[\s\S]*<EmailWorkspaceBoundary locale=\{localeOptions\.locale\} \/>[\s\S]*mail_forgot_password_button/,
   'Forgot-password email should render the shared workspace boundary before the reset action.'
 );
 assert.match(
   verifyEmailTemplateSource,
-  /EmailWorkspaceBoundary[\s\S]*mail_verify_email_body[\s\S]*mail_verify_email_workspace_note[\s\S]*<EmailWorkspaceBoundary \/>[\s\S]*mail_verify_email_button/,
+  /EmailWorkspaceBoundary[\s\S]*mail_verify_email_body[\s\S]*mail_verify_email_workspace_note[\s\S]*<EmailWorkspaceBoundary locale=\{localeOptions\.locale\} \/>[\s\S]*mail_verify_email_button/,
   'Verify-email template should render the shared workspace boundary before the verify action.'
 );
 assert.match(
   subscribeNewsletterEmailTemplateSource,
-  /EmailWorkspaceBoundary[\s\S]*mail_subscribe_newsletter_title[\s\S]*mail_subscribe_newsletter_body[\s\S]*mail_subscribe_newsletter_workspace_note[\s\S]*<EmailWorkspaceBoundary \/>/,
+  /EmailWorkspaceBoundary[\s\S]*mail_subscribe_newsletter_title[\s\S]*mail_subscribe_newsletter_body[\s\S]*mail_subscribe_newsletter_workspace_note[\s\S]*<EmailWorkspaceBoundary locale=\{localeOptions\.locale\} \/>/,
   'Subscribe-newsletter email should render the shared workspace boundary after the classroom update scope note.'
 );
 assert.match(
   contactEmailTemplateSource,
-  /EmailWorkspaceBoundary[\s\S]*mail_contact_message_message[\s\S]*<EmailWorkspaceBoundary \/>/,
+  /EmailWorkspaceBoundary[\s\S]*mail_contact_message_message[\s\S]*<EmailWorkspaceBoundary locale=\{localeOptions\.locale\} \/>/,
   'Contact email template should render the shared workspace boundary after the inquiry body.'
 );
 const newsletterFormCardSource = readFileSync(

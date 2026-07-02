@@ -2,6 +2,7 @@ import { createServerFn } from '@tanstack/react-start';
 import { websiteConfig } from '@/config/website';
 import { m } from '@/locale/paraglide/messages';
 import { sendEmail } from '@/mail';
+import { getLocale } from '@/lib/locale';
 import { isSubscribed, subscribe, unsubscribe } from '@/newsletter';
 import { z } from 'zod';
 
@@ -42,7 +43,7 @@ export const subscribeNewsletter = createServerFn({ method: 'POST' })
           await sendEmail({
             to: data.email,
             template: 'subscribeNewsletter',
-            context: { email: data.email },
+            context: { email: data.email, locale: getLocale() },
           });
         } catch (e) {
           console.error('Newsletter welcome email error:', e);

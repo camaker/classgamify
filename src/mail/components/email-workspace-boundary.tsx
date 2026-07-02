@@ -2,10 +2,15 @@ import {
   buildMailWorkspaceBoundaryView,
   type MailWorkspaceBoundaryItemView,
 } from '@/mail/workspace-boundary';
+import type { MailLocale } from '@/mail/locale';
 import { Section, Text } from '@react-email/components';
 
-export default function EmailWorkspaceBoundary() {
-  const view = buildMailWorkspaceBoundaryView();
+export default function EmailWorkspaceBoundary({
+  locale,
+}: {
+  locale?: MailLocale;
+}) {
+  const view = buildMailWorkspaceBoundaryView({ locale });
 
   return (
     <Section

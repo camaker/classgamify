@@ -15,7 +15,8 @@ boundary around transactional mail, see [Configuration](./configuration.md).
 src/mail/
 ├── index.ts           # sendEmail, getMailProvider, getTemplate; providerRegistry
 ├── types.ts           # EmailTemplate, MailProviderName, Send*Params, MailProvider
-├── render.ts          # getTemplate, renderEmailHtml, toPlainText; subjectByTemplate
+├── locale.ts          # mail locale normalization and message options
+├── render.ts          # getTemplate, renderEmailHtml, toPlainText; getEmailSubject
 ├── provider/
 │   ├── resend.ts      # ResendProvider implements MailProvider
 │   └── cloudflare.ts  # CloudflareProvider implements MailProvider
@@ -100,7 +101,10 @@ mail: {
 |--------|-------------|
 | **sendEmail(params)** | `SendTemplateParams` → render template + send; `SendRawEmailParams` → send raw. Returns `Promise<SendEmailResult>`. |
 | **getMailProvider()** | Lazy-initialized provider from `websiteConfig.mail.provider`. |
-| **getTemplate({ template, context })** | Returns `{ html, text, subject }`; used by providers internally. |
+| **getTemplate({ template, context })** | Normalizes optional `context.locale`, renders `{ html, text, subject }`, and passes the same locale into the template component and subject resolver. Used by providers internally. |
+
+`context.locale` accepts the configured Paraglide locale values (`en`, `zh`).
+Missing or unsupported values fall back to the base locale before rendering.
 
 **Types (re-exported):** `EmailTemplate`, `MailProviderName`, `SendTemplateParams`, `SendRawEmailParams`.
 
@@ -108,19 +112,19 @@ mail: {
 
 ## Templates
 
-| Template | Context | Subject (in render.ts) |
-|----------|---------|---------------------------|
-| forgotPassword | `{ url, name }` | Reset your ClassGamify teacher workspace password |
-| verifyEmail | `{ url, name }` | Verify your ClassGamify teacher workspace email |
-| subscribeNewsletter | `{ email? }` | ClassGamify classroom updates enabled |
-| contactMessage | `{ name, email, message, intent?, classroomInquiry? }` | ClassGamify classroom and product inquiry |
+| Template | Context | Subject source |
+|----------|---------|----------------|
+| forgotPassword | `{ url, name, locale? }` | `mail_forgot_password_subject` |
+| verifyEmail | `{ url, name, locale? }` | `mail_verify_email_subject` |
+| subscribeNewsletter | `{ email?, locale? }` | `mail_subscribe_newsletter_subject` |
+| contactMessage | `{ name, email, message, intent?, classroomInquiry?, locale? }` | `mail_contact_message_subject` |
 
 Each transactional template renders the shared workspace boundary panel from
 `src/mail/workspace-boundary.ts`, covering saved activities, assignment links,
 student attempts/results, teacher-reviewed AI drafts, and safe source-material
 provenance.
 
-**Adding a template:** extend `EmailTemplate` in `types.ts` → add to `EmailTemplates` and `subjectByTemplate` in `render.ts` → add React component under `templates/`.
+**Adding a template:** extend `EmailTemplate` in `types.ts` → add to `EmailTemplates` and `getEmailSubject` in `render.ts` → add React component under `templates/`. Any new visible subject, heading, body, or button copy must be added to the locale message files before it is used by the template.
 
 ---
 

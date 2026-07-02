@@ -1,6 +1,9 @@
 import { m } from '@/locale/paraglide/messages';
-
-const en = { locale: 'en' as const };
+import {
+  getMailLocaleMessageOptions,
+  type MailLocaleInput,
+  type MailLocaleMessageOptions,
+} from '@/mail/locale';
 
 export type MailWorkspaceBoundaryItemId =
   | 'activities'
@@ -21,46 +24,68 @@ export type MailWorkspaceBoundaryView = {
   title: string;
 };
 
-export function buildMailWorkspaceBoundaryView(): MailWorkspaceBoundaryView {
+export function buildMailWorkspaceBoundaryView(
+  input?: MailLocaleInput
+): MailWorkspaceBoundaryView {
+  const localeOptions = getMailLocaleMessageOptions(input);
   const items = [
     buildMailWorkspaceBoundaryItemView({
       description: m.mail_workspace_boundary_item_activities_description(
         undefined,
-        en
+        localeOptions
       ),
       id: 'activities',
-      label: m.mail_workspace_boundary_item_activities_label(undefined, en),
+      label: m.mail_workspace_boundary_item_activities_label(
+        undefined,
+        localeOptions
+      ),
+      localeOptions,
     }),
     buildMailWorkspaceBoundaryItemView({
       description: m.mail_workspace_boundary_item_assignments_description(
         undefined,
-        en
+        localeOptions
       ),
       id: 'assignments',
-      label: m.mail_workspace_boundary_item_assignments_label(undefined, en),
+      label: m.mail_workspace_boundary_item_assignments_label(
+        undefined,
+        localeOptions
+      ),
+      localeOptions,
     }),
     buildMailWorkspaceBoundaryItemView({
       description: m.mail_workspace_boundary_item_results_description(
         undefined,
-        en
+        localeOptions
       ),
       id: 'results',
-      label: m.mail_workspace_boundary_item_results_label(undefined, en),
+      label: m.mail_workspace_boundary_item_results_label(
+        undefined,
+        localeOptions
+      ),
+      localeOptions,
     }),
     buildMailWorkspaceBoundaryItemView({
       description: m.mail_workspace_boundary_item_ai_sources_description(
         undefined,
-        en
+        localeOptions
       ),
       id: 'ai-sources',
-      label: m.mail_workspace_boundary_item_ai_sources_label(undefined, en),
+      label: m.mail_workspace_boundary_item_ai_sources_label(
+        undefined,
+        localeOptions
+      ),
+      localeOptions,
     }),
   ];
 
   return {
-    description: m.mail_workspace_boundary_description(undefined, en),
+    description: m.mail_workspace_boundary_description(
+      undefined,
+      localeOptions
+    ),
     items,
-    title: m.mail_workspace_boundary_title(undefined, en),
+    title: m.mail_workspace_boundary_title(undefined, localeOptions),
   };
 }
 
@@ -68,7 +93,10 @@ function buildMailWorkspaceBoundaryItemView({
   description,
   id,
   label,
-}: Omit<MailWorkspaceBoundaryItemView, 'line'>): MailWorkspaceBoundaryItemView {
+  localeOptions,
+}: Omit<MailWorkspaceBoundaryItemView, 'line'> & {
+  localeOptions: MailLocaleMessageOptions;
+}): MailWorkspaceBoundaryItemView {
   return {
     description,
     id,
@@ -78,7 +106,7 @@ function buildMailWorkspaceBoundaryItemView({
         description,
         label,
       },
-      en
+      localeOptions
     ),
   };
 }
