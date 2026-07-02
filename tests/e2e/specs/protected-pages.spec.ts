@@ -111,6 +111,32 @@ test.describe('protected page smoke coverage', () => {
               )
             ).toBeVisible();
           }
+          if (protectedPage.path === '/settings/files') {
+            await expect(
+              page.getByText(
+                getLocaleMessage(
+                  locale,
+                  'settings_files_workspace_summary_title'
+                )
+              )
+            ).toBeVisible();
+            await expect(
+              page.getByText(
+                getLocaleMessage(
+                  locale,
+                  'settings_files_workspace_summary_library_label'
+                )
+              )
+            ).toBeVisible();
+            await expect(
+              page.getByText(
+                getLocaleMessage(
+                  locale,
+                  'settings_files_workspace_summary_privacy_label'
+                )
+              )
+            ).toBeVisible();
+          }
         });
       }
     });

@@ -405,6 +405,10 @@ import {
   buildSettingsBillingWorkspaceSummaryView,
   buildSettingsPaymentPageViewModel,
 } from '@/settings/billing-view';
+import {
+  buildSettingsFilesPageViewModel,
+  buildSettingsFilesWorkspaceSummaryView,
+} from '@/settings/files-view';
 import type { PricePlan, Subscription } from '@/payment/types';
 import {
   AssignmentAttemptAnswerValidationError,
@@ -1809,6 +1813,18 @@ const securityWorkspaceSummarySource = readFileSync(
   'src/components/settings/security/security-workspace-summary.tsx',
   'utf8'
 );
+const settingsFilesRouteProductSource = readFileSync(
+  'src/routes/settings/files.tsx',
+  'utf8'
+);
+const settingsFilesViewSource = readFileSync(
+  'src/settings/files-view.ts',
+  'utf8'
+);
+const filesWorkspaceSummarySource = readFileSync(
+  'src/components/settings/files/files-workspace-summary.tsx',
+  'utf8'
+);
 assert.doesNotMatch(
   updatePasswordCardSource,
   /ctx\.error|err\.message|error\.message|err instanceof Error|error instanceof Error/,
@@ -1878,6 +1894,46 @@ assert.doesNotMatch(
   securityWorkspaceSummarySource,
   /Workspace security boundary|Available security controls|Account access|Assignment links|Student results|Email password|Account deletion|工作区安全边界|可用安全控制|账号访问|作业链接|学生结果|邮箱密码|账号删除/,
   'Security workspace summary component should not hard-code visible security boundary copy.'
+);
+assert.match(
+  settingsFilesViewSource,
+  /export type SettingsFilesWorkspaceSummaryItemId =[\s\S]*'activity-attachments'[\s\S]*'ai-provenance'[\s\S]*'source-library'[\s\S]*'student-privacy'/,
+  'Files settings view model should expose stable classroom material boundary item ids.'
+);
+assert.match(
+  settingsFilesViewSource,
+  /export function isSettingsFilesEnabled\(\)[\s\S]*websiteConfig\.storage\?\.enable === true/,
+  'Files settings feature visibility should be centralized in the settings files view helper.'
+);
+assert.match(
+  settingsFilesViewSource,
+  /export function buildSettingsFilesPageViewModel\(\)[\s\S]*breadcrumbs:[\s\S]*id: 'settings'[\s\S]*id: 'files'[\s\S]*workspaceSummaryView: buildSettingsFilesWorkspaceSummaryView/,
+  'Files settings view model should own localized page state, breadcrumbs, and workspace summary.'
+);
+assert.match(
+  settingsFilesViewSource,
+  /settings_files_workspace_summary_title[\s\S]*settings_files_workspace_summary_description[\s\S]*settings_files_workspace_summary_library_description[\s\S]*settings_files_workspace_summary_attachments_description[\s\S]*settings_files_workspace_summary_ai_description[\s\S]*settings_files_workspace_summary_privacy_description/,
+  'Files settings view model should prepare localized classroom material boundary copy.'
+);
+assert.match(
+  settingsFilesRouteProductSource,
+  /const pageView = buildSettingsFilesPageViewModel\(\);[\s\S]*breadcrumbs=\{pageView\.breadcrumbs\}[\s\S]*title=\{pageView\.title\}[\s\S]*FilesWorkspaceSummary[\s\S]*view=\{pageView\.workspaceSummaryView\}[\s\S]*FilesPageContent/,
+  'Files settings route should consume the settings files page view model and render the prepared material boundary summary.'
+);
+assert.doesNotMatch(
+  settingsFilesRouteProductSource,
+  /m\.settings_files_|m\.common_settings|websiteConfig\.storage/,
+  'Files settings route should not rebuild localized files page copy or feature visibility directly.'
+);
+assert.match(
+  filesWorkspaceSummarySource,
+  /view\.itemViews\.map\(\(itemView\) =>[\s\S]*key=\{itemView\.id\}[\s\S]*function FilesWorkspaceSummaryItem[\s\S]*itemView\.label[\s\S]*itemView\.description/,
+  'Files workspace summary component should render prepared boundary views keyed by stable ids.'
+);
+assert.doesNotMatch(
+  filesWorkspaceSummarySource,
+  /Classroom material boundary|Source material library|Activity attachments|AI draft provenance|Student payload privacy|课堂素材边界|来源素材库|活动附件|AI 草稿来源|学生载荷隐私/,
+  'Files workspace summary component should not hard-code visible material boundary copy.'
 );
 const deleteAccountCardSource = readFileSync(
   'src/components/settings/security/delete-account-card.tsx',
@@ -7544,6 +7600,22 @@ assert.match(
   'Payment status and next-step copy should stay centralized in the payment status view helper.'
 );
 overwriteGetLocale(() => 'en');
+const filesPageView = buildSettingsFilesPageViewModel();
+assert.equal(filesPageView.breadcrumbs.at(-1)?.id, 'files');
+assert.equal(filesPageView.title, 'Files');
+const filesWorkspaceSummaryItemIds = filesPageView.workspaceSummaryView.itemViews
+  .map((item) => item.id)
+  .join(',');
+assert.equal(
+  filesWorkspaceSummaryItemIds,
+  'source-library,activity-attachments,ai-provenance,student-privacy'
+);
+assert.match(
+  filesPageView.workspaceSummaryView.description,
+  /teacher-owned classroom source materials/
+);
+const filesWorkspaceSummaryView = buildSettingsFilesWorkspaceSummaryView();
+assert.equal(filesWorkspaceSummaryView.itemViews.length, 4);
 const billingPageView = buildSettingsBillingPageViewModel();
 assert.equal(billingPageView.breadcrumbs.at(-1)?.id, 'billing');
 assert.equal(billingPageView.title, 'Billing');
@@ -9602,8 +9674,12 @@ const protectedPagesSpecSource = readFileSync(
   'utf8'
 );
 assert.match(
+  settingsFilesViewSource,
+  /websiteConfig\.storage\?\.enable === true/
+);
+assert.match(
   settingsFilesRouteSource,
-  /websiteConfig\.storage\?\.enable !== true/
+  /isSettingsFilesEnabled\(\)/
 );
 assert.match(
   settingsBillingViewSource,
@@ -9624,7 +9700,7 @@ assert.match(
 for (const [source, breadcrumbId] of [
   [settingsProfileViewSource, 'profile'],
   [settingsSecurityViewSource, 'security'],
-  [settingsFilesRouteSource, 'files'],
+  [settingsFilesViewSource, 'files'],
   [settingsBillingViewSource, 'billing'],
   [settingsNotificationsRouteSource, 'notifications'],
   [settingsBillingViewSource, 'payment'],
@@ -9852,6 +9928,11 @@ const authWorkspaceBoundaryRequirements = [
       ['settings_profile_workspace_summary_assignments_description', /Published assignment links/],
       ['settings_profile_workspace_summary_student_description', /ClassGamify teacher workspace/],
       ['settings_profile_workspace_summary_results_description', /student attempt records/],
+      ['settings_files_workspace_summary_description', /classroom source materials/],
+      ['settings_files_workspace_summary_library_description', /future worksheet extraction flows/],
+      ['settings_files_workspace_summary_attachments_description', /published assignment snapshots/],
+      ['settings_files_workspace_summary_ai_description', /storage keys, URLs, and permissions/],
+      ['settings_files_workspace_summary_privacy_description', /sanitized runtime prompts and choices/],
       ['settings_security_workspace_summary_description', /reusable activities, source materials, assignment links/],
       ['settings_security_workspace_summary_access_description', /teacher workspace/],
       ['settings_security_workspace_summary_activities_description', /source-material references/],
@@ -9901,6 +9982,11 @@ const authWorkspaceBoundaryRequirements = [
       ['settings_profile_workspace_summary_assignments_description', /已发布作业链接/],
       ['settings_profile_workspace_summary_student_description', /ClassGamify 教师工作区/],
       ['settings_profile_workspace_summary_results_description', /学生尝试记录/],
+      ['settings_files_workspace_summary_description', /课堂来源素材/],
+      ['settings_files_workspace_summary_library_description', /未来练习纸提取流程/],
+      ['settings_files_workspace_summary_attachments_description', /已发布作业快照/],
+      ['settings_files_workspace_summary_ai_description', /存储 key、URL 和权限信息/],
+      ['settings_files_workspace_summary_privacy_description', /运行时题目和选项/],
       ['settings_security_workspace_summary_description', /可复用活动、来源素材、作业链接/],
       ['settings_security_workspace_summary_access_description', /教师工作区/],
       ['settings_security_workspace_summary_activities_description', /来源素材引用/],

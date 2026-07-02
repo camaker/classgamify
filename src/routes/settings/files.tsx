@@ -1,12 +1,15 @@
-import { m } from '@/locale/paraglide/messages';
 import { DashboardLayout } from '@/components/layout/dashboard-layout';
 import { FilesPageContent } from '@/components/settings/files/files-page-content';
-import { websiteConfig } from '@/config/website';
+import { FilesWorkspaceSummary } from '@/components/settings/files/files-workspace-summary';
+import {
+  buildSettingsFilesPageViewModel,
+  isSettingsFilesEnabled,
+} from '@/settings/files-view';
 import { createFileRoute, notFound, rootRouteId } from '@tanstack/react-router';
 
 export const Route = createFileRoute('/settings/files')({
   beforeLoad: () => {
-    if (websiteConfig.storage?.enable !== true) {
+    if (!isSettingsFilesEnabled()) {
       throw notFound({ routeId: rootRouteId });
     }
   },
@@ -14,17 +17,18 @@ export const Route = createFileRoute('/settings/files')({
 });
 
 function FilesPage() {
-  const breadcrumbs = [
-    { id: 'settings', label: m.common_settings(), isCurrentPage: false },
-    { id: 'files', label: m.settings_files_title(), isCurrentPage: true },
-  ];
+  const pageView = buildSettingsFilesPageViewModel();
+
   return (
     <DashboardLayout
-      breadcrumbs={breadcrumbs}
-      title={m.settings_files_title()}
-      description={m.settings_files_description()}
+      breadcrumbs={pageView.breadcrumbs}
+      title={pageView.title}
+      description={pageView.description}
     >
-      <FilesPageContent />
+      <div className="flex flex-col gap-8">
+        <FilesWorkspaceSummary view={pageView.workspaceSummaryView} />
+        <FilesPageContent />
+      </div>
     </DashboardLayout>
   );
 }
