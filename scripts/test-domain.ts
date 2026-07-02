@@ -1285,46 +1285,99 @@ assert.doesNotMatch(
   /activityContentToEditorInput|buildActivityEditAccessView|activityEditPageCopy/,
   'The activity edit route should not rebuild editor initial values, access state, or page copy directly.'
 );
-const localizedLegalPageRequirements = [
+const legalPolicyPageProductSurfaceRequirements = [
+  {
+    filePath: 'content/pages/terms.md',
+    patterns: [
+      /ClassGamify/,
+      /reusable activities/,
+      /student assignment links/,
+      /student attempts and results/,
+      /frozen activity snapshot/,
+      /anonymous participation[\s\S]*browser-based attempt\s+tokens/,
+      /CSV exports/,
+      /source materials/,
+      /AI-assisted drafts/,
+    ],
+  },
+  {
+    filePath: 'content/pages/privacy.md',
+    patterns: [
+      /ClassGamify/,
+      /Classroom activity content/,
+      /assignment snapshots/,
+      /public share identifiers/,
+      /anonymous\s+browser token/,
+      /teacher results, and result exports/,
+      /safe material\s+provenance/,
+      /source-material storage identifiers/,
+      /AI-assisted\s+drafting/,
+    ],
+  },
+  {
+    filePath: 'content/pages/cookie.md',
+    patterns: [
+      /ClassGamify/,
+      /classroom\s+activity platform/,
+      /frozen assignment snapshot/,
+      /anonymous student token/,
+      /timer\s+state/,
+      /partial-attempt confirmation state/,
+      /local browser label/,
+      /classroom source materials/,
+    ],
+  },
   {
     filePath: 'content/pages/terms.zh.md',
     patterns: [
       /ClassGamify/,
-      /课堂活动/,
-      /作业链接/,
-      /学生(?:作答|提交)/,
-      /结果/,
-      /AI/,
+      /可复用的课堂活动/,
+      /学生作业链接/,
+      /学生提交和结果/,
+      /冻结的活动快照/,
+      /匿名参与[\s\S]*浏览器端尝试标记/,
+      /CSV 导出/,
+      /来源素材/,
+      /AI 辅助/,
     ],
   },
   {
     filePath: 'content/pages/privacy.zh.md',
     patterns: [
       /ClassGamify/,
-      /课堂活动/,
-      /作业链接/,
-      /学生参与数据|学生作答/,
-      /老师结果|结果/,
-      /AI/,
+      /课堂活动内容/,
+      /作业快照/,
+      /公开分享标识/,
+      /匿名浏览器标记/,
+      /老师结果和结果导出/,
+      /安全来源信息/,
+      /来源素材存储标识/,
+      /AI 辅助草稿/,
     ],
   },
   {
     filePath: 'content/pages/cookie.zh.md',
     patterns: [
       /ClassGamify/,
-      /课堂活动/,
-      /作业链接/,
-      /匿名学生|匿名尝试/,
-      /本地作答状态/,
-      /AI/,
+      /课堂活动平台/,
+      /冻结作业快照/,
+      /匿名学生标记/,
+      /计时器状态/,
+      /部分提交确认状态/,
+      /本地浏览器标签/,
+      /课堂来源素材/,
     ],
   },
 ] as const;
-for (const { filePath, patterns } of localizedLegalPageRequirements) {
+const legalPolicyAiDemoPattern = /\bAI demos?\b|AI 演示/i;
+for (const {
+  filePath,
+  patterns,
+} of legalPolicyPageProductSurfaceRequirements) {
   assert.equal(
     existsSync(filePath),
     true,
-    `${filePath} should exist so zh legal routes do not fall back to English.`
+    `${filePath} should exist so localized legal routes do not fall back.`
   );
 
   const fileText = readFileSync(filePath, 'utf8');
@@ -1335,27 +1388,19 @@ for (const { filePath, patterns } of localizedLegalPageRequirements) {
     `${filePath} should not mention copied learning-site product language.`
   );
 
+  assert.doesNotMatch(
+    fileText,
+    legalPolicyAiDemoPattern,
+    `${filePath} should describe AI as a teacher-reviewed product capability.`
+  );
+
   for (const pattern of patterns) {
     assert.match(
       fileText,
       pattern,
-      `${filePath} should describe the ClassGamify classroom activity, assignment, student attempt, results, and AI/file data model.`
+      `${filePath} should describe its ClassGamify product data surfaces.`
     );
   }
-}
-for (const filePath of [
-  'content/pages/terms.md',
-  'content/pages/privacy.md',
-  'content/pages/cookie.md',
-  'content/pages/terms.zh.md',
-  'content/pages/privacy.zh.md',
-  'content/pages/cookie.zh.md',
-]) {
-  assert.doesNotMatch(
-    readFileSync(filePath, 'utf8'),
-    /\bAI demos?\b/i,
-    `${filePath} should describe AI as teacher-reviewed product capability, not demo positioning.`
-  );
 }
 const environmentTemplateFiles = ['.env.example', '.env.production.example'];
 for (const filePath of environmentTemplateFiles) {

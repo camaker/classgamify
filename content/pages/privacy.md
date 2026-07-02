@@ -1,7 +1,7 @@
 ---
 title: Privacy Policy
 description: How ClassGamify collects, uses, stores, and protects personal information
-date: 2026-06-20
+date: 2026-07-02
 ---
 
 ## Overview
@@ -30,13 +30,13 @@ ClassGamify.
 - **Classroom activity content**: We may process activity titles, descriptions,
   teacher instructions, learning goals, vocabulary, questions, answer keys,
   accepted alternatives, answer explanations, matching pairs, groups, listening
-  scripts, worksheet settings, selected templates, assignment settings, and
-  public share identifiers.
+  scripts, worksheet settings, selected templates, assignment settings,
+  assignment snapshots, and public share identifiers.
 - **Student participation data**: When a student uses an assignment link, we may
   process the student name if the teacher chooses to collect it, an anonymous
   browser token for attempt limits, submitted answers, score, accuracy,
   completion time, attempt duration, review state, and technical data needed to
-  show the student result and teacher results.
+  show the student result, teacher results, and result exports.
 - **Files and profile content**: If account file, avatar, audio, image, or
   worksheet upload features are available and you upload files, we process the
   file name, type, size, storage key, upload time, and the file itself.
@@ -46,6 +46,9 @@ ClassGamify.
   process the text you enter, uploaded images or files, and generated output
   through the configured provider. Depending on the feature, those inputs and
   outputs may also be logged for abuse prevention, debugging, or rate limiting.
+  For source-material draft notes, the product is designed to use safe material
+  provenance such as material kind and filename basename before any dedicated
+  extraction pipeline is enabled.
 - **Contact and support information**: If you email us, submit a contact form,
   or use a support channel, we receive the contact details and message content
   you choose to provide.
@@ -73,7 +76,8 @@ We use information to:
 - authenticate users, keep sessions secure, verify email addresses, and prevent
   account abuse
 - publish assignment links, enforce assignment settings, score attempts, show
-  student feedback where enabled, and provide teacher result summaries
+  student feedback where enabled, and provide teacher result summaries and CSV
+  exports
 - generate, remix, or improve activity drafts requested by the user
 - process purchases, renewals, cancellations, refunds, invoices, and payment
   support when paid features are enabled
@@ -129,6 +133,12 @@ required by your organization, school, family, or applicable law.
 Do not ask students to submit sensitive personal information through assignment
 answers, student name fields, comments, or uploads. Student results are intended
 for classroom review, reteaching, feedback, and ordinary instructional records.
+
+Public student assignment payloads are intended to show the runtime prompts,
+choices, rules, and review feedback needed for the assignment. Teacher-only
+answer keys, file lists, source-material storage identifiers, and private result
+exports are handled in teacher-facing workflows rather than in the public runner
+before they are authorized or relevant.
 
 ## Cookies, Local Storage, and Analytics
 

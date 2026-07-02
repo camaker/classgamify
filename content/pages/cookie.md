@@ -1,7 +1,7 @@
 ---
 title: Cookie Policy
 description: How ClassGamify uses cookies, local storage, and similar technologies
-date: 2026-06-20
+date: 2026-07-02
 ---
 
 ## Overview
@@ -17,9 +17,10 @@ read together with our [Privacy Policy](/privacy), which explains how we handle
 personal information more broadly.
 
 Where the product offers public assignment links, the link may include a share
-identifier so students can open the correct activity. The browser may also store
-local attempt state, an anonymous student token, or display preferences so the
-assignment can work consistently on the same device.
+identifier so students can open the correct frozen assignment snapshot. The
+browser may also store local attempt state, an anonymous student token, timer
+state, or display preferences so the assignment can work consistently on the
+same device.
 
 ## What Cookies and Similar Technologies Are
 
@@ -42,7 +43,8 @@ These are required to provide the service or keep it secure. They may support:
 - sign-in sessions, account authentication, and email verification
 - fraud, spam, abuse, and security protections
 - request routing, load handling, and Cloudflare security services
-- assignment link access, anonymous attempt tokens, and attempt-limit checks
+- assignment link access, anonymous attempt tokens, timer continuity, and
+  attempt-limit checks
 - account deletion, password reset, and other account workflows
 
 If you block essential cookies, account features, assignment links, paid access,
@@ -65,7 +67,8 @@ Clearing browser storage may reset these preferences.
 Some student runner and authoring features may save temporary state in your
 browser rather than in an account. This can include draft form values, selected
 answers before submission, anonymous student tokens, elapsed timer state,
-template UI state, or recently opened assignment links.
+partial-attempt confirmation state, template UI state, recently opened
+assignment links, or the local browser label used to explain anonymous work.
 
 This local state helps an activity or assignment continue on the same browser
 where appropriate. It may not sync across devices. Clearing local storage can
@@ -92,8 +95,8 @@ If paid checkout, transactional email, AI features, file storage, or support
 tools are enabled, providers such as Creem, Stripe, Cloudflare Email, Resend,
 Cloudflare Workers AI, fal.ai, Cloudflare R2, or a support widget may use their
 own cookies or similar technologies to process payments, prevent fraud, deliver
-emails, process AI requests, store files, provide support, or keep their
-services secure.
+emails, process AI requests, store classroom source materials, provide support,
+or keep their services secure.
 
 Those providers process information under their own terms and privacy policies.
 

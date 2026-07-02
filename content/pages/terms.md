@@ -1,7 +1,7 @@
 ---
 title: Terms of Service
 description: Terms for using ClassGamify's classroom activity platform
-date: 2026-06-24
+date: 2026-07-02
 ---
 
 ## Agreement
@@ -22,6 +22,12 @@ ClassGamify provides educational tools for teachers and tutors to create
 reusable activities, render them through templates such as quiz, matching,
 sorting, fill-in, line matching, open-box, and listening activities, publish
 student assignment links, and review student attempts and results.
+
+When a teacher publishes an assignment, the shared student link is based on the
+assignment settings and a frozen activity snapshot. Later edits to the reusable
+activity do not automatically change an already published assignment link, so
+teachers should review the link settings, prompts, answers, instructions, and
+result visibility before sharing it with students.
 
 We try to make the product useful and reliable, but ClassGamify does not
 guarantee learning outcomes, grades, test results, curriculum alignment,
@@ -60,12 +66,22 @@ Public assignment links should not be used to collect sensitive personal
 information, medical information, legal information, financial information, or
 other data that is not necessary for ordinary classroom practice.
 
+Teachers control whether a student name is requested for an assignment. When
+anonymous participation is enabled, ClassGamify may use browser-based attempt
+tokens to enforce attempt limits and label results without exposing raw tokens
+to teachers.
+
 ## Free and Paid Features
 
 ClassGamify may offer free starter features and paid plans, such as expanded
 activity limits, additional templates, assignment history, CSV exports,
 worksheet tools, AI-assisted drafting, teacher workflows, subscriptions, or
 lifetime access.
+
+Teacher result pages and CSV exports may include assignment settings, student
+attempt records, submitted answers, scores, review states, timing information,
+and item-level result summaries so teachers can use them for ordinary classroom
+review, gradebook transfer, family follow-up, or lesson planning.
 
 Paid features are available only when checkout and payment processing are
 enabled. Prices, plan limits, included features, billing intervals, taxes,
@@ -136,6 +152,13 @@ answer explanations, pairs, groups, audio scripts, student names, student
 answers, comments, uploaded files, or other content, you remain responsible for
 that content and for having the rights and permissions needed to use it.
 
+Teacher-uploaded audio, worksheet images, worksheet documents, spreadsheets, or
+similar source materials may be linked to activities for editing, AI-assisted
+drafting, worksheet extraction, or future classroom tooling. Public assignment
+links are intended to expose only the student-facing runtime content needed for
+the activity, not teacher-only file lists, storage identifiers, or private
+source-material metadata.
+
 ## AI Features
 
 ClassGamify may provide AI-assisted drafting, remixing, distractor generation,
@@ -147,6 +170,10 @@ before saving, publishing, sharing, or using them with students.
 Do not submit confidential, sensitive, regulated, or third-party content to AI
 features unless you have authority to do so and understand that configured AI
 providers may process the input and output under their own terms and policies.
+
+AI-assisted drafts are teacher-reviewable activity drafts. They should not be
+treated as automatically approved curriculum, final grades, or direct student
+instructions until a teacher has reviewed, edited, and saved the activity.
 
 ## User Content and Feedback
 
