@@ -6,6 +6,8 @@ import type { ActivityAiDraftFocus } from '@/activities/ai-draft-focus';
 import type {
   ActivityEditorAiDraftPanelView,
   ActivityEditorAiDraftSourceCapabilityCardView,
+  ActivityEditorAiDraftSourceMaterialSafetyMetricView,
+  ActivityEditorAiDraftSourceMaterialSafetyView,
 } from '@/activities/editor';
 import { ActivityDraftMetaSummary } from '@/components/activities/activity-draft-meta-summary';
 import { Badge } from '@/components/ui/badge';
@@ -144,6 +146,11 @@ function ActivityAiDraftSourceControls({
         placeholder={panelView.sourcePlaceholder}
       />
       <ActivityAiDraftSourceReadiness panelView={panelView} />
+      {panelView.sourceMaterialSafetyView.hasInput ? (
+        <ActivityAiDraftSourceMaterialSafety
+          safetyView={panelView.sourceMaterialSafetyView}
+        />
+      ) : null}
       {panelView.sourceCapabilityViews.length > 0 ? (
         <ActivityAiDraftSourceCapabilities panelView={panelView} />
       ) : null}
@@ -167,6 +174,63 @@ function ActivityAiDraftSourceControls({
           </div>
         </div>
       ) : null}
+    </div>
+  );
+}
+
+function ActivityAiDraftSourceMaterialSafety({
+  safetyView,
+}: {
+  safetyView: ActivityEditorAiDraftSourceMaterialSafetyView;
+}) {
+  return (
+    <section
+      aria-label={safetyView.ariaLabel}
+      className="rounded-md border bg-background p-3"
+    >
+      <div className="flex flex-wrap items-center justify-between gap-2">
+        <p className="font-medium text-xs">{safetyView.title}</p>
+        {safetyView.hasOmitted ? (
+          <Badge variant="outline" className="rounded-md">
+            {
+              safetyView.metricViews.find(
+                (metricView) => metricView.id === 'omitted'
+              )?.value
+            }
+          </Badge>
+        ) : null}
+      </div>
+      <p className="mt-1 text-muted-foreground text-xs leading-5">
+        {safetyView.description}
+      </p>
+      <dl className="mt-2 grid gap-2 sm:grid-cols-2">
+        {safetyView.metricViews.map((metricView) => (
+          <ActivityAiDraftSourceMaterialSafetyMetric
+            key={metricView.id}
+            metricView={metricView}
+          />
+        ))}
+      </dl>
+    </section>
+  );
+}
+
+function ActivityAiDraftSourceMaterialSafetyMetric({
+  metricView,
+}: {
+  metricView: ActivityEditorAiDraftSourceMaterialSafetyMetricView;
+}) {
+  return (
+    <div className="rounded-md border bg-muted/20 p-2">
+      <dt className="text-muted-foreground text-xs leading-5">
+        {metricView.label}
+      </dt>
+      <dd className="mt-1 font-medium text-xs leading-5">
+        <output aria-label={metricView.ariaLabel}>{metricView.value}</output>
+      </dd>
+      <dd className="mt-1 text-muted-foreground text-xs leading-5">
+        {metricView.description}
+      </dd>
     </div>
   );
 }

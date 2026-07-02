@@ -201,6 +201,7 @@ import {
   appendActivitySourceMaterialDraftNotes,
   buildActivitySourceMaterialDraftNoteView,
   buildActivitySourceMaterialDraftNoteSafetySummary,
+  buildActivitySourceMaterialDraftNoteSafetySummaryFromSourceText,
   buildActivitySourceMaterialDraftNoteViews,
   buildActivitySourceMaterialDraftNoteViewsFromSourceText,
   buildActivitySourceMaterialDraftNotes,
@@ -4419,7 +4420,7 @@ assert.match(
 );
 assert.match(
   activityEditorSource,
-  /export type ActivityEditorAiDraftSourceCapabilityView[\s\S]*export type ActivityEditorSourceMaterialDraftNoteView[\s\S]*export type ActivityEditorAiDraftSourceReadinessView[\s\S]*export type ActivityEditorAiDraftPanelView[\s\S]*export type ActivityEditorAiDraftSourceCapabilityCardView =\s*ActivityEditorAiDraftSourceCapabilityView;/,
+  /export type ActivityEditorAiDraftSourceCapabilityView[\s\S]*export type ActivityEditorSourceMaterialDraftNoteView[\s\S]*export type ActivityEditorAiDraftSourceReadinessView[\s\S]*export type ActivityEditorAiDraftSourceMaterialSafetyMetricView[\s\S]*export type ActivityEditorAiDraftSourceMaterialSafetyView[\s\S]*export type ActivityEditorAiDraftPanelView[\s\S]*export type ActivityEditorAiDraftSourceCapabilityCardView =\s*ActivityEditorAiDraftSourceCapabilityView;/,
   'Activity editor domain should expose explicit AI draft panel view contracts.'
 );
 assert.match(
@@ -4474,7 +4475,7 @@ assert.match(
 );
 assert.match(
   activityAiDraftPanelSource,
-  /ActivityEditorAiDraftPanelView[\s\S]*ActivityEditorAiDraftSourceCapabilityCardView/,
+  /ActivityEditorAiDraftPanelView[\s\S]*ActivityEditorAiDraftSourceCapabilityCardView[\s\S]*ActivityEditorAiDraftSourceMaterialSafetyMetricView[\s\S]*ActivityEditorAiDraftSourceMaterialSafetyView/,
   'Activity AI draft panel should import explicit AI draft panel view contracts.'
 );
 assert.doesNotMatch(
@@ -4509,6 +4510,21 @@ assert.match(
 );
 assert.match(
   activityAiDraftPanelSource,
+  /panelView\.sourceMaterialSafetyView\.hasInput[\s\S]*ActivityAiDraftSourceMaterialSafety[\s\S]*safetyView=\{panelView\.sourceMaterialSafetyView\}/,
+  'Activity AI draft source controls should render the prepared source-material safety view when source notes contain material provenance.'
+);
+assert.match(
+  activityAiDraftPanelSource,
+  /function ActivityAiDraftSourceMaterialSafety[\s\S]*aria-label=\{safetyView\.ariaLabel\}[\s\S]*safetyView\.title[\s\S]*safetyView\.description[\s\S]*safetyView\.metricViews\.map[\s\S]*ActivityAiDraftSourceMaterialSafetyMetric/,
+  'Activity AI draft source-material safety panel should render prepared title, description, aria label, and metric rows.'
+);
+assert.match(
+  activityAiDraftPanelSource,
+  /function ActivityAiDraftSourceMaterialSafetyMetric[\s\S]*metricView\.label[\s\S]*<output aria-label=\{metricView\.ariaLabel\}>\{metricView\.value\}<\/output>[\s\S]*metricView\.description/,
+  'Activity AI draft source-material safety metric rows should expose semantic label, value, aria label, and description.'
+);
+assert.match(
+  activityAiDraftPanelSource,
   /ActivityAiDraftSourceCapabilities[\s\S]*panelView\.sourceCapabilityTitle[\s\S]*panelView\.sourceCapabilityViews\.map[\s\S]*ActivityAiDraftSourceCapabilityBadge/,
   'Activity AI draft source controls should delegate attached-material capability rendering.'
 );
@@ -4519,8 +4535,13 @@ assert.match(
 );
 assert.match(
   activityEditorSource,
-  /buildActivityEditorAiDraftSourceReadinessView[\s\S]*activity_form_ai_source_readiness_synced_description[\s\S]*activity_form_ai_source_readiness_sync_available_description[\s\S]*activity_form_ai_source_readiness_default_description[\s\S]*activity_form_ai_source_readiness_ready_description/,
+  /buildActivityEditorAiDraftSourceReadinessView[\s\S]*activity_form_ai_source_readiness_synced_with_omitted_description[\s\S]*activity_form_ai_source_readiness_synced_description[\s\S]*activity_form_ai_source_readiness_sync_available_description[\s\S]*activity_form_ai_source_readiness_default_description[\s\S]*activity_form_ai_source_readiness_ready_description/,
   'Activity editor AI draft source readiness copy should come from the activity-domain view model.'
+);
+assert.match(
+  activityEditorSource,
+  /buildActivityEditorAiDraftSourceMaterialSafetyView[\s\S]*activity_form_ai_source_material_safety_aria_label[\s\S]*activity_form_ai_source_material_safety_description[\s\S]*activity_form_ai_source_material_safety_metric_aria_label[\s\S]*activity_form_ai_source_material_safety_title/,
+  'Activity editor AI draft source-material safety copy should come from the activity-domain view model.'
 );
 assert.match(
   activityEditorSource,
@@ -4769,8 +4790,8 @@ assert.doesNotMatch(
 );
 assert.doesNotMatch(
   activityAiDraftPanelSource,
-  /activity_form_ai_source_capability_|hasAudio|hasWorksheet|hasSpreadsheet|worksheet-extraction|audio-extraction|spreadsheet-import/,
-  'Activity AI draft panel component should not rebuild source-material capability labels or detection locally.'
+  /activity_form_ai_source_capability_|activity_form_ai_source_material_safety_|hasAudio|hasWorksheet|hasSpreadsheet|worksheet-extraction|audio-extraction|spreadsheet-import/,
+  'Activity AI draft panel component should not rebuild source-material capability or safety labels and detection locally.'
 );
 assert.doesNotMatch(
   activityEditorFormSource,
@@ -29559,6 +29580,11 @@ assert.match(
   /export function buildActivitySourceMaterialDraftNoteSafetySummary[\s\S]*uniqueActivitySourceMaterialDraftNoteViews[\s\S]*omittedCount: Math\.max\(0, inputCount - safeCount\)/,
   'AI draft source materials should expose safe and omitted source-note counts without retaining unsafe notes.'
 );
+assert.match(
+  activityDraftSourceSource,
+  /export function buildActivitySourceMaterialDraftNoteSafetySummaryFromSourceText[\s\S]*parseActivitySourceMaterialDraftNotesParagraphInput/,
+  'AI draft source text safety summaries should count raw source-material note inputs before filtering unsafe provenance.'
+);
 assert.doesNotMatch(
   activityDraftSourceSource,
   /ActivitySourceMaterialDraftSummary\['kindCounts'\]/,
@@ -29581,8 +29607,8 @@ assert.match(
 );
 assert.match(
   activityDraftSourceSource,
-  /parseActivitySourceMaterialDraftNoteLine[\s\S]*normalizeActivitySourceMaterialDraftNoteView[\s\S]*isSafeActivitySourceMaterialDraftNoteView/,
-  'AI draft source-text note parsing should sanitize parsed notes before accepting them.'
+  /parseActivitySourceMaterialDraftNoteLine[\s\S]*parseActivitySourceMaterialDraftNoteLineInput[\s\S]*isSafeActivitySourceMaterialDraftNoteView[\s\S]*parseActivitySourceMaterialDraftNoteLineInput[\s\S]*normalizeActivitySourceMaterialDraftNoteView/,
+  'AI draft source-text note parsing should sanitize raw parsed notes before accepting them.'
 );
 assert.match(
   activityDraftSourceSource,
@@ -37701,6 +37727,7 @@ assert.deepEqual(
         'Attached classroom source materials:',
         '- Worksheet document: Weather worksheet.pdf',
         '- Audio: Weather listening.mp3',
+        '- storageKey: classroom/private/worksheet.pdf',
       ].join('\n'),
       sourceMaterials: [],
     }),
@@ -37719,16 +37746,45 @@ assert.deepEqual(
     reviewNote: 'Teacher reviews before saving',
     safeSourceDescription:
       'AI drafting uses the text below plus safe source-material provenance only.',
-    sourceCapabilityTitle: 'Attached material AI readiness',
-    sourceCapabilityViews: [],
-    sourceReadiness: {
-      characterCountLabel: '132/2000 characters',
-      description:
-        '2 safe material notes are included. File ids, storage keys, and permissions stay out of the prompt.',
-      hasWarnings: false,
-      status: 'synced-materials',
-      title: 'Safe materials included',
-    },
+  sourceCapabilityTitle: 'Attached material AI readiness',
+  sourceCapabilityViews: [],
+  sourceMaterialSafetyView: {
+    ariaLabel:
+      'Source material safety before generation: 2 safe sources; 1 omitted source',
+    description:
+      'Only safe material kind and filename notes can be sent for generation; unsafe or duplicate notes are omitted first.',
+    hasInput: true,
+    hasOmitted: true,
+    metricViews: [
+      {
+        ariaLabel:
+          'Safe for generation: 2 safe sources. These source notes have a recognized material kind and safe filename basename.',
+        description:
+          'These source notes have a recognized material kind and safe filename basename.',
+        id: 'safe',
+        label: 'Safe for generation',
+        value: '2 safe sources',
+      },
+      {
+        ariaLabel:
+          'Omitted before generation: 1 omitted source. Duplicate notes, unsafe material kinds, and notes without a safe filename stay out of the AI request.',
+        description:
+          'Duplicate notes, unsafe material kinds, and notes without a safe filename stay out of the AI request.',
+        id: 'omitted',
+        label: 'Omitted before generation',
+        value: '1 omitted source',
+      },
+    ],
+    title: 'Source material safety',
+  },
+  sourceReadiness: {
+    characterCountLabel: '178/2000 characters',
+    description:
+      'Safe material notes included: 2. Omitted unsafe or duplicate notes: 1. File ids, storage keys, and permissions stay out of the prompt.',
+    hasWarnings: true,
+    status: 'synced-materials',
+    title: 'Safe materials included',
+  },
     sourceMaterialNoteViews: [
       {
         displayText: 'Worksheet document · Weather worksheet.pdf',
@@ -38018,12 +38074,14 @@ assert.deepEqual(
     hasDraftSourceMaterialNotes: false,
     isDefaultSource: false,
     isTooLong: false,
+    omittedSourceMaterialNoteCount: 0,
     safeSourceMaterialNoteCount: 0,
     sourceMaterialCapabilityCounts: {
       'audio-extraction': 0,
       'spreadsheet-import': 0,
       'worksheet-extraction': 0,
     },
+    sourceMaterialNoteInputCount: 0,
     sourceLength: 31,
   }
 );
@@ -38039,12 +38097,14 @@ assert.deepEqual(
     hasDraftSourceMaterialNotes: false,
     isDefaultSource: true,
     isTooLong: false,
+    omittedSourceMaterialNoteCount: 0,
     safeSourceMaterialNoteCount: 0,
     sourceMaterialCapabilityCounts: {
       'audio-extraction': 0,
       'spreadsheet-import': 0,
       'worksheet-extraction': 0,
     },
+    sourceMaterialNoteInputCount: 0,
     sourceLength: 36,
   }
 );
@@ -38091,12 +38151,14 @@ assert.deepEqual(
     hasDraftSourceMaterialNotes: true,
     isDefaultSource: false,
     isTooLong: false,
+    omittedSourceMaterialNoteCount: 0,
     safeSourceMaterialNoteCount: 1,
     sourceMaterialCapabilityCounts: {
       'audio-extraction': 0,
       'spreadsheet-import': 0,
       'worksheet-extraction': 0,
     },
+    sourceMaterialNoteInputCount: 1,
     sourceLength: syncedEditorDraftSource.length,
   }
 );
@@ -38149,6 +38211,35 @@ assert.deepEqual(disabledAiDraftPanelView, {
     'AI drafting uses the text below plus safe source-material provenance only.',
   sourceCapabilityTitle: 'Attached material AI readiness',
   sourceCapabilityViews: [],
+  sourceMaterialSafetyView: {
+    ariaLabel:
+      'Source material safety before generation: 0 safe sources; 0 omitted sources',
+    description:
+      'Only safe material kind and filename notes can be sent for generation; unsafe or duplicate notes are omitted first.',
+    hasInput: false,
+    hasOmitted: false,
+    metricViews: [
+      {
+        ariaLabel:
+          'Safe for generation: 0 safe sources. These source notes have a recognized material kind and safe filename basename.',
+        description:
+          'These source notes have a recognized material kind and safe filename basename.',
+        id: 'safe',
+        label: 'Safe for generation',
+        value: '0 safe sources',
+      },
+      {
+        ariaLabel:
+          'Omitted before generation: 0 omitted sources. Duplicate notes, unsafe material kinds, and notes without a safe filename stay out of the AI request.',
+        description:
+          'Duplicate notes, unsafe material kinds, and notes without a safe filename stay out of the AI request.',
+        id: 'omitted',
+        label: 'Omitted before generation',
+        value: '0 omitted sources',
+      },
+    ],
+    title: 'Source material safety',
+  },
   sourceReadiness: {
     characterCountLabel: '36/2000 characters',
     description:
@@ -38289,6 +38380,46 @@ assert.deepEqual(
     hasWarnings: false,
     status: 'synced-materials',
     title: 'Safe materials included',
+  }
+);
+assert.deepEqual(
+  buildActivityEditorAiDraftPanelView({
+    draftSourceText: syncedEditorDraftSource,
+    hasUser: true,
+    isGeneratingDraft: false,
+    sourceState: buildActivityEditorDraftSourceState({
+      draftSourceText: syncedEditorDraftSource,
+      sourceMaterials: [],
+    }),
+  }).sourceMaterialSafetyView,
+  {
+    ariaLabel:
+      'Source material safety before generation: 1 safe source; 0 omitted sources',
+    description:
+      'Only safe material kind and filename notes can be sent for generation; unsafe or duplicate notes are omitted first.',
+    hasInput: true,
+    hasOmitted: false,
+    metricViews: [
+      {
+        ariaLabel:
+          'Safe for generation: 1 safe source. These source notes have a recognized material kind and safe filename basename.',
+        description:
+          'These source notes have a recognized material kind and safe filename basename.',
+        id: 'safe',
+        label: 'Safe for generation',
+        value: '1 safe source',
+      },
+      {
+        ariaLabel:
+          'Omitted before generation: 0 omitted sources. Duplicate notes, unsafe material kinds, and notes without a safe filename stay out of the AI request.',
+        description:
+          'Duplicate notes, unsafe material kinds, and notes without a safe filename stay out of the AI request.',
+        id: 'omitted',
+        label: 'Omitted before generation',
+        value: '0 omitted sources',
+      },
+    ],
+    title: 'Source material safety',
   }
 );
 const editorSelectOptions = buildActivityEditorSelectOptions();
@@ -43556,6 +43687,28 @@ assert.deepEqual(
       name: '<>',
     },
   ]),
+  {
+    inputCount: 4,
+    omittedCount: 3,
+    safeCount: 1,
+    safeNoteViews: [
+      {
+        kindLabel: 'Worksheet document',
+        name: 'Unit 1.pdf',
+      },
+    ],
+  }
+);
+assert.deepEqual(
+  buildActivitySourceMaterialDraftNoteSafetySummaryFromSourceText(
+    [
+      'Attached classroom source materials:',
+      '- Worksheet document: https://files.example.test/private/Unit 1.pdf?token=secret',
+      '- worksheet document: C:\\teacher\\private\\unit 1.pdf?signature=abc',
+      '- storageKey: userfiles/teacher/private.pdf',
+      '- Audio: <>',
+    ].join('\n')
+  ),
   {
     inputCount: 4,
     omittedCount: 3,

@@ -155,6 +155,16 @@ export function buildActivitySourceMaterialDraftNoteSafetySummary(
   };
 }
 
+export function buildActivitySourceMaterialDraftNoteSafetySummaryFromSourceText(
+  sourceText: string
+): ActivitySourceMaterialDraftNoteSafetySummary {
+  return buildActivitySourceMaterialDraftNoteSafetySummary(
+    getActivityDraftSourceTextParagraphs(sourceText).flatMap(
+      parseActivitySourceMaterialDraftNotesParagraphInput
+    )
+  );
+}
+
 export function appendActivitySourceMaterialDraftNotes({
   sourceMaterials,
   sourceText,
@@ -422,17 +432,27 @@ function removeActivitySourceMaterialDraftNotesFromParagraph(
 function parseActivitySourceMaterialDraftNoteLine(
   line: string
 ): ActivitySourceMaterialDraftNoteView | null {
+  const noteView = parseActivitySourceMaterialDraftNoteLineInput(line);
+
+  if (!noteView || !isSafeActivitySourceMaterialDraftNoteView(noteView)) {
+    return null;
+  }
+
+  return noteView;
+}
+
+function parseActivitySourceMaterialDraftNoteLineInput(
+  line: string
+): ActivitySourceMaterialDraftNoteView | null {
   const match = line.match(
     /^-\s*(?<kindLabel>[^:：]+)\s*[:：]\s*(?<name>.+)$/u
   );
-  const noteView = normalizeActivitySourceMaterialDraftNoteView({
-    kindLabel: match?.groups?.kindLabel ?? '',
-    name: match?.groups?.name ?? '',
-  });
+  if (!match?.groups) return null;
 
-  if (!isSafeActivitySourceMaterialDraftNoteView(noteView)) {
-    return null;
-  }
+  const noteView = normalizeActivitySourceMaterialDraftNoteView({
+    kindLabel: match.groups.kindLabel,
+    name: match.groups.name,
+  });
 
   return noteView;
 }
@@ -450,6 +470,24 @@ function parseActivitySourceMaterialDraftNotesParagraph(paragraph: string) {
   return lines
     .slice(noteStartIndex + 1)
     .map(parseActivitySourceMaterialDraftNoteLine)
+    .filter((noteView) => noteView !== null);
+}
+
+function parseActivitySourceMaterialDraftNotesParagraphInput(
+  paragraph: string
+) {
+  if (!hasActivitySourceMaterialDraftNotesParagraph(paragraph)) return [];
+
+  const lines = paragraph.split(/\r?\n/);
+  const noteStartIndex = lines.findIndex((line) =>
+    isActivitySourceMaterialDraftNotesParagraph(line)
+  );
+
+  if (noteStartIndex === -1) return [];
+
+  return lines
+    .slice(noteStartIndex + 1)
+    .map(parseActivitySourceMaterialDraftNoteLineInput)
     .filter((noteView) => noteView !== null);
 }
 

@@ -27,6 +27,7 @@ import { Routes } from '@/lib/routes';
 import {
   ACTIVITY_DRAFT_SOURCE_MAX_LENGTH,
   appendActivitySourceMaterialDraftNotes,
+  buildActivitySourceMaterialDraftNoteSafetySummaryFromSourceText,
   buildActivitySourceMaterialDraftNoteViewsFromSourceText,
   buildActivitySourceMaterialDraftSummary,
   getActivitySourceMaterialDraftNoteIdentityKey,
@@ -174,8 +175,10 @@ type ActivityEditorDraftSourceState = {
   hasDraftSourceMaterialNotes: boolean;
   isDefaultSource: boolean;
   isTooLong: boolean;
+  omittedSourceMaterialNoteCount: number;
   safeSourceMaterialNoteCount: number;
   sourceMaterialCapabilityCounts: ActivitySourceMaterialCapabilityCounts;
+  sourceMaterialNoteInputCount: number;
   sourceLength: number;
 };
 
@@ -199,6 +202,27 @@ export type ActivityEditorAiDraftSourceReadinessView = {
   title: string;
 };
 
+export type ActivityEditorAiDraftSourceMaterialSafetyMetricId =
+  | 'omitted'
+  | 'safe';
+
+export type ActivityEditorAiDraftSourceMaterialSafetyMetricView = {
+  ariaLabel: string;
+  description: string;
+  id: ActivityEditorAiDraftSourceMaterialSafetyMetricId;
+  label: string;
+  value: string;
+};
+
+export type ActivityEditorAiDraftSourceMaterialSafetyView = {
+  ariaLabel: string;
+  description: string;
+  hasInput: boolean;
+  hasOmitted: boolean;
+  metricViews: ActivityEditorAiDraftSourceMaterialSafetyMetricView[];
+  title: string;
+};
+
 export type ActivityEditorAiDraftPanelView = {
   badgeLabel: string;
   canGenerateDraft: boolean;
@@ -213,6 +237,7 @@ export type ActivityEditorAiDraftPanelView = {
   safeSourceDescription: string;
   sourceCapabilityTitle: string;
   sourceCapabilityViews: ActivityEditorAiDraftSourceCapabilityView[];
+  sourceMaterialSafetyView: ActivityEditorAiDraftSourceMaterialSafetyView;
   sourceReadiness: ActivityEditorAiDraftSourceReadinessView;
   sourceMaterialNoteViews: ActivityEditorSourceMaterialDraftNoteView[];
   sourceMaterialSummaryLabel?: string;
@@ -494,10 +519,10 @@ export function buildActivityEditorDraftSourceState({
   const hasAttachedSourceMaterials = sourceMaterialSummary.totalCount > 0;
   const hasDraftSourceMaterialNotes =
     hasActivitySourceMaterialDraftNotes(normalizedSourceText);
-  const safeSourceMaterialNoteCount =
-    buildActivitySourceMaterialDraftNoteViewsFromSourceText(
+  const sourceMaterialNoteSafetySummary =
+    buildActivitySourceMaterialDraftNoteSafetySummaryFromSourceText(
       normalizedSourceText
-    ).length;
+    );
 
   return {
     attachedSourceMaterialCount: sourceMaterialSummary.totalCount,
@@ -507,11 +532,14 @@ export function buildActivityEditorDraftSourceState({
     hasDraftSourceMaterialNotes,
     isDefaultSource: isDefaultActivityDraftSourceText(normalizedSourceText),
     isTooLong: normalizedSourceText.length > ACTIVITY_DRAFT_SOURCE_MAX_LENGTH,
-    safeSourceMaterialNoteCount,
+    omittedSourceMaterialNoteCount:
+      sourceMaterialNoteSafetySummary.omittedCount,
+    safeSourceMaterialNoteCount: sourceMaterialNoteSafetySummary.safeCount,
     sourceMaterialCapabilityCounts:
       buildActivitySourceMaterialCapabilityCountsFromActions(
         sourceMaterialSummaryView.extractionActions
       ),
+    sourceMaterialNoteInputCount: sourceMaterialNoteSafetySummary.inputCount,
     sourceLength: normalizedSourceText.length,
   };
 }
@@ -566,6 +594,8 @@ export function buildActivityEditorAiDraftPanelView({
     sourceCapabilityViews: buildActivityEditorAiDraftSourceCapabilityViews(
       sourceState.sourceMaterialCapabilityCounts
     ),
+    sourceMaterialSafetyView:
+      buildActivityEditorAiDraftSourceMaterialSafetyView(sourceState),
     sourceReadiness: buildActivityEditorAiDraftSourceReadinessView(sourceState),
     sourceMaterialNoteViews,
     sourceMaterialSummaryLabel:
@@ -606,6 +636,56 @@ function buildActivityEditorAiDraftSourceCapabilityViews(
   });
 }
 
+function buildActivityEditorAiDraftSourceMaterialSafetyView(
+  sourceState: ActivityEditorDraftSourceState
+): ActivityEditorAiDraftSourceMaterialSafetyView {
+  const safeValue = buildActivityEditorAiDraftSafeSourceCountValue(
+    sourceState.safeSourceMaterialNoteCount
+  );
+  const omittedValue = buildActivityEditorAiDraftOmittedSourceCountValue(
+    sourceState.omittedSourceMaterialNoteCount
+  );
+  const safeDescription =
+    m.activity_form_ai_source_material_safety_safe_description();
+  const omittedDescription =
+    m.activity_form_ai_source_material_safety_omitted_description();
+
+  return {
+    ariaLabel: m.activity_form_ai_source_material_safety_aria_label({
+      omittedValue,
+      safeValue,
+    }),
+    description: m.activity_form_ai_source_material_safety_description(),
+    hasInput: sourceState.sourceMaterialNoteInputCount > 0,
+    hasOmitted: sourceState.omittedSourceMaterialNoteCount > 0,
+    metricViews: [
+      {
+        ariaLabel: m.activity_form_ai_source_material_safety_metric_aria_label({
+          description: safeDescription,
+          label: m.activity_form_ai_source_material_safety_safe_label(),
+          value: safeValue,
+        }),
+        description: safeDescription,
+        id: 'safe',
+        label: m.activity_form_ai_source_material_safety_safe_label(),
+        value: safeValue,
+      },
+      {
+        ariaLabel: m.activity_form_ai_source_material_safety_metric_aria_label({
+          description: omittedDescription,
+          label: m.activity_form_ai_source_material_safety_omitted_label(),
+          value: omittedValue,
+        }),
+        description: omittedDescription,
+        id: 'omitted',
+        label: m.activity_form_ai_source_material_safety_omitted_label(),
+        value: omittedValue,
+      },
+    ],
+    title: m.activity_form_ai_source_material_safety_title(),
+  };
+}
+
 function buildActivityEditorAiDraftSourceReadinessView(
   sourceState: ActivityEditorDraftSourceState
 ): ActivityEditorAiDraftSourceReadinessView {
@@ -627,10 +707,18 @@ function buildActivityEditorAiDraftSourceReadinessView(
   if (sourceState.hasDraftSourceMaterialNotes) {
     return {
       characterCountLabel,
-      description: m.activity_form_ai_source_readiness_synced_description({
-        count: sourceState.safeSourceMaterialNoteCount,
-      }),
-      hasWarnings: false,
+      description:
+        sourceState.omittedSourceMaterialNoteCount > 0
+          ? m.activity_form_ai_source_readiness_synced_with_omitted_description(
+              {
+                omittedCount: sourceState.omittedSourceMaterialNoteCount,
+                safeCount: sourceState.safeSourceMaterialNoteCount,
+              }
+            )
+          : m.activity_form_ai_source_readiness_synced_description({
+              count: sourceState.safeSourceMaterialNoteCount,
+            }),
+      hasWarnings: sourceState.omittedSourceMaterialNoteCount > 0,
       status: 'synced-materials',
       title: m.activity_form_ai_source_readiness_synced_title(),
     };
@@ -687,6 +775,26 @@ function buildActivityEditorSourceMaterialSummaryLabel(count: number) {
   return count === 1
     ? m.activity_form_ai_source_material_count_one({ count })
     : m.activity_form_ai_source_material_count_many({ count });
+}
+
+function buildActivityEditorAiDraftSafeSourceCountValue(count: number) {
+  if (count === 0) {
+    return m.activity_form_ai_source_material_safety_safe_none_value();
+  }
+
+  return count === 1
+    ? m.activity_form_ai_source_material_safety_safe_one_value({ count })
+    : m.activity_form_ai_source_material_safety_safe_many_value({ count });
+}
+
+function buildActivityEditorAiDraftOmittedSourceCountValue(count: number) {
+  if (count === 0) {
+    return m.activity_form_ai_source_material_safety_omitted_none_value();
+  }
+
+  return count === 1
+    ? m.activity_form_ai_source_material_safety_omitted_one_value({ count })
+    : m.activity_form_ai_source_material_safety_omitted_many_value({ count });
 }
 
 export function buildActivityEditorSyncedDraftSourceText({
