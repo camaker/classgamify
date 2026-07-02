@@ -1606,6 +1606,11 @@ assert.match(
   /\{ name, email, message, intent\?, classroomInquiry\? \}[\s\S]*ClassGamify classroom and product inquiry/,
   'Mail docs should document structured classroom inquiry template context.'
 );
+assert.match(
+  mailDocumentationSource,
+  /forgotPassword[\s\S]*ClassGamify teacher workspace password[\s\S]*verifyEmail[\s\S]*ClassGamify teacher workspace email[\s\S]*subscribeNewsletter[\s\S]*ClassGamify classroom updates enabled/,
+  'Mail docs should describe transactional email subjects in ClassGamify teacher-workspace terms.'
+);
 assert.doesNotMatch(
   blogPostVisualSource,
   />ClassGamify</,
@@ -6796,6 +6801,18 @@ const contactEmailTemplateSource = readFileSync(
   'src/mail/templates/contact-message.tsx',
   'utf8'
 );
+const forgotPasswordEmailTemplateSource = readFileSync(
+  'src/mail/templates/forgot-password.tsx',
+  'utf8'
+);
+const verifyEmailTemplateSource = readFileSync(
+  'src/mail/templates/verify-email.tsx',
+  'utf8'
+);
+const subscribeNewsletterEmailTemplateSource = readFileSync(
+  'src/mail/templates/subscribe-newsletter.tsx',
+  'utf8'
+);
 assert.doesNotMatch(
   contactFormCardSource,
   /err\.message|error\.message|err instanceof Error|error instanceof Error/,
@@ -6840,6 +6857,21 @@ assert.match(
   contactEmailTemplateSource,
   /mail_contact_message_type_classroom[\s\S]*mail_contact_message_type_general/,
   'Contact email template should label classroom versus general product inquiries.'
+);
+assert.match(
+  forgotPasswordEmailTemplateSource,
+  /mail_forgot_password_body[\s\S]*mail_forgot_password_security_note[\s\S]*mail_forgot_password_button/,
+  'Forgot-password email should render the teacher-workspace security note before the reset action.'
+);
+assert.match(
+  verifyEmailTemplateSource,
+  /mail_verify_email_body[\s\S]*mail_verify_email_workspace_note[\s\S]*mail_verify_email_button/,
+  'Verify-email template should render the teacher-workspace protection note before the verify action.'
+);
+assert.match(
+  subscribeNewsletterEmailTemplateSource,
+  /mail_subscribe_newsletter_title[\s\S]*mail_subscribe_newsletter_body[\s\S]*mail_subscribe_newsletter_workspace_note/,
+  'Subscribe-newsletter email should render the classroom update scope note.'
 );
 const newsletterFormCardSource = readFileSync(
   'src/components/settings/notification/newsletter-form-card.tsx',
@@ -8975,6 +9007,53 @@ for (const [
       messages[key] ?? '',
       pattern,
       `${locale} ${key} should describe ClassGamify classroom contact boundaries.`
+    );
+  }
+}
+const transactionalEmailBoundaryRequirements = [
+  [
+    enLocaleMessages,
+    'en',
+    [
+      ['mail_verify_email_subject', /ClassGamify teacher workspace email/],
+      ['mail_verify_email_body', /verify the email for your ClassGamify teacher workspace/],
+      ['mail_verify_email_workspace_note', /saved activities, assignment links, source materials/],
+      ['mail_forgot_password_subject', /ClassGamify teacher workspace password/],
+      ['mail_forgot_password_body', /reset access to your ClassGamify teacher workspace/],
+      ['mail_forgot_password_security_note', /student attempts, and result records/],
+      ['mail_subscribe_newsletter_subject', /ClassGamify classroom updates enabled/],
+      ['mail_subscribe_newsletter_body', /assignment links, teacher-reviewed AI drafts/],
+      ['mail_subscribe_newsletter_workspace_note', /activity to assignment to attempt to results loop/],
+      ['mail_layout_copyright', /teacher activity platform/],
+    ],
+  ],
+  [
+    zhLocaleMessages,
+    'zh',
+    [
+      ['mail_verify_email_subject', /ClassGamify 教师工作区邮箱/],
+      ['mail_verify_email_body', /验证你的 ClassGamify 教师工作区邮箱/],
+      ['mail_verify_email_workspace_note', /已保存活动、作业链接、来源素材/],
+      ['mail_forgot_password_subject', /ClassGamify 教师工作区密码/],
+      ['mail_forgot_password_body', /重置你的 ClassGamify 教师工作区访问密码/],
+      ['mail_forgot_password_security_note', /学生尝试和结果记录/],
+      ['mail_subscribe_newsletter_subject', /ClassGamify 课堂更新/],
+      ['mail_subscribe_newsletter_body', /作业链接、老师审核的 AI 草稿/],
+      ['mail_subscribe_newsletter_workspace_note', /活动、作业、作答和结果闭环/],
+      ['mail_layout_copyright', /教师课堂活动平台/],
+    ],
+  ],
+] as const;
+for (const [
+  messages,
+  locale,
+  requirements,
+] of transactionalEmailBoundaryRequirements) {
+  for (const [key, pattern] of requirements) {
+    assert.match(
+      messages[key] ?? '',
+      pattern,
+      `${locale} ${key} should describe ClassGamify transactional email boundaries.`
     );
   }
 }

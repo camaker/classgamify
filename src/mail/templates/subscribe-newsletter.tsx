@@ -11,6 +11,7 @@ export default function SubscribeNewsletter() {
         {m.mail_subscribe_newsletter_title(undefined, en)}
       </Heading>
       <Text>{m.mail_subscribe_newsletter_body(undefined, en)}</Text>
+      <Text>{m.mail_subscribe_newsletter_workspace_note(undefined, en)}</Text>
     </EmailLayout>
   );
 }

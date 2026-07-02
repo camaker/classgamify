@@ -105,9 +105,9 @@ mail: {
 
 | Template | Context | Subject (in render.ts) |
 |----------|---------|---------------------------|
-| forgotPassword | `{ url, name }` | Reset your password |
-| verifyEmail | `{ url, name }` | Verify your email |
-| subscribeNewsletter | `{ email? }` | Thanks for subscribing |
+| forgotPassword | `{ url, name }` | Reset your ClassGamify teacher workspace password |
+| verifyEmail | `{ url, name }` | Verify your ClassGamify teacher workspace email |
+| subscribeNewsletter | `{ email? }` | ClassGamify classroom updates enabled |
 | contactMessage | `{ name, email, message, intent?, classroomInquiry? }` | ClassGamify classroom and product inquiry |
 
 **Adding a template:** extend `EmailTemplate` in `types.ts` → add to `EmailTemplates` and `subjectByTemplate` in `render.ts` → add React component under `templates/`.

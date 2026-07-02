@@ -17,6 +17,7 @@ export default function VerifyEmail({ url, name }: VerifyEmailProps) {
         {m.mail_verify_email_greeting(undefined, en)} {name}.
       </Text>
       <Text>{m.mail_verify_email_body(undefined, en)}</Text>
+      <Text>{m.mail_verify_email_workspace_note(undefined, en)}</Text>
       <EmailButton href={url}>
         {m.mail_verify_email_button(undefined, en)}
       </EmailButton>

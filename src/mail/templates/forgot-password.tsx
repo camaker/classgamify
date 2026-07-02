@@ -17,6 +17,7 @@ export default function ForgotPassword({ url, name }: ForgotPasswordProps) {
         {m.mail_forgot_password_greeting(undefined, en)} {name}.
       </Text>
       <Text>{m.mail_forgot_password_body(undefined, en)}</Text>
+      <Text>{m.mail_forgot_password_security_note(undefined, en)}</Text>
       <EmailButton href={url}>
         {m.mail_forgot_password_button(undefined, en)}
       </EmailButton>
