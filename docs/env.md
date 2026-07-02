@@ -1,5 +1,10 @@
 # Environment Variables
 
+For the production configuration boundary across ClassGamify classroom
+activities, assignment links, student attempts, results, source materials, and
+AI drafts, start with [Configuration](./configuration.md). This page details
+the environment-variable split behind that product boundary.
+
 The project uses **T3 Env** (`@t3-oss/env-core`) for type-safe validation:
 
 | Source | File | When | Prefix / source |

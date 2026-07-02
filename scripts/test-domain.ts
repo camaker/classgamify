@@ -1231,6 +1231,7 @@ const activeClassGamifySurfaceFiles = [
   'CLAUDE.md',
   'README.md',
   'docs/locale.md',
+  'docs/configuration.md',
   'docs/newsletter.md',
   'public/og-source.svg',
   'src/components/blog/blog-post-visual.tsx',
@@ -1651,6 +1652,61 @@ assert.doesNotMatch(
   /GitHub Actions deployment needs|repository secrets/i,
   'Production env example should not reintroduce a GitHub Actions deploy path.'
 );
+const configurationDocumentationSource = readFileSync(
+  'docs/configuration.md',
+  'utf8'
+);
+assert.match(
+  readFileSync('README.md', 'utf8'),
+  /docs\/configuration\.md/,
+  'README should link to the ClassGamify configuration boundary.'
+);
+for (const filePath of [
+  'docs/env.md',
+  'docs/auth.md',
+  'docs/mail.md',
+  'docs/payment.md',
+  'docs/storage.md',
+]) {
+  assert.match(
+    readFileSync(filePath, 'utf8'),
+    /configuration\.md/,
+    `${filePath} should link to the shared configuration boundary.`
+  );
+}
+assert.doesNotMatch(
+  configurationDocumentationSource,
+  copiedTemplateMarkerPattern,
+  'Configuration docs should not reuse copied template product language.'
+);
+assert.doesNotMatch(
+  configurationDocumentationSource,
+  /requires GitHub repository secrets|GitHub repository secrets are required/i,
+  'Configuration docs should preserve Cloudflare deploy ownership.'
+);
+for (const pattern of [
+  /Activity -> Assignment -> Attempt -> Results/,
+  /Cloudflare Git integration owns production builds and deploys/,
+  /does not contain a GitHub Actions deploy workflow/,
+  /`VITE_\*` values are build-time inputs/,
+  /Worker runtime secrets belong in Cloudflare Worker secrets/,
+  /D1 uses the `DB` binding[\s\S]*activities[\s\S]*assignment snapshots[\s\S]*attempts[\s\S]*result\s+review data/,
+  /R2 uses the `BUCKET` binding[\s\S]*source materials/,
+  /saved activities[\s\S]*assignment links[\s\S]*source materials[\s\S]*attempts[\s\S]*results/,
+  /verification email[\s\S]*password reset[\s\S]*contact form[\s\S]*newsletter subscription/,
+  /plan access[\s\S]*activity creation[\s\S]*assignment publishing[\s\S]*AI draft[\s\S]*result-review/,
+  /AI-assisted activity creation is a teacher-reviewed draft workflow/,
+  /sanitized classroom\s+content[\s\S]*safe source-material provenance/,
+  /should not publish an\s+assignment[\s\S]*without teacher review/,
+  /e2e-\*@example\.test/,
+  /Student assignment payloads[\s\S]*should not expose teacher source-material\s+lists[\s\S]*R2 keys/,
+]) {
+  assert.match(
+    configurationDocumentationSource,
+    pattern,
+    'Configuration docs should cover the expected ClassGamify launch boundary.'
+  );
+}
 const mailDocumentationSource = readFileSync('docs/mail.md', 'utf8');
 assert.doesNotMatch(
   mailDocumentationSource,

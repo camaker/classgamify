@@ -66,6 +66,9 @@ implement the feature, walk the UI locally when the Workers runtime is
 available, then add or update the matching Playwright spec. Keep fast domain
 logic covered in `scripts/test-domain.ts`.
 
+For environment ownership, Cloudflare bindings, runtime secrets, and
+provider-specific setup, see [docs/configuration.md](docs/configuration.md).
+
 ## Deployment
 
 Cloudflare Workers is the production build and deploy system. Pushes to `main`

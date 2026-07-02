@@ -4,6 +4,9 @@ Transactional email (verification, password reset, contact form, subscription we
 
 **Consumers:** Auth (`sendVerificationEmail`, `sendResetPassword`), contact form (`sendContactMessage` in `src/api/contact.ts`), newsletter subscribe — all use `sendEmail(...)` only.
 
+For production secret ownership and the ClassGamify classroom configuration
+boundary around transactional mail, see [Configuration](./configuration.md).
+
 ---
 
 ## Directory structure

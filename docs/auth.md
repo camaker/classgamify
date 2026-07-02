@@ -2,6 +2,10 @@
 
 Authentication is built on [Better Auth](https://www.better-auth.com/). The server uses D1 (Drizzle) with email verification and password reset via the Mail module. The client uses `better-auth/react`'s `createAuthClient`, integrated with TanStack Start via `tanstackStartCookies`.
 
+For how auth secrets protect the ClassGamify teacher workspace, saved
+activities, assignment links, source materials, attempts, and results, see the
+[Configuration](./configuration.md) boundary.
+
 ---
 
 ## Directory structure

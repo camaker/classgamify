@@ -11,6 +11,9 @@ materials: future activity audio, worksheet images, worksheet documents,
 spreadsheets, and similar files. Avatar upload is still supported through the
 same server function, but it is not the only storage consumer.
 
+For the production configuration boundary around R2 bindings, source-material
+privacy, and student payload safety, see [Configuration](./configuration.md).
+
 ## Enabling Storage
 
 1. **Create the R2 bucket** (once per environment):
