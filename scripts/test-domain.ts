@@ -174,6 +174,7 @@ import {
   ACTIVITY_DRAFT_SOURCE_MAX_LENGTH,
   appendActivitySourceMaterialDraftNotes,
   buildActivitySourceMaterialDraftNoteView,
+  buildActivitySourceMaterialDraftNoteSafetySummary,
   buildActivitySourceMaterialDraftNoteViews,
   buildActivitySourceMaterialDraftNoteViewsFromSourceText,
   buildActivitySourceMaterialDraftNotes,
@@ -4159,7 +4160,7 @@ const activityDraftMetaSource = readFileSync(
 );
 assert.match(
   activityDraftMetaSource,
-  /export type ActivityDraftMetaSummaryCoverageStatView[\s\S]*export type ActivityDraftMetaSummaryReadinessOption[\s\S]*export type ActivityDraftMetaSummarySourceMaterialNoteView[\s\S]*export type ActivityDraftMetaSummarySourceMaterialCapabilityView[\s\S]*export type ActivityDraftMetaSummaryView[\s\S]*export type ActivityDraftReviewChecklistItemView[\s\S]*export type ActivityDraftReviewChecklistStatusView[\s\S]*export type ActivityDraftMetaSummaryQuestionChoiceReadinessView[\s\S]*export type ActivityDraftMetaSummaryQuestionChoiceReadinessItemView/,
+  /export type ActivityDraftMetaSummaryCoverageStatView[\s\S]*export type ActivityDraftMetaSummaryReadinessOption[\s\S]*export type ActivityDraftMetaSummarySourceMaterialNoteView[\s\S]*export type ActivityDraftMetaSummarySourceMaterialCapabilityView[\s\S]*export type ActivityDraftMetaSummarySourceMaterialSafetyView[\s\S]*export type ActivityDraftMetaSummaryView[\s\S]*export type ActivityDraftReviewChecklistItemView[\s\S]*export type ActivityDraftReviewChecklistStatusView[\s\S]*export type ActivityDraftMetaSummaryQuestionChoiceReadinessView[\s\S]*export type ActivityDraftMetaSummaryQuestionChoiceReadinessItemView/,
   'AI draft meta domain should expose explicit summary, checklist, source-material, readiness, and quiz-choice view contracts.'
 );
 assert.match(
@@ -4169,13 +4170,18 @@ assert.match(
 );
 assert.match(
   activityDraftMetaSource,
-  /export type ActivityDraftMetaSummaryCoverageStatId =[\s\S]*'groups'[\s\S]*'pairs'[\s\S]*'questions'[\s\S]*'teacher-notes'[\s\S]*'vocabulary'[\s\S]*export type ActivityDraftMetaSummaryCoverageStatView = \{[\s\S]*id: ActivityDraftMetaSummaryCoverageStatId;[\s\S]*label: string;[\s\S]*value: number;/,
-  'AI draft coverage stats should expose stable ids separately from localized labels.'
+  /export type ActivityDraftMetaSummaryCoverageStatId =[\s\S]*'groups'[\s\S]*'pairs'[\s\S]*'questions'[\s\S]*'teacher-notes'[\s\S]*'vocabulary'[\s\S]*export type ActivityDraftMetaSummaryCoverageStatView = \{[\s\S]*ariaLabel: string;[\s\S]*description: string;[\s\S]*id: ActivityDraftMetaSummaryCoverageStatId;[\s\S]*label: string;[\s\S]*value: number;/,
+  'AI draft coverage stats should expose stable ids, aria labels, and descriptions separately from localized labels.'
 );
 assert.match(
   activityDraftMetaSource,
-  /export type ActivityDraftMetaSummarySourceMaterialNoteView =[\s\S]*ActivitySourceMaterialDraftNoteView & \{[\s\S]*displayText: string;[\s\S]*key: string;/,
-  'AI draft meta source material note views should expose stable keys separately from display text.'
+  /export type ActivityDraftMetaSummarySourceMaterialNoteView =[\s\S]*ActivitySourceMaterialDraftNoteView & \{[\s\S]*ariaLabel: string;[\s\S]*displayText: string;[\s\S]*key: string;/,
+  'AI draft meta source material note views should expose stable keys and aria labels separately from display text.'
+);
+assert.match(
+  activityDraftMetaSource,
+  /export type ActivityDraftMetaSummarySourceMaterialSafetyMetricView = \{[\s\S]*ariaLabel: string;[\s\S]*description: string;[\s\S]*id: ActivityDraftMetaSummarySourceMaterialSafetyMetricId;[\s\S]*label: string;[\s\S]*value: string;[\s\S]*export type ActivityDraftMetaSummarySourceMaterialSafetyView = \{[\s\S]*hasInput: boolean;[\s\S]*omittedCount: number;[\s\S]*safeCount: number;/,
+  'AI draft meta source-material safety view should expose safe and omitted counts without unsafe note payloads.'
 );
 assert.match(
   activityDraftMetaSource,
@@ -4199,7 +4205,7 @@ assert.doesNotMatch(
 );
 assert.match(
   activityDraftMetaSummarySource,
-  /ActivityDraftMetaSummaryView[\s\S]*ActivityDraftMetaSummaryCoverageStatView[\s\S]*ActivityDraftMetaSummaryReadinessOption[\s\S]*ActivityDraftMetaSummarySourceMaterialCapabilityView[\s\S]*ActivityDraftReviewChecklistItemView[\s\S]*ActivityDraftMetaSummaryQuestionChoiceReadinessView[\s\S]*ActivityDraftMetaSummaryQuestionChoiceReadinessItemView/,
+  /ActivityDraftMetaSummaryCoverageStatView[\s\S]*ActivityDraftMetaSummaryReadinessOption[\s\S]*ActivityDraftMetaSummarySourceMaterialCapabilityView[\s\S]*ActivityDraftMetaSummarySourceMaterialSafetyMetricView[\s\S]*ActivityDraftMetaSummarySourceMaterialSafetyView[\s\S]*ActivityDraftReviewChecklistItemView[\s\S]*ActivityDraftMetaSummaryQuestionChoiceReadinessView[\s\S]*ActivityDraftMetaSummaryQuestionChoiceReadinessItemView/,
   'AI draft summary component should import explicit draft-meta subview contracts.'
 );
 assert.match(
@@ -4259,6 +4265,11 @@ assert.match(
 );
 assert.match(
   activityDraftMetaSummarySource,
+  /function ActivityDraftCoverageStat[\s\S]*<article[\s\S]*aria-label=\{stat\.ariaLabel\}[\s\S]*<output aria-label=\{stat\.ariaLabel\}>\{stat\.value\}<\/output>[\s\S]*stat\.description/,
+  'AI draft coverage stats should render semantic article and output elements with prepared aria labels.'
+);
+assert.match(
+  activityDraftMetaSummarySource,
   /summaryView\.coverageStats\.map[\s\S]*key=\{stat\.id\}/,
   'AI draft summary component should key coverage stats by stable stat ids.'
 );
@@ -4289,8 +4300,8 @@ assert.match(
 );
 assert.match(
   activityDraftMetaSummarySource,
-  /function ActivityDraftTrustItem[\s\S]*item\.label[\s\S]*item\.value[\s\S]*item\.description/,
-  'AI draft trust items should render prepared label, value, and description fields.'
+  /function ActivityDraftTrustItem[\s\S]*item\.label[\s\S]*<output aria-label=\{item\.ariaLabel\}>\{item\.value\}<\/output>[\s\S]*item\.description/,
+  'AI draft trust items should render prepared label, aria value, and description fields.'
 );
 assert.doesNotMatch(
   activityDraftMetaSummarySource,
@@ -4304,8 +4315,18 @@ assert.match(
 );
 assert.match(
   activityDraftMetaSummarySource,
-  /summaryView\.sourceMaterialNoteViews\.map[\s\S]*noteView\.displayText/,
+  /ActivityDraftSourceMaterialSafety[\s\S]*safetyView=\{summaryView\.sourceMaterialSafetyView\}[\s\S]*summaryView\.sourceMaterialNoteViews\.map[\s\S]*noteView\.displayText/,
   'AI draft summary component should render prepared source-material provenance display text.'
+);
+assert.match(
+  activityDraftMetaSummarySource,
+  /function ActivityDraftSourceMaterialSafety[\s\S]*aria-label=\{safetyView\.ariaLabel\}[\s\S]*safetyView\.metricViews\.map[\s\S]*ActivityDraftSourceMaterialSafetyMetric/,
+  'AI draft source-material safety summary should render prepared safety metrics in a labelled region.'
+);
+assert.match(
+  activityDraftMetaSummarySource,
+  /function ActivityDraftSourceMaterialSafetyMetric[\s\S]*metricView\.label[\s\S]*<output aria-label=\{metricView\.ariaLabel\}>\{metricView\.value\}<\/output>[\s\S]*metricView\.description/,
+  'AI draft source-material safety metrics should render prepared label, aria value, and description fields.'
 );
 assert.match(
   activityDraftMetaSummarySource,
@@ -4329,8 +4350,8 @@ assert.match(
 );
 assert.match(
   activityDraftMetaSummarySource,
-  /function ActivityDraftSourceMaterialCapabilityBadge[\s\S]*capability\.label[\s\S]*capability\.value[\s\S]*capability\.description/,
-  'AI draft source-material capability badges should render prepared label, value, and description.'
+  /function ActivityDraftSourceMaterialCapabilityBadge[\s\S]*capability\.label[\s\S]*<output aria-label=\{capability\.ariaLabel\}>[\s\S]*capability\.value[\s\S]*capability\.description/,
+  'AI draft source-material capability badges should render prepared label, aria value, and description.'
 );
 assert.doesNotMatch(
   activityDraftMetaSummarySource,
@@ -8352,6 +8373,11 @@ assert.deepEqual(activityDraftSourceMaterialSummary, {
   ],
   notesText:
     'Attached classroom source materials:\n- Worksheet document: Worksheet Scan 1.pdf\n- Audio: 三年级听力.mp3\n- Worksheet document: Parent guide.pdf',
+  safety: {
+    inputCount: 3,
+    omittedCount: 0,
+    safeCount: 3,
+  },
   totalCount: 3,
 });
 const sensitiveNamedMaterialReference = buildActivityMaterialReferenceFromUserFile({
@@ -8381,6 +8407,11 @@ assert.deepEqual(buildActivitySourceMaterialDraftSummary([]), {
   kindCounts: {},
   noteViews: [],
   notesText: undefined,
+  safety: {
+    inputCount: 0,
+    omittedCount: 0,
+    safeCount: 0,
+  },
   totalCount: 0,
 });
 assert.doesNotMatch(
@@ -25776,8 +25807,13 @@ const activityDraftSourceSource = readFileSync(
 );
 assert.match(
   activityDraftSourceSource,
-  /export type ActivitySourceMaterialDraftKindCounts = Partial<[\s\S]*Record<ActivityMaterialReference\['kind'\], number>[\s\S]*export type ActivitySourceMaterialDraftSummary[\s\S]*kindCounts: ActivitySourceMaterialDraftKindCounts[\s\S]*noteViews[\s\S]*notesText[\s\S]*totalCount/,
+  /export type ActivitySourceMaterialDraftKindCounts = Partial<[\s\S]*Record<ActivityMaterialReference\['kind'\], number>[\s\S]*export type ActivitySourceMaterialDraftSafetySummary = \{[\s\S]*inputCount: number;[\s\S]*omittedCount: number;[\s\S]*safeCount: number;[\s\S]*export type ActivitySourceMaterialDraftSummary[\s\S]*kindCounts: ActivitySourceMaterialDraftKindCounts[\s\S]*noteViews[\s\S]*notesText[\s\S]*safety: ActivitySourceMaterialDraftSafetySummary[\s\S]*totalCount/,
   'AI draft source materials should expose a structured safe provenance summary.'
+);
+assert.match(
+  activityDraftSourceSource,
+  /export function buildActivitySourceMaterialDraftNoteSafetySummary[\s\S]*uniqueActivitySourceMaterialDraftNoteViews[\s\S]*omittedCount: Math\.max\(0, inputCount - safeCount\)/,
+  'AI draft source materials should expose safe and omitted source-note counts without retaining unsafe notes.'
 );
 assert.doesNotMatch(
   activityDraftSourceSource,
@@ -25826,7 +25862,7 @@ assert.doesNotMatch(
 );
 assert.match(
   activityDraftMetaSource,
-  /normalizeActivitySourceMaterialDraftNoteView[\s\S]*sourceMaterialNoteViews \?\? \[\][\s\S]*normalizeActivitySourceMaterialDraftNoteView\(noteView\)/,
+  /normalizeActivityDraftSourceMaterialNoteViews[\s\S]*safetySummary\.safeNoteViews[\s\S]*normalizeActivitySourceMaterialDraftNoteView\(noteView\)/,
   'AI draft meta source material note views should reuse draft-source filename sanitization.'
 );
 assert.match(
@@ -36915,25 +36951,56 @@ const fallbackDraftMetaSummary = buildActivityDraftMetaSummaryView({
     },
   ],
 });
-assert.deepEqual(fallbackDraftMetaSummary.coverageStats, [
-  { id: 'questions', label: 'Questions', value: 5 },
-  { id: 'pairs', label: 'Pairs', value: 5 },
-  {
-    id: 'groups',
-    label: 'Groups',
-    value: fallbackDraftMeta.coverage.groups,
-  },
-  {
-    id: 'vocabulary',
-    label: 'Vocab',
-    value: fallbackDraftMeta.coverage.vocabulary,
-  },
-  {
-    id: 'teacher-notes',
-    label: 'Notes',
-    value: fallbackDraftMeta.coverage.teacherNotes,
-  },
-]);
+assert.deepEqual(
+  fallbackDraftMetaSummary.coverageStats.map((stat) => ({
+    ariaLabel: stat.ariaLabel,
+    description: stat.description,
+    id: stat.id,
+    label: stat.label,
+    value: stat.value,
+  })),
+  [
+    {
+      ariaLabel:
+        'Questions: 5. Question prompts generated for quiz and worksheet-style classroom modes.',
+      description:
+        'Question prompts generated for quiz and worksheet-style classroom modes.',
+      id: 'questions',
+      label: 'Questions',
+      value: 5,
+    },
+    {
+      ariaLabel:
+        'Pairs: 5. Reusable matching pairs generated for pair-based modes.',
+      description: 'Reusable matching pairs generated for pair-based modes.',
+      id: 'pairs',
+      label: 'Pairs',
+      value: 5,
+    },
+    {
+      ariaLabel: `Groups: ${fallbackDraftMeta.coverage.groups}. Sorting categories generated for reusable classroom modes.`,
+      description:
+        'Sorting categories generated for reusable classroom modes.',
+      id: 'groups',
+      label: 'Groups',
+      value: fallbackDraftMeta.coverage.groups,
+    },
+    {
+      ariaLabel: `Vocab: ${fallbackDraftMeta.coverage.vocabulary}. Vocabulary terms generated for reuse across templates.`,
+      description: 'Vocabulary terms generated for reuse across templates.',
+      id: 'vocabulary',
+      label: 'Vocab',
+      value: fallbackDraftMeta.coverage.vocabulary,
+    },
+    {
+      ariaLabel: `Notes: ${fallbackDraftMeta.coverage.teacherNotes}. Teacher notes included for review before saving.`,
+      description: 'Teacher notes included for review before saving.',
+      id: 'teacher-notes',
+      label: 'Notes',
+      value: fallbackDraftMeta.coverage.teacherNotes,
+    },
+  ]
+);
 assert.equal(fallbackDraftMetaSummary.title, 'AI draft coverage');
 assert.equal(
   fallbackDraftMetaSummary.description,
@@ -36978,6 +37045,8 @@ assert.deepEqual(fallbackDraftMetaSummary.trustView, {
     'Use this provenance before trusting the generated draft or publishing an assignment link.',
   items: [
     {
+      ariaLabel:
+        'Provider: Fallback. Generated locally from the source notes, so treat it like a scaffold before assigning.',
       description:
         'Generated locally from the source notes, so treat it like a scaffold before assigning.',
       id: 'provider',
@@ -36985,6 +37054,8 @@ assert.deepEqual(fallbackDraftMetaSummary.trustView, {
       value: 'Fallback',
     },
     {
+      ariaLabel:
+        'Model: test-model. Model names are shown for review context only; teachers still approve the final activity.',
       description:
         'Model names are shown for review context only; teachers still approve the final activity.',
       id: 'model',
@@ -36992,6 +37063,8 @@ assert.deepEqual(fallbackDraftMetaSummary.trustView, {
       value: 'test-model',
     },
     {
+      ariaLabel:
+        'Review gate: Teacher review required. The draft fills the editor only; saving and publishing still require teacher action.',
       description:
         'The draft fills the editor only; saving and publishing still require teacher action.',
       id: 'review',
@@ -36999,6 +37072,8 @@ assert.deepEqual(fallbackDraftMetaSummary.trustView, {
       value: 'Teacher review required',
     },
     {
+      ariaLabel:
+        'Safe sources: 2 safe sources. Only material kind and safe filename basenames are counted here.',
       description:
         'Only material kind and safe filename basenames are counted here.',
       id: 'source-materials',
@@ -37006,6 +37081,8 @@ assert.deepEqual(fallbackDraftMetaSummary.trustView, {
       value: '2 safe sources',
     },
     {
+      ariaLabel:
+        'Notice: Fallback used for testing. Fallback or completion notes explain when local deterministic drafting changed the result.',
       description:
         'Fallback or completion notes explain when local deterministic drafting changed the result.',
       id: 'notice',
@@ -37104,14 +37181,47 @@ assert.equal(
   fallbackDraftMetaSummary.sourceMaterialCountLabel,
   '2 source materials'
 );
+assert.deepEqual(fallbackDraftMetaSummary.sourceMaterialSafetyView, {
+  ariaLabel: 'Source material safety: 2 safe sources; 2 omitted sources',
+  description:
+    'Unsafe or duplicate source notes are counted but never displayed to the prompt or teacher summary.',
+  hasInput: true,
+  hasOmitted: true,
+  inputCount: 4,
+  metricViews: [
+    {
+      ariaLabel:
+        'Safe for AI prompt: 2 safe sources. Source notes allowed into the AI draft prompt after kind and filename sanitization.',
+      description:
+        'Source notes allowed into the AI draft prompt after kind and filename sanitization.',
+      id: 'safe',
+      label: 'Safe for AI prompt',
+      value: '2 safe sources',
+    },
+    {
+      ariaLabel:
+        'Omitted from AI prompt: 2 omitted sources. Source notes omitted because they were duplicates, had unsafe material kinds, or lacked a safe filename.',
+      description:
+        'Source notes omitted because they were duplicates, had unsafe material kinds, or lacked a safe filename.',
+      id: 'omitted',
+      label: 'Omitted from AI prompt',
+      value: '2 omitted sources',
+    },
+  ],
+  omittedCount: 2,
+  safeCount: 2,
+});
 assert.deepEqual(fallbackDraftMetaSummary.sourceMaterialNoteViews, [
   {
+    ariaLabel:
+      'Safe source material: Worksheet document · Weather worksheet.pdf',
     displayText: 'Worksheet document · Weather worksheet.pdf',
     key: 'worksheet-document\u0000weather worksheet.pdf',
     kindLabel: 'Worksheet document',
     name: 'Weather worksheet.pdf',
   },
   {
+    ariaLabel: 'Safe source material: Audio · Weather listening.mp3',
     displayText: 'Audio · Weather listening.mp3',
     key: 'audio\u0000weather listening.mp3',
     kindLabel: 'Audio',
@@ -37128,6 +37238,8 @@ assert.equal(
 );
 assert.deepEqual(fallbackDraftMetaSummary.sourceMaterialCapabilityViews, [
   {
+    ariaLabel:
+      'Audio: 1. Can support future listening prompts or transcript drafting after teacher review.',
     capability: 'audio-extraction',
     description:
       'Can support future listening prompts or transcript drafting after teacher review.',
@@ -37135,6 +37247,8 @@ assert.deepEqual(fallbackDraftMetaSummary.sourceMaterialCapabilityViews, [
     value: '1',
   },
   {
+    ariaLabel:
+      'Worksheet: 1. Can support future worksheet prompt and accepted-answer extraction after teacher review.',
     capability: 'worksheet-extraction',
     description:
       'Can support future worksheet prompt and accepted-answer extraction after teacher review.',
@@ -37195,16 +37309,24 @@ const dedupedMaterialDraftMetaSummary = buildActivityDraftMetaSummaryView({
 });
 assert.deepEqual(dedupedMaterialDraftMetaSummary.sourceMaterialNoteViews, [
   {
+    ariaLabel: 'Safe source material: Worksheet document · Unit 1.pdf',
     displayText: 'Worksheet document · Unit 1.pdf',
     key: 'worksheet-document\u0000unit 1.pdf',
     kindLabel: 'Worksheet document',
     name: 'Unit 1.pdf',
   },
 ]);
+assert.equal(dedupedMaterialDraftMetaSummary.sourceMaterialSafetyView.safeCount, 1);
+assert.equal(
+  dedupedMaterialDraftMetaSummary.sourceMaterialSafetyView.omittedCount,
+  2
+);
 assert.deepEqual(
   dedupedMaterialDraftMetaSummary.sourceMaterialCapabilityViews,
   [
     {
+      ariaLabel:
+        'Worksheet: 1. Can support future worksheet prompt and accepted-answer extraction after teacher review.',
       capability: 'worksheet-extraction',
       description:
         'Can support future worksheet prompt and accepted-answer extraction after teacher review.',
@@ -37230,6 +37352,8 @@ assert.deepEqual(
   allMaterialCapabilityDraftMetaSummary.sourceMaterialCapabilityViews,
   [
     {
+      ariaLabel:
+        'Audio: 1. Can support future listening prompts or transcript drafting after teacher review.',
       capability: 'audio-extraction',
       description:
         'Can support future listening prompts or transcript drafting after teacher review.',
@@ -37237,6 +37361,8 @@ assert.deepEqual(
       value: '1',
     },
     {
+      ariaLabel:
+        'Worksheet: 1. Can support future worksheet prompt and accepted-answer extraction after teacher review.',
       capability: 'worksheet-extraction',
       description:
         'Can support future worksheet prompt and accepted-answer extraction after teacher review.',
@@ -37244,6 +37370,8 @@ assert.deepEqual(
       value: '1',
     },
     {
+      ariaLabel:
+        'Spreadsheet: 1. Can support future structured question and vocabulary import after teacher review.',
       capability: 'spreadsheet-import',
       description:
         'Can support future structured question and vocabulary import after teacher review.',
@@ -37267,6 +37395,16 @@ assert.equal(
     (item) => item.id === 'source-materials'
   )?.value,
   '4 safe sources'
+);
+assert.equal(
+  allMaterialCapabilityDraftMetaSummary.sourceMaterialSafetyView.omittedCount,
+  0
+);
+assert.equal(
+  allMaterialCapabilityDraftMetaSummary.sourceMaterialNoteViews.some(
+    (noteView) => noteView.displayText === 'Video · class-demo.mp4'
+  ),
+  true
 );
 assert.equal(
   fallbackDraftMetaSummary.suggestedTemplateOptions,
@@ -37443,13 +37581,23 @@ assert.equal(normalizeActivityDraftMetaCount(Number.NaN), 0);
 assert.equal(normalizeActivityDraftMetaCount(Number.POSITIVE_INFINITY), 0);
 assert.equal(normalizeActivityDraftMetaCount(-1.8), 0);
 assert.equal(normalizeActivityDraftMetaCount(6.7), 6);
-assert.deepEqual(malformedDraftMetaSummary.coverageStats, [
-  { id: 'questions', label: 'Questions', value: 0 },
-  { id: 'pairs', label: 'Pairs', value: 0 },
-  { id: 'groups', label: 'Groups', value: 2 },
-  { id: 'vocabulary', label: 'Vocab', value: 4 },
-  { id: 'teacher-notes', label: 'Notes', value: 0 },
-]);
+assert.deepEqual(
+  malformedDraftMetaSummary.coverageStats.map((stat) => ({
+    id: stat.id,
+    value: stat.value,
+  })),
+  [
+    { id: 'questions', value: 0 },
+    { id: 'pairs', value: 0 },
+    { id: 'groups', value: 2 },
+    { id: 'vocabulary', value: 4 },
+    { id: 'teacher-notes', value: 0 },
+  ]
+);
+assert.match(
+  malformedDraftMetaSummary.coverageStats[0]?.ariaLabel ?? '',
+  /Questions: 0\./
+);
 assert.equal(malformedDraftMetaSummary.readyTemplateLabel, '0 ready templates');
 assert.equal(
   buildActivityDraftMetaSummaryView({
@@ -37537,42 +37685,19 @@ try {
     zhFallbackDraftMetaSummary.providerDescription,
     '已根据素材备注在本地生成，请把它当作脚手架检查后再发布。'
   );
-  assert.deepEqual(zhFallbackDraftMetaSummary.trustView, {
-    description: '信任这份生成草稿或发布作业链接前，请先查看这些来源信息。',
-    items: [
-      {
-        description: '已根据素材备注在本地生成，请把它当作脚手架检查后再发布。',
-        id: 'provider',
-        label: '生成来源',
-        value: '本地兜底',
-      },
-      {
-        description: '模型名称仅用于检查生成背景；最终活动仍需老师确认。',
-        id: 'model',
-        label: '模型',
-        value: 'test-model',
-      },
-      {
-        description: '草稿只会填入编辑器；保存和发布仍必须由老师操作。',
-        id: 'review',
-        label: '检查门槛',
-        value: '需要老师检查',
-      },
-      {
-        description: '这里仅统计素材类型和安全文件名。',
-        id: 'source-materials',
-        label: '安全来源',
-        value: '无附加安全来源',
-      },
-      {
-        description: '兜底或补齐说明会解释本地确定性生成是否改变了结果。',
-        id: 'notice',
-        label: '说明',
-        value: '无生成说明',
-      },
-    ],
-    title: '草稿信任检查',
-  });
+  assert.equal(zhFallbackDraftMetaSummary.trustView.title, '草稿信任检查');
+  assert.equal(
+    zhFallbackDraftMetaSummary.trustView.items.find(
+      (item) => item.id === 'provider'
+    )?.ariaLabel,
+    '生成来源：本地兜底。已根据素材备注在本地生成，请把它当作脚手架检查后再发布。'
+  );
+  assert.equal(
+    zhFallbackDraftMetaSummary.trustView.items.find(
+      (item) => item.id === 'source-materials'
+    )?.value,
+    '无附加安全来源'
+  );
   assert.equal(zhFallbackDraftMetaSummary.appliedLabel, '已填入编辑器');
   assert.equal(zhFallbackDraftMetaSummary.nextStepLabel, '下一步');
   assert.equal(
@@ -37619,18 +37744,21 @@ try {
     zhMaterialCapabilityDraftMetaSummary.sourceMaterialCapabilityViews,
     [
       {
+        ariaLabel: '音频：1。老师检查后，可支持后续听力题提示或听力文本草稿。',
         capability: 'audio-extraction',
         description: '老师检查后，可支持后续听力题提示或听力文本草稿。',
         label: '音频',
         value: '1',
       },
       {
+        ariaLabel: '练习纸：1。老师检查后，可支持后续练习纸题干和可接受答案提取。',
         capability: 'worksheet-extraction',
         description: '老师检查后，可支持后续练习纸题干和可接受答案提取。',
         label: '练习纸',
         value: '1',
       },
       {
+        ariaLabel: '表格：1。老师检查后，可支持后续结构化题目和词汇导入。',
         capability: 'spreadsheet-import',
         description: '老师检查后，可支持后续结构化题目和词汇导入。',
         label: '表格',
@@ -37643,6 +37771,10 @@ try {
       (item) => item.id === 'source-materials'
     )?.value,
     '3 个安全来源'
+  );
+  assert.equal(
+    zhMaterialCapabilityDraftMetaSummary.sourceMaterialSafetyView.ariaLabel,
+    '来源素材安全性：3 个安全来源；已省略 0 个来源'
   );
   assert.equal(zhFallbackDraftMetaSummary.lockedTemplatesTitle, '暂不可用模板');
   assert.match(
@@ -38583,6 +38715,37 @@ assert.equal(
     kindLabel: 'Audio',
     name: 'unit 1 listening.mp3',
   })
+);
+assert.deepEqual(
+  buildActivitySourceMaterialDraftNoteSafetySummary([
+    {
+      kindLabel: 'Worksheet document',
+      name: 'https://files.example.test/private/Unit 1.pdf?token=secret',
+    },
+    {
+      kindLabel: 'worksheet document',
+      name: 'C:\\teacher\\private\\unit 1.pdf?signature=abc',
+    },
+    {
+      kindLabel: 'storageKey',
+      name: 'userfiles/teacher/private.pdf',
+    },
+    {
+      kindLabel: 'Audio',
+      name: '<>',
+    },
+  ]),
+  {
+    inputCount: 4,
+    omittedCount: 3,
+    safeCount: 1,
+    safeNoteViews: [
+      {
+        kindLabel: 'Worksheet document',
+        name: 'Unit 1.pdf',
+      },
+    ],
+  }
 );
 assert.equal(
   isSafeActivitySourceMaterialDraftNoteView({

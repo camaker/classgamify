@@ -26,6 +26,17 @@ export type ActivitySourceMaterialDraftKindCounts = Partial<
   Record<ActivityMaterialReference['kind'], number>
 >;
 
+export type ActivitySourceMaterialDraftSafetySummary = {
+  inputCount: number;
+  omittedCount: number;
+  safeCount: number;
+};
+
+export type ActivitySourceMaterialDraftNoteSafetySummary =
+  ActivitySourceMaterialDraftSafetySummary & {
+    safeNoteViews: ActivitySourceMaterialDraftNoteView[];
+  };
+
 type ActivitySourceMaterialDraftNoteSource = Pick<
   ActivityMaterialReference,
   'kind' | 'originalName'
@@ -36,6 +47,7 @@ export type ActivitySourceMaterialDraftSummary = {
   kindCounts: ActivitySourceMaterialDraftKindCounts;
   noteViews: ActivitySourceMaterialDraftNoteView[];
   notesText?: string;
+  safety: ActivitySourceMaterialDraftSafetySummary;
   totalCount: number;
 };
 
@@ -87,6 +99,9 @@ export function buildActivitySourceMaterialDraftSummary(
 ): ActivitySourceMaterialDraftSummary {
   const materials = normalizeActivityMaterialReferences(value);
   const noteViews = materials.map(buildActivitySourceMaterialDraftNoteView);
+  const safety = toActivitySourceMaterialDraftSafetySummary(
+    buildActivitySourceMaterialDraftNoteSafetySummary(noteViews)
+  );
   const notesText = formatActivitySourceMaterialDraftNotes(noteViews);
 
   return {
@@ -94,6 +109,7 @@ export function buildActivitySourceMaterialDraftSummary(
     kindCounts: countActivitySourceMaterialDraftKinds(materials),
     noteViews,
     notesText,
+    safety,
     totalCount: noteViews.length,
   };
 }
@@ -116,6 +132,27 @@ export function buildActivitySourceMaterialDraftNoteViewsFromSourceText(
 
 export function buildActivitySourceMaterialDraftNotes(value: unknown) {
   return buildActivitySourceMaterialDraftSummary(value).notesText;
+}
+
+export function buildActivitySourceMaterialDraftNoteSafetySummary(
+  noteViews: ActivitySourceMaterialDraftNoteView[] | undefined
+): ActivitySourceMaterialDraftNoteSafetySummary {
+  const inputCount = normalizeActivitySourceMaterialDraftCount(
+    noteViews?.length ?? 0
+  );
+  const safeNoteViews = uniqueActivitySourceMaterialDraftNoteViews(
+    noteViews ?? []
+  );
+  const safeCount = normalizeActivitySourceMaterialDraftCount(
+    safeNoteViews.length
+  );
+
+  return {
+    inputCount,
+    omittedCount: Math.max(0, inputCount - safeCount),
+    safeCount,
+    safeNoteViews,
+  };
 }
 
 export function appendActivitySourceMaterialDraftNotes({
@@ -226,6 +263,16 @@ function countActivitySourceMaterialDraftKinds(
   }
 
   return counts;
+}
+
+function toActivitySourceMaterialDraftSafetySummary(
+  summary: ActivitySourceMaterialDraftNoteSafetySummary
+): ActivitySourceMaterialDraftSafetySummary {
+  return {
+    inputCount: summary.inputCount,
+    omittedCount: summary.omittedCount,
+    safeCount: summary.safeCount,
+  };
 }
 
 function getSafeActivitySourceMaterialDraftKind(
@@ -432,4 +479,9 @@ function normalizeDraftSourceText(value: string | undefined) {
       .replace(/[ \t]+/gu, ' ')
       .trim() ?? ''
   );
+}
+
+function normalizeActivitySourceMaterialDraftCount(count: number) {
+  if (!Number.isFinite(count)) return 0;
+  return Math.max(0, Math.floor(count));
 }

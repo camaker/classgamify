@@ -7,9 +7,10 @@ import {
   type ActivityDraftMetaSummaryQuestionChoiceReadinessView,
   type ActivityDraftMetaSummaryReadinessOption,
   type ActivityDraftMetaSummarySourceMaterialCapabilityView,
+  type ActivityDraftMetaSummarySourceMaterialSafetyMetricView,
+  type ActivityDraftMetaSummarySourceMaterialSafetyView,
   type ActivityDraftMetaSummaryTrustItemView,
   type ActivityDraftMetaSummaryTrustView,
-  type ActivityDraftMetaSummaryView,
   type ActivityDraftReviewChecklistItemView,
 } from '@/activities/draft-meta';
 import { Badge } from '@/components/ui/badge';
@@ -101,7 +102,7 @@ export function ActivityDraftMetaSummary({
           readiness={summaryView.questionChoiceReadiness}
         />
       ) : null}
-      {summaryView.sourceMaterialNoteViews.length > 0 ? (
+      {summaryView.sourceMaterialSafetyView.hasInput ? (
         <div className="mt-4 rounded-lg border bg-background p-3">
           <div className="flex flex-wrap items-center justify-between gap-2">
             <p className="font-medium text-sm">
@@ -116,17 +117,23 @@ export function ActivityDraftMetaSummary({
           <p className="mt-1 text-muted-foreground text-xs leading-5">
             {summaryView.sourceMaterialDescription}
           </p>
-          <div className="mt-2 flex flex-wrap gap-1.5">
-            {summaryView.sourceMaterialNoteViews.map((noteView) => (
-              <Badge
-                key={noteView.key}
-                variant="outline"
-                className="max-w-full rounded-md"
-              >
-                <span className="truncate">{noteView.displayText}</span>
-              </Badge>
-            ))}
-          </div>
+          <ActivityDraftSourceMaterialSafety
+            safetyView={summaryView.sourceMaterialSafetyView}
+          />
+          {summaryView.sourceMaterialNoteViews.length > 0 ? (
+            <div className="mt-2 flex flex-wrap gap-1.5">
+              {summaryView.sourceMaterialNoteViews.map((noteView) => (
+                <Badge
+                  key={noteView.key}
+                  aria-label={noteView.ariaLabel}
+                  variant="outline"
+                  className="max-w-full rounded-md"
+                >
+                  <span className="truncate">{noteView.displayText}</span>
+                </Badge>
+              ))}
+            </div>
+          ) : null}
         </div>
       ) : null}
       {summaryView.sourceMaterialCapabilityViews.length > 0 ? (
@@ -193,17 +200,20 @@ function ActivityDraftTrustPanel({
   trustView: ActivityDraftMetaSummaryTrustView;
 }) {
   return (
-    <div className="mt-4 rounded-lg border bg-background p-3">
-      <p className="font-medium text-sm">{trustView.title}</p>
+    <section
+      aria-label={trustView.title}
+      className="mt-4 rounded-lg border bg-background p-3"
+    >
+      <h4 className="font-medium text-sm">{trustView.title}</h4>
       <p className="mt-1 text-muted-foreground text-xs leading-5">
         {trustView.description}
       </p>
-      <div className="mt-3 grid gap-2 md:grid-cols-5">
+      <dl className="mt-3 grid gap-2 md:grid-cols-5">
         {trustView.items.map((item) => (
           <ActivityDraftTrustItem item={item} key={item.id} />
         ))}
-      </div>
-    </div>
+      </dl>
+    </section>
   );
 }
 
@@ -214,13 +224,55 @@ function ActivityDraftTrustItem({
 }) {
   return (
     <div className="rounded-md border bg-muted/20 p-2.5">
-      <p className="text-muted-foreground text-xs leading-5">{item.label}</p>
-      <p className="mt-1 break-words font-medium text-xs leading-5">
-        {item.value}
-      </p>
-      <p className="mt-1 text-muted-foreground text-xs leading-5">
+      <dt className="text-muted-foreground text-xs leading-5">{item.label}</dt>
+      <dd className="mt-1 break-words font-medium text-xs leading-5">
+        <output aria-label={item.ariaLabel}>{item.value}</output>
+      </dd>
+      <dd className="mt-1 text-muted-foreground text-xs leading-5">
         {item.description}
+      </dd>
+    </div>
+  );
+}
+
+function ActivityDraftSourceMaterialSafety({
+  safetyView,
+}: {
+  safetyView: ActivityDraftMetaSummarySourceMaterialSafetyView;
+}) {
+  return (
+    <section aria-label={safetyView.ariaLabel} className="mt-3">
+      <p className="text-muted-foreground text-xs leading-5">
+        {safetyView.description}
       </p>
+      <dl className="mt-2 grid gap-2 sm:grid-cols-2">
+        {safetyView.metricViews.map((metricView) => (
+          <ActivityDraftSourceMaterialSafetyMetric
+            key={metricView.id}
+            metricView={metricView}
+          />
+        ))}
+      </dl>
+    </section>
+  );
+}
+
+function ActivityDraftSourceMaterialSafetyMetric({
+  metricView,
+}: {
+  metricView: ActivityDraftMetaSummarySourceMaterialSafetyMetricView;
+}) {
+  return (
+    <div className="rounded-md border bg-muted/20 p-2.5">
+      <dt className="text-muted-foreground text-xs leading-5">
+        {metricView.label}
+      </dt>
+      <dd className="mt-1 font-medium text-xs leading-5">
+        <output aria-label={metricView.ariaLabel}>{metricView.value}</output>
+      </dd>
+      <dd className="mt-1 text-muted-foreground text-xs leading-5">
+        {metricView.description}
+      </dd>
     </div>
   );
 }
@@ -235,20 +287,23 @@ function ActivityDraftSourceMaterialCapabilities({
   title: string;
 }) {
   return (
-    <div className="mt-4 rounded-lg border bg-background p-3">
-      <p className="font-medium text-sm">{title}</p>
+    <section
+      aria-label={title}
+      className="mt-4 rounded-lg border bg-background p-3"
+    >
+      <h4 className="font-medium text-sm">{title}</h4>
       <p className="mt-1 text-muted-foreground text-xs leading-5">
         {description}
       </p>
-      <div className="mt-2 grid gap-2 sm:grid-cols-3">
+      <dl className="mt-2 grid gap-2 sm:grid-cols-3">
         {capabilities.map((capability) => (
           <ActivityDraftSourceMaterialCapabilityBadge
             capability={capability}
             key={capability.capability}
           />
         ))}
-      </div>
-    </div>
+      </dl>
+    </section>
   );
 }
 
@@ -260,14 +315,18 @@ function ActivityDraftSourceMaterialCapabilityBadge({
   return (
     <div className="rounded-md border bg-muted/20 p-2.5">
       <div className="flex items-center justify-between gap-2">
-        <p className="font-medium text-xs leading-5">{capability.label}</p>
-        <Badge variant="outline" className="rounded-md">
-          {capability.value}
-        </Badge>
+        <dt className="font-medium text-xs leading-5">{capability.label}</dt>
+        <dd>
+          <Badge variant="outline" className="rounded-md">
+            <output aria-label={capability.ariaLabel}>
+              {capability.value}
+            </output>
+          </Badge>
+        </dd>
       </div>
-      <p className="mt-1 text-muted-foreground text-xs leading-5">
+      <dd className="mt-1 text-muted-foreground text-xs leading-5">
         {capability.description}
-      </p>
+      </dd>
     </div>
   );
 }
@@ -306,9 +365,12 @@ function ActivityDraftQuestionChoiceReadiness({
   readiness: ActivityDraftMetaSummaryQuestionChoiceReadinessView;
 }) {
   return (
-    <div className="mt-4 rounded-lg border bg-background p-3">
+    <section
+      aria-label={readiness.title}
+      className="mt-4 rounded-lg border bg-background p-3"
+    >
       <div className="flex flex-wrap items-center justify-between gap-2">
-        <p className="font-medium text-sm">{readiness.title}</p>
+        <h4 className="font-medium text-sm">{readiness.title}</h4>
         <Badge variant="outline" className="rounded-md">
           {readiness.summaryLabel}
         </Badge>
@@ -324,7 +386,7 @@ function ActivityDraftQuestionChoiceReadiness({
           />
         ))}
       </div>
-    </div>
+    </section>
   );
 }
 
@@ -370,10 +432,16 @@ function ActivityDraftCoverageStat({
   stat: ActivityDraftMetaSummaryCoverageStatView;
 }) {
   return (
-    <div className="rounded-lg border bg-background p-3">
-      <p className="text-lg font-semibold">{stat.value}</p>
+    <article
+      aria-label={stat.ariaLabel}
+      className="rounded-lg border bg-background p-3"
+    >
+      <p className="text-lg font-semibold">
+        <output aria-label={stat.ariaLabel}>{stat.value}</output>
+      </p>
       <p className="text-xs text-muted-foreground">{stat.label}</p>
-    </div>
+      <p className="sr-only">{stat.description}</p>
+    </article>
   );
 }
 

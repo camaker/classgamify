@@ -14,9 +14,11 @@ import {
   type ActivityAiDraftFocus,
 } from '@/activities/ai-draft-focus';
 import {
+  buildActivitySourceMaterialDraftNoteSafetySummary,
   getActivitySourceMaterialDraftNoteIdentityKey,
   isSafeActivitySourceMaterialDraftKind,
   normalizeActivitySourceMaterialDraftNoteView,
+  type ActivitySourceMaterialDraftNoteSafetySummary,
   type ActivitySourceMaterialDraftNoteView,
 } from '@/activities/draft-source';
 import {
@@ -139,6 +141,8 @@ export type ActivityDraftMetaSummaryCoverageStatId =
   | 'vocabulary';
 
 export type ActivityDraftMetaSummaryCoverageStatView = {
+  ariaLabel: string;
+  description: string;
   id: ActivityDraftMetaSummaryCoverageStatId;
   label: string;
   value: number;
@@ -158,15 +162,40 @@ export type ActivityDraftMetaSummaryReadinessOption = {
 
 export type ActivityDraftMetaSummarySourceMaterialNoteView =
   ActivitySourceMaterialDraftNoteView & {
+    ariaLabel: string;
     displayText: string;
     key: string;
   };
 
 export type ActivityDraftMetaSummarySourceMaterialCapabilityView =
   ActivitySourceMaterialCapabilityView<{
+    ariaLabel: string;
     description: string;
     label: string;
   }>;
+
+export type ActivityDraftMetaSummarySourceMaterialSafetyMetricId =
+  | 'omitted'
+  | 'safe';
+
+export type ActivityDraftMetaSummarySourceMaterialSafetyMetricView = {
+  ariaLabel: string;
+  description: string;
+  id: ActivityDraftMetaSummarySourceMaterialSafetyMetricId;
+  label: string;
+  value: string;
+};
+
+export type ActivityDraftMetaSummarySourceMaterialSafetyView = {
+  ariaLabel: string;
+  description: string;
+  hasInput: boolean;
+  hasOmitted: boolean;
+  inputCount: number;
+  metricViews: ActivityDraftMetaSummarySourceMaterialSafetyMetricView[];
+  omittedCount: number;
+  safeCount: number;
+};
 
 export type ActivityDraftMetaSummaryTrustItemId =
   | 'model'
@@ -176,6 +205,7 @@ export type ActivityDraftMetaSummaryTrustItemId =
   | 'source-materials';
 
 export type ActivityDraftMetaSummaryTrustItemView = {
+  ariaLabel: string;
   description: string;
   id: ActivityDraftMetaSummaryTrustItemId;
   label: string;
@@ -222,6 +252,7 @@ export type ActivityDraftMetaSummaryView = {
   sourceMaterialCountLabel?: string;
   sourceMaterialDescription: string;
   sourceMaterialNoteViews: ActivityDraftMetaSummarySourceMaterialNoteView[];
+  sourceMaterialSafetyView: ActivityDraftMetaSummarySourceMaterialSafetyView;
   sourceMaterialTitle: string;
   suggestedTemplateOptions: ActivityDraftTemplateOption[];
   suggestedTemplatesEmptyText: string;
@@ -348,8 +379,10 @@ export function buildActivityDraftMetaSummaryView({
   const normalizedDraftFocus = draftFocus ?? 'balanced';
   const draftFocusLabel = m.activity_draft_meta_focus_label();
   const draftFocusName = formatActivityAiDraftFocusLabel(normalizedDraftFocus);
+  const sourceMaterialSafetySummary =
+    buildActivitySourceMaterialDraftNoteSafetySummary(sourceMaterialNoteViews);
   const normalizedSourceMaterialNoteViews =
-    normalizeActivityDraftSourceMaterialNoteViews(sourceMaterialNoteViews);
+    normalizeActivityDraftSourceMaterialNoteViews(sourceMaterialSafetySummary);
   const reviewChecklistItems = buildActivityDraftReviewChecklistItemViews({
     checklist: meta.reviewChecklist,
     items: meta.reviewChecklistItems,
@@ -368,26 +401,62 @@ export function buildActivityDraftMetaSummaryView({
     appliedLabel: m.activity_draft_meta_applied_label(),
     coverageStats: [
       {
+        ariaLabel: formatActivityDraftMetaSummaryItemAriaLabel({
+          description: m.activity_draft_meta_coverage_questions_description(),
+          label: m.activity_draft_meta_coverage_questions(),
+          value: String(
+            normalizeActivityDraftMetaCount(meta.coverage.questions)
+          ),
+        }),
+        description: m.activity_draft_meta_coverage_questions_description(),
         id: 'questions',
         label: m.activity_draft_meta_coverage_questions(),
         value: normalizeActivityDraftMetaCount(meta.coverage.questions),
       },
       {
+        ariaLabel: formatActivityDraftMetaSummaryItemAriaLabel({
+          description: m.activity_draft_meta_coverage_pairs_description(),
+          label: m.activity_draft_meta_coverage_pairs(),
+          value: String(normalizeActivityDraftMetaCount(meta.coverage.pairs)),
+        }),
+        description: m.activity_draft_meta_coverage_pairs_description(),
         id: 'pairs',
         label: m.activity_draft_meta_coverage_pairs(),
         value: normalizeActivityDraftMetaCount(meta.coverage.pairs),
       },
       {
+        ariaLabel: formatActivityDraftMetaSummaryItemAriaLabel({
+          description: m.activity_draft_meta_coverage_groups_description(),
+          label: m.activity_draft_meta_coverage_groups(),
+          value: String(normalizeActivityDraftMetaCount(meta.coverage.groups)),
+        }),
+        description: m.activity_draft_meta_coverage_groups_description(),
         id: 'groups',
         label: m.activity_draft_meta_coverage_groups(),
         value: normalizeActivityDraftMetaCount(meta.coverage.groups),
       },
       {
+        ariaLabel: formatActivityDraftMetaSummaryItemAriaLabel({
+          description: m.activity_draft_meta_coverage_vocab_description(),
+          label: m.activity_draft_meta_coverage_vocab(),
+          value: String(
+            normalizeActivityDraftMetaCount(meta.coverage.vocabulary)
+          ),
+        }),
+        description: m.activity_draft_meta_coverage_vocab_description(),
         id: 'vocabulary',
         label: m.activity_draft_meta_coverage_vocab(),
         value: normalizeActivityDraftMetaCount(meta.coverage.vocabulary),
       },
       {
+        ariaLabel: formatActivityDraftMetaSummaryItemAriaLabel({
+          description: m.activity_draft_meta_coverage_notes_description(),
+          label: m.activity_draft_meta_coverage_notes(),
+          value: String(
+            normalizeActivityDraftMetaCount(meta.coverage.teacherNotes)
+          ),
+        }),
+        description: m.activity_draft_meta_coverage_notes_description(),
         id: 'teacher-notes',
         label: m.activity_draft_meta_coverage_notes(),
         value: normalizeActivityDraftMetaCount(meta.coverage.teacherNotes),
@@ -466,6 +535,10 @@ export function buildActivityDraftMetaSummaryView({
     sourceMaterialDescription:
       m.activity_draft_meta_source_materials_description(),
     sourceMaterialNoteViews: normalizedSourceMaterialNoteViews,
+    sourceMaterialSafetyView:
+      buildActivityDraftMetaSummarySourceMaterialSafetyView(
+        sourceMaterialSafetySummary
+      ),
     sourceMaterialTitle: m.activity_draft_meta_source_materials_title(),
     suggestedTemplateOptions: meta.suggestedTemplateOptions,
     suggestedTemplatesEmptyText:
@@ -502,30 +575,55 @@ function buildActivityDraftMetaSummaryTrustView({
     description: m.activity_draft_meta_trust_description(),
     items: [
       {
+        ariaLabel: formatActivityDraftMetaSummaryItemAriaLabel({
+          description: providerDescription,
+          label: m.activity_draft_meta_trust_provider_label(),
+          value: providerLabel,
+        }),
         description: providerDescription,
         id: 'provider',
         label: m.activity_draft_meta_trust_provider_label(),
         value: providerLabel,
       },
       {
+        ariaLabel: formatActivityDraftMetaSummaryItemAriaLabel({
+          description: m.activity_draft_meta_trust_model_description(),
+          label: m.activity_draft_meta_trust_model_label(),
+          value: modelName,
+        }),
         description: m.activity_draft_meta_trust_model_description(),
         id: 'model',
         label: m.activity_draft_meta_trust_model_label(),
         value: modelName,
       },
       {
+        ariaLabel: formatActivityDraftMetaSummaryItemAriaLabel({
+          description: m.activity_draft_meta_trust_review_description(),
+          label: m.activity_draft_meta_trust_review_label(),
+          value: m.activity_draft_meta_trust_review_value(),
+        }),
         description: m.activity_draft_meta_trust_review_description(),
         id: 'review',
         label: m.activity_draft_meta_trust_review_label(),
         value: m.activity_draft_meta_trust_review_value(),
       },
       {
+        ariaLabel: formatActivityDraftMetaSummaryItemAriaLabel({
+          description: m.activity_draft_meta_trust_source_description(),
+          label: m.activity_draft_meta_trust_source_label(),
+          value: buildActivityDraftMetaTrustSourceValue(safeSourceCount),
+        }),
         description: m.activity_draft_meta_trust_source_description(),
         id: 'source-materials',
         label: m.activity_draft_meta_trust_source_label(),
         value: buildActivityDraftMetaTrustSourceValue(safeSourceCount),
       },
       {
+        ariaLabel: formatActivityDraftMetaSummaryItemAriaLabel({
+          description: m.activity_draft_meta_trust_notice_description(),
+          label: m.activity_draft_meta_trust_notice_label(),
+          value: notice ?? m.activity_draft_meta_trust_notice_none_value(),
+        }),
         description: m.activity_draft_meta_trust_notice_description(),
         id: 'notice',
         label: m.activity_draft_meta_trust_notice_label(),
@@ -703,6 +801,95 @@ function buildActivityDraftSourceMaterialCountLabel(count: number) {
     : m.activity_draft_meta_source_materials_count_many({ count });
 }
 
+function buildActivityDraftMetaSummarySourceMaterialSafetyView(
+  summary: ActivitySourceMaterialDraftNoteSafetySummary
+): ActivityDraftMetaSummarySourceMaterialSafetyView {
+  const safeCount = normalizeActivityDraftMetaCount(summary.safeCount);
+  const omittedCount = normalizeActivityDraftMetaCount(summary.omittedCount);
+  const inputCount = normalizeActivityDraftMetaCount(summary.inputCount);
+  const safeValue = buildActivityDraftMetaSafeSourceCountValue(safeCount);
+  const omittedValue =
+    buildActivityDraftMetaOmittedSourceCountValue(omittedCount);
+  const safeDescription =
+    m.activity_draft_meta_source_material_safety_safe_description();
+  const omittedDescription =
+    m.activity_draft_meta_source_material_safety_omitted_description();
+  const metricViews: ActivityDraftMetaSummarySourceMaterialSafetyMetricView[] =
+    [
+      {
+        ariaLabel: formatActivityDraftMetaSummaryItemAriaLabel({
+          description: safeDescription,
+          label: m.activity_draft_meta_source_material_safety_safe_label(),
+          value: safeValue,
+        }),
+        description: safeDescription,
+        id: 'safe',
+        label: m.activity_draft_meta_source_material_safety_safe_label(),
+        value: safeValue,
+      },
+      {
+        ariaLabel: formatActivityDraftMetaSummaryItemAriaLabel({
+          description: omittedDescription,
+          label: m.activity_draft_meta_source_material_safety_omitted_label(),
+          value: omittedValue,
+        }),
+        description: omittedDescription,
+        id: 'omitted',
+        label: m.activity_draft_meta_source_material_safety_omitted_label(),
+        value: omittedValue,
+      },
+    ];
+
+  return {
+    ariaLabel: formatActivityDraftMetaSourceMaterialSafetyAriaLabel({
+      omittedValue,
+      safeValue,
+    }),
+    description: m.activity_draft_meta_source_material_safety_description(),
+    hasInput: inputCount > 0,
+    hasOmitted: omittedCount > 0,
+    inputCount,
+    metricViews,
+    omittedCount,
+    safeCount,
+  };
+}
+
+function buildActivityDraftMetaSafeSourceCountValue(count: number) {
+  if (count === 0) {
+    return m.activity_draft_meta_source_material_safety_safe_none_value();
+  }
+
+  return count === 1
+    ? m.activity_draft_meta_source_material_safety_safe_one_value({ count })
+    : m.activity_draft_meta_source_material_safety_safe_many_value({ count });
+}
+
+function buildActivityDraftMetaOmittedSourceCountValue(count: number) {
+  if (count === 0) {
+    return m.activity_draft_meta_source_material_safety_omitted_none_value();
+  }
+
+  return count === 1
+    ? m.activity_draft_meta_source_material_safety_omitted_one_value({ count })
+    : m.activity_draft_meta_source_material_safety_omitted_many_value({
+        count,
+      });
+}
+
+function formatActivityDraftMetaSourceMaterialSafetyAriaLabel({
+  omittedValue,
+  safeValue,
+}: {
+  omittedValue: string;
+  safeValue: string;
+}) {
+  return m.activity_draft_meta_source_material_safety_aria_label({
+    omittedValue,
+    safeValue,
+  });
+}
+
 function buildActivityDraftMetaSourceMaterialCapabilityViews(
   noteViews: ActivityDraftMetaSummarySourceMaterialNoteView[]
 ): ActivityDraftMetaSummarySourceMaterialCapabilityView[] {
@@ -713,23 +900,59 @@ function buildActivityDraftMetaSourceMaterialCapabilityViews(
     capabilityCounts,
     copy: {
       'audio-extraction': {
+        ariaLabel: buildActivityDraftMetaSourceMaterialCapabilityAriaLabel({
+          count: capabilityCounts['audio-extraction'],
+          description:
+            m.activity_draft_meta_source_material_capability_audio_description(),
+          label: m.activity_draft_meta_source_material_capability_audio_label(),
+        }),
         description:
           m.activity_draft_meta_source_material_capability_audio_description(),
         label: m.activity_draft_meta_source_material_capability_audio_label(),
       },
       'spreadsheet-import': {
+        ariaLabel: buildActivityDraftMetaSourceMaterialCapabilityAriaLabel({
+          count: capabilityCounts['spreadsheet-import'],
+          description:
+            m.activity_draft_meta_source_material_capability_spreadsheet_description(),
+          label:
+            m.activity_draft_meta_source_material_capability_spreadsheet_label(),
+        }),
         description:
           m.activity_draft_meta_source_material_capability_spreadsheet_description(),
         label:
           m.activity_draft_meta_source_material_capability_spreadsheet_label(),
       },
       'worksheet-extraction': {
+        ariaLabel: buildActivityDraftMetaSourceMaterialCapabilityAriaLabel({
+          count: capabilityCounts['worksheet-extraction'],
+          description:
+            m.activity_draft_meta_source_material_capability_worksheet_description(),
+          label:
+            m.activity_draft_meta_source_material_capability_worksheet_label(),
+        }),
         description:
           m.activity_draft_meta_source_material_capability_worksheet_description(),
         label:
           m.activity_draft_meta_source_material_capability_worksheet_label(),
       },
     },
+  });
+}
+
+function buildActivityDraftMetaSourceMaterialCapabilityAriaLabel({
+  count,
+  description,
+  label,
+}: {
+  count: number;
+  description: string;
+  label: string;
+}) {
+  return formatActivityDraftMetaSummaryItemAriaLabel({
+    description,
+    label,
+    value: String(normalizeActivityDraftMetaCount(count)),
   });
 }
 
@@ -754,13 +977,13 @@ function buildActivityDraftMetaSourceMaterialCapabilityCounts(
 }
 
 function normalizeActivityDraftSourceMaterialNoteViews(
-  sourceMaterialNoteViews: ActivitySourceMaterialDraftNoteView[] | undefined
+  safetySummary: ActivitySourceMaterialDraftNoteSafetySummary
 ) {
   const normalizedNoteViews: ActivityDraftMetaSummarySourceMaterialNoteView[] =
     [];
   const seen = new Set<string>();
 
-  for (const noteView of sourceMaterialNoteViews ?? []) {
+  for (const noteView of safetySummary.safeNoteViews) {
     const normalizedNoteView =
       normalizeActivitySourceMaterialDraftNoteView(noteView);
     const kindLabel = normalizedNoteView.kindLabel;
@@ -779,11 +1002,15 @@ function normalizeActivityDraftSourceMaterialNoteViews(
     }
 
     seen.add(key);
+    const displayText = m.activity_draft_meta_source_material_item({
+      kind: kindLabel,
+      name,
+    });
     normalizedNoteViews.push({
-      displayText: m.activity_draft_meta_source_material_item({
-        kind: kindLabel,
-        name,
+      ariaLabel: m.activity_draft_meta_source_material_item_aria_label({
+        displayText,
       }),
+      displayText,
       key,
       kindLabel,
       name,
@@ -791,6 +1018,26 @@ function normalizeActivityDraftSourceMaterialNoteViews(
   }
 
   return normalizedNoteViews;
+}
+
+function formatActivityDraftMetaSummaryItemAriaLabel({
+  description,
+  label,
+  value,
+}: {
+  description: string;
+  label: string;
+  value: string;
+}) {
+  return m.activity_draft_meta_item_aria_label({
+    description,
+    label,
+    value: normalizeActivityDraftMetaAriaValue(value),
+  });
+}
+
+function normalizeActivityDraftMetaAriaValue(value: string) {
+  return value.replace(/[.!?。！？]+$/u, '');
 }
 
 function buildActivityDraftReviewChecklistItemViews({
