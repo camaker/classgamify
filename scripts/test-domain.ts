@@ -10090,13 +10090,18 @@ assert.match(
 );
 assert.match(
   studentRunnerViewSource,
-  /buildStudentRunnerPrepareView[\s\S]*student_runner_prepare_step_review_rules[\s\S]*student_runner_prepare_step_name[\s\S]*student_runner_prepare_step_anonymous[\s\S]*student_runner_prepare_step_timer[\s\S]*student_runner_prepare_step_no_timer[\s\S]*student_runner_prepare_step_submit/,
-  'Student runner prepare guidance should be prepared from localized assignment-domain messages.'
+  /buildStudentRunnerPrepareView[\s\S]*student_runner_prepare_step_review_rules[\s\S]*student_runner_prepare_step_review_rules_label[\s\S]*student_runner_prepare_step_name[\s\S]*student_runner_prepare_step_name_label[\s\S]*student_runner_prepare_step_anonymous[\s\S]*student_runner_prepare_step_anonymous_label[\s\S]*student_runner_prepare_step_timer[\s\S]*student_runner_prepare_step_timer_label[\s\S]*student_runner_prepare_step_no_timer[\s\S]*student_runner_prepare_step_no_timer_label[\s\S]*student_runner_prepare_step_submit[\s\S]*student_runner_prepare_step_submit_label/,
+  'Student runner prepare guidance should be prepared from localized assignment-domain labels and descriptions.'
 );
 assert.match(
   studentRunnerViewSource,
-  /export type StudentRunnerPrepareView = \{[\s\S]*stepViews: StudentRunnerPrepareStepView\[\];[\s\S]*title: string;[\s\S]*export type StudentRunnerPrepareStepId =[\s\S]*'anonymous'[\s\S]*'no-timer'[\s\S]*'review-rules'[\s\S]*'student-name'[\s\S]*'submit'[\s\S]*'timer'[\s\S]*export type StudentRunnerPrepareStepView = \{[\s\S]*id: StudentRunnerPrepareStepId;[\s\S]*label: string;/,
-  'Student runner prepare guidance should expose stable step ids and structured labels.'
+  /export type StudentRunnerPrepareView = \{[\s\S]*stepViews: StudentRunnerPrepareStepView\[\];[\s\S]*title: string;[\s\S]*export type StudentRunnerPrepareStepId =[\s\S]*'anonymous'[\s\S]*'no-timer'[\s\S]*'review-rules'[\s\S]*'student-name'[\s\S]*'submit'[\s\S]*'timer'[\s\S]*export type StudentRunnerPrepareStepView = \{[\s\S]*ariaLabel: string;[\s\S]*description: string;[\s\S]*id: StudentRunnerPrepareStepId;[\s\S]*label: string;/,
+  'Student runner prepare guidance should expose stable step ids and structured accessibility, label, and description fields.'
+);
+assert.match(
+  studentRunnerViewSource,
+  /function buildStudentRunnerPrepareStepView[\s\S]*student_runner_prepare_step_aria[\s\S]*description,[\s\S]*label,/,
+  'Student runner prepare steps should build prepared aria labels in the assignment domain.'
 );
 assert.match(
   studentRunnerViewSource,
@@ -10525,13 +10530,18 @@ assert.doesNotMatch(
 );
 assert.match(
   studentRunnerHeaderCardSource,
-  /StudentRunnerPrepareCard[\s\S]*prepareView=\{view\.prepareView\}[\s\S]*prepareView\.stepViews\.map[\s\S]*key=\{step\.id\}[\s\S]*step\.label/,
-  'Student runner header card should render prepared before-start guidance from the header view.'
+  /StudentRunnerPrepareCard[\s\S]*prepareView=\{view\.prepareView\}[\s\S]*prepareView\.stepViews\.map[\s\S]*key=\{step\.id\}[\s\S]*step\.ariaLabel[\s\S]*step\.label[\s\S]*step\.description/,
+  'Student runner header card should render prepared before-start guidance labels, descriptions, and aria text from the header view.'
 );
 assert.doesNotMatch(
   studentRunnerHeaderCardSource,
   /key=\{step\}|prepareView\.steps\.map/,
   'Student runner prepare card should not key before-start guidance by localized step copy.'
+);
+assert.doesNotMatch(
+  studentRunnerHeaderCardSource,
+  /Review rules|Name required|Browser identity|Timer starts after load|No timer|Submit answers|先看规则|需要姓名|浏览器身份|加载后开始计时|不计时|提交答案/,
+  'Student runner header card should not hard-code visible before-start guidance copy.'
 );
 assert.match(
   studentRunnerAttemptShellSource,
@@ -18457,22 +18467,35 @@ assert.deepEqual(studentRunnerHeaderView, {
   prepareView: {
     stepViews: [
       {
+        ariaLabel:
+          'Review rules. Read the teacher instructions and assignment rules.',
+        description: 'Read the teacher instructions and assignment rules.',
         id: 'review-rules',
-        label: 'Read the teacher instructions and assignment rules.',
+        label: 'Review rules',
       },
       {
-        id: 'student-name',
-        label:
+        ariaLabel:
+          'Name required. Type your name before submitting so your teacher can find your work.',
+        description:
           'Type your name before submitting so your teacher can find your work.',
+        id: 'student-name',
+        label: 'Name required',
       },
       {
-        id: 'timer',
-        label:
+        ariaLabel:
+          'Timer starts after load. The timer starts once the activity is ready, then your submitted time is saved.',
+        description:
           'The timer starts once the activity is ready, then your submitted time is saved.',
+        id: 'timer',
+        label: 'Timer starts after load',
       },
       {
+        ariaLabel:
+          'Submit answers. Answer the items below and submit when you are finished.',
+        description:
+          'Answer the items below and submit when you are finished.',
         id: 'submit',
-        label: 'Answer the items below and submit when you are finished.',
+        label: 'Submit answers',
       },
     ],
     title: 'Before you start',
@@ -18572,21 +18595,35 @@ assert.deepEqual(
   {
     stepViews: [
       {
+        ariaLabel:
+          'Review rules. Read the teacher instructions and assignment rules.',
+        description: 'Read the teacher instructions and assignment rules.',
         id: 'review-rules',
-        label: 'Read the teacher instructions and assignment rules.',
+        label: 'Review rules',
       },
       {
-        id: 'anonymous',
-        label:
+        ariaLabel:
+          'Browser identity. This browser identifies your attempt, so use the same device if you try again.',
+        description:
           'This browser identifies your attempt, so use the same device if you try again.',
+        id: 'anonymous',
+        label: 'Browser identity',
       },
       {
+        ariaLabel:
+          'No timer. There is no timer, so submit when your answers are ready.',
+        description:
+          'There is no timer, so submit when your answers are ready.',
         id: 'no-timer',
-        label: 'There is no timer, so submit when your answers are ready.',
+        label: 'No timer',
       },
       {
+        ariaLabel:
+          'Submit answers. Answer the items below and submit when you are finished.',
+        description:
+          'Answer the items below and submit when you are finished.',
         id: 'submit',
-        label: 'Answer the items below and submit when you are finished.',
+        label: 'Submit answers',
       },
     ],
     title: 'Before you start',

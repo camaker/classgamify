@@ -79,11 +79,14 @@ function StudentRunnerPrepareCard({
   return (
     <div className="max-w-2xl rounded-lg border bg-background p-3 text-sm leading-6">
       <div className="font-medium text-foreground">{prepareView.title}</div>
-      <ul className="mt-2 grid gap-1 text-muted-foreground text-xs leading-5">
+      <ul className="mt-2 grid gap-2">
         {prepareView.stepViews.map((step) => (
-          <li className="flex gap-2" key={step.id}>
-            <span aria-hidden="true">-</span>
-            <span>{step.label}</span>
+          <li className="rounded-md border bg-muted/20 px-3 py-2" key={step.id}>
+            <span className="sr-only">{step.ariaLabel}</span>
+            <p className="font-medium text-xs text-foreground">{step.label}</p>
+            <p className="mt-1 text-muted-foreground text-xs leading-5">
+              {step.description}
+            </p>
           </li>
         ))}
       </ul>

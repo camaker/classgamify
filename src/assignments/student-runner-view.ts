@@ -324,6 +324,8 @@ export type StudentRunnerPrepareStepId =
   | 'timer';
 
 export type StudentRunnerPrepareStepView = {
+  ariaLabel: string;
+  description: string;
   id: StudentRunnerPrepareStepId;
   label: string;
 };
@@ -393,34 +395,60 @@ function buildStudentRunnerPrepareView(
 ): StudentRunnerPrepareView {
   return {
     stepViews: [
-      {
+      buildStudentRunnerPrepareStepView({
+        description: m.student_runner_prepare_step_review_rules(),
         id: 'review-rules',
-        label: m.student_runner_prepare_step_review_rules(),
-      },
+        label: m.student_runner_prepare_step_review_rules_label(),
+      }),
       settings.collectStudentName
-        ? {
+        ? buildStudentRunnerPrepareStepView({
+            description: m.student_runner_prepare_step_name(),
             id: 'student-name',
-            label: m.student_runner_prepare_step_name(),
-          }
-        : {
+            label: m.student_runner_prepare_step_name_label(),
+          })
+        : buildStudentRunnerPrepareStepView({
+            description: m.student_runner_prepare_step_anonymous(),
             id: 'anonymous',
-            label: m.student_runner_prepare_step_anonymous(),
-          },
+            label: m.student_runner_prepare_step_anonymous_label(),
+          }),
       settings.timeLimitSeconds
-        ? {
+        ? buildStudentRunnerPrepareStepView({
+            description: m.student_runner_prepare_step_timer(),
             id: 'timer',
-            label: m.student_runner_prepare_step_timer(),
-          }
-        : {
+            label: m.student_runner_prepare_step_timer_label(),
+          })
+        : buildStudentRunnerPrepareStepView({
+            description: m.student_runner_prepare_step_no_timer(),
             id: 'no-timer',
-            label: m.student_runner_prepare_step_no_timer(),
-          },
-      {
+            label: m.student_runner_prepare_step_no_timer_label(),
+          }),
+      buildStudentRunnerPrepareStepView({
+        description: m.student_runner_prepare_step_submit(),
         id: 'submit',
-        label: m.student_runner_prepare_step_submit(),
-      },
+        label: m.student_runner_prepare_step_submit_label(),
+      }),
     ],
     title: m.student_runner_prepare_title(),
+  };
+}
+
+function buildStudentRunnerPrepareStepView({
+  description,
+  id,
+  label,
+}: {
+  description: string;
+  id: StudentRunnerPrepareStepId;
+  label: string;
+}): StudentRunnerPrepareStepView {
+  return {
+    ariaLabel: m.student_runner_prepare_step_aria({
+      description,
+      label,
+    }),
+    description,
+    id,
+    label,
   };
 }
 
