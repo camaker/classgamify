@@ -31,7 +31,7 @@ import {
   IconX,
 } from '@tabler/icons-react';
 import { Link } from '@tanstack/react-router';
-import { useMemo, type ReactNode } from 'react';
+import { useId, useMemo, type ReactNode } from 'react';
 
 type ActivitySourceMaterialsFieldProps = {
   attachedSummaryActionSlot?: ReactNode;
@@ -288,8 +288,12 @@ function MaterialReferenceRow({
   itemView: ActivitySourceMaterialPickerItemView;
   selected?: boolean;
 }) {
+  const descriptionId = useId();
+
   return (
-    <div
+    <fieldset
+      aria-describedby={descriptionId}
+      aria-label={itemView.ariaLabel}
       className={cn(
         'flex min-w-0 items-center justify-between gap-3 rounded-lg border bg-background p-3',
         selected && 'border-primary/30 bg-primary/5'
@@ -304,10 +308,13 @@ function MaterialReferenceRow({
           <span className="block truncate text-muted-foreground text-xs">
             {itemView.meta}
           </span>
+          <span id={descriptionId} className="sr-only">
+            {itemView.description}
+          </span>
         </span>
       </div>
       <div className="shrink-0">{action}</div>
-    </div>
+    </fieldset>
   );
 }
 
@@ -318,17 +325,25 @@ function ActivitySourceMaterialRemoveButton({
   itemView: ActivitySourceMaterialPickerItemView;
   onClick: () => void;
 }) {
+  const descriptionId = useId();
+
   return (
-    <Button
-      type="button"
-      variant="ghost"
-      size="sm"
-      aria-label={itemView.removeLabel}
-      onClick={onClick}
-    >
-      <IconX className="size-4" />
-      {m.activity_form_source_materials_remove()}
-    </Button>
+    <>
+      <Button
+        type="button"
+        variant="ghost"
+        size="sm"
+        aria-describedby={descriptionId}
+        aria-label={itemView.removeLabel}
+        onClick={onClick}
+      >
+        <IconX className="size-4" />
+        {m.activity_form_source_materials_remove()}
+      </Button>
+      <span id={descriptionId} className="sr-only">
+        {itemView.removeDescription}
+      </span>
+    </>
   );
 }
 
@@ -339,19 +354,27 @@ function ActivitySourceMaterialAttachButton({
   itemView: ActivitySourceMaterialPickerItemView;
   onClick: () => void;
 }) {
+  const descriptionId = useId();
+
   return (
-    <Button
-      type="button"
-      variant={itemView.selected ? 'secondary' : 'outline'}
-      size="sm"
-      className={cn(!itemView.selected && 'bg-background')}
-      disabled={itemView.disabled}
-      aria-label={itemView.attachLabel}
-      onClick={onClick}
-    >
-      <IconPlus className="size-4" />
-      {itemView.actionLabel}
-    </Button>
+    <>
+      <Button
+        type="button"
+        variant={itemView.selected ? 'secondary' : 'outline'}
+        size="sm"
+        className={cn(!itemView.selected && 'bg-background')}
+        disabled={itemView.disabled}
+        aria-describedby={descriptionId}
+        aria-label={itemView.attachLabel}
+        onClick={onClick}
+      >
+        <IconPlus className="size-4" />
+        {itemView.actionLabel}
+      </Button>
+      <span id={descriptionId} className="sr-only">
+        {itemView.attachDescription}
+      </span>
+    </>
   );
 }
 

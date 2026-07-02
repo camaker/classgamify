@@ -159,10 +159,14 @@ type ActivitySourceMaterialPickerAvailableFile = {
 
 export type ActivitySourceMaterialPickerItemView = {
   actionLabel: string;
+  ariaLabel: string;
+  attachDescription: string;
   attachLabel: string;
+  description: string;
   disabled: boolean;
   material: ActivityMaterialReference;
   meta: string;
+  removeDescription: string;
   removeLabel: string;
   selected: boolean;
 };
@@ -463,25 +467,67 @@ function buildActivitySourceMaterialPickerItemView({
   material: ActivityMaterialReference;
   selected: boolean;
 }): ActivitySourceMaterialPickerItemView {
+  const meta = formatActivitySourceMaterialReferenceMeta(material, [
+    typeof material.size === 'number' ? formatBytes(material.size) : undefined,
+  ]);
+  const description = m.activity_form_source_materials_item_description();
+
   return {
     actionLabel: selected
       ? m.activity_form_source_materials_attached()
       : m.activity_form_source_materials_attach(),
+    ariaLabel: m.activity_form_source_materials_item_aria_label({
+      description,
+      meta,
+      name: material.originalName,
+    }),
+    attachDescription: getActivitySourceMaterialAttachDescription({
+      isAtLimit,
+      material,
+      selected,
+    }),
     attachLabel: m.activity_form_source_materials_attach_label({
       name: material.originalName,
     }),
+    description,
     disabled: selected || isAtLimit,
     material,
-    meta: formatActivitySourceMaterialReferenceMeta(material, [
-      typeof material.size === 'number'
-        ? formatBytes(material.size)
-        : undefined,
-    ]),
+    meta,
+    removeDescription: m.activity_form_source_materials_remove_description({
+      name: material.originalName,
+    }),
     removeLabel: m.activity_form_source_materials_remove_label({
       name: material.originalName,
     }),
     selected,
   };
+}
+
+function getActivitySourceMaterialAttachDescription({
+  isAtLimit,
+  material,
+  selected,
+}: {
+  isAtLimit: boolean;
+  material: ActivityMaterialReference;
+  selected: boolean;
+}) {
+  if (selected) {
+    return m.activity_form_source_materials_attached_description({
+      name: material.originalName,
+    });
+  }
+
+  if (isAtLimit) {
+    return m.activity_form_source_materials_attach_limit_description({
+      count: ACTIVITY_SOURCE_MATERIALS_MAX_COUNT,
+      name: material.originalName,
+    });
+  }
+
+  return m.activity_form_source_materials_attach_description({
+    name: material.originalName,
+  });
 }
 
 function resolveActivitySourceMaterialPickerStatus({

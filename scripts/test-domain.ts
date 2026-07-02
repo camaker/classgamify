@@ -4040,6 +4040,21 @@ assert.match(
   /function MaterialReferenceRow[\s\S]*itemView\.material\.originalName[\s\S]*itemView\.meta/,
   'Activity source-material picker rows should render prepared material names and metadata from item views.'
 );
+assert.match(
+  activitySourceMaterialsFieldSource,
+  /function MaterialReferenceRow[\s\S]*const descriptionId = useId\(\)[\s\S]*<fieldset[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*aria-label=\{itemView\.ariaLabel\}[\s\S]*id=\{descriptionId\}[\s\S]*itemView\.description/,
+  'Activity source-material picker rows should associate prepared item descriptions with the semantic row group.'
+);
+assert.match(
+  activitySourceMaterialsFieldSource,
+  /function ActivitySourceMaterialRemoveButton[\s\S]*const descriptionId = useId\(\)[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*aria-label=\{itemView\.removeLabel\}[\s\S]*itemView\.removeDescription/,
+  'Activity source-material remove buttons should associate prepared remove descriptions.'
+);
+assert.match(
+  activitySourceMaterialsFieldSource,
+  /function ActivitySourceMaterialAttachButton[\s\S]*const descriptionId = useId\(\)[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*aria-label=\{itemView\.attachLabel\}[\s\S]*itemView\.attachDescription/,
+  'Activity source-material attach buttons should associate prepared attach, attached, or limit descriptions.'
+);
 assert.doesNotMatch(
   activitySourceMaterialsFieldSource,
   /buildActivitySourceMaterialSummaryView|buildActivityMaterialReferenceFromUserFile|formatActivitySourceMaterialReferenceMeta|formatBytes|selectedIds|isAtLimit|availableOptions|join\(' \/ '\)/,
@@ -8496,6 +8511,11 @@ const activityMaterialSummarySource = readFileSync(
   'utf8'
 );
 assert.match(
+  activityMaterialSummarySource,
+  /export type ActivitySourceMaterialPickerItemView = \{[\s\S]*ariaLabel: string;[\s\S]*attachDescription: string;[\s\S]*description: string;[\s\S]*removeDescription: string;/,
+  'Activity source-material picker item views should expose prepared accessible row and action descriptions.'
+);
+assert.match(
   activityMaterialReferencesSource,
   /ACTIVITY_SOURCE_MATERIAL_REFERENCE_LIMITS[\s\S]*fileIdMaxLength: 120[\s\S]*originalNameMaxLength: 200/,
   'Activity source material references should expose named text limits.'
@@ -8634,13 +8654,28 @@ assert.match(
 );
 assert.match(
   activityMaterialSummarySource,
-  /buildActivitySourceMaterialPickerItemView[\s\S]*actionLabel:[\s\S]*activity_form_source_materials_attached[\s\S]*activity_form_source_materials_attach[\s\S]*attachLabel:[\s\S]*activity_form_source_materials_attach_label[\s\S]*removeLabel:[\s\S]*activity_form_source_materials_remove_label/,
-  'Activity source-material picker item views should prepare localized attach/remove action labels.'
+  /buildActivitySourceMaterialPickerItemView[\s\S]*const description = m\.activity_form_source_materials_item_description\(\)/,
+  'Activity source-material picker item descriptions should come from localized activity-domain copy.'
 );
 assert.match(
   activityMaterialSummarySource,
-  /buildActivitySourceMaterialPickerItemView[\s\S]*disabled: selected \|\| isAtLimit[\s\S]*formatActivitySourceMaterialReferenceMeta[\s\S]*formatBytes/,
-  'Activity source-material picker item views should prepare disabled state and visible metadata.'
+  /buildActivitySourceMaterialPickerItemView[\s\S]*actionLabel:[\s\S]*activity_form_source_materials_attached[\s\S]*activity_form_source_materials_attach[\s\S]*ariaLabel:[\s\S]*activity_form_source_materials_item_aria_label[\s\S]*attachDescription:[\s\S]*getActivitySourceMaterialAttachDescription[\s\S]*attachLabel:[\s\S]*activity_form_source_materials_attach_label[\s\S]*description,[\s\S]*removeDescription:[\s\S]*activity_form_source_materials_remove_description[\s\S]*removeLabel:[\s\S]*activity_form_source_materials_remove_label/,
+  'Activity source-material picker item views should prepare localized attach/remove action labels and accessible descriptions.'
+);
+assert.match(
+  activityMaterialSummarySource,
+  /function getActivitySourceMaterialAttachDescription[\s\S]*activity_form_source_materials_attached_description[\s\S]*activity_form_source_materials_attach_limit_description[\s\S]*activity_form_source_materials_attach_description/,
+  'Activity source-material picker attach descriptions should cover selected, limit, and attachable states.'
+);
+assert.match(
+  activityMaterialSummarySource,
+  /buildActivitySourceMaterialPickerItemView[\s\S]*const meta = formatActivitySourceMaterialReferenceMeta[\s\S]*formatBytes/,
+  'Activity source-material picker item views should prepare visible metadata from source-material references and file size.'
+);
+assert.match(
+  activityMaterialSummarySource,
+  /buildActivitySourceMaterialPickerItemView[\s\S]*disabled: selected \|\| isAtLimit[\s\S]*meta,/,
+  'Activity source-material picker item views should expose prepared disabled state and metadata.'
 );
 assert.match(
   activityMaterialSummarySource,
@@ -8744,13 +8779,26 @@ assert.equal(
   'Audio, 1.5 KB, audio/mpeg'
 );
 assert.equal(
+  sourceMaterialPickerView.attachedItems[0]?.description,
+  'Private teacher source material for activity editing and future AI extraction; student assignments do not expose file references or storage keys.'
+);
+assert.equal(
+  sourceMaterialPickerView.attachedItems[0]?.ariaLabel,
+  '三年级听力.mp3: Audio, 1.5 KB, audio/mpeg. Private teacher source material for activity editing and future AI extraction; student assignments do not expose file references or storage keys.'
+);
+assert.equal(
   sourceMaterialPickerView.attachedItems[0]?.removeLabel,
   'Remove 三年级听力.mp3'
+);
+assert.equal(
+  sourceMaterialPickerView.attachedItems[0]?.removeDescription,
+  'Remove 三年级听力.mp3 from this activity draft without deleting the uploaded classroom file.'
 );
 assert.equal(sourceMaterialPickerView.availableItems.length, 3);
 assert.deepEqual(
   sourceMaterialPickerView.availableItems.map((item) => ({
     actionLabel: item.actionLabel,
+    attachDescription: item.attachDescription,
     disabled: item.disabled,
     fileId: item.material.fileId,
     meta: item.meta,
@@ -8759,6 +8807,8 @@ assert.deepEqual(
   [
     {
       actionLabel: 'Attached',
+      attachDescription:
+        '三年级听力.mp3 is already attached. It remains private teacher material and is hidden from student assignments.',
       disabled: true,
       fileId: 'audio-1',
       meta: 'Audio, 1.5 KB, audio/mpeg',
@@ -8766,6 +8816,8 @@ assert.deepEqual(
     },
     {
       actionLabel: 'Attach',
+      attachDescription:
+        'Attach Worksheet Scan.pdf as safe source-material provenance for this activity draft.',
       disabled: false,
       fileId: 'worksheet-1',
       meta: 'Worksheet document, 2.0 KB, application/pdf',
@@ -8773,6 +8825,8 @@ assert.deepEqual(
     },
     {
       actionLabel: 'Attach',
+      attachDescription:
+        'Attach Words.csv as safe source-material provenance for this activity draft.',
       disabled: false,
       fileId: 'spreadsheet-1',
       meta: 'Spreadsheet, 512 B, text/csv',
@@ -8783,6 +8837,10 @@ assert.deepEqual(
 assert.equal(
   sourceMaterialPickerView.availableItems[1]?.attachLabel,
   'Attach Worksheet Scan.pdf'
+);
+assert.equal(
+  sourceMaterialPickerView.availableItems[1]?.ariaLabel,
+  'Worksheet Scan.pdf: Worksheet document, 2.0 KB, application/pdf. Private teacher source material for activity editing and future AI extraction; student assignments do not expose file references or storage keys.'
 );
 const normalizedSelectedSourceMaterialPickerView =
   buildActivitySourceMaterialPickerView({
@@ -8813,6 +8871,34 @@ assert.equal(
   normalizedSelectedSourceMaterialPickerView.availableItems[0]?.disabled,
   true
 );
+overwriteGetLocale(() => 'zh');
+try {
+  const zhSourceMaterialPickerView = buildActivitySourceMaterialPickerView({
+    availableFiles: [
+      {
+        contentType: 'application/pdf',
+        id: 'worksheet-zh',
+        originalName: '练习纸.pdf',
+        size: 2048,
+      },
+    ],
+    canLoadFiles: true,
+    isError: false,
+    isLoading: false,
+    selectedMaterials: [],
+  });
+
+  assert.equal(
+    zhSourceMaterialPickerView.availableItems[0]?.attachDescription,
+    '把练习纸.pdf作为安全来源素材记录附加到这个活动草稿。'
+  );
+  assert.match(
+    zhSourceMaterialPickerView.availableItems[0]?.ariaLabel ?? '',
+    /练习纸\.pdf：练习纸文档，2\.0 KB，application\/pdf。用于活动编辑和后续 AI 提取的老师私有来源素材；学生作业不会暴露文件引用或存储 key。/
+  );
+} finally {
+  overwriteGetLocale(() => 'en');
+}
 assert.equal(
   buildActivitySourceMaterialPickerView({
     availableFiles: [],
@@ -8853,25 +8939,27 @@ assert.equal(
   }).statusMessage,
   'No uploaded classroom files are available yet.'
 );
+const overflowSourceMaterialPickerView = buildActivitySourceMaterialPickerView({
+  availableFiles: [
+    {
+      contentType: 'text/csv',
+      id: 'overflow',
+      originalName: 'Overflow.csv',
+    },
+  ],
+  canLoadFiles: true,
+  isError: false,
+  isLoading: false,
+  selectedMaterials: Array.from({ length: 12 }).map((_, index) => ({
+    fileId: `material-${index}`,
+    kind: 'file',
+    originalName: `Material ${index}`,
+  })),
+});
+assert.equal(overflowSourceMaterialPickerView.availableItems[0]?.disabled, true);
 assert.equal(
-  buildActivitySourceMaterialPickerView({
-    availableFiles: [
-      {
-        contentType: 'text/csv',
-        id: 'overflow',
-        originalName: 'Overflow.csv',
-      },
-    ],
-    canLoadFiles: true,
-    isError: false,
-    isLoading: false,
-    selectedMaterials: Array.from({ length: 12 }).map((_, index) => ({
-      fileId: `material-${index}`,
-      kind: 'file',
-      originalName: `Material ${index}`,
-    })),
-  }).availableItems[0]?.disabled,
-  true
+  overflowSourceMaterialPickerView.availableItems[0]?.attachDescription,
+  'This activity already has 12 source materials. Remove one before attaching Overflow.csv.'
 );
 assert.deepEqual(
   addActivitySourceMaterialPickerItem({
