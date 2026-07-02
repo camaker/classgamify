@@ -219,6 +219,9 @@ function StudentRunnerResultPanel({
 }) {
   if (!view.show) return null;
 
+  const startAnotherAttemptDescriptionId =
+    'student-runner-start-another-attempt-description';
+
   return (
     <section
       aria-label={view.ariaLabel}
@@ -251,16 +254,23 @@ function StudentRunnerResultPanel({
       <StudentRunnerFeedbackScope view={view.feedbackScopeView} />
       <StudentRunnerResultNextSteps view={view.nextStepsView} />
       {view.showStartAnotherAttempt ? (
-        <Button
-          type="button"
-          size="sm"
-          variant="outline"
-          className="mt-3 w-full justify-start bg-background"
-          onClick={onStartAnotherAttempt}
-        >
-          <IconRepeat className="size-4" />
-          {view.startAnotherAttemptLabel}
-        </Button>
+        <>
+          <Button
+            type="button"
+            size="sm"
+            variant="outline"
+            aria-describedby={startAnotherAttemptDescriptionId}
+            aria-label={view.startAnotherAttemptAriaLabel}
+            className="mt-3 w-full justify-start bg-background"
+            onClick={onStartAnotherAttempt}
+          >
+            <IconRepeat className="size-4" />
+            {view.startAnotherAttemptLabel}
+          </Button>
+          <p id={startAnotherAttemptDescriptionId} className="sr-only">
+            {view.startAnotherAttemptDescription}
+          </p>
+        </>
       ) : null}
     </section>
   );

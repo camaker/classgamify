@@ -2895,6 +2895,8 @@
   "student_runner_sequential_default_item_label": "Item",
   "student_runner_sequential_item_label": "{label} {index}",
   "student_runner_start_another_attempt": "Start another attempt",
+  "student_runner_start_another_attempt_aria_label": "Start another attempt with the same student identity",
+  "student_runner_start_another_attempt_description": "Current answers will be cleared for the next try, while the saved student name or anonymous browser label stays grouped with this assignment link.",
   "student_runner_status_bar_label": "Attempt status",
   "student_runner_student_name_description": "Type the name your teacher should see in results.",
   "student_runner_identity_region_label": "Student identity",

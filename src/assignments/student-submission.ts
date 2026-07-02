@@ -202,6 +202,8 @@ type StudentRunnerCopy = {
   reviewSummaryVisibleDescription: string;
   seoDescription: string;
   seoTitlePrefix: string;
+  startAnotherAttemptAriaLabel: string;
+  startAnotherAttemptDescription: string;
   startAnotherAttemptLabel: string;
   missingStudentNameMessage: string;
   studentNameDescription: string;
@@ -465,6 +467,12 @@ const STUDENT_RUNNER_COPY = {
   },
   get seoTitlePrefix() {
     return m.student_runner_seo_title_prefix();
+  },
+  get startAnotherAttemptAriaLabel() {
+    return m.student_runner_start_another_attempt_aria_label();
+  },
+  get startAnotherAttemptDescription() {
+    return m.student_runner_start_another_attempt_description();
   },
   get startAnotherAttemptLabel() {
     return m.student_runner_start_another_attempt();

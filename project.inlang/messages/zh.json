@@ -2895,6 +2895,8 @@
   "student_runner_sequential_default_item_label": "题目",
   "student_runner_sequential_item_label": "{label} {index}",
   "student_runner_start_another_attempt": "再次作答",
+  "student_runner_start_another_attempt_aria_label": "使用相同学生身份再次作答",
+  "student_runner_start_another_attempt_description": "会清空当前答案并开始下一次作答，同时保留已保存的学生姓名或匿名浏览器标签，方便老师按同一身份汇总结果。",
   "student_runner_status_bar_label": "作答状态",
   "student_runner_student_name_description": "输入老师在结果里需要看到的姓名。",
   "student_runner_identity_region_label": "学生身份",

@@ -260,6 +260,8 @@ export type StudentRunnerResultPanelView =
       scoreLabel: string;
       show: true;
       showStartAnotherAttempt: boolean;
+      startAnotherAttemptAriaLabel: string;
+      startAnotherAttemptDescription: string;
       startAnotherAttemptLabel: string;
       statusLabel: string;
     };
@@ -1179,6 +1181,8 @@ function buildStudentRunnerResultPanelView({
     scoreLabel: attemptResultDisplay.scoreLabel,
     show: true,
     showStartAnotherAttempt,
+    startAnotherAttemptAriaLabel: runnerCopy.startAnotherAttemptAriaLabel,
+    startAnotherAttemptDescription: runnerCopy.startAnotherAttemptDescription,
     startAnotherAttemptLabel: runnerCopy.startAnotherAttemptLabel,
     statusLabel: runnerCopy.resultSubmittedLabel,
   };

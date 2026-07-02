@@ -11017,6 +11017,11 @@ assert.match(
 );
 assert.match(
   studentRunnerSubmissionSource,
+  /startAnotherAttemptAriaLabel: string;[\s\S]*startAnotherAttemptDescription: string;[\s\S]*student_runner_start_another_attempt_aria_label[\s\S]*student_runner_start_another_attempt_description/,
+  'Student start-another-attempt action copy should include localized accessible label and consequence description.'
+);
+assert.match(
+  studentRunnerSubmissionSource,
   /export type StudentAttemptResultNextStepId =[\s\S]*'done'[\s\S]*'feedback'[\s\S]*'review-score'[\s\S]*'start-another'[\s\S]*'teacher-review'[\s\S]*export type StudentAttemptResultNextStepView = \{[\s\S]*id: StudentAttemptResultNextStepId;[\s\S]*label: string;[\s\S]*export type StudentAttemptResultNextStepsView = \{[\s\S]*ariaLabel: string;[\s\S]*stepViews: StudentAttemptResultNextStepView\[\];[\s\S]*title: string;/,
   'Student result next steps should expose stable step ids and structured labels.'
 );
@@ -11519,6 +11524,11 @@ assert.match(
 );
 assert.match(
   studentRunnerStateSource,
+  /StudentRunnerResultPanelView =[\s\S]*startAnotherAttemptAriaLabel: string;[\s\S]*startAnotherAttemptDescription: string;[\s\S]*buildStudentRunnerResultPanelView[\s\S]*startAnotherAttemptAriaLabel: runnerCopy\.startAnotherAttemptAriaLabel[\s\S]*startAnotherAttemptDescription: runnerCopy\.startAnotherAttemptDescription/,
+  'Student runner result panel should expose a prepared accessible retry action contract.'
+);
+assert.match(
+  studentRunnerStateSource,
   /buildStudentRunnerResultPanelView\(\{[\s\S]*attemptResultDisplay,[\s\S]*reviewSummary: result\?\.reviewSummary,[\s\S]*showStartAnotherAttempt[\s\S]*reviewSummaryView: buildStudentAttemptReviewSummaryView\(\{[\s\S]*summary: reviewSummary/,
   'Student runner result panel should prepare post-submit review summary views from the submitted result summary.'
 );
@@ -11853,6 +11863,11 @@ assert.match(
   studentRunnerAttemptShellSource,
   /function StudentRunnerResultPanel[\s\S]*aria-label=\{view\.ariaLabel\}[\s\S]*<output[\s\S]*aria-label=\{view\.scoreAriaLabel\}/,
   'Student runner result panel should use domain-prepared result and score labels.'
+);
+assert.match(
+  studentRunnerAttemptShellSource,
+  /startAnotherAttemptDescriptionId[\s\S]*aria-describedby=\{startAnotherAttemptDescriptionId\}[\s\S]*aria-label=\{view\.startAnotherAttemptAriaLabel\}[\s\S]*view\.startAnotherAttemptLabel[\s\S]*id=\{startAnotherAttemptDescriptionId\}[\s\S]*view\.startAnotherAttemptDescription/,
+  'Student runner start-another-attempt button should associate its prepared accessible label and reset consequence description.'
 );
 assert.match(
   studentRunnerAttemptShellSource,
@@ -13064,6 +13079,10 @@ assert.deepEqual(
       studentRunnerCopy.reviewSummaryVisibleDescription,
     seoDescription: studentRunnerCopy.seoDescription,
     seoTitlePrefix: studentRunnerCopy.seoTitlePrefix,
+    startAnotherAttemptAriaLabel:
+      studentRunnerCopy.startAnotherAttemptAriaLabel,
+    startAnotherAttemptDescription:
+      studentRunnerCopy.startAnotherAttemptDescription,
     startAnotherAttemptLabel: studentRunnerCopy.startAnotherAttemptLabel,
     missingStudentNameMessage: studentRunnerCopy.missingStudentNameMessage,
     studentNameDescription: studentRunnerCopy.studentNameDescription,
@@ -13135,6 +13154,10 @@ assert.deepEqual(
   seoDescription:
     'Open a public student activity runner from a teacher assignment link.',
   seoTitlePrefix: 'Student activity',
+  startAnotherAttemptAriaLabel:
+    'Start another attempt with the same student identity',
+  startAnotherAttemptDescription:
+    'Current answers will be cleared for the next try, while the saved student name or anonymous browser label stays grouped with this assignment link.',
   startAnotherAttemptLabel: 'Start another attempt',
   missingStudentNameMessage: 'Type your name before submitting.',
   studentNameDescription: 'Type the name your teacher should see in results.',
@@ -22933,6 +22956,10 @@ assert.deepEqual(
       scoreLabel: '1/2',
       show: true,
       showStartAnotherAttempt: true,
+      startAnotherAttemptAriaLabel:
+        'Start another attempt with the same student identity',
+      startAnotherAttemptDescription:
+        'Current answers will be cleared for the next try, while the saved student name or anonymous browser label stays grouped with this assignment link.',
       startAnotherAttemptLabel: 'Start another attempt',
       statusLabel: 'Score submitted',
     },
