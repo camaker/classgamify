@@ -1306,6 +1306,7 @@
   "assignment_result_review_item_answer": "答案",
   "assignment_result_review_scope_attempts_label": "作答",
   "assignment_result_review_scope_description": "表格、答案卡片和复制到课堂材料的内容都会跟随这个当前复盘范围。",
+  "assignment_result_review_scope_item_aria_label": "{label}：{value}。状态：{status}。{description}",
   "assignment_result_review_scope_items_label": "题目",
   "assignment_result_review_scope_review_label": "答案复盘",
   "assignment_result_review_scope_search_all": "全部学生",

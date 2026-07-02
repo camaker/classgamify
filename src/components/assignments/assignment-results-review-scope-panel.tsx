@@ -3,6 +3,7 @@ import type {
   AssignmentResultReviewScopeSummaryItemView,
   AssignmentResultReviewScopeView,
 } from '@/assignments/result-view';
+import { AssignmentResultControlStatusBadge } from '@/components/assignments/assignment-result-control-status-badge';
 
 type AssignmentResultsReviewScopePanelProps = {
   view: AssignmentResultReviewScopeView;
@@ -65,23 +66,27 @@ function AssignmentResultsReviewScopeItem({
   const labelId = `assignment-result-review-scope-${itemView.id}-label`;
   const valueId = `assignment-result-review-scope-${itemView.id}-value`;
   const descriptionId = `assignment-result-review-scope-${itemView.id}-description`;
+  const statusDescriptionId = `assignment-result-review-scope-${itemView.id}-status-description`;
 
   return (
     <article
-      className="rounded-md border bg-background p-3"
-      aria-describedby={descriptionId}
+      className="grid gap-2 rounded-md border bg-background p-3"
+      aria-describedby={`${descriptionId} ${statusDescriptionId}`}
       aria-labelledby={`${labelId} ${valueId}`}
     >
-      <p id={labelId} className="text-muted-foreground text-xs">
-        {itemView.label}
+      <div className="flex min-w-0 items-start justify-between gap-2">
+        <p id={labelId} className="min-w-0 text-muted-foreground text-xs">
+          {itemView.label}
+        </p>
+        <AssignmentResultControlStatusBadge
+          descriptionId={statusDescriptionId}
+          view={itemView.statusView}
+        />
+      </div>
+      <p id={valueId} className="break-words font-semibold text-base">
+        <output aria-label={itemView.ariaLabel}>{itemView.value}</output>
       </p>
-      <p id={valueId} className="mt-1 break-words font-semibold text-base">
-        {itemView.value}
-      </p>
-      <p
-        id={descriptionId}
-        className="mt-1 text-muted-foreground text-xs leading-5"
-      >
+      <p id={descriptionId} className="text-muted-foreground text-xs leading-5">
         {itemView.description}
       </p>
     </article>

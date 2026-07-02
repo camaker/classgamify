@@ -5910,13 +5910,18 @@ assert.match(
 );
 assert.match(
   assignmentResultViewSource,
-  /export type AssignmentResultReviewScopeItemView = \{[\s\S]*description: string;[\s\S]*id: AssignmentResultReviewScopeItemId;[\s\S]*label: string;[\s\S]*value: string;[\s\S]*export type AssignmentResultReviewScopeSummaryItemView = \{[\s\S]*id: AssignmentResultReviewScopeSummaryItemId;[\s\S]*label: string;[\s\S]*value: string;[\s\S]*export type AssignmentResultReviewScopeView = \{[\s\S]*description: string;[\s\S]*itemViews: AssignmentResultReviewScopeItemView\[\];[\s\S]*summaryItems: AssignmentResultReviewScopeSummaryItemView\[\];[\s\S]*summaryLabel: string;[\s\S]*title: string;/,
+  /export type AssignmentResultReviewScopeItemView = \{[\s\S]*ariaLabel: string;[\s\S]*description: string;[\s\S]*id: AssignmentResultReviewScopeItemId;[\s\S]*label: string;[\s\S]*statusView: AssignmentResultControlStatusView;[\s\S]*value: string;[\s\S]*export type AssignmentResultReviewScopeSummaryItemView = \{[\s\S]*ariaLabel: string;[\s\S]*description: string;[\s\S]*id: AssignmentResultReviewScopeSummaryItemId;[\s\S]*label: string;[\s\S]*value: string;[\s\S]*export type AssignmentResultReviewScopeView = \{[\s\S]*description: string;[\s\S]*itemViews: AssignmentResultReviewScopeItemView\[\];[\s\S]*summaryItems: AssignmentResultReviewScopeSummaryItemView\[\];[\s\S]*summaryLabel: string;[\s\S]*title: string;/,
   'Assignment result view domain should expose explicit current review-scope panel contracts.'
 );
 assert.match(
   assignmentResultViewSource,
-  /export function buildAssignmentResultReviewScopeView\(\{[\s\S]*controlViews,[\s\S]*summary,[\s\S]*\}\)[\s\S]*controlViews\.studentSearch\.value[\s\S]*controlViews\.studentSearch\.selectedSortOption[\s\S]*controlViews\.itemPerformanceSort\.selectedSortOption[\s\S]*controlViews\.attemptReviewFilter\.selectedFilterOption[\s\S]*buildAssignmentResultReviewScopeSummaryItems\(summary\)/,
-  'Assignment result review scope should derive student search, student sort, item sort, review filter, and matched counts from prepared control views and shared scope summary.'
+  /export function buildAssignmentResultReviewScopeView\(\{[\s\S]*controlViews,[\s\S]*summary,[\s\S]*\}\)[\s\S]*buildAssignmentResultReviewScopeItemView\(\{[\s\S]*statusView: controlViews\.studentSearch\.searchStatusView[\s\S]*statusView: controlViews\.studentSearch\.sortStatusView[\s\S]*statusView: controlViews\.itemPerformanceSort\.statusView[\s\S]*statusView: controlViews\.attemptReviewFilter\.statusView[\s\S]*buildAssignmentResultReviewScopeSummaryItems\(summary\)/,
+  'Assignment result review scope should derive student search, student sort, item sort, review filter status, and matched counts from prepared control views and shared scope summary.'
+);
+assert.match(
+  assignmentResultViewSource,
+  /function buildAssignmentResultReviewScopeItemView\([\s\S]*statusView: AssignmentResultControlStatusView[\s\S]*ariaLabel: m\.assignment_result_review_scope_item_aria_label\(\{[\s\S]*status: statusView\.value[\s\S]*statusView,/,
+  'Assignment result review-scope item builder should attach localized aria text and prepared control status to each scope item.'
 );
 assert.match(
   assignmentResultViewSource,
@@ -5930,8 +5935,8 @@ assert.match(
 );
 assert.match(
   assignmentResultsReviewScopePanelSource,
-  /const labelId = `assignment-result-review-scope-\$\{itemView\.id\}-label`[\s\S]*const valueId = `assignment-result-review-scope-\$\{itemView\.id\}-value`[\s\S]*const descriptionId = `assignment-result-review-scope-\$\{itemView\.id\}-description`[\s\S]*<article[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*aria-labelledby=\{`\$\{labelId\} \$\{valueId\}`\}[\s\S]*id=\{labelId\}[\s\S]*id=\{valueId\}[\s\S]*id=\{descriptionId\}/,
-  'Assignment result review-scope items should associate each prepared scope value with its prepared explanation.'
+  /const labelId = `assignment-result-review-scope-\$\{itemView\.id\}-label`[\s\S]*const valueId = `assignment-result-review-scope-\$\{itemView\.id\}-value`[\s\S]*const descriptionId = `assignment-result-review-scope-\$\{itemView\.id\}-description`[\s\S]*const statusDescriptionId = `assignment-result-review-scope-\$\{itemView\.id\}-status-description`[\s\S]*<article[\s\S]*aria-describedby=\{`\$\{descriptionId\} \$\{statusDescriptionId\}`\}[\s\S]*aria-labelledby=\{`\$\{labelId\} \$\{valueId\}`\}[\s\S]*AssignmentResultControlStatusBadge[\s\S]*descriptionId=\{statusDescriptionId\}[\s\S]*view=\{itemView\.statusView\}[\s\S]*id=\{valueId\}[\s\S]*aria-label=\{itemView\.ariaLabel\}[\s\S]*id=\{descriptionId\}/,
+  'Assignment result review-scope items should associate each prepared scope value with its explanation, control status, and aria label.'
 );
 assert.match(
   assignmentResultsReviewScopePanelSource,
@@ -42861,29 +42866,69 @@ assert.deepEqual(
       'Tables, answer cards, and copied classroom artifacts follow this current review scope.',
     itemViews: [
       {
+        ariaLabel:
+          'Student search: Alice. Status: Adjusted. Which students and attempts are included in the visible result tables.',
         description:
           'Which students and attempts are included in the visible result tables.',
         id: 'student-search',
         label: 'Student search',
+        statusView: {
+          ariaLabel:
+            'Scope status: Adjusted. Find student is adjusted to Alice.',
+          description: 'Find student is adjusted to Alice.',
+          label: 'Scope status',
+          tone: 'custom',
+          value: 'Adjusted',
+        },
         value: 'Alice',
       },
       {
+        ariaLabel:
+          'Student sort: Student name. Status: Adjusted. Use alphabetical order for grading or roster checks.',
         description: 'Use alphabetical order for grading or roster checks.',
         id: 'student-sort',
         label: 'Student sort',
+        statusView: {
+          ariaLabel:
+            'Scope status: Adjusted. Sort students is adjusted to Student name.',
+          description: 'Sort students is adjusted to Student name.',
+          label: 'Scope status',
+          tone: 'custom',
+          value: 'Adjusted',
+        },
         value: 'Student name',
       },
       {
+        ariaLabel:
+          'Sort items: Lowest accuracy. Status: Adjusted. Surface the prompts with the lowest correct rate first.',
         description: 'Surface the prompts with the lowest correct rate first.',
         id: 'item-sort',
         label: 'Sort items',
+        statusView: {
+          ariaLabel:
+            'Scope status: Adjusted. Sort items is adjusted to Lowest accuracy.',
+          description: 'Sort items is adjusted to Lowest accuracy.',
+          label: 'Scope status',
+          tone: 'custom',
+          value: 'Adjusted',
+        },
         value: 'Lowest accuracy',
       },
       {
+        ariaLabel:
+          'Answer review: Needs review only. Status: Adjusted. Focus the answer review on submissions with at least one missed or unanswered item.',
         description:
           'Focus the answer review on submissions with at least one missed or unanswered item.',
         id: 'answer-review',
         label: 'Answer review',
+        statusView: {
+          ariaLabel:
+            'Scope status: Adjusted. Review view is adjusted to Needs review only.',
+          description: 'Review view is adjusted to Needs review only.',
+          label: 'Scope status',
+          tone: 'custom',
+          value: 'Adjusted',
+        },
         value: 'Needs review only',
       },
     ],
@@ -43175,6 +43220,9 @@ assert.deepEqual(
           itemView.label,
           itemView.value,
           itemView.description,
+          itemView.statusView.value,
+          itemView.statusView.tone,
+          itemView.ariaLabel,
         ]
       ),
       summaryItems: scoredResultsPageView.reviewScopeView.summaryItems.map(
@@ -43608,24 +43656,36 @@ assert.deepEqual(
           'Student search',
           'Alice',
           'Which students and attempts are included in the visible result tables.',
+          'Adjusted',
+          'custom',
+          'Student search: Alice. Status: Adjusted. Which students and attempts are included in the visible result tables.',
         ],
         [
           'student-sort',
           'Student sort',
           'Student name',
           'Use alphabetical order for grading or roster checks.',
+          'Adjusted',
+          'custom',
+          'Student sort: Student name. Status: Adjusted. Use alphabetical order for grading or roster checks.',
         ],
         [
           'item-sort',
           'Sort items',
           'Lowest accuracy',
           'Surface the prompts with the lowest correct rate first.',
+          'Adjusted',
+          'custom',
+          'Sort items: Lowest accuracy. Status: Adjusted. Surface the prompts with the lowest correct rate first.',
         ],
         [
           'answer-review',
           'Answer review',
           'Needs review only',
           'Focus the answer review on submissions with at least one missed or unanswered item.',
+          'Adjusted',
+          'custom',
+          'Answer review: Needs review only. Status: Adjusted. Focus the answer review on submissions with at least one missed or unanswered item.',
         ],
       ],
       summaryItems: [

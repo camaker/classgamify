@@ -1306,6 +1306,7 @@
   "assignment_result_review_item_answer": "answer",
   "assignment_result_review_scope_attempts_label": "Attempts",
   "assignment_result_review_scope_description": "Tables, answer cards, and copied classroom artifacts follow this current review scope.",
+  "assignment_result_review_scope_item_aria_label": "{label}: {value}. Status: {status}. {description}",
   "assignment_result_review_scope_items_label": "Items",
   "assignment_result_review_scope_review_label": "Answer review",
   "assignment_result_review_scope_search_all": "All students",

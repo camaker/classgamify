@@ -497,9 +497,11 @@ type AssignmentResultReviewScopeItemId =
   | 'student-sort';
 
 export type AssignmentResultReviewScopeItemView = {
+  ariaLabel: string;
   description: string;
   id: AssignmentResultReviewScopeItemId;
   label: string;
+  statusView: AssignmentResultControlStatusView;
   value: string;
 };
 
@@ -2530,41 +2532,75 @@ export function buildAssignmentResultReviewScopeView({
   controlViews: AssignmentResultControlViews;
   summary: AssignmentResultReviewScopeSummary;
 }): AssignmentResultReviewScopeView {
+  const itemViews = [
+    buildAssignmentResultReviewScopeItemView({
+      description: assignmentResultReviewScopeCopy.searchDescription,
+      id: 'student-search',
+      label: assignmentResultReviewScopeCopy.searchLabel,
+      statusView: controlViews.studentSearch.searchStatusView,
+      value:
+        controlViews.studentSearch.value ||
+        assignmentResultReviewScopeCopy.searchAllValue,
+    }),
+    buildAssignmentResultReviewScopeItemView({
+      description: controlViews.studentSearch.selectedSortOption.description,
+      id: 'student-sort',
+      label: assignmentResultReviewScopeCopy.studentSortLabel,
+      statusView: controlViews.studentSearch.sortStatusView,
+      value: controlViews.studentSearch.selectedSortOption.label,
+    }),
+    buildAssignmentResultReviewScopeItemView({
+      description:
+        controlViews.itemPerformanceSort.selectedSortOption.description,
+      id: 'item-sort',
+      label: assignmentResultReviewScopeCopy.itemSortLabel,
+      statusView: controlViews.itemPerformanceSort.statusView,
+      value: controlViews.itemPerformanceSort.selectedSortOption.label,
+    }),
+    buildAssignmentResultReviewScopeItemView({
+      description:
+        controlViews.attemptReviewFilter.selectedFilterOption.description,
+      id: 'answer-review',
+      label: assignmentResultReviewScopeCopy.answerReviewsLabel,
+      statusView: controlViews.attemptReviewFilter.statusView,
+      value: controlViews.attemptReviewFilter.selectedFilterOption.label,
+    }),
+  ];
+
   return {
     description: assignmentResultReviewScopeCopy.description,
-    itemViews: [
-      {
-        description: assignmentResultReviewScopeCopy.searchDescription,
-        id: 'student-search',
-        label: assignmentResultReviewScopeCopy.searchLabel,
-        value:
-          controlViews.studentSearch.value ||
-          assignmentResultReviewScopeCopy.searchAllValue,
-      },
-      {
-        description: controlViews.studentSearch.selectedSortOption.description,
-        id: 'student-sort',
-        label: assignmentResultReviewScopeCopy.studentSortLabel,
-        value: controlViews.studentSearch.selectedSortOption.label,
-      },
-      {
-        description:
-          controlViews.itemPerformanceSort.selectedSortOption.description,
-        id: 'item-sort',
-        label: assignmentResultReviewScopeCopy.itemSortLabel,
-        value: controlViews.itemPerformanceSort.selectedSortOption.label,
-      },
-      {
-        description:
-          controlViews.attemptReviewFilter.selectedFilterOption.description,
-        id: 'answer-review',
-        label: assignmentResultReviewScopeCopy.answerReviewsLabel,
-        value: controlViews.attemptReviewFilter.selectedFilterOption.label,
-      },
-    ],
+    itemViews,
     summaryItems: buildAssignmentResultReviewScopeSummaryItems(summary),
     summaryLabel: assignmentResultReviewScopeCopy.matchedRecordsLabel,
     title: assignmentResultReviewScopeCopy.title,
+  };
+}
+
+function buildAssignmentResultReviewScopeItemView({
+  description,
+  id,
+  label,
+  statusView,
+  value,
+}: {
+  description: string;
+  id: AssignmentResultReviewScopeItemId;
+  label: string;
+  statusView: AssignmentResultControlStatusView;
+  value: string;
+}): AssignmentResultReviewScopeItemView {
+  return {
+    ariaLabel: m.assignment_result_review_scope_item_aria_label({
+      description,
+      label,
+      status: statusView.value,
+      value,
+    }),
+    description,
+    id,
+    label,
+    statusView,
+    value,
   };
 }
 
