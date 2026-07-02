@@ -7,6 +7,7 @@ import type {
   AssignmentResultHeaderPrintAction,
   AssignmentResultHeaderShareAction,
 } from '@/assignments/result-view';
+import { Badge } from '@/components/ui/badge';
 import { CopyAssignmentShareLinkButton } from '@/components/assignments/copy-assignment-share-link-button';
 import { Button, buttonVariants } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
@@ -239,6 +240,7 @@ function AssignmentResultsHeaderResultActionButton({
         className="w-full justify-start bg-background"
         disabled={actionButton.disabled}
         onClick={onClick}
+        aria-label={actionButton.ariaLabel}
         aria-describedby={disabledReasonId}
       >
         <Icon aria-hidden="true" className="size-4" />
@@ -247,6 +249,61 @@ function AssignmentResultsHeaderResultActionButton({
       <p className="text-muted-foreground text-xs leading-snug">
         {actionButton.description}
       </p>
+      <dl className="grid gap-1 text-xs">
+        <AssignmentResultActionSummaryItem
+          ariaLabel={actionButton.scopeView.ariaLabel}
+          description={actionButton.scopeView.description}
+          id={`${actionButton.id}-scope`}
+          label={actionButton.scopeView.label}
+          value={actionButton.scopeView.value}
+        />
+        <AssignmentResultActionSummaryItem
+          ariaLabel={actionButton.statusView.ariaLabel}
+          description={actionButton.statusView.description}
+          id={`${actionButton.id}-status`}
+          label={actionButton.statusView.label}
+          tone={actionButton.statusView.tone}
+          value={actionButton.statusView.value}
+        />
+      </dl>
+    </div>
+  );
+}
+
+function AssignmentResultActionSummaryItem({
+  ariaLabel,
+  description,
+  id,
+  label,
+  tone,
+  value,
+}: {
+  ariaLabel: string;
+  description: string;
+  id: string;
+  label: string;
+  tone?: AssignmentResultActionButton['statusView']['tone'];
+  value: string;
+}) {
+  const descriptionId = `assignment-result-action-summary-${id}-description`;
+
+  return (
+    <div className="grid gap-1">
+      <dt className="sr-only">{label}</dt>
+      <dd aria-describedby={descriptionId} className="min-w-0">
+        <Badge
+          data-tone={tone}
+          variant={tone === 'blocked' ? 'destructive' : 'secondary'}
+          className="max-w-full rounded-md"
+        >
+          <output aria-label={ariaLabel} className="truncate">
+            {value}
+          </output>
+        </Badge>
+      </dd>
+      <dd id={descriptionId} className="sr-only">
+        {description}
+      </dd>
     </div>
   );
 }

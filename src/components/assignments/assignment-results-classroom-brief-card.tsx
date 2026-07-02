@@ -464,6 +464,7 @@ function AssignmentResultsCopyArtifactPreview({
           className="shrink-0 bg-background"
           disabled={preview.actionButton.disabled}
           onClick={() => onResultAction(preview.actionButton)}
+          aria-label={preview.actionButton.ariaLabel}
           aria-describedby={disabledReasonId}
         >
           <IconCopy aria-hidden="true" className="size-4" />

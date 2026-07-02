@@ -52,11 +52,29 @@ export type AssignmentResultActionDataScope =
 export type AssignmentResultActionButtonId =
   `${AssignmentResultAction}:${AssignmentResultActionDataScope}`;
 
+export type AssignmentResultActionScopeView = {
+  ariaLabel: string;
+  dataScope: AssignmentResultActionDataScope;
+  description: string;
+  label: string;
+  value: string;
+};
+
 export type AssignmentResultActionBlockedReason =
   | 'brief-not-ready'
   | 'missing-attempts'
   | 'missing-items'
   | 'missing-students';
+
+export type AssignmentResultActionStatusTone = 'blocked' | 'ready';
+
+export type AssignmentResultActionStatusView = {
+  ariaLabel: string;
+  description: string;
+  label: string;
+  tone: AssignmentResultActionStatusTone;
+  value: string;
+};
 
 export type AssignmentResultActionGate =
   | {
@@ -93,6 +111,7 @@ export type AssignmentResultActionDescriptor =
 export type AssignmentResultActionButton =
   | {
       action: AssignmentResultCopyAction;
+      ariaLabel: string;
       dataScope: Extract<AssignmentResultActionDataScope, 'current-review'>;
       description: string;
       disabled: boolean;
@@ -102,10 +121,13 @@ export type AssignmentResultActionButton =
       id: AssignmentResultActionButtonId;
       kind: 'copy-text';
       label: string;
+      scopeView: AssignmentResultActionScopeView;
+      statusView: AssignmentResultActionStatusView;
       successMessage: string;
     }
   | {
       action: 'export-csv';
+      ariaLabel: string;
       dataScope: Extract<
         AssignmentResultActionDataScope,
         'full-assignment-results'
@@ -118,6 +140,8 @@ export type AssignmentResultActionButton =
       id: AssignmentResultActionButtonId;
       kind: 'download-csv';
       label: string;
+      scopeView: AssignmentResultActionScopeView;
+      statusView: AssignmentResultActionStatusView;
       successMessage: string;
     };
 
@@ -157,12 +181,15 @@ export type AssignmentResultActionExecutionPlan =
     };
 
 type AssignmentResultActionButtonBase = {
+  ariaLabel: string;
   description: string;
   disabled: boolean;
   disabledReason?: string;
   failureMessage: string;
   gate: AssignmentResultActionGate;
   label: string;
+  scopeView: AssignmentResultActionScopeView;
+  statusView: AssignmentResultActionStatusView;
   successMessage: string;
 };
 
@@ -361,13 +388,25 @@ export function buildAssignmentResultActionButtons({
     });
     const actionCopy = getAssignmentResultActionCopy(descriptor.action);
     const disabledReason = getAssignmentResultActionDisabledReason(gate);
+    const scopeView = buildAssignmentResultActionScopeView(
+      descriptor.dataScope
+    );
+    const statusView = buildAssignmentResultActionStatusView(gate);
     const base = {
+      ariaLabel: m.assignment_result_action_button_aria({
+        description: actionCopy.description,
+        label: actionCopy.label,
+        scope: scopeView.ariaLabel,
+        status: statusView.ariaLabel,
+      }),
       description: actionCopy.description,
       disabled: Boolean(disabledReason),
       ...(disabledReason ? { disabledReason } : {}),
       failureMessage: actionCopy.failureMessage,
       gate,
       label: actionCopy.label,
+      scopeView,
+      statusView,
       successMessage: actionCopy.successMessage,
     } satisfies AssignmentResultActionButtonBase;
     const id = getAssignmentResultActionButtonId(descriptor);
@@ -422,6 +461,72 @@ export function getAssignmentResultActionDisabledReason(
   gate: AssignmentResultActionGate
 ) {
   return gate.type === 'blocked' ? gate.message : undefined;
+}
+
+export function buildAssignmentResultActionScopeView(
+  dataScope: AssignmentResultActionDataScope
+): AssignmentResultActionScopeView {
+  const label = m.assignment_result_action_scope_label();
+  const value =
+    dataScope === 'current-review'
+      ? m.assignment_result_action_scope_current_review_value()
+      : m.assignment_result_action_scope_full_assignment_value();
+  const description =
+    dataScope === 'current-review'
+      ? m.assignment_result_action_scope_current_review_description()
+      : m.assignment_result_action_scope_full_assignment_description();
+
+  return {
+    ariaLabel: m.assignment_result_action_scope_aria_label({
+      description,
+      label,
+      value,
+    }),
+    dataScope,
+    description,
+    label,
+    value,
+  };
+}
+
+export function buildAssignmentResultActionStatusView(
+  gate: AssignmentResultActionGate
+): AssignmentResultActionStatusView {
+  const label = m.assignment_result_action_status_label();
+
+  if (gate.type === 'blocked') {
+    const value = m.assignment_result_action_status_blocked_value();
+    const description = m.assignment_result_action_status_blocked_description({
+      reason: gate.message,
+    });
+
+    return {
+      ariaLabel: m.assignment_result_action_status_aria_label({
+        description,
+        label,
+        value,
+      }),
+      description,
+      label,
+      tone: 'blocked',
+      value,
+    };
+  }
+
+  const value = m.assignment_result_action_status_ready_value();
+  const description = m.assignment_result_action_status_ready_description();
+
+  return {
+    ariaLabel: m.assignment_result_action_status_aria_label({
+      description,
+      label,
+      value,
+    }),
+    description,
+    label,
+    tone: 'ready',
+    value,
+  };
 }
 
 export function buildAssignmentResultCopyArtifacts(

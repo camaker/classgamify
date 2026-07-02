@@ -646,6 +646,8 @@ import {
   buildAssignmentResultActionExecutionPlan,
   buildAssignmentResultActionPayload,
   buildAssignmentResultActionState,
+  buildAssignmentResultActionScopeView,
+  buildAssignmentResultActionStatusView,
   buildAssignmentResultCopyActionData,
   buildAssignmentResultCopyArtifacts,
   buildAssignmentResultCopyArtifactPreviews,
@@ -2112,6 +2114,16 @@ assert.match(
 );
 assert.match(
   assignmentResultActionsSource,
+  /export type AssignmentResultActionScopeView = \{[\s\S]*ariaLabel: string;[\s\S]*dataScope: AssignmentResultActionDataScope;[\s\S]*description: string;[\s\S]*label: string;[\s\S]*value: string;[\s\S]*export type AssignmentResultActionStatusView = \{[\s\S]*ariaLabel: string;[\s\S]*description: string;[\s\S]*tone: AssignmentResultActionStatusTone;/,
+  'Assignment result action buttons should expose prepared action scope and status views.'
+);
+assert.match(
+  assignmentResultActionsSource,
+  /ariaLabel: string;[\s\S]*scopeView: AssignmentResultActionScopeView;[\s\S]*statusView: AssignmentResultActionStatusView;/,
+  'Assignment result action buttons should carry prepared aria labels, data-scope views, and status views.'
+);
+assert.match(
+  assignmentResultActionsSource,
   /export type AssignmentResultActionBlockedReason =[\s\S]*'brief-not-ready'[\s\S]*'missing-attempts'[\s\S]*'missing-items'[\s\S]*'missing-students'/,
   'Assignment result action gates should expose stable blocked-reason codes separately from localized messages.'
 );
@@ -2257,13 +2269,28 @@ assert.match(
 );
 assert.match(
   assignmentResultActionsSource,
-  /getAssignmentResultActionDisabledReason\(gate\)/,
-  'Assignment result action buttons should derive disabled explanations inside the assignment-domain action model.'
+  /const scopeView = buildAssignmentResultActionScopeView\([\s\S]*descriptor\.dataScope[\s\S]*const statusView = buildAssignmentResultActionStatusView\(gate\)[\s\S]*ariaLabel: m\.assignment_result_action_button_aria\(\{[\s\S]*scope: scopeView\.ariaLabel,[\s\S]*status: statusView\.ariaLabel,[\s\S]*scopeView,[\s\S]*statusView,/,
+  'Assignment result action buttons should derive action aria labels, data-scope views, and status views inside the assignment-domain action model.'
 );
 assert.match(
   assignmentResultActionsSource,
   /description: m\.assignment_result_action_copy_brief_description\(\)[\s\S]*description: m\.assignment_result_action_copy_follow_up_description\(\)[\s\S]*description: m\.assignment_result_action_copy_item_review_description\(\)[\s\S]*description: m\.assignment_result_action_copy_reteach_plan_description\(\)[\s\S]*description: m\.assignment_result_action_export_csv_description\(\)/,
   'Assignment result action descriptions should come from localized assignment-domain action copy.'
+);
+assert.match(
+  assignmentResultActionsSource,
+  /buildAssignmentResultActionScopeView[\s\S]*assignment_result_action_scope_label[\s\S]*assignment_result_action_scope_current_review_value[\s\S]*assignment_result_action_scope_full_assignment_value[\s\S]*assignment_result_action_scope_aria_label/,
+  'Assignment result action data-scope views should come from localized assignment-domain copy.'
+);
+assert.match(
+  assignmentResultActionsSource,
+  /buildAssignmentResultActionStatusView[\s\S]*assignment_result_action_status_label[\s\S]*assignment_result_action_status_blocked_value[\s\S]*assignment_result_action_status_ready_value[\s\S]*assignment_result_action_status_aria_label/,
+  'Assignment result action status views should come from localized assignment-domain copy.'
+);
+assert.match(
+  assignmentResultActionsSource,
+  /getAssignmentResultActionDisabledReason\(gate\)/,
+  'Assignment result action buttons should derive disabled explanations inside the assignment-domain action model.'
 );
 assert.match(
   assignmentResultActionsSource,
@@ -6025,8 +6052,13 @@ assert.match(
 );
 assert.match(
   assignmentResultsHeaderActionsSource,
-  /function AssignmentResultsHeaderResultActions[\s\S]*resultActions\.map[\s\S]*AssignmentResultsHeaderResultActionButton[\s\S]*function AssignmentResultsHeaderResultActionButton[\s\S]*resultActionIconByAction\[actionButton\.action\][\s\S]*actionButton\.disabled[\s\S]*actionButton\.label[\s\S]*actionButton\.description/,
-  'Assignment result action buttons should render prepared result action state and descriptions through focused button components.'
+  /function AssignmentResultsHeaderResultActions[\s\S]*resultActions\.map[\s\S]*AssignmentResultsHeaderResultActionButton[\s\S]*function AssignmentResultsHeaderResultActionButton[\s\S]*resultActionIconByAction\[actionButton\.action\][\s\S]*actionButton\.disabled[\s\S]*aria-label=\{actionButton\.ariaLabel\}[\s\S]*actionButton\.label[\s\S]*actionButton\.description[\s\S]*actionButton\.scopeView[\s\S]*actionButton\.statusView/,
+  'Assignment result action buttons should render prepared result action state, aria labels, data scope, status, and descriptions through focused button components.'
+);
+assert.match(
+  assignmentResultsHeaderActionsSource,
+  /function AssignmentResultActionSummaryItem[\s\S]*ariaLabel[\s\S]*description[\s\S]*label[\s\S]*tone[\s\S]*value[\s\S]*<Badge[\s\S]*data-tone=\{tone\}[\s\S]*<output[\s\S]*aria-label=\{ariaLabel\}[\s\S]*\{value\}[\s\S]*\{description\}/,
+  'Assignment result action summary items should render prepared scope/status labels, values, tones, descriptions, and accessible labels.'
 );
 assert.match(
   assignmentResultsHeaderActionsSource,
@@ -6065,8 +6097,8 @@ assert.match(
 );
 assert.doesNotMatch(
   assignmentResultsHeaderActionsSource,
-  /gate\.message|assignment_results_export_preparation_|CSV export coverage|Delivery fields|Answer rows|CSV 导出覆盖范围|投放字段|答案行/,
-  'Assignment result action controls should not read raw gate messages or hard-code export preparation copy.'
+  /gate\.message|assignment_results_export_preparation_|assignment_result_action_scope_|assignment_result_action_status_|CSV export coverage|Delivery fields|Answer rows|Current review|Full assignment results|Ready|Needs data|CSV 导出覆盖范围|投放字段|答案行|当前复盘范围|完整作业结果|可执行|需要数据/,
+  'Assignment result action controls should not read raw gate messages, call locale keys, or hard-code export/action scope copy.'
 );
 assert.doesNotMatch(
   assignmentResultsHeaderCardSource,
@@ -6205,8 +6237,8 @@ assert.match(
 );
 assert.match(
   assignmentResultsClassroomBriefCardSource,
-  /function AssignmentResultsCopyArtifactPreview[\s\S]*preview\.label[\s\S]*preview\.description[\s\S]*preview\.actionButton\.disabled[\s\S]*onResultAction\(preview\.actionButton\)[\s\S]*preview\.actionButton\.label[\s\S]*preview\.summaryLabel[\s\S]*preview\.metaItems\.map[\s\S]*metaItem\.label[\s\S]*metaItem\.value[\s\S]*preview\.text/,
-  'Assignment classroom brief copy artifact preview cards should render prepared label, description, summary, metadata, copied text, and action button state.'
+  /function AssignmentResultsCopyArtifactPreview[\s\S]*preview\.label[\s\S]*preview\.description[\s\S]*preview\.actionButton\.disabled[\s\S]*onResultAction\(preview\.actionButton\)[\s\S]*aria-label=\{preview\.actionButton\.ariaLabel\}[\s\S]*preview\.actionButton\.label[\s\S]*preview\.summaryLabel[\s\S]*preview\.metaItems\.map[\s\S]*metaItem\.label[\s\S]*metaItem\.value[\s\S]*preview\.text/,
+  'Assignment classroom brief copy artifact preview cards should render prepared label, description, action aria label, summary, metadata, copied text, and action button state.'
 );
 assert.match(
   assignmentResultsClassroomBriefCardSource,
@@ -41837,6 +41869,9 @@ assert.deepEqual(
       button.id,
       button.action,
       button.disabled,
+      button.scopeView.value,
+      button.statusView.value,
+      button.statusView.tone,
     ]),
     actionDataAssignmentId: scoredResultsPageView.actionData?.assignment.id,
     actionDataItemIds: scoredResultsPageView.actionData?.analysis.perItem.map(
@@ -42127,11 +42162,46 @@ assert.deepEqual(
   },
   {
     actionDisabled: [
-      ['copy-brief:current-review', 'copy-brief', false],
-      ['copy-reteach-plan:current-review', 'copy-reteach-plan', false],
-      ['copy-item-review:current-review', 'copy-item-review', false],
-      ['copy-follow-up:current-review', 'copy-follow-up', false],
-      ['export-csv:full-assignment-results', 'export-csv', false],
+      [
+        'copy-brief:current-review',
+        'copy-brief',
+        false,
+        'Current review',
+        'Ready',
+        'ready',
+      ],
+      [
+        'copy-reteach-plan:current-review',
+        'copy-reteach-plan',
+        false,
+        'Current review',
+        'Ready',
+        'ready',
+      ],
+      [
+        'copy-item-review:current-review',
+        'copy-item-review',
+        false,
+        'Current review',
+        'Ready',
+        'ready',
+      ],
+      [
+        'copy-follow-up:current-review',
+        'copy-follow-up',
+        false,
+        'Current review',
+        'Ready',
+        'ready',
+      ],
+      [
+        'export-csv:full-assignment-results',
+        'export-csv',
+        false,
+        'Full assignment results',
+        'Ready',
+        'ready',
+      ],
     ],
     actionDataAssignmentId: 'assignment-results-page',
     actionDataItemIds: ['q-1', 'pair-1'],
@@ -45174,6 +45244,85 @@ assert.equal(
   }),
   'export-csv:full-assignment-results'
 );
+function expectAssignmentResultActionScopeView(
+  dataScope: 'current-review' | 'full-assignment-results'
+) {
+  const value =
+    dataScope === 'current-review'
+      ? 'Current review'
+      : 'Full assignment results';
+  const description =
+    dataScope === 'current-review'
+      ? 'Uses the current student search, student sort, item sort, and answer-review filter.'
+      : 'Uses the full private result set for this assignment, independent of current filters.';
+
+  return {
+    ariaLabel: `Data scope: ${value}. ${description}`,
+    dataScope,
+    description,
+    label: 'Data scope',
+    value,
+  };
+}
+function expectAssignmentResultActionStatusView(
+  gate: ReturnType<typeof getAssignmentResultActionGateFromState>
+) {
+  if (gate.type === 'blocked') {
+    return {
+      ariaLabel: `Action status: Needs data. ${gate.message}`,
+      description: gate.message,
+      label: 'Action status',
+      tone: 'blocked',
+      value: 'Needs data',
+    };
+  }
+
+  return {
+    ariaLabel:
+      'Action status: Ready. This action is available with the current result data.',
+    description: 'This action is available with the current result data.',
+    label: 'Action status',
+    tone: 'ready',
+    value: 'Ready',
+  };
+}
+function expectAssignmentResultActionAriaLabel({
+  description,
+  label,
+  scopeView,
+  statusView,
+}: {
+  description: string;
+  label: string;
+  scopeView: ReturnType<typeof expectAssignmentResultActionScopeView>;
+  statusView: ReturnType<typeof expectAssignmentResultActionStatusView>;
+}) {
+  return `${label}. ${scopeView.ariaLabel}. ${statusView.ariaLabel}. ${description}`;
+}
+assert.deepEqual(
+  buildAssignmentResultActionScopeView('current-review'),
+  expectAssignmentResultActionScopeView('current-review')
+);
+assert.deepEqual(
+  buildAssignmentResultActionScopeView('full-assignment-results'),
+  expectAssignmentResultActionScopeView('full-assignment-results')
+);
+assert.deepEqual(
+  buildAssignmentResultActionStatusView({ type: 'ready' }),
+  expectAssignmentResultActionStatusView({ type: 'ready' })
+);
+assert.deepEqual(
+  buildAssignmentResultActionStatusView({
+    message: 'Submit at least one attempt before exporting results.',
+    reason: 'missing-attempts',
+    type: 'blocked',
+  }),
+  expectAssignmentResultActionStatusView({
+    message: 'Submit at least one attempt before exporting results.',
+    reason: 'missing-attempts',
+    type: 'blocked',
+  })
+);
 const emptyAssignmentResultActionState = buildAssignmentResultActionState({
   attemptCount: 0,
   itemCount: 0,
@@ -45204,6 +45353,17 @@ assert.deepEqual(
   [
     {
       action: 'copy-brief',
+      ariaLabel: expectAssignmentResultActionAriaLabel({
+        description:
+          'Copy a compact class snapshot with metrics, reteach focus, and students who need follow-up.',
+        label: 'Copy brief',
+        scopeView: expectAssignmentResultActionScopeView('current-review'),
+        statusView: expectAssignmentResultActionStatusView({
+          message: 'Submit at least one attempt before copying a brief.',
+          reason: 'brief-not-ready',
+          type: 'blocked',
+        }),
+      }),
       dataScope: 'current-review',
       description:
         'Copy a compact class snapshot with metrics, reteach focus, and students who need follow-up.',
@@ -45218,10 +45378,28 @@ assert.deepEqual(
       id: 'copy-brief:current-review',
       kind: 'copy-text',
       label: 'Copy brief',
+      scopeView: expectAssignmentResultActionScopeView('current-review'),
+      statusView: expectAssignmentResultActionStatusView({
+        message: 'Submit at least one attempt before copying a brief.',
+        reason: 'brief-not-ready',
+        type: 'blocked',
+      }),
       successMessage: 'Classroom brief copied.',
     },
     {
       action: 'copy-reteach-plan',
+      ariaLabel: expectAssignmentResultActionAriaLabel({
+        description:
+          'Copy a lesson-ready script for the weakest items and priority students.',
+        label: 'Copy reteach plan',
+        scopeView: expectAssignmentResultActionScopeView('current-review'),
+        statusView: expectAssignmentResultActionStatusView({
+          message:
+            'Submit at least one attempt before copying a reteach plan.',
+          reason: 'missing-attempts',
+          type: 'blocked',
+        }),
+      }),
       dataScope: 'current-review',
       description:
         'Copy a lesson-ready script for the weakest items and priority students.',
@@ -45237,10 +45415,27 @@ assert.deepEqual(
       id: 'copy-reteach-plan:current-review',
       kind: 'copy-text',
       label: 'Copy reteach plan',
+      scopeView: expectAssignmentResultActionScopeView('current-review'),
+      statusView: expectAssignmentResultActionStatusView({
+        message: 'Submit at least one attempt before copying a reteach plan.',
+        reason: 'missing-attempts',
+        type: 'blocked',
+      }),
       successMessage: 'Reteach plan copied.',
     },
     {
       action: 'copy-item-review',
+      ariaLabel: expectAssignmentResultActionAriaLabel({
+        description:
+          'Copy prompt-level performance with expected answers, alternatives, and notes.',
+        label: 'Copy item review',
+        scopeView: expectAssignmentResultActionScopeView('current-review'),
+        statusView: expectAssignmentResultActionStatusView({
+          message: 'Add assignment items before copying item review.',
+          reason: 'missing-items',
+          type: 'blocked',
+        }),
+      }),
       dataScope: 'current-review',
       description:
         'Copy prompt-level performance with expected answers, alternatives, and notes.',
@@ -45255,10 +45450,27 @@ assert.deepEqual(
       id: 'copy-item-review:current-review',
       kind: 'copy-text',
       label: 'Copy item review',
+      scopeView: expectAssignmentResultActionScopeView('current-review'),
+      statusView: expectAssignmentResultActionStatusView({
+        message: 'Add assignment items before copying item review.',
+        reason: 'missing-items',
+        type: 'blocked',
+      }),
       successMessage: 'Item review copied.',
     },
     {
       action: 'copy-follow-up',
+      ariaLabel: expectAssignmentResultActionAriaLabel({
+        description:
+          'Copy a student-by-student support list sorted by review need.',
+        label: 'Copy follow-up',
+        scopeView: expectAssignmentResultActionScopeView('current-review'),
+        statusView: expectAssignmentResultActionStatusView({
+          message: 'Submit at least one attempt before copying follow-up.',
+          reason: 'missing-students',
+          type: 'blocked',
+        }),
+      }),
       dataScope: 'current-review',
       description:
         'Copy a student-by-student support list sorted by review need.',
@@ -45273,10 +45485,29 @@ assert.deepEqual(
       id: 'copy-follow-up:current-review',
       kind: 'copy-text',
       label: 'Copy follow-up',
+      scopeView: expectAssignmentResultActionScopeView('current-review'),
+      statusView: expectAssignmentResultActionStatusView({
+        message: 'Submit at least one attempt before copying follow-up.',
+        reason: 'missing-students',
+        type: 'blocked',
+      }),
       successMessage: 'Student follow-up copied.',
     },
     {
       action: 'export-csv',
+      ariaLabel: expectAssignmentResultActionAriaLabel({
+        description:
+          'Download gradebook-ready results with delivery policy and item-level answers.',
+        label: 'Download CSV',
+        scopeView: expectAssignmentResultActionScopeView(
+          'full-assignment-results'
+        ),
+        statusView: expectAssignmentResultActionStatusView({
+          message: 'Submit at least one attempt before exporting results.',
+          reason: 'missing-attempts',
+          type: 'blocked',
+        }),
+      }),
       dataScope: 'full-assignment-results',
       description:
         'Download gradebook-ready results with delivery policy and item-level answers.',
@@ -45291,6 +45522,14 @@ assert.deepEqual(
       id: 'export-csv:full-assignment-results',
       kind: 'download-csv',
       label: 'Download CSV',
+      scopeView: expectAssignmentResultActionScopeView(
+        'full-assignment-results'
+      ),
+      statusView: expectAssignmentResultActionStatusView({
+        message: 'Submit at least one attempt before exporting results.',
+        reason: 'missing-attempts',
+        type: 'blocked',
+      }),
       successMessage: 'Results CSV downloaded.',
     },
   ]
@@ -45306,6 +45545,13 @@ assert.deepEqual(
   [
     {
       action: 'copy-brief',
+      ariaLabel: expectAssignmentResultActionAriaLabel({
+        description:
+          'Copy a compact class snapshot with metrics, reteach focus, and students who need follow-up.',
+        label: 'Copy brief',
+        scopeView: expectAssignmentResultActionScopeView('current-review'),
+        statusView: expectAssignmentResultActionStatusView({ type: 'ready' }),
+      }),
       dataScope: 'current-review',
       description:
         'Copy a compact class snapshot with metrics, reteach focus, and students who need follow-up.',
@@ -45315,10 +45561,19 @@ assert.deepEqual(
       id: 'copy-brief:current-review',
       kind: 'copy-text',
       label: 'Copy brief',
+      scopeView: expectAssignmentResultActionScopeView('current-review'),
+      statusView: expectAssignmentResultActionStatusView({ type: 'ready' }),
       successMessage: 'Classroom brief copied.',
     },
     {
       action: 'copy-reteach-plan',
+      ariaLabel: expectAssignmentResultActionAriaLabel({
+        description:
+          'Copy a lesson-ready script for the weakest items and priority students.',
+        label: 'Copy reteach plan',
+        scopeView: expectAssignmentResultActionScopeView('current-review'),
+        statusView: expectAssignmentResultActionStatusView({ type: 'ready' }),
+      }),
       dataScope: 'current-review',
       description:
         'Copy a lesson-ready script for the weakest items and priority students.',
@@ -45328,10 +45583,19 @@ assert.deepEqual(
       id: 'copy-reteach-plan:current-review',
       kind: 'copy-text',
       label: 'Copy reteach plan',
+      scopeView: expectAssignmentResultActionScopeView('current-review'),
+      statusView: expectAssignmentResultActionStatusView({ type: 'ready' }),
       successMessage: 'Reteach plan copied.',
     },
     {
       action: 'copy-item-review',
+      ariaLabel: expectAssignmentResultActionAriaLabel({
+        description:
+          'Copy prompt-level performance with expected answers, alternatives, and notes.',
+        label: 'Copy item review',
+        scopeView: expectAssignmentResultActionScopeView('current-review'),
+        statusView: expectAssignmentResultActionStatusView({ type: 'ready' }),
+      }),
       dataScope: 'current-review',
       description:
         'Copy prompt-level performance with expected answers, alternatives, and notes.',
@@ -45341,10 +45605,19 @@ assert.deepEqual(
       id: 'copy-item-review:current-review',
       kind: 'copy-text',
       label: 'Copy item review',
+      scopeView: expectAssignmentResultActionScopeView('current-review'),
+      statusView: expectAssignmentResultActionStatusView({ type: 'ready' }),
       successMessage: 'Item review copied.',
     },
     {
       action: 'copy-follow-up',
+      ariaLabel: expectAssignmentResultActionAriaLabel({
+        description:
+          'Copy a student-by-student support list sorted by review need.',
+        label: 'Copy follow-up',
+        scopeView: expectAssignmentResultActionScopeView('current-review'),
+        statusView: expectAssignmentResultActionStatusView({ type: 'ready' }),
+      }),
       dataScope: 'current-review',
       description:
         'Copy a student-by-student support list sorted by review need.',
@@ -45354,10 +45627,21 @@ assert.deepEqual(
       id: 'copy-follow-up:current-review',
       kind: 'copy-text',
       label: 'Copy follow-up',
+      scopeView: expectAssignmentResultActionScopeView('current-review'),
+      statusView: expectAssignmentResultActionStatusView({ type: 'ready' }),
       successMessage: 'Student follow-up copied.',
     },
     {
       action: 'export-csv',
+      ariaLabel: expectAssignmentResultActionAriaLabel({
+        description:
+          'Download gradebook-ready results with delivery policy and item-level answers.',
+        label: 'Download CSV',
+        scopeView: expectAssignmentResultActionScopeView(
+          'full-assignment-results'
+        ),
+        statusView: expectAssignmentResultActionStatusView({ type: 'ready' }),
+      }),
       dataScope: 'full-assignment-results',
       description:
         'Download gradebook-ready results with delivery policy and item-level answers.',
@@ -45367,6 +45651,10 @@ assert.deepEqual(
       id: 'export-csv:full-assignment-results',
       kind: 'download-csv',
       label: 'Download CSV',
+      scopeView: expectAssignmentResultActionScopeView(
+        'full-assignment-results'
+      ),
+      statusView: expectAssignmentResultActionStatusView({ type: 'ready' }),
       successMessage: 'Results CSV downloaded.',
     },
   ]
@@ -49429,26 +49717,50 @@ assert.equal(
 );
 const readyCopyBriefActionButton = {
   action: 'copy-brief',
+  ariaLabel: expectAssignmentResultActionAriaLabel({
+    description:
+      'Copy a compact class snapshot with metrics, reteach focus, and students who need follow-up.',
+    label: 'Copy brief',
+    scopeView: expectAssignmentResultActionScopeView('current-review'),
+    statusView: expectAssignmentResultActionStatusView({ type: 'ready' }),
+  }),
   dataScope: 'current-review',
   description:
     'Copy a compact class snapshot with metrics, reteach focus, and students who need follow-up.',
   disabled: false,
   failureMessage: 'Classroom brief could not be copied.',
   gate: { type: 'ready' },
+  id: 'copy-brief:current-review',
   kind: 'copy-text',
   label: 'Copy brief',
+  scopeView: expectAssignmentResultActionScopeView('current-review'),
+  statusView: expectAssignmentResultActionStatusView({ type: 'ready' }),
   successMessage: 'Classroom brief copied.',
 } as const;
 const readyExportCsvActionButton = {
   action: 'export-csv',
+  ariaLabel: expectAssignmentResultActionAriaLabel({
+    description:
+      'Download gradebook-ready results with delivery policy and item-level answers.',
+    label: 'Download CSV',
+    scopeView: expectAssignmentResultActionScopeView(
+      'full-assignment-results'
+    ),
+    statusView: expectAssignmentResultActionStatusView({ type: 'ready' }),
+  }),
   dataScope: 'full-assignment-results',
   description:
     'Download gradebook-ready results with delivery policy and item-level answers.',
   disabled: false,
   failureMessage: 'Results CSV could not be downloaded.',
   gate: { type: 'ready' },
+  id: 'export-csv:full-assignment-results',
   kind: 'download-csv',
   label: 'Download CSV',
+  scopeView: expectAssignmentResultActionScopeView(
+    'full-assignment-results'
+  ),
+  statusView: expectAssignmentResultActionStatusView({ type: 'ready' }),
   successMessage: 'Results CSV downloaded.',
 } as const;
 assert.equal(
@@ -49547,6 +49859,17 @@ assert.throws(
     buildAssignmentResultActionPayload({
       actionButton: {
         action: 'copy-brief',
+        ariaLabel: expectAssignmentResultActionAriaLabel({
+          description:
+            'Copy a compact class snapshot with metrics, reteach focus, and students who need follow-up.',
+          label: 'Copy brief',
+          scopeView: expectAssignmentResultActionScopeView('current-review'),
+          statusView: expectAssignmentResultActionStatusView({
+            message: 'Submit at least one attempt before copying a brief.',
+            reason: 'brief-not-ready',
+            type: 'blocked',
+          }),
+        }),
         dataScope: 'current-review',
         description:
           'Copy a compact class snapshot with metrics, reteach focus, and students who need follow-up.',
@@ -49557,8 +49880,15 @@ assert.throws(
           reason: 'brief-not-ready',
           type: 'blocked',
         },
+        id: 'copy-brief:current-review',
         kind: 'copy-text',
         label: 'Copy brief',
+        scopeView: expectAssignmentResultActionScopeView('current-review'),
+        statusView: expectAssignmentResultActionStatusView({
+          message: 'Submit at least one attempt before copying a brief.',
+          reason: 'brief-not-ready',
+          type: 'blocked',
+        }),
         successMessage: 'Classroom brief copied.',
       },
       data: csvExportData,
@@ -49615,6 +49945,19 @@ assert.throws(
     buildAssignmentResultActionPayload({
       actionButton: {
         action: 'export-csv',
+        ariaLabel: expectAssignmentResultActionAriaLabel({
+          description:
+            'Download gradebook-ready results with delivery policy and item-level answers.',
+          label: 'Download CSV',
+          scopeView: expectAssignmentResultActionScopeView(
+            'full-assignment-results'
+          ),
+          statusView: expectAssignmentResultActionStatusView({
+            message: 'Submit at least one attempt before exporting results.',
+            reason: 'missing-attempts',
+            type: 'blocked',
+          }),
+        }),
         dataScope: 'full-assignment-results',
         description:
           'Download gradebook-ready results with delivery policy and item-level answers.',
@@ -49625,8 +49968,17 @@ assert.throws(
           reason: 'missing-attempts',
           type: 'blocked',
         },
+        id: 'export-csv:full-assignment-results',
         kind: 'download-csv',
         label: 'Download CSV',
+        scopeView: expectAssignmentResultActionScopeView(
+          'full-assignment-results'
+        ),
+        statusView: expectAssignmentResultActionStatusView({
+          message: 'Submit at least one attempt before exporting results.',
+          reason: 'missing-attempts',
+          type: 'blocked',
+        }),
         successMessage: 'Results CSV downloaded.',
       },
       data: csvExportData,
@@ -49637,6 +49989,19 @@ assert.deepEqual(
   buildAssignmentResultActionExecutionPlan({
     actionButton: {
       action: 'export-csv',
+      ariaLabel: expectAssignmentResultActionAriaLabel({
+        description:
+          'Download gradebook-ready results with delivery policy and item-level answers.',
+        label: 'Download CSV',
+        scopeView: expectAssignmentResultActionScopeView(
+          'full-assignment-results'
+        ),
+        statusView: expectAssignmentResultActionStatusView({
+          message: 'Submit at least one attempt before exporting results.',
+          reason: 'missing-attempts',
+          type: 'blocked',
+        }),
+      }),
       dataScope: 'full-assignment-results',
       description:
         'Download gradebook-ready results with delivery policy and item-level answers.',
@@ -49647,8 +50012,17 @@ assert.deepEqual(
         reason: 'missing-attempts',
         type: 'blocked',
       },
+      id: 'export-csv:full-assignment-results',
       kind: 'download-csv',
       label: 'Download CSV',
+      scopeView: expectAssignmentResultActionScopeView(
+        'full-assignment-results'
+      ),
+      statusView: expectAssignmentResultActionStatusView({
+        message: 'Submit at least one attempt before exporting results.',
+        reason: 'missing-attempts',
+        type: 'blocked',
+      }),
       successMessage: 'Results CSV downloaded.',
     },
     data: csvExportData,
@@ -49665,14 +50039,24 @@ assert.deepEqual(
   buildAssignmentResultActionExecutionPlan({
     actionButton: {
       action: 'copy-brief',
+      ariaLabel: expectAssignmentResultActionAriaLabel({
+        description:
+          'Copy a compact class snapshot with metrics, reteach focus, and students who need follow-up.',
+        label: 'Copy brief',
+        scopeView: expectAssignmentResultActionScopeView('current-review'),
+        statusView: expectAssignmentResultActionStatusView({ type: 'ready' }),
+      }),
       dataScope: 'current-review',
       description:
         'Copy a compact class snapshot with metrics, reteach focus, and students who need follow-up.',
       disabled: false,
       failureMessage: 'Classroom brief could not be copied.',
       gate: { type: 'ready' },
+      id: 'copy-brief:current-review',
       kind: 'copy-text',
       label: 'Copy brief',
+      scopeView: expectAssignmentResultActionScopeView('current-review'),
+      statusView: expectAssignmentResultActionStatusView({ type: 'ready' }),
       successMessage: 'Classroom brief copied.',
     },
     data: null,
