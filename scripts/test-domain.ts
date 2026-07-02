@@ -5152,13 +5152,23 @@ assert.match(
 );
 assert.match(
   assignmentSettingsSummarySource,
-  /AssignmentDeliverySummaryItem[\s\S]*AssignmentInstructionSummary[\s\S]*AssignmentSettingsSummaryView/,
-  'Assignment settings summary component should import explicit delivery item and instruction child contracts.'
+  /AssignmentSettingsStatusTile[\s\S]*statusView=\{summaryView\.status\}[\s\S]*AssignmentInstructionsTile[\s\S]*instructions=\{summaryView\.instructions\}/,
+  'Assignment settings summary should render the prepared delivery status before instruction and rule tiles.'
+);
+assert.match(
+  assignmentSettingsSummarySource,
+  /AssignmentDeliverySummaryItem[\s\S]*AssignmentInstructionSummary[\s\S]*AssignmentSettingsSummaryStatusView[\s\S]*AssignmentSettingsSummaryView/,
+  'Assignment settings summary component should import explicit delivery status, item, and instruction child contracts.'
 );
 assert.match(
   assignmentSettingsSummarySource,
   /summaryView\.items\.map[\s\S]*AssignmentSettingTile[\s\S]*item=\{item\}/,
   'Assignment settings summary should delegate prepared setting item views to focused tiles.'
+);
+assert.match(
+  assignmentSettingsSummarySource,
+  /function AssignmentSettingsStatusTile[\s\S]*statusView: AssignmentSettingsSummaryStatusView[\s\S]*aria-label=\{statusView\.ariaLabel\}[\s\S]*data-tone=\{statusView\.tone\}[\s\S]*statusView\.label[\s\S]*statusView\.value[\s\S]*statusView\.description/,
+  'Assignment settings status tile should render prepared status labels, values, descriptions, aria labels, and tones.'
 );
 assert.match(
   assignmentSettingsSummarySource,
@@ -5172,7 +5182,7 @@ assert.match(
 );
 assert.doesNotMatch(
   assignmentSettingsSummarySource,
-  /AssignmentSettingsSummaryView\['(?:instructions|items)'\](?:\[number\])?/,
+  /AssignmentSettingsSummaryView\['(?:instructions|items|status|summary)'\](?:\[number\])?/,
   'Assignment settings summary tiles should not infer child props from aggregate summary indexes.'
 );
 assert.doesNotMatch(
@@ -10612,6 +10622,26 @@ assert.match(
 );
 assert.match(
   assignmentDeliverySummarySource,
+  /export type AssignmentSettingsSummaryStatus =[\s\S]*'attempt-limited'[\s\S]*'open'[\s\S]*'scheduled'[\s\S]*'timed'[\s\S]*'timed-scheduled'[\s\S]*export type AssignmentSettingsSummaryStatusView = \{[\s\S]*ariaLabel: string;[\s\S]*description: string;[\s\S]*label: string;[\s\S]*status: AssignmentSettingsSummaryStatus;[\s\S]*tone: AssignmentSettingsSummaryStatusTone;[\s\S]*value: string;[\s\S]*export type AssignmentSettingsSummaryStats = \{[\s\S]*deliveryRuleCount: number;[\s\S]*hasAttemptLimit: boolean;[\s\S]*hasCloseTime: boolean;[\s\S]*hasInstructions: boolean;[\s\S]*hasTimer: boolean;[\s\S]*status: AssignmentSettingsSummaryStatus;[\s\S]*export type AssignmentSettingsSummaryView = \{[\s\S]*status: AssignmentSettingsSummaryStatusView;[\s\S]*summary: AssignmentSettingsSummaryStats;/,
+  'Assignment settings summary views should expose explicit teacher-facing delivery status and summary metadata contracts.'
+);
+assert.match(
+  assignmentDeliverySummarySource,
+  /buildAssignmentSettingsSummaryView[\s\S]*const items = buildAssignmentDeliverySummary\(\{[\s\S]*const summary = buildAssignmentSettingsSummaryStats\(\{[\s\S]*deliveryRuleCount: items\.length[\s\S]*status: buildAssignmentSettingsSummaryStatusView\(summary\),[\s\S]*summary,/,
+  'Assignment settings summary views should derive teacher-facing status metadata from the same prepared delivery-rule items.'
+);
+assert.match(
+  assignmentDeliverySummarySource,
+  /buildAssignmentSettingsSummaryStats[\s\S]*hasAttemptLimit = isPositiveWholeNumber\(maxAttempts\)[\s\S]*hasCloseTime = hasAssignmentCloseTime\(expiresAt\)[\s\S]*hasTimer =[\s\S]*normalizeAttemptTimeLimitSeconds\(timeLimitSeconds\) !== undefined[\s\S]*resolveAssignmentSettingsSummaryStatus\(\{[\s\S]*hasAttemptLimit,[\s\S]*hasCloseTime,[\s\S]*hasTimer/,
+  'Assignment settings summary stats should normalize timer, close-time, and attempt-limit state before resolving teacher-facing delivery status.'
+);
+assert.match(
+  assignmentDeliverySummarySource,
+  /buildAssignmentSettingsSummaryStatusView[\s\S]*assignment_settings_summary_status_aria[\s\S]*summary\.status === 'open' \|\| summary\.status === 'attempt-limited'[\s\S]*formatAssignmentSettingsSummaryStatusValue[\s\S]*assignment_settings_summary_status_attempt_limited_value[\s\S]*assignment_settings_summary_status_open_value[\s\S]*assignment_settings_summary_status_scheduled_value[\s\S]*assignment_settings_summary_status_timed_value[\s\S]*assignment_settings_summary_status_timed_scheduled_value[\s\S]*formatAssignmentSettingsSummaryStatusDescription[\s\S]*assignment_settings_summary_status_attempt_limited_description[\s\S]*assignment_settings_summary_status_open_description[\s\S]*assignment_settings_summary_status_scheduled_description[\s\S]*assignment_settings_summary_status_timed_description[\s\S]*assignment_settings_summary_status_timed_scheduled_description/,
+  'Assignment settings summary status labels, descriptions, aria labels, and tones should come from localized assignment delivery messages.'
+);
+assert.match(
+  assignmentDeliverySummarySource,
   /normalizeAssignmentLifecycleTimestamp[\s\S]*function hasAssignmentCloseTime[\s\S]*normalizeAssignmentLifecycleTimestamp\(expiresAt\)[\s\S]*export function formatAssignmentExpiry[\s\S]*const timestamp = normalizeAssignmentLifecycleTimestamp\(expiresAt\)/,
   'Assignment delivery close-time summaries should reuse shared lifecycle timestamp normalization.'
 );
@@ -15543,7 +15573,7 @@ assert.match(
 );
 assert.match(
   assignmentPublishInputSource,
-  /buildAssignmentPublishPreviewContextView[\s\S]*hasInstructions = !settingsSummaryView\.instructions\.isEmpty[\s\S]*hasTimer = settingsSummaryView\.settings\.timeLimitSeconds !== undefined[\s\S]*hasCloseAfter = closeAfter\.status === 'ready'[\s\S]*deliveryRuleCount = settingsSummaryView\.items\.length/,
+  /buildAssignmentPublishPreviewContextView[\s\S]*hasInstructions = !settingsSummaryView\.instructions\.isEmpty[\s\S]*hasTimer = settingsSummaryView\.settings\.timeLimitSeconds !== undefined[\s\S]*hasCloseAfter = closeAfter\.status === 'ready'[\s\S]*deliveryRuleCount = settingsSummaryView\.summary\.deliveryRuleCount/,
   'Assignment publish preview context should derive trust stats from the prepared settings summary and close-after status.'
 );
 assert.match(
@@ -17445,6 +17475,24 @@ assert.deepEqual(
     ['itemOrder', 'Fixed order'],
   ]
 );
+assert.deepEqual(assignmentSettingsSummaryView.summary, {
+  deliveryRuleCount: 6,
+  hasAttemptLimit: true,
+  hasCloseTime: false,
+  hasInstructions: true,
+  hasTimer: true,
+  status: 'timed',
+});
+assert.deepEqual(assignmentSettingsSummaryView.status, {
+  ariaLabel:
+    'Delivery status: Timer on. The student timer starts after the activity is ready, and submitted duration is stored with each attempt.',
+  description:
+    'The student timer starts after the activity is ready, and submitted duration is stored with each attempt.',
+  label: 'Delivery status',
+  status: 'timed',
+  tone: 'attention',
+  value: 'Timer on',
+});
 assert.deepEqual(
   buildAssignmentDeliverySummary({
     expiresAt: null,
@@ -17483,6 +17531,24 @@ assert.deepEqual(partialAssignmentSettingsSummaryView.instructions, {
   isEmpty: false,
   label: 'Student instructions',
   value: 'Review before Friday.',
+});
+assert.deepEqual(partialAssignmentSettingsSummaryView.summary, {
+  deliveryRuleCount: 6,
+  hasAttemptLimit: true,
+  hasCloseTime: false,
+  hasInstructions: true,
+  hasTimer: false,
+  status: 'attempt-limited',
+});
+assert.deepEqual(partialAssignmentSettingsSummaryView.status, {
+  ariaLabel:
+    'Delivery status: Attempt limit. Students have a capped number of attempts, with no timer or scheduled close time.',
+  description:
+    'Students have a capped number of attempts, with no timer or scheduled close time.',
+  label: 'Delivery status',
+  status: 'attempt-limited',
+  tone: 'neutral',
+  value: 'Attempt limit',
 });
 assert.deepEqual(
   partialAssignmentSettingsSummaryView.items.map((item) => [
@@ -17531,6 +17597,48 @@ assert.deepEqual(legacyAssignmentSettingsSummaryView.instructions, {
   label: 'Student instructions',
   value: 'Legacy field instructions.',
 });
+const openAssignmentSettingsSummaryView = buildAssignmentSettingsSummaryView({
+  expiresAt: null,
+  settings: {
+    maxAttempts: null,
+  },
+});
+assert.equal(openAssignmentSettingsSummaryView.status.status, 'open');
+assert.equal(openAssignmentSettingsSummaryView.status.value, 'Open policy');
+assert.equal(openAssignmentSettingsSummaryView.status.tone, 'neutral');
+const scheduledAssignmentSettingsSummaryView =
+  buildAssignmentSettingsSummaryView({
+    expiresAt: new Date('2030-01-01T00:00:00.000Z'),
+    settings: {
+      maxAttempts: null,
+    },
+  });
+assert.equal(scheduledAssignmentSettingsSummaryView.status.status, 'scheduled');
+assert.equal(
+  scheduledAssignmentSettingsSummaryView.status.value,
+  'Close scheduled'
+);
+assert.equal(scheduledAssignmentSettingsSummaryView.status.tone, 'attention');
+const timedScheduledAssignmentSettingsSummaryView =
+  buildAssignmentSettingsSummaryView({
+    expiresAt: new Date('2030-01-01T00:00:00.000Z'),
+    settings: {
+      maxAttempts: null,
+      timeLimitSeconds: 120,
+    },
+  });
+assert.equal(
+  timedScheduledAssignmentSettingsSummaryView.status.status,
+  'timed-scheduled'
+);
+assert.equal(
+  timedScheduledAssignmentSettingsSummaryView.status.value,
+  'Timer and close time'
+);
+assert.equal(
+  timedScheduledAssignmentSettingsSummaryView.status.tone,
+  'attention'
+);
 assert.equal(
   formatAssignmentDeliveryPolicyText({
     expiresAt: null,

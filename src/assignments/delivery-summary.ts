@@ -114,10 +114,39 @@ export type AssignmentInstructionSummary = {
   value: string;
 };
 
+export type AssignmentSettingsSummaryStatus =
+  | 'attempt-limited'
+  | 'open'
+  | 'scheduled'
+  | 'timed'
+  | 'timed-scheduled';
+
+export type AssignmentSettingsSummaryStatusTone = 'attention' | 'neutral';
+
+export type AssignmentSettingsSummaryStatusView = {
+  ariaLabel: string;
+  description: string;
+  label: string;
+  status: AssignmentSettingsSummaryStatus;
+  tone: AssignmentSettingsSummaryStatusTone;
+  value: string;
+};
+
+export type AssignmentSettingsSummaryStats = {
+  deliveryRuleCount: number;
+  hasAttemptLimit: boolean;
+  hasCloseTime: boolean;
+  hasInstructions: boolean;
+  hasTimer: boolean;
+  status: AssignmentSettingsSummaryStatus;
+};
+
 export type AssignmentSettingsSummaryView = {
   instructions: AssignmentInstructionSummary;
   items: AssignmentDeliverySummaryItem[];
   settings: AssignmentSettings;
+  status: AssignmentSettingsSummaryStatusView;
+  summary: AssignmentSettingsSummaryStats;
 };
 
 export function buildAssignmentDeliverySummary({
@@ -185,20 +214,30 @@ export function buildAssignmentSettingsSummaryView({
       timeLimitSeconds: timeLimitSeconds ?? undefined,
     }
   );
+  const items = buildAssignmentDeliverySummary({
+    collectStudentName: resolvedSettings.collectStudentName,
+    expiresAt,
+    maxAttempts: resolvedSettings.maxAttempts,
+    showCorrectAnswers: resolvedSettings.showCorrectAnswers,
+    shuffleItems: resolvedSettings.shuffleItems,
+    timeLimitSeconds: resolvedSettings.timeLimitSeconds,
+  });
+  const summary = buildAssignmentSettingsSummaryStats({
+    deliveryRuleCount: items.length,
+    expiresAt,
+    instructions: resolvedSettings.instructions,
+    maxAttempts: resolvedSettings.maxAttempts,
+    timeLimitSeconds: resolvedSettings.timeLimitSeconds,
+  });
 
   return {
     instructions: buildAssignmentInstructionSummary(
       resolvedSettings.instructions
     ),
-    items: buildAssignmentDeliverySummary({
-      collectStudentName: resolvedSettings.collectStudentName,
-      expiresAt,
-      maxAttempts: resolvedSettings.maxAttempts,
-      showCorrectAnswers: resolvedSettings.showCorrectAnswers,
-      shuffleItems: resolvedSettings.shuffleItems,
-      timeLimitSeconds: resolvedSettings.timeLimitSeconds,
-    }),
+    items,
     settings: resolvedSettings,
+    status: buildAssignmentSettingsSummaryStatusView(summary),
+    summary,
   };
 }
 
@@ -528,6 +567,117 @@ function buildAssignmentInstructionSummary(
         ? normalizedInstructions
         : m.assignment_delivery_instructions_none(),
   };
+}
+
+function buildAssignmentSettingsSummaryStats({
+  expiresAt,
+  instructions,
+  deliveryRuleCount,
+  maxAttempts,
+  timeLimitSeconds,
+}: {
+  deliveryRuleCount: number;
+  expiresAt: AssignmentDate;
+  instructions?: string;
+  maxAttempts?: number | null;
+  timeLimitSeconds?: number | null;
+}): AssignmentSettingsSummaryStats {
+  const hasAttemptLimit = isPositiveWholeNumber(maxAttempts);
+  const hasCloseTime = hasAssignmentCloseTime(expiresAt);
+  const hasTimer =
+    normalizeAttemptTimeLimitSeconds(timeLimitSeconds) !== undefined;
+  const status = resolveAssignmentSettingsSummaryStatus({
+    hasAttemptLimit,
+    hasCloseTime,
+    hasTimer,
+  });
+
+  return {
+    deliveryRuleCount,
+    hasAttemptLimit,
+    hasCloseTime,
+    hasInstructions: Boolean(
+      formatAssignmentDeliveryInstructions(instructions)
+    ),
+    hasTimer,
+    status,
+  };
+}
+
+function resolveAssignmentSettingsSummaryStatus({
+  hasAttemptLimit,
+  hasCloseTime,
+  hasTimer,
+}: Pick<
+  AssignmentSettingsSummaryStats,
+  'hasAttemptLimit' | 'hasCloseTime' | 'hasTimer'
+>): AssignmentSettingsSummaryStatus {
+  if (hasTimer && hasCloseTime) return 'timed-scheduled';
+  if (hasTimer) return 'timed';
+  if (hasCloseTime) return 'scheduled';
+  if (hasAttemptLimit) return 'attempt-limited';
+
+  return 'open';
+}
+
+function buildAssignmentSettingsSummaryStatusView(
+  summary: AssignmentSettingsSummaryStats
+): AssignmentSettingsSummaryStatusView {
+  const value = formatAssignmentSettingsSummaryStatusValue(summary.status);
+  const description = formatAssignmentSettingsSummaryStatusDescription(
+    summary.status
+  );
+  const label = m.assignment_settings_summary_status_label();
+
+  return {
+    ariaLabel: m.assignment_settings_summary_status_aria({
+      description,
+      label,
+      value,
+    }),
+    description,
+    label,
+    status: summary.status,
+    tone:
+      summary.status === 'open' || summary.status === 'attempt-limited'
+        ? 'neutral'
+        : 'attention',
+    value,
+  };
+}
+
+function formatAssignmentSettingsSummaryStatusValue(
+  status: AssignmentSettingsSummaryStatus
+) {
+  switch (status) {
+    case 'attempt-limited':
+      return m.assignment_settings_summary_status_attempt_limited_value();
+    case 'open':
+      return m.assignment_settings_summary_status_open_value();
+    case 'scheduled':
+      return m.assignment_settings_summary_status_scheduled_value();
+    case 'timed':
+      return m.assignment_settings_summary_status_timed_value();
+    case 'timed-scheduled':
+      return m.assignment_settings_summary_status_timed_scheduled_value();
+  }
+}
+
+function formatAssignmentSettingsSummaryStatusDescription(
+  status: AssignmentSettingsSummaryStatus
+) {
+  switch (status) {
+    case 'attempt-limited':
+      return m.assignment_settings_summary_status_attempt_limited_description();
+    case 'open':
+      return m.assignment_settings_summary_status_open_description();
+    case 'scheduled':
+      return m.assignment_settings_summary_status_scheduled_description();
+    case 'timed':
+      return m.assignment_settings_summary_status_timed_description();
+    case 'timed-scheduled':
+      return m.assignment_settings_summary_status_timed_scheduled_description();
+  }
 }
 
 function formatStudentIdentity(collectStudentName: boolean) {

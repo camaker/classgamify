@@ -485,7 +485,7 @@ export function buildAssignmentPublishPreviewContextView({
   const hasInstructions = !settingsSummaryView.instructions.isEmpty;
   const hasTimer = settingsSummaryView.settings.timeLimitSeconds !== undefined;
   const hasCloseAfter = closeAfter.status === 'ready';
-  const deliveryRuleCount = settingsSummaryView.items.length;
+  const deliveryRuleCount = settingsSummaryView.summary.deliveryRuleCount;
 
   return {
     description: m.assignment_publish_preview_context_description(),

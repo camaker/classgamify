@@ -2,18 +2,22 @@ import {
   type AssignmentDeliverySummaryItem,
   type AssignmentDeliverySummaryId,
   type AssignmentInstructionSummary,
+  type AssignmentSettingsSummaryStatusView,
   type AssignmentSettingsSummaryView,
   buildAssignmentSettingsSummaryView,
 } from '@/assignments/delivery-summary';
+import { Badge } from '@/components/ui/badge';
 import type { AssignmentSettings } from '@/activities/types';
 import type { AssignmentDate } from '@/assignments/lifecycle';
 import { cn } from '@/lib/utils';
 import {
+  IconAlertCircle,
   IconArrowsShuffle,
   IconCalendarTime,
   IconClock,
   IconClipboardText,
   IconEye,
+  IconInfoCircle,
   IconRepeat,
   IconUser,
   IconUserOff,
@@ -57,6 +61,7 @@ export function AssignmentSettingsSummary(
 
   return (
     <div className="grid gap-3">
+      <AssignmentSettingsStatusTile statusView={summaryView.status} />
       <AssignmentInstructionsTile instructions={summaryView.instructions} />
       <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
         {summaryView.items.map((item) => (
@@ -68,6 +73,39 @@ export function AssignmentSettingsSummary(
         ))}
       </div>
     </div>
+  );
+}
+
+function AssignmentSettingsStatusTile({
+  statusView,
+}: {
+  statusView: AssignmentSettingsSummaryStatusView;
+}) {
+  const Icon =
+    statusView.tone === 'attention' ? IconAlertCircle : IconInfoCircle;
+
+  return (
+    <section
+      aria-label={statusView.ariaLabel}
+      className="rounded-lg border bg-muted/30 p-3"
+      data-tone={statusView.tone}
+    >
+      <div className="flex flex-wrap items-center justify-between gap-2">
+        <div className="flex items-center gap-2 font-medium text-sm">
+          <Icon aria-hidden="true" className="size-4 text-primary" />
+          {statusView.label}
+        </div>
+        <Badge
+          variant={statusView.tone === 'attention' ? 'secondary' : 'outline'}
+          className="rounded-md"
+        >
+          {statusView.value}
+        </Badge>
+      </div>
+      <p className="mt-2 text-muted-foreground text-xs leading-5">
+        {statusView.description}
+      </p>
+    </section>
   );
 }
 
