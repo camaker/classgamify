@@ -22,6 +22,7 @@ import {
   buildLatestAttemptReviewByStudentKey,
   formatStudentFollowUpLastSubmitted,
   formatStudentFollowUpLastSubmittedContext,
+  formatStudentFollowUpLatestAttemptDuration,
   formatStudentFollowUpLatestAttemptCompletedAt,
   formatStudentFollowUpLatestAttemptSummary,
   formatStudentFollowUpRecommendation,
@@ -116,6 +117,7 @@ export type AssignmentClassroomBriefFocusItemView = {
 export type AssignmentClassroomBriefFollowUpStudentView = {
   accuracyLabel: string;
   followUpRecommendation: string;
+  latestAttemptDurationLabel: string | null;
   lastSubmittedLabel: string | null;
   latestAccuracyLabel: string;
   latestAttemptCompletedAtLabel: string | null;
@@ -409,10 +411,14 @@ export function buildAssignmentClassroomBriefFollowUpStudentView({
   const latestAttemptCompletedAtLabel = latestAttempt
     ? formatStudentFollowUpLatestAttemptCompletedAt(latestAttempt)
     : null;
+  const latestAttemptDurationLabel = latestAttempt
+    ? formatStudentFollowUpLatestAttemptDuration(latestAttempt)
+    : null;
   const latestAttemptSummaryLabel = latestAttempt
     ? formatStudentFollowUpLatestAttemptSummary({
         attempt: latestAttempt,
         completedAtLabel: latestAttemptCompletedAtLabel,
+        durationLabel: latestAttemptDurationLabel,
       })
     : null;
   const lastSubmittedContextLabel = formatStudentFollowUpLastSubmittedContext({
@@ -435,6 +441,7 @@ export function buildAssignmentClassroomBriefFollowUpStudentView({
   return {
     accuracyLabel: formatAssignmentBriefStudentAccuracy(student),
     followUpRecommendation,
+    latestAttemptDurationLabel,
     lastSubmittedLabel,
     latestAccuracyLabel,
     latestAttemptCompletedAtLabel,

@@ -838,6 +838,7 @@ import {
   formatStudentFollowUpLastSubmitted,
   formatStudentFollowUpLastSubmittedContext,
   formatStudentFollowUpLatestAttemptCompletedAt,
+  formatStudentFollowUpLatestAttemptDuration,
   formatStudentFollowUpLatestAttemptSummary,
   formatStudentFollowUpSubmittedContext,
 } from '@/assignments/student-follow-up-summary';
@@ -2250,8 +2251,8 @@ assert.match(
 );
 assert.match(
   assignmentResultActionsSource,
-  /countAssignmentResultCopyLatestAttemptTimeViews\([\s\S]*latestAttemptCompletedAtLabel/,
-  'Assignment result copy latest-attempt-time metadata should count structured submitted-time labels instead of parsing copied text.'
+  /countAssignmentResultCopyLatestAttemptTimeViews\([\s\S]*latestAttemptCompletedAtLabel[\s\S]*latestAttemptDurationLabel/,
+  'Assignment result copy latest-attempt-time metadata should count structured submitted-time or duration labels instead of parsing copied text.'
 );
 assert.match(
   assignmentResultActionsSource,
@@ -2528,8 +2529,8 @@ assert.match(
 );
 assert.match(
   assignmentClassroomBriefSource,
-  /formatStudentFollowUpLatestAttemptSummary\(\{[\s\S]*attempt: latestAttempt,[\s\S]*completedAtLabel: latestAttemptCompletedAtLabel[\s\S]*assignment_classroom_brief_follow_up_student_with_latest_attempt/,
-  'Classroom brief student follow-up rows should reuse the shared latest-attempt summary label.'
+  /formatStudentFollowUpLatestAttemptSummary\(\{[\s\S]*attempt: latestAttempt,[\s\S]*completedAtLabel: latestAttemptCompletedAtLabel,[\s\S]*durationLabel: latestAttemptDurationLabel[\s\S]*assignment_classroom_brief_follow_up_student_with_latest_attempt/,
+  'Classroom brief student follow-up rows should reuse the shared latest-attempt summary and duration label.'
 );
 assert.match(
   assignmentClassroomBriefSource,
@@ -2622,8 +2623,8 @@ assert.match(
 );
 assert.match(
   assignmentReteachPlanSource,
-  /formatStudentFollowUpLatestAttemptSummary\(\{[\s\S]*attempt: latestAttempt,[\s\S]*completedAtLabel: latestAttemptCompletedAtLabel[\s\S]*assignment_reteach_plan_student_with_latest_attempt/,
-  'Reteach plan student follow-up rows should reuse the shared latest-attempt summary label.'
+  /formatStudentFollowUpLatestAttemptSummary\(\{[\s\S]*attempt: latestAttempt,[\s\S]*completedAtLabel: latestAttemptCompletedAtLabel,[\s\S]*durationLabel: latestAttemptDurationLabel[\s\S]*assignment_reteach_plan_student_with_latest_attempt/,
+  'Reteach plan student follow-up rows should reuse the shared latest-attempt summary and duration label.'
 );
 assert.match(
   assignmentReteachPlanSource,
@@ -2996,8 +2997,13 @@ assert.doesNotMatch(
 );
 assert.match(
   assignmentResultsSource,
-  /export type AssignmentAttemptReviewAnswer = \{[\s\S]*acceptedAnswers: string\[\];[\s\S]*submitted: boolean;[\s\S]*export type AssignmentAttemptReview = \{[\s\S]*answers: AssignmentAttemptReviewAnswer\[\];/,
-  'Assignment result analysis should expose an explicit attempt review answer contract.'
+  /export type AssignmentAttemptReviewAnswer = \{[\s\S]*acceptedAnswers: string\[\];[\s\S]*submitted: boolean;[\s\S]*export type AssignmentAttemptReview = \{[\s\S]*answers: AssignmentAttemptReviewAnswer\[\];[\s\S]*durationSeconds: number \| undefined;/,
+  'Assignment result analysis should expose explicit attempt review answer and duration contracts.'
+);
+assert.match(
+  assignmentResultsSource,
+  /analyzeAssignmentResults\(\{[\s\S]*timeLimitSeconds,[\s\S]*durationSeconds: normalizeAttemptDurationSeconds\(\{[\s\S]*durationSeconds: attempt\.resultJson\.durationSeconds,[\s\S]*timeLimitSeconds/,
+  'Assignment result analysis should normalize attempt review durations through the shared timer-aware helper.'
 );
 assert.doesNotMatch(
   assignmentResultsSource,
@@ -26808,8 +26814,8 @@ assert.doesNotMatch(
 );
 assert.match(
   assignmentsApiSource,
-  /export const getAssignmentResults[\s\S]*\.select\(buildAssignmentResultsAttemptSelect\(\)\)[\s\S]*buildScoredAssignmentAttemptWhere\(\{[\s\S]*assignmentId: row\.assignment\.id,[\s\S]*\}\)[\s\S]*orderBy\(\.\.\.buildAttemptCompletedAtOrderBy\(\)\)[\s\S]*analyzeAssignmentResults/,
-  'Assignment results API should load explicit scored-attempt result fields through the assignment-domain query helper.'
+  /export const getAssignmentResults[\s\S]*\.select\(buildAssignmentResultsAttemptSelect\(\)\)[\s\S]*buildScoredAssignmentAttemptWhere\(\{[\s\S]*assignmentId: row\.assignment\.id,[\s\S]*\}\)[\s\S]*orderBy\(\.\.\.buildAttemptCompletedAtOrderBy\(\)\)[\s\S]*const settings = resolveAssignmentSettings[\s\S]*analyzeAssignmentResults\(\{[\s\S]*timeLimitSeconds: settings\.timeLimitSeconds/,
+  'Assignment results API should load explicit scored-attempt result fields and pass timer settings into assignment analysis.'
 );
 assert.doesNotMatch(
   assignmentsApiSource,
@@ -41678,6 +41684,7 @@ const resultAnalysis = analyzeAssignmentResults({
         accuracy: 50,
         completedItemCount: 2,
         correctItemCount: 1,
+        durationSeconds: 75,
         earnedPoints: 1,
         totalPoints: 2,
       },
@@ -41699,6 +41706,7 @@ const resultAnalysis = analyzeAssignmentResults({
         accuracy: 100,
         completedItemCount: 2,
         correctItemCount: 2,
+        durationSeconds: 30,
         earnedPoints: 2,
         totalPoints: 2,
       },
@@ -41717,6 +41725,7 @@ const resultAnalysis = analyzeAssignmentResults({
         accuracy: 0,
         completedItemCount: 1,
         correctItemCount: 0,
+        durationSeconds: 95,
         earnedPoints: 0,
         totalPoints: 2,
       },
@@ -41725,7 +41734,19 @@ const resultAnalysis = analyzeAssignmentResults({
     },
   ],
   runtimeItems: resultRuntimeItems,
+  timeLimitSeconds: 60,
 });
+assert.deepEqual(
+  resultAnalysis.attempts.map((attempt) => [
+    attempt.id,
+    attempt.durationSeconds,
+  ]),
+  [
+    ['attempt-1', 60],
+    ['attempt-2', 30],
+    ['attempt-3', 60],
+  ]
+);
 const normalizedRuntimeItemIdResultAnalysis = analyzeAssignmentResults({
   attempts: [
     {
@@ -48728,6 +48749,9 @@ const anonymousLatestAttemptSummary =
   formatStudentFollowUpLatestAttemptSummary(resultAnalysis.attempts[2]!);
 const anonymousLatestAttemptCompletedAtLabel =
   formatStudentFollowUpLatestAttemptCompletedAt(resultAnalysis.attempts[2]!);
+const anonymousLatestAttemptDurationLabel =
+  formatStudentFollowUpLatestAttemptDuration(resultAnalysis.attempts[2]!);
+assert.match(anonymousLatestAttemptSummary, /time 1m 00s\./);
 const anonymousStudentLastSubmittedLabel = formatStudentFollowUpLastSubmitted(
   resultAnalysis.students[0]!
 );
@@ -48947,6 +48971,7 @@ assert.deepEqual(
     accuracyLabel: 'Latest 0% · best 0%',
     followUpRecommendation:
       'review missed or unanswered items, then assign one short retry',
+    latestAttemptDurationLabel: null,
     lastSubmittedLabel: anonymousStudentLastSubmittedLabel,
     latestAccuracyLabel: '0%',
     latestAttemptCompletedAtLabel: null,
@@ -48963,6 +48988,7 @@ assert.deepEqual(classroomBrief.followUpStudentViews[0], {
   accuracyLabel: 'Latest 0% · best 0%',
   followUpRecommendation:
     'review missed or unanswered items, then assign one short retry',
+  latestAttemptDurationLabel: null,
   lastSubmittedLabel: anonymousStudentLastSubmittedLabel,
   latestAccuracyLabel: '0%',
   latestAttemptCompletedAtLabel: null,
@@ -48978,6 +49004,7 @@ assert.deepEqual(classroomBriefWithAttempts.followUpStudentViews[0], {
   accuracyLabel: 'Latest 0% · best 0%',
   followUpRecommendation:
     'review missed or unanswered items, then assign one short retry',
+  latestAttemptDurationLabel: anonymousLatestAttemptDurationLabel,
   lastSubmittedLabel: anonymousStudentLastSubmittedLabel,
   latestAccuracyLabel: '0%',
   latestAttemptCompletedAtLabel: anonymousLatestAttemptCompletedAtLabel,
@@ -49164,6 +49191,7 @@ assert.deepEqual(buildAssignmentReteachPlanStudentView({
   accuracyLabel: '70%',
   followUpRecommendation:
     'review missed or unanswered items, then assign one short retry',
+  latestAttemptDurationLabel: null,
   lastSubmittedLabel: alphaReviewLastSubmittedLabel,
   latestAttemptCompletedAtLabel: null,
   latestAttemptSummaryLabel: null,
@@ -49177,6 +49205,7 @@ assert.deepEqual(reteachPlanWithAttempts.studentViews[0], {
   accuracyLabel: '0%',
   followUpRecommendation:
     'review missed or unanswered items, then assign one short retry',
+  latestAttemptDurationLabel: anonymousLatestAttemptDurationLabel,
   lastSubmittedLabel: anonymousStudentLastSubmittedLabel,
   latestAttemptCompletedAtLabel: anonymousLatestAttemptCompletedAtLabel,
   latestAttemptSummaryLabel: anonymousLatestAttemptSummary,
@@ -49508,8 +49537,8 @@ assert.match(
 );
 assert.match(
   assignmentStudentFollowUpSummarySource,
-  /latestAttemptCompletedAtLabel = latestAttempt[\s\S]*formatStudentFollowUpLatestAttemptCompletedAt\(latestAttempt\)[\s\S]*completedAtLabel: latestAttemptCompletedAtLabel/,
-  'Assignment student follow-up summaries should expose the same submitted-time label used by latest-attempt copied text.'
+  /latestAttemptCompletedAtLabel = latestAttempt[\s\S]*formatStudentFollowUpLatestAttemptCompletedAt\(latestAttempt\)[\s\S]*latestAttemptDurationLabel = latestAttempt[\s\S]*formatStudentFollowUpLatestAttemptDuration\(latestAttempt\)[\s\S]*durationLabel: latestAttemptDurationLabel/,
+  'Assignment student follow-up summaries should expose the same submitted-time and duration labels used by latest-attempt copied text.'
 );
 assert.match(
   assignmentStudentFollowUpSummarySource,
@@ -49533,8 +49562,18 @@ assert.match(
 );
 assert.match(
   assignmentStudentFollowUpSummarySource,
-  /formatStudentFollowUpLatestAttemptSummary[\s\S]*buildAssignmentAttemptReviewSummary\(attempt\)[\s\S]*formatAssignmentResultDate\(attempt\.completedAt/,
-  'Assignment student follow-up latest-attempt summaries should reuse shared attempt-review and result-date helpers.'
+  /formatStudentFollowUpLatestAttemptSummary[\s\S]*buildAssignmentAttemptReviewSummary\(attempt\)/,
+  'Assignment student follow-up latest-attempt summaries should reuse the shared attempt-review helper.'
+);
+assert.match(
+  assignmentStudentFollowUpSummarySource,
+  /formatStudentFollowUpLatestAttemptDuration[\s\S]*buildAttemptDurationDisplayView\(\{[\s\S]*durationSeconds: attempt\.durationSeconds/,
+  'Assignment student follow-up latest-attempt duration labels should reuse the shared duration display helper.'
+);
+assert.match(
+  assignmentStudentFollowUpSummarySource,
+  /formatStudentFollowUpLatestAttemptCompletedAt[\s\S]*formatAssignmentResultDate\(attempt\.completedAt/,
+  'Assignment student follow-up latest-attempt submitted-time labels should reuse the shared result-date helper.'
 );
 assert.match(
   assignmentStudentFollowUpSummarySource,
@@ -49543,8 +49582,8 @@ assert.match(
 );
 assert.match(
   assignmentStudentFollowUpSummarySource,
-  /assignment_student_follow_up_latest_attempt_summary_with_time[\s\S]*assignment_student_follow_up_latest_attempt_summary/,
-  'Assignment student follow-up latest-attempt summaries should use localized timed and untimed copy.'
+  /assignment_student_follow_up_latest_attempt_summary_with_time_and_duration[\s\S]*assignment_student_follow_up_latest_attempt_summary_with_time[\s\S]*assignment_student_follow_up_latest_attempt_summary_with_duration[\s\S]*assignment_student_follow_up_latest_attempt_summary/,
+  'Assignment student follow-up latest-attempt summaries should use localized submitted-time, duration, and fallback copy.'
 );
 assert.match(
   assignmentStudentFollowUpSummarySource,
@@ -49572,6 +49611,7 @@ assert.deepEqual(
     bestAccuracyLabel: '70%',
     followUpRecommendation:
       'review missed or unanswered items, then assign one short retry',
+    latestAttemptDurationLabel: null,
     lastSubmittedLabel: alphaReviewLastSubmittedLabel,
     latestAccuracyLabel: '70%',
     latestAttemptCompletedAtLabel: null,
@@ -49629,12 +49669,13 @@ assert.equal(
   formatStudentFollowUpLatestAttemptSummary(resultAnalysis.attempts[2]!),
   anonymousLatestAttemptSummary
 );
+assert.equal(anonymousLatestAttemptDurationLabel, '1m 00s');
 assert.equal(
   formatStudentFollowUpLatestAttemptSummary({
     ...resultAnalysis.attempts[2]!,
     completedAt: null,
   }),
-  'Latest attempt: submitted 1/2, correct 0/2, 2 items to review.'
+  'Latest attempt: submitted 1/2, correct 0/2, 2 items to review, time 1m 00s.'
 );
 assert.equal(
   buildLatestAttemptReviewByStudentKey(resultAnalysis.attempts).get(
@@ -49663,6 +49704,7 @@ assert.deepEqual(
     bestAccuracyLabel: '0%',
     followUpRecommendation:
       'review missed or unanswered items, then assign one short retry',
+    latestAttemptDurationLabel: anonymousLatestAttemptDurationLabel,
     lastSubmittedLabel: anonymousStudentLastSubmittedLabel,
     latestAccuracyLabel: '0%',
     latestAttemptCompletedAtLabel: anonymousLatestAttemptCompletedAtLabel,

@@ -9,6 +9,7 @@ import {
   buildAttemptAnswerMapByItemId,
   getAttemptAnswerByRuntimeItemId,
 } from '@/assignments/attempt-answers';
+import { normalizeAttemptDurationSeconds } from '@/assignments/attempt-duration';
 import { createStudentIdentityResolver } from '@/assignments/identity';
 import { getAssignmentReviewPriorityItems } from '@/assignments/review-priority';
 import {
@@ -59,6 +60,7 @@ export type AssignmentAttemptReview = {
   accuracy: number;
   answers: AssignmentAttemptReviewAnswer[];
   completedAt: Date | null;
+  durationSeconds: number | undefined;
   id: string;
   score: number;
   studentKey: string;
@@ -95,9 +97,11 @@ export const ASSIGNMENT_RESULTS_ANALYSIS_LIMITS = {
 export function analyzeAssignmentResults({
   attempts,
   runtimeItems,
+  timeLimitSeconds,
 }: {
   attempts: AttemptForAnalysis[];
   runtimeItems: RuntimeItem[];
+  timeLimitSeconds?: number | null;
 }): AssignmentResultsAnalysis {
   const completedAttempts = attempts.filter(hasAttemptResult);
   const completedAttemptAnswerMaps = completedAttempts.map((attempt) =>
@@ -149,6 +153,10 @@ export function analyzeAssignmentResults({
         runtimeItems,
       }),
       completedAt: attempt.completedAt,
+      durationSeconds: normalizeAttemptDurationSeconds({
+        durationSeconds: attempt.resultJson.durationSeconds,
+        timeLimitSeconds,
+      }),
       id: attempt.id,
       score: getAttemptReviewScore(attempt),
       studentKey: identity.key,

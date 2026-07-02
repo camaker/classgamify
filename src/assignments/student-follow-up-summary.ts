@@ -15,6 +15,7 @@ import {
   formatAssignmentResultNumber,
   formatAssignmentResultValue,
 } from '@/assignments/result-format';
+import { buildAttemptDurationDisplayView } from '@/assignments/attempt-duration';
 import {
   formatAssignmentResultFraction,
   formatAssignmentResultStudentLabel,
@@ -39,6 +40,7 @@ export type AssignmentStudentFollowUpSummaryStudentView = {
   averageAccuracyLabel: string;
   bestAccuracyLabel: string;
   followUpRecommendation: string;
+  latestAttemptDurationLabel: string | null;
   lastSubmittedLabel: string | null;
   latestAccuracyLabel: string;
   latestAttemptCompletedAtLabel: string | null;
@@ -214,10 +216,14 @@ export function buildAssignmentStudentFollowUpSummaryStudentView({
   const latestAttemptCompletedAtLabel = latestAttempt
     ? formatStudentFollowUpLatestAttemptCompletedAt(latestAttempt)
     : null;
+  const latestAttemptDurationLabel = latestAttempt
+    ? formatStudentFollowUpLatestAttemptDuration(latestAttempt)
+    : null;
   const latestAttemptSummaryLabel = latestAttempt
     ? formatStudentFollowUpLatestAttemptSummary({
         attempt: latestAttempt,
         completedAtLabel: latestAttemptCompletedAtLabel,
+        durationLabel: latestAttemptDurationLabel,
       })
     : null;
   const lastSubmittedContextLabel = formatStudentFollowUpLastSubmittedContext({
@@ -245,6 +251,7 @@ export function buildAssignmentStudentFollowUpSummaryStudentView({
     averageAccuracyLabel,
     bestAccuracyLabel,
     followUpRecommendation,
+    latestAttemptDurationLabel,
     lastSubmittedLabel,
     latestAccuracyLabel,
     latestAttemptCompletedAtLabel,
@@ -292,10 +299,17 @@ export function formatStudentFollowUpRecommendation(needsReviewCount: number) {
 
 export function formatStudentFollowUpLatestAttemptSummary(
   input:
-    | Pick<AssignmentAttemptReview, 'answers' | 'completedAt'>
+    | Pick<
+        AssignmentAttemptReview,
+        'answers' | 'completedAt' | 'durationSeconds'
+      >
     | {
-        attempt: Pick<AssignmentAttemptReview, 'answers' | 'completedAt'>;
+        attempt: Pick<
+          AssignmentAttemptReview,
+          'answers' | 'completedAt' | 'durationSeconds'
+        >;
         completedAtLabel: string | null;
+        durationLabel: string | null;
       }
 ) {
   const attempt = 'attempt' in input ? input.attempt : input;
@@ -304,6 +318,10 @@ export function formatStudentFollowUpLatestAttemptSummary(
     'attempt' in input
       ? input.completedAtLabel
       : formatStudentFollowUpLatestAttemptCompletedAt(attempt);
+  const durationLabel =
+    'attempt' in input
+      ? input.durationLabel
+      : formatStudentFollowUpLatestAttemptDuration(attempt);
   const summaryInput = {
     correct: formatAssignmentResultFraction(
       summary.correctItemCount,
@@ -318,6 +336,18 @@ export function formatStudentFollowUpLatestAttemptSummary(
     ),
   };
 
+  if (completedAtLabel && durationLabel) {
+    return m.assignment_student_follow_up_latest_attempt_summary_with_time_and_duration(
+      {
+        ...summaryInput,
+        completedAt: formatAssignmentResultValue(completedAtLabel, {
+          emptyValue: '',
+        }),
+        duration: durationLabel,
+      }
+    );
+  }
+
   if (completedAtLabel) {
     return m.assignment_student_follow_up_latest_attempt_summary_with_time({
       ...summaryInput,
@@ -327,7 +357,26 @@ export function formatStudentFollowUpLatestAttemptSummary(
     });
   }
 
+  if (durationLabel) {
+    return m.assignment_student_follow_up_latest_attempt_summary_with_duration({
+      ...summaryInput,
+      duration: durationLabel,
+    });
+  }
+
   return m.assignment_student_follow_up_latest_attempt_summary(summaryInput);
+}
+
+export function formatStudentFollowUpLatestAttemptDuration(
+  attempt: Pick<AssignmentAttemptReview, 'durationSeconds'>
+) {
+  const durationView = buildAttemptDurationDisplayView({
+    durationSeconds: attempt.durationSeconds,
+  });
+
+  return durationView.empty
+    ? null
+    : formatAssignmentResultValue(durationView.label, { emptyValue: '' });
 }
 
 export function formatStudentFollowUpLatestAttemptCompletedAt(

@@ -408,6 +408,7 @@ export const getAssignmentResults = createServerFn({ method: 'GET' })
       analysis: analyzeAssignmentResults({
         attempts,
         runtimeItems: resolvedSource.runtimeItems,
+        timeLimitSeconds: settings.timeLimitSeconds,
       }),
       attempts,
       stats,

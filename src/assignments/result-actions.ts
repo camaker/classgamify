@@ -1018,6 +1018,7 @@ function getAssignmentResultCopyArtifactPreviewCoverageMetaKey(
 
 function buildAssignmentResultCopyArtifactStudentAttemptMetaItems(
   studentViews: Array<{
+    latestAttemptDurationLabel: string | null;
     lastSubmittedLabel: string | null;
     latestAttemptCompletedAtLabel: string | null;
     latestAttemptSummaryLabel: string | null;
@@ -1051,10 +1052,16 @@ function countAssignmentResultCopyLatestAttemptViews(
 }
 
 function countAssignmentResultCopyLatestAttemptTimeViews(
-  studentViews: Array<{ latestAttemptCompletedAtLabel: string | null }>
+  studentViews: Array<{
+    latestAttemptCompletedAtLabel: string | null;
+    latestAttemptDurationLabel: string | null;
+  }>
 ) {
   return studentViews.filter((studentView) =>
-    Boolean(studentView.latestAttemptCompletedAtLabel)
+    Boolean(
+      studentView.latestAttemptCompletedAtLabel ||
+        studentView.latestAttemptDurationLabel
+    )
   ).length;
 }
 
