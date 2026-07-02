@@ -104,6 +104,7 @@ import {
   buildActivityLibraryStarterPreview,
   buildActivityLibraryTemplateFilterOptions,
   findCreatedActivityInList,
+  formatActivityLibraryDisplayDescription,
   formatActivityLibraryDisplayTitle,
   formatActivityLibraryTemplateShortNameList,
   formatActivityLibraryStatusLabel,
@@ -24011,6 +24012,13 @@ assert.equal(
 );
 assert.equal(formatActivityLibraryDisplayTitle('   '), 'Untitled activity');
 assert.equal(
+  formatActivityLibraryDisplayDescription(
+    '  Ｓｏｒｔ\u00A0　states\r\n by   observable properties.  '
+  ),
+  'Sort states by observable properties.'
+);
+assert.equal(formatActivityLibraryDisplayDescription('   '), '');
+assert.equal(
   buildCreatedActivityPanelContext({
     activity: {
       ...createdActivities[1],
@@ -25385,8 +25393,13 @@ assert.match(
 );
 assert.match(
   activityLibraryViewSource,
-  /buildActivityLibraryCardDisplayView[\s\S]*const displayTitle = formatActivityLibraryDisplayTitle\(activity\.title\)[\s\S]*actionsLabel: m\.activity_library_card_actions_label\(\{[\s\S]*title: displayTitle,[\s\S]*ariaLabel: m\.activity_library_card_aria_label\(\{[\s\S]*title: displayTitle,[\s\S]*displayTitle,/,
-  'Activity library card display view should reuse the normalized display title for visible, aria, and action labels.'
+  /export type ActivityLibraryCardDisplayView = \{[\s\S]*displayDescription: string;[\s\S]*export function formatActivityLibraryDisplayDescription\(description: string\)[\s\S]*normalizeRuntimeDisplayText\(description\)/,
+  'Activity library card display views should normalize visible descriptions through one display-description helper.'
+);
+assert.match(
+  activityLibraryViewSource,
+  /buildActivityLibraryCardDisplayView[\s\S]*const displayTitle = formatActivityLibraryDisplayTitle\(activity\.title\)[\s\S]*const displayDescription = formatActivityLibraryDisplayDescription\([\s\S]*activity\.description[\s\S]*actionsLabel: m\.activity_library_card_actions_label\(\{[\s\S]*title: displayTitle,[\s\S]*ariaLabel: m\.activity_library_card_aria_label\(\{[\s\S]*title: displayTitle,[\s\S]*displayDescription,[\s\S]*displayTitle,/,
+  'Activity library card display view should reuse normalized display title and description for visible, aria, and action labels.'
 );
 assert.match(
   activityLibraryViewSource,
@@ -25502,6 +25515,16 @@ assert.match(
   activityLibraryCardComponentSource,
   /<CardTitle>[\s\S]*\{cardDisplayView\.displayTitle\}[\s\S]*<\/CardTitle>/,
   'Activity library card component should render the prepared display title instead of raw activity titles.'
+);
+assert.match(
+  activityLibraryCardComponentSource,
+  /<CardDescription>[\s\S]*\{cardDisplayView\.displayDescription\}[\s\S]*<\/CardDescription>/,
+  'Activity library card component should render the prepared display description instead of raw activity descriptions.'
+);
+assert.doesNotMatch(
+  activityLibraryCardComponentSource,
+  /\{activity\.description\}/,
+  'Activity library card component should not render raw activity descriptions.'
 );
 assert.match(
   activityLibraryCardComponentSource,
@@ -31005,6 +31028,8 @@ const starterActivityDisplayView = buildActivityLibraryCardDisplayView({
 const normalizedTitleActivityDisplayView = buildActivityLibraryCardDisplayView({
   activity: {
     ...starterActivityCardView,
+    description:
+      '  Ｐｒａｃｔｉｃｅ\u00A0　food\r\n words   with quick choices.  ',
     title: '  Ｆｏｏｄ\u00A0　words  ',
   },
   libraryStatus: 'active',
@@ -31013,6 +31038,10 @@ assert.equal(starterActivityDisplayView.templateName, 'Quiz');
 assert.equal(starterActivityDisplayView.templateType, 'quiz');
 assert.equal(starterActivityDisplayView.statusLabel, 'Preview');
 assert.equal(normalizedTitleActivityDisplayView.displayTitle, 'Food words');
+assert.equal(
+  normalizedTitleActivityDisplayView.displayDescription,
+  'Practice food words with quick choices.'
+);
 assert.equal(
   normalizedTitleActivityDisplayView.ariaLabel,
   'Food words, Preview, Quiz'

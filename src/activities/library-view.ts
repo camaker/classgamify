@@ -168,6 +168,7 @@ export type ActivityLibraryCardDisplayView = {
   compatibilityLabel: string;
   contentLabel: string;
   detailsLabel: string;
+  displayDescription: string;
   displayTitle: string;
   restoreRequiredLabel: string;
   sourceMaterials: ActivitySourceMaterialSummaryView;
@@ -1328,6 +1329,10 @@ export function formatActivityLibraryDisplayTitle(title: string) {
   );
 }
 
+export function formatActivityLibraryDisplayDescription(description: string) {
+  return normalizeRuntimeDisplayText(description);
+}
+
 export function buildActivityLibraryCardDisplayView({
   activity,
   libraryStatus,
@@ -1342,6 +1347,9 @@ export function buildActivityLibraryCardDisplayView({
   });
   const statusLabel = formatActivityLibraryCardStatusLabel(activity);
   const displayTitle = formatActivityLibraryDisplayTitle(activity.title);
+  const displayDescription = formatActivityLibraryDisplayDescription(
+    activity.description
+  );
 
   return {
     actionState: buildActivityLibraryCardActionState({
@@ -1373,6 +1381,7 @@ export function buildActivityLibraryCardDisplayView({
     detailsLabel: m.activity_library_card_details_label({
       title: displayTitle,
     }),
+    displayDescription,
     displayTitle,
     editAction: buildActivityLibraryEditorAction({
       activityId: activity.id,

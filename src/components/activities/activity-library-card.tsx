@@ -193,7 +193,7 @@ export function ActivityLibraryCard({
           </h2>
         </CardTitle>
         <CardDescription>
-          <p>{activity.description}</p>
+          <p>{cardDisplayView.displayDescription}</p>
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
