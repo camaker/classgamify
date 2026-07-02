@@ -9,6 +9,7 @@ import { toast } from 'sonner';
 
 export function CopyAssignmentShareLinkButton({
   className,
+  descriptionId,
   disabled,
   disabledReasonCode,
   disabledMessage,
@@ -18,6 +19,7 @@ export function CopyAssignmentShareLinkButton({
   shareUrl,
 }: {
   className?: string;
+  descriptionId?: string;
   disabled?: boolean;
   disabledReasonCode?: AssignmentShareLinkDisabledReasonCode;
   disabledMessage?: string;
@@ -53,11 +55,19 @@ export function CopyAssignmentShareLinkButton({
       variant="outline"
       className={className}
       disabled={disabled}
-      aria-describedby={disabled ? disabledReasonId : undefined}
+      aria-describedby={buildShareLinkButtonDescriptionIds(
+        descriptionId,
+        disabled ? disabledReasonId : undefined
+      )}
       onClick={copyShareLink}
     >
-      <IconCopy className="size-4" />
+      <IconCopy aria-hidden="true" className="size-4" />
       {label}
     </Button>
   );
+}
+
+function buildShareLinkButtonDescriptionIds(...ids: Array<string | undefined>) {
+  const descriptionIds = ids.filter(Boolean).join(' ');
+  return descriptionIds || undefined;
 }

@@ -308,19 +308,26 @@ function AssignmentListShareActions({
   action: AssignmentListShareAction;
 }) {
   const disabledReasonId = getAssignmentListShareDisabledReasonId(action);
+  const sharePathDescriptionId =
+    getAssignmentListSharePathDescriptionId(action);
 
   return (
     <div className="grid gap-2">
-      <AssignmentListSharePath action={action} />
+      <AssignmentListSharePath
+        action={action}
+        descriptionId={sharePathDescriptionId}
+      />
       <AssignmentListSharePreviewAction
         action={action}
         disabledReasonId={disabledReasonId}
+        sharePathDescriptionId={sharePathDescriptionId}
       />
       <CopyAssignmentShareLinkButton
         disabled={!action.isAvailable}
         disabledReasonCode={action.disabledReasonCode}
         disabledMessage={action.disabledReason}
         disabledReasonId={disabledReasonId}
+        descriptionId={sharePathDescriptionId}
         label={action.copyLabel}
         shareSlug={action.shareSlug}
         shareUrl={action.shareUrl}
@@ -336,33 +343,75 @@ function AssignmentListShareActions({
 
 function AssignmentListSharePath({
   action,
+  descriptionId,
 }: {
   action: AssignmentListShareAction;
+  descriptionId: string;
 }) {
+  const shareUrlLabelId = getAssignmentListSharePathElementId(
+    action,
+    'url-label'
+  );
+  const shareUrlValueId = getAssignmentListSharePathElementId(
+    action,
+    'url-value'
+  );
+  const sharePathLabelId = getAssignmentListSharePathElementId(
+    action,
+    'path-label'
+  );
+  const sharePathValueId = getAssignmentListSharePathElementId(
+    action,
+    'path-value'
+  );
+
   return (
-    <div className="max-w-64 rounded-lg border bg-muted/30 px-3 py-2 text-muted-foreground text-xs leading-5">
-      <span className="font-medium">{action.shareUrlLabel}</span>
-      <span className="mt-1 block break-all font-mono">{action.shareUrl}</span>
-      <span className="mt-1 block font-medium">{action.sharePathLabel}</span>
-      <span className="mt-1 block truncate font-mono">{action.sharePath}</span>
-    </div>
+    <section
+      aria-labelledby={shareUrlLabelId}
+      aria-describedby={descriptionId}
+      className="max-w-64 rounded-lg border bg-muted/30 px-3 py-2 text-muted-foreground text-xs leading-5"
+    >
+      <span id={shareUrlLabelId} className="font-medium">
+        {action.shareUrlLabel}
+      </span>
+      <span id={shareUrlValueId} className="mt-1 block break-all font-mono">
+        {action.shareUrl}
+      </span>
+      <span id={sharePathLabelId} className="mt-1 block font-medium">
+        {action.sharePathLabel}
+      </span>
+      <span id={sharePathValueId} className="mt-1 block truncate font-mono">
+        {action.sharePath}
+      </span>
+      <span id={descriptionId} className="sr-only">
+        {action.shareUrlLabel} {action.shareUrl} {action.sharePathLabel}{' '}
+        {action.sharePath}
+      </span>
+    </section>
   );
 }
 
 function AssignmentListSharePreviewAction({
   action,
   disabledReasonId,
+  sharePathDescriptionId,
 }: {
   action: AssignmentListShareAction;
   disabledReasonId: string | undefined;
+  sharePathDescriptionId: string;
 }) {
+  const describedBy = buildAssignmentListShareDescriptionIds(
+    sharePathDescriptionId,
+    disabledReasonId
+  );
+
   if (!action.isAvailable) {
     return (
       <Button
         type="button"
         className="w-full lg:w-auto"
         disabled
-        aria-describedby={disabledReasonId}
+        aria-describedby={describedBy}
       >
         <IconPlayerPlay aria-hidden="true" className="size-4" />
         {action.label}
@@ -375,6 +424,7 @@ function AssignmentListSharePreviewAction({
       to={action.to}
       params={{ shareId: action.shareSlug }}
       className={cn(buttonVariants(), 'w-full lg:w-auto')}
+      aria-describedby={sharePathDescriptionId}
     >
       <IconPlayerPlay aria-hidden="true" className="size-4" />
       {action.label}
@@ -406,6 +456,35 @@ function getAssignmentListShareDisabledReasonId({
   shareSlug,
 }: AssignmentListShareAction) {
   return disabledReason
-    ? `assignment-list-share-${shareSlug}-disabled-reason`
+    ? `assignment-list-share-${getAssignmentShareDomIdPart(
+        shareSlug
+      )}-disabled-reason`
     : undefined;
+}
+
+function getAssignmentListSharePathDescriptionId(
+  action: AssignmentListShareAction
+) {
+  return getAssignmentListSharePathElementId(action, 'description');
+}
+
+function getAssignmentListSharePathElementId(
+  { shareSlug }: AssignmentListShareAction,
+  suffix: string
+) {
+  return `assignment-list-share-${getAssignmentShareDomIdPart(
+    shareSlug
+  )}-${suffix}`;
+}
+
+function getAssignmentShareDomIdPart(shareSlug: string) {
+  const normalizedShareSlug = shareSlug.normalize('NFKC').trim();
+  return encodeURIComponent(normalizedShareSlug || 'missing-share-slug');
+}
+
+function buildAssignmentListShareDescriptionIds(
+  ...ids: Array<string | undefined>
+) {
+  const descriptionIds = ids.filter(Boolean).join(' ');
+  return descriptionIds || undefined;
 }

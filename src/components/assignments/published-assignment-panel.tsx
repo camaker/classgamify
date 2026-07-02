@@ -39,30 +39,24 @@ export function PublishedAssignmentPanel({
       isLoading: true,
       shareSlug,
     });
+  const shareSummaryDescriptionId =
+    getPublishedAssignmentShareSummaryDescriptionId(shareSlug);
 
   return (
     <section className="grid gap-4 rounded-lg border border-primary/25 bg-primary/5 p-4 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-center">
       <div className="min-w-0">
         <div className="flex items-center gap-2 text-sm font-medium text-primary">
-          <IconCircleCheck className="size-4" />
+          <IconCircleCheck aria-hidden="true" className="size-4" />
           {assignmentListPublishedPanelCopy.publishedLabel}
         </div>
         <h2 className="mt-2 text-lg font-semibold">{panelContext.title}</h2>
         <p className="mt-1 text-sm leading-6 text-muted-foreground">
           {panelContext.body}
         </p>
-        <div className="mt-2 grid w-fit max-w-full gap-1 rounded-md border bg-background px-2 py-1 text-xs text-muted-foreground">
-          <span>
-            <span className="font-medium">{panelContext.shareUrlLabel}</span>
-            <span className="ml-2 break-all font-mono">
-              {panelContext.shareUrl}
-            </span>
-          </span>
-          <span>
-            <span className="font-medium">{panelContext.sharePathLabel}</span>
-            <span className="ml-2 font-mono">{panelContext.sharePath}</span>
-          </span>
-        </div>
+        <PublishedAssignmentShareSummary
+          descriptionId={shareSummaryDescriptionId}
+          panelContext={panelContext}
+        />
         <PublishedAssignmentNextSteps
           label={panelContext.nextStepsLabel}
           stepViews={panelContext.nextStepViews}
@@ -76,7 +70,62 @@ export function PublishedAssignmentPanel({
       <PublishedAssignmentPanelActions
         actionView={panelContext.actionView}
         onDismiss={onDismiss}
+        shareSummaryDescriptionId={shareSummaryDescriptionId}
       />
+    </section>
+  );
+}
+
+function PublishedAssignmentShareSummary({
+  descriptionId,
+  panelContext,
+}: {
+  descriptionId: string;
+  panelContext: PublishedAssignmentPanelContext;
+}) {
+  const shareUrlLabelId = getPublishedAssignmentShareSummaryElementId(
+    descriptionId,
+    'url-label'
+  );
+  const shareUrlValueId = getPublishedAssignmentShareSummaryElementId(
+    descriptionId,
+    'url-value'
+  );
+  const sharePathLabelId = getPublishedAssignmentShareSummaryElementId(
+    descriptionId,
+    'path-label'
+  );
+  const sharePathValueId = getPublishedAssignmentShareSummaryElementId(
+    descriptionId,
+    'path-value'
+  );
+
+  return (
+    <section
+      aria-labelledby={shareUrlLabelId}
+      aria-describedby={descriptionId}
+      className="mt-2 grid w-fit max-w-full gap-1 rounded-md border bg-background px-2 py-1 text-xs text-muted-foreground"
+    >
+      <span>
+        <span id={shareUrlLabelId} className="font-medium">
+          {panelContext.shareUrlLabel}
+        </span>
+        <span id={shareUrlValueId} className="ml-2 break-all font-mono">
+          {panelContext.shareUrl}
+        </span>
+      </span>
+      <span>
+        <span id={sharePathLabelId} className="font-medium">
+          {panelContext.sharePathLabel}
+        </span>
+        <span id={sharePathValueId} className="ml-2 font-mono">
+          {panelContext.sharePath}
+        </span>
+      </span>
+      <span id={descriptionId} className="sr-only">
+        {panelContext.shareUrlLabel} {panelContext.shareUrl}{' '}
+        {panelContext.sharePathLabel} {panelContext.sharePath}
+      </span>
     </section>
   );
 }
@@ -120,9 +169,11 @@ function PublishedAssignmentNextSteps({
 function PublishedAssignmentPanelActions({
   actionView,
   onDismiss,
+  shareSummaryDescriptionId,
 }: {
   actionView: PublishedAssignmentPanelActionView;
   onDismiss: () => void;
+  shareSummaryDescriptionId: string;
 }) {
   return (
     <div className="flex flex-col gap-2 sm:flex-row lg:justify-end">
@@ -135,7 +186,10 @@ function PublishedAssignmentPanelActions({
         <PublishedAssignmentPrintActionLink action={actionView.printAction} />
       ) : null}
       {actionView.shareAction ? (
-        <PublishedAssignmentShareActions action={actionView.shareAction} />
+        <PublishedAssignmentShareActions
+          action={actionView.shareAction}
+          shareSummaryDescriptionId={shareSummaryDescriptionId}
+        />
       ) : null}
       {actionView.dismissAction ? (
         <PublishedAssignmentDismissActionButton
@@ -161,7 +215,7 @@ function PublishedAssignmentResultsActionLink({
         'w-full bg-background sm:w-auto'
       )}
     >
-      <IconChartBar className="size-4" />
+      <IconChartBar aria-hidden="true" className="size-4" />
       {action.label}
     </Link>
   );
@@ -184,7 +238,7 @@ function PublishedAssignmentPrintActionLink({
         'w-full bg-background sm:w-auto'
       )}
     >
-      <IconPrinter className="size-4" />
+      <IconPrinter aria-hidden="true" className="size-4" />
       {action.label}
     </Link>
   );
@@ -192,8 +246,10 @@ function PublishedAssignmentPrintActionLink({
 
 function PublishedAssignmentShareActions({
   action,
+  shareSummaryDescriptionId,
 }: {
   action: PublishedAssignmentPanelShareAction;
+  shareSummaryDescriptionId: string;
 }) {
   const disabledReasonId = getPublishedAssignmentShareDisabledReasonId(action);
 
@@ -202,12 +258,14 @@ function PublishedAssignmentShareActions({
       <PublishedAssignmentSharePreviewAction
         action={action}
         disabledReasonId={disabledReasonId}
+        shareSummaryDescriptionId={shareSummaryDescriptionId}
       />
       <CopyAssignmentShareLinkButton
         disabled={!action.isAvailable}
         disabledReasonCode={action.disabledReasonCode}
         disabledMessage={action.disabledReason}
         disabledReasonId={disabledReasonId}
+        descriptionId={shareSummaryDescriptionId}
         label={action.copyLabel}
         shareSlug={action.shareSlug}
         shareUrl={action.shareUrl}
@@ -224,10 +282,17 @@ function PublishedAssignmentShareActions({
 function PublishedAssignmentSharePreviewAction({
   action,
   disabledReasonId,
+  shareSummaryDescriptionId,
 }: {
   action: PublishedAssignmentPanelShareAction;
   disabledReasonId: string | undefined;
+  shareSummaryDescriptionId: string;
 }) {
+  const describedBy = buildPublishedAssignmentShareDescriptionIds(
+    shareSummaryDescriptionId,
+    disabledReasonId
+  );
+
   if (!action.isAvailable) {
     return (
       <Button
@@ -235,9 +300,9 @@ function PublishedAssignmentSharePreviewAction({
         variant="outline"
         className="w-full bg-background sm:w-auto"
         disabled
-        aria-describedby={disabledReasonId}
+        aria-describedby={describedBy}
       >
-        <IconPlayerPlay className="size-4" />
+        <IconPlayerPlay aria-hidden="true" className="size-4" />
         {action.label}
       </Button>
     );
@@ -251,8 +316,9 @@ function PublishedAssignmentSharePreviewAction({
         buttonVariants({ variant: 'outline' }),
         'w-full bg-background sm:w-auto'
       )}
+      aria-describedby={shareSummaryDescriptionId}
     >
-      <IconPlayerPlay className="size-4" />
+      <IconPlayerPlay aria-hidden="true" className="size-4" />
       {action.label}
     </Link>
   );
@@ -282,7 +348,9 @@ function getPublishedAssignmentShareDisabledReasonId({
   shareSlug,
 }: PublishedAssignmentPanelShareAction) {
   return disabledReason
-    ? `published-assignment-share-${shareSlug}-disabled-reason`
+    ? `published-assignment-share-${getPublishedAssignmentShareDomIdPart(
+        shareSlug
+      )}-disabled-reason`
     : undefined;
 }
 
@@ -300,8 +368,33 @@ function PublishedAssignmentDismissActionButton({
       className="w-full sm:w-auto"
       onClick={onClick}
     >
-      <IconX className="size-4" />
+      <IconX aria-hidden="true" className="size-4" />
       {action.label}
     </Button>
   );
+}
+
+function getPublishedAssignmentShareSummaryDescriptionId(shareSlug: string) {
+  return `published-assignment-share-${getPublishedAssignmentShareDomIdPart(
+    shareSlug
+  )}-description`;
+}
+
+function getPublishedAssignmentShareSummaryElementId(
+  descriptionId: string,
+  suffix: string
+) {
+  return `${descriptionId}-${suffix}`;
+}
+
+function getPublishedAssignmentShareDomIdPart(shareSlug: string) {
+  const normalizedShareSlug = shareSlug.normalize('NFKC').trim();
+  return encodeURIComponent(normalizedShareSlug || 'missing-share-slug');
+}
+
+function buildPublishedAssignmentShareDescriptionIds(
+  ...ids: Array<string | undefined>
+) {
+  const descriptionIds = ids.filter(Boolean).join(' ');
+  return descriptionIds || undefined;
 }

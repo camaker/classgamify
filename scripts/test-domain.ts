@@ -2257,8 +2257,8 @@ assert.match(
 );
 assert.match(
   copyAssignmentShareLinkButtonSource,
-  /disabledReasonId,[\s\S]*disabledReasonId\?: string;[\s\S]*aria-describedby=\{disabled \? disabledReasonId : undefined\}/,
-  'Share-link copy button should associate disabled copy controls with the prepared disabled reason text when available.'
+  /descriptionId,[\s\S]*disabledReasonId,[\s\S]*descriptionId\?: string;[\s\S]*disabledReasonId\?: string;[\s\S]*aria-describedby=\{buildShareLinkButtonDescriptionIds\([\s\S]*descriptionId,[\s\S]*disabled \? disabledReasonId : undefined/,
+  'Share-link copy button should associate copy controls with prepared link descriptions and disabled reason text when available.'
 );
 assert.match(
   copyAssignmentShareLinkButtonSource,
@@ -2279,6 +2279,11 @@ assert.match(
   copyAssignmentShareLinkButtonSource,
   /executionPlan\.type === 'blocked'[\s\S]*toast\.error\(executionPlan\.message\)[\s\S]*copyTextToClipboard\(executionPlan\.url\)[\s\S]*toast\.success\(executionPlan\.successMessage\)[\s\S]*toast\.error\(executionPlan\.failureMessage\)/,
   'Share-link copy button should execute prepared blocked and copy-link plans.'
+);
+assert.match(
+  copyAssignmentShareLinkButtonSource,
+  /IconCopy aria-hidden="true"/,
+  'Share-link copy button should mark the copy icon decorative because the prepared label names the action.'
 );
 assert.doesNotMatch(
   copyAssignmentShareLinkButtonSource,
@@ -6724,8 +6729,8 @@ assert.match(
 );
 assert.match(
   assignmentResultsHeaderActionsSource,
-  /function AssignmentResultsHeaderSharePreviewLink[\s\S]*shareAction\.isAvailable[\s\S]*to=\{shareAction\.to\}[\s\S]*shareAction\.label/,
-  'Assignment result share preview action should render prepared share availability and label.'
+  /function AssignmentResultsHeaderSharePreviewLink[\s\S]*sharePathDescriptionId[\s\S]*buildAssignmentResultHeaderShareDescriptionIds\([\s\S]*sharePathDescriptionId,[\s\S]*disabledReasonId[\s\S]*aria-describedby=\{describedBy\}[\s\S]*to=\{shareAction\.to\}[\s\S]*aria-describedby=\{sharePathDescriptionId\}[\s\S]*shareAction\.label/,
+  'Assignment result share preview action should render prepared share availability and associate the current student-link description.'
 );
 assert.match(
   assignmentResultViewSource,
@@ -6739,18 +6744,18 @@ assert.match(
 );
 assert.match(
   assignmentResultsHeaderActionsSource,
-  /const shareDisabledReasonId =\s*getAssignmentResultHeaderShareDisabledReasonId\(shareAction\)[\s\S]*AssignmentResultsHeaderSharePreviewLink[\s\S]*disabledReasonId=\{shareDisabledReasonId\}[\s\S]*AssignmentResultsHeaderCopyShareAction[\s\S]*disabledReasonId=\{shareDisabledReasonId\}[\s\S]*AssignmentResultsHeaderShareDisabledReason[\s\S]*disabledReasonId=\{shareDisabledReasonId\}/,
-  'Assignment result share controls should pass the same prepared disabled reason id to preview, copy, and disabled reason text.'
+  /const shareDisabledReasonId =\s*getAssignmentResultHeaderShareDisabledReasonId\(shareAction\)[\s\S]*const sharePathDescriptionId =\s*getAssignmentResultHeaderSharePathDescriptionId\(shareAction\)[\s\S]*AssignmentResultsHeaderSharePreviewLink[\s\S]*disabledReasonId=\{shareDisabledReasonId\}[\s\S]*sharePathDescriptionId=\{sharePathDescriptionId\}[\s\S]*AssignmentResultsHeaderSharePath[\s\S]*descriptionId=\{sharePathDescriptionId\}[\s\S]*AssignmentResultsHeaderCopyShareAction[\s\S]*disabledReasonId=\{shareDisabledReasonId\}[\s\S]*sharePathDescriptionId=\{sharePathDescriptionId\}[\s\S]*AssignmentResultsHeaderShareDisabledReason[\s\S]*disabledReasonId=\{shareDisabledReasonId\}/,
+  'Assignment result share controls should pass the same prepared disabled reason id and current student-link description id through preview, path, copy, and disabled reason text.'
 );
 assert.match(
   assignmentResultsHeaderActionsSource,
-  /function getAssignmentResultHeaderShareDisabledReasonId\(\{[\s\S]*disabledReason,[\s\S]*shareSlug,[\s\S]*\}: AssignmentResultHeaderShareAction\)[\s\S]*`assignment-result-share-\$\{shareSlug\}-disabled-reason`/,
-  'Assignment result share disabled reason ids should be stable per student-link share slug.'
+  /function getAssignmentResultHeaderShareDisabledReasonId\(\{[\s\S]*disabledReason,[\s\S]*shareSlug,[\s\S]*\}: AssignmentResultHeaderShareAction\)[\s\S]*getAssignmentResultHeaderShareDomIdPart\([\s\S]*shareSlug[\s\S]*\)[\s\S]*-disabled-reason/,
+  'Assignment result share disabled reason ids should be stable and whitespace-safe per student-link share slug.'
 );
 assert.match(
   assignmentResultsHeaderActionsSource,
-  /function AssignmentResultsHeaderSharePath[\s\S]*shareAction\.sharePathLabel[\s\S]*shareAction\.sharePath[\s\S]*function AssignmentResultsHeaderCopyShareAction[\s\S]*label=\{shareAction\.copyLabel\}/,
-  'Assignment result header share controls should render prepared student-link path labels and copy labels.'
+  /function AssignmentResultsHeaderSharePath[\s\S]*<section[\s\S]*aria-labelledby=\{shareUrlLabelId\}[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*id=\{shareUrlLabelId\}[\s\S]*shareAction\.shareUrlLabel[\s\S]*id=\{shareUrlValueId\}[\s\S]*shareAction\.shareUrl[\s\S]*id=\{sharePathLabelId\}[\s\S]*shareAction\.sharePathLabel[\s\S]*id=\{sharePathValueId\}[\s\S]*shareAction\.sharePath[\s\S]*id=\{descriptionId\}[\s\S]*function AssignmentResultsHeaderCopyShareAction[\s\S]*descriptionId=\{sharePathDescriptionId\}[\s\S]*label=\{shareAction\.copyLabel\}/,
+  'Assignment result header share controls should render prepared student-link path labels, stable descriptions, and copy labels.'
 );
 assert.match(
   assignmentResultsHeaderActionsSource,
@@ -28925,13 +28930,13 @@ assert.match(
 );
 assert.match(
   assignmentListCardComponentSource,
-  /function AssignmentListSharePath[\s\S]*action\.sharePathLabel[\s\S]*action\.sharePath/,
-  'Assignment list share path should render the prepared student-link label and path from the action view.'
+  /function AssignmentListSharePath[\s\S]*descriptionId: string[\s\S]*<section[\s\S]*aria-labelledby=\{shareUrlLabelId\}[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*id=\{shareUrlLabelId\}[\s\S]*action\.shareUrlLabel[\s\S]*id=\{shareUrlValueId\}[\s\S]*action\.shareUrl[\s\S]*id=\{sharePathLabelId\}[\s\S]*action\.sharePathLabel[\s\S]*id=\{sharePathValueId\}[\s\S]*action\.sharePath[\s\S]*id=\{descriptionId\}/,
+  'Assignment list share path should render prepared student-link labels, values, and a stable accessible description from the action view.'
 );
 assert.match(
   assignmentListCardComponentSource,
-  /function AssignmentListSharePreviewAction[\s\S]*!action\.isAvailable[\s\S]*aria-describedby=\{disabledReasonId\}[\s\S]*to=\{action\.to\}[\s\S]*action\.shareSlug[\s\S]*action\.label/,
-  'Assignment list share preview action should render prepared share availability and label.'
+  /function AssignmentListSharePreviewAction[\s\S]*sharePathDescriptionId: string[\s\S]*buildAssignmentListShareDescriptionIds\([\s\S]*sharePathDescriptionId,[\s\S]*disabledReasonId[\s\S]*!action\.isAvailable[\s\S]*aria-describedby=\{describedBy\}[\s\S]*to=\{action\.to\}[\s\S]*action\.shareSlug[\s\S]*aria-describedby=\{sharePathDescriptionId\}[\s\S]*action\.label/,
+  'Assignment list share preview action should render prepared share availability and associate the current student-link description.'
 );
 assert.match(
   assignmentListCardComponentSource,
@@ -28940,8 +28945,13 @@ assert.match(
 );
 assert.match(
   assignmentListCardComponentSource,
-  /function AssignmentListShareActions[\s\S]*const disabledReasonId = getAssignmentListShareDisabledReasonId\(action\)[\s\S]*CopyAssignmentShareLinkButton[\s\S]*disabledReasonId=\{disabledReasonId\}[\s\S]*AssignmentListShareDisabledReason[\s\S]*disabledReasonId=\{disabledReasonId\}/,
-  'Assignment list share copy button should reference the same prepared disabled reason text as the preview action.'
+  /function AssignmentListShareActions[\s\S]*const disabledReasonId = getAssignmentListShareDisabledReasonId\(action\)[\s\S]*const sharePathDescriptionId =\s*getAssignmentListSharePathDescriptionId\(action\)[\s\S]*AssignmentListSharePath[\s\S]*descriptionId=\{sharePathDescriptionId\}[\s\S]*AssignmentListSharePreviewAction[\s\S]*sharePathDescriptionId=\{sharePathDescriptionId\}[\s\S]*CopyAssignmentShareLinkButton[\s\S]*disabledReasonId=\{disabledReasonId\}[\s\S]*descriptionId=\{sharePathDescriptionId\}[\s\S]*AssignmentListShareDisabledReason[\s\S]*disabledReasonId=\{disabledReasonId\}/,
+  'Assignment list share copy button should reference the same prepared disabled reason text and current student-link description as the preview action.'
+);
+assert.match(
+  assignmentListCardComponentSource,
+  /function getAssignmentListShareDisabledReasonId\(\{[\s\S]*disabledReason,[\s\S]*shareSlug,[\s\S]*\}: AssignmentListShareAction\)[\s\S]*getAssignmentShareDomIdPart\([\s\S]*shareSlug[\s\S]*\)[\s\S]*-disabled-reason[\s\S]*function getAssignmentShareDomIdPart\(shareSlug: string\)[\s\S]*normalize\('NFKC'\)\.trim\(\)[\s\S]*encodeURIComponent/,
+  'Assignment list share action description and disabled-reason ids should be whitespace-safe for encoded student-link slugs.'
 );
 assert.doesNotMatch(
   assignmentListCardComponentSource,
@@ -29112,13 +29122,13 @@ assert.doesNotMatch(
 );
 assert.match(
   publishedAssignmentPanelComponentSource,
-  /PublishedAssignmentPanelActions[\s\S]*actionView=\{panelContext\.actionView\}[\s\S]*onDismiss=\{onDismiss\}/,
-  'Published assignment panel should delegate prepared action rendering to a focused action component.'
+  /const shareSummaryDescriptionId =\s*getPublishedAssignmentShareSummaryDescriptionId\(shareSlug\)[\s\S]*PublishedAssignmentShareSummary[\s\S]*descriptionId=\{shareSummaryDescriptionId\}[\s\S]*panelContext=\{panelContext\}[\s\S]*PublishedAssignmentPanelActions[\s\S]*actionView=\{panelContext\.actionView\}[\s\S]*onDismiss=\{onDismiss\}[\s\S]*shareSummaryDescriptionId=\{shareSummaryDescriptionId\}/,
+  'Published assignment panel should create one student-link summary description id and share it with the summary and action controls.'
 );
 assert.match(
   publishedAssignmentPanelComponentSource,
-  /panelContext\.sharePathLabel[\s\S]*panelContext\.sharePath[\s\S]*PublishedAssignmentNextSteps[\s\S]*label=\{panelContext\.nextStepsLabel\}[\s\S]*stepViews=\{panelContext\.nextStepViews\}[\s\S]*stepViews\.map[\s\S]*key=\{stepView\.id\}[\s\S]*stepView\.label/,
-  'Published assignment panel should render prepared student-link path labels and structured next steps from the panel context.'
+  /function PublishedAssignmentShareSummary[\s\S]*<section[\s\S]*aria-labelledby=\{shareUrlLabelId\}[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*id=\{shareUrlLabelId\}[\s\S]*panelContext\.shareUrlLabel[\s\S]*id=\{shareUrlValueId\}[\s\S]*panelContext\.shareUrl[\s\S]*id=\{sharePathLabelId\}[\s\S]*panelContext\.sharePathLabel[\s\S]*id=\{sharePathValueId\}[\s\S]*panelContext\.sharePath[\s\S]*id=\{descriptionId\}/,
+  'Published assignment panel should render prepared student-link summary labels, values, and stable descriptions from the panel context.'
 );
 assert.doesNotMatch(
   publishedAssignmentPanelComponentSource,
@@ -29147,8 +29157,8 @@ assert.doesNotMatch(
 );
 assert.match(
   publishedAssignmentPanelComponentSource,
-  /function PublishedAssignmentSharePreviewAction[\s\S]*!action\.isAvailable[\s\S]*aria-describedby=\{disabledReasonId\}[\s\S]*to=\{action\.to\}[\s\S]*action\.shareSlug/,
-  'Published assignment panel share action should render the prepared student-link route target.'
+  /function PublishedAssignmentSharePreviewAction[\s\S]*shareSummaryDescriptionId: string[\s\S]*buildPublishedAssignmentShareDescriptionIds\([\s\S]*shareSummaryDescriptionId,[\s\S]*disabledReasonId[\s\S]*!action\.isAvailable[\s\S]*aria-describedby=\{describedBy\}[\s\S]*to=\{action\.to\}[\s\S]*action\.shareSlug[\s\S]*aria-describedby=\{shareSummaryDescriptionId\}/,
+  'Published assignment panel share action should render the prepared student-link route target and associate the current share summary.'
 );
 assert.match(
   publishedAssignmentPanelComponentSource,
@@ -29157,8 +29167,18 @@ assert.match(
 );
 assert.match(
   publishedAssignmentPanelComponentSource,
-  /function PublishedAssignmentShareActions[\s\S]*const disabledReasonId = getPublishedAssignmentShareDisabledReasonId\(action\)[\s\S]*CopyAssignmentShareLinkButton[\s\S]*disabledReasonId=\{disabledReasonId\}[\s\S]*PublishedAssignmentShareDisabledReason[\s\S]*disabledReasonId=\{disabledReasonId\}/,
-  'Published assignment panel copy action should reference the same prepared disabled reason text as the preview action.'
+  /function PublishedAssignmentShareActions[\s\S]*const disabledReasonId = getPublishedAssignmentShareDisabledReasonId\(action\)[\s\S]*PublishedAssignmentSharePreviewAction[\s\S]*shareSummaryDescriptionId=\{shareSummaryDescriptionId\}[\s\S]*CopyAssignmentShareLinkButton[\s\S]*disabledReasonId=\{disabledReasonId\}[\s\S]*descriptionId=\{shareSummaryDescriptionId\}[\s\S]*PublishedAssignmentShareDisabledReason[\s\S]*disabledReasonId=\{disabledReasonId\}/,
+  'Published assignment panel copy action should reference the same prepared disabled reason text and current share summary as the preview action.'
+);
+assert.match(
+  publishedAssignmentPanelComponentSource,
+  /function getPublishedAssignmentShareDisabledReasonId\(\{[\s\S]*disabledReason,[\s\S]*shareSlug,[\s\S]*\}: PublishedAssignmentPanelShareAction\)[\s\S]*getPublishedAssignmentShareDomIdPart\([\s\S]*shareSlug[\s\S]*\)[\s\S]*-disabled-reason[\s\S]*function getPublishedAssignmentShareDomIdPart\(shareSlug: string\)[\s\S]*normalize\('NFKC'\)\.trim\(\)[\s\S]*encodeURIComponent/,
+  'Published assignment share action ids should be whitespace-safe for encoded student-link slugs.'
+);
+assert.match(
+  publishedAssignmentPanelComponentSource,
+  /function getPublishedAssignmentShareSummaryDescriptionId\(shareSlug: string\)[\s\S]*published-assignment-share-\$\{getPublishedAssignmentShareDomIdPart\([\s\S]*shareSlug[\s\S]*\)\}-description/,
+  'Published assignment share summary description ids should use the same encoded student-link slug id part.'
 );
 assert.doesNotMatch(
   publishedAssignmentPanelComponentSource,

@@ -40,16 +40,23 @@ export function AssignmentResultsHeaderActions({
 }: AssignmentResultsHeaderActionsProps) {
   const shareDisabledReasonId =
     getAssignmentResultHeaderShareDisabledReasonId(shareAction);
+  const sharePathDescriptionId =
+    getAssignmentResultHeaderSharePathDescriptionId(shareAction);
 
   return (
     <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap">
       <AssignmentResultsHeaderSharePreviewLink
         disabledReasonId={shareDisabledReasonId}
+        sharePathDescriptionId={sharePathDescriptionId}
         shareAction={shareAction}
       />
-      <AssignmentResultsHeaderSharePath shareAction={shareAction} />
+      <AssignmentResultsHeaderSharePath
+        descriptionId={sharePathDescriptionId}
+        shareAction={shareAction}
+      />
       <AssignmentResultsHeaderCopyShareAction
         disabledReasonId={shareDisabledReasonId}
+        sharePathDescriptionId={sharePathDescriptionId}
         shareAction={shareAction}
       />
       <AssignmentResultsHeaderPrintActionLink printAction={printAction} />
@@ -71,18 +78,25 @@ export function AssignmentResultsHeaderActions({
 
 function AssignmentResultsHeaderSharePreviewLink({
   disabledReasonId,
+  sharePathDescriptionId,
   shareAction,
 }: {
   disabledReasonId: string | undefined;
+  sharePathDescriptionId: string;
   shareAction: AssignmentResultHeaderShareAction;
 }) {
+  const describedBy = buildAssignmentResultHeaderShareDescriptionIds(
+    sharePathDescriptionId,
+    disabledReasonId
+  );
+
   if (!shareAction.isAvailable) {
     return (
       <Button
         type="button"
         className="w-full sm:w-auto"
         disabled
-        aria-describedby={disabledReasonId}
+        aria-describedby={describedBy}
       >
         <IconPlayerPlay aria-hidden="true" className="size-4" />
         {shareAction.label}
@@ -97,6 +111,7 @@ function AssignmentResultsHeaderSharePreviewLink({
         shareId: shareAction.shareSlug,
       }}
       className={cn(buttonVariants(), 'w-full sm:w-auto')}
+      aria-describedby={sharePathDescriptionId}
     >
       <IconPlayerPlay aria-hidden="true" className="size-4" />
       {shareAction.label}
@@ -105,28 +120,63 @@ function AssignmentResultsHeaderSharePreviewLink({
 }
 
 function AssignmentResultsHeaderSharePath({
+  descriptionId,
   shareAction,
 }: {
+  descriptionId: string;
   shareAction: AssignmentResultHeaderShareAction;
 }) {
+  const shareUrlLabelId = getAssignmentResultHeaderSharePathElementId(
+    shareAction,
+    'url-label'
+  );
+  const shareUrlValueId = getAssignmentResultHeaderSharePathElementId(
+    shareAction,
+    'url-value'
+  );
+  const sharePathLabelId = getAssignmentResultHeaderSharePathElementId(
+    shareAction,
+    'path-label'
+  );
+  const sharePathValueId = getAssignmentResultHeaderSharePathElementId(
+    shareAction,
+    'path-value'
+  );
+
   return (
-    <div className="flex min-h-8 max-w-full flex-wrap items-center gap-2 rounded-lg border bg-muted/30 px-3 py-2 text-sm text-muted-foreground">
+    <section
+      aria-labelledby={shareUrlLabelId}
+      aria-describedby={descriptionId}
+      className="flex min-h-8 max-w-full flex-wrap items-center gap-2 rounded-lg border bg-muted/30 px-3 py-2 text-sm text-muted-foreground"
+    >
       <IconShare3 aria-hidden="true" className="size-4" />
-      <span className="font-medium">{shareAction.shareUrlLabel}</span>
-      <span className="break-all font-mono text-xs">
+      <span id={shareUrlLabelId} className="font-medium">
+        {shareAction.shareUrlLabel}
+      </span>
+      <span id={shareUrlValueId} className="break-all font-mono text-xs">
         {shareAction.shareUrl}
       </span>
-      <span className="font-medium">{shareAction.sharePathLabel}</span>
-      <span className="font-mono text-xs">{shareAction.sharePath}</span>
-    </div>
+      <span id={sharePathLabelId} className="font-medium">
+        {shareAction.sharePathLabel}
+      </span>
+      <span id={sharePathValueId} className="font-mono text-xs">
+        {shareAction.sharePath}
+      </span>
+      <span id={descriptionId} className="sr-only">
+        {shareAction.shareUrlLabel} {shareAction.shareUrl}{' '}
+        {shareAction.sharePathLabel} {shareAction.sharePath}
+      </span>
+    </section>
   );
 }
 
 function AssignmentResultsHeaderCopyShareAction({
   disabledReasonId,
+  sharePathDescriptionId,
   shareAction,
 }: {
   disabledReasonId: string | undefined;
+  sharePathDescriptionId: string;
   shareAction: AssignmentResultHeaderShareAction;
 }) {
   return (
@@ -135,6 +185,7 @@ function AssignmentResultsHeaderCopyShareAction({
       disabledReasonCode={shareAction.disabledReasonCode}
       disabledMessage={shareAction.disabledReason}
       disabledReasonId={disabledReasonId}
+      descriptionId={sharePathDescriptionId}
       label={shareAction.copyLabel}
       shareSlug={shareAction.shareSlug}
       shareUrl={shareAction.shareUrl}
@@ -188,8 +239,37 @@ function getAssignmentResultHeaderShareDisabledReasonId({
   shareSlug,
 }: AssignmentResultHeaderShareAction) {
   return disabledReason
-    ? `assignment-result-share-${shareSlug}-disabled-reason`
+    ? `assignment-result-share-${getAssignmentResultHeaderShareDomIdPart(
+        shareSlug
+      )}-disabled-reason`
     : undefined;
+}
+
+function getAssignmentResultHeaderSharePathDescriptionId(
+  action: AssignmentResultHeaderShareAction
+) {
+  return getAssignmentResultHeaderSharePathElementId(action, 'description');
+}
+
+function getAssignmentResultHeaderSharePathElementId(
+  { shareSlug }: AssignmentResultHeaderShareAction,
+  suffix: string
+) {
+  return `assignment-result-share-${getAssignmentResultHeaderShareDomIdPart(
+    shareSlug
+  )}-${suffix}`;
+}
+
+function getAssignmentResultHeaderShareDomIdPart(shareSlug: string) {
+  const normalizedShareSlug = shareSlug.normalize('NFKC').trim();
+  return encodeURIComponent(normalizedShareSlug || 'missing-share-slug');
+}
+
+function buildAssignmentResultHeaderShareDescriptionIds(
+  ...ids: Array<string | undefined>
+) {
+  const descriptionIds = ids.filter(Boolean).join(' ');
+  return descriptionIds || undefined;
 }
 
 function AssignmentResultsHeaderResultActions({
