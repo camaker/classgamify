@@ -1,7 +1,8 @@
-import { m } from '@/locale/paraglide/messages';
 import { DashboardLayout } from '@/components/layout/dashboard-layout';
+import { ProfileWorkspaceSummary } from '@/components/settings/profile/profile-workspace-summary';
 import { UpdateAvatarCard } from '@/components/settings/profile/update-avatar-card';
 import { UpdateNameCard } from '@/components/settings/profile/update-name-card';
+import { buildSettingsProfilePageViewModel } from '@/settings/profile-view';
 import { createFileRoute } from '@tanstack/react-router';
 
 export const Route = createFileRoute('/settings/profile')({
@@ -9,17 +10,16 @@ export const Route = createFileRoute('/settings/profile')({
 });
 
 function ProfilePage() {
-  const breadcrumbs = [
-    { id: 'settings', label: m.common_settings(), isCurrentPage: false },
-    { id: 'profile', label: m.settings_profile_title(), isCurrentPage: true },
-  ];
+  const pageView = buildSettingsProfilePageViewModel();
+
   return (
     <DashboardLayout
-      breadcrumbs={breadcrumbs}
-      title={m.settings_profile_title()}
-      description={m.settings_profile_description()}
+      breadcrumbs={pageView.breadcrumbs}
+      title={pageView.title}
+      description={pageView.description}
     >
       <div className="flex flex-col gap-8">
+        <ProfileWorkspaceSummary view={pageView.workspaceSummaryView} />
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
           <UpdateNameCard />
         </div>

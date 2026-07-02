@@ -1736,6 +1736,58 @@ assert.match(
   /const message = m\.settings_profile_name_fail\(\);/,
   'Profile name update failures should use the localized name failure message.'
 );
+const settingsProfileRouteProductSource = readFileSync(
+  'src/routes/settings/profile.tsx',
+  'utf8'
+);
+const settingsProfileViewSource = readFileSync(
+  'src/settings/profile-view.ts',
+  'utf8'
+);
+const profileWorkspaceSummarySource = readFileSync(
+  'src/components/settings/profile/profile-workspace-summary.tsx',
+  'utf8'
+);
+assert.match(
+  settingsProfileViewSource,
+  /export type SettingsProfileWorkspaceSummaryItemId =[\s\S]*'activities'[\s\S]*'assignments'[\s\S]*'results'[\s\S]*'student-recognition'/,
+  'Profile settings view model should expose stable teacher identity scope item ids.'
+);
+assert.match(
+  settingsProfileViewSource,
+  /export function buildSettingsProfilePageViewModel\(\)[\s\S]*breadcrumbs:[\s\S]*id: 'settings'[\s\S]*id: 'profile'[\s\S]*workspaceSummaryView: buildSettingsProfileWorkspaceSummaryView\(\)/,
+  'Profile settings view model should own page breadcrumbs and the workspace identity summary.'
+);
+assert.match(
+  settingsProfileViewSource,
+  /settings_profile_workspace_summary_title[\s\S]*settings_profile_workspace_summary_description[\s\S]*settings_profile_workspace_summary_activities_description[\s\S]*settings_profile_workspace_summary_assignments_description[\s\S]*settings_profile_workspace_summary_student_description[\s\S]*settings_profile_workspace_summary_results_description/,
+  'Profile settings view model should prepare localized teacher identity scope copy.'
+);
+assert.match(
+  settingsProfileRouteProductSource,
+  /const pageView = buildSettingsProfilePageViewModel\(\);[\s\S]*breadcrumbs=\{pageView\.breadcrumbs\}[\s\S]*title=\{pageView\.title\}[\s\S]*description=\{pageView\.description\}/,
+  'Profile settings route should consume the settings profile page view model.'
+);
+assert.match(
+  settingsProfileRouteProductSource,
+  /ProfileWorkspaceSummary[\s\S]*view=\{pageView\.workspaceSummaryView\}/,
+  'Profile settings route should render the prepared teacher identity scope summary.'
+);
+assert.doesNotMatch(
+  settingsProfileRouteProductSource,
+  /m\.settings_profile_title|m\.settings_profile_description|m\.common_settings/,
+  'Profile settings route should not rebuild localized page copy directly.'
+);
+assert.match(
+  profileWorkspaceSummarySource,
+  /view\.itemViews\.map\(\(itemView\) =>[\s\S]*key=\{itemView\.id\}[\s\S]*itemView\.label[\s\S]*itemView\.description/,
+  'Profile workspace summary component should render prepared summary items keyed by stable ids.'
+);
+assert.doesNotMatch(
+  profileWorkspaceSummarySource,
+  /Teacher identity scope|Activities|Assignment links|Student recognition|Results|教师身份|活动|作业链接|学生识别|结果/,
+  'Profile workspace summary component should not hard-code visible profile scope copy.'
+);
 const updatePasswordCardSource = readFileSync(
   'src/components/settings/security/update-password-card.tsx',
   'utf8'
@@ -9419,7 +9471,7 @@ assert.match(
   /websiteConfig\.newsletter\?\.enable !== true/
 );
 for (const [source, breadcrumbId] of [
-  [settingsProfileRouteSource, 'profile'],
+  [settingsProfileViewSource, 'profile'],
   [settingsSecurityRouteSource, 'security'],
   [settingsFilesRouteSource, 'files'],
   [settingsBillingRouteSource, 'billing'],
@@ -9431,7 +9483,7 @@ for (const [source, breadcrumbId] of [
     new RegExp(
       `id: 'settings'[\\s\\S]*id: '${breadcrumbId}'[\\s\\S]*isCurrentPage: true`
     ),
-    `Settings ${breadcrumbId} route should pass stable breadcrumb ids.`
+    `Settings ${breadcrumbId} route or view model should pass stable breadcrumb ids.`
   );
 }
 assert.doesNotMatch(
@@ -9624,6 +9676,11 @@ const authWorkspaceBoundaryRequirements = [
       ['auth_register_benefit_review', /student attempts/],
       ['auth_forgot_password_description', /activities, assignment links, and results/],
       ['auth_reset_password_description', /source materials, and result records/],
+      ['settings_profile_workspace_summary_description', /display name and avatar/],
+      ['settings_profile_workspace_summary_activities_description', /reusable classroom content/],
+      ['settings_profile_workspace_summary_assignments_description', /Published assignment links/],
+      ['settings_profile_workspace_summary_student_description', /ClassGamify teacher workspace/],
+      ['settings_profile_workspace_summary_results_description', /student attempt records/],
       ['settings_security_description', /connected providers/],
       [
         'settings_security_delete_account_confirm_description',
@@ -9655,6 +9712,11 @@ const authWorkspaceBoundaryRequirements = [
       ['auth_register_benefit_review', /学生尝试/],
       ['auth_forgot_password_description', /活动、作业链接和结果记录/],
       ['auth_reset_password_description', /来源素材和结果记录/],
+      ['settings_profile_workspace_summary_description', /显示名称和头像/],
+      ['settings_profile_workspace_summary_activities_description', /可复用课堂内容/],
+      ['settings_profile_workspace_summary_assignments_description', /已发布作业链接/],
+      ['settings_profile_workspace_summary_student_description', /ClassGamify 教师工作区/],
+      ['settings_profile_workspace_summary_results_description', /学生尝试记录/],
       ['settings_security_description', /已连接登录方式/],
       [
         'settings_security_delete_account_confirm_description',
