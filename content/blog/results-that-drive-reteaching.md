@@ -1,7 +1,7 @@
 ---
 title: Results should tell teachers what to reteach next
 description: Assignment analytics are useful when they show item performance, student follow-up, explanations, and exportable evidence.
-date: 2026-06-17
+date: 2026-07-02
 category: Results
 image: https://classgamify.com/og.png
 ---
@@ -25,6 +25,7 @@ A good result view should show:
 - how many students submitted an answer
 - the correct rate
 - the expected answer
+- accepted alternatives when the teacher provided them
 - the teacher's explanation when one exists
 
 That turns results into a lesson-planning surface.
@@ -48,6 +49,15 @@ real school workflows.
 
 The export should preserve summary data, attempt data, and item-level answers
 so the teacher does not have to copy details by hand.
+
+For classroom records, the export should also keep the delivery policy beside
+the scores: identity mode, answer reveal, shuffle, attempt limit, timer, close
+time, instructions, submitted duration, and accepted-answer context. That way a
+score still carries the rules that produced it.
+
+Anonymous work needs one more privacy guard. Teachers need stable anonymous
+student labels for review, but raw browser tokens should stay out of result
+tables, copied summaries, and CSV exports.
 
 ## The result page is part of the teaching loop
 

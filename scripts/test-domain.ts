@@ -1202,6 +1202,141 @@ const activeClassGamifySurfaceText = activeClassGamifySurfaceFiles
   })
   .join('\n');
 assert.match(activeClassGamifySurfaceText, /ClassGamify/);
+const editorialProductSurfaceRequirements = [
+  {
+    filePath: 'content/blog/ai-drafts-teacher-review.md',
+    patterns: [
+      /AI activity drafts/,
+      /Teacher source notes -> AI draft -> editable activity -> teacher publishes/,
+      /safe\s+filename basenames/,
+      /storage keys, URLs, path segments, query tokens, or\s+permission metadata/,
+      /source materials were safely referenced/,
+      /materials\s+were omitted from the AI prompt/,
+    ],
+  },
+  {
+    filePath: 'content/blog/ai-drafts-teacher-review.zh.md',
+    patterns: [
+      /AI 活动草稿/,
+      /老师资料 -> AI 草稿 -> 可编辑活动 -> 老师发布/,
+      /安全文件名/,
+      /存储 key、URL、路径片段、查询 token 或权限元数据/,
+      /来源素材被安全引用/,
+      /没有进入 AI 提示/,
+    ],
+  },
+  {
+    filePath: 'content/blog/assignment-links-without-lms.md',
+    patterns: [
+      /Assignment links/,
+      /browser\s+token/,
+      /item count,\s+attempt limit,\s+timer,\s+close time,\s+identity mode/,
+      /answer keys and teacher-only notes do not/,
+      /Closed or expired links/,
+      /should\s+not expose the frozen runtime items/,
+    ],
+  },
+  {
+    filePath: 'content/blog/assignment-links-without-lms.zh.md',
+    patterns: [
+      /作业链接/,
+      /浏览器标记限制尝试次数/,
+      /题目数量、尝试次数限制、计时器、关闭时间、身份方式/,
+      /答案和老师专用备注不属于/,
+      /关闭或过期的链接/,
+      /不应该[\s\S]*暴露冻结的运行时题目/,
+    ],
+  },
+  {
+    filePath: 'content/blog/results-that-drive-reteaching.md',
+    patterns: [
+      /Results should tell teachers/,
+      /accepted alternatives/,
+      /identity mode,\s+answer reveal,\s+shuffle,\s+attempt limit,\s+timer,\s+close\s+time/,
+      /submitted duration/,
+      /raw browser tokens should stay out of result\s+tables/,
+    ],
+  },
+  {
+    filePath: 'content/blog/results-that-drive-reteaching.zh.md',
+    patterns: [
+      /结果页应该告诉老师/,
+      /可接受替代答案/,
+      /身份方式、答案展示、题目乱序、尝试次数限制、计时器、关闭时间/,
+      /提交耗时/,
+      /原始浏览器标记不应该出现在结果表/,
+    ],
+  },
+  {
+    filePath: 'content/blog/wordwall-style-activity-loop.md',
+    patterns: [
+      /Wordwall-style activity loop/,
+      /Source materials can support that activity/,
+      /not teacher file lists or storage metadata/,
+      /assignment snapshot and scored attempts/,
+      /copied classroom briefs, and follow-up summaries/,
+    ],
+  },
+  {
+    filePath: 'content/blog/wordwall-style-activity-loop.zh.md',
+    patterns: [
+      /Wordwall 风格的课堂活动闭环/,
+      /来源素材可以支持这个活动/,
+      /不是老师的文件列表或存储元数据/,
+      /作业快照和已批改尝试/,
+      /可复制课堂简报和学生跟进摘要/,
+    ],
+  },
+  {
+    filePath: 'content/changelog/v2.0.0.md',
+    patterns: [
+      /Assignments, Results, and AI Draft Readiness/,
+      /Rule summaries/,
+      /item count, attempts,\s+timer, close time, identity mode, and review behavior/,
+      /Copy-ready review artifacts/,
+      /raw anonymous browser tokens/,
+      /Source-material safety/,
+      /omitted private file metadata/,
+    ],
+  },
+  {
+    filePath: 'content/changelog/v2.0.0.zh.md',
+    patterns: [
+      /作业、结果和 AI 草稿准备度/,
+      /规则摘要/,
+      /题目数量、尝试次数、计时器、关闭时间、身份方式和复盘行为/,
+      /可复制复盘材料/,
+      /原始匿名浏览器标记/,
+      /来源素材安全/,
+      /私有文件元数据/,
+    ],
+  },
+] as const;
+for (const {
+  filePath,
+  patterns,
+} of editorialProductSurfaceRequirements) {
+  const fileText = readFileSync(filePath, 'utf8');
+
+  assert.match(
+    fileText,
+    /ClassGamify|AI|作业|课堂|老师|学生/,
+    `${filePath} should remain a ClassGamify editorial surface.`
+  );
+  assert.doesNotMatch(
+    fileText,
+    /\bAI demos?\b|AI 演示/i,
+    `${filePath} should not position product AI as a demo.`
+  );
+
+  for (const pattern of patterns) {
+    assert.match(
+      fileText,
+      pattern,
+      `${filePath} should describe the expected editorial product boundary.`
+    );
+  }
+}
 const blogPostVisualSource = readFileSync(
   'src/components/blog/blog-post-visual.tsx',
   'utf8'
@@ -8980,7 +9115,17 @@ for (const retiredStubRouteFile of [
   assert.equal(excludedPageRouteFiles.includes(retiredStubRouteFile), false);
 }
 assert.match(sitemapRouteSource, /Routes\.Worksheets/);
+assert.match(
+  sitemapRouteSource,
+  /getSortedPosts\(baseLocale\)\.map\(\(post\) => \(\{[\s\S]*path: `\$\{Routes\.Blog\}\/\$\{post\.slug\}`[\s\S]*lastmod: post\.date/,
+  'Sitemap should derive indexed editorial URLs from the ClassGamify blog collection.'
+);
 assert.doesNotMatch(sitemapRouteSource, /Routes\.StudentPreview/);
+assert.doesNotMatch(
+  sitemapRouteSource,
+  /Routes\.Changelog|['"]\/changelog|['"]\/hsk|['"]\/hanzi|['"]\/learn|getlangstudy/i,
+  'Sitemap should not index copied learning, handwriting, or retired release-note routes.'
+);
 assert.doesNotMatch(routeConstantsSource, /['"]\/play\/demo-food['"]/);
 assert.equal(isLocalizedPath('/worksheets'), true);
 assert.equal(isLocalizedPath('/play/demo-food'), false);

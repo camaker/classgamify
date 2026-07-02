@@ -1,7 +1,7 @@
 ---
 title: Assignment links for teachers who do not want another LMS
 description: Why public student links need snapshots, limits, timers, and safe answer reveal instead of a heavy course system.
-date: 2026-06-19
+date: 2026-07-02
 category: Assignments
 image: https://classgamify.com/og.png
 ---
@@ -27,6 +27,11 @@ Anonymous assignment links can still enforce attempt limits with a browser
 token. That lets a teacher avoid collecting names for quick practice while still
 keeping the homework from being submitted repeatedly by accident.
 
+The runner should also explain the rules before students start: item count,
+attempt limit, timer, close time, identity mode, and whether review feedback can
+appear after submission. That rule summary belongs in the public assignment
+payload, but answer keys and teacher-only notes do not.
+
 ## Snapshots protect already-shared homework
 
 Teachers edit activities all the time. They fix a typo, add an explanation, or
@@ -36,6 +41,10 @@ assignment that has already been sent.
 ClassGamify publishes assignments from snapshots. A snapshot freezes the
 student-facing content and settings for that link. The activity library remains
 editable, but the assignment remains stable.
+
+Closed or expired links should respect the same boundary. They can tell students
+that the assignment is unavailable and to contact the teacher, but they should
+not expose the frozen runtime items after access is no longer allowed.
 
 ## Settings belong on the assignment
 

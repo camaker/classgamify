@@ -1,7 +1,7 @@
 ---
 title: AI activity drafts should still end in teacher review
 description: The safest AI workflow is source notes to structured draft to editable activity, never straight to published homework.
-date: 2026-06-18
+date: 2026-07-02
 category: AI Authoring
 image: https://classgamify.com/og.png
 ---
@@ -17,6 +17,13 @@ Teacher source notes -> AI draft -> editable activity -> teacher publishes
 ```
 
 That extra review step is what makes AI practical in a classroom product.
+
+When a draft starts from uploaded classroom material, the safe first step is
+provenance, not extraction. The draft can show the teacher that an audio file,
+worksheet image, document, or spreadsheet is attached, and it can use safe
+filename basenames to help the teacher recognize the material. It should not
+silently read file bytes, storage keys, URLs, path segments, query tokens, or
+permission metadata before a dedicated extraction workflow exists.
 
 ## The draft should use the same activity contract
 
@@ -37,6 +44,11 @@ can be filled from related answers and vocabulary before AI distractor
 generation is connected.
 
 AI should make the structure easier to complete, not hide uncertainty.
+
+That uncertainty should also be visible in the draft summary. A teacher should
+be able to see which source materials were safely referenced, which materials
+were omitted from the AI prompt, which template families are ready, and which
+ones still need teacher-written content.
 
 ## Publishing remains a teacher decision
 
