@@ -1792,6 +1792,18 @@ const updatePasswordCardSource = readFileSync(
   'src/components/settings/security/update-password-card.tsx',
   'utf8'
 );
+const settingsSecurityRouteProductSource = readFileSync(
+  'src/routes/settings/security.tsx',
+  'utf8'
+);
+const settingsSecurityViewSource = readFileSync(
+  'src/settings/security-view.ts',
+  'utf8'
+);
+const securityWorkspaceSummarySource = readFileSync(
+  'src/components/settings/security/security-workspace-summary.tsx',
+  'utf8'
+);
 assert.doesNotMatch(
   updatePasswordCardSource,
   /ctx\.error|err\.message|error\.message|err instanceof Error|error instanceof Error/,
@@ -1801,6 +1813,66 @@ assert.match(
   updatePasswordCardSource,
   /const message = m\.settings_security_update_password_fail\(\);/,
   'Password update failures should use the localized password failure message.'
+);
+assert.match(
+  settingsSecurityViewSource,
+  /export type SettingsSecurityWorkspaceSummaryItemId =[\s\S]*'account-access'[\s\S]*'activities'[\s\S]*'assignments'[\s\S]*'student-results'/,
+  'Security settings view model should expose stable workspace boundary item ids.'
+);
+assert.match(
+  settingsSecurityViewSource,
+  /export type SettingsSecurityCapabilityId =[\s\S]*'account-deletion'[\s\S]*'email-password'/,
+  'Security settings view model should expose stable security capability ids.'
+);
+assert.match(
+  settingsSecurityViewSource,
+  /export function buildSettingsSecurityPageViewModel\(\)[\s\S]*websiteConfig\.auth\?\.enableCredentialLogin[\s\S]*websiteConfig\.auth\?\.enableDeleteAccount[\s\S]*breadcrumbs:[\s\S]*id: 'settings'[\s\S]*id: 'security'[\s\S]*workspaceSummaryView: buildSettingsSecurityWorkspaceSummaryView/,
+  'Security settings view model should own config-aware page state, breadcrumbs, and workspace summary.'
+);
+assert.match(
+  settingsSecurityViewSource,
+  /settings_security_workspace_summary_title[\s\S]*settings_security_workspace_summary_description[\s\S]*settings_security_workspace_capabilities_description[\s\S]*settings_security_workspace_capability_password_enabled_description[\s\S]*settings_security_workspace_capability_delete_enabled_description/,
+  'Security settings view model should prepare localized workspace capability copy.'
+);
+assert.match(
+  settingsSecurityViewSource,
+  /settings_security_workspace_summary_access_description[\s\S]*settings_security_workspace_summary_activities_description[\s\S]*settings_security_workspace_summary_assignments_description[\s\S]*settings_security_workspace_summary_results_description/,
+  'Security settings view model should prepare localized workspace boundary copy.'
+);
+assert.match(
+  settingsSecurityRouteProductSource,
+  /const pageView = buildSettingsSecurityPageViewModel\(\);[\s\S]*breadcrumbs=\{pageView\.breadcrumbs\}[\s\S]*title=\{pageView\.title\}[\s\S]*description=\{pageView\.description\}/,
+  'Security settings route should consume the settings security page view model.'
+);
+assert.match(
+  settingsSecurityRouteProductSource,
+  /SecurityWorkspaceSummary[\s\S]*view=\{pageView\.workspaceSummaryView\}/,
+  'Security settings route should render the prepared workspace security boundary summary.'
+);
+assert.match(
+  settingsSecurityRouteProductSource,
+  /pageView\.credentialLoginEnabled[\s\S]*PasswordCardWrapper[\s\S]*pageView\.deleteAccountEnabled[\s\S]*DeleteAccountCard/,
+  'Security settings route should use prepared config flags for password and deletion controls.'
+);
+assert.doesNotMatch(
+  settingsSecurityRouteProductSource,
+  /m\.settings_security_title|m\.settings_security_description|m\.common_settings|websiteConfig\.auth/,
+  'Security settings route should not rebuild localized page copy or config-derived state directly.'
+);
+assert.match(
+  securityWorkspaceSummarySource,
+  /view\.itemViews\.map\(\(itemView\) =>[\s\S]*key=\{itemView\.id\}[\s\S]*function SecurityWorkspaceSummaryItem[\s\S]*itemView\.label[\s\S]*itemView\.description/,
+  'Security workspace summary component should render prepared boundary views keyed by stable ids.'
+);
+assert.match(
+  securityWorkspaceSummarySource,
+  /view\.capabilityViews\.map\(\(capabilityView\) =>[\s\S]*key=\{capabilityView\.id\}[\s\S]*function SecurityCapabilityItem[\s\S]*capabilityView\.state[\s\S]*capabilityView\.value[\s\S]*capabilityView\.description/,
+  'Security workspace summary component should render prepared capability views keyed by stable ids.'
+);
+assert.doesNotMatch(
+  securityWorkspaceSummarySource,
+  /Workspace security boundary|Available security controls|Account access|Assignment links|Student results|Email password|Account deletion|工作区安全边界|可用安全控制|账号访问|作业链接|学生结果|邮箱密码|账号删除/,
+  'Security workspace summary component should not hard-code visible security boundary copy.'
 );
 const deleteAccountCardSource = readFileSync(
   'src/components/settings/security/delete-account-card.tsx',
@@ -9472,7 +9544,7 @@ assert.match(
 );
 for (const [source, breadcrumbId] of [
   [settingsProfileViewSource, 'profile'],
-  [settingsSecurityRouteSource, 'security'],
+  [settingsSecurityViewSource, 'security'],
   [settingsFilesRouteSource, 'files'],
   [settingsBillingRouteSource, 'billing'],
   [settingsNotificationsRouteSource, 'notifications'],
@@ -9681,6 +9753,13 @@ const authWorkspaceBoundaryRequirements = [
       ['settings_profile_workspace_summary_assignments_description', /Published assignment links/],
       ['settings_profile_workspace_summary_student_description', /ClassGamify teacher workspace/],
       ['settings_profile_workspace_summary_results_description', /student attempt records/],
+      ['settings_security_workspace_summary_description', /reusable activities, source materials, assignment links/],
+      ['settings_security_workspace_summary_access_description', /teacher workspace/],
+      ['settings_security_workspace_summary_activities_description', /source-material references/],
+      ['settings_security_workspace_summary_assignments_description', /Published assignment links/],
+      ['settings_security_workspace_summary_results_description', /Student attempt records/],
+      ['settings_security_workspace_capability_password_enabled_description', /activities, source materials, links, and results/],
+      ['settings_security_workspace_capability_delete_enabled_description', /classroom result records/],
       ['settings_security_description', /connected providers/],
       [
         'settings_security_delete_account_confirm_description',
@@ -9717,6 +9796,13 @@ const authWorkspaceBoundaryRequirements = [
       ['settings_profile_workspace_summary_assignments_description', /已发布作业链接/],
       ['settings_profile_workspace_summary_student_description', /ClassGamify 教师工作区/],
       ['settings_profile_workspace_summary_results_description', /学生尝试记录/],
+      ['settings_security_workspace_summary_description', /可复用活动、来源素材、作业链接/],
+      ['settings_security_workspace_summary_access_description', /教师工作区/],
+      ['settings_security_workspace_summary_activities_description', /来源素材引用/],
+      ['settings_security_workspace_summary_assignments_description', /已发布作业链接/],
+      ['settings_security_workspace_summary_results_description', /学生尝试记录/],
+      ['settings_security_workspace_capability_password_enabled_description', /活动、来源素材、作业链接和结果记录/],
+      ['settings_security_workspace_capability_delete_enabled_description', /课堂结果记录/],
       ['settings_security_description', /已连接登录方式/],
       [
         'settings_security_delete_account_confirm_description',

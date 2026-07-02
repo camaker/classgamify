@@ -1,4 +1,5 @@
-import { test } from '@playwright/test';
+import { readFileSync } from 'node:fs';
+import { expect, test } from '@playwright/test';
 import {
   cleanupE2EUsers,
   loginByForm,
@@ -12,6 +13,8 @@ import {
   type LocaleMode,
   type ThemeMode,
 } from '../fixtures/page-health';
+
+type LocaleMessages = Record<string, string>;
 
 const protectedPages = [
   { path: '/dashboard', name: 'dashboard' },
@@ -29,6 +32,30 @@ const smokeMatrix: Array<{ locale: LocaleMode; theme: ThemeMode }> = [
   { locale: 'zh', theme: 'dark' },
   { locale: 'zh', theme: 'light' },
 ];
+
+const localeMessages: Record<LocaleMode, LocaleMessages> = {
+  en: readLocaleMessages('en'),
+  zh: readLocaleMessages('zh'),
+};
+
+function readLocaleMessages(locale: LocaleMode): LocaleMessages {
+  return JSON.parse(
+    readFileSync(
+      new URL(
+        `../../../project.inlang/messages/${locale}.json`,
+        import.meta.url
+      ),
+      'utf8'
+    )
+  ) as LocaleMessages;
+}
+
+function getLocaleMessage(locale: LocaleMode, key: string) {
+  const value = localeMessages[locale][key];
+  if (!value) throw new Error(`Missing locale message ${locale}:${key}`);
+
+  return value;
+}
 
 test.describe('protected page smoke coverage', () => {
   test.beforeAll(async ({ request }) => {
@@ -58,6 +85,32 @@ test.describe('protected page smoke coverage', () => {
             localizedPath(protectedPage.path, locale),
             { theme }
           );
+          if (protectedPage.path === '/settings/security') {
+            await expect(
+              page.getByText(
+                getLocaleMessage(
+                  locale,
+                  'settings_security_workspace_summary_title'
+                )
+              )
+            ).toBeVisible();
+            await expect(
+              page.getByText(
+                getLocaleMessage(
+                  locale,
+                  'settings_security_workspace_capabilities_title'
+                )
+              )
+            ).toBeVisible();
+            await expect(
+              page.getByText(
+                getLocaleMessage(
+                  locale,
+                  'settings_security_workspace_summary_results_label'
+                )
+              )
+            ).toBeVisible();
+          }
         });
       }
     });

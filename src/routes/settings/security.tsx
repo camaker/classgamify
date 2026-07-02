@@ -1,8 +1,8 @@
-import { m } from '@/locale/paraglide/messages';
 import { DashboardLayout } from '@/components/layout/dashboard-layout';
 import { DeleteAccountCard } from '@/components/settings/security/delete-account-card';
 import { PasswordCardWrapper } from '@/components/settings/security/password-card-wrapper';
-import { websiteConfig } from '@/config/website';
+import { SecurityWorkspaceSummary } from '@/components/settings/security/security-workspace-summary';
+import { buildSettingsSecurityPageViewModel } from '@/settings/security-view';
 import { createFileRoute } from '@tanstack/react-router';
 
 export const Route = createFileRoute('/settings/security')({
@@ -10,26 +10,22 @@ export const Route = createFileRoute('/settings/security')({
 });
 
 function SecurityPage() {
-  const breadcrumbs = [
-    { id: 'settings', label: m.common_settings(), isCurrentPage: false },
-    { id: 'security', label: m.settings_security_title(), isCurrentPage: true },
-  ];
-  const credentialLoginEnabled =
-    websiteConfig.auth?.enableCredentialLogin ?? false;
-  const deleteAccountEnabled = websiteConfig.auth?.enableDeleteAccount ?? false;
+  const pageView = buildSettingsSecurityPageViewModel();
+
   return (
     <DashboardLayout
-      breadcrumbs={breadcrumbs}
-      title={m.settings_security_title()}
-      description={m.settings_security_description()}
+      breadcrumbs={pageView.breadcrumbs}
+      title={pageView.title}
+      description={pageView.description}
     >
       <div className="flex flex-col gap-8">
-        {credentialLoginEnabled && (
+        <SecurityWorkspaceSummary view={pageView.workspaceSummaryView} />
+        {pageView.credentialLoginEnabled && (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             <PasswordCardWrapper />
           </div>
         )}
-        {deleteAccountEnabled && (
+        {pageView.deleteAccountEnabled && (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             <DeleteAccountCard />
           </div>
