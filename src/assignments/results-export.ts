@@ -412,9 +412,9 @@ function buildAssignmentResultsExportAttemptBaseColumns({
     durationSeconds: statsView.averageDurationSeconds,
     timeLimitSeconds: deliveryView.timeLimitSeconds,
   });
-  const attemptDurationView = buildAttemptDurationDisplayView({
-    durationSeconds: storedAttempt?.resultJson?.durationSeconds,
-    timeLimitSeconds: deliveryView.timeLimitSeconds,
+  const attemptDurationView = buildAssignmentResultsExportAttemptDurationView({
+    attempt,
+    deliveryView,
   });
 
   return [
@@ -492,6 +492,19 @@ function buildAssignmentResultsExportAttemptBaseColumns({
     }),
     formatAssignmentResultCsvDate(studentSummary?.lastCompletedAt),
   ];
+}
+
+function buildAssignmentResultsExportAttemptDurationView({
+  attempt,
+  deliveryView,
+}: {
+  attempt: Pick<AssignmentResultsExportAttemptReview, 'durationSeconds'>;
+  deliveryView: Pick<AssignmentResultsExportDeliveryView, 'timeLimitSeconds'>;
+}) {
+  return buildAttemptDurationDisplayView({
+    durationSeconds: attempt.durationSeconds,
+    timeLimitSeconds: deliveryView.timeLimitSeconds,
+  });
 }
 
 function buildAssignmentResultsExportAnswerRow({

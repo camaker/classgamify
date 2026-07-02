@@ -3070,8 +3070,18 @@ assert.match(
 );
 assert.match(
   assignmentResultsExportSource,
-  /buildAssignmentResultsExportAttemptBaseColumns[\s\S]*const averageDurationView = buildAttemptDurationDisplayView\(\{[\s\S]*durationSeconds: statsView\.averageDurationSeconds,[\s\S]*timeLimitSeconds: deliveryView\.timeLimitSeconds,[\s\S]*const attemptDurationView = buildAttemptDurationDisplayView\(\{[\s\S]*durationSeconds: storedAttempt\?\.resultJson\?\.durationSeconds,[\s\S]*timeLimitSeconds: deliveryView\.timeLimitSeconds,[\s\S]*formatAssignmentResultCsvNumber\(averageDurationView\.seconds,[\s\S]*formatAssignmentResultCsvNumber\(attemptDurationView\.seconds,/,
-  'Assignment CSV export duration columns should reuse the shared attempt-duration display contract for average and per-attempt seconds.'
+  /buildAssignmentResultsExportAttemptBaseColumns[\s\S]*const averageDurationView = buildAttemptDurationDisplayView\(\{[\s\S]*durationSeconds: statsView\.averageDurationSeconds,[\s\S]*timeLimitSeconds: deliveryView\.timeLimitSeconds,[\s\S]*const attemptDurationView = buildAssignmentResultsExportAttemptDurationView\(\{[\s\S]*attempt,[\s\S]*deliveryView,[\s\S]*formatAssignmentResultCsvNumber\(averageDurationView\.seconds,[\s\S]*formatAssignmentResultCsvNumber\(attemptDurationView\.seconds,/,
+  'Assignment CSV export duration columns should reuse the shared attempt-duration display contract for average and analyzed per-attempt seconds.'
+);
+assert.match(
+  assignmentResultsExportSource,
+  /function buildAssignmentResultsExportAttemptDurationView[\s\S]*attempt: Pick<AssignmentResultsExportAttemptReview, 'durationSeconds'>;[\s\S]*durationSeconds: attempt\.durationSeconds,[\s\S]*timeLimitSeconds: deliveryView\.timeLimitSeconds/,
+  'Assignment CSV export per-attempt duration views should consume the result-analysis attempt duration contract.'
+);
+assert.doesNotMatch(
+  assignmentResultsExportSource,
+  /durationSeconds:\s*storedAttempt\?\.resultJson\?\.durationSeconds/,
+  'Assignment CSV export per-attempt durations should not be rebuilt from raw stored attempt result JSON.'
 );
 assert.match(
   assignmentResultsExportSource,
@@ -48326,7 +48336,7 @@ assert.match(
 );
 assert.match(
   csv,
-  /"attempt-3","Anonymous student 1","2026-01-03T10:00:00\.000Z","0","","0","","2","0","2","1","","1","0","0","0","2","2026-01-03T10:00:00\.000Z"/
+  /"attempt-3","Anonymous student 1","2026-01-03T10:00:00\.000Z","0","","0","","2","0","2","1","60","1","0","0","0","2","2026-01-03T10:00:00\.000Z"/
 );
 const csvHeaderRow = csvRows[0] ?? [];
 const emptyAnswerCsvRow = csvRows.find((row) => row.includes('attempt-3'));
@@ -48334,7 +48344,7 @@ assert.ok(emptyAnswerCsvRow);
 assert.equal(emptyAnswerCsvRow.length, csvHeaderRow.length);
 assert.match(
   csv,
-  /"attempt-1","Alice","2026-01-01T10:00:00\.000Z","1","2","50","2","2","1","1","0","45","2","100","75","100","0","2026-01-02T10:00:00\.000Z","1","q-1"/
+  /"attempt-1","Alice","2026-01-01T10:00:00\.000Z","1","2","50","2","2","1","1","0","60","2","100","75","100","0","2026-01-02T10:00:00\.000Z","1","q-1"/
 );
 assert.match(csv, /"Paris","Paris, France","correct"/);
 assert.match(csv, /"Paris is the capital of France\."/);
@@ -48539,7 +48549,7 @@ const weightedScoreCsv = buildAssignmentResultsCsv({
 });
 assert.match(
   weightedScoreCsv,
-  /"attempt-1","Alice","2026-01-01T10:00:00\.000Z","1","10","50","2","2","1","1","0","45","2","100","75","100","0","2026-01-02T10:00:00\.000Z"/
+  /"attempt-1","Alice","2026-01-01T10:00:00\.000Z","1","10","50","2","2","1","1","0","60","2","100","75","100","0","2026-01-02T10:00:00\.000Z"/
 );
 function buildCsvWithStoredAttemptDuration(durationSeconds: number) {
   return buildAssignmentResultsCsv({
@@ -48561,14 +48571,48 @@ assert.match(
 );
 assert.match(
   buildCsvWithStoredAttemptDuration(-3),
-  /"attempt-1","Alice","2026-01-01T10:00:00\.000Z","1","2","50","2","2","1","1","0","0","2","100","75","100","0","2026-01-02T10:00:00\.000Z"/
+  /"attempt-1","Alice","2026-01-01T10:00:00\.000Z","1","2","50","2","2","1","1","0","60","2","100","75","100","0","2026-01-02T10:00:00\.000Z"/
 );
 assert.match(
   buildCsvWithStoredAttemptDuration(4.6),
-  /"attempt-1","Alice","2026-01-01T10:00:00\.000Z","1","2","50","2","2","1","1","0","5","2","100","75","100","0","2026-01-02T10:00:00\.000Z"/
+  /"attempt-1","Alice","2026-01-01T10:00:00\.000Z","1","2","50","2","2","1","1","0","60","2","100","75","100","0","2026-01-02T10:00:00\.000Z"/
 );
 assert.match(
   buildCsvWithStoredAttemptDuration(Number.POSITIVE_INFINITY),
+  /"attempt-1","Alice","2026-01-01T10:00:00\.000Z","1","2","50","2","2","1","1","0","60","2","100","75","100","0","2026-01-02T10:00:00\.000Z"/
+);
+function buildCsvWithAnalyzedAttemptDuration(
+  durationSeconds: number | undefined
+) {
+  return buildAssignmentResultsCsv({
+    ...csvExportData,
+    analysis: {
+      ...csvExportData.analysis,
+      attempts: csvExportData.analysis.attempts.map((attempt, attemptIndex) =>
+        attemptIndex === 0
+          ? {
+              ...attempt,
+              durationSeconds,
+            }
+          : attempt
+      ),
+    },
+  });
+}
+assert.match(
+  buildCsvWithAnalyzedAttemptDuration(120),
+  /"attempt-1","Alice","2026-01-01T10:00:00\.000Z","1","2","50","2","2","1","1","0","60","2","100","75","100","0","2026-01-02T10:00:00\.000Z"/
+);
+assert.match(
+  buildCsvWithAnalyzedAttemptDuration(-3),
+  /"attempt-1","Alice","2026-01-01T10:00:00\.000Z","1","2","50","2","2","1","1","0","0","2","100","75","100","0","2026-01-02T10:00:00\.000Z"/
+);
+assert.match(
+  buildCsvWithAnalyzedAttemptDuration(4.6),
+  /"attempt-1","Alice","2026-01-01T10:00:00\.000Z","1","2","50","2","2","1","1","0","5","2","100","75","100","0","2026-01-02T10:00:00\.000Z"/
+);
+assert.match(
+  buildCsvWithAnalyzedAttemptDuration(Number.POSITIVE_INFINITY),
   /"attempt-1","Alice","2026-01-01T10:00:00\.000Z","1","2","50","2","2","1","1","0","","2","100","75","100","0","2026-01-02T10:00:00\.000Z"/
 );
 const zeroAverageDurationCsv = buildAssignmentResultsCsv({
@@ -48627,7 +48671,7 @@ const invalidStoredAttemptCsv = buildAssignmentResultsCsv({
 assert.doesNotMatch(invalidStoredAttemptCsv, /NaN|Infinity/);
 assert.match(
   invalidStoredAttemptCsv,
-  /"attempt-1","Alice","2026-01-01T10:00:00\.000Z","0","","50","0","2","1","1","0","45","2","100","75","100","0","2026-01-02T10:00:00\.000Z"/
+  /"attempt-1","Alice","2026-01-01T10:00:00\.000Z","0","","50","0","2","1","1","0","60","2","100","75","100","0","2026-01-02T10:00:00\.000Z"/
 );
 const activityTemplateFallbackCsv = buildAssignmentResultsCsv({
   ...csvExportData,
