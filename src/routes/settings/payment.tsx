@@ -1,17 +1,19 @@
-import { m } from '@/locale/paraglide/messages';
 import {
   createFileRoute,
   notFound,
   rootRouteId,
   useSearch,
 } from '@tanstack/react-router';
-import { DashboardHeader } from '@/components/layout/dashboard-header';
+import { DashboardLayout } from '@/components/layout/dashboard-layout';
 import { PaymentCard } from '@/components/payment/payment-card';
-import { websiteConfig } from '@/config/website';
+import {
+  buildSettingsPaymentPageViewModel,
+  isSettingsBillingEnabled,
+} from '@/settings/billing-view';
 
 export const Route = createFileRoute('/settings/payment')({
   beforeLoad: () => {
-    if (websiteConfig.payment?.enable !== true) {
+    if (!isSettingsBillingEnabled()) {
       throw notFound({ routeId: rootRouteId });
     }
   },
@@ -29,29 +31,17 @@ export const Route = createFileRoute('/settings/payment')({
 
 function PaymentPage() {
   const search = useSearch({ from: '/settings/payment' });
-  const breadcrumbs = [
-    { id: 'settings', label: m.common_settings(), isCurrentPage: false },
-    {
-      id: 'payment',
-      label: m.settings_billing_breadcrumb(),
-      isCurrentPage: true,
-    },
-  ];
+  const pageView = buildSettingsPaymentPageViewModel({
+    callback: search.callback,
+  });
+
   return (
-    <>
-      <DashboardHeader breadcrumbs={breadcrumbs} />
-      <div className="flex flex-1 flex-col">
-        <div className="@container/main flex flex-1 flex-col gap-2">
-          <div className="flex flex-col gap-4 py-4 lg:gap-6 lg:py-6">
-            <div className="px-4 lg:px-6">
-              <PaymentCard
-                sessionId={search.session_id}
-                callback={search.callback ?? '/settings/billing'}
-              />
-            </div>
-          </div>
-        </div>
-      </div>
-    </>
+    <DashboardLayout
+      breadcrumbs={pageView.breadcrumbs}
+      title={pageView.title}
+      description={pageView.description}
+    >
+      <PaymentCard sessionId={search.session_id} callback={pageView.callback} />
+    </DashboardLayout>
   );
 }

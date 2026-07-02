@@ -400,6 +400,11 @@ import {
   getInitialPaymentConfirmationStatus,
 } from '@/payment/payment-status-view';
 import { buildSettingsBillingCardViewModel } from '@/payment/billing-view';
+import {
+  buildSettingsBillingPageViewModel,
+  buildSettingsBillingWorkspaceSummaryView,
+  buildSettingsPaymentPageViewModel,
+} from '@/settings/billing-view';
 import type { PricePlan, Subscription } from '@/payment/types';
 import {
   AssignmentAttemptAnswerValidationError,
@@ -7432,6 +7437,14 @@ const billingCardSource = readFileSync(
   'utf8'
 );
 const billingViewSource = readFileSync('src/payment/billing-view.ts', 'utf8');
+const settingsBillingViewSource = readFileSync(
+  'src/settings/billing-view.ts',
+  'utf8'
+);
+const billingWorkspaceSummarySource = readFileSync(
+  'src/components/settings/billing/billing-workspace-summary.tsx',
+  'utf8'
+);
 const paymentCardSource = readFileSync(
   'src/components/payment/payment-card.tsx',
   'utf8'
@@ -7471,6 +7484,41 @@ assert.doesNotMatch(
   'BillingCard should not keep plan resolution or subscription status rules in the component.'
 );
 assert.match(
+  settingsBillingViewSource,
+  /export type SettingsBillingWorkspaceSummaryItemId =[\s\S]*'activity-library'[\s\S]*'assignment-workflow'[\s\S]*'plan-access'[\s\S]*'results-ai'/,
+  'Settings billing view model should expose stable workspace billing boundary item ids.'
+);
+assert.match(
+  settingsBillingViewSource,
+  /export function isSettingsBillingEnabled\(\)[\s\S]*websiteConfig\.payment\?\.enable === true/,
+  'Settings billing feature visibility should be centralized in the settings billing view helper.'
+);
+assert.match(
+  settingsBillingViewSource,
+  /export function buildSettingsBillingPageViewModel\(\)[\s\S]*breadcrumbs:[\s\S]*id: 'settings'[\s\S]*id: 'billing'[\s\S]*workspaceSummaryView: buildSettingsBillingWorkspaceSummaryView/,
+  'Settings billing page view model should own localized page state, breadcrumbs, and workspace summary.'
+);
+assert.match(
+  settingsBillingViewSource,
+  /export function buildSettingsPaymentPageViewModel\(\{[\s\S]*callback[\s\S]*id: 'payment'[\s\S]*callback: callback \?\? '\/settings\/billing'/,
+  'Settings payment page view model should own localized page state, breadcrumbs, and default billing callback.'
+);
+assert.match(
+  settingsBillingViewSource,
+  /settings_billing_workspace_summary_title[\s\S]*settings_billing_workspace_summary_description[\s\S]*settings_billing_workspace_summary_plan_description[\s\S]*settings_billing_workspace_summary_activities_description[\s\S]*settings_billing_workspace_summary_assignments_description[\s\S]*settings_billing_workspace_summary_results_description/,
+  'Settings billing view model should prepare localized workspace billing boundary copy.'
+);
+assert.match(
+  billingWorkspaceSummarySource,
+  /view\.itemViews\.map\(\(itemView\) =>[\s\S]*key=\{itemView\.id\}[\s\S]*function BillingWorkspaceSummaryItem[\s\S]*itemView\.label[\s\S]*itemView\.description/,
+  'Billing workspace summary component should render prepared boundary views keyed by stable ids.'
+);
+assert.doesNotMatch(
+  billingWorkspaceSummarySource,
+  /Workspace billing boundary|Plan access|Activity library|Assignment workflow|Results and AI|工作区账单边界|方案权限|活动库|作业工作流|结果和 AI/,
+  'Billing workspace summary component should not hard-code visible billing boundary copy.'
+);
+assert.match(
   paymentCardSource,
   /buildPaymentStatusView/,
   'PaymentCard should render the shared payment status view instead of owning localized status copy.'
@@ -7496,6 +7544,33 @@ assert.match(
   'Payment status and next-step copy should stay centralized in the payment status view helper.'
 );
 overwriteGetLocale(() => 'en');
+const billingPageView = buildSettingsBillingPageViewModel();
+assert.equal(billingPageView.breadcrumbs.at(-1)?.id, 'billing');
+assert.equal(billingPageView.title, 'Billing');
+const billingWorkspaceSummaryItemIds =
+  billingPageView.workspaceSummaryView.itemViews
+    .map((item) => item.id)
+    .join(',');
+assert.equal(
+  billingWorkspaceSummaryItemIds,
+  'plan-access,activity-library,assignment-workflow,results-ai'
+);
+assert.match(
+  billingPageView.workspaceSummaryView.description,
+  /Billing connects hosted checkout status/
+);
+const billingWorkspaceSummaryView = buildSettingsBillingWorkspaceSummaryView();
+assert.equal(billingWorkspaceSummaryView.itemViews.length, 4);
+const paymentPageView = buildSettingsPaymentPageViewModel({
+  callback: '/dashboard/assignments',
+});
+assert.equal(paymentPageView.breadcrumbs.at(-1)?.id, 'payment');
+assert.equal(paymentPageView.callback, '/dashboard/assignments');
+assert.equal(
+  buildSettingsPaymentPageViewModel({}).callback,
+  '/settings/billing'
+);
+assert.match(paymentPageView.description, /hosted checkout status/);
 const formatBillingTestDate = (date: Date) =>
   `date:${date.toISOString().slice(0, 10)}`;
 const freeBillingPlan: PricePlan = {
@@ -9531,12 +9606,16 @@ assert.match(
   /websiteConfig\.storage\?\.enable !== true/
 );
 assert.match(
+  settingsBillingViewSource,
+  /websiteConfig\.payment\?\.enable === true/
+);
+assert.match(
   settingsBillingRouteSource,
-  /websiteConfig\.payment\?\.enable !== true/
+  /isSettingsBillingEnabled\(\)/
 );
 assert.match(
   settingsPaymentRouteSource,
-  /websiteConfig\.payment\?\.enable !== true/
+  /isSettingsBillingEnabled\(\)/
 );
 assert.match(
   settingsNotificationsRouteSource,
@@ -9546,9 +9625,9 @@ for (const [source, breadcrumbId] of [
   [settingsProfileViewSource, 'profile'],
   [settingsSecurityViewSource, 'security'],
   [settingsFilesRouteSource, 'files'],
-  [settingsBillingRouteSource, 'billing'],
+  [settingsBillingViewSource, 'billing'],
   [settingsNotificationsRouteSource, 'notifications'],
-  [settingsPaymentRouteSource, 'payment'],
+  [settingsBillingViewSource, 'payment'],
 ] as const) {
   assert.match(
     source,
@@ -9558,6 +9637,26 @@ for (const [source, breadcrumbId] of [
     `Settings ${breadcrumbId} route or view model should pass stable breadcrumb ids.`
   );
 }
+assert.match(
+  settingsBillingRouteSource,
+  /const pageView = buildSettingsBillingPageViewModel\(\);[\s\S]*breadcrumbs=\{pageView\.breadcrumbs\}[\s\S]*BillingWorkspaceSummary[\s\S]*view=\{pageView\.workspaceSummaryView\}[\s\S]*BillingCard/,
+  'Settings billing route should consume the billing page view model and render the prepared workspace billing summary.'
+);
+assert.doesNotMatch(
+  settingsBillingRouteSource,
+  /m\.settings_billing_|websiteConfig\.payment/,
+  'Settings billing route should not rebuild localized billing page copy or feature visibility directly.'
+);
+assert.match(
+  settingsPaymentRouteSource,
+  /const pageView = buildSettingsPaymentPageViewModel\(\{[\s\S]*callback: search\.callback[\s\S]*breadcrumbs=\{pageView\.breadcrumbs\}[\s\S]*title=\{pageView\.title\}[\s\S]*PaymentCard[\s\S]*callback=\{pageView\.callback\}/,
+  'Settings payment route should consume the payment page view model and pass the prepared billing callback.'
+);
+assert.doesNotMatch(
+  settingsPaymentRouteSource,
+  /m\.settings_|websiteConfig\.payment|DashboardHeader/,
+  'Settings payment route should not rebuild localized payment page copy, feature visibility, or header layout directly.'
+);
 assert.doesNotMatch(
   settingsFilesRouteSource,
   /beforeLoad:\s*\(\)\s*=>\s*\{\s*throw notFound/s,
@@ -9768,6 +9867,7 @@ const authWorkspaceBoundaryRequirements = [
       ['settings_security_delete_account_warning', /classroom result records/],
       ['settings_payment_processing_description', /saved activities, assignments, and results/],
       ['settings_payment_processing_next_step_description', /AI drafts, and result workflows/],
+      ['settings_payment_description', /activity, assignment, AI, and result access/],
       ['settings_payment_success_description', /activity, assignment, and AI access/],
       ['settings_payment_success_next_step_description', /classroom access/],
       ['settings_billing_card_current_plan_description', /assignment workflow limits/],
@@ -9776,6 +9876,11 @@ const authWorkspaceBoundaryRequirements = [
       ['settings_billing_card_free_plan_message', /AI drafts, and result exports/],
       ['settings_billing_card_lifetime_message', /source-material workflows/],
       ['settings_billing_card_next_step_pro_description', /student attempts, AI drafts, and result exports/],
+      ['settings_billing_workspace_summary_description', /activities, assignment links, AI drafting, and private results/],
+      ['settings_billing_workspace_summary_plan_description', /hosted billing portal/],
+      ['settings_billing_workspace_summary_activities_description', /source-material workflows/],
+      ['settings_billing_workspace_summary_assignments_description', /timers, attempt rules, shuffle policy/],
+      ['settings_billing_workspace_summary_results_description', /Result exports, classroom briefs, AI-assisted drafting/],
     ],
   ],
   [
@@ -9811,6 +9916,7 @@ const authWorkspaceBoundaryRequirements = [
       ['settings_security_delete_account_warning', /课堂结果记录/],
       ['settings_payment_processing_description', /已保存活动、作业和结果/],
       ['settings_payment_processing_next_step_description', /AI 草稿和结果工作流/],
+      ['settings_payment_description', /活动、作业、AI 和结果权限/],
       ['settings_payment_success_description', /活动、作业和 AI 权限/],
       ['settings_payment_success_next_step_description', /课堂权限/],
       ['settings_billing_card_current_plan_description', /作业工作流限制/],
@@ -9819,6 +9925,11 @@ const authWorkspaceBoundaryRequirements = [
       ['settings_billing_card_free_plan_message', /AI 草稿和结果导出/],
       ['settings_billing_card_lifetime_message', /来源素材工作流/],
       ['settings_billing_card_next_step_pro_description', /学生尝试、AI 草稿和结果导出/],
+      ['settings_billing_workspace_summary_description', /活动、作业链接、AI 草稿和私密结果/],
+      ['settings_billing_workspace_summary_plan_description', /托管账单入口/],
+      ['settings_billing_workspace_summary_activities_description', /来源素材工作流/],
+      ['settings_billing_workspace_summary_assignments_description', /计时器、尝试规则、打乱策略/],
+      ['settings_billing_workspace_summary_results_description', /结果导出、课堂简报、AI 辅助草稿/],
     ],
   ],
 ] as const;
