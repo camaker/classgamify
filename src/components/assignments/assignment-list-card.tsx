@@ -1,6 +1,9 @@
 import type {
   AssignmentListCardActionView,
   AssignmentListCardViewModel,
+  AssignmentListDistributionStepId,
+  AssignmentListDistributionStepView,
+  AssignmentListDistributionView,
   AssignmentListPrintAction,
   AssignmentListResultAction,
   AssignmentListShareAction,
@@ -23,6 +26,7 @@ import { useUpdateAssignmentStatus } from '@/hooks/use-assignments';
 import { cn } from '@/lib/utils';
 import {
   IconChartBar,
+  IconClipboardText,
   IconListCheck,
   IconLock,
   IconLockOpen,
@@ -108,6 +112,7 @@ function AssignmentListCardSummary({
 }) {
   return (
     <section aria-label={assignment.summaryLabel} className="grid gap-4">
+      <AssignmentListDistribution view={assignment.distributionView} />
       <AssignmentSettingsSummary view={assignment.settingsSummaryView} />
       <AssignmentListStats
         label={assignment.statsLabel}
@@ -116,6 +121,84 @@ function AssignmentListCardSummary({
     </section>
   );
 }
+
+function AssignmentListDistribution({
+  view,
+}: {
+  view: AssignmentListDistributionView;
+}) {
+  return (
+    <section aria-label={view.ariaLabel} className="grid gap-3">
+      <div className="flex flex-wrap items-center justify-between gap-2">
+        <div>
+          <h3 className="font-medium text-sm">{view.title}</h3>
+          <p className="mt-1 text-muted-foreground text-xs leading-5">
+            {view.description}
+          </p>
+        </div>
+        <Badge
+          variant={view.status === 'ready-to-share' ? 'secondary' : 'outline'}
+          className={cn(
+            'rounded-md',
+            view.status === 'blocked' && 'border-amber-300 text-amber-800',
+            view.status === 'collecting-results' &&
+              'border-blue-200 bg-blue-50 text-blue-700'
+          )}
+        >
+          {view.statusLabel}
+        </Badge>
+      </div>
+      <dl className="grid gap-2 sm:grid-cols-2 xl:grid-cols-4">
+        {view.stepViews.map((stepView) => (
+          <AssignmentListDistributionStep
+            key={stepView.id}
+            stepView={stepView}
+          />
+        ))}
+      </dl>
+    </section>
+  );
+}
+
+function AssignmentListDistributionStep({
+  stepView,
+}: {
+  stepView: AssignmentListDistributionStepView;
+}) {
+  const Icon = assignmentListDistributionStepIcons[stepView.id];
+
+  return (
+    <div
+      className="rounded-lg border bg-muted/20 p-3"
+      data-status={stepView.status}
+    >
+      <div className="flex items-start justify-between gap-2">
+        <dt className="flex items-center gap-2 font-medium text-xs leading-5">
+          <Icon aria-hidden="true" className="size-4 text-primary" />
+          {stepView.label}
+        </dt>
+        <dd>
+          <Badge
+            variant={stepView.status === 'ready' ? 'secondary' : 'outline'}
+            className="rounded-md"
+          >
+            {stepView.statusLabel}
+          </Badge>
+        </dd>
+      </div>
+      <dd className="mt-2 text-muted-foreground text-xs leading-5">
+        <output aria-label={stepView.ariaLabel}>{stepView.description}</output>
+      </dd>
+    </div>
+  );
+}
+
+const assignmentListDistributionStepIcons = {
+  'copy-link': IconClipboardText,
+  'preview-link': IconPlayerPlay,
+  'print-worksheet': IconPrinter,
+  'review-results': IconChartBar,
+} satisfies Record<AssignmentListDistributionStepId, typeof IconChartBar>;
 
 function AssignmentListCardActions({
   actionView,

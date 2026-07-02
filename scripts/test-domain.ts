@@ -592,6 +592,7 @@ import {
   buildAssignmentListCardActionView,
   buildAssignmentListCardStats,
   buildAssignmentListCardViewModel,
+  buildAssignmentListDistributionView,
   buildAssignmentListEmptyStateView,
   buildAssignmentListPageScopeView,
   buildAssignmentListPageViewModel,
@@ -27556,8 +27557,13 @@ assert.match(
 );
 assert.match(
   assignmentListViewSource,
-  /export type AssignmentListCardViewModel = \{[\s\S]*actionsLabel: string;[\s\S]*ariaLabel: string;[\s\S]*statsLabel: string;[\s\S]*summaryLabel: string;/,
-  'Assignment list card view-model should expose prepared card, summary, stats, and action labels.'
+  /export type AssignmentListDistributionStatus =[\s\S]*'blocked'[\s\S]*'collecting-results'[\s\S]*'preview'[\s\S]*'ready-to-share'[\s\S]*export type AssignmentListDistributionStepId =[\s\S]*'copy-link'[\s\S]*'preview-link'[\s\S]*'print-worksheet'[\s\S]*'review-results'[\s\S]*export type AssignmentListDistributionView = \{[\s\S]*description: string;[\s\S]*status: AssignmentListDistributionStatus;[\s\S]*stepViews: AssignmentListDistributionStepView\[\];/,
+  'Assignment list distribution status should be an explicit domain contract with stable step ids.'
+);
+assert.match(
+  assignmentListViewSource,
+  /export type AssignmentListCardViewModel = \{[\s\S]*actionsLabel: string;[\s\S]*ariaLabel: string;[\s\S]*distributionView: AssignmentListDistributionView;[\s\S]*statsLabel: string;[\s\S]*summaryLabel: string;/,
+  'Assignment list card view-model should expose prepared card, distribution, summary, stats, and action labels.'
 );
 assert.match(
   assignmentListViewSource,
@@ -27611,8 +27617,28 @@ assert.match(
 );
 assert.match(
   assignmentListCardComponentSource,
-  /<section[\s\S]*aria-label=\{assignment\.summaryLabel\}[\s\S]*AssignmentSettingsSummary[\s\S]*AssignmentListStats/,
-  'Assignment list card summary should expose the prepared summary-region label.'
+  /<section[\s\S]*aria-label=\{assignment\.summaryLabel\}[\s\S]*AssignmentListDistribution[\s\S]*view=\{assignment\.distributionView\}[\s\S]*AssignmentSettingsSummary[\s\S]*AssignmentListStats/,
+  'Assignment list card summary should expose the prepared summary-region label and render distribution, settings, and stats views.'
+);
+assert.match(
+  assignmentListCardComponentSource,
+  /AssignmentListDistributionStepId[\s\S]*AssignmentListDistributionStepView[\s\S]*AssignmentListDistributionView/,
+  'Assignment list card component should import focused distribution child contracts.'
+);
+assert.match(
+  assignmentListCardComponentSource,
+  /function AssignmentListDistribution[\s\S]*aria-label=\{view\.ariaLabel\}[\s\S]*view\.title[\s\S]*view\.description[\s\S]*view\.statusLabel[\s\S]*view\.stepViews\.map[\s\S]*AssignmentListDistributionStep/,
+  'Assignment list distribution component should render prepared title, description, status, and step views.'
+);
+assert.match(
+  assignmentListCardComponentSource,
+  /function AssignmentListDistributionStep[\s\S]*stepView\.label[\s\S]*stepView\.statusLabel[\s\S]*<output aria-label=\{stepView\.ariaLabel\}>\{stepView\.description\}<\/output>/,
+  'Assignment list distribution steps should render prepared labels, status labels, aria labels, and descriptions.'
+);
+assert.doesNotMatch(
+  assignmentListCardComponentSource,
+  /Distribution status|Ready to share|Not shareable|Collecting results|Preview only|分发状态|可以分享|不可分享|正在收集结果|仅供预览/,
+  'Assignment list card component should not hard-code visible distribution copy.'
 );
 assert.match(
   assignmentListCardComponentSource,
@@ -27686,8 +27712,8 @@ assert.match(
 );
 assert.match(
   assignmentListCardComponentSource,
-  /function AssignmentListCardSummary[\s\S]*aria-label=\{assignment\.summaryLabel\}[\s\S]*AssignmentSettingsSummary[\s\S]*view=\{assignment\.settingsSummaryView\}[\s\S]*AssignmentListStats[\s\S]*label=\{assignment\.statsLabel\}[\s\S]*statItems=\{assignment\.statItems\}/,
-  'Assignment list card summary should render prepared settings summary, stats label, and stats.'
+  /function AssignmentListCardSummary[\s\S]*aria-label=\{assignment\.summaryLabel\}[\s\S]*AssignmentListDistribution[\s\S]*view=\{assignment\.distributionView\}[\s\S]*AssignmentSettingsSummary[\s\S]*view=\{assignment\.settingsSummaryView\}[\s\S]*AssignmentListStats[\s\S]*label=\{assignment\.statsLabel\}[\s\S]*statItems=\{assignment\.statItems\}/,
+  'Assignment list card summary should render prepared distribution status, settings summary, stats label, and stats.'
 );
 assert.match(
   assignmentListCardComponentSource,
@@ -27741,13 +27767,33 @@ assert.match(
 );
 assert.doesNotMatch(
   assignmentListCardComponentSource,
-  /assignment_list_share_link_|assignment_list_action_share_link_unavailable|status ===|expiresAt|isAssignmentOpen|getAssignmentLifecycleStatus/,
+  /assignment_list_share_link_|assignment_list_action_share_link_unavailable|expiresAt|isAssignmentOpen|getAssignmentLifecycleStatus/,
   'Assignment list card component should not rebuild share lifecycle copy or availability from raw assignment state.'
 );
 assert.match(
   assignmentListViewSource,
   /buildAssignmentShareLinkAvailability\(\{[\s\S]*expiresAt,[\s\S]*shareSlug,[\s\S]*status,[\s\S]*\}\)/,
   'Assignment list card action state should resolve share-link state and path through the shared assignment share helper.'
+);
+assert.match(
+  assignmentListViewSource,
+  /distributionView: buildAssignmentListDistributionView\(\{[\s\S]*actionState,[\s\S]*stats,[\s\S]*\}\)/,
+  'Assignment list card view-models should build a prepared distribution status view from action state and assignment stats.'
+);
+assert.match(
+  assignmentListViewSource,
+  /export function buildAssignmentListDistributionView[\s\S]*resolveAssignmentListDistributionStatus[\s\S]*formatAssignmentListDistributionStatus[\s\S]*buildAssignmentListDistributionStepViews/,
+  'Assignment list distribution view should centralize card distribution status labels and step views in the assignment domain.'
+);
+assert.match(
+  assignmentListViewSource,
+  /function resolveAssignmentListDistributionStatus[\s\S]*!actionState\.isPersisted[\s\S]*!actionState\.shareAvailability\.isAvailable[\s\S]*normalizeAssignmentListCardStatCount\(stats\.completions\) > 0[\s\S]*'collecting-results'[\s\S]*'ready-to-share'/,
+  'Assignment list distribution status should distinguish preview, blocked, collecting-results, and ready-to-share states from domain inputs.'
+);
+assert.match(
+  assignmentListViewSource,
+  /function buildAssignmentListDistributionStepViews[\s\S]*isShareAvailable[\s\S]*hasPublishedSnapshot[\s\S]*hasCompletions[\s\S]*'copy-link'[\s\S]*'preview-link'[\s\S]*'print-worksheet'[\s\S]*'review-results'/,
+  'Assignment list distribution step views should cover copy, preview, printable worksheet, and result-review steps.'
 );
 assert.match(
   assignmentListViewSource,
@@ -34313,6 +34359,56 @@ assert.deepEqual(
     activityDescription: 'Frozen activity description',
     ariaLabel:
       'Persisted assignment, Open, Line match, share id share-1',
+    distributionView: {
+      ariaLabel: 'Distribution status: Collecting results',
+      description:
+        'The student link is open and submitted attempts are ready for teacher review.',
+      status: 'collecting-results',
+      statusLabel: 'Collecting results',
+      stepViews: [
+        {
+          ariaLabel:
+            'Copy link: Ready. Copy the full /play link for class chat, LMS, or email.',
+          description:
+            'Copy the full /play link for class chat, LMS, or email.',
+          id: 'copy-link',
+          label: 'Copy link',
+          status: 'ready',
+          statusLabel: 'Ready',
+        },
+        {
+          ariaLabel:
+            'Preview as student: Ready. Open the public runner to verify the student experience.',
+          description:
+            'Open the public runner to verify the student experience.',
+          id: 'preview-link',
+          label: 'Preview as student',
+          status: 'ready',
+          statusLabel: 'Ready',
+        },
+        {
+          ariaLabel:
+            'Print worksheet: Optional. Prepare a printable worksheet from the frozen assignment snapshot.',
+          description:
+            'Prepare a printable worksheet from the frozen assignment snapshot.',
+          id: 'print-worksheet',
+          label: 'Print worksheet',
+          status: 'optional',
+          statusLabel: 'Optional',
+        },
+        {
+          ariaLabel:
+            'Review results: Ready. Open results to review submitted attempts and follow-up needs.',
+          description:
+            'Open results to review submitted attempts and follow-up needs.',
+          id: 'review-results',
+          label: 'Review results',
+          status: 'ready',
+          statusLabel: 'Ready',
+        },
+      ],
+      title: 'Distribution status',
+    },
     id: 'persisted-assignment-1',
     persisted: true,
     settingsSummaryView: buildAssignmentSettingsSummaryView({
@@ -34425,6 +34521,56 @@ assert.deepEqual(
     actionsLabel: 'Actions for Food words homework',
     activityDescription: 'Starter activity description',
     ariaLabel: 'Food words homework, Preview, Group sort, share id demo-food',
+    distributionView: {
+      ariaLabel: 'Distribution status: Preview only',
+      description:
+        'This starter assignment is preview content; create your own assignment before using a real class link.',
+      status: 'preview',
+      statusLabel: 'Preview only',
+      stepViews: [
+        {
+          ariaLabel:
+            'Copy link: Ready. Copy the full /play link for class chat, LMS, or email.',
+          description:
+            'Copy the full /play link for class chat, LMS, or email.',
+          id: 'copy-link',
+          label: 'Copy link',
+          status: 'ready',
+          statusLabel: 'Ready',
+        },
+        {
+          ariaLabel:
+            'Preview as student: Ready. Open the public runner to verify the student experience.',
+          description:
+            'Open the public runner to verify the student experience.',
+          id: 'preview-link',
+          label: 'Preview as student',
+          status: 'ready',
+          statusLabel: 'Ready',
+        },
+        {
+          ariaLabel:
+            'Print worksheet: Blocked. Printable worksheets become available after the assignment is published.',
+          description:
+            'Printable worksheets become available after the assignment is published.',
+          id: 'print-worksheet',
+          label: 'Print worksheet',
+          status: 'blocked',
+          statusLabel: 'Blocked',
+        },
+        {
+          ariaLabel:
+            'Review results: Blocked. Results become available after the assignment has a frozen published snapshot.',
+          description:
+            'Results become available after the assignment has a frozen published snapshot.',
+          id: 'review-results',
+          label: 'Review results',
+          status: 'blocked',
+          statusLabel: 'Blocked',
+        },
+      ],
+      title: 'Distribution status',
+    },
     id: 'assignment-food-demo',
     persisted: false,
     settingsSummaryView: buildAssignmentSettingsSummaryView({
@@ -34604,6 +34750,65 @@ assert.deepEqual(
     showShareActions: true,
     statusAction: undefined,
   }
+);
+const readyAssignmentDistributionView = buildAssignmentListDistributionView({
+  actionState: getAssignmentListCardActionState({
+    expiresAt: null,
+    persisted: true,
+    shareSlug: 'ready-share',
+    status: 'published',
+  }),
+  stats: {
+    averageScore: 0,
+    completions: 0,
+  },
+});
+assert.equal(readyAssignmentDistributionView.status, 'ready-to-share');
+assert.equal(readyAssignmentDistributionView.statusLabel, 'Ready to share');
+assert.deepEqual(
+  readyAssignmentDistributionView.stepViews.map((stepView) => [
+    stepView.id,
+    stepView.status,
+    stepView.statusLabel,
+  ]),
+  [
+    ['copy-link', 'ready', 'Ready'],
+    ['preview-link', 'ready', 'Ready'],
+    ['print-worksheet', 'optional', 'Optional'],
+    ['review-results', 'waiting', 'Waiting'],
+  ]
+);
+assert.match(
+  readyAssignmentDistributionView.stepViews.find(
+    (stepView) => stepView.id === 'review-results'
+  )?.description ?? '',
+  /after students submit attempts/
+);
+const blockedDraftDistributionView = buildAssignmentListDistributionView({
+  actionState: getAssignmentListCardActionState({
+    expiresAt: null,
+    persisted: true,
+    shareSlug: 'draft-share',
+    status: 'draft',
+  }),
+  stats: {
+    averageScore: 0,
+    completions: 0,
+  },
+});
+assert.equal(blockedDraftDistributionView.status, 'blocked');
+assert.equal(blockedDraftDistributionView.statusLabel, 'Not shareable');
+assert.deepEqual(
+  blockedDraftDistributionView.stepViews.map((stepView) => [
+    stepView.id,
+    stepView.status,
+  ]),
+  [
+    ['copy-link', 'blocked'],
+    ['preview-link', 'blocked'],
+    ['print-worksheet', 'blocked'],
+    ['review-results', 'blocked'],
+  ]
 );
 assert.deepEqual(
   buildAssignmentListCardActionView({
