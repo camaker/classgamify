@@ -13,11 +13,17 @@ export function AssignmentResultsAttemptReviewCard({
   attemptView,
 }: AssignmentResultsAttemptReviewCardProps) {
   return (
-    <div className="rounded-lg border bg-background p-4">
+    <article
+      aria-label={attemptView.ariaLabel}
+      className="rounded-lg border bg-background p-4"
+    >
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
           <div className="flex items-center gap-2">
-            <IconListDetails className="size-4 text-primary" />
+            <IconListDetails
+              aria-hidden="true"
+              className="size-4 text-primary"
+            />
             <p className="font-medium text-sm">{attemptView.studentLabel}</p>
           </div>
           <p className="mt-1 text-xs text-muted-foreground">
@@ -34,7 +40,11 @@ export function AssignmentResultsAttemptReviewCard({
             <dt className="text-[11px] text-muted-foreground">
               {metricView.label}
             </dt>
-            <dd className="mt-1 font-semibold text-sm">{metricView.value}</dd>
+            <dd className="mt-1 font-semibold text-sm">
+              <output aria-label={metricView.ariaLabel}>
+                {metricView.value}
+              </output>
+            </dd>
           </div>
         ))}
       </dl>
@@ -46,7 +56,7 @@ export function AssignmentResultsAttemptReviewCard({
           />
         ))}
       </div>
-    </div>
+    </article>
   );
 }
 
@@ -56,7 +66,10 @@ function AssignmentResultsAttemptAnswerReview({
   answerView: AssignmentResultAttemptAnswerReviewView;
 }) {
   return (
-    <div className="rounded-lg border bg-muted/20 p-3">
+    <article
+      aria-label={answerView.ariaLabel}
+      className="rounded-lg border bg-muted/20 p-3"
+    >
       <div className="flex flex-wrap items-center justify-between gap-2">
         <p className="min-w-0 text-sm font-medium">{answerView.promptLabel}</p>
         <Badge
@@ -82,6 +95,6 @@ function AssignmentResultsAttemptAnswerReview({
           {answerView.explanationText}
         </p>
       ) : null}
-    </div>
+    </article>
   );
 }

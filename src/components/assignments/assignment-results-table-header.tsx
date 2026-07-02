@@ -12,7 +12,9 @@ export function AssignmentResultsTableHeader({
     <TableHeader>
       <TableRow>
         {headers.map((header) => (
-          <TableHead key={header.id}>{header.label}</TableHead>
+          <TableHead key={header.id} scope="col">
+            {header.label}
+          </TableHead>
         ))}
       </TableRow>
     </TableHeader>

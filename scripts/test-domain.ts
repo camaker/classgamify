@@ -7120,12 +7120,12 @@ assert.match(
 );
 assert.match(
   assignmentResultsItemPerformanceTableSource,
-  /AssignmentResultsTableHeader[\s\S]*headers=\{tableView\.headers\}[\s\S]*tableView\.rows\.map[\s\S]*AssignmentResultsItemPerformanceRow[\s\S]*rowView=\{rowView\}/,
+  /<Table aria-label=\{tableView\.ariaLabel\}[\s\S]*TableCaption className="sr-only"[\s\S]*tableView\.caption[\s\S]*AssignmentResultsTableHeader[\s\S]*headers=\{tableView\.headers\}[\s\S]*tableView\.rows\.map[\s\S]*AssignmentResultsItemPerformanceRow[\s\S]*rowView=\{rowView\}/,
   'Assignment result item performance table component should delegate prepared item table views.'
 );
 assert.match(
   assignmentResultsTableHeaderSource,
-  /headers\.map\(\(header\)[\s\S]*TableHead[\s\S]*key=\{header\.id\}[\s\S]*header\.label/,
+  /headers\.map\(\(header\)[\s\S]*TableHead[\s\S]*key=\{header\.id\}[\s\S]*scope="col"[\s\S]*header\.label/,
   'Assignment result table header should render prepared result-table headers with stable ids.'
 );
 assert.doesNotMatch(
@@ -7135,8 +7135,8 @@ assert.doesNotMatch(
 );
 assert.match(
   assignmentResultsItemPerformanceTableSource,
-  /function AssignmentResultsItemPerformanceRow[\s\S]*rowView\.promptLabel/,
-  'Assignment result item performance row should render prepared prompt labels.'
+  /function AssignmentResultsItemPerformanceRow[\s\S]*TableRow aria-label=\{rowView\.ariaLabel\}[\s\S]*rowView\.promptLabel/,
+  'Assignment result item performance row should render prepared prompt labels and row-level accessible labels.'
 );
 assert.doesNotMatch(
   assignmentResultsItemPerformanceTableSource,
@@ -7145,8 +7145,13 @@ assert.doesNotMatch(
 );
 assert.match(
   assignmentResultsStudentSummaryTableSource,
-  /AssignmentResultsTableHeader[\s\S]*headers=\{tableView\.headers\}[\s\S]*tableView\.rows\.map[\s\S]*AssignmentResultsStudentSummaryRow[\s\S]*rowView=\{rowView\}/,
+  /<Table aria-label=\{tableView\.ariaLabel\}[\s\S]*TableCaption className="sr-only"[\s\S]*tableView\.caption[\s\S]*AssignmentResultsTableHeader[\s\S]*headers=\{tableView\.headers\}[\s\S]*tableView\.rows\.map[\s\S]*AssignmentResultsStudentSummaryRow[\s\S]*rowView=\{rowView\}/,
   'Assignment result student summary table component should delegate prepared student table views.'
+);
+assert.match(
+  assignmentResultsStudentSummaryTableSource,
+  /function AssignmentResultsStudentSummaryRow[\s\S]*TableRow aria-label=\{rowView\.ariaLabel\}[\s\S]*rowView\.studentLabel[\s\S]*rowView\.lastSubmittedLabel/,
+  'Assignment result student summary rows should render prepared row-level accessible labels.'
 );
 assert.doesNotMatch(
   `${assignmentResultsItemPerformanceTableSource}\n${assignmentResultsStudentSummaryTableSource}\n${assignmentResultsAttemptsTableSource}`,
@@ -7155,13 +7160,13 @@ assert.doesNotMatch(
 );
 assert.match(
   assignmentResultsAttemptsTableSource,
-  /AssignmentResultsTableHeader[\s\S]*headers=\{tableView\.headers\}[\s\S]*tableView\.rows\.map[\s\S]*AssignmentResultsAttemptRow[\s\S]*rowDisplay=\{rowDisplay\}/,
+  /<Table aria-label=\{tableView\.ariaLabel\}[\s\S]*TableCaption className="sr-only"[\s\S]*tableView\.caption[\s\S]*AssignmentResultsTableHeader[\s\S]*headers=\{tableView\.headers\}[\s\S]*tableView\.rows\.map[\s\S]*AssignmentResultsAttemptRow[\s\S]*rowDisplay=\{rowDisplay\}/,
   'Assignment result attempts table component should delegate prepared attempt table views.'
 );
 assert.match(
   assignmentResultsAttemptsTableSource,
-  /function AssignmentResultsAttemptRow[\s\S]*rowDisplay\.studentLabel[\s\S]*rowDisplay\.submittedAtLabel/,
-  'Assignment result attempt row should render prepared attempt row labels.'
+  /function AssignmentResultsAttemptRow[\s\S]*TableRow aria-label=\{rowDisplay\.ariaLabel\}[\s\S]*rowDisplay\.studentLabel[\s\S]*rowDisplay\.submittedAtLabel/,
+  'Assignment result attempt row should render prepared attempt row labels and row-level accessible labels.'
 );
 assert.match(
   assignmentResultsItemAnalysisCardSource,
@@ -7190,7 +7195,7 @@ assert.match(
 );
 assert.match(
   assignmentResultsAttemptReviewCardSource,
-  /attemptView\.answerViews\.map[\s\S]*AssignmentResultsAttemptAnswerReview[\s\S]*answerView=\{answerView\}/,
+  /aria-label=\{attemptView\.ariaLabel\}[\s\S]*IconListDetails[\s\S]*aria-hidden="true"[\s\S]*attemptView\.answerViews\.map[\s\S]*AssignmentResultsAttemptAnswerReview[\s\S]*answerView=\{answerView\}/,
   'Assignment result attempt review card component should delegate prepared answer review views to a focused item component.'
 );
 assert.doesNotMatch(
@@ -7200,8 +7205,8 @@ assert.doesNotMatch(
 );
 assert.match(
   assignmentResultsAttemptReviewCardSource,
-  /function AssignmentResultsAttemptAnswerReview[\s\S]*answerView\.studentAnswerLineText[\s\S]*answerView\.expectedAnswerLineText[\s\S]*answerView\.acceptedAnswersLineText/,
-  'Assignment result attempt answer review item should render prepared answer review text lines.'
+  /metricView\.ariaLabel[\s\S]*function AssignmentResultsAttemptAnswerReview[\s\S]*aria-label=\{answerView\.ariaLabel\}[\s\S]*answerView\.studentAnswerLineText[\s\S]*answerView\.expectedAnswerLineText[\s\S]*answerView\.acceptedAnswersLineText/,
+  'Assignment result attempt answer review item should render prepared metric labels, answer-review accessible labels, and text lines.'
 );
 assert.match(
   assignmentResultsEmptyStateSource,
@@ -7319,7 +7324,7 @@ assert.match(
 );
 assert.match(
   assignmentResultViewSource,
-  /buildAssignmentItemAnalysisCardView[\s\S]*correctRateLabel: formatAssignmentResultPercent\(\s*normalizeAssignmentResultPercentLabelValue\(item\.correctRate\)[\s\S]*buildAssignmentItemPerformanceRowView[\s\S]*correctRateLabel: formatAssignmentResultPercent\(\s*normalizeAssignmentResultPercentLabelValue\(item\.correctRate\)/,
+  /buildAssignmentItemAnalysisCardView[\s\S]*correctRateLabel: formatAssignmentResultPercent\(\s*normalizeAssignmentResultPercentLabelValue\(item\.correctRate\)[\s\S]*buildAssignmentItemPerformanceRowView[\s\S]*const correctRateLabel = formatAssignmentResultPercent\(\s*normalizeAssignmentResultPercentLabelValue\(item\.correctRate\)/,
   'Assignment item performance labels should normalize bounded percentages before display.'
 );
 assert.doesNotMatch(
@@ -46082,6 +46087,8 @@ assert.deepEqual(
       row.durationLabel,
     ]),
     attemptTableView: {
+      ariaLabel: scoredResultsPageView.attemptTableView.ariaLabel,
+      caption: scoredResultsPageView.attemptTableView.caption,
       headers: summarizeAssignmentResultTableHeaders(
         scoredResultsPageView.attemptTableView.headers
       ),
@@ -46250,6 +46257,8 @@ assert.deepEqual(
       (row) => [row.id, row.itemNumberLabel, row.correctRateLabel]
     ),
     itemPerformanceTableView: {
+      ariaLabel: scoredResultsPageView.itemPerformanceTableView.ariaLabel,
+      caption: scoredResultsPageView.itemPerformanceTableView.caption,
       headers: summarizeAssignmentResultTableHeaders(
         scoredResultsPageView.itemPerformanceTableView.headers
       ),
@@ -46373,6 +46382,8 @@ assert.deepEqual(
       (row) => [row.studentLabel, row.needsReviewLabel]
     ),
     studentSummaryTableView: {
+      ariaLabel: scoredResultsPageView.studentSummaryTableView.ariaLabel,
+      caption: scoredResultsPageView.studentSummaryTableView.caption,
       headers: summarizeAssignmentResultTableHeaders(
         scoredResultsPageView.studentSummaryTableView.headers
       ),
@@ -46436,6 +46447,9 @@ assert.deepEqual(
     attemptReviewCardViews: [['completed-attempt', 'Alice', 2]],
     attemptRowViews: [['completed-attempt', 'Alice', '30s']],
     attemptTableView: {
+      ariaLabel: 'Student attempts',
+      caption:
+        'Latest submitted attempts are shown first, with detailed answer review below.',
       headers: [
         ['student', 'Student'],
         ['score', 'Score'],
@@ -46694,6 +46708,9 @@ assert.deepEqual(
       ['q-1', '2.', '100%'],
     ],
     itemPerformanceTableView: {
+      ariaLabel: 'Item performance',
+      caption:
+        'Review every prompt from the frozen assignment snapshot, including submitted counts, correct rates, and answer notes.',
       headers: [
         ['item', 'Item'],
         ['type', 'Type'],
@@ -46854,6 +46871,9 @@ assert.deepEqual(
     },
     studentSummaryRowViews: [['Alice', '1']],
     studentSummaryTableView: {
+      ariaLabel: 'Student summary',
+      caption:
+        'Sort students by review priority, best score, name, attempt volume, or last submitted time before reading every submitted answer.',
       headers: [
         ['student', 'Student'],
         ['attempts', 'Attempts'],
@@ -47064,6 +47084,8 @@ assert.deepEqual(
   }),
   {
     acceptedAnswersText: 'Paris, France',
+    ariaLabel:
+      '1. Capital of France?. Type Question. Correct rate 67%. Submitted 2/3. Unanswered 0 unanswered. Expected answer Paris. Accepted answers Paris, France.',
     correctRateLabel: '67%',
     expectedAnswerText: 'Paris',
     explanationText: 'Paris is the capital of France.',
@@ -47087,6 +47109,8 @@ assert.deepEqual(
   }),
   {
     acceptedAnswersText: '-',
+    ariaLabel:
+      '1. Match "Hot" with its pair.. Type Pair. Correct rate 50%. Submitted 1/2. Unanswered 1 unanswered. Expected answer Cold. Accepted answers -.',
     correctRateLabel: '50%',
     expectedAnswerText: 'Cold',
     explanationText: '-',
@@ -47130,6 +47154,8 @@ assert.deepEqual(
   }),
   {
     acceptedAnswersText: 'Paris, France',
+    ariaLabel:
+      '1. Capital of France?. Type Question. Correct rate 67%. Submitted 0/0. Unanswered 0 unanswered. Expected answer Paris. Accepted answers Paris, France.',
     correctRateLabel: '67%',
     expectedAnswerText: 'Paris',
     explanationText: 'Paris is the capital of France.',
@@ -47166,6 +47192,10 @@ assert.deepEqual(
 );
 assert.deepEqual(
   {
+    ariaLabel: buildAssignmentItemPerformanceTableView(resultAnalysis.perItem)
+      .ariaLabel,
+    caption: buildAssignmentItemPerformanceTableView(resultAnalysis.perItem)
+      .caption,
     headers: summarizeAssignmentResultTableHeaders(
       buildAssignmentItemPerformanceTableView(resultAnalysis.perItem).headers
     ),
@@ -47174,6 +47204,9 @@ assert.deepEqual(
     ),
   },
   {
+    ariaLabel: 'Item performance',
+    caption:
+      'Review every prompt from the frozen assignment snapshot, including submitted counts, correct rates, and answer notes.',
     headers: summarizeAssignmentResultTableHeaders(
       assignmentResultTableHeaders.itemPerformance
     ),
@@ -47196,6 +47229,8 @@ assert.deepEqual(
     acceptedAnswersLabel: 'Accepted answers',
     acceptedAnswersLineText: 'Accepted answers: Paris, France',
     acceptedAnswersText: 'Paris, France',
+    ariaLabel:
+      '1. Capital of France?. Status Correct. Student: paris france Expected: Paris Accepted answers: Paris, France Paris is the capital of France.',
     expectedAnswerLabel: 'Expected',
     expectedAnswerLineText: 'Expected: Paris',
     expectedAnswerText: 'Paris',
@@ -47280,10 +47315,30 @@ assert.deepEqual(
     answers: resultAnalysis.attempts[2]!.answers,
   }),
   [
-    { key: 'submitted', label: 'Submitted', value: '1/2' },
-    { key: 'correct', label: 'Correct', value: '0' },
-    { key: 'needs-review', label: 'Needs review', value: '2' },
-    { key: 'unanswered', label: 'Unanswered', value: '1' },
+    {
+      ariaLabel: 'Submitted: 1/2.',
+      key: 'submitted',
+      label: 'Submitted',
+      value: '1/2',
+    },
+    {
+      ariaLabel: 'Correct: 0.',
+      key: 'correct',
+      label: 'Correct',
+      value: '0',
+    },
+    {
+      ariaLabel: 'Needs review: 2.',
+      key: 'needs-review',
+      label: 'Needs review',
+      value: '2',
+    },
+    {
+      ariaLabel: 'Unanswered: 1.',
+      key: 'unanswered',
+      label: 'Unanswered',
+      value: '1',
+    },
   ]
 );
 assert.deepEqual(
@@ -47302,6 +47357,8 @@ assert.deepEqual(
     acceptedAnswersLabel: 'Accepted answers',
     acceptedAnswersLineText: null,
     acceptedAnswersText: null,
+    ariaLabel:
+      '1. Match "Hot" with its pair.. Status Unanswered. Student: Unanswered Expected: Cold',
     expectedAnswerLabel: 'Expected',
     expectedAnswerLineText: 'Expected: Cold',
     expectedAnswerText: 'Cold',
@@ -47345,6 +47402,9 @@ assert.equal(JSON.stringify(resultAnalysis).includes('browser-token-1'), false);
 assert.deepEqual(
   buildAssignmentStudentSummaryRowView(resultAnalysis.students[1]!),
   {
+    ariaLabel: `Alice. Attempts 2. Latest 100%. Average 75%. Best 100%. Needs review 0. Last submitted ${formatAssignmentResultDate(
+      resultAnalysis.students[1]!.lastCompletedAt
+    )}.`,
     attemptsLabel: '2',
     averageAccuracyLabel: '75%',
     bestAccuracyLabel: '100%',
@@ -47368,6 +47428,8 @@ assert.deepEqual(
     studentLabel: ' Ａｎｏｎｙｍｏｕｓ\u00A0　student 2 ',
   }),
   {
+    ariaLabel:
+      'Anonymous student 2. Attempts 0. Latest 0%. Average 0%. Best 0%. Needs review 0. Last submitted -.',
     attemptsLabel: '0',
     averageAccuracyLabel: '0%',
     bestAccuracyLabel: '0%',
@@ -47389,6 +47451,8 @@ assert.deepEqual(
     studentLabel: 'Bounded Student',
   }),
   {
+    ariaLabel:
+      'Bounded Student. Attempts 2. Latest 0%. Average 100%. Best 100%. Needs review 0. Last submitted -.',
     attemptsLabel: '2',
     averageAccuracyLabel: '100%',
     bestAccuracyLabel: '100%',
@@ -47410,6 +47474,8 @@ assert.deepEqual(
     studentLabel: 'Invalid Counts',
   }),
   {
+    ariaLabel:
+      'Invalid Counts. Attempts 0. Latest -. Average -. Best -. Needs review 0. Last submitted -.',
     attemptsLabel: '0',
     averageAccuracyLabel: '-',
     bestAccuracyLabel: '-',
@@ -47453,6 +47519,8 @@ const studentSummaryTableView = buildAssignmentStudentSummaryTableView([
 ]);
 assert.deepEqual(
   {
+    ariaLabel: studentSummaryTableView.ariaLabel,
+    caption: studentSummaryTableView.caption,
     headers: summarizeAssignmentResultTableHeaders(
       studentSummaryTableView.headers
     ),
@@ -47463,6 +47531,9 @@ assert.deepEqual(
     ]),
   },
   {
+    ariaLabel: 'Student summary',
+    caption:
+      'Sort students by review priority, best score, name, attempt volume, or last submitted time before reading every submitted answer.',
     headers: summarizeAssignmentResultTableHeaders(
       assignmentResultTableHeaders.studentSummary
     ),
@@ -49128,6 +49199,9 @@ assert.deepEqual(
   {
     accuracyLabel: '75%',
     answeredLabel: '3/4',
+    ariaLabel: `Alice. Score 3/4. Accuracy 75%. Answered 3/4. Time 1m 02s. Submitted ${formatAssignmentResultDate(
+      attemptRowCompletedAt
+    )}.`,
     durationLabel: '1m 02s',
     durationView: expectReadableAttemptDurationView('1m 02s', 62),
     id: 'attempt-row',
@@ -49184,6 +49258,9 @@ assert.deepEqual(
   {
     accuracyLabel: '75%',
     answeredLabel: '3/4',
+    ariaLabel: `Raw student. Score 3/4. Accuracy 75%. Answered 3/4. Time 1m 00s. Submitted ${formatAssignmentResultDate(
+      attemptRowCompletedAt
+    )}.`,
     durationLabel: '1m 00s',
     durationView: expectReadableAttemptDurationView('1m 00s', 60, {
       timeLimitLabel: '1m 00s',
@@ -49214,6 +49291,9 @@ assert.deepEqual(
   {
     accuracyLabel: '0%',
     answeredLabel: '1/2',
+    ariaLabel: `Anonymous student 1. Score 0/2. Accuracy 0%. Answered 1/2. Time 1m 00s. Submitted ${formatAssignmentResultDate(
+      new Date('2026-01-03T10:00:00.000Z')
+    )}.`,
     durationLabel: '1m 00s',
     durationView: expectReadableAttemptDurationView('1m 00s', 60),
     id: 'attempt-3',
@@ -49239,6 +49319,8 @@ assert.deepEqual(
   {
     accuracyLabel: '0%',
     answeredLabel: '0/0',
+    ariaLabel:
+      'Anonymous student. Score 0/0. Accuracy 0%. Answered 0/0. Time -. Submitted -.',
     durationLabel: '-',
     durationView: expectReadableAttemptDurationView('-', undefined),
     id: 'anonymous-row',
@@ -49262,6 +49344,8 @@ assert.deepEqual(
   {
     accuracyLabel: '0%',
     answeredLabel: '0/0',
+    ariaLabel:
+      'Ava Chen. Score 0/0. Accuracy 0%. Answered 0/0. Time -. Submitted -.',
     durationLabel: '-',
     durationView: expectReadableAttemptDurationView('-', undefined),
     id: 'normalized-name-row',
@@ -49297,6 +49381,9 @@ assert.deepEqual(
     {
       accuracyLabel: '75%',
       answeredLabel: '3/4',
+      ariaLabel: `Displayed student. Score 3/4. Accuracy 75%. Answered 3/4. Time 1m 00s. Submitted ${formatAssignmentResultDate(
+        attemptRowCompletedAt
+      )}.`,
       durationLabel: '1m 00s',
       durationView: expectReadableAttemptDurationView('1m 00s', 60, {
         timeLimitLabel: '1m 00s',
@@ -49332,6 +49419,8 @@ const attemptTableView = buildAssignmentAttemptTableView({
 });
 assert.deepEqual(
   {
+    ariaLabel: attemptTableView.ariaLabel,
+    caption: attemptTableView.caption,
     headers: summarizeAssignmentResultTableHeaders(attemptTableView.headers),
     rows: attemptTableView.rows.map((row) => [
       row.id,
@@ -49340,6 +49429,9 @@ assert.deepEqual(
     ]),
   },
   {
+    ariaLabel: 'Student attempts',
+    caption:
+      'Latest submitted attempts are shown first, with detailed answer review below.',
     headers: summarizeAssignmentResultTableHeaders(
       assignmentResultTableHeaders.studentAttempts
     ),
@@ -49408,6 +49500,8 @@ assert.deepEqual(
         acceptedAnswersLabel: 'Accepted answers',
         acceptedAnswersLineText: null,
         acceptedAnswersText: null,
+        ariaLabel:
+          '1. Capital?. Status Correct. Student: Paris Expected: Paris',
         expectedAnswerLabel: 'Expected',
         expectedAnswerLineText: 'Expected: Paris',
         expectedAnswerText: 'Paris',
@@ -49421,13 +49515,36 @@ assert.deepEqual(
         studentAnswerText: 'Paris',
       },
     ],
+    ariaLabel: `Alice. Submitted ${formatAssignmentResultDate(
+      attemptRowCompletedAt
+    )}. 2 pts · 67%.`,
     badgeLabel: '2 pts · 67%',
     id: 'attempt-1',
     summaryMetricViews: [
-      { key: 'submitted', label: 'Submitted', value: '1/1' },
-      { key: 'correct', label: 'Correct', value: '1' },
-      { key: 'needs-review', label: 'Needs review', value: '0' },
-      { key: 'unanswered', label: 'Unanswered', value: '0' },
+      {
+        ariaLabel: 'Submitted: 1/1.',
+        key: 'submitted',
+        label: 'Submitted',
+        value: '1/1',
+      },
+      {
+        ariaLabel: 'Correct: 1.',
+        key: 'correct',
+        label: 'Correct',
+        value: '1',
+      },
+      {
+        ariaLabel: 'Needs review: 0.',
+        key: 'needs-review',
+        label: 'Needs review',
+        value: '0',
+      },
+      {
+        ariaLabel: 'Unanswered: 0.',
+        key: 'unanswered',
+        label: 'Unanswered',
+        value: '0',
+      },
     ],
     studentLabel: 'Alice',
     submittedAtLabel: formatAssignmentResultDate(attemptRowCompletedAt),
@@ -49444,13 +49561,34 @@ assert.deepEqual(
   }),
   {
     answerViews: [],
+    ariaLabel: 'Anonymous student. Submitted -. 0 pts · 0%.',
     badgeLabel: '0 pts · 0%',
     id: 'attempt-empty',
     summaryMetricViews: [
-      { key: 'submitted', label: 'Submitted', value: '0/0' },
-      { key: 'correct', label: 'Correct', value: '0' },
-      { key: 'needs-review', label: 'Needs review', value: '0' },
-      { key: 'unanswered', label: 'Unanswered', value: '0' },
+      {
+        ariaLabel: 'Submitted: 0/0.',
+        key: 'submitted',
+        label: 'Submitted',
+        value: '0/0',
+      },
+      {
+        ariaLabel: 'Correct: 0.',
+        key: 'correct',
+        label: 'Correct',
+        value: '0',
+      },
+      {
+        ariaLabel: 'Needs review: 0.',
+        key: 'needs-review',
+        label: 'Needs review',
+        value: '0',
+      },
+      {
+        ariaLabel: 'Unanswered: 0.',
+        key: 'unanswered',
+        label: 'Unanswered',
+        value: '0',
+      },
     ],
     studentLabel: 'Anonymous student',
     submittedAtLabel: '-',

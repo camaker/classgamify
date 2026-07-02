@@ -242,6 +242,8 @@ type AssignmentResultContentState = {
 };
 
 type AssignmentResultTableView<TRow> = {
+  ariaLabel: string;
+  caption: string;
   headers: AssignmentResultTableHeaderView[];
   rows: TRow[];
 };
@@ -286,6 +288,7 @@ export type AssignmentResultAttemptRowMetricLabels = {
 
 export type AssignmentResultAttemptRowView =
   AssignmentResultAttemptRowMetricLabels & {
+    ariaLabel: string;
     durationLabel: string;
     durationView: AttemptDurationDisplayView;
     id: string;
@@ -300,6 +303,7 @@ export type AssignmentResultAttemptAnswerReviewDisplayView = {
   acceptedAnswersLabel: string;
   acceptedAnswersLineText: string | null;
   acceptedAnswersText: string | null;
+  ariaLabel: string;
   expectedAnswerLabel: string;
   expectedAnswerLineText: string;
   expectedAnswerText: string;
@@ -324,6 +328,7 @@ export type AssignmentResultAttemptReviewSummaryMetricKey =
   | 'unanswered';
 
 export type AssignmentResultAttemptReviewSummaryMetricView = {
+  ariaLabel: string;
   key: AssignmentResultAttemptReviewSummaryMetricKey;
   label: string;
   value: string;
@@ -331,6 +336,7 @@ export type AssignmentResultAttemptReviewSummaryMetricView = {
 
 export type AssignmentResultAttemptReviewCardView = {
   answerViews: AssignmentResultAttemptAnswerReviewView[];
+  ariaLabel: string;
   badgeLabel: string;
   id: string;
   summaryMetricViews: AssignmentResultAttemptReviewSummaryMetricView[];
@@ -339,6 +345,7 @@ export type AssignmentResultAttemptReviewCardView = {
 };
 
 export type AssignmentResultStudentSummaryRowDisplayView = {
+  ariaLabel: string;
   attemptsLabel: string;
   averageAccuracyLabel: string;
   bestAccuracyLabel: string;
@@ -379,6 +386,7 @@ export type AssignmentResultItemAnalysisCardView =
 
 export type AssignmentResultItemPerformanceRowDisplayView = {
   acceptedAnswersText: string;
+  ariaLabel: string;
   correctRateLabel: string;
   expectedAnswerText: string;
   explanationText: string;
@@ -1524,20 +1532,31 @@ export function buildAssignmentAttemptRowDisplay({
     review,
     timeLimitSeconds,
   });
+  const metricLabels = buildAssignmentAttemptRowMetricLabels(attempt);
+  const studentDisplayLabel = formatAssignmentResultStudentLabel(
+    studentLabel ??
+      getAssignmentAttemptStudentLabel({
+        reviewStudentLabel: review?.studentLabel,
+        studentName: attempt.studentName,
+      })
+  );
+  const submittedAtLabel = formatAssignmentResultDate(attempt.completedAt);
 
   return {
+    ...metricLabels,
+    ariaLabel: m.assignment_result_attempt_row_aria_label({
+      accuracy: metricLabels.accuracyLabel,
+      answered: metricLabels.answeredLabel,
+      score: metricLabels.scoreLabel,
+      student: studentDisplayLabel,
+      submitted: submittedAtLabel,
+      time: durationView.label,
+    }),
     id: attempt.id,
-    ...buildAssignmentAttemptRowMetricLabels(attempt),
     durationLabel: durationView.label,
     durationView,
-    studentLabel: formatAssignmentResultStudentLabel(
-      studentLabel ??
-        getAssignmentAttemptStudentLabel({
-          reviewStudentLabel: review?.studentLabel,
-          studentName: attempt.studentName,
-        })
-    ),
-    submittedAtLabel: formatAssignmentResultDate(attempt.completedAt),
+    studentLabel: studentDisplayLabel,
+    submittedAtLabel,
   };
 }
 
@@ -1646,6 +1665,8 @@ export function buildAssignmentAttemptTableView<
   timeLimitSeconds?: number | null;
 }): AssignmentResultAttemptTableView {
   return {
+    ariaLabel: assignmentResultSectionCopy.studentAttempts.title,
+    caption: assignmentResultSectionCopy.studentAttempts.description,
     headers: assignmentResultTableHeaders.studentAttempts,
     rows: buildAssignmentAttemptRowViews(input),
   };
@@ -1688,13 +1709,22 @@ export function buildAssignmentAttemptReviewCardView(
     'accuracy' | 'answers' | 'completedAt' | 'id' | 'score' | 'studentLabel'
   >
 ): AssignmentResultAttemptReviewCardView {
+  const badgeLabel = formatAssignmentAttemptReviewBadge(attempt);
+  const studentLabel = formatAssignmentResultStudentLabel(attempt.studentLabel);
+  const submittedAtLabel = formatAssignmentResultDate(attempt.completedAt);
+
   return {
     answerViews: buildAssignmentAttemptAnswerReviewViews(attempt.answers),
-    badgeLabel: formatAssignmentAttemptReviewBadge(attempt),
+    ariaLabel: m.assignment_result_attempt_review_card_aria_label({
+      badge: badgeLabel,
+      student: studentLabel,
+      submitted: submittedAtLabel,
+    }),
+    badgeLabel,
     id: attempt.id,
     summaryMetricViews: buildAssignmentAttemptReviewSummaryMetricViews(attempt),
-    studentLabel: formatAssignmentResultStudentLabel(attempt.studentLabel),
-    submittedAtLabel: formatAssignmentResultDate(attempt.completedAt),
+    studentLabel,
+    submittedAtLabel,
   };
 }
 
@@ -1741,13 +1771,19 @@ export function buildAssignmentAttemptReviewSummaryMetricViews(
         min: 0,
       }),
     },
-  ];
+  ].map((metricView) => ({
+    ...metricView,
+    ariaLabel: m.assignment_result_attempt_review_metric_aria_label({
+      label: metricView.label,
+      value: metricView.value,
+    }),
+  }));
 }
 
 export function buildAssignmentStudentSummaryRowView(
   student: AssignmentStudentSummary
 ): AssignmentResultStudentSummaryRowDisplayView {
-  return {
+  const rowView = {
     attemptsLabel: formatAssignmentResultNumber(
       normalizeAssignmentStudentSummaryRowCount(student.attempts),
       { min: 0 }
@@ -1767,6 +1803,19 @@ export function buildAssignmentStudentSummaryRowView(
       { min: 0 }
     ),
     studentLabel: formatAssignmentResultStudentLabel(student.studentLabel),
+  };
+
+  return {
+    ...rowView,
+    ariaLabel: m.assignment_result_student_summary_row_aria_label({
+      attempts: rowView.attemptsLabel,
+      average: rowView.averageAccuracyLabel,
+      best: rowView.bestAccuracyLabel,
+      lastSubmitted: rowView.lastSubmittedLabel,
+      latest: rowView.latestAccuracyLabel,
+      needsReview: rowView.needsReviewLabel,
+      student: rowView.studentLabel,
+    }),
   };
 }
 
@@ -1798,6 +1847,8 @@ export function buildAssignmentStudentSummaryTableView(
   students: AssignmentStudentSummary[]
 ): AssignmentResultStudentSummaryTableView {
   return {
+    ariaLabel: assignmentResultSectionCopy.studentSummary.title,
+    caption: assignmentResultSectionCopy.studentSummary.description,
     headers: assignmentResultTableHeaders.studentSummary,
     rows: buildAssignmentStudentSummaryRowViews(students),
   };
@@ -1870,12 +1921,20 @@ export function buildAssignmentItemPerformanceRowView({
   const submittedCount = normalizeAssignmentItemPerformanceRowCount(
     item.submittedCount
   );
+  const correctRateLabel = formatAssignmentResultPercent(
+    normalizeAssignmentResultPercentLabelValue(item.correctRate)
+  );
+  const submittedLabel = formatAssignmentResultFraction(
+    correctCount,
+    submittedCount
+  );
+  const unansweredLabel = formatAssignmentSummaryUnansweredCount(
+    item.unansweredCount
+  );
 
-  return {
+  const rowView = {
     acceptedAnswersText: answerView.acceptedAlternativesText,
-    correctRateLabel: formatAssignmentResultPercent(
-      normalizeAssignmentResultPercentLabelValue(item.correctRate)
-    ),
+    correctRateLabel,
     expectedAnswerText: answerView.expectedAnswerText,
     explanationText: formatAssignmentResultValue(item.explanation),
     itemNumberLabel,
@@ -1885,13 +1944,21 @@ export function buildAssignmentItemPerformanceRowView({
       itemNumberLabel,
       prompt: item.prompt,
     }),
-    submittedLabel: formatAssignmentResultFraction(
-      correctCount,
-      submittedCount
-    ),
-    unansweredLabel: formatAssignmentSummaryUnansweredCount(
-      item.unansweredCount
-    ),
+    submittedLabel,
+    unansweredLabel,
+  };
+
+  return {
+    ...rowView,
+    ariaLabel: m.assignment_result_item_performance_row_aria_label({
+      acceptedAnswers: rowView.acceptedAnswersText,
+      correctRate: rowView.correctRateLabel,
+      expectedAnswer: rowView.expectedAnswerText,
+      item: rowView.promptLabel,
+      submitted: rowView.submittedLabel,
+      type: rowView.kindLabel,
+      unanswered: rowView.unansweredLabel,
+    }),
   };
 }
 
@@ -1921,6 +1988,8 @@ export function buildAssignmentItemPerformanceTableView(
   items: AssignmentItemAnalysis[]
 ): AssignmentResultItemPerformanceTableView {
   return {
+    ariaLabel: assignmentResultSectionCopy.itemPerformance.title,
+    caption: assignmentResultSectionCopy.itemPerformance.description,
     headers: assignmentResultTableHeaders.itemPerformance,
     rows: buildAssignmentItemPerformanceRowViews(items),
   };
@@ -1934,34 +2003,51 @@ export function buildAssignmentAttemptAnswerReviewView({
   index: number;
 }): AssignmentResultAttemptAnswerReviewDisplayView {
   const answerView = buildAssignmentResultAttemptAnswerTextView(answer);
+  const acceptedAnswersLineText = answerView.optionalAcceptedAlternativesText
+    ? m.assignment_result_review_accepted_answers_line({
+        label: assignmentResultReviewCopy.acceptedAnswersLabel,
+        value: answerView.optionalAcceptedAlternativesText,
+      })
+    : null;
+  const expectedAnswerLineText = m.assignment_result_review_expected_line({
+    label: assignmentResultReviewCopy.expectedAnswerLabel,
+    value: answerView.expectedAnswerText,
+  });
+  const explanationText = formatAssignmentResultOptionalText(
+    answer.explanation
+  );
+  const promptLabel = formatAssignmentResultPromptLabel({
+    index,
+    prompt: answer.prompt,
+  });
+  const studentAnswerLineText = m.assignment_result_review_student_answer_line({
+    label: assignmentResultReviewCopy.studentAnswerLabel,
+    value: answerView.studentAnswerText,
+  });
 
   return {
     acceptedAnswersLabel: assignmentResultReviewCopy.acceptedAnswersLabel,
-    acceptedAnswersLineText: answerView.optionalAcceptedAlternativesText
-      ? m.assignment_result_review_accepted_answers_line({
-          label: assignmentResultReviewCopy.acceptedAnswersLabel,
-          value: answerView.optionalAcceptedAlternativesText,
-        })
-      : null,
+    acceptedAnswersLineText,
     acceptedAnswersText: answerView.optionalAcceptedAlternativesText,
+    ariaLabel: m.assignment_result_attempt_answer_review_aria_label({
+      acceptedAnswers: acceptedAnswersLineText
+        ? ` ${acceptedAnswersLineText}`
+        : '',
+      expectedAnswer: expectedAnswerLineText,
+      explanation: explanationText ? ` ${explanationText}` : '',
+      prompt: promptLabel,
+      status: answerView.statusLabel,
+      studentAnswer: studentAnswerLineText,
+    }),
     expectedAnswerLabel: assignmentResultReviewCopy.expectedAnswerLabel,
-    expectedAnswerLineText: m.assignment_result_review_expected_line({
-      label: assignmentResultReviewCopy.expectedAnswerLabel,
-      value: answerView.expectedAnswerText,
-    }),
+    expectedAnswerLineText,
     expectedAnswerText: answerView.expectedAnswerText,
-    explanationText: formatAssignmentResultOptionalText(answer.explanation),
-    promptLabel: formatAssignmentResultPromptLabel({
-      index,
-      prompt: answer.prompt,
-    }),
+    explanationText,
+    promptLabel,
     statusLabel: answerView.statusLabel,
     statusTone: answerView.statusTone,
     studentAnswerLabel: assignmentResultReviewCopy.studentAnswerLabel,
-    studentAnswerLineText: m.assignment_result_review_student_answer_line({
-      label: assignmentResultReviewCopy.studentAnswerLabel,
-      value: answerView.studentAnswerText,
-    }),
+    studentAnswerLineText,
     studentAnswerText: answerView.studentAnswerText,
   };
 }
