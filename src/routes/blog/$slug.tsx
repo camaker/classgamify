@@ -18,7 +18,7 @@ import {
   organizationJsonLd,
 } from '@/lib/structured-data';
 import { cn } from '@/lib/utils';
-import { getBlogCtaActions } from '@/pages/blog-page-view';
+import { buildBlogPostCtaViewModel } from '@/pages/blog-page-view';
 import { IconArrowLeft } from '@tabler/icons-react';
 import { Link, createFileRoute, notFound } from '@tanstack/react-router';
 
@@ -66,7 +66,7 @@ export const Route = createFileRoute('/blog/$slug')({
 function BlogPostPage() {
   const { post } = Route.useLoaderData();
   if (!post) throw notFound();
-  const ctaActions = getBlogCtaActions();
+  const ctaView = buildBlogPostCtaViewModel();
 
   return (
     <Container className="px-4 py-16">
@@ -107,14 +107,14 @@ function BlogPostPage() {
           <div className="grid gap-4 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-center">
             <div className="min-w-0 space-y-2">
               <h2 className="text-lg font-semibold tracking-normal">
-                {m.blog_post_cta_title()}
+                {ctaView.title}
               </h2>
               <p className="text-sm leading-6 text-muted-foreground">
-                {m.blog_post_cta_description()}
+                {ctaView.description}
               </p>
             </div>
             <div className="flex flex-wrap gap-2 sm:justify-end">
-              {ctaActions.map((action) => (
+              {ctaView.actions.map((action) => (
                 <BlogCtaActionLink action={action} key={action.id} />
               ))}
             </div>

@@ -407,7 +407,11 @@ import {
   buildRoadmapPageViewModel,
   buildTeachersPageViewModel,
 } from '@/pages/public-page-view';
-import { getBlogCtaActions } from '@/pages/blog-page-view';
+import {
+  buildBlogListPageViewModel,
+  buildBlogPostCtaViewModel,
+  getBlogCtaActions,
+} from '@/pages/blog-page-view';
 import {
   buildPaymentStatusView,
   getInitialPaymentConfirmationStatus,
@@ -5778,28 +5782,28 @@ assert.match(
 );
 assert.match(
   blogListRouteSource,
-  /getBlogCtaActions\(\)[\s\S]*BlogCtaActionLink[\s\S]*action=\{action\}/,
-  'Blog list route should render prepared blog CTA actions through the shared component.'
+  /const pageView = buildBlogListPageViewModel\(\);[\s\S]*pageView\.seoTitle[\s\S]*pageView\.seoDescription/,
+  'Blog list route head should consume prepared editorial SEO copy from the blog page view.'
 );
 assert.match(
   blogListRouteSource,
-  /ctaActions\.map[\s\S]*key=\{action\.id\}/,
-  'Blog list route should key prepared CTA actions by stable action ids.'
+  /const pageView = buildBlogListPageViewModel\(\);[\s\S]*pageView\.eyebrow[\s\S]*pageView\.title[\s\S]*pageView\.description[\s\S]*pageView\.ctaActions\.map[\s\S]*key=\{action\.id\}/,
+  'Blog list route should render prepared hero copy and CTA actions keyed by stable ids.'
 );
 assert.match(
   blogPostRouteSource,
-  /getBlogCtaActions\(\)[\s\S]*BlogCtaActionLink[\s\S]*action=\{action\}/,
-  'Blog post route should render prepared blog CTA actions through the shared component.'
+  /const ctaView = buildBlogPostCtaViewModel\(\);[\s\S]*ctaView\.title[\s\S]*ctaView\.description[\s\S]*ctaView\.actions\.map/,
+  'Blog post route should render prepared post CTA copy and actions through the shared component.'
 );
 assert.match(
   blogPostRouteSource,
-  /ctaActions\.map[\s\S]*key=\{action\.id\}/,
+  /ctaView\.actions\.map[\s\S]*key=\{action\.id\}/,
   'Blog post route should key prepared CTA actions by stable action ids.'
 );
 assert.doesNotMatch(
   `${blogListRouteSource}\n${blogPostRouteSource}`,
-  /Routes\.(Create|Templates|StudentPreview)|blog_page_create_activity|blog_page_browse_templates|blog_page_student_preview|key=\{action\.to\}/,
-  'Blog routes should not hardcode product CTA route targets or labels.'
+  /Routes\.(Create|Templates|StudentPreview)|blog_page_(?:create_activity|browse_templates|student_preview|eyebrow|title|description|seo_title|seo_description)|blog_post_cta_(?:title|description)|key=\{action\.to\}/,
+  'Blog routes should not hardcode editorial copy, product CTA route targets, or CTA labels.'
 );
 assert.match(
   blogCtaActionLinkSource,
@@ -5810,6 +5814,26 @@ assert.match(
   blogPageViewSource,
   /export type BlogCtaAction = \{[\s\S]*id: BlogCtaActionIcon;[\s\S]*to:/,
   'Blog CTA action view should expose stable ids separate from route targets.'
+);
+assert.match(
+  blogPageViewSource,
+  /export type BlogListPageViewModel = \{[\s\S]*ctaActions: BlogCtaAction\[\];[\s\S]*seoDescription: string;[\s\S]*seoTitle: string;[\s\S]*title: string;/,
+  'Blog page view should expose prepared list-page hero, SEO, and CTA copy.'
+);
+assert.match(
+  blogPageViewSource,
+  /export type BlogPostCtaViewModel = \{[\s\S]*actions: BlogCtaAction\[\];[\s\S]*description: string;[\s\S]*title: string;/,
+  'Blog page view should expose prepared post CTA copy and actions.'
+);
+assert.match(
+  blogPageViewSource,
+  /buildBlogListPageViewModel[\s\S]*blog_page_description[\s\S]*blog_page_eyebrow[\s\S]*blog_page_seo_description[\s\S]*blog_page_seo_title[\s\S]*blog_page_title/,
+  'Blog page view should prepare localized editorial list-page copy and SEO metadata.'
+);
+assert.match(
+  blogPageViewSource,
+  /buildBlogPostCtaViewModel[\s\S]*blog_post_cta_description[\s\S]*blog_post_cta_title/,
+  'Blog page view should prepare localized post CTA copy.'
 );
 assert.match(
   blogPageViewSource,
@@ -10213,6 +10237,41 @@ for (const [
       messages[key] ?? '',
       pattern,
       `${locale} ${key} should describe ClassGamify classroom contact boundaries.`
+    );
+  }
+}
+const editorialNavigationMessageRequirements = [
+  [
+    enLocaleMessages,
+    'en',
+    [
+      ['blog_description', /templates, assignment links, AI drafting/],
+      ['changelog_description', /student runners, AI drafts, and teacher results/],
+      ['changelog_subtitle', /activity -> assignment -> attempt -> results loop/],
+      ['nav_changelog_description', /activities, assignments, AI drafts, and results/],
+    ],
+  ],
+  [
+    zhLocaleMessages,
+    'zh',
+    [
+      ['blog_description', /模板、作业链接、AI 草稿/],
+      ['changelog_description', /学生作答页、AI 草稿和老师结果/],
+      ['changelog_subtitle', /活动 -> 作业 -> 作答 -> 结果闭环/],
+      ['nav_changelog_description', /活动、作业、AI 草稿和结果复盘/],
+    ],
+  ],
+] as const;
+for (const [
+  messages,
+  locale,
+  requirements,
+] of editorialNavigationMessageRequirements) {
+  for (const [key, pattern] of requirements) {
+    assert.match(
+      messages[key] ?? '',
+      pattern,
+      `${locale} ${key} should describe ClassGamify editorial and release-note boundaries.`
     );
   }
 }
@@ -31024,6 +31083,33 @@ assert.deepEqual(getBlogCtaActions(), [
     variant: 'outline',
   },
 ]);
+const blogListPageView = buildBlogListPageViewModel();
+assert.equal(blogListPageView.eyebrow, 'Classroom activities');
+assert.equal(blogListPageView.seoTitle, 'Classroom Activity Resources');
+assert.match(
+  blogListPageView.description,
+  /teacher activity creation, publishing assignments, and using AI/
+);
+assert.deepEqual(
+  blogListPageView.ctaActions.map((action) => action.id),
+  ['create', 'templates', 'preview']
+);
+const blogPostCtaView = buildBlogPostCtaViewModel();
+assert.match(blogPostCtaView.title, /next activity/);
+assert.deepEqual(
+  blogPostCtaView.actions.map((action) => action.id),
+  ['create', 'templates', 'preview']
+);
+overwriteGetLocale(() => 'zh');
+try {
+  const zhBlogListPageView = buildBlogListPageViewModel();
+  assert.equal(zhBlogListPageView.eyebrow, '课堂活动');
+  assert.match(zhBlogListPageView.description, /发布作业和用 AI 加速备课/);
+  const zhBlogPostCtaView = buildBlogPostCtaViewModel();
+  assert.match(zhBlogPostCtaView.title, /下一个课堂活动/);
+} finally {
+  overwriteGetLocale(() => 'en');
+}
 function buildExpectedTemplateEntrySteps(templateShortName: string) {
   return [
     {
