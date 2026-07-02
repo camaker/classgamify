@@ -30407,8 +30407,8 @@ assert.match(
 );
 assert.match(
   printableWorksheetAnswerKeySource,
-  /aria-label=\{view\.accessView\.ariaLabel\}[\s\S]*data-print-answer-key-state=\{view\.accessView\.state\}[\s\S]*view\.accessView\.value/,
-  'Printable worksheet answer-key component should render only the prepared answer-key access status.'
+  /const titleId = 'printable-worksheet-answer-key-title'[\s\S]*const descriptionId = 'printable-worksheet-answer-key-description'[\s\S]*const accessDescriptionId =[\s\S]*'printable-worksheet-answer-key-access-description'[\s\S]*aria-describedby=\{`\$\{descriptionId\} \$\{accessDescriptionId\}`\}[\s\S]*aria-labelledby=\{titleId\}[\s\S]*data-print-answer-key-state=\{view\.accessView\.state\}[\s\S]*id=\{titleId\}[\s\S]*aria-describedby=\{accessDescriptionId\}[\s\S]*aria-label=\{view\.accessView\.ariaLabel\}[\s\S]*view\.accessView\.value[\s\S]*id=\{descriptionId\}[\s\S]*view\.description[\s\S]*id=\{accessDescriptionId\}[\s\S]*view\.accessView\.description/,
+  'Printable worksheet answer-key component should associate the teacher-only answer-key title, description, and prepared access status.'
 );
 assert.match(
   printableWorksheetPreparationSummarySource,
@@ -30419,6 +30419,11 @@ assert.match(
   printableWorksheetPreparationSummarySource,
   /view\.title[\s\S]*view\.description[\s\S]*view\.items\.map[\s\S]*key=\{itemView\.id\}[\s\S]*itemView\.label[\s\S]*itemView\.value[\s\S]*itemView\.description/,
   'Printable worksheet preparation summary should render prepared title, description, stable item ids, labels, values, and descriptions.'
+);
+assert.match(
+  printableWorksheetPreparationSummarySource,
+  /const titleId = 'printable-worksheet-preparation-title'[\s\S]*const descriptionId = 'printable-worksheet-preparation-description'[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*aria-labelledby=\{titleId\}[\s\S]*id=\{titleId\}[\s\S]*id=\{descriptionId\}[\s\S]*const labelId = `printable-worksheet-preparation-\$\{itemView\.id\}-label`[\s\S]*const valueId = `printable-worksheet-preparation-\$\{itemView\.id\}-value`[\s\S]*const descriptionId = `printable-worksheet-preparation-\$\{itemView\.id\}-description`[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*aria-labelledby=\{`\$\{labelId\} \$\{valueId\}`\}[\s\S]*id=\{labelId\}[\s\S]*id=\{valueId\}[\s\S]*id=\{descriptionId\}/,
+  'Printable worksheet preparation summary and item cards should associate prepared labels, values, and descriptions.'
 );
 assert.doesNotMatch(
   printableWorksheetPreparationSummarySource,
@@ -30692,8 +30697,8 @@ assert.match(
 );
 assert.match(
   printableWorksheetToolbarSource,
-  /function PrintableWorksheetAnswerKeyToggle[\s\S]*toggleView: PrintableWorksheetAnswerKeyToggleView[\s\S]*checked=\{toggleView\.value\}[\s\S]*toggleView\.label[\s\S]*toggleView\.accessView\.ariaLabel[\s\S]*data-print-answer-key-state=\{toggleView\.accessView\.state\}[\s\S]*toggleView\.accessView\.value[\s\S]*toggleView\.description/,
-  'Printable worksheet answer-key toggle should consume a focused prepared toggle view and access status.'
+  /function PrintableWorksheetAnswerKeyToggle[\s\S]*toggleView: PrintableWorksheetAnswerKeyToggleView[\s\S]*const answerKeyDescriptionId = 'printable-answer-key-description'[\s\S]*const answerKeyStatusDescriptionId =[\s\S]*'printable-answer-key-status-description'[\s\S]*checked=\{toggleView\.value\}[\s\S]*aria-describedby=\{`\$\{answerKeyDescriptionId\} \$\{answerKeyStatusDescriptionId\}`\}[\s\S]*toggleView\.label[\s\S]*aria-describedby=\{answerKeyStatusDescriptionId\}[\s\S]*toggleView\.accessView\.ariaLabel[\s\S]*data-print-answer-key-state=\{toggleView\.accessView\.state\}[\s\S]*toggleView\.accessView\.value[\s\S]*id=\{answerKeyDescriptionId\}[\s\S]*toggleView\.description[\s\S]*id=\{answerKeyStatusDescriptionId\}[\s\S]*toggleView\.accessView\.description/,
+  'Printable worksheet answer-key toggle should consume a focused prepared toggle view and associate both help text and access status.'
 );
 assert.match(
   printableWorksheetToolbarSource,
@@ -30732,8 +30737,8 @@ assert.match(
 );
 assert.match(
   printableWorksheetAnswerKeySource,
-  /function PrintableWorksheetAnswerKeyItem[\s\S]*itemView\.detailViews\.map[\s\S]*PrintableWorksheetAnswerKeyDetail[\s\S]*detailView=\{detailView\}/,
-  'Printable worksheet answer-key item component should render prepared answer-key detail views.'
+  /function PrintableWorksheetAnswerKeyItem[\s\S]*const titleId = `printable-worksheet-answer-key-\$\{itemView\.id\}-title`[\s\S]*const descriptionId = `printable-worksheet-answer-key-\$\{itemView\.id\}-description`[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*aria-labelledby=\{titleId\}[\s\S]*id=\{titleId\}[\s\S]*id=\{descriptionId\}[\s\S]*itemView\.detailViews\.map[\s\S]*PrintableWorksheetAnswerKeyDetail[\s\S]*detailView=\{detailView\}/,
+  'Printable worksheet answer-key item component should associate prepared item headings and prompts while rendering prepared answer-key detail views.'
 );
 assert.match(
   printableWorksheetAnswerKeySource,

@@ -49,6 +49,8 @@ function PrintableWorksheetAnswerKeyToggle({
   toggleView: PrintableWorksheetAnswerKeyToggleView;
 }) {
   const answerKeyDescriptionId = 'printable-answer-key-description';
+  const answerKeyStatusDescriptionId =
+    'printable-answer-key-status-description';
 
   return (
     <label
@@ -58,19 +60,20 @@ function PrintableWorksheetAnswerKeyToggle({
       <Switch
         id="printable-answer-key"
         checked={toggleView.value}
-        aria-describedby={answerKeyDescriptionId}
+        aria-describedby={`${answerKeyDescriptionId} ${answerKeyStatusDescriptionId}`}
         onCheckedChange={onAnswerKeyChange}
       />
       <span className="grid gap-1">
         <span className="flex flex-wrap items-center gap-2">
           <span>{toggleView.label}</span>
           <Badge
+            aria-describedby={answerKeyStatusDescriptionId}
             aria-label={toggleView.accessView.ariaLabel}
             className="rounded-md"
             data-print-answer-key-state={toggleView.accessView.state}
             variant="outline"
           >
-            {toggleView.accessView.value}
+            <output>{toggleView.accessView.value}</output>
           </Badge>
         </span>
         <span
@@ -78,6 +81,9 @@ function PrintableWorksheetAnswerKeyToggle({
           className="max-w-64 text-muted-foreground text-xs leading-snug"
         >
           {toggleView.description}
+        </span>
+        <span id={answerKeyStatusDescriptionId} className="sr-only">
+          {toggleView.accessView.description}
         </span>
       </span>
     </label>
@@ -100,7 +106,7 @@ function PrintableWorksheetPrintButton({
         aria-describedby={printDescriptionId}
         onClick={onPrint}
       >
-        <IconPrinter className="size-4" />
+        <IconPrinter aria-hidden="true" className="size-4" />
         {action.label}
       </Button>
       <span id={printDescriptionId} className="sr-only">
@@ -121,7 +127,7 @@ function PrintableWorksheetBackToResultsLink({
       params={{ assignmentId: action.assignmentId }}
       className={cn(buttonVariants({ variant: 'outline' }), 'w-fit')}
     >
-      <IconArrowLeft className="size-4" />
+      <IconArrowLeft aria-hidden="true" className="size-4" />
       {action.label}
     </Link>
   );
