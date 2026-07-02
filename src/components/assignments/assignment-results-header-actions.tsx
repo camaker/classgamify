@@ -231,6 +231,21 @@ function AssignmentResultsHeaderResultActionButton({
   onClick: () => void;
 }) {
   const Icon = resultActionIconByAction[actionButton.action];
+  const actionDescriptionId = getResultActionDescriptionId(actionButton.id);
+  const scopeDescriptionId = getResultActionSummaryDescriptionId(
+    `${actionButton.id}-scope`
+  );
+  const statusDescriptionId = getResultActionSummaryDescriptionId(
+    `${actionButton.id}-status`
+  );
+  const describedBy = [
+    actionDescriptionId,
+    scopeDescriptionId,
+    statusDescriptionId,
+    disabledReasonId,
+  ]
+    .filter(Boolean)
+    .join(' ');
 
   return (
     <div className="grid min-w-0 gap-1">
@@ -241,12 +256,15 @@ function AssignmentResultsHeaderResultActionButton({
         disabled={actionButton.disabled}
         onClick={onClick}
         aria-label={actionButton.ariaLabel}
-        aria-describedby={disabledReasonId}
+        aria-describedby={describedBy}
       >
         <Icon aria-hidden="true" className="size-4" />
         {actionButton.label}
       </Button>
-      <p className="text-muted-foreground text-xs leading-snug">
+      <p
+        id={actionDescriptionId}
+        className="text-muted-foreground text-xs leading-snug"
+      >
         {actionButton.description}
       </p>
       <dl className="grid gap-1 text-xs">
@@ -285,7 +303,7 @@ function AssignmentResultActionSummaryItem({
   tone?: AssignmentResultActionButton['statusView']['tone'];
   value: string;
 }) {
-  const descriptionId = `assignment-result-action-summary-${id}-description`;
+  const descriptionId = getResultActionSummaryDescriptionId(id);
 
   return (
     <div className="grid gap-1">
@@ -393,6 +411,14 @@ function getResultActionDisabledReasonId({
   return disabledReason
     ? `assignment-result-action-${id}-disabled-reason`
     : undefined;
+}
+
+function getResultActionDescriptionId(id: AssignmentResultActionButton['id']) {
+  return `assignment-result-action-${id}-description`;
+}
+
+function getResultActionSummaryDescriptionId(id: string) {
+  return `assignment-result-action-summary-${id}-description`;
 }
 
 const resultActionIconByAction: Record<

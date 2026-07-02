@@ -6764,8 +6764,18 @@ assert.match(
 );
 assert.match(
   assignmentResultsHeaderActionsSource,
+  /const actionDescriptionId = getResultActionDescriptionId\(actionButton\.id\)[\s\S]*const scopeDescriptionId = getResultActionSummaryDescriptionId\([\s\S]*`\$\{actionButton\.id\}-scope`[\s\S]*const statusDescriptionId = getResultActionSummaryDescriptionId\([\s\S]*`\$\{actionButton\.id\}-status`[\s\S]*const describedBy = \[[\s\S]*actionDescriptionId,[\s\S]*scopeDescriptionId,[\s\S]*statusDescriptionId,[\s\S]*disabledReasonId,[\s\S]*aria-describedby=\{describedBy\}[\s\S]*id=\{actionDescriptionId\}/,
+  'Assignment result action buttons should associate action, scope, status, and disabled-reason descriptions with the button control.'
+);
+assert.match(
+  assignmentResultsHeaderActionsSource,
   /function AssignmentResultActionSummaryItem[\s\S]*ariaLabel[\s\S]*description[\s\S]*label[\s\S]*tone[\s\S]*value[\s\S]*<Badge[\s\S]*data-tone=\{tone\}[\s\S]*<output[\s\S]*aria-label=\{ariaLabel\}[\s\S]*\{value\}[\s\S]*\{description\}/,
   'Assignment result action summary items should render prepared scope/status labels, values, tones, descriptions, and accessible labels.'
+);
+assert.match(
+  assignmentResultsHeaderActionsSource,
+  /function AssignmentResultActionSummaryItem[\s\S]*const descriptionId = getResultActionSummaryDescriptionId\(id\)[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*id=\{descriptionId\}/,
+  'Assignment result action summary descriptions should use the same stable ids referenced by result action buttons.'
 );
 assert.match(
   assignmentResultsHeaderActionsSource,
@@ -6789,7 +6799,7 @@ assert.match(
 );
 assert.match(
   assignmentResultsHeaderActionsSource,
-  /aria-describedby=\{disabledReasonId\}[\s\S]*id=\{getResultActionDisabledReasonId[\s\S]*id: disabledReason\.id/,
+  /function AssignmentResultsHeaderResultActionButton[\s\S]*const describedBy = \[[\s\S]*disabledReasonId,[\s\S]*aria-describedby=\{describedBy\}[\s\S]*function AssignmentResultsHeaderResultActionDisabledReasons[\s\S]*id=\{getResultActionDisabledReasonId[\s\S]*id: disabledReason\.id/,
   'Assignment result action disabled buttons should be associated with their prepared disabled reason text.'
 );
 assert.match(
