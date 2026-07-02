@@ -356,6 +356,7 @@
   "activity_library_card_restore_required_label": "Restore requirement for {title}",
   "activity_library_card_source_materials_label": "Source materials for {title}",
   "activity_library_card_source_material_edit_action": "Review in editor",
+  "activity_library_card_untitled": "Untitled activity",
   "activity_library_created_panel_label": "Activity saved",
   "activity_library_created_panel_missing_hint": "The saved activity may be on another page or hidden by filters. The edit action appears once the activity can be resolved for this teacher.",
   "activity_library_empty_archived_description": "Archived activities will appear here after you move them out of the active library.",

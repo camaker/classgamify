@@ -168,6 +168,7 @@ export type ActivityLibraryCardDisplayView = {
   compatibilityLabel: string;
   contentLabel: string;
   detailsLabel: string;
+  displayTitle: string;
   restoreRequiredLabel: string;
   sourceMaterials: ActivitySourceMaterialSummaryView;
   sourceMaterialsLabel: string;
@@ -1154,6 +1155,7 @@ export function buildCreatedActivityPanelContext({
   if (activity) {
     const canEdit = canEditActivity(activity.visibility);
     const canPublish = canDeriveActivityWork(activity.visibility);
+    const displayTitle = formatActivityLibraryDisplayTitle(activity.title);
 
     return {
       activity,
@@ -1165,7 +1167,7 @@ export function buildCreatedActivityPanelContext({
       showMissingHint: false,
       showPublishAction: canPublish,
       status: 'found',
-      title: activity.title,
+      title: displayTitle,
     };
   }
 
@@ -1320,6 +1322,12 @@ export function buildStarterActivityLibraryCardViewModel(
   };
 }
 
+export function formatActivityLibraryDisplayTitle(title: string) {
+  return (
+    normalizeRuntimeDisplayText(title) || m.activity_library_card_untitled()
+  );
+}
+
 export function buildActivityLibraryCardDisplayView({
   activity,
   libraryStatus,
@@ -1333,6 +1341,7 @@ export function buildActivityLibraryCardDisplayView({
     templateType: template.type,
   });
   const statusLabel = formatActivityLibraryCardStatusLabel(activity);
+  const displayTitle = formatActivityLibraryDisplayTitle(activity.title);
 
   return {
     actionState: buildActivityLibraryCardActionState({
@@ -1343,12 +1352,12 @@ export function buildActivityLibraryCardDisplayView({
     }),
     actionView: buildActivityLibraryCardActionView(activity.status),
     actionsLabel: m.activity_library_card_actions_label({
-      title: activity.title,
+      title: displayTitle,
     }),
     ariaLabel: m.activity_library_card_aria_label({
       status: statusLabel,
       template: template.name,
-      title: activity.title,
+      title: displayTitle,
     }),
     compatibility: buildActivityLibraryCompatibilityView({
       currentTemplateType: activity.templateType,
@@ -1356,26 +1365,27 @@ export function buildActivityLibraryCardDisplayView({
       visibility: activity.status,
     }),
     compatibilityLabel: m.activity_library_card_compatibility_label({
-      title: activity.title,
+      title: displayTitle,
     }),
     contentLabel: m.activity_library_card_content_label({
-      title: activity.title,
+      title: displayTitle,
     }),
     detailsLabel: m.activity_library_card_details_label({
-      title: activity.title,
+      title: displayTitle,
     }),
+    displayTitle,
     editAction: buildActivityLibraryEditorAction({
       activityId: activity.id,
       label: activityLibraryCardCopy.actionLabels.edit,
     }),
     restoreRequiredLabel: m.activity_library_card_restore_required_label({
-      title: activity.title,
+      title: displayTitle,
     }),
     sourceMaterials: buildActivitySourceMaterialSummaryView(
       activity.content.sourceMaterials
     ),
     sourceMaterialsLabel: m.activity_library_card_source_materials_label({
-      title: activity.title,
+      title: displayTitle,
     }),
     sourceMaterialEditAction: buildActivityLibraryEditorAction({
       activityId: activity.id,

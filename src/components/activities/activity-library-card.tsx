@@ -188,7 +188,9 @@ export function ActivityLibraryCard({
           </Badge>
         </div>
         <CardTitle>
-          <h2 className="text-lg font-semibold">{activity.title}</h2>
+          <h2 className="text-lg font-semibold">
+            {cardDisplayView.displayTitle}
+          </h2>
         </CardTitle>
         <CardDescription>
           <p>{activity.description}</p>

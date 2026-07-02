@@ -356,6 +356,7 @@
   "activity_library_card_restore_required_label": "“{title}”的恢复要求",
   "activity_library_card_source_materials_label": "“{title}”的来源素材",
   "activity_library_card_source_material_edit_action": "在编辑器中检查",
+  "activity_library_card_untitled": "未命名活动",
   "activity_library_created_panel_label": "活动已保存",
   "activity_library_created_panel_missing_hint": "刚保存的活动可能在其他页面，或被筛选条件隐藏。系统确认这份活动属于当前老师后，会显示编辑操作。",
   "activity_library_empty_archived_description": "当你把活动移出当前活动库后，归档活动会显示在这里。",

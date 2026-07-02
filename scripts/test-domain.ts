@@ -104,6 +104,7 @@ import {
   buildActivityLibraryStarterPreview,
   buildActivityLibraryTemplateFilterOptions,
   findCreatedActivityInList,
+  formatActivityLibraryDisplayTitle,
   formatActivityLibraryTemplateShortNameList,
   formatActivityLibraryStatusLabel,
   resolveCreatedActivityPanelActivity,
@@ -24004,6 +24005,21 @@ assert.deepEqual(
     title: 'Activity saved to your library.',
   }
 );
+assert.equal(
+  formatActivityLibraryDisplayTitle('  Ｍａｔｅｒｉａｌ\u00A0　groups  '),
+  'Material groups'
+);
+assert.equal(formatActivityLibraryDisplayTitle('   '), 'Untitled activity');
+assert.equal(
+  buildCreatedActivityPanelContext({
+    activity: {
+      ...createdActivities[1],
+      title: '  Ｍａｔｅｒｉａｌ\u00A0　groups  ',
+    },
+    isLoading: false,
+  }).title,
+  'Material groups'
+);
 assert.equal(normalizeActivityLibrarySearch('  word   match  '), 'word match');
 assert.equal(normalizeActivityLibrarySearch('  Ｇｒｏｕｐ   １  '), 'Group 1');
 assert.equal(normalizeActivityLibrarySearch('   '), undefined);
@@ -25364,6 +25380,21 @@ assert.match(
 );
 assert.match(
   activityLibraryViewSource,
+  /export type ActivityLibraryCardDisplayView = \{[\s\S]*displayTitle: string;[\s\S]*export function formatActivityLibraryDisplayTitle\(title: string\)[\s\S]*normalizeRuntimeDisplayText\(title\)[\s\S]*m\.activity_library_card_untitled\(\)/,
+  'Activity library card display views should normalize visible titles through one localized display-title helper.'
+);
+assert.match(
+  activityLibraryViewSource,
+  /buildActivityLibraryCardDisplayView[\s\S]*const displayTitle = formatActivityLibraryDisplayTitle\(activity\.title\)[\s\S]*actionsLabel: m\.activity_library_card_actions_label\(\{[\s\S]*title: displayTitle,[\s\S]*ariaLabel: m\.activity_library_card_aria_label\(\{[\s\S]*title: displayTitle,[\s\S]*displayTitle,/,
+  'Activity library card display view should reuse the normalized display title for visible, aria, and action labels.'
+);
+assert.match(
+  activityLibraryViewSource,
+  /buildCreatedActivityPanelContext[\s\S]*const displayTitle = formatActivityLibraryDisplayTitle\(activity\.title\)[\s\S]*title: displayTitle/,
+  'Created activity panels should show the same normalized activity display title as library cards.'
+);
+assert.match(
+  activityLibraryViewSource,
   /export type ActivityLibraryCompatibilityView = \{[\s\S]*remixStatusView: ActivityLibraryActionStatusView;[\s\S]*restoreRequiredMessage\?: string;[\s\S]*buildActivityLibraryCompatibilityView\(\{[\s\S]*visibility = 'draft'[\s\S]*buildActivityDerivativeActionGate\(\{[\s\S]*action: 'remix'[\s\S]*visibility,[\s\S]*remixStatusView[\s\S]*restoreRequiredMessage/,
   'Activity library compatibility view should expose remix status and restore guidance from the remix lifecycle gate.'
 );
@@ -25466,6 +25497,11 @@ assert.match(
   activityLibraryCardComponentSource,
   /<Card[\s\S]*role="article"[\s\S]*aria-label=\{cardDisplayView\.ariaLabel\}[\s\S]*<section[\s\S]*aria-label=\{cardDisplayView\.detailsLabel\}/,
   'Activity library card component should expose the prepared card and details labels semantically.'
+);
+assert.match(
+  activityLibraryCardComponentSource,
+  /<CardTitle>[\s\S]*\{cardDisplayView\.displayTitle\}[\s\S]*<\/CardTitle>/,
+  'Activity library card component should render the prepared display title instead of raw activity titles.'
 );
 assert.match(
   activityLibraryCardComponentSource,
@@ -30966,9 +31002,45 @@ const starterActivityDisplayView = buildActivityLibraryCardDisplayView({
   activity: starterActivityCardView,
   libraryStatus: 'active',
 });
+const normalizedTitleActivityDisplayView = buildActivityLibraryCardDisplayView({
+  activity: {
+    ...starterActivityCardView,
+    title: '  Ｆｏｏｄ\u00A0　words  ',
+  },
+  libraryStatus: 'active',
+});
 assert.equal(starterActivityDisplayView.templateName, 'Quiz');
 assert.equal(starterActivityDisplayView.templateType, 'quiz');
 assert.equal(starterActivityDisplayView.statusLabel, 'Preview');
+assert.equal(normalizedTitleActivityDisplayView.displayTitle, 'Food words');
+assert.equal(
+  normalizedTitleActivityDisplayView.ariaLabel,
+  'Food words, Preview, Quiz'
+);
+assert.equal(
+  normalizedTitleActivityDisplayView.actionsLabel,
+  'Actions for Food words'
+);
+assert.equal(
+  normalizedTitleActivityDisplayView.detailsLabel,
+  'Activity details for Food words'
+);
+assert.equal(
+  normalizedTitleActivityDisplayView.contentLabel,
+  'Activity content counts for Food words'
+);
+assert.equal(
+  normalizedTitleActivityDisplayView.compatibilityLabel,
+  'Template compatibility for Food words'
+);
+assert.equal(
+  normalizedTitleActivityDisplayView.sourceMaterialsLabel,
+  'Source materials for Food words'
+);
+assert.equal(
+  normalizedTitleActivityDisplayView.restoreRequiredLabel,
+  'Restore requirement for Food words'
+);
 assert.deepEqual(starterActivityDisplayView.stats, [
   {
     ariaLabel: 'Questions: 3. Question prompts stored in this activity.',
