@@ -192,6 +192,7 @@ export type StudentRunnerControlView = {
   submitConfirmationMessage?: string;
   submitDisabled: boolean;
   submitHintViews: StudentRunnerSubmitHintView[];
+  submitReadinessView: StudentRunnerSubmitReadinessView;
   timeExpiredNoticeLabel: string;
   timeExpiredMessage: string;
   timerBadge: StudentAttemptTimerBadge;
@@ -208,6 +209,36 @@ export type StudentRunnerSubmitHintView = {
   id: StudentRunnerSubmitHintId;
   text: string;
   tone: 'info' | 'warning';
+};
+
+export type StudentRunnerSubmitReadinessStatus =
+  | 'blocked'
+  | 'needs-action'
+  | 'ready';
+
+export type StudentRunnerSubmitReadinessItemId =
+  | 'completion'
+  | 'incomplete-confirmation'
+  | 'runtime-items'
+  | 'share-link'
+  | 'submission-state';
+
+export type StudentRunnerSubmitReadinessItemView = {
+  ariaLabel: string;
+  description: string;
+  id: StudentRunnerSubmitReadinessItemId;
+  label: string;
+  status: StudentRunnerSubmitReadinessStatus;
+  statusLabel: string;
+};
+
+export type StudentRunnerSubmitReadinessView = {
+  ariaLabel: string;
+  description: string;
+  items: StudentRunnerSubmitReadinessItemView[];
+  status: StudentRunnerSubmitReadinessStatus;
+  statusLabel: string;
+  title: string;
 };
 
 export type StudentRunnerResultPanelView =
@@ -693,6 +724,10 @@ export function buildStudentRunnerPageViewModel({
   const submitConfirmationMessage = requiresIncompleteSubmitConfirmation
     ? completionCopy.confirmIncompleteSubmit
     : undefined;
+  const currentPayloadSummary = buildStudentRunnerCurrentPayloadSummary({
+    activeShareId,
+    attemptState,
+  });
   const revealAnswers = Boolean(
     result && assignment?.settings.showCorrectAnswers
   );
@@ -724,10 +759,7 @@ export function buildStudentRunnerPageViewModel({
       attemptRegionDescription: m.student_runner_attempt_region_description(),
       attemptRegionLabel: m.student_runner_attempt_region_label(),
       payloadSummaryView: buildStudentRunnerSubmissionPayloadSummaryView(
-        buildStudentRunnerCurrentPayloadSummary({
-          activeShareId,
-          attemptState,
-        })
+        currentPayloadSummary
       ),
       progressDescription: m.student_runner_progress_description({
         progress: progressView.label,
@@ -756,6 +788,13 @@ export function buildStudentRunnerPageViewModel({
         readOnlyMessage: attemptControlState.readOnlyMessage,
         submitConfirmationMessage,
         unansweredLabel: attemptControlState.unansweredLabel,
+      }),
+      submitReadinessView: buildStudentRunnerSubmitReadinessView({
+        attemptControlState,
+        hasResult: Boolean(result),
+        isSubmitting,
+        payloadSummary: currentPayloadSummary,
+        requiresIncompleteSubmitConfirmation,
       }),
       timeExpiredNoticeLabel: m.student_runner_time_expired_notice_label(),
       timeExpiredMessage: runnerCopy.timeExpiredMessage,
@@ -1496,6 +1535,251 @@ function buildStudentRunnerSubmissionPayloadSummaryView(
     ],
     title: m.student_runner_payload_summary_title(),
   };
+}
+
+function buildStudentRunnerSubmitReadinessView({
+  attemptControlState,
+  hasResult,
+  isSubmitting,
+  payloadSummary,
+  requiresIncompleteSubmitConfirmation,
+}: {
+  attemptControlState: StudentAttemptControlState;
+  hasResult: boolean;
+  isSubmitting: boolean;
+  payloadSummary: StudentRunnerSubmissionPayloadSummary;
+  requiresIncompleteSubmitConfirmation: boolean;
+}): StudentRunnerSubmitReadinessView {
+  const items = buildStudentRunnerSubmitReadinessItems({
+    attemptControlState,
+    hasResult,
+    isSubmitting,
+    payloadSummary,
+    requiresIncompleteSubmitConfirmation,
+  });
+  const status = getStudentRunnerSubmitReadinessStatus(items);
+  const statusLabel = getStudentRunnerSubmitReadinessStatusLabel(status);
+
+  return {
+    ariaLabel: m.student_runner_submit_readiness_aria_label(),
+    description: m.student_runner_submit_readiness_description(),
+    items,
+    status,
+    statusLabel,
+    title: m.student_runner_submit_readiness_title(),
+  };
+}
+
+function buildStudentRunnerSubmitReadinessItems({
+  attemptControlState,
+  hasResult,
+  isSubmitting,
+  payloadSummary,
+  requiresIncompleteSubmitConfirmation,
+}: {
+  attemptControlState: StudentAttemptControlState;
+  hasResult: boolean;
+  isSubmitting: boolean;
+  payloadSummary: StudentRunnerSubmissionPayloadSummary;
+  requiresIncompleteSubmitConfirmation: boolean;
+}): StudentRunnerSubmitReadinessItemView[] {
+  const normalizedShareSlug = normalizeAssignmentShareSlug(
+    payloadSummary.shareSlug
+  );
+
+  return [
+    buildStudentRunnerSubmitReadinessItemView({
+      description: normalizedShareSlug
+        ? m.student_runner_submit_readiness_share_ready_description({
+            shareSlug: normalizedShareSlug,
+          })
+        : m.student_runner_submit_readiness_share_blocked_description(),
+      id: 'share-link',
+      label: m.student_runner_submit_readiness_share_label(),
+      status: normalizedShareSlug ? 'ready' : 'blocked',
+    }),
+    buildStudentRunnerSubmitReadinessItemView({
+      description:
+        payloadSummary.itemCount > 0
+          ? m.student_runner_submit_readiness_items_ready_description({
+              count: formatStudentRunnerSubmissionPayloadCount(
+                payloadSummary.itemCount
+              ),
+            })
+          : m.student_runner_submit_readiness_items_blocked_description(),
+      id: 'runtime-items',
+      label: m.student_runner_submit_readiness_items_label(),
+      status: payloadSummary.itemCount > 0 ? 'ready' : 'blocked',
+    }),
+    buildStudentRunnerSubmitReadinessItemView({
+      description:
+        payloadSummary.unansweredItemCount > 0
+          ? m.student_runner_submit_readiness_completion_unanswered_description(
+              {
+                unanswered: formatStudentRunnerSubmissionPayloadCount(
+                  payloadSummary.unansweredItemCount
+                ),
+              }
+            )
+          : m.student_runner_submit_readiness_completion_ready_description({
+              answered: formatStudentRunnerSubmissionPayloadCount(
+                payloadSummary.answerCount
+              ),
+            }),
+      id: 'completion',
+      label: m.student_runner_submit_readiness_completion_label(),
+      status: payloadSummary.unansweredItemCount > 0 ? 'needs-action' : 'ready',
+    }),
+    buildStudentRunnerSubmitReadinessItemView({
+      description: getStudentRunnerSubmitReadinessConfirmationDescription({
+        requiresIncompleteSubmitConfirmation,
+        unansweredItemCount: payloadSummary.unansweredItemCount,
+      }),
+      id: 'incomplete-confirmation',
+      label: m.student_runner_submit_readiness_confirmation_label(),
+      status: getStudentRunnerSubmitReadinessConfirmationStatus({
+        requiresIncompleteSubmitConfirmation,
+        unansweredItemCount: payloadSummary.unansweredItemCount,
+      }),
+    }),
+    buildStudentRunnerSubmitReadinessItemView({
+      description: getStudentRunnerSubmitReadinessSubmissionDescription({
+        attemptControlState,
+        hasResult,
+        isSubmitting,
+      }),
+      id: 'submission-state',
+      label: m.student_runner_submit_readiness_submission_label(),
+      status: getStudentRunnerSubmitReadinessSubmissionStatus({
+        attemptControlState,
+        hasResult,
+        isSubmitting,
+      }),
+    }),
+  ];
+}
+
+function buildStudentRunnerSubmitReadinessItemView({
+  description,
+  id,
+  label,
+  status,
+}: {
+  description: string;
+  id: StudentRunnerSubmitReadinessItemId;
+  label: string;
+  status: StudentRunnerSubmitReadinessStatus;
+}): StudentRunnerSubmitReadinessItemView {
+  const statusLabel = getStudentRunnerSubmitReadinessStatusLabel(status);
+
+  return {
+    ariaLabel: m.student_runner_submit_readiness_item_aria({
+      description,
+      label,
+      status: statusLabel,
+    }),
+    description,
+    id,
+    label,
+    status,
+    statusLabel,
+  };
+}
+
+function getStudentRunnerSubmitReadinessStatus(
+  items: StudentRunnerSubmitReadinessItemView[]
+): StudentRunnerSubmitReadinessStatus {
+  if (items.some((item) => item.status === 'blocked')) return 'blocked';
+  if (items.some((item) => item.status === 'needs-action')) {
+    return 'needs-action';
+  }
+
+  return 'ready';
+}
+
+function getStudentRunnerSubmitReadinessStatusLabel(
+  status: StudentRunnerSubmitReadinessStatus
+) {
+  if (status === 'blocked') {
+    return m.student_runner_submit_readiness_status_blocked();
+  }
+
+  if (status === 'needs-action') {
+    return m.student_runner_submit_readiness_status_needs_action();
+  }
+
+  return m.student_runner_submit_readiness_status_ready();
+}
+
+function getStudentRunnerSubmitReadinessConfirmationDescription({
+  requiresIncompleteSubmitConfirmation,
+  unansweredItemCount,
+}: {
+  requiresIncompleteSubmitConfirmation: boolean;
+  unansweredItemCount: number;
+}) {
+  if (unansweredItemCount <= 0) {
+    return m.student_runner_submit_readiness_confirmation_ready_description();
+  }
+
+  if (requiresIncompleteSubmitConfirmation) {
+    return m.student_runner_submit_readiness_confirmation_confirm_description();
+  }
+
+  return m.student_runner_submit_readiness_confirmation_needed_description();
+}
+
+function getStudentRunnerSubmitReadinessConfirmationStatus({
+  requiresIncompleteSubmitConfirmation,
+  unansweredItemCount,
+}: {
+  requiresIncompleteSubmitConfirmation: boolean;
+  unansweredItemCount: number;
+}): StudentRunnerSubmitReadinessStatus {
+  if (unansweredItemCount <= 0) return 'ready';
+
+  return requiresIncompleteSubmitConfirmation ? 'ready' : 'needs-action';
+}
+
+function getStudentRunnerSubmitReadinessSubmissionDescription({
+  attemptControlState,
+  hasResult,
+  isSubmitting,
+}: {
+  attemptControlState: StudentAttemptControlState;
+  hasResult: boolean;
+  isSubmitting: boolean;
+}) {
+  if (attemptControlState.readOnlyMessage) {
+    return m.student_runner_submit_readiness_submission_blocked_description({
+      message: attemptControlState.readOnlyMessage,
+    });
+  }
+
+  if (hasResult) {
+    return m.student_runner_submit_readiness_submission_submitted_description();
+  }
+
+  if (isSubmitting) {
+    return m.student_runner_submit_readiness_submission_pending_description();
+  }
+
+  return m.student_runner_submit_readiness_submission_available_description();
+}
+
+function getStudentRunnerSubmitReadinessSubmissionStatus({
+  attemptControlState,
+  hasResult,
+  isSubmitting,
+}: {
+  attemptControlState: StudentAttemptControlState;
+  hasResult: boolean;
+  isSubmitting: boolean;
+}): StudentRunnerSubmitReadinessStatus {
+  if (attemptControlState.readOnlyMessage) return 'blocked';
+  if (hasResult || isSubmitting) return 'ready';
+
+  return attemptControlState.submitDisabled ? 'blocked' : 'ready';
 }
 
 function buildStudentRunnerSubmissionPayloadSummaryMetricView({

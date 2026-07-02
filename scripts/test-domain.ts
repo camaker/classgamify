@@ -10384,10 +10384,20 @@ assert.match(
   /<fieldset[\s\S]*controlView\.payloadSummaryView\.ariaLabel[\s\S]*<legend[\s\S]*controlView\.payloadSummaryView\.title[\s\S]*controlView\.payloadSummaryView\.description[\s\S]*<dl[\s\S]*controlView\.payloadSummaryView\.metrics\.map\(\(metric\)[\s\S]*<output[\s\S]*aria-label=\{metric\.ariaLabel\}[\s\S]*\{metric\.value\}[\s\S]*\{metric\.description\}/,
   'Student runner submit controls should render the prepared browser payload summary as semantic labelled outputs.'
 );
+assert.match(
+  studentRunnerStateSource,
+  /export type StudentRunnerSubmitReadinessStatus =[\s\S]*'blocked'[\s\S]*'needs-action'[\s\S]*'ready'[\s\S]*export type StudentRunnerSubmitReadinessItemId =[\s\S]*'completion'[\s\S]*'incomplete-confirmation'[\s\S]*'runtime-items'[\s\S]*'share-link'[\s\S]*'submission-state'[\s\S]*export type StudentRunnerSubmitReadinessView = \{[\s\S]*items: StudentRunnerSubmitReadinessItemView\[\];[\s\S]*status: StudentRunnerSubmitReadinessStatus;[\s\S]*statusLabel: string;/,
+  'Student runner state should expose an explicit submit-readiness view contract.'
+);
+assert.match(
+  studentRunnerSubmitControlsSource,
+  /<StudentRunnerSubmitReadiness[\s\S]*view=\{controlView\.submitReadinessView\}[\s\S]*aria-label=\{view\.ariaLabel\}[\s\S]*data-status=\{view\.status\}[\s\S]*view\.items\.map\(\(item\)[\s\S]*aria-label=\{item\.ariaLabel\}[\s\S]*data-status=\{item\.status\}[\s\S]*item\.statusLabel[\s\S]*item\.description/,
+  'Student runner submit controls should render the domain-prepared submit-readiness checks.'
+);
 assert.doesNotMatch(
   studentRunnerSubmitControlsSource,
   /anonymousToken|studentName|submittedStudentName|answers\[/,
-  'Student runner submit controls should not expose identity tokens, names, or answer payload contents inside the prepared browser payload summary.'
+  'Student runner submit controls should not expose identity tokens, names, or answer payload contents inside prepared submit views.'
 );
 assert.match(
   studentRunnerStateSource,
@@ -10411,8 +10421,8 @@ assert.match(
 );
 assert.match(
   studentRunnerStateSource,
-  /const requiresIncompleteSubmitConfirmation = Boolean\([\s\S]*confirmIncompleteSubmit[\s\S]*attemptControlState\.unansweredLabel[\s\S]*const submitConfirmationMessage = requiresIncompleteSubmitConfirmation[\s\S]*payloadSummaryView: buildStudentRunnerSubmissionPayloadSummaryView\([\s\S]*buildStudentRunnerCurrentPayloadSummary\(\{[\s\S]*activeShareId,[\s\S]*attemptState,[\s\S]*requiresIncompleteSubmitConfirmation,[\s\S]*submitConfirmationMessage,[\s\S]*submitHintViews: buildStudentRunnerSubmitHintViews\(\{/,
-  'Student runner page view-model should expose prepared payload summary and structured incomplete-submit confirmation state instead of making components infer it from copy.'
+  /const requiresIncompleteSubmitConfirmation = Boolean\([\s\S]*confirmIncompleteSubmit[\s\S]*attemptControlState\.unansweredLabel[\s\S]*const submitConfirmationMessage = requiresIncompleteSubmitConfirmation[\s\S]*const currentPayloadSummary = buildStudentRunnerCurrentPayloadSummary\(\{[\s\S]*activeShareId,[\s\S]*attemptState,[\s\S]*payloadSummaryView: buildStudentRunnerSubmissionPayloadSummaryView\([\s\S]*currentPayloadSummary[\s\S]*requiresIncompleteSubmitConfirmation,[\s\S]*submitConfirmationMessage,[\s\S]*submitHintViews: buildStudentRunnerSubmitHintViews\(\{[\s\S]*submitReadinessView: buildStudentRunnerSubmitReadinessView\(\{[\s\S]*attemptControlState,[\s\S]*hasResult: Boolean\(result\),[\s\S]*isSubmitting,[\s\S]*payloadSummary: currentPayloadSummary,[\s\S]*requiresIncompleteSubmitConfirmation/,
+  'Student runner page view-model should expose prepared payload summary, submit readiness, and structured incomplete-submit confirmation state instead of making components infer it from copy.'
 );
 assert.match(
   studentRunnerStateSource,
@@ -10423,6 +10433,11 @@ assert.match(
   studentRunnerStateSource,
   /export function buildStudentRunnerSubmitHintViews\(\{[\s\S]*unansweredLabel[\s\S]*submitConfirmationMessage[\s\S]*readOnlyMessage[\s\S]*\.flatMap/,
   'Student runner state should prepare submit hint order and empty-message filtering in the assignment domain.'
+);
+assert.match(
+  studentRunnerStateSource,
+  /function buildStudentRunnerSubmitReadinessView\(\{[\s\S]*payloadSummary[\s\S]*requiresIncompleteSubmitConfirmation[\s\S]*buildStudentRunnerSubmitReadinessItems\(\{[\s\S]*getStudentRunnerSubmitReadinessStatus\(items\)[\s\S]*function buildStudentRunnerSubmitReadinessItems\(\{[\s\S]*attemptControlState[\s\S]*hasResult[\s\S]*isSubmitting[\s\S]*payloadSummary[\s\S]*requiresIncompleteSubmitConfirmation/,
+  'Student runner state should derive submit-readiness checks from shared submission state and payload summary.'
 );
 assert.doesNotMatch(
   getSourceSlice(
@@ -21379,6 +21394,13 @@ assert.deepEqual(
       submitConfirmationMessage: undefined,
       submitDisabled: true,
       submitHintViews: [],
+      submitReadinessView: buildExpectedStudentRunnerSubmitReadinessView({
+        answerCount: 1,
+        hasResult: true,
+        itemCount: 1,
+        shareSlug: 'share-public',
+        unansweredItemCount: 0,
+      }),
       timeExpiredNoticeLabel: 'Time expired notice',
       timeExpiredMessage: 'Time is up. Review your saved answers, then submit.',
       timerBadge: {
@@ -21665,6 +21687,171 @@ function buildExpectedStudentRunnerPayloadSummaryView({
     title: 'Prepared browser payload',
   };
 }
+function buildExpectedStudentRunnerSubmitReadinessView({
+  answerCount,
+  hasResult = false,
+  isSubmitting = false,
+  itemCount,
+  readOnlyMessage,
+  requiresIncompleteSubmitConfirmation = false,
+  shareSlug,
+  unansweredItemCount,
+}: {
+  answerCount: number;
+  hasResult?: boolean;
+  isSubmitting?: boolean;
+  itemCount: number;
+  readOnlyMessage?: string;
+  requiresIncompleteSubmitConfirmation?: boolean;
+  shareSlug: string;
+  unansweredItemCount: number;
+}) {
+  const normalizedShareSlug = shareSlug.trim().toLowerCase();
+  const shareStatus = normalizedShareSlug ? 'ready' : 'blocked';
+  const itemStatus = itemCount > 0 ? 'ready' : 'blocked';
+  const completionStatus =
+    unansweredItemCount > 0 ? 'needs-action' : 'ready';
+  const confirmationStatus =
+    unansweredItemCount <= 0 || requiresIncompleteSubmitConfirmation
+      ? 'ready'
+      : 'needs-action';
+  const submissionStatus = readOnlyMessage ? 'blocked' : 'ready';
+  const items = [
+    buildExpectedStudentRunnerSubmitReadinessItemView({
+      description: normalizedShareSlug
+        ? `This attempt will submit to the frozen link ${normalizedShareSlug}.`
+        : 'This browser does not have a valid assignment share link for submission.',
+      id: 'share-link',
+      label: 'Assignment link',
+      status: shareStatus,
+    }),
+    buildExpectedStudentRunnerSubmitReadinessItemView({
+      description:
+        itemCount > 0
+          ? `${itemCount} runtime items loaded from the teacher assignment snapshot.`
+          : 'No playable runtime items are available for this submission.',
+      id: 'runtime-items',
+      label: 'Frozen runtime items',
+      status: itemStatus,
+    }),
+    buildExpectedStudentRunnerSubmitReadinessItemView({
+      description:
+        unansweredItemCount > 0
+          ? `${unansweredItemCount} items still need answers or an intentional partial submit.`
+          : `${answerCount} answered items are ready for submission.`,
+      id: 'completion',
+      label: 'Completion',
+      status: completionStatus,
+    }),
+    buildExpectedStudentRunnerSubmitReadinessItemView({
+      description: getExpectedStudentRunnerSubmitReadinessConfirmationDescription(
+        {
+          requiresIncompleteSubmitConfirmation,
+          unansweredItemCount,
+        }
+      ),
+      id: 'incomplete-confirmation',
+      label: 'Partial-submit confirmation',
+      status: confirmationStatus,
+    }),
+    buildExpectedStudentRunnerSubmitReadinessItemView({
+      description: getExpectedStudentRunnerSubmitReadinessSubmissionDescription(
+        {
+          hasResult,
+          isSubmitting,
+          readOnlyMessage,
+        }
+      ),
+      id: 'submission-state',
+      label: 'Submission state',
+      status: submissionStatus,
+    }),
+  ];
+  const status = getExpectedStudentRunnerSubmitReadinessStatus(items);
+
+  return {
+    ariaLabel: 'Submit readiness checks',
+    description:
+      'Check the frozen link, loaded items, completion, and submit state before sending this attempt.',
+    items,
+    status,
+    statusLabel: getExpectedStudentRunnerSubmitReadinessStatusLabel(status),
+    title: 'Submit readiness',
+  };
+}
+
+function buildExpectedStudentRunnerSubmitReadinessItemView({
+  description,
+  id,
+  label,
+  status,
+}: {
+  description: string;
+  id: string;
+  label: string;
+  status: string;
+}) {
+  const statusLabel = getExpectedStudentRunnerSubmitReadinessStatusLabel(status);
+
+  return {
+    ariaLabel: `${label}: ${statusLabel}. ${description}`,
+    description,
+    id,
+    label,
+    status,
+    statusLabel,
+  };
+}
+
+function getExpectedStudentRunnerSubmitReadinessStatus(items: { status: string }[]) {
+  if (items.some((item) => item.status === 'blocked')) return 'blocked';
+  if (items.some((item) => item.status === 'needs-action')) {
+    return 'needs-action';
+  }
+
+  return 'ready';
+}
+
+function getExpectedStudentRunnerSubmitReadinessStatusLabel(status: string) {
+  if (status === 'blocked') return 'Unavailable';
+  if (status === 'needs-action') return 'Needs review';
+
+  return 'Ready';
+}
+
+function getExpectedStudentRunnerSubmitReadinessConfirmationDescription({
+  requiresIncompleteSubmitConfirmation,
+  unansweredItemCount,
+}: {
+  requiresIncompleteSubmitConfirmation: boolean;
+  unansweredItemCount: number;
+}) {
+  if (unansweredItemCount <= 0) {
+    return 'No second confirmation is needed because every item is answered.';
+  }
+
+  if (requiresIncompleteSubmitConfirmation) {
+    return 'Your next submit action will confirm that unanswered items should stay blank.';
+  }
+
+  return 'Submit once to review unanswered items before sending a partial attempt.';
+}
+
+function getExpectedStudentRunnerSubmitReadinessSubmissionDescription({
+  hasResult,
+  isSubmitting,
+  readOnlyMessage,
+}: {
+  hasResult: boolean;
+  isSubmitting: boolean;
+  readOnlyMessage?: string;
+}) {
+  if (readOnlyMessage) return readOnlyMessage;
+  if (hasResult) return 'This attempt has already been submitted and saved.';
+  if (isSubmitting) return 'The current attempt is already being saved.';
+
+  return 'Submission is available for this loaded assignment.';
+}
 assert.deepEqual(
   buildStudentRunnerSubmissionPlan({
     anonymousToken: ' browser-token-1 ',
@@ -21789,6 +21976,16 @@ assert.equal(
 );
 assert.equal(pendingSubmitStudentRunnerPageView.runtimeListView.disabled, true);
 assert.deepEqual(
+  pendingSubmitStudentRunnerPageView.controlView.submitReadinessView,
+  buildExpectedStudentRunnerSubmitReadinessView({
+    answerCount: 1,
+    isSubmitting: true,
+    itemCount: 1,
+    shareSlug: 'share-public',
+    unansweredItemCount: 0,
+  })
+);
+assert.deepEqual(
   buildStudentRunnerSubmissionExecutionPlan({
     anonymousToken: ' browser-token-1 ',
     answers: {
@@ -21883,6 +22080,8 @@ assert.deepEqual(
         .requiresIncompleteSubmitConfirmation,
     submitHintViews:
       confirmIncompleteStudentRunnerPageView.controlView.submitHintViews,
+    submitReadinessView:
+      confirmIncompleteStudentRunnerPageView.controlView.submitReadinessView,
     unansweredLabel:
       confirmIncompleteStudentRunnerPageView.controlView.unansweredLabel,
   },
@@ -21913,6 +22112,13 @@ assert.deepEqual(
         tone: 'warning',
       },
     ],
+    submitReadinessView: buildExpectedStudentRunnerSubmitReadinessView({
+      answerCount: 1,
+      itemCount: 2,
+      requiresIncompleteSubmitConfirmation: true,
+      shareSlug: 'share-public',
+      unansweredItemCount: 1,
+    }),
     unansweredLabel: '1 item left unanswered.',
   }
 );

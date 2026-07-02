@@ -1,11 +1,21 @@
 import type { StudentRunnerControlView } from '@/assignments/student-runner-state';
 import { Button } from '@/components/ui/button';
-import { IconCheck } from '@tabler/icons-react';
+import {
+  IconAlertTriangle,
+  IconCheck,
+  IconCircleCheck,
+  IconInfoCircle,
+} from '@tabler/icons-react';
 
 type StudentRunnerSubmitControlsProps = {
   controlView: StudentRunnerControlView;
   onSubmit: () => void;
 };
+
+type StudentRunnerSubmitReadinessView =
+  StudentRunnerControlView['submitReadinessView'];
+type StudentRunnerSubmitReadinessItemView =
+  StudentRunnerSubmitReadinessView['items'][number];
 
 export function StudentRunnerSubmitControls({
   controlView,
@@ -14,11 +24,16 @@ export function StudentRunnerSubmitControls({
   const submitHintIds = controlView.submitHintViews.map((hintView) =>
     buildStudentRunnerSubmitHintId(hintView.id)
   );
+  const readinessDescriptionId = 'student-runner-submit-readiness-description';
   const payloadSummaryDescriptionId =
     'student-runner-submit-payload-summary-description';
 
   return (
     <section aria-label={controlView.submitControlsLabel} className="mt-4">
+      <StudentRunnerSubmitReadiness
+        view={controlView.submitReadinessView}
+        descriptionId={readinessDescriptionId}
+      />
       <fieldset
         aria-label={controlView.payloadSummaryView.ariaLabel}
         aria-describedby={payloadSummaryDescriptionId}
@@ -81,6 +96,123 @@ export function StudentRunnerSubmitControls({
       ))}
     </section>
   );
+}
+
+function StudentRunnerSubmitReadiness({
+  descriptionId,
+  view,
+}: {
+  descriptionId: string;
+  view: StudentRunnerSubmitReadinessView;
+}) {
+  return (
+    <section
+      aria-label={view.ariaLabel}
+      aria-describedby={descriptionId}
+      data-status={view.status}
+      className="mb-4 rounded-md border bg-background p-4"
+    >
+      <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
+        <div>
+          <h3 className="text-sm font-medium">{view.title}</h3>
+          <p id={descriptionId} className="mt-1 text-xs text-muted-foreground">
+            {view.description}
+          </p>
+        </div>
+        <span
+          className={getStudentRunnerSubmitReadinessStatusClasses(view.status)}
+        >
+          {view.statusLabel}
+        </span>
+      </div>
+      <ul className="mt-3 grid gap-2">
+        {view.items.map((item) => (
+          <StudentRunnerSubmitReadinessItem item={item} key={item.id} />
+        ))}
+      </ul>
+    </section>
+  );
+}
+
+function StudentRunnerSubmitReadinessItem({
+  item,
+}: {
+  item: StudentRunnerSubmitReadinessItemView;
+}) {
+  return (
+    <li
+      aria-label={item.ariaLabel}
+      data-status={item.status}
+      className={getStudentRunnerSubmitReadinessItemClasses(item.status)}
+    >
+      <StudentRunnerSubmitReadinessIcon status={item.status} />
+      <div className="min-w-0 flex-1">
+        <div className="flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between">
+          <p className="text-sm font-medium">{item.label}</p>
+          <span
+            className={getStudentRunnerSubmitReadinessStatusClasses(
+              item.status
+            )}
+          >
+            {item.statusLabel}
+          </span>
+        </div>
+        <p className="mt-1 text-xs text-muted-foreground">{item.description}</p>
+      </div>
+    </li>
+  );
+}
+
+function StudentRunnerSubmitReadinessIcon({
+  status,
+}: {
+  status: StudentRunnerSubmitReadinessItemView['status'];
+}) {
+  if (status === 'blocked') {
+    return <IconAlertTriangle aria-hidden="true" className="mt-0.5 size-4" />;
+  }
+
+  if (status === 'needs-action') {
+    return <IconInfoCircle aria-hidden="true" className="mt-0.5 size-4" />;
+  }
+
+  return <IconCircleCheck aria-hidden="true" className="mt-0.5 size-4" />;
+}
+
+function getStudentRunnerSubmitReadinessItemClasses(
+  status: StudentRunnerSubmitReadinessItemView['status']
+) {
+  const base =
+    'flex gap-3 rounded-md border p-3 text-sm transition-colors ' +
+    '[&_svg]:shrink-0';
+
+  if (status === 'blocked') {
+    return `${base} border-destructive/30 bg-destructive/5 text-destructive`;
+  }
+
+  if (status === 'needs-action') {
+    return `${base} border-amber-400/40 bg-amber-50 text-amber-950 dark:border-amber-500/30 dark:bg-amber-950/20 dark:text-amber-200`;
+  }
+
+  return `${base} border-emerald-400/30 bg-emerald-50 text-emerald-950 dark:border-emerald-500/30 dark:bg-emerald-950/20 dark:text-emerald-200`;
+}
+
+function getStudentRunnerSubmitReadinessStatusClasses(
+  status: StudentRunnerSubmitReadinessItemView['status']
+) {
+  const base =
+    'inline-flex w-fit items-center rounded-md border px-2 py-1 ' +
+    'text-[0.6875rem] font-medium';
+
+  if (status === 'blocked') {
+    return `${base} border-destructive/30 bg-destructive/10 text-destructive`;
+  }
+
+  if (status === 'needs-action') {
+    return `${base} border-amber-400/40 bg-amber-50 text-amber-950 dark:border-amber-500/30 dark:bg-amber-950/20 dark:text-amber-200`;
+  }
+
+  return `${base} border-emerald-400/30 bg-emerald-50 text-emerald-950 dark:border-emerald-500/30 dark:bg-emerald-950/20 dark:text-emerald-200`;
 }
 
 function StudentRunnerSubmitHint({
