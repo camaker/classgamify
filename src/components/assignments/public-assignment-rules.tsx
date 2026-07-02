@@ -7,6 +7,7 @@ import type {
 import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
 import {
+  IconArrowsShuffle,
   IconClock,
   IconEye,
   IconListCheck,
@@ -95,6 +96,7 @@ const publicAssignmentRuleIcons = {
   attempts: IconRepeat,
   closes: IconClock,
   identity: IconUser,
+  itemOrder: IconArrowsShuffle,
   items: IconListCheck,
   timer: IconClock,
 } satisfies Record<PublicAssignmentRuleSummaryId, Icon>;

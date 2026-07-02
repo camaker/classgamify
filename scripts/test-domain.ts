@@ -10573,7 +10573,7 @@ assert.match(
 );
 assert.match(
   publicAssignmentRulesComponentSource,
-  /publicAssignmentRuleIcons[\s\S]*answerReveal: IconEye[\s\S]*attempts: IconRepeat[\s\S]*closes: IconClock[\s\S]*identity: IconUser[\s\S]*items: IconListCheck[\s\S]*timer: IconClock[\s\S]*satisfies Record<PublicAssignmentRuleSummaryId, Icon>/,
+  /publicAssignmentRuleIcons[\s\S]*answerReveal: IconEye[\s\S]*attempts: IconRepeat[\s\S]*closes: IconClock[\s\S]*identity: IconUser[\s\S]*itemOrder: IconArrowsShuffle[\s\S]*items: IconListCheck[\s\S]*timer: IconClock[\s\S]*satisfies Record<PublicAssignmentRuleSummaryId, Icon>/,
   'Public assignment rules should map every rule id to a typed classroom policy icon.'
 );
 assert.doesNotMatch(
@@ -10604,6 +10604,11 @@ assert.match(
   assignmentDeliverySummarySource,
   /export type PublicAssignmentRuleSummaryStatus =[\s\S]*'attempt-limited'[\s\S]*'open'[\s\S]*'scheduled'[\s\S]*'timed'[\s\S]*'timed-scheduled'[\s\S]*export type PublicAssignmentRuleSummaryStatusView = \{[\s\S]*ariaLabel: string;[\s\S]*description: string;[\s\S]*label: string;[\s\S]*status: PublicAssignmentRuleSummaryStatus;[\s\S]*tone: PublicAssignmentRuleSummaryStatusTone;[\s\S]*export type PublicAssignmentRuleSummaryView = \{[\s\S]*description: string;[\s\S]*items: PublicAssignmentRuleSummaryItem\[\];[\s\S]*status: PublicAssignmentRuleSummaryStatusView;[\s\S]*summary: PublicAssignmentRuleSummaryStats;[\s\S]*title: string;/,
   'Assignment delivery summary should expose structured public rule summary, status, and heading contracts.'
+);
+assert.match(
+  assignmentDeliverySummarySource,
+  /export type PublicAssignmentRuleSummaryStats = \{[\s\S]*collectsStudentName: boolean;[\s\S]*hasAttemptLimit: boolean;[\s\S]*hasCloseTime: boolean;[\s\S]*hasTimer: boolean;[\s\S]*itemCount: number;[\s\S]*ruleCount: number;[\s\S]*ruleIds: PublicAssignmentRuleSummaryId\[\];[\s\S]*shufflesItems: boolean;[\s\S]*showsCorrectAnswers: boolean;/,
+  'Public assignment rule summary stats should expose item-order delivery metadata.'
 );
 assert.match(
   assignmentDeliverySummarySource,
@@ -10657,18 +10662,23 @@ assert.match(
 );
 assert.match(
   assignmentDeliverySummarySource,
-  /getPublicAssignmentRuleDescription[\s\S]*assignment_delivery_public_rule_items_description[\s\S]*assignment_delivery_public_rule_attempts_open_description[\s\S]*assignment_delivery_public_rule_attempts_limited_description[\s\S]*assignment_delivery_public_rule_timer_none_description[\s\S]*assignment_delivery_public_rule_timer_limited_description[\s\S]*assignment_delivery_public_rule_closes_none_description[\s\S]*assignment_delivery_public_rule_closes_scheduled_description[\s\S]*assignment_delivery_public_rule_identity_anonymous_description[\s\S]*assignment_delivery_public_rule_identity_names_description[\s\S]*assignment_delivery_public_rule_review_visible_description[\s\S]*assignment_delivery_public_rule_review_hidden_description/,
+  /getPublicAssignmentRuleDescription[\s\S]*assignment_delivery_public_rule_items_description[\s\S]*assignment_delivery_public_rule_attempts_open_description[\s\S]*assignment_delivery_public_rule_attempts_limited_description[\s\S]*assignment_delivery_public_rule_timer_none_description[\s\S]*assignment_delivery_public_rule_timer_limited_description[\s\S]*assignment_delivery_public_rule_closes_none_description[\s\S]*assignment_delivery_public_rule_closes_scheduled_description[\s\S]*assignment_delivery_public_rule_identity_anonymous_description[\s\S]*assignment_delivery_public_rule_identity_names_description[\s\S]*assignment_delivery_public_rule_item_order_shuffled_description[\s\S]*assignment_delivery_public_rule_item_order_fixed_description[\s\S]*assignment_delivery_public_rule_review_visible_description[\s\S]*assignment_delivery_public_rule_review_hidden_description/,
   'Public assignment rule descriptions should come from localized assignment delivery messages and account for the resolved delivery setting values.'
 );
 assert.match(
   assignmentDeliverySummarySource,
-  /type PublicAssignmentRuleDescriptionState =[\s\S]*'attemptsOpen'[\s\S]*'attemptsLimited'[\s\S]*'timerNone'[\s\S]*'timerLimited'[\s\S]*'closesNone'[\s\S]*'closesScheduled'[\s\S]*'identityAnonymous'[\s\S]*'identityNames'[\s\S]*'reviewVisible'[\s\S]*'reviewHidden'/,
+  /type PublicAssignmentRuleDescriptionState =[\s\S]*'attemptsOpen'[\s\S]*'attemptsLimited'[\s\S]*'timerNone'[\s\S]*'timerLimited'[\s\S]*'closesNone'[\s\S]*'closesScheduled'[\s\S]*'identityAnonymous'[\s\S]*'identityNames'[\s\S]*'itemOrderShuffled'[\s\S]*'itemOrderFixed'[\s\S]*'reviewVisible'[\s\S]*'reviewHidden'/,
   'Public assignment rule descriptions should be keyed by structured delivery states.'
 );
 assert.match(
   assignmentDeliverySummarySource,
-  /descriptionState: isPositiveWholeNumber\(maxAttempts\)[\s\S]*descriptionState:[\s\S]*normalizeAttemptTimeLimitSeconds\(timeLimitSeconds\)[\s\S]*descriptionState: hasAssignmentCloseTime\(expiresAt\)[\s\S]*descriptionState: collectStudentName[\s\S]*descriptionState: showCorrectAnswers/,
+  /descriptionState: isPositiveWholeNumber\(maxAttempts\)[\s\S]*descriptionState:[\s\S]*normalizeAttemptTimeLimitSeconds\(timeLimitSeconds\)[\s\S]*descriptionState: hasAssignmentCloseTime\(expiresAt\)[\s\S]*descriptionState: collectStudentName[\s\S]*descriptionState: showCorrectAnswers[\s\S]*descriptionState: shuffleItems[\s\S]*id: 'itemOrder'[\s\S]*formatShuffleItems\(shuffleItems\)/,
   'Public assignment rule summary items should resolve description states from normalized assignment settings.'
+);
+assert.match(
+  assignmentDeliverySummarySource,
+  /buildPublicAssignmentRuleSummaryViewFromSettings[\s\S]*resolveAssignmentSettings\(settings\)[\s\S]*shuffleItems: resolvedSettings\.shuffleItems/,
+  'Public assignment rule summaries should pass resolved shuffle policy from assignment settings.'
 );
 const publicRuleDescriptionSource = getSourceSlice(
   assignmentDeliverySummarySource,
@@ -17382,7 +17392,7 @@ assert.deepEqual(
       hasCloseTime: true,
       hasTimer: false,
       itemCount: 2,
-      ruleCount: 6,
+      ruleCount: 7,
       ruleIds: [
         'items',
         'attempts',
@@ -17390,7 +17400,9 @@ assert.deepEqual(
         'closes',
         'identity',
         'answerReveal',
+        'itemOrder',
       ],
+      shufflesItems: true,
       showsCorrectAnswers: true,
     },
     title: 'Assignment rules',
@@ -17750,6 +17762,14 @@ assert.deepEqual(
       label: 'Review',
       value: 'Hidden',
     },
+    {
+      ariaLabel:
+        'Item order: Shuffled. Items appear in a stable mixed order for this link.',
+      description: 'Items appear in a stable mixed order for this link.',
+      id: 'itemOrder',
+      label: 'Item order',
+      value: 'Shuffled',
+    },
   ]
 );
 assert.deepEqual(
@@ -17784,7 +17804,7 @@ assert.deepEqual(
     hasCloseTime: false,
     hasTimer: true,
     itemCount: 3,
-    ruleCount: 6,
+    ruleCount: 7,
     ruleIds: [
       'items',
       'attempts',
@@ -17792,7 +17812,9 @@ assert.deepEqual(
       'closes',
       'identity',
       'answerReveal',
+      'itemOrder',
     ],
+    shufflesItems: true,
     showsCorrectAnswers: true,
   }
 );
@@ -17859,7 +17881,9 @@ assert.deepEqual(
     showCorrectAnswers: true,
   })
     .filter((rule) =>
-      ['answerReveal', 'attempts', 'identity', 'timer'].includes(rule.id)
+      ['answerReveal', 'attempts', 'identity', 'itemOrder', 'timer'].includes(
+        rule.id
+      )
     )
     .map((rule) => [rule.id, rule.value, rule.description]),
   [
@@ -17882,6 +17906,11 @@ assert.deepEqual(
       'answerReveal',
       'After submit',
       'Allowed answers appear after you submit.',
+    ],
+    [
+      'itemOrder',
+      'Shuffled',
+      'Items appear in a stable mixed order for this link.',
     ],
   ]
 );
@@ -17946,6 +17975,14 @@ assert.deepEqual(
       label: 'Review',
       value: 'After submit',
     },
+    {
+      ariaLabel:
+        "Item order: Fixed order. Items stay in the teacher's published order.",
+      description: "Items stay in the teacher's published order.",
+      id: 'itemOrder',
+      label: 'Item order',
+      value: 'Fixed order',
+    },
   ]
 );
 assert.deepEqual(
@@ -17965,7 +18002,7 @@ assert.deepEqual(
     hasCloseTime: false,
     hasTimer: false,
     itemCount: 0,
-    ruleCount: 6,
+    ruleCount: 7,
     ruleIds: [
       'items',
       'attempts',
@@ -17973,7 +18010,9 @@ assert.deepEqual(
       'closes',
       'identity',
       'answerReveal',
+      'itemOrder',
     ],
+    shufflesItems: true,
     showsCorrectAnswers: true,
   }
 );
@@ -18035,6 +18074,14 @@ assert.deepEqual(
       label: 'Review',
       value: 'Hidden',
     },
+    {
+      ariaLabel:
+        'Item order: Shuffled. Items appear in a stable mixed order for this link.',
+      description: 'Items appear in a stable mixed order for this link.',
+      id: 'itemOrder',
+      label: 'Item order',
+      value: 'Shuffled',
+    },
   ]
 );
 overwriteGetLocale(() => 'zh');
@@ -18090,6 +18137,13 @@ try {
         id: 'answerReveal',
         label: '回顾',
         value: '提交后显示',
+      },
+      {
+        ariaLabel: '题目顺序：随机顺序。题目会按此链接的稳定随机顺序显示。',
+        description: '题目会按此链接的稳定随机顺序显示。',
+        id: 'itemOrder',
+        label: '题目顺序',
+        value: '随机顺序',
       },
     ]
   );

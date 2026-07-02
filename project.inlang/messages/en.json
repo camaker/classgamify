@@ -885,6 +885,8 @@
   "assignment_delivery_public_rule_closes_scheduled_description": "The link stops accepting work after this time.",
   "assignment_delivery_public_rule_identity_anonymous_description": "This browser is used as your anonymous student identity.",
   "assignment_delivery_public_rule_identity_names_description": "Type your name so your teacher can find your work.",
+  "assignment_delivery_public_rule_item_order_fixed_description": "Items stay in the teacher's published order.",
+  "assignment_delivery_public_rule_item_order_shuffled_description": "Items appear in a stable mixed order for this link.",
   "assignment_delivery_public_rule_items_description": "These are the playable items in this assignment.",
   "assignment_delivery_public_rule_review_hidden_description": "Answers stay hidden after submission.",
   "assignment_delivery_public_rule_review_visible_description": "Allowed answers appear after you submit.",

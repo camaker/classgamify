@@ -45,6 +45,8 @@ type PublicAssignmentRuleDescriptionState =
   | 'closesScheduled'
   | 'identityAnonymous'
   | 'identityNames'
+  | 'itemOrderShuffled'
+  | 'itemOrderFixed'
   | 'items'
   | 'reviewHidden'
   | 'reviewVisible'
@@ -66,6 +68,7 @@ export type PublicAssignmentRuleSummaryStats = {
   itemCount: number;
   ruleCount: number;
   ruleIds: PublicAssignmentRuleSummaryId[];
+  shufflesItems: boolean;
   showsCorrectAnswers: boolean;
 };
 
@@ -291,6 +294,7 @@ export function buildPublicAssignmentRuleSummaryView({
   itemCount,
   maxAttempts = defaultAssignmentSettings.maxAttempts,
   showCorrectAnswers = true,
+  shuffleItems = true,
   timeLimitSeconds,
 }: AssignmentDeliverySummaryInput & {
   itemCount: number;
@@ -341,6 +345,12 @@ export function buildPublicAssignmentRuleSummaryView({
       label: m.assignment_delivery_label_review(),
       value: formatAnswerReveal(showCorrectAnswers),
     },
+    {
+      descriptionState: shuffleItems ? 'itemOrderShuffled' : 'itemOrderFixed',
+      id: 'itemOrder',
+      label: m.assignment_delivery_label_item_order(),
+      value: formatShuffleItems(shuffleItems),
+    },
   ] satisfies PublicAssignmentRuleSummarySourceItem[];
   const items = ruleItems.map(toPublicAssignmentRuleSummaryItem);
   const summary = buildPublicAssignmentRuleSummaryStats({
@@ -350,6 +360,7 @@ export function buildPublicAssignmentRuleSummaryView({
     maxAttempts,
     ruleIds: items.map((item) => item.id),
     showCorrectAnswers,
+    shuffleItems,
     timeLimitSeconds,
   });
 
@@ -395,6 +406,7 @@ export function buildPublicAssignmentRuleSummaryViewFromSettings({
     itemCount,
     maxAttempts: resolvedSettings.maxAttempts,
     showCorrectAnswers: resolvedSettings.showCorrectAnswers,
+    shuffleItems: resolvedSettings.shuffleItems,
     timeLimitSeconds: resolvedSettings.timeLimitSeconds,
   });
 }
@@ -422,6 +434,7 @@ function buildPublicAssignmentRuleSummaryStats({
   maxAttempts = defaultAssignmentSettings.maxAttempts,
   ruleIds,
   showCorrectAnswers = true,
+  shuffleItems = true,
   timeLimitSeconds,
 }: AssignmentDeliverySummaryInput & {
   itemCount: number;
@@ -435,6 +448,7 @@ function buildPublicAssignmentRuleSummaryStats({
     itemCount: normalizeAssignmentItemCount(itemCount),
     ruleCount: ruleIds.length,
     ruleIds,
+    shufflesItems: shuffleItems,
     showsCorrectAnswers: showCorrectAnswers,
   };
 }
@@ -738,6 +752,10 @@ function getPublicAssignmentRuleDescription(
       return m.assignment_delivery_public_rule_identity_anonymous_description();
     case 'identityNames':
       return m.assignment_delivery_public_rule_identity_names_description();
+    case 'itemOrderShuffled':
+      return m.assignment_delivery_public_rule_item_order_shuffled_description();
+    case 'itemOrderFixed':
+      return m.assignment_delivery_public_rule_item_order_fixed_description();
     case 'reviewVisible':
       return m.assignment_delivery_public_rule_review_visible_description();
     case 'reviewHidden':

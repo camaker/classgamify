@@ -885,6 +885,8 @@
   "assignment_delivery_public_rule_closes_scheduled_description": "超过这个时间后，链接将停止接收作答。",
   "assignment_delivery_public_rule_identity_anonymous_description": "这个浏览器会作为你的匿名学生身份。",
   "assignment_delivery_public_rule_identity_names_description": "请填写姓名，方便老师找到你的作答。",
+  "assignment_delivery_public_rule_item_order_fixed_description": "题目会保持老师发布时的顺序。",
+  "assignment_delivery_public_rule_item_order_shuffled_description": "题目会按此链接的稳定随机顺序显示。",
   "assignment_delivery_public_rule_items_description": "这是这份作业中的可作答项目。",
   "assignment_delivery_public_rule_review_hidden_description": "提交后不会显示答案。",
   "assignment_delivery_public_rule_review_visible_description": "提交后会显示老师允许查看的答案。",
