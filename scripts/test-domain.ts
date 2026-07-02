@@ -6977,7 +6977,8 @@ assert.match(lifetimeBillingView.plan?.message ?? '', /lifetime access/);
 assert.equal(getInitialPaymentConfirmationStatus(undefined), 'failed');
 assert.equal(getInitialPaymentConfirmationStatus('cs_test'), 'processing');
 assert.deepEqual(buildPaymentStatusView('processing'), {
-  description: 'Please wait while we verify your ClassGamify plan access.',
+  description:
+    'Please wait while we verify ClassGamify plan access for your teacher workspace, saved activities, assignments, and results.',
   icon: 'loader',
   title: 'Confirming your payment',
   tone: 'working',
@@ -6985,12 +6986,15 @@ assert.deepEqual(buildPaymentStatusView('processing'), {
 assert.equal(buildPaymentStatusView('success').tone, 'success');
 assert.match(
   buildPaymentStatusView('success').description,
-  /ClassGamify workspace billing page/
+  /workspace can show updated activity, assignment, and AI access/
 );
 assert.equal(buildPaymentStatusView('failed').icon, 'x');
 assert.match(buildPaymentStatusView('failed').description, /pricing page/);
 assert.equal(buildPaymentStatusView('timeout').tone, 'warning');
-assert.match(buildPaymentStatusView('timeout').description, /Billing/);
+assert.match(
+  buildPaymentStatusView('timeout').description,
+  /Billing later[\s\S]*assignment workflow limits/
+);
 const newsletterApiSource = readFileSync('src/api/newsletter.ts', 'utf8');
 assert.doesNotMatch(
   newsletterApiSource,
@@ -8852,6 +8856,69 @@ const enLocaleMessages = JSON.parse(
 const zhLocaleMessages = JSON.parse(
   readFileSync('project.inlang/messages/zh.json', 'utf8')
 ) as Record<string, string>;
+const authWorkspaceBoundaryRequirements = [
+  [
+    enLocaleMessages,
+    'en',
+    [
+      ['auth_login_title', /Teacher sign-in/],
+      ['auth_login_benefit_progress', /source materials/],
+      ['auth_login_benefit_review', /student attempts, and result exports/],
+      ['auth_login_trust_note', /activity drafts, assignment links, source materials/],
+      ['auth_register_create_account', /Create teacher workspace/],
+      ['auth_register_benefit_progress', /source materials, assignments/],
+      ['auth_register_benefit_review', /student attempts/],
+      ['auth_forgot_password_description', /activities, assignment links, and results/],
+      ['auth_reset_password_description', /source materials, and result records/],
+      ['settings_security_description', /connected providers/],
+      [
+        'settings_security_delete_account_confirm_description',
+        /source-material references, assignment links, student attempts/,
+      ],
+      ['settings_security_delete_account_warning', /classroom result records/],
+      ['settings_payment_processing_description', /saved activities, assignments, and results/],
+      ['settings_payment_success_description', /activity, assignment, and AI access/],
+      ['settings_billing_card_current_plan_description', /assignment workflow limits/],
+      ['settings_billing_card_free_plan_message', /AI drafts, and result exports/],
+      ['settings_billing_card_lifetime_message', /source-material workflows/],
+    ],
+  ],
+  [
+    zhLocaleMessages,
+    'zh',
+    [
+      ['auth_login_title', /教师登录/],
+      ['auth_login_benefit_progress', /来源素材/],
+      ['auth_login_benefit_review', /学生尝试和结果导出/],
+      ['auth_login_trust_note', /活动草稿、作业链接、来源素材/],
+      ['auth_register_create_account', /创建教师工作区/],
+      ['auth_register_benefit_progress', /来源素材、作业/],
+      ['auth_register_benefit_review', /学生尝试/],
+      ['auth_forgot_password_description', /活动、作业链接和结果记录/],
+      ['auth_reset_password_description', /来源素材和结果记录/],
+      ['settings_security_description', /已连接登录方式/],
+      [
+        'settings_security_delete_account_confirm_description',
+        /来源素材引用、作业链接、学生尝试/,
+      ],
+      ['settings_security_delete_account_warning', /课堂结果记录/],
+      ['settings_payment_processing_description', /已保存活动、作业和结果/],
+      ['settings_payment_success_description', /活动、作业和 AI 权限/],
+      ['settings_billing_card_current_plan_description', /作业工作流限制/],
+      ['settings_billing_card_free_plan_message', /AI 草稿和结果导出/],
+      ['settings_billing_card_lifetime_message', /来源素材工作流/],
+    ],
+  ],
+] as const;
+for (const [messages, locale, requirements] of authWorkspaceBoundaryRequirements) {
+  for (const [key, pattern] of requirements) {
+    assert.match(
+      messages[key] ?? '',
+      pattern,
+      `${locale} ${key} should describe ClassGamify teacher workspace, assignment, result, or source-material boundaries.`
+    );
+  }
+}
 const pricingMessageText = [
   'project.inlang/messages/en.json',
   'project.inlang/messages/zh.json',
