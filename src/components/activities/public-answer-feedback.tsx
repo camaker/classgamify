@@ -23,7 +23,8 @@ export function PublicAnswerFeedback({
   });
 
   return (
-    <div
+    <section
+      aria-label={feedback.ariaLabel}
       className={cn(
         'mt-3 flex flex-wrap items-center gap-2 rounded-lg border px-3 py-2 text-xs',
         feedback.status === 'correct'
@@ -33,16 +34,24 @@ export function PublicAnswerFeedback({
       )}
     >
       {feedback.status === 'correct' ? (
-        <IconCheck className="size-3.5" />
+        <IconCheck aria-hidden="true" className="size-3.5" />
       ) : (
-        <IconX className="size-3.5" />
+        <IconX aria-hidden="true" className="size-3.5" />
       )}
-      <span>{feedback.statusLabel}</span>
-      {feedback.detailLines.map((line) => (
-        <span className="basis-full text-muted-foreground" key={line.id}>
-          {line.text}
-        </span>
-      ))}
-    </div>
+      <output aria-label={feedback.statusAriaLabel}>
+        {feedback.statusLabel}
+      </output>
+      <p className="sr-only">{feedback.description}</p>
+      <dl className="basis-full space-y-1 text-muted-foreground">
+        {feedback.detailLines.map((line) => (
+          <div className="grid gap-0.5" key={line.id}>
+            <dt className="sr-only">{line.label}</dt>
+            <dd>
+              <output aria-label={line.ariaLabel}>{line.text}</output>
+            </dd>
+          </div>
+        ))}
+      </dl>
+    </section>
   );
 }

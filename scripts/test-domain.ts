@@ -6319,8 +6319,22 @@ assert.doesNotMatch(
 );
 assert.match(
   publicAnswerFeedbackSource,
-  /feedback\.detailLines\.map[\s\S]*line\.id[\s\S]*line\.text/,
-  'Public answer feedback component should render ordered feedback detail lines prepared by the assignment-domain feedback view.'
+  /<section[\s\S]*aria-label=\{feedback\.ariaLabel\}[\s\S]*aria-label=\{feedback\.statusAriaLabel\}[\s\S]*feedback\.description[\s\S]*<dl[\s\S]*feedback\.detailLines\.map[\s\S]*line\.id[\s\S]*line\.label[\s\S]*<output aria-label=\{line\.ariaLabel\}>\{line\.text\}<\/output>/,
+  'Public answer feedback component should render ordered semantic feedback detail lines prepared by the assignment-domain feedback view.'
+);
+const earlyStudentRunnerViewSource = readFileSync(
+  'src/assignments/student-runner-view.ts',
+  'utf8'
+);
+assert.match(
+  earlyStudentRunnerViewSource,
+  /export type PublicAnswerFeedbackDetailLine = \{[\s\S]*ariaLabel: string;[\s\S]*id: PublicAnswerFeedbackDetailLineId;[\s\S]*label: string;[\s\S]*text: string;[\s\S]*value: string;[\s\S]*export type PublicAnswerFeedbackView = \{[\s\S]*ariaLabel: string;[\s\S]*description: string;[\s\S]*statusAriaLabel: string;/,
+  'Student answer feedback view should expose explicit aria, label, value, and description contracts.'
+);
+assert.match(
+  earlyStudentRunnerViewSource,
+  /function buildPublicAnswerFeedbackDetailLine[\s\S]*student_runner_feedback_detail_aria[\s\S]*function getPublicAnswerFeedbackDescription[\s\S]*student_runner_feedback_description_correct[\s\S]*student_runner_feedback_description_unanswered[\s\S]*student_runner_feedback_description_needs_review/,
+  'Student answer feedback detail labels and descriptions should be prepared from localized domain messages.'
 );
 const groupSortBoardSource = readFileSync(
   'src/components/activities/group-sort-board.tsx',
@@ -8720,6 +8734,12 @@ assert.doesNotMatch(
 for (const key of [
   'student_attempt_progress_aria_label',
   'student_attempt_progress_description',
+  'student_runner_feedback_description_correct',
+  'student_runner_feedback_description_needs_review',
+  'student_runner_feedback_description_unanswered',
+  'student_runner_feedback_detail_aria',
+  'student_runner_feedback_region_aria',
+  'student_runner_feedback_status_aria',
   'student_runner_review_summary_correct_label',
   'student_runner_review_summary_hidden_description',
   'student_runner_review_summary_item_count_label',
@@ -12195,31 +12215,47 @@ assert.deepEqual(
   {
     acceptedAnswersLabel: 'Accepted answers',
     acceptedAnswersText: 'Accepted answers: Paris, France',
+    ariaLabel: 'Answer feedback: Needs review',
     correctAnswer: 'Paris',
     correctAnswerLabel: 'Correct match',
     correctAnswerText: 'Correct match: Paris',
+    description:
+      'This response needs review against the expected answer, accepted alternatives, and explanation.',
     detailLines: [
       {
+        ariaLabel: 'Your answer: Lyon',
         id: 'submitted-answer',
+        label: 'Your answer',
         text: 'Your answer: Lyon',
+        value: 'Lyon',
       },
       {
+        ariaLabel: 'Correct match: Paris',
         id: 'correct-answer',
+        label: 'Correct match',
         text: 'Correct match: Paris',
+        value: 'Paris',
       },
       {
+        ariaLabel: 'Accepted answers: Paris, France',
         id: 'accepted-answers',
+        label: 'Accepted answers',
         text: 'Accepted answers: Paris, France',
+        value: 'Paris, France',
       },
       {
+        ariaLabel: 'Why: Paris is the capital of France.',
         id: 'explanation',
+        label: 'Why',
         text: 'Why: Paris is the capital of France.',
+        value: 'Paris is the capital of France.',
       },
     ],
     explanation: 'Paris is the capital of France.',
     explanationLabel: 'Why',
     explanationText: 'Why: Paris is the capital of France.',
     status: 'needs-review',
+    statusAriaLabel: 'Feedback status: Needs review',
     statusLabel: 'Needs review',
     submittedAnswer: 'Lyon',
     submittedAnswerLabel: 'Your answer',
@@ -12241,20 +12277,32 @@ assert.deepEqual(
   }).detailLines,
   [
     {
+      ariaLabel: 'Your answer: Lyon',
       id: 'submitted-answer',
+      label: 'Your answer',
       text: 'Your answer: Lyon',
+      value: 'Lyon',
     },
     {
+      ariaLabel: 'Correct match: Paris',
       id: 'correct-answer',
+      label: 'Correct match',
       text: 'Correct match: Paris',
+      value: 'Paris',
     },
     {
+      ariaLabel: 'Accepted answers: Paris, France',
       id: 'accepted-answers',
+      label: 'Accepted answers',
       text: 'Accepted answers: Paris, France',
+      value: 'Paris, France',
     },
     {
+      ariaLabel: 'Why: Paris is the capital of France.',
       id: 'explanation',
+      label: 'Why',
       text: 'Why: Paris is the capital of France.',
+      value: 'Paris is the capital of France.',
     },
   ],
   'Student post-submit feedback should format submitted answers, correct answers, and explanations through shared result-display rules.'
@@ -12279,18 +12327,39 @@ try {
     zhPublicAnswerFeedbackView?.submittedAnswerText,
     '你的答案：里昂'
   );
+  assert.equal(
+    zhPublicAnswerFeedbackView?.ariaLabel,
+    '答案反馈：需复盘'
+  );
+  assert.equal(
+    zhPublicAnswerFeedbackView?.statusAriaLabel,
+    '反馈状态：需复盘'
+  );
+  assert.equal(
+    zhPublicAnswerFeedbackView?.description,
+    '这份回答需要结合预期答案、可接受答案和解释进行复核。'
+  );
   assert.deepEqual(zhPublicAnswerFeedbackView?.detailLines, [
     {
+      ariaLabel: '你的答案：里昂',
       id: 'submitted-answer',
+      label: '你的答案',
       text: '你的答案：里昂',
+      value: '里昂',
     },
     {
+      ariaLabel: '正确答案：Paris',
       id: 'correct-answer',
+      label: '正确答案',
       text: '正确答案：Paris',
+      value: 'Paris',
     },
     {
+      ariaLabel: '可接受答案：Paris, France',
       id: 'accepted-answers',
+      label: '可接受答案',
       text: '可接受答案：Paris, France',
+      value: 'Paris, France',
     },
   ]);
 } finally {
@@ -12310,23 +12379,33 @@ assert.deepEqual(
   {
     acceptedAnswersLabel: 'Accepted answers',
     acceptedAnswersText: null,
+    ariaLabel: 'Answer feedback: Correct',
     correctAnswer: 'Mitochondria',
     correctAnswerLabel: 'Correct answer',
     correctAnswerText: 'Correct answer: Mitochondria',
+    description:
+      'This response matched the expected answer for the frozen assignment item.',
     detailLines: [
       {
+        ariaLabel: 'Your answer: Mitochondria',
         id: 'submitted-answer',
+        label: 'Your answer',
         text: 'Your answer: Mitochondria',
+        value: 'Mitochondria',
       },
       {
+        ariaLabel: 'Correct answer: Mitochondria',
         id: 'correct-answer',
+        label: 'Correct answer',
         text: 'Correct answer: Mitochondria',
+        value: 'Mitochondria',
       },
     ],
     explanation: null,
     explanationLabel: 'Why',
     explanationText: null,
     status: 'correct',
+    statusAriaLabel: 'Feedback status: Correct',
     statusLabel: 'Correct',
     submittedAnswer: 'Mitochondria',
     submittedAnswerLabel: 'Your answer',
@@ -12361,27 +12440,40 @@ assert.deepEqual(
   {
     acceptedAnswersLabel: 'Accepted answers',
     acceptedAnswersText: null,
+    ariaLabel: 'Answer feedback: Unanswered',
     correctAnswer: 'Cold',
     correctAnswerLabel: 'Correct answer',
     correctAnswerText: 'Correct answer: Cold',
+    description:
+      'This item was submitted without a student answer and is marked as unanswered.',
     detailLines: [
       {
+        ariaLabel: 'Your answer: Unanswered',
         id: 'submitted-answer',
+        label: 'Your answer',
         text: 'Your answer: Unanswered',
+        value: 'Unanswered',
       },
       {
+        ariaLabel: 'Correct answer: Cold',
         id: 'correct-answer',
+        label: 'Correct answer',
         text: 'Correct answer: Cold',
+        value: 'Cold',
       },
       {
+        ariaLabel: 'Why: Hot pairs with cold.',
         id: 'explanation',
+        label: 'Why',
         text: 'Why: Hot pairs with cold.',
+        value: 'Hot pairs with cold.',
       },
     ],
     explanation: 'Hot pairs with cold.',
     explanationLabel: 'Why',
     explanationText: 'Why: Hot pairs with cold.',
     status: 'unanswered',
+    statusAriaLabel: 'Feedback status: Unanswered',
     statusLabel: 'Unanswered',
     submittedAnswer: 'Unanswered',
     submittedAnswerLabel: 'Your answer',

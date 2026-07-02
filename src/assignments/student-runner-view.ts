@@ -255,21 +255,27 @@ export type PublicAnswerFeedbackDetailLineId =
   | 'submitted-answer';
 
 export type PublicAnswerFeedbackDetailLine = {
+  ariaLabel: string;
   id: PublicAnswerFeedbackDetailLineId;
+  label: string;
   text: string;
+  value: string;
 };
 
 export type PublicAnswerFeedbackView = {
   acceptedAnswersLabel: string;
   acceptedAnswersText: string | null;
+  ariaLabel: string;
   correctAnswer: string;
   correctAnswerLabel: string;
   correctAnswerText: string;
+  description: string;
   detailLines: PublicAnswerFeedbackDetailLine[];
   explanation: string | null;
   explanationLabel: string;
   explanationText: string | null;
   status: PublicAnswerFeedbackStatus;
+  statusAriaLabel: string;
   statusLabel: string;
   submittedAnswer: string;
   submittedAnswerLabel: string;
@@ -1224,46 +1230,101 @@ export function buildPublicAnswerFeedbackView({
       })
     : null;
   const detailLines: PublicAnswerFeedbackDetailLine[] = [
-    {
+    buildPublicAnswerFeedbackDetailLine({
       id: 'submitted-answer',
+      label: submittedAnswerLabel,
       text: submittedAnswerText,
-    },
-    {
+      value: submittedAnswerValue,
+    }),
+    buildPublicAnswerFeedbackDetailLine({
       id: 'correct-answer',
+      label: correctAnswerLabel,
       text: correctAnswerText,
-    },
+      value: correctAnswerValue,
+    }),
   ];
 
   if (acceptedAnswersText) {
-    detailLines.push({
-      id: 'accepted-answers',
-      text: acceptedAnswersText,
-    });
+    detailLines.push(
+      buildPublicAnswerFeedbackDetailLine({
+        id: 'accepted-answers',
+        label: acceptedAnswersLabel,
+        text: acceptedAnswersText,
+        value: acceptedAnswersValue ?? '',
+      })
+    );
   }
 
   if (explanationText) {
-    detailLines.push({
-      id: 'explanation',
-      text: explanationText,
-    });
+    detailLines.push(
+      buildPublicAnswerFeedbackDetailLine({
+        id: 'explanation',
+        label: explanationLabel,
+        text: explanationText,
+        value: explanationValue ?? '',
+      })
+    );
   }
+  const status = getPublicAnswerFeedbackStatus(reviewItem);
+  const statusLabel = getPublicAnswerFeedbackStatusLabel(reviewItem);
 
   return {
     acceptedAnswersLabel,
     acceptedAnswersText,
+    ariaLabel: m.student_runner_feedback_region_aria({
+      status: statusLabel,
+    }),
     correctAnswer: correctAnswerValue,
     correctAnswerLabel,
     correctAnswerText,
+    description: getPublicAnswerFeedbackDescription(status),
     detailLines,
     explanation: explanationValue,
     explanationLabel,
     explanationText,
-    status: getPublicAnswerFeedbackStatus(reviewItem),
-    statusLabel: getPublicAnswerFeedbackStatusLabel(reviewItem),
+    status,
+    statusAriaLabel: m.student_runner_feedback_status_aria({
+      status: statusLabel,
+    }),
+    statusLabel,
     submittedAnswer: submittedAnswerValue,
     submittedAnswerLabel,
     submittedAnswerText,
   };
+}
+
+function buildPublicAnswerFeedbackDetailLine({
+  id,
+  label,
+  text,
+  value,
+}: {
+  id: PublicAnswerFeedbackDetailLineId;
+  label: string;
+  text: string;
+  value: string;
+}): PublicAnswerFeedbackDetailLine {
+  return {
+    ariaLabel: m.student_runner_feedback_detail_aria({ label, value }),
+    id,
+    label,
+    text,
+    value,
+  };
+}
+
+function getPublicAnswerFeedbackDescription(
+  status: PublicAnswerFeedbackStatus
+) {
+  if (status === 'correct') {
+    return m.student_runner_feedback_description_correct();
+  }
+
+  if (status === 'unanswered') {
+    return m.student_runner_feedback_description_unanswered();
+  }
+
+  return m.student_runner_feedback_description_needs_review();
 }
 
 function formatPublicAnswerFeedbackOptionalValue(
