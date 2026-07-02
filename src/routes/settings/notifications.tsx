@@ -28,7 +28,7 @@ function NotificationsPage() {
       <div className="flex flex-col gap-8">
         <NotificationWorkspaceSummary view={pageView.workspaceSummaryView} />
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-          <NewsletterFormCard />
+          <NewsletterFormCard view={pageView.newsletterCardView} />
         </div>
       </div>
     </DashboardLayout>

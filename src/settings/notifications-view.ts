@@ -21,9 +21,25 @@ export type SettingsNotificationWorkspaceSummaryView = {
   title: string;
 };
 
+export type SettingsNotificationNewsletterCardView = {
+  description: string;
+  emailRequiredMessage: string;
+  errorMessage: string;
+  hint: string;
+  label: string;
+  scopeDescription: string;
+  scopeLabel: string;
+  subscribeSuccessMessage: string;
+  switchAriaLabel: string;
+  switchDescription: string;
+  title: string;
+  unsubscribeSuccessMessage: string;
+};
+
 export type SettingsNotificationPageViewModel = {
   breadcrumbs: DashboardBreadcrumbItem[];
   description: string;
+  newsletterCardView: SettingsNotificationNewsletterCardView;
   title: string;
   workspaceSummaryView: SettingsNotificationWorkspaceSummaryView;
 };
@@ -46,8 +62,28 @@ export function buildSettingsNotificationPageViewModel(): SettingsNotificationPa
       },
     ],
     description,
+    newsletterCardView: buildSettingsNotificationNewsletterCardView(),
     title,
     workspaceSummaryView: buildSettingsNotificationWorkspaceSummaryView(),
+  };
+}
+
+export function buildSettingsNotificationNewsletterCardView(): SettingsNotificationNewsletterCardView {
+  return {
+    description: m.settings_notification_newsletter_description(),
+    emailRequiredMessage: m.settings_notification_newsletter_email_required(),
+    errorMessage: m.settings_notification_newsletter_error(),
+    hint: m.settings_notification_newsletter_hint(),
+    label: m.settings_notification_newsletter_label(),
+    scopeDescription: m.settings_notification_newsletter_scope_description(),
+    scopeLabel: m.settings_notification_newsletter_scope_label(),
+    subscribeSuccessMessage:
+      m.settings_notification_newsletter_subscribe_success(),
+    switchAriaLabel: m.settings_notification_newsletter_switch_aria_label(),
+    switchDescription: m.settings_notification_newsletter_switch_description(),
+    title: m.settings_notification_newsletter_title(),
+    unsubscribeSuccessMessage:
+      m.settings_notification_newsletter_unsubscribe_success(),
   };
 }
 

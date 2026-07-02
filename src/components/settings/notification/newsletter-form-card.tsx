@@ -1,4 +1,3 @@
-import { m } from '@/locale/paraglide/messages';
 import { FormError } from '@/components/shared/form-error';
 import {
   Card,
@@ -23,26 +22,37 @@ import {
 } from '@/hooks/use-newsletter';
 import { authClient } from '@/auth/client';
 import { cn } from '@/lib/utils';
-import { isSettingsNotificationsEnabled } from '@/settings/notifications-view';
+import {
+  isSettingsNotificationsEnabled,
+  type SettingsNotificationNewsletterCardView,
+} from '@/settings/notifications-view';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { IconLoader2 } from '@tabler/icons-react';
-import { useEffect } from 'react';
+import { useEffect, useId } from 'react';
 import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
 import { z } from 'zod';
 interface NewsletterFormCardProps {
   className?: string;
+  view: SettingsNotificationNewsletterCardView;
 }
 const formSchema = z.object({ subscribed: z.boolean() });
-export function NewsletterFormCard({ className }: NewsletterFormCardProps) {
-  if (!isSettingsNotificationsEnabled()) return null;
+export function NewsletterFormCard({
+  className,
+  view,
+}: NewsletterFormCardProps) {
+  const descriptionId = useId();
+  const notificationsEnabled = isSettingsNotificationsEnabled();
+
   const { data: session } = authClient.useSession();
   const currentUser = session?.user;
   const {
     data: newsletterStatus,
     isLoading: isStatusLoading,
     error: statusError,
-  } = useNewsletterStatus(currentUser?.email);
+  } = useNewsletterStatus(
+    notificationsEnabled ? currentUser?.email : undefined
+  );
   const subscribeMutation = useSubscribeNewsletter();
   const unsubscribeMutation = useUnsubscribeNewsletter();
   const form = useForm<z.infer<typeof formSchema>>({
@@ -51,41 +61,38 @@ export function NewsletterFormCard({ className }: NewsletterFormCardProps) {
   });
   const newsletterErrorMessage =
     statusError || subscribeMutation.error || unsubscribeMutation.error
-      ? m.settings_notification_newsletter_error()
+      ? view.errorMessage
       : undefined;
   useEffect(() => {
     if (newsletterStatus)
       form.setValue('subscribed', newsletterStatus.subscribed);
   }, [newsletterStatus, form]);
+  if (!notificationsEnabled) return null;
   if (!currentUser) return null;
   const handleSubscriptionChange = async (value: boolean) => {
     if (!currentUser.email) {
-      toast.error(m.settings_notification_newsletter_email_required());
+      toast.error(view.emailRequiredMessage);
       return;
     }
     try {
       if (value) {
         await subscribeMutation.mutateAsync(currentUser.email);
-        toast.success(m.settings_notification_newsletter_subscribe_success());
+        toast.success(view.subscribeSuccessMessage);
       } else {
         await unsubscribeMutation.mutateAsync(currentUser.email);
-        toast.success(m.settings_notification_newsletter_unsubscribe_success());
+        toast.success(view.unsubscribeSuccessMessage);
       }
     } catch (err) {
       console.error('newsletter subscription error:', err);
-      toast.error(m.settings_notification_newsletter_error());
+      toast.error(view.errorMessage);
       form.setValue('subscribed', newsletterStatus?.subscribed ?? false);
     }
   };
   return (
     <Card className={cn('w-full overflow-hidden pt-6 pb-0', className)}>
       <CardHeader>
-        <CardTitle className="text-lg font-semibold">
-          {m.settings_notification_newsletter_title()}
-        </CardTitle>
-        <CardDescription>
-          {m.settings_notification_newsletter_description()}
-        </CardDescription>
+        <CardTitle className="text-lg font-semibold">{view.title}</CardTitle>
+        <CardDescription>{view.description}</CardDescription>
       </CardHeader>
       <Form {...form}>
         <form>
@@ -94,10 +101,16 @@ export function NewsletterFormCard({ className }: NewsletterFormCardProps) {
               control={form.control}
               name="subscribed"
               render={({ field }) => (
-                <FormItem className="flex flex-row items-center justify-between">
-                  <FormLabel className="text-base">
-                    {m.settings_notification_newsletter_label()}
-                  </FormLabel>
+                <FormItem className="grid gap-3 sm:grid-cols-[1fr_auto] sm:items-start">
+                  <div className="space-y-1">
+                    <FormLabel className="text-base">{view.label}</FormLabel>
+                    <p
+                      className="text-muted-foreground text-sm leading-6"
+                      id={descriptionId}
+                    >
+                      {view.switchDescription}
+                    </p>
+                  </div>
                   <div className="relative flex items-center">
                     {(isStatusLoading ||
                       subscribeMutation.isPending ||
@@ -106,6 +119,8 @@ export function NewsletterFormCard({ className }: NewsletterFormCardProps) {
                     )}
                     <FormControl>
                       <Switch
+                        aria-describedby={descriptionId}
+                        aria-label={view.switchAriaLabel}
                         checked={field.value}
                         onCheckedChange={(checked) => {
                           field.onChange(checked);
@@ -122,12 +137,19 @@ export function NewsletterFormCard({ className }: NewsletterFormCardProps) {
                 </FormItem>
               )}
             />
+            <section
+              aria-label={view.scopeLabel}
+              className="border-l-2 pl-3 text-sm"
+            >
+              <p className="font-medium text-foreground">{view.scopeLabel}</p>
+              <p className="mt-1 text-muted-foreground leading-6">
+                {view.scopeDescription}
+              </p>
+            </section>
             <FormError message={newsletterErrorMessage} />
           </CardContent>
           <CardFooter className="mt-6 px-6 py-4 bg-muted rounded-none">
-            <p className="text-sm text-muted-foreground">
-              {m.settings_notification_newsletter_hint()}
-            </p>
+            <p className="text-sm text-muted-foreground">{view.hint}</p>
           </CardFooter>
         </form>
       </Form>

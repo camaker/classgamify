@@ -423,6 +423,7 @@ import {
   buildSettingsFilesWorkspaceSummaryView,
 } from '@/settings/files-view';
 import {
+  buildSettingsNotificationNewsletterCardView,
   buildSettingsNotificationPageViewModel,
   buildSettingsNotificationWorkspaceSummaryView,
 } from '@/settings/notifications-view';
@@ -7693,13 +7694,23 @@ assert.match(
 );
 assert.match(
   newsletterFormCardSource,
-  /const newsletterErrorMessage =[\s\S]*m\.settings_notification_newsletter_error\(\)/,
-  'Newsletter settings inline errors should show the localized settings failure message.'
+  /type SettingsNotificationNewsletterCardView[\s\S]*const newsletterErrorMessage =[\s\S]*view\.errorMessage/,
+  'Newsletter settings inline errors should show the prepared localized settings failure message.'
 );
 assert.match(
   newsletterFormCardSource,
-  /toast\.error\(m\.settings_notification_newsletter_error\(\)\)/,
-  'Newsletter settings toast failures should show the localized settings failure message.'
+  /toast\.error\(view\.emailRequiredMessage\)[\s\S]*toast\.success\(view\.subscribeSuccessMessage\)[\s\S]*toast\.success\(view\.unsubscribeSuccessMessage\)[\s\S]*toast\.error\(view\.errorMessage\)/,
+  'Newsletter settings toasts should use prepared localized email-required, success, and failure copy.'
+);
+assert.match(
+  newsletterFormCardSource,
+  /const descriptionId = useId\(\)[\s\S]*view\.title[\s\S]*view\.description[\s\S]*view\.label[\s\S]*id=\{descriptionId\}[\s\S]*view\.switchDescription[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*aria-label=\{view\.switchAriaLabel\}[\s\S]*view\.scopeLabel[\s\S]*view\.scopeDescription[\s\S]*view\.hint/,
+  'Newsletter settings card should render prepared card copy, switch description, update scope, and hint.'
+);
+assert.doesNotMatch(
+  newsletterFormCardSource,
+  /m\.settings_notification_/,
+  'Newsletter settings card should not hard-code notification message keys instead of consuming the prepared view.'
 );
 assert.match(
   settingsNotificationViewSource,
@@ -7708,13 +7719,18 @@ assert.match(
 );
 assert.match(
   settingsNotificationViewSource,
+  /export type SettingsNotificationNewsletterCardView = \{[\s\S]*emailRequiredMessage: string;[\s\S]*errorMessage: string;[\s\S]*scopeDescription: string;[\s\S]*scopeLabel: string;[\s\S]*subscribeSuccessMessage: string;[\s\S]*switchAriaLabel: string;[\s\S]*switchDescription: string;[\s\S]*unsubscribeSuccessMessage: string;/,
+  'Notification settings view model should expose prepared newsletter card copy, switch descriptions, and update scope.'
+);
+assert.match(
+  settingsNotificationViewSource,
   /export function isSettingsNotificationsEnabled\(\)[\s\S]*websiteConfig\.newsletter\?\.enable === true/,
   'Notification settings feature visibility should be centralized in the settings notification view helper.'
 );
 assert.match(
   settingsNotificationViewSource,
-  /export function buildSettingsNotificationPageViewModel\(\)[\s\S]*breadcrumbs:[\s\S]*id: 'settings'[\s\S]*id: 'notifications'[\s\S]*workspaceSummaryView: buildSettingsNotificationWorkspaceSummaryView/,
-  'Notification settings view model should own localized page state, breadcrumbs, and workspace summary.'
+  /export function buildSettingsNotificationPageViewModel\(\)[\s\S]*breadcrumbs:[\s\S]*id: 'settings'[\s\S]*id: 'notifications'[\s\S]*newsletterCardView: buildSettingsNotificationNewsletterCardView\(\)[\s\S]*workspaceSummaryView: buildSettingsNotificationWorkspaceSummaryView/,
+  'Notification settings view model should own localized page state, breadcrumbs, workspace summary, and newsletter card view.'
 );
 assert.match(
   settingsNotificationViewSource,
@@ -7722,9 +7738,14 @@ assert.match(
   'Notification settings view model should prepare localized classroom update boundary copy.'
 );
 assert.match(
+  settingsNotificationViewSource,
+  /buildSettingsNotificationNewsletterCardView[\s\S]*settings_notification_newsletter_description[\s\S]*settings_notification_newsletter_email_required[\s\S]*settings_notification_newsletter_error[\s\S]*settings_notification_newsletter_hint[\s\S]*settings_notification_newsletter_label[\s\S]*settings_notification_newsletter_scope_description[\s\S]*settings_notification_newsletter_scope_label[\s\S]*settings_notification_newsletter_subscribe_success[\s\S]*settings_notification_newsletter_switch_aria_label[\s\S]*settings_notification_newsletter_switch_description[\s\S]*settings_notification_newsletter_title[\s\S]*settings_notification_newsletter_unsubscribe_success/,
+  'Notification settings view model should prepare localized newsletter card copy, update scope, switch text, and toast messages.'
+);
+assert.match(
   settingsNotificationRouteProductSource,
-  /const pageView = buildSettingsNotificationPageViewModel\(\);[\s\S]*breadcrumbs=\{pageView\.breadcrumbs\}[\s\S]*title=\{pageView\.title\}[\s\S]*NotificationWorkspaceSummary[\s\S]*view=\{pageView\.workspaceSummaryView\}[\s\S]*NewsletterFormCard/,
-  'Notification settings route should consume the notification page view model and render the prepared classroom update summary.'
+  /const pageView = buildSettingsNotificationPageViewModel\(\);[\s\S]*breadcrumbs=\{pageView\.breadcrumbs\}[\s\S]*title=\{pageView\.title\}[\s\S]*NotificationWorkspaceSummary[\s\S]*view=\{pageView\.workspaceSummaryView\}[\s\S]*NewsletterFormCard[\s\S]*view=\{pageView\.newsletterCardView\}/,
+  'Notification settings route should consume the notification page view model and render prepared classroom update and newsletter views.'
 );
 assert.doesNotMatch(
   settingsNotificationRouteProductSource,
@@ -7872,6 +7893,18 @@ assert.equal(filesWorkspaceSummaryView.itemViews.length, 4);
 const notificationPageView = buildSettingsNotificationPageViewModel();
 assert.equal(notificationPageView.breadcrumbs.at(-1)?.id, 'notifications');
 assert.equal(notificationPageView.title, 'Updates');
+assert.equal(
+  notificationPageView.newsletterCardView.scopeLabel,
+  'Update scope'
+);
+assert.match(
+  notificationPageView.newsletterCardView.scopeDescription,
+  /do not send student assignment reminders/
+);
+assert.match(
+  notificationPageView.newsletterCardView.switchDescription,
+  /template changes, worksheet workflows, and result-review improvements/
+);
 const notificationWorkspaceSummaryItemIds =
   notificationPageView.workspaceSummaryView.itemViews
     .map((item) => item.id)
@@ -7887,6 +7920,28 @@ assert.match(
 const notificationWorkspaceSummaryView =
   buildSettingsNotificationWorkspaceSummaryView();
 assert.equal(notificationWorkspaceSummaryView.itemViews.length, 4);
+const notificationNewsletterCardView =
+  buildSettingsNotificationNewsletterCardView();
+assert.match(
+  notificationNewsletterCardView.switchAriaLabel,
+  /teacher workspace/
+);
+overwriteGetLocale(() => 'zh');
+try {
+  const zhNotificationNewsletterCardView =
+    buildSettingsNotificationNewsletterCardView();
+  assert.equal(zhNotificationNewsletterCardView.scopeLabel, '更新范围');
+  assert.match(
+    zhNotificationNewsletterCardView.switchDescription,
+    /练习纸工作流和结果复盘/
+  );
+  assert.match(
+    zhNotificationNewsletterCardView.scopeDescription,
+    /不会发送学生作业提醒/
+  );
+} finally {
+  overwriteGetLocale(() => 'en');
+}
 const billingPageView = buildSettingsBillingPageViewModel();
 assert.equal(billingPageView.breadcrumbs.at(-1)?.id, 'billing');
 assert.equal(billingPageView.title, 'Billing');
@@ -10385,6 +10440,10 @@ const authWorkspaceBoundaryRequirements = [
       ['settings_notification_workspace_summary_worksheets_description', /source-material workflows/],
       ['settings_notification_workspace_summary_review_description', /classroom briefs, reteach plans/],
       ['settings_notification_workspace_summary_control_description', /account access, activities, assignments, or results/],
+      ['settings_notification_newsletter_switch_aria_label', /teacher workspace/],
+      ['settings_notification_newsletter_switch_description', /template changes, worksheet workflows, and result-review improvements/],
+      ['settings_notification_newsletter_scope_label', /Update scope/],
+      ['settings_notification_newsletter_scope_description', /do not send student assignment reminders/],
       ['settings_security_workspace_summary_description', /reusable activities, source materials, assignment links/],
       ['settings_security_workspace_summary_access_description', /teacher workspace/],
       ['settings_security_workspace_summary_activities_description', /source-material references/],
@@ -10457,6 +10516,10 @@ const authWorkspaceBoundaryRequirements = [
       ['settings_notification_workspace_summary_worksheets_description', /来源素材工作流/],
       ['settings_notification_workspace_summary_review_description', /课堂简报、再讲计划/],
       ['settings_notification_workspace_summary_control_description', /账号访问、活动、作业或结果记录/],
+      ['settings_notification_newsletter_switch_aria_label', /教师工作区/],
+      ['settings_notification_newsletter_switch_description', /练习纸工作流和结果复盘/],
+      ['settings_notification_newsletter_scope_label', /更新范围/],
+      ['settings_notification_newsletter_scope_description', /不会发送学生作业提醒/],
       ['settings_security_workspace_summary_description', /可复用活动、来源素材、作业链接/],
       ['settings_security_workspace_summary_access_description', /教师工作区/],
       ['settings_security_workspace_summary_activities_description', /来源素材引用/],
