@@ -672,6 +672,7 @@ import {
   buildAssignmentResultControlStatusView,
   buildAssignmentResultCopyScopeView,
   buildAssignmentResultReviewScopeView,
+  buildAssignmentResultReviewStatusView,
   buildAssignmentResultReviewScopeSummary,
   buildAssignmentResultViewModel,
   buildAssignmentResultsPageViewModel,
@@ -5710,6 +5711,10 @@ const assignmentResultsReviewScopePanelSource = readFileSync(
   'src/components/assignments/assignment-results-review-scope-panel.tsx',
   'utf8'
 );
+const assignmentResultsReviewStatusPanelSource = readFileSync(
+  'src/components/assignments/assignment-results-review-status-panel.tsx',
+  'utf8'
+);
 const assignmentResultsStudentSearchSource = readFileSync(
   'src/components/assignments/assignment-results-student-search.tsx',
   'utf8'
@@ -6056,15 +6061,55 @@ assert.match(
   'Assignment result route should render the prepared current review-scope panel from the page view-model.'
 );
 assert.match(
+  assignmentResultRouteSource,
+  /AssignmentResultsReviewStatusPanel[\s\S]*view=\{pageView\.reviewStatusView\}/,
+  'Assignment result route should render the prepared review-status panel from the page view-model.'
+);
+assert.match(
   assignmentResultViewSource,
   /export type AssignmentResultReviewScopeItemView = \{[\s\S]*ariaLabel: string;[\s\S]*description: string;[\s\S]*id: AssignmentResultReviewScopeItemId;[\s\S]*label: string;[\s\S]*statusView: AssignmentResultControlStatusView;[\s\S]*value: string;[\s\S]*export type AssignmentResultReviewScopeSummaryItemView = \{[\s\S]*ariaLabel: string;[\s\S]*description: string;[\s\S]*id: AssignmentResultReviewScopeSummaryItemId;[\s\S]*label: string;[\s\S]*value: string;[\s\S]*export type AssignmentResultReviewScopeView = \{[\s\S]*description: string;[\s\S]*itemViews: AssignmentResultReviewScopeItemView\[\];[\s\S]*summaryItems: AssignmentResultReviewScopeSummaryItemView\[\];[\s\S]*summaryLabel: string;[\s\S]*title: string;/,
   'Assignment result view domain should expose explicit current review-scope panel contracts.'
 );
 assert.match(
   assignmentResultViewSource,
+  /export type AssignmentResultReviewStatus[\s\S]*'class-ready'[\s\S]*'focused'[\s\S]*'needs-review'[\s\S]*'no-matches'[\s\S]*'waiting-for-attempts'[\s\S]*export type AssignmentResultReviewStatusView = \{[\s\S]*ariaLabel: string;[\s\S]*status: AssignmentResultReviewStatus;[\s\S]*step: AssignmentResultReviewStatusStepView;[\s\S]*summaryItems: AssignmentResultReviewScopeSummaryItemView\[\];/,
+  'Assignment result view domain should expose an explicit review-status panel contract with stable status ids and prepared summary items.'
+);
+assert.match(
+  assignmentResultViewSource,
   /export function buildAssignmentResultReviewScopeView\(\{[\s\S]*controlViews,[\s\S]*summary,[\s\S]*\}\)[\s\S]*buildAssignmentResultReviewScopeItemView\(\{[\s\S]*statusView: controlViews\.studentSearch\.searchStatusView[\s\S]*statusView: controlViews\.studentSearch\.sortStatusView[\s\S]*statusView: controlViews\.itemPerformanceSort\.statusView[\s\S]*statusView: controlViews\.attemptReviewFilter\.statusView[\s\S]*buildAssignmentResultReviewScopeSummaryItems\(summary\)/,
   'Assignment result review scope should derive student search, student sort, item sort, review filter status, and matched counts from prepared control views and shared scope summary.'
 );
+assert.match(
+  assignmentResultViewSource,
+  /const reviewStatusView = buildAssignmentResultReviewStatusView\(\{[\s\S]*controlViews,[\s\S]*summary: resultView\.reviewScope\.summary,[\s\S]*viewState,[\s\S]*\}\)[\s\S]*reviewStatusView,/,
+  'Assignment result page view-model should prepare the review-status panel from the same control views, view state, and review-scope summary used by current review scope.'
+);
+assert.match(
+  assignmentResultViewSource,
+  /buildAssignmentResultReviewStatusView[\s\S]*resolveAssignmentResultReviewStatus[\s\S]*buildAssignmentResultReviewScopeSummaryItems\(summary\)[\s\S]*assignmentResultReviewStatusCopy\.summaryLabel/,
+  'Assignment result review-status view should resolve status and matched-record summaries inside the assignment result domain.'
+);
+assert.match(
+  assignmentResultViewSource,
+  /resolveAssignmentResultReviewStatus[\s\S]*summary\.attemptRows\.total[\s\S]*statusView\.tone === 'custom'[\s\S]*viewState\.attemptReviewFilter === 'needs-review'[\s\S]*return 'waiting-for-attempts'[\s\S]*return 'no-matches'[\s\S]*return 'needs-review'[\s\S]*return 'focused'[\s\S]*return 'class-ready'/,
+  'Assignment result review-status resolver should distinguish waiting, no-match, needs-review, focused, and full-class review states from shared scope evidence.'
+);
+for (const reviewStatusMessageKey of [
+  'assignment_result_review_status_class_ready_',
+  'assignment_result_review_status_focused_',
+  'assignment_result_review_status_needs_review_',
+  'assignment_result_review_status_no_matches_',
+  'assignment_result_review_status_waiting_',
+]) {
+  assert.match(
+    assignmentResultViewSource,
+    new RegExp(
+      `getAssignmentResultReviewStatusCopy[\\s\\S]*${reviewStatusMessageKey}`
+    ),
+    'Assignment result review-status copy should come from localized assignment result messages for every status.'
+  );
+}
 assert.match(
   assignmentResultViewSource,
   /function buildAssignmentResultReviewScopeItemView\([\s\S]*statusView: AssignmentResultControlStatusView[\s\S]*ariaLabel: m\.assignment_result_review_scope_item_aria_label\(\{[\s\S]*status: statusView\.value[\s\S]*statusView,/,
@@ -6091,14 +6136,34 @@ assert.match(
   'Assignment result review-scope summary counts should expose stable labels and values for assistive technology.'
 );
 assert.match(
+  assignmentResultsReviewStatusPanelSource,
+  /AssignmentResultReviewStatusView[\s\S]*AssignmentResultReviewStatus[\s\S]*const titleId = 'assignment-result-review-status-title'[\s\S]*const descriptionId = 'assignment-result-review-status-description'[\s\S]*aria-label=\{view\.ariaLabel\}[\s\S]*id=\{titleId\}[\s\S]*view\.title[\s\S]*id=\{descriptionId\}[\s\S]*view\.description/,
+  'Assignment result review-status panel should render the prepared status title, description, and accessible label from the page view-model.'
+);
+assert.match(
+  assignmentResultsReviewStatusPanelSource,
+  /data-status=\{view\.status\}[\s\S]*getAssignmentResultReviewStatusBadgeVariant\(view\.status\)[\s\S]*view\.statusLabel[\s\S]*view\.step\.label[\s\S]*view\.step\.description/,
+  'Assignment result review-status panel should render prepared status and next-step copy with status-driven badge presentation.'
+);
+assert.match(
+  assignmentResultsReviewStatusPanelSource,
+  /summaryLabelId = 'assignment-result-review-status-summary-label'[\s\S]*view\.summaryLabel[\s\S]*view\.summaryItems\.map[\s\S]*key=\{summaryItem\.id\}[\s\S]*AssignmentResultsReviewStatusSummaryItem/,
+  'Assignment result review-status panel should render prepared matched-record summary items keyed by stable ids.'
+);
+assert.match(
+  assignmentResultsReviewStatusPanelSource,
+  /const labelId = `assignment-result-review-status-summary-\$\{summaryItem\.id\}-label`[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*<output[\s\S]*aria-label=\{summaryItem\.ariaLabel\}[\s\S]*summaryItem\.description/,
+  'Assignment result review-status summary items should render prepared accessible labels and hidden descriptions.'
+);
+assert.match(
   assignmentResultsReviewScopePanelSource,
   /const descriptionId = `assignment-result-review-scope-summary-\$\{summaryItem\.id\}-description`[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*<output[\s\S]*aria-label=\{summaryItem\.ariaLabel\}[\s\S]*summaryItem\.description/,
   'Assignment result review-scope summary counts should render prepared accessible labels and hidden descriptions.'
 );
 assert.doesNotMatch(
-  `${assignmentResultsReviewScopePanelSource}\n${assignmentResultRouteSource}`,
-  /Current review scope|Matched records|Student search|学生搜索|当前复盘范围|匹配记录/,
-  'Assignment result route and review-scope panel component should not hard-code current review-scope copy.'
+  `${assignmentResultsReviewScopePanelSource}\n${assignmentResultsReviewStatusPanelSource}\n${assignmentResultRouteSource}`,
+  /Current review scope|Matched records|Current matched records|Ready to review|Waiting for student attempts|Student search|学生搜索|当前复盘范围|匹配记录|当前匹配记录|等待学生提交|可以复盘全班/,
+  'Assignment result route, review-scope panel, and review-status panel should not hard-code review-scope or review-status copy.'
 );
 assert.doesNotMatch(
   assignmentResultRouteSource,
@@ -44174,6 +44239,22 @@ assert.deepEqual(
     contentState: emptyResultsPageView.contentState,
     headerView: emptyResultsPageView.headerView,
     metricItems: emptyResultsPageView.metricItems,
+    reviewStatusView: {
+      status: emptyResultsPageView.reviewStatusView.status,
+      statusLabel: emptyResultsPageView.reviewStatusView.statusLabel,
+      step: [
+        emptyResultsPageView.reviewStatusView.step.label,
+        emptyResultsPageView.reviewStatusView.step.description,
+      ],
+      summaryItems: emptyResultsPageView.reviewStatusView.summaryItems.map(
+        (summaryItem) => [
+          summaryItem.id,
+          summaryItem.label,
+          summaryItem.value,
+        ]
+      ),
+      title: emptyResultsPageView.reviewStatusView.title,
+    },
     sectionState: emptyResultsPageView.sectionState,
     title: emptyResultsPageView.title,
     viewState: emptyResultsPageView.viewState,
@@ -44197,6 +44278,21 @@ assert.deepEqual(
     },
     headerView: null,
     metricItems: [],
+    reviewStatusView: {
+      status: 'waiting-for-attempts',
+      statusLabel: 'Waiting',
+      step: [
+        'Share the student link',
+        'Copy or preview the student link from the header, then return here after the first submission.',
+      ],
+      summaryItems: [
+        ['students', 'Students', '0/0'],
+        ['attempts', 'Attempts', '0/0'],
+        ['items', 'Items', '0/0'],
+        ['answer-reviews', 'Answer review', '0/0'],
+      ],
+      title: 'Waiting for student attempts.',
+    },
     sectionState: {
       showAnswerReview: false,
       showClassroomBrief: false,
@@ -44272,6 +44368,85 @@ const scoredResultsPageView = buildAssignmentResultsPageViewModel({
   data: scoredResultsPageData,
   search: scoredResultsPageSearch,
 });
+const defaultResultsPageView = buildAssignmentResultsPageViewModel({
+  data: scoredResultsPageData,
+  search: {},
+});
+const focusedResultsPageView = buildAssignmentResultsPageViewModel({
+  data: scoredResultsPageData,
+  search: { student: 'Alice' },
+});
+const noMatchResultsPageView = buildAssignmentResultsPageViewModel({
+  data: scoredResultsPageData,
+  search: { student: 'Nobody' },
+});
+assert.deepEqual(
+  [
+    defaultResultsPageView.reviewStatusView,
+    focusedResultsPageView.reviewStatusView,
+    scoredResultsPageView.reviewStatusView,
+    noMatchResultsPageView.reviewStatusView,
+  ].map((view) => [
+    view.status,
+    view.statusLabel,
+    view.title,
+    view.step.label,
+    view.summaryItems.map((summaryItem) => [
+      summaryItem.id,
+      summaryItem.value,
+    ]),
+  ]),
+  [
+    [
+      'class-ready',
+      'Class review',
+      'Ready to review the full class.',
+      'Scan the class',
+      [
+        ['students', '1/1'],
+        ['attempts', '1/1'],
+        ['items', '2/2'],
+        ['answer-reviews', '1/1'],
+      ],
+    ],
+    [
+      'focused',
+      'Focused view',
+      'Reviewing a focused result set.',
+      'Use this scope',
+      [
+        ['students', '1/1'],
+        ['attempts', '1/1'],
+        ['items', '2/2'],
+        ['answer-reviews', '1/1'],
+      ],
+    ],
+    [
+      'needs-review',
+      'Needs review',
+      'Follow-up answers are in focus.',
+      'Review flagged answers',
+      [
+        ['students', '1/1'],
+        ['attempts', '1/1'],
+        ['items', '2/2'],
+        ['answer-reviews', '1/1'],
+      ],
+    ],
+    [
+      'no-matches',
+      'No matches',
+      'No records match this review scope.',
+      'Adjust filters',
+      [
+        ['students', '0/1'],
+        ['attempts', '0/1'],
+        ['items', '2/2'],
+        ['answer-reviews', '0/1'],
+      ],
+    ],
+  ]
+);
 assert.equal(
   buildAssignmentResultsRouteState({
     data: scoredResultsPageData,
@@ -44758,6 +44933,25 @@ assert.deepEqual(
       summaryLabel: scoredResultsPageView.reviewScopeView.summaryLabel,
       title: scoredResultsPageView.reviewScopeView.title,
     },
+    reviewStatusView: {
+      ariaLabel: scoredResultsPageView.reviewStatusView.ariaLabel,
+      description: scoredResultsPageView.reviewStatusView.description,
+      status: scoredResultsPageView.reviewStatusView.status,
+      statusLabel: scoredResultsPageView.reviewStatusView.statusLabel,
+      step: [
+        scoredResultsPageView.reviewStatusView.step.label,
+        scoredResultsPageView.reviewStatusView.step.description,
+      ],
+      summaryItems: scoredResultsPageView.reviewStatusView.summaryItems.map(
+        (summaryItem) => [
+          summaryItem.id,
+          summaryItem.label,
+          summaryItem.value,
+        ]
+      ),
+      summaryLabel: scoredResultsPageView.reviewStatusView.summaryLabel,
+      title: scoredResultsPageView.reviewStatusView.title,
+    },
     sectionState: scoredResultsPageView.sectionState,
     sectionViews: {
       answerReview: {
@@ -45219,6 +45413,26 @@ assert.deepEqual(
       ],
       summaryLabel: 'Matched records',
       title: 'Current review scope',
+    },
+    reviewStatusView: {
+      ariaLabel:
+        'Follow-up answers are in focus.: Needs review. The answer review is focused on submissions with missed or unanswered items, so the current cards are ready for follow-up.',
+      description:
+        'The answer review is focused on submissions with missed or unanswered items, so the current cards are ready for follow-up.',
+      status: 'needs-review',
+      statusLabel: 'Needs review',
+      step: [
+        'Review flagged answers',
+        'Read the flagged answer cards, then copy the reteach plan or student follow-up summary.',
+      ],
+      summaryItems: [
+        ['students', 'Students', '1/1'],
+        ['attempts', 'Attempts', '1/1'],
+        ['items', 'Items', '2/2'],
+        ['answer-reviews', 'Answer review', '1/1'],
+      ],
+      summaryLabel: 'Current matched records',
+      title: 'Follow-up answers are in focus.',
     },
     sectionState: {
       showAnswerReview: true,

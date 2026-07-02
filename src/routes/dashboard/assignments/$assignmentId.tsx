@@ -20,6 +20,7 @@ import { AssignmentResultsItemPerformanceSortControl } from '@/components/assign
 import { AssignmentResultsItemPerformanceTable } from '@/components/assignments/assignment-results-item-performance-table';
 import { AssignmentResultsMetricCard } from '@/components/assignments/assignment-results-metric-card';
 import { AssignmentResultsReviewScopePanel } from '@/components/assignments/assignment-results-review-scope-panel';
+import { AssignmentResultsReviewStatusPanel } from '@/components/assignments/assignment-results-review-status-panel';
 import { AssignmentResultsStudentSearch } from '@/components/assignments/assignment-results-student-search';
 import { AssignmentResultsStudentSummaryTable } from '@/components/assignments/assignment-results-student-summary-table';
 import { DashboardLayout } from '@/components/layout/dashboard-layout';
@@ -148,6 +149,8 @@ function LoadedAssignmentResultsPage({
         onResultAction={(actionButton) => void onResultAction(actionButton)}
         resultActions={pageView.actionButtons}
       />
+
+      <AssignmentResultsReviewStatusPanel view={pageView.reviewStatusView} />
 
       {pageView.sectionState.showStudentSearch ? (
         <>

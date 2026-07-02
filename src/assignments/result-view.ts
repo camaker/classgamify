@@ -527,6 +527,29 @@ export type AssignmentResultReviewScopeView = {
   title: string;
 };
 
+export type AssignmentResultReviewStatus =
+  | 'class-ready'
+  | 'focused'
+  | 'needs-review'
+  | 'no-matches'
+  | 'waiting-for-attempts';
+
+export type AssignmentResultReviewStatusStepView = {
+  description: string;
+  label: string;
+};
+
+export type AssignmentResultReviewStatusView = {
+  ariaLabel: string;
+  description: string;
+  status: AssignmentResultReviewStatus;
+  statusLabel: string;
+  step: AssignmentResultReviewStatusStepView;
+  summaryItems: AssignmentResultReviewScopeSummaryItemView[];
+  summaryLabel: string;
+  title: string;
+};
+
 export type AssignmentAttemptRowDisplayInput = AssignmentAttemptRowInput & {
   completedAt: Date | string | null;
   maxScore: number | null;
@@ -631,6 +654,7 @@ export type AssignmentResultsPageViewModel<
   itemPerformanceTableView: AssignmentResultItemPerformanceTableView;
   metricItems: AssignmentResultMetricItem[];
   resultView: AssignmentResultViewModel<TAttempt>;
+  reviewStatusView: AssignmentResultReviewStatusView;
   reviewScopeView: AssignmentResultReviewScopeView;
   sectionState: AssignmentResultSectionState;
   sectionViews: AssignmentResultSectionViews;
@@ -783,6 +807,12 @@ export const assignmentResultReviewScopeCopy = {
   },
   get title() {
     return m.assignment_result_review_scope_title();
+  },
+} as const;
+
+export const assignmentResultReviewStatusCopy = {
+  get summaryLabel() {
+    return m.assignment_result_review_status_summary_label();
   },
 } as const;
 
@@ -2169,6 +2199,11 @@ export function buildAssignmentResultsPageViewModel<
     controlViews,
     summary: resultView.reviewScope.summary,
   });
+  const reviewStatusView = buildAssignmentResultReviewStatusView({
+    controlViews,
+    summary: resultView.reviewScope.summary,
+    viewState,
+  });
   const attemptTableView = data
     ? buildAssignmentAttemptTableView({
         rows: resultView.filteredAttemptRows,
@@ -2310,6 +2345,7 @@ export function buildAssignmentResultsPageViewModel<
         })
       : [],
     resultView,
+    reviewStatusView,
     reviewScopeView,
     sectionState,
     sectionViews,
@@ -2525,6 +2561,35 @@ export function buildAssignmentResultCopyScopeView({
   };
 }
 
+export function buildAssignmentResultReviewStatusView({
+  controlViews,
+  summary,
+  viewState,
+}: {
+  controlViews: AssignmentResultControlViews;
+  summary: AssignmentResultReviewScopeSummary;
+  viewState: AssignmentResultResolvedViewState;
+}): AssignmentResultReviewStatusView {
+  const status = resolveAssignmentResultReviewStatus({
+    controlViews,
+    summary,
+    viewState,
+  });
+  const copy = getAssignmentResultReviewStatusCopy(status);
+
+  return {
+    ...copy,
+    ariaLabel: m.assignment_result_review_status_aria_label({
+      description: copy.description,
+      status: copy.statusLabel,
+      title: copy.title,
+    }),
+    status,
+    summaryItems: buildAssignmentResultReviewScopeSummaryItems(summary),
+    summaryLabel: assignmentResultReviewStatusCopy.summaryLabel,
+  };
+}
+
 export function buildAssignmentResultReviewScopeView({
   controlViews,
   summary,
@@ -2574,6 +2639,106 @@ export function buildAssignmentResultReviewScopeView({
     summaryLabel: assignmentResultReviewScopeCopy.matchedRecordsLabel,
     title: assignmentResultReviewScopeCopy.title,
   };
+}
+
+function resolveAssignmentResultReviewStatus({
+  controlViews,
+  summary,
+  viewState,
+}: {
+  controlViews: AssignmentResultControlViews;
+  summary: AssignmentResultReviewScopeSummary;
+  viewState: AssignmentResultResolvedViewState;
+}): AssignmentResultReviewStatus {
+  const hasAttempts =
+    summary.attemptRows.total > 0 || summary.attemptReviews.total > 0;
+  const hasAdjustedScope = [
+    controlViews.attemptReviewFilter.statusView,
+    controlViews.itemPerformanceSort.statusView,
+    controlViews.studentSearch.searchStatusView,
+    controlViews.studentSearch.sortStatusView,
+  ].some((statusView) => statusView.tone === 'custom');
+  const needsReviewFilter = viewState.attemptReviewFilter === 'needs-review';
+
+  if (!hasAttempts) return 'waiting-for-attempts';
+  if (
+    summary.students.matched === 0 ||
+    summary.attemptRows.matched === 0 ||
+    (needsReviewFilter && summary.attemptReviews.matched === 0)
+  ) {
+    return 'no-matches';
+  }
+  if (needsReviewFilter) return 'needs-review';
+  if (hasAdjustedScope) return 'focused';
+
+  return 'class-ready';
+}
+
+function getAssignmentResultReviewStatusCopy(
+  status: AssignmentResultReviewStatus
+): Omit<
+  AssignmentResultReviewStatusView,
+  'ariaLabel' | 'status' | 'summaryItems' | 'summaryLabel'
+> {
+  switch (status) {
+    case 'focused':
+      return {
+        description: m.assignment_result_review_status_focused_description(),
+        statusLabel: m.assignment_result_review_status_focused_label(),
+        step: {
+          description:
+            m.assignment_result_review_status_focused_step_description(),
+          label: m.assignment_result_review_status_focused_step_label(),
+        },
+        title: m.assignment_result_review_status_focused_title(),
+      };
+    case 'needs-review':
+      return {
+        description:
+          m.assignment_result_review_status_needs_review_description(),
+        statusLabel: m.assignment_result_review_status_needs_review_label(),
+        step: {
+          description:
+            m.assignment_result_review_status_needs_review_step_description(),
+          label: m.assignment_result_review_status_needs_review_step_label(),
+        },
+        title: m.assignment_result_review_status_needs_review_title(),
+      };
+    case 'no-matches':
+      return {
+        description: m.assignment_result_review_status_no_matches_description(),
+        statusLabel: m.assignment_result_review_status_no_matches_label(),
+        step: {
+          description:
+            m.assignment_result_review_status_no_matches_step_description(),
+          label: m.assignment_result_review_status_no_matches_step_label(),
+        },
+        title: m.assignment_result_review_status_no_matches_title(),
+      };
+    case 'waiting-for-attempts':
+      return {
+        description: m.assignment_result_review_status_waiting_description(),
+        statusLabel: m.assignment_result_review_status_waiting_label(),
+        step: {
+          description:
+            m.assignment_result_review_status_waiting_step_description(),
+          label: m.assignment_result_review_status_waiting_step_label(),
+        },
+        title: m.assignment_result_review_status_waiting_title(),
+      };
+    case 'class-ready':
+      return {
+        description:
+          m.assignment_result_review_status_class_ready_description(),
+        statusLabel: m.assignment_result_review_status_class_ready_label(),
+        step: {
+          description:
+            m.assignment_result_review_status_class_ready_step_description(),
+          label: m.assignment_result_review_status_class_ready_step_label(),
+        },
+        title: m.assignment_result_review_status_class_ready_title(),
+      };
+  }
 }
 
 function buildAssignmentResultReviewScopeItemView({
