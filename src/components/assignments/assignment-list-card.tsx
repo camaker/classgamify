@@ -69,6 +69,7 @@ export function AssignmentListCard({ assignment }: AssignmentListCardProps) {
       <CardContent className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-end">
         <AssignmentListCardSummary assignment={assignment} />
         <AssignmentListCardActions
+          assignmentId={assignment.id}
           label={assignment.actionsLabel}
           actionView={assignment.actionView}
           statusPending={updateStatusMutation.isPending}
@@ -201,11 +202,13 @@ const assignmentListDistributionStepIcons = {
 } satisfies Record<AssignmentListDistributionStepId, typeof IconChartBar>;
 
 function AssignmentListCardActions({
+  assignmentId,
   actionView,
   label,
   onUpdateStatus,
   statusPending,
 }: {
+  assignmentId: string;
   actionView: AssignmentListCardActionView;
   label: string;
   onUpdateStatus: () => void;
@@ -224,7 +227,8 @@ function AssignmentListCardActions({
       ) : null}
       {actionView.statusAction ? (
         <AssignmentListStatusActionButton
-          disabled={statusPending}
+          assignmentId={assignmentId}
+          isPending={statusPending}
           statusAction={actionView.statusAction}
           onUpdateStatus={onUpdateStatus}
         />
@@ -278,28 +282,93 @@ function AssignmentListPrintActionLink({
 }
 
 function AssignmentListStatusActionButton({
-  disabled,
+  assignmentId,
+  isPending,
   onUpdateStatus,
   statusAction,
 }: {
-  disabled: boolean;
+  assignmentId: string;
+  isPending: boolean;
   onUpdateStatus: () => void;
   statusAction: AssignmentListStatusAction;
 }) {
   const Icon = statusAction.kind === 'close-link' ? IconLock : IconLockOpen;
+  const descriptionId = getAssignmentListStatusActionElementId({
+    assignmentId,
+    statusAction,
+    suffix: 'description',
+  });
+  const currentStatusId = getAssignmentListStatusActionElementId({
+    assignmentId,
+    statusAction,
+    suffix: 'current-status',
+  });
+  const nextStatusId = getAssignmentListStatusActionElementId({
+    assignmentId,
+    statusAction,
+    suffix: 'next-status',
+  });
+  const describedBy = buildAssignmentListStatusActionDescriptionIds(
+    descriptionId,
+    currentStatusId,
+    nextStatusId
+  );
 
   return (
-    <Button
-      type="button"
-      variant="outline"
-      className="w-full bg-background lg:w-auto"
-      disabled={disabled}
-      onClick={onUpdateStatus}
-    >
-      <Icon aria-hidden="true" className="size-4" />
-      {statusAction.label}
-    </Button>
+    <div className="grid gap-1">
+      <Button
+        type="button"
+        variant="outline"
+        className="w-full bg-background lg:w-auto"
+        disabled={isPending}
+        aria-label={statusAction.ariaLabel}
+        aria-describedby={describedBy}
+        onClick={onUpdateStatus}
+      >
+        <Icon aria-hidden="true" className="size-4" />
+        {isPending ? statusAction.pendingLabel : statusAction.label}
+      </Button>
+      <p id={descriptionId} className="sr-only">
+        {statusAction.description}
+      </p>
+      <dl className="sr-only">
+        <div>
+          <dt>{statusAction.currentStatusLabel}</dt>
+          <dd id={currentStatusId}>{statusAction.currentStatusValue}</dd>
+        </div>
+        <div>
+          <dt>{statusAction.nextStatusLabel}</dt>
+          <dd id={nextStatusId}>{statusAction.nextStatusValue}</dd>
+        </div>
+      </dl>
+    </div>
   );
+}
+
+function getAssignmentListStatusActionElementId({
+  assignmentId,
+  statusAction,
+  suffix,
+}: {
+  assignmentId: string;
+  statusAction: AssignmentListStatusAction;
+  suffix: string;
+}) {
+  return `assignment-list-status-action-${getAssignmentActionDomIdPart(
+    assignmentId
+  )}-${statusAction.kind}-${suffix}`;
+}
+
+function getAssignmentActionDomIdPart(value: string) {
+  const normalizedValue = value.normalize('NFKC').trim();
+  return encodeURIComponent(normalizedValue || 'missing-assignment-id');
+}
+
+function buildAssignmentListStatusActionDescriptionIds(
+  ...ids: Array<string | undefined>
+) {
+  const descriptionIds = ids.filter(Boolean).join(' ');
+  return descriptionIds || undefined;
 }
 
 function AssignmentListShareActions({

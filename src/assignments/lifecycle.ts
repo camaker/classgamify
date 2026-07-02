@@ -24,10 +24,17 @@ export type AssignmentStatusTransitionErrorView = {
 };
 
 export type AssignmentStatusAction = {
+  ariaLabel: string;
+  currentStatusLabel: string;
+  currentStatusValue: string;
+  description: string;
   failureMessage: string;
   kind: AssignmentStatusActionKind;
   label: string;
+  nextStatusLabel: string;
   nextStatus: ManagedAssignmentStatus;
+  nextStatusValue: string;
+  pendingLabel: string;
   successMessage: string;
 };
 
@@ -250,20 +257,43 @@ function getNextManagedAssignmentStatus(
 
 export function getAssignmentStatusActionCopy(
   nextStatus: ManagedAssignmentStatus
-): Omit<AssignmentStatusAction, 'kind' | 'nextStatus'> {
+): Pick<
+  AssignmentStatusAction,
+  'description' | 'failureMessage' | 'label' | 'pendingLabel' | 'successMessage'
+> {
   if (nextStatus === 'closed') {
     return {
+      description: m.assignment_status_action_close_description(),
       failureMessage: m.assignment_status_action_failure(),
       label: m.assignment_status_action_close_label(),
+      pendingLabel: m.assignment_status_action_close_pending_label(),
       successMessage: m.assignment_status_action_close_success(),
     };
   }
 
   return {
+    description: m.assignment_status_action_reopen_description(),
     failureMessage: m.assignment_status_action_failure(),
     label: m.assignment_status_action_reopen_label(),
+    pendingLabel: m.assignment_status_action_reopen_pending_label(),
     successMessage: m.assignment_status_action_reopen_success(),
   };
+}
+
+function buildAssignmentStatusActionAriaLabel({
+  currentStatusValue,
+  label,
+  nextStatusValue,
+}: {
+  currentStatusValue: string;
+  label: string;
+  nextStatusValue: string;
+}) {
+  return m.assignment_status_action_aria_label({
+    currentStatus: currentStatusValue,
+    label,
+    nextStatus: nextStatusValue,
+  });
 }
 
 export function buildAssignmentStatusAction({
@@ -292,10 +322,27 @@ export function buildAssignmentStatusAction({
     return undefined;
   }
 
+  const copy = getAssignmentStatusActionCopy(nextStatus);
+  const currentStatusValue = getAssignmentStatusLabel(
+    currentStatus,
+    expiresAt,
+    now
+  );
+  const nextStatusValue = getAssignmentStatusLabel(nextStatus, expiresAt, now);
+
   return {
+    ariaLabel: buildAssignmentStatusActionAriaLabel({
+      currentStatusValue,
+      label: copy.label,
+      nextStatusValue,
+    }),
+    currentStatusLabel: m.assignment_status_action_current_status_label(),
+    currentStatusValue,
     kind: nextStatus === 'closed' ? 'close-link' : 'reopen-link',
     nextStatus,
-    ...getAssignmentStatusActionCopy(nextStatus),
+    nextStatusLabel: m.assignment_status_action_next_status_label(),
+    nextStatusValue,
+    ...copy,
   };
 }
 

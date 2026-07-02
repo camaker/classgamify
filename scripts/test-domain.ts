@@ -16449,13 +16449,19 @@ assert.throws(() =>
   })
 );
 assert.deepEqual(getAssignmentStatusActionCopy('closed'), {
+  description:
+    'Close this student link while keeping the frozen snapshot and existing results available to the teacher.',
   failureMessage: 'Assignment status could not be updated.',
   label: 'Close link',
+  pendingLabel: 'Closing link...',
   successMessage: 'Assignment link closed.',
 });
 assert.deepEqual(getAssignmentStatusActionCopy('published'), {
+  description:
+    'Reopen this student link so students can use the same frozen assignment snapshot again.',
   failureMessage: 'Assignment status could not be updated.',
   label: 'Reopen link',
+  pendingLabel: 'Reopening link...',
   successMessage: 'Assignment link reopened.',
 });
 const assignmentLifecycleNow = new Date('2026-01-01T10:00:00.000Z').getTime();
@@ -16563,6 +16569,16 @@ assert.match(
   assignmentLifecycleSource,
   /export type AssignmentStatusActionBlockedReason = 'missing-status-action'[\s\S]*reason: AssignmentStatusActionBlockedReason;[\s\S]*type: 'blocked'/,
   'Assignment status action execution plans should expose a structured blocked reason.'
+);
+assert.match(
+  assignmentLifecycleSource,
+  /export type AssignmentStatusAction = \{[\s\S]*ariaLabel: string;[\s\S]*currentStatusLabel: string;[\s\S]*currentStatusValue: string;[\s\S]*description: string;[\s\S]*nextStatusLabel: string;[\s\S]*nextStatusValue: string;[\s\S]*pendingLabel: string;/,
+  'Assignment status actions should expose prepared status labels, descriptions, pending labels, and aria labels.'
+);
+assert.match(
+  assignmentLifecycleSource,
+  /buildAssignmentStatusActionAriaLabel[\s\S]*assignment_status_action_aria_label[\s\S]*currentStatus: currentStatusValue[\s\S]*nextStatus: nextStatusValue/,
+  'Assignment status action aria labels should be localized through the assignment lifecycle domain.'
 );
 assert.match(
   assignmentLifecycleSource,
@@ -16718,10 +16734,19 @@ assert.deepEqual(
     isPersisted: true,
   }),
   {
+    ariaLabel:
+      'Close link. Current status: Open. Next status after this action: Closed.',
+    currentStatusLabel: 'Current status',
+    currentStatusValue: 'Open',
+    description:
+      'Close this student link while keeping the frozen snapshot and existing results available to the teacher.',
     failureMessage: 'Assignment status could not be updated.',
     kind: 'close-link',
     label: 'Close link',
+    nextStatusLabel: 'Next status',
     nextStatus: 'closed',
+    nextStatusValue: 'Closed',
+    pendingLabel: 'Closing link...',
     successMessage: 'Assignment link closed.',
   }
 );
@@ -16732,10 +16757,19 @@ assert.deepEqual(
     isPersisted: true,
   }),
   {
+    ariaLabel:
+      'Reopen link. Current status: Closed. Next status after this action: Open.',
+    currentStatusLabel: 'Current status',
+    currentStatusValue: 'Closed',
+    description:
+      'Reopen this student link so students can use the same frozen assignment snapshot again.',
     failureMessage: 'Assignment status could not be updated.',
     kind: 'reopen-link',
     label: 'Reopen link',
+    nextStatusLabel: 'Next status',
     nextStatus: 'published',
+    nextStatusValue: 'Open',
+    pendingLabel: 'Reopening link...',
     successMessage: 'Assignment link reopened.',
   }
 );
@@ -28825,7 +28859,7 @@ assert.doesNotMatch(
 );
 assert.match(
   assignmentListCardComponentSource,
-  /AssignmentListCardActions[\s\S]*label=\{assignment\.actionsLabel\}[\s\S]*function AssignmentListCardActions[\s\S]*<section[\s\S]*aria-label=\{label\}/,
+  /AssignmentListCardActions[\s\S]*assignmentId=\{assignment\.id\}[\s\S]*label=\{assignment\.actionsLabel\}[\s\S]*function AssignmentListCardActions\(\{[\s\S]*assignmentId,[\s\S]*<section[\s\S]*aria-label=\{label\}/,
   'Assignment list card actions should expose the prepared action-region label.'
 );
 assert.doesNotMatch(
@@ -28880,8 +28914,8 @@ assert.match(
 );
 assert.match(
   assignmentListCardComponentSource,
-  /AssignmentListCardActions[\s\S]*actionView=\{assignment\.actionView\}[\s\S]*onUpdateStatus=\{updateStatus\}/,
-  'Assignment list card component should delegate prepared action rendering to a focused action group.'
+  /AssignmentListCardActions[\s\S]*assignmentId=\{assignment\.id\}[\s\S]*actionView=\{assignment\.actionView\}[\s\S]*onUpdateStatus=\{updateStatus\}/,
+  'Assignment list card component should delegate prepared action rendering and assignment identity to a focused action group.'
 );
 assert.match(
   assignmentListCardComponentSource,
@@ -28915,8 +28949,13 @@ assert.match(
 );
 assert.match(
   assignmentListCardComponentSource,
-  /function AssignmentListStatusActionButton[\s\S]*statusAction\.kind[\s\S]*statusAction\.label/,
-  'Assignment list status action button should render prepared lifecycle action labels.'
+  /function AssignmentListStatusActionButton[\s\S]*assignmentId: string[\s\S]*isPending: boolean[\s\S]*statusAction\.kind[\s\S]*getAssignmentListStatusActionElementId\([\s\S]*suffix: 'description'[\s\S]*suffix: 'current-status'[\s\S]*suffix: 'next-status'[\s\S]*buildAssignmentListStatusActionDescriptionIds\([\s\S]*descriptionId,[\s\S]*currentStatusId,[\s\S]*nextStatusId[\s\S]*aria-label=\{statusAction\.ariaLabel\}[\s\S]*aria-describedby=\{describedBy\}[\s\S]*isPending \? statusAction\.pendingLabel : statusAction\.label[\s\S]*id=\{descriptionId\}[\s\S]*statusAction\.description[\s\S]*statusAction\.currentStatusLabel[\s\S]*id=\{currentStatusId\}[\s\S]*statusAction\.currentStatusValue[\s\S]*statusAction\.nextStatusLabel[\s\S]*id=\{nextStatusId\}[\s\S]*statusAction\.nextStatusValue/,
+  'Assignment list status action button should render prepared lifecycle action labels, pending labels, descriptions, aria labels, and current/next status summaries.'
+);
+assert.match(
+  assignmentListCardComponentSource,
+  /function getAssignmentListStatusActionElementId\(\{[\s\S]*assignmentId,[\s\S]*statusAction,[\s\S]*suffix,[\s\S]*\}[\s\S]*assignment-list-status-action-\$\{getAssignmentActionDomIdPart\([\s\S]*assignmentId[\s\S]*\)\}-\$\{statusAction\.kind\}-\$\{suffix\}[\s\S]*function getAssignmentActionDomIdPart\(value: string\)[\s\S]*normalize\('NFKC'\)\.trim\(\)[\s\S]*encodeURIComponent/,
+  'Assignment list status action ids should be stable and whitespace-safe per assignment card.'
 );
 assert.match(
   assignmentListCardComponentSource,
@@ -29017,7 +29056,7 @@ assert.doesNotMatch(
 );
 assert.doesNotMatch(
   assignmentListCardComponentSource,
-  /statusAction\.nextStatus/,
+  /statusAction\.nextStatus\b/,
   'Assignment list card component should not rebuild status mutation input from status action details.'
 );
 assert.match(
@@ -35926,10 +35965,19 @@ assert.deepEqual(
         to: Routes.Play,
       },
       statusAction: {
+        ariaLabel:
+          'Close link. Current status: Open. Next status after this action: Closed.',
+        currentStatusLabel: 'Current status',
+        currentStatusValue: 'Open',
+        description:
+          'Close this student link while keeping the frozen snapshot and existing results available to the teacher.',
         failureMessage: 'Assignment status could not be updated.',
         kind: 'close-link',
         label: 'Close link',
+        nextStatusLabel: 'Next status',
         nextStatus: 'closed',
+        nextStatusValue: 'Closed',
+        pendingLabel: 'Closing link...',
         successMessage: 'Assignment link closed.',
       },
     },
@@ -36233,10 +36281,19 @@ assert.deepEqual(
     showResultsAction: true,
     showShareActions: true,
     statusAction: {
+      ariaLabel:
+        'Close link. Current status: Open. Next status after this action: Closed.',
+      currentStatusLabel: 'Current status',
+      currentStatusValue: 'Open',
+      description:
+        'Close this student link while keeping the frozen snapshot and existing results available to the teacher.',
       failureMessage: 'Assignment status could not be updated.',
       kind: 'close-link',
       label: 'Close link',
+      nextStatusLabel: 'Next status',
       nextStatus: 'closed',
+      nextStatusValue: 'Closed',
+      pendingLabel: 'Closing link...',
       successMessage: 'Assignment link closed.',
     },
   }
@@ -36264,10 +36321,19 @@ assert.deepEqual(
     showResultsAction: true,
     showShareActions: true,
     statusAction: {
+      ariaLabel:
+        'Reopen link. Current status: Closed. Next status after this action: Open.',
+      currentStatusLabel: 'Current status',
+      currentStatusValue: 'Closed',
+      description:
+        'Reopen this student link so students can use the same frozen assignment snapshot again.',
       failureMessage: 'Assignment status could not be updated.',
       kind: 'reopen-link',
       label: 'Reopen link',
+      nextStatusLabel: 'Next status',
       nextStatus: 'published',
+      nextStatusValue: 'Open',
+      pendingLabel: 'Reopening link...',
       successMessage: 'Assignment link reopened.',
     },
   }
@@ -36296,10 +36362,19 @@ assert.deepEqual(
     showResultsAction: true,
     showShareActions: true,
     statusAction: {
+      ariaLabel:
+        'Close link. Current status: Expired. Next status after this action: Closed.',
+      currentStatusLabel: 'Current status',
+      currentStatusValue: 'Expired',
+      description:
+        'Close this student link while keeping the frozen snapshot and existing results available to the teacher.',
       failureMessage: 'Assignment status could not be updated.',
       kind: 'close-link',
       label: 'Close link',
+      nextStatusLabel: 'Next status',
       nextStatus: 'closed',
+      nextStatusValue: 'Closed',
+      pendingLabel: 'Closing link...',
       successMessage: 'Assignment link closed.',
     },
   }
