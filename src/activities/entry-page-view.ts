@@ -77,8 +77,23 @@ export type WorksheetsPageModeCardView = {
   action: EntryAction;
   contentRequirements: TemplateRequirementView[];
   description: string;
+  signalLabel: string;
+  signalViews: WorksheetsPageModeSignalView[];
   template: WorksheetModeTemplate;
   title: string;
+};
+
+export type WorksheetsPageModeSignalId =
+  | 'assignment-link'
+  | 'editor-scaffold'
+  | 'results-export';
+
+export type WorksheetsPageModeSignalView = {
+  ariaLabel: string;
+  description: string;
+  id: WorksheetsPageModeSignalId;
+  label: string;
+  value: string;
 };
 
 export type WorksheetsPageResultSignalId =
@@ -191,6 +206,7 @@ export function buildWorksheetsPageViewModel({
       const template = activityTemplates.find(
         (item) => item.type === mode.template
       );
+      const signalViews = buildWorksheetsPageModeSignalViews();
 
       return {
         action: buildWorksheetModeEntryAction(mode),
@@ -198,6 +214,8 @@ export function buildWorksheetsPageViewModel({
           ? formatTemplateRequirementViews(template.contentRequirements)
           : [],
         description: mode.description,
+        signalLabel: m.worksheets_page_mode_signal_label(),
+        signalViews,
         template: mode.template,
         title: mode.title,
       };
@@ -254,6 +272,38 @@ export function buildWorksheetsPageViewModel({
       positionLabel: formatWorksheetsPageWorkflowPosition(index),
     })),
   };
+}
+
+function buildWorksheetsPageModeSignalViews(): WorksheetsPageModeSignalView[] {
+  const signals = [
+    {
+      description: m.worksheets_page_mode_signal_editor_description(),
+      id: 'editor-scaffold',
+      label: m.worksheets_page_mode_signal_editor_label(),
+      value: m.worksheets_page_mode_signal_editor_value(),
+    },
+    {
+      description: m.worksheets_page_mode_signal_assignment_description(),
+      id: 'assignment-link',
+      label: m.worksheets_page_mode_signal_assignment_label(),
+      value: m.worksheets_page_mode_signal_assignment_value(),
+    },
+    {
+      description: m.worksheets_page_mode_signal_results_description(),
+      id: 'results-export',
+      label: m.worksheets_page_mode_signal_results_label(),
+      value: m.worksheets_page_mode_signal_results_value(),
+    },
+  ] satisfies Array<Omit<WorksheetsPageModeSignalView, 'ariaLabel'>>;
+
+  return signals.map((signal) => ({
+    ...signal,
+    ariaLabel: m.worksheets_page_mode_signal_aria_label({
+      description: signal.description,
+      label: signal.label,
+      value: signal.value,
+    }),
+  }));
 }
 
 function formatWorksheetsPageWorkflowPosition(index: number) {

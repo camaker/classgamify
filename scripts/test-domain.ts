@@ -5505,10 +5505,25 @@ assert.match(
   /mode\.contentRequirements\.map[\s\S]*key=\{requirement\.id\}[\s\S]*requirement\.label[\s\S]*to=\{getPathWithLocale\(mode\.action\.to\)\}[\s\S]*mode\.action\.search/,
   'Worksheet mode cards should render structured content requirement badges before the locale-aware create action.'
 );
+assert.match(
+  worksheetModeCardSource,
+  /WorksheetsPageModeSignalView[\s\S]*const signalLabelId = `worksheet-mode-\$\{mode\.template\}-signals`[\s\S]*aria-labelledby=\{signalLabelId\}[\s\S]*id=\{signalLabelId\}[\s\S]*mode\.signalLabel[\s\S]*mode\.signalViews\.map[\s\S]*WorksheetModeSignal[\s\S]*key=\{signalView\.id\}/,
+  'Worksheet mode cards should render prepared same-model signal groups from the worksheet mode-card view.'
+);
+assert.match(
+  worksheetModeCardSource,
+  /function WorksheetModeSignal[\s\S]*signalView: WorksheetsPageModeSignalView[\s\S]*descriptionId = `worksheet-mode-\$\{modeTemplate\}-\$\{signalView\.id\}-description`[\s\S]*signalView\.label[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*aria-label=\{signalView\.ariaLabel\}[\s\S]*signalView\.value[\s\S]*signalView\.description/,
+  'Worksheet mode signal rows should expose prepared labels, values, and hidden descriptions for assistive technology.'
+);
 assert.doesNotMatch(
   worksheetModeCardSource,
   /key=\{requirement\}|>\s*\{requirement\}\s*</,
   'Worksheet mode cards should not key or render requirement badges from bare localized strings.'
+);
+assert.doesNotMatch(
+  `${worksheetsRouteSource}\n${worksheetModeCardSource}`,
+  /Same product loop|Shared activity|Student link|Export-ready|同一产品闭环|共享活动|学生链接|可导出/,
+  'Worksheets route and mode cards should not hard-code same-model signal copy.'
 );
 assert.doesNotMatch(
   worksheetModeCardSource,
@@ -29450,6 +29465,57 @@ assert.deepEqual(
     ['group-sort', [['groups', 'groups']]],
   ]
 );
+const expectedWorksheetModeSignalViews = [
+  {
+    ariaLabel:
+      'Editor: Shared activity. Loads the selected scaffold in /create using the normal structured activity input.',
+    description:
+      'Loads the selected scaffold in /create using the normal structured activity input.',
+    id: 'editor-scaffold',
+    label: 'Editor',
+    value: 'Shared activity',
+  },
+  {
+    ariaLabel:
+      'Assignment: Student link. Publishes through the same assignment snapshot and student runner instead of a separate worksheet product.',
+    description:
+      'Publishes through the same assignment snapshot and student runner instead of a separate worksheet product.',
+    id: 'assignment-link',
+    label: 'Assignment',
+    value: 'Student link',
+  },
+  {
+    ariaLabel:
+      'Results: Export-ready. Attempts, accepted alternatives, reteach priorities, and CSV exports stay on the assignment results model.',
+    description:
+      'Attempts, accepted alternatives, reteach priorities, and CSV exports stay on the assignment results model.',
+    id: 'results-export',
+    label: 'Results',
+    value: 'Export-ready',
+  },
+];
+assert.deepEqual(
+  worksheetsPageView.modeCards.map((card) => [
+    card.template,
+    card.signalLabel,
+    card.signalViews.map((signalView) => [
+      signalView.id,
+      signalView.label,
+      signalView.value,
+      signalView.ariaLabel,
+    ]),
+  ]),
+  WORKSHEET_MODE_TEMPLATES.map((template) => [
+    template,
+    'Same product loop',
+    expectedWorksheetModeSignalViews.map((signalView) => [
+      signalView.id,
+      signalView.label,
+      signalView.value,
+      signalView.ariaLabel,
+    ]),
+  ])
+);
 assert.deepEqual(worksheetsPageView, {
   hero: {
     badgeLabel: 'Liveworksheets-style modes',
@@ -29497,6 +29563,8 @@ assert.deepEqual(worksheetsPageView, {
       contentRequirements: [{ id: 'questions', label: 'questions' }],
       description:
         'Place short answers directly into sentence gaps for grammar, spelling, vocabulary, or reading checks.',
+      signalLabel: 'Same product loop',
+      signalViews: expectedWorksheetModeSignalViews,
       template: 'fill-blank',
       title: 'Fill blanks',
     },
@@ -29509,6 +29577,8 @@ assert.deepEqual(worksheetsPageView, {
       contentRequirements: [{ id: 'pairs', label: 'match pairs' }],
       description:
         'Turn terms and definitions into a two-column connection board that feels familiar to worksheet users.',
+      signalLabel: 'Same product loop',
+      signalViews: expectedWorksheetModeSignalViews,
       template: 'line-match',
       title: 'Line matching',
     },
@@ -29521,6 +29591,8 @@ assert.deepEqual(worksheetsPageView, {
       contentRequirements: [{ id: 'questions', label: 'questions' }],
       description:
         'Use spoken tracks for dictation, comprehension, or pronunciation follow-up while hiding transcripts before review.',
+      signalLabel: 'Same product loop',
+      signalViews: expectedWorksheetModeSignalViews,
       template: 'listening',
       title: 'Listening prompts',
     },
@@ -29533,6 +29605,8 @@ assert.deepEqual(worksheetsPageView, {
       contentRequirements: [{ id: 'groups', label: 'groups' }],
       description:
         'Ask learners to classify words, examples, or concepts into teacher-defined groups before seeing the answer pattern.',
+      signalLabel: 'Same product loop',
+      signalViews: expectedWorksheetModeSignalViews,
       template: 'group-sort',
       title: 'Drag sorting',
     },
@@ -29717,6 +29791,11 @@ assert.match(
 );
 assert.match(
   entryPageViewSource,
+  /export type WorksheetsPageModeCardView = \{[\s\S]*signalLabel: string;[\s\S]*signalViews: WorksheetsPageModeSignalView\[\];[\s\S]*export type WorksheetsPageModeSignalId =[\s\S]*'assignment-link'[\s\S]*'editor-scaffold'[\s\S]*'results-export'[\s\S]*export type WorksheetsPageModeSignalView = \{[\s\S]*ariaLabel: string;[\s\S]*description: string;[\s\S]*id: WorksheetsPageModeSignalId;[\s\S]*label: string;[\s\S]*value: string;/,
+  'Worksheets mode card view-model should expose structured same-model handoff signals with accessible labels.'
+);
+assert.match(
+  entryPageViewSource,
   /export type WorksheetsPageResultSignalId =[\s\S]*'accepted-answers'[\s\S]*'attempts'[\s\S]*'csv-export'[\s\S]*'reteach'[\s\S]*export type WorksheetsPageResultSignalView = \{[\s\S]*id: WorksheetsPageResultSignalId;[\s\S]*label: string;[\s\S]*export type WorksheetsPageWorkflowStepId =[\s\S]*'assign'[\s\S]*'create'[\s\S]*'review'[\s\S]*'student-submit'[\s\S]*export type WorksheetsPageWorkflowStepView = \{[\s\S]*id: WorksheetsPageWorkflowStepId;[\s\S]*label: string;[\s\S]*positionLabel: string;/,
   'Worksheets page view-model should expose stable ids for workflow steps and result signals.'
 );
@@ -29776,6 +29855,11 @@ assert.match(
   entryPageViewSource,
   /buildWorksheetsPageViewModel[\s\S]*activityTemplates = getActivityTemplates\(\)[\s\S]*formatTemplateRequirementViews\(template\.contentRequirements\)/,
   'Worksheets page view-model should derive structured mode card requirements from shared activity template definitions.'
+);
+assert.match(
+  entryPageViewSource,
+  /const signalViews = buildWorksheetsPageModeSignalViews\(\)[\s\S]*signalLabel: m\.worksheets_page_mode_signal_label\(\)[\s\S]*signalViews,[\s\S]*function buildWorksheetsPageModeSignalViews\(\): WorksheetsPageModeSignalView\[\][\s\S]*worksheets_page_mode_signal_editor_[\s\S]*worksheets_page_mode_signal_assignment_[\s\S]*worksheets_page_mode_signal_results_[\s\S]*worksheets_page_mode_signal_aria_label/,
+  'Worksheets page view-model should attach localized same-model signals to every worksheet mode card.'
 );
 assert.doesNotMatch(
   entryPageViewSource,
