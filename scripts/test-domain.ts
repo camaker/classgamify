@@ -10230,8 +10230,13 @@ assert.match(
 );
 assert.match(
   studentRunnerSubmissionSource,
-  /type StudentRunnerCopy = \{[\s\S]*studentNameDescription: string;[\s\S]*studentNameLockedDescription: string;[\s\S]*export type AnonymousAttemptCopy = \{[\s\S]*browserLabelAriaLabel: string;[\s\S]*browserLabel: string;[\s\S]*browserLabelCaption: string;[\s\S]*retryDescription: string;[\s\S]*summary: \{[\s\S]*hidesRawToken: boolean;[\s\S]*showsBrowserLabel: boolean;[\s\S]*export type StudentAttemptResultDisplay = \{/,
+  /type StudentRunnerCopy = \{[\s\S]*studentNameDescription: string;[\s\S]*studentNameLockedDescription: string;[\s\S]*export type AnonymousAttemptCopy = \{[\s\S]*browserLabelAriaLabel: string;[\s\S]*browserLabel: string;[\s\S]*browserLabelCaption: string;[\s\S]*retryDescription: string;[\s\S]*summary: \{[\s\S]*hidesRawToken: boolean;[\s\S]*itemCount: number;[\s\S]*showsBrowserLabel: boolean;[\s\S]*summaryItems: AnonymousAttemptSummaryItem\[\];[\s\S]*export type AnonymousAttemptSummaryItemId =[\s\S]*'browser-label'[\s\S]*'retry-browser'[\s\S]*'token-privacy'[\s\S]*export type StudentAttemptResultDisplay = \{/,
   'Student submission domain should expose explicit identity copy, control, result, and timer badge contracts.'
+);
+assert.match(
+  studentRunnerSubmissionSource,
+  /buildAnonymousAttemptSummaryItems[\s\S]*student_runner_anonymous_summary_browser_description[\s\S]*id: 'browser-label'[\s\S]*student_runner_anonymous_summary_retry_description[\s\S]*id: 'retry-browser'[\s\S]*student_runner_anonymous_summary_privacy_description[\s\S]*id: 'token-privacy'[\s\S]*student_runner_anonymous_summary_item_aria/,
+  'Anonymous student identity copy should prepare structured browser, retry, and privacy summary items from localized messages.'
 );
 assert.match(
   studentRunnerSubmissionSource,
@@ -10469,7 +10474,7 @@ assert.match(
 );
 assert.match(
   studentRunnerAttemptShellSource,
-  /function StudentRunnerIdentityPanel[\s\S]*identityView\.mode === 'student-name'[\s\S]*aria-label=\{identityView\.ariaLabel\}[\s\S]*id="student-name"[\s\S]*disabled=\{identityView\.disabled\}[\s\S]*identityView\.description[\s\S]*aria-label=\{identityView\.ariaLabel\}[\s\S]*identityView\.copy\.description[\s\S]*aria-label=\{identityView\.copy\.browserLabelAriaLabel\}[\s\S]*identityView\.copy\.browserLabelCaption[\s\S]*identityView\.copy\.browserLabel[\s\S]*identityView\.copy\.retryDescription/,
+  /function StudentRunnerIdentityPanel[\s\S]*identityView\.mode === 'student-name'[\s\S]*aria-label=\{identityView\.ariaLabel\}[\s\S]*id="student-name"[\s\S]*disabled=\{identityView\.disabled\}[\s\S]*identityView\.description[\s\S]*aria-label=\{identityView\.ariaLabel\}[\s\S]*identityView\.copy\.description[\s\S]*aria-label=\{identityView\.copy\.browserLabelAriaLabel\}[\s\S]*identityView\.copy\.browserLabelCaption[\s\S]*identityView\.copy\.browserLabel[\s\S]*identityView\.copy\.summaryItems\.map[\s\S]*aria-label=\{summaryItem\.ariaLabel\}[\s\S]*key=\{summaryItem\.id\}[\s\S]*summaryItem\.label[\s\S]*summaryItem\.value[\s\S]*summaryItem\.description[\s\S]*identityView\.copy\.retryDescription/,
   'Student runner identity panel should render prepared named-student lock state and anonymous browser identity views.'
 );
 assert.doesNotMatch(
@@ -11525,6 +11530,36 @@ assert.deepEqual(
     label: 'Anonymous student 2',
   }
 );
+function buildExpectedAnonymousAttemptSummaryItems(label: string) {
+  return [
+    {
+      ariaLabel: `Browser label: ${label}. This short label identifies the current browser on this assignment link.`,
+      description:
+        'This short label identifies the current browser on this assignment link.',
+      id: 'browser-label',
+      label: 'Browser label',
+      value: label,
+    },
+    {
+      ariaLabel:
+        'Retry identity: Same browser. Use this browser for another attempt so the attempt limit and result grouping stay consistent.',
+      description:
+        'Use this browser for another attempt so the attempt limit and result grouping stay consistent.',
+      id: 'retry-browser',
+      label: 'Retry identity',
+      value: 'Same browser',
+    },
+    {
+      ariaLabel:
+        'Result privacy: Token hidden. Teachers see an anonymous student label in results, not the raw browser token.',
+      description:
+        'Teachers see an anonymous student label in results, not the raw browser token.',
+      id: 'token-privacy',
+      label: 'Result privacy',
+      value: 'Token hidden',
+    },
+  ];
+}
 assert.deepEqual(buildAnonymousAttemptCopy({}), {
   browserLabelAriaLabel: 'Current browser identity: Anonymous browser',
   browserLabel: 'Anonymous browser',
@@ -11535,8 +11570,10 @@ assert.deepEqual(buildAnonymousAttemptCopy({}), {
     'If you submit again, use this same browser so your attempts stay together.',
   summary: {
     hidesRawToken: true,
+    itemCount: 3,
     showsBrowserLabel: true,
   },
+  summaryItems: buildExpectedAnonymousAttemptSummaryItems('Anonymous browser'),
   title: 'Anonymous attempt',
 });
 assert.deepEqual(
@@ -11552,8 +11589,12 @@ assert.deepEqual(
       'If you submit again, use this same browser so your attempts stay together.',
     summary: {
       hidesRawToken: true,
+      itemCount: 3,
       showsBrowserLabel: true,
     },
+    summaryItems: buildExpectedAnonymousAttemptSummaryItems(
+      'Anonymous browser A1B2C3'
+    ),
     title: 'Anonymous attempt',
   }
 );
@@ -11569,11 +11610,51 @@ assert.deepEqual(
       'If you submit again, use this same browser so your attempts stay together.',
     summary: {
       hidesRawToken: true,
+      itemCount: 3,
       showsBrowserLabel: true,
     },
+    summaryItems: buildExpectedAnonymousAttemptSummaryItems('Anon 1'),
     title: 'Anonymous attempt',
   }
 );
+overwriteGetLocale(() => 'zh');
+try {
+  assert.deepEqual(
+    buildAnonymousAttemptCopy({ browserLabel: ' 匿名浏览器 A1B2C3 ' })
+      .summaryItems,
+    [
+      {
+        ariaLabel:
+          '浏览器标签：匿名浏览器 A1B2C3。这个短标签用于识别当前浏览器在这条作业链接上的身份。',
+        description:
+          '这个短标签用于识别当前浏览器在这条作业链接上的身份。',
+        id: 'browser-label',
+        label: '浏览器标签',
+        value: '匿名浏览器 A1B2C3',
+      },
+      {
+        ariaLabel:
+          '再次作答身份：同一浏览器。再次作答时使用这个浏览器，作答次数和结果归组才会保持一致。',
+        description:
+          '再次作答时使用这个浏览器，作答次数和结果归组才会保持一致。',
+        id: 'retry-browser',
+        label: '再次作答身份',
+        value: '同一浏览器',
+      },
+      {
+        ariaLabel:
+          '结果隐私：令牌已隐藏。老师结果里会看到匿名学生标签，不会看到原始浏览器令牌。',
+        description:
+          '老师结果里会看到匿名学生标签，不会看到原始浏览器令牌。',
+        id: 'token-privacy',
+        label: '结果隐私',
+        value: '令牌已隐藏',
+      },
+    ]
+  );
+} finally {
+  overwriteGetLocale(() => 'en');
+}
 const anonymousAttemptCopyWithToken = buildAnonymousAttemptCopy({
   browserLabel: getAnonymousBrowserLabel('anonymous-token-1'),
 });
@@ -20960,8 +21041,12 @@ const studentRunnerAnonymousAttemptCopy = {
     'If you submit again, use this same browser so your attempts stay together.',
   summary: {
     hidesRawToken: true,
+    itemCount: 3,
     showsBrowserLabel: true,
   },
+  summaryItems: buildExpectedAnonymousAttemptSummaryItems(
+    studentRunnerAnonymousBrowserLabel
+  ),
   title: 'Anonymous attempt',
 };
 assert.equal(

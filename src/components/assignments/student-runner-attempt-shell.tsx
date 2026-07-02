@@ -183,6 +183,25 @@ function StudentRunnerIdentityPanel({
           {identityView.copy.browserLabel}
         </p>
       </section>
+      <div className="mt-3 grid gap-2 sm:grid-cols-3">
+        {identityView.copy.summaryItems.map((summaryItem) => (
+          <section
+            aria-label={summaryItem.ariaLabel}
+            className="rounded-md border bg-background px-3 py-2"
+            key={summaryItem.id}
+          >
+            <p className="text-[11px] leading-4 text-muted-foreground">
+              {summaryItem.label}
+            </p>
+            <p className="mt-1 break-words font-medium text-sm">
+              {summaryItem.value}
+            </p>
+            <p className="mt-1 text-[11px] leading-4 text-muted-foreground">
+              {summaryItem.description}
+            </p>
+          </section>
+        ))}
+      </div>
       <p className="mt-2 text-xs leading-5 text-muted-foreground">
         {identityView.copy.retryDescription}
       </p>

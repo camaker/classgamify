@@ -227,9 +227,24 @@ export type AnonymousAttemptCopy = {
   retryDescription: string;
   summary: {
     hidesRawToken: boolean;
+    itemCount: number;
     showsBrowserLabel: boolean;
   };
+  summaryItems: AnonymousAttemptSummaryItem[];
   title: string;
+};
+
+export type AnonymousAttemptSummaryItemId =
+  | 'browser-label'
+  | 'retry-browser'
+  | 'token-privacy';
+
+export type AnonymousAttemptSummaryItem = {
+  ariaLabel: string;
+  description: string;
+  id: AnonymousAttemptSummaryItemId;
+  label: string;
+  value: string;
 };
 
 type StudentAttemptAnonymousTokenResolver = {
@@ -735,6 +750,7 @@ export function buildAnonymousAttemptCopy({
 }): AnonymousAttemptCopy {
   const label =
     normalizeRuntimeDisplayText(browserLabel) || getAnonymousBrowserLabel();
+  const summaryItems = buildAnonymousAttemptSummaryItems(label);
 
   return {
     browserLabelAriaLabel: m.student_runner_anonymous_browser_label_aria({
@@ -746,9 +762,58 @@ export function buildAnonymousAttemptCopy({
     retryDescription: m.student_runner_anonymous_retry_description(),
     summary: {
       hidesRawToken: true,
+      itemCount: summaryItems.length,
       showsBrowserLabel: Boolean(label),
     },
+    summaryItems,
     title: m.student_runner_anonymous_attempt_title(),
+  };
+}
+
+function buildAnonymousAttemptSummaryItems(
+  browserLabel: string
+): AnonymousAttemptSummaryItem[] {
+  return [
+    buildAnonymousAttemptSummaryItem({
+      description: m.student_runner_anonymous_summary_browser_description(),
+      id: 'browser-label',
+      label: m.student_runner_anonymous_summary_browser_label(),
+      value: browserLabel,
+    }),
+    buildAnonymousAttemptSummaryItem({
+      description: m.student_runner_anonymous_summary_retry_description(),
+      id: 'retry-browser',
+      label: m.student_runner_anonymous_summary_retry_label(),
+      value: m.student_runner_anonymous_summary_retry_value(),
+    }),
+    buildAnonymousAttemptSummaryItem({
+      description: m.student_runner_anonymous_summary_privacy_description(),
+      id: 'token-privacy',
+      label: m.student_runner_anonymous_summary_privacy_label(),
+      value: m.student_runner_anonymous_summary_privacy_value(),
+    }),
+  ];
+}
+
+function buildAnonymousAttemptSummaryItem({
+  description,
+  id,
+  label,
+  value,
+}: Omit<
+  AnonymousAttemptSummaryItem,
+  'ariaLabel'
+>): AnonymousAttemptSummaryItem {
+  return {
+    ariaLabel: m.student_runner_anonymous_summary_item_aria({
+      description,
+      label,
+      value,
+    }),
+    description,
+    id,
+    label,
+    value,
   };
 }
 
