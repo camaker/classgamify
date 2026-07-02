@@ -88,6 +88,16 @@ export const ACTIVITY_EDITOR_READINESS_PANEL_LIMITS = {
   lockedOptions: 4,
 } as const;
 
+export const ACTIVITY_EDITOR_SECTION_IDS = {
+  editor: 'activity-editor',
+  templateReadiness: 'activity-template-readiness',
+} as const;
+
+export type ActivityEditorSectionId =
+  (typeof ACTIVITY_EDITOR_SECTION_IDS)[keyof typeof ACTIVITY_EDITOR_SECTION_IDS];
+
+export type ActivityEditorSectionHref = `#${ActivityEditorSectionId}`;
+
 type ActivityEditorSource = {
   content: ActivityContent;
   description?: string | null;
@@ -112,10 +122,26 @@ export type ActivityEditorTemplateSetupView = {
   actionLabel: string;
   description: string;
   requirementBadges: ActivityEditorTemplateRequirementBadgeView[];
+  reviewChecklistItems: ActivityEditorTemplateScaffoldReviewItemView[];
+  reviewChecklistLabel: string;
   scaffoldSummary: ActivityTemplateScaffoldReadinessSummary;
   shortName: string;
   successMessage: string;
   title: string;
+};
+
+export type ActivityEditorTemplateScaffoldReviewItemId =
+  | 'check-ready-modes'
+  | 'edit-before-save'
+  | 'review-fields';
+
+export type ActivityEditorTemplateScaffoldReviewItemView = {
+  actionHref: ActivityEditorSectionHref;
+  actionLabel: string;
+  ariaLabel: string;
+  description: string;
+  id: ActivityEditorTemplateScaffoldReviewItemId;
+  label: string;
 };
 
 export type ActivityEditorTemplateRequirementBadgeView =
@@ -423,7 +449,7 @@ export type ActivityEditRouteState =
       status: 'ready';
     };
 
-const activityEditorSectionId = 'activity-editor';
+const activityEditorSectionId = ACTIVITY_EDITOR_SECTION_IDS.editor;
 
 export function getActivityEditorDefaultInput(): CreateActivityInput {
   return {
@@ -1270,6 +1296,8 @@ export function buildActivityEditorTemplateSetupView(
         requirement: requirement.label,
       }),
     })),
+    reviewChecklistItems: buildActivityEditorTemplateScaffoldReviewItems(),
+    reviewChecklistLabel: m.activity_editor_scaffold_review_label(),
     scaffoldSummary: buildActivityTemplateScaffoldReadinessSummary({
       current,
       templateType,
@@ -1280,6 +1308,42 @@ export function buildActivityEditorTemplateSetupView(
     }),
     title: m.activity_editor_setup_title({ template: template.name }),
   };
+}
+
+function buildActivityEditorTemplateScaffoldReviewItems(): ActivityEditorTemplateScaffoldReviewItemView[] {
+  const items = [
+    {
+      actionHref: `#${ACTIVITY_EDITOR_SECTION_IDS.editor}`,
+      actionLabel: m.activity_editor_scaffold_review_fields_action(),
+      description: m.activity_editor_scaffold_review_fields_description(),
+      id: 'review-fields',
+      label: m.activity_editor_scaffold_review_fields_label(),
+    },
+    {
+      actionHref: `#${ACTIVITY_EDITOR_SECTION_IDS.templateReadiness}`,
+      actionLabel: m.activity_editor_scaffold_review_modes_action(),
+      description: m.activity_editor_scaffold_review_modes_description(),
+      id: 'check-ready-modes',
+      label: m.activity_editor_scaffold_review_modes_label(),
+    },
+    {
+      actionHref: `#${ACTIVITY_EDITOR_SECTION_IDS.editor}`,
+      actionLabel: m.activity_editor_scaffold_review_save_action(),
+      description: m.activity_editor_scaffold_review_save_description(),
+      id: 'edit-before-save',
+      label: m.activity_editor_scaffold_review_save_label(),
+    },
+  ] satisfies Array<
+    Omit<ActivityEditorTemplateScaffoldReviewItemView, 'ariaLabel'>
+  >;
+
+  return items.map((item) => ({
+    ...item,
+    ariaLabel: m.activity_editor_scaffold_review_item_aria_label({
+      description: item.description,
+      label: item.label,
+    }),
+  }));
 }
 
 export function buildActivityEditorTemplateView({

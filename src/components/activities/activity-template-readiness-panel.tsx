@@ -10,14 +10,16 @@ import { cn } from '@/lib/utils';
 import { IconLayoutGrid, IconSparkles } from '@tabler/icons-react';
 
 type ActivityTemplateReadinessPanelProps = {
+  sectionId?: string;
   summary: ActivityTemplateReadinessPanelSummary;
 };
 
 export function ActivityTemplateReadinessPanel({
+  sectionId,
   summary,
 }: ActivityTemplateReadinessPanelProps) {
   return (
-    <div className="rounded-lg border bg-muted/20 p-4">
+    <div id={sectionId} className="rounded-lg border bg-muted/20 p-4">
       <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
         <div>
           <div className="flex items-center gap-2">

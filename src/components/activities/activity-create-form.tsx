@@ -1,4 +1,5 @@
 import {
+  ACTIVITY_EDITOR_SECTION_IDS,
   buildActivityEditorAiDraftPanelView,
   buildActivityEditorDraftGenerationExecutionPlan,
   buildActivityEditorDraftSourceState,
@@ -234,7 +235,10 @@ export function ActivityCreateForm({
       />
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)}>
-          <CardContent className="space-y-6">
+          <CardContent
+            id={ACTIVITY_EDITOR_SECTION_IDS.editor}
+            className="space-y-6"
+          >
             <ActivityAiDraftPanel
               draftFocus={draftFocus}
               draftItemCount={draftItemCount}
@@ -260,6 +264,7 @@ export function ActivityCreateForm({
             />
 
             <ActivityTemplateReadinessPanel
+              sectionId={ACTIVITY_EDITOR_SECTION_IDS.templateReadiness}
               summary={templateView.readinessSummary}
             />
 

@@ -327,6 +327,7 @@ import {
   buildActivityEditPageViewModel,
   buildActivityEditRouteState,
   activityContentToEditorInput,
+  ACTIVITY_EDITOR_SECTION_IDS,
   ACTIVITY_EDITOR_READINESS_PANEL_LIMITS,
   buildActivityEditorAiDraftPanelView,
   buildActivityEditorDraftGenerationExecutionPlan,
@@ -4052,8 +4053,13 @@ assert.match(
 );
 assert.match(
   activityEditorSource,
-  /export type ActivityEditorTemplateSetupView[\s\S]*requirementBadges: ActivityEditorTemplateRequirementBadgeView\[\];[\s\S]*export type ActivityEditorTemplateRequirementBadgeView =\s*TemplateRequirementView;[\s\S]*export type ActivityEditorTemplateScaffoldSummaryView =\s*ActivityTemplateScaffoldReadinessSummary;[\s\S]*export type ActivityEditorTemplateScaffoldCoverageMetricView =\s*ActivityTemplateScaffoldCoverageMetricView;[\s\S]*export type ActivityEditorTemplateScaffoldReadyOptionView =\s*ActivityTemplateScaffoldReadyOptionView;/,
+  /export type ActivityEditorTemplateSetupView[\s\S]*requirementBadges: ActivityEditorTemplateRequirementBadgeView\[\];[\s\S]*reviewChecklistItems: ActivityEditorTemplateScaffoldReviewItemView\[\];[\s\S]*reviewChecklistLabel: string;[\s\S]*export type ActivityEditorTemplateScaffoldReviewItemId =[\s\S]*'check-ready-modes'[\s\S]*'edit-before-save'[\s\S]*'review-fields';[\s\S]*export type ActivityEditorTemplateScaffoldReviewItemView = \{[\s\S]*actionHref: ActivityEditorSectionHref;[\s\S]*actionLabel: string;[\s\S]*ariaLabel: string;[\s\S]*export type ActivityEditorTemplateRequirementBadgeView =\s*TemplateRequirementView;[\s\S]*export type ActivityEditorTemplateScaffoldSummaryView =\s*ActivityTemplateScaffoldReadinessSummary;[\s\S]*export type ActivityEditorTemplateScaffoldCoverageMetricView =\s*ActivityTemplateScaffoldCoverageMetricView;[\s\S]*export type ActivityEditorTemplateScaffoldReadyOptionView =\s*ActivityTemplateScaffoldReadyOptionView;/,
   'Activity editor domain should expose explicit template scaffold view contracts.'
+);
+assert.match(
+  activityEditorSource,
+  /export const ACTIVITY_EDITOR_SECTION_IDS = \{[\s\S]*editor: 'activity-editor'[\s\S]*templateReadiness: 'activity-template-readiness'[\s\S]*export type ActivityEditorSectionHref = `#\$\{ActivityEditorSectionId\}`;/,
+  'Activity editor domain should expose stable section targets for scaffold review actions.'
 );
 assert.match(
   activityTemplateRemixSource,
@@ -4242,6 +4248,11 @@ assert.match(
 );
 assert.match(
   activityEditorFormSource,
+  /ACTIVITY_EDITOR_SECTION_IDS[\s\S]*CardContent[\s\S]*id=\{ACTIVITY_EDITOR_SECTION_IDS\.editor\}[\s\S]*ActivityTemplateReadinessPanel[\s\S]*sectionId=\{ACTIVITY_EDITOR_SECTION_IDS\.templateReadiness\}/,
+  'Activity editor form should wire stable editor and readiness section targets for scaffold review actions.'
+);
+assert.match(
+  activityEditorFormSource,
   /ActivityTemplateScaffoldPanel[\s\S]*setupView=\{templateView\.setupView\}[\s\S]*onApplyScaffold=\{applyTemplateScaffold\}/,
   'Activity editor form should delegate template scaffold setup rendering.'
 );
@@ -4362,8 +4373,8 @@ assert.match(
 );
 assert.match(
   activityTemplateScaffoldPanelSource,
-  /function ActivityTemplateScaffoldPanel[\s\S]*setupView\.shortName[\s\S]*setupView\.title[\s\S]*setupView\.description[\s\S]*setupView\.requirementBadges\.map[\s\S]*key=\{requirement\.id\}[\s\S]*ActivityTemplateScaffoldSummary[\s\S]*summary=\{setupView\.scaffoldSummary\}/,
-  'Activity editor scaffold panel should render prepared setup view labels and delegate scaffold summary details.'
+  /function ActivityTemplateScaffoldPanel[\s\S]*setupView\.shortName[\s\S]*setupView\.title[\s\S]*setupView\.description[\s\S]*setupView\.requirementBadges\.map[\s\S]*key=\{requirement\.id\}[\s\S]*ActivityTemplateScaffoldSummary[\s\S]*summary=\{setupView\.scaffoldSummary\}[\s\S]*ActivityTemplateScaffoldReviewChecklist[\s\S]*setupView=\{setupView\}/,
+  'Activity editor scaffold panel should render prepared setup view labels and delegate scaffold summary and checklist details.'
 );
 assert.match(
   activityTemplateScaffoldPanelSource,
@@ -4382,7 +4393,7 @@ assert.doesNotMatch(
 );
 assert.match(
   activityTemplateScaffoldPanelSource,
-  /ActivityEditorTemplateSetupView[\s\S]*ActivityEditorTemplateRequirementBadgeView[\s\S]*ActivityEditorTemplateScaffoldSummaryView[\s\S]*ActivityEditorTemplateScaffoldCoverageMetricView[\s\S]*ActivityEditorTemplateScaffoldReadyOptionView/,
+  /ActivityEditorTemplateRequirementBadgeView[\s\S]*ActivityEditorTemplateScaffoldCoverageMetricView[\s\S]*ActivityEditorTemplateScaffoldReadyOptionView[\s\S]*ActivityEditorTemplateScaffoldReviewItemView[\s\S]*ActivityEditorTemplateScaffoldSummaryView[\s\S]*ActivityEditorTemplateSetupView/,
   'Activity editor scaffold panel should import explicit template scaffold view contracts.'
 );
 assert.doesNotMatch(
@@ -4394,6 +4405,21 @@ assert.match(
   activityTemplateScaffoldPanelSource,
   /function ActivityTemplateScaffoldSummary[\s\S]*summary\.runtimeItemLabel[\s\S]*summary\.readyTemplateLabel[\s\S]*summary\.coverageMetrics\.map[\s\S]*ActivityTemplateScaffoldMetricBadge[\s\S]*summary\.readyTemplateOptions\.map[\s\S]*ActivityTemplateScaffoldReadyBadge/,
   'Activity editor scaffold summary should render prepared runtime, coverage, and ready-template details.'
+);
+assert.match(
+  activityTemplateScaffoldPanelSource,
+  /function ActivityTemplateScaffoldReviewChecklist[\s\S]*aria-labelledby=\{labelId\}[\s\S]*setupView\.reviewChecklistLabel[\s\S]*setupView\.reviewChecklistItems\.map[\s\S]*ActivityTemplateScaffoldReviewItem[\s\S]*key=\{item\.id\}/,
+  'Activity editor scaffold review checklist should render prepared checklist rows with stable item ids.'
+);
+assert.match(
+  activityTemplateScaffoldPanelSource,
+  /function ActivityTemplateScaffoldReviewItem[\s\S]*ActivityEditorTemplateScaffoldReviewItemView[\s\S]*item\.ariaLabel[\s\S]*item\.label[\s\S]*href=\{item\.actionHref\}[\s\S]*item\.actionLabel[\s\S]*item\.description/,
+  'Activity editor scaffold review item should render prepared labels, descriptions, aria labels, and action targets.'
+);
+assert.doesNotMatch(
+  activityTemplateScaffoldPanelSource,
+  /Review fields|Check ready modes|Edit before saving|Go to fields|View readiness|Keep editing|检查字段|检查可用模式|保存前编辑|去检查字段|查看准备度|继续编辑/,
+  'Activity editor scaffold panel should not hard-code visible review checklist copy.'
 );
 assert.match(
   activityTemplateScaffoldPanelSource,
@@ -4449,6 +4475,16 @@ assert.match(
   activityEditorSource,
   /formatTemplateRequirementViews\([\s\S]*template\.contentRequirements[\s\S]*activity_editor_requires_requirement\(\{[\s\S]*requirement: requirement\.label/,
   'Activity editor template setup should use the activity-domain requirement view formatter.'
+);
+assert.match(
+  activityEditorSource,
+  /buildActivityEditorTemplateScaffoldReviewItems[\s\S]*actionHref: `#\$\{ACTIVITY_EDITOR_SECTION_IDS\.editor\}`[\s\S]*activity_editor_scaffold_review_fields_action[\s\S]*actionHref: `#\$\{ACTIVITY_EDITOR_SECTION_IDS\.templateReadiness\}`[\s\S]*activity_editor_scaffold_review_modes_action[\s\S]*activity_editor_scaffold_review_save_action[\s\S]*activity_editor_scaffold_review_item_aria_label/,
+  'Activity editor template setup should build localized scaffold review actions with stable section targets.'
+);
+assert.doesNotMatch(
+  activityEditorSource,
+  /Go to fields|View readiness|Keep editing|去检查字段|查看准备度|继续编辑/,
+  'Activity editor domain should not hard-code visible scaffold review action copy.'
 );
 assert.doesNotMatch(
   activityEditorSource,
@@ -4807,6 +4843,11 @@ assert.match(
   activityTemplateReadinessPanelSource,
   /ActivityTemplateReadinessPanelSummary/,
   'Template-readiness panel should consume the activity-domain readiness summary contract.'
+);
+assert.match(
+  activityTemplateReadinessPanelSource,
+  /type ActivityTemplateReadinessPanelProps = \{[\s\S]*sectionId\?: string;[\s\S]*<div id=\{sectionId\} className="rounded-lg border bg-muted\/20 p-4">/,
+  'Template-readiness panel should expose a stable section target for scaffold review links.'
 );
 assert.match(
   activityTemplateReadinessPanelSource,
@@ -34848,6 +34889,39 @@ assert.deepEqual(buildActivityEditorTemplateSetupView('group-sort'), {
   description:
     'Students drag items into teacher-defined groups and compare patterns.',
   requirementBadges: [{ id: 'groups', label: 'Requires groups' }],
+  reviewChecklistItems: [
+    {
+      actionHref: '#activity-editor',
+      actionLabel: 'Go to fields',
+      ariaLabel:
+        'Review fields. Check the generated questions, pairs, groups, vocabulary, learning goal, and teacher notes before saving.',
+      description:
+        'Check the generated questions, pairs, groups, vocabulary, learning goal, and teacher notes before saving.',
+      id: 'review-fields',
+      label: 'Review fields',
+    },
+    {
+      actionHref: '#activity-template-readiness',
+      actionLabel: 'View readiness',
+      ariaLabel:
+        'Check ready modes. Use the readiness panel to confirm which templates are playable and which fields still need content.',
+      description:
+        'Use the readiness panel to confirm which templates are playable and which fields still need content.',
+      id: 'check-ready-modes',
+      label: 'Check ready modes',
+    },
+    {
+      actionHref: '#activity-editor',
+      actionLabel: 'Keep editing',
+      ariaLabel:
+        'Edit before saving. Treat the example as a starting point: edit it for your class, then save it as a reusable activity.',
+      description:
+        'Treat the example as a starting point: edit it for your class, then save it as a reusable activity.',
+      id: 'edit-before-save',
+      label: 'Edit before saving',
+    },
+  ],
+  reviewChecklistLabel: 'Before saving this example',
   scaffoldSummary: {
     coverageMetrics: [
       {
@@ -34930,6 +35004,10 @@ assert.equal(
 );
 assert.deepEqual(ACTIVITY_EDITOR_READINESS_PANEL_LIMITS, {
   lockedOptions: 4,
+});
+assert.deepEqual(ACTIVITY_EDITOR_SECTION_IDS, {
+  editor: 'activity-editor',
+  templateReadiness: 'activity-template-readiness',
 });
 assert.deepEqual(buildActivityEditorModeView('create'), {
   footerHint:
