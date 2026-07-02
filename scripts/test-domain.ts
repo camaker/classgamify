@@ -5385,10 +5385,25 @@ assert.match(
   /template\.contentRequirements\.map[\s\S]*key=\{requirement\.id\}[\s\S]*requirement\.label[\s\S]*to=\{getPathWithLocale\(template\.action\.to\)\}[\s\S]*template\.action\.search/,
   'Template directory cards should own structured requirement badges and locale-aware create actions.'
 );
+assert.match(
+  templateDirectoryCardSource,
+  /TemplatesPageCardEntryStepView[\s\S]*const entryLabelId = `template-entry-\$\{template\.template\}-label`[\s\S]*aria-labelledby=\{entryLabelId\}[\s\S]*id=\{entryLabelId\}[\s\S]*template\.entryLabel[\s\S]*template\.entrySteps\.map[\s\S]*TemplateEntryStep[\s\S]*key=\{step\.id\}/,
+  'Template directory cards should render prepared create-entry steps from the card view.'
+);
+assert.match(
+  templateDirectoryCardSource,
+  /function TemplateEntryStep[\s\S]*step: TemplatesPageCardEntryStepView[\s\S]*descriptionId = `template-entry-\$\{templateType\}-\$\{step\.id\}-description`[\s\S]*step\.label[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*aria-label=\{step\.ariaLabel\}[\s\S]*step\.value[\s\S]*step\.description/,
+  'Template entry step rows should expose prepared labels, values, aria labels, and hidden descriptions.'
+);
 assert.doesNotMatch(
   templateDirectoryCardSource,
   /key=\{requirement\}|>\s*\{requirement\}\s*</,
   'Template directory cards should not key or render requirement badges from bare localized strings.'
+);
+assert.doesNotMatch(
+  `${templatesRouteSource}\n${templateDirectoryCardSource}`,
+  /Creation path|Example ready|Shared editor|创建路径|示例已就绪|共享编辑器/,
+  'Templates route and directory cards should not hard-code create-entry step copy.'
 );
 assert.doesNotMatch(
   templateDirectoryCardSource,
@@ -29135,6 +29150,37 @@ assert.deepEqual(getBlogCtaActions(), [
     variant: 'outline',
   },
 ]);
+function buildExpectedTemplateEntrySteps(templateShortName: string) {
+  return [
+    {
+      ariaLabel:
+        `Template: ${templateShortName} selected. The create page opens with this primary template selected.`,
+      description:
+        'The create page opens with this primary template selected.',
+      id: 'select-template',
+      label: 'Template',
+      value: `${templateShortName} selected`,
+    },
+    {
+      ariaLabel:
+        'Scaffold: Example ready. The create page loads a template-specific example that teachers review before saving.',
+      description:
+        'The create page loads a template-specific example that teachers review before saving.',
+      id: 'load-scaffold',
+      label: 'Scaffold',
+      value: 'Example ready',
+    },
+    {
+      ariaLabel:
+        'Fields: Shared editor. Questions, pairs, groups, vocabulary, and notes still use the shared activity input contract.',
+      description:
+        'Questions, pairs, groups, vocabulary, and notes still use the shared activity input contract.',
+      id: 'shared-editor',
+      label: 'Fields',
+      value: 'Shared editor',
+    },
+  ];
+}
 assert.deepEqual(buildTemplatesPageViewModel(), {
   cards: activityTemplates.map((template) => ({
     action: {
@@ -29150,6 +29196,8 @@ assert.deepEqual(buildTemplatesPageViewModel(), {
       template.contentRequirements
     ),
     description: template.description,
+    entryLabel: 'Creation path',
+    entrySteps: buildExpectedTemplateEntrySteps(template.shortName),
     name: template.name,
     template: template.type,
   })),
@@ -29753,6 +29801,16 @@ assert.match(
   entryPageViewSource,
   /export type EntryActionSearch = CreateActivityTemplateSearch;[\s\S]*export type EntryAction = TemplateEntryAction;[\s\S]*export type LinkAction = TemplateEntryLinkAction;[\s\S]*export type CreateLinkAction = TemplateEntryCreateLinkAction;[\s\S]*export type WorksheetsPageHeroActionView = EntryAction & \{/,
   'Entry page view domain should export focused entry and link action contracts.'
+);
+assert.match(
+  entryPageViewSource,
+  /export type TemplatesPageCardView = \{[\s\S]*entryLabel: string;[\s\S]*entrySteps: TemplatesPageCardEntryStepView\[\];[\s\S]*export type TemplatesPageCardEntryStepId =[\s\S]*'load-scaffold'[\s\S]*'select-template'[\s\S]*'shared-editor'[\s\S]*export type TemplatesPageCardEntryStepView = \{[\s\S]*ariaLabel: string;[\s\S]*description: string;[\s\S]*id: TemplatesPageCardEntryStepId;[\s\S]*label: string;[\s\S]*value: string;/,
+  'Template directory card view-model should expose structured create-entry steps with accessible labels.'
+);
+assert.match(
+  entryPageViewSource,
+  /entryLabel: m\.templates_page_entry_label\(\)[\s\S]*entrySteps: buildTemplatesPageCardEntrySteps\(template\.shortName\)[\s\S]*function buildTemplatesPageCardEntrySteps\([\s\S]*templateShortName: string[\s\S]*templates_page_entry_step_template_[\s\S]*templates_page_entry_step_scaffold_[\s\S]*templates_page_entry_step_shared_[\s\S]*templates_page_entry_step_aria_label/,
+  'Template directory card view-model should derive localized create-entry steps from the selected template short name.'
 );
 assert.match(
   templateEntrySource,

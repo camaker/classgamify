@@ -1,4 +1,7 @@
-import type { TemplatesPageCardView } from '@/activities/entry-page-view';
+import type {
+  TemplatesPageCardEntryStepView,
+  TemplatesPageCardView,
+} from '@/activities/entry-page-view';
 import { buttonVariants } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import {
@@ -20,6 +23,8 @@ type TemplateDirectoryCardProps = {
 export function TemplateDirectoryCard({
   template,
 }: TemplateDirectoryCardProps) {
+  const entryLabelId = `template-entry-${template.template}-label`;
+
   return (
     <Card className="rounded-lg">
       <CardHeader>
@@ -57,6 +62,28 @@ export function TemplateDirectoryCard({
             </Badge>
           ))}
         </div>
+        {template.entrySteps.length ? (
+          <section
+            className="grid gap-2 border-t pt-3"
+            aria-labelledby={entryLabelId}
+          >
+            <p
+              id={entryLabelId}
+              className="font-medium text-muted-foreground text-xs"
+            >
+              {template.entryLabel}
+            </p>
+            <dl className="grid gap-2">
+              {template.entrySteps.map((step) => (
+                <TemplateEntryStep
+                  key={step.id}
+                  step={step}
+                  templateType={template.template}
+                />
+              ))}
+            </dl>
+          </section>
+        ) : null}
         <Link
           to={getPathWithLocale(template.action.to)}
           search={template.action.search}
@@ -70,5 +97,29 @@ export function TemplateDirectoryCard({
         </Link>
       </CardContent>
     </Card>
+  );
+}
+
+function TemplateEntryStep({
+  step,
+  templateType,
+}: {
+  step: TemplatesPageCardEntryStepView;
+  templateType: TemplatesPageCardView['template'];
+}) {
+  const descriptionId = `template-entry-${templateType}-${step.id}-description`;
+
+  return (
+    <div className="grid grid-cols-[minmax(0,5.75rem)_minmax(0,1fr)] gap-2 text-xs">
+      <dt className="truncate text-muted-foreground">{step.label}</dt>
+      <dd aria-describedby={descriptionId} className="min-w-0 font-medium">
+        <output aria-label={step.ariaLabel} className="break-words">
+          {step.value}
+        </output>
+        <span id={descriptionId} className="sr-only">
+          {step.description}
+        </span>
+      </dd>
+    </div>
   );
 }

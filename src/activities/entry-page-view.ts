@@ -49,8 +49,23 @@ export type TemplatesPageCardView = {
   classroomModeLabel: string;
   contentRequirements: TemplateRequirementView[];
   description: string;
+  entryLabel: string;
+  entrySteps: TemplatesPageCardEntryStepView[];
   name: string;
   template: ActivityTemplateType;
+};
+
+export type TemplatesPageCardEntryStepId =
+  | 'load-scaffold'
+  | 'select-template'
+  | 'shared-editor';
+
+export type TemplatesPageCardEntryStepView = {
+  ariaLabel: string;
+  description: string;
+  id: TemplatesPageCardEntryStepId;
+  label: string;
+  value: string;
 };
 
 export type TemplatesPageViewModelInput = {
@@ -153,6 +168,8 @@ export function buildTemplatesPageViewModel({
       template.contentRequirements
     ),
     description: template.description,
+    entryLabel: m.templates_page_entry_label(),
+    entrySteps: buildTemplatesPageCardEntrySteps(template.shortName),
     name: template.name,
     template: template.type,
   }));
@@ -186,6 +203,42 @@ export function buildTemplatesPageViewModel({
       title: m.templates_page_title(),
     },
   };
+}
+
+function buildTemplatesPageCardEntrySteps(
+  templateShortName: string
+): TemplatesPageCardEntryStepView[] {
+  const steps = [
+    {
+      description: m.templates_page_entry_step_template_description(),
+      id: 'select-template',
+      label: m.templates_page_entry_step_template_label(),
+      value: m.templates_page_entry_step_template_value({
+        template: templateShortName,
+      }),
+    },
+    {
+      description: m.templates_page_entry_step_scaffold_description(),
+      id: 'load-scaffold',
+      label: m.templates_page_entry_step_scaffold_label(),
+      value: m.templates_page_entry_step_scaffold_value(),
+    },
+    {
+      description: m.templates_page_entry_step_shared_description(),
+      id: 'shared-editor',
+      label: m.templates_page_entry_step_shared_label(),
+      value: m.templates_page_entry_step_shared_value(),
+    },
+  ] satisfies Array<Omit<TemplatesPageCardEntryStepView, 'ariaLabel'>>;
+
+  return steps.map((step) => ({
+    ...step,
+    ariaLabel: m.templates_page_entry_step_aria_label({
+      description: step.description,
+      label: step.label,
+      value: step.value,
+    }),
+  }));
 }
 
 export function buildWorksheetsPageViewModel({
