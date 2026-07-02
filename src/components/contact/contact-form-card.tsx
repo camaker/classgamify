@@ -9,6 +9,11 @@ import {
   type ContactInquiryIntent,
 } from '@/contact/inquiry';
 import {
+  buildContactClassroomInquiryScopeView,
+  type ContactClassroomInquiryScopeItemId,
+  type ContactClassroomInquiryScopeView,
+} from '@/contact/inquiry-view';
+import {
   Card,
   CardContent,
   CardFooter,
@@ -26,6 +31,15 @@ import {
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { zodResolver } from '@hookform/resolvers/zod';
+import {
+  IconChartBar,
+  IconClipboardList,
+  IconFileText,
+  IconListCheck,
+  IconSchool,
+  IconShieldCheck,
+  type TablerIcon,
+} from '@tabler/icons-react';
 import { useState } from 'react';
 import { useForm, type Control } from 'react-hook-form';
 import { toast } from 'sonner';
@@ -70,6 +84,10 @@ export function ContactFormCard({
 }) {
   const [error, setError] = useState<string | undefined>();
   const classroomCopy = getClassroomInquiryCopy();
+  const classroomScope =
+    intent === 'classroom'
+      ? buildContactClassroomInquiryScopeView()
+      : undefined;
   const defaultMessage =
     intent === 'classroom' ? m.contact_classroom_message_template() : '';
   const form = useForm<FormValues>({
@@ -193,6 +211,9 @@ export function ContactFormCard({
                 </FormItem>
               )}
             />
+            {classroomScope ? (
+              <ClassroomInquiryScopePanel view={classroomScope} />
+            ) : null}
             {intent === 'classroom' ? (
               <ClassroomInquiryFields
                 control={form.control}
@@ -213,6 +234,65 @@ export function ContactFormCard({
 }
 
 type ClassroomInquiryCopy = ReturnType<typeof getClassroomInquiryCopy>;
+
+function ClassroomInquiryScopePanel({
+  view,
+}: {
+  view: ContactClassroomInquiryScopeView;
+}) {
+  const titleId = 'contact-classroom-scope-title';
+
+  return (
+    <section
+      aria-labelledby={titleId}
+      className="space-y-3 rounded-lg border border-primary/20 bg-primary/5 p-3"
+    >
+      <div className="space-y-1">
+        <p id={titleId} className="text-sm font-medium">
+          {view.title}
+        </p>
+        <p className="text-xs leading-5 text-muted-foreground">
+          {view.description}
+        </p>
+      </div>
+      <div className="grid gap-2">
+        {view.items.map((item) => {
+          const Icon = classroomInquiryScopeIcons[item.id];
+
+          return (
+            <div
+              key={item.id}
+              className="flex gap-2 rounded-md bg-background/70 p-2"
+            >
+              <Icon
+                aria-hidden="true"
+                className="mt-0.5 size-4 shrink-0 text-primary"
+              />
+              <div className="min-w-0">
+                <p className="text-xs font-medium">{item.title}</p>
+                <p className="mt-1 text-xs leading-5 text-muted-foreground">
+                  {item.description}
+                </p>
+              </div>
+            </div>
+          );
+        })}
+      </div>
+      <div className="flex gap-2 rounded-md border bg-background/80 p-2">
+        <IconShieldCheck
+          aria-hidden="true"
+          className="mt-0.5 size-4 shrink-0 text-primary"
+        />
+        <div className="min-w-0">
+          <p className="text-xs font-medium">{view.privacyBoundary.title}</p>
+          <p className="mt-1 text-xs leading-5 text-muted-foreground">
+            {view.privacyBoundary.description}
+          </p>
+        </div>
+      </div>
+    </section>
+  );
+}
 
 function ClassroomInquiryFields({
   control,
@@ -337,3 +417,11 @@ function getClassroomInquiryCopy() {
     title: m.contact_classroom_details_title(),
   };
 }
+
+const classroomInquiryScopeIcons = {
+  'activity-material': IconFileText,
+  'assignment-routine': IconClipboardList,
+  learners: IconSchool,
+  'result-review': IconChartBar,
+  'template-worksheet': IconListCheck,
+} satisfies Record<ContactClassroomInquiryScopeItemId, TablerIcon>;

@@ -16,6 +16,10 @@ import {
   normalizeContactClassroomInquiryFields,
   normalizeContactInquiryIntent,
 } from '@/contact/inquiry';
+import {
+  buildContactClassroomInquiryScopeView,
+  CONTACT_CLASSROOM_INQUIRY_SCOPE_ITEM_IDS,
+} from '@/contact/inquiry-view';
 import { buildMailWorkspaceBoundaryView } from '@/mail/workspace-boundary';
 import { getAvatarLinks } from '@/config/avatar-config';
 import { getFooterLinks } from '@/config/footer-config';
@@ -7374,6 +7378,10 @@ const contactFormCardSource = readFileSync(
 );
 const contactApiSource = readFileSync('src/api/contact.ts', 'utf8');
 const contactInquirySource = readFileSync('src/contact/inquiry.ts', 'utf8');
+const contactInquiryViewSource = readFileSync(
+  'src/contact/inquiry-view.ts',
+  'utf8'
+);
 const contactEmailTemplateSource = readFileSync(
   'src/mail/templates/contact-message.tsx',
   'utf8'
@@ -7432,6 +7440,26 @@ assert.match(
   contactInquirySource,
   /CONTACT_CLASSROOM_INQUIRY_FIELD_IDS[\s\S]*'learners'[\s\S]*'grade'[\s\S]*'material'[\s\S]*'routine'[\s\S]*'need'/,
   'Contact inquiry domain should own the classroom field order.'
+);
+assert.match(
+  contactInquiryViewSource,
+  /CONTACT_CLASSROOM_INQUIRY_SCOPE_ITEM_IDS[\s\S]*'learners'[\s\S]*'activity-material'[\s\S]*'assignment-routine'[\s\S]*'template-worksheet'[\s\S]*'result-review'/,
+  'Contact inquiry view should own the classroom scope item order.'
+);
+assert.match(
+  contactInquiryViewSource,
+  /privacyBoundary:[\s\S]*id: 'safe-classroom-context'/,
+  'Contact inquiry view should expose a stable safe-context privacy boundary.'
+);
+assert.doesNotMatch(
+  contactInquiryViewSource,
+  /Learners and class|Activity material|Assignment routine|Template or worksheet need|Result review|storage keys|private file URLs/,
+  'Contact inquiry view should read visible classroom scope copy from locale messages.'
+);
+assert.match(
+  contactFormCardSource,
+  /buildContactClassroomInquiryScopeView[\s\S]*ClassroomInquiryScopePanel[\s\S]*view\.items\.map[\s\S]*key=\{item\.id\}[\s\S]*view\.privacyBoundary/,
+  'Contact classroom form should render the prepared inquiry-scope view.'
 );
 assert.match(
   contactEmailTemplateSource,
@@ -9893,6 +9921,47 @@ for (const [
       messages[key] ?? '',
       pattern,
       `${locale} ${key} should describe ClassGamify classroom contact boundaries.`
+    );
+  }
+}
+const contactClassroomScopeRequirements = [
+  [
+    enLocaleMessages,
+    'en',
+    [
+      ['contact_classroom_scope_title', /scope the workflow/],
+      ['contact_classroom_scope_description', /activity, delivery, and review loop/],
+      ['contact_classroom_scope_activity_material_description', /source material type, or worksheet/],
+      ['contact_classroom_scope_assignment_routine_description', /links are handed to students/],
+      ['contact_classroom_scope_template_worksheet_description', /matching, fill blank, line match, listening, group sort/],
+      ['contact_classroom_scope_result_review_description', /CSV export, reteach notes, or student follow-up/],
+      ['contact_classroom_scope_privacy_description', /storage keys, private file URLs, raw student identifiers/],
+    ],
+  ],
+  [
+    zhLocaleMessages,
+    'zh',
+    [
+      ['contact_classroom_scope_title', /判断流程/],
+      ['contact_classroom_scope_description', /活动、交付和结果复盘闭环/],
+      ['contact_classroom_scope_activity_material_description', /来源素材类型/],
+      ['contact_classroom_scope_assignment_routine_description', /学生如何收到链接/],
+      ['contact_classroom_scope_template_worksheet_description', /配对、填空、连线、听力、分类/],
+      ['contact_classroom_scope_result_review_description', /CSV 导出、重讲提示或学生跟进/],
+      ['contact_classroom_scope_privacy_description', /存储 key、私有文件 URL、原始学生标识/],
+    ],
+  ],
+] as const;
+for (const [
+  messages,
+  locale,
+  requirements,
+] of contactClassroomScopeRequirements) {
+  for (const [key, pattern] of requirements) {
+    assert.match(
+      messages[key] ?? '',
+      pattern,
+      `${locale} ${key} should describe the classroom inquiry scope boundary.`
     );
   }
 }
@@ -30508,6 +30577,34 @@ assert.equal(
     intent: 'classroom',
   }),
   false
+);
+assert.deepEqual(CONTACT_CLASSROOM_INQUIRY_SCOPE_ITEM_IDS, [
+  'learners',
+  'activity-material',
+  'assignment-routine',
+  'template-worksheet',
+  'result-review',
+]);
+assert.deepEqual(
+  buildContactClassroomInquiryScopeView().items.map((item) => [
+    item.id,
+    item.fieldIds,
+  ]),
+  [
+    ['learners', ['learners', 'grade']],
+    ['activity-material', ['material']],
+    ['assignment-routine', ['routine']],
+    ['template-worksheet', ['material', 'need']],
+    ['result-review', ['need']],
+  ]
+);
+assert.equal(
+  buildContactClassroomInquiryScopeView().privacyBoundary.id,
+  'safe-classroom-context'
+);
+assert.match(
+  buildContactClassroomInquiryScopeView().privacyBoundary.description,
+  /storage keys, private file URLs, raw student identifiers/
 );
 assert.deepEqual(buildPricingPageViewModel().hero, {
   eyebrow: 'ClassGamify plans',
