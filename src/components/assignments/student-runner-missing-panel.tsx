@@ -10,6 +10,7 @@ import {
   IconEyeOff,
   IconRoute,
   IconSendOff,
+  IconUserOff,
   type Icon,
 } from '@tabler/icons-react';
 import { Link } from '@tanstack/react-router';
@@ -71,6 +72,7 @@ function StudentRunnerMissingScopeIcon({
 
 const studentRunnerMissingScopeIcons = {
   'activity-content': IconEyeOff,
+  'browser-identity': IconUserOff,
   'link-status': IconCircleOff,
   'next-step': IconRoute,
   submissions: IconSendOff,

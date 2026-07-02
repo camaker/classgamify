@@ -130,6 +130,29 @@ export type PublicAssignmentUnavailableReason = Exclude<
   'open'
 >;
 
+export type PublicAssignmentUnavailableContentPolicy = {
+  answerKeysHidden: true;
+  explanationsHidden: true;
+  runtimeItemsHidden: true;
+  teacherMaterialsHidden: true;
+};
+
+export type PublicAssignmentUnavailableIdentityPolicy = {
+  browserLabelHidden: true;
+  rawAnonymousTokenHidden: true;
+};
+
+export type PublicAssignmentUnavailableSubmissionPolicy = {
+  submissionsBlocked: true;
+};
+
+export type PublicAssignmentUnavailablePayload = {
+  contentPolicy: PublicAssignmentUnavailableContentPolicy;
+  identityPolicy: PublicAssignmentUnavailableIdentityPolicy;
+  reason: PublicAssignmentUnavailableReason;
+  submissionPolicy: PublicAssignmentUnavailableSubmissionPolicy;
+};
+
 export type PublicAssignmentLookupResult =
   | {
       payload: PublicAssignmentPayload;
@@ -138,6 +161,7 @@ export type PublicAssignmentLookupResult =
   | {
       reason: PublicAssignmentUnavailableReason;
       status: 'unavailable';
+      unavailable: PublicAssignmentUnavailablePayload;
     };
 
 export const PUBLIC_ASSIGNMENT_ESTIMATED_MINUTES = {
@@ -208,6 +232,28 @@ export function buildPublicAssignmentLookupResult(
   return {
     reason: lifecycleStatus,
     status: 'unavailable',
+    unavailable: buildPublicAssignmentUnavailablePayload(lifecycleStatus),
+  };
+}
+
+export function buildPublicAssignmentUnavailablePayload(
+  reason: PublicAssignmentUnavailableReason
+): PublicAssignmentUnavailablePayload {
+  return {
+    contentPolicy: {
+      answerKeysHidden: true,
+      explanationsHidden: true,
+      runtimeItemsHidden: true,
+      teacherMaterialsHidden: true,
+    },
+    identityPolicy: {
+      browserLabelHidden: true,
+      rawAnonymousTokenHidden: true,
+    },
+    reason,
+    submissionPolicy: {
+      submissionsBlocked: true,
+    },
   };
 }
 

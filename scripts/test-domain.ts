@@ -491,6 +491,7 @@ import {
   buildPublicAssignmentPayload,
   buildPublicAssignmentPreviewActivity,
   buildPublicAssignmentPreviewAssignment,
+  buildPublicAssignmentUnavailablePayload,
   buildPublicAttemptResult,
   buildPublicAttemptReviewItems,
   buildPublicAttemptReviewItemMap,
@@ -3218,6 +3219,21 @@ assert.match(
   publicAssignmentSource,
   /PUBLIC_ASSIGNMENT_ESTIMATED_MINUTES[\s\S]*max: 20[\s\S]*min: 5[\s\S]*perItem: 2/,
   'Public assignment estimated minutes should expose named domain limits.'
+);
+assert.match(
+  publicAssignmentSource,
+  /export type PublicAssignmentUnavailablePayload = \{[\s\S]*contentPolicy: PublicAssignmentUnavailableContentPolicy;[\s\S]*identityPolicy: PublicAssignmentUnavailableIdentityPolicy;[\s\S]*reason: PublicAssignmentUnavailableReason;[\s\S]*submissionPolicy: PublicAssignmentUnavailableSubmissionPolicy;/,
+  'Public unavailable assignments should expose an explicit safe unavailable-payload contract.'
+);
+assert.match(
+  publicAssignmentSource,
+  /export function buildPublicAssignmentUnavailablePayload[\s\S]*answerKeysHidden: true[\s\S]*explanationsHidden: true[\s\S]*runtimeItemsHidden: true[\s\S]*teacherMaterialsHidden: true[\s\S]*browserLabelHidden: true[\s\S]*rawAnonymousTokenHidden: true[\s\S]*submissionsBlocked: true/,
+  'Public unavailable assignment payloads should explicitly state hidden content, private browser identity, and blocked submissions.'
+);
+assert.match(
+  publicAssignmentSource,
+  /buildPublicAssignmentLookupResult[\s\S]*reason: lifecycleStatus,[\s\S]*status: 'unavailable',[\s\S]*unavailable: buildPublicAssignmentUnavailablePayload\(lifecycleStatus\)/,
+  'Public assignment lookup should return structured unavailable policy instead of runtime content for closed, expired, or draft links.'
 );
 assert.match(
   publicAssignmentSource,
@@ -9990,7 +10006,7 @@ assert.match(
 );
 assert.match(
   studentRunnerStateSource,
-  /export type StudentRunnerLoadingView = \{[\s\S]*export type StudentRunnerMissingPageView = \{[\s\S]*reason: StudentRunnerMissingReason;[\s\S]*scopeItems: StudentRunnerMissingScopeItem\[\];[\s\S]*export type StudentRunnerIdentityView =[\s\S]*ariaLabel: string;[\s\S]*description: string;[\s\S]*disabled: boolean;[\s\S]*export type StudentRunnerControlView = \{[\s\S]*attemptRegionLabel: string;[\s\S]*statusBarLabel: string;[\s\S]*export type StudentRunnerResultPanelView =[\s\S]*ariaLabel: string;[\s\S]*export type StudentRunnerActivityPreviewView = \{[\s\S]*export type StudentRunnerRuntimeListView = \{[\s\S]*export type StudentRunnerPageViewModel = \{/,
+  /export type StudentRunnerLoadingView = \{[\s\S]*export type StudentRunnerMissingPageView = \{[\s\S]*reason: StudentRunnerMissingReason;[\s\S]*scopeItems: StudentRunnerMissingScopeItem\[\];[\s\S]*unavailable\?: PublicAssignmentUnavailablePayload;[\s\S]*export type StudentRunnerIdentityView =[\s\S]*ariaLabel: string;[\s\S]*description: string;[\s\S]*disabled: boolean;[\s\S]*export type StudentRunnerControlView = \{[\s\S]*attemptRegionLabel: string;[\s\S]*statusBarLabel: string;[\s\S]*export type StudentRunnerResultPanelView =[\s\S]*ariaLabel: string;[\s\S]*export type StudentRunnerActivityPreviewView = \{[\s\S]*export type StudentRunnerRuntimeListView = \{[\s\S]*export type StudentRunnerPageViewModel = \{/,
   'Student runner state domain should export focused route-facing page and sub-view contracts.'
 );
 assert.match(
@@ -10000,12 +10016,12 @@ assert.match(
 );
 assert.match(
   studentRunnerSubmissionSource,
-  /export type StudentRunnerMissingScopeItemId =[\s\S]*'activity-content'[\s\S]*'link-status'[\s\S]*'next-step'[\s\S]*'submissions'[\s\S]*export type StudentRunnerMissingScopeItem = \{[\s\S]*description: string;[\s\S]*id: StudentRunnerMissingScopeItemId;[\s\S]*label: string;[\s\S]*value: string;[\s\S]*export type StudentRunnerMissingView = \{[\s\S]*reason: StudentRunnerMissingReason;[\s\S]*scopeItems: StudentRunnerMissingScopeItem\[\];/,
+  /export type StudentRunnerMissingScopeItemId =[\s\S]*'activity-content'[\s\S]*'browser-identity'[\s\S]*'link-status'[\s\S]*'next-step'[\s\S]*'submissions'[\s\S]*export type StudentRunnerMissingScopeItem = \{[\s\S]*description: string;[\s\S]*id: StudentRunnerMissingScopeItemId;[\s\S]*label: string;[\s\S]*value: string;[\s\S]*export type StudentRunnerMissingView = \{[\s\S]*reason: StudentRunnerMissingReason;[\s\S]*scopeItems: StudentRunnerMissingScopeItem\[\];[\s\S]*unavailable\?: PublicAssignmentUnavailablePayload;/,
   'Student submission domain should expose explicit missing-link scope item and view contracts.'
 );
 assert.match(
   studentRunnerSubmissionSource,
-  /buildStudentRunnerMissingScopeItems[\s\S]*student_runner_missing_scope_status_label[\s\S]*student_runner_missing_scope_activity_content_label[\s\S]*student_runner_missing_scope_submissions_label[\s\S]*student_runner_missing_scope_next_step_label/,
+  /buildStudentRunnerMissingScopeItems[\s\S]*student_runner_missing_scope_status_label[\s\S]*student_runner_missing_scope_activity_content_label[\s\S]*student_runner_missing_scope_submissions_label[\s\S]*student_runner_missing_scope_browser_identity_label[\s\S]*student_runner_missing_scope_next_step_label/,
   'Student missing-link scope items should be prepared from localized assignment-domain messages.'
 );
 assert.match(
@@ -11593,6 +11609,13 @@ assert.deepEqual(buildStudentRunnerMissingView('not-found'), {
     },
     {
       description:
+        'Unavailable links do not show the anonymous browser label or raw browser token.',
+      id: 'browser-identity',
+      label: 'Browser identity',
+      value: 'Private',
+    },
+    {
+      description:
         'Check the link spelling or ask your teacher to resend the assignment link.',
       id: 'next-step',
       label: 'Next step',
@@ -11625,6 +11648,13 @@ assert.deepEqual(buildStudentRunnerMissingView('closed'), {
       id: 'submissions',
       label: 'Submissions',
       value: 'Blocked',
+    },
+    {
+      description:
+        'Unavailable links do not show the anonymous browser label or raw browser token.',
+      id: 'browser-identity',
+      label: 'Browser identity',
+      value: 'Private',
     },
     {
       description:
@@ -11664,6 +11694,13 @@ assert.deepEqual(buildStudentRunnerMissingView('expired'), {
     },
     {
       description:
+        'Unavailable links do not show the anonymous browser label or raw browser token.',
+      id: 'browser-identity',
+      label: 'Browser identity',
+      value: 'Private',
+    },
+    {
+      description:
         'Ask your teacher whether there is a new homework window or replacement link.',
       id: 'next-step',
       label: 'Next step',
@@ -11696,6 +11733,13 @@ assert.deepEqual(buildStudentRunnerMissingView('draft'), {
       id: 'submissions',
       label: 'Submissions',
       value: 'Blocked',
+    },
+    {
+      description:
+        'Unavailable links do not show the anonymous browser label or raw browser token.',
+      id: 'browser-identity',
+      label: 'Browser identity',
+      value: 'Private',
     },
     {
       description: 'Ask your teacher for the published student link.',
@@ -11731,6 +11775,13 @@ try {
         id: 'submissions',
         label: '提交状态',
         value: '已阻止',
+      },
+      {
+        description:
+          '链接不可用时，不会显示匿名浏览器标签或原始浏览器令牌。',
+        id: 'browser-identity',
+        label: '浏览器身份',
+        value: '已保护',
       },
       {
         description: '请让老师重新开放这个链接，或发送新的作业链接。',
@@ -18153,10 +18204,32 @@ const publicAssignmentPayload = buildPublicAssignmentPayload(
 const publicAssignmentLookupAvailable = buildPublicAssignmentLookupResult(
   publicAssignmentPayloadSource
 );
+const publicAssignmentUnavailableClosedPayload =
+  buildPublicAssignmentUnavailablePayload('closed');
+const publicAssignmentUnavailableExpiredPayload =
+  buildPublicAssignmentUnavailablePayload('expired');
+const publicAssignmentUnavailableDraftPayload =
+  buildPublicAssignmentUnavailablePayload('draft');
 assert.deepEqual(PUBLIC_ASSIGNMENT_ESTIMATED_MINUTES, {
   max: 20,
   min: 5,
   perItem: 2,
+});
+assert.deepEqual(publicAssignmentUnavailableClosedPayload, {
+  contentPolicy: {
+    answerKeysHidden: true,
+    explanationsHidden: true,
+    runtimeItemsHidden: true,
+    teacherMaterialsHidden: true,
+  },
+  identityPolicy: {
+    browserLabelHidden: true,
+    rawAnonymousTokenHidden: true,
+  },
+  reason: 'closed',
+  submissionPolicy: {
+    submissionsBlocked: true,
+  },
 });
 assert.equal(normalizeRuntimeDisplayText('  Ｎｅｗ   York  '), 'New York');
 assert.equal(
@@ -19576,6 +19649,7 @@ assert.deepEqual(
   {
     reason: 'closed',
     status: 'unavailable',
+    unavailable: publicAssignmentUnavailableClosedPayload,
   }
 );
 assert.equal(
@@ -19605,6 +19679,7 @@ assert.deepEqual(
   {
     reason: 'expired',
     status: 'unavailable',
+    unavailable: publicAssignmentUnavailableExpiredPayload,
   }
 );
 assert.deepEqual(
@@ -19618,6 +19693,7 @@ assert.deepEqual(
   {
     reason: 'draft',
     status: 'unavailable',
+    unavailable: publicAssignmentUnavailableDraftPayload,
   }
 );
 const publicRuntimeSanitizationInput = {
@@ -19921,36 +19997,51 @@ assert.deepEqual(
     data: {
       reason: 'closed',
       status: 'unavailable',
+      unavailable: publicAssignmentUnavailableClosedPayload,
     },
     isLoading: false,
     shareId: 'share-public',
     starterPreview: runnerStateStarterPreview,
   }),
-  { reason: 'closed', status: 'missing' }
+  {
+    reason: 'closed',
+    status: 'missing',
+    unavailable: publicAssignmentUnavailableClosedPayload,
+  }
 );
 assert.deepEqual(
   buildStudentRunnerPageState({
     data: {
       reason: 'expired',
       status: 'unavailable',
+      unavailable: publicAssignmentUnavailableExpiredPayload,
     },
     isLoading: false,
     shareId: 'share-public',
     starterPreview: runnerStateStarterPreview,
   }),
-  { reason: 'expired', status: 'missing' }
+  {
+    reason: 'expired',
+    status: 'missing',
+    unavailable: publicAssignmentUnavailableExpiredPayload,
+  }
 );
 assert.deepEqual(
   buildStudentRunnerPageState({
     data: {
       reason: 'draft',
       status: 'unavailable',
+      unavailable: publicAssignmentUnavailableDraftPayload,
     },
     isLoading: false,
     shareId: 'share-public',
     starterPreview: runnerStateStarterPreview,
   }),
-  { reason: 'draft', status: 'missing' }
+  {
+    reason: 'draft',
+    status: 'missing',
+    unavailable: publicAssignmentUnavailableDraftPayload,
+  }
 );
 const publicRunnerState = buildStudentRunnerPageState({
   data: publicAssignmentLookupAvailable,
@@ -20961,7 +21052,11 @@ const missingStudentRunnerPageView = buildStudentRunnerPageViewModel({
   confirmIncompleteSubmit: false,
   fallbackStartedAt: 2_000,
   isSubmitting: false,
-  pageState: { reason: 'closed', status: 'missing' },
+  pageState: {
+    reason: 'closed',
+    status: 'missing',
+    unavailable: publicAssignmentUnavailableClosedPayload,
+  },
   shareId: 'missing-share',
   submittedAttemptCount: 0,
 });
@@ -21004,6 +21099,13 @@ assert.deepEqual(missingStudentRunnerPageView.missingView, {
     },
     {
       description:
+        'Unavailable links do not show the anonymous browser label or raw browser token.',
+      id: 'browser-identity',
+      label: 'Browser identity',
+      value: 'Private',
+    },
+    {
+      description:
         'Ask your teacher to reopen this link or send a new assignment link.',
       id: 'next-step',
       label: 'Next step',
@@ -21011,6 +21113,7 @@ assert.deepEqual(missingStudentRunnerPageView.missingView, {
     },
   ],
   title: 'Assignment closed',
+  unavailable: publicAssignmentUnavailableClosedPayload,
 });
 assert.deepEqual(missingStudentRunnerPageView.resultPanelView, {
   show: false,

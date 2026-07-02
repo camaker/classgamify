@@ -25,7 +25,10 @@ import {
   normalizeAnonymousToken,
   normalizeStudentName,
 } from '@/assignments/identity';
-import type { PublicAttemptReviewSummary } from '@/assignments/public';
+import type {
+  PublicAssignmentUnavailablePayload,
+  PublicAttemptReviewSummary,
+} from '@/assignments/public';
 import { formatAssignmentResultPercent } from '@/assignments/result-format';
 import {
   normalizeRuntimeDisplayCount,
@@ -308,6 +311,7 @@ export type StudentRunnerMissingReason =
 
 export type StudentRunnerMissingScopeItemId =
   | 'activity-content'
+  | 'browser-identity'
   | 'link-status'
   | 'next-step'
   | 'submissions';
@@ -324,6 +328,7 @@ export type StudentRunnerMissingView = {
   reason: StudentRunnerMissingReason;
   scopeItems: StudentRunnerMissingScopeItem[];
   title: string;
+  unavailable?: PublicAssignmentUnavailablePayload;
 };
 
 const STUDENT_RUNNER_COPY = {
@@ -593,7 +598,8 @@ function getSafeStudentAttemptSubmissionFailureEntries(): Array<{
 }
 
 export function buildStudentRunnerMissingView(
-  reason: StudentRunnerMissingReason
+  reason: StudentRunnerMissingReason,
+  unavailable?: PublicAssignmentUnavailablePayload
 ): StudentRunnerMissingView {
   const reasonView = getStudentRunnerMissingReasonView(reason);
 
@@ -601,6 +607,7 @@ export function buildStudentRunnerMissingView(
     ...reasonView,
     reason,
     scopeItems: buildStudentRunnerMissingScopeItems(reason),
+    ...(unavailable ? { unavailable } : {}),
   };
 }
 
@@ -656,6 +663,13 @@ function buildStudentRunnerMissingScopeItems(
       id: 'submissions',
       label: m.student_runner_missing_scope_submissions_label(),
       value: m.student_runner_missing_scope_submissions_value(),
+    },
+    {
+      description:
+        m.student_runner_missing_scope_browser_identity_description(),
+      id: 'browser-identity',
+      label: m.student_runner_missing_scope_browser_identity_label(),
+      value: m.student_runner_missing_scope_browser_identity_value(),
     },
     {
       description: getStudentRunnerMissingNextStepDescription(reason),

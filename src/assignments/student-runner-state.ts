@@ -59,6 +59,7 @@ import {
   buildPublicAssignmentPreviewAssignment,
   summarizePublicAttemptReviewItemsForTotal,
   stripRuntimeAnswers,
+  type PublicAssignmentUnavailablePayload,
   type PublicAssignmentLookupResult,
   type PublicAttemptReviewSummary,
   type PublicAttemptReviewItem,
@@ -100,6 +101,7 @@ type StudentRunnerPageState =
   | {
       reason: StudentRunnerMissingReason;
       status: 'missing';
+      unavailable?: PublicAssignmentUnavailablePayload;
     }
   | StudentRunnerReadyState;
 
@@ -129,6 +131,7 @@ export type StudentRunnerMissingPageView = {
   reason: StudentRunnerMissingReason;
   scopeItems: StudentRunnerMissingScopeItem[];
   title: string;
+  unavailable?: PublicAssignmentUnavailablePayload;
 };
 
 export type StudentRunnerIdentityView =
@@ -434,7 +437,11 @@ export function buildStudentRunnerPageState({
   }
 
   if (data?.status === 'unavailable') {
-    return { reason: data.reason, status: 'missing' };
+    return {
+      reason: data.reason,
+      status: 'missing',
+      unavailable: data.unavailable,
+    };
   }
 
   if (
@@ -727,7 +734,10 @@ export function buildStudentRunnerPageViewModel({
       pageState.status === 'missing' ? pageState.reason : undefined,
     missingView:
       pageState.status === 'missing'
-        ? buildStudentRunnerMissingPageView(pageState.reason)
+        ? buildStudentRunnerMissingPageView(
+            pageState.reason,
+            pageState.unavailable
+          )
         : undefined,
     previewView:
       activity && assignment && pageState.status === 'ready'
@@ -876,10 +886,11 @@ export function buildStudentRunnerRouteState(
 }
 
 function buildStudentRunnerMissingPageView(
-  reason: StudentRunnerMissingReason
+  reason: StudentRunnerMissingReason,
+  unavailable?: PublicAssignmentUnavailablePayload
 ): StudentRunnerMissingPageView {
   const runnerCopy = getStudentRunnerCopy();
-  const missingView = buildStudentRunnerMissingView(reason);
+  const missingView = buildStudentRunnerMissingView(reason, unavailable);
 
   return {
     badgeLabel: runnerCopy.publicRouteBadgeLabel,
@@ -888,6 +899,9 @@ function buildStudentRunnerMissingPageView(
     reason: missingView.reason,
     scopeItems: missingView.scopeItems,
     title: missingView.title,
+    ...(missingView.unavailable
+      ? { unavailable: missingView.unavailable }
+      : {}),
   };
 }
 
