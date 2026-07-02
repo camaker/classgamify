@@ -1440,8 +1440,9 @@ export function buildAssignmentAttemptRowDisplay({
   studentLabel?: string;
   timeLimitSeconds?: number | null;
 }): AssignmentResultAttemptRowView {
-  const durationView = buildAttemptDurationDisplayView({
-    durationSeconds: attempt.resultJson?.durationSeconds,
+  const durationView = buildAssignmentAttemptRowDurationView({
+    attempt,
+    review,
     timeLimitSeconds,
   });
 
@@ -1459,6 +1460,22 @@ export function buildAssignmentAttemptRowDisplay({
     ),
     submittedAtLabel: formatAssignmentResultDate(attempt.completedAt),
   };
+}
+
+function buildAssignmentAttemptRowDurationView({
+  attempt,
+  review,
+  timeLimitSeconds,
+}: {
+  attempt: Pick<AssignmentAttemptRowDisplayInput, 'resultJson'>;
+  review: Pick<AssignmentAttemptReview, 'durationSeconds'> | undefined;
+  timeLimitSeconds?: number | null;
+}) {
+  return buildAttemptDurationDisplayView({
+    durationSeconds:
+      review?.durationSeconds ?? attempt.resultJson?.durationSeconds,
+    timeLimitSeconds,
+  });
 }
 
 export function buildAssignmentAttemptRowMetricLabels(

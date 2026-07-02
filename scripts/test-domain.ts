@@ -5817,6 +5817,11 @@ assert.match(
   /buildAssignmentAttemptRowDisplay[\s\S]*buildAssignmentAttemptRowMetricLabels\(attempt\)/,
   'Assignment attempt row displays should consume prepared metric labels.'
 );
+assert.match(
+  assignmentResultViewSource,
+  /function buildAssignmentAttemptRowDurationView[\s\S]*review: Pick<AssignmentAttemptReview, 'durationSeconds'> \| undefined;[\s\S]*durationSeconds:[\s\S]*review\?\.durationSeconds \?\? attempt\.resultJson\?\.durationSeconds[\s\S]*timeLimitSeconds/,
+  'Assignment attempt row displays should prefer result-analysis duration while retaining a raw-attempt fallback.'
+);
 assert.doesNotMatch(
   getSourceSlice(
     assignmentResultViewSource,
@@ -45503,8 +45508,8 @@ assert.deepEqual(
   {
     accuracyLabel: '0%',
     answeredLabel: '1/2',
-    durationLabel: '40s',
-    durationView: expectReadableAttemptDurationView('40s', 40),
+    durationLabel: '1m 00s',
+    durationView: expectReadableAttemptDurationView('1m 00s', 60),
     id: 'attempt-3',
     scoreLabel: '0/2',
     studentLabel: 'Anonymous student 1',
