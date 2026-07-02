@@ -1,4 +1,5 @@
 import type { ActivityLibraryStatus } from '@/activities/library-filters';
+import { buildAssignmentPublishDialogAccessView } from '@/assignments/publish-input';
 import { buildAssignmentListRouteSearch } from '@/assignments/list-filters';
 import { buildActivityLibraryRouteSearch } from '@/activities/library-filters';
 import {
@@ -160,6 +161,16 @@ export function ActivityLibraryCard({
     }
   }
 
+  function openPublishDialog() {
+    const accessView = buildAssignmentPublishDialogAccessView(activity.status);
+    if (!accessView.canOpen) {
+      toast.error(accessView.message ?? accessView.description);
+      return;
+    }
+
+    setPublishDialogOpen(true);
+  }
+
   return (
     <Card
       role="article"
@@ -224,7 +235,7 @@ export function ActivityLibraryCard({
           isRestoring={restoreMutation.isPending}
           onArchive={archiveActivity}
           onDuplicate={duplicateActivity}
-          onPublish={() => setPublishDialogOpen(true)}
+          onPublish={openPublishDialog}
           onRestore={restoreActivity}
         />
       </CardContent>

@@ -809,6 +809,7 @@ import {
   assignmentPublishToggleOptions,
   buildAssignmentPublishDraft,
   buildAssignmentPublishDraftDefaults,
+  buildAssignmentPublishDialogAccessView,
   buildAssignmentPublishDialogState,
   buildAssignmentPublishDialogViewModel,
   buildActivityPublishExecutionPlan,
@@ -5027,8 +5028,18 @@ assert.doesNotMatch(
 );
 assert.match(
   activityPublishDialogSource,
-  /buildAssignmentPublishDialogViewModel/,
-  'Assignment publish dialog should consume the assignment-domain dialog view-model.'
+  /buildAssignmentPublishDialogViewModel\(\{[\s\S]*defaults: publishDraftDefaults,[\s\S]*isPublishing: publishMutation\.isPending,[\s\S]*values: publishDraft,[\s\S]*visibility: activity\.visibility/,
+  'Assignment publish dialog should consume the assignment-domain dialog view-model with activity lifecycle visibility.'
+);
+assert.match(
+  activityPublishDialogSource,
+  /function handleOpenChange\(nextOpen: boolean\)[\s\S]*nextOpen && !publishView\.accessView\.canOpen[\s\S]*toast\.error\([\s\S]*publishView\.accessView\.message \?\? publishView\.accessView\.description[\s\S]*onOpenChange\(false\)[\s\S]*<Dialog open=\{open\} onOpenChange=\{handleOpenChange\}/,
+  'Assignment publish dialog should gate open requests through the prepared publish access view.'
+);
+assert.match(
+  activityPublishDialogSource,
+  /aria-label=\{publishView\.accessView\.label\}[\s\S]*aria-describedby=\{accessDescriptionId\}[\s\S]*publishView\.accessView\.description[\s\S]*aria-label=\{publishView\.accessView\.ariaLabel\}[\s\S]*data-status=\{publishView\.accessView\.status\}[\s\S]*publishView\.accessView\.value/,
+  'Assignment publish dialog should render the prepared publish access status without rebuilding copy.'
 );
 assert.match(
   activityPublishDialogSource,
@@ -15473,6 +15484,11 @@ assert.match(
 );
 assert.match(
   assignmentPublishInputSource,
+  /export type AssignmentPublishDialogAccessView = \{[\s\S]*ariaLabel: string;[\s\S]*canOpen: boolean;[\s\S]*canPublish: boolean;[\s\S]*description: string;[\s\S]*label: string;[\s\S]*message\?: string;[\s\S]*status: AssignmentPublishDialogAccessStatus;[\s\S]*value: string;[\s\S]*export function buildAssignmentPublishDialogAccessView\([\s\S]*visibility: ActivityVisibility[\s\S]*buildActivityLifecycleActionView\(\{[\s\S]*action: 'publish'[\s\S]*visibility,[\s\S]*assignment_publish_dialog_access_label[\s\S]*assignment_publish_dialog_access_aria_label/,
+  'Assignment publish dialog access should expose an explicit lifecycle-gated view contract.'
+);
+assert.match(
+  assignmentPublishInputSource,
   /message: string;[\s\S]*ok: false;[\s\S]*reason: AssignmentPublishValidationCode/,
   'Assignment publish draft validation failures should include structured validation reasons.'
 );
@@ -16053,6 +16069,37 @@ assert.equal(
   assignmentPublishDialogCopy.maxAttemptsHelp,
   'Leave blank for unlimited attempts. Use 1-10 to cap each student identity.'
 );
+const assignmentPublishReadyAccessView = {
+  ariaLabel:
+    'Publish access: Available. This activity can be frozen into a student share link.',
+  canOpen: true,
+  canPublish: true,
+  description: 'This activity can be frozen into a student share link.',
+  label: 'Publish access',
+  status: 'ready' as const,
+  value: 'Available',
+};
+const assignmentPublishArchivedAccessMessage =
+  'Restore this activity before publishing, duplicating, or remixing it.';
+const assignmentPublishArchivedAccessView = {
+  ariaLabel:
+    'Publish access: Restore required. Restore this activity before publishing, duplicating, or remixing it.',
+  canOpen: false,
+  canPublish: false,
+  description: assignmentPublishArchivedAccessMessage,
+  label: 'Publish access',
+  message: assignmentPublishArchivedAccessMessage,
+  status: 'blocked' as const,
+  value: 'Restore required',
+};
+assert.deepEqual(
+  buildAssignmentPublishDialogAccessView('draft'),
+  assignmentPublishReadyAccessView
+);
+assert.deepEqual(
+  buildAssignmentPublishDialogAccessView('archived'),
+  assignmentPublishArchivedAccessView
+);
 assert.deepEqual(
   buildAssignmentPublishDraft({
     defaults: buildAssignmentPublishDraftDefaults({
@@ -16336,6 +16383,7 @@ const assignmentPublishDialogViewModel = buildAssignmentPublishDialogViewModel({
 });
 assert.deepEqual(
   {
+    accessView: assignmentPublishDialogViewModel.accessView,
     dialogState: assignmentPublishDialogViewModel.dialogState,
     draft: assignmentPublishDialogViewModel.draft,
     preview: assignmentPublishDialogViewModel.preview,
@@ -16343,6 +16391,7 @@ assert.deepEqual(
     validation: assignmentPublishDialogViewModel.validation,
   },
   {
+    accessView: assignmentPublishReadyAccessView,
     dialogState: {
       errorMessage: undefined,
       publishDisabled: false,
@@ -16397,6 +16446,33 @@ assert.deepEqual(
   {
     errorMessage: 'Add an assignment title before publishing.',
     publishDisabled: true,
+  }
+);
+const archivedAssignmentPublishDialogViewModel =
+  buildAssignmentPublishDialogViewModel({
+    defaults: buildAssignmentPublishDraftDefaults({
+      activityId: 'activity-archived',
+      title: 'Archived food groups',
+    }),
+    now: new Date('2026-01-01T00:00:00.000Z'),
+    values: {
+      title: 'Archived food groups',
+    },
+    visibility: 'archived',
+  });
+assert.deepEqual(
+  {
+    accessView: archivedAssignmentPublishDialogViewModel.accessView,
+    dialogState: archivedAssignmentPublishDialogViewModel.dialogState,
+    validation: archivedAssignmentPublishDialogViewModel.validation,
+  },
+  {
+    accessView: assignmentPublishArchivedAccessView,
+    dialogState: {
+      errorMessage: undefined,
+      publishDisabled: true,
+    },
+    validation: { ok: true },
   }
 );
 assert.deepEqual(
@@ -25289,7 +25365,7 @@ assert.match(
 );
 assert.match(
   activityLibraryCardComponentSource,
-  /ActivityLibraryCardActions[\s\S]*actionState=\{cardDisplayView\.actionState\}[\s\S]*actionView=\{cardDisplayView\.actionView\}[\s\S]*editAction=\{cardDisplayView\.editAction\}[\s\S]*onArchive=\{archiveActivity\}[\s\S]*onDuplicate=\{duplicateActivity\}[\s\S]*onPublish=\{\(\) => setPublishDialogOpen\(true\)\}[\s\S]*onRestore=\{restoreActivity\}/,
+  /function openPublishDialog\(\)[\s\S]*buildAssignmentPublishDialogAccessView\(activity\.status\)[\s\S]*!accessView\.canOpen[\s\S]*toast\.error\(accessView\.message \?\? accessView\.description\)[\s\S]*setPublishDialogOpen\(true\)[\s\S]*ActivityLibraryCardActions[\s\S]*actionState=\{cardDisplayView\.actionState\}[\s\S]*actionView=\{cardDisplayView\.actionView\}[\s\S]*editAction=\{cardDisplayView\.editAction\}[\s\S]*onArchive=\{archiveActivity\}[\s\S]*onDuplicate=\{duplicateActivity\}[\s\S]*onPublish=\{openPublishDialog\}[\s\S]*onRestore=\{restoreActivity\}/,
   'Activity library card component should delegate persisted action rendering to a focused action component.'
 );
 assert.match(
@@ -25484,7 +25560,7 @@ assert.match(
 );
 assert.match(
   createdActivityPanelComponentSource,
-  /CreatedActivityPanelActions[\s\S]*actionView=\{panelContext\.actionView\}[\s\S]*context=\{panelContext\}[\s\S]*onDismiss=\{onDismiss\}[\s\S]*onPublish=\{\(\) => setPublishDialogOpen\(true\)\}/,
+  /function openPublishDialog\(\)[\s\S]*buildAssignmentPublishDialogAccessView\([\s\S]*activity\.visibility[\s\S]*!accessView\.canOpen[\s\S]*toast\.error\(accessView\.message \?\? accessView\.description\)[\s\S]*setPublishDialogOpen\(true\)[\s\S]*CreatedActivityPanelActions[\s\S]*actionView=\{panelContext\.actionView\}[\s\S]*context=\{panelContext\}[\s\S]*onDismiss=\{onDismiss\}[\s\S]*onPublish=\{openPublishDialog\}/,
   'Created activity panel should delegate saved-activity actions to a focused action component.'
 );
 assert.match(

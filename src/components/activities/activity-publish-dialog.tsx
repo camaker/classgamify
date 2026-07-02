@@ -7,6 +7,7 @@ import {
   type AssignmentPublishDraftValues,
 } from '@/assignments/publish-input';
 import { ActivityPublishSettingsForm } from '@/components/activities/activity-publish-settings-form';
+import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import {
   Dialog,
@@ -18,7 +19,7 @@ import {
 } from '@/components/ui/dialog';
 import { usePublishAssignment } from '@/hooks/use-assignments';
 import { IconPlus } from '@tabler/icons-react';
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useId, useMemo, useState } from 'react';
 import { toast } from 'sonner';
 
 type ActivityPublishDialogActivity = {
@@ -45,6 +46,7 @@ export function ActivityPublishDialog({
   open: boolean;
 }) {
   const publishMutation = usePublishAssignment();
+  const accessDescriptionId = useId();
   const publishDraftDefaults = useMemo(
     () =>
       buildAssignmentPublishDraftDefaults({
@@ -58,6 +60,7 @@ export function ActivityPublishDialog({
     defaults: publishDraftDefaults,
     isPublishing: publishMutation.isPending,
     values: publishDraft,
+    visibility: activity.visibility,
   });
 
   useEffect(() => {
@@ -94,8 +97,20 @@ export function ActivityPublishDialog({
     }
   }
 
+  function handleOpenChange(nextOpen: boolean) {
+    if (nextOpen && !publishView.accessView.canOpen) {
+      toast.error(
+        publishView.accessView.message ?? publishView.accessView.description
+      );
+      onOpenChange(false);
+      return;
+    }
+
+    onOpenChange(nextOpen);
+  }
+
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
+    <Dialog open={open} onOpenChange={handleOpenChange}>
       <DialogContent className="sm:max-w-lg">
         <DialogHeader>
           <DialogTitle>{assignmentPublishDialogCopy.title}</DialogTitle>
@@ -103,6 +118,35 @@ export function ActivityPublishDialog({
             {assignmentPublishDialogCopy.description}
           </DialogDescription>
         </DialogHeader>
+        <section
+          aria-label={publishView.accessView.label}
+          aria-describedby={accessDescriptionId}
+          className="flex flex-wrap items-start justify-between gap-3 rounded-lg border bg-muted/30 p-3"
+        >
+          <div className="min-w-0">
+            <p className="font-medium text-sm">
+              {publishView.accessView.label}
+            </p>
+            <p
+              className="mt-1 text-muted-foreground text-xs leading-5"
+              id={accessDescriptionId}
+            >
+              {publishView.accessView.description}
+            </p>
+          </div>
+          <Badge
+            aria-label={publishView.accessView.ariaLabel}
+            className="rounded-md"
+            data-status={publishView.accessView.status}
+            variant={
+              publishView.accessView.status === 'blocked'
+                ? 'destructive'
+                : 'outline'
+            }
+          >
+            {publishView.accessView.value}
+          </Badge>
+        </section>
         <ActivityPublishSettingsForm
           activityId={activity.id}
           draft={publishView.draft}

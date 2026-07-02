@@ -128,6 +128,19 @@ export type AssignmentPublishPreviewContextStatId =
 
 export type AssignmentPublishPreviewContextTone = 'blocked' | 'ready';
 
+export type AssignmentPublishDialogAccessStatus = 'blocked' | 'ready';
+
+export type AssignmentPublishDialogAccessView = {
+  ariaLabel: string;
+  canOpen: boolean;
+  canPublish: boolean;
+  description: string;
+  label: string;
+  message?: string;
+  status: AssignmentPublishDialogAccessStatus;
+  value: string;
+};
+
 export type AssignmentPublishPreviewContextStatusView = {
   label: string;
   message: string;
@@ -175,6 +188,7 @@ export type AssignmentPublishDraftValues = Partial<
 >;
 
 export type AssignmentPublishDialogViewModel = {
+  accessView: AssignmentPublishDialogAccessView;
   dialogState: AssignmentPublishDialogState;
   draft: AssignmentPublishDraft;
   preview: AssignmentPublishPreview;
@@ -209,6 +223,9 @@ export const assignmentPublishDialogCopy = {
   },
   get description() {
     return m.assignment_publish_dialog_description();
+  },
+  get accessLabel() {
+    return m.assignment_publish_dialog_access_label();
   },
   get instructionsLabel() {
     return m.assignment_publish_dialog_instructions_label();
@@ -346,11 +363,13 @@ export function buildAssignmentPublishDialogViewModel({
   isPublishing = false,
   now,
   values,
+  visibility = 'draft',
 }: {
   defaults: AssignmentPublishDraft;
   isPublishing?: boolean;
   now?: Date;
   values: AssignmentPublishDraftValues;
+  visibility?: ActivityVisibility;
 }): AssignmentPublishDialogViewModel {
   const draft = buildAssignmentPublishDraft({ defaults, values });
   const effectiveNow = now ?? new Date();
@@ -358,9 +377,12 @@ export function buildAssignmentPublishDialogViewModel({
     ...draft,
     now: effectiveNow,
   });
+  const accessView = buildAssignmentPublishDialogAccessView(visibility);
 
   return {
+    accessView,
     dialogState: buildAssignmentPublishDialogState({
+      accessView,
       isPublishing,
       validation,
     }),
@@ -372,6 +394,41 @@ export function buildAssignmentPublishDialogViewModel({
     }),
     toggleViews: buildAssignmentPublishToggleViews(draft),
     validation,
+  };
+}
+
+export function buildAssignmentPublishDialogAccessView(
+  visibility: ActivityVisibility
+): AssignmentPublishDialogAccessView {
+  const actionView = buildActivityLifecycleActionView({
+    action: 'publish',
+    visibility,
+  });
+  const blockedGate =
+    actionView.gate.type === 'blocked' ? actionView.gate : undefined;
+  const label = m.assignment_publish_dialog_access_label();
+  const value = blockedGate
+    ? m.assignment_publish_dialog_access_blocked_value()
+    : m.assignment_publish_dialog_access_ready_value();
+  const description = blockedGate
+    ? m.assignment_publish_dialog_access_blocked_description({
+        reason: blockedGate.message,
+      })
+    : m.assignment_publish_dialog_access_ready_description();
+
+  return {
+    ariaLabel: m.assignment_publish_dialog_access_aria_label({
+      description,
+      label,
+      value,
+    }),
+    canOpen: !blockedGate,
+    canPublish: !blockedGate,
+    description,
+    label,
+    ...(blockedGate ? { message: blockedGate.message } : {}),
+    status: blockedGate ? 'blocked' : 'ready',
+    value,
   };
 }
 
@@ -593,15 +650,19 @@ export function validateAssignmentPublishDraft({
 }
 
 export function buildAssignmentPublishDialogState({
+  accessView,
   isPublishing = false,
   validation,
 }: {
+  accessView?: AssignmentPublishDialogAccessView;
   isPublishing?: boolean;
   validation: AssignmentPublishDraftValidation;
 }): AssignmentPublishDialogState {
+  const accessBlocked = accessView ? !accessView.canPublish : false;
+
   return {
     errorMessage: validation.ok ? undefined : validation.message,
-    publishDisabled: isPublishing || !validation.ok,
+    publishDisabled: isPublishing || !validation.ok || accessBlocked,
   };
 }
 

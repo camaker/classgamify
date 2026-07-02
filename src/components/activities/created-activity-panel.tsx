@@ -9,6 +9,7 @@ import {
   type CreatedActivityPanelPublishActionView,
 } from '@/activities/library-view';
 import { buildAssignmentListRouteSearch } from '@/assignments/list-filters';
+import { buildAssignmentPublishDialogAccessView } from '@/assignments/publish-input';
 import { ActivityPublishDialog } from '@/components/activities/activity-publish-dialog';
 import { Button, buttonVariants } from '@/components/ui/button';
 import { Routes } from '@/lib/routes';
@@ -21,6 +22,7 @@ import {
 } from '@tabler/icons-react';
 import { Link, useNavigate } from '@tanstack/react-router';
 import { useState } from 'react';
+import { toast } from 'sonner';
 
 type CreatedActivityPanelProps = {
   context: CreatedActivityPanelContext | undefined;
@@ -40,6 +42,20 @@ export function CreatedActivityPanel({
       isLoading: true,
     });
   const { activity } = panelContext;
+
+  function openPublishDialog() {
+    if (!activity) return;
+
+    const accessView = buildAssignmentPublishDialogAccessView(
+      activity.visibility
+    );
+    if (!accessView.canOpen) {
+      toast.error(accessView.message ?? accessView.description);
+      return;
+    }
+
+    setPublishDialogOpen(true);
+  }
 
   return (
     <>
@@ -63,7 +79,7 @@ export function CreatedActivityPanel({
           actionView={panelContext.actionView}
           context={panelContext}
           onDismiss={onDismiss}
-          onPublish={() => setPublishDialogOpen(true)}
+          onPublish={openPublishDialog}
         />
       </section>
       {activity ? (
