@@ -34,6 +34,27 @@ type SettingsBillingCardAction = {
   label: string;
 };
 
+export type SettingsBillingCardPlanFeatureSectionId = 'features' | 'limits';
+
+export type SettingsBillingCardPlanFeatureItem = {
+  ariaLabel: string;
+  id: string;
+  label: string;
+};
+
+export type SettingsBillingCardPlanFeatureSection = {
+  description: string;
+  id: SettingsBillingCardPlanFeatureSectionId;
+  items: SettingsBillingCardPlanFeatureItem[];
+  title: string;
+};
+
+export type SettingsBillingCardNextStepView = {
+  ariaLabel: string;
+  description: string;
+  label: string;
+};
+
 export type SettingsBillingCardBadge = {
   icon: SettingsBillingCardBadgeIcon;
   label: string;
@@ -49,17 +70,21 @@ export type SettingsBillingCardPeriodRow = {
 };
 
 export type SettingsBillingCardPlanView = {
+  description?: string;
+  featureSections: SettingsBillingCardPlanFeatureSection[];
   id: string;
   isFree: boolean;
   isLifetime: boolean;
   message?: string;
   name: string;
+  nextStep: SettingsBillingCardNextStepView;
 };
 
 export type SettingsBillingCardViewModel = {
   action?: SettingsBillingCardAction;
   header: SettingsBillingCardHeader;
   message?: string;
+  nextStep?: SettingsBillingCardNextStepView;
   periodRows: SettingsBillingCardPeriodRow[];
   plan?: SettingsBillingCardPlanView;
   state: SettingsBillingCardState;
@@ -122,6 +147,7 @@ export function buildSettingsBillingCardViewModel({
         label: m.settings_billing_card_upgrade_plan(),
       },
       message: m.settings_billing_card_no_plan(),
+      nextStep: buildSettingsBillingNoPlanNextStepView(),
     };
   }
 
@@ -169,11 +195,14 @@ function buildSettingsBillingCardPlanView(
   plan: PricePlan
 ): SettingsBillingCardPlanView {
   return {
+    description: normalizeSettingsBillingText(plan.description),
+    featureSections: buildSettingsBillingPlanFeatureSections(plan),
     id: plan.id,
     isFree: plan.isFree,
     isLifetime: plan.isLifetime,
     message: buildSettingsBillingPlanMessage(plan),
     name: plan.name ?? plan.id ?? m.settings_billing_card_free(),
+    nextStep: buildSettingsBillingPlanNextStepView(plan),
   };
 }
 
@@ -182,6 +211,117 @@ function buildSettingsBillingPlanMessage(plan: PricePlan) {
   if (plan.isLifetime) return m.settings_billing_card_lifetime_message();
 
   return undefined;
+}
+
+function buildSettingsBillingPlanFeatureSections(
+  plan: PricePlan
+): SettingsBillingCardPlanFeatureSection[] {
+  const sections: SettingsBillingCardPlanFeatureSection[] = [];
+  const featureItems = buildSettingsBillingPlanFeatureItems({
+    items: plan.features,
+    sectionId: 'features',
+  });
+  const limitItems = buildSettingsBillingPlanFeatureItems({
+    items: plan.limits,
+    sectionId: 'limits',
+  });
+
+  if (featureItems.length > 0) {
+    sections.push({
+      description: m.settings_billing_card_features_description(),
+      id: 'features',
+      items: featureItems,
+      title: m.settings_billing_card_features_title(),
+    });
+  }
+
+  if (limitItems.length > 0) {
+    sections.push({
+      description: m.settings_billing_card_limits_description(),
+      id: 'limits',
+      items: limitItems,
+      title: m.settings_billing_card_limits_title(),
+    });
+  }
+
+  return sections;
+}
+
+function buildSettingsBillingPlanFeatureItems({
+  items,
+  sectionId,
+}: {
+  items?: string[];
+  sectionId: SettingsBillingCardPlanFeatureSectionId;
+}): SettingsBillingCardPlanFeatureItem[] {
+  return normalizeSettingsBillingTextList(items).map((label, index) => ({
+    ariaLabel:
+      sectionId === 'features'
+        ? m.settings_billing_card_feature_item_aria({ label })
+        : m.settings_billing_card_limit_item_aria({ label }),
+    id: `${sectionId}:${index}`,
+    label,
+  }));
+}
+
+function buildSettingsBillingPlanNextStepView(
+  plan: PricePlan
+): SettingsBillingCardNextStepView {
+  if (plan.isFree) {
+    return buildSettingsBillingNextStepView({
+      description: m.settings_billing_card_next_step_free_description(),
+      label: m.settings_billing_card_next_step_free_label(),
+    });
+  }
+
+  if (plan.isLifetime) {
+    return buildSettingsBillingNextStepView({
+      description: m.settings_billing_card_next_step_lifetime_description(),
+      label: m.settings_billing_card_next_step_lifetime_label(),
+    });
+  }
+
+  return buildSettingsBillingNextStepView({
+    description: m.settings_billing_card_next_step_pro_description(),
+    label: m.settings_billing_card_next_step_pro_label(),
+  });
+}
+
+function buildSettingsBillingNoPlanNextStepView(): SettingsBillingCardNextStepView {
+  return buildSettingsBillingNextStepView({
+    description: m.settings_billing_card_next_step_no_plan_description(),
+    label: m.settings_billing_card_next_step_no_plan_label(),
+  });
+}
+
+function buildSettingsBillingNextStepView({
+  description,
+  label,
+}: {
+  description: string;
+  label: string;
+}): SettingsBillingCardNextStepView {
+  return {
+    ariaLabel: m.settings_billing_card_next_step_aria({
+      description,
+      label,
+    }),
+    description,
+    label,
+  };
+}
+
+function normalizeSettingsBillingText(value: string | undefined) {
+  const normalizedValue = value?.trim();
+  return normalizedValue ? normalizedValue : undefined;
+}
+
+function normalizeSettingsBillingTextList(values: string[] | undefined) {
+  return (
+    values
+      ?.map((value) => normalizeSettingsBillingText(value))
+      .filter((value): value is string => Boolean(value)) ?? []
+  );
 }
 
 function buildSettingsBillingCardAction({

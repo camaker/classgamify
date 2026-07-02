@@ -7331,6 +7331,16 @@ assert.match(
   /buildSettingsBillingCardViewModel/,
   'BillingCard should render the shared billing view model instead of rebuilding plan state locally.'
 );
+assert.match(
+  billingCardSource,
+  /BillingPlanFeatureSections[\s\S]*sections=\{view\.plan\.featureSections\}[\s\S]*BillingNextStepView[\s\S]*nextStep=\{view\.plan\.nextStep\}/,
+  'BillingCard should render prepared plan features and next-step copy from the billing view model.'
+);
+assert.match(
+  billingViewSource,
+  /description: normalizeSettingsBillingText\(plan\.description\)[\s\S]*featureSections: buildSettingsBillingPlanFeatureSections\(plan\)[\s\S]*buildSettingsBillingPlanFeatureItems\(\{[\s\S]*items: plan\.features[\s\S]*items: plan\.limits/,
+  'Billing view model should derive plan description, included capabilities, and limits from the configured price plan.'
+);
 assert.doesNotMatch(
   billingCardSource,
   /getPricePlans\(\)[\s\S]*find\(\(p\) => p\.id === currentPlan\.id\)|subscription\.status === 'trialing'|subscription\.cancelAtPeriodEnd/,
@@ -7340,6 +7350,11 @@ assert.match(
   paymentCardSource,
   /buildPaymentStatusView/,
   'PaymentCard should render the shared payment status view instead of owning localized status copy.'
+);
+assert.match(
+  paymentCardSource,
+  /PaymentStatusNextStep[\s\S]*nextStep=\{statusView\.nextStep\}/,
+  'PaymentCard should render the prepared payment next-step view from the payment status helper.'
 );
 assert.match(
   paymentCardSource,
@@ -7353,8 +7368,8 @@ assert.doesNotMatch(
 );
 assert.match(
   paymentStatusViewSource,
-  /settings_payment_processing_description[\s\S]*settings_payment_success_description[\s\S]*settings_payment_failed_description[\s\S]*settings_payment_timeout_description/,
-  'Payment status copy should stay centralized in the payment status view helper.'
+  /settings_payment_processing_description[\s\S]*settings_payment_processing_next_step_description[\s\S]*settings_payment_success_description[\s\S]*settings_payment_success_next_step_description[\s\S]*settings_payment_failed_description[\s\S]*settings_payment_failed_next_step_description[\s\S]*settings_payment_timeout_description[\s\S]*settings_payment_timeout_next_step_description/,
+  'Payment status and next-step copy should stay centralized in the payment status view helper.'
 );
 overwriteGetLocale(() => 'en');
 const formatBillingTestDate = (date: Date) =>
@@ -7368,12 +7383,21 @@ const freeBillingPlan: PricePlan = {
 };
 const configuredFreeBillingPlan: PricePlan = {
   ...freeBillingPlan,
+  description: 'Configured starter classroom access.',
+  features: ['Create classroom activities', 'Open student preview links'],
+  limits: ['AI drafts', 'Result exports'],
   name: 'Configured Free',
 };
 const proBillingPlan: PricePlan = {
+  description: 'Reusable activities and assignment review for teachers.',
+  features: [
+    'Larger activity library',
+    'Student completion and score tracking',
+  ],
   id: 'pro',
   isFree: false,
   isLifetime: false,
+  limits: ['School workspace seats'],
   name: 'Classroom Pro',
   prices: [
     {
@@ -7386,9 +7410,12 @@ const proBillingPlan: PricePlan = {
   ],
 };
 const lifetimeBillingPlan: PricePlan = {
+  description: 'Early supporter classroom workflow access.',
+  features: ['Everything in Teacher Pro', 'Early access to new templates'],
   id: 'lifetime',
   isFree: false,
   isLifetime: true,
+  limits: [],
   name: 'Lifetime Studio',
   prices: [
     {
@@ -7445,6 +7472,10 @@ const noPlanBillingView = buildSettingsBillingCardViewModel({
 });
 assert.equal(noPlanBillingView.state, 'no-plan');
 assert.equal(noPlanBillingView.action?.kind, 'upgrade');
+assert.match(
+  noPlanBillingView.nextStep?.description ?? '',
+  /student previews/
+);
 const freeBillingView = buildSettingsBillingCardViewModel({
   canManageBilling: true,
   currentPlan: freeBillingPlan,
@@ -7457,8 +7488,30 @@ const freeBillingView = buildSettingsBillingCardViewModel({
 assert.equal(freeBillingView.state, 'ready');
 assert.equal(freeBillingView.plan?.name, 'Configured Free');
 assert.equal(freeBillingView.plan?.isFree, true);
+assert.equal(
+  freeBillingView.plan?.description,
+  'Configured starter classroom access.'
+);
 assert.equal(freeBillingView.action?.kind, 'upgrade');
 assert.match(freeBillingView.plan?.message ?? '', /classroom activity workflow/);
+assert.deepEqual(
+  freeBillingView.plan?.featureSections.map((section) => [
+    section.id,
+    section.items.map((item) => item.label),
+  ]),
+  [
+    ['features', ['Create classroom activities', 'Open student preview links']],
+    ['limits', ['AI drafts', 'Result exports']],
+  ]
+);
+assert.match(
+  freeBillingView.plan?.featureSections[0]?.items[0]?.ariaLabel ?? '',
+  /Included plan capability/
+);
+assert.match(
+  freeBillingView.plan?.nextStep.description ?? '',
+  /assignment handoffs/
+);
 assert.doesNotMatch(
   freeBillingView.plan?.message ?? '',
   /starter activity workflow/i,
@@ -7479,6 +7532,23 @@ const trialBillingView = buildSettingsBillingCardViewModel({
 assert.equal(trialBillingView.statusBadge?.tone, 'trial');
 assert.equal(trialBillingView.statusBadge?.icon, 'clock');
 assert.equal(trialBillingView.action?.kind, 'manage-subscription');
+assert.deepEqual(
+  trialBillingView.plan?.featureSections.map((section) => [
+    section.id,
+    section.items.map((item) => item.label),
+  ]),
+  [
+    [
+      'features',
+      ['Larger activity library', 'Student completion and score tracking'],
+    ],
+    ['limits', ['School workspace seats']],
+  ]
+);
+assert.match(
+  trialBillingView.plan?.nextStep.description ?? '',
+  /result exports/
+);
 assert.deepEqual(
   trialBillingView.periodRows.map((row) => [
     row.id,
@@ -7502,12 +7572,27 @@ const lifetimeBillingView = buildSettingsBillingCardViewModel({
 });
 assert.equal(lifetimeBillingView.action?.kind, 'manage-billing');
 assert.match(lifetimeBillingView.plan?.message ?? '', /lifetime access/);
+assert.deepEqual(
+  lifetimeBillingView.plan?.featureSections.map((section) => section.id),
+  ['features']
+);
+assert.match(
+  lifetimeBillingView.plan?.nextStep.description ?? '',
+  /source-material workflows/
+);
 assert.equal(getInitialPaymentConfirmationStatus(undefined), 'failed');
 assert.equal(getInitialPaymentConfirmationStatus('cs_test'), 'processing');
 assert.deepEqual(buildPaymentStatusView('processing'), {
   description:
     'Please wait while we verify ClassGamify plan access for your teacher workspace, saved activities, assignments, and results.',
   icon: 'loader',
+  nextStep: {
+    ariaLabel:
+      'What happens next. ClassGamify keeps checking the hosted payment result, then refreshes your billing access for activities, assignments, AI drafts, and result workflows.',
+    description:
+      'ClassGamify keeps checking the hosted payment result, then refreshes your billing access for activities, assignments, AI drafts, and result workflows.',
+    label: 'What happens next',
+  },
   title: 'Confirming your payment',
   tone: 'working',
 });
@@ -7518,10 +7603,18 @@ assert.match(
 );
 assert.equal(buildPaymentStatusView('failed').icon, 'x');
 assert.match(buildPaymentStatusView('failed').description, /pricing page/);
+assert.match(
+  buildPaymentStatusView('failed').nextStep.description,
+  /hosted checkout session/
+);
 assert.equal(buildPaymentStatusView('timeout').tone, 'warning');
 assert.match(
   buildPaymentStatusView('timeout').description,
   /Billing later[\s\S]*assignment workflow limits/
+);
+assert.match(
+  buildPaymentStatusView('timeout').nextStep.description,
+  /source of truth/
 );
 const newsletterApiSource = readFileSync('src/api/newsletter.ts', 'utf8');
 assert.doesNotMatch(
@@ -9538,10 +9631,15 @@ const authWorkspaceBoundaryRequirements = [
       ],
       ['settings_security_delete_account_warning', /classroom result records/],
       ['settings_payment_processing_description', /saved activities, assignments, and results/],
+      ['settings_payment_processing_next_step_description', /AI drafts, and result workflows/],
       ['settings_payment_success_description', /activity, assignment, and AI access/],
+      ['settings_payment_success_next_step_description', /classroom access/],
       ['settings_billing_card_current_plan_description', /assignment workflow limits/],
+      ['settings_billing_card_features_description', /assignment links, AI drafts, and result workflows/],
+      ['settings_billing_card_limits_description', /school plan/],
       ['settings_billing_card_free_plan_message', /AI drafts, and result exports/],
       ['settings_billing_card_lifetime_message', /source-material workflows/],
+      ['settings_billing_card_next_step_pro_description', /student attempts, AI drafts, and result exports/],
     ],
   ],
   [
@@ -9564,10 +9662,15 @@ const authWorkspaceBoundaryRequirements = [
       ],
       ['settings_security_delete_account_warning', /课堂结果记录/],
       ['settings_payment_processing_description', /已保存活动、作业和结果/],
+      ['settings_payment_processing_next_step_description', /AI 草稿和结果工作流/],
       ['settings_payment_success_description', /活动、作业和 AI 权限/],
+      ['settings_payment_success_next_step_description', /课堂权限/],
       ['settings_billing_card_current_plan_description', /作业工作流限制/],
+      ['settings_billing_card_features_description', /作业链接、AI 草稿和结果工作流/],
+      ['settings_billing_card_limits_description', /学校方案/],
       ['settings_billing_card_free_plan_message', /AI 草稿和结果导出/],
       ['settings_billing_card_lifetime_message', /来源素材工作流/],
+      ['settings_billing_card_next_step_pro_description', /学生尝试、AI 草稿和结果导出/],
     ],
   ],
 ] as const;

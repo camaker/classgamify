@@ -13,6 +13,7 @@ import {
   buildPaymentStatusView,
   getInitialPaymentConfirmationStatus,
   type PaymentConfirmationStatus,
+  type PaymentStatusNextStepView,
   type PaymentStatusIconKey,
   type PaymentStatusTone,
 } from '@/payment/payment-status-view';
@@ -117,8 +118,27 @@ export function PaymentCard({
           </div>
           <CardTitle>{statusView.title}</CardTitle>
           <CardDescription>{statusView.description}</CardDescription>
+          <PaymentStatusNextStep nextStep={statusView.nextStep} />
         </CardHeader>
       </Card>
     </div>
+  );
+}
+
+function PaymentStatusNextStep({
+  nextStep,
+}: {
+  nextStep: PaymentStatusNextStepView;
+}) {
+  return (
+    <section
+      aria-label={nextStep.ariaLabel}
+      className="mt-4 border-t pt-4 text-left text-sm"
+    >
+      <p className="font-medium text-foreground">{nextStep.label}</p>
+      <p className="mt-1 text-muted-foreground leading-6">
+        {nextStep.description}
+      </p>
+    </section>
   );
 }

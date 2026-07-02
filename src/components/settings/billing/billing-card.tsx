@@ -19,11 +19,18 @@ import {
   buildSettingsBillingCardViewModel,
   type SettingsBillingCardActionKind,
   type SettingsBillingCardBadge,
+  type SettingsBillingCardNextStepView,
+  type SettingsBillingCardPlanFeatureSection,
   type SettingsBillingCardPeriodRow,
 } from '@/payment/billing-view';
 import { Link } from '@tanstack/react-router';
 import { Routes } from '@/lib/routes';
-import { IconCircleCheck, IconClock, IconRefresh } from '@tabler/icons-react';
+import {
+  IconCircleCheck,
+  IconClock,
+  IconListCheck,
+  IconRefresh,
+} from '@tabler/icons-react';
 import { useCallback } from 'react';
 /** Card container: full width, no bottom padding */
 const cardClass = cn('w-full overflow-hidden pt-6 pb-0 flex flex-col');
@@ -115,7 +122,12 @@ export function BillingCard() {
           <CardDescription>{view.header.description}</CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="text-sm text-muted-foreground">{view.message}</div>
+          <div className="space-y-4 text-sm text-muted-foreground">
+            <p>{view.message}</p>
+            {view.nextStep ? (
+              <BillingNextStepView nextStep={view.nextStep} />
+            ) : null}
+          </div>
         </CardContent>
         <CardFooter className={footerClass}>
           <BillingCardAction action={view.action} onRetry={handleRetry} />
@@ -144,6 +156,20 @@ export function BillingCard() {
           </div>
         )}
 
+        {view.plan?.description ? (
+          <div className="text-sm text-muted-foreground">
+            {view.plan.description}
+          </div>
+        ) : null}
+
+        {view.plan ? (
+          <BillingPlanFeatureSections sections={view.plan.featureSections} />
+        ) : null}
+
+        {view.plan?.nextStep ? (
+          <BillingNextStepView nextStep={view.plan.nextStep} />
+        ) : null}
+
         {view.periodRows.length > 0 && (
           <div className="text-sm text-muted-foreground space-y-2">
             {view.periodRows.map((row) => (
@@ -156,6 +182,58 @@ export function BillingCard() {
         <BillingCardAction action={view.action} onRetry={handleRetry} />
       </CardFooter>
     </Card>
+  );
+}
+
+function BillingPlanFeatureSections({
+  sections,
+}: {
+  sections: SettingsBillingCardPlanFeatureSection[];
+}) {
+  if (sections.length === 0) return null;
+
+  return (
+    <div className="grid gap-4 border-t pt-4 sm:grid-cols-2">
+      {sections.map((section) => (
+        <section className="min-w-0 space-y-2" key={section.id}>
+          <div className="space-y-1">
+            <h3 className="font-medium text-sm">{section.title}</h3>
+            <p className="text-muted-foreground text-xs leading-5">
+              {section.description}
+            </p>
+          </div>
+          <ul className="grid gap-2">
+            {section.items.map((item) => (
+              <li
+                aria-label={item.ariaLabel}
+                className="flex min-w-0 items-start gap-2 text-sm"
+                key={item.id}
+              >
+                <IconListCheck className="mt-0.5 size-4 shrink-0 text-primary" />
+                <span className="min-w-0 text-muted-foreground">
+                  {item.label}
+                </span>
+              </li>
+            ))}
+          </ul>
+        </section>
+      ))}
+    </div>
+  );
+}
+
+function BillingNextStepView({
+  nextStep,
+}: {
+  nextStep: SettingsBillingCardNextStepView;
+}) {
+  return (
+    <section aria-label={nextStep.ariaLabel} className="border-t pt-4 text-sm">
+      <p className="font-medium text-foreground">{nextStep.label}</p>
+      <p className="mt-1 text-muted-foreground leading-6">
+        {nextStep.description}
+      </p>
+    </section>
   );
 }
 
