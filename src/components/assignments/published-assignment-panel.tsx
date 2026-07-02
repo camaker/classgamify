@@ -6,6 +6,7 @@ import {
   type PublishedAssignmentPanelPrintAction,
   type PublishedAssignmentPanelResultAction,
   type PublishedAssignmentPanelShareAction,
+  type PublishedAssignmentPanelNextStepView,
   buildPublishedAssignmentPanelContext,
 } from '@/assignments/published-assignment';
 import { CopyAssignmentShareLinkButton } from '@/components/assignments/copy-assignment-share-link-button';
@@ -62,16 +63,10 @@ export function PublishedAssignmentPanel({
             <span className="ml-2 font-mono">{panelContext.sharePath}</span>
           </span>
         </div>
-        {panelContext.nextStepViews.length ? (
-          <ul className="mt-3 grid gap-1 text-muted-foreground text-xs leading-5">
-            {panelContext.nextStepViews.map((step) => (
-              <li className="flex gap-2" key={step.id}>
-                <span aria-hidden="true">-</span>
-                <span>{step.label}</span>
-              </li>
-            ))}
-          </ul>
-        ) : null}
+        <PublishedAssignmentNextSteps
+          label={panelContext.nextStepsLabel}
+          stepViews={panelContext.nextStepViews}
+        />
         {panelContext.showMissingHint ? (
           <p className="mt-2 text-xs leading-5 text-muted-foreground">
             {assignmentListPublishedPanelCopy.missingHint}
@@ -82,6 +77,42 @@ export function PublishedAssignmentPanel({
         actionView={panelContext.actionView}
         onDismiss={onDismiss}
       />
+    </section>
+  );
+}
+
+function PublishedAssignmentNextSteps({
+  label,
+  stepViews,
+}: {
+  label: string;
+  stepViews: PublishedAssignmentPanelNextStepView[];
+}) {
+  if (!stepViews.length) return null;
+
+  return (
+    <section aria-label={label} className="mt-3">
+      <p className="font-medium text-muted-foreground text-xs">{label}</p>
+      <ul className="mt-2 grid gap-2 md:grid-cols-2">
+        {stepViews.map((stepView) => (
+          <li key={stepView.id}>
+            <section
+              aria-label={stepView.ariaLabel}
+              className="rounded-md border bg-background px-3 py-2"
+            >
+              <div className="flex items-center justify-between gap-2">
+                <span className="font-medium text-sm">{stepView.label}</span>
+                <span className="rounded-md border bg-muted px-2 py-0.5 text-[11px] text-muted-foreground">
+                  {stepView.statusLabel}
+                </span>
+              </div>
+              <p className="mt-1 text-muted-foreground text-xs leading-5">
+                {stepView.description}
+              </p>
+            </section>
+          </li>
+        ))}
+      </ul>
     </section>
   );
 }

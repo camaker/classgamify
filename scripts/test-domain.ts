@@ -17219,6 +17219,58 @@ const publishedAssignmentFromLookup = {
   shareSlug: ' share-３ ',
   title: 'Week 3',
 };
+function buildExpectedPublishedAssignmentNextStepViews({
+  includeFoundActions,
+}: {
+  includeFoundActions: boolean;
+}) {
+  const baseSteps = [
+    {
+      ariaLabel:
+        'Copy link: Ready now. Copy the student link into your class chat or LMS.',
+      description: 'Copy the student link into your class chat or LMS.',
+      id: 'copy-link',
+      label: 'Copy link',
+      status: 'ready',
+      statusLabel: 'Ready now',
+    },
+    {
+      ariaLabel:
+        'Preview as student: Ready now. Open the link once as a student before sending it.',
+      description: 'Open the link once as a student before sending it.',
+      id: 'preview-link',
+      label: 'Preview as student',
+      status: 'ready',
+      statusLabel: 'Ready now',
+    },
+  ];
+
+  return includeFoundActions
+    ? [
+        ...baseSteps,
+        {
+          ariaLabel:
+            'Prepare print page: Optional. Open the printable worksheet without an answer key for offline backup or paper handout.',
+          description:
+            'Open the printable worksheet without an answer key for offline backup or paper handout.',
+          id: 'print-worksheet',
+          label: 'Prepare print page',
+          status: 'optional',
+          statusLabel: 'Optional',
+        },
+        {
+          ariaLabel:
+            'Open results: After submissions. Keep the results page ready for submissions and follow-up.',
+          description:
+            'Keep the results page ready for submissions and follow-up.',
+          id: 'review-results',
+          label: 'Open results',
+          status: 'after-submissions',
+          statusLabel: 'After submissions',
+        },
+      ]
+    : baseSteps;
+}
 assert.deepEqual(
   resolvePublishedAssignmentPanelAssignment({
     assignment: publishedAssignmentFromLookup,
@@ -17271,20 +17323,10 @@ assert.deepEqual(
     },
     assignment: publishedAssignments[1]?.assignment,
     body: 'Copy the student link for your class, open the student preview, or jump into the results page before submissions arrive.',
-    nextStepViews: [
-      {
-        id: 'copy-link',
-        label: 'Copy the student link into your class chat or LMS.',
-      },
-      {
-        id: 'preview-link',
-        label: 'Open the link once as a student before sending it.',
-      },
-      {
-        id: 'review-results',
-        label: 'Keep the results page ready for submissions and follow-up.',
-      },
-    ],
+    nextStepViews: buildExpectedPublishedAssignmentNextStepViews({
+      includeFoundActions: true,
+    }),
+    nextStepsLabel: 'Distribution checklist',
     sharePath: '/play/share-2',
     sharePathLabel: 'Student link',
     shareUrl: buildAssignmentShareUrl('share-2'),
@@ -17320,16 +17362,10 @@ assert.deepEqual(
       },
     },
     body: 'Loading the newly published assignment link and classroom actions.',
-    nextStepViews: [
-      {
-        id: 'copy-link',
-        label: 'Copy the student link into your class chat or LMS.',
-      },
-      {
-        id: 'preview-link',
-        label: 'Open the link once as a student before sending it.',
-      },
-    ],
+    nextStepViews: buildExpectedPublishedAssignmentNextStepViews({
+      includeFoundActions: false,
+    }),
+    nextStepsLabel: 'Distribution checklist',
     sharePath: '/play/share-2',
     sharePathLabel: 'Student link',
     shareUrl: buildAssignmentShareUrl('share-2'),
@@ -17365,16 +17401,10 @@ assert.deepEqual(
       },
     },
     body: 'Copy the student link for your class or open the student preview. Results will appear once the assignment is visible in this list.',
-    nextStepViews: [
-      {
-        id: 'copy-link',
-        label: 'Copy the student link into your class chat or LMS.',
-      },
-      {
-        id: 'preview-link',
-        label: 'Open the link once as a student before sending it.',
-      },
-    ],
+    nextStepViews: buildExpectedPublishedAssignmentNextStepViews({
+      includeFoundActions: false,
+    }),
+    nextStepsLabel: 'Distribution checklist',
     sharePath: '/play/missing',
     sharePathLabel: 'Student link',
     shareUrl: buildAssignmentShareUrl('missing'),
@@ -17394,7 +17424,7 @@ assert.equal(
 );
 assert.deepEqual(
   buildPublishedAssignmentPanelNextStepViews('found').map((step) => step.id),
-  ['copy-link', 'preview-link', 'review-results']
+  ['copy-link', 'preview-link', 'print-worksheet', 'review-results']
 );
 assert.deepEqual(
   buildPublishedAssignmentPanelNextStepViews('loading').map((step) => step.id),
@@ -17404,6 +17434,46 @@ assert.deepEqual(
   buildPublishedAssignmentPanelNextStepViews('missing').map((step) => step.id),
   ['copy-link', 'preview-link']
 );
+overwriteGetLocale(() => 'zh');
+try {
+  assert.deepEqual(buildPublishedAssignmentPanelNextStepViews('found'), [
+    {
+      ariaLabel: '复制链接：现在可用。把学生链接复制到班级群、学习平台或邮件里。',
+      description: '把学生链接复制到班级群、学习平台或邮件里。',
+      id: 'copy-link',
+      label: '复制链接',
+      status: 'ready',
+      statusLabel: '现在可用',
+    },
+    {
+      ariaLabel: '学生预览：现在可用。发送前先以学生身份打开一次链接。',
+      description: '发送前先以学生身份打开一次链接。',
+      id: 'preview-link',
+      label: '学生预览',
+      status: 'ready',
+      statusLabel: '现在可用',
+    },
+    {
+      ariaLabel:
+        '准备打印页：可选。打开不含答案的打印练习页，作为线下备用或纸质讲义。',
+      description: '打开不含答案的打印练习页，作为线下备用或纸质讲义。',
+      id: 'print-worksheet',
+      label: '准备打印页',
+      status: 'optional',
+      statusLabel: '可选',
+    },
+    {
+      ariaLabel: '打开结果页：提交后。保留结果页入口，方便查看提交和后续讲评。',
+      description: '保留结果页入口，方便查看提交和后续讲评。',
+      id: 'review-results',
+      label: '打开结果页',
+      status: 'after-submissions',
+      statusLabel: '提交后',
+    },
+  ]);
+} finally {
+  overwriteGetLocale(() => 'en');
+}
 assert.deepEqual(buildAssignmentDeliverySummary({ expiresAt: null }), [
   { id: 'attempts', label: 'Attempts', value: '2 max' },
   { id: 'timer', label: 'Timer', value: 'No timer' },
@@ -27005,17 +27075,17 @@ assert.doesNotMatch(
 );
 assert.match(
   publishedAssignmentSource,
-  /export type PublishedAssignmentPanelNextStepId[\s\S]*'copy-link'[\s\S]*'preview-link'[\s\S]*'review-results'[\s\S]*export type PublishedAssignmentPanelNextStepView[\s\S]*id: PublishedAssignmentPanelNextStepId;[\s\S]*label: string;/,
+  /export type PublishedAssignmentPanelNextStepId[\s\S]*'copy-link'[\s\S]*'print-worksheet'[\s\S]*'preview-link'[\s\S]*'review-results'[\s\S]*export type PublishedAssignmentPanelNextStepStatus[\s\S]*'after-submissions'[\s\S]*'optional'[\s\S]*'ready'[\s\S]*export type PublishedAssignmentPanelNextStepView[\s\S]*ariaLabel: string;[\s\S]*description: string;[\s\S]*id: PublishedAssignmentPanelNextStepId;[\s\S]*label: string;[\s\S]*status: PublishedAssignmentPanelNextStepStatus;[\s\S]*statusLabel: string;/,
   'Published assignment panel next-step contracts should expose stable distribution step ids.'
 );
 assert.match(
   publishedAssignmentSource,
-  /export function buildPublishedAssignmentPanelNextStepViews[\s\S]*assignment_published_panel_next_step_copy_link[\s\S]*assignment_published_panel_next_step_preview_link[\s\S]*assignment_published_panel_next_step_review_results/,
+  /export function buildPublishedAssignmentPanelNextStepViews[\s\S]*assignment_published_panel_next_step_copy_link[\s\S]*assignment_published_panel_next_step_copy_link_label[\s\S]*assignment_published_panel_next_step_preview_link[\s\S]*assignment_published_panel_next_step_preview_link_label[\s\S]*assignment_published_panel_next_step_print_worksheet[\s\S]*assignment_published_panel_next_step_print_worksheet_label[\s\S]*assignment_published_panel_next_step_review_results[\s\S]*assignment_published_panel_next_step_review_results_label[\s\S]*assignment_published_panel_next_step_aria/,
   'Published assignment panel domain should prepare structured localized post-publish next steps.'
 );
 assert.match(
   publishedAssignmentSource,
-  /export type PublishedAssignmentPanelContext = \{[\s\S]*nextStepViews: PublishedAssignmentPanelNextStepView\[\];/,
+  /export type PublishedAssignmentPanelContext = \{[\s\S]*nextStepViews: PublishedAssignmentPanelNextStepView\[\];[\s\S]*nextStepsLabel: string;/,
   'Published assignment panel context should expose structured next-step views.'
 );
 assert.doesNotMatch(
@@ -27038,6 +27108,11 @@ assert.match(
   /type PublishedAssignmentPanelActionView,[\s\S]*type PublishedAssignmentPanelContext,[\s\S]*type PublishedAssignmentPanelDismissAction,[\s\S]*type PublishedAssignmentPanelPrintAction,[\s\S]*type PublishedAssignmentPanelResultAction,[\s\S]*type PublishedAssignmentPanelShareAction,[\s\S]*buildPublishedAssignmentPanelContext/,
   'Published assignment panel component should import the explicit assignment-domain panel contracts.'
 );
+assert.match(
+  publishedAssignmentPanelComponentSource,
+  /PublishedAssignmentNextSteps[\s\S]*label=\{panelContext\.nextStepsLabel\}[\s\S]*stepViews=\{panelContext\.nextStepViews\}[\s\S]*stepViews\.map[\s\S]*key=\{stepView\.id\}[\s\S]*aria-label=\{stepView\.ariaLabel\}[\s\S]*stepView\.label[\s\S]*stepView\.statusLabel[\s\S]*stepView\.description/,
+  'Published assignment panel component should render prepared structured distribution checklist fields.'
+);
 assert.doesNotMatch(
   publishedAssignmentPanelComponentSource,
   /ReturnType<typeof buildPublishedAssignmentPanelContext>/,
@@ -27055,7 +27130,7 @@ assert.match(
 );
 assert.match(
   publishedAssignmentPanelComponentSource,
-  /panelContext\.sharePathLabel[\s\S]*panelContext\.sharePath[\s\S]*panelContext\.nextStepViews\.map[\s\S]*key=\{step\.id\}[\s\S]*step\.label/,
+  /panelContext\.sharePathLabel[\s\S]*panelContext\.sharePath[\s\S]*PublishedAssignmentNextSteps[\s\S]*label=\{panelContext\.nextStepsLabel\}[\s\S]*stepViews=\{panelContext\.nextStepViews\}[\s\S]*stepViews\.map[\s\S]*key=\{stepView\.id\}[\s\S]*stepView\.label/,
   'Published assignment panel should render prepared student-link path labels and structured next steps from the panel context.'
 );
 assert.doesNotMatch(
@@ -33066,20 +33141,10 @@ assert.deepEqual(
         title: 'Persisted assignment',
       },
       body: 'Copy the student link for your class, open the student preview, or jump into the results page before submissions arrive.',
-      nextStepViews: [
-        {
-          id: 'copy-link',
-          label: 'Copy the student link into your class chat or LMS.',
-        },
-        {
-          id: 'preview-link',
-          label: 'Open the link once as a student before sending it.',
-        },
-        {
-          id: 'review-results',
-          label: 'Keep the results page ready for submissions and follow-up.',
-        },
-      ],
+      nextStepViews: buildExpectedPublishedAssignmentNextStepViews({
+        includeFoundActions: true,
+      }),
+      nextStepsLabel: 'Distribution checklist',
       sharePath: '/play/share-1',
       sharePathLabel: 'Student link',
       shareUrl: buildAssignmentShareUrl('share-1'),

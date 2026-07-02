@@ -59,12 +59,22 @@ export type PublishedAssignmentPanelStatus = 'found' | 'loading' | 'missing';
 
 export type PublishedAssignmentPanelNextStepId =
   | 'copy-link'
+  | 'print-worksheet'
   | 'preview-link'
   | 'review-results';
 
+export type PublishedAssignmentPanelNextStepStatus =
+  | 'after-submissions'
+  | 'optional'
+  | 'ready';
+
 export type PublishedAssignmentPanelNextStepView = {
+  ariaLabel: string;
+  description: string;
   id: PublishedAssignmentPanelNextStepId;
   label: string;
+  status: PublishedAssignmentPanelNextStepStatus;
+  statusLabel: string;
 };
 
 export function findPublishedAssignmentInList<
@@ -109,6 +119,7 @@ export type PublishedAssignmentPanelContext = {
   assignment?: PublishedAssignmentPanelAssignment;
   body: string;
   nextStepViews: PublishedAssignmentPanelNextStepView[];
+  nextStepsLabel: string;
   sharePath: string;
   sharePathLabel: string;
   shareUrl: string;
@@ -150,6 +161,7 @@ export function buildPublishedAssignmentPanelContext({
       assignment,
       body: m.assignment_published_panel_found_body(),
       nextStepViews: foundNextStepViews,
+      nextStepsLabel: m.assignment_published_panel_next_steps_label(),
       sharePath,
       sharePathLabel: m.assignment_published_panel_share_path_label(),
       shareUrl: shareAction.shareUrl,
@@ -169,6 +181,7 @@ export function buildPublishedAssignmentPanelContext({
       }),
       body: m.assignment_published_panel_loading_body(),
       nextStepViews: loadingNextStepViews,
+      nextStepsLabel: m.assignment_published_panel_next_steps_label(),
       sharePath,
       sharePathLabel: m.assignment_published_panel_share_path_label(),
       shareUrl: shareAction.shareUrl,
@@ -187,6 +200,7 @@ export function buildPublishedAssignmentPanelContext({
     }),
     body: m.assignment_published_panel_missing_body(),
     nextStepViews: missingNextStepViews,
+    nextStepsLabel: m.assignment_published_panel_next_steps_label(),
     sharePath,
     sharePathLabel: m.assignment_published_panel_share_path_label(),
     shareUrl: shareAction.shareUrl,
@@ -238,25 +252,63 @@ export function buildPublishedAssignmentPanelNextStepViews(
   status: PublishedAssignmentPanelStatus
 ) {
   const baseSteps = [
-    {
+    buildPublishedAssignmentPanelNextStepView({
+      description: m.assignment_published_panel_next_step_copy_link(),
       id: 'copy-link',
-      label: m.assignment_published_panel_next_step_copy_link(),
-    },
-    {
+      label: m.assignment_published_panel_next_step_copy_link_label(),
+      status: 'ready',
+      statusLabel: m.assignment_published_panel_next_step_status_ready(),
+    }),
+    buildPublishedAssignmentPanelNextStepView({
+      description: m.assignment_published_panel_next_step_preview_link(),
       id: 'preview-link',
-      label: m.assignment_published_panel_next_step_preview_link(),
-    },
+      label: m.assignment_published_panel_next_step_preview_link_label(),
+      status: 'ready',
+      statusLabel: m.assignment_published_panel_next_step_status_ready(),
+    }),
   ] satisfies PublishedAssignmentPanelNextStepView[];
 
   return status === 'found'
     ? [
         ...baseSteps,
-        {
+        buildPublishedAssignmentPanelNextStepView({
+          description: m.assignment_published_panel_next_step_print_worksheet(),
+          id: 'print-worksheet',
+          label: m.assignment_published_panel_next_step_print_worksheet_label(),
+          status: 'optional',
+          statusLabel: m.assignment_published_panel_next_step_status_optional(),
+        }),
+        buildPublishedAssignmentPanelNextStepView({
+          description: m.assignment_published_panel_next_step_review_results(),
           id: 'review-results',
-          label: m.assignment_published_panel_next_step_review_results(),
-        },
+          label: m.assignment_published_panel_next_step_review_results_label(),
+          status: 'after-submissions',
+          statusLabel:
+            m.assignment_published_panel_next_step_status_after_submissions(),
+        }),
       ]
     : baseSteps;
+}
+
+function buildPublishedAssignmentPanelNextStepView({
+  description,
+  id,
+  label,
+  status,
+  statusLabel,
+}: Omit<PublishedAssignmentPanelNextStepView, 'ariaLabel'>) {
+  return {
+    ariaLabel: m.assignment_published_panel_next_step_aria({
+      description,
+      label,
+      status: statusLabel,
+    }),
+    description,
+    id,
+    label,
+    status,
+    statusLabel,
+  };
 }
 
 function normalizeOptionalAssignmentShareSlug(shareSlug?: string) {
