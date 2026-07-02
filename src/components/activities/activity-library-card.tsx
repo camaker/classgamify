@@ -8,6 +8,8 @@ import {
   type ActivityLibraryCardActionView,
   type ActivityLibraryCardDerivativeActionView,
   type ActivityLibraryCardActionState,
+  type ActivityLibraryCardStatusSummaryItem as ActivityLibraryCardStatusSummaryItemView,
+  type ActivityLibraryCardStatusSummaryView,
   type ActivityLibraryCardRestoreActionView,
   type ActivityLibraryCardTemplateType,
   type ActivityLibraryCardViewModel,
@@ -40,10 +42,13 @@ import {
 import { Routes } from '@/lib/routes';
 import { cn } from '@/lib/utils';
 import {
+  IconAlertCircle,
+  IconCircleCheck,
   IconCopy,
   IconDeviceGamepad2,
   IconEdit,
   IconFolderOff,
+  IconInfoCircle,
   IconPlus,
   IconRotateClockwise,
 } from '@tabler/icons-react';
@@ -195,6 +200,9 @@ export function ActivityLibraryCard({
         <CardDescription>
           <p>{cardDisplayView.displayDescription}</p>
         </CardDescription>
+        <ActivityLibraryCardStatusSummary
+          summary={cardDisplayView.statusSummary}
+        />
       </CardHeader>
       <CardContent className="space-y-4">
         <section
@@ -244,7 +252,7 @@ export function ActivityLibraryCard({
       <ActivityPublishDialog
         activity={{
           id: activity.id,
-          title: activity.title,
+          title: cardDisplayView.displayTitle,
           visibility: activity.status,
         }}
         open={publishDialogOpen}
@@ -259,6 +267,66 @@ export function ActivityLibraryCard({
         }
       />
     </Card>
+  );
+}
+
+function ActivityLibraryCardStatusSummary({
+  summary,
+}: {
+  summary: ActivityLibraryCardStatusSummaryView;
+}) {
+  return (
+    <section
+      aria-label={summary.ariaLabel}
+      className="mt-3 grid gap-2 sm:grid-cols-2"
+    >
+      {summary.items.map((item) => (
+        <ActivityLibraryCardStatusSummaryEntry item={item} key={item.id} />
+      ))}
+    </section>
+  );
+}
+
+function ActivityLibraryCardStatusSummaryEntry({
+  item,
+}: {
+  item: ActivityLibraryCardStatusSummaryItemView;
+}) {
+  const Icon =
+    item.tone === 'blocked'
+      ? IconAlertCircle
+      : item.tone === 'ready'
+        ? IconCircleCheck
+        : IconInfoCircle;
+
+  return (
+    <section
+      aria-label={item.ariaLabel}
+      className="rounded-md border bg-muted/30 p-2.5"
+      data-tone={item.tone}
+    >
+      <div className="flex min-w-0 items-center justify-between gap-2">
+        <p className="flex min-w-0 items-center gap-1.5 font-medium text-xs">
+          <Icon aria-hidden="true" className="size-3.5 shrink-0" />
+          <span className="truncate">{item.label}</span>
+        </p>
+        <Badge
+          variant={
+            item.tone === 'blocked'
+              ? 'destructive'
+              : item.tone === 'ready'
+                ? 'secondary'
+                : 'outline'
+          }
+          className="rounded-md"
+        >
+          {item.value}
+        </Badge>
+      </div>
+      <p className="mt-1 line-clamp-2 text-muted-foreground text-xs leading-5">
+        {item.description}
+      </p>
+    </section>
   );
 }
 

@@ -139,6 +139,32 @@ export type ActivityLibraryCardActionState = {
   showRemixActions: boolean;
 };
 
+export type ActivityLibraryCardStatusSummaryItemId =
+  | 'library-status'
+  | 'publish'
+  | 'remix'
+  | 'source-materials';
+
+export type ActivityLibraryCardStatusSummaryTone =
+  | 'blocked'
+  | 'neutral'
+  | 'ready';
+
+export type ActivityLibraryCardStatusSummaryItem = {
+  ariaLabel: string;
+  description: string;
+  id: ActivityLibraryCardStatusSummaryItemId;
+  label: string;
+  tone: ActivityLibraryCardStatusSummaryTone;
+  value: string;
+};
+
+export type ActivityLibraryCardStatusSummaryView = {
+  ariaLabel: string;
+  items: ActivityLibraryCardStatusSummaryItem[];
+  label: string;
+};
+
 type PersistedActivityLibraryCardSource = {
   contentJson: ActivityContent;
   description: string | null;
@@ -174,6 +200,7 @@ export type ActivityLibraryCardDisplayView = {
   sourceMaterials: ActivitySourceMaterialSummaryView;
   sourceMaterialsLabel: string;
   sourceMaterialEditAction: ActivityLibraryEditorActionView;
+  statusSummary: ActivityLibraryCardStatusSummaryView;
   stats: ActivityLibraryCardStat[];
   statusLabel: string;
   templateName: string;
@@ -1350,15 +1377,25 @@ export function buildActivityLibraryCardDisplayView({
   const displayDescription = formatActivityLibraryDisplayDescription(
     activity.description
   );
+  const actionState = buildActivityLibraryCardActionState({
+    libraryStatus,
+    persisted: activity.persisted,
+    readyRemixCount: summary.suggestedTemplateOptions.length,
+    visibility: activity.status,
+  });
+  const actionView = buildActivityLibraryCardActionView(activity.status);
+  const compatibility = buildActivityLibraryCompatibilityView({
+    currentTemplateType: activity.templateType,
+    summary,
+    visibility: activity.status,
+  });
+  const sourceMaterials = buildActivitySourceMaterialSummaryView(
+    activity.content.sourceMaterials
+  );
 
   return {
-    actionState: buildActivityLibraryCardActionState({
-      libraryStatus,
-      persisted: activity.persisted,
-      readyRemixCount: summary.suggestedTemplateOptions.length,
-      visibility: activity.status,
-    }),
-    actionView: buildActivityLibraryCardActionView(activity.status),
+    actionState,
+    actionView,
     actionsLabel: m.activity_library_card_actions_label({
       title: displayTitle,
     }),
@@ -1367,11 +1404,7 @@ export function buildActivityLibraryCardDisplayView({
       template: template.name,
       title: displayTitle,
     }),
-    compatibility: buildActivityLibraryCompatibilityView({
-      currentTemplateType: activity.templateType,
-      summary,
-      visibility: activity.status,
-    }),
+    compatibility,
     compatibilityLabel: m.activity_library_card_compatibility_label({
       title: displayTitle,
     }),
@@ -1390,15 +1423,21 @@ export function buildActivityLibraryCardDisplayView({
     restoreRequiredLabel: m.activity_library_card_restore_required_label({
       title: displayTitle,
     }),
-    sourceMaterials: buildActivitySourceMaterialSummaryView(
-      activity.content.sourceMaterials
-    ),
+    sourceMaterials,
     sourceMaterialsLabel: m.activity_library_card_source_materials_label({
       title: displayTitle,
     }),
     sourceMaterialEditAction: buildActivityLibraryEditorAction({
       activityId: activity.id,
       label: activityLibraryCardCopy.sourceMaterialEditActionLabel,
+    }),
+    statusSummary: buildActivityLibraryCardStatusSummaryView({
+      activity,
+      actionView,
+      compatibility,
+      displayTitle,
+      sourceMaterials,
+      statusLabel,
     }),
     stats: buildActivityLibraryCardStats({
       groups: summary.contentCounts.groups,
@@ -1409,6 +1448,123 @@ export function buildActivityLibraryCardDisplayView({
     templateName: template.name,
     templateType: template.type,
   };
+}
+
+export function buildActivityLibraryCardStatusSummaryView({
+  activity,
+  actionView,
+  compatibility,
+  displayTitle,
+  sourceMaterials,
+  statusLabel,
+}: {
+  activity: ActivityLibraryCardViewModel;
+  actionView: Pick<ActivityLibraryCardActionView, 'publish'>;
+  compatibility: Pick<ActivityLibraryCompatibilityView, 'remixStatusView'>;
+  displayTitle: string;
+  sourceMaterials: ActivitySourceMaterialSummaryView;
+  statusLabel: string;
+}): ActivityLibraryCardStatusSummaryView {
+  const label = m.activity_library_card_status_summary_label({
+    title: displayTitle,
+  });
+  const items: ActivityLibraryCardStatusSummaryItem[] = [
+    buildActivityLibraryCardStatusSummaryItem({
+      description:
+        getActivityLibraryCardStatusSummaryStatusDescription(activity),
+      id: 'library-status',
+      label: m.activity_library_card_status_summary_status_label(),
+      tone: getActivityLibraryCardStatusSummaryStatusTone(activity),
+      value: statusLabel,
+    }),
+    buildActivityLibraryCardStatusSummaryItem({
+      description: actionView.publish.statusView.description,
+      id: 'publish',
+      label: actionView.publish.label,
+      tone: actionView.publish.statusView.tone,
+      value: actionView.publish.statusView.value,
+    }),
+    buildActivityLibraryCardStatusSummaryItem({
+      description: compatibility.remixStatusView.description,
+      id: 'remix',
+      label: activityLibraryCardCopy.remixActionLabel,
+      tone: compatibility.remixStatusView.tone,
+      value: compatibility.remixStatusView.value,
+    }),
+    buildActivityLibraryCardStatusSummaryItem({
+      description: sourceMaterials.readinessStatus.description,
+      id: 'source-materials',
+      label: sourceMaterials.readinessStatus.label,
+      tone:
+        sourceMaterials.readinessStatus.id === 'extractable'
+          ? 'ready'
+          : 'neutral',
+      value: sourceMaterials.readinessStatus.value,
+    }),
+  ];
+
+  return {
+    ariaLabel: formatActivityLibraryCardStatusSummaryAriaLabel({
+      items,
+      label,
+    }),
+    items,
+    label,
+  };
+}
+
+function buildActivityLibraryCardStatusSummaryItem({
+  description,
+  id,
+  label,
+  tone,
+  value,
+}: Omit<ActivityLibraryCardStatusSummaryItem, 'ariaLabel'>) {
+  return {
+    ariaLabel: m.activity_library_card_status_summary_item_aria({
+      description,
+      label,
+      value,
+    }),
+    description,
+    id,
+    label,
+    tone,
+    value,
+  };
+}
+
+function formatActivityLibraryCardStatusSummaryAriaLabel({
+  items,
+  label,
+}: {
+  items: ActivityLibraryCardStatusSummaryItem[];
+  label: string;
+}) {
+  return [label, ...items.map((item) => item.ariaLabel)]
+    .map(normalizeRuntimeDisplayText)
+    .filter(Boolean)
+    .join(m.activity_source_material_summary_list_separator());
+}
+
+function getActivityLibraryCardStatusSummaryStatusDescription(
+  activity: ActivityLibraryCardViewModel
+) {
+  if (!activity.persisted) {
+    return m.activity_library_card_status_summary_status_preview_description();
+  }
+
+  return isActivityArchived(activity.status)
+    ? m.activity_library_card_status_summary_status_archived_description()
+    : m.activity_library_card_status_summary_status_saved_description();
+}
+
+function getActivityLibraryCardStatusSummaryStatusTone(
+  activity: ActivityLibraryCardViewModel
+): ActivityLibraryCardStatusSummaryTone {
+  if (!activity.persisted) return 'neutral';
+
+  return isActivityArchived(activity.status) ? 'blocked' : 'ready';
 }
 
 function formatActivityLibraryStatAriaLabel({

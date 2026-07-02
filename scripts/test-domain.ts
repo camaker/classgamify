@@ -25388,6 +25388,11 @@ assert.match(
 );
 assert.match(
   activityLibraryViewSource,
+  /export type ActivityLibraryCardStatusSummaryItemId =[\s\S]*'library-status'[\s\S]*'publish'[\s\S]*'remix'[\s\S]*'source-materials'[\s\S]*export type ActivityLibraryCardStatusSummaryItem = \{[\s\S]*ariaLabel: string;[\s\S]*description: string;[\s\S]*id: ActivityLibraryCardStatusSummaryItemId;[\s\S]*label: string;[\s\S]*tone: ActivityLibraryCardStatusSummaryTone;[\s\S]*value: string;[\s\S]*export type ActivityLibraryCardStatusSummaryView = \{[\s\S]*ariaLabel: string;[\s\S]*items: ActivityLibraryCardStatusSummaryItem\[\];[\s\S]*label: string;/,
+  'Activity library card display view should expose a prepared classroom-readiness status summary contract.'
+);
+assert.match(
+  activityLibraryViewSource,
   /export type ActivityLibraryCardDisplayView = \{[\s\S]*displayTitle: string;[\s\S]*export function formatActivityLibraryDisplayTitle\(title: string\)[\s\S]*normalizeRuntimeDisplayText\(title\)[\s\S]*m\.activity_library_card_untitled\(\)/,
   'Activity library card display views should normalize visible titles through one localized display-title helper.'
 );
@@ -25400,6 +25405,16 @@ assert.match(
   activityLibraryViewSource,
   /buildActivityLibraryCardDisplayView[\s\S]*const displayTitle = formatActivityLibraryDisplayTitle\(activity\.title\)[\s\S]*const displayDescription = formatActivityLibraryDisplayDescription\([\s\S]*activity\.description[\s\S]*actionsLabel: m\.activity_library_card_actions_label\(\{[\s\S]*title: displayTitle,[\s\S]*ariaLabel: m\.activity_library_card_aria_label\(\{[\s\S]*title: displayTitle,[\s\S]*displayDescription,[\s\S]*displayTitle,/,
   'Activity library card display view should reuse normalized display title and description for visible, aria, and action labels.'
+);
+assert.match(
+  activityLibraryViewSource,
+  /buildActivityLibraryCardDisplayView[\s\S]*const actionView = buildActivityLibraryCardActionView\(activity\.status\)[\s\S]*const compatibility = buildActivityLibraryCompatibilityView\([\s\S]*const sourceMaterials = buildActivitySourceMaterialSummaryView\([\s\S]*statusSummary: buildActivityLibraryCardStatusSummaryView\(\{[\s\S]*actionView,[\s\S]*compatibility,[\s\S]*displayTitle,[\s\S]*sourceMaterials,[\s\S]*statusLabel/,
+  'Activity library card display view should build the readiness summary from prepared action, compatibility, display-title, and source-material views.'
+);
+assert.match(
+  activityLibraryViewSource,
+  /export function buildActivityLibraryCardStatusSummaryView[\s\S]*id: 'library-status'[\s\S]*id: 'publish'[\s\S]*id: 'remix'[\s\S]*id: 'source-materials'[\s\S]*activity_library_card_status_summary_item_aria[\s\S]*activity_library_card_status_summary_status_archived_description[\s\S]*activity_library_card_status_summary_status_saved_description/,
+  'Activity library card status summary should prepare stable status, publish, remix, and source-material items with localized copy.'
 );
 assert.match(
   activityLibraryViewSource,
@@ -25521,10 +25536,30 @@ assert.match(
   /<CardDescription>[\s\S]*\{cardDisplayView\.displayDescription\}[\s\S]*<\/CardDescription>/,
   'Activity library card component should render the prepared display description instead of raw activity descriptions.'
 );
+assert.match(
+  activityLibraryCardComponentSource,
+  /ActivityLibraryCardStatusSummary[\s\S]*summary=\{cardDisplayView\.statusSummary\}[\s\S]*function ActivityLibraryCardStatusSummary\([\s\S]*summary: ActivityLibraryCardStatusSummaryView[\s\S]*aria-label=\{summary\.ariaLabel\}[\s\S]*summary\.items\.map[\s\S]*ActivityLibraryCardStatusSummaryEntry[\s\S]*item=\{item\}/,
+  'Activity library card component should render the prepared classroom-readiness status summary.'
+);
+assert.match(
+  activityLibraryCardComponentSource,
+  /function ActivityLibraryCardStatusSummaryEntry[\s\S]*item: ActivityLibraryCardStatusSummaryItemView[\s\S]*item\.tone === 'blocked'[\s\S]*item\.tone === 'ready'[\s\S]*<section[\s\S]*aria-label=\{item\.ariaLabel\}[\s\S]*data-tone=\{item\.tone\}[\s\S]*\{item\.label\}[\s\S]*\{item\.value\}[\s\S]*\{item\.description\}/,
+  'Activity library card status summary items should render prepared labels, values, descriptions, aria labels, and tones.'
+);
+assert.match(
+  activityLibraryCardComponentSource,
+  /ActivityPublishDialog[\s\S]*activity=\{\{[\s\S]*id: activity\.id,[\s\S]*title: cardDisplayView\.displayTitle,[\s\S]*visibility: activity\.status/,
+  'Activity library card publish dialog should receive the normalized display title as the default assignment title.'
+);
 assert.doesNotMatch(
   activityLibraryCardComponentSource,
   /\{activity\.description\}/,
   'Activity library card component should not render raw activity descriptions.'
+);
+assert.doesNotMatch(
+  activityLibraryCardComponentSource,
+  /ActivityPublishDialog[\s\S]*title: activity\.title/,
+  'Activity library card publish dialog should not seed assignment titles from raw activity titles.'
 );
 assert.match(
   activityLibraryCardComponentSource,
@@ -25785,6 +25820,16 @@ assert.match(
   createdActivityPanelComponentSource,
   /onPublished=\{\(result\) =>[\s\S]*to: Routes\.DashboardAssignments[\s\S]*search: buildAssignmentListRouteSearch\(\{[\s\S]*published: result\.assignment\.shareSlug[\s\S]*\}\)/,
   'Created activity panel publish action should return to the assignment published panel through the assignment-domain route search helper.'
+);
+assert.match(
+  createdActivityPanelComponentSource,
+  /ActivityPublishDialog[\s\S]*activity=\{\{[\s\S]*id: activity\.id,[\s\S]*title: panelContext\.title,[\s\S]*visibility: activity\.visibility/,
+  'Created activity panel publish dialog should receive the normalized panel title as the default assignment title.'
+);
+assert.doesNotMatch(
+  createdActivityPanelComponentSource,
+  /ActivityPublishDialog[\s\S]*title: activity\.title/,
+  'Created activity panel publish dialog should not seed assignment titles from raw activity titles.'
 );
 assert.doesNotMatch(
   `${activityLibraryCardComponentSource}\n${createdActivityPanelComponentSource}`,
@@ -31070,6 +31115,27 @@ assert.equal(
   normalizedTitleActivityDisplayView.restoreRequiredLabel,
   'Restore requirement for Food words'
 );
+assert.equal(
+  normalizedTitleActivityDisplayView.statusSummary.label,
+  'Classroom readiness for Food words'
+);
+assert.deepEqual(
+  normalizedTitleActivityDisplayView.statusSummary.items.map((item) => ({
+    id: item.id,
+    tone: item.tone,
+    value: item.value,
+  })),
+  [
+    { id: 'library-status', tone: 'neutral', value: 'Preview' },
+    { id: 'publish', tone: 'ready', value: 'Available' },
+    { id: 'remix', tone: 'ready', value: 'Available' },
+    { id: 'source-materials', tone: 'neutral', value: 'No materials' },
+  ]
+);
+assert.match(
+  normalizedTitleActivityDisplayView.statusSummary.ariaLabel,
+  /Classroom readiness for Food words[\s\S]*Library status: Preview[\s\S]*Publish assignment: Available[\s\S]*Remix: Available[\s\S]*Material readiness: No materials/
+);
 assert.deepEqual(starterActivityDisplayView.stats, [
   {
     ariaLabel: 'Questions: 3. Question prompts stored in this activity.',
@@ -31181,6 +31247,31 @@ assert.deepEqual(
       value: '1 extraction-ready file',
     },
     title: 'Source materials',
+  }
+);
+const sourceReadyActivityDisplayView = buildActivityLibraryCardDisplayView({
+  activity: {
+    ...starterActivityCardView,
+    content: {
+      ...starterActivityCardView.content,
+      sourceMaterials: [listeningMaterialReference],
+    },
+  },
+  libraryStatus: 'active',
+});
+assert.deepEqual(
+  sourceReadyActivityDisplayView.statusSummary.items.find(
+    (item) => item.id === 'source-materials'
+  ),
+  {
+    ariaLabel:
+      'Material readiness: 1 extraction-ready file. At least one attached classroom file can feed a future AI extraction or import workflow while staying private.',
+    description:
+      'At least one attached classroom file can feed a future AI extraction or import workflow while staying private.',
+    id: 'source-materials',
+    label: 'Material readiness',
+    tone: 'ready',
+    value: '1 extraction-ready file',
   }
 );
 assert.equal(formatActivityLibraryStatusLabel('archived'), 'Archived');

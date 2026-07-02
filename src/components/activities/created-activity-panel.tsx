@@ -86,7 +86,7 @@ export function CreatedActivityPanel({
         <ActivityPublishDialog
           activity={{
             id: activity.id,
-            title: activity.title,
+            title: panelContext.title,
             visibility: activity.visibility,
           }}
           open={publishDialogOpen}
