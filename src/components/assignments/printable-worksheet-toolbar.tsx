@@ -4,6 +4,7 @@ import type {
   PrintableWorksheetControlView,
   PrintableWorksheetPrintAction,
 } from '@/assignments/printable-worksheet-view';
+import { Badge } from '@/components/ui/badge';
 import { Button, buttonVariants } from '@/components/ui/button';
 import { Switch } from '@/components/ui/switch';
 import { cn } from '@/lib/utils';
@@ -61,7 +62,17 @@ function PrintableWorksheetAnswerKeyToggle({
         onCheckedChange={onAnswerKeyChange}
       />
       <span className="grid gap-1">
-        <span>{toggleView.label}</span>
+        <span className="flex flex-wrap items-center gap-2">
+          <span>{toggleView.label}</span>
+          <Badge
+            aria-label={toggleView.accessView.ariaLabel}
+            className="rounded-md"
+            data-print-answer-key-state={toggleView.accessView.state}
+            variant="outline"
+          >
+            {toggleView.accessView.value}
+          </Badge>
+        </span>
         <span
           id={answerKeyDescriptionId}
           className="max-w-64 text-muted-foreground text-xs leading-snug"

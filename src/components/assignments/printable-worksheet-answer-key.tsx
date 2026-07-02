@@ -3,6 +3,7 @@ import type {
   PrintableWorksheetAnswerKeyItemView,
   PrintableWorksheetAnswerKeyView,
 } from '@/assignments/printable-worksheet-view';
+import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
 import { IconKey } from '@tabler/icons-react';
 
@@ -16,11 +17,21 @@ export function PrintableWorksheetAnswerKey({
   if (!view.show) return null;
 
   return (
-    <section data-print-answer-key className="grid gap-3 border-t pt-5">
+    <section
+      aria-label={view.accessView.ariaLabel}
+      className="grid gap-3 border-t pt-5"
+      data-print-answer-key
+      data-print-answer-key-state={view.accessView.state}
+    >
       <div className="flex items-center gap-2">
         <IconKey className="size-5 text-primary" />
         <div>
-          <h2 className="font-semibold">{view.title}</h2>
+          <div className="flex flex-wrap items-center gap-2">
+            <h2 className="font-semibold">{view.title}</h2>
+            <Badge variant="outline" className="rounded-md">
+              {view.accessView.value}
+            </Badge>
+          </div>
           <p className="text-sm text-muted-foreground">{view.description}</p>
         </div>
       </div>

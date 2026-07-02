@@ -539,6 +539,7 @@ import {
 } from '@/assignments/printable-worksheet';
 import {
   PRINTABLE_WORKSHEET_BODY_PRINT_MODE,
+  buildPrintableWorksheetAnswerKeyAccessView,
   buildPrintableWorksheetAnswerKeyItemView,
   buildPrintableWorksheetErrorView,
   buildPrintableWorksheetHeaderOverviewItems,
@@ -18844,10 +18845,10 @@ assert.deepEqual(
       },
       {
         description:
-          'Students receive practice pages only; teacher-only answers stay hidden until you include the key.',
+          'Students receive practice pages only; teacher-only answers are not loaded into this printable view.',
         id: 'answer-key',
         label: 'Answer key',
-        value: 'Answer key hidden',
+        value: 'Hidden by default',
       },
     ],
     title: 'Before printing',
@@ -19486,10 +19487,10 @@ try {
         },
         {
           description:
-            '学生只会拿到练习页；教师答案会保持隐藏，直到你选择包含答案页。',
+            '学生只会拿到练习页；仅教师可见的答案不会载入这份打印视图。',
           id: 'answer-key',
           label: '答案页',
-          value: '未包含答案页',
+          value: '默认隐藏',
         },
       ],
       title: '打印前检查',
@@ -19680,6 +19681,7 @@ const printableWorksheetPageView = buildPrintableWorksheetPageViewModel({
 assert.deepEqual(
   {
     answerKeyView: {
+      accessView: printableWorksheetPageView.answerKeyView.accessView,
       description: printableWorksheetPageView.answerKeyView.description,
       itemIds: printableWorksheetPageView.answerKeyView.itemViews.map(
         (item) => item.id
@@ -19700,6 +19702,15 @@ assert.deepEqual(
   },
   {
     answerKeyView: {
+      accessView: {
+        ariaLabel:
+          'Answer key status: Teacher-only key included. Teacher-only expected answers, accepted alternatives, and explanations are appended after the student pages.',
+        description:
+          'Teacher-only expected answers, accepted alternatives, and explanations are appended after the student pages.',
+        label: 'Answer key status',
+        state: 'included',
+        value: 'Teacher-only key included',
+      },
       description: 'Teacher-only answers from the frozen assignment snapshot.',
       itemIds: ['q-frozen-prompt'],
       show: true,
@@ -19756,6 +19767,15 @@ assert.deepEqual(
     ],
     controlView: {
       answerKeyToggle: {
+        accessView: {
+          ariaLabel:
+            'Answer key status: Teacher-only key included. Teacher-only expected answers, accepted alternatives, and explanations are appended after the student pages.',
+          description:
+            'Teacher-only expected answers, accepted alternatives, and explanations are appended after the student pages.',
+          label: 'Answer key status',
+          state: 'included',
+          value: 'Teacher-only key included',
+        },
         description:
           'Teacher-only answers from the frozen assignment snapshot.',
         label: 'Include answer key',
@@ -19787,7 +19807,7 @@ assert.deepEqual(
       overviewItems: [
         { id: 'items', label: '1 item' },
         { id: 'response-modes', label: 'Multiple choice practice' },
-        { id: 'answer-key', label: 'Answer key included' },
+        { id: 'answer-key', label: 'Teacher-only key included' },
       ],
       printModeLabel: 'Printable practice',
       sharePath: '/play/printable-1',
@@ -19815,10 +19835,10 @@ assert.deepEqual(
         },
         {
           description:
-            'The printable view includes teacher-only answers, accepted alternatives, and explanations after the student pages.',
+            'Teacher-only expected answers, accepted alternatives, and explanations are appended after the student pages.',
           id: 'answer-key',
           label: 'Answer key',
-          value: 'Answer key included',
+          value: 'Teacher-only key included',
         },
       ],
       title: 'Before printing',
@@ -19853,15 +19873,49 @@ const printableWorksheetPageViewWithoutAnswerKey =
   });
 assert.deepEqual(
   {
+    accessView:
+      printableWorksheetPageViewWithoutAnswerKey.answerKeyView.accessView,
     answerKeyItemViews:
       printableWorksheetPageViewWithoutAnswerKey.answerKeyItemViews,
     answerKeyViewItemViews:
       printableWorksheetPageViewWithoutAnswerKey.answerKeyView.itemViews,
+    controlAccessView:
+      printableWorksheetPageViewWithoutAnswerKey.controlView.answerKeyToggle
+        .accessView,
+    preparationAnswerKeyItem:
+      printableWorksheetPageViewWithoutAnswerKey.preparationView.items.find(
+        (item) => item.id === 'answer-key'
+      ),
     showAnswerKey: printableWorksheetPageViewWithoutAnswerKey.showAnswerKey,
   },
   {
+    accessView: {
+      ariaLabel:
+        'Answer key status: Hidden by default. Students receive practice pages only; teacher-only answers are not loaded into this printable view.',
+      description:
+        'Students receive practice pages only; teacher-only answers are not loaded into this printable view.',
+      label: 'Answer key status',
+      state: 'hidden',
+      value: 'Hidden by default',
+    },
     answerKeyItemViews: [],
     answerKeyViewItemViews: [],
+    controlAccessView: {
+      ariaLabel:
+        'Answer key status: Hidden by default. Students receive practice pages only; teacher-only answers are not loaded into this printable view.',
+      description:
+        'Students receive practice pages only; teacher-only answers are not loaded into this printable view.',
+      label: 'Answer key status',
+      state: 'hidden',
+      value: 'Hidden by default',
+    },
+    preparationAnswerKeyItem: {
+      description:
+        'Students receive practice pages only; teacher-only answers are not loaded into this printable view.',
+      id: 'answer-key',
+      label: 'Answer key',
+      value: 'Hidden by default',
+    },
     showAnswerKey: false,
   }
 );
@@ -19874,8 +19928,72 @@ assert.deepEqual(
   [
     { id: 'items', label: '1 item' },
     { id: 'response-modes', label: 'Multiple choice practice' },
-    { id: 'answer-key', label: 'Answer key hidden' },
+    { id: 'answer-key', label: 'Hidden by default' },
   ]
+);
+assert.deepEqual(
+  buildPrintableWorksheetAnswerKeyAccessView({
+    answerKey: true,
+    summary: summarizePrintableAssignmentWorksheet(
+      printableSnapshotWorksheetWithAnswers
+    ),
+  }),
+  {
+    ariaLabel:
+      'Answer key status: Teacher-only key included. Teacher-only expected answers, accepted alternatives, and explanations are appended after the student pages.',
+    description:
+      'Teacher-only expected answers, accepted alternatives, and explanations are appended after the student pages.',
+    label: 'Answer key status',
+    state: 'included',
+    value: 'Teacher-only key included',
+  }
+);
+const printableWorksheetUnavailableAnswerKeyPageView =
+  buildPrintableWorksheetPageViewModel({
+    answerKey: true,
+    assignmentId: 'assignment-printable-empty',
+    worksheet: emptyPrintableWorksheet,
+  });
+assert.deepEqual(
+  {
+    accessView:
+      printableWorksheetUnavailableAnswerKeyPageView.answerKeyView.accessView,
+    answerKeyItemViews:
+      printableWorksheetUnavailableAnswerKeyPageView.answerKeyItemViews,
+    headerOverview:
+      printableWorksheetUnavailableAnswerKeyPageView.headerView.overviewItems,
+    preparationAnswerKeyItem:
+      printableWorksheetUnavailableAnswerKeyPageView.preparationView.items.find(
+        (item) => item.id === 'answer-key'
+      ),
+    showAnswerKey:
+      printableWorksheetUnavailableAnswerKeyPageView.showAnswerKey,
+  },
+  {
+    accessView: {
+      ariaLabel:
+        'Answer key status: No answer key available. This assignment snapshot has no printable answer-key items to append.',
+      description:
+        'This assignment snapshot has no printable answer-key items to append.',
+      label: 'Answer key status',
+      state: 'unavailable',
+      value: 'No answer key available',
+    },
+    answerKeyItemViews: [],
+    headerOverview: [
+      { id: 'items', label: '0 items' },
+      { id: 'response-modes', label: '0 response modes' },
+      { id: 'answer-key', label: 'No answer key available' },
+    ],
+    preparationAnswerKeyItem: {
+      description:
+        'This assignment snapshot has no printable answer-key items to append.',
+      id: 'answer-key',
+      label: 'Answer key',
+      value: 'No answer key available',
+    },
+    showAnswerKey: false,
+  }
 );
 assert.equal(PRINTABLE_WORKSHEET_BODY_PRINT_MODE, 'worksheet');
 assert.deepEqual(
@@ -27653,8 +27771,8 @@ assert.match(
 );
 assert.match(
   printableWorksheetViewSource,
-  /const summary = summarizePrintableAssignmentWorksheet\(worksheet, options\)[\s\S]*overviewItems: buildPrintableWorksheetHeaderOverviewItems\(summary\)/,
-  'Printable worksheet header views should derive prepared overview metadata from the shared printable worksheet summary.'
+  /const summary = summarizePrintableAssignmentWorksheet\(worksheet, options\)[\s\S]*overviewItems: buildPrintableWorksheetHeaderOverviewItems\(summary,[\s\S]*answerKeyAccessView/,
+  'Printable worksheet header views should derive prepared overview metadata and answer-key access state from the shared printable worksheet summary.'
 );
 assert.match(
   printableWorksheetViewSource,
@@ -27668,13 +27786,13 @@ assert.match(
 );
 assert.match(
   printableWorksheetViewSource,
-  /export function buildPrintableWorksheetPreparationView\([\s\S]*summary: PrintableAssignmentWorksheetSummary[\s\S]*preparationStudentFieldsLabel[\s\S]*assignment_printable_preparation_response_plan_value[\s\S]*summary\.showAnswerKey[\s\S]*assignment_printable_overview_answer_key_included[\s\S]*assignment_printable_overview_answer_key_hidden/,
-  'Printable worksheet preparation summary should localize student fields, response plan, and answer-key state from the shared worksheet summary.'
+  /export function buildPrintableWorksheetPreparationView\([\s\S]*summary: PrintableAssignmentWorksheetSummary[\s\S]*answerKeyAccessView[\s\S]*preparationStudentFieldsLabel[\s\S]*assignment_printable_preparation_response_plan_value[\s\S]*description: answerKeyAccessView\.description[\s\S]*value: answerKeyAccessView\.value/,
+  'Printable worksheet preparation summary should localize student fields, response plan, and answer-key access state from the prepared access view.'
 );
 assert.match(
   printableWorksheetViewSource,
-  /const summary = summarizePrintableAssignmentWorksheet\(worksheet,[\s\S]*includeAnswerKey: answerKeyView\.show[\s\S]*preparationView: buildPrintableWorksheetPreparationView\(summary\)/,
-  'Printable worksheet page view-model should derive preparation summary from the same answer-key visibility used by the header.'
+  /const answerKeyAccessView = buildPrintableWorksheetAnswerKeyAccessView[\s\S]*buildPrintableWorksheetHeaderView\(worksheet,[\s\S]*answerKeyAccessView[\s\S]*preparationView: buildPrintableWorksheetPreparationView\(summary,[\s\S]*answerKeyAccessView/,
+  'Printable worksheet page view-model should share the same answer-key access view across the header and preparation summary.'
 );
 assert.doesNotMatch(
   printableWorksheetViewSource,
@@ -27723,13 +27841,33 @@ assert.match(
 );
 assert.match(
   printableWorksheetViewSource,
-  /buildPrintableWorksheetAnswerKeyView[\s\S]*summarizePrintableAssignmentWorksheet\(worksheet,[\s\S]*includeAnswerKey: answerKey,[\s\S]*\)\.showAnswerKey/,
+  /buildPrintableWorksheetAnswerKeyView[\s\S]*const summary =[\s\S]*summarizePrintableAssignmentWorksheet\(worksheet,[\s\S]*includeAnswerKey: answerKey,[\s\S]*const show = summary\.showAnswerKey/,
   'Printable worksheet answer-key visibility should be derived from the shared printable worksheet summary.'
 );
 assert.match(
   printableWorksheetViewSource,
   /emptyState: buildPrintableWorksheetEmptyState\(\)/,
   'Printable worksheet page view-model should own empty worksheet state.'
+);
+assert.match(
+  printableWorksheetViewSource,
+  /export type PrintableWorksheetAnswerKeyAccessState =[\s\S]*'hidden'[\s\S]*'included'[\s\S]*'unavailable'[\s\S]*export type PrintableWorksheetAnswerKeyAccessView = \{[\s\S]*ariaLabel: string;[\s\S]*description: string;[\s\S]*label: string;[\s\S]*state: PrintableWorksheetAnswerKeyAccessState;[\s\S]*value: string;/,
+  'Printable worksheet answer-key access should expose a stable hidden, included, and unavailable state contract.'
+);
+assert.match(
+  printableWorksheetViewSource,
+  /export function buildPrintableWorksheetAnswerKeyAccessView[\s\S]*getPrintableWorksheetAnswerKeyAccessState[\s\S]*assignment_printable_answer_key_access_aria_label[\s\S]*state,[\s\S]*value,/,
+  'Printable worksheet answer-key access view should localize aria labels and visible status values in the domain view layer.'
+);
+assert.match(
+  printableWorksheetViewSource,
+  /function getPrintableWorksheetAnswerKeyAccessState[\s\S]*if \(!answerKey\) return 'hidden'[\s\S]*if \(summary\.showAnswerKey\) return 'included'[\s\S]*return 'unavailable'/,
+  'Printable worksheet answer-key access should distinguish hidden-by-default from requested but unavailable answer keys.'
+);
+assert.match(
+  printableWorksheetViewSource,
+  /buildPrintableWorksheetPageViewModel[\s\S]*const answerKeySummary = summarizePrintableAssignmentWorksheet\(worksheet,[\s\S]*includeAnswerKey: answerKey[\s\S]*const answerKeyAccessView = buildPrintableWorksheetAnswerKeyAccessView[\s\S]*answerKeySummary[\s\S]*controlView: buildPrintableWorksheetControlView\(\{[\s\S]*answerKeyAccessView/,
+  'Printable worksheet page view-model should derive one answer-key access view and pass it into toolbar state.'
 );
 const printableAssignmentRouteSource = readFileSync(
   'src/routes/print/assignments/$assignmentId.tsx',
@@ -27832,6 +27970,11 @@ assert.match(
   printableWorksheetAnswerKeySource,
   /PrintableWorksheetAnswerKeyDetailView[\s\S]*PrintableWorksheetAnswerKeyItemView[\s\S]*PrintableWorksheetAnswerKeyView/,
   'Printable worksheet answer key should consume explicit answer-key section, item, and detail view contracts.'
+);
+assert.match(
+  printableWorksheetAnswerKeySource,
+  /aria-label=\{view\.accessView\.ariaLabel\}[\s\S]*data-print-answer-key-state=\{view\.accessView\.state\}[\s\S]*view\.accessView\.value/,
+  'Printable worksheet answer-key component should render only the prepared answer-key access status.'
 );
 assert.match(
   printableWorksheetPreparationSummarySource,
@@ -28115,8 +28258,8 @@ assert.match(
 );
 assert.match(
   printableWorksheetToolbarSource,
-  /function PrintableWorksheetAnswerKeyToggle[\s\S]*toggleView: PrintableWorksheetAnswerKeyToggleView[\s\S]*checked=\{toggleView\.value\}[\s\S]*toggleView\.label[\s\S]*toggleView\.description/,
-  'Printable worksheet answer-key toggle should consume a focused prepared toggle view.'
+  /function PrintableWorksheetAnswerKeyToggle[\s\S]*toggleView: PrintableWorksheetAnswerKeyToggleView[\s\S]*checked=\{toggleView\.value\}[\s\S]*toggleView\.label[\s\S]*toggleView\.accessView\.ariaLabel[\s\S]*data-print-answer-key-state=\{toggleView\.accessView\.state\}[\s\S]*toggleView\.accessView\.value[\s\S]*toggleView\.description/,
+  'Printable worksheet answer-key toggle should consume a focused prepared toggle view and access status.'
 );
 assert.match(
   printableWorksheetToolbarSource,
@@ -28213,6 +28356,11 @@ assert.match(
   e2eTestCatalogText,
   /printable worksheet action[\s\S]*\/print\/assignments\/:assignmentId[\s\S]*answerKey=true/,
   'E2E catalog should cover the teacher printable worksheet journey and answer-key toggle.'
+);
+assert.match(
+  e2eTestCatalogText,
+  /hidden-by-default answer-key access state[\s\S]*teacher-only key included state[\s\S]*no-answer-key-available state/,
+  'E2E catalog should cover printable worksheet answer-key hidden, included, and unavailable states.'
 );
 assert.match(
   e2eTestCatalogText,

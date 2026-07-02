@@ -34,6 +34,19 @@ export type PrintableWorksheetHeaderOverviewItem = {
   label: string;
 };
 
+export type PrintableWorksheetAnswerKeyAccessState =
+  | 'hidden'
+  | 'included'
+  | 'unavailable';
+
+export type PrintableWorksheetAnswerKeyAccessView = {
+  ariaLabel: string;
+  description: string;
+  label: string;
+  state: PrintableWorksheetAnswerKeyAccessState;
+  value: string;
+};
+
 export type PrintableWorksheetPreparationItemId =
   | 'answer-key'
   | 'response-plan'
@@ -144,6 +157,7 @@ export type PrintableWorksheetAssignmentFieldView =
   | PrintableWorksheetTextFieldView;
 
 export type PrintableWorksheetAnswerKeyView = {
+  accessView: PrintableWorksheetAnswerKeyAccessView;
   description: string;
   itemViews: PrintableWorksheetAnswerKeyItemView[];
   show: boolean;
@@ -157,6 +171,7 @@ export type PrintableWorksheetBackToResultsAction = {
 };
 
 export type PrintableWorksheetAnswerKeyToggleView = {
+  accessView: PrintableWorksheetAnswerKeyAccessView;
   description: string;
   label: string;
   value: boolean;
@@ -216,6 +231,27 @@ export const printableWorksheetPageCopy = {
   },
   get answerKeyLabel() {
     return m.assignment_printable_answer_key_label();
+  },
+  get answerKeyAccessHiddenDescription() {
+    return m.assignment_printable_answer_key_access_hidden_description();
+  },
+  get answerKeyAccessHiddenValue() {
+    return m.assignment_printable_answer_key_access_hidden_value();
+  },
+  get answerKeyAccessIncludedDescription() {
+    return m.assignment_printable_answer_key_access_included_description();
+  },
+  get answerKeyAccessIncludedValue() {
+    return m.assignment_printable_answer_key_access_included_value();
+  },
+  get answerKeyAccessLabel() {
+    return m.assignment_printable_answer_key_access_label();
+  },
+  get answerKeyAccessUnavailableDescription() {
+    return m.assignment_printable_answer_key_access_unavailable_description();
+  },
+  get answerKeyAccessUnavailableValue() {
+    return m.assignment_printable_answer_key_access_unavailable_value();
   },
   get answerKeyTitle() {
     return m.assignment_printable_answer_key_title();
@@ -309,6 +345,7 @@ export const printableWorksheetPageCopy = {
 export function buildPrintableWorksheetHeaderView(
   worksheet: PrintableAssignmentWorksheet,
   options?: {
+    answerKeyAccessView?: PrintableWorksheetAnswerKeyAccessView;
     includeAnswerKey?: boolean;
   }
 ): PrintableWorksheetHeaderView {
@@ -322,7 +359,9 @@ export function buildPrintableWorksheetHeaderView(
     deliveryPolicy: worksheet.deliveryPolicyText,
     instructions:
       worksheet.instructions || printableWorksheetPageCopy.instructionsFallback,
-    overviewItems: buildPrintableWorksheetHeaderOverviewItems(summary),
+    overviewItems: buildPrintableWorksheetHeaderOverviewItems(summary, {
+      answerKeyAccessView: options?.answerKeyAccessView,
+    }),
     printModeLabel: printableWorksheetPageCopy.printModeLabel,
     sharePath: worksheet.sharePath,
     sharePathLabel: printableWorksheetPageCopy.sharePathLabel,
@@ -331,7 +370,10 @@ export function buildPrintableWorksheetHeaderView(
 }
 
 export function buildPrintableWorksheetHeaderOverviewItems(
-  summary: PrintableAssignmentWorksheetSummary
+  summary: PrintableAssignmentWorksheetSummary,
+  options?: {
+    answerKeyAccessView?: PrintableWorksheetAnswerKeyAccessView;
+  }
 ): PrintableWorksheetHeaderOverviewItem[] {
   return [
     {
@@ -344,11 +386,23 @@ export function buildPrintableWorksheetHeaderOverviewItems(
     },
     {
       id: 'answer-key',
-      label: summary.showAnswerKey
-        ? m.assignment_printable_overview_answer_key_included()
-        : m.assignment_printable_overview_answer_key_hidden(),
+      label: formatPrintableWorksheetAnswerKeyOverviewLabel(
+        summary,
+        options?.answerKeyAccessView
+      ),
     },
   ];
+}
+
+function formatPrintableWorksheetAnswerKeyOverviewLabel(
+  summary: PrintableAssignmentWorksheetSummary,
+  accessView?: PrintableWorksheetAnswerKeyAccessView
+) {
+  if (accessView) return accessView.value;
+
+  return summary.showAnswerKey
+    ? m.assignment_printable_overview_answer_key_included()
+    : m.assignment_printable_overview_answer_key_hidden();
 }
 
 export function buildPrintableWorksheetPageViewModel({
@@ -360,15 +414,24 @@ export function buildPrintableWorksheetPageViewModel({
   assignmentId: string;
   worksheet: PrintableAssignmentWorksheet;
 }): PrintableWorksheetPageViewModel {
-  const answerKeyItemViews = answerKey
+  const answerKeySummary = summarizePrintableAssignmentWorksheet(worksheet, {
+    includeAnswerKey: answerKey,
+  });
+  const answerKeyAccessView = buildPrintableWorksheetAnswerKeyAccessView({
+    answerKey,
+    summary: answerKeySummary,
+  });
+  const answerKeyItemViews = answerKeySummary.showAnswerKey
     ? (worksheet.answerKey?.map(buildPrintableWorksheetAnswerKeyItemView) ?? [])
     : [];
   const answerKeyView = buildPrintableWorksheetAnswerKeyView({
+    accessView: answerKeyAccessView,
     answerKey,
     itemViews: answerKeyItemViews,
     worksheet,
   });
   const headerView = buildPrintableWorksheetHeaderView(worksheet, {
+    answerKeyAccessView,
     includeAnswerKey: answerKeyView.show,
   });
   const summary = summarizePrintableAssignmentWorksheet(worksheet, {
@@ -382,19 +445,32 @@ export function buildPrintableWorksheetPageViewModel({
       buildPrintableWorksheetAssignmentFieldViews(headerView),
     controlView: buildPrintableWorksheetControlView({
       answerKey,
+      answerKeyAccessView,
       assignmentId,
     }),
     emptyState: buildPrintableWorksheetEmptyState(),
     headerView,
     itemViews: worksheet.items.map(buildPrintableWorksheetItemView),
-    preparationView: buildPrintableWorksheetPreparationView(summary),
+    preparationView: buildPrintableWorksheetPreparationView(summary, {
+      answerKeyAccessView,
+    }),
     showAnswerKey: answerKeyView.show,
   };
 }
 
 export function buildPrintableWorksheetPreparationView(
-  summary: PrintableAssignmentWorksheetSummary
+  summary: PrintableAssignmentWorksheetSummary,
+  options?: {
+    answerKeyAccessView?: PrintableWorksheetAnswerKeyAccessView;
+  }
 ): PrintableWorksheetPreparationView {
+  const answerKeyAccessView =
+    options?.answerKeyAccessView ??
+    buildPrintableWorksheetAnswerKeyAccessView({
+      answerKey: summary.showAnswerKey,
+      summary,
+    });
+
   return {
     description: printableWorksheetPageCopy.preparationDescription,
     items: [
@@ -419,14 +495,10 @@ export function buildPrintableWorksheetPreparationView(
         }),
       },
       {
-        description: summary.showAnswerKey
-          ? printableWorksheetPageCopy.preparationAnswerKeyIncludedDescription
-          : printableWorksheetPageCopy.preparationAnswerKeyHiddenDescription,
+        description: answerKeyAccessView.description,
         id: 'answer-key',
         label: printableWorksheetPageCopy.preparationAnswerKeyLabel,
-        value: summary.showAnswerKey
-          ? m.assignment_printable_overview_answer_key_included()
-          : m.assignment_printable_overview_answer_key_hidden(),
+        value: answerKeyAccessView.value,
       },
     ],
     title: printableWorksheetPageCopy.preparationTitle,
@@ -484,13 +556,16 @@ export function buildPrintableWorksheetErrorView(): PrintableWorksheetLoadStateV
 
 export function buildPrintableWorksheetControlView({
   answerKey,
+  answerKeyAccessView,
   assignmentId,
 }: {
   answerKey: boolean;
+  answerKeyAccessView: PrintableWorksheetAnswerKeyAccessView;
   assignmentId: string;
 }): PrintableWorksheetControlView {
   return {
     answerKeyToggle: {
+      accessView: answerKeyAccessView,
       description: printableWorksheetPageCopy.answerKeyDescription,
       label: printableWorksheetPageCopy.answerKeyLabel,
       value: answerKey,
@@ -576,26 +651,125 @@ export function buildPrintableWorksheetEmptyState(): PrintableWorksheetEmptyStat
 }
 
 export function buildPrintableWorksheetAnswerKeyView({
+  accessView,
   answerKey,
   itemViews,
   worksheet,
 }: {
+  accessView?: PrintableWorksheetAnswerKeyAccessView;
   answerKey: boolean;
   itemViews: PrintableWorksheetAnswerKeyItemView[];
   worksheet?: PrintableAssignmentWorksheet;
 }): PrintableWorksheetAnswerKeyView {
-  const show =
+  const summary =
     worksheet !== undefined
       ? summarizePrintableAssignmentWorksheet(worksheet, {
           includeAnswerKey: answerKey,
-        }).showAnswerKey
-      : answerKey && itemViews.length > 0;
+        })
+      : buildPrintableWorksheetAnswerKeyFallbackSummary({
+          itemCount: itemViews.length,
+          showAnswerKey: answerKey && itemViews.length > 0,
+        });
+  const show = summary.showAnswerKey;
 
   return {
+    accessView:
+      accessView ??
+      buildPrintableWorksheetAnswerKeyAccessView({
+        answerKey,
+        summary,
+      }),
     description: printableWorksheetPageCopy.answerKeyDescription,
     itemViews,
     show,
     title: printableWorksheetPageCopy.answerKeyTitle,
+  };
+}
+
+export function buildPrintableWorksheetAnswerKeyAccessView({
+  answerKey,
+  summary,
+}: {
+  answerKey: boolean;
+  summary: PrintableAssignmentWorksheetSummary;
+}): PrintableWorksheetAnswerKeyAccessView {
+  const state = getPrintableWorksheetAnswerKeyAccessState({
+    answerKey,
+    summary,
+  });
+  const { description, value } =
+    getPrintableWorksheetAnswerKeyAccessCopy(state);
+  const label = printableWorksheetPageCopy.answerKeyAccessLabel;
+
+  return {
+    ariaLabel: m.assignment_printable_answer_key_access_aria_label({
+      description,
+      label,
+      value,
+    }),
+    description,
+    label,
+    state,
+    value,
+  };
+}
+
+function getPrintableWorksheetAnswerKeyAccessState({
+  answerKey,
+  summary,
+}: {
+  answerKey: boolean;
+  summary: PrintableAssignmentWorksheetSummary;
+}): PrintableWorksheetAnswerKeyAccessState {
+  if (!answerKey) return 'hidden';
+  if (summary.showAnswerKey) return 'included';
+
+  return 'unavailable';
+}
+
+function getPrintableWorksheetAnswerKeyAccessCopy(
+  state: PrintableWorksheetAnswerKeyAccessState
+) {
+  switch (state) {
+    case 'hidden':
+      return {
+        description:
+          printableWorksheetPageCopy.answerKeyAccessHiddenDescription,
+        value: printableWorksheetPageCopy.answerKeyAccessHiddenValue,
+      };
+    case 'included':
+      return {
+        description:
+          printableWorksheetPageCopy.answerKeyAccessIncludedDescription,
+        value: printableWorksheetPageCopy.answerKeyAccessIncludedValue,
+      };
+    case 'unavailable':
+      return {
+        description:
+          printableWorksheetPageCopy.answerKeyAccessUnavailableDescription,
+        value: printableWorksheetPageCopy.answerKeyAccessUnavailableValue,
+      };
+  }
+}
+
+function buildPrintableWorksheetAnswerKeyFallbackSummary({
+  itemCount,
+  showAnswerKey,
+}: {
+  itemCount: number;
+  showAnswerKey: boolean;
+}): PrintableAssignmentWorksheetSummary {
+  const answerKeyItemCount = normalizeRuntimeDisplayCount(itemCount, {
+    min: 0,
+  });
+
+  return {
+    answerKeyItemCount,
+    choiceBankItemCount: 0,
+    itemCount: answerKeyItemCount,
+    responseModeCount: 0,
+    responseModes: [],
+    showAnswerKey,
   };
 }
 
