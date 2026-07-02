@@ -1,8 +1,10 @@
 import {
+  buildAttemptDurationDisplayView,
   formatAttemptDuration,
   normalizeAttemptDurationSeconds,
   normalizeAttemptTimeLimitSeconds,
   resolveAttemptSubmissionDurationSeconds,
+  type AttemptDurationDisplayView,
 } from '@/assignments/attempt-duration';
 import {
   canUseAnotherAssignmentAttempt,
@@ -236,6 +238,7 @@ type StudentAttemptAnonymousTokenResolver = {
 export type StudentAttemptResultDisplay = {
   accuracyLabel: string;
   durationLabel: string;
+  durationView: AttemptDurationDisplayView;
   scoreAriaLabel: string;
   scoreLabel: string;
 };
@@ -757,6 +760,11 @@ export function buildStudentAttemptResultDisplay({
     normalizeAttemptDurationSeconds({
       durationSeconds: fallbackDurationSeconds,
     });
+  const durationView = buildAttemptDurationDisplayView({
+    durationSeconds: normalizedDurationSeconds,
+    emptyValue: '',
+    style: 'timer',
+  });
   const scoreLabel = m.student_runner_result_score_line({
     earnedPoints: normalizedEarnedPoints,
     totalPoints: normalizedTotalPoints,
@@ -771,11 +779,9 @@ export function buildStudentAttemptResultDisplay({
     }),
     durationLabel: m.student_runner_result_time_line({
       label: STUDENT_RUNNER_COPY.resultTimePrefix,
-      time: formatAttemptDuration(normalizedDurationSeconds, {
-        emptyValue: '',
-        style: 'timer',
-      }),
+      time: durationView.label,
     }),
+    durationView,
     scoreAriaLabel: m.student_runner_result_score_aria({ score: scoreLabel }),
     scoreLabel,
   };

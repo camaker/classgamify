@@ -9,6 +9,7 @@ import { getActivityTemplateRunnerCopy } from '@/activities/runner-copy';
 import {
   ASSIGNMENT_ATTEMPT_DURATION_UNITS,
   buildAttemptTimerState,
+  type AttemptDurationDisplayView,
   type AttemptTimerState,
 } from '@/assignments/attempt-duration';
 import {
@@ -190,6 +191,7 @@ export type StudentRunnerResultPanelView =
       accuracyLabel: string;
       attemptUsageLabel?: string;
       durationLabel: string;
+      durationView: AttemptDurationDisplayView;
       nextStepsView: StudentAttemptResultNextStepsView;
       reviewSummaryView: StudentAttemptReviewSummaryView;
       scoreAriaLabel: string;
@@ -980,6 +982,7 @@ function buildStudentRunnerResultPanelView({
     accuracyLabel: attemptResultDisplay.accuracyLabel,
     attemptUsageLabel,
     durationLabel: attemptResultDisplay.durationLabel,
+    durationView: attemptResultDisplay.durationView,
     nextStepsView: buildStudentAttemptResultNextStepsView({
       canStartAnotherAttempt: showStartAnotherAttempt,
       showCorrectAnswers: Boolean(assignment?.settings.showCorrectAnswers),

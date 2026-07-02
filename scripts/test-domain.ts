@@ -402,6 +402,7 @@ import {
 import { buildScoredAttemptInsert } from '@/assignments/attempt-persistence';
 import {
   ASSIGNMENT_ATTEMPT_DURATION_UNITS,
+  buildAttemptDurationDisplayView,
   buildAttemptStartedAt,
   buildAttemptTimerState,
   formatAttemptDuration,
@@ -2789,8 +2790,13 @@ assert.doesNotMatch(
 );
 assert.match(
   assignmentResultsExportSource,
-  /function buildAssignmentResultsExportAttemptBaseColumns[\s\S]*formatAssignmentResultCsvNumber\(statsView\.completions[\s\S]*formatAssignmentResultCsvNumber\(storedAttempt\?\.score \?\? attempt\.score[\s\S]*formatAssignmentResultCsvNumber\(attemptSummary\.correctItemCount[\s\S]*formatAssignmentResultCsvNumber\(attemptSummary\.needsReviewItemCount[\s\S]*formatAssignmentResultCsvNumber\(attemptSummary\.unansweredItemCount[\s\S]*formatAssignmentResultCsvNumber\(attemptDurationSeconds,[\s\S]*formatAssignmentResultCsvNumber\(studentSummary\?\.needsReviewCount/,
+  /function buildAssignmentResultsExportAttemptBaseColumns[\s\S]*formatAssignmentResultCsvNumber\(statsView\.completions[\s\S]*formatAssignmentResultCsvNumber\(storedAttempt\?\.score \?\? attempt\.score[\s\S]*formatAssignmentResultCsvNumber\(attemptSummary\.correctItemCount[\s\S]*formatAssignmentResultCsvNumber\(attemptSummary\.needsReviewItemCount[\s\S]*formatAssignmentResultCsvNumber\(attemptSummary\.unansweredItemCount[\s\S]*formatAssignmentResultCsvNumber\(attemptDurationView\.seconds,[\s\S]*formatAssignmentResultCsvNumber\(studentSummary\?\.needsReviewCount/,
   'Assignment CSV export attempt base columns should format numeric cells through the shared result-format CSV helper.'
+);
+assert.match(
+  assignmentResultsExportSource,
+  /buildAssignmentResultsExportAttemptBaseColumns[\s\S]*const averageDurationView = buildAttemptDurationDisplayView\(\{[\s\S]*durationSeconds: statsView\.averageDurationSeconds,[\s\S]*timeLimitSeconds: deliveryView\.timeLimitSeconds,[\s\S]*const attemptDurationView = buildAttemptDurationDisplayView\(\{[\s\S]*durationSeconds: storedAttempt\?\.resultJson\?\.durationSeconds,[\s\S]*timeLimitSeconds: deliveryView\.timeLimitSeconds,[\s\S]*formatAssignmentResultCsvNumber\(averageDurationView\.seconds,[\s\S]*formatAssignmentResultCsvNumber\(attemptDurationView\.seconds,/,
+  'Assignment CSV export duration columns should reuse the shared attempt-duration display contract for average and per-attempt seconds.'
 );
 assert.match(
   assignmentResultsExportSource,
@@ -13055,6 +13061,7 @@ assert.deepEqual(
   {
     accuracyLabel: '67% accuracy',
     durationLabel: 'Time: 1:05',
+    durationView: expectTimerAttemptDurationView('1:05', 65),
     scoreAriaLabel: 'Score: 2/3',
     scoreLabel: '2/3',
   }
@@ -13069,6 +13076,7 @@ assert.deepEqual(
   {
     accuracyLabel: '100% accuracy',
     durationLabel: 'Time: 5s',
+    durationView: expectTimerAttemptDurationView('5s', 5),
     scoreAriaLabel: 'Score: 4/4',
     scoreLabel: '4/4',
   }
@@ -13083,6 +13091,7 @@ assert.deepEqual(
   {
     accuracyLabel: '100% accuracy',
     durationLabel: 'Time: 5s',
+    durationView: expectTimerAttemptDurationView('5s', 5),
     scoreAriaLabel: 'Score: 2/2',
     scoreLabel: '2/2',
   }
@@ -13097,6 +13106,7 @@ assert.deepEqual(
   {
     accuracyLabel: '0% accuracy',
     durationLabel: 'Time: 5s',
+    durationView: expectTimerAttemptDurationView('5s', 5),
     scoreAriaLabel: 'Score: 1/2',
     scoreLabel: '1/2',
   }
@@ -13112,6 +13122,7 @@ assert.deepEqual(
   {
     accuracyLabel: '- accuracy',
     durationLabel: 'Time: 5s',
+    durationView: expectTimerAttemptDurationView('5s', 5),
     scoreAriaLabel: 'Score: 0/0',
     scoreLabel: '0/0',
   }
@@ -13126,6 +13137,7 @@ assert.deepEqual(
   {
     accuracyLabel: '50% accuracy',
     durationLabel: 'Time: 5s',
+    durationView: expectTimerAttemptDurationView('5s', 5),
     scoreAriaLabel: 'Score: 1/2',
     scoreLabel: '1/2',
   }
@@ -13142,6 +13154,15 @@ try {
     {
       accuracyLabel: '50% 正确率',
       durationLabel: '用时：5 秒',
+      durationView: {
+        ariaLabel:
+          '作答用时：5 秒。用时会先归一化为非负整秒后再用于展示和统计。',
+        description: '用时会先归一化为非负整秒后再用于展示和统计。',
+        empty: false,
+        label: '5 秒',
+        seconds: 5,
+        style: 'timer',
+      },
       scoreAriaLabel: '得分：1/2',
       scoreLabel: '1/2',
     }
@@ -19785,6 +19806,7 @@ assert.deepEqual(
     attemptResultDisplay: {
       accuracyLabel: '50% accuracy',
       durationLabel: 'Time: 1:20',
+      durationView: expectTimerAttemptDurationView('1:20', 80),
       scoreAriaLabel: 'Score: 1/2',
       scoreLabel: '1/2',
     },
@@ -19868,6 +19890,7 @@ assert.deepEqual(
       accuracyLabel: '50% accuracy',
       attemptUsageLabel: '1 attempt left',
       durationLabel: 'Time: 1:20',
+      durationView: expectTimerAttemptDurationView('1:20', 80),
       nextStepsView: {
         ariaLabel: 'Post-submit next steps',
         stepViews: [
@@ -39479,6 +39502,39 @@ assert.equal(formatAttemptDuration(-3), '-');
 assert.equal(formatAttemptDuration(Number.NaN, { style: 'timer' }), '-');
 assert.equal(formatAttemptDuration(65, { style: 'timer' }), '1:05');
 assert.equal(formatAttemptDuration(5, { style: 'timer' }), '5s');
+assert.deepEqual(
+  buildAttemptDurationDisplayView({
+    durationSeconds: 62,
+    timeLimitSeconds: 60,
+  }),
+  {
+    ariaLabel:
+      'Attempt duration: 1m 00s. Duration is normalized into whole seconds and capped at the assignment timer of 1m 00s.',
+    description:
+      'Duration is normalized into whole seconds and capped at the assignment timer of 1m 00s.',
+    empty: false,
+    label: '1m 00s',
+    seconds: 60,
+    style: 'readable',
+  }
+);
+assert.deepEqual(
+  buildAttemptDurationDisplayView({
+    durationSeconds: undefined,
+    emptyValue: '',
+    style: 'timer',
+  }),
+  {
+    ariaLabel:
+      'Attempt duration unavailable. Duration is normalized into whole non-negative seconds before reporting.',
+    description:
+      'Duration is normalized into whole non-negative seconds before reporting.',
+    empty: true,
+    label: '',
+    seconds: undefined,
+    style: 'timer',
+  }
+);
 assert.equal(formatAssignmentResultDate(null), '-');
 assert.equal(formatAssignmentResultDate('not-a-date'), '-');
 assert.equal(formatAssignmentResultCsvNumber(null), '');
@@ -40067,6 +40123,45 @@ assert.equal(
 assert.equal(
   clampedAssignmentAttemptStatsById.get('assignment-b')?.averageDurationSeconds,
   120
+);
+assert.deepEqual(
+  summarizeAssignmentAttempts(
+    [
+      {
+        resultJson: {
+          accuracy: 100,
+          completedItemCount: 2,
+          correctItemCount: 2,
+          durationSeconds: 90,
+          earnedPoints: 2,
+          totalPoints: 2,
+        },
+        score: 2,
+        timeLimitSeconds: 30,
+      },
+      {
+        resultJson: {
+          accuracy: 50,
+          completedItemCount: 1,
+          correctItemCount: 1,
+          durationSeconds: 90,
+          earnedPoints: 1,
+          totalPoints: 2,
+        },
+        score: 1,
+      },
+    ],
+    {
+      respectAttemptTimeLimit: true,
+      timeLimitSeconds: 60,
+    }
+  ),
+  {
+    averageDurationSeconds: 60,
+    averagePoints: 2,
+    averageScore: 75,
+    completions: 2,
+  }
 );
 
 const resultRuntimeItems = [
@@ -42784,10 +42879,74 @@ assert.deepEqual(
 function expectAssignmentResultMetricItems(
   items: ReturnType<typeof buildAssignmentResultMetricItems>
 ) {
-  return items.map((item) => ({
-    ...item,
-    ariaLabel: `${item.label}: ${item.value}. ${item.description}`,
-  }));
+  return items.map((item) => {
+    const durationSecondsByValue = new Map<string, number | undefined>([
+      ['-', undefined],
+      ['1m 32s', 92],
+      ['1m 00s', 60],
+      ['2m 30s', 150],
+    ]);
+
+    return {
+      ...item,
+      ariaLabel: `${item.label}: ${item.value}. ${item.description}`,
+      ...(item.key === 'average-time'
+        ? {
+            durationView: expectReadableAttemptDurationView(
+              item.value,
+              durationSecondsByValue.get(item.value),
+              item.value === '1m 00s'
+                ? { timeLimitLabel: '1m 00s' }
+                : undefined
+            ),
+          }
+        : {}),
+    };
+  });
+}
+
+function expectReadableAttemptDurationView(
+  label: string,
+  seconds: number | undefined,
+  options?: {
+    timeLimitLabel?: string;
+  }
+) {
+  const hasDuration = seconds !== undefined && seconds > 0;
+  const description = options?.timeLimitLabel
+    ? `Duration is normalized into whole seconds and capped at the assignment timer of ${options.timeLimitLabel}.`
+    : 'Duration is normalized into whole non-negative seconds before reporting.';
+
+  return {
+    ariaLabel: hasDuration
+      ? `Attempt duration: ${label}. ${description}`
+      : `Attempt duration unavailable. ${description}`,
+    description,
+    empty: !hasDuration,
+    label,
+    seconds,
+    style: 'readable',
+  };
+}
+
+function expectTimerAttemptDurationView(
+  label: string,
+  seconds: number | undefined
+) {
+  const hasDuration = seconds !== undefined && seconds > 0;
+  const description =
+    'Duration is normalized into whole non-negative seconds before reporting.';
+
+  return {
+    ariaLabel: hasDuration
+      ? `Attempt duration: ${label}. ${description}`
+      : `Attempt duration unavailable. ${description}`,
+    description,
+    empty: !hasDuration,
+    label,
+    seconds,
+    style: 'timer',
+  };
 }
 
 function expectAssignmentResultsExportPreparationItemViews(
@@ -42971,6 +43130,51 @@ assert.deepEqual(
       key: 'average-time',
       label: 'Average time',
       value: '1m 32s',
+    },
+    {
+      description:
+        'The homework window cutoff currently enforced for students.',
+      key: 'closes',
+      label: 'Closes',
+      value: formatAssignmentExpiry(null),
+    },
+  ])
+);
+assert.deepEqual(
+  buildAssignmentResultMetricItems({
+    averageDurationSeconds: 91.6,
+    averagePoints: 4.6,
+    averageScore: 66.4,
+    completions: 2.9,
+    expiresAt: null,
+    timeLimitSeconds: 60,
+  }),
+  expectAssignmentResultMetricItems([
+    {
+      description: 'Submitted attempts matched to scored result records.',
+      key: 'completions',
+      label: 'Completions',
+      value: '2',
+    },
+    {
+      description:
+        'Calculated from scored student attempts in this assignment.',
+      key: 'average-accuracy',
+      label: 'Average accuracy',
+      value: '66%',
+    },
+    {
+      description: 'Average points earned across completed, scored attempts.',
+      key: 'average-points',
+      label: 'Average points',
+      value: '5',
+    },
+    {
+      description:
+        'Average submitted duration after assignment timer normalization.',
+      key: 'average-time',
+      label: 'Average time',
+      value: '1m 00s',
     },
     {
       description:
@@ -43542,6 +43746,7 @@ assert.deepEqual(
     accuracyLabel: '75%',
     answeredLabel: '3/4',
     durationLabel: '1m 02s',
+    durationView: expectReadableAttemptDurationView('1m 02s', 62),
     id: 'attempt-row',
     scoreLabel: '3/4',
     studentLabel: 'Alice',
@@ -43597,6 +43802,9 @@ assert.deepEqual(
     accuracyLabel: '75%',
     answeredLabel: '3/4',
     durationLabel: '1m 00s',
+    durationView: expectReadableAttemptDurationView('1m 00s', 60, {
+      timeLimitLabel: '1m 00s',
+    }),
     id: 'timed-attempt-row',
     scoreLabel: '3/4',
     studentLabel: 'Raw student',
@@ -43624,6 +43832,7 @@ assert.deepEqual(
     accuracyLabel: '0%',
     answeredLabel: '1/2',
     durationLabel: '40s',
+    durationView: expectReadableAttemptDurationView('40s', 40),
     id: 'attempt-3',
     scoreLabel: '0/2',
     studentLabel: 'Anonymous student 1',
@@ -43648,6 +43857,7 @@ assert.deepEqual(
     accuracyLabel: '0%',
     answeredLabel: '0/0',
     durationLabel: '-',
+    durationView: expectReadableAttemptDurationView('-', undefined),
     id: 'anonymous-row',
     scoreLabel: '0/0',
     studentLabel: 'Anonymous student',
@@ -43670,6 +43880,7 @@ assert.deepEqual(
     accuracyLabel: '0%',
     answeredLabel: '0/0',
     durationLabel: '-',
+    durationView: expectReadableAttemptDurationView('-', undefined),
     id: 'normalized-name-row',
     scoreLabel: '0/0',
     studentLabel: 'Ava Chen',
@@ -43704,6 +43915,9 @@ assert.deepEqual(
       accuracyLabel: '75%',
       answeredLabel: '3/4',
       durationLabel: '1m 00s',
+      durationView: expectReadableAttemptDurationView('1m 00s', 60, {
+        timeLimitLabel: '1m 00s',
+      }),
       id: 'row-view-1',
       scoreLabel: '3/4',
       studentLabel: 'Displayed student',
@@ -46480,7 +46694,7 @@ const fractionalCompletionStatsCsv = buildAssignmentResultsCsv({
 });
 assert.match(
   fractionalCompletionStatsCsv,
-  /"Snapshot Capitals","Quiz","2","66","5","92","attempt-1"/
+  /"Snapshot Capitals","Quiz","2","66","5","60","attempt-1"/
 );
 const invalidStoredAttemptCsv = buildAssignmentResultsCsv({
   ...csvExportData,

@@ -38,7 +38,14 @@ function AssignmentResultsAttemptRow({
       <TableCell>{rowDisplay.scoreLabel}</TableCell>
       <TableCell>{rowDisplay.accuracyLabel}</TableCell>
       <TableCell>{rowDisplay.answeredLabel}</TableCell>
-      <TableCell>{rowDisplay.durationLabel}</TableCell>
+      <TableCell>
+        <output
+          aria-description={rowDisplay.durationView.description}
+          aria-label={rowDisplay.durationView.ariaLabel}
+        >
+          {rowDisplay.durationView.label}
+        </output>
+      </TableCell>
       <TableCell>{rowDisplay.submittedAtLabel}</TableCell>
     </TableRow>
   );

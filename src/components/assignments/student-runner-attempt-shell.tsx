@@ -215,7 +215,13 @@ function StudentRunnerResultPanel({
         {view.scoreLabel}
       </output>
       <p className="text-xs text-muted-foreground">{view.accuracyLabel}</p>
-      <p className="text-xs text-muted-foreground">{view.durationLabel}</p>
+      <output
+        aria-description={view.durationView.description}
+        aria-label={view.durationView.ariaLabel}
+        className="block text-xs text-muted-foreground"
+      >
+        {view.durationLabel}
+      </output>
       {view.attemptUsageLabel ? (
         <p className="text-xs text-muted-foreground">
           {view.attemptUsageLabel}

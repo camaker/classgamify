@@ -10,8 +10,8 @@ import { formatAssignmentDisplayTitle } from '@/assignments/assignment-display';
 import { buildAssignmentAttemptStatsView } from '@/assignments/attempt-stats';
 import { getAssignmentStatusLabel } from '@/assignments/lifecycle';
 import {
-  formatAttemptDuration,
-  normalizeAttemptDurationSeconds,
+  buildAttemptDurationDisplayView,
+  type AttemptDurationDisplayView,
 } from '@/assignments/attempt-duration';
 import {
   buildAssignmentSettingsSummaryView,
@@ -270,6 +270,7 @@ export type AssignmentResultTableHeaderView = {
 
 export type AssignmentResultMetricItem = AssignmentResultMetricDescriptor & {
   ariaLabel: string;
+  durationView?: AttemptDurationDisplayView;
   value: string;
 };
 
@@ -282,6 +283,7 @@ export type AssignmentResultAttemptRowMetricLabels = {
 export type AssignmentResultAttemptRowView =
   AssignmentResultAttemptRowMetricLabels & {
     durationLabel: string;
+    durationView: AttemptDurationDisplayView;
     id: string;
     studentLabel: string;
     submittedAtLabel: string;
@@ -1142,12 +1144,14 @@ export function buildAssignmentResultMetricItems({
   averageScore,
   completions,
   expiresAt,
+  timeLimitSeconds,
 }: {
   averageDurationSeconds: number | null | undefined;
   averagePoints: number;
   averageScore: number;
   completions: number;
   expiresAt: Date | string | null | undefined;
+  timeLimitSeconds?: number | null;
 }): AssignmentResultMetricItem[] {
   const completedAttemptCount =
     getAssignmentResultCompletedAttemptCount(completions);
@@ -1157,12 +1161,16 @@ export function buildAssignmentResultMetricItems({
     averageScore,
     completions: completedAttemptCount,
   });
+  const averageDurationView = buildAttemptDurationDisplayView({
+    durationSeconds: statsView.averageDurationSeconds,
+    timeLimitSeconds,
+  });
   const valueByMetric = {
     'average-accuracy': formatAssignmentResultPercent(statsView.averageScore),
     'average-points': formatAssignmentResultNumber(statsView.averagePoints, {
       min: 0,
     }),
-    'average-time': formatAttemptDuration(statsView.averageDurationSeconds),
+    'average-time': averageDurationView.label,
     closes: formatAssignmentExpiry(expiresAt),
     completions: formatAssignmentResultNumber(statsView.completions, {
       min: 0,
@@ -1179,6 +1187,9 @@ export function buildAssignmentResultMetricItems({
         label: metric.label,
         value,
       }),
+      ...(metric.key === 'average-time'
+        ? { durationView: averageDurationView }
+        : {}),
       value,
     };
   });
@@ -1411,15 +1422,16 @@ export function buildAssignmentAttemptRowDisplay({
   studentLabel?: string;
   timeLimitSeconds?: number | null;
 }): AssignmentResultAttemptRowView {
-  const durationSeconds = normalizeAttemptDurationSeconds({
+  const durationView = buildAttemptDurationDisplayView({
     durationSeconds: attempt.resultJson?.durationSeconds,
-    timeLimitSeconds: timeLimitSeconds ?? undefined,
+    timeLimitSeconds,
   });
 
   return {
     id: attempt.id,
     ...buildAssignmentAttemptRowMetricLabels(attempt),
-    durationLabel: formatAttemptDuration(durationSeconds),
+    durationLabel: durationView.label,
+    durationView,
     studentLabel: formatAssignmentResultStudentLabel(
       studentLabel ??
         getAssignmentAttemptStudentLabel({
@@ -2256,6 +2268,8 @@ export function buildAssignmentResultsPageViewModel<
           averageScore: data.stats.averageScore,
           completions: data.stats.completions,
           expiresAt: data.assignment.expiresAt,
+          timeLimitSeconds:
+            headerView?.settingsSummaryView.settings.timeLimitSeconds,
         })
       : [],
     resultView,

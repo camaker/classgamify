@@ -8,7 +8,7 @@ import {
   buildAssignmentAttemptStatsView,
   type AssignmentAttemptStatsView,
 } from '@/assignments/attempt-stats';
-import { normalizeAttemptDurationSeconds } from '@/assignments/attempt-duration';
+import { buildAttemptDurationDisplayView } from '@/assignments/attempt-duration';
 import { getAssignmentStatusLabel } from '@/assignments/lifecycle';
 import type {
   AssignmentAttemptReview,
@@ -376,7 +376,11 @@ function buildAssignmentResultsExportAttemptBaseColumns({
   const storedAttempt = exportContext.attemptsById.get(attempt.id);
   const studentSummary = exportContext.studentsByKey.get(attempt.studentKey);
   const attemptSummary = buildAssignmentAttemptReviewSummary(attempt);
-  const attemptDurationSeconds = normalizeAttemptDurationSeconds({
+  const averageDurationView = buildAttemptDurationDisplayView({
+    durationSeconds: statsView.averageDurationSeconds,
+    timeLimitSeconds: deliveryView.timeLimitSeconds,
+  });
+  const attemptDurationView = buildAttemptDurationDisplayView({
     durationSeconds: storedAttempt?.resultJson?.durationSeconds,
     timeLimitSeconds: deliveryView.timeLimitSeconds,
   });
@@ -405,7 +409,7 @@ function buildAssignmentResultsExportAttemptBaseColumns({
     formatAssignmentResultCsvNumber(statsView.averageScore, { min: 0 }),
     formatAssignmentResultCsvNumber(statsView.averagePoints, { min: 0 }),
     statsView.completed
-      ? formatAssignmentResultCsvNumber(statsView.averageDurationSeconds, {
+      ? formatAssignmentResultCsvNumber(averageDurationView.seconds, {
           min: 0,
           round: true,
         })
@@ -434,7 +438,7 @@ function buildAssignmentResultsExportAttemptBaseColumns({
     formatAssignmentResultCsvNumber(attemptSummary.unansweredItemCount, {
       min: 0,
     }),
-    formatAssignmentResultCsvNumber(attemptDurationSeconds, {
+    formatAssignmentResultCsvNumber(attemptDurationView.seconds, {
       min: 0,
       round: true,
     }),

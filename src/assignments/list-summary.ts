@@ -68,7 +68,9 @@ export function buildAssignmentListSummary({
   now?: number;
   totalAssignments?: number;
 }): AssignmentListSummary {
-  const stats = summarizeAssignmentAttempts(attempts);
+  const stats = summarizeAssignmentAttempts(attempts, {
+    respectAttemptTimeLimit: true,
+  });
   const statusCounts = buildAssignmentListStatusCounts({ assignments, now });
 
   return {

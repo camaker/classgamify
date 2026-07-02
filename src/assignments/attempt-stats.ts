@@ -47,6 +47,7 @@ export function withAssignmentAttemptStatsSettings<
 export function summarizeAssignmentAttempts(
   attempts: AssignmentAttemptStatsSource[],
   options?: {
+    respectAttemptTimeLimit?: boolean;
     timeLimitSeconds?: number | null;
   }
 ): AssignmentAttemptStats {
@@ -97,12 +98,15 @@ function hasAttemptResult(
 function getAttemptDurationSeconds(
   item: AssignmentAttemptStatsSource,
   options?: {
+    respectAttemptTimeLimit?: boolean;
     timeLimitSeconds?: number | null;
   }
 ) {
   return normalizeAttemptDurationSeconds({
     durationSeconds: item.resultJson?.durationSeconds,
-    timeLimitSeconds: item.timeLimitSeconds ?? options?.timeLimitSeconds,
+    timeLimitSeconds: options?.respectAttemptTimeLimit
+      ? item.timeLimitSeconds
+      : (item.timeLimitSeconds ?? options?.timeLimitSeconds),
   });
 }
 
@@ -163,7 +167,9 @@ export function summarizeAssignmentAttemptsByAssignmentId(
   return new Map(
     [...attemptsByAssignmentId.entries()].map(([assignmentId, items]) => [
       assignmentId,
-      summarizeAssignmentAttempts(items),
+      summarizeAssignmentAttempts(items, {
+        respectAttemptTimeLimit: true,
+      }),
     ])
   );
 }
