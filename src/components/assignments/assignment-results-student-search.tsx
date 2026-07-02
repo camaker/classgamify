@@ -2,6 +2,7 @@ import type {
   StudentSummarySort,
   AssignmentResultStudentSearchControlView,
 } from '@/assignments/result-view';
+import { AssignmentResultControlStatusBadge } from '@/components/assignments/assignment-result-control-status-badge';
 import { Input } from '@/components/ui/input';
 import {
   NativeSelect,
@@ -23,17 +24,27 @@ export function AssignmentResultsStudentSearch({
   view,
 }: AssignmentResultsStudentSearchProps) {
   const searchSummaryId = 'assignment-result-search-summary';
+  const searchStatusDescriptionId =
+    'assignment-result-search-status-description';
   const studentSortDescriptionId = 'student-summary-sort-description';
+  const studentSortStatusDescriptionId =
+    'student-summary-sort-status-description';
 
   return (
     <section className="grid gap-3 rounded-lg border bg-card p-4 md:grid-cols-[minmax(0,1fr)_12rem_auto] md:items-start">
       <div className="grid gap-2">
-        <label
-          htmlFor="assignment-result-search"
-          className="font-medium text-sm"
-        >
-          {view.label}
-        </label>
+        <div className="flex min-w-0 items-center justify-between gap-2">
+          <label
+            htmlFor="assignment-result-search"
+            className="font-medium text-sm"
+          >
+            {view.label}
+          </label>
+          <AssignmentResultControlStatusBadge
+            descriptionId={searchStatusDescriptionId}
+            view={view.searchStatusView}
+          />
+        </div>
         <div className="relative max-w-xl">
           <IconSearch className="-translate-y-1/2 pointer-events-none absolute top-1/2 left-3 size-4 text-muted-foreground" />
           <Input
@@ -41,7 +52,7 @@ export function AssignmentResultsStudentSearch({
             value={view.value}
             placeholder={view.placeholder}
             className="pl-9 pr-9"
-            aria-describedby={searchSummaryId}
+            aria-describedby={`${searchSummaryId} ${searchStatusDescriptionId}`}
             onChange={(event) => onSearch(event.currentTarget.value)}
           />
           {view.hasSearchValue ? (
@@ -57,13 +68,19 @@ export function AssignmentResultsStudentSearch({
         </div>
       </div>
       <div className="grid gap-2">
-        <label htmlFor="student-summary-sort" className="font-medium text-sm">
-          {view.sortLabel}
-        </label>
+        <div className="flex min-w-0 items-center justify-between gap-2">
+          <label htmlFor="student-summary-sort" className="font-medium text-sm">
+            {view.sortLabel}
+          </label>
+          <AssignmentResultControlStatusBadge
+            descriptionId={studentSortStatusDescriptionId}
+            view={view.sortStatusView}
+          />
+        </div>
         <NativeSelect
           id="student-summary-sort"
           value={view.sort}
-          aria-describedby={studentSortDescriptionId}
+          aria-describedby={`${studentSortDescriptionId} ${studentSortStatusDescriptionId}`}
           onChange={(event) =>
             onSortChange(event.currentTarget.value as StudentSummarySort)
           }

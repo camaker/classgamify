@@ -2,6 +2,7 @@ import type {
   AttemptReviewFilter,
   AssignmentResultAttemptReviewFilterControlView,
 } from '@/assignments/result-view';
+import { AssignmentResultControlStatusBadge } from '@/components/assignments/assignment-result-control-status-badge';
 import {
   NativeSelect,
   NativeSelectOption,
@@ -17,16 +18,23 @@ export function AssignmentResultsAttemptReviewFilterControl({
   view,
 }: AssignmentResultsAttemptReviewFilterControlProps) {
   const descriptionId = 'attempt-review-filter-description';
+  const statusDescriptionId = 'attempt-review-filter-status-description';
 
   return (
     <div className="flex flex-col gap-2 sm:w-48">
-      <label htmlFor="attempt-review-filter" className="font-medium text-sm">
-        {view.label}
-      </label>
+      <div className="flex min-w-0 items-center justify-between gap-2">
+        <label htmlFor="attempt-review-filter" className="font-medium text-sm">
+          {view.label}
+        </label>
+        <AssignmentResultControlStatusBadge
+          descriptionId={statusDescriptionId}
+          view={view.statusView}
+        />
+      </div>
       <NativeSelect
         id="attempt-review-filter"
         value={view.filter}
-        aria-describedby={descriptionId}
+        aria-describedby={`${descriptionId} ${statusDescriptionId}`}
         onChange={(event) =>
           onFilterChange(event.currentTarget.value as AttemptReviewFilter)
         }

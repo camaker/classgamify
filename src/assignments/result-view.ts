@@ -411,14 +411,26 @@ type AssignmentResultControlOption<TValue extends string> = {
   value: TValue;
 };
 
+export type AssignmentResultControlStatusTone = 'custom' | 'default';
+
+export type AssignmentResultControlStatusView = {
+  ariaLabel: string;
+  description: string;
+  label: string;
+  tone: AssignmentResultControlStatusTone;
+  value: string;
+};
+
 export type AssignmentResultStudentSearchControlView = {
   clearLabel: string;
   label: string;
   hasSearchValue: boolean;
   placeholder: string;
+  searchStatusView: AssignmentResultControlStatusView;
   sort: StudentSummarySort;
   sortLabel: string;
   selectedSortOption: AssignmentResultControlOption<StudentSummarySort>;
+  sortStatusView: AssignmentResultControlStatusView;
   sortOptions: Array<AssignmentResultControlOption<StudentSummarySort>>;
   summary: string;
   value: string;
@@ -429,6 +441,7 @@ export type AssignmentResultItemPerformanceSortControlView = {
   options: Array<AssignmentResultControlOption<ItemPerformanceSort>>;
   selectedSortOption: AssignmentResultControlOption<ItemPerformanceSort>;
   sort: ItemPerformanceSort;
+  statusView: AssignmentResultControlStatusView;
 };
 
 export type AssignmentResultAttemptReviewFilterControlView = {
@@ -436,6 +449,7 @@ export type AssignmentResultAttemptReviewFilterControlView = {
   label: string;
   options: Array<AssignmentResultControlOption<AttemptReviewFilter>>;
   selectedFilterOption: AssignmentResultControlOption<AttemptReviewFilter>;
+  statusView: AssignmentResultControlStatusView;
 };
 
 export type AssignmentResultControlViews = {
@@ -2370,25 +2384,85 @@ export function buildAssignmentResultControlViews({
       label: assignmentResultSearchCopy.reviewViewLabel,
       options: attemptReviewFilterOptions,
       selectedFilterOption: selectedAttemptReviewFilterOption,
+      statusView: buildAssignmentResultControlStatusView({
+        controlLabel: assignmentResultSearchCopy.reviewViewLabel,
+        isDefault:
+          viewState.attemptReviewFilter === DEFAULT_ATTEMPT_REVIEW_FILTER,
+        selectedLabel: selectedAttemptReviewFilterOption.label,
+      }),
     },
     itemPerformanceSort: {
       label: assignmentResultSearchCopy.sortItemsLabel,
       options: itemPerformanceSortOptions,
       selectedSortOption: selectedItemPerformanceSortOption,
       sort: viewState.itemPerformanceSort,
+      statusView: buildAssignmentResultControlStatusView({
+        controlLabel: assignmentResultSearchCopy.sortItemsLabel,
+        isDefault:
+          viewState.itemPerformanceSort === DEFAULT_ITEM_PERFORMANCE_SORT,
+        selectedLabel: selectedItemPerformanceSortOption.label,
+      }),
     },
     studentSearch: {
       clearLabel: assignmentResultSearchCopy.clearStudentSearchLabel,
       hasSearchValue: Boolean(viewState.studentSearch),
       label: assignmentResultSearchCopy.findStudentLabel,
       placeholder: assignmentResultSearchCopy.placeholder,
+      searchStatusView: buildAssignmentResultControlStatusView({
+        controlLabel: assignmentResultSearchCopy.findStudentLabel,
+        isDefault: !viewState.studentSearch,
+        selectedLabel:
+          viewState.studentSearch ||
+          assignmentResultReviewScopeCopy.searchAllValue,
+      }),
       selectedSortOption: selectedStudentSortOption,
       sort: viewState.studentSort,
       sortLabel: assignmentResultSearchCopy.sortStudentsLabel,
+      sortStatusView: buildAssignmentResultControlStatusView({
+        controlLabel: assignmentResultSearchCopy.sortStudentsLabel,
+        isDefault: viewState.studentSort === DEFAULT_STUDENT_SUMMARY_SORT,
+        selectedLabel: selectedStudentSortOption.label,
+      }),
       sortOptions: studentSummarySortOptions,
       summary: resultSearchSummary,
       value: viewState.studentSearch,
     },
+  };
+}
+
+export function buildAssignmentResultControlStatusView({
+  controlLabel,
+  isDefault,
+  selectedLabel,
+}: {
+  controlLabel: string;
+  isDefault: boolean;
+  selectedLabel: string;
+}): AssignmentResultControlStatusView {
+  const label = m.assignment_result_search_control_status_label();
+  const value = isDefault
+    ? m.assignment_result_search_control_status_default_value()
+    : m.assignment_result_search_control_status_custom_value();
+  const description = isDefault
+    ? m.assignment_result_search_control_status_default_description({
+        control: controlLabel,
+        selection: selectedLabel,
+      })
+    : m.assignment_result_search_control_status_custom_description({
+        control: controlLabel,
+        selection: selectedLabel,
+      });
+
+  return {
+    ariaLabel: m.assignment_result_search_control_status_aria_label({
+      description,
+      label,
+      value,
+    }),
+    description,
+    label,
+    tone: isDefault ? 'default' : 'custom',
+    value,
   };
 }
 

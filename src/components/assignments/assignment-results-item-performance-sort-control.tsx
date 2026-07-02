@@ -2,6 +2,7 @@ import type {
   ItemPerformanceSort,
   AssignmentResultItemPerformanceSortControlView,
 } from '@/assignments/result-view';
+import { AssignmentResultControlStatusBadge } from '@/components/assignments/assignment-result-control-status-badge';
 import {
   NativeSelect,
   NativeSelectOption,
@@ -17,16 +18,23 @@ export function AssignmentResultsItemPerformanceSortControl({
   view,
 }: AssignmentResultsItemPerformanceSortControlProps) {
   const descriptionId = 'item-performance-sort-description';
+  const statusDescriptionId = 'item-performance-sort-status-description';
 
   return (
     <div className="flex flex-col gap-2 sm:w-52">
-      <label htmlFor="item-performance-sort" className="font-medium text-sm">
-        {view.label}
-      </label>
+      <div className="flex min-w-0 items-center justify-between gap-2">
+        <label htmlFor="item-performance-sort" className="font-medium text-sm">
+          {view.label}
+        </label>
+        <AssignmentResultControlStatusBadge
+          descriptionId={statusDescriptionId}
+          view={view.statusView}
+        />
+      </div>
       <NativeSelect
         id="item-performance-sort"
         value={view.sort}
-        aria-describedby={descriptionId}
+        aria-describedby={`${descriptionId} ${statusDescriptionId}`}
         onChange={(event) =>
           onSortChange(event.currentTarget.value as ItemPerformanceSort)
         }
