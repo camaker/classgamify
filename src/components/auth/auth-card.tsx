@@ -10,9 +10,18 @@ import {
 import { Link } from '@tanstack/react-router';
 import {
   IconCircleCheck,
+  IconKey,
   IconInfoCircle,
+  IconListCheck,
   IconRoute,
+  IconShieldCheck,
+  IconUsers,
+  type TablerIcon,
 } from '@tabler/icons-react';
+import type {
+  AuthWorkspaceBoundaryItemId,
+  AuthWorkspaceBoundaryView,
+} from '@/auth/workspace-boundary';
 import { cn } from '@/lib/utils';
 
 export type AuthCardBenefitItem = {
@@ -34,6 +43,7 @@ interface AuthCardProps {
   description?: string;
   benefits?: AuthCardBenefitItem[];
   workflowSteps?: AuthWorkflowStep[];
+  workspaceBoundary?: AuthWorkspaceBoundaryView;
   returnHint?: string;
   trustNote?: string;
   bottomButtonLabel: string;
@@ -49,6 +59,7 @@ export function AuthCard({
   description,
   benefits,
   workflowSteps,
+  workspaceBoundary,
   returnHint,
   trustNote,
   bottomButtonLabel,
@@ -134,6 +145,9 @@ export function AuthCard({
             </ol>
           </div>
         )}
+        {workspaceBoundary ? (
+          <AuthWorkspaceBoundaryPanel view={workspaceBoundary} />
+        ) : null}
         {trustNote && (
           <div className="mt-3 flex w-full items-start gap-2 rounded-lg bg-muted/40 px-3 py-2 text-xs leading-relaxed text-muted-foreground">
             <IconInfoCircle
@@ -156,3 +170,65 @@ export function AuthCard({
     </Card>
   );
 }
+
+function AuthWorkspaceBoundaryPanel({
+  view,
+}: {
+  view: AuthWorkspaceBoundaryView;
+}) {
+  const titleId = 'auth-workspace-boundary-title';
+
+  return (
+    <section
+      aria-labelledby={titleId}
+      className="mt-3 w-full rounded-lg border border-primary/15 bg-primary/5 px-3 py-3 text-left"
+    >
+      <div className="flex items-start gap-2">
+        <IconShieldCheck
+          aria-hidden="true"
+          className="mt-0.5 size-4 shrink-0 text-primary"
+          stroke={1.8}
+        />
+        <div className="min-w-0 space-y-1">
+          <p id={titleId} className="text-xs font-medium text-foreground">
+            {view.title}
+          </p>
+          <p className="text-xs leading-relaxed text-muted-foreground">
+            {view.description}
+          </p>
+        </div>
+      </div>
+      <ul className="mt-3 grid gap-2 sm:grid-cols-2">
+        {view.items.map((item) => {
+          const Icon = authWorkspaceBoundaryIcons[item.id];
+
+          return (
+            <li key={item.id} className="flex min-w-0 gap-2">
+              <Icon
+                aria-hidden="true"
+                className="mt-0.5 size-3.5 shrink-0 text-primary"
+                stroke={1.8}
+              />
+              <span className="min-w-0">
+                <span className="block text-xs font-medium text-foreground">
+                  {item.label}
+                </span>
+                <span className="mt-0.5 block text-xs leading-relaxed text-muted-foreground">
+                  {item.description}
+                </span>
+              </span>
+            </li>
+          );
+        })}
+      </ul>
+    </section>
+  );
+}
+
+const authWorkspaceBoundaryIcons = {
+  'account-access': IconKey,
+  'activity-library': IconListCheck,
+  'assignment-links': IconRoute,
+  'source-materials': IconShieldCheck,
+  'student-results': IconUsers,
+} satisfies Record<AuthWorkspaceBoundaryItemId, TablerIcon>;

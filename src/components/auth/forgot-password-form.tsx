@@ -15,6 +15,7 @@ import {
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { authClient } from '@/auth/client';
+import { buildAuthWorkspaceBoundaryView } from '@/auth/workspace-boundary';
 import { cn } from '@/lib/utils';
 import { Routes } from '@/lib/routes';
 import { getPathWithLocale, getSafeCallbackPath } from '@/lib/urls';
@@ -84,6 +85,7 @@ export function ForgotPasswordForm({ className }: { className?: string }) {
       bottomButtonLabel={m.auth_forgot_password_back_to_login()}
       bottomButtonHref={Routes.Login}
       bottomButtonSearch={authSwitchSearch}
+      workspaceBoundary={buildAuthWorkspaceBoundaryView()}
       className={cn('', className)}
     >
       <Form {...form}>

@@ -20,6 +20,10 @@ import {
   buildContactClassroomInquiryScopeView,
   CONTACT_CLASSROOM_INQUIRY_SCOPE_ITEM_IDS,
 } from '@/contact/inquiry-view';
+import {
+  AUTH_WORKSPACE_BOUNDARY_ITEM_IDS,
+  buildAuthWorkspaceBoundaryView,
+} from '@/auth/workspace-boundary';
 import { buildMailWorkspaceBoundaryView } from '@/mail/workspace-boundary';
 import { getAvatarLinks } from '@/config/avatar-config';
 import { getFooterLinks } from '@/config/footer-config';
@@ -5272,12 +5276,24 @@ const authCardSource = readFileSync(
   'src/components/auth/auth-card.tsx',
   'utf8'
 );
+const authWorkspaceBoundarySource = readFileSync(
+  'src/auth/workspace-boundary.ts',
+  'utf8'
+);
 const loginFormSource = readFileSync(
   'src/components/auth/login-form.tsx',
   'utf8'
 );
 const registerFormSource = readFileSync(
   'src/components/auth/register-form.tsx',
+  'utf8'
+);
+const forgotPasswordFormSource = readFileSync(
+  'src/components/auth/forgot-password-form.tsx',
+  'utf8'
+);
+const resetPasswordFormSource = readFileSync(
+  'src/components/auth/reset-password-form.tsx',
   'utf8'
 );
 const blogListRouteSource = readFileSync('src/routes/blog/index.tsx', 'utf8');
@@ -5816,6 +5832,21 @@ assert.match(
   /export type AuthWorkflowStep = \{[\s\S]*id: string;[\s\S]*workflowSteps\?: AuthWorkflowStep\[\];[\s\S]*key=\{step\.id\}/,
   'Auth cards should render workflow steps from stable step ids.'
 );
+assert.match(
+  authWorkspaceBoundarySource,
+  /AUTH_WORKSPACE_BOUNDARY_ITEM_IDS[\s\S]*'account-access'[\s\S]*'activity-library'[\s\S]*'assignment-links'[\s\S]*'student-results'[\s\S]*'source-materials'/,
+  'Auth workspace-boundary domain should own stable account boundary item ids.'
+);
+assert.doesNotMatch(
+  authWorkspaceBoundarySource,
+  /Teacher workspace boundary|Account access|Activity library|Assignment links|Student results|Source materials/,
+  'Auth workspace-boundary domain should read visible copy from locale messages.'
+);
+assert.match(
+  authCardSource,
+  /AuthWorkspaceBoundaryView[\s\S]*workspaceBoundary\?: AuthWorkspaceBoundaryView[\s\S]*AuthWorkspaceBoundaryPanel[\s\S]*view\.items\.map\(\(item\) =>[\s\S]*key=\{item\.id\}[\s\S]*item\.label[\s\S]*item\.description/,
+  'Auth cards should render the prepared workspace-boundary view from stable item ids.'
+);
 assert.doesNotMatch(
   authCardSource,
   /key=\{benefit\}|key=\{`\$\{step\.label\}-\$\{step\.title\}`\}/,
@@ -5830,6 +5861,26 @@ assert.match(
   registerFormSource,
   /benefits=\{\[[\s\S]*id: 'progress'[\s\S]*auth_register_benefit_progress[\s\S]*id: 'worksheets'[\s\S]*auth_register_benefit_worksheets[\s\S]*id: 'review'[\s\S]*auth_register_benefit_review/,
   'Register form should pass structured auth benefit rows.'
+);
+assert.match(
+  loginFormSource,
+  /buildAuthWorkspaceBoundaryView[\s\S]*workspaceBoundary=\{buildAuthWorkspaceBoundaryView\(\)\}/,
+  'Login form should render the teacher workspace boundary before sign-in.'
+);
+assert.match(
+  registerFormSource,
+  /buildAuthWorkspaceBoundaryView[\s\S]*workspaceBoundary=\{buildAuthWorkspaceBoundaryView\(\)\}/,
+  'Register form should render the teacher workspace boundary before account creation.'
+);
+assert.match(
+  forgotPasswordFormSource,
+  /buildAuthWorkspaceBoundaryView[\s\S]*workspaceBoundary=\{buildAuthWorkspaceBoundaryView\(\)\}/,
+  'Forgot-password form should render the teacher workspace boundary before reset requests.'
+);
+assert.match(
+  resetPasswordFormSource,
+  /buildAuthWorkspaceBoundaryView[\s\S]*workspaceBoundary=\{buildAuthWorkspaceBoundaryView\(\)\}[\s\S]*workspaceBoundary=\{buildAuthWorkspaceBoundaryView\(\)\}/,
+  'Reset-password form should render the teacher workspace boundary for invalid and active reset states.'
 );
 assert.match(
   worksheetsRouteSource,
@@ -10061,6 +10112,29 @@ assert.deepEqual(buildMailWorkspaceBoundaryView(), {
   ],
   title: 'Workspace boundary',
 });
+assert.deepEqual(AUTH_WORKSPACE_BOUNDARY_ITEM_IDS, [
+  'account-access',
+  'activity-library',
+  'assignment-links',
+  'student-results',
+  'source-materials',
+]);
+const authWorkspaceBoundaryView = buildAuthWorkspaceBoundaryView();
+assert.equal(authWorkspaceBoundaryView.title, 'Teacher workspace boundary');
+assert.match(
+  authWorkspaceBoundaryView.description,
+  /creating, publishing, and reviewing classroom work/
+);
+assert.deepEqual(
+  authWorkspaceBoundaryView.items.map((item) => [item.id, item.label]),
+  [
+    ['account-access', 'Account access'],
+    ['activity-library', 'Activity library'],
+    ['assignment-links', 'Assignment links'],
+    ['student-results', 'Student results'],
+    ['source-materials', 'Source materials'],
+  ]
+);
 const authWorkspaceBoundaryRequirements = [
   [
     enLocaleMessages,
@@ -10075,6 +10149,13 @@ const authWorkspaceBoundaryRequirements = [
       ['auth_register_benefit_review', /student attempts/],
       ['auth_forgot_password_description', /activities, assignment links, and results/],
       ['auth_reset_password_description', /source materials, and result records/],
+      ['auth_workspace_boundary_title', /Teacher workspace boundary/],
+      ['auth_workspace_boundary_description', /creating, publishing, and reviewing classroom work/],
+      ['auth_workspace_boundary_item_account_access_description', /protected teacher workspace/],
+      ['auth_workspace_boundary_item_activity_library_description', /template scaffolds, edits, duplicates/],
+      ['auth_workspace_boundary_item_assignment_links_description', /frozen snapshots, instructions, timers/],
+      ['auth_workspace_boundary_item_student_results_description', /anonymous browser identities, summaries, exports/],
+      ['auth_workspace_boundary_item_source_materials_description', /audio, worksheet images, documents, and spreadsheets/],
       ['settings_profile_workspace_summary_description', /display name and avatar/],
       ['settings_profile_workspace_summary_activities_description', /reusable classroom content/],
       ['settings_profile_workspace_summary_assignments_description', /Published assignment links/],
@@ -10134,6 +10215,13 @@ const authWorkspaceBoundaryRequirements = [
       ['auth_register_benefit_review', /学生尝试/],
       ['auth_forgot_password_description', /活动、作业链接和结果记录/],
       ['auth_reset_password_description', /来源素材和结果记录/],
+      ['auth_workspace_boundary_title', /教师工作区边界/],
+      ['auth_workspace_boundary_description', /创建、发布和复盘课堂工作/],
+      ['auth_workspace_boundary_item_account_access_description', /受保护的教师工作区/],
+      ['auth_workspace_boundary_item_activity_library_description', /模板示例、编辑、复制/],
+      ['auth_workspace_boundary_item_assignment_links_description', /冻结快照、说明、计时器/],
+      ['auth_workspace_boundary_item_student_results_description', /匿名浏览器身份、摘要、导出/],
+      ['auth_workspace_boundary_item_source_materials_description', /音频、练习纸图片、文档和表格/],
       ['settings_profile_workspace_summary_description', /显示名称和头像/],
       ['settings_profile_workspace_summary_activities_description', /可复用课堂内容/],
       ['settings_profile_workspace_summary_assignments_description', /已发布作业链接/],
