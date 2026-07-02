@@ -17,6 +17,7 @@ import {
   IconArrowRight,
   IconChartBar,
   IconCheck,
+  IconCircle,
   IconDeviceGamepad2,
   IconLayoutGrid,
   IconListCheck,
@@ -152,21 +153,51 @@ function RoadmapColumn({ column }: { column: RoadmapColumnView }) {
       </div>
       <ul className="mt-5 space-y-3">
         {column.items.map((item) => (
-          <li
-            key={item.id}
-            className="grid grid-cols-[1rem_minmax(0,1fr)] gap-2 text-sm leading-6"
-          >
-            <IconCheck className="mt-1 size-4 text-primary" />
-            <span>
-              <span className="block font-medium">{item.title}</span>
-              <span className="mt-1 block text-muted-foreground">
-                {item.description}
-              </span>
-            </span>
-          </li>
+          <RoadmapTaskItem item={item} key={item.id} />
         ))}
       </ul>
     </div>
+  );
+}
+
+function RoadmapTaskItem({
+  item,
+}: {
+  item: RoadmapColumnView['items'][number];
+}) {
+  const Icon = roadmapTaskStatusIcons[item.status];
+
+  return (
+    <li className="grid grid-cols-[1rem_minmax(0,1fr)] gap-2 text-sm leading-6">
+      <Icon className="mt-1 size-4 text-primary" />
+      <div className="min-w-0">
+        <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
+          <span className="font-medium">{item.title}</span>
+          <Badge
+            aria-label={item.statusAriaLabel}
+            variant={getRoadmapTaskStatusBadgeVariant(item.status)}
+            className="w-fit shrink-0 rounded-md"
+          >
+            {item.statusLabel}
+          </Badge>
+        </div>
+        <p className="mt-1 text-muted-foreground">{item.description}</p>
+        <dl className="mt-3 grid gap-2 text-xs leading-5">
+          <div>
+            <dt className="font-medium text-foreground">
+              {item.evidenceLabel}
+            </dt>
+            <dd className="mt-0.5 text-muted-foreground">{item.evidence}</dd>
+          </div>
+          <div>
+            <dt className="font-medium text-foreground">
+              {item.nextStepLabel}
+            </dt>
+            <dd className="mt-0.5 text-muted-foreground">{item.nextStep}</dd>
+          </div>
+        </dl>
+      </div>
+    </li>
   );
 }
 
@@ -197,3 +228,18 @@ const roadmapPrincipleIcons = {
   learning: IconListCheck,
   validation: IconChartBar,
 } satisfies Record<RoadmapPrincipleId, TablerIcon>;
+
+const roadmapTaskStatusIcons = {
+  available: IconCheck,
+  improving: IconDeviceGamepad2,
+  planned: IconCircle,
+} satisfies Record<RoadmapColumnView['items'][number]['status'], TablerIcon>;
+
+function getRoadmapTaskStatusBadgeVariant(
+  status: RoadmapColumnView['items'][number]['status']
+) {
+  if (status === 'available') return 'secondary';
+  if (status === 'improving') return 'default';
+
+  return 'outline';
+}

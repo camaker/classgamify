@@ -5428,6 +5428,11 @@ assert.match(
   /column\.items\.map[\s\S]*key=\{item\.id\}/,
   'Roadmap route should key roadmap tasks by prepared stable task ids.'
 );
+assert.match(
+  roadmapRouteSource,
+  /item\.statusAriaLabel[\s\S]*item\.statusLabel[\s\S]*item\.evidenceLabel[\s\S]*item\.evidence[\s\S]*item\.nextStepLabel[\s\S]*item\.nextStep/,
+  'Roadmap route should render prepared task status, evidence, and next-step copy from the page view model.'
+);
 assert.doesNotMatch(
   roadmapRouteSource,
   /ReturnType<typeof buildRoadmapPageViewModel>/,
@@ -5445,8 +5450,28 @@ assert.match(
 );
 assert.match(
   publicPageViewSource,
-  /export type RoadmapTaskId[\s\S]*type RoadmapTaskView = \{[\s\S]*id: RoadmapTaskId;[\s\S]*title: string;/,
-  'Roadmap task view models should expose stable ids separate from localized titles.'
+  /export type RoadmapTaskStatus = 'available' \| 'improving' \| 'planned'/,
+  'Roadmap task view models should expose explicit product status states.'
+);
+assert.match(
+  publicPageViewSource,
+  /export type RoadmapTaskId[\s\S]*type RoadmapTaskView = \{[\s\S]*evidence: string;[\s\S]*id: RoadmapTaskId;[\s\S]*nextStep: string;[\s\S]*status: RoadmapTaskStatus;[\s\S]*statusAriaLabel: string;[\s\S]*title: string;/,
+  'Roadmap task view models should expose stable ids, task status, evidence, and next-step copy separate from localized titles.'
+);
+assert.match(
+  publicPageViewSource,
+  /buildRoadmapTaskView\(\{[\s\S]*evidenceLabel: m\.roadmap_task_evidence_label\(\)[\s\S]*nextStepLabel: m\.roadmap_task_next_step_label\(\)[\s\S]*statusAriaLabel: m\.roadmap_task_status_aria/,
+  'Roadmap task status evidence and next-step labels should be prepared through localized page view helpers.'
+);
+assert.match(
+  publicPageViewSource,
+  /id: 'done'[\s\S]*id: 'ai-assisted-activity-drafting'[\s\S]*status: 'available'[\s\S]*id: 'in-progress'/,
+  'Roadmap should present teacher-reviewed AI drafts as an available capability rather than stale backlog copy.'
+);
+assert.doesNotMatch(
+  publicPageViewSource,
+  /id: 'backlog'[\s\S]*id: 'ai-assisted-activity-drafting'/,
+  'Roadmap backlog should not include the already-available AI draft flow.'
 );
 assert.match(
   publicPageViewSource,
@@ -30084,14 +30109,47 @@ assert.deepEqual(buildRoadmapPageViewModel(), {
         {
           description:
             'Teachers can create reusable structured activities, publish assignment links, and keep snapshots stable for student attempts.',
+          evidence:
+            'The current loop saves activities, publishes share links, freezes assignment snapshots, accepts public attempts, and shows teacher results.',
+          evidenceLabel: 'Classroom evidence',
           id: 'activity-assignment-loop',
+          nextStep:
+            'Keep distribution and result handoff reliable while retiring copied starter surfaces in small verified waves.',
+          nextStepLabel: 'Next step',
+          status: 'available',
+          statusAriaLabel: 'Activity to assignment loop status: Live',
+          statusLabel: 'Live',
           title: 'Activity to assignment loop',
         },
         {
           description:
             'Quiz, matching games, group sorting, line matching, fill-ins, listening, pair matching, and box reveal modes share one content model.',
+          evidence:
+            'The student runner uses the same runtime answer contract across quizzes, matching games, line matching, group sorting, fill-ins, listening, pair matching, and box reveal modes.',
+          evidenceLabel: 'Classroom evidence',
           id: 'playable-template-foundation',
+          nextStep:
+            'Deepen each template interaction without splitting scoring, snapshots, or result review into separate data shapes.',
+          nextStepLabel: 'Next step',
+          status: 'available',
+          statusAriaLabel: 'Playable template foundation status: Live',
+          statusLabel: 'Live',
           title: 'Playable template foundation',
+        },
+        {
+          description:
+            'Teachers can generate AI-assisted activity drafts, review coverage, inspect safe source-material provenance, and edit everything before saving.',
+          evidence:
+            'AI drafts now fill the normal activity editor with teacher-reviewable questions, pairs, groups, vocabulary, notes, readiness, trust, and safety summaries.',
+          evidenceLabel: 'Classroom evidence',
+          id: 'ai-assisted-activity-drafting',
+          nextStep:
+            'Extend from draft creation into deterministic remix assists, distractor generation, leveled variants, and worksheet extraction.',
+          nextStepLabel: 'Next step',
+          status: 'available',
+          statusAriaLabel: 'Teacher-reviewed AI drafts status: Live',
+          statusLabel: 'Live',
+          title: 'Teacher-reviewed AI drafts',
         },
       ],
       status: 'Live',
@@ -30105,13 +30163,31 @@ assert.deepEqual(buildRoadmapPageViewModel(), {
         {
           description:
             'Make completion, scores, item misses, exports, and review filters clearer for teacher follow-up.',
+          evidence:
+            'Result pages already expose metrics, review filters, classroom briefs, reteach plans, item review summaries, student follow-up summaries, CSV export, and printable handoff paths.',
+          evidenceLabel: 'Classroom evidence',
           id: 'results-reteach-summaries',
+          nextStep:
+            'Keep sharpening the current review scope, copy artifacts, and offline export confidence around the same results data.',
+          nextStepLabel: 'Next step',
+          status: 'improving',
+          statusAriaLabel: 'Results and reteach summaries status: Improving',
+          statusLabel: 'Improving',
           title: 'Results and reteach summaries',
         },
         {
           description:
             'Tighten printable follow-up, fill-in, line matching, and listening flows around the same assignment snapshot.',
+          evidence:
+            'Worksheet-style modes and printable assignment pages already reuse frozen assignment snapshots, delivery settings, answer reveal rules, and accepted alternatives.',
+          evidenceLabel: 'Classroom evidence',
           id: 'worksheet-style-delivery',
+          nextStep:
+            'Improve worksheet preparation, audio handoff, and future extraction without creating a parallel worksheet product.',
+          nextStepLabel: 'Next step',
+          status: 'improving',
+          statusAriaLabel: 'Worksheet-style delivery status: Improving',
+          statusLabel: 'Improving',
           title: 'Worksheet-style delivery',
         },
       ],
@@ -30125,20 +30201,32 @@ assert.deepEqual(buildRoadmapPageViewModel(), {
       items: [
         {
           description:
-            'Turn teacher notes, vocabulary lists, and worksheet prompts into reviewable activity drafts without bypassing teacher control.',
-          id: 'ai-assisted-activity-drafting',
-          title: 'AI-assisted activity drafting',
-        },
-        {
-          description:
             'Read teacher-uploaded worksheets into structured prompts, accepted answers, and printable follow-up modes.',
+          evidence:
+            'Uploaded worksheet files can already attach to activities as safe private source-material references.',
+          evidenceLabel: 'Classroom evidence',
           id: 'worksheet-extraction',
+          nextStep:
+            'Design teacher-reviewed extraction before reading file bytes or changing the shared activity schema.',
+          nextStepLabel: 'Next step',
+          status: 'planned',
+          statusAriaLabel: 'Worksheet extraction status: Exploring',
+          statusLabel: 'Exploring',
           title: 'Worksheet extraction',
         },
         {
           description:
             'Add multi-teacher sharing, class-level result retention, and permission rules for schools and learning centers.',
+          evidence:
+            'The product currently keeps teacher-owned activities, assignment links, student attempts, and result records scoped to the signed-in owner.',
+          evidenceLabel: 'Classroom evidence',
           id: 'school-team-workflows',
+          nextStep:
+            'Validate school data rules, teacher seats, and permission boundaries before broadening workspace sharing.',
+          nextStepLabel: 'Next step',
+          status: 'planned',
+          statusAriaLabel: 'School team workflows status: Exploring',
+          statusLabel: 'Exploring',
           title: 'School team workflows',
         },
       ],
@@ -30149,7 +30237,7 @@ assert.deepEqual(buildRoadmapPageViewModel(), {
   hero: {
     badgeLabel: 'Product direction',
     description:
-      'A practical view of what is already usable, what is being tightened now, and where AI-assisted classroom activity creation comes next.',
+      'A practical view of what is already usable, what is being tightened now, and how teacher-reviewed AI creation expands next.',
     primaryAction: {
       label: 'Create activity',
       to: Routes.Create,
@@ -30195,9 +30283,9 @@ assert.deepEqual(buildRoadmapPageViewModel(), {
     },
     {
       description:
-        'AI should draft, remix, differentiate, and summarize inside the teacher-reviewed activity model.',
+        'AI drafts now stay inside the teacher-reviewed activity model; the next expansion is remix assistance and worksheet extraction.',
       id: 'expansion',
-      title: 'AI and worksheet extraction next',
+      title: 'AI drafts now, extraction next',
     },
   ],
   validation: {

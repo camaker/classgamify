@@ -113,9 +113,18 @@ export type RoadmapTaskId =
   | 'worksheet-extraction'
   | 'worksheet-style-delivery';
 
+export type RoadmapTaskStatus = 'available' | 'improving' | 'planned';
+
 type RoadmapTaskView = {
   description: string;
+  evidence: string;
+  evidenceLabel: string;
   id: RoadmapTaskId;
+  nextStep: string;
+  nextStepLabel: string;
+  status: RoadmapTaskStatus;
+  statusAriaLabel: string;
+  statusLabel: string;
   title: string;
 };
 
@@ -350,16 +359,30 @@ export function buildRoadmapPageViewModel(): RoadmapPageViewModel {
         description: m.roadmap_columns_done_description(),
         id: 'done',
         items: [
-          {
+          buildRoadmapTaskView({
             description: m.roadmap_board_tasks_done_0_description(),
+            evidence: m.roadmap_board_tasks_done_0_evidence(),
             id: 'activity-assignment-loop',
+            nextStep: m.roadmap_board_tasks_done_0_next_step(),
+            status: 'available',
             title: m.roadmap_board_tasks_done_0_title(),
-          },
-          {
+          }),
+          buildRoadmapTaskView({
             description: m.roadmap_board_tasks_done_1_description(),
+            evidence: m.roadmap_board_tasks_done_1_evidence(),
             id: 'playable-template-foundation',
+            nextStep: m.roadmap_board_tasks_done_1_next_step(),
+            status: 'available',
             title: m.roadmap_board_tasks_done_1_title(),
-          },
+          }),
+          buildRoadmapTaskView({
+            description: m.roadmap_board_tasks_done_2_description(),
+            evidence: m.roadmap_board_tasks_done_2_evidence(),
+            id: 'ai-assisted-activity-drafting',
+            nextStep: m.roadmap_board_tasks_done_2_next_step(),
+            status: 'available',
+            title: m.roadmap_board_tasks_done_2_title(),
+          }),
         ],
         status: m.roadmap_status_available(),
         title: m.roadmap_columns_done(),
@@ -368,16 +391,22 @@ export function buildRoadmapPageViewModel(): RoadmapPageViewModel {
         description: m.roadmap_columns_in_progress_description(),
         id: 'in-progress',
         items: [
-          {
+          buildRoadmapTaskView({
             description: m.roadmap_board_tasks_in_progress_0_description(),
+            evidence: m.roadmap_board_tasks_in_progress_0_evidence(),
             id: 'results-reteach-summaries',
+            nextStep: m.roadmap_board_tasks_in_progress_0_next_step(),
+            status: 'improving',
             title: m.roadmap_board_tasks_in_progress_0_title(),
-          },
-          {
+          }),
+          buildRoadmapTaskView({
             description: m.roadmap_board_tasks_in_progress_1_description(),
+            evidence: m.roadmap_board_tasks_in_progress_1_evidence(),
             id: 'worksheet-style-delivery',
+            nextStep: m.roadmap_board_tasks_in_progress_1_next_step(),
+            status: 'improving',
             title: m.roadmap_board_tasks_in_progress_1_title(),
-          },
+          }),
         ],
         status: m.roadmap_status_improving(),
         title: m.roadmap_columns_in_progress(),
@@ -386,21 +415,22 @@ export function buildRoadmapPageViewModel(): RoadmapPageViewModel {
         description: m.roadmap_columns_backlog_description(),
         id: 'backlog',
         items: [
-          {
-            description: m.roadmap_board_tasks_backlog_0_description(),
-            id: 'ai-assisted-activity-drafting',
-            title: m.roadmap_board_tasks_backlog_0_title(),
-          },
-          {
+          buildRoadmapTaskView({
             description: m.roadmap_board_tasks_backlog_1_description(),
+            evidence: m.roadmap_board_tasks_backlog_1_evidence(),
             id: 'worksheet-extraction',
+            nextStep: m.roadmap_board_tasks_backlog_1_next_step(),
+            status: 'planned',
             title: m.roadmap_board_tasks_backlog_1_title(),
-          },
-          {
+          }),
+          buildRoadmapTaskView({
             description: m.roadmap_board_tasks_backlog_2_description(),
+            evidence: m.roadmap_board_tasks_backlog_2_evidence(),
             id: 'school-team-workflows',
+            nextStep: m.roadmap_board_tasks_backlog_2_next_step(),
+            status: 'planned',
             title: m.roadmap_board_tasks_backlog_2_title(),
-          },
+          }),
         ],
         status: m.roadmap_status_exploring(),
         title: m.roadmap_columns_backlog(),
@@ -463,6 +493,47 @@ export function buildRoadmapPageViewModel(): RoadmapPageViewModel {
       title: m.roadmap_validation_title(),
     },
   };
+}
+
+function buildRoadmapTaskView({
+  description,
+  evidence,
+  id,
+  nextStep,
+  status,
+  title,
+}: {
+  description: string;
+  evidence: string;
+  id: RoadmapTaskId;
+  nextStep: string;
+  status: RoadmapTaskStatus;
+  title: string;
+}): RoadmapTaskView {
+  const statusLabel = getRoadmapTaskStatusLabel(status);
+
+  return {
+    description,
+    evidence,
+    evidenceLabel: m.roadmap_task_evidence_label(),
+    id,
+    nextStep,
+    nextStepLabel: m.roadmap_task_next_step_label(),
+    status,
+    statusAriaLabel: m.roadmap_task_status_aria({
+      status: statusLabel,
+      title,
+    }),
+    statusLabel,
+    title,
+  };
+}
+
+function getRoadmapTaskStatusLabel(status: RoadmapTaskStatus) {
+  if (status === 'available') return m.roadmap_status_available();
+  if (status === 'improving') return m.roadmap_status_improving();
+
+  return m.roadmap_status_exploring();
 }
 
 export function buildTeachersPageViewModel(): TeachersPageViewModel {
