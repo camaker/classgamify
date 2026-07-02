@@ -9246,6 +9246,18 @@ for (const key of [
   'student_runner_feedback_detail_aria',
   'student_runner_feedback_region_aria',
   'student_runner_feedback_status_aria',
+  'student_runner_payload_summary_answers_description',
+  'student_runner_payload_summary_answers_label',
+  'student_runner_payload_summary_aria_label',
+  'student_runner_payload_summary_description',
+  'student_runner_payload_summary_items_description',
+  'student_runner_payload_summary_items_label',
+  'student_runner_payload_summary_metric_aria',
+  'student_runner_payload_summary_share_description',
+  'student_runner_payload_summary_share_label',
+  'student_runner_payload_summary_title',
+  'student_runner_payload_summary_unanswered_description',
+  'student_runner_payload_summary_unanswered_label',
   'student_runner_review_summary_correct_label',
   'student_runner_review_summary_hidden_description',
   'student_runner_review_summary_item_count_label',
@@ -10071,13 +10083,23 @@ assert.match(
 );
 assert.match(
   studentRunnerSubmitControlsSource,
+  /<fieldset[\s\S]*controlView\.payloadSummaryView\.ariaLabel[\s\S]*<legend[\s\S]*controlView\.payloadSummaryView\.title[\s\S]*controlView\.payloadSummaryView\.description[\s\S]*<dl[\s\S]*controlView\.payloadSummaryView\.metrics\.map\(\(metric\)[\s\S]*<output[\s\S]*aria-label=\{metric\.ariaLabel\}[\s\S]*\{metric\.value\}[\s\S]*\{metric\.description\}/,
+  'Student runner submit controls should render the prepared browser payload summary as semantic labelled outputs.'
+);
+assert.doesNotMatch(
+  studentRunnerSubmitControlsSource,
+  /anonymousToken|studentName|submittedStudentName|answers\[/,
+  'Student runner submit controls should not expose identity tokens, names, or answer payload contents inside the prepared browser payload summary.'
+);
+assert.match(
+  studentRunnerSubmitControlsSource,
   /const submitHintIds = controlView\.submitHintViews\.map[\s\S]*aria-describedby=\{[\s\S]*submitHintIds\.join\(' '\)[\s\S]*id=\{buildStudentRunnerSubmitHintId\(hintView\.id\)\}[\s\S]*function buildStudentRunnerSubmitHintId[\s\S]*student-runner-submit-\$\{id\}-hint/,
   'Student runner submit button should be associated with every prepared submit hint.'
 );
 assert.match(
   studentRunnerStateSource,
-  /const requiresIncompleteSubmitConfirmation = Boolean\([\s\S]*confirmIncompleteSubmit[\s\S]*attemptControlState\.unansweredLabel[\s\S]*const submitConfirmationMessage = requiresIncompleteSubmitConfirmation[\s\S]*requiresIncompleteSubmitConfirmation,[\s\S]*submitConfirmationMessage,[\s\S]*submitHintViews: buildStudentRunnerSubmitHintViews\(\{/,
-  'Student runner page view-model should expose a structured incomplete-submit confirmation state instead of making components infer it from copy.'
+  /const requiresIncompleteSubmitConfirmation = Boolean\([\s\S]*confirmIncompleteSubmit[\s\S]*attemptControlState\.unansweredLabel[\s\S]*const submitConfirmationMessage = requiresIncompleteSubmitConfirmation[\s\S]*payloadSummaryView: buildStudentRunnerSubmissionPayloadSummaryView\([\s\S]*buildStudentRunnerCurrentPayloadSummary\(\{[\s\S]*activeShareId,[\s\S]*attemptState,[\s\S]*requiresIncompleteSubmitConfirmation,[\s\S]*submitConfirmationMessage,[\s\S]*submitHintViews: buildStudentRunnerSubmitHintViews\(\{/,
+  'Student runner page view-model should expose prepared payload summary and structured incomplete-submit confirmation state instead of making components infer it from copy.'
 );
 assert.match(
   studentRunnerStateSource,
@@ -10487,8 +10509,8 @@ assert.match(
 );
 assert.match(
   studentRunnerStateSource,
-  /export type StudentRunnerSubmissionPayloadSummary = \{[\s\S]*answerCount: number;[\s\S]*itemCount: number;[\s\S]*shareSlug: string;[\s\S]*unansweredItemCount: number;[\s\S]*payloadSummary: buildStudentRunnerSubmissionPayloadSummary\(\{[\s\S]*input: submissionPlan\.input,[\s\S]*pageView,[\s\S]*function buildStudentRunnerSubmissionPayloadSummary/,
-  'Student runner submission execution plans should expose a route-safe summary of the normalized browser payload.'
+  /export type StudentRunnerSubmissionPayloadSummary = \{[\s\S]*answerCount: number;[\s\S]*itemCount: number;[\s\S]*shareSlug: string;[\s\S]*unansweredItemCount: number;[\s\S]*export type StudentRunnerSubmissionPayloadSummaryView = \{[\s\S]*metrics: StudentRunnerSubmissionPayloadSummaryMetricView\[\];[\s\S]*buildStudentRunnerSubmissionPayloadSummaryExecutionViews\(\{[\s\S]*input: submissionPlan\.input,[\s\S]*pageView,[\s\S]*payloadSummaryView:[\s\S]*buildStudentRunnerSubmissionPayloadSummaryView\(payloadSummary\)[\s\S]*function buildStudentRunnerSubmissionPayloadSummary/,
+  'Student runner submission execution plans should expose raw and localized route-safe summaries of the normalized browser payload.'
 );
 assert.match(
   studentRunnerSubmissionSource,
@@ -20412,6 +20434,12 @@ assert.deepEqual(
       attemptRegionDescription:
         'Answer the activity items, review progress, and submit this attempt from this area.',
       attemptRegionLabel: 'Student attempt workspace',
+      payloadSummaryView: buildExpectedStudentRunnerPayloadSummaryView({
+        answerCount: 1,
+        itemCount: 1,
+        shareSlug: 'share-public',
+        unansweredItemCount: 0,
+      }),
       progressDescription: 'Current completion progress: 1/1 answered.',
       progressLabel: '1/1 answered',
       progressView: {
@@ -20661,6 +20689,65 @@ const submittableStudentRunnerPageView = buildStudentRunnerPageViewModel({
   shareId: ' share-public ',
   submittedAttemptCount: 0,
 });
+function buildExpectedStudentRunnerPayloadSummaryView({
+  answerCount,
+  itemCount,
+  shareSlug,
+  unansweredItemCount,
+}: {
+  answerCount: number;
+  itemCount: number;
+  shareSlug: string;
+  unansweredItemCount: number;
+}) {
+  return {
+    ariaLabel: 'Prepared browser submission payload',
+    description:
+      'Review the assignment link and answer counts this browser will send when you submit.',
+    metrics: [
+      {
+        ariaLabel:
+          `Share link: ${shareSlug}. ` +
+          'Frozen assignment link id used for this submission.',
+        description: 'Frozen assignment link id used for this submission.',
+        key: 'share-link',
+        label: 'Share link',
+        value: shareSlug,
+      },
+      {
+        ariaLabel:
+          `Runtime items: ${itemCount}. ` +
+          'Frozen runtime items loaded from the teacher assignment snapshot.',
+        description:
+          'Frozen runtime items loaded from the teacher assignment snapshot.',
+        key: 'items',
+        label: 'Runtime items',
+        value: String(itemCount),
+      },
+      {
+        ariaLabel:
+          `Answers to submit: ${answerCount}. ` +
+          'Filled answers prepared from the current browser state.',
+        description:
+          'Filled answers prepared from the current browser state.',
+        key: 'answers',
+        label: 'Answers to submit',
+        value: String(answerCount),
+      },
+      {
+        ariaLabel:
+          `Unanswered items: ${unansweredItemCount}. ` +
+          'Items left blank if you submit without adding more answers.',
+        description:
+          'Items left blank if you submit without adding more answers.',
+        key: 'unanswered',
+        label: 'Unanswered items',
+        value: String(unansweredItemCount),
+      },
+    ],
+    title: 'Prepared browser payload',
+  };
+}
 assert.deepEqual(
   buildStudentRunnerSubmissionPlan({
     anonymousToken: ' browser-token-1 ',
@@ -20725,6 +20812,12 @@ assert.deepEqual(
       shareSlug: 'share-public',
       unansweredItemCount: 0,
     },
+    payloadSummaryView: buildExpectedStudentRunnerPayloadSummaryView({
+      answerCount: 1,
+      itemCount: 1,
+      shareSlug: 'share-public',
+      unansweredItemCount: 0,
+    }),
     reason: 'complete',
     successMessage: 'Attempt submitted.',
     type: 'submit',
@@ -20857,6 +20950,8 @@ const confirmIncompleteStudentRunnerPageView = buildStudentRunnerPageViewModel({
 });
 assert.deepEqual(
   {
+    payloadSummaryView:
+      confirmIncompleteStudentRunnerPageView.controlView.payloadSummaryView,
     submitButtonLabel:
       confirmIncompleteStudentRunnerPageView.controlView.submitButtonLabel,
     submitButtonAriaLabel:
@@ -20875,6 +20970,12 @@ assert.deepEqual(
       confirmIncompleteStudentRunnerPageView.controlView.unansweredLabel,
   },
   {
+    payloadSummaryView: buildExpectedStudentRunnerPayloadSummaryView({
+      answerCount: 1,
+      itemCount: 2,
+      shareSlug: 'share-public',
+      unansweredItemCount: 1,
+    }),
     submitButtonLabel: 'Submit anyway',
     submitButtonAriaLabel: 'Submit anyway. 1/2 answered.',
     submitControlsLabel: 'Submit attempt controls',
@@ -20994,6 +21095,12 @@ assert.deepEqual(
       shareSlug: 'share-public',
       unansweredItemCount: 0,
     },
+    payloadSummaryView: buildExpectedStudentRunnerPayloadSummaryView({
+      answerCount: 1,
+      itemCount: 1,
+      shareSlug: 'share-public',
+      unansweredItemCount: 0,
+    }),
     reason: 'complete',
     submittedStudentName: 'Ada Lovelace',
     successMessage: 'Attempt submitted.',
@@ -21720,6 +21827,12 @@ assert.deepEqual(
         shareSlug: 'share-public',
         unansweredItemCount: 0,
       },
+      payloadSummaryView: buildExpectedStudentRunnerPayloadSummaryView({
+        answerCount: 1,
+        itemCount: 1,
+        shareSlug: 'share-public',
+        unansweredItemCount: 0,
+      }),
       reason: 'complete',
       submittedStudentName: 'Ada Lovelace',
       successMessage: 'Attempt submitted.',
@@ -21753,6 +21866,12 @@ assert.equal(
         shareSlug: 'share-public',
         unansweredItemCount: 0,
       },
+      payloadSummaryView: buildExpectedStudentRunnerPayloadSummaryView({
+        answerCount: 0,
+        itemCount: 0,
+        shareSlug: 'share-public',
+        unansweredItemCount: 0,
+      }),
       reason: 'complete',
       successMessage: 'Attempt submitted.',
       type: 'submit',
@@ -21782,6 +21901,12 @@ assert.equal(
         shareSlug: 'share-public',
         unansweredItemCount: 0,
       },
+      payloadSummaryView: buildExpectedStudentRunnerPayloadSummaryView({
+        answerCount: 0,
+        itemCount: 0,
+        shareSlug: 'share-public',
+        unansweredItemCount: 0,
+      }),
       reason: 'complete',
       successMessage: 'Attempt submitted.',
       type: 'submit',
@@ -21811,6 +21936,12 @@ assert.equal(
         shareSlug: 'share-public',
         unansweredItemCount: 0,
       },
+      payloadSummaryView: buildExpectedStudentRunnerPayloadSummaryView({
+        answerCount: 0,
+        itemCount: 0,
+        shareSlug: 'share-public',
+        unansweredItemCount: 0,
+      }),
       reason: 'complete',
       successMessage: 'Attempt submitted.',
       type: 'submit',

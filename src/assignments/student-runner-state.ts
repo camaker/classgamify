@@ -68,7 +68,10 @@ import {
 } from '@/assignments/public';
 import { getAnonymousBrowserLabel } from '@/assignments/identity';
 import { orderAssignmentRuntimeItems } from '@/assignments/item-order';
-import { normalizeRuntimeDisplayText } from '@/assignments/runtime-display';
+import {
+  normalizeRuntimeDisplayCount,
+  normalizeRuntimeDisplayText,
+} from '@/assignments/runtime-display';
 import { normalizeAssignmentShareSlug } from '@/assignments/share-slug';
 import {
   buildStudentRunnerHeaderView,
@@ -152,6 +155,7 @@ export type StudentRunnerIdentityView =
 export type StudentRunnerControlView = {
   attemptRegionDescription: string;
   attemptRegionLabel: string;
+  payloadSummaryView: StudentRunnerSubmissionPayloadSummaryView;
   progressDescription: string;
   progressView: StudentAttemptProgressView;
   statusBarLabel: string;
@@ -377,6 +381,7 @@ export type StudentRunnerSubmissionExecutionPlan =
       anonymousToken?: string;
       input: StudentAttemptSubmissionInput;
       payloadSummary: StudentRunnerSubmissionPayloadSummary;
+      payloadSummaryView: StudentRunnerSubmissionPayloadSummaryView;
       reason: StudentAttemptSubmissionSubmitReason;
       submittedStudentName?: string;
       successMessage: string;
@@ -388,6 +393,27 @@ export type StudentRunnerSubmissionPayloadSummary = {
   itemCount: number;
   shareSlug: string;
   unansweredItemCount: number;
+};
+
+export type StudentRunnerSubmissionPayloadSummaryMetricKey =
+  | 'answers'
+  | 'items'
+  | 'share-link'
+  | 'unanswered';
+
+export type StudentRunnerSubmissionPayloadSummaryMetricView = {
+  ariaLabel: string;
+  description: string;
+  key: StudentRunnerSubmissionPayloadSummaryMetricKey;
+  label: string;
+  value: string;
+};
+
+export type StudentRunnerSubmissionPayloadSummaryView = {
+  ariaLabel: string;
+  description: string;
+  metrics: StudentRunnerSubmissionPayloadSummaryMetricView[];
+  title: string;
 };
 
 export type StudentRunnerSubmissionSuccessState = {
@@ -676,6 +702,12 @@ export function buildStudentRunnerPageViewModel({
     controlView: {
       attemptRegionDescription: m.student_runner_attempt_region_description(),
       attemptRegionLabel: m.student_runner_attempt_region_label(),
+      payloadSummaryView: buildStudentRunnerSubmissionPayloadSummaryView(
+        buildStudentRunnerCurrentPayloadSummary({
+          activeShareId,
+          attemptState,
+        })
+      ),
       progressDescription: m.student_runner_progress_description({
         progress: progressView.label,
       }),
@@ -1275,7 +1307,7 @@ export function buildStudentRunnerSubmissionExecutionPlan({
       ? { anonymousToken: submissionPlan.anonymousToken }
       : {}),
     input: submissionPlan.input,
-    payloadSummary: buildStudentRunnerSubmissionPayloadSummary({
+    ...buildStudentRunnerSubmissionPayloadSummaryExecutionViews({
       input: submissionPlan.input,
       pageView,
     }),
@@ -1285,6 +1317,25 @@ export function buildStudentRunnerSubmissionExecutionPlan({
       : {}),
     successMessage: pageView.submissionSuccessMessage,
     type: 'submit',
+  };
+}
+
+function buildStudentRunnerSubmissionPayloadSummaryExecutionViews({
+  input,
+  pageView,
+}: {
+  input: StudentAttemptSubmissionInput;
+  pageView: StudentRunnerPageViewModel;
+}) {
+  const payloadSummary = buildStudentRunnerSubmissionPayloadSummary({
+    input,
+    pageView,
+  });
+
+  return {
+    payloadSummary,
+    payloadSummaryView:
+      buildStudentRunnerSubmissionPayloadSummaryView(payloadSummary),
   };
 }
 
@@ -1302,6 +1353,87 @@ function buildStudentRunnerSubmissionPayloadSummary({
     unansweredItemCount:
       pageView.attemptState.completionSummary.unansweredItemCount,
   };
+}
+
+function buildStudentRunnerCurrentPayloadSummary({
+  activeShareId,
+  attemptState,
+}: {
+  activeShareId: string;
+  attemptState: StudentRunnerAttemptState;
+}): StudentRunnerSubmissionPayloadSummary {
+  return {
+    answerCount: attemptState.completionSummary.answeredItemCount,
+    itemCount: attemptState.completionSummary.itemCount,
+    shareSlug: activeShareId,
+    unansweredItemCount: attemptState.completionSummary.unansweredItemCount,
+  };
+}
+
+function buildStudentRunnerSubmissionPayloadSummaryView(
+  summary: StudentRunnerSubmissionPayloadSummary
+): StudentRunnerSubmissionPayloadSummaryView {
+  return {
+    ariaLabel: m.student_runner_payload_summary_aria_label(),
+    description: m.student_runner_payload_summary_description(),
+    metrics: [
+      buildStudentRunnerSubmissionPayloadSummaryMetricView({
+        key: 'share-link',
+        label: m.student_runner_payload_summary_share_label(),
+        value: normalizeAssignmentShareSlug(summary.shareSlug),
+        description: m.student_runner_payload_summary_share_description(),
+      }),
+      buildStudentRunnerSubmissionPayloadSummaryMetricView({
+        key: 'items',
+        label: m.student_runner_payload_summary_items_label(),
+        value: formatStudentRunnerSubmissionPayloadCount(summary.itemCount),
+        description: m.student_runner_payload_summary_items_description(),
+      }),
+      buildStudentRunnerSubmissionPayloadSummaryMetricView({
+        key: 'answers',
+        label: m.student_runner_payload_summary_answers_label(),
+        value: formatStudentRunnerSubmissionPayloadCount(summary.answerCount),
+        description: m.student_runner_payload_summary_answers_description(),
+      }),
+      buildStudentRunnerSubmissionPayloadSummaryMetricView({
+        key: 'unanswered',
+        label: m.student_runner_payload_summary_unanswered_label(),
+        value: formatStudentRunnerSubmissionPayloadCount(
+          summary.unansweredItemCount
+        ),
+        description: m.student_runner_payload_summary_unanswered_description(),
+      }),
+    ],
+    title: m.student_runner_payload_summary_title(),
+  };
+}
+
+function buildStudentRunnerSubmissionPayloadSummaryMetricView({
+  description,
+  key,
+  label,
+  value,
+}: {
+  description: string;
+  key: StudentRunnerSubmissionPayloadSummaryMetricKey;
+  label: string;
+  value: string;
+}): StudentRunnerSubmissionPayloadSummaryMetricView {
+  return {
+    ariaLabel: m.student_runner_payload_summary_metric_aria({
+      description,
+      label,
+      value,
+    }),
+    description,
+    key,
+    label,
+    value,
+  };
+}
+
+function formatStudentRunnerSubmissionPayloadCount(value: number) {
+  return String(normalizeRuntimeDisplayCount(value));
 }
 
 function getStudentRunnerSubmissionMessageTone(

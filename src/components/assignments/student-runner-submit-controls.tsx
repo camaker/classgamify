@@ -14,9 +14,46 @@ export function StudentRunnerSubmitControls({
   const submitHintIds = controlView.submitHintViews.map((hintView) =>
     buildStudentRunnerSubmitHintId(hintView.id)
   );
+  const payloadSummaryDescriptionId =
+    'student-runner-submit-payload-summary-description';
 
   return (
     <section aria-label={controlView.submitControlsLabel} className="mt-4">
+      <fieldset
+        aria-label={controlView.payloadSummaryView.ariaLabel}
+        aria-describedby={payloadSummaryDescriptionId}
+        className="mb-4 rounded-md border bg-muted/20 p-4"
+      >
+        <legend className="text-sm font-medium">
+          {controlView.payloadSummaryView.title}
+        </legend>
+        <p
+          id={payloadSummaryDescriptionId}
+          className="mt-1 text-xs text-muted-foreground"
+        >
+          {controlView.payloadSummaryView.description}
+        </p>
+        <dl className="mt-3 grid gap-3 sm:grid-cols-2">
+          {controlView.payloadSummaryView.metrics.map((metric) => (
+            <div key={metric.key} className="space-y-1">
+              <dt className="text-xs font-medium text-muted-foreground">
+                {metric.label}
+              </dt>
+              <dd className="space-y-1">
+                <output
+                  aria-label={metric.ariaLabel}
+                  className="block text-sm font-semibold text-foreground"
+                >
+                  {metric.value}
+                </output>
+                <p className="text-xs text-muted-foreground">
+                  {metric.description}
+                </p>
+              </dd>
+            </div>
+          ))}
+        </dl>
+      </fieldset>
       <Button
         type="button"
         className="w-full sm:w-fit"
