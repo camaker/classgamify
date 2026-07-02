@@ -17,7 +17,11 @@ export function AssignmentResultControlStatusBadge({
         variant={view.tone === 'custom' ? 'secondary' : 'outline'}
         className="max-w-full rounded-md"
       >
-        <output aria-label={view.ariaLabel} className="truncate">
+        <output
+          aria-describedby={descriptionId}
+          aria-label={view.ariaLabel}
+          className="truncate"
+        >
           {view.value}
         </output>
       </Badge>

@@ -699,6 +699,7 @@ import {
   buildAssignmentResultMetricItems,
   buildAssignmentResultSectionState,
   buildAssignmentResultSectionViews,
+  buildAssignmentResultControlAriaLabel,
   buildAssignmentResultControlViews,
   buildAssignmentResultControlStatusView,
   buildAssignmentResultCopyScopeView,
@@ -6290,13 +6291,28 @@ assert.match(
 );
 assert.match(
   assignmentResultViewSource,
+  /export type AssignmentResultSelectControlIds = \{[\s\S]*description: string;[\s\S]*select: string;[\s\S]*statusDescription: string;[\s\S]*export type AssignmentResultStudentSearchControlIds = \{[\s\S]*description: string;[\s\S]*input: string;[\s\S]*searchStatusDescription: string;[\s\S]*sortDescription: string;[\s\S]*sortSelect: string;[\s\S]*sortStatusDescription: string;[\s\S]*summary: string;/,
+  'Assignment result control views should expose explicit stable DOM id contracts for control descriptions and statuses.'
+);
+assert.match(
+  assignmentResultViewSource,
   /buildAssignmentResultControlStatusView[\s\S]*assignment_result_search_control_status_label[\s\S]*assignment_result_search_control_status_default_value[\s\S]*assignment_result_search_control_status_custom_value[\s\S]*assignment_result_search_control_status_aria_label/,
   'Assignment result control status views should come from localized assignment-domain copy.'
 );
 assert.match(
   assignmentResultViewSource,
-  /statusView: buildAssignmentResultControlStatusView[\s\S]*controlLabel: assignmentResultSearchCopy\.reviewViewLabel[\s\S]*statusView: buildAssignmentResultControlStatusView[\s\S]*controlLabel: assignmentResultSearchCopy\.sortItemsLabel[\s\S]*searchStatusView: buildAssignmentResultControlStatusView[\s\S]*controlLabel: assignmentResultSearchCopy\.findStudentLabel[\s\S]*sortStatusView: buildAssignmentResultControlStatusView[\s\S]*controlLabel: assignmentResultSearchCopy\.sortStudentsLabel/,
+  /const attemptReviewFilterStatusView = buildAssignmentResultControlStatusView[\s\S]*controlLabel: assignmentResultSearchCopy\.reviewViewLabel[\s\S]*const itemPerformanceSortStatusView = buildAssignmentResultControlStatusView[\s\S]*controlLabel: assignmentResultSearchCopy\.sortItemsLabel[\s\S]*const studentSearchStatusView = buildAssignmentResultControlStatusView[\s\S]*controlLabel: assignmentResultSearchCopy\.findStudentLabel[\s\S]*const studentSortStatusView = buildAssignmentResultControlStatusView[\s\S]*controlLabel: assignmentResultSearchCopy\.sortStudentsLabel/,
   'Assignment result control views should derive default/custom status for review, item sort, student search, and student sort inside the domain view model.'
+);
+assert.match(
+  assignmentResultViewSource,
+  /ariaLabel: buildAssignmentResultControlAriaLabel[\s\S]*searchAriaLabel: buildAssignmentResultControlAriaLabel[\s\S]*sortAriaLabel: buildAssignmentResultControlAriaLabel/,
+  'Assignment result control views should prepare accessible labels for search, sort, and review-filter controls in the assignment domain.'
+);
+assert.match(
+  assignmentResultViewSource,
+  /export function buildAssignmentResultControlAriaLabel[\s\S]*m\.assignment_result_review_scope_item_aria_label/,
+  'Assignment result control accessible labels should reuse localized assignment-domain scope copy.'
 );
 assert.match(
   assignmentResultViewSource,
@@ -7014,13 +7030,23 @@ assert.match(
 );
 assert.match(
   assignmentResultsStudentSearchSource,
-  /const searchSummaryId = 'assignment-result-search-summary'[\s\S]*const searchStatusDescriptionId =[\s\S]*<Input[\s\S]*id="assignment-result-search"[\s\S]*aria-describedby=\{`\$\{searchSummaryId\} \$\{searchStatusDescriptionId\}`\}[\s\S]*id=\{searchSummaryId\}[\s\S]*view\.summary/,
-  'Assignment result student search input should be associated with the prepared current-result summary and status description.'
+  /const searchDescriptionIds = \[[\s\S]*view\.searchIds\.description,[\s\S]*view\.searchIds\.summary,[\s\S]*view\.searchIds\.searchStatusDescription,[\s\S]*<Input[\s\S]*id=\{view\.searchIds\.input\}[\s\S]*aria-describedby=\{searchDescriptionIds\}[\s\S]*aria-label=\{view\.searchAriaLabel\}[\s\S]*id=\{view\.searchIds\.description\}[\s\S]*view\.searchDescription[\s\S]*id=\{view\.searchIds\.summary\}[\s\S]*view\.summary/,
+  'Assignment result student search input should be associated with prepared domain ids, current-result summary, search description, status description, and accessible label.'
 );
 assert.match(
   assignmentResultsStudentSearchSource,
-  /const studentSortDescriptionId = 'student-summary-sort-description'[\s\S]*const studentSortStatusDescriptionId =[\s\S]*<NativeSelect[\s\S]*id="student-summary-sort"[\s\S]*aria-describedby=\{`\$\{studentSortDescriptionId\} \$\{studentSortStatusDescriptionId\}`\}[\s\S]*id=\{studentSortDescriptionId\}[\s\S]*view\.selectedSortOption\.description/,
-  'Assignment result student summary sort select should be associated with its prepared sort explanation and status description.'
+  /const sortDescriptionIds = \[[\s\S]*view\.sortIds\.description,[\s\S]*view\.sortIds\.statusDescription,[\s\S]*<NativeSelect[\s\S]*id=\{view\.sortIds\.select\}[\s\S]*aria-describedby=\{sortDescriptionIds\}[\s\S]*aria-label=\{view\.sortAriaLabel\}[\s\S]*id=\{view\.sortIds\.description\}[\s\S]*view\.selectedSortOption\.description/,
+  'Assignment result student summary sort select should be associated with prepared domain ids, sort explanation, status description, and accessible label.'
+);
+assert.match(
+  assignmentResultsStudentSearchSource,
+  /aria-describedby=\{searchDescriptionIds\}[\s\S]*aria-label=\{view\.clearLabel\}[\s\S]*IconX aria-hidden="true"/,
+  'Assignment result student search clear action should keep the current search scope and status description associated with the clear button.'
+);
+assert.match(
+  assignmentResultsStudentSearchSource,
+  /IconSearch[\s\S]*aria-hidden="true"/,
+  'Assignment result student search decorative search icon should be hidden from assistive technology.'
 );
 assert.doesNotMatch(
   `${assignmentResultsStudentSearchSource}\n${assignmentResultsAttemptReviewFilterSource}\n${assignmentResultsItemPerformanceSortSource}`,
@@ -7059,8 +7085,8 @@ assert.match(
 );
 assert.match(
   assignmentResultsAttemptReviewFilterSource,
-  /const descriptionId = 'attempt-review-filter-description'[\s\S]*const statusDescriptionId =[\s\S]*<NativeSelect[\s\S]*id="attempt-review-filter"[\s\S]*aria-describedby=\{`\$\{descriptionId\} \$\{statusDescriptionId\}`\}[\s\S]*id=\{descriptionId\}[\s\S]*view\.selectedFilterOption\.description/,
-  'Assignment result attempt review filter select should be associated with its prepared filter explanation and status description.'
+  /const descriptionIds = \[[\s\S]*view\.ids\.description,[\s\S]*view\.ids\.statusDescription,[\s\S]*<NativeSelect[\s\S]*id=\{view\.ids\.select\}[\s\S]*aria-describedby=\{descriptionIds\}[\s\S]*aria-label=\{view\.ariaLabel\}[\s\S]*id=\{view\.ids\.description\}[\s\S]*view\.selectedFilterOption\.description/,
+  'Assignment result attempt review filter select should be associated with prepared domain ids, filter explanation, status description, and accessible label.'
 );
 assert.match(
   assignmentResultsItemPerformanceSortSource,
@@ -7074,12 +7100,12 @@ assert.match(
 );
 assert.match(
   assignmentResultsItemPerformanceSortSource,
-  /const descriptionId = 'item-performance-sort-description'[\s\S]*const statusDescriptionId =[\s\S]*<NativeSelect[\s\S]*id="item-performance-sort"[\s\S]*aria-describedby=\{`\$\{descriptionId\} \$\{statusDescriptionId\}`\}[\s\S]*id=\{descriptionId\}[\s\S]*view\.selectedSortOption\.description/,
-  'Assignment result item performance sort select should be associated with its prepared sort explanation and status description.'
+  /const descriptionIds = \[[\s\S]*view\.ids\.description,[\s\S]*view\.ids\.statusDescription,[\s\S]*<NativeSelect[\s\S]*id=\{view\.ids\.select\}[\s\S]*aria-describedby=\{descriptionIds\}[\s\S]*aria-label=\{view\.ariaLabel\}[\s\S]*id=\{view\.ids\.description\}[\s\S]*view\.selectedSortOption\.description/,
+  'Assignment result item performance sort select should be associated with prepared domain ids, sort explanation, status description, and accessible label.'
 );
 assert.match(
   assignmentResultControlStatusBadgeSource,
-  /AssignmentResultControlStatusView[\s\S]*data-tone=\{view\.tone\}[\s\S]*variant=\{view\.tone === 'custom' \? 'secondary' : 'outline'\}[\s\S]*aria-label=\{view\.ariaLabel\}[\s\S]*view\.description/,
+  /AssignmentResultControlStatusView[\s\S]*data-tone=\{view\.tone\}[\s\S]*variant=\{view\.tone === 'custom' \? 'secondary' : 'outline'\}[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*aria-label=\{view\.ariaLabel\}[\s\S]*view\.description/,
   'Assignment result control status badge should render prepared status tone, accessible label, and hidden description from the domain view.'
 );
 assert.match(
@@ -47972,7 +47998,14 @@ assert.deepEqual(
   }),
   {
     attemptReviewFilter: {
+      ariaLabel:
+        'Review view: Needs review only. Status: Adjusted. Focus the answer review on submissions with at least one missed or unanswered item.',
       filter: 'needs-review',
+      ids: {
+        description: 'attempt-review-filter-description',
+        select: 'attempt-review-filter',
+        statusDescription: 'attempt-review-filter-status-description',
+      },
       label: 'Review view',
       options: attemptReviewFilterOptions,
       selectedFilterOption: attemptReviewFilterOptions[1],
@@ -47986,6 +48019,13 @@ assert.deepEqual(
       },
     },
     itemPerformanceSort: {
+      ariaLabel:
+        'Sort items: Lowest accuracy. Status: Adjusted. Surface the prompts with the lowest correct rate first.',
+      ids: {
+        description: 'item-performance-sort-description',
+        select: 'item-performance-sort',
+        statusDescription: 'item-performance-sort-status-description',
+      },
       label: 'Sort items',
       options: itemPerformanceSortOptions,
       selectedSortOption: itemPerformanceSortOptions[1],
@@ -48004,6 +48044,20 @@ assert.deepEqual(
       hasSearchValue: true,
       label: 'Find student',
       placeholder: 'Search by student name',
+      searchAriaLabel:
+        'Find student: alice. Status: Adjusted. Which students and attempts are included in the visible result tables.',
+      searchDescription:
+        'Which students and attempts are included in the visible result tables.',
+      searchIds: {
+        description: 'assignment-result-search-description',
+        input: 'assignment-result-search',
+        searchStatusDescription:
+          'assignment-result-search-status-description',
+        sortDescription: 'student-summary-sort-description',
+        sortSelect: 'student-summary-sort',
+        sortStatusDescription: 'student-summary-sort-status-description',
+        summary: 'assignment-result-search-summary',
+      },
       searchStatusView: {
         ariaLabel: 'Scope status: Adjusted. Find student is adjusted to alice.',
         description: 'Find student is adjusted to alice.',
@@ -48013,6 +48067,13 @@ assert.deepEqual(
       },
       selectedSortOption: studentSummarySortOptions[1],
       sort: 'best',
+      sortAriaLabel:
+        'Sort students: Best score. Status: Adjusted. Scan strongest performances before opening individual attempts.',
+      sortIds: {
+        description: 'student-summary-sort-description',
+        select: 'student-summary-sort',
+        statusDescription: 'student-summary-sort-status-description',
+      },
       sortLabel: 'Sort students',
       sortStatusView: {
         ariaLabel:
@@ -48042,6 +48103,20 @@ assert.deepEqual(
     tone: 'default',
     value: 'Default',
   }
+);
+assert.equal(
+  buildAssignmentResultControlAriaLabel({
+    controlLabel: 'Find student',
+    description:
+      'Which students and attempts are included in the visible result tables.',
+    selectedLabel: 'All students',
+    statusView: buildAssignmentResultControlStatusView({
+      controlLabel: 'Find student',
+      isDefault: true,
+      selectedLabel: 'All students',
+    }),
+  }),
+  'Find student: All students. Status: Default. Which students and attempts are included in the visible result tables.'
 );
 assert.deepEqual(
   buildAssignmentResultCopyScopeView({
