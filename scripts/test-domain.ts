@@ -5118,8 +5118,8 @@ assert.match(
 );
 assert.match(
   activityPublishSettingsFormSource,
-  /AssignmentPublishPreviewContextTone[\s\S]*AssignmentPublishPreviewContextView/,
-  'Assignment publish settings form should import the explicit assignment-domain preview context contract.'
+  /AssignmentPublishPreviewContextTone[\s\S]*AssignmentPublishPreviewContextView[\s\S]*AssignmentPublishPreviewReviewItemView/,
+  'Assignment publish settings form should import the explicit assignment-domain preview context and review item contracts.'
 );
 assert.match(
   activityPublishSettingsFormSource,
@@ -5133,8 +5133,18 @@ assert.match(
 );
 assert.match(
   activityPublishSettingsFormSource,
-  /function ActivityPublishPreviewContext[\s\S]*context\.title[\s\S]*context\.description[\s\S]*context\.status\.label[\s\S]*context\.status\.message[\s\S]*context\.statItems\.map[\s\S]*item\.label[\s\S]*item\.value/,
-  'Assignment publish preview context component should render prepared title, status, message, and stat items.'
+  /function ActivityPublishPreviewContext[\s\S]*context\.title[\s\S]*context\.description[\s\S]*context\.status\.label[\s\S]*context\.status\.message[\s\S]*context\.statItems\.map[\s\S]*item\.label[\s\S]*item\.value[\s\S]*context\.reviewLabel[\s\S]*context\.reviewItems\.map[\s\S]*key=\{item\.id\}/,
+  'Assignment publish preview context component should render prepared title, status, message, stat items, and review items.'
+);
+assert.match(
+  activityPublishSettingsFormSource,
+  /function AssignmentPublishPreviewReviewItem[\s\S]*AssignmentPublishPreviewReviewItemView[\s\S]*item\.ariaLabel[\s\S]*item\.label[\s\S]*item\.description/,
+  'Assignment publish preview review item should render prepared aria, label, and description copy.'
+);
+assert.doesNotMatch(
+  activityPublishSettingsFormSource,
+  /Before creating the link|Snapshot is frozen|Student link follows these rules|Results use the same policy|创建链接前|快照已冻结|学生链接遵守这些规则|结果使用同一规则/,
+  'Assignment publish settings form should not hard-code visible publish review checklist copy.'
 );
 assert.match(
   activityPublishSettingsFormSource,
@@ -15730,8 +15740,8 @@ assert.match(
 );
 assert.match(
   assignmentPublishInputSource,
-  /export type AssignmentPublishPreviewContextView = \{[\s\S]*description: string;[\s\S]*statItems: AssignmentPublishPreviewContextStatView\[\];[\s\S]*status: AssignmentPublishPreviewContextStatusView;[\s\S]*summary: AssignmentPublishPreviewContextSummary;[\s\S]*title: string;/,
-  'Assignment publish preview should expose a structured frozen-link context contract.'
+  /export type AssignmentPublishPreviewReviewItemId =[\s\S]*'results-policy'[\s\S]*'snapshot-freeze'[\s\S]*'student-link-rules';[\s\S]*export type AssignmentPublishPreviewReviewItemView = \{[\s\S]*ariaLabel: string;[\s\S]*description: string;[\s\S]*id: AssignmentPublishPreviewReviewItemId;[\s\S]*label: string;[\s\S]*export type AssignmentPublishPreviewContextView = \{[\s\S]*description: string;[\s\S]*reviewItems: AssignmentPublishPreviewReviewItemView\[\];[\s\S]*reviewLabel: string;[\s\S]*statItems: AssignmentPublishPreviewContextStatView\[\];[\s\S]*status: AssignmentPublishPreviewContextStatusView;[\s\S]*summary: AssignmentPublishPreviewContextSummary;[\s\S]*title: string;/,
+  'Assignment publish preview should expose structured frozen-link context and review checklist contracts.'
 );
 assert.match(
   assignmentPublishInputSource,
@@ -15745,8 +15755,18 @@ assert.match(
 );
 assert.match(
   assignmentPublishInputSource,
-  /assignment_publish_preview_context_title[\s\S]*assignment_publish_preview_context_description[\s\S]*assignment_publish_preview_stat_rules_value[\s\S]*assignment_publish_preview_status_ready_message[\s\S]*assignment_publish_preview_status_blocked_message/,
+  /assignment_publish_preview_context_title[\s\S]*assignment_publish_preview_context_description[\s\S]*assignment_publish_preview_review_label[\s\S]*assignment_publish_preview_stat_rules_value[\s\S]*assignment_publish_preview_status_ready_message[\s\S]*assignment_publish_preview_status_blocked_message/,
   'Assignment publish preview context should use localized assignment-domain copy for visible text.'
+);
+assert.match(
+  assignmentPublishInputSource,
+  /buildAssignmentPublishPreviewReviewItems[\s\S]*assignment_publish_preview_review_snapshot_description[\s\S]*assignment_publish_preview_review_snapshot_label[\s\S]*assignment_publish_preview_review_student_description[\s\S]*assignment_publish_preview_review_student_label[\s\S]*assignment_publish_preview_review_results_description[\s\S]*assignment_publish_preview_review_results_label[\s\S]*assignment_publish_preview_review_item_aria/,
+  'Assignment publish preview review checklist should build localized snapshot, student-link, and results policy items.'
+);
+assert.doesNotMatch(
+  assignmentPublishInputSource,
+  /Before creating the link|Snapshot is frozen|Student link follows these rules|Results use the same policy|创建链接前|快照已冻结|学生链接遵守这些规则|结果使用同一规则/,
+  'Assignment publish domain should not hard-code visible publish review checklist copy.'
 );
 assert.match(
   assignmentPublishInputSource,
@@ -16350,6 +16370,33 @@ assert.deepEqual(
 const assignmentPublishPreviewContextDescription =
   'These settings are the teacher-facing preview of the rules that will be saved with the assignment snapshot and student share link.';
 const assignmentPublishPreviewContextTitle = 'Frozen link rules';
+const assignmentPublishPreviewReviewLabel = 'Before creating the link';
+const assignmentPublishPreviewReviewItems = [
+  {
+    ariaLabel:
+      'Snapshot is frozen. Publishing freezes the activity title, template, and content while saving these delivery settings on the share link.',
+    description:
+      'Publishing freezes the activity title, template, and content while saving these delivery settings on the share link.',
+    id: 'snapshot-freeze',
+    label: 'Snapshot is frozen',
+  },
+  {
+    ariaLabel:
+      'Student link follows these rules. The public runner uses the shown attempts, timer, close time, identity, answer review, and item order.',
+    description:
+      'The public runner uses the shown attempts, timer, close time, identity, answer review, and item order.',
+    id: 'student-link-rules',
+    label: 'Student link follows these rules',
+  },
+  {
+    ariaLabel:
+      'Results use the same policy. Attempts, averages, exports, and review pages read from the same frozen assignment settings.',
+    description:
+      'Attempts, averages, exports, and review pages read from the same frozen assignment settings.',
+    id: 'results-policy',
+    label: 'Results use the same policy',
+  },
+];
 const assignmentPublishReadyCloseAfter = {
   expiresAt: new Date('2026-01-10T09:30'),
   status: 'ready' as const,
@@ -16369,6 +16416,8 @@ const assignmentPublishReadySettingsSummaryView =
   });
 const assignmentPublishReadyPreviewContext = {
   description: assignmentPublishPreviewContextDescription,
+  reviewItems: assignmentPublishPreviewReviewItems,
+  reviewLabel: assignmentPublishPreviewReviewLabel,
   statItems: [
     {
       id: 'deliveryRules',
@@ -16447,6 +16496,8 @@ function buildAssignmentPublishBlockedPreviewContext({
 }) {
   return {
     description: assignmentPublishPreviewContextDescription,
+    reviewItems: assignmentPublishPreviewReviewItems,
+    reviewLabel: assignmentPublishPreviewReviewLabel,
     statItems: [
       {
         id: 'deliveryRules',
@@ -16524,6 +16575,8 @@ const assignmentPublishPastPreview = {
 };
 const assignmentPublishOpenReadyPreviewContext = {
   description: assignmentPublishPreviewContextDescription,
+  reviewItems: assignmentPublishPreviewReviewItems,
+  reviewLabel: assignmentPublishPreviewReviewLabel,
   statItems: [
     {
       id: 'deliveryRules',

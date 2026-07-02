@@ -5,6 +5,7 @@ import {
   type AssignmentPublishDraftValues,
   type AssignmentPublishPreviewContextTone,
   type AssignmentPublishPreviewContextView,
+  type AssignmentPublishPreviewReviewItemView,
   type AssignmentPublishToggleView,
 } from '@/assignments/publish-input';
 import { buildAssignmentPublishCloseAfterMinLocal } from '@/assignments/publish-schedule';
@@ -287,7 +288,29 @@ function ActivityPublishPreviewContext({
           </div>
         ))}
       </dl>
+      <div className="border-t pt-3">
+        <p className="font-medium text-xs">{context.reviewLabel}</p>
+        <ul className="mt-2 grid gap-2">
+          {context.reviewItems.map((item) => (
+            <AssignmentPublishPreviewReviewItem item={item} key={item.id} />
+          ))}
+        </ul>
+      </div>
     </section>
+  );
+}
+
+function AssignmentPublishPreviewReviewItem({
+  item,
+}: {
+  item: AssignmentPublishPreviewReviewItemView;
+}) {
+  return (
+    <li className="rounded-md border bg-background px-3 py-2 text-xs">
+      <span className="sr-only">{item.ariaLabel}</span>
+      <p className="font-medium">{item.label}</p>
+      <p className="mt-1 leading-5 text-muted-foreground">{item.description}</p>
+    </li>
   );
 }
 

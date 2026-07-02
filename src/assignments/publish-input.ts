@@ -126,6 +126,11 @@ export type AssignmentPublishPreviewContextStatId =
   | 'studentInstructions'
   | 'timer';
 
+export type AssignmentPublishPreviewReviewItemId =
+  | 'results-policy'
+  | 'snapshot-freeze'
+  | 'student-link-rules';
+
 export type AssignmentPublishPreviewContextTone = 'blocked' | 'ready';
 
 export type AssignmentPublishDialogAccessStatus = 'blocked' | 'ready';
@@ -153,6 +158,13 @@ export type AssignmentPublishPreviewContextStatView = {
   value: string;
 };
 
+export type AssignmentPublishPreviewReviewItemView = {
+  ariaLabel: string;
+  description: string;
+  id: AssignmentPublishPreviewReviewItemId;
+  label: string;
+};
+
 export type AssignmentPublishPreviewContextSummary = {
   closeAfterStatus: AssignmentPublishCloseAfterStatus;
   deliveryRuleCount: number;
@@ -164,6 +176,8 @@ export type AssignmentPublishPreviewContextSummary = {
 
 export type AssignmentPublishPreviewContextView = {
   description: string;
+  reviewItems: AssignmentPublishPreviewReviewItemView[];
+  reviewLabel: string;
   statItems: AssignmentPublishPreviewContextStatView[];
   status: AssignmentPublishPreviewContextStatusView;
   summary: AssignmentPublishPreviewContextSummary;
@@ -489,6 +503,8 @@ export function buildAssignmentPublishPreviewContextView({
 
   return {
     description: m.assignment_publish_preview_context_description(),
+    reviewItems: buildAssignmentPublishPreviewReviewItems(),
+    reviewLabel: m.assignment_publish_preview_review_label(),
     statItems: [
       {
         id: 'deliveryRules',
@@ -551,6 +567,34 @@ function formatAssignmentPublishPreviewCloseAfterStat(
     case 'none':
       return m.assignment_publish_preview_stat_close_after_open();
   }
+}
+
+function buildAssignmentPublishPreviewReviewItems(): AssignmentPublishPreviewReviewItemView[] {
+  const items = [
+    {
+      description: m.assignment_publish_preview_review_snapshot_description(),
+      id: 'snapshot-freeze',
+      label: m.assignment_publish_preview_review_snapshot_label(),
+    },
+    {
+      description: m.assignment_publish_preview_review_student_description(),
+      id: 'student-link-rules',
+      label: m.assignment_publish_preview_review_student_label(),
+    },
+    {
+      description: m.assignment_publish_preview_review_results_description(),
+      id: 'results-policy',
+      label: m.assignment_publish_preview_review_results_label(),
+    },
+  ] satisfies Array<Omit<AssignmentPublishPreviewReviewItemView, 'ariaLabel'>>;
+
+  return items.map((item) => ({
+    ...item,
+    ariaLabel: m.assignment_publish_preview_review_item_aria({
+      description: item.description,
+      label: item.label,
+    }),
+  }));
 }
 
 export function validateAssignmentPublishDraft({
