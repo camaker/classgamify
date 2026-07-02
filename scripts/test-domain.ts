@@ -928,6 +928,7 @@ import {
   buildStudentAttemptProgressView,
   buildStudentAnswerChange,
   buildStudentAnswerChanges,
+  buildStudentAttemptFeedbackScopeView,
   buildStudentAttemptReviewSummaryView,
   buildStudentAttemptResultNextStepsView,
   buildStudentAttemptResultDisplay,
@@ -9528,6 +9529,27 @@ for (const key of [
   'student_runner_feedback_description_unanswered',
   'student_runner_feedback_detail_aria',
   'student_runner_feedback_region_aria',
+  'student_runner_feedback_scope_accepted_alternatives_description',
+  'student_runner_feedback_scope_accepted_alternatives_label',
+  'student_runner_feedback_scope_aria_label',
+  'student_runner_feedback_scope_explanations_description',
+  'student_runner_feedback_scope_explanations_label',
+  'student_runner_feedback_scope_hidden_description',
+  'student_runner_feedback_scope_items_hidden_description',
+  'student_runner_feedback_scope_items_label',
+  'student_runner_feedback_scope_items_visible_description',
+  'student_runner_feedback_scope_metric_aria',
+  'student_runner_feedback_scope_needs_review_description',
+  'student_runner_feedback_scope_status_hidden',
+  'student_runner_feedback_scope_status_visible',
+  'student_runner_feedback_scope_title',
+  'student_runner_feedback_scope_unanswered_description',
+  'student_runner_feedback_scope_visibility_hidden_description',
+  'student_runner_feedback_scope_visibility_hidden_value',
+  'student_runner_feedback_scope_visibility_label',
+  'student_runner_feedback_scope_visibility_visible_description',
+  'student_runner_feedback_scope_visibility_visible_value',
+  'student_runner_feedback_scope_visible_description',
   'student_runner_feedback_status_aria',
   'student_runner_payload_summary_answers_description',
   'student_runner_payload_summary_answers_label',
@@ -9810,18 +9832,38 @@ assert.match(
 );
 assert.match(
   studentRunnerSubmissionSource,
+  /export type StudentAttemptFeedbackScopeStatus = 'hidden' \| 'visible';[\s\S]*export type StudentAttemptFeedbackScopeMetricKey =[\s\S]*'accepted-alternatives'[\s\S]*'explanations'[\s\S]*'item-feedback'[\s\S]*'needs-review'[\s\S]*'unanswered'[\s\S]*'visibility'[\s\S]*export type StudentAttemptFeedbackScopeView = \{[\s\S]*hiddenBySettings: boolean;[\s\S]*metrics: StudentAttemptFeedbackScopeMetricView\[\];[\s\S]*status: StudentAttemptFeedbackScopeStatus;[\s\S]*statusLabel: string;/,
+  'Student submission domain should expose an explicit feedback coverage view contract.'
+);
+assert.match(
+  studentRunnerSubmissionSource,
   /student_runner_review_summary_correct_label[\s\S]*student_runner_review_summary_hidden_description[\s\S]*student_runner_review_summary_item_count_label[\s\S]*student_runner_review_summary_needs_review_label[\s\S]*student_runner_review_summary_review_hidden_value[\s\S]*student_runner_review_summary_review_visibility_label[\s\S]*student_runner_review_summary_submitted_label[\s\S]*student_runner_review_summary_title[\s\S]*student_runner_review_summary_unanswered_label[\s\S]*student_runner_review_summary_visible_description/,
   'Student review summary copy should come from localized student-runner messages.'
+);
+assert.match(
+  studentRunnerSubmissionSource,
+  /student_runner_feedback_scope_aria_label[\s\S]*student_runner_feedback_scope_hidden_description[\s\S]*student_runner_feedback_scope_visible_description[\s\S]*student_runner_feedback_scope_metric_aria[\s\S]*student_runner_feedback_scope_status_hidden[\s\S]*student_runner_feedback_scope_status_visible/,
+  'Student feedback coverage copy should come from localized student-runner messages.'
 );
 assert.match(
   studentRunnerSubmissionSource,
   /export function buildStudentAttemptReviewSummaryView[\s\S]*summary: PublicAttemptReviewSummary[\s\S]*hiddenBySettings[\s\S]*reviewSummaryHiddenDescription[\s\S]*reviewSummaryVisibleDescription[\s\S]*reviewSummarySubmittedLabel[\s\S]*reviewSummaryCorrectLabel[\s\S]*reviewSummaryNeedsReviewLabel[\s\S]*reviewSummaryUnansweredLabel/,
   'Student submission domain should prepare visible and hidden post-submit review summary views from the public review summary.'
 );
+assert.match(
+  studentRunnerSubmissionSource,
+  /export function buildStudentAttemptFeedbackScopeView\(\{[\s\S]*reviewItems,[\s\S]*summary,[\s\S]*hiddenBySettings[\s\S]*const visibleReviewItems = hiddenBySettings \? \[\] : reviewItems[\s\S]*countStudentAttemptReviewItemsWithAcceptedAlternatives\([\s\S]*visibleReviewItems[\s\S]*countStudentAttemptReviewItemsWithExplanations\(visibleReviewItems\)/,
+  'Student submission domain should prepare feedback coverage from public review items while hiding item-level coverage when answers are hidden.'
+);
+assert.match(
+  studentRunnerSubmissionSource,
+  /function hasStudentAttemptFeedbackAcceptedAlternatives[\s\S]*formatOptionalAcceptedAnswerAlternatives\(reviewItem\.acceptedAnswers,[\s\S]*includePrimary: false,[\s\S]*separator: m\.student_runner_choice_separator\(\)/,
+  'Student feedback coverage should reuse the shared accepted-answer formatter when counting visible alternatives.'
+);
 assert.doesNotMatch(
   studentRunnerSubmissionSource,
-  /Submission review|Needs review|Teacher review|Correct answers are not shown|Alternatives and explanations appear|提交回顾|需复核|老师复核|可接受答案/,
-  'Student submission domain should not hard-code visible review summary copy.'
+  /Submission review|Feedback coverage|Needs review|Teacher review|Correct answers are not shown|Alternatives and explanations appear|提交回顾|反馈覆盖范围|需复核|老师复核|可接受答案/,
+  'Student submission domain should not hard-code visible review or feedback coverage copy.'
 );
 assert.match(
   studentRunnerSubmissionSource,
@@ -10285,6 +10327,11 @@ assert.match(
   /buildStudentRunnerResultPanelView\(\{[\s\S]*attemptResultDisplay,[\s\S]*reviewSummary: result\?\.reviewSummary,[\s\S]*showStartAnotherAttempt[\s\S]*reviewSummaryView: buildStudentAttemptReviewSummaryView\(\{[\s\S]*summary: reviewSummary/,
   'Student runner result panel should prepare post-submit review summary views from the submitted result summary.'
 );
+assert.match(
+  studentRunnerStateSource,
+  /buildStudentRunnerResultPanelView\(\{[\s\S]*reviewItems: result\?\.reviewItems,[\s\S]*reviewSummary: result\?\.reviewSummary[\s\S]*feedbackScopeView: buildStudentAttemptFeedbackScopeView\(\{[\s\S]*reviewItems: reviewItems \?\? \[\],[\s\S]*summary: reviewSummary/,
+  'Student runner result panel should prepare feedback coverage from submitted public review items and summary state.'
+);
 assert.doesNotMatch(
   getSourceSlice(
     studentRunnerStateSource,
@@ -10629,13 +10676,18 @@ assert.match(
 );
 assert.match(
   studentRunnerAttemptShellSource,
-  /function StudentRunnerReviewSummary[\s\S]*aria-label=\{view\.ariaLabel\}[\s\S]*function StudentRunnerResultNextSteps[\s\S]*aria-label=\{view\.ariaLabel\}/,
-  'Student runner review summary and next-step panels should use domain-prepared accessible labels.'
+  /StudentRunnerFeedbackScope[\s\S]*view=\{view\.feedbackScopeView\}[\s\S]*function StudentRunnerFeedbackScope[\s\S]*aria-label=\{view\.ariaLabel\}[\s\S]*data-status=\{view\.status\}[\s\S]*view\.statusLabel[\s\S]*view\.metrics\.map[\s\S]*metric\.ariaLabel[\s\S]*metric\.value[\s\S]*metric\.label[\s\S]*metric\.description/,
+  'Student runner result panel should render prepared feedback coverage metrics from the result panel view.'
+);
+assert.match(
+  studentRunnerAttemptShellSource,
+  /function StudentRunnerFeedbackScope[\s\S]*aria-label=\{view\.ariaLabel\}[\s\S]*function StudentRunnerReviewSummary[\s\S]*aria-label=\{view\.ariaLabel\}[\s\S]*function StudentRunnerResultNextSteps[\s\S]*aria-label=\{view\.ariaLabel\}/,
+  'Student runner review summary, feedback coverage, and next-step panels should use domain-prepared accessible labels.'
 );
 assert.doesNotMatch(
   studentRunnerAttemptShellSource,
-  /Submission review|Needs review|Teacher review|Correct answers are not shown|Alternatives and explanations appear|提交回顾|需复核|老师复核|可接受答案/,
-  'Student runner attempt shell should not hard-code visible review summary copy.'
+  /Submission review|Feedback coverage|Needs review|Teacher review|Correct answers are not shown|Alternatives and explanations appear|提交回顾|反馈覆盖范围|需复核|老师复核|可接受答案/,
+  'Student runner attempt shell should not hard-code visible review summary or feedback coverage copy.'
 );
 assert.match(
   studentRunnerHeaderCardSource,
@@ -14547,6 +14599,187 @@ assert.deepEqual(
       },
     ],
     title: 'Submission review',
+  }
+);
+assert.deepEqual(
+  buildStudentAttemptFeedbackScopeView({
+    reviewItems: [
+      {
+        acceptedAnswers: ['Apple', 'Red apple', 'Apple fruit'],
+        correct: true,
+        correctAnswer: 'Apple',
+        explanation: 'Apples are fruit.',
+        itemId: 'fruit-apple',
+        submitted: true,
+        submittedAnswer: 'red apple',
+      },
+      {
+        acceptedAnswers: ['Milk'],
+        correct: false,
+        correctAnswer: 'Milk',
+        itemId: 'drink-milk',
+        submitted: true,
+        submittedAnswer: 'Water',
+      },
+      {
+        acceptedAnswers: ['Rice'],
+        correct: false,
+        correctAnswer: 'Rice',
+        explanation: 'Rice is a grain.',
+        itemId: 'food-rice',
+        submitted: false,
+        submittedAnswer: '',
+      },
+    ],
+    summary: {
+      correctItemCount: 1,
+      hiddenBySettings: false,
+      needsReviewItemCount: 2,
+      reviewItemCount: 3,
+      showCorrectAnswers: true,
+      submittedItemCount: 2,
+      totalItemCount: 3,
+      unansweredItemCount: 1,
+    },
+  }),
+  {
+    ariaLabel: 'Feedback coverage',
+    description:
+      'Your teacher allowed post-submit review. Item feedback below uses the same answer, alternatives, and explanation format across activity types.',
+    hiddenBySettings: false,
+    metrics: [
+      {
+        ariaLabel:
+          'Answer visibility: Shown. Correct answers, accepted alternatives, and explanations can appear below when available.',
+        description:
+          'Correct answers, accepted alternatives, and explanations can appear below when available.',
+        key: 'visibility',
+        label: 'Answer visibility',
+        value: 'Shown',
+      },
+      {
+        ariaLabel: 'Item feedback: 3. Item feedback cards available below: 3.',
+        description: 'Item feedback cards available below: 3.',
+        key: 'item-feedback',
+        label: 'Item feedback',
+        value: '3',
+      },
+      {
+        ariaLabel:
+          'Alternatives: 1. Items with accepted alternatives beyond the primary answer.',
+        description: 'Items with accepted alternatives beyond the primary answer.',
+        key: 'accepted-alternatives',
+        label: 'Alternatives',
+        value: '1',
+      },
+      {
+        ariaLabel: 'Explanations: 2. Items with teacher explanations.',
+        description: 'Items with teacher explanations.',
+        key: 'explanations',
+        label: 'Explanations',
+        value: '2',
+      },
+      {
+        ariaLabel: 'Needs review: 2. Items that may need another look.',
+        description: 'Items that may need another look.',
+        key: 'needs-review',
+        label: 'Needs review',
+        value: '2',
+      },
+      {
+        ariaLabel: 'Unanswered: 1. Items left unanswered.',
+        description: 'Items left unanswered.',
+        key: 'unanswered',
+        label: 'Unanswered',
+        value: '1',
+      },
+    ],
+    status: 'visible',
+    statusLabel: 'Visible',
+    title: 'Feedback coverage',
+  }
+);
+assert.deepEqual(
+  buildStudentAttemptFeedbackScopeView({
+    reviewItems: [
+      {
+        acceptedAnswers: ['Hidden', 'Alternative'],
+        correct: true,
+        correctAnswer: 'Hidden',
+        explanation: 'This should not count while hidden.',
+        itemId: 'hidden-item',
+        submitted: true,
+        submittedAnswer: 'Hidden',
+      },
+    ],
+    summary: {
+      correctItemCount: 0,
+      hiddenBySettings: true,
+      needsReviewItemCount: 0,
+      reviewItemCount: 0,
+      showCorrectAnswers: false,
+      submittedItemCount: 1,
+      totalItemCount: 2,
+      unansweredItemCount: 1,
+    },
+  }),
+  {
+    ariaLabel: 'Feedback coverage',
+    description:
+      'Your teacher will review your answers. Correct answers, accepted alternatives, and explanations are hidden on this link.',
+    hiddenBySettings: true,
+    metrics: [
+      {
+        ariaLabel:
+          'Answer visibility: Hidden. Correct answers, accepted alternatives, and explanations stay teacher-only.',
+        description:
+          'Correct answers, accepted alternatives, and explanations stay teacher-only.',
+        key: 'visibility',
+        label: 'Answer visibility',
+        value: 'Hidden',
+      },
+      {
+        ariaLabel:
+          'Item feedback: 0. No item feedback cards are shown while answers are hidden.',
+        description:
+          'No item feedback cards are shown while answers are hidden.',
+        key: 'item-feedback',
+        label: 'Item feedback',
+        value: '0',
+      },
+      {
+        ariaLabel:
+          'Alternatives: 0. Items with accepted alternatives beyond the primary answer.',
+        description: 'Items with accepted alternatives beyond the primary answer.',
+        key: 'accepted-alternatives',
+        label: 'Alternatives',
+        value: '0',
+      },
+      {
+        ariaLabel: 'Explanations: 0. Items with teacher explanations.',
+        description: 'Items with teacher explanations.',
+        key: 'explanations',
+        label: 'Explanations',
+        value: '0',
+      },
+      {
+        ariaLabel: 'Needs review: 0. Items that may need another look.',
+        description: 'Items that may need another look.',
+        key: 'needs-review',
+        label: 'Needs review',
+        value: '0',
+      },
+      {
+        ariaLabel: 'Unanswered: 1. Items left unanswered.',
+        description: 'Items left unanswered.',
+        key: 'unanswered',
+        label: 'Unanswered',
+        value: '1',
+      },
+    ],
+    status: 'hidden',
+    statusLabel: 'Teacher review',
+    title: 'Feedback coverage',
   }
 );
 assert.equal(
@@ -21443,6 +21676,13 @@ assert.deepEqual(
       attemptUsageLabel: '1 attempt left',
       durationLabel: 'Time: 1:20',
       durationView: expectTimerAttemptDurationView('1:20', 80),
+      feedbackScopeView: buildExpectedStudentAttemptFeedbackScopeView({
+        acceptedAlternativeItemCount: 0,
+        explanationItemCount: 0,
+        needsReviewItemCount: 0,
+        reviewItemCount: 1,
+        unansweredItemCount: 0,
+      }),
       nextStepsView: {
         ariaLabel: 'Post-submit next steps',
         stepViews: [
@@ -21685,6 +21925,94 @@ function buildExpectedStudentRunnerPayloadSummaryView({
       },
     ],
     title: 'Prepared browser payload',
+  };
+}
+function buildExpectedStudentAttemptFeedbackScopeView({
+  acceptedAlternativeItemCount,
+  explanationItemCount,
+  hiddenBySettings = false,
+  needsReviewItemCount,
+  reviewItemCount,
+  unansweredItemCount,
+}: {
+  acceptedAlternativeItemCount: number;
+  explanationItemCount: number;
+  hiddenBySettings?: boolean;
+  needsReviewItemCount: number;
+  reviewItemCount: number;
+  unansweredItemCount: number;
+}) {
+  const status = hiddenBySettings ? 'hidden' : 'visible';
+  const statusLabel = hiddenBySettings ? 'Teacher review' : 'Visible';
+
+  return {
+    ariaLabel: 'Feedback coverage',
+    description: hiddenBySettings
+      ? 'Your teacher will review your answers. Correct answers, accepted alternatives, and explanations are hidden on this link.'
+      : 'Your teacher allowed post-submit review. Item feedback below uses the same answer, alternatives, and explanation format across activity types.',
+    hiddenBySettings,
+    metrics: [
+      {
+        ariaLabel: hiddenBySettings
+          ? 'Answer visibility: Hidden. Correct answers, accepted alternatives, and explanations stay teacher-only.'
+          : 'Answer visibility: Shown. Correct answers, accepted alternatives, and explanations can appear below when available.',
+        description: hiddenBySettings
+          ? 'Correct answers, accepted alternatives, and explanations stay teacher-only.'
+          : 'Correct answers, accepted alternatives, and explanations can appear below when available.',
+        key: 'visibility',
+        label: 'Answer visibility',
+        value: hiddenBySettings ? 'Hidden' : 'Shown',
+      },
+      {
+        ariaLabel: hiddenBySettings
+          ? 'Item feedback: 0. No item feedback cards are shown while answers are hidden.'
+          : `Item feedback: ${reviewItemCount}. Item feedback cards available below: ${reviewItemCount}.`,
+        description: hiddenBySettings
+          ? 'No item feedback cards are shown while answers are hidden.'
+          : `Item feedback cards available below: ${reviewItemCount}.`,
+        key: 'item-feedback',
+        label: 'Item feedback',
+        value: String(reviewItemCount),
+      },
+      {
+        ariaLabel:
+          `Alternatives: ${acceptedAlternativeItemCount}. ` +
+          'Items with accepted alternatives beyond the primary answer.',
+        description: 'Items with accepted alternatives beyond the primary answer.',
+        key: 'accepted-alternatives',
+        label: 'Alternatives',
+        value: String(acceptedAlternativeItemCount),
+      },
+      {
+        ariaLabel:
+          `Explanations: ${explanationItemCount}. ` +
+          'Items with teacher explanations.',
+        description: 'Items with teacher explanations.',
+        key: 'explanations',
+        label: 'Explanations',
+        value: String(explanationItemCount),
+      },
+      {
+        ariaLabel:
+          `Needs review: ${needsReviewItemCount}. ` +
+          'Items that may need another look.',
+        description: 'Items that may need another look.',
+        key: 'needs-review',
+        label: 'Needs review',
+        value: String(needsReviewItemCount),
+      },
+      {
+        ariaLabel:
+          `Unanswered: ${unansweredItemCount}. Items left unanswered.`,
+        description: 'Items left unanswered.',
+        key: 'unanswered',
+        label: 'Unanswered',
+        value: String(unansweredItemCount),
+      },
+    ],
+    status,
+    statusLabel,
+    title: 'Feedback coverage',
   };
 }
 function buildExpectedStudentRunnerSubmitReadinessView({

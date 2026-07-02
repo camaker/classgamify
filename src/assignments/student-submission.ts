@@ -27,9 +27,13 @@ import {
 } from '@/assignments/identity';
 import type {
   PublicAssignmentUnavailablePayload,
+  PublicAttemptReviewItem,
   PublicAttemptReviewSummary,
 } from '@/assignments/public';
-import { formatAssignmentResultPercent } from '@/assignments/result-format';
+import {
+  formatAssignmentResultPercent,
+  formatOptionalAcceptedAnswerAlternatives,
+} from '@/assignments/result-format';
 import {
   normalizeRuntimeDisplayCount,
   normalizeRuntimeDisplayText,
@@ -299,6 +303,34 @@ export type StudentAttemptReviewSummaryView = {
   description: string;
   hiddenBySettings: boolean;
   metrics: StudentAttemptReviewSummaryMetricView[];
+  title: string;
+};
+
+export type StudentAttemptFeedbackScopeStatus = 'hidden' | 'visible';
+
+export type StudentAttemptFeedbackScopeMetricKey =
+  | 'accepted-alternatives'
+  | 'explanations'
+  | 'item-feedback'
+  | 'needs-review'
+  | 'unanswered'
+  | 'visibility';
+
+export type StudentAttemptFeedbackScopeMetricView = {
+  ariaLabel: string;
+  description: string;
+  key: StudentAttemptFeedbackScopeMetricKey;
+  label: string;
+  value: string;
+};
+
+export type StudentAttemptFeedbackScopeView = {
+  ariaLabel: string;
+  description: string;
+  hiddenBySettings: boolean;
+  metrics: StudentAttemptFeedbackScopeMetricView[];
+  status: StudentAttemptFeedbackScopeStatus;
+  statusLabel: string;
   title: string;
 };
 
@@ -965,6 +997,148 @@ export function buildStudentAttemptReviewSummaryView({
     ],
     title: STUDENT_RUNNER_COPY.reviewSummaryTitle,
   };
+}
+
+export function buildStudentAttemptFeedbackScopeView({
+  reviewItems,
+  summary,
+}: {
+  reviewItems: PublicAttemptReviewItem[];
+  summary: PublicAttemptReviewSummary;
+}): StudentAttemptFeedbackScopeView {
+  const hiddenBySettings =
+    summary.hiddenBySettings || !summary.showCorrectAnswers;
+  const visibleReviewItems = hiddenBySettings ? [] : reviewItems;
+  const status: StudentAttemptFeedbackScopeStatus = hiddenBySettings
+    ? 'hidden'
+    : 'visible';
+
+  return {
+    ariaLabel: m.student_runner_feedback_scope_aria_label(),
+    description: hiddenBySettings
+      ? m.student_runner_feedback_scope_hidden_description()
+      : m.student_runner_feedback_scope_visible_description(),
+    hiddenBySettings,
+    metrics: [
+      buildStudentAttemptFeedbackScopeMetricView({
+        description: hiddenBySettings
+          ? m.student_runner_feedback_scope_visibility_hidden_description()
+          : m.student_runner_feedback_scope_visibility_visible_description(),
+        key: 'visibility',
+        label: m.student_runner_feedback_scope_visibility_label(),
+        value: hiddenBySettings
+          ? m.student_runner_feedback_scope_visibility_hidden_value()
+          : m.student_runner_feedback_scope_visibility_visible_value(),
+      }),
+      buildStudentAttemptFeedbackScopeMetricView({
+        description: hiddenBySettings
+          ? m.student_runner_feedback_scope_items_hidden_description()
+          : m.student_runner_feedback_scope_items_visible_description({
+              count: formatStudentReviewSummaryCount(summary.reviewItemCount),
+            }),
+        key: 'item-feedback',
+        label: m.student_runner_feedback_scope_items_label(),
+        value: formatStudentReviewSummaryCount(summary.reviewItemCount),
+      }),
+      buildStudentAttemptFeedbackScopeMetricView({
+        description:
+          m.student_runner_feedback_scope_accepted_alternatives_description(),
+        key: 'accepted-alternatives',
+        label: m.student_runner_feedback_scope_accepted_alternatives_label(),
+        value: formatStudentReviewSummaryCount(
+          countStudentAttemptReviewItemsWithAcceptedAlternatives(
+            visibleReviewItems
+          )
+        ),
+      }),
+      buildStudentAttemptFeedbackScopeMetricView({
+        description: m.student_runner_feedback_scope_explanations_description(),
+        key: 'explanations',
+        label: m.student_runner_feedback_scope_explanations_label(),
+        value: formatStudentReviewSummaryCount(
+          countStudentAttemptReviewItemsWithExplanations(visibleReviewItems)
+        ),
+      }),
+      buildStudentAttemptFeedbackScopeMetricView({
+        description: m.student_runner_feedback_scope_needs_review_description(),
+        key: 'needs-review',
+        label: STUDENT_RUNNER_COPY.reviewSummaryNeedsReviewLabel,
+        value: formatStudentReviewSummaryCount(summary.needsReviewItemCount),
+      }),
+      buildStudentAttemptFeedbackScopeMetricView({
+        description: m.student_runner_feedback_scope_unanswered_description(),
+        key: 'unanswered',
+        label: STUDENT_RUNNER_COPY.reviewSummaryUnansweredLabel,
+        value: formatStudentReviewSummaryCount(summary.unansweredItemCount),
+      }),
+    ],
+    status,
+    statusLabel: getStudentAttemptFeedbackScopeStatusLabel(status),
+    title: m.student_runner_feedback_scope_title(),
+  };
+}
+
+function buildStudentAttemptFeedbackScopeMetricView({
+  description,
+  key,
+  label,
+  value,
+}: {
+  description: string;
+  key: StudentAttemptFeedbackScopeMetricKey;
+  label: string;
+  value: string;
+}): StudentAttemptFeedbackScopeMetricView {
+  return {
+    ariaLabel: m.student_runner_feedback_scope_metric_aria({
+      description,
+      label,
+      value,
+    }),
+    description,
+    key,
+    label,
+    value,
+  };
+}
+
+function getStudentAttemptFeedbackScopeStatusLabel(
+  status: StudentAttemptFeedbackScopeStatus
+) {
+  return status === 'hidden'
+    ? m.student_runner_feedback_scope_status_hidden()
+    : m.student_runner_feedback_scope_status_visible();
+}
+
+function countStudentAttemptReviewItemsWithAcceptedAlternatives(
+  reviewItems: PublicAttemptReviewItem[]
+) {
+  return normalizeRuntimeDisplayCount(
+    reviewItems.filter((reviewItem) =>
+      hasStudentAttemptFeedbackAcceptedAlternatives(reviewItem)
+    ).length
+  );
+}
+
+function hasStudentAttemptFeedbackAcceptedAlternatives(
+  reviewItem: PublicAttemptReviewItem
+) {
+  return Boolean(
+    formatOptionalAcceptedAnswerAlternatives(reviewItem.acceptedAnswers, {
+      includePrimary: false,
+      separator: m.student_runner_choice_separator(),
+    })
+  );
+}
+
+function countStudentAttemptReviewItemsWithExplanations(
+  reviewItems: PublicAttemptReviewItem[]
+) {
+  return normalizeRuntimeDisplayCount(
+    reviewItems.filter((reviewItem) =>
+      Boolean(normalizeRuntimeDisplayText(reviewItem.explanation))
+    ).length
+  );
 }
 
 function normalizeStudentResultScore(

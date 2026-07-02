@@ -4,6 +4,7 @@ import type {
   StudentRunnerResultPanelView,
 } from '@/assignments/student-runner-state';
 import type {
+  StudentAttemptFeedbackScopeView,
   StudentAttemptReviewSummaryView,
   StudentAttemptResultNextStepsView,
 } from '@/assignments/student-submission';
@@ -247,6 +248,7 @@ function StudentRunnerResultPanel({
         </p>
       ) : null}
       <StudentRunnerReviewSummary view={view.reviewSummaryView} />
+      <StudentRunnerFeedbackScope view={view.feedbackScopeView} />
       <StudentRunnerResultNextSteps view={view.nextStepsView} />
       {view.showStartAnotherAttempt ? (
         <Button
@@ -262,6 +264,61 @@ function StudentRunnerResultPanel({
       ) : null}
     </section>
   );
+}
+
+function StudentRunnerFeedbackScope({
+  view,
+}: {
+  view: StudentAttemptFeedbackScopeView;
+}) {
+  return (
+    <section
+      aria-label={view.ariaLabel}
+      data-status={view.status}
+      className="mt-3 rounded-md border bg-background/80 p-2"
+    >
+      <div className="flex flex-col gap-1 sm:flex-row sm:items-start sm:justify-between">
+        <div>
+          <p className="text-xs font-medium">{view.title}</p>
+          <p className="mt-1 text-xs leading-5 text-muted-foreground">
+            {view.description}
+          </p>
+        </div>
+        <span className={getStudentRunnerFeedbackScopeStatusClassName(view)}>
+          {view.statusLabel}
+        </span>
+      </div>
+      <dl className="mt-2 grid grid-cols-2 gap-2">
+        {view.metrics.map((metric) => (
+          <div
+            key={metric.key}
+            className="rounded-md border bg-muted/20 px-2 py-1.5"
+          >
+            <dd className="text-sm font-semibold">
+              <output aria-label={metric.ariaLabel}>{metric.value}</output>
+            </dd>
+            <dt className="text-[11px] leading-4 text-muted-foreground">
+              {metric.label}
+            </dt>
+            <p className="sr-only">{metric.description}</p>
+          </div>
+        ))}
+      </dl>
+    </section>
+  );
+}
+
+function getStudentRunnerFeedbackScopeStatusClassName(
+  view: StudentAttemptFeedbackScopeView
+) {
+  const base =
+    'inline-flex w-fit rounded-md border px-2 py-1 text-[0.6875rem] font-medium';
+
+  if (view.hiddenBySettings) {
+    return `${base} bg-muted/40 text-muted-foreground`;
+  }
+
+  return `${base} border-primary/30 bg-primary/10 text-primary`;
 }
 
 function StudentRunnerReviewSummary({

@@ -19,6 +19,7 @@ import {
 import {
   buildAnonymousAttemptCopy,
   buildAttemptCompletionCopy,
+  buildStudentAttemptFeedbackScopeView,
   buildStudentAttemptSubmissionPlan,
   buildStudentAttemptSessionKey,
   buildStudentAttemptControlState,
@@ -39,6 +40,7 @@ import {
   type AttemptCompletionSummary,
   type StudentAttemptProgressView,
   type StudentAttemptControlState,
+  type StudentAttemptFeedbackScopeView,
   type StudentAttemptReviewSummaryView,
   type StudentAttemptResultDisplay,
   type StudentAttemptResultNextStepsView,
@@ -251,6 +253,7 @@ export type StudentRunnerResultPanelView =
       attemptUsageLabel?: string;
       durationLabel: string;
       durationView: AttemptDurationDisplayView;
+      feedbackScopeView: StudentAttemptFeedbackScopeView;
       nextStepsView: StudentAttemptResultNextStepsView;
       reviewSummaryView: StudentAttemptReviewSummaryView;
       scoreAriaLabel: string;
@@ -843,6 +846,7 @@ export function buildStudentRunnerPageViewModel({
       assignment,
       attemptResultDisplay,
       attemptUsageLabel,
+      reviewItems: result?.reviewItems,
       reviewSummary: result?.reviewSummary,
       showStartAnotherAttempt,
     }),
@@ -1137,12 +1141,14 @@ function buildStudentRunnerResultPanelView({
   assignment,
   attemptResultDisplay,
   attemptUsageLabel,
+  reviewItems,
   reviewSummary,
   showStartAnotherAttempt,
 }: {
   assignment?: AssignmentSeed;
   attemptResultDisplay?: StudentAttemptResultDisplay;
   attemptUsageLabel?: string;
+  reviewItems?: PublicAttemptReviewItem[];
   reviewSummary?: PublicAttemptReviewSummary;
   showStartAnotherAttempt: boolean;
 }): StudentRunnerResultPanelView {
@@ -1158,6 +1164,10 @@ function buildStudentRunnerResultPanelView({
     attemptUsageLabel,
     durationLabel: attemptResultDisplay.durationLabel,
     durationView: attemptResultDisplay.durationView,
+    feedbackScopeView: buildStudentAttemptFeedbackScopeView({
+      reviewItems: reviewItems ?? [],
+      summary: reviewSummary,
+    }),
     nextStepsView: buildStudentAttemptResultNextStepsView({
       canStartAnotherAttempt: showStartAnotherAttempt,
       showCorrectAnswers: Boolean(assignment?.settings.showCorrectAnswers),
