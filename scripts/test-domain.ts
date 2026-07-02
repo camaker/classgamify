@@ -16,6 +16,7 @@ import {
   normalizeContactClassroomInquiryFields,
   normalizeContactInquiryIntent,
 } from '@/contact/inquiry';
+import { buildMailWorkspaceBoundaryView } from '@/mail/workspace-boundary';
 import { getAvatarLinks } from '@/config/avatar-config';
 import { getFooterLinks } from '@/config/footer-config';
 import { getNavbarLinks } from '@/config/navbar-config';
@@ -1615,6 +1616,11 @@ assert.match(
   mailDocumentationSource,
   /forgotPassword[\s\S]*ClassGamify teacher workspace password[\s\S]*verifyEmail[\s\S]*ClassGamify teacher workspace email[\s\S]*subscribeNewsletter[\s\S]*ClassGamify classroom updates enabled/,
   'Mail docs should describe transactional email subjects in ClassGamify teacher-workspace terms.'
+);
+assert.match(
+  mailDocumentationSource,
+  /workspace-boundary\.ts[\s\S]*shared workspace boundary panel[\s\S]*saved activities[\s\S]*assignment links[\s\S]*student attempts\/results[\s\S]*teacher-reviewed AI drafts[\s\S]*safe source-material[\s\S]*provenance/,
+  'Mail docs should document the shared transactional workspace-boundary panel.'
 );
 assert.doesNotMatch(
   blogPostVisualSource,
@@ -6907,6 +6913,14 @@ const subscribeNewsletterEmailTemplateSource = readFileSync(
   'src/mail/templates/subscribe-newsletter.tsx',
   'utf8'
 );
+const mailWorkspaceBoundarySource = readFileSync(
+  'src/mail/workspace-boundary.ts',
+  'utf8'
+);
+const emailWorkspaceBoundaryComponentSource = readFileSync(
+  'src/mail/components/email-workspace-boundary.tsx',
+  'utf8'
+);
 assert.doesNotMatch(
   contactFormCardSource,
   /err\.message|error\.message|err instanceof Error|error instanceof Error/,
@@ -6953,19 +6967,34 @@ assert.match(
   'Contact email template should label classroom versus general product inquiries.'
 );
 assert.match(
+  mailWorkspaceBoundarySource,
+  /export type MailWorkspaceBoundaryItemId =[\s\S]*'activities'[\s\S]*'assignments'[\s\S]*'results'[\s\S]*'ai-sources'[\s\S]*export type MailWorkspaceBoundaryView = \{[\s\S]*items: MailWorkspaceBoundaryItemView\[\];[\s\S]*buildMailWorkspaceBoundaryView[\s\S]*mail_workspace_boundary_item_activities_description[\s\S]*mail_workspace_boundary_description[\s\S]*mail_workspace_boundary_title[\s\S]*buildMailWorkspaceBoundaryItemView[\s\S]*mail_workspace_boundary_item_line/,
+  'Mail workspace-boundary domain should expose explicit item and panel view contracts from localized copy.'
+);
+assert.match(
+  emailWorkspaceBoundaryComponentSource,
+  /buildMailWorkspaceBoundaryView[\s\S]*<Section[\s\S]*aria-label=\{view\.title\}[\s\S]*view\.items\.map\(\(item\) =>[\s\S]*key=\{item\.id\}[\s\S]*item\.line/,
+  'Email workspace-boundary component should render prepared panel and item lines from the mail-domain view.'
+);
+assert.match(
   forgotPasswordEmailTemplateSource,
-  /mail_forgot_password_body[\s\S]*mail_forgot_password_security_note[\s\S]*mail_forgot_password_button/,
-  'Forgot-password email should render the teacher-workspace security note before the reset action.'
+  /EmailWorkspaceBoundary[\s\S]*mail_forgot_password_body[\s\S]*mail_forgot_password_security_note[\s\S]*<EmailWorkspaceBoundary \/>[\s\S]*mail_forgot_password_button/,
+  'Forgot-password email should render the shared workspace boundary before the reset action.'
 );
 assert.match(
   verifyEmailTemplateSource,
-  /mail_verify_email_body[\s\S]*mail_verify_email_workspace_note[\s\S]*mail_verify_email_button/,
-  'Verify-email template should render the teacher-workspace protection note before the verify action.'
+  /EmailWorkspaceBoundary[\s\S]*mail_verify_email_body[\s\S]*mail_verify_email_workspace_note[\s\S]*<EmailWorkspaceBoundary \/>[\s\S]*mail_verify_email_button/,
+  'Verify-email template should render the shared workspace boundary before the verify action.'
 );
 assert.match(
   subscribeNewsletterEmailTemplateSource,
-  /mail_subscribe_newsletter_title[\s\S]*mail_subscribe_newsletter_body[\s\S]*mail_subscribe_newsletter_workspace_note/,
-  'Subscribe-newsletter email should render the classroom update scope note.'
+  /EmailWorkspaceBoundary[\s\S]*mail_subscribe_newsletter_title[\s\S]*mail_subscribe_newsletter_body[\s\S]*mail_subscribe_newsletter_workspace_note[\s\S]*<EmailWorkspaceBoundary \/>/,
+  'Subscribe-newsletter email should render the shared workspace boundary after the classroom update scope note.'
+);
+assert.match(
+  contactEmailTemplateSource,
+  /EmailWorkspaceBoundary[\s\S]*mail_contact_message_message[\s\S]*<EmailWorkspaceBoundary \/>/,
+  'Contact email template should render the shared workspace boundary after the inquiry body.'
 );
 const newsletterFormCardSource = readFileSync(
   'src/components/settings/notification/newsletter-form-card.tsx',
@@ -9119,6 +9148,13 @@ const transactionalEmailBoundaryRequirements = [
       ['mail_subscribe_newsletter_body', /assignment links, teacher-reviewed AI drafts/],
       ['mail_subscribe_newsletter_workspace_note', /activity to assignment to attempt to results loop/],
       ['mail_layout_copyright', /teacher activity platform/],
+      ['mail_workspace_boundary_title', /Workspace boundary/],
+      ['mail_workspace_boundary_description', /ClassGamify teacher workspace/],
+      ['mail_workspace_boundary_item_activities_description', /Saved activities, reusable structured content/],
+      ['mail_workspace_boundary_item_assignments_description', /Published links, frozen snapshots/],
+      ['mail_workspace_boundary_item_results_description', /Submitted attempts, review summaries, CSV exports/],
+      ['mail_workspace_boundary_item_ai_sources_description', /Teacher-reviewed AI drafts and safe source-material provenance/],
+      ['mail_workspace_boundary_item_line', /\{label\}: \{description\}/],
     ],
   ],
   [
@@ -9135,6 +9171,13 @@ const transactionalEmailBoundaryRequirements = [
       ['mail_subscribe_newsletter_body', /作业链接、老师审核的 AI 草稿/],
       ['mail_subscribe_newsletter_workspace_note', /活动、作业、作答和结果闭环/],
       ['mail_layout_copyright', /教师课堂活动平台/],
+      ['mail_workspace_boundary_title', /工作区边界/],
+      ['mail_workspace_boundary_description', /ClassGamify 教师工作区/],
+      ['mail_workspace_boundary_item_activities_description', /已保存活动、可复用结构化内容/],
+      ['mail_workspace_boundary_item_assignments_description', /已发布链接、冻结快照/],
+      ['mail_workspace_boundary_item_results_description', /已提交作答、复盘摘要、CSV 导出/],
+      ['mail_workspace_boundary_item_ai_sources_description', /老师审核的 AI 草稿和安全来源素材信息/],
+      ['mail_workspace_boundary_item_line', /\{label\}：\{description\}/],
     ],
   ],
 ] as const;
@@ -9151,6 +9194,41 @@ for (const [
     );
   }
 }
+assert.deepEqual(buildMailWorkspaceBoundaryView(), {
+  description:
+    'These messages refer to your ClassGamify teacher workspace, not a generic account inbox.',
+  items: [
+    {
+      description:
+        'Saved activities, reusable structured content, and Wordwall-style template readiness.',
+      id: 'activities',
+      label: 'Activities and templates',
+      line: 'Activities and templates: Saved activities, reusable structured content, and Wordwall-style template readiness.',
+    },
+    {
+      description:
+        'Published links, frozen snapshots, instructions, attempt limits, timers, and close times.',
+      id: 'assignments',
+      label: 'Assignment links',
+      line: 'Assignment links: Published links, frozen snapshots, instructions, attempt limits, timers, and close times.',
+    },
+    {
+      description:
+        'Submitted attempts, review summaries, CSV exports, and teacher follow-up records.',
+      id: 'results',
+      label: 'Student attempts and results',
+      line: 'Student attempts and results: Submitted attempts, review summaries, CSV exports, and teacher follow-up records.',
+    },
+    {
+      description:
+        'Teacher-reviewed AI drafts and safe source-material provenance, without file URLs or storage keys.',
+      id: 'ai-sources',
+      label: 'AI drafts and source materials',
+      line: 'AI drafts and source materials: Teacher-reviewed AI drafts and safe source-material provenance, without file URLs or storage keys.',
+    },
+  ],
+  title: 'Workspace boundary',
+});
 const authWorkspaceBoundaryRequirements = [
   [
     enLocaleMessages,

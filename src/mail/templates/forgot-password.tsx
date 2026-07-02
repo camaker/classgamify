@@ -1,5 +1,6 @@
 import EmailButton from '../components/email-button';
 import EmailLayout from '../components/email-layout';
+import EmailWorkspaceBoundary from '../components/email-workspace-boundary';
 import { Text } from '@react-email/components';
 import { m } from '@/locale/paraglide/messages';
 
@@ -18,6 +19,7 @@ export default function ForgotPassword({ url, name }: ForgotPasswordProps) {
       </Text>
       <Text>{m.mail_forgot_password_body(undefined, en)}</Text>
       <Text>{m.mail_forgot_password_security_note(undefined, en)}</Text>
+      <EmailWorkspaceBoundary />
       <EmailButton href={url}>
         {m.mail_forgot_password_button(undefined, en)}
       </EmailButton>

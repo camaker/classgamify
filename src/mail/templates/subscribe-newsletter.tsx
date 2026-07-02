@@ -1,4 +1,5 @@
 import EmailLayout from '../components/email-layout';
+import EmailWorkspaceBoundary from '../components/email-workspace-boundary';
 import { Heading, Text } from '@react-email/components';
 import { m } from '@/locale/paraglide/messages';
 
@@ -12,6 +13,7 @@ export default function SubscribeNewsletter() {
       </Heading>
       <Text>{m.mail_subscribe_newsletter_body(undefined, en)}</Text>
       <Text>{m.mail_subscribe_newsletter_workspace_note(undefined, en)}</Text>
+      <EmailWorkspaceBoundary />
     </EmailLayout>
   );
 }

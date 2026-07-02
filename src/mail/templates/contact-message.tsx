@@ -1,4 +1,5 @@
 import EmailLayout from '../components/email-layout';
+import EmailWorkspaceBoundary from '../components/email-workspace-boundary';
 import { Section, Text } from '@react-email/components';
 import { m } from '@/locale/paraglide/messages';
 import {
@@ -64,6 +65,7 @@ export default function ContactMessage({
       <Text>
         {m.mail_contact_message_message(undefined, en)} {message}
       </Text>
+      <EmailWorkspaceBoundary />
     </EmailLayout>
   );
 }

@@ -21,9 +21,11 @@ src/mail/
 │   ├── forgot-password.tsx
 │   ├── subscribe-newsletter.tsx
 │   └── contact-message.tsx
-└── components/
-    ├── email-layout.tsx
-    └── email-button.tsx
+├── components/
+│   ├── email-layout.tsx
+│   ├── email-workspace-boundary.tsx
+│   └── email-button.tsx
+└── workspace-boundary.ts # shared teacher-workspace boundary view
 ```
 
 ---
@@ -109,6 +111,11 @@ mail: {
 | verifyEmail | `{ url, name }` | Verify your ClassGamify teacher workspace email |
 | subscribeNewsletter | `{ email? }` | ClassGamify classroom updates enabled |
 | contactMessage | `{ name, email, message, intent?, classroomInquiry? }` | ClassGamify classroom and product inquiry |
+
+Each transactional template renders the shared workspace boundary panel from
+`src/mail/workspace-boundary.ts`, covering saved activities, assignment links,
+student attempts/results, teacher-reviewed AI drafts, and safe source-material
+provenance.
 
 **Adding a template:** extend `EmailTemplate` in `types.ts` → add to `EmailTemplates` and `subjectByTemplate` in `render.ts` → add React component under `templates/`.
 

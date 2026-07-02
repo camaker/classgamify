@@ -1,5 +1,6 @@
 import EmailButton from '../components/email-button';
 import EmailLayout from '../components/email-layout';
+import EmailWorkspaceBoundary from '../components/email-workspace-boundary';
 import { Text } from '@react-email/components';
 import { m } from '@/locale/paraglide/messages';
 
@@ -18,6 +19,7 @@ export default function VerifyEmail({ url, name }: VerifyEmailProps) {
       </Text>
       <Text>{m.mail_verify_email_body(undefined, en)}</Text>
       <Text>{m.mail_verify_email_workspace_note(undefined, en)}</Text>
+      <EmailWorkspaceBoundary />
       <EmailButton href={url}>
         {m.mail_verify_email_button(undefined, en)}
       </EmailButton>
