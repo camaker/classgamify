@@ -907,6 +907,7 @@ import {
   buildStudentRunnerSubmissionSuccessState,
   buildStudentRunnerSubmitHintViews,
   buildStudentRunnerTimerTickPlan,
+  buildStudentRunnerUnavailableSafetyView,
   getStudentRunnerAttemptStartedAt,
   shouldResetStudentRunnerAttemptSession,
   shouldStartStudentRunnerAttemptClock,
@@ -10174,8 +10175,13 @@ assert.match(
 );
 assert.match(
   studentRunnerStateSource,
-  /export type StudentRunnerLoadingView = \{[\s\S]*export type StudentRunnerMissingPageView = \{[\s\S]*reason: StudentRunnerMissingReason;[\s\S]*scopeItems: StudentRunnerMissingScopeItem\[\];[\s\S]*unavailable\?: PublicAssignmentUnavailablePayload;[\s\S]*export type StudentRunnerIdentityView =[\s\S]*ariaLabel: string;[\s\S]*description: string;[\s\S]*disabled: boolean;[\s\S]*export type StudentRunnerControlView = \{[\s\S]*attemptRegionLabel: string;[\s\S]*statusBarLabel: string;[\s\S]*export type StudentRunnerResultPanelView =[\s\S]*ariaLabel: string;[\s\S]*export type StudentRunnerActivityPreviewView = \{[\s\S]*export type StudentRunnerRuntimeListView = \{[\s\S]*export type StudentRunnerPageViewModel = \{/,
+  /export type StudentRunnerLoadingView = \{[\s\S]*export type StudentRunnerMissingPageView = \{[\s\S]*reason: StudentRunnerMissingReason;[\s\S]*scopeItems: StudentRunnerMissingScopeItem\[\];[\s\S]*unavailable\?: PublicAssignmentUnavailablePayload;[\s\S]*unavailableSafetyView\?: StudentRunnerUnavailableSafetyView;[\s\S]*export type StudentRunnerIdentityView =[\s\S]*ariaLabel: string;[\s\S]*description: string;[\s\S]*disabled: boolean;[\s\S]*export type StudentRunnerControlView = \{[\s\S]*attemptRegionLabel: string;[\s\S]*statusBarLabel: string;[\s\S]*export type StudentRunnerResultPanelView =[\s\S]*ariaLabel: string;[\s\S]*export type StudentRunnerActivityPreviewView = \{[\s\S]*export type StudentRunnerRuntimeListView = \{[\s\S]*export type StudentRunnerPageViewModel = \{/,
   'Student runner state domain should export focused route-facing page and sub-view contracts.'
+);
+assert.match(
+  studentRunnerStateSource,
+  /export type StudentRunnerUnavailableSafetyItemId =[\s\S]*'activity-content'[\s\S]*'answer-feedback'[\s\S]*'browser-identity'[\s\S]*'source-materials'[\s\S]*'submissions'[\s\S]*export type StudentRunnerUnavailableSafetyItemView = \{[\s\S]*description: string;[\s\S]*id: StudentRunnerUnavailableSafetyItemId;[\s\S]*label: string;[\s\S]*value: string;[\s\S]*export type StudentRunnerUnavailableSafetyView = \{[\s\S]*description: string;[\s\S]*items: StudentRunnerUnavailableSafetyItemView\[\];[\s\S]*title: string;/,
+  'Student runner state should expose an explicit unavailable-link safety view contract.'
 );
 assert.match(
   studentRunnerSubmissionSource,
@@ -10241,6 +10247,21 @@ assert.doesNotMatch(
   studentRunnerSubmitControlsSource,
   /anonymousToken|studentName|submittedStudentName|answers\[/,
   'Student runner submit controls should not expose identity tokens, names, or answer payload contents inside the prepared browser payload summary.'
+);
+assert.match(
+  studentRunnerStateSource,
+  /unavailableSafetyView: buildStudentRunnerUnavailableSafetyView\([\s\S]*missingView\.unavailable[\s\S]*export function buildStudentRunnerUnavailableSafetyView\([\s\S]*unavailable: PublicAssignmentUnavailablePayload[\s\S]*student_runner_unavailable_safety_description[\s\S]*buildStudentRunnerUnavailableSafetyItems\(unavailable\)[\s\S]*student_runner_unavailable_safety_title/,
+  'Student runner missing page should prepare unavailable-link safety copy from the public unavailable payload.'
+);
+assert.match(
+  studentRunnerStateSource,
+  /buildStudentRunnerUnavailableSafetyItems[\s\S]*contentPolicy\.runtimeItemsHidden[\s\S]*student_runner_unavailable_safety_activity_content_label[\s\S]*contentPolicy\.answerKeysHidden[\s\S]*contentPolicy\.explanationsHidden[\s\S]*student_runner_unavailable_safety_answer_feedback_label[\s\S]*identityPolicy\.browserLabelHidden[\s\S]*identityPolicy\.rawAnonymousTokenHidden[\s\S]*student_runner_unavailable_safety_browser_identity_label[\s\S]*contentPolicy\.teacherMaterialsHidden[\s\S]*student_runner_unavailable_safety_source_materials_label[\s\S]*submissionPolicy\.submissionsBlocked[\s\S]*student_runner_unavailable_safety_submissions_label/,
+  'Student runner unavailable safety items should be derived from explicit public payload privacy and submission policies.'
+);
+assert.match(
+  studentRunnerMissingPanelSource,
+  /view\.unavailableSafetyView[\s\S]*aria-labelledby="student-runner-unavailable-safety-title"[\s\S]*view\.unavailableSafetyView\.title[\s\S]*view\.unavailableSafetyView\.description[\s\S]*view\.unavailableSafetyView\.items\.map\(\(item\)[\s\S]*StudentRunnerUnavailableSafetyIcon[\s\S]*item\.label[\s\S]*item\.value[\s\S]*item\.description/,
+  'Student runner missing panel should render the prepared unavailable-link safety view without rebuilding copy.'
 );
 assert.match(
   studentRunnerSubmitControlsSource,
@@ -18409,6 +18430,51 @@ assert.deepEqual(publicAssignmentUnavailableClosedPayload, {
     submissionsBlocked: true,
   },
 });
+assert.deepEqual(
+  buildStudentRunnerUnavailableSafetyView(publicAssignmentUnavailableClosedPayload),
+  {
+    description:
+      'This link is not open, so ClassGamify keeps student-facing content, teacher-only answers, browser identity, source materials, and submissions closed.',
+    items: [
+      {
+        description:
+          'Runtime prompts and playable items are not returned for this link state.',
+        id: 'activity-content',
+        label: 'Activity content',
+        value: 'Hidden',
+      },
+      {
+        description:
+          'Answer keys, accepted alternatives, and explanations stay teacher-only.',
+        id: 'answer-feedback',
+        label: 'Answers and explanations',
+        value: 'Hidden',
+      },
+      {
+        description:
+          'Browser labels and raw anonymous tokens are not shown for unavailable links.',
+        id: 'browser-identity',
+        label: 'Browser identity',
+        value: 'Private',
+      },
+      {
+        description:
+          'Teacher-uploaded audio, worksheets, documents, and storage references stay hidden.',
+        id: 'source-materials',
+        label: 'Source materials',
+        value: 'Private',
+      },
+      {
+        description:
+          'Students cannot submit attempts until the teacher opens the assignment link.',
+        id: 'submissions',
+        label: 'Submissions',
+        value: 'Blocked',
+      },
+    ],
+    title: 'What stays private',
+  }
+);
 assert.equal(normalizeRuntimeDisplayText('  Ｎｅｗ   York  '), 'New York');
 assert.equal(
   normalizeRuntimeDisplaySearchKey('  Ｉｓｔａｎｂｕｌ   Student  '),
@@ -21377,6 +21443,48 @@ assert.deepEqual(missingStudentRunnerPageView.missingView, {
   ],
   title: 'Assignment closed',
   unavailable: publicAssignmentUnavailableClosedPayload,
+  unavailableSafetyView: {
+    description:
+      'This link is not open, so ClassGamify keeps student-facing content, teacher-only answers, browser identity, source materials, and submissions closed.',
+    items: [
+      {
+        description:
+          'Runtime prompts and playable items are not returned for this link state.',
+        id: 'activity-content',
+        label: 'Activity content',
+        value: 'Hidden',
+      },
+      {
+        description:
+          'Answer keys, accepted alternatives, and explanations stay teacher-only.',
+        id: 'answer-feedback',
+        label: 'Answers and explanations',
+        value: 'Hidden',
+      },
+      {
+        description:
+          'Browser labels and raw anonymous tokens are not shown for unavailable links.',
+        id: 'browser-identity',
+        label: 'Browser identity',
+        value: 'Private',
+      },
+      {
+        description:
+          'Teacher-uploaded audio, worksheets, documents, and storage references stay hidden.',
+        id: 'source-materials',
+        label: 'Source materials',
+        value: 'Private',
+      },
+      {
+        description:
+          'Students cannot submit attempts until the teacher opens the assignment link.',
+        id: 'submissions',
+        label: 'Submissions',
+        value: 'Blocked',
+      },
+    ],
+    title: 'What stays private',
+  },
 });
 assert.deepEqual(missingStudentRunnerPageView.resultPanelView, {
   show: false,

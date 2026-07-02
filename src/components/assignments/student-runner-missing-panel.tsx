@@ -1,4 +1,7 @@
-import type { StudentRunnerMissingPageView } from '@/assignments/student-runner-state';
+import type {
+  StudentRunnerMissingPageView,
+  StudentRunnerUnavailableSafetyItemView,
+} from '@/assignments/student-runner-state';
 import Container from '@/components/layout/container';
 import { Badge } from '@/components/ui/badge';
 import { buttonVariants } from '@/components/ui/button';
@@ -50,6 +53,40 @@ export function StudentRunnerMissingPanel({
             </div>
           ))}
         </div>
+        {view.unavailableSafetyView ? (
+          <section
+            aria-labelledby="student-runner-unavailable-safety-title"
+            className="mt-5 border-t pt-5"
+          >
+            <div>
+              <h2
+                className="font-semibold text-base"
+                id="student-runner-unavailable-safety-title"
+              >
+                {view.unavailableSafetyView.title}
+              </h2>
+              <p className="mt-2 text-muted-foreground text-sm leading-6">
+                {view.unavailableSafetyView.description}
+              </p>
+            </div>
+            <div className="mt-4 grid gap-3 sm:grid-cols-2">
+              {view.unavailableSafetyView.items.map((item) => (
+                <div className="flex min-w-0 gap-3 border-l pl-3" key={item.id}>
+                  <StudentRunnerUnavailableSafetyIcon id={item.id} />
+                  <div className="min-w-0">
+                    <p className="text-muted-foreground text-xs">
+                      {item.label}
+                    </p>
+                    <p className="font-medium text-sm">{item.value}</p>
+                    <p className="mt-1 text-muted-foreground text-xs leading-5">
+                      {item.description}
+                    </p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </section>
+        ) : null}
         <Link
           to={Routes.Templates}
           className={cn(buttonVariants(), 'mt-5 w-fit')}
@@ -70,6 +107,15 @@ function StudentRunnerMissingScopeIcon({
   return <Icon className="mt-0.5 size-4 shrink-0 text-primary" />;
 }
 
+function StudentRunnerUnavailableSafetyIcon({
+  id,
+}: {
+  id: StudentRunnerUnavailableSafetyItemView['id'];
+}) {
+  const Icon = studentRunnerUnavailableSafetyIcons[id];
+  return <Icon className="mt-0.5 size-4 shrink-0 text-primary" />;
+}
+
 const studentRunnerMissingScopeIcons = {
   'activity-content': IconEyeOff,
   'browser-identity': IconUserOff,
@@ -80,3 +126,11 @@ const studentRunnerMissingScopeIcons = {
   StudentRunnerMissingPageView['scopeItems'][number]['id'],
   Icon
 >;
+
+const studentRunnerUnavailableSafetyIcons = {
+  'activity-content': IconEyeOff,
+  'answer-feedback': IconCircleOff,
+  'browser-identity': IconUserOff,
+  'source-materials': IconRoute,
+  submissions: IconSendOff,
+} satisfies Record<StudentRunnerUnavailableSafetyItemView['id'], Icon>;

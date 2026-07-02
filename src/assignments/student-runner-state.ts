@@ -135,6 +135,27 @@ export type StudentRunnerMissingPageView = {
   scopeItems: StudentRunnerMissingScopeItem[];
   title: string;
   unavailable?: PublicAssignmentUnavailablePayload;
+  unavailableSafetyView?: StudentRunnerUnavailableSafetyView;
+};
+
+export type StudentRunnerUnavailableSafetyItemId =
+  | 'activity-content'
+  | 'answer-feedback'
+  | 'browser-identity'
+  | 'source-materials'
+  | 'submissions';
+
+export type StudentRunnerUnavailableSafetyItemView = {
+  description: string;
+  id: StudentRunnerUnavailableSafetyItemId;
+  label: string;
+  value: string;
+};
+
+export type StudentRunnerUnavailableSafetyView = {
+  description: string;
+  items: StudentRunnerUnavailableSafetyItemView[];
+  title: string;
 };
 
 export type StudentRunnerIdentityView =
@@ -932,9 +953,78 @@ function buildStudentRunnerMissingPageView(
     scopeItems: missingView.scopeItems,
     title: missingView.title,
     ...(missingView.unavailable
-      ? { unavailable: missingView.unavailable }
+      ? {
+          unavailable: missingView.unavailable,
+          unavailableSafetyView: buildStudentRunnerUnavailableSafetyView(
+            missingView.unavailable
+          ),
+        }
       : {}),
   };
+}
+
+export function buildStudentRunnerUnavailableSafetyView(
+  unavailable: PublicAssignmentUnavailablePayload
+): StudentRunnerUnavailableSafetyView {
+  return {
+    description: m.student_runner_unavailable_safety_description(),
+    items: buildStudentRunnerUnavailableSafetyItems(unavailable),
+    title: m.student_runner_unavailable_safety_title(),
+  };
+}
+
+function buildStudentRunnerUnavailableSafetyItems(
+  unavailable: PublicAssignmentUnavailablePayload
+): StudentRunnerUnavailableSafetyItemView[] {
+  return [
+    unavailable.contentPolicy.runtimeItemsHidden
+      ? {
+          description:
+            m.student_runner_unavailable_safety_activity_content_description(),
+          id: 'activity-content',
+          label: m.student_runner_unavailable_safety_activity_content_label(),
+          value: m.student_runner_unavailable_safety_activity_content_value(),
+        }
+      : null,
+    unavailable.contentPolicy.answerKeysHidden &&
+    unavailable.contentPolicy.explanationsHidden
+      ? {
+          description:
+            m.student_runner_unavailable_safety_answer_feedback_description(),
+          id: 'answer-feedback',
+          label: m.student_runner_unavailable_safety_answer_feedback_label(),
+          value: m.student_runner_unavailable_safety_answer_feedback_value(),
+        }
+      : null,
+    unavailable.identityPolicy.browserLabelHidden &&
+    unavailable.identityPolicy.rawAnonymousTokenHidden
+      ? {
+          description:
+            m.student_runner_unavailable_safety_browser_identity_description(),
+          id: 'browser-identity',
+          label: m.student_runner_unavailable_safety_browser_identity_label(),
+          value: m.student_runner_unavailable_safety_browser_identity_value(),
+        }
+      : null,
+    unavailable.contentPolicy.teacherMaterialsHidden
+      ? {
+          description:
+            m.student_runner_unavailable_safety_source_materials_description(),
+          id: 'source-materials',
+          label: m.student_runner_unavailable_safety_source_materials_label(),
+          value: m.student_runner_unavailable_safety_source_materials_value(),
+        }
+      : null,
+    unavailable.submissionPolicy.submissionsBlocked
+      ? {
+          description:
+            m.student_runner_unavailable_safety_submissions_description(),
+          id: 'submissions',
+          label: m.student_runner_unavailable_safety_submissions_label(),
+          value: m.student_runner_unavailable_safety_submissions_value(),
+        }
+      : null,
+  ].flatMap((item) => (item ? [item] : []));
 }
 
 function buildStudentRunnerIdentityView({
