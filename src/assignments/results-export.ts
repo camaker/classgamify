@@ -119,6 +119,8 @@ export type AssignmentResultsExportPreparationItemId =
   | 'attempts'
   | 'columns'
   | 'delivery-policy'
+  | 'raw-settings'
+  | 'student-privacy'
   | 'students';
 
 export type AssignmentResultsExportPreparationItemView = {
@@ -178,11 +180,27 @@ export function buildAssignmentResultsExportPreparationView(
     },
     {
       description:
+        m.assignment_results_export_preparation_student_privacy_description(),
+      id: 'student-privacy',
+      label: m.assignment_results_export_preparation_student_privacy_label(),
+      value: m.assignment_results_export_preparation_student_privacy_value(),
+    },
+    {
+      description:
         m.assignment_results_export_preparation_delivery_policy_description(),
       id: 'delivery-policy',
       label: m.assignment_results_export_preparation_delivery_policy_label(),
       value: formatAssignmentResultsExportPreparationCount(
         summary.deliveryPolicyFieldCount
+      ),
+    },
+    {
+      description:
+        m.assignment_results_export_preparation_raw_settings_description(),
+      id: 'raw-settings',
+      label: m.assignment_results_export_preparation_raw_settings_label(),
+      value: formatAssignmentResultsExportPreparationCount(
+        summary.rawSettingFieldCount
       ),
     },
     {
@@ -234,6 +252,8 @@ function buildAssignmentResultsExportPreparationSummary({
     columnCount: getAssignmentResultsExportColumns().length,
     deliveryPolicyFieldCount:
       countAssignmentResultsExportDeliveryFields(deliveryView),
+    rawSettingFieldCount:
+      countAssignmentResultsExportRawSettingFields(deliveryView),
     studentCount: data.analysis.students.length,
   };
 }
@@ -363,6 +383,18 @@ function countAssignmentResultsExportDeliveryFields({
   ].filter((value) => value !== '' && value !== undefined).length;
 }
 
+function countAssignmentResultsExportRawSettingFields(
+  deliveryView: AssignmentResultsExportDeliveryView
+) {
+  return [
+    deliveryView.rawCollectStudentName,
+    deliveryView.rawShowCorrectAnswers,
+    deliveryView.rawShuffleItems,
+    deliveryView.rawMaxAttempts,
+    deliveryView.rawTimeLimitSeconds,
+  ].length;
+}
+
 function buildAssignmentResultsExportAttemptBaseColumns({
   attempt,
   data,
@@ -403,6 +435,11 @@ function buildAssignmentResultsExportAttemptBaseColumns({
     deliveryView.itemOrder,
     deliveryView.maxAttempts,
     deliveryView.timeLimitSeconds ?? '',
+    deliveryView.rawCollectStudentName,
+    deliveryView.rawShowCorrectAnswers,
+    deliveryView.rawShuffleItems,
+    deliveryView.rawMaxAttempts ?? '',
+    deliveryView.rawTimeLimitSeconds ?? '',
     resolvedSource.activityTitle,
     formatAssignmentExportTemplateLabel(resolvedSource.templateType),
     formatAssignmentResultCsvNumber(statsView.completions, { min: 0 }),
@@ -538,8 +575,13 @@ export type AssignmentResultsExportDeliveryView = {
   identityMode: string;
   instructions: string;
   itemOrder: string;
-  maxAttempts: string;
+  maxAttempts: number | string;
   policyText: string;
+  rawCollectStudentName: boolean;
+  rawMaxAttempts: number | null | undefined;
+  rawShowCorrectAnswers: boolean;
+  rawShuffleItems: boolean;
+  rawTimeLimitSeconds: number | undefined;
   settings: AssignmentSettings;
   timeLimitSeconds: number | undefined;
 };
@@ -574,6 +616,11 @@ export function buildAssignmentResultsExportDeliveryView({
       expiresAt,
       settings: exportSettings,
     }),
+    rawCollectStudentName: exportSettings.collectStudentName,
+    rawMaxAttempts: exportSettings.maxAttempts,
+    rawShowCorrectAnswers: exportSettings.showCorrectAnswers,
+    rawShuffleItems: exportSettings.shuffleItems,
+    rawTimeLimitSeconds: exportSettings.timeLimitSeconds,
     settings: exportSettings,
     timeLimitSeconds: exportSettings.timeLimitSeconds,
   };
@@ -594,6 +641,11 @@ function getAssignmentResultsExportColumns() {
     m.assignment_results_export_column_shuffle_items(),
     m.assignment_results_export_column_max_attempts(),
     m.assignment_results_export_column_time_limit_seconds(),
+    m.assignment_results_export_column_collect_student_name_raw(),
+    m.assignment_results_export_column_show_correct_answers_raw(),
+    m.assignment_results_export_column_shuffle_items_raw(),
+    m.assignment_results_export_column_max_attempts_raw(),
+    m.assignment_results_export_column_time_limit_seconds_raw(),
     m.assignment_results_export_column_activity_title(),
     m.assignment_results_export_column_template_type(),
     m.assignment_results_export_column_completions(),

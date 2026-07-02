@@ -2991,23 +2991,23 @@ assert.match(
 );
 assert.match(
   assignmentResultsExportSource,
-  /export type AssignmentResultsExportDeliveryView = \{[\s\S]*answerReveal: string;[\s\S]*policyText: string;[\s\S]*settings: AssignmentSettings;[\s\S]*timeLimitSeconds: number \| undefined;/,
+  /export type AssignmentResultsExportDeliveryView = \{[\s\S]*answerReveal: string;[\s\S]*maxAttempts: number \| string;[\s\S]*policyText: string;[\s\S]*rawCollectStudentName: boolean;[\s\S]*rawMaxAttempts: number \| null \| undefined;[\s\S]*rawShowCorrectAnswers: boolean;[\s\S]*rawShuffleItems: boolean;[\s\S]*rawTimeLimitSeconds: number \| undefined;[\s\S]*settings: AssignmentSettings;[\s\S]*timeLimitSeconds: number \| undefined;/,
   'Assignment CSV export domain should expose an explicit delivery view contract.'
 );
 assert.match(
   assignmentResultsExportSource,
-  /export type AssignmentResultsExportPreparationItemId =[\s\S]*'answer-rows'[\s\S]*'attempts'[\s\S]*'columns'[\s\S]*'delivery-policy'[\s\S]*'students'[\s\S]*export type AssignmentResultsExportPreparationView = \{[\s\S]*description: string;[\s\S]*itemViews: AssignmentResultsExportPreparationItemView\[\];[\s\S]*title: string;/,
+  /export type AssignmentResultsExportPreparationItemId =[\s\S]*'answer-rows'[\s\S]*'attempts'[\s\S]*'columns'[\s\S]*'delivery-policy'[\s\S]*'raw-settings'[\s\S]*'student-privacy'[\s\S]*'students'[\s\S]*export type AssignmentResultsExportPreparationView = \{[\s\S]*description: string;[\s\S]*itemViews: AssignmentResultsExportPreparationItemView\[\];[\s\S]*title: string;/,
   'Assignment CSV export domain should expose a stable prepared export coverage view contract.'
 );
 assert.match(
   assignmentResultsExportSource,
-  /export function buildAssignmentResultsExportPreparationView[\s\S]*buildAssignmentResultsExportPreparationSummary[\s\S]*assignment_results_export_preparation_attempts_label[\s\S]*assignment_results_export_preparation_students_label[\s\S]*assignment_results_export_preparation_delivery_policy_label[\s\S]*assignment_results_export_preparation_answer_rows_label[\s\S]*assignment_results_export_preparation_columns_label/,
+  /export function buildAssignmentResultsExportPreparationView[\s\S]*buildAssignmentResultsExportPreparationSummary[\s\S]*assignment_results_export_preparation_attempts_label[\s\S]*assignment_results_export_preparation_students_label[\s\S]*assignment_results_export_preparation_student_privacy_label[\s\S]*assignment_results_export_preparation_delivery_policy_label[\s\S]*assignment_results_export_preparation_raw_settings_label[\s\S]*assignment_results_export_preparation_answer_rows_label[\s\S]*assignment_results_export_preparation_columns_label/,
   'Assignment CSV export preparation views should use localized labels for each export coverage item.'
 );
 assert.match(
   assignmentResultsExportSource,
-  /function buildAssignmentResultsExportPreparationSummary[\s\S]*answerRowCount: countAssignmentResultsExportAnswerRows[\s\S]*attemptCount: data\.analysis\.attempts\.length[\s\S]*columnCount: getAssignmentResultsExportColumns\(\)\.length[\s\S]*deliveryPolicyFieldCount:[\s\S]*countAssignmentResultsExportDeliveryFields[\s\S]*studentCount: data\.analysis\.students\.length/,
-  'Assignment CSV export preparation summaries should count attempts, students, answer rows, columns, and delivery-policy fields from the export domain.'
+  /function buildAssignmentResultsExportPreparationSummary[\s\S]*answerRowCount: countAssignmentResultsExportAnswerRows[\s\S]*attemptCount: data\.analysis\.attempts\.length[\s\S]*columnCount: getAssignmentResultsExportColumns\(\)\.length[\s\S]*deliveryPolicyFieldCount:[\s\S]*countAssignmentResultsExportDeliveryFields[\s\S]*rawSettingFieldCount:[\s\S]*countAssignmentResultsExportRawSettingFields[\s\S]*studentCount: data\.analysis\.students\.length/,
+  'Assignment CSV export preparation summaries should count attempts, students, answer rows, columns, delivery-policy fields, and raw setting fields from the export domain.'
 );
 assert.match(
   assignmentResultsExportSource,
@@ -3028,6 +3028,11 @@ assert.match(
   assignmentResultsExportSource,
   /buildAssignmentResultsExportAttemptBaseColumns[\s\S]*const averageDurationView = buildAttemptDurationDisplayView\(\{[\s\S]*durationSeconds: statsView\.averageDurationSeconds,[\s\S]*timeLimitSeconds: deliveryView\.timeLimitSeconds,[\s\S]*const attemptDurationView = buildAttemptDurationDisplayView\(\{[\s\S]*durationSeconds: storedAttempt\?\.resultJson\?\.durationSeconds,[\s\S]*timeLimitSeconds: deliveryView\.timeLimitSeconds,[\s\S]*formatAssignmentResultCsvNumber\(averageDurationView\.seconds,[\s\S]*formatAssignmentResultCsvNumber\(attemptDurationView\.seconds,/,
   'Assignment CSV export duration columns should reuse the shared attempt-duration display contract for average and per-attempt seconds.'
+);
+assert.match(
+  assignmentResultsExportSource,
+  /function buildAssignmentResultsExportAttemptBaseColumns[\s\S]*deliveryView\.rawCollectStudentName[\s\S]*deliveryView\.rawShowCorrectAnswers[\s\S]*deliveryView\.rawShuffleItems[\s\S]*deliveryView\.rawMaxAttempts \?\? ''[\s\S]*deliveryView\.rawTimeLimitSeconds \?\? ''/,
+  'Assignment CSV export attempt base columns should include raw publish-setting values next to human-readable delivery rules.'
 );
 assert.match(
   assignmentResultsExportSource,
@@ -42200,10 +42205,22 @@ assert.deepEqual(
           'Student summary records included with latest, average, best, follow-up count, and last submitted fields.',
         ],
         [
+          'student-privacy',
+          'Student privacy',
+          'Protected',
+          'Student rows use normalized display labels; raw anonymous browser tokens are not exported.',
+        ],
+        [
           'delivery-policy',
           'Delivery fields',
           '7',
           'Delivery fields captured for offline records, including attempts, timer, identity, reveal, order, close time, and instructions when present.',
+        ],
+        [
+          'raw-settings',
+          'Raw settings',
+          '5',
+          'Raw publish-setting columns preserve booleans and numeric limits for spreadsheet filtering or SIS import.',
         ],
         [
           'answer-rows',
@@ -42214,7 +42231,7 @@ assert.deepEqual(
         [
           'columns',
           'Columns',
-          '49',
+          '54',
           'CSV columns covering assignment, delivery, student summary, attempts, items, and answer details.',
         ],
       ],
@@ -44098,10 +44115,24 @@ assert.deepEqual(
         },
         {
           description:
+            'Student rows use normalized display labels; raw anonymous browser tokens are not exported.',
+          id: 'student-privacy',
+          label: 'Student privacy',
+          value: 'Protected',
+        },
+        {
+          description:
             'Delivery fields captured for offline records, including attempts, timer, identity, reveal, order, close time, and instructions when present.',
           id: 'delivery-policy',
           label: 'Delivery fields',
           value: '8',
+        },
+        {
+          description:
+            'Raw publish-setting columns preserve booleans and numeric limits for spreadsheet filtering or SIS import.',
+          id: 'raw-settings',
+          label: 'Raw settings',
+          value: '5',
         },
         {
           description:
@@ -44115,7 +44146,7 @@ assert.deepEqual(
             'CSV columns covering assignment, delivery, student summary, attempts, items, and answer details.',
           id: 'columns',
           label: 'Columns',
-          value: '49',
+          value: '54',
         },
       ]),
       title: 'CSV export coverage',
@@ -44199,10 +44230,24 @@ assert.deepEqual(
         },
         {
           description:
+            'Student rows use normalized display labels; raw anonymous browser tokens are not exported.',
+          id: 'student-privacy',
+          label: 'Student privacy',
+          value: 'Protected',
+        },
+        {
+          description:
             'Delivery fields captured for offline records, including attempts, timer, identity, reveal, order, close time, and instructions when present.',
           id: 'delivery-policy',
           label: 'Delivery fields',
           value: '6',
+        },
+        {
+          description:
+            'Raw publish-setting columns preserve booleans and numeric limits for spreadsheet filtering or SIS import.',
+          id: 'raw-settings',
+          label: 'Raw settings',
+          value: '5',
         },
         {
           description:
@@ -44216,7 +44261,7 @@ assert.deepEqual(
             'CSV columns covering assignment, delivery, student summary, attempts, items, and answer details.',
           id: 'columns',
           label: 'Columns',
-          value: '49',
+          value: '54',
         },
       ]),
       title: 'CSV export coverage',
@@ -47042,10 +47087,22 @@ assert.deepEqual(
         'Student summary records included with latest, average, best, follow-up count, and last submitted fields.',
       ],
       [
+        'student-privacy',
+        'Student privacy',
+        'Protected',
+        'Student rows use normalized display labels; raw anonymous browser tokens are not exported.',
+      ],
+      [
         'delivery-policy',
         'Delivery fields',
         '8',
         'Delivery fields captured for offline records, including attempts, timer, identity, reveal, order, close time, and instructions when present.',
+      ],
+      [
+        'raw-settings',
+        'Raw settings',
+        '5',
+        'Raw publish-setting columns preserve booleans and numeric limits for spreadsheet filtering or SIS import.',
       ],
       [
         'answer-rows',
@@ -47056,7 +47113,7 @@ assert.deepEqual(
       [
         'columns',
         'Columns',
-        '49',
+        '54',
         'CSV columns covering assignment, delivery, student summary, attempts, items, and answer details.',
       ],
     ],
@@ -47094,10 +47151,22 @@ try {
           '包含最近、平均、最佳、跟进数量和最近提交时间字段的学生汇总记录。',
         ],
         [
+          'student-privacy',
+          '学生隐私',
+          '已保护',
+          '学生行使用规范化显示标签，不导出原始匿名浏览器令牌。',
+        ],
+        [
           'delivery-policy',
           '投放字段',
           '8',
           '为离线记录保留作答次数、计时器、身份、答案显示、题目顺序、关闭时间以及有内容时的说明。',
+        ],
+        [
+          'raw-settings',
+          '原始设置',
+          '5',
+          '原始发布设置列会保留布尔值和数字限制，便于表格筛选或导入校务系统。',
         ],
         [
           'answer-rows',
@@ -47108,7 +47177,7 @@ try {
         [
           'columns',
           '列',
-          '49',
+          '54',
           '覆盖作业、投放规则、学生汇总、作答、题目和答案详情的 CSV 列。',
         ],
       ],
@@ -47132,6 +47201,11 @@ assert.deepEqual(
     maxAttempts: 2,
     policyText:
       'Student instructions: Use "complete sentences", then submit.; Attempts: 2 max; Timer: 1 min; Closes: 2026年1月10日 18:00; Student identity: Names; Answer reveal: After submit; Item order: Fixed order',
+    rawCollectStudentName: true,
+    rawMaxAttempts: 2,
+    rawShowCorrectAnswers: true,
+    rawShuffleItems: false,
+    rawTimeLimitSeconds: 60,
     settings: {
       collectStudentName: true,
       instructions: 'Use "complete sentences", then submit.',
@@ -47145,6 +47219,10 @@ assert.deepEqual(
 );
 assert.ok(csv.startsWith('\uFEFF"assignment_id","assignment_title"'));
 assert.match(csv, /"expires_at","close_time","delivery_policy","instructions"/);
+assert.match(
+  csv,
+  /"collect_student_name_raw","show_correct_answers_raw","shuffle_items_raw","max_attempts_raw","time_limit_seconds_raw"/
+);
 assert.match(
   csv,
   /"completed_items","total_items","attempt_correct_items","attempt_needs_review_items","attempt_unanswered_items","duration_seconds"[\s\S]*"student_last_submitted","item_number"/
@@ -47162,7 +47240,7 @@ assert.match(csv, /Answer reveal: After submit; Item order: Fixed order/);
 assert.match(csv, /"Use ""complete sentences"", then submit\."/);
 assert.match(
   csv,
-  /"2026年1月10日 18:00","Student instructions: Use ""complete sentences"", then submit\.; Attempts: 2 max; Timer: 1 min; Closes: 2026年1月10日 18:00; Student identity: Names; Answer reveal: After submit; Item order: Fixed order","Use ""complete sentences"", then submit\.","Names","After submit","Fixed order","2","60"/
+  /"2026年1月10日 18:00","Student instructions: Use ""complete sentences"", then submit\.; Attempts: 2 max; Timer: 1 min; Closes: 2026年1月10日 18:00; Student identity: Names; Answer reveal: After submit; Item order: Fixed order","Use ""complete sentences"", then submit\.","Names","After submit","Fixed order","2","60","true","true","false","2","60"/
 );
 const stringSettingsCsv = buildAssignmentResultsCsv({
   ...csvExportData,
@@ -47173,7 +47251,7 @@ const stringSettingsCsv = buildAssignmentResultsCsv({
 });
 assert.match(
   stringSettingsCsv,
-  /"Use ""complete sentences"", then submit\.","Names","After submit","Fixed order","2","60"/
+  /"Use ""complete sentences"", then submit\.","Names","After submit","Fixed order","2","60","true","true","false","2","60"/
 );
 assert.match(csv, /"Snapshot Capitals","Quiz"/);
 assert.match(csv, /"attempt-1","Alice","2026-01-01T10:00:00\.000Z"/);
@@ -47559,7 +47637,7 @@ const partialSettingsCsv = buildAssignmentResultsCsv({
 });
 assert.match(
   partialSettingsCsv,
-  /"Review quietly\.","Anonymous","Hidden","Shuffled","2",""/
+  /"Review quietly\.","Anonymous","Hidden","Shuffled","2","","false","false","true","2",""/
 );
 assert.match(
   partialSettingsCsv,
@@ -47582,7 +47660,7 @@ assert.match(
 );
 assert.match(
   unlimitedAttemptsCsv,
-  /"Use ""complete sentences"", then submit\.","Names","After submit","Fixed order","Open","60"/
+  /"Use ""complete sentences"", then submit\.","Names","After submit","Fixed order","Open","60","true","true","false","","60"/
 );
 
 assert.deepEqual(ASSIGNMENT_CLASSROOM_BRIEF_LIMITS, {
