@@ -11083,27 +11083,27 @@ assert.match(
 );
 assert.match(
   studentRunnerSubmissionSource,
-  /export type StudentAttemptReviewSummaryMetricView = \{[\s\S]*key: StudentAttemptReviewSummaryMetricKey;[\s\S]*label: string;[\s\S]*value: string;[\s\S]*export type StudentAttemptReviewSummaryView = \{[\s\S]*ariaLabel: string;[\s\S]*description: string;[\s\S]*hiddenBySettings: boolean;[\s\S]*metrics: StudentAttemptReviewSummaryMetricView\[\];[\s\S]*title: string;/,
+  /export type StudentAttemptReviewSummaryMetricView = \{[\s\S]*ariaLabel: string;[\s\S]*description: string;[\s\S]*key: StudentAttemptReviewSummaryMetricKey;[\s\S]*label: string;[\s\S]*value: string;[\s\S]*export type StudentAttemptReviewSummaryView = \{[\s\S]*ariaLabel: string;[\s\S]*description: string;[\s\S]*hiddenBySettings: boolean;[\s\S]*metricsLabel: string;[\s\S]*metrics: StudentAttemptReviewSummaryMetricView\[\];[\s\S]*title: string;/,
   'Student submission domain should expose an explicit post-submit review summary view contract.'
 );
 assert.match(
   studentRunnerSubmissionSource,
-  /export type StudentAttemptFeedbackScopeStatus = 'hidden' \| 'visible';[\s\S]*export type StudentAttemptFeedbackScopeMetricKey =[\s\S]*'accepted-alternatives'[\s\S]*'explanations'[\s\S]*'item-feedback'[\s\S]*'needs-review'[\s\S]*'unanswered'[\s\S]*'visibility'[\s\S]*export type StudentAttemptFeedbackScopeView = \{[\s\S]*hiddenBySettings: boolean;[\s\S]*metrics: StudentAttemptFeedbackScopeMetricView\[\];[\s\S]*status: StudentAttemptFeedbackScopeStatus;[\s\S]*statusLabel: string;/,
+  /export type StudentAttemptFeedbackScopeStatus = 'hidden' \| 'visible';[\s\S]*export type StudentAttemptFeedbackScopeMetricKey =[\s\S]*'accepted-alternatives'[\s\S]*'explanations'[\s\S]*'item-feedback'[\s\S]*'needs-review'[\s\S]*'unanswered'[\s\S]*'visibility'[\s\S]*export type StudentAttemptFeedbackScopeView = \{[\s\S]*hiddenBySettings: boolean;[\s\S]*metricsLabel: string;[\s\S]*metrics: StudentAttemptFeedbackScopeMetricView\[\];[\s\S]*status: StudentAttemptFeedbackScopeStatus;[\s\S]*statusAriaLabel: string;[\s\S]*statusLabel: string;/,
   'Student submission domain should expose an explicit feedback coverage view contract.'
 );
 assert.match(
   studentRunnerSubmissionSource,
-  /student_runner_review_summary_correct_label[\s\S]*student_runner_review_summary_hidden_description[\s\S]*student_runner_review_summary_item_count_label[\s\S]*student_runner_review_summary_needs_review_label[\s\S]*student_runner_review_summary_review_hidden_value[\s\S]*student_runner_review_summary_review_visibility_label[\s\S]*student_runner_review_summary_submitted_label[\s\S]*student_runner_review_summary_title[\s\S]*student_runner_review_summary_unanswered_label[\s\S]*student_runner_review_summary_visible_description/,
+  /student_runner_review_summary_correct_label[\s\S]*student_runner_review_summary_correct_description[\s\S]*student_runner_review_summary_hidden_description[\s\S]*student_runner_review_summary_item_count_label[\s\S]*student_runner_review_summary_metrics_label[\s\S]*student_runner_review_summary_needs_review_description[\s\S]*student_runner_review_summary_needs_review_label[\s\S]*student_runner_review_summary_review_visibility_description[\s\S]*student_runner_review_summary_review_hidden_value[\s\S]*student_runner_review_summary_review_visibility_label[\s\S]*student_runner_review_summary_submitted_description[\s\S]*student_runner_review_summary_submitted_label[\s\S]*student_runner_review_summary_title[\s\S]*student_runner_review_summary_unanswered_description[\s\S]*student_runner_review_summary_unanswered_label[\s\S]*student_runner_review_summary_visible_description/,
   'Student review summary copy should come from localized student-runner messages.'
 );
 assert.match(
   studentRunnerSubmissionSource,
-  /student_runner_feedback_scope_aria_label[\s\S]*student_runner_feedback_scope_hidden_description[\s\S]*student_runner_feedback_scope_visible_description[\s\S]*student_runner_feedback_scope_metric_aria[\s\S]*student_runner_feedback_scope_status_hidden[\s\S]*student_runner_feedback_scope_status_visible/,
+  /student_runner_feedback_scope_aria_label[\s\S]*student_runner_feedback_scope_hidden_description[\s\S]*student_runner_feedback_scope_visible_description[\s\S]*student_runner_feedback_scope_metrics_label[\s\S]*student_runner_feedback_scope_status_aria[\s\S]*student_runner_feedback_scope_metric_aria[\s\S]*student_runner_feedback_scope_status_hidden[\s\S]*student_runner_feedback_scope_status_visible/,
   'Student feedback coverage copy should come from localized student-runner messages.'
 );
 assert.match(
   studentRunnerSubmissionSource,
-  /export function buildStudentAttemptReviewSummaryView[\s\S]*summary: PublicAttemptReviewSummary[\s\S]*hiddenBySettings[\s\S]*reviewSummaryHiddenDescription[\s\S]*reviewSummaryVisibleDescription[\s\S]*reviewSummarySubmittedLabel[\s\S]*reviewSummaryCorrectLabel[\s\S]*reviewSummaryNeedsReviewLabel[\s\S]*reviewSummaryUnansweredLabel/,
+  /export function buildStudentAttemptReviewSummaryView[\s\S]*summary: PublicAttemptReviewSummary[\s\S]*hiddenBySettings[\s\S]*reviewSummaryHiddenDescription[\s\S]*reviewSummaryMetricsLabel[\s\S]*reviewSummarySubmittedDescription[\s\S]*reviewSummaryUnansweredDescription[\s\S]*reviewSummaryReviewVisibilityDescription[\s\S]*reviewSummaryVisibleDescription[\s\S]*reviewSummaryCorrectDescription[\s\S]*reviewSummaryNeedsReviewDescription/,
   'Student submission domain should prepare visible and hidden post-submit review summary views from the public review summary.'
 );
 assert.match(
@@ -11937,12 +11937,12 @@ assert.doesNotMatch(
 );
 assert.match(
   studentRunnerAttemptShellSource,
-  /StudentRunnerReviewSummary[\s\S]*view=\{view\.reviewSummaryView\}[\s\S]*function StudentRunnerReviewSummary[\s\S]*view\.title[\s\S]*view\.description[\s\S]*view\.metrics\.map[\s\S]*metric\.value[\s\S]*metric\.label/,
+  /StudentRunnerReviewSummary[\s\S]*view=\{view\.reviewSummaryView\}[\s\S]*function StudentRunnerReviewSummary[\s\S]*view\.title[\s\S]*view\.description[\s\S]*aria-label=\{view\.metricsLabel\}[\s\S]*view\.metrics\.map[\s\S]*metric\.ariaLabel[\s\S]*metric\.value[\s\S]*metric\.label[\s\S]*metric\.description/,
   'Student runner result panel should render prepared post-submit review summary metrics from the result panel view.'
 );
 assert.match(
   studentRunnerAttemptShellSource,
-  /StudentRunnerFeedbackScope[\s\S]*view=\{view\.feedbackScopeView\}[\s\S]*function StudentRunnerFeedbackScope[\s\S]*aria-label=\{view\.ariaLabel\}[\s\S]*data-status=\{view\.status\}[\s\S]*view\.statusLabel[\s\S]*view\.metrics\.map[\s\S]*metric\.ariaLabel[\s\S]*metric\.value[\s\S]*metric\.label[\s\S]*metric\.description/,
+  /StudentRunnerFeedbackScope[\s\S]*view=\{view\.feedbackScopeView\}[\s\S]*function StudentRunnerFeedbackScope[\s\S]*aria-label=\{view\.ariaLabel\}[\s\S]*data-status=\{view\.status\}[\s\S]*aria-label=\{view\.statusAriaLabel\}[\s\S]*view\.statusLabel[\s\S]*aria-label=\{view\.metricsLabel\}[\s\S]*view\.metrics\.map[\s\S]*metric\.ariaLabel[\s\S]*metric\.value[\s\S]*metric\.label[\s\S]*metric\.description/,
   'Student runner result panel should render prepared feedback coverage metrics from the result panel view.'
 );
 assert.match(
@@ -15805,27 +15805,34 @@ assert.deepEqual(
     description:
       'Review the items your teacher allows after submission. Alternatives and explanations appear in the activity below.',
     hiddenBySettings: false,
+    metricsLabel: 'Submission review counts',
     metrics: [
       {
-        ariaLabel: 'Submitted: 3',
+        ariaLabel: 'Submitted: 3. Items submitted in this saved attempt.',
+        description: 'Items submitted in this saved attempt.',
         key: 'submitted',
         label: 'Submitted',
         value: '3',
       },
       {
-        ariaLabel: 'Correct: 1',
+        ariaLabel: 'Correct: 1. Items that matched the expected answer.',
+        description: 'Items that matched the expected answer.',
         key: 'correct',
         label: 'Correct',
         value: '1',
       },
       {
-        ariaLabel: 'Needs review: 2',
+        ariaLabel:
+          'Needs review: 2. Items to review against the expected answer, accepted alternatives, or teacher explanation.',
+        description:
+          'Items to review against the expected answer, accepted alternatives, or teacher explanation.',
         key: 'needs-review',
         label: 'Needs review',
         value: '2',
       },
       {
-        ariaLabel: 'Unanswered: 2',
+        ariaLabel: 'Unanswered: 2. Items left blank in this saved attempt.',
+        description: 'Items left blank in this saved attempt.',
         key: 'unanswered',
         label: 'Unanswered',
         value: '2',
@@ -15852,21 +15859,27 @@ assert.deepEqual(
     description:
       'Your teacher will review the submitted answers. Correct answers are not shown on this link.',
     hiddenBySettings: true,
+    metricsLabel: 'Submission review counts',
     metrics: [
       {
-        ariaLabel: 'Submitted: 3',
+        ariaLabel: 'Submitted: 3. Items submitted in this saved attempt.',
+        description: 'Items submitted in this saved attempt.',
         key: 'submitted',
         label: 'Submitted',
         value: '3',
       },
       {
-        ariaLabel: 'Unanswered: 3',
+        ariaLabel: 'Unanswered: 3. Items left blank in this saved attempt.',
+        description: 'Items left blank in this saved attempt.',
         key: 'unanswered',
         label: 'Unanswered',
         value: '3',
       },
       {
-        ariaLabel: 'Answer review: Teacher review',
+        ariaLabel:
+          'Answer review: Teacher review. Whether correct answers and item feedback are visible on this assignment link.',
+        description:
+          'Whether correct answers and item feedback are visible on this assignment link.',
         key: 'review',
         label: 'Answer review',
         value: 'Teacher review',
@@ -15921,6 +15934,7 @@ assert.deepEqual(
     description:
       'Your teacher allowed post-submit review. Item feedback below uses the same answer, alternatives, and explanation format across activity types.',
     hiddenBySettings: false,
+    metricsLabel: 'Feedback coverage details',
     metrics: [
       {
         ariaLabel:
@@ -15969,6 +15983,7 @@ assert.deepEqual(
       },
     ],
     status: 'visible',
+    statusAriaLabel: 'Feedback visibility: Visible',
     statusLabel: 'Visible',
     title: 'Feedback coverage',
   }
@@ -16002,6 +16017,7 @@ assert.deepEqual(
     description:
       'Your teacher will review your answers. Correct answers, accepted alternatives, and explanations are hidden on this link.',
     hiddenBySettings: true,
+    metricsLabel: 'Feedback coverage details',
     metrics: [
       {
         ariaLabel:
@@ -16052,6 +16068,7 @@ assert.deepEqual(
       },
     ],
     status: 'hidden',
+    statusAriaLabel: 'Feedback visibility: Teacher review',
     statusLabel: 'Teacher review',
     title: 'Feedback coverage',
   }
@@ -23014,27 +23031,34 @@ assert.deepEqual(
         description:
           'Review the items your teacher allows after submission. Alternatives and explanations appear in the activity below.',
         hiddenBySettings: false,
+        metricsLabel: 'Submission review counts',
         metrics: [
           {
-            ariaLabel: 'Submitted: 1',
+            ariaLabel: 'Submitted: 1. Items submitted in this saved attempt.',
+            description: 'Items submitted in this saved attempt.',
             key: 'submitted',
             label: 'Submitted',
             value: '1',
           },
           {
-            ariaLabel: 'Correct: 1',
+            ariaLabel: 'Correct: 1. Items that matched the expected answer.',
+            description: 'Items that matched the expected answer.',
             key: 'correct',
             label: 'Correct',
             value: '1',
           },
           {
-            ariaLabel: 'Needs review: 0',
+            ariaLabel:
+              'Needs review: 0. Items to review against the expected answer, accepted alternatives, or teacher explanation.',
+            description:
+              'Items to review against the expected answer, accepted alternatives, or teacher explanation.',
             key: 'needs-review',
             label: 'Needs review',
             value: '0',
           },
           {
-            ariaLabel: 'Unanswered: 0',
+            ariaLabel: 'Unanswered: 0. Items left blank in this saved attempt.',
+            description: 'Items left blank in this saved attempt.',
             key: 'unanswered',
             label: 'Unanswered',
             value: '0',
@@ -23263,6 +23287,7 @@ function buildExpectedStudentAttemptFeedbackScopeView({
       ? 'Your teacher will review your answers. Correct answers, accepted alternatives, and explanations are hidden on this link.'
       : 'Your teacher allowed post-submit review. Item feedback below uses the same answer, alternatives, and explanation format across activity types.',
     hiddenBySettings,
+    metricsLabel: 'Feedback coverage details',
     metrics: [
       {
         ariaLabel: hiddenBySettings
@@ -23323,6 +23348,7 @@ function buildExpectedStudentAttemptFeedbackScopeView({
       },
     ],
     status,
+    statusAriaLabel: `Feedback visibility: ${statusLabel}`,
     statusLabel,
     title: 'Feedback coverage',
   };

@@ -294,11 +294,17 @@ function StudentRunnerFeedbackScope({
             {view.description}
           </p>
         </div>
-        <span className={getStudentRunnerFeedbackScopeStatusClassName(view)}>
+        <output
+          aria-label={view.statusAriaLabel}
+          className={getStudentRunnerFeedbackScopeStatusClassName(view)}
+        >
           {view.statusLabel}
-        </span>
+        </output>
       </div>
-      <dl className="mt-2 grid grid-cols-2 gap-2">
+      <dl
+        aria-label={view.metricsLabel}
+        className="mt-2 grid grid-cols-2 gap-2"
+      >
         {view.metrics.map((metric) => (
           <div
             key={metric.key}
@@ -345,7 +351,10 @@ function StudentRunnerReviewSummary({
       <p className="mt-1 text-xs leading-5 text-muted-foreground">
         {view.description}
       </p>
-      <dl className="mt-2 grid grid-cols-2 gap-2">
+      <dl
+        aria-label={view.metricsLabel}
+        className="mt-2 grid grid-cols-2 gap-2"
+      >
         {view.metrics.map((metric) => (
           <div
             key={metric.key}
@@ -357,6 +366,7 @@ function StudentRunnerReviewSummary({
             <dt className="text-[11px] leading-4 text-muted-foreground">
               {metric.label}
             </dt>
+            <p className="sr-only">{metric.description}</p>
           </div>
         ))}
       </dl>

@@ -190,14 +190,20 @@ type StudentRunnerCopy = {
   resultNextStepsTitle: string;
   resultSubmittedLabel: string;
   resultTimePrefix: string;
+  reviewSummaryCorrectDescription: string;
   reviewSummaryCorrectLabel: string;
   reviewSummaryHiddenDescription: string;
   reviewSummaryItemCountLabel: string;
+  reviewSummaryMetricsLabel: string;
+  reviewSummaryNeedsReviewDescription: string;
   reviewSummaryNeedsReviewLabel: string;
+  reviewSummaryReviewVisibilityDescription: string;
   reviewSummaryReviewHiddenValue: string;
   reviewSummaryReviewVisibilityLabel: string;
+  reviewSummarySubmittedDescription: string;
   reviewSummarySubmittedLabel: string;
   reviewSummaryTitle: string;
+  reviewSummaryUnansweredDescription: string;
   reviewSummaryUnansweredLabel: string;
   reviewSummaryVisibleDescription: string;
   seoDescription: string;
@@ -295,6 +301,7 @@ export type StudentAttemptReviewSummaryMetricKey =
 
 export type StudentAttemptReviewSummaryMetricView = {
   ariaLabel: string;
+  description: string;
   key: StudentAttemptReviewSummaryMetricKey;
   label: string;
   value: string;
@@ -304,6 +311,7 @@ export type StudentAttemptReviewSummaryView = {
   ariaLabel: string;
   description: string;
   hiddenBySettings: boolean;
+  metricsLabel: string;
   metrics: StudentAttemptReviewSummaryMetricView[];
   title: string;
 };
@@ -330,8 +338,10 @@ export type StudentAttemptFeedbackScopeView = {
   ariaLabel: string;
   description: string;
   hiddenBySettings: boolean;
+  metricsLabel: string;
   metrics: StudentAttemptFeedbackScopeMetricView[];
   status: StudentAttemptFeedbackScopeStatus;
+  statusAriaLabel: string;
   statusLabel: string;
   title: string;
 };
@@ -435,14 +445,26 @@ const STUDENT_RUNNER_COPY = {
   get reviewSummaryCorrectLabel() {
     return m.student_runner_review_summary_correct_label();
   },
+  get reviewSummaryCorrectDescription() {
+    return m.student_runner_review_summary_correct_description();
+  },
   get reviewSummaryHiddenDescription() {
     return m.student_runner_review_summary_hidden_description();
   },
   get reviewSummaryItemCountLabel() {
     return m.student_runner_review_summary_item_count_label();
   },
+  get reviewSummaryMetricsLabel() {
+    return m.student_runner_review_summary_metrics_label();
+  },
+  get reviewSummaryNeedsReviewDescription() {
+    return m.student_runner_review_summary_needs_review_description();
+  },
   get reviewSummaryNeedsReviewLabel() {
     return m.student_runner_review_summary_needs_review_label();
+  },
+  get reviewSummaryReviewVisibilityDescription() {
+    return m.student_runner_review_summary_review_visibility_description();
   },
   get reviewSummaryReviewHiddenValue() {
     return m.student_runner_review_summary_review_hidden_value();
@@ -450,11 +472,17 @@ const STUDENT_RUNNER_COPY = {
   get reviewSummaryReviewVisibilityLabel() {
     return m.student_runner_review_summary_review_visibility_label();
   },
+  get reviewSummarySubmittedDescription() {
+    return m.student_runner_review_summary_submitted_description();
+  },
   get reviewSummarySubmittedLabel() {
     return m.student_runner_review_summary_submitted_label();
   },
   get reviewSummaryTitle() {
     return m.student_runner_review_summary_title();
+  },
+  get reviewSummaryUnansweredDescription() {
+    return m.student_runner_review_summary_unanswered_description();
   },
   get reviewSummaryUnansweredLabel() {
     return m.student_runner_review_summary_unanswered_label();
@@ -956,18 +984,23 @@ export function buildStudentAttemptReviewSummaryView({
       ariaLabel: m.student_runner_review_summary_aria_label(),
       description: STUDENT_RUNNER_COPY.reviewSummaryHiddenDescription,
       hiddenBySettings,
+      metricsLabel: STUDENT_RUNNER_COPY.reviewSummaryMetricsLabel,
       metrics: [
         buildStudentAttemptReviewSummaryMetricView({
+          description: STUDENT_RUNNER_COPY.reviewSummarySubmittedDescription,
           key: 'submitted',
           label: STUDENT_RUNNER_COPY.reviewSummarySubmittedLabel,
           value: formatStudentReviewSummaryCount(summary.submittedItemCount),
         }),
         buildStudentAttemptReviewSummaryMetricView({
+          description: STUDENT_RUNNER_COPY.reviewSummaryUnansweredDescription,
           key: 'unanswered',
           label: STUDENT_RUNNER_COPY.reviewSummaryUnansweredLabel,
           value: formatStudentReviewSummaryCount(summary.unansweredItemCount),
         }),
         buildStudentAttemptReviewSummaryMetricView({
+          description:
+            STUDENT_RUNNER_COPY.reviewSummaryReviewVisibilityDescription,
           key: 'review',
           label: STUDENT_RUNNER_COPY.reviewSummaryReviewVisibilityLabel,
           value: STUDENT_RUNNER_COPY.reviewSummaryReviewHiddenValue,
@@ -981,23 +1014,28 @@ export function buildStudentAttemptReviewSummaryView({
     ariaLabel: m.student_runner_review_summary_aria_label(),
     description: STUDENT_RUNNER_COPY.reviewSummaryVisibleDescription,
     hiddenBySettings,
+    metricsLabel: STUDENT_RUNNER_COPY.reviewSummaryMetricsLabel,
     metrics: [
       buildStudentAttemptReviewSummaryMetricView({
+        description: STUDENT_RUNNER_COPY.reviewSummarySubmittedDescription,
         key: 'submitted',
         label: STUDENT_RUNNER_COPY.reviewSummarySubmittedLabel,
         value: formatStudentReviewSummaryCount(summary.submittedItemCount),
       }),
       buildStudentAttemptReviewSummaryMetricView({
+        description: STUDENT_RUNNER_COPY.reviewSummaryCorrectDescription,
         key: 'correct',
         label: STUDENT_RUNNER_COPY.reviewSummaryCorrectLabel,
         value: formatStudentReviewSummaryCount(summary.correctItemCount),
       }),
       buildStudentAttemptReviewSummaryMetricView({
+        description: STUDENT_RUNNER_COPY.reviewSummaryNeedsReviewDescription,
         key: 'needs-review',
         label: STUDENT_RUNNER_COPY.reviewSummaryNeedsReviewLabel,
         value: formatStudentReviewSummaryCount(summary.needsReviewItemCount),
       }),
       buildStudentAttemptReviewSummaryMetricView({
+        description: STUDENT_RUNNER_COPY.reviewSummaryUnansweredDescription,
         key: 'unanswered',
         label: STUDENT_RUNNER_COPY.reviewSummaryUnansweredLabel,
         value: formatStudentReviewSummaryCount(summary.unansweredItemCount),
@@ -1020,6 +1058,7 @@ export function buildStudentAttemptFeedbackScopeView({
   const status: StudentAttemptFeedbackScopeStatus = hiddenBySettings
     ? 'hidden'
     : 'visible';
+  const statusLabel = getStudentAttemptFeedbackScopeStatusLabel(status);
 
   return {
     ariaLabel: m.student_runner_feedback_scope_aria_label(),
@@ -1027,6 +1066,7 @@ export function buildStudentAttemptFeedbackScopeView({
       ? m.student_runner_feedback_scope_hidden_description()
       : m.student_runner_feedback_scope_visible_description(),
     hiddenBySettings,
+    metricsLabel: m.student_runner_feedback_scope_metrics_label(),
     metrics: [
       buildStudentAttemptFeedbackScopeMetricView({
         description: hiddenBySettings
@@ -1081,7 +1121,10 @@ export function buildStudentAttemptFeedbackScopeView({
       }),
     ],
     status,
-    statusLabel: getStudentAttemptFeedbackScopeStatusLabel(status),
+    statusAriaLabel: m.student_runner_feedback_scope_status_aria({
+      status: statusLabel,
+    }),
+    statusLabel,
     title: m.student_runner_feedback_scope_title(),
   };
 }
@@ -1176,19 +1219,23 @@ function formatStudentReviewSummaryCount(value: number) {
 }
 
 function buildStudentAttemptReviewSummaryMetricView({
+  description,
   key,
   label,
   value,
 }: {
+  description: string;
   key: StudentAttemptReviewSummaryMetricKey;
   label: string;
   value: string;
 }): StudentAttemptReviewSummaryMetricView {
   return {
     ariaLabel: m.student_runner_review_summary_metric_aria({
+      description,
       label,
       value,
     }),
+    description,
     key,
     label,
     value,
