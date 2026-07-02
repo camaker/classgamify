@@ -24,6 +24,11 @@ import {
   AUTH_WORKSPACE_BOUNDARY_ITEM_IDS,
   buildAuthWorkspaceBoundaryView,
 } from '@/auth/workspace-boundary';
+import {
+  AUTH_ERROR_RECOVERY_STEP_IDS,
+  buildAuthErrorDisplayView,
+  buildAuthErrorRecoveryView,
+} from '@/auth/error-recovery';
 import { buildMailWorkspaceBoundaryView } from '@/mail/workspace-boundary';
 import { getAvatarLinks } from '@/config/avatar-config';
 import { getFooterLinks } from '@/config/footer-config';
@@ -5280,6 +5285,18 @@ const authWorkspaceBoundarySource = readFileSync(
   'src/auth/workspace-boundary.ts',
   'utf8'
 );
+const authErrorRecoverySource = readFileSync(
+  'src/auth/error-recovery.ts',
+  'utf8'
+);
+const authErrorCardSource = readFileSync(
+  'src/components/auth/error-card.tsx',
+  'utf8'
+);
+const authErrorRouteSource = readFileSync(
+  'src/routes/auth/error.tsx',
+  'utf8'
+);
 const loginFormSource = readFileSync(
   'src/components/auth/login-form.tsx',
   'utf8'
@@ -5846,6 +5863,31 @@ assert.match(
   authCardSource,
   /AuthWorkspaceBoundaryView[\s\S]*workspaceBoundary\?: AuthWorkspaceBoundaryView[\s\S]*AuthWorkspaceBoundaryPanel[\s\S]*view\.items\.map\(\(item\) =>[\s\S]*key=\{item\.id\}[\s\S]*item\.label[\s\S]*item\.description/,
   'Auth cards should render the prepared workspace-boundary view from stable item ids.'
+);
+assert.match(
+  authErrorRecoverySource,
+  /AUTH_ERROR_RECOVERY_STEP_IDS[\s\S]*'retry-sign-in'[\s\S]*'check-email'[\s\S]*'protect-workspace'/,
+  'Auth error-recovery domain should own stable recovery step ids.'
+);
+assert.doesNotMatch(
+  authErrorRecoverySource,
+  /Workspace sign-in issue|Recovery steps|Try teacher sign-in again|Workspace data stays protected/,
+  'Auth error-recovery domain should read visible recovery copy from locale messages.'
+);
+assert.match(
+  authErrorCardSource,
+  /buildAuthErrorRecoveryView[\s\S]*getKnownAuthErrorMessage\(errorCode\)[\s\S]*workspaceBoundary=\{buildAuthWorkspaceBoundaryView\(\)\}[\s\S]*recoveryView\.steps\.map\(\(step\) =>[\s\S]*key=\{step\.id\}/,
+  'Auth error card should render prepared recovery and workspace-boundary views.'
+);
+assert.doesNotMatch(
+  authErrorCardSource,
+  /errorDescription|error_description|getDisplayMessage/,
+  'Auth error card should not render raw external error descriptions.'
+);
+assert.match(
+  authErrorRouteSource,
+  /error_description:[\s\S]*component: AuthErrorPage[\s\S]*head: \(\) => \(\{[\s\S]*auth_error_workspace_title[\s\S]*auth_error_workspace_description[\s\S]*const \{ callbackUrl, error \} = Route\.useSearch\(\)[\s\S]*<ErrorCard callbackUrl=\{callbackUrl\} errorCode=\{error\} \/>/,
+  'Auth error route should parse external descriptions without passing them into the UI.'
 );
 assert.doesNotMatch(
   authCardSource,
@@ -10135,6 +10177,28 @@ assert.deepEqual(
     ['source-materials', 'Source materials'],
   ]
 );
+assert.deepEqual(AUTH_ERROR_RECOVERY_STEP_IDS, [
+  'retry-sign-in',
+  'check-email',
+  'protect-workspace',
+]);
+assert.deepEqual(buildAuthErrorDisplayView('  Known localized message  '), {
+  message: 'Known localized message',
+  source: 'known-code',
+});
+assert.deepEqual(buildAuthErrorDisplayView(undefined), {
+  message:
+    'The sign-in request could not be completed. Your classroom activities, assignment links, source materials, and results are still protected.',
+  source: 'fallback',
+});
+const authErrorRecoveryView = buildAuthErrorRecoveryView({
+  knownMessage: 'Session expired or invalid. Please try again.',
+});
+assert.equal(authErrorRecoveryView.title, 'Workspace sign-in issue');
+assert.deepEqual(
+  authErrorRecoveryView.steps.map((step) => step.id),
+  ['retry-sign-in', 'check-email', 'protect-workspace']
+);
 const authWorkspaceBoundaryRequirements = [
   [
     enLocaleMessages,
@@ -10149,6 +10213,12 @@ const authWorkspaceBoundaryRequirements = [
       ['auth_register_benefit_review', /student attempts/],
       ['auth_forgot_password_description', /activities, assignment links, and results/],
       ['auth_reset_password_description', /source materials, and result records/],
+      ['auth_error_workspace_title', /Workspace sign-in issue/],
+      ['auth_error_workspace_description', /creating, publishing, or reviewing classroom work/],
+      ['auth_error_workspace_unknown_message', /classroom activities, assignment links, source materials, and results/],
+      ['auth_error_recovery_retry_sign_in_description', /activity, assignment, result, or settings page/],
+      ['auth_error_recovery_check_email_description', /verification or password link/],
+      ['auth_error_recovery_protect_workspace_description', /saved activities, source materials, assignment links/],
       ['auth_workspace_boundary_title', /Teacher workspace boundary/],
       ['auth_workspace_boundary_description', /creating, publishing, and reviewing classroom work/],
       ['auth_workspace_boundary_item_account_access_description', /protected teacher workspace/],
@@ -10215,6 +10285,12 @@ const authWorkspaceBoundaryRequirements = [
       ['auth_register_benefit_review', /学生尝试/],
       ['auth_forgot_password_description', /活动、作业链接和结果记录/],
       ['auth_reset_password_description', /来源素材和结果记录/],
+      ['auth_error_workspace_title', /工作区登录异常/],
+      ['auth_error_workspace_description', /创建、发布或复盘课堂工作/],
+      ['auth_error_workspace_unknown_message', /课堂活动、作业链接、来源素材和结果记录/],
+      ['auth_error_recovery_retry_sign_in_description', /活动、作业、结果或设置页面/],
+      ['auth_error_recovery_check_email_description', /验证或密码链接/],
+      ['auth_error_recovery_protect_workspace_description', /已保存活动、来源素材、作业链接/],
       ['auth_workspace_boundary_title', /教师工作区边界/],
       ['auth_workspace_boundary_description', /创建、发布和复盘课堂工作/],
       ['auth_workspace_boundary_item_account_access_description', /受保护的教师工作区/],

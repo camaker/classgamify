@@ -1,55 +1,97 @@
 import { getAuthErrorMessages } from '@/lib/locale';
 import { m } from '@/locale/paraglide/messages';
 import { AuthCard } from '@/components/auth/auth-card';
+import { buildAuthErrorRecoveryView } from '@/auth/error-recovery';
+import { buildAuthWorkspaceBoundaryView } from '@/auth/workspace-boundary';
 import { Routes } from '@/lib/routes';
 import { getSafeCallbackPath } from '@/lib/urls';
-import { IconAlertTriangle } from '@tabler/icons-react';
-function getDisplayMessage(
-  errorCode: string | undefined,
-  errorDescription: string | undefined
-): string {
+import { IconAlertTriangle, IconCircleCheck } from '@tabler/icons-react';
+
+function getKnownAuthErrorMessage(
+  errorCode: string | undefined
+): string | undefined {
   const authErrorMessages = getAuthErrorMessages();
+  const normalizedCode = errorCode?.toLowerCase();
+
   if (errorCode && authErrorMessages[errorCode]) {
     return authErrorMessages[errorCode];
   }
-  if (errorDescription) {
-    return errorDescription;
+  if (normalizedCode && authErrorMessages[normalizedCode]) {
+    return authErrorMessages[normalizedCode];
   }
-  if (errorCode) {
-    return errorCode;
-  }
-  return m.auth_error_try_again();
+
+  return undefined;
 }
+
 export function ErrorCard({
   callbackUrl,
   errorCode,
-  errorDescription,
 }: {
   callbackUrl?: string;
   errorCode?: string;
-  errorDescription?: string;
 } = {}) {
-  const displayMessage = getDisplayMessage(errorCode, errorDescription);
+  const recoveryView = buildAuthErrorRecoveryView({
+    knownMessage: getKnownAuthErrorMessage(errorCode),
+  });
   const safeCallbackUrl = getSafeCallbackPath(callbackUrl, Routes.Create);
   const authSwitchSearch =
     safeCallbackUrl === Routes.Create
       ? undefined
       : { callbackUrl: safeCallbackUrl };
+
   return (
     <AuthCard
-      headerLabel={m.auth_error_title()}
+      headerLabel={recoveryView.title}
+      description={recoveryView.description}
+      workspaceBoundary={buildAuthWorkspaceBoundaryView()}
       bottomButtonHref={Routes.Login}
       bottomButtonLabel={m.auth_error_back_to_login()}
       bottomButtonSearch={authSwitchSearch}
       className="border-none"
     >
-      <div className="w-full flex flex-col justify-center items-center py-4 gap-2">
-        <div className="flex items-center gap-2">
-          <IconAlertTriangle className="text-destructive size-4 shrink-0" />
-          <p className="font-medium text-destructive text-center">
-            {displayMessage}
-          </p>
+      <div className="w-full space-y-4 py-4">
+        <div className="rounded-lg border border-destructive/30 bg-destructive/5 p-3">
+          <div className="flex items-start gap-2">
+            <IconAlertTriangle
+              aria-hidden="true"
+              className="mt-0.5 size-4 shrink-0 text-destructive"
+            />
+            <div className="min-w-0 space-y-1">
+              <p className="text-xs font-medium text-destructive">
+                {recoveryView.messageLabel}
+              </p>
+              <p className="text-sm font-medium text-destructive">
+                {recoveryView.message.message}
+              </p>
+            </div>
+          </div>
         </div>
+        <section
+          aria-label={recoveryView.stepsTitle}
+          className="rounded-lg border bg-muted/30 p-3"
+        >
+          <p className="text-xs font-medium text-foreground">
+            {recoveryView.stepsTitle}
+          </p>
+          <ul className="mt-3 space-y-2">
+            {recoveryView.steps.map((step) => (
+              <li key={step.id} className="flex gap-2">
+                <IconCircleCheck
+                  aria-hidden="true"
+                  className="mt-0.5 size-4 shrink-0 text-primary"
+                />
+                <span className="min-w-0">
+                  <span className="block text-xs font-medium text-foreground">
+                    {step.title}
+                  </span>
+                  <span className="mt-0.5 block text-xs leading-relaxed text-muted-foreground">
+                    {step.description}
+                  </span>
+                </span>
+              </li>
+            ))}
+          </ul>
+        </section>
       </div>
     </AuthCard>
   );
