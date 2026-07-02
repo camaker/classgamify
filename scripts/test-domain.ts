@@ -6959,7 +6959,12 @@ assert.match(
 );
 assert.match(
   assignmentResultsClassroomBriefCardSource,
-  /AssignmentResultsCopyArtifactPreviewScope[\s\S]*copyScopeView=\{preview\.copyScopeView\}[\s\S]*function AssignmentResultsCopyArtifactPreviewScope[\s\S]*copyScopeView\.title[\s\S]*copyScopeView\.itemViews\.map[\s\S]*itemView\.label[\s\S]*itemView\.value[\s\S]*copyScopeView\.summaryItems\.map[\s\S]*summaryItem\.label[\s\S]*summaryItem\.value/,
+  /const titleId = getCopyArtifactPreviewTitleId\(preview\.id\)[\s\S]*const descriptionId = getCopyArtifactPreviewDescriptionId\(preview\.id\)[\s\S]*const scopeDescriptionId = getCopyArtifactPreviewScopeDescriptionId\([\s\S]*preview\.id[\s\S]*const describedBy = \[[\s\S]*descriptionId,[\s\S]*scopeDescriptionId,[\s\S]*disabledReasonId[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*aria-labelledby=\{titleId\}[\s\S]*id=\{titleId\}[\s\S]*id=\{descriptionId\}[\s\S]*aria-describedby=\{describedBy\}/,
+  'Assignment classroom brief copy artifact preview cards should associate preview labels, descriptions, copy-scope descriptions, and disabled reasons with their controls.'
+);
+assert.match(
+  assignmentResultsClassroomBriefCardSource,
+  /AssignmentResultsCopyArtifactPreviewScope[\s\S]*copyScopeView=\{preview\.copyScopeView\}[\s\S]*descriptionId=\{scopeDescriptionId\}[\s\S]*function AssignmentResultsCopyArtifactPreviewScope[\s\S]*descriptionId: string;[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*copyScopeView\.title[\s\S]*id=\{descriptionId\}[\s\S]*copyScopeView\.description[\s\S]*copyScopeView\.itemViews\.map[\s\S]*itemView\.label[\s\S]*itemView\.value[\s\S]*copyScopeView\.summaryItems\.map[\s\S]*summaryItem\.label[\s\S]*summaryItem\.value/,
   'Assignment classroom brief copy artifact preview cards should render each preview-specific copy scope and summary count item.'
 );
 assert.match(
@@ -6969,8 +6974,13 @@ assert.match(
 );
 assert.match(
   assignmentResultsClassroomBriefCardSource,
-  /const disabledReasonId = getCopyArtifactPreviewDisabledReasonId\([\s\S]*preview\.actionButton[\s\S]*aria-describedby=\{disabledReasonId\}[\s\S]*AssignmentResultsCopyArtifactDisabledReason[\s\S]*actionButton=\{preview\.actionButton\}[\s\S]*disabledReasonId=\{disabledReasonId\}/,
+  /const disabledReasonId = getCopyArtifactPreviewDisabledReasonId\([\s\S]*preview\.actionButton[\s\S]*const describedBy = \[[\s\S]*disabledReasonId[\s\S]*aria-describedby=\{describedBy\}[\s\S]*AssignmentResultsCopyArtifactDisabledReason[\s\S]*actionButton=\{preview\.actionButton\}[\s\S]*disabledReasonId=\{disabledReasonId\}/,
   'Assignment classroom brief copy artifact preview buttons should associate disabled actions with their prepared disabled reason text.'
+);
+assert.match(
+  assignmentResultsClassroomBriefCardSource,
+  /function getCopyArtifactPreviewTitleId\([\s\S]*AssignmentResultCopyArtifactPreview\['id'\][\s\S]*function getCopyArtifactPreviewDescriptionId\([\s\S]*AssignmentResultCopyArtifactPreview\['id'\][\s\S]*function getCopyArtifactPreviewScopeDescriptionId\([\s\S]*AssignmentResultCopyArtifactPreview\['id'\]/,
+  'Assignment classroom brief copy artifact preview ids should be stable from the prepared preview id contract.'
 );
 assert.match(
   assignmentResultsClassroomBriefCardSource,

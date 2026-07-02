@@ -449,13 +449,29 @@ function AssignmentResultsCopyArtifactPreview({
   const disabledReasonId = getCopyArtifactPreviewDisabledReasonId(
     preview.actionButton
   );
+  const titleId = getCopyArtifactPreviewTitleId(preview.id);
+  const descriptionId = getCopyArtifactPreviewDescriptionId(preview.id);
+  const scopeDescriptionId = getCopyArtifactPreviewScopeDescriptionId(
+    preview.id
+  );
+  const describedBy = [descriptionId, scopeDescriptionId, disabledReasonId]
+    .filter(Boolean)
+    .join(' ');
 
   return (
-    <article className="grid gap-2 rounded-md border bg-background p-3">
+    <article
+      aria-describedby={descriptionId}
+      aria-labelledby={titleId}
+      className="grid gap-2 rounded-md border bg-background p-3"
+    >
       <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
         <div className="grid gap-1">
-          <h4 className="font-medium text-sm">{preview.label}</h4>
-          <p className="text-muted-foreground text-xs">{preview.description}</p>
+          <h4 id={titleId} className="font-medium text-sm">
+            {preview.label}
+          </h4>
+          <p id={descriptionId} className="text-muted-foreground text-xs">
+            {preview.description}
+          </p>
         </div>
         <Button
           type="button"
@@ -465,7 +481,7 @@ function AssignmentResultsCopyArtifactPreview({
           disabled={preview.actionButton.disabled}
           onClick={() => onResultAction(preview.actionButton)}
           aria-label={preview.actionButton.ariaLabel}
-          aria-describedby={disabledReasonId}
+          aria-describedby={describedBy}
         >
           <IconCopy aria-hidden="true" className="size-4" />
           {preview.actionButton.label}
@@ -477,6 +493,7 @@ function AssignmentResultsCopyArtifactPreview({
       />
       <AssignmentResultsCopyArtifactPreviewScope
         copyScopeView={preview.copyScopeView}
+        descriptionId={scopeDescriptionId}
       />
       <div className="grid gap-2">
         <p className="font-medium text-xs">{preview.summaryLabel}</p>
@@ -501,15 +518,21 @@ function AssignmentResultsCopyArtifactPreview({
 
 function AssignmentResultsCopyArtifactPreviewScope({
   copyScopeView,
+  descriptionId,
 }: {
   copyScopeView: AssignmentResultCopyArtifactPreviewScope;
+  descriptionId: string;
 }) {
   return (
     <section
+      aria-describedby={descriptionId}
       aria-label={copyScopeView.title}
       className="grid gap-2 rounded-md bg-muted/30 p-2 text-xs"
     >
       <p className="font-medium">{copyScopeView.title}</p>
+      <p id={descriptionId} className="sr-only">
+        {copyScopeView.description}
+      </p>
       <div className="flex flex-wrap gap-2">
         {copyScopeView.itemViews.map((itemView) => (
           <Badge key={itemView.id} variant="outline" className="rounded-md">
@@ -561,4 +584,22 @@ function getCopyArtifactPreviewDisabledReasonId({
   return disabledReason
     ? `assignment-result-copy-preview-${id}-disabled-reason`
     : undefined;
+}
+
+function getCopyArtifactPreviewTitleId(
+  id: AssignmentResultCopyArtifactPreview['id']
+) {
+  return `assignment-result-copy-preview-${id}-title`;
+}
+
+function getCopyArtifactPreviewDescriptionId(
+  id: AssignmentResultCopyArtifactPreview['id']
+) {
+  return `assignment-result-copy-preview-${id}-description`;
+}
+
+function getCopyArtifactPreviewScopeDescriptionId(
+  id: AssignmentResultCopyArtifactPreview['id']
+) {
+  return `assignment-result-copy-preview-${id}-scope-description`;
 }
