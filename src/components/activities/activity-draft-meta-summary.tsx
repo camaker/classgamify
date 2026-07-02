@@ -2,6 +2,8 @@ import type { ActivityDraftResult } from '@/activities/ai-draft';
 import type { ActivitySourceMaterialDraftNoteView } from '@/activities/draft-source';
 import {
   buildActivityDraftMetaSummaryView,
+  type ActivityDraftMetaReviewGateMetricView,
+  type ActivityDraftMetaReviewGateView,
   type ActivityDraftMetaSummaryCoverageStatView,
   type ActivityDraftMetaSummaryQuestionChoiceReadinessItemView,
   type ActivityDraftMetaSummaryQuestionChoiceReadinessView,
@@ -56,6 +58,7 @@ export function ActivityDraftMetaSummary({
         </div>
       </div>
       <ActivityDraftTrustPanel trustView={summaryView.trustView} />
+      <ActivityDraftReviewGate reviewGateView={summaryView.reviewGateView} />
       <div className="mt-3 rounded-lg border bg-background p-3 text-xs leading-5 text-muted-foreground">
         <p className="font-medium">{summaryView.draftFocusLineText}</p>
         <p className="mt-1">{summaryView.draftFocusDescription}</p>
@@ -190,6 +193,76 @@ export function ActivityDraftMetaSummary({
           />
         ))}
       </div>
+    </div>
+  );
+}
+
+function ActivityDraftReviewGate({
+  reviewGateView,
+}: {
+  reviewGateView: ActivityDraftMetaReviewGateView;
+}) {
+  return (
+    <section
+      aria-label={reviewGateView.ariaLabel}
+      className={cn(
+        'mt-4 rounded-lg border bg-background p-3',
+        reviewGateView.status === 'action-needed' &&
+          'border-amber-200 bg-amber-50/50',
+        reviewGateView.status === 'ready-to-save' &&
+          'border-emerald-200 bg-emerald-50/50'
+      )}
+    >
+      <div className="flex flex-wrap items-start justify-between gap-2">
+        <div>
+          <h4 className="font-medium text-sm">{reviewGateView.title}</h4>
+          <p className="mt-1 text-muted-foreground text-xs leading-5">
+            {reviewGateView.description}
+          </p>
+        </div>
+        <Badge
+          variant={
+            reviewGateView.status === 'ready-to-save' ? 'secondary' : 'outline'
+          }
+          className={cn(
+            'w-fit rounded-md',
+            reviewGateView.status === 'action-needed' &&
+              'border-amber-300 text-amber-800',
+            reviewGateView.status === 'ready-to-save' &&
+              'border-emerald-200 bg-emerald-50 text-emerald-700'
+          )}
+        >
+          {reviewGateView.badgeLabel}
+        </Badge>
+      </div>
+      <dl className="mt-3 grid gap-2 sm:grid-cols-2 lg:grid-cols-7">
+        {reviewGateView.metricViews.map((metricView) => (
+          <ActivityDraftReviewGateMetric
+            key={metricView.id}
+            metricView={metricView}
+          />
+        ))}
+      </dl>
+    </section>
+  );
+}
+
+function ActivityDraftReviewGateMetric({
+  metricView,
+}: {
+  metricView: ActivityDraftMetaReviewGateMetricView;
+}) {
+  return (
+    <div className="rounded-md border bg-background/80 p-2.5">
+      <dt className="text-muted-foreground text-xs leading-5">
+        {metricView.label}
+      </dt>
+      <dd className="mt-1 font-medium text-xs leading-5">
+        <output aria-label={metricView.ariaLabel}>{metricView.value}</output>
+      </dd>
+      <dd className="mt-1 text-muted-foreground text-xs leading-5">
+        {metricView.description}
+      </dd>
     </div>
   );
 }

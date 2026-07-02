@@ -218,6 +218,37 @@ export type ActivityDraftMetaSummaryTrustView = {
   title: string;
 };
 
+export type ActivityDraftMetaReviewGateStatus =
+  | 'action-needed'
+  | 'ready-to-save'
+  | 'review-required';
+
+export type ActivityDraftMetaReviewGateMetricId =
+  | 'action-needed'
+  | 'locked-templates'
+  | 'omitted-sources'
+  | 'ready'
+  | 'ready-templates'
+  | 'review-required'
+  | 'safe-sources';
+
+export type ActivityDraftMetaReviewGateMetricView = {
+  ariaLabel: string;
+  description: string;
+  id: ActivityDraftMetaReviewGateMetricId;
+  label: string;
+  value: number;
+};
+
+export type ActivityDraftMetaReviewGateView = {
+  ariaLabel: string;
+  badgeLabel: string;
+  description: string;
+  metricViews: ActivityDraftMetaReviewGateMetricView[];
+  status: ActivityDraftMetaReviewGateStatus;
+  title: string;
+};
+
 export type ActivityDraftMetaSummaryView = {
   appliedDescription: string;
   appliedLabel: string;
@@ -244,6 +275,7 @@ export type ActivityDraftMetaSummaryView = {
   readyTemplateLabel: string;
   readyTemplatesTitle: string;
   reviewChecklist: string[];
+  reviewGateView: ActivityDraftMetaReviewGateView;
   reviewChecklistItems: ActivityDraftReviewChecklistItemView[];
   reviewChecklistStatusViews: ActivityDraftReviewChecklistStatusView[];
   sourceMaterialCapabilityDescription: string;
@@ -381,12 +413,18 @@ export function buildActivityDraftMetaSummaryView({
   const draftFocusName = formatActivityAiDraftFocusLabel(normalizedDraftFocus);
   const sourceMaterialSafetySummary =
     buildActivitySourceMaterialDraftNoteSafetySummary(sourceMaterialNoteViews);
+  const sourceMaterialSafetyView =
+    buildActivityDraftMetaSummarySourceMaterialSafetyView(
+      sourceMaterialSafetySummary
+    );
   const normalizedSourceMaterialNoteViews =
     normalizeActivityDraftSourceMaterialNoteViews(sourceMaterialSafetySummary);
   const reviewChecklistItems = buildActivityDraftReviewChecklistItemViews({
     checklist: meta.reviewChecklist,
     items: meta.reviewChecklistItems,
   });
+  const reviewChecklistStatusViews =
+    buildActivityDraftReviewChecklistStatusViews(reviewChecklistItems);
   const providerDescription = buildActivityDraftProviderDescription({
     notice: normalizedNotice,
     provider,
@@ -515,9 +553,16 @@ export function buildActivityDraftMetaSummaryView({
           }),
     readyTemplatesTitle: m.activity_draft_meta_ready_templates_title(),
     reviewChecklist: meta.reviewChecklist,
+    reviewGateView: buildActivityDraftMetaReviewGateView({
+      lockedTemplateCount,
+      notice: normalizedNotice,
+      provider,
+      readyTemplateCount,
+      reviewChecklistItems,
+      sourceMaterialSafetyView,
+    }),
     reviewChecklistItems,
-    reviewChecklistStatusViews:
-      buildActivityDraftReviewChecklistStatusViews(reviewChecklistItems),
+    reviewChecklistStatusViews,
     sourceMaterialCapabilityDescription:
       m.activity_draft_meta_source_material_capabilities_description(),
     sourceMaterialCapabilityTitle:
@@ -535,10 +580,7 @@ export function buildActivityDraftMetaSummaryView({
     sourceMaterialDescription:
       m.activity_draft_meta_source_materials_description(),
     sourceMaterialNoteViews: normalizedSourceMaterialNoteViews,
-    sourceMaterialSafetyView:
-      buildActivityDraftMetaSummarySourceMaterialSafetyView(
-        sourceMaterialSafetySummary
-      ),
+    sourceMaterialSafetyView,
     sourceMaterialTitle: m.activity_draft_meta_source_materials_title(),
     suggestedTemplateOptions: meta.suggestedTemplateOptions,
     suggestedTemplatesEmptyText:
@@ -554,6 +596,165 @@ export function buildActivityDraftMetaSummaryView({
       sourceMaterialCount: normalizedSourceMaterialNoteViews.length,
     }),
   };
+}
+
+function buildActivityDraftMetaReviewGateView({
+  lockedTemplateCount,
+  notice,
+  provider,
+  readyTemplateCount,
+  reviewChecklistItems,
+  sourceMaterialSafetyView,
+}: {
+  lockedTemplateCount: number;
+  notice?: string;
+  provider: ActivityDraftProvider;
+  readyTemplateCount: number;
+  reviewChecklistItems: ActivityDraftReviewChecklistItemView[];
+  sourceMaterialSafetyView: ActivityDraftMetaSummarySourceMaterialSafetyView;
+}): ActivityDraftMetaReviewGateView {
+  const actionNeededCount = countActivityDraftReviewChecklistStatus(
+    reviewChecklistItems,
+    'action-needed'
+  );
+  const reviewRequiredCount = countActivityDraftReviewChecklistStatus(
+    reviewChecklistItems,
+    'review'
+  );
+  const readyCount = countActivityDraftReviewChecklistStatus(
+    reviewChecklistItems,
+    'ready'
+  );
+  const omittedSourceCount = normalizeActivityDraftMetaCount(
+    sourceMaterialSafetyView.omittedCount
+  );
+  const hasActionNeeded =
+    actionNeededCount > 0 || omittedSourceCount > 0 || readyTemplateCount === 0;
+  const hasReviewRequired =
+    reviewRequiredCount > 0 ||
+    lockedTemplateCount > 0 ||
+    provider === 'fallback' ||
+    Boolean(notice);
+  const status: ActivityDraftMetaReviewGateStatus = hasActionNeeded
+    ? 'action-needed'
+    : hasReviewRequired
+      ? 'review-required'
+      : 'ready-to-save';
+  const badgeLabel = formatActivityDraftMetaReviewGateBadge(status);
+
+  return {
+    ariaLabel: m.activity_draft_meta_review_gate_aria_label({
+      status: badgeLabel,
+    }),
+    badgeLabel,
+    description: formatActivityDraftMetaReviewGateDescription(status),
+    metricViews: [
+      buildActivityDraftMetaReviewGateMetricView({
+        description:
+          m.activity_draft_meta_review_gate_metric_action_needed_description(),
+        id: 'action-needed',
+        label: m.activity_draft_meta_review_gate_metric_action_needed_label(),
+        value: actionNeededCount,
+      }),
+      buildActivityDraftMetaReviewGateMetricView({
+        description:
+          m.activity_draft_meta_review_gate_metric_review_required_description(),
+        id: 'review-required',
+        label: m.activity_draft_meta_review_gate_metric_review_required_label(),
+        value: reviewRequiredCount,
+      }),
+      buildActivityDraftMetaReviewGateMetricView({
+        description:
+          m.activity_draft_meta_review_gate_metric_ready_description(),
+        id: 'ready',
+        label: m.activity_draft_meta_review_gate_metric_ready_label(),
+        value: readyCount,
+      }),
+      buildActivityDraftMetaReviewGateMetricView({
+        description:
+          m.activity_draft_meta_review_gate_metric_ready_templates_description(),
+        id: 'ready-templates',
+        label: m.activity_draft_meta_review_gate_metric_ready_templates_label(),
+        value: readyTemplateCount,
+      }),
+      buildActivityDraftMetaReviewGateMetricView({
+        description:
+          m.activity_draft_meta_review_gate_metric_locked_templates_description(),
+        id: 'locked-templates',
+        label:
+          m.activity_draft_meta_review_gate_metric_locked_templates_label(),
+        value: lockedTemplateCount,
+      }),
+      buildActivityDraftMetaReviewGateMetricView({
+        description:
+          m.activity_draft_meta_review_gate_metric_safe_sources_description(),
+        id: 'safe-sources',
+        label: m.activity_draft_meta_review_gate_metric_safe_sources_label(),
+        value: sourceMaterialSafetyView.safeCount,
+      }),
+      buildActivityDraftMetaReviewGateMetricView({
+        description:
+          m.activity_draft_meta_review_gate_metric_omitted_sources_description(),
+        id: 'omitted-sources',
+        label: m.activity_draft_meta_review_gate_metric_omitted_sources_label(),
+        value: omittedSourceCount,
+      }),
+    ],
+    status,
+    title: m.activity_draft_meta_review_gate_title(),
+  };
+}
+
+function buildActivityDraftMetaReviewGateMetricView({
+  description,
+  id,
+  label,
+  value,
+}: {
+  description: string;
+  id: ActivityDraftMetaReviewGateMetricId;
+  label: string;
+  value: number;
+}): ActivityDraftMetaReviewGateMetricView {
+  const normalizedValue = normalizeActivityDraftMetaCount(value);
+
+  return {
+    ariaLabel: formatActivityDraftMetaSummaryItemAriaLabel({
+      description,
+      label,
+      value: String(normalizedValue),
+    }),
+    description,
+    id,
+    label,
+    value: normalizedValue,
+  };
+}
+
+function formatActivityDraftMetaReviewGateBadge(
+  status: ActivityDraftMetaReviewGateStatus
+) {
+  switch (status) {
+    case 'action-needed':
+      return m.activity_draft_meta_review_gate_badge_action_needed();
+    case 'ready-to-save':
+      return m.activity_draft_meta_review_gate_badge_ready_to_save();
+    case 'review-required':
+      return m.activity_draft_meta_review_gate_badge_review_required();
+  }
+}
+
+function formatActivityDraftMetaReviewGateDescription(
+  status: ActivityDraftMetaReviewGateStatus
+) {
+  switch (status) {
+    case 'action-needed':
+      return m.activity_draft_meta_review_gate_description_action_needed();
+    case 'ready-to-save':
+      return m.activity_draft_meta_review_gate_description_ready_to_save();
+    case 'review-required':
+      return m.activity_draft_meta_review_gate_description_review_required();
+  }
 }
 
 function buildActivityDraftMetaSummaryTrustView({

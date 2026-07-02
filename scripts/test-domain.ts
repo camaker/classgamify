@@ -211,6 +211,8 @@ import {
   buildActivityTemplateReadinessPanelSummary,
   getActivityTemplateQuizChoiceReadinessItemPosition,
   normalizeActivityDraftMetaCount,
+  type ActivityDraftMeta,
+  type ActivityDraftMetaReviewGateMetricView,
   type ActivityDraftReviewChecklistItem,
 } from '@/activities/draft-meta';
 import {
@@ -1056,6 +1058,22 @@ function findActivityDraftChecklistItem<
   );
 
   return item;
+}
+
+function findActivityDraftReviewGateMetric<
+  T extends Pick<ActivityDraftMetaReviewGateMetricView, 'id'>,
+>({
+  id,
+  metrics,
+}: {
+  id: ActivityDraftMetaReviewGateMetricView['id'];
+  metrics: readonly T[];
+}): T {
+  const metric = metrics.find((candidate) => candidate.id === id);
+
+  assert.ok(metric, `Expected AI draft review gate metric "${id}".`);
+
+  return metric;
 }
 
 const activityEditorDefaultInput = getActivityEditorDefaultInput();
@@ -4523,6 +4541,11 @@ assert.match(
 );
 assert.match(
   activityDraftMetaSource,
+  /export type ActivityDraftMetaReviewGateStatus =[\s\S]*'action-needed'[\s\S]*'ready-to-save'[\s\S]*'review-required'[\s\S]*export type ActivityDraftMetaReviewGateMetricId =[\s\S]*'action-needed'[\s\S]*'locked-templates'[\s\S]*'omitted-sources'[\s\S]*'ready'[\s\S]*'ready-templates'[\s\S]*'review-required'[\s\S]*'safe-sources'[\s\S]*export type ActivityDraftMetaReviewGateView = \{[\s\S]*badgeLabel: string;[\s\S]*metricViews: ActivityDraftMetaReviewGateMetricView\[\];[\s\S]*status: ActivityDraftMetaReviewGateStatus;/,
+  'AI draft meta domain should expose an explicit save review-gate status and metric view contract.'
+);
+assert.match(
+  activityDraftMetaSource,
   /export type ActivityDraftMetaSummaryCoverageStatId =[\s\S]*'groups'[\s\S]*'pairs'[\s\S]*'questions'[\s\S]*'teacher-notes'[\s\S]*'vocabulary'[\s\S]*export type ActivityDraftMetaSummaryCoverageStatView = \{[\s\S]*ariaLabel: string;[\s\S]*description: string;[\s\S]*id: ActivityDraftMetaSummaryCoverageStatId;[\s\S]*label: string;[\s\S]*value: number;/,
   'AI draft coverage stats should expose stable ids, aria labels, and descriptions separately from localized labels.'
 );
@@ -4566,9 +4589,14 @@ assert.match(
   /ActivityDraftMetaSummaryTrustItemView[\s\S]*ActivityDraftMetaSummaryTrustView/,
   'AI draft summary component should import explicit trust subview contracts.'
 );
+assert.match(
+  activityDraftMetaSummarySource,
+  /ActivityDraftMetaReviewGateMetricView[\s\S]*ActivityDraftMetaReviewGateView/,
+  'AI draft summary component should import explicit review-gate child view contracts.'
+);
 assert.doesNotMatch(
   activityDraftMetaSummarySource,
-  /ReturnType<typeof buildActivityDraftMetaSummaryView>|ActivityDraftMetaSummaryView\['(?:sourceMaterialCapabilityViews|reviewChecklistItems|questionChoiceReadiness|coverageStats|templateReadinessOptions)'\]|NonNullable</,
+  /ReturnType<typeof buildActivityDraftMetaSummaryView>|ActivityDraftMetaSummaryView\['(?:sourceMaterialCapabilityViews|reviewChecklistItems|questionChoiceReadiness|coverageStats|templateReadinessOptions|reviewGateView)'\]|NonNullable</,
   'AI draft summary component should not infer child prop contracts from builder return types, aggregate view indexes, or NonNullable.'
 );
 assert.match(
@@ -4645,6 +4673,26 @@ assert.match(
   activityDraftMetaSummarySource,
   /ActivityDraftTrustPanel[\s\S]*trustView=\{summaryView\.trustView\}/,
   'AI draft summary component should delegate provider, model, notice, review-gate, and source-safety provenance to the trust panel.'
+);
+assert.match(
+  activityDraftMetaSummarySource,
+  /ActivityDraftReviewGate[\s\S]*reviewGateView=\{summaryView\.reviewGateView\}/,
+  'AI draft summary component should delegate save review-gate rendering to a prepared view.'
+);
+assert.match(
+  activityDraftMetaSummarySource,
+  /function ActivityDraftReviewGate[\s\S]*reviewGateView\.ariaLabel[\s\S]*reviewGateView\.title[\s\S]*reviewGateView\.description[\s\S]*reviewGateView\.badgeLabel[\s\S]*reviewGateView\.metricViews\.map[\s\S]*ActivityDraftReviewGateMetric/,
+  'AI draft review-gate component should render prepared title, description, badge, and metric views.'
+);
+assert.match(
+  activityDraftMetaSummarySource,
+  /function ActivityDraftReviewGateMetric[\s\S]*metricView\.label[\s\S]*<output aria-label=\{metricView\.ariaLabel\}>\{metricView\.value\}<\/output>[\s\S]*metricView\.description/,
+  'AI draft review-gate metrics should render prepared label, aria value, and description fields.'
+);
+assert.doesNotMatch(
+  activityDraftMetaSummarySource,
+  /Save review gate|Action needed before save|Teacher review required|Ready to save|保存前检查门槛|保存前需要处理|需要老师检查|可以保存/,
+  'AI draft summary component should not hard-code visible save review-gate copy.'
 );
 assert.match(
   activityDraftMetaSummarySource,
@@ -4822,13 +4870,28 @@ assert.doesNotMatch(
 );
 assert.match(
   activityDraftMetaSource,
-  /const reviewChecklistItems = buildActivityDraftReviewChecklistItemViews[\s\S]*reviewChecklistStatusViews:[\s\S]*buildActivityDraftReviewChecklistStatusViews\(reviewChecklistItems\)/,
+  /const reviewChecklistItems = buildActivityDraftReviewChecklistItemViews[\s\S]*const reviewChecklistStatusViews =[\s\S]*buildActivityDraftReviewChecklistStatusViews\(reviewChecklistItems\)[\s\S]*reviewChecklistStatusViews,/,
   'AI draft meta summary should derive checklist status overview badges from prepared checklist item views.'
+);
+assert.match(
+  activityDraftMetaSource,
+  /const sourceMaterialSafetyView =[\s\S]*buildActivityDraftMetaSummarySourceMaterialSafetyView[\s\S]*reviewGateView: buildActivityDraftMetaReviewGateView\(\{[\s\S]*lockedTemplateCount[\s\S]*notice: normalizedNotice[\s\S]*provider[\s\S]*readyTemplateCount[\s\S]*reviewChecklistItems[\s\S]*sourceMaterialSafetyView/,
+  'AI draft meta summary should build the save review gate from checklist, template, source-safety, provider, and notice signals.'
 );
 assert.match(
   activityDraftMetaSource,
   /function buildActivityDraftReviewChecklistStatusViews[\s\S]*activity_draft_meta_checklist_status_summary_action_needed[\s\S]*activity_draft_meta_checklist_status_summary_review[\s\S]*activity_draft_meta_checklist_status_summary_ready/,
   'AI draft checklist status overview should use localized status summary copy.'
+);
+assert.match(
+  activityDraftMetaSource,
+  /function buildActivityDraftMetaReviewGateView[\s\S]*countActivityDraftReviewChecklistStatus\([\s\S]*'action-needed'[\s\S]*countActivityDraftReviewChecklistStatus\([\s\S]*'review'[\s\S]*countActivityDraftReviewChecklistStatus\([\s\S]*'ready'[\s\S]*omittedSourceCount[\s\S]*readyTemplateCount === 0[\s\S]*provider === 'fallback'[\s\S]*Boolean\(notice\)/,
+  'AI draft save review gate should classify save readiness from checklist counts, source omissions, template readiness, fallback provider, and generation notices.'
+);
+assert.match(
+  activityDraftMetaSource,
+  /function buildActivityDraftMetaReviewGateMetricView[\s\S]*formatActivityDraftMetaSummaryItemAriaLabel[\s\S]*normalizeActivityDraftMetaCount/,
+  'AI draft save review-gate metrics should expose normalized counts with prepared aria labels.'
 );
 assert.doesNotMatch(
   activityDraftMetaSource,
@@ -41041,6 +41104,159 @@ assert.deepEqual(
     status: 'action-needed',
     templateType: 'quiz',
   }
+);
+const actionNeededDraftGateSummary = buildActivityDraftMetaSummaryView({
+  meta: questionOnlyDraftMeta,
+  model: 'local-test-model',
+  notice:
+    'Workers AI credentials are not configured, so a local deterministic draft was used.',
+  provider: 'fallback',
+  sourceMaterialNoteViews: [
+    buildActivitySourceMaterialDraftNoteView({
+      kind: 'worksheet-document',
+      originalName: 'Unit worksheet.pdf',
+    }),
+    {
+      kindLabel: 'Private link',
+      name: 'classroom/private/unit.pdf?token=secret',
+    },
+  ],
+});
+assert.equal(
+  actionNeededDraftGateSummary.reviewGateView.status,
+  'action-needed'
+);
+assert.equal(
+  actionNeededDraftGateSummary.reviewGateView.badgeLabel,
+  'Action needed before save'
+);
+assert.equal(
+  findActivityDraftReviewGateMetric({
+    id: 'action-needed',
+    metrics: actionNeededDraftGateSummary.reviewGateView.metricViews,
+  }).value,
+  2
+);
+assert.equal(
+  findActivityDraftReviewGateMetric({
+    id: 'review-required',
+    metrics: actionNeededDraftGateSummary.reviewGateView.metricViews,
+  }).value,
+  2
+);
+assert.equal(
+  findActivityDraftReviewGateMetric({
+    id: 'ready',
+    metrics: actionNeededDraftGateSummary.reviewGateView.metricViews,
+  }).value,
+  1
+);
+assert.ok(
+  findActivityDraftReviewGateMetric({
+    id: 'ready-templates',
+    metrics: actionNeededDraftGateSummary.reviewGateView.metricViews,
+  }).value > 0
+);
+assert.ok(
+  findActivityDraftReviewGateMetric({
+    id: 'locked-templates',
+    metrics: actionNeededDraftGateSummary.reviewGateView.metricViews,
+  }).value > 0
+);
+assert.equal(
+  findActivityDraftReviewGateMetric({
+    id: 'safe-sources',
+    metrics: actionNeededDraftGateSummary.reviewGateView.metricViews,
+  }).value,
+  1
+);
+assert.equal(
+  findActivityDraftReviewGateMetric({
+    id: 'omitted-sources',
+    metrics: actionNeededDraftGateSummary.reviewGateView.metricViews,
+  }).value,
+  1
+);
+assert.equal(actionNeededDraftGateSummary.sourceMaterialNoteViews.length, 1);
+const readyTemplateReadiness = questionOnlyDraftMeta.templateReadiness.find(
+  (option) => option.isReady
+);
+const readyTemplateOption = questionOnlyDraftMeta.readyTemplateOptions[0];
+assert.ok(readyTemplateReadiness);
+assert.ok(readyTemplateOption);
+const readyToSaveDraftMeta: ActivityDraftMeta = {
+  ...questionOnlyDraftMeta,
+  readyTemplateCount: 1,
+  readyTemplateOptions: [readyTemplateOption],
+  readyTemplates: [readyTemplateOption.shortName],
+  reviewChecklist: ['Teacher checked every generated field.'],
+  reviewChecklistItems: [
+    {
+      description: 'Answers, level, and explanations have been checked.',
+      id: 'ready-remix',
+      label: 'Teacher checked every generated field.',
+      priority: 'normal',
+      status: 'ready',
+    },
+  ],
+  suggestedTemplateCount: 1,
+  suggestedTemplateOptions: [readyTemplateOption],
+  suggestedTemplates: [readyTemplateOption.shortName],
+  templateReadiness: [readyTemplateReadiness],
+};
+const readyToSaveDraftGateSummary = buildActivityDraftMetaSummaryView({
+  meta: readyToSaveDraftMeta,
+  model: '@cf/meta/llama-3.1-8b-instruct',
+  provider: 'workers-ai',
+  sourceMaterialNoteViews: [
+    buildActivitySourceMaterialDraftNoteView({
+      kind: 'worksheet-document',
+      originalName: 'Reviewed worksheet.pdf',
+    }),
+  ],
+});
+assert.equal(
+  readyToSaveDraftGateSummary.reviewGateView.status,
+  'ready-to-save'
+);
+assert.equal(
+  readyToSaveDraftGateSummary.reviewGateView.badgeLabel,
+  'Ready to save'
+);
+assert.equal(
+  findActivityDraftReviewGateMetric({
+    id: 'action-needed',
+    metrics: readyToSaveDraftGateSummary.reviewGateView.metricViews,
+  }).value,
+  0
+);
+assert.equal(
+  findActivityDraftReviewGateMetric({
+    id: 'review-required',
+    metrics: readyToSaveDraftGateSummary.reviewGateView.metricViews,
+  }).value,
+  0
+);
+assert.equal(
+  findActivityDraftReviewGateMetric({
+    id: 'ready',
+    metrics: readyToSaveDraftGateSummary.reviewGateView.metricViews,
+  }).value,
+  1
+);
+assert.equal(
+  findActivityDraftReviewGateMetric({
+    id: 'locked-templates',
+    metrics: readyToSaveDraftGateSummary.reviewGateView.metricViews,
+  }).value,
+  0
+);
+assert.equal(
+  findActivityDraftReviewGateMetric({
+    id: 'omitted-sources',
+    metrics: readyToSaveDraftGateSummary.reviewGateView.metricViews,
+  }).value,
+  0
 );
 const fallbackFillBlankDraft = createFallbackActivityDraft({
   difficulty: 'starter',
