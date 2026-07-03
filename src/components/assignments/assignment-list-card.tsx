@@ -42,6 +42,9 @@ type AssignmentListCardProps = {
 
 export function AssignmentListCard({ assignment }: AssignmentListCardProps) {
   const updateStatusMutation = useUpdateAssignmentStatus();
+  const cardElementId = formatAssignmentListElementId(
+    `assignment-list-card-${assignment.id}`
+  );
 
   async function updateStatus() {
     const plan = buildAssignmentStatusActionExecutionPlan({
@@ -67,7 +70,10 @@ export function AssignmentListCard({ assignment }: AssignmentListCardProps) {
     >
       <AssignmentListCardHeader assignment={assignment} />
       <CardContent className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-end">
-        <AssignmentListCardSummary assignment={assignment} />
+        <AssignmentListCardSummary
+          assignment={assignment}
+          idPrefix={cardElementId}
+        />
         <AssignmentListCardActions
           assignmentId={assignment.id}
           label={assignment.actionsLabel}
@@ -108,14 +114,20 @@ function AssignmentListCardHeader({
 
 function AssignmentListCardSummary({
   assignment,
+  idPrefix,
 }: {
   assignment: AssignmentListCardViewModel;
+  idPrefix: string;
 }) {
   return (
     <section aria-label={assignment.summaryLabel} className="grid gap-4">
-      <AssignmentListDistribution view={assignment.distributionView} />
+      <AssignmentListDistribution
+        idPrefix={idPrefix}
+        view={assignment.distributionView}
+      />
       <AssignmentSettingsSummary view={assignment.settingsSummaryView} />
       <AssignmentListStats
+        idPrefix={idPrefix}
         label={assignment.statsLabel}
         statItems={assignment.statItems}
       />
@@ -124,20 +136,37 @@ function AssignmentListCardSummary({
 }
 
 function AssignmentListDistribution({
+  idPrefix,
   view,
 }: {
+  idPrefix: string;
   view: AssignmentListDistributionView;
 }) {
+  const titleId = `${idPrefix}-distribution-title`;
+  const descriptionId = `${idPrefix}-distribution-description`;
+  const statusId = `${idPrefix}-distribution-status`;
+
   return (
-    <section aria-label={view.ariaLabel} className="grid gap-3">
+    <section
+      aria-label={view.ariaLabel}
+      aria-describedby={`${descriptionId} ${statusId}`}
+      className="grid gap-3"
+    >
       <div className="flex flex-wrap items-center justify-between gap-2">
         <div>
-          <h3 className="font-medium text-sm">{view.title}</h3>
-          <p className="mt-1 text-muted-foreground text-xs leading-5">
+          <h3 id={titleId} className="font-medium text-sm">
+            {view.title}
+          </h3>
+          <p
+            id={descriptionId}
+            className="mt-1 text-muted-foreground text-xs leading-5"
+          >
             {view.description}
           </p>
         </div>
         <Badge
+          id={statusId}
+          aria-describedby={descriptionId}
           variant={view.status === 'ready-to-share' ? 'secondary' : 'outline'}
           className={cn(
             'rounded-md',
@@ -152,6 +181,7 @@ function AssignmentListDistribution({
       <dl className="grid gap-2 sm:grid-cols-2 xl:grid-cols-4">
         {view.stepViews.map((stepView) => (
           <AssignmentListDistributionStep
+            idPrefix={idPrefix}
             key={stepView.id}
             stepView={stepView}
           />
@@ -162,11 +192,16 @@ function AssignmentListDistribution({
 }
 
 function AssignmentListDistributionStep({
+  idPrefix,
   stepView,
 }: {
+  idPrefix: string;
   stepView: AssignmentListDistributionStepView;
 }) {
   const Icon = assignmentListDistributionStepIcons[stepView.id];
+  const labelId = `${idPrefix}-distribution-${stepView.id}-label`;
+  const statusId = `${idPrefix}-distribution-${stepView.id}-status`;
+  const descriptionId = `${idPrefix}-distribution-${stepView.id}-description`;
 
   return (
     <div
@@ -174,12 +209,18 @@ function AssignmentListDistributionStep({
       data-status={stepView.status}
     >
       <div className="flex items-start justify-between gap-2">
-        <dt className="flex items-center gap-2 font-medium text-xs leading-5">
+        <dt
+          id={labelId}
+          className="flex items-center gap-2 font-medium text-xs leading-5"
+        >
           <Icon aria-hidden="true" className="size-4 text-primary" />
           {stepView.label}
         </dt>
         <dd>
           <Badge
+            id={statusId}
+            aria-labelledby={`${labelId} ${statusId}`}
+            aria-describedby={descriptionId}
             variant={stepView.status === 'ready' ? 'secondary' : 'outline'}
             className="rounded-md"
           >
@@ -188,7 +229,13 @@ function AssignmentListDistributionStep({
         </dd>
       </div>
       <dd className="mt-2 text-muted-foreground text-xs leading-5">
-        <output aria-label={stepView.ariaLabel}>{stepView.description}</output>
+        <output
+          id={descriptionId}
+          aria-label={stepView.ariaLabel}
+          aria-labelledby={`${labelId} ${descriptionId}`}
+        >
+          {stepView.description}
+        </output>
       </dd>
     </div>
   );
@@ -556,4 +603,8 @@ function buildAssignmentListShareDescriptionIds(
 ) {
   const descriptionIds = ids.filter(Boolean).join(' ');
   return descriptionIds || undefined;
+}
+
+function formatAssignmentListElementId(value: string) {
+  return value.replace(/[^a-zA-Z0-9_-]/g, '-');
 }

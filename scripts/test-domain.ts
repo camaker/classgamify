@@ -29222,13 +29222,13 @@ assert.match(
 );
 assert.match(
   assignmentListScopePanelComponentSource,
-  /AssignmentListPageScopeItem[\s\S]*AssignmentListPageScopeView[\s\S]*aria-label=\{view\.label\}[\s\S]*view\.summary[\s\S]*view\.items\.map[\s\S]*key=\{item\.id\}/,
-  'Assignment list scope panel should render prepared scope text and key items by stable ids.'
+  /AssignmentListPageScopeItem[\s\S]*AssignmentListPageScopeView[\s\S]*const titleId = 'assignment-list-scope-panel-title'[\s\S]*const summaryId = 'assignment-list-scope-panel-summary'[\s\S]*aria-labelledby=\{titleId\}[\s\S]*aria-describedby=\{summaryId\}[\s\S]*id=\{titleId\}[\s\S]*view\.label[\s\S]*id=\{summaryId\}[\s\S]*view\.summary[\s\S]*view\.items\.map[\s\S]*key=\{item\.id\}/,
+  'Assignment list scope panel should render prepared scope text and key items in a labelled semantic region.'
 );
 assert.match(
   assignmentListScopePanelComponentSource,
-  /<dl[\s\S]*view\.items\.map[\s\S]*<dt[\s\S]*item\.label[\s\S]*<dd[\s\S]*item\.value[\s\S]*<dd[\s\S]*item\.description/,
-  'Assignment list scope panel should expose current-view scope items as a semantic description list.'
+  /<dl[\s\S]*aria-labelledby=\{titleId\}[\s\S]*aria-describedby=\{summaryId\}[\s\S]*view\.items\.map[\s\S]*function AssignmentListScopeItem[\s\S]*const labelId = `assignment-list-scope-\$\{item\.id\}-label`[\s\S]*const valueId = `assignment-list-scope-\$\{item\.id\}-value`[\s\S]*const descriptionId = `assignment-list-scope-\$\{item\.id\}-description`[\s\S]*<dt id=\{labelId\}[\s\S]*item\.label[\s\S]*<output[\s\S]*id=\{valueId\}[\s\S]*aria-labelledby=\{`\$\{labelId\} \$\{valueId\}`\}[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*item\.value[\s\S]*<dd[\s\S]*id=\{descriptionId\}[\s\S]*item\.description/,
+  'Assignment list scope panel should expose current-view scope items as stable semantic label/value/description outputs.'
 );
 assert.match(
   assignmentListScopePanelComponentSource,
@@ -29247,8 +29247,8 @@ assert.doesNotMatch(
 );
 assert.match(
   assignmentListSummaryCardComponentSource,
-  /role="article"[\s\S]*aria-label=\{metric\.ariaLabel\}[\s\S]*metric\.value[\s\S]*metric\.label[\s\S]*metric\.description/,
-  'Assignment list summary cards should render prepared metric values, descriptions, and aria labels.'
+  /const labelId = `assignment-list-summary-\$\{metric\.id\}-label`[\s\S]*const valueId = `assignment-list-summary-\$\{metric\.id\}-value`[\s\S]*const descriptionId = `assignment-list-summary-\$\{metric\.id\}-description`[\s\S]*role="article"[\s\S]*aria-label=\{metric\.ariaLabel\}[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*<output id=\{valueId\}[\s\S]*aria-labelledby=\{`\$\{labelId\} \$\{valueId\}`\}[\s\S]*metric\.value[\s\S]*id=\{labelId\}[\s\S]*metric\.label[\s\S]*id=\{descriptionId\}[\s\S]*metric\.description/,
+  'Assignment list summary cards should render prepared metric values, descriptions, and aria labels as stable accessible outputs.'
 );
 assert.match(
   assignmentListCardComponentSource,
@@ -29322,13 +29322,18 @@ assert.match(
 );
 assert.match(
   assignmentListCardComponentSource,
-  /AssignmentListStats[\s\S]*label=\{assignment\.statsLabel\}[\s\S]*statItems=\{assignment\.statItems\}/,
-  'Assignment list card component should delegate prepared stat item rendering and stats labels to a focused component.'
+  /const cardElementId = formatAssignmentListElementId\([\s\S]*`assignment-list-card-\$\{assignment\.id\}`[\s\S]*AssignmentListStats[\s\S]*idPrefix=\{idPrefix\}[\s\S]*label=\{assignment\.statsLabel\}[\s\S]*statItems=\{assignment\.statItems\}/,
+  'Assignment list card component should delegate prepared stat item rendering, stats labels, and per-card id prefixes to a focused component.'
 );
 assert.match(
   assignmentListCardComponentSource,
-  /<section[\s\S]*aria-label=\{assignment\.summaryLabel\}[\s\S]*AssignmentListDistribution[\s\S]*view=\{assignment\.distributionView\}[\s\S]*AssignmentSettingsSummary[\s\S]*AssignmentListStats/,
-  'Assignment list card summary should expose the prepared summary-region label and render distribution, settings, and stats views.'
+  /function formatAssignmentListElementId[\s\S]*replace\([^)]*\[\^a-zA-Z0-9_-\]/,
+  'Assignment list card component should normalize persisted assignment ids before using them in semantic DOM id prefixes.'
+);
+assert.match(
+  assignmentListCardComponentSource,
+  /function AssignmentListCardSummary[\s\S]*idPrefix: string[\s\S]*<section[\s\S]*aria-label=\{assignment\.summaryLabel\}[\s\S]*AssignmentListDistribution[\s\S]*idPrefix=\{idPrefix\}[\s\S]*view=\{assignment\.distributionView\}[\s\S]*AssignmentSettingsSummary[\s\S]*AssignmentListStats[\s\S]*idPrefix=\{idPrefix\}/,
+  'Assignment list card summary should expose the prepared summary-region label and render distribution, settings, and stats views with stable per-card ids.'
 );
 assert.match(
   assignmentListCardComponentSource,
@@ -29337,13 +29342,13 @@ assert.match(
 );
 assert.match(
   assignmentListCardComponentSource,
-  /function AssignmentListDistribution[\s\S]*aria-label=\{view\.ariaLabel\}[\s\S]*view\.title[\s\S]*view\.description[\s\S]*view\.statusLabel[\s\S]*view\.stepViews\.map[\s\S]*AssignmentListDistributionStep/,
-  'Assignment list distribution component should render prepared title, description, status, and step views.'
+  /function AssignmentListDistribution[\s\S]*idPrefix: string[\s\S]*const titleId = `\$\{idPrefix\}-distribution-title`[\s\S]*const descriptionId = `\$\{idPrefix\}-distribution-description`[\s\S]*const statusId = `\$\{idPrefix\}-distribution-status`[\s\S]*aria-label=\{view\.ariaLabel\}[\s\S]*aria-describedby=\{`\$\{descriptionId\} \$\{statusId\}`\}[\s\S]*id=\{titleId\}[\s\S]*view\.title[\s\S]*id=\{descriptionId\}[\s\S]*view\.description[\s\S]*id=\{statusId\}[\s\S]*view\.statusLabel[\s\S]*view\.stepViews\.map[\s\S]*AssignmentListDistributionStep[\s\S]*idPrefix=\{idPrefix\}/,
+  'Assignment list distribution component should render prepared title, description, status, and step views with stable per-card ids.'
 );
 assert.match(
   assignmentListCardComponentSource,
-  /function AssignmentListDistributionStep[\s\S]*stepView\.label[\s\S]*stepView\.statusLabel[\s\S]*<output aria-label=\{stepView\.ariaLabel\}>\{stepView\.description\}<\/output>/,
-  'Assignment list distribution steps should render prepared labels, status labels, aria labels, and descriptions.'
+  /function AssignmentListDistributionStep[\s\S]*idPrefix: string[\s\S]*const labelId = `\$\{idPrefix\}-distribution-\$\{stepView\.id\}-label`[\s\S]*const statusId = `\$\{idPrefix\}-distribution-\$\{stepView\.id\}-status`[\s\S]*const descriptionId = `\$\{idPrefix\}-distribution-\$\{stepView\.id\}-description`[\s\S]*<dt[\s\S]*id=\{labelId\}[\s\S]*stepView\.label[\s\S]*id=\{statusId\}[\s\S]*aria-labelledby=\{`\$\{labelId\} \$\{statusId\}`\}[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*stepView\.statusLabel[\s\S]*<output[\s\S]*id=\{descriptionId\}[\s\S]*aria-label=\{stepView\.ariaLabel\}[\s\S]*aria-labelledby=\{`\$\{labelId\} \$\{descriptionId\}`\}[\s\S]*stepView\.description/,
+  'Assignment list distribution steps should render prepared labels, status labels, aria labels, and descriptions as stable semantic outputs.'
 );
 assert.doesNotMatch(
   assignmentListCardComponentSource,
@@ -29372,13 +29377,13 @@ assert.match(
 );
 assert.match(
   assignmentListStatsComponentSource,
-  /<dl[\s\S]*aria-label=\{label\}[\s\S]*statItems\.map[\s\S]*ariaLabel=\{stat\.ariaLabel\}[\s\S]*description=\{stat\.description\}/,
-  'Assignment list stats component should render prepared stat labels, descriptions, and aria labels in a semantic list.'
+  /idPrefix: string[\s\S]*<dl[\s\S]*aria-label=\{label\}[\s\S]*statItems\.map[\s\S]*<AssignmentListStat[\s\S]*idPrefix=\{idPrefix\}[\s\S]*stat=\{stat\}/,
+  'Assignment list stats component should render prepared stat views and the per-card id prefix in a semantic list.'
 );
 assert.match(
   assignmentListStatsComponentSource,
-  /<dt[\s\S]*\{label\}[\s\S]*<dd[\s\S]*<output[\s\S]*aria-label=\{ariaLabel\}[\s\S]*\{value\}[\s\S]*<dd[\s\S]*\{description\}/,
-  'Assignment list stat items should expose label, value, and description through semantic terms and details.'
+  /function AssignmentListStat[\s\S]*const Icon = assignmentListCardStatIcons\[stat\.key\][\s\S]*const labelId = `\$\{idPrefix\}-stat-\$\{stat\.key\}-label`[\s\S]*const valueId = `\$\{idPrefix\}-stat-\$\{stat\.key\}-value`[\s\S]*const descriptionId = `\$\{idPrefix\}-stat-\$\{stat\.key\}-description`[\s\S]*<dt id=\{labelId\}[\s\S]*stat\.label[\s\S]*<output[\s\S]*id=\{valueId\}[\s\S]*aria-label=\{stat\.ariaLabel\}[\s\S]*aria-labelledby=\{`\$\{labelId\} \$\{valueId\}`\}[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*stat\.value[\s\S]*<dd id=\{descriptionId\} className="sr-only"[\s\S]*stat\.description/,
+  'Assignment list stat items should expose label, value, and description through stable semantic terms and outputs.'
 );
 assert.doesNotMatch(
   assignmentListViewSource,
@@ -29422,8 +29427,8 @@ assert.match(
 );
 assert.match(
   assignmentListCardComponentSource,
-  /function AssignmentListCardSummary[\s\S]*aria-label=\{assignment\.summaryLabel\}[\s\S]*AssignmentListDistribution[\s\S]*view=\{assignment\.distributionView\}[\s\S]*AssignmentSettingsSummary[\s\S]*view=\{assignment\.settingsSummaryView\}[\s\S]*AssignmentListStats[\s\S]*label=\{assignment\.statsLabel\}[\s\S]*statItems=\{assignment\.statItems\}/,
-  'Assignment list card summary should render prepared distribution status, settings summary, stats label, and stats.'
+  /function AssignmentListCardSummary[\s\S]*aria-label=\{assignment\.summaryLabel\}[\s\S]*AssignmentListDistribution[\s\S]*idPrefix=\{idPrefix\}[\s\S]*view=\{assignment\.distributionView\}[\s\S]*AssignmentSettingsSummary[\s\S]*view=\{assignment\.settingsSummaryView\}[\s\S]*AssignmentListStats[\s\S]*idPrefix=\{idPrefix\}[\s\S]*label=\{assignment\.statsLabel\}[\s\S]*statItems=\{assignment\.statItems\}/,
+  'Assignment list card summary should render prepared distribution status, settings summary, stats label, and stats with stable per-card ids.'
 );
 assert.match(
   assignmentListCardComponentSource,
