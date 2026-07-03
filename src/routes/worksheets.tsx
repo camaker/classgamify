@@ -61,16 +61,22 @@ function WorksheetsPage() {
             </div>
           </div>
 
-          <div className="rounded-lg border bg-card p-5">
+          <section
+            aria-label={pageView.deliveryLoop.ariaLabel}
+            className="rounded-lg border bg-card p-5"
+          >
             <p className="text-sm font-medium text-muted-foreground">
-              {m.worksheets_page_delivery_loop_title()}
+              {pageView.deliveryLoop.title}
+            </p>
+            <p className="mt-2 text-xs leading-5 text-muted-foreground">
+              {pageView.deliveryLoop.description}
             </p>
             <ol className="mt-4 space-y-3">
               {pageView.workflowSteps.map((stepView) => (
                 <WorksheetWorkflowStep key={stepView.id} stepView={stepView} />
               ))}
             </ol>
-          </div>
+          </section>
         </section>
 
         <section className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
@@ -112,6 +118,7 @@ function WorksheetsPage() {
             </p>
           </div>
           <Link
+            aria-label={pageView.templatesCta.action.ariaLabel}
             to={getPathWithLocale(pageView.templatesCta.action.to)}
             className={cn(buttonVariants(), 'w-full md:w-auto')}
           >
@@ -131,6 +138,7 @@ function WorksheetHeroActionLink({
 }) {
   return (
     <Link
+      aria-label={action.ariaLabel}
       to={getPathWithLocale(action.to)}
       search={action.search}
       className={cn(
@@ -155,11 +163,19 @@ function WorksheetWorkflowStep({
   stepView: WorksheetsPageWorkflowStepView;
 }) {
   return (
-    <li className="grid grid-cols-[1.75rem_minmax(0,1fr)] gap-3 text-sm leading-6">
+    <li
+      aria-label={stepView.ariaLabel}
+      className="grid grid-cols-[1.75rem_minmax(0,1fr)] gap-3 text-sm leading-6"
+    >
       <span className="flex size-7 items-center justify-center rounded-lg border bg-background text-xs font-semibold text-primary">
         {stepView.positionLabel}
       </span>
-      <span>{stepView.label}</span>
+      <span>
+        <span className="font-medium">{stepView.label}</span>
+        <span className="mt-0.5 block text-muted-foreground text-xs leading-5">
+          {stepView.description}
+        </span>
+      </span>
     </li>
   );
 }
@@ -170,8 +186,15 @@ function WorksheetResultSignal({
   signalView: WorksheetsPageResultSignalView;
 }) {
   return (
-    <div className="rounded-lg border bg-background px-3 py-2 text-sm font-medium">
-      {signalView.label}
-    </div>
+    <dl
+      aria-label={signalView.ariaLabel}
+      className="rounded-lg border bg-background px-3 py-2 text-sm"
+    >
+      <dt className="font-medium">{signalView.label}</dt>
+      <dd className="mt-1 text-muted-foreground text-xs">
+        <output aria-label={signalView.ariaLabel}>{signalView.value}</output>
+      </dd>
+      <dd className="sr-only">{signalView.description}</dd>
+    </dl>
   );
 }

@@ -31610,6 +31610,7 @@ assert.deepEqual(buildTemplateCreateSearch('line-match'), {
 assert.deepEqual(
   activityTemplates.map((template) => buildTemplateEntryAction(template)),
   activityTemplates.map((template) => ({
+    ariaLabel: `Start ${template.shortName}. Opens the activity editor with ${template.shortName} selected and its scaffold ready for teacher review.`,
     label: `Start ${template.shortName}`,
     search: { source: 'templates', template: template.type },
     to: Routes.Create,
@@ -31921,10 +31922,12 @@ function buildExpectedTemplateEntrySteps(templateShortName: string) {
 assert.deepEqual(buildTemplatesPageViewModel(), {
   cards: activityTemplates.map((template) => ({
     action: {
+      ariaLabel: `Start ${template.shortName}. Opens the activity editor with ${template.shortName} selected and its scaffold ready for teacher review.`,
       label: `Start ${template.shortName}`,
       search: { source: 'templates', template: template.type },
       to: Routes.Create,
     },
+    ariaLabel: `${template.name}: ${template.description}`,
     bestFor: template.bestFor,
     bestForLabel: 'Best for',
     classroomMode: formatActivityTemplateClassroomMode(template.classroomMode),
@@ -31932,6 +31935,8 @@ assert.deepEqual(buildTemplatesPageViewModel(), {
     contentRequirements: formatTemplateRequirementViews(
       template.contentRequirements
     ),
+    contentRequirementsAriaLabel: `${template.name} content requirements`,
+    contentRequirementsLabel: 'Content required',
     description: template.description,
     entryLabel: 'Creation path',
     entrySteps: buildExpectedTemplateEntrySteps(template.shortName),
@@ -31940,6 +31945,7 @@ assert.deepEqual(buildTemplatesPageViewModel(), {
   })),
   footer: {
     createAction: {
+      ariaLabel: 'Create a blank reusable activity in the shared editor.',
       label: 'Create activity',
       to: Routes.Create,
     },
@@ -31950,6 +31956,8 @@ assert.deepEqual(buildTemplatesPageViewModel(), {
   hero: {
     badgeLabel: 'Template library',
     createAction: {
+      ariaLabel:
+        'Create from the first template card and load its scaffold in the shared editor.',
       label: 'Create from template',
       search: { source: 'templates', template: 'quiz' },
       to: Routes.Create,
@@ -31957,6 +31965,7 @@ assert.deepEqual(buildTemplatesPageViewModel(), {
     description:
       'ClassGamify templates render shared questions, pairs, groups, and vocabulary as quick checks, matching games, worksheet practice, listening prompts, or whole-class reveal rounds.',
     studentPreviewAction: {
+      ariaLabel: 'Open the demo student assignment preview.',
       label: 'Open student preview',
       to: Routes.StudentPreview,
     },
@@ -31966,6 +31975,8 @@ assert.deepEqual(buildTemplatesPageViewModel(), {
 assert.deepEqual(
   buildTemplatesPageViewModel({ activityTemplates: [] }).hero.createAction,
   {
+    ariaLabel:
+      'Create from the first template card and load its scaffold in the shared editor.',
     label: 'Create from template',
     search: { source: 'templates', template: 'quiz' },
     to: Routes.Create,
@@ -32342,6 +32353,82 @@ const expectedWorksheetModeSignalViews = [
     value: 'Export-ready',
   },
 ];
+const expectedWorksheetResultSignalViews = [
+  {
+    ariaLabel:
+      'Attempt summaries: Snapshot-based. Student submissions stay attached to the assignment snapshot for teacher review.',
+    description:
+      'Student submissions stay attached to the assignment snapshot for teacher review.',
+    id: 'attempts',
+    label: 'Attempt summaries',
+    value: 'Snapshot-based',
+  },
+  {
+    ariaLabel:
+      'Accepted answer alternatives: Review-safe. Teachers can define acceptable answer variants and keep them available for review after submission.',
+    description:
+      'Teachers can define acceptable answer variants and keep them available for review after submission.',
+    id: 'accepted-answers',
+    label: 'Accepted answer alternatives',
+    value: 'Review-safe',
+  },
+  {
+    ariaLabel:
+      'Reteach priorities: Teacher-ready. Low-performing items and follow-up students can feed classroom reteach planning.',
+    description:
+      'Low-performing items and follow-up students can feed classroom reteach planning.',
+    id: 'reteach',
+    label: 'Reteach priorities',
+    value: 'Teacher-ready',
+  },
+  {
+    ariaLabel:
+      'CSV export: Gradebook-ready. Offline exports keep delivery policy and item-level answers with the same assignment record.',
+    description:
+      'Offline exports keep delivery policy and item-level answers with the same assignment record.',
+    id: 'csv-export',
+    label: 'CSV export',
+    value: 'Gradebook-ready',
+  },
+];
+const expectedWorksheetWorkflowSteps = [
+  {
+    ariaLabel:
+      'Step 1: Create content. Paste lesson material once into questions, pairs, groups, vocabulary, and notes.',
+    description:
+      'Paste lesson material once into questions, pairs, groups, vocabulary, and notes.',
+    id: 'create',
+    label: 'Create content',
+    positionLabel: '1',
+  },
+  {
+    ariaLabel:
+      'Step 2: Choose mode. Choose a worksheet-style template and review the example before saving.',
+    description:
+      'Choose a worksheet-style template and review the example before saving.',
+    id: 'assign',
+    label: 'Choose mode',
+    positionLabel: '2',
+  },
+  {
+    ariaLabel:
+      'Step 3: Publish link. Publish a student assignment link with attempts, timer, answer reveal, and close time.',
+    description:
+      'Publish a student assignment link with attempts, timer, answer reveal, and close time.',
+    id: 'student-submit',
+    label: 'Publish link',
+    positionLabel: '3',
+  },
+  {
+    ariaLabel:
+      'Step 4: Review results. Review submissions, accepted answers, reteach priorities, and CSV exports.',
+    description:
+      'Review submissions, accepted answers, reteach priorities, and CSV exports.',
+    id: 'review',
+    label: 'Review results',
+    positionLabel: '4',
+  },
+];
 assert.deepEqual(
   worksheetsPageView.modeCards.map((card) => [
     card.template,
@@ -32365,6 +32452,13 @@ assert.deepEqual(
   ])
 );
 assert.deepEqual(worksheetsPageView, {
+  deliveryLoop: {
+    ariaLabel:
+      'Worksheet delivery loop: Every worksheet mode stays in the same flow: create reusable activity content, publish a student link, collect attempts, then review results.',
+    description:
+      'Every worksheet mode stays in the same flow: create reusable activity content, publish a student link, collect attempts, then review results.',
+    title: 'Worksheet delivery loop',
+  },
   hero: {
     badgeLabel: 'Liveworksheets-style modes',
     description:
@@ -32373,6 +32467,8 @@ assert.deepEqual(worksheetsPageView, {
   },
   heroActions: [
     {
+      ariaLabel:
+        'Create fill blanks. Opens Fill blanks in the shared activity editor with the worksheet scaffold selected.',
       isPrimary: true,
       label: 'Create fill blanks',
       search: { source: 'worksheets', template: 'fill-blank' },
@@ -32380,6 +32476,8 @@ assert.deepEqual(worksheetsPageView, {
       to: Routes.Create,
     },
     {
+      ariaLabel:
+        'Start line match. Opens Line matching in the shared activity editor with the worksheet scaffold selected.',
       isPrimary: false,
       label: 'Start line match',
       search: { source: 'worksheets', template: 'line-match' },
@@ -32387,6 +32485,8 @@ assert.deepEqual(worksheetsPageView, {
       to: Routes.Create,
     },
     {
+      ariaLabel:
+        'Create listening. Opens Listening prompts in the shared activity editor with the worksheet scaffold selected.',
       isPrimary: false,
       label: 'Create listening',
       search: { source: 'worksheets', template: 'listening' },
@@ -32394,6 +32494,8 @@ assert.deepEqual(worksheetsPageView, {
       to: Routes.Create,
     },
     {
+      ariaLabel:
+        'Create sort. Opens Drag sorting in the shared activity editor with the worksheet scaffold selected.',
       isPrimary: false,
       label: 'Create sort',
       search: { source: 'worksheets', template: 'group-sort' },
@@ -32404,10 +32506,14 @@ assert.deepEqual(worksheetsPageView, {
   modeCards: [
     {
       action: {
+        ariaLabel:
+          'Create fill blanks. Opens Fill blanks in the shared activity editor with the worksheet scaffold selected.',
         label: 'Create fill blanks',
         search: { source: 'worksheets', template: 'fill-blank' },
         to: Routes.Create,
       },
+      ariaLabel:
+        'Fill blanks: Place short answers directly into sentence gaps for grammar, spelling, vocabulary, or reading checks.',
       contentRequirements: [{ id: 'questions', label: 'questions' }],
       description:
         'Place short answers directly into sentence gaps for grammar, spelling, vocabulary, or reading checks.',
@@ -32418,10 +32524,14 @@ assert.deepEqual(worksheetsPageView, {
     },
     {
       action: {
+        ariaLabel:
+          'Start line match. Opens Line matching in the shared activity editor with the worksheet scaffold selected.',
         label: 'Start line match',
         search: { source: 'worksheets', template: 'line-match' },
         to: Routes.Create,
       },
+      ariaLabel:
+        'Line matching: Turn terms and definitions into a two-column connection board that feels familiar to worksheet users.',
       contentRequirements: [{ id: 'pairs', label: 'match pairs' }],
       description:
         'Turn terms and definitions into a two-column connection board that feels familiar to worksheet users.',
@@ -32432,10 +32542,14 @@ assert.deepEqual(worksheetsPageView, {
     },
     {
       action: {
+        ariaLabel:
+          'Create listening. Opens Listening prompts in the shared activity editor with the worksheet scaffold selected.',
         label: 'Create listening',
         search: { source: 'worksheets', template: 'listening' },
         to: Routes.Create,
       },
+      ariaLabel:
+        'Listening prompts: Use spoken tracks for dictation, comprehension, or pronunciation follow-up while hiding transcripts before review.',
       contentRequirements: [{ id: 'questions', label: 'questions' }],
       description:
         'Use spoken tracks for dictation, comprehension, or pronunciation follow-up while hiding transcripts before review.',
@@ -32446,10 +32560,14 @@ assert.deepEqual(worksheetsPageView, {
     },
     {
       action: {
+        ariaLabel:
+          'Create sort. Opens Drag sorting in the shared activity editor with the worksheet scaffold selected.',
         label: 'Create sort',
         search: { source: 'worksheets', template: 'group-sort' },
         to: Routes.Create,
       },
+      ariaLabel:
+        'Drag sorting: Ask learners to classify words, examples, or concepts into teacher-defined groups before seeing the answer pattern.',
       contentRequirements: [{ id: 'groups', label: 'groups' }],
       description:
         'Ask learners to classify words, examples, or concepts into teacher-defined groups before seeing the answer pattern.',
@@ -32464,14 +32582,11 @@ assert.deepEqual(worksheetsPageView, {
       'The first product pass focuses on interactive worksheets with scoring, attempts, accepted answers, and result exports. Printable practice and teacher-uploaded worksheet extraction should extend the same activity snapshot and results model instead of creating a separate worksheet product.',
     title: 'Printable follow-up can build on the same assignment record.',
   },
-  resultSignals: [
-    { id: 'attempts', label: 'Attempt summaries' },
-    { id: 'accepted-answers', label: 'Accepted answer alternatives' },
-    { id: 'reteach', label: 'Reteach priorities' },
-    { id: 'csv-export', label: 'CSV export' },
-  ],
+  resultSignals: expectedWorksheetResultSignalViews,
   templatesCta: {
     action: {
+      ariaLabel:
+        'Browse the full template library for other game views of the same activity content.',
       label: 'Browse templates',
       to: Routes.Templates,
     },
@@ -32479,38 +32594,14 @@ assert.deepEqual(worksheetsPageView, {
       'Browse the full template library to switch the same structured content into quiz, matching games, box reveals, and group play.',
     title: 'Want a different game view for the same lesson?',
   },
-  workflowSteps: [
-    {
-      id: 'create',
-      label:
-        'Paste lesson material once into questions, pairs, groups, vocabulary, and notes.',
-      positionLabel: '1',
-    },
-    {
-      id: 'assign',
-      label:
-        'Choose a worksheet-style template and review the example before saving.',
-      positionLabel: '2',
-    },
-    {
-      id: 'student-submit',
-      label:
-        'Publish a student assignment link with attempts, timer, answer reveal, and close time.',
-      positionLabel: '3',
-    },
-    {
-      id: 'review',
-      label:
-        'Review submissions, accepted answers, reteach priorities, and CSV exports.',
-      positionLabel: '4',
-    },
-  ],
+  workflowSteps: expectedWorksheetWorkflowSteps,
 });
 assert.deepEqual(
   getWorksheetModeDefinitions().map((mode) =>
     buildWorksheetModeEntryAction(mode)
   ),
   getWorksheetModeDefinitions().map((mode) => ({
+    ariaLabel: `${mode.action}. Opens ${mode.title} in the shared activity editor with the worksheet scaffold selected.`,
     label: mode.action,
     search: { source: 'worksheets', template: mode.template },
     to: Routes.Create,
@@ -32518,6 +32609,8 @@ assert.deepEqual(
 );
 assert.deepEqual(buildWorksheetHeroActions(getWorksheetModeDefinitions()), [
   {
+    ariaLabel:
+      'Create fill blanks. Opens Fill blanks in the shared activity editor with the worksheet scaffold selected.',
     isPrimary: true,
     label: 'Create fill blanks',
     search: { source: 'worksheets', template: 'fill-blank' },
@@ -32525,6 +32618,8 @@ assert.deepEqual(buildWorksheetHeroActions(getWorksheetModeDefinitions()), [
     to: Routes.Create,
   },
   {
+    ariaLabel:
+      'Start line match. Opens Line matching in the shared activity editor with the worksheet scaffold selected.',
     isPrimary: false,
     label: 'Start line match',
     search: { source: 'worksheets', template: 'line-match' },
@@ -32532,6 +32627,8 @@ assert.deepEqual(buildWorksheetHeroActions(getWorksheetModeDefinitions()), [
     to: Routes.Create,
   },
   {
+    ariaLabel:
+      'Create listening. Opens Listening prompts in the shared activity editor with the worksheet scaffold selected.',
     isPrimary: false,
     label: 'Create listening',
     search: { source: 'worksheets', template: 'listening' },
@@ -32539,6 +32636,8 @@ assert.deepEqual(buildWorksheetHeroActions(getWorksheetModeDefinitions()), [
     to: Routes.Create,
   },
   {
+    ariaLabel:
+      'Create sort. Opens Drag sorting in the shared activity editor with the worksheet scaffold selected.',
     isPrimary: false,
     label: 'Create sort',
     search: { source: 'worksheets', template: 'group-sort' },
@@ -32553,6 +32652,7 @@ assert.deepEqual(
     )
   )[1],
   {
+    ariaLabel: 'Create Lines. Opens the activity editor with Lines selected.',
     isPrimary: false,
     label: 'Create Lines',
     search: { source: 'worksheets', template: 'line-match' },
@@ -32570,6 +32670,7 @@ assert.deepEqual(
   [...WORKSHEET_MODE_TEMPLATES]
 );
 assert.deepEqual(worksheetsPageWithoutLineMatch.heroActions[1], {
+  ariaLabel: 'Create Lines. Opens the activity editor with Lines selected.',
   isPrimary: false,
   label: 'Create Lines',
   search: { source: 'worksheets', template: 'line-match' },
@@ -32738,6 +32839,7 @@ try {
       )
     )[1],
     {
+      ariaLabel: '创建连线。打开活动编辑器并预选连线。',
       isPrimary: false,
       label: '创建连线',
       search: { source: 'worksheets', template: 'line-match' },

@@ -39,6 +39,7 @@ function TemplatesPage() {
           </p>
           <div className="flex flex-col gap-3 sm:flex-row">
             <Link
+              aria-label={pageView.hero.createAction.ariaLabel}
               to={getPathWithLocale(pageView.hero.createAction.to)}
               search={pageView.hero.createAction.search}
               className={cn(buttonVariants(), 'w-fit')}
@@ -47,6 +48,7 @@ function TemplatesPage() {
               {pageView.hero.createAction.label}
             </Link>
             <Link
+              aria-label={pageView.hero.studentPreviewAction.ariaLabel}
               to={pageView.hero.studentPreviewAction.to}
               className={cn(
                 buttonVariants({ variant: 'outline' }),
@@ -77,6 +79,7 @@ function TemplatesPage() {
               </p>
             </div>
             <Link
+              aria-label={pageView.footer.createAction.ariaLabel}
               to={getPathWithLocale(pageView.footer.createAction.to)}
               className={cn(buttonVariants(), 'w-fit')}
             >

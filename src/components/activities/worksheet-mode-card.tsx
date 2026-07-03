@@ -25,7 +25,10 @@ export function WorksheetModeCard({ mode }: WorksheetModeCardProps) {
   const signalLabelId = `worksheet-mode-${mode.template}-signals`;
 
   return (
-    <div className="rounded-lg border bg-card p-5">
+    <article
+      aria-label={mode.ariaLabel}
+      className="rounded-lg border bg-card p-5"
+    >
       <div className="flex size-9 items-center justify-center rounded-lg border bg-background text-primary">
         <Icon className="size-4" />
       </div>
@@ -66,6 +69,7 @@ export function WorksheetModeCard({ mode }: WorksheetModeCardProps) {
         </section>
       ) : null}
       <Link
+        aria-label={mode.action.ariaLabel}
         to={getPathWithLocale(mode.action.to)}
         search={mode.action.search}
         className={cn(
@@ -75,7 +79,7 @@ export function WorksheetModeCard({ mode }: WorksheetModeCardProps) {
       >
         {mode.action.label}
       </Link>
-    </div>
+    </article>
   );
 }
 

@@ -20,17 +20,20 @@ export type CreateActivityTemplateSearch = {
 export type CreateActivityTemplateSource = 'templates' | 'worksheets';
 
 export type TemplateEntryAction = {
+  ariaLabel: string;
   label: string;
   search: CreateActivityTemplateSearch;
   to: typeof Routes.Create;
 };
 
 export type TemplateEntryLinkAction = {
+  ariaLabel: string;
   label: string;
   to: typeof Routes.StudentPreview | typeof Routes.Templates;
 };
 
 export type TemplateEntryCreateLinkAction = {
+  ariaLabel: string;
   label: string;
   to: typeof Routes.Create;
 };
@@ -57,8 +60,16 @@ export function parseCreateActivityTemplateSourceSearch(
 export function buildTemplateEntryAction(
   template: ActivityTemplateDefinition
 ): TemplateEntryAction {
+  const label = m.activity_template_start_action({
+    template: template.shortName,
+  });
+
   return {
-    label: m.activity_template_start_action({ template: template.shortName }),
+    ariaLabel: m.template_entry_action_aria_label({
+      label,
+      template: template.shortName,
+    }),
+    label,
     search: buildTemplateCreateSearch(template.type, 'templates'),
     to: Routes.Create,
   };
@@ -68,6 +79,10 @@ export function buildWorksheetModeEntryAction(
   mode: WorksheetModeDefinition
 ): TemplateEntryAction {
   return {
+    ariaLabel: m.worksheets_page_mode_action_aria_label({
+      action: mode.action,
+      mode: mode.title,
+    }),
     label: mode.action,
     search: buildTemplateCreateSearch(mode.template, 'worksheets'),
     to: Routes.Create,
@@ -97,11 +112,16 @@ function buildWorksheetHeroAction(
   const mode = modes.find((item) => item.template === template);
   if (!mode) {
     const fallbackTemplate = getTemplateByType(template);
+    const label = m.worksheets_page_mode_fallback_action({
+      template: fallbackTemplate.shortName,
+    });
 
     return {
-      label: m.worksheets_page_mode_fallback_action({
+      ariaLabel: m.worksheets_page_mode_fallback_action_aria_label({
+        action: label,
         template: fallbackTemplate.shortName,
       }),
+      label,
       search: buildTemplateCreateSearch(template, 'worksheets'),
       template,
       to: Routes.Create,

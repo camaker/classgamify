@@ -24,9 +24,10 @@ export function TemplateDirectoryCard({
   template,
 }: TemplateDirectoryCardProps) {
   const entryLabelId = `template-entry-${template.template}-label`;
+  const requirementsLabelId = `template-requirements-${template.template}-label`;
 
   return (
-    <Card className="rounded-lg">
+    <Card role="article" aria-label={template.ariaLabel} className="rounded-lg">
       <CardHeader>
         <div className="mb-2 flex size-9 items-center justify-center rounded-lg border bg-background text-primary">
           <IconDeviceGamepad2 className="size-4" />
@@ -51,17 +52,31 @@ export function TemplateDirectoryCard({
           </p>
           <p className="mt-1 text-sm">{template.classroomMode}</p>
         </div>
-        <div className="flex flex-wrap gap-1.5">
-          {template.contentRequirements.map((requirement) => (
-            <Badge
-              key={requirement.id}
-              variant="secondary"
-              className="rounded-md"
+        {template.contentRequirements.length ? (
+          <section
+            aria-label={template.contentRequirementsAriaLabel}
+            aria-labelledby={requirementsLabelId}
+            className="grid gap-2"
+          >
+            <p
+              id={requirementsLabelId}
+              className="font-medium text-muted-foreground text-xs"
             >
-              {requirement.label}
-            </Badge>
-          ))}
-        </div>
+              {template.contentRequirementsLabel}
+            </p>
+            <div className="flex flex-wrap gap-1.5">
+              {template.contentRequirements.map((requirement) => (
+                <Badge
+                  key={requirement.id}
+                  variant="secondary"
+                  className="rounded-md"
+                >
+                  {requirement.label}
+                </Badge>
+              ))}
+            </div>
+          </section>
+        ) : null}
         {template.entrySteps.length ? (
           <section
             className="grid gap-2 border-t pt-3"
@@ -85,6 +100,7 @@ export function TemplateDirectoryCard({
           </section>
         ) : null}
         <Link
+          aria-label={template.action.ariaLabel}
           to={getPathWithLocale(template.action.to)}
           search={template.action.search}
           className={cn(
