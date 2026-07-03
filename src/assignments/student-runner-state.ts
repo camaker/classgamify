@@ -9,6 +9,7 @@ import { getActivityTemplateRunnerCopy } from '@/activities/runner-copy';
 import {
   ASSIGNMENT_ATTEMPT_DURATION_UNITS,
   buildAttemptTimerState,
+  formatAttemptDuration,
   type AttemptDurationDisplayView,
   type AttemptTimerState,
 } from '@/assignments/attempt-duration';
@@ -232,6 +233,56 @@ export type StudentRunnerSubmissionContractView = {
   title: string;
 };
 
+export type StudentRunnerSubmissionHandoffItemId =
+  | 'share-link'
+  | 'runtime-items'
+  | 'answered-items'
+  | 'unanswered-items'
+  | 'progress'
+  | 'payload-summary'
+  | 'submit-readiness'
+  | 'partial-confirmation'
+  | 'submission-state'
+  | 'identity-mode'
+  | 'identity-privacy'
+  | 'timer-status'
+  | 'timer-limit'
+  | 'attempt-duration'
+  | 'attempt-clock'
+  | 'result-status'
+  | 'score-summary'
+  | 'review-summary'
+  | 'feedback-scope'
+  | 'next-steps';
+
+export type StudentRunnerSubmissionHandoffItemView = {
+  ariaLabel: string;
+  description: string;
+  id: StudentRunnerSubmissionHandoffItemId;
+  label: string;
+  value: string;
+};
+
+export type StudentRunnerSubmissionHandoffPrivacyContract = {
+  exposesAnonymousToken: false;
+  exposesAnswerText: false;
+  exposesRawSubmissionPayload: false;
+  exposesRuntimeItemIds: false;
+  exposesStudentName: false;
+  exposesTeacherOnlyAnswers: false;
+  exposesTeacherSourceMaterials: false;
+  itemIds: StudentRunnerSubmissionHandoffItemId[];
+  payloadMetricKeys: StudentRunnerSubmissionPayloadSummaryMetricKey[];
+  readinessItemIds: StudentRunnerSubmitReadinessItemId[];
+};
+
+export type StudentRunnerSubmissionHandoffView = {
+  description: string;
+  itemViews: StudentRunnerSubmissionHandoffItemView[];
+  privacy: StudentRunnerSubmissionHandoffPrivacyContract;
+  title: string;
+};
+
 export type StudentRunnerSubmitHintId =
   | 'confirm-incomplete'
   | 'read-only'
@@ -344,6 +395,7 @@ export type StudentRunnerPageViewModel = {
   showStartAnotherAttempt: boolean;
   startedAt: number;
   submissionContractView: StudentRunnerSubmissionContractView;
+  submissionHandoffView: StudentRunnerSubmissionHandoffView;
   submissionSuccessMessage: string;
   timeLimitSeconds?: number;
 };
@@ -808,6 +860,19 @@ export function buildStudentRunnerPageViewModel({
     submitReadinessView,
     timerBadge: attemptTimerBadge,
   });
+  const submissionHandoffView = buildStudentRunnerSubmissionHandoffView({
+    activeShareId,
+    attemptResultDisplay,
+    attemptState,
+    attemptTimer,
+    identityView,
+    payloadSummaryView: currentPayloadSummaryView,
+    progressView,
+    resultPanelView,
+    submitReadinessView,
+    timerBadge: attemptTimerBadge,
+    timeLimitSeconds,
+  });
 
   return {
     activeShareId,
@@ -907,6 +972,7 @@ export function buildStudentRunnerPageViewModel({
     showStartAnotherAttempt,
     startedAt,
     submissionContractView,
+    submissionHandoffView,
     submissionSuccessMessage: runnerCopy.submissionSuccessMessage,
     timeLimitSeconds,
   };
@@ -1650,6 +1716,221 @@ export function buildStudentRunnerSubmissionContractView({
   };
 }
 
+export function buildStudentRunnerSubmissionHandoffView({
+  activeShareId,
+  attemptResultDisplay,
+  attemptState,
+  attemptTimer,
+  identityView,
+  payloadSummaryView,
+  progressView,
+  resultPanelView,
+  submitReadinessView,
+  timerBadge,
+  timeLimitSeconds,
+}: {
+  activeShareId: string;
+  attemptResultDisplay?: StudentAttemptResultDisplay;
+  attemptState: {
+    canSubmit: boolean;
+    completionSummary: AttemptCompletionSummary;
+    currentAttemptSessionKey?: string;
+    itemCount: number;
+  };
+  attemptTimer: AttemptTimerState;
+  identityView?: StudentRunnerIdentityView;
+  payloadSummaryView: StudentRunnerSubmissionPayloadSummaryView;
+  progressView: StudentAttemptProgressView;
+  resultPanelView: StudentRunnerResultPanelView;
+  submitReadinessView: StudentRunnerSubmitReadinessView;
+  timerBadge: StudentAttemptTimerBadge;
+  timeLimitSeconds?: number;
+}): StudentRunnerSubmissionHandoffView {
+  const shareMetric = getStudentRunnerSubmissionPayloadMetric(
+    payloadSummaryView,
+    'share-link'
+  );
+  const itemsMetric = getStudentRunnerSubmissionPayloadMetric(
+    payloadSummaryView,
+    'items'
+  );
+  const answersMetric = getStudentRunnerSubmissionPayloadMetric(
+    payloadSummaryView,
+    'answers'
+  );
+  const unansweredMetric = getStudentRunnerSubmissionPayloadMetric(
+    payloadSummaryView,
+    'unanswered'
+  );
+  const confirmationItem = getStudentRunnerSubmitReadinessItem(
+    submitReadinessView,
+    'incomplete-confirmation'
+  );
+  const submissionItem = getStudentRunnerSubmitReadinessItem(
+    submitReadinessView,
+    'submission-state'
+  );
+  const itemViews: StudentRunnerSubmissionHandoffItemView[] = [
+    buildStudentRunnerSubmissionHandoffItemView({
+      description: shareMetric.description,
+      id: 'share-link',
+      label: shareMetric.label,
+      value: normalizeAssignmentShareSlug(activeShareId),
+    }),
+    buildStudentRunnerSubmissionHandoffItemView({
+      description: itemsMetric.description,
+      id: 'runtime-items',
+      label: itemsMetric.label,
+      value: itemsMetric.value,
+    }),
+    buildStudentRunnerSubmissionHandoffItemView({
+      description: progressView.description,
+      id: 'answered-items',
+      label: answersMetric.label,
+      value: formatStudentRunnerSubmissionPayloadCount(
+        attemptState.completionSummary.answeredItemCount
+      ),
+    }),
+    buildStudentRunnerSubmissionHandoffItemView({
+      description: unansweredMetric.description,
+      id: 'unanswered-items',
+      label: unansweredMetric.label,
+      value: unansweredMetric.value,
+    }),
+    buildStudentRunnerSubmissionHandoffItemView({
+      description: progressView.description,
+      id: 'progress',
+      label: m.student_runner_status_bar_label(),
+      value: progressView.label,
+    }),
+    buildStudentRunnerSubmissionHandoffItemView({
+      description: payloadSummaryView.description,
+      id: 'payload-summary',
+      label: payloadSummaryView.title,
+      value: formatStudentRunnerSubmissionContractMetricSummary(
+        payloadSummaryView.metrics
+      ),
+    }),
+    buildStudentRunnerSubmissionHandoffItemView({
+      description: submitReadinessView.description,
+      id: 'submit-readiness',
+      label: submitReadinessView.title,
+      value: submitReadinessView.statusLabel,
+    }),
+    buildStudentRunnerSubmissionHandoffItemView({
+      description: confirmationItem.description,
+      id: 'partial-confirmation',
+      label: confirmationItem.label,
+      value: confirmationItem.statusLabel,
+    }),
+    buildStudentRunnerSubmissionHandoffItemView({
+      description: submissionItem.description,
+      id: 'submission-state',
+      label: submissionItem.label,
+      value: submissionItem.statusLabel,
+    }),
+    buildStudentRunnerSubmissionHandoffItemView(
+      buildStudentRunnerIdentityHandoffModeItem(identityView)
+    ),
+    buildStudentRunnerSubmissionHandoffItemView(
+      buildStudentRunnerIdentityHandoffPrivacyItem(identityView)
+    ),
+    buildStudentRunnerSubmissionHandoffItemView({
+      description: timerBadge.description,
+      id: 'timer-status',
+      label: m.assignment_delivery_label_timer(),
+      value: timerBadge.show
+        ? timerBadge.label
+        : m.assignment_delivery_timer_none(),
+    }),
+    buildStudentRunnerSubmissionHandoffItemView({
+      description: getStudentRunnerTimerLimitDescription(timeLimitSeconds),
+      id: 'timer-limit',
+      label: m.assignment_publish_dialog_time_limit_label(),
+      value: formatStudentRunnerTimerLimitLabel(timeLimitSeconds),
+    }),
+    buildStudentRunnerSubmissionHandoffItemView({
+      description:
+        attemptResultDisplay?.durationView.description ??
+        m.assignment_attempt_duration_display_description(),
+      id: 'attempt-duration',
+      label: m.assignment_result_table_header_time(),
+      value: formatStudentRunnerCurrentAttemptDuration({
+        attemptResultDisplay,
+        attemptTimer,
+      }),
+    }),
+    buildStudentRunnerSubmissionHandoffItemView({
+      description: m.student_runner_timer_active_description(),
+      id: 'attempt-clock',
+      label: m.student_runner_prepare_step_timer_label(),
+      value: formatStudentRunnerAttemptClockLabel({
+        attemptState,
+        attemptTimer,
+      }),
+    }),
+    buildStudentRunnerSubmissionHandoffItemView({
+      description: getStudentRunnerResultHandoffDescription(resultPanelView),
+      id: 'result-status',
+      label: m.student_runner_result_region_label(),
+      value: resultPanelView.show
+        ? resultPanelView.statusLabel
+        : submitReadinessView.statusLabel,
+    }),
+    buildStudentRunnerSubmissionHandoffItemView({
+      description: getStudentRunnerResultHandoffDescription(resultPanelView),
+      id: 'score-summary',
+      label: m.student_runner_result_region_label(),
+      value: resultPanelView.show
+        ? resultPanelView.scoreLabel
+        : submitReadinessView.statusLabel,
+    }),
+    buildStudentRunnerSubmissionHandoffItemView({
+      description: resultPanelView.show
+        ? resultPanelView.reviewSummaryView.description
+        : getStudentRunnerCopy().resultNextStepReviewScore,
+      id: 'review-summary',
+      label: getStudentRunnerCopy().reviewSummaryTitle,
+      value: resultPanelView.show
+        ? formatStudentRunnerHandoffMetricSummary(
+            resultPanelView.reviewSummaryView.metrics
+          )
+        : getStudentRunnerCopy().reviewSummaryReviewHiddenValue,
+    }),
+    buildStudentRunnerSubmissionHandoffItemView({
+      description: resultPanelView.show
+        ? resultPanelView.feedbackScopeView.description
+        : getStudentRunnerCopy().resultNextStepReviewScore,
+      id: 'feedback-scope',
+      label: m.student_runner_feedback_scope_title(),
+      value: resultPanelView.show
+        ? resultPanelView.feedbackScopeView.statusLabel
+        : getStudentRunnerCopy().reviewSummaryReviewHiddenValue,
+    }),
+    buildStudentRunnerSubmissionHandoffItemView({
+      description: getStudentRunnerResultHandoffDescription(resultPanelView),
+      id: 'next-steps',
+      label: getStudentRunnerCopy().resultNextStepsTitle,
+      value: resultPanelView.show
+        ? formatStudentRunnerHandoffStepSummary(
+            resultPanelView.nextStepsView.stepViews
+          )
+        : getStudentRunnerCopy().resultNextStepReviewScore,
+    }),
+  ];
+
+  return {
+    description: m.student_runner_attempt_region_description(),
+    itemViews,
+    privacy: buildStudentRunnerSubmissionHandoffPrivacyContract({
+      itemViews,
+      payloadSummaryView,
+      submitReadinessView,
+    }),
+    title: m.student_runner_attempt_region_label(),
+  };
+}
+
 function buildStudentRunnerIdentityContractItem(
   identityView: StudentRunnerIdentityView | undefined
 ): Omit<StudentRunnerSubmissionContractItemView, 'ariaLabel'> {
@@ -1697,6 +1978,257 @@ function buildStudentRunnerFeedbackContractItem(
     label: resultPanelView.feedbackScopeView.title,
     value: resultPanelView.feedbackScopeView.statusLabel,
   };
+}
+
+function buildStudentRunnerIdentityHandoffModeItem(
+  identityView: StudentRunnerIdentityView | undefined
+): Omit<StudentRunnerSubmissionHandoffItemView, 'ariaLabel'> {
+  if (!identityView) {
+    return {
+      description: '',
+      id: 'identity-mode',
+      label: m.student_runner_identity_region_label(),
+      value: '',
+    };
+  }
+
+  if (identityView.mode === 'student-name') {
+    return {
+      description: identityView.description,
+      id: 'identity-mode',
+      label: identityView.label,
+      value: identityView.mode,
+    };
+  }
+
+  return {
+    description: identityView.copy.description,
+    id: 'identity-mode',
+    label: identityView.copy.title,
+    value: identityView.mode,
+  };
+}
+
+function buildStudentRunnerIdentityHandoffPrivacyItem(
+  identityView: StudentRunnerIdentityView | undefined
+): Omit<StudentRunnerSubmissionHandoffItemView, 'ariaLabel'> {
+  if (identityView?.mode === 'anonymous') {
+    const privacyItem = identityView.copy.summaryItems.find(
+      (item) => item.id === 'token-privacy'
+    );
+
+    if (privacyItem) {
+      return {
+        description: privacyItem.description,
+        id: 'identity-privacy',
+        label: privacyItem.label,
+        value: privacyItem.value,
+      };
+    }
+  }
+
+  return {
+    description:
+      identityView?.mode === 'student-name' ? identityView.description : '',
+    id: 'identity-privacy',
+    label: m.student_runner_anonymous_summary_privacy_label(),
+    value:
+      identityView?.mode === 'student-name'
+        ? m.student_runner_student_name_label()
+        : '',
+  };
+}
+
+function getStudentRunnerTimerLimitDescription(timeLimitSeconds?: number) {
+  return formatStudentRunnerTimerLimitLabel(timeLimitSeconds) ===
+    m.assignment_delivery_timer_none()
+    ? m.assignment_delivery_public_rule_timer_none_description()
+    : m.assignment_delivery_public_rule_timer_limited_description();
+}
+
+function formatStudentRunnerTimerLimitLabel(timeLimitSeconds?: number) {
+  return formatAttemptDuration(timeLimitSeconds, {
+    emptyValue: m.assignment_delivery_timer_none(),
+    style: 'timer',
+  });
+}
+
+function formatStudentRunnerCurrentAttemptDuration({
+  attemptResultDisplay,
+  attemptTimer,
+}: {
+  attemptResultDisplay?: StudentAttemptResultDisplay;
+  attemptTimer: AttemptTimerState;
+}) {
+  if (attemptResultDisplay?.durationView.label) {
+    return attemptResultDisplay.durationView.label;
+  }
+
+  return formatAttemptDuration(attemptTimer.durationSeconds, {
+    emptyValue: m.assignment_attempt_duration_timer_seconds({ seconds: 0 }),
+    style: 'timer',
+  });
+}
+
+function formatStudentRunnerAttemptClockLabel({
+  attemptState,
+  attemptTimer,
+}: {
+  attemptState: {
+    canSubmit: boolean;
+    currentAttemptSessionKey?: string;
+    itemCount: number;
+  };
+  attemptTimer: AttemptTimerState;
+}) {
+  if (
+    !attemptState.canSubmit ||
+    attemptState.itemCount <= 0 ||
+    !attemptState.currentAttemptSessionKey
+  ) {
+    return m.student_runner_submit_readiness_status_blocked();
+  }
+
+  return formatAttemptDuration(attemptTimer.elapsedSeconds, {
+    emptyValue: m.assignment_attempt_duration_timer_seconds({ seconds: 0 }),
+    style: 'timer',
+  });
+}
+
+function getStudentRunnerResultHandoffDescription(
+  resultPanelView: StudentRunnerResultPanelView
+) {
+  return resultPanelView.show
+    ? resultPanelView.ariaLabel
+    : getStudentRunnerCopy().resultNextStepReviewScore;
+}
+
+function getStudentRunnerSubmissionPayloadMetric(
+  payloadSummaryView: StudentRunnerSubmissionPayloadSummaryView,
+  key: StudentRunnerSubmissionPayloadSummaryMetricKey
+): StudentRunnerSubmissionPayloadSummaryMetricView {
+  const metric = payloadSummaryView.metrics.find(
+    (payloadMetric) => payloadMetric.key === key
+  );
+  if (metric) return metric;
+
+  return buildStudentRunnerSubmissionPayloadMetricFallback(key);
+}
+
+function buildStudentRunnerSubmissionPayloadMetricFallback(
+  key: StudentRunnerSubmissionPayloadSummaryMetricKey
+): StudentRunnerSubmissionPayloadSummaryMetricView {
+  if (key === 'share-link') {
+    return buildStudentRunnerSubmissionPayloadSummaryMetricView({
+      description: m.student_runner_payload_summary_share_description(),
+      key,
+      label: m.student_runner_payload_summary_share_label(),
+      value: '',
+    });
+  }
+
+  if (key === 'items') {
+    return buildStudentRunnerSubmissionPayloadSummaryMetricView({
+      description: m.student_runner_payload_summary_items_description(),
+      key,
+      label: m.student_runner_payload_summary_items_label(),
+      value: '',
+    });
+  }
+
+  if (key === 'answers') {
+    return buildStudentRunnerSubmissionPayloadSummaryMetricView({
+      description: m.student_runner_payload_summary_answers_description(),
+      key,
+      label: m.student_runner_payload_summary_answers_label(),
+      value: '',
+    });
+  }
+
+  return buildStudentRunnerSubmissionPayloadSummaryMetricView({
+    description: m.student_runner_payload_summary_unanswered_description(),
+    key,
+    label: m.student_runner_payload_summary_unanswered_label(),
+    value: '',
+  });
+}
+
+function getStudentRunnerSubmitReadinessItem(
+  submitReadinessView: StudentRunnerSubmitReadinessView,
+  id: StudentRunnerSubmitReadinessItemId
+): StudentRunnerSubmitReadinessItemView {
+  const item = submitReadinessView.items.find(
+    (readinessItem) => readinessItem.id === id
+  );
+  if (item) return item;
+
+  return {
+    ariaLabel: submitReadinessView.ariaLabel,
+    description: submitReadinessView.description,
+    id,
+    label: submitReadinessView.title,
+    status: submitReadinessView.status,
+    statusLabel: submitReadinessView.statusLabel,
+  };
+}
+
+function buildStudentRunnerSubmissionHandoffItemView({
+  description,
+  id,
+  label,
+  value,
+}: Omit<
+  StudentRunnerSubmissionHandoffItemView,
+  'ariaLabel'
+>): StudentRunnerSubmissionHandoffItemView {
+  return {
+    ariaLabel: m.student_runner_payload_summary_metric_aria({
+      description,
+      label,
+      value,
+    }),
+    description,
+    id,
+    label,
+    value,
+  };
+}
+
+function buildStudentRunnerSubmissionHandoffPrivacyContract({
+  itemViews,
+  payloadSummaryView,
+  submitReadinessView,
+}: {
+  itemViews: StudentRunnerSubmissionHandoffItemView[];
+  payloadSummaryView: StudentRunnerSubmissionPayloadSummaryView;
+  submitReadinessView: StudentRunnerSubmitReadinessView;
+}): StudentRunnerSubmissionHandoffPrivacyContract {
+  return {
+    exposesAnonymousToken: false,
+    exposesAnswerText: false,
+    exposesRawSubmissionPayload: false,
+    exposesRuntimeItemIds: false,
+    exposesStudentName: false,
+    exposesTeacherOnlyAnswers: false,
+    exposesTeacherSourceMaterials: false,
+    itemIds: itemViews.map((item) => item.id),
+    payloadMetricKeys: payloadSummaryView.metrics.map((metric) => metric.key),
+    readinessItemIds: submitReadinessView.items.map((item) => item.id),
+  };
+}
+
+function formatStudentRunnerHandoffMetricSummary(
+  metrics: Array<{ label: string; value: string }>
+) {
+  return metrics
+    .map((metric) => `${metric.label}: ${metric.value}`)
+    .join(' · ');
+}
+
+function formatStudentRunnerHandoffStepSummary(
+  stepViews: StudentAttemptResultNextStepsView['stepViews']
+) {
+  return stepViews.map((step) => step.label).join(' · ');
 }
 
 function buildStudentRunnerSubmissionContractItemView({

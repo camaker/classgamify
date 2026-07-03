@@ -12464,6 +12464,21 @@ assert.match(
   'Student runner state should expose an explicit submit-readiness view contract.'
 );
 assert.match(
+  studentRunnerStateSource,
+  /export type StudentRunnerSubmissionHandoffItemId =(?=[\s\S]*'share-link')(?=[\s\S]*'runtime-items')(?=[\s\S]*'answered-items')(?=[\s\S]*'payload-summary')(?=[\s\S]*'submit-readiness')(?=[\s\S]*'identity-privacy')(?=[\s\S]*'timer-limit')(?=[\s\S]*'attempt-clock')(?=[\s\S]*'review-summary')(?=[\s\S]*'feedback-scope')(?=[\s\S]*'next-steps')[\s\S]*export type StudentRunnerSubmissionHandoffPrivacyContract = \{[\s\S]*exposesAnonymousToken: false;[\s\S]*exposesAnswerText: false;[\s\S]*exposesRawSubmissionPayload: false;[\s\S]*exposesRuntimeItemIds: false;[\s\S]*exposesStudentName: false;[\s\S]*exposesTeacherOnlyAnswers: false;[\s\S]*exposesTeacherSourceMaterials: false;/,
+  'Student runner submission handoff should expose a typed 20-slice contract with explicit privacy flags.'
+);
+assert.match(
+  studentRunnerStateSource,
+  /submissionHandoffView: StudentRunnerSubmissionHandoffView;[\s\S]*const submissionHandoffView = buildStudentRunnerSubmissionHandoffView\(\{[\s\S]*activeShareId,[\s\S]*attemptResultDisplay,[\s\S]*attemptState,[\s\S]*attemptTimer,[\s\S]*identityView,[\s\S]*payloadSummaryView: currentPayloadSummaryView,[\s\S]*progressView,[\s\S]*resultPanelView,[\s\S]*submitReadinessView,[\s\S]*timerBadge: attemptTimerBadge,[\s\S]*submissionHandoffView,/,
+  'Student runner page view-model should compose the submission handoff from prepared progress, payload, readiness, identity, timer, and result views.'
+);
+assert.match(
+  studentRunnerStateSource,
+  /export function buildStudentRunnerSubmissionHandoffView(?=[\s\S]*payloadSummaryView)(?=[\s\S]*progressView)(?=[\s\S]*submitReadinessView)(?=[\s\S]*identityView)(?=[\s\S]*resultPanelView)[\s\S]*id: 'payload-summary'[\s\S]*id: 'submit-readiness'[\s\S]*buildStudentRunnerIdentityHandoffPrivacyItem\(identityView\)[\s\S]*id: 'attempt-duration'[\s\S]*id: 'review-summary'[\s\S]*id: 'feedback-scope'[\s\S]*id: 'next-steps'[\s\S]*privacy: buildStudentRunnerSubmissionHandoffPrivacyContract/,
+  'Student runner submission handoff should collect progress, payload, readiness, identity, timer, result, review, feedback, and next-step slices.'
+);
+assert.match(
   studentRunnerSubmitControlsSource,
   /<StudentRunnerSubmitReadiness[\s\S]*view=\{controlView\.submitReadinessView\}[\s\S]*const titleId = 'student-runner-submit-readiness-title'[\s\S]*aria-describedby=\{`\$\{descriptionId\} \$\{statusValueId\}`\}[\s\S]*aria-label=\{view\.ariaLabel\}[\s\S]*aria-labelledby=\{titleId\}[\s\S]*data-status=\{view\.status\}[\s\S]*<output[\s\S]*aria-label=\{view\.ariaLabel\}[\s\S]*id=\{statusValueId\}[\s\S]*view\.statusLabel[\s\S]*view\.items\.map\(\(item\)[\s\S]*const labelId = `student-runner-submit-readiness-\$\{item\.id\}-label`[\s\S]*const valueId = `student-runner-submit-readiness-\$\{item\.id\}-value`[\s\S]*const descriptionId = `student-runner-submit-readiness-\$\{item\.id\}-description`[\s\S]*aria-label=\{item\.ariaLabel\}[\s\S]*data-status=\{item\.status\}[\s\S]*<output[\s\S]*aria-label=\{item\.ariaLabel\}[\s\S]*id=\{valueId\}[\s\S]*item\.statusLabel[\s\S]*item\.description/,
   'Student runner submit controls should render the domain-prepared submit-readiness checks.'
