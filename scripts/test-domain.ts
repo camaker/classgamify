@@ -5612,8 +5612,8 @@ assert.match(
 );
 assert.match(
   activityPublishSettingsFormSource,
-  /AssignmentPublishPreviewContextTone[\s\S]*AssignmentPublishPreviewContextView[\s\S]*AssignmentPublishPreviewReviewItemView/,
-  'Assignment publish settings form should import the explicit assignment-domain preview context and review item contracts.'
+  /AssignmentPublishPreviewContextTone[\s\S]*AssignmentPublishPreviewContextStatView[\s\S]*AssignmentPublishPreviewContextView[\s\S]*AssignmentPublishPreviewReviewItemView/,
+  'Assignment publish settings form should import the explicit assignment-domain preview context, stat item, and review item contracts.'
 );
 assert.match(
   activityPublishSettingsFormSource,
@@ -5627,13 +5627,43 @@ assert.match(
 );
 assert.match(
   activityPublishSettingsFormSource,
-  /function ActivityPublishPreviewContext[\s\S]*context\.title[\s\S]*context\.description[\s\S]*context\.status\.label[\s\S]*context\.status\.message[\s\S]*context\.statItems\.map[\s\S]*item\.label[\s\S]*item\.value[\s\S]*context\.reviewLabel[\s\S]*context\.reviewItems\.map[\s\S]*key=\{item\.id\}/,
-  'Assignment publish preview context component should render prepared title, status, message, stat items, and review items.'
+  /function ActivityPublishPreview[\s\S]*aria-labelledby="assignment-publish-preview-label"[\s\S]*id="assignment-publish-preview-label"[\s\S]*assignmentPublishDialogCopy\.previewLabel[\s\S]*role="alert"[\s\S]*view\.dialogState\.errorMessage/,
+  'Assignment publish preview should expose the prepared preview label and validation errors as semantic status for teachers before publishing.'
+);
+assert.match(
+  activityPublishSettingsFormSource,
+  /function ActivityPublishPreviewContext[\s\S]*context\.title[\s\S]*context\.description[\s\S]*context\.status\.label[\s\S]*context\.status\.message[\s\S]*context\.statItems\.map[\s\S]*AssignmentPublishPreviewStatItem[\s\S]*context\.reviewLabel[\s\S]*context\.reviewItems\.map[\s\S]*key=\{item\.id\}/,
+  'Assignment publish preview context component should render prepared title, status, message, and delegate stat and review items.'
+);
+assert.match(
+  activityPublishSettingsFormSource,
+  /function ActivityPublishPreviewContext[\s\S]*const titleId = 'assignment-publish-preview-context-title'[\s\S]*const descriptionId = 'assignment-publish-preview-context-description'[\s\S]*const statusMessageId = 'assignment-publish-preview-context-status-message'[\s\S]*aria-labelledby=\{titleId\}[\s\S]*aria-describedby=\{`\$\{descriptionId\} \$\{statusMessageId\}`\}[\s\S]*id=\{titleId\}[\s\S]*context\.title[\s\S]*id=\{descriptionId\}[\s\S]*context\.description/,
+  'Assignment publish preview context should bind its prepared title, description, and status message to the preview region.'
+);
+assert.match(
+  activityPublishSettingsFormSource,
+  /aria-describedby=\{statusMessageId\}[\s\S]*context\.status\.label[\s\S]*id=\{statusMessageId\}[\s\S]*role=\{context\.status\.tone === 'blocked'[\s\S]*'alert'[\s\S]*'status'\}[\s\S]*context\.status\.message/,
+  'Assignment publish preview status should associate the visible status badge with the prepared ready or blocked message.'
+);
+assert.match(
+  activityPublishSettingsFormSource,
+  /function AssignmentPublishPreviewStatItem[\s\S]*item: AssignmentPublishPreviewContextStatView[\s\S]*const labelId = `assignment-publish-preview-stat-\$\{item\.id\}-label`[\s\S]*const valueId = `assignment-publish-preview-stat-\$\{item\.id\}-value`[\s\S]*<fieldset[\s\S]*aria-labelledby=\{`\$\{labelId\} \$\{valueId\}`\}[\s\S]*<legend id=\{labelId\}[\s\S]*item\.label[\s\S]*id=\{valueId\}[\s\S]*<output>\{item\.value\}<\/output>[\s\S]*<\/fieldset>/,
+  'Assignment publish preview stat items should expose prepared label/value pairs as native semantic grouped outputs.'
+);
+assert.match(
+  activityPublishSettingsFormSource,
+  /const reviewLabelId = 'assignment-publish-preview-review-label'[\s\S]*id=\{reviewLabelId\}[\s\S]*context\.reviewLabel[\s\S]*<ul aria-labelledby=\{reviewLabelId\}/,
+  'Assignment publish preview review checklist should be labelled by the prepared review label.'
 );
 assert.match(
   activityPublishSettingsFormSource,
   /function AssignmentPublishPreviewReviewItem[\s\S]*AssignmentPublishPreviewReviewItemView[\s\S]*item\.ariaLabel[\s\S]*item\.label[\s\S]*item\.description/,
   'Assignment publish preview review item should render prepared aria, label, and description copy.'
+);
+assert.match(
+  activityPublishSettingsFormSource,
+  /function AssignmentPublishPreviewReviewItem[\s\S]*const labelId = `assignment-publish-preview-review-\$\{item\.id\}-label`[\s\S]*const descriptionId = `assignment-publish-preview-review-\$\{item\.id\}-description`[\s\S]*aria-labelledby=\{labelId\}[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*id=\{labelId\}[\s\S]*item\.label[\s\S]*id=\{descriptionId\}[\s\S]*item\.description/,
+  'Assignment publish preview review rows should bind prepared labels and descriptions to each checklist item.'
 );
 assert.doesNotMatch(
   activityPublishSettingsFormSource,

@@ -4,6 +4,7 @@ import {
   type AssignmentPublishDraft,
   type AssignmentPublishDraftValues,
   type AssignmentPublishPreviewContextTone,
+  type AssignmentPublishPreviewContextStatView,
   type AssignmentPublishPreviewContextView,
   type AssignmentPublishPreviewReviewItemView,
   type AssignmentPublishToggleView,
@@ -234,18 +235,24 @@ function ActivityPublishPreview({
   view: AssignmentPublishDialogViewModel;
 }) {
   return (
-    <div className="grid gap-2">
-      <p className="font-medium text-sm">
+    <section
+      aria-labelledby="assignment-publish-preview-label"
+      className="grid gap-2"
+    >
+      <p id="assignment-publish-preview-label" className="font-medium text-sm">
         {assignmentPublishDialogCopy.previewLabel}
       </p>
       <ActivityPublishPreviewContext context={view.preview.context} />
       <AssignmentSettingsSummary view={view.preview.settingsSummaryView} />
       {view.dialogState.errorMessage ? (
-        <p className="rounded-md border border-destructive/30 bg-destructive/5 px-3 py-2 text-destructive text-sm">
+        <p
+          className="rounded-md border border-destructive/30 bg-destructive/5 px-3 py-2 text-destructive text-sm"
+          role="alert"
+        >
           {view.dialogState.errorMessage}
         </p>
       ) : null}
-    </div>
+    </section>
   );
 }
 
@@ -254,12 +261,26 @@ function ActivityPublishPreviewContext({
 }: {
   context: AssignmentPublishPreviewContextView;
 }) {
+  const titleId = 'assignment-publish-preview-context-title';
+  const descriptionId = 'assignment-publish-preview-context-description';
+  const statusMessageId = 'assignment-publish-preview-context-status-message';
+  const reviewLabelId = 'assignment-publish-preview-review-label';
+
   return (
-    <section className="grid gap-3 rounded-lg border bg-muted/20 p-3">
+    <section
+      aria-labelledby={titleId}
+      aria-describedby={`${descriptionId} ${statusMessageId}`}
+      className="grid gap-3 rounded-lg border bg-muted/20 p-3"
+    >
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div className="min-w-0">
-          <p className="font-medium text-sm">{context.title}</p>
-          <p className="mt-1 text-muted-foreground text-xs leading-5">
+          <p id={titleId} className="font-medium text-sm">
+            {context.title}
+          </p>
+          <p
+            id={descriptionId}
+            className="mt-1 text-muted-foreground text-xs leading-5"
+          >
             {context.description}
           </p>
         </div>
@@ -268,6 +289,7 @@ function ActivityPublishPreviewContext({
             'shrink-0 rounded-md px-2 py-1 font-medium text-xs',
             getActivityPublishPreviewStatusClass(context.status.tone)
           )}
+          aria-describedby={statusMessageId}
         >
           {context.status.label}
         </span>
@@ -277,20 +299,21 @@ function ActivityPublishPreviewContext({
           'rounded-md border px-3 py-2 text-sm',
           getActivityPublishPreviewMessageClass(context.status.tone)
         )}
+        id={statusMessageId}
+        role={context.status.tone === 'blocked' ? 'alert' : 'status'}
       >
         {context.status.message}
       </p>
-      <dl className="grid gap-2 sm:grid-cols-2">
+      <div className="grid gap-2 sm:grid-cols-2">
         {context.statItems.map((item) => (
-          <div key={item.id} className="rounded-md border bg-background p-2">
-            <dt className="text-muted-foreground text-xs">{item.label}</dt>
-            <dd className="mt-1 font-medium text-sm">{item.value}</dd>
-          </div>
+          <AssignmentPublishPreviewStatItem item={item} key={item.id} />
         ))}
-      </dl>
+      </div>
       <div className="border-t pt-3">
-        <p className="font-medium text-xs">{context.reviewLabel}</p>
-        <ul className="mt-2 grid gap-2">
+        <p id={reviewLabelId} className="font-medium text-xs">
+          {context.reviewLabel}
+        </p>
+        <ul aria-labelledby={reviewLabelId} className="mt-2 grid gap-2">
           {context.reviewItems.map((item) => (
             <AssignmentPublishPreviewReviewItem item={item} key={item.id} />
           ))}
@@ -300,16 +323,51 @@ function ActivityPublishPreviewContext({
   );
 }
 
+function AssignmentPublishPreviewStatItem({
+  item,
+}: {
+  item: AssignmentPublishPreviewContextStatView;
+}) {
+  const labelId = `assignment-publish-preview-stat-${item.id}-label`;
+  const valueId = `assignment-publish-preview-stat-${item.id}-value`;
+
+  return (
+    <fieldset
+      aria-labelledby={`${labelId} ${valueId}`}
+      className="rounded-md border bg-background p-2"
+    >
+      <legend id={labelId} className="text-muted-foreground text-xs">
+        {item.label}
+      </legend>
+      <div id={valueId} className="mt-1 font-medium text-sm">
+        <output>{item.value}</output>
+      </div>
+    </fieldset>
+  );
+}
+
 function AssignmentPublishPreviewReviewItem({
   item,
 }: {
   item: AssignmentPublishPreviewReviewItemView;
 }) {
+  const labelId = `assignment-publish-preview-review-${item.id}-label`;
+  const descriptionId = `assignment-publish-preview-review-${item.id}-description`;
+
   return (
-    <li className="rounded-md border bg-background px-3 py-2 text-xs">
+    <li
+      aria-label={item.ariaLabel}
+      aria-labelledby={labelId}
+      aria-describedby={descriptionId}
+      className="rounded-md border bg-background px-3 py-2 text-xs"
+    >
       <span className="sr-only">{item.ariaLabel}</span>
-      <p className="font-medium">{item.label}</p>
-      <p className="mt-1 leading-5 text-muted-foreground">{item.description}</p>
+      <p id={labelId} className="font-medium">
+        {item.label}
+      </p>
+      <p id={descriptionId} className="mt-1 leading-5 text-muted-foreground">
+        {item.description}
+      </p>
     </li>
   );
 }

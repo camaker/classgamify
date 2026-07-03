@@ -163,6 +163,9 @@ teacher creates the share link, so configuration mistakes are visible before an
 assignment is frozen. Delivery summary labels, order, and fallback values should
 come from assignment-domain helpers before they are rendered in publish dialogs,
 assignment cards, result pages, or public student rule cards.
+Publish-dialog previews should expose the frozen-link status, delivery-rule
+stats, and review checklist as labelled semantic regions, so screen-reader and
+keyboard users can verify the same assignment policy before publishing.
 Publish-dialog timer and close-time parsing should also live in assignment
 domain helpers so preview values and submitted settings use the same input
 rules.
