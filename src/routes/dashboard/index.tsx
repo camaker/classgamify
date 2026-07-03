@@ -103,14 +103,32 @@ function DashboardPage() {
 
           <Card className="rounded-lg">
             <CardHeader>
-              <CardTitle>
-                <h2 className="text-base font-semibold">
-                  {dashboardOverviewPageCopy.readinessTitle}
-                </h2>
-              </CardTitle>
+              <div className="flex flex-wrap items-start justify-between gap-2">
+                <div className="min-w-0 space-y-1">
+                  <CardTitle>
+                    <h2 className="text-base font-semibold">
+                      {pageView.readinessView.title}
+                    </h2>
+                  </CardTitle>
+                  <p className="text-muted-foreground text-xs leading-5">
+                    {pageView.readinessView.description}
+                  </p>
+                </div>
+                <Badge
+                  aria-label={pageView.readinessView.ariaLabel}
+                  variant={
+                    pageView.readinessView.status === 'ready'
+                      ? 'secondary'
+                      : 'outline'
+                  }
+                  className="rounded-md"
+                >
+                  {pageView.readinessView.statusLabel}
+                </Badge>
+              </div>
             </CardHeader>
             <CardContent className="space-y-4">
-              {pageView.readinessRows.map((row) => (
+              {pageView.readinessView.rows.map((row) => (
                 <DashboardOverviewReadinessRow key={row.id} row={row} />
               ))}
             </CardContent>

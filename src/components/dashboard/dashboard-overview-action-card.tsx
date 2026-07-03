@@ -2,7 +2,6 @@ import type {
   DashboardOverviewActionCard as DashboardOverviewActionCardView,
   DashboardOverviewActionCardId,
 } from '@/dashboard/overview';
-import { Routes } from '@/lib/routes';
 import {
   IconDeviceGamepad2,
   IconListCheck,
@@ -22,7 +21,8 @@ export function DashboardOverviewActionCard({
 
   return (
     <Link
-      to={dashboardActionHrefs[card.id]}
+      aria-label={card.ariaLabel}
+      to={card.to}
       className="group rounded-lg border bg-card p-5 transition-colors hover:border-primary/40 hover:bg-primary/5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
     >
       <div className="flex size-9 items-center justify-center rounded-lg border bg-background text-primary">
@@ -45,9 +45,3 @@ const dashboardActionIcons: Record<DashboardOverviewActionCardId, TablerIcon> =
     assignments: IconListCheck,
     'student-preview': IconPlayerPlay,
   };
-
-const dashboardActionHrefs: Record<DashboardOverviewActionCardId, string> = {
-  activities: Routes.DashboardActivities,
-  assignments: Routes.DashboardAssignments,
-  'student-preview': Routes.StudentPreview,
-};

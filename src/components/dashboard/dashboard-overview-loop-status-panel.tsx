@@ -27,7 +27,7 @@ export function DashboardOverviewLoopStatusPanel({
   view,
 }: DashboardOverviewLoopStatusPanelProps) {
   return (
-    <Card className="rounded-lg">
+    <Card aria-label={view.ariaLabel} className="rounded-lg">
       <CardHeader className="gap-3">
         <div className="flex flex-wrap items-center justify-between gap-2">
           <Badge variant="outline" className="rounded-md border-primary/30">
@@ -60,6 +60,7 @@ export function DashboardOverviewLoopStatusPanel({
                   <Icon aria-hidden="true" className="size-4" />
                 </span>
                 <Badge
+                  aria-label={action.statusAriaLabel}
                   variant={getDashboardNextActionBadgeVariant(action.status)}
                   className="rounded-md"
                 >
@@ -72,6 +73,7 @@ export function DashboardOverviewLoopStatusPanel({
                 <p className="text-xs leading-5 text-muted-foreground">
                   {action.description}
                 </p>
+                <p className="sr-only">{action.statusDescription}</p>
               </div>
               {action.status === 'ready' ? (
                 <Link

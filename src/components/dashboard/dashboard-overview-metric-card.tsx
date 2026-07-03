@@ -1,4 +1,4 @@
-import type { DashboardOverviewMetricId } from '@/dashboard/overview';
+import type { DashboardOverviewMetric } from '@/dashboard/overview';
 import { Card, CardContent } from '@/components/ui/card';
 import {
   IconChartBar,
@@ -9,12 +9,7 @@ import {
 } from '@tabler/icons-react';
 
 type DashboardOverviewMetricCardProps = {
-  metric: {
-    description: string;
-    id: DashboardOverviewMetricId;
-    label: string;
-    value: string;
-  };
+  metric: DashboardOverviewMetric;
 };
 
 export function DashboardOverviewMetricCard({
@@ -23,10 +18,15 @@ export function DashboardOverviewMetricCard({
   const Icon = dashboardMetricIcons[metric.id];
 
   return (
-    <Card className="rounded-lg">
+    <Card aria-label={metric.ariaLabel} className="rounded-lg">
       <CardContent className="p-4">
         <Icon className="size-5 text-primary" />
-        <p className="mt-4 text-2xl font-semibold">{metric.value}</p>
+        <output
+          aria-label={metric.ariaLabel}
+          className="mt-4 block text-2xl font-semibold"
+        >
+          {metric.value}
+        </output>
         <p className="text-sm font-medium">{metric.label}</p>
         <p className="mt-1 text-xs leading-5 text-muted-foreground">
           {metric.description}
@@ -36,9 +36,10 @@ export function DashboardOverviewMetricCard({
   );
 }
 
-const dashboardMetricIcons: Record<DashboardOverviewMetricId, TablerIcon> = {
-  activities: IconDeviceGamepad2,
-  assignments: IconClipboardList,
-  results: IconChartBar,
-  templates: IconLayoutGrid,
-};
+const dashboardMetricIcons: Record<DashboardOverviewMetric['id'], TablerIcon> =
+  {
+    activities: IconDeviceGamepad2,
+    assignments: IconClipboardList,
+    results: IconChartBar,
+    templates: IconLayoutGrid,
+  };

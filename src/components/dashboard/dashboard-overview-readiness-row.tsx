@@ -9,15 +9,19 @@ export function DashboardOverviewReadinessRow({
   row,
 }: DashboardOverviewReadinessRowProps) {
   return (
-    <div className="space-y-2">
+    <section aria-label={row.ariaLabel} className="space-y-2">
       <div className="flex items-center justify-between gap-3 text-sm">
         <span>{row.label}</span>
-        <span className="text-muted-foreground">{row.value}%</span>
+        <span className="text-muted-foreground">{row.percentLabel}</span>
       </div>
       <p className="text-muted-foreground text-xs leading-5">
         {row.description}
       </p>
-      <Progress value={row.value} />
-    </div>
+      <Progress
+        aria-label={row.ariaLabel}
+        aria-valuetext={`${row.percentLabel}. ${row.statusLabel}`}
+        value={row.value}
+      />
+    </section>
   );
 }
