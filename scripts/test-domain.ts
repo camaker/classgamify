@@ -55,7 +55,12 @@ import {
   getAuthBannedUserMessage,
   getAuthDefaultBanReason,
 } from '@/auth/plugin-copy';
-import { buildMailWorkspaceBoundaryView } from '@/mail/workspace-boundary';
+import {
+  buildMailTransactionalWorkspaceHandoffView,
+  buildMailWorkspaceBoundaryView,
+  MAIL_TRANSACTIONAL_TEMPLATE_IDS,
+  MAIL_TRANSACTIONAL_WORKSPACE_HANDOFF_ITEM_IDS,
+} from '@/mail/workspace-boundary';
 import { normalizeMailLocale } from '@/mail/locale';
 import { getEmailSubject } from '@/mail/render';
 import { getAvatarLinks } from '@/config/avatar-config';
@@ -1923,6 +1928,11 @@ assert.match(
   mailDocumentationSource,
   /workspace-boundary\.ts[\s\S]*shared workspace boundary panel[\s\S]*saved activities[\s\S]*assignment links[\s\S]*student attempts\/results[\s\S]*teacher-reviewed AI drafts[\s\S]*safe source-material[\s\S]*provenance/,
   'Mail docs should document the shared transactional workspace-boundary panel.'
+);
+assert.match(
+  mailDocumentationSource,
+  /buildMailTransactionalWorkspaceHandoffView\(\)[\s\S]*20-slice preflight contract[\s\S]*template set[\s\S]*HTML\/plain-text rendering[\s\S]*private-data guard[\s\S]*recipient names[\s\S]*action URLs[\s\S]*source-material storage keys/,
+  'Mail docs should document the transactional email handoff privacy contract.'
 );
 assert.doesNotMatch(
   blogPostVisualSource,
@@ -8448,6 +8458,21 @@ assert.match(
   'Mail workspace-boundary domain should expose explicit item and panel view contracts from localized copy.'
 );
 assert.match(
+  mailWorkspaceBoundarySource,
+  /export const MAIL_TRANSACTIONAL_WORKSPACE_HANDOFF_ITEM_IDS = \[(?=[\s\S]*'template-set')(?=[\s\S]*'verify-email-template')(?=[\s\S]*'forgot-password-template')(?=[\s\S]*'newsletter-template')(?=[\s\S]*'contact-template')(?=[\s\S]*'localized-subjects')(?=[\s\S]*'html-language')(?=[\s\S]*'plain-text-render')(?=[\s\S]*'shared-layout')(?=[\s\S]*'boundary-panel')(?=[\s\S]*'activities-scope')(?=[\s\S]*'assignments-scope')(?=[\s\S]*'attempt-results-scope')(?=[\s\S]*'ai-draft-scope')(?=[\s\S]*'source-material-safety')(?=[\s\S]*'worksheet-workflow-scope')(?=[\s\S]*'contact-classroom-fields')(?=[\s\S]*'action-link-placement')(?=[\s\S]*'legacy-copy-guard')(?=[\s\S]*'private-data-guard')/,
+  'Transactional mail handoff should expose 20 stable workspace boundary slice ids.'
+);
+assert.match(
+  mailWorkspaceBoundarySource,
+  /export type MailTransactionalWorkspaceHandoffPrivacyContract = \{[\s\S]*exposesActionUrls: false;[\s\S]*exposesContactMessageText: false;[\s\S]*exposesRawErrors: false;[\s\S]*exposesRecipientEmail: false;[\s\S]*exposesRecipientName: false;[\s\S]*exposesSourceMaterialStorageKeys: false;[\s\S]*exposesStudentIdentifiers: false;[\s\S]*rendersSharedBoundaryPanel: true;[\s\S]*scope: 'transactional-email-workspace-boundary';[\s\S]*usesLocalizedSubjects: true;/,
+  'Transactional mail handoff should publish explicit privacy flags for private email values.'
+);
+assert.match(
+  mailWorkspaceBoundarySource,
+  /buildMailTransactionalWorkspaceHandoffView[\s\S]*buildMailWorkspaceBoundaryView\(input\)[\s\S]*MAIL_TRANSACTIONAL_WORKSPACE_HANDOFF_ITEM_IDS\.map[\s\S]*buildMailTransactionalWorkspaceHandoffItemView[\s\S]*privacy: buildMailTransactionalWorkspaceHandoffPrivacyContract/,
+  'Transactional mail handoff should derive slice views from localized mail subjects and the shared workspace boundary panel.'
+);
+assert.match(
   emailWorkspaceBoundaryComponentSource,
   /buildMailWorkspaceBoundaryView\(\{ locale \}\)[\s\S]*<Section[\s\S]*aria-label=\{view\.title\}[\s\S]*view\.items\.map\(\(item\) =>[\s\S]*key=\{item\.id\}[\s\S]*item\.line/,
   'Email workspace-boundary component should render prepared panel and item lines from the mail-domain view.'
@@ -11285,6 +11310,11 @@ const transactionalEmailBoundaryRequirements = [
       ['mail_workspace_boundary_item_results_description', /Submitted attempts, review summaries, CSV exports/],
       ['mail_workspace_boundary_item_ai_sources_description', /Teacher-reviewed AI drafts and safe source-material provenance/],
       ['mail_workspace_boundary_item_line', /\{label\}: \{description\}/],
+      ['mail_transactional_handoff_title', /Transactional email workspace handoff/],
+      ['mail_transactional_handoff_description', /20-slice preflight contract/],
+      ['mail_transactional_handoff_template_set_description', /verification, password reset, classroom update, and contact-message templates/],
+      ['mail_transactional_handoff_source_material_safety_description', /file URLs, paths, permission metadata, or storage keys/],
+      ['mail_transactional_handoff_private_data_guard_description', /recipient names, email addresses, action URLs/],
     ],
   ],
   [
@@ -11308,6 +11338,11 @@ const transactionalEmailBoundaryRequirements = [
       ['mail_workspace_boundary_item_results_description', /已提交作答、复盘摘要、CSV 导出/],
       ['mail_workspace_boundary_item_ai_sources_description', /老师审核的 AI 草稿和安全来源素材信息/],
       ['mail_workspace_boundary_item_line', /\{label\}：\{description\}/],
+      ['mail_transactional_handoff_title', /事务邮件工作区交接/],
+      ['mail_transactional_handoff_description', /20 切片预检契约/],
+      ['mail_transactional_handoff_template_set_description', /邮箱验证、密码重置、课堂更新和联系消息模板/],
+      ['mail_transactional_handoff_source_material_safety_description', /文件 URL、路径、权限元数据或存储密钥/],
+      ['mail_transactional_handoff_private_data_guard_description', /收件人姓名、邮箱、操作 URL/],
     ],
   ],
 ] as const;
@@ -11359,6 +11394,108 @@ assert.deepEqual(buildMailWorkspaceBoundaryView(), {
   ],
   title: 'Workspace boundary',
 });
+const mailTransactionalHandoffView =
+  buildMailTransactionalWorkspaceHandoffView();
+const mailTransactionalHandoffItemIds =
+  mailTransactionalHandoffView.itemViews.map((item) => item.id);
+const getMailTransactionalHandoffValue = (
+  id: (typeof MAIL_TRANSACTIONAL_WORKSPACE_HANDOFF_ITEM_IDS)[number]
+) => {
+  const item = mailTransactionalHandoffView.itemViews.find(
+    (handoffItem) => handoffItem.id === id
+  );
+  assert.ok(item, `Missing mail transactional handoff item ${id}`);
+  return item.value;
+};
+assert.deepEqual(mailTransactionalHandoffItemIds, [
+  ...MAIL_TRANSACTIONAL_WORKSPACE_HANDOFF_ITEM_IDS,
+]);
+assert.equal(new Set(mailTransactionalHandoffItemIds).size, 20);
+assert.deepEqual(mailTransactionalHandoffView.privacy, {
+  exposesActionUrls: false,
+  exposesContactMessageText: false,
+  exposesRawErrors: false,
+  exposesRecipientEmail: false,
+  exposesRecipientName: false,
+  exposesSourceMaterialStorageKeys: false,
+  exposesStudentIdentifiers: false,
+  itemIds: mailTransactionalHandoffItemIds,
+  rendersSharedBoundaryPanel: true,
+  scope: 'transactional-email-workspace-boundary',
+  templateIds: [...MAIL_TRANSACTIONAL_TEMPLATE_IDS],
+  usesLocalizedSubjects: true,
+});
+assert.deepEqual(
+  [
+    getMailTransactionalHandoffValue('template-set'),
+    getMailTransactionalHandoffValue('verify-email-template'),
+    getMailTransactionalHandoffValue('forgot-password-template'),
+    getMailTransactionalHandoffValue('newsletter-template'),
+    getMailTransactionalHandoffValue('contact-template'),
+    getMailTransactionalHandoffValue('boundary-panel'),
+    getMailTransactionalHandoffValue('activities-scope'),
+    getMailTransactionalHandoffValue('assignments-scope'),
+    getMailTransactionalHandoffValue('attempt-results-scope'),
+    getMailTransactionalHandoffValue('ai-draft-scope'),
+    getMailTransactionalHandoffValue('source-material-safety'),
+    getMailTransactionalHandoffValue('worksheet-workflow-scope'),
+    getMailTransactionalHandoffValue('contact-classroom-fields'),
+    getMailTransactionalHandoffValue('action-link-placement'),
+    getMailTransactionalHandoffValue('legacy-copy-guard'),
+    getMailTransactionalHandoffValue('private-data-guard'),
+  ],
+  [
+    '4 templates',
+    'Verify your ClassGamify teacher workspace email',
+    'Reset your ClassGamify teacher workspace password',
+    'ClassGamify classroom updates enabled',
+    'ClassGamify classroom and product inquiry',
+    'Workspace boundary',
+    'Activities and templates',
+    'Assignment links',
+    'Student attempts and results',
+    'AI drafts and source materials',
+    'No storage keys',
+    'Worksheet workflows',
+    'Structured fields',
+    'After boundary',
+    'ClassGamify only',
+    'Private data omitted',
+  ]
+);
+assert.deepEqual(
+  buildMailTransactionalWorkspaceHandoffView({
+    locale: 'zh',
+  }).itemViews.map((item) => [item.id, item.value]),
+  [
+    ['template-set', '4 个模板'],
+    ['verify-email-template', '验证你的 ClassGamify 教师工作区邮箱'],
+    ['forgot-password-template', '重置你的 ClassGamify 教师工作区密码'],
+    ['newsletter-template', '已开启 ClassGamify 课堂更新'],
+    ['contact-template', 'ClassGamify 课堂与产品咨询'],
+    ['localized-subjects', '消息键'],
+    ['html-language', 'zh'],
+    ['plain-text-render', 'HTML 和文本'],
+    ['shared-layout', 'EmailLayout'],
+    ['boundary-panel', '工作区边界'],
+    ['activities-scope', '活动与模板'],
+    ['assignments-scope', '作业链接'],
+    ['attempt-results-scope', '学生作答与结果'],
+    ['ai-draft-scope', 'AI 草稿与来源素材'],
+    ['source-material-safety', '无存储密钥'],
+    ['worksheet-workflow-scope', '练习纸流程'],
+    ['contact-classroom-fields', '结构化字段'],
+    ['action-link-placement', '边界之后'],
+    ['legacy-copy-guard', '仅 ClassGamify'],
+    ['private-data-guard', '已省略私有数据'],
+  ]
+);
+assert.equal(
+  buildMailTransactionalWorkspaceHandoffView({
+    locale: 'not-supported',
+  }).title,
+  mailTransactionalHandoffView.title
+);
 assert.deepEqual(AUTH_WORKSPACE_BOUNDARY_ITEM_IDS, [
   'account-access',
   'activity-library',

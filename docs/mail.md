@@ -29,7 +29,7 @@ src/mail/
 │   ├── email-layout.tsx
 │   ├── email-workspace-boundary.tsx
 │   └── email-button.tsx
-└── workspace-boundary.ts # shared teacher-workspace boundary view
+└── workspace-boundary.ts # shared boundary view + transactional handoff
 ```
 
 ---
@@ -123,6 +123,16 @@ Each transactional template renders the shared workspace boundary panel from
 `src/mail/workspace-boundary.ts`, covering saved activities, assignment links,
 student attempts/results, teacher-reviewed AI drafts, and safe source-material
 provenance.
+
+The same module also exposes `buildMailTransactionalWorkspaceHandoffView()`, a
+localized 20-slice preflight contract for verifying transactional email
+boundaries without sending real mail. It covers the template set, individual
+subjects, normalized HTML language, HTML/plain-text rendering, shared layout,
+workspace boundary panel, activity/assignment/result/AI/source/worksheet
+scopes, structured classroom contact fields, action-link placement, legacy-copy
+guard, and private-data guard. Its privacy contract must stay false for
+recipient names, recipient emails, action URLs, contact message text, raw
+errors, raw student identifiers, and source-material storage keys.
 
 **Adding a template:** extend `EmailTemplate` in `types.ts` → add to `EmailTemplates` and `getEmailSubject` in `render.ts` → add React component under `templates/`. Any new visible subject, heading, body, or button copy must be added to the locale message files before it is used by the template.
 
