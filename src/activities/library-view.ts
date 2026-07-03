@@ -316,6 +316,51 @@ export type ActivityLibraryPageScopeView = {
   summary: string;
 };
 
+export type ActivityLibraryPageHandoffItemId =
+  | 'filter-summary'
+  | 'owner-scope'
+  | 'pagination'
+  | 'scope-page'
+  | 'scope-range'
+  | 'scope-search'
+  | 'scope-source'
+  | 'scope-status'
+  | 'scope-template'
+  | 'source-capability-audio-extraction'
+  | 'source-capability-spreadsheet-import'
+  | 'source-capability-worksheet-extraction'
+  | 'starter-preview'
+  | 'status-active'
+  | 'status-archived'
+  | 'summary-remix-ready'
+  | 'summary-source-extraction'
+  | 'summary-template-coverage'
+  | 'summary-total'
+  | 'visible-page-items';
+
+export type ActivityLibraryPageHandoffItemView = {
+  ariaLabel: string;
+  description: string;
+  id: ActivityLibraryPageHandoffItemId;
+  label: string;
+  value: string;
+};
+
+export type ActivityLibraryPageHandoffPrivacyView = {
+  broadensBeyondOwner: false;
+  countsStarterPreviewAsOwned: false;
+  exposesSourceMaterialFileIds: false;
+  exposesSourceMaterialStorageKeys: false;
+  itemIds: ActivityLibraryPageHandoffItemId[];
+};
+
+export type ActivityLibraryPageHandoffView = {
+  description: string;
+  itemViews: ActivityLibraryPageHandoffItemView[];
+  privacy: ActivityLibraryPageHandoffPrivacyView;
+  title: string;
+};
+
 export type ActivityLibraryCardActionButtonView =
   ActivityLifecycleActionCopy & {
     ariaLabel: string;
@@ -374,6 +419,7 @@ type ActivityLibraryPageViewModel<TItem extends ActivityLibraryPageItem> = {
   createdPanelContext?: CreatedActivityPanelContext;
   description: string;
   emptyState: ActivityLibraryEmptyStateView;
+  handoffView: ActivityLibraryPageHandoffView;
   hasActivities: boolean;
   hero: typeof activityLibraryHeroCopy;
   loadErrorMessage: string;
@@ -693,6 +739,32 @@ export function buildActivityLibraryPageViewModel<
     isLoading,
     starterPreview,
   });
+  const scopeView = buildActivityLibraryPageScopeView({
+    currentPage: resolvedSearch.currentPage,
+    pageSize: ACTIVITY_LIBRARY_PAGE_SIZE,
+    search: resolvedSearch.searchQuery,
+    source: resolvedSearch.sourceFilter,
+    status: resolvedSearch.libraryStatus,
+    template: resolvedSearch.templateFilter,
+    total: totalActivities,
+    totalPages,
+    visibleCount: activities.length,
+  });
+  const summaryMetrics = buildActivityLibrarySummaryMetrics({
+    hasFilters: resolvedSearch.hasFilters,
+    summary: data?.summary,
+    totalActivities,
+  });
+  const searchPanelView = buildActivityLibrarySearchPanelView({
+    isLoading,
+    search: resolvedSearch.searchQuery,
+    source: resolvedSearch.sourceFilter,
+    status: resolvedSearch.libraryStatus,
+    summary: data?.summary,
+    statusSummary: data?.statusSummary,
+    template: resolvedSearch.templateFilter,
+    total: totalActivities,
+  });
 
   return {
     activities,
@@ -711,27 +783,24 @@ export function buildActivityLibraryPageViewModel<
     createdPanelContext,
     description: activityLibraryPageCopy.description,
     emptyState,
+    handoffView: buildActivityLibraryPageHandoffView({
+      emptyState,
+      resolvedSearch,
+      scopeView,
+      searchPanelView,
+      starterPreview: resolvedStarterPreview,
+      summaryMetrics,
+      totalActivities,
+      totalPages,
+      visibleCount: activities.length,
+    }),
     hasActivities: activities.length > 0,
     hero: activityLibraryHeroCopy,
     loadErrorMessage: activityLibraryPageCopy.loadErrorMessage,
     resolvedSearch,
-    scopeView: buildActivityLibraryPageScopeView({
-      currentPage: resolvedSearch.currentPage,
-      pageSize: ACTIVITY_LIBRARY_PAGE_SIZE,
-      search: resolvedSearch.searchQuery,
-      source: resolvedSearch.sourceFilter,
-      status: resolvedSearch.libraryStatus,
-      template: resolvedSearch.templateFilter,
-      total: totalActivities,
-      totalPages,
-      visibleCount: activities.length,
-    }),
+    scopeView,
     starterPreview: resolvedStarterPreview,
-    summaryMetrics: buildActivityLibrarySummaryMetrics({
-      hasFilters: resolvedSearch.hasFilters,
-      summary: data?.summary,
-      totalActivities,
-    }),
+    summaryMetrics,
     title: activityLibraryPageCopy.title,
     totalActivities,
     totalPages,
@@ -1130,6 +1199,204 @@ function normalizeActivityLibraryScopePageSize(value: number) {
   return Number.isInteger(value) && value > 0
     ? value
     : ACTIVITY_LIBRARY_PAGE_SIZE;
+}
+
+function buildActivityLibraryPageHandoffView({
+  emptyState,
+  resolvedSearch,
+  scopeView,
+  searchPanelView,
+  starterPreview,
+  summaryMetrics,
+  totalActivities,
+  totalPages,
+  visibleCount,
+}: {
+  emptyState: ActivityLibraryEmptyStateView;
+  resolvedSearch: ActivityLibraryPageResolvedSearch;
+  scopeView: ActivityLibraryPageScopeView;
+  searchPanelView: ActivityLibrarySearchPanelView;
+  starterPreview: ActivityLibraryStarterPreview;
+  summaryMetrics: ActivityLibrarySummaryMetric[];
+  totalActivities: number;
+  totalPages: number;
+  visibleCount: number;
+}): ActivityLibraryPageHandoffView {
+  const itemViews: ActivityLibraryPageHandoffItemView[] = [
+    buildActivityLibraryPageHandoffItem({
+      description: m.activity_library_handoff_owner_scope_description(),
+      id: 'owner-scope',
+      label: m.activity_library_handoff_owner_scope_label(),
+      value: m.activity_library_handoff_owner_scope_value(),
+    }),
+    ...summaryMetrics.map((metric) =>
+      buildActivityLibraryPageHandoffItem({
+        description: metric.description,
+        id: toActivityLibrarySummaryHandoffItemId(metric.id),
+        label: metric.label,
+        value: metric.value,
+      })
+    ),
+    ...scopeView.items.map((item) =>
+      buildActivityLibraryPageHandoffItem({
+        description: item.description,
+        id: toActivityLibraryScopeHandoffItemId(item.id),
+        label: item.label,
+        value: item.value,
+      })
+    ),
+    ...searchPanelView.sourceCapabilityMetrics.map((metric) =>
+      buildActivityLibraryPageHandoffItem({
+        description: searchPanelView.sourceFilterDescription,
+        id: toActivityLibrarySourceCapabilityHandoffItemId(metric.capability),
+        label: metric.label,
+        value: metric.value,
+      })
+    ),
+    ...searchPanelView.statusMetrics.map((metric) =>
+      buildActivityLibraryPageHandoffItem({
+        description: searchPanelView.statusDescription,
+        id: toActivityLibraryStatusHandoffItemId(metric.status),
+        label: metric.label,
+        value: metric.value,
+      })
+    ),
+    buildActivityLibraryPageHandoffItem({
+      description: searchPanelView.searchDescription,
+      id: 'filter-summary',
+      label: activityLibrarySearchCopy.label,
+      value: searchPanelView.filterSummary.text,
+    }),
+    buildActivityLibraryPageHandoffItem({
+      description: m.activity_library_handoff_visible_items_description(),
+      id: 'visible-page-items',
+      label: m.activity_library_handoff_visible_items_label(),
+      value: m.activity_library_handoff_visible_items_value({
+        count: normalizeActivityLibraryListCount(visibleCount),
+      }),
+    }),
+    buildActivityLibraryPageHandoffItem({
+      description: m.activity_library_handoff_pagination_description(),
+      id: 'pagination',
+      label: m.activity_library_handoff_pagination_label(),
+      value: m.activity_library_handoff_pagination_value({
+        currentPage: formatActivityLibraryScopeNumber(
+          resolvedSearch.currentPage,
+          { min: 1 }
+        ),
+        totalActivities: formatActivityLibraryScopeNumber(totalActivities),
+        totalPages: formatActivityLibraryScopeNumber(totalPages, { min: 1 }),
+      }),
+    }),
+    buildActivityLibraryPageHandoffItem({
+      description: m.activity_library_handoff_starter_preview_description({
+        emptyState: emptyState.title,
+      }),
+      id: 'starter-preview',
+      label: m.activity_library_handoff_starter_preview_label(),
+      value: m.activity_library_handoff_starter_preview_value({
+        count: normalizeActivityLibraryListCount(
+          starterPreview.activities.length
+        ),
+      }),
+    }),
+  ];
+
+  return {
+    description: m.activity_library_handoff_description(),
+    itemViews,
+    privacy: buildActivityLibraryPageHandoffPrivacyView(itemViews),
+    title: m.activity_library_handoff_title(),
+  };
+}
+
+function toActivityLibrarySummaryHandoffItemId(
+  id: ActivityLibrarySummaryMetric['id']
+): ActivityLibraryPageHandoffItemId {
+  switch (id) {
+    case 'coverage':
+      return 'summary-template-coverage';
+    case 'remix':
+      return 'summary-remix-ready';
+    case 'sourceExtraction':
+      return 'summary-source-extraction';
+    case 'total':
+      return 'summary-total';
+  }
+}
+
+function toActivityLibraryScopeHandoffItemId(
+  id: ActivityLibraryPageScopeItemId
+): ActivityLibraryPageHandoffItemId {
+  switch (id) {
+    case 'page':
+      return 'scope-page';
+    case 'range':
+      return 'scope-range';
+    case 'search':
+      return 'scope-search';
+    case 'source':
+      return 'scope-source';
+    case 'status':
+      return 'scope-status';
+    case 'template':
+      return 'scope-template';
+  }
+}
+
+function toActivityLibrarySourceCapabilityHandoffItemId(
+  capability: ActivityLibrarySourceCapabilityMetric['capability']
+): ActivityLibraryPageHandoffItemId {
+  switch (capability) {
+    case 'audio-extraction':
+      return 'source-capability-audio-extraction';
+    case 'spreadsheet-import':
+      return 'source-capability-spreadsheet-import';
+    case 'worksheet-extraction':
+      return 'source-capability-worksheet-extraction';
+  }
+}
+
+function toActivityLibraryStatusHandoffItemId(
+  status: ActivityLibraryStatus
+): ActivityLibraryPageHandoffItemId {
+  return status === 'archived' ? 'status-archived' : 'status-active';
+}
+
+function buildActivityLibraryPageHandoffPrivacyView(
+  itemViews: ActivityLibraryPageHandoffItemView[]
+): ActivityLibraryPageHandoffPrivacyView {
+  return {
+    broadensBeyondOwner: false,
+    countsStarterPreviewAsOwned: false,
+    exposesSourceMaterialFileIds: false,
+    exposesSourceMaterialStorageKeys: false,
+    itemIds: itemViews.map((item) => item.id),
+  };
+}
+
+function buildActivityLibraryPageHandoffItem({
+  description,
+  id,
+  label,
+  value,
+}: {
+  description: string;
+  id: ActivityLibraryPageHandoffItemId;
+  label: string;
+  value: string;
+}): ActivityLibraryPageHandoffItemView {
+  return {
+    ariaLabel: m.activity_library_summary_aria_label({
+      description,
+      label,
+      value,
+    }),
+    description,
+    id,
+    label,
+    value,
+  };
 }
 
 function formatActivityLibraryScopeNumber(

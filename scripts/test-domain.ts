@@ -28480,14 +28480,14 @@ assert.match(
 );
 assert.match(
   activityLibraryViewSource,
-  /summaryMetrics: buildActivityLibrarySummaryMetrics\(\{[\s\S]*summary: data\?\.summary,[\s\S]*totalActivities,[\s\S]*\}\)/,
+  /const summaryMetrics = buildActivityLibrarySummaryMetrics\(\{[\s\S]*summary: data\?\.summary,[\s\S]*totalActivities,[\s\S]*\}\)/,
   'Activity library summary metrics should come from real list data and totals.'
 );
 assert.doesNotMatch(
   getSourceSlice(
     activityLibraryViewSource,
-    'summaryMetrics: buildActivityLibrarySummaryMetrics',
-    'title: activityLibraryPageCopy.title'
+    'const summaryMetrics = buildActivityLibrarySummaryMetrics',
+    'const searchPanelView = buildActivityLibrarySearchPanelView'
   ),
   /starterPreview|getStarterActivities|getStarterActivity/,
   'Activity library summary metrics should not count starter-preview activities.'
@@ -28579,7 +28579,7 @@ assert.match(
 );
 assert.match(
   activityLibraryViewSource,
-  /scopeView: buildActivityLibraryPageScopeView\(\{[\s\S]*currentPage: resolvedSearch\.currentPage,[\s\S]*pageSize: ACTIVITY_LIBRARY_PAGE_SIZE,[\s\S]*search: resolvedSearch\.searchQuery,[\s\S]*source: resolvedSearch\.sourceFilter,[\s\S]*status: resolvedSearch\.libraryStatus,[\s\S]*template: resolvedSearch\.templateFilter,[\s\S]*total: totalActivities,[\s\S]*totalPages,[\s\S]*visibleCount: activities\.length/,
+  /const scopeView = buildActivityLibraryPageScopeView\(\{[\s\S]*currentPage: resolvedSearch\.currentPage,[\s\S]*pageSize: ACTIVITY_LIBRARY_PAGE_SIZE,[\s\S]*search: resolvedSearch\.searchQuery,[\s\S]*source: resolvedSearch\.sourceFilter,[\s\S]*status: resolvedSearch\.libraryStatus,[\s\S]*template: resolvedSearch\.templateFilter,[\s\S]*total: totalActivities,[\s\S]*totalPages,[\s\S]*visibleCount: activities\.length/,
   'Activity library page view-model should prepare a current-view scope from resolved search, source, template, total pages, and visible item count.'
 );
 assert.match(
