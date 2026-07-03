@@ -8,6 +8,38 @@ import { m } from '@/locale/paraglide/messages';
 
 export const ASSIGNMENT_SHARE_ROUTE_TARGET = '/play/$shareId';
 
+export const ASSIGNMENT_SHARE_LINK_HANDOFF_ITEM_IDS = [
+  'route-target',
+  'normalized-share-slug',
+  'encoded-share-path',
+  'absolute-share-url',
+  'base-url-origin',
+  'route-param',
+  'path-label',
+  'url-label',
+  'availability',
+  'lifecycle-guard',
+  'disabled-reason',
+  'copy-action',
+  'copy-feedback',
+  'preview-action',
+  'student-runner-target',
+  'publish-success-surface',
+  'assignment-list-surface',
+  'result-page-surface',
+  'missing-slug-guard',
+  'privacy-guard',
+] as const;
+
+export type AssignmentShareLinkHandoffItemId =
+  (typeof ASSIGNMENT_SHARE_LINK_HANDOFF_ITEM_IDS)[number];
+
+export type AssignmentShareLinkHandoffSurface =
+  | 'assignment-list'
+  | 'publish-success'
+  | 'result-page'
+  | 'shared';
+
 export type AssignmentShareLinkAvailability = {
   disabledReasonCode?: AssignmentShareLinkDisabledReasonCode;
   isAvailable: boolean;
@@ -33,6 +65,36 @@ export type AssignmentShareLinkActionView = {
   shareUrl: string;
   shareUrlLabel: string;
   to: typeof ASSIGNMENT_SHARE_ROUTE_TARGET;
+};
+
+export type AssignmentShareLinkHandoffItemView = {
+  ariaLabel: string;
+  description: string;
+  id: AssignmentShareLinkHandoffItemId;
+  label: string;
+  statusLabel?: string;
+  value: string;
+};
+
+export type AssignmentShareLinkHandoffPrivacyContract = {
+  exposesActivityContent: false;
+  exposesAnswerKeys: false;
+  exposesInternalAssignmentIds: false;
+  exposesRawAnonymousToken: false;
+  exposesSourceMaterialStorageKeys: false;
+  exposesStudentAnswerText: false;
+  exposesStudentNames: false;
+  exposesTeacherNotes: false;
+  itemIds: AssignmentShareLinkHandoffItemId[];
+  shareUrlIsPublicDeliveryLink: true;
+};
+
+export type AssignmentShareLinkHandoffView = {
+  description: string;
+  itemViews: AssignmentShareLinkHandoffItemView[];
+  privacy: AssignmentShareLinkHandoffPrivacyContract;
+  surface: AssignmentShareLinkHandoffSurface;
+  title: string;
 };
 
 export type AssignmentShareLinkDisabledReasonCode =
@@ -184,6 +246,151 @@ export function buildAssignmentShareLinkActionView({
   };
 }
 
+export function buildAssignmentShareLinkHandoffView(
+  actionView: AssignmentShareLinkActionView,
+  {
+    surface = 'shared',
+  }: {
+    surface?: AssignmentShareLinkHandoffSurface;
+  } = {}
+): AssignmentShareLinkHandoffView {
+  const availabilityValue = actionView.isAvailable
+    ? m.assignment_share_link_handoff_available_value()
+    : m.assignment_share_link_handoff_unavailable_value();
+  const actionStateValue = actionView.isAvailable
+    ? m.assignment_share_link_handoff_enabled_value()
+    : m.assignment_share_link_handoff_disabled_value();
+  const disabledReasonValue =
+    actionView.disabledReason ??
+    formatAssignmentShareLinkDisabledReasonCode(actionView.disabledReasonCode);
+  const itemViews: AssignmentShareLinkHandoffItemView[] = [
+    buildAssignmentShareLinkHandoffItem({
+      id: 'route-target',
+      value: actionView.to,
+    }),
+    buildAssignmentShareLinkHandoffItem({
+      id: 'normalized-share-slug',
+      value: actionView.shareSlug
+        ? m.assignment_share_link_handoff_resolved_value()
+        : m.assignment_share_link_handoff_missing_value(),
+    }),
+    buildAssignmentShareLinkHandoffItem({
+      id: 'encoded-share-path',
+      value: actionView.sharePath,
+    }),
+    buildAssignmentShareLinkHandoffItem({
+      id: 'absolute-share-url',
+      value: actionView.shareUrl,
+    }),
+    buildAssignmentShareLinkHandoffItem({
+      id: 'base-url-origin',
+      value: getAssignmentShareLinkUrlOrigin(actionView.shareUrl),
+    }),
+    buildAssignmentShareLinkHandoffItem({
+      id: 'route-param',
+      value: 'shareId',
+    }),
+    buildAssignmentShareLinkHandoffItem({
+      id: 'path-label',
+      value: actionView.sharePathLabel,
+    }),
+    buildAssignmentShareLinkHandoffItem({
+      id: 'url-label',
+      value: actionView.shareUrlLabel,
+    }),
+    buildAssignmentShareLinkHandoffItem({
+      id: 'availability',
+      statusLabel: availabilityValue,
+      value: availabilityValue,
+    }),
+    buildAssignmentShareLinkHandoffItem({
+      id: 'lifecycle-guard',
+      statusLabel: disabledReasonValue,
+      value:
+        disabledReasonValue || m.assignment_share_link_handoff_open_value(),
+    }),
+    buildAssignmentShareLinkHandoffItem({
+      id: 'disabled-reason',
+      value:
+        disabledReasonValue || m.assignment_share_link_handoff_none_value(),
+    }),
+    buildAssignmentShareLinkHandoffItem({
+      id: 'copy-action',
+      statusLabel: actionStateValue,
+      value: actionStateValue,
+    }),
+    buildAssignmentShareLinkHandoffItem({
+      id: 'copy-feedback',
+      value: assignmentShareLinkActionCopy.successMessage,
+    }),
+    buildAssignmentShareLinkHandoffItem({
+      id: 'preview-action',
+      statusLabel: actionStateValue,
+      value: actionStateValue,
+    }),
+    buildAssignmentShareLinkHandoffItem({
+      id: 'student-runner-target',
+      value: ASSIGNMENT_SHARE_ROUTE_TARGET,
+    }),
+    buildAssignmentShareLinkHandoffItem({
+      id: 'publish-success-surface',
+      statusLabel: formatAssignmentShareLinkHandoffSurfaceValue(
+        surface,
+        'publish-success'
+      ),
+      value: formatAssignmentShareLinkHandoffSurfaceValue(
+        surface,
+        'publish-success'
+      ),
+    }),
+    buildAssignmentShareLinkHandoffItem({
+      id: 'assignment-list-surface',
+      statusLabel: formatAssignmentShareLinkHandoffSurfaceValue(
+        surface,
+        'assignment-list'
+      ),
+      value: formatAssignmentShareLinkHandoffSurfaceValue(
+        surface,
+        'assignment-list'
+      ),
+    }),
+    buildAssignmentShareLinkHandoffItem({
+      id: 'result-page-surface',
+      statusLabel: formatAssignmentShareLinkHandoffSurfaceValue(
+        surface,
+        'result-page'
+      ),
+      value: formatAssignmentShareLinkHandoffSurfaceValue(
+        surface,
+        'result-page'
+      ),
+    }),
+    buildAssignmentShareLinkHandoffItem({
+      id: 'missing-slug-guard',
+      statusLabel:
+        actionView.disabledReasonCode === 'missing-share-slug'
+          ? m.assignment_share_link_handoff_blocked_value()
+          : m.assignment_share_link_handoff_passed_value(),
+      value:
+        actionView.disabledReasonCode === 'missing-share-slug'
+          ? m.assignment_share_link_handoff_blocked_value()
+          : m.assignment_share_link_handoff_passed_value(),
+    }),
+    buildAssignmentShareLinkHandoffItem({
+      id: 'privacy-guard',
+      value: m.assignment_share_link_handoff_private_data_omitted_value(),
+    }),
+  ];
+
+  return {
+    description: m.assignment_share_link_handoff_description(),
+    itemViews,
+    privacy: buildAssignmentShareLinkHandoffPrivacyContract(itemViews),
+    surface,
+    title: m.assignment_share_link_handoff_title(),
+  };
+}
+
 export function buildAssignmentShareUrl(shareSlug: string, baseUrl?: string) {
   const origin = normalizeShareBaseUrl(baseUrl ?? '') || getRuntimeBaseUrl();
   return `${origin}${buildAssignmentSharePath(shareSlug)}`;
@@ -272,4 +479,200 @@ function getAssignmentShareLinkDisabledReasonCode({
   if (lifecycleStatus === 'open') return {};
 
   return { disabledReasonCode: lifecycleStatus };
+}
+
+function buildAssignmentShareLinkHandoffPrivacyContract(
+  itemViews: AssignmentShareLinkHandoffItemView[]
+): AssignmentShareLinkHandoffPrivacyContract {
+  return {
+    exposesActivityContent: false,
+    exposesAnswerKeys: false,
+    exposesInternalAssignmentIds: false,
+    exposesRawAnonymousToken: false,
+    exposesSourceMaterialStorageKeys: false,
+    exposesStudentAnswerText: false,
+    exposesStudentNames: false,
+    exposesTeacherNotes: false,
+    itemIds: itemViews.map((item) => item.id),
+    shareUrlIsPublicDeliveryLink: true,
+  };
+}
+
+function buildAssignmentShareLinkHandoffItem({
+  id,
+  statusLabel,
+  value,
+}: {
+  id: AssignmentShareLinkHandoffItemId;
+  statusLabel?: string;
+  value: string;
+}): AssignmentShareLinkHandoffItemView {
+  const copy = getAssignmentShareLinkHandoffItemCopy(id);
+
+  return {
+    ariaLabel: m.assignment_share_link_handoff_item_aria({
+      description: copy.description,
+      label: copy.label,
+      value,
+    }),
+    description: copy.description,
+    id,
+    label: copy.label,
+    statusLabel,
+    value,
+  };
+}
+
+function getAssignmentShareLinkHandoffItemCopy(
+  id: AssignmentShareLinkHandoffItemId
+) {
+  switch (id) {
+    case 'route-target':
+      return {
+        description: m.assignment_share_link_handoff_route_target_description(),
+        label: m.assignment_share_link_handoff_route_target_label(),
+      };
+    case 'normalized-share-slug':
+      return {
+        description:
+          m.assignment_share_link_handoff_normalized_slug_description(),
+        label: m.assignment_share_link_handoff_normalized_slug_label(),
+      };
+    case 'encoded-share-path':
+      return {
+        description: m.assignment_share_link_handoff_encoded_path_description(),
+        label: m.assignment_share_link_handoff_encoded_path_label(),
+      };
+    case 'absolute-share-url':
+      return {
+        description: m.assignment_share_link_handoff_absolute_url_description(),
+        label: m.assignment_share_link_handoff_absolute_url_label(),
+      };
+    case 'base-url-origin':
+      return {
+        description: m.assignment_share_link_handoff_base_origin_description(),
+        label: m.assignment_share_link_handoff_base_origin_label(),
+      };
+    case 'route-param':
+      return {
+        description: m.assignment_share_link_handoff_route_param_description(),
+        label: m.assignment_share_link_handoff_route_param_label(),
+      };
+    case 'path-label':
+      return {
+        description: m.assignment_share_link_handoff_path_label_description(),
+        label: m.assignment_share_link_handoff_path_label_label(),
+      };
+    case 'url-label':
+      return {
+        description: m.assignment_share_link_handoff_url_label_description(),
+        label: m.assignment_share_link_handoff_url_label_label(),
+      };
+    case 'availability':
+      return {
+        description: m.assignment_share_link_handoff_availability_description(),
+        label: m.assignment_share_link_handoff_availability_label(),
+      };
+    case 'lifecycle-guard':
+      return {
+        description:
+          m.assignment_share_link_handoff_lifecycle_guard_description(),
+        label: m.assignment_share_link_handoff_lifecycle_guard_label(),
+      };
+    case 'disabled-reason':
+      return {
+        description:
+          m.assignment_share_link_handoff_disabled_reason_description(),
+        label: m.assignment_share_link_handoff_disabled_reason_label(),
+      };
+    case 'copy-action':
+      return {
+        description: m.assignment_share_link_handoff_copy_action_description(),
+        label: m.assignment_share_link_handoff_copy_action_label(),
+      };
+    case 'copy-feedback':
+      return {
+        description:
+          m.assignment_share_link_handoff_copy_feedback_description(),
+        label: m.assignment_share_link_handoff_copy_feedback_label(),
+      };
+    case 'preview-action':
+      return {
+        description:
+          m.assignment_share_link_handoff_preview_action_description(),
+        label: m.assignment_share_link_handoff_preview_action_label(),
+      };
+    case 'student-runner-target':
+      return {
+        description:
+          m.assignment_share_link_handoff_student_runner_target_description(),
+        label: m.assignment_share_link_handoff_student_runner_target_label(),
+      };
+    case 'publish-success-surface':
+      return {
+        description:
+          m.assignment_share_link_handoff_publish_surface_description(),
+        label: m.assignment_share_link_handoff_publish_surface_label(),
+      };
+    case 'assignment-list-surface':
+      return {
+        description: m.assignment_share_link_handoff_list_surface_description(),
+        label: m.assignment_share_link_handoff_list_surface_label(),
+      };
+    case 'result-page-surface':
+      return {
+        description:
+          m.assignment_share_link_handoff_result_surface_description(),
+        label: m.assignment_share_link_handoff_result_surface_label(),
+      };
+    case 'missing-slug-guard':
+      return {
+        description:
+          m.assignment_share_link_handoff_missing_slug_guard_description(),
+        label: m.assignment_share_link_handoff_missing_slug_guard_label(),
+      };
+    case 'privacy-guard':
+      return {
+        description:
+          m.assignment_share_link_handoff_privacy_guard_description(),
+        label: m.assignment_share_link_handoff_privacy_guard_label(),
+      };
+  }
+}
+
+function formatAssignmentShareLinkHandoffSurfaceValue(
+  surface: AssignmentShareLinkHandoffSurface,
+  target: Exclude<AssignmentShareLinkHandoffSurface, 'shared'>
+) {
+  return surface === target
+    ? m.assignment_share_link_handoff_active_value()
+    : m.assignment_share_link_handoff_compatible_value();
+}
+
+function formatAssignmentShareLinkDisabledReasonCode(
+  reasonCode?: AssignmentShareLinkDisabledReasonCode
+) {
+  if (!reasonCode) return '';
+
+  if (reasonCode === 'missing-share-slug') {
+    return m.assignment_share_link_handoff_missing_slug_value();
+  }
+
+  if (reasonCode === 'closed') {
+    return m.assignment_share_link_handoff_closed_value();
+  }
+
+  if (reasonCode === 'draft') {
+    return m.assignment_share_link_handoff_draft_value();
+  }
+
+  return m.assignment_share_link_handoff_expired_value();
+}
+
+function getAssignmentShareLinkUrlOrigin(shareUrl: string) {
+  try {
+    return new URL(shareUrl).origin;
+  } catch {
+    return m.assignment_share_link_handoff_missing_value();
+  }
 }

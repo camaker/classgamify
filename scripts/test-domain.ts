@@ -861,12 +861,14 @@ import {
   resolvePublishedAssignmentPanelAssignment,
 } from '@/assignments/published-assignment';
 import {
+  ASSIGNMENT_SHARE_LINK_HANDOFF_ITEM_IDS,
   ASSIGNMENT_SHARE_ROUTE_TARGET,
   assignmentShareLinkActionCopy,
   buildAssignmentShareLinkAvailability,
   buildAssignmentShareLinkActionView,
   buildAssignmentShareLinkAvailabilityState,
   buildAssignmentShareLinkCopyExecutionPlan,
+  buildAssignmentShareLinkHandoffView,
   buildAssignmentSharePath,
   buildAssignmentShareUrl,
   normalizeShareBaseUrl,
@@ -2386,6 +2388,21 @@ assert.match(
   assignmentShareLinkSource,
   /export type AssignmentShareLinkActionView = \{[\s\S]*sharePath: string;[\s\S]*sharePathLabel: string;[\s\S]*shareSlug: string;[\s\S]*shareUrl: string;[\s\S]*shareUrlLabel: string;/,
   'Share-link action views should expose both route paths and absolute student-link URLs for teacher distribution surfaces.'
+);
+assert.match(
+  assignmentShareLinkSource,
+  /export const ASSIGNMENT_SHARE_LINK_HANDOFF_ITEM_IDS = \[(?=[\s\S]*'route-target')(?=[\s\S]*'normalized-share-slug')(?=[\s\S]*'encoded-share-path')(?=[\s\S]*'absolute-share-url')(?=[\s\S]*'copy-action')(?=[\s\S]*'preview-action')(?=[\s\S]*'publish-success-surface')(?=[\s\S]*'assignment-list-surface')(?=[\s\S]*'result-page-surface')(?=[\s\S]*'privacy-guard')[\s\S]*export type AssignmentShareLinkHandoffPrivacyContract = \{[\s\S]*exposesActivityContent: false;[\s\S]*exposesAnswerKeys: false;[\s\S]*exposesInternalAssignmentIds: false;[\s\S]*exposesRawAnonymousToken: false;[\s\S]*exposesSourceMaterialStorageKeys: false;[\s\S]*exposesStudentAnswerText: false;[\s\S]*shareUrlIsPublicDeliveryLink: true;/,
+  'Share-link handoff should expose a typed 20-slice distribution contract with explicit privacy flags.'
+);
+assert.match(
+  assignmentShareLinkSource,
+  /export function buildAssignmentShareLinkHandoffView\([\s\S]*actionView: AssignmentShareLinkActionView[\s\S]*surface = 'shared'[\s\S]*id: 'route-target'[\s\S]*id: 'normalized-share-slug'[\s\S]*id: 'encoded-share-path'[\s\S]*id: 'absolute-share-url'[\s\S]*id: 'copy-action'[\s\S]*id: 'preview-action'[\s\S]*id: 'publish-success-surface'[\s\S]*id: 'assignment-list-surface'[\s\S]*id: 'result-page-surface'[\s\S]*privacy: buildAssignmentShareLinkHandoffPrivacyContract/,
+  'Share-link handoff should collect path, URL, lifecycle, copy, preview, and distribution-surface slices from the prepared action view.'
+);
+assert.doesNotMatch(
+  assignmentShareLinkSource,
+  /AssignmentShareLinkActionView\['handoffView'\]|ReturnType<\s*typeof buildAssignmentShareLinkHandoffView>/,
+  'Share-link handoff contracts should not derive from aggregate action indexes or builder return types.'
 );
 assert.match(
   assignmentShareLinkSource,
@@ -18454,6 +18471,90 @@ assert.deepEqual(
     shareUrlLabel: 'Full student link',
     to: Routes.Play,
   }
+);
+const assignmentShareLinkHandoffView = buildAssignmentShareLinkHandoffView(
+  buildAssignmentShareLinkActionView({
+    baseUrl: ' classgamify.test/dashboard ',
+    label: 'SECRET_SHARE_ACTION_LABEL',
+    shareSlug: '　class/１２３　',
+  }),
+  {
+    surface: 'publish-success',
+  }
+);
+const assignmentShareLinkHandoffItemIds =
+  assignmentShareLinkHandoffView.itemViews.map((item) => item.id);
+assert.deepEqual(assignmentShareLinkHandoffItemIds, [
+  ...ASSIGNMENT_SHARE_LINK_HANDOFF_ITEM_IDS,
+]);
+assert.equal(assignmentShareLinkHandoffView.itemViews.length, 20);
+assert.deepEqual(assignmentShareLinkHandoffView.privacy, {
+  exposesActivityContent: false,
+  exposesAnswerKeys: false,
+  exposesInternalAssignmentIds: false,
+  exposesRawAnonymousToken: false,
+  exposesSourceMaterialStorageKeys: false,
+  exposesStudentAnswerText: false,
+  exposesStudentNames: false,
+  exposesTeacherNotes: false,
+  itemIds: assignmentShareLinkHandoffItemIds,
+  shareUrlIsPublicDeliveryLink: true,
+});
+assert.deepEqual(
+  assignmentShareLinkHandoffView.itemViews.map((item) => [
+    item.id,
+    item.value,
+  ]),
+  [
+    ['route-target', '/play/$shareId'],
+    ['normalized-share-slug', 'Resolved'],
+    ['encoded-share-path', '/play/class%2F123'],
+    ['absolute-share-url', 'https://classgamify.test/play/class%2F123'],
+    ['base-url-origin', 'https://classgamify.test'],
+    ['route-param', 'shareId'],
+    ['path-label', 'Student link'],
+    ['url-label', 'Full student link'],
+    ['availability', 'Available'],
+    ['lifecycle-guard', 'Open'],
+    ['disabled-reason', 'None'],
+    ['copy-action', 'Enabled'],
+    ['copy-feedback', 'Student link copied.'],
+    ['preview-action', 'Enabled'],
+    ['student-runner-target', '/play/$shareId'],
+    ['publish-success-surface', 'Active'],
+    ['assignment-list-surface', 'Compatible'],
+    ['result-page-surface', 'Compatible'],
+    ['missing-slug-guard', 'Passed'],
+    ['privacy-guard', 'Private data omitted'],
+  ]
+);
+assert.equal(
+  JSON.stringify(assignmentShareLinkHandoffView).includes(
+    'SECRET_SHARE_ACTION_LABEL'
+  ),
+  false
+);
+const missingShareLinkHandoffView = buildAssignmentShareLinkHandoffView(
+  buildAssignmentShareLinkActionView({
+    disabledReasonCode: 'missing-share-slug',
+    label: 'Student link unavailable',
+    shareSlug: '   ',
+  }),
+  {
+    surface: 'assignment-list',
+  }
+);
+assert.equal(
+  missingShareLinkHandoffView.itemViews.find(
+    (item) => item.id === 'normalized-share-slug'
+  )?.value,
+  'Missing'
+);
+assert.equal(
+  missingShareLinkHandoffView.itemViews.find(
+    (item) => item.id === 'missing-slug-guard'
+  )?.value,
+  'Blocked'
 );
 assert.deepEqual(
   buildAssignmentShareLinkCopyExecutionPlan({
