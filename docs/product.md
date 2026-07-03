@@ -356,6 +356,11 @@ notes may include only safe material provenance such as material kind and safe
 filename basenames. The AI draft flow must not read file bytes, storage keys,
 URLs, path segments, query tokens, or permission metadata until a dedicated
 extraction pipeline is designed.
+The AI source panel should also expose its safety note, source readiness,
+attached-material extraction readiness, and synced material provenance as
+semantic descriptions of the source textarea and generate action, so teachers
+using assistive technology receive the same review-before-save context as
+visual users.
 
 Current flow:
 

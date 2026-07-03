@@ -4546,8 +4546,18 @@ assert.match(
 );
 assert.match(
   activityAiDraftPanelSource,
+  /const safeSourceDescriptionId = 'activity-ai-safe-source-description'[\s\S]*const sourceDescriptionIds = joinDomIds\(\[[\s\S]*safeSourceDescriptionId[\s\S]*ACTIVITY_AI_SOURCE_READINESS_DESCRIPTION_ID[\s\S]*sourceMaterialSafetyDescriptionId[\s\S]*sourceCapabilityTitleId[\s\S]*sourceMaterialNotesLabelId[\s\S]*<Textarea[\s\S]*aria-describedby=\{sourceDescriptionIds\}/,
+  'Activity AI draft source textarea should be described by safe-source, readiness, source-material safety, capability, and material-note context.'
+);
+assert.match(
+  activityAiDraftPanelSource,
   /panelView\.sourceMaterialNoteViews\.map[\s\S]*key=\{noteView\.key\}/,
   'Activity AI draft source controls should key source material notes by stable note keys.'
+);
+assert.match(
+  activityAiDraftPanelSource,
+  /sourceMaterialNotesLabelId[\s\S]*aria-labelledby=\{[\s\S]*sourceMaterialNotesLabelId[\s\S]*id=\{sourceMaterialNotesLabelId\}[\s\S]*panelView\.sourceMaterialSummaryLabel/,
+  'Activity AI draft source material notes should expose a labelled region tied to prepared summary copy.'
 );
 assert.doesNotMatch(
   activityAiDraftPanelSource,
@@ -4561,6 +4571,11 @@ assert.match(
 );
 assert.match(
   activityAiDraftPanelSource,
+  /function ActivityAiDraftSourceReadiness[\s\S]*aria-labelledby=\{titleId\}[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*id=\{titleId\}[\s\S]*panelView\.sourceReadiness\.title[\s\S]*id=\{descriptionId\}[\s\S]*panelView\.sourceReadiness\.description/,
+  'Activity AI draft source readiness should associate its prepared title and description with the readiness section.'
+);
+assert.match(
+  activityAiDraftPanelSource,
   /panelView\.sourceMaterialSafetyView\.hasInput[\s\S]*ActivityAiDraftSourceMaterialSafety[\s\S]*safetyView=\{panelView\.sourceMaterialSafetyView\}/,
   'Activity AI draft source controls should render the prepared source-material safety view when source notes contain material provenance.'
 );
@@ -4568,6 +4583,11 @@ assert.match(
   activityAiDraftPanelSource,
   /function ActivityAiDraftSourceMaterialSafety[\s\S]*aria-label=\{safetyView\.ariaLabel\}[\s\S]*safetyView\.title[\s\S]*safetyView\.description[\s\S]*safetyView\.metricViews\.map[\s\S]*ActivityAiDraftSourceMaterialSafetyMetric/,
   'Activity AI draft source-material safety panel should render prepared title, description, aria label, and metric rows.'
+);
+assert.match(
+  activityAiDraftPanelSource,
+  /function ActivityAiDraftSourceMaterialSafety[\s\S]*aria-label=\{safetyView\.ariaLabel\}[\s\S]*aria-labelledby=\{titleId\}[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*id=\{titleId\}[\s\S]*safetyView\.title[\s\S]*id=\{descriptionId\}[\s\S]*safetyView\.description/,
+  'Activity AI draft source-material safety panel should bind prepared safety title and description to the region.'
 );
 assert.match(
   activityAiDraftPanelSource,
@@ -4581,8 +4601,18 @@ assert.match(
 );
 assert.match(
   activityAiDraftPanelSource,
+  /function ActivityAiDraftSourceCapabilities[\s\S]*aria-labelledby=\{titleId\}[\s\S]*id=\{titleId\}[\s\S]*panelView\.sourceCapabilityTitle/,
+  'Activity AI draft source capabilities should expose a labelled region from prepared capability copy.'
+);
+assert.match(
+  activityAiDraftPanelSource,
   /function ActivityAiDraftSourceCapabilityBadge[\s\S]*capability\.label[\s\S]*capability\.value[\s\S]*capability\.description/,
   'Activity AI draft source capability badges should render prepared label, value, and description.'
+);
+assert.match(
+  activityAiDraftPanelSource,
+  /function ActivityAiDraftSourceCapabilityBadge[\s\S]*aria-labelledby=\{`\$\{titleId\} \$\{valueId\}`\}[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*id=\{titleId\}[\s\S]*id=\{valueId\}[\s\S]*id=\{descriptionId\}/,
+  'Activity AI draft source capability badges should associate prepared label, value, and description without string-built aria copy.'
 );
 assert.match(
   activityEditorSource,
@@ -4618,6 +4648,16 @@ assert.match(
   activityAiDraftPanelSource,
   /function ActivityAiDraftGenerateButton[\s\S]*panelView\.canGenerateDraft[\s\S]*panelView\.generateButtonLabel[\s\S]*panelView\.generationDisabledReason/,
   'Activity AI draft generate button should render prepared generation gate and label.'
+);
+assert.match(
+  activityAiDraftPanelSource,
+  /const generationDescriptionIds = joinDomIds\(\[[\s\S]*ACTIVITY_AI_SOURCE_READINESS_DESCRIPTION_ID[\s\S]*generationDisabledReasonId[\s\S]*aria-describedby=\{generationDescriptionIds\}/,
+  'Activity AI draft generate button should stay described by source readiness and any prepared disabled reason.'
+);
+assert.match(
+  activityAiDraftPanelSource,
+  /function joinDomIds\([\s\S]*filter\(\(id\): id is string => Boolean\(id\)\)[\s\S]*\.join\(' '\)/,
+  'Activity AI draft panel should omit missing optional ids from aria-describedby values.'
 );
 assert.match(
   activityEditorFormSource,

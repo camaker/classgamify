@@ -19,6 +19,11 @@ import {
 import { Textarea } from '@/components/ui/textarea';
 import { IconLoader2, IconPaperclip, IconSparkles } from '@tabler/icons-react';
 
+const ACTIVITY_AI_SOURCE_READINESS_DESCRIPTION_ID =
+  'activity-ai-source-readiness-description';
+const ACTIVITY_AI_SOURCE_READINESS_TITLE_ID =
+  'activity-ai-source-readiness-title';
+
 type ActivityAiDraftPanelProps = {
   draftFocus: ActivityAiDraftFocus;
   draftItemCount: number;
@@ -98,6 +103,27 @@ function ActivityAiDraftSourceControls({
   panelView: ActivityEditorAiDraftPanelView;
 }) {
   const syncMaterialsHelpTextId = 'activity-ai-sync-materials-help';
+  const safeSourceDescriptionId = 'activity-ai-safe-source-description';
+  const sourceMaterialSafetyTitleId =
+    'activity-ai-source-material-safety-title';
+  const sourceMaterialSafetyDescriptionId =
+    'activity-ai-source-material-safety-description';
+  const sourceCapabilityTitleId = 'activity-ai-source-capability-title';
+  const sourceMaterialNotesLabelId = 'activity-ai-source-material-notes-label';
+  const sourceDescriptionIds = joinDomIds([
+    safeSourceDescriptionId,
+    ACTIVITY_AI_SOURCE_READINESS_DESCRIPTION_ID,
+    panelView.sourceMaterialSafetyView.hasInput
+      ? sourceMaterialSafetyDescriptionId
+      : undefined,
+    panelView.sourceCapabilityViews.length > 0
+      ? sourceCapabilityTitleId
+      : undefined,
+    panelView.sourceMaterialNoteViews.length > 0 &&
+    panelView.sourceMaterialSummaryLabel
+      ? sourceMaterialNotesLabelId
+      : undefined,
+  ]);
 
   return (
     <div className="min-w-0 flex-1 space-y-2">
@@ -110,7 +136,10 @@ function ActivityAiDraftSourceControls({
           {panelView.reviewNote}
         </span>
       </div>
-      <p className="text-xs leading-5 text-muted-foreground">
+      <p
+        id={safeSourceDescriptionId}
+        className="text-xs leading-5 text-muted-foreground"
+      >
         {panelView.safeSourceDescription}
       </p>
       <div className="flex flex-wrap items-center justify-between gap-2">
@@ -144,20 +173,42 @@ function ActivityAiDraftSourceControls({
         onChange={(event) => onDraftSourceTextChange(event.currentTarget.value)}
         rows={3}
         placeholder={panelView.sourcePlaceholder}
+        aria-describedby={sourceDescriptionIds}
       />
-      <ActivityAiDraftSourceReadiness panelView={panelView} />
+      <ActivityAiDraftSourceReadiness
+        descriptionId={ACTIVITY_AI_SOURCE_READINESS_DESCRIPTION_ID}
+        panelView={panelView}
+        titleId={ACTIVITY_AI_SOURCE_READINESS_TITLE_ID}
+      />
       {panelView.sourceMaterialSafetyView.hasInput ? (
         <ActivityAiDraftSourceMaterialSafety
+          descriptionId={sourceMaterialSafetyDescriptionId}
           safetyView={panelView.sourceMaterialSafetyView}
+          titleId={sourceMaterialSafetyTitleId}
         />
       ) : null}
       {panelView.sourceCapabilityViews.length > 0 ? (
-        <ActivityAiDraftSourceCapabilities panelView={panelView} />
+        <ActivityAiDraftSourceCapabilities
+          panelView={panelView}
+          titleId={sourceCapabilityTitleId}
+        />
       ) : null}
       {panelView.sourceMaterialNoteViews.length > 0 ? (
-        <div className="space-y-2 rounded-md border bg-background p-3">
+        <section
+          aria-label={
+            panelView.sourceMaterialSummaryLabel
+              ? undefined
+              : panelView.sourceTextLabel
+          }
+          aria-labelledby={
+            panelView.sourceMaterialSummaryLabel
+              ? sourceMaterialNotesLabelId
+              : undefined
+          }
+          className="space-y-2 rounded-md border bg-background p-3"
+        >
           {panelView.sourceMaterialSummaryLabel ? (
-            <p className="font-medium text-xs">
+            <p id={sourceMaterialNotesLabelId} className="font-medium text-xs">
               {panelView.sourceMaterialSummaryLabel}
             </p>
           ) : null}
@@ -172,24 +223,32 @@ function ActivityAiDraftSourceControls({
               </Badge>
             ))}
           </div>
-        </div>
+        </section>
       ) : null}
     </div>
   );
 }
 
 function ActivityAiDraftSourceMaterialSafety({
+  descriptionId,
   safetyView,
+  titleId,
 }: {
+  descriptionId: string;
   safetyView: ActivityEditorAiDraftSourceMaterialSafetyView;
+  titleId: string;
 }) {
   return (
     <section
       aria-label={safetyView.ariaLabel}
+      aria-labelledby={titleId}
+      aria-describedby={descriptionId}
       className="rounded-md border bg-background p-3"
     >
       <div className="flex flex-wrap items-center justify-between gap-2">
-        <p className="font-medium text-xs">{safetyView.title}</p>
+        <p id={titleId} className="font-medium text-xs">
+          {safetyView.title}
+        </p>
         {safetyView.hasOmitted ? (
           <Badge variant="outline" className="rounded-md">
             {
@@ -200,7 +259,10 @@ function ActivityAiDraftSourceMaterialSafety({
           </Badge>
         ) : null}
       </div>
-      <p className="mt-1 text-muted-foreground text-xs leading-5">
+      <p
+        id={descriptionId}
+        className="mt-1 text-muted-foreground text-xs leading-5"
+      >
         {safetyView.description}
       </p>
       <dl className="mt-2 grid gap-2 sm:grid-cols-2">
@@ -237,12 +299,19 @@ function ActivityAiDraftSourceMaterialSafetyMetric({
 
 function ActivityAiDraftSourceCapabilities({
   panelView,
+  titleId,
 }: {
   panelView: ActivityEditorAiDraftPanelView;
+  titleId: string;
 }) {
   return (
-    <div className="rounded-md border bg-background p-3">
-      <p className="font-medium text-xs">{panelView.sourceCapabilityTitle}</p>
+    <section
+      aria-labelledby={titleId}
+      className="rounded-md border bg-background p-3"
+    >
+      <p id={titleId} className="font-medium text-xs">
+        {panelView.sourceCapabilityTitle}
+      </p>
       <div className="mt-2 grid gap-2 sm:grid-cols-3">
         {panelView.sourceCapabilityViews.map((capability) => (
           <ActivityAiDraftSourceCapabilityBadge
@@ -251,7 +320,7 @@ function ActivityAiDraftSourceCapabilities({
           />
         ))}
       </div>
-    </div>
+    </section>
   );
 }
 
@@ -260,30 +329,53 @@ function ActivityAiDraftSourceCapabilityBadge({
 }: {
   capability: ActivityEditorAiDraftSourceCapabilityCardView;
 }) {
+  const titleId = `activity-ai-source-capability-${capability.capability}-title`;
+  const valueId = `activity-ai-source-capability-${capability.capability}-value`;
+  const descriptionId = `activity-ai-source-capability-${capability.capability}-description`;
+
   return (
-    <div className="rounded-md border bg-muted/20 p-2">
+    <section
+      aria-labelledby={`${titleId} ${valueId}`}
+      aria-describedby={descriptionId}
+      className="rounded-md border bg-muted/20 p-2"
+    >
       <div className="flex items-center justify-between gap-2">
-        <span className="font-medium text-xs">{capability.label}</span>
-        <Badge variant="outline" className="rounded-md">
+        <span id={titleId} className="font-medium text-xs">
+          {capability.label}
+        </span>
+        <Badge id={valueId} variant="outline" className="rounded-md">
           {capability.value}
         </Badge>
       </div>
-      <p className="mt-1 text-muted-foreground text-xs leading-5">
+      <p
+        id={descriptionId}
+        className="mt-1 text-muted-foreground text-xs leading-5"
+      >
         {capability.description}
       </p>
-    </div>
+    </section>
   );
 }
 
 function ActivityAiDraftSourceReadiness({
+  descriptionId,
   panelView,
+  titleId,
 }: {
+  descriptionId: string;
   panelView: ActivityEditorAiDraftPanelView;
+  titleId: string;
 }) {
   return (
-    <div className="rounded-md border bg-background p-3">
+    <section
+      aria-labelledby={titleId}
+      aria-describedby={descriptionId}
+      className="rounded-md border bg-background p-3"
+    >
       <div className="flex flex-wrap items-center justify-between gap-2">
-        <p className="font-medium text-xs">{panelView.sourceReadiness.title}</p>
+        <p id={titleId} className="font-medium text-xs">
+          {panelView.sourceReadiness.title}
+        </p>
         <Badge
           variant={
             panelView.sourceReadiness.hasWarnings ? 'outline' : 'secondary'
@@ -293,10 +385,13 @@ function ActivityAiDraftSourceReadiness({
           {panelView.sourceReadiness.characterCountLabel}
         </Badge>
       </div>
-      <p className="mt-1 text-muted-foreground text-xs leading-5">
+      <p
+        id={descriptionId}
+        className="mt-1 text-muted-foreground text-xs leading-5"
+      >
         {panelView.sourceReadiness.description}
       </p>
-    </div>
+    </section>
   );
 }
 
@@ -391,6 +486,10 @@ function ActivityAiDraftGenerateButton({
   panelView: ActivityEditorAiDraftPanelView;
 }) {
   const generationDisabledReasonId = 'activity-ai-generate-disabled-reason';
+  const generationDescriptionIds = joinDomIds([
+    ACTIVITY_AI_SOURCE_READINESS_DESCRIPTION_ID,
+    panelView.generationDisabledReason ? generationDisabledReasonId : undefined,
+  ]);
 
   return (
     <>
@@ -399,11 +498,7 @@ function ActivityAiDraftGenerateButton({
         variant="secondary"
         onClick={onGenerateDraft}
         disabled={!panelView.canGenerateDraft}
-        aria-describedby={
-          panelView.generationDisabledReason
-            ? generationDisabledReasonId
-            : undefined
-        }
+        aria-describedby={generationDescriptionIds}
         className="self-end sm:col-span-2"
       >
         {isGeneratingDraft ? (
@@ -423,4 +518,8 @@ function ActivityAiDraftGenerateButton({
       ) : null}
     </>
   );
+}
+
+function joinDomIds(ids: Array<string | undefined>) {
+  return ids.filter((id): id is string => Boolean(id)).join(' ');
 }
