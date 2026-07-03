@@ -67,6 +67,7 @@ function AssignmentResultsReviewScopeItem({
   const valueId = `assignment-result-review-scope-${itemView.id}-value`;
   const descriptionId = `assignment-result-review-scope-${itemView.id}-description`;
   const statusDescriptionId = `assignment-result-review-scope-${itemView.id}-status-description`;
+  const statusValueId = `assignment-result-review-scope-${itemView.id}-status`;
 
   return (
     <article
@@ -80,11 +81,20 @@ function AssignmentResultsReviewScopeItem({
         </p>
         <AssignmentResultControlStatusBadge
           descriptionId={statusDescriptionId}
+          labelId={labelId}
+          valueId={statusValueId}
           view={itemView.statusView}
         />
       </div>
-      <p id={valueId} className="break-words font-semibold text-base">
-        <output aria-label={itemView.ariaLabel}>{itemView.value}</output>
+      <p className="break-words font-semibold text-base">
+        <output
+          aria-describedby={`${descriptionId} ${statusDescriptionId}`}
+          aria-label={itemView.ariaLabel}
+          aria-labelledby={`${labelId} ${valueId}`}
+          id={valueId}
+        >
+          {itemView.value}
+        </output>
       </p>
       <p id={descriptionId} className="text-muted-foreground text-xs leading-5">
         {itemView.description}
@@ -107,8 +117,15 @@ function AssignmentResultsReviewScopeSummaryItem({
       <dt id={labelId} className="text-muted-foreground">
         {summaryItem.label}
       </dt>
-      <dd aria-describedby={descriptionId} id={valueId} className="font-medium">
-        <output aria-label={summaryItem.ariaLabel}>{summaryItem.value}</output>
+      <dd aria-describedby={descriptionId} className="font-medium">
+        <output
+          aria-describedby={descriptionId}
+          aria-label={summaryItem.ariaLabel}
+          aria-labelledby={`${labelId} ${valueId}`}
+          id={valueId}
+        >
+          {summaryItem.value}
+        </output>
         <span id={descriptionId} className="sr-only">
           {summaryItem.description}
         </span>

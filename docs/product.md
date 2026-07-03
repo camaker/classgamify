@@ -316,6 +316,11 @@ Assignment attempt metrics such as completions, average accuracy, average
 points, and average duration should be computed through shared assignment-domain
 stats helpers before they reach assignment lists, result pages, classroom
 briefs, or CSV exports.
+Result metric cards, current review-status summaries, review-scope summaries,
+classroom-brief coverage, and copy-scope previews should expose the same
+prepared result-domain labels, values, descriptions, and accessible labels as
+stable semantic outputs so teachers can verify the current review evidence
+before copying reteach artifacts or exporting results.
 The teacher result page should show the student summary, the top reteach
 priorities, and the full item performance table so a teacher can scan the
 class before opening individual student answers. The full item performance

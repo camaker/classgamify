@@ -3,13 +3,19 @@ import { Badge } from '@/components/ui/badge';
 
 type AssignmentResultControlStatusBadgeProps = {
   descriptionId: string;
+  labelId?: string;
+  valueId?: string;
   view: AssignmentResultControlStatusView;
 };
 
 export function AssignmentResultControlStatusBadge({
   descriptionId,
+  labelId,
+  valueId,
   view,
 }: AssignmentResultControlStatusBadgeProps) {
+  const labelledBy = labelId && valueId ? `${labelId} ${valueId}` : undefined;
+
   return (
     <span className="inline-flex min-w-0 items-center">
       <Badge
@@ -20,7 +26,9 @@ export function AssignmentResultControlStatusBadge({
         <output
           aria-describedby={descriptionId}
           aria-label={view.ariaLabel}
+          aria-labelledby={labelledBy}
           className="truncate"
+          id={valueId}
         >
           {view.value}
         </output>

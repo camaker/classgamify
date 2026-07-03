@@ -11,6 +11,7 @@ import type {
   AssignmentResultClassroomBriefSectionViews,
   AssignmentResultCopyArtifactPreview,
   AssignmentResultCopyArtifactPreviewScope,
+  AssignmentResultCopyScopeItemView,
   AssignmentResultCopyScopeView,
   AssignmentResultCopyScopeSummaryItemView,
   AssignmentResultSectionView,
@@ -131,13 +132,23 @@ function AssignmentResultsClassroomBriefScopeItem({
 }: {
   scopeView: AssignmentClassroomBriefScopeView;
 }) {
+  const labelId = `assignment-results-classroom-brief-scope-${scopeView.id}-label`;
+  const valueId = `assignment-results-classroom-brief-scope-${scopeView.id}-value`;
   const descriptionId = `assignment-results-classroom-brief-scope-${scopeView.id}-description`;
 
   return (
     <div className="rounded-md border bg-muted/20 p-3">
-      <dt className="text-muted-foreground text-xs">{scopeView.label}</dt>
-      <dd aria-describedby={descriptionId}>
-        <output aria-label={scopeView.ariaLabel} className="mt-1 block">
+      <dt id={labelId} className="text-muted-foreground text-xs">
+        {scopeView.label}
+      </dt>
+      <dd>
+        <output
+          aria-describedby={descriptionId}
+          aria-label={scopeView.ariaLabel}
+          aria-labelledby={`${labelId} ${valueId}`}
+          className="mt-1 block"
+          id={valueId}
+        >
           <span className="font-semibold text-lg">{scopeView.value}</span>
         </output>
       </dd>
@@ -180,13 +191,23 @@ function AssignmentResultsClassroomBriefStat({
 }: {
   statView: AssignmentClassroomBriefStatView;
 }) {
+  const labelId = `assignment-results-classroom-brief-stat-${statView.key}-label`;
+  const valueId = `assignment-results-classroom-brief-stat-${statView.key}-value`;
   const descriptionId = `assignment-results-classroom-brief-stat-${statView.key}-description`;
 
   return (
     <div className="rounded-md border bg-background p-3">
-      <dt className="text-muted-foreground text-xs">{statView.label}</dt>
-      <dd aria-describedby={descriptionId}>
-        <output aria-label={statView.ariaLabel} className="mt-1 block">
+      <dt id={labelId} className="text-muted-foreground text-xs">
+        {statView.label}
+      </dt>
+      <dd>
+        <output
+          aria-describedby={descriptionId}
+          aria-label={statView.ariaLabel}
+          aria-labelledby={`${labelId} ${valueId}`}
+          className="mt-1 block"
+          id={valueId}
+        >
           <span className="font-semibold text-lg">{statView.value}</span>
         </output>
       </dd>
@@ -385,19 +406,14 @@ function AssignmentResultsCopyScopeView({
           {copyScopeView.description}
         </p>
       </div>
-      <div className="grid gap-2 md:grid-cols-3">
+      <dl className="grid gap-2 md:grid-cols-3">
         {copyScopeView.itemViews.map((itemView) => (
-          <div className="grid gap-1 text-xs" key={itemView.id}>
-            <div className="flex flex-wrap items-center gap-2">
-              <Badge variant="outline" className="rounded-md bg-background">
-                {itemView.label}
-              </Badge>
-              <span className="font-medium">{itemView.value}</span>
-            </div>
-            <p className="text-muted-foreground">{itemView.description}</p>
-          </div>
+          <AssignmentResultsCopyScopeItem
+            itemView={itemView}
+            key={itemView.id}
+          />
         ))}
-      </div>
+      </dl>
       {copyScopeView.summaryItems.length > 0 ? (
         <section aria-labelledby={summaryLabelId} className="grid gap-2">
           <p id={summaryLabelId} className="font-medium text-xs">
@@ -417,18 +433,66 @@ function AssignmentResultsCopyScopeView({
   );
 }
 
+function AssignmentResultsCopyScopeItem({
+  itemView,
+}: {
+  itemView: AssignmentResultCopyScopeItemView;
+}) {
+  const labelId = `assignment-results-copy-scope-${itemView.id}-label`;
+  const valueId = `assignment-results-copy-scope-${itemView.id}-value`;
+  const descriptionId = `assignment-results-copy-scope-${itemView.id}-description`;
+
+  return (
+    <div className="grid gap-1 text-xs">
+      <dt>
+        <Badge
+          id={labelId}
+          variant="outline"
+          className="rounded-md bg-background"
+        >
+          {itemView.label}
+        </Badge>
+      </dt>
+      <dd>
+        <output
+          aria-describedby={descriptionId}
+          aria-labelledby={`${labelId} ${valueId}`}
+          className="font-medium"
+          id={valueId}
+        >
+          {itemView.value}
+        </output>
+      </dd>
+      <dd id={descriptionId} className="text-muted-foreground">
+        {itemView.description}
+      </dd>
+    </div>
+  );
+}
+
 function AssignmentResultsCopyScopeSummaryItem({
   summaryItem,
 }: {
   summaryItem: AssignmentResultCopyScopeSummaryItemView;
 }) {
+  const labelId = `assignment-results-copy-scope-summary-${summaryItem.id}-label`;
+  const valueId = `assignment-results-copy-scope-summary-${summaryItem.id}-value`;
   const descriptionId = `assignment-results-copy-scope-summary-${summaryItem.id}-description`;
 
   return (
     <div className="flex min-w-0 items-center justify-between gap-3 text-xs">
-      <dt className="text-muted-foreground">{summaryItem.label}</dt>
+      <dt id={labelId} className="text-muted-foreground">
+        {summaryItem.label}
+      </dt>
       <dd aria-describedby={descriptionId} className="font-medium">
-        <output aria-label={summaryItem.ariaLabel}>{summaryItem.value}</output>
+        <output
+          aria-describedby={descriptionId}
+          aria-label={summaryItem.ariaLabel}
+          aria-labelledby={`${labelId} ${valueId}`}
+          id={valueId}
+        >
+          {summaryItem.value}
+        </output>
         <span id={descriptionId} className="sr-only">
           {summaryItem.description}
         </span>
@@ -451,6 +515,7 @@ function AssignmentResultsCopyArtifactPreview({
   );
   const titleId = getCopyArtifactPreviewTitleId(preview.id);
   const descriptionId = getCopyArtifactPreviewDescriptionId(preview.id);
+  const scopeTitleId = getCopyArtifactPreviewScopeTitleId(preview.id);
   const scopeDescriptionId = getCopyArtifactPreviewScopeDescriptionId(
     preview.id
   );
@@ -494,6 +559,8 @@ function AssignmentResultsCopyArtifactPreview({
       <AssignmentResultsCopyArtifactPreviewScope
         copyScopeView={preview.copyScopeView}
         descriptionId={scopeDescriptionId}
+        previewId={preview.id}
+        titleId={scopeTitleId}
       />
       <div className="grid gap-2">
         <p className="font-medium text-xs">{preview.summaryLabel}</p>
@@ -519,45 +586,117 @@ function AssignmentResultsCopyArtifactPreview({
 function AssignmentResultsCopyArtifactPreviewScope({
   copyScopeView,
   descriptionId,
+  previewId,
+  titleId,
 }: {
   copyScopeView: AssignmentResultCopyArtifactPreviewScope;
   descriptionId: string;
+  previewId: AssignmentResultCopyArtifactPreview['id'];
+  titleId: string;
 }) {
   return (
     <section
       aria-describedby={descriptionId}
-      aria-label={copyScopeView.title}
+      aria-labelledby={titleId}
       className="grid gap-2 rounded-md bg-muted/30 p-2 text-xs"
     >
-      <p className="font-medium">{copyScopeView.title}</p>
+      <p id={titleId} className="font-medium">
+        {copyScopeView.title}
+      </p>
       <p id={descriptionId} className="sr-only">
         {copyScopeView.description}
       </p>
       <div className="flex flex-wrap gap-2">
         {copyScopeView.itemViews.map((itemView) => (
-          <Badge key={itemView.id} variant="outline" className="rounded-md">
-            <span>{itemView.label}</span>
-            <span className="ml-1 font-medium">{itemView.value}</span>
-          </Badge>
+          <AssignmentResultsCopyArtifactPreviewScopeItem
+            itemView={itemView}
+            key={itemView.id}
+            previewId={previewId}
+          />
         ))}
       </div>
       {copyScopeView.summaryItems.length > 0 ? (
         <div className="flex flex-wrap gap-2">
           {copyScopeView.summaryItems.map((summaryItem) => (
-            <Badge
-              aria-label={summaryItem.ariaLabel}
+            <AssignmentResultsCopyArtifactPreviewScopeSummaryItem
               key={summaryItem.id}
-              variant="secondary"
-              className="rounded-md"
-            >
-              <span>{summaryItem.label}</span>
-              <span className="ml-1 font-medium">{summaryItem.value}</span>
-              <span className="sr-only">{summaryItem.description}</span>
-            </Badge>
+              previewId={previewId}
+              summaryItem={summaryItem}
+            />
           ))}
         </div>
       ) : null}
     </section>
+  );
+}
+
+function AssignmentResultsCopyArtifactPreviewScopeItem({
+  itemView,
+  previewId,
+}: {
+  itemView: AssignmentResultCopyScopeItemView;
+  previewId: AssignmentResultCopyArtifactPreview['id'];
+}) {
+  const labelId = `assignment-result-copy-preview-${previewId}-scope-${itemView.id}-label`;
+  const valueId = `assignment-result-copy-preview-${previewId}-scope-${itemView.id}-value`;
+  const descriptionId = `assignment-result-copy-preview-${previewId}-scope-${itemView.id}-description`;
+
+  return (
+    <Badge
+      aria-describedby={descriptionId}
+      aria-labelledby={`${labelId} ${valueId}`}
+      variant="outline"
+      className="rounded-md"
+    >
+      <span id={labelId}>{itemView.label}</span>
+      <output
+        aria-describedby={descriptionId}
+        aria-labelledby={`${labelId} ${valueId}`}
+        className="ml-1 font-medium"
+        id={valueId}
+      >
+        {itemView.value}
+      </output>
+      <span id={descriptionId} className="sr-only">
+        {itemView.description}
+      </span>
+    </Badge>
+  );
+}
+
+function AssignmentResultsCopyArtifactPreviewScopeSummaryItem({
+  previewId,
+  summaryItem,
+}: {
+  previewId: AssignmentResultCopyArtifactPreview['id'];
+  summaryItem: AssignmentResultCopyScopeSummaryItemView;
+}) {
+  const labelId = `assignment-result-copy-preview-${previewId}-scope-summary-${summaryItem.id}-label`;
+  const valueId = `assignment-result-copy-preview-${previewId}-scope-summary-${summaryItem.id}-value`;
+  const descriptionId = `assignment-result-copy-preview-${previewId}-scope-summary-${summaryItem.id}-description`;
+
+  return (
+    <Badge
+      aria-describedby={descriptionId}
+      aria-label={summaryItem.ariaLabel}
+      aria-labelledby={`${labelId} ${valueId}`}
+      variant="secondary"
+      className="rounded-md"
+    >
+      <span id={labelId}>{summaryItem.label}</span>
+      <output
+        aria-describedby={descriptionId}
+        aria-label={summaryItem.ariaLabel}
+        aria-labelledby={`${labelId} ${valueId}`}
+        className="ml-1 font-medium"
+        id={valueId}
+      >
+        {summaryItem.value}
+      </output>
+      <span id={descriptionId} className="sr-only">
+        {summaryItem.description}
+      </span>
+    </Badge>
   );
 }
 
@@ -596,6 +735,12 @@ function getCopyArtifactPreviewDescriptionId(
   id: AssignmentResultCopyArtifactPreview['id']
 ) {
   return `assignment-result-copy-preview-${id}-description`;
+}
+
+function getCopyArtifactPreviewScopeTitleId(
+  id: AssignmentResultCopyArtifactPreview['id']
+) {
+  return `assignment-result-copy-preview-${id}-scope-title`;
 }
 
 function getCopyArtifactPreviewScopeDescriptionId(

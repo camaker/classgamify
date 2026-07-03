@@ -15,6 +15,8 @@ export function AssignmentResultsReviewStatusPanel({
   const titleId = 'assignment-result-review-status-title';
   const descriptionId = 'assignment-result-review-status-description';
   const stepDescriptionId = 'assignment-result-review-status-step-description';
+  const statusValueId = 'assignment-result-review-status-value';
+  const stepLabelId = 'assignment-result-review-status-step-label';
   const summaryLabelId = 'assignment-result-review-status-summary-label';
 
   return (
@@ -31,7 +33,14 @@ export function AssignmentResultsReviewStatusPanel({
             variant={getAssignmentResultReviewStatusBadgeVariant(view.status)}
             className="rounded-md"
           >
-            {view.statusLabel}
+            <output
+              aria-describedby={descriptionId}
+              aria-label={view.ariaLabel}
+              aria-labelledby={`${titleId} ${statusValueId}`}
+              id={statusValueId}
+            >
+              {view.statusLabel}
+            </output>
           </Badge>
           <h2 id={titleId} className="mt-3 font-semibold text-base">
             {view.title}
@@ -43,15 +52,20 @@ export function AssignmentResultsReviewStatusPanel({
             {view.description}
           </p>
         </div>
-        <div className="rounded-md border bg-background p-3 lg:max-w-sm">
-          <p className="font-medium text-sm">{view.step.label}</p>
+        <fieldset
+          aria-describedby={stepDescriptionId}
+          className="rounded-md border bg-background p-3 lg:max-w-sm"
+        >
+          <legend id={stepLabelId} className="font-medium text-sm">
+            {view.step.label}
+          </legend>
           <p
             id={stepDescriptionId}
             className="mt-1 text-muted-foreground text-xs leading-5"
           >
             {view.step.description}
           </p>
-        </div>
+        </fieldset>
       </div>
       <section aria-labelledby={summaryLabelId} className="grid gap-2">
         <p id={summaryLabelId} className="font-medium text-sm">
@@ -76,6 +90,7 @@ function AssignmentResultsReviewStatusSummaryItem({
   summaryItem: AssignmentResultReviewScopeSummaryItemView;
 }) {
   const labelId = `assignment-result-review-status-summary-${summaryItem.id}-label`;
+  const valueId = `assignment-result-review-status-summary-${summaryItem.id}-value`;
   const descriptionId = `assignment-result-review-status-summary-${summaryItem.id}-description`;
 
   return (
@@ -84,7 +99,13 @@ function AssignmentResultsReviewStatusSummaryItem({
         {summaryItem.label}
       </dt>
       <dd aria-describedby={descriptionId} className="mt-1">
-        <output aria-label={summaryItem.ariaLabel} className="font-semibold">
+        <output
+          aria-describedby={descriptionId}
+          aria-label={summaryItem.ariaLabel}
+          aria-labelledby={`${labelId} ${valueId}`}
+          className="font-semibold"
+          id={valueId}
+        >
           {summaryItem.value}
         </output>
       </dd>

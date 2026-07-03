@@ -18,16 +18,36 @@ export function AssignmentResultsMetricCard({
   metric,
 }: AssignmentResultsMetricCardProps) {
   const Icon = resultMetricIconByKey[metric.key];
+  const labelId = `assignment-result-metric-${metric.key}-label`;
+  const valueId = `assignment-result-metric-${metric.key}-value`;
+  const descriptionId = `assignment-result-metric-${metric.key}-description`;
 
   return (
-    <Card aria-label={metric.ariaLabel} className="rounded-lg" role="article">
+    <Card
+      aria-describedby={descriptionId}
+      aria-label={metric.ariaLabel}
+      aria-labelledby={`${labelId} ${valueId}`}
+      className="rounded-lg"
+      role="article"
+    >
       <CardContent className="p-4">
         <Icon aria-hidden="true" className="size-5 text-primary" />
-        <output aria-label={metric.ariaLabel} className="mt-4 block">
+        <output
+          aria-describedby={descriptionId}
+          aria-label={metric.ariaLabel}
+          aria-labelledby={`${labelId} ${valueId}`}
+          className="mt-4 block"
+          id={valueId}
+        >
           <span className="text-2xl font-semibold">{metric.value}</span>
         </output>
-        <p className="text-sm text-muted-foreground">{metric.label}</p>
-        <p className="mt-2 text-xs leading-relaxed text-muted-foreground">
+        <p id={labelId} className="text-sm text-muted-foreground">
+          {metric.label}
+        </p>
+        <p
+          id={descriptionId}
+          className="mt-2 text-xs leading-relaxed text-muted-foreground"
+        >
           {metric.description}
         </p>
       </CardContent>

@@ -6742,12 +6742,12 @@ assert.match(
 );
 assert.match(
   assignmentResultsReviewScopePanelSource,
-  /const labelId = `assignment-result-review-scope-\$\{itemView\.id\}-label`[\s\S]*const valueId = `assignment-result-review-scope-\$\{itemView\.id\}-value`[\s\S]*const descriptionId = `assignment-result-review-scope-\$\{itemView\.id\}-description`[\s\S]*const statusDescriptionId = `assignment-result-review-scope-\$\{itemView\.id\}-status-description`[\s\S]*<article[\s\S]*aria-describedby=\{`\$\{descriptionId\} \$\{statusDescriptionId\}`\}[\s\S]*aria-labelledby=\{`\$\{labelId\} \$\{valueId\}`\}[\s\S]*AssignmentResultControlStatusBadge[\s\S]*descriptionId=\{statusDescriptionId\}[\s\S]*view=\{itemView\.statusView\}[\s\S]*id=\{valueId\}[\s\S]*aria-label=\{itemView\.ariaLabel\}[\s\S]*id=\{descriptionId\}/,
+  /const labelId = `assignment-result-review-scope-\$\{itemView\.id\}-label`[\s\S]*const valueId = `assignment-result-review-scope-\$\{itemView\.id\}-value`[\s\S]*const descriptionId = `assignment-result-review-scope-\$\{itemView\.id\}-description`[\s\S]*const statusDescriptionId = `assignment-result-review-scope-\$\{itemView\.id\}-status-description`[\s\S]*const statusValueId = `assignment-result-review-scope-\$\{itemView\.id\}-status`[\s\S]*<article[\s\S]*aria-describedby=\{`\$\{descriptionId\} \$\{statusDescriptionId\}`\}[\s\S]*aria-labelledby=\{`\$\{labelId\} \$\{valueId\}`\}[\s\S]*AssignmentResultControlStatusBadge[\s\S]*descriptionId=\{statusDescriptionId\}[\s\S]*labelId=\{labelId\}[\s\S]*valueId=\{statusValueId\}[\s\S]*view=\{itemView\.statusView\}[\s\S]*<output[\s\S]*aria-describedby=\{`\$\{descriptionId\} \$\{statusDescriptionId\}`\}[\s\S]*aria-label=\{itemView\.ariaLabel\}[\s\S]*aria-labelledby=\{`\$\{labelId\} \$\{valueId\}`\}[\s\S]*id=\{valueId\}[\s\S]*id=\{descriptionId\}/,
   'Assignment result review-scope items should associate each prepared scope value with its explanation, control status, and aria label.'
 );
 assert.match(
   assignmentResultsReviewScopePanelSource,
-  /const summaryLabelId = 'assignment-result-review-scope-summary-label'[\s\S]*<section[\s\S]*aria-labelledby=\{summaryLabelId\}[\s\S]*id=\{summaryLabelId\}[\s\S]*<dl[\s\S]*const labelId = `assignment-result-review-scope-summary-\$\{summaryItem\.id\}-label`[\s\S]*const valueId = `assignment-result-review-scope-summary-\$\{summaryItem\.id\}-value`[\s\S]*<dt[\s\S]*id=\{labelId\}[\s\S]*<dd[\s\S]*id=\{valueId\}/,
+  /const summaryLabelId = 'assignment-result-review-scope-summary-label'[\s\S]*<section[\s\S]*aria-labelledby=\{summaryLabelId\}[\s\S]*id=\{summaryLabelId\}[\s\S]*<dl[\s\S]*const labelId = `assignment-result-review-scope-summary-\$\{summaryItem\.id\}-label`[\s\S]*const valueId = `assignment-result-review-scope-summary-\$\{summaryItem\.id\}-value`[\s\S]*<dt[\s\S]*id=\{labelId\}[\s\S]*<output[\s\S]*aria-labelledby=\{`\$\{labelId\} \$\{valueId\}`\}[\s\S]*id=\{valueId\}/,
   'Assignment result review-scope summary counts should expose stable labels and values for assistive technology.'
 );
 assert.match(
@@ -6757,7 +6757,7 @@ assert.match(
 );
 assert.match(
   assignmentResultsReviewStatusPanelSource,
-  /data-status=\{view\.status\}[\s\S]*getAssignmentResultReviewStatusBadgeVariant\(view\.status\)[\s\S]*view\.statusLabel[\s\S]*view\.step\.label[\s\S]*view\.step\.description/,
+  /const statusValueId = 'assignment-result-review-status-value'[\s\S]*const stepLabelId = 'assignment-result-review-status-step-label'[\s\S]*data-status=\{view\.status\}[\s\S]*getAssignmentResultReviewStatusBadgeVariant\(view\.status\)[\s\S]*<output[\s\S]*aria-labelledby=\{`\$\{titleId\} \$\{statusValueId\}`\}[\s\S]*id=\{statusValueId\}[\s\S]*view\.statusLabel[\s\S]*<fieldset[\s\S]*aria-describedby=\{stepDescriptionId\}[\s\S]*<legend[\s\S]*id=\{stepLabelId\}[\s\S]*view\.step\.label[\s\S]*view\.step\.description/,
   'Assignment result review-status panel should render prepared status and next-step copy with status-driven badge presentation.'
 );
 assert.match(
@@ -6767,12 +6767,12 @@ assert.match(
 );
 assert.match(
   assignmentResultsReviewStatusPanelSource,
-  /const labelId = `assignment-result-review-status-summary-\$\{summaryItem\.id\}-label`[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*<output[\s\S]*aria-label=\{summaryItem\.ariaLabel\}[\s\S]*summaryItem\.description/,
+  /const labelId = `assignment-result-review-status-summary-\$\{summaryItem\.id\}-label`[\s\S]*const valueId = `assignment-result-review-status-summary-\$\{summaryItem\.id\}-value`[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*<output[\s\S]*aria-label=\{summaryItem\.ariaLabel\}[\s\S]*aria-labelledby=\{`\$\{labelId\} \$\{valueId\}`\}[\s\S]*id=\{valueId\}[\s\S]*summaryItem\.description/,
   'Assignment result review-status summary items should render prepared accessible labels and hidden descriptions.'
 );
 assert.match(
   assignmentResultsReviewScopePanelSource,
-  /const descriptionId = `assignment-result-review-scope-summary-\$\{summaryItem\.id\}-description`[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*<output[\s\S]*aria-label=\{summaryItem\.ariaLabel\}[\s\S]*summaryItem\.description/,
+  /const descriptionId = `assignment-result-review-scope-summary-\$\{summaryItem\.id\}-description`[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*<output[\s\S]*aria-label=\{summaryItem\.ariaLabel\}[\s\S]*aria-labelledby=\{`\$\{labelId\} \$\{valueId\}`\}[\s\S]*summaryItem\.description/,
   'Assignment result review-scope summary counts should render prepared accessible labels and hidden descriptions.'
 );
 assert.doesNotMatch(
@@ -6867,7 +6867,7 @@ assert.match(
 );
 assert.match(
   assignmentResultsMetricCardSource,
-  /<Card[\s\S]*aria-label=\{metric\.ariaLabel\}[\s\S]*role="article"[\s\S]*<output[\s\S]*aria-label=\{metric\.ariaLabel\}[\s\S]*metric\.description/,
+  /const labelId = `assignment-result-metric-\$\{metric\.key\}-label`[\s\S]*const valueId = `assignment-result-metric-\$\{metric\.key\}-value`[\s\S]*const descriptionId = `assignment-result-metric-\$\{metric\.key\}-description`[\s\S]*<Card[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*aria-label=\{metric\.ariaLabel\}[\s\S]*aria-labelledby=\{`\$\{labelId\} \$\{valueId\}`\}[\s\S]*role="article"[\s\S]*<output[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*aria-label=\{metric\.ariaLabel\}[\s\S]*aria-labelledby=\{`\$\{labelId\} \$\{valueId\}`\}[\s\S]*id=\{valueId\}[\s\S]*id=\{labelId\}[\s\S]*id=\{descriptionId\}[\s\S]*metric\.description/,
   'Assignment result metric cards should render prepared accessible metric labels, values, and descriptions.'
 );
 assert.match(
@@ -7087,7 +7087,7 @@ assert.match(
 );
 assert.match(
   assignmentResultsClassroomBriefCardSource,
-  /function AssignmentResultsClassroomBriefScopeItem[\s\S]*scopeView\.label[\s\S]*<output[\s\S]*aria-label=\{scopeView\.ariaLabel\}[\s\S]*scopeView\.value[\s\S]*scopeView\.description/,
+  /function AssignmentResultsClassroomBriefScopeItem[\s\S]*const labelId = `assignment-results-classroom-brief-scope-\$\{scopeView\.id\}-label`[\s\S]*const valueId = `assignment-results-classroom-brief-scope-\$\{scopeView\.id\}-value`[\s\S]*const descriptionId = `assignment-results-classroom-brief-scope-\$\{scopeView\.id\}-description`[\s\S]*id=\{labelId\}[\s\S]*scopeView\.label[\s\S]*<output[\s\S]*aria-label=\{scopeView\.ariaLabel\}[\s\S]*aria-labelledby=\{`\$\{labelId\} \$\{valueId\}`\}[\s\S]*id=\{valueId\}[\s\S]*scopeView\.value[\s\S]*id=\{descriptionId\}[\s\S]*scopeView\.description/,
   'Assignment classroom brief scope items should render prepared labels, values, descriptions, and accessible labels.'
 );
 assert.match(
@@ -7097,7 +7097,7 @@ assert.match(
 );
 assert.match(
   assignmentResultsClassroomBriefCardSource,
-  /function AssignmentResultsClassroomBriefStat[\s\S]*statView\.label[\s\S]*<output[\s\S]*aria-label=\{statView\.ariaLabel\}[\s\S]*statView\.value[\s\S]*statView\.description/,
+  /function AssignmentResultsClassroomBriefStat[\s\S]*const labelId = `assignment-results-classroom-brief-stat-\$\{statView\.key\}-label`[\s\S]*const valueId = `assignment-results-classroom-brief-stat-\$\{statView\.key\}-value`[\s\S]*const descriptionId = `assignment-results-classroom-brief-stat-\$\{statView\.key\}-description`[\s\S]*id=\{labelId\}[\s\S]*statView\.label[\s\S]*<output[\s\S]*aria-label=\{statView\.ariaLabel\}[\s\S]*aria-labelledby=\{`\$\{labelId\} \$\{valueId\}`\}[\s\S]*id=\{valueId\}[\s\S]*statView\.value[\s\S]*id=\{descriptionId\}[\s\S]*statView\.description/,
   'Assignment classroom brief stat cards should render prepared stat labels, values, descriptions, and accessible labels.'
 );
 assert.match(
@@ -7152,12 +7152,12 @@ assert.doesNotMatch(
 );
 assert.match(
   assignmentResultsClassroomBriefCardSource,
-  /function AssignmentResultsCopyScopeView[\s\S]*copyScopeView\.title[\s\S]*copyScopeView\.description[\s\S]*copyScopeView\.itemViews\.map[\s\S]*itemView\.label[\s\S]*itemView\.value[\s\S]*itemView\.description/,
+  /function AssignmentResultsCopyScopeView[\s\S]*copyScopeView\.title[\s\S]*copyScopeView\.description[\s\S]*copyScopeView\.itemViews\.map[\s\S]*AssignmentResultsCopyScopeItem[\s\S]*function AssignmentResultsCopyScopeItem[\s\S]*AssignmentResultCopyScopeItemView[\s\S]*const labelId = `assignment-results-copy-scope-\$\{itemView\.id\}-label`[\s\S]*const valueId = `assignment-results-copy-scope-\$\{itemView\.id\}-value`[\s\S]*const descriptionId = `assignment-results-copy-scope-\$\{itemView\.id\}-description`[\s\S]*itemView\.label[\s\S]*<output[\s\S]*aria-labelledby=\{`\$\{labelId\} \$\{valueId\}`\}[\s\S]*id=\{valueId\}[\s\S]*itemView\.value[\s\S]*id=\{descriptionId\}[\s\S]*itemView\.description/,
   'Assignment classroom brief copy-scope view should render prepared scope title, description, labels, values, and descriptions.'
 );
 assert.match(
   assignmentResultsClassroomBriefCardSource,
-  /function AssignmentResultsCopyScopeSummaryItem[\s\S]*AssignmentResultCopyScopeSummaryItemView[\s\S]*<output[\s\S]*aria-label=\{summaryItem\.ariaLabel\}[\s\S]*summaryItem\.description/,
+  /function AssignmentResultsCopyScopeSummaryItem[\s\S]*AssignmentResultCopyScopeSummaryItemView[\s\S]*const labelId = `assignment-results-copy-scope-summary-\$\{summaryItem\.id\}-label`[\s\S]*const valueId = `assignment-results-copy-scope-summary-\$\{summaryItem\.id\}-value`[\s\S]*<output[\s\S]*aria-label=\{summaryItem\.ariaLabel\}[\s\S]*aria-labelledby=\{`\$\{labelId\} \$\{valueId\}`\}[\s\S]*id=\{valueId\}[\s\S]*summaryItem\.description/,
   'Assignment classroom brief copy-scope summary should render prepared accessible labels and descriptions.'
 );
 assert.match(
@@ -7172,12 +7172,12 @@ assert.match(
 );
 assert.match(
   assignmentResultsClassroomBriefCardSource,
-  /AssignmentResultsCopyArtifactPreviewScope[\s\S]*copyScopeView=\{preview\.copyScopeView\}[\s\S]*descriptionId=\{scopeDescriptionId\}[\s\S]*function AssignmentResultsCopyArtifactPreviewScope[\s\S]*descriptionId: string;[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*copyScopeView\.title[\s\S]*id=\{descriptionId\}[\s\S]*copyScopeView\.description[\s\S]*copyScopeView\.itemViews\.map[\s\S]*itemView\.label[\s\S]*itemView\.value[\s\S]*copyScopeView\.summaryItems\.map[\s\S]*summaryItem\.label[\s\S]*summaryItem\.value/,
+  /const scopeTitleId = getCopyArtifactPreviewScopeTitleId\(preview\.id\)[\s\S]*AssignmentResultsCopyArtifactPreviewScope[\s\S]*copyScopeView=\{preview\.copyScopeView\}[\s\S]*descriptionId=\{scopeDescriptionId\}[\s\S]*previewId=\{preview\.id\}[\s\S]*titleId=\{scopeTitleId\}[\s\S]*function AssignmentResultsCopyArtifactPreviewScope[\s\S]*previewId: AssignmentResultCopyArtifactPreview\['id'\][\s\S]*titleId: string;[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*aria-labelledby=\{titleId\}[\s\S]*id=\{titleId\}[\s\S]*copyScopeView\.title[\s\S]*id=\{descriptionId\}[\s\S]*copyScopeView\.description[\s\S]*copyScopeView\.itemViews\.map[\s\S]*AssignmentResultsCopyArtifactPreviewScopeItem[\s\S]*copyScopeView\.summaryItems\.map[\s\S]*AssignmentResultsCopyArtifactPreviewScopeSummaryItem/,
   'Assignment classroom brief copy artifact preview cards should render each preview-specific copy scope and summary count item.'
 );
 assert.match(
   assignmentResultsClassroomBriefCardSource,
-  /copyScopeView\.summaryItems\.map[\s\S]*aria-label=\{summaryItem\.ariaLabel\}[\s\S]*summaryItem\.description/,
+  /function AssignmentResultsCopyArtifactPreviewScopeItem[\s\S]*AssignmentResultCopyScopeItemView[\s\S]*const labelId = `assignment-result-copy-preview-\$\{previewId\}-scope-\$\{itemView\.id\}-label`[\s\S]*const valueId = `assignment-result-copy-preview-\$\{previewId\}-scope-\$\{itemView\.id\}-value`[\s\S]*const descriptionId = `assignment-result-copy-preview-\$\{previewId\}-scope-\$\{itemView\.id\}-description`[\s\S]*aria-labelledby=\{`\$\{labelId\} \$\{valueId\}`\}[\s\S]*itemView\.label[\s\S]*<output[\s\S]*aria-labelledby=\{`\$\{labelId\} \$\{valueId\}`\}[\s\S]*id=\{valueId\}[\s\S]*itemView\.value[\s\S]*itemView\.description[\s\S]*function AssignmentResultsCopyArtifactPreviewScopeSummaryItem[\s\S]*AssignmentResultCopyScopeSummaryItemView[\s\S]*const labelId = `assignment-result-copy-preview-\$\{previewId\}-scope-summary-\$\{summaryItem\.id\}-label`[\s\S]*const valueId = `assignment-result-copy-preview-\$\{previewId\}-scope-summary-\$\{summaryItem\.id\}-value`[\s\S]*aria-label=\{summaryItem\.ariaLabel\}[\s\S]*<output[\s\S]*aria-label=\{summaryItem\.ariaLabel\}[\s\S]*aria-labelledby=\{`\$\{labelId\} \$\{valueId\}`\}[\s\S]*id=\{valueId\}[\s\S]*summaryItem\.description/,
   'Assignment classroom brief copy artifact preview summaries should render prepared accessible labels and descriptions.'
 );
 assert.match(
@@ -7187,7 +7187,7 @@ assert.match(
 );
 assert.match(
   assignmentResultsClassroomBriefCardSource,
-  /function getCopyArtifactPreviewTitleId\([\s\S]*AssignmentResultCopyArtifactPreview\['id'\][\s\S]*function getCopyArtifactPreviewDescriptionId\([\s\S]*AssignmentResultCopyArtifactPreview\['id'\][\s\S]*function getCopyArtifactPreviewScopeDescriptionId\([\s\S]*AssignmentResultCopyArtifactPreview\['id'\]/,
+  /function getCopyArtifactPreviewTitleId\([\s\S]*AssignmentResultCopyArtifactPreview\['id'\][\s\S]*function getCopyArtifactPreviewDescriptionId\([\s\S]*AssignmentResultCopyArtifactPreview\['id'\][\s\S]*function getCopyArtifactPreviewScopeTitleId\([\s\S]*AssignmentResultCopyArtifactPreview\['id'\][\s\S]*function getCopyArtifactPreviewScopeDescriptionId\([\s\S]*AssignmentResultCopyArtifactPreview\['id'\]/,
   'Assignment classroom brief copy artifact preview ids should be stable from the prepared preview id contract.'
 );
 assert.match(
@@ -7292,7 +7292,7 @@ assert.match(
 );
 assert.match(
   assignmentResultControlStatusBadgeSource,
-  /AssignmentResultControlStatusView[\s\S]*data-tone=\{view\.tone\}[\s\S]*variant=\{view\.tone === 'custom' \? 'secondary' : 'outline'\}[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*aria-label=\{view\.ariaLabel\}[\s\S]*view\.description/,
+  /AssignmentResultControlStatusView[\s\S]*labelId\?: string[\s\S]*valueId\?: string[\s\S]*const labelledBy = labelId && valueId \? `\$\{labelId\} \$\{valueId\}` : undefined[\s\S]*data-tone=\{view\.tone\}[\s\S]*variant=\{view\.tone === 'custom' \? 'secondary' : 'outline'\}[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*aria-label=\{view\.ariaLabel\}[\s\S]*aria-labelledby=\{labelledBy\}[\s\S]*id=\{valueId\}[\s\S]*view\.description/,
   'Assignment result control status badge should render prepared status tone, accessible label, and hidden description from the domain view.'
 );
 assert.match(
