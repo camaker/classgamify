@@ -174,11 +174,14 @@ export type ContactPageViewModel = {
   hero: ContactHeroView;
   inquiryPanel?: ContactInquiryPanelView;
   intent: ContactIntent;
-  supportCtaLabel: string;
+  supportCta: ContactSupportActionView;
   supportEmail: {
+    actionAriaLabel: string;
+    ariaLabel: string;
     description: string;
     title: string;
   };
+  topicSection: ContactSectionView;
   topics: ContactTopicView[];
 };
 
@@ -193,34 +196,50 @@ export type ContactChecklistItemId =
   | 'page';
 
 type ContactChecklistItemView = {
+  ariaLabel: string;
   id: ContactChecklistItemId;
   text: string;
 };
 
 type ContactChecklistView = {
+  ariaLabel: string;
   description: string;
   items: ContactChecklistItemView[];
   title: string;
 };
 
 type ContactHeroView = {
+  ariaLabel: string;
   description: string;
   title: string;
 };
 
 export type ContactInquiryPanelView = {
+  ariaLabel: string;
   description: string;
   highlights: ContactInquiryPanelHighlightView[];
   title: string;
 };
 
 type ContactInquiryPanelHighlightView = {
+  ariaLabel: string;
   description: string;
   id: 'materials' | 'rollout' | 'students';
   title: string;
 };
 
+type ContactSectionView = {
+  ariaLabel: string;
+};
+
+type ContactSupportActionView = {
+  ariaLabel: string;
+  label: string;
+};
+
 type ContactTopicView = {
+  actionAriaLabel: string;
+  ariaLabel: string;
   description: string;
   id: ContactTopicId;
   subject: string;
@@ -797,44 +816,71 @@ export function buildContactPageViewModel(
   intent: ContactIntent = 'general'
 ): ContactPageViewModel {
   const isClassroom = intent === 'classroom';
+  const directSubject = isClassroom
+    ? m.contact_subject_classroom()
+    : m.contact_subject_general();
+  const heroDescription = isClassroom
+    ? m.contact_classroom_description()
+    : m.contact_description();
+  const heroTitle = isClassroom
+    ? m.contact_classroom_title()
+    : m.contact_title();
+  const supportEmailDescription = m.contact_email_support_description();
+  const supportEmailTitle = m.contact_email_support();
+  const supportCtaLabel = m.contact_support_cta();
 
   return {
     checklist: buildContactChecklist(intent),
-    directSubject: isClassroom
-      ? m.contact_subject_classroom()
-      : m.contact_subject_general(),
+    directSubject,
     hero: {
-      description: isClassroom
-        ? m.contact_classroom_description()
-        : m.contact_description(),
-      title: isClassroom ? m.contact_classroom_title() : m.contact_title(),
+      ariaLabel: m.contact_hero_aria_label({
+        description: heroDescription,
+        title: heroTitle,
+      }),
+      description: heroDescription,
+      title: heroTitle,
     },
     inquiryPanel: isClassroom ? buildContactInquiryPanel() : undefined,
     intent,
-    supportCtaLabel: m.contact_support_cta(),
+    supportCta: {
+      ariaLabel: m.contact_support_cta_aria_label({
+        subject: directSubject,
+      }),
+      label: supportCtaLabel,
+    },
     supportEmail: {
-      description: m.contact_email_support_description(),
-      title: m.contact_email_support(),
+      actionAriaLabel: m.contact_email_support_action_aria_label({
+        subject: directSubject,
+      }),
+      ariaLabel: m.contact_email_support_card_aria_label({
+        description: supportEmailDescription,
+        title: supportEmailTitle,
+      }),
+      description: supportEmailDescription,
+      title: supportEmailTitle,
+    },
+    topicSection: {
+      ariaLabel: m.contact_topic_section_aria_label(),
     },
     topics: [
-      {
+      buildContactTopicView({
         description: m.contact_topic_learning_description(),
         id: 'product',
         subject: m.contact_subject_product(),
         title: m.contact_topic_learning_title(),
-      },
-      {
+      }),
+      buildContactTopicView({
         description: m.contact_topic_classroom_description(),
         id: 'classroom',
         subject: m.contact_subject_classroom(),
         title: m.contact_topic_classroom_title(),
-      },
-      {
+      }),
+      buildContactTopicView({
         description: m.contact_topic_partnership_description(),
         id: 'partnership',
         subject: m.contact_subject_pricing(),
         title: m.contact_topic_partnership_title(),
-      },
+      }),
     ],
   };
 }
@@ -972,66 +1018,139 @@ function buildPricingValueCardView({
 
 function buildContactChecklist(intent: ContactIntent): ContactChecklistView {
   if (intent === 'classroom') {
+    const description = m.contact_classroom_checklist_description();
+    const title = m.contact_classroom_checklist_title();
+
     return {
-      description: m.contact_classroom_checklist_description(),
+      ariaLabel: m.contact_checklist_aria_label({
+        description,
+        title,
+      }),
+      description,
       items: [
-        {
+        buildContactChecklistItemView({
           id: 'classroom-learners',
           text: m.contact_classroom_checklist_learners(),
-        },
-        {
+        }),
+        buildContactChecklistItemView({
           id: 'classroom-routine',
           text: m.contact_classroom_checklist_routine(),
-        },
-        {
+        }),
+        buildContactChecklistItemView({
           id: 'classroom-worksheets',
           text: m.contact_classroom_checklist_worksheets(),
-        },
+        }),
       ],
-      title: m.contact_classroom_checklist_title(),
+      title,
     };
   }
 
+  const description = m.contact_checklist_description();
+  const title = m.contact_checklist_title();
+
   return {
-    description: m.contact_checklist_description(),
+    ariaLabel: m.contact_checklist_aria_label({
+      description,
+      title,
+    }),
+    description,
     items: [
-      {
+      buildContactChecklistItemView({
         id: 'page',
         text: m.contact_checklist_page(),
-      },
-      {
+      }),
+      buildContactChecklistItemView({
         id: 'device',
         text: m.contact_checklist_device(),
-      },
-      {
+      }),
+      buildContactChecklistItemView({
         id: 'goal',
         text: m.contact_checklist_goal(),
-      },
+      }),
     ],
-    title: m.contact_checklist_title(),
+    title,
   };
 }
 
 function buildContactInquiryPanel(): ContactInquiryPanelView {
+  const description = m.contact_classroom_panel_description();
+  const title = m.contact_classroom_panel_title();
+
   return {
-    description: m.contact_classroom_panel_description(),
+    ariaLabel: m.contact_classroom_panel_aria_label({ description, title }),
+    description,
     highlights: [
-      {
+      buildContactInquiryPanelHighlightView({
         description: m.contact_classroom_panel_students_description(),
         id: 'students',
         title: m.contact_classroom_panel_students_title(),
-      },
-      {
+      }),
+      buildContactInquiryPanelHighlightView({
         description: m.contact_classroom_panel_materials_description(),
         id: 'materials',
         title: m.contact_classroom_panel_materials_title(),
-      },
-      {
+      }),
+      buildContactInquiryPanelHighlightView({
         description: m.contact_classroom_panel_rollout_description(),
         id: 'rollout',
         title: m.contact_classroom_panel_rollout_title(),
-      },
+      }),
     ],
-    title: m.contact_classroom_panel_title(),
+    title,
+  };
+}
+
+function buildContactChecklistItemView({
+  id,
+  text,
+}: {
+  id: ContactChecklistItemId;
+  text: string;
+}): ContactChecklistItemView {
+  return {
+    ariaLabel: m.contact_checklist_item_aria_label({ text }),
+    id,
+    text,
+  };
+}
+
+function buildContactInquiryPanelHighlightView({
+  description,
+  id,
+  title,
+}: {
+  description: string;
+  id: ContactInquiryPanelHighlightView['id'];
+  title: string;
+}): ContactInquiryPanelHighlightView {
+  return {
+    ariaLabel: m.contact_classroom_panel_highlight_aria_label({
+      description,
+      title,
+    }),
+    description,
+    id,
+    title,
+  };
+}
+
+function buildContactTopicView({
+  description,
+  id,
+  subject,
+  title,
+}: {
+  description: string;
+  id: ContactTopicId;
+  subject: string;
+  title: string;
+}): ContactTopicView {
+  return {
+    actionAriaLabel: m.contact_topic_action_aria_label({ title }),
+    ariaLabel: m.contact_topic_card_aria_label({ description, title }),
+    description,
+    id,
+    subject,
+    title,
   };
 }

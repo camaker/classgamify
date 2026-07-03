@@ -5956,15 +5956,60 @@ assert.match(
   /pageView\.checklist\.items\.map[\s\S]*key=\{item\.id\}[\s\S]*item\.text/,
   'Contact route should render checklist items by stable prepared item ids.'
 );
+assert.match(
+  contactRouteSource,
+  /aria-label=\{pageView\.hero\.ariaLabel\}[\s\S]*pageView\.hero\.title[\s\S]*pageView\.hero\.description/,
+  'Contact route should render prepared hero semantics.'
+);
+assert.match(
+  contactRouteSource,
+  /aria-label=\{pageView\.topicSection\.ariaLabel\}[\s\S]*pageView\.topics\.map[\s\S]*<SupportTopicCard[\s\S]*topic=\{topic\}/,
+  'Contact route should render support topics inside prepared topic section semantics.'
+);
+assert.match(
+  contactRouteSource,
+  /aria-label=\{pageView\.checklist\.ariaLabel\}[\s\S]*pageView\.checklist\.items\.map[\s\S]*aria-label=\{item\.ariaLabel\}[\s\S]*key=\{item\.id\}[\s\S]*item\.text/,
+  'Contact route should render prepared checklist and checklist item semantics.'
+);
+assert.match(
+  contactRouteSource,
+  /aria-label=\{pageView\.supportEmail\.ariaLabel\}[\s\S]*aria-label=\{pageView\.supportEmail\.actionAriaLabel\}[\s\S]*aria-label=\{pageView\.supportCta\.ariaLabel\}[\s\S]*pageView\.supportCta\.label/,
+  'Contact route should render prepared email card and support CTA semantics.'
+);
+assert.match(
+  contactRouteSource,
+  /function ClassroomInquiryPanel[\s\S]*aria-label=\{panel\.ariaLabel\}[\s\S]*panel\.highlights\.map[\s\S]*<article[\s\S]*aria-label=\{item\.ariaLabel\}/,
+  'Contact classroom inquiry panel should render prepared panel and highlight semantics.'
+);
+assert.match(
+  contactRouteSource,
+  /function SupportTopicCard[\s\S]*actionAriaLabel: string[\s\S]*ariaLabel: string[\s\S]*<article[\s\S]*aria-label=\{topic\.ariaLabel\}[\s\S]*<a[\s\S]*aria-label=\{topic\.actionAriaLabel\}/,
+  'Contact support topic cards should expose prepared card and mail action labels.'
+);
 assert.doesNotMatch(
   contactRouteSource,
-  /key=\{item\}|ReturnType<typeof buildContactPageViewModel>/,
-  'Contact route should not key checklist rows by localized copy or infer child contracts from page builders.'
+  /key=\{item\}|ReturnType<typeof buildContactPageViewModel>|supportCtaLabel/,
+  'Contact route should not key checklist rows by localized copy, infer child contracts from page builders, or use legacy flat CTA labels.'
 );
 assert.match(
   contactRouteSource,
   /ContactInquiryPanelView/,
   'Contact route should consume the focused classroom inquiry panel view contract.'
+);
+assert.match(
+  publicPageViewSource,
+  /export type ContactPageViewModel[\s\S]*supportCta: ContactSupportActionView;[\s\S]*supportEmail:[\s\S]*actionAriaLabel: string;[\s\S]*ariaLabel: string;[\s\S]*topicSection: ContactSectionView;[\s\S]*type ContactChecklistItemView = \{[\s\S]*ariaLabel: string;[\s\S]*type ContactTopicView = \{[\s\S]*actionAriaLabel: string;[\s\S]*ariaLabel: string;/,
+  'Contact page view models should expose prepared hero, checklist, topic, support, and inquiry semantics.'
+);
+assert.match(
+  publicPageViewSource,
+  /m\.contact_hero_aria_label\(\{[\s\S]*m\.contact_support_cta_aria_label\(\{[\s\S]*m\.contact_email_support_action_aria_label\(\{[\s\S]*m\.contact_topic_section_aria_label\(\)/,
+  'Contact page view model should prepare localized hero, support action, email, and topic section labels.'
+);
+assert.match(
+  publicPageViewSource,
+  /m\.contact_checklist_aria_label\(\{[\s\S]*m\.contact_classroom_panel_aria_label\(\{[\s\S]*m\.contact_checklist_item_aria_label\(\{[\s\S]*m\.contact_classroom_panel_highlight_aria_label\(\{[\s\S]*m\.contact_topic_action_aria_label\(\{/,
+  'Contact page view helpers should prepare localized checklist, inquiry panel, and support topic labels.'
 );
 assert.match(
   roadmapRouteSource,
@@ -31831,8 +31876,10 @@ assert.deepEqual(buildHomePageViewModel({ preview: homePageStarterPreview }), {
   ],
 });
 assert.equal(buildHomePageViewModel().preview.source, 'starter-preview');
+const contactPageView = buildContactPageViewModel();
+const classroomContactPageView = buildContactPageViewModel('classroom');
 assert.deepEqual(
-  buildContactPageViewModel().topics.map((topic) => [
+  contactPageView.topics.map((topic) => [
     topic.id,
     topic.title,
     topic.subject,
@@ -31847,49 +31894,135 @@ assert.deepEqual(
     ],
   ]
 );
-assert.deepEqual(buildContactPageViewModel().hero, {
+assert.deepEqual(contactPageView.topicSection, {
+  ariaLabel:
+    'ClassGamify contact topics for activity support, classroom workflow, and partnerships.',
+});
+assert.deepEqual(contactPageView.topics, [
+  {
+    actionAriaLabel: 'Email ClassGamify about Activity support.',
+    ariaLabel:
+      'Activity support: Questions about templates, activity creation, assignment links, or results.',
+    description:
+      'Questions about templates, activity creation, assignment links, or results.',
+    id: 'product',
+    subject: 'ClassGamify product support',
+    title: 'Activity support',
+  },
+  {
+    actionAriaLabel: 'Email ClassGamify about Teachers and parents.',
+    ariaLabel:
+      'Teachers and parents: Requests for classroom sharing, assignment routines, or student-friendly practice.',
+    description:
+      'Requests for classroom sharing, assignment routines, or student-friendly practice.',
+    id: 'classroom',
+    subject: 'ClassGamify classroom workflow',
+    title: 'Teachers and parents',
+  },
+  {
+    actionAriaLabel: 'Email ClassGamify about Pricing or partnership.',
+    ariaLabel:
+      'Pricing or partnership: Questions about plans, early access, or collaborations.',
+    description: 'Questions about plans, early access, or collaborations.',
+    id: 'partnership',
+    subject: 'ClassGamify pricing or partnership',
+    title: 'Pricing or partnership',
+  },
+]);
+assert.deepEqual(contactPageView.hero, {
+  ariaLabel:
+    'Contact: Reach the ClassGamify team for product feedback, classroom use, account support, or partnership questions.',
   description:
     'Reach the ClassGamify team for product feedback, classroom use, account support, or partnership questions.',
   title: 'Contact',
 });
-assert.deepEqual(buildContactPageViewModel().checklist, {
+assert.deepEqual(contactPageView.checklist, {
+  ariaLabel: 'What to include: A little context helps us answer faster.',
   description: 'A little context helps us answer faster.',
   items: [
     {
+      ariaLabel:
+        'Share the activity, template, assignment, page URL, or workflow you mean.',
       id: 'page',
       text: 'Share the activity, template, assignment, page URL, or workflow you mean.',
     },
     {
+      ariaLabel:
+        'Tell us which device, browser, or printer setup you used.',
       id: 'device',
       text: 'Tell us which device, browser, or printer setup you used.',
     },
     {
+      ariaLabel:
+        'Say whether this is for a class, tutoring group, family practice, or worksheet follow-up.',
       id: 'goal',
       text: 'Say whether this is for a class, tutoring group, family practice, or worksheet follow-up.',
     },
   ],
   title: 'What to include',
 });
-assert.equal(buildContactPageViewModel().intent, 'general');
-assert.equal(buildContactPageViewModel().inquiryPanel, undefined);
-assert.equal(
-  buildContactPageViewModel('classroom').directSubject,
-  'ClassGamify classroom workflow'
-);
-assert.deepEqual(buildContactPageViewModel('classroom').hero, {
+assert.deepEqual(contactPageView.supportEmail, {
+  actionAriaLabel: 'Email ClassGamify about ClassGamify support.',
+  ariaLabel: 'Email support: Send product feedback, support questions, or partnership ideas.',
+  description: 'Send product feedback, support questions, or partnership ideas.',
+  title: 'Email support',
+});
+assert.deepEqual(contactPageView.supportCta, {
+  ariaLabel: 'Email ClassGamify about ClassGamify support.',
+  label: 'Contact ClassGamify',
+});
+assert.equal(contactPageView.intent, 'general');
+assert.equal(contactPageView.inquiryPanel, undefined);
+assert.equal(classroomContactPageView.directSubject, 'ClassGamify classroom workflow');
+assert.deepEqual(classroomContactPageView.supportCta, {
+  ariaLabel: 'Email ClassGamify about ClassGamify classroom workflow.',
+  label: 'Contact ClassGamify',
+});
+assert.deepEqual(classroomContactPageView.supportEmail, {
+  actionAriaLabel:
+    'Email ClassGamify about ClassGamify classroom workflow.',
+  ariaLabel: 'Email support: Send product feedback, support questions, or partnership ideas.',
+  description: 'Send product feedback, support questions, or partnership ideas.',
+  title: 'Email support',
+});
+assert.deepEqual(classroomContactPageView.hero, {
+  ariaLabel:
+    'Classroom inquiry: Tell us how you want to use ClassGamify with students, tutoring groups, or a school team, and we will help shape the workflow around your routine.',
   description:
     'Tell us how you want to use ClassGamify with students, tutoring groups, or a school team, and we will help shape the workflow around your routine.',
   title: 'Classroom inquiry',
 });
 assert.deepEqual(
-  buildContactPageViewModel('classroom').checklist.items.map((item) => item.id),
+  classroomContactPageView.checklist.items.map((item) => item.id),
   ['classroom-learners', 'classroom-routine', 'classroom-worksheets']
 );
 assert.deepEqual(
-  buildContactPageViewModel('classroom').inquiryPanel?.highlights.map(
-    (item) => item.id
-  ),
+  classroomContactPageView.inquiryPanel?.highlights.map((item) => item.id),
   ['students', 'materials', 'rollout']
+);
+assert.equal(
+  classroomContactPageView.inquiryPanel?.ariaLabel,
+  'For teachers, tutors, and parents: ClassGamify is being built around reusable activities, game templates, assignment links, student attempts, and teacher result views.'
+);
+assert.deepEqual(
+  classroomContactPageView.inquiryPanel?.highlights.map((item) => [
+    item.id,
+    item.ariaLabel,
+  ]),
+  [
+    [
+      'students',
+      'Learners: Age, level, group size, and parent or teacher role help us recommend the right workflow.',
+    ],
+    [
+      'materials',
+      'Materials: We can prioritize printable packs, review queues, and assignment wording around your class routine.',
+    ],
+    [
+      'rollout',
+      'Rollout: Tell us when you want to try it, and we can point you to the most stable flow first.',
+    ],
+  ]
 );
 assert.equal(normalizeContactInquiryIntent('classroom'), 'classroom');
 assert.equal(normalizeContactInquiryIntent('support'), 'general');
