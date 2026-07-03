@@ -58,6 +58,7 @@ function RoadmapPage() {
             <div className="flex flex-col gap-3 sm:flex-row">
               <Link
                 to={pageView.hero.primaryAction.to}
+                aria-label={pageView.hero.primaryAction.ariaLabel}
                 className={cn(buttonVariants({ size: 'lg' }), 'rounded-lg')}
               >
                 {pageView.hero.primaryAction.label}
@@ -65,6 +66,7 @@ function RoadmapPage() {
               </Link>
               <Link
                 to={pageView.hero.secondaryAction.to}
+                aria-label={pageView.hero.secondaryAction.ariaLabel}
                 className={cn(
                   buttonVariants({ variant: 'outline', size: 'lg' }),
                   'rounded-lg bg-background'
@@ -120,6 +122,7 @@ function RoadmapPage() {
           </div>
           <Link
             to={pageView.validation.action.to}
+            aria-label={pageView.validation.action.ariaLabel}
             className={cn(buttonVariants(), 'w-full md:w-auto')}
           >
             {pageView.validation.action.label}

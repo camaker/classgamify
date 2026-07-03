@@ -5828,7 +5828,7 @@ assert.match(
 );
 assert.match(
   homeRouteSource,
-  /<dl aria-label=\{signal\.ariaLabel\}[\s\S]*<dt[\s\S]*signal\.label[\s\S]*<output[\s\S]*signal\.value[\s\S]*signal\.description/s,
+  /<dl[\s\S]*aria-label=\{signal\.ariaLabel\}[\s\S]*<dt[\s\S]*signal\.label[\s\S]*<output[\s\S]*signal\.value[\s\S]*signal\.description/s,
   'Home route signals should render prepared label/value/description semantics.'
 );
 assert.match(
@@ -5873,13 +5873,43 @@ assert.match(
 );
 assert.match(
   teachersRouteSource,
-  /pageView\.hero\.primaryAction\.to[\s\S]*pageView\.hero\.primaryAction\.label[\s\S]*pageView\.hero\.secondaryAction\.to[\s\S]*pageView\.hero\.secondaryAction\.label[\s\S]*pageView\.schoolCta\.action\.to[\s\S]*pageView\.schoolCta\.action\.label/,
+  /pageView\.hero\.primaryAction\.to[\s\S]*pageView\.hero\.primaryAction\.ariaLabel[\s\S]*pageView\.hero\.primaryAction\.label[\s\S]*pageView\.hero\.secondaryAction\.to[\s\S]*pageView\.hero\.secondaryAction\.ariaLabel[\s\S]*pageView\.hero\.secondaryAction\.label[\s\S]*pageView\.schoolCta\.action\.to[\s\S]*pageView\.schoolCta\.action\.ariaLabel[\s\S]*pageView\.schoolCta\.action\.label/,
   'Teachers route should render prepared hero and school CTA actions.'
 );
 assert.doesNotMatch(
   teachersRouteSource,
   /Routes\.(Create|ContactClassroom)/,
   'Teachers route should not hardcode CTA route targets.'
+);
+assert.match(
+  teachersRouteSource,
+  /aria-label=\{pageView\.templatePanel\.ariaLabel\}[\s\S]*pageView\.templatePanel\.title[\s\S]*pageView\.templatePanel\.description[\s\S]*pageView\.templatePanel\.templates\.map[\s\S]*aria-label=\{template\.ariaLabel\}[\s\S]*pageView\.templatePanel\.classroomModeLabel[\s\S]*template\.classroomMode/,
+  'Teachers route should render the prepared template panel and template item semantics.'
+);
+assert.match(
+  teachersRouteSource,
+  /aria-label=\{pageView\.workflowSection\.ariaLabel\}[\s\S]*pageView\.workflowSection\.title[\s\S]*pageView\.workflowSection\.description[\s\S]*pageView\.workflow\.map[\s\S]*FeatureCard[\s\S]*item=\{item\}/,
+  'Teachers route should render the prepared teacher workflow section.'
+);
+assert.match(
+  teachersRouteSource,
+  /aria-label=\{pageView\.schoolCta\.ariaLabel\}[\s\S]*pageView\.schoolCta\.title[\s\S]*pageView\.schoolCta\.description[\s\S]*pageView\.schoolCta\.action\.ariaLabel/,
+  'Teachers route should render the prepared school workflow CTA section.'
+);
+assert.match(
+  teachersRouteSource,
+  /aria-label=\{pageView\.useCaseSection\.ariaLabel\}[\s\S]*pageView\.useCaseSection\.title[\s\S]*pageView\.useCaseSection\.description[\s\S]*pageView\.useCases\.map[\s\S]*FeatureCard[\s\S]*item=\{item\}/,
+  'Teachers route should render the prepared classroom use-case section.'
+);
+assert.match(
+  teachersRouteSource,
+  /function FeatureCard[\s\S]*ariaLabel: string[\s\S]*<article[\s\S]*aria-label=\{item\.ariaLabel\}/,
+  'Teachers feature cards should expose prepared accessible labels.'
+);
+assert.match(
+  roadmapRouteSource,
+  /pageView\.hero\.primaryAction\.to[\s\S]*pageView\.hero\.primaryAction\.ariaLabel[\s\S]*pageView\.hero\.primaryAction\.label[\s\S]*pageView\.hero\.secondaryAction\.to[\s\S]*pageView\.hero\.secondaryAction\.ariaLabel[\s\S]*pageView\.hero\.secondaryAction\.label[\s\S]*pageView\.validation\.action\.to[\s\S]*pageView\.validation\.action\.ariaLabel[\s\S]*pageView\.validation\.action\.label/,
+  'Roadmap route should render prepared hero and validation CTA aria labels.'
 );
 assert.match(
   contactRouteSource,
@@ -32203,10 +32233,13 @@ assert.deepEqual(buildRoadmapPageViewModel(), {
     description:
       'A practical view of what is already usable, what is being tightened now, and how teacher-reviewed AI creation expands next.',
     primaryAction: {
+      ariaLabel: 'Create an activity from the roadmap page.',
       label: 'Create activity',
       to: Routes.Create,
     },
     secondaryAction: {
+      ariaLabel:
+        'Browse available ClassGamify templates from the roadmap page.',
       label: 'Browse templates',
       to: Routes.Templates,
     },
@@ -32254,6 +32287,7 @@ assert.deepEqual(buildRoadmapPageViewModel(), {
   ],
   validation: {
     action: {
+      ariaLabel: 'Share classroom feedback about the ClassGamify roadmap.',
       label: 'Share classroom feedback',
       to: Routes.ContactClassroom,
     },
@@ -32269,10 +32303,12 @@ assert.deepEqual(buildTeachersPageViewModel(), {
     description:
       'ClassGamify supports the real Wordwall-style loop: create an activity, switch templates, publish a share link, and review student results.',
     primaryAction: {
+      ariaLabel: 'Create a reusable activity from the teachers page.',
       label: 'Create activity',
       to: Routes.Create,
     },
     secondaryAction: {
+      ariaLabel: 'Talk to ClassGamify about classroom workflow needs.',
       label: 'Talk to us',
       to: Routes.ContactClassroom,
     },
@@ -32281,15 +32317,27 @@ assert.deepEqual(buildTeachersPageViewModel(), {
   },
   schoolCta: {
     action: {
+      ariaLabel:
+        'Contact ClassGamify about a school or learning-center workflow.',
       label: 'Contact us',
       to: Routes.ContactClassroom,
     },
+    ariaLabel:
+      'Need a school or learning-center workflow?: Multi-teacher use needs thoughtful decisions about student names, result retention, template sharing, and classroom permissions.',
     description:
       'Multi-teacher use needs thoughtful decisions about student names, result retention, template sharing, and classroom permissions.',
     title: 'Need a school or learning-center workflow?',
   },
   templatePanel: {
+    ariaLabel:
+      'First template families: These are the first reusable template families teachers can apply to shared activity content.',
+    classroomModeLabel: 'Classroom mode',
+    description:
+      'These are the first reusable template families teachers can apply to shared activity content.',
     templates: activityTemplates.map((template) => ({
+      ariaLabel: `${template.name}: ${formatActivityTemplateClassroomMode(
+        template.classroomMode
+      )} classroom mode.`,
       classroomMode: formatActivityTemplateClassroomMode(
         template.classroomMode
       ),
@@ -32298,40 +32346,66 @@ assert.deepEqual(buildTeachersPageViewModel(), {
     })),
     title: 'First template families',
   },
+  useCaseSection: {
+    ariaLabel:
+      'Classroom use cases: Ways teachers can use ClassGamify across homework, live play, and result follow-up.',
+    description:
+      'Ways teachers can use ClassGamify across homework, live play, and result follow-up.',
+    title: 'Classroom use cases',
+  },
   useCases: [
     {
+      ariaLabel:
+        'Classroom homework: Assign short games after class and see which students completed the activity.',
       description:
         'Assign short games after class and see which students completed the activity.',
       id: 'classrooms',
       title: 'Classroom homework',
     },
     {
+      ariaLabel:
+        'Live classroom play: Use box reveals, listening, line matching, sorting, and matching activities for warmups, review rounds, or small groups.',
       description:
         'Use box reveals, listening, line matching, sorting, and matching activities for warmups, review rounds, or small groups.',
       id: 'games',
       title: 'Live classroom play',
     },
     {
+      ariaLabel:
+        'Result follow-up: Use completions and scores to decide which items need reteaching or another activity.',
       description:
         'Use completions and scores to decide which items need reteaching or another activity.',
       id: 'results',
       title: 'Result follow-up',
     },
   ],
+  workflowSection: {
+    ariaLabel:
+      'Teacher workflow: The teacher path from lesson material to reusable activity, playable template, and assignment link.',
+    description:
+      'The teacher path from lesson material to reusable activity, playable template, and assignment link.',
+    title: 'Teacher workflow',
+  },
   workflow: [
     {
+      ariaLabel:
+        'Start from lesson content: Paste vocabulary, questions, examples, or worksheet prompts into one structured activity model.',
       description:
         'Paste vocabulary, questions, examples, or worksheet prompts into one structured activity model.',
       id: 'draft',
       title: 'Start from lesson content',
     },
     {
+      ariaLabel:
+        'Choose a game template: Render the same content as quiz, matching games, line matching, group sorting, fill-ins, listening, pair matching, or box reveal play.',
       description:
         'Render the same content as quiz, matching games, line matching, group sorting, fill-ins, listening, pair matching, or box reveal play.',
       id: 'publish',
       title: 'Choose a game template',
     },
     {
+      ariaLabel:
+        'Publish an assignment: Share a public student link while keeping the reusable activity in the teacher library.',
       description:
         'Share a public student link while keeping the reusable activity in the teacher library.',
       id: 'share',

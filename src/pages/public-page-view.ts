@@ -160,7 +160,9 @@ export type TeachersPageViewModel = {
   hero: TeachersHeroView;
   schoolCta: TeachersSchoolCtaView;
   templatePanel: TeachersTemplatePanelView;
+  useCaseSection: TeachersPageSectionView;
   useCases: TeachersPageItemView<TeachersPageUseCaseId>[];
+  workflowSection: TeachersPageSectionView;
   workflow: TeachersPageItemView<TeachersPageWorkflowId>[];
 };
 
@@ -271,8 +273,15 @@ export type TeachersPageWorkflowId = 'draft' | 'publish' | 'share';
 export type TeachersPageUseCaseId = 'classrooms' | 'games' | 'results';
 
 type TeachersPageItemView<Id extends string> = {
+  ariaLabel: string;
   description: string;
   id: Id;
+  title: string;
+};
+
+type TeachersPageSectionView = {
+  ariaLabel: string;
+  description: string;
   title: string;
 };
 
@@ -286,16 +295,21 @@ type TeachersHeroView = {
 
 type TeachersSchoolCtaView = {
   action: PublicPageRouteAction;
+  ariaLabel: string;
   description: string;
   title: string;
 };
 
 type TeachersTemplatePanelView = {
+  ariaLabel: string;
+  classroomModeLabel: string;
+  description: string;
   title: string;
   templates: TeachersTemplatePanelItemView[];
 };
 
 type TeachersTemplatePanelItemView = {
+  ariaLabel: string;
   classroomMode: string;
   name: string;
   templateType: ActivityTemplateType;
@@ -530,10 +544,12 @@ export function buildRoadmapPageViewModel(): RoadmapPageViewModel {
       badgeLabel: m.roadmap_eyebrow(),
       description: m.roadmap_subtitle(),
       primaryAction: {
+        ariaLabel: m.roadmap_primary_cta_aria_label(),
         label: m.roadmap_primary_cta(),
         to: Routes.Create,
       },
       secondaryAction: {
+        ariaLabel: m.roadmap_secondary_cta_aria_label(),
         label: m.roadmap_secondary_cta(),
         to: Routes.Templates,
       },
@@ -575,6 +591,7 @@ export function buildRoadmapPageViewModel(): RoadmapPageViewModel {
     ],
     validation: {
       action: {
+        ariaLabel: m.roadmap_feedback_cta_aria_label(),
         label: m.roadmap_feedback_cta(),
         to: Routes.ContactClassroom,
       },
@@ -627,21 +644,28 @@ function getRoadmapTaskStatusLabel(status: RoadmapTaskStatus) {
 }
 
 export function buildTeachersPageViewModel(): TeachersPageViewModel {
-  const templates = getActivityTemplates().map((template) => ({
-    classroomMode: formatActivityTemplateClassroomMode(template.classroomMode),
-    name: template.name,
-    templateType: template.type,
-  }));
+  const templatePanelTitle = m.teachers_page_template_panel_title();
+  const templatePanelDescription = m.teachers_page_template_panel_description();
+  const schoolCtaTitle = m.teachers_page_school_cta_title();
+  const schoolCtaDescription = m.teachers_page_school_cta_description();
+  const useCaseSectionTitle = m.teachers_page_use_case_section_title();
+  const useCaseSectionDescription =
+    m.teachers_page_use_case_section_description();
+  const workflowSectionTitle = m.teachers_page_workflow_section_title();
+  const workflowSectionDescription =
+    m.teachers_page_workflow_section_description();
 
   return {
     hero: {
       badgeLabel: m.teachers_page_eyebrow(),
       description: m.teachers_page_description(),
       primaryAction: {
+        ariaLabel: m.teachers_page_primary_cta_aria_label(),
         label: m.teachers_page_primary_cta(),
         to: Routes.Create,
       },
       secondaryAction: {
+        ariaLabel: m.teachers_page_secondary_cta_aria_label(),
         label: m.teachers_page_secondary_cta(),
         to: Routes.ContactClassroom,
       },
@@ -649,50 +673,112 @@ export function buildTeachersPageViewModel(): TeachersPageViewModel {
     },
     schoolCta: {
       action: {
+        ariaLabel: m.teachers_page_school_cta_aria_label(),
         label: m.teachers_page_school_cta(),
         to: Routes.ContactClassroom,
       },
-      description: m.teachers_page_school_cta_description(),
-      title: m.teachers_page_school_cta_title(),
+      ariaLabel: m.teachers_page_school_cta_section_aria_label({
+        description: schoolCtaDescription,
+        title: schoolCtaTitle,
+      }),
+      description: schoolCtaDescription,
+      title: schoolCtaTitle,
     },
     templatePanel: {
-      title: m.teachers_page_template_panel_title(),
-      templates,
+      ariaLabel: m.teachers_page_template_panel_aria_label({
+        description: templatePanelDescription,
+        title: templatePanelTitle,
+      }),
+      classroomModeLabel: m.teachers_page_template_panel_mode_label(),
+      description: templatePanelDescription,
+      templates: getActivityTemplates().map(buildTeachersTemplatePanelItemView),
+      title: templatePanelTitle,
+    },
+    useCaseSection: {
+      ariaLabel: m.teachers_page_use_case_section_aria_label({
+        description: useCaseSectionDescription,
+        title: useCaseSectionTitle,
+      }),
+      description: useCaseSectionDescription,
+      title: useCaseSectionTitle,
     },
     useCases: [
-      {
+      buildTeachersPageItemView({
         description: m.teachers_page_use_case_0_description(),
         id: 'classrooms',
         title: m.teachers_page_use_case_0_title(),
-      },
-      {
+      }),
+      buildTeachersPageItemView({
         description: m.teachers_page_use_case_1_description(),
         id: 'games',
         title: m.teachers_page_use_case_1_title(),
-      },
-      {
+      }),
+      buildTeachersPageItemView({
         description: m.teachers_page_use_case_2_description(),
         id: 'results',
         title: m.teachers_page_use_case_2_title(),
-      },
+      }),
     ],
+    workflowSection: {
+      ariaLabel: m.teachers_page_workflow_section_aria_label({
+        description: workflowSectionDescription,
+        title: workflowSectionTitle,
+      }),
+      description: workflowSectionDescription,
+      title: workflowSectionTitle,
+    },
     workflow: [
-      {
+      buildTeachersPageItemView({
         description: m.teachers_page_workflow_0_description(),
         id: 'draft',
         title: m.teachers_page_workflow_0_title(),
-      },
-      {
+      }),
+      buildTeachersPageItemView({
         description: m.teachers_page_workflow_1_description(),
         id: 'publish',
         title: m.teachers_page_workflow_1_title(),
-      },
-      {
+      }),
+      buildTeachersPageItemView({
         description: m.teachers_page_workflow_2_description(),
         id: 'share',
         title: m.teachers_page_workflow_2_title(),
-      },
+      }),
     ],
+  };
+}
+
+function buildTeachersTemplatePanelItemView(
+  template: ReturnType<typeof getActivityTemplates>[number]
+): TeachersTemplatePanelItemView {
+  const classroomMode = formatActivityTemplateClassroomMode(
+    template.classroomMode
+  );
+
+  return {
+    ariaLabel: m.teachers_page_template_panel_item_aria_label({
+      mode: classroomMode,
+      template: template.name,
+    }),
+    classroomMode,
+    name: template.name,
+    templateType: template.type,
+  };
+}
+
+function buildTeachersPageItemView<Id extends string>({
+  description,
+  id,
+  title,
+}: {
+  description: string;
+  id: Id;
+  title: string;
+}): TeachersPageItemView<Id> {
+  return {
+    ariaLabel: m.teachers_page_card_aria_label({ description, title }),
+    description,
+    id,
+    title,
   };
 }
 

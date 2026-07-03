@@ -78,6 +78,7 @@ function TeachersPage() {
             <div className="flex flex-col gap-3 sm:flex-row">
               <Link
                 to={pageView.hero.primaryAction.to}
+                aria-label={pageView.hero.primaryAction.ariaLabel}
                 className={cn(buttonVariants({ size: 'lg' }), 'rounded-lg')}
               >
                 {pageView.hero.primaryAction.label}
@@ -85,6 +86,7 @@ function TeachersPage() {
               </Link>
               <Link
                 to={pageView.hero.secondaryAction.to}
+                aria-label={pageView.hero.secondaryAction.ariaLabel}
                 className={cn(
                   buttonVariants({ variant: 'outline', size: 'lg' }),
                   'rounded-lg bg-background'
@@ -95,37 +97,63 @@ function TeachersPage() {
             </div>
           </div>
 
-          <div className="rounded-lg border bg-card p-5">
-            <p className="text-sm font-medium text-muted-foreground">
+          <section
+            aria-label={pageView.templatePanel.ariaLabel}
+            className="rounded-lg border bg-card p-5"
+          >
+            <h2 className="text-sm font-medium text-muted-foreground">
               {pageView.templatePanel.title}
+            </h2>
+            <p className="mt-2 text-sm leading-6 text-muted-foreground">
+              {pageView.templatePanel.description}
             </p>
             <div className="mt-4 grid gap-2">
               {pageView.templatePanel.templates.map((template) => (
-                <div
+                <dl
+                  aria-label={template.ariaLabel}
                   key={template.templateType}
                   className="flex items-center justify-between gap-3 rounded-lg border bg-background p-3"
                 >
-                  <span className="text-sm font-medium">{template.name}</span>
-                  <span className="text-xs text-muted-foreground">
+                  <dt className="text-sm font-medium">{template.name}</dt>
+                  <dd className="text-right text-xs text-muted-foreground">
+                    <span className="sr-only">
+                      {pageView.templatePanel.classroomModeLabel}:{' '}
+                    </span>
                     {template.classroomMode}
-                  </span>
-                </div>
+                  </dd>
+                </dl>
               ))}
             </div>
+          </section>
+        </section>
+
+        <section
+          aria-label={pageView.workflowSection.ariaLabel}
+          className="space-y-4"
+        >
+          <div>
+            <h2 className="text-2xl font-semibold tracking-normal">
+              {pageView.workflowSection.title}
+            </h2>
+            <p className="mt-2 max-w-2xl text-sm leading-6 text-muted-foreground">
+              {pageView.workflowSection.description}
+            </p>
+          </div>
+          <div className="grid gap-4 md:grid-cols-3">
+            {pageView.workflow.map((item) => (
+              <FeatureCard
+                key={item.id}
+                icon={teacherWorkflowIcons[item.id]}
+                item={item}
+              />
+            ))}
           </div>
         </section>
 
-        <section className="grid gap-4 md:grid-cols-3">
-          {pageView.workflow.map((item) => (
-            <FeatureCard
-              key={item.id}
-              icon={teacherWorkflowIcons[item.id]}
-              item={item}
-            />
-          ))}
-        </section>
-
-        <section className="grid gap-4 rounded-lg border bg-card p-5 md:grid-cols-[minmax(0,1fr)_auto] md:items-center">
+        <section
+          aria-label={pageView.schoolCta.ariaLabel}
+          className="grid gap-4 rounded-lg border bg-card p-5 md:grid-cols-[minmax(0,1fr)_auto] md:items-center"
+        >
           <div className="min-w-0">
             <h2 className="text-xl font-semibold">
               {pageView.schoolCta.title}
@@ -136,20 +164,34 @@ function TeachersPage() {
           </div>
           <Link
             to={pageView.schoolCta.action.to}
+            aria-label={pageView.schoolCta.action.ariaLabel}
             className={cn(buttonVariants(), 'w-full md:w-auto')}
           >
             {pageView.schoolCta.action.label}
           </Link>
         </section>
 
-        <section className="grid gap-4 md:grid-cols-3">
-          {pageView.useCases.map((item) => (
-            <FeatureCard
-              key={item.id}
-              icon={teacherUseCaseIcons[item.id]}
-              item={item}
-            />
-          ))}
+        <section
+          aria-label={pageView.useCaseSection.ariaLabel}
+          className="space-y-4"
+        >
+          <div>
+            <h2 className="text-2xl font-semibold tracking-normal">
+              {pageView.useCaseSection.title}
+            </h2>
+            <p className="mt-2 max-w-2xl text-sm leading-6 text-muted-foreground">
+              {pageView.useCaseSection.description}
+            </p>
+          </div>
+          <div className="grid gap-4 md:grid-cols-3">
+            {pageView.useCases.map((item) => (
+              <FeatureCard
+                key={item.id}
+                icon={teacherUseCaseIcons[item.id]}
+                item={item}
+              />
+            ))}
+          </div>
         </section>
       </div>
     </Container>
@@ -162,12 +204,16 @@ function FeatureCard({
 }: {
   icon: TablerIcon;
   item: {
+    ariaLabel: string;
     description: string;
     title: string;
   };
 }) {
   return (
-    <div className="rounded-lg border bg-card p-5">
+    <article
+      aria-label={item.ariaLabel}
+      className="rounded-lg border bg-card p-5"
+    >
       <div className="flex size-9 items-center justify-center rounded-lg border bg-background text-primary">
         <Icon className="size-4" />
       </div>
@@ -175,7 +221,7 @@ function FeatureCard({
       <p className="mt-2 text-sm leading-6 text-muted-foreground">
         {item.description}
       </p>
-    </div>
+    </article>
   );
 }
 
