@@ -9,6 +9,10 @@ import { getLocale } from '@/lib/locale';
 import { getBaseUrl } from '@/lib/urls';
 import { serverEnv } from '@/env/server';
 import { websiteConfig } from '@/config/website';
+import {
+  getAuthBannedUserMessage,
+  getAuthDefaultBanReason,
+} from '@/auth/plugin-copy';
 import { emailHarmony } from 'better-auth-harmony';
 import { admin, apiKey, oneTap } from 'better-auth/plugins';
 
@@ -123,10 +127,9 @@ export const auth = betterAuth({
     // support user management, ban/unban user, manage user roles, etc.
     admin({
       // https://www.better-auth.com/docs/plugins/admin#default-ban-reason
-      // defaultBanReason: 'Spamming',
+      defaultBanReason: getAuthDefaultBanReason(),
       defaultBanExpiresIn: undefined,
-      bannedUserMessage:
-        'You have been banned from this application. Please contact support if you believe this is an error.',
+      bannedUserMessage: getAuthBannedUserMessage(),
     }),
     // https://www.better-auth.com/docs/plugins/api-key
     // support API key management for user authentication

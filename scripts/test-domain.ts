@@ -32,6 +32,10 @@ import {
   buildAuthErrorDisplayView,
   buildAuthErrorRecoveryView,
 } from '@/auth/error-recovery';
+import {
+  getAuthBannedUserMessage,
+  getAuthDefaultBanReason,
+} from '@/auth/plugin-copy';
 import { buildMailWorkspaceBoundaryView } from '@/mail/workspace-boundary';
 import { normalizeMailLocale } from '@/mail/locale';
 import { getEmailSubject } from '@/mail/render';
@@ -5410,6 +5414,13 @@ const authErrorRouteSource = readFileSync(
   'src/routes/auth/error.tsx',
   'utf8'
 );
+const authServerConfigSource = readFileSync('src/auth/auth.ts', 'utf8');
+const authPluginCopySource = readFileSync('src/auth/plugin-copy.ts', 'utf8');
+const authDocumentationSource = readFileSync('docs/auth.md', 'utf8');
+const authE2eCatalogSource = readFileSync(
+  'tests/e2e/TEST-CATALOG.md',
+  'utf8'
+);
 const loginFormSource = readFileSync(
   'src/components/auth/login-form.tsx',
   'utf8'
@@ -6021,6 +6032,44 @@ assert.match(
   authErrorRouteSource,
   /error_description:[\s\S]*component: AuthErrorPage[\s\S]*head: \(\) => \(\{[\s\S]*auth_error_workspace_title[\s\S]*auth_error_workspace_description[\s\S]*const \{ callbackUrl, error \} = Route\.useSearch\(\)[\s\S]*<ErrorCard callbackUrl=\{callbackUrl\} errorCode=\{error\} \/>/,
   'Auth error route should parse external descriptions without passing them into the UI.'
+);
+overwriteGetLocale(() => 'en');
+assert.match(
+  getAuthBannedUserMessage(),
+  /ClassGamify teacher workspace[\s\S]*classroom activities[\s\S]*assignment links[\s\S]*student result records/
+);
+assert.equal(getAuthDefaultBanReason(), 'Spamming');
+overwriteGetLocale(() => 'zh');
+assert.match(
+  getAuthBannedUserMessage(),
+  /ClassGamify 教师工作区[\s\S]*课堂活动[\s\S]*作业链接[\s\S]*学生结果记录/
+);
+assert.equal(getAuthDefaultBanReason(), '垃圾信息');
+overwriteGetLocale(() => 'en');
+assert.match(
+  authPluginCopySource,
+  /auth_banned_user_message[\s\S]*admin_users_ban_default_reason/,
+  'Auth plugin copy helper should read Better Auth admin plugin messages from locale keys.'
+);
+assert.match(
+  authServerConfigSource,
+  /admin\(\{[\s\S]*defaultBanReason: getAuthDefaultBanReason\(\)[\s\S]*bannedUserMessage: getAuthBannedUserMessage\(\)/,
+  'Better Auth admin plugin should receive locale-backed ban copy from auth helper functions.'
+);
+assert.doesNotMatch(
+  authServerConfigSource,
+  /You have been banned from this application|Please contact support if you believe this is an error|defaultBanReason: 'Spamming'/,
+  'Auth server config should not hard-code Better Auth blocked-account copy.'
+);
+assert.match(
+  authDocumentationSource,
+  /bannedUserMessage[\s\S]*defaultBanReason[\s\S]*locale-backed auth plugin copy helpers/,
+  'Auth docs should document locale-backed Better Auth admin plugin copy.'
+);
+assert.match(
+  authE2eCatalogSource,
+  /banned-account fixture[\s\S]*blocked teacher-workspace message is localized[\s\S]*Better Auth or starter-template English/,
+  'E2E catalog should cover localized banned-account auth messaging.'
 );
 assert.doesNotMatch(
   authCardSource,
@@ -10639,6 +10688,7 @@ const authWorkspaceBoundaryRequirements = [
     enLocaleMessages,
     'en',
     [
+      ['auth_banned_user_message', /ClassGamify teacher workspace/],
       ['auth_login_title', /Teacher sign-in/],
       ['auth_login_benefit_progress', /source materials/],
       ['auth_login_benefit_review', /student attempts, and result exports/],
@@ -10715,6 +10765,7 @@ const authWorkspaceBoundaryRequirements = [
     zhLocaleMessages,
     'zh',
     [
+      ['auth_banned_user_message', /ClassGamify 教师工作区/],
       ['auth_login_title', /教师登录/],
       ['auth_login_benefit_progress', /来源素材/],
       ['auth_login_benefit_review', /学生尝试和结果导出/],

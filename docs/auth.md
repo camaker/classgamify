@@ -45,7 +45,7 @@ src/auth/
 - **user**: `deleteUser.enabled: true`.
 - **plugins**:
   - `tanstackStartCookies()` — cookies/session with TanStack Start on Cloudflare.
-  - `admin()` — user management, ban/unban, roles; `bannedUserMessage` and optional `defaultBanExpiresIn`.
+  - `admin()` — user management, ban/unban, roles; `bannedUserMessage` and `defaultBanReason` are supplied by locale-backed auth plugin copy helpers so blocked teacher-workspace messaging stays in the translation files.
   - `apiKey()` — API key management for users.
   - `emailHarmony()` — email normalization/validation; `allowNormalizedSignin: false`.
 - **onAPIError**: `errorURL: '/auth/error'`; optional `onError` logging.
