@@ -980,6 +980,7 @@ import {
   buildStudentRunnerReadyState,
   buildStudentRunnerRouteState,
   buildStudentRunnerSeoView,
+  buildStudentRunnerStartHandoffView,
   buildStudentRunnerStarterPreview,
   buildStudentRunnerSubmissionExecutionPlan,
   buildStudentRunnerSubmissionPlan,
@@ -989,6 +990,7 @@ import {
   buildStudentRunnerTimerTickPlan,
   buildStudentRunnerUnavailableSafetyView,
   getStudentRunnerAttemptStartedAt,
+  STUDENT_RUNNER_START_HANDOFF_ITEM_IDS,
   shouldResetStudentRunnerAttemptSession,
   shouldStartStudentRunnerAttemptClock,
 } from '@/assignments/student-runner-state';
@@ -12498,6 +12500,26 @@ assert.match(
   studentRunnerStateSource,
   /export type StudentRunnerRouteState =[\s\S]*headerView: StudentRunnerHeaderView;[\s\S]*identityView: StudentRunnerIdentityView;[\s\S]*previewView: StudentRunnerActivityPreviewView;/,
   'Student runner route state should expose ready-state views through explicit focused contracts.'
+);
+assert.match(
+  studentRunnerStateSource,
+  /export const STUDENT_RUNNER_START_HANDOFF_ITEM_IDS = \[(?=[\s\S]*'share-link')(?=[\s\S]*'assignment-title')(?=[\s\S]*'runner-source')(?=[\s\S]*'runtime-availability')(?=[\s\S]*'rule-status')(?=[\s\S]*'item-count')(?=[\s\S]*'attempt-limit')(?=[\s\S]*'timer-policy')(?=[\s\S]*'close-time')(?=[\s\S]*'identity-mode')(?=[\s\S]*'review-behavior')(?=[\s\S]*'item-order')(?=[\s\S]*'instructions')(?=[\s\S]*'prepare-review-rules')(?=[\s\S]*'prepare-identity')(?=[\s\S]*'prepare-timer')(?=[\s\S]*'prepare-submit')(?=[\s\S]*'browser-label')(?=[\s\S]*'teacher-action')(?=[\s\S]*'privacy-guard')[\s\S]*export type StudentRunnerStartHandoffPrivacyContract = \{[\s\S]*exposesAnonymousToken: false;[\s\S]*exposesAnswerText: false;[\s\S]*exposesRuntimeChoiceText: false;[\s\S]*exposesRuntimeItemIds: false;[\s\S]*exposesRuntimePromptText: false;[\s\S]*exposesStudentName: false;[\s\S]*exposesTeacherOnlyAnswers: false;[\s\S]*exposesTeacherSourceMaterials: false;/,
+  'Student runner start handoff should expose a typed 20-slice contract with explicit privacy flags.'
+);
+assert.match(
+  studentRunnerStateSource,
+  /startHandoffView\?: StudentRunnerStartHandoffView;[\s\S]*const startHandoffView = headerView[\s\S]*buildStudentRunnerStartHandoffView\(\{[\s\S]*activeShareId,[\s\S]*canSubmit: attemptState\.canSubmit,[\s\S]*headerView,[\s\S]*identityView,[\s\S]*source: pageState\.status === 'ready' \? pageState\.source : undefined,[\s\S]*startHandoffView,/,
+  'Student runner page view-model should compose the start handoff from prepared header, identity, source, share-link, and submit availability state.'
+);
+assert.match(
+  studentRunnerStateSource,
+  /export function buildStudentRunnerStartHandoffView(?=[\s\S]*STUDENT_RUNNER_START_HANDOFF_ITEM_IDS\.map)(?=[\s\S]*buildStudentRunnerStartHandoffItem)(?=[\s\S]*headerView\.ruleSummaryView)(?=[\s\S]*headerView\.prepareView)(?=[\s\S]*identityView)(?=[\s\S]*privacy: buildStudentRunnerStartHandoffPrivacyContract)[\s\S]*id === 'item-count'[\s\S]*id === 'attempt-limit'[\s\S]*id === 'timer-policy'[\s\S]*id === 'identity-mode'[\s\S]*id === 'browser-label'[\s\S]*student_runner_start_handoff_privacy_description/,
+  'Student runner start handoff should collect compact rules, prepare steps, identity setup, runtime availability, and privacy slices from domain views.'
+);
+assert.doesNotMatch(
+  studentRunnerStateSource,
+  /StudentRunnerStartHandoffView\['itemViews'\]|ReturnType<\s*typeof buildStudentRunnerStartHandoffView>/,
+  'Student runner start handoff contracts should not derive from aggregate view indexes or builder return types.'
 );
 assert.match(
   studentRunnerSubmitControlsSource,
@@ -24461,6 +24483,85 @@ const submittableStudentRunnerPageView = buildStudentRunnerPageViewModel({
   shareId: ' share-public ',
   submittedAttemptCount: 0,
 });
+const studentRunnerStartHandoffView =
+  submittableStudentRunnerPageView.startHandoffView;
+assert.ok(studentRunnerStartHandoffView);
+assert.deepEqual(
+  studentRunnerStartHandoffView.itemViews.map((item) => item.id),
+  [...STUDENT_RUNNER_START_HANDOFF_ITEM_IDS]
+);
+assert.deepEqual(studentRunnerStartHandoffView.privacy, {
+  exposesAnonymousToken: false,
+  exposesAnswerText: false,
+  exposesRuntimeChoiceText: false,
+  exposesRuntimeItemIds: false,
+  exposesRuntimePromptText: false,
+  exposesStudentName: false,
+  exposesTeacherOnlyAnswers: false,
+  exposesTeacherSourceMaterials: false,
+  itemIds: [...STUDENT_RUNNER_START_HANDOFF_ITEM_IDS],
+  prepareStepIds: ['review-rules', 'anonymous', 'no-timer', 'submit'],
+  ruleIds: [
+    'items',
+    'attempts',
+    'timer',
+    'closes',
+    'identity',
+    'answerReveal',
+    'itemOrder',
+  ],
+});
+assert.deepEqual(
+  [
+    getStudentRunnerStartHandoffValue('share-link'),
+    getStudentRunnerStartHandoffValue('runner-source'),
+    getStudentRunnerStartHandoffValue('runtime-availability'),
+    getStudentRunnerStartHandoffValue('rule-status'),
+    getStudentRunnerStartHandoffValue('attempt-limit'),
+    getStudentRunnerStartHandoffValue('timer-policy'),
+    getStudentRunnerStartHandoffValue('identity-mode'),
+    getStudentRunnerStartHandoffValue('review-behavior'),
+    getStudentRunnerStartHandoffValue('privacy-guard'),
+  ],
+  [
+    'share-public',
+    'Public assignment',
+    'Ready to submit',
+    'Attempt limit',
+    '2 max',
+    'No timer',
+    'Anonymous',
+    'After submit',
+    'Private data omitted',
+  ]
+);
+assert.match(
+  getStudentRunnerStartHandoffValue('browser-label'),
+  /^Anonymous browser [A-Z0-9]{6}$/
+);
+assert.deepEqual(
+  buildStudentRunnerStartHandoffView({
+    activeShareId: submittableStudentRunnerPageView.activeShareId,
+    canSubmit: submittableStudentRunnerPageView.attemptState.canSubmit,
+    headerView: submittableStudentRunnerPageView.headerView!,
+    identityView: submittableStudentRunnerPageView.identityView,
+    source: 'public-assignment',
+  }).privacy,
+  studentRunnerStartHandoffView.privacy
+);
+assert.equal(
+  JSON.stringify(studentRunnerStartHandoffView).includes('browser-token-1'),
+  false
+);
+function getStudentRunnerStartHandoffValue(
+  id: (typeof STUDENT_RUNNER_START_HANDOFF_ITEM_IDS)[number]
+) {
+  const item = studentRunnerStartHandoffView.itemViews.find(
+    (view) => view.id === id
+  );
+  assert.ok(item, `Missing student runner start handoff item ${id}`);
+  return item.value;
+}
 function buildExpectedStudentRunnerPayloadSummaryView({
   answerCount,
   itemCount,

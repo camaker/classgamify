@@ -17,6 +17,7 @@ import {
   normalizeAssignmentAttemptCount,
   type AssignmentAttemptUsage,
 } from '@/assignments/attempt-limits';
+import type { PublicAssignmentRuleSummaryId } from '@/assignments/delivery-summary';
 import {
   buildAnonymousAttemptCopy,
   buildAttemptCompletionCopy,
@@ -79,10 +80,13 @@ import { normalizeAssignmentShareSlug } from '@/assignments/share-slug';
 import {
   buildStudentRunnerHeaderView,
   type StudentRunnerHeaderView,
+  type StudentRunnerPrepareStepId,
 } from '@/assignments/student-runner-view';
 import { m } from '@/locale/paraglide/messages';
 
-type StudentRunnerReadyStateSource = 'public-assignment' | 'starter-preview';
+export type StudentRunnerReadyStateSource =
+  | 'public-assignment'
+  | 'starter-preview';
 
 export type StudentRunnerStarterPreview = {
   activity: ActivitySeed;
@@ -283,6 +287,61 @@ export type StudentRunnerSubmissionHandoffView = {
   title: string;
 };
 
+export const STUDENT_RUNNER_START_HANDOFF_ITEM_IDS = [
+  'share-link',
+  'assignment-title',
+  'runner-source',
+  'runtime-availability',
+  'rule-status',
+  'item-count',
+  'attempt-limit',
+  'timer-policy',
+  'close-time',
+  'identity-mode',
+  'review-behavior',
+  'item-order',
+  'instructions',
+  'prepare-review-rules',
+  'prepare-identity',
+  'prepare-timer',
+  'prepare-submit',
+  'browser-label',
+  'teacher-action',
+  'privacy-guard',
+] as const;
+
+export type StudentRunnerStartHandoffItemId =
+  (typeof STUDENT_RUNNER_START_HANDOFF_ITEM_IDS)[number];
+
+export type StudentRunnerStartHandoffItemView = {
+  ariaLabel: string;
+  description: string;
+  id: StudentRunnerStartHandoffItemId;
+  label: string;
+  value: string;
+};
+
+export type StudentRunnerStartHandoffPrivacyContract = {
+  exposesAnonymousToken: false;
+  exposesAnswerText: false;
+  exposesRuntimeChoiceText: false;
+  exposesRuntimeItemIds: false;
+  exposesRuntimePromptText: false;
+  exposesStudentName: false;
+  exposesTeacherOnlyAnswers: false;
+  exposesTeacherSourceMaterials: false;
+  itemIds: StudentRunnerStartHandoffItemId[];
+  prepareStepIds: StudentRunnerPrepareStepId[];
+  ruleIds: PublicAssignmentRuleSummaryId[];
+};
+
+export type StudentRunnerStartHandoffView = {
+  description: string;
+  itemViews: StudentRunnerStartHandoffItemView[];
+  privacy: StudentRunnerStartHandoffPrivacyContract;
+  title: string;
+};
+
 export type StudentRunnerSubmitHintId =
   | 'confirm-incomplete'
   | 'read-only'
@@ -394,6 +453,7 @@ export type StudentRunnerPageViewModel = {
   runtimeListView: StudentRunnerRuntimeListView;
   showStartAnotherAttempt: boolean;
   startedAt: number;
+  startHandoffView?: StudentRunnerStartHandoffView;
   submissionContractView: StudentRunnerSubmissionContractView;
   submissionHandoffView: StudentRunnerSubmissionHandoffView;
   submissionSuccessMessage: string;
@@ -835,6 +895,14 @@ export function buildStudentRunnerPageViewModel({
         submittedAttemptCount: effectiveSubmittedAttemptCount,
       })
     : undefined;
+  const headerView =
+    assignment && pageState.status === 'ready'
+      ? buildStudentRunnerHeaderView({
+          assignment,
+          itemCount: attemptState.itemCount,
+          source: pageState.source,
+        })
+      : undefined;
   const revealAnswers = Boolean(
     result && assignment?.settings.showCorrectAnswers
   );
@@ -873,6 +941,15 @@ export function buildStudentRunnerPageViewModel({
     timerBadge: attemptTimerBadge,
     timeLimitSeconds,
   });
+  const startHandoffView = headerView
+    ? buildStudentRunnerStartHandoffView({
+        activeShareId,
+        canSubmit: attemptState.canSubmit,
+        headerView,
+        identityView,
+        source: pageState.status === 'ready' ? pageState.source : undefined,
+      })
+    : undefined;
 
   return {
     activeShareId,
@@ -929,14 +1006,7 @@ export function buildStudentRunnerPageViewModel({
       unansweredLabel: attemptControlState.unansweredLabel,
     },
     currentAttemptSessionKey: attemptState.currentAttemptSessionKey,
-    headerView:
-      assignment && pageState.status === 'ready'
-        ? buildStudentRunnerHeaderView({
-            assignment,
-            itemCount: attemptState.itemCount,
-            source: pageState.source,
-          })
-        : undefined,
+    headerView,
     identityView,
     itemCount: attemptState.itemCount,
     loadingView: {
@@ -971,6 +1041,7 @@ export function buildStudentRunnerPageViewModel({
     },
     showStartAnotherAttempt,
     startedAt,
+    startHandoffView,
     submissionContractView,
     submissionHandoffView,
     submissionSuccessMessage: runnerCopy.submissionSuccessMessage,
@@ -1180,6 +1251,361 @@ function buildStudentRunnerUnavailableSafetyItems(
         }
       : null,
   ].flatMap((item) => (item ? [item] : []));
+}
+
+export function buildStudentRunnerStartHandoffView({
+  activeShareId,
+  canSubmit,
+  headerView,
+  identityView,
+  source,
+}: {
+  activeShareId: string;
+  canSubmit: boolean;
+  headerView: StudentRunnerHeaderView;
+  identityView?: StudentRunnerIdentityView;
+  source?: StudentRunnerReadyStateSource;
+}): StudentRunnerStartHandoffView {
+  const itemViews = STUDENT_RUNNER_START_HANDOFF_ITEM_IDS.map((id) =>
+    buildStudentRunnerStartHandoffItemView(
+      buildStudentRunnerStartHandoffItem({
+        activeShareId,
+        canSubmit,
+        headerView,
+        id,
+        identityView,
+        source,
+      })
+    )
+  );
+
+  return {
+    description: m.student_runner_start_handoff_description(),
+    itemViews,
+    privacy: buildStudentRunnerStartHandoffPrivacyContract({
+      headerView,
+      itemViews,
+    }),
+    title: m.student_runner_start_handoff_title(),
+  };
+}
+
+function buildStudentRunnerStartHandoffItem({
+  activeShareId,
+  canSubmit,
+  headerView,
+  id,
+  identityView,
+  source,
+}: {
+  activeShareId: string;
+  canSubmit: boolean;
+  headerView: StudentRunnerHeaderView;
+  id: StudentRunnerStartHandoffItemId;
+  identityView?: StudentRunnerIdentityView;
+  source?: StudentRunnerReadyStateSource;
+}): Omit<StudentRunnerStartHandoffItemView, 'ariaLabel'> {
+  if (id === 'share-link') {
+    return {
+      description: m.student_runner_start_handoff_share_description(),
+      id,
+      label: m.public_assignment_access_handoff_share_label(),
+      value:
+        normalizeAssignmentShareSlug(activeShareId) ||
+        m.public_assignment_access_handoff_missing_value(),
+    };
+  }
+
+  if (id === 'assignment-title') {
+    return {
+      description: m.student_runner_start_handoff_title_description(),
+      id,
+      label: m.public_assignment_access_handoff_title_label(),
+      value: headerView.title,
+    };
+  }
+
+  if (id === 'runner-source') {
+    return {
+      description: m.student_runner_start_handoff_source_description(),
+      id,
+      label: m.student_runner_start_handoff_source_label(),
+      value: formatStudentRunnerStartHandoffSource(source),
+    };
+  }
+
+  if (id === 'runtime-availability') {
+    return {
+      description: m.student_runner_start_handoff_runtime_description(),
+      id,
+      label: m.student_runner_start_handoff_runtime_label(),
+      value: formatStudentRunnerStartRuntimeAvailability({
+        canSubmit,
+        source,
+      }),
+    };
+  }
+
+  if (id === 'rule-status') {
+    return {
+      description: headerView.ruleSummaryView.status.description,
+      id,
+      label: m.student_runner_start_handoff_rule_status_label(),
+      value: headerView.ruleSummaryView.status.label,
+    };
+  }
+
+  if (id === 'item-count') {
+    return buildStudentRunnerStartRuleHandoffItem(headerView, id, 'items');
+  }
+
+  if (id === 'attempt-limit') {
+    return buildStudentRunnerStartRuleHandoffItem(headerView, id, 'attempts');
+  }
+
+  if (id === 'timer-policy') {
+    return buildStudentRunnerStartRuleHandoffItem(headerView, id, 'timer');
+  }
+
+  if (id === 'close-time') {
+    return buildStudentRunnerStartRuleHandoffItem(headerView, id, 'closes');
+  }
+
+  if (id === 'identity-mode') {
+    return buildStudentRunnerStartRuleHandoffItem(headerView, id, 'identity');
+  }
+
+  if (id === 'review-behavior') {
+    return buildStudentRunnerStartRuleHandoffItem(
+      headerView,
+      id,
+      'answerReveal'
+    );
+  }
+
+  if (id === 'item-order') {
+    return buildStudentRunnerStartRuleHandoffItem(headerView, id, 'itemOrder');
+  }
+
+  if (id === 'instructions') {
+    return {
+      description: m.student_runner_start_handoff_instructions_description(),
+      id,
+      label:
+        headerView.instructions?.label ??
+        m.assignment_delivery_label_instructions(),
+      value:
+        headerView.instructions?.value ??
+        m.student_runner_start_handoff_no_instructions_value(),
+    };
+  }
+
+  if (id === 'prepare-review-rules') {
+    return buildStudentRunnerStartPrepareHandoffItem(
+      headerView,
+      id,
+      'review-rules'
+    );
+  }
+
+  if (id === 'prepare-identity') {
+    return buildStudentRunnerStartPrepareHandoffItem(
+      headerView,
+      id,
+      headerView.ruleSummaryView.summary.collectsStudentName
+        ? 'student-name'
+        : 'anonymous'
+    );
+  }
+
+  if (id === 'prepare-timer') {
+    return buildStudentRunnerStartPrepareHandoffItem(
+      headerView,
+      id,
+      headerView.ruleSummaryView.summary.hasTimer ? 'timer' : 'no-timer'
+    );
+  }
+
+  if (id === 'prepare-submit') {
+    return buildStudentRunnerStartPrepareHandoffItem(headerView, id, 'submit');
+  }
+
+  if (id === 'browser-label') {
+    return buildStudentRunnerStartBrowserLabelItem(identityView);
+  }
+
+  if (id === 'teacher-action') {
+    return {
+      description: m.student_runner_start_handoff_teacher_action_description(),
+      id,
+      label: m.student_runner_start_handoff_teacher_action_label(),
+      value: headerView.teacherAction.label,
+    };
+  }
+
+  return {
+    description: m.student_runner_start_handoff_privacy_description(),
+    id,
+    label: m.student_runner_start_handoff_privacy_label(),
+    value: m.student_runner_start_handoff_private_data_omitted_value(),
+  };
+}
+
+function buildStudentRunnerStartRuleHandoffItem(
+  headerView: StudentRunnerHeaderView,
+  id: StudentRunnerStartHandoffItemId,
+  ruleId: PublicAssignmentRuleSummaryId
+): Omit<StudentRunnerStartHandoffItemView, 'ariaLabel'> {
+  const ruleItem = headerView.ruleSummaryView.items.find(
+    (item) => item.id === ruleId
+  );
+
+  if (ruleItem) {
+    return {
+      description: ruleItem.description,
+      id,
+      label: ruleItem.label,
+      value: ruleItem.value,
+    };
+  }
+
+  return {
+    description: m.student_runner_start_handoff_rule_missing_description(),
+    id,
+    label: m.student_runner_start_handoff_rule_status_label(),
+    value: m.public_assignment_access_handoff_missing_value(),
+  };
+}
+
+function buildStudentRunnerStartPrepareHandoffItem(
+  headerView: StudentRunnerHeaderView,
+  id: StudentRunnerStartHandoffItemId,
+  stepId: StudentRunnerPrepareStepId
+): Omit<StudentRunnerStartHandoffItemView, 'ariaLabel'> {
+  const stepView = headerView.prepareView.stepViews.find(
+    (step) => step.id === stepId
+  );
+
+  if (stepView) {
+    return {
+      description: stepView.description,
+      id,
+      label: stepView.label,
+      value: m.student_runner_start_handoff_prepare_ready_value(),
+    };
+  }
+
+  return {
+    description: m.student_runner_start_handoff_prepare_missing_description(),
+    id,
+    label: headerView.prepareView.title,
+    value: m.public_assignment_access_handoff_missing_value(),
+  };
+}
+
+function buildStudentRunnerStartBrowserLabelItem(
+  identityView?: StudentRunnerIdentityView
+): Omit<StudentRunnerStartHandoffItemView, 'ariaLabel'> {
+  if (identityView?.mode === 'anonymous') {
+    return {
+      description: m.student_runner_start_handoff_browser_description(),
+      id: 'browser-label',
+      label: m.student_runner_start_handoff_browser_label(),
+      value: identityView.copy.browserLabel,
+    };
+  }
+
+  if (identityView?.mode === 'student-name') {
+    return {
+      description: identityView.description,
+      id: 'browser-label',
+      label: m.student_runner_start_handoff_browser_label(),
+      value: m.student_runner_start_handoff_student_name_entry_value(),
+    };
+  }
+
+  return {
+    description: m.student_runner_start_handoff_browser_missing_description(),
+    id: 'browser-label',
+    label: m.student_runner_start_handoff_browser_label(),
+    value: m.public_assignment_access_handoff_missing_value(),
+  };
+}
+
+function buildStudentRunnerStartHandoffItemView({
+  description,
+  id,
+  label,
+  value,
+}: Omit<
+  StudentRunnerStartHandoffItemView,
+  'ariaLabel'
+>): StudentRunnerStartHandoffItemView {
+  return {
+    ariaLabel: m.student_runner_start_handoff_item_aria({
+      description,
+      label,
+      value,
+    }),
+    description,
+    id,
+    label,
+    value,
+  };
+}
+
+function buildStudentRunnerStartHandoffPrivacyContract({
+  headerView,
+  itemViews,
+}: {
+  headerView: StudentRunnerHeaderView;
+  itemViews: StudentRunnerStartHandoffItemView[];
+}): StudentRunnerStartHandoffPrivacyContract {
+  return {
+    exposesAnonymousToken: false,
+    exposesAnswerText: false,
+    exposesRuntimeChoiceText: false,
+    exposesRuntimeItemIds: false,
+    exposesRuntimePromptText: false,
+    exposesStudentName: false,
+    exposesTeacherOnlyAnswers: false,
+    exposesTeacherSourceMaterials: false,
+    itemIds: itemViews.map((item) => item.id),
+    prepareStepIds: headerView.prepareView.stepViews.map((step) => step.id),
+    ruleIds: headerView.ruleSummaryView.summary.ruleIds,
+  };
+}
+
+function formatStudentRunnerStartHandoffSource(
+  source?: StudentRunnerReadyStateSource
+) {
+  if (source === 'public-assignment') {
+    return m.student_runner_start_handoff_source_public_value();
+  }
+
+  if (source === 'starter-preview') {
+    return m.student_runner_start_handoff_source_starter_value();
+  }
+
+  return m.public_assignment_access_handoff_missing_value();
+}
+
+function formatStudentRunnerStartRuntimeAvailability({
+  canSubmit,
+  source,
+}: {
+  canSubmit: boolean;
+  source?: StudentRunnerReadyStateSource;
+}) {
+  if (canSubmit) {
+    return m.student_runner_start_handoff_runtime_ready_value();
+  }
+
+  if (source === 'starter-preview') {
+    return m.student_runner_start_handoff_runtime_preview_value();
+  }
+
+  return m.student_runner_start_handoff_runtime_blocked_value();
 }
 
 function buildStudentRunnerIdentityView({
