@@ -880,6 +880,7 @@ import {
 import {
   assignmentPublishDialogCopy,
   assignmentPublishToggleOptions,
+  ASSIGNMENT_PUBLISH_HANDOFF_ITEM_IDS,
   buildAssignmentPublishDraft,
   buildAssignmentPublishDraftDefaults,
   buildAssignmentPublishDialogAccessView,
@@ -3654,6 +3655,26 @@ assert.doesNotMatch(
   assignmentPublishSource,
   /parseAssignmentDateTimeLocal|expiresAt\.getTime\(\) <= now\.getTime\(\)|new Date\(\s*Number\(year\)/,
   'Assignment publish input should not keep local close-after parsing or future-time checks.'
+);
+assert.match(
+  assignmentPublishSource,
+  /export const ASSIGNMENT_PUBLISH_HANDOFF_ITEM_IDS = \[(?=[\s\S]*'publish-access')(?=[\s\S]*'validation-message')(?=[\s\S]*'delivery-rule-count')(?=[\s\S]*'student-instructions')(?=[\s\S]*'attempts-policy')(?=[\s\S]*'settings-json')(?=[\s\S]*'close-time-parser')(?=[\s\S]*'snapshot-freeze')(?=[\s\S]*'results-policy')[\s\S]*export type AssignmentPublishHandoffPrivacyContract = \{[\s\S]*exposesActivityContent: false;[\s\S]*exposesAnswerKeys: false;[\s\S]*exposesAssignmentTitle: false;[\s\S]*exposesRawSettingsJson: false;[\s\S]*exposesShareSlug: false;[\s\S]*exposesStudentInstructions: false;[\s\S]*exposesStudentNames: false;/,
+  'Assignment publish handoff should expose a typed 20-slice contract with explicit privacy flags.'
+);
+assert.match(
+  assignmentPublishSource,
+  /handoffView: AssignmentPublishHandoffView;[\s\S]*handoffView: buildAssignmentPublishHandoffView\(\{[\s\S]*accessView,[\s\S]*dialogState,[\s\S]*draft,[\s\S]*preview,[\s\S]*toggleViews,[\s\S]*validation,[\s\S]*\}\)/,
+  'Assignment publish dialog view-model should compose handoff state from access, validation, preview, toggles, and dialog state.'
+);
+assert.match(
+  assignmentPublishSource,
+  /export function buildAssignmentPublishHandoffView(?=[\s\S]*accessView: AssignmentPublishDialogAccessView)(?=[\s\S]*dialogState: AssignmentPublishDialogState)(?=[\s\S]*preview: AssignmentPublishPreview)[\s\S]*id: 'publish-access'[\s\S]*id: 'validation-message'[\s\S]*id: 'delivery-rule-count'[\s\S]*id: 'student-instructions'[\s\S]*id: 'attempts-policy'[\s\S]*id: 'settings-json'[\s\S]*id: 'close-time-parser'[\s\S]*id: 'snapshot-freeze'[\s\S]*id: 'results-policy'[\s\S]*privacy: buildAssignmentPublishHandoffPrivacyContract/,
+  'Assignment publish handoff should collect publish access, validation, delivery rules, settings persistence, close parsing, and review checklist slices.'
+);
+assert.doesNotMatch(
+  assignmentPublishSource,
+  /AssignmentPublishDialogViewModel\['handoffView'\]|ReturnType<\s*typeof buildAssignmentPublishHandoffView>/,
+  'Assignment publish handoff contracts should not derive from aggregate view indexes or builder return types.'
 );
 const publicAssignmentSource = readFileSync(
   'src/assignments/public.ts',
@@ -19094,6 +19115,62 @@ assert.deepEqual(
     ],
     validation: { ok: true },
   }
+);
+const assignmentPublishHandoffItemIds =
+  assignmentPublishDialogViewModel.handoffView.itemViews.map((item) => item.id);
+assert.deepEqual(assignmentPublishHandoffItemIds, [
+  ...ASSIGNMENT_PUBLISH_HANDOFF_ITEM_IDS,
+]);
+assert.equal(assignmentPublishDialogViewModel.handoffView.itemViews.length, 20);
+assert.deepEqual(assignmentPublishDialogViewModel.handoffView.privacy, {
+  exposesActivityContent: false,
+  exposesAnswerKeys: false,
+  exposesAssignmentTitle: false,
+  exposesRawSettingsJson: false,
+  exposesShareSlug: false,
+  exposesStudentInstructions: false,
+  exposesStudentNames: false,
+  itemIds: assignmentPublishHandoffItemIds,
+});
+assert.deepEqual(
+  assignmentPublishDialogViewModel.handoffView.itemViews.map((item) => [
+    item.id,
+    item.value,
+  ]),
+  [
+    ['publish-access', 'Available'],
+    ['publish-action', 'Enabled'],
+    ['publish-disabled', 'Enabled'],
+    ['validation-status', 'Ready to publish'],
+    ['validation-message', 'No validation blocker'],
+    ['title-field', 'Provided'],
+    ['frozen-link-status', 'Ready to publish'],
+    ['delivery-rule-count', '6 rules'],
+    ['student-instructions', 'Added'],
+    ['timer-status', 'Enabled'],
+    ['close-time-status', 'Scheduled'],
+    ['attempts-policy', '3 max'],
+    ['identity-policy', 'Anonymous'],
+    ['answer-reveal-policy', 'Hidden'],
+    ['item-order-policy', 'Fixed order'],
+    ['settings-json', '6 setting fields'],
+    ['close-time-parser', 'Scheduled'],
+    ['snapshot-freeze', 'Ready to publish'],
+    ['student-link-rules', 'Ready to publish'],
+    ['results-policy', 'Ready to publish'],
+  ]
+);
+assert.equal(
+  JSON.stringify(assignmentPublishDialogViewModel.handoffView).includes(
+    'Week 1 review'
+  ),
+  false
+);
+assert.equal(
+  JSON.stringify(assignmentPublishDialogViewModel.handoffView).includes(
+    'Finish before class.'
+  ),
+  false
 );
 assert.deepEqual(
   buildAssignmentPublishDialogViewModel({

@@ -7,6 +7,7 @@ import type {
   AssignmentSettings,
 } from '@/activities/types';
 import {
+  type AssignmentDeliverySummaryId,
   type AssignmentSettingsSummaryView,
   buildAssignmentSettingsSummaryView,
 } from '@/assignments/delivery-summary';
@@ -184,7 +185,60 @@ export type AssignmentPublishPreviewContextView = {
   title: string;
 };
 
-type AssignmentPublishPreview = {
+export const ASSIGNMENT_PUBLISH_HANDOFF_ITEM_IDS = [
+  'publish-access',
+  'publish-action',
+  'publish-disabled',
+  'validation-status',
+  'validation-message',
+  'title-field',
+  'frozen-link-status',
+  'delivery-rule-count',
+  'student-instructions',
+  'timer-status',
+  'close-time-status',
+  'attempts-policy',
+  'identity-policy',
+  'answer-reveal-policy',
+  'item-order-policy',
+  'settings-json',
+  'close-time-parser',
+  'snapshot-freeze',
+  'student-link-rules',
+  'results-policy',
+] as const;
+
+export type AssignmentPublishHandoffItemId =
+  (typeof ASSIGNMENT_PUBLISH_HANDOFF_ITEM_IDS)[number];
+
+export type AssignmentPublishHandoffItemView = {
+  ariaLabel: string;
+  description: string;
+  id: AssignmentPublishHandoffItemId;
+  label: string;
+  statusLabel?: string;
+  value: string;
+};
+
+export type AssignmentPublishHandoffPrivacyContract = {
+  exposesActivityContent: false;
+  exposesAnswerKeys: false;
+  exposesAssignmentTitle: false;
+  exposesRawSettingsJson: false;
+  exposesShareSlug: false;
+  exposesStudentInstructions: false;
+  exposesStudentNames: false;
+  itemIds: AssignmentPublishHandoffItemId[];
+};
+
+export type AssignmentPublishHandoffView = {
+  description: string;
+  itemViews: AssignmentPublishHandoffItemView[];
+  privacy: AssignmentPublishHandoffPrivacyContract;
+  title: string;
+};
+
+export type AssignmentPublishPreview = {
   closeAfter: AssignmentPublishCloseAfterResolution;
   context: AssignmentPublishPreviewContextView;
   expiresAt: Date | null;
@@ -192,7 +246,7 @@ type AssignmentPublishPreview = {
   settingsSummaryView: AssignmentSettingsSummaryView;
 };
 
-type AssignmentPublishDialogState = {
+export type AssignmentPublishDialogState = {
   errorMessage?: string;
   publishDisabled: boolean;
 };
@@ -205,6 +259,7 @@ export type AssignmentPublishDialogViewModel = {
   accessView: AssignmentPublishDialogAccessView;
   dialogState: AssignmentPublishDialogState;
   draft: AssignmentPublishDraft;
+  handoffView: AssignmentPublishHandoffView;
   preview: AssignmentPublishPreview;
   toggleViews: AssignmentPublishToggleView[];
   validation: AssignmentPublishDraftValidation;
@@ -392,21 +447,32 @@ export function buildAssignmentPublishDialogViewModel({
     now: effectiveNow,
   });
   const accessView = buildAssignmentPublishDialogAccessView(visibility);
+  const dialogState = buildAssignmentPublishDialogState({
+    accessView,
+    isPublishing,
+    validation,
+  });
+  const preview = buildAssignmentPublishPreviewFromDraft({
+    draft,
+    now: effectiveNow,
+    validation,
+  });
+  const toggleViews = buildAssignmentPublishToggleViews(draft);
 
   return {
     accessView,
-    dialogState: buildAssignmentPublishDialogState({
-      accessView,
-      isPublishing,
-      validation,
-    }),
+    dialogState,
     draft,
-    preview: buildAssignmentPublishPreviewFromDraft({
+    handoffView: buildAssignmentPublishHandoffView({
+      accessView,
+      dialogState,
       draft,
-      now: effectiveNow,
+      preview,
+      toggleViews,
       validation,
     }),
-    toggleViews: buildAssignmentPublishToggleViews(draft),
+    preview,
+    toggleViews,
     validation,
   };
 }
@@ -551,6 +617,318 @@ export function buildAssignmentPublishPreviewContextView({
       status,
     },
     title: m.assignment_publish_preview_context_title(),
+  };
+}
+
+export function buildAssignmentPublishHandoffView({
+  accessView,
+  dialogState,
+  draft,
+  preview,
+  toggleViews,
+  validation,
+}: {
+  accessView: AssignmentPublishDialogAccessView;
+  dialogState: AssignmentPublishDialogState;
+  draft: AssignmentPublishDraft;
+  preview: AssignmentPublishPreview;
+  toggleViews: AssignmentPublishToggleView[];
+  validation: AssignmentPublishDraftValidation;
+}): AssignmentPublishHandoffView {
+  const deliveryRuleStat = getAssignmentPublishPreviewStat(
+    preview.context,
+    'deliveryRules'
+  );
+  const instructionsStat = getAssignmentPublishPreviewStat(
+    preview.context,
+    'studentInstructions'
+  );
+  const timerStat = getAssignmentPublishPreviewStat(preview.context, 'timer');
+  const closeAfterStat = getAssignmentPublishPreviewStat(
+    preview.context,
+    'closeAfter'
+  );
+  const attemptsPolicy = getAssignmentPublishDeliveryPolicy(
+    preview.settingsSummaryView,
+    'attempts'
+  );
+  const identityPolicy = getAssignmentPublishDeliveryPolicy(
+    preview.settingsSummaryView,
+    'identity'
+  );
+  const answerRevealPolicy = getAssignmentPublishDeliveryPolicy(
+    preview.settingsSummaryView,
+    'answerReveal'
+  );
+  const itemOrderPolicy = getAssignmentPublishDeliveryPolicy(
+    preview.settingsSummaryView,
+    'itemOrder'
+  );
+  const snapshotReview = getAssignmentPublishReviewItem(
+    preview.context,
+    'snapshot-freeze'
+  );
+  const studentLinkReview = getAssignmentPublishReviewItem(
+    preview.context,
+    'student-link-rules'
+  );
+  const resultsReview = getAssignmentPublishReviewItem(
+    preview.context,
+    'results-policy'
+  );
+  const actionValue = dialogState.publishDisabled
+    ? m.assignment_publish_handoff_disabled_value()
+    : m.assignment_publish_handoff_enabled_value();
+  const validationStatusValue = validation.ok
+    ? m.assignment_publish_preview_status_ready_label()
+    : m.assignment_publish_preview_status_blocked_label();
+  const itemViews: AssignmentPublishHandoffItemView[] = [
+    buildAssignmentPublishHandoffItem({
+      description: accessView.description,
+      id: 'publish-access',
+      label: accessView.label,
+      statusLabel: accessView.status,
+      value: accessView.value,
+    }),
+    buildAssignmentPublishHandoffItem({
+      description: m.assignment_publish_handoff_publish_action_description(),
+      id: 'publish-action',
+      label: m.assignment_publish_handoff_publish_action_label(),
+      statusLabel: actionValue,
+      value: actionValue,
+    }),
+    buildAssignmentPublishHandoffItem({
+      description: m.assignment_publish_handoff_publish_disabled_description(),
+      id: 'publish-disabled',
+      label: m.assignment_publish_handoff_publish_disabled_label(),
+      statusLabel: actionValue,
+      value: actionValue,
+    }),
+    buildAssignmentPublishHandoffItem({
+      description: m.assignment_publish_handoff_validation_status_description(),
+      id: 'validation-status',
+      label: m.assignment_publish_handoff_validation_status_label(),
+      statusLabel: validationStatusValue,
+      value: validationStatusValue,
+    }),
+    buildAssignmentPublishHandoffItem({
+      description:
+        m.assignment_publish_handoff_validation_message_description(),
+      id: 'validation-message',
+      label: m.assignment_publish_handoff_validation_message_label(),
+      statusLabel: validationStatusValue,
+      value: validation.ok
+        ? m.assignment_publish_handoff_no_validation_blocker()
+        : validation.message,
+    }),
+    buildAssignmentPublishHandoffItem({
+      description: m.assignment_publish_handoff_title_field_description(),
+      id: 'title-field',
+      label: assignmentPublishDialogCopy.titleLabel,
+      value: normalizePublishDraftText(draft.title)
+        ? m.assignment_publish_handoff_field_present()
+        : m.assignment_publish_handoff_field_missing(),
+    }),
+    buildAssignmentPublishHandoffItem({
+      description: preview.context.status.message,
+      id: 'frozen-link-status',
+      label: preview.context.title,
+      statusLabel: preview.context.status.label,
+      value: preview.context.status.label,
+    }),
+    buildAssignmentPublishHandoffItem({
+      description: preview.context.description,
+      id: 'delivery-rule-count',
+      label: deliveryRuleStat.label,
+      value: deliveryRuleStat.value,
+    }),
+    buildAssignmentPublishHandoffItem({
+      description: assignmentPublishDialogCopy.instructionsHelp,
+      id: 'student-instructions',
+      label: instructionsStat.label,
+      value: instructionsStat.value,
+    }),
+    buildAssignmentPublishHandoffItem({
+      description: assignmentPublishDialogCopy.timeLimitHelp,
+      id: 'timer-status',
+      label: timerStat.label,
+      value: timerStat.value,
+    }),
+    buildAssignmentPublishHandoffItem({
+      description: assignmentPublishDialogCopy.closeAfterHelp,
+      id: 'close-time-status',
+      label: closeAfterStat.label,
+      statusLabel: preview.closeAfter.status,
+      value: closeAfterStat.value,
+    }),
+    buildAssignmentPublishHandoffItem({
+      description: m.assignment_publish_handoff_attempts_description(),
+      id: 'attempts-policy',
+      label: attemptsPolicy.label,
+      value: attemptsPolicy.value,
+    }),
+    buildAssignmentPublishHandoffItem({
+      description: getAssignmentPublishToggleDescription(
+        toggleViews,
+        'collectStudentName'
+      ),
+      id: 'identity-policy',
+      label: identityPolicy.label,
+      value: identityPolicy.value,
+    }),
+    buildAssignmentPublishHandoffItem({
+      description: getAssignmentPublishToggleDescription(
+        toggleViews,
+        'showCorrectAnswers'
+      ),
+      id: 'answer-reveal-policy',
+      label: answerRevealPolicy.label,
+      value: answerRevealPolicy.value,
+    }),
+    buildAssignmentPublishHandoffItem({
+      description: getAssignmentPublishToggleDescription(
+        toggleViews,
+        'shuffleItems'
+      ),
+      id: 'item-order-policy',
+      label: itemOrderPolicy.label,
+      value: itemOrderPolicy.value,
+    }),
+    buildAssignmentPublishHandoffItem({
+      description: m.assignment_publish_handoff_settings_json_description(),
+      id: 'settings-json',
+      label: m.assignment_publish_handoff_settings_json_label(),
+      value: m.assignment_publish_handoff_settings_json_value({
+        count: countAssignmentPublishSettingsJsonFields(),
+      }),
+    }),
+    buildAssignmentPublishHandoffItem({
+      description: m.assignment_publish_handoff_close_parser_description(),
+      id: 'close-time-parser',
+      label: m.assignment_publish_handoff_close_parser_label(),
+      statusLabel: preview.closeAfter.status,
+      value: closeAfterStat.value,
+    }),
+    buildAssignmentPublishHandoffItem({
+      description: snapshotReview.description,
+      id: 'snapshot-freeze',
+      label: snapshotReview.label,
+      value: preview.context.status.label,
+    }),
+    buildAssignmentPublishHandoffItem({
+      description: studentLinkReview.description,
+      id: 'student-link-rules',
+      label: studentLinkReview.label,
+      value: preview.context.status.label,
+    }),
+    buildAssignmentPublishHandoffItem({
+      description: resultsReview.description,
+      id: 'results-policy',
+      label: resultsReview.label,
+      value: preview.context.status.label,
+    }),
+  ];
+
+  return {
+    description: m.assignment_publish_handoff_description(),
+    itemViews,
+    privacy: buildAssignmentPublishHandoffPrivacyContract(itemViews),
+    title: m.assignment_publish_handoff_title(),
+  };
+}
+
+function getAssignmentPublishPreviewStat(
+  context: AssignmentPublishPreviewContextView,
+  id: AssignmentPublishPreviewContextStatId
+) {
+  return (
+    context.statItems.find((item) => item.id === id) ?? {
+      id,
+      label: id,
+      value: '',
+    }
+  );
+}
+
+function getAssignmentPublishDeliveryPolicy(
+  settingsSummaryView: AssignmentSettingsSummaryView,
+  id: AssignmentDeliverySummaryId
+) {
+  return (
+    settingsSummaryView.items.find((item) => item.id === id) ?? {
+      id,
+      label: id,
+      value: '',
+    }
+  );
+}
+
+function getAssignmentPublishReviewItem(
+  context: AssignmentPublishPreviewContextView,
+  id: AssignmentPublishPreviewReviewItemId
+) {
+  return (
+    context.reviewItems.find((item) => item.id === id) ?? {
+      ariaLabel: id,
+      description: '',
+      id,
+      label: id,
+    }
+  );
+}
+
+function getAssignmentPublishToggleDescription(
+  toggleViews: AssignmentPublishToggleView[],
+  key: AssignmentPublishToggleKey
+) {
+  return (
+    toggleViews.find((toggleView) => toggleView.key === key)?.description ?? ''
+  );
+}
+
+function countAssignmentPublishSettingsJsonFields() {
+  return 6;
+}
+
+function buildAssignmentPublishHandoffPrivacyContract(
+  itemViews: AssignmentPublishHandoffItemView[]
+): AssignmentPublishHandoffPrivacyContract {
+  return {
+    exposesActivityContent: false,
+    exposesAnswerKeys: false,
+    exposesAssignmentTitle: false,
+    exposesRawSettingsJson: false,
+    exposesShareSlug: false,
+    exposesStudentInstructions: false,
+    exposesStudentNames: false,
+    itemIds: itemViews.map((item) => item.id),
+  };
+}
+
+function buildAssignmentPublishHandoffItem({
+  description,
+  id,
+  label,
+  statusLabel,
+  value,
+}: {
+  description: string;
+  id: AssignmentPublishHandoffItemId;
+  label: string;
+  statusLabel?: string;
+  value: string;
+}): AssignmentPublishHandoffItemView {
+  return {
+    ariaLabel: m.assignment_publish_handoff_item_aria_label({
+      description,
+      label,
+      value,
+    }),
+    description,
+    id,
+    label,
+    statusLabel,
+    value,
   };
 }
 
