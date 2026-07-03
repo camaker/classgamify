@@ -1,4 +1,5 @@
 import type { RuntimeItem, RuntimeItemKind } from '@/activities/runtime';
+import { getTemplateByType } from '@/activities/catalog';
 import type {
   ActivityContent,
   ActivityDifficulty,
@@ -18,7 +19,12 @@ import {
 } from '@/assignments/attempt-answers';
 import { normalizeAttemptDurationSeconds } from '@/assignments/attempt-duration';
 import { formatAssignmentDisplayTitle } from '@/assignments/assignment-display';
-import { formatAssignmentDeliveryInstructions } from '@/assignments/delivery-summary';
+import {
+  buildPublicAssignmentRuleSummaryViewFromSettings,
+  formatAssignmentDeliveryInstructions,
+  type PublicAssignmentRuleSummaryId,
+  type PublicAssignmentRuleSummaryItem,
+} from '@/assignments/delivery-summary';
 import {
   type AssignmentLifecycleStatus,
   getAssignmentLifecycleStatus,
@@ -39,6 +45,7 @@ import {
   type AssignmentSettingsInput,
   resolveAssignmentSettings,
 } from '@/assignments/validation';
+import { m } from '@/locale/paraglide/messages';
 
 export type PublicRuntimeItem = {
   choices?: string[];
@@ -164,6 +171,55 @@ export type PublicAssignmentLookupResult =
       unavailable: PublicAssignmentUnavailablePayload;
     };
 
+export type PublicAssignmentAccessHandoffItemId =
+  | 'access-status'
+  | 'answer-keys'
+  | 'assignment-title'
+  | 'attempt-limit'
+  | 'close-time'
+  | 'explanations'
+  | 'identity-mode'
+  | 'instructions'
+  | 'item-count'
+  | 'lifecycle-status'
+  | 'review-behavior'
+  | 'runtime-choices'
+  | 'runtime-prompts'
+  | 'share-link'
+  | 'shuffle-policy'
+  | 'source-materials'
+  | 'submission-policy'
+  | 'template'
+  | 'timer'
+  | 'unavailable-safety';
+
+export type PublicAssignmentAccessHandoffItemView = {
+  ariaLabel: string;
+  description: string;
+  id: PublicAssignmentAccessHandoffItemId;
+  label: string;
+  value: string;
+};
+
+export type PublicAssignmentAccessHandoffPrivacyView = {
+  exposesAcceptedAlternatives: false;
+  exposesActivityContentJson: false;
+  exposesRawAnonymousToken: false;
+  exposesRuntimeChoiceText: false;
+  exposesRuntimePromptText: false;
+  exposesStudentAnswerText: false;
+  exposesTeacherOnlyAnswers: false;
+  exposesTeacherSourceMaterials: false;
+  itemIds: PublicAssignmentAccessHandoffItemId[];
+};
+
+export type PublicAssignmentAccessHandoffView = {
+  description: string;
+  itemViews: PublicAssignmentAccessHandoffItemView[];
+  privacy: PublicAssignmentAccessHandoffPrivacyView;
+  title: string;
+};
+
 export const PUBLIC_ASSIGNMENT_ESTIMATED_MINUTES = {
   max: 20,
   min: 5,
@@ -254,6 +310,380 @@ export function buildPublicAssignmentUnavailablePayload(
     submissionPolicy: {
       submissionsBlocked: true,
     },
+  };
+}
+
+export function buildPublicAssignmentAccessHandoffView({
+  lookupResult,
+  shareSlug,
+}: {
+  lookupResult: PublicAssignmentLookupResult;
+  shareSlug?: string;
+}): PublicAssignmentAccessHandoffView {
+  const context = buildPublicAssignmentAccessHandoffContext({
+    lookupResult,
+    shareSlug,
+  });
+  const itemViews: PublicAssignmentAccessHandoffItemView[] = [
+    buildPublicAssignmentAccessHandoffItem({
+      description: m.public_assignment_access_handoff_access_description(),
+      id: 'access-status',
+      label: m.public_assignment_access_handoff_access_label(),
+      value:
+        context.status === 'available'
+          ? m.public_assignment_access_handoff_access_available()
+          : m.public_assignment_access_handoff_access_unavailable(),
+    }),
+    buildPublicAssignmentAccessHandoffItem({
+      description: m.public_assignment_access_handoff_lifecycle_description(),
+      id: 'lifecycle-status',
+      label: m.public_assignment_access_handoff_lifecycle_label(),
+      value: formatPublicAssignmentAccessLifecycleValue(context),
+    }),
+    buildPublicAssignmentAccessHandoffItem({
+      description: m.public_assignment_access_handoff_share_description(),
+      id: 'share-link',
+      label: m.public_assignment_access_handoff_share_label(),
+      value: context.shareSlug
+        ? context.shareSlug
+        : m.public_assignment_access_handoff_missing_value(),
+    }),
+    buildPublicAssignmentAccessHandoffItem({
+      description: m.public_assignment_access_handoff_title_description(),
+      id: 'assignment-title',
+      label: m.public_assignment_access_handoff_title_label(),
+      value:
+        context.status === 'available'
+          ? context.payload.assignment.title
+          : m.public_assignment_access_handoff_hidden_value(),
+    }),
+    buildPublicAssignmentAccessHandoffItem({
+      description: m.public_assignment_access_handoff_template_description(),
+      id: 'template',
+      label: m.public_assignment_access_handoff_template_label(),
+      value:
+        context.status === 'available'
+          ? getTemplateByType(context.payload.activity.templateType).name
+          : m.public_assignment_access_handoff_hidden_value(),
+    }),
+    buildPublicAssignmentAccessHandoffItem(
+      buildPublicAssignmentAccessRuleHandoffItem(context, 'items', 'item-count')
+    ),
+    buildPublicAssignmentAccessHandoffItem({
+      description:
+        context.status === 'available'
+          ? m.public_assignment_access_handoff_runtime_prompts_description()
+          : m.public_assignment_access_handoff_runtime_hidden_description(),
+      id: 'runtime-prompts',
+      label: m.public_assignment_access_handoff_runtime_prompts_label(),
+      value:
+        context.status === 'available'
+          ? m.public_assignment_access_handoff_runtime_prompts_value({
+              count: normalizeRuntimeDisplayCount(
+                context.payload.runtimeItems.length
+              ),
+            })
+          : m.public_assignment_access_handoff_hidden_value(),
+    }),
+    buildPublicAssignmentAccessHandoffItem({
+      description:
+        context.status === 'available'
+          ? m.public_assignment_access_handoff_runtime_choices_description()
+          : m.public_assignment_access_handoff_runtime_hidden_description(),
+      id: 'runtime-choices',
+      label: m.public_assignment_access_handoff_runtime_choices_label(),
+      value:
+        context.status === 'available'
+          ? m.public_assignment_access_handoff_runtime_choices_value({
+              count: countPublicAssignmentRuntimeChoices(
+                context.payload.runtimeItems
+              ),
+            })
+          : m.public_assignment_access_handoff_hidden_value(),
+    }),
+    buildPublicAssignmentAccessHandoffItem({
+      description:
+        context.status === 'available'
+          ? m.public_assignment_access_handoff_answer_keys_description()
+          : m.public_assignment_access_handoff_answer_keys_unavailable_description(),
+      id: 'answer-keys',
+      label: m.public_assignment_access_handoff_answer_keys_label(),
+      value: m.public_assignment_access_handoff_answer_keys_value(),
+    }),
+    buildPublicAssignmentAccessHandoffItem({
+      description: formatPublicAssignmentAccessExplanationDescription(context),
+      id: 'explanations',
+      label: m.public_assignment_access_handoff_explanations_label(),
+      value: formatPublicAssignmentAccessExplanationValue(context),
+    }),
+    buildPublicAssignmentAccessHandoffItem({
+      description:
+        m.public_assignment_access_handoff_source_materials_description(),
+      id: 'source-materials',
+      label: m.public_assignment_access_handoff_source_materials_label(),
+      value: m.public_assignment_access_handoff_source_materials_value(),
+    }),
+    buildPublicAssignmentAccessHandoffItem({
+      description:
+        m.public_assignment_access_handoff_instructions_description(),
+      id: 'instructions',
+      label: m.public_assignment_access_handoff_instructions_label(),
+      value:
+        context.status === 'available'
+          ? context.payload.assignment.settingsJson.instructions ||
+            m.public_assignment_access_handoff_missing_value()
+          : m.public_assignment_access_handoff_hidden_value(),
+    }),
+    buildPublicAssignmentAccessHandoffItem(
+      buildPublicAssignmentAccessRuleHandoffItem(
+        context,
+        'attempts',
+        'attempt-limit'
+      )
+    ),
+    buildPublicAssignmentAccessHandoffItem(
+      buildPublicAssignmentAccessRuleHandoffItem(context, 'timer', 'timer')
+    ),
+    buildPublicAssignmentAccessHandoffItem(
+      buildPublicAssignmentAccessRuleHandoffItem(
+        context,
+        'closes',
+        'close-time'
+      )
+    ),
+    buildPublicAssignmentAccessHandoffItem(
+      buildPublicAssignmentAccessRuleHandoffItem(
+        context,
+        'identity',
+        'identity-mode'
+      )
+    ),
+    buildPublicAssignmentAccessHandoffItem(
+      buildPublicAssignmentAccessRuleHandoffItem(
+        context,
+        'itemOrder',
+        'shuffle-policy'
+      )
+    ),
+    buildPublicAssignmentAccessHandoffItem(
+      buildPublicAssignmentAccessRuleHandoffItem(
+        context,
+        'answerReveal',
+        'review-behavior'
+      )
+    ),
+    buildPublicAssignmentAccessHandoffItem({
+      description:
+        context.status === 'available'
+          ? m.public_assignment_access_handoff_submission_available_description()
+          : m.public_assignment_access_handoff_submission_blocked_description(),
+      id: 'submission-policy',
+      label: m.public_assignment_access_handoff_submission_label(),
+      value:
+        context.status === 'available'
+          ? m.public_assignment_access_handoff_submission_available_value()
+          : m.public_assignment_access_handoff_submission_blocked_value(),
+    }),
+    buildPublicAssignmentAccessHandoffItem({
+      description:
+        m.public_assignment_access_handoff_unavailable_safety_description(),
+      id: 'unavailable-safety',
+      label: m.public_assignment_access_handoff_unavailable_safety_label(),
+      value:
+        context.status === 'available'
+          ? m.public_assignment_access_handoff_unavailable_safety_available()
+          : m.public_assignment_access_handoff_unavailable_safety_blocked(),
+    }),
+  ];
+
+  return {
+    description: m.public_assignment_access_handoff_description(),
+    itemViews,
+    privacy: buildPublicAssignmentAccessHandoffPrivacyView(itemViews),
+    title: m.public_assignment_access_handoff_title(),
+  };
+}
+
+type PublicAssignmentAccessHandoffContext =
+  | {
+      payload: PublicAssignmentPayload;
+      ruleItems: PublicAssignmentRuleSummaryItem[];
+      shareSlug: string;
+      status: 'available';
+    }
+  | {
+      reason: PublicAssignmentUnavailableReason;
+      shareSlug: string;
+      status: 'unavailable';
+      unavailable: PublicAssignmentUnavailablePayload;
+    };
+
+function buildPublicAssignmentAccessHandoffContext({
+  lookupResult,
+  shareSlug,
+}: {
+  lookupResult: PublicAssignmentLookupResult;
+  shareSlug?: string;
+}): PublicAssignmentAccessHandoffContext {
+  if (lookupResult.status === 'available') {
+    const payload = lookupResult.payload;
+    const normalizedShareSlug = normalizeAssignmentShareSlug(
+      payload.assignment.shareSlug
+    );
+
+    return {
+      payload,
+      ruleItems: buildPublicAssignmentRuleSummaryViewFromSettings({
+        expiresAt: payload.assignment.expiresAt,
+        itemCount: payload.summary.itemCount,
+        settings: payload.assignment.settingsJson,
+      }).items,
+      shareSlug: normalizedShareSlug,
+      status: 'available',
+    };
+  }
+
+  return {
+    reason: lookupResult.reason,
+    shareSlug: normalizeAssignmentShareSlug(shareSlug ?? ''),
+    status: 'unavailable',
+    unavailable: lookupResult.unavailable,
+  };
+}
+
+function buildPublicAssignmentAccessRuleHandoffItem(
+  context: PublicAssignmentAccessHandoffContext,
+  ruleId: PublicAssignmentRuleSummaryId,
+  id: PublicAssignmentAccessHandoffItemId
+): Omit<PublicAssignmentAccessHandoffItemView, 'ariaLabel'> {
+  if (context.status === 'available') {
+    const ruleItem = context.ruleItems.find((item) => item.id === ruleId);
+
+    if (ruleItem) {
+      return {
+        description: ruleItem.description,
+        id,
+        label: ruleItem.label,
+        value: ruleItem.value,
+      };
+    }
+  }
+
+  return {
+    description: m.public_assignment_access_handoff_rules_hidden_description(),
+    id,
+    label: formatPublicAssignmentAccessRuleLabel(ruleId),
+    value: m.public_assignment_access_handoff_hidden_value(),
+  };
+}
+
+function formatPublicAssignmentAccessRuleLabel(
+  ruleId: PublicAssignmentRuleSummaryId
+) {
+  switch (ruleId) {
+    case 'answerReveal':
+      return m.assignment_delivery_label_review();
+    case 'attempts':
+      return m.assignment_delivery_label_attempts();
+    case 'closes':
+      return m.assignment_delivery_label_closes();
+    case 'identity':
+      return m.assignment_delivery_label_identity();
+    case 'itemOrder':
+      return m.assignment_delivery_label_item_order();
+    case 'items':
+      return m.assignment_delivery_label_items();
+    case 'timer':
+      return m.assignment_delivery_label_timer();
+  }
+}
+
+function formatPublicAssignmentAccessLifecycleValue(
+  context: PublicAssignmentAccessHandoffContext
+) {
+  if (context.status === 'available') {
+    return m.public_assignment_access_handoff_lifecycle_open();
+  }
+
+  switch (context.reason) {
+    case 'closed':
+      return m.public_assignment_access_handoff_lifecycle_closed();
+    case 'draft':
+      return m.public_assignment_access_handoff_lifecycle_draft();
+    case 'expired':
+      return m.public_assignment_access_handoff_lifecycle_expired();
+  }
+}
+
+function formatPublicAssignmentAccessExplanationDescription(
+  context: PublicAssignmentAccessHandoffContext
+) {
+  if (context.status === 'unavailable') {
+    return m.public_assignment_access_handoff_explanations_unavailable_description();
+  }
+
+  return context.payload.assignment.settingsJson.showCorrectAnswers
+    ? m.public_assignment_access_handoff_explanations_after_scoring_description()
+    : m.public_assignment_access_handoff_explanations_hidden_description();
+}
+
+function formatPublicAssignmentAccessExplanationValue(
+  context: PublicAssignmentAccessHandoffContext
+) {
+  if (
+    context.status === 'available' &&
+    context.payload.assignment.settingsJson.showCorrectAnswers
+  ) {
+    return m.public_assignment_access_handoff_explanations_after_scoring_value();
+  }
+
+  return m.public_assignment_access_handoff_hidden_value();
+}
+
+function countPublicAssignmentRuntimeChoices(items: PublicRuntimeItem[]) {
+  return normalizeRuntimeDisplayCount(
+    items.reduce(
+      (total, item) => total + normalizeRuntimeChoiceList(item.choices).length,
+      0
+    )
+  );
+}
+
+function buildPublicAssignmentAccessHandoffPrivacyView(
+  itemViews: PublicAssignmentAccessHandoffItemView[]
+): PublicAssignmentAccessHandoffPrivacyView {
+  return {
+    exposesAcceptedAlternatives: false,
+    exposesActivityContentJson: false,
+    exposesRawAnonymousToken: false,
+    exposesRuntimeChoiceText: false,
+    exposesRuntimePromptText: false,
+    exposesStudentAnswerText: false,
+    exposesTeacherOnlyAnswers: false,
+    exposesTeacherSourceMaterials: false,
+    itemIds: itemViews.map((item) => item.id),
+  };
+}
+
+function buildPublicAssignmentAccessHandoffItem({
+  description,
+  id,
+  label,
+  value,
+}: Omit<
+  PublicAssignmentAccessHandoffItemView,
+  'ariaLabel'
+>): PublicAssignmentAccessHandoffItemView {
+  return {
+    ariaLabel: m.public_assignment_access_handoff_item_aria({
+      description,
+      label,
+      value,
+    }),
+    description,
+    id,
+    label,
+    value,
   };
 }
 

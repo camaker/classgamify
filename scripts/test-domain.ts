@@ -3674,6 +3674,21 @@ assert.match(
 );
 assert.match(
   publicAssignmentSource,
+  /export type PublicAssignmentAccessHandoffItemId =(?=[\s\S]*'access-status')(?=[\s\S]*'lifecycle-status')(?=[\s\S]*'runtime-prompts')(?=[\s\S]*'answer-keys')(?=[\s\S]*'submission-policy')(?=[\s\S]*'unavailable-safety')[\s\S]*export type PublicAssignmentAccessHandoffPrivacyView = \{[\s\S]*exposesActivityContentJson: false;[\s\S]*exposesRawAnonymousToken: false;[\s\S]*exposesRuntimePromptText: false;[\s\S]*exposesStudentAnswerText: false;[\s\S]*export type PublicAssignmentAccessHandoffView = \{/,
+  'Public assignment access should expose a typed 20-slice handoff contract with explicit privacy flags.'
+);
+assert.match(
+  publicAssignmentSource,
+  /export function buildPublicAssignmentAccessHandoffView(?=[\s\S]*buildPublicAssignmentAccessHandoffContext\(\{)(?=[\s\S]*lookupResult)(?=[\s\S]*shareSlug)(?=[\s\S]*'items'[\s\S]*'item-count')(?=[\s\S]*'attempts'[\s\S]*'attempt-limit')(?=[\s\S]*'timer'[\s\S]*'timer')(?=[\s\S]*'closes'[\s\S]*'close-time')(?=[\s\S]*'identity'[\s\S]*'identity-mode')(?=[\s\S]*'itemOrder'[\s\S]*'shuffle-policy')(?=[\s\S]*'answerReveal'[\s\S]*'review-behavior')[\s\S]*privacy: buildPublicAssignmentAccessHandoffPrivacyView/,
+  'Public assignment access handoff should compose stable rule slices from the shared public rule-summary view.'
+);
+assert.match(
+  publicAssignmentSource,
+  /function buildPublicAssignmentAccessHandoffContext[\s\S]*buildPublicAssignmentRuleSummaryViewFromSettings\(\{[\s\S]*expiresAt: payload\.assignment\.expiresAt,[\s\S]*itemCount: payload\.summary\.itemCount,[\s\S]*settings: payload\.assignment\.settingsJson,[\s\S]*\}\)\.items[\s\S]*status: 'unavailable'/,
+  'Public assignment access handoff context should derive open-link rules from sanitized payload settings and keep unavailable links content-free.'
+);
+assert.match(
+  publicAssignmentSource,
   /export type PublicAssignmentUnavailablePayload = \{[\s\S]*contentPolicy: PublicAssignmentUnavailableContentPolicy;[\s\S]*identityPolicy: PublicAssignmentUnavailableIdentityPolicy;[\s\S]*reason: PublicAssignmentUnavailableReason;[\s\S]*submissionPolicy: PublicAssignmentUnavailableSubmissionPolicy;/,
   'Public unavailable assignments should expose an explicit safe unavailable-payload contract.'
 );
