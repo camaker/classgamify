@@ -81,7 +81,10 @@ function PricingPage() {
           </p>
         </section>
 
-        <section className="grid gap-4 md:grid-cols-3">
+        <section
+          aria-label={pageView.valueSection.ariaLabel}
+          className="grid gap-4 md:grid-cols-3"
+        >
           {pageView.valueCards.map((item) => (
             <ValueCard
               key={item.id}
@@ -98,7 +101,10 @@ function PricingPage() {
           />
         </div>
 
-        <section className="grid gap-4 rounded-lg border bg-card p-5 md:grid-cols-[minmax(0,1fr)_auto] md:items-center">
+        <section
+          aria-label={pageView.schoolCta.ariaLabel}
+          className="grid gap-4 rounded-lg border bg-card p-5 md:grid-cols-[minmax(0,1fr)_auto] md:items-center"
+        >
           <div className="min-w-0 space-y-2">
             <div className="flex items-center gap-2 text-sm font-medium text-primary">
               <IconSchool className="size-4" />
@@ -112,15 +118,19 @@ function PricingPage() {
             </p>
           </div>
           <Link
-            to={Routes.ContactClassroom}
+            to={pageView.schoolCta.action.to}
+            aria-label={pageView.schoolCta.action.ariaLabel}
             className={cn(buttonVariants(), 'w-full md:w-auto')}
           >
-            {pageView.schoolCta.label}
+            {pageView.schoolCta.action.label}
             <IconArrowRight className="size-4" />
           </Link>
         </section>
 
-        <section className="mx-auto max-w-3xl space-y-4">
+        <section
+          aria-label={pageView.faq.ariaLabel}
+          className="mx-auto max-w-3xl space-y-4"
+        >
           <div className="space-y-2 text-center">
             <h2 className="text-2xl font-semibold tracking-tight">
               {pageView.faq.title}
@@ -133,7 +143,11 @@ function PricingPage() {
             className="rounded-lg border px-4"
           >
             {pageView.faq.items.map((item) => (
-              <AccordionItem key={item.id} value={item.id}>
+              <AccordionItem
+                aria-label={item.ariaLabel}
+                key={item.id}
+                value={item.id}
+              >
                 <AccordionTrigger className="text-left">
                   {item.question}
                 </AccordionTrigger>
@@ -155,12 +169,16 @@ function ValueCard({
 }: {
   icon: TablerIcon;
   item: {
+    ariaLabel: string;
     description: string;
     title: string;
   };
 }) {
   return (
-    <div className="rounded-lg border bg-card p-5">
+    <article
+      aria-label={item.ariaLabel}
+      className="rounded-lg border bg-card p-5"
+    >
       <div className="flex size-9 items-center justify-center rounded-lg border bg-background text-primary">
         <Icon className="size-4" />
       </div>
@@ -168,7 +186,7 @@ function ValueCard({
       <p className="mt-2 text-sm leading-6 text-muted-foreground">
         {item.description}
       </p>
-    </div>
+    </article>
   );
 }
 

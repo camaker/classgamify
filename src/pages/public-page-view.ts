@@ -229,6 +229,7 @@ type ContactTopicView = {
 
 export type PricingPageViewModel = {
   faq: {
+    ariaLabel: string;
     description: string;
     items: PricingFaqItemView[];
     title: string;
@@ -239,11 +240,13 @@ export type PricingPageViewModel = {
     title: string;
   };
   schoolCta: {
+    action: PublicPageRouteAction;
+    ariaLabel: string;
     description: string;
     eyebrow: string;
-    label: string;
     title: string;
   };
+  valueSection: PricingPageSectionView;
   valueCards: PricingValueCardView[];
 };
 
@@ -258,11 +261,19 @@ export type PricingFaqItemId =
 
 export type PricingFaqItemView = {
   answer: string;
+  ariaLabel: string;
   id: PricingFaqItemId;
   question: string;
 };
 
+type PricingPageSectionView = {
+  ariaLabel: string;
+  description: string;
+  title: string;
+};
+
 type PricingValueCardView = {
+  ariaLabel: string;
   description: string;
   id: PricingValueCardId;
   title: string;
@@ -829,11 +840,40 @@ export function buildContactPageViewModel(
 }
 
 export function buildPricingPageViewModel(): PricingPageViewModel {
+  const faqTitle = m.pricing_faq_title();
+  const faqDescription = m.pricing_faq_description();
+  const schoolCtaTitle = m.pricing_school_title();
+  const schoolCtaDescription = m.pricing_school_description();
+  const schoolCtaLabel = m.pricing_school_cta();
+  const valueSectionTitle = m.pricing_value_section_title();
+  const valueSectionDescription = m.pricing_value_section_description();
+  const valueCards = [
+    buildPricingValueCardView({
+      description: m.pricing_value_templates_description(),
+      id: 'templates',
+      title: m.pricing_value_templates_title(),
+    }),
+    buildPricingValueCardView({
+      description: m.pricing_value_assignments_description(),
+      id: 'assignments',
+      title: m.pricing_value_assignments_title(),
+    }),
+    buildPricingValueCardView({
+      description: m.pricing_value_ai_description(),
+      id: 'ai',
+      title: m.pricing_value_ai_title(),
+    }),
+  ];
+
   return {
     faq: {
-      description: m.pricing_faq_description(),
+      ariaLabel: m.pricing_faq_section_aria_label({
+        description: faqDescription,
+        title: faqTitle,
+      }),
+      description: faqDescription,
       items: buildPricingFaqItems(),
-      title: m.pricing_faq_title(),
+      title: faqTitle,
     },
     hero: {
       eyebrow: m.pricing_eyebrow(),
@@ -841,59 +881,93 @@ export function buildPricingPageViewModel(): PricingPageViewModel {
       title: m.pricing_title(),
     },
     schoolCta: {
-      description: m.pricing_school_description(),
+      action: {
+        ariaLabel: m.pricing_school_cta_aria_label(),
+        label: schoolCtaLabel,
+        to: Routes.ContactClassroom,
+      },
+      ariaLabel: m.pricing_school_cta_section_aria_label({
+        description: schoolCtaDescription,
+        title: schoolCtaTitle,
+      }),
+      description: schoolCtaDescription,
       eyebrow: m.pricing_school_eyebrow(),
-      label: m.pricing_school_cta(),
-      title: m.pricing_school_title(),
+      title: schoolCtaTitle,
     },
-    valueCards: [
-      {
-        description: m.pricing_value_templates_description(),
-        id: 'templates',
-        title: m.pricing_value_templates_title(),
-      },
-      {
-        description: m.pricing_value_assignments_description(),
-        id: 'assignments',
-        title: m.pricing_value_assignments_title(),
-      },
-      {
-        description: m.pricing_value_ai_description(),
-        id: 'ai',
-        title: m.pricing_value_ai_title(),
-      },
-    ],
+    valueSection: {
+      ariaLabel: m.pricing_value_section_aria_label({
+        description: valueSectionDescription,
+        title: valueSectionTitle,
+      }),
+      description: valueSectionDescription,
+      title: valueSectionTitle,
+    },
+    valueCards,
   };
 }
 
 export function buildPricingFaqItems(): PricingFaqItemView[] {
   return [
-    {
+    buildPricingFaqItemView({
       answer: m.pricing_faq_free_answer(),
       id: 'free',
       question: m.pricing_faq_free_question(),
-    },
-    {
+    }),
+    buildPricingFaqItemView({
       answer: m.pricing_faq_pro_answer(),
       id: 'pro',
       question: m.pricing_faq_pro_question(),
-    },
-    {
+    }),
+    buildPricingFaqItemView({
       answer: m.pricing_faq_templates_answer(),
       id: 'templates',
       question: m.pricing_faq_templates_question(),
-    },
-    {
+    }),
+    buildPricingFaqItemView({
       answer: m.pricing_faq_student_accounts_answer(),
       id: 'student-accounts',
       question: m.pricing_faq_student_accounts_question(),
-    },
-    {
+    }),
+    buildPricingFaqItemView({
       answer: m.pricing_faq_schools_answer(),
       id: 'schools',
       question: m.pricing_faq_schools_question(),
-    },
+    }),
   ];
+}
+
+function buildPricingFaqItemView({
+  answer,
+  id,
+  question,
+}: {
+  answer: string;
+  id: PricingFaqItemId;
+  question: string;
+}): PricingFaqItemView {
+  return {
+    answer,
+    ariaLabel: m.pricing_faq_item_aria_label({ answer, question }),
+    id,
+    question,
+  };
+}
+
+function buildPricingValueCardView({
+  description,
+  id,
+  title,
+}: {
+  description: string;
+  id: PricingValueCardId;
+  title: string;
+}): PricingValueCardView {
+  return {
+    ariaLabel: m.pricing_value_card_aria_label({ description, title }),
+    description,
+    id,
+    title,
+  };
 }
 
 function buildContactChecklist(intent: ContactIntent): ContactChecklistView {

@@ -1495,8 +1495,33 @@ const pricingRouteSource = readFileSync(
 );
 assert.match(
   pricingRouteSource,
-  /pageView\.faq\.items\.map[\s\S]*<AccordionItem key=\{item\.id\} value=\{item\.id\}>[\s\S]*item\.question[\s\S]*item\.answer/,
+  /pageView\.faq\.items\.map[\s\S]*<AccordionItem[\s\S]*key=\{item\.id\}[\s\S]*value=\{item\.id\}[\s\S]*item\.question[\s\S]*item\.answer/,
   'The pricing route should render FAQ accordion rows with stable FAQ ids.'
+);
+assert.match(
+  pricingRouteSource,
+  /aria-label=\{pageView\.valueSection\.ariaLabel\}[\s\S]*pageView\.valueCards\.map[\s\S]*<ValueCard[\s\S]*item=\{item\}/,
+  'The pricing route should render value cards inside the prepared value section semantics.'
+);
+assert.match(
+  pricingRouteSource,
+  /aria-label=\{pageView\.schoolCta\.ariaLabel\}[\s\S]*pageView\.schoolCta\.title[\s\S]*pageView\.schoolCta\.description[\s\S]*to=\{pageView\.schoolCta\.action\.to\}[\s\S]*aria-label=\{pageView\.schoolCta\.action\.ariaLabel\}[\s\S]*pageView\.schoolCta\.action\.label/,
+  'The pricing route should render the prepared school CTA section and action.'
+);
+assert.doesNotMatch(
+  pricingRouteSource,
+  /Routes\.ContactClassroom/,
+  'The pricing route should not hardcode the classroom contact CTA route target.'
+);
+assert.match(
+  pricingRouteSource,
+  /aria-label=\{pageView\.faq\.ariaLabel\}[\s\S]*pageView\.faq\.items\.map[\s\S]*<AccordionItem[\s\S]*aria-label=\{item\.ariaLabel\}/,
+  'The pricing route should render the prepared FAQ section and item semantics.'
+);
+assert.match(
+  pricingRouteSource,
+  /function ValueCard[\s\S]*ariaLabel: string[\s\S]*<article[\s\S]*aria-label=\{item\.ariaLabel\}/,
+  'Pricing value cards should expose prepared accessible labels through semantic articles.'
 );
 assert.doesNotMatch(
   pricingRouteSource,
@@ -5448,6 +5473,21 @@ const roadmapRouteSource = readFileSync(
 const publicPageViewSource = readFileSync(
   'src/pages/public-page-view.ts',
   'utf8'
+);
+assert.match(
+  publicPageViewSource,
+  /export type PricingPageViewModel[\s\S]*valueSection: PricingPageSectionView;[\s\S]*valueCards: PricingValueCardView\[\];[\s\S]*export type PricingFaqItemView = \{[\s\S]*ariaLabel: string;[\s\S]*type PricingValueCardView = \{[\s\S]*ariaLabel: string;/,
+  'Pricing page view models should expose prepared section, FAQ item, and value card semantics.'
+);
+assert.match(
+  publicPageViewSource,
+  /schoolCta:[\s\S]*action:[\s\S]*ariaLabel: m\.pricing_school_cta_aria_label\(\)[\s\S]*label: schoolCtaLabel[\s\S]*to: Routes\.ContactClassroom/,
+  'Pricing page view model should own the school CTA route action.'
+);
+assert.match(
+  publicPageViewSource,
+  /m\.pricing_faq_section_aria_label\(\{[\s\S]*m\.pricing_value_section_aria_label\(\{[\s\S]*m\.pricing_faq_item_aria_label\(\{[\s\S]*m\.pricing_value_card_aria_label\(\{/,
+  'Pricing page view model should prepare localized value, FAQ, and card aria labels.'
 );
 const menuItemConfigSource = readFileSync('src/types/index.d.ts', 'utf8');
 const navbarSource = readFileSync('src/components/layout/navbar.tsx', 'utf8');
@@ -31925,20 +31965,60 @@ assert.match(
   buildContactClassroomInquiryScopeView().privacyBoundary.description,
   /storage keys, private file URLs, raw student identifiers/
 );
-assert.deepEqual(buildPricingPageViewModel().hero, {
+const pricingPageView = buildPricingPageViewModel();
+assert.deepEqual(pricingPageView.hero, {
   eyebrow: 'ClassGamify plans',
   subtitle:
     'Start with the classroom activity loop, then upgrade for more creation, assignment, AI, and result workflows.',
   title: 'ClassGamify Plans',
 });
-assert.deepEqual(
-  buildPricingPageViewModel().valueCards.map((card) => [card.id, card.title]),
-  [
-    ['templates', 'Template library'],
-    ['assignments', 'Activities and assignments'],
-    ['ai', 'AI creation speed'],
-  ]
-);
+assert.deepEqual(pricingPageView.valueSection, {
+  ariaLabel:
+    'Plan value for classroom activities: Templates, assignments, and AI upgrades stay tied to reusable classroom activities, published links, and teacher result review.',
+  description:
+    'Templates, assignments, and AI upgrades stay tied to reusable classroom activities, published links, and teacher result review.',
+  title: 'Plan value for classroom activities',
+});
+assert.deepEqual(pricingPageView.valueCards, [
+  {
+    ariaLabel:
+      'Template library: Start with core templates such as quiz, matching games, line matching, group sorting, fill-ins, listening, pair matching, and box reveal activities.',
+    description:
+      'Start with core templates such as quiz, matching games, line matching, group sorting, fill-ins, listening, pair matching, and box reveal activities.',
+    id: 'templates',
+    title: 'Template library',
+  },
+  {
+    ariaLabel:
+      'Activities and assignments: Save lesson content as reusable activities, then publish separate assignment links for each class run.',
+    description:
+      'Save lesson content as reusable activities, then publish separate assignment links for each class run.',
+    id: 'assignments',
+    title: 'Activities and assignments',
+  },
+  {
+    ariaLabel:
+      'AI creation speed: Paid plans will expand around AI creation, remixing, more templates, and result reporting.',
+    description:
+      'Paid plans will expand around AI creation, remixing, more templates, and result reporting.',
+    id: 'ai',
+    title: 'AI creation speed',
+  },
+]);
+assert.deepEqual(pricingPageView.schoolCta, {
+  action: {
+    ariaLabel:
+      'Contact ClassGamify about school seats, student data rules, and rollout timing.',
+    label: 'Talk to us',
+    to: Routes.ContactClassroom,
+  },
+  ariaLabel:
+    'Need a multi-teacher workspace?: For multiple teachers, campuses, or long-running cohorts, contact us to plan teacher seats, student data handling, template needs, and rollout timing.',
+  description:
+    'For multiple teachers, campuses, or long-running cohorts, contact us to plan teacher seats, student data handling, template needs, and rollout timing.',
+  eyebrow: 'Schools and teams',
+  title: 'Need a multi-teacher workspace?',
+});
 assert.deepEqual(
   buildPricingFaqItems().map((item) => [item.id, item.question]),
   [
@@ -31949,7 +32029,56 @@ assert.deepEqual(
     ['schools', 'Can schools or tutoring teams use it?'],
   ]
 );
-assert.deepEqual(buildPricingPageViewModel().faq.items, buildPricingFaqItems());
+assert.deepEqual(buildPricingFaqItems(), [
+  {
+    answer:
+      'The free plan is for testing the core creation loop: browse templates, create a small number of activities, open student previews, and see whether the workflow fits your class rhythm.',
+    ariaLabel:
+      'What is the free plan for?: The free plan is for testing the core creation loop: browse templates, create a small number of activities, open student previews, and see whether the workflow fits your class rhythm.',
+    id: 'free',
+    question: 'What is the free plan for?',
+  },
+  {
+    answer:
+      'Pro will expand around higher activity and assignment limits, result tracking, AI generation, and faster template remixing.',
+    ariaLabel:
+      'What will Pro unlock?: Pro will expand around higher activity and assignment limits, result tracking, AI generation, and faster template remixing.',
+    id: 'pro',
+    question: 'What will Pro unlock?',
+  },
+  {
+    answer:
+      'The first version intentionally starts with a focused set of high-frequency classroom templates so creation, publishing, student play, and results become reliable before the catalog grows.',
+    ariaLabel:
+      'Why are there only a few templates first?: The first version intentionally starts with a focused set of high-frequency classroom templates so creation, publishing, student play, and results become reliable before the catalog grows.',
+    id: 'templates',
+    question: 'Why are there only a few templates first?',
+  },
+  {
+    answer:
+      'The v1 direction is public assignment links with a lightweight student name or anonymous token. Teacher accounts own creation, publishing, and results.',
+    ariaLabel:
+      'Do students need accounts?: The v1 direction is public assignment links with a lightweight student name or anonymous token. Teacher accounts own creation, publishing, and results.',
+    id: 'student-accounts',
+    question: 'Do students need accounts?',
+  },
+  {
+    answer:
+      'That is part of the product direction. School use needs teacher seats, student data rules, permissions, and rollout details, so contact us before a larger deployment.',
+    ariaLabel:
+      'Can schools or tutoring teams use it?: That is part of the product direction. School use needs teacher seats, student data rules, permissions, and rollout details, so contact us before a larger deployment.',
+    id: 'schools',
+    question: 'Can schools or tutoring teams use it?',
+  },
+]);
+assert.deepEqual(pricingPageView.faq, {
+  ariaLabel:
+    'Frequently asked questions: Questions about activity templates, assignment links, student results, and school use.',
+  description:
+    'Questions about activity templates, assignment links, student results, and school use.',
+  items: buildPricingFaqItems(),
+  title: 'Frequently asked questions',
+});
 assert.deepEqual(getBlogCtaActions(), [
   {
     icon: 'create',
