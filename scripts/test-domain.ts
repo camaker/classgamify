@@ -1030,6 +1030,7 @@ import {
 import {
   buildStudentRuntimeItemListView,
   buildStudentRuntimeSingleAnswerChanges,
+  STUDENT_RUNTIME_INTERACTION_HANDOFF_ITEM_IDS,
 } from '@/assignments/student-runtime-item-list';
 import {
   ASSIGNMENT_MAX_ATTEMPTS_RANGE,
@@ -12125,6 +12126,57 @@ assert.match(
   /defaultItemCardViews: DefaultRuntimeItemCardView\[\];[\s\S]*runnerCopy: ActivityRunnerCopy;/,
   'Student runtime item list domain should compose explicit runner copy and default-card contracts.'
 );
+assert.deepEqual(
+  [...STUDENT_RUNTIME_INTERACTION_HANDOFF_ITEM_IDS],
+  [
+    'template-type',
+    'runner-surface',
+    'runner-title',
+    'runtime-items',
+    'runtime-kind-summary',
+    'choice-count',
+    'choice-list-renderer',
+    'line-match-renderer',
+    'fill-blank-renderer',
+    'open-box-renderer',
+    'listening-renderer',
+    'listening-language',
+    'group-sort-renderer',
+    'matching-pairs-renderer',
+    'answer-contract',
+    'answer-change-contract',
+    'selection-scope',
+    'review-feedback',
+    'disabled-state',
+    'privacy-guard',
+  ],
+  'Student runtime interaction handoff should expose exactly 20 stable slice ids.'
+);
+assert.match(
+  studentRuntimeItemListDomainSource,
+  /export type StudentRuntimeInteractionHandoffView = \{[\s\S]*description: string;[\s\S]*itemViews: StudentRuntimeInteractionHandoffItemView\[\];[\s\S]*privacy: StudentRuntimeInteractionHandoffPrivacyContract;[\s\S]*title: string;/,
+  'Student runtime item list domain should expose an explicit runtime interaction handoff view contract.'
+);
+assert.match(
+  studentRuntimeItemListDomainSource,
+  /interactionHandoffView: StudentRuntimeInteractionHandoffView;/,
+  'Student runtime item list view should include the prepared runtime interaction handoff view.'
+);
+assert.match(
+  studentRuntimeItemListDomainSource,
+  /buildStudentRuntimeInteractionHandoffView\(\{[\s\S]*disabled,[\s\S]*items,[\s\S]*language,[\s\S]*revealAnswer,[\s\S]*runnerCopy,[\s\S]*surface,[\s\S]*templateType,/,
+  'Student runtime item-list domain should compose interaction handoff state from renderer dispatch, language, disabled, and review inputs.'
+);
+assert.match(
+  studentRuntimeItemListDomainSource,
+  /exposesAnswerText: false,[\s\S]*exposesRuntimeChoiceText: false,[\s\S]*exposesRuntimeItemIds: false,[\s\S]*exposesRuntimePromptText: false,[\s\S]*exposesStudentNames: false,[\s\S]*exposesTeacherOnlyAnswers: false,/,
+  'Student runtime interaction handoff privacy should forbid answer, prompt, choice, runtime id, student name, and teacher-only answer exposure.'
+);
+assert.match(
+  studentRuntimeItemListDomainSource,
+  /getTemplateByType\(templateType\)\.name[\s\S]*normalizeListeningSpeechLanguage\(language\)[\s\S]*formatStudentRuntimeAnswerChangeContract\(surface\)[\s\S]*formatStudentRuntimeSelectionScope\(surface\)/,
+  'Student runtime interaction handoff should derive template, listening language, answer-update, and selection-scope semantics from shared helpers.'
+);
 assert.match(
   studentRuntimeItemListSource,
   /type RuntimeChoiceButtonView[\s\S]*choiceViews: RuntimeChoiceButtonView\[\];[\s\S]*choices: RuntimeChoiceButtonView\[\];|import type \{ RuntimeChoiceButtonView \}[\s\S]*choiceViews: RuntimeChoiceButtonView\[\];[\s\S]*choices: RuntimeChoiceButtonView\[\];/,
@@ -12137,7 +12189,7 @@ assert.match(
 );
 assert.doesNotMatch(
   `${studentRunnerViewSource}\n${studentRuntimeItemListDomainSource}\n${studentRuntimeItemListSource}\n${fillBlankWorksheetSource}`,
-  /ReturnType<typeof (?:buildStudentRunnerView|buildDefaultRuntimeItemCardViews|buildStudentRuntimeItemListView|buildFillBlankWorksheetView|buildChoicePairingRunnerView|buildGroupSortRunnerView)>/,
+  /ReturnType<typeof (?:buildStudentRunnerView|buildDefaultRuntimeItemCardViews|buildStudentRuntimeItemListView|buildStudentRuntimeInteractionHandoffView|buildFillBlankWorksheetView|buildChoicePairingRunnerView|buildGroupSortRunnerView)>/,
   'Student runner and runtime list surfaces should not infer public renderer contracts from builder return types.'
 );
 assert.match(
@@ -13218,7 +13270,7 @@ assert.doesNotMatch(
 );
 assert.match(
   studentRuntimeItemListSource,
-  /buildStudentRuntimeItemListView\(\{[\s\S]*answers,[\s\S]*items,[\s\S]*reviewItems,[\s\S]*templateType/,
+  /buildStudentRuntimeItemListView\(\{[\s\S]*answers,[\s\S]*disabled,[\s\S]*items,[\s\S]*language,[\s\S]*revealAnswer,[\s\S]*reviewItems,[\s\S]*templateType/,
   'Student runtime item list should consume the assignment-domain template dispatch view.'
 );
 assert.match(
@@ -14535,6 +14587,117 @@ assert.deepEqual(
       positionLabel: '1. Capital of France?',
     },
   ]
+);
+const quizRuntimeInteractionHandoffView =
+  quizRuntimeListView.interactionHandoffView;
+const quizRuntimeInteractionHandoffValues = new Map(
+  quizRuntimeInteractionHandoffView.itemViews.map((item) => [
+    item.id,
+    item.value,
+  ])
+);
+assert.deepEqual(
+  quizRuntimeInteractionHandoffView.itemViews.map((item) => item.id),
+  [...STUDENT_RUNTIME_INTERACTION_HANDOFF_ITEM_IDS],
+  'Student runtime interaction handoff should expose the stable 20 slice order.'
+);
+assert.deepEqual(quizRuntimeInteractionHandoffView.privacy, {
+  exposesAnswerText: false,
+  exposesRuntimeChoiceText: false,
+  exposesRuntimeItemIds: false,
+  exposesRuntimePromptText: false,
+  exposesStudentNames: false,
+  exposesTeacherOnlyAnswers: false,
+  itemIds: [...STUDENT_RUNTIME_INTERACTION_HANDOFF_ITEM_IDS],
+  runnerSurface: 'choice-list',
+  templateType: 'quiz',
+});
+assert.equal(quizRuntimeInteractionHandoffValues.get('template-type'), 'Quiz');
+assert.equal(
+  quizRuntimeInteractionHandoffValues.get('runner-surface'),
+  'choice-list'
+);
+assert.equal(
+  quizRuntimeInteractionHandoffValues.get('choice-count'),
+  '2 choices'
+);
+assert.equal(
+  quizRuntimeInteractionHandoffValues.get('answer-contract'),
+  '{ itemId, answer }'
+);
+assert.equal(
+  quizRuntimeInteractionHandoffValues.get('choice-list-renderer'),
+  'Active'
+);
+assert.equal(
+  quizRuntimeInteractionHandoffValues.get('line-match-renderer'),
+  'Inactive'
+);
+assert.equal(
+  quizRuntimeInteractionHandoffValues.get('review-feedback'),
+  'Hidden'
+);
+assert.equal(
+  quizRuntimeInteractionHandoffValues.get('privacy-guard'),
+  'Private data omitted'
+);
+assert.equal(
+  JSON.stringify(quizRuntimeInteractionHandoffView).includes(
+    'Capital of France?'
+  ),
+  false,
+  'Student runtime interaction handoff should not expose prompt text.'
+);
+assert.equal(
+  JSON.stringify(quizRuntimeInteractionHandoffView).includes('Paris'),
+  false,
+  'Student runtime interaction handoff should not expose answer or choice text.'
+);
+assert.equal(
+  JSON.stringify(quizRuntimeInteractionHandoffView).includes('q-1'),
+  false,
+  'Student runtime interaction handoff should not expose runtime item ids.'
+);
+const listeningRuntimeInteractionHandoffView =
+  buildStudentRuntimeItemListView({
+    answers: {},
+    disabled: true,
+    items: [
+      {
+        id: 'listen-1',
+        kind: 'question',
+        prompt: '听到的短句',
+      },
+    ],
+    language: '中文',
+    revealAnswer: true,
+    templateType: 'listening',
+  }).interactionHandoffView;
+const listeningRuntimeInteractionHandoffValues = new Map(
+  listeningRuntimeInteractionHandoffView.itemViews.map((item) => [
+    item.id,
+    item.value,
+  ])
+);
+assert.equal(
+  listeningRuntimeInteractionHandoffView.privacy.runnerSurface,
+  'listening'
+);
+assert.equal(
+  listeningRuntimeInteractionHandoffValues.get('listening-renderer'),
+  'Active'
+);
+assert.equal(
+  listeningRuntimeInteractionHandoffValues.get('listening-language'),
+  'zh-CN'
+);
+assert.equal(
+  listeningRuntimeInteractionHandoffValues.get('review-feedback'),
+  'Visible'
+);
+assert.equal(
+  listeningRuntimeInteractionHandoffValues.get('disabled-state'),
+  'Disabled'
 );
 assert.equal(
   buildStudentRuntimeItemListView({

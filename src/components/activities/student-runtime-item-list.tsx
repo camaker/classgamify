@@ -43,7 +43,10 @@ export function StudentRuntimeItemList({
 }: StudentRuntimeItemListProps) {
   const listView = buildStudentRuntimeItemListView({
     answers,
+    disabled,
     items,
+    language,
+    revealAnswer,
     reviewItems,
     templateType,
   });
