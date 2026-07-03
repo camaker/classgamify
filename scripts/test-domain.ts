@@ -31307,6 +31307,21 @@ assert.match(
 );
 assert.match(
   printableWorksheetViewSource,
+  /export type PrintableWorksheetHandoffItemId =(?=[\s\S]*'student-fields')(?=[\s\S]*'response-plan')(?=[\s\S]*'printable-items')(?=[\s\S]*'choice-bank-coverage')(?=[\s\S]*'writing-area-coverage')(?=[\s\S]*'item-response-help')(?=[\s\S]*'student-name-field')(?=[\s\S]*'delivery-policy')(?=[\s\S]*'answer-key-items')(?=[\s\S]*'answer-key-details')(?=[\s\S]*'print-action')[\s\S]*export type PrintableWorksheetHandoffPrivacyContract = \{[\s\S]*exposesAnswerKeyText: false;[\s\S]*exposesChoiceText: false;[\s\S]*exposesPromptText: false;[\s\S]*exposesStudentResponseText: false;[\s\S]*itemIds: PrintableWorksheetHandoffItemId\[\];/,
+  'Printable worksheet handoff should expose a typed 20-slice paper handoff contract with explicit privacy flags.'
+);
+assert.match(
+  printableWorksheetViewSource,
+  /const itemViews = worksheet\.items\.map\(buildPrintableWorksheetItemView\)[\s\S]*handoffView: buildPrintableWorksheetHandoffView\(\{[\s\S]*answerKeyView,[\s\S]*assignmentFieldViews,[\s\S]*controlView,[\s\S]*headerView,[\s\S]*itemViews,[\s\S]*preparationView,/,
+  'Printable worksheet page view-model should compose handoff state from prepared answer-key, assignment-field, control, header, item, and preparation views.'
+);
+assert.match(
+  printableWorksheetViewSource,
+  /export function buildPrintableWorksheetHandoffView(?=[\s\S]*answerKeyView: PrintableWorksheetAnswerKeyView)(?=[\s\S]*itemViews: PrintableWorksheetItemView\[\])[\s\S]*id: 'choice-bank-coverage'[\s\S]*id: 'writing-area-coverage'[\s\S]*id: 'item-response-help'[\s\S]*id: 'answer-key-items'[\s\S]*id: 'answer-key-details'[\s\S]*privacy: buildPrintableWorksheetHandoffPrivacyContract/,
+  'Printable worksheet handoff should collect paper overview, response, field, answer-key, result-return, and print-action slices from prepared view state.'
+);
+assert.match(
+  printableWorksheetViewSource,
   /const answerKeyItemViews = answerKey[\s\S]*worksheet\.answerKey\?\.map\(buildPrintableWorksheetAnswerKeyItemView\)[\s\S]*: \[\]/,
   'Printable worksheet page view-model should only prepare teacher-only answer-key item views when answer key display is requested.'
 );

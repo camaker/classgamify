@@ -228,11 +228,32 @@ test('printable worksheet page view exposes a complete handoff contract', () => 
       'student-fields',
       'response-plan',
       'answer-key',
+      'printable-items',
+      'response-modes',
+      'choice-bank-coverage',
+      'writing-area-coverage',
+      'item-response-help',
+      'student-name-field',
+      'date-field',
+      'score-field',
       'share-path',
+      'template',
+      'snapshot-source',
+      'instructions',
+      'delivery-policy',
+      'answer-key-items',
+      'answer-key-details',
       'results-return',
       'print-action',
     ]
   );
+  assert.deepEqual(hiddenPageView.handoffView.privacy, {
+    exposesAnswerKeyText: false,
+    exposesChoiceText: false,
+    exposesPromptText: false,
+    exposesStudentResponseText: false,
+    itemIds: hiddenPageView.handoffView.itemViews.map((item) => item.id),
+  });
   assert.equal(hiddenPageView.showAnswerKey, false);
   assert.equal(hiddenPageView.answerKeyView.accessView.state, 'hidden');
   assert.equal(
@@ -259,6 +280,16 @@ test('printable worksheet page view exposes a complete handoff contract', () => 
       (item) => item.id === 'answer-key'
     )?.value,
     includedPageView.answerKeyView.accessView.value
+  );
+  assert.equal(
+    includedPageView.handoffView.itemViews.find(
+      (item) => item.id === 'answer-key-items'
+    )?.value,
+    '1 item'
+  );
+  assert.equal(
+    JSON.stringify(includedPageView.handoffView).includes('Paris'),
+    false
   );
 
   const unavailablePageView = buildPrintableWorksheetPageViewModel({
