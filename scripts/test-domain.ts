@@ -393,6 +393,7 @@ import {
   buildActivityEditorTemplateSetupView,
   buildActivityEditorTemplateReadiness,
   buildActivityEditorTemplateView,
+  ACTIVITY_EDITOR_TEMPLATE_HANDOFF_ITEM_IDS,
   formatActivityEditorDifficulty,
   formatActivityEditorVisibility,
 } from '@/activities/editor';
@@ -4475,6 +4476,26 @@ assert.match(
   activityEditorSource,
   /export type ActivityEditorTemplateSetupView[\s\S]*requirementBadges: ActivityEditorTemplateRequirementBadgeView\[\];[\s\S]*reviewChecklistItems: ActivityEditorTemplateScaffoldReviewItemView\[\];[\s\S]*reviewChecklistLabel: string;[\s\S]*export type ActivityEditorTemplateScaffoldReviewItemId =[\s\S]*'check-ready-modes'[\s\S]*'edit-before-save'[\s\S]*'review-fields';[\s\S]*export type ActivityEditorTemplateScaffoldReviewItemView = \{[\s\S]*actionHref: ActivityEditorSectionHref;[\s\S]*actionLabel: string;[\s\S]*ariaLabel: string;[\s\S]*export type ActivityEditorTemplateRequirementBadgeView =\s*TemplateRequirementView;[\s\S]*export type ActivityEditorTemplateScaffoldSummaryView =\s*ActivityTemplateScaffoldReadinessSummary;[\s\S]*export type ActivityEditorTemplateScaffoldCoverageMetricView =\s*ActivityTemplateScaffoldCoverageMetricView;[\s\S]*export type ActivityEditorTemplateScaffoldReadyOptionView =\s*ActivityTemplateScaffoldReadyOptionView;/,
   'Activity editor domain should expose explicit template scaffold view contracts.'
+);
+assert.match(
+  activityEditorSource,
+  /export const ACTIVITY_EDITOR_TEMPLATE_HANDOFF_ITEM_IDS = \[(?=[\s\S]*'selected-template')(?=[\s\S]*'template-short-name')(?=[\s\S]*'current-template-readiness')(?=[\s\S]*'suggested-remix-options')(?=[\s\S]*'locked-template-options')(?=[\s\S]*'question-choice-readiness')(?=[\s\S]*'scaffold-reusable-coverage')(?=[\s\S]*'scaffold-teacher-notes')[\s\S]*export type ActivityEditorTemplateHandoffPrivacyContract = \{[\s\S]*exposesAnswerText: false;[\s\S]*exposesQuestionPromptText: false;[\s\S]*exposesRawEditorInput: false;[\s\S]*exposesRawScaffoldContent: false;[\s\S]*exposesSourceMaterialFileIds: false;[\s\S]*exposesSourceMaterialStorageKeys: false;[\s\S]*exposesTeacherNotesText: false;[\s\S]*itemIds: ActivityEditorTemplateHandoffItemId\[\];/,
+  'Activity editor template handoff should expose a typed 20-slice contract with explicit privacy flags.'
+);
+assert.match(
+  activityEditorSource,
+  /handoffView: ActivityEditorTemplateHandoffView;[\s\S]*handoffView: buildActivityEditorTemplateHandoffView\(\{[\s\S]*readinessSummary,[\s\S]*remixPlan: templateReadiness,[\s\S]*setupView,[\s\S]*template,[\s\S]*\}\)/,
+  'Activity editor template view should compose its handoff from prepared readiness, scaffold, and selected-template state.'
+);
+assert.match(
+  activityEditorSource,
+  /export function buildActivityEditorTemplateHandoffView(?=[\s\S]*readinessSummary: ActivityTemplateReadinessPanelSummary)(?=[\s\S]*setupView: ActivityEditorTemplateSetupView)(?=[\s\S]*template: ActivityTemplateDefinition)[\s\S]*id: 'selected-template'[\s\S]*id: 'current-template-readiness'[\s\S]*id: 'ready-template-options'[\s\S]*id: 'suggested-remix-options'[\s\S]*id: 'locked-template-options'[\s\S]*id: 'question-choice-readiness'[\s\S]*id: 'scaffold-reusable-coverage'[\s\S]*id: 'scaffold-teacher-notes'[\s\S]*privacy: buildActivityEditorTemplateHandoffPrivacyContract/,
+  'Activity editor template handoff should collect selected template, readiness, remix, scaffold, and field-coverage slices.'
+);
+assert.doesNotMatch(
+  activityEditorSource,
+  /ActivityEditorTemplateView\['handoffView'\]|ReturnType<\s*typeof buildActivityEditorTemplateHandoffView>/,
+  'Activity editor template handoff contracts should not derive from aggregate view indexes or builder return types.'
 );
 assert.match(
   activityEditorSource,
@@ -40009,6 +40030,53 @@ assert.deepEqual(
     ['groups', '3 groups', 3],
     ['vocabulary', '8 words', 8],
     ['teacherNotes', '2 notes', 2],
+  ]
+);
+const editorTemplateHandoffItemIds =
+  editorTemplateView.handoffView.itemViews.map((item) => item.id);
+assert.deepEqual(editorTemplateHandoffItemIds, [
+  ...ACTIVITY_EDITOR_TEMPLATE_HANDOFF_ITEM_IDS,
+]);
+assert.equal(editorTemplateView.handoffView.itemViews.length, 20);
+assert.deepEqual(editorTemplateView.handoffView.privacy, {
+  exposesAnswerText: false,
+  exposesQuestionPromptText: false,
+  exposesRawEditorInput: false,
+  exposesRawScaffoldContent: false,
+  exposesSourceMaterialFileIds: false,
+  exposesSourceMaterialStorageKeys: false,
+  exposesTeacherNotesText: false,
+  itemIds: editorTemplateHandoffItemIds,
+});
+assert.deepEqual(
+  editorTemplateView.handoffView.itemViews.map((item) => [
+    item.id,
+    item.value,
+  ]),
+  [
+    ['selected-template', 'Quiz'],
+    ['template-short-name', 'Quiz'],
+    ['classroom-mode', 'Individual'],
+    ['required-content', 'questions'],
+    ['current-template-readiness', 'Quiz is selected and ready.'],
+    ['ready-template-count', '4 ready'],
+    ['ready-template-options', 'Quiz, Fill, Listen, and Box'],
+    ['suggested-remix-options', 'Fill, Listen, and Box'],
+    ['locked-template-count', '4 locked'],
+    [
+      'locked-template-options',
+      'Add match pairs to unlock Match., Add match pairs to unlock Lines., Add groups to unlock Sort., and Add match pairs to unlock Pairs.',
+    ],
+    ['question-choice-readiness', '1/1 question ready'],
+    ['scaffold-action', 'Quiz example loaded.'],
+    ['scaffold-runtime-items', '4 playable items'],
+    ['scaffold-ready-modes', '8 modes ready'],
+    ['scaffold-reusable-coverage', 'Ready'],
+    ['scaffold-questions', '4 questions'],
+    ['scaffold-pairs', '8 pairs'],
+    ['scaffold-groups', '3 groups'],
+    ['scaffold-vocabulary', '8 words'],
+    ['scaffold-teacher-notes', '2 notes'],
   ]
 );
 assert.ok(

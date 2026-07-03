@@ -15,8 +15,11 @@ import {
   buildGenerateActivityDraftInputFromEditor,
   type GenerateActivityDraftInput,
 } from '@/activities/ai-draft';
-import { getTemplateByType } from '@/activities/catalog';
-import { getActivityTemplates } from '@/activities/catalog';
+import {
+  formatActivityTemplateClassroomMode,
+  getActivityTemplates,
+  getTemplateByType,
+} from '@/activities/catalog';
 import {
   activityEditPageCopy,
   buildActivityEditAccessView,
@@ -78,13 +81,18 @@ import {
   type CreateActivityInput,
 } from '@/activities/validation';
 import {
+  formatTemplateRequirementList,
   formatTemplateRequirementViews,
-  getTemplateRemixPlan,
   formatTemplateRequirements,
+  getTemplateRemixPlan,
   type TemplateRequirementView,
   type TemplateRemixPlan,
+  type TemplateRemixTemplateOption,
 } from '@/activities/template-remix';
-import { normalizeOptionalRuntimeDisplayText } from '@/activities/runtime-display';
+import {
+  normalizeOptionalRuntimeDisplayText,
+  normalizeRuntimeDisplayText,
+} from '@/activities/runtime-display';
 
 export const ACTIVITY_EDITOR_READINESS_PANEL_LIMITS = {
   lockedOptions: 4,
@@ -129,6 +137,59 @@ export type ActivityEditorTemplateSetupView = {
   scaffoldSummary: ActivityTemplateScaffoldReadinessSummary;
   shortName: string;
   successMessage: string;
+  title: string;
+};
+
+export const ACTIVITY_EDITOR_TEMPLATE_HANDOFF_ITEM_IDS = [
+  'selected-template',
+  'template-short-name',
+  'classroom-mode',
+  'required-content',
+  'current-template-readiness',
+  'ready-template-count',
+  'ready-template-options',
+  'suggested-remix-options',
+  'locked-template-count',
+  'locked-template-options',
+  'question-choice-readiness',
+  'scaffold-action',
+  'scaffold-runtime-items',
+  'scaffold-ready-modes',
+  'scaffold-reusable-coverage',
+  'scaffold-questions',
+  'scaffold-pairs',
+  'scaffold-groups',
+  'scaffold-vocabulary',
+  'scaffold-teacher-notes',
+] as const;
+
+export type ActivityEditorTemplateHandoffItemId =
+  (typeof ACTIVITY_EDITOR_TEMPLATE_HANDOFF_ITEM_IDS)[number];
+
+export type ActivityEditorTemplateHandoffItemView = {
+  ariaLabel: string;
+  description: string;
+  id: ActivityEditorTemplateHandoffItemId;
+  label: string;
+  statusLabel?: string;
+  value: string;
+};
+
+export type ActivityEditorTemplateHandoffPrivacyContract = {
+  exposesAnswerText: false;
+  exposesQuestionPromptText: false;
+  exposesRawEditorInput: false;
+  exposesRawScaffoldContent: false;
+  exposesSourceMaterialFileIds: false;
+  exposesSourceMaterialStorageKeys: false;
+  exposesTeacherNotesText: false;
+  itemIds: ActivityEditorTemplateHandoffItemId[];
+};
+
+export type ActivityEditorTemplateHandoffView = {
+  description: string;
+  itemViews: ActivityEditorTemplateHandoffItemView[];
+  privacy: ActivityEditorTemplateHandoffPrivacyContract;
   title: string;
 };
 
@@ -393,6 +454,7 @@ type ActivityEditorTemplateScaffoldApplication = {
 };
 
 export type ActivityEditorTemplateView = {
+  handoffView: ActivityEditorTemplateHandoffView;
   readinessSummary: ActivityTemplateReadinessPanelSummary;
   setupView: ActivityEditorTemplateSetupView;
   template: ActivityTemplateDefinition;
@@ -1817,19 +1879,312 @@ export function buildActivityEditorTemplateView({
   const scaffoldSummaryInput = parsedCurrentInput.success
     ? parsedCurrentInput.data
     : getActivityEditorDefaultInput();
+  const readinessSummary = buildActivityEditorReadinessPanelSummary(
+    templateReadiness,
+    currentContent
+  );
+  const setupView = buildActivityEditorTemplateSetupView(
+    templateType,
+    scaffoldSummaryInput
+  );
 
   return {
-    readinessSummary: buildActivityEditorReadinessPanelSummary(
-      templateReadiness,
-      currentContent
-    ),
-    setupView: buildActivityEditorTemplateSetupView(
-      templateType,
-      scaffoldSummaryInput
-    ),
+    handoffView: buildActivityEditorTemplateHandoffView({
+      readinessSummary,
+      remixPlan: templateReadiness,
+      setupView,
+      template,
+    }),
+    readinessSummary,
+    setupView,
     template,
     templateOptions,
   };
+}
+
+export function buildActivityEditorTemplateHandoffView({
+  readinessSummary,
+  remixPlan,
+  setupView,
+  template,
+}: {
+  readinessSummary: ActivityTemplateReadinessPanelSummary;
+  remixPlan: TemplateRemixPlan | null;
+  setupView: ActivityEditorTemplateSetupView;
+  template: ActivityTemplateDefinition;
+}): ActivityEditorTemplateHandoffView {
+  const selectedOption = remixPlan?.options.find(
+    (option) => option.template.type === template.type
+  );
+  const lockedOptions =
+    remixPlan?.options.filter((option) => !option.isReady) ?? [];
+  const suggestedOptions =
+    remixPlan?.suggestedOptions.map((option) => ({
+      shortName: option.template.shortName,
+      template: option.template.type,
+    })) ?? [];
+  const lockedTemplateCount = remixPlan
+    ? lockedOptions.length
+    : getActivityTemplates().length;
+  const scaffoldSummary = setupView.scaffoldSummary;
+  const itemViews: ActivityEditorTemplateHandoffItemView[] = [
+    buildActivityEditorTemplateHandoffItem({
+      description: template.description,
+      id: 'selected-template',
+      label: m.activity_form_field_primary_template(),
+      statusLabel: selectedOption?.readinessLabel,
+      value: template.name,
+    }),
+    buildActivityEditorTemplateHandoffItem({
+      description: m.activity_editor_template_handoff_short_name_description(),
+      id: 'template-short-name',
+      label: m.activity_editor_template_handoff_short_name_label(),
+      value: template.shortName,
+    }),
+    buildActivityEditorTemplateHandoffItem({
+      description:
+        m.activity_editor_template_handoff_classroom_mode_description(),
+      id: 'classroom-mode',
+      label: m.activity_editor_template_handoff_classroom_mode_label(),
+      value: formatActivityTemplateClassroomMode(template.classroomMode),
+    }),
+    buildActivityEditorTemplateHandoffItem({
+      description: m.activity_editor_template_handoff_requirement_description(),
+      id: 'required-content',
+      label: m.activity_editor_template_handoff_requirement_label(),
+      value: formatTemplateRequirementList(
+        formatTemplateRequirements(template.contentRequirements)
+      ),
+    }),
+    buildActivityEditorTemplateHandoffItem({
+      description:
+        m.activity_editor_template_handoff_current_readiness_description(),
+      id: 'current-template-readiness',
+      label: m.activity_editor_template_handoff_current_readiness_label(),
+      statusLabel:
+        selectedOption?.readinessLabel ?? m.template_remix_needs_more_content(),
+      value:
+        selectedOption?.diagnosis ??
+        m.activity_template_readiness_panel_empty(),
+    }),
+    buildActivityEditorTemplateHandoffItem({
+      description: readinessSummary.description,
+      id: 'ready-template-count',
+      label: readinessSummary.title,
+      value: readinessSummary.readyCountLabel,
+    }),
+    buildActivityEditorTemplateHandoffItem({
+      description:
+        m.activity_editor_template_handoff_ready_options_description(),
+      id: 'ready-template-options',
+      label: m.create_page_template_entry_ready_modes_label(),
+      value: formatActivityEditorTemplateHandoffTemplateOptions(
+        readinessSummary.readyOptions,
+        readinessSummary.emptyText
+      ),
+    }),
+    buildActivityEditorTemplateHandoffItem({
+      description: m.activity_editor_template_handoff_suggested_description(),
+      id: 'suggested-remix-options',
+      label: m.activity_editor_template_handoff_suggested_label(),
+      value: formatActivityEditorTemplateHandoffTemplateOptions(
+        suggestedOptions,
+        readinessSummary.emptyText
+      ),
+    }),
+    buildActivityEditorTemplateHandoffItem({
+      description: m.activity_editor_template_handoff_locked_description(),
+      id: 'locked-template-count',
+      label: m.activity_editor_template_handoff_locked_count_label(),
+      value: m.activity_editor_template_handoff_locked_value({
+        count: lockedTemplateCount,
+      }),
+    }),
+    buildActivityEditorTemplateHandoffItem({
+      description: m.activity_editor_template_handoff_locked_description(),
+      id: 'locked-template-options',
+      label: m.activity_editor_template_handoff_locked_count_label(),
+      value: formatActivityEditorTemplateHandoffList(
+        lockedOptions.map((option) => option.diagnosis),
+        readinessSummary.emptyText
+      ),
+    }),
+    buildActivityEditorTemplateHandoffItem({
+      description:
+        readinessSummary.questionChoiceReadiness?.description ??
+        m.activity_template_readiness_panel_quiz_choices_empty(),
+      id: 'question-choice-readiness',
+      label: m.activity_template_readiness_panel_quiz_choices_title(),
+      value:
+        readinessSummary.questionChoiceReadiness?.summaryLabel ??
+        m.activity_template_readiness_panel_quiz_choices_empty(),
+    }),
+    buildActivityEditorTemplateHandoffItem({
+      description: m.activity_editor_template_handoff_action_description(),
+      id: 'scaffold-action',
+      label: setupView.actionLabel,
+      value: setupView.successMessage,
+    }),
+    buildActivityEditorTemplateHandoffItem({
+      description: scaffoldSummary.title,
+      id: 'scaffold-runtime-items',
+      label: m.create_page_template_entry_runtime_items_label(),
+      value: scaffoldSummary.runtimeItemLabel,
+    }),
+    buildActivityEditorTemplateHandoffItem({
+      description: scaffoldSummary.title,
+      id: 'scaffold-ready-modes',
+      label: m.create_page_template_entry_ready_modes_label(),
+      value: scaffoldSummary.readyTemplateLabel,
+    }),
+    buildActivityEditorTemplateHandoffItem({
+      description:
+        m.activity_editor_template_handoff_reusable_coverage_description(),
+      id: 'scaffold-reusable-coverage',
+      label: m.activity_editor_template_handoff_reusable_coverage_label(),
+      statusLabel: scaffoldSummary.isReusableAcrossTemplates
+        ? m.template_remix_ready()
+        : m.template_remix_needs_more_content(),
+      value: scaffoldSummary.isReusableAcrossTemplates
+        ? m.template_remix_ready()
+        : m.template_remix_needs_more_content(),
+    }),
+    buildActivityEditorTemplateScaffoldMetricHandoffItem({
+      description: m.activity_form_questions_description(),
+      id: 'scaffold-questions',
+      label: m.activity_form_field_questions(),
+      metricId: 'questions',
+      setupView,
+    }),
+    buildActivityEditorTemplateScaffoldMetricHandoffItem({
+      description: m.activity_form_pairs_description(),
+      id: 'scaffold-pairs',
+      label: m.activity_form_field_pairs(),
+      metricId: 'pairs',
+      setupView,
+    }),
+    buildActivityEditorTemplateScaffoldMetricHandoffItem({
+      description: m.activity_form_groups_description(),
+      id: 'scaffold-groups',
+      label: m.activity_form_field_groups(),
+      metricId: 'groups',
+      setupView,
+    }),
+    buildActivityEditorTemplateScaffoldMetricHandoffItem({
+      description: m.activity_form_vocabulary_description(),
+      id: 'scaffold-vocabulary',
+      label: m.activity_form_field_vocabulary(),
+      metricId: 'vocabulary',
+      setupView,
+    }),
+    buildActivityEditorTemplateScaffoldMetricHandoffItem({
+      description: m.activity_form_teacher_notes_description(),
+      id: 'scaffold-teacher-notes',
+      label: m.activity_form_field_teacher_notes(),
+      metricId: 'teacherNotes',
+      setupView,
+    }),
+  ];
+
+  return {
+    description: m.activity_editor_template_handoff_description(),
+    itemViews,
+    privacy: buildActivityEditorTemplateHandoffPrivacyContract(itemViews),
+    title: m.activity_editor_template_handoff_title(),
+  };
+}
+
+function buildActivityEditorTemplateScaffoldMetricHandoffItem({
+  description,
+  id,
+  label,
+  metricId,
+  setupView,
+}: {
+  description: string;
+  id: ActivityEditorTemplateHandoffItemId;
+  label: string;
+  metricId: ActivityTemplateScaffoldCoverageMetricView['id'];
+  setupView: ActivityEditorTemplateSetupView;
+}) {
+  const metric = setupView.scaffoldSummary.coverageMetrics.find(
+    (item) => item.id === metricId
+  );
+
+  return buildActivityEditorTemplateHandoffItem({
+    description,
+    id,
+    label,
+    statusLabel: metric?.meetsTarget
+      ? m.template_remix_ready()
+      : m.template_remix_needs_more_content(),
+    value: metric?.label ?? m.activity_template_readiness_panel_empty(),
+  });
+}
+
+function buildActivityEditorTemplateHandoffPrivacyContract(
+  itemViews: ActivityEditorTemplateHandoffItemView[]
+): ActivityEditorTemplateHandoffPrivacyContract {
+  return {
+    exposesAnswerText: false,
+    exposesQuestionPromptText: false,
+    exposesRawEditorInput: false,
+    exposesRawScaffoldContent: false,
+    exposesSourceMaterialFileIds: false,
+    exposesSourceMaterialStorageKeys: false,
+    exposesTeacherNotesText: false,
+    itemIds: itemViews.map((item) => item.id),
+  };
+}
+
+function buildActivityEditorTemplateHandoffItem({
+  description,
+  id,
+  label,
+  statusLabel,
+  value,
+}: {
+  description: string;
+  id: ActivityEditorTemplateHandoffItemId;
+  label: string;
+  statusLabel?: string;
+  value: string;
+}): ActivityEditorTemplateHandoffItemView {
+  return {
+    ariaLabel: m.activity_editor_template_handoff_item_aria_label({
+      description,
+      label,
+      value,
+    }),
+    description,
+    id,
+    label,
+    statusLabel,
+    value,
+  };
+}
+
+function formatActivityEditorTemplateHandoffTemplateOptions(
+  options: TemplateRemixTemplateOption[],
+  emptyText: string
+) {
+  return formatActivityEditorTemplateHandoffList(
+    options.map((option) => option.shortName),
+    emptyText
+  );
+}
+
+function formatActivityEditorTemplateHandoffList(
+  values: readonly string[],
+  emptyText: string
+) {
+  const normalizedValues = values
+    .map(normalizeRuntimeDisplayText)
+    .filter(Boolean);
+
+  if (normalizedValues.length === 0) return emptyText;
+
+  return formatTemplateRequirementList(normalizedValues);
 }
 
 export function buildActivityEditorReadinessPanelSummary(
