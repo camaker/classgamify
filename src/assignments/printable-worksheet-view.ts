@@ -30,8 +30,11 @@ import { Routes } from '@/lib/routes';
 import { m } from '@/locale/paraglide/messages';
 
 export type PrintableWorksheetHeaderOverviewItem = {
+  ariaLabel: string;
+  description: string;
   id: 'answer-key' | 'items' | 'response-modes';
   label: string;
+  value: string;
 };
 
 export type PrintableWorksheetAnswerKeyAccessState =
@@ -53,6 +56,7 @@ export type PrintableWorksheetPreparationItemId =
   | 'student-fields';
 
 export type PrintableWorksheetPreparationItemView = {
+  ariaLabel: string;
   description: string;
   id: PrintableWorksheetPreparationItemId;
   label: string;
@@ -84,7 +88,9 @@ export type PrintableWorksheetAnswerLineView = {
 };
 
 export type PrintableWorksheetChoiceBankChoiceView = {
+  ariaLabel: string;
   choice: string;
+  description: string;
   indexLabel: string;
   key: string;
 };
@@ -122,12 +128,14 @@ export type PrintableWorksheetAnswerKeyDetailId =
   | 'explanation';
 
 export type PrintableWorksheetAnswerKeyDetailView = {
+  ariaLabel: string;
   id: PrintableWorksheetAnswerKeyDetailId;
   label: string;
   tone: 'primary' | 'secondary';
 };
 
 export type PrintableWorksheetAnswerKeyItemView = {
+  ariaLabel: string;
   detailViews: PrintableWorksheetAnswerKeyDetailView[];
   headingLabel: string;
   id: string;
@@ -135,12 +143,17 @@ export type PrintableWorksheetAnswerKeyItemView = {
 };
 
 export type PrintableWorksheetBlankFieldView = {
+  ariaLabel: string;
+  description: string;
   id: 'date' | 'score' | 'student-name';
   kind: 'blank-line';
   label: string;
+  value: string;
 };
 
 export type PrintableWorksheetTextFieldView = {
+  ariaLabel: string;
+  description: string;
   id:
     | 'delivery-policy'
     | 'instructions'
@@ -256,6 +269,12 @@ export const printableWorksheetPageCopy = {
   get answerKeyTitle() {
     return m.assignment_printable_answer_key_title();
   },
+  get blankFieldDescription() {
+    return m.assignment_printable_field_blank_description();
+  },
+  get blankFieldValue() {
+    return m.assignment_printable_field_blank_value();
+  },
   get backToResultsLabel() {
     return m.assignment_printable_back_to_results();
   },
@@ -340,6 +359,9 @@ export const printableWorksheetPageCopy = {
   get templateLabel() {
     return m.assignment_printable_template_label();
   },
+  get textFieldDescription() {
+    return m.assignment_printable_field_text_description();
+  },
 } as const;
 
 export function buildPrintableWorksheetHeaderView(
@@ -375,23 +397,60 @@ export function buildPrintableWorksheetHeaderOverviewItems(
     answerKeyAccessView?: PrintableWorksheetAnswerKeyAccessView;
   }
 ): PrintableWorksheetHeaderOverviewItem[] {
+  const itemCountValue = formatPrintableWorksheetOverviewItemCount(
+    summary.itemCount
+  );
+  const responseModesValue =
+    formatPrintableWorksheetOverviewResponseModes(summary);
+  const answerKeyValue = formatPrintableWorksheetAnswerKeyOverviewLabel(
+    summary,
+    options?.answerKeyAccessView
+  );
+  const answerKeyDescription =
+    options?.answerKeyAccessView?.description ??
+    (summary.showAnswerKey
+      ? printableWorksheetPageCopy.answerKeyAccessIncludedDescription
+      : printableWorksheetPageCopy.answerKeyAccessHiddenDescription);
+
   return [
-    {
+    buildPrintableWorksheetHeaderOverviewItemView({
+      description: m.assignment_printable_overview_items_description(),
       id: 'items',
-      label: formatPrintableWorksheetOverviewItemCount(summary.itemCount),
-    },
-    {
+      label: m.assignment_printable_overview_items_label(),
+      value: itemCountValue,
+    }),
+    buildPrintableWorksheetHeaderOverviewItemView({
+      description: m.assignment_printable_overview_response_modes_description(),
       id: 'response-modes',
-      label: formatPrintableWorksheetOverviewResponseModes(summary),
-    },
-    {
+      label: m.assignment_printable_overview_response_modes_label(),
+      value: responseModesValue,
+    }),
+    buildPrintableWorksheetHeaderOverviewItemView({
+      description: answerKeyDescription,
       id: 'answer-key',
-      label: formatPrintableWorksheetAnswerKeyOverviewLabel(
-        summary,
-        options?.answerKeyAccessView
-      ),
-    },
+      label: m.assignment_printable_overview_answer_key_label(),
+      value: answerKeyValue,
+    }),
   ];
+}
+
+function buildPrintableWorksheetHeaderOverviewItemView({
+  description,
+  id,
+  label,
+  value,
+}: Omit<PrintableWorksheetHeaderOverviewItem, 'ariaLabel'>) {
+  return {
+    ariaLabel: buildPrintableWorksheetSemanticAriaLabel({
+      description,
+      label,
+      value,
+    }),
+    description,
+    id,
+    label,
+    value,
+  };
 }
 
 function formatPrintableWorksheetAnswerKeyOverviewLabel(
@@ -474,14 +533,14 @@ export function buildPrintableWorksheetPreparationView(
   return {
     description: printableWorksheetPageCopy.preparationDescription,
     items: [
-      {
+      buildPrintableWorksheetPreparationItemView({
         description:
           printableWorksheetPageCopy.preparationStudentFieldsDescription,
         id: 'student-fields',
         label: printableWorksheetPageCopy.preparationStudentFieldsLabel,
         value: printableWorksheetPageCopy.preparationStudentFieldsValue,
-      },
-      {
+      }),
+      buildPrintableWorksheetPreparationItemView({
         description:
           printableWorksheetPageCopy.preparationResponsePlanDescription,
         id: 'response-plan',
@@ -493,15 +552,34 @@ export function buildPrintableWorksheetPreparationView(
           responseSummary:
             formatPrintableWorksheetOverviewResponseModes(summary),
         }),
-      },
-      {
+      }),
+      buildPrintableWorksheetPreparationItemView({
         description: answerKeyAccessView.description,
         id: 'answer-key',
         label: printableWorksheetPageCopy.preparationAnswerKeyLabel,
         value: answerKeyAccessView.value,
-      },
+      }),
     ],
     title: printableWorksheetPageCopy.preparationTitle,
+  };
+}
+
+function buildPrintableWorksheetPreparationItemView({
+  description,
+  id,
+  label,
+  value,
+}: Omit<PrintableWorksheetPreparationItemView, 'ariaLabel'>) {
+  return {
+    ariaLabel: buildPrintableWorksheetSemanticAriaLabel({
+      description,
+      label,
+      value,
+    }),
+    description,
+    id,
+    label,
+    value,
   };
 }
 
@@ -586,53 +664,97 @@ export function buildPrintableWorksheetAssignmentFieldViews(
   headerView: PrintableWorksheetHeaderView
 ): PrintableWorksheetAssignmentFieldView[] {
   return [
-    {
+    buildPrintableWorksheetBlankFieldView({
       id: 'student-name',
       kind: 'blank-line',
       label: printableWorksheetPageCopy.studentNameLabel,
-    },
-    {
+    }),
+    buildPrintableWorksheetBlankFieldView({
       id: 'date',
       kind: 'blank-line',
       label: printableWorksheetPageCopy.dateLabel,
-    },
-    {
+    }),
+    buildPrintableWorksheetBlankFieldView({
       id: 'score',
       kind: 'blank-line',
       label: printableWorksheetPageCopy.scoreLabel,
-    },
-    {
+    }),
+    buildPrintableWorksheetTextFieldView({
       id: 'share-path',
       kind: 'text',
       label: printableWorksheetPageCopy.sharePathLabel,
       value: headerView.sharePath,
-    },
-    {
+    }),
+    buildPrintableWorksheetTextFieldView({
       id: 'template',
       kind: 'text',
       label: printableWorksheetPageCopy.templateLabel,
       value: headerView.templateLabel,
-    },
+    }),
     buildPrintableWorksheetSnapshotSourceFieldView(headerView),
-    {
+    buildPrintableWorksheetTextFieldView({
       id: 'instructions',
       kind: 'text',
       label: printableWorksheetPageCopy.instructionsLabel,
       value: headerView.instructions,
-    },
-    {
+    }),
+    buildPrintableWorksheetTextFieldView({
       id: 'delivery-policy',
       kind: 'text',
       label: printableWorksheetPageCopy.deliveryPolicyLabel,
       value: headerView.deliveryPolicy,
-    },
+    }),
   ];
+}
+
+function buildPrintableWorksheetBlankFieldView({
+  id,
+  kind,
+  label,
+}: Pick<PrintableWorksheetBlankFieldView, 'id' | 'kind' | 'label'>) {
+  const description = printableWorksheetPageCopy.blankFieldDescription;
+  const value = printableWorksheetPageCopy.blankFieldValue;
+
+  return {
+    ariaLabel: buildPrintableWorksheetSemanticAriaLabel({
+      description,
+      label,
+      value,
+    }),
+    description,
+    id,
+    kind,
+    label,
+    value,
+  };
+}
+
+function buildPrintableWorksheetTextFieldView({
+  id,
+  kind,
+  label,
+  value,
+}: Pick<PrintableWorksheetTextFieldView, 'id' | 'kind' | 'label' | 'value'>) {
+  const description = printableWorksheetPageCopy.textFieldDescription;
+
+  return {
+    ariaLabel: buildPrintableWorksheetSemanticAriaLabel({
+      description,
+      label,
+      value,
+    }),
+    description,
+    id,
+    kind,
+    label,
+    value,
+  };
 }
 
 export function buildPrintableWorksheetSnapshotSourceFieldView(
   headerView: PrintableWorksheetHeaderView
 ): PrintableWorksheetAssignmentFieldView {
-  return {
+  return buildPrintableWorksheetTextFieldView({
     id: 'snapshot-source',
     kind: 'text',
     label: printableWorksheetPageCopy.snapshotSourceLabel,
@@ -640,7 +762,7 @@ export function buildPrintableWorksheetSnapshotSourceFieldView(
       activityTitle: headerView.activityTitle,
       sharePath: headerView.sharePath,
     }),
-  };
+  });
 }
 
 export function buildPrintableWorksheetEmptyState(): PrintableWorksheetEmptyState {
@@ -712,6 +834,22 @@ export function buildPrintableWorksheetAnswerKeyAccessView({
     state,
     value,
   };
+}
+
+function buildPrintableWorksheetSemanticAriaLabel({
+  description,
+  label,
+  value,
+}: {
+  description: string;
+  label: string;
+  value: string;
+}) {
+  return m.assignment_printable_semantic_item_aria_label({
+    description,
+    label,
+    value,
+  });
 }
 
 function getPrintableWorksheetAnswerKeyAccessState({
@@ -823,19 +961,27 @@ export function buildPrintableWorksheetAnswerKeyItemView(
     ),
   });
 
+  const headingLabel = m.assignment_printable_item_heading({
+    kindLabel: formatRuntimeItemKindLabel(item),
+    sequenceLabel,
+  });
+  const prompt = formatPrintableWorksheetAnswerKeyPrompt(item);
+
   return {
+    ariaLabel: buildPrintableWorksheetSemanticAriaLabel({
+      description: prompt,
+      label: headingLabel,
+      value: formatPrintableWorksheetValue(item.answer),
+    }),
     detailViews: buildPrintableWorksheetAnswerKeyDetailViews({
       acceptedAnswers,
       answer: item.answer,
       explanation,
       sequenceNumber: item.sequenceNumber,
     }),
-    headingLabel: m.assignment_printable_item_heading({
-      kindLabel: formatRuntimeItemKindLabel(item),
-      sequenceLabel,
-    }),
+    headingLabel,
     id: item.id,
-    prompt: formatPrintableWorksheetAnswerKeyPrompt(item),
+    prompt,
   };
 }
 
@@ -851,7 +997,7 @@ function buildPrintableWorksheetAnswerKeyDetailViews({
   sequenceNumber: number;
 }): PrintableWorksheetAnswerKeyDetailView[] {
   return [
-    {
+    buildPrintableWorksheetAnswerKeyDetailView({
       id: 'expected-answer',
       label: m.assignment_printable_answer_key_item({
         answer: formatPrintableWorksheetValue(answer),
@@ -859,30 +1005,43 @@ function buildPrintableWorksheetAnswerKeyDetailViews({
           normalizePrintableWorksheetSequenceNumber(sequenceNumber),
       }),
       tone: 'primary',
-    },
+    }),
     ...(acceptedAnswers
       ? [
-          {
+          buildPrintableWorksheetAnswerKeyDetailView({
             id: 'accepted-answers',
             label: m.assignment_printable_answer_key_accepted({
               acceptedAnswers,
             }),
             tone: 'secondary',
-          } satisfies PrintableWorksheetAnswerKeyDetailView,
+          }),
         ]
       : []),
     ...(explanation
       ? [
-          {
+          buildPrintableWorksheetAnswerKeyDetailView({
             id: 'explanation',
             label: m.assignment_printable_answer_key_explanation({
               explanation,
             }),
             tone: 'secondary',
-          } satisfies PrintableWorksheetAnswerKeyDetailView,
+          }),
         ]
       : []),
   ];
+}
+
+function buildPrintableWorksheetAnswerKeyDetailView({
+  id,
+  label,
+  tone,
+}: Omit<PrintableWorksheetAnswerKeyDetailView, 'ariaLabel'>) {
+  return {
+    ariaLabel: label,
+    id,
+    label,
+    tone,
+  };
 }
 
 function buildPrintableWorksheetChoiceBankView(
@@ -892,29 +1051,64 @@ function buildPrintableWorksheetChoiceBankView(
   const choices = showChoiceBank
     ? (normalizeRuntimeChoiceList(item.choices) ?? [])
     : [];
+  const label =
+    showChoiceBank && choices.length > 0
+      ? getPrintableWorksheetChoiceBankLabel(item.choicePresentation)
+      : null;
+  const summary = formatPrintableWorksheetChoiceBankSummary({
+    count: choices.length,
+    presentation: item.choicePresentation,
+    showChoiceBank,
+  });
 
   return {
-    choices: choices.map((choice, index) => ({
-      choice,
-      indexLabel: formatPrintableWorksheetChoiceIndex(index),
-      key: `${item.id}-choice-${index}`,
-    })),
+    choices: choices.map((choice, index) =>
+      buildPrintableWorksheetChoiceBankChoiceView({
+        choice,
+        description: summary ?? '',
+        index,
+        itemId: item.id,
+        label,
+      })
+    ),
     emptySummary:
       showChoiceBank && choices.length === 0
         ? m.assignment_printable_choice_bank_empty()
         : null,
-    label:
-      showChoiceBank && choices.length > 0
-        ? getPrintableWorksheetChoiceBankLabel(item.choicePresentation)
-        : null,
+    label,
     presentation: item.choicePresentation,
     show: showChoiceBank,
     showIndexLabels: showChoiceBank && item.choicePresentation !== 'group-bank',
-    summary: formatPrintableWorksheetChoiceBankSummary({
-      count: choices.length,
-      presentation: item.choicePresentation,
-      showChoiceBank,
+    summary,
+  };
+}
+
+function buildPrintableWorksheetChoiceBankChoiceView({
+  choice,
+  description,
+  index,
+  itemId,
+  label,
+}: {
+  choice: string;
+  description: string;
+  index: number;
+  itemId: string;
+  label: string | null;
+}) {
+  const indexLabel = formatPrintableWorksheetChoiceIndex(index);
+  const choiceLabel = label ?? indexLabel;
+
+  return {
+    ariaLabel: buildPrintableWorksheetSemanticAriaLabel({
+      description,
+      label: choiceLabel,
+      value: choice,
     }),
+    choice,
+    description,
+    indexLabel,
+    key: `${itemId}-choice-${index}`,
   };
 }
 

@@ -51,6 +51,9 @@ function PrintableWorksheetAnswerKeyToggle({
   const answerKeyDescriptionId = 'printable-answer-key-description';
   const answerKeyStatusDescriptionId =
     'printable-answer-key-status-description';
+  const answerKeyLabelId = 'printable-answer-key-label';
+  const answerKeyStatusLabelId = 'printable-answer-key-status-label';
+  const answerKeyStatusValueId = 'printable-answer-key-status-value';
 
   return (
     <label
@@ -61,19 +64,30 @@ function PrintableWorksheetAnswerKeyToggle({
         id="printable-answer-key"
         checked={toggleView.value}
         aria-describedby={`${answerKeyDescriptionId} ${answerKeyStatusDescriptionId}`}
+        aria-labelledby={answerKeyLabelId}
         onCheckedChange={onAnswerKeyChange}
       />
       <span className="grid gap-1">
         <span className="flex flex-wrap items-center gap-2">
-          <span>{toggleView.label}</span>
+          <span id={answerKeyLabelId}>{toggleView.label}</span>
           <Badge
             aria-describedby={answerKeyStatusDescriptionId}
-            aria-label={toggleView.accessView.ariaLabel}
+            aria-labelledby={`${answerKeyStatusLabelId} ${answerKeyStatusValueId}`}
             className="rounded-md"
             data-print-answer-key-state={toggleView.accessView.state}
             variant="outline"
           >
-            <output>{toggleView.accessView.value}</output>
+            <span id={answerKeyStatusLabelId} className="sr-only">
+              {toggleView.accessView.label}
+            </span>
+            <output
+              aria-describedby={answerKeyStatusDescriptionId}
+              aria-label={toggleView.accessView.ariaLabel}
+              aria-labelledby={`${answerKeyStatusLabelId} ${answerKeyStatusValueId}`}
+              id={answerKeyStatusValueId}
+            >
+              {toggleView.accessView.value}
+            </output>
           </Badge>
         </span>
         <span
@@ -121,14 +135,17 @@ function PrintableWorksheetBackToResultsLink({
 }: {
   action: PrintableWorksheetBackToResultsAction;
 }) {
+  const labelId = 'printable-worksheet-back-to-results-label';
+
   return (
     <Link
       to={action.to}
       params={{ assignmentId: action.assignmentId }}
+      aria-labelledby={labelId}
       className={cn(buttonVariants({ variant: 'outline' }), 'w-fit')}
     >
       <IconArrowLeft aria-hidden="true" className="size-4" />
-      {action.label}
+      <span id={labelId}>{action.label}</span>
     </Link>
   );
 }

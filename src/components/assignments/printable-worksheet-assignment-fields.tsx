@@ -43,11 +43,32 @@ function PrintableWorksheetBlankField({
 }: {
   fieldView: PrintableWorksheetBlankFieldView;
 }) {
+  const labelId = `printable-worksheet-assignment-field-${fieldView.id}-label`;
+  const valueId = `printable-worksheet-assignment-field-${fieldView.id}-value`;
+  const descriptionId = `printable-worksheet-assignment-field-${fieldView.id}-description`;
+
   return (
-    <div>
-      <p className="font-medium">{fieldView.label}</p>
-      <div className="mt-3 h-8 border-b" />
-    </div>
+    <article
+      aria-describedby={descriptionId}
+      aria-labelledby={`${labelId} ${valueId}`}
+    >
+      <p id={labelId} className="font-medium">
+        {fieldView.label}
+      </p>
+      <output
+        aria-describedby={descriptionId}
+        aria-label={fieldView.ariaLabel}
+        aria-labelledby={`${labelId} ${valueId}`}
+        className="sr-only"
+        id={valueId}
+      >
+        {fieldView.value}
+      </output>
+      <div aria-hidden="true" className="mt-3 h-8 border-b" />
+      <p id={descriptionId} className="sr-only">
+        {fieldView.description}
+      </p>
+    </article>
   );
 }
 
@@ -56,10 +77,30 @@ function PrintableWorksheetTextField({
 }: {
   fieldView: PrintableWorksheetTextFieldView;
 }) {
+  const labelId = `printable-worksheet-assignment-field-${fieldView.id}-label`;
+  const valueId = `printable-worksheet-assignment-field-${fieldView.id}-value`;
+  const descriptionId = `printable-worksheet-assignment-field-${fieldView.id}-description`;
+
   return (
-    <div>
-      <p className="font-medium">{fieldView.label}</p>
-      <p className="mt-2 text-muted-foreground">{fieldView.value}</p>
-    </div>
+    <article
+      aria-describedby={descriptionId}
+      aria-labelledby={`${labelId} ${valueId}`}
+    >
+      <p id={labelId} className="font-medium">
+        {fieldView.label}
+      </p>
+      <output
+        aria-describedby={descriptionId}
+        aria-label={fieldView.ariaLabel}
+        aria-labelledby={`${labelId} ${valueId}`}
+        className="mt-2 block text-muted-foreground"
+        id={valueId}
+      >
+        {fieldView.value}
+      </output>
+      <p id={descriptionId} className="sr-only">
+        {fieldView.description}
+      </p>
+    </article>
   );
 }

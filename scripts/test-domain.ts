@@ -21317,19 +21317,88 @@ assert.deepEqual(
     showAnswerKey: false,
   }
 );
+function simplifyPrintableHeaderOverviewItems(
+  items: ReturnType<typeof buildPrintableWorksheetHeaderOverviewItems>
+) {
+  return items.map((item) => ({
+    id: item.id,
+    label: item.label,
+    value: item.value,
+  }));
+}
+
+function simplifyPrintablePreparationView(
+  view: ReturnType<typeof buildPrintableWorksheetPreparationView>
+) {
+  return {
+    description: view.description,
+    items: view.items.map((item) => ({
+      description: item.description,
+      id: item.id,
+      label: item.label,
+      value: item.value,
+    })),
+    title: view.title,
+  };
+}
+
+function simplifyPrintableChoiceBankChoices(
+  choices: ReturnType<typeof buildPrintableWorksheetItemView>['choiceBank']['choices']
+) {
+  return choices.map((choice) => ({
+    choice: choice.choice,
+    indexLabel: choice.indexLabel,
+    key: choice.key,
+  }));
+}
+
+function simplifyPrintableAnswerKeyItemView(
+  item: ReturnType<typeof buildPrintableWorksheetAnswerKeyItemView>
+) {
+  return {
+    detailViews: item.detailViews.map((detail) => ({
+      id: detail.id,
+      label: detail.label,
+      tone: detail.tone,
+    })),
+    headingLabel: item.headingLabel,
+    id: item.id,
+    prompt: item.prompt,
+  };
+}
+
+function simplifyPrintableAssignmentFieldViews(
+  fields: ReturnType<typeof buildPrintableWorksheetPageViewModel>['assignmentFieldViews']
+) {
+  return fields.map((field) => ({
+    id: field.id,
+    kind: field.kind,
+    label: field.label,
+    ...(field.kind === 'text' ? { value: field.value } : {}),
+  }));
+}
+
 assert.deepEqual(
-  buildPrintableWorksheetHeaderOverviewItems(
-    summarizePrintableAssignmentWorksheet(printableSnapshotWorksheet)
+  simplifyPrintableHeaderOverviewItems(
+    buildPrintableWorksheetHeaderOverviewItems(
+      summarizePrintableAssignmentWorksheet(printableSnapshotWorksheet)
+    )
   ),
   [
-    { id: 'items', label: '1 item' },
-    { id: 'response-modes', label: 'Multiple choice practice' },
-    { id: 'answer-key', label: 'Answer key hidden' },
+    { id: 'items', label: 'Printable items', value: '1 item' },
+    {
+      id: 'response-modes',
+      label: 'Response modes',
+      value: 'Multiple choice practice',
+    },
+    { id: 'answer-key', label: 'Answer key', value: 'Answer key hidden' },
   ]
 );
 assert.deepEqual(
-  buildPrintableWorksheetPreparationView(
-    summarizePrintableAssignmentWorksheet(printableSnapshotWorksheet)
+  simplifyPrintablePreparationView(
+    buildPrintableWorksheetPreparationView(
+      summarizePrintableAssignmentWorksheet(printableSnapshotWorksheet)
+    )
   ),
   {
     description:
@@ -21595,13 +21664,19 @@ assert.deepEqual(
   }
 );
 assert.deepEqual(
-  buildPrintableWorksheetHeaderOverviewItems(
-    summarizePrintableAssignmentWorksheet(messyPrintableWorksheet)
+  simplifyPrintableHeaderOverviewItems(
+    buildPrintableWorksheetHeaderOverviewItems(
+      summarizePrintableAssignmentWorksheet(messyPrintableWorksheet)
+    )
   ),
   [
-    { id: 'items', label: '1 item' },
-    { id: 'response-modes', label: 'Multiple choice practice' },
-    { id: 'answer-key', label: 'Answer key included' },
+    { id: 'items', label: 'Printable items', value: '1 item' },
+    {
+      id: 'response-modes',
+      label: 'Response modes',
+      value: 'Multiple choice practice',
+    },
+    { id: 'answer-key', label: 'Answer key', value: 'Answer key included' },
   ]
 );
 const printableShortAnswerWorksheet = buildPrintableAssignmentWorksheet({
@@ -21651,13 +21726,19 @@ assert.deepEqual(
   }
 );
 assert.deepEqual(
-  buildPrintableWorksheetHeaderOverviewItems(
-    summarizePrintableAssignmentWorksheet(printableShortAnswerWorksheet)
+  simplifyPrintableHeaderOverviewItems(
+    buildPrintableWorksheetHeaderOverviewItems(
+      summarizePrintableAssignmentWorksheet(printableShortAnswerWorksheet)
+    )
   ),
   [
-    { id: 'items', label: '1 item' },
-    { id: 'response-modes', label: 'Written answer practice' },
-    { id: 'answer-key', label: 'Answer key hidden' },
+    { id: 'items', label: 'Printable items', value: '1 item' },
+    {
+      id: 'response-modes',
+      label: 'Response modes',
+      value: 'Written answer practice',
+    },
+    { id: 'answer-key', label: 'Answer key', value: 'Answer key hidden' },
   ]
 );
 const emptyPrintableWorksheet = buildPrintableAssignmentWorksheet({
@@ -21688,13 +21769,19 @@ assert.deepEqual(
   }
 );
 assert.deepEqual(
-  buildPrintableWorksheetHeaderOverviewItems(
-    summarizePrintableAssignmentWorksheet(emptyPrintableWorksheet)
+  simplifyPrintableHeaderOverviewItems(
+    buildPrintableWorksheetHeaderOverviewItems(
+      summarizePrintableAssignmentWorksheet(emptyPrintableWorksheet)
+    )
   ),
   [
-    { id: 'items', label: '0 items' },
-    { id: 'response-modes', label: '0 response modes' },
-    { id: 'answer-key', label: 'Answer key hidden' },
+    { id: 'items', label: 'Printable items', value: '0 items' },
+    {
+      id: 'response-modes',
+      label: 'Response modes',
+      value: '0 response modes',
+    },
+    { id: 'answer-key', label: 'Answer key', value: 'Answer key hidden' },
   ]
 );
 const printableSnapshotItemView = buildPrintableWorksheetItemView(
@@ -21715,7 +21802,7 @@ assert.equal(
 assert.deepEqual(printableSnapshotItemView.answerLines, [
   { key: 'q-frozen-prompt-answer-line-0' },
 ]);
-assert.deepEqual(printableSnapshotItemView.choiceBank.choices, [
+assert.deepEqual(simplifyPrintableChoiceBankChoices(printableSnapshotItemView.choiceBank.choices), [
   {
     choice: 'Frozen answer / Frozen accepted',
     indexLabel: 'A',
@@ -21754,7 +21841,7 @@ assert.deepEqual(messyPrintableItemView.answerLines, [
   { key: 'messy-print-item-answer-line-0' },
 ]);
 assert.deepEqual(messyPrintableItemView.choices, ['Paris', 'Rome']);
-assert.deepEqual(messyPrintableItemView.choiceBank.choices, [
+assert.deepEqual(simplifyPrintableChoiceBankChoices(messyPrintableItemView.choiceBank.choices), [
   {
     choice: 'Paris',
     indexLabel: 'A',
@@ -21923,7 +22010,7 @@ try {
   assert.equal(zhPrintableItemView.choiceBank.summary, '2 个选项');
   assert.equal(zhPrintableItemView.choiceBank.show, true);
   assert.equal(zhPrintableItemView.responseModeLabel, '作答方式：选择题');
-  assert.deepEqual(zhPrintableItemView.choiceBank.choices, [
+  assert.deepEqual(simplifyPrintableChoiceBankChoices(zhPrintableItemView.choiceBank.choices), [
     {
       choice: '苹果',
       indexLabel: 'A',
@@ -21936,44 +22023,48 @@ try {
     },
   ]);
   assert.deepEqual(
-    buildPrintableWorksheetHeaderOverviewItems(
-      summarizePrintableAssignmentWorksheet({
-        ...printableShortAnswerWorksheet,
-        items: [
-          {
-            ...printableShortAnswerWorksheet.items[0]!,
-            responseMode: 'short-answer',
-          },
-          {
-            ...printableShortAnswerWorksheet.items[0]!,
-            id: 'zh-printable-group',
-            responseMode: 'group-choice',
-          },
-        ],
-      })
+    simplifyPrintableHeaderOverviewItems(
+      buildPrintableWorksheetHeaderOverviewItems(
+        summarizePrintableAssignmentWorksheet({
+          ...printableShortAnswerWorksheet,
+          items: [
+            {
+              ...printableShortAnswerWorksheet.items[0]!,
+              responseMode: 'short-answer',
+            },
+            {
+              ...printableShortAnswerWorksheet.items[0]!,
+              id: 'zh-printable-group',
+              responseMode: 'group-choice',
+            },
+          ],
+        })
+      )
     ),
     [
-      { id: 'items', label: '2 道题' },
-      { id: 'response-modes', label: '2 种作答方式' },
-      { id: 'answer-key', label: '未包含答案页' },
+      { id: 'items', label: '可打印题目', value: '2 道题' },
+      { id: 'response-modes', label: '作答形式', value: '2 种作答方式' },
+      { id: 'answer-key', label: '答案页', value: '未包含答案页' },
     ]
   );
   assert.deepEqual(
-    buildPrintableWorksheetPreparationView(
-      summarizePrintableAssignmentWorksheet({
-        ...printableShortAnswerWorksheet,
-        items: [
-          {
-            ...printableShortAnswerWorksheet.items[0]!,
-            responseMode: 'short-answer',
-          },
-          {
-            ...printableShortAnswerWorksheet.items[0]!,
-            id: 'zh-printable-group',
-            responseMode: 'group-choice',
-          },
-        ],
-      })
+    simplifyPrintablePreparationView(
+      buildPrintableWorksheetPreparationView(
+        summarizePrintableAssignmentWorksheet({
+          ...printableShortAnswerWorksheet,
+          items: [
+            {
+              ...printableShortAnswerWorksheet.items[0]!,
+              responseMode: 'short-answer',
+            },
+            {
+              ...printableShortAnswerWorksheet.items[0]!,
+              id: 'zh-printable-group',
+              responseMode: 'group-choice',
+            },
+          ],
+        })
+      )
     ),
     {
       description: '打开浏览器打印窗口前，先检查这份纸质发放版本。',
@@ -22070,8 +22161,10 @@ assert.deepEqual(
   }
 );
 assert.deepEqual(
-  buildPrintableWorksheetAnswerKeyItemView(
-    printableSnapshotWorksheetWithAnswers.answerKey[0]!
+  simplifyPrintableAnswerKeyItemView(
+    buildPrintableWorksheetAnswerKeyItemView(
+      printableSnapshotWorksheetWithAnswers.answerKey[0]!
+    )
   ),
   {
     detailViews: [
@@ -22093,15 +22186,17 @@ assert.deepEqual(
   }
 );
 assert.deepEqual(
-  buildPrintableWorksheetAnswerKeyItemView({
-    acceptedAnswers: [' Paris ', 'Paris, France'],
-    answer: ' Paris ',
-    explanation: '  France capital.  ',
-    id: 'messy-answer-key',
-    kind: 'question',
-    prompt: '  Capital   of   France?  ',
-    sequenceNumber: Number.POSITIVE_INFINITY,
-  }),
+  simplifyPrintableAnswerKeyItemView(
+    buildPrintableWorksheetAnswerKeyItemView({
+      acceptedAnswers: [' Paris ', 'Paris, France'],
+      answer: ' Paris ',
+      explanation: '  France capital.  ',
+      id: 'messy-answer-key',
+      kind: 'question',
+      prompt: '  Capital   of   France?  ',
+      sequenceNumber: Number.POSITIVE_INFINITY,
+    })
+  ),
   {
     detailViews: [
       { id: 'expected-answer', label: '1. Paris', tone: 'primary' },
@@ -22122,21 +22217,23 @@ assert.deepEqual(
   }
 );
 assert.deepEqual(
-  buildPrintableWorksheetAnswerKeyItemView({
-    acceptedAnswers: [
-      ' Paris ',
-      'paris',
-      'Ｐａｒｉｓ',
-      'Paris, France',
-      'La capitale',
-    ],
-    answer: ' Paris ',
-    explanation: '',
-    id: 'deduped-answer-key',
-    kind: 'question',
-    prompt: 'Capital?',
-    sequenceNumber: 2,
-  }),
+  simplifyPrintableAnswerKeyItemView(
+    buildPrintableWorksheetAnswerKeyItemView({
+      acceptedAnswers: [
+        ' Paris ',
+        'paris',
+        'Ｐａｒｉｓ',
+        'Paris, France',
+        'La capitale',
+      ],
+      answer: ' Paris ',
+      explanation: '',
+      id: 'deduped-answer-key',
+      kind: 'question',
+      prompt: 'Capital?',
+      sequenceNumber: 2,
+    })
+  ),
   {
     detailViews: [
       { id: 'expected-answer', label: '2. Paris', tone: 'primary' },
@@ -22154,14 +22251,16 @@ assert.deepEqual(
 overwriteGetLocale(() => 'zh');
 try {
   assert.deepEqual(
-    buildPrintableWorksheetAnswerKeyItemView({
-      acceptedAnswers: ['答案', '答案', '答案一', '答案二'],
-      answer: '答案',
-      id: 'zh-answer-key',
-      kind: 'question',
-      prompt: '题目？',
-      sequenceNumber: 1,
-    }),
+    simplifyPrintableAnswerKeyItemView(
+      buildPrintableWorksheetAnswerKeyItemView({
+        acceptedAnswers: ['答案', '答案', '答案一', '答案二'],
+        answer: '答案',
+        id: 'zh-answer-key',
+        kind: 'question',
+        prompt: '题目？',
+        sequenceNumber: 1,
+      })
+    ),
     {
       detailViews: [
         { id: 'expected-answer', label: '1. 答案', tone: 'primary' },
@@ -22198,12 +22297,21 @@ assert.deepEqual(
     answerKeyItemIds: printableWorksheetPageView.answerKeyItemViews.map(
       (item) => item.id
     ),
-    assignmentFieldViews: printableWorksheetPageView.assignmentFieldViews,
+    assignmentFieldViews: simplifyPrintableAssignmentFieldViews(
+      printableWorksheetPageView.assignmentFieldViews
+    ),
     controlView: printableWorksheetPageView.controlView,
     emptyState: printableWorksheetPageView.emptyState,
-    headerView: printableWorksheetPageView.headerView,
+    headerView: {
+      ...printableWorksheetPageView.headerView,
+      overviewItems: simplifyPrintableHeaderOverviewItems(
+        printableWorksheetPageView.headerView.overviewItems
+      ),
+    },
     itemIds: printableWorksheetPageView.itemViews.map((item) => item.id),
-    preparationView: printableWorksheetPageView.preparationView,
+    preparationView: simplifyPrintablePreparationView(
+      printableWorksheetPageView.preparationView
+    ),
     showAnswerKey: printableWorksheetPageView.showAnswerKey,
   },
   {
@@ -22311,9 +22419,17 @@ assert.deepEqual(
       deliveryPolicy: printableSnapshotWorksheetWithAnswers.deliveryPolicyText,
       instructions: 'Finish on paper.',
       overviewItems: [
-        { id: 'items', label: '1 item' },
-        { id: 'response-modes', label: 'Multiple choice practice' },
-        { id: 'answer-key', label: 'Teacher-only key included' },
+        { id: 'items', label: 'Printable items', value: '1 item' },
+        {
+          id: 'response-modes',
+          label: 'Response modes',
+          value: 'Multiple choice practice',
+        },
+        {
+          id: 'answer-key',
+          label: 'Answer key',
+          value: 'Teacher-only key included',
+        },
       ],
       printModeLabel: 'Printable practice',
       sharePath: '/play/printable-1',
@@ -22353,15 +22469,23 @@ assert.deepEqual(
   }
 );
 assert.deepEqual(
-  buildPrintableWorksheetSnapshotSourceFieldView(
-    printableWorksheetPageView.headerView
-  ),
+  simplifyPrintableAssignmentFieldViews([
+    buildPrintableWorksheetSnapshotSourceFieldView(
+      printableWorksheetPageView.headerView
+    ),
+  ])[0],
   {
     id: 'snapshot-source',
     kind: 'text',
     label: 'Snapshot source',
     value: 'Frozen from Frozen activity title for /play/printable-1',
   }
+);
+assert.match(
+  buildPrintableWorksheetSnapshotSourceFieldView(
+    printableWorksheetPageView.headerView
+  ).ariaLabel,
+  /Snapshot source: Frozen from Frozen activity title for \/play\/printable-1/
 );
 assert.deepEqual(
   buildPrintableWorksheetPageViewModel({
@@ -22389,9 +22513,9 @@ assert.deepEqual(
       printableWorksheetPageViewWithoutAnswerKey.controlView.answerKeyToggle
         .accessView,
     preparationAnswerKeyItem:
-      printableWorksheetPageViewWithoutAnswerKey.preparationView.items.find(
-        (item) => item.id === 'answer-key'
-      ),
+      simplifyPrintablePreparationView(
+        printableWorksheetPageViewWithoutAnswerKey.preparationView
+      ).items.find((item) => item.id === 'answer-key'),
     showAnswerKey: printableWorksheetPageViewWithoutAnswerKey.showAnswerKey,
   },
   {
@@ -22426,15 +22550,21 @@ assert.deepEqual(
   }
 );
 assert.deepEqual(
-  buildPrintableWorksheetPageViewModel({
-    answerKey: false,
-    assignmentId: 'assignment-printable-1',
-    worksheet: printableSnapshotWorksheetWithAnswers,
-  }).headerView.overviewItems,
+  simplifyPrintableHeaderOverviewItems(
+    buildPrintableWorksheetPageViewModel({
+      answerKey: false,
+      assignmentId: 'assignment-printable-1',
+      worksheet: printableSnapshotWorksheetWithAnswers,
+    }).headerView.overviewItems
+  ),
   [
-    { id: 'items', label: '1 item' },
-    { id: 'response-modes', label: 'Multiple choice practice' },
-    { id: 'answer-key', label: 'Hidden by default' },
+    { id: 'items', label: 'Printable items', value: '1 item' },
+    {
+      id: 'response-modes',
+      label: 'Response modes',
+      value: 'Multiple choice practice',
+    },
+    { id: 'answer-key', label: 'Answer key', value: 'Hidden by default' },
   ]
 );
 assert.deepEqual(
@@ -22467,11 +22597,13 @@ assert.deepEqual(
     answerKeyItemViews:
       printableWorksheetUnavailableAnswerKeyPageView.answerKeyItemViews,
     headerOverview:
-      printableWorksheetUnavailableAnswerKeyPageView.headerView.overviewItems,
-    preparationAnswerKeyItem:
-      printableWorksheetUnavailableAnswerKeyPageView.preparationView.items.find(
-        (item) => item.id === 'answer-key'
+      simplifyPrintableHeaderOverviewItems(
+        printableWorksheetUnavailableAnswerKeyPageView.headerView.overviewItems
       ),
+    preparationAnswerKeyItem:
+      simplifyPrintablePreparationView(
+        printableWorksheetUnavailableAnswerKeyPageView.preparationView
+      ).items.find((item) => item.id === 'answer-key'),
     showAnswerKey:
       printableWorksheetUnavailableAnswerKeyPageView.showAnswerKey,
   },
@@ -22487,9 +22619,9 @@ assert.deepEqual(
     },
     answerKeyItemViews: [],
     headerOverview: [
-      { id: 'items', label: '0 items' },
-      { id: 'response-modes', label: '0 response modes' },
-      { id: 'answer-key', label: 'No answer key available' },
+      { id: 'items', label: 'Printable items', value: '0 items' },
+      { id: 'response-modes', label: 'Response modes', value: '0 response modes' },
+      { id: 'answer-key', label: 'Answer key', value: 'No answer key available' },
     ],
     preparationAnswerKeyItem: {
       description:
@@ -30672,7 +30804,7 @@ assert.match(
 );
 assert.match(
   printableWorksheetViewSource,
-  /show: showChoiceBank[\s\S]*summary: formatPrintableWorksheetChoiceBankSummary/,
+  /const summary = formatPrintableWorksheetChoiceBankSummary\([\s\S]*choices: choices\.map\([\s\S]*description: summary \?\? ''[\s\S]*show: showChoiceBank[\s\S]*summary,/,
   'Printable worksheet choice-bank views should expose prepared visibility and localized choice-bank summaries.'
 );
 assert.match(
@@ -30687,7 +30819,7 @@ assert.match(
 );
 assert.match(
   printableWorksheetViewSource,
-  /key: `\$\{item\.id\}-choice-\$\{index\}`/,
+  /key: `\$\{itemId\}-choice-\$\{index\}`/,
   'Printable worksheet choice-bank views should expose stable per-choice keys.'
 );
 assert.match(
@@ -30865,6 +30997,26 @@ assert.match(
   /buildPrintableWorksheetPageViewModel[\s\S]*const answerKeySummary = summarizePrintableAssignmentWorksheet\(worksheet,[\s\S]*includeAnswerKey: answerKey[\s\S]*const answerKeyAccessView = buildPrintableWorksheetAnswerKeyAccessView[\s\S]*answerKeySummary[\s\S]*controlView: buildPrintableWorksheetControlView\(\{[\s\S]*answerKeyAccessView/,
   'Printable worksheet page view-model should derive one answer-key access view and pass it into toolbar state.'
 );
+assert.match(
+  printableWorksheetViewSource,
+  /function buildPrintableWorksheetSemanticAriaLabel[\s\S]*assignment_printable_semantic_item_aria_label[\s\S]*description,[\s\S]*label,[\s\S]*value/,
+  'Printable worksheet domain should generate reusable semantic aria labels from localized printable copy.'
+);
+assert.match(
+  printableWorksheetViewSource,
+  /buildPrintableWorksheetHeaderOverviewItems[\s\S]*assignment_printable_overview_items_description[\s\S]*assignment_printable_overview_items_label[\s\S]*assignment_printable_overview_response_modes_description[\s\S]*assignment_printable_overview_response_modes_label[\s\S]*assignment_printable_overview_answer_key_label[\s\S]*buildPrintableWorksheetHeaderOverviewItemView/,
+  'Printable worksheet header overview items should prepare localized labels, values, descriptions, and aria labels in the domain view.'
+);
+assert.match(
+  printableWorksheetViewSource,
+  /buildPrintableWorksheetBlankFieldView[\s\S]*blankFieldDescription[\s\S]*blankFieldValue[\s\S]*buildPrintableWorksheetSemanticAriaLabel[\s\S]*buildPrintableWorksheetTextFieldView[\s\S]*textFieldDescription[\s\S]*buildPrintableWorksheetSemanticAriaLabel/,
+  'Printable worksheet assignment field builders should prepare localized blank-line and text-field semantic views.'
+);
+assert.match(
+  printableWorksheetViewSource,
+  /buildPrintableWorksheetChoiceBankChoiceView[\s\S]*PrintableWorksheetChoiceBankChoiceView[\s\S]*buildPrintableWorksheetSemanticAriaLabel[\s\S]*description,[\s\S]*label: choiceLabel,[\s\S]*value: choice/,
+  'Printable worksheet choice-bank choices should carry prepared semantic aria labels from the domain view.'
+);
 const printableAssignmentRouteSource = readFileSync(
   'src/routes/print/assignments/$assignmentId.tsx',
   'utf8'
@@ -30904,22 +31056,22 @@ assert.match(
 );
 assert.match(
   printableWorksheetHeaderSource,
-  /headerView\.overviewItems\.map[\s\S]*overviewItem\.label/,
-  'Printable worksheet header component should render prepared overview labels from the domain view.'
+  /headerView\.overviewItems\.map[\s\S]*PrintableWorksheetHeaderOverviewBadge[\s\S]*PrintableWorksheetHeaderOverviewItem[\s\S]*const labelId = `printable-worksheet-header-overview-\$\{overviewItem\.id\}-label`[\s\S]*const valueId = `printable-worksheet-header-overview-\$\{overviewItem\.id\}-value`[\s\S]*const descriptionId = `printable-worksheet-header-overview-\$\{overviewItem\.id\}-description`[\s\S]*overviewItem\.label[\s\S]*<output[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*aria-label=\{overviewItem\.ariaLabel\}[\s\S]*aria-labelledby=\{`\$\{labelId\} \$\{valueId\}`\}[\s\S]*id=\{valueId\}[\s\S]*overviewItem\.value[\s\S]*overviewItem\.description/,
+  'Printable worksheet header component should render prepared overview labels, values, descriptions, and aria labels from the domain view.'
 );
 assert.match(
   printableWorksheetViewSource,
-  /export type PrintableWorksheetHeaderOverviewItem = \{[\s\S]*export type PrintableWorksheetPreparationItemId =[\s\S]*'answer-key'[\s\S]*'response-plan'[\s\S]*'student-fields'[\s\S]*export type PrintableWorksheetPreparationView = \{[\s\S]*export type PrintableWorksheetHeaderView = \{[\s\S]*overviewItems: PrintableWorksheetHeaderOverviewItem\[\];[\s\S]*export type PrintableWorksheetAnswerLineView = \{[\s\S]*export type PrintableWorksheetChoiceBankView = \{[\s\S]*export type PrintableWorksheetItemView = \{[\s\S]*choiceBank: PrintableWorksheetChoiceBankView;[\s\S]*export type PrintableWorksheetAnswerKeyDetailView = \{[\s\S]*export type PrintableWorksheetAnswerKeyItemView = \{[\s\S]*detailViews: PrintableWorksheetAnswerKeyDetailView\[\];/,
+  /export type PrintableWorksheetHeaderOverviewItem = \{[\s\S]*ariaLabel: string;[\s\S]*description: string;[\s\S]*value: string;[\s\S]*export type PrintableWorksheetPreparationItemId =[\s\S]*'answer-key'[\s\S]*'response-plan'[\s\S]*'student-fields'[\s\S]*export type PrintableWorksheetPreparationItemView = \{[\s\S]*ariaLabel: string;[\s\S]*export type PrintableWorksheetPreparationView = \{[\s\S]*export type PrintableWorksheetHeaderView = \{[\s\S]*overviewItems: PrintableWorksheetHeaderOverviewItem\[\];[\s\S]*export type PrintableWorksheetAnswerLineView = \{[\s\S]*export type PrintableWorksheetChoiceBankChoiceView = \{[\s\S]*ariaLabel: string;[\s\S]*description: string;[\s\S]*export type PrintableWorksheetChoiceBankView = \{[\s\S]*export type PrintableWorksheetItemView = \{[\s\S]*choiceBank: PrintableWorksheetChoiceBankView;[\s\S]*export type PrintableWorksheetAnswerKeyDetailView = \{[\s\S]*ariaLabel: string;[\s\S]*export type PrintableWorksheetAnswerKeyItemView = \{[\s\S]*ariaLabel: string;[\s\S]*detailViews: PrintableWorksheetAnswerKeyDetailView\[\];/,
   'Printable worksheet view domain should export focused header, preparation, item, choice-bank, answer-line, and answer-key item contracts.'
 );
 assert.match(
   printableWorksheetViewSource,
-  /export type PrintableWorksheetAnswerKeyDetailId =[\s\S]*'accepted-answers'[\s\S]*'expected-answer'[\s\S]*'explanation'[\s\S]*export type PrintableWorksheetAnswerKeyDetailView = \{[\s\S]*id: PrintableWorksheetAnswerKeyDetailId;[\s\S]*label: string;[\s\S]*tone: 'primary' \| 'secondary';/,
+  /export type PrintableWorksheetAnswerKeyDetailId =[\s\S]*'accepted-answers'[\s\S]*'expected-answer'[\s\S]*'explanation'[\s\S]*export type PrintableWorksheetAnswerKeyDetailView = \{[\s\S]*ariaLabel: string;[\s\S]*id: PrintableWorksheetAnswerKeyDetailId;[\s\S]*label: string;[\s\S]*tone: 'primary' \| 'secondary';/,
   'Printable worksheet answer-key details should expose stable ids separately from localized labels.'
 );
 assert.match(
   printableWorksheetViewSource,
-  /export type PrintableWorksheetBlankFieldView = \{[\s\S]*kind: 'blank-line';[\s\S]*export type PrintableWorksheetTextFieldView = \{[\s\S]*kind: 'text';[\s\S]*export type PrintableWorksheetAssignmentFieldView =[\s\S]*PrintableWorksheetBlankFieldView[\s\S]*PrintableWorksheetTextFieldView;[\s\S]*export type PrintableWorksheetAnswerKeyView = \{[\s\S]*export type PrintableWorksheetBackToResultsAction = \{[\s\S]*export type PrintableWorksheetAnswerKeyToggleView = \{[\s\S]*export type PrintableWorksheetPrintAction = \{[\s\S]*export type PrintableWorksheetControlView = \{[\s\S]*answerKeyToggle: PrintableWorksheetAnswerKeyToggleView;[\s\S]*backToResultsAction: PrintableWorksheetBackToResultsAction;[\s\S]*printAction: PrintableWorksheetPrintAction;[\s\S]*export type PrintableWorksheetEmptyState = \{[\s\S]*export type PrintableWorksheetLoadStateView = \{[\s\S]*export type PrintableWorksheetPageViewModel = \{/,
+  /export type PrintableWorksheetBlankFieldView = \{[\s\S]*ariaLabel: string;[\s\S]*description: string;[\s\S]*kind: 'blank-line';[\s\S]*value: string;[\s\S]*export type PrintableWorksheetTextFieldView = \{[\s\S]*ariaLabel: string;[\s\S]*description: string;[\s\S]*kind: 'text';[\s\S]*export type PrintableWorksheetAssignmentFieldView =[\s\S]*PrintableWorksheetBlankFieldView[\s\S]*PrintableWorksheetTextFieldView;[\s\S]*export type PrintableWorksheetAnswerKeyView = \{[\s\S]*export type PrintableWorksheetBackToResultsAction = \{[\s\S]*export type PrintableWorksheetAnswerKeyToggleView = \{[\s\S]*export type PrintableWorksheetPrintAction = \{[\s\S]*export type PrintableWorksheetControlView = \{[\s\S]*answerKeyToggle: PrintableWorksheetAnswerKeyToggleView;[\s\S]*backToResultsAction: PrintableWorksheetBackToResultsAction;[\s\S]*printAction: PrintableWorksheetPrintAction;[\s\S]*export type PrintableWorksheetEmptyState = \{[\s\S]*export type PrintableWorksheetLoadStateView = \{[\s\S]*export type PrintableWorksheetPageViewModel = \{/,
   'Printable worksheet view domain should export focused assignment-field, answer-key, control, empty, load, and page view contracts.'
 );
 assert.match(
@@ -30969,7 +31121,7 @@ assert.match(
 );
 assert.match(
   printableWorksheetAnswerKeySource,
-  /const titleId = 'printable-worksheet-answer-key-title'[\s\S]*const descriptionId = 'printable-worksheet-answer-key-description'[\s\S]*const accessDescriptionId =[\s\S]*'printable-worksheet-answer-key-access-description'[\s\S]*aria-describedby=\{`\$\{descriptionId\} \$\{accessDescriptionId\}`\}[\s\S]*aria-labelledby=\{titleId\}[\s\S]*data-print-answer-key-state=\{view\.accessView\.state\}[\s\S]*id=\{titleId\}[\s\S]*aria-describedby=\{accessDescriptionId\}[\s\S]*aria-label=\{view\.accessView\.ariaLabel\}[\s\S]*view\.accessView\.value[\s\S]*id=\{descriptionId\}[\s\S]*view\.description[\s\S]*id=\{accessDescriptionId\}[\s\S]*view\.accessView\.description/,
+  /const titleId = 'printable-worksheet-answer-key-title'[\s\S]*const descriptionId = 'printable-worksheet-answer-key-description'[\s\S]*const accessDescriptionId =[\s\S]*'printable-worksheet-answer-key-access-description'[\s\S]*const accessLabelId = 'printable-worksheet-answer-key-access-label'[\s\S]*const accessValueId = 'printable-worksheet-answer-key-access-value'[\s\S]*aria-describedby=\{`\$\{descriptionId\} \$\{accessDescriptionId\}`\}[\s\S]*aria-labelledby=\{titleId\}[\s\S]*data-print-answer-key-state=\{view\.accessView\.state\}[\s\S]*id=\{titleId\}[\s\S]*aria-labelledby=\{`\$\{accessLabelId\} \$\{accessValueId\}`\}[\s\S]*view\.accessView\.label[\s\S]*<output[\s\S]*aria-label=\{view\.accessView\.ariaLabel\}[\s\S]*aria-labelledby=\{`\$\{accessLabelId\} \$\{accessValueId\}`\}[\s\S]*id=\{accessValueId\}[\s\S]*view\.accessView\.value[\s\S]*id=\{descriptionId\}[\s\S]*view\.description[\s\S]*id=\{accessDescriptionId\}[\s\S]*view\.accessView\.description/,
   'Printable worksheet answer-key component should associate the teacher-only answer-key title, description, and prepared access status.'
 );
 assert.match(
@@ -30984,7 +31136,7 @@ assert.match(
 );
 assert.match(
   printableWorksheetPreparationSummarySource,
-  /const titleId = 'printable-worksheet-preparation-title'[\s\S]*const descriptionId = 'printable-worksheet-preparation-description'[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*aria-labelledby=\{titleId\}[\s\S]*id=\{titleId\}[\s\S]*id=\{descriptionId\}[\s\S]*const labelId = `printable-worksheet-preparation-\$\{itemView\.id\}-label`[\s\S]*const valueId = `printable-worksheet-preparation-\$\{itemView\.id\}-value`[\s\S]*const descriptionId = `printable-worksheet-preparation-\$\{itemView\.id\}-description`[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*aria-labelledby=\{`\$\{labelId\} \$\{valueId\}`\}[\s\S]*id=\{labelId\}[\s\S]*id=\{valueId\}[\s\S]*id=\{descriptionId\}/,
+  /const titleId = 'printable-worksheet-preparation-title'[\s\S]*const descriptionId = 'printable-worksheet-preparation-description'[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*aria-labelledby=\{titleId\}[\s\S]*id=\{titleId\}[\s\S]*id=\{descriptionId\}[\s\S]*const labelId = `printable-worksheet-preparation-\$\{itemView\.id\}-label`[\s\S]*const valueId = `printable-worksheet-preparation-\$\{itemView\.id\}-value`[\s\S]*const descriptionId = `printable-worksheet-preparation-\$\{itemView\.id\}-description`[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*aria-labelledby=\{`\$\{labelId\} \$\{valueId\}`\}[\s\S]*id=\{labelId\}[\s\S]*<output[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*aria-label=\{itemView\.ariaLabel\}[\s\S]*aria-labelledby=\{`\$\{labelId\} \$\{valueId\}`\}[\s\S]*id=\{valueId\}[\s\S]*id=\{descriptionId\}/,
   'Printable worksheet preparation summary and item cards should associate prepared labels, values, and descriptions.'
 );
 assert.doesNotMatch(
@@ -31124,13 +31276,13 @@ assert.match(
 );
 assert.match(
   printableWorksheetAssignmentFieldsSource,
-  /function PrintableWorksheetBlankField[\s\S]*fieldView: PrintableWorksheetBlankFieldView[\s\S]*fieldView\.label[\s\S]*h-8 border-b/,
-  'Printable worksheet blank assignment fields should render prepared labels with blank print lines.'
+  /function PrintableWorksheetBlankField[\s\S]*fieldView: PrintableWorksheetBlankFieldView[\s\S]*const labelId = `printable-worksheet-assignment-field-\$\{fieldView\.id\}-label`[\s\S]*const valueId = `printable-worksheet-assignment-field-\$\{fieldView\.id\}-value`[\s\S]*const descriptionId = `printable-worksheet-assignment-field-\$\{fieldView\.id\}-description`[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*aria-labelledby=\{`\$\{labelId\} \$\{valueId\}`\}[\s\S]*fieldView\.label[\s\S]*<output[\s\S]*aria-label=\{fieldView\.ariaLabel\}[\s\S]*aria-labelledby=\{`\$\{labelId\} \$\{valueId\}`\}[\s\S]*fieldView\.value[\s\S]*aria-hidden="true"[\s\S]*h-8 border-b[\s\S]*fieldView\.description/,
+  'Printable worksheet blank assignment fields should render prepared labels, blank-line values, descriptions, and print lines.'
 );
 assert.match(
   printableWorksheetAssignmentFieldsSource,
-  /function PrintableWorksheetTextField[\s\S]*fieldView: PrintableWorksheetTextFieldView[\s\S]*fieldView\.label[\s\S]*fieldView\.value/,
-  'Printable worksheet text assignment fields should render prepared labels and values.'
+  /function PrintableWorksheetTextField[\s\S]*fieldView: PrintableWorksheetTextFieldView[\s\S]*const labelId = `printable-worksheet-assignment-field-\$\{fieldView\.id\}-label`[\s\S]*const valueId = `printable-worksheet-assignment-field-\$\{fieldView\.id\}-value`[\s\S]*const descriptionId = `printable-worksheet-assignment-field-\$\{fieldView\.id\}-description`[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*aria-labelledby=\{`\$\{labelId\} \$\{valueId\}`\}[\s\S]*fieldView\.label[\s\S]*<output[\s\S]*aria-label=\{fieldView\.ariaLabel\}[\s\S]*aria-labelledby=\{`\$\{labelId\} \$\{valueId\}`\}[\s\S]*fieldView\.value[\s\S]*fieldView\.description/,
+  'Printable worksheet text assignment fields should render prepared labels, values, descriptions, and aria labels.'
 );
 assert.match(
   printableWorksheetAnswerKeySource,
@@ -31139,7 +31291,7 @@ assert.match(
 );
 assert.match(
   printableWorksheetItemListSource,
-  /emptyState\.title/,
+  /printable-worksheet-empty-title[\s\S]*emptyState\.title[\s\S]*printable-worksheet-empty-description[\s\S]*emptyState\.description/,
   'Printable worksheet item list component should render the empty printable state from the printable worksheet page view-model.'
 );
 assert.match(
@@ -31194,18 +31346,18 @@ assert.doesNotMatch(
 );
 assert.match(
   printableWorksheetItemListSource,
-  /itemView\.headingLabel/,
-  'Printable worksheet item list component should render the prepared printable item heading.'
+  /const headingId = `printable-worksheet-item-\$\{itemView\.id\}-heading`[\s\S]*const promptId = `printable-worksheet-item-\$\{itemView\.id\}-prompt`[\s\S]*const responseHelpId = `printable-worksheet-item-\$\{itemView\.id\}-response-help`[\s\S]*const responseModeId = `printable-worksheet-item-\$\{itemView\.id\}-response-mode`[\s\S]*aria-describedby=\{`\$\{promptId\} \$\{responseHelpId\} \$\{responseModeId\}`\}[\s\S]*aria-labelledby=\{headingId\}[\s\S]*id=\{headingId\}[\s\S]*itemView\.headingLabel[\s\S]*id=\{promptId\}[\s\S]*itemView\.prompt[\s\S]*<output id=\{responseHelpId\}[\s\S]*itemView\.responseHelp[\s\S]*id=\{responseModeId\}[\s\S]*itemView\.responseModeLabel/,
+  'Printable worksheet item list component should render prepared item heading, prompt, response help, and response mode with stable ids.'
 );
 assert.match(
   printableWorksheetItemListSource,
-  /PrintableWorksheetChoiceBank[\s\S]*choiceBank=\{itemView\.choiceBank\}/,
-  'Printable worksheet item list should delegate prepared choice-bank rendering to a focused component.'
+  /PrintableWorksheetChoiceBank[\s\S]*choiceBank=\{itemView\.choiceBank\}[\s\S]*itemId=\{itemView\.id\}/,
+  'Printable worksheet item list should delegate prepared choice-bank rendering with item-scoped ids to a focused component.'
 );
 assert.match(
   printableWorksheetItemListSource,
-  /function PrintableWorksheetChoiceBankHeader[\s\S]*choiceBank\.label[\s\S]*choiceBank\.summary/,
-  'Printable worksheet choice-bank header should render prepared labels and summaries from the item view.'
+  /function PrintableWorksheetChoiceBankHeader[\s\S]*itemId: PrintableWorksheetItemView\['id'\][\s\S]*const labelId = getPrintableWorksheetChoiceBankLabelId\(choiceBank, itemId\)[\s\S]*const summaryId = getPrintableWorksheetChoiceBankSummaryId\([\s\S]*choiceBank,[\s\S]*itemId[\s\S]*id=\{labelId\}[\s\S]*choiceBank\.label[\s\S]*<output id=\{summaryId\}[\s\S]*choiceBank\.summary/,
+  'Printable worksheet choice-bank header should render prepared labels and summaries from the item view with item-scoped stable ids.'
 );
 assert.match(
   printableWorksheetItemListSource,
@@ -31219,13 +31371,13 @@ assert.match(
 );
 assert.match(
   printableWorksheetItemListSource,
-  /itemView\.answerLineSummary/,
-  'Printable worksheet item list should render prepared answer-line summaries from the item view.'
+  /const labelId = `printable-worksheet-item-\$\{itemView\.id\}-answer-area-label`[\s\S]*const summaryId = `printable-worksheet-item-\$\{itemView\.id\}-answer-line-summary`[\s\S]*<fieldset[\s\S]*aria-describedby=\{summaryId\}[\s\S]*<legend[\s\S]*id=\{labelId\}[\s\S]*itemView\.answerAreaLabel[\s\S]*<output id=\{summaryId\}[\s\S]*itemView\.answerLineSummary[\s\S]*aria-hidden="true"/,
+  'Printable worksheet item list should render prepared answer-area labels and answer-line summaries through a described fieldset.'
 );
 assert.match(
   printableWorksheetItemListSource,
-  /PrintableWorksheetChoiceBankHeader[\s\S]*choiceBank\.summary/,
-  'Printable worksheet choice-bank component should render prepared choice-bank summaries.'
+  /PrintableWorksheetChoiceBankHeader[\s\S]*itemId=\{itemId\}[\s\S]*PrintableWorksheetChoiceBankGrid[\s\S]*itemId=\{itemId\}[\s\S]*function PrintableWorksheetChoiceBankGrid[\s\S]*aria-describedby=\{getPrintableWorksheetChoiceBankSummaryId\([\s\S]*choiceBank,[\s\S]*itemId[\s\S]*aria-labelledby=\{getPrintableWorksheetChoiceBankLabelId\([\s\S]*choiceBank,[\s\S]*itemId/,
+  'Printable worksheet choice-bank component should render prepared choice-bank summaries in an item-scoped labelled grid.'
 );
 assert.match(
   printableWorksheetItemListSource,
@@ -31259,7 +31411,7 @@ assert.match(
 );
 assert.match(
   printableWorksheetToolbarSource,
-  /function PrintableWorksheetAnswerKeyToggle[\s\S]*toggleView: PrintableWorksheetAnswerKeyToggleView[\s\S]*const answerKeyDescriptionId = 'printable-answer-key-description'[\s\S]*const answerKeyStatusDescriptionId =[\s\S]*'printable-answer-key-status-description'[\s\S]*checked=\{toggleView\.value\}[\s\S]*aria-describedby=\{`\$\{answerKeyDescriptionId\} \$\{answerKeyStatusDescriptionId\}`\}[\s\S]*toggleView\.label[\s\S]*aria-describedby=\{answerKeyStatusDescriptionId\}[\s\S]*toggleView\.accessView\.ariaLabel[\s\S]*data-print-answer-key-state=\{toggleView\.accessView\.state\}[\s\S]*toggleView\.accessView\.value[\s\S]*id=\{answerKeyDescriptionId\}[\s\S]*toggleView\.description[\s\S]*id=\{answerKeyStatusDescriptionId\}[\s\S]*toggleView\.accessView\.description/,
+  /function PrintableWorksheetAnswerKeyToggle[\s\S]*toggleView: PrintableWorksheetAnswerKeyToggleView[\s\S]*const answerKeyDescriptionId = 'printable-answer-key-description'[\s\S]*const answerKeyStatusDescriptionId =[\s\S]*'printable-answer-key-status-description'[\s\S]*const answerKeyLabelId = 'printable-answer-key-label'[\s\S]*const answerKeyStatusLabelId = 'printable-answer-key-status-label'[\s\S]*const answerKeyStatusValueId = 'printable-answer-key-status-value'[\s\S]*checked=\{toggleView\.value\}[\s\S]*aria-describedby=\{`\$\{answerKeyDescriptionId\} \$\{answerKeyStatusDescriptionId\}`\}[\s\S]*aria-labelledby=\{answerKeyLabelId\}[\s\S]*id=\{answerKeyLabelId\}[\s\S]*toggleView\.label[\s\S]*aria-labelledby=\{`\$\{answerKeyStatusLabelId\} \$\{answerKeyStatusValueId\}`\}[\s\S]*toggleView\.accessView\.label[\s\S]*<output[\s\S]*aria-label=\{toggleView\.accessView\.ariaLabel\}[\s\S]*aria-labelledby=\{`\$\{answerKeyStatusLabelId\} \$\{answerKeyStatusValueId\}`\}[\s\S]*id=\{answerKeyStatusValueId\}[\s\S]*toggleView\.accessView\.value[\s\S]*id=\{answerKeyDescriptionId\}[\s\S]*toggleView\.description[\s\S]*id=\{answerKeyStatusDescriptionId\}[\s\S]*toggleView\.accessView\.description/,
   'Printable worksheet answer-key toggle should consume a focused prepared toggle view and associate both help text and access status.'
 );
 assert.match(
@@ -31284,8 +31436,13 @@ assert.match(
 );
 assert.match(
   printableWorksheetItemListSource,
-  /function PrintableWorksheetChoiceBankChoice[\s\S]*choiceBank\.showIndexLabels \?[\s\S]*choiceView\.indexLabel/,
-  'Printable worksheet choice-bank choice should render lettered choice labels only when the choice-bank view asks for them.'
+  /function getPrintableWorksheetChoiceBankLabelId[\s\S]*itemId: PrintableWorksheetItemView\['id'\][\s\S]*`printable-worksheet-choice-bank-\$\{itemId\}-\$\{choiceBank\.presentation\}-label`[\s\S]*function getPrintableWorksheetChoiceBankSummaryId[\s\S]*itemId: PrintableWorksheetItemView\['id'\][\s\S]*`printable-worksheet-choice-bank-\$\{itemId\}-\$\{choiceBank\.presentation\}-summary`/,
+  'Printable worksheet choice-bank ids should include the item id so repeated choice-bank presentations remain unique on one handout.'
+);
+assert.match(
+  printableWorksheetItemListSource,
+  /function PrintableWorksheetChoiceBankChoice[\s\S]*const labelId = `printable-worksheet-choice-bank-\$\{choiceView\.key\}-label`[\s\S]*const valueId = `printable-worksheet-choice-bank-\$\{choiceView\.key\}-value`[\s\S]*const descriptionId = `printable-worksheet-choice-bank-\$\{choiceView\.key\}-description`[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*aria-labelledby=\{`\$\{labelId\} \$\{valueId\}`\}[\s\S]*choiceBank\.showIndexLabels \?[\s\S]*choiceView\.indexLabel[\s\S]*<output[\s\S]*aria-label=\{choiceView\.ariaLabel\}[\s\S]*aria-labelledby=\{`\$\{labelId\} \$\{valueId\}`\}[\s\S]*id=\{valueId\}[\s\S]*choiceView\.choice[\s\S]*choiceView\.description/,
+  'Printable worksheet choice-bank choice should render indexed choices as stable label/value/description outputs.'
 );
 assert.match(
   printableWorksheetItemListSource,
@@ -31299,7 +31456,7 @@ assert.match(
 );
 assert.match(
   printableWorksheetAnswerKeySource,
-  /function PrintableWorksheetAnswerKeyItem[\s\S]*const titleId = `printable-worksheet-answer-key-\$\{itemView\.id\}-title`[\s\S]*const descriptionId = `printable-worksheet-answer-key-\$\{itemView\.id\}-description`[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*aria-labelledby=\{titleId\}[\s\S]*id=\{titleId\}[\s\S]*id=\{descriptionId\}[\s\S]*itemView\.detailViews\.map[\s\S]*PrintableWorksheetAnswerKeyDetail[\s\S]*detailView=\{detailView\}/,
+  /function PrintableWorksheetAnswerKeyItem[\s\S]*const titleId = `printable-worksheet-answer-key-\$\{itemView\.id\}-title`[\s\S]*const descriptionId = `printable-worksheet-answer-key-\$\{itemView\.id\}-description`[\s\S]*const promptId = `printable-worksheet-answer-key-\$\{itemView\.id\}-prompt`[\s\S]*aria-describedby=\{`\$\{promptId\} \$\{descriptionId\}`\}[\s\S]*aria-label=\{itemView\.ariaLabel\}[\s\S]*aria-labelledby=\{titleId\}[\s\S]*id=\{titleId\}[\s\S]*id=\{promptId\}[\s\S]*id=\{descriptionId\}[\s\S]*itemView\.detailViews\.map[\s\S]*PrintableWorksheetAnswerKeyDetail[\s\S]*detailView=\{detailView\}[\s\S]*itemId=\{itemView\.id\}/,
   'Printable worksheet answer-key item component should associate prepared item headings and prompts while rendering prepared answer-key detail views.'
 );
 assert.match(
@@ -31314,8 +31471,8 @@ assert.doesNotMatch(
 );
 assert.match(
   printableWorksheetAnswerKeySource,
-  /function PrintableWorksheetAnswerKeyDetail[\s\S]*detailView: PrintableWorksheetAnswerKeyDetailView[\s\S]*detailView\.tone === 'primary'[\s\S]*detailView\.label/,
-  'Printable worksheet answer-key detail component should render prepared detail labels with their display tone.'
+  /function PrintableWorksheetAnswerKeyDetail[\s\S]*detailView: PrintableWorksheetAnswerKeyDetailView[\s\S]*itemId: PrintableWorksheetAnswerKeyItemView\['id'\][\s\S]*const labelId = `printable-worksheet-answer-key-\$\{itemId\}-detail-\$\{detailView\.id\}-label`[\s\S]*const valueId = `printable-worksheet-answer-key-\$\{itemId\}-detail-\$\{detailView\.id\}-value`[\s\S]*detailView\.tone === 'primary'[\s\S]*<output[\s\S]*aria-label=\{detailView\.ariaLabel\}[\s\S]*aria-labelledby=\{`\$\{labelId\} \$\{valueId\}`\}[\s\S]*id=\{valueId\}[\s\S]*detailView\.label/,
+  'Printable worksheet answer-key detail component should render prepared detail labels with stable output ids and display tone.'
 );
 assert.doesNotMatch(
   printableWorksheetAnswerKeySource,

@@ -20,6 +20,8 @@ export function PrintableWorksheetAnswerKey({
   const descriptionId = 'printable-worksheet-answer-key-description';
   const accessDescriptionId =
     'printable-worksheet-answer-key-access-description';
+  const accessLabelId = 'printable-worksheet-answer-key-access-label';
+  const accessValueId = 'printable-worksheet-answer-key-access-value';
 
   return (
     <section
@@ -38,11 +40,21 @@ export function PrintableWorksheetAnswerKey({
             </h2>
             <Badge
               aria-describedby={accessDescriptionId}
-              aria-label={view.accessView.ariaLabel}
+              aria-labelledby={`${accessLabelId} ${accessValueId}`}
               variant="outline"
               className="rounded-md"
             >
-              <output>{view.accessView.value}</output>
+              <span id={accessLabelId} className="sr-only">
+                {view.accessView.label}
+              </span>
+              <output
+                aria-describedby={accessDescriptionId}
+                aria-label={view.accessView.ariaLabel}
+                aria-labelledby={`${accessLabelId} ${accessValueId}`}
+                id={accessValueId}
+              >
+                {view.accessView.value}
+              </output>
             </Badge>
           </div>
           <p id={descriptionId} className="text-sm text-muted-foreground">
@@ -72,43 +84,62 @@ function PrintableWorksheetAnswerKeyItem({
 }) {
   const titleId = `printable-worksheet-answer-key-${itemView.id}-title`;
   const descriptionId = `printable-worksheet-answer-key-${itemView.id}-description`;
+  const promptId = `printable-worksheet-answer-key-${itemView.id}-prompt`;
 
   return (
     <article
-      aria-describedby={descriptionId}
+      aria-describedby={`${promptId} ${descriptionId}`}
+      aria-label={itemView.ariaLabel}
       aria-labelledby={titleId}
       className="rounded-lg border bg-muted/20 p-3 text-sm"
     >
       <p id={titleId} className="text-muted-foreground text-xs">
         {itemView.headingLabel}
       </p>
-      <p id={descriptionId} className="mt-1 text-muted-foreground">
+      <p id={promptId} className="mt-1 text-muted-foreground">
         {itemView.prompt}
       </p>
-      <div className="mt-1 grid gap-1">
+      <dl id={descriptionId} className="mt-1 grid gap-1">
         {itemView.detailViews.map((detailView) => (
           <PrintableWorksheetAnswerKeyDetail
             detailView={detailView}
+            itemId={itemView.id}
             key={detailView.id}
           />
         ))}
-      </div>
+      </dl>
     </article>
   );
 }
 
 function PrintableWorksheetAnswerKeyDetail({
   detailView,
+  itemId,
 }: {
   detailView: PrintableWorksheetAnswerKeyDetailView;
+  itemId: PrintableWorksheetAnswerKeyItemView['id'];
 }) {
+  const labelId = `printable-worksheet-answer-key-${itemId}-detail-${detailView.id}-label`;
+  const valueId = `printable-worksheet-answer-key-${itemId}-detail-${detailView.id}-value`;
+
   return (
-    <p
+    <div
       className={cn(
         detailView.tone === 'primary' ? 'font-medium' : 'text-muted-foreground'
       )}
     >
-      {detailView.label}
-    </p>
+      <dt id={labelId} className="sr-only">
+        {detailView.id}
+      </dt>
+      <dd>
+        <output
+          aria-label={detailView.ariaLabel}
+          aria-labelledby={`${labelId} ${valueId}`}
+          id={valueId}
+        >
+          {detailView.label}
+        </output>
+      </dd>
+    </div>
   );
 }

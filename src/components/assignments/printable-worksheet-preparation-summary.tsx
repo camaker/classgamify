@@ -61,7 +61,14 @@ function PrintableWorksheetPreparationItem({
           {itemView.label}
         </p>
         <Badge variant="outline" className="rounded-md">
-          <output id={valueId}>{itemView.value}</output>
+          <output
+            aria-describedby={descriptionId}
+            aria-label={itemView.ariaLabel}
+            aria-labelledby={`${labelId} ${valueId}`}
+            id={valueId}
+          >
+            {itemView.value}
+          </output>
         </Badge>
       </div>
       <p id={descriptionId} className="text-muted-foreground text-xs leading-5">
