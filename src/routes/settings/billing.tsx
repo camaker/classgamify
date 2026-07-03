@@ -25,12 +25,18 @@ function BillingPage() {
       title={pageView.title}
       description={pageView.description}
     >
-      <div className="flex flex-col gap-8">
+      <section
+        aria-label={pageView.contentAriaLabel}
+        className="flex flex-col gap-8"
+      >
         <BillingWorkspaceSummary view={pageView.workspaceSummaryView} />
-        <div className="grid grid-cols-1 gap-8 md:grid-cols-2">
+        <section
+          aria-label={pageView.planSectionAriaLabel}
+          className="grid grid-cols-1 gap-8 md:grid-cols-2"
+        >
           <BillingCard />
-        </div>
-      </div>
+        </section>
+      </section>
     </DashboardLayout>
   );
 }

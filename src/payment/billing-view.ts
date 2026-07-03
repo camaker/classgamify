@@ -30,6 +30,7 @@ type SettingsBillingCardHeader = {
 };
 
 type SettingsBillingCardAction = {
+  ariaLabel: string;
   kind: SettingsBillingCardActionKind;
   label: string;
 };
@@ -43,6 +44,7 @@ export type SettingsBillingCardPlanFeatureItem = {
 };
 
 export type SettingsBillingCardPlanFeatureSection = {
+  ariaLabel: string;
   description: string;
   id: SettingsBillingCardPlanFeatureSectionId;
   items: SettingsBillingCardPlanFeatureItem[];
@@ -56,12 +58,14 @@ export type SettingsBillingCardNextStepView = {
 };
 
 export type SettingsBillingCardBadge = {
+  ariaLabel: string;
   icon: SettingsBillingCardBadgeIcon;
   label: string;
   tone: SettingsBillingCardBadgeTone;
 };
 
 export type SettingsBillingCardPeriodRow = {
+  ariaLabel: string;
   id: SettingsBillingCardPeriodRowId;
   label: string;
   suffix?: string;
@@ -82,6 +86,7 @@ export type SettingsBillingCardPlanView = {
 
 export type SettingsBillingCardViewModel = {
   action?: SettingsBillingCardAction;
+  ariaLabel: string;
   header: SettingsBillingCardHeader;
   message?: string;
   nextStep?: SettingsBillingCardNextStepView;
@@ -126,10 +131,10 @@ export function buildSettingsBillingCardViewModel({
   if (hasLoadError) {
     return {
       ...buildSettingsBillingCardBaseView('error'),
-      action: {
+      action: buildSettingsBillingCardActionView({
         kind: 'retry',
         label: m.settings_billing_card_retry(),
-      },
+      }),
       message: m.settings_billing_card_load_error(),
     };
   }
@@ -142,10 +147,10 @@ export function buildSettingsBillingCardViewModel({
   if (!resolvedPlan) {
     return {
       ...buildSettingsBillingCardBaseView('no-plan'),
-      action: {
+      action: buildSettingsBillingCardActionView({
         kind: 'upgrade',
         label: m.settings_billing_card_upgrade_plan(),
-      },
+      }),
       message: m.settings_billing_card_no_plan(),
       nextStep: buildSettingsBillingNoPlanNextStepView(),
     };
@@ -184,7 +189,11 @@ export function resolveSettingsBillingPlan({
 function buildSettingsBillingCardBaseView(
   state: SettingsBillingCardState
 ): SettingsBillingCardViewModel {
+  const description = settingsBillingCardHeader.description;
+  const title = settingsBillingCardHeader.title;
+
   return {
+    ariaLabel: m.settings_billing_card_aria_label({ description, title }),
     header: settingsBillingCardHeader,
     periodRows: [],
     state,
@@ -227,20 +236,34 @@ function buildSettingsBillingPlanFeatureSections(
   });
 
   if (featureItems.length > 0) {
+    const description = m.settings_billing_card_features_description();
+    const title = m.settings_billing_card_features_title();
+
     sections.push({
-      description: m.settings_billing_card_features_description(),
+      ariaLabel: m.settings_billing_card_feature_section_aria({
+        description,
+        title,
+      }),
+      description,
       id: 'features',
       items: featureItems,
-      title: m.settings_billing_card_features_title(),
+      title,
     });
   }
 
   if (limitItems.length > 0) {
+    const description = m.settings_billing_card_limits_description();
+    const title = m.settings_billing_card_limits_title();
+
     sections.push({
-      description: m.settings_billing_card_limits_description(),
+      ariaLabel: m.settings_billing_card_feature_section_aria({
+        description,
+        title,
+      }),
+      description,
       id: 'limits',
       items: limitItems,
-      title: m.settings_billing_card_limits_title(),
+      title,
     });
   }
 
@@ -334,24 +357,38 @@ function buildSettingsBillingCardAction({
   isLifetimePlan: boolean;
 }): SettingsBillingCardAction | undefined {
   if (isFreePlan) {
-    return {
+    return buildSettingsBillingCardActionView({
       kind: 'upgrade',
       label: m.settings_billing_card_upgrade_plan(),
-    };
+    });
   }
 
   if (!canManageBilling) return undefined;
 
   if (isLifetimePlan) {
-    return {
+    return buildSettingsBillingCardActionView({
       kind: 'manage-billing',
       label: m.settings_billing_card_manage_billing(),
-    };
+    });
   }
 
-  return {
+  return buildSettingsBillingCardActionView({
     kind: 'manage-subscription',
     label: m.settings_billing_card_manage_subscription(),
+  });
+}
+
+function buildSettingsBillingCardActionView({
+  kind,
+  label,
+}: {
+  kind: SettingsBillingCardActionKind;
+  label: string;
+}): SettingsBillingCardAction {
+  return {
+    ariaLabel: m.settings_billing_card_action_aria({ label }),
+    kind,
+    label,
   };
 }
 
@@ -361,17 +398,23 @@ function buildSettingsBillingCardStatusBadge(
   if (!subscription) return undefined;
 
   if (subscription.status === 'trialing') {
+    const label = m.settings_billing_card_status_trial();
+
     return {
+      ariaLabel: m.settings_billing_card_status_aria({ status: label }),
       icon: 'clock',
-      label: m.settings_billing_card_status_trial(),
+      label,
       tone: 'trial',
     };
   }
 
   if (subscription.status === 'active') {
+    const label = m.settings_billing_card_status_active();
+
     return {
+      ariaLabel: m.settings_billing_card_status_aria({ status: label }),
       icon: 'check',
-      label: m.settings_billing_card_status_active(),
+      label,
       tone: 'active',
     };
   }
@@ -400,34 +443,64 @@ function buildSettingsBillingCardPeriodRows({
     : null;
 
   if (currentPeriodStart) {
-    rows.push({
-      id: 'period-start',
-      label: m.settings_billing_card_period_start(),
-      tone: 'muted',
-      value: currentPeriodStart,
-    });
+    rows.push(
+      buildSettingsBillingCardPeriodRowView({
+        id: 'period-start',
+        label: m.settings_billing_card_period_start(),
+        tone: 'muted',
+        value: currentPeriodStart,
+      })
+    );
   }
 
   if (currentPeriodEnd) {
-    rows.push({
-      id: 'period-end',
-      label: m.settings_billing_card_period_ends(),
-      suffix: subscription.cancelAtPeriodEnd
-        ? m.settings_billing_card_cancels_at_period_end()
-        : undefined,
-      tone: 'muted',
-      value: currentPeriodEnd,
-    });
+    rows.push(
+      buildSettingsBillingCardPeriodRowView({
+        id: 'period-end',
+        label: m.settings_billing_card_period_ends(),
+        suffix: subscription.cancelAtPeriodEnd
+          ? m.settings_billing_card_cancels_at_period_end()
+          : undefined,
+        tone: 'muted',
+        value: currentPeriodEnd,
+      })
+    );
   }
 
   if (subscription.status === 'trialing' && trialEndDate) {
-    rows.push({
-      id: 'trial-end',
-      label: m.settings_billing_card_trial_ends(),
-      tone: 'warning',
-      value: trialEndDate,
-    });
+    rows.push(
+      buildSettingsBillingCardPeriodRowView({
+        id: 'trial-end',
+        label: m.settings_billing_card_trial_ends(),
+        tone: 'warning',
+        value: trialEndDate,
+      })
+    );
   }
 
   return rows;
+}
+
+function buildSettingsBillingCardPeriodRowView({
+  id,
+  label,
+  suffix,
+  tone,
+  value,
+}: Omit<
+  SettingsBillingCardPeriodRow,
+  'ariaLabel'
+>): SettingsBillingCardPeriodRow {
+  return {
+    ariaLabel: m.settings_billing_card_period_row_aria({
+      label,
+      suffix: suffix ? ` ${suffix}` : '',
+      value,
+    }),
+    id,
+    label,
+    suffix,
+    tone,
+    value,
+  };
 }

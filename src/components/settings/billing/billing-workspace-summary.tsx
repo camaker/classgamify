@@ -35,7 +35,10 @@ function BillingWorkspaceSummaryItem({
   itemView: SettingsBillingWorkspaceSummaryItemView;
 }) {
   return (
-    <li className="grid gap-2 rounded-md border bg-background p-3">
+    <li
+      aria-label={itemView.ariaLabel}
+      className="grid gap-2 rounded-md border bg-background p-3"
+    >
       <Badge className="w-fit rounded-md" variant="outline">
         {itemView.label}
       </Badge>

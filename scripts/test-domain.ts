@@ -8319,18 +8319,33 @@ assert.match(
 );
 assert.match(
   billingCardSource,
-  /BillingPlanFeatureSections[\s\S]*sections=\{view\.plan\.featureSections\}[\s\S]*BillingNextStepView[\s\S]*nextStep=\{view\.plan\.nextStep\}/,
-  'BillingCard should render prepared plan features and next-step copy from the billing view model.'
+  /aria-label=\{view\.ariaLabel\}[\s\S]*BillingPlanFeatureSections[\s\S]*sections=\{view\.plan\.featureSections\}[\s\S]*BillingNextStepView[\s\S]*nextStep=\{view\.plan\.nextStep\}/,
+  'BillingCard should render prepared card semantics, plan features, and next-step copy from the billing view model.'
 );
 assert.match(
   billingViewSource,
-  /description: normalizeSettingsBillingText\(plan\.description\)[\s\S]*featureSections: buildSettingsBillingPlanFeatureSections\(plan\)[\s\S]*buildSettingsBillingPlanFeatureItems\(\{[\s\S]*items: plan\.features[\s\S]*items: plan\.limits/,
-  'Billing view model should derive plan description, included capabilities, and limits from the configured price plan.'
+  /ariaLabel: m\.settings_billing_card_aria_label[\s\S]*description: normalizeSettingsBillingText\(plan\.description\)[\s\S]*featureSections: buildSettingsBillingPlanFeatureSections\(plan\)[\s\S]*buildSettingsBillingPlanFeatureItems\(\{[\s\S]*items: plan\.features[\s\S]*items: plan\.limits[\s\S]*settings_billing_card_feature_section_aria/,
+  'Billing view model should derive card semantics, plan description, included capabilities, and limits from the configured price plan.'
 );
 assert.doesNotMatch(
   billingCardSource,
   /getPricePlans\(\)[\s\S]*find\(\(p\) => p\.id === currentPlan\.id\)|subscription\.status === 'trialing'|subscription\.cancelAtPeriodEnd/,
   'BillingCard should not keep plan resolution or subscription status rules in the component.'
+);
+assert.match(
+  billingCardSource,
+  /BillingPlanFeatureSections[\s\S]*aria-label=\{section\.ariaLabel\}[\s\S]*BillingStatusBadge[\s\S]*aria-label=\{badge\.ariaLabel\}[\s\S]*BillingPeriodRow[\s\S]*<legend className="sr-only">\{row\.ariaLabel\}<\/legend>/,
+  'BillingCard should render prepared feature-section, status-badge, and period-row semantics.'
+);
+assert.match(
+  billingCardSource,
+  /function BillingCardAction[\s\S]*ariaLabel: string[\s\S]*aria-label=\{action\.ariaLabel\}[\s\S]*CustomerPortalButton ariaLabel=\{action\.ariaLabel\}/,
+  'BillingCard actions should render prepared accessible labels across retry, upgrade, and portal actions.'
+);
+assert.match(
+  billingViewSource,
+  /buildSettingsBillingCardActionView[\s\S]*settings_billing_card_action_aria[\s\S]*settings_billing_card_status_aria[\s\S]*buildSettingsBillingCardPeriodRowView[\s\S]*settings_billing_card_period_row_aria/,
+  'Billing view model should prepare action, status, and period-row accessible labels.'
 );
 assert.match(
   settingsBillingViewSource,
@@ -8344,8 +8359,8 @@ assert.match(
 );
 assert.match(
   settingsBillingViewSource,
-  /export function buildSettingsBillingPageViewModel\(\)[\s\S]*breadcrumbs:[\s\S]*id: 'settings'[\s\S]*id: 'billing'[\s\S]*workspaceSummaryView: buildSettingsBillingWorkspaceSummaryView/,
-  'Settings billing page view model should own localized page state, breadcrumbs, and workspace summary.'
+  /export function buildSettingsBillingPageViewModel\(\)[\s\S]*breadcrumbs:[\s\S]*id: 'settings'[\s\S]*id: 'billing'[\s\S]*contentAriaLabel: m\.settings_billing_content_aria_label[\s\S]*planSectionAriaLabel: m\.settings_billing_plan_section_aria_label[\s\S]*workspaceSummaryView: buildSettingsBillingWorkspaceSummaryView/,
+  'Settings billing page view model should own localized page state, breadcrumbs, section semantics, and workspace summary.'
 );
 assert.match(
   settingsBillingViewSource,
@@ -8354,13 +8369,13 @@ assert.match(
 );
 assert.match(
   settingsBillingViewSource,
-  /settings_billing_workspace_summary_title[\s\S]*settings_billing_workspace_summary_description[\s\S]*settings_billing_workspace_summary_plan_description[\s\S]*settings_billing_workspace_summary_activities_description[\s\S]*settings_billing_workspace_summary_assignments_description[\s\S]*settings_billing_workspace_summary_results_description/,
-  'Settings billing view model should prepare localized workspace billing boundary copy.'
+  /settings_billing_workspace_summary_title[\s\S]*settings_billing_workspace_summary_description[\s\S]*buildSettingsBillingWorkspaceSummaryItemView[\s\S]*settings_billing_workspace_summary_plan_description[\s\S]*settings_billing_workspace_summary_activities_description[\s\S]*settings_billing_workspace_summary_assignments_description[\s\S]*settings_billing_workspace_summary_results_description[\s\S]*settings_billing_workspace_summary_item_aria_label/,
+  'Settings billing view model should prepare localized workspace billing boundary copy and item semantics.'
 );
 assert.match(
   billingWorkspaceSummarySource,
-  /view\.itemViews\.map\(\(itemView\) =>[\s\S]*key=\{itemView\.id\}[\s\S]*function BillingWorkspaceSummaryItem[\s\S]*itemView\.label[\s\S]*itemView\.description/,
-  'Billing workspace summary component should render prepared boundary views keyed by stable ids.'
+  /view\.itemViews\.map\(\(itemView\) =>[\s\S]*key=\{itemView\.id\}[\s\S]*function BillingWorkspaceSummaryItem[\s\S]*aria-label=\{itemView\.ariaLabel\}[\s\S]*itemView\.label[\s\S]*itemView\.description/,
+  'Billing workspace summary component should render prepared boundary views and item semantics keyed by stable ids.'
 );
 assert.doesNotMatch(
   billingWorkspaceSummarySource,
@@ -8525,6 +8540,14 @@ try {
 const billingPageView = buildSettingsBillingPageViewModel();
 assert.equal(billingPageView.breadcrumbs.at(-1)?.id, 'billing');
 assert.equal(billingPageView.title, 'Billing');
+assert.equal(
+  billingPageView.contentAriaLabel,
+  'Billing: Review your ClassGamify workspace access, hosted checkout status, assignment workflow limits, and plan management options'
+);
+assert.equal(
+  billingPageView.planSectionAriaLabel,
+  'Current ClassGamify plan and hosted billing controls'
+);
 const billingWorkspaceSummaryItemIds =
   billingPageView.workspaceSummaryView.itemViews
     .map((item) => item.id)
@@ -8536,6 +8559,30 @@ assert.equal(
 assert.match(
   billingPageView.workspaceSummaryView.description,
   /Billing connects hosted checkout status/
+);
+assert.deepEqual(
+  billingPageView.workspaceSummaryView.itemViews.map((item) => [
+    item.id,
+    item.ariaLabel,
+  ]),
+  [
+    [
+      'plan-access',
+      'Plan access: The current plan is the source of truth for which teacher workspace capabilities are included, upgradeable, or managed in the hosted billing portal.',
+    ],
+    [
+      'activity-library',
+      'Activity library: Plan access can shape how many saved activity sets, source-material workflows, and reusable template remixes fit into the teacher workspace.',
+    ],
+    [
+      'assignment-workflow',
+      'Assignment workflow: Assignment limits and upgrade paths should be checked before sending links with timers, attempt rules, shuffle policy, or close times to a class.',
+    ],
+    [
+      'results-ai',
+      'Results and AI: Result exports, classroom briefs, AI-assisted drafting, and future school workspace needs stay tied to the same plan boundary.',
+    ],
+  ]
 );
 const billingWorkspaceSummaryView = buildSettingsBillingWorkspaceSummaryView();
 assert.equal(billingWorkspaceSummaryView.itemViews.length, 4);
@@ -8625,6 +8672,10 @@ const loadingBillingView = buildSettingsBillingCardViewModel({
   subscription: null,
 });
 assert.equal(loadingBillingView.state, 'loading');
+assert.equal(
+  loadingBillingView.ariaLabel,
+  'Current plan: Your ClassGamify plan, activity access, assignment workflow limits, and hosted billing status'
+);
 assert.equal(loadingBillingView.action, undefined);
 const errorBillingView = buildSettingsBillingCardViewModel({
   canManageBilling: false,
@@ -8637,6 +8688,10 @@ const errorBillingView = buildSettingsBillingCardViewModel({
 });
 assert.equal(errorBillingView.state, 'error');
 assert.equal(errorBillingView.action?.kind, 'retry');
+assert.equal(
+  errorBillingView.action?.ariaLabel,
+  'Retry. Billing action for the current ClassGamify teacher workspace.'
+);
 assert.equal(errorBillingView.message, 'Failed to load billing info');
 const noPlanBillingView = buildSettingsBillingCardViewModel({
   canManageBilling: false,
@@ -8649,6 +8704,10 @@ const noPlanBillingView = buildSettingsBillingCardViewModel({
 });
 assert.equal(noPlanBillingView.state, 'no-plan');
 assert.equal(noPlanBillingView.action?.kind, 'upgrade');
+assert.equal(
+  noPlanBillingView.action?.ariaLabel,
+  'View ClassGamify plans. Billing action for the current ClassGamify teacher workspace.'
+);
 assert.match(
   noPlanBillingView.nextStep?.description ?? '',
   /student previews/
@@ -8670,15 +8729,28 @@ assert.equal(
   'Configured starter classroom access.'
 );
 assert.equal(freeBillingView.action?.kind, 'upgrade');
+assert.equal(
+  freeBillingView.action?.ariaLabel,
+  'View ClassGamify plans. Billing action for the current ClassGamify teacher workspace.'
+);
 assert.match(freeBillingView.plan?.message ?? '', /classroom activity workflow/);
 assert.deepEqual(
   freeBillingView.plan?.featureSections.map((section) => [
     section.id,
+    section.ariaLabel,
     section.items.map((item) => item.label),
   ]),
   [
-    ['features', ['Create classroom activities', 'Open student preview links']],
-    ['limits', ['AI drafts', 'Result exports']],
+    [
+      'features',
+      'Included classroom access: Configured plan capabilities for reusable classroom activities, assignment links, AI drafts, and result workflows.',
+      ['Create classroom activities', 'Open student preview links'],
+    ],
+    [
+      'limits',
+      'Upgrade path: Capabilities that may need an upgrade, school plan, or future workspace expansion.',
+      ['AI drafts', 'Result exports'],
+    ],
   ]
 );
 assert.match(
@@ -8708,7 +8780,12 @@ const trialBillingView = buildSettingsBillingCardViewModel({
 });
 assert.equal(trialBillingView.statusBadge?.tone, 'trial');
 assert.equal(trialBillingView.statusBadge?.icon, 'clock');
+assert.equal(trialBillingView.statusBadge?.ariaLabel, 'Plan status: Trial');
 assert.equal(trialBillingView.action?.kind, 'manage-subscription');
+assert.equal(
+  trialBillingView.action?.ariaLabel,
+  'Manage subscription. Billing action for the current ClassGamify teacher workspace.'
+);
 assert.deepEqual(
   trialBillingView.plan?.featureSections.map((section) => [
     section.id,
@@ -8729,13 +8806,29 @@ assert.match(
 assert.deepEqual(
   trialBillingView.periodRows.map((row) => [
     row.id,
+    row.ariaLabel,
     row.value,
     row.suffix ?? '',
   ]),
   [
-    ['period-start', 'date:2026-01-01', ''],
-    ['period-end', 'date:2026-02-01', '(cancels at period end)'],
-    ['trial-end', 'date:2026-01-15', ''],
+    [
+      'period-start',
+      'Current period starts: date:2026-01-01',
+      'date:2026-01-01',
+      '',
+    ],
+    [
+      'period-end',
+      'Current period ends: date:2026-02-01 (cancels at period end)',
+      'date:2026-02-01',
+      '(cancels at period end)',
+    ],
+    [
+      'trial-end',
+      'Trial ends: date:2026-01-15',
+      'date:2026-01-15',
+      '',
+    ],
   ]
 );
 const lifetimeBillingView = buildSettingsBillingCardViewModel({
@@ -8748,6 +8841,10 @@ const lifetimeBillingView = buildSettingsBillingCardViewModel({
   subscription: null,
 });
 assert.equal(lifetimeBillingView.action?.kind, 'manage-billing');
+assert.equal(
+  lifetimeBillingView.action?.ariaLabel,
+  'Manage billing. Billing action for the current ClassGamify teacher workspace.'
+);
 assert.match(lifetimeBillingView.plan?.message ?? '', /lifetime access/);
 assert.deepEqual(
   lifetimeBillingView.plan?.featureSections.map((section) => section.id),
@@ -10705,8 +10802,8 @@ for (const [source, breadcrumbId] of [
 }
 assert.match(
   settingsBillingRouteSource,
-  /const pageView = buildSettingsBillingPageViewModel\(\);[\s\S]*breadcrumbs=\{pageView\.breadcrumbs\}[\s\S]*BillingWorkspaceSummary[\s\S]*view=\{pageView\.workspaceSummaryView\}[\s\S]*BillingCard/,
-  'Settings billing route should consume the billing page view model and render the prepared workspace billing summary.'
+  /const pageView = buildSettingsBillingPageViewModel\(\);[\s\S]*breadcrumbs=\{pageView\.breadcrumbs\}[\s\S]*aria-label=\{pageView\.contentAriaLabel\}[\s\S]*BillingWorkspaceSummary[\s\S]*view=\{pageView\.workspaceSummaryView\}[\s\S]*aria-label=\{pageView\.planSectionAriaLabel\}[\s\S]*BillingCard/,
+  'Settings billing route should consume the billing page view model and render the prepared workspace billing summary and plan section semantics.'
 );
 assert.doesNotMatch(
   settingsBillingRouteSource,

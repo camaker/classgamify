@@ -6,6 +6,7 @@ import { IconLoader2 } from '@tabler/icons-react';
 import { useState } from 'react';
 import { toast } from 'sonner';
 interface CustomerPortalButtonProps {
+  ariaLabel?: string;
   userId: string;
   returnUrl?: string;
   variant?:
@@ -21,6 +22,7 @@ interface CustomerPortalButtonProps {
   children?: React.ReactNode;
 }
 export function CustomerPortalButton({
+  ariaLabel,
   returnUrl,
   variant = 'default',
   size = 'default',
@@ -50,6 +52,7 @@ export function CustomerPortalButton({
   };
   return (
     <Button
+      aria-label={ariaLabel}
       variant={variant}
       size={size}
       className={className}

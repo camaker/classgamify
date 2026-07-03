@@ -68,7 +68,7 @@ export function BillingCard() {
 
   if (view.state === 'loading') {
     return (
-      <Card className={cardClass}>
+      <Card aria-label={view.ariaLabel} className={cardClass}>
         <CardHeader>
           <CardTitle className="text-lg font-semibold">
             {view.header.title}
@@ -92,7 +92,7 @@ export function BillingCard() {
 
   if (view.state === 'error') {
     return (
-      <Card className={cardClass}>
+      <Card aria-label={view.ariaLabel} className={cardClass}>
         <CardHeader>
           <CardTitle className="text-lg font-semibold">
             {view.header.title}
@@ -103,7 +103,11 @@ export function BillingCard() {
           <div className="text-destructive text-sm">{view.message}</div>
         </CardContent>
         <CardFooter className={footerClass}>
-          <Button variant="outline" onClick={handleRetry}>
+          <Button
+            aria-label={view.action?.ariaLabel}
+            variant="outline"
+            onClick={handleRetry}
+          >
             <IconRefresh className="size-4 mr-1" />
             {view.action?.label}
           </Button>
@@ -114,7 +118,7 @@ export function BillingCard() {
 
   if (view.state === 'no-plan') {
     return (
-      <Card className={cardClass}>
+      <Card aria-label={view.ariaLabel} className={cardClass}>
         <CardHeader>
           <CardTitle className="text-lg font-semibold">
             {view.header.title}
@@ -137,7 +141,7 @@ export function BillingCard() {
   }
 
   return (
-    <Card className={cardClass}>
+    <Card aria-label={view.ariaLabel} className={cardClass}>
       <CardHeader>
         <CardTitle className="text-lg font-semibold">
           {view.header.title}
@@ -195,7 +199,11 @@ function BillingPlanFeatureSections({
   return (
     <div className="grid gap-4 border-t pt-4 sm:grid-cols-2">
       {sections.map((section) => (
-        <section className="min-w-0 space-y-2" key={section.id}>
+        <section
+          aria-label={section.ariaLabel}
+          className="min-w-0 space-y-2"
+          key={section.id}
+        >
           <div className="space-y-1">
             <h3 className="font-medium text-sm">{section.title}</h3>
             <p className="text-muted-foreground text-xs leading-5">
@@ -242,6 +250,7 @@ function BillingStatusBadge({ badge }: { badge: SettingsBillingCardBadge }) {
 
   return (
     <Badge
+      aria-label={badge.ariaLabel}
       variant="outline"
       className={cn(
         'text-xs border-transparent',
@@ -260,14 +269,16 @@ function BillingStatusBadge({ badge }: { badge: SettingsBillingCardBadge }) {
 
 function BillingPeriodRow({ row }: { row: SettingsBillingCardPeriodRow }) {
   return (
-    <div
+    <fieldset
       className={cn(
+        'm-0 border-0 p-0',
         row.tone === 'warning' ? 'text-amber-600' : 'text-muted-foreground'
       )}
     >
+      <legend className="sr-only">{row.ariaLabel}</legend>
       {row.label} {row.value}
       {row.suffix && ` ${row.suffix}`}
-    </div>
+    </fieldset>
   );
 }
 
@@ -276,6 +287,7 @@ function BillingCardAction({
   onRetry,
 }: {
   action?: {
+    ariaLabel: string;
     kind: SettingsBillingCardActionKind;
     label: string;
   };
@@ -285,7 +297,7 @@ function BillingCardAction({
 
   if (action.kind === 'retry') {
     return (
-      <Button variant="outline" onClick={onRetry}>
+      <Button aria-label={action.ariaLabel} variant="outline" onClick={onRetry}>
         <IconRefresh className="size-4 mr-1" />
         {action.label}
       </Button>
@@ -295,6 +307,7 @@ function BillingCardAction({
   if (action.kind === 'upgrade') {
     return (
       <Link
+        aria-label={action.ariaLabel}
         to={Routes.Pricing}
         className={buttonVariants({ variant: 'default' })}
       >
@@ -304,7 +317,7 @@ function BillingCardAction({
   }
 
   return (
-    <CustomerPortalButton returnUrl={undefined}>
+    <CustomerPortalButton ariaLabel={action.ariaLabel} returnUrl={undefined}>
       {action.label}
     </CustomerPortalButton>
   );

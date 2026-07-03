@@ -9,6 +9,7 @@ export type SettingsBillingWorkspaceSummaryItemId =
   | 'results-ai';
 
 export type SettingsBillingWorkspaceSummaryItemView = {
+  ariaLabel: string;
   description: string;
   id: SettingsBillingWorkspaceSummaryItemId;
   label: string;
@@ -23,7 +24,9 @@ export type SettingsBillingWorkspaceSummaryView = {
 
 export type SettingsBillingPageViewModel = {
   breadcrumbs: DashboardBreadcrumbItem[];
+  contentAriaLabel: string;
   description: string;
+  planSectionAriaLabel: string;
   title: string;
   workspaceSummaryView: SettingsBillingWorkspaceSummaryView;
 };
@@ -52,7 +55,12 @@ export function buildSettingsBillingPageViewModel(): SettingsBillingPageViewMode
         isCurrentPage: true,
       },
     ],
+    contentAriaLabel: m.settings_billing_content_aria_label({
+      description,
+      title,
+    }),
     description,
+    planSectionAriaLabel: m.settings_billing_plan_section_aria_label(),
     title,
     workspaceSummaryView: buildSettingsBillingWorkspaceSummaryView(),
   };
@@ -92,29 +100,49 @@ export function buildSettingsBillingWorkspaceSummaryView(): SettingsBillingWorks
     }),
     description,
     itemViews: [
-      {
+      buildSettingsBillingWorkspaceSummaryItemView({
         description: m.settings_billing_workspace_summary_plan_description(),
         id: 'plan-access',
         label: m.settings_billing_workspace_summary_plan_label(),
-      },
-      {
+      }),
+      buildSettingsBillingWorkspaceSummaryItemView({
         description:
           m.settings_billing_workspace_summary_activities_description(),
         id: 'activity-library',
         label: m.settings_billing_workspace_summary_activities_label(),
-      },
-      {
+      }),
+      buildSettingsBillingWorkspaceSummaryItemView({
         description:
           m.settings_billing_workspace_summary_assignments_description(),
         id: 'assignment-workflow',
         label: m.settings_billing_workspace_summary_assignments_label(),
-      },
-      {
+      }),
+      buildSettingsBillingWorkspaceSummaryItemView({
         description: m.settings_billing_workspace_summary_results_description(),
         id: 'results-ai',
         label: m.settings_billing_workspace_summary_results_label(),
-      },
+      }),
     ],
     title,
+  };
+}
+
+function buildSettingsBillingWorkspaceSummaryItemView({
+  description,
+  id,
+  label,
+}: {
+  description: string;
+  id: SettingsBillingWorkspaceSummaryItemId;
+  label: string;
+}): SettingsBillingWorkspaceSummaryItemView {
+  return {
+    ariaLabel: m.settings_billing_workspace_summary_item_aria_label({
+      description,
+      label,
+    }),
+    description,
+    id,
+    label,
   };
 }
