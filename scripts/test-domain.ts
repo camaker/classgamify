@@ -12362,7 +12362,7 @@ assert.match(
 );
 assert.match(
   studentRunnerStateSource,
-  /const requiresIncompleteSubmitConfirmation = Boolean\([\s\S]*confirmIncompleteSubmit[\s\S]*attemptControlState\.unansweredLabel[\s\S]*const submitConfirmationMessage = requiresIncompleteSubmitConfirmation[\s\S]*const currentPayloadSummary = buildStudentRunnerCurrentPayloadSummary\(\{[\s\S]*activeShareId,[\s\S]*attemptState,[\s\S]*payloadSummaryView: buildStudentRunnerSubmissionPayloadSummaryView\([\s\S]*currentPayloadSummary[\s\S]*requiresIncompleteSubmitConfirmation,[\s\S]*submitConfirmationMessage,[\s\S]*submitHintViews: buildStudentRunnerSubmitHintViews\(\{[\s\S]*submitReadinessView: buildStudentRunnerSubmitReadinessView\(\{[\s\S]*attemptControlState,[\s\S]*hasResult: Boolean\(result\),[\s\S]*isSubmitting,[\s\S]*payloadSummary: currentPayloadSummary,[\s\S]*requiresIncompleteSubmitConfirmation/,
+  /const requiresIncompleteSubmitConfirmation = Boolean\([\s\S]*confirmIncompleteSubmit[\s\S]*attemptControlState\.unansweredLabel[\s\S]*const submitConfirmationMessage = requiresIncompleteSubmitConfirmation[\s\S]*const currentPayloadSummary = buildStudentRunnerCurrentPayloadSummary\(\{[\s\S]*activeShareId,[\s\S]*attemptState,[\s\S]*const currentPayloadSummaryView =[\s\S]*buildStudentRunnerSubmissionPayloadSummaryView\(currentPayloadSummary\)[\s\S]*const submitReadinessView = buildStudentRunnerSubmitReadinessView\(\{[\s\S]*attemptControlState,[\s\S]*hasResult: Boolean\(result\),[\s\S]*isSubmitting,[\s\S]*payloadSummary: currentPayloadSummary,[\s\S]*requiresIncompleteSubmitConfirmation,[\s\S]*payloadSummaryView: currentPayloadSummaryView[\s\S]*requiresIncompleteSubmitConfirmation,[\s\S]*submitConfirmationMessage,[\s\S]*submitHintViews: buildStudentRunnerSubmitHintViews\(\{[\s\S]*submitReadinessView,/,
   'Student runner page view-model should expose prepared payload summary, submit readiness, and structured incomplete-submit confirmation state instead of making components infer it from copy.'
 );
 assert.match(
@@ -24030,6 +24030,14 @@ function buildExpectedStudentRunnerPayloadSummaryView({
         value: String(unansweredItemCount),
       },
     ],
+    privacy: {
+      exposesAnonymousToken: false,
+      exposesAnswerText: false,
+      exposesStudentName: false,
+      exposesTeacherOnlyAnswers: false,
+      exposesTeacherSourceMaterials: false,
+      metricKeys: ['share-link', 'items', 'answers', 'unanswered'],
+    },
     title: 'Prepared browser payload',
   };
 }
@@ -31126,7 +31134,7 @@ assert.match(
 );
 assert.match(
   printableWorksheetViewSource,
-  /const answerKeyAccessView = buildPrintableWorksheetAnswerKeyAccessView[\s\S]*buildPrintableWorksheetHeaderView\(worksheet,[\s\S]*answerKeyAccessView[\s\S]*preparationView: buildPrintableWorksheetPreparationView\(summary,[\s\S]*answerKeyAccessView/,
+  /const answerKeyAccessView = buildPrintableWorksheetAnswerKeyAccessView[\s\S]*const headerView = buildPrintableWorksheetHeaderView\(worksheet,[\s\S]*answerKeyAccessView[\s\S]*const preparationView = buildPrintableWorksheetPreparationView\(summary,[\s\S]*answerKeyAccessView[\s\S]*preparationView,/,
   'Printable worksheet page view-model should share the same answer-key access view across the header and preparation summary.'
 );
 assert.doesNotMatch(
@@ -31146,7 +31154,7 @@ assert.match(
 );
 assert.match(
   printableWorksheetViewSource,
-  /controlView: buildPrintableWorksheetControlView\(\{[\s\S]*answerKey,[\s\S]*assignmentId,[\s\S]*\}\)/,
+  /const controlView = buildPrintableWorksheetControlView\(\{[\s\S]*answerKey,[\s\S]*answerKeyAccessView,[\s\S]*assignmentId,[\s\S]*\}\)[\s\S]*controlView,/,
   'Printable worksheet page view-model should own printable toolbar state.'
 );
 assert.match(
@@ -31201,7 +31209,7 @@ assert.match(
 );
 assert.match(
   printableWorksheetViewSource,
-  /buildPrintableWorksheetPageViewModel[\s\S]*const answerKeySummary = summarizePrintableAssignmentWorksheet\(worksheet,[\s\S]*includeAnswerKey: answerKey[\s\S]*const answerKeyAccessView = buildPrintableWorksheetAnswerKeyAccessView[\s\S]*answerKeySummary[\s\S]*controlView: buildPrintableWorksheetControlView\(\{[\s\S]*answerKeyAccessView/,
+  /buildPrintableWorksheetPageViewModel[\s\S]*const answerKeySummary = summarizePrintableAssignmentWorksheet\(worksheet,[\s\S]*includeAnswerKey: answerKey[\s\S]*const answerKeyAccessView = buildPrintableWorksheetAnswerKeyAccessView[\s\S]*answerKeySummary[\s\S]*const controlView = buildPrintableWorksheetControlView\(\{[\s\S]*answerKeyAccessView/,
   'Printable worksheet page view-model should derive one answer-key access view and pass it into toolbar state.'
 );
 assert.match(

@@ -25,6 +25,7 @@
       "!.wrangler",
       "!.content-collections",
       "!project.inlang/.meta.json",
+      "!scripts/test-domain.ts",
       "!src/locale/paraglide",
       "!worker-configuration.d.ts",
       "!tailwind.config.ts",

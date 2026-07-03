@@ -201,6 +201,37 @@ export type StudentRunnerControlView = {
   unansweredLabel?: string;
 };
 
+export type StudentRunnerSubmissionContractItemId =
+  | 'feedback'
+  | 'identity'
+  | 'payload-summary'
+  | 'submit-readiness'
+  | 'timer';
+
+export type StudentRunnerSubmissionContractItemView = {
+  ariaLabel: string;
+  description: string;
+  id: StudentRunnerSubmissionContractItemId;
+  label: string;
+  value: string;
+};
+
+export type StudentRunnerSubmissionPrivacyContract = {
+  exposesAnonymousToken: false;
+  exposesAnswerText: false;
+  exposesStudentName: false;
+  exposesTeacherOnlyAnswers: false;
+  exposesTeacherSourceMaterials: false;
+  metricKeys: StudentRunnerSubmissionPayloadSummaryMetricKey[];
+};
+
+export type StudentRunnerSubmissionContractView = {
+  description: string;
+  itemViews: StudentRunnerSubmissionContractItemView[];
+  privacy: StudentRunnerSubmissionPrivacyContract;
+  title: string;
+};
+
 export type StudentRunnerSubmitHintId =
   | 'confirm-incomplete'
   | 'read-only'
@@ -312,6 +343,7 @@ export type StudentRunnerPageViewModel = {
   runtimeListView: StudentRunnerRuntimeListView;
   showStartAnotherAttempt: boolean;
   startedAt: number;
+  submissionContractView: StudentRunnerSubmissionContractView;
   submissionSuccessMessage: string;
   timeLimitSeconds?: number;
 };
@@ -470,6 +502,7 @@ export type StudentRunnerSubmissionPayloadSummaryView = {
   ariaLabel: string;
   description: string;
   metrics: StudentRunnerSubmissionPayloadSummaryMetricView[];
+  privacy: StudentRunnerSubmissionPrivacyContract;
   title: string;
 };
 
@@ -733,6 +766,23 @@ export function buildStudentRunnerPageViewModel({
     activeShareId,
     attemptState,
   });
+  const currentPayloadSummaryView =
+    buildStudentRunnerSubmissionPayloadSummaryView(currentPayloadSummary);
+  const submitReadinessView = buildStudentRunnerSubmitReadinessView({
+    attemptControlState,
+    hasResult: Boolean(result),
+    isSubmitting,
+    payloadSummary: currentPayloadSummary,
+    requiresIncompleteSubmitConfirmation,
+  });
+  const identityView = assignment
+    ? buildStudentRunnerIdentityView({
+        anonymousToken,
+        collectStudentName: assignment.settings.collectStudentName,
+        isSubmitting,
+        submittedAttemptCount: effectiveSubmittedAttemptCount,
+      })
+    : undefined;
   const revealAnswers = Boolean(
     result && assignment?.settings.showCorrectAnswers
   );
@@ -742,6 +792,21 @@ export function buildStudentRunnerPageViewModel({
     maxAttempts:
       result?.attemptUsage.maxAttempts ?? assignment?.settings.maxAttempts,
     submittedAttemptCount: effectiveSubmittedAttemptCount,
+  });
+  const resultPanelView = buildStudentRunnerResultPanelView({
+    assignment,
+    attemptResultDisplay,
+    attemptUsageLabel,
+    reviewItems: result?.reviewItems,
+    reviewSummary: result?.reviewSummary,
+    showStartAnotherAttempt,
+  });
+  const submissionContractView = buildStudentRunnerSubmissionContractView({
+    identityView,
+    payloadSummaryView: currentPayloadSummaryView,
+    resultPanelView,
+    submitReadinessView,
+    timerBadge: attemptTimerBadge,
   });
 
   return {
@@ -763,9 +828,7 @@ export function buildStudentRunnerPageViewModel({
     controlView: {
       attemptRegionDescription: m.student_runner_attempt_region_description(),
       attemptRegionLabel: m.student_runner_attempt_region_label(),
-      payloadSummaryView: buildStudentRunnerSubmissionPayloadSummaryView(
-        currentPayloadSummary
-      ),
+      payloadSummaryView: currentPayloadSummaryView,
       progressDescription: m.student_runner_progress_description({
         progress: progressView.label,
       }),
@@ -794,13 +857,7 @@ export function buildStudentRunnerPageViewModel({
         submitConfirmationMessage,
         unansweredLabel: attemptControlState.unansweredLabel,
       }),
-      submitReadinessView: buildStudentRunnerSubmitReadinessView({
-        attemptControlState,
-        hasResult: Boolean(result),
-        isSubmitting,
-        payloadSummary: currentPayloadSummary,
-        requiresIncompleteSubmitConfirmation,
-      }),
+      submitReadinessView,
       timeExpiredNoticeLabel: m.student_runner_time_expired_notice_label(),
       timeExpiredMessage: runnerCopy.timeExpiredMessage,
       timerBadge: attemptTimerBadge,
@@ -815,14 +872,7 @@ export function buildStudentRunnerPageViewModel({
             source: pageState.source,
           })
         : undefined,
-    identityView: assignment
-      ? buildStudentRunnerIdentityView({
-          anonymousToken,
-          collectStudentName: assignment.settings.collectStudentName,
-          isSubmitting,
-          submittedAttemptCount: effectiveSubmittedAttemptCount,
-        })
-      : undefined,
+    identityView,
     itemCount: attemptState.itemCount,
     loadingView: {
       message: runnerCopy.loadingMessage,
@@ -844,14 +894,7 @@ export function buildStudentRunnerPageViewModel({
             hideAnswers: pageState.hidePreviewAnswers,
           }
         : undefined,
-    resultPanelView: buildStudentRunnerResultPanelView({
-      assignment,
-      attemptResultDisplay,
-      attemptUsageLabel,
-      reviewItems: result?.reviewItems,
-      reviewSummary: result?.reviewSummary,
-      showStartAnotherAttempt,
-    }),
+    resultPanelView,
     routeBadgeLabel: runnerCopy.publicRouteBadgeLabel,
     runtimeListView: {
       disabled: attemptControlState.runtimeItemsDisabled,
@@ -863,6 +906,7 @@ export function buildStudentRunnerPageViewModel({
     },
     showStartAnotherAttempt,
     startedAt,
+    submissionContractView,
     submissionSuccessMessage: runnerCopy.submissionSuccessMessage,
     timeLimitSeconds,
   };
@@ -1516,39 +1560,181 @@ function buildStudentRunnerCurrentPayloadSummary({
 function buildStudentRunnerSubmissionPayloadSummaryView(
   summary: StudentRunnerSubmissionPayloadSummary
 ): StudentRunnerSubmissionPayloadSummaryView {
+  const metrics = [
+    buildStudentRunnerSubmissionPayloadSummaryMetricView({
+      key: 'share-link',
+      label: m.student_runner_payload_summary_share_label(),
+      value: normalizeAssignmentShareSlug(summary.shareSlug),
+      description: m.student_runner_payload_summary_share_description(),
+    }),
+    buildStudentRunnerSubmissionPayloadSummaryMetricView({
+      key: 'items',
+      label: m.student_runner_payload_summary_items_label(),
+      value: formatStudentRunnerSubmissionPayloadCount(summary.itemCount),
+      description: m.student_runner_payload_summary_items_description(),
+    }),
+    buildStudentRunnerSubmissionPayloadSummaryMetricView({
+      key: 'answers',
+      label: m.student_runner_payload_summary_answers_label(),
+      value: formatStudentRunnerSubmissionPayloadCount(summary.answerCount),
+      description: m.student_runner_payload_summary_answers_description(),
+    }),
+    buildStudentRunnerSubmissionPayloadSummaryMetricView({
+      key: 'unanswered',
+      label: m.student_runner_payload_summary_unanswered_label(),
+      value: formatStudentRunnerSubmissionPayloadCount(
+        summary.unansweredItemCount
+      ),
+      description: m.student_runner_payload_summary_unanswered_description(),
+    }),
+  ];
+
   return {
     ariaLabel: m.student_runner_payload_summary_aria_label(),
     description: m.student_runner_payload_summary_description(),
-    metrics: [
-      buildStudentRunnerSubmissionPayloadSummaryMetricView({
-        key: 'share-link',
-        label: m.student_runner_payload_summary_share_label(),
-        value: normalizeAssignmentShareSlug(summary.shareSlug),
-        description: m.student_runner_payload_summary_share_description(),
-      }),
-      buildStudentRunnerSubmissionPayloadSummaryMetricView({
-        key: 'items',
-        label: m.student_runner_payload_summary_items_label(),
-        value: formatStudentRunnerSubmissionPayloadCount(summary.itemCount),
-        description: m.student_runner_payload_summary_items_description(),
-      }),
-      buildStudentRunnerSubmissionPayloadSummaryMetricView({
-        key: 'answers',
-        label: m.student_runner_payload_summary_answers_label(),
-        value: formatStudentRunnerSubmissionPayloadCount(summary.answerCount),
-        description: m.student_runner_payload_summary_answers_description(),
-      }),
-      buildStudentRunnerSubmissionPayloadSummaryMetricView({
-        key: 'unanswered',
-        label: m.student_runner_payload_summary_unanswered_label(),
-        value: formatStudentRunnerSubmissionPayloadCount(
-          summary.unansweredItemCount
-        ),
-        description: m.student_runner_payload_summary_unanswered_description(),
-      }),
-    ],
+    metrics,
+    privacy: buildStudentRunnerSubmissionPrivacyContract(metrics),
     title: m.student_runner_payload_summary_title(),
   };
+}
+
+export function buildStudentRunnerSubmissionContractView({
+  identityView,
+  payloadSummaryView,
+  resultPanelView,
+  submitReadinessView,
+  timerBadge,
+}: {
+  identityView?: StudentRunnerIdentityView;
+  payloadSummaryView: StudentRunnerSubmissionPayloadSummaryView;
+  resultPanelView: StudentRunnerResultPanelView;
+  submitReadinessView: StudentRunnerSubmitReadinessView;
+  timerBadge: StudentAttemptTimerBadge;
+}): StudentRunnerSubmissionContractView {
+  const itemViews = [
+    buildStudentRunnerSubmissionContractItemView({
+      description: payloadSummaryView.description,
+      id: 'payload-summary',
+      label: payloadSummaryView.title,
+      value: formatStudentRunnerSubmissionContractMetricSummary(
+        payloadSummaryView.metrics
+      ),
+    }),
+    buildStudentRunnerSubmissionContractItemView({
+      description: submitReadinessView.description,
+      id: 'submit-readiness',
+      label: submitReadinessView.title,
+      value: submitReadinessView.statusLabel,
+    }),
+    buildStudentRunnerSubmissionContractItemView(
+      buildStudentRunnerIdentityContractItem(identityView)
+    ),
+    buildStudentRunnerSubmissionContractItemView({
+      description: timerBadge.description,
+      id: 'timer',
+      label: timerBadge.ariaLabel,
+      value: timerBadge.show
+        ? timerBadge.label
+        : getStudentRunnerCopy().timerOffDescription,
+    }),
+    buildStudentRunnerSubmissionContractItemView(
+      buildStudentRunnerFeedbackContractItem(resultPanelView)
+    ),
+  ];
+
+  return {
+    description: payloadSummaryView.description,
+    itemViews,
+    privacy: payloadSummaryView.privacy,
+    title: payloadSummaryView.title,
+  };
+}
+
+function buildStudentRunnerIdentityContractItem(
+  identityView: StudentRunnerIdentityView | undefined
+): Omit<StudentRunnerSubmissionContractItemView, 'ariaLabel'> {
+  if (!identityView) {
+    return {
+      description: '',
+      id: 'identity',
+      label: m.student_runner_identity_region_label(),
+      value: '',
+    };
+  }
+
+  if (identityView.mode === 'student-name') {
+    return {
+      description: identityView.description,
+      id: 'identity',
+      label: identityView.label,
+      value: identityView.mode,
+    };
+  }
+
+  return {
+    description: identityView.copy.description,
+    id: 'identity',
+    label: identityView.copy.title,
+    value: identityView.copy.browserLabel,
+  };
+}
+
+function buildStudentRunnerFeedbackContractItem(
+  resultPanelView: StudentRunnerResultPanelView
+): Omit<StudentRunnerSubmissionContractItemView, 'ariaLabel'> {
+  if (!resultPanelView.show) {
+    return {
+      description: getStudentRunnerCopy().resultNextStepReviewScore,
+      id: 'feedback',
+      label: getStudentRunnerCopy().reviewSummaryTitle,
+      value: getStudentRunnerCopy().reviewSummaryReviewHiddenValue,
+    };
+  }
+
+  return {
+    description: resultPanelView.feedbackScopeView.description,
+    id: 'feedback',
+    label: resultPanelView.feedbackScopeView.title,
+    value: resultPanelView.feedbackScopeView.statusLabel,
+  };
+}
+
+function buildStudentRunnerSubmissionContractItemView({
+  description,
+  id,
+  label,
+  value,
+}: Omit<StudentRunnerSubmissionContractItemView, 'ariaLabel'>) {
+  return {
+    ariaLabel: m.student_runner_payload_summary_metric_aria({
+      description,
+      label,
+      value,
+    }),
+    description,
+    id,
+    label,
+    value,
+  };
+}
+
+function buildStudentRunnerSubmissionPrivacyContract(
+  metrics: StudentRunnerSubmissionPayloadSummaryMetricView[]
+): StudentRunnerSubmissionPrivacyContract {
+  return {
+    exposesAnonymousToken: false,
+    exposesAnswerText: false,
+    exposesStudentName: false,
+    exposesTeacherOnlyAnswers: false,
+    exposesTeacherSourceMaterials: false,
+    metricKeys: metrics.map((metric) => metric.key),
+  };
+}
+
+function formatStudentRunnerSubmissionContractMetricSummary(
+  metrics: StudentRunnerSubmissionPayloadSummaryMetricView[]
+) {
+  return metrics.map((metric) => metric.value).join(' · ');
 }
 
 function buildStudentRunnerSubmitReadinessView({

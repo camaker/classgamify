@@ -69,6 +69,28 @@ export type PrintableWorksheetPreparationView = {
   title: string;
 };
 
+export type PrintableWorksheetHandoffItemId =
+  | 'answer-key'
+  | 'print-action'
+  | 'response-plan'
+  | 'results-return'
+  | 'share-path'
+  | 'student-fields';
+
+export type PrintableWorksheetHandoffItemView = {
+  ariaLabel: string;
+  description: string;
+  id: PrintableWorksheetHandoffItemId;
+  label: string;
+  value: string;
+};
+
+export type PrintableWorksheetHandoffView = {
+  description: string;
+  itemViews: PrintableWorksheetHandoffItemView[];
+  title: string;
+};
+
 export type PrintableWorksheetHeaderView = {
   activityDescription: string | null;
   activityTitle: string;
@@ -216,6 +238,7 @@ export type PrintableWorksheetPageViewModel = {
   assignmentFieldViews: PrintableWorksheetAssignmentFieldView[];
   controlView: PrintableWorksheetControlView;
   emptyState: PrintableWorksheetEmptyState;
+  handoffView: PrintableWorksheetHandoffView;
   headerView: PrintableWorksheetHeaderView;
   itemViews: PrintableWorksheetItemView[];
   preparationView: PrintableWorksheetPreparationView;
@@ -496,23 +519,32 @@ export function buildPrintableWorksheetPageViewModel({
   const summary = summarizePrintableAssignmentWorksheet(worksheet, {
     includeAnswerKey: answerKeyView.show,
   });
+  const assignmentFieldViews =
+    buildPrintableWorksheetAssignmentFieldViews(headerView);
+  const controlView = buildPrintableWorksheetControlView({
+    answerKey,
+    answerKeyAccessView,
+    assignmentId,
+  });
+  const preparationView = buildPrintableWorksheetPreparationView(summary, {
+    answerKeyAccessView,
+  });
 
   return {
     answerKeyView,
     answerKeyItemViews,
-    assignmentFieldViews:
-      buildPrintableWorksheetAssignmentFieldViews(headerView),
-    controlView: buildPrintableWorksheetControlView({
-      answerKey,
-      answerKeyAccessView,
-      assignmentId,
-    }),
+    assignmentFieldViews,
+    controlView,
     emptyState: buildPrintableWorksheetEmptyState(),
+    handoffView: buildPrintableWorksheetHandoffView({
+      assignmentFieldViews,
+      controlView,
+      headerView,
+      preparationView,
+    }),
     headerView,
     itemViews: worksheet.items.map(buildPrintableWorksheetItemView),
-    preparationView: buildPrintableWorksheetPreparationView(summary, {
-      answerKeyAccessView,
-    }),
+    preparationView,
     showAnswerKey: answerKeyView.show,
   };
 }
@@ -581,6 +613,98 @@ function buildPrintableWorksheetPreparationItemView({
     label,
     value,
   };
+}
+
+export function buildPrintableWorksheetHandoffView({
+  assignmentFieldViews,
+  controlView,
+  headerView,
+  preparationView,
+}: {
+  assignmentFieldViews: PrintableWorksheetAssignmentFieldView[];
+  controlView: PrintableWorksheetControlView;
+  headerView: PrintableWorksheetHeaderView;
+  preparationView: PrintableWorksheetPreparationView;
+}): PrintableWorksheetHandoffView {
+  return {
+    description: preparationView.description,
+    itemViews: [
+      ...preparationView.items.map(
+        buildPrintableWorksheetHandoffPreparationItem
+      ),
+      buildPrintableWorksheetHandoffAssignmentFieldItem({
+        fieldViews: assignmentFieldViews,
+        id: 'share-path',
+      }),
+      buildPrintableWorksheetHandoffItemView({
+        description: headerView.assignmentTitle,
+        id: 'results-return',
+        label: controlView.backToResultsAction.label,
+        value: controlView.backToResultsAction.assignmentId,
+      }),
+      buildPrintableWorksheetHandoffItemView({
+        description: controlView.printAction.description,
+        id: 'print-action',
+        label: controlView.printAction.label,
+        value: headerView.printModeLabel,
+      }),
+    ].filter(isPrintableWorksheetHandoffItemView),
+    title: preparationView.title,
+  };
+}
+
+function buildPrintableWorksheetHandoffPreparationItem(
+  itemView: PrintableWorksheetPreparationItemView
+): PrintableWorksheetHandoffItemView {
+  return buildPrintableWorksheetHandoffItemView({
+    description: itemView.description,
+    id: itemView.id,
+    label: itemView.label,
+    value: itemView.value,
+  });
+}
+
+function buildPrintableWorksheetHandoffAssignmentFieldItem({
+  fieldViews,
+  id,
+}: {
+  fieldViews: PrintableWorksheetAssignmentFieldView[];
+  id: Extract<PrintableWorksheetHandoffItemId, 'share-path'>;
+}) {
+  const fieldView = fieldViews.find((view) => view.id === id);
+  if (!fieldView) return null;
+
+  return buildPrintableWorksheetHandoffItemView({
+    description: fieldView.description,
+    id,
+    label: fieldView.label,
+    value: fieldView.value,
+  });
+}
+
+function buildPrintableWorksheetHandoffItemView({
+  description,
+  id,
+  label,
+  value,
+}: Omit<PrintableWorksheetHandoffItemView, 'ariaLabel'>) {
+  return {
+    ariaLabel: buildPrintableWorksheetSemanticAriaLabel({
+      description,
+      label,
+      value,
+    }),
+    description,
+    id,
+    label,
+    value,
+  };
+}
+
+function isPrintableWorksheetHandoffItemView(
+  itemView: PrintableWorksheetHandoffItemView | null
+): itemView is PrintableWorksheetHandoffItemView {
+  return itemView !== null;
 }
 
 export function buildPrintableWorksheetRouteState({
