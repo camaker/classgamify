@@ -249,6 +249,63 @@ export type ActivityDraftMetaReviewGateView = {
   title: string;
 };
 
+export const ACTIVITY_DRAFT_META_HANDOFF_ITEM_IDS = [
+  'draft-provider',
+  'draft-model',
+  'generation-notice',
+  'teacher-review-gate',
+  'review-gate-status',
+  'action-needed-count',
+  'review-required-count',
+  'ready-check-count',
+  'ready-template-count',
+  'locked-template-count',
+  'suggested-remix-count',
+  'question-count',
+  'pair-count',
+  'group-count',
+  'vocabulary-count',
+  'teacher-note-count',
+  'quiz-choice-readiness',
+  'safe-source-count',
+  'omitted-source-count',
+  'save-boundary',
+] as const;
+
+export type ActivityDraftMetaHandoffItemId =
+  (typeof ACTIVITY_DRAFT_META_HANDOFF_ITEM_IDS)[number];
+
+export type ActivityDraftMetaHandoffItemView = {
+  ariaLabel: string;
+  description: string;
+  id: ActivityDraftMetaHandoffItemId;
+  label: string;
+  value: string;
+};
+
+export type ActivityDraftMetaHandoffPrivacyContract = {
+  appliesToEditorBeforeSave: true;
+  exposesAnswerText: false;
+  exposesQuestionPromptText: false;
+  exposesRawDraftJson: false;
+  exposesRawSourceText: false;
+  exposesSourceMaterialFileIds: false;
+  exposesSourceMaterialStorageKeys: false;
+  exposesTeacherNotesText: false;
+  itemIds: ActivityDraftMetaHandoffItemId[];
+  publishesAssignmentWithoutTeacherAction: false;
+  requiresTeacherReview: true;
+  savesActivityWithoutTeacherAction: false;
+  scope: 'teacher-reviewed-ai-draft';
+};
+
+export type ActivityDraftMetaHandoffView = {
+  description: string;
+  itemViews: ActivityDraftMetaHandoffItemView[];
+  privacy: ActivityDraftMetaHandoffPrivacyContract;
+  title: string;
+};
+
 export type ActivityDraftMetaSummaryView = {
   appliedDescription: string;
   appliedLabel: string;
@@ -258,6 +315,7 @@ export type ActivityDraftMetaSummaryView = {
   draftFocusLabel: string;
   draftFocusLineText: string;
   draftFocusName: string;
+  handoffView: ActivityDraftMetaHandoffView;
   lockedTemplateLabel: string;
   lockedTemplateOptions: ActivityDraftMetaSummaryReadinessOption[];
   lockedTemplatesTitle: string;
@@ -433,73 +491,46 @@ export function buildActivityDraftMetaSummaryView({
     provider === 'workers-ai'
       ? m.activity_draft_meta_provider_workers_ai()
       : m.activity_draft_meta_provider_fallback();
+  const coverageStats = buildActivityDraftMetaSummaryCoverageStats(
+    meta.coverage
+  );
+  const questionChoiceReadiness =
+    buildActivityDraftMetaSummaryQuestionChoiceReadinessView(
+      meta.questionChoiceReadiness
+    );
+  const reviewGateView = buildActivityDraftMetaReviewGateView({
+    lockedTemplateCount,
+    notice: normalizedNotice,
+    provider,
+    readyTemplateCount,
+    reviewChecklistItems,
+    sourceMaterialSafetyView,
+  });
+  const trustView = buildActivityDraftMetaSummaryTrustView({
+    modelName,
+    notice: normalizedNotice,
+    providerDescription,
+    providerLabel,
+    sourceMaterialCount: normalizedSourceMaterialNoteViews.length,
+  });
+  const handoffView = buildActivityDraftMetaHandoffView({
+    coverageStats,
+    modelName,
+    notice: normalizedNotice,
+    providerDescription,
+    providerLabel,
+    questionChoiceReadiness,
+    reviewGateView,
+    sourceMaterialSafetyView,
+    suggestedTemplateCount: normalizeActivityDraftMetaCount(
+      meta.suggestedTemplateOptions.length
+    ),
+  });
 
   return {
     appliedDescription: m.activity_draft_meta_applied_description(),
     appliedLabel: m.activity_draft_meta_applied_label(),
-    coverageStats: [
-      {
-        ariaLabel: formatActivityDraftMetaSummaryItemAriaLabel({
-          description: m.activity_draft_meta_coverage_questions_description(),
-          label: m.activity_draft_meta_coverage_questions(),
-          value: String(
-            normalizeActivityDraftMetaCount(meta.coverage.questions)
-          ),
-        }),
-        description: m.activity_draft_meta_coverage_questions_description(),
-        id: 'questions',
-        label: m.activity_draft_meta_coverage_questions(),
-        value: normalizeActivityDraftMetaCount(meta.coverage.questions),
-      },
-      {
-        ariaLabel: formatActivityDraftMetaSummaryItemAriaLabel({
-          description: m.activity_draft_meta_coverage_pairs_description(),
-          label: m.activity_draft_meta_coverage_pairs(),
-          value: String(normalizeActivityDraftMetaCount(meta.coverage.pairs)),
-        }),
-        description: m.activity_draft_meta_coverage_pairs_description(),
-        id: 'pairs',
-        label: m.activity_draft_meta_coverage_pairs(),
-        value: normalizeActivityDraftMetaCount(meta.coverage.pairs),
-      },
-      {
-        ariaLabel: formatActivityDraftMetaSummaryItemAriaLabel({
-          description: m.activity_draft_meta_coverage_groups_description(),
-          label: m.activity_draft_meta_coverage_groups(),
-          value: String(normalizeActivityDraftMetaCount(meta.coverage.groups)),
-        }),
-        description: m.activity_draft_meta_coverage_groups_description(),
-        id: 'groups',
-        label: m.activity_draft_meta_coverage_groups(),
-        value: normalizeActivityDraftMetaCount(meta.coverage.groups),
-      },
-      {
-        ariaLabel: formatActivityDraftMetaSummaryItemAriaLabel({
-          description: m.activity_draft_meta_coverage_vocab_description(),
-          label: m.activity_draft_meta_coverage_vocab(),
-          value: String(
-            normalizeActivityDraftMetaCount(meta.coverage.vocabulary)
-          ),
-        }),
-        description: m.activity_draft_meta_coverage_vocab_description(),
-        id: 'vocabulary',
-        label: m.activity_draft_meta_coverage_vocab(),
-        value: normalizeActivityDraftMetaCount(meta.coverage.vocabulary),
-      },
-      {
-        ariaLabel: formatActivityDraftMetaSummaryItemAriaLabel({
-          description: m.activity_draft_meta_coverage_notes_description(),
-          label: m.activity_draft_meta_coverage_notes(),
-          value: String(
-            normalizeActivityDraftMetaCount(meta.coverage.teacherNotes)
-          ),
-        }),
-        description: m.activity_draft_meta_coverage_notes_description(),
-        id: 'teacher-notes',
-        label: m.activity_draft_meta_coverage_notes(),
-        value: normalizeActivityDraftMetaCount(meta.coverage.teacherNotes),
-      },
-    ],
+    coverageStats,
     description: m.activity_draft_meta_description(),
     draftFocusDescription:
       formatActivityAiDraftFocusDescription(normalizedDraftFocus),
@@ -509,6 +540,7 @@ export function buildActivityDraftMetaSummaryView({
       value: draftFocusName,
     }),
     draftFocusName,
+    handoffView,
     lockedTemplateLabel:
       lockedTemplateCount === 1
         ? m.activity_draft_meta_locked_template_label_one({
@@ -539,10 +571,7 @@ export function buildActivityDraftMetaSummaryView({
       : undefined,
     providerDescription,
     providerLabel,
-    questionChoiceReadiness:
-      buildActivityDraftMetaSummaryQuestionChoiceReadinessView(
-        meta.questionChoiceReadiness
-      ),
+    questionChoiceReadiness,
     readyTemplateLabel:
       readyTemplateCount === 1
         ? m.activity_draft_meta_ready_template_label_one({
@@ -553,14 +582,7 @@ export function buildActivityDraftMetaSummaryView({
           }),
     readyTemplatesTitle: m.activity_draft_meta_ready_templates_title(),
     reviewChecklist: meta.reviewChecklist,
-    reviewGateView: buildActivityDraftMetaReviewGateView({
-      lockedTemplateCount,
-      notice: normalizedNotice,
-      provider,
-      readyTemplateCount,
-      reviewChecklistItems,
-      sourceMaterialSafetyView,
-    }),
+    reviewGateView,
     reviewChecklistItems,
     reviewChecklistStatusViews,
     sourceMaterialCapabilityDescription:
@@ -588,14 +610,410 @@ export function buildActivityDraftMetaSummaryView({
     suggestedTemplatesTitle: m.activity_draft_meta_suggested_templates_title(),
     templateReadinessOptions: normalizedTemplateReadinessOptions,
     title: m.activity_draft_meta_title(),
-    trustView: buildActivityDraftMetaSummaryTrustView({
-      modelName,
-      notice: normalizedNotice,
-      providerDescription,
-      providerLabel,
-      sourceMaterialCount: normalizedSourceMaterialNoteViews.length,
-    }),
+    trustView,
   };
+}
+
+function buildActivityDraftMetaSummaryCoverageStats(
+  coverage: ActivityDraftMeta['coverage']
+): ActivityDraftMetaSummaryCoverageStatView[] {
+  return [
+    {
+      ariaLabel: formatActivityDraftMetaSummaryItemAriaLabel({
+        description: m.activity_draft_meta_coverage_questions_description(),
+        label: m.activity_draft_meta_coverage_questions(),
+        value: String(normalizeActivityDraftMetaCount(coverage.questions)),
+      }),
+      description: m.activity_draft_meta_coverage_questions_description(),
+      id: 'questions',
+      label: m.activity_draft_meta_coverage_questions(),
+      value: normalizeActivityDraftMetaCount(coverage.questions),
+    },
+    {
+      ariaLabel: formatActivityDraftMetaSummaryItemAriaLabel({
+        description: m.activity_draft_meta_coverage_pairs_description(),
+        label: m.activity_draft_meta_coverage_pairs(),
+        value: String(normalizeActivityDraftMetaCount(coverage.pairs)),
+      }),
+      description: m.activity_draft_meta_coverage_pairs_description(),
+      id: 'pairs',
+      label: m.activity_draft_meta_coverage_pairs(),
+      value: normalizeActivityDraftMetaCount(coverage.pairs),
+    },
+    {
+      ariaLabel: formatActivityDraftMetaSummaryItemAriaLabel({
+        description: m.activity_draft_meta_coverage_groups_description(),
+        label: m.activity_draft_meta_coverage_groups(),
+        value: String(normalizeActivityDraftMetaCount(coverage.groups)),
+      }),
+      description: m.activity_draft_meta_coverage_groups_description(),
+      id: 'groups',
+      label: m.activity_draft_meta_coverage_groups(),
+      value: normalizeActivityDraftMetaCount(coverage.groups),
+    },
+    {
+      ariaLabel: formatActivityDraftMetaSummaryItemAriaLabel({
+        description: m.activity_draft_meta_coverage_vocab_description(),
+        label: m.activity_draft_meta_coverage_vocab(),
+        value: String(normalizeActivityDraftMetaCount(coverage.vocabulary)),
+      }),
+      description: m.activity_draft_meta_coverage_vocab_description(),
+      id: 'vocabulary',
+      label: m.activity_draft_meta_coverage_vocab(),
+      value: normalizeActivityDraftMetaCount(coverage.vocabulary),
+    },
+    {
+      ariaLabel: formatActivityDraftMetaSummaryItemAriaLabel({
+        description: m.activity_draft_meta_coverage_notes_description(),
+        label: m.activity_draft_meta_coverage_notes(),
+        value: String(normalizeActivityDraftMetaCount(coverage.teacherNotes)),
+      }),
+      description: m.activity_draft_meta_coverage_notes_description(),
+      id: 'teacher-notes',
+      label: m.activity_draft_meta_coverage_notes(),
+      value: normalizeActivityDraftMetaCount(coverage.teacherNotes),
+    },
+  ];
+}
+
+type ActivityDraftMetaHandoffSummary = {
+  actionNeededCount: string;
+  coverageStats: ActivityDraftMetaSummaryCoverageStatView[];
+  generationNotice: string;
+  lockedTemplateCount: string;
+  modelName: string;
+  omittedSourceCount: string;
+  providerDescription: string;
+  providerLabel: string;
+  quizChoiceReadiness: string;
+  readyCheckCount: string;
+  readyTemplateCount: string;
+  reviewGateStatus: string;
+  reviewRequiredCount: string;
+  safeSourceCount: string;
+  suggestedTemplateCount: string;
+};
+
+function buildActivityDraftMetaHandoffView({
+  coverageStats,
+  modelName,
+  notice,
+  providerDescription,
+  providerLabel,
+  questionChoiceReadiness,
+  reviewGateView,
+  sourceMaterialSafetyView,
+  suggestedTemplateCount,
+}: {
+  coverageStats: ActivityDraftMetaSummaryCoverageStatView[];
+  modelName: string;
+  notice?: string;
+  providerDescription: string;
+  providerLabel: string;
+  questionChoiceReadiness?: ActivityDraftMetaSummaryQuestionChoiceReadinessView;
+  reviewGateView: ActivityDraftMetaReviewGateView;
+  sourceMaterialSafetyView: ActivityDraftMetaSummarySourceMaterialSafetyView;
+  suggestedTemplateCount: number;
+}): ActivityDraftMetaHandoffView {
+  const summary: ActivityDraftMetaHandoffSummary = {
+    actionNeededCount: getActivityDraftMetaReviewGateMetricValue(
+      reviewGateView,
+      'action-needed'
+    ),
+    coverageStats,
+    generationNotice: notice ?? m.activity_draft_meta_trust_notice_none_value(),
+    lockedTemplateCount: getActivityDraftMetaReviewGateMetricValue(
+      reviewGateView,
+      'locked-templates'
+    ),
+    modelName,
+    omittedSourceCount: getActivityDraftMetaSourceMaterialSafetyMetricValue(
+      sourceMaterialSafetyView,
+      'omitted'
+    ),
+    providerDescription,
+    providerLabel,
+    quizChoiceReadiness:
+      questionChoiceReadiness?.summaryLabel ??
+      m.activity_draft_meta_handoff_quiz_choice_none_value(),
+    readyCheckCount: getActivityDraftMetaReviewGateMetricValue(
+      reviewGateView,
+      'ready'
+    ),
+    readyTemplateCount: getActivityDraftMetaReviewGateMetricValue(
+      reviewGateView,
+      'ready-templates'
+    ),
+    reviewGateStatus: reviewGateView.badgeLabel,
+    reviewRequiredCount: getActivityDraftMetaReviewGateMetricValue(
+      reviewGateView,
+      'review-required'
+    ),
+    safeSourceCount: getActivityDraftMetaSourceMaterialSafetyMetricValue(
+      sourceMaterialSafetyView,
+      'safe'
+    ),
+    suggestedTemplateCount: String(
+      normalizeActivityDraftMetaCount(suggestedTemplateCount)
+    ),
+  };
+  const itemViews = ACTIVITY_DRAFT_META_HANDOFF_ITEM_IDS.map((id) =>
+    buildActivityDraftMetaHandoffItemView(
+      buildActivityDraftMetaHandoffItem({ id, summary })
+    )
+  );
+
+  return {
+    description: m.activity_draft_meta_handoff_description(),
+    itemViews,
+    privacy: buildActivityDraftMetaHandoffPrivacyContract(itemViews),
+    title: m.activity_draft_meta_handoff_title(),
+  };
+}
+
+function buildActivityDraftMetaHandoffItem({
+  id,
+  summary,
+}: {
+  id: ActivityDraftMetaHandoffItemId;
+  summary: ActivityDraftMetaHandoffSummary;
+}): Omit<ActivityDraftMetaHandoffItemView, 'ariaLabel'> {
+  if (id === 'draft-provider') {
+    return {
+      description: summary.providerDescription,
+      id,
+      label: m.activity_draft_meta_trust_provider_label(),
+      value: summary.providerLabel,
+    };
+  }
+
+  if (id === 'draft-model') {
+    return {
+      description: m.activity_draft_meta_trust_model_description(),
+      id,
+      label: m.activity_draft_meta_trust_model_label(),
+      value: summary.modelName,
+    };
+  }
+
+  if (id === 'generation-notice') {
+    return {
+      description: m.activity_draft_meta_trust_notice_description(),
+      id,
+      label: m.activity_draft_meta_trust_notice_label(),
+      value: summary.generationNotice,
+    };
+  }
+
+  if (id === 'teacher-review-gate') {
+    return {
+      description: m.activity_draft_meta_trust_review_description(),
+      id,
+      label: m.activity_draft_meta_trust_review_label(),
+      value: m.activity_draft_meta_trust_review_value(),
+    };
+  }
+
+  if (id === 'review-gate-status') {
+    return {
+      description:
+        m.activity_draft_meta_handoff_review_gate_status_description(),
+      id,
+      label: m.activity_draft_meta_handoff_review_gate_status_label(),
+      value: summary.reviewGateStatus,
+    };
+  }
+
+  if (id === 'action-needed-count') {
+    return {
+      description:
+        m.activity_draft_meta_review_gate_metric_action_needed_description(),
+      id,
+      label: m.activity_draft_meta_review_gate_metric_action_needed_label(),
+      value: summary.actionNeededCount,
+    };
+  }
+
+  if (id === 'review-required-count') {
+    return {
+      description:
+        m.activity_draft_meta_review_gate_metric_review_required_description(),
+      id,
+      label: m.activity_draft_meta_review_gate_metric_review_required_label(),
+      value: summary.reviewRequiredCount,
+    };
+  }
+
+  if (id === 'ready-check-count') {
+    return {
+      description: m.activity_draft_meta_review_gate_metric_ready_description(),
+      id,
+      label: m.activity_draft_meta_review_gate_metric_ready_label(),
+      value: summary.readyCheckCount,
+    };
+  }
+
+  if (id === 'ready-template-count') {
+    return {
+      description:
+        m.activity_draft_meta_review_gate_metric_ready_templates_description(),
+      id,
+      label: m.activity_draft_meta_review_gate_metric_ready_templates_label(),
+      value: summary.readyTemplateCount,
+    };
+  }
+
+  if (id === 'locked-template-count') {
+    return {
+      description:
+        m.activity_draft_meta_review_gate_metric_locked_templates_description(),
+      id,
+      label: m.activity_draft_meta_review_gate_metric_locked_templates_label(),
+      value: summary.lockedTemplateCount,
+    };
+  }
+
+  if (id === 'suggested-remix-count') {
+    return {
+      description: m.activity_draft_meta_handoff_suggested_remix_description(),
+      id,
+      label: m.activity_draft_meta_handoff_suggested_remix_label(),
+      value: summary.suggestedTemplateCount,
+    };
+  }
+
+  if (id === 'quiz-choice-readiness') {
+    return {
+      description: m.activity_draft_meta_handoff_quiz_choice_description(),
+      id,
+      label: m.activity_draft_meta_handoff_quiz_choice_label(),
+      value: summary.quizChoiceReadiness,
+    };
+  }
+
+  if (id === 'safe-source-count') {
+    return {
+      description:
+        m.activity_draft_meta_source_material_safety_safe_description(),
+      id,
+      label: m.activity_draft_meta_source_material_safety_safe_label(),
+      value: summary.safeSourceCount,
+    };
+  }
+
+  if (id === 'omitted-source-count') {
+    return {
+      description:
+        m.activity_draft_meta_source_material_safety_omitted_description(),
+      id,
+      label: m.activity_draft_meta_source_material_safety_omitted_label(),
+      value: summary.omittedSourceCount,
+    };
+  }
+
+  if (id === 'save-boundary') {
+    return {
+      description: m.activity_draft_meta_handoff_save_boundary_description(),
+      id,
+      label: m.activity_draft_meta_handoff_save_boundary_label(),
+      value: m.activity_draft_meta_handoff_save_boundary_value(),
+    };
+  }
+
+  const coverageId = getActivityDraftMetaHandoffCoverageStatId(id);
+  const coverageStat = coverageId
+    ? summary.coverageStats.find((stat) => stat.id === coverageId)
+    : undefined;
+
+  return {
+    description:
+      coverageStat?.description ??
+      m.activity_draft_meta_handoff_unknown_description(),
+    id,
+    label: coverageStat?.label ?? m.activity_draft_meta_handoff_unknown_label(),
+    value: String(coverageStat?.value ?? 0),
+  };
+}
+
+function buildActivityDraftMetaHandoffItemView({
+  description,
+  id,
+  label,
+  value,
+}: Omit<
+  ActivityDraftMetaHandoffItemView,
+  'ariaLabel'
+>): ActivityDraftMetaHandoffItemView {
+  return {
+    ariaLabel: formatActivityDraftMetaSummaryItemAriaLabel({
+      description,
+      label,
+      value,
+    }),
+    description,
+    id,
+    label,
+    value,
+  };
+}
+
+function buildActivityDraftMetaHandoffPrivacyContract(
+  itemViews: ActivityDraftMetaHandoffItemView[]
+): ActivityDraftMetaHandoffPrivacyContract {
+  return {
+    appliesToEditorBeforeSave: true,
+    exposesAnswerText: false,
+    exposesQuestionPromptText: false,
+    exposesRawDraftJson: false,
+    exposesRawSourceText: false,
+    exposesSourceMaterialFileIds: false,
+    exposesSourceMaterialStorageKeys: false,
+    exposesTeacherNotesText: false,
+    itemIds: itemViews.map((itemView) => itemView.id),
+    publishesAssignmentWithoutTeacherAction: false,
+    requiresTeacherReview: true,
+    savesActivityWithoutTeacherAction: false,
+    scope: 'teacher-reviewed-ai-draft',
+  };
+}
+
+function getActivityDraftMetaHandoffCoverageStatId(
+  id: ActivityDraftMetaHandoffItemId
+): ActivityDraftMetaSummaryCoverageStatId | undefined {
+  switch (id) {
+    case 'question-count':
+      return 'questions';
+    case 'pair-count':
+      return 'pairs';
+    case 'group-count':
+      return 'groups';
+    case 'vocabulary-count':
+      return 'vocabulary';
+    case 'teacher-note-count':
+      return 'teacher-notes';
+    default:
+      return undefined;
+  }
+}
+
+function getActivityDraftMetaReviewGateMetricValue(
+  reviewGateView: ActivityDraftMetaReviewGateView,
+  id: ActivityDraftMetaReviewGateMetricId
+) {
+  return String(
+    reviewGateView.metricViews.find((metricView) => metricView.id === id)
+      ?.value ?? 0
+  );
+}
+
+function getActivityDraftMetaSourceMaterialSafetyMetricValue(
+  safetyView: ActivityDraftMetaSummarySourceMaterialSafetyView,
+  id: ActivityDraftMetaSummarySourceMaterialSafetyMetricId
+) {
+  return (
+    safetyView.metricViews.find((metricView) => metricView.id === id)?.value ??
+    m.activity_draft_meta_handoff_none_value()
+  );
 }
 
 function buildActivityDraftMetaReviewGateView({

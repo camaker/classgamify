@@ -2,6 +2,8 @@ import type { ActivityDraftResult } from '@/activities/ai-draft';
 import type { ActivitySourceMaterialDraftNoteView } from '@/activities/draft-source';
 import {
   buildActivityDraftMetaSummaryView,
+  type ActivityDraftMetaHandoffItemView,
+  type ActivityDraftMetaHandoffView,
   type ActivityDraftMetaReviewGateMetricView,
   type ActivityDraftMetaReviewGateView,
   type ActivityDraftMetaSummaryCoverageStatView,
@@ -59,6 +61,7 @@ export function ActivityDraftMetaSummary({
       </div>
       <ActivityDraftTrustPanel trustView={summaryView.trustView} />
       <ActivityDraftReviewGate reviewGateView={summaryView.reviewGateView} />
+      <ActivityDraftMetaHandoff handoffView={summaryView.handoffView} />
       <div className="mt-3 rounded-lg border bg-background p-3 text-xs leading-5 text-muted-foreground">
         <p className="font-medium">{summaryView.draftFocusLineText}</p>
         <p className="mt-1">{summaryView.draftFocusDescription}</p>
@@ -262,6 +265,47 @@ function ActivityDraftReviewGateMetric({
       </dd>
       <dd className="mt-1 text-muted-foreground text-xs leading-5">
         {metricView.description}
+      </dd>
+    </div>
+  );
+}
+
+function ActivityDraftMetaHandoff({
+  handoffView,
+}: {
+  handoffView: ActivityDraftMetaHandoffView;
+}) {
+  return (
+    <section
+      aria-label={handoffView.title}
+      className="mt-4 rounded-lg border bg-background p-3"
+    >
+      <h4 className="font-medium text-sm">{handoffView.title}</h4>
+      <p className="mt-1 text-muted-foreground text-xs leading-5">
+        {handoffView.description}
+      </p>
+      <dl className="mt-3 grid gap-2 sm:grid-cols-2 lg:grid-cols-5">
+        {handoffView.itemViews.map((item) => (
+          <ActivityDraftMetaHandoffItem item={item} key={item.id} />
+        ))}
+      </dl>
+    </section>
+  );
+}
+
+function ActivityDraftMetaHandoffItem({
+  item,
+}: {
+  item: ActivityDraftMetaHandoffItemView;
+}) {
+  return (
+    <div className="rounded-md border bg-muted/20 p-2.5">
+      <dt className="text-muted-foreground text-xs leading-5">{item.label}</dt>
+      <dd className="mt-1 break-words font-medium text-xs leading-5">
+        <output aria-label={item.ariaLabel}>{item.value}</output>
+      </dd>
+      <dd className="mt-1 text-muted-foreground text-xs leading-5">
+        {item.description}
       </dd>
     </div>
   );

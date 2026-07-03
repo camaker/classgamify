@@ -250,12 +250,16 @@ import {
   buildDefaultActivityPreviewPanel,
 } from '@/activities/preview-view';
 import {
+  ACTIVITY_DRAFT_META_HANDOFF_ITEM_IDS,
   buildActivityDraftMeta,
   buildActivityDraftMetaSummaryView,
   buildActivityTemplateReadinessPanelSummary,
   getActivityTemplateQuizChoiceReadinessItemPosition,
   normalizeActivityDraftMetaCount,
   type ActivityDraftMeta,
+  type ActivityDraftMetaHandoffItemId,
+  type ActivityDraftMetaHandoffItemView,
+  type ActivityDraftMetaHandoffView,
   type ActivityDraftMetaReviewGateMetricView,
   type ActivityDraftReviewChecklistItem,
 } from '@/activities/draft-meta';
@@ -1155,6 +1159,46 @@ function findActivityDraftReviewGateMetric<
   assert.ok(metric, `Expected AI draft review gate metric "${id}".`);
 
   return metric;
+}
+
+function findActivityDraftMetaHandoffItem<
+  T extends Pick<ActivityDraftMetaHandoffItemView, 'id'>,
+>({
+  id,
+  itemViews,
+}: {
+  id: ActivityDraftMetaHandoffItemId;
+  itemViews: readonly T[];
+}): T {
+  const itemView = itemViews.find((candidate) => candidate.id === id);
+
+  assert.ok(itemView, `Expected AI draft handoff item "${id}".`);
+
+  return itemView;
+}
+
+function expectActivityDraftMetaHandoffPrivacy(
+  view: ActivityDraftMetaHandoffView
+) {
+  const itemIds = view.itemViews.map((itemView) => itemView.id);
+
+  assert.deepEqual(itemIds, [...ACTIVITY_DRAFT_META_HANDOFF_ITEM_IDS]);
+  assert.equal(new Set(itemIds).size, 20);
+  assert.deepEqual(view.privacy, {
+    appliesToEditorBeforeSave: true,
+    exposesAnswerText: false,
+    exposesQuestionPromptText: false,
+    exposesRawDraftJson: false,
+    exposesRawSourceText: false,
+    exposesSourceMaterialFileIds: false,
+    exposesSourceMaterialStorageKeys: false,
+    exposesTeacherNotesText: false,
+    itemIds,
+    publishesAssignmentWithoutTeacherAction: false,
+    requiresTeacherReview: true,
+    savesActivityWithoutTeacherAction: false,
+    scope: 'teacher-reviewed-ai-draft',
+  });
 }
 
 const activityEditorDefaultInput = getActivityEditorDefaultInput();
@@ -5123,6 +5167,26 @@ assert.match(
 );
 assert.match(
   activityDraftMetaSource,
+  /export const ACTIVITY_DRAFT_META_HANDOFF_ITEM_IDS = \[[\s\S]*'draft-provider'[\s\S]*'draft-model'[\s\S]*'generation-notice'[\s\S]*'teacher-review-gate'[\s\S]*'review-gate-status'[\s\S]*'action-needed-count'[\s\S]*'review-required-count'[\s\S]*'ready-check-count'[\s\S]*'ready-template-count'[\s\S]*'locked-template-count'[\s\S]*'suggested-remix-count'[\s\S]*'question-count'[\s\S]*'pair-count'[\s\S]*'group-count'[\s\S]*'vocabulary-count'[\s\S]*'teacher-note-count'[\s\S]*'quiz-choice-readiness'[\s\S]*'safe-source-count'[\s\S]*'omitted-source-count'[\s\S]*'save-boundary'/,
+  'AI draft meta domain should expose 20 stable save handoff item ids.'
+);
+assert.match(
+  activityDraftMetaSource,
+  /export type ActivityDraftMetaHandoffItemView = \{[\s\S]*ariaLabel: string;[\s\S]*description: string;[\s\S]*id: ActivityDraftMetaHandoffItemId;[\s\S]*label: string;[\s\S]*value: string;[\s\S]*export type ActivityDraftMetaHandoffPrivacyContract = \{[\s\S]*appliesToEditorBeforeSave: true;[\s\S]*exposesAnswerText: false;[\s\S]*exposesQuestionPromptText: false;[\s\S]*exposesRawDraftJson: false;[\s\S]*exposesRawSourceText: false;[\s\S]*exposesSourceMaterialFileIds: false;[\s\S]*exposesSourceMaterialStorageKeys: false;[\s\S]*exposesTeacherNotesText: false;[\s\S]*publishesAssignmentWithoutTeacherAction: false;[\s\S]*requiresTeacherReview: true;[\s\S]*savesActivityWithoutTeacherAction: false;[\s\S]*scope: 'teacher-reviewed-ai-draft';[\s\S]*export type ActivityDraftMetaHandoffView = \{[\s\S]*itemViews: ActivityDraftMetaHandoffItemView\[\];[\s\S]*privacy: ActivityDraftMetaHandoffPrivacyContract;/,
+  'AI draft meta domain should expose an explicit safe handoff privacy contract.'
+);
+assert.match(
+  activityDraftMetaSource,
+  /export type ActivityDraftMetaSummaryView = \{[\s\S]*handoffView: ActivityDraftMetaHandoffView;/,
+  'AI draft summary view should include a prepared handoff view.'
+);
+assert.match(
+  activityDraftMetaSource,
+  /const handoffView = buildActivityDraftMetaHandoffView\(\{[\s\S]*coverageStats[\s\S]*modelName[\s\S]*notice: normalizedNotice[\s\S]*providerDescription[\s\S]*providerLabel[\s\S]*questionChoiceReadiness[\s\S]*reviewGateView[\s\S]*sourceMaterialSafetyView[\s\S]*suggestedTemplateCount/,
+  'AI draft summary builder should construct the save handoff from prepared domain views.'
+);
+assert.match(
+  activityDraftMetaSource,
   /export type ActivityDraftMetaSummaryCoverageStatId =[\s\S]*'groups'[\s\S]*'pairs'[\s\S]*'questions'[\s\S]*'teacher-notes'[\s\S]*'vocabulary'[\s\S]*export type ActivityDraftMetaSummaryCoverageStatView = \{[\s\S]*ariaLabel: string;[\s\S]*description: string;[\s\S]*id: ActivityDraftMetaSummaryCoverageStatId;[\s\S]*label: string;[\s\S]*value: number;/,
   'AI draft coverage stats should expose stable ids, aria labels, and descriptions separately from localized labels.'
 );
@@ -5171,9 +5235,14 @@ assert.match(
   /ActivityDraftMetaReviewGateMetricView[\s\S]*ActivityDraftMetaReviewGateView/,
   'AI draft summary component should import explicit review-gate child view contracts.'
 );
+assert.match(
+  activityDraftMetaSummarySource,
+  /ActivityDraftMetaHandoffItemView[\s\S]*ActivityDraftMetaHandoffView/,
+  'AI draft summary component should import explicit handoff child view contracts.'
+);
 assert.doesNotMatch(
   activityDraftMetaSummarySource,
-  /ReturnType<typeof buildActivityDraftMetaSummaryView>|ActivityDraftMetaSummaryView\['(?:sourceMaterialCapabilityViews|reviewChecklistItems|questionChoiceReadiness|coverageStats|templateReadinessOptions|reviewGateView)'\]|NonNullable</,
+  /ReturnType<typeof buildActivityDraftMetaSummaryView>|ActivityDraftMetaSummaryView\['(?:sourceMaterialCapabilityViews|reviewChecklistItems|questionChoiceReadiness|coverageStats|templateReadinessOptions|reviewGateView|handoffView)'\]|NonNullable</,
   'AI draft summary component should not infer child prop contracts from builder return types, aggregate view indexes, or NonNullable.'
 );
 assert.match(
@@ -5258,6 +5327,11 @@ assert.match(
 );
 assert.match(
   activityDraftMetaSummarySource,
+  /ActivityDraftMetaHandoff[\s\S]*handoffView=\{summaryView\.handoffView\}/,
+  'AI draft summary component should delegate save handoff rendering to a prepared view.'
+);
+assert.match(
+  activityDraftMetaSummarySource,
   /function ActivityDraftReviewGate[\s\S]*reviewGateView\.ariaLabel[\s\S]*reviewGateView\.title[\s\S]*reviewGateView\.description[\s\S]*reviewGateView\.badgeLabel[\s\S]*reviewGateView\.metricViews\.map[\s\S]*ActivityDraftReviewGateMetric/,
   'AI draft review-gate component should render prepared title, description, badge, and metric views.'
 );
@@ -5270,6 +5344,21 @@ assert.doesNotMatch(
   activityDraftMetaSummarySource,
   /Save review gate|Action needed before save|Teacher review required|Ready to save|保存前检查门槛|保存前需要处理|需要老师检查|可以保存/,
   'AI draft summary component should not hard-code visible save review-gate copy.'
+);
+assert.match(
+  activityDraftMetaSummarySource,
+  /function ActivityDraftMetaHandoff[\s\S]*handoffView\.title[\s\S]*handoffView\.description[\s\S]*handoffView\.itemViews\.map[\s\S]*ActivityDraftMetaHandoffItem[\s\S]*key=\{item\.id\}/,
+  'AI draft handoff component should render prepared title, description, and item views keyed by stable ids.'
+);
+assert.match(
+  activityDraftMetaSummarySource,
+  /function ActivityDraftMetaHandoffItem[\s\S]*item\.label[\s\S]*<output aria-label=\{item\.ariaLabel\}>\{item\.value\}<\/output>[\s\S]*item\.description/,
+  'AI draft handoff items should render prepared label, aria value, and description fields.'
+);
+assert.doesNotMatch(
+  activityDraftMetaSummarySource,
+  /AI draft save handoff|Save boundary|Teacher saves first|AI 草稿保存交接|保存边界|老师先保存/,
+  'AI draft summary component should not hard-code visible save handoff copy.'
 );
 assert.match(
   activityDraftMetaSummarySource,
@@ -5452,7 +5541,7 @@ assert.match(
 );
 assert.match(
   activityDraftMetaSource,
-  /const sourceMaterialSafetyView =[\s\S]*buildActivityDraftMetaSummarySourceMaterialSafetyView[\s\S]*reviewGateView: buildActivityDraftMetaReviewGateView\(\{[\s\S]*lockedTemplateCount[\s\S]*notice: normalizedNotice[\s\S]*provider[\s\S]*readyTemplateCount[\s\S]*reviewChecklistItems[\s\S]*sourceMaterialSafetyView/,
+  /const sourceMaterialSafetyView =[\s\S]*buildActivityDraftMetaSummarySourceMaterialSafetyView[\s\S]*const reviewGateView = buildActivityDraftMetaReviewGateView\(\{[\s\S]*lockedTemplateCount[\s\S]*notice: normalizedNotice[\s\S]*provider[\s\S]*readyTemplateCount[\s\S]*reviewChecklistItems[\s\S]*sourceMaterialSafetyView[\s\S]*reviewGateView,/,
   'AI draft meta summary should build the save review gate from checklist, template, source-safety, provider, and notice signals.'
 );
 assert.match(
@@ -45725,6 +45814,68 @@ assert.equal(
   1
 );
 assert.equal(actionNeededDraftGateSummary.sourceMaterialNoteViews.length, 1);
+expectActivityDraftMetaHandoffPrivacy(
+  actionNeededDraftGateSummary.handoffView
+);
+assert.equal(
+  findActivityDraftMetaHandoffItem({
+    id: 'draft-provider',
+    itemViews: actionNeededDraftGateSummary.handoffView.itemViews,
+  }).value,
+  'Fallback'
+);
+assert.equal(
+  findActivityDraftMetaHandoffItem({
+    id: 'review-gate-status',
+    itemViews: actionNeededDraftGateSummary.handoffView.itemViews,
+  }).value,
+  'Action needed before save'
+);
+assert.equal(
+  findActivityDraftMetaHandoffItem({
+    id: 'ready-template-count',
+    itemViews: actionNeededDraftGateSummary.handoffView.itemViews,
+  }).value,
+  String(
+    findActivityDraftReviewGateMetric({
+      id: 'ready-templates',
+      metrics: actionNeededDraftGateSummary.reviewGateView.metricViews,
+    }).value
+  )
+);
+assert.equal(
+  findActivityDraftMetaHandoffItem({
+    id: 'locked-template-count',
+    itemViews: actionNeededDraftGateSummary.handoffView.itemViews,
+  }).value,
+  String(
+    findActivityDraftReviewGateMetric({
+      id: 'locked-templates',
+      metrics: actionNeededDraftGateSummary.reviewGateView.metricViews,
+    }).value
+  )
+);
+assert.equal(
+  findActivityDraftMetaHandoffItem({
+    id: 'safe-source-count',
+    itemViews: actionNeededDraftGateSummary.handoffView.itemViews,
+  }).value,
+  '1 safe source'
+);
+assert.equal(
+  findActivityDraftMetaHandoffItem({
+    id: 'omitted-source-count',
+    itemViews: actionNeededDraftGateSummary.handoffView.itemViews,
+  }).value,
+  '1 omitted source'
+);
+assert.equal(
+  findActivityDraftMetaHandoffItem({
+    id: 'save-boundary',
+    itemViews: actionNeededDraftGateSummary.handoffView.itemViews,
+  }).value,
+  'Teacher saves first'
+);
 const readyTemplateReadiness = questionOnlyDraftMeta.templateReadiness.find(
   (option) => option.isReady
 );
@@ -45804,6 +45955,28 @@ assert.equal(
     metrics: readyToSaveDraftGateSummary.reviewGateView.metricViews,
   }).value,
   0
+);
+expectActivityDraftMetaHandoffPrivacy(readyToSaveDraftGateSummary.handoffView);
+assert.equal(
+  findActivityDraftMetaHandoffItem({
+    id: 'review-gate-status',
+    itemViews: readyToSaveDraftGateSummary.handoffView.itemViews,
+  }).value,
+  'Ready to save'
+);
+assert.equal(
+  findActivityDraftMetaHandoffItem({
+    id: 'ready-template-count',
+    itemViews: readyToSaveDraftGateSummary.handoffView.itemViews,
+  }).value,
+  '1'
+);
+assert.equal(
+  findActivityDraftMetaHandoffItem({
+    id: 'locked-template-count',
+    itemViews: readyToSaveDraftGateSummary.handoffView.itemViews,
+  }).value,
+  '0'
 );
 const fallbackFillBlankDraft = createFallbackActivityDraft({
   difficulty: 'starter',
