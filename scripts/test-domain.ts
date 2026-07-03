@@ -328,7 +328,10 @@ import {
   normalizeListeningSpeechLanguage,
 } from '@/activities/listening-speech';
 import {
+  ACTIVITY_TEMPLATE_REMIX_HANDOFF_ITEM_IDS,
+  ACTIVITY_TEMPLATE_REMIX_HANDOFF_VISIBLE_ACTION_LIMIT,
   assertTemplateRemixOptionReady,
+  buildActivityTemplateRemixHandoffView,
   getActivityTemplateDraftGuidance,
   buildTemplateRemixSummary,
   formatTemplateRequirementList,
@@ -2319,6 +2322,26 @@ assert.match(
   /export class TemplateRemixReadinessError extends Error[\s\S]*readonly code: TemplateRemixReadinessErrorCode[\s\S]*readonly diagnosis: string[\s\S]*readonly missingRequirements: ActivityTemplateContentRequirement\[\][\s\S]*readonly templateType: ActivityTemplateType[\s\S]*export function assertTemplateRemixOptionReady\(option: TemplateRemixOption\)/,
   'Template remix readiness failures should expose a structured domain error contract.'
 );
+assert.match(
+  activityTemplateRemixSource,
+  /export const ACTIVITY_TEMPLATE_REMIX_HANDOFF_ITEM_IDS = \[[\s\S]*'current-template'[\s\S]*'current-readiness'[\s\S]*'ready-template-count'[\s\S]*'suggested-remix-count'[\s\S]*'suggested-remix-actions'[\s\S]*'locked-template-count'[\s\S]*'locked-diagnostics'[\s\S]*'missing-requirements'[\s\S]*'lifecycle-gate'[\s\S]*'draft-output'[\s\S]*'title-strategy'[\s\S]*'title-limit'[\s\S]*'template-switch'[\s\S]*'content-clone'[\s\S]*'questions'[\s\S]*'pairs'[\s\S]*'groups'[\s\S]*'vocabulary'[\s\S]*'teacher-notes'[\s\S]*'privacy-guard'/,
+  'Template remix handoff should expose 20 stable slice ids for the deterministic draft-copy contract.'
+);
+assert.match(
+  activityTemplateRemixSource,
+  /export const ACTIVITY_TEMPLATE_REMIX_HANDOFF_VISIBLE_ACTION_LIMIT = 3/,
+  'Template remix handoff should keep visible Copy as action evidence aligned to the library action limit.'
+);
+assert.match(
+  activityTemplateRemixSource,
+  /export type ActivityTemplateRemixHandoffPrivacyContract = \{[\s\S]*exposesActivityContentText: false;[\s\S]*exposesAnswerText: false;[\s\S]*exposesQuestionPromptText: false;[\s\S]*exposesSourceMaterialFileIds: false;[\s\S]*exposesSourceMaterialStorageKeys: false;[\s\S]*exposesTeacherNotesText: false;[\s\S]*modifiesOriginalActivity: false;[\s\S]*modifiesPublishedAssignmentSnapshots: false;[\s\S]*outputVisibility: 'draft';[\s\S]*scope: 'deterministic-template-remix';[\s\S]*targetTemplatesAreReadyOnly: true;/,
+  'Template remix handoff should publish an explicit privacy and draft-output contract.'
+);
+assert.match(
+  activityTemplateRemixSource,
+  /buildActivityTemplateRemixHandoffView[\s\S]*getTemplateRemixPlan\(\{[\s\S]*currentTemplateType: source\.currentTemplateType[\s\S]*buildActivityTemplateRemixHandoffSummary[\s\S]*buildTemplateRemixSummary\(remixPlan\)[\s\S]*buildRemixedActivityTitle\(\{[\s\S]*targetShortName[\s\S]*titleLimit: ACTIVITY_TITLE_LENGTH\.max/,
+  'Template remix handoff should derive readiness, draft title, and title limits from shared activity-domain helpers.'
+);
 assert.doesNotMatch(
   activityTemplateRemixSource,
   /\.trim\(\)/,
@@ -3955,8 +3978,8 @@ const activityLibraryViewSource = readFileSync(
 );
 assert.match(
   activityLibraryViewSource,
-  /ACTIVITY_LIBRARY_COMPATIBILITY_LIMITS[\s\S]*lockedTemplateDiagnostics: 2[\s\S]*remixActionOptions: 3/,
-  'Activity library compatibility view should expose named display limits.'
+  /ACTIVITY_LIBRARY_COMPATIBILITY_LIMITS[\s\S]*lockedTemplateDiagnostics: 2[\s\S]*remixActionOptions: ACTIVITY_TEMPLATE_REMIX_HANDOFF_VISIBLE_ACTION_LIMIT/,
+  'Activity library compatibility view should expose named display limits shared with the template-remix handoff.'
 );
 assert.match(
   activityLibraryViewSource,
@@ -29286,7 +29309,7 @@ assert.match(
 );
 assert.match(
   activityLibraryViewSource,
-  /export type ActivityLibraryCardStat[\s\S]*export type ActivityLibraryReadyTemplateOptionView[\s\S]*isCurrent: boolean;[\s\S]*export type ActivityLibraryRemixActionOptionView[\s\S]*actionLabel: string;[\s\S]*export type ActivityLibraryCompatibilityView[\s\S]*readyTemplateOptions: ActivityLibraryReadyTemplateOptionView\[\];[\s\S]*remixStatusView: ActivityLibraryActionStatusView;[\s\S]*remixActionOptions: ActivityLibraryRemixActionOptionView\[\];[\s\S]*export type ActivityLibraryCardActionState[\s\S]*export type ActivityLibraryCardViewModel[\s\S]*export type ActivityLibraryCardDisplayView[\s\S]*export type ActivityLibraryCardTemplateType = ActivityTemplateType;[\s\S]*export type ActivityLibraryCardActionView[\s\S]*export type ActivityLibraryEditorActionView/,
+  /export type ActivityLibraryCardStat[\s\S]*export type ActivityLibraryReadyTemplateOptionView[\s\S]*isCurrent: boolean;[\s\S]*export type ActivityLibraryRemixActionOptionView[\s\S]*actionLabel: string;[\s\S]*export type ActivityLibraryCompatibilityView[\s\S]*readyTemplateOptions: ActivityLibraryReadyTemplateOptionView\[\];[\s\S]*remixHandoffView: ActivityTemplateRemixHandoffView;[\s\S]*remixStatusView: ActivityLibraryActionStatusView;[\s\S]*remixActionOptions: ActivityLibraryRemixActionOptionView\[\];[\s\S]*export type ActivityLibraryCardActionState[\s\S]*export type ActivityLibraryCardViewModel[\s\S]*export type ActivityLibraryCardDisplayView[\s\S]*export type ActivityLibraryCardTemplateType = ActivityTemplateType;[\s\S]*export type ActivityLibraryCardActionView[\s\S]*export type ActivityLibraryEditorActionView/,
   'Activity library domain should expose explicit card, compatibility, action, and stat view contracts.'
 );
 assert.match(
@@ -29336,13 +29359,13 @@ assert.match(
 );
 assert.match(
   activityLibraryViewSource,
-  /export type ActivityLibraryCompatibilityView = \{[\s\S]*remixStatusView: ActivityLibraryActionStatusView;[\s\S]*restoreRequiredMessage\?: string;[\s\S]*buildActivityLibraryCompatibilityView\(\{[\s\S]*visibility = 'draft'[\s\S]*buildActivityDerivativeActionGate\(\{[\s\S]*action: 'remix'[\s\S]*visibility,[\s\S]*remixStatusView[\s\S]*restoreRequiredMessage/,
-  'Activity library compatibility view should expose remix status and restore guidance from the remix lifecycle gate.'
+  /export type ActivityLibraryCompatibilityView = \{[\s\S]*remixHandoffView: ActivityTemplateRemixHandoffView;[\s\S]*remixStatusView: ActivityLibraryActionStatusView;[\s\S]*restoreRequiredMessage\?: string;[\s\S]*buildActivityLibraryCompatibilityView\(\{[\s\S]*content,[\s\S]*currentTemplateType,[\s\S]*sourceTitle,[\s\S]*visibility = 'draft'[\s\S]*buildActivityDerivativeActionGate\(\{[\s\S]*action: 'remix'[\s\S]*visibility,[\s\S]*remixHandoffView: buildActivityTemplateRemixHandoffView\(\{[\s\S]*content,[\s\S]*currentTemplateType,[\s\S]*sourceTitle,[\s\S]*visibility,[\s\S]*remixStatusView[\s\S]*restoreRequiredMessage/,
+  'Activity library compatibility view should expose remix status, handoff evidence, and restore guidance from the remix lifecycle gate.'
 );
 assert.match(
   activityLibraryViewSource,
-  /buildActivityLibraryCardDisplayView[\s\S]*buildActivityLibraryCompatibilityView\(\{[\s\S]*currentTemplateType: activity\.templateType,[\s\S]*summary,[\s\S]*visibility: activity\.status/,
-  'Activity library card display view should pass activity visibility into compatibility rendering.'
+  /buildActivityLibraryCardDisplayView[\s\S]*buildActivityLibraryCompatibilityView\(\{[\s\S]*content: activity\.content,[\s\S]*currentTemplateType: activity\.templateType,[\s\S]*sourceTitle: activity\.title,[\s\S]*summary,[\s\S]*visibility: activity\.status/,
+  'Activity library card display view should pass activity content, title, and visibility into compatibility rendering.'
 );
 assert.doesNotMatch(
   activityLibraryViewSource,
@@ -29586,6 +29609,11 @@ assert.match(
 );
 assert.match(
   activityLibraryCompatibilityPanelSource,
+  /ActivityTemplateRemixHandoffItemView[\s\S]*ActivityTemplateRemixHandoffView/,
+  'Activity library compatibility panel should import explicit template-remix handoff contracts.'
+);
+assert.match(
+  activityLibraryCompatibilityPanelSource,
   /label: string;[\s\S]*const remixStatusDescriptionId = useId\(\)[\s\S]*<section aria-label=\{label\}[\s\S]*ActivityLibraryActionStatusBadge[\s\S]*view=\{compatibility\.remixStatusView\}/,
   'Activity library compatibility panel should expose the prepared compatibility label and remix status on its section.'
 );
@@ -29613,6 +29641,16 @@ assert.match(
   activityLibraryCompatibilityPanelSource,
   /actionState\.showRestoreRequiredMessage[\s\S]*compatibility\.restoreRequiredMessage[\s\S]*\{compatibility\.restoreRequiredMessage\}/,
   'Activity library compatibility panel should render prepared restore guidance for archived remix actions.'
+);
+assert.match(
+  activityLibraryCompatibilityPanelSource,
+  /<ActivityLibraryTemplateRemixHandoff[\s\S]*handoff=\{compatibility\.remixHandoffView\}[\s\S]*function ActivityLibraryTemplateRemixHandoff[\s\S]*handoff: ActivityTemplateRemixHandoffView[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*aria-labelledby=\{titleId\}[\s\S]*\{handoff\.title\}[\s\S]*\{handoff\.description\}[\s\S]*handoff\.itemViews\.map\(\(item\) => \([\s\S]*ActivityLibraryTemplateRemixHandoffItem[\s\S]*item=\{item\}/,
+  'Activity library compatibility panel should render the prepared template-remix handoff title, description, and item views.'
+);
+assert.match(
+  activityLibraryCompatibilityPanelSource,
+  /function ActivityLibraryTemplateRemixHandoffItem[\s\S]*item: ActivityTemplateRemixHandoffItemView[\s\S]*\{item\.ariaLabel\}[\s\S]*\{item\.label\}[\s\S]*\{item\.value\}[\s\S]*\{item\.description\}/,
+  'Activity library template-remix handoff items should render prepared aria labels, labels, values, and descriptions.'
 );
 assert.match(
   activityLibraryCompatibilityPanelSource,
@@ -41108,6 +41146,112 @@ assert.deepEqual(questionOnlyRemixSummary, {
     { shortName: 'Box', template: 'open-box' },
   ],
 });
+assert.deepEqual([...ACTIVITY_TEMPLATE_REMIX_HANDOFF_ITEM_IDS], [
+  'current-template',
+  'current-readiness',
+  'ready-template-count',
+  'suggested-remix-count',
+  'suggested-remix-actions',
+  'locked-template-count',
+  'locked-diagnostics',
+  'missing-requirements',
+  'lifecycle-gate',
+  'draft-output',
+  'title-strategy',
+  'title-limit',
+  'template-switch',
+  'content-clone',
+  'questions',
+  'pairs',
+  'groups',
+  'vocabulary',
+  'teacher-notes',
+  'privacy-guard',
+]);
+assert.equal(new Set(ACTIVITY_TEMPLATE_REMIX_HANDOFF_ITEM_IDS).size, 20);
+assert.equal(
+  ACTIVITY_TEMPLATE_REMIX_HANDOFF_VISIBLE_ACTION_LIMIT,
+  ACTIVITY_LIBRARY_COMPATIBILITY_LIMITS.remixActionOptions
+);
+const questionOnlyDraftRemixHandoffView =
+  buildActivityTemplateRemixHandoffView({
+    content: questionOnlyContent,
+    currentTemplateType: 'quiz',
+    sourceTitle: 'Question review',
+    visibility: 'draft',
+  });
+const questionOnlyDraftRemixHandoffItems = new Map(
+  questionOnlyDraftRemixHandoffView.itemViews.map((item) => [
+    item.id,
+    item.value,
+  ])
+);
+assert.deepEqual(
+  questionOnlyDraftRemixHandoffView.itemViews.map((item) => item.id),
+  [...ACTIVITY_TEMPLATE_REMIX_HANDOFF_ITEM_IDS]
+);
+assert.ok(
+  questionOnlyDraftRemixHandoffView.itemViews.every(
+    (item) => item.ariaLabel && item.description && item.label && item.value
+  )
+);
+assert.deepEqual(questionOnlyDraftRemixHandoffView.privacy, {
+  exposesActivityContentText: false,
+  exposesAnswerText: false,
+  exposesQuestionPromptText: false,
+  exposesSourceMaterialFileIds: false,
+  exposesSourceMaterialStorageKeys: false,
+  exposesTeacherNotesText: false,
+  itemIds: [...ACTIVITY_TEMPLATE_REMIX_HANDOFF_ITEM_IDS],
+  modifiesOriginalActivity: false,
+  modifiesPublishedAssignmentSnapshots: false,
+  outputVisibility: 'draft',
+  scope: 'deterministic-template-remix',
+  targetTemplatesAreReadyOnly: true,
+});
+assert.deepEqual(
+  Object.fromEntries(questionOnlyDraftRemixHandoffItems),
+  {
+    'content-clone': 'Same structured content',
+    'current-readiness': 'Ready',
+    'current-template': 'Quiz',
+    'draft-output': 'Draft copy',
+    groups: '0',
+    'lifecycle-gate': 'Ready to remix',
+    'locked-diagnostics': '4',
+    'locked-template-count': '4',
+    'missing-requirements': '2',
+    pairs: '0',
+    'privacy-guard': 'Content hidden',
+    questions: '2',
+    'ready-template-count': '4',
+    'suggested-remix-actions': 'Fill, Listen, and Box',
+    'suggested-remix-count': '3',
+    'teacher-notes': '0',
+    'template-switch': 'Fill',
+    'title-limit': '120 chars',
+    'title-strategy': 'Question review (Fill)',
+    vocabulary: '0',
+  }
+);
+assert.doesNotMatch(
+  JSON.stringify(questionOnlyDraftRemixHandoffView),
+  /Capital of France|Paris|2 \+ 2|Quick review/,
+  'Template remix handoff should not leak source prompts, answers, or source summaries.'
+);
+const questionOnlyArchivedRemixHandoffView =
+  buildActivityTemplateRemixHandoffView({
+    content: questionOnlyContent,
+    currentTemplateType: 'quiz',
+    sourceTitle: 'Question review',
+    visibility: 'archived',
+  });
+assert.equal(
+  questionOnlyArchivedRemixHandoffView.itemViews.find(
+    (item) => item.id === 'lifecycle-gate'
+  )?.value,
+  'Restore required'
+);
 assert.deepEqual(
   questionOnlyRemixPlan.options.find(
     (option) => option.template.type === 'group-sort'
@@ -41237,7 +41381,9 @@ assert.deepEqual(questionOnlyCardSummary.lockedTemplateOptions.slice(0, 2), [
 ]);
 assert.deepEqual(
   buildActivityLibraryCompatibilityView({
+    content: questionOnlyContent,
     currentTemplateType: 'quiz',
+    sourceTitle: 'Question review',
     summary: questionOnlyCardSummary,
   }),
   {
@@ -41274,13 +41420,16 @@ assert.deepEqual(
         template: 'open-box',
       },
     ],
+    remixHandoffView: questionOnlyDraftRemixHandoffView,
     remixHint: 'Ready to remix into Fill, Listen, Box.',
     remixStatusView: remixActivityReadyStatus,
   }
 );
 assert.deepEqual(
   buildActivityLibraryCompatibilityView({
+    content: questionOnlyContent,
     currentTemplateType: 'quiz',
+    sourceTitle: 'Question review',
     summary: questionOnlyCardSummary,
     visibility: 'archived',
   }),
@@ -41318,6 +41467,7 @@ assert.deepEqual(
         template: 'open-box',
       },
     ],
+    remixHandoffView: questionOnlyArchivedRemixHandoffView,
     restoreRequiredMessage:
       'Ready template modes are preserved, but remix actions unlock only after restore.',
     remixHint: 'Ready to remix into Fill, Listen, Box.',
@@ -41325,7 +41475,9 @@ assert.deepEqual(
   }
 );
 const questionOnlyCompatibilityView = buildActivityLibraryCompatibilityView({
+  content: questionOnlyContent,
   currentTemplateType: 'quiz',
+  sourceTitle: 'Question review',
   summary: questionOnlyCardSummary,
 });
 assert.equal(

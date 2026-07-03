@@ -51,6 +51,11 @@ import {
   type ActivitySourceMaterialSummaryView,
 } from '@/activities/material-summary';
 import { normalizeRuntimeDisplayText } from '@/activities/runtime-display';
+import {
+  ACTIVITY_TEMPLATE_REMIX_HANDOFF_VISIBLE_ACTION_LIMIT,
+  buildActivityTemplateRemixHandoffView,
+  type ActivityTemplateRemixHandoffView,
+} from '@/activities/template-remix';
 import type {
   ActivityContent,
   ActivitySeed,
@@ -120,6 +125,7 @@ export type ActivityLibraryLockedTemplateDiagnosticView = {
 export type ActivityLibraryCompatibilityView = {
   lockedTemplateDiagnostics: ActivityLibraryLockedTemplateDiagnosticView[];
   readyTemplateOptions: ActivityLibraryReadyTemplateOptionView[];
+  remixHandoffView: ActivityTemplateRemixHandoffView;
   remixStatusView: ActivityLibraryActionStatusView;
   remixActionOptions: ActivityLibraryRemixActionOptionView[];
   restoreRequiredMessage?: string;
@@ -128,7 +134,7 @@ export type ActivityLibraryCompatibilityView = {
 
 export const ACTIVITY_LIBRARY_COMPATIBILITY_LIMITS = {
   lockedTemplateDiagnostics: 2,
-  remixActionOptions: 3,
+  remixActionOptions: ACTIVITY_TEMPLATE_REMIX_HANDOFF_VISIBLE_ACTION_LIMIT,
 } as const;
 
 export type ActivityLibraryCardActionState = {
@@ -1661,7 +1667,9 @@ export function buildActivityLibraryCardDisplayView({
     activity
   );
   const compatibility = buildActivityLibraryCompatibilityView({
+    content: activity.content,
     currentTemplateType: activity.templateType,
+    sourceTitle: activity.title,
     summary,
     visibility: activity.status,
   });
@@ -2107,11 +2115,15 @@ export function buildActivityLibraryRemixActionLabel(shortName: string) {
 }
 
 export function buildActivityLibraryCompatibilityView({
+  content,
   currentTemplateType,
+  sourceTitle,
   summary,
   visibility = 'draft',
 }: {
+  content: ActivityContent;
   currentTemplateType: ActivityTemplateType;
+  sourceTitle: string;
   summary: ActivityLibraryCardSummary;
   visibility?: ActivityVisibility;
 }): ActivityLibraryCompatibilityView {
@@ -2136,6 +2148,12 @@ export function buildActivityLibraryCompatibilityView({
       ...option,
       isCurrent: option.template === currentTemplateType,
     })),
+    remixHandoffView: buildActivityTemplateRemixHandoffView({
+      content,
+      currentTemplateType,
+      sourceTitle,
+      visibility,
+    }),
     remixStatusView,
     remixActionOptions: summary.suggestedTemplateOptions
       .slice(0, ACTIVITY_LIBRARY_COMPATIBILITY_LIMITS.remixActionOptions)
