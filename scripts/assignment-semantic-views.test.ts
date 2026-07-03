@@ -1,12 +1,19 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 import { STARTER_FOOD_ASSIGNMENT_SHARE_ID } from '@/activities/starter-ids';
-import type { AssignmentSeed } from '@/activities/types';
+import type { RuntimeItem } from '@/activities/runtime';
+import type {
+  AssignmentSeed,
+  AttemptAnswers,
+  AttemptResult,
+} from '@/activities/types';
+import { analyzeAssignmentResults } from '@/assignments/results';
 import type {
   PrintableAssignmentWorksheet,
   PrintableWorksheetItem,
 } from '@/assignments/printable-worksheet';
 import { buildPrintableWorksheetPageViewModel } from '@/assignments/printable-worksheet-view';
+import { buildAssignmentResultsPageViewModel } from '@/assignments/result-view';
 import type {
   PublicAttemptReviewItem,
   PublicAttemptReviewSummary,
@@ -26,6 +33,16 @@ overwriteGetLocale(() => 'en');
 const SECRET_ANSWER_TEXT = 'SECRET_STUDENT_ANSWER';
 const SECRET_STUDENT_NAME = 'Student Private Name';
 const SECRET_TOKEN = 'raw-anonymous-token-value';
+
+type ResultAttemptFixture = {
+  anonymousToken: string | null;
+  answersJson: AttemptAnswers;
+  completedAt: Date;
+  id: string;
+  resultJson: AttemptResult;
+  score: number;
+  studentName: string | null;
+};
 
 test('student runner exposes a safe submission contract view', () => {
   const starterPreview = buildStudentRunnerStarterPreview(
@@ -259,6 +276,125 @@ test('printable worksheet page view exposes a complete handoff contract', () => 
   );
 });
 
+test('teacher results expose a scoped review handoff contract', () => {
+  const runtimeItems = buildResultRuntimeItems();
+  const resultAttempts = buildResultAttempts();
+  const analysis = analyzeAssignmentResults({
+    attempts: resultAttempts,
+    runtimeItems,
+    timeLimitSeconds: 120,
+  });
+  const pageView = buildAssignmentResultsPageViewModel({
+    data: {
+      activity: {
+        description: 'Exit ticket review.',
+        templateType: 'quiz',
+        title: 'Capital review',
+      },
+      analysis,
+      assignment: {
+        expiresAt: null,
+        id: 'assignment-1',
+        settingsJson: {
+          collectStudentName: true,
+          maxAttempts: 2,
+          showCorrectAnswers: true,
+          shuffleItems: false,
+          timeLimitSeconds: 120,
+        },
+        shareSlug: 'capital-review',
+        status: 'published',
+        title: 'Capital review',
+      },
+      attempts: resultAttempts.map(buildResultAttemptRow),
+      snapshot: {
+        activityDescription: 'Exit ticket review.',
+        activityTitle: 'Capital review',
+        templateType: 'quiz',
+      },
+      stats: {
+        averageDurationSeconds: 43,
+        averagePoints: 1.5,
+        averageScore: 75,
+        completions: 2,
+      },
+    },
+    search: {
+      itemSort: 'accuracy',
+      review: 'needs-review',
+      sort: 'name',
+      student: ' Alice ',
+    },
+  });
+
+  const handoffView = pageView.reviewHandoffView;
+  const expectedItemIds = [
+    'review-status',
+    'student-search',
+    'student-sort',
+    'item-sort',
+    'answer-review',
+    'matched-students',
+    'matched-attempts',
+    'matched-items',
+    'matched-answer-reviews',
+    'copy-scope-students',
+    'copy-scope-items',
+    'copy-scope-review',
+    'action-copy-brief',
+    'action-copy-reteach-plan',
+    'action-copy-item-review',
+    'action-copy-follow-up',
+    'action-export-csv',
+    'preview-copy-brief',
+    'preview-copy-reteach-plan',
+    'preview-copy-item-review',
+    'preview-copy-follow-up',
+  ];
+
+  assert.deepEqual(
+    handoffView.itemViews.map((item) => item.id),
+    expectedItemIds
+  );
+  assert.deepEqual(handoffView.privacy, {
+    exposesCopyArtifactText: false,
+    exposesCsvDataUrl: false,
+    exposesRawAnonymousToken: false,
+    exposesStudentAnswerText: false,
+    exposesTeacherAnswerKey: false,
+    itemIds: expectedItemIds,
+  });
+  assert.equal(
+    handoffView.itemViews.every((item) => Boolean(item.ariaLabel)),
+    true
+  );
+  assert.equal(
+    handoffView.itemViews.find((item) => item.id === 'action-export-csv')
+      ?.dataScope,
+    'full-assignment-results'
+  );
+  assert.equal(
+    handoffView.itemViews.find((item) => item.id === 'preview-copy-brief')
+      ?.dataScope,
+    'current-review'
+  );
+  assert.deepEqual(
+    pageView.copyArtifactPreviews.map((preview) => preview.actionButton.id),
+    [
+      'copy-brief:current-review',
+      'copy-reteach-plan:current-review',
+      'copy-item-review:current-review',
+      'copy-follow-up:current-review',
+    ]
+  );
+
+  const serializedHandoff = JSON.stringify(handoffView);
+  assert.equal(serializedHandoff.includes(SECRET_ANSWER_TEXT), false);
+  assert.equal(serializedHandoff.includes(SECRET_TOKEN), false);
+  assert.equal(serializedHandoff.includes('data:text/csv'), false);
+  assert.equal(serializedHandoff.includes('Paris'), false);
+});
+
 function withAssignmentSettings(
   assignment: AssignmentSeed,
   settings: Partial<AssignmentSeed['settings']>
@@ -269,6 +405,104 @@ function withAssignmentSettings(
       ...assignment.settings,
       ...settings,
     },
+  };
+}
+
+function buildResultRuntimeItems(): RuntimeItem[] {
+  return [
+    {
+      answer: 'Paris',
+      choices: ['Paris', 'Lyon'],
+      explanation: 'Paris is the capital city.',
+      id: 'capital-city',
+      kind: 'question',
+      prompt: 'Which city is the capital of France?',
+    },
+    {
+      answer: '4',
+      choices: ['3', '4'],
+      explanation: 'Two plus two equals four.',
+      id: 'simple-sum',
+      kind: 'question',
+      prompt: 'What is 2 + 2?',
+    },
+  ];
+}
+
+function buildResultAttempts(): ResultAttemptFixture[] {
+  return [
+    {
+      anonymousToken: null,
+      answersJson: {
+        answers: [
+          {
+            answer: SECRET_ANSWER_TEXT,
+            correct: false,
+            itemId: 'capital-city',
+          },
+          {
+            answer: '4',
+            correct: true,
+            itemId: 'simple-sum',
+          },
+        ],
+        templateType: 'quiz',
+      },
+      completedAt: new Date('2026-01-04T10:00:00.000Z'),
+      id: 'attempt-alice',
+      resultJson: {
+        accuracy: 50,
+        completedItemCount: 2,
+        correctItemCount: 1,
+        durationSeconds: 42,
+        earnedPoints: 1,
+        totalPoints: 2,
+      },
+      score: 1,
+      studentName: ' Alice ',
+    },
+    {
+      anonymousToken: SECRET_TOKEN,
+      answersJson: {
+        answers: [
+          {
+            answer: 'Paris',
+            correct: true,
+            itemId: 'capital-city',
+          },
+          {
+            answer: '4',
+            correct: true,
+            itemId: 'simple-sum',
+          },
+        ],
+        templateType: 'quiz',
+      },
+      completedAt: new Date('2026-01-05T10:00:00.000Z'),
+      id: 'attempt-anonymous',
+      resultJson: {
+        accuracy: 100,
+        completedItemCount: 2,
+        correctItemCount: 2,
+        durationSeconds: 44,
+        earnedPoints: 2,
+        totalPoints: 2,
+      },
+      score: 2,
+      studentName: null,
+    },
+  ];
+}
+
+function buildResultAttemptRow(attempt: ResultAttemptFixture) {
+  return {
+    anonymousToken: attempt.anonymousToken,
+    completedAt: attempt.completedAt,
+    id: attempt.id,
+    maxScore: attempt.resultJson.totalPoints,
+    resultJson: attempt.resultJson,
+    score: attempt.score,
+    studentName: attempt.studentName,
   };
 }
 

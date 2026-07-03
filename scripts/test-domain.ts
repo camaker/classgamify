@@ -733,6 +733,7 @@ import {
   buildAssignmentResultControlViews,
   buildAssignmentResultControlStatusView,
   buildAssignmentResultCopyScopeView,
+  buildAssignmentResultReviewHandoffView,
   buildAssignmentResultReviewScopeView,
   buildAssignmentResultReviewStatusView,
   buildAssignmentResultReviewScopeSummary,
@@ -2708,8 +2709,28 @@ assert.match(
 );
 assert.match(
   assignmentResultViewActionBoundarySource,
+  /export type AssignmentResultReviewHandoffItemId =[\s\S]*'review-status'[\s\S]*AssignmentResultReviewHandoffActionItemId[\s\S]*AssignmentResultReviewHandoffCopyScopeItemId[\s\S]*AssignmentResultReviewHandoffMatchedItemId[\s\S]*AssignmentResultReviewHandoffPreviewItemId/,
+  'Assignment result review handoff should expose stable ids for review status, controls, matched counts, copy scope, actions, and previews.'
+);
+assert.match(
+  assignmentResultViewActionBoundarySource,
+  /export type AssignmentResultReviewHandoffPrivacyContract = \{[\s\S]*exposesCopyArtifactText: false;[\s\S]*exposesCsvDataUrl: false;[\s\S]*exposesRawAnonymousToken: false;[\s\S]*exposesStudentAnswerText: false;[\s\S]*exposesTeacherAnswerKey: false;/,
+  'Assignment result review handoff should document that the handoff contract excludes copy text, CSV data URLs, raw anonymous tokens, submitted answers, and teacher answer keys.'
+);
+assert.match(
+  assignmentResultViewActionBoundarySource,
   /const controlViews = buildAssignmentResultControlViews\([\s\S]*const copyScopeView = buildAssignmentResultCopyScopeView\(\{[\s\S]*controlViews,[\s\S]*summary: resultView\.reviewScope\.summary,[\s\S]*\}\)[\s\S]*copyScopeView,/,
   'Assignment result page view-model should derive copy-scope previews from the prepared result control views and shared review scope summary.'
+);
+assert.match(
+  assignmentResultViewActionBoundarySource,
+  /const reviewHandoffView = buildAssignmentResultReviewHandoffView\(\{[\s\S]*actionButtons,[\s\S]*copyArtifactPreviews,[\s\S]*copyScopeView,[\s\S]*reviewScopeView,[\s\S]*reviewStatusView,[\s\S]*\}\)[\s\S]*reviewHandoffView,/,
+  'Assignment result page view-model should expose a review handoff view derived from prepared controls, scopes, actions, and scoped copy previews.'
+);
+assert.match(
+  assignmentResultViewActionBoundarySource,
+  /buildAssignmentResultReviewHandoffView[\s\S]*buildAssignmentResultReviewHandoffScopeItemView[\s\S]*buildAssignmentResultReviewHandoffMatchedItemView[\s\S]*buildAssignmentResultReviewHandoffCopyScopeItemView[\s\S]*buildAssignmentResultReviewHandoffActionItemView[\s\S]*buildAssignmentResultReviewHandoffPreviewItemView/,
+  'Assignment result review handoff should collect review controls, matched counts, copy scope, action states, and copy preview summaries.'
 );
 assert.match(
   assignmentResultViewActionBoundarySource,
