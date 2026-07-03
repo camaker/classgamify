@@ -69,36 +69,45 @@ function StudentRunnerAttemptStatusBar({
   controlView: StudentRunnerControlView;
 }) {
   const progressDescriptionId = 'student-runner-progress-description';
+  const progressValueId = 'student-runner-progress-value';
   const timerDescriptionId = 'student-runner-timer-description';
+  const timerValueId = 'student-runner-timer-value';
 
   return (
     <section
       aria-label={controlView.statusBarLabel}
+      aria-describedby={
+        controlView.timerBadge.show
+          ? `${progressDescriptionId} ${timerDescriptionId}`
+          : progressDescriptionId
+      }
       className="flex flex-wrap items-center justify-between gap-3"
     >
       <div className="flex items-center gap-2 text-sm font-medium">
-        <IconPlayerPlay className="size-4 text-primary" />
+        <IconPlayerPlay aria-hidden="true" className="size-4 text-primary" />
         {controlView.runnerTitle}
       </div>
-      <Badge
-        variant="secondary"
-        className="rounded-md"
-        aria-label={controlView.progressView.ariaLabel}
-        aria-describedby={progressDescriptionId}
-      >
-        <output>{controlView.progressView.label}</output>
+      <Badge variant="secondary" className="rounded-md">
+        <output
+          aria-describedby={progressDescriptionId}
+          aria-label={controlView.progressView.ariaLabel}
+          id={progressValueId}
+        >
+          {controlView.progressView.label}
+        </output>
       </Badge>
       <span id={progressDescriptionId} className="sr-only">
         {controlView.progressView.description}
       </span>
       {controlView.timerBadge.show ? (
-        <Badge
-          variant="outline"
-          className="rounded-md"
-          aria-describedby={timerDescriptionId}
-          aria-label={controlView.timerBadge.ariaLabel}
-        >
-          {controlView.timerBadge.label}
+        <Badge variant="outline" className="rounded-md">
+          <output
+            aria-describedby={timerDescriptionId}
+            aria-label={controlView.timerBadge.ariaLabel}
+            id={timerValueId}
+          >
+            {controlView.timerBadge.label}
+          </output>
         </Badge>
       ) : null}
       <span id={timerDescriptionId} className="sr-only">
@@ -138,7 +147,10 @@ function StudentRunnerIdentityPanel({
     const studentNameDescriptionId = 'student-name-description';
 
     return (
-      <section aria-label={identityView.ariaLabel}>
+      <section
+        aria-describedby={studentNameDescriptionId}
+        aria-label={identityView.ariaLabel}
+      >
         <label
           htmlFor="student-name"
           className="text-sm font-medium text-foreground"
@@ -164,6 +176,10 @@ function StudentRunnerIdentityPanel({
     );
   }
 
+  const browserLabelCaptionId =
+    'student-runner-anonymous-browser-label-caption';
+  const browserLabelValueId = 'student-runner-anonymous-browser-label-value';
+
   return (
     <section
       aria-label={identityView.ariaLabel}
@@ -177,34 +193,72 @@ function StudentRunnerIdentityPanel({
         aria-label={identityView.copy.browserLabelAriaLabel}
         className="mt-3 rounded-md border bg-background px-3 py-2"
       >
-        <p className="text-[11px] uppercase text-muted-foreground">
+        <p
+          id={browserLabelCaptionId}
+          className="text-[11px] uppercase text-muted-foreground"
+        >
           {identityView.copy.browserLabelCaption}
         </p>
-        <p className="mt-1 font-medium text-sm">
+        <output
+          aria-label={identityView.copy.browserLabelAriaLabel}
+          aria-labelledby={`${browserLabelCaptionId} ${browserLabelValueId}`}
+          className="mt-1 block font-medium text-sm"
+          id={browserLabelValueId}
+        >
           {identityView.copy.browserLabel}
-        </p>
+        </output>
       </section>
       <div className="mt-3 grid gap-2 sm:grid-cols-3">
         {identityView.copy.summaryItems.map((summaryItem) => (
-          <section
-            aria-label={summaryItem.ariaLabel}
-            className="rounded-md border bg-background px-3 py-2"
+          <StudentRunnerAnonymousSummaryItem
             key={summaryItem.id}
-          >
-            <p className="text-[11px] leading-4 text-muted-foreground">
-              {summaryItem.label}
-            </p>
-            <p className="mt-1 break-words font-medium text-sm">
-              {summaryItem.value}
-            </p>
-            <p className="mt-1 text-[11px] leading-4 text-muted-foreground">
-              {summaryItem.description}
-            </p>
-          </section>
+            summaryItem={summaryItem}
+          />
         ))}
       </div>
       <p className="mt-2 text-xs leading-5 text-muted-foreground">
         {identityView.copy.retryDescription}
+      </p>
+    </section>
+  );
+}
+
+function StudentRunnerAnonymousSummaryItem({
+  summaryItem,
+}: {
+  summaryItem: Extract<
+    StudentRunnerIdentityView,
+    { mode: 'anonymous' }
+  >['copy']['summaryItems'][number];
+}) {
+  const labelId = `student-runner-anonymous-summary-${summaryItem.id}-label`;
+  const valueId = `student-runner-anonymous-summary-${summaryItem.id}-value`;
+  const descriptionId = `student-runner-anonymous-summary-${summaryItem.id}-description`;
+
+  return (
+    <section
+      aria-describedby={descriptionId}
+      aria-label={summaryItem.ariaLabel}
+      aria-labelledby={`${labelId} ${valueId}`}
+      className="rounded-md border bg-background px-3 py-2"
+    >
+      <p id={labelId} className="text-[11px] leading-4 text-muted-foreground">
+        {summaryItem.label}
+      </p>
+      <output
+        aria-describedby={descriptionId}
+        aria-label={summaryItem.ariaLabel}
+        aria-labelledby={`${labelId} ${valueId}`}
+        className="mt-1 block break-words font-medium text-sm"
+        id={valueId}
+      >
+        {summaryItem.value}
+      </output>
+      <p
+        id={descriptionId}
+        className="mt-1 text-[11px] leading-4 text-muted-foreground"
+      >
+        {summaryItem.description}
       </p>
     </section>
   );
@@ -221,34 +275,60 @@ function StudentRunnerResultPanel({
 
   const startAnotherAttemptDescriptionId =
     'student-runner-start-another-attempt-description';
+  const resultStatusId = 'student-runner-result-status';
+  const resultScoreId = 'student-runner-result-score';
+  const resultAccuracyId = 'student-runner-result-accuracy';
+  const resultDurationId = 'student-runner-result-duration';
+  const resultAttemptUsageId = 'student-runner-result-attempt-usage';
 
   return (
     <section
+      aria-describedby={
+        view.attemptUsageLabel
+          ? `${resultAccuracyId} ${resultDurationId} ${resultAttemptUsageId}`
+          : `${resultAccuracyId} ${resultDurationId}`
+      }
       aria-label={view.ariaLabel}
+      aria-labelledby={resultStatusId}
       className="rounded-lg border bg-primary/5 p-3"
     >
-      <div className="flex items-center gap-2 text-sm font-medium">
-        <IconCheck className="size-4 text-primary" />
+      <div
+        id={resultStatusId}
+        className="flex items-center gap-2 text-sm font-medium"
+      >
+        <IconCheck aria-hidden="true" className="size-4 text-primary" />
         {view.statusLabel}
       </div>
       <output
         className="mt-2 block text-2xl font-semibold"
         aria-label={view.scoreAriaLabel}
+        id={resultScoreId}
       >
         {view.scoreLabel}
       </output>
-      <p className="text-xs text-muted-foreground">{view.accuracyLabel}</p>
+      <output
+        aria-label={view.accuracyLabel}
+        className="block text-xs text-muted-foreground"
+        id={resultAccuracyId}
+      >
+        {view.accuracyLabel}
+      </output>
       <output
         aria-description={view.durationView.description}
         aria-label={view.durationView.ariaLabel}
         className="block text-xs text-muted-foreground"
+        id={resultDurationId}
       >
         {view.durationLabel}
       </output>
       {view.attemptUsageLabel ? (
-        <p className="text-xs text-muted-foreground">
+        <output
+          aria-label={view.attemptUsageLabel}
+          className="block text-xs text-muted-foreground"
+          id={resultAttemptUsageId}
+        >
           {view.attemptUsageLabel}
-        </p>
+        </output>
       ) : null}
       <StudentRunnerReviewSummary view={view.reviewSummaryView} />
       <StudentRunnerFeedbackScope view={view.feedbackScopeView} />
@@ -281,23 +361,41 @@ function StudentRunnerFeedbackScope({
 }: {
   view: StudentAttemptFeedbackScopeView;
 }) {
+  const titleId = 'student-runner-feedback-scope-title';
+  const descriptionId = 'student-runner-feedback-scope-description';
+  const statusLabelId = 'student-runner-feedback-scope-status-label';
+  const statusValueId = 'student-runner-feedback-scope-status-value';
+
   return (
     <section
+      aria-describedby={`${descriptionId} ${statusValueId}`}
       aria-label={view.ariaLabel}
+      aria-labelledby={titleId}
       data-status={view.status}
       className="mt-3 rounded-md border bg-background/80 p-2"
     >
       <div className="flex flex-col gap-1 sm:flex-row sm:items-start sm:justify-between">
         <div>
-          <p className="text-xs font-medium">{view.title}</p>
-          <p className="mt-1 text-xs leading-5 text-muted-foreground">
+          <p id={titleId} className="text-xs font-medium">
+            {view.title}
+          </p>
+          <p
+            id={descriptionId}
+            className="mt-1 text-xs leading-5 text-muted-foreground"
+          >
             {view.description}
           </p>
         </div>
         <output
+          aria-describedby={descriptionId}
           aria-label={view.statusAriaLabel}
+          aria-labelledby={`${statusLabelId} ${statusValueId}`}
           className={getStudentRunnerFeedbackScopeStatusClassName(view)}
+          id={statusValueId}
         >
+          <span id={statusLabelId} className="sr-only">
+            {view.title}
+          </span>
           {view.statusLabel}
         </output>
       </div>
@@ -306,18 +404,11 @@ function StudentRunnerFeedbackScope({
         className="mt-2 grid grid-cols-2 gap-2"
       >
         {view.metrics.map((metric) => (
-          <div
+          <StudentRunnerMetricOutput
             key={metric.key}
-            className="rounded-md border bg-muted/20 px-2 py-1.5"
-          >
-            <dd className="text-sm font-semibold">
-              <output aria-label={metric.ariaLabel}>{metric.value}</output>
-            </dd>
-            <dt className="text-[11px] leading-4 text-muted-foreground">
-              {metric.label}
-            </dt>
-            <p className="sr-only">{metric.description}</p>
-          </div>
+            metric={metric}
+            prefix="student-runner-feedback-scope"
+          />
         ))}
       </dl>
     </section>
@@ -342,13 +433,23 @@ function StudentRunnerReviewSummary({
 }: {
   view: StudentAttemptReviewSummaryView;
 }) {
+  const titleId = 'student-runner-review-summary-title';
+  const descriptionId = 'student-runner-review-summary-description';
+
   return (
     <section
+      aria-describedby={descriptionId}
       aria-label={view.ariaLabel}
+      aria-labelledby={titleId}
       className="mt-3 rounded-md border bg-background/80 p-2"
     >
-      <p className="text-xs font-medium">{view.title}</p>
-      <p className="mt-1 text-xs leading-5 text-muted-foreground">
+      <p id={titleId} className="text-xs font-medium">
+        {view.title}
+      </p>
+      <p
+        id={descriptionId}
+        className="mt-1 text-xs leading-5 text-muted-foreground"
+      >
         {view.description}
       </p>
       <dl
@@ -356,21 +457,53 @@ function StudentRunnerReviewSummary({
         className="mt-2 grid grid-cols-2 gap-2"
       >
         {view.metrics.map((metric) => (
-          <div
+          <StudentRunnerMetricOutput
             key={metric.key}
-            className="rounded-md border bg-muted/20 px-2 py-1.5"
-          >
-            <dd className="text-sm font-semibold">
-              <output aria-label={metric.ariaLabel}>{metric.value}</output>
-            </dd>
-            <dt className="text-[11px] leading-4 text-muted-foreground">
-              {metric.label}
-            </dt>
-            <p className="sr-only">{metric.description}</p>
-          </div>
+            metric={metric}
+            prefix="student-runner-review-summary"
+          />
         ))}
       </dl>
     </section>
+  );
+}
+
+function StudentRunnerMetricOutput({
+  metric,
+  prefix,
+}: {
+  metric: {
+    ariaLabel: string;
+    description: string;
+    key: string;
+    label: string;
+    value: string;
+  };
+  prefix: string;
+}) {
+  const labelId = `${prefix}-${metric.key}-label`;
+  const valueId = `${prefix}-${metric.key}-value`;
+  const descriptionId = `${prefix}-${metric.key}-description`;
+
+  return (
+    <div className="rounded-md border bg-muted/20 px-2 py-1.5">
+      <dt id={labelId} className="text-[11px] leading-4 text-muted-foreground">
+        {metric.label}
+      </dt>
+      <dd className="text-sm font-semibold">
+        <output
+          aria-describedby={descriptionId}
+          aria-label={metric.ariaLabel}
+          aria-labelledby={`${labelId} ${valueId}`}
+          id={valueId}
+        >
+          {metric.value}
+        </output>
+      </dd>
+      <p id={descriptionId} className="sr-only">
+        {metric.description}
+      </p>
+    </div>
   );
 }
 
@@ -379,15 +512,24 @@ function StudentRunnerResultNextSteps({
 }: {
   view: StudentAttemptResultNextStepsView;
 }) {
+  const titleId = 'student-runner-result-next-steps-title';
+
   return (
     <section
       aria-label={view.ariaLabel}
+      aria-labelledby={titleId}
       className="mt-3 rounded-md border bg-background/80 p-2"
     >
-      <p className="text-xs font-medium">{view.title}</p>
+      <p id={titleId} className="text-xs font-medium">
+        {view.title}
+      </p>
       <ul className="mt-1 grid gap-1 text-muted-foreground text-xs leading-5">
         {view.stepViews.map((step) => (
-          <li className="flex gap-2" key={step.id}>
+          <li
+            className="flex gap-2"
+            id={`student-runner-result-next-step-${step.id}`}
+            key={step.id}
+          >
             <span aria-hidden="true">-</span>
             <span>{step.label}</span>
           </li>

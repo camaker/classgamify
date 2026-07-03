@@ -265,6 +265,12 @@ Student progress counts, browser submission payloads, and incomplete-submit
 decisions should be derived from shared assignment-domain helpers, not
 per-template route math, so every runner counts answered items, submits frozen
 runtime item ids, and prompts for partial attempts consistently.
+Student runner submission surfaces should expose those prepared progress,
+payload, submit-readiness, identity, result, review-summary, feedback-scope,
+and post-submit next-step views as stable semantic label/value/description
+outputs, so students and assistive technology receive the same submission
+state without exposing student names, answer text, anonymous tokens, or
+teacher-only answers in the pre-submit payload summary.
 Pure assignment-domain helpers should have fast script-level coverage so core
 submission semantics can be verified without depending on the local Workers
 E2E runtime.

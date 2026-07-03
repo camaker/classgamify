@@ -12115,12 +12115,12 @@ assert.doesNotMatch(
 );
 assert.match(
   studentRunnerSubmitControlsSource,
-  /aria-label=\{controlView\.submitControlsLabel\}[\s\S]*data-confirm-incomplete=[\s\S]*controlView\.requiresIncompleteSubmitConfirmation[\s\S]*controlView\.submitDisabled[\s\S]*aria-label=\{controlView\.submitButtonAriaLabel\}[\s\S]*controlView\.submitButtonLabel[\s\S]*controlView\.submitHintViews\.map\(\(hintView\)[\s\S]*key=\{hintView\.id\}[\s\S]*ariaLabel=\{hintView\.ariaLabel\}[\s\S]*text=\{hintView\.text\}[\s\S]*tone=\{hintView\.tone\}/,
+  /const submitControlsLabelId = 'student-runner-submit-controls-label'[\s\S]*aria-labelledby=\{submitControlsLabelId\}[\s\S]*controlView\.submitControlsLabel[\s\S]*data-confirm-incomplete=[\s\S]*controlView\.requiresIncompleteSubmitConfirmation[\s\S]*controlView\.submitDisabled[\s\S]*aria-label=\{controlView\.submitButtonAriaLabel\}[\s\S]*aria-describedby=\{buttonDescriptionIds\.join\(' '\)\}[\s\S]*controlView\.submitButtonLabel[\s\S]*controlView\.submitHintViews\.map\(\(hintView\)[\s\S]*key=\{hintView\.id\}[\s\S]*ariaLabel=\{hintView\.ariaLabel\}[\s\S]*text=\{hintView\.text\}[\s\S]*tone=\{hintView\.tone\}/,
   'Student runner submit controls should render prepared submit disabled state, labels, structured incomplete-confirmation state, and domain-prepared hint views.'
 );
 assert.match(
   studentRunnerSubmitControlsSource,
-  /<fieldset[\s\S]*controlView\.payloadSummaryView\.ariaLabel[\s\S]*<legend[\s\S]*controlView\.payloadSummaryView\.title[\s\S]*controlView\.payloadSummaryView\.description[\s\S]*<dl[\s\S]*controlView\.payloadSummaryView\.metrics\.map\(\(metric\)[\s\S]*<output[\s\S]*aria-label=\{metric\.ariaLabel\}[\s\S]*\{metric\.value\}[\s\S]*\{metric\.description\}/,
+  /<fieldset[\s\S]*controlView\.payloadSummaryView\.ariaLabel[\s\S]*<legend[\s\S]*controlView\.payloadSummaryView\.title[\s\S]*controlView\.payloadSummaryView\.description[\s\S]*<dl[\s\S]*controlView\.payloadSummaryView\.metrics\.map\(\(metric\)[\s\S]*buildStudentRunnerPayloadMetricLabelId\(metric\.key\)[\s\S]*<output[\s\S]*aria-describedby=\{buildStudentRunnerPayloadMetricDescriptionId\([\s\S]*metric\.key[\s\S]*aria-label=\{metric\.ariaLabel\}[\s\S]*aria-labelledby=\{`\$\{buildStudentRunnerPayloadMetricLabelId\([\s\S]*metric\.key[\s\S]*\} \$\{buildStudentRunnerPayloadMetricValueId\(metric\.key\)\}`\}[\s\S]*id=\{buildStudentRunnerPayloadMetricValueId\(metric\.key\)\}[\s\S]*\{metric\.value\}[\s\S]*id=\{buildStudentRunnerPayloadMetricDescriptionId\(metric\.key\)\}[\s\S]*\{metric\.description\}/,
   'Student runner submit controls should render the prepared browser payload summary as semantic labelled outputs.'
 );
 assert.match(
@@ -12130,7 +12130,7 @@ assert.match(
 );
 assert.match(
   studentRunnerSubmitControlsSource,
-  /<StudentRunnerSubmitReadiness[\s\S]*view=\{controlView\.submitReadinessView\}[\s\S]*aria-label=\{view\.ariaLabel\}[\s\S]*data-status=\{view\.status\}[\s\S]*view\.items\.map\(\(item\)[\s\S]*aria-label=\{item\.ariaLabel\}[\s\S]*data-status=\{item\.status\}[\s\S]*item\.statusLabel[\s\S]*item\.description/,
+  /<StudentRunnerSubmitReadiness[\s\S]*view=\{controlView\.submitReadinessView\}[\s\S]*const titleId = 'student-runner-submit-readiness-title'[\s\S]*aria-describedby=\{`\$\{descriptionId\} \$\{statusValueId\}`\}[\s\S]*aria-label=\{view\.ariaLabel\}[\s\S]*aria-labelledby=\{titleId\}[\s\S]*data-status=\{view\.status\}[\s\S]*<output[\s\S]*aria-label=\{view\.ariaLabel\}[\s\S]*id=\{statusValueId\}[\s\S]*view\.statusLabel[\s\S]*view\.items\.map\(\(item\)[\s\S]*const labelId = `student-runner-submit-readiness-\$\{item\.id\}-label`[\s\S]*const valueId = `student-runner-submit-readiness-\$\{item\.id\}-value`[\s\S]*const descriptionId = `student-runner-submit-readiness-\$\{item\.id\}-description`[\s\S]*aria-label=\{item\.ariaLabel\}[\s\S]*data-status=\{item\.status\}[\s\S]*<output[\s\S]*aria-label=\{item\.ariaLabel\}[\s\S]*id=\{valueId\}[\s\S]*item\.statusLabel[\s\S]*item\.description/,
   'Student runner submit controls should render the domain-prepared submit-readiness checks.'
 );
 assert.doesNotMatch(
@@ -12155,8 +12155,8 @@ assert.match(
 );
 assert.match(
   studentRunnerSubmitControlsSource,
-  /const submitHintIds = controlView\.submitHintViews\.map[\s\S]*aria-describedby=\{[\s\S]*submitHintIds\.join\(' '\)[\s\S]*id=\{buildStudentRunnerSubmitHintId\(hintView\.id\)\}[\s\S]*function buildStudentRunnerSubmitHintId[\s\S]*student-runner-submit-\$\{id\}-hint/,
-  'Student runner submit button should be associated with every prepared submit hint.'
+  /const submitHintIds = controlView\.submitHintViews\.map[\s\S]*const buttonDescriptionIds = \[[\s\S]*readinessDescriptionId,[\s\S]*payloadSummaryDescriptionId,[\s\S]*\.\.\.submitHintIds,[\s\S]*aria-describedby=\{buttonDescriptionIds\.join\(' '\)\}[\s\S]*id=\{buildStudentRunnerSubmitHintId\(hintView\.id\)\}[\s\S]*function buildStudentRunnerSubmitHintId[\s\S]*student-runner-submit-\$\{id\}-hint/,
+  'Student runner submit button should be associated with readiness, payload, and every prepared submit hint.'
 );
 assert.match(
   studentRunnerStateSource,
@@ -12189,12 +12189,12 @@ assert.doesNotMatch(
 );
 assert.match(
   studentRunnerAttemptShellSource,
-  /aria-label=\{controlView\.progressView\.ariaLabel\}[\s\S]*<output>\{controlView\.progressView\.label\}<\/output>[\s\S]*controlView\.progressView\.description/,
+  /const progressDescriptionId = 'student-runner-progress-description'[\s\S]*const progressValueId = 'student-runner-progress-value'[\s\S]*const timerDescriptionId = 'student-runner-timer-description'[\s\S]*const timerValueId = 'student-runner-timer-value'[\s\S]*aria-describedby=\{[\s\S]*progressDescriptionId[\s\S]*<output[\s\S]*aria-describedby=\{progressDescriptionId\}[\s\S]*aria-label=\{controlView\.progressView\.ariaLabel\}[\s\S]*id=\{progressValueId\}[\s\S]*controlView\.progressView\.label[\s\S]*controlView\.progressView\.description[\s\S]*controlView\.timerBadge\.show[\s\S]*aria-label=\{controlView\.timerBadge\.ariaLabel\}[\s\S]*id=\{timerValueId\}[\s\S]*controlView\.timerBadge\.label[\s\S]*controlView\.timerBadge\.description/,
   'Student runner attempt status bar should render progress as a semantic output with prepared accessible labels.'
 );
 assert.match(
   studentRunnerAttemptShellSource,
-  /<dl[\s\S]*view\.metrics\.map[\s\S]*<dd[\s\S]*<output aria-label=\{metric\.ariaLabel\}>\{metric\.value\}<\/output>[\s\S]*<dt[\s\S]*\{metric\.label\}/,
+  /function StudentRunnerMetricOutput[\s\S]*const labelId = `\$\{prefix\}-\$\{metric\.key\}-label`[\s\S]*const valueId = `\$\{prefix\}-\$\{metric\.key\}-value`[\s\S]*const descriptionId = `\$\{prefix\}-\$\{metric\.key\}-description`[\s\S]*<dt id=\{labelId\}[\s\S]*metric\.label[\s\S]*<output[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*aria-label=\{metric\.ariaLabel\}[\s\S]*aria-labelledby=\{`\$\{labelId\} \$\{valueId\}`\}[\s\S]*id=\{valueId\}[\s\S]*metric\.value[\s\S]*id=\{descriptionId\}[\s\S]*metric\.description/,
   'Student runner post-submit review summary should render metric values as semantic labelled outputs.'
 );
 assert.match(
@@ -12324,8 +12324,13 @@ assert.match(
 );
 assert.match(
   studentRunnerAttemptShellSource,
-  /function StudentRunnerIdentityPanel[\s\S]*identityView\.mode === 'student-name'[\s\S]*aria-label=\{identityView\.ariaLabel\}[\s\S]*id="student-name"[\s\S]*disabled=\{identityView\.disabled\}[\s\S]*identityView\.description[\s\S]*aria-label=\{identityView\.ariaLabel\}[\s\S]*identityView\.copy\.description[\s\S]*aria-label=\{identityView\.copy\.browserLabelAriaLabel\}[\s\S]*identityView\.copy\.browserLabelCaption[\s\S]*identityView\.copy\.browserLabel[\s\S]*identityView\.copy\.summaryItems\.map[\s\S]*aria-label=\{summaryItem\.ariaLabel\}[\s\S]*key=\{summaryItem\.id\}[\s\S]*summaryItem\.label[\s\S]*summaryItem\.value[\s\S]*summaryItem\.description[\s\S]*identityView\.copy\.retryDescription/,
-  'Student runner identity panel should render prepared named-student lock state and anonymous browser identity views.'
+  /function StudentRunnerIdentityPanel[\s\S]*identityView\.mode === 'student-name'[\s\S]*aria-describedby=\{studentNameDescriptionId\}[\s\S]*aria-label=\{identityView\.ariaLabel\}[\s\S]*id="student-name"[\s\S]*disabled=\{identityView\.disabled\}[\s\S]*identityView\.description[\s\S]*const browserLabelCaptionId =[\s\S]*'student-runner-anonymous-browser-label-caption'[\s\S]*const browserLabelValueId = 'student-runner-anonymous-browser-label-value'[\s\S]*aria-label=\{identityView\.ariaLabel\}[\s\S]*identityView\.copy\.description[\s\S]*aria-label=\{identityView\.copy\.browserLabelAriaLabel\}[\s\S]*identityView\.copy\.browserLabelCaption[\s\S]*aria-labelledby=\{`\$\{browserLabelCaptionId\} \$\{browserLabelValueId\}`\}[\s\S]*id=\{browserLabelValueId\}[\s\S]*identityView\.copy\.browserLabel[\s\S]*identityView\.copy\.summaryItems\.map[\s\S]*StudentRunnerAnonymousSummaryItem[\s\S]*key=\{summaryItem\.id\}[\s\S]*summaryItem=\{summaryItem\}[\s\S]*identityView\.copy\.retryDescription/,
+  'Student runner identity panel should render prepared named-student lock state and anonymous browser identity views with stable output ids.'
+);
+assert.match(
+  studentRunnerAttemptShellSource,
+  /function StudentRunnerAnonymousSummaryItem[\s\S]*const labelId = `student-runner-anonymous-summary-\$\{summaryItem\.id\}-label`[\s\S]*const valueId = `student-runner-anonymous-summary-\$\{summaryItem\.id\}-value`[\s\S]*const descriptionId = `student-runner-anonymous-summary-\$\{summaryItem\.id\}-description`[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*aria-label=\{summaryItem\.ariaLabel\}[\s\S]*aria-labelledby=\{`\$\{labelId\} \$\{valueId\}`\}[\s\S]*summaryItem\.label[\s\S]*<output[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*aria-label=\{summaryItem\.ariaLabel\}[\s\S]*id=\{valueId\}[\s\S]*summaryItem\.value[\s\S]*summaryItem\.description/,
+  'Student runner anonymous identity summary items should render prepared label, value, and privacy descriptions as stable semantic outputs.'
 );
 assert.doesNotMatch(
   getSourceSlice(
@@ -12348,8 +12353,8 @@ assert.match(
 );
 assert.match(
   studentRunnerAttemptShellSource,
-  /function StudentRunnerResultPanel[\s\S]*aria-label=\{view\.ariaLabel\}[\s\S]*<output[\s\S]*aria-label=\{view\.scoreAriaLabel\}/,
-  'Student runner result panel should use domain-prepared result and score labels.'
+  /function StudentRunnerResultPanel[\s\S]*const resultStatusId = 'student-runner-result-status'[\s\S]*const resultScoreId = 'student-runner-result-score'[\s\S]*const resultAccuracyId = 'student-runner-result-accuracy'[\s\S]*const resultDurationId = 'student-runner-result-duration'[\s\S]*const resultAttemptUsageId = 'student-runner-result-attempt-usage'[\s\S]*aria-describedby=\{[\s\S]*resultAccuracyId[\s\S]*resultDurationId[\s\S]*aria-label=\{view\.ariaLabel\}[\s\S]*aria-labelledby=\{resultStatusId\}[\s\S]*id=\{resultStatusId\}[\s\S]*view\.statusLabel[\s\S]*<output[\s\S]*aria-label=\{view\.scoreAriaLabel\}[\s\S]*id=\{resultScoreId\}[\s\S]*view\.scoreLabel[\s\S]*aria-label=\{view\.accuracyLabel\}[\s\S]*id=\{resultAccuracyId\}[\s\S]*view\.accuracyLabel[\s\S]*aria-label=\{view\.durationView\.ariaLabel\}[\s\S]*id=\{resultDurationId\}[\s\S]*view\.durationLabel[\s\S]*view\.attemptUsageLabel/,
+  'Student runner result panel should use stable domain-prepared result, score, accuracy, duration, and attempt-usage outputs.'
 );
 assert.match(
   studentRunnerAttemptShellSource,
@@ -12358,8 +12363,8 @@ assert.match(
 );
 assert.match(
   studentRunnerAttemptShellSource,
-  /StudentRunnerResultNextSteps[\s\S]*view=\{view\.nextStepsView\}[\s\S]*view\.stepViews\.map[\s\S]*key=\{step\.id\}[\s\S]*step\.label/,
-  'Student runner result panel should render prepared post-submit next steps from the result panel view.'
+  /StudentRunnerResultNextSteps[\s\S]*view=\{view\.nextStepsView\}[\s\S]*const titleId = 'student-runner-result-next-steps-title'[\s\S]*aria-label=\{view\.ariaLabel\}[\s\S]*aria-labelledby=\{titleId\}[\s\S]*id=\{titleId\}[\s\S]*view\.title[\s\S]*view\.stepViews\.map[\s\S]*id=\{`student-runner-result-next-step-\$\{step\.id\}`\}[\s\S]*key=\{step\.id\}[\s\S]*step\.label/,
+  'Student runner result panel should render prepared post-submit next steps from the result panel view with stable step ids.'
 );
 assert.doesNotMatch(
   studentRunnerAttemptShellSource,
@@ -12368,17 +12373,17 @@ assert.doesNotMatch(
 );
 assert.match(
   studentRunnerAttemptShellSource,
-  /StudentRunnerReviewSummary[\s\S]*view=\{view\.reviewSummaryView\}[\s\S]*function StudentRunnerReviewSummary[\s\S]*view\.title[\s\S]*view\.description[\s\S]*aria-label=\{view\.metricsLabel\}[\s\S]*view\.metrics\.map[\s\S]*metric\.ariaLabel[\s\S]*metric\.value[\s\S]*metric\.label[\s\S]*metric\.description/,
-  'Student runner result panel should render prepared post-submit review summary metrics from the result panel view.'
+  /StudentRunnerReviewSummary[\s\S]*view=\{view\.reviewSummaryView\}[\s\S]*function StudentRunnerReviewSummary[\s\S]*const titleId = 'student-runner-review-summary-title'[\s\S]*const descriptionId = 'student-runner-review-summary-description'[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*aria-label=\{view\.ariaLabel\}[\s\S]*aria-labelledby=\{titleId\}[\s\S]*view\.title[\s\S]*view\.description[\s\S]*aria-label=\{view\.metricsLabel\}[\s\S]*view\.metrics\.map[\s\S]*StudentRunnerMetricOutput[\s\S]*prefix="student-runner-review-summary"/,
+  'Student runner result panel should render prepared post-submit review summary metrics from the result panel view as stable outputs.'
 );
 assert.match(
   studentRunnerAttemptShellSource,
-  /StudentRunnerFeedbackScope[\s\S]*view=\{view\.feedbackScopeView\}[\s\S]*function StudentRunnerFeedbackScope[\s\S]*aria-label=\{view\.ariaLabel\}[\s\S]*data-status=\{view\.status\}[\s\S]*aria-label=\{view\.statusAriaLabel\}[\s\S]*view\.statusLabel[\s\S]*aria-label=\{view\.metricsLabel\}[\s\S]*view\.metrics\.map[\s\S]*metric\.ariaLabel[\s\S]*metric\.value[\s\S]*metric\.label[\s\S]*metric\.description/,
-  'Student runner result panel should render prepared feedback coverage metrics from the result panel view.'
+  /StudentRunnerFeedbackScope[\s\S]*view=\{view\.feedbackScopeView\}[\s\S]*function StudentRunnerFeedbackScope[\s\S]*const titleId = 'student-runner-feedback-scope-title'[\s\S]*const descriptionId = 'student-runner-feedback-scope-description'[\s\S]*const statusLabelId = 'student-runner-feedback-scope-status-label'[\s\S]*const statusValueId = 'student-runner-feedback-scope-status-value'[\s\S]*aria-describedby=\{`\$\{descriptionId\} \$\{statusValueId\}`\}[\s\S]*aria-label=\{view\.ariaLabel\}[\s\S]*aria-labelledby=\{titleId\}[\s\S]*data-status=\{view\.status\}[\s\S]*aria-label=\{view\.statusAriaLabel\}[\s\S]*id=\{statusValueId\}[\s\S]*view\.statusLabel[\s\S]*aria-label=\{view\.metricsLabel\}[\s\S]*view\.metrics\.map[\s\S]*StudentRunnerMetricOutput[\s\S]*prefix="student-runner-feedback-scope"/,
+  'Student runner result panel should render prepared feedback coverage status and metrics from the result panel view as stable outputs.'
 );
 assert.match(
   studentRunnerAttemptShellSource,
-  /function StudentRunnerFeedbackScope[\s\S]*aria-label=\{view\.ariaLabel\}[\s\S]*function StudentRunnerReviewSummary[\s\S]*aria-label=\{view\.ariaLabel\}[\s\S]*function StudentRunnerResultNextSteps[\s\S]*aria-label=\{view\.ariaLabel\}/,
+  /function StudentRunnerFeedbackScope[\s\S]*aria-label=\{view\.ariaLabel\}[\s\S]*function StudentRunnerReviewSummary[\s\S]*aria-label=\{view\.ariaLabel\}[\s\S]*function StudentRunnerMetricOutput[\s\S]*function StudentRunnerResultNextSteps[\s\S]*aria-label=\{view\.ariaLabel\}/,
   'Student runner review summary, feedback coverage, and next-step panels should use domain-prepared accessible labels.'
 );
 assert.doesNotMatch(
