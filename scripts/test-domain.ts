@@ -8202,8 +8202,8 @@ assert.match(
 );
 assert.match(
   newsletterFormCardSource,
-  /const descriptionId = useId\(\)[\s\S]*view\.title[\s\S]*view\.description[\s\S]*view\.label[\s\S]*id=\{descriptionId\}[\s\S]*view\.switchDescription[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*aria-label=\{view\.switchAriaLabel\}[\s\S]*view\.scopeLabel[\s\S]*view\.scopeDescription[\s\S]*view\.hint/,
-  'Newsletter settings card should render prepared card copy, switch description, update scope, and hint.'
+  /const descriptionId = useId\(\)[\s\S]*aria-label=\{view\.ariaLabel\}[\s\S]*view\.title[\s\S]*view\.description[\s\S]*<form aria-label=\{view\.formAriaLabel\}>[\s\S]*aria-label=\{view\.switchGroupAriaLabel\}[\s\S]*view\.label[\s\S]*id=\{descriptionId\}[\s\S]*view\.switchDescription[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*aria-label=\{view\.switchAriaLabel\}[\s\S]*aria-label=\{view\.scopeAriaLabel\}[\s\S]*view\.scopeLabel[\s\S]*view\.scopeDescription[\s\S]*aria-label=\{view\.hintAriaLabel\}[\s\S]*view\.hint/,
+  'Newsletter settings card should render prepared card, form, switch, update scope, and hint semantics.'
 );
 assert.doesNotMatch(
   newsletterFormCardSource,
@@ -8217,8 +8217,8 @@ assert.match(
 );
 assert.match(
   settingsNotificationViewSource,
-  /export type SettingsNotificationNewsletterCardView = \{[\s\S]*emailRequiredMessage: string;[\s\S]*errorMessage: string;[\s\S]*scopeDescription: string;[\s\S]*scopeLabel: string;[\s\S]*subscribeSuccessMessage: string;[\s\S]*switchAriaLabel: string;[\s\S]*switchDescription: string;[\s\S]*unsubscribeSuccessMessage: string;/,
-  'Notification settings view model should expose prepared newsletter card copy, switch descriptions, and update scope.'
+  /export type SettingsNotificationNewsletterCardView = \{[\s\S]*ariaLabel: string;[\s\S]*emailRequiredMessage: string;[\s\S]*formAriaLabel: string;[\s\S]*hintAriaLabel: string;[\s\S]*scopeAriaLabel: string;[\s\S]*scopeDescription: string;[\s\S]*scopeLabel: string;[\s\S]*subscribeSuccessMessage: string;[\s\S]*switchAriaLabel: string;[\s\S]*switchDescription: string;[\s\S]*switchGroupAriaLabel: string;[\s\S]*unsubscribeSuccessMessage: string;/,
+  'Notification settings view model should expose prepared newsletter card copy, switch descriptions, update scope, and semantic labels.'
 );
 assert.match(
   settingsNotificationViewSource,
@@ -8227,23 +8227,23 @@ assert.match(
 );
 assert.match(
   settingsNotificationViewSource,
-  /export function buildSettingsNotificationPageViewModel\(\)[\s\S]*breadcrumbs:[\s\S]*id: 'settings'[\s\S]*id: 'notifications'[\s\S]*newsletterCardView: buildSettingsNotificationNewsletterCardView\(\)[\s\S]*workspaceSummaryView: buildSettingsNotificationWorkspaceSummaryView/,
-  'Notification settings view model should own localized page state, breadcrumbs, workspace summary, and newsletter card view.'
+  /export function buildSettingsNotificationPageViewModel\(\)[\s\S]*breadcrumbs:[\s\S]*id: 'settings'[\s\S]*id: 'notifications'[\s\S]*contentAriaLabel: m\.settings_notification_content_aria_label[\s\S]*newsletterCardView: buildSettingsNotificationNewsletterCardView\(\)[\s\S]*newsletterSectionAriaLabel:[\s\S]*settings_notification_newsletter_section_aria_label[\s\S]*workspaceSummaryView: buildSettingsNotificationWorkspaceSummaryView/,
+  'Notification settings view model should own localized page state, breadcrumbs, section semantics, workspace summary, and newsletter card view.'
 );
 assert.match(
   settingsNotificationViewSource,
-  /settings_notification_workspace_summary_title[\s\S]*settings_notification_workspace_summary_description[\s\S]*settings_notification_workspace_summary_templates_description[\s\S]*settings_notification_workspace_summary_worksheets_description[\s\S]*settings_notification_workspace_summary_review_description[\s\S]*settings_notification_workspace_summary_control_description/,
-  'Notification settings view model should prepare localized classroom update boundary copy.'
+  /settings_notification_workspace_summary_title[\s\S]*settings_notification_workspace_summary_description[\s\S]*buildSettingsNotificationWorkspaceSummaryItemView[\s\S]*settings_notification_workspace_summary_templates_description[\s\S]*settings_notification_workspace_summary_worksheets_description[\s\S]*settings_notification_workspace_summary_review_description[\s\S]*settings_notification_workspace_summary_control_description[\s\S]*settings_notification_workspace_summary_item_aria_label/,
+  'Notification settings view model should prepare localized classroom update boundary copy and item semantics.'
 );
 assert.match(
   settingsNotificationViewSource,
-  /buildSettingsNotificationNewsletterCardView[\s\S]*settings_notification_newsletter_description[\s\S]*settings_notification_newsletter_email_required[\s\S]*settings_notification_newsletter_error[\s\S]*settings_notification_newsletter_hint[\s\S]*settings_notification_newsletter_label[\s\S]*settings_notification_newsletter_scope_description[\s\S]*settings_notification_newsletter_scope_label[\s\S]*settings_notification_newsletter_subscribe_success[\s\S]*settings_notification_newsletter_switch_aria_label[\s\S]*settings_notification_newsletter_switch_description[\s\S]*settings_notification_newsletter_title[\s\S]*settings_notification_newsletter_unsubscribe_success/,
-  'Notification settings view model should prepare localized newsletter card copy, update scope, switch text, and toast messages.'
+  /buildSettingsNotificationNewsletterCardView[\s\S]*settings_notification_newsletter_description[\s\S]*settings_notification_newsletter_hint[\s\S]*settings_notification_newsletter_label[\s\S]*settings_notification_newsletter_scope_description[\s\S]*settings_notification_newsletter_scope_label[\s\S]*settings_notification_newsletter_switch_description[\s\S]*settings_notification_newsletter_title[\s\S]*settings_notification_newsletter_card_aria_label[\s\S]*settings_notification_newsletter_email_required[\s\S]*settings_notification_newsletter_error[\s\S]*settings_notification_newsletter_form_aria_label[\s\S]*settings_notification_newsletter_hint_aria_label[\s\S]*settings_notification_newsletter_scope_aria_label[\s\S]*settings_notification_newsletter_subscribe_success[\s\S]*settings_notification_newsletter_switch_aria_label[\s\S]*settings_notification_newsletter_switch_group_aria_label[\s\S]*settings_notification_newsletter_unsubscribe_success/,
+  'Notification settings view model should prepare localized newsletter card copy, semantic labels, update scope, switch text, and toast messages.'
 );
 assert.match(
   settingsNotificationRouteProductSource,
-  /const pageView = buildSettingsNotificationPageViewModel\(\);[\s\S]*breadcrumbs=\{pageView\.breadcrumbs\}[\s\S]*title=\{pageView\.title\}[\s\S]*NotificationWorkspaceSummary[\s\S]*view=\{pageView\.workspaceSummaryView\}[\s\S]*NewsletterFormCard[\s\S]*view=\{pageView\.newsletterCardView\}/,
-  'Notification settings route should consume the notification page view model and render prepared classroom update and newsletter views.'
+  /const pageView = buildSettingsNotificationPageViewModel\(\);[\s\S]*breadcrumbs=\{pageView\.breadcrumbs\}[\s\S]*title=\{pageView\.title\}[\s\S]*aria-label=\{pageView\.contentAriaLabel\}[\s\S]*NotificationWorkspaceSummary[\s\S]*view=\{pageView\.workspaceSummaryView\}[\s\S]*aria-label=\{pageView\.newsletterSectionAriaLabel\}[\s\S]*NewsletterFormCard[\s\S]*view=\{pageView\.newsletterCardView\}/,
+  'Notification settings route should consume the notification page view model and render prepared classroom update, newsletter views, and section semantics.'
 );
 assert.doesNotMatch(
   settingsNotificationRouteProductSource,
@@ -8252,8 +8252,8 @@ assert.doesNotMatch(
 );
 assert.match(
   notificationWorkspaceSummarySource,
-  /view\.itemViews\.map\(\(itemView\) =>[\s\S]*key=\{itemView\.id\}[\s\S]*function NotificationWorkspaceSummaryItem[\s\S]*itemView\.label[\s\S]*itemView\.description/,
-  'Notification workspace summary component should render prepared boundary views keyed by stable ids.'
+  /view\.itemViews\.map\(\(itemView\) =>[\s\S]*key=\{itemView\.id\}[\s\S]*function NotificationWorkspaceSummaryItem[\s\S]*aria-label=\{itemView\.ariaLabel\}[\s\S]*itemView\.label[\s\S]*itemView\.description/,
+  'Notification workspace summary component should render prepared boundary views and item semantics keyed by stable ids.'
 );
 assert.doesNotMatch(
   notificationWorkspaceSummarySource,
@@ -8392,6 +8392,14 @@ const notificationPageView = buildSettingsNotificationPageViewModel();
 assert.equal(notificationPageView.breadcrumbs.at(-1)?.id, 'notifications');
 assert.equal(notificationPageView.title, 'Updates');
 assert.equal(
+  notificationPageView.contentAriaLabel,
+  'Updates: Choose whether this teacher workspace receives ClassGamify product updates.'
+);
+assert.equal(
+  notificationPageView.newsletterSectionAriaLabel,
+  'ClassGamify classroom update email controls'
+);
+assert.equal(
   notificationPageView.newsletterCardView.scopeLabel,
   'Update scope'
 );
@@ -8402,6 +8410,27 @@ assert.match(
 assert.match(
   notificationPageView.newsletterCardView.switchDescription,
   /template changes, worksheet workflows, and result-review improvements/
+);
+assert.deepEqual(
+  {
+    ariaLabel: notificationPageView.newsletterCardView.ariaLabel,
+    formAriaLabel: notificationPageView.newsletterCardView.formAriaLabel,
+    hintAriaLabel: notificationPageView.newsletterCardView.hintAriaLabel,
+    scopeAriaLabel: notificationPageView.newsletterCardView.scopeAriaLabel,
+    switchGroupAriaLabel:
+      notificationPageView.newsletterCardView.switchGroupAriaLabel,
+  },
+  {
+    ariaLabel:
+      'ClassGamify update emails: Receive occasional updates about classroom templates, worksheet workflows, and assignment review features.',
+    formAriaLabel: 'ClassGamify update emails subscription controls',
+    hintAriaLabel:
+      'Teacher control note: You can change classroom update emails at any time.',
+    scopeAriaLabel:
+      'Update scope: These emails are product updates for teachers; they do not send student assignment reminders, change public links, or notify learners.',
+    switchGroupAriaLabel:
+      'Receive ClassGamify updates: Turns update emails on or off for template changes, worksheet workflows, and result-review improvements only.',
+  }
 );
 const notificationWorkspaceSummaryItemIds =
   notificationPageView.workspaceSummaryView.itemViews
@@ -8414,6 +8443,30 @@ assert.equal(
 assert.match(
   notificationPageView.workspaceSummaryView.description,
   /teacher workspace/
+);
+assert.deepEqual(
+  notificationPageView.workspaceSummaryView.itemViews.map((item) => [
+    item.id,
+    item.ariaLabel,
+  ]),
+  [
+    [
+      'template-updates',
+      'Template updates: Template updates cover quiz games, matching activities, category sorting, reveal boxes, pair matching, and remix readiness improvements.',
+    ],
+    [
+      'worksheet-workflows',
+      'Worksheet workflows: Worksheet updates cover fill-in-the-blank practice, line matching, listening activities, source-material workflows, and future extraction tools.',
+    ],
+    [
+      'assignment-review',
+      'Assignment review: Result-review updates focus on classroom briefs, reteach plans, exports, and follow-up workflows teachers use after student attempts.',
+    ],
+    [
+      'teacher-control',
+      'Teacher control: Teachers can pause or resume these classroom update emails at any time without changing account access, activities, assignments, or results.',
+    ],
+  ]
 );
 const notificationWorkspaceSummaryView =
   buildSettingsNotificationWorkspaceSummaryView();
@@ -8429,6 +8482,14 @@ try {
   const zhNotificationNewsletterCardView =
     buildSettingsNotificationNewsletterCardView();
   assert.equal(zhNotificationNewsletterCardView.scopeLabel, '更新范围');
+  assert.equal(
+    zhNotificationNewsletterCardView.formAriaLabel,
+    'ClassGamify 更新邮件订阅控制'
+  );
+  assert.match(
+    zhNotificationNewsletterCardView.scopeAriaLabel,
+    /不会发送学生作业提醒/
+  );
   assert.match(
     zhNotificationNewsletterCardView.switchDescription,
     /练习纸工作流和结果复盘/

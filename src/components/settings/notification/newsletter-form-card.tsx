@@ -89,19 +89,25 @@ export function NewsletterFormCard({
     }
   };
   return (
-    <Card className={cn('w-full overflow-hidden pt-6 pb-0', className)}>
+    <Card
+      aria-label={view.ariaLabel}
+      className={cn('w-full overflow-hidden pt-6 pb-0', className)}
+    >
       <CardHeader>
         <CardTitle className="text-lg font-semibold">{view.title}</CardTitle>
         <CardDescription>{view.description}</CardDescription>
       </CardHeader>
       <Form {...form}>
-        <form>
+        <form aria-label={view.formAriaLabel}>
           <CardContent className="space-y-4">
             <FormField
               control={form.control}
               name="subscribed"
               render={({ field }) => (
-                <FormItem className="grid gap-3 sm:grid-cols-[1fr_auto] sm:items-start">
+                <FormItem
+                  aria-label={view.switchGroupAriaLabel}
+                  className="grid gap-3 sm:grid-cols-[1fr_auto] sm:items-start"
+                >
                   <div className="space-y-1">
                     <FormLabel className="text-base">{view.label}</FormLabel>
                     <p
@@ -138,7 +144,7 @@ export function NewsletterFormCard({
               )}
             />
             <section
-              aria-label={view.scopeLabel}
+              aria-label={view.scopeAriaLabel}
               className="border-l-2 pl-3 text-sm"
             >
               <p className="font-medium text-foreground">{view.scopeLabel}</p>
@@ -148,7 +154,10 @@ export function NewsletterFormCard({
             </section>
             <FormError message={newsletterErrorMessage} />
           </CardContent>
-          <CardFooter className="mt-6 px-6 py-4 bg-muted rounded-none">
+          <CardFooter
+            aria-label={view.hintAriaLabel}
+            className="mt-6 rounded-none bg-muted px-6 py-4"
+          >
             <p className="text-sm text-muted-foreground">{view.hint}</p>
           </CardFooter>
         </form>
