@@ -13,6 +13,11 @@ import {
   normalizeActivityLibrarySearch,
 } from '@/activities/library-filters';
 import {
+  buildActivityDuplicateHandoffView,
+  type ActivityDuplicateHandoffSource,
+  type ActivityDuplicateHandoffView,
+} from '@/activities/duplicate';
+import {
   canArchiveActivity,
   canEditActivity,
   canDeriveActivityWork,
@@ -371,6 +376,7 @@ export type ActivityLibraryCardActionButtonView =
 export type ActivityLibraryCardDerivativeActionView =
   ActivityLifecycleActionView & {
     ariaLabel: string;
+    duplicateHandoffView?: ActivityDuplicateHandoffView;
     label: string;
     statusView: ActivityLibraryActionStatusView;
   };
@@ -1650,7 +1656,10 @@ export function buildActivityLibraryCardDisplayView({
     readyRemixCount: summary.suggestedTemplateOptions.length,
     visibility: activity.status,
   });
-  const actionView = buildActivityLibraryCardActionView(activity.status);
+  const actionView = buildActivityLibraryCardActionView(
+    activity.status,
+    activity
+  );
   const compatibility = buildActivityLibraryCompatibilityView({
     currentTemplateType: activity.templateType,
     summary,
@@ -1865,7 +1874,8 @@ function buildActivityLibraryEditorAction({
 }
 
 export function buildActivityLibraryCardActionView(
-  visibility: ActivityVisibility
+  visibility: ActivityVisibility,
+  activity?: ActivityDuplicateHandoffSource
 ): ActivityLibraryCardActionView {
   return {
     archive: buildActivityLibraryCardActionButtonView({
@@ -1874,6 +1884,7 @@ export function buildActivityLibraryCardActionView(
     }),
     duplicate: buildActivityLibraryCardDerivativeActionView({
       action: 'duplicate',
+      activity,
       visibility,
     }),
     publish: buildActivityLibraryCardDerivativeActionView({
@@ -1917,9 +1928,11 @@ function buildActivityLibraryCardActionButtonView({
 
 function buildActivityLibraryCardDerivativeActionView({
   action,
+  activity,
   visibility,
 }: {
   action: Exclude<ActivityDerivativeAction, 'remix'>;
+  activity?: ActivityDuplicateHandoffSource;
   visibility: ActivityVisibility;
 }): ActivityLibraryCardDerivativeActionView {
   const actionView = buildActivityLifecycleActionView({
@@ -1936,6 +1949,9 @@ function buildActivityLibraryCardDerivativeActionView({
   return {
     ...actionView,
     ariaLabel: buildActivityLibraryActionAriaLabel({ label, statusView }),
+    ...(action === 'duplicate' && activity
+      ? { duplicateHandoffView: buildActivityDuplicateHandoffView(activity) }
+      : {}),
     label,
     statusView,
   };

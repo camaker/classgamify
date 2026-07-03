@@ -213,6 +213,8 @@ import {
   getTemplateByType,
 } from '@/activities/catalog';
 import {
+  ACTIVITY_DUPLICATE_HANDOFF_ITEM_IDS,
+  buildActivityDuplicateHandoffView,
   buildDuplicatedActivityTitle,
   buildRemixedActivityTitle,
   cloneActivityContentForDerivative,
@@ -4419,8 +4421,8 @@ assert.match(
 );
 assert.match(
   activityLibraryViewSource,
-  /export type ActivityLibraryActionStatusView = \{[\s\S]*ariaLabel: string;[\s\S]*description: string;[\s\S]*tone: ActivityLibraryActionStatusTone;[\s\S]*export type ActivityLibraryCardActionButtonView =[\s\S]*ariaLabel: string;[\s\S]*label: string;[\s\S]*statusView: ActivityLibraryActionStatusView;[\s\S]*export type ActivityLibraryCardDerivativeActionView =[\s\S]*ariaLabel: string;[\s\S]*label: string;[\s\S]*statusView: ActivityLibraryActionStatusView;[\s\S]*export type ActivityLibraryCardRestoreActionView =[\s\S]*requiredMessage: string;[\s\S]*export type ActivityLibraryCardRemixActionView =[\s\S]*statusView: ActivityLibraryActionStatusView;[\s\S]*export type ActivityLibraryCardActionView = \{[\s\S]*archive: ActivityLibraryCardActionButtonView;[\s\S]*duplicate: ActivityLibraryCardDerivativeActionView;[\s\S]*publish: ActivityLibraryCardDerivativeActionView;[\s\S]*remix: ActivityLibraryCardRemixActionView;[\s\S]*restore: ActivityLibraryCardRestoreActionView;/,
-  'Activity library card actions should compose explicit lifecycle action view contracts with prepared labels, status views, aria labels, and restore guidance.'
+  /export type ActivityLibraryActionStatusView = \{[\s\S]*ariaLabel: string;[\s\S]*description: string;[\s\S]*tone: ActivityLibraryActionStatusTone;[\s\S]*export type ActivityLibraryCardActionButtonView =[\s\S]*ariaLabel: string;[\s\S]*label: string;[\s\S]*statusView: ActivityLibraryActionStatusView;[\s\S]*export type ActivityLibraryCardDerivativeActionView =[\s\S]*ariaLabel: string;[\s\S]*duplicateHandoffView\?: ActivityDuplicateHandoffView;[\s\S]*label: string;[\s\S]*statusView: ActivityLibraryActionStatusView;[\s\S]*export type ActivityLibraryCardRestoreActionView =[\s\S]*requiredMessage: string;[\s\S]*export type ActivityLibraryCardRemixActionView =[\s\S]*statusView: ActivityLibraryActionStatusView;[\s\S]*export type ActivityLibraryCardActionView = \{[\s\S]*archive: ActivityLibraryCardActionButtonView;[\s\S]*duplicate: ActivityLibraryCardDerivativeActionView;[\s\S]*publish: ActivityLibraryCardDerivativeActionView;[\s\S]*remix: ActivityLibraryCardRemixActionView;[\s\S]*restore: ActivityLibraryCardRestoreActionView;/,
+  'Activity library card actions should compose explicit lifecycle action view contracts with prepared labels, status views, aria labels, duplicate handoff, and restore guidance.'
 );
 assert.match(
   activityLibraryViewSource,
@@ -29319,8 +29321,8 @@ assert.match(
 );
 assert.match(
   activityLibraryViewSource,
-  /buildActivityLibraryCardDisplayView[\s\S]*const actionView = buildActivityLibraryCardActionView\(activity\.status\)[\s\S]*const compatibility = buildActivityLibraryCompatibilityView\([\s\S]*const sourceMaterials = buildActivitySourceMaterialSummaryView\([\s\S]*statusSummary: buildActivityLibraryCardStatusSummaryView\(\{[\s\S]*actionView,[\s\S]*compatibility,[\s\S]*displayTitle,[\s\S]*sourceMaterials,[\s\S]*statusLabel/,
-  'Activity library card display view should build the readiness summary from prepared action, compatibility, display-title, and source-material views.'
+  /buildActivityLibraryCardDisplayView[\s\S]*const actionView = buildActivityLibraryCardActionView\([\s\S]*activity\.status,[\s\S]*activity[\s\S]*\)[\s\S]*const compatibility = buildActivityLibraryCompatibilityView\([\s\S]*const sourceMaterials = buildActivitySourceMaterialSummaryView\([\s\S]*statusSummary: buildActivityLibraryCardStatusSummaryView\(\{[\s\S]*actionView,[\s\S]*compatibility,[\s\S]*displayTitle,[\s\S]*sourceMaterials,[\s\S]*statusLabel/,
+  'Activity library card display view should build the readiness summary from prepared action, duplicate handoff, compatibility, display-title, and source-material views.'
 );
 assert.match(
   activityLibraryViewSource,
@@ -36358,6 +36360,53 @@ assert.deepEqual(
     value: '1 extraction-ready file',
   }
 );
+assert.ok(sourceReadyActivityDisplayView.actionView.duplicate.duplicateHandoffView);
+assert.deepEqual(
+  sourceReadyActivityDisplayView.actionView.duplicate.duplicateHandoffView.privacy,
+  {
+    exposesActivityContentText: false,
+    exposesAnswerText: false,
+    exposesQuestionPromptText: false,
+    exposesSourceMaterialFileIds: false,
+    exposesSourceMaterialStorageKeys: false,
+    exposesTeacherNotesText: false,
+    itemIds: [...ACTIVITY_DUPLICATE_HANDOFF_ITEM_IDS],
+    modifiesOriginalActivity: false,
+    modifiesPublishedAssignmentSnapshots: false,
+    outputVisibility: 'draft',
+    requiresOwnerScopedSource: true,
+    scope: 'owner-activity-duplicate',
+  }
+);
+assert.deepEqual(
+  new Map(
+    sourceReadyActivityDisplayView.actionView.duplicate.duplicateHandoffView.itemViews.map(
+      (item) => [item.id, item.value]
+    )
+  ),
+  new Map([
+    ['source-activity', 'Food words quick check'],
+    ['owner-scope', 'Current teacher'],
+    ['source-status', 'Preview'],
+    ['action-availability', 'Preview only'],
+    ['lifecycle-gate', 'Save required'],
+    ['draft-output', 'Draft copy'],
+    ['title-strategy', 'Copy of Food words quick check'],
+    ['title-limit', '120 chars'],
+    ['template-preserved', 'Quiz'],
+    ['content-clone', 'Structured copy'],
+    ['questions', '3'],
+    ['pairs', '4'],
+    ['groups', '2'],
+    ['vocabulary', '6'],
+    ['teacher-notes', '2'],
+    ['source-materials', '1'],
+    ['source-material-kinds', '1'],
+    ['source-material-privacy', 'File ids hidden'],
+    ['assignment-snapshot-protection', 'Snapshots unchanged'],
+    ['original-activity-protection', 'Unchanged'],
+  ])
+);
 assert.equal(formatActivityLibraryStatusLabel('archived'), 'Archived');
 assert.equal(formatActivityLibraryStatusLabel('private'), 'Private');
 assert.equal(
@@ -42986,6 +43035,47 @@ assert.doesNotMatch(
   /const MAX_ACTIVITY_TITLE_LENGTH = 120/,
   'Activity duplicate helpers should not maintain a local title length.'
 );
+assert.match(
+  activityDuplicateSource,
+  /export const ACTIVITY_DUPLICATE_HANDOFF_ITEM_IDS = \[(?=[\s\S]*'source-activity')(?=[\s\S]*'owner-scope')(?=[\s\S]*'source-status')(?=[\s\S]*'action-availability')(?=[\s\S]*'lifecycle-gate')(?=[\s\S]*'draft-output')(?=[\s\S]*'title-strategy')(?=[\s\S]*'template-preserved')(?=[\s\S]*'source-material-privacy')(?=[\s\S]*'assignment-snapshot-protection')(?=[\s\S]*'original-activity-protection')[\s\S]*export type ActivityDuplicateHandoffPrivacyContract = \{[\s\S]*exposesActivityContentText: false;[\s\S]*exposesAnswerText: false;[\s\S]*exposesQuestionPromptText: false;[\s\S]*exposesSourceMaterialFileIds: false;[\s\S]*exposesSourceMaterialStorageKeys: false;[\s\S]*exposesTeacherNotesText: false;[\s\S]*modifiesOriginalActivity: false;[\s\S]*modifiesPublishedAssignmentSnapshots: false;[\s\S]*outputVisibility: 'draft';[\s\S]*requiresOwnerScopedSource: true;[\s\S]*scope: 'owner-activity-duplicate';/,
+  'Activity duplicate handoff should expose a typed 20-slice safe draft-copy contract with explicit privacy flags.'
+);
+assert.deepEqual(
+  [...ACTIVITY_DUPLICATE_HANDOFF_ITEM_IDS],
+  [
+    'source-activity',
+    'owner-scope',
+    'source-status',
+    'action-availability',
+    'lifecycle-gate',
+    'draft-output',
+    'title-strategy',
+    'title-limit',
+    'template-preserved',
+    'content-clone',
+    'questions',
+    'pairs',
+    'groups',
+    'vocabulary',
+    'teacher-notes',
+    'source-materials',
+    'source-material-kinds',
+    'source-material-privacy',
+    'assignment-snapshot-protection',
+    'original-activity-protection',
+  ],
+  'Activity duplicate handoff should expose exactly 20 stable slice ids.'
+);
+assert.match(
+  activityDuplicateSource,
+  /export function buildActivityDuplicateHandoffView[\s\S]*ACTIVITY_DUPLICATE_HANDOFF_ITEM_IDS\.map[\s\S]*buildActivityDuplicateHandoffItem[\s\S]*privacy: buildActivityDuplicateHandoffPrivacyContract/,
+  'Activity duplicate handoff should build stable item views and privacy from the duplicate domain.'
+);
+assert.match(
+  activityDuplicateSource,
+  /function buildActivityDuplicateHandoffSummary[\s\S]*normalizeActivityMaterialReferences\([\s\S]*content\.sourceMaterials[\s\S]*buildDuplicatedActivityTitle\(title\)[\s\S]*getTemplateByType\(templateType\)\.name[\s\S]*ACTIVITY_TITLE_LENGTH\.max/,
+  'Activity duplicate handoff summary should derive title, content counts, template label, material references, and title limits from existing activity-domain helpers.'
+);
 assert.equal(buildDuplicatedActivityTitle('   '), 'Copy of Untitled activity');
 assert.equal(
   buildDuplicatedActivityTitle('A'.repeat(200)).length,
@@ -43072,6 +43162,57 @@ const derivativeSourceContent = buildActivityContent({
 });
 const derivativeClonedContent = cloneActivityContentForDerivative(
   derivativeSourceContent
+);
+const duplicateHandoffView = buildActivityDuplicateHandoffView({
+  content: derivativeSourceContent,
+  persisted: true,
+  status: 'private',
+  templateType: 'group-sort',
+  title: '  Food words quick check  ',
+});
+assert.deepEqual(duplicateHandoffView.privacy, {
+  exposesActivityContentText: false,
+  exposesAnswerText: false,
+  exposesQuestionPromptText: false,
+  exposesSourceMaterialFileIds: false,
+  exposesSourceMaterialStorageKeys: false,
+  exposesTeacherNotesText: false,
+  itemIds: [...ACTIVITY_DUPLICATE_HANDOFF_ITEM_IDS],
+  modifiesOriginalActivity: false,
+  modifiesPublishedAssignmentSnapshots: false,
+  outputVisibility: 'draft',
+  requiresOwnerScopedSource: true,
+  scope: 'owner-activity-duplicate',
+});
+assert.deepEqual(
+  new Map(duplicateHandoffView.itemViews.map((item) => [item.id, item.value])),
+  new Map([
+    ['source-activity', 'Food words quick check'],
+    ['owner-scope', 'Current teacher'],
+    ['source-status', 'Private'],
+    ['action-availability', 'Ready'],
+    ['lifecycle-gate', 'Derivative allowed'],
+    ['draft-output', 'Draft copy'],
+    ['title-strategy', 'Copy of Food words quick check'],
+    ['title-limit', '120 chars'],
+    ['template-preserved', 'Group sort'],
+    ['content-clone', 'Structured copy'],
+    ['questions', '1'],
+    ['pairs', '1'],
+    ['groups', '1'],
+    ['vocabulary', '2'],
+    ['teacher-notes', '1'],
+    ['source-materials', '2'],
+    ['source-material-kinds', '2'],
+    ['source-material-privacy', 'File ids hidden'],
+    ['assignment-snapshot-protection', 'Snapshots unchanged'],
+    ['original-activity-protection', 'Unchanged'],
+  ])
+);
+assert.doesNotMatch(
+  JSON.stringify(duplicateHandoffView),
+  /Favorite food\?|apple, bread|Choose the food|file-listening-1|file-worksheet-derivative|worksheet derivative\.pdf|userfiles\/teacher\/private\.pdf|Use after vocabulary warmup/,
+  'Activity duplicate handoff should omit classroom content, answers, notes, source-material filenames, file ids, and storage keys.'
 );
 const activityInsertNow = new Date('2026-01-15T08:00:00.000Z');
 const baseActivityCreateInput = {
