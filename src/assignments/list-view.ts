@@ -50,6 +50,7 @@ import {
   resolvePublishedAssignmentPanelAssignment,
   type PublishedAssignmentPanelAssignment,
   type PublishedAssignmentPanelContext,
+  type PublishedAssignmentPanelNextStepId,
 } from '@/assignments/published-assignment';
 import {
   formatAssignmentResultNumber,
@@ -99,6 +100,55 @@ export type AssignmentListSearchPanelView = {
   statusLabel: string;
   statusMetrics: AssignmentListStatusMetric[];
   statusOptions: AssignmentListControlOption[];
+};
+
+export type AssignmentListPageHandoffItemId =
+  | 'distribution-copy-link'
+  | 'distribution-preview-link'
+  | 'distribution-review-results'
+  | 'filter-summary'
+  | 'owner-scope'
+  | 'pagination'
+  | 'published-share-context'
+  | 'scope-page'
+  | 'scope-range'
+  | 'scope-search'
+  | 'scope-status'
+  | 'status-closed'
+  | 'status-draft'
+  | 'status-expired'
+  | 'status-open'
+  | 'summary-average'
+  | 'summary-completions'
+  | 'summary-open'
+  | 'summary-total'
+  | 'visible-page-items';
+
+export type AssignmentListPageHandoffItemView = {
+  ariaLabel: string;
+  description: string;
+  id: AssignmentListPageHandoffItemId;
+  label: string;
+  value: string;
+};
+
+export type AssignmentListPageHandoffPrivacyView = {
+  broadensBeyondOwner: false;
+  countsStarterPreviewAsOwned: false;
+  exposesInternalAssignmentIds: false;
+  exposesInternalOwnerId: false;
+  exposesRawAnonymousToken: false;
+  exposesSourceMaterialStorageKeys: false;
+  exposesStudentAnswerText: false;
+  exposesTeacherOnlyAnswers: false;
+  itemIds: AssignmentListPageHandoffItemId[];
+};
+
+export type AssignmentListPageHandoffView = {
+  description: string;
+  itemViews: AssignmentListPageHandoffItemView[];
+  privacy: AssignmentListPageHandoffPrivacyView;
+  title: string;
 };
 
 export type AssignmentListCardStatKey = 'average' | 'completions';
@@ -297,6 +347,7 @@ type AssignmentListPageViewModel<TItem extends AssignmentListPageItem> = {
   breadcrumbs: AssignmentListPageBreadcrumb[];
   description: string;
   emptyState: AssignmentListEmptyStateView;
+  handoffView: AssignmentListPageHandoffView;
   hasAssignments: boolean;
   loadErrorMessage: string;
   publishedPanelContext?: PublishedAssignmentPanelContext;
@@ -729,6 +780,27 @@ export function buildAssignmentListPageViewModel<
     isLoading,
     starterPreview,
   });
+  const scopeView = buildAssignmentListPageScopeView({
+    currentPage: resolvedSearch.currentPage,
+    pageSize: ASSIGNMENT_LIST_PAGE_SIZE,
+    search: resolvedSearch.searchQuery,
+    status: resolvedSearch.statusFilter,
+    total: totalAssignments,
+    totalPages,
+    visibleCount: assignments.length,
+  });
+  const summaryMetrics = buildAssignmentListSummaryMetrics({
+    hasFilters: resolvedSearch.hasFilters,
+    summary: data?.summary,
+    totalAssignments,
+  });
+  const searchPanelView = buildAssignmentListSearchPanelView({
+    isLoading,
+    search: resolvedSearch.searchQuery,
+    status: resolvedSearch.statusFilter,
+    summary: data?.summary,
+    total: totalAssignments,
+  });
 
   return {
     assignments,
@@ -746,25 +818,24 @@ export function buildAssignmentListPageViewModel<
     ],
     description: assignmentListPageCopy.description,
     emptyState,
+    handoffView: buildAssignmentListPageHandoffView({
+      assignments,
+      publishedPanelContext,
+      resolvedSearch,
+      scopeView,
+      searchPanelView,
+      summaryMetrics,
+      totalAssignments,
+      totalPages,
+      visibleCount: assignments.length,
+    }),
     hasAssignments: assignments.length > 0,
     loadErrorMessage: assignmentListPageCopy.loadErrorMessage,
     publishedPanelContext,
     resolvedSearch,
-    scopeView: buildAssignmentListPageScopeView({
-      currentPage: resolvedSearch.currentPage,
-      pageSize: ASSIGNMENT_LIST_PAGE_SIZE,
-      search: resolvedSearch.searchQuery,
-      status: resolvedSearch.statusFilter,
-      total: totalAssignments,
-      totalPages,
-      visibleCount: assignments.length,
-    }),
+    scopeView,
     starterPreview: resolvedStarterPreview,
-    summaryMetrics: buildAssignmentListSummaryMetrics({
-      hasFilters: resolvedSearch.hasFilters,
-      summary: data?.summary,
-      totalAssignments,
-    }),
+    summaryMetrics,
     title: assignmentListPageCopy.title,
     totalAssignments,
     totalPages,
@@ -891,6 +962,339 @@ export function resolveAssignmentListPageSearch(
     searchQuery,
     statusFilter,
   };
+}
+
+function buildAssignmentListPageHandoffView<
+  TItem extends AssignmentListPageItem,
+>({
+  assignments,
+  publishedPanelContext,
+  resolvedSearch,
+  scopeView,
+  searchPanelView,
+  summaryMetrics,
+  totalAssignments,
+  totalPages,
+  visibleCount,
+}: {
+  assignments: TItem[];
+  publishedPanelContext?: PublishedAssignmentPanelContext;
+  resolvedSearch: AssignmentListPageResolvedSearch;
+  scopeView: AssignmentListPageScopeView;
+  searchPanelView: AssignmentListSearchPanelView;
+  summaryMetrics: AssignmentListSummaryMetric[];
+  totalAssignments: number;
+  totalPages: number;
+  visibleCount: number;
+}): AssignmentListPageHandoffView {
+  const distributionStepViews = resolveAssignmentListHandoffDistributionSteps({
+    assignments,
+    publishedPanelContext,
+  });
+  const itemViews: AssignmentListPageHandoffItemView[] = [
+    buildAssignmentListPageHandoffItem({
+      description: m.assignment_list_handoff_owner_scope_description(),
+      id: 'owner-scope',
+      label: m.assignment_list_handoff_owner_scope_label(),
+      value: m.assignment_list_handoff_owner_scope_value(),
+    }),
+    ...summaryMetrics.map((metric) =>
+      buildAssignmentListPageHandoffItem({
+        description: metric.description,
+        id: toAssignmentListSummaryHandoffItemId(metric.id),
+        label: metric.label,
+        value: metric.value,
+      })
+    ),
+    ...scopeView.items.map((item) =>
+      buildAssignmentListPageHandoffItem({
+        description: item.description,
+        id: toAssignmentListScopeHandoffItemId(item.id),
+        label: item.label,
+        value: item.value,
+      })
+    ),
+    ...searchPanelView.statusMetrics.map((metric) =>
+      buildAssignmentListPageHandoffItem({
+        description: m.assignment_list_handoff_status_metric_description({
+          status: metric.label,
+        }),
+        id: toAssignmentListStatusHandoffItemId(metric.status),
+        label: metric.label,
+        value: metric.value,
+      })
+    ),
+    buildAssignmentListPageHandoffItem({
+      description: searchPanelView.searchDescription,
+      id: 'filter-summary',
+      label: assignmentListSearchCopy.label,
+      value: searchPanelView.filterSummary.text,
+    }),
+    buildAssignmentListPageHandoffItem({
+      description: m.assignment_list_handoff_visible_items_description(),
+      id: 'visible-page-items',
+      label: m.assignment_list_handoff_visible_items_label(),
+      value: m.assignment_list_handoff_visible_items_value({
+        count: normalizeAssignmentListSummaryCount(visibleCount),
+      }),
+    }),
+    buildAssignmentListPageHandoffItem({
+      description: m.assignment_list_handoff_pagination_description(),
+      id: 'pagination',
+      label: m.assignment_list_handoff_pagination_label(),
+      value: m.assignment_list_handoff_pagination_value({
+        currentPage: formatAssignmentListHandoffNumber(
+          resolvedSearch.currentPage,
+          { min: 1 }
+        ),
+        totalAssignments: formatAssignmentListHandoffNumber(totalAssignments),
+        totalPages: formatAssignmentListHandoffNumber(totalPages, { min: 1 }),
+      }),
+    }),
+    buildAssignmentListPageHandoffItem({
+      description: formatAssignmentListPublishedContextDescription(
+        publishedPanelContext
+      ),
+      id: 'published-share-context',
+      label: m.assignment_list_handoff_published_context_label(),
+      value: formatAssignmentListPublishedContextValue(publishedPanelContext),
+    }),
+    ...distributionStepViews.map((stepView) =>
+      buildAssignmentListPageHandoffItem({
+        description: stepView.description,
+        id: toAssignmentListDistributionHandoffItemId(stepView.id),
+        label: stepView.label,
+        value: stepView.statusLabel,
+      })
+    ),
+  ];
+
+  return {
+    description: m.assignment_list_handoff_description(),
+    itemViews,
+    privacy: buildAssignmentListPageHandoffPrivacyView(itemViews),
+    title: m.assignment_list_handoff_title(),
+  };
+}
+
+function toAssignmentListSummaryHandoffItemId(
+  id: AssignmentListSummaryMetric['id']
+): AssignmentListPageHandoffItemId {
+  switch (id) {
+    case 'average':
+      return 'summary-average';
+    case 'completions':
+      return 'summary-completions';
+    case 'open':
+      return 'summary-open';
+    case 'total':
+      return 'summary-total';
+  }
+}
+
+function toAssignmentListScopeHandoffItemId(
+  id: AssignmentListPageScopeItemId
+): AssignmentListPageHandoffItemId {
+  switch (id) {
+    case 'page':
+      return 'scope-page';
+    case 'range':
+      return 'scope-range';
+    case 'search':
+      return 'scope-search';
+    case 'status':
+      return 'scope-status';
+  }
+}
+
+function toAssignmentListStatusHandoffItemId(
+  status: AssignmentListStatusMetric['status']
+): AssignmentListPageHandoffItemId {
+  switch (status) {
+    case 'closed':
+      return 'status-closed';
+    case 'draft':
+      return 'status-draft';
+    case 'expired':
+      return 'status-expired';
+    case 'open':
+      return 'status-open';
+    case 'all':
+      return 'status-open';
+  }
+}
+
+type AssignmentListHandoffDistributionStepId = Extract<
+  PublishedAssignmentPanelNextStepId,
+  'copy-link' | 'preview-link' | 'review-results'
+>;
+
+type AssignmentListHandoffDistributionStepView = {
+  description: string;
+  id: AssignmentListHandoffDistributionStepId;
+  label: string;
+  statusLabel: string;
+};
+
+function resolveAssignmentListHandoffDistributionSteps<
+  TItem extends AssignmentListPageItem,
+>({
+  assignments,
+  publishedPanelContext,
+}: {
+  assignments: TItem[];
+  publishedPanelContext?: PublishedAssignmentPanelContext;
+}): AssignmentListHandoffDistributionStepView[] {
+  const stepViews =
+    publishedPanelContext?.nextStepViews ??
+    (assignments[0]
+      ? buildAssignmentListCardViewModel(assignments[0]).distributionView
+          .stepViews
+      : []);
+
+  return [
+    resolveAssignmentListHandoffDistributionStep(stepViews, 'copy-link'),
+    resolveAssignmentListHandoffDistributionStep(stepViews, 'preview-link'),
+    resolveAssignmentListHandoffDistributionStep(stepViews, 'review-results'),
+  ];
+}
+
+function resolveAssignmentListHandoffDistributionStep(
+  stepViews: Array<{
+    description: string;
+    id: PublishedAssignmentPanelNextStepId | AssignmentListDistributionStepId;
+    label: string;
+    statusLabel: string;
+  }>,
+  id: AssignmentListHandoffDistributionStepId
+): AssignmentListHandoffDistributionStepView {
+  const matchedStepView = stepViews.find((stepView) => stepView.id === id);
+
+  if (matchedStepView) {
+    return {
+      description: matchedStepView.description,
+      id,
+      label: matchedStepView.label,
+      statusLabel: matchedStepView.statusLabel,
+    };
+  }
+
+  return {
+    description: m.assignment_list_handoff_distribution_empty_description(),
+    id,
+    label: formatAssignmentListHandoffDistributionStepLabel(id),
+    statusLabel: m.assignment_list_handoff_distribution_empty_value(),
+  };
+}
+
+function formatAssignmentListHandoffDistributionStepLabel(
+  id: AssignmentListHandoffDistributionStepId
+) {
+  switch (id) {
+    case 'copy-link':
+      return m.assignment_list_distribution_step_copy_label();
+    case 'preview-link':
+      return m.assignment_list_distribution_step_preview_label();
+    case 'review-results':
+      return m.assignment_list_distribution_step_results_label();
+  }
+}
+
+function toAssignmentListDistributionHandoffItemId(
+  id: AssignmentListHandoffDistributionStepId
+): AssignmentListPageHandoffItemId {
+  switch (id) {
+    case 'copy-link':
+      return 'distribution-copy-link';
+    case 'preview-link':
+      return 'distribution-preview-link';
+    case 'review-results':
+      return 'distribution-review-results';
+  }
+}
+
+function formatAssignmentListPublishedContextDescription(
+  context?: PublishedAssignmentPanelContext
+) {
+  return context?.body ?? m.assignment_list_handoff_published_context_empty();
+}
+
+function formatAssignmentListPublishedContextValue(
+  context?: PublishedAssignmentPanelContext
+) {
+  if (!context) {
+    return m.assignment_list_handoff_published_context_empty_value();
+  }
+
+  return m.assignment_list_handoff_published_context_value({
+    sharePath: context.sharePath,
+    status: formatAssignmentListPublishedContextStatus(context.status),
+  });
+}
+
+function formatAssignmentListPublishedContextStatus(
+  status: PublishedAssignmentPanelContext['status']
+) {
+  switch (status) {
+    case 'found':
+      return m.assignment_list_handoff_published_context_found();
+    case 'loading':
+      return m.assignment_list_handoff_published_context_loading();
+    case 'missing':
+      return m.assignment_list_handoff_published_context_missing();
+  }
+}
+
+function buildAssignmentListPageHandoffPrivacyView(
+  itemViews: AssignmentListPageHandoffItemView[]
+): AssignmentListPageHandoffPrivacyView {
+  return {
+    broadensBeyondOwner: false,
+    countsStarterPreviewAsOwned: false,
+    exposesInternalAssignmentIds: false,
+    exposesInternalOwnerId: false,
+    exposesRawAnonymousToken: false,
+    exposesSourceMaterialStorageKeys: false,
+    exposesStudentAnswerText: false,
+    exposesTeacherOnlyAnswers: false,
+    itemIds: itemViews.map((item) => item.id),
+  };
+}
+
+function buildAssignmentListPageHandoffItem({
+  description,
+  id,
+  label,
+  value,
+}: {
+  description: string;
+  id: AssignmentListPageHandoffItemId;
+  label: string;
+  value: string;
+}): AssignmentListPageHandoffItemView {
+  return {
+    ariaLabel: m.assignment_list_summary_metric_aria_label({
+      description,
+      label,
+      value,
+    }),
+    description,
+    id,
+    label,
+    value,
+  };
+}
+
+function formatAssignmentListHandoffNumber(
+  value: number,
+  options?: { min?: number }
+) {
+  const normalizedValue = normalizeAssignmentListSummaryCount(value);
+  return String(
+    options?.min === undefined
+      ? normalizedValue
+      : Math.max(options.min, normalizedValue)
+  );
 }
 
 export function buildAssignmentListCardStats({

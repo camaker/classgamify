@@ -29598,17 +29598,27 @@ assert.match(
 );
 assert.match(
   assignmentListViewSource,
-  /summaryMetrics: buildAssignmentListSummaryMetrics\(\{[\s\S]*summary: data\?\.summary,[\s\S]*totalAssignments,[\s\S]*\}\)/,
+  /const summaryMetrics = buildAssignmentListSummaryMetrics\(\{[\s\S]*summary: data\?\.summary,[\s\S]*totalAssignments,[\s\S]*\}\)[\s\S]*summaryMetrics,/,
   'Assignment list summary metrics should come from real list data and totals.'
 );
 assert.doesNotMatch(
   getSourceSlice(
     assignmentListViewSource,
-    'summaryMetrics: buildAssignmentListSummaryMetrics',
-    'title: assignmentListPageCopy.title'
+    'const summaryMetrics = buildAssignmentListSummaryMetrics',
+    'const searchPanelView = buildAssignmentListSearchPanelView'
   ),
   /starterPreview|getStarterAssignments|getStarterAssignment|getStarterActivity/,
   'Assignment list summary metrics should not count starter-preview assignments.'
+);
+assert.match(
+  assignmentListViewSource,
+  /export type AssignmentListPageHandoffItemId =(?=[\s\S]*'owner-scope')(?=[\s\S]*'summary-total')(?=[\s\S]*'scope-range')(?=[\s\S]*'status-open')(?=[\s\S]*'published-share-context')(?=[\s\S]*'distribution-copy-link')[\s\S]*export type AssignmentListPageHandoffPrivacyView = \{[\s\S]*broadensBeyondOwner: false;[\s\S]*countsStarterPreviewAsOwned: false;[\s\S]*exposesRawAnonymousToken: false;[\s\S]*exposesStudentAnswerText: false;[\s\S]*export type AssignmentListPageHandoffView = \{/,
+  'Assignment list page handoff should expose a typed owner-scoped distribution contract with explicit privacy flags.'
+);
+assert.match(
+  assignmentListViewSource,
+  /handoffView: buildAssignmentListPageHandoffView\(\{[\s\S]*assignments,[\s\S]*publishedPanelContext,[\s\S]*scopeView,[\s\S]*searchPanelView,[\s\S]*summaryMetrics,[\s\S]*visibleCount: assignments\.length/,
+  'Assignment list page view-model should compose the handoff view from prepared assignment-domain page, filter, summary, and distribution views.'
 );
 assert.match(
   dashboardAssignmentsRouteSource,
@@ -29682,7 +29692,7 @@ assert.match(
 );
 assert.match(
   assignmentListViewSource,
-  /scopeView: buildAssignmentListPageScopeView\(\{[\s\S]*currentPage: resolvedSearch\.currentPage,[\s\S]*pageSize: ASSIGNMENT_LIST_PAGE_SIZE,[\s\S]*search: resolvedSearch\.searchQuery,[\s\S]*status: resolvedSearch\.statusFilter,[\s\S]*total: totalAssignments,[\s\S]*totalPages,[\s\S]*visibleCount: assignments\.length/,
+  /const scopeView = buildAssignmentListPageScopeView\(\{[\s\S]*currentPage: resolvedSearch\.currentPage,[\s\S]*pageSize: ASSIGNMENT_LIST_PAGE_SIZE,[\s\S]*search: resolvedSearch\.searchQuery,[\s\S]*status: resolvedSearch\.statusFilter,[\s\S]*total: totalAssignments,[\s\S]*totalPages,[\s\S]*visibleCount: assignments\.length[\s\S]*\}\)[\s\S]*scopeView,/,
   'Assignment list page view-model should prepare a current-view scope from resolved search, total pages, and visible item count.'
 );
 assert.match(
