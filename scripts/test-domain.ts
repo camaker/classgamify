@@ -39166,8 +39166,17 @@ assert.deepEqual(
   },
   'AI draft generation should normalize source notes before sending them to the draft service.'
 );
-assert.deepEqual(
-  buildActivityEditorAiDraftPanelView({
+const safeMaterialAiDraftPanelView = buildActivityEditorAiDraftPanelView({
+  draftSourceText: [
+    'weather source notes',
+    'Attached classroom source materials:',
+    '- Worksheet document: Weather worksheet.pdf',
+    '- Audio: Weather listening.mp3',
+    '- storageKey: classroom/private/worksheet.pdf',
+  ].join('\n'),
+  hasUser: true,
+  isGeneratingDraft: false,
+  sourceState: buildActivityEditorDraftSourceState({
     draftSourceText: [
       'weather source notes',
       'Attached classroom source materials:',
@@ -39175,19 +39184,19 @@ assert.deepEqual(
       '- Audio: Weather listening.mp3',
       '- storageKey: classroom/private/worksheet.pdf',
     ].join('\n'),
-    hasUser: true,
-    isGeneratingDraft: false,
-    sourceState: buildActivityEditorDraftSourceState({
-      draftSourceText: [
-        'weather source notes',
-        'Attached classroom source materials:',
-        '- Worksheet document: Weather worksheet.pdf',
-        '- Audio: Weather listening.mp3',
-        '- storageKey: classroom/private/worksheet.pdf',
-      ].join('\n'),
-      sourceMaterials: [],
-    }),
+    sourceMaterials: [],
   }),
+});
+assert.equal(
+  safeMaterialAiDraftPanelView.sourceHandoffView.itemViews.length,
+  20
+);
+assert.equal(
+  safeMaterialAiDraftPanelView.sourceHandoffView.privacy.exposesStorageKeys,
+  false
+);
+assert.deepEqual(
+  omitActivityEditorAiDraftSourceHandoffView(safeMaterialAiDraftPanelView),
   {
     badgeLabel: 'AI draft',
     canGenerateDraft: true,
@@ -39626,7 +39635,9 @@ const disabledAiDraftPanelView = buildActivityEditorAiDraftPanelView({
     sourceMaterials: [],
   }),
 });
-assert.deepEqual(disabledAiDraftPanelView, {
+assert.deepEqual(
+  omitActivityEditorAiDraftSourceHandoffView(disabledAiDraftPanelView),
+  {
   badgeLabel: 'AI draft',
   canGenerateDraft: false,
   canSyncDraftSourceMaterials: false,
@@ -39712,23 +39723,24 @@ assert.deepEqual(disabledAiDraftPanelView, {
   syncMaterialsLabel: 'Sync attached materials',
   syncSuccessMessage: 'Attached materials synced to AI source notes.',
 });
-assert.deepEqual(
-  buildActivityEditorAiDraftPanelView({
-    hasUser: true,
-    isGeneratingDraft: false,
-    sourceState: buildActivityEditorDraftSourceState({
-      draftSourceText: 'Classroom source notes.',
-      sourceMaterials: [
-        {
-          fileId: 'file-1',
-          kind: 'worksheet-document',
-          originalName: 'unit-notes.pdf',
-        },
-      ],
-    }),
+const syncAvailableAiDraftPanelView = buildActivityEditorAiDraftPanelView({
+  hasUser: true,
+  isGeneratingDraft: false,
+  sourceState: buildActivityEditorDraftSourceState({
+    draftSourceText: 'Classroom source notes.',
+    sourceMaterials: [
+      {
+        fileId: 'file-1',
+        kind: 'worksheet-document',
+        originalName: 'unit-notes.pdf',
+      },
+    ],
   }),
+});
+assert.deepEqual(
+  omitActivityEditorAiDraftSourceHandoffView(syncAvailableAiDraftPanelView),
   {
-    ...disabledAiDraftPanelView,
+    ...omitActivityEditorAiDraftSourceHandoffView(disabledAiDraftPanelView),
     canGenerateDraft: true,
     canSyncDraftSourceMaterials: true,
     generationDisabledReason: undefined,
@@ -39878,6 +39890,14 @@ assert.deepEqual(
     title: 'Source material safety',
   }
 );
+function omitActivityEditorAiDraftSourceHandoffView(
+  view: ReturnType<typeof buildActivityEditorAiDraftPanelView>
+) {
+  const { sourceHandoffView: _sourceHandoffView, ...viewWithoutHandoff } =
+    view;
+  return viewWithoutHandoff;
+}
+
 const editorSelectOptions = buildActivityEditorSelectOptions();
 assert.deepEqual(
   editorSelectOptions.difficultyOptions.map((option) => option.label),

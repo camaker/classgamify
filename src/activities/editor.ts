@@ -56,6 +56,7 @@ import {
   buildActivitySourceMaterialSummaryView,
   type ActivitySourceMaterialCapabilityCounts,
   type ActivitySourceMaterialCapabilityView,
+  type ActivitySourceMaterialReadinessCapability,
 } from '@/activities/material-summary';
 import {
   buildActivityTemplateScaffoldInput,
@@ -223,6 +224,56 @@ export type ActivityEditorAiDraftSourceMaterialSafetyView = {
   title: string;
 };
 
+export type ActivityEditorAiDraftSourceHandoffItemId =
+  | 'attached-materials'
+  | 'capability-audio-extraction'
+  | 'capability-spreadsheet-import'
+  | 'capability-worksheet-extraction'
+  | 'focus'
+  | 'generate-action'
+  | 'generation-gate'
+  | 'item-count'
+  | 'material-safety'
+  | 'omitted-material-notes'
+  | 'prompt-privacy'
+  | 'safe-material-notes'
+  | 'safe-source'
+  | 'source-length'
+  | 'source-readiness'
+  | 'source-textarea'
+  | 'source-warning'
+  | 'sync-action'
+  | 'synced-material-provenance'
+  | 'teacher-review';
+
+export type ActivityEditorAiDraftSourceHandoffItemView = {
+  ariaLabel: string;
+  description: string;
+  id: ActivityEditorAiDraftSourceHandoffItemId;
+  label: string;
+  statusLabel?: string;
+  value: string;
+};
+
+export type ActivityEditorAiDraftSourcePrivacyContractView = {
+  exposesFileBytes: false;
+  exposesFileIds: false;
+  exposesOmittedNotePayloads: false;
+  exposesPathSegments: false;
+  exposesPermissionMetadata: false;
+  exposesQueryTokens: false;
+  exposesStorageKeys: false;
+  exposesUrls: false;
+  itemIds: ActivityEditorAiDraftSourceHandoffItemId[];
+};
+
+export type ActivityEditorAiDraftSourceHandoffView = {
+  description: string;
+  itemViews: ActivityEditorAiDraftSourceHandoffItemView[];
+  privacy: ActivityEditorAiDraftSourcePrivacyContractView;
+  title: string;
+};
+
 export type ActivityEditorAiDraftPanelView = {
   badgeLabel: string;
   canGenerateDraft: boolean;
@@ -237,6 +288,7 @@ export type ActivityEditorAiDraftPanelView = {
   safeSourceDescription: string;
   sourceCapabilityTitle: string;
   sourceCapabilityViews: ActivityEditorAiDraftSourceCapabilityView[];
+  sourceHandoffView: ActivityEditorAiDraftSourceHandoffView;
   sourceMaterialSafetyView: ActivityEditorAiDraftSourceMaterialSafetyView;
   sourceReadiness: ActivityEditorAiDraftSourceReadinessView;
   sourceMaterialNoteViews: ActivityEditorSourceMaterialDraftNoteView[];
@@ -555,6 +607,25 @@ export function buildActivityEditorAiDraftPanelView({
   isGeneratingDraft: boolean;
   sourceState: ActivityEditorDraftSourceState;
 }): ActivityEditorAiDraftPanelView {
+  const canGenerateDraft =
+    hasUser && !isGeneratingDraft && !sourceState.isTooLong;
+  const generationDisabledReason =
+    buildActivityEditorDraftGenerationDisabledReason({
+      hasUser,
+      isGeneratingDraft,
+      sourceState,
+    });
+  const focusOptions = buildActivityAiDraftFocusOptions();
+  const itemCountDescription = m.activity_form_ai_item_count_description();
+  const itemCountLabel = m.activity_form_ai_item_count_label();
+  const safeSourceDescription = m.activity_form_ai_safe_source_description();
+  const sourceCapabilityViews = buildActivityEditorAiDraftSourceCapabilityViews(
+    sourceState.sourceMaterialCapabilityCounts
+  );
+  const sourceMaterialSafetyView =
+    buildActivityEditorAiDraftSourceMaterialSafetyView(sourceState);
+  const sourceReadiness =
+    buildActivityEditorAiDraftSourceReadinessView(sourceState);
   const sourceMaterialNoteViews =
     buildActivitySourceMaterialDraftNoteViewsFromSourceText(
       draftSourceText
@@ -573,47 +644,58 @@ export function buildActivityEditorAiDraftPanelView({
         },
       ];
     });
+  const sourceMaterialSummaryLabel =
+    sourceMaterialNoteViews.length > 0
+      ? buildActivityEditorSourceMaterialSummaryLabel(
+          sourceMaterialNoteViews.length
+        )
+      : undefined;
+  const syncMaterialsHelpText = m.activity_form_ai_sync_materials_help();
 
   return {
     badgeLabel: m.activity_form_ai_draft_badge(),
-    canGenerateDraft: hasUser && !isGeneratingDraft && !sourceState.isTooLong,
+    canGenerateDraft,
     canSyncDraftSourceMaterials: sourceState.canSyncDraftSourceMaterials,
-    generationDisabledReason: buildActivityEditorDraftGenerationDisabledReason({
-      hasUser,
-      isGeneratingDraft,
-      sourceState,
-    }),
+    generationDisabledReason,
     focusLabel: m.activity_form_ai_focus_label(),
-    focusOptions: buildActivityAiDraftFocusOptions(),
+    focusOptions,
     generateButtonLabel: m.activity_form_generate_draft(),
-    itemCountDescription: m.activity_form_ai_item_count_description(),
-    itemCountLabel: m.activity_form_ai_item_count_label(),
+    itemCountDescription,
+    itemCountLabel,
     reviewNote: m.activity_form_ai_draft_review_note(),
-    safeSourceDescription: m.activity_form_ai_safe_source_description(),
+    safeSourceDescription,
     sourceCapabilityTitle: m.activity_form_ai_source_capabilities_title(),
-    sourceCapabilityViews: buildActivityEditorAiDraftSourceCapabilityViews(
-      sourceState.sourceMaterialCapabilityCounts
-    ),
-    sourceMaterialSafetyView:
-      buildActivityEditorAiDraftSourceMaterialSafetyView(sourceState),
-    sourceReadiness: buildActivityEditorAiDraftSourceReadinessView(sourceState),
+    sourceCapabilityViews,
+    sourceHandoffView: buildActivityEditorAiDraftSourceHandoffView({
+      canGenerateDraft,
+      canSyncDraftSourceMaterials: sourceState.canSyncDraftSourceMaterials,
+      focusOptions,
+      generationDisabledReason,
+      itemCountDescription,
+      itemCountLabel,
+      safeSourceDescription,
+      sourceMaterialSafetyView,
+      sourceMaterialNoteViews,
+      sourceMaterialSummaryLabel,
+      sourceReadiness,
+      sourceState,
+      syncMaterialsHelpText,
+    }),
+    sourceMaterialSafetyView,
+    sourceReadiness,
     sourceMaterialNoteViews,
-    sourceMaterialSummaryLabel:
-      sourceMaterialNoteViews.length > 0
-        ? buildActivityEditorSourceMaterialSummaryLabel(
-            sourceMaterialNoteViews.length
-          )
-        : undefined,
+    sourceMaterialSummaryLabel,
     sourcePlaceholder: m.activity_form_ai_source_placeholder(),
     sourceTextLabel: m.activity_form_ai_source_label(),
     syncMaterialsLabel: m.activity_form_use_attached_materials(),
-    syncMaterialsHelpText: m.activity_form_ai_sync_materials_help(),
+    syncMaterialsHelpText,
     syncSuccessMessage: m.activity_form_toast_source_materials_synced(),
   };
 }
 
 function buildActivityEditorAiDraftSourceCapabilityViews(
-  capabilityCounts: ActivitySourceMaterialCapabilityCounts
+  capabilityCounts: ActivitySourceMaterialCapabilityCounts,
+  options: { includeZero?: boolean } = {}
 ): ActivityEditorAiDraftSourceCapabilityView[] {
   return buildActivitySourceMaterialCapabilityViews({
     capabilityCounts,
@@ -633,7 +715,269 @@ function buildActivityEditorAiDraftSourceCapabilityViews(
         label: m.activity_form_ai_source_capability_worksheet_label(),
       },
     },
+    includeZero: options.includeZero,
   });
+}
+
+function buildActivityEditorAiDraftSourceHandoffView({
+  canGenerateDraft,
+  canSyncDraftSourceMaterials,
+  focusOptions,
+  generationDisabledReason,
+  itemCountDescription,
+  itemCountLabel,
+  safeSourceDescription,
+  sourceMaterialSafetyView,
+  sourceMaterialNoteViews,
+  sourceMaterialSummaryLabel,
+  sourceReadiness,
+  sourceState,
+  syncMaterialsHelpText,
+}: {
+  canGenerateDraft: boolean;
+  canSyncDraftSourceMaterials: boolean;
+  focusOptions: ActivityAiDraftFocusOption[];
+  generationDisabledReason?: string;
+  itemCountDescription: string;
+  itemCountLabel: string;
+  safeSourceDescription: string;
+  sourceMaterialSafetyView: ActivityEditorAiDraftSourceMaterialSafetyView;
+  sourceMaterialNoteViews: ActivityEditorSourceMaterialDraftNoteView[];
+  sourceMaterialSummaryLabel?: string;
+  sourceReadiness: ActivityEditorAiDraftSourceReadinessView;
+  sourceState: ActivityEditorDraftSourceState;
+  syncMaterialsHelpText: string;
+}): ActivityEditorAiDraftSourceHandoffView {
+  const enabledValue = m.activity_form_ai_source_handoff_enabled_value();
+  const disabledValue = m.activity_form_ai_source_handoff_disabled_value();
+  const readyValue = m.activity_form_ai_source_handoff_ready_value();
+  const blockedValue = m.activity_form_ai_source_handoff_blocked_value();
+  const warningValue = m.activity_form_ai_source_handoff_warning_value();
+  const clearValue = m.activity_form_ai_source_handoff_clear_value();
+  const itemViews: ActivityEditorAiDraftSourceHandoffItemView[] = [
+    buildActivityEditorAiDraftSourceHandoffItem({
+      description: safeSourceDescription,
+      id: 'safe-source',
+      label: m.activity_form_ai_draft_badge(),
+      value: m.activity_form_ai_source_handoff_prompt_privacy_value(),
+    }),
+    buildActivityEditorAiDraftSourceHandoffItem({
+      description: m.activity_form_ai_source_handoff_textarea_description(),
+      id: 'source-textarea',
+      label: m.activity_form_ai_source_label(),
+      value: sourceReadiness.status,
+    }),
+    buildActivityEditorAiDraftSourceHandoffItem({
+      description: sourceReadiness.description,
+      id: 'source-readiness',
+      label: sourceReadiness.title,
+      statusLabel: sourceReadiness.hasWarnings ? warningValue : clearValue,
+      value: sourceReadiness.status,
+    }),
+    buildActivityEditorAiDraftSourceHandoffItem({
+      description: sourceReadiness.description,
+      id: 'source-length',
+      label: m.activity_form_ai_source_label(),
+      value: sourceReadiness.characterCountLabel,
+    }),
+    buildActivityEditorAiDraftSourceHandoffItem({
+      description: sourceReadiness.description,
+      id: 'source-warning',
+      label: sourceReadiness.title,
+      value: sourceReadiness.hasWarnings ? warningValue : clearValue,
+    }),
+    buildActivityEditorAiDraftSourceHandoffItem({
+      description: m.activity_form_ai_draft_review_note(),
+      id: 'teacher-review',
+      label: m.activity_form_ai_draft_review_note(),
+      value: readyValue,
+    }),
+    buildActivityEditorAiDraftSourceHandoffItem({
+      description: itemCountDescription,
+      id: 'item-count',
+      label: itemCountLabel,
+      value: itemCountLabel,
+    }),
+    buildActivityEditorAiDraftSourceHandoffItem({
+      description: m.activity_form_ai_source_handoff_focus_description({
+        count: focusOptions.length,
+      }),
+      id: 'focus',
+      label: m.activity_form_ai_focus_label(),
+      value: m.activity_form_ai_source_handoff_focus_value({
+        count: focusOptions.length,
+      }),
+    }),
+    buildActivityEditorAiDraftSourceHandoffItem({
+      description: syncMaterialsHelpText,
+      id: 'sync-action',
+      label: m.activity_form_use_attached_materials(),
+      value: canSyncDraftSourceMaterials ? enabledValue : disabledValue,
+    }),
+    buildActivityEditorAiDraftSourceHandoffItem({
+      description:
+        generationDisabledReason ??
+        m.activity_form_ai_source_handoff_generate_description(),
+      id: 'generate-action',
+      label: m.activity_form_generate_draft(),
+      value: canGenerateDraft ? readyValue : blockedValue,
+    }),
+    buildActivityEditorAiDraftSourceHandoffItem({
+      description:
+        generationDisabledReason ??
+        m.activity_form_ai_source_handoff_generation_gate_description(),
+      id: 'generation-gate',
+      label: m.activity_form_ai_source_handoff_generation_gate_label(),
+      value:
+        generationDisabledReason ??
+        m.activity_form_ai_source_handoff_no_blocker_value(),
+    }),
+    buildActivityEditorAiDraftSourceHandoffItem({
+      description:
+        m.activity_form_ai_source_handoff_attached_materials_description(),
+      id: 'attached-materials',
+      label: m.activity_form_ai_source_handoff_attached_materials_label(),
+      value: m.activity_form_ai_source_handoff_attached_materials_value({
+        count: sourceState.attachedSourceMaterialCount,
+      }),
+    }),
+    buildActivityEditorAiDraftSourceHandoffItem({
+      description: sourceMaterialSafetyView.description,
+      id: 'material-safety',
+      label: sourceMaterialSafetyView.title,
+      statusLabel: sourceMaterialSafetyView.hasOmitted
+        ? warningValue
+        : clearValue,
+      value: sourceMaterialSafetyView.ariaLabel,
+    }),
+    ...sourceMaterialSafetyView.metricViews.map((metricView) =>
+      buildActivityEditorAiDraftSourceHandoffItem({
+        description: metricView.description,
+        id:
+          metricView.id === 'safe'
+            ? 'safe-material-notes'
+            : 'omitted-material-notes',
+        label: metricView.label,
+        value: metricView.value,
+      })
+    ),
+    buildActivityEditorAiDraftSourceHandoffItem({
+      description:
+        m.activity_form_ai_source_handoff_synced_provenance_description(),
+      id: 'synced-material-provenance',
+      label: m.activity_form_ai_source_handoff_synced_provenance_label(),
+      value: buildActivityEditorAiDraftSyncedProvenanceHandoffValue({
+        sourceMaterialNoteViews,
+        sourceMaterialSummaryLabel,
+      }),
+    }),
+    ...buildActivityEditorAiDraftSourceCapabilityHandoffItems(
+      sourceState.sourceMaterialCapabilityCounts
+    ),
+    buildActivityEditorAiDraftSourceHandoffItem({
+      description:
+        m.activity_form_ai_source_handoff_prompt_privacy_description(),
+      id: 'prompt-privacy',
+      label: m.activity_form_ai_source_handoff_prompt_privacy_label(),
+      value: m.activity_form_ai_source_handoff_prompt_privacy_value(),
+    }),
+  ];
+
+  return {
+    description: m.activity_form_ai_source_handoff_description(),
+    itemViews,
+    privacy: buildActivityEditorAiDraftSourcePrivacyContract(itemViews),
+    title: m.activity_form_ai_source_handoff_title(),
+  };
+}
+
+function buildActivityEditorAiDraftSyncedProvenanceHandoffValue({
+  sourceMaterialNoteViews,
+  sourceMaterialSummaryLabel,
+}: {
+  sourceMaterialNoteViews: ActivityEditorSourceMaterialDraftNoteView[];
+  sourceMaterialSummaryLabel?: string;
+}) {
+  if (sourceMaterialNoteViews.length > 0) {
+    return sourceMaterialNoteViews
+      .map((noteView) => noteView.displayText)
+      .join(m.activity_source_material_summary_list_separator());
+  }
+
+  return (
+    sourceMaterialSummaryLabel ??
+    buildActivityEditorAiDraftSafeSourceCountValue(
+      sourceMaterialNoteViews.length
+    )
+  );
+}
+
+function buildActivityEditorAiDraftSourceCapabilityHandoffItems(
+  capabilityCounts: ActivitySourceMaterialCapabilityCounts
+): ActivityEditorAiDraftSourceHandoffItemView[] {
+  return buildActivityEditorAiDraftSourceCapabilityViews(capabilityCounts, {
+    includeZero: true,
+  }).map((capability) =>
+    buildActivityEditorAiDraftSourceHandoffItem({
+      description:
+        capability.description ??
+        m.activity_form_ai_source_capabilities_title(),
+      id: toActivityEditorAiDraftSourceCapabilityHandoffItemId(
+        capability.capability
+      ),
+      label: capability.label,
+      value: capability.value,
+    })
+  );
+}
+
+function toActivityEditorAiDraftSourceCapabilityHandoffItemId(
+  capability: ActivitySourceMaterialReadinessCapability
+): ActivityEditorAiDraftSourceHandoffItemId {
+  return `capability-${capability}`;
+}
+
+function buildActivityEditorAiDraftSourcePrivacyContract(
+  itemViews: ActivityEditorAiDraftSourceHandoffItemView[]
+): ActivityEditorAiDraftSourcePrivacyContractView {
+  return {
+    exposesFileBytes: false,
+    exposesFileIds: false,
+    exposesOmittedNotePayloads: false,
+    exposesPathSegments: false,
+    exposesPermissionMetadata: false,
+    exposesQueryTokens: false,
+    exposesStorageKeys: false,
+    exposesUrls: false,
+    itemIds: itemViews.map((item) => item.id),
+  };
+}
+
+function buildActivityEditorAiDraftSourceHandoffItem({
+  description,
+  id,
+  label,
+  statusLabel,
+  value,
+}: {
+  description: string;
+  id: ActivityEditorAiDraftSourceHandoffItemId;
+  label: string;
+  statusLabel?: string;
+  value: string;
+}): ActivityEditorAiDraftSourceHandoffItemView {
+  return {
+    ariaLabel: m.activity_form_ai_source_material_safety_metric_aria_label({
+      description,
+      label,
+      value,
+    }),
+    description,
+    id,
+    label,
+    statusLabel,
+    value,
+  };
 }
 
 function buildActivityEditorAiDraftSourceMaterialSafetyView(
