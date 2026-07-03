@@ -5,10 +5,40 @@ export type AssignmentDate = Date | string | null | undefined;
 export type AssignmentLifecycleNow = AssignmentDate | number;
 export type AssignmentLifecycleStatus = 'closed' | 'draft' | 'expired' | 'open';
 export const ASSIGNMENT_MANAGED_STATUSES = ['published', 'closed'] as const;
+export const ASSIGNMENT_LIFECYCLE_HANDOFF_ITEM_IDS = [
+  'current-status',
+  'status-label',
+  'student-access',
+  'public-payload',
+  'submission-gate',
+  'teacher-list-state',
+  'result-page-state',
+  'close-action',
+  'reopen-action',
+  'next-status',
+  'transition-error',
+  'execution-plan',
+  'expiry-check',
+  'close-time',
+  'draft-snapshot-gate',
+  'closed-snapshot-retention',
+  'attempt-review-retention',
+  'server-transition-guard',
+  'owner-scope',
+  'privacy-guard',
+] as const;
 export type ManagedAssignmentStatus = Extract<
   AssignmentStatus,
   (typeof ASSIGNMENT_MANAGED_STATUSES)[number]
 >;
+export type AssignmentLifecycleHandoffItemId =
+  (typeof ASSIGNMENT_LIFECYCLE_HANDOFF_ITEM_IDS)[number];
+export type AssignmentLifecycleHandoffSurface =
+  | 'result-page'
+  | 'server-function'
+  | 'shared'
+  | 'student-access'
+  | 'teacher-list';
 export type AssignmentStatusActionKind = 'close-link' | 'reopen-link';
 export type AssignmentStatusTransitionErrorCode =
   | 'already-closed'
@@ -36,6 +66,34 @@ export type AssignmentStatusAction = {
   nextStatusValue: string;
   pendingLabel: string;
   successMessage: string;
+};
+
+export type AssignmentLifecycleHandoffItemView = {
+  ariaLabel: string;
+  description: string;
+  id: AssignmentLifecycleHandoffItemId;
+  label: string;
+  statusLabel?: string;
+  value: string;
+};
+
+export type AssignmentLifecycleHandoffPrivacyContract = {
+  exposesActivityContent: false;
+  exposesAnswerKeys: false;
+  exposesInternalAssignmentIds: false;
+  exposesRawAnonymousToken: false;
+  exposesStudentAnswerText: false;
+  exposesStudentNames: false;
+  exposesTeacherNotes: false;
+  itemIds: AssignmentLifecycleHandoffItemId[];
+};
+
+export type AssignmentLifecycleHandoffView = {
+  description: string;
+  itemViews: AssignmentLifecycleHandoffItemView[];
+  privacy: AssignmentLifecycleHandoffPrivacyContract;
+  surface: AssignmentLifecycleHandoffSurface;
+  title: string;
 };
 
 export type AssignmentStatusActionBlockedReason = 'missing-status-action';
@@ -381,4 +439,402 @@ export function assertAssignmentStatusTransition(input: {
   if (!transitionError) return;
 
   throw new Error(transitionError.message);
+}
+
+export function buildAssignmentLifecycleHandoffView({
+  currentStatus,
+  expiresAt,
+  isPersisted = true,
+  now = Date.now(),
+  surface = 'shared',
+}: {
+  currentStatus: AssignmentStatus;
+  expiresAt: AssignmentDate;
+  isPersisted?: boolean;
+  now?: AssignmentLifecycleNow;
+  surface?: AssignmentLifecycleHandoffSurface;
+}): AssignmentLifecycleHandoffView {
+  const lifecycleStatus = getAssignmentLifecycleStatus(
+    currentStatus,
+    expiresAt,
+    now
+  );
+  const statusLabel = getAssignmentStatusLabel(currentStatus, expiresAt, now);
+  const submissionErrorMessage = getAssignmentSubmissionErrorMessage({
+    expiresAt,
+    now,
+    status: currentStatus,
+  });
+  const statusAction = buildAssignmentStatusAction({
+    currentStatus,
+    expiresAt,
+    isPersisted,
+    now,
+  });
+  const executionPlan = buildAssignmentStatusActionExecutionPlan({
+    assignmentId: 'assignment-lifecycle-handoff',
+    statusAction,
+  });
+  const closeTransitionError = getAssignmentStatusTransitionErrorView({
+    currentStatus,
+    expiresAt,
+    nextStatus: 'closed',
+    now,
+  });
+  const reopenTransitionError = getAssignmentStatusTransitionErrorView({
+    currentStatus,
+    expiresAt,
+    nextStatus: 'published',
+    now,
+  });
+  const transitionErrorMessage = resolveAssignmentLifecycleTransitionError({
+    closeTransitionError,
+    currentStatus,
+    reopenTransitionError,
+    statusAction,
+  });
+  const timestamp = normalizeAssignmentLifecycleTimestamp(expiresAt);
+  const isOpen = lifecycleStatus === 'open';
+  const itemViews: AssignmentLifecycleHandoffItemView[] = [
+    buildAssignmentLifecycleHandoffItem({
+      id: 'current-status',
+      statusLabel,
+      value: lifecycleStatus,
+    }),
+    buildAssignmentLifecycleHandoffItem({
+      id: 'status-label',
+      statusLabel,
+      value: statusLabel,
+    }),
+    buildAssignmentLifecycleHandoffItem({
+      id: 'student-access',
+      statusLabel: formatAssignmentLifecycleAvailability(isOpen),
+      value: formatAssignmentLifecycleAvailability(isOpen),
+    }),
+    buildAssignmentLifecycleHandoffItem({
+      id: 'public-payload',
+      statusLabel: formatAssignmentLifecycleAvailability(isOpen),
+      value: formatAssignmentLifecycleAvailability(isOpen),
+    }),
+    buildAssignmentLifecycleHandoffItem({
+      id: 'submission-gate',
+      statusLabel: isOpen
+        ? m.assignment_lifecycle_handoff_accepting_submissions_value()
+        : m.assignment_lifecycle_handoff_rejecting_submissions_value(),
+      value:
+        submissionErrorMessage ??
+        m.assignment_lifecycle_handoff_accepting_submissions_value(),
+    }),
+    buildAssignmentLifecycleHandoffItem({
+      id: 'teacher-list-state',
+      statusLabel,
+      value: statusLabel,
+    }),
+    buildAssignmentLifecycleHandoffItem({
+      id: 'result-page-state',
+      statusLabel,
+      value: statusLabel,
+    }),
+    buildAssignmentLifecycleHandoffItem({
+      id: 'close-action',
+      statusLabel: formatAssignmentLifecycleActionReadiness(
+        statusAction?.kind === 'close-link'
+      ),
+      value: formatAssignmentLifecycleActionReadiness(
+        statusAction?.kind === 'close-link'
+      ),
+    }),
+    buildAssignmentLifecycleHandoffItem({
+      id: 'reopen-action',
+      statusLabel: formatAssignmentLifecycleActionReadiness(
+        statusAction?.kind === 'reopen-link'
+      ),
+      value: formatAssignmentLifecycleActionReadiness(
+        statusAction?.kind === 'reopen-link'
+      ),
+    }),
+    buildAssignmentLifecycleHandoffItem({
+      id: 'next-status',
+      value:
+        statusAction?.nextStatusValue ??
+        m.assignment_lifecycle_handoff_not_available_value(),
+    }),
+    buildAssignmentLifecycleHandoffItem({
+      id: 'transition-error',
+      value:
+        transitionErrorMessage ?? m.assignment_lifecycle_handoff_none_value(),
+    }),
+    buildAssignmentLifecycleHandoffItem({
+      id: 'execution-plan',
+      statusLabel: executionPlan.type,
+      value: executionPlan.type,
+    }),
+    buildAssignmentLifecycleHandoffItem({
+      id: 'expiry-check',
+      value: formatAssignmentLifecycleExpiryCheck({
+        expiresAt,
+        now,
+      }),
+    }),
+    buildAssignmentLifecycleHandoffItem({
+      id: 'close-time',
+      value:
+        timestamp === undefined
+          ? m.assignment_lifecycle_handoff_not_scheduled_value()
+          : m.assignment_lifecycle_handoff_scheduled_value(),
+    }),
+    buildAssignmentLifecycleHandoffItem({
+      id: 'draft-snapshot-gate',
+      value:
+        lifecycleStatus === 'draft'
+          ? m.assignment_lifecycle_handoff_publish_required_value()
+          : m.assignment_lifecycle_handoff_snapshot_frozen_value(),
+    }),
+    buildAssignmentLifecycleHandoffItem({
+      id: 'closed-snapshot-retention',
+      value:
+        lifecycleStatus === 'closed'
+          ? m.assignment_lifecycle_handoff_results_retained_value()
+          : m.assignment_lifecycle_handoff_snapshot_frozen_value(),
+    }),
+    buildAssignmentLifecycleHandoffItem({
+      id: 'attempt-review-retention',
+      value: m.assignment_lifecycle_handoff_attempt_review_retained_value(),
+    }),
+    buildAssignmentLifecycleHandoffItem({
+      id: 'server-transition-guard',
+      value: m.assignment_lifecycle_handoff_validated_value(),
+    }),
+    buildAssignmentLifecycleHandoffItem({
+      id: 'owner-scope',
+      value: m.assignment_lifecycle_handoff_owner_scoped_value(),
+    }),
+    buildAssignmentLifecycleHandoffItem({
+      id: 'privacy-guard',
+      value: m.assignment_lifecycle_handoff_private_data_omitted_value(),
+    }),
+  ];
+
+  return {
+    description: m.assignment_lifecycle_handoff_description(),
+    itemViews,
+    privacy: buildAssignmentLifecycleHandoffPrivacyContract(itemViews),
+    surface,
+    title: m.assignment_lifecycle_handoff_title(),
+  };
+}
+
+function buildAssignmentLifecycleHandoffPrivacyContract(
+  itemViews: AssignmentLifecycleHandoffItemView[]
+): AssignmentLifecycleHandoffPrivacyContract {
+  return {
+    exposesActivityContent: false,
+    exposesAnswerKeys: false,
+    exposesInternalAssignmentIds: false,
+    exposesRawAnonymousToken: false,
+    exposesStudentAnswerText: false,
+    exposesStudentNames: false,
+    exposesTeacherNotes: false,
+    itemIds: itemViews.map((item) => item.id),
+  };
+}
+
+function buildAssignmentLifecycleHandoffItem({
+  id,
+  statusLabel,
+  value,
+}: {
+  id: AssignmentLifecycleHandoffItemId;
+  statusLabel?: string;
+  value: string;
+}): AssignmentLifecycleHandoffItemView {
+  const copy = getAssignmentLifecycleHandoffItemCopy(id);
+
+  return {
+    ariaLabel: m.assignment_lifecycle_handoff_item_aria({
+      description: copy.description,
+      label: copy.label,
+      value,
+    }),
+    description: copy.description,
+    id,
+    label: copy.label,
+    statusLabel,
+    value,
+  };
+}
+
+function getAssignmentLifecycleHandoffItemCopy(
+  id: AssignmentLifecycleHandoffItemId
+) {
+  switch (id) {
+    case 'current-status':
+      return {
+        description:
+          m.assignment_lifecycle_handoff_current_status_description(),
+        label: m.assignment_lifecycle_handoff_current_status_label(),
+      };
+    case 'status-label':
+      return {
+        description: m.assignment_lifecycle_handoff_status_label_description(),
+        label: m.assignment_lifecycle_handoff_status_label_label(),
+      };
+    case 'student-access':
+      return {
+        description:
+          m.assignment_lifecycle_handoff_student_access_description(),
+        label: m.assignment_lifecycle_handoff_student_access_label(),
+      };
+    case 'public-payload':
+      return {
+        description:
+          m.assignment_lifecycle_handoff_public_payload_description(),
+        label: m.assignment_lifecycle_handoff_public_payload_label(),
+      };
+    case 'submission-gate':
+      return {
+        description:
+          m.assignment_lifecycle_handoff_submission_gate_description(),
+        label: m.assignment_lifecycle_handoff_submission_gate_label(),
+      };
+    case 'teacher-list-state':
+      return {
+        description:
+          m.assignment_lifecycle_handoff_teacher_list_state_description(),
+        label: m.assignment_lifecycle_handoff_teacher_list_state_label(),
+      };
+    case 'result-page-state':
+      return {
+        description:
+          m.assignment_lifecycle_handoff_result_page_state_description(),
+        label: m.assignment_lifecycle_handoff_result_page_state_label(),
+      };
+    case 'close-action':
+      return {
+        description: m.assignment_lifecycle_handoff_close_action_description(),
+        label: m.assignment_lifecycle_handoff_close_action_label(),
+      };
+    case 'reopen-action':
+      return {
+        description: m.assignment_lifecycle_handoff_reopen_action_description(),
+        label: m.assignment_lifecycle_handoff_reopen_action_label(),
+      };
+    case 'next-status':
+      return {
+        description: m.assignment_lifecycle_handoff_next_status_description(),
+        label: m.assignment_lifecycle_handoff_next_status_label(),
+      };
+    case 'transition-error':
+      return {
+        description:
+          m.assignment_lifecycle_handoff_transition_error_description(),
+        label: m.assignment_lifecycle_handoff_transition_error_label(),
+      };
+    case 'execution-plan':
+      return {
+        description:
+          m.assignment_lifecycle_handoff_execution_plan_description(),
+        label: m.assignment_lifecycle_handoff_execution_plan_label(),
+      };
+    case 'expiry-check':
+      return {
+        description: m.assignment_lifecycle_handoff_expiry_check_description(),
+        label: m.assignment_lifecycle_handoff_expiry_check_label(),
+      };
+    case 'close-time':
+      return {
+        description: m.assignment_lifecycle_handoff_close_time_description(),
+        label: m.assignment_lifecycle_handoff_close_time_label(),
+      };
+    case 'draft-snapshot-gate':
+      return {
+        description:
+          m.assignment_lifecycle_handoff_draft_snapshot_gate_description(),
+        label: m.assignment_lifecycle_handoff_draft_snapshot_gate_label(),
+      };
+    case 'closed-snapshot-retention':
+      return {
+        description:
+          m.assignment_lifecycle_handoff_closed_snapshot_retention_description(),
+        label: m.assignment_lifecycle_handoff_closed_snapshot_retention_label(),
+      };
+    case 'attempt-review-retention':
+      return {
+        description:
+          m.assignment_lifecycle_handoff_attempt_review_retention_description(),
+        label: m.assignment_lifecycle_handoff_attempt_review_retention_label(),
+      };
+    case 'server-transition-guard':
+      return {
+        description:
+          m.assignment_lifecycle_handoff_server_transition_guard_description(),
+        label: m.assignment_lifecycle_handoff_server_transition_guard_label(),
+      };
+    case 'owner-scope':
+      return {
+        description: m.assignment_lifecycle_handoff_owner_scope_description(),
+        label: m.assignment_lifecycle_handoff_owner_scope_label(),
+      };
+    case 'privacy-guard':
+      return {
+        description: m.assignment_lifecycle_handoff_privacy_guard_description(),
+        label: m.assignment_lifecycle_handoff_privacy_guard_label(),
+      };
+  }
+}
+
+function formatAssignmentLifecycleAvailability(isAvailable: boolean) {
+  return isAvailable
+    ? m.assignment_lifecycle_handoff_available_value()
+    : m.assignment_lifecycle_handoff_blocked_value();
+}
+
+function formatAssignmentLifecycleActionReadiness(isReady: boolean) {
+  return isReady
+    ? m.assignment_lifecycle_handoff_ready_value()
+    : m.assignment_lifecycle_handoff_not_available_value();
+}
+
+function formatAssignmentLifecycleExpiryCheck({
+  expiresAt,
+  now,
+}: {
+  expiresAt: AssignmentDate;
+  now: AssignmentLifecycleNow;
+}) {
+  if (isAssignmentExpired(expiresAt, now)) {
+    return m.assignment_lifecycle_handoff_expired_close_time_value();
+  }
+
+  if (normalizeAssignmentLifecycleTimestamp(expiresAt) !== undefined) {
+    return m.assignment_lifecycle_handoff_future_close_time_value();
+  }
+
+  return m.assignment_lifecycle_handoff_no_close_time_value();
+}
+
+function resolveAssignmentLifecycleTransitionError({
+  closeTransitionError,
+  currentStatus,
+  reopenTransitionError,
+  statusAction,
+}: {
+  closeTransitionError?: AssignmentStatusTransitionErrorView;
+  currentStatus: AssignmentStatus;
+  reopenTransitionError?: AssignmentStatusTransitionErrorView;
+  statusAction?: AssignmentStatusAction;
+}) {
+  if (statusAction?.nextStatus === 'published') {
+    return reopenTransitionError?.message;
+  }
+
+  if (statusAction?.nextStatus === 'closed') {
+    return closeTransitionError?.message;
+  }
+
+  if (currentStatus === 'closed') {
+    return reopenTransitionError?.message ?? closeTransitionError?.message;
+  }
+
+  return closeTransitionError?.message ?? reopenTransitionError?.message;
 }

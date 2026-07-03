@@ -667,9 +667,11 @@ import {
   getAssignmentListEmptyState,
 } from '@/assignments/list-view';
 import {
+  ASSIGNMENT_LIFECYCLE_HANDOFF_ITEM_IDS,
   ASSIGNMENT_MANAGED_STATUSES,
   assertAssignmentAcceptsSubmissions,
   assertAssignmentStatusTransition,
+  buildAssignmentLifecycleHandoffView,
   buildAssignmentStatusAction,
   buildAssignmentStatusActionExecutionPlan,
   getAssignmentLifecycleStatus,
@@ -17445,6 +17447,26 @@ assert.match(
 );
 assert.match(
   assignmentLifecycleSource,
+  /export const ASSIGNMENT_LIFECYCLE_HANDOFF_ITEM_IDS = \[(?=[\s\S]*'current-status')(?=[\s\S]*'student-access')(?=[\s\S]*'public-payload')(?=[\s\S]*'submission-gate')(?=[\s\S]*'teacher-list-state')(?=[\s\S]*'result-page-state')(?=[\s\S]*'close-action')(?=[\s\S]*'reopen-action')(?=[\s\S]*'draft-snapshot-gate')(?=[\s\S]*'privacy-guard')[\s\S]*export type AssignmentLifecycleHandoffPrivacyContract = \{[\s\S]*exposesActivityContent: false;[\s\S]*exposesAnswerKeys: false;[\s\S]*exposesInternalAssignmentIds: false;[\s\S]*exposesRawAnonymousToken: false;[\s\S]*exposesStudentAnswerText: false;[\s\S]*exposesStudentNames: false;[\s\S]*exposesTeacherNotes: false;/,
+  'Assignment lifecycle handoff should expose a typed 20-slice lifecycle contract with explicit privacy flags.'
+);
+assert.match(
+  assignmentLifecycleSource,
+  /export function buildAssignmentLifecycleHandoffView\(\{[\s\S]*currentStatus,[\s\S]*expiresAt,[\s\S]*isPersisted = true,[\s\S]*surface = 'shared'[\s\S]*const lifecycleStatus = getAssignmentLifecycleStatus\([\s\S]*const submissionErrorMessage = getAssignmentSubmissionErrorMessage\(\{[\s\S]*const statusAction = buildAssignmentStatusAction\(\{[\s\S]*const executionPlan = buildAssignmentStatusActionExecutionPlan\(\{[\s\S]*const closeTransitionError = getAssignmentStatusTransitionErrorView\(\{[\s\S]*const reopenTransitionError = getAssignmentStatusTransitionErrorView\(\{[\s\S]*privacy: buildAssignmentLifecycleHandoffPrivacyContract/,
+  'Assignment lifecycle handoff should compose status, submission gates, status actions, execution plans, and transition errors from shared lifecycle helpers.'
+);
+assert.match(
+  assignmentLifecycleSource,
+  /id: 'student-access'[\s\S]*id: 'public-payload'[\s\S]*id: 'submission-gate'[\s\S]*id: 'teacher-list-state'[\s\S]*id: 'result-page-state'[\s\S]*id: 'close-action'[\s\S]*id: 'reopen-action'[\s\S]*id: 'draft-snapshot-gate'[\s\S]*id: 'closed-snapshot-retention'[\s\S]*id: 'attempt-review-retention'[\s\S]*id: 'server-transition-guard'/,
+  'Assignment lifecycle handoff should collect student access, teacher list, result page, transition, snapshot, and review-retention slices.'
+);
+assert.doesNotMatch(
+  assignmentLifecycleSource,
+  /AssignmentLifecycleHandoffView\['itemViews'\]|ReturnType<\s*typeof buildAssignmentLifecycleHandoffView>/,
+  'Assignment lifecycle handoff contracts should not derive from aggregate view indexes or builder return types.'
+);
+assert.match(
+  assignmentLifecycleSource,
   /export function getAssignmentStatusTransitionError\([\s\S]*getAssignmentStatusTransitionErrorView\([\s\S]*\)\?\.message/,
   'Assignment lifecycle should keep the legacy transition error message helper as a compatibility wrapper.'
 );
@@ -17619,6 +17641,124 @@ assert.throws(
       status: 'draft',
     }),
   /This assignment has not been published for students yet\./
+);
+const openLifecycleHandoffView = buildAssignmentLifecycleHandoffView({
+  currentStatus: 'published',
+  expiresAt: new Date('2026-01-01T10:00:01.000Z'),
+  now: assignmentLifecycleNow,
+  surface: 'student-access',
+});
+const openLifecycleHandoffItemIds = openLifecycleHandoffView.itemViews.map(
+  (item) => item.id
+);
+assert.deepEqual(openLifecycleHandoffItemIds, [
+  ...ASSIGNMENT_LIFECYCLE_HANDOFF_ITEM_IDS,
+]);
+assert.equal(openLifecycleHandoffView.itemViews.length, 20);
+assert.deepEqual(openLifecycleHandoffView.privacy, {
+  exposesActivityContent: false,
+  exposesAnswerKeys: false,
+  exposesInternalAssignmentIds: false,
+  exposesRawAnonymousToken: false,
+  exposesStudentAnswerText: false,
+  exposesStudentNames: false,
+  exposesTeacherNotes: false,
+  itemIds: openLifecycleHandoffItemIds,
+});
+assert.deepEqual(
+  openLifecycleHandoffView.itemViews.map((item) => [item.id, item.value]),
+  [
+    ['current-status', 'open'],
+    ['status-label', 'Open'],
+    ['student-access', 'Available'],
+    ['public-payload', 'Available'],
+    ['submission-gate', 'Accepting submissions'],
+    ['teacher-list-state', 'Open'],
+    ['result-page-state', 'Open'],
+    ['close-action', 'Ready'],
+    ['reopen-action', 'Not available'],
+    ['next-status', 'Closed'],
+    ['transition-error', 'None'],
+    ['execution-plan', 'update-status'],
+    ['expiry-check', 'Future close time'],
+    ['close-time', 'Scheduled'],
+    ['draft-snapshot-gate', 'Snapshot frozen'],
+    ['closed-snapshot-retention', 'Snapshot frozen'],
+    ['attempt-review-retention', 'Attempt review retained'],
+    ['server-transition-guard', 'Validated'],
+    ['owner-scope', 'Owner scoped'],
+    ['privacy-guard', 'Private data omitted'],
+  ]
+);
+assert.equal(
+  JSON.stringify(openLifecycleHandoffView).includes('SECRET_ASSIGNMENT_ID'),
+  false
+);
+const closedLifecycleHandoffView = buildAssignmentLifecycleHandoffView({
+  currentStatus: 'closed',
+  expiresAt: null,
+  now: assignmentLifecycleNow,
+  surface: 'teacher-list',
+});
+assert.equal(
+  closedLifecycleHandoffView.itemViews.find(
+    (item) => item.id === 'submission-gate'
+  )?.value,
+  'This assignment is closed.'
+);
+assert.equal(
+  closedLifecycleHandoffView.itemViews.find(
+    (item) => item.id === 'reopen-action'
+  )?.value,
+  'Ready'
+);
+assert.equal(
+  closedLifecycleHandoffView.itemViews.find(
+    (item) => item.id === 'closed-snapshot-retention'
+  )?.value,
+  'Results retained'
+);
+const expiredClosedLifecycleHandoffView = buildAssignmentLifecycleHandoffView({
+  currentStatus: 'closed',
+  expiresAt: new Date('2026-01-01T09:00:00.000Z'),
+  now: assignmentLifecycleNow,
+  surface: 'server-function',
+});
+assert.equal(
+  expiredClosedLifecycleHandoffView.itemViews.find(
+    (item) => item.id === 'reopen-action'
+  )?.value,
+  'Not available'
+);
+assert.equal(
+  expiredClosedLifecycleHandoffView.itemViews.find(
+    (item) => item.id === 'transition-error'
+  )?.value,
+  'Expired assignments cannot be reopened.'
+);
+assert.equal(
+  expiredClosedLifecycleHandoffView.itemViews.find(
+    (item) => item.id === 'expiry-check'
+  )?.value,
+  'Expired close time'
+);
+const draftLifecycleHandoffView = buildAssignmentLifecycleHandoffView({
+  currentStatus: 'draft',
+  expiresAt: null,
+  now: assignmentLifecycleNow,
+  surface: 'result-page',
+});
+assert.equal(
+  draftLifecycleHandoffView.itemViews.find(
+    (item) => item.id === 'public-payload'
+  )?.value,
+  'Blocked'
+);
+assert.equal(
+  draftLifecycleHandoffView.itemViews.find(
+    (item) => item.id === 'draft-snapshot-gate'
+  )?.value,
+  'Publish required'
 );
 assert.deepEqual(
   buildAssignmentStatusAction({
