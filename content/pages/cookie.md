@@ -93,10 +93,11 @@ will rely on consent or provide the controls required by applicable law.
 
 If paid checkout, transactional email, AI features, file storage, or support
 tools are enabled, providers such as Creem, Stripe, Cloudflare Email, Resend,
-Cloudflare Workers AI, fal.ai, Cloudflare R2, or a support widget may use their
-own cookies or similar technologies to process payments, prevent fraud, deliver
-emails, process AI requests, store classroom source materials, provide support,
-or keep their services secure.
+Cloudflare Workers AI, Cloudflare R2, or a support widget may use their own
+cookies or similar technologies to process payments, prevent fraud, deliver
+emails, process teacher-reviewed AI draft or worksheet extraction requests,
+store classroom source materials, provide support, or keep their services
+secure.
 
 Those providers process information under their own terms and privacy policies.
 

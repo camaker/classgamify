@@ -42,10 +42,11 @@ ClassGamify.
   file name, type, size, storage key, upload time, and the file itself.
 - **AI prompts, uploads, and generated results**: If you use AI-assisted
   drafting, remixing, distractor generation, answer explanations, listening
-  scripts, worksheet extraction, image generation, or similar tools, we may
-  process the text you enter, uploaded images or files, and generated output
-  through the configured provider. Depending on the feature, those inputs and
-  outputs may also be logged for abuse prevention, debugging, or rate limiting.
+  scripts, worksheet extraction, source-material provenance, or similar
+  classroom authoring tools, we may process the text you enter, uploaded
+  classroom images or files, and generated output through the configured
+  provider. Depending on the feature, those inputs and outputs may also be
+  logged for abuse prevention, debugging, or rate limiting.
   For source-material draft notes, the product is designed to use safe material
   provenance such as material kind and filename basename before any dedicated
   extraction pipeline is enabled.
@@ -105,9 +106,10 @@ ClassGamify, including:
   logs, email sending, and analytics
 - **Better Auth and OAuth providers** for account authentication, including
   Google sign-in if enabled
-- **Cloudflare Workers AI, fal.ai, and similar AI providers** for AI-assisted
-  drafting, text generation, image generation, worksheet extraction, or related
-  experimental features when those tools are enabled
+- **Configured classroom AI providers, such as Cloudflare Workers AI** for
+  AI-assisted drafting, text generation, template remixing, distractor
+  generation, listening scripts, worksheet extraction, source-material
+  provenance, or related teacher-reviewed features when those tools are enabled
 - **Analytics providers** such as Microsoft Clarity, Umami, Google Analytics, or
   Plausible, when configured
 - **Payment providers** such as Creem or Stripe, when paid checkout is enabled

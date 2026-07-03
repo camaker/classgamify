@@ -162,10 +162,11 @@ source-material metadata.
 ## AI Features
 
 ClassGamify may provide AI-assisted drafting, remixing, distractor generation,
-answer explanations, listening scripts, worksheet extraction, image generation,
-or similar tools. AI output can be inaccurate, incomplete, biased, or unsuitable
-for a particular class. You are responsible for reviewing and editing AI drafts
-before saving, publishing, sharing, or using them with students.
+answer explanations, listening scripts, worksheet extraction, source-material
+provenance, or similar classroom authoring tools. AI output can be inaccurate,
+incomplete, biased, or unsuitable for a particular class. You are responsible
+for reviewing and editing AI drafts before saving, publishing, sharing, or using
+them with students.
 
 Do not submit confidential, sensitive, regulated, or third-party content to AI
 features unless you have authority to do so and understand that configured AI
@@ -195,10 +196,11 @@ and security. These services may have their own terms, policies, outages,
 limits, and data practices. We are not responsible for third-party services, but
 we choose them to support ClassGamify's operation.
 
-Cloudflare Workers AI, fal.ai, or similar providers may power AI-assisted
-activity drafts, text generation, image generation, worksheet extraction, or
-future experimental classroom features. Payment providers such as Creem or
-Stripe may process checkout, invoices, subscriptions, taxes, and fraud
+Configured classroom AI providers such as Cloudflare Workers AI may power
+AI-assisted activity drafts, text generation, template remixing, distractor
+generation, listening scripts, worksheet extraction, source-material provenance,
+or future teacher-reviewed classroom features. Payment providers such as Creem
+or Stripe may process checkout, invoices, subscriptions, taxes, and fraud
 prevention if paid features are enabled. Email, storage, authentication, and
 analytics providers may process information needed to operate those features.
 

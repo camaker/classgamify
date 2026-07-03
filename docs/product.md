@@ -32,6 +32,9 @@ Public policy pages are also product surfaces: terms, privacy, and cookie copy
 must describe ClassGamify's teacher activity, public assignment link, student
 attempt, results, and AI-draft data model instead of the copied learning-site
 model.
+Legal provider examples should stay tied to configured classroom AI providers
+and teacher-reviewed activity/worksheet workflows; do not describe unused
+image-generation providers as part of the active ClassGamify data model.
 Public editorial surfaces follow the same rule. Blog posts, release notes, and
 their generated sitemap URLs should describe ClassGamify templates, assignments,
 AI authoring, and teacher results instead of inherited course or handwriting

@@ -1539,6 +1539,8 @@ const legalPolicyPageProductSurfaceRequirements = [
       /CSV exports/,
       /source materials/,
       /AI-assisted drafts/,
+      /Configured classroom AI providers/,
+      /teacher-reviewed classroom features/,
     ],
   },
   {
@@ -1553,6 +1555,8 @@ const legalPolicyPageProductSurfaceRequirements = [
       /safe material\s+provenance/,
       /source-material storage identifiers/,
       /AI-assisted\s+drafting/,
+      /Configured classroom AI providers/,
+      /source-material\s+provenance/,
     ],
   },
   {
@@ -1566,6 +1570,7 @@ const legalPolicyPageProductSurfaceRequirements = [
       /partial-attempt confirmation state/,
       /local browser label/,
       /classroom source materials/,
+      /teacher-reviewed AI draft or worksheet extraction requests/,
     ],
   },
   {
@@ -1580,6 +1585,8 @@ const legalPolicyPageProductSurfaceRequirements = [
       /CSV 导出/,
       /来源素材/,
       /AI 辅助/,
+      /已配置的课堂 AI 服务商/,
+      /需要老师审核的课堂功能/,
     ],
   },
   {
@@ -1594,6 +1601,8 @@ const legalPolicyPageProductSurfaceRequirements = [
       /安全来源信息/,
       /来源素材存储标识/,
       /AI 辅助草稿/,
+      /已配置的课堂 AI 服务商/,
+      /需要老师审核的功能/,
     ],
   },
   {
@@ -1607,10 +1616,13 @@ const legalPolicyPageProductSurfaceRequirements = [
       /部分提交确认状态/,
       /本地浏览器标签/,
       /课堂来源素材/,
+      /需要老师审核的 AI 草稿或练习纸提取请求/,
     ],
   },
 ] as const;
 const legalPolicyAiDemoPattern = /\bAI demos?\b|AI 演示/i;
+const legalPolicyUnusedAiProviderPattern =
+  /fal\.ai|image generation|图片生成|AI image generation|AI 图片生成/i;
 for (const {
   filePath,
   patterns,
@@ -1633,6 +1645,12 @@ for (const {
     fileText,
     legalPolicyAiDemoPattern,
     `${filePath} should describe AI as a teacher-reviewed product capability.`
+  );
+
+  assert.doesNotMatch(
+    fileText,
+    legalPolicyUnusedAiProviderPattern,
+    `${filePath} should not describe unused AI image-generation providers as part of ClassGamify legal surfaces.`
   );
 
   for (const pattern of patterns) {

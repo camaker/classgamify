@@ -61,7 +61,7 @@ ClassGamify 可能使用以下类别的 Cookie 和浏览器存储。
 
 ### 支付、邮件、AI、存储和支持服务
 
-如果启用付费结账、交易邮件、AI 功能、文件存储或支持工具，Creem、Stripe、Cloudflare Email、Resend、Cloudflare Workers AI、fal.ai、Cloudflare R2 或支持组件等服务商可能会使用自己的 Cookie 或类似技术来处理支付、防止欺诈、发送邮件、处理 AI 请求、存储课堂来源素材、提供支持或保护其服务安全。
+如果启用付费结账、交易邮件、AI 功能、文件存储或支持工具，Creem、Stripe、Cloudflare Email、Resend、Cloudflare Workers AI、Cloudflare R2 或支持组件等服务商可能会使用自己的 Cookie 或类似技术来处理支付、防止欺诈、发送邮件、处理需要老师审核的 AI 草稿或练习纸提取请求、存储课堂来源素材、提供支持或保护其服务安全。
 
 这些服务商会按照各自的条款和隐私政策处理信息。
 
