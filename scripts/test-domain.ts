@@ -4,9 +4,28 @@ import {
   baseLocale,
   overwriteGetLocale,
 } from '@/locale/paraglide/runtime';
-import { isLocalizedPath } from '@/lib/locale';
+import { isLocalizedPath, LOCALIZED_PATHS } from '@/lib/locale';
 import { isLinkActive, isLinkSectionActive } from '@/lib/urls';
 import { Routes } from '@/lib/routes';
+import {
+  PUBLIC_INDEXABLE_STATIC_ROUTES,
+  PUBLIC_INDEXED_BLOG_BASE_PATH,
+  PUBLIC_LOCALIZED_PATHS,
+  PUBLIC_ROBOTS_DISALLOW_RULES,
+  RETIRED_LEGACY_PUBLIC_PATHS,
+} from '@/seo/public-routes';
+import {
+  buildRobotsTxt,
+  buildSitemap,
+  buildSitemapUrlEntries,
+  getRobotsDisallowPaths,
+  ROBOTS_TXT_HEADERS,
+  SITEMAP_XML_HEADERS,
+} from '@/seo/public-indexing';
+import {
+  buildWebAppManifest,
+  WEB_MANIFEST_HEADERS,
+} from '@/seo/web-manifest';
 import { getPricePlans } from '@/lib/price-plan';
 import { buildSqlLikeContainsPattern } from '@/lib/sql-like';
 import { APP_ENTITY_ID_LENGTH } from '@/lib/entity-id';
@@ -10178,6 +10197,13 @@ assert.match(
 assert.doesNotMatch(chineseDownloadDisposition, /\r|\n|C:\\/);
 const robotsRouteSource = readFileSync('src/routes/robots[.]txt.ts', 'utf8');
 const sitemapRouteSource = readFileSync('src/routes/sitemap[.]xml.ts', 'utf8');
+const manifestRouteSource = readFileSync(
+  'src/routes/manifest[.]json.ts',
+  'utf8'
+);
+const publicIndexingSource = readFileSync('src/seo/public-indexing.ts', 'utf8');
+const publicRoutesSource = readFileSync('src/seo/public-routes.ts', 'utf8');
+const webManifestSource = readFileSync('src/seo/web-manifest.ts', 'utf8');
 const routeConstantsSource = readFileSync('src/lib/routes.ts', 'utf8');
 const websiteConfigSource = readFileSync('src/config/website.ts', 'utf8');
 const storageFileRouteSource = readFileSync(
@@ -11107,10 +11133,102 @@ for (const retiredTestRouteFile of [
     `${retiredTestRouteFile} should stay unmounted as copied template test UI.`
   );
 }
-assert.doesNotMatch(robotsRouteSource, /['"]\/worksheets['"]/);
-assert.match(robotsRouteSource, /['"]\/play['"]/);
+assert.match(
+  robotsRouteSource,
+  /buildRobotsTxt[\s\S]*ROBOTS_TXT_HEADERS/,
+  'Robots route should delegate product indexing rules to the SEO domain module.'
+);
 assert.doesNotMatch(
   robotsRouteSource,
+  /disallowedPaths|getDisallowRules|localizeHref/,
+  'Robots route should not rebuild localized disallow rules locally.'
+);
+assert.match(
+  sitemapRouteSource,
+  /buildSitemap[\s\S]*SITEMAP_XML_HEADERS/,
+  'Sitemap route should delegate indexed product URLs to the SEO domain module.'
+);
+assert.doesNotMatch(
+  sitemapRouteSource,
+  /getSortedPosts|staticUrls|urlEntry|escapeXml/,
+  'Sitemap route should not rebuild public URL or XML serialization rules locally.'
+);
+assert.match(
+  manifestRouteSource,
+  /buildWebAppManifest[\s\S]*WEB_MANIFEST_HEADERS/,
+  'Manifest route should delegate platform metadata to the manifest domain helper.'
+);
+assert.doesNotMatch(
+  manifestRouteSource,
+  /websiteConfig|metadata\?\.name|background_color|theme_color/,
+  'Manifest route should not rebuild platform metadata locally.'
+);
+assert.deepEqual(
+  PUBLIC_INDEXABLE_STATIC_ROUTES.map((route) => route.id),
+  [
+    'home',
+    'templates',
+    'worksheets',
+    'create',
+    'pricing',
+    'teachers',
+    'contact',
+    'blog',
+    'roadmap',
+    'cookie',
+    'terms',
+    'privacy',
+  ],
+  'Indexed static route order should keep ClassGamify product entry points ahead of support pages.'
+);
+assert.deepEqual(PUBLIC_LOCALIZED_PATHS, [...LOCALIZED_PATHS]);
+assert.equal(PUBLIC_INDEXED_BLOG_BASE_PATH, Routes.Blog);
+assert.deepEqual(
+  PUBLIC_ROBOTS_DISALLOW_RULES.map((rule) => [rule.id, rule.path]),
+  [
+    ['auth', Routes.Auth],
+    ['admin', Routes.Admin],
+    ['settings', Routes.Settings],
+    ['dashboard', Routes.Dashboard],
+    ['print', '/print'],
+    ['play', '/play'],
+  ],
+  'Robots disallow rules should cover private teacher, student runner, and print surfaces.'
+);
+assert.deepEqual(getRobotsDisallowPaths(), [
+  '/auth',
+  '/zh/auth',
+  '/admin',
+  '/zh/admin',
+  '/settings',
+  '/zh/settings',
+  '/dashboard',
+  '/zh/dashboard',
+  '/print',
+  '/zh/print',
+  '/play',
+  '/zh/play',
+]);
+assert.deepEqual(ROBOTS_TXT_HEADERS, {
+  'Cache-Control': 'public, max-age=3600',
+  'Content-Type': 'text/plain; charset=utf-8',
+});
+assert.deepEqual(SITEMAP_XML_HEADERS, {
+  'Cache-Control': 'public, max-age=3600',
+  'Content-Type': 'application/xml; charset=utf-8',
+});
+const publicIndexingBaseUrl = 'https://classgamify.example/';
+const robotsTxt = buildRobotsTxt({ baseUrl: publicIndexingBaseUrl });
+assert.match(robotsTxt, /^User-agent: \*\nAllow: \//);
+assert.match(robotsTxt, /Disallow: \/play/);
+assert.match(robotsTxt, /Disallow: \/zh\/play/);
+assert.match(
+  robotsTxt,
+  /Sitemap: https:\/\/classgamify\.example\/sitemap\.xml/
+);
+assert.doesNotMatch(robotsTxt, /\/worksheets|\/learn|\/hsk|\/hanzi/i);
+assert.doesNotMatch(
+  publicRoutesSource,
   /['"]\/test-(?:404|error)['"]/,
   'Robots should not preserve copied template test routes.'
 );
@@ -11119,17 +11237,19 @@ assert.doesNotMatch(
   /test-(?:404|error)|\(tests\)/,
   'Generated route tree should not mount copied template test routes.'
 );
-for (const retiredStubRoute of [
-  '/about',
-  '/ai',
-  '/changelog',
-  '/hanzi',
-  '/hsk',
-  '/learn',
-  '/settings/credits',
-  '/waitlist',
-]) {
-  assert.doesNotMatch(robotsRouteSource, new RegExp(`['"]${retiredStubRoute}`));
+const indexedStaticRoutePathText = PUBLIC_INDEXABLE_STATIC_ROUTES.map(
+  (route) => route.path
+).join('\n');
+assert.ok(
+  RETIRED_LEGACY_PUBLIC_PATHS.includes('/learn'),
+  'Retired legacy path inventory should stay explicit while excluded from indexed routes.'
+);
+for (const retiredStubRoute of RETIRED_LEGACY_PUBLIC_PATHS) {
+  assert.doesNotMatch(robotsTxt, new RegExp(`Disallow: ${retiredStubRoute}`));
+  assert.doesNotMatch(
+    indexedStaticRoutePathText,
+    new RegExp(`^${retiredStubRoute}$`, 'm')
+  );
   assert.doesNotMatch(
     routeConstantsSource,
     new RegExp(`['"]${retiredStubRoute}`)
@@ -11143,17 +11263,68 @@ for (const retiredStubRouteFile of [
 ]) {
   assert.equal(excludedPageRouteFiles.includes(retiredStubRouteFile), false);
 }
-assert.match(sitemapRouteSource, /Routes\.Worksheets/);
+assert.match(publicRoutesSource, /Routes\.Worksheets/);
 assert.match(
-  sitemapRouteSource,
-  /getSortedPosts\(baseLocale\)\.map\(\(post\) => \(\{[\s\S]*path: `\$\{Routes\.Blog\}\/\$\{post\.slug\}`[\s\S]*lastmod: post\.date/,
+  publicIndexingSource,
+  /getSortedPosts\(baseLocale\)\.map\(\(post\) => \(\{[\s\S]*lastmod: post\.date[\s\S]*path: `\$\{Routes\.Blog\}\/\$\{post\.slug\}`/,
   'Sitemap should derive indexed editorial URLs from the ClassGamify blog collection.'
 );
-assert.doesNotMatch(sitemapRouteSource, /Routes\.StudentPreview/);
+assert.doesNotMatch(publicRoutesSource, /Routes\.StudentPreview/);
 assert.doesNotMatch(
-  sitemapRouteSource,
+  indexedStaticRoutePathText + publicIndexingSource,
   /Routes\.Changelog|['"]\/changelog|['"]\/hsk|['"]\/hanzi|['"]\/learn|getlangstudy/i,
   'Sitemap should not index copied learning, handwriting, or retired release-note routes.'
+);
+const sitemapEntries = buildSitemapUrlEntries({
+  baseUrl: publicIndexingBaseUrl,
+});
+assert.ok(
+  sitemapEntries.some(
+    (entry) =>
+      entry.path === Routes.Worksheets &&
+      entry.locale === 'zh' &&
+      entry.loc === 'https://classgamify.example/zh/worksheets'
+  ),
+  'Sitemap entries should include localized worksheet creation URLs.'
+);
+assert.ok(
+  sitemapEntries.some(
+    (entry) =>
+      entry.path.startsWith(`${Routes.Blog}/`) &&
+      typeof entry.lastmod === 'string'
+  ),
+  'Sitemap entries should include blog post lastmod metadata.'
+);
+const sitemapXml = buildSitemap({ baseUrl: publicIndexingBaseUrl });
+assert.match(
+  sitemapXml,
+  /<xhtml:link rel="alternate" hreflang="zh-CN" href="https:\/\/classgamify\.example\/zh\/worksheets" \/>/
+);
+assert.match(
+  sitemapXml,
+  /<xhtml:link rel="alternate" hreflang="x-default" href="https:\/\/classgamify\.example\/worksheets" \/>/
+);
+assert.doesNotMatch(
+  sitemapXml,
+  /\/play\/demo-food|\/learn|\/hsk|\/hanzi|getlangstudy/i
+);
+assert.deepEqual(WEB_MANIFEST_HEADERS, {
+  'Cache-Control': 'public, max-age=3600',
+  'Content-Type': 'application/manifest+json; charset=utf-8',
+});
+assert.match(webManifestSource, /websiteConfig\.metadata/);
+const webAppManifest = buildWebAppManifest();
+assert.equal(webAppManifest.start_url, '/');
+assert.equal(webAppManifest.scope, '/');
+assert.equal(webAppManifest.display, 'standalone');
+assert.equal(webAppManifest.theme_color, '#09090b');
+assert.ok(
+  webAppManifest.icons.some(
+    (icon) =>
+      icon.src === '/android-chrome-512x512.png' &&
+      icon.purpose === 'maskable'
+  ),
+  'Web manifest should keep ClassGamify install metadata in the domain helper.'
 );
 assert.doesNotMatch(routeConstantsSource, /['"]\/play\/demo-food['"]/);
 assert.equal(isLocalizedPath('/worksheets'), true);
@@ -31080,8 +31251,8 @@ assert.match(
   'Printable worksheet pages should render without public marketing chrome.'
 );
 assert.match(
-  robotsRouteSource,
-  /'\/print'/,
+  robotsTxt,
+  /Disallow: \/print[\s\S]*Disallow: \/zh\/print/,
   'Printable worksheet pages should be disallowed in robots.txt.'
 );
 assert.match(

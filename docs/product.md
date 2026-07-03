@@ -36,6 +36,11 @@ Public editorial surfaces follow the same rule. Blog posts, release notes, and
 their generated sitemap URLs should describe ClassGamify templates, assignments,
 AI authoring, and teacher results instead of inherited course or handwriting
 content.
+Public indexing and install metadata should derive from shared product-route
+helpers: sitemap URLs, localized alternates, robots disallow rules, and the web
+app manifest must agree on which ClassGamify pages are public entry points and
+which teacher, student-runner, print, or retired legacy paths stay out of
+search indexing.
 Developer-facing examples and active account/contact copy should follow the
 same product boundary: visible surfaces may refer to legacy URLs only when they
 are explicit migration entry points, while current forms, billing pages, and

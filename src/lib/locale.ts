@@ -7,6 +7,10 @@ import {
   type Locale,
 } from '@/locale/paraglide/runtime';
 import { m } from '@/locale/paraglide/messages';
+import {
+  PUBLIC_INDEXED_BLOG_BASE_PATH,
+  PUBLIC_LOCALIZED_PATHS,
+} from '@/seo/public-routes';
 
 export {
   baseLocale,
@@ -89,20 +93,7 @@ export function getCanonicalPathname(pathname: string) {
  * in sitemap / SEO metadata. Keep this list limited to pages that are
  * intentionally public.
  */
-export const LOCALIZED_PATHS = new Set([
-  '/',
-  '/templates',
-  '/worksheets',
-  '/create',
-  '/blog',
-  '/contact',
-  '/pricing',
-  '/roadmap',
-  '/teachers',
-  '/cookie',
-  '/privacy',
-  '/terms',
-]);
+export const LOCALIZED_PATHS = new Set(PUBLIC_LOCALIZED_PATHS);
 
 /**
  * True for any user-visible path that exists in every locale and therefore
@@ -111,5 +102,5 @@ export const LOCALIZED_PATHS = new Set([
  */
 export function isLocalizedPath(path: string): boolean {
   if (LOCALIZED_PATHS.has(path)) return true;
-  return path.startsWith('/blog/');
+  return path.startsWith(`${PUBLIC_INDEXED_BLOG_BASE_PATH}/`);
 }
