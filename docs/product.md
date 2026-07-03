@@ -94,7 +94,11 @@ the full current filter result, not only the visible page, including matching
 activities, template-family coverage, activities ready to remix into another
 template, and total ready template modes. The summary logic belongs in the
 activity domain layer so dashboard surfaces and server functions reuse the same
-template-readiness calculation instead of duplicating UI-only math.
+template-readiness calculation instead of duplicating UI-only math. Overview
+cards, current-view scope items, card readiness summaries, and content stats
+should expose the prepared activity-domain labels, values, and descriptions
+through stable semantic outputs so teachers can audit filtered library state
+without relying on visual card layout alone.
 Individual activity cards should also summarize attached source materials by
 count and material kind, so teachers can see which reusable activities have
 audio, worksheet images, documents, or spreadsheet provenance before reopening

@@ -75,6 +75,9 @@ export function ActivityLibraryCard({
     activity,
     libraryStatus,
   });
+  const cardElementId = formatActivityLibraryElementId(
+    `activity-library-card-${activity.id}`
+  );
 
   async function remixActivity(
     targetTemplateType: ActivityLibraryCardTemplateType
@@ -201,6 +204,7 @@ export function ActivityLibraryCard({
           <p>{cardDisplayView.displayDescription}</p>
         </CardDescription>
         <ActivityLibraryCardStatusSummary
+          idPrefix={cardElementId}
           summary={cardDisplayView.statusSummary}
         />
       </CardHeader>
@@ -210,6 +214,7 @@ export function ActivityLibraryCard({
           className="space-y-4"
         >
           <ActivityLibraryStats
+            idPrefix={cardElementId}
             label={cardDisplayView.contentLabel}
             stats={cardDisplayView.stats}
           />
@@ -271,25 +276,39 @@ export function ActivityLibraryCard({
 }
 
 function ActivityLibraryCardStatusSummary({
+  idPrefix,
   summary,
 }: {
+  idPrefix: string;
   summary: ActivityLibraryCardStatusSummaryView;
 }) {
+  const labelId = `${idPrefix}-status-summary-label`;
+
   return (
     <section
       aria-label={summary.ariaLabel}
+      aria-labelledby={labelId}
       className="mt-3 grid gap-2 sm:grid-cols-2"
     >
+      <h3 id={labelId} className="sr-only">
+        {summary.label}
+      </h3>
       {summary.items.map((item) => (
-        <ActivityLibraryCardStatusSummaryEntry item={item} key={item.id} />
+        <ActivityLibraryCardStatusSummaryEntry
+          idPrefix={idPrefix}
+          item={item}
+          key={item.id}
+        />
       ))}
     </section>
   );
 }
 
 function ActivityLibraryCardStatusSummaryEntry({
+  idPrefix,
   item,
 }: {
+  idPrefix: string;
   item: ActivityLibraryCardStatusSummaryItemView;
 }) {
   const Icon =
@@ -298,19 +317,30 @@ function ActivityLibraryCardStatusSummaryEntry({
       : item.tone === 'ready'
         ? IconCircleCheck
         : IconInfoCircle;
+  const itemId = `${idPrefix}-status-${item.id}`;
+  const labelId = `${itemId}-label`;
+  const valueId = `${itemId}-value`;
+  const descriptionId = `${itemId}-description`;
 
   return (
     <section
       aria-label={item.ariaLabel}
+      aria-describedby={descriptionId}
       className="rounded-md border bg-muted/30 p-2.5"
       data-tone={item.tone}
     >
       <div className="flex min-w-0 items-center justify-between gap-2">
-        <p className="flex min-w-0 items-center gap-1.5 font-medium text-xs">
+        <p
+          id={labelId}
+          className="flex min-w-0 items-center gap-1.5 font-medium text-xs"
+        >
           <Icon aria-hidden="true" className="size-3.5 shrink-0" />
           <span className="truncate">{item.label}</span>
         </p>
         <Badge
+          id={valueId}
+          aria-labelledby={`${labelId} ${valueId}`}
+          aria-describedby={descriptionId}
           variant={
             item.tone === 'blocked'
               ? 'destructive'
@@ -323,7 +353,10 @@ function ActivityLibraryCardStatusSummaryEntry({
           {item.value}
         </Badge>
       </div>
-      <p className="mt-1 line-clamp-2 text-muted-foreground text-xs leading-5">
+      <p
+        id={descriptionId}
+        className="mt-1 line-clamp-2 text-muted-foreground text-xs leading-5"
+      >
         {item.description}
       </p>
     </section>
@@ -587,4 +620,8 @@ function ActivityLibraryRestoreActionButton({
       {action.label}
     </Button>
   );
+}
+
+function formatActivityLibraryElementId(value: string) {
+  return value.replace(/[^a-zA-Z0-9_-]/g, '-');
 }

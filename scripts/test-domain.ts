@@ -28119,13 +28119,13 @@ assert.match(
 );
 assert.match(
   activityLibraryScopePanelComponentSource,
-  /ActivityLibraryPageScopeItem[\s\S]*ActivityLibraryPageScopeView[\s\S]*aria-label=\{view\.label\}[\s\S]*view\.summary[\s\S]*view\.items\.map[\s\S]*key=\{item\.id\}/,
-  'Activity library scope panel should render prepared scope text and key items by stable ids.'
+  /ActivityLibraryPageScopeItem[\s\S]*ActivityLibraryPageScopeView[\s\S]*const titleId = 'activity-library-scope-panel-title'[\s\S]*const summaryId = 'activity-library-scope-panel-summary'[\s\S]*aria-labelledby=\{titleId\}[\s\S]*aria-describedby=\{summaryId\}[\s\S]*id=\{titleId\}[\s\S]*view\.label[\s\S]*id=\{summaryId\}[\s\S]*view\.summary[\s\S]*view\.items\.map[\s\S]*key=\{item\.id\}/,
+  'Activity library scope panel should render prepared scope text and key items in a labelled semantic region.'
 );
 assert.match(
   activityLibraryScopePanelComponentSource,
-  /<dl[\s\S]*view\.items\.map[\s\S]*<dt[\s\S]*item\.label[\s\S]*<dd[\s\S]*item\.value[\s\S]*<dd[\s\S]*item\.description/,
-  'Activity library scope panel should render current-view scope as semantic label/value/description items.'
+  /<dl[\s\S]*aria-labelledby=\{titleId\}[\s\S]*aria-describedby=\{summaryId\}[\s\S]*view\.items\.map[\s\S]*function ActivityLibraryScopeItem[\s\S]*const labelId = `activity-library-scope-\$\{item\.id\}-label`[\s\S]*const valueId = `activity-library-scope-\$\{item\.id\}-value`[\s\S]*const descriptionId = `activity-library-scope-\$\{item\.id\}-description`[\s\S]*<dt id=\{labelId\}[\s\S]*item\.label[\s\S]*<output[\s\S]*id=\{valueId\}[\s\S]*aria-labelledby=\{`\$\{labelId\} \$\{valueId\}`\}[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*item\.value[\s\S]*<dd[\s\S]*id=\{descriptionId\}[\s\S]*item\.description/,
+  'Activity library scope panel should render current-view scope as stable semantic label/value/description outputs.'
 );
 assert.match(
   activityLibraryScopePanelComponentSource,
@@ -28149,8 +28149,8 @@ assert.match(
 );
 assert.match(
   activityLibrarySummaryCardComponentSource,
-  /<Card[\s\S]*role="article"[\s\S]*aria-label=\{metric\.ariaLabel\}[\s\S]*metric\.description/,
-  'Activity library summary cards should expose each prepared metric as an accessible article.'
+  /const labelId = `activity-library-summary-\$\{metric\.id\}-label`[\s\S]*const valueId = `activity-library-summary-\$\{metric\.id\}-value`[\s\S]*const descriptionId = `activity-library-summary-\$\{metric\.id\}-description`[\s\S]*<Card[\s\S]*role="article"[\s\S]*aria-label=\{metric\.ariaLabel\}[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*<output id=\{valueId\}[\s\S]*aria-labelledby=\{`\$\{labelId\} \$\{valueId\}`\}[\s\S]*metric\.value[\s\S]*id=\{labelId\}[\s\S]*metric\.label[\s\S]*id=\{descriptionId\}[\s\S]*metric\.description/,
+  'Activity library summary cards should expose each prepared metric as a stable accessible article output.'
 );
 assert.match(
   activityLibraryCardComponentSource,
@@ -28324,13 +28324,13 @@ assert.match(
 );
 assert.match(
   activityLibraryCardComponentSource,
-  /ActivityLibraryCardStatusSummary[\s\S]*summary=\{cardDisplayView\.statusSummary\}[\s\S]*function ActivityLibraryCardStatusSummary\([\s\S]*summary: ActivityLibraryCardStatusSummaryView[\s\S]*aria-label=\{summary\.ariaLabel\}[\s\S]*summary\.items\.map[\s\S]*ActivityLibraryCardStatusSummaryEntry[\s\S]*item=\{item\}/,
-  'Activity library card component should render the prepared classroom-readiness status summary.'
+  /const cardElementId = formatActivityLibraryElementId\([\s\S]*`activity-library-card-\$\{activity\.id\}`[\s\S]*ActivityLibraryCardStatusSummary[\s\S]*idPrefix=\{cardElementId\}[\s\S]*summary=\{cardDisplayView\.statusSummary\}[\s\S]*function ActivityLibraryCardStatusSummary\([\s\S]*idPrefix: string[\s\S]*summary: ActivityLibraryCardStatusSummaryView[\s\S]*const labelId = `\$\{idPrefix\}-status-summary-label`[\s\S]*aria-label=\{summary\.ariaLabel\}[\s\S]*aria-labelledby=\{labelId\}[\s\S]*summary\.label[\s\S]*summary\.items\.map[\s\S]*ActivityLibraryCardStatusSummaryEntry[\s\S]*idPrefix=\{idPrefix\}[\s\S]*item=\{item\}/,
+  'Activity library card component should render the prepared classroom-readiness status summary with stable per-card ids.'
 );
 assert.match(
   activityLibraryCardComponentSource,
-  /function ActivityLibraryCardStatusSummaryEntry[\s\S]*item: ActivityLibraryCardStatusSummaryItemView[\s\S]*item\.tone === 'blocked'[\s\S]*item\.tone === 'ready'[\s\S]*<section[\s\S]*aria-label=\{item\.ariaLabel\}[\s\S]*data-tone=\{item\.tone\}[\s\S]*\{item\.label\}[\s\S]*\{item\.value\}[\s\S]*\{item\.description\}/,
-  'Activity library card status summary items should render prepared labels, values, descriptions, aria labels, and tones.'
+  /function ActivityLibraryCardStatusSummaryEntry[\s\S]*idPrefix: string[\s\S]*item: ActivityLibraryCardStatusSummaryItemView[\s\S]*item\.tone === 'blocked'[\s\S]*item\.tone === 'ready'[\s\S]*const itemId = `\$\{idPrefix\}-status-\$\{item\.id\}`[\s\S]*const labelId = `\$\{itemId\}-label`[\s\S]*const valueId = `\$\{itemId\}-value`[\s\S]*const descriptionId = `\$\{itemId\}-description`[\s\S]*<section[\s\S]*aria-label=\{item\.ariaLabel\}[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*data-tone=\{item\.tone\}[\s\S]*id=\{labelId\}[\s\S]*item\.label[\s\S]*id=\{valueId\}[\s\S]*aria-labelledby=\{`\$\{labelId\} \$\{valueId\}`\}[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*item\.value[\s\S]*id=\{descriptionId\}[\s\S]*item\.description/,
+  'Activity library card status summary items should render prepared labels, values, descriptions, aria labels, and tones as stable semantic outputs.'
 );
 assert.match(
   activityLibraryCardComponentSource,
@@ -28349,8 +28349,13 @@ assert.doesNotMatch(
 );
 assert.match(
   activityLibraryCardComponentSource,
-  /ActivityLibraryStats[\s\S]*label=\{cardDisplayView\.contentLabel\}[\s\S]*stats=\{cardDisplayView\.stats\}/,
-  'Activity library card component should pass the prepared content-count section label into stats rendering.'
+  /ActivityLibraryStats[\s\S]*idPrefix=\{cardElementId\}[\s\S]*label=\{cardDisplayView\.contentLabel\}[\s\S]*stats=\{cardDisplayView\.stats\}/,
+  'Activity library card component should pass the prepared content-count section label and per-card id prefix into stats rendering.'
+);
+assert.match(
+  activityLibraryCardComponentSource,
+  /function formatActivityLibraryElementId[\s\S]*replace\([^)]*\[\^a-zA-Z0-9_-\]/,
+  'Activity library card component should normalize persisted activity ids before using them in semantic DOM id prefixes.'
 );
 assert.doesNotMatch(
   activityLibraryCardComponentSource,
@@ -28519,13 +28524,13 @@ assert.match(
 );
 assert.match(
   activityLibraryStatsComponentSource,
-  /stats\.map[\s\S]*ariaLabel=\{stat\.ariaLabel\}[\s\S]*description=\{stat\.description\}[\s\S]*label=\{stat\.label\}[\s\S]*value=\{stat\.value\}/,
-  'Activity library stats component should pass prepared stat labels, values, and descriptions into semantic stat items.'
+  /idPrefix: string[\s\S]*stats\.map[\s\S]*<ActivityLibraryStat idPrefix=\{idPrefix\} key=\{stat\.key\} stat=\{stat\}/,
+  'Activity library stats component should pass prepared stat views and the per-card id prefix into semantic stat items.'
 );
 assert.match(
   activityLibraryStatsComponentSource,
-  /<dl aria-label=\{label\}[\s\S]*<dt[\s\S]*\{label\}[\s\S]*<output aria-label=\{ariaLabel\}[\s\S]*<dd className="sr-only">\{description\}/,
-  'Activity library stats component should render prepared stat labels, values, and descriptions as semantic items.'
+  /<dl aria-label=\{label\}[\s\S]*function ActivityLibraryStat[\s\S]*const labelId = `\$\{idPrefix\}-stat-\$\{stat\.key\}-label`[\s\S]*const valueId = `\$\{idPrefix\}-stat-\$\{stat\.key\}-value`[\s\S]*const descriptionId = `\$\{idPrefix\}-stat-\$\{stat\.key\}-description`[\s\S]*<dt id=\{labelId\}[\s\S]*stat\.label[\s\S]*<output[\s\S]*id=\{valueId\}[\s\S]*aria-label=\{stat\.ariaLabel\}[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*stat\.value[\s\S]*<dd id=\{descriptionId\} className="sr-only"[\s\S]*stat\.description/,
+  'Activity library stats component should render prepared stat labels, values, and descriptions as stable semantic outputs.'
 );
 assert.doesNotMatch(
   activityLibraryStatsComponentSource,
