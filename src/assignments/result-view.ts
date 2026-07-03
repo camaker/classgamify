@@ -1356,9 +1356,11 @@ export function buildAssignmentResultHeaderView({
   assignment,
   now,
   snapshot,
+  stats,
 }: AssignmentResultHeaderSource & {
   analysis?: AssignmentResultsAnalysis;
   now?: number;
+  stats?: AssignmentResultsPageData<AssignmentAttemptRowDisplayInput>['stats'];
 }): AssignmentResultHeaderView {
   const resolvedSource = resolveAssignmentSnapshotSource({
     activity,
@@ -1379,8 +1381,11 @@ export function buildAssignmentResultHeaderView({
     assignmentShareUrl: shareAction.shareUrl,
     assignmentTitle: formatAssignmentDisplayTitle(assignment.title),
     exportPreparationView: buildAssignmentResultsExportPreparationView({
+      activity,
       analysis: analysis ?? EMPTY_ASSIGNMENT_RESULTS_ANALYSIS,
       assignment,
+      snapshot,
+      stats,
     }),
     printAction: {
       assignmentId: assignment.id,

@@ -1,0 +1,226 @@
+import assert from 'node:assert/strict';
+import test from 'node:test';
+import {
+  ASSIGNMENT_RESULTS_EXPORT_PREPARATION_ITEM_IDS,
+  buildAssignmentResultsExportPreparationView,
+  type AssignmentResultsExportPreparationItemId,
+  type AssignmentResultsExportPreparationView,
+} from '@/assignments/results-export';
+import { overwriteGetLocale } from '@/locale/paraglide/runtime';
+
+overwriteGetLocale(() => 'en');
+
+const SECRET_ACCEPTED_ANSWER = 'SECRET_ACCEPTED_ANSWER';
+const SECRET_ANSWER_TEXT = 'SECRET_STUDENT_ANSWER';
+const SECRET_INSTRUCTIONS = 'SECRET_STUDENT_INSTRUCTIONS';
+const SECRET_PROMPT_TEXT = 'SECRET_PROMPT_TEXT';
+const SECRET_TOKEN = 'raw-anonymous-token-value';
+
+test('assignment results export preparation exposes 20 safe CSV coverage slices', () => {
+  const preparationView = buildAssignmentResultsExportPreparationView({
+    activity: {
+      description: 'Live activity description',
+      templateType: 'quiz',
+      title: 'Live activity title',
+    },
+    analysis: {
+      attempts: [
+        {
+          accuracy: 50,
+          answers: [
+            {
+              acceptedAnswers: ['Paris', SECRET_ACCEPTED_ANSWER],
+              answer: SECRET_ANSWER_TEXT,
+              correct: false,
+              expectedAnswer: 'Paris',
+              explanation: 'Teacher-only explanation',
+              itemId: 'item-1',
+              prompt: SECRET_PROMPT_TEXT,
+              submitted: true,
+            },
+          ],
+          completedAt: new Date('2026-01-01T10:00:00.000Z'),
+          durationSeconds: 30,
+          id: 'attempt-1',
+          score: 1,
+          studentKey: 'student:alice',
+          studentLabel: 'Alice',
+        },
+      ],
+      needsReview: [
+        {
+          acceptedAnswers: ['Paris', SECRET_ACCEPTED_ANSWER],
+          correctCount: 0,
+          correctRate: 0,
+          expectedAnswer: 'Paris',
+          itemId: 'item-1',
+          kind: 'question',
+          kindLabel: 'Question',
+          prompt: SECRET_PROMPT_TEXT,
+          submittedCount: 1,
+          unansweredCount: 0,
+        },
+      ],
+      perItem: [
+        {
+          acceptedAnswers: ['Paris', SECRET_ACCEPTED_ANSWER],
+          correctCount: 0,
+          correctRate: 0,
+          expectedAnswer: 'Paris',
+          itemId: 'item-1',
+          kind: 'question',
+          kindLabel: 'Question',
+          prompt: SECRET_PROMPT_TEXT,
+          submittedCount: 1,
+          unansweredCount: 0,
+        },
+      ],
+      students: [
+        {
+          attempts: 1,
+          averageAccuracy: 50,
+          bestAccuracy: 50,
+          lastCompletedAt: new Date('2026-01-01T10:00:00.000Z'),
+          latestAccuracy: 50,
+          needsReviewCount: 1,
+          studentKey: 'student:alice',
+          studentLabel: 'Alice',
+        },
+      ],
+    },
+    assignment: {
+      expiresAt: new Date('2026-01-10T10:00:00.000Z'),
+      id: 'assignment-1',
+      settingsJson: {
+        collectStudentName: true,
+        instructions: SECRET_INSTRUCTIONS,
+        maxAttempts: 2,
+        showCorrectAnswers: true,
+        shuffleItems: false,
+        timeLimitSeconds: 60,
+      },
+      shareSlug: 'share-123',
+      status: 'published',
+      title: 'Export safety check',
+    },
+    snapshot: {
+      activityDescription: 'Snapshot description',
+      activityTitle: 'Snapshot title',
+      templateType: 'quiz',
+    },
+    stats: {
+      averageDurationSeconds: 30,
+      averagePoints: 1,
+      averageScore: 50,
+      completions: 1,
+    },
+  });
+  const itemIds = preparationView.itemViews.map((itemView) => itemView.id);
+
+  assert.deepEqual(itemIds, [
+    ...ASSIGNMENT_RESULTS_EXPORT_PREPARATION_ITEM_IDS,
+  ]);
+  assert.equal(new Set(itemIds).size, 20);
+  assert.equal(
+    preparationView.itemViews.every(
+      (itemView) =>
+        Boolean(itemView.ariaLabel) &&
+        Boolean(itemView.description) &&
+        Boolean(itemView.label) &&
+        Boolean(itemView.value)
+    ),
+    true
+  );
+  assert.deepEqual(preparationView.privacy, {
+    exposesCopyArtifactText: false,
+    exposesCsvDataUrl: false,
+    exposesRawAnonymousToken: false,
+    exposesStudentAnswerText: false,
+    exposesTeacherAnswerText: false,
+    itemIds,
+    scope: 'full-assignment-results',
+  });
+
+  assert.equal(
+    getPreparationItemValue(preparationView, 'export-scope'),
+    'Full assignment results'
+  );
+  assert.equal(
+    getPreparationItemValue(preparationView, 'activity-snapshot'),
+    'Quiz'
+  );
+  assert.equal(getPreparationItemValue(preparationView, 'attempts'), '1');
+  assert.equal(getPreparationItemValue(preparationView, 'students'), '1');
+  assert.equal(
+    getPreparationItemValue(preparationView, 'delivery-identity'),
+    'Names'
+  );
+  assert.equal(
+    getPreparationItemValue(preparationView, 'delivery-answer-reveal'),
+    'After submit'
+  );
+  assert.equal(
+    getPreparationItemValue(preparationView, 'delivery-item-order'),
+    'Fixed order'
+  );
+  assert.equal(
+    getPreparationItemValue(preparationView, 'delivery-attempt-limit'),
+    '2'
+  );
+  assert.equal(
+    getPreparationItemValue(preparationView, 'delivery-timer'),
+    '60'
+  );
+  assert.match(
+    getPreparationItemValue(preparationView, 'delivery-close-time'),
+    /2026/
+  );
+  assert.equal(
+    getPreparationItemValue(preparationView, 'delivery-instructions'),
+    'Present'
+  );
+  assert.equal(getPreparationItemValue(preparationView, 'raw-settings'), '5');
+  assert.equal(getPreparationItemValue(preparationView, 'result-metrics'), '4');
+  assert.equal(
+    getPreparationItemValue(preparationView, 'item-performance'),
+    '1'
+  );
+  assert.equal(getPreparationItemValue(preparationView, 'answer-rows'), '1');
+  assert.equal(
+    getPreparationItemValue(preparationView, 'expected-answer'),
+    'Primary answer column'
+  );
+  assert.equal(
+    getPreparationItemValue(preparationView, 'accepted-alternatives'),
+    'Alternatives column'
+  );
+  assert.equal(getPreparationItemValue(preparationView, 'columns'), '54');
+
+  assertNoPrivateExportPreparationText(JSON.stringify(preparationView));
+});
+
+function getPreparationItemValue(
+  view: AssignmentResultsExportPreparationView,
+  id: AssignmentResultsExportPreparationItemId
+) {
+  const itemView = view.itemViews.find((item) => item.id === id);
+  assert.ok(itemView, `Missing export preparation item ${id}`);
+  return itemView.value;
+}
+
+function assertNoPrivateExportPreparationText(serializedView: string) {
+  for (const privateValue of [
+    SECRET_ACCEPTED_ANSWER,
+    SECRET_ANSWER_TEXT,
+    SECRET_INSTRUCTIONS,
+    SECRET_PROMPT_TEXT,
+    SECRET_TOKEN,
+    'data:text/csv',
+  ]) {
+    assert.equal(
+      serializedView.includes(privateValue),
+      false,
+      `Export preparation leaked private text: ${privateValue}`
+    );
+  }
+}

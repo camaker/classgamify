@@ -849,6 +849,7 @@ import {
   isAssignmentAttemptAnswerNeedsReview,
 } from '@/assignments/results';
 import {
+  ASSIGNMENT_RESULTS_EXPORT_PREPARATION_ITEM_IDS,
   ASSIGNMENT_RESULTS_EXPORT_FILENAME_LIMITS,
   buildAssignmentResultsExportPreparationView,
   buildAssignmentResultsExportDeliveryView,
@@ -3457,18 +3458,44 @@ assert.match(
 );
 assert.match(
   assignmentResultsExportSource,
-  /export type AssignmentResultsExportPreparationItemId =[\s\S]*'answer-rows'[\s\S]*'attempts'[\s\S]*'columns'[\s\S]*'delivery-policy'[\s\S]*'raw-settings'[\s\S]*'student-privacy'[\s\S]*'students'[\s\S]*export type AssignmentResultsExportPreparationView = \{[\s\S]*description: string;[\s\S]*itemViews: AssignmentResultsExportPreparationItemView\[\];[\s\S]*title: string;/,
-  'Assignment CSV export domain should expose a stable prepared export coverage view contract.'
+  /export const ASSIGNMENT_RESULTS_EXPORT_PREPARATION_ITEM_IDS = \[(?=[\s\S]*'export-scope')(?=[\s\S]*'assignment-context')(?=[\s\S]*'activity-snapshot')(?=[\s\S]*'delivery-identity')(?=[\s\S]*'delivery-answer-reveal')(?=[\s\S]*'delivery-item-order')(?=[\s\S]*'delivery-attempt-limit')(?=[\s\S]*'delivery-timer')(?=[\s\S]*'delivery-close-time')(?=[\s\S]*'delivery-instructions')(?=[\s\S]*'result-metrics')(?=[\s\S]*'item-performance')(?=[\s\S]*'expected-answer')(?=[\s\S]*'accepted-alternatives')[\s\S]*export type AssignmentResultsExportPreparationPrivacyContract = \{[\s\S]*exposesCopyArtifactText: false;[\s\S]*exposesCsvDataUrl: false;[\s\S]*exposesRawAnonymousToken: false;[\s\S]*exposesStudentAnswerText: false;[\s\S]*exposesTeacherAnswerText: false;[\s\S]*scope: 'full-assignment-results';[\s\S]*export type AssignmentResultsExportPreparationView = \{[\s\S]*description: string;[\s\S]*itemViews: AssignmentResultsExportPreparationItemView\[\];[\s\S]*privacy: AssignmentResultsExportPreparationPrivacyContract;[\s\S]*title: string;/,
+  'Assignment CSV export domain should expose a stable 20-slice prepared export coverage view contract with privacy flags.'
+);
+assert.deepEqual(
+  [...ASSIGNMENT_RESULTS_EXPORT_PREPARATION_ITEM_IDS],
+  [
+    'export-scope',
+    'assignment-context',
+    'activity-snapshot',
+    'attempts',
+    'students',
+    'student-privacy',
+    'delivery-identity',
+    'delivery-answer-reveal',
+    'delivery-item-order',
+    'delivery-attempt-limit',
+    'delivery-timer',
+    'delivery-close-time',
+    'delivery-instructions',
+    'raw-settings',
+    'result-metrics',
+    'item-performance',
+    'answer-rows',
+    'expected-answer',
+    'accepted-alternatives',
+    'columns',
+  ],
+  'Assignment CSV export preparation should expose exactly 20 stable slice ids.'
 );
 assert.match(
   assignmentResultsExportSource,
-  /export function buildAssignmentResultsExportPreparationView[\s\S]*buildAssignmentResultsExportPreparationSummary[\s\S]*assignment_results_export_preparation_attempts_label[\s\S]*assignment_results_export_preparation_students_label[\s\S]*assignment_results_export_preparation_student_privacy_label[\s\S]*assignment_results_export_preparation_delivery_policy_label[\s\S]*assignment_results_export_preparation_raw_settings_label[\s\S]*assignment_results_export_preparation_answer_rows_label[\s\S]*assignment_results_export_preparation_columns_label/,
+  /export function buildAssignmentResultsExportPreparationView[\s\S]*ASSIGNMENT_RESULTS_EXPORT_PREPARATION_ITEM_IDS\.map[\s\S]*buildAssignmentResultsExportPreparationItem[\s\S]*assignment_results_export_preparation_export_scope_label[\s\S]*assignment_results_export_preparation_activity_snapshot_label[\s\S]*assignment_results_export_preparation_delivery_identity_label[\s\S]*assignment_results_export_preparation_result_metrics_label[\s\S]*assignment_results_export_preparation_accepted_alternatives_label/,
   'Assignment CSV export preparation views should use localized labels for each export coverage item.'
 );
 assert.match(
   assignmentResultsExportSource,
-  /function buildAssignmentResultsExportPreparationSummary[\s\S]*answerRowCount: countAssignmentResultsExportAnswerRows[\s\S]*attemptCount: data\.analysis\.attempts\.length[\s\S]*columnCount: getAssignmentResultsExportColumns\(\)\.length[\s\S]*deliveryPolicyFieldCount:[\s\S]*countAssignmentResultsExportDeliveryFields[\s\S]*rawSettingFieldCount:[\s\S]*countAssignmentResultsExportRawSettingFields[\s\S]*studentCount: data\.analysis\.students\.length/,
-  'Assignment CSV export preparation summaries should count attempts, students, answer rows, columns, delivery-policy fields, and raw setting fields from the export domain.'
+  /function buildAssignmentResultsExportPreparationSummary[\s\S]*const resolvedSource = resolveAssignmentSnapshotSource\(data\)[\s\S]*answerRowCount: countAssignmentResultsExportAnswerRows[\s\S]*attemptCount: data\.analysis\.attempts\.length[\s\S]*columnCount: getAssignmentResultsExportColumns\(\)\.length[\s\S]*itemPerformanceCount: data\.analysis\.perItem\.length[\s\S]*rawSettingFieldCount:[\s\S]*countAssignmentResultsExportRawSettingFields[\s\S]*resultMetricCount: countAssignmentResultsExportResultMetricColumns[\s\S]*snapshotTemplateLabel: formatAssignmentExportTemplateLabel/,
+  'Assignment CSV export preparation summaries should count attempts, students, item performance, answer rows, result metrics, raw settings, columns, and snapshot template from the export domain.'
 );
 assert.match(
   assignmentResultsExportSource,
@@ -7043,7 +7070,7 @@ assert.match(
 );
 assert.match(
   assignmentResultViewSource,
-  /exportPreparationView: buildAssignmentResultsExportPreparationView\(\{[\s\S]*analysis: analysis \?\? EMPTY_ASSIGNMENT_RESULTS_ANALYSIS,[\s\S]*assignment[\s\S]*\}\)/,
+  /exportPreparationView: buildAssignmentResultsExportPreparationView\(\{[\s\S]*activity,[\s\S]*analysis: analysis \?\? EMPTY_ASSIGNMENT_RESULTS_ANALYSIS,[\s\S]*assignment,[\s\S]*snapshot,[\s\S]*stats,/,
   'Assignment result header view should prepare CSV export coverage from the full assignment result scope.'
 );
 assert.match(
@@ -49006,50 +49033,20 @@ assert.deepEqual(
     headerExportPreparation: {
       description:
         'CSV export uses the full assignment result set, independent of the current search or review filter.',
-      itemViews: [
-        [
-          'attempts',
-          'Attempts',
-          '1',
-          'Completed attempt reviews included in the full export scope.',
-        ],
-        [
-          'students',
-          'Students',
-          '1',
-          'Student summary records included with latest, average, best, follow-up count, and last submitted fields.',
-        ],
-        [
-          'student-privacy',
-          'Student privacy',
-          'Protected',
-          'Student rows use normalized display labels; raw anonymous browser tokens are not exported.',
-        ],
-        [
-          'delivery-policy',
-          'Delivery fields',
-          '7',
-          'Delivery fields captured for offline records, including attempts, timer, identity, reveal, order, close time, and instructions when present.',
-        ],
-        [
-          'raw-settings',
-          'Raw settings',
-          '5',
-          'Raw publish-setting columns preserve booleans and numeric limits for spreadsheet filtering or SIS import.',
-        ],
-        [
-          'answer-rows',
-          'Answer rows',
-          '2',
-          'Rows prepared from every submitted answer, with empty-answer attempts kept aligned to the header.',
-        ],
-        [
-          'columns',
-          'Columns',
-          '54',
-          'CSV columns covering assignment, delivery, student summary, attempts, items, and answer details.',
-        ],
-      ],
+      itemViews: expectedAssignmentResultsExportPreparationRowsEn({
+        activitySnapshot: 'Quiz',
+        answerRows: '2',
+        attempts: '1',
+        deliveryAnswerReveal: 'After submit',
+        deliveryAttemptLimit: '2',
+        deliveryCloseTime: 'No close time',
+        deliveryIdentity: 'Names',
+        deliveryInstructions: 'None',
+        deliveryItemOrder: 'Shuffled',
+        deliveryTimer: '60',
+        itemPerformance: '2',
+        students: '1',
+      }),
       title: 'CSV export coverage',
     },
     headerDeliveryItems: [
@@ -50749,6 +50746,369 @@ function expectAssignmentResultsExportPreparationItemViews(
   }));
 }
 
+type ExpectedAssignmentResultsExportPreparationItem = Omit<
+  ReturnType<typeof buildAssignmentResultsExportPreparationView>['itemViews'][number],
+  'ariaLabel'
+>;
+
+type ExpectedAssignmentResultsExportPreparationValues = {
+  activitySnapshot: string;
+  answerRows: string;
+  attempts: string;
+  columns?: string;
+  deliveryAnswerReveal: string;
+  deliveryAttemptLimit: string;
+  deliveryCloseTime: string;
+  deliveryIdentity: string;
+  deliveryInstructions: string;
+  deliveryItemOrder: string;
+  deliveryTimer: string;
+  itemPerformance: string;
+  rawSettings?: string;
+  resultMetrics?: string;
+  students: string;
+};
+
+function expectedAssignmentResultsExportPreparationPrivacy() {
+  return {
+    exposesCopyArtifactText: false,
+    exposesCsvDataUrl: false,
+    exposesRawAnonymousToken: false,
+    exposesStudentAnswerText: false,
+    exposesTeacherAnswerText: false,
+    itemIds: [...ASSIGNMENT_RESULTS_EXPORT_PREPARATION_ITEM_IDS],
+    scope: 'full-assignment-results',
+  };
+}
+
+function expectedAssignmentResultsExportPreparationItemsEn({
+  activitySnapshot,
+  answerRows,
+  attempts,
+  columns = '54',
+  deliveryAnswerReveal,
+  deliveryAttemptLimit,
+  deliveryCloseTime,
+  deliveryIdentity,
+  deliveryInstructions,
+  deliveryItemOrder,
+  deliveryTimer,
+  itemPerformance,
+  rawSettings = '5',
+  resultMetrics = '4',
+  students,
+}: ExpectedAssignmentResultsExportPreparationValues): ExpectedAssignmentResultsExportPreparationItem[] {
+  return [
+    {
+      description:
+        'Export action uses full assignment results rather than the current review filters.',
+      id: 'export-scope',
+      label: 'Export scope',
+      value: 'Full assignment results',
+    },
+    {
+      description:
+        'Assignment id, title, share slug, status, and close time are included for offline records.',
+      id: 'assignment-context',
+      label: 'Assignment context',
+      value: 'Prepared',
+    },
+    {
+      description:
+        'Activity title, description, and template come from the frozen assignment snapshot when available.',
+      id: 'activity-snapshot',
+      label: 'Activity snapshot',
+      value: activitySnapshot,
+    },
+    {
+      description:
+        'Completed attempt reviews included in the full export scope.',
+      id: 'attempts',
+      label: 'Attempts',
+      value: attempts,
+    },
+    {
+      description:
+        'Student summary records included with latest, average, best, follow-up count, and last submitted fields.',
+      id: 'students',
+      label: 'Students',
+      value: students,
+    },
+    {
+      description:
+        'Student rows use normalized display labels; raw anonymous browser tokens are not exported.',
+      id: 'student-privacy',
+      label: 'Student privacy',
+      value: 'Protected',
+    },
+    {
+      description:
+        'Identity mode is exported as a display policy without raw anonymous browser tokens.',
+      id: 'delivery-identity',
+      label: 'Identity mode',
+      value: deliveryIdentity,
+    },
+    {
+      description:
+        'Answer reveal policy is exported so offline records explain whether students could review correct answers.',
+      id: 'delivery-answer-reveal',
+      label: 'Answer reveal',
+      value: deliveryAnswerReveal,
+    },
+    {
+      description:
+        'Shuffle or fixed-order policy is preserved next to item result rows.',
+      id: 'delivery-item-order',
+      label: 'Item order',
+      value: deliveryItemOrder,
+    },
+    {
+      description:
+        'Attempt limits are exported with the same assignment delivery formatting.',
+      id: 'delivery-attempt-limit',
+      label: 'Attempt limit',
+      value: deliveryAttemptLimit,
+    },
+    {
+      description:
+        'Timer seconds are exported beside normalized attempt durations.',
+      id: 'delivery-timer',
+      label: 'Timer',
+      value: deliveryTimer,
+    },
+    {
+      description:
+        'The scheduled close time is formatted with shared result date helpers.',
+      id: 'delivery-close-time',
+      label: 'Close time',
+      value: deliveryCloseTime,
+    },
+    {
+      description:
+        'Student instructions are included only as the teacher-published assignment instructions.',
+      id: 'delivery-instructions',
+      label: 'Instructions',
+      value: deliveryInstructions,
+    },
+    {
+      description:
+        'Raw publish-setting columns preserve booleans and numeric limits for spreadsheet filtering or SIS import.',
+      id: 'raw-settings',
+      label: 'Raw settings',
+      value: rawSettings,
+    },
+    {
+      description:
+        'Assignment metrics include completions, average accuracy, average points, and average duration.',
+      id: 'result-metrics',
+      label: 'Result metrics',
+      value: resultMetrics,
+    },
+    {
+      description:
+        'Item performance columns include correct rate, correct count, submitted count, and unanswered count.',
+      id: 'item-performance',
+      label: 'Item performance',
+      value: itemPerformance,
+    },
+    {
+      description:
+        'Rows prepared from every submitted answer, with empty-answer attempts kept aligned to the header.',
+      id: 'answer-rows',
+      label: 'Answer rows',
+      value: answerRows,
+    },
+    {
+      description:
+        'Primary expected answers are exported separately from alternatives for gradebook review.',
+      id: 'expected-answer',
+      label: 'Expected answer',
+      value: 'Primary answer column',
+    },
+    {
+      description:
+        'Accepted alternatives use the same answer parser as scoring and student review.',
+      id: 'accepted-alternatives',
+      label: 'Accepted alternatives',
+      value: 'Alternatives column',
+    },
+    {
+      description:
+        'CSV columns covering assignment, delivery, student summary, attempts, items, and answer details.',
+      id: 'columns',
+      label: 'Columns',
+      value: columns,
+    },
+  ];
+}
+
+function expectedAssignmentResultsExportPreparationRowsEn(
+  values: ExpectedAssignmentResultsExportPreparationValues
+) {
+  return expectedAssignmentResultsExportPreparationItemsEn(values).map(
+    ({ description, id, label, value }) => [id, label, value, description]
+  );
+}
+
+function expectedAssignmentResultsExportPreparationItemsZh({
+  activitySnapshot,
+  answerRows,
+  attempts,
+  columns = '54',
+  deliveryAnswerReveal,
+  deliveryAttemptLimit,
+  deliveryCloseTime,
+  deliveryIdentity,
+  deliveryInstructions,
+  deliveryItemOrder,
+  deliveryTimer,
+  itemPerformance,
+  rawSettings = '5',
+  resultMetrics = '4',
+  students,
+}: ExpectedAssignmentResultsExportPreparationValues): ExpectedAssignmentResultsExportPreparationItem[] {
+  return [
+    {
+      description: '导出操作使用完整作业结果，而不是当前复盘筛选。',
+      id: 'export-scope',
+      label: '导出范围',
+      value: '完整作业结果',
+    },
+    {
+      description:
+        '离线记录会包含作业 ID、标题、分享 slug、状态和关闭时间。',
+      id: 'assignment-context',
+      label: '作业上下文',
+      value: '已准备',
+    },
+    {
+      description:
+        '有冻结作业快照时，活动标题、说明和模板会来自快照。',
+      id: 'activity-snapshot',
+      label: '活动快照',
+      value: activitySnapshot,
+    },
+    {
+      description: '完整导出范围内包含的已完成作答复盘。',
+      id: 'attempts',
+      label: '作答',
+      value: attempts,
+    },
+    {
+      description:
+        '包含最近、平均、最佳、跟进数量和最近提交时间字段的学生汇总记录。',
+      id: 'students',
+      label: '学生',
+      value: students,
+    },
+    {
+      description: '学生行使用规范化显示标签，不导出原始匿名浏览器令牌。',
+      id: 'student-privacy',
+      label: '学生隐私',
+      value: '已保护',
+    },
+    {
+      description: '身份模式以显示策略导出，不包含原始匿名浏览器令牌。',
+      id: 'delivery-identity',
+      label: '身份模式',
+      value: deliveryIdentity,
+    },
+    {
+      description:
+        '导出答案显示策略，离线记录也能说明学生是否可查看正确答案。',
+      id: 'delivery-answer-reveal',
+      label: '答案显示',
+      value: deliveryAnswerReveal,
+    },
+    {
+      description: '题目乱序或固定顺序策略会和题目结果行一起保留。',
+      id: 'delivery-item-order',
+      label: '题目顺序',
+      value: deliveryItemOrder,
+    },
+    {
+      description: '作答次数限制会用同一套作业投放格式导出。',
+      id: 'delivery-attempt-limit',
+      label: '作答次数',
+      value: deliveryAttemptLimit,
+    },
+    {
+      description: '计时秒数会和规范化后的作答用时一起导出。',
+      id: 'delivery-timer',
+      label: '计时器',
+      value: deliveryTimer,
+    },
+    {
+      description: '计划关闭时间通过共享结果日期格式输出。',
+      id: 'delivery-close-time',
+      label: '关闭时间',
+      value: deliveryCloseTime,
+    },
+    {
+      description: '只导出老师发布到作业里的学生说明。',
+      id: 'delivery-instructions',
+      label: '学生说明',
+      value: deliveryInstructions,
+    },
+    {
+      description:
+        '原始发布设置列会保留布尔值和数字限制，便于表格筛选或导入校务系统。',
+      id: 'raw-settings',
+      label: '原始设置',
+      value: rawSettings,
+    },
+    {
+      description:
+        '作业指标包含完成数、平均正确率、平均得分和平均用时。',
+      id: 'result-metrics',
+      label: '结果指标',
+      value: resultMetrics,
+    },
+    {
+      description:
+        '题目表现列包含正确率、正确数、提交数和未作答数。',
+      id: 'item-performance',
+      label: '题目表现',
+      value: itemPerformance,
+    },
+    {
+      description:
+        '按每个已提交答案生成的行；无答案作答也会保留与表头对齐的空答案行。',
+      id: 'answer-rows',
+      label: '答案行',
+      value: answerRows,
+    },
+    {
+      description:
+        '主要预期答案会和替代答案分列导出，方便成绩册复核。',
+      id: 'expected-answer',
+      label: '预期答案',
+      value: '主答案列',
+    },
+    {
+      description:
+        '可接受替代答案使用与评分和学生回顾相同的答案解析器。',
+      id: 'accepted-alternatives',
+      label: '可接受替代',
+      value: '替代答案列',
+    },
+    {
+      description: '覆盖作业、投放规则、学生汇总、作答、题目和答案详情的 CSV 列。',
+      id: 'columns',
+      label: '列',
+      value: columns,
+    },
+  ];
+}
+
+function expectedAssignmentResultsExportPreparationRowsZh(
+  values: ExpectedAssignmentResultsExportPreparationValues
+) {
+  return expectedAssignmentResultsExportPreparationItemsZh(values).map(
+    ({ description, id, label, value }) => [id, label, value, description]
+  );
+}
+
 function expectAssignmentClassroomBriefStatViews(
   statViews: Array<
     Omit<
@@ -51097,57 +51457,23 @@ assert.deepEqual(
     exportPreparationView: {
       description:
         'CSV export uses the full assignment result set, independent of the current search or review filter.',
-      itemViews: expectAssignmentResultsExportPreparationItemViews([
-        {
-          description:
-            'Completed attempt reviews included in the full export scope.',
-          id: 'attempts',
-          label: 'Attempts',
-          value: '0',
-        },
-        {
-          description:
-            'Student summary records included with latest, average, best, follow-up count, and last submitted fields.',
-          id: 'students',
-          label: 'Students',
-          value: '0',
-        },
-        {
-          description:
-            'Student rows use normalized display labels; raw anonymous browser tokens are not exported.',
-          id: 'student-privacy',
-          label: 'Student privacy',
-          value: 'Protected',
-        },
-        {
-          description:
-            'Delivery fields captured for offline records, including attempts, timer, identity, reveal, order, close time, and instructions when present.',
-          id: 'delivery-policy',
-          label: 'Delivery fields',
-          value: '8',
-        },
-        {
-          description:
-            'Raw publish-setting columns preserve booleans and numeric limits for spreadsheet filtering or SIS import.',
-          id: 'raw-settings',
-          label: 'Raw settings',
-          value: '5',
-        },
-        {
-          description:
-            'Rows prepared from every submitted answer, with empty-answer attempts kept aligned to the header.',
-          id: 'answer-rows',
-          label: 'Answer rows',
-          value: '0',
-        },
-        {
-          description:
-            'CSV columns covering assignment, delivery, student summary, attempts, items, and answer details.',
-          id: 'columns',
-          label: 'Columns',
-          value: '54',
-        },
-      ]),
+      itemViews: expectAssignmentResultsExportPreparationItemViews(
+        expectedAssignmentResultsExportPreparationItemsEn({
+          activitySnapshot: 'Line match',
+          answerRows: '0',
+          attempts: '0',
+          deliveryAnswerReveal: 'Hidden',
+          deliveryAttemptLimit: '2',
+          deliveryCloseTime: '2026年7月1日 08:00',
+          deliveryIdentity: 'Anonymous',
+          deliveryInstructions: 'Present',
+          deliveryItemOrder: 'Fixed order',
+          deliveryTimer: '120',
+          itemPerformance: '0',
+          students: '0',
+        })
+      ),
+      privacy: expectedAssignmentResultsExportPreparationPrivacy(),
       title: 'CSV export coverage',
     },
     printAction: {
@@ -51212,57 +51538,23 @@ assert.deepEqual(
     exportPreparationView: {
       description:
         'CSV export uses the full assignment result set, independent of the current search or review filter.',
-      itemViews: expectAssignmentResultsExportPreparationItemViews([
-        {
-          description:
-            'Completed attempt reviews included in the full export scope.',
-          id: 'attempts',
-          label: 'Attempts',
-          value: '0',
-        },
-        {
-          description:
-            'Student summary records included with latest, average, best, follow-up count, and last submitted fields.',
-          id: 'students',
-          label: 'Students',
-          value: '0',
-        },
-        {
-          description:
-            'Student rows use normalized display labels; raw anonymous browser tokens are not exported.',
-          id: 'student-privacy',
-          label: 'Student privacy',
-          value: 'Protected',
-        },
-        {
-          description:
-            'Delivery fields captured for offline records, including attempts, timer, identity, reveal, order, close time, and instructions when present.',
-          id: 'delivery-policy',
-          label: 'Delivery fields',
-          value: '6',
-        },
-        {
-          description:
-            'Raw publish-setting columns preserve booleans and numeric limits for spreadsheet filtering or SIS import.',
-          id: 'raw-settings',
-          label: 'Raw settings',
-          value: '5',
-        },
-        {
-          description:
-            'Rows prepared from every submitted answer, with empty-answer attempts kept aligned to the header.',
-          id: 'answer-rows',
-          label: 'Answer rows',
-          value: '0',
-        },
-        {
-          description:
-            'CSV columns covering assignment, delivery, student summary, attempts, items, and answer details.',
-          id: 'columns',
-          label: 'Columns',
-          value: '54',
-        },
-      ]),
+      itemViews: expectAssignmentResultsExportPreparationItemViews(
+        expectedAssignmentResultsExportPreparationItemsEn({
+          activitySnapshot: 'Quiz',
+          answerRows: '0',
+          attempts: '0',
+          deliveryAnswerReveal: 'After submit',
+          deliveryAttemptLimit: '2',
+          deliveryCloseTime: '2026年5月1日 08:00',
+          deliveryIdentity: 'Names',
+          deliveryInstructions: 'None',
+          deliveryItemOrder: 'Shuffled',
+          deliveryTimer: 'No timer',
+          itemPerformance: '0',
+          students: '0',
+        })
+      ),
+      privacy: expectedAssignmentResultsExportPreparationPrivacy(),
       title: 'CSV export coverage',
     },
     printAction: {
@@ -54357,50 +54649,20 @@ assert.deepEqual(
   {
     description:
       'CSV export uses the full assignment result set, independent of the current search or review filter.',
-    itemViews: [
-      [
-        'attempts',
-        'Attempts',
-        '3',
-        'Completed attempt reviews included in the full export scope.',
-      ],
-      [
-        'students',
-        'Students',
-        '2',
-        'Student summary records included with latest, average, best, follow-up count, and last submitted fields.',
-      ],
-      [
-        'student-privacy',
-        'Student privacy',
-        'Protected',
-        'Student rows use normalized display labels; raw anonymous browser tokens are not exported.',
-      ],
-      [
-        'delivery-policy',
-        'Delivery fields',
-        '8',
-        'Delivery fields captured for offline records, including attempts, timer, identity, reveal, order, close time, and instructions when present.',
-      ],
-      [
-        'raw-settings',
-        'Raw settings',
-        '5',
-        'Raw publish-setting columns preserve booleans and numeric limits for spreadsheet filtering or SIS import.',
-      ],
-      [
-        'answer-rows',
-        'Answer rows',
-        '6',
-        'Rows prepared from every submitted answer, with empty-answer attempts kept aligned to the header.',
-      ],
-      [
-        'columns',
-        'Columns',
-        '54',
-        'CSV columns covering assignment, delivery, student summary, attempts, items, and answer details.',
-      ],
-    ],
+    itemViews: expectedAssignmentResultsExportPreparationRowsEn({
+      activitySnapshot: 'Quiz',
+      answerRows: '6',
+      attempts: '3',
+      deliveryAnswerReveal: 'After submit',
+      deliveryAttemptLimit: '2',
+      deliveryCloseTime: '2026年1月10日 18:00',
+      deliveryIdentity: 'Names',
+      deliveryInstructions: 'Present',
+      deliveryItemOrder: 'Fixed order',
+      deliveryTimer: '60',
+      itemPerformance: '2',
+      students: '2',
+    }),
     title: 'CSV export coverage',
   }
 );
@@ -54421,50 +54683,20 @@ try {
     },
     {
       description: 'CSV 导出使用完整作业结果，不受当前搜索或复盘筛选影响。',
-      itemViews: [
-        [
-          'attempts',
-          '作答',
-          '3',
-          '完整导出范围内包含的已完成作答复盘。',
-        ],
-        [
-          'students',
-          '学生',
-          '2',
-          '包含最近、平均、最佳、跟进数量和最近提交时间字段的学生汇总记录。',
-        ],
-        [
-          'student-privacy',
-          '学生隐私',
-          '已保护',
-          '学生行使用规范化显示标签，不导出原始匿名浏览器令牌。',
-        ],
-        [
-          'delivery-policy',
-          '投放字段',
-          '8',
-          '为离线记录保留作答次数、计时器、身份、答案显示、题目顺序、关闭时间以及有内容时的说明。',
-        ],
-        [
-          'raw-settings',
-          '原始设置',
-          '5',
-          '原始发布设置列会保留布尔值和数字限制，便于表格筛选或导入校务系统。',
-        ],
-        [
-          'answer-rows',
-          '答案行',
-          '6',
-          '按每个已提交答案生成的行；无答案作答也会保留与表头对齐的空答案行。',
-        ],
-        [
-          'columns',
-          '列',
-          '54',
-          '覆盖作业、投放规则、学生汇总、作答、题目和答案详情的 CSV 列。',
-        ],
-      ],
+      itemViews: expectedAssignmentResultsExportPreparationRowsZh({
+        activitySnapshot: '测验',
+        answerRows: '6',
+        attempts: '3',
+        deliveryAnswerReveal: '提交后显示',
+        deliveryAttemptLimit: '2',
+        deliveryCloseTime: '2026年1月10日 18:00',
+        deliveryIdentity: '姓名',
+        deliveryInstructions: '有',
+        deliveryItemOrder: '固定顺序',
+        deliveryTimer: '60',
+        itemPerformance: '2',
+        students: '2',
+      }),
       title: 'CSV 导出覆盖范围',
     }
   );
