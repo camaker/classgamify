@@ -408,8 +408,13 @@ import {
 } from '@/activities/editor';
 import {
   buildQuestionChoiceReadinessSummary,
+  buildQuestionChoiceGenerationHandoffView,
   buildQuestionChoices,
   DEFAULT_QUESTION_CHOICE_COUNT,
+  QUESTION_CHOICE_GENERATION_HANDOFF_ITEM_IDS,
+  type QuestionChoiceGenerationHandoffItemId,
+  type QuestionChoiceGenerationHandoffItemView,
+  type QuestionChoiceGenerationHandoffView,
 } from '@/activities/distractors';
 import { buildQuestionOptionTexts } from '@/activities/question-options';
 import {
@@ -1198,6 +1203,48 @@ function expectActivityDraftMetaHandoffPrivacy(
     requiresTeacherReview: true,
     savesActivityWithoutTeacherAction: false,
     scope: 'teacher-reviewed-ai-draft',
+  });
+}
+
+function findQuestionChoiceGenerationHandoffItem<
+  T extends Pick<QuestionChoiceGenerationHandoffItemView, 'id'>,
+>({
+  id,
+  itemViews,
+}: {
+  id: QuestionChoiceGenerationHandoffItemId;
+  itemViews: readonly T[];
+}): T {
+  const itemView = itemViews.find((candidate) => candidate.id === id);
+
+  assert.ok(
+    itemView,
+    `Expected question choice generation handoff item "${id}".`
+  );
+
+  return itemView;
+}
+
+function expectQuestionChoiceGenerationHandoffPrivacy(
+  view: QuestionChoiceGenerationHandoffView
+) {
+  const itemIds = view.itemViews.map((itemView) => itemView.id);
+
+  assert.deepEqual(itemIds, [...QUESTION_CHOICE_GENERATION_HANDOFF_ITEM_IDS]);
+  assert.equal(new Set(itemIds).size, 20);
+  assert.deepEqual(view.privacy, {
+    appliesBeforeActivitySave: true,
+    exposesAnswerText: false,
+    exposesOptionText: false,
+    exposesQuestionPromptText: false,
+    exposesRawAiOutput: false,
+    itemIds,
+    persistsActivityWithoutTeacherAction: false,
+    publishesAssignmentWithoutTeacherAction: false,
+    requiresTeacherReview: true,
+    scope: 'teacher-reviewed-quiz-choice-generation',
+    usesQuestionOptionStructure: true,
+    writeTarget: 'ActivityQuestion.options',
   });
 }
 
@@ -5584,9 +5631,14 @@ assert.match(
   /ActivityTemplateReadinessPanelSummary[\s\S]*ActivityTemplateReadinessPanelOption[\s\S]*ActivityTemplateReadinessPanelLockedOption[\s\S]*ActivityTemplateQuizChoiceReadinessView[\s\S]*ActivityTemplateQuizChoiceReadinessItemView/,
   'Template-readiness panel should import explicit summary, option, locked-option, and quiz-choice child contracts.'
 );
+assert.match(
+  activityTemplateReadinessPanelSource,
+  /QuestionChoiceGenerationHandoffItemView[\s\S]*QuestionChoiceGenerationHandoffView/,
+  'Template-readiness panel should import explicit question choice generation handoff contracts.'
+);
 assert.doesNotMatch(
   activityTemplateReadinessPanelSource,
-  /ActivityTemplateReadinessPanelSummary\['readyOptions'\]\[number\]|NonNullable<\s*ActivityTemplateReadinessPanelSummary\['questionChoiceReadiness'\]|ActivityTemplateQuizChoiceReadiness\['itemViews'\]\[number\]/,
+  /ActivityTemplateReadinessPanelSummary\['readyOptions'\]\[number\]|NonNullable<\s*ActivityTemplateReadinessPanelSummary\['questionChoiceReadiness'\]|ActivityTemplateQuizChoiceReadiness\['itemViews'\]\[number\]|ActivityTemplateQuizChoiceReadinessView\['generationHandoffView'\]/,
   'Template-readiness panel should not infer child props from aggregate summary indexes or NonNullable.'
 );
 assert.match(
@@ -5614,9 +5666,24 @@ assert.match(
   /questionChoiceReadiness[\s\S]*summaryLabel[\s\S]*itemViews[\s\S]*statusLabel[\s\S]*sourceLabel/,
   'Activity template readiness panel should render prepared quiz choice diagnostics from the view model.'
 );
+assert.match(
+  activityTemplateReadinessPanelSource,
+  /ActivityTemplateQuizChoiceGenerationHandoff[\s\S]*handoffView=\{readiness\.generationHandoffView\}/,
+  'Activity template readiness panel should delegate quiz choice generation handoff rendering.'
+);
+assert.match(
+  activityTemplateReadinessPanelSource,
+  /function ActivityTemplateQuizChoiceGenerationHandoff[\s\S]*handoffView\.title[\s\S]*handoffView\.description[\s\S]*handoffView\.itemViews\.map[\s\S]*ActivityTemplateQuizChoiceGenerationHandoffItem[\s\S]*key=\{item\.id\}/,
+  'Activity template readiness panel should render prepared quiz choice generation handoff views.'
+);
+assert.match(
+  activityTemplateReadinessPanelSource,
+  /function ActivityTemplateQuizChoiceGenerationHandoffItem[\s\S]*item\.label[\s\S]*<output aria-label=\{item\.ariaLabel\}>\{item\.value\}<\/output>[\s\S]*item\.description/,
+  'Activity template readiness panel should render quiz choice generation handoff items with label, output, and description.'
+);
 assert.doesNotMatch(
   activityTemplateReadinessPanelSource,
-  /Quiz choice readiness|Needs candidates|Completed locally|Explicit choices|测验选项|需要候选项|本地已补齐|显式选项/,
+  /Quiz choice readiness|Needs candidates|Completed locally|Explicit choices|Quiz choice generation handoff|Question options|測验选项|测验选项|需要候选项|本地已补齐|显式选项|测验选项生成交接|题目选项/,
   'Activity template readiness panel should not hard-code visible quiz choice readiness labels.'
 );
 assert.doesNotMatch(
@@ -13597,6 +13664,21 @@ assert.match(
   activityDistractorsSource,
   /siblingAnswerCandidateCount[\s\S]*vocabularyCandidateCount/,
   'Question choice diagnostics should preserve candidate source counts for teacher-facing explanations.'
+);
+assert.match(
+  activityDistractorsSource,
+  /export const QUESTION_CHOICE_GENERATION_HANDOFF_ITEM_IDS = \[[\s\S]*'generation-scope'[\s\S]*'target-choice-count'[\s\S]*'question-count'[\s\S]*'ready-question-count'[\s\S]*'explicit-ready-count'[\s\S]*'completed-locally-count'[\s\S]*'needs-candidates-count'[\s\S]*'explicit-choice-count'[\s\S]*'deterministic-choice-count'[\s\S]*'missing-choice-count'[\s\S]*'sibling-answer-candidates'[\s\S]*'vocabulary-candidates'[\s\S]*'candidate-source-count'[\s\S]*'answer-coverage-count'[\s\S]*'missing-answer-count'[\s\S]*'option-structure'[\s\S]*'generation-mode'[\s\S]*'write-target'[\s\S]*'teacher-review'[\s\S]*'publish-boundary'/,
+  'Question choice generation should expose 20 stable handoff item ids.'
+);
+assert.match(
+  activityDistractorsSource,
+  /export type QuestionChoiceGenerationHandoffPrivacyContract = \{[\s\S]*appliesBeforeActivitySave: true;[\s\S]*exposesAnswerText: false;[\s\S]*exposesOptionText: false;[\s\S]*exposesQuestionPromptText: false;[\s\S]*exposesRawAiOutput: false;[\s\S]*persistsActivityWithoutTeacherAction: false;[\s\S]*publishesAssignmentWithoutTeacherAction: false;[\s\S]*requiresTeacherReview: true;[\s\S]*scope: 'teacher-reviewed-quiz-choice-generation';[\s\S]*usesQuestionOptionStructure: true;[\s\S]*writeTarget: 'ActivityQuestion.options';/,
+  'Question choice generation handoff should keep AI distractor privacy and write-target constraints explicit.'
+);
+assert.match(
+  activityDistractorsSource,
+  /buildQuestionChoiceGenerationHandoffView[\s\S]*buildQuestionChoiceReadinessSummary[\s\S]*buildQuestionChoiceGenerationHandoffSummary[\s\S]*QUESTION_CHOICE_GENERATION_HANDOFF_ITEM_IDS\.map/,
+  'Question choice generation handoff should derive semantic slices from the shared readiness summary.'
 );
 
 assert.equal(isStudentAnswerFilled(undefined), false);
@@ -39212,6 +39294,73 @@ assert.deepEqual(choiceCompletionReadiness.items[0], {
   targetCount: 4,
   vocabularyCandidateCount: 2,
 });
+const choiceGenerationHandoff = buildQuestionChoiceGenerationHandoffView({
+  summary: choiceCompletionReadiness,
+});
+expectQuestionChoiceGenerationHandoffPrivacy(choiceGenerationHandoff);
+assert.equal(
+  findQuestionChoiceGenerationHandoffItem({
+    id: 'generation-scope',
+    itemViews: choiceGenerationHandoff.itemViews,
+  }).value,
+  'Editor before save'
+);
+assert.equal(
+  findQuestionChoiceGenerationHandoffItem({
+    id: 'target-choice-count',
+    itemViews: choiceGenerationHandoff.itemViews,
+  }).value,
+  '4'
+);
+assert.equal(
+  findQuestionChoiceGenerationHandoffItem({
+    id: 'question-count',
+    itemViews: choiceGenerationHandoff.itemViews,
+  }).value,
+  '3'
+);
+assert.equal(
+  findQuestionChoiceGenerationHandoffItem({
+    id: 'ready-question-count',
+    itemViews: choiceGenerationHandoff.itemViews,
+  }).value,
+  '3'
+);
+assert.equal(
+  findQuestionChoiceGenerationHandoffItem({
+    id: 'completed-locally-count',
+    itemViews: choiceGenerationHandoff.itemViews,
+  }).value,
+  '3'
+);
+assert.equal(
+  findQuestionChoiceGenerationHandoffItem({
+    id: 'option-structure',
+    itemViews: choiceGenerationHandoff.itemViews,
+  }).value,
+  'ActivityQuestionOption[]'
+);
+assert.equal(
+  findQuestionChoiceGenerationHandoffItem({
+    id: 'write-target',
+    itemViews: choiceGenerationHandoff.itemViews,
+  }).value,
+  'Question options'
+);
+assert.equal(
+  findQuestionChoiceGenerationHandoffItem({
+    id: 'teacher-review',
+    itemViews: choiceGenerationHandoff.itemViews,
+  }).value,
+  'Review before save'
+);
+assert.equal(
+  findQuestionChoiceGenerationHandoffItem({
+    id: 'publish-boundary',
+    itemViews: choiceGenerationHandoff.itemViews,
+  }).value,
+  'Save before publish'
+);
 const explicitChoiceReadinessContent = buildActivityContent({
   description: 'Explicit quiz choices',
   difficulty: 'starter',
@@ -39274,6 +39423,31 @@ assert.deepEqual(sparseChoiceReadiness.items[0], {
   targetCount: 4,
   vocabularyCandidateCount: 0,
 });
+const sparseChoiceGenerationHandoff = buildQuestionChoiceGenerationHandoffView({
+  summary: sparseChoiceReadiness,
+});
+expectQuestionChoiceGenerationHandoffPrivacy(sparseChoiceGenerationHandoff);
+assert.equal(
+  findQuestionChoiceGenerationHandoffItem({
+    id: 'ready-question-count',
+    itemViews: sparseChoiceGenerationHandoff.itemViews,
+  }).value,
+  '0'
+);
+assert.equal(
+  findQuestionChoiceGenerationHandoffItem({
+    id: 'needs-candidates-count',
+    itemViews: sparseChoiceGenerationHandoff.itemViews,
+  }).value,
+  '1'
+);
+assert.equal(
+  findQuestionChoiceGenerationHandoffItem({
+    id: 'missing-choice-count',
+    itemViews: sparseChoiceGenerationHandoff.itemViews,
+  }).value,
+  '3'
+);
 const normalizedChoiceReadinessContent = buildActivityContent({
   description: 'Normalized quiz choices',
   difficulty: 'starter',
@@ -41372,6 +41546,9 @@ assert.deepEqual(
       description:
         'Each quiz question should have 4 playable choices. Missing distractors can be completed from sibling answers and vocabulary before AI distractor generation is connected.',
       emptyText: 'Add quiz questions to inspect choice readiness.',
+      generationHandoffView: buildQuestionChoiceGenerationHandoffView({
+        content: questionOnlyContent,
+      }),
       itemViews: [
         {
           detail:
@@ -41425,6 +41602,19 @@ assert.equal(
   questionOnlyEditorReadinessSummary.questionChoiceReadiness?.itemViews[0]
     ?.statusLabel,
   'Needs candidates'
+);
+assert.ok(questionOnlyEditorReadinessSummary.questionChoiceReadiness);
+expectQuestionChoiceGenerationHandoffPrivacy(
+  questionOnlyEditorReadinessSummary.questionChoiceReadiness.generationHandoffView
+);
+assert.equal(
+  findQuestionChoiceGenerationHandoffItem({
+    id: 'needs-candidates-count',
+    itemViews:
+      questionOnlyEditorReadinessSummary.questionChoiceReadiness
+        .generationHandoffView.itemViews,
+  }).value,
+  '2'
 );
 assert.equal(getActivityTemplateQuizChoiceReadinessItemPosition(0), 1);
 assert.equal(getActivityTemplateQuizChoiceReadinessItemPosition(2.9), 3);

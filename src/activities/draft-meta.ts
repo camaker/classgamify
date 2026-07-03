@@ -3,7 +3,9 @@ import {
   getTemplateRemixPlan,
 } from '@/activities/template-remix';
 import {
+  buildQuestionChoiceGenerationHandoffView,
   buildQuestionChoiceReadinessSummary,
+  type QuestionChoiceGenerationHandoffView,
   type QuestionChoiceReadinessItem,
   type QuestionChoiceReadinessStatus,
   type QuestionChoiceReadinessSummary,
@@ -116,6 +118,7 @@ export type ActivityTemplateReadinessPanelSummary = {
 export type ActivityTemplateQuizChoiceReadinessView = {
   description: string;
   emptyText: string;
+  generationHandoffView: QuestionChoiceGenerationHandoffView;
   itemViews: ActivityTemplateQuizChoiceReadinessItemView[];
   summaryLabel: string;
   title: string;
@@ -1784,6 +1787,9 @@ function buildActivityTemplateQuizChoiceReadinessView(
       targetCount: summary.targetCount,
     }),
     emptyText: m.activity_template_readiness_panel_quiz_choices_empty(),
+    generationHandoffView: buildQuestionChoiceGenerationHandoffView({
+      summary,
+    }),
     itemViews: summary.items.map((item, index) =>
       buildActivityTemplateQuizChoiceReadinessItemView({ index, item })
     ),
