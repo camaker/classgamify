@@ -5813,13 +5813,28 @@ assert.doesNotMatch(
 );
 assert.match(
   homeRouteSource,
-  /pageView\.hero\.primaryAction\.to[\s\S]*pageView\.hero\.primaryAction\.label[\s\S]*pageView\.hero\.browseTemplatesAction\.to[\s\S]*pageView\.hero\.browseTemplatesAction\.label/,
+  /pageView\.hero\.primaryAction\.to[\s\S]*pageView\.hero\.primaryAction\.ariaLabel[\s\S]*pageView\.hero\.primaryAction\.label[\s\S]*pageView\.hero\.browseTemplatesAction\.to[\s\S]*pageView\.hero\.browseTemplatesAction\.ariaLabel[\s\S]*pageView\.hero\.browseTemplatesAction\.label[\s\S]*pageView\.hero\.worksheetAction\.to[\s\S]*pageView\.hero\.worksheetAction\.ariaLabel[\s\S]*pageView\.hero\.worksheetAction\.label/,
   'Home route should render prepared hero CTA actions.'
 );
 assert.doesNotMatch(
   homeRouteSource,
-  /Routes\.(Create|Templates)/,
+  /Routes\.(Create|Templates|Worksheets)/,
   'Home route should not hardcode hero CTA route targets.'
+);
+assert.match(
+  homeRouteSource,
+  /aria-label=\{pageView\.signalPanel\.ariaLabel\}[\s\S]*pageView\.signalPanel\.title[\s\S]*pageView\.signalPanel\.description[\s\S]*pageView\.signals\.map[\s\S]*signal=\{signal\}/,
+  'Home route should render the prepared classroom-loop signal panel.'
+);
+assert.match(
+  homeRouteSource,
+  /<dl aria-label=\{signal\.ariaLabel\}[\s\S]*<dt[\s\S]*signal\.label[\s\S]*<output[\s\S]*signal\.value[\s\S]*signal\.description/s,
+  'Home route signals should render prepared label/value/description semantics.'
+);
+assert.match(
+  homeRouteSource,
+  /aria-label=\{pageView\.featureSection\.ariaLabel\}[\s\S]*pageView\.featureSection\.eyebrowLabel[\s\S]*pageView\.featureSection\.title[\s\S]*pageView\.featureSection\.description[\s\S]*<article[\s\S]*aria-label=\{item\.ariaLabel\}/,
+  'Home route should render the prepared feature section and card aria labels.'
 );
 assert.match(
   homeRouteSource,
@@ -5838,8 +5853,18 @@ assert.match(
 );
 assert.match(
   publicPageViewSource,
-  /export function buildHomePageViewModel\(\{[\s\S]*preview = buildHomePageStarterPreview\(\)[\s\S]*preview\?: HomePagePreviewView;[\s\S]*preview,[\s\S]*signals:/,
-  'Home page view model should own the default starter preview composition.'
+  /export function buildHomePageViewModel\(\{[\s\S]*preview = buildHomePageStarterPreview\(\)[\s\S]*preview\?: HomePagePreviewView;[\s\S]*featureSection:[\s\S]*preview,[\s\S]*signalPanel:[\s\S]*signals:/,
+  'Home page view model should own the default starter preview and semantic section composition.'
+);
+assert.match(
+  publicPageViewSource,
+  /type HomePageFeature = \{[\s\S]*ariaLabel: string;[\s\S]*description: string;[\s\S]*id: HomePageFeatureId;[\s\S]*title: string;[\s\S]*type HomePageSignal = \{[\s\S]*ariaLabel: string;[\s\S]*description: string;[\s\S]*id: HomePageSignalId;[\s\S]*label: string;[\s\S]*value: string;/,
+  'Home page feature and signal views should expose prepared semantic labels and descriptions.'
+);
+assert.match(
+  publicPageViewSource,
+  /worksheetAction:[\s\S]*ariaLabel: m\.home_hero_secondary_aria_label\(\)[\s\S]*label: m\.home_hero_secondary\(\)[\s\S]*to: Routes\.Worksheets/,
+  'Home page view model should expose a prepared worksheet CTA action.'
 );
 assert.match(
   publicPageViewSource,
@@ -31634,49 +31659,105 @@ assert.deepEqual(
 assert.deepEqual(buildHomePageViewModel({ preview: homePageStarterPreview }), {
   features: [
     {
+      ariaLabel:
+        'Structured activities: Build reusable questions, pairs, groups, vocabulary, learning goals, and teacher notes in one structured editor.',
       description:
         'Build reusable questions, pairs, groups, vocabulary, learning goals, and teacher notes in one structured editor.',
       id: 'teacher-workflows',
       title: 'Structured activities',
     },
     {
+      ariaLabel:
+        'Template switching: Render the same content as quiz, matching games, line matching, group sorting, fill-in, listening, pair matching, or box reveals.',
       description:
         'Render the same content as quiz, matching games, line matching, group sorting, fill-in, listening, pair matching, or box reveals.',
       id: 'activity-templates',
       title: 'Template switching',
     },
     {
+      ariaLabel:
+        'Assignment links: Publish student links with attempt limits, timers, answer reveal, shuffle, and close-time settings.',
       description:
         'Publish student links with attempt limits, timers, answer reveal, shuffle, and close-time settings.',
       id: 'assignment-links',
       title: 'Assignment links',
     },
     {
+      ariaLabel:
+        'Teacher results: Review scores, item performance, accepted answers, reteach priorities, and student follow-up summaries.',
       description:
         'Review scores, item performance, accepted answers, reteach priorities, and student follow-up summaries.',
       id: 'results',
       title: 'Teacher results',
     },
   ],
+  featureSection: {
+    ariaLabel:
+      'Activity tools: Core tools for turning lesson material into a repeatable classroom activity workflow.',
+    description:
+      'Core tools for turning lesson material into a repeatable classroom activity workflow.',
+    eyebrowLabel: 'Classroom loop',
+    title: 'Activity tools',
+  },
   hero: {
     badgeLabel: 'Wordwall-style classroom activities',
     browseTemplatesAction: {
+      ariaLabel: 'Browse ClassGamify templates before creating an activity.',
       label: 'Browse templates',
       to: Routes.Templates,
     },
     description:
       'Create game-based classroom activities, publish assignment links, and review student attempts from the same structured content.',
     primaryAction: {
+      ariaLabel:
+        'Create a reusable ClassGamify activity in the shared editor.',
       label: 'Create activity',
       to: Routes.Create,
+    },
+    worksheetAction: {
+      ariaLabel:
+        'Create a Liveworksheets-style activity from worksheet modes.',
+      label: 'Create worksheet',
+      to: Routes.Worksheets,
     },
     title: 'Make classroom practice feel like a game',
   },
   preview: homePageStarterPreview,
+  signalPanel: {
+    ariaLabel:
+      'Classroom loop signals: Homepage signals for templates, share-link delivery, and result review.',
+    description:
+      'Homepage signals for templates, share-link delivery, and result review.',
+    title: 'Classroom loop signals',
+  },
   signals: [
-    { id: 'templates', label: 'Templates', value: '8 first' },
-    { id: 'delivery', label: 'Delivery', value: 'Share link' },
-    { id: 'results', label: 'Results', value: 'Attempt log' },
+    {
+      ariaLabel:
+        'Templates: 8 first. Start from quizzes, matching activities, category sorting, fill-in practice, listening prompts, pair matching, line matching, and reveal boxes.',
+      description:
+        'Start from quizzes, matching activities, category sorting, fill-in practice, listening prompts, pair matching, line matching, and reveal boxes.',
+      id: 'templates',
+      label: 'Templates',
+      value: '8 first',
+    },
+    {
+      ariaLabel:
+        'Delivery: Share link. Publish assignment links that keep the activity snapshot and delivery rules together.',
+      description:
+        'Publish assignment links that keep the activity snapshot and delivery rules together.',
+      id: 'delivery',
+      label: 'Delivery',
+      value: 'Share link',
+    },
+    {
+      ariaLabel:
+        'Results: Attempt log. Review student attempts, scores, accepted answers, and reteach signals after submission.',
+      description:
+        'Review student attempts, scores, accepted answers, and reteach signals after submission.',
+      id: 'results',
+      label: 'Results',
+      value: 'Attempt log',
+    },
   ],
 });
 assert.equal(buildHomePageViewModel().preview.source, 'starter-preview');

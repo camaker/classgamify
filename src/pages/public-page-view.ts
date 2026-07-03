@@ -13,18 +13,22 @@ import type {
 } from '@/activities/types';
 
 type PublicPageRouteAction = {
+  ariaLabel: string;
   label: string;
   to:
     | typeof Routes.ContactClassroom
     | typeof Routes.Create
+    | typeof Routes.Worksheets
     | typeof Routes.StudentPreview
     | typeof Routes.Templates;
 };
 
 export type HomePageViewModel = {
   features: HomePageFeature[];
+  featureSection: HomePageFeatureSectionView;
   hero: HomePageHeroView;
   preview: HomePagePreviewView;
+  signalPanel: HomePageSignalPanelView;
   signals: HomePageSignal[];
 };
 
@@ -35,8 +39,16 @@ export type HomePageFeatureId =
   | 'teacher-workflows';
 
 type HomePageFeature = {
+  ariaLabel: string;
   description: string;
   id: HomePageFeatureId;
+  title: string;
+};
+
+type HomePageFeatureSectionView = {
+  ariaLabel: string;
+  description: string;
+  eyebrowLabel: string;
   title: string;
 };
 
@@ -45,6 +57,7 @@ type HomePageHeroView = {
   browseTemplatesAction: PublicPageRouteAction;
   description: string;
   primaryAction: PublicPageRouteAction;
+  worksheetAction: PublicPageRouteAction;
   title: string;
 };
 
@@ -57,9 +70,17 @@ export type HomePagePreviewView = {
 export type HomePageSignalId = 'delivery' | 'results' | 'templates';
 
 type HomePageSignal = {
+  ariaLabel: string;
+  description: string;
   id: HomePageSignalId;
   label: string;
   value: string;
+};
+
+type HomePageSignalPanelView = {
+  ariaLabel: string;
+  description: string;
+  title: string;
 };
 
 export type RoadmapPageViewModel = {
@@ -285,60 +306,129 @@ export function buildHomePageViewModel({
 }: {
   preview?: HomePagePreviewView;
 } = {}): HomePageViewModel {
+  const featureSectionTitle = m.home_features_title();
+  const featureSectionDescription = m.home_features_description();
+  const signalPanelTitle = m.home_signal_panel_title();
+  const signalPanelDescription = m.home_signal_panel_description();
+
   return {
     features: [
-      {
+      buildHomePageFeatureView({
         description: m.home_features_items_item_1_description(),
         id: 'teacher-workflows',
         title: m.home_features_items_item_1_title(),
-      },
-      {
+      }),
+      buildHomePageFeatureView({
         description: m.home_features_items_item_2_description(),
         id: 'activity-templates',
         title: m.home_features_items_item_2_title(),
-      },
-      {
+      }),
+      buildHomePageFeatureView({
         description: m.home_features_items_item_3_description(),
         id: 'assignment-links',
         title: m.home_features_items_item_3_title(),
-      },
-      {
+      }),
+      buildHomePageFeatureView({
         description: m.home_features_items_item_4_description(),
         id: 'results',
         title: m.home_features_items_item_4_title(),
-      },
+      }),
     ],
+    featureSection: {
+      ariaLabel: m.home_feature_section_aria_label({
+        description: featureSectionDescription,
+        title: featureSectionTitle,
+      }),
+      description: featureSectionDescription,
+      eyebrowLabel: m.home_features_subtitle(),
+      title: featureSectionTitle,
+    },
     hero: {
       badgeLabel: m.home_hero_introduction(),
       browseTemplatesAction: {
+        ariaLabel: m.home_hero_browse_templates_aria_label(),
         label: m.home_hero_browse_templates(),
         to: Routes.Templates,
       },
       description: m.home_hero_description(),
       primaryAction: {
+        ariaLabel: m.home_hero_primary_aria_label(),
         label: m.home_hero_primary(),
         to: Routes.Create,
+      },
+      worksheetAction: {
+        ariaLabel: m.home_hero_secondary_aria_label(),
+        label: m.home_hero_secondary(),
+        to: Routes.Worksheets,
       },
       title: m.home_hero_title(),
     },
     preview,
+    signalPanel: {
+      ariaLabel: m.home_signal_panel_aria_label({
+        description: signalPanelDescription,
+        title: signalPanelTitle,
+      }),
+      description: signalPanelDescription,
+      title: signalPanelTitle,
+    },
     signals: [
-      {
+      buildHomePageSignalView({
+        description: m.home_signal_templates_description(),
         id: 'templates',
         label: m.home_signal_templates_label(),
         value: m.home_signal_templates_value(),
-      },
-      {
+      }),
+      buildHomePageSignalView({
+        description: m.home_signal_delivery_description(),
         id: 'delivery',
         label: m.home_signal_delivery_label(),
         value: m.home_signal_delivery_value(),
-      },
-      {
+      }),
+      buildHomePageSignalView({
+        description: m.home_signal_results_description(),
         id: 'results',
         label: m.home_signal_results_label(),
         value: m.home_signal_results_value(),
-      },
+      }),
     ],
+  };
+}
+
+function buildHomePageFeatureView({
+  description,
+  id,
+  title,
+}: {
+  description: string;
+  id: HomePageFeatureId;
+  title: string;
+}): HomePageFeature {
+  return {
+    ariaLabel: m.home_feature_aria_label({ description, title }),
+    description,
+    id,
+    title,
+  };
+}
+
+function buildHomePageSignalView({
+  description,
+  id,
+  label,
+  value,
+}: {
+  description: string;
+  id: HomePageSignalId;
+  label: string;
+  value: string;
+}): HomePageSignal {
+  return {
+    ariaLabel: m.home_signal_aria_label({ description, label, value }),
+    description,
+    id,
+    label,
+    value,
   };
 }
 

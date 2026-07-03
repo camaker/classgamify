@@ -75,6 +75,7 @@ function HomePage() {
             <div className="flex flex-col gap-3 sm:flex-row">
               <Link
                 to={pageView.hero.primaryAction.to}
+                aria-label={pageView.hero.primaryAction.ariaLabel}
                 className={cn(buttonVariants({ size: 'lg' }), 'rounded-lg')}
               >
                 <IconPlus className="size-4" />
@@ -82,6 +83,7 @@ function HomePage() {
               </Link>
               <Link
                 to={pageView.hero.browseTemplatesAction.to}
+                aria-label={pageView.hero.browseTemplatesAction.ariaLabel}
                 className={cn(
                   buttonVariants({ variant: 'outline', size: 'lg' }),
                   'rounded-lg bg-background'
@@ -90,21 +92,42 @@ function HomePage() {
                 <IconLayoutGrid className="size-4" />
                 {pageView.hero.browseTemplatesAction.label}
               </Link>
+              <Link
+                to={pageView.hero.worksheetAction.to}
+                aria-label={pageView.hero.worksheetAction.ariaLabel}
+                className={cn(
+                  buttonVariants({ variant: 'outline', size: 'lg' }),
+                  'rounded-lg bg-background'
+                )}
+              >
+                <IconSparkles className="size-4" />
+                {pageView.hero.worksheetAction.label}
+              </Link>
             </div>
           </div>
 
-          <div className="rounded-lg border bg-card p-4">
+          <section
+            aria-label={pageView.signalPanel.ariaLabel}
+            className="rounded-lg border bg-card p-4"
+          >
+            <div className="mb-4">
+              <h2 className="font-semibold text-sm">
+                {pageView.signalPanel.title}
+              </h2>
+              <p className="mt-1 text-muted-foreground text-sm">
+                {pageView.signalPanel.description}
+              </p>
+            </div>
             <div className="grid gap-3 sm:grid-cols-3">
               {pageView.signals.map((signal) => (
                 <Signal
                   key={signal.id}
                   icon={homeSignalIcons[signal.id]}
-                  label={signal.label}
-                  value={signal.value}
+                  signal={signal}
                 />
               ))}
             </div>
-          </div>
+          </section>
         </section>
 
         <ActivityPreview
@@ -112,22 +135,42 @@ function HomePage() {
           assignment={pageView.preview.assignment}
         />
 
-        <section className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
-          {pageView.features.map((item) => {
-            const Icon = homeFeatureIcons[item.id];
+        <section
+          aria-label={pageView.featureSection.ariaLabel}
+          className="space-y-4"
+        >
+          <div>
+            <p className="text-sm font-medium text-primary">
+              {pageView.featureSection.eyebrowLabel}
+            </p>
+            <h2 className="mt-2 text-2xl font-semibold tracking-normal">
+              {pageView.featureSection.title}
+            </h2>
+            <p className="mt-2 max-w-2xl text-sm leading-6 text-muted-foreground">
+              {pageView.featureSection.description}
+            </p>
+          </div>
+          <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+            {pageView.features.map((item) => {
+              const Icon = homeFeatureIcons[item.id];
 
-            return (
-              <div key={item.id} className="rounded-lg border bg-card p-5">
-                <div className="mb-4 flex size-9 items-center justify-center rounded-lg border bg-background text-primary">
-                  <Icon className="size-4" />
-                </div>
-                <h2 className="font-semibold">{item.title}</h2>
-                <p className="mt-2 text-sm leading-6 text-muted-foreground">
-                  {item.description}
-                </p>
-              </div>
-            );
-          })}
+              return (
+                <article
+                  aria-label={item.ariaLabel}
+                  key={item.id}
+                  className="rounded-lg border bg-card p-5"
+                >
+                  <div className="mb-4 flex size-9 items-center justify-center rounded-lg border bg-background text-primary">
+                    <Icon className="size-4" />
+                  </div>
+                  <h2 className="font-semibold">{item.title}</h2>
+                  <p className="mt-2 text-sm leading-6 text-muted-foreground">
+                    {item.description}
+                  </p>
+                </article>
+              );
+            })}
+          </div>
         </section>
       </div>
     </Container>
@@ -136,19 +179,25 @@ function HomePage() {
 
 function Signal({
   icon: Icon,
-  label,
-  value,
+  signal,
 }: {
   icon: TablerIcon;
-  label: string;
-  value: string;
+  signal: ReturnType<typeof buildHomePageViewModel>['signals'][number];
 }) {
   return (
-    <div className="rounded-lg border bg-background p-4">
+    <dl
+      aria-label={signal.ariaLabel}
+      className="rounded-lg border bg-background p-4"
+    >
       <Icon className="size-5 text-primary" />
-      <p className="mt-4 text-2xl font-semibold">{value}</p>
-      <p className="mt-1 text-sm text-muted-foreground">{label}</p>
-    </div>
+      <dt className="mt-4 text-sm text-muted-foreground">{signal.label}</dt>
+      <dd>
+        <output className="text-2xl font-semibold">{signal.value}</output>
+        <p className="mt-1 text-xs leading-5 text-muted-foreground">
+          {signal.description}
+        </p>
+      </dd>
+    </dl>
   );
 }
 
