@@ -1,5 +1,6 @@
 import { m } from '@/locale/paraglide/messages';
 import { DataTablePagination } from '@/components/data-table/data-table-pagination';
+import { FilesSourceMaterialHandoffPanel } from '@/components/settings/files/files-source-material-handoff-panel';
 import { Button, buttonVariants } from '@/components/ui/button';
 import {
   Dialog,
@@ -42,6 +43,7 @@ import {
   buildUserFileMaterialSummaryItems,
   type UserFileMaterialSummary,
 } from '@/storage/file-summary';
+import { buildSettingsFilesSourceMaterialHandoffView } from '@/settings/files-view';
 import {
   type ColumnDef,
   type VisibilityState,
@@ -149,6 +151,27 @@ export function FilesTable({
   const materialSummary = useMemo(
     () => summary ?? buildUserFileMaterialSummary(data),
     [data, summary]
+  );
+  const handoffView = useMemo(
+    () =>
+      buildSettingsFilesSourceMaterialHandoffView({
+        loading,
+        pageIndex,
+        pageSize,
+        summary: materialSummary,
+        total,
+        uploading,
+        visibleItemCount: data.length,
+      }),
+    [
+      data.length,
+      loading,
+      materialSummary,
+      pageIndex,
+      pageSize,
+      total,
+      uploading,
+    ]
   );
   const columns: ColumnDef<UserFiles>[] = useMemo(
     () => [
@@ -401,6 +424,8 @@ export function FilesTable({
       </div>
 
       <FilesSummaryStrip summary={materialSummary} />
+
+      <FilesSourceMaterialHandoffPanel view={handoffView} />
 
       <div className="relative flex flex-col gap-4 overflow-auto">
         <div className="overflow-hidden rounded-lg border">
