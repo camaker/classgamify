@@ -209,6 +209,11 @@ import {
   buildActivityAiDraftFocusPromptLine,
 } from '@/activities/ai-draft-focus';
 import {
+  ACTIVITY_AI_REMIX_ASSIST_HANDOFF_ITEM_IDS,
+  buildActivityAiRemixAssistHandoffView,
+  buildActivityAiRemixAssistPlan,
+} from '@/activities/ai-remix-assist';
+import {
   formatEditorGroupRow,
   formatEditorGroupRows,
   formatEditorInlineList,
@@ -2577,6 +2582,10 @@ const activityTemplateRemixSource = readFileSync(
   'src/activities/template-remix.ts',
   'utf8'
 );
+const activityAiRemixAssistSource = readFileSync(
+  'src/activities/ai-remix-assist.ts',
+  'utf8'
+);
 assert.match(
   activityRuntimeSource,
   /normalizeRuntimeDisplayText\(answer\.answer\)/,
@@ -2656,6 +2665,21 @@ assert.doesNotMatch(
   activityTemplateRemixSource,
   /\.trim\(\)/,
   'Template remix readiness should not use ad hoc trim-only content checks.'
+);
+assert.match(
+  activityAiRemixAssistSource,
+  /export const ACTIVITY_AI_REMIX_ASSIST_HANDOFF_ITEM_IDS = \[(?=[\s\S]*'source-template')(?=[\s\S]*'target-template')(?=[\s\S]*'target-readiness')(?=[\s\S]*'missing-requirement-count')(?=[\s\S]*'missing-requirement-list')(?=[\s\S]*'deterministic-remix-path')(?=[\s\S]*'ai-completion-path')(?=[\s\S]*'editor-review-gate')(?=[\s\S]*'draft-output')(?=[\s\S]*'persistence-boundary')(?=[\s\S]*'publish-boundary')(?=[\s\S]*'source-lifecycle-gate')(?=[\s\S]*'owner-scope')(?=[\s\S]*'prompt-source')(?=[\s\S]*'source-material-provenance')(?=[\s\S]*'source-file-byte-guard')(?=[\s\S]*'storage-key-guard')(?=[\s\S]*'question-count')(?=[\s\S]*'pair-count')(?=[\s\S]*'group-count')(?=[\s\S]*'vocabulary-count')(?=[\s\S]*'teacher-note-count')(?=[\s\S]*'suggested-ready-count')(?=[\s\S]*'locked-target-count')(?=[\s\S]*'review-checklist')(?=[\s\S]*'title-strategy')(?=[\s\S]*'template-switch')(?=[\s\S]*'assignment-snapshot-protection')(?=[\s\S]*'original-activity-protection')(?=[\s\S]*'privacy-guard')[\s\S]*export type ActivityAiRemixAssistHandoffPrivacyContract = \{[\s\S]*aiCanFillMissingStructuredFields: true;[\s\S]*appliesBeforeActivitySave: true;[\s\S]*exposesActivityContentText: false;[\s\S]*exposesAnswerText: false;[\s\S]*exposesPromptText: false;[\s\S]*exposesSourceMaterialFileIds: false;[\s\S]*exposesSourceMaterialFilenames: false;[\s\S]*exposesSourceMaterialStorageKeys: false;[\s\S]*exposesTeacherNotesText: false;[\s\S]*modifiesOriginalActivity: false;[\s\S]*modifiesPublishedAssignmentSnapshots: false;[\s\S]*publishesAssignmentWithoutTeacherAction: false;[\s\S]*readsSourceMaterialBytes: false;[\s\S]*requiresEditorReview: true;[\s\S]*savesActivityWithoutTeacherAction: false;[\s\S]*scope: 'teacher-reviewed-ai-remix-assist';/,
+  'AI remix assist handoff should expose 30 stable teacher-reviewed assist slices with explicit privacy flags.'
+);
+assert.match(
+  activityAiRemixAssistSource,
+  /getTemplateRemixPlan\(\{ content, currentTemplateType \}\)[\s\S]*buildTemplateRemixSummary\(remixPlan\)[\s\S]*selectActivityAiRemixAssistTarget[\s\S]*normalizeActivityMaterialReferences[\s\S]*buildRemixedActivityTitle/,
+  'AI remix assist should derive target readiness, missing structure, material counts, and draft titles from shared activity-domain helpers.'
+);
+assert.doesNotMatch(
+  activityAiRemixAssistSource,
+  /material\.originalName|material\.fileId|source\.content\.sourceSummary|source\.content\.teacherNotes\.join|source\.content\.questions\.map|source\.content\.pairs\.map|source\.content\.groups\.map/,
+  'AI remix assist handoff should not serialize private activity text, filenames, or file ids.'
 );
 const copyAssignmentShareLinkButtonSource = readFileSync(
   'src/components/assignments/copy-assignment-share-link-button.tsx',
@@ -4315,6 +4339,11 @@ assert.match(
   activityLibraryViewSource,
   /lockedTemplateDiagnostics: summary\.lockedTemplateOptions[\s\S]*id: option\.template/,
   'Activity library compatibility view should derive locked-template diagnostic ids from template types.'
+);
+assert.match(
+  activityLibraryViewSource,
+  /aiRemixAssistHandoffView: ActivityAiRemixAssistHandoffView[\s\S]*buildActivityAiRemixAssistHandoffView\(\{[\s\S]*content,[\s\S]*currentTemplateType,[\s\S]*sourceTitle,[\s\S]*visibility/,
+  'Activity library compatibility view should attach the AI remix assist handoff from the same content, template, title, and lifecycle context.'
 );
 assert.doesNotMatch(
   activityLibraryViewSource,
@@ -30768,6 +30797,11 @@ assert.match(
 );
 assert.match(
   activityLibraryCompatibilityPanelSource,
+  /ActivityAiRemixAssistHandoffItemView[\s\S]*ActivityAiRemixAssistHandoffView/,
+  'Activity library compatibility panel should import explicit AI remix assist handoff contracts.'
+);
+assert.match(
+  activityLibraryCompatibilityPanelSource,
   /label: string;[\s\S]*const remixStatusDescriptionId = useId\(\)[\s\S]*<section aria-label=\{label\}[\s\S]*ActivityLibraryActionStatusBadge[\s\S]*view=\{compatibility\.remixStatusView\}/,
   'Activity library compatibility panel should expose the prepared compatibility label and remix status on its section.'
 );
@@ -30805,6 +30839,16 @@ assert.match(
   activityLibraryCompatibilityPanelSource,
   /function ActivityLibraryTemplateRemixHandoffItem[\s\S]*item: ActivityTemplateRemixHandoffItemView[\s\S]*data-handoff-item=\{item\.id\}[\s\S]*\{item\.ariaLabel\}[\s\S]*\{item\.label\}[\s\S]*\{item\.value\}[\s\S]*\{item\.description\}/,
   'Activity library template-remix handoff items should render prepared aria labels, labels, values, and descriptions.'
+);
+assert.match(
+  activityLibraryCompatibilityPanelSource,
+  /<ActivityLibraryAiRemixAssistHandoff[\s\S]*handoff=\{compatibility\.aiRemixAssistHandoffView\}[\s\S]*function ActivityLibraryAiRemixAssistHandoff[\s\S]*handoff: ActivityAiRemixAssistHandoffView[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*aria-labelledby=\{titleId\}[\s\S]*data-handoff="activity-ai-remix-assist"[\s\S]*handoff\.itemViews\.map\(\(item\) => \([\s\S]*ActivityLibraryAiRemixAssistHandoffItem[\s\S]*item=\{item\}/,
+  'Activity library compatibility panel should render the prepared AI remix assist handoff as a stable semantic region.'
+);
+assert.match(
+  activityLibraryCompatibilityPanelSource,
+  /function ActivityLibraryAiRemixAssistHandoffItem[\s\S]*item: ActivityAiRemixAssistHandoffItemView[\s\S]*data-handoff-item=\{item\.id\}[\s\S]*aria-label=\{item\.ariaLabel\}[\s\S]*\{item\.value\}[\s\S]*\{item\.description\}/,
+  'Activity library AI remix assist items should render prepared aria labels, values, and descriptions.'
 );
 assert.match(
   activityLibraryCompatibilityPanelSource,
@@ -42831,6 +42875,143 @@ assert.equal(
   )?.value,
   'Restore required'
 );
+assert.deepEqual([...ACTIVITY_AI_REMIX_ASSIST_HANDOFF_ITEM_IDS], [
+  'source-template',
+  'target-template',
+  'target-readiness',
+  'missing-requirement-count',
+  'missing-requirement-list',
+  'deterministic-remix-path',
+  'ai-completion-path',
+  'editor-review-gate',
+  'draft-output',
+  'persistence-boundary',
+  'publish-boundary',
+  'source-lifecycle-gate',
+  'owner-scope',
+  'prompt-source',
+  'source-material-provenance',
+  'source-file-byte-guard',
+  'storage-key-guard',
+  'question-count',
+  'pair-count',
+  'group-count',
+  'vocabulary-count',
+  'teacher-note-count',
+  'suggested-ready-count',
+  'locked-target-count',
+  'review-checklist',
+  'title-strategy',
+  'template-switch',
+  'assignment-snapshot-protection',
+  'original-activity-protection',
+  'privacy-guard',
+]);
+assert.equal(new Set(ACTIVITY_AI_REMIX_ASSIST_HANDOFF_ITEM_IDS).size, 30);
+const questionOnlyAiRemixAssistHandoffView =
+  buildActivityAiRemixAssistHandoffView({
+    content: questionOnlyContent,
+    currentTemplateType: 'quiz',
+    sourceTitle: 'Question review',
+    visibility: 'draft',
+  });
+const questionOnlyAiRemixAssistHandoffItems = new Map(
+  questionOnlyAiRemixAssistHandoffView.itemViews.map((item) => [
+    item.id,
+    item.value,
+  ])
+);
+assert.deepEqual(
+  questionOnlyAiRemixAssistHandoffView.itemViews.map((item) => item.id),
+  [...ACTIVITY_AI_REMIX_ASSIST_HANDOFF_ITEM_IDS]
+);
+assert.ok(
+  questionOnlyAiRemixAssistHandoffView.itemViews.every(
+    (item) => item.ariaLabel && item.description && item.label && item.value
+  )
+);
+assert.deepEqual(questionOnlyAiRemixAssistHandoffView.privacy, {
+  aiCanFillMissingStructuredFields: true,
+  appliesBeforeActivitySave: true,
+  exposesActivityContentText: false,
+  exposesAnswerText: false,
+  exposesPromptText: false,
+  exposesSourceMaterialFileIds: false,
+  exposesSourceMaterialFilenames: false,
+  exposesSourceMaterialStorageKeys: false,
+  exposesTeacherNotesText: false,
+  itemIds: [...ACTIVITY_AI_REMIX_ASSIST_HANDOFF_ITEM_IDS],
+  modifiesOriginalActivity: false,
+  modifiesPublishedAssignmentSnapshots: false,
+  publishesAssignmentWithoutTeacherAction: false,
+  readsSourceMaterialBytes: false,
+  requiresEditorReview: true,
+  savesActivityWithoutTeacherAction: false,
+  scope: 'teacher-reviewed-ai-remix-assist',
+});
+assert.deepEqual(
+  Object.fromEntries(questionOnlyAiRemixAssistHandoffItems),
+  {
+    'ai-completion-path': 'Draft assist ready',
+    'assignment-snapshot-protection': 'Snapshots unchanged',
+    'deterministic-remix-path': 'Needs structure',
+    'draft-output': 'Editor draft',
+    'editor-review-gate': 'Teacher review required',
+    'group-count': '0',
+    'locked-target-count': '4',
+    'missing-requirement-count': '1',
+    'missing-requirement-list': 'match pairs',
+    'original-activity-protection': 'Source unchanged',
+    'owner-scope': 'Current teacher',
+    'pair-count': '0',
+    'persistence-boundary': 'Not auto-saved',
+    'privacy-guard': 'Private text hidden',
+    'prompt-source': 'Structured editor context',
+    'publish-boundary': 'Save before publish',
+    'question-count': '2',
+    'review-checklist': '5 checks',
+    'source-file-byte-guard': 'Bytes not read',
+    'source-lifecycle-gate': 'Ready',
+    'source-material-provenance': '0 materials, 0 kinds',
+    'source-template': 'Quiz',
+    'storage-key-guard': 'Storage hidden',
+    'suggested-ready-count': '3',
+    'target-readiness': 'Needs AI completion',
+    'target-template': 'Match',
+    'teacher-note-count': '0',
+    'template-switch': 'Match',
+    'title-strategy': 'Question review (Match)',
+    'vocabulary-count': '0',
+  }
+);
+assert.equal(
+  buildActivityAiRemixAssistPlan({
+    content: questionOnlyContent,
+    currentTemplateType: 'quiz',
+    sourceTitle: 'Question review',
+    targetTemplateType: 'fill-blank',
+    visibility: 'draft',
+  }).targetStatus,
+  'deterministic-ready'
+);
+assert.doesNotMatch(
+  JSON.stringify(questionOnlyAiRemixAssistHandoffView),
+  /Capital of France|Paris|2 \+ 2|Quick review/,
+  'AI remix assist handoff should not leak source prompts, answers, or source summaries.'
+);
+const questionOnlyArchivedAiRemixAssistHandoffView =
+  buildActivityAiRemixAssistHandoffView({
+    content: questionOnlyContent,
+    currentTemplateType: 'quiz',
+    sourceTitle: 'Question review',
+    visibility: 'archived',
+  });
+assert.equal(
+  questionOnlyArchivedAiRemixAssistHandoffView.itemViews.find(
+    (item) => item.id === 'source-lifecycle-gate'
+  )?.value,
+  'Restore first'
+);
 assert.deepEqual(
   questionOnlyRemixPlan.options.find(
     (option) => option.template.type === 'group-sort'
@@ -42982,6 +43163,7 @@ assert.deepEqual(
     summary: questionOnlyCardSummary,
   }),
   {
+    aiRemixAssistHandoffView: questionOnlyAiRemixAssistHandoffView,
     lockedTemplateDiagnostics: [
       {
         diagnosis: 'Add match pairs to unlock Match.',
@@ -43029,6 +43211,7 @@ assert.deepEqual(
     visibility: 'archived',
   }),
   {
+    aiRemixAssistHandoffView: questionOnlyArchivedAiRemixAssistHandoffView,
     lockedTemplateDiagnostics: [
       {
         diagnosis: 'Add match pairs to unlock Match.',

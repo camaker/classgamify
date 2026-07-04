@@ -59,6 +59,10 @@ import {
   buildActivityTemplateRemixHandoffView,
   type ActivityTemplateRemixHandoffView,
 } from '@/activities/template-remix';
+import {
+  buildActivityAiRemixAssistHandoffView,
+  type ActivityAiRemixAssistHandoffView,
+} from '@/activities/ai-remix-assist';
 import type {
   ActivityContent,
   ActivitySeed,
@@ -126,6 +130,7 @@ export type ActivityLibraryLockedTemplateDiagnosticView = {
 };
 
 export type ActivityLibraryCompatibilityView = {
+  aiRemixAssistHandoffView: ActivityAiRemixAssistHandoffView;
   lockedTemplateDiagnostics: ActivityLibraryLockedTemplateDiagnosticView[];
   readyTemplateOptions: ActivityLibraryReadyTemplateOptionView[];
   remixHandoffView: ActivityTemplateRemixHandoffView;
@@ -2349,6 +2354,12 @@ export function buildActivityLibraryCompatibilityView({
   });
 
   return {
+    aiRemixAssistHandoffView: buildActivityAiRemixAssistHandoffView({
+      content,
+      currentTemplateType,
+      sourceTitle,
+      visibility,
+    }),
     lockedTemplateDiagnostics: summary.lockedTemplateOptions
       .slice(0, ACTIVITY_LIBRARY_COMPATIBILITY_LIMITS.lockedTemplateDiagnostics)
       .map((option) => ({

@@ -1,4 +1,8 @@
 import type {
+  ActivityAiRemixAssistHandoffItemView,
+  ActivityAiRemixAssistHandoffView,
+} from '@/activities/ai-remix-assist';
+import type {
   ActivityLibraryCardActionState,
   ActivityLibraryCardTemplateType,
   ActivityLibraryCompatibilityView,
@@ -71,6 +75,9 @@ export function ActivityLibraryCompatibilityPanel({
       ) : null}
       <ActivityLibraryTemplateRemixHandoff
         handoff={compatibility.remixHandoffView}
+      />
+      <ActivityLibraryAiRemixAssistHandoff
+        handoff={compatibility.aiRemixAssistHandoffView}
       />
       {actionState.showRemixActions ? (
         <div className="mt-3 flex flex-wrap gap-2">
@@ -149,6 +156,48 @@ function ActivityLibraryTemplateRemixHandoffItem({
       <p className="mt-0.5 text-[0.68rem] leading-4 text-muted-foreground">
         {item.description}
       </p>
+    </div>
+  );
+}
+
+function ActivityLibraryAiRemixAssistHandoff({
+  handoff,
+}: {
+  handoff: ActivityAiRemixAssistHandoffView;
+}) {
+  const titleId = useId();
+  const descriptionId = useId();
+
+  return (
+    <section
+      aria-describedby={descriptionId}
+      aria-labelledby={titleId}
+      className="sr-only"
+      data-handoff="activity-ai-remix-assist"
+    >
+      <h3 id={titleId}>{handoff.title}</h3>
+      <p id={descriptionId}>{handoff.description}</p>
+      <dl>
+        {handoff.itemViews.map((item) => (
+          <ActivityLibraryAiRemixAssistHandoffItem item={item} key={item.id} />
+        ))}
+      </dl>
+    </section>
+  );
+}
+
+function ActivityLibraryAiRemixAssistHandoffItem({
+  item,
+}: {
+  item: ActivityAiRemixAssistHandoffItemView;
+}) {
+  return (
+    <div data-handoff-item={item.id}>
+      <dt>{item.label}</dt>
+      <dd>
+        <output aria-label={item.ariaLabel}>{item.value}</output>
+        <span>{item.description}</span>
+      </dd>
     </div>
   );
 }

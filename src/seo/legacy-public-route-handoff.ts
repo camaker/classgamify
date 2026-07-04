@@ -122,10 +122,10 @@ export function buildLegacyPublicRouteHandoffView(
   );
 
   return {
-    description: m.legacy_public_route_handoff_description(),
+    description: m.retired_public_route_handoff_description(),
     itemViews,
     privacy: buildLegacyPublicRouteHandoffPrivacyContract(itemViews),
-    title: m.legacy_public_route_handoff_title(),
+    title: m.retired_public_route_handoff_title(),
   };
 }
 
@@ -136,7 +136,7 @@ function buildLegacyPublicRouteHandoffItemView(
 
   return {
     ...item,
-    ariaLabel: m.legacy_public_route_handoff_item_aria_label({
+    ariaLabel: m.retired_public_route_handoff_item_aria_label({
       description: item.description,
       label: item.label,
       value: item.value,
@@ -151,7 +151,7 @@ function buildLegacyPublicRouteHandoffItem(
 
   if (path) {
     return buildLegacyPublicRouteHandoffStaticItem({
-      description: m.legacy_public_route_handoff_retired_path_description({
+      description: m.retired_public_route_handoff_retired_path_description({
         path,
       }),
       id: context.id,
@@ -164,231 +164,233 @@ function buildLegacyPublicRouteHandoffItem(
     case 'retired-inventory-count':
       return buildLegacyPublicRouteHandoffStaticItem({
         description:
-          m.legacy_public_route_handoff_retired_inventory_count_description(),
+          m.retired_public_route_handoff_retired_inventory_count_description(),
         id: context.id,
-        label: m.legacy_public_route_handoff_retired_inventory_count_label(),
-        value: m.legacy_public_route_handoff_path_count_value({
+        label: m.retired_public_route_handoff_retired_inventory_count_label(),
+        value: m.retired_public_route_handoff_path_count_value({
           count: String(RETIRED_LEGACY_PUBLIC_PATHS.length),
         }),
       });
     case 'retired-path-list':
       return buildLegacyPublicRouteHandoffStaticItem({
         description:
-          m.legacy_public_route_handoff_retired_path_list_description(),
+          m.retired_public_route_handoff_retired_path_list_description(),
         id: context.id,
-        label: m.legacy_public_route_handoff_retired_path_list_label(),
+        label: m.retired_public_route_handoff_retired_path_list_label(),
         value: RETIRED_LEGACY_PUBLIC_PATHS.join(', '),
       });
     case 'mounted-route-count':
       return buildLegacyPublicRouteHandoffStaticItem({
         description:
-          m.legacy_public_route_handoff_mounted_route_count_description(),
+          m.retired_public_route_handoff_mounted_route_count_description(),
         id: context.id,
-        label: m.legacy_public_route_handoff_mounted_route_count_label(),
-        value: m.legacy_public_route_handoff_mounted_count_value({
+        label: m.retired_public_route_handoff_mounted_route_count_label(),
+        value: m.retired_public_route_handoff_mounted_count_value({
           count: String(context.mountedRetiredPaths.length),
         }),
       });
     case 'route-tree-boundary':
       return buildLegacyPublicRouteHandoffStatusItem({
         description:
-          m.legacy_public_route_handoff_route_tree_boundary_description(),
+          m.retired_public_route_handoff_route_tree_boundary_description(),
         id: context.id,
-        label: m.legacy_public_route_handoff_route_tree_boundary_label(),
+        label: m.retired_public_route_handoff_route_tree_boundary_label(),
         ok: context.routeTreeRetiredPaths.length === 0,
-        value: m.legacy_public_route_handoff_no_generated_routes_value(),
+        value: m.retired_public_route_handoff_no_generated_routes_value(),
       });
     case 'migration-entrypoint-boundary':
       return buildLegacyPublicRouteHandoffStaticItem({
         description:
-          m.legacy_public_route_handoff_migration_entrypoint_boundary_description(),
+          m.retired_public_route_handoff_migration_entrypoint_boundary_description(),
         id: context.id,
         label:
-          m.legacy_public_route_handoff_migration_entrypoint_boundary_label(),
+          m.retired_public_route_handoff_migration_entrypoint_boundary_label(),
         value:
           context.mountedRetiredPaths.length === 0
-            ? m.legacy_public_route_handoff_not_required_value()
+            ? m.retired_public_route_handoff_not_required_value()
             : allPathsCovered(
                   context.mountedRetiredPaths,
                   context.migrationEntrypointRetiredPaths
                 )
-              ? m.legacy_public_route_handoff_migration_only_value()
-              : m.legacy_public_route_handoff_needs_review_value(),
+              ? m.retired_public_route_handoff_migration_only_value()
+              : m.retired_public_route_handoff_needs_review_value(),
       });
     case 'noindex-metadata-boundary':
       return buildLegacyPublicRouteHandoffStaticItem({
         description:
-          m.legacy_public_route_handoff_noindex_metadata_boundary_description(),
+          m.retired_public_route_handoff_noindex_metadata_boundary_description(),
         id: context.id,
-        label: m.legacy_public_route_handoff_noindex_metadata_boundary_label(),
+        label: m.retired_public_route_handoff_noindex_metadata_boundary_label(),
         value:
           context.mountedRetiredPaths.length === 0 ||
           allPathsCovered(
             context.mountedRetiredPaths,
             context.noindexRetiredPaths
           )
-            ? m.legacy_public_route_handoff_noindex_ready_value()
-            : m.legacy_public_route_handoff_needs_review_value(),
+            ? m.retired_public_route_handoff_noindex_ready_value()
+            : m.retired_public_route_handoff_needs_review_value(),
       });
     case 'sitemap-exclusion':
       return buildLegacyPublicRouteHandoffStatusItem({
         description:
-          m.legacy_public_route_handoff_sitemap_exclusion_description(),
+          m.retired_public_route_handoff_sitemap_exclusion_description(),
         id: context.id,
-        label: m.legacy_public_route_handoff_sitemap_exclusion_label(),
+        label: m.retired_public_route_handoff_sitemap_exclusion_label(),
         ok: context.sitemapRetiredPaths.length === 0,
-        value: m.legacy_public_route_handoff_excluded_value(),
+        value: m.retired_public_route_handoff_excluded_value(),
       });
     case 'localized-sitemap-exclusion':
       return buildLegacyPublicRouteHandoffStatusItem({
         description:
-          m.legacy_public_route_handoff_localized_sitemap_exclusion_description(),
+          m.retired_public_route_handoff_localized_sitemap_exclusion_description(),
         id: context.id,
         label:
-          m.legacy_public_route_handoff_localized_sitemap_exclusion_label(),
+          m.retired_public_route_handoff_localized_sitemap_exclusion_label(),
         ok: context.localizedSitemapRetiredPaths.length === 0,
-        value: m.legacy_public_route_handoff_excluded_value(),
+        value: m.retired_public_route_handoff_excluded_value(),
       });
     case 'route-constant-exclusion':
       return buildLegacyPublicRouteHandoffStatusItem({
         description:
-          m.legacy_public_route_handoff_route_constant_exclusion_description(),
+          m.retired_public_route_handoff_route_constant_exclusion_description(),
         id: context.id,
-        label: m.legacy_public_route_handoff_route_constant_exclusion_label(),
+        label: m.retired_public_route_handoff_route_constant_exclusion_label(),
         ok: context.routeConstantRetiredPaths.length === 0,
-        value: m.legacy_public_route_handoff_excluded_value(),
+        value: m.retired_public_route_handoff_excluded_value(),
       });
     case 'navbar-exclusion':
       return buildLegacyPublicRouteHandoffStatusItem({
         description:
-          m.legacy_public_route_handoff_navbar_exclusion_description(),
+          m.retired_public_route_handoff_navbar_exclusion_description(),
         id: context.id,
-        label: m.legacy_public_route_handoff_navbar_exclusion_label(),
+        label: m.retired_public_route_handoff_navbar_exclusion_label(),
         ok: context.navbarRetiredHrefs.length === 0,
-        value: m.legacy_public_route_handoff_classgamify_navigation_value(),
+        value: m.retired_public_route_handoff_classgamify_navigation_value(),
       });
     case 'footer-exclusion':
       return buildLegacyPublicRouteHandoffStatusItem({
         description:
-          m.legacy_public_route_handoff_footer_exclusion_description(),
+          m.retired_public_route_handoff_footer_exclusion_description(),
         id: context.id,
-        label: m.legacy_public_route_handoff_footer_exclusion_label(),
+        label: m.retired_public_route_handoff_footer_exclusion_label(),
         ok: context.footerRetiredHrefs.length === 0,
-        value: m.legacy_public_route_handoff_classgamify_footer_value(),
+        value: m.retired_public_route_handoff_classgamify_footer_value(),
       });
     case 'sidebar-exclusion':
       return buildLegacyPublicRouteHandoffStatusItem({
         description:
-          m.legacy_public_route_handoff_sidebar_exclusion_description(),
+          m.retired_public_route_handoff_sidebar_exclusion_description(),
         id: context.id,
-        label: m.legacy_public_route_handoff_sidebar_exclusion_label(),
+        label: m.retired_public_route_handoff_sidebar_exclusion_label(),
         ok: context.sidebarRetiredHrefs.length === 0,
-        value: m.legacy_public_route_handoff_classgamify_sidebar_value(),
+        value: m.retired_public_route_handoff_classgamify_sidebar_value(),
       });
     case 'robots-protected-boundary':
       return buildLegacyPublicRouteHandoffStatusItem({
         description:
-          m.legacy_public_route_handoff_robots_protected_boundary_description(),
+          m.retired_public_route_handoff_robots_protected_boundary_description(),
         id: context.id,
-        label: m.legacy_public_route_handoff_robots_protected_boundary_label(),
+        label: m.retired_public_route_handoff_robots_protected_boundary_label(),
         ok: allPathsCovered(
           [...PROTECTED_ROBOTS_BOUNDARY_PATHS],
           context.protectedRobotsPaths
         ),
-        value: m.legacy_public_route_handoff_protected_surfaces_blocked_value(),
+        value:
+          m.retired_public_route_handoff_protected_surfaces_blocked_value(),
       });
     case 'homepage-entrypoint-boundary':
       return buildLegacyPublicRouteHandoffStatusItem({
         description:
-          m.legacy_public_route_handoff_homepage_entrypoint_boundary_description(),
+          m.retired_public_route_handoff_homepage_entrypoint_boundary_description(),
         id: context.id,
         label:
-          m.legacy_public_route_handoff_homepage_entrypoint_boundary_label(),
+          m.retired_public_route_handoff_homepage_entrypoint_boundary_label(),
         ok: noRetiredPaths(context.homeEntrypointHrefs),
-        value: m.legacy_public_route_handoff_classgamify_entrypoints_value(),
+        value: m.retired_public_route_handoff_classgamify_entrypoints_value(),
       });
     case 'template-entrypoint-boundary':
       return buildLegacyPublicRouteHandoffStaticItem({
         description:
-          m.legacy_public_route_handoff_template_entrypoint_boundary_description(),
+          m.retired_public_route_handoff_template_entrypoint_boundary_description(),
         id: context.id,
         label:
-          m.legacy_public_route_handoff_template_entrypoint_boundary_label(),
+          m.retired_public_route_handoff_template_entrypoint_boundary_label(),
         value: Routes.Templates,
       });
     case 'create-entrypoint-boundary':
       return buildLegacyPublicRouteHandoffStaticItem({
         description:
-          m.legacy_public_route_handoff_create_entrypoint_boundary_description(),
+          m.retired_public_route_handoff_create_entrypoint_boundary_description(),
         id: context.id,
-        label: m.legacy_public_route_handoff_create_entrypoint_boundary_label(),
+        label:
+          m.retired_public_route_handoff_create_entrypoint_boundary_label(),
         value: Routes.Create,
       });
     case 'worksheet-entrypoint-boundary':
       return buildLegacyPublicRouteHandoffStaticItem({
         description:
-          m.legacy_public_route_handoff_worksheet_entrypoint_boundary_description(),
+          m.retired_public_route_handoff_worksheet_entrypoint_boundary_description(),
         id: context.id,
         label:
-          m.legacy_public_route_handoff_worksheet_entrypoint_boundary_label(),
+          m.retired_public_route_handoff_worksheet_entrypoint_boundary_label(),
         value: Routes.Worksheets,
       });
     case 'student-preview-boundary':
       return buildLegacyPublicRouteHandoffStaticItem({
         description:
-          m.legacy_public_route_handoff_student_preview_boundary_description(),
+          m.retired_public_route_handoff_student_preview_boundary_description(),
         id: context.id,
-        label: m.legacy_public_route_handoff_student_preview_boundary_label(),
+        label: m.retired_public_route_handoff_student_preview_boundary_label(),
         value: Routes.StudentPreview,
       });
     case 'route-module-cleanup':
       return buildLegacyPublicRouteHandoffStatusItem({
         description:
-          m.legacy_public_route_handoff_route_module_cleanup_description(),
+          m.retired_public_route_handoff_route_module_cleanup_description(),
         id: context.id,
-        label: m.legacy_public_route_handoff_route_module_cleanup_label(),
+        label: m.retired_public_route_handoff_route_module_cleanup_label(),
         ok: context.routeModuleRetiredPaths.length === 0,
-        value: m.legacy_public_route_handoff_no_route_modules_value(),
+        value: m.retired_public_route_handoff_no_route_modules_value(),
       });
     case 'migration-copy-boundary':
       return buildLegacyPublicRouteHandoffStaticItem({
         description:
-          m.legacy_public_route_handoff_migration_copy_boundary_description(),
+          m.retired_public_route_handoff_migration_copy_boundary_description(),
         id: context.id,
-        label: m.legacy_public_route_handoff_migration_copy_boundary_label(),
+        label: m.retired_public_route_handoff_migration_copy_boundary_label(),
         value:
           context.mountedRetiredPaths.length === 0
-            ? m.legacy_public_route_handoff_not_required_value()
+            ? m.retired_public_route_handoff_not_required_value()
             : allPathsCovered(
                   context.mountedRetiredPaths,
                   context.migrationCopyRetiredPaths
                 )
-              ? m.legacy_public_route_handoff_classgamify_migration_value()
-              : m.legacy_public_route_handoff_needs_review_value(),
+              ? m.retired_public_route_handoff_classgamify_migration_value()
+              : m.retired_public_route_handoff_needs_review_value(),
       });
     case 'product-loop-redirect-boundary':
       return buildLegacyPublicRouteHandoffStaticItem({
         description:
-          m.legacy_public_route_handoff_product_loop_redirect_boundary_description(),
+          m.retired_public_route_handoff_product_loop_redirect_boundary_description(),
         id: context.id,
         label:
-          m.legacy_public_route_handoff_product_loop_redirect_boundary_label(),
+          m.retired_public_route_handoff_product_loop_redirect_boundary_label(),
         value:
           context.mountedRetiredPaths.length === 0
-            ? m.legacy_public_route_handoff_classgamify_routes_only_value()
+            ? m.retired_public_route_handoff_classgamify_routes_only_value()
             : allPathsCovered(
                   context.mountedRetiredPaths,
                   context.migrationEntrypointRetiredPaths
                 )
-              ? m.legacy_public_route_handoff_activity_assignment_loop_value()
-              : m.legacy_public_route_handoff_needs_review_value(),
+              ? m.retired_public_route_handoff_activity_assignment_loop_value()
+              : m.retired_public_route_handoff_needs_review_value(),
       });
     case 'privacy-guard':
       return buildLegacyPublicRouteHandoffStaticItem({
-        description: m.legacy_public_route_handoff_privacy_guard_description(),
+        description: m.retired_public_route_handoff_privacy_guard_description(),
         id: context.id,
-        label: m.legacy_public_route_handoff_privacy_guard_label(),
-        value: m.legacy_public_route_handoff_private_data_hidden_value(),
+        label: m.retired_public_route_handoff_privacy_guard_label(),
+        value: m.retired_public_route_handoff_private_data_hidden_value(),
       });
   }
 }
@@ -406,7 +408,7 @@ function buildLegacyPublicRouteHandoffStatusItem({
     description,
     id,
     label,
-    value: ok ? value : m.legacy_public_route_handoff_needs_review_value(),
+    value: ok ? value : m.retired_public_route_handoff_needs_review_value(),
   });
 }
 
@@ -450,17 +452,17 @@ function getLegacyPublicRoutePathState(
   evidence: LegacyPublicRouteHandoffEvidence
 ) {
   if (!evidence.mountedRetiredPaths.includes(path)) {
-    return m.legacy_public_route_handoff_unmounted_value();
+    return m.retired_public_route_handoff_unmounted_value();
   }
 
   if (
     evidence.migrationEntrypointRetiredPaths.includes(path) &&
     evidence.noindexRetiredPaths.includes(path)
   ) {
-    return m.legacy_public_route_handoff_migration_noindex_value();
+    return m.retired_public_route_handoff_migration_noindex_value();
   }
 
-  return m.legacy_public_route_handoff_needs_review_value();
+  return m.retired_public_route_handoff_needs_review_value();
 }
 
 function allPathsCovered(paths: readonly string[], coveredPaths: string[]) {
