@@ -10,7 +10,7 @@ overwriteGetLocale(() => 'en');
 const SECRET_FILE_ID = 'SECRET_LIBRARY_FILE_ID_SHOULD_NOT_LEAK';
 const SECRET_STORAGE_KEY = 'classroom/private/source-material.pdf';
 
-test('activity library page exposes a 20-slice owner-scoped handoff', () => {
+test('activity library page exposes a 30-slice owner-scoped handoff', () => {
   const activeActivities = [
     buildLibraryActivity({
       content: buildContent({
@@ -96,10 +96,20 @@ test('activity library page exposes a 20-slice owner-scoped handoff', () => {
     'status-archived',
     'filter-summary',
     'visible-page-items',
+    'visible-publish-ready',
+    'visible-publish-blocked',
+    'visible-duplicate-ready',
+    'visible-duplicate-blocked',
+    'visible-remix-ready',
+    'visible-remix-blocked',
+    'visible-archive-ready',
+    'visible-restore-ready',
+    'visible-source-material-activities',
+    'visible-extractable-source-activities',
     'pagination',
     'starter-preview',
   ]);
-  assert.equal(new Set(itemIds).size, 20);
+  assert.equal(new Set(itemIds).size, 30);
   assert.equal(
     handoffView.itemViews.every(
       (item) =>
@@ -113,6 +123,8 @@ test('activity library page exposes a 20-slice owner-scoped handoff', () => {
   assert.deepEqual(handoffView.privacy, {
     broadensBeyondOwner: false,
     countsStarterPreviewAsOwned: false,
+    exposesDerivativeDraftPayloads: false,
+    exposesPrivateActivityContent: false,
     exposesSourceMaterialFileIds: false,
     exposesSourceMaterialStorageKeys: false,
     itemIds,
@@ -151,6 +163,52 @@ test('activity library page exposes a 20-slice owner-scoped handoff', () => {
     '2 visible activities'
   );
   assert.equal(
+    getHandoffValue(handoffView.itemViews, 'visible-publish-ready'),
+    '2 visible activities'
+  );
+  assert.equal(
+    getHandoffValue(handoffView.itemViews, 'visible-publish-blocked'),
+    '0 visible activities'
+  );
+  assert.equal(
+    getHandoffValue(handoffView.itemViews, 'visible-duplicate-ready'),
+    '2 visible activities'
+  );
+  assert.equal(
+    getHandoffValue(handoffView.itemViews, 'visible-duplicate-blocked'),
+    '0 visible activities'
+  );
+  assert.equal(
+    getHandoffValue(handoffView.itemViews, 'visible-remix-ready'),
+    '2 visible activities'
+  );
+  assert.equal(
+    getHandoffValue(handoffView.itemViews, 'visible-remix-blocked'),
+    '0 visible activities'
+  );
+  assert.equal(
+    getHandoffValue(handoffView.itemViews, 'visible-archive-ready'),
+    '2 visible activities'
+  );
+  assert.equal(
+    getHandoffValue(handoffView.itemViews, 'visible-restore-ready'),
+    '0 visible activities'
+  );
+  assert.equal(
+    getHandoffValue(
+      handoffView.itemViews,
+      'visible-source-material-activities'
+    ),
+    '2 visible activities'
+  );
+  assert.equal(
+    getHandoffValue(
+      handoffView.itemViews,
+      'visible-extractable-source-activities'
+    ),
+    '2 visible activities'
+  );
+  assert.equal(
     getHandoffValue(handoffView.itemViews, 'pagination'),
     'Page 1 of 1; 2 owned activities'
   );
@@ -161,6 +219,64 @@ test('activity library page exposes a 20-slice owner-scoped handoff', () => {
 
   const serializedHandoffView = JSON.stringify(handoffView);
   assertNoPrivateMaterialText(serializedHandoffView);
+});
+
+test('activity library handoff counts archived lifecycle gates', () => {
+  const archivedActivity = buildLibraryActivity({
+    content: buildContent(),
+    id: 'archived-weather',
+    templateType: 'match-up',
+    title: 'Archived weather',
+    visibility: 'archived',
+  });
+  const pageView = buildActivityLibraryPageViewModel({
+    data: {
+      items: [archivedActivity],
+      statusSummary: summarizeActivityLibrary([archivedActivity]),
+      summary: summarizeActivityLibrary([archivedActivity]),
+      total: 1,
+    },
+    isLoading: false,
+    search: {
+      status: 'archived',
+    },
+  });
+
+  assert.equal(
+    getHandoffValue(pageView.handoffView.itemViews, 'visible-publish-ready'),
+    '0 visible activities'
+  );
+  assert.equal(
+    getHandoffValue(pageView.handoffView.itemViews, 'visible-publish-blocked'),
+    '1 visible activities'
+  );
+  assert.equal(
+    getHandoffValue(pageView.handoffView.itemViews, 'visible-duplicate-ready'),
+    '0 visible activities'
+  );
+  assert.equal(
+    getHandoffValue(
+      pageView.handoffView.itemViews,
+      'visible-duplicate-blocked'
+    ),
+    '1 visible activities'
+  );
+  assert.equal(
+    getHandoffValue(pageView.handoffView.itemViews, 'visible-remix-ready'),
+    '0 visible activities'
+  );
+  assert.equal(
+    getHandoffValue(pageView.handoffView.itemViews, 'visible-remix-blocked'),
+    '1 visible activities'
+  );
+  assert.equal(
+    getHandoffValue(pageView.handoffView.itemViews, 'visible-archive-ready'),
+    '0 visible activities'
+  );
+  assert.equal(
+    getHandoffValue(pageView.handoffView.itemViews, 'visible-restore-ready'),
+    '1 visible activities'
+  );
 });
 
 test('starter previews remain outside owned activity metrics', () => {
