@@ -177,51 +177,73 @@ function AuthWorkspaceBoundaryPanel({
   view: AuthWorkspaceBoundaryView;
 }) {
   const titleId = 'auth-workspace-boundary-title';
+  const handoffTitleId = 'auth-workspace-handoff-title';
+  const handoffDescriptionId = 'auth-workspace-handoff-description';
 
   return (
-    <section
-      aria-labelledby={titleId}
-      className="mt-3 w-full rounded-lg border border-primary/15 bg-primary/5 px-3 py-3 text-left"
-    >
-      <div className="flex items-start gap-2">
-        <IconShieldCheck
-          aria-hidden="true"
-          className="mt-0.5 size-4 shrink-0 text-primary"
-          stroke={1.8}
-        />
-        <div className="min-w-0 space-y-1">
-          <p id={titleId} className="text-xs font-medium text-foreground">
-            {view.title}
-          </p>
-          <p className="text-xs leading-relaxed text-muted-foreground">
-            {view.description}
-          </p>
+    <>
+      <section
+        aria-labelledby={titleId}
+        className="mt-3 w-full rounded-lg border border-primary/15 bg-primary/5 px-3 py-3 text-left"
+      >
+        <div className="flex items-start gap-2">
+          <IconShieldCheck
+            aria-hidden="true"
+            className="mt-0.5 size-4 shrink-0 text-primary"
+            stroke={1.8}
+          />
+          <div className="min-w-0 space-y-1">
+            <p id={titleId} className="text-xs font-medium text-foreground">
+              {view.title}
+            </p>
+            <p className="text-xs leading-relaxed text-muted-foreground">
+              {view.description}
+            </p>
+          </div>
         </div>
-      </div>
-      <ul className="mt-3 grid gap-2 sm:grid-cols-2">
-        {view.items.map((item) => {
-          const Icon = authWorkspaceBoundaryIcons[item.id];
+        <ul className="mt-3 grid gap-2 sm:grid-cols-2">
+          {view.items.map((item) => {
+            const Icon = authWorkspaceBoundaryIcons[item.id];
 
-          return (
-            <li key={item.id} className="flex min-w-0 gap-2">
-              <Icon
-                aria-hidden="true"
-                className="mt-0.5 size-3.5 shrink-0 text-primary"
-                stroke={1.8}
-              />
-              <span className="min-w-0">
-                <span className="block text-xs font-medium text-foreground">
-                  {item.label}
+            return (
+              <li key={item.id} className="flex min-w-0 gap-2">
+                <Icon
+                  aria-hidden="true"
+                  className="mt-0.5 size-3.5 shrink-0 text-primary"
+                  stroke={1.8}
+                />
+                <span className="min-w-0">
+                  <span className="block text-xs font-medium text-foreground">
+                    {item.label}
+                  </span>
+                  <span className="mt-0.5 block text-xs leading-relaxed text-muted-foreground">
+                    {item.description}
+                  </span>
                 </span>
-                <span className="mt-0.5 block text-xs leading-relaxed text-muted-foreground">
-                  {item.description}
-                </span>
-              </span>
-            </li>
-          );
-        })}
-      </ul>
-    </section>
+              </li>
+            );
+          })}
+        </ul>
+      </section>
+      <section
+        aria-describedby={handoffDescriptionId}
+        aria-labelledby={handoffTitleId}
+        className="sr-only"
+        data-handoff="auth-workspace-boundary"
+      >
+        <h2 id={handoffTitleId}>{view.title}</h2>
+        <p id={handoffDescriptionId}>{view.description}</p>
+        <dl>
+          {view.itemViews.map((item) => (
+            <div data-handoff-item={item.id} key={item.id}>
+              <dt>{item.label}</dt>
+              <dd>{item.value}</dd>
+              <dd>{item.description}</dd>
+            </div>
+          ))}
+        </dl>
+      </section>
+    </>
   );
 }
 
