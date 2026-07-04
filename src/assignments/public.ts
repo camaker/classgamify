@@ -173,24 +173,34 @@ export type PublicAssignmentLookupResult =
 
 export type PublicAssignmentAccessHandoffItemId =
   | 'access-status'
+  | 'accepted-alternatives'
+  | 'activity-content-guard'
   | 'answer-keys'
   | 'assignment-title'
   | 'attempt-limit'
+  | 'browser-identity-policy'
   | 'close-time'
   | 'explanations'
   | 'identity-mode'
   | 'instructions'
   | 'item-count'
   | 'lifecycle-status'
+  | 'post-submit-review-gate'
+  | 'privacy-guard'
+  | 'public-rule-summary'
   | 'review-behavior'
+  | 'runtime-id-contract'
   | 'runtime-choices'
   | 'runtime-prompts'
+  | 'sanitized-payload'
   | 'share-link'
   | 'shuffle-policy'
+  | 'snapshot-source'
   | 'source-materials'
   | 'submission-policy'
   | 'template'
   | 'timer'
+  | 'unavailable-content-guard'
   | 'unavailable-safety';
 
 export type PublicAssignmentAccessHandoffItemView = {
@@ -204,9 +214,13 @@ export type PublicAssignmentAccessHandoffItemView = {
 export type PublicAssignmentAccessHandoffPrivacyView = {
   exposesAcceptedAlternatives: false;
   exposesActivityContentJson: false;
+  exposesAssignmentSettingsJson: false;
+  exposesBrowserIdentity: false;
   exposesRawAnonymousToken: false;
   exposesRuntimeChoiceText: false;
+  exposesRuntimeItemIds: false;
   exposesRuntimePromptText: false;
+  exposesSnapshotContentJson: false;
   exposesStudentAnswerText: false;
   exposesTeacherOnlyAnswers: false;
   exposesTeacherSourceMaterials: false;
@@ -366,9 +380,33 @@ export function buildPublicAssignmentAccessHandoffView({
           ? getTemplateByType(context.payload.activity.templateType).name
           : m.public_assignment_access_handoff_hidden_value(),
     }),
+    buildPublicAssignmentAccessHandoffItem({
+      description:
+        m.public_assignment_access_handoff_snapshot_source_description(),
+      id: 'snapshot-source',
+      label: m.public_assignment_access_handoff_snapshot_source_label(),
+      value: formatPublicAssignmentAccessSnapshotSourceValue(context),
+    }),
     buildPublicAssignmentAccessHandoffItem(
       buildPublicAssignmentAccessRuleHandoffItem(context, 'items', 'item-count')
     ),
+    buildPublicAssignmentAccessHandoffItem({
+      description:
+        m.public_assignment_access_handoff_public_rule_summary_description(),
+      id: 'public-rule-summary',
+      label: m.public_assignment_access_handoff_public_rule_summary_label(),
+      value: formatPublicAssignmentAccessRuleSummaryValue(context),
+    }),
+    buildPublicAssignmentAccessHandoffItem({
+      description:
+        m.public_assignment_access_handoff_sanitized_payload_description(),
+      id: 'sanitized-payload',
+      label: m.public_assignment_access_handoff_sanitized_payload_label(),
+      value:
+        context.status === 'available'
+          ? m.public_assignment_access_handoff_prepared_value()
+          : m.public_assignment_access_handoff_hidden_value(),
+    }),
     buildPublicAssignmentAccessHandoffItem({
       description:
         context.status === 'available'
@@ -403,6 +441,16 @@ export function buildPublicAssignmentAccessHandoffView({
     }),
     buildPublicAssignmentAccessHandoffItem({
       description:
+        m.public_assignment_access_handoff_runtime_id_contract_description(),
+      id: 'runtime-id-contract',
+      label: m.public_assignment_access_handoff_runtime_id_contract_label(),
+      value:
+        context.status === 'available'
+          ? m.public_assignment_access_handoff_runtime_id_contract_value()
+          : m.public_assignment_access_handoff_hidden_value(),
+    }),
+    buildPublicAssignmentAccessHandoffItem({
+      description:
         context.status === 'available'
           ? m.public_assignment_access_handoff_answer_keys_description()
           : m.public_assignment_access_handoff_answer_keys_unavailable_description(),
@@ -418,10 +466,31 @@ export function buildPublicAssignmentAccessHandoffView({
     }),
     buildPublicAssignmentAccessHandoffItem({
       description:
+        m.public_assignment_access_handoff_accepted_alternatives_description(),
+      id: 'accepted-alternatives',
+      label: m.public_assignment_access_handoff_accepted_alternatives_label(),
+      value: formatPublicAssignmentAccessAcceptedAlternativesValue(context),
+    }),
+    buildPublicAssignmentAccessHandoffItem({
+      description:
+        m.public_assignment_access_handoff_post_submit_review_gate_description(),
+      id: 'post-submit-review-gate',
+      label: m.public_assignment_access_handoff_post_submit_review_gate_label(),
+      value: formatPublicAssignmentAccessPostSubmitReviewGateValue(context),
+    }),
+    buildPublicAssignmentAccessHandoffItem({
+      description:
         m.public_assignment_access_handoff_source_materials_description(),
       id: 'source-materials',
       label: m.public_assignment_access_handoff_source_materials_label(),
       value: m.public_assignment_access_handoff_source_materials_value(),
+    }),
+    buildPublicAssignmentAccessHandoffItem({
+      description:
+        m.public_assignment_access_handoff_activity_content_guard_description(),
+      id: 'activity-content-guard',
+      label: m.public_assignment_access_handoff_activity_content_guard_label(),
+      value: m.public_assignment_access_handoff_activity_content_guard_value(),
     }),
     buildPublicAssignmentAccessHandoffItem({
       description:
@@ -458,6 +527,13 @@ export function buildPublicAssignmentAccessHandoffView({
         'identity-mode'
       )
     ),
+    buildPublicAssignmentAccessHandoffItem({
+      description:
+        m.public_assignment_access_handoff_browser_identity_policy_description(),
+      id: 'browser-identity-policy',
+      label: m.public_assignment_access_handoff_browser_identity_policy_label(),
+      value: formatPublicAssignmentAccessBrowserIdentityPolicyValue(context),
+    }),
     buildPublicAssignmentAccessHandoffItem(
       buildPublicAssignmentAccessRuleHandoffItem(
         context,
@@ -493,6 +569,23 @@ export function buildPublicAssignmentAccessHandoffView({
         context.status === 'available'
           ? m.public_assignment_access_handoff_unavailable_safety_available()
           : m.public_assignment_access_handoff_unavailable_safety_blocked(),
+    }),
+    buildPublicAssignmentAccessHandoffItem({
+      description:
+        m.public_assignment_access_handoff_unavailable_content_guard_description(),
+      id: 'unavailable-content-guard',
+      label:
+        m.public_assignment_access_handoff_unavailable_content_guard_label(),
+      value:
+        context.status === 'available'
+          ? m.public_assignment_access_handoff_unavailable_safety_available()
+          : m.public_assignment_access_handoff_unavailable_content_guard_value(),
+    }),
+    buildPublicAssignmentAccessHandoffItem({
+      description: m.public_assignment_access_handoff_privacy_description(),
+      id: 'privacy-guard',
+      label: m.public_assignment_access_handoff_privacy_label(),
+      value: m.public_assignment_access_handoff_private_data_omitted_value(),
     }),
   ];
 
@@ -640,6 +733,66 @@ function formatPublicAssignmentAccessExplanationValue(
   return m.public_assignment_access_handoff_hidden_value();
 }
 
+function formatPublicAssignmentAccessSnapshotSourceValue(
+  context: PublicAssignmentAccessHandoffContext
+) {
+  if (context.status === 'unavailable') {
+    return m.public_assignment_access_handoff_hidden_value();
+  }
+
+  return context.payload.snapshot
+    ? m.public_assignment_access_handoff_snapshot_source_frozen_value()
+    : m.public_assignment_access_handoff_snapshot_source_activity_value();
+}
+
+function formatPublicAssignmentAccessRuleSummaryValue(
+  context: PublicAssignmentAccessHandoffContext
+) {
+  if (context.status === 'unavailable') {
+    return m.public_assignment_access_handoff_hidden_value();
+  }
+
+  return m.public_assignment_access_handoff_rule_count_value({
+    count: normalizeRuntimeDisplayCount(context.ruleItems.length),
+  });
+}
+
+function formatPublicAssignmentAccessAcceptedAlternativesValue(
+  context: PublicAssignmentAccessHandoffContext
+) {
+  if (context.status === 'unavailable') {
+    return m.public_assignment_access_handoff_hidden_value();
+  }
+
+  return context.payload.assignment.settingsJson.showCorrectAnswers
+    ? m.public_assignment_access_handoff_explanations_after_scoring_value()
+    : m.public_assignment_access_handoff_hidden_value();
+}
+
+function formatPublicAssignmentAccessPostSubmitReviewGateValue(
+  context: PublicAssignmentAccessHandoffContext
+) {
+  if (context.status === 'unavailable') {
+    return m.public_assignment_access_handoff_hidden_value();
+  }
+
+  return context.payload.assignment.settingsJson.showCorrectAnswers
+    ? m.public_assignment_access_handoff_post_submit_review_gate_allowed_value()
+    : m.public_assignment_access_handoff_post_submit_review_gate_teacher_value();
+}
+
+function formatPublicAssignmentAccessBrowserIdentityPolicyValue(
+  context: PublicAssignmentAccessHandoffContext
+) {
+  if (context.status === 'unavailable') {
+    return m.public_assignment_access_handoff_hidden_value();
+  }
+
+  return context.payload.assignment.settingsJson.collectStudentName
+    ? m.public_assignment_access_handoff_browser_identity_policy_name_value()
+    : m.public_assignment_access_handoff_browser_identity_policy_token_value();
+}
+
 function countPublicAssignmentRuntimeChoices(items: PublicRuntimeItem[]) {
   return normalizeRuntimeDisplayCount(
     items.reduce(
@@ -655,9 +808,13 @@ function buildPublicAssignmentAccessHandoffPrivacyView(
   return {
     exposesAcceptedAlternatives: false,
     exposesActivityContentJson: false,
+    exposesAssignmentSettingsJson: false,
+    exposesBrowserIdentity: false,
     exposesRawAnonymousToken: false,
     exposesRuntimeChoiceText: false,
+    exposesRuntimeItemIds: false,
     exposesRuntimePromptText: false,
+    exposesSnapshotContentJson: false,
     exposesStudentAnswerText: false,
     exposesTeacherOnlyAnswers: false,
     exposesTeacherSourceMaterials: false,

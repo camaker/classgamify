@@ -1,5 +1,6 @@
 import { buildAssignmentSharePath } from '@/assignments/share-link';
 import { getOrCreateAnonymousAttemptToken } from '@/assignments/identity';
+import { buildPublicAssignmentAccessHandoffView } from '@/assignments/public';
 import {
   resolveStudentAttemptSubmissionFailureMessage,
   type StudentAnswerChange,
@@ -23,6 +24,7 @@ import {
 } from '@/assignments/student-runner-state';
 import { normalizeAssignmentShareSlug } from '@/assignments/share-slug';
 import { ActivityPreview } from '@/components/activities/activity-preview';
+import { PublicAssignmentAccessHandoff } from '@/components/assignments/public-assignment-access-handoff';
 import { StudentRuntimeItemList } from '@/components/activities/student-runtime-item-list';
 import { StudentRunnerAttemptShell } from '@/components/assignments/student-runner-attempt-shell';
 import { StudentRunnerHeaderCard } from '@/components/assignments/student-runner-header-card';
@@ -114,6 +116,16 @@ function PlayPage() {
   const runnerRouteState = useMemo(
     () => buildStudentRunnerRouteState(runnerPageView),
     [runnerPageView]
+  );
+  const publicAccessHandoffView = useMemo(
+    () =>
+      data
+        ? buildPublicAssignmentAccessHandoffView({
+            lookupResult: data,
+            shareSlug: normalizedShareId,
+          })
+        : undefined,
+    [data, normalizedShareId]
   );
 
   useEffect(() => {
@@ -286,6 +298,9 @@ function PlayPage() {
           badgeLabel={runnerPageView.routeBadgeLabel}
           view={runnerRouteState.headerView}
         />
+        {publicAccessHandoffView ? (
+          <PublicAssignmentAccessHandoff view={publicAccessHandoffView} />
+        ) : null}
 
         <StudentRunnerAttemptShell
           controlView={controlView}
