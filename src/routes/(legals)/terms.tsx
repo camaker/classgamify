@@ -4,6 +4,7 @@ import { MarkdownPage } from '@/components/page/markdown-page';
 import { getPageBySlug } from '@/lib/pages';
 import { websiteConfig } from '@/config/website';
 import { seo } from '@/lib/seo';
+import { buildLegalPolicyPageViewModel } from '@/pages/legal-policy-view';
 
 export const Route = createFileRoute('/(legals)/terms')({
   loader: () => {
@@ -25,9 +26,14 @@ export const Route = createFileRoute('/(legals)/terms')({
 function TermsPage() {
   const { page } = Route.useLoaderData();
   if (!page) throw notFound();
+  const pageView = buildLegalPolicyPageViewModel({
+    page,
+    policyId: 'terms',
+  });
+
   return (
     <Container className="py-16 px-4">
-      <MarkdownPage page={page} />
+      <MarkdownPage handoffView={pageView.handoffView} page={pageView.page} />
     </Container>
   );
 }
