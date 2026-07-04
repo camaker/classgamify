@@ -3,6 +3,7 @@ import test from 'node:test';
 import { buildSettingsBillingCardViewModel } from '@/payment/billing-view';
 import type { PricePlan, Subscription } from '@/payment/types';
 import {
+  SETTINGS_BILLING_WORKSPACE_HANDOFF_ITEM_IDS,
   buildSettingsBillingPageViewModel,
   buildSettingsBillingWorkspaceSummaryView,
 } from '@/settings/billing-view';
@@ -28,9 +29,24 @@ test('billing page exposes ClassGamify workspace billing semantics', () => {
     ['plan-access', 'activity-library', 'assignment-workflow', 'results-ai']
   );
   assert.equal(workspaceSummaryView.itemViews.length, 4);
+  assert.deepEqual(
+    workspaceSummaryView.handoffView.itemViews.map((item) => item.id),
+    [...SETTINGS_BILLING_WORKSPACE_HANDOFF_ITEM_IDS]
+  );
+  assert.equal(workspaceSummaryView.handoffView.itemViews.length, 30);
   assert.equal(
     pageView.workspaceSummaryView.itemViews.every((item) =>
       Boolean(item.ariaLabel)
+    ),
+    true
+  );
+  assert.equal(
+    pageView.workspaceSummaryView.handoffView.itemViews.every(
+      (item) =>
+        Boolean(item.ariaLabel) &&
+        Boolean(item.description) &&
+        Boolean(item.label) &&
+        Boolean(item.value)
     ),
     true
   );
@@ -108,6 +124,36 @@ test('billing card exposes plan, action, status, and period semantics', () => {
     'workspace-activity-library',
     'workspace-assignment-workflow',
     'workspace-results-ai',
+    'handoff-workspace-scope',
+    'handoff-route-gate',
+    'handoff-payment-feature-gate',
+    'handoff-plan-source',
+    'handoff-current-plan-card',
+    'handoff-plan-status-badge',
+    'handoff-plan-feature-section',
+    'handoff-plan-limit-section',
+    'handoff-free-plan-boundary',
+    'handoff-pro-plan-boundary',
+    'handoff-lifetime-plan-boundary',
+    'handoff-upgrade-action',
+    'handoff-portal-action',
+    'handoff-retry-action',
+    'handoff-hosted-checkout',
+    'handoff-customer-portal',
+    'handoff-payment-callback',
+    'handoff-activity-library-access',
+    'handoff-assignment-workflow-access',
+    'handoff-ai-draft-access',
+    'handoff-result-export-access',
+    'handoff-source-material-access',
+    'handoff-school-workspace-path',
+    'handoff-period-start',
+    'handoff-period-end',
+    'handoff-trial-end',
+    'handoff-cancel-at-period-end',
+    'handoff-provider-boundary',
+    'handoff-student-data-boundary',
+    'handoff-privacy-guard',
     'card-current-plan',
     'card-state-ready',
     'card-action-upgrade',
@@ -205,6 +251,9 @@ function collectBillingSemanticSliceIds() {
     'plan-section',
     ...pageView.workspaceSummaryView.itemViews.map(
       (item) => `workspace-${item.id}`
+    ),
+    ...pageView.workspaceSummaryView.handoffView.itemViews.map(
+      (item) => `handoff-${item.id}`
     ),
     'card-current-plan',
     `card-state-${freeBillingView.state}`,

@@ -1,4 +1,6 @@
 import type {
+  SettingsBillingWorkspaceHandoffItemView,
+  SettingsBillingWorkspaceHandoffView,
   SettingsBillingWorkspaceSummaryItemView,
   SettingsBillingWorkspaceSummaryView,
 } from '@/settings/billing-view';
@@ -25,6 +27,7 @@ export function BillingWorkspaceSummary({
           <BillingWorkspaceSummaryItem itemView={itemView} key={itemView.id} />
         ))}
       </ul>
+      <BillingWorkspaceHandoff handoffView={view.handoffView} />
     </section>
   );
 }
@@ -46,5 +49,50 @@ function BillingWorkspaceSummaryItem({
         {itemView.description}
       </p>
     </li>
+  );
+}
+
+function BillingWorkspaceHandoff({
+  handoffView,
+}: {
+  handoffView: SettingsBillingWorkspaceHandoffView;
+}) {
+  return (
+    <section
+      aria-label={handoffView.title}
+      className="grid gap-3 rounded-md border bg-background/80 p-3"
+    >
+      <div>
+        <h3 className="font-medium text-sm">{handoffView.title}</h3>
+        <p className="mt-1 text-muted-foreground text-xs leading-5">
+          {handoffView.description}
+        </p>
+      </div>
+      <dl className="grid gap-2 md:grid-cols-2 xl:grid-cols-3">
+        {handoffView.itemViews.map((itemView) => (
+          <BillingWorkspaceHandoffItem itemView={itemView} key={itemView.id} />
+        ))}
+      </dl>
+    </section>
+  );
+}
+
+function BillingWorkspaceHandoffItem({
+  itemView,
+}: {
+  itemView: SettingsBillingWorkspaceHandoffItemView;
+}) {
+  return (
+    <div className="rounded-md border bg-muted/20 px-3 py-2">
+      <dt className="font-medium text-xs">{itemView.label}</dt>
+      <dd className="mt-1">
+        <output aria-label={itemView.ariaLabel} className="text-sm">
+          {itemView.value}
+        </output>
+        <p className="mt-1 text-muted-foreground text-xs leading-5">
+          {itemView.description}
+        </p>
+      </dd>
+    </div>
   );
 }

@@ -87,7 +87,7 @@ test('assignment result material handoff exposes 30 safe teacher-material slices
   );
   assert.equal(
     getHandoffValue(handoffView, 'csv-export-preparation'),
-    '20 slices'
+    '30 slices'
   );
   assert.equal(getHandoffValue(handoffView, 'csv-delivery-policy'), '7 fields');
   assert.equal(getHandoffValue(handoffView, 'csv-answer-columns'), '9');

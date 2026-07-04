@@ -481,7 +481,9 @@ import {
   SETTINGS_ACCOUNT_WORKSPACE_HANDOFF_ITEM_IDS,
 } from '@/settings/account-handoff';
 import {
+  SETTINGS_BILLING_WORKSPACE_HANDOFF_ITEM_IDS,
   buildSettingsBillingPageViewModel,
+  buildSettingsBillingWorkspaceHandoffView,
   buildSettingsBillingWorkspaceSummaryView,
   buildSettingsPaymentPageViewModel,
 } from '@/settings/billing-view';
@@ -8945,6 +8947,48 @@ assert.match(
   /export type SettingsBillingWorkspaceSummaryItemId =[\s\S]*'activity-library'[\s\S]*'assignment-workflow'[\s\S]*'plan-access'[\s\S]*'results-ai'/,
   'Settings billing view model should expose stable workspace billing boundary item ids.'
 );
+assert.deepEqual(SETTINGS_BILLING_WORKSPACE_HANDOFF_ITEM_IDS, [
+  'workspace-scope',
+  'route-gate',
+  'payment-feature-gate',
+  'plan-source',
+  'current-plan-card',
+  'plan-status-badge',
+  'plan-feature-section',
+  'plan-limit-section',
+  'free-plan-boundary',
+  'pro-plan-boundary',
+  'lifetime-plan-boundary',
+  'upgrade-action',
+  'portal-action',
+  'retry-action',
+  'hosted-checkout',
+  'customer-portal',
+  'payment-callback',
+  'activity-library-access',
+  'assignment-workflow-access',
+  'ai-draft-access',
+  'result-export-access',
+  'source-material-access',
+  'school-workspace-path',
+  'period-start',
+  'period-end',
+  'trial-end',
+  'cancel-at-period-end',
+  'provider-boundary',
+  'student-data-boundary',
+  'privacy-guard',
+]);
+assert.match(
+  settingsBillingViewSource,
+  /export const SETTINGS_BILLING_WORKSPACE_HANDOFF_ITEM_IDS = \[(?=[\s\S]*'workspace-scope')(?=[\s\S]*'route-gate')(?=[\s\S]*'payment-feature-gate')(?=[\s\S]*'plan-source')(?=[\s\S]*'current-plan-card')(?=[\s\S]*'plan-status-badge')(?=[\s\S]*'plan-feature-section')(?=[\s\S]*'plan-limit-section')(?=[\s\S]*'free-plan-boundary')(?=[\s\S]*'pro-plan-boundary')(?=[\s\S]*'lifetime-plan-boundary')(?=[\s\S]*'upgrade-action')(?=[\s\S]*'portal-action')(?=[\s\S]*'retry-action')(?=[\s\S]*'hosted-checkout')(?=[\s\S]*'customer-portal')(?=[\s\S]*'payment-callback')(?=[\s\S]*'activity-library-access')(?=[\s\S]*'assignment-workflow-access')(?=[\s\S]*'ai-draft-access')(?=[\s\S]*'result-export-access')(?=[\s\S]*'source-material-access')(?=[\s\S]*'school-workspace-path')(?=[\s\S]*'period-start')(?=[\s\S]*'period-end')(?=[\s\S]*'trial-end')(?=[\s\S]*'cancel-at-period-end')(?=[\s\S]*'provider-boundary')(?=[\s\S]*'student-data-boundary')(?=[\s\S]*'privacy-guard')/,
+  'Settings billing handoff should expose stable 30-slice workspace billing item ids.'
+);
+assert.match(
+  settingsBillingViewSource,
+  /export type SettingsBillingWorkspaceHandoffPrivacyContract = \{[\s\S]*changesActivityContent: false;[\s\S]*changesAssignmentLinks: false;[\s\S]*exposesActivityContent: false;[\s\S]*exposesPaymentProviderSecrets: false;[\s\S]*exposesRawCheckoutSession: false;[\s\S]*exposesSourceMaterialStorageKeys: false;[\s\S]*exposesStudentAnswers: false;[\s\S]*exposesStudentIdentifiers: false;[\s\S]*exposesTeacherEmail: false;[\s\S]*hostedBillingOnly: true;[\s\S]*modifiesAssignmentSnapshots: false;[\s\S]*planCapabilitiesAffectClassroomLoop: true;[\s\S]*scope: 'teacher-billing-workspace';/,
+  'Settings billing handoff should publish explicit hosted-billing privacy and classroom behavior flags.'
+);
 assert.match(
   settingsBillingViewSource,
   /export function isSettingsBillingEnabled\(\)[\s\S]*websiteConfig\.payment\?\.enable === true/,
@@ -8966,14 +9010,73 @@ assert.match(
   'Settings billing view model should prepare localized workspace billing boundary copy and item semantics.'
 );
 assert.match(
+  settingsBillingViewSource,
+  /handoffView: buildSettingsBillingWorkspaceHandoffView\(\)[\s\S]*buildSettingsBillingWorkspaceHandoffView[\s\S]*SETTINGS_BILLING_WORKSPACE_HANDOFF_ITEM_IDS\.map[\s\S]*settings_billing_handoff_description[\s\S]*settings_billing_handoff_title[\s\S]*settings_billing_handoff_item_aria_label/,
+  'Settings billing summary should attach the prepared localized 30-slice handoff view.'
+);
+assert.match(
   billingWorkspaceSummarySource,
   /view\.itemViews\.map\(\(itemView\) =>[\s\S]*key=\{itemView\.id\}[\s\S]*function BillingWorkspaceSummaryItem[\s\S]*aria-label=\{itemView\.ariaLabel\}[\s\S]*itemView\.label[\s\S]*itemView\.description/,
   'Billing workspace summary component should render prepared boundary views and item semantics keyed by stable ids.'
 );
+assert.match(
+  billingWorkspaceSummarySource,
+  /SettingsBillingWorkspaceHandoffItemView[\s\S]*SettingsBillingWorkspaceHandoffView[\s\S]*<BillingWorkspaceHandoff handoffView=\{view\.handoffView\} \/>[\s\S]*function BillingWorkspaceHandoff[\s\S]*aria-label=\{handoffView\.title\}[\s\S]*handoffView\.description[\s\S]*handoffView\.itemViews\.map[\s\S]*function BillingWorkspaceHandoffItem[\s\S]*<output aria-label=\{itemView\.ariaLabel\}/,
+  'Billing workspace summary component should render prepared billing handoff semantic outputs.'
+);
 assert.doesNotMatch(
   billingWorkspaceSummarySource,
-  /Workspace billing boundary|Plan access|Activity library|Assignment workflow|Results and AI|工作区账单边界|方案权限|活动库|作业工作流|结果和 AI/,
+  /Workspace billing boundary|Billing workspace handoff|Plan access|Activity library|Assignment workflow|Results and AI|Teacher billing workspace|Hosted checkout|Provider secrets hidden|Student data unchanged|工作区账单边界|账单工作区交接|方案权限|活动库|作业工作流|结果和 AI|教师账单工作区|托管结账|已隐藏服务商密钥|学生数据不变/,
   'Billing workspace summary component should not hard-code visible billing boundary copy.'
+);
+const billingWorkspaceHandoffView = buildSettingsBillingWorkspaceHandoffView();
+const billingWorkspaceHandoffItemIds =
+  billingWorkspaceHandoffView.itemViews.map((item) => item.id);
+assert.deepEqual(billingWorkspaceHandoffItemIds, [
+  ...SETTINGS_BILLING_WORKSPACE_HANDOFF_ITEM_IDS,
+]);
+assert.deepEqual(billingWorkspaceHandoffView.privacy, {
+  changesActivityContent: false,
+  changesAssignmentLinks: false,
+  exposesActivityContent: false,
+  exposesPaymentProviderSecrets: false,
+  exposesRawCheckoutSession: false,
+  exposesSourceMaterialStorageKeys: false,
+  exposesStudentAnswers: false,
+  exposesStudentIdentifiers: false,
+  exposesTeacherEmail: false,
+  hostedBillingOnly: true,
+  itemIds: billingWorkspaceHandoffItemIds,
+  modifiesAssignmentSnapshots: false,
+  planCapabilitiesAffectClassroomLoop: true,
+  scope: 'teacher-billing-workspace',
+});
+assert.deepEqual(
+  billingWorkspaceHandoffView.itemViews
+    .filter((item) =>
+      [
+        'workspace-scope',
+        'hosted-checkout',
+        'assignment-workflow-access',
+        'provider-boundary',
+        'student-data-boundary',
+        'privacy-guard',
+      ].includes(item.id)
+    )
+    .map((item) => [item.id, item.value]),
+  [
+    ['workspace-scope', 'Teacher billing workspace'],
+    ['hosted-checkout', 'Hosted checkout'],
+    ['assignment-workflow-access', 'Assignment workflow'],
+    ['provider-boundary', 'Provider secrets hidden'],
+    ['student-data-boundary', 'Student data unchanged'],
+    ['privacy-guard', 'Private billing data omitted'],
+  ]
+);
+assert.doesNotMatch(
+  JSON.stringify(billingWorkspaceHandoffView),
+  /checkout-session-secret|sk_live_payment_provider_secret|teacher-private@example\.test|anonymous-browser-token|source-materials\/private\/key\.pdf|student wrote a private answer/,
+  'Billing workspace handoff should not serialize checkout sessions, provider secrets, teacher email, student data, or source-material keys.'
 );
 assert.match(
   paymentCardSource,
@@ -12041,6 +12144,12 @@ const authWorkspaceBoundaryRequirements = [
       ['settings_billing_workspace_summary_activities_description', /source-material workflows/],
       ['settings_billing_workspace_summary_assignments_description', /timers, attempt rules, shuffle policy/],
       ['settings_billing_workspace_summary_results_description', /Result exports, classroom briefs, AI-assisted drafting/],
+      ['settings_billing_handoff_description', /hosted plan management, classroom capability boundaries/],
+      ['settings_billing_handoff_workspace_scope_description', /teacher-owned activities, assignments, AI drafts/],
+      ['settings_billing_handoff_assignment_workflow_access_description', /published links, timers, attempt rules/],
+      ['settings_billing_handoff_provider_boundary_description', /Payment provider secrets, webhook payloads/],
+      ['settings_billing_handoff_student_data_boundary_description', /student names, anonymous tokens, answers/],
+      ['settings_billing_handoff_privacy_guard_description', /teacher emails, raw checkout sessions, processor secrets/],
     ],
   ],
   [
@@ -12135,6 +12244,12 @@ const authWorkspaceBoundaryRequirements = [
       ['settings_billing_workspace_summary_activities_description', /来源素材工作流/],
       ['settings_billing_workspace_summary_assignments_description', /计时器、尝试规则、打乱策略/],
       ['settings_billing_workspace_summary_results_description', /结果导出、课堂简报、AI 辅助草稿/],
+      ['settings_billing_handoff_description', /托管方案管理、课堂能力边界/],
+      ['settings_billing_handoff_workspace_scope_description', /教师拥有的活动、作业、AI 草稿/],
+      ['settings_billing_handoff_assignment_workflow_access_description', /已发布链接、计时器、尝试规则/],
+      ['settings_billing_handoff_provider_boundary_description', /支付服务商密钥、webhook 载荷/],
+      ['settings_billing_handoff_student_data_boundary_description', /学生姓名、匿名令牌、答案/],
+      ['settings_billing_handoff_privacy_guard_description', /教师邮箱、原始结账会话、支付服务商密钥/],
     ],
   ],
 ] as const;
