@@ -4679,8 +4679,8 @@ assert.match(
 );
 assert.match(
   activityEditorSource,
-  /export const ACTIVITY_EDITOR_TEMPLATE_HANDOFF_ITEM_IDS = \[(?=[\s\S]*'selected-template')(?=[\s\S]*'template-short-name')(?=[\s\S]*'current-template-readiness')(?=[\s\S]*'suggested-remix-options')(?=[\s\S]*'locked-template-options')(?=[\s\S]*'question-choice-readiness')(?=[\s\S]*'scaffold-reusable-coverage')(?=[\s\S]*'scaffold-teacher-notes')[\s\S]*export type ActivityEditorTemplateHandoffPrivacyContract = \{[\s\S]*exposesAnswerText: false;[\s\S]*exposesQuestionPromptText: false;[\s\S]*exposesRawEditorInput: false;[\s\S]*exposesRawScaffoldContent: false;[\s\S]*exposesSourceMaterialFileIds: false;[\s\S]*exposesSourceMaterialStorageKeys: false;[\s\S]*exposesTeacherNotesText: false;[\s\S]*itemIds: ActivityEditorTemplateHandoffItemId\[\];/,
-  'Activity editor template handoff should expose a typed 20-slice contract with explicit privacy flags.'
+  /export const ACTIVITY_EDITOR_TEMPLATE_HANDOFF_ITEM_IDS = \[(?=[\s\S]*'selected-template')(?=[\s\S]*'template-short-name')(?=[\s\S]*'current-template-readiness')(?=[\s\S]*'suggested-remix-options')(?=[\s\S]*'locked-template-options')(?=[\s\S]*'question-choice-readiness')(?=[\s\S]*'scaffold-reusable-coverage')(?=[\s\S]*'scaffold-teacher-notes')(?=[\s\S]*'shared-editor-contract')(?=[\s\S]*'parsed-content-status')(?=[\s\S]*'current-question-count')(?=[\s\S]*'current-pair-count')(?=[\s\S]*'current-group-count')(?=[\s\S]*'current-vocabulary-count')(?=[\s\S]*'current-teacher-note-count')(?=[\s\S]*'scaffold-review-steps')(?=[\s\S]*'save-before-publish-boundary')(?=[\s\S]*'privacy-guard')[\s\S]*export type ActivityEditorTemplateHandoffPrivacyContract = \{[\s\S]*exposesAnswerText: false;[\s\S]*exposesCurrentFieldText: false;[\s\S]*exposesQuestionPromptText: false;[\s\S]*exposesRawEditorInput: false;[\s\S]*exposesRawScaffoldContent: false;[\s\S]*exposesSourceMaterialFileIds: false;[\s\S]*exposesSourceMaterialStorageKeys: false;[\s\S]*exposesTeacherNotesText: false;[\s\S]*itemIds: ActivityEditorTemplateHandoffItemId\[\];/,
+  'Activity editor template handoff should expose a typed 30-slice contract with explicit privacy flags.'
 );
 assert.match(
   activityEditorSource,
@@ -4689,8 +4689,13 @@ assert.match(
 );
 assert.match(
   activityEditorSource,
-  /export function buildActivityEditorTemplateHandoffView(?=[\s\S]*readinessSummary: ActivityTemplateReadinessPanelSummary)(?=[\s\S]*setupView: ActivityEditorTemplateSetupView)(?=[\s\S]*template: ActivityTemplateDefinition)[\s\S]*id: 'selected-template'[\s\S]*id: 'current-template-readiness'[\s\S]*id: 'ready-template-options'[\s\S]*id: 'suggested-remix-options'[\s\S]*id: 'locked-template-options'[\s\S]*id: 'question-choice-readiness'[\s\S]*id: 'scaffold-reusable-coverage'[\s\S]*id: 'scaffold-teacher-notes'[\s\S]*privacy: buildActivityEditorTemplateHandoffPrivacyContract/,
-  'Activity editor template handoff should collect selected template, readiness, remix, scaffold, and field-coverage slices.'
+  /export function buildActivityEditorTemplateHandoffView(?=[\s\S]*currentContent: ActivityContent \| null)(?=[\s\S]*readinessSummary: ActivityTemplateReadinessPanelSummary)(?=[\s\S]*setupView: ActivityEditorTemplateSetupView)(?=[\s\S]*template: ActivityTemplateDefinition)[\s\S]*id: 'selected-template'[\s\S]*id: 'current-template-readiness'[\s\S]*id: 'ready-template-options'[\s\S]*id: 'suggested-remix-options'[\s\S]*id: 'locked-template-options'[\s\S]*id: 'question-choice-readiness'[\s\S]*id: 'scaffold-reusable-coverage'[\s\S]*id: 'scaffold-teacher-notes'[\s\S]*id: 'shared-editor-contract'[\s\S]*id: 'parsed-content-status'[\s\S]*id: 'current-question-count'[\s\S]*id: 'save-before-publish-boundary'[\s\S]*id: 'privacy-guard'[\s\S]*privacy: buildActivityEditorTemplateHandoffPrivacyContract/,
+  'Activity editor template handoff should collect selected template, readiness, remix, scaffold, current parsed fields, review, and privacy slices.'
+);
+assert.match(
+  activityEditorFormSource,
+  /ActivityEditorTemplateHandoff[\s\S]*data-handoff="activity-editor-template"[\s\S]*data-handoff-item=\{item\.id\}/,
+  'Activity editor form should render the template handoff in the real create/edit surface.'
 );
 assert.doesNotMatch(
   activityEditorSource,
@@ -41554,9 +41559,10 @@ const editorTemplateHandoffItemIds =
 assert.deepEqual(editorTemplateHandoffItemIds, [
   ...ACTIVITY_EDITOR_TEMPLATE_HANDOFF_ITEM_IDS,
 ]);
-assert.equal(editorTemplateView.handoffView.itemViews.length, 20);
+assert.equal(editorTemplateView.handoffView.itemViews.length, 30);
 assert.deepEqual(editorTemplateView.handoffView.privacy, {
   exposesAnswerText: false,
+  exposesCurrentFieldText: false,
   exposesQuestionPromptText: false,
   exposesRawEditorInput: false,
   exposesRawScaffoldContent: false,
@@ -41594,6 +41600,16 @@ assert.deepEqual(
     ['scaffold-groups', '3 groups'],
     ['scaffold-vocabulary', '8 words'],
     ['scaffold-teacher-notes', '2 notes'],
+    ['shared-editor-contract', 'Shared structured input'],
+    ['parsed-content-status', 'Structured fields parsed'],
+    ['current-question-count', '1 questions'],
+    ['current-pair-count', '0 pairs'],
+    ['current-group-count', '0 groups'],
+    ['current-vocabulary-count', '6 words'],
+    ['current-teacher-note-count', '2 notes'],
+    ['scaffold-review-steps', '3 review steps'],
+    ['save-before-publish-boundary', 'Save before publish'],
+    ['privacy-guard', 'Private editor text hidden'],
   ]
 );
 assert.ok(

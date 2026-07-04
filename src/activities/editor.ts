@@ -161,6 +161,16 @@ export const ACTIVITY_EDITOR_TEMPLATE_HANDOFF_ITEM_IDS = [
   'scaffold-groups',
   'scaffold-vocabulary',
   'scaffold-teacher-notes',
+  'shared-editor-contract',
+  'parsed-content-status',
+  'current-question-count',
+  'current-pair-count',
+  'current-group-count',
+  'current-vocabulary-count',
+  'current-teacher-note-count',
+  'scaffold-review-steps',
+  'save-before-publish-boundary',
+  'privacy-guard',
 ] as const;
 
 export type ActivityEditorTemplateHandoffItemId =
@@ -177,6 +187,7 @@ export type ActivityEditorTemplateHandoffItemView = {
 
 export type ActivityEditorTemplateHandoffPrivacyContract = {
   exposesAnswerText: false;
+  exposesCurrentFieldText: false;
   exposesQuestionPromptText: false;
   exposesRawEditorInput: false;
   exposesRawScaffoldContent: false;
@@ -1890,6 +1901,7 @@ export function buildActivityEditorTemplateView({
 
   return {
     handoffView: buildActivityEditorTemplateHandoffView({
+      currentContent,
       readinessSummary,
       remixPlan: templateReadiness,
       setupView,
@@ -1903,11 +1915,13 @@ export function buildActivityEditorTemplateView({
 }
 
 export function buildActivityEditorTemplateHandoffView({
+  currentContent,
   readinessSummary,
   remixPlan,
   setupView,
   template,
 }: {
+  currentContent: ActivityContent | null;
   readinessSummary: ActivityTemplateReadinessPanelSummary;
   remixPlan: TemplateRemixPlan | null;
   setupView: ActivityEditorTemplateSetupView;
@@ -1927,6 +1941,8 @@ export function buildActivityEditorTemplateHandoffView({
     ? lockedOptions.length
     : getActivityTemplates().length;
   const scaffoldSummary = setupView.scaffoldSummary;
+  const currentCounts =
+    buildActivityEditorTemplateCurrentContentCounts(currentContent);
   const itemViews: ActivityEditorTemplateHandoffItemView[] = [
     buildActivityEditorTemplateHandoffItem({
       description: template.description,
@@ -2084,6 +2100,92 @@ export function buildActivityEditorTemplateHandoffView({
       metricId: 'teacherNotes',
       setupView,
     }),
+    buildActivityEditorTemplateHandoffItem({
+      description:
+        m.activity_editor_template_handoff_shared_contract_description(),
+      id: 'shared-editor-contract',
+      label: m.activity_editor_template_handoff_shared_contract_label(),
+      value: m.activity_editor_template_handoff_shared_contract_value(),
+    }),
+    buildActivityEditorTemplateHandoffItem({
+      description:
+        m.activity_editor_template_handoff_parsed_content_description(),
+      id: 'parsed-content-status',
+      label: m.activity_editor_template_handoff_parsed_content_label(),
+      statusLabel: currentContent
+        ? m.template_remix_ready()
+        : m.template_remix_needs_more_content(),
+      value: currentContent
+        ? m.activity_editor_template_handoff_parsed_content_ready_value()
+        : m.activity_editor_template_handoff_parsed_content_needs_review_value(),
+    }),
+    buildActivityEditorTemplateCurrentCountHandoffItem({
+      description:
+        m.activity_editor_template_handoff_current_questions_description(),
+      id: 'current-question-count',
+      label: m.activity_form_field_questions(),
+      value: m.activity_template_scaffold_coverage_questions({
+        count: currentCounts.questions,
+      }),
+    }),
+    buildActivityEditorTemplateCurrentCountHandoffItem({
+      description:
+        m.activity_editor_template_handoff_current_pairs_description(),
+      id: 'current-pair-count',
+      label: m.activity_form_field_pairs(),
+      value: m.activity_template_scaffold_coverage_pairs({
+        count: currentCounts.pairs,
+      }),
+    }),
+    buildActivityEditorTemplateCurrentCountHandoffItem({
+      description:
+        m.activity_editor_template_handoff_current_groups_description(),
+      id: 'current-group-count',
+      label: m.activity_form_field_groups(),
+      value: m.activity_template_scaffold_coverage_groups({
+        count: currentCounts.groups,
+      }),
+    }),
+    buildActivityEditorTemplateCurrentCountHandoffItem({
+      description:
+        m.activity_editor_template_handoff_current_vocabulary_description(),
+      id: 'current-vocabulary-count',
+      label: m.activity_form_field_vocabulary(),
+      value: m.activity_template_scaffold_coverage_vocabulary({
+        count: currentCounts.vocabulary,
+      }),
+    }),
+    buildActivityEditorTemplateCurrentCountHandoffItem({
+      description:
+        m.activity_editor_template_handoff_current_teacher_notes_description(),
+      id: 'current-teacher-note-count',
+      label: m.activity_form_field_teacher_notes(),
+      value: m.activity_template_scaffold_coverage_teacher_notes({
+        count: currentCounts.teacherNotes,
+      }),
+    }),
+    buildActivityEditorTemplateHandoffItem({
+      description:
+        m.activity_editor_template_handoff_review_steps_description(),
+      id: 'scaffold-review-steps',
+      label: setupView.reviewChecklistLabel,
+      value: m.activity_editor_template_handoff_review_steps_value({
+        count: setupView.reviewChecklistItems.length,
+      }),
+    }),
+    buildActivityEditorTemplateHandoffItem({
+      description:
+        m.activity_editor_template_handoff_save_boundary_description(),
+      id: 'save-before-publish-boundary',
+      label: m.activity_editor_template_handoff_save_boundary_label(),
+      value: m.activity_editor_template_handoff_save_boundary_value(),
+    }),
+    buildActivityEditorTemplateHandoffItem({
+      description: m.activity_editor_template_handoff_privacy_description(),
+      id: 'privacy-guard',
+      label: m.activity_editor_template_handoff_privacy_label(),
+      value: m.activity_editor_template_handoff_privacy_value(),
+    }),
   ];
 
   return {
@@ -2122,11 +2224,43 @@ function buildActivityEditorTemplateScaffoldMetricHandoffItem({
   });
 }
 
+function buildActivityEditorTemplateCurrentCountHandoffItem({
+  description,
+  id,
+  label,
+  value,
+}: {
+  description: string;
+  id: ActivityEditorTemplateHandoffItemId;
+  label: string;
+  value: string;
+}) {
+  return buildActivityEditorTemplateHandoffItem({
+    description,
+    id,
+    label,
+    value,
+  });
+}
+
+function buildActivityEditorTemplateCurrentContentCounts(
+  content: ActivityContent | null
+) {
+  return {
+    groups: content?.groups.length ?? 0,
+    pairs: content?.pairs.length ?? 0,
+    questions: content?.questions.length ?? 0,
+    teacherNotes: content?.teacherNotes.length ?? 0,
+    vocabulary: content?.vocabulary.length ?? 0,
+  };
+}
+
 function buildActivityEditorTemplateHandoffPrivacyContract(
   itemViews: ActivityEditorTemplateHandoffItemView[]
 ): ActivityEditorTemplateHandoffPrivacyContract {
   return {
     exposesAnswerText: false,
+    exposesCurrentFieldText: false,
     exposesQuestionPromptText: false,
     exposesRawEditorInput: false,
     exposesRawScaffoldContent: false,

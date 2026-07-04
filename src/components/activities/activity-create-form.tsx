@@ -12,6 +12,7 @@ import {
   buildActivityEditorTemplateScaffoldApplication,
   buildActivityEditorTemplateView,
   getActivityEditorDefaultInput,
+  type ActivityEditorTemplateHandoffView,
 } from '@/activities/editor';
 import {
   ACTIVITY_AI_DRAFT_ITEM_COUNT_RANGE,
@@ -258,6 +259,10 @@ export function ActivityCreateForm({
               templateView={templateView}
             />
 
+            <ActivityEditorTemplateHandoff
+              handoffView={templateView.handoffView}
+            />
+
             <ActivityTemplateScaffoldPanel
               setupView={templateView.setupView}
               onApplyScaffold={applyTemplateScaffold}
@@ -300,5 +305,37 @@ export function ActivityCreateForm({
         </form>
       </Form>
     </Card>
+  );
+}
+
+function ActivityEditorTemplateHandoff({
+  handoffView,
+}: {
+  handoffView: ActivityEditorTemplateHandoffView;
+}) {
+  const titleId = 'activity-editor-template-handoff-title';
+  const descriptionId = 'activity-editor-template-handoff-description';
+
+  return (
+    <section
+      aria-describedby={descriptionId}
+      aria-labelledby={titleId}
+      className="sr-only"
+      data-handoff="activity-editor-template"
+    >
+      <h2 id={titleId}>{handoffView.title}</h2>
+      <p id={descriptionId}>{handoffView.description}</p>
+      <dl>
+        {handoffView.itemViews.map((item) => (
+          <div data-handoff-item={item.id} key={item.id}>
+            <dt>{item.label}</dt>
+            <dd>
+              <output aria-label={item.ariaLabel}>{item.value}</output>
+              <span>{item.description}</span>
+            </dd>
+          </div>
+        ))}
+      </dl>
+    </section>
   );
 }

@@ -15,7 +15,7 @@ const SECRET_ANSWER = 'SECRET_TEMPLATE_ANSWER_SHOULD_NOT_LEAK';
 const SECRET_FILE_ID = 'SECRET_TEMPLATE_FILE_ID_SHOULD_NOT_LEAK';
 const SECRET_STORAGE_KEY = 'classroom/private/template-source.pdf';
 
-test('activity editor template view exposes a 20-slice handoff contract', () => {
+test('activity editor template view exposes a 30-slice handoff contract', () => {
   const templateView = buildActivityEditorTemplateView({
     input: {
       ...getActivityEditorDefaultInput(),
@@ -37,7 +37,7 @@ test('activity editor template view exposes a 20-slice handoff contract', () => 
   const itemIds = handoffView.itemViews.map((item) => item.id);
 
   assert.deepEqual(itemIds, [...ACTIVITY_EDITOR_TEMPLATE_HANDOFF_ITEM_IDS]);
-  assert.equal(new Set(itemIds).size, 20);
+  assert.equal(new Set(itemIds).size, 30);
   assert.equal(
     handoffView.itemViews.every(
       (item) =>
@@ -50,6 +50,7 @@ test('activity editor template view exposes a 20-slice handoff contract', () => 
   );
   assert.deepEqual(handoffView.privacy, {
     exposesAnswerText: false,
+    exposesCurrentFieldText: false,
     exposesQuestionPromptText: false,
     exposesRawEditorInput: false,
     exposesRawScaffoldContent: false,
@@ -119,6 +120,46 @@ test('activity editor template view exposes a 20-slice handoff contract', () => 
     getHandoffItemValue(handoffView.itemViews, 'scaffold-teacher-notes'),
     '2 notes'
   );
+  assert.equal(
+    getHandoffItemValue(handoffView.itemViews, 'shared-editor-contract'),
+    'Shared structured input'
+  );
+  assert.equal(
+    getHandoffItemValue(handoffView.itemViews, 'parsed-content-status'),
+    'Structured fields parsed'
+  );
+  assert.equal(
+    getHandoffItemValue(handoffView.itemViews, 'current-question-count'),
+    '1 questions'
+  );
+  assert.equal(
+    getHandoffItemValue(handoffView.itemViews, 'current-pair-count'),
+    '0 pairs'
+  );
+  assert.equal(
+    getHandoffItemValue(handoffView.itemViews, 'current-group-count'),
+    '0 groups'
+  );
+  assert.equal(
+    getHandoffItemValue(handoffView.itemViews, 'current-vocabulary-count'),
+    '6 words'
+  );
+  assert.equal(
+    getHandoffItemValue(handoffView.itemViews, 'current-teacher-note-count'),
+    '2 notes'
+  );
+  assert.equal(
+    getHandoffItemValue(handoffView.itemViews, 'scaffold-review-steps'),
+    '3 review steps'
+  );
+  assert.equal(
+    getHandoffItemValue(handoffView.itemViews, 'save-before-publish-boundary'),
+    'Save before publish'
+  );
+  assert.equal(
+    getHandoffItemValue(handoffView.itemViews, 'privacy-guard'),
+    'Private editor text hidden'
+  );
 
   assertNoPrivateTemplateText(JSON.stringify(handoffView));
 });
@@ -160,6 +201,14 @@ test('invalid editor fields still produce a safe template handoff', () => {
   assert.equal(
     getHandoffItemValue(handoffView.itemViews, 'scaffold-runtime-items'),
     '8 playable items'
+  );
+  assert.equal(
+    getHandoffItemValue(handoffView.itemViews, 'parsed-content-status'),
+    'Needs field review'
+  );
+  assert.equal(
+    getHandoffItemValue(handoffView.itemViews, 'current-question-count'),
+    '0 questions'
   );
   assertNoPrivateTemplateText(JSON.stringify(handoffView));
 });

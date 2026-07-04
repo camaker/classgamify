@@ -39,7 +39,6 @@ import {
 import {
   type AssignmentStatusAction,
   buildAssignmentStatusAction,
-  getAssignmentLifecycleStatus,
   getAssignmentStatusLabel,
 } from '@/assignments/lifecycle';
 import {
@@ -1402,11 +1401,12 @@ function summarizeAssignmentListVisibleCards<
 
   for (const assignment of assignments) {
     const cardView = buildAssignmentListCardViewModel(assignment);
-    const lifecycleStatus = getAssignmentLifecycleStatus(
-      assignment.assignment.status,
-      assignment.assignment.expiresAt,
-      assignment.now
-    );
+    const lifecycleStatus = buildAssignmentShareLinkAvailability({
+      expiresAt: assignment.assignment.expiresAt,
+      now: assignment.now,
+      shareSlug: assignment.assignment.shareSlug,
+      status: assignment.assignment.status,
+    }).lifecycleStatus;
     const shareAction = cardView.actionView.shareAction;
 
     switch (lifecycleStatus) {
