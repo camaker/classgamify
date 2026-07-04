@@ -39,7 +39,9 @@ import {
   normalizeContactInquiryIntent,
 } from '@/contact/inquiry';
 import {
+  buildContactClassroomIntakeHandoffView,
   buildContactClassroomInquiryScopeView,
+  CONTACT_CLASSROOM_INTAKE_HANDOFF_ITEM_IDS,
   CONTACT_CLASSROOM_INQUIRY_SCOPE_ITEM_IDS,
 } from '@/contact/inquiry-view';
 import {
@@ -8431,13 +8433,38 @@ assert.match(
 );
 assert.match(
   contactInquiryViewSource,
+  /CONTACT_CLASSROOM_INTAKE_HANDOFF_ITEM_IDS = \[(?=[\s\S]*'classroom-intent')(?=[\s\S]*'subject-routing')(?=[\s\S]*'message-template')(?=[\s\S]*'learners-field')(?=[\s\S]*'grade-field')(?=[\s\S]*'material-field')(?=[\s\S]*'routine-field')(?=[\s\S]*'need-field')(?=[\s\S]*'message-body')(?=[\s\S]*'name-field')(?=[\s\S]*'email-field')(?=[\s\S]*'field-normalization')(?=[\s\S]*'field-limits')(?=[\s\S]*'structured-payload')(?=[\s\S]*'api-intent-normalization')(?=[\s\S]*'mail-context')(?=[\s\S]*'locale-forwarding')(?=[\s\S]*'safe-context-boundary')(?=[\s\S]*'private-data-guard')(?=[\s\S]*'legacy-copy-guard')/,
+  'Contact classroom intake handoff should expose stable 20-slice classroom inquiry item ids.'
+);
+assert.match(
+  contactInquiryViewSource,
+  /export type ContactClassroomIntakeHandoffPrivacyContract = \{[\s\S]*createsAssignmentLinks: false;[\s\S]*exposesPrivateFileUrls: false;[\s\S]*exposesRawProviderErrors: false;[\s\S]*exposesRawStudentIdentifiers: false;[\s\S]*exposesRecipientEmailInView: false;[\s\S]*exposesSourceMaterialStorageKeys: false;[\s\S]*forwardsLocaleToMail: true;[\s\S]*notifiesLearners: false;[\s\S]*persistsActivityContent: false;[\s\S]*readsFileBytes: false;[\s\S]*scope: 'public-classroom-inquiry-intake';[\s\S]*usesStructuredFields: true;/,
+  'Contact classroom intake handoff should publish explicit safety and behavior flags.'
+);
+assert.match(
+  contactInquiryViewSource,
   /privacyBoundary:[\s\S]*id: 'safe-classroom-context'/,
   'Contact inquiry view should expose a stable safe-context privacy boundary.'
 );
+assert.match(
+  contactInquiryViewSource,
+  /buildContactClassroomIntakeHandoffView[\s\S]*contact_classroom_intake_handoff_description[\s\S]*buildContactClassroomIntakeHandoffPrivacyContract[\s\S]*contact_classroom_intake_handoff_title[\s\S]*contact_classroom_intake_handoff_item_aria_label/,
+  'Contact classroom intake handoff should prepare localized title, description, item semantics, and privacy contract.'
+);
 assert.doesNotMatch(
   contactInquiryViewSource,
-  /Learners and class|Activity material|Assignment routine|Template or worksheet need|Result review|storage keys|private file URLs/,
+  /Classroom inquiry intake|Classroom workflow|Prompted context|Trimmed NFKC text|Bounded fields|Safe classroom context|Private data omitted|Learners and class|Activity material|Assignment routine|Template or worksheet need|Result review|storage keys|private file URLs/,
   'Contact inquiry view should read visible classroom scope copy from locale messages.'
+);
+assert.match(
+  contactFormCardSource,
+  /buildContactClassroomIntakeHandoffView\(\{ scopeView: classroomScope \}\)[\s\S]*<ClassroomIntakeHandoff view=\{classroomIntakeHandoff\} \/>[\s\S]*function ClassroomIntakeHandoff[\s\S]*aria-label=\{view\.title\}[\s\S]*view\.description[\s\S]*view\.itemViews\.map[\s\S]*function ClassroomIntakeHandoffItem[\s\S]*<output aria-label=\{itemView\.ariaLabel\}/,
+  'Contact classroom form should render the prepared intake handoff title, description, item views, and semantic output values.'
+);
+assert.doesNotMatch(
+  contactFormCardSource,
+  /Classroom inquiry intake|Classroom workflow|Prompted context|Trimmed NFKC text|Bounded fields|Safe classroom context|Private data omitted|课堂咨询收集|课堂工作流|提示式上下文|有界字段|安全课堂上下文|已省略私有数据/,
+  'Contact classroom form should not hard-code visible intake handoff copy.'
 );
 assert.match(
   contactFormCardSource,
@@ -11404,6 +11431,10 @@ const contactClassroomScopeRequirements = [
       ['contact_classroom_scope_template_worksheet_description', /matching, fill blank, line match, listening, group sort/],
       ['contact_classroom_scope_result_review_description', /CSV export, reteach notes, or student follow-up/],
       ['contact_classroom_scope_privacy_description', /storage keys, private file URLs, raw student identifiers/],
+      ['contact_classroom_intake_handoff_description', /20-slice classroom inquiry intake contract/],
+      ['contact_classroom_intake_handoff_field_normalization_description', /NFKC, collapsed whitespace, trimming/],
+      ['contact_classroom_intake_handoff_structured_payload_description', /learner, grade, material, routine, and need fields/],
+      ['contact_classroom_intake_handoff_private_data_guard_description', /raw student identifiers, source-material storage keys/],
     ],
   ],
   [
@@ -11417,6 +11448,10 @@ const contactClassroomScopeRequirements = [
       ['contact_classroom_scope_template_worksheet_description', /配对、填空、连线、听力、分类/],
       ['contact_classroom_scope_result_review_description', /CSV 导出、重讲提示或学生跟进/],
       ['contact_classroom_scope_privacy_description', /存储 key、私有文件 URL、原始学生标识/],
+      ['contact_classroom_intake_handoff_description', /20 切片课堂咨询收集契约/],
+      ['contact_classroom_intake_handoff_field_normalization_description', /NFKC 规范化、空白折叠/],
+      ['contact_classroom_intake_handoff_structured_payload_description', /学习者、年级、材料、节奏和需求字段/],
+      ['contact_classroom_intake_handoff_private_data_guard_description', /原始学生标识、来源素材存储 key/],
     ],
   ],
 ] as const;
@@ -33473,6 +33508,113 @@ assert.match(
   buildContactClassroomInquiryScopeView().privacyBoundary.description,
   /storage keys, private file URLs, raw student identifiers/
 );
+assert.deepEqual(CONTACT_CLASSROOM_INTAKE_HANDOFF_ITEM_IDS, [
+  'classroom-intent',
+  'subject-routing',
+  'message-template',
+  'learners-field',
+  'grade-field',
+  'material-field',
+  'routine-field',
+  'need-field',
+  'message-body',
+  'name-field',
+  'email-field',
+  'field-normalization',
+  'field-limits',
+  'structured-payload',
+  'api-intent-normalization',
+  'mail-context',
+  'locale-forwarding',
+  'safe-context-boundary',
+  'private-data-guard',
+  'legacy-copy-guard',
+]);
+const contactClassroomIntakeHandoffView =
+  buildContactClassroomIntakeHandoffView();
+const contactClassroomIntakeHandoffItemIds =
+  contactClassroomIntakeHandoffView.itemViews.map((item) => item.id);
+assert.deepEqual(contactClassroomIntakeHandoffItemIds, [
+  ...CONTACT_CLASSROOM_INTAKE_HANDOFF_ITEM_IDS,
+]);
+assert.deepEqual(contactClassroomIntakeHandoffView.privacy, {
+  createsAssignmentLinks: false,
+  exposesPrivateFileUrls: false,
+  exposesRawProviderErrors: false,
+  exposesRawStudentIdentifiers: false,
+  exposesRecipientEmailInView: false,
+  exposesSourceMaterialStorageKeys: false,
+  forwardsLocaleToMail: true,
+  itemIds: contactClassroomIntakeHandoffItemIds,
+  notifiesLearners: false,
+  persistsActivityContent: false,
+  readsFileBytes: false,
+  scope: 'public-classroom-inquiry-intake',
+  usesStructuredFields: true,
+});
+assert.deepEqual(
+  contactClassroomIntakeHandoffView.itemViews.map((item) => [
+    item.id,
+    item.value,
+  ]),
+  [
+    ['classroom-intent', 'Classroom workflow'],
+    ['subject-routing', 'ClassGamify classroom workflow'],
+    ['message-template', 'Prompted context'],
+    ['learners-field', 'Learners'],
+    ['grade-field', 'Class or grade'],
+    ['material-field', 'Activity material'],
+    ['routine-field', 'Weekly routine'],
+    ['need-field', 'Main need'],
+    ['message-body', 'Message'],
+    ['name-field', 'Name'],
+    ['email-field', 'Email'],
+    ['field-normalization', 'Trimmed NFKC text'],
+    ['field-limits', 'Bounded fields'],
+    ['structured-payload', 'classroomInquiry'],
+    ['api-intent-normalization', 'Server normalized'],
+    ['mail-context', 'Contact email'],
+    ['locale-forwarding', 'Request locale'],
+    ['safe-context-boundary', 'Safe classroom context'],
+    ['private-data-guard', 'Private data omitted'],
+    ['legacy-copy-guard', 'ClassGamify only'],
+  ]
+);
+assert.doesNotMatch(
+  JSON.stringify(contactClassroomIntakeHandoffView),
+  /raw-student-token|source-material\/private\/storage-key|private\/worksheet\.pdf|raw-provider-stack-trace|raw-private-file-bytes/,
+  'Contact classroom intake handoff should not serialize private student, source-material, provider, file URL, or file-byte text.'
+);
+overwriteGetLocale(() => 'zh');
+try {
+  const zhContactClassroomIntakeHandoffView =
+    buildContactClassroomIntakeHandoffView();
+  assert.equal(zhContactClassroomIntakeHandoffView.title, '课堂咨询收集');
+  assert.match(
+    zhContactClassroomIntakeHandoffView.description,
+    /20 切片课堂咨询收集契约/
+  );
+  assert.deepEqual(
+    zhContactClassroomIntakeHandoffView.itemViews
+      .filter((item) =>
+        [
+          'classroom-intent',
+          'field-normalization',
+          'safe-context-boundary',
+          'private-data-guard',
+        ].includes(item.id)
+      )
+      .map((item) => [item.id, item.value]),
+    [
+      ['classroom-intent', '课堂工作流'],
+      ['field-normalization', '已裁剪 NFKC 文本'],
+      ['safe-context-boundary', '安全课堂上下文'],
+      ['private-data-guard', '已省略私有数据'],
+    ]
+  );
+} finally {
+  overwriteGetLocale(() => 'en');
+}
 const pricingPageView = buildPricingPageViewModel();
 assert.deepEqual(pricingPageView.hero, {
   eyebrow: 'ClassGamify plans',

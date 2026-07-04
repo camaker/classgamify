@@ -9,7 +9,10 @@ import {
   type ContactInquiryIntent,
 } from '@/contact/inquiry';
 import {
+  buildContactClassroomIntakeHandoffView,
   buildContactClassroomInquiryScopeView,
+  type ContactClassroomIntakeHandoffItemView,
+  type ContactClassroomIntakeHandoffView,
   type ContactClassroomInquiryScopeItemId,
   type ContactClassroomInquiryScopeView,
 } from '@/contact/inquiry-view';
@@ -88,6 +91,9 @@ export function ContactFormCard({
     intent === 'classroom'
       ? buildContactClassroomInquiryScopeView()
       : undefined;
+  const classroomIntakeHandoff = classroomScope
+    ? buildContactClassroomIntakeHandoffView({ scopeView: classroomScope })
+    : undefined;
   const defaultMessage =
     intent === 'classroom' ? m.contact_classroom_message_template() : '';
   const form = useForm<FormValues>({
@@ -220,6 +226,9 @@ export function ContactFormCard({
                 copy={classroomCopy}
               />
             ) : null}
+            {classroomIntakeHandoff ? (
+              <ClassroomIntakeHandoff view={classroomIntakeHandoff} />
+            ) : null}
             <FormError message={error} />
           </CardContent>
           <CardFooter className="mt-6 flex items-center justify-between rounded-none border-t bg-muted px-6 py-4">
@@ -291,6 +300,48 @@ function ClassroomInquiryScopePanel({
         </div>
       </div>
     </section>
+  );
+}
+
+function ClassroomIntakeHandoff({
+  view,
+}: {
+  view: ContactClassroomIntakeHandoffView;
+}) {
+  return (
+    <section aria-label={view.title} className="space-y-3 border-t pt-4">
+      <div className="space-y-1">
+        <p className="text-sm font-medium">{view.title}</p>
+        <p className="text-xs leading-5 text-muted-foreground">
+          {view.description}
+        </p>
+      </div>
+      <dl className="grid gap-2 sm:grid-cols-2">
+        {view.itemViews.map((itemView) => (
+          <ClassroomIntakeHandoffItem itemView={itemView} key={itemView.id} />
+        ))}
+      </dl>
+    </section>
+  );
+}
+
+function ClassroomIntakeHandoffItem({
+  itemView,
+}: {
+  itemView: ContactClassroomIntakeHandoffItemView;
+}) {
+  return (
+    <div className="rounded-md border bg-background/70 px-3 py-2">
+      <dt className="font-medium text-xs">{itemView.label}</dt>
+      <dd className="mt-1">
+        <output aria-label={itemView.ariaLabel} className="text-sm">
+          {itemView.value}
+        </output>
+        <p className="mt-1 text-muted-foreground text-xs leading-5">
+          {itemView.description}
+        </p>
+      </dd>
+    </div>
   );
 }
 
