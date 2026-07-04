@@ -16,7 +16,7 @@ const SECRET_INSTRUCTIONS = 'SECRET_STUDENT_INSTRUCTIONS';
 const SECRET_PROMPT_TEXT = 'SECRET_PROMPT_TEXT';
 const SECRET_TOKEN = 'raw-anonymous-token-value';
 
-test('assignment results export preparation exposes 20 safe CSV coverage slices', () => {
+test('assignment results export preparation exposes 30 safe CSV coverage slices', () => {
   const preparationView = buildAssignmentResultsExportPreparationView({
     activity: {
       description: 'Live activity description',
@@ -120,7 +120,7 @@ test('assignment results export preparation exposes 20 safe CSV coverage slices'
   assert.deepEqual(itemIds, [
     ...ASSIGNMENT_RESULTS_EXPORT_PREPARATION_ITEM_IDS,
   ]);
-  assert.equal(new Set(itemIds).size, 20);
+  assert.equal(new Set(itemIds).size, 30);
   assert.equal(
     preparationView.itemViews.every(
       (itemView) =>
@@ -132,10 +132,14 @@ test('assignment results export preparation exposes 20 safe CSV coverage slices'
     true
   );
   assert.deepEqual(preparationView.privacy, {
+    exposesAssignmentTitle: false,
     exposesCopyArtifactText: false,
     exposesCsvDataUrl: false,
+    exposesCsvFilename: false,
+    exposesPromptText: false,
     exposesRawAnonymousToken: false,
     exposesStudentAnswerText: false,
+    exposesStudentInstructions: false,
     exposesTeacherAnswerText: false,
     itemIds,
     scope: 'full-assignment-results',
@@ -193,6 +197,46 @@ test('assignment results export preparation exposes 20 safe CSV coverage slices'
   assert.equal(
     getPreparationItemValue(preparationView, 'accepted-alternatives'),
     'Alternatives column'
+  );
+  assert.equal(
+    getPreparationItemValue(preparationView, 'export-filename'),
+    'Prepared'
+  );
+  assert.equal(
+    getPreparationItemValue(preparationView, 'csv-data-url-boundary'),
+    'Not exposed'
+  );
+  assert.equal(
+    getPreparationItemValue(preparationView, 'formula-injection-guard'),
+    'Enabled'
+  );
+  assert.equal(
+    getPreparationItemValue(preparationView, 'submitted-date-format'),
+    'Prepared'
+  );
+  assert.equal(
+    getPreparationItemValue(preparationView, 'duration-normalization'),
+    'Timer-aware'
+  );
+  assert.equal(
+    getPreparationItemValue(preparationView, 'empty-answer-row'),
+    'Prepared'
+  );
+  assert.equal(
+    getPreparationItemValue(preparationView, 'prompt-column'),
+    'Prompt column'
+  );
+  assert.equal(
+    getPreparationItemValue(preparationView, 'student-answer-column'),
+    'Student answer column'
+  );
+  assert.equal(
+    getPreparationItemValue(preparationView, 'correctness-column'),
+    'Correctness column'
+  );
+  assert.equal(
+    getPreparationItemValue(preparationView, 'explanation-column'),
+    'Explanation column'
   );
   assert.equal(getPreparationItemValue(preparationView, 'columns'), '54');
 

@@ -134,6 +134,16 @@ export const ASSIGNMENT_RESULTS_EXPORT_PREPARATION_ITEM_IDS = [
   'answer-rows',
   'expected-answer',
   'accepted-alternatives',
+  'export-filename',
+  'csv-data-url-boundary',
+  'formula-injection-guard',
+  'submitted-date-format',
+  'duration-normalization',
+  'empty-answer-row',
+  'prompt-column',
+  'student-answer-column',
+  'correctness-column',
+  'explanation-column',
   'columns',
 ] as const;
 
@@ -149,10 +159,14 @@ export type AssignmentResultsExportPreparationItemView = {
 };
 
 export type AssignmentResultsExportPreparationPrivacyContract = {
+  exposesAssignmentTitle: false;
   exposesCopyArtifactText: false;
   exposesCsvDataUrl: false;
+  exposesCsvFilename: false;
+  exposesPromptText: false;
   exposesRawAnonymousToken: false;
   exposesStudentAnswerText: false;
+  exposesStudentInstructions: false;
   exposesTeacherAnswerText: false;
   itemIds: AssignmentResultsExportPreparationItemId[];
   scope: 'full-assignment-results';
@@ -469,6 +483,111 @@ function buildAssignmentResultsExportPreparationItem({
     };
   }
 
+  if (id === 'export-filename') {
+    return {
+      description:
+        m.assignment_results_export_preparation_export_filename_description(),
+      id,
+      label: m.assignment_results_export_preparation_export_filename_label(),
+      value: m.assignment_results_export_preparation_prepared_value(),
+    };
+  }
+
+  if (id === 'csv-data-url-boundary') {
+    return {
+      description:
+        m.assignment_results_export_preparation_data_url_boundary_description(),
+      id,
+      label: m.assignment_results_export_preparation_data_url_boundary_label(),
+      value: m.assignment_results_export_preparation_not_exposed_value(),
+    };
+  }
+
+  if (id === 'formula-injection-guard') {
+    return {
+      description:
+        m.assignment_results_export_preparation_formula_guard_description(),
+      id,
+      label: m.assignment_results_export_preparation_formula_guard_label(),
+      value: m.assignment_results_export_preparation_enabled_value(),
+    };
+  }
+
+  if (id === 'submitted-date-format') {
+    return {
+      description:
+        m.assignment_results_export_preparation_submitted_date_format_description(),
+      id,
+      label:
+        m.assignment_results_export_preparation_submitted_date_format_label(),
+      value: m.assignment_results_export_preparation_prepared_value(),
+    };
+  }
+
+  if (id === 'duration-normalization') {
+    return {
+      description:
+        m.assignment_results_export_preparation_duration_normalization_description(),
+      id,
+      label:
+        m.assignment_results_export_preparation_duration_normalization_label(),
+      value:
+        m.assignment_results_export_preparation_duration_normalization_value(),
+    };
+  }
+
+  if (id === 'empty-answer-row') {
+    return {
+      description:
+        m.assignment_results_export_preparation_empty_answer_row_description(),
+      id,
+      label: m.assignment_results_export_preparation_empty_answer_row_label(),
+      value: m.assignment_results_export_preparation_prepared_value(),
+    };
+  }
+
+  if (id === 'prompt-column') {
+    return {
+      description:
+        m.assignment_results_export_preparation_prompt_column_description(),
+      id,
+      label: m.assignment_results_export_preparation_prompt_column_label(),
+      value: m.assignment_results_export_preparation_prompt_column_value(),
+    };
+  }
+
+  if (id === 'student-answer-column') {
+    return {
+      description:
+        m.assignment_results_export_preparation_student_answer_column_description(),
+      id,
+      label:
+        m.assignment_results_export_preparation_student_answer_column_label(),
+      value:
+        m.assignment_results_export_preparation_student_answer_column_value(),
+    };
+  }
+
+  if (id === 'correctness-column') {
+    return {
+      description:
+        m.assignment_results_export_preparation_correctness_column_description(),
+      id,
+      label: m.assignment_results_export_preparation_correctness_column_label(),
+      value: m.assignment_results_export_preparation_correctness_column_value(),
+    };
+  }
+
+  if (id === 'explanation-column') {
+    return {
+      description:
+        m.assignment_results_export_preparation_explanation_column_description(),
+      id,
+      label: m.assignment_results_export_preparation_explanation_column_label(),
+      value: m.assignment_results_export_preparation_explanation_column_value(),
+    };
+  }
+
   return {
     description: m.assignment_results_export_preparation_columns_description(),
     id,
@@ -503,10 +622,14 @@ function buildAssignmentResultsExportPreparationPrivacyContract(
   itemViews: AssignmentResultsExportPreparationItemView[]
 ): AssignmentResultsExportPreparationPrivacyContract {
   return {
+    exposesAssignmentTitle: false,
     exposesCopyArtifactText: false,
     exposesCsvDataUrl: false,
+    exposesCsvFilename: false,
+    exposesPromptText: false,
     exposesRawAnonymousToken: false,
     exposesStudentAnswerText: false,
+    exposesStudentInstructions: false,
     exposesTeacherAnswerText: false,
     itemIds: itemViews.map((itemView) => itemView.id),
     scope: 'full-assignment-results',

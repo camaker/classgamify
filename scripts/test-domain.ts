@@ -3594,8 +3594,8 @@ assert.match(
 );
 assert.match(
   assignmentResultsExportSource,
-  /export const ASSIGNMENT_RESULTS_EXPORT_PREPARATION_ITEM_IDS = \[(?=[\s\S]*'export-scope')(?=[\s\S]*'assignment-context')(?=[\s\S]*'activity-snapshot')(?=[\s\S]*'delivery-identity')(?=[\s\S]*'delivery-answer-reveal')(?=[\s\S]*'delivery-item-order')(?=[\s\S]*'delivery-attempt-limit')(?=[\s\S]*'delivery-timer')(?=[\s\S]*'delivery-close-time')(?=[\s\S]*'delivery-instructions')(?=[\s\S]*'result-metrics')(?=[\s\S]*'item-performance')(?=[\s\S]*'expected-answer')(?=[\s\S]*'accepted-alternatives')[\s\S]*export type AssignmentResultsExportPreparationPrivacyContract = \{[\s\S]*exposesCopyArtifactText: false;[\s\S]*exposesCsvDataUrl: false;[\s\S]*exposesRawAnonymousToken: false;[\s\S]*exposesStudentAnswerText: false;[\s\S]*exposesTeacherAnswerText: false;[\s\S]*scope: 'full-assignment-results';[\s\S]*export type AssignmentResultsExportPreparationView = \{[\s\S]*description: string;[\s\S]*itemViews: AssignmentResultsExportPreparationItemView\[\];[\s\S]*privacy: AssignmentResultsExportPreparationPrivacyContract;[\s\S]*title: string;/,
-  'Assignment CSV export domain should expose a stable 20-slice prepared export coverage view contract with privacy flags.'
+  /export const ASSIGNMENT_RESULTS_EXPORT_PREPARATION_ITEM_IDS = \[(?=[\s\S]*'export-scope')(?=[\s\S]*'assignment-context')(?=[\s\S]*'activity-snapshot')(?=[\s\S]*'delivery-identity')(?=[\s\S]*'delivery-answer-reveal')(?=[\s\S]*'delivery-item-order')(?=[\s\S]*'delivery-attempt-limit')(?=[\s\S]*'delivery-timer')(?=[\s\S]*'delivery-close-time')(?=[\s\S]*'delivery-instructions')(?=[\s\S]*'result-metrics')(?=[\s\S]*'item-performance')(?=[\s\S]*'expected-answer')(?=[\s\S]*'accepted-alternatives')(?=[\s\S]*'export-filename')(?=[\s\S]*'csv-data-url-boundary')(?=[\s\S]*'formula-injection-guard')(?=[\s\S]*'submitted-date-format')(?=[\s\S]*'duration-normalization')(?=[\s\S]*'empty-answer-row')(?=[\s\S]*'prompt-column')(?=[\s\S]*'student-answer-column')(?=[\s\S]*'correctness-column')(?=[\s\S]*'explanation-column')[\s\S]*export type AssignmentResultsExportPreparationPrivacyContract = \{[\s\S]*exposesAssignmentTitle: false;[\s\S]*exposesCopyArtifactText: false;[\s\S]*exposesCsvDataUrl: false;[\s\S]*exposesCsvFilename: false;[\s\S]*exposesPromptText: false;[\s\S]*exposesRawAnonymousToken: false;[\s\S]*exposesStudentAnswerText: false;[\s\S]*exposesStudentInstructions: false;[\s\S]*exposesTeacherAnswerText: false;[\s\S]*scope: 'full-assignment-results';[\s\S]*export type AssignmentResultsExportPreparationView = \{[\s\S]*description: string;[\s\S]*itemViews: AssignmentResultsExportPreparationItemView\[\];[\s\S]*privacy: AssignmentResultsExportPreparationPrivacyContract;[\s\S]*title: string;/,
+  'Assignment CSV export domain should expose a stable 30-slice prepared export coverage view contract with privacy flags.'
 );
 assert.deepEqual(
   [...ASSIGNMENT_RESULTS_EXPORT_PREPARATION_ITEM_IDS],
@@ -3619,13 +3619,23 @@ assert.deepEqual(
     'answer-rows',
     'expected-answer',
     'accepted-alternatives',
+    'export-filename',
+    'csv-data-url-boundary',
+    'formula-injection-guard',
+    'submitted-date-format',
+    'duration-normalization',
+    'empty-answer-row',
+    'prompt-column',
+    'student-answer-column',
+    'correctness-column',
+    'explanation-column',
     'columns',
   ],
-  'Assignment CSV export preparation should expose exactly 20 stable slice ids.'
+  'Assignment CSV export preparation should expose exactly 30 stable slice ids.'
 );
 assert.match(
   assignmentResultsExportSource,
-  /export function buildAssignmentResultsExportPreparationView[\s\S]*ASSIGNMENT_RESULTS_EXPORT_PREPARATION_ITEM_IDS\.map[\s\S]*buildAssignmentResultsExportPreparationItem[\s\S]*assignment_results_export_preparation_export_scope_label[\s\S]*assignment_results_export_preparation_activity_snapshot_label[\s\S]*assignment_results_export_preparation_delivery_identity_label[\s\S]*assignment_results_export_preparation_result_metrics_label[\s\S]*assignment_results_export_preparation_accepted_alternatives_label/,
+  /export function buildAssignmentResultsExportPreparationView[\s\S]*ASSIGNMENT_RESULTS_EXPORT_PREPARATION_ITEM_IDS\.map[\s\S]*buildAssignmentResultsExportPreparationItem[\s\S]*assignment_results_export_preparation_export_scope_label[\s\S]*assignment_results_export_preparation_activity_snapshot_label[\s\S]*assignment_results_export_preparation_delivery_identity_label[\s\S]*assignment_results_export_preparation_result_metrics_label[\s\S]*assignment_results_export_preparation_accepted_alternatives_label[\s\S]*assignment_results_export_preparation_export_filename_label[\s\S]*assignment_results_export_preparation_data_url_boundary_label[\s\S]*assignment_results_export_preparation_formula_guard_label[\s\S]*assignment_results_export_preparation_student_answer_column_label/,
   'Assignment CSV export preparation views should use localized labels for each export coverage item.'
 );
 assert.match(
@@ -52357,10 +52367,14 @@ type ExpectedAssignmentResultsExportPreparationValues = {
 
 function expectedAssignmentResultsExportPreparationPrivacy() {
   return {
+    exposesAssignmentTitle: false,
     exposesCopyArtifactText: false,
     exposesCsvDataUrl: false,
+    exposesCsvFilename: false,
+    exposesPromptText: false,
     exposesRawAnonymousToken: false,
     exposesStudentAnswerText: false,
+    exposesStudentInstructions: false,
     exposesTeacherAnswerText: false,
     itemIds: [...ASSIGNMENT_RESULTS_EXPORT_PREPARATION_ITEM_IDS],
     scope: 'full-assignment-results',
@@ -52517,6 +52531,76 @@ function expectedAssignmentResultsExportPreparationItemsEn({
       id: 'accepted-alternatives',
       label: 'Accepted alternatives',
       value: 'Alternatives column',
+    },
+    {
+      description:
+        'The export filename is derived from a normalized assignment title and share slug without exposing it in the preparation view.',
+      id: 'export-filename',
+      label: 'Export filename',
+      value: 'Prepared',
+    },
+    {
+      description:
+        'The preparation view confirms CSV download readiness without exposing the generated data URL.',
+      id: 'csv-data-url-boundary',
+      label: 'Data URL boundary',
+      value: 'Not exposed',
+    },
+    {
+      description:
+        'Spreadsheet formula-looking text is prefixed before CSV serialization.',
+      id: 'formula-injection-guard',
+      label: 'Formula guard',
+      value: 'Enabled',
+    },
+    {
+      description:
+        'The same result date formatter prepares submitted dates for CSV cells.',
+      id: 'submitted-date-format',
+      label: 'Submitted date format',
+      value: 'Prepared',
+    },
+    {
+      description:
+        'Attempt and average duration seconds are normalized through the shared timer-aware duration helper.',
+      id: 'duration-normalization',
+      label: 'Duration normalization',
+      value: 'Timer-aware',
+    },
+    {
+      description:
+        'Attempts without answer rows still receive a header-aligned empty answer segment.',
+      id: 'empty-answer-row',
+      label: 'Empty-answer rows',
+      value: 'Prepared',
+    },
+    {
+      description:
+        'Item prompts are exported as CSV cells but omitted from this preparation summary.',
+      id: 'prompt-column',
+      label: 'Prompt column',
+      value: 'Prompt column',
+    },
+    {
+      description:
+        'Student answer text is exported only in the CSV file, never in the preparation summary or handoff.',
+      id: 'student-answer-column',
+      label: 'Student answer column',
+      value: 'Student answer column',
+    },
+    {
+      description:
+        'Correctness status is exported separately from student answer text and expected answer text.',
+      id: 'correctness-column',
+      label: 'Correctness column',
+      value: 'Correctness column',
+    },
+    {
+      description:
+        'Answer explanations are exported through the same answer-view path as teacher review.',
+      id: 'explanation-column',
+      label: 'Explanation column',
+      value: 'Explanation column',
     },
     {
       description:
@@ -52677,6 +52761,68 @@ function expectedAssignmentResultsExportPreparationItemsZh({
       id: 'accepted-alternatives',
       label: '可接受替代',
       value: '替代答案列',
+    },
+    {
+      description:
+        '导出文件名来自规范化后的作业标题和分享 slug，但准备视图不会暴露文件名。',
+      id: 'export-filename',
+      label: '导出文件名',
+      value: '已准备',
+    },
+    {
+      description: '准备视图只确认 CSV 下载已就绪，不暴露生成后的 data URL。',
+      id: 'csv-data-url-boundary',
+      label: 'Data URL 边界',
+      value: '未暴露',
+    },
+    {
+      description: '看起来像电子表格公式的文本会在 CSV 序列化前加前缀。',
+      id: 'formula-injection-guard',
+      label: '公式防护',
+      value: '已启用',
+    },
+    {
+      description: '同一个结果日期格式器会为 CSV 单元格准备提交日期。',
+      id: 'submitted-date-format',
+      label: '提交日期格式',
+      value: '已准备',
+    },
+    {
+      description:
+        '作答用时和平均用时会通过共享的计时器感知 duration helper 规范化。',
+      id: 'duration-normalization',
+      label: '用时规范化',
+      value: '计时器感知',
+    },
+    {
+      description: '没有答案行的作答仍会获得与表头对齐的空答案片段。',
+      id: 'empty-answer-row',
+      label: '空答案行',
+      value: '已准备',
+    },
+    {
+      description: '题目提示会作为 CSV 单元格导出，但不会出现在准备摘要中。',
+      id: 'prompt-column',
+      label: '题目提示列',
+      value: '题目提示列',
+    },
+    {
+      description: '学生答案文本只会进入 CSV 文件，不会出现在准备摘要或交接视图中。',
+      id: 'student-answer-column',
+      label: '学生答案列',
+      value: '学生答案列',
+    },
+    {
+      description: '正确状态会独立于学生答案文本和预期答案文本导出。',
+      id: 'correctness-column',
+      label: '正确状态列',
+      value: '正确状态列',
+    },
+    {
+      description: '答案解析会通过与教师复盘相同的答案视图路径导出。',
+      id: 'explanation-column',
+      label: '解析列',
+      value: '解析列',
     },
     {
       description: '覆盖作业、投放规则、学生汇总、作答、题目和答案详情的 CSV 列。',
