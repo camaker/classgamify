@@ -39,6 +39,7 @@ import {
 import {
   type AssignmentStatusAction,
   buildAssignmentStatusAction,
+  getAssignmentLifecycleStatus,
   getAssignmentStatusLabel,
 } from '@/assignments/lifecycle';
 import {
@@ -122,7 +123,17 @@ export type AssignmentListPageHandoffItemId =
   | 'summary-completions'
   | 'summary-open'
   | 'summary-total'
-  | 'visible-page-items';
+  | 'visible-closed-links'
+  | 'visible-copy-blocked'
+  | 'visible-copy-ready'
+  | 'visible-draft-assignments'
+  | 'visible-expired-links'
+  | 'visible-open-links'
+  | 'visible-page-items'
+  | 'visible-preview-ready'
+  | 'visible-print-ready'
+  | 'visible-result-evidence'
+  | 'visible-results-ready';
 
 export type AssignmentListPageHandoffItemView = {
   ariaLabel: string;
@@ -137,7 +148,9 @@ export type AssignmentListPageHandoffPrivacyView = {
   countsStarterPreviewAsOwned: false;
   exposesInternalAssignmentIds: false;
   exposesInternalOwnerId: false;
+  exposesPublicRuntimeContent: false;
   exposesRawAnonymousToken: false;
+  exposesResultExportRows: false;
   exposesSourceMaterialStorageKeys: false;
   exposesStudentAnswerText: false;
   exposesTeacherOnlyAnswers: false;
@@ -149,6 +162,19 @@ export type AssignmentListPageHandoffView = {
   itemViews: AssignmentListPageHandoffItemView[];
   privacy: AssignmentListPageHandoffPrivacyView;
   title: string;
+};
+
+type AssignmentListVisibleCardHandoffSummary = {
+  closedLinks: number;
+  copyBlocked: number;
+  copyReady: number;
+  draftAssignments: number;
+  expiredLinks: number;
+  openLinks: number;
+  previewReady: number;
+  printReady: number;
+  resultEvidence: number;
+  resultsReady: number;
 };
 
 export type AssignmentListCardStatKey = 'average' | 'completions';
@@ -991,6 +1017,7 @@ function buildAssignmentListPageHandoffView<
     assignments,
     publishedPanelContext,
   });
+  const visibleCardSummary = summarizeAssignmentListVisibleCards(assignments);
   const itemViews: AssignmentListPageHandoffItemView[] = [
     buildAssignmentListPageHandoffItem({
       description: m.assignment_list_handoff_owner_scope_description(),
@@ -1038,6 +1065,7 @@ function buildAssignmentListPageHandoffView<
         count: normalizeAssignmentListSummaryCount(visibleCount),
       }),
     }),
+    ...buildAssignmentListVisibleCardHandoffItems(visibleCardSummary),
     buildAssignmentListPageHandoffItem({
       description: m.assignment_list_handoff_pagination_description(),
       id: 'pagination',
@@ -1253,12 +1281,168 @@ function buildAssignmentListPageHandoffPrivacyView(
     countsStarterPreviewAsOwned: false,
     exposesInternalAssignmentIds: false,
     exposesInternalOwnerId: false,
+    exposesPublicRuntimeContent: false,
     exposesRawAnonymousToken: false,
+    exposesResultExportRows: false,
     exposesSourceMaterialStorageKeys: false,
     exposesStudentAnswerText: false,
     exposesTeacherOnlyAnswers: false,
     itemIds: itemViews.map((item) => item.id),
   };
+}
+
+function buildAssignmentListVisibleCardHandoffItems(
+  summary: AssignmentListVisibleCardHandoffSummary
+): AssignmentListPageHandoffItemView[] {
+  return [
+    buildAssignmentListVisibleCardCountHandoffItem({
+      count: summary.openLinks,
+      description: m.assignment_list_handoff_visible_open_links_description(),
+      id: 'visible-open-links',
+      label: m.assignment_list_handoff_visible_open_links_label(),
+    }),
+    buildAssignmentListVisibleCardCountHandoffItem({
+      count: summary.closedLinks,
+      description: m.assignment_list_handoff_visible_closed_links_description(),
+      id: 'visible-closed-links',
+      label: m.assignment_list_handoff_visible_closed_links_label(),
+    }),
+    buildAssignmentListVisibleCardCountHandoffItem({
+      count: summary.expiredLinks,
+      description:
+        m.assignment_list_handoff_visible_expired_links_description(),
+      id: 'visible-expired-links',
+      label: m.assignment_list_handoff_visible_expired_links_label(),
+    }),
+    buildAssignmentListVisibleCardCountHandoffItem({
+      count: summary.draftAssignments,
+      description:
+        m.assignment_list_handoff_visible_draft_assignments_description(),
+      id: 'visible-draft-assignments',
+      label: m.assignment_list_handoff_visible_draft_assignments_label(),
+    }),
+    buildAssignmentListVisibleCardCountHandoffItem({
+      count: summary.copyReady,
+      description: m.assignment_list_handoff_visible_copy_ready_description(),
+      id: 'visible-copy-ready',
+      label: m.assignment_list_handoff_visible_copy_ready_label(),
+    }),
+    buildAssignmentListVisibleCardCountHandoffItem({
+      count: summary.copyBlocked,
+      description: m.assignment_list_handoff_visible_copy_blocked_description(),
+      id: 'visible-copy-blocked',
+      label: m.assignment_list_handoff_visible_copy_blocked_label(),
+    }),
+    buildAssignmentListVisibleCardCountHandoffItem({
+      count: summary.previewReady,
+      description:
+        m.assignment_list_handoff_visible_preview_ready_description(),
+      id: 'visible-preview-ready',
+      label: m.assignment_list_handoff_visible_preview_ready_label(),
+    }),
+    buildAssignmentListVisibleCardCountHandoffItem({
+      count: summary.printReady,
+      description: m.assignment_list_handoff_visible_print_ready_description(),
+      id: 'visible-print-ready',
+      label: m.assignment_list_handoff_visible_print_ready_label(),
+    }),
+    buildAssignmentListVisibleCardCountHandoffItem({
+      count: summary.resultsReady,
+      description:
+        m.assignment_list_handoff_visible_results_ready_description(),
+      id: 'visible-results-ready',
+      label: m.assignment_list_handoff_visible_results_ready_label(),
+    }),
+    buildAssignmentListVisibleCardCountHandoffItem({
+      count: summary.resultEvidence,
+      description:
+        m.assignment_list_handoff_visible_result_evidence_description(),
+      id: 'visible-result-evidence',
+      label: m.assignment_list_handoff_visible_result_evidence_label(),
+    }),
+  ];
+}
+
+function buildAssignmentListVisibleCardCountHandoffItem({
+  count,
+  description,
+  id,
+  label,
+}: {
+  count: number;
+  description: string;
+  id: AssignmentListPageHandoffItemId;
+  label: string;
+}) {
+  return buildAssignmentListPageHandoffItem({
+    description,
+    id,
+    label,
+    value: m.assignment_list_handoff_visible_assignment_count_value({
+      count: normalizeAssignmentListSummaryCount(count),
+    }),
+  });
+}
+
+function summarizeAssignmentListVisibleCards<
+  TItem extends AssignmentListPageItem,
+>(assignments: TItem[]): AssignmentListVisibleCardHandoffSummary {
+  const summary: AssignmentListVisibleCardHandoffSummary = {
+    closedLinks: 0,
+    copyBlocked: 0,
+    copyReady: 0,
+    draftAssignments: 0,
+    expiredLinks: 0,
+    openLinks: 0,
+    previewReady: 0,
+    printReady: 0,
+    resultEvidence: 0,
+    resultsReady: 0,
+  };
+
+  for (const assignment of assignments) {
+    const cardView = buildAssignmentListCardViewModel(assignment);
+    const lifecycleStatus = getAssignmentLifecycleStatus(
+      assignment.assignment.status,
+      assignment.assignment.expiresAt,
+      assignment.now
+    );
+    const shareAction = cardView.actionView.shareAction;
+
+    switch (lifecycleStatus) {
+      case 'closed':
+        summary.closedLinks += 1;
+        break;
+      case 'draft':
+        summary.draftAssignments += 1;
+        break;
+      case 'expired':
+        summary.expiredLinks += 1;
+        break;
+      case 'open':
+        summary.openLinks += 1;
+        break;
+    }
+
+    if (shareAction?.isAvailable) {
+      summary.copyReady += 1;
+      summary.previewReady += 1;
+    } else if (shareAction) {
+      summary.copyBlocked += 1;
+    }
+
+    if (cardView.actionView.printAction) {
+      summary.printReady += 1;
+    }
+    if (cardView.actionView.resultAction) {
+      summary.resultsReady += 1;
+    }
+    if (normalizeAssignmentListSummaryCount(cardView.stats.completions) > 0) {
+      summary.resultEvidence += 1;
+    }
+  }
+
+  return summary;
 }
 
 function buildAssignmentListPageHandoffItem({

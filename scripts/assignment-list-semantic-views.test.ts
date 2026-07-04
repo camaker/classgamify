@@ -14,7 +14,7 @@ const SECRET_STORAGE_KEY = 'classroom/private/assignment-source.json';
 const SECRET_STUDENT_ANSWER = 'SECRET_STUDENT_ANSWER';
 const SECRET_TOKEN = 'raw-anonymous-token-value';
 
-test('assignment list page exposes a 20-slice distribution handoff', () => {
+test('assignment list page exposes a 30-slice distribution handoff', () => {
   const pageView = buildAssignmentListPageViewModel({
     data: {
       items: [
@@ -79,13 +79,23 @@ test('assignment list page exposes a 20-slice distribution handoff', () => {
     'status-draft',
     'filter-summary',
     'visible-page-items',
+    'visible-open-links',
+    'visible-closed-links',
+    'visible-expired-links',
+    'visible-draft-assignments',
+    'visible-copy-ready',
+    'visible-copy-blocked',
+    'visible-preview-ready',
+    'visible-print-ready',
+    'visible-results-ready',
+    'visible-result-evidence',
     'pagination',
     'published-share-context',
     'distribution-copy-link',
     'distribution-preview-link',
     'distribution-review-results',
   ]);
-  assert.equal(new Set(itemIds).size, 20);
+  assert.equal(new Set(itemIds).size, 30);
   assert.equal(
     handoffView.itemViews.every(
       (item) =>
@@ -101,7 +111,9 @@ test('assignment list page exposes a 20-slice distribution handoff', () => {
     countsStarterPreviewAsOwned: false,
     exposesInternalAssignmentIds: false,
     exposesInternalOwnerId: false,
+    exposesPublicRuntimeContent: false,
     exposesRawAnonymousToken: false,
+    exposesResultExportRows: false,
     exposesSourceMaterialStorageKeys: false,
     exposesStudentAnswerText: false,
     exposesTeacherOnlyAnswers: false,
@@ -139,6 +151,46 @@ test('assignment list page exposes a 20-slice distribution handoff', () => {
     '2 visible assignments'
   );
   assert.equal(
+    getHandoffValue(handoffView.itemViews, 'visible-open-links'),
+    '1 visible assignments'
+  );
+  assert.equal(
+    getHandoffValue(handoffView.itemViews, 'visible-closed-links'),
+    '1 visible assignments'
+  );
+  assert.equal(
+    getHandoffValue(handoffView.itemViews, 'visible-expired-links'),
+    '0 visible assignments'
+  );
+  assert.equal(
+    getHandoffValue(handoffView.itemViews, 'visible-draft-assignments'),
+    '0 visible assignments'
+  );
+  assert.equal(
+    getHandoffValue(handoffView.itemViews, 'visible-copy-ready'),
+    '1 visible assignments'
+  );
+  assert.equal(
+    getHandoffValue(handoffView.itemViews, 'visible-copy-blocked'),
+    '1 visible assignments'
+  );
+  assert.equal(
+    getHandoffValue(handoffView.itemViews, 'visible-preview-ready'),
+    '1 visible assignments'
+  );
+  assert.equal(
+    getHandoffValue(handoffView.itemViews, 'visible-print-ready'),
+    '2 visible assignments'
+  );
+  assert.equal(
+    getHandoffValue(handoffView.itemViews, 'visible-results-ready'),
+    '2 visible assignments'
+  );
+  assert.equal(
+    getHandoffValue(handoffView.itemViews, 'visible-result-evidence'),
+    '2 visible assignments'
+  );
+  assert.equal(
     getHandoffValue(handoffView.itemViews, 'pagination'),
     'Page 2 of 3; 31 teacher assignments'
   );
@@ -160,6 +212,84 @@ test('assignment list page exposes a 20-slice distribution handoff', () => {
   );
 
   assertNoPrivateAssignmentText(JSON.stringify(handoffView));
+});
+
+test('assignment list handoff counts draft and expired distribution gates', () => {
+  const now = Date.parse('2026-01-02T00:00:00.000Z');
+  const pageView = buildAssignmentListPageViewModel({
+    data: {
+      items: [
+        buildAssignmentListItem({
+          averageScore: 0,
+          completions: 0,
+          id: `${SECRET_INTERNAL_ASSIGNMENT_ID}-draft`,
+          shareSlug: 'draft-link',
+          status: 'draft',
+          title: 'Draft link',
+        }),
+        buildAssignmentListItem({
+          averageScore: 0,
+          completions: 0,
+          expiresAt: new Date('2026-01-01T00:00:00.000Z'),
+          id: `${SECRET_INTERNAL_ASSIGNMENT_ID}-expired`,
+          now,
+          shareSlug: 'expired-link',
+          status: 'published',
+          title: 'Expired link',
+        }),
+      ],
+      summary: {
+        averageScore: 0,
+        closedAssignments: 0,
+        completions: 0,
+        draftAssignments: 1,
+        expiredAssignments: 1,
+        openAssignments: 0,
+        totalAssignments: 2,
+      },
+      total: 2,
+    },
+    isLoading: false,
+    search: {},
+  });
+  const itemViews = pageView.handoffView.itemViews;
+
+  assert.equal(
+    getHandoffValue(itemViews, 'visible-open-links'),
+    '0 visible assignments'
+  );
+  assert.equal(
+    getHandoffValue(itemViews, 'visible-expired-links'),
+    '1 visible assignments'
+  );
+  assert.equal(
+    getHandoffValue(itemViews, 'visible-draft-assignments'),
+    '1 visible assignments'
+  );
+  assert.equal(
+    getHandoffValue(itemViews, 'visible-copy-ready'),
+    '0 visible assignments'
+  );
+  assert.equal(
+    getHandoffValue(itemViews, 'visible-copy-blocked'),
+    '2 visible assignments'
+  );
+  assert.equal(
+    getHandoffValue(itemViews, 'visible-preview-ready'),
+    '0 visible assignments'
+  );
+  assert.equal(
+    getHandoffValue(itemViews, 'visible-print-ready'),
+    '1 visible assignments'
+  );
+  assert.equal(
+    getHandoffValue(itemViews, 'visible-results-ready'),
+    '1 visible assignments'
+  );
+  assert.equal(
+    getHandoffValue(itemViews, 'visible-result-evidence'),
+    '0 visible assignments'
+  );
 });
 
 test('starter previews remain outside owned assignment metrics', () => {
@@ -192,7 +322,9 @@ function buildAssignmentListItem({
   activityDescription = 'Classroom source text',
   averageScore,
   completions,
+  expiresAt = null,
   id,
+  now,
   shareSlug,
   status,
   title,
@@ -200,7 +332,9 @@ function buildAssignmentListItem({
   activityDescription?: string;
   averageScore: number;
   completions: number;
+  expiresAt?: Date | null;
   id: string;
+  now?: number;
   shareSlug: string;
   status: 'closed' | 'draft' | 'published';
   title: string;
@@ -211,7 +345,7 @@ function buildAssignmentListItem({
       templateType: 'quiz' as const,
     },
     assignment: {
-      expiresAt: null,
+      expiresAt,
       id,
       settingsJson: {
         collectStudentName: true,
@@ -230,6 +364,7 @@ function buildAssignmentListItem({
       averageScore,
       completions,
     },
+    ...(now === undefined ? {} : { now }),
   };
 }
 
