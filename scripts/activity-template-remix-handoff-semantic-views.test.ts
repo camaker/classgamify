@@ -64,7 +64,7 @@ const remixReadyContent: ActivityContent = {
   vocabulary: ['apple', 'bread'],
 };
 
-test('activity template remix handoff exposes 20 safe draft-copy slices', () => {
+test('activity template remix handoff exposes 30 safe draft-copy slices', () => {
   const handoffView = buildActivityTemplateRemixHandoffView({
     content: remixReadyContent,
     currentTemplateType: 'quiz',
@@ -74,7 +74,7 @@ test('activity template remix handoff exposes 20 safe draft-copy slices', () => 
   const itemIds = handoffView.itemViews.map((itemView) => itemView.id);
 
   assert.deepEqual(itemIds, [...ACTIVITY_TEMPLATE_REMIX_HANDOFF_ITEM_IDS]);
-  assert.equal(new Set(itemIds).size, 20);
+  assert.equal(new Set(itemIds).size, 30);
   assert.equal(
     handoffView.itemViews.every(
       (itemView) =>
@@ -86,16 +86,21 @@ test('activity template remix handoff exposes 20 safe draft-copy slices', () => 
     true
   );
   assert.deepEqual(handoffView.privacy, {
+    clonesSourceMaterialReferences: true,
+    excludesCurrentTemplate: true,
     exposesActivityContentText: false,
     exposesAnswerText: false,
     exposesQuestionPromptText: false,
+    exposesSourceMaterialFilenames: false,
     exposesSourceMaterialFileIds: false,
     exposesSourceMaterialStorageKeys: false,
+    exposesSourceSummaryText: false,
     exposesTeacherNotesText: false,
     itemIds,
     modifiesOriginalActivity: false,
     modifiesPublishedAssignmentSnapshots: false,
     outputVisibility: 'draft',
+    requiresOwnerScopedSource: true,
     scope: 'deterministic-template-remix',
     targetTemplatesAreReadyOnly: true,
   });
@@ -112,8 +117,25 @@ test('activity template remix handoff exposes 20 safe draft-copy slices', () => 
   assert.equal(getRemixHandoffValue(handoffView, 'locked-diagnostics'), '0');
   assert.equal(getRemixHandoffValue(handoffView, 'missing-requirements'), '0');
   assert.equal(
+    getRemixHandoffValue(handoffView, 'owner-scope'),
+    'Current teacher'
+  );
+  assert.equal(getRemixHandoffValue(handoffView, 'source-status'), 'Private');
+  assert.equal(
     getRemixHandoffValue(handoffView, 'lifecycle-gate'),
     'Ready to remix'
+  );
+  assert.equal(
+    getRemixHandoffValue(handoffView, 'ready-target-only'),
+    'Ready targets'
+  );
+  assert.equal(
+    getRemixHandoffValue(handoffView, 'current-template-excluded'),
+    'Current excluded'
+  );
+  assert.equal(
+    getRemixHandoffValue(handoffView, 'visible-action-limit'),
+    '3 actions'
   );
   assert.equal(getRemixHandoffValue(handoffView, 'draft-output'), 'Draft copy');
   assert.equal(
@@ -131,6 +153,20 @@ test('activity template remix handoff exposes 20 safe draft-copy slices', () => 
   assert.equal(getRemixHandoffValue(handoffView, 'groups'), '1');
   assert.equal(getRemixHandoffValue(handoffView, 'vocabulary'), '2');
   assert.equal(getRemixHandoffValue(handoffView, 'teacher-notes'), '1');
+  assert.equal(getRemixHandoffValue(handoffView, 'source-materials'), '1');
+  assert.equal(getRemixHandoffValue(handoffView, 'source-material-kinds'), '1');
+  assert.equal(
+    getRemixHandoffValue(handoffView, 'source-material-privacy'),
+    'File ids hidden'
+  );
+  assert.equal(
+    getRemixHandoffValue(handoffView, 'assignment-snapshot-protection'),
+    'Snapshots unchanged'
+  );
+  assert.equal(
+    getRemixHandoffValue(handoffView, 'original-activity-protection'),
+    'Source unchanged'
+  );
   assert.equal(
     getRemixHandoffValue(handoffView, 'privacy-guard'),
     'Content hidden'

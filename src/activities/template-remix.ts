@@ -1,5 +1,6 @@
 import { getActivityTemplates } from '@/activities/catalog';
 import { buildRemixedActivityTitle } from '@/activities/duplicate';
+import { normalizeActivityMaterialReferences } from '@/activities/material-references';
 import { hasRuntimeDisplayText } from '@/activities/runtime-display';
 import {
   ACTIVITY_TITLE_LENGTH,
@@ -78,7 +79,12 @@ export const ACTIVITY_TEMPLATE_REMIX_HANDOFF_ITEM_IDS = [
   'locked-template-count',
   'locked-diagnostics',
   'missing-requirements',
+  'owner-scope',
+  'source-status',
   'lifecycle-gate',
+  'ready-target-only',
+  'current-template-excluded',
+  'visible-action-limit',
   'draft-output',
   'title-strategy',
   'title-limit',
@@ -89,6 +95,11 @@ export const ACTIVITY_TEMPLATE_REMIX_HANDOFF_ITEM_IDS = [
   'groups',
   'vocabulary',
   'teacher-notes',
+  'source-materials',
+  'source-material-kinds',
+  'source-material-privacy',
+  'assignment-snapshot-protection',
+  'original-activity-protection',
   'privacy-guard',
 ] as const;
 
@@ -106,16 +117,21 @@ export type ActivityTemplateRemixHandoffItemView = {
 };
 
 export type ActivityTemplateRemixHandoffPrivacyContract = {
+  clonesSourceMaterialReferences: true;
+  excludesCurrentTemplate: true;
   exposesActivityContentText: false;
   exposesAnswerText: false;
   exposesQuestionPromptText: false;
+  exposesSourceMaterialFilenames: false;
   exposesSourceMaterialFileIds: false;
   exposesSourceMaterialStorageKeys: false;
+  exposesSourceSummaryText: false;
   exposesTeacherNotesText: false;
   itemIds: ActivityTemplateRemixHandoffItemId[];
   modifiesOriginalActivity: false;
   modifiesPublishedAssignmentSnapshots: false;
   outputVisibility: 'draft';
+  requiresOwnerScopedSource: true;
   scope: 'deterministic-template-remix';
   targetTemplatesAreReadyOnly: true;
 };
@@ -199,6 +215,9 @@ function buildActivityTemplateRemixHandoffSummary({
   const currentOption = remixPlan.options.find((option) => option.isCurrent);
   const firstSuggestedOption = remixSummary.suggestedTemplateOptions[0];
   const targetShortName = firstSuggestedOption?.shortName;
+  const sourceMaterials = normalizeActivityMaterialReferences(
+    source.content.sourceMaterials
+  );
   const uniqueMissingRequirements = [
     ...new Set(
       remixPlan.options.flatMap((option) => option.missingRequirements)
@@ -212,6 +231,8 @@ function buildActivityTemplateRemixHandoffSummary({
     currentTemplateLabel:
       currentOption?.template.name ??
       m.activity_template_remix_handoff_unknown_value(),
+    currentTemplateExcluded:
+      m.activity_template_remix_handoff_current_template_excluded_value(),
     draftTitle: targetShortName
       ? buildRemixedActivityTitle({
           sourceTitle: source.sourceTitle,
@@ -229,6 +250,13 @@ function buildActivityTemplateRemixHandoffSummary({
     pairCount: source.content.pairs.length,
     questionCount: source.content.questions.length,
     readyTemplateCount: remixSummary.readyTemplateOptions.length,
+    readyTargetOnly:
+      m.activity_template_remix_handoff_ready_target_only_value(),
+    sourceMaterialCount: sourceMaterials.length,
+    sourceMaterialKindCount: new Set(
+      sourceMaterials.map((material) => material.kind)
+    ).size,
+    sourceStatus: getActivityTemplateRemixHandoffStatusLabel(source.visibility),
     suggestedActionTemplateList: formatActivityTemplateRemixHandoffTemplateList(
       remixSummary.suggestedTemplateOptions
         .slice(0, ACTIVITY_TEMPLATE_REMIX_HANDOFF_VISIBLE_ACTION_LIMIT)
@@ -241,6 +269,10 @@ function buildActivityTemplateRemixHandoffSummary({
     teacherNoteCount: source.content.teacherNotes.length,
     titleLimit: ACTIVITY_TITLE_LENGTH.max,
     vocabularyCount: source.content.vocabulary.length,
+    visibleActionLimit:
+      m.activity_template_remix_handoff_visible_action_limit_value({
+        count: ACTIVITY_TEMPLATE_REMIX_HANDOFF_VISIBLE_ACTION_LIMIT,
+      }),
   };
 }
 
@@ -351,6 +383,56 @@ function buildActivityTemplateRemixHandoffItem({
     };
   }
 
+  if (id === 'owner-scope') {
+    return {
+      description: m.activity_template_remix_handoff_owner_scope_description(),
+      id,
+      label: m.activity_template_remix_handoff_owner_scope_label(),
+      value: m.activity_template_remix_handoff_owner_scope_value(),
+    };
+  }
+
+  if (id === 'source-status') {
+    return {
+      description:
+        m.activity_template_remix_handoff_source_status_description(),
+      id,
+      label: m.activity_template_remix_handoff_source_status_label(),
+      value: summary.sourceStatus,
+    };
+  }
+
+  if (id === 'ready-target-only') {
+    return {
+      description:
+        m.activity_template_remix_handoff_ready_target_only_description(),
+      id,
+      label: m.activity_template_remix_handoff_ready_target_only_label(),
+      value: summary.readyTargetOnly,
+    };
+  }
+
+  if (id === 'current-template-excluded') {
+    return {
+      description:
+        m.activity_template_remix_handoff_current_template_excluded_description(),
+      id,
+      label:
+        m.activity_template_remix_handoff_current_template_excluded_label(),
+      value: summary.currentTemplateExcluded,
+    };
+  }
+
+  if (id === 'visible-action-limit') {
+    return {
+      description:
+        m.activity_template_remix_handoff_visible_action_limit_description(),
+      id,
+      label: m.activity_template_remix_handoff_visible_action_limit_label(),
+      value: summary.visibleActionLimit,
+    };
+  }
+
   if (id === 'draft-output') {
     return {
       description: m.activity_template_remix_handoff_draft_output_description(),
@@ -447,6 +529,64 @@ function buildActivityTemplateRemixHandoffItem({
     };
   }
 
+  if (id === 'source-materials') {
+    return {
+      description:
+        m.activity_template_remix_handoff_source_materials_description(),
+      id,
+      label: m.activity_template_remix_handoff_source_materials_label(),
+      value: formatActivityTemplateRemixHandoffCount(
+        summary.sourceMaterialCount
+      ),
+    };
+  }
+
+  if (id === 'source-material-kinds') {
+    return {
+      description:
+        m.activity_template_remix_handoff_source_material_kinds_description(),
+      id,
+      label: m.activity_template_remix_handoff_source_material_kinds_label(),
+      value: formatActivityTemplateRemixHandoffCount(
+        summary.sourceMaterialKindCount
+      ),
+    };
+  }
+
+  if (id === 'source-material-privacy') {
+    return {
+      description:
+        m.activity_template_remix_handoff_source_material_privacy_description(),
+      id,
+      label: m.activity_template_remix_handoff_source_material_privacy_label(),
+      value: m.activity_template_remix_handoff_source_material_privacy_value(),
+    };
+  }
+
+  if (id === 'assignment-snapshot-protection') {
+    return {
+      description:
+        m.activity_template_remix_handoff_assignment_snapshot_protection_description(),
+      id,
+      label:
+        m.activity_template_remix_handoff_assignment_snapshot_protection_label(),
+      value:
+        m.activity_template_remix_handoff_assignment_snapshot_protection_value(),
+    };
+  }
+
+  if (id === 'original-activity-protection') {
+    return {
+      description:
+        m.activity_template_remix_handoff_original_activity_protection_description(),
+      id,
+      label:
+        m.activity_template_remix_handoff_original_activity_protection_label(),
+      value:
+        m.activity_template_remix_handoff_original_activity_protection_value(),
+    };
+  }
+
   return {
     description: m.activity_template_remix_handoff_privacy_guard_description(),
     id,
@@ -481,16 +621,21 @@ function buildActivityTemplateRemixHandoffPrivacyContract(
   itemViews: ActivityTemplateRemixHandoffItemView[]
 ): ActivityTemplateRemixHandoffPrivacyContract {
   return {
+    clonesSourceMaterialReferences: true,
+    excludesCurrentTemplate: true,
     exposesActivityContentText: false,
     exposesAnswerText: false,
     exposesQuestionPromptText: false,
+    exposesSourceMaterialFilenames: false,
     exposesSourceMaterialFileIds: false,
     exposesSourceMaterialStorageKeys: false,
+    exposesSourceSummaryText: false,
     exposesTeacherNotesText: false,
     itemIds: itemViews.map((itemView) => itemView.id),
     modifiesOriginalActivity: false,
     modifiesPublishedAssignmentSnapshots: false,
     outputVisibility: 'draft',
+    requiresOwnerScopedSource: true,
     scope: 'deterministic-template-remix',
     targetTemplatesAreReadyOnly: true,
   };
@@ -510,6 +655,23 @@ function getActivityTemplateRemixHandoffLifecycleGateValue({
   return hasSuggestedTemplates
     ? m.activity_template_remix_handoff_lifecycle_gate_ready_value()
     : m.activity_template_remix_handoff_lifecycle_gate_blocked_value();
+}
+
+function getActivityTemplateRemixHandoffStatusLabel(
+  visibility: ActivityTemplateRemixHandoffSource['visibility']
+) {
+  switch (visibility) {
+    case 'archived':
+      return m.activity_template_remix_handoff_source_status_archived_value();
+    case 'draft':
+      return m.activity_form_visibility_draft();
+    case 'private':
+      return m.activity_form_visibility_private();
+    case 'public':
+      return m.activity_form_visibility_public();
+    case 'unlisted':
+      return m.activity_form_visibility_unlisted();
+  }
 }
 
 function formatActivityTemplateRemixHandoffTemplateList(values: string[]) {

@@ -2432,8 +2432,8 @@ assert.match(
 );
 assert.match(
   activityTemplateRemixSource,
-  /export const ACTIVITY_TEMPLATE_REMIX_HANDOFF_ITEM_IDS = \[[\s\S]*'current-template'[\s\S]*'current-readiness'[\s\S]*'ready-template-count'[\s\S]*'suggested-remix-count'[\s\S]*'suggested-remix-actions'[\s\S]*'locked-template-count'[\s\S]*'locked-diagnostics'[\s\S]*'missing-requirements'[\s\S]*'lifecycle-gate'[\s\S]*'draft-output'[\s\S]*'title-strategy'[\s\S]*'title-limit'[\s\S]*'template-switch'[\s\S]*'content-clone'[\s\S]*'questions'[\s\S]*'pairs'[\s\S]*'groups'[\s\S]*'vocabulary'[\s\S]*'teacher-notes'[\s\S]*'privacy-guard'/,
-  'Template remix handoff should expose 20 stable slice ids for the deterministic draft-copy contract.'
+  /export const ACTIVITY_TEMPLATE_REMIX_HANDOFF_ITEM_IDS = \[(?=[\s\S]*'current-template')(?=[\s\S]*'current-readiness')(?=[\s\S]*'ready-template-count')(?=[\s\S]*'suggested-remix-count')(?=[\s\S]*'suggested-remix-actions')(?=[\s\S]*'locked-template-count')(?=[\s\S]*'locked-diagnostics')(?=[\s\S]*'missing-requirements')(?=[\s\S]*'owner-scope')(?=[\s\S]*'source-status')(?=[\s\S]*'lifecycle-gate')(?=[\s\S]*'ready-target-only')(?=[\s\S]*'current-template-excluded')(?=[\s\S]*'visible-action-limit')(?=[\s\S]*'draft-output')(?=[\s\S]*'title-strategy')(?=[\s\S]*'title-limit')(?=[\s\S]*'template-switch')(?=[\s\S]*'content-clone')(?=[\s\S]*'questions')(?=[\s\S]*'pairs')(?=[\s\S]*'groups')(?=[\s\S]*'vocabulary')(?=[\s\S]*'teacher-notes')(?=[\s\S]*'source-materials')(?=[\s\S]*'source-material-kinds')(?=[\s\S]*'source-material-privacy')(?=[\s\S]*'assignment-snapshot-protection')(?=[\s\S]*'original-activity-protection')(?=[\s\S]*'privacy-guard')[\s\S]*export type ActivityTemplateRemixHandoffPrivacyContract = \{[\s\S]*clonesSourceMaterialReferences: true;[\s\S]*excludesCurrentTemplate: true;[\s\S]*exposesActivityContentText: false;[\s\S]*exposesAnswerText: false;[\s\S]*exposesQuestionPromptText: false;[\s\S]*exposesSourceMaterialFilenames: false;[\s\S]*exposesSourceMaterialFileIds: false;[\s\S]*exposesSourceMaterialStorageKeys: false;[\s\S]*exposesSourceSummaryText: false;[\s\S]*exposesTeacherNotesText: false;[\s\S]*modifiesOriginalActivity: false;[\s\S]*modifiesPublishedAssignmentSnapshots: false;[\s\S]*outputVisibility: 'draft';[\s\S]*requiresOwnerScopedSource: true;[\s\S]*scope: 'deterministic-template-remix';[\s\S]*targetTemplatesAreReadyOnly: true;/,
+  'Template remix handoff should expose 30 stable slice ids for the deterministic draft-copy contract.'
 );
 assert.match(
   activityTemplateRemixSource,
@@ -2442,7 +2442,7 @@ assert.match(
 );
 assert.match(
   activityTemplateRemixSource,
-  /export type ActivityTemplateRemixHandoffPrivacyContract = \{[\s\S]*exposesActivityContentText: false;[\s\S]*exposesAnswerText: false;[\s\S]*exposesQuestionPromptText: false;[\s\S]*exposesSourceMaterialFileIds: false;[\s\S]*exposesSourceMaterialStorageKeys: false;[\s\S]*exposesTeacherNotesText: false;[\s\S]*modifiesOriginalActivity: false;[\s\S]*modifiesPublishedAssignmentSnapshots: false;[\s\S]*outputVisibility: 'draft';[\s\S]*scope: 'deterministic-template-remix';[\s\S]*targetTemplatesAreReadyOnly: true;/,
+  /export type ActivityTemplateRemixHandoffPrivacyContract = \{[\s\S]*clonesSourceMaterialReferences: true;[\s\S]*excludesCurrentTemplate: true;[\s\S]*exposesActivityContentText: false;[\s\S]*exposesAnswerText: false;[\s\S]*exposesQuestionPromptText: false;[\s\S]*exposesSourceMaterialFilenames: false;[\s\S]*exposesSourceMaterialFileIds: false;[\s\S]*exposesSourceMaterialStorageKeys: false;[\s\S]*exposesSourceSummaryText: false;[\s\S]*exposesTeacherNotesText: false;[\s\S]*modifiesOriginalActivity: false;[\s\S]*modifiesPublishedAssignmentSnapshots: false;[\s\S]*outputVisibility: 'draft';[\s\S]*requiresOwnerScopedSource: true;[\s\S]*scope: 'deterministic-template-remix';[\s\S]*targetTemplatesAreReadyOnly: true;/,
   'Template remix handoff should publish an explicit privacy and draft-output contract.'
 );
 assert.match(
@@ -30255,12 +30255,12 @@ assert.match(
 );
 assert.match(
   activityLibraryCompatibilityPanelSource,
-  /<ActivityLibraryTemplateRemixHandoff[\s\S]*handoff=\{compatibility\.remixHandoffView\}[\s\S]*function ActivityLibraryTemplateRemixHandoff[\s\S]*handoff: ActivityTemplateRemixHandoffView[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*aria-labelledby=\{titleId\}[\s\S]*\{handoff\.title\}[\s\S]*\{handoff\.description\}[\s\S]*handoff\.itemViews\.map\(\(item\) => \([\s\S]*ActivityLibraryTemplateRemixHandoffItem[\s\S]*item=\{item\}/,
+  /<ActivityLibraryTemplateRemixHandoff[\s\S]*handoff=\{compatibility\.remixHandoffView\}[\s\S]*function ActivityLibraryTemplateRemixHandoff[\s\S]*handoff: ActivityTemplateRemixHandoffView[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*aria-labelledby=\{titleId\}[\s\S]*data-handoff="activity-template-remix"[\s\S]*\{handoff\.title\}[\s\S]*\{handoff\.description\}[\s\S]*handoff\.itemViews\.map\(\(item\) => \([\s\S]*ActivityLibraryTemplateRemixHandoffItem[\s\S]*item=\{item\}/,
   'Activity library compatibility panel should render the prepared template-remix handoff title, description, and item views.'
 );
 assert.match(
   activityLibraryCompatibilityPanelSource,
-  /function ActivityLibraryTemplateRemixHandoffItem[\s\S]*item: ActivityTemplateRemixHandoffItemView[\s\S]*\{item\.ariaLabel\}[\s\S]*\{item\.label\}[\s\S]*\{item\.value\}[\s\S]*\{item\.description\}/,
+  /function ActivityLibraryTemplateRemixHandoffItem[\s\S]*item: ActivityTemplateRemixHandoffItemView[\s\S]*data-handoff-item=\{item\.id\}[\s\S]*\{item\.ariaLabel\}[\s\S]*\{item\.label\}[\s\S]*\{item\.value\}[\s\S]*\{item\.description\}/,
   'Activity library template-remix handoff items should render prepared aria labels, labels, values, and descriptions.'
 );
 assert.match(
@@ -41995,7 +41995,12 @@ assert.deepEqual([...ACTIVITY_TEMPLATE_REMIX_HANDOFF_ITEM_IDS], [
   'locked-template-count',
   'locked-diagnostics',
   'missing-requirements',
+  'owner-scope',
+  'source-status',
   'lifecycle-gate',
+  'ready-target-only',
+  'current-template-excluded',
+  'visible-action-limit',
   'draft-output',
   'title-strategy',
   'title-limit',
@@ -42006,9 +42011,14 @@ assert.deepEqual([...ACTIVITY_TEMPLATE_REMIX_HANDOFF_ITEM_IDS], [
   'groups',
   'vocabulary',
   'teacher-notes',
+  'source-materials',
+  'source-material-kinds',
+  'source-material-privacy',
+  'assignment-snapshot-protection',
+  'original-activity-protection',
   'privacy-guard',
 ]);
-assert.equal(new Set(ACTIVITY_TEMPLATE_REMIX_HANDOFF_ITEM_IDS).size, 20);
+assert.equal(new Set(ACTIVITY_TEMPLATE_REMIX_HANDOFF_ITEM_IDS).size, 30);
 assert.equal(
   ACTIVITY_TEMPLATE_REMIX_HANDOFF_VISIBLE_ACTION_LIMIT,
   ACTIVITY_LIBRARY_COMPATIBILITY_LIMITS.remixActionOptions
@@ -42036,35 +42046,49 @@ assert.ok(
   )
 );
 assert.deepEqual(questionOnlyDraftRemixHandoffView.privacy, {
+  clonesSourceMaterialReferences: true,
+  excludesCurrentTemplate: true,
   exposesActivityContentText: false,
   exposesAnswerText: false,
   exposesQuestionPromptText: false,
+  exposesSourceMaterialFilenames: false,
   exposesSourceMaterialFileIds: false,
   exposesSourceMaterialStorageKeys: false,
+  exposesSourceSummaryText: false,
   exposesTeacherNotesText: false,
   itemIds: [...ACTIVITY_TEMPLATE_REMIX_HANDOFF_ITEM_IDS],
   modifiesOriginalActivity: false,
   modifiesPublishedAssignmentSnapshots: false,
   outputVisibility: 'draft',
+  requiresOwnerScopedSource: true,
   scope: 'deterministic-template-remix',
   targetTemplatesAreReadyOnly: true,
 });
 assert.deepEqual(
   Object.fromEntries(questionOnlyDraftRemixHandoffItems),
   {
+    'assignment-snapshot-protection': 'Snapshots unchanged',
     'content-clone': 'Same structured content',
     'current-readiness': 'Ready',
     'current-template': 'Quiz',
+    'current-template-excluded': 'Current excluded',
     'draft-output': 'Draft copy',
     groups: '0',
     'lifecycle-gate': 'Ready to remix',
     'locked-diagnostics': '4',
     'locked-template-count': '4',
     'missing-requirements': '2',
+    'original-activity-protection': 'Source unchanged',
+    'owner-scope': 'Current teacher',
     pairs: '0',
     'privacy-guard': 'Content hidden',
     questions: '2',
+    'ready-target-only': 'Ready targets',
     'ready-template-count': '4',
+    'source-material-kinds': '0',
+    'source-material-privacy': 'File ids hidden',
+    'source-materials': '0',
+    'source-status': 'Draft',
     'suggested-remix-actions': 'Fill, Listen, and Box',
     'suggested-remix-count': '3',
     'teacher-notes': '0',
@@ -42072,6 +42096,7 @@ assert.deepEqual(
     'title-limit': '120 chars',
     'title-strategy': 'Question review (Fill)',
     vocabulary: '0',
+    'visible-action-limit': '3 actions',
   }
 );
 assert.doesNotMatch(

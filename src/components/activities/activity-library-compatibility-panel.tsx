@@ -111,6 +111,7 @@ function ActivityLibraryTemplateRemixHandoff({
       aria-describedby={descriptionId}
       aria-labelledby={titleId}
       className="mt-3 border-t pt-3"
+      data-handoff="activity-template-remix"
     >
       <div className="flex min-w-0 items-center gap-2 text-xs font-medium">
         <IconShieldCheck aria-hidden="true" className="size-4 text-primary" />
@@ -137,7 +138,7 @@ function ActivityLibraryTemplateRemixHandoffItem({
   item: ActivityTemplateRemixHandoffItemView;
 }) {
   return (
-    <div className="min-w-0">
+    <div className="min-w-0" data-handoff-item={item.id}>
       <span className="sr-only">{item.ariaLabel}</span>
       <dt className="text-[0.68rem] font-medium uppercase tracking-normal text-muted-foreground">
         {item.label}
