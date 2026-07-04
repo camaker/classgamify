@@ -32520,8 +32520,8 @@ assert.match(
 );
 assert.match(
   printableWorksheetViewSource,
-  /export type PrintableWorksheetHandoffItemId =(?=[\s\S]*'student-fields')(?=[\s\S]*'response-plan')(?=[\s\S]*'printable-items')(?=[\s\S]*'choice-bank-coverage')(?=[\s\S]*'writing-area-coverage')(?=[\s\S]*'item-response-help')(?=[\s\S]*'student-name-field')(?=[\s\S]*'delivery-policy')(?=[\s\S]*'answer-key-items')(?=[\s\S]*'answer-key-details')(?=[\s\S]*'print-action')[\s\S]*export type PrintableWorksheetHandoffPrivacyContract = \{[\s\S]*exposesAnswerKeyText: false;[\s\S]*exposesChoiceText: false;[\s\S]*exposesPromptText: false;[\s\S]*exposesStudentResponseText: false;[\s\S]*itemIds: PrintableWorksheetHandoffItemId\[\];/,
-  'Printable worksheet handoff should expose a typed 20-slice paper handoff contract with explicit privacy flags.'
+  /export type PrintableWorksheetHandoffItemId =(?=[\s\S]*'handout-overview')(?=[\s\S]*'preparation-metric-count')(?=[\s\S]*'student-fields')(?=[\s\S]*'response-plan')(?=[\s\S]*'answer-key-access')(?=[\s\S]*'answer-key-toggle-boundary')(?=[\s\S]*'printable-items')(?=[\s\S]*'choice-bank-coverage')(?=[\s\S]*'choice-bank-choice-count')(?=[\s\S]*'writing-area-coverage')(?=[\s\S]*'answer-line-count')(?=[\s\S]*'item-response-help')(?=[\s\S]*'assignment-field-count')(?=[\s\S]*'student-name-field')(?=[\s\S]*'delivery-policy')(?=[\s\S]*'answer-key-items')(?=[\s\S]*'answer-key-details')(?=[\s\S]*'print-action')(?=[\s\S]*'print-route-boundary')(?=[\s\S]*'public-runner-boundary')(?=[\s\S]*'privacy-guard')[\s\S]*export type PrintableWorksheetHandoffPrivacyContract = \{[\s\S]*exposesAnswerKeyText: false;[\s\S]*exposesChoiceText: false;[\s\S]*exposesPromptText: false;[\s\S]*exposesStudentResponseText: false;[\s\S]*itemIds: PrintableWorksheetHandoffItemId\[\];/,
+  'Printable worksheet handoff should expose a typed 30-slice paper handoff contract with explicit privacy flags.'
 );
 assert.match(
   printableWorksheetViewSource,
@@ -32530,8 +32530,8 @@ assert.match(
 );
 assert.match(
   printableWorksheetViewSource,
-  /export function buildPrintableWorksheetHandoffView(?=[\s\S]*answerKeyView: PrintableWorksheetAnswerKeyView)(?=[\s\S]*itemViews: PrintableWorksheetItemView\[\])[\s\S]*id: 'choice-bank-coverage'[\s\S]*id: 'writing-area-coverage'[\s\S]*id: 'item-response-help'[\s\S]*id: 'answer-key-items'[\s\S]*id: 'answer-key-details'[\s\S]*privacy: buildPrintableWorksheetHandoffPrivacyContract/,
-  'Printable worksheet handoff should collect paper overview, response, field, answer-key, result-return, and print-action slices from prepared view state.'
+  /export function buildPrintableWorksheetHandoffView(?=[\s\S]*answerKeyView: PrintableWorksheetAnswerKeyView)(?=[\s\S]*itemViews: PrintableWorksheetItemView\[\])[\s\S]*id: 'handout-overview'[\s\S]*id: 'preparation-metric-count'[\s\S]*id: 'answer-key-access'[\s\S]*id: 'answer-key-toggle-boundary'[\s\S]*id: 'choice-bank-coverage'[\s\S]*id: 'choice-bank-choice-count'[\s\S]*id: 'writing-area-coverage'[\s\S]*id: 'answer-line-count'[\s\S]*id: 'item-response-help'[\s\S]*id: 'assignment-field-count'[\s\S]*id: 'answer-key-items'[\s\S]*id: 'answer-key-details'[\s\S]*id: 'print-route-boundary'[\s\S]*id: 'public-runner-boundary'[\s\S]*id: 'privacy-guard'[\s\S]*privacy: buildPrintableWorksheetHandoffPrivacyContract/,
+  'Printable worksheet handoff should collect paper overview, response, field, answer-key, route-boundary, privacy, result-return, and print-action slices from prepared view state.'
 );
 assert.match(
   printableWorksheetViewSource,
@@ -32650,6 +32650,10 @@ const printableWorksheetPreparationSummarySource = readFileSync(
   'src/components/assignments/printable-worksheet-preparation-summary.tsx',
   'utf8'
 );
+const printableWorksheetHandoffSource = readFileSync(
+  'src/components/assignments/printable-worksheet-handoff.tsx',
+  'utf8'
+);
 assert.match(
   printableWorksheetAnswerKeySource,
   /itemView\.headingLabel/,
@@ -32681,9 +32685,14 @@ assert.match(
   'Printable worksheet builders should return explicit printable view contracts.'
 );
 assert.doesNotMatch(
-  `${printableWorksheetToolbarSource}\n${printableWorksheetStatePanelSource}\n${printableWorksheetHeaderSource}\n${printableWorksheetAssignmentFieldsSource}\n${printableWorksheetItemListSource}\n${printableWorksheetAnswerKeySource}\n${printableWorksheetPreparationSummarySource}`,
+  `${printableWorksheetToolbarSource}\n${printableWorksheetStatePanelSource}\n${printableWorksheetHeaderSource}\n${printableWorksheetAssignmentFieldsSource}\n${printableWorksheetItemListSource}\n${printableWorksheetAnswerKeySource}\n${printableWorksheetPreparationSummarySource}\n${printableWorksheetHandoffSource}`,
   /buildPrintableWorksheetPageViewModel|PrintableWorksheetPageViewModel\[|ReturnType<\s*typeof buildPrintableWorksheet(?:LoadingView|ErrorView|PageViewModel)/,
   'Printable worksheet components should import focused view contracts instead of deriving them from printable page builders.'
+);
+assert.match(
+  printableWorksheetHandoffSource,
+  /PrintableWorksheetHandoffView[\s\S]*data-handoff="printable-worksheet"[\s\S]*view\.itemViews\.map[\s\S]*data-handoff-item=\{item\.id\}[\s\S]*<output aria-label=\{item\.ariaLabel\}>/,
+  'Printable worksheet handoff component should render hidden stable handoff outputs from the prepared handoff view.'
 );
 assert.match(
   printableWorksheetToolbarSource,
@@ -33100,6 +33109,11 @@ assert.match(
   /to=\{printAction\.to\}[\s\S]*assignmentId: printAction\.assignmentId/,
   'Assignment results header actions should expose the prepared printable worksheet teacher action.'
 );
+assert.match(
+  printableAssignmentRouteSource,
+  /PrintableWorksheetHandoff[\s\S]*view=\{pageView\.handoffView\}/,
+  'Printable worksheet route should expose the prepared handoff view as hidden semantic DOM output.'
+);
 const rootRouteSource = readFileSync('src/routes/__root.tsx', 'utf8');
 assert.match(
   rootRouteSource,
@@ -33115,6 +33129,11 @@ assert.match(
   e2eTestCatalogText,
   /printable worksheet action[\s\S]*\/print\/assignments\/:assignmentId[\s\S]*answerKey=true/,
   'E2E catalog should cover the teacher printable worksheet journey and answer-key toggle.'
+);
+assert.match(
+  e2eTestCatalogText,
+  /hidden localized 30-slice printable worksheet handoff[\s\S]*handout overview[\s\S]*public-runner boundary[\s\S]*privacy guard/,
+  'E2E catalog should cover the printable worksheet hidden 30-slice handoff contract.'
 );
 assert.match(
   e2eTestCatalogText,

@@ -14,14 +14,21 @@ const SECRET_CHOICE_TEXT = 'SECRET_CHOICE_TEXT';
 const SECRET_PROMPT_TEXT = 'SECRET_PROMPT_TEXT';
 
 const EXPECTED_HANDOFF_ITEM_IDS = [
+  'handout-overview',
+  'preparation-metric-count',
   'student-fields',
   'response-plan',
   'answer-key',
+  'answer-key-access',
+  'answer-key-toggle-boundary',
   'printable-items',
   'response-modes',
   'choice-bank-coverage',
+  'choice-bank-choice-count',
   'writing-area-coverage',
+  'answer-line-count',
   'item-response-help',
+  'assignment-field-count',
   'student-name-field',
   'date-field',
   'score-field',
@@ -34,9 +41,12 @@ const EXPECTED_HANDOFF_ITEM_IDS = [
   'answer-key-details',
   'results-return',
   'print-action',
+  'print-route-boundary',
+  'public-runner-boundary',
+  'privacy-guard',
 ] satisfies PrintableWorksheetHandoffItemId[];
 
-test('printable worksheet handoff exposes 20 paper handoff slices safely', () => {
+test('printable worksheet handoff exposes 30 paper handoff slices safely', () => {
   const pageView = buildPrintableWorksheetPageViewModel({
     answerKey: false,
     assignmentId: 'assignment-1',
@@ -47,6 +57,7 @@ test('printable worksheet handoff exposes 20 paper handoff slices safely', () =>
     pageView.handoffView.itemViews.map((item) => item.id),
     EXPECTED_HANDOFF_ITEM_IDS
   );
+  assert.equal(pageView.handoffView.itemViews.length, 30);
   assert.deepEqual(pageView.handoffView.privacy, {
     exposesAnswerKeyText: false,
     exposesChoiceText: false,
@@ -59,14 +70,54 @@ test('printable worksheet handoff exposes 20 paper handoff slices safely', () =>
     'Hidden by default'
   );
   assert.equal(
+    getHandoffItemValue(pageView, 'answer-key-access'),
+    'Hidden by default'
+  );
+  assert.equal(
     getHandoffItemValue(pageView, 'answer-key-items'),
     'Hidden by default'
+  );
+  assert.equal(
+    getHandoffItemValue(pageView, 'handout-overview'),
+    'Ready to print'
+  );
+  assert.equal(
+    getHandoffItemValue(pageView, 'preparation-metric-count'),
+    '3 checks'
+  );
+  assert.equal(
+    getHandoffItemValue(pageView, 'assignment-field-count'),
+    '8 fields'
   );
   assert.equal(getHandoffItemValue(pageView, 'printable-items'), '1 item');
   assert.equal(getHandoffItemValue(pageView, 'choice-bank-coverage'), '1 item');
   assert.equal(
+    getHandoffItemValue(pageView, 'choice-bank-choice-count'),
+    '2 choices'
+  );
+  assert.equal(
     getHandoffItemValue(pageView, 'writing-area-coverage'),
     '1 answer line'
+  );
+  assert.equal(
+    getHandoffItemValue(pageView, 'answer-line-count'),
+    '1 answer line'
+  );
+  assert.equal(
+    getHandoffItemValue(pageView, 'answer-key-toggle-boundary'),
+    'Teacher toggle'
+  );
+  assert.equal(
+    getHandoffItemValue(pageView, 'print-route-boundary'),
+    'Teacher print route'
+  );
+  assert.equal(
+    getHandoffItemValue(pageView, 'public-runner-boundary'),
+    'Runner unchanged'
+  );
+  assert.equal(
+    getHandoffItemValue(pageView, 'privacy-guard'),
+    'Private data omitted'
   );
   assert.equal(
     pageView.handoffView.itemViews.every((item) => Boolean(item.ariaLabel)),
@@ -88,6 +139,10 @@ test('printable worksheet handoff summarizes included answer keys without key te
     getHandoffItemValue(pageView, 'answer-key'),
     'Teacher-only key included'
   );
+  assert.equal(
+    getHandoffItemValue(pageView, 'answer-key-access'),
+    'Teacher-only key included'
+  );
   assert.equal(getHandoffItemValue(pageView, 'answer-key-items'), '1 item');
   assert.equal(getHandoffItemValue(pageView, 'answer-key-details'), '3 items');
   assertNoPrivatePrintableText(JSON.stringify(pageView.handoffView));
@@ -107,6 +162,10 @@ test('printable worksheet handoff keeps unavailable answer keys explicit', () =>
   assert.equal(pageView.answerKeyView.accessView.state, 'unavailable');
   assert.equal(
     getHandoffItemValue(pageView, 'answer-key-items'),
+    'No answer key available'
+  );
+  assert.equal(
+    getHandoffItemValue(pageView, 'answer-key-access'),
     'No answer key available'
   );
   assert.equal(

@@ -8,6 +8,7 @@ import {
 } from '@/assignments/printable-worksheet-view';
 import { PrintableWorksheetAnswerKey } from '@/components/assignments/printable-worksheet-answer-key';
 import { PrintableWorksheetAssignmentFields } from '@/components/assignments/printable-worksheet-assignment-fields';
+import { PrintableWorksheetHandoff } from '@/components/assignments/printable-worksheet-handoff';
 import { PrintableWorksheetHeader } from '@/components/assignments/printable-worksheet-header';
 import { PrintableWorksheetItemList } from '@/components/assignments/printable-worksheet-item-list';
 import { PrintableWorksheetPreparationSummary } from '@/components/assignments/printable-worksheet-preparation-summary';
@@ -125,6 +126,8 @@ function PrintableAssignmentWorksheetPage() {
           />
 
           <PrintableWorksheetAnswerKey view={pageView.answerKeyView} />
+
+          <PrintableWorksheetHandoff view={pageView.handoffView} />
         </article>
       </div>
     </main>

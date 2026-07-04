@@ -71,15 +71,25 @@ export type PrintableWorksheetPreparationView = {
 
 export type PrintableWorksheetHandoffItemId =
   | 'answer-key'
+  | 'answer-key-access'
   | 'answer-key-details'
   | 'answer-key-items'
+  | 'answer-key-toggle-boundary'
+  | 'answer-line-count'
+  | 'assignment-field-count'
   | 'choice-bank-coverage'
+  | 'choice-bank-choice-count'
   | 'date-field'
   | 'delivery-policy'
+  | 'handout-overview'
   | 'instructions'
   | 'item-response-help'
+  | 'preparation-metric-count'
   | 'print-action'
+  | 'print-route-boundary'
   | 'printable-items'
+  | 'privacy-guard'
+  | 'public-runner-boundary'
   | 'response-modes'
   | 'response-plan'
   | 'results-return'
@@ -657,6 +667,22 @@ export function buildPrintableWorksheetHandoffView({
   preparationView: PrintableWorksheetPreparationView;
 }): PrintableWorksheetHandoffView {
   const itemViewsResult = [
+    buildPrintableWorksheetHandoffItemView({
+      description:
+        m.assignment_printable_handoff_handout_overview_description(),
+      id: 'handout-overview',
+      label: m.assignment_printable_handoff_handout_overview_label(),
+      value: m.assignment_printable_handoff_handout_overview_value(),
+    }),
+    buildPrintableWorksheetHandoffItemView({
+      description:
+        m.assignment_printable_handoff_preparation_metric_count_description(),
+      id: 'preparation-metric-count',
+      label: m.assignment_printable_handoff_preparation_metric_count_label(),
+      value: formatPrintableWorksheetPreparationMetricCount(
+        preparationView.items.length
+      ),
+    }),
     buildPrintableWorksheetHandoffPreparationItem(
       getPrintableWorksheetPreparationItem(preparationView, 'student-fields')
     ),
@@ -666,6 +692,19 @@ export function buildPrintableWorksheetHandoffView({
     buildPrintableWorksheetHandoffPreparationItem(
       getPrintableWorksheetPreparationItem(preparationView, 'answer-key')
     ),
+    buildPrintableWorksheetHandoffItemView({
+      description: answerKeyView.accessView.description,
+      id: 'answer-key-access',
+      label: m.assignment_printable_handoff_answer_key_access_label(),
+      value: answerKeyView.accessView.value,
+    }),
+    buildPrintableWorksheetHandoffItemView({
+      description:
+        m.assignment_printable_handoff_answer_key_toggle_boundary_description(),
+      id: 'answer-key-toggle-boundary',
+      label: m.assignment_printable_handoff_answer_key_toggle_boundary_label(),
+      value: m.assignment_printable_handoff_answer_key_toggle_boundary_value(),
+    }),
     buildPrintableWorksheetHandoffOverviewItem({
       headerView,
       id: 'items',
@@ -685,9 +724,27 @@ export function buildPrintableWorksheetHandoffView({
       ),
     }),
     buildPrintableWorksheetHandoffItemView({
+      description:
+        m.assignment_printable_handoff_choice_bank_choice_count_description(),
+      id: 'choice-bank-choice-count',
+      label: m.assignment_printable_handoff_choice_bank_choice_count_label(),
+      value: formatPrintableWorksheetChoiceBankChoiceCount(
+        countPrintableWorksheetChoiceBankChoices(itemViews)
+      ),
+    }),
+    buildPrintableWorksheetHandoffItemView({
       description: printableWorksheetPageCopy.blankFieldDescription,
       id: 'writing-area-coverage',
       label: m.assignment_printable_answer_area_label(),
+      value: formatPrintableWorksheetAnswerLineSummary(
+        countPrintableWorksheetAnswerLines(itemViews)
+      ),
+    }),
+    buildPrintableWorksheetHandoffItemView({
+      description:
+        m.assignment_printable_handoff_answer_line_count_description(),
+      id: 'answer-line-count',
+      label: m.assignment_printable_handoff_answer_line_count_label(),
       value: formatPrintableWorksheetAnswerLineSummary(
         countPrintableWorksheetAnswerLines(itemViews)
       ),
@@ -698,6 +755,15 @@ export function buildPrintableWorksheetHandoffView({
       id: 'item-response-help',
       label: m.assignment_printable_overview_response_modes_label(),
       value: formatPrintableWorksheetResponseHelpSummary(itemViews),
+    }),
+    buildPrintableWorksheetHandoffItemView({
+      description:
+        m.assignment_printable_handoff_assignment_field_count_description(),
+      id: 'assignment-field-count',
+      label: m.assignment_printable_handoff_assignment_field_count_label(),
+      value: formatPrintableWorksheetAssignmentFieldCount(
+        assignmentFieldViews.length
+      ),
     }),
     buildPrintableWorksheetHandoffAssignmentFieldItem({
       fieldViews: assignmentFieldViews,
@@ -757,6 +823,26 @@ export function buildPrintableWorksheetHandoffView({
       id: 'print-action',
       label: controlView.printAction.label,
       value: headerView.printModeLabel,
+    }),
+    buildPrintableWorksheetHandoffItemView({
+      description:
+        m.assignment_printable_handoff_print_route_boundary_description(),
+      id: 'print-route-boundary',
+      label: m.assignment_printable_handoff_print_route_boundary_label(),
+      value: m.assignment_printable_handoff_print_route_boundary_value(),
+    }),
+    buildPrintableWorksheetHandoffItemView({
+      description:
+        m.assignment_printable_handoff_public_runner_boundary_description(),
+      id: 'public-runner-boundary',
+      label: m.assignment_printable_handoff_public_runner_boundary_label(),
+      value: m.assignment_printable_handoff_public_runner_boundary_value(),
+    }),
+    buildPrintableWorksheetHandoffItemView({
+      description: m.assignment_printable_handoff_privacy_description(),
+      id: 'privacy-guard',
+      label: m.assignment_printable_handoff_privacy_label(),
+      value: m.assignment_printable_handoff_private_data_omitted_value(),
     }),
   ].filter(isPrintableWorksheetHandoffItemView);
 
@@ -910,6 +996,40 @@ function countPrintableWorksheetAnswerLines(
       0
     ),
     { min: 0 }
+  );
+}
+
+function countPrintableWorksheetChoiceBankChoices(
+  itemViews: PrintableWorksheetItemView[]
+) {
+  return normalizeRuntimeDisplayCount(
+    itemViews.reduce(
+      (count, itemView) => count + itemView.choiceBank.choices.length,
+      0
+    ),
+    { min: 0 }
+  );
+}
+
+function formatPrintableWorksheetPreparationMetricCount(count: number) {
+  return m.assignment_printable_handoff_preparation_metric_count_value({
+    count: normalizeRuntimeDisplayCount(count, { min: 0 }),
+  });
+}
+
+function formatPrintableWorksheetAssignmentFieldCount(count: number) {
+  return m.assignment_printable_handoff_assignment_field_count_value({
+    count: normalizeRuntimeDisplayCount(count, { min: 0 }),
+  });
+}
+
+function formatPrintableWorksheetChoiceBankChoiceCount(count: number) {
+  return (
+    formatPrintableWorksheetChoiceBankSummary({
+      count,
+      presentation: 'choice-list',
+      showChoiceBank: true,
+    }) ?? m.assignment_printable_choice_bank_summary_none()
   );
 }
 

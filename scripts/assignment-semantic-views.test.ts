@@ -228,14 +228,21 @@ test('printable worksheet page view exposes a complete handoff contract', () => 
   assert.deepEqual(
     hiddenPageView.handoffView.itemViews.map((item) => item.id),
     [
+      'handout-overview',
+      'preparation-metric-count',
       'student-fields',
       'response-plan',
       'answer-key',
+      'answer-key-access',
+      'answer-key-toggle-boundary',
       'printable-items',
       'response-modes',
       'choice-bank-coverage',
+      'choice-bank-choice-count',
       'writing-area-coverage',
+      'answer-line-count',
       'item-response-help',
+      'assignment-field-count',
       'student-name-field',
       'date-field',
       'score-field',
@@ -248,8 +255,12 @@ test('printable worksheet page view exposes a complete handoff contract', () => 
       'answer-key-details',
       'results-return',
       'print-action',
+      'print-route-boundary',
+      'public-runner-boundary',
+      'privacy-guard',
     ]
   );
+  assert.equal(hiddenPageView.handoffView.itemViews.length, 30);
   assert.deepEqual(hiddenPageView.handoffView.privacy, {
     exposesAnswerKeyText: false,
     exposesChoiceText: false,
