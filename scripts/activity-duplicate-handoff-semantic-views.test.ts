@@ -12,9 +12,13 @@ import { overwriteGetLocale } from '@/locale/paraglide/runtime';
 overwriteGetLocale(() => 'en');
 
 const SECRET_ANSWER = 'SECRET_ANSWER_TEXT';
+const SECRET_DESCRIPTION = 'SECRET_DESCRIPTION_TEXT';
+const SECRET_EXPLANATION = 'SECRET_EXPLANATION_TEXT';
 const SECRET_FILE_ID = 'secret-file-id';
 const SECRET_FILENAME = 'secret worksheet.pdf';
+const SECRET_OPTION = 'SECRET_OPTION_TEXT';
 const SECRET_PROMPT = 'SECRET_PROMPT_TEXT';
+const SECRET_SOURCE_SUMMARY = 'SECRET_SOURCE_SUMMARY_TEXT';
 const SECRET_STORAGE_KEY = 'userfiles/teacher/private-key.pdf';
 const SECRET_TEACHER_NOTE = 'SECRET_TEACHER_NOTE';
 
@@ -40,8 +44,20 @@ const duplicateSourceContent: ActivityContent = {
   questions: [
     {
       answer: SECRET_ANSWER,
-      explanation: 'Teacher-only answer explanation',
+      explanation: SECRET_EXPLANATION,
       id: 'question-food',
+      options: [
+        {
+          id: 'option-secret-answer',
+          isCorrect: true,
+          text: SECRET_ANSWER,
+        },
+        {
+          id: 'option-secret-distractor',
+          isCorrect: false,
+          text: SECRET_OPTION,
+        },
+      ],
       prompt: SECRET_PROMPT,
     },
   ],
@@ -61,15 +77,16 @@ const duplicateSourceContent: ActivityContent = {
       size: 2400,
     },
   ],
-  sourceSummary: 'Teacher source summary',
+  sourceSummary: SECRET_SOURCE_SUMMARY,
   subject: 'English',
   teacherNotes: [SECRET_TEACHER_NOTE],
   vocabulary: ['apple', 'bread'],
 };
 
-test('activity duplicate handoff exposes 20 safe draft-copy slices', () => {
+test('activity duplicate handoff exposes 30 safe draft-copy slices', () => {
   const handoffView = buildActivityDuplicateHandoffView({
     content: duplicateSourceContent,
+    description: SECRET_DESCRIPTION,
     persisted: true,
     status: 'private',
     templateType: 'group-sort',
@@ -78,7 +95,7 @@ test('activity duplicate handoff exposes 20 safe draft-copy slices', () => {
   const itemIds = handoffView.itemViews.map((itemView) => itemView.id);
 
   assert.deepEqual(itemIds, [...ACTIVITY_DUPLICATE_HANDOFF_ITEM_IDS]);
-  assert.equal(new Set(itemIds).size, 20);
+  assert.equal(new Set(itemIds).size, 30);
   assert.equal(
     handoffView.itemViews.every(
       (itemView) =>
@@ -90,17 +107,27 @@ test('activity duplicate handoff exposes 20 safe draft-copy slices', () => {
     true
   );
   assert.deepEqual(handoffView.privacy, {
+    clonesAnswerExplanations: true,
+    clonesQuestionOptions: true,
+    clonesSourceMaterialReferences: true,
+    exposesAnswerExplanationText: false,
     exposesActivityContentText: false,
     exposesAnswerText: false,
+    exposesQuestionOptionText: false,
     exposesQuestionPromptText: false,
+    exposesSourceMaterialFilenames: false,
     exposesSourceMaterialFileIds: false,
     exposesSourceMaterialStorageKeys: false,
+    exposesSourceSummaryText: false,
     exposesTeacherNotesText: false,
     itemIds,
     modifiesOriginalActivity: false,
     modifiesPublishedAssignmentSnapshots: false,
     outputVisibility: 'draft',
+    preservesTemplateType: true,
     requiresOwnerScopedSource: true,
+    requiresPersistedSourceForAction: true,
+    resetsVisibilityToDraft: true,
     scope: 'owner-activity-duplicate',
   });
 
@@ -111,6 +138,10 @@ test('activity duplicate handoff exposes 20 safe draft-copy slices', () => {
   assert.equal(
     getDuplicateHandoffValue(handoffView, 'owner-scope'),
     'Current teacher'
+  );
+  assert.equal(
+    getDuplicateHandoffValue(handoffView, 'persisted-source'),
+    'Saved source'
   );
   assert.equal(
     getDuplicateHandoffValue(handoffView, 'source-status'),
@@ -125,12 +156,24 @@ test('activity duplicate handoff exposes 20 safe draft-copy slices', () => {
     'Derivative allowed'
   );
   assert.equal(
+    getDuplicateHandoffValue(handoffView, 'derivative-scope'),
+    'Owner draft'
+  );
+  assert.equal(
     getDuplicateHandoffValue(handoffView, 'draft-output'),
     'Draft copy'
   );
   assert.equal(
+    getDuplicateHandoffValue(handoffView, 'visibility-reset'),
+    'Draft visibility'
+  );
+  assert.equal(
     getDuplicateHandoffValue(handoffView, 'title-strategy'),
     'Copy of Food words quick check'
+  );
+  assert.equal(
+    getDuplicateHandoffValue(handoffView, 'title-normalization'),
+    'Whitespace normalized'
   );
   assert.equal(
     getDuplicateHandoffValue(handoffView, 'title-limit'),
@@ -141,14 +184,35 @@ test('activity duplicate handoff exposes 20 safe draft-copy slices', () => {
     'Group sort'
   );
   assert.equal(
+    getDuplicateHandoffValue(handoffView, 'template-transform'),
+    'No transform'
+  );
+  assert.equal(
+    getDuplicateHandoffValue(handoffView, 'description-preserved'),
+    'Description copied'
+  );
+  assert.equal(
     getDuplicateHandoffValue(handoffView, 'content-clone'),
     'Structured copy'
   );
+  assert.equal(
+    getDuplicateHandoffValue(handoffView, 'reference-isolation'),
+    'Independent copy'
+  );
   assert.equal(getDuplicateHandoffValue(handoffView, 'questions'), '1');
+  assert.equal(getDuplicateHandoffValue(handoffView, 'question-options'), '2');
+  assert.equal(
+    getDuplicateHandoffValue(handoffView, 'answer-explanations'),
+    '1'
+  );
   assert.equal(getDuplicateHandoffValue(handoffView, 'pairs'), '1');
   assert.equal(getDuplicateHandoffValue(handoffView, 'groups'), '1');
   assert.equal(getDuplicateHandoffValue(handoffView, 'vocabulary'), '2');
   assert.equal(getDuplicateHandoffValue(handoffView, 'teacher-notes'), '1');
+  assert.equal(
+    getDuplicateHandoffValue(handoffView, 'source-summary-privacy'),
+    'Summary hidden'
+  );
   assert.equal(getDuplicateHandoffValue(handoffView, 'source-materials'), '2');
   assert.equal(
     getDuplicateHandoffValue(handoffView, 'source-material-kinds'),
@@ -206,6 +270,10 @@ test('activity duplicate handoff keeps archived and preview sources blocked', ()
     getDuplicateHandoffValue(previewHandoffView, 'source-status'),
     'Preview'
   );
+  assert.equal(
+    getDuplicateHandoffValue(previewHandoffView, 'persisted-source'),
+    'Preview source'
+  );
   assertNoPrivateDuplicateHandoffText(JSON.stringify(archivedHandoffView));
   assertNoPrivateDuplicateHandoffText(JSON.stringify(previewHandoffView));
 });
@@ -222,9 +290,13 @@ function getDuplicateHandoffValue(
 function assertNoPrivateDuplicateHandoffText(serializedView: string) {
   for (const privateValue of [
     SECRET_ANSWER,
+    SECRET_DESCRIPTION,
+    SECRET_EXPLANATION,
     SECRET_FILE_ID,
     SECRET_FILENAME,
+    SECRET_OPTION,
     SECRET_PROMPT,
+    SECRET_SOURCE_SUMMARY,
     SECRET_STORAGE_KEY,
     SECRET_TEACHER_NOTE,
   ]) {

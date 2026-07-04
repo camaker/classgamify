@@ -1,6 +1,7 @@
 import { m } from '@/locale/paraglide/messages';
 import { getTemplateByType } from '@/activities/catalog';
 import { normalizeActivityMaterialReferences } from '@/activities/material-references';
+import { hasRuntimeDisplayText } from '@/activities/runtime-display';
 import {
   ACTIVITY_TITLE_LENGTH,
   type ActivityContent,
@@ -12,19 +13,29 @@ import {
 export const ACTIVITY_DUPLICATE_HANDOFF_ITEM_IDS = [
   'source-activity',
   'owner-scope',
+  'persisted-source',
   'source-status',
   'action-availability',
   'lifecycle-gate',
+  'derivative-scope',
   'draft-output',
+  'visibility-reset',
   'title-strategy',
+  'title-normalization',
   'title-limit',
   'template-preserved',
+  'template-transform',
+  'description-preserved',
   'content-clone',
+  'reference-isolation',
   'questions',
+  'question-options',
+  'answer-explanations',
   'pairs',
   'groups',
   'vocabulary',
   'teacher-notes',
+  'source-summary-privacy',
   'source-materials',
   'source-material-kinds',
   'source-material-privacy',
@@ -44,17 +55,27 @@ export type ActivityDuplicateHandoffItemView = {
 };
 
 export type ActivityDuplicateHandoffPrivacyContract = {
+  clonesAnswerExplanations: true;
+  clonesQuestionOptions: true;
+  clonesSourceMaterialReferences: true;
+  exposesAnswerExplanationText: false;
   exposesActivityContentText: false;
   exposesAnswerText: false;
+  exposesQuestionOptionText: false;
   exposesQuestionPromptText: false;
+  exposesSourceMaterialFilenames: false;
   exposesSourceMaterialFileIds: false;
   exposesSourceMaterialStorageKeys: false;
+  exposesSourceSummaryText: false;
   exposesTeacherNotesText: false;
   itemIds: ActivityDuplicateHandoffItemId[];
   modifiesOriginalActivity: false;
   modifiesPublishedAssignmentSnapshots: false;
   outputVisibility: 'draft';
+  preservesTemplateType: true;
   requiresOwnerScopedSource: true;
+  requiresPersistedSourceForAction: true;
+  resetsVisibilityToDraft: true;
   scope: 'owner-activity-duplicate';
 };
 
@@ -67,6 +88,7 @@ export type ActivityDuplicateHandoffView = {
 
 export type ActivityDuplicateHandoffSource = {
   content: ActivityContent;
+  description?: string | null;
   persisted: boolean;
   status: ActivityVisibility;
   templateType: ActivityTemplateType;
@@ -124,6 +146,7 @@ type ActivityDuplicateHandoffSummary = ReturnType<
 
 function buildActivityDuplicateHandoffSummary({
   content,
+  description,
   persisted,
   status,
   templateType,
@@ -139,6 +162,13 @@ function buildActivityDuplicateHandoffSummary({
       canDuplicate,
       persisted,
     }),
+    answerExplanationCount: content.questions.filter((question) =>
+      hasRuntimeDisplayText(question.explanation)
+    ).length,
+    descriptionState: hasRuntimeDisplayText(description)
+      ? m.activity_duplicate_handoff_description_preserved_value()
+      : m.activity_duplicate_handoff_description_empty_value(),
+    derivativeScope: m.activity_duplicate_handoff_derivative_scope_value(),
     duplicateTitle: buildDuplicatedActivityTitle(title),
     groupCount: content.groups.length,
     lifecycleGate: getActivityDuplicateHandoffLifecycleGateValue({
@@ -146,19 +176,35 @@ function buildActivityDuplicateHandoffSummary({
       persisted,
     }),
     pairCount: content.pairs.length,
+    persistedSource: persisted
+      ? m.activity_duplicate_handoff_persisted_source_saved_value()
+      : m.activity_duplicate_handoff_persisted_source_preview_value(),
+    questionOptionCount: content.questions.reduce(
+      (count, question) => count + (question.options?.length ?? 0),
+      0
+    ),
     questionCount: content.questions.length,
+    referenceIsolation:
+      m.activity_duplicate_handoff_reference_isolation_value(),
     sourceActivity: normalizeActivitySourceTitle(title),
     sourceMaterialCount: sourceMaterials.length,
     sourceMaterialKindCount: new Set(
       sourceMaterials.map((material) => material.kind)
     ).size,
+    sourceSummaryState: hasRuntimeDisplayText(content.sourceSummary)
+      ? m.activity_duplicate_handoff_source_summary_privacy_included_value()
+      : m.activity_duplicate_handoff_source_summary_privacy_empty_value(),
     sourceStatus: getActivityDuplicateHandoffStatusLabel({
       persisted,
       status,
     }),
     teacherNoteCount: content.teacherNotes.length,
     templateLabel: getTemplateByType(templateType).name,
+    templateTransform: m.activity_duplicate_handoff_template_transform_value(),
+    titleNormalization:
+      m.activity_duplicate_handoff_title_normalization_value(),
     titleLimit: ACTIVITY_TITLE_LENGTH.max,
+    visibilityReset: m.activity_duplicate_handoff_visibility_reset_value(),
     vocabularyCount: content.vocabulary.length,
   };
 }
@@ -197,6 +243,15 @@ function buildActivityDuplicateHandoffItem({
     };
   }
 
+  if (id === 'persisted-source') {
+    return {
+      description: m.activity_duplicate_handoff_persisted_source_description(),
+      id,
+      label: m.activity_duplicate_handoff_persisted_source_label(),
+      value: summary.persistedSource,
+    };
+  }
+
   if (id === 'action-availability') {
     return {
       description:
@@ -216,6 +271,15 @@ function buildActivityDuplicateHandoffItem({
     };
   }
 
+  if (id === 'derivative-scope') {
+    return {
+      description: m.activity_duplicate_handoff_derivative_scope_description(),
+      id,
+      label: m.activity_duplicate_handoff_derivative_scope_label(),
+      value: summary.derivativeScope,
+    };
+  }
+
   if (id === 'draft-output') {
     return {
       description: m.activity_duplicate_handoff_draft_output_description(),
@@ -225,12 +289,31 @@ function buildActivityDuplicateHandoffItem({
     };
   }
 
+  if (id === 'visibility-reset') {
+    return {
+      description: m.activity_duplicate_handoff_visibility_reset_description(),
+      id,
+      label: m.activity_duplicate_handoff_visibility_reset_label(),
+      value: summary.visibilityReset,
+    };
+  }
+
   if (id === 'title-strategy') {
     return {
       description: m.activity_duplicate_handoff_title_strategy_description(),
       id,
       label: m.activity_duplicate_handoff_title_strategy_label(),
       value: summary.duplicateTitle,
+    };
+  }
+
+  if (id === 'title-normalization') {
+    return {
+      description:
+        m.activity_duplicate_handoff_title_normalization_description(),
+      id,
+      label: m.activity_duplicate_handoff_title_normalization_label(),
+      value: summary.titleNormalization,
     };
   }
 
@@ -255,6 +338,26 @@ function buildActivityDuplicateHandoffItem({
     };
   }
 
+  if (id === 'template-transform') {
+    return {
+      description:
+        m.activity_duplicate_handoff_template_transform_description(),
+      id,
+      label: m.activity_duplicate_handoff_template_transform_label(),
+      value: summary.templateTransform,
+    };
+  }
+
+  if (id === 'description-preserved') {
+    return {
+      description:
+        m.activity_duplicate_handoff_description_preserved_description(),
+      id,
+      label: m.activity_duplicate_handoff_description_preserved_label(),
+      value: summary.descriptionState,
+    };
+  }
+
   if (id === 'content-clone') {
     return {
       description: m.activity_duplicate_handoff_content_clone_description(),
@@ -264,12 +367,43 @@ function buildActivityDuplicateHandoffItem({
     };
   }
 
+  if (id === 'reference-isolation') {
+    return {
+      description:
+        m.activity_duplicate_handoff_reference_isolation_description(),
+      id,
+      label: m.activity_duplicate_handoff_reference_isolation_label(),
+      value: summary.referenceIsolation,
+    };
+  }
+
   if (id === 'questions') {
     return {
       description: m.activity_duplicate_handoff_questions_description(),
       id,
       label: m.activity_duplicate_handoff_questions_label(),
       value: formatActivityDuplicateHandoffCount(summary.questionCount),
+    };
+  }
+
+  if (id === 'question-options') {
+    return {
+      description: m.activity_duplicate_handoff_question_options_description(),
+      id,
+      label: m.activity_duplicate_handoff_question_options_label(),
+      value: formatActivityDuplicateHandoffCount(summary.questionOptionCount),
+    };
+  }
+
+  if (id === 'answer-explanations') {
+    return {
+      description:
+        m.activity_duplicate_handoff_answer_explanations_description(),
+      id,
+      label: m.activity_duplicate_handoff_answer_explanations_label(),
+      value: formatActivityDuplicateHandoffCount(
+        summary.answerExplanationCount
+      ),
     };
   }
 
@@ -306,6 +440,16 @@ function buildActivityDuplicateHandoffItem({
       id,
       label: m.activity_duplicate_handoff_teacher_notes_label(),
       value: formatActivityDuplicateHandoffCount(summary.teacherNoteCount),
+    };
+  }
+
+  if (id === 'source-summary-privacy') {
+    return {
+      description:
+        m.activity_duplicate_handoff_source_summary_privacy_description(),
+      id,
+      label: m.activity_duplicate_handoff_source_summary_privacy_label(),
+      value: summary.sourceSummaryState,
     };
   }
 
@@ -387,17 +531,27 @@ function buildActivityDuplicateHandoffPrivacyContract(
   itemViews: ActivityDuplicateHandoffItemView[]
 ): ActivityDuplicateHandoffPrivacyContract {
   return {
+    clonesAnswerExplanations: true,
+    clonesQuestionOptions: true,
+    clonesSourceMaterialReferences: true,
+    exposesAnswerExplanationText: false,
     exposesActivityContentText: false,
     exposesAnswerText: false,
+    exposesQuestionOptionText: false,
     exposesQuestionPromptText: false,
+    exposesSourceMaterialFilenames: false,
     exposesSourceMaterialFileIds: false,
     exposesSourceMaterialStorageKeys: false,
+    exposesSourceSummaryText: false,
     exposesTeacherNotesText: false,
     itemIds: itemViews.map((itemView) => itemView.id),
     modifiesOriginalActivity: false,
     modifiesPublishedAssignmentSnapshots: false,
     outputVisibility: 'draft',
+    preservesTemplateType: true,
     requiresOwnerScopedSource: true,
+    requiresPersistedSourceForAction: true,
+    resetsVisibilityToDraft: true,
     scope: 'owner-activity-duplicate',
   };
 }

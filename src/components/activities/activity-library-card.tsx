@@ -2,6 +2,10 @@ import type { ActivityLibraryStatus } from '@/activities/library-filters';
 import { buildAssignmentPublishDialogAccessView } from '@/assignments/publish-input';
 import { buildAssignmentListRouteSearch } from '@/assignments/list-filters';
 import { buildActivityLibraryRouteSearch } from '@/activities/library-filters';
+import type {
+  ActivityDuplicateHandoffItemView,
+  ActivityDuplicateHandoffView,
+} from '@/activities/duplicate';
 import {
   buildActivityLibraryCardDisplayView,
   type ActivityLibraryCardActionButtonView,
@@ -413,6 +417,11 @@ function ActivityLibraryCardActions({
 
   return (
     <section aria-label={label} className="flex flex-col gap-2 sm:flex-row">
+      {actionView.duplicate.duplicateHandoffView ? (
+        <ActivityLibraryDuplicateHandoff
+          handoff={actionView.duplicate.duplicateHandoffView}
+        />
+      ) : null}
       {actionState.showEditAction ? (
         <ActivityLibraryEditActionLink action={editAction} />
       ) : null}
@@ -447,6 +456,48 @@ function ActivityLibraryCardActions({
         />
       ) : null}
     </section>
+  );
+}
+
+function ActivityLibraryDuplicateHandoff({
+  handoff,
+}: {
+  handoff: ActivityDuplicateHandoffView;
+}) {
+  const titleId = useId();
+  const descriptionId = useId();
+
+  return (
+    <section
+      aria-describedby={descriptionId}
+      aria-labelledby={titleId}
+      className="sr-only"
+      data-handoff="activity-duplicate"
+    >
+      <h3 id={titleId}>{handoff.title}</h3>
+      <p id={descriptionId}>{handoff.description}</p>
+      <dl>
+        {handoff.itemViews.map((item) => (
+          <ActivityLibraryDuplicateHandoffItem item={item} key={item.id} />
+        ))}
+      </dl>
+    </section>
+  );
+}
+
+function ActivityLibraryDuplicateHandoffItem({
+  item,
+}: {
+  item: ActivityDuplicateHandoffItemView;
+}) {
+  return (
+    <div data-handoff-item={item.id}>
+      <dt>{item.label}</dt>
+      <dd>
+        <output aria-label={item.ariaLabel}>{item.value}</output>
+        <span>{item.description}</span>
+      </dd>
+    </div>
   );
 }
 
