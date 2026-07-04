@@ -138,3 +138,6 @@ real UI locally when available, and run the relevant Playwright specs.
 - `docs/storage.md` documents the R2 source-material boundary.
 - `.env.example` and `.env.production.example` use ClassGamify placeholders.
 - `wrangler.jsonc` owns D1 and R2 bindings for the Worker.
+- `src/config/developer-configuration-handoff.ts` exposes the 20-slice
+  developer configuration boundary used by fast tests to keep examples,
+  secrets, bindings, and provider copy aligned with the classroom product loop.
