@@ -3837,8 +3837,8 @@ assert.doesNotMatch(
 );
 assert.match(
   assignmentPublishSource,
-  /export const ASSIGNMENT_PUBLISH_HANDOFF_ITEM_IDS = \[(?=[\s\S]*'publish-access')(?=[\s\S]*'validation-message')(?=[\s\S]*'delivery-rule-count')(?=[\s\S]*'student-instructions')(?=[\s\S]*'attempts-policy')(?=[\s\S]*'settings-json')(?=[\s\S]*'close-time-parser')(?=[\s\S]*'snapshot-freeze')(?=[\s\S]*'results-policy')[\s\S]*export type AssignmentPublishHandoffPrivacyContract = \{[\s\S]*exposesActivityContent: false;[\s\S]*exposesAnswerKeys: false;[\s\S]*exposesAssignmentTitle: false;[\s\S]*exposesRawSettingsJson: false;[\s\S]*exposesShareSlug: false;[\s\S]*exposesStudentInstructions: false;[\s\S]*exposesStudentNames: false;/,
-  'Assignment publish handoff should expose a typed 20-slice contract with explicit privacy flags.'
+  /export const ASSIGNMENT_PUBLISH_HANDOFF_ITEM_IDS = \[(?=[\s\S]*'publish-access')(?=[\s\S]*'activity-lifecycle-gate')(?=[\s\S]*'validation-message')(?=[\s\S]*'draft-field-count')(?=[\s\S]*'field-limit-boundary')(?=[\s\S]*'delivery-rule-count')(?=[\s\S]*'settings-summary-status')(?=[\s\S]*'student-instructions')(?=[\s\S]*'review-checklist-count')(?=[\s\S]*'delivery-defaults')(?=[\s\S]*'attempts-policy')(?=[\s\S]*'attempt-limit-parser')(?=[\s\S]*'timer-parser')(?=[\s\S]*'settings-json')(?=[\s\S]*'close-time-parser')(?=[\s\S]*'snapshot-freeze')(?=[\s\S]*'public-payload-boundary')(?=[\s\S]*'results-policy')(?=[\s\S]*'privacy-guard')[\s\S]*export type AssignmentPublishHandoffPrivacyContract = \{[\s\S]*exposesActivityContent: false;[\s\S]*exposesAnswerKeys: false;[\s\S]*exposesAssignmentTitle: false;[\s\S]*exposesInternalActivityIds: false;[\s\S]*exposesPublicRuntimeContent: false;[\s\S]*exposesRawSettingsJson: false;[\s\S]*exposesShareSlug: false;[\s\S]*exposesSourceMaterialStorageKeys: false;[\s\S]*exposesStudentAnswerText: false;[\s\S]*exposesStudentInstructions: false;[\s\S]*exposesStudentNames: false;[\s\S]*exposesTeacherNotes: false;/,
+  'Assignment publish handoff should expose a typed 30-slice contract with explicit privacy flags.'
 );
 assert.match(
   assignmentPublishSource,
@@ -3847,8 +3847,8 @@ assert.match(
 );
 assert.match(
   assignmentPublishSource,
-  /export function buildAssignmentPublishHandoffView(?=[\s\S]*accessView: AssignmentPublishDialogAccessView)(?=[\s\S]*dialogState: AssignmentPublishDialogState)(?=[\s\S]*preview: AssignmentPublishPreview)[\s\S]*id: 'publish-access'[\s\S]*id: 'validation-message'[\s\S]*id: 'delivery-rule-count'[\s\S]*id: 'student-instructions'[\s\S]*id: 'attempts-policy'[\s\S]*id: 'settings-json'[\s\S]*id: 'close-time-parser'[\s\S]*id: 'snapshot-freeze'[\s\S]*id: 'results-policy'[\s\S]*privacy: buildAssignmentPublishHandoffPrivacyContract/,
-  'Assignment publish handoff should collect publish access, validation, delivery rules, settings persistence, close parsing, and review checklist slices.'
+  /export function buildAssignmentPublishHandoffView(?=[\s\S]*accessView: AssignmentPublishDialogAccessView)(?=[\s\S]*dialogState: AssignmentPublishDialogState)(?=[\s\S]*preview: AssignmentPublishPreview)[\s\S]*id: 'publish-access'[\s\S]*id: 'activity-lifecycle-gate'[\s\S]*id: 'validation-message'[\s\S]*id: 'draft-field-count'[\s\S]*id: 'field-limit-boundary'[\s\S]*id: 'delivery-rule-count'[\s\S]*id: 'settings-summary-status'[\s\S]*id: 'student-instructions'[\s\S]*id: 'review-checklist-count'[\s\S]*id: 'delivery-defaults'[\s\S]*id: 'attempts-policy'[\s\S]*id: 'attempt-limit-parser'[\s\S]*id: 'timer-parser'[\s\S]*id: 'settings-json'[\s\S]*id: 'close-time-parser'[\s\S]*id: 'snapshot-freeze'[\s\S]*id: 'public-payload-boundary'[\s\S]*id: 'results-policy'[\s\S]*id: 'privacy-guard'[\s\S]*privacy: buildAssignmentPublishHandoffPrivacyContract/,
+  'Assignment publish handoff should collect publish access, validation, delivery rules, defaults, parsers, payload, privacy, and review checklist slices.'
 );
 assert.doesNotMatch(
   assignmentPublishSource,
@@ -5970,8 +5970,8 @@ assert.match(
 );
 assert.match(
   activityPublishSettingsFormSource,
-  /AssignmentPublishDialogViewModel[\s\S]*AssignmentPublishDraft[\s\S]*AssignmentPublishDraftValues[\s\S]*AssignmentPublishToggleView/,
-  'Assignment publish settings form should import the explicit assignment-domain toggle view contract.'
+  /AssignmentPublishDialogViewModel[\s\S]*AssignmentPublishDraft[\s\S]*AssignmentPublishDraftValues[\s\S]*AssignmentPublishHandoffView[\s\S]*AssignmentPublishToggleView/,
+  'Assignment publish settings form should import the explicit assignment-domain handoff and toggle view contracts.'
 );
 assert.match(
   activityPublishSettingsFormSource,
@@ -5987,6 +5987,11 @@ assert.match(
   activityPublishSettingsFormSource,
   /ActivityPublishPreviewContext[\s\S]*context=\{view\.preview\.context\}/,
   'Assignment publish settings form should render the prepared frozen-link preview context.'
+);
+assert.match(
+  activityPublishSettingsFormSource,
+  /AssignmentPublishHandoff[\s\S]*view=\{view\.handoffView\}[\s\S]*data-handoff="assignment-publish"[\s\S]*data-handoff-item=\{item\.id\}/,
+  'Assignment publish settings form should render the prepared publish handoff as hidden semantic output.'
 );
 assert.match(
   activityPublishSettingsFormSource,
@@ -20102,15 +20107,20 @@ const assignmentPublishHandoffItemIds =
 assert.deepEqual(assignmentPublishHandoffItemIds, [
   ...ASSIGNMENT_PUBLISH_HANDOFF_ITEM_IDS,
 ]);
-assert.equal(assignmentPublishDialogViewModel.handoffView.itemViews.length, 20);
+assert.equal(assignmentPublishDialogViewModel.handoffView.itemViews.length, 30);
 assert.deepEqual(assignmentPublishDialogViewModel.handoffView.privacy, {
   exposesActivityContent: false,
   exposesAnswerKeys: false,
   exposesAssignmentTitle: false,
+  exposesInternalActivityIds: false,
+  exposesPublicRuntimeContent: false,
   exposesRawSettingsJson: false,
   exposesShareSlug: false,
+  exposesSourceMaterialStorageKeys: false,
+  exposesStudentAnswerText: false,
   exposesStudentInstructions: false,
   exposesStudentNames: false,
+  exposesTeacherNotes: false,
   itemIds: assignmentPublishHandoffItemIds,
 });
 assert.deepEqual(
@@ -20120,25 +20130,35 @@ assert.deepEqual(
   ]),
   [
     ['publish-access', 'Available'],
+    ['activity-lifecycle-gate', 'Available'],
     ['publish-action', 'Enabled'],
     ['publish-disabled', 'Enabled'],
     ['validation-status', 'Ready to publish'],
     ['validation-message', 'No validation blocker'],
     ['title-field', 'Provided'],
+    ['draft-field-count', '8 draft fields'],
+    ['field-limit-boundary', 'Limits enforced'],
     ['frozen-link-status', 'Ready to publish'],
     ['delivery-rule-count', '6 rules'],
+    ['settings-summary-status', 'Timer and close time'],
     ['student-instructions', 'Added'],
     ['timer-status', 'Enabled'],
     ['close-time-status', 'Scheduled'],
+    ['review-checklist-count', '3 checks'],
+    ['delivery-defaults', 'Resolved settings'],
     ['attempts-policy', '3 max'],
+    ['attempt-limit-parser', 'Limited'],
     ['identity-policy', 'Anonymous'],
     ['answer-reveal-policy', 'Hidden'],
     ['item-order-policy', 'Fixed order'],
+    ['timer-parser', '15 min'],
     ['settings-json', '6 setting fields'],
     ['close-time-parser', 'Scheduled'],
     ['snapshot-freeze', 'Ready to publish'],
     ['student-link-rules', 'Ready to publish'],
+    ['public-payload-boundary', 'Student payload safe'],
     ['results-policy', 'Ready to publish'],
+    ['privacy-guard', 'Private data omitted'],
   ]
 );
 assert.equal(

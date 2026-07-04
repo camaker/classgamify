@@ -15,7 +15,7 @@ const SECRET_INSTRUCTIONS = 'SECRET_STUDENT_INSTRUCTIONS_SHOULD_NOT_LEAK';
 const SECRET_SHARE_SLUG = 'SECRET_SHARE_SLUG_SHOULD_NOT_LEAK';
 const NOW = new Date('2026-01-01T00:00:00.000Z');
 
-test('publish dialog exposes a safe 20-slice preview handoff', () => {
+test('publish dialog exposes a safe 30-slice preview handoff', () => {
   const defaults = buildAssignmentPublishDraftDefaults({
     activityId: 'activity-publish-ready',
     title: SECRET_TITLE,
@@ -38,7 +38,7 @@ test('publish dialog exposes a safe 20-slice preview handoff', () => {
   const itemIds = handoffView.itemViews.map((item) => item.id);
 
   assert.deepEqual(itemIds, [...ASSIGNMENT_PUBLISH_HANDOFF_ITEM_IDS]);
-  assert.equal(new Set(itemIds).size, 20);
+  assert.equal(new Set(itemIds).size, 30);
   assert.equal(
     handoffView.itemViews.every(
       (item) =>
@@ -53,35 +53,50 @@ test('publish dialog exposes a safe 20-slice preview handoff', () => {
     exposesActivityContent: false,
     exposesAnswerKeys: false,
     exposesAssignmentTitle: false,
+    exposesInternalActivityIds: false,
+    exposesPublicRuntimeContent: false,
     exposesRawSettingsJson: false,
     exposesShareSlug: false,
+    exposesSourceMaterialStorageKeys: false,
+    exposesStudentAnswerText: false,
     exposesStudentInstructions: false,
     exposesStudentNames: false,
+    exposesTeacherNotes: false,
     itemIds,
   });
   assert.deepEqual(
     handoffView.itemViews.map((item) => [item.id, item.value]),
     [
       ['publish-access', 'Available'],
+      ['activity-lifecycle-gate', 'Available'],
       ['publish-action', 'Enabled'],
       ['publish-disabled', 'Enabled'],
       ['validation-status', 'Ready to publish'],
       ['validation-message', 'No validation blocker'],
       ['title-field', 'Provided'],
+      ['draft-field-count', '8 draft fields'],
+      ['field-limit-boundary', 'Limits enforced'],
       ['frozen-link-status', 'Ready to publish'],
       ['delivery-rule-count', '6 rules'],
+      ['settings-summary-status', 'Timer and close time'],
       ['student-instructions', 'Added'],
       ['timer-status', 'Enabled'],
       ['close-time-status', 'Scheduled'],
+      ['review-checklist-count', '3 checks'],
+      ['delivery-defaults', 'Resolved settings'],
       ['attempts-policy', '3 max'],
+      ['attempt-limit-parser', 'Limited'],
       ['identity-policy', 'Anonymous'],
       ['answer-reveal-policy', 'Hidden'],
       ['item-order-policy', 'Fixed order'],
+      ['timer-parser', '15 min'],
       ['settings-json', '6 setting fields'],
       ['close-time-parser', 'Scheduled'],
       ['snapshot-freeze', 'Ready to publish'],
       ['student-link-rules', 'Ready to publish'],
+      ['public-payload-boundary', 'Student payload safe'],
       ['results-policy', 'Ready to publish'],
+      ['privacy-guard', 'Private data omitted'],
     ]
   );
   assertNoPrivatePublishText(JSON.stringify(handoffView));
@@ -112,6 +127,10 @@ test('publish handoff keeps blocked access and invalid drafts explicit', () => {
     'Restore required'
   );
   assert.equal(
+    getHandoffItemValue(handoffView.itemViews, 'activity-lifecycle-gate'),
+    'Restore required'
+  );
+  assert.equal(
     getHandoffItemValue(handoffView.itemViews, 'publish-action'),
     'Disabled'
   );
@@ -126,6 +145,14 @@ test('publish handoff keeps blocked access and invalid drafts explicit', () => {
   assert.equal(
     getHandoffItemValue(handoffView.itemViews, 'student-instructions'),
     'Added'
+  );
+  assert.equal(
+    getHandoffItemValue(handoffView.itemViews, 'public-payload-boundary'),
+    'Student payload safe'
+  );
+  assert.equal(
+    getHandoffItemValue(handoffView.itemViews, 'privacy-guard'),
+    'Private data omitted'
   );
   assertNoPrivatePublishText(JSON.stringify(handoffView));
 });

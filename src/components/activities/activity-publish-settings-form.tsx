@@ -3,6 +3,7 @@ import {
   type AssignmentPublishDialogViewModel,
   type AssignmentPublishDraft,
   type AssignmentPublishDraftValues,
+  type AssignmentPublishHandoffView,
   type AssignmentPublishPreviewContextTone,
   type AssignmentPublishPreviewContextStatView,
   type AssignmentPublishPreviewContextView,
@@ -244,6 +245,7 @@ function ActivityPublishPreview({
       </p>
       <ActivityPublishPreviewContext context={view.preview.context} />
       <AssignmentSettingsSummary view={view.preview.settingsSummaryView} />
+      <AssignmentPublishHandoff view={view.handoffView} />
       {view.dialogState.errorMessage ? (
         <p
           className="rounded-md border border-destructive/30 bg-destructive/5 px-3 py-2 text-destructive text-sm"
@@ -252,6 +254,38 @@ function ActivityPublishPreview({
           {view.dialogState.errorMessage}
         </p>
       ) : null}
+    </section>
+  );
+}
+
+function AssignmentPublishHandoff({
+  view,
+}: {
+  view: AssignmentPublishHandoffView;
+}) {
+  const titleId = 'assignment-publish-handoff-title';
+  const descriptionId = 'assignment-publish-handoff-description';
+
+  return (
+    <section
+      aria-describedby={descriptionId}
+      aria-labelledby={titleId}
+      className="sr-only"
+      data-handoff="assignment-publish"
+    >
+      <h3 id={titleId}>{view.title}</h3>
+      <p id={descriptionId}>{view.description}</p>
+      <dl>
+        {view.itemViews.map((item) => (
+          <div data-handoff-item={item.id} key={item.id}>
+            <dt>{item.label}</dt>
+            <dd>
+              <output aria-label={item.ariaLabel}>{item.value}</output>
+              <span>{item.description}</span>
+            </dd>
+          </div>
+        ))}
+      </dl>
     </section>
   );
 }

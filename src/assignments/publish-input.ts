@@ -187,25 +187,35 @@ export type AssignmentPublishPreviewContextView = {
 
 export const ASSIGNMENT_PUBLISH_HANDOFF_ITEM_IDS = [
   'publish-access',
+  'activity-lifecycle-gate',
   'publish-action',
   'publish-disabled',
   'validation-status',
   'validation-message',
   'title-field',
+  'draft-field-count',
+  'field-limit-boundary',
   'frozen-link-status',
   'delivery-rule-count',
+  'settings-summary-status',
   'student-instructions',
   'timer-status',
   'close-time-status',
+  'review-checklist-count',
+  'delivery-defaults',
   'attempts-policy',
+  'attempt-limit-parser',
   'identity-policy',
   'answer-reveal-policy',
   'item-order-policy',
+  'timer-parser',
   'settings-json',
   'close-time-parser',
   'snapshot-freeze',
   'student-link-rules',
+  'public-payload-boundary',
   'results-policy',
+  'privacy-guard',
 ] as const;
 
 export type AssignmentPublishHandoffItemId =
@@ -224,10 +234,15 @@ export type AssignmentPublishHandoffPrivacyContract = {
   exposesActivityContent: false;
   exposesAnswerKeys: false;
   exposesAssignmentTitle: false;
+  exposesInternalActivityIds: false;
+  exposesPublicRuntimeContent: false;
   exposesRawSettingsJson: false;
   exposesShareSlug: false;
+  exposesSourceMaterialStorageKeys: false;
+  exposesStudentAnswerText: false;
   exposesStudentInstructions: false;
   exposesStudentNames: false;
+  exposesTeacherNotes: false;
   itemIds: AssignmentPublishHandoffItemId[];
 };
 
@@ -652,6 +667,10 @@ export function buildAssignmentPublishHandoffView({
     preview.settingsSummaryView,
     'attempts'
   );
+  const timerPolicy = getAssignmentPublishDeliveryPolicy(
+    preview.settingsSummaryView,
+    'timer'
+  );
   const identityPolicy = getAssignmentPublishDeliveryPolicy(
     preview.settingsSummaryView,
     'identity'
@@ -687,6 +706,14 @@ export function buildAssignmentPublishHandoffView({
       description: accessView.description,
       id: 'publish-access',
       label: accessView.label,
+      statusLabel: accessView.status,
+      value: accessView.value,
+    }),
+    buildAssignmentPublishHandoffItem({
+      description:
+        m.assignment_publish_handoff_activity_lifecycle_gate_description(),
+      id: 'activity-lifecycle-gate',
+      label: m.assignment_publish_handoff_activity_lifecycle_gate_label(),
       statusLabel: accessView.status,
       value: accessView.value,
     }),
@@ -730,6 +757,20 @@ export function buildAssignmentPublishHandoffView({
         : m.assignment_publish_handoff_field_missing(),
     }),
     buildAssignmentPublishHandoffItem({
+      description: m.assignment_publish_handoff_draft_fields_description(),
+      id: 'draft-field-count',
+      label: m.assignment_publish_handoff_draft_fields_label(),
+      value: m.assignment_publish_handoff_draft_fields_value({
+        count: countAssignmentPublishDraftFields(),
+      }),
+    }),
+    buildAssignmentPublishHandoffItem({
+      description: m.assignment_publish_handoff_field_limits_description(),
+      id: 'field-limit-boundary',
+      label: m.assignment_publish_handoff_field_limits_label(),
+      value: m.assignment_publish_handoff_field_limits_value(),
+    }),
+    buildAssignmentPublishHandoffItem({
       description: preview.context.status.message,
       id: 'frozen-link-status',
       label: preview.context.title,
@@ -741,6 +782,13 @@ export function buildAssignmentPublishHandoffView({
       id: 'delivery-rule-count',
       label: deliveryRuleStat.label,
       value: deliveryRuleStat.value,
+    }),
+    buildAssignmentPublishHandoffItem({
+      description: preview.settingsSummaryView.status.description,
+      id: 'settings-summary-status',
+      label: m.assignment_publish_handoff_settings_summary_status_label(),
+      statusLabel: preview.settingsSummaryView.status.value,
+      value: preview.settingsSummaryView.status.value,
     }),
     buildAssignmentPublishHandoffItem({
       description: assignmentPublishDialogCopy.instructionsHelp,
@@ -762,10 +810,32 @@ export function buildAssignmentPublishHandoffView({
       value: closeAfterStat.value,
     }),
     buildAssignmentPublishHandoffItem({
+      description: m.assignment_publish_handoff_review_checklist_description(),
+      id: 'review-checklist-count',
+      label: m.assignment_publish_handoff_review_checklist_label(),
+      value: m.assignment_publish_handoff_review_checklist_value({
+        count: preview.context.reviewItems.length,
+      }),
+    }),
+    buildAssignmentPublishHandoffItem({
+      description: m.assignment_publish_handoff_delivery_defaults_description(),
+      id: 'delivery-defaults',
+      label: m.assignment_publish_handoff_delivery_defaults_label(),
+      value: m.assignment_publish_handoff_delivery_defaults_value(),
+    }),
+    buildAssignmentPublishHandoffItem({
       description: m.assignment_publish_handoff_attempts_description(),
       id: 'attempts-policy',
       label: attemptsPolicy.label,
       value: attemptsPolicy.value,
+    }),
+    buildAssignmentPublishHandoffItem({
+      description: m.assignment_publish_handoff_attempt_parser_description(),
+      id: 'attempt-limit-parser',
+      label: m.assignment_publish_handoff_attempt_parser_label(),
+      value: formatAssignmentPublishAttemptParserValue(
+        preview.settings.maxAttempts
+      ),
     }),
     buildAssignmentPublishHandoffItem({
       description: getAssignmentPublishToggleDescription(
@@ -795,6 +865,12 @@ export function buildAssignmentPublishHandoffView({
       value: itemOrderPolicy.value,
     }),
     buildAssignmentPublishHandoffItem({
+      description: m.assignment_publish_handoff_timer_parser_description(),
+      id: 'timer-parser',
+      label: m.assignment_publish_handoff_timer_parser_label(),
+      value: timerPolicy.value,
+    }),
+    buildAssignmentPublishHandoffItem({
       description: m.assignment_publish_handoff_settings_json_description(),
       id: 'settings-json',
       label: m.assignment_publish_handoff_settings_json_label(),
@@ -822,10 +898,22 @@ export function buildAssignmentPublishHandoffView({
       value: preview.context.status.label,
     }),
     buildAssignmentPublishHandoffItem({
+      description: m.assignment_publish_handoff_public_payload_description(),
+      id: 'public-payload-boundary',
+      label: m.assignment_publish_handoff_public_payload_label(),
+      value: m.assignment_publish_handoff_public_payload_value(),
+    }),
+    buildAssignmentPublishHandoffItem({
       description: resultsReview.description,
       id: 'results-policy',
       label: resultsReview.label,
       value: preview.context.status.label,
+    }),
+    buildAssignmentPublishHandoffItem({
+      description: m.assignment_publish_handoff_privacy_guard_description(),
+      id: 'privacy-guard',
+      label: m.assignment_publish_handoff_privacy_guard_label(),
+      value: m.assignment_publish_handoff_privacy_guard_value(),
     }),
   ];
 
@@ -890,6 +978,18 @@ function countAssignmentPublishSettingsJsonFields() {
   return 6;
 }
 
+function countAssignmentPublishDraftFields() {
+  return 8;
+}
+
+function formatAssignmentPublishAttemptParserValue(
+  maxAttempts: AssignmentSettings['maxAttempts']
+) {
+  return typeof maxAttempts === 'number'
+    ? m.assignment_publish_handoff_attempt_parser_limited_value()
+    : m.assignment_publish_handoff_attempt_parser_unlimited_value();
+}
+
 function buildAssignmentPublishHandoffPrivacyContract(
   itemViews: AssignmentPublishHandoffItemView[]
 ): AssignmentPublishHandoffPrivacyContract {
@@ -897,10 +997,15 @@ function buildAssignmentPublishHandoffPrivacyContract(
     exposesActivityContent: false,
     exposesAnswerKeys: false,
     exposesAssignmentTitle: false,
+    exposesInternalActivityIds: false,
+    exposesPublicRuntimeContent: false,
     exposesRawSettingsJson: false,
     exposesShareSlug: false,
+    exposesSourceMaterialStorageKeys: false,
+    exposesStudentAnswerText: false,
     exposesStudentInstructions: false,
     exposesStudentNames: false,
+    exposesTeacherNotes: false,
     itemIds: itemViews.map((item) => item.id),
   };
 }
