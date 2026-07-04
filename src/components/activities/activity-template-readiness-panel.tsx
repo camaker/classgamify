@@ -146,6 +146,7 @@ function ActivityTemplateQuizChoiceGenerationHandoff({
     <section
       aria-label={handoffView.title}
       className="mt-4 rounded-lg border bg-background/70 p-3"
+      data-handoff="question-choice-generation"
     >
       <h5 className="font-medium text-xs leading-5">{handoffView.title}</h5>
       <p className="mt-1 text-muted-foreground text-xs leading-5">
@@ -169,7 +170,10 @@ function ActivityTemplateQuizChoiceGenerationHandoffItem({
   item: QuestionChoiceGenerationHandoffItemView;
 }) {
   return (
-    <div className="rounded-md border bg-muted/20 p-2.5">
+    <div
+      className="rounded-md border bg-muted/20 p-2.5"
+      data-handoff-item={item.id}
+    >
       <dt className="text-muted-foreground text-xs leading-5">{item.label}</dt>
       <dd className="mt-1 break-words font-medium text-xs leading-5">
         <output aria-label={item.ariaLabel}>{item.value}</output>

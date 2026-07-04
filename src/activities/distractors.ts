@@ -29,6 +29,16 @@ export const QUESTION_CHOICE_GENERATION_HANDOFF_ITEM_IDS = [
   'write-target',
   'teacher-review',
   'publish-boundary',
+  'completed-choice-count',
+  'explicit-answer-coverage-count',
+  'local-candidate-question-count',
+  'candidate-deduplication',
+  'candidate-normalization',
+  'stable-choice-order',
+  'runtime-choice-source',
+  'answer-inclusion-guard',
+  'empty-content-guard',
+  'privacy-guard',
 ] as const;
 
 export type QuestionChoiceReadinessStatus =
@@ -50,9 +60,12 @@ export type QuestionChoiceGenerationHandoffItemView = {
 export type QuestionChoiceGenerationHandoffPrivacyContract = {
   appliesBeforeActivitySave: true;
   exposesAnswerText: false;
+  exposesCandidateText: false;
   exposesOptionText: false;
   exposesQuestionPromptText: false;
   exposesRawAiOutput: false;
+  exposesStableChoiceSeed: false;
+  exposesVocabularyText: false;
   itemIds: QuestionChoiceGenerationHandoffItemId[];
   persistsActivityWithoutTeacherAction: false;
   publishesAssignmentWithoutTeacherAction: false;
@@ -192,7 +205,7 @@ export function buildQuestionChoiceGenerationHandoffView({
   content?: ActivityContent;
   summary?: QuestionChoiceReadinessSummary;
   targetCount?: number;
-}): QuestionChoiceGenerationHandoffView {
+} = {}): QuestionChoiceGenerationHandoffView {
   const readinessSummary =
     summary ??
     (content
@@ -275,11 +288,14 @@ function buildQuestionChoiceReadinessItem({
 type QuestionChoiceGenerationHandoffSummary = {
   answerCoverageCount: number;
   candidateSourceCount: number;
+  completedChoiceCount: number;
   completedLocallyCount: number;
   deterministicChoiceCount: number;
+  explicitAnswerCoverageCount: number;
   explicitChoiceCount: number;
   explicitReadyCount: number;
   itemCount: number;
+  localCandidateQuestionCount: number;
   missingAnswerCount: number;
   missingChoiceCount: number;
   needsCandidateCount: number;
@@ -309,6 +325,9 @@ function buildQuestionChoiceGenerationHandoffSummary(
   const answerCoverageCount = summary.items.filter(
     (item) => item.answerIncluded
   ).length;
+  const explicitAnswerCoverageCount = summary.items.filter(
+    (item) => item.explicitAnswerIncluded
+  ).length;
 
   return {
     answerCoverageCount,
@@ -316,17 +335,25 @@ function buildQuestionChoiceGenerationHandoffSummary(
       summary.items,
       (item) => item.candidateChoiceCount
     ),
+    completedChoiceCount: sumQuestionChoiceReadinessItems(
+      summary.items,
+      (item) => item.completedChoiceCount
+    ),
     completedLocallyCount: summary.completedLocallyCount,
     deterministicChoiceCount: sumQuestionChoiceReadinessItems(
       summary.items,
       (item) => item.deterministicChoiceCount
     ),
+    explicitAnswerCoverageCount,
     explicitChoiceCount: sumQuestionChoiceReadinessItems(
       summary.items,
       (item) => item.explicitChoiceCount
     ),
     explicitReadyCount: summary.explicitReadyCount,
     itemCount: summary.itemCount,
+    localCandidateQuestionCount: summary.items.filter(
+      (item) => item.candidateChoiceCount > 0
+    ).length,
     missingAnswerCount: Math.max(0, summary.itemCount - answerCoverageCount),
     missingChoiceCount: sumQuestionChoiceReadinessItems(
       summary.items,
@@ -526,6 +553,100 @@ function buildQuestionChoiceGenerationHandoffItem({
         label: m.question_choice_generation_handoff_publish_boundary_label(),
         value: m.question_choice_generation_handoff_publish_boundary_value(),
       };
+    case 'completed-choice-count':
+      return {
+        description:
+          m.question_choice_generation_handoff_completed_choice_count_description(),
+        id,
+        label:
+          m.question_choice_generation_handoff_completed_choice_count_label(),
+        value: String(summary.completedChoiceCount),
+      };
+    case 'explicit-answer-coverage-count':
+      return {
+        description:
+          m.question_choice_generation_handoff_explicit_answer_coverage_count_description(),
+        id,
+        label:
+          m.question_choice_generation_handoff_explicit_answer_coverage_count_label(),
+        value: String(summary.explicitAnswerCoverageCount),
+      };
+    case 'local-candidate-question-count':
+      return {
+        description:
+          m.question_choice_generation_handoff_local_candidate_question_count_description(),
+        id,
+        label:
+          m.question_choice_generation_handoff_local_candidate_question_count_label(),
+        value: String(summary.localCandidateQuestionCount),
+      };
+    case 'candidate-deduplication':
+      return {
+        description:
+          m.question_choice_generation_handoff_candidate_deduplication_description(),
+        id,
+        label:
+          m.question_choice_generation_handoff_candidate_deduplication_label(),
+        value:
+          m.question_choice_generation_handoff_candidate_deduplication_value(),
+      };
+    case 'candidate-normalization':
+      return {
+        description:
+          m.question_choice_generation_handoff_candidate_normalization_description(),
+        id,
+        label:
+          m.question_choice_generation_handoff_candidate_normalization_label(),
+        value:
+          m.question_choice_generation_handoff_candidate_normalization_value(),
+      };
+    case 'stable-choice-order':
+      return {
+        description:
+          m.question_choice_generation_handoff_stable_choice_order_description(),
+        id,
+        label: m.question_choice_generation_handoff_stable_choice_order_label(),
+        value: m.question_choice_generation_handoff_stable_choice_order_value(),
+      };
+    case 'runtime-choice-source':
+      return {
+        description:
+          m.question_choice_generation_handoff_runtime_choice_source_description(),
+        id,
+        label:
+          m.question_choice_generation_handoff_runtime_choice_source_label(),
+        value:
+          m.question_choice_generation_handoff_runtime_choice_source_value(),
+      };
+    case 'answer-inclusion-guard':
+      return {
+        description:
+          m.question_choice_generation_handoff_answer_inclusion_guard_description(),
+        id,
+        label:
+          m.question_choice_generation_handoff_answer_inclusion_guard_label(),
+        value:
+          m.question_choice_generation_handoff_answer_inclusion_guard_value(),
+      };
+    case 'empty-content-guard':
+      return {
+        description:
+          m.question_choice_generation_handoff_empty_content_guard_description(),
+        id,
+        label: m.question_choice_generation_handoff_empty_content_guard_label(),
+        value:
+          summary.itemCount > 0
+            ? m.question_choice_generation_handoff_empty_content_guard_present_value()
+            : m.question_choice_generation_handoff_empty_content_guard_empty_value(),
+      };
+    case 'privacy-guard':
+      return {
+        description:
+          m.question_choice_generation_handoff_privacy_guard_description(),
+        id,
+        label: m.question_choice_generation_handoff_privacy_guard_label(),
+        value: m.question_choice_generation_handoff_privacy_guard_value(),
+      };
   }
 }
 
@@ -557,9 +678,12 @@ function buildQuestionChoiceGenerationHandoffPrivacyContract(
   return {
     appliesBeforeActivitySave: true,
     exposesAnswerText: false,
+    exposesCandidateText: false,
     exposesOptionText: false,
     exposesQuestionPromptText: false,
     exposesRawAiOutput: false,
+    exposesStableChoiceSeed: false,
+    exposesVocabularyText: false,
     itemIds: itemViews.map((itemView) => itemView.id),
     persistsActivityWithoutTeacherAction: false,
     publishesAssignmentWithoutTeacherAction: false,

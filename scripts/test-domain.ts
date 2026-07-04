@@ -1240,13 +1240,16 @@ function expectQuestionChoiceGenerationHandoffPrivacy(
   const itemIds = view.itemViews.map((itemView) => itemView.id);
 
   assert.deepEqual(itemIds, [...QUESTION_CHOICE_GENERATION_HANDOFF_ITEM_IDS]);
-  assert.equal(new Set(itemIds).size, 20);
+  assert.equal(new Set(itemIds).size, 30);
   assert.deepEqual(view.privacy, {
     appliesBeforeActivitySave: true,
     exposesAnswerText: false,
+    exposesCandidateText: false,
     exposesOptionText: false,
     exposesQuestionPromptText: false,
     exposesRawAiOutput: false,
+    exposesStableChoiceSeed: false,
+    exposesVocabularyText: false,
     itemIds,
     persistsActivityWithoutTeacherAction: false,
     publishesAssignmentWithoutTeacherAction: false,
@@ -5692,12 +5695,12 @@ assert.match(
 );
 assert.match(
   activityTemplateReadinessPanelSource,
-  /function ActivityTemplateQuizChoiceGenerationHandoff[\s\S]*handoffView\.title[\s\S]*handoffView\.description[\s\S]*handoffView\.itemViews\.map[\s\S]*ActivityTemplateQuizChoiceGenerationHandoffItem[\s\S]*key=\{item\.id\}/,
+  /function ActivityTemplateQuizChoiceGenerationHandoff[\s\S]*data-handoff="question-choice-generation"[\s\S]*handoffView\.title[\s\S]*handoffView\.description[\s\S]*handoffView\.itemViews\.map[\s\S]*ActivityTemplateQuizChoiceGenerationHandoffItem[\s\S]*key=\{item\.id\}/,
   'Activity template readiness panel should render prepared quiz choice generation handoff views.'
 );
 assert.match(
   activityTemplateReadinessPanelSource,
-  /function ActivityTemplateQuizChoiceGenerationHandoffItem[\s\S]*item\.label[\s\S]*<output aria-label=\{item\.ariaLabel\}>\{item\.value\}<\/output>[\s\S]*item\.description/,
+  /function ActivityTemplateQuizChoiceGenerationHandoffItem[\s\S]*data-handoff-item=\{item\.id\}[\s\S]*item\.label[\s\S]*<output aria-label=\{item\.ariaLabel\}>\{item\.value\}<\/output>[\s\S]*item\.description/,
   'Activity template readiness panel should render quiz choice generation handoff items with label, output, and description.'
 );
 assert.doesNotMatch(
@@ -14024,12 +14027,12 @@ assert.match(
 );
 assert.match(
   activityDistractorsSource,
-  /export const QUESTION_CHOICE_GENERATION_HANDOFF_ITEM_IDS = \[[\s\S]*'generation-scope'[\s\S]*'target-choice-count'[\s\S]*'question-count'[\s\S]*'ready-question-count'[\s\S]*'explicit-ready-count'[\s\S]*'completed-locally-count'[\s\S]*'needs-candidates-count'[\s\S]*'explicit-choice-count'[\s\S]*'deterministic-choice-count'[\s\S]*'missing-choice-count'[\s\S]*'sibling-answer-candidates'[\s\S]*'vocabulary-candidates'[\s\S]*'candidate-source-count'[\s\S]*'answer-coverage-count'[\s\S]*'missing-answer-count'[\s\S]*'option-structure'[\s\S]*'generation-mode'[\s\S]*'write-target'[\s\S]*'teacher-review'[\s\S]*'publish-boundary'/,
-  'Question choice generation should expose 20 stable handoff item ids.'
+  /export const QUESTION_CHOICE_GENERATION_HANDOFF_ITEM_IDS = \[[\s\S]*'generation-scope'[\s\S]*'target-choice-count'[\s\S]*'question-count'[\s\S]*'ready-question-count'[\s\S]*'explicit-ready-count'[\s\S]*'completed-locally-count'[\s\S]*'needs-candidates-count'[\s\S]*'explicit-choice-count'[\s\S]*'deterministic-choice-count'[\s\S]*'missing-choice-count'[\s\S]*'sibling-answer-candidates'[\s\S]*'vocabulary-candidates'[\s\S]*'candidate-source-count'[\s\S]*'answer-coverage-count'[\s\S]*'missing-answer-count'[\s\S]*'option-structure'[\s\S]*'generation-mode'[\s\S]*'write-target'[\s\S]*'teacher-review'[\s\S]*'publish-boundary'[\s\S]*'completed-choice-count'[\s\S]*'explicit-answer-coverage-count'[\s\S]*'local-candidate-question-count'[\s\S]*'candidate-deduplication'[\s\S]*'candidate-normalization'[\s\S]*'stable-choice-order'[\s\S]*'runtime-choice-source'[\s\S]*'answer-inclusion-guard'[\s\S]*'empty-content-guard'[\s\S]*'privacy-guard'/,
+  'Question choice generation should expose 30 stable handoff item ids.'
 );
 assert.match(
   activityDistractorsSource,
-  /export type QuestionChoiceGenerationHandoffPrivacyContract = \{[\s\S]*appliesBeforeActivitySave: true;[\s\S]*exposesAnswerText: false;[\s\S]*exposesOptionText: false;[\s\S]*exposesQuestionPromptText: false;[\s\S]*exposesRawAiOutput: false;[\s\S]*persistsActivityWithoutTeacherAction: false;[\s\S]*publishesAssignmentWithoutTeacherAction: false;[\s\S]*requiresTeacherReview: true;[\s\S]*scope: 'teacher-reviewed-quiz-choice-generation';[\s\S]*usesQuestionOptionStructure: true;[\s\S]*writeTarget: 'ActivityQuestion.options';/,
+  /export type QuestionChoiceGenerationHandoffPrivacyContract = \{[\s\S]*appliesBeforeActivitySave: true;[\s\S]*exposesAnswerText: false;[\s\S]*exposesCandidateText: false;[\s\S]*exposesOptionText: false;[\s\S]*exposesQuestionPromptText: false;[\s\S]*exposesRawAiOutput: false;[\s\S]*exposesStableChoiceSeed: false;[\s\S]*exposesVocabularyText: false;[\s\S]*persistsActivityWithoutTeacherAction: false;[\s\S]*publishesAssignmentWithoutTeacherAction: false;[\s\S]*requiresTeacherReview: true;[\s\S]*scope: 'teacher-reviewed-quiz-choice-generation';[\s\S]*usesQuestionOptionStructure: true;[\s\S]*writeTarget: 'ActivityQuestion.options';/,
   'Question choice generation handoff should keep AI distractor privacy and write-target constraints explicit.'
 );
 assert.match(

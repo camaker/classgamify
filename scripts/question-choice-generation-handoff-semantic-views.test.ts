@@ -61,14 +61,14 @@ const mixedChoiceContent: ActivityContent = {
   vocabulary: [SECRET_VOCABULARY],
 };
 
-test('question choice generation handoff exposes 20 safe slices', () => {
+test('question choice generation handoff exposes 30 safe slices', () => {
   const handoffView = buildQuestionChoiceGenerationHandoffView({
     content: mixedChoiceContent,
   });
   const itemIds = handoffView.itemViews.map((item) => item.id);
 
   assert.deepEqual(itemIds, [...QUESTION_CHOICE_GENERATION_HANDOFF_ITEM_IDS]);
-  assert.equal(new Set(itemIds).size, 20);
+  assert.equal(new Set(itemIds).size, 30);
   assert.equal(
     handoffView.itemViews.every(
       (item) =>
@@ -82,9 +82,12 @@ test('question choice generation handoff exposes 20 safe slices', () => {
   assert.deepEqual(handoffView.privacy, {
     appliesBeforeActivitySave: true,
     exposesAnswerText: false,
+    exposesCandidateText: false,
     exposesOptionText: false,
     exposesQuestionPromptText: false,
     exposesRawAiOutput: false,
+    exposesStableChoiceSeed: false,
+    exposesVocabularyText: false,
     itemIds,
     persistsActivityWithoutTeacherAction: false,
     publishesAssignmentWithoutTeacherAction: false,
@@ -132,6 +135,43 @@ test('question choice generation handoff exposes 20 safe slices', () => {
     getHandoffValue(handoffView, 'publish-boundary'),
     'Save before publish'
   );
+  assert.equal(getHandoffValue(handoffView, 'completed-choice-count'), '12');
+  assert.equal(
+    getHandoffValue(handoffView, 'explicit-answer-coverage-count'),
+    '3'
+  );
+  assert.equal(
+    getHandoffValue(handoffView, 'local-candidate-question-count'),
+    '3'
+  );
+  assert.equal(
+    getHandoffValue(handoffView, 'candidate-deduplication'),
+    'Unique candidates'
+  );
+  assert.equal(
+    getHandoffValue(handoffView, 'candidate-normalization'),
+    'Shared option normalization'
+  );
+  assert.equal(
+    getHandoffValue(handoffView, 'stable-choice-order'),
+    'Question-seeded order'
+  );
+  assert.equal(
+    getHandoffValue(handoffView, 'runtime-choice-source'),
+    'buildQuestionChoices'
+  );
+  assert.equal(
+    getHandoffValue(handoffView, 'answer-inclusion-guard'),
+    'Answer retained'
+  );
+  assert.equal(
+    getHandoffValue(handoffView, 'empty-content-guard'),
+    'Questions present'
+  );
+  assert.equal(
+    getHandoffValue(handoffView, 'privacy-guard'),
+    'Choice text hidden'
+  );
 
   assertNoPrivateQuestionChoiceText(JSON.stringify(handoffView));
 });
@@ -168,8 +208,41 @@ test('question choice generation handoff keeps sparse quizzes explicit', () => {
   assert.equal(getHandoffValue(handoffView, 'candidate-source-count'), '0');
   assert.equal(getHandoffValue(handoffView, 'answer-coverage-count'), '1');
   assert.equal(getHandoffValue(handoffView, 'missing-answer-count'), '0');
+  assert.equal(getHandoffValue(handoffView, 'completed-choice-count'), '1');
+  assert.equal(
+    getHandoffValue(handoffView, 'explicit-answer-coverage-count'),
+    '1'
+  );
+  assert.equal(
+    getHandoffValue(handoffView, 'local-candidate-question-count'),
+    '0'
+  );
+  assert.equal(
+    getHandoffValue(handoffView, 'empty-content-guard'),
+    'Questions present'
+  );
 
   assertNoPrivateQuestionChoiceText(JSON.stringify(handoffView));
+});
+
+test('question choice generation handoff keeps empty content safe', () => {
+  const handoffView = buildQuestionChoiceGenerationHandoffView();
+
+  assert.deepEqual(
+    handoffView.itemViews.map((item) => item.id),
+    [...QUESTION_CHOICE_GENERATION_HANDOFF_ITEM_IDS]
+  );
+  assert.equal(getHandoffValue(handoffView, 'question-count'), '0');
+  assert.equal(getHandoffValue(handoffView, 'ready-question-count'), '0');
+  assert.equal(getHandoffValue(handoffView, 'completed-choice-count'), '0');
+  assert.equal(
+    getHandoffValue(handoffView, 'empty-content-guard'),
+    'No quiz questions'
+  );
+  assert.equal(
+    getHandoffValue(handoffView, 'privacy-guard'),
+    'Choice text hidden'
+  );
 });
 
 function getHandoffValue(
