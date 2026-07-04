@@ -479,7 +479,9 @@ import {
 import {
   buildSettingsNotificationNewsletterCardView,
   buildSettingsNotificationPageViewModel,
+  buildSettingsNotificationUpdateHandoffView,
   buildSettingsNotificationWorkspaceSummaryView,
+  SETTINGS_NOTIFICATION_UPDATE_HANDOFF_ITEM_IDS,
 } from '@/settings/notifications-view';
 import type { PricePlan, Subscription } from '@/payment/types';
 import {
@@ -8555,6 +8557,16 @@ assert.match(
 );
 assert.match(
   settingsNotificationViewSource,
+  /export const SETTINGS_NOTIFICATION_UPDATE_HANDOFF_ITEM_IDS = \[(?=[\s\S]*'update-scope')(?=[\s\S]*'template-updates')(?=[\s\S]*'worksheet-workflows')(?=[\s\S]*'assignment-review')(?=[\s\S]*'teacher-control')(?=[\s\S]*'newsletter-card')(?=[\s\S]*'subscription-form')(?=[\s\S]*'subscription-switch')(?=[\s\S]*'email-requirement')(?=[\s\S]*'status-loading')(?=[\s\S]*'subscribe-action')(?=[\s\S]*'unsubscribe-action')(?=[\s\S]*'error-feedback')(?=[\s\S]*'scope-note')(?=[\s\S]*'provider-visibility')(?=[\s\S]*'student-reminder-boundary')(?=[\s\S]*'public-link-boundary')(?=[\s\S]*'learner-notification-boundary')(?=[\s\S]*'private-data-guard')(?=[\s\S]*'legacy-copy-guard')/,
+  'Notification settings handoff should expose stable 20-slice classroom update item ids.'
+);
+assert.match(
+  settingsNotificationViewSource,
+  /export type SettingsNotificationUpdateHandoffPrivacyContract = \{[\s\S]*changesAssignmentDeliveryRules: false;[\s\S]*changesPublicAssignmentLinks: false;[\s\S]*exposesRawProviderErrors: false;[\s\S]*exposesRecipientEmail: false;[\s\S]*exposesSourceMaterialStorageKeys: false;[\s\S]*exposesStudentIdentifiers: false;[\s\S]*notifiesLearners: false;[\s\S]*scope: 'teacher-classroom-update-settings';[\s\S]*sendsStudentAssignmentReminders: false;[\s\S]*teacherCanPauseUpdates: true;[\s\S]*updatesTeacherProductEmailOnly: true;/,
+  'Notification settings handoff should publish explicit privacy and classroom update behavior flags.'
+);
+assert.match(
+  settingsNotificationViewSource,
   /export function isSettingsNotificationsEnabled\(\)[\s\S]*websiteConfig\.newsletter\?\.enable === true/,
   'Notification settings feature visibility should be centralized in the settings notification view helper.'
 );
@@ -8565,8 +8577,18 @@ assert.match(
 );
 assert.match(
   settingsNotificationViewSource,
+  /buildSettingsNotificationWorkspaceSummaryView\(\)[\s\S]*handoffView: buildSettingsNotificationUpdateHandoffView\(\{[\s\S]*newsletterCardView: buildSettingsNotificationNewsletterCardView\(\)[\s\S]*workspaceSummaryView: summaryView/,
+  'Notification settings workspace summary should attach the shared classroom update handoff view.'
+);
+assert.match(
+  settingsNotificationViewSource,
   /settings_notification_workspace_summary_title[\s\S]*settings_notification_workspace_summary_description[\s\S]*buildSettingsNotificationWorkspaceSummaryItemView[\s\S]*settings_notification_workspace_summary_templates_description[\s\S]*settings_notification_workspace_summary_worksheets_description[\s\S]*settings_notification_workspace_summary_review_description[\s\S]*settings_notification_workspace_summary_control_description[\s\S]*settings_notification_workspace_summary_item_aria_label/,
   'Notification settings view model should prepare localized classroom update boundary copy and item semantics.'
+);
+assert.match(
+  settingsNotificationViewSource,
+  /buildSettingsNotificationUpdateHandoffView[\s\S]*settings_notification_handoff_description[\s\S]*buildSettingsNotificationUpdateHandoffPrivacyContract[\s\S]*settings_notification_handoff_title[\s\S]*settings_notification_handoff_item_aria_label/,
+  'Notification settings view model should prepare localized handoff title, description, item semantics, and privacy contract.'
 );
 assert.match(
   settingsNotificationViewSource,
@@ -8588,9 +8610,14 @@ assert.match(
   /view\.itemViews\.map\(\(itemView\) =>[\s\S]*key=\{itemView\.id\}[\s\S]*function NotificationWorkspaceSummaryItem[\s\S]*aria-label=\{itemView\.ariaLabel\}[\s\S]*itemView\.label[\s\S]*itemView\.description/,
   'Notification workspace summary component should render prepared boundary views and item semantics keyed by stable ids.'
 );
+assert.match(
+  notificationWorkspaceSummarySource,
+  /SettingsNotificationUpdateHandoffItemView[\s\S]*SettingsNotificationUpdateHandoffView[\s\S]*<NotificationUpdateHandoff handoffView=\{view\.handoffView\} \/>[\s\S]*function NotificationUpdateHandoff[\s\S]*aria-label=\{handoffView\.title\}[\s\S]*handoffView\.description[\s\S]*handoffView\.itemViews\.map[\s\S]*function NotificationUpdateHandoffItem[\s\S]*<output aria-label=\{itemView\.ariaLabel\}/,
+  'Notification workspace summary component should render prepared handoff title, description, item views, and semantic output values.'
+);
 assert.doesNotMatch(
   notificationWorkspaceSummarySource,
-  /Classroom update boundary|Template updates|Worksheet workflows|Assignment review|Teacher control|课堂更新边界|模板更新|练习纸工作流|作业复盘|教师控制/,
+  /Classroom update boundary|Classroom update handoff|Template updates|Worksheet workflows|Assignment review|Teacher control|No student reminders|No link changes|No learner notifications|Private data omitted|课堂更新边界|课堂更新交接|模板更新|练习纸工作流|作业复盘|教师控制|不发送学生提醒|不改链接|不通知学习者|已省略私有数据/,
   'Notification workspace summary component should not hard-code visible update boundary copy.'
 );
 const billingCardSource = readFileSync(
@@ -8819,6 +8846,97 @@ assert.deepEqual(
 const notificationWorkspaceSummaryView =
   buildSettingsNotificationWorkspaceSummaryView();
 assert.equal(notificationWorkspaceSummaryView.itemViews.length, 4);
+assert.deepEqual(
+  SETTINGS_NOTIFICATION_UPDATE_HANDOFF_ITEM_IDS,
+  [
+    'update-scope',
+    'template-updates',
+    'worksheet-workflows',
+    'assignment-review',
+    'teacher-control',
+    'newsletter-card',
+    'subscription-form',
+    'subscription-switch',
+    'email-requirement',
+    'status-loading',
+    'subscribe-action',
+    'unsubscribe-action',
+    'error-feedback',
+    'scope-note',
+    'provider-visibility',
+    'student-reminder-boundary',
+    'public-link-boundary',
+    'learner-notification-boundary',
+    'private-data-guard',
+    'legacy-copy-guard',
+  ]
+);
+const notificationUpdateHandoffView =
+  buildSettingsNotificationUpdateHandoffView();
+const notificationUpdateHandoffItemIds =
+  notificationUpdateHandoffView.itemViews.map((item) => item.id);
+assert.deepEqual(notificationUpdateHandoffItemIds, [
+  ...SETTINGS_NOTIFICATION_UPDATE_HANDOFF_ITEM_IDS,
+]);
+assert.deepEqual(
+  notificationPageView.workspaceSummaryView.handoffView.itemViews.map(
+    (item) => item.id
+  ),
+  [...SETTINGS_NOTIFICATION_UPDATE_HANDOFF_ITEM_IDS]
+);
+assert.deepEqual(notificationUpdateHandoffView.privacy, {
+  changesAssignmentDeliveryRules: false,
+  changesPublicAssignmentLinks: false,
+  exposesRawProviderErrors: false,
+  exposesRecipientEmail: false,
+  exposesSourceMaterialStorageKeys: false,
+  exposesStudentIdentifiers: false,
+  itemIds: notificationUpdateHandoffItemIds,
+  notifiesLearners: false,
+  scope: 'teacher-classroom-update-settings',
+  sendsStudentAssignmentReminders: false,
+  teacherCanPauseUpdates: true,
+  updatesTeacherProductEmailOnly: true,
+});
+assert.deepEqual(
+  notificationUpdateHandoffView.itemViews.map((item) => [
+    item.id,
+    item.value,
+  ]),
+  [
+    ['update-scope', 'Teacher product updates'],
+    ['template-updates', 'Template updates'],
+    ['worksheet-workflows', 'Worksheet workflows'],
+    ['assignment-review', 'Assignment review'],
+    ['teacher-control', 'Teacher control'],
+    ['newsletter-card', 'ClassGamify update emails'],
+    ['subscription-form', 'ClassGamify update emails subscription controls'],
+    ['subscription-switch', 'Receive ClassGamify updates'],
+    [
+      'email-requirement',
+      'Email is required to receive ClassGamify updates',
+    ],
+    ['status-loading', 'Disable while syncing'],
+    ['subscribe-action', 'ClassGamify updates enabled'],
+    ['unsubscribe-action', 'ClassGamify updates paused'],
+    [
+      'error-feedback',
+      'An error occurred while updating your subscription',
+    ],
+    ['scope-note', 'Update scope'],
+    ['provider-visibility', 'Configuration gate'],
+    ['student-reminder-boundary', 'No student reminders'],
+    ['public-link-boundary', 'No link changes'],
+    ['learner-notification-boundary', 'No learner notifications'],
+    ['private-data-guard', 'Private data omitted'],
+    ['legacy-copy-guard', 'ClassGamify only'],
+  ]
+);
+assert.doesNotMatch(
+  JSON.stringify(notificationUpdateHandoffView),
+  /teacher-private@example\.test|raw-student-token|source-material\/private\/storage-key|raw-provider-stack-trace/,
+  'Notification update handoff should not serialize private teacher, student, source-material, or provider text.'
+);
 const notificationNewsletterCardView =
   buildSettingsNotificationNewsletterCardView();
 assert.match(
@@ -8845,6 +8963,33 @@ try {
   assert.match(
     zhNotificationNewsletterCardView.scopeDescription,
     /不会发送学生作业提醒/
+  );
+  const zhNotificationUpdateHandoffView =
+    buildSettingsNotificationUpdateHandoffView();
+  assert.equal(zhNotificationUpdateHandoffView.title, '课堂更新交接');
+  assert.match(
+    zhNotificationUpdateHandoffView.description,
+    /不会改变学生作业/
+  );
+  assert.deepEqual(
+    zhNotificationUpdateHandoffView.itemViews
+      .filter((item) =>
+        [
+          'update-scope',
+          'student-reminder-boundary',
+          'public-link-boundary',
+          'learner-notification-boundary',
+          'private-data-guard',
+        ].includes(item.id)
+      )
+      .map((item) => [item.id, item.value]),
+    [
+      ['update-scope', '教师产品更新'],
+      ['student-reminder-boundary', '不发送学生提醒'],
+      ['public-link-boundary', '不改链接'],
+      ['learner-notification-boundary', '不通知学习者'],
+      ['private-data-guard', '已省略私有数据'],
+    ]
   );
 } finally {
   overwriteGetLocale(() => 'en');
@@ -11588,6 +11733,11 @@ const authWorkspaceBoundaryRequirements = [
       ['settings_notification_newsletter_switch_description', /template changes, worksheet workflows, and result-review improvements/],
       ['settings_notification_newsletter_scope_label', /Update scope/],
       ['settings_notification_newsletter_scope_description', /do not send student assignment reminders/],
+      ['settings_notification_handoff_description', /20-slice classroom update contract/],
+      ['settings_notification_handoff_student_reminder_boundary_description', /not assignment due-date reminders/],
+      ['settings_notification_handoff_public_link_boundary_description', /never opens, closes, rewrites/],
+      ['settings_notification_handoff_learner_notification_boundary_description', /do not notify learners/],
+      ['settings_notification_handoff_private_data_guard_description', /teacher email addresses, raw student identifiers/],
       ['settings_security_workspace_summary_description', /reusable activities, source materials, assignment links/],
       ['settings_security_workspace_summary_access_description', /teacher workspace/],
       ['settings_security_workspace_summary_activities_description', /source-material references/],
@@ -11665,6 +11815,11 @@ const authWorkspaceBoundaryRequirements = [
       ['settings_notification_newsletter_switch_description', /练习纸工作流和结果复盘/],
       ['settings_notification_newsletter_scope_label', /更新范围/],
       ['settings_notification_newsletter_scope_description', /不会发送学生作业提醒/],
+      ['settings_notification_handoff_description', /20 切片课堂更新契约/],
+      ['settings_notification_handoff_student_reminder_boundary_description', /不是作业截止提醒/],
+      ['settings_notification_handoff_public_link_boundary_description', /不会打开、关闭、改写/],
+      ['settings_notification_handoff_learner_notification_boundary_description', /不会通知学习者/],
+      ['settings_notification_handoff_private_data_guard_description', /不暴露教师邮箱、原始学生标识/],
       ['settings_security_workspace_summary_description', /可复用活动、来源素材、作业链接/],
       ['settings_security_workspace_summary_access_description', /教师工作区/],
       ['settings_security_workspace_summary_activities_description', /来源素材引用/],

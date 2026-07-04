@@ -1,4 +1,6 @@
 import type {
+  SettingsNotificationUpdateHandoffItemView,
+  SettingsNotificationUpdateHandoffView,
   SettingsNotificationWorkspaceSummaryItemView,
   SettingsNotificationWorkspaceSummaryView,
 } from '@/settings/notifications-view';
@@ -28,6 +30,7 @@ export function NotificationWorkspaceSummary({
           />
         ))}
       </ul>
+      <NotificationUpdateHandoff handoffView={view.handoffView} />
     </section>
   );
 }
@@ -49,5 +52,53 @@ function NotificationWorkspaceSummaryItem({
         {itemView.description}
       </p>
     </li>
+  );
+}
+
+function NotificationUpdateHandoff({
+  handoffView,
+}: {
+  handoffView: SettingsNotificationUpdateHandoffView;
+}) {
+  return (
+    <section
+      aria-label={handoffView.title}
+      className="grid gap-3 border-t pt-3"
+    >
+      <div>
+        <h3 className="font-medium text-sm">{handoffView.title}</h3>
+        <p className="mt-1 text-muted-foreground text-sm">
+          {handoffView.description}
+        </p>
+      </div>
+      <dl className="grid gap-2 md:grid-cols-2">
+        {handoffView.itemViews.map((itemView) => (
+          <NotificationUpdateHandoffItem
+            itemView={itemView}
+            key={itemView.id}
+          />
+        ))}
+      </dl>
+    </section>
+  );
+}
+
+function NotificationUpdateHandoffItem({
+  itemView,
+}: {
+  itemView: SettingsNotificationUpdateHandoffItemView;
+}) {
+  return (
+    <div className="rounded-md border bg-background px-3 py-2">
+      <dt className="font-medium text-xs">{itemView.label}</dt>
+      <dd className="mt-1">
+        <output aria-label={itemView.ariaLabel} className="text-sm">
+          {itemView.value}
+        </output>
+        <p className="mt-1 text-muted-foreground text-xs leading-5">
+          {itemView.description}
+        </p>
+      </dd>
+    </div>
   );
 }

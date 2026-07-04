@@ -15,9 +15,66 @@ export type SettingsNotificationWorkspaceSummaryItemView = {
   label: string;
 };
 
+export const SETTINGS_NOTIFICATION_UPDATE_HANDOFF_ITEM_IDS = [
+  'update-scope',
+  'template-updates',
+  'worksheet-workflows',
+  'assignment-review',
+  'teacher-control',
+  'newsletter-card',
+  'subscription-form',
+  'subscription-switch',
+  'email-requirement',
+  'status-loading',
+  'subscribe-action',
+  'unsubscribe-action',
+  'error-feedback',
+  'scope-note',
+  'provider-visibility',
+  'student-reminder-boundary',
+  'public-link-boundary',
+  'learner-notification-boundary',
+  'private-data-guard',
+  'legacy-copy-guard',
+] as const;
+
+export type SettingsNotificationUpdateHandoffItemId =
+  (typeof SETTINGS_NOTIFICATION_UPDATE_HANDOFF_ITEM_IDS)[number];
+
+export type SettingsNotificationUpdateHandoffItemView = {
+  ariaLabel: string;
+  description: string;
+  id: SettingsNotificationUpdateHandoffItemId;
+  label: string;
+  value: string;
+};
+
+export type SettingsNotificationUpdateHandoffPrivacyContract = {
+  changesAssignmentDeliveryRules: false;
+  changesPublicAssignmentLinks: false;
+  exposesRawProviderErrors: false;
+  exposesRecipientEmail: false;
+  exposesSourceMaterialStorageKeys: false;
+  exposesStudentIdentifiers: false;
+  itemIds: SettingsNotificationUpdateHandoffItemId[];
+  notifiesLearners: false;
+  scope: 'teacher-classroom-update-settings';
+  sendsStudentAssignmentReminders: false;
+  teacherCanPauseUpdates: true;
+  updatesTeacherProductEmailOnly: true;
+};
+
+export type SettingsNotificationUpdateHandoffView = {
+  description: string;
+  itemViews: SettingsNotificationUpdateHandoffItemView[];
+  privacy: SettingsNotificationUpdateHandoffPrivacyContract;
+  title: string;
+};
+
 export type SettingsNotificationWorkspaceSummaryView = {
   ariaLabel: string;
   description: string;
+  handoffView: SettingsNotificationUpdateHandoffView;
   itemViews: SettingsNotificationWorkspaceSummaryItemView[];
   title: string;
 };
@@ -41,6 +98,11 @@ export type SettingsNotificationNewsletterCardView = {
   title: string;
   unsubscribeSuccessMessage: string;
 };
+
+type SettingsNotificationWorkspaceSummaryBaseView = Omit<
+  SettingsNotificationWorkspaceSummaryView,
+  'handoffView'
+>;
 
 export type SettingsNotificationPageViewModel = {
   breadcrumbs: DashboardBreadcrumbItem[];
@@ -131,6 +193,41 @@ export function buildSettingsNotificationNewsletterCardView(): SettingsNotificat
 }
 
 export function buildSettingsNotificationWorkspaceSummaryView(): SettingsNotificationWorkspaceSummaryView {
+  const summaryView = buildSettingsNotificationWorkspaceSummaryBaseView();
+
+  return {
+    ...summaryView,
+    handoffView: buildSettingsNotificationUpdateHandoffView({
+      newsletterCardView: buildSettingsNotificationNewsletterCardView(),
+      workspaceSummaryView: summaryView,
+    }),
+  };
+}
+
+export function buildSettingsNotificationUpdateHandoffView({
+  newsletterCardView = buildSettingsNotificationNewsletterCardView(),
+  workspaceSummaryView = buildSettingsNotificationWorkspaceSummaryBaseView(),
+}: {
+  newsletterCardView?: SettingsNotificationNewsletterCardView;
+  workspaceSummaryView?: SettingsNotificationWorkspaceSummaryBaseView;
+} = {}): SettingsNotificationUpdateHandoffView {
+  const itemViews = SETTINGS_NOTIFICATION_UPDATE_HANDOFF_ITEM_IDS.map((id) =>
+    buildSettingsNotificationUpdateHandoffItemView({
+      id,
+      newsletterCardView,
+      workspaceSummaryView,
+    })
+  );
+
+  return {
+    description: m.settings_notification_handoff_description(),
+    itemViews,
+    privacy: buildSettingsNotificationUpdateHandoffPrivacyContract(itemViews),
+    title: m.settings_notification_handoff_title(),
+  };
+}
+
+function buildSettingsNotificationWorkspaceSummaryBaseView(): SettingsNotificationWorkspaceSummaryBaseView {
   const title = m.settings_notification_workspace_summary_title();
   const description = m.settings_notification_workspace_summary_description();
 
@@ -168,6 +265,297 @@ export function buildSettingsNotificationWorkspaceSummaryView(): SettingsNotific
     ],
     title,
   };
+}
+
+function buildSettingsNotificationUpdateHandoffItemView({
+  id,
+  newsletterCardView,
+  workspaceSummaryView,
+}: {
+  id: SettingsNotificationUpdateHandoffItemId;
+  newsletterCardView: SettingsNotificationNewsletterCardView;
+  workspaceSummaryView: SettingsNotificationWorkspaceSummaryBaseView;
+}): SettingsNotificationUpdateHandoffItemView {
+  const item = buildSettingsNotificationUpdateHandoffItem({
+    id,
+    newsletterCardView,
+    workspaceSummaryView,
+  });
+
+  return {
+    ...item,
+    ariaLabel: m.settings_notification_handoff_item_aria_label({
+      description: item.description,
+      label: item.label,
+      value: item.value,
+    }),
+  };
+}
+
+function buildSettingsNotificationUpdateHandoffItem({
+  id,
+  newsletterCardView,
+  workspaceSummaryView,
+}: {
+  id: SettingsNotificationUpdateHandoffItemId;
+  newsletterCardView: SettingsNotificationNewsletterCardView;
+  workspaceSummaryView: SettingsNotificationWorkspaceSummaryBaseView;
+}): Omit<SettingsNotificationUpdateHandoffItemView, 'ariaLabel'> {
+  if (id === 'update-scope') {
+    return buildSettingsNotificationUpdateHandoffStaticItem({
+      description: newsletterCardView.scopeDescription,
+      id,
+      label: newsletterCardView.scopeLabel,
+      value: m.settings_notification_handoff_update_scope_value(),
+    });
+  }
+
+  if (id === 'template-updates') {
+    return buildSettingsNotificationUpdateHandoffSummaryItem({
+      id,
+      itemView: getSettingsNotificationWorkspaceSummaryItem(
+        workspaceSummaryView,
+        'template-updates'
+      ),
+    });
+  }
+
+  if (id === 'worksheet-workflows') {
+    return buildSettingsNotificationUpdateHandoffSummaryItem({
+      id,
+      itemView: getSettingsNotificationWorkspaceSummaryItem(
+        workspaceSummaryView,
+        'worksheet-workflows'
+      ),
+    });
+  }
+
+  if (id === 'assignment-review') {
+    return buildSettingsNotificationUpdateHandoffSummaryItem({
+      id,
+      itemView: getSettingsNotificationWorkspaceSummaryItem(
+        workspaceSummaryView,
+        'assignment-review'
+      ),
+    });
+  }
+
+  if (id === 'teacher-control') {
+    return buildSettingsNotificationUpdateHandoffSummaryItem({
+      id,
+      itemView: getSettingsNotificationWorkspaceSummaryItem(
+        workspaceSummaryView,
+        'teacher-control'
+      ),
+    });
+  }
+
+  if (id === 'newsletter-card') {
+    return buildSettingsNotificationUpdateHandoffStaticItem({
+      description: newsletterCardView.description,
+      id,
+      label: m.settings_notification_handoff_newsletter_card_label(),
+      value: newsletterCardView.title,
+    });
+  }
+
+  if (id === 'subscription-form') {
+    return buildSettingsNotificationUpdateHandoffStaticItem({
+      description:
+        m.settings_notification_handoff_subscription_form_description(),
+      id,
+      label: m.settings_notification_handoff_subscription_form_label(),
+      value: newsletterCardView.formAriaLabel,
+    });
+  }
+
+  if (id === 'subscription-switch') {
+    return buildSettingsNotificationUpdateHandoffStaticItem({
+      description: newsletterCardView.switchDescription,
+      id,
+      label: m.settings_notification_handoff_subscription_switch_label(),
+      value: newsletterCardView.label,
+    });
+  }
+
+  if (id === 'email-requirement') {
+    return buildSettingsNotificationUpdateHandoffStaticItem({
+      description:
+        m.settings_notification_handoff_email_requirement_description(),
+      id,
+      label: m.settings_notification_handoff_email_requirement_label(),
+      value: newsletterCardView.emailRequiredMessage,
+    });
+  }
+
+  if (id === 'status-loading') {
+    return buildSettingsNotificationUpdateHandoffStaticItem({
+      description: m.settings_notification_handoff_status_loading_description(),
+      id,
+      label: m.settings_notification_handoff_status_loading_label(),
+      value: m.settings_notification_handoff_status_loading_value(),
+    });
+  }
+
+  if (id === 'subscribe-action') {
+    return buildSettingsNotificationUpdateHandoffStaticItem({
+      description:
+        m.settings_notification_handoff_subscribe_action_description(),
+      id,
+      label: m.settings_notification_handoff_subscribe_action_label(),
+      value: newsletterCardView.subscribeSuccessMessage,
+    });
+  }
+
+  if (id === 'unsubscribe-action') {
+    return buildSettingsNotificationUpdateHandoffStaticItem({
+      description:
+        m.settings_notification_handoff_unsubscribe_action_description(),
+      id,
+      label: m.settings_notification_handoff_unsubscribe_action_label(),
+      value: newsletterCardView.unsubscribeSuccessMessage,
+    });
+  }
+
+  if (id === 'error-feedback') {
+    return buildSettingsNotificationUpdateHandoffStaticItem({
+      description: m.settings_notification_handoff_error_feedback_description(),
+      id,
+      label: m.settings_notification_handoff_error_feedback_label(),
+      value: newsletterCardView.errorMessage,
+    });
+  }
+
+  if (id === 'scope-note') {
+    return buildSettingsNotificationUpdateHandoffStaticItem({
+      description: newsletterCardView.scopeDescription,
+      id,
+      label: m.settings_notification_handoff_scope_note_label(),
+      value: newsletterCardView.scopeLabel,
+    });
+  }
+
+  if (id === 'provider-visibility') {
+    return buildSettingsNotificationUpdateHandoffStaticItem({
+      description:
+        m.settings_notification_handoff_provider_visibility_description(),
+      id,
+      label: m.settings_notification_handoff_provider_visibility_label(),
+      value: m.settings_notification_handoff_provider_visibility_value(),
+    });
+  }
+
+  if (id === 'student-reminder-boundary') {
+    return buildSettingsNotificationUpdateHandoffStaticItem({
+      description:
+        m.settings_notification_handoff_student_reminder_boundary_description(),
+      id,
+      label: m.settings_notification_handoff_student_reminder_boundary_label(),
+      value: m.settings_notification_handoff_student_reminder_boundary_value(),
+    });
+  }
+
+  if (id === 'public-link-boundary') {
+    return buildSettingsNotificationUpdateHandoffStaticItem({
+      description:
+        m.settings_notification_handoff_public_link_boundary_description(),
+      id,
+      label: m.settings_notification_handoff_public_link_boundary_label(),
+      value: m.settings_notification_handoff_public_link_boundary_value(),
+    });
+  }
+
+  if (id === 'learner-notification-boundary') {
+    return buildSettingsNotificationUpdateHandoffStaticItem({
+      description:
+        m.settings_notification_handoff_learner_notification_boundary_description(),
+      id,
+      label:
+        m.settings_notification_handoff_learner_notification_boundary_label(),
+      value:
+        m.settings_notification_handoff_learner_notification_boundary_value(),
+    });
+  }
+
+  if (id === 'private-data-guard') {
+    return buildSettingsNotificationUpdateHandoffStaticItem({
+      description:
+        m.settings_notification_handoff_private_data_guard_description(),
+      id,
+      label: m.settings_notification_handoff_private_data_guard_label(),
+      value: m.settings_notification_handoff_private_data_guard_value(),
+    });
+  }
+
+  return buildSettingsNotificationUpdateHandoffStaticItem({
+    description:
+      m.settings_notification_handoff_legacy_copy_guard_description(),
+    id,
+    label: m.settings_notification_handoff_legacy_copy_guard_label(),
+    value: m.settings_notification_handoff_legacy_copy_guard_value(),
+  });
+}
+
+function buildSettingsNotificationUpdateHandoffStaticItem({
+  description,
+  id,
+  label,
+  value,
+}: Omit<SettingsNotificationUpdateHandoffItemView, 'ariaLabel'>) {
+  return {
+    description,
+    id,
+    label,
+    value,
+  };
+}
+
+function buildSettingsNotificationUpdateHandoffSummaryItem({
+  id,
+  itemView,
+}: {
+  id: SettingsNotificationUpdateHandoffItemId;
+  itemView: SettingsNotificationWorkspaceSummaryItemView;
+}) {
+  return {
+    description: itemView.description,
+    id,
+    label: itemView.label,
+    value: itemView.label,
+  };
+}
+
+function buildSettingsNotificationUpdateHandoffPrivacyContract(
+  itemViews: SettingsNotificationUpdateHandoffItemView[]
+): SettingsNotificationUpdateHandoffPrivacyContract {
+  return {
+    changesAssignmentDeliveryRules: false,
+    changesPublicAssignmentLinks: false,
+    exposesRawProviderErrors: false,
+    exposesRecipientEmail: false,
+    exposesSourceMaterialStorageKeys: false,
+    exposesStudentIdentifiers: false,
+    itemIds: itemViews.map((item) => item.id),
+    notifiesLearners: false,
+    scope: 'teacher-classroom-update-settings',
+    sendsStudentAssignmentReminders: false,
+    teacherCanPauseUpdates: true,
+    updatesTeacherProductEmailOnly: true,
+  };
+}
+
+function getSettingsNotificationWorkspaceSummaryItem(
+  workspaceSummaryView: SettingsNotificationWorkspaceSummaryBaseView,
+  id: SettingsNotificationWorkspaceSummaryItemId
+) {
+  const itemView = workspaceSummaryView.itemViews.find(
+    (item) => item.id === id
+  );
+  if (!itemView) {
+    throw new Error(`Missing notification workspace summary item: ${id}`);
+  }
+
+  return itemView;
 }
 
 function buildSettingsNotificationWorkspaceSummaryItemView({
