@@ -1,4 +1,8 @@
 import type {
+  AssignmentLifecycleHandoffItemView,
+  AssignmentLifecycleHandoffView,
+} from '@/assignments/lifecycle';
+import type {
   AssignmentListCardActionView,
   AssignmentListCardViewModel,
   AssignmentListDistributionStepId,
@@ -34,6 +38,7 @@ import {
   IconPrinter,
 } from '@tabler/icons-react';
 import { Link } from '@tanstack/react-router';
+import { useId } from 'react';
 import { toast } from 'sonner';
 
 type AssignmentListCardProps = {
@@ -70,6 +75,9 @@ export function AssignmentListCard({ assignment }: AssignmentListCardProps) {
     >
       <AssignmentListCardHeader assignment={assignment} />
       <CardContent className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-end">
+        <AssignmentListLifecycleHandoff
+          handoff={assignment.lifecycleHandoffView}
+        />
         <AssignmentListCardSummary
           assignment={assignment}
           idPrefix={cardElementId}
@@ -83,6 +91,48 @@ export function AssignmentListCard({ assignment }: AssignmentListCardProps) {
         />
       </CardContent>
     </Card>
+  );
+}
+
+function AssignmentListLifecycleHandoff({
+  handoff,
+}: {
+  handoff: AssignmentLifecycleHandoffView;
+}) {
+  const titleId = useId();
+  const descriptionId = useId();
+
+  return (
+    <section
+      aria-describedby={descriptionId}
+      aria-labelledby={titleId}
+      className="sr-only"
+      data-handoff="assignment-lifecycle"
+    >
+      <h3 id={titleId}>{handoff.title}</h3>
+      <p id={descriptionId}>{handoff.description}</p>
+      <dl>
+        {handoff.itemViews.map((item) => (
+          <AssignmentListLifecycleHandoffItem item={item} key={item.id} />
+        ))}
+      </dl>
+    </section>
+  );
+}
+
+function AssignmentListLifecycleHandoffItem({
+  item,
+}: {
+  item: AssignmentLifecycleHandoffItemView;
+}) {
+  return (
+    <div data-handoff-item={item.id}>
+      <dt>{item.label}</dt>
+      <dd>
+        <output aria-label={item.ariaLabel}>{item.value}</output>
+        <span>{item.description}</span>
+      </dd>
+    </div>
   );
 }
 

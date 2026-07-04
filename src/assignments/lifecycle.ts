@@ -7,20 +7,30 @@ export type AssignmentLifecycleStatus = 'closed' | 'draft' | 'expired' | 'open';
 export const ASSIGNMENT_MANAGED_STATUSES = ['published', 'closed'] as const;
 export const ASSIGNMENT_LIFECYCLE_HANDOFF_ITEM_IDS = [
   'current-status',
+  'source-status',
   'status-label',
+  'persisted-source',
   'student-access',
   'public-payload',
+  'public-route-contract',
   'submission-gate',
   'teacher-list-state',
+  'status-filter-alignment',
   'result-page-state',
   'close-action',
   'reopen-action',
+  'copy-link-action',
+  'preview-link-action',
   'next-status',
+  'close-transition',
+  'reopen-transition',
   'transition-error',
   'execution-plan',
   'expiry-check',
   'close-time',
+  'close-window-policy',
   'draft-snapshot-gate',
+  'snapshot-retention',
   'closed-snapshot-retention',
   'attempt-review-retention',
   'server-transition-guard',
@@ -81,6 +91,8 @@ export type AssignmentLifecycleHandoffPrivacyContract = {
   exposesActivityContent: false;
   exposesAnswerKeys: false;
   exposesInternalAssignmentIds: false;
+  exposesPublicRouteUrl: false;
+  exposesPublicShareSlug: false;
   exposesRawAnonymousToken: false;
   exposesStudentAnswerText: false;
   exposesStudentNames: false;
@@ -495,6 +507,7 @@ export function buildAssignmentLifecycleHandoffView({
   });
   const timestamp = normalizeAssignmentLifecycleTimestamp(expiresAt);
   const isOpen = lifecycleStatus === 'open';
+  const isPersistedOpen = isPersisted && isOpen;
   const itemViews: AssignmentLifecycleHandoffItemView[] = [
     buildAssignmentLifecycleHandoffItem({
       id: 'current-status',
@@ -502,9 +515,18 @@ export function buildAssignmentLifecycleHandoffView({
       value: lifecycleStatus,
     }),
     buildAssignmentLifecycleHandoffItem({
+      id: 'source-status',
+      statusLabel: currentStatus,
+      value: currentStatus,
+    }),
+    buildAssignmentLifecycleHandoffItem({
       id: 'status-label',
       statusLabel,
       value: statusLabel,
+    }),
+    buildAssignmentLifecycleHandoffItem({
+      id: 'persisted-source',
+      value: formatAssignmentLifecyclePersistence(isPersisted),
     }),
     buildAssignmentLifecycleHandoffItem({
       id: 'student-access',
@@ -515,6 +537,11 @@ export function buildAssignmentLifecycleHandoffView({
       id: 'public-payload',
       statusLabel: formatAssignmentLifecycleAvailability(isOpen),
       value: formatAssignmentLifecycleAvailability(isOpen),
+    }),
+    buildAssignmentLifecycleHandoffItem({
+      id: 'public-route-contract',
+      statusLabel: formatAssignmentLifecycleAvailability(isPersistedOpen),
+      value: formatAssignmentLifecycleAvailability(isPersistedOpen),
     }),
     buildAssignmentLifecycleHandoffItem({
       id: 'submission-gate',
@@ -529,6 +556,11 @@ export function buildAssignmentLifecycleHandoffView({
       id: 'teacher-list-state',
       statusLabel,
       value: statusLabel,
+    }),
+    buildAssignmentLifecycleHandoffItem({
+      id: 'status-filter-alignment',
+      statusLabel: lifecycleStatus,
+      value: lifecycleStatus,
     }),
     buildAssignmentLifecycleHandoffItem({
       id: 'result-page-state',
@@ -554,10 +586,32 @@ export function buildAssignmentLifecycleHandoffView({
       ),
     }),
     buildAssignmentLifecycleHandoffItem({
+      id: 'copy-link-action',
+      statusLabel: formatAssignmentLifecycleActionReadiness(isPersistedOpen),
+      value: formatAssignmentLifecycleActionReadiness(isPersistedOpen),
+    }),
+    buildAssignmentLifecycleHandoffItem({
+      id: 'preview-link-action',
+      statusLabel: formatAssignmentLifecycleActionReadiness(isPersistedOpen),
+      value: formatAssignmentLifecycleActionReadiness(isPersistedOpen),
+    }),
+    buildAssignmentLifecycleHandoffItem({
       id: 'next-status',
       value:
         statusAction?.nextStatusValue ??
         m.assignment_lifecycle_handoff_not_available_value(),
+    }),
+    buildAssignmentLifecycleHandoffItem({
+      id: 'close-transition',
+      value:
+        closeTransitionError?.message ??
+        m.assignment_lifecycle_handoff_ready_value(),
+    }),
+    buildAssignmentLifecycleHandoffItem({
+      id: 'reopen-transition',
+      value:
+        reopenTransitionError?.message ??
+        m.assignment_lifecycle_handoff_ready_value(),
     }),
     buildAssignmentLifecycleHandoffItem({
       id: 'transition-error',
@@ -584,7 +638,21 @@ export function buildAssignmentLifecycleHandoffView({
           : m.assignment_lifecycle_handoff_scheduled_value(),
     }),
     buildAssignmentLifecycleHandoffItem({
+      id: 'close-window-policy',
+      value: formatAssignmentLifecycleCloseWindowPolicy({
+        expiresAt,
+        now,
+      }),
+    }),
+    buildAssignmentLifecycleHandoffItem({
       id: 'draft-snapshot-gate',
+      value:
+        lifecycleStatus === 'draft'
+          ? m.assignment_lifecycle_handoff_publish_required_value()
+          : m.assignment_lifecycle_handoff_snapshot_frozen_value(),
+    }),
+    buildAssignmentLifecycleHandoffItem({
+      id: 'snapshot-retention',
       value:
         lifecycleStatus === 'draft'
           ? m.assignment_lifecycle_handoff_publish_required_value()
@@ -631,6 +699,8 @@ function buildAssignmentLifecycleHandoffPrivacyContract(
     exposesActivityContent: false,
     exposesAnswerKeys: false,
     exposesInternalAssignmentIds: false,
+    exposesPublicRouteUrl: false,
+    exposesPublicShareSlug: false,
     exposesRawAnonymousToken: false,
     exposesStudentAnswerText: false,
     exposesStudentNames: false,
@@ -674,10 +744,21 @@ function getAssignmentLifecycleHandoffItemCopy(
           m.assignment_lifecycle_handoff_current_status_description(),
         label: m.assignment_lifecycle_handoff_current_status_label(),
       };
+    case 'source-status':
+      return {
+        description: m.assignment_lifecycle_handoff_source_status_description(),
+        label: m.assignment_lifecycle_handoff_source_status_label(),
+      };
     case 'status-label':
       return {
         description: m.assignment_lifecycle_handoff_status_label_description(),
         label: m.assignment_lifecycle_handoff_status_label_label(),
+      };
+    case 'persisted-source':
+      return {
+        description:
+          m.assignment_lifecycle_handoff_persisted_source_description(),
+        label: m.assignment_lifecycle_handoff_persisted_source_label(),
       };
     case 'student-access':
       return {
@@ -691,6 +772,12 @@ function getAssignmentLifecycleHandoffItemCopy(
           m.assignment_lifecycle_handoff_public_payload_description(),
         label: m.assignment_lifecycle_handoff_public_payload_label(),
       };
+    case 'public-route-contract':
+      return {
+        description:
+          m.assignment_lifecycle_handoff_public_route_contract_description(),
+        label: m.assignment_lifecycle_handoff_public_route_contract_label(),
+      };
     case 'submission-gate':
       return {
         description:
@@ -702,6 +789,12 @@ function getAssignmentLifecycleHandoffItemCopy(
         description:
           m.assignment_lifecycle_handoff_teacher_list_state_description(),
         label: m.assignment_lifecycle_handoff_teacher_list_state_label(),
+      };
+    case 'status-filter-alignment':
+      return {
+        description:
+          m.assignment_lifecycle_handoff_status_filter_alignment_description(),
+        label: m.assignment_lifecycle_handoff_status_filter_alignment_label(),
       };
     case 'result-page-state':
       return {
@@ -719,10 +812,34 @@ function getAssignmentLifecycleHandoffItemCopy(
         description: m.assignment_lifecycle_handoff_reopen_action_description(),
         label: m.assignment_lifecycle_handoff_reopen_action_label(),
       };
+    case 'copy-link-action':
+      return {
+        description:
+          m.assignment_lifecycle_handoff_copy_link_action_description(),
+        label: m.assignment_lifecycle_handoff_copy_link_action_label(),
+      };
+    case 'preview-link-action':
+      return {
+        description:
+          m.assignment_lifecycle_handoff_preview_link_action_description(),
+        label: m.assignment_lifecycle_handoff_preview_link_action_label(),
+      };
     case 'next-status':
       return {
         description: m.assignment_lifecycle_handoff_next_status_description(),
         label: m.assignment_lifecycle_handoff_next_status_label(),
+      };
+    case 'close-transition':
+      return {
+        description:
+          m.assignment_lifecycle_handoff_close_transition_description(),
+        label: m.assignment_lifecycle_handoff_close_transition_label(),
+      };
+    case 'reopen-transition':
+      return {
+        description:
+          m.assignment_lifecycle_handoff_reopen_transition_description(),
+        label: m.assignment_lifecycle_handoff_reopen_transition_label(),
       };
     case 'transition-error':
       return {
@@ -746,11 +863,23 @@ function getAssignmentLifecycleHandoffItemCopy(
         description: m.assignment_lifecycle_handoff_close_time_description(),
         label: m.assignment_lifecycle_handoff_close_time_label(),
       };
+    case 'close-window-policy':
+      return {
+        description:
+          m.assignment_lifecycle_handoff_close_window_policy_description(),
+        label: m.assignment_lifecycle_handoff_close_window_policy_label(),
+      };
     case 'draft-snapshot-gate':
       return {
         description:
           m.assignment_lifecycle_handoff_draft_snapshot_gate_description(),
         label: m.assignment_lifecycle_handoff_draft_snapshot_gate_label(),
+      };
+    case 'snapshot-retention':
+      return {
+        description:
+          m.assignment_lifecycle_handoff_snapshot_retention_description(),
+        label: m.assignment_lifecycle_handoff_snapshot_retention_label(),
       };
     case 'closed-snapshot-retention':
       return {
@@ -795,6 +924,12 @@ function formatAssignmentLifecycleActionReadiness(isReady: boolean) {
     : m.assignment_lifecycle_handoff_not_available_value();
 }
 
+function formatAssignmentLifecyclePersistence(isPersisted: boolean) {
+  return isPersisted
+    ? m.assignment_lifecycle_handoff_persisted_value()
+    : m.assignment_lifecycle_handoff_preview_value();
+}
+
 function formatAssignmentLifecycleExpiryCheck({
   expiresAt,
   now,
@@ -811,6 +946,24 @@ function formatAssignmentLifecycleExpiryCheck({
   }
 
   return m.assignment_lifecycle_handoff_no_close_time_value();
+}
+
+function formatAssignmentLifecycleCloseWindowPolicy({
+  expiresAt,
+  now,
+}: {
+  expiresAt: AssignmentDate;
+  now: AssignmentLifecycleNow;
+}) {
+  if (isAssignmentExpired(expiresAt, now)) {
+    return m.assignment_lifecycle_handoff_close_window_expired_value();
+  }
+
+  if (normalizeAssignmentLifecycleTimestamp(expiresAt) !== undefined) {
+    return m.assignment_lifecycle_handoff_close_window_scheduled_value();
+  }
+
+  return m.assignment_lifecycle_handoff_close_window_open_value();
 }
 
 function resolveAssignmentLifecycleTransitionError({

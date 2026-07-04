@@ -18,7 +18,7 @@ const SECRET_TEACHER_NOTE = 'SECRET_TEACHER_NOTE_SHOULD_NOT_LEAK';
 const SECRET_TOKEN = 'SECRET_ANONYMOUS_TOKEN_SHOULD_NOT_LEAK';
 const NOW = new Date('2026-01-01T00:00:00.000Z').getTime();
 
-test('open assignment lifecycle exposes a safe 20-slice handoff', () => {
+test('open assignment lifecycle exposes a safe 30-slice handoff', () => {
   const handoffView = buildAssignmentLifecycleHandoffView({
     currentStatus: 'published',
     expiresAt: new Date('2026-01-02T00:00:00.000Z'),
@@ -28,7 +28,7 @@ test('open assignment lifecycle exposes a safe 20-slice handoff', () => {
   const itemIds = handoffView.itemViews.map((item) => item.id);
 
   assert.deepEqual(itemIds, [...ASSIGNMENT_LIFECYCLE_HANDOFF_ITEM_IDS]);
-  assert.equal(new Set(itemIds).size, 20);
+  assert.equal(new Set(itemIds).size, 30);
   assert.equal(
     handoffView.itemViews.every(
       (item) =>
@@ -43,6 +43,8 @@ test('open assignment lifecycle exposes a safe 20-slice handoff', () => {
     exposesActivityContent: false,
     exposesAnswerKeys: false,
     exposesInternalAssignmentIds: false,
+    exposesPublicRouteUrl: false,
+    exposesPublicShareSlug: false,
     exposesRawAnonymousToken: false,
     exposesStudentAnswerText: false,
     exposesStudentNames: false,
@@ -53,20 +55,30 @@ test('open assignment lifecycle exposes a safe 20-slice handoff', () => {
     handoffView.itemViews.map((item) => [item.id, item.value]),
     [
       ['current-status', 'open'],
+      ['source-status', 'published'],
       ['status-label', 'Open'],
+      ['persisted-source', 'Persisted'],
       ['student-access', 'Available'],
       ['public-payload', 'Available'],
+      ['public-route-contract', 'Available'],
       ['submission-gate', 'Accepting submissions'],
       ['teacher-list-state', 'Open'],
+      ['status-filter-alignment', 'open'],
       ['result-page-state', 'Open'],
       ['close-action', 'Ready'],
       ['reopen-action', 'Not available'],
+      ['copy-link-action', 'Ready'],
+      ['preview-link-action', 'Ready'],
       ['next-status', 'Closed'],
+      ['close-transition', 'Ready'],
+      ['reopen-transition', 'Assignment link is already open.'],
       ['transition-error', 'None'],
       ['execution-plan', 'update-status'],
       ['expiry-check', 'Future close time'],
       ['close-time', 'Scheduled'],
+      ['close-window-policy', 'Close window scheduled'],
       ['draft-snapshot-gate', 'Snapshot frozen'],
+      ['snapshot-retention', 'Snapshot frozen'],
       ['closed-snapshot-retention', 'Snapshot frozen'],
       ['attempt-review-retention', 'Attempt review retained'],
       ['server-transition-guard', 'Validated'],
@@ -98,6 +110,10 @@ test('closed assignment lifecycle keeps results and reopen action explicit', () 
     'Blocked'
   );
   assert.equal(
+    getHandoffItemValue(handoffView.itemViews, 'public-route-contract'),
+    'Blocked'
+  );
+  assert.equal(
     getHandoffItemValue(handoffView.itemViews, 'submission-gate'),
     'This assignment is closed.'
   );
@@ -110,12 +126,24 @@ test('closed assignment lifecycle keeps results and reopen action explicit', () 
     'Ready'
   );
   assert.equal(
+    getHandoffItemValue(handoffView.itemViews, 'close-transition'),
+    'Assignment link is already closed.'
+  );
+  assert.equal(
+    getHandoffItemValue(handoffView.itemViews, 'reopen-transition'),
+    'Ready'
+  );
+  assert.equal(
     getHandoffItemValue(handoffView.itemViews, 'next-status'),
     'Open'
   );
   assert.equal(
     getHandoffItemValue(handoffView.itemViews, 'closed-snapshot-retention'),
     'Results retained'
+  );
+  assert.equal(
+    getHandoffItemValue(handoffView.itemViews, 'snapshot-retention'),
+    'Snapshot frozen'
   );
   assertNoPrivateLifecycleText(JSON.stringify(handoffView));
 });
@@ -141,12 +169,20 @@ test('expired lifecycle blocks reopen without changing close window', () => {
     'Expired assignments cannot be reopened.'
   );
   assert.equal(
+    getHandoffItemValue(handoffView.itemViews, 'reopen-transition'),
+    'Expired assignments cannot be reopened.'
+  );
+  assert.equal(
     getHandoffItemValue(handoffView.itemViews, 'execution-plan'),
     'blocked'
   );
   assert.equal(
     getHandoffItemValue(handoffView.itemViews, 'expiry-check'),
     'Expired close time'
+  );
+  assert.equal(
+    getHandoffItemValue(handoffView.itemViews, 'close-window-policy'),
+    'Close window expired'
   );
   assert.equal(
     getHandoffItemValue(handoffView.itemViews, 'attempt-review-retention'),
@@ -172,8 +208,24 @@ test('draft lifecycle cannot bypass publish-and-snapshot flow', () => {
     'Blocked'
   );
   assert.equal(
+    getHandoffItemValue(handoffView.itemViews, 'source-status'),
+    'draft'
+  );
+  assert.equal(
+    getHandoffItemValue(handoffView.itemViews, 'public-route-contract'),
+    'Blocked'
+  );
+  assert.equal(
     getHandoffItemValue(handoffView.itemViews, 'submission-gate'),
     'This assignment has not been published for students yet.'
+  );
+  assert.equal(
+    getHandoffItemValue(handoffView.itemViews, 'close-transition'),
+    'Only published assignment links can be closed.'
+  );
+  assert.equal(
+    getHandoffItemValue(handoffView.itemViews, 'reopen-transition'),
+    'Only closed assignment links can be reopened.'
   );
   assert.equal(
     getHandoffItemValue(handoffView.itemViews, 'transition-error'),
@@ -186,6 +238,54 @@ test('draft lifecycle cannot bypass publish-and-snapshot flow', () => {
   assert.equal(
     getHandoffItemValue(handoffView.itemViews, 'draft-snapshot-gate'),
     'Publish required'
+  );
+  assert.equal(
+    getHandoffItemValue(handoffView.itemViews, 'snapshot-retention'),
+    'Publish required'
+  );
+  assertNoPrivateLifecycleText(JSON.stringify(handoffView));
+});
+
+test('preview assignment lifecycle is semantic but blocks persisted link actions', () => {
+  const handoffView = buildAssignmentLifecycleHandoffView({
+    currentStatus: 'published',
+    expiresAt: new Date('2026-01-02T00:00:00.000Z'),
+    isPersisted: false,
+    now: NOW,
+    surface: 'teacher-list',
+  });
+
+  assert.deepEqual(
+    handoffView.itemViews.map((item) => item.id),
+    [...ASSIGNMENT_LIFECYCLE_HANDOFF_ITEM_IDS]
+  );
+  assert.equal(
+    getHandoffItemValue(handoffView.itemViews, 'current-status'),
+    'open'
+  );
+  assert.equal(
+    getHandoffItemValue(handoffView.itemViews, 'persisted-source'),
+    'Preview'
+  );
+  assert.equal(
+    getHandoffItemValue(handoffView.itemViews, 'student-access'),
+    'Available'
+  );
+  assert.equal(
+    getHandoffItemValue(handoffView.itemViews, 'public-route-contract'),
+    'Blocked'
+  );
+  assert.equal(
+    getHandoffItemValue(handoffView.itemViews, 'copy-link-action'),
+    'Not available'
+  );
+  assert.equal(
+    getHandoffItemValue(handoffView.itemViews, 'preview-link-action'),
+    'Not available'
+  );
+  assert.equal(
+    getHandoffItemValue(handoffView.itemViews, 'execution-plan'),
+    'blocked'
   );
   assertNoPrivateLifecycleText(JSON.stringify(handoffView));
 });

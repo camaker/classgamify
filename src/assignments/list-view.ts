@@ -37,7 +37,9 @@ import {
   normalizeAssignmentListSummaryCount,
 } from '@/assignments/list-summary';
 import {
+  type AssignmentLifecycleHandoffView,
   type AssignmentStatusAction,
+  buildAssignmentLifecycleHandoffView,
   buildAssignmentStatusAction,
   getAssignmentStatusLabel,
 } from '@/assignments/lifecycle';
@@ -271,6 +273,7 @@ export type AssignmentListCardViewModel = {
   ariaLabel: string;
   distributionView: AssignmentListDistributionView;
   id: string;
+  lifecycleHandoffView: AssignmentLifecycleHandoffView;
   persisted: boolean;
   settingsSummaryView: AssignmentSettingsSummaryView;
   shareSlug: string;
@@ -1574,6 +1577,13 @@ export function buildAssignmentListCardViewModel({
       stats,
     }),
     id: assignment.id,
+    lifecycleHandoffView: buildAssignmentLifecycleHandoffView({
+      currentStatus: assignment.status,
+      expiresAt: assignment.expiresAt,
+      isPersisted: persisted,
+      now,
+      surface: 'teacher-list',
+    }),
     persisted,
     settingsSummaryView: buildAssignmentSettingsSummaryView({
       expiresAt: assignment.expiresAt,
@@ -1634,6 +1644,12 @@ export function buildStarterAssignmentListCardViewModel({
       stats,
     }),
     id: assignment.id,
+    lifecycleHandoffView: buildAssignmentLifecycleHandoffView({
+      currentStatus: assignment.status,
+      expiresAt,
+      isPersisted: persisted,
+      surface: 'teacher-list',
+    }),
     persisted,
     settingsSummaryView: buildAssignmentSettingsSummaryView({
       expiresAt,
