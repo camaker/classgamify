@@ -1,5 +1,6 @@
 import { ActivityPreview } from '@/components/activities/activity-preview';
 import { DashboardOverviewActionCard } from '@/components/dashboard/dashboard-overview-action-card';
+import { DashboardOverviewHandoffPanel } from '@/components/dashboard/dashboard-overview-handoff-panel';
 import { DashboardOverviewLoopStatusPanel } from '@/components/dashboard/dashboard-overview-loop-status-panel';
 import { DashboardOverviewMetricCard } from '@/components/dashboard/dashboard-overview-metric-card';
 import { DashboardOverviewReadinessRow } from '@/components/dashboard/dashboard-overview-readiness-row';
@@ -136,6 +137,8 @@ function DashboardPage() {
         </section>
 
         <DashboardOverviewLoopStatusPanel view={pageView.loopStatus} />
+
+        <DashboardOverviewHandoffPanel view={pageView.handoffView} />
 
         <ActivityPreview
           activity={pageView.preview.activity}

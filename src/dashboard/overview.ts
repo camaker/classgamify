@@ -77,6 +77,7 @@ export type DashboardOverviewLoopStatusView = {
 
 type DashboardOverviewPageViewModel = {
   actionCards: DashboardOverviewActionCard[];
+  handoffView: DashboardOverviewHandoffView;
   loopStatus: DashboardOverviewLoopStatusView;
   metrics: DashboardOverviewMetric[];
   preview: DashboardOverviewPreview;
@@ -138,6 +139,69 @@ export type DashboardOverviewPreview = {
   activity: ActivitySeed;
   assignment: AssignmentSeed;
   source: 'starter-preview';
+};
+
+export const DASHBOARD_OVERVIEW_HANDOFF_ITEM_IDS = [
+  'owner-activity-scope',
+  'owner-assignment-scope',
+  'starter-preview-boundary',
+  'activity-loading-state',
+  'assignment-loading-state',
+  'activity-metric',
+  'template-coverage-metric',
+  'assignment-metric',
+  'result-metric',
+  'core-loop-status',
+  'create-action',
+  'publish-action',
+  'share-action',
+  'review-action',
+  'activity-readiness',
+  'assignment-link-readiness',
+  'student-runner-readiness',
+  'teacher-results-readiness',
+  'action-card-activities',
+  'action-card-assignments',
+  'action-card-student-preview',
+  'preview-source',
+  'preview-activity',
+  'preview-assignment',
+  'route-create',
+  'route-activities',
+  'route-assignments',
+  'route-student-preview',
+  'loading-independence',
+  'privacy-guard',
+] as const;
+
+export type DashboardOverviewHandoffItemId =
+  (typeof DASHBOARD_OVERVIEW_HANDOFF_ITEM_IDS)[number];
+
+export type DashboardOverviewHandoffItemView = {
+  ariaLabel: string;
+  description: string;
+  id: DashboardOverviewHandoffItemId;
+  label: string;
+  statusLabel?: string;
+  value: string;
+};
+
+export type DashboardOverviewHandoffPrivacyContract = {
+  countsStarterPreviewAsOwnedMetrics: false;
+  exposesAssignmentAttemptDetails: false;
+  exposesRawAnonymousToken: false;
+  exposesSourceMaterialStorageKeys: false;
+  exposesStudentAnswerText: false;
+  exposesTeacherPrivateActivityContent: false;
+  itemIds: DashboardOverviewHandoffItemId[];
+  scope: 'teacher-dashboard-overview';
+};
+
+export type DashboardOverviewHandoffView = {
+  description: string;
+  itemViews: DashboardOverviewHandoffItemView[];
+  privacy: DashboardOverviewHandoffPrivacyContract;
+  title: string;
 };
 
 export const dashboardOverviewPageCopy = {
@@ -232,23 +296,553 @@ export function buildDashboardOverviewPageViewModel({
     activitySummary,
     assignmentSummary,
   });
+  const actionCards = getDashboardOverviewActionCards();
+  const loopStatus = buildDashboardOverviewLoopStatus({
+    activitySummary,
+    assignmentSummary,
+  });
+  const metrics = buildDashboardOverviewMetrics({
+    activitySummary,
+    activitiesLoading: resolvedActivitiesLoading,
+    assignmentSummary,
+    assignmentsLoading: resolvedAssignmentsLoading,
+  });
 
   return {
-    actionCards: getDashboardOverviewActionCards(),
-    loopStatus: buildDashboardOverviewLoopStatus({
-      activitySummary,
-      assignmentSummary,
-    }),
-    metrics: buildDashboardOverviewMetrics({
-      activitySummary,
+    actionCards,
+    handoffView: buildDashboardOverviewHandoffView({
+      actionCards,
       activitiesLoading: resolvedActivitiesLoading,
+      activitySummary,
       assignmentSummary,
       assignmentsLoading: resolvedAssignmentsLoading,
+      loopStatus,
+      metrics,
+      preview,
+      readinessView,
     }),
+    loopStatus,
+    metrics,
     preview,
     readinessView,
     readinessRows: readinessView.rows,
   };
+}
+
+export function buildDashboardOverviewHandoffView({
+  actionCards,
+  activitiesLoading,
+  activitySummary,
+  assignmentSummary,
+  assignmentsLoading,
+  loopStatus,
+  metrics,
+  preview,
+  readinessView,
+}: {
+  actionCards: DashboardOverviewActionCard[];
+  activitiesLoading: boolean;
+  activitySummary?: DashboardOverviewOwnerActivitySummary;
+  assignmentSummary?: DashboardOverviewOwnerAssignmentSummary;
+  assignmentsLoading: boolean;
+  loopStatus: DashboardOverviewLoopStatusView;
+  metrics: DashboardOverviewMetric[];
+  preview: DashboardOverviewPreview;
+  readinessView: DashboardCoreLoopReadinessView;
+}): DashboardOverviewHandoffView {
+  const itemViews = DASHBOARD_OVERVIEW_HANDOFF_ITEM_IDS.map((id) =>
+    buildDashboardOverviewHandoffItemView({
+      actionCards,
+      activitiesLoading,
+      activitySummary,
+      assignmentSummary,
+      assignmentsLoading,
+      id,
+      loopStatus,
+      metrics,
+      preview,
+      readinessView,
+    })
+  );
+
+  return {
+    description: m.dashboard_overview_handoff_description(),
+    itemViews,
+    privacy: buildDashboardOverviewHandoffPrivacyContract(itemViews),
+    title: m.dashboard_overview_handoff_title(),
+  };
+}
+
+type DashboardOverviewHandoffBuildContext = {
+  actionCards: DashboardOverviewActionCard[];
+  activitiesLoading: boolean;
+  activitySummary?: DashboardOverviewOwnerActivitySummary;
+  assignmentSummary?: DashboardOverviewOwnerAssignmentSummary;
+  assignmentsLoading: boolean;
+  id: DashboardOverviewHandoffItemId;
+  loopStatus: DashboardOverviewLoopStatusView;
+  metrics: DashboardOverviewMetric[];
+  preview: DashboardOverviewPreview;
+  readinessView: DashboardCoreLoopReadinessView;
+};
+
+function buildDashboardOverviewHandoffItemView(
+  context: DashboardOverviewHandoffBuildContext
+): DashboardOverviewHandoffItemView {
+  switch (context.id) {
+    case 'owner-activity-scope':
+      return buildDashboardOverviewHandoffItem({
+        description:
+          m.dashboard_overview_handoff_owner_activity_scope_description(),
+        id: context.id,
+        label: m.dashboard_overview_handoff_owner_activity_scope_label(),
+        value: formatDashboardMetricValue(
+          normalizeDashboardSummaryCount(
+            context.activitySummary?.totalActivities
+          )
+        ),
+      });
+    case 'owner-assignment-scope':
+      return buildDashboardOverviewHandoffItem({
+        description:
+          m.dashboard_overview_handoff_owner_assignment_scope_description(),
+        id: context.id,
+        label: m.dashboard_overview_handoff_owner_assignment_scope_label(),
+        value: formatDashboardMetricValue(
+          normalizeDashboardSummaryCount(
+            context.assignmentSummary?.totalAssignments
+          )
+        ),
+      });
+    case 'starter-preview-boundary':
+      return buildDashboardOverviewHandoffItem({
+        description:
+          m.dashboard_overview_handoff_starter_preview_boundary_description(),
+        id: context.id,
+        label: m.dashboard_overview_handoff_starter_preview_boundary_label(),
+        value: m.dashboard_overview_handoff_preview_only_value(),
+      });
+    case 'activity-loading-state':
+      return buildDashboardOverviewHandoffLoadingItem({
+        id: context.id,
+        isLoading: context.activitiesLoading,
+        label: m.dashboard_overview_handoff_activity_loading_label(),
+      });
+    case 'assignment-loading-state':
+      return buildDashboardOverviewHandoffLoadingItem({
+        id: context.id,
+        isLoading: context.assignmentsLoading,
+        label: m.dashboard_overview_handoff_assignment_loading_label(),
+      });
+    case 'activity-metric':
+      return buildDashboardOverviewHandoffMetricItem({
+        id: context.id,
+        metric: getDashboardOverviewHandoffMetric(
+          context.metrics,
+          'activities'
+        ),
+      });
+    case 'template-coverage-metric':
+      return buildDashboardOverviewHandoffMetricItem({
+        id: context.id,
+        metric: getDashboardOverviewHandoffMetric(context.metrics, 'templates'),
+      });
+    case 'assignment-metric':
+      return buildDashboardOverviewHandoffMetricItem({
+        id: context.id,
+        metric: getDashboardOverviewHandoffMetric(
+          context.metrics,
+          'assignments'
+        ),
+      });
+    case 'result-metric':
+      return buildDashboardOverviewHandoffMetricItem({
+        id: context.id,
+        metric: getDashboardOverviewHandoffMetric(context.metrics, 'results'),
+      });
+    case 'core-loop-status':
+      return buildDashboardOverviewHandoffItem({
+        description: context.loopStatus.description,
+        id: context.id,
+        label: context.loopStatus.title,
+        statusLabel: context.loopStatus.statusLabel,
+        value: context.loopStatus.statusLabel,
+      });
+    case 'create-action':
+      return buildDashboardOverviewHandoffNextActionItem({
+        action: getDashboardOverviewHandoffNextAction(
+          context.loopStatus,
+          'create-activity'
+        ),
+        id: context.id,
+      });
+    case 'publish-action':
+      return buildDashboardOverviewHandoffNextActionItem({
+        action: getDashboardOverviewHandoffNextAction(
+          context.loopStatus,
+          'publish-assignment'
+        ),
+        id: context.id,
+      });
+    case 'share-action':
+      return buildDashboardOverviewHandoffNextActionItem({
+        action: getDashboardOverviewHandoffNextAction(
+          context.loopStatus,
+          'share-assignment'
+        ),
+        id: context.id,
+      });
+    case 'review-action':
+      return buildDashboardOverviewHandoffNextActionItem({
+        action: getDashboardOverviewHandoffNextAction(
+          context.loopStatus,
+          'review-results'
+        ),
+        id: context.id,
+      });
+    case 'activity-readiness':
+      return buildDashboardOverviewHandoffReadinessItem({
+        id: context.id,
+        row: getDashboardOverviewHandoffReadinessRow(
+          context.readinessView,
+          'activity-authoring'
+        ),
+      });
+    case 'assignment-link-readiness':
+      return buildDashboardOverviewHandoffReadinessItem({
+        id: context.id,
+        row: getDashboardOverviewHandoffReadinessRow(
+          context.readinessView,
+          'assignment-links'
+        ),
+      });
+    case 'student-runner-readiness':
+      return buildDashboardOverviewHandoffReadinessItem({
+        id: context.id,
+        row: getDashboardOverviewHandoffReadinessRow(
+          context.readinessView,
+          'student-runner'
+        ),
+      });
+    case 'teacher-results-readiness':
+      return buildDashboardOverviewHandoffReadinessItem({
+        id: context.id,
+        row: getDashboardOverviewHandoffReadinessRow(
+          context.readinessView,
+          'teacher-results'
+        ),
+      });
+    case 'action-card-activities':
+      return buildDashboardOverviewHandoffActionCardItem({
+        card: getDashboardOverviewHandoffActionCard(
+          context.actionCards,
+          'activities'
+        ),
+        id: context.id,
+      });
+    case 'action-card-assignments':
+      return buildDashboardOverviewHandoffActionCardItem({
+        card: getDashboardOverviewHandoffActionCard(
+          context.actionCards,
+          'assignments'
+        ),
+        id: context.id,
+      });
+    case 'action-card-student-preview':
+      return buildDashboardOverviewHandoffActionCardItem({
+        card: getDashboardOverviewHandoffActionCard(
+          context.actionCards,
+          'student-preview'
+        ),
+        id: context.id,
+      });
+    case 'preview-source':
+      return buildDashboardOverviewHandoffItem({
+        description: m.dashboard_overview_handoff_preview_source_description(),
+        id: context.id,
+        label: m.dashboard_overview_handoff_preview_source_label(),
+        value: getDashboardOverviewPreviewSourceValue(context.preview.source),
+      });
+    case 'preview-activity':
+      return buildDashboardOverviewHandoffItem({
+        description:
+          m.dashboard_overview_handoff_preview_activity_description(),
+        id: context.id,
+        label: m.dashboard_overview_handoff_preview_activity_label(),
+        value: m.dashboard_overview_handoff_preview_activity_value(),
+      });
+    case 'preview-assignment':
+      return buildDashboardOverviewHandoffItem({
+        description:
+          m.dashboard_overview_handoff_preview_assignment_description(),
+        id: context.id,
+        label: m.dashboard_overview_handoff_preview_assignment_label(),
+        value: m.dashboard_overview_handoff_preview_assignment_value(),
+      });
+    case 'route-create':
+      return buildDashboardOverviewHandoffRouteItem({
+        id: context.id,
+        label: m.dashboard_overview_handoff_route_create_label(),
+        value: Routes.Create,
+      });
+    case 'route-activities':
+      return buildDashboardOverviewHandoffRouteItem({
+        id: context.id,
+        label: m.dashboard_overview_handoff_route_activities_label(),
+        value: Routes.DashboardActivities,
+      });
+    case 'route-assignments':
+      return buildDashboardOverviewHandoffRouteItem({
+        id: context.id,
+        label: m.dashboard_overview_handoff_route_assignments_label(),
+        value: Routes.DashboardAssignments,
+      });
+    case 'route-student-preview':
+      return buildDashboardOverviewHandoffRouteItem({
+        id: context.id,
+        label: m.dashboard_overview_handoff_route_student_preview_label(),
+        value: Routes.StudentPreview,
+      });
+    case 'loading-independence':
+      return buildDashboardOverviewHandoffItem({
+        description:
+          m.dashboard_overview_handoff_loading_independence_description(),
+        id: context.id,
+        label: m.dashboard_overview_handoff_loading_independence_label(),
+        value: getDashboardOverviewLoadingIndependenceValue({
+          activitiesLoading: context.activitiesLoading,
+          assignmentsLoading: context.assignmentsLoading,
+        }),
+      });
+    case 'privacy-guard':
+      return buildDashboardOverviewHandoffItem({
+        description: m.dashboard_overview_handoff_privacy_guard_description(),
+        id: context.id,
+        label: m.dashboard_overview_handoff_privacy_guard_label(),
+        value: m.dashboard_overview_handoff_private_data_hidden_value(),
+      });
+  }
+}
+
+function buildDashboardOverviewHandoffMetricItem({
+  id,
+  metric,
+}: {
+  id: DashboardOverviewHandoffItemId;
+  metric: DashboardOverviewMetric;
+}) {
+  return buildDashboardOverviewHandoffItem({
+    description: metric.description,
+    id,
+    label: metric.label,
+    value: metric.value,
+  });
+}
+
+function buildDashboardOverviewHandoffNextActionItem({
+  action,
+  id,
+}: {
+  action: DashboardOverviewNextActionView;
+  id: DashboardOverviewHandoffItemId;
+}) {
+  return buildDashboardOverviewHandoffItem({
+    description: action.description,
+    id,
+    label: action.label,
+    statusLabel: action.statusLabel,
+    value: action.statusLabel,
+  });
+}
+
+function buildDashboardOverviewHandoffReadinessItem({
+  id,
+  row,
+}: {
+  id: DashboardOverviewHandoffItemId;
+  row: DashboardCoreLoopReadinessRow;
+}) {
+  return buildDashboardOverviewHandoffItem({
+    description: row.description,
+    id,
+    label: row.label,
+    statusLabel: row.statusLabel,
+    value: row.percentLabel,
+  });
+}
+
+function buildDashboardOverviewHandoffActionCardItem({
+  card,
+  id,
+}: {
+  card: DashboardOverviewActionCard;
+  id: DashboardOverviewHandoffItemId;
+}) {
+  return buildDashboardOverviewHandoffItem({
+    description: card.description,
+    id,
+    label: card.title,
+    value: card.cta,
+  });
+}
+
+function buildDashboardOverviewHandoffLoadingItem({
+  id,
+  isLoading,
+  label,
+}: {
+  id: DashboardOverviewHandoffItemId;
+  isLoading: boolean;
+  label: string;
+}) {
+  return buildDashboardOverviewHandoffItem({
+    description: isLoading
+      ? m.dashboard_overview_handoff_loading_description()
+      : m.dashboard_overview_handoff_ready_description(),
+    id,
+    label,
+    statusLabel: isLoading
+      ? m.dashboard_overview_handoff_loading_value()
+      : m.dashboard_overview_handoff_ready_value(),
+    value: isLoading
+      ? m.dashboard_overview_handoff_loading_value()
+      : m.dashboard_overview_handoff_ready_value(),
+  });
+}
+
+function buildDashboardOverviewHandoffRouteItem({
+  id,
+  label,
+  value,
+}: {
+  id: DashboardOverviewHandoffItemId;
+  label: string;
+  value: string;
+}) {
+  return buildDashboardOverviewHandoffItem({
+    description: m.dashboard_overview_handoff_route_description(),
+    id,
+    label,
+    value,
+  });
+}
+
+function buildDashboardOverviewHandoffItem({
+  description,
+  id,
+  label,
+  statusLabel,
+  value,
+}: Omit<DashboardOverviewHandoffItemView, 'ariaLabel'>) {
+  return {
+    ariaLabel: m.dashboard_overview_handoff_item_aria_label({
+      description,
+      label,
+      status: statusLabel ? ` ${statusLabel}.` : '',
+      value,
+    }),
+    description,
+    id,
+    label,
+    ...(statusLabel ? { statusLabel } : {}),
+    value,
+  };
+}
+
+function buildDashboardOverviewHandoffPrivacyContract(
+  itemViews: DashboardOverviewHandoffItemView[]
+): DashboardOverviewHandoffPrivacyContract {
+  return {
+    countsStarterPreviewAsOwnedMetrics: false,
+    exposesAssignmentAttemptDetails: false,
+    exposesRawAnonymousToken: false,
+    exposesSourceMaterialStorageKeys: false,
+    exposesStudentAnswerText: false,
+    exposesTeacherPrivateActivityContent: false,
+    itemIds: itemViews.map((itemView) => itemView.id),
+    scope: 'teacher-dashboard-overview',
+  };
+}
+
+function getDashboardOverviewHandoffMetric(
+  metrics: DashboardOverviewMetric[],
+  id: DashboardOverviewMetricId
+) {
+  const metric = metrics.find((item) => item.id === id);
+  if (metric) return metric;
+
+  return buildDashboardOverviewMetricView({
+    description: m.dashboard_overview_handoff_missing_metric_description(),
+    id,
+    label: m.dashboard_overview_handoff_missing_metric_label(),
+    value: '-',
+  });
+}
+
+function getDashboardOverviewHandoffNextAction(
+  loopStatus: DashboardOverviewLoopStatusView,
+  id: DashboardOverviewNextActionId
+) {
+  const action = loopStatus.nextActions.find((item) => item.id === id);
+  if (action) return action;
+
+  return buildDashboardOverviewNextActionView({ id, status: 'blocked' });
+}
+
+function getDashboardOverviewHandoffReadinessRow(
+  readinessView: DashboardCoreLoopReadinessView,
+  id: DashboardCoreLoopReadinessId
+) {
+  const row = readinessView.rows.find((item) => item.id === id);
+  if (row) return row;
+
+  return buildDashboardCoreLoopReadinessRow({
+    description: m.dashboard_overview_handoff_missing_readiness_description(),
+    id,
+    label: m.dashboard_overview_handoff_missing_readiness_label(),
+    value: 0,
+  });
+}
+
+function getDashboardOverviewHandoffActionCard(
+  actionCards: DashboardOverviewActionCard[],
+  id: DashboardOverviewActionCardId
+) {
+  const actionCard = actionCards.find((card) => card.id === id);
+  if (actionCard) return actionCard;
+
+  return {
+    ariaLabel: m.dashboard_overview_handoff_missing_action_card_label(),
+    cta: m.dashboard_overview_handoff_missing_action_card_value(),
+    description: m.dashboard_overview_handoff_missing_action_card_description(),
+    id,
+    title: m.dashboard_overview_handoff_missing_action_card_label(),
+    to: Routes.Dashboard,
+  } satisfies DashboardOverviewActionCard;
+}
+
+function getDashboardOverviewPreviewSourceValue(
+  source: DashboardOverviewPreview['source']
+) {
+  return source === 'starter-preview'
+    ? m.dashboard_overview_handoff_preview_source_value()
+    : m.dashboard_overview_handoff_unknown_value();
+}
+
+function getDashboardOverviewLoadingIndependenceValue({
+  activitiesLoading,
+  assignmentsLoading,
+}: {
+  activitiesLoading: boolean;
+  assignmentsLoading: boolean;
+}) {
+  if (activitiesLoading !== assignmentsLoading) {
+    return m.dashboard_overview_handoff_split_loading_value();
+  }
+
+  return activitiesLoading
+    ? m.dashboard_overview_handoff_both_loading_value()
+    : m.dashboard_overview_handoff_both_ready_value();
 }
 
 export function buildDashboardOverviewRouteViewModel({
