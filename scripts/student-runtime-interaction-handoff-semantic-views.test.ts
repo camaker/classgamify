@@ -19,7 +19,7 @@ const SECRET_RUNTIME_ITEM_ID = 'secret-runtime-item-id';
 const SECRET_STUDENT_NAME = 'Student Private Name';
 const SECRET_TOKEN = 'raw-anonymous-token-value';
 
-test('student runtime interaction handoff exposes 20 safe choice-list slices', () => {
+test('student runtime interaction handoff exposes 30 safe choice-list slices', () => {
   const handoffView = buildStudentRuntimeItemListView({
     answers: {
       [SECRET_RUNTIME_ITEM_ID]: SECRET_ANSWER_TEXT,
@@ -38,7 +38,7 @@ test('student runtime interaction handoff exposes 20 safe choice-list slices', (
   const itemIds = handoffView.itemViews.map((item) => item.id);
 
   assert.deepEqual(itemIds, [...STUDENT_RUNTIME_INTERACTION_HANDOFF_ITEM_IDS]);
-  assert.equal(new Set(itemIds).size, 20);
+  assert.equal(new Set(itemIds).size, 30);
   assert.equal(
     handoffView.itemViews.every(
       (item) =>
@@ -65,6 +65,14 @@ test('student runtime interaction handoff exposes 20 safe choice-list slices', (
   assert.equal(
     getHandoffItemValue(handoffView, 'runner-surface'),
     'choice-list'
+  );
+  assert.equal(
+    getHandoffItemValue(handoffView, 'renderer-surface-count'),
+    '7 surfaces'
+  );
+  assert.equal(
+    getHandoffItemValue(handoffView, 'renderer-dispatch-boundary'),
+    'Template-driven'
   );
   assert.equal(getHandoffItemValue(handoffView, 'runner-title'), 'Quiz');
   assert.equal(getHandoffItemValue(handoffView, 'runtime-items'), '1 items');
@@ -94,11 +102,43 @@ test('student runtime interaction handoff exposes 20 safe choice-list slices', (
     'Single answer change'
   );
   assert.equal(
+    getHandoffItemValue(handoffView, 'submission-payload-boundary'),
+    'Shared answer rows'
+  );
+  assert.equal(
     getHandoffItemValue(handoffView, 'selection-scope'),
     'Per-item answer'
   );
   assert.equal(getHandoffItemValue(handoffView, 'review-feedback'), 'Hidden');
+  assert.equal(
+    getHandoffItemValue(handoffView, 'review-item-count'),
+    '0 review items'
+  );
+  assert.equal(
+    getHandoffItemValue(handoffView, 'feedback-data-boundary'),
+    'Review summary only'
+  );
   assert.equal(getHandoffItemValue(handoffView, 'disabled-state'), 'Enabled');
+  assert.equal(
+    getHandoffItemValue(handoffView, 'public-payload-boundary'),
+    'Sanitized runtime'
+  );
+  assert.equal(
+    getHandoffItemValue(handoffView, 'runtime-id-boundary'),
+    'Ids hidden'
+  );
+  assert.equal(
+    getHandoffItemValue(handoffView, 'prompt-text-boundary'),
+    'Prompts omitted'
+  );
+  assert.equal(
+    getHandoffItemValue(handoffView, 'choice-text-boundary'),
+    'Choice text omitted'
+  );
+  assert.equal(
+    getHandoffItemValue(handoffView, 'answer-text-boundary'),
+    'Answers omitted'
+  );
   assert.equal(
     getHandoffItemValue(handoffView, 'privacy-guard'),
     'Private data omitted'
@@ -120,6 +160,17 @@ test('student runtime interaction handoff preserves listening language and revie
     ],
     language: '中文',
     revealAnswer: true,
+    reviewItems: [
+      {
+        acceptedAnswers: [SECRET_ANSWER_TEXT],
+        correct: false,
+        correctAnswer: SECRET_ANSWER_TEXT,
+        explanation: 'Teacher-only explanation text.',
+        itemId: SECRET_RUNTIME_ITEM_ID,
+        submitted: true,
+        submittedAnswer: SECRET_ANSWER_TEXT,
+      },
+    ],
     templateType: 'listening',
   }).interactionHandoffView;
 
@@ -139,6 +190,10 @@ test('student runtime interaction handoff preserves listening language and revie
     'Sequential item focus'
   );
   assert.equal(getHandoffItemValue(handoffView, 'review-feedback'), 'Visible');
+  assert.equal(
+    getHandoffItemValue(handoffView, 'review-item-count'),
+    '1 review item'
+  );
   assert.equal(getHandoffItemValue(handoffView, 'disabled-state'), 'Disabled');
 
   assertNoPrivateInteractionText(JSON.stringify(handoffView));

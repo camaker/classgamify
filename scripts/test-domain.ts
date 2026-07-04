@@ -12671,6 +12671,8 @@ assert.deepEqual(
   [
     'template-type',
     'runner-surface',
+    'renderer-surface-count',
+    'renderer-dispatch-boundary',
     'runner-title',
     'runtime-items',
     'runtime-kind-summary',
@@ -12685,12 +12687,20 @@ assert.deepEqual(
     'matching-pairs-renderer',
     'answer-contract',
     'answer-change-contract',
+    'submission-payload-boundary',
     'selection-scope',
     'review-feedback',
+    'review-item-count',
+    'feedback-data-boundary',
     'disabled-state',
+    'public-payload-boundary',
+    'runtime-id-boundary',
+    'prompt-text-boundary',
+    'choice-text-boundary',
+    'answer-text-boundary',
     'privacy-guard',
   ],
-  'Student runtime interaction handoff should expose exactly 20 stable slice ids.'
+  'Student runtime interaction handoff should expose exactly 30 stable slice ids.'
 );
 assert.match(
   studentRuntimeItemListDomainSource,
@@ -12704,8 +12714,8 @@ assert.match(
 );
 assert.match(
   studentRuntimeItemListDomainSource,
-  /buildStudentRuntimeInteractionHandoffView\(\{[\s\S]*disabled,[\s\S]*items,[\s\S]*language,[\s\S]*revealAnswer,[\s\S]*runnerCopy,[\s\S]*surface,[\s\S]*templateType,/,
-  'Student runtime item-list domain should compose interaction handoff state from renderer dispatch, language, disabled, and review inputs.'
+  /buildStudentRuntimeInteractionHandoffView\(\{[\s\S]*disabled,[\s\S]*items,[\s\S]*language,[\s\S]*revealAnswer,[\s\S]*reviewItems,[\s\S]*runnerCopy,[\s\S]*surface,[\s\S]*templateType,/,
+  'Student runtime item-list domain should compose interaction handoff state from renderer dispatch, language, disabled, review items, and review inputs.'
 );
 assert.match(
   studentRuntimeItemListDomainSource,
@@ -12714,8 +12724,13 @@ assert.match(
 );
 assert.match(
   studentRuntimeItemListDomainSource,
-  /getTemplateByType\(templateType\)\.name[\s\S]*normalizeListeningSpeechLanguage\(language\)[\s\S]*formatStudentRuntimeAnswerChangeContract\(surface\)[\s\S]*formatStudentRuntimeSelectionScope\(surface\)/,
-  'Student runtime interaction handoff should derive template, listening language, answer-update, and selection-scope semantics from shared helpers.'
+  /getTemplateByType\(templateType\)\.name[\s\S]*STUDENT_RUNTIME_RENDERER_SURFACES[\s\S]*normalizeListeningSpeechLanguage\(language\)[\s\S]*formatStudentRuntimeAnswerChangeContract\(surface\)[\s\S]*formatStudentRuntimeSelectionScope\(surface\)[\s\S]*formatStudentRuntimeReviewItemCount\(reviewItems\)/,
+  'Student runtime interaction handoff should derive template, renderer-count, listening language, answer-update, selection-scope, and review-count semantics from shared helpers.'
+);
+assert.match(
+  studentRuntimeItemListSource,
+  /StudentRuntimeInteractionHandoffView[\s\S]*data-handoff="student-runtime-interaction"[\s\S]*view\.itemViews\.map[\s\S]*data-handoff-item=\{item\.id\}[\s\S]*<output aria-label=\{item\.ariaLabel\}>/,
+  'Student runtime item-list component should render hidden stable runtime-interaction handoff outputs from the prepared view.'
 );
 assert.match(
   studentRuntimeItemListSource,
@@ -15159,7 +15174,7 @@ const quizRuntimeInteractionHandoffValues = new Map(
 assert.deepEqual(
   quizRuntimeInteractionHandoffView.itemViews.map((item) => item.id),
   [...STUDENT_RUNTIME_INTERACTION_HANDOFF_ITEM_IDS],
-  'Student runtime interaction handoff should expose the stable 20 slice order.'
+  'Student runtime interaction handoff should expose the stable 30 slice order.'
 );
 assert.deepEqual(quizRuntimeInteractionHandoffView.privacy, {
   exposesAnswerText: false,
@@ -15178,12 +15193,24 @@ assert.equal(
   'choice-list'
 );
 assert.equal(
+  quizRuntimeInteractionHandoffValues.get('renderer-surface-count'),
+  '7 surfaces'
+);
+assert.equal(
+  quizRuntimeInteractionHandoffValues.get('renderer-dispatch-boundary'),
+  'Template-driven'
+);
+assert.equal(
   quizRuntimeInteractionHandoffValues.get('choice-count'),
   '2 choices'
 );
 assert.equal(
   quizRuntimeInteractionHandoffValues.get('answer-contract'),
   '{ itemId, answer }'
+);
+assert.equal(
+  quizRuntimeInteractionHandoffValues.get('submission-payload-boundary'),
+  'Shared answer rows'
 );
 assert.equal(
   quizRuntimeInteractionHandoffValues.get('choice-list-renderer'),
@@ -15196,6 +15223,34 @@ assert.equal(
 assert.equal(
   quizRuntimeInteractionHandoffValues.get('review-feedback'),
   'Hidden'
+);
+assert.equal(
+  quizRuntimeInteractionHandoffValues.get('review-item-count'),
+  '0 review items'
+);
+assert.equal(
+  quizRuntimeInteractionHandoffValues.get('feedback-data-boundary'),
+  'Review summary only'
+);
+assert.equal(
+  quizRuntimeInteractionHandoffValues.get('public-payload-boundary'),
+  'Sanitized runtime'
+);
+assert.equal(
+  quizRuntimeInteractionHandoffValues.get('runtime-id-boundary'),
+  'Ids hidden'
+);
+assert.equal(
+  quizRuntimeInteractionHandoffValues.get('prompt-text-boundary'),
+  'Prompts omitted'
+);
+assert.equal(
+  quizRuntimeInteractionHandoffValues.get('choice-text-boundary'),
+  'Choice text omitted'
+);
+assert.equal(
+  quizRuntimeInteractionHandoffValues.get('answer-text-boundary'),
+  'Answers omitted'
 );
 assert.equal(
   quizRuntimeInteractionHandoffValues.get('privacy-guard'),
@@ -15217,6 +15272,11 @@ assert.equal(
   JSON.stringify(quizRuntimeInteractionHandoffView).includes('q-1'),
   false,
   'Student runtime interaction handoff should not expose runtime item ids.'
+);
+assert.match(
+  e2eTestCatalogText,
+  /Student runtime interaction exposes a 30-slice handoff[\s\S]*student-runtime-interaction[\s\S]*renderer dispatch boundary[\s\S]*prompt\/choice\/answer text boundaries/,
+  'E2E catalog should cover the hidden 30-slice student runtime interaction handoff contract.'
 );
 const listeningRuntimeInteractionHandoffView =
   buildStudentRuntimeItemListView({

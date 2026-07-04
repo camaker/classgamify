@@ -11,7 +11,10 @@ import type {
   PublicAttemptReviewItem,
   PublicRuntimeItem,
 } from '@/assignments/public';
-import { normalizeRuntimeChoiceList } from '@/assignments/runtime-display';
+import {
+  normalizeRuntimeChoiceList,
+  normalizeRuntimeDisplayCount,
+} from '@/assignments/runtime-display';
 import {
   buildDefaultRuntimeItemCardViews,
   type DefaultRuntimeItemCardView,
@@ -27,10 +30,21 @@ export type { StudentAnswerChange };
 export type StudentRuntimeItemListSurface = ActivityTemplateRunnerKind;
 
 const STUDENT_RUNTIME_ANSWER_CONTRACT_VALUE = '{ itemId, answer }';
+const STUDENT_RUNTIME_RENDERER_SURFACES = [
+  'choice-list',
+  'line-match',
+  'fill-blank',
+  'open-box',
+  'listening',
+  'group-sort',
+  'matching-pairs',
+] satisfies StudentRuntimeItemListSurface[];
 
 export const STUDENT_RUNTIME_INTERACTION_HANDOFF_ITEM_IDS = [
   'template-type',
   'runner-surface',
+  'renderer-surface-count',
+  'renderer-dispatch-boundary',
   'runner-title',
   'runtime-items',
   'runtime-kind-summary',
@@ -45,9 +59,17 @@ export const STUDENT_RUNTIME_INTERACTION_HANDOFF_ITEM_IDS = [
   'matching-pairs-renderer',
   'answer-contract',
   'answer-change-contract',
+  'submission-payload-boundary',
   'selection-scope',
   'review-feedback',
+  'review-item-count',
+  'feedback-data-boundary',
   'disabled-state',
+  'public-payload-boundary',
+  'runtime-id-boundary',
+  'prompt-text-boundary',
+  'choice-text-boundary',
+  'answer-text-boundary',
   'privacy-guard',
 ] as const;
 
@@ -123,6 +145,7 @@ export function buildStudentRuntimeItemListView({
       items,
       language,
       revealAnswer,
+      reviewItems,
       runnerCopy,
       surface,
       templateType,
@@ -137,6 +160,7 @@ export function buildStudentRuntimeInteractionHandoffView({
   items,
   language,
   revealAnswer = false,
+  reviewItems,
   runnerCopy,
   surface,
   templateType,
@@ -145,6 +169,7 @@ export function buildStudentRuntimeInteractionHandoffView({
   items: PublicRuntimeItem[];
   language?: string;
   revealAnswer?: boolean;
+  reviewItems?: PublicAttemptReviewItem[];
   runnerCopy: ActivityRunnerCopy;
   surface: StudentRuntimeItemListSurface;
   templateType: ActivityTemplateType;
@@ -157,6 +182,7 @@ export function buildStudentRuntimeInteractionHandoffView({
         items,
         language,
         revealAnswer,
+        reviewItems,
         runnerCopy,
         surface,
         templateType,
@@ -192,6 +218,7 @@ function buildStudentRuntimeInteractionHandoffItem({
   items,
   language,
   revealAnswer,
+  reviewItems,
   runnerCopy,
   surface,
   templateType,
@@ -201,6 +228,7 @@ function buildStudentRuntimeInteractionHandoffItem({
   items: PublicRuntimeItem[];
   language?: string;
   revealAnswer: boolean;
+  reviewItems?: PublicAttemptReviewItem[];
   runnerCopy: ActivityRunnerCopy;
   surface: StudentRuntimeItemListSurface;
   templateType: ActivityTemplateType;
@@ -220,6 +248,31 @@ function buildStudentRuntimeInteractionHandoffItem({
       id,
       label: m.student_runtime_interaction_handoff_surface_label(),
       value: surface,
+    };
+  }
+
+  if (id === 'renderer-surface-count') {
+    return {
+      description:
+        m.student_runtime_interaction_handoff_renderer_surface_count_description(),
+      id,
+      label:
+        m.student_runtime_interaction_handoff_renderer_surface_count_label(),
+      value: m.student_runtime_interaction_handoff_renderer_surface_count_value(
+        {
+          count: STUDENT_RUNTIME_RENDERER_SURFACES.length,
+        }
+      ),
+    };
+  }
+
+  if (id === 'renderer-dispatch-boundary') {
+    return {
+      description:
+        m.student_runtime_interaction_handoff_renderer_dispatch_description(),
+      id,
+      label: m.student_runtime_interaction_handoff_renderer_dispatch_label(),
+      value: m.student_runtime_interaction_handoff_renderer_dispatch_value(),
     };
   }
 
@@ -375,6 +428,16 @@ function buildStudentRuntimeInteractionHandoffItem({
     };
   }
 
+  if (id === 'submission-payload-boundary') {
+    return {
+      description:
+        m.student_runtime_interaction_handoff_submission_payload_description(),
+      id,
+      label: m.student_runtime_interaction_handoff_submission_payload_label(),
+      value: m.student_runtime_interaction_handoff_submission_payload_value(),
+    };
+  }
+
   if (id === 'selection-scope') {
     return {
       description:
@@ -397,6 +460,26 @@ function buildStudentRuntimeInteractionHandoffItem({
     };
   }
 
+  if (id === 'review-item-count') {
+    return {
+      description:
+        m.student_runtime_interaction_handoff_review_item_count_description(),
+      id,
+      label: m.student_runtime_interaction_handoff_review_item_count_label(),
+      value: formatStudentRuntimeReviewItemCount(reviewItems),
+    };
+  }
+
+  if (id === 'feedback-data-boundary') {
+    return {
+      description:
+        m.student_runtime_interaction_handoff_feedback_data_description(),
+      id,
+      label: m.student_runtime_interaction_handoff_feedback_data_label(),
+      value: m.student_runtime_interaction_handoff_feedback_data_value(),
+    };
+  }
+
   if (id === 'disabled-state') {
     return {
       description: m.student_runtime_interaction_handoff_disabled_description(),
@@ -405,6 +488,56 @@ function buildStudentRuntimeInteractionHandoffItem({
       value: disabled
         ? m.student_runtime_interaction_handoff_disabled_value()
         : m.student_runtime_interaction_handoff_enabled_value(),
+    };
+  }
+
+  if (id === 'public-payload-boundary') {
+    return {
+      description:
+        m.student_runtime_interaction_handoff_public_payload_description(),
+      id,
+      label: m.student_runtime_interaction_handoff_public_payload_label(),
+      value: m.student_runtime_interaction_handoff_public_payload_value(),
+    };
+  }
+
+  if (id === 'runtime-id-boundary') {
+    return {
+      description:
+        m.student_runtime_interaction_handoff_runtime_id_boundary_description(),
+      id,
+      label: m.student_runtime_interaction_handoff_runtime_id_boundary_label(),
+      value: m.student_runtime_interaction_handoff_runtime_id_boundary_value(),
+    };
+  }
+
+  if (id === 'prompt-text-boundary') {
+    return {
+      description:
+        m.student_runtime_interaction_handoff_prompt_text_boundary_description(),
+      id,
+      label: m.student_runtime_interaction_handoff_prompt_text_boundary_label(),
+      value: m.student_runtime_interaction_handoff_prompt_text_boundary_value(),
+    };
+  }
+
+  if (id === 'choice-text-boundary') {
+    return {
+      description:
+        m.student_runtime_interaction_handoff_choice_text_boundary_description(),
+      id,
+      label: m.student_runtime_interaction_handoff_choice_text_boundary_label(),
+      value: m.student_runtime_interaction_handoff_choice_text_boundary_value(),
+    };
+  }
+
+  if (id === 'answer-text-boundary') {
+    return {
+      description:
+        m.student_runtime_interaction_handoff_answer_text_boundary_description(),
+      id,
+      label: m.student_runtime_interaction_handoff_answer_text_boundary_label(),
+      value: m.student_runtime_interaction_handoff_answer_text_boundary_value(),
     };
   }
 
@@ -489,6 +622,24 @@ function countStudentRuntimeChoices(items: PublicRuntimeItem[]) {
     normalizeRuntimeChoiceList(items.flatMap((item) => item.choices ?? []))
       ?.length ?? 0
   );
+}
+
+function formatStudentRuntimeReviewItemCount(
+  reviewItems: PublicAttemptReviewItem[] | undefined
+) {
+  const count = normalizeRuntimeDisplayCount(reviewItems?.length ?? 0, {
+    min: 0,
+  });
+
+  if (count === 1) {
+    return m.student_runtime_interaction_handoff_review_item_count_one({
+      count,
+    });
+  }
+
+  return m.student_runtime_interaction_handoff_review_item_count_many({
+    count,
+  });
 }
 
 function formatStudentRuntimeKindSummary(items: PublicRuntimeItem[]) {

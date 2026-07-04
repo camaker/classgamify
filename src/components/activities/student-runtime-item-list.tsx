@@ -7,6 +7,7 @@ import {
   buildStudentRuntimeItemListView,
   buildStudentRuntimeSingleAnswerChanges,
   type StudentAnswerChange,
+  type StudentRuntimeInteractionHandoffView,
 } from '@/assignments/student-runtime-item-list';
 import type { RuntimeChoiceButtonView } from '@/assignments/student-runner-view';
 import { PublicAnswerFeedback } from '@/components/activities/public-answer-feedback';
@@ -19,6 +20,7 @@ import { OpenBoxRunner } from '@/components/activities/open-box-runner';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { cn } from '@/lib/utils';
+import type { ReactNode } from 'react';
 
 type StudentRuntimeItemListProps = {
   answers: Record<string, string>;
@@ -62,121 +64,196 @@ export function StudentRuntimeItemList({
 
   if (listView.surface === 'line-match') {
     return (
-      <div className="mt-4">
-        <LineMatchBoard
-          answers={answers}
-          disabled={disabled}
-          items={items}
-          revealAnswer={revealAnswer}
-          reviewItems={reviewItems}
-          onAnswerChanges={onAnswerChanges}
-        />
-      </div>
+      <StudentRuntimeInteractionRegion
+        handoffView={listView.interactionHandoffView}
+      >
+        <div className="mt-4">
+          <LineMatchBoard
+            answers={answers}
+            disabled={disabled}
+            items={items}
+            revealAnswer={revealAnswer}
+            reviewItems={reviewItems}
+            onAnswerChanges={onAnswerChanges}
+          />
+        </div>
+      </StudentRuntimeInteractionRegion>
     );
   }
 
   if (listView.surface === 'matching-pairs') {
     return (
-      <div className="mt-4">
-        <MatchingPairsBoard
-          answers={answers}
-          disabled={disabled}
-          items={items}
-          revealAnswer={revealAnswer}
-          reviewItems={reviewItems}
-          onAnswerChanges={onAnswerChanges}
-        />
-      </div>
+      <StudentRuntimeInteractionRegion
+        handoffView={listView.interactionHandoffView}
+      >
+        <div className="mt-4">
+          <MatchingPairsBoard
+            answers={answers}
+            disabled={disabled}
+            items={items}
+            revealAnswer={revealAnswer}
+            reviewItems={reviewItems}
+            onAnswerChanges={onAnswerChanges}
+          />
+        </div>
+      </StudentRuntimeInteractionRegion>
     );
   }
 
   if (listView.surface === 'group-sort') {
     return (
-      <div className="mt-4">
-        <GroupSortBoard
-          answers={answers}
-          disabled={disabled}
-          items={items}
-          revealAnswer={revealAnswer}
-          reviewItems={reviewItems}
-          onAnswerChange={handleSingleAnswerChange}
-        />
-      </div>
+      <StudentRuntimeInteractionRegion
+        handoffView={listView.interactionHandoffView}
+      >
+        <div className="mt-4">
+          <GroupSortBoard
+            answers={answers}
+            disabled={disabled}
+            items={items}
+            revealAnswer={revealAnswer}
+            reviewItems={reviewItems}
+            onAnswerChange={handleSingleAnswerChange}
+          />
+        </div>
+      </StudentRuntimeInteractionRegion>
     );
   }
 
   if (listView.surface === 'fill-blank') {
     return (
-      <div className="mt-4">
-        <FillBlankWorksheet
-          answers={answers}
-          disabled={disabled}
-          items={items}
-          revealAnswer={revealAnswer}
-          reviewItems={reviewItems}
-          onAnswerChange={handleSingleAnswerChange}
-        />
-      </div>
+      <StudentRuntimeInteractionRegion
+        handoffView={listView.interactionHandoffView}
+      >
+        <div className="mt-4">
+          <FillBlankWorksheet
+            answers={answers}
+            disabled={disabled}
+            items={items}
+            revealAnswer={revealAnswer}
+            reviewItems={reviewItems}
+            onAnswerChange={handleSingleAnswerChange}
+          />
+        </div>
+      </StudentRuntimeInteractionRegion>
     );
   }
 
   if (listView.surface === 'open-box') {
     return (
-      <div className="mt-4">
-        <OpenBoxRunner
-          answers={answers}
-          disabled={disabled}
-          items={items}
-          revealAnswer={revealAnswer}
-          reviewItems={reviewItems}
-          onAnswerChange={handleSingleAnswerChange}
-        />
-      </div>
+      <StudentRuntimeInteractionRegion
+        handoffView={listView.interactionHandoffView}
+      >
+        <div className="mt-4">
+          <OpenBoxRunner
+            answers={answers}
+            disabled={disabled}
+            items={items}
+            revealAnswer={revealAnswer}
+            reviewItems={reviewItems}
+            onAnswerChange={handleSingleAnswerChange}
+          />
+        </div>
+      </StudentRuntimeInteractionRegion>
     );
   }
 
   if (listView.surface === 'listening') {
     return (
-      <div className="mt-4">
-        <ListeningRunner
-          answers={answers}
-          disabled={disabled}
-          items={items}
-          language={language}
-          revealAnswer={revealAnswer}
-          reviewItems={reviewItems}
-          onAnswerChange={handleSingleAnswerChange}
-        />
-      </div>
+      <StudentRuntimeInteractionRegion
+        handoffView={listView.interactionHandoffView}
+      >
+        <div className="mt-4">
+          <ListeningRunner
+            answers={answers}
+            disabled={disabled}
+            items={items}
+            language={language}
+            revealAnswer={revealAnswer}
+            reviewItems={reviewItems}
+            onAnswerChange={handleSingleAnswerChange}
+          />
+        </div>
+      </StudentRuntimeInteractionRegion>
     );
   }
 
   if (listView.surface === 'choice-list') {
     return (
-      <div className="mt-4 grid gap-3">
-        {listView.defaultItemCardViews.map((itemView) => (
-          <RuntimeItemCard
-            key={itemView.item.id}
-            answer={itemView.answer}
-            choiceViews={itemView.choiceViews}
-            correctAnswerLabel={itemView.correctAnswerLabel}
-            disabled={disabled}
-            inputPlaceholder={itemView.inputPlaceholder}
-            kindLabel={itemView.kindLabel}
-            positionLabel={itemView.positionLabel}
-            reviewItem={itemView.reviewItem}
-            revealAnswer={revealAnswer}
-            showChoices={itemView.showChoices}
-            onAnswerChange={(answer) =>
-              handleSingleAnswerChange(itemView.item.id, answer)
-            }
-          />
-        ))}
-      </div>
+      <StudentRuntimeInteractionRegion
+        handoffView={listView.interactionHandoffView}
+      >
+        <div className="mt-4 grid gap-3">
+          {listView.defaultItemCardViews.map((itemView) => (
+            <RuntimeItemCard
+              key={itemView.item.id}
+              answer={itemView.answer}
+              choiceViews={itemView.choiceViews}
+              correctAnswerLabel={itemView.correctAnswerLabel}
+              disabled={disabled}
+              inputPlaceholder={itemView.inputPlaceholder}
+              kindLabel={itemView.kindLabel}
+              positionLabel={itemView.positionLabel}
+              reviewItem={itemView.reviewItem}
+              revealAnswer={revealAnswer}
+              showChoices={itemView.showChoices}
+              onAnswerChange={(answer) =>
+                handleSingleAnswerChange(itemView.item.id, answer)
+              }
+            />
+          ))}
+        </div>
+      </StudentRuntimeInteractionRegion>
     );
   }
 
   return assertUnhandledStudentRuntimeItemListSurface(listView.surface);
+}
+
+function StudentRuntimeInteractionRegion({
+  children,
+  handoffView,
+}: {
+  children: ReactNode;
+  handoffView: StudentRuntimeInteractionHandoffView;
+}) {
+  return (
+    <>
+      <StudentRuntimeInteractionHandoff view={handoffView} />
+      {children}
+    </>
+  );
+}
+
+function StudentRuntimeInteractionHandoff({
+  view,
+}: {
+  view: StudentRuntimeInteractionHandoffView;
+}) {
+  const titleId = 'student-runtime-interaction-handoff-title';
+  const descriptionId = 'student-runtime-interaction-handoff-description';
+
+  return (
+    <section
+      aria-describedby={descriptionId}
+      aria-labelledby={titleId}
+      className="sr-only"
+      data-handoff="student-runtime-interaction"
+    >
+      <h2 id={titleId}>{view.title}</h2>
+      <p id={descriptionId}>{view.description}</p>
+      <dl>
+        {view.itemViews.map((item) => (
+          <div data-handoff-item={item.id} key={item.id}>
+            <dt>{item.label}</dt>
+            <dd>
+              <output aria-label={item.ariaLabel}>{item.value}</output>
+              <span>{item.description}</span>
+            </dd>
+          </div>
+        ))}
+      </dl>
+    </section>
+  );
 }
 
 function assertUnhandledStudentRuntimeItemListSurface(surface: never): never {
