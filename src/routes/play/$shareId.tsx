@@ -296,6 +296,7 @@ function PlayPage() {
       <div className="mx-auto max-w-6xl space-y-8 pb-16">
         <StudentRunnerHeaderCard
           badgeLabel={runnerPageView.routeBadgeLabel}
+          startHandoffView={runnerPageView.startHandoffView}
           view={runnerRouteState.headerView}
         />
         {publicAccessHandoffView ? (

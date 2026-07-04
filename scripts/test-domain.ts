@@ -12971,8 +12971,8 @@ assert.match(
 );
 assert.match(
   playRouteSource,
-  /StudentRunnerHeaderCard[\s\S]*badgeLabel=\{runnerPageView\.routeBadgeLabel\}[\s\S]*view=\{runnerRouteState\.headerView\}/,
-  'Student play route should delegate student assignment header rendering.'
+  /StudentRunnerHeaderCard[\s\S]*badgeLabel=\{runnerPageView\.routeBadgeLabel\}[\s\S]*startHandoffView=\{runnerPageView\.startHandoffView\}[\s\S]*view=\{runnerRouteState\.headerView\}/,
+  'Student play route should delegate student assignment header rendering and start handoff output.'
 );
 assert.match(
   playRouteSource,
@@ -13090,8 +13090,8 @@ assert.match(
 );
 assert.match(
   studentRunnerStateSource,
-  /export const STUDENT_RUNNER_START_HANDOFF_ITEM_IDS = \[(?=[\s\S]*'share-link')(?=[\s\S]*'assignment-title')(?=[\s\S]*'runner-source')(?=[\s\S]*'runtime-availability')(?=[\s\S]*'rule-status')(?=[\s\S]*'item-count')(?=[\s\S]*'attempt-limit')(?=[\s\S]*'timer-policy')(?=[\s\S]*'close-time')(?=[\s\S]*'identity-mode')(?=[\s\S]*'review-behavior')(?=[\s\S]*'item-order')(?=[\s\S]*'instructions')(?=[\s\S]*'prepare-review-rules')(?=[\s\S]*'prepare-identity')(?=[\s\S]*'prepare-timer')(?=[\s\S]*'prepare-submit')(?=[\s\S]*'browser-label')(?=[\s\S]*'teacher-action')(?=[\s\S]*'privacy-guard')[\s\S]*export type StudentRunnerStartHandoffPrivacyContract = \{[\s\S]*exposesAnonymousToken: false;[\s\S]*exposesAnswerText: false;[\s\S]*exposesRuntimeChoiceText: false;[\s\S]*exposesRuntimeItemIds: false;[\s\S]*exposesRuntimePromptText: false;[\s\S]*exposesStudentName: false;[\s\S]*exposesTeacherOnlyAnswers: false;[\s\S]*exposesTeacherSourceMaterials: false;/,
-  'Student runner start handoff should expose a typed 20-slice contract with explicit privacy flags.'
+  /export const STUDENT_RUNNER_START_HANDOFF_ITEM_IDS = \[(?=[\s\S]*'share-link')(?=[\s\S]*'assignment-title')(?=[\s\S]*'runner-source')(?=[\s\S]*'source-boundary')(?=[\s\S]*'runtime-availability')(?=[\s\S]*'submit-gate')(?=[\s\S]*'read-only-state')(?=[\s\S]*'rule-status')(?=[\s\S]*'rule-count')(?=[\s\S]*'item-count')(?=[\s\S]*'attempt-limit')(?=[\s\S]*'timer-policy')(?=[\s\S]*'timer-start-boundary')(?=[\s\S]*'close-time')(?=[\s\S]*'identity-mode')(?=[\s\S]*'identity-privacy')(?=[\s\S]*'review-behavior')(?=[\s\S]*'item-order')(?=[\s\S]*'instructions')(?=[\s\S]*'prepare-review-rules')(?=[\s\S]*'prepare-identity')(?=[\s\S]*'prepare-timer')(?=[\s\S]*'prepare-submit')(?=[\s\S]*'prepare-step-count')(?=[\s\S]*'browser-label')(?=[\s\S]*'teacher-action')(?=[\s\S]*'runtime-content-guard')(?=[\s\S]*'answer-key-guard')(?=[\s\S]*'student-data-guard')(?=[\s\S]*'privacy-guard')[\s\S]*export type StudentRunnerStartHandoffPrivacyContract = \{[\s\S]*exposesAnonymousToken: false;[\s\S]*exposesAnswerText: false;[\s\S]*exposesRuntimeChoiceText: false;[\s\S]*exposesRuntimeItemIds: false;[\s\S]*exposesRuntimePromptText: false;[\s\S]*exposesStudentName: false;[\s\S]*exposesTeacherOnlyAnswers: false;[\s\S]*exposesTeacherSourceMaterials: false;/,
+  'Student runner start handoff should expose a typed 30-slice contract with explicit privacy flags.'
 );
 assert.match(
   studentRunnerStateSource,
@@ -13100,8 +13100,8 @@ assert.match(
 );
 assert.match(
   studentRunnerStateSource,
-  /export function buildStudentRunnerStartHandoffView(?=[\s\S]*STUDENT_RUNNER_START_HANDOFF_ITEM_IDS\.map)(?=[\s\S]*buildStudentRunnerStartHandoffItem)(?=[\s\S]*headerView\.ruleSummaryView)(?=[\s\S]*headerView\.prepareView)(?=[\s\S]*identityView)(?=[\s\S]*privacy: buildStudentRunnerStartHandoffPrivacyContract)[\s\S]*id === 'item-count'[\s\S]*id === 'attempt-limit'[\s\S]*id === 'timer-policy'[\s\S]*id === 'identity-mode'[\s\S]*id === 'browser-label'[\s\S]*student_runner_start_handoff_privacy_description/,
-  'Student runner start handoff should collect compact rules, prepare steps, identity setup, runtime availability, and privacy slices from domain views.'
+  /export function buildStudentRunnerStartHandoffView(?=[\s\S]*STUDENT_RUNNER_START_HANDOFF_ITEM_IDS\.map)(?=[\s\S]*buildStudentRunnerStartHandoffItem)(?=[\s\S]*headerView\.ruleSummaryView)(?=[\s\S]*headerView\.prepareView)(?=[\s\S]*identityView)(?=[\s\S]*privacy: buildStudentRunnerStartHandoffPrivacyContract)[\s\S]*id === 'source-boundary'[\s\S]*id === 'submit-gate'[\s\S]*id === 'read-only-state'[\s\S]*id === 'rule-count'[\s\S]*id === 'item-count'[\s\S]*id === 'attempt-limit'[\s\S]*id === 'timer-policy'[\s\S]*id === 'timer-start-boundary'[\s\S]*id === 'identity-mode'[\s\S]*id === 'identity-privacy'[\s\S]*id === 'browser-label'[\s\S]*id === 'runtime-content-guard'[\s\S]*id === 'answer-key-guard'[\s\S]*id === 'student-data-guard'[\s\S]*student_runner_start_handoff_privacy_description/,
+  'Student runner start handoff should collect compact rules, prepare steps, identity setup, runtime availability, submit boundaries, and privacy slices from domain views.'
 );
 assert.doesNotMatch(
   studentRunnerStateSource,
@@ -13256,6 +13256,11 @@ assert.match(
   studentRunnerHeaderCardSource,
   /StudentRunnerHeaderView[\s\S]*StudentRunnerTeacherAction[\s\S]*StudentRunnerPrepareView[\s\S]*StudentRunnerInstructionView/,
   'Student runner header card should consume explicit assignment-domain header sub-view contracts.'
+);
+assert.match(
+  studentRunnerHeaderCardSource,
+  /StudentRunnerStartHandoffView[\s\S]*startHandoffView\?: StudentRunnerStartHandoffView[\s\S]*data-handoff="student-runner-start"[\s\S]*data-handoff-item=\{item\.id\}/,
+  'Student runner header card should render the prepared start handoff as hidden semantic output.'
 );
 assert.match(
   studentRunnerHeaderCardSource,
@@ -25228,23 +25233,43 @@ assert.deepEqual(
   [
     getStudentRunnerStartHandoffValue('share-link'),
     getStudentRunnerStartHandoffValue('runner-source'),
+    getStudentRunnerStartHandoffValue('source-boundary'),
     getStudentRunnerStartHandoffValue('runtime-availability'),
+    getStudentRunnerStartHandoffValue('submit-gate'),
+    getStudentRunnerStartHandoffValue('read-only-state'),
     getStudentRunnerStartHandoffValue('rule-status'),
+    getStudentRunnerStartHandoffValue('rule-count'),
     getStudentRunnerStartHandoffValue('attempt-limit'),
     getStudentRunnerStartHandoffValue('timer-policy'),
+    getStudentRunnerStartHandoffValue('timer-start-boundary'),
     getStudentRunnerStartHandoffValue('identity-mode'),
+    getStudentRunnerStartHandoffValue('identity-privacy'),
     getStudentRunnerStartHandoffValue('review-behavior'),
+    getStudentRunnerStartHandoffValue('prepare-step-count'),
+    getStudentRunnerStartHandoffValue('runtime-content-guard'),
+    getStudentRunnerStartHandoffValue('answer-key-guard'),
+    getStudentRunnerStartHandoffValue('student-data-guard'),
     getStudentRunnerStartHandoffValue('privacy-guard'),
   ],
   [
     'share-public',
     'Public assignment',
+    'Public assignment',
     'Ready to submit',
+    'Ready to submit',
+    'Submittable',
     'Attempt limit',
+    '7 rules',
     '2 max',
     'No timer',
+    'No timer',
     'Anonymous',
+    'Token hidden',
     'After submit',
+    '4 steps',
+    'Prompts and choices omitted',
+    'Answer keys hidden',
+    'Student data omitted',
     'Private data omitted',
   ]
 );

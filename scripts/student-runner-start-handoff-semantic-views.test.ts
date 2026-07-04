@@ -19,7 +19,7 @@ const SECRET_PROMPT_TEXT = 'SECRET_PROMPT_TEXT';
 const SECRET_STUDENT_NAME = 'Student Private Name';
 const SECRET_TOKEN = 'raw-anonymous-token-value';
 
-test('student runner start handoff exposes 20 safe public-start slices', () => {
+test('student runner start handoff exposes 30 safe public-start slices', () => {
   const starterPreview = buildStudentRunnerStarterPreview(
     STARTER_FOOD_ASSIGNMENT_SHARE_ID
   );
@@ -50,7 +50,7 @@ test('student runner start handoff exposes 20 safe public-start slices', () => {
   const itemIds = handoffView.itemViews.map((item) => item.id);
 
   assert.deepEqual(itemIds, [...STUDENT_RUNNER_START_HANDOFF_ITEM_IDS]);
-  assert.equal(new Set(itemIds).size, 20);
+  assert.equal(new Set(itemIds).size, 30);
   assert.equal(
     handoffView.itemViews.every(
       (item) =>
@@ -92,15 +92,36 @@ test('student runner start handoff exposes 20 safe public-start slices', () => {
     'Public assignment'
   );
   assert.equal(
+    getHandoffItemValue(handoffView, 'source-boundary'),
+    'Public assignment'
+  );
+  assert.equal(
     getHandoffItemValue(handoffView, 'runtime-availability'),
     'Ready to submit'
   );
+  assert.equal(
+    getHandoffItemValue(handoffView, 'submit-gate'),
+    'Ready to submit'
+  );
+  assert.equal(
+    getHandoffItemValue(handoffView, 'read-only-state'),
+    'Submittable'
+  );
   assert.equal(getHandoffItemValue(handoffView, 'rule-status'), 'Timer on');
+  assert.equal(getHandoffItemValue(handoffView, 'rule-count'), '7 rules');
   assert.match(getHandoffItemValue(handoffView, 'item-count'), /\d+ items/);
   assert.equal(getHandoffItemValue(handoffView, 'attempt-limit'), '2 max');
   assert.equal(getHandoffItemValue(handoffView, 'timer-policy'), '2 min');
+  assert.equal(
+    getHandoffItemValue(handoffView, 'timer-start-boundary'),
+    'After load'
+  );
   assert.equal(getHandoffItemValue(handoffView, 'close-time'), 'No close time');
   assert.equal(getHandoffItemValue(handoffView, 'identity-mode'), 'Anonymous');
+  assert.equal(
+    getHandoffItemValue(handoffView, 'identity-privacy'),
+    'Token hidden'
+  );
   assert.equal(getHandoffItemValue(handoffView, 'review-behavior'), 'Hidden');
   assert.equal(getHandoffItemValue(handoffView, 'item-order'), 'Shuffled');
   assert.equal(
@@ -114,6 +135,10 @@ test('student runner start handoff exposes 20 safe public-start slices', () => {
   assert.equal(getHandoffItemValue(handoffView, 'prepare-identity'), 'Ready');
   assert.equal(getHandoffItemValue(handoffView, 'prepare-timer'), 'Ready');
   assert.equal(getHandoffItemValue(handoffView, 'prepare-submit'), 'Ready');
+  assert.equal(
+    getHandoffItemValue(handoffView, 'prepare-step-count'),
+    '4 steps'
+  );
   assert.match(
     getHandoffItemValue(handoffView, 'browser-label'),
     /^Anonymous browser [A-Z0-9]{6}$/
@@ -121,6 +146,18 @@ test('student runner start handoff exposes 20 safe public-start slices', () => {
   assert.equal(
     getHandoffItemValue(handoffView, 'teacher-action'),
     'Teacher results'
+  );
+  assert.equal(
+    getHandoffItemValue(handoffView, 'runtime-content-guard'),
+    'Prompts and choices omitted'
+  );
+  assert.equal(
+    getHandoffItemValue(handoffView, 'answer-key-guard'),
+    'Answer keys hidden'
+  );
+  assert.equal(
+    getHandoffItemValue(handoffView, 'student-data-guard'),
+    'Student data omitted'
   );
   assert.equal(
     getHandoffItemValue(handoffView, 'privacy-guard'),
@@ -174,10 +211,32 @@ test('student runner start handoff marks starter previews as read-only', () => {
     'Starter preview'
   );
   assert.equal(
+    getHandoffItemValue(handoffView, 'source-boundary'),
+    'Starter preview'
+  );
+  assert.equal(
     getHandoffItemValue(handoffView, 'runtime-availability'),
     'Preview only'
   );
+  assert.equal(getHandoffItemValue(handoffView, 'submit-gate'), 'Preview only');
+  assert.equal(
+    getHandoffItemValue(handoffView, 'read-only-state'),
+    'Read-only'
+  );
+  assert.equal(getHandoffItemValue(handoffView, 'rule-count'), '7 rules');
+  assert.equal(
+    getHandoffItemValue(handoffView, 'prepare-step-count'),
+    '4 steps'
+  );
+  assert.equal(
+    getHandoffItemValue(handoffView, 'timer-start-boundary'),
+    'No timer'
+  );
   assert.equal(getHandoffItemValue(handoffView, 'identity-mode'), 'Names');
+  assert.equal(
+    getHandoffItemValue(handoffView, 'identity-privacy'),
+    'Name withheld'
+  );
   assert.equal(
     getHandoffItemValue(handoffView, 'browser-label'),
     'Student name entry'
@@ -189,6 +248,18 @@ test('student runner start handoff marks starter previews as read-only', () => {
   assert.equal(
     getHandoffItemValue(handoffView, 'teacher-action'),
     'Create activity'
+  );
+  assert.equal(
+    getHandoffItemValue(handoffView, 'runtime-content-guard'),
+    'Prompts and choices omitted'
+  );
+  assert.equal(
+    getHandoffItemValue(handoffView, 'answer-key-guard'),
+    'Answer keys hidden'
+  );
+  assert.equal(
+    getHandoffItemValue(handoffView, 'student-data-guard'),
+    'Student data omitted'
   );
   assertNoPrivateStartText(JSON.stringify(handoffView));
 });

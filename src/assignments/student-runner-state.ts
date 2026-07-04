@@ -307,13 +307,19 @@ export const STUDENT_RUNNER_START_HANDOFF_ITEM_IDS = [
   'share-link',
   'assignment-title',
   'runner-source',
+  'source-boundary',
   'runtime-availability',
+  'submit-gate',
+  'read-only-state',
   'rule-status',
+  'rule-count',
   'item-count',
   'attempt-limit',
   'timer-policy',
+  'timer-start-boundary',
   'close-time',
   'identity-mode',
+  'identity-privacy',
   'review-behavior',
   'item-order',
   'instructions',
@@ -321,8 +327,12 @@ export const STUDENT_RUNNER_START_HANDOFF_ITEM_IDS = [
   'prepare-identity',
   'prepare-timer',
   'prepare-submit',
+  'prepare-step-count',
   'browser-label',
   'teacher-action',
+  'runtime-content-guard',
+  'answer-key-guard',
+  'student-data-guard',
   'privacy-guard',
 ] as const;
 
@@ -1350,6 +1360,15 @@ function buildStudentRunnerStartHandoffItem({
     };
   }
 
+  if (id === 'source-boundary') {
+    return {
+      description: m.student_runner_start_handoff_source_boundary_description(),
+      id,
+      label: m.student_runner_start_handoff_source_boundary_label(),
+      value: formatStudentRunnerStartHandoffSource(source),
+    };
+  }
+
   if (id === 'runtime-availability') {
     return {
       description: m.student_runner_start_handoff_runtime_description(),
@@ -1362,12 +1381,44 @@ function buildStudentRunnerStartHandoffItem({
     };
   }
 
+  if (id === 'submit-gate') {
+    return {
+      description: m.student_runner_start_handoff_submit_gate_description(),
+      id,
+      label: m.student_runner_start_handoff_submit_gate_label(),
+      value: formatStudentRunnerStartRuntimeAvailability({
+        canSubmit,
+        source,
+      }),
+    };
+  }
+
+  if (id === 'read-only-state') {
+    return {
+      description: m.student_runner_start_handoff_read_only_description(),
+      id,
+      label: m.student_runner_start_handoff_read_only_label(),
+      value: formatStudentRunnerStartReadOnlyState({ canSubmit, source }),
+    };
+  }
+
   if (id === 'rule-status') {
     return {
       description: headerView.ruleSummaryView.status.description,
       id,
       label: m.student_runner_start_handoff_rule_status_label(),
       value: headerView.ruleSummaryView.status.label,
+    };
+  }
+
+  if (id === 'rule-count') {
+    return {
+      description: m.student_runner_start_handoff_rule_count_description(),
+      id,
+      label: m.student_runner_start_handoff_rule_count_label(),
+      value: m.student_runner_start_handoff_rule_count_value({
+        count: headerView.ruleSummaryView.summary.ruleCount,
+      }),
     };
   }
 
@@ -1383,12 +1434,33 @@ function buildStudentRunnerStartHandoffItem({
     return buildStudentRunnerStartRuleHandoffItem(headerView, id, 'timer');
   }
 
+  if (id === 'timer-start-boundary') {
+    return {
+      description: m.student_runner_start_handoff_timer_start_description(),
+      id,
+      label: m.student_runner_start_handoff_timer_start_label(),
+      value: headerView.ruleSummaryView.summary.hasTimer
+        ? m.student_runner_start_handoff_timer_start_after_load_value()
+        : m.student_runner_start_handoff_timer_start_no_timer_value(),
+    };
+  }
+
   if (id === 'close-time') {
     return buildStudentRunnerStartRuleHandoffItem(headerView, id, 'closes');
   }
 
   if (id === 'identity-mode') {
     return buildStudentRunnerStartRuleHandoffItem(headerView, id, 'identity');
+  }
+
+  if (id === 'identity-privacy') {
+    return {
+      description:
+        m.student_runner_start_handoff_identity_privacy_description(),
+      id,
+      label: m.student_runner_start_handoff_identity_privacy_label(),
+      value: formatStudentRunnerStartIdentityPrivacy(identityView),
+    };
   }
 
   if (id === 'review-behavior') {
@@ -1446,6 +1518,17 @@ function buildStudentRunnerStartHandoffItem({
     return buildStudentRunnerStartPrepareHandoffItem(headerView, id, 'submit');
   }
 
+  if (id === 'prepare-step-count') {
+    return {
+      description: m.student_runner_start_handoff_prepare_count_description(),
+      id,
+      label: m.student_runner_start_handoff_prepare_count_label(),
+      value: m.student_runner_start_handoff_prepare_count_value({
+        count: headerView.prepareView.stepViews.length,
+      }),
+    };
+  }
+
   if (id === 'browser-label') {
     return buildStudentRunnerStartBrowserLabelItem(identityView);
   }
@@ -1456,6 +1539,33 @@ function buildStudentRunnerStartHandoffItem({
       id,
       label: m.student_runner_start_handoff_teacher_action_label(),
       value: headerView.teacherAction.label,
+    };
+  }
+
+  if (id === 'runtime-content-guard') {
+    return {
+      description: m.student_runner_start_handoff_runtime_content_description(),
+      id,
+      label: m.student_runner_start_handoff_runtime_content_label(),
+      value: m.student_runner_start_handoff_runtime_content_value(),
+    };
+  }
+
+  if (id === 'answer-key-guard') {
+    return {
+      description: m.student_runner_start_handoff_answer_key_description(),
+      id,
+      label: m.student_runner_start_handoff_answer_key_label(),
+      value: m.student_runner_start_handoff_answer_key_value(),
+    };
+  }
+
+  if (id === 'student-data-guard') {
+    return {
+      description: m.student_runner_start_handoff_student_data_description(),
+      id,
+      label: m.student_runner_start_handoff_student_data_label(),
+      value: m.student_runner_start_handoff_student_data_value(),
     };
   }
 
@@ -1606,6 +1716,24 @@ function formatStudentRunnerStartHandoffSource(
   return m.public_assignment_access_handoff_missing_value();
 }
 
+function formatStudentRunnerStartReadOnlyState({
+  canSubmit,
+  source,
+}: {
+  canSubmit: boolean;
+  source?: StudentRunnerReadyStateSource;
+}) {
+  if (canSubmit) {
+    return m.student_runner_start_handoff_read_only_submittable_value();
+  }
+
+  if (source === 'starter-preview') {
+    return m.student_runner_start_handoff_read_only_preview_value();
+  }
+
+  return m.student_runner_start_handoff_read_only_blocked_value();
+}
+
 function formatStudentRunnerStartRuntimeAvailability({
   canSubmit,
   source,
@@ -1622,6 +1750,20 @@ function formatStudentRunnerStartRuntimeAvailability({
   }
 
   return m.student_runner_start_handoff_runtime_blocked_value();
+}
+
+function formatStudentRunnerStartIdentityPrivacy(
+  identityView?: StudentRunnerIdentityView
+) {
+  if (identityView?.mode === 'anonymous') {
+    return m.student_runner_start_handoff_identity_privacy_token_hidden_value();
+  }
+
+  if (identityView?.mode === 'student-name') {
+    return m.student_runner_start_handoff_identity_privacy_name_withheld_value();
+  }
+
+  return m.student_runner_start_handoff_identity_privacy_omitted_value();
 }
 
 function buildStudentRunnerIdentityView({
