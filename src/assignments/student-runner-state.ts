@@ -42,7 +42,11 @@ import {
   type AttemptCompletionSummary,
   type StudentAttemptProgressView,
   type StudentAttemptControlState,
+  type StudentAttemptFeedbackScopeMetricKey,
+  type StudentAttemptFeedbackScopeMetricView,
   type StudentAttemptFeedbackScopeView,
+  type StudentAttemptReviewSummaryMetricKey,
+  type StudentAttemptReviewSummaryMetricView,
   type StudentAttemptReviewSummaryView,
   type StudentAttemptResultDisplay,
   type StudentAttemptResultNextStepsView,
@@ -255,9 +259,19 @@ export type StudentRunnerSubmissionHandoffItemId =
   | 'attempt-clock'
   | 'result-status'
   | 'score-summary'
+  | 'result-accuracy'
+  | 'attempt-usage'
+  | 'retry-availability'
   | 'review-summary'
+  | 'review-submitted'
+  | 'review-needs-review'
+  | 'review-unanswered'
   | 'feedback-scope'
-  | 'next-steps';
+  | 'feedback-visibility'
+  | 'feedback-items'
+  | 'feedback-detail-evidence'
+  | 'next-steps'
+  | 'privacy-guard';
 
 export type StudentRunnerSubmissionHandoffItemView = {
   ariaLabel: string;
@@ -275,9 +289,11 @@ export type StudentRunnerSubmissionHandoffPrivacyContract = {
   exposesStudentName: false;
   exposesTeacherOnlyAnswers: false;
   exposesTeacherSourceMaterials: false;
+  feedbackMetricKeys: StudentAttemptFeedbackScopeMetricKey[];
   itemIds: StudentRunnerSubmissionHandoffItemId[];
   payloadMetricKeys: StudentRunnerSubmissionPayloadSummaryMetricKey[];
   readinessItemIds: StudentRunnerSubmitReadinessItemId[];
+  reviewMetricKeys: StudentAttemptReviewSummaryMetricKey[];
 };
 
 export type StudentRunnerSubmissionHandoffView = {
@@ -2196,6 +2212,34 @@ export function buildStudentRunnerSubmissionHandoffView({
     submitReadinessView,
     'submission-state'
   );
+  const reviewSubmittedMetric = getStudentRunnerReviewSummaryMetric(
+    resultPanelView,
+    'submitted'
+  );
+  const reviewNeedsReviewMetric = getStudentRunnerReviewSummaryMetric(
+    resultPanelView,
+    'needs-review'
+  );
+  const reviewUnansweredMetric = getStudentRunnerReviewSummaryMetric(
+    resultPanelView,
+    'unanswered'
+  );
+  const feedbackVisibilityMetric = getStudentRunnerFeedbackScopeMetric(
+    resultPanelView,
+    'visibility'
+  );
+  const feedbackItemsMetric = getStudentRunnerFeedbackScopeMetric(
+    resultPanelView,
+    'item-feedback'
+  );
+  const feedbackAlternativesMetric = getStudentRunnerFeedbackScopeMetric(
+    resultPanelView,
+    'accepted-alternatives'
+  );
+  const feedbackExplanationsMetric = getStudentRunnerFeedbackScopeMetric(
+    resultPanelView,
+    'explanations'
+  );
   const itemViews: StudentRunnerSubmissionHandoffItemView[] = [
     buildStudentRunnerSubmissionHandoffItemView({
       description: shareMetric.description,
@@ -2313,6 +2357,35 @@ export function buildStudentRunnerSubmissionHandoffView({
     }),
     buildStudentRunnerSubmissionHandoffItemView({
       description: resultPanelView.show
+        ? resultPanelView.scoreAriaLabel
+        : m.student_runner_submission_handoff_result_pending_description(),
+      id: 'result-accuracy',
+      label: m.student_runner_submission_handoff_result_accuracy_label(),
+      value: resultPanelView.show
+        ? resultPanelView.accuracyLabel
+        : m.student_runner_submission_handoff_not_submitted_value(),
+    }),
+    buildStudentRunnerSubmissionHandoffItemView({
+      description: resultPanelView.show
+        ? m.student_runner_submission_handoff_attempt_usage_description()
+        : m.student_runner_submission_handoff_attempt_usage_pending_description(),
+      id: 'attempt-usage',
+      label: m.assignment_delivery_label_attempts(),
+      value:
+        resultPanelView.show && resultPanelView.attemptUsageLabel
+          ? resultPanelView.attemptUsageLabel
+          : m.student_runner_submission_handoff_not_submitted_value(),
+    }),
+    buildStudentRunnerSubmissionHandoffItemView({
+      description: resultPanelView.show
+        ? resultPanelView.startAnotherAttemptDescription
+        : m.student_runner_submission_handoff_retry_pending_description(),
+      id: 'retry-availability',
+      label: m.student_runner_start_another_attempt(),
+      value: formatStudentRunnerRetryAvailability(resultPanelView),
+    }),
+    buildStudentRunnerSubmissionHandoffItemView({
+      description: resultPanelView.show
         ? resultPanelView.reviewSummaryView.description
         : getStudentRunnerCopy().resultNextStepReviewScore,
       id: 'review-summary',
@@ -2322,6 +2395,24 @@ export function buildStudentRunnerSubmissionHandoffView({
             resultPanelView.reviewSummaryView.metrics
           )
         : getStudentRunnerCopy().reviewSummaryReviewHiddenValue,
+    }),
+    buildStudentRunnerSubmissionHandoffItemView({
+      description: reviewSubmittedMetric.description,
+      id: 'review-submitted',
+      label: reviewSubmittedMetric.label,
+      value: reviewSubmittedMetric.value,
+    }),
+    buildStudentRunnerSubmissionHandoffItemView({
+      description: reviewNeedsReviewMetric.description,
+      id: 'review-needs-review',
+      label: reviewNeedsReviewMetric.label,
+      value: reviewNeedsReviewMetric.value,
+    }),
+    buildStudentRunnerSubmissionHandoffItemView({
+      description: reviewUnansweredMetric.description,
+      id: 'review-unanswered',
+      label: reviewUnansweredMetric.label,
+      value: reviewUnansweredMetric.value,
     }),
     buildStudentRunnerSubmissionHandoffItemView({
       description: resultPanelView.show
@@ -2334,6 +2425,31 @@ export function buildStudentRunnerSubmissionHandoffView({
         : getStudentRunnerCopy().reviewSummaryReviewHiddenValue,
     }),
     buildStudentRunnerSubmissionHandoffItemView({
+      description: feedbackVisibilityMetric.description,
+      id: 'feedback-visibility',
+      label: feedbackVisibilityMetric.label,
+      value: feedbackVisibilityMetric.value,
+    }),
+    buildStudentRunnerSubmissionHandoffItemView({
+      description: feedbackItemsMetric.description,
+      id: 'feedback-items',
+      label: feedbackItemsMetric.label,
+      value: feedbackItemsMetric.value,
+    }),
+    buildStudentRunnerSubmissionHandoffItemView({
+      description:
+        m.student_runner_submission_handoff_feedback_detail_evidence_description(),
+      id: 'feedback-detail-evidence',
+      label:
+        m.student_runner_submission_handoff_feedback_detail_evidence_label(),
+      value: m.student_runner_submission_handoff_feedback_detail_evidence_value(
+        {
+          alternatives: feedbackAlternativesMetric.value,
+          explanations: feedbackExplanationsMetric.value,
+        }
+      ),
+    }),
+    buildStudentRunnerSubmissionHandoffItemView({
       description: getStudentRunnerResultHandoffDescription(resultPanelView),
       id: 'next-steps',
       label: getStudentRunnerCopy().resultNextStepsTitle,
@@ -2343,6 +2459,12 @@ export function buildStudentRunnerSubmissionHandoffView({
           )
         : getStudentRunnerCopy().resultNextStepReviewScore,
     }),
+    buildStudentRunnerSubmissionHandoffItemView({
+      description: m.student_runner_submission_handoff_privacy_description(),
+      id: 'privacy-guard',
+      label: m.student_runner_submission_handoff_privacy_label(),
+      value: m.student_runner_submission_handoff_private_data_omitted_value(),
+    }),
   ];
 
   return {
@@ -2351,6 +2473,7 @@ export function buildStudentRunnerSubmissionHandoffView({
     privacy: buildStudentRunnerSubmissionHandoffPrivacyContract({
       itemViews,
       payloadSummaryView,
+      resultPanelView,
       submitReadinessView,
     }),
     title: m.student_runner_attempt_region_label(),
@@ -2529,6 +2652,156 @@ function getStudentRunnerResultHandoffDescription(
     : getStudentRunnerCopy().resultNextStepReviewScore;
 }
 
+function formatStudentRunnerRetryAvailability(
+  resultPanelView: StudentRunnerResultPanelView
+) {
+  if (!resultPanelView.show) {
+    return m.student_runner_submission_handoff_not_submitted_value();
+  }
+
+  return resultPanelView.showStartAnotherAttempt
+    ? m.student_runner_submission_handoff_retry_available_value()
+    : m.student_runner_submission_handoff_retry_unavailable_value();
+}
+
+function getStudentRunnerReviewSummaryMetric(
+  resultPanelView: StudentRunnerResultPanelView,
+  key: StudentAttemptReviewSummaryMetricKey
+): StudentAttemptReviewSummaryMetricView {
+  if (resultPanelView.show) {
+    const metric = resultPanelView.reviewSummaryView.metrics.find(
+      (reviewMetric) => reviewMetric.key === key
+    );
+    if (metric) return metric;
+  }
+
+  return buildStudentRunnerReviewSummaryMetricFallback(key);
+}
+
+function buildStudentRunnerReviewSummaryMetricFallback(
+  key: StudentAttemptReviewSummaryMetricKey
+): StudentAttemptReviewSummaryMetricView {
+  const fallback = m.student_runner_submission_handoff_not_submitted_value();
+
+  if (key === 'needs-review') {
+    return {
+      ariaLabel: m.student_runner_review_summary_metric_aria({
+        description: getStudentRunnerCopy().reviewSummaryNeedsReviewDescription,
+        label: getStudentRunnerCopy().reviewSummaryNeedsReviewLabel,
+        value: fallback,
+      }),
+      description: getStudentRunnerCopy().reviewSummaryNeedsReviewDescription,
+      key,
+      label: getStudentRunnerCopy().reviewSummaryNeedsReviewLabel,
+      value: fallback,
+    };
+  }
+
+  if (key === 'unanswered') {
+    return {
+      ariaLabel: m.student_runner_review_summary_metric_aria({
+        description: getStudentRunnerCopy().reviewSummaryUnansweredDescription,
+        label: getStudentRunnerCopy().reviewSummaryUnansweredLabel,
+        value: fallback,
+      }),
+      description: getStudentRunnerCopy().reviewSummaryUnansweredDescription,
+      key,
+      label: getStudentRunnerCopy().reviewSummaryUnansweredLabel,
+      value: fallback,
+    };
+  }
+
+  return {
+    ariaLabel: m.student_runner_review_summary_metric_aria({
+      description: getStudentRunnerCopy().reviewSummarySubmittedDescription,
+      label: getStudentRunnerCopy().reviewSummarySubmittedLabel,
+      value: fallback,
+    }),
+    description: getStudentRunnerCopy().reviewSummarySubmittedDescription,
+    key,
+    label: getStudentRunnerCopy().reviewSummarySubmittedLabel,
+    value: fallback,
+  };
+}
+
+function getStudentRunnerFeedbackScopeMetric(
+  resultPanelView: StudentRunnerResultPanelView,
+  key: StudentAttemptFeedbackScopeMetricKey
+): StudentAttemptFeedbackScopeMetricView {
+  if (resultPanelView.show) {
+    const metric = resultPanelView.feedbackScopeView.metrics.find(
+      (feedbackMetric) => feedbackMetric.key === key
+    );
+    if (metric) return metric;
+  }
+
+  return buildStudentRunnerFeedbackScopeMetricFallback(key);
+}
+
+function buildStudentRunnerFeedbackScopeMetricFallback(
+  key: StudentAttemptFeedbackScopeMetricKey
+): StudentAttemptFeedbackScopeMetricView {
+  const fallback = m.student_runner_submission_handoff_not_submitted_value();
+
+  if (key === 'item-feedback') {
+    return {
+      ariaLabel: m.student_runner_feedback_scope_metric_aria({
+        description: m.student_runner_feedback_scope_items_hidden_description(),
+        label: m.student_runner_feedback_scope_items_label(),
+        value: fallback,
+      }),
+      description: m.student_runner_feedback_scope_items_hidden_description(),
+      key,
+      label: m.student_runner_feedback_scope_items_label(),
+      value: fallback,
+    };
+  }
+
+  if (key === 'accepted-alternatives') {
+    return {
+      ariaLabel: m.student_runner_feedback_scope_metric_aria({
+        description:
+          m.student_runner_feedback_scope_accepted_alternatives_description(),
+        label: m.student_runner_feedback_scope_accepted_alternatives_label(),
+        value: fallback,
+      }),
+      description:
+        m.student_runner_feedback_scope_accepted_alternatives_description(),
+      key,
+      label: m.student_runner_feedback_scope_accepted_alternatives_label(),
+      value: fallback,
+    };
+  }
+
+  if (key === 'explanations') {
+    return {
+      ariaLabel: m.student_runner_feedback_scope_metric_aria({
+        description: m.student_runner_feedback_scope_explanations_description(),
+        label: m.student_runner_feedback_scope_explanations_label(),
+        value: fallback,
+      }),
+      description: m.student_runner_feedback_scope_explanations_description(),
+      key,
+      label: m.student_runner_feedback_scope_explanations_label(),
+      value: fallback,
+    };
+  }
+
+  return {
+    ariaLabel: m.student_runner_feedback_scope_metric_aria({
+      description:
+        m.student_runner_feedback_scope_visibility_hidden_description(),
+      label: m.student_runner_feedback_scope_visibility_label(),
+      value: fallback,
+    }),
+    description:
+      m.student_runner_feedback_scope_visibility_hidden_description(),
+    key,
+    label: m.student_runner_feedback_scope_visibility_label(),
+    value: fallback,
+  };
+}
+
 function getStudentRunnerSubmissionPayloadMetric(
   payloadSummaryView: StudentRunnerSubmissionPayloadSummaryView,
   key: StudentRunnerSubmissionPayloadSummaryMetricKey
@@ -2623,10 +2896,12 @@ function buildStudentRunnerSubmissionHandoffItemView({
 function buildStudentRunnerSubmissionHandoffPrivacyContract({
   itemViews,
   payloadSummaryView,
+  resultPanelView,
   submitReadinessView,
 }: {
   itemViews: StudentRunnerSubmissionHandoffItemView[];
   payloadSummaryView: StudentRunnerSubmissionPayloadSummaryView;
+  resultPanelView: StudentRunnerResultPanelView;
   submitReadinessView: StudentRunnerSubmitReadinessView;
 }): StudentRunnerSubmissionHandoffPrivacyContract {
   return {
@@ -2637,9 +2912,15 @@ function buildStudentRunnerSubmissionHandoffPrivacyContract({
     exposesStudentName: false,
     exposesTeacherOnlyAnswers: false,
     exposesTeacherSourceMaterials: false,
+    feedbackMetricKeys: resultPanelView.show
+      ? resultPanelView.feedbackScopeView.metrics.map((metric) => metric.key)
+      : [],
     itemIds: itemViews.map((item) => item.id),
     payloadMetricKeys: payloadSummaryView.metrics.map((metric) => metric.key),
     readinessItemIds: submitReadinessView.items.map((item) => item.id),
+    reviewMetricKeys: resultPanelView.show
+      ? resultPanelView.reviewSummaryView.metrics.map((metric) => metric.key)
+      : [],
   };
 }
 

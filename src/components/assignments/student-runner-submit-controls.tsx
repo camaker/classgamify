@@ -1,4 +1,7 @@
-import type { StudentRunnerControlView } from '@/assignments/student-runner-state';
+import type {
+  StudentRunnerControlView,
+  StudentRunnerSubmissionHandoffView,
+} from '@/assignments/student-runner-state';
 import { Button } from '@/components/ui/button';
 import {
   IconAlertTriangle,
@@ -10,6 +13,7 @@ import {
 type StudentRunnerSubmitControlsProps = {
   controlView: StudentRunnerControlView;
   onSubmit: () => void;
+  submissionHandoffView: StudentRunnerSubmissionHandoffView;
 };
 
 type StudentRunnerSubmitReadinessView =
@@ -20,6 +24,7 @@ type StudentRunnerSubmitReadinessItemView =
 export function StudentRunnerSubmitControls({
   controlView,
   onSubmit,
+  submissionHandoffView,
 }: StudentRunnerSubmitControlsProps) {
   const submitHintIds = controlView.submitHintViews.map((hintView) =>
     buildStudentRunnerSubmitHintId(hintView.id)
@@ -114,6 +119,39 @@ export function StudentRunnerSubmitControls({
           tone={hintView.tone}
         />
       ))}
+      <StudentRunnerSubmissionHandoff view={submissionHandoffView} />
+    </section>
+  );
+}
+
+function StudentRunnerSubmissionHandoff({
+  view,
+}: {
+  view: StudentRunnerSubmissionHandoffView;
+}) {
+  const titleId = 'student-runner-submission-handoff-title';
+  const descriptionId = 'student-runner-submission-handoff-description';
+
+  return (
+    <section
+      aria-describedby={descriptionId}
+      aria-labelledby={titleId}
+      className="sr-only"
+      data-handoff="student-runner-submission"
+    >
+      <h3 id={titleId}>{view.title}</h3>
+      <p id={descriptionId}>{view.description}</p>
+      <dl>
+        {view.itemViews.map((item) => (
+          <div data-handoff-item={item.id} key={item.id}>
+            <dt>{item.label}</dt>
+            <dd>
+              <output aria-label={item.ariaLabel}>{item.value}</output>
+              <span>{item.description}</span>
+            </dd>
+          </div>
+        ))}
+      </dl>
     </section>
   );
 }

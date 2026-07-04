@@ -39,12 +39,22 @@ const EXPECTED_HANDOFF_ITEM_IDS = [
   'attempt-clock',
   'result-status',
   'score-summary',
+  'result-accuracy',
+  'attempt-usage',
+  'retry-availability',
   'review-summary',
+  'review-submitted',
+  'review-needs-review',
+  'review-unanswered',
   'feedback-scope',
+  'feedback-visibility',
+  'feedback-items',
+  'feedback-detail-evidence',
   'next-steps',
+  'privacy-guard',
 ] satisfies StudentRunnerSubmissionHandoffItemId[];
 
-test('student runner submission handoff exposes 20 safe pre-submit slices', () => {
+test('student runner submission handoff exposes 30 safe pre-submit slices', () => {
   const starterPreview = buildStudentRunnerStarterPreview(
     STARTER_FOOD_ASSIGNMENT_SHARE_ID
   );
@@ -77,6 +87,7 @@ test('student runner submission handoff exposes 20 safe pre-submit slices', () =
     pageView.submissionHandoffView.itemViews.map((item) => item.id),
     EXPECTED_HANDOFF_ITEM_IDS
   );
+  assert.equal(pageView.submissionHandoffView.itemViews.length, 30);
   assert.deepEqual(pageView.submissionHandoffView.privacy, {
     exposesAnonymousToken: false,
     exposesAnswerText: false,
@@ -85,6 +96,7 @@ test('student runner submission handoff exposes 20 safe pre-submit slices', () =
     exposesStudentName: false,
     exposesTeacherOnlyAnswers: false,
     exposesTeacherSourceMaterials: false,
+    feedbackMetricKeys: [],
     itemIds: EXPECTED_HANDOFF_ITEM_IDS,
     payloadMetricKeys: ['share-link', 'items', 'answers', 'unanswered'],
     readinessItemIds: [
@@ -94,6 +106,7 @@ test('student runner submission handoff exposes 20 safe pre-submit slices', () =
       'incomplete-confirmation',
       'submission-state',
     ],
+    reviewMetricKeys: [],
   });
   assert.equal(
     getHandoffItemValue(pageView.submissionHandoffView, 'share-link'),
@@ -114,6 +127,37 @@ test('student runner submission handoff exposes 20 safe pre-submit slices', () =
   assert.equal(
     getHandoffItemValue(pageView.submissionHandoffView, 'timer-limit'),
     '2:00'
+  );
+  assert.equal(
+    getHandoffItemValue(pageView.submissionHandoffView, 'result-accuracy'),
+    'Not submitted'
+  );
+  assert.equal(
+    getHandoffItemValue(pageView.submissionHandoffView, 'attempt-usage'),
+    'Not submitted'
+  );
+  assert.equal(
+    getHandoffItemValue(pageView.submissionHandoffView, 'retry-availability'),
+    'Not submitted'
+  );
+  assert.equal(
+    getHandoffItemValue(pageView.submissionHandoffView, 'review-submitted'),
+    'Not submitted'
+  );
+  assert.equal(
+    getHandoffItemValue(pageView.submissionHandoffView, 'feedback-items'),
+    'Not submitted'
+  );
+  assert.equal(
+    getHandoffItemValue(
+      pageView.submissionHandoffView,
+      'feedback-detail-evidence'
+    ),
+    'Alternatives: Not submitted · Explanations: Not submitted'
+  );
+  assert.equal(
+    getHandoffItemValue(pageView.submissionHandoffView, 'privacy-guard'),
+    'Private data omitted'
   );
   assert.equal(
     pageView.submissionHandoffView.itemViews.every((item) =>
@@ -162,6 +206,21 @@ test('student runner submission handoff summarizes safe post-submit review state
     pageView.submissionHandoffView.itemViews.map((item) => item.id),
     EXPECTED_HANDOFF_ITEM_IDS
   );
+  assert.equal(pageView.submissionHandoffView.itemViews.length, 30);
+  assert.deepEqual(pageView.submissionHandoffView.privacy.reviewMetricKeys, [
+    'submitted',
+    'correct',
+    'needs-review',
+    'unanswered',
+  ]);
+  assert.deepEqual(pageView.submissionHandoffView.privacy.feedbackMetricKeys, [
+    'visibility',
+    'item-feedback',
+    'accepted-alternatives',
+    'explanations',
+    'needs-review',
+    'unanswered',
+  ]);
   assert.equal(
     getHandoffItemValue(pageView.submissionHandoffView, 'identity-mode'),
     'student-name'
@@ -175,8 +234,51 @@ test('student runner submission handoff summarizes safe post-submit review state
     `0/${starterPreview.runtimeItems.length}`
   );
   assert.equal(
+    getHandoffItemValue(pageView.submissionHandoffView, 'result-accuracy'),
+    '0% accuracy'
+  );
+  assert.equal(
+    getHandoffItemValue(pageView.submissionHandoffView, 'attempt-usage'),
+    '1 attempt left'
+  );
+  assert.equal(
+    getHandoffItemValue(pageView.submissionHandoffView, 'retry-availability'),
+    'Available'
+  );
+  assert.equal(
     getHandoffItemValue(pageView.submissionHandoffView, 'feedback-scope'),
     'Visible'
+  );
+  assert.equal(
+    getHandoffItemValue(pageView.submissionHandoffView, 'review-submitted'),
+    '1'
+  );
+  assert.equal(
+    getHandoffItemValue(pageView.submissionHandoffView, 'review-needs-review'),
+    '1'
+  );
+  assert.equal(
+    getHandoffItemValue(pageView.submissionHandoffView, 'review-unanswered'),
+    String(starterPreview.runtimeItems.length - 1)
+  );
+  assert.equal(
+    getHandoffItemValue(pageView.submissionHandoffView, 'feedback-visibility'),
+    'Shown'
+  );
+  assert.equal(
+    getHandoffItemValue(pageView.submissionHandoffView, 'feedback-items'),
+    '1'
+  );
+  assert.equal(
+    getHandoffItemValue(
+      pageView.submissionHandoffView,
+      'feedback-detail-evidence'
+    ),
+    'Alternatives: 0 · Explanations: 1'
+  );
+  assert.equal(
+    getHandoffItemValue(pageView.submissionHandoffView, 'privacy-guard'),
+    'Private data omitted'
   );
   assert.match(
     getHandoffItemValue(pageView.submissionHandoffView, 'review-summary'),
