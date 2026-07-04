@@ -300,6 +300,7 @@ import {
   normalizeActivityMaterialReferences,
 } from '@/activities/material-references';
 import {
+  ACTIVITY_LIFECYCLE_HANDOFF_ITEM_IDS,
   ACTIVITY_RESTORED_VISIBILITY,
   activityEditPageCopy,
   assertActivityCanArchive,
@@ -309,6 +310,7 @@ import {
   buildActivityDerivativeActionExecutionPlan,
   buildActivityDerivativeActionGate,
   buildActivityEditAccessView,
+  buildActivityLifecycleHandoffView,
   buildActivityLifecycleActionView,
   buildActivityVisibilityActionExecutionPlan,
   canArchiveActivity,
@@ -30091,6 +30093,11 @@ assert.match(
 );
 assert.match(
   activityLibraryCardComponentSource,
+  /ActivityLibraryLifecycleHandoff[\s\S]*handoff=\{cardDisplayView\.lifecycleHandoffView\}[\s\S]*function ActivityLibraryLifecycleHandoff\([\s\S]*handoff: ActivityLifecycleHandoffView[\s\S]*data-handoff="activity-lifecycle"[\s\S]*handoff\.title[\s\S]*handoff\.description[\s\S]*handoff\.itemViews\.map[\s\S]*ActivityLibraryLifecycleHandoffItem[\s\S]*function ActivityLibraryLifecycleHandoffItem[\s\S]*item: ActivityLifecycleHandoffItemView[\s\S]*data-handoff-item=\{item\.id\}[\s\S]*item\.label[\s\S]*aria-label=\{item\.ariaLabel\}[\s\S]*item\.value[\s\S]*item\.description/,
+  'Activity library card component should render the prepared activity lifecycle handoff as stable hidden semantic output.'
+);
+assert.match(
+  activityLibraryCardComponentSource,
   /function ActivityLibraryCardStatusSummaryEntry[\s\S]*idPrefix: string[\s\S]*item: ActivityLibraryCardStatusSummaryItemView[\s\S]*item\.tone === 'blocked'[\s\S]*item\.tone === 'ready'[\s\S]*const itemId = `\$\{idPrefix\}-status-\$\{item\.id\}`[\s\S]*const labelId = `\$\{itemId\}-label`[\s\S]*const valueId = `\$\{itemId\}-value`[\s\S]*const descriptionId = `\$\{itemId\}-description`[\s\S]*<section[\s\S]*aria-label=\{item\.ariaLabel\}[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*data-tone=\{item\.tone\}[\s\S]*id=\{labelId\}[\s\S]*item\.label[\s\S]*id=\{valueId\}[\s\S]*aria-labelledby=\{`\$\{labelId\} \$\{valueId\}`\}[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*item\.value[\s\S]*id=\{descriptionId\}[\s\S]*item\.description/,
   'Activity library card status summary items should render prepared labels, values, descriptions, aria labels, and tones as stable semantic outputs.'
 );
@@ -36398,6 +36405,100 @@ assert.deepEqual(
     reason: 'not-archived',
     type: 'blocked',
   }
+);
+const activeActivityLifecycleHandoffView = buildActivityLifecycleHandoffView({
+  surface: 'active-library',
+  visibility: 'private',
+});
+assert.deepEqual(
+  activeActivityLifecycleHandoffView.itemViews.map((item) => item.id),
+  [...ACTIVITY_LIFECYCLE_HANDOFF_ITEM_IDS]
+);
+assert.equal(activeActivityLifecycleHandoffView.itemViews.length, 30);
+assert.deepEqual(activeActivityLifecycleHandoffView.privacy, {
+  exposesActivityContentText: false,
+  exposesAssignmentSnapshotContent: false,
+  exposesInternalActivityIds: false,
+  exposesSourceMaterialFileIds: false,
+  exposesSourceMaterialStorageKeys: false,
+  exposesTeacherNotesText: false,
+  itemIds: [...ACTIVITY_LIFECYCLE_HANDOFF_ITEM_IDS],
+  mutatesAssignmentSnapshots: false,
+  scope: 'owner-activity-lifecycle',
+});
+assert.deepEqual(
+  new Map(
+    activeActivityLifecycleHandoffView.itemViews.map((item) => [
+      item.id,
+      item.value,
+    ])
+  ),
+  new Map([
+    ['source-status', 'Private'],
+    ['lifecycle-surface', 'Active library'],
+    ['owner-scope', 'Owner scoped'],
+    ['persisted-source', 'Saved source'],
+    ['default-library-scope', 'Active workspace'],
+    ['archived-library-scope', 'Restore workspace'],
+    ['active-library-visibility', 'Visible'],
+    ['archived-library-visibility', 'Hidden'],
+    ['edit-action', 'Ready'],
+    ['publish-action', 'Ready'],
+    ['duplicate-action', 'Ready'],
+    ['remix-action', 'Ready'],
+    ['archive-action', 'Ready'],
+    ['restore-action', 'Not available'],
+    ['derivative-gate', 'Derivative allowed'],
+    ['restore-before-derive', 'Not required'],
+    ['archive-transition', 'To archived'],
+    ['restore-transition', 'Blocked'],
+    ['restored-visibility', 'Draft'],
+    ['content-retention', 'Content retained'],
+    ['source-material-retention', 'References retained'],
+    ['assignment-snapshot-protection', 'Snapshots unchanged'],
+    ['public-assignment-continuity', 'Existing links unchanged'],
+    ['status-filter-alignment', 'Active filter'],
+    ['server-archive-guard', 'Validated'],
+    ['server-restore-guard', 'Validated'],
+    ['server-derivative-guard', 'Validated'],
+    ['execution-plan', 'archive-or-derive'],
+    ['teacher-next-step', 'Ready for library actions'],
+    ['privacy-guard', 'Private data omitted'],
+  ])
+);
+const archivedActivityLifecycleHandoffValues = new Map(
+  buildActivityLifecycleHandoffView({
+    surface: 'archived-library',
+    visibility: 'archived',
+  }).itemViews.map((item) => [item.id, item.value])
+);
+assert.deepEqual(
+  [
+    archivedActivityLifecycleHandoffValues.get('source-status'),
+    archivedActivityLifecycleHandoffValues.get('active-library-visibility'),
+    archivedActivityLifecycleHandoffValues.get('archived-library-visibility'),
+    archivedActivityLifecycleHandoffValues.get('edit-action'),
+    archivedActivityLifecycleHandoffValues.get('publish-action'),
+    archivedActivityLifecycleHandoffValues.get('duplicate-action'),
+    archivedActivityLifecycleHandoffValues.get('remix-action'),
+    archivedActivityLifecycleHandoffValues.get('archive-action'),
+    archivedActivityLifecycleHandoffValues.get('restore-action'),
+    archivedActivityLifecycleHandoffValues.get('execution-plan'),
+    archivedActivityLifecycleHandoffValues.get('teacher-next-step'),
+  ],
+  [
+    'Archived',
+    'Hidden',
+    'Visible',
+    'Restore required',
+    'Restore required',
+    'Restore required',
+    'Restore required',
+    'Already archived',
+    'Ready',
+    'restore',
+    'Restore before editing',
+  ]
 );
 assert.deepEqual(buildActivityEditAccessView('draft'), {
   actionLabel: 'Edit activity',

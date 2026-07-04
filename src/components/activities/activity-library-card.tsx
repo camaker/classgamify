@@ -22,6 +22,8 @@ import {
 import {
   buildActivityDerivativeActionExecutionPlan,
   buildActivityVisibilityActionExecutionPlan,
+  type ActivityLifecycleHandoffItemView,
+  type ActivityLifecycleHandoffView,
 } from '@/activities/lifecycle';
 import { ActivityLibraryActionStatusBadge } from '@/components/activities/activity-library-action-status-badge';
 import { ActivityLibraryCompatibilityPanel } from '@/components/activities/activity-library-compatibility-panel';
@@ -213,6 +215,9 @@ export function ActivityLibraryCard({
         />
       </CardHeader>
       <CardContent className="space-y-4">
+        <ActivityLibraryLifecycleHandoff
+          handoff={cardDisplayView.lifecycleHandoffView}
+        />
         <section
           aria-label={cardDisplayView.detailsLabel}
           className="space-y-4"
@@ -383,6 +388,48 @@ function ActivityLibrarySourceMaterialEditAction({
     >
       {action.label}
     </Link>
+  );
+}
+
+function ActivityLibraryLifecycleHandoff({
+  handoff,
+}: {
+  handoff: ActivityLifecycleHandoffView;
+}) {
+  const titleId = useId();
+  const descriptionId = useId();
+
+  return (
+    <section
+      aria-describedby={descriptionId}
+      aria-labelledby={titleId}
+      className="sr-only"
+      data-handoff="activity-lifecycle"
+    >
+      <h3 id={titleId}>{handoff.title}</h3>
+      <p id={descriptionId}>{handoff.description}</p>
+      <dl>
+        {handoff.itemViews.map((item) => (
+          <ActivityLibraryLifecycleHandoffItem item={item} key={item.id} />
+        ))}
+      </dl>
+    </section>
+  );
+}
+
+function ActivityLibraryLifecycleHandoffItem({
+  item,
+}: {
+  item: ActivityLifecycleHandoffItemView;
+}) {
+  return (
+    <div data-handoff-item={item.id}>
+      <dt>{item.label}</dt>
+      <dd>
+        <output aria-label={item.ariaLabel}>{item.value}</output>
+        <span>{item.description}</span>
+      </dd>
+    </div>
   );
 }
 

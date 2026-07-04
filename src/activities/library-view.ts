@@ -23,9 +23,12 @@ import {
   canDeriveActivityWork,
   canRestoreActivity,
   type ActivityDerivativeAction,
+  type ActivityLifecycleHandoffSurface,
+  type ActivityLifecycleHandoffView,
   type ActivityLifecycleAction,
   buildActivityLifecycleActionView,
   buildActivityDerivativeActionGate,
+  buildActivityLifecycleHandoffView,
   type ActivityLifecycleActionCopy,
   type ActivityLifecycleActionView,
   getActivityLifecycleActionCopy,
@@ -207,6 +210,7 @@ export type ActivityLibraryCardDisplayView = {
   detailsLabel: string;
   displayDescription: string;
   displayTitle: string;
+  lifecycleHandoffView: ActivityLifecycleHandoffView;
   restoreRequiredLabel: string;
   sourceMaterials: ActivitySourceMaterialSummaryView;
   sourceMaterialsLabel: string;
@@ -1900,6 +1904,11 @@ export function buildActivityLibraryCardDisplayView({
       activityId: activity.id,
       label: activityLibraryCardCopy.actionLabels.edit,
     }),
+    lifecycleHandoffView: buildActivityLifecycleHandoffView({
+      persisted: activity.persisted,
+      surface: getActivityLifecycleHandoffSurface(libraryStatus),
+      visibility: activity.status,
+    }),
     restoreRequiredLabel: m.activity_library_card_restore_required_label({
       title: displayTitle,
     }),
@@ -1928,6 +1937,12 @@ export function buildActivityLibraryCardDisplayView({
     templateName: template.name,
     templateType: template.type,
   };
+}
+
+function getActivityLifecycleHandoffSurface(
+  libraryStatus: ActivityLibraryStatus
+): ActivityLifecycleHandoffSurface {
+  return libraryStatus === 'archived' ? 'archived-library' : 'active-library';
 }
 
 export function buildActivityLibraryCardStatusSummaryView({
