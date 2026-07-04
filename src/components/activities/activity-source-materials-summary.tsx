@@ -3,10 +3,15 @@ import type {
   ActivitySourceMaterialKindBadgeView,
   ActivitySourceMaterialSummaryView,
 } from '@/activities/material-summary';
+import {
+  buildActivitySourceExtractionAssistHandoffView,
+  type ActivitySourceExtractionAssistHandoffItemView,
+  type ActivitySourceExtractionAssistHandoffView,
+} from '@/activities/source-extraction-assist';
 import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
 import { IconPaperclip, IconSparkles } from '@tabler/icons-react';
-import type { ReactNode } from 'react';
+import { useId, type ReactNode } from 'react';
 
 type ActivitySourceMaterialsSummaryProps = {
   actionSlot?: ReactNode;
@@ -22,6 +27,13 @@ export function ActivitySourceMaterialsSummary({
   summary,
 }: ActivitySourceMaterialsSummaryProps) {
   if (!summary.hasMaterials) return null;
+
+  const extractionAssistHandoff =
+    buildActivitySourceExtractionAssistHandoffView({
+      extractableMaterialCount: summary.readiness.extractableCount,
+      extractionActions: summary.extractionActions,
+      sourceKindCounts: summary.kindBadges,
+    });
 
   return (
     <section
@@ -59,6 +71,9 @@ export function ActivitySourceMaterialsSummary({
       {summary.extractionActions.length ? (
         <ActivitySourceMaterialExtractionSummary summary={summary} />
       ) : null}
+      <ActivitySourceExtractionAssistHandoff
+        handoff={extractionAssistHandoff}
+      />
     </section>
   );
 }
@@ -118,6 +133,51 @@ function ActivitySourceMaterialExtractionBadge({
       <p className="mt-0.5 text-muted-foreground text-xs leading-5">
         {action.nextStep.description}
       </p>
+    </div>
+  );
+}
+
+function ActivitySourceExtractionAssistHandoff({
+  handoff,
+}: {
+  handoff: ActivitySourceExtractionAssistHandoffView;
+}) {
+  const titleId = useId();
+  const descriptionId = useId();
+
+  return (
+    <section
+      aria-describedby={descriptionId}
+      aria-labelledby={titleId}
+      className="sr-only"
+      data-handoff="activity-source-extraction-assist"
+    >
+      <h3 id={titleId}>{handoff.title}</h3>
+      <p id={descriptionId}>{handoff.description}</p>
+      <dl>
+        {handoff.itemViews.map((item) => (
+          <ActivitySourceExtractionAssistHandoffItem
+            item={item}
+            key={item.id}
+          />
+        ))}
+      </dl>
+    </section>
+  );
+}
+
+function ActivitySourceExtractionAssistHandoffItem({
+  item,
+}: {
+  item: ActivitySourceExtractionAssistHandoffItemView;
+}) {
+  return (
+    <div data-handoff-item={item.id}>
+      <dt>{item.label}</dt>
+      <dd>
+        <output aria-label={item.ariaLabel}>{item.value}</output>
+        <span>{item.description}</span>
+      </dd>
     </div>
   );
 }
