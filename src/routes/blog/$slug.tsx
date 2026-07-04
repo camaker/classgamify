@@ -1,6 +1,7 @@
 import { Markdown } from '@/components/markdown/markdown';
 import { BlogPostVisual } from '@/components/blog/blog-post-visual';
 import { BlogCtaActionLink } from '@/components/blog/blog-cta-action-link';
+import { PublicEditorialHandoff } from '@/components/blog/public-editorial-handoff';
 import Container from '@/components/layout/container';
 import { Badge } from '@/components/ui/badge';
 import { buttonVariants } from '@/components/ui/button';
@@ -19,6 +20,7 @@ import {
 } from '@/lib/structured-data';
 import { cn } from '@/lib/utils';
 import { buildBlogPostCtaViewModel } from '@/pages/blog-page-view';
+import { buildPublicEditorialHandoffView } from '@/pages/public-editorial-content-view';
 import { IconArrowLeft } from '@tabler/icons-react';
 import { Link, createFileRoute, notFound } from '@tanstack/react-router';
 
@@ -67,6 +69,7 @@ function BlogPostPage() {
   const { post } = Route.useLoaderData();
   if (!post) throw notFound();
   const ctaView = buildBlogPostCtaViewModel();
+  const handoffView = buildPublicEditorialHandoffView();
 
   return (
     <Container className="px-4 py-16">
@@ -120,6 +123,7 @@ function BlogPostPage() {
             </div>
           </div>
         </aside>
+        <PublicEditorialHandoff view={handoffView} />
       </article>
     </Container>
   );
