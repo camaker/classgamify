@@ -473,6 +473,10 @@ import {
 } from '@/payment/payment-status-view';
 import { buildSettingsBillingCardViewModel } from '@/payment/billing-view';
 import {
+  buildSettingsAccountWorkspaceHandoffView,
+  SETTINGS_ACCOUNT_WORKSPACE_HANDOFF_ITEM_IDS,
+} from '@/settings/account-handoff';
+import {
   buildSettingsBillingPageViewModel,
   buildSettingsBillingWorkspaceSummaryView,
   buildSettingsPaymentPageViewModel,
@@ -2037,9 +2041,45 @@ const settingsProfileViewSource = readFileSync(
   'src/settings/profile-view.ts',
   'utf8'
 );
+const settingsAccountHandoffSource = readFileSync(
+  'src/settings/account-handoff.ts',
+  'utf8'
+);
 const profileWorkspaceSummarySource = readFileSync(
   'src/components/settings/profile/profile-workspace-summary.tsx',
   'utf8'
+);
+assert.match(
+  settingsAccountHandoffSource,
+  /export const SETTINGS_ACCOUNT_WORKSPACE_HANDOFF_ITEM_IDS = \[(?=[\s\S]*'account-scope')(?=[\s\S]*'profile-page')(?=[\s\S]*'security-page')(?=[\s\S]*'account-access')(?=[\s\S]*'profile-display-name')(?=[\s\S]*'profile-avatar')(?=[\s\S]*'activity-author-identity')(?=[\s\S]*'assignment-handoff-identity')(?=[\s\S]*'student-recognition')(?=[\s\S]*'result-review-identity')(?=[\s\S]*'credential-login-gate')(?=[\s\S]*'password-card')(?=[\s\S]*'password-update-action')(?=[\s\S]*'password-reset-action')(?=[\s\S]*'account-deletion-gate')(?=[\s\S]*'account-delete-action')(?=[\s\S]*'delete-confirmation-boundary')(?=[\s\S]*'session-boundary')(?=[\s\S]*'owner-scope')(?=[\s\S]*'source-material-boundary')(?=[\s\S]*'assignment-link-boundary')(?=[\s\S]*'student-result-boundary')(?=[\s\S]*'public-runner-boundary')(?=[\s\S]*'auth-provider-boundary')(?=[\s\S]*'email-visibility')(?=[\s\S]*'raw-secret-guard')(?=[\s\S]*'student-token-guard')(?=[\s\S]*'storage-key-guard')(?=[\s\S]*'legacy-copy-guard')(?=[\s\S]*'privacy-guard')/,
+  'Account settings handoff should expose stable 30-slice teacher-account item ids.'
+);
+assert.match(
+  settingsAccountHandoffSource,
+  /export type SettingsAccountWorkspaceHandoffPrivacyContract = \{[\s\S]*changesActivityContent: false;[\s\S]*changesPublicAssignmentLinks: false;[\s\S]*deletesWorkspaceDataWithoutExplicitAction: false;[\s\S]*exposesAuthSecrets: false;[\s\S]*exposesRawAnonymousToken: false;[\s\S]*exposesSourceMaterialStorageKeys: false;[\s\S]*exposesStudentIdentifiers: false;[\s\S]*exposesTeacherEmail: false;[\s\S]*modifiesAssignmentSnapshots: false;[\s\S]*modifiesStudentAttempts: false;[\s\S]*scope: 'teacher-account-settings';/,
+  'Account settings handoff should publish explicit privacy and classroom account behavior flags.'
+);
+const accountSettingsHandoffView = buildSettingsAccountWorkspaceHandoffView({
+  credentialLoginEnabled: true,
+  deleteAccountEnabled: false,
+  page: 'security',
+});
+assert.deepEqual(
+  accountSettingsHandoffView.itemViews.map((item) => item.id),
+  [...SETTINGS_ACCOUNT_WORKSPACE_HANDOFF_ITEM_IDS],
+  'Account settings handoff should preserve the exported item order.'
+);
+assert.equal(
+  accountSettingsHandoffView.itemViews.length,
+  30,
+  'Account settings handoff should expose exactly 30 product/architecture slices.'
+);
+assert.equal(
+  JSON.stringify(accountSettingsHandoffView).includes(
+    'teacher-private@example.test'
+  ),
+  false,
+  'Account settings handoff should not expose teacher email values.'
 );
 assert.match(
   settingsProfileViewSource,
@@ -2055,6 +2095,11 @@ assert.match(
   settingsProfileViewSource,
   /settings_profile_workspace_summary_title[\s\S]*settings_profile_workspace_summary_description[\s\S]*settings_profile_workspace_summary_activities_description[\s\S]*settings_profile_workspace_summary_assignments_description[\s\S]*settings_profile_workspace_summary_student_description[\s\S]*settings_profile_workspace_summary_results_description/,
   'Profile settings view model should prepare localized teacher identity scope copy.'
+);
+assert.match(
+  settingsProfileViewSource,
+  /buildSettingsAccountWorkspaceHandoffView\(\{[\s\S]*page: 'profile'/,
+  'Profile settings view model should attach the account workspace handoff to the summary view.'
 );
 assert.match(
   settingsProfileRouteProductSource,
@@ -2076,9 +2121,14 @@ assert.match(
   /view\.itemViews\.map\(\(itemView\) =>[\s\S]*key=\{itemView\.id\}[\s\S]*itemView\.label[\s\S]*itemView\.description/,
   'Profile workspace summary component should render prepared summary items keyed by stable ids.'
 );
+assert.match(
+  profileWorkspaceSummarySource,
+  /SettingsAccountWorkspaceHandoffItemView[\s\S]*SettingsAccountWorkspaceHandoffView[\s\S]*<AccountWorkspaceHandoff handoffView=\{view\.handoffView\} \/>[\s\S]*function AccountWorkspaceHandoff[\s\S]*handoffView\.description[\s\S]*handoffView\.itemViews\.map[\s\S]*function AccountWorkspaceHandoffItem[\s\S]*<output aria-label=\{itemView\.ariaLabel\}/,
+  'Profile workspace summary component should render prepared account handoff semantic outputs.'
+);
 assert.doesNotMatch(
   profileWorkspaceSummarySource,
-  /Teacher identity scope|Activities|Assignment links|Student recognition|Results|教师身份|活动|作业链接|学生识别|结果/,
+  /Teacher identity scope|Account workspace handoff|Activities|Assignment links|Student recognition|Results|教师身份|账号工作区交接|活动|作业链接|学生识别|结果/,
   'Profile workspace summary component should not hard-code visible profile scope copy.'
 );
 const updatePasswordCardSource = readFileSync(
@@ -2145,6 +2195,11 @@ assert.match(
   'Security settings view model should prepare localized workspace boundary copy.'
 );
 assert.match(
+  settingsSecurityViewSource,
+  /buildSettingsAccountWorkspaceHandoffView\(\{[\s\S]*credentialLoginEnabled[\s\S]*deleteAccountEnabled[\s\S]*page: 'security'/,
+  'Security settings view model should attach the account workspace handoff with config-aware gates.'
+);
+assert.match(
   settingsSecurityRouteProductSource,
   /const pageView = buildSettingsSecurityPageViewModel\(\);[\s\S]*breadcrumbs=\{pageView\.breadcrumbs\}[\s\S]*title=\{pageView\.title\}[\s\S]*description=\{pageView\.description\}/,
   'Security settings route should consume the settings security page view model.'
@@ -2174,9 +2229,14 @@ assert.match(
   /view\.capabilityViews\.map\(\(capabilityView\) =>[\s\S]*key=\{capabilityView\.id\}[\s\S]*function SecurityCapabilityItem[\s\S]*capabilityView\.state[\s\S]*capabilityView\.value[\s\S]*capabilityView\.description/,
   'Security workspace summary component should render prepared capability views keyed by stable ids.'
 );
+assert.match(
+  securityWorkspaceSummarySource,
+  /SettingsAccountWorkspaceHandoffItemView[\s\S]*SettingsAccountWorkspaceHandoffView[\s\S]*<AccountWorkspaceHandoff handoffView=\{view\.handoffView\} \/>[\s\S]*function AccountWorkspaceHandoff[\s\S]*handoffView\.description[\s\S]*handoffView\.itemViews\.map[\s\S]*function AccountWorkspaceHandoffItem[\s\S]*<output aria-label=\{itemView\.ariaLabel\}/,
+  'Security workspace summary component should render prepared account handoff semantic outputs.'
+);
 assert.doesNotMatch(
   securityWorkspaceSummarySource,
-  /Workspace security boundary|Available security controls|Account access|Assignment links|Student results|Email password|Account deletion|工作区安全边界|可用安全控制|账号访问|作业链接|学生结果|邮箱密码|账号删除/,
+  /Workspace security boundary|Account workspace handoff|Available security controls|Account access|Assignment links|Student results|Email password|Account deletion|工作区安全边界|账号工作区交接|可用安全控制|账号访问|作业链接|学生结果|邮箱密码|账号删除/,
   'Security workspace summary component should not hard-code visible security boundary copy.'
 );
 assert.match(
@@ -11780,6 +11840,11 @@ const authWorkspaceBoundaryRequirements = [
       ['auth_workspace_boundary_item_assignment_links_description', /frozen snapshots, instructions, timers/],
       ['auth_workspace_boundary_item_student_results_description', /anonymous browser identities, summaries, exports/],
       ['auth_workspace_boundary_item_source_materials_description', /audio, worksheet images, documents, and spreadsheets/],
+      ['settings_account_handoff_description', /30-slice account settings contract/],
+      ['settings_account_handoff_account_scope_description', /teacher account that owns activities/],
+      ['settings_account_handoff_assignment_link_boundary_description', /do not open, close, rewrite/],
+      ['settings_account_handoff_delete_confirmation_boundary_description', /saved activities, source materials, assignment links/],
+      ['settings_account_handoff_privacy_guard_description', /teacher emails, auth secrets, raw student identifiers/],
       ['settings_profile_workspace_summary_description', /display name and avatar/],
       ['settings_profile_workspace_summary_activities_description', /reusable classroom content/],
       ['settings_profile_workspace_summary_assignments_description', /Published assignment links/],
@@ -11862,6 +11927,11 @@ const authWorkspaceBoundaryRequirements = [
       ['auth_workspace_boundary_item_assignment_links_description', /冻结快照、说明、计时器/],
       ['auth_workspace_boundary_item_student_results_description', /匿名浏览器身份、摘要、导出/],
       ['auth_workspace_boundary_item_source_materials_description', /音频、练习纸图片、文档和表格/],
+      ['settings_account_handoff_description', /30 切片账号设置契约/],
+      ['settings_account_handoff_account_scope_description', /拥有活动、来源素材、作业链接和结果/],
+      ['settings_account_handoff_assignment_link_boundary_description', /不会打开、关闭、改写/],
+      ['settings_account_handoff_delete_confirmation_boundary_description', /已保存活动、来源素材、作业链接/],
+      ['settings_account_handoff_privacy_guard_description', /教师邮箱、认证密钥、原始学生标识/],
       ['settings_profile_workspace_summary_description', /显示名称和头像/],
       ['settings_profile_workspace_summary_activities_description', /可复用课堂内容/],
       ['settings_profile_workspace_summary_assignments_description', /已发布作业链接/],

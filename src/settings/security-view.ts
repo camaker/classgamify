@@ -1,5 +1,9 @@
 import type { DashboardBreadcrumbItem } from '@/components/layout/dashboard-header';
 import { websiteConfig } from '@/config/website';
+import {
+  buildSettingsAccountWorkspaceHandoffView,
+  type SettingsAccountWorkspaceHandoffView,
+} from '@/settings/account-handoff';
 import { m } from '@/locale/paraglide/messages';
 
 export type SettingsSecurityWorkspaceSummaryItemId =
@@ -34,6 +38,7 @@ export type SettingsSecurityWorkspaceSummaryView = {
   capabilityTitle: string;
   capabilityViews: SettingsSecurityCapabilityView[];
   description: string;
+  handoffView: SettingsAccountWorkspaceHandoffView;
   itemViews: SettingsSecurityWorkspaceSummaryItemView[];
   title: string;
 };
@@ -107,6 +112,11 @@ export function buildSettingsSecurityWorkspaceSummaryView({
       }),
     ],
     description,
+    handoffView: buildSettingsAccountWorkspaceHandoffView({
+      credentialLoginEnabled,
+      deleteAccountEnabled,
+      page: 'security',
+    }),
     itemViews: [
       {
         description: m.settings_security_workspace_summary_access_description(),

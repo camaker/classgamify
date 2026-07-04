@@ -1,4 +1,8 @@
 import type {
+  SettingsAccountWorkspaceHandoffItemView,
+  SettingsAccountWorkspaceHandoffView,
+} from '@/settings/account-handoff';
+import type {
   SettingsProfileWorkspaceSummaryItemView,
   SettingsProfileWorkspaceSummaryView,
 } from '@/settings/profile-view';
@@ -25,6 +29,7 @@ export function ProfileWorkspaceSummary({
           <ProfileWorkspaceSummaryItem itemView={itemView} key={itemView.id} />
         ))}
       </ul>
+      <AccountWorkspaceHandoff handoffView={view.handoffView} />
     </section>
   );
 }
@@ -43,5 +48,50 @@ function ProfileWorkspaceSummaryItem({
         {itemView.description}
       </p>
     </li>
+  );
+}
+
+function AccountWorkspaceHandoff({
+  handoffView,
+}: {
+  handoffView: SettingsAccountWorkspaceHandoffView;
+}) {
+  return (
+    <section
+      aria-label={handoffView.title}
+      className="grid gap-3 border-t pt-3"
+    >
+      <div>
+        <h3 className="font-medium text-sm">{handoffView.title}</h3>
+        <p className="mt-1 text-muted-foreground text-sm">
+          {handoffView.description}
+        </p>
+      </div>
+      <dl className="grid gap-2 md:grid-cols-2">
+        {handoffView.itemViews.map((itemView) => (
+          <AccountWorkspaceHandoffItem itemView={itemView} key={itemView.id} />
+        ))}
+      </dl>
+    </section>
+  );
+}
+
+function AccountWorkspaceHandoffItem({
+  itemView,
+}: {
+  itemView: SettingsAccountWorkspaceHandoffItemView;
+}) {
+  return (
+    <div className="rounded-md border bg-background px-3 py-2">
+      <dt className="font-medium text-xs">{itemView.label}</dt>
+      <dd className="mt-1">
+        <output aria-label={itemView.ariaLabel} className="text-sm">
+          {itemView.value}
+        </output>
+        <p className="mt-1 text-muted-foreground text-xs leading-5">
+          {itemView.description}
+        </p>
+      </dd>
+    </div>
   );
 }
