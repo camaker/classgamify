@@ -9,6 +9,7 @@ import {
 import { Analytics } from '@/components/analytics/analytics';
 import { CrispChat } from '@/components/chatbox/crisp-chat';
 import { GoogleOneTapPrompt } from '@/components/auth/google-one-tap-prompt';
+import { ClassroomControlSemanticsHandoff } from '@/components/classroom/classroom-control-semantics-handoff';
 import { ThemeProvider } from '@/components/theme/theme-provider';
 import { Navbar } from '@/components/layout/navbar';
 import { Footer } from '@/components/layout/footer';
@@ -178,6 +179,7 @@ function RootDocument({ children }: { children: React.ReactNode }) {
         <ThemeProvider>
           <TooltipProvider>
             {children}
+            <ClassroomControlSemanticsHandoff />
             <GoogleOneTapPrompt />
             <Toaster richColors position="top-right" offset={64} />
           </TooltipProvider>
