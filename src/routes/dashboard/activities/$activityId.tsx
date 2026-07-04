@@ -1,4 +1,8 @@
-import { buildActivityEditRouteState } from '@/activities/editor';
+import {
+  buildActivityEditRouteHandoffView,
+  buildActivityEditRouteState,
+  type ActivityEditRouteHandoffView,
+} from '@/activities/editor';
 import { ActivityCreateForm } from '@/components/activities/activity-create-form';
 import { DashboardLayout } from '@/components/layout/dashboard-layout';
 import { Button, buttonVariants } from '@/components/ui/button';
@@ -25,6 +29,14 @@ function ActivityEditPage() {
       }),
     [activity, isError, isLoading]
   );
+  const handoffView = useMemo(
+    () =>
+      buildActivityEditRouteHandoffView({
+        activity,
+        routeStatus: routeState.status,
+      }),
+    [activity, routeState.status]
+  );
   const pageView = routeState.pageView;
 
   return (
@@ -44,6 +56,8 @@ function ActivityEditPage() {
           <IconArrowLeft className="size-4" />
           {pageView.backAction.label}
         </Link>
+
+        <ActivityEditRouteHandoff handoffView={handoffView} />
 
         {routeState.status === 'loading' ? (
           <Card className="min-h-96 rounded-lg" />
@@ -81,5 +95,37 @@ function ActivityEditPage() {
         )}
       </div>
     </DashboardLayout>
+  );
+}
+
+function ActivityEditRouteHandoff({
+  handoffView,
+}: {
+  handoffView: ActivityEditRouteHandoffView;
+}) {
+  const titleId = 'activity-edit-route-handoff-title';
+  const descriptionId = 'activity-edit-route-handoff-description';
+
+  return (
+    <section
+      aria-describedby={descriptionId}
+      aria-labelledby={titleId}
+      className="sr-only"
+      data-handoff="activity-edit-route"
+    >
+      <h2 id={titleId}>{handoffView.title}</h2>
+      <p id={descriptionId}>{handoffView.description}</p>
+      <dl>
+        {handoffView.itemViews.map((item) => (
+          <div data-handoff-item={item.id} key={item.id}>
+            <dt>{item.label}</dt>
+            <dd>
+              <output aria-label={item.ariaLabel}>{item.value}</output>
+              <span>{item.description}</span>
+            </dd>
+          </div>
+        ))}
+      </dl>
+    </section>
   );
 }

@@ -90,6 +90,7 @@ import {
   type TemplateRemixTemplateOption,
 } from '@/activities/template-remix';
 import {
+  hasRuntimeDisplayText,
   normalizeOptionalRuntimeDisplayText,
   normalizeRuntimeDisplayText,
 } from '@/activities/runtime-display';
@@ -598,6 +599,74 @@ export type ActivityEditRouteState =
       pageView: ActivityEditReadyPageViewModel;
       status: 'ready';
     };
+
+export const ACTIVITY_EDIT_ROUTE_HANDOFF_ITEM_IDS = [
+  'route-status',
+  'activity-source',
+  'owner-scope',
+  'persisted-source',
+  'edit-access',
+  'lifecycle-gate',
+  'archived-restore-action',
+  'editor-mode',
+  'shared-input-contract',
+  'title-hydration',
+  'description-hydration',
+  'template-hydration',
+  'visibility-hydration',
+  'learning-goal-hydration',
+  'question-row-count',
+  'question-option-count',
+  'answer-explanation-count',
+  'pair-row-count',
+  'group-row-count',
+  'vocabulary-count',
+  'teacher-note-count',
+  'source-summary-privacy',
+  'source-material-count',
+  'source-material-kind-count',
+  'source-reference-hydration',
+  'readiness-after-load',
+  'future-assignment-boundary',
+  'snapshot-protection',
+  'save-target',
+  'privacy-guard',
+] as const;
+
+export type ActivityEditRouteHandoffItemId =
+  (typeof ACTIVITY_EDIT_ROUTE_HANDOFF_ITEM_IDS)[number];
+
+export type ActivityEditRouteHandoffItemView = {
+  ariaLabel: string;
+  description: string;
+  id: ActivityEditRouteHandoffItemId;
+  label: string;
+  value: string;
+};
+
+export type ActivityEditRouteHandoffPrivacyContract = {
+  exposesActivityContentText: false;
+  exposesAnswerExplanationText: false;
+  exposesAnswerText: false;
+  exposesInternalActivityId: false;
+  exposesQuestionOptionText: false;
+  exposesQuestionPromptText: false;
+  exposesSourceMaterialFileIds: false;
+  exposesSourceMaterialStorageKeys: false;
+  exposesSourceSummaryText: false;
+  exposesTeacherNotesText: false;
+  itemIds: ActivityEditRouteHandoffItemId[];
+  mutatesPublishedAssignmentSnapshots: false;
+  scope: 'owner-activity-edit-route';
+  usesCreateActivityInputContract: true;
+};
+
+export type ActivityEditRouteHandoffView = {
+  description: string;
+  itemViews: ActivityEditRouteHandoffItemView[];
+  privacy: ActivityEditRouteHandoffPrivacyContract;
+  title: string;
+};
 
 const activityEditorSectionId = ACTIVITY_EDITOR_SECTION_IDS.editor;
 
@@ -1660,6 +1729,478 @@ function buildActivityCreatePageTemplateEntrySourceView({
     label: m.create_page_template_entry_source_direct_label(),
     source: 'direct',
   };
+}
+
+export function buildActivityEditRouteHandoffView({
+  activity,
+  routeStatus,
+}: {
+  activity?: ActivityEditPageActivitySource | null;
+  routeStatus: ActivityEditRouteState['status'];
+}): ActivityEditRouteHandoffView {
+  const summary = buildActivityEditRouteHandoffSummary({
+    activity,
+    routeStatus,
+  });
+  const itemViews = ACTIVITY_EDIT_ROUTE_HANDOFF_ITEM_IDS.map((id) =>
+    buildActivityEditRouteHandoffItemView(
+      buildActivityEditRouteHandoffItem({
+        id,
+        summary,
+      })
+    )
+  );
+
+  return {
+    description: m.activity_edit_route_handoff_description(),
+    itemViews,
+    privacy: buildActivityEditRouteHandoffPrivacyContract(itemViews),
+    title: m.activity_edit_route_handoff_title(),
+  };
+}
+
+type ActivityEditRouteHandoffSummary = ReturnType<
+  typeof buildActivityEditRouteHandoffSummary
+>;
+
+function buildActivityEditRouteHandoffSummary({
+  activity,
+  routeStatus,
+}: {
+  activity?: ActivityEditPageActivitySource | null;
+  routeStatus: ActivityEditRouteState['status'];
+}) {
+  const content = activity?.contentJson;
+  const sourceMaterials = normalizeActivityMaterialReferences(
+    content?.sourceMaterials
+  );
+  const editAccessView = activity
+    ? buildActivityEditAccessView(activity.visibility)
+    : null;
+  const editorInput =
+    activity && editAccessView?.canEdit
+      ? activityContentToEditorInput({
+          content: activity.contentJson,
+          description: activity.description,
+          templateType: activity.templateType,
+          title: activity.title,
+          visibility: activity.visibility,
+        })
+      : null;
+  const remixPlan = activity
+    ? getTemplateRemixPlan({
+        content: activity.contentJson,
+        currentTemplateType: activity.templateType,
+      })
+    : null;
+
+  return {
+    answerExplanationCount:
+      content?.questions.filter((question) =>
+        hasRuntimeDisplayText(question.explanation)
+      ).length ?? 0,
+    canEdit: Boolean(editAccessView?.canEdit),
+    descriptionHydration: editorInput
+      ? getActivityEditRouteHandoffFieldState(editorInput.description)
+      : m.activity_edit_route_handoff_not_loaded_value(),
+    editAccess: activity
+      ? getActivityEditRouteHandoffEditAccessValue(editAccessView?.canEdit)
+      : m.activity_edit_route_handoff_unavailable_value(),
+    editorMode:
+      editorInput && editAccessView?.canEdit
+        ? m.activity_edit_route_handoff_editor_mode_edit_value()
+        : m.activity_edit_route_handoff_unavailable_value(),
+    groupCount: content?.groups.length ?? 0,
+    hasActivity: Boolean(activity),
+    learningGoalHydration: editorInput
+      ? getActivityEditRouteHandoffFieldState(editorInput.learningGoal)
+      : m.activity_edit_route_handoff_not_loaded_value(),
+    lifecycleGate: activity
+      ? getActivityEditRouteHandoffLifecycleGateValue(editAccessView?.canEdit)
+      : m.activity_edit_route_handoff_load_required_value(),
+    pairCount: content?.pairs.length ?? 0,
+    persistedSource: activity
+      ? m.activity_edit_route_handoff_saved_source_value()
+      : m.activity_edit_route_handoff_pending_load_value(),
+    questionCount: content?.questions.length ?? 0,
+    questionOptionCount:
+      content?.questions.reduce(
+        (count, question) => count + (question.options?.length ?? 0),
+        0
+      ) ?? 0,
+    readyTemplateCount: remixPlan?.readyOptions.length ?? 0,
+    restoreAction:
+      activity && !editAccessView?.canEdit
+        ? (editAccessView?.actionLabel ??
+          m.activity_edit_route_handoff_unavailable_value())
+        : m.activity_edit_route_handoff_restore_not_required_value(),
+    routeStatus: getActivityEditRouteHandoffStatusValue(routeStatus),
+    sourceActivity: activity
+      ? m.activity_edit_route_handoff_source_loaded_value()
+      : m.activity_edit_route_handoff_source_missing_value(),
+    sourceMaterialCount: sourceMaterials.length,
+    sourceMaterialKindCount: new Set(
+      sourceMaterials.map((material) => material.kind)
+    ).size,
+    sourceReferenceHydration:
+      sourceMaterials.length > 0
+        ? m.activity_edit_route_handoff_references_hydrated_value()
+        : m.activity_edit_route_handoff_references_empty_value(),
+    sourceSummaryPrivacy:
+      content && hasRuntimeDisplayText(content.sourceSummary)
+        ? m.activity_edit_route_handoff_source_summary_hidden_value()
+        : m.activity_edit_route_handoff_source_summary_empty_value(),
+    teacherNoteCount: content?.teacherNotes.length ?? 0,
+    templateHydration: activity
+      ? getTemplateByType(activity.templateType).name
+      : m.activity_edit_route_handoff_not_loaded_value(),
+    titleHydration: editorInput
+      ? getActivityEditRouteHandoffFieldState(editorInput.title)
+      : m.activity_edit_route_handoff_not_loaded_value(),
+    visibilityHydration: activity
+      ? formatActivityEditRouteHandoffVisibility(activity.visibility)
+      : m.activity_edit_route_handoff_not_loaded_value(),
+    vocabularyCount: content?.vocabulary.length ?? 0,
+  };
+}
+
+function buildActivityEditRouteHandoffItem({
+  id,
+  summary,
+}: {
+  id: ActivityEditRouteHandoffItemId;
+  summary: ActivityEditRouteHandoffSummary;
+}): Omit<ActivityEditRouteHandoffItemView, 'ariaLabel'> {
+  switch (id) {
+    case 'route-status':
+      return {
+        description: m.activity_edit_route_handoff_route_status_description(),
+        id,
+        label: m.activity_edit_route_handoff_route_status_label(),
+        value: summary.routeStatus,
+      };
+    case 'activity-source':
+      return {
+        description:
+          m.activity_edit_route_handoff_activity_source_description(),
+        id,
+        label: m.activity_edit_route_handoff_activity_source_label(),
+        value: summary.sourceActivity,
+      };
+    case 'owner-scope':
+      return {
+        description: m.activity_edit_route_handoff_owner_scope_description(),
+        id,
+        label: m.activity_edit_route_handoff_owner_scope_label(),
+        value: m.activity_edit_route_handoff_owner_scope_value(),
+      };
+    case 'persisted-source':
+      return {
+        description:
+          m.activity_edit_route_handoff_persisted_source_description(),
+        id,
+        label: m.activity_edit_route_handoff_persisted_source_label(),
+        value: summary.persistedSource,
+      };
+    case 'edit-access':
+      return {
+        description: m.activity_edit_route_handoff_edit_access_description(),
+        id,
+        label: m.activity_edit_route_handoff_edit_access_label(),
+        value: summary.editAccess,
+      };
+    case 'lifecycle-gate':
+      return {
+        description: m.activity_edit_route_handoff_lifecycle_gate_description(),
+        id,
+        label: m.activity_edit_route_handoff_lifecycle_gate_label(),
+        value: summary.lifecycleGate,
+      };
+    case 'archived-restore-action':
+      return {
+        description:
+          m.activity_edit_route_handoff_archived_restore_action_description(),
+        id,
+        label: m.activity_edit_route_handoff_archived_restore_action_label(),
+        value: summary.restoreAction,
+      };
+    case 'editor-mode':
+      return {
+        description: m.activity_edit_route_handoff_editor_mode_description(),
+        id,
+        label: m.activity_edit_route_handoff_editor_mode_label(),
+        value: summary.editorMode,
+      };
+    case 'shared-input-contract':
+      return {
+        description:
+          m.activity_edit_route_handoff_shared_input_contract_description(),
+        id,
+        label: m.activity_edit_route_handoff_shared_input_contract_label(),
+        value: m.activity_edit_route_handoff_shared_input_contract_value(),
+      };
+    case 'title-hydration':
+      return {
+        description:
+          m.activity_edit_route_handoff_title_hydration_description(),
+        id,
+        label: m.activity_edit_route_handoff_title_hydration_label(),
+        value: summary.titleHydration,
+      };
+    case 'description-hydration':
+      return {
+        description:
+          m.activity_edit_route_handoff_description_hydration_description(),
+        id,
+        label: m.activity_edit_route_handoff_description_hydration_label(),
+        value: summary.descriptionHydration,
+      };
+    case 'template-hydration':
+      return {
+        description:
+          m.activity_edit_route_handoff_template_hydration_description(),
+        id,
+        label: m.activity_edit_route_handoff_template_hydration_label(),
+        value: summary.templateHydration,
+      };
+    case 'visibility-hydration':
+      return {
+        description:
+          m.activity_edit_route_handoff_visibility_hydration_description(),
+        id,
+        label: m.activity_edit_route_handoff_visibility_hydration_label(),
+        value: summary.visibilityHydration,
+      };
+    case 'learning-goal-hydration':
+      return {
+        description:
+          m.activity_edit_route_handoff_learning_goal_hydration_description(),
+        id,
+        label: m.activity_edit_route_handoff_learning_goal_hydration_label(),
+        value: summary.learningGoalHydration,
+      };
+    case 'question-row-count':
+      return {
+        description:
+          m.activity_edit_route_handoff_question_row_count_description(),
+        id,
+        label: m.activity_form_field_questions(),
+        value: String(summary.questionCount),
+      };
+    case 'question-option-count':
+      return {
+        description:
+          m.activity_edit_route_handoff_question_option_count_description(),
+        id,
+        label: m.activity_edit_route_handoff_question_option_count_label(),
+        value: String(summary.questionOptionCount),
+      };
+    case 'answer-explanation-count':
+      return {
+        description:
+          m.activity_edit_route_handoff_answer_explanation_count_description(),
+        id,
+        label: m.activity_edit_route_handoff_answer_explanation_count_label(),
+        value: String(summary.answerExplanationCount),
+      };
+    case 'pair-row-count':
+      return {
+        description: m.activity_edit_route_handoff_pair_row_count_description(),
+        id,
+        label: m.activity_form_field_pairs(),
+        value: String(summary.pairCount),
+      };
+    case 'group-row-count':
+      return {
+        description:
+          m.activity_edit_route_handoff_group_row_count_description(),
+        id,
+        label: m.activity_form_field_groups(),
+        value: String(summary.groupCount),
+      };
+    case 'vocabulary-count':
+      return {
+        description:
+          m.activity_edit_route_handoff_vocabulary_count_description(),
+        id,
+        label: m.activity_form_field_vocabulary(),
+        value: String(summary.vocabularyCount),
+      };
+    case 'teacher-note-count':
+      return {
+        description:
+          m.activity_edit_route_handoff_teacher_note_count_description(),
+        id,
+        label: m.activity_form_field_teacher_notes(),
+        value: String(summary.teacherNoteCount),
+      };
+    case 'source-summary-privacy':
+      return {
+        description:
+          m.activity_edit_route_handoff_source_summary_privacy_description(),
+        id,
+        label: m.activity_edit_route_handoff_source_summary_privacy_label(),
+        value: summary.sourceSummaryPrivacy,
+      };
+    case 'source-material-count':
+      return {
+        description:
+          m.activity_edit_route_handoff_source_material_count_description(),
+        id,
+        label: m.activity_edit_route_handoff_source_material_count_label(),
+        value: String(summary.sourceMaterialCount),
+      };
+    case 'source-material-kind-count':
+      return {
+        description:
+          m.activity_edit_route_handoff_source_material_kind_count_description(),
+        id,
+        label: m.activity_edit_route_handoff_source_material_kind_count_label(),
+        value: String(summary.sourceMaterialKindCount),
+      };
+    case 'source-reference-hydration':
+      return {
+        description:
+          m.activity_edit_route_handoff_source_reference_hydration_description(),
+        id,
+        label: m.activity_edit_route_handoff_source_reference_hydration_label(),
+        value: summary.sourceReferenceHydration,
+      };
+    case 'readiness-after-load':
+      return {
+        description:
+          m.activity_edit_route_handoff_readiness_after_load_description(),
+        id,
+        label: m.activity_edit_route_handoff_readiness_after_load_label(),
+        value: summary.hasActivity
+          ? m.activity_edit_route_handoff_ready_modes_value({
+              count: summary.readyTemplateCount,
+            })
+          : m.activity_edit_route_handoff_not_loaded_value(),
+      };
+    case 'future-assignment-boundary':
+      return {
+        description:
+          m.activity_edit_route_handoff_future_assignment_boundary_description(),
+        id,
+        label: m.activity_edit_route_handoff_future_assignment_boundary_label(),
+        value: m.activity_edit_route_handoff_future_assignment_boundary_value(),
+      };
+    case 'snapshot-protection':
+      return {
+        description:
+          m.activity_edit_route_handoff_snapshot_protection_description(),
+        id,
+        label: m.activity_edit_route_handoff_snapshot_protection_label(),
+        value: m.activity_edit_route_handoff_snapshot_protection_value(),
+      };
+    case 'save-target':
+      return {
+        description: m.activity_edit_route_handoff_save_target_description(),
+        id,
+        label: m.activity_edit_route_handoff_save_target_label(),
+        value: summary.canEdit
+          ? m.activity_edit_route_handoff_save_target_update_value()
+          : m.activity_edit_route_handoff_unavailable_value(),
+      };
+    case 'privacy-guard':
+      return {
+        description: m.activity_edit_route_handoff_privacy_guard_description(),
+        id,
+        label: m.activity_edit_route_handoff_privacy_guard_label(),
+        value: m.activity_edit_route_handoff_privacy_guard_value(),
+      };
+  }
+}
+
+function buildActivityEditRouteHandoffItemView({
+  description,
+  id,
+  label,
+  value,
+}: Omit<
+  ActivityEditRouteHandoffItemView,
+  'ariaLabel'
+>): ActivityEditRouteHandoffItemView {
+  return {
+    ariaLabel: m.activity_edit_route_handoff_item_aria({
+      description,
+      label,
+      value,
+    }),
+    description,
+    id,
+    label,
+    value,
+  };
+}
+
+function buildActivityEditRouteHandoffPrivacyContract(
+  itemViews: ActivityEditRouteHandoffItemView[]
+): ActivityEditRouteHandoffPrivacyContract {
+  return {
+    exposesActivityContentText: false,
+    exposesAnswerExplanationText: false,
+    exposesAnswerText: false,
+    exposesInternalActivityId: false,
+    exposesQuestionOptionText: false,
+    exposesQuestionPromptText: false,
+    exposesSourceMaterialFileIds: false,
+    exposesSourceMaterialStorageKeys: false,
+    exposesSourceSummaryText: false,
+    exposesTeacherNotesText: false,
+    itemIds: itemViews.map((item) => item.id),
+    mutatesPublishedAssignmentSnapshots: false,
+    scope: 'owner-activity-edit-route',
+    usesCreateActivityInputContract: true,
+  };
+}
+
+function getActivityEditRouteHandoffStatusValue(
+  routeStatus: ActivityEditRouteState['status']
+) {
+  switch (routeStatus) {
+    case 'blocked':
+      return m.activity_edit_route_handoff_status_blocked_value();
+    case 'error':
+      return m.activity_edit_route_handoff_status_error_value();
+    case 'loading':
+      return m.activity_edit_route_handoff_status_loading_value();
+    case 'ready':
+      return m.activity_edit_route_handoff_status_ready_value();
+  }
+}
+
+function getActivityEditRouteHandoffEditAccessValue(canEdit?: boolean) {
+  return canEdit
+    ? m.activity_edit_route_handoff_ready_value()
+    : m.activity_edit_route_handoff_restore_required_value();
+}
+
+function getActivityEditRouteHandoffLifecycleGateValue(canEdit?: boolean) {
+  return canEdit
+    ? m.activity_edit_route_handoff_editable_value()
+    : m.activity_edit_route_handoff_restore_first_value();
+}
+
+function getActivityEditRouteHandoffFieldState(value?: string | null) {
+  return hasRuntimeDisplayText(value)
+    ? m.activity_edit_route_handoff_field_hydrated_value()
+    : m.activity_edit_route_handoff_field_empty_value();
+}
+
+function formatActivityEditRouteHandoffVisibility(
+  visibility: ActivityVisibility
+) {
+  switch (visibility) {
+    case 'archived':
+      return m.activity_edit_route_handoff_visibility_archived_value();
+    case 'draft':
+    case 'private':
+    case 'public':
+    case 'unlisted':
+      return formatActivityEditorVisibility(visibility);
+  }
 }
 
 export function buildActivityEditPageViewModel(
