@@ -1,5 +1,6 @@
 import Container from '@/components/layout/container';
 import { WorksheetModeCard } from '@/components/activities/worksheet-mode-card';
+import { PublicTemplateEntryHandoffPanel } from '@/components/activities/public-template-entry-handoff-panel';
 import { Badge } from '@/components/ui/badge';
 import { buttonVariants } from '@/components/ui/button';
 import {
@@ -84,6 +85,8 @@ function WorksheetsPage() {
             <WorksheetModeCard key={mode.template} mode={mode} />
           ))}
         </section>
+
+        <PublicTemplateEntryHandoffPanel view={pageView.handoffView} />
 
         <section className="grid gap-4 rounded-lg border bg-card p-5 lg:grid-cols-[minmax(0,1fr)_22rem] lg:items-center">
           <div className="min-w-0">

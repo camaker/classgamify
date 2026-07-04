@@ -36,6 +36,74 @@ export type LinkAction = TemplateEntryLinkAction;
 
 export type CreateLinkAction = TemplateEntryCreateLinkAction;
 
+export type PublicTemplateEntrySurface = 'templates' | 'worksheets';
+
+export const PUBLIC_TEMPLATE_ENTRY_HANDOFF_ITEM_IDS = [
+  'entry-surface',
+  'templates-route',
+  'worksheets-route',
+  'template-count',
+  'worksheet-mode-count',
+  'default-template',
+  'hero-create-action',
+  'student-preview-action',
+  'footer-create-action',
+  'worksheet-primary-action',
+  'worksheet-hero-actions',
+  'worksheet-mode-actions',
+  'templates-source-param',
+  'worksheets-source-param',
+  'template-search-param',
+  'scaffold-loading',
+  'shared-editor-contract',
+  'content-requirements',
+  'card-entry-steps',
+  'worksheet-delivery-loop',
+  'workflow-create',
+  'workflow-assign',
+  'workflow-student-submit',
+  'workflow-review',
+  'assignment-snapshot-boundary',
+  'results-export-boundary',
+  'printable-extension-boundary',
+  'legacy-product-guard',
+  'indexing-scope',
+  'privacy-guard',
+] as const;
+
+export type PublicTemplateEntryHandoffItemId =
+  (typeof PUBLIC_TEMPLATE_ENTRY_HANDOFF_ITEM_IDS)[number];
+
+export type PublicTemplateEntryHandoffItemView = {
+  ariaLabel: string;
+  description: string;
+  id: PublicTemplateEntryHandoffItemId;
+  label: string;
+  value: string;
+};
+
+export type PublicTemplateEntryHandoffPrivacyContract = {
+  exposesActivityContent: false;
+  exposesAnswerKeys: false;
+  exposesAssignmentAttempts: false;
+  exposesRawStudentIdentity: false;
+  exposesSourceMaterialStorageKeys: false;
+  exposesTeacherPrivateWorkspaceData: false;
+  itemIds: PublicTemplateEntryHandoffItemId[];
+  mutatesTeacherData: false;
+  opensCreateEditorOnly: true;
+  preservesSharedActivityAssignmentModel: true;
+  scope: 'public-template-entry';
+  surface: PublicTemplateEntrySurface;
+};
+
+export type PublicTemplateEntryHandoffView = {
+  description: string;
+  itemViews: PublicTemplateEntryHandoffItemView[];
+  privacy: PublicTemplateEntryHandoffPrivacyContract;
+  title: string;
+};
+
 export type WorksheetsPageHeroActionView = EntryAction & {
   isPrimary: boolean;
   template: WorksheetModeTemplate;
@@ -89,6 +157,7 @@ export type TemplatesPageViewModel = {
     studentPreviewAction: LinkAction;
     title: string;
   };
+  handoffView: PublicTemplateEntryHandoffView;
 };
 
 export type WorksheetsPageModeCardView = {
@@ -154,6 +223,7 @@ export type WorksheetsPageViewModel = {
     description: string;
     title: string;
   };
+  handoffView: PublicTemplateEntryHandoffView;
   heroActions: WorksheetsPageHeroActionView[];
   modeCards: WorksheetsPageModeCardView[];
   printable: {
@@ -228,6 +298,10 @@ export function buildTemplatesPageViewModel({
       },
       title: m.templates_page_title(),
     },
+    handoffView: buildPublicTemplateEntryHandoffView({
+      activityTemplates,
+      surface: 'templates',
+    }),
   };
 }
 
@@ -283,6 +357,11 @@ export function buildWorksheetsPageViewModel({
       description: m.worksheets_page_description(),
       title: m.worksheets_page_title(),
     },
+    handoffView: buildPublicTemplateEntryHandoffView({
+      activityTemplates,
+      surface: 'worksheets',
+      worksheetModeDefinitions,
+    }),
     heroActions: buildWorksheetHeroActions(worksheetModeDefinitions),
     modeCards: worksheetModeDefinitions.map((mode) => {
       const template = activityTemplates.find(
@@ -447,4 +526,344 @@ function buildWorksheetsPageResultSignals(): WorksheetsPageResultSignalView[] {
 
 function formatWorksheetsPageWorkflowPosition(index: number) {
   return String(index + 1);
+}
+
+export function buildPublicTemplateEntryHandoffView({
+  activityTemplates = getActivityTemplates(),
+  surface,
+  worksheetModeDefinitions = getWorksheetModeDefinitions(),
+}: {
+  activityTemplates?: ActivityTemplateDefinition[];
+  surface: PublicTemplateEntrySurface;
+  worksheetModeDefinitions?: WorksheetModeDefinition[];
+}): PublicTemplateEntryHandoffView {
+  const heroActions = buildWorksheetHeroActions(worksheetModeDefinitions);
+  const itemViews = PUBLIC_TEMPLATE_ENTRY_HANDOFF_ITEM_IDS.map((id) =>
+    buildPublicTemplateEntryHandoffItemView({
+      activityTemplates,
+      heroActions,
+      id,
+      surface,
+      worksheetModeDefinitions,
+    })
+  );
+
+  return {
+    description: m.public_template_entry_handoff_description(),
+    itemViews,
+    privacy: buildPublicTemplateEntryHandoffPrivacyContract({
+      itemViews,
+      surface,
+    }),
+    title: m.public_template_entry_handoff_title(),
+  };
+}
+
+function buildPublicTemplateEntryHandoffPrivacyContract({
+  itemViews,
+  surface,
+}: {
+  itemViews: PublicTemplateEntryHandoffItemView[];
+  surface: PublicTemplateEntrySurface;
+}): PublicTemplateEntryHandoffPrivacyContract {
+  return {
+    exposesActivityContent: false,
+    exposesAnswerKeys: false,
+    exposesAssignmentAttempts: false,
+    exposesRawStudentIdentity: false,
+    exposesSourceMaterialStorageKeys: false,
+    exposesTeacherPrivateWorkspaceData: false,
+    itemIds: itemViews.map((itemView) => itemView.id),
+    mutatesTeacherData: false,
+    opensCreateEditorOnly: true,
+    preservesSharedActivityAssignmentModel: true,
+    scope: 'public-template-entry',
+    surface,
+  };
+}
+
+function buildPublicTemplateEntryHandoffItemView({
+  activityTemplates,
+  heroActions,
+  id,
+  surface,
+  worksheetModeDefinitions,
+}: {
+  activityTemplates: ActivityTemplateDefinition[];
+  heroActions: WorksheetsPageHeroActionView[];
+  id: PublicTemplateEntryHandoffItemId;
+  surface: PublicTemplateEntrySurface;
+  worksheetModeDefinitions: WorksheetModeDefinition[];
+}): PublicTemplateEntryHandoffItemView {
+  const value = getPublicTemplateEntryHandoffItemValue({
+    activityTemplates,
+    heroActions,
+    id,
+    surface,
+    worksheetModeDefinitions,
+  });
+  const label = getPublicTemplateEntryHandoffItemLabel(id);
+  const description = getPublicTemplateEntryHandoffItemDescription(id);
+
+  return {
+    ariaLabel: m.public_template_entry_handoff_item_aria_label({
+      description,
+      label,
+      value,
+    }),
+    description,
+    id,
+    label,
+    value,
+  };
+}
+
+function getPublicTemplateEntryHandoffItemValue({
+  activityTemplates,
+  heroActions,
+  id,
+  surface,
+  worksheetModeDefinitions,
+}: {
+  activityTemplates: ActivityTemplateDefinition[];
+  heroActions: WorksheetsPageHeroActionView[];
+  id: PublicTemplateEntryHandoffItemId;
+  surface: PublicTemplateEntrySurface;
+  worksheetModeDefinitions: WorksheetModeDefinition[];
+}) {
+  const firstTemplate = activityTemplates[0];
+  const primaryWorksheetAction =
+    heroActions.find((action) => action.isPrimary) ?? heroActions[0];
+  const requirementCount = new Set(
+    activityTemplates.flatMap((template) => template.contentRequirements)
+  ).size;
+  const entryStepCount = buildTemplatesPageCardEntrySteps(
+    firstTemplate?.shortName ?? ''
+  ).length;
+
+  switch (id) {
+    case 'entry-surface':
+      return surface === 'templates'
+        ? m.public_template_entry_handoff_surface_templates_value()
+        : m.public_template_entry_handoff_surface_worksheets_value();
+    case 'templates-route':
+      return Routes.Templates;
+    case 'worksheets-route':
+      return Routes.Worksheets;
+    case 'template-count':
+      return m.public_template_entry_handoff_count_value({
+        count: activityTemplates.length,
+      });
+    case 'worksheet-mode-count':
+      return m.public_template_entry_handoff_count_value({
+        count: worksheetModeDefinitions.length,
+      });
+    case 'default-template':
+      return (
+        firstTemplate?.shortName ??
+        m.public_template_entry_handoff_unavailable_value()
+      );
+    case 'hero-create-action':
+      return m.templates_page_create_from_template();
+    case 'student-preview-action':
+      return m.templates_page_open_student_preview();
+    case 'footer-create-action':
+      return m.templates_page_create_activity();
+    case 'worksheet-primary-action':
+      return (
+        primaryWorksheetAction?.label ??
+        m.public_template_entry_handoff_unavailable_value()
+      );
+    case 'worksheet-hero-actions':
+      return m.public_template_entry_handoff_count_value({
+        count: heroActions.length,
+      });
+    case 'worksheet-mode-actions':
+      return m.public_template_entry_handoff_count_value({
+        count: worksheetModeDefinitions.length,
+      });
+    case 'templates-source-param':
+      return 'source=templates';
+    case 'worksheets-source-param':
+      return 'source=worksheets';
+    case 'template-search-param':
+      return 'template';
+    case 'scaffold-loading':
+      return m.public_template_entry_handoff_scaffold_value();
+    case 'shared-editor-contract':
+      return 'CreateActivityInput';
+    case 'content-requirements':
+      return m.public_template_entry_handoff_count_value({
+        count: requirementCount,
+      });
+    case 'card-entry-steps':
+      return m.public_template_entry_handoff_count_value({
+        count: entryStepCount,
+      });
+    case 'worksheet-delivery-loop':
+      return 'Activity -> Assignment -> Attempt -> Results';
+    case 'workflow-create':
+      return m.worksheets_page_workflow_step_create_label();
+    case 'workflow-assign':
+      return m.worksheets_page_workflow_step_assign_label();
+    case 'workflow-student-submit':
+      return m.worksheets_page_workflow_step_student_submit_label();
+    case 'workflow-review':
+      return m.worksheets_page_workflow_step_review_label();
+    case 'assignment-snapshot-boundary':
+      return 'AssignmentSnapshot';
+    case 'results-export-boundary':
+      return m.public_template_entry_handoff_results_value();
+    case 'printable-extension-boundary':
+      return m.public_template_entry_handoff_printable_value();
+    case 'legacy-product-guard':
+      return m.public_template_entry_handoff_legacy_guard_value();
+    case 'indexing-scope':
+      return m.public_template_entry_handoff_indexing_value();
+    case 'privacy-guard':
+      return m.public_template_entry_handoff_privacy_value();
+  }
+
+  const exhaustiveItemId: never = id;
+  return exhaustiveItemId;
+}
+
+function getPublicTemplateEntryHandoffItemLabel(
+  id: PublicTemplateEntryHandoffItemId
+) {
+  switch (id) {
+    case 'entry-surface':
+      return m.public_template_entry_handoff_surface_label();
+    case 'templates-route':
+      return m.public_template_entry_handoff_templates_route_label();
+    case 'worksheets-route':
+      return m.public_template_entry_handoff_worksheets_route_label();
+    case 'template-count':
+      return m.public_template_entry_handoff_template_count_label();
+    case 'worksheet-mode-count':
+      return m.public_template_entry_handoff_worksheet_mode_count_label();
+    case 'default-template':
+      return m.public_template_entry_handoff_default_template_label();
+    case 'hero-create-action':
+      return m.public_template_entry_handoff_hero_create_label();
+    case 'student-preview-action':
+      return m.public_template_entry_handoff_student_preview_label();
+    case 'footer-create-action':
+      return m.public_template_entry_handoff_footer_create_label();
+    case 'worksheet-primary-action':
+      return m.public_template_entry_handoff_worksheet_primary_label();
+    case 'worksheet-hero-actions':
+      return m.public_template_entry_handoff_worksheet_hero_actions_label();
+    case 'worksheet-mode-actions':
+      return m.public_template_entry_handoff_worksheet_mode_actions_label();
+    case 'templates-source-param':
+      return m.public_template_entry_handoff_templates_source_label();
+    case 'worksheets-source-param':
+      return m.public_template_entry_handoff_worksheets_source_label();
+    case 'template-search-param':
+      return m.public_template_entry_handoff_template_search_label();
+    case 'scaffold-loading':
+      return m.public_template_entry_handoff_scaffold_label();
+    case 'shared-editor-contract':
+      return m.public_template_entry_handoff_shared_editor_label();
+    case 'content-requirements':
+      return m.public_template_entry_handoff_content_requirements_label();
+    case 'card-entry-steps':
+      return m.public_template_entry_handoff_card_steps_label();
+    case 'worksheet-delivery-loop':
+      return m.public_template_entry_handoff_delivery_loop_label();
+    case 'workflow-create':
+      return m.public_template_entry_handoff_workflow_create_label();
+    case 'workflow-assign':
+      return m.public_template_entry_handoff_workflow_assign_label();
+    case 'workflow-student-submit':
+      return m.public_template_entry_handoff_workflow_submit_label();
+    case 'workflow-review':
+      return m.public_template_entry_handoff_workflow_review_label();
+    case 'assignment-snapshot-boundary':
+      return m.public_template_entry_handoff_snapshot_label();
+    case 'results-export-boundary':
+      return m.public_template_entry_handoff_results_label();
+    case 'printable-extension-boundary':
+      return m.public_template_entry_handoff_printable_label();
+    case 'legacy-product-guard':
+      return m.public_template_entry_handoff_legacy_guard_label();
+    case 'indexing-scope':
+      return m.public_template_entry_handoff_indexing_label();
+    case 'privacy-guard':
+      return m.public_template_entry_handoff_privacy_label();
+  }
+
+  const exhaustiveItemId: never = id;
+  return exhaustiveItemId;
+}
+
+function getPublicTemplateEntryHandoffItemDescription(
+  id: PublicTemplateEntryHandoffItemId
+) {
+  switch (id) {
+    case 'entry-surface':
+      return m.public_template_entry_handoff_surface_description();
+    case 'templates-route':
+      return m.public_template_entry_handoff_templates_route_description();
+    case 'worksheets-route':
+      return m.public_template_entry_handoff_worksheets_route_description();
+    case 'template-count':
+      return m.public_template_entry_handoff_template_count_description();
+    case 'worksheet-mode-count':
+      return m.public_template_entry_handoff_worksheet_mode_count_description();
+    case 'default-template':
+      return m.public_template_entry_handoff_default_template_description();
+    case 'hero-create-action':
+      return m.public_template_entry_handoff_hero_create_description();
+    case 'student-preview-action':
+      return m.public_template_entry_handoff_student_preview_description();
+    case 'footer-create-action':
+      return m.public_template_entry_handoff_footer_create_description();
+    case 'worksheet-primary-action':
+      return m.public_template_entry_handoff_worksheet_primary_description();
+    case 'worksheet-hero-actions':
+      return m.public_template_entry_handoff_worksheet_hero_actions_description();
+    case 'worksheet-mode-actions':
+      return m.public_template_entry_handoff_worksheet_mode_actions_description();
+    case 'templates-source-param':
+      return m.public_template_entry_handoff_templates_source_description();
+    case 'worksheets-source-param':
+      return m.public_template_entry_handoff_worksheets_source_description();
+    case 'template-search-param':
+      return m.public_template_entry_handoff_template_search_description();
+    case 'scaffold-loading':
+      return m.public_template_entry_handoff_scaffold_description();
+    case 'shared-editor-contract':
+      return m.public_template_entry_handoff_shared_editor_description();
+    case 'content-requirements':
+      return m.public_template_entry_handoff_content_requirements_description();
+    case 'card-entry-steps':
+      return m.public_template_entry_handoff_card_steps_description();
+    case 'worksheet-delivery-loop':
+      return m.public_template_entry_handoff_delivery_loop_description();
+    case 'workflow-create':
+      return m.public_template_entry_handoff_workflow_create_description();
+    case 'workflow-assign':
+      return m.public_template_entry_handoff_workflow_assign_description();
+    case 'workflow-student-submit':
+      return m.public_template_entry_handoff_workflow_submit_description();
+    case 'workflow-review':
+      return m.public_template_entry_handoff_workflow_review_description();
+    case 'assignment-snapshot-boundary':
+      return m.public_template_entry_handoff_snapshot_description();
+    case 'results-export-boundary':
+      return m.public_template_entry_handoff_results_description();
+    case 'printable-extension-boundary':
+      return m.public_template_entry_handoff_printable_description();
+    case 'legacy-product-guard':
+      return m.public_template_entry_handoff_legacy_guard_description();
+    case 'indexing-scope':
+      return m.public_template_entry_handoff_indexing_description();
+    case 'privacy-guard':
+      return m.public_template_entry_handoff_privacy_description();
+  }
+
+  const exhaustiveItemId: never = id;
+  return exhaustiveItemId;
 }
