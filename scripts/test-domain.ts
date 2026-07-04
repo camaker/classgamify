@@ -465,6 +465,7 @@ import {
   buildPricingPageViewModel,
   buildRoadmapPageViewModel,
   buildTeachersPageViewModel,
+  ROADMAP_PUBLIC_HANDOFF_ITEM_IDS,
 } from '@/pages/public-page-view';
 import {
   buildBlogListPageViewModel,
@@ -6591,6 +6592,16 @@ assert.match(
   roadmapRouteSource,
   /RoadmapColumnView[\s\S]*RoadmapPrincipleView/,
   'Roadmap route should import focused roadmap child view contracts.'
+);
+assert.match(
+  roadmapRouteSource,
+  /<RoadmapPublicHandoff view=\{pageView\.handoffView\} \/>/,
+  'Roadmap route should render the prepared public roadmap handoff view.'
+);
+assert.match(
+  roadmapRouteSource,
+  /data-handoff="roadmap-public-boundary"[\s\S]*view\.itemViews\.map[\s\S]*key=\{itemView\.id\}[\s\S]*<output aria-label=\{itemView\.ariaLabel\}/,
+  'Roadmap public handoff should render semantic item outputs keyed by stable ids.'
 );
 assert.match(
   publicPageViewSource,
@@ -34566,7 +34577,11 @@ assert.deepEqual(
     to: Routes.Create,
   }
 );
-assert.deepEqual(buildRoadmapPageViewModel(), {
+const {
+  handoffView: roadmapPublicHandoffView,
+  ...roadmapPageViewModel
+} = buildRoadmapPageViewModel();
+assert.deepEqual(roadmapPageViewModel, {
   columns: [
     {
       description:
@@ -34770,6 +34785,15 @@ assert.deepEqual(buildRoadmapPageViewModel(), {
     title: 'Every roadmap item needs classroom proof',
   },
 });
+assert.deepEqual(
+  roadmapPublicHandoffView.itemViews.map((itemView) => itemView.id),
+  [...ROADMAP_PUBLIC_HANDOFF_ITEM_IDS]
+);
+assert.equal(roadmapPublicHandoffView.itemViews.length, 20);
+assert.equal(
+  roadmapPublicHandoffView.privacy.scope,
+  'public-roadmap-product-boundary'
+);
 assert.deepEqual(buildTeachersPageViewModel(), {
   hero: {
     badgeLabel: 'Teachers and learning teams',
