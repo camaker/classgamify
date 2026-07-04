@@ -9,6 +9,8 @@ import {
   type PublishedAssignmentPanelNextStepView,
   buildPublishedAssignmentPanelContext,
 } from '@/assignments/published-assignment';
+import { buildAssignmentShareLinkHandoffView } from '@/assignments/share-link';
+import { AssignmentShareLinkHandoff } from '@/components/assignments/assignment-share-link-handoff';
 import { CopyAssignmentShareLinkButton } from '@/components/assignments/copy-assignment-share-link-button';
 import { Button, buttonVariants } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
@@ -252,9 +254,13 @@ function PublishedAssignmentShareActions({
   shareSummaryDescriptionId: string;
 }) {
   const disabledReasonId = getPublishedAssignmentShareDisabledReasonId(action);
+  const handoffView = buildAssignmentShareLinkHandoffView(action, {
+    surface: 'publish-success',
+  });
 
   return (
     <>
+      <AssignmentShareLinkHandoff handoff={handoffView} />
       <PublishedAssignmentSharePreviewAction
         action={action}
         disabledReasonId={disabledReasonId}

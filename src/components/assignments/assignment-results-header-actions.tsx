@@ -8,7 +8,9 @@ import type {
   AssignmentResultHeaderPrintAction,
   AssignmentResultHeaderShareAction,
 } from '@/assignments/result-view';
+import { buildAssignmentShareLinkHandoffView } from '@/assignments/share-link';
 import { Badge } from '@/components/ui/badge';
+import { AssignmentShareLinkHandoff } from '@/components/assignments/assignment-share-link-handoff';
 import { CopyAssignmentShareLinkButton } from '@/components/assignments/copy-assignment-share-link-button';
 import { Button, buttonVariants } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
@@ -45,9 +47,16 @@ export function AssignmentResultsHeaderActions({
     getAssignmentResultHeaderShareDisabledReasonId(shareAction);
   const sharePathDescriptionId =
     getAssignmentResultHeaderSharePathDescriptionId(shareAction);
+  const shareLinkHandoffView = buildAssignmentShareLinkHandoffView(
+    shareAction,
+    {
+      surface: 'result-page',
+    }
+  );
 
   return (
     <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap">
+      <AssignmentShareLinkHandoff handoff={shareLinkHandoffView} />
       <AssignmentResultsHeaderSharePreviewLink
         disabledReasonId={shareDisabledReasonId}
         sharePathDescriptionId={sharePathDescriptionId}

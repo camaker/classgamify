@@ -2533,13 +2533,13 @@ assert.match(
 );
 assert.match(
   assignmentShareLinkSource,
-  /export const ASSIGNMENT_SHARE_LINK_HANDOFF_ITEM_IDS = \[(?=[\s\S]*'route-target')(?=[\s\S]*'normalized-share-slug')(?=[\s\S]*'encoded-share-path')(?=[\s\S]*'absolute-share-url')(?=[\s\S]*'copy-action')(?=[\s\S]*'preview-action')(?=[\s\S]*'publish-success-surface')(?=[\s\S]*'assignment-list-surface')(?=[\s\S]*'result-page-surface')(?=[\s\S]*'privacy-guard')[\s\S]*export type AssignmentShareLinkHandoffPrivacyContract = \{[\s\S]*exposesActivityContent: false;[\s\S]*exposesAnswerKeys: false;[\s\S]*exposesInternalAssignmentIds: false;[\s\S]*exposesRawAnonymousToken: false;[\s\S]*exposesSourceMaterialStorageKeys: false;[\s\S]*exposesStudentAnswerText: false;[\s\S]*shareUrlIsPublicDeliveryLink: true;/,
-  'Share-link handoff should expose a typed 20-slice distribution contract with explicit privacy flags.'
+  /export const ASSIGNMENT_SHARE_LINK_HANDOFF_ITEM_IDS = \[(?=[\s\S]*'route-target')(?=[\s\S]*'normalized-share-slug')(?=[\s\S]*'normalized-slug-component')(?=[\s\S]*'encoded-share-path')(?=[\s\S]*'encoded-route-param')(?=[\s\S]*'absolute-share-url')(?=[\s\S]*'preview-route-params')(?=[\s\S]*'public-delivery-contract')(?=[\s\S]*'copy-disabled-gate')(?=[\s\S]*'copy-action')(?=[\s\S]*'clipboard-payload')(?=[\s\S]*'copy-execution-plan')(?=[\s\S]*'preview-disabled-gate')(?=[\s\S]*'preview-action')(?=[\s\S]*'path-encoding-guard')(?=[\s\S]*'publish-success-surface')(?=[\s\S]*'assignment-list-surface')(?=[\s\S]*'result-page-surface')(?=[\s\S]*'surface-consistency')(?=[\s\S]*'privacy-guard')[\s\S]*export type AssignmentShareLinkHandoffPrivacyContract = \{[\s\S]*exposesActivityContent: false;[\s\S]*exposesAnswerKeys: false;[\s\S]*exposesClipboardPrivateData: false;[\s\S]*exposesInternalAssignmentIds: false;[\s\S]*exposesInternalBaseUrlConfig: false;[\s\S]*exposesRawAnonymousToken: false;[\s\S]*exposesSourceMaterialStorageKeys: false;[\s\S]*exposesStudentAnswerText: false;[\s\S]*shareUrlIsPublicDeliveryLink: true;/,
+  'Share-link handoff should expose a typed 30-slice distribution contract with explicit privacy flags.'
 );
 assert.match(
   assignmentShareLinkSource,
-  /export function buildAssignmentShareLinkHandoffView\([\s\S]*actionView: AssignmentShareLinkActionView[\s\S]*surface = 'shared'[\s\S]*id: 'route-target'[\s\S]*id: 'normalized-share-slug'[\s\S]*id: 'encoded-share-path'[\s\S]*id: 'absolute-share-url'[\s\S]*id: 'copy-action'[\s\S]*id: 'preview-action'[\s\S]*id: 'publish-success-surface'[\s\S]*id: 'assignment-list-surface'[\s\S]*id: 'result-page-surface'[\s\S]*privacy: buildAssignmentShareLinkHandoffPrivacyContract/,
-  'Share-link handoff should collect path, URL, lifecycle, copy, preview, and distribution-surface slices from the prepared action view.'
+  /export function buildAssignmentShareLinkHandoffView\([\s\S]*actionView: AssignmentShareLinkActionView[\s\S]*surface = 'shared'[\s\S]*buildAssignmentShareLinkCopyExecutionPlan[\s\S]*getAssignmentShareLinkEncodedRouteParam[\s\S]*id: 'route-target'[\s\S]*id: 'normalized-share-slug'[\s\S]*id: 'normalized-slug-component'[\s\S]*id: 'encoded-share-path'[\s\S]*id: 'encoded-route-param'[\s\S]*id: 'absolute-share-url'[\s\S]*id: 'preview-route-params'[\s\S]*id: 'public-delivery-contract'[\s\S]*id: 'copy-disabled-gate'[\s\S]*id: 'clipboard-payload'[\s\S]*id: 'copy-execution-plan'[\s\S]*id: 'preview-disabled-gate'[\s\S]*id: 'path-encoding-guard'[\s\S]*id: 'surface-consistency'[\s\S]*privacy: buildAssignmentShareLinkHandoffPrivacyContract/,
+  'Share-link handoff should collect path, URL, lifecycle, copy-plan, preview-route, encoding, and distribution-surface slices from the prepared action view.'
 );
 assert.doesNotMatch(
   assignmentShareLinkSource,
@@ -7428,6 +7428,11 @@ assert.match(
   assignmentResultsHeaderActionsSource,
   /const shareDisabledReasonId =\s*getAssignmentResultHeaderShareDisabledReasonId\(shareAction\)[\s\S]*const sharePathDescriptionId =\s*getAssignmentResultHeaderSharePathDescriptionId\(shareAction\)[\s\S]*AssignmentResultsHeaderSharePreviewLink[\s\S]*disabledReasonId=\{shareDisabledReasonId\}[\s\S]*sharePathDescriptionId=\{sharePathDescriptionId\}[\s\S]*AssignmentResultsHeaderSharePath[\s\S]*descriptionId=\{sharePathDescriptionId\}[\s\S]*AssignmentResultsHeaderCopyShareAction[\s\S]*disabledReasonId=\{shareDisabledReasonId\}[\s\S]*sharePathDescriptionId=\{sharePathDescriptionId\}[\s\S]*AssignmentResultsHeaderShareDisabledReason[\s\S]*disabledReasonId=\{shareDisabledReasonId\}/,
   'Assignment result share controls should pass the same prepared disabled reason id and current student-link description id through preview, path, copy, and disabled reason text.'
+);
+assert.match(
+  assignmentResultsHeaderActionsSource,
+  /const shareLinkHandoffView = buildAssignmentShareLinkHandoffView\([\s\S]*shareAction,[\s\S]*surface: 'result-page'[\s\S]*<AssignmentShareLinkHandoff handoff=\{shareLinkHandoffView\} \/>/,
+  'Assignment result header should expose the prepared assignment share-link handoff for the result-page surface.'
 );
 assert.match(
   assignmentResultsHeaderActionsSource,
@@ -19540,11 +19545,13 @@ const assignmentShareLinkHandoffItemIds =
 assert.deepEqual(assignmentShareLinkHandoffItemIds, [
   ...ASSIGNMENT_SHARE_LINK_HANDOFF_ITEM_IDS,
 ]);
-assert.equal(assignmentShareLinkHandoffView.itemViews.length, 20);
+assert.equal(assignmentShareLinkHandoffView.itemViews.length, 30);
 assert.deepEqual(assignmentShareLinkHandoffView.privacy, {
   exposesActivityContent: false,
   exposesAnswerKeys: false,
+  exposesClipboardPrivateData: false,
   exposesInternalAssignmentIds: false,
+  exposesInternalBaseUrlConfig: false,
   exposesRawAnonymousToken: false,
   exposesSourceMaterialStorageKeys: false,
   exposesStudentAnswerText: false,
@@ -19561,22 +19568,32 @@ assert.deepEqual(
   [
     ['route-target', '/play/$shareId'],
     ['normalized-share-slug', 'Resolved'],
+    ['normalized-slug-component', 'class/123'],
     ['encoded-share-path', '/play/class%2F123'],
+    ['encoded-route-param', 'class%2F123'],
     ['absolute-share-url', 'https://classgamify.test/play/class%2F123'],
     ['base-url-origin', 'https://classgamify.test'],
     ['route-param', 'shareId'],
+    ['preview-route-params', 'shareId=class%2F123'],
     ['path-label', 'Student link'],
     ['url-label', 'Full student link'],
+    ['public-delivery-contract', 'Public delivery link'],
     ['availability', 'Available'],
     ['lifecycle-guard', 'Open'],
     ['disabled-reason', 'None'],
+    ['copy-disabled-gate', 'Enabled'],
     ['copy-action', 'Enabled'],
+    ['clipboard-payload', 'https://classgamify.test/play/class%2F123'],
+    ['copy-execution-plan', 'copy-link'],
     ['copy-feedback', 'Student link copied.'],
+    ['preview-disabled-gate', 'Enabled'],
     ['preview-action', 'Enabled'],
     ['student-runner-target', '/play/$shareId'],
+    ['path-encoding-guard', 'Passed'],
     ['publish-success-surface', 'Active'],
     ['assignment-list-surface', 'Compatible'],
     ['result-page-surface', 'Compatible'],
+    ['surface-consistency', 'Consistent'],
     ['missing-slug-guard', 'Passed'],
     ['privacy-guard', 'Private data omitted'],
   ]
@@ -19608,6 +19625,24 @@ assert.equal(
     (item) => item.id === 'missing-slug-guard'
   )?.value,
   'Blocked'
+);
+assert.equal(
+  missingShareLinkHandoffView.itemViews.find(
+    (item) => item.id === 'copy-execution-plan'
+  )?.value,
+  'blocked'
+);
+assert.equal(
+  missingShareLinkHandoffView.itemViews.find(
+    (item) => item.id === 'clipboard-payload'
+  )?.value,
+  'Blocked'
+);
+assert.equal(
+  missingShareLinkHandoffView.itemViews.find(
+    (item) => item.id === 'preview-route-params'
+  )?.value,
+  'shareId=Missing'
 );
 assert.deepEqual(
   buildAssignmentShareLinkCopyExecutionPlan({
@@ -30574,6 +30609,10 @@ const assignmentListCardComponentSource = readFileSync(
   'src/components/assignments/assignment-list-card.tsx',
   'utf8'
 );
+const assignmentShareLinkHandoffComponentSource = readFileSync(
+  'src/components/assignments/assignment-share-link-handoff.tsx',
+  'utf8'
+);
 const assignmentListStatsComponentSource = readFileSync(
   'src/components/assignments/assignment-list-stats.tsx',
   'utf8'
@@ -31237,6 +31276,11 @@ assert.match(
   'Assignment list card component should render the prepared assignment lifecycle handoff as stable hidden semantic output.'
 );
 assert.match(
+  assignmentShareLinkHandoffComponentSource,
+  /AssignmentShareLinkHandoffView[\s\S]*useId[\s\S]*export function AssignmentShareLinkHandoff[\s\S]*data-handoff="assignment-share-link"[\s\S]*handoff\.title[\s\S]*handoff\.description[\s\S]*handoff\.itemViews\.map\(\(item\) => \([\s\S]*AssignmentShareLinkHandoffItem[\s\S]*item=\{item\}[\s\S]*key=\{item\.id\}[\s\S]*function AssignmentShareLinkHandoffItem[\s\S]*item: AssignmentShareLinkHandoffItemView[\s\S]*data-handoff-item=\{item\.id\}[\s\S]*item\.label[\s\S]*aria-label=\{item\.ariaLabel\}[\s\S]*item\.value[\s\S]*item\.description/,
+  'Assignment share-link handoff component should render prepared share-link item views as stable hidden semantic output.'
+);
+assert.match(
   assignmentListCardComponentSource,
   /AssignmentListDistributionStepId[\s\S]*AssignmentListDistributionStepView[\s\S]*AssignmentListDistributionView/,
   'Assignment list card component should import focused distribution child contracts.'
@@ -31360,6 +31404,11 @@ assert.match(
   assignmentListCardComponentSource,
   /function AssignmentListShareActions[\s\S]*AssignmentListSharePreviewAction[\s\S]*CopyAssignmentShareLinkButton[\s\S]*disabled=\{!action\.isAvailable\}[\s\S]*disabledReasonCode=\{action\.disabledReasonCode\}[\s\S]*disabledMessage=\{action\.disabledReason\}[\s\S]*AssignmentListShareDisabledReason/,
   'Assignment list share actions should render prepared student-link availability, copy-disabled state, disabled reason code, and disabled reason text.'
+);
+assert.match(
+  assignmentListCardComponentSource,
+  /function AssignmentListShareActions[\s\S]*const handoffView = buildAssignmentShareLinkHandoffView\(action, \{[\s\S]*surface: 'assignment-list'[\s\S]*<AssignmentShareLinkHandoff handoff=\{handoffView\} \/>/,
+  'Assignment list share actions should expose the prepared assignment share-link handoff for the assignment-list surface.'
 );
 assert.match(
   assignmentListCardComponentSource,
@@ -31587,6 +31636,11 @@ assert.match(
   publishedAssignmentPanelComponentSource,
   /function PublishedAssignmentShareActions[\s\S]*PublishedAssignmentSharePreviewAction[\s\S]*CopyAssignmentShareLinkButton[\s\S]*disabled=\{!action\.isAvailable\}[\s\S]*disabledReasonCode=\{action\.disabledReasonCode\}[\s\S]*disabledMessage=\{action\.disabledReason\}[\s\S]*label=\{action\.copyLabel\}[\s\S]*shareSlug=\{action\.shareSlug\}[\s\S]*PublishedAssignmentShareDisabledReason[\s\S]*function PublishedAssignmentDismissActionButton[\s\S]*action\.label/,
   'Published assignment share and dismiss actions should render prepared share data, disabled state, copy labels, and copy-link behavior.'
+);
+assert.match(
+  publishedAssignmentPanelComponentSource,
+  /function PublishedAssignmentShareActions[\s\S]*const handoffView = buildAssignmentShareLinkHandoffView\(action, \{[\s\S]*surface: 'publish-success'[\s\S]*<AssignmentShareLinkHandoff handoff=\{handoffView\} \/>/,
+  'Published assignment share actions should expose the prepared assignment share-link handoff for the publish-success surface.'
 );
 assert.doesNotMatch(
   publishedAssignmentPanelComponentSource,

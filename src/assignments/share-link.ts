@@ -11,22 +11,32 @@ export const ASSIGNMENT_SHARE_ROUTE_TARGET = '/play/$shareId';
 export const ASSIGNMENT_SHARE_LINK_HANDOFF_ITEM_IDS = [
   'route-target',
   'normalized-share-slug',
+  'normalized-slug-component',
   'encoded-share-path',
+  'encoded-route-param',
   'absolute-share-url',
   'base-url-origin',
   'route-param',
+  'preview-route-params',
   'path-label',
   'url-label',
+  'public-delivery-contract',
   'availability',
   'lifecycle-guard',
   'disabled-reason',
+  'copy-disabled-gate',
   'copy-action',
+  'clipboard-payload',
+  'copy-execution-plan',
   'copy-feedback',
+  'preview-disabled-gate',
   'preview-action',
   'student-runner-target',
+  'path-encoding-guard',
   'publish-success-surface',
   'assignment-list-surface',
   'result-page-surface',
+  'surface-consistency',
   'missing-slug-guard',
   'privacy-guard',
 ] as const;
@@ -79,7 +89,9 @@ export type AssignmentShareLinkHandoffItemView = {
 export type AssignmentShareLinkHandoffPrivacyContract = {
   exposesActivityContent: false;
   exposesAnswerKeys: false;
+  exposesClipboardPrivateData: false;
   exposesInternalAssignmentIds: false;
+  exposesInternalBaseUrlConfig: false;
   exposesRawAnonymousToken: false;
   exposesSourceMaterialStorageKeys: false;
   exposesStudentAnswerText: false;
@@ -263,6 +275,18 @@ export function buildAssignmentShareLinkHandoffView(
   const disabledReasonValue =
     actionView.disabledReason ??
     formatAssignmentShareLinkDisabledReasonCode(actionView.disabledReasonCode);
+  const copyExecutionPlan = buildAssignmentShareLinkCopyExecutionPlan({
+    disabled: !actionView.isAvailable,
+    disabledMessage: disabledReasonValue || undefined,
+    disabledReasonCode: actionView.disabledReasonCode,
+    shareSlug: actionView.shareSlug,
+    shareUrl: actionView.shareUrl,
+  });
+  const encodedRouteParam = getAssignmentShareLinkEncodedRouteParam(
+    actionView.sharePath
+  );
+  const encodedRouteParamValue =
+    encodedRouteParam || m.assignment_share_link_handoff_missing_value();
   const itemViews: AssignmentShareLinkHandoffItemView[] = [
     buildAssignmentShareLinkHandoffItem({
       id: 'route-target',
@@ -275,8 +299,17 @@ export function buildAssignmentShareLinkHandoffView(
         : m.assignment_share_link_handoff_missing_value(),
     }),
     buildAssignmentShareLinkHandoffItem({
+      id: 'normalized-slug-component',
+      value:
+        actionView.shareSlug || m.assignment_share_link_handoff_missing_value(),
+    }),
+    buildAssignmentShareLinkHandoffItem({
       id: 'encoded-share-path',
       value: actionView.sharePath,
+    }),
+    buildAssignmentShareLinkHandoffItem({
+      id: 'encoded-route-param',
+      value: encodedRouteParamValue,
     }),
     buildAssignmentShareLinkHandoffItem({
       id: 'absolute-share-url',
@@ -291,12 +324,20 @@ export function buildAssignmentShareLinkHandoffView(
       value: 'shareId',
     }),
     buildAssignmentShareLinkHandoffItem({
+      id: 'preview-route-params',
+      value: `shareId=${encodedRouteParamValue}`,
+    }),
+    buildAssignmentShareLinkHandoffItem({
       id: 'path-label',
       value: actionView.sharePathLabel,
     }),
     buildAssignmentShareLinkHandoffItem({
       id: 'url-label',
       value: actionView.shareUrlLabel,
+    }),
+    buildAssignmentShareLinkHandoffItem({
+      id: 'public-delivery-contract',
+      value: m.assignment_share_link_handoff_public_delivery_link_value(),
     }),
     buildAssignmentShareLinkHandoffItem({
       id: 'availability',
@@ -315,13 +356,35 @@ export function buildAssignmentShareLinkHandoffView(
         disabledReasonValue || m.assignment_share_link_handoff_none_value(),
     }),
     buildAssignmentShareLinkHandoffItem({
+      id: 'copy-disabled-gate',
+      statusLabel: actionStateValue,
+      value: actionStateValue,
+    }),
+    buildAssignmentShareLinkHandoffItem({
       id: 'copy-action',
       statusLabel: actionStateValue,
       value: actionStateValue,
     }),
     buildAssignmentShareLinkHandoffItem({
+      id: 'clipboard-payload',
+      value: actionView.isAvailable
+        ? actionView.shareUrl
+        : m.assignment_share_link_handoff_blocked_value(),
+    }),
+    buildAssignmentShareLinkHandoffItem({
+      id: 'copy-execution-plan',
+      statusLabel:
+        formatAssignmentShareLinkCopyExecutionPlanValue(copyExecutionPlan),
+      value: formatAssignmentShareLinkCopyExecutionPlanValue(copyExecutionPlan),
+    }),
+    buildAssignmentShareLinkHandoffItem({
       id: 'copy-feedback',
       value: assignmentShareLinkActionCopy.successMessage,
+    }),
+    buildAssignmentShareLinkHandoffItem({
+      id: 'preview-disabled-gate',
+      statusLabel: actionStateValue,
+      value: actionStateValue,
     }),
     buildAssignmentShareLinkHandoffItem({
       id: 'preview-action',
@@ -331,6 +394,11 @@ export function buildAssignmentShareLinkHandoffView(
     buildAssignmentShareLinkHandoffItem({
       id: 'student-runner-target',
       value: ASSIGNMENT_SHARE_ROUTE_TARGET,
+    }),
+    buildAssignmentShareLinkHandoffItem({
+      id: 'path-encoding-guard',
+      statusLabel: formatAssignmentShareLinkPathEncodingGuard(actionView),
+      value: formatAssignmentShareLinkPathEncodingGuard(actionView),
     }),
     buildAssignmentShareLinkHandoffItem({
       id: 'publish-success-surface',
@@ -364,6 +432,11 @@ export function buildAssignmentShareLinkHandoffView(
         surface,
         'result-page'
       ),
+    }),
+    buildAssignmentShareLinkHandoffItem({
+      id: 'surface-consistency',
+      statusLabel: m.assignment_share_link_handoff_surface_consistent_value(),
+      value: m.assignment_share_link_handoff_surface_consistent_value(),
     }),
     buildAssignmentShareLinkHandoffItem({
       id: 'missing-slug-guard',
@@ -487,7 +560,9 @@ function buildAssignmentShareLinkHandoffPrivacyContract(
   return {
     exposesActivityContent: false,
     exposesAnswerKeys: false,
+    exposesClipboardPrivateData: false,
     exposesInternalAssignmentIds: false,
+    exposesInternalBaseUrlConfig: false,
     exposesRawAnonymousToken: false,
     exposesSourceMaterialStorageKeys: false,
     exposesStudentAnswerText: false,
@@ -538,10 +613,22 @@ function getAssignmentShareLinkHandoffItemCopy(
           m.assignment_share_link_handoff_normalized_slug_description(),
         label: m.assignment_share_link_handoff_normalized_slug_label(),
       };
+    case 'normalized-slug-component':
+      return {
+        description:
+          m.assignment_share_link_handoff_normalized_component_description(),
+        label: m.assignment_share_link_handoff_normalized_component_label(),
+      };
     case 'encoded-share-path':
       return {
         description: m.assignment_share_link_handoff_encoded_path_description(),
         label: m.assignment_share_link_handoff_encoded_path_label(),
+      };
+    case 'encoded-route-param':
+      return {
+        description:
+          m.assignment_share_link_handoff_encoded_route_param_description(),
+        label: m.assignment_share_link_handoff_encoded_route_param_label(),
       };
     case 'absolute-share-url':
       return {
@@ -558,6 +645,12 @@ function getAssignmentShareLinkHandoffItemCopy(
         description: m.assignment_share_link_handoff_route_param_description(),
         label: m.assignment_share_link_handoff_route_param_label(),
       };
+    case 'preview-route-params':
+      return {
+        description:
+          m.assignment_share_link_handoff_preview_route_params_description(),
+        label: m.assignment_share_link_handoff_preview_route_params_label(),
+      };
     case 'path-label':
       return {
         description: m.assignment_share_link_handoff_path_label_description(),
@@ -567,6 +660,12 @@ function getAssignmentShareLinkHandoffItemCopy(
       return {
         description: m.assignment_share_link_handoff_url_label_description(),
         label: m.assignment_share_link_handoff_url_label_label(),
+      };
+    case 'public-delivery-contract':
+      return {
+        description:
+          m.assignment_share_link_handoff_public_delivery_contract_description(),
+        label: m.assignment_share_link_handoff_public_delivery_contract_label(),
       };
     case 'availability':
       return {
@@ -585,16 +684,40 @@ function getAssignmentShareLinkHandoffItemCopy(
           m.assignment_share_link_handoff_disabled_reason_description(),
         label: m.assignment_share_link_handoff_disabled_reason_label(),
       };
+    case 'copy-disabled-gate':
+      return {
+        description:
+          m.assignment_share_link_handoff_copy_disabled_gate_description(),
+        label: m.assignment_share_link_handoff_copy_disabled_gate_label(),
+      };
     case 'copy-action':
       return {
         description: m.assignment_share_link_handoff_copy_action_description(),
         label: m.assignment_share_link_handoff_copy_action_label(),
+      };
+    case 'clipboard-payload':
+      return {
+        description:
+          m.assignment_share_link_handoff_clipboard_payload_description(),
+        label: m.assignment_share_link_handoff_clipboard_payload_label(),
+      };
+    case 'copy-execution-plan':
+      return {
+        description:
+          m.assignment_share_link_handoff_copy_execution_plan_description(),
+        label: m.assignment_share_link_handoff_copy_execution_plan_label(),
       };
     case 'copy-feedback':
       return {
         description:
           m.assignment_share_link_handoff_copy_feedback_description(),
         label: m.assignment_share_link_handoff_copy_feedback_label(),
+      };
+    case 'preview-disabled-gate':
+      return {
+        description:
+          m.assignment_share_link_handoff_preview_disabled_gate_description(),
+        label: m.assignment_share_link_handoff_preview_disabled_gate_label(),
       };
     case 'preview-action':
       return {
@@ -607,6 +730,12 @@ function getAssignmentShareLinkHandoffItemCopy(
         description:
           m.assignment_share_link_handoff_student_runner_target_description(),
         label: m.assignment_share_link_handoff_student_runner_target_label(),
+      };
+    case 'path-encoding-guard':
+      return {
+        description:
+          m.assignment_share_link_handoff_path_encoding_guard_description(),
+        label: m.assignment_share_link_handoff_path_encoding_guard_label(),
       };
     case 'publish-success-surface':
       return {
@@ -624,6 +753,12 @@ function getAssignmentShareLinkHandoffItemCopy(
         description:
           m.assignment_share_link_handoff_result_surface_description(),
         label: m.assignment_share_link_handoff_result_surface_label(),
+      };
+    case 'surface-consistency':
+      return {
+        description:
+          m.assignment_share_link_handoff_surface_consistency_description(),
+        label: m.assignment_share_link_handoff_surface_consistency_label(),
       };
     case 'missing-slug-guard':
       return {
@@ -675,4 +810,28 @@ function getAssignmentShareLinkUrlOrigin(shareUrl: string) {
   } catch {
     return m.assignment_share_link_handoff_missing_value();
   }
+}
+
+function getAssignmentShareLinkEncodedRouteParam(sharePath: string) {
+  if (!sharePath.startsWith('/play/')) return '';
+
+  return sharePath.slice('/play/'.length);
+}
+
+function formatAssignmentShareLinkCopyExecutionPlanValue(
+  plan: AssignmentShareLinkCopyExecutionPlan
+) {
+  if (plan.type === 'copy-link') {
+    return m.assignment_share_link_handoff_copy_plan_copy_link_value();
+  }
+
+  return m.assignment_share_link_handoff_copy_plan_blocked_value();
+}
+
+function formatAssignmentShareLinkPathEncodingGuard(
+  actionView: AssignmentShareLinkActionView
+) {
+  return actionView.sharePath === buildAssignmentSharePath(actionView.shareSlug)
+    ? m.assignment_share_link_handoff_passed_value()
+    : m.assignment_share_link_handoff_blocked_value();
 }

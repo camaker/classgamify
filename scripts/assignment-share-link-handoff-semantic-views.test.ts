@@ -24,7 +24,7 @@ const SECRET_STORAGE_KEY = 'SECRET_STORAGE_KEY_SHOULD_NOT_LEAK';
 const SECRET_STUDENT_NAME = 'SECRET_STUDENT_NAME_SHOULD_NOT_LEAK';
 const SECRET_TOKEN = 'SECRET_ANONYMOUS_TOKEN_SHOULD_NOT_LEAK';
 
-test('share-link helper exposes a safe 20-slice handoff', () => {
+test('share-link helper exposes a safe 30-slice handoff', () => {
   const actionView = buildAssignmentShareLinkActionView({
     baseUrl: ' classgamify.test/dashboard ',
     label: SECRET_LABEL,
@@ -36,7 +36,7 @@ test('share-link helper exposes a safe 20-slice handoff', () => {
   const itemIds = handoffView.itemViews.map((item) => item.id);
 
   assert.deepEqual(itemIds, [...ASSIGNMENT_SHARE_LINK_HANDOFF_ITEM_IDS]);
-  assert.equal(new Set(itemIds).size, 20);
+  assert.equal(new Set(itemIds).size, 30);
   assert.equal(
     handoffView.itemViews.every(
       (item) =>
@@ -50,7 +50,9 @@ test('share-link helper exposes a safe 20-slice handoff', () => {
   assert.deepEqual(handoffView.privacy, {
     exposesActivityContent: false,
     exposesAnswerKeys: false,
+    exposesClipboardPrivateData: false,
     exposesInternalAssignmentIds: false,
+    exposesInternalBaseUrlConfig: false,
     exposesRawAnonymousToken: false,
     exposesSourceMaterialStorageKeys: false,
     exposesStudentAnswerText: false,
@@ -64,22 +66,32 @@ test('share-link helper exposes a safe 20-slice handoff', () => {
     [
       ['route-target', '/play/$shareId'],
       ['normalized-share-slug', 'Resolved'],
+      ['normalized-slug-component', 'Class 1/2'],
       ['encoded-share-path', '/play/Class%201%2F2'],
+      ['encoded-route-param', 'Class%201%2F2'],
       ['absolute-share-url', 'https://classgamify.test/play/Class%201%2F2'],
       ['base-url-origin', 'https://classgamify.test'],
       ['route-param', 'shareId'],
+      ['preview-route-params', 'shareId=Class%201%2F2'],
       ['path-label', 'Student link'],
       ['url-label', 'Full student link'],
+      ['public-delivery-contract', 'Public delivery link'],
       ['availability', 'Available'],
       ['lifecycle-guard', 'Open'],
       ['disabled-reason', 'None'],
+      ['copy-disabled-gate', 'Enabled'],
       ['copy-action', 'Enabled'],
+      ['clipboard-payload', 'https://classgamify.test/play/Class%201%2F2'],
+      ['copy-execution-plan', 'copy-link'],
       ['copy-feedback', 'Student link copied.'],
+      ['preview-disabled-gate', 'Enabled'],
       ['preview-action', 'Enabled'],
       ['student-runner-target', '/play/$shareId'],
+      ['path-encoding-guard', 'Passed'],
       ['publish-success-surface', 'Compatible'],
       ['assignment-list-surface', 'Compatible'],
       ['result-page-surface', 'Active'],
+      ['surface-consistency', 'Consistent'],
       ['missing-slug-guard', 'Passed'],
       ['privacy-guard', 'Private data omitted'],
     ]
@@ -106,6 +118,18 @@ test('share-link handoff keeps missing slugs blocked before copy or preview', ()
     'Missing'
   );
   assert.equal(
+    getHandoffItemValue(handoffView.itemViews, 'normalized-slug-component'),
+    'Missing'
+  );
+  assert.equal(
+    getHandoffItemValue(handoffView.itemViews, 'encoded-route-param'),
+    'Missing'
+  );
+  assert.equal(
+    getHandoffItemValue(handoffView.itemViews, 'preview-route-params'),
+    'shareId=Missing'
+  );
+  assert.equal(
     getHandoffItemValue(handoffView.itemViews, 'availability'),
     'Unavailable'
   );
@@ -122,7 +146,23 @@ test('share-link handoff keeps missing slugs blocked before copy or preview', ()
     'Disabled'
   );
   assert.equal(
+    getHandoffItemValue(handoffView.itemViews, 'copy-disabled-gate'),
+    'Disabled'
+  );
+  assert.equal(
+    getHandoffItemValue(handoffView.itemViews, 'clipboard-payload'),
+    'Blocked'
+  );
+  assert.equal(
+    getHandoffItemValue(handoffView.itemViews, 'copy-execution-plan'),
+    'blocked'
+  );
+  assert.equal(
     getHandoffItemValue(handoffView.itemViews, 'preview-action'),
+    'Disabled'
+  );
+  assert.equal(
+    getHandoffItemValue(handoffView.itemViews, 'preview-disabled-gate'),
     'Disabled'
   );
   assert.equal(
@@ -255,12 +295,28 @@ test('publish panel, assignment list, and result page share one link contract', 
       '/play/shared-class'
     );
     assert.equal(
+      getHandoffItemValue(handoffView.itemViews, 'encoded-route-param'),
+      'shared-class'
+    );
+    assert.equal(
       getHandoffItemValue(handoffView.itemViews, 'absolute-share-url'),
       buildAssignmentShareUrl(shareSlug)
     );
     assert.equal(
+      getHandoffItemValue(handoffView.itemViews, 'clipboard-payload'),
+      buildAssignmentShareUrl(shareSlug)
+    );
+    assert.equal(
+      getHandoffItemValue(handoffView.itemViews, 'copy-execution-plan'),
+      'copy-link'
+    );
+    assert.equal(
       getHandoffItemValue(handoffView.itemViews, activeSurfaceId),
       'Active'
+    );
+    assert.equal(
+      getHandoffItemValue(handoffView.itemViews, 'surface-consistency'),
+      'Consistent'
     );
     assertNoPrivateShareText(JSON.stringify(handoffView));
   }

@@ -14,8 +14,10 @@ import type {
   AssignmentListStatusAction,
 } from '@/assignments/list-view';
 import { buildAssignmentStatusActionExecutionPlan } from '@/assignments/lifecycle';
+import { buildAssignmentShareLinkHandoffView } from '@/assignments/share-link';
 import { AssignmentListStats } from '@/components/assignments/assignment-list-stats';
 import { AssignmentSettingsSummary } from '@/components/assignments/assignment-settings-summary';
+import { AssignmentShareLinkHandoff } from '@/components/assignments/assignment-share-link-handoff';
 import { CopyAssignmentShareLinkButton } from '@/components/assignments/copy-assignment-share-link-button';
 import { Badge } from '@/components/ui/badge';
 import { Button, buttonVariants } from '@/components/ui/button';
@@ -476,9 +478,13 @@ function AssignmentListShareActions({
   const disabledReasonId = getAssignmentListShareDisabledReasonId(action);
   const sharePathDescriptionId =
     getAssignmentListSharePathDescriptionId(action);
+  const handoffView = buildAssignmentShareLinkHandoffView(action, {
+    surface: 'assignment-list',
+  });
 
   return (
     <div className="grid gap-2">
+      <AssignmentShareLinkHandoff handoff={handoffView} />
       <AssignmentListSharePath
         action={action}
         descriptionId={sharePathDescriptionId}
