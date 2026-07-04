@@ -1,3 +1,5 @@
+import { buildAdminUsersHandoffView } from '@/admin/users-view';
+import { AdminUsersHandoffPanel } from '@/components/admin/users/admin-users-handoff-panel';
 import { UsersTable } from '@/components/admin/users/users-table';
 import { useUsers } from '@/hooks/use-users';
 import type { ColumnFiltersState, SortingState } from '@tanstack/react-table';
@@ -62,6 +64,29 @@ export function AdminUsersContent() {
     effectiveSort,
     clientFilters
   );
+  const handoffView = useMemo(
+    () =>
+      buildAdminUsersHandoffView({
+        filters: clientFilters,
+        loading: isLoading,
+        pageIndex: page,
+        pageSize: size,
+        search,
+        sorting: effectiveSort,
+        total: data?.total ?? 0,
+        visibleCount: data?.items.length ?? 0,
+      }),
+    [
+      clientFilters,
+      data?.items.length,
+      data?.total,
+      effectiveSort,
+      isLoading,
+      page,
+      search,
+      size,
+    ]
+  );
 
   const handleFilterChange = (filters: ColumnFiltersState) => {
     const getValue = (id: string) => {
@@ -86,20 +111,25 @@ export function AdminUsersContent() {
   };
 
   return (
-    <UsersTable
-      data={data?.items ?? []}
-      total={data?.total ?? 0}
-      pageIndex={page}
-      pageSize={size}
-      search={search}
-      sorting={effectiveSort}
-      filters={serverFilters}
-      loading={isLoading}
-      onSearch={(newSearch) => setQueryStates({ search: newSearch, page: 0 })}
-      onPageChange={(newPage) => setQueryStates({ page: newPage })}
-      onPageSizeChange={(newSize) => setQueryStates({ size: newSize, page: 0 })}
-      onSortingChange={handleSortChange}
-      onFiltersChange={handleFilterChange}
-    />
+    <div className="grid gap-4">
+      <AdminUsersHandoffPanel handoffView={handoffView} />
+      <UsersTable
+        data={data?.items ?? []}
+        total={data?.total ?? 0}
+        pageIndex={page}
+        pageSize={size}
+        search={search}
+        sorting={effectiveSort}
+        filters={serverFilters}
+        loading={isLoading}
+        onSearch={(newSearch) => setQueryStates({ search: newSearch, page: 0 })}
+        onPageChange={(newPage) => setQueryStates({ page: newPage })}
+        onPageSizeChange={(newSize) =>
+          setQueryStates({ size: newSize, page: 0 })
+        }
+        onSortingChange={handleSortChange}
+        onFiltersChange={handleFilterChange}
+      />
+    </div>
   );
 }

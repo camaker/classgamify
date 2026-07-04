@@ -77,6 +77,10 @@ import {
   normalizeAdminUserSortId,
 } from '@/admin/users-query';
 import {
+  ADMIN_USERS_HANDOFF_ITEM_IDS,
+  buildAdminUsersHandoffView,
+} from '@/admin/users-view';
+import {
   buildUserFileDetailOwnerWhere,
   getUserFileListOffset,
   USER_FILE_LIST_INPUT_LIMITS,
@@ -2305,6 +2309,15 @@ const adminUsersRouteSource = readFileSync(
   'src/routes/admin/users.tsx',
   'utf8'
 );
+const adminUsersViewSource = readFileSync('src/admin/users-view.ts', 'utf8');
+const adminUsersContentSource = readFileSync(
+  'src/components/admin/users/admin-users-content.tsx',
+  'utf8'
+);
+const adminUsersHandoffPanelSource = readFileSync(
+  'src/components/admin/users/admin-users-handoff-panel.tsx',
+  'utf8'
+);
 const useAuthSource = readFileSync('src/hooks/use-auth.ts', 'utf8');
 assert.match(
   adminUsersTableSource,
@@ -2356,10 +2369,133 @@ assert.match(
   /const message = m\.admin_users_unban_error\(\);/,
   'Admin user unban failures should use the localized unban failure message.'
 );
+assert.deepEqual(ADMIN_USERS_HANDOFF_ITEM_IDS, [
+  'admin-scope',
+  'route-gate',
+  'admin-role-boundary',
+  'user-list-query',
+  'search-state',
+  'role-filter',
+  'status-filter',
+  'sort-state',
+  'pagination-state',
+  'visible-rows',
+  'total-users',
+  'loading-state',
+  'table-columns',
+  'name-column',
+  'email-column',
+  'email-copy-action',
+  'email-verification-status',
+  'role-column',
+  'status-column',
+  'ban-reason-column',
+  'ban-expiry-column',
+  'detail-drawer',
+  'ban-action',
+  'unban-action',
+  'ban-reason-required',
+  'ban-expiry-optional',
+  'mutation-feedback',
+  'activity-content-boundary',
+  'assignment-link-boundary',
+  'student-result-boundary',
+]);
+assert.match(
+  adminUsersViewSource,
+  /export const ADMIN_USERS_HANDOFF_ITEM_IDS = \[(?=[\s\S]*'admin-scope')(?=[\s\S]*'route-gate')(?=[\s\S]*'admin-role-boundary')(?=[\s\S]*'user-list-query')(?=[\s\S]*'search-state')(?=[\s\S]*'role-filter')(?=[\s\S]*'status-filter')(?=[\s\S]*'sort-state')(?=[\s\S]*'pagination-state')(?=[\s\S]*'visible-rows')(?=[\s\S]*'total-users')(?=[\s\S]*'loading-state')(?=[\s\S]*'table-columns')(?=[\s\S]*'name-column')(?=[\s\S]*'email-column')(?=[\s\S]*'email-copy-action')(?=[\s\S]*'email-verification-status')(?=[\s\S]*'role-column')(?=[\s\S]*'status-column')(?=[\s\S]*'ban-reason-column')(?=[\s\S]*'ban-expiry-column')(?=[\s\S]*'detail-drawer')(?=[\s\S]*'ban-action')(?=[\s\S]*'unban-action')(?=[\s\S]*'ban-reason-required')(?=[\s\S]*'ban-expiry-optional')(?=[\s\S]*'mutation-feedback')(?=[\s\S]*'activity-content-boundary')(?=[\s\S]*'assignment-link-boundary')(?=[\s\S]*'student-result-boundary')/,
+  'Admin users handoff should expose stable 30-slice teacher-account governance item ids.'
+);
+assert.match(
+  adminUsersViewSource,
+  /export type AdminUsersHandoffPrivacyContract = \{[\s\S]*changesActivityContent: false;[\s\S]*changesAssignmentLinks: false;[\s\S]*exposesActivityContent: false;[\s\S]*exposesAssignmentSnapshots: false;[\s\S]*exposesRawStudentIdentifiers: false;[\s\S]*exposesSearchText: false;[\s\S]*exposesSourceMaterialStorageKeys: false;[\s\S]*exposesStudentAnswers: false;[\s\S]*exposesUserEmails: false;[\s\S]*scope: 'admin-user-governance';/,
+  'Admin users handoff should publish explicit privacy and classroom data-boundary flags.'
+);
+assert.match(
+  adminUsersViewSource,
+  /buildAdminUsersPageViewModel[\s\S]*id: 'admin'[\s\S]*id: 'users'[\s\S]*contentAriaLabel: m\.admin_users_content_aria_label/,
+  'Admin users view domain should own stable breadcrumb ids and page aria copy.'
+);
 assert.match(
   adminUsersRouteSource,
-  /id: 'admin'[\s\S]*id: 'users'[\s\S]*isCurrentPage: true/,
-  'Admin users route should pass stable breadcrumb ids.'
+  /buildAdminUsersPageViewModel\(\)[\s\S]*DashboardHeader breadcrumbs=\{pageView\.breadcrumbs\}[\s\S]*aria-label=\{pageView\.contentAriaLabel\}/,
+  'Admin users route should render the prepared page view model instead of hand-writing route copy.'
+);
+assert.match(
+  adminUsersContentSource,
+  /buildAdminUsersHandoffView\(\{[\s\S]*filters: clientFilters[\s\S]*loading: isLoading[\s\S]*pageIndex: page[\s\S]*pageSize: size[\s\S]*search,[\s\S]*sorting: effectiveSort[\s\S]*total: data\?\.total \?\? 0[\s\S]*visibleCount: data\?\.items\.length \?\? 0[\s\S]*<AdminUsersHandoffPanel handoffView=\{handoffView\} \/>[\s\S]*<UsersTable/,
+  'Admin users content should prepare the handoff view from current filters, query state, and result counts before rendering the table.'
+);
+assert.match(
+  adminUsersHandoffPanelSource,
+  /aria-label=\{handoffView\.title\}[\s\S]*handoffView\.itemViews\.map\(\(itemView\) =>[\s\S]*key=\{itemView\.id\}[\s\S]*<output aria-label=\{itemView\.ariaLabel\}/,
+  'Admin users handoff panel should render semantic item outputs from prepared item views.'
+);
+assert.doesNotMatch(
+  `${adminUsersViewSource}\n${adminUsersHandoffPanelSource}`,
+  /Teacher account governance|Protected admin route|Clipboard guarded|Private results|教师账号治理|管理员路由门禁|剪贴板受控|私密结果/,
+  'Admin users handoff source and panel should read visible governance copy from locale messages.'
+);
+const adminUsersHandoffView = buildAdminUsersHandoffView({
+  filters: [
+    { id: 'role', value: 'user' },
+    { id: 'status', value: 'inactive' },
+  ],
+  loading: false,
+  pageIndex: 1,
+  pageSize: 25,
+  search: 'private teacher email search',
+  sorting: [{ id: 'email', desc: false }],
+  total: 42,
+  visibleCount: 25,
+});
+const adminUsersHandoffItemIds = adminUsersHandoffView.itemViews.map(
+  (item) => item.id
+);
+assert.deepEqual(adminUsersHandoffItemIds, [
+  ...ADMIN_USERS_HANDOFF_ITEM_IDS,
+]);
+assert.deepEqual(adminUsersHandoffView.privacy, {
+  changesActivityContent: false,
+  changesAssignmentLinks: false,
+  exposesActivityContent: false,
+  exposesAssignmentSnapshots: false,
+  exposesRawStudentIdentifiers: false,
+  exposesSearchText: false,
+  exposesSourceMaterialStorageKeys: false,
+  exposesStudentAnswers: false,
+  exposesUserEmails: false,
+  itemIds: adminUsersHandoffItemIds,
+  scope: 'admin-user-governance',
+});
+assert.deepEqual(
+  adminUsersHandoffView.itemViews
+    .filter((item) =>
+      [
+        'search-state',
+        'role-filter',
+        'status-filter',
+        'sort-state',
+        'pagination-state',
+        'assignment-link-boundary',
+        'student-result-boundary',
+      ].includes(item.id)
+    )
+    .map((item) => [item.id, item.value]),
+  [
+    ['search-state', 'Search active'],
+    ['role-filter', 'Teacher'],
+    ['status-filter', 'Inactive'],
+    ['sort-state', 'Email ascending'],
+    ['pagination-state', 'Page 2 · 25 per page'],
+    ['assignment-link-boundary', 'No link changes'],
+    ['student-result-boundary', 'Private results'],
+  ]
+);
+assert.doesNotMatch(
+  JSON.stringify(adminUsersHandoffView),
+  /private teacher email search|teacher-private@example\.test|anonymous-browser-token|source-materials\/private\/key\.pdf|student wrote the private answer/,
+  'Admin users handoff should not serialize search text, email values, storage keys, raw student tokens, or student answers.'
 );
 assert.doesNotMatch(
   useAuthSource,
@@ -11845,6 +11981,13 @@ const authWorkspaceBoundaryRequirements = [
       ['settings_account_handoff_assignment_link_boundary_description', /do not open, close, rewrite/],
       ['settings_account_handoff_delete_confirmation_boundary_description', /saved activities, source materials, assignment links/],
       ['settings_account_handoff_privacy_guard_description', /teacher emails, auth secrets, raw student identifiers/],
+      ['admin_users_title', /Teacher accounts/],
+      ['admin_users_handoff_description', /ClassGamify teacher accounts/],
+      ['admin_users_handoff_admin_scope_description', /generic SaaS users/],
+      ['admin_users_handoff_activity_content_boundary_description', /saved activity content/],
+      ['admin_users_handoff_assignment_link_boundary_description', /does not open, close, rewrite/],
+      ['admin_users_handoff_student_result_boundary_description', /student answers, anonymous tokens/],
+      ['admin_users_handoff_email_copy_action_description', /does not include copied email values/],
       ['settings_profile_workspace_summary_description', /display name and avatar/],
       ['settings_profile_workspace_summary_activities_description', /reusable classroom content/],
       ['settings_profile_workspace_summary_assignments_description', /Published assignment links/],
@@ -11932,6 +12075,13 @@ const authWorkspaceBoundaryRequirements = [
       ['settings_account_handoff_assignment_link_boundary_description', /不会打开、关闭、改写/],
       ['settings_account_handoff_delete_confirmation_boundary_description', /已保存活动、来源素材、作业链接/],
       ['settings_account_handoff_privacy_guard_description', /教师邮箱、认证密钥、原始学生标识/],
+      ['admin_users_title', /教师账号治理/],
+      ['admin_users_handoff_description', /ClassGamify 教师账号/],
+      ['admin_users_handoff_admin_scope_description', /通用 SaaS 用户/],
+      ['admin_users_handoff_activity_content_boundary_description', /已保存活动内容/],
+      ['admin_users_handoff_assignment_link_boundary_description', /不会打开、关闭、改写/],
+      ['admin_users_handoff_student_result_boundary_description', /学生答案、匿名令牌/],
+      ['admin_users_handoff_email_copy_action_description', /不会包含被复制的邮箱值/],
       ['settings_profile_workspace_summary_description', /显示名称和头像/],
       ['settings_profile_workspace_summary_activities_description', /可复用课堂内容/],
       ['settings_profile_workspace_summary_assignments_description', /已发布作业链接/],
