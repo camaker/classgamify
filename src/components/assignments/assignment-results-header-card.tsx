@@ -1,6 +1,7 @@
 import type {
   AssignmentResultActionButton,
   AssignmentResultHeaderView,
+  AssignmentResultMaterialHandoffView,
 } from '@/assignments/result-view';
 import { AssignmentResultsHeaderActions } from '@/components/assignments/assignment-results-header-actions';
 import { AssignmentSettingsSummary } from '@/components/assignments/assignment-settings-summary';
@@ -15,12 +16,14 @@ import {
 
 type AssignmentResultsHeaderCardProps = {
   headerView: AssignmentResultHeaderView;
+  materialHandoffView: AssignmentResultMaterialHandoffView;
   onResultAction: (actionButton: AssignmentResultActionButton) => void;
   resultActions: AssignmentResultActionButton[];
 };
 
 export function AssignmentResultsHeaderCard({
   headerView,
+  materialHandoffView,
   onResultAction,
   resultActions,
 }: AssignmentResultsHeaderCardProps) {
@@ -46,6 +49,7 @@ export function AssignmentResultsHeaderCard({
         <AssignmentSettingsSummary view={headerView.settingsSummaryView} />
         <AssignmentResultsHeaderActions
           exportPreparationView={headerView.exportPreparationView}
+          materialHandoffView={materialHandoffView}
           onResultAction={onResultAction}
           printAction={headerView.printAction}
           resultActionsLabel={headerView.resultActionsLabel}

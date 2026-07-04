@@ -86,12 +86,14 @@ import {
   buildAssignmentResultCopyActionData,
   buildAssignmentResultCopyArtifacts,
   buildAssignmentResultCopyArtifactPreviews,
+  buildAssignmentResultMaterialHandoffView,
   buildAssignmentResultActionState,
   type AssignmentResultActionButton,
   type AssignmentResultActionDataSet,
   type AssignmentResultCopyActionData,
   type AssignmentResultCopyArtifactPreview,
   type AssignmentResultCopyArtifacts,
+  type AssignmentResultMaterialHandoffView,
   type AssignmentResultActionState,
 } from '@/assignments/result-actions';
 import {
@@ -157,6 +159,7 @@ export {
   buildAssignmentResultActionState,
   buildAssignmentResultActionScopeView,
   buildAssignmentResultActionStatusView,
+  buildAssignmentResultMaterialHandoffView,
   buildAssignmentResultCopyActionData,
   buildAssignmentResultCopyArtifacts,
   buildAssignmentResultCopyArtifactPreviews,
@@ -181,6 +184,7 @@ export {
   type AssignmentResultCopyArtifactPreview,
   type AssignmentResultCopyArtifactPreviewScope,
   type AssignmentResultCopyArtifactPreviewId,
+  type AssignmentResultMaterialHandoffView,
 } from '@/assignments/result-actions';
 
 export type AssignmentResultEmptyState = {
@@ -734,6 +738,7 @@ export type AssignmentResultsPageViewModel<
   loadErrorMessage: string;
   itemPerformanceRowViews: AssignmentResultItemPerformanceRowView[];
   itemPerformanceTableView: AssignmentResultItemPerformanceTableView;
+  materialHandoffView: AssignmentResultMaterialHandoffView;
   metricItems: AssignmentResultMetricItem[];
   resultView: AssignmentResultViewModel<TAttempt>;
   reviewHandoffView: AssignmentResultReviewHandoffView;
@@ -2491,6 +2496,14 @@ export function buildAssignmentResultsPageViewModel<
     reviewScopeView,
     reviewStatusView,
   });
+  const materialHandoffView = buildAssignmentResultMaterialHandoffView({
+    actionButtons,
+    copyArtifactPreviews,
+    copyScopeView,
+    exportPreparationView: headerView?.exportPreparationView ?? null,
+    printAction: headerView?.printAction ?? null,
+    reviewStatusView,
+  });
 
   return {
     actionButtons,
@@ -2528,6 +2541,7 @@ export function buildAssignmentResultsPageViewModel<
     itemPerformanceRowViews,
     itemPerformanceTableView,
     loadErrorMessage: assignmentResultPageCopy.loadErrorMessage,
+    materialHandoffView,
     metricItems: data
       ? buildAssignmentResultMetricItems({
           averageDurationSeconds: data.stats.averageDurationSeconds,

@@ -19,6 +19,8 @@ import {
   buildAssignmentResultsCsv,
   buildAssignmentResultsCsvDataUrl,
   buildAssignmentResultsCsvFilename,
+  type AssignmentResultsExportPreparationItemId,
+  type AssignmentResultsExportPreparationView,
   type AssignmentResultsExportData,
 } from '@/assignments/results-export';
 import type {
@@ -322,6 +324,81 @@ export type AssignmentResultCopyArtifactPreviewMetaKey =
   | 'student-last-submitted'
   | 'students';
 
+export const ASSIGNMENT_RESULT_MATERIAL_HANDOFF_ITEM_IDS = [
+  'review-status',
+  'current-review-scope',
+  'matched-students',
+  'matched-attempts',
+  'matched-items',
+  'matched-answer-reviews',
+  'action-copy-brief',
+  'action-copy-reteach-plan',
+  'action-copy-item-review',
+  'action-copy-follow-up',
+  'action-export-csv',
+  'preview-copy-brief',
+  'preview-copy-reteach-plan',
+  'preview-copy-item-review',
+  'preview-copy-follow-up',
+  'csv-export-preparation',
+  'csv-delivery-policy',
+  'csv-answer-columns',
+  'print-worksheet-action',
+  'print-answer-key-boundary',
+  'data-scope-current-review',
+  'data-scope-full-assignment',
+  'filtered-copy-boundary',
+  'full-export-boundary',
+  'public-runner-unchanged',
+  'snapshot-source',
+  'normalized-student-labels',
+  'anonymous-token-guard',
+  'copy-artifact-text-guard',
+  'teacher-answer-key-guard',
+] as const;
+
+export type AssignmentResultMaterialHandoffItemId =
+  (typeof ASSIGNMENT_RESULT_MATERIAL_HANDOFF_ITEM_IDS)[number];
+
+export type AssignmentResultMaterialHandoffItemView = {
+  ariaLabel: string;
+  dataScope?: AssignmentResultActionDataScope;
+  description: string;
+  id: AssignmentResultMaterialHandoffItemId;
+  label: string;
+  statusLabel?: string;
+  value: string;
+};
+
+export type AssignmentResultMaterialHandoffPrivacyContract = {
+  exposesCopyArtifactText: false;
+  exposesCsvDataUrl: false;
+  exposesPublicRunnerContent: false;
+  exposesRawAnonymousToken: false;
+  exposesStudentAnswerText: false;
+  exposesTeacherAnswerKey: false;
+  itemIds: AssignmentResultMaterialHandoffItemId[];
+  scope: 'teacher-result-materials';
+};
+
+export type AssignmentResultMaterialHandoffView = {
+  description: string;
+  itemViews: AssignmentResultMaterialHandoffItemView[];
+  privacy: AssignmentResultMaterialHandoffPrivacyContract;
+  title: string;
+};
+
+type AssignmentResultMaterialHandoffReviewStatusInput = {
+  description: string;
+  statusLabel: string;
+  title: string;
+};
+
+type AssignmentResultMaterialHandoffPrintActionInput = {
+  assignmentId?: string | null;
+  label: string;
+};
+
 export const assignmentResultActionDescriptors = [
   {
     action: 'copy-brief',
@@ -527,6 +604,475 @@ export function buildAssignmentResultActionStatusView(
     tone: 'ready',
     value,
   };
+}
+
+export function buildAssignmentResultMaterialHandoffView({
+  actionButtons,
+  copyArtifactPreviews,
+  copyScopeView,
+  exportPreparationView,
+  printAction,
+  reviewStatusView,
+}: {
+  actionButtons: AssignmentResultActionButton[];
+  copyArtifactPreviews: AssignmentResultCopyArtifactPreview[];
+  copyScopeView: AssignmentResultCopyArtifactPreviewScope;
+  exportPreparationView: AssignmentResultsExportPreparationView | null;
+  printAction: AssignmentResultMaterialHandoffPrintActionInput | null;
+  reviewStatusView: AssignmentResultMaterialHandoffReviewStatusInput;
+}): AssignmentResultMaterialHandoffView {
+  const itemViews = ASSIGNMENT_RESULT_MATERIAL_HANDOFF_ITEM_IDS.map((id) =>
+    buildAssignmentResultMaterialHandoffItemView({
+      actionButtons,
+      copyArtifactPreviews,
+      copyScopeView,
+      exportPreparationView,
+      id,
+      printAction,
+      reviewStatusView,
+    })
+  );
+
+  return {
+    description: m.assignment_result_material_handoff_description(),
+    itemViews,
+    privacy: buildAssignmentResultMaterialHandoffPrivacyContract(itemViews),
+    title: m.assignment_result_material_handoff_title(),
+  };
+}
+
+function buildAssignmentResultMaterialHandoffItemView({
+  actionButtons,
+  copyArtifactPreviews,
+  copyScopeView,
+  exportPreparationView,
+  id,
+  printAction,
+  reviewStatusView,
+}: {
+  actionButtons: AssignmentResultActionButton[];
+  copyArtifactPreviews: AssignmentResultCopyArtifactPreview[];
+  copyScopeView: AssignmentResultCopyArtifactPreviewScope;
+  exportPreparationView: AssignmentResultsExportPreparationView | null;
+  id: AssignmentResultMaterialHandoffItemId;
+  printAction: AssignmentResultMaterialHandoffPrintActionInput | null;
+  reviewStatusView: AssignmentResultMaterialHandoffReviewStatusInput;
+}): AssignmentResultMaterialHandoffItemView {
+  switch (id) {
+    case 'review-status':
+      return buildAssignmentResultMaterialHandoffItem({
+        description: reviewStatusView.description,
+        id,
+        label: reviewStatusView.title,
+        statusLabel: reviewStatusView.statusLabel,
+        value: reviewStatusView.statusLabel,
+      });
+    case 'current-review-scope':
+      return buildAssignmentResultMaterialHandoffItem({
+        description: copyScopeView.description,
+        id,
+        label: copyScopeView.title,
+        value: m.assignment_result_material_handoff_current_review_value(),
+      });
+    case 'matched-students':
+      return buildAssignmentResultMaterialHandoffMatchedItem({
+        copyScopeView,
+        id,
+        summaryItemId: 'students',
+      });
+    case 'matched-attempts':
+      return buildAssignmentResultMaterialHandoffMatchedItem({
+        copyScopeView,
+        id,
+        summaryItemId: 'attempts',
+      });
+    case 'matched-items':
+      return buildAssignmentResultMaterialHandoffMatchedItem({
+        copyScopeView,
+        id,
+        summaryItemId: 'items',
+      });
+    case 'matched-answer-reviews':
+      return buildAssignmentResultMaterialHandoffMatchedItem({
+        copyScopeView,
+        id,
+        summaryItemId: 'answer-reviews',
+      });
+    case 'action-copy-brief':
+      return buildAssignmentResultMaterialHandoffActionItem({
+        action: 'copy-brief',
+        actionButtons,
+        id,
+      });
+    case 'action-copy-reteach-plan':
+      return buildAssignmentResultMaterialHandoffActionItem({
+        action: 'copy-reteach-plan',
+        actionButtons,
+        id,
+      });
+    case 'action-copy-item-review':
+      return buildAssignmentResultMaterialHandoffActionItem({
+        action: 'copy-item-review',
+        actionButtons,
+        id,
+      });
+    case 'action-copy-follow-up':
+      return buildAssignmentResultMaterialHandoffActionItem({
+        action: 'copy-follow-up',
+        actionButtons,
+        id,
+      });
+    case 'action-export-csv':
+      return buildAssignmentResultMaterialHandoffActionItem({
+        action: 'export-csv',
+        actionButtons,
+        id,
+      });
+    case 'preview-copy-brief':
+      return buildAssignmentResultMaterialHandoffPreviewItem({
+        action: 'copy-brief',
+        copyArtifactPreviews,
+        id,
+      });
+    case 'preview-copy-reteach-plan':
+      return buildAssignmentResultMaterialHandoffPreviewItem({
+        action: 'copy-reteach-plan',
+        copyArtifactPreviews,
+        id,
+      });
+    case 'preview-copy-item-review':
+      return buildAssignmentResultMaterialHandoffPreviewItem({
+        action: 'copy-item-review',
+        copyArtifactPreviews,
+        id,
+      });
+    case 'preview-copy-follow-up':
+      return buildAssignmentResultMaterialHandoffPreviewItem({
+        action: 'copy-follow-up',
+        copyArtifactPreviews,
+        id,
+      });
+    case 'csv-export-preparation':
+      return buildAssignmentResultMaterialHandoffItem({
+        description:
+          m.assignment_result_material_handoff_csv_export_description(),
+        id,
+        label: m.assignment_result_material_handoff_csv_export_label(),
+        statusLabel: getAssignmentResultMaterialHandoffReadyStatus(
+          Boolean(exportPreparationView)
+        ),
+        value: m.assignment_result_material_handoff_count_value({
+          count: exportPreparationView?.itemViews.length ?? 0,
+        }),
+      });
+    case 'csv-delivery-policy':
+      return buildAssignmentResultMaterialHandoffItem({
+        description:
+          m.assignment_result_material_handoff_csv_delivery_description(),
+        id,
+        label: m.assignment_result_material_handoff_csv_delivery_label(),
+        value: m.assignment_result_material_handoff_field_count_value({
+          count: countAssignmentResultMaterialHandoffExportItems(
+            exportPreparationView,
+            'delivery'
+          ),
+        }),
+      });
+    case 'csv-answer-columns':
+      return buildAssignmentResultMaterialHandoffExportItem({
+        exportPreparationView,
+        fallbackDescription:
+          m.assignment_result_material_handoff_csv_answers_description(),
+        fallbackLabel: m.assignment_result_material_handoff_csv_answers_label(),
+        id,
+        itemId: 'answer-rows',
+      });
+    case 'print-worksheet-action':
+      return buildAssignmentResultMaterialHandoffItem({
+        description:
+          m.assignment_result_material_handoff_print_action_description(),
+        id,
+        label:
+          printAction?.label ??
+          m.assignment_result_material_handoff_print_action_label(),
+        statusLabel: getAssignmentResultMaterialHandoffReadyStatus(
+          Boolean(printAction?.assignmentId)
+        ),
+        value: printAction?.assignmentId
+          ? m.assignment_result_material_handoff_ready_value()
+          : m.assignment_result_material_handoff_not_ready_value(),
+      });
+    case 'print-answer-key-boundary':
+      return buildAssignmentResultMaterialHandoffItem({
+        description:
+          m.assignment_result_material_handoff_print_answer_key_description(),
+        id,
+        label: m.assignment_result_material_handoff_print_answer_key_label(),
+        value: m.assignment_result_material_handoff_teacher_toggle_value(),
+      });
+    case 'data-scope-current-review':
+      return buildAssignmentResultMaterialHandoffScopeItem({
+        dataScope: 'current-review',
+        id,
+      });
+    case 'data-scope-full-assignment':
+      return buildAssignmentResultMaterialHandoffScopeItem({
+        dataScope: 'full-assignment-results',
+        id,
+      });
+    case 'filtered-copy-boundary':
+      return buildAssignmentResultMaterialHandoffItem({
+        description:
+          m.assignment_result_material_handoff_filtered_copy_description(),
+        id,
+        label: m.assignment_result_material_handoff_filtered_copy_label(),
+        value: m.assignment_result_material_handoff_current_review_value(),
+      });
+    case 'full-export-boundary':
+      return buildAssignmentResultMaterialHandoffItem({
+        description:
+          m.assignment_result_material_handoff_full_export_description(),
+        id,
+        label: m.assignment_result_material_handoff_full_export_label(),
+        value: m.assignment_result_action_scope_full_assignment_value(),
+      });
+    case 'public-runner-unchanged':
+      return buildAssignmentResultMaterialHandoffItem({
+        description:
+          m.assignment_result_material_handoff_public_runner_description(),
+        id,
+        label: m.assignment_result_material_handoff_public_runner_label(),
+        value: m.assignment_result_material_handoff_unchanged_value(),
+      });
+    case 'snapshot-source':
+      return buildAssignmentResultMaterialHandoffExportItem({
+        exportPreparationView,
+        fallbackDescription:
+          m.assignment_result_material_handoff_snapshot_source_description(),
+        fallbackLabel:
+          m.assignment_result_material_handoff_snapshot_source_label(),
+        id,
+        itemId: 'activity-snapshot',
+      });
+    case 'normalized-student-labels':
+      return buildAssignmentResultMaterialHandoffExportItem({
+        exportPreparationView,
+        fallbackDescription:
+          m.assignment_result_material_handoff_student_labels_description(),
+        fallbackLabel:
+          m.assignment_result_material_handoff_student_labels_label(),
+        id,
+        itemId: 'student-privacy',
+      });
+    case 'anonymous-token-guard':
+      return buildAssignmentResultMaterialHandoffItem({
+        description:
+          m.assignment_result_material_handoff_anonymous_guard_description(),
+        id,
+        label: m.assignment_result_material_handoff_anonymous_guard_label(),
+        value: m.assignment_result_material_handoff_hidden_value(),
+      });
+    case 'copy-artifact-text-guard':
+      return buildAssignmentResultMaterialHandoffItem({
+        description:
+          m.assignment_result_material_handoff_copy_text_guard_description(),
+        id,
+        label: m.assignment_result_material_handoff_copy_text_guard_label(),
+        value: m.assignment_result_material_handoff_hidden_value(),
+      });
+    case 'teacher-answer-key-guard':
+      return buildAssignmentResultMaterialHandoffItem({
+        description:
+          m.assignment_result_material_handoff_answer_key_guard_description(),
+        id,
+        label: m.assignment_result_material_handoff_answer_key_guard_label(),
+        value: m.assignment_result_material_handoff_hidden_value(),
+      });
+  }
+}
+
+function buildAssignmentResultMaterialHandoffMatchedItem({
+  copyScopeView,
+  id,
+  summaryItemId,
+}: {
+  copyScopeView: AssignmentResultCopyArtifactPreviewScope;
+  id: AssignmentResultMaterialHandoffItemId;
+  summaryItemId: AssignmentResultCopyArtifactPreviewScopeSummaryItemId;
+}) {
+  const summaryItem = copyScopeView.summaryItems.find(
+    (item) => item.id === summaryItemId
+  );
+
+  return buildAssignmentResultMaterialHandoffItem({
+    description:
+      summaryItem?.description ??
+      m.assignment_result_material_handoff_missing_summary_description(),
+    id,
+    label:
+      summaryItem?.label ??
+      m.assignment_result_material_handoff_missing_summary_label(),
+    value: summaryItem?.value ?? '0',
+  });
+}
+
+function buildAssignmentResultMaterialHandoffActionItem({
+  action,
+  actionButtons,
+  id,
+}: {
+  action: AssignmentResultAction;
+  actionButtons: AssignmentResultActionButton[];
+  id: AssignmentResultMaterialHandoffItemId;
+}) {
+  const actionButton = actionButtons.find((button) => button.action === action);
+  const actionCopy = getAssignmentResultActionCopy(action);
+  const scopeView =
+    actionButton?.scopeView ??
+    buildAssignmentResultActionScopeView(
+      getAssignmentResultActionDataScope(action)
+    );
+  const statusView =
+    actionButton?.statusView ??
+    buildAssignmentResultActionStatusView({ type: 'ready' });
+
+  return buildAssignmentResultMaterialHandoffItem({
+    dataScope: scopeView.dataScope,
+    description: actionButton?.description ?? actionCopy.description,
+    id,
+    label: actionButton?.label ?? actionCopy.label,
+    statusLabel: statusView.value,
+    value: `${scopeView.value} | ${statusView.value}`,
+  });
+}
+
+function buildAssignmentResultMaterialHandoffPreviewItem({
+  action,
+  copyArtifactPreviews,
+  id,
+}: {
+  action: AssignmentResultCopyAction;
+  copyArtifactPreviews: AssignmentResultCopyArtifactPreview[];
+  id: AssignmentResultMaterialHandoffItemId;
+}) {
+  const preview = copyArtifactPreviews.find(
+    (copyPreview) => copyPreview.action === action
+  );
+  const actionCopy = getAssignmentResultActionCopy(action);
+
+  return buildAssignmentResultMaterialHandoffItem({
+    dataScope: 'current-review',
+    description: preview?.description ?? actionCopy.description,
+    id,
+    label: preview?.label ?? actionCopy.label,
+    statusLabel: getAssignmentResultMaterialHandoffReadyStatus(
+      Boolean(preview)
+    ),
+    value:
+      preview?.summaryLabel ??
+      m.assignment_result_material_handoff_not_ready_value(),
+  });
+}
+
+function buildAssignmentResultMaterialHandoffScopeItem({
+  dataScope,
+  id,
+}: {
+  dataScope: AssignmentResultActionDataScope;
+  id: AssignmentResultMaterialHandoffItemId;
+}) {
+  const scopeView = buildAssignmentResultActionScopeView(dataScope);
+
+  return buildAssignmentResultMaterialHandoffItem({
+    dataScope,
+    description: scopeView.description,
+    id,
+    label: scopeView.label,
+    value: scopeView.value,
+  });
+}
+
+function buildAssignmentResultMaterialHandoffExportItem({
+  exportPreparationView,
+  fallbackDescription,
+  fallbackLabel,
+  id,
+  itemId,
+}: {
+  exportPreparationView: AssignmentResultsExportPreparationView | null;
+  fallbackDescription: string;
+  fallbackLabel: string;
+  id: AssignmentResultMaterialHandoffItemId;
+  itemId: AssignmentResultsExportPreparationItemId;
+}) {
+  const exportItem = exportPreparationView?.itemViews.find(
+    (itemView) => itemView.id === itemId
+  );
+
+  return buildAssignmentResultMaterialHandoffItem({
+    description: exportItem?.description ?? fallbackDescription,
+    id,
+    label: exportItem?.label ?? fallbackLabel,
+    value:
+      exportItem?.value ??
+      m.assignment_result_material_handoff_not_ready_value(),
+  });
+}
+
+function buildAssignmentResultMaterialHandoffItem({
+  dataScope,
+  description,
+  id,
+  label,
+  statusLabel,
+  value,
+}: Omit<AssignmentResultMaterialHandoffItemView, 'ariaLabel'>) {
+  return {
+    ariaLabel: m.assignment_result_material_handoff_item_aria_label({
+      description,
+      label,
+      status: statusLabel ? ` ${statusLabel}.` : '',
+      value,
+    }),
+    ...(dataScope ? { dataScope } : {}),
+    description,
+    id,
+    label,
+    ...(statusLabel ? { statusLabel } : {}),
+    value,
+  };
+}
+
+function buildAssignmentResultMaterialHandoffPrivacyContract(
+  itemViews: AssignmentResultMaterialHandoffItemView[]
+): AssignmentResultMaterialHandoffPrivacyContract {
+  return {
+    exposesCopyArtifactText: false,
+    exposesCsvDataUrl: false,
+    exposesPublicRunnerContent: false,
+    exposesRawAnonymousToken: false,
+    exposesStudentAnswerText: false,
+    exposesTeacherAnswerKey: false,
+    itemIds: itemViews.map((itemView) => itemView.id),
+    scope: 'teacher-result-materials',
+  };
+}
+
+function countAssignmentResultMaterialHandoffExportItems(
+  exportPreparationView: AssignmentResultsExportPreparationView | null,
+  prefix: string
+) {
+  return (
+    exportPreparationView?.itemViews.filter((itemView) =>
+      itemView.id.startsWith(prefix)
+    ).length ?? 0
+  );
+}
+
+function getAssignmentResultMaterialHandoffReadyStatus(isReady: boolean) {
+  return isReady
+    ? m.assignment_result_material_handoff_ready_value()
+    : m.assignment_result_material_handoff_not_ready_value();
 }
 
 export function buildAssignmentResultCopyArtifacts(

@@ -146,6 +146,7 @@ function LoadedAssignmentResultsPage({
 
       <AssignmentResultsHeaderCard
         headerView={headerView}
+        materialHandoffView={pageView.materialHandoffView}
         onResultAction={(actionButton) => void onResultAction(actionButton)}
         resultActions={pageView.actionButtons}
       />

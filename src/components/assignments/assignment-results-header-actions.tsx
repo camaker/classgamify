@@ -1,6 +1,7 @@
 import type {
   AssignmentResultAction,
   AssignmentResultActionButton,
+  AssignmentResultMaterialHandoffView,
 } from '@/assignments/result-actions';
 import type { AssignmentResultsExportPreparationView } from '@/assignments/results-export';
 import type {
@@ -23,6 +24,7 @@ import { Link } from '@tanstack/react-router';
 
 type AssignmentResultsHeaderActionsProps = {
   exportPreparationView: AssignmentResultsExportPreparationView;
+  materialHandoffView: AssignmentResultMaterialHandoffView;
   onResultAction: (actionButton: AssignmentResultActionButton) => void;
   printAction: AssignmentResultHeaderPrintAction;
   resultActionsLabel: string;
@@ -32,6 +34,7 @@ type AssignmentResultsHeaderActionsProps = {
 
 export function AssignmentResultsHeaderActions({
   exportPreparationView,
+  materialHandoffView,
   onResultAction,
   printAction,
   resultActionsLabel,
@@ -68,6 +71,9 @@ export function AssignmentResultsHeaderActions({
         onResultAction={onResultAction}
         resultActionsLabel={resultActionsLabel}
         resultActions={resultActions}
+      />
+      <AssignmentResultsMaterialHandoff
+        materialHandoffView={materialHandoffView}
       />
       <AssignmentResultsExportPreparation
         exportPreparationView={exportPreparationView}
@@ -473,6 +479,57 @@ function AssignmentResultsExportPreparation({
             <p className="text-muted-foreground text-xs">{itemView.label}</p>
             <output aria-label={itemView.ariaLabel}>
               <span className="font-semibold text-lg">{itemView.value}</span>
+            </output>
+            <p className="text-muted-foreground text-xs">
+              {itemView.description}
+            </p>
+          </article>
+        ))}
+      </div>
+    </section>
+  );
+}
+
+function AssignmentResultsMaterialHandoff({
+  materialHandoffView,
+}: {
+  materialHandoffView: AssignmentResultMaterialHandoffView;
+}) {
+  const titleId = 'assignment-results-material-handoff-title';
+  const descriptionId = 'assignment-results-material-handoff-description';
+
+  return (
+    <section
+      aria-describedby={descriptionId}
+      aria-labelledby={titleId}
+      className="grid basis-full gap-3 rounded-lg border bg-muted/20 p-3"
+    >
+      <div className="grid gap-1">
+        <h3 id={titleId} className="font-medium text-sm">
+          {materialHandoffView.title}
+        </h3>
+        <p id={descriptionId} className="text-muted-foreground text-xs">
+          {materialHandoffView.description}
+        </p>
+      </div>
+      <div className="grid gap-2 sm:grid-cols-2 xl:grid-cols-5">
+        {materialHandoffView.itemViews.map((itemView) => (
+          <article
+            aria-label={itemView.ariaLabel}
+            className="grid gap-1 rounded-md border bg-background p-3"
+            data-scope={itemView.dataScope}
+            key={itemView.id}
+          >
+            <div className="flex min-w-0 items-center justify-between gap-2">
+              <p className="text-muted-foreground text-xs">{itemView.label}</p>
+              {itemView.statusLabel ? (
+                <Badge variant="secondary" className="rounded-md">
+                  {itemView.statusLabel}
+                </Badge>
+              ) : null}
+            </div>
+            <output aria-label={itemView.ariaLabel}>
+              <span className="font-semibold text-base">{itemView.value}</span>
             </output>
             <p className="text-muted-foreground text-xs">
               {itemView.description}
