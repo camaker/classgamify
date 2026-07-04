@@ -31,6 +31,16 @@ export const SETTINGS_NOTIFICATION_UPDATE_HANDOFF_ITEM_IDS = [
   'error-feedback',
   'scope-note',
   'provider-visibility',
+  'email-channel',
+  'subscription-status-source',
+  'update-frequency',
+  'activity-library-boundary',
+  'activity-content-boundary',
+  'assignment-snapshot-boundary',
+  'attempt-record-boundary',
+  'result-export-boundary',
+  'source-material-read-boundary',
+  'mutation-payload-guard',
   'student-reminder-boundary',
   'public-link-boundary',
   'learner-notification-boundary',
@@ -50,14 +60,21 @@ export type SettingsNotificationUpdateHandoffItemView = {
 };
 
 export type SettingsNotificationUpdateHandoffPrivacyContract = {
+  changesActivityContent: false;
+  changesActivityLibrary: false;
   changesAssignmentDeliveryRules: false;
+  changesAssignmentSnapshots: false;
+  changesAttemptRecords: false;
   changesPublicAssignmentLinks: false;
+  changesResultExports: false;
+  exposesRawMutationPayload: false;
   exposesRawProviderErrors: false;
   exposesRecipientEmail: false;
   exposesSourceMaterialStorageKeys: false;
   exposesStudentIdentifiers: false;
   itemIds: SettingsNotificationUpdateHandoffItemId[];
   notifiesLearners: false;
+  readsSourceMaterialFiles: false;
   scope: 'teacher-classroom-update-settings';
   sendsStudentAssignmentReminders: false;
   teacherCanPauseUpdates: true;
@@ -445,6 +462,109 @@ function buildSettingsNotificationUpdateHandoffItem({
     });
   }
 
+  if (id === 'email-channel') {
+    return buildSettingsNotificationUpdateHandoffStaticItem({
+      description: m.settings_notification_handoff_email_channel_description(),
+      id,
+      label: m.settings_notification_handoff_email_channel_label(),
+      value: m.settings_notification_handoff_email_channel_value(),
+    });
+  }
+
+  if (id === 'subscription-status-source') {
+    return buildSettingsNotificationUpdateHandoffStaticItem({
+      description:
+        m.settings_notification_handoff_subscription_status_source_description(),
+      id,
+      label: m.settings_notification_handoff_subscription_status_source_label(),
+      value: m.settings_notification_handoff_subscription_status_source_value(),
+    });
+  }
+
+  if (id === 'update-frequency') {
+    return buildSettingsNotificationUpdateHandoffStaticItem({
+      description:
+        m.settings_notification_handoff_update_frequency_description(),
+      id,
+      label: m.settings_notification_handoff_update_frequency_label(),
+      value: m.settings_notification_handoff_update_frequency_value(),
+    });
+  }
+
+  if (id === 'activity-library-boundary') {
+    return buildSettingsNotificationUpdateHandoffStaticItem({
+      description:
+        m.settings_notification_handoff_activity_library_boundary_description(),
+      id,
+      label: m.settings_notification_handoff_activity_library_boundary_label(),
+      value: m.settings_notification_handoff_activity_library_boundary_value(),
+    });
+  }
+
+  if (id === 'activity-content-boundary') {
+    return buildSettingsNotificationUpdateHandoffStaticItem({
+      description:
+        m.settings_notification_handoff_activity_content_boundary_description(),
+      id,
+      label: m.settings_notification_handoff_activity_content_boundary_label(),
+      value: m.settings_notification_handoff_activity_content_boundary_value(),
+    });
+  }
+
+  if (id === 'assignment-snapshot-boundary') {
+    return buildSettingsNotificationUpdateHandoffStaticItem({
+      description:
+        m.settings_notification_handoff_assignment_snapshot_boundary_description(),
+      id,
+      label:
+        m.settings_notification_handoff_assignment_snapshot_boundary_label(),
+      value:
+        m.settings_notification_handoff_assignment_snapshot_boundary_value(),
+    });
+  }
+
+  if (id === 'attempt-record-boundary') {
+    return buildSettingsNotificationUpdateHandoffStaticItem({
+      description:
+        m.settings_notification_handoff_attempt_record_boundary_description(),
+      id,
+      label: m.settings_notification_handoff_attempt_record_boundary_label(),
+      value: m.settings_notification_handoff_attempt_record_boundary_value(),
+    });
+  }
+
+  if (id === 'result-export-boundary') {
+    return buildSettingsNotificationUpdateHandoffStaticItem({
+      description:
+        m.settings_notification_handoff_result_export_boundary_description(),
+      id,
+      label: m.settings_notification_handoff_result_export_boundary_label(),
+      value: m.settings_notification_handoff_result_export_boundary_value(),
+    });
+  }
+
+  if (id === 'source-material-read-boundary') {
+    return buildSettingsNotificationUpdateHandoffStaticItem({
+      description:
+        m.settings_notification_handoff_source_material_read_boundary_description(),
+      id,
+      label:
+        m.settings_notification_handoff_source_material_read_boundary_label(),
+      value:
+        m.settings_notification_handoff_source_material_read_boundary_value(),
+    });
+  }
+
+  if (id === 'mutation-payload-guard') {
+    return buildSettingsNotificationUpdateHandoffStaticItem({
+      description:
+        m.settings_notification_handoff_mutation_payload_guard_description(),
+      id,
+      label: m.settings_notification_handoff_mutation_payload_guard_label(),
+      value: m.settings_notification_handoff_mutation_payload_guard_value(),
+    });
+  }
+
   if (id === 'student-reminder-boundary') {
     return buildSettingsNotificationUpdateHandoffStaticItem({
       description:
@@ -529,14 +649,21 @@ function buildSettingsNotificationUpdateHandoffPrivacyContract(
   itemViews: SettingsNotificationUpdateHandoffItemView[]
 ): SettingsNotificationUpdateHandoffPrivacyContract {
   return {
+    changesActivityContent: false,
+    changesActivityLibrary: false,
     changesAssignmentDeliveryRules: false,
+    changesAssignmentSnapshots: false,
+    changesAttemptRecords: false,
     changesPublicAssignmentLinks: false,
+    changesResultExports: false,
+    exposesRawMutationPayload: false,
     exposesRawProviderErrors: false,
     exposesRecipientEmail: false,
     exposesSourceMaterialStorageKeys: false,
     exposesStudentIdentifiers: false,
     itemIds: itemViews.map((item) => item.id),
     notifiesLearners: false,
+    readsSourceMaterialFiles: false,
     scope: 'teacher-classroom-update-settings',
     sendsStudentAssignmentReminders: false,
     teacherCanPauseUpdates: true,

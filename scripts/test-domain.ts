@@ -8813,12 +8813,12 @@ assert.match(
 );
 assert.match(
   settingsNotificationViewSource,
-  /export const SETTINGS_NOTIFICATION_UPDATE_HANDOFF_ITEM_IDS = \[(?=[\s\S]*'update-scope')(?=[\s\S]*'template-updates')(?=[\s\S]*'worksheet-workflows')(?=[\s\S]*'assignment-review')(?=[\s\S]*'teacher-control')(?=[\s\S]*'newsletter-card')(?=[\s\S]*'subscription-form')(?=[\s\S]*'subscription-switch')(?=[\s\S]*'email-requirement')(?=[\s\S]*'status-loading')(?=[\s\S]*'subscribe-action')(?=[\s\S]*'unsubscribe-action')(?=[\s\S]*'error-feedback')(?=[\s\S]*'scope-note')(?=[\s\S]*'provider-visibility')(?=[\s\S]*'student-reminder-boundary')(?=[\s\S]*'public-link-boundary')(?=[\s\S]*'learner-notification-boundary')(?=[\s\S]*'private-data-guard')(?=[\s\S]*'legacy-copy-guard')/,
-  'Notification settings handoff should expose stable 20-slice classroom update item ids.'
+  /export const SETTINGS_NOTIFICATION_UPDATE_HANDOFF_ITEM_IDS = \[(?=[\s\S]*'update-scope')(?=[\s\S]*'template-updates')(?=[\s\S]*'worksheet-workflows')(?=[\s\S]*'assignment-review')(?=[\s\S]*'teacher-control')(?=[\s\S]*'newsletter-card')(?=[\s\S]*'subscription-form')(?=[\s\S]*'subscription-switch')(?=[\s\S]*'email-requirement')(?=[\s\S]*'status-loading')(?=[\s\S]*'subscribe-action')(?=[\s\S]*'unsubscribe-action')(?=[\s\S]*'error-feedback')(?=[\s\S]*'scope-note')(?=[\s\S]*'provider-visibility')(?=[\s\S]*'email-channel')(?=[\s\S]*'subscription-status-source')(?=[\s\S]*'update-frequency')(?=[\s\S]*'activity-library-boundary')(?=[\s\S]*'activity-content-boundary')(?=[\s\S]*'assignment-snapshot-boundary')(?=[\s\S]*'attempt-record-boundary')(?=[\s\S]*'result-export-boundary')(?=[\s\S]*'source-material-read-boundary')(?=[\s\S]*'mutation-payload-guard')(?=[\s\S]*'student-reminder-boundary')(?=[\s\S]*'public-link-boundary')(?=[\s\S]*'learner-notification-boundary')(?=[\s\S]*'private-data-guard')(?=[\s\S]*'legacy-copy-guard')/,
+  'Notification settings handoff should expose stable 30-slice classroom update item ids.'
 );
 assert.match(
   settingsNotificationViewSource,
-  /export type SettingsNotificationUpdateHandoffPrivacyContract = \{[\s\S]*changesAssignmentDeliveryRules: false;[\s\S]*changesPublicAssignmentLinks: false;[\s\S]*exposesRawProviderErrors: false;[\s\S]*exposesRecipientEmail: false;[\s\S]*exposesSourceMaterialStorageKeys: false;[\s\S]*exposesStudentIdentifiers: false;[\s\S]*notifiesLearners: false;[\s\S]*scope: 'teacher-classroom-update-settings';[\s\S]*sendsStudentAssignmentReminders: false;[\s\S]*teacherCanPauseUpdates: true;[\s\S]*updatesTeacherProductEmailOnly: true;/,
+  /export type SettingsNotificationUpdateHandoffPrivacyContract = \{[\s\S]*changesActivityContent: false;[\s\S]*changesActivityLibrary: false;[\s\S]*changesAssignmentDeliveryRules: false;[\s\S]*changesAssignmentSnapshots: false;[\s\S]*changesAttemptRecords: false;[\s\S]*changesPublicAssignmentLinks: false;[\s\S]*changesResultExports: false;[\s\S]*exposesRawMutationPayload: false;[\s\S]*exposesRawProviderErrors: false;[\s\S]*exposesRecipientEmail: false;[\s\S]*exposesSourceMaterialStorageKeys: false;[\s\S]*exposesStudentIdentifiers: false;[\s\S]*notifiesLearners: false;[\s\S]*readsSourceMaterialFiles: false;[\s\S]*scope: 'teacher-classroom-update-settings';[\s\S]*sendsStudentAssignmentReminders: false;[\s\S]*teacherCanPauseUpdates: true;[\s\S]*updatesTeacherProductEmailOnly: true;/,
   'Notification settings handoff should publish explicit privacy and classroom update behavior flags.'
 );
 assert.match(
@@ -9221,6 +9221,16 @@ assert.deepEqual(
     'error-feedback',
     'scope-note',
     'provider-visibility',
+    'email-channel',
+    'subscription-status-source',
+    'update-frequency',
+    'activity-library-boundary',
+    'activity-content-boundary',
+    'assignment-snapshot-boundary',
+    'attempt-record-boundary',
+    'result-export-boundary',
+    'source-material-read-boundary',
+    'mutation-payload-guard',
     'student-reminder-boundary',
     'public-link-boundary',
     'learner-notification-boundary',
@@ -9242,14 +9252,21 @@ assert.deepEqual(
   [...SETTINGS_NOTIFICATION_UPDATE_HANDOFF_ITEM_IDS]
 );
 assert.deepEqual(notificationUpdateHandoffView.privacy, {
+  changesActivityContent: false,
+  changesActivityLibrary: false,
   changesAssignmentDeliveryRules: false,
+  changesAssignmentSnapshots: false,
+  changesAttemptRecords: false,
   changesPublicAssignmentLinks: false,
+  changesResultExports: false,
+  exposesRawMutationPayload: false,
   exposesRawProviderErrors: false,
   exposesRecipientEmail: false,
   exposesSourceMaterialStorageKeys: false,
   exposesStudentIdentifiers: false,
   itemIds: notificationUpdateHandoffItemIds,
   notifiesLearners: false,
+  readsSourceMaterialFiles: false,
   scope: 'teacher-classroom-update-settings',
   sendsStudentAssignmentReminders: false,
   teacherCanPauseUpdates: true,
@@ -9282,6 +9299,16 @@ assert.deepEqual(
     ],
     ['scope-note', 'Update scope'],
     ['provider-visibility', 'Configuration gate'],
+    ['email-channel', 'Teacher email only'],
+    ['subscription-status-source', 'Newsletter provider status'],
+    ['update-frequency', 'Occasional updates'],
+    ['activity-library-boundary', 'No library changes'],
+    ['activity-content-boundary', 'No content changes'],
+    ['assignment-snapshot-boundary', 'Snapshots unchanged'],
+    ['attempt-record-boundary', 'Attempts unchanged'],
+    ['result-export-boundary', 'Exports unchanged'],
+    ['source-material-read-boundary', 'No file reads'],
+    ['mutation-payload-guard', 'Payload hidden'],
     ['student-reminder-boundary', 'No student reminders'],
     ['public-link-boundary', 'No link changes'],
     ['learner-notification-boundary', 'No learner notifications'],
@@ -9291,8 +9318,8 @@ assert.deepEqual(
 );
 assert.doesNotMatch(
   JSON.stringify(notificationUpdateHandoffView),
-  /teacher-private@example\.test|raw-student-token|source-material\/private\/storage-key|raw-provider-stack-trace/,
-  'Notification update handoff should not serialize private teacher, student, source-material, or provider text.'
+  /teacher-private@example\.test|raw-student-token|source-material\/private\/storage-key|raw-provider-stack-trace|raw-newsletter-mutation-payload/,
+  'Notification update handoff should not serialize private teacher, student, source-material, provider, or mutation-payload text.'
 );
 const notificationNewsletterCardView =
   buildSettingsNotificationNewsletterCardView();
@@ -9326,13 +9353,16 @@ try {
   assert.equal(zhNotificationUpdateHandoffView.title, '课堂更新交接');
   assert.match(
     zhNotificationUpdateHandoffView.description,
-    /不会改变学生作业/
+    /不会改变活动、作业、作答/
   );
   assert.deepEqual(
     zhNotificationUpdateHandoffView.itemViews
       .filter((item) =>
         [
           'update-scope',
+          'email-channel',
+          'assignment-snapshot-boundary',
+          'source-material-read-boundary',
           'student-reminder-boundary',
           'public-link-boundary',
           'learner-notification-boundary',
@@ -9342,6 +9372,9 @@ try {
       .map((item) => [item.id, item.value]),
     [
       ['update-scope', '教师产品更新'],
+      ['email-channel', '仅教师邮箱'],
+      ['assignment-snapshot-boundary', '快照不变'],
+      ['source-material-read-boundary', '不读取文件'],
       ['student-reminder-boundary', '不发送学生提醒'],
       ['public-link-boundary', '不改链接'],
       ['learner-notification-boundary', '不通知学习者'],
@@ -12110,7 +12143,14 @@ const authWorkspaceBoundaryRequirements = [
       ['settings_notification_newsletter_switch_description', /template changes, worksheet workflows, and result-review improvements/],
       ['settings_notification_newsletter_scope_label', /Update scope/],
       ['settings_notification_newsletter_scope_description', /do not send student assignment reminders/],
-      ['settings_notification_handoff_description', /20-slice classroom update contract/],
+      ['settings_notification_handoff_description', /30-slice classroom update contract/],
+      ['settings_notification_handoff_email_channel_description', /teacher account email only/],
+      ['settings_notification_handoff_activity_library_boundary_description', /never creates, archives, restores/],
+      ['settings_notification_handoff_assignment_snapshot_boundary_description', /snapshots stay frozen/],
+      ['settings_notification_handoff_attempt_record_boundary_description', /do not create, score, hide, or delete/],
+      ['settings_notification_handoff_result_export_boundary_description', /CSV exports are unaffected/],
+      ['settings_notification_handoff_source_material_read_boundary_description', /does not read worksheet files/],
+      ['settings_notification_handoff_mutation_payload_guard_description', /without serializing newsletter mutation payloads/],
       ['settings_notification_handoff_student_reminder_boundary_description', /not assignment due-date reminders/],
       ['settings_notification_handoff_public_link_boundary_description', /never opens, closes, rewrites/],
       ['settings_notification_handoff_learner_notification_boundary_description', /do not notify learners/],
@@ -12210,7 +12250,14 @@ const authWorkspaceBoundaryRequirements = [
       ['settings_notification_newsletter_switch_description', /练习纸工作流和结果复盘/],
       ['settings_notification_newsletter_scope_label', /更新范围/],
       ['settings_notification_newsletter_scope_description', /不会发送学生作业提醒/],
-      ['settings_notification_handoff_description', /20 切片课堂更新契约/],
+      ['settings_notification_handoff_description', /30 切片课堂更新契约/],
+      ['settings_notification_handoff_email_channel_description', /只使用已登录教师账号邮箱/],
+      ['settings_notification_handoff_activity_library_boundary_description', /不会创建、归档、恢复/],
+      ['settings_notification_handoff_assignment_snapshot_boundary_description', /已发布作业快照仍保持冻结/],
+      ['settings_notification_handoff_attempt_record_boundary_description', /不会创建、评分、隐藏或删除/],
+      ['settings_notification_handoff_result_export_boundary_description', /CSV 导出不受更新订阅变更影响/],
+      ['settings_notification_handoff_source_material_read_boundary_description', /不会读取练习纸文件/],
+      ['settings_notification_handoff_mutation_payload_guard_description', /不序列化 newsletter mutation payload/],
       ['settings_notification_handoff_student_reminder_boundary_description', /不是作业截止提醒/],
       ['settings_notification_handoff_public_link_boundary_description', /不会打开、关闭、改写/],
       ['settings_notification_handoff_learner_notification_boundary_description', /不会通知学习者/],
