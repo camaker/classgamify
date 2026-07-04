@@ -2864,13 +2864,13 @@ assert.match(
 );
 assert.match(
   assignmentResultViewActionBoundarySource,
-  /export type AssignmentResultReviewHandoffItemId =[\s\S]*'review-status'[\s\S]*AssignmentResultReviewHandoffActionItemId[\s\S]*AssignmentResultReviewHandoffCopyScopeItemId[\s\S]*AssignmentResultReviewHandoffMatchedItemId[\s\S]*AssignmentResultReviewHandoffPreviewItemId/,
-  'Assignment result review handoff should expose stable ids for review status, controls, matched counts, copy scope, actions, and previews.'
+  /export const ASSIGNMENT_RESULT_REVIEW_HANDOFF_ITEM_IDS = \[[\s\S]*'review-status'[\s\S]*'review-next-step'[\s\S]*'student-search-status'[\s\S]*'answer-review-status'[\s\S]*'matched-answer-reviews'[\s\S]*'copy-scope-review'[\s\S]*'action-export-csv'[\s\S]*'preview-copy-follow-up'[\s\S]*'route-state'[\s\S]*'current-review-boundary'[\s\S]*'full-export-boundary'[\s\S]*'privacy-guard'[\s\S]*\] as const/,
+  'Assignment result review handoff should expose fixed ids for review status, next step, controls, matched counts, copy scope, actions, previews, route state, boundaries, and privacy.'
 );
 assert.match(
   assignmentResultViewActionBoundarySource,
-  /export type AssignmentResultReviewHandoffPrivacyContract = \{[\s\S]*exposesCopyArtifactText: false;[\s\S]*exposesCsvDataUrl: false;[\s\S]*exposesRawAnonymousToken: false;[\s\S]*exposesStudentAnswerText: false;[\s\S]*exposesTeacherAnswerKey: false;/,
-  'Assignment result review handoff should document that the handoff contract excludes copy text, CSV data URLs, raw anonymous tokens, submitted answers, and teacher answer keys.'
+  /export type AssignmentResultReviewHandoffPrivacyContract = \{[\s\S]*exposesCopyArtifactText: false;[\s\S]*exposesCsvDataUrl: false;[\s\S]*exposesRawAnonymousToken: false;[\s\S]*exposesStudentAnswerText: false;[\s\S]*exposesTeacherAnswerKey: false;[\s\S]*scope: 'teacher-result-review';/,
+  'Assignment result review handoff should document that the handoff contract excludes copy text, CSV data URLs, raw anonymous tokens, submitted answers, and teacher answer keys inside the teacher result review scope.'
 );
 assert.match(
   assignmentResultViewActionBoundarySource,
@@ -2879,13 +2879,13 @@ assert.match(
 );
 assert.match(
   assignmentResultViewActionBoundarySource,
-  /const reviewHandoffView = buildAssignmentResultReviewHandoffView\(\{[\s\S]*actionButtons,[\s\S]*copyArtifactPreviews,[\s\S]*copyScopeView,[\s\S]*reviewScopeView,[\s\S]*reviewStatusView,[\s\S]*\}\)[\s\S]*reviewHandoffView,/,
+  /const reviewHandoffView = buildAssignmentResultReviewHandoffView\(\{[\s\S]*actionButtons,[\s\S]*controlViews,[\s\S]*copyArtifactPreviews,[\s\S]*copyScopeView,[\s\S]*reviewScopeView,[\s\S]*reviewStatusView,[\s\S]*\}\)[\s\S]*reviewHandoffView,/,
   'Assignment result page view-model should expose a review handoff view derived from prepared controls, scopes, actions, and scoped copy previews.'
 );
 assert.match(
   assignmentResultViewActionBoundarySource,
-  /buildAssignmentResultReviewHandoffView[\s\S]*buildAssignmentResultReviewHandoffScopeItemView[\s\S]*buildAssignmentResultReviewHandoffMatchedItemView[\s\S]*buildAssignmentResultReviewHandoffCopyScopeItemView[\s\S]*buildAssignmentResultReviewHandoffActionItemView[\s\S]*buildAssignmentResultReviewHandoffPreviewItemView/,
-  'Assignment result review handoff should collect review controls, matched counts, copy scope, action states, and copy preview summaries.'
+  /buildAssignmentResultReviewHandoffView[\s\S]*ASSIGNMENT_RESULT_REVIEW_HANDOFF_ITEM_IDS\.map[\s\S]*buildAssignmentResultReviewHandoffScopeItem[\s\S]*buildAssignmentResultReviewHandoffControlStatusItem[\s\S]*buildAssignmentResultReviewHandoffMatchedItem[\s\S]*buildAssignmentResultReviewHandoffCopyScopeItem[\s\S]*buildAssignmentResultReviewHandoffActionItem[\s\S]*buildAssignmentResultReviewHandoffPreviewItem[\s\S]*buildAssignmentResultReviewHandoffRouteStateItem[\s\S]*buildAssignmentResultReviewHandoffDataScopeItem/,
+  'Assignment result review handoff should collect review controls, control state, matched counts, copy scope, action states, copy preview summaries, route state, and data-scope boundaries.'
 );
 assert.match(
   assignmentResultViewActionBoundarySource,

@@ -83,13 +83,20 @@ import type { AssignmentSettingsInput } from '@/assignments/validation';
 import {
   buildAssignmentResultActionButtons,
   buildAssignmentResultActionDataSet,
+  buildAssignmentResultActionScopeView,
+  buildAssignmentResultActionStatusView,
   buildAssignmentResultCopyActionData,
   buildAssignmentResultCopyArtifacts,
   buildAssignmentResultCopyArtifactPreviews,
   buildAssignmentResultMaterialHandoffView,
   buildAssignmentResultActionState,
+  getAssignmentResultActionCopy,
+  getAssignmentResultActionDataScope,
+  type AssignmentResultAction,
   type AssignmentResultActionButton,
+  type AssignmentResultActionDataScope,
   type AssignmentResultActionDataSet,
+  type AssignmentResultCopyAction,
   type AssignmentResultCopyActionData,
   type AssignmentResultCopyArtifactPreview,
   type AssignmentResultCopyArtifacts,
@@ -587,28 +594,41 @@ export type AssignmentResultReviewStatusView = {
   title: string;
 };
 
-type AssignmentResultReviewHandoffActionItemId =
-  `action-${AssignmentResultAction}`;
-
-type AssignmentResultReviewHandoffPreviewItemId =
-  `preview-${AssignmentResultCopyAction}`;
-
-type AssignmentResultReviewHandoffCopyScopeItemId =
-  `copy-scope-${AssignmentResultCopyScopeItemId}`;
-
-type AssignmentResultReviewHandoffMatchedItemId =
-  `matched-${AssignmentResultReviewScopeSummaryItemId}`;
+export const ASSIGNMENT_RESULT_REVIEW_HANDOFF_ITEM_IDS = [
+  'review-status',
+  'review-next-step',
+  'student-search',
+  'student-search-status',
+  'student-sort',
+  'student-sort-status',
+  'item-sort',
+  'item-sort-status',
+  'answer-review',
+  'answer-review-status',
+  'matched-students',
+  'matched-attempts',
+  'matched-items',
+  'matched-answer-reviews',
+  'copy-scope-students',
+  'copy-scope-items',
+  'copy-scope-review',
+  'action-copy-brief',
+  'action-copy-reteach-plan',
+  'action-copy-item-review',
+  'action-copy-follow-up',
+  'action-export-csv',
+  'preview-copy-brief',
+  'preview-copy-reteach-plan',
+  'preview-copy-item-review',
+  'preview-copy-follow-up',
+  'route-state',
+  'current-review-boundary',
+  'full-export-boundary',
+  'privacy-guard',
+] as const;
 
 export type AssignmentResultReviewHandoffItemId =
-  | 'answer-review'
-  | 'item-sort'
-  | 'review-status'
-  | 'student-search'
-  | 'student-sort'
-  | AssignmentResultReviewHandoffActionItemId
-  | AssignmentResultReviewHandoffCopyScopeItemId
-  | AssignmentResultReviewHandoffMatchedItemId
-  | AssignmentResultReviewHandoffPreviewItemId;
+  (typeof ASSIGNMENT_RESULT_REVIEW_HANDOFF_ITEM_IDS)[number];
 
 export type AssignmentResultReviewHandoffPrivacyContract = {
   exposesCopyArtifactText: false;
@@ -617,6 +637,7 @@ export type AssignmentResultReviewHandoffPrivacyContract = {
   exposesStudentAnswerText: false;
   exposesTeacherAnswerKey: false;
   itemIds: AssignmentResultReviewHandoffItemId[];
+  scope: 'teacher-result-review';
 };
 
 export type AssignmentResultReviewHandoffItemView = {
@@ -2491,6 +2512,7 @@ export function buildAssignmentResultsPageViewModel<
     : [];
   const reviewHandoffView = buildAssignmentResultReviewHandoffView({
     actionButtons,
+    controlViews,
     copyArtifactPreviews,
     copyScopeView,
     reviewScopeView,
@@ -2908,12 +2930,14 @@ export function buildAssignmentResultReviewScopeView({
 
 export function buildAssignmentResultReviewHandoffView({
   actionButtons,
+  controlViews,
   copyArtifactPreviews,
   copyScopeView,
   reviewScopeView,
   reviewStatusView,
 }: {
   actionButtons: AssignmentResultActionButton[];
+  controlViews: AssignmentResultControlViews;
   copyArtifactPreviews: Array<
     AssignmentResultCopyArtifactPreview & {
       actionButton: AssignmentResultActionButton;
@@ -2923,96 +2947,430 @@ export function buildAssignmentResultReviewHandoffView({
   reviewScopeView: AssignmentResultReviewScopeView;
   reviewStatusView: AssignmentResultReviewStatusView;
 }): AssignmentResultReviewHandoffView {
-  const itemViews: AssignmentResultReviewHandoffItemView[] = [
-    buildAssignmentResultReviewHandoffItemView({
-      description: reviewStatusView.description,
-      id: 'review-status',
-      label: reviewStatusView.title,
-      statusLabel: reviewStatusView.step.label,
-      value: reviewStatusView.statusLabel,
-    }),
-    ...reviewScopeView.itemViews.map(
-      buildAssignmentResultReviewHandoffScopeItemView
-    ),
-    ...reviewScopeView.summaryItems.map(
-      buildAssignmentResultReviewHandoffMatchedItemView
-    ),
-    ...copyScopeView.itemViews.map(
-      buildAssignmentResultReviewHandoffCopyScopeItemView
-    ),
-    ...actionButtons.map(buildAssignmentResultReviewHandoffActionItemView),
-    ...copyArtifactPreviews.map(
-      buildAssignmentResultReviewHandoffPreviewItemView
-    ),
-  ];
+  const itemViews = ASSIGNMENT_RESULT_REVIEW_HANDOFF_ITEM_IDS.map((id) =>
+    buildAssignmentResultReviewHandoffItem({
+      actionButtons,
+      controlViews,
+      copyArtifactPreviews,
+      copyScopeView,
+      id,
+      reviewScopeView,
+      reviewStatusView,
+    })
+  );
 
   return {
-    description: reviewStatusView.description,
+    description: m.assignment_result_review_handoff_description(),
     itemViews,
     privacy: buildAssignmentResultReviewHandoffPrivacyContract(itemViews),
-    title: reviewScopeView.title,
+    title: m.assignment_result_review_handoff_title(),
   };
 }
 
-function buildAssignmentResultReviewHandoffScopeItemView(
-  itemView: AssignmentResultReviewScopeItemView
-): AssignmentResultReviewHandoffItemView {
-  return buildAssignmentResultReviewHandoffItemView({
-    description: itemView.description,
-    id: itemView.id,
-    label: itemView.label,
-    statusLabel: itemView.statusView.value,
-    value: itemView.value,
-  });
-}
+type AssignmentResultReviewHandoffBuildContext = {
+  actionButtons: AssignmentResultActionButton[];
+  controlViews: AssignmentResultControlViews;
+  copyArtifactPreviews: Array<
+    AssignmentResultCopyArtifactPreview & {
+      actionButton: AssignmentResultActionButton;
+    }
+  >;
+  copyScopeView: AssignmentResultCopyScopeView;
+  id: AssignmentResultReviewHandoffItemId;
+  reviewScopeView: AssignmentResultReviewScopeView;
+  reviewStatusView: AssignmentResultReviewStatusView;
+};
 
-function buildAssignmentResultReviewHandoffMatchedItemView(
-  itemView: AssignmentResultReviewScopeSummaryItemView
+function buildAssignmentResultReviewHandoffItem(
+  context: AssignmentResultReviewHandoffBuildContext
 ): AssignmentResultReviewHandoffItemView {
-  return buildAssignmentResultReviewHandoffItemView({
-    description: itemView.description,
-    id: `matched-${itemView.id}`,
-    label: itemView.label,
-    value: itemView.value,
-  });
-}
-
-function buildAssignmentResultReviewHandoffCopyScopeItemView(
-  itemView: AssignmentResultCopyScopeItemView
-): AssignmentResultReviewHandoffItemView {
-  return buildAssignmentResultReviewHandoffItemView({
-    description: itemView.description,
-    id: `copy-scope-${itemView.id}`,
-    label: itemView.label,
-    value: itemView.value,
-  });
-}
-
-function buildAssignmentResultReviewHandoffActionItemView(
-  actionButton: AssignmentResultActionButton
-): AssignmentResultReviewHandoffItemView {
-  return buildAssignmentResultReviewHandoffItemView({
-    dataScope: actionButton.dataScope,
-    description: actionButton.description,
-    id: `action-${actionButton.action}`,
-    label: actionButton.label,
-    statusLabel: actionButton.statusView.value,
-    value: `${actionButton.scopeView.value} | ${actionButton.statusView.value}`,
-  });
-}
-
-function buildAssignmentResultReviewHandoffPreviewItemView(
-  preview: AssignmentResultCopyArtifactPreview & {
-    actionButton: AssignmentResultActionButton;
+  switch (context.id) {
+    case 'review-status':
+      return buildAssignmentResultReviewHandoffItemView({
+        description: context.reviewStatusView.description,
+        id: context.id,
+        label: context.reviewStatusView.title,
+        statusLabel: context.reviewStatusView.step.label,
+        value: context.reviewStatusView.statusLabel,
+      });
+    case 'review-next-step':
+      return buildAssignmentResultReviewHandoffItemView({
+        description: context.reviewStatusView.step.description,
+        id: context.id,
+        label: m.assignment_result_review_handoff_next_step_label(),
+        statusLabel: context.reviewStatusView.statusLabel,
+        value: context.reviewStatusView.step.label,
+      });
+    case 'student-search':
+      return buildAssignmentResultReviewHandoffScopeItem({
+        id: context.id,
+        reviewScopeView: context.reviewScopeView,
+        scopeItemId: 'student-search',
+      });
+    case 'student-search-status':
+      return buildAssignmentResultReviewHandoffControlStatusItem({
+        id: context.id,
+        label: m.assignment_result_review_handoff_student_search_status_label(),
+        statusView: context.controlViews.studentSearch.searchStatusView,
+      });
+    case 'student-sort':
+      return buildAssignmentResultReviewHandoffScopeItem({
+        id: context.id,
+        reviewScopeView: context.reviewScopeView,
+        scopeItemId: 'student-sort',
+      });
+    case 'student-sort-status':
+      return buildAssignmentResultReviewHandoffControlStatusItem({
+        id: context.id,
+        label: m.assignment_result_review_handoff_student_sort_status_label(),
+        statusView: context.controlViews.studentSearch.sortStatusView,
+      });
+    case 'item-sort':
+      return buildAssignmentResultReviewHandoffScopeItem({
+        id: context.id,
+        reviewScopeView: context.reviewScopeView,
+        scopeItemId: 'item-sort',
+      });
+    case 'item-sort-status':
+      return buildAssignmentResultReviewHandoffControlStatusItem({
+        id: context.id,
+        label: m.assignment_result_review_handoff_item_sort_status_label(),
+        statusView: context.controlViews.itemPerformanceSort.statusView,
+      });
+    case 'answer-review':
+      return buildAssignmentResultReviewHandoffScopeItem({
+        id: context.id,
+        reviewScopeView: context.reviewScopeView,
+        scopeItemId: 'answer-review',
+      });
+    case 'answer-review-status':
+      return buildAssignmentResultReviewHandoffControlStatusItem({
+        id: context.id,
+        label: m.assignment_result_review_handoff_answer_review_status_label(),
+        statusView: context.controlViews.attemptReviewFilter.statusView,
+      });
+    case 'matched-students':
+      return buildAssignmentResultReviewHandoffMatchedItem({
+        id: context.id,
+        reviewScopeView: context.reviewScopeView,
+        summaryItemId: 'students',
+      });
+    case 'matched-attempts':
+      return buildAssignmentResultReviewHandoffMatchedItem({
+        id: context.id,
+        reviewScopeView: context.reviewScopeView,
+        summaryItemId: 'attempts',
+      });
+    case 'matched-items':
+      return buildAssignmentResultReviewHandoffMatchedItem({
+        id: context.id,
+        reviewScopeView: context.reviewScopeView,
+        summaryItemId: 'items',
+      });
+    case 'matched-answer-reviews':
+      return buildAssignmentResultReviewHandoffMatchedItem({
+        id: context.id,
+        reviewScopeView: context.reviewScopeView,
+        summaryItemId: 'answer-reviews',
+      });
+    case 'copy-scope-students':
+      return buildAssignmentResultReviewHandoffCopyScopeItem({
+        copyScopeItemId: 'students',
+        copyScopeView: context.copyScopeView,
+        id: context.id,
+      });
+    case 'copy-scope-items':
+      return buildAssignmentResultReviewHandoffCopyScopeItem({
+        copyScopeItemId: 'items',
+        copyScopeView: context.copyScopeView,
+        id: context.id,
+      });
+    case 'copy-scope-review':
+      return buildAssignmentResultReviewHandoffCopyScopeItem({
+        copyScopeItemId: 'review',
+        copyScopeView: context.copyScopeView,
+        id: context.id,
+      });
+    case 'action-copy-brief':
+      return buildAssignmentResultReviewHandoffActionItem({
+        action: 'copy-brief',
+        actionButtons: context.actionButtons,
+        id: context.id,
+      });
+    case 'action-copy-reteach-plan':
+      return buildAssignmentResultReviewHandoffActionItem({
+        action: 'copy-reteach-plan',
+        actionButtons: context.actionButtons,
+        id: context.id,
+      });
+    case 'action-copy-item-review':
+      return buildAssignmentResultReviewHandoffActionItem({
+        action: 'copy-item-review',
+        actionButtons: context.actionButtons,
+        id: context.id,
+      });
+    case 'action-copy-follow-up':
+      return buildAssignmentResultReviewHandoffActionItem({
+        action: 'copy-follow-up',
+        actionButtons: context.actionButtons,
+        id: context.id,
+      });
+    case 'action-export-csv':
+      return buildAssignmentResultReviewHandoffActionItem({
+        action: 'export-csv',
+        actionButtons: context.actionButtons,
+        id: context.id,
+      });
+    case 'preview-copy-brief':
+      return buildAssignmentResultReviewHandoffPreviewItem({
+        action: 'copy-brief',
+        copyArtifactPreviews: context.copyArtifactPreviews,
+        id: context.id,
+      });
+    case 'preview-copy-reteach-plan':
+      return buildAssignmentResultReviewHandoffPreviewItem({
+        action: 'copy-reteach-plan',
+        copyArtifactPreviews: context.copyArtifactPreviews,
+        id: context.id,
+      });
+    case 'preview-copy-item-review':
+      return buildAssignmentResultReviewHandoffPreviewItem({
+        action: 'copy-item-review',
+        copyArtifactPreviews: context.copyArtifactPreviews,
+        id: context.id,
+      });
+    case 'preview-copy-follow-up':
+      return buildAssignmentResultReviewHandoffPreviewItem({
+        action: 'copy-follow-up',
+        copyArtifactPreviews: context.copyArtifactPreviews,
+        id: context.id,
+      });
+    case 'route-state':
+      return buildAssignmentResultReviewHandoffRouteStateItem({
+        controlViews: context.controlViews,
+        id: context.id,
+      });
+    case 'current-review-boundary':
+      return buildAssignmentResultReviewHandoffDataScopeItem({
+        dataScope: 'current-review',
+        id: context.id,
+      });
+    case 'full-export-boundary':
+      return buildAssignmentResultReviewHandoffDataScopeItem({
+        dataScope: 'full-assignment-results',
+        id: context.id,
+      });
+    case 'privacy-guard':
+      return buildAssignmentResultReviewHandoffItemView({
+        description: m.assignment_result_review_handoff_privacy_description(),
+        id: context.id,
+        label: m.assignment_result_review_handoff_privacy_label(),
+        value: m.assignment_result_review_handoff_hidden_value(),
+      });
   }
-): AssignmentResultReviewHandoffItemView {
+}
+
+function buildAssignmentResultReviewHandoffScopeItem({
+  id,
+  reviewScopeView,
+  scopeItemId,
+}: {
+  id: AssignmentResultReviewHandoffItemId;
+  reviewScopeView: AssignmentResultReviewScopeView;
+  scopeItemId: AssignmentResultReviewScopeItemId;
+}) {
+  const itemView = reviewScopeView.itemViews.find(
+    (item) => item.id === scopeItemId
+  );
+
   return buildAssignmentResultReviewHandoffItemView({
-    dataScope: preview.dataScope,
-    description: preview.description,
-    id: `preview-${preview.action}`,
-    label: preview.label,
-    statusLabel: preview.actionButton.statusView.value,
-    value: preview.summaryLabel,
+    description:
+      itemView?.description ??
+      m.assignment_result_review_handoff_missing_description(),
+    id,
+    label:
+      itemView?.label ?? m.assignment_result_review_handoff_missing_label(),
+    statusLabel: itemView?.statusView.value,
+    value:
+      itemView?.value ?? m.assignment_result_review_handoff_missing_value(),
+  });
+}
+
+function buildAssignmentResultReviewHandoffControlStatusItem({
+  id,
+  label,
+  statusView,
+}: {
+  id: AssignmentResultReviewHandoffItemId;
+  label: string;
+  statusView: AssignmentResultControlStatusView;
+}) {
+  return buildAssignmentResultReviewHandoffItemView({
+    description: statusView.description,
+    id,
+    label,
+    statusLabel: statusView.value,
+    value: statusView.value,
+  });
+}
+
+function buildAssignmentResultReviewHandoffMatchedItem({
+  id,
+  reviewScopeView,
+  summaryItemId,
+}: {
+  id: AssignmentResultReviewHandoffItemId;
+  reviewScopeView: AssignmentResultReviewScopeView;
+  summaryItemId: AssignmentResultReviewScopeSummaryItemId;
+}) {
+  const itemView = reviewScopeView.summaryItems.find(
+    (item) => item.id === summaryItemId
+  );
+
+  return buildAssignmentResultReviewHandoffItemView({
+    description:
+      itemView?.description ??
+      m.assignment_result_review_handoff_missing_description(),
+    id,
+    label:
+      itemView?.label ?? m.assignment_result_review_handoff_missing_label(),
+    value:
+      itemView?.value ?? m.assignment_result_review_handoff_missing_value(),
+  });
+}
+
+function buildAssignmentResultReviewHandoffCopyScopeItem({
+  copyScopeItemId,
+  copyScopeView,
+  id,
+}: {
+  copyScopeItemId: AssignmentResultCopyScopeItemId;
+  copyScopeView: AssignmentResultCopyScopeView;
+  id: AssignmentResultReviewHandoffItemId;
+}) {
+  const itemView = copyScopeView.itemViews.find(
+    (item) => item.id === copyScopeItemId
+  );
+
+  return buildAssignmentResultReviewHandoffItemView({
+    description:
+      itemView?.description ??
+      m.assignment_result_review_handoff_missing_description(),
+    id,
+    label:
+      itemView?.label ?? m.assignment_result_review_handoff_missing_label(),
+    value:
+      itemView?.value ?? m.assignment_result_review_handoff_missing_value(),
+  });
+}
+
+function buildAssignmentResultReviewHandoffActionItem({
+  action,
+  actionButtons,
+  id,
+}: {
+  action: AssignmentResultAction;
+  actionButtons: AssignmentResultActionButton[];
+  id: AssignmentResultReviewHandoffItemId;
+}) {
+  const actionButton = actionButtons.find((button) => button.action === action);
+  const actionCopy = getAssignmentResultActionCopy(action);
+  const scopeView =
+    actionButton?.scopeView ??
+    buildAssignmentResultActionScopeView(
+      getAssignmentResultActionDataScope(action)
+    );
+  const statusView =
+    actionButton?.statusView ??
+    buildAssignmentResultActionStatusView({ type: 'ready' });
+
+  return buildAssignmentResultReviewHandoffItemView({
+    dataScope: scopeView.dataScope,
+    description: actionButton?.description ?? actionCopy.description,
+    id,
+    label: actionButton?.label ?? actionCopy.label,
+    statusLabel: statusView.value,
+    value: `${scopeView.value} | ${statusView.value}`,
+  });
+}
+
+function buildAssignmentResultReviewHandoffPreviewItem({
+  action,
+  copyArtifactPreviews,
+  id,
+}: {
+  action: AssignmentResultCopyAction;
+  copyArtifactPreviews: Array<
+    AssignmentResultCopyArtifactPreview & {
+      actionButton: AssignmentResultActionButton;
+    }
+  >;
+  id: AssignmentResultReviewHandoffItemId;
+}) {
+  const preview = copyArtifactPreviews.find(
+    (copyPreview) => copyPreview.action === action
+  );
+  const actionCopy = getAssignmentResultActionCopy(action);
+
+  return buildAssignmentResultReviewHandoffItemView({
+    dataScope: 'current-review',
+    description: preview?.description ?? actionCopy.description,
+    id,
+    label: preview?.label ?? actionCopy.label,
+    statusLabel:
+      preview?.actionButton.statusView.value ??
+      m.assignment_result_review_handoff_not_ready_value(),
+    value:
+      preview?.summaryLabel ??
+      m.assignment_result_review_handoff_not_ready_value(),
+  });
+}
+
+function buildAssignmentResultReviewHandoffRouteStateItem({
+  controlViews,
+  id,
+}: {
+  controlViews: AssignmentResultControlViews;
+  id: AssignmentResultReviewHandoffItemId;
+}) {
+  const isAdjusted = [
+    controlViews.attemptReviewFilter.statusView,
+    controlViews.itemPerformanceSort.statusView,
+    controlViews.studentSearch.searchStatusView,
+    controlViews.studentSearch.sortStatusView,
+  ].some((statusView) => statusView.tone === 'custom');
+  const value = isAdjusted
+    ? m.assignment_result_review_handoff_route_adjusted_value()
+    : m.assignment_result_review_handoff_route_default_value();
+
+  return buildAssignmentResultReviewHandoffItemView({
+    description: m.assignment_result_review_handoff_route_description(),
+    id,
+    label: m.assignment_result_review_handoff_route_label(),
+    statusLabel: value,
+    value,
+  });
+}
+
+function buildAssignmentResultReviewHandoffDataScopeItem({
+  dataScope,
+  id,
+}: {
+  dataScope: AssignmentResultActionDataScope;
+  id: AssignmentResultReviewHandoffItemId;
+}) {
+  const scopeView = buildAssignmentResultActionScopeView(dataScope);
+  const description =
+    dataScope === 'current-review'
+      ? m.assignment_result_review_handoff_current_review_description()
+      : m.assignment_result_review_handoff_full_export_description();
+
+  return buildAssignmentResultReviewHandoffItemView({
+    dataScope,
+    description,
+    id,
+    label: scopeView.label,
+    value: scopeView.value,
   });
 }
 
@@ -3056,6 +3414,7 @@ function buildAssignmentResultReviewHandoffPrivacyContract(
     exposesStudentAnswerText: false,
     exposesTeacherAnswerKey: false,
     itemIds: itemViews.map((itemView) => itemView.id),
+    scope: 'teacher-result-review',
   };
 }
 

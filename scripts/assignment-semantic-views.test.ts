@@ -13,7 +13,10 @@ import type {
   PrintableWorksheetItem,
 } from '@/assignments/printable-worksheet';
 import { buildPrintableWorksheetPageViewModel } from '@/assignments/printable-worksheet-view';
-import { buildAssignmentResultsPageViewModel } from '@/assignments/result-view';
+import {
+  ASSIGNMENT_RESULT_REVIEW_HANDOFF_ITEM_IDS,
+  buildAssignmentResultsPageViewModel,
+} from '@/assignments/result-view';
 import type {
   PublicAttemptReviewItem,
   PublicAttemptReviewSummary,
@@ -359,34 +362,13 @@ test('teacher results expose a scoped review handoff contract', () => {
   });
 
   const handoffView = pageView.reviewHandoffView;
-  const expectedItemIds = [
-    'review-status',
-    'student-search',
-    'student-sort',
-    'item-sort',
-    'answer-review',
-    'matched-students',
-    'matched-attempts',
-    'matched-items',
-    'matched-answer-reviews',
-    'copy-scope-students',
-    'copy-scope-items',
-    'copy-scope-review',
-    'action-copy-brief',
-    'action-copy-reteach-plan',
-    'action-copy-item-review',
-    'action-copy-follow-up',
-    'action-export-csv',
-    'preview-copy-brief',
-    'preview-copy-reteach-plan',
-    'preview-copy-item-review',
-    'preview-copy-follow-up',
-  ];
+  const expectedItemIds = [...ASSIGNMENT_RESULT_REVIEW_HANDOFF_ITEM_IDS];
 
   assert.deepEqual(
     handoffView.itemViews.map((item) => item.id),
     expectedItemIds
   );
+  assert.equal(new Set(expectedItemIds).size, 30);
   assert.deepEqual(handoffView.privacy, {
     exposesCopyArtifactText: false,
     exposesCsvDataUrl: false,
@@ -394,11 +376,57 @@ test('teacher results expose a scoped review handoff contract', () => {
     exposesStudentAnswerText: false,
     exposesTeacherAnswerKey: false,
     itemIds: expectedItemIds,
+    scope: 'teacher-result-review',
   });
   assert.equal(
     handoffView.itemViews.every((item) => Boolean(item.ariaLabel)),
     true
   );
+  assert.equal(
+    getReviewHandoffValue(handoffView, 'review-status'),
+    'Needs review'
+  );
+  assert.equal(
+    getReviewHandoffValue(handoffView, 'review-next-step'),
+    'Review flagged answers'
+  );
+  assert.equal(getReviewHandoffValue(handoffView, 'student-search'), 'Alice');
+  assert.equal(
+    getReviewHandoffValue(handoffView, 'student-search-status'),
+    'Adjusted'
+  );
+  assert.equal(
+    getReviewHandoffValue(handoffView, 'student-sort'),
+    'Student name'
+  );
+  assert.equal(
+    getReviewHandoffValue(handoffView, 'item-sort'),
+    'Lowest accuracy'
+  );
+  assert.equal(
+    getReviewHandoffValue(handoffView, 'answer-review'),
+    'Needs review only'
+  );
+  assert.equal(getReviewHandoffValue(handoffView, 'matched-students'), '1/2');
+  assert.equal(getReviewHandoffValue(handoffView, 'matched-attempts'), '1/2');
+  assert.equal(getReviewHandoffValue(handoffView, 'matched-items'), '2/2');
+  assert.equal(
+    getReviewHandoffValue(handoffView, 'matched-answer-reviews'),
+    '1/2'
+  );
+  assert.equal(
+    getReviewHandoffValue(handoffView, 'route-state'),
+    'Adjusted route'
+  );
+  assert.equal(
+    getReviewHandoffValue(handoffView, 'current-review-boundary'),
+    'Current review'
+  );
+  assert.equal(
+    getReviewHandoffValue(handoffView, 'full-export-boundary'),
+    'Full assignment results'
+  );
+  assert.equal(getReviewHandoffValue(handoffView, 'privacy-guard'), 'Hidden');
   assert.equal(
     handoffView.itemViews.find((item) => item.id === 'action-export-csv')
       ?.dataScope,
@@ -425,6 +453,17 @@ test('teacher results expose a scoped review handoff contract', () => {
   assert.equal(serializedHandoff.includes('data:text/csv'), false);
   assert.equal(serializedHandoff.includes('Paris'), false);
 });
+
+function getReviewHandoffValue(
+  view: ReturnType<
+    typeof buildAssignmentResultsPageViewModel
+  >['reviewHandoffView'],
+  id: (typeof ASSIGNMENT_RESULT_REVIEW_HANDOFF_ITEM_IDS)[number]
+) {
+  const itemView = view.itemViews.find((item) => item.id === id);
+  assert.ok(itemView, `Missing result review handoff item ${id}`);
+  return itemView.value;
+}
 
 function withAssignmentSettings(
   assignment: AssignmentSeed,
