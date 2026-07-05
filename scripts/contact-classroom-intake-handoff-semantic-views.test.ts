@@ -17,12 +17,12 @@ const SECRET_PROVIDER_ERROR = 'raw-provider-stack-trace';
 const SECRET_SOURCE_STORAGE_KEY = 'source-material/private/storage-key.pdf';
 const SECRET_STUDENT_TOKEN = 'raw-student-token';
 
-test('contact classroom intake handoff exposes 20 safe intake slices', () => {
+test('contact classroom intake handoff exposes 30 safe intake slices', () => {
   const handoffView = buildContactClassroomIntakeHandoffView();
   const itemIds = handoffView.itemViews.map((item) => item.id);
 
   assert.deepEqual(itemIds, [...CONTACT_CLASSROOM_INTAKE_HANDOFF_ITEM_IDS]);
-  assert.equal(new Set(itemIds).size, 20);
+  assert.equal(new Set(itemIds).size, 30);
   assert.equal(
     handoffView.itemViews.every(
       (item) =>
@@ -34,7 +34,10 @@ test('contact classroom intake handoff exposes 20 safe intake slices', () => {
     true
   );
   assert.deepEqual(handoffView.privacy, {
+    createsActivities: false,
     createsAssignmentLinks: false,
+    createsStudentRecords: false,
+    exposesContactMessageTextInHandoff: false,
     exposesPrivateFileUrls: false,
     exposesRawProviderErrors: false,
     exposesRawStudentIdentifiers: false,
@@ -42,18 +45,26 @@ test('contact classroom intake handoff exposes 20 safe intake slices', () => {
     exposesSourceMaterialStorageKeys: false,
     forwardsLocaleToMail: true,
     itemIds,
+    mutatesTeacherWorkspace: false,
     notifiesLearners: false,
     persistsActivityContent: false,
     readsFileBytes: false,
+    rendersStructuredFieldsInMail: true,
     scope: 'public-classroom-inquiry-intake',
+    usesClassroomRouteIntent: true,
     usesStructuredFields: true,
   });
   assert.deepEqual(
     handoffView.itemViews.map((item) => [item.id, item.value]),
     [
       ['classroom-intent', 'Classroom workflow'],
+      ['contact-route', '/contact?subject=classroom'],
+      ['inquiry-panel', 'Classroom inquiry panel'],
+      ['scope-panel', '5 scope items'],
+      ['scope-field-mapping', 'Structured field ids'],
       ['subject-routing', 'ClassGamify classroom workflow'],
       ['message-template', 'Prompted context'],
+      ['form-rendering', 'Separate classroom fields'],
       ['learners-field', 'Learners'],
       ['grade-field', 'Class or grade'],
       ['material-field', 'Activity material'],
@@ -65,11 +76,16 @@ test('contact classroom intake handoff exposes 20 safe intake slices', () => {
       ['field-normalization', 'Trimmed NFKC text'],
       ['field-limits', 'Bounded fields'],
       ['structured-payload', 'classroomInquiry'],
+      ['client-submit-boundary', 'Client structured payload'],
       ['api-intent-normalization', 'Server normalized'],
+      ['server-rebuild-boundary', 'Server rebuilt payload'],
       ['mail-context', 'Contact email'],
+      ['email-template-boundary', 'Structured email fields'],
       ['locale-forwarding', 'Request locale'],
       ['safe-context-boundary', 'Safe classroom context'],
       ['private-data-guard', 'Private data omitted'],
+      ['no-activity-mutation', 'No activity mutation'],
+      ['no-student-notification', 'No learner notification'],
       ['legacy-copy-guard', 'ClassGamify only'],
     ]
   );
@@ -82,10 +98,18 @@ test('contact classroom intake handoff localizes Chinese boundaries', () => {
     const handoffView = buildContactClassroomIntakeHandoffView();
 
     assert.equal(handoffView.title, '课堂咨询收集');
-    assert.match(handoffView.description, /20 切片课堂咨询收集契约/);
+    assert.match(handoffView.description, /30 切片课堂咨询收集契约/);
     assert.equal(
       getHandoffItemValue(handoffView, 'classroom-intent'),
       '课堂工作流'
+    );
+    assert.equal(
+      getHandoffItemValue(handoffView, 'contact-route'),
+      '/contact?subject=classroom'
+    );
+    assert.equal(
+      getHandoffItemValue(handoffView, 'scope-panel'),
+      '5 个范围项目'
     );
     assert.equal(
       getHandoffItemValue(handoffView, 'field-normalization'),
@@ -98,6 +122,10 @@ test('contact classroom intake handoff localizes Chinese boundaries', () => {
     assert.equal(
       getHandoffItemValue(handoffView, 'private-data-guard'),
       '已省略私有数据'
+    );
+    assert.equal(
+      getHandoffItemValue(handoffView, 'no-student-notification'),
+      '不通知学习者'
     );
     assertNoPrivateContactText(JSON.stringify(handoffView));
   } finally {

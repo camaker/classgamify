@@ -14,8 +14,13 @@ export const CONTACT_CLASSROOM_INQUIRY_SCOPE_ITEM_IDS = [
 
 export const CONTACT_CLASSROOM_INTAKE_HANDOFF_ITEM_IDS = [
   'classroom-intent',
+  'contact-route',
+  'inquiry-panel',
+  'scope-panel',
+  'scope-field-mapping',
   'subject-routing',
   'message-template',
+  'form-rendering',
   'learners-field',
   'grade-field',
   'material-field',
@@ -27,11 +32,16 @@ export const CONTACT_CLASSROOM_INTAKE_HANDOFF_ITEM_IDS = [
   'field-normalization',
   'field-limits',
   'structured-payload',
+  'client-submit-boundary',
   'api-intent-normalization',
+  'server-rebuild-boundary',
   'mail-context',
+  'email-template-boundary',
   'locale-forwarding',
   'safe-context-boundary',
   'private-data-guard',
+  'no-activity-mutation',
+  'no-student-notification',
   'legacy-copy-guard',
 ] as const;
 
@@ -65,7 +75,10 @@ export type ContactClassroomIntakeHandoffItemView = {
 };
 
 export type ContactClassroomIntakeHandoffPrivacyContract = {
+  createsActivities: false;
   createsAssignmentLinks: false;
+  createsStudentRecords: false;
+  exposesContactMessageTextInHandoff: false;
   exposesPrivateFileUrls: false;
   exposesRawProviderErrors: false;
   exposesRawStudentIdentifiers: false;
@@ -73,10 +86,13 @@ export type ContactClassroomIntakeHandoffPrivacyContract = {
   exposesSourceMaterialStorageKeys: false;
   forwardsLocaleToMail: true;
   itemIds: ContactClassroomIntakeHandoffItemId[];
+  mutatesTeacherWorkspace: false;
   notifiesLearners: false;
   persistsActivityContent: false;
   readsFileBytes: false;
+  rendersStructuredFieldsInMail: true;
   scope: 'public-classroom-inquiry-intake';
+  usesClassroomRouteIntent: true;
   usesStructuredFields: true;
 };
 
@@ -191,6 +207,52 @@ function buildContactClassroomIntakeHandoffItem({
     });
   }
 
+  if (id === 'contact-route') {
+    return buildContactClassroomIntakeHandoffStaticItem({
+      description:
+        m.contact_classroom_intake_handoff_contact_route_description(),
+      id,
+      label: m.contact_classroom_intake_handoff_contact_route_label(),
+      value: m.contact_classroom_intake_handoff_contact_route_value(),
+    });
+  }
+
+  if (id === 'inquiry-panel') {
+    return buildContactClassroomIntakeHandoffStaticItem({
+      description:
+        m.contact_classroom_intake_handoff_inquiry_panel_description(),
+      id,
+      label: m.contact_classroom_intake_handoff_inquiry_panel_label(),
+      value: m.contact_classroom_intake_handoff_inquiry_panel_value(),
+    });
+  }
+
+  if (id === 'scope-panel') {
+    return buildContactClassroomIntakeHandoffStaticItem({
+      description: m.contact_classroom_intake_handoff_scope_panel_description({
+        scopeItemCount: scopeView.items.length,
+      }),
+      id,
+      label: m.contact_classroom_intake_handoff_scope_panel_label(),
+      value: m.contact_classroom_intake_handoff_scope_panel_value({
+        scopeItemCount: scopeView.items.length,
+      }),
+    });
+  }
+
+  if (id === 'scope-field-mapping') {
+    return buildContactClassroomIntakeHandoffStaticItem({
+      description:
+        m.contact_classroom_intake_handoff_scope_field_mapping_description({
+          fieldIds:
+            getContactClassroomInquiryScopeFieldIds(scopeView).join(', '),
+        }),
+      id,
+      label: m.contact_classroom_intake_handoff_scope_field_mapping_label(),
+      value: m.contact_classroom_intake_handoff_scope_field_mapping_value(),
+    });
+  }
+
   if (id === 'subject-routing') {
     return buildContactClassroomIntakeHandoffStaticItem({
       description:
@@ -208,6 +270,16 @@ function buildContactClassroomIntakeHandoffItem({
       id,
       label: m.contact_classroom_intake_handoff_message_template_label(),
       value: m.contact_classroom_intake_handoff_message_template_value(),
+    });
+  }
+
+  if (id === 'form-rendering') {
+    return buildContactClassroomIntakeHandoffStaticItem({
+      description:
+        m.contact_classroom_intake_handoff_form_rendering_description(),
+      id,
+      label: m.contact_classroom_intake_handoff_form_rendering_label(),
+      value: m.contact_classroom_intake_handoff_form_rendering_value(),
     });
   }
 
@@ -328,6 +400,16 @@ function buildContactClassroomIntakeHandoffItem({
     });
   }
 
+  if (id === 'client-submit-boundary') {
+    return buildContactClassroomIntakeHandoffStaticItem({
+      description:
+        m.contact_classroom_intake_handoff_client_submit_boundary_description(),
+      id,
+      label: m.contact_classroom_intake_handoff_client_submit_boundary_label(),
+      value: m.contact_classroom_intake_handoff_client_submit_boundary_value(),
+    });
+  }
+
   if (id === 'api-intent-normalization') {
     return buildContactClassroomIntakeHandoffStaticItem({
       description:
@@ -340,6 +422,16 @@ function buildContactClassroomIntakeHandoffItem({
     });
   }
 
+  if (id === 'server-rebuild-boundary') {
+    return buildContactClassroomIntakeHandoffStaticItem({
+      description:
+        m.contact_classroom_intake_handoff_server_rebuild_boundary_description(),
+      id,
+      label: m.contact_classroom_intake_handoff_server_rebuild_boundary_label(),
+      value: m.contact_classroom_intake_handoff_server_rebuild_boundary_value(),
+    });
+  }
+
   if (id === 'mail-context') {
     return buildContactClassroomIntakeHandoffStaticItem({
       description:
@@ -347,6 +439,16 @@ function buildContactClassroomIntakeHandoffItem({
       id,
       label: m.contact_classroom_intake_handoff_mail_context_label(),
       value: m.contact_classroom_intake_handoff_mail_context_value(),
+    });
+  }
+
+  if (id === 'email-template-boundary') {
+    return buildContactClassroomIntakeHandoffStaticItem({
+      description:
+        m.contact_classroom_intake_handoff_email_template_boundary_description(),
+      id,
+      label: m.contact_classroom_intake_handoff_email_template_boundary_label(),
+      value: m.contact_classroom_intake_handoff_email_template_boundary_value(),
     });
   }
 
@@ -376,6 +478,26 @@ function buildContactClassroomIntakeHandoffItem({
       id,
       label: m.contact_classroom_intake_handoff_private_data_guard_label(),
       value: m.contact_classroom_intake_handoff_private_data_guard_value(),
+    });
+  }
+
+  if (id === 'no-activity-mutation') {
+    return buildContactClassroomIntakeHandoffStaticItem({
+      description:
+        m.contact_classroom_intake_handoff_no_activity_mutation_description(),
+      id,
+      label: m.contact_classroom_intake_handoff_no_activity_mutation_label(),
+      value: m.contact_classroom_intake_handoff_no_activity_mutation_value(),
+    });
+  }
+
+  if (id === 'no-student-notification') {
+    return buildContactClassroomIntakeHandoffStaticItem({
+      description:
+        m.contact_classroom_intake_handoff_no_student_notification_description(),
+      id,
+      label: m.contact_classroom_intake_handoff_no_student_notification_label(),
+      value: m.contact_classroom_intake_handoff_no_student_notification_value(),
     });
   }
 
@@ -428,7 +550,10 @@ function buildContactClassroomIntakeHandoffPrivacyContract(
   itemViews: ContactClassroomIntakeHandoffItemView[]
 ): ContactClassroomIntakeHandoffPrivacyContract {
   return {
+    createsActivities: false,
     createsAssignmentLinks: false,
+    createsStudentRecords: false,
+    exposesContactMessageTextInHandoff: false,
     exposesPrivateFileUrls: false,
     exposesRawProviderErrors: false,
     exposesRawStudentIdentifiers: false,
@@ -436,12 +561,21 @@ function buildContactClassroomIntakeHandoffPrivacyContract(
     exposesSourceMaterialStorageKeys: false,
     forwardsLocaleToMail: true,
     itemIds: itemViews.map((item) => item.id),
+    mutatesTeacherWorkspace: false,
     notifiesLearners: false,
     persistsActivityContent: false,
     readsFileBytes: false,
+    rendersStructuredFieldsInMail: true,
     scope: 'public-classroom-inquiry-intake',
+    usesClassroomRouteIntent: true,
     usesStructuredFields: true,
   };
+}
+
+function getContactClassroomInquiryScopeFieldIds(
+  scopeView: ContactClassroomInquiryScopeView
+) {
+  return [...new Set(scopeView.items.flatMap((item) => item.fieldIds))];
 }
 
 function getContactClassroomInquiryScopeItem(
