@@ -16,6 +16,10 @@ import {
   normalizeRuntimeDisplayCount,
 } from '@/assignments/runtime-display';
 import {
+  buildStudentRuntimeIdentityHandoffView,
+  type StudentRuntimeIdentityHandoffView,
+} from '@/assignments/runtime-identity-handoff';
+import {
   buildDefaultRuntimeItemCardViews,
   type DefaultRuntimeItemCardView,
 } from '@/assignments/student-runner-view';
@@ -106,6 +110,7 @@ export type StudentRuntimeInteractionHandoffView = {
 export type StudentRuntimeItemListView = {
   defaultItemCardViews: DefaultRuntimeItemCardView[];
   interactionHandoffView: StudentRuntimeInteractionHandoffView;
+  runtimeIdentityHandoffView: StudentRuntimeIdentityHandoffView;
   runnerCopy: ActivityRunnerCopy;
   surface: StudentRuntimeItemListSurface;
 };
@@ -148,6 +153,10 @@ export function buildStudentRuntimeItemListView({
       reviewItems,
       runnerCopy,
       surface,
+      templateType,
+    }),
+    runtimeIdentityHandoffView: buildStudentRuntimeIdentityHandoffView({
+      items,
       templateType,
     }),
     runnerCopy,

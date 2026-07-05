@@ -9,6 +9,7 @@ import {
   type StudentAnswerChange,
   type StudentRuntimeInteractionHandoffView,
 } from '@/assignments/student-runtime-item-list';
+import type { StudentRuntimeIdentityHandoffView } from '@/assignments/runtime-identity-handoff';
 import type { RuntimeChoiceButtonView } from '@/assignments/student-runner-view';
 import { PublicAnswerFeedback } from '@/components/activities/public-answer-feedback';
 import { FillBlankWorksheet } from '@/components/activities/fill-blank-worksheet';
@@ -66,6 +67,7 @@ export function StudentRuntimeItemList({
     return (
       <StudentRuntimeInteractionRegion
         handoffView={listView.interactionHandoffView}
+        identityHandoffView={listView.runtimeIdentityHandoffView}
       >
         <div className="mt-4">
           <LineMatchBoard
@@ -85,6 +87,7 @@ export function StudentRuntimeItemList({
     return (
       <StudentRuntimeInteractionRegion
         handoffView={listView.interactionHandoffView}
+        identityHandoffView={listView.runtimeIdentityHandoffView}
       >
         <div className="mt-4">
           <MatchingPairsBoard
@@ -104,6 +107,7 @@ export function StudentRuntimeItemList({
     return (
       <StudentRuntimeInteractionRegion
         handoffView={listView.interactionHandoffView}
+        identityHandoffView={listView.runtimeIdentityHandoffView}
       >
         <div className="mt-4">
           <GroupSortBoard
@@ -123,6 +127,7 @@ export function StudentRuntimeItemList({
     return (
       <StudentRuntimeInteractionRegion
         handoffView={listView.interactionHandoffView}
+        identityHandoffView={listView.runtimeIdentityHandoffView}
       >
         <div className="mt-4">
           <FillBlankWorksheet
@@ -142,6 +147,7 @@ export function StudentRuntimeItemList({
     return (
       <StudentRuntimeInteractionRegion
         handoffView={listView.interactionHandoffView}
+        identityHandoffView={listView.runtimeIdentityHandoffView}
       >
         <div className="mt-4">
           <OpenBoxRunner
@@ -161,6 +167,7 @@ export function StudentRuntimeItemList({
     return (
       <StudentRuntimeInteractionRegion
         handoffView={listView.interactionHandoffView}
+        identityHandoffView={listView.runtimeIdentityHandoffView}
       >
         <div className="mt-4">
           <ListeningRunner
@@ -181,6 +188,7 @@ export function StudentRuntimeItemList({
     return (
       <StudentRuntimeInteractionRegion
         handoffView={listView.interactionHandoffView}
+        identityHandoffView={listView.runtimeIdentityHandoffView}
       >
         <div className="mt-4 grid gap-3">
           {listView.defaultItemCardViews.map((itemView) => (
@@ -212,13 +220,16 @@ export function StudentRuntimeItemList({
 function StudentRuntimeInteractionRegion({
   children,
   handoffView,
+  identityHandoffView,
 }: {
   children: ReactNode;
   handoffView: StudentRuntimeInteractionHandoffView;
+  identityHandoffView: StudentRuntimeIdentityHandoffView;
 }) {
   return (
     <>
       <StudentRuntimeInteractionHandoff view={handoffView} />
+      <StudentRuntimeIdentityHandoff view={identityHandoffView} />
       {children}
     </>
   );
@@ -238,6 +249,38 @@ function StudentRuntimeInteractionHandoff({
       aria-labelledby={titleId}
       className="sr-only"
       data-handoff="student-runtime-interaction"
+    >
+      <h2 id={titleId}>{view.title}</h2>
+      <p id={descriptionId}>{view.description}</p>
+      <dl>
+        {view.itemViews.map((item) => (
+          <div data-handoff-item={item.id} key={item.id}>
+            <dt>{item.label}</dt>
+            <dd>
+              <output aria-label={item.ariaLabel}>{item.value}</output>
+              <span>{item.description}</span>
+            </dd>
+          </div>
+        ))}
+      </dl>
+    </section>
+  );
+}
+
+function StudentRuntimeIdentityHandoff({
+  view,
+}: {
+  view: StudentRuntimeIdentityHandoffView;
+}) {
+  const titleId = 'student-runtime-identity-handoff-title';
+  const descriptionId = 'student-runtime-identity-handoff-description';
+
+  return (
+    <section
+      aria-describedby={descriptionId}
+      aria-labelledby={titleId}
+      className="sr-only"
+      data-handoff="student-runtime-identity"
     >
       <h2 id={titleId}>{view.title}</h2>
       <p id={descriptionId}>{view.description}</p>
