@@ -20,6 +20,10 @@ import {
   type StudentRuntimeIdentityHandoffView,
 } from '@/assignments/runtime-identity-handoff';
 import {
+  buildStudentRuntimeChoiceAssignmentHandoffView,
+  type StudentRuntimeChoiceAssignmentHandoffView,
+} from '@/assignments/runtime-choice-assignment-handoff';
+import {
   buildDefaultRuntimeItemCardViews,
   type DefaultRuntimeItemCardView,
 } from '@/assignments/student-runner-view';
@@ -110,6 +114,7 @@ export type StudentRuntimeInteractionHandoffView = {
 export type StudentRuntimeItemListView = {
   defaultItemCardViews: DefaultRuntimeItemCardView[];
   interactionHandoffView: StudentRuntimeInteractionHandoffView;
+  runtimeChoiceAssignmentHandoffView: StudentRuntimeChoiceAssignmentHandoffView;
   runtimeIdentityHandoffView: StudentRuntimeIdentityHandoffView;
   runnerCopy: ActivityRunnerCopy;
   surface: StudentRuntimeItemListSurface;
@@ -155,6 +160,14 @@ export function buildStudentRuntimeItemListView({
       surface,
       templateType,
     }),
+    runtimeChoiceAssignmentHandoffView:
+      buildStudentRuntimeChoiceAssignmentHandoffView({
+        answers,
+        disabled,
+        items,
+        surface,
+        templateType,
+      }),
     runtimeIdentityHandoffView: buildStudentRuntimeIdentityHandoffView({
       items,
       templateType,

@@ -7,6 +7,7 @@ import {
   buildStudentRuntimeItemListView,
   buildStudentRuntimeSingleAnswerChanges,
   type StudentAnswerChange,
+  type StudentRuntimeChoiceAssignmentHandoffView,
   type StudentRuntimeInteractionHandoffView,
 } from '@/assignments/student-runtime-item-list';
 import type { StudentRuntimeIdentityHandoffView } from '@/assignments/runtime-identity-handoff';
@@ -67,6 +68,9 @@ export function StudentRuntimeItemList({
     return (
       <StudentRuntimeInteractionRegion
         handoffView={listView.interactionHandoffView}
+        choiceAssignmentHandoffView={
+          listView.runtimeChoiceAssignmentHandoffView
+        }
         identityHandoffView={listView.runtimeIdentityHandoffView}
       >
         <div className="mt-4">
@@ -87,6 +91,9 @@ export function StudentRuntimeItemList({
     return (
       <StudentRuntimeInteractionRegion
         handoffView={listView.interactionHandoffView}
+        choiceAssignmentHandoffView={
+          listView.runtimeChoiceAssignmentHandoffView
+        }
         identityHandoffView={listView.runtimeIdentityHandoffView}
       >
         <div className="mt-4">
@@ -107,6 +114,9 @@ export function StudentRuntimeItemList({
     return (
       <StudentRuntimeInteractionRegion
         handoffView={listView.interactionHandoffView}
+        choiceAssignmentHandoffView={
+          listView.runtimeChoiceAssignmentHandoffView
+        }
         identityHandoffView={listView.runtimeIdentityHandoffView}
       >
         <div className="mt-4">
@@ -127,6 +137,9 @@ export function StudentRuntimeItemList({
     return (
       <StudentRuntimeInteractionRegion
         handoffView={listView.interactionHandoffView}
+        choiceAssignmentHandoffView={
+          listView.runtimeChoiceAssignmentHandoffView
+        }
         identityHandoffView={listView.runtimeIdentityHandoffView}
       >
         <div className="mt-4">
@@ -147,6 +160,9 @@ export function StudentRuntimeItemList({
     return (
       <StudentRuntimeInteractionRegion
         handoffView={listView.interactionHandoffView}
+        choiceAssignmentHandoffView={
+          listView.runtimeChoiceAssignmentHandoffView
+        }
         identityHandoffView={listView.runtimeIdentityHandoffView}
       >
         <div className="mt-4">
@@ -167,6 +183,9 @@ export function StudentRuntimeItemList({
     return (
       <StudentRuntimeInteractionRegion
         handoffView={listView.interactionHandoffView}
+        choiceAssignmentHandoffView={
+          listView.runtimeChoiceAssignmentHandoffView
+        }
         identityHandoffView={listView.runtimeIdentityHandoffView}
       >
         <div className="mt-4">
@@ -188,6 +207,9 @@ export function StudentRuntimeItemList({
     return (
       <StudentRuntimeInteractionRegion
         handoffView={listView.interactionHandoffView}
+        choiceAssignmentHandoffView={
+          listView.runtimeChoiceAssignmentHandoffView
+        }
         identityHandoffView={listView.runtimeIdentityHandoffView}
       >
         <div className="mt-4 grid gap-3">
@@ -219,16 +241,21 @@ export function StudentRuntimeItemList({
 
 function StudentRuntimeInteractionRegion({
   children,
+  choiceAssignmentHandoffView,
   handoffView,
   identityHandoffView,
 }: {
   children: ReactNode;
+  choiceAssignmentHandoffView: StudentRuntimeChoiceAssignmentHandoffView;
   handoffView: StudentRuntimeInteractionHandoffView;
   identityHandoffView: StudentRuntimeIdentityHandoffView;
 }) {
   return (
     <>
       <StudentRuntimeInteractionHandoff view={handoffView} />
+      <StudentRuntimeChoiceAssignmentHandoff
+        view={choiceAssignmentHandoffView}
+      />
       <StudentRuntimeIdentityHandoff view={identityHandoffView} />
       {children}
     </>
@@ -249,6 +276,38 @@ function StudentRuntimeInteractionHandoff({
       aria-labelledby={titleId}
       className="sr-only"
       data-handoff="student-runtime-interaction"
+    >
+      <h2 id={titleId}>{view.title}</h2>
+      <p id={descriptionId}>{view.description}</p>
+      <dl>
+        {view.itemViews.map((item) => (
+          <div data-handoff-item={item.id} key={item.id}>
+            <dt>{item.label}</dt>
+            <dd>
+              <output aria-label={item.ariaLabel}>{item.value}</output>
+              <span>{item.description}</span>
+            </dd>
+          </div>
+        ))}
+      </dl>
+    </section>
+  );
+}
+
+function StudentRuntimeChoiceAssignmentHandoff({
+  view,
+}: {
+  view: StudentRuntimeChoiceAssignmentHandoffView;
+}) {
+  const titleId = 'student-runtime-choice-assignment-handoff-title';
+  const descriptionId = 'student-runtime-choice-assignment-handoff-description';
+
+  return (
+    <section
+      aria-describedby={descriptionId}
+      aria-labelledby={titleId}
+      className="sr-only"
+      data-handoff="student-runtime-choice-assignment"
     >
       <h2 id={titleId}>{view.title}</h2>
       <p id={descriptionId}>{view.description}</p>
