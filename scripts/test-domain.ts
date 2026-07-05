@@ -19,9 +19,14 @@ import {
   buildSitemap,
   buildSitemapUrlEntries,
   getRobotsDisallowPaths,
+  getSitemapUrls,
   ROBOTS_TXT_HEADERS,
   SITEMAP_XML_HEADERS,
 } from '@/seo/public-indexing';
+import {
+  buildPublicMetadataHandoffView,
+  PUBLIC_METADATA_HANDOFF_ITEM_IDS,
+} from '@/seo/public-metadata-handoff';
 import {
   buildWebAppManifest,
   WEB_MANIFEST_HEADERS,
@@ -11520,6 +11525,135 @@ assert.match(
   websiteConfigSource,
   /blog:\s*\{\s*enable:\s*true,\s*paginationSize:\s*6,/s,
   'ClassGamify articles should be enabled because /blog is an indexed product resource.'
+);
+assert.match(
+  sitemapRouteSource,
+  /buildSitemap\(\)[\s\S]*headers: SITEMAP_XML_HEADERS/,
+  'Sitemap route should delegate XML generation and headers to the shared public-indexing helper.'
+);
+assert.doesNotMatch(
+  sitemapRouteSource,
+  /PUBLIC_INDEXABLE_STATIC_ROUTES|getSortedPosts|localizeHref|Routes\./,
+  'Sitemap route should not rebuild indexed routes, blog URLs, localized alternates, or route constants inline.'
+);
+assert.match(
+  robotsRouteSource,
+  /buildRobotsTxt\(\)[\s\S]*headers: ROBOTS_TXT_HEADERS/,
+  'Robots route should delegate robots output and headers to the shared public-indexing helper.'
+);
+assert.doesNotMatch(
+  robotsRouteSource,
+  /PUBLIC_ROBOTS_DISALLOW_RULES|Disallow:|Routes\./,
+  'Robots route should not rebuild crawler disallow rules or route constants inline.'
+);
+assert.match(
+  manifestRouteSource,
+  /JSON\.stringify\(buildWebAppManifest\(\)\)[\s\S]*headers: WEB_MANIFEST_HEADERS/,
+  'Manifest route should delegate install metadata and headers to the shared web-manifest helper.'
+);
+assert.doesNotMatch(
+  manifestRouteSource,
+  /websiteConfig|metadata|start_url|scope|icons|theme_color/,
+  'Manifest route should not rebuild ClassGamify install metadata inline.'
+);
+assert.match(
+  publicIndexingSource,
+  /PUBLIC_INDEXABLE_STATIC_ROUTES[\s\S]*getSortedPosts\(baseLocale\)[\s\S]*buildSitemapAlternateLinks[\s\S]*hreflang: 'x-default'/,
+  'Public indexing helpers should combine the shared route registry, editorial URLs, localized alternates, and x-default links.'
+);
+assert.match(
+  publicIndexingSource,
+  /PUBLIC_ROBOTS_DISALLOW_RULES\.flatMap[\s\S]*getLocalizedPublicPathVariants\(rule\.path\)/,
+  'Robots disallow paths should expand through the shared localized public path helper.'
+);
+assert.match(
+  publicRoutesSource,
+  /PUBLIC_INDEXABLE_STATIC_ROUTES = \[[\s\S]*Routes\.Templates[\s\S]*Routes\.Worksheets[\s\S]*Routes\.Create[\s\S]*Routes\.Blog[\s\S]*Routes\.Roadmap[\s\S]*PUBLIC_ROBOTS_DISALLOW_RULES = \[[\s\S]*Routes\.Dashboard[\s\S]*\/print[\s\S]*\/play/,
+  'Public route registry should keep product entrypoints indexed while dashboard, print, and student runner paths remain crawler-blocked.'
+);
+assert.match(
+  webManifestSource,
+  /metadata = websiteConfig\.metadata(?=[\s\S]*description: metadata\?\.description)(?=[\s\S]*name: metadata\?\.name)(?=[\s\S]*scope: '\/')(?=[\s\S]*start_url: '\/')/,
+  'Web manifest helper should derive install name and description from ClassGamify site metadata while keeping public root start and scope.'
+);
+const publicMetadataHandoffView = buildPublicMetadataHandoffView({
+  baseUrl: 'https://classgamify.example/',
+});
+const publicMetadataHandoffIds = publicMetadataHandoffView.itemViews.map(
+  (itemView) => itemView.id
+);
+assert.deepEqual(publicMetadataHandoffIds, [
+  ...PUBLIC_METADATA_HANDOFF_ITEM_IDS,
+]);
+assert.equal(publicMetadataHandoffView.itemViews.length, 30);
+assert.equal(
+  publicMetadataHandoffView.itemViews.every(
+    (itemView) =>
+      Boolean(itemView.ariaLabel) &&
+      Boolean(itemView.description) &&
+      Boolean(itemView.label) &&
+      Boolean(itemView.value)
+  ),
+  true
+);
+assert.deepEqual(publicMetadataHandoffView.privacy, {
+  createsAssignmentLinks: false,
+  exposesAnswerKeys: false,
+  exposesRawAnonymousToken: false,
+  exposesSourceMaterialStorageKeys: false,
+  exposesStudentAttemptRecords: false,
+  exposesTeacherPrivateActivityContent: false,
+  includesLocalizedAlternates: true,
+  itemIds: publicMetadataHandoffIds,
+  keepsDashboardOutOfIndex: true,
+  keepsPrintViewsOutOfIndex: true,
+  keepsRetiredLegacyOutOfIndex: true,
+  keepsStudentRunnerOutOfIndex: true,
+  readsSourceMaterialFileBytes: false,
+  routeActionsUseSharedConstants: true,
+  scope: 'public-indexing-install-metadata',
+});
+assert.deepEqual(
+  publicMetadataHandoffView.itemViews.map((itemView) => itemView.id),
+  [...PUBLIC_METADATA_HANDOFF_ITEM_IDS]
+);
+assert.equal(
+  publicMetadataHandoffView.itemViews.find(
+    (itemView) => itemView.id === 'sitemap-url-count'
+  )?.value,
+  String(
+    buildSitemapUrlEntries({
+      baseUrl: 'https://classgamify.example',
+    }).length
+  )
+);
+assert.equal(
+  publicMetadataHandoffView.itemViews.find(
+    (itemView) => itemView.id === 'sitemap-blog-count'
+  )?.value,
+  String(
+    getSitemapUrls().filter((url) =>
+      url.path.startsWith(`${PUBLIC_INDEXED_BLOG_BASE_PATH}/`)
+    ).length
+  )
+);
+assert.equal(
+  publicMetadataHandoffView.itemViews.find(
+    (itemView) => itemView.id === 'robots-disallow-paths'
+  )?.value,
+  String(getRobotsDisallowPaths().length)
+);
+assert.equal(
+  publicMetadataHandoffView.itemViews.find(
+    (itemView) => itemView.id === 'manifest-display'
+  )?.value,
+  'standalone'
+);
+assert.equal(
+  publicMetadataHandoffView.itemViews.find(
+    (itemView) => itemView.id === 'privacy-guard'
+  )?.value,
+  'Private data hidden'
 );
 assert.match(
   menuItemConfigSource,
