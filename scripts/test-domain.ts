@@ -500,6 +500,7 @@ import {
   buildSettingsBillingWorkspaceHandoffView,
   buildSettingsBillingWorkspaceSummaryView,
   buildSettingsPaymentPageViewModel,
+  normalizeSettingsPaymentCallback,
 } from '@/settings/billing-view';
 import {
   buildSettingsFilesPageViewModel,
@@ -9482,8 +9483,13 @@ assert.match(
 );
 assert.match(
   settingsBillingViewSource,
-  /export function buildSettingsPaymentPageViewModel\(\{[\s\S]*callback[\s\S]*id: 'payment'[\s\S]*callback: callback \?\? '\/settings\/billing'/,
-  'Settings payment page view model should own localized page state, breadcrumbs, and default billing callback.'
+  /export function buildSettingsPaymentPageViewModel\(\{[\s\S]*callback[\s\S]*id: 'payment'[\s\S]*callback: normalizeSettingsPaymentCallback\(callback\)/,
+  'Settings payment page view model should own localized page state, breadcrumbs, and a normalized billing callback.'
+);
+assert.match(
+  settingsBillingViewSource,
+  /export function normalizeSettingsPaymentCallback\(callback\?: string\)[\s\S]*getSafeCallbackPath\(callback, SETTINGS_PAYMENT_DEFAULT_CALLBACK\)/,
+  'Settings payment callback normalization should reuse the shared safe-callback path helper.'
 );
 assert.match(
   settingsBillingViewSource,
@@ -9921,6 +9927,31 @@ assert.equal(paymentPageView.breadcrumbs.at(-1)?.id, 'payment');
 assert.equal(paymentPageView.callback, '/dashboard/assignments');
 assert.equal(
   buildSettingsPaymentPageViewModel({}).callback,
+  '/settings/billing'
+);
+assert.equal(
+  normalizeSettingsPaymentCallback('/dashboard/assignments?published=abc'),
+  '/dashboard/assignments?published=abc'
+);
+assert.equal(
+  normalizeSettingsPaymentCallback('dashboard/assignments#results'),
+  '/dashboard/assignments#results'
+);
+for (const unsafePaymentCallback of [
+  '',
+  'https://evil.example/payments',
+  '//evil.example/payments',
+  'javascript:alert(1)',
+]) {
+  assert.equal(
+    normalizeSettingsPaymentCallback(unsafePaymentCallback),
+    '/settings/billing'
+  );
+}
+assert.equal(
+  buildSettingsPaymentPageViewModel({
+    callback: 'https://evil.example/payments',
+  }).callback,
   '/settings/billing'
 );
 assert.match(paymentPageView.description, /hosted checkout status/);

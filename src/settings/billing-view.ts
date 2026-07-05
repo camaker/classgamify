@@ -1,6 +1,9 @@
 import type { DashboardBreadcrumbItem } from '@/components/layout/dashboard-header';
 import { websiteConfig } from '@/config/website';
+import { getSafeCallbackPath } from '@/lib/urls';
 import { m } from '@/locale/paraglide/messages';
+
+const SETTINGS_PAYMENT_DEFAULT_CALLBACK = '/settings/billing';
 
 export type SettingsBillingWorkspaceSummaryItemId =
   | 'activity-library'
@@ -152,10 +155,14 @@ export function buildSettingsPaymentPageViewModel({
         isCurrentPage: true,
       },
     ],
-    callback: callback ?? '/settings/billing',
+    callback: normalizeSettingsPaymentCallback(callback),
     description,
     title,
   };
+}
+
+export function normalizeSettingsPaymentCallback(callback?: string) {
+  return getSafeCallbackPath(callback, SETTINGS_PAYMENT_DEFAULT_CALLBACK);
 }
 
 export function buildSettingsBillingWorkspaceSummaryView(): SettingsBillingWorkspaceSummaryView {
