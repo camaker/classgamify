@@ -4,6 +4,7 @@ import type { ActivityContent, AssignmentSettings } from '@/activities/types';
 import {
   buildPublicAssignmentAccessHandoffView,
   buildPublicAssignmentLookupResult,
+  PUBLIC_ASSIGNMENT_ACCESS_HANDOFF_ITEM_IDS,
 } from '@/assignments/public';
 import { overwriteGetLocale } from '@/locale/paraglide/runtime';
 
@@ -16,39 +17,6 @@ const SECRET_PROMPT = 'SECRET_PROMPT_TEXT';
 const SECRET_SOURCE_KEY = 'classroom/private/source-material.pdf';
 const SECRET_STUDENT_ANSWER = 'SECRET_STUDENT_ANSWER';
 const SECRET_TOKEN = 'raw-anonymous-token-value';
-
-const EXPECTED_PUBLIC_ACCESS_HANDOFF_ITEM_IDS = [
-  'access-status',
-  'lifecycle-status',
-  'share-link',
-  'assignment-title',
-  'template',
-  'snapshot-source',
-  'item-count',
-  'public-rule-summary',
-  'sanitized-payload',
-  'runtime-prompts',
-  'runtime-choices',
-  'runtime-id-contract',
-  'answer-keys',
-  'explanations',
-  'accepted-alternatives',
-  'post-submit-review-gate',
-  'source-materials',
-  'activity-content-guard',
-  'instructions',
-  'attempt-limit',
-  'timer',
-  'close-time',
-  'identity-mode',
-  'browser-identity-policy',
-  'shuffle-policy',
-  'review-behavior',
-  'submission-policy',
-  'unavailable-safety',
-  'unavailable-content-guard',
-  'privacy-guard',
-] as const;
 
 test('public assignment access exposes a 30-slice safe handoff for open links', () => {
   const lookupResult = buildPublicAssignmentLookupResult(
@@ -69,7 +37,7 @@ test('public assignment access exposes a 30-slice safe handoff for open links', 
   });
   const itemIds = handoffView.itemViews.map((item) => item.id);
 
-  assert.deepEqual(itemIds, [...EXPECTED_PUBLIC_ACCESS_HANDOFF_ITEM_IDS]);
+  assert.deepEqual(itemIds, [...PUBLIC_ASSIGNMENT_ACCESS_HANDOFF_ITEM_IDS]);
   assert.equal(new Set(itemIds).size, 30);
   assert.equal(
     handoffView.itemViews.every(
@@ -295,7 +263,7 @@ test('public assignment access keeps unavailable links content-free', () => {
   );
   assert.deepEqual(
     handoffView.itemViews.map((item) => item.id),
-    [...EXPECTED_PUBLIC_ACCESS_HANDOFF_ITEM_IDS]
+    [...PUBLIC_ASSIGNMENT_ACCESS_HANDOFF_ITEM_IDS]
   );
   assertNoPrivatePublicAssignmentText(JSON.stringify(handoffView));
 });
@@ -315,7 +283,7 @@ test('public assignment access keeps expired links content-free', () => {
 
   assert.deepEqual(
     handoffView.itemViews.map((item) => item.id),
-    [...EXPECTED_PUBLIC_ACCESS_HANDOFF_ITEM_IDS]
+    [...PUBLIC_ASSIGNMENT_ACCESS_HANDOFF_ITEM_IDS]
   );
   assert.equal(
     getHandoffValue(handoffView.itemViews, 'access-status'),

@@ -4895,7 +4895,7 @@
   "public_assignment_access_handoff_browser_identity_policy_label": "Browser identity policy",
   "public_assignment_access_handoff_browser_identity_policy_name_value": "Student name entry",
   "public_assignment_access_handoff_browser_identity_policy_token_value": "Anonymous token hidden",
-  "public_assignment_access_handoff_description": "Semantic contract for public assignment-link access, sanitized runtime payloads, public rules, unavailable-link safety, and submission policy.",
+  "public_assignment_access_handoff_description": "30-slice semantic contract for public assignment-link access, sanitized runtime payloads, public rules, unavailable-link safety, and submission policy.",
   "public_assignment_access_handoff_explanations_after_scoring_description": "Explanations can appear only after scoring because the assignment allows answer review.",
   "public_assignment_access_handoff_explanations_after_scoring_value": "After scoring",
   "public_assignment_access_handoff_explanations_hidden_description": "Explanations stay hidden because the assignment does not allow answer review.",

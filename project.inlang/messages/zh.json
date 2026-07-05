@@ -4895,7 +4895,7 @@
   "public_assignment_access_handoff_browser_identity_policy_label": "浏览器身份策略",
   "public_assignment_access_handoff_browser_identity_policy_name_value": "学生姓名输入",
   "public_assignment_access_handoff_browser_identity_policy_token_value": "匿名令牌已隐藏",
-  "public_assignment_access_handoff_description": "公开作业链接访问、净化运行时载荷、公开规则、不可用链接安全策略和提交策略的语义契约。",
+  "public_assignment_access_handoff_description": "30 切片公开作业链接访问、净化运行时载荷、公开规则、不可用链接安全策略和提交策略的语义契约。",
   "public_assignment_access_handoff_explanations_after_scoring_description": "因为作业允许答案复盘，解析只会在评分后出现。",
   "public_assignment_access_handoff_explanations_after_scoring_value": "评分后显示",
   "public_assignment_access_handoff_explanations_hidden_description": "因为作业不允许答案复盘，解析会保持隐藏。",

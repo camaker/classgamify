@@ -605,6 +605,7 @@ import {
 } from '@/assignments/detail-query';
 import {
   buildOpenPublicAssignmentPayload,
+  buildPublicAssignmentAccessHandoffView,
   buildPublicAssignmentLookupResult,
   buildPublicAssignmentPayload,
   buildPublicAssignmentPreviewActivity,
@@ -614,6 +615,7 @@ import {
   buildPublicAttemptReviewItems,
   buildPublicAttemptReviewItemMap,
   buildPublicAttemptReviewSummaryView,
+  PUBLIC_ASSIGNMENT_ACCESS_HANDOFF_ITEM_IDS,
   PUBLIC_ASSIGNMENT_ESTIMATED_MINUTES,
   stripRuntimeAnswer,
   stripRuntimeAnswers,
@@ -4123,14 +4125,60 @@ assert.match(
   /PUBLIC_ASSIGNMENT_ESTIMATED_MINUTES[\s\S]*max: 20[\s\S]*min: 5[\s\S]*perItem: 2/,
   'Public assignment estimated minutes should expose named domain limits.'
 );
-assert.match(
-  publicAssignmentSource,
-  /export type PublicAssignmentAccessHandoffItemId =(?=[\s\S]*'access-status')(?=[\s\S]*'lifecycle-status')(?=[\s\S]*'runtime-prompts')(?=[\s\S]*'answer-keys')(?=[\s\S]*'submission-policy')(?=[\s\S]*'unavailable-safety')[\s\S]*export type PublicAssignmentAccessHandoffPrivacyView = \{[\s\S]*exposesActivityContentJson: false;[\s\S]*exposesRawAnonymousToken: false;[\s\S]*exposesRuntimePromptText: false;[\s\S]*exposesStudentAnswerText: false;[\s\S]*export type PublicAssignmentAccessHandoffView = \{/,
-  'Public assignment access should expose a typed 20-slice handoff contract with explicit privacy flags.'
+assert.deepEqual(
+  [...PUBLIC_ASSIGNMENT_ACCESS_HANDOFF_ITEM_IDS],
+  [
+    'access-status',
+    'lifecycle-status',
+    'share-link',
+    'assignment-title',
+    'template',
+    'snapshot-source',
+    'item-count',
+    'public-rule-summary',
+    'sanitized-payload',
+    'runtime-prompts',
+    'runtime-choices',
+    'runtime-id-contract',
+    'answer-keys',
+    'explanations',
+    'accepted-alternatives',
+    'post-submit-review-gate',
+    'source-materials',
+    'activity-content-guard',
+    'instructions',
+    'attempt-limit',
+    'timer',
+    'close-time',
+    'identity-mode',
+    'browser-identity-policy',
+    'shuffle-policy',
+    'review-behavior',
+    'submission-policy',
+    'unavailable-safety',
+    'unavailable-content-guard',
+    'privacy-guard',
+  ],
+  'Public assignment access should expose exactly 30 stable handoff slice ids.'
 );
 assert.match(
   publicAssignmentSource,
-  /export function buildPublicAssignmentAccessHandoffView(?=[\s\S]*buildPublicAssignmentAccessHandoffContext\(\{)(?=[\s\S]*lookupResult)(?=[\s\S]*shareSlug)(?=[\s\S]*'items'[\s\S]*'item-count')(?=[\s\S]*'attempts'[\s\S]*'attempt-limit')(?=[\s\S]*'timer'[\s\S]*'timer')(?=[\s\S]*'closes'[\s\S]*'close-time')(?=[\s\S]*'identity'[\s\S]*'identity-mode')(?=[\s\S]*'itemOrder'[\s\S]*'shuffle-policy')(?=[\s\S]*'answerReveal'[\s\S]*'review-behavior')[\s\S]*privacy: buildPublicAssignmentAccessHandoffPrivacyView/,
+  /export const PUBLIC_ASSIGNMENT_ACCESS_HANDOFF_ITEM_IDS = \[[\s\S]*'access-status'[\s\S]*'runtime-prompts'[\s\S]*'answer-keys'[\s\S]*'submission-policy'[\s\S]*'unavailable-content-guard'[\s\S]*'privacy-guard'[\s\S]*\] as const;[\s\S]*export type PublicAssignmentAccessHandoffItemId =[\s\S]*typeof PUBLIC_ASSIGNMENT_ACCESS_HANDOFF_ITEM_IDS/,
+  'Public assignment access should derive the typed handoff item id contract from the stable 30-slice id list.'
+);
+assert.match(
+  publicAssignmentSource,
+  /export type PublicAssignmentAccessHandoffPrivacyView = \{[\s\S]*exposesAcceptedAlternatives: false;[\s\S]*exposesActivityContentJson: false;[\s\S]*exposesAssignmentSettingsJson: false;[\s\S]*exposesBrowserIdentity: false;[\s\S]*exposesRawAnonymousToken: false;[\s\S]*exposesRuntimeChoiceText: false;[\s\S]*exposesRuntimeItemIds: false;[\s\S]*exposesRuntimePromptText: false;[\s\S]*exposesSnapshotContentJson: false;[\s\S]*exposesStudentAnswerText: false;[\s\S]*exposesTeacherOnlyAnswers: false;[\s\S]*exposesTeacherSourceMaterials: false;/,
+  'Public assignment access should expose explicit privacy flags for public payload, review data, student identity, and source-material boundaries.'
+);
+assert.match(
+  publicAssignmentSource,
+  /const itemViews = PUBLIC_ASSIGNMENT_ACCESS_HANDOFF_ITEM_IDS\.map\(\(id\) =>[\s\S]*buildPublicAssignmentAccessHandoffItemInput\(context, id\)[\s\S]*privacy: buildPublicAssignmentAccessHandoffPrivacyView\(itemViews\)/,
+  'Public assignment access handoff should build item views from the stable 30-slice id list.'
+);
+assert.match(
+  publicAssignmentSource,
+  /function buildPublicAssignmentAccessHandoffItemInput(?=[\s\S]*case 'item-count':[\s\S]*'items'[\s\S]*id)(?=[\s\S]*case 'attempt-limit':[\s\S]*'attempts'[\s\S]*id)(?=[\s\S]*case 'timer':[\s\S]*'timer'[\s\S]*id)(?=[\s\S]*case 'close-time':[\s\S]*'closes'[\s\S]*id)(?=[\s\S]*case 'identity-mode':[\s\S]*'identity'[\s\S]*id)(?=[\s\S]*case 'shuffle-policy':[\s\S]*'itemOrder'[\s\S]*id)(?=[\s\S]*case 'review-behavior':[\s\S]*'answerReveal'[\s\S]*id)/,
   'Public assignment access handoff should compose stable rule slices from the shared public rule-summary view.'
 );
 assert.match(
@@ -4138,6 +4186,271 @@ assert.match(
   /function buildPublicAssignmentAccessHandoffContext[\s\S]*buildPublicAssignmentRuleSummaryViewFromSettings\(\{[\s\S]*expiresAt: payload\.assignment\.expiresAt,[\s\S]*itemCount: payload\.summary\.itemCount,[\s\S]*settings: payload\.assignment\.settingsJson,[\s\S]*\}\)\.items[\s\S]*status: 'unavailable'/,
   'Public assignment access handoff context should derive open-link rules from sanitized payload settings and keep unavailable links content-free.'
 );
+const publicAssignmentAccessPrivatePrompt = 'PRIVATE_ACCESS_PROMPT';
+const publicAssignmentAccessPrivateAnswer = 'PRIVATE_ACCESS_ANSWER';
+const publicAssignmentAccessPrivateChoice = 'PRIVATE_ACCESS_CHOICE';
+const publicAssignmentAccessPrivateSource = 'private-access-source.pdf';
+const publicAssignmentAccessContent = buildActivityContent({
+  description: 'Public assignment access fixture',
+  difficulty: 'core',
+  gradeBand: 'Grade 4',
+  groupsText: '',
+  language: 'en',
+  learningGoal: 'Students can use the public assignment link safely.',
+  pairsText: '',
+  questionsText: `${publicAssignmentAccessPrivatePrompt}? | ${publicAssignmentAccessPrivateAnswer}`,
+  sourceSummary: publicAssignmentAccessPrivateSource,
+  subject: 'General',
+  teacherNotesText: publicAssignmentAccessPrivateAnswer,
+  templateType: 'quiz',
+  title: 'Public assignment access activity',
+  visibility: 'draft',
+  vocabularyText: '',
+});
+publicAssignmentAccessContent.questions[0]!.options = [
+  {
+    id: 'private-choice',
+    isCorrect: true,
+    text: publicAssignmentAccessPrivateChoice,
+  },
+  {
+    id: 'safe-choice',
+    text: 'Visible choice count only',
+  },
+];
+publicAssignmentAccessContent.sourceMaterials = [
+  {
+    fileId: 'private-access-file-id',
+    kind: 'worksheet-document',
+    originalName: publicAssignmentAccessPrivateSource,
+  },
+];
+const publicAssignmentAccessSource = {
+  activity: {
+    contentJson: publicAssignmentAccessContent,
+    description: 'Access activity description',
+    id: 'public-access-activity',
+    templateType: 'quiz' as ActivityTemplateType,
+    title: 'Public access activity',
+    visibility: 'private' as const,
+  },
+  assignment: {
+    expiresAt: null,
+    id: 'public-access-assignment',
+    settingsJson: {
+      collectStudentName: false,
+      instructions: '  Read the classroom prompt and answer carefully.  ',
+      maxAttempts: 3,
+      showCorrectAnswers: false,
+      shuffleItems: true,
+      timeLimitSeconds: 120,
+    },
+    shareSlug: ' public-access-share ',
+    status: 'published' as const,
+    title: '  Public access homework  ',
+  },
+  snapshot: {
+    activityDescription: 'Frozen public access activity',
+    activityTitle: 'Frozen public access title',
+    contentJson: structuredClone(publicAssignmentAccessContent),
+    templateType: 'quiz' as ActivityTemplateType,
+  },
+};
+const publicAssignmentAccessHandoffView =
+  buildPublicAssignmentAccessHandoffView({
+    lookupResult: buildPublicAssignmentLookupResult(
+      publicAssignmentAccessSource
+    ),
+  });
+const publicAssignmentAccessHandoffValues = new Map(
+  publicAssignmentAccessHandoffView.itemViews.map((item) => [
+    item.id,
+    item.value,
+  ])
+);
+assert.match(publicAssignmentAccessHandoffView.description, /30-slice/);
+assert.deepEqual(
+  publicAssignmentAccessHandoffView.itemViews.map((item) => item.id),
+  [...PUBLIC_ASSIGNMENT_ACCESS_HANDOFF_ITEM_IDS],
+  'Public assignment access handoff should expose the stable 30-slice order for open links.'
+);
+assert.deepEqual(publicAssignmentAccessHandoffView.privacy, {
+  exposesAcceptedAlternatives: false,
+  exposesActivityContentJson: false,
+  exposesAssignmentSettingsJson: false,
+  exposesBrowserIdentity: false,
+  exposesRawAnonymousToken: false,
+  exposesRuntimeChoiceText: false,
+  exposesRuntimeItemIds: false,
+  exposesRuntimePromptText: false,
+  exposesSnapshotContentJson: false,
+  exposesStudentAnswerText: false,
+  exposesTeacherOnlyAnswers: false,
+  exposesTeacherSourceMaterials: false,
+  itemIds: [...PUBLIC_ASSIGNMENT_ACCESS_HANDOFF_ITEM_IDS],
+});
+assert.equal(
+  publicAssignmentAccessHandoffValues.get('access-status'),
+  'Available'
+);
+assert.equal(
+  publicAssignmentAccessHandoffValues.get('lifecycle-status'),
+  'Open'
+);
+assert.equal(
+  publicAssignmentAccessHandoffValues.get('share-link'),
+  'public-access-share'
+);
+assert.equal(
+  publicAssignmentAccessHandoffValues.get('assignment-title'),
+  'Public access homework'
+);
+assert.equal(publicAssignmentAccessHandoffValues.get('template'), 'Quiz');
+assert.equal(
+  publicAssignmentAccessHandoffValues.get('snapshot-source'),
+  'Frozen snapshot'
+);
+assert.equal(publicAssignmentAccessHandoffValues.get('item-count'), '1 item');
+assert.equal(
+  publicAssignmentAccessHandoffValues.get('public-rule-summary'),
+  '7 rules'
+);
+assert.equal(
+  publicAssignmentAccessHandoffValues.get('sanitized-payload'),
+  'Prepared'
+);
+assert.equal(
+  publicAssignmentAccessHandoffValues.get('runtime-prompts'),
+  '1 prompts'
+);
+assert.equal(
+  publicAssignmentAccessHandoffValues.get('runtime-choices'),
+  '3 choices'
+);
+assert.equal(
+  publicAssignmentAccessHandoffValues.get('runtime-id-contract'),
+  'Ids omitted'
+);
+assert.equal(
+  publicAssignmentAccessHandoffValues.get('source-materials'),
+  'Private'
+);
+assert.equal(
+  publicAssignmentAccessHandoffValues.get('activity-content-guard'),
+  'Content JSON hidden'
+);
+assert.equal(
+  publicAssignmentAccessHandoffValues.get('instructions'),
+  'Read the classroom prompt and answer carefully.'
+);
+assert.equal(
+  publicAssignmentAccessHandoffValues.get('attempt-limit'),
+  '3 max'
+);
+assert.equal(publicAssignmentAccessHandoffValues.get('timer'), '2 min');
+assert.equal(
+  publicAssignmentAccessHandoffValues.get('identity-mode'),
+  'Anonymous'
+);
+assert.equal(
+  publicAssignmentAccessHandoffValues.get('browser-identity-policy'),
+  'Anonymous token hidden'
+);
+assert.equal(
+  publicAssignmentAccessHandoffValues.get('submission-policy'),
+  'Submissions allowed'
+);
+assert.equal(
+  publicAssignmentAccessHandoffValues.get('unavailable-content-guard'),
+  'Open link'
+);
+assert.equal(
+  publicAssignmentAccessHandoffValues.get('privacy-guard'),
+  'Private data omitted'
+);
+for (const privateValue of [
+  publicAssignmentAccessPrivatePrompt,
+  publicAssignmentAccessPrivateAnswer,
+  publicAssignmentAccessPrivateChoice,
+  publicAssignmentAccessPrivateSource,
+  'private-access-file-id',
+]) {
+  assert.equal(
+    JSON.stringify(publicAssignmentAccessHandoffView).includes(privateValue),
+    false,
+    `Public assignment access handoff leaked private text: ${privateValue}`
+  );
+}
+const closedPublicAssignmentAccessHandoffView =
+  buildPublicAssignmentAccessHandoffView({
+    lookupResult: buildPublicAssignmentLookupResult({
+      ...publicAssignmentAccessSource,
+      assignment: {
+        ...publicAssignmentAccessSource.assignment,
+        shareSlug: 'closed-public-access-share',
+        status: 'closed',
+      },
+    }),
+    shareSlug: 'closed-public-access-share',
+  });
+const closedPublicAssignmentAccessHandoffValues = new Map(
+  closedPublicAssignmentAccessHandoffView.itemViews.map((item) => [
+    item.id,
+    item.value,
+  ])
+);
+assert.deepEqual(
+  closedPublicAssignmentAccessHandoffView.itemViews.map((item) => item.id),
+  [...PUBLIC_ASSIGNMENT_ACCESS_HANDOFF_ITEM_IDS],
+  'Public assignment access handoff should expose the stable 30-slice order for unavailable links.'
+);
+assert.equal(
+  closedPublicAssignmentAccessHandoffValues.get('access-status'),
+  'Unavailable'
+);
+assert.equal(
+  closedPublicAssignmentAccessHandoffValues.get('lifecycle-status'),
+  'Closed'
+);
+assert.equal(
+  closedPublicAssignmentAccessHandoffValues.get('assignment-title'),
+  'Hidden'
+);
+assert.equal(
+  closedPublicAssignmentAccessHandoffValues.get('runtime-prompts'),
+  'Hidden'
+);
+assert.equal(
+  closedPublicAssignmentAccessHandoffValues.get('browser-identity-policy'),
+  'Hidden'
+);
+assert.equal(
+  closedPublicAssignmentAccessHandoffValues.get('submission-policy'),
+  'Submissions blocked'
+);
+assert.equal(
+  closedPublicAssignmentAccessHandoffValues.get('unavailable-safety'),
+  'Safety policy active'
+);
+assert.equal(
+  closedPublicAssignmentAccessHandoffValues.get('unavailable-content-guard'),
+  'Runtime hidden'
+);
+for (const privateValue of [
+  publicAssignmentAccessPrivatePrompt,
+  publicAssignmentAccessPrivateAnswer,
+  publicAssignmentAccessPrivateChoice,
+  publicAssignmentAccessPrivateSource,
+  'private-access-file-id',
+]) {
+  assert.equal(
+    JSON.stringify(closedPublicAssignmentAccessHandoffView).includes(
+      privateValue
+    ),
+    false,
+    `Closed public assignment access handoff leaked private text: ${privateValue}`
+  );
+}
 assert.match(
   publicAssignmentSource,
   /export type PublicAssignmentUnavailablePayload = \{[\s\S]*contentPolicy: PublicAssignmentUnavailableContentPolicy;[\s\S]*identityPolicy: PublicAssignmentUnavailableIdentityPolicy;[\s\S]*reason: PublicAssignmentUnavailableReason;[\s\S]*submissionPolicy: PublicAssignmentUnavailableSubmissionPolicy;/,
