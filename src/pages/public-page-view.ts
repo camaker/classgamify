@@ -26,6 +26,7 @@ type PublicPageRouteAction = {
 export type HomePageViewModel = {
   features: HomePageFeature[];
   featureSection: HomePageFeatureSectionView;
+  handoffView: HomePageProductLoopHandoffView;
   hero: HomePageHeroView;
   preview: HomePagePreviewView;
   signalPanel: HomePageSignalPanelView;
@@ -80,6 +81,72 @@ type HomePageSignal = {
 type HomePageSignalPanelView = {
   ariaLabel: string;
   description: string;
+  title: string;
+};
+
+export const HOME_PAGE_PRODUCT_LOOP_HANDOFF_ITEM_IDS = [
+  'product-loop',
+  'homepage-surface',
+  'hero-create-route',
+  'hero-template-route',
+  'hero-worksheet-route',
+  'create-route',
+  'templates-route',
+  'worksheets-route',
+  'starter-preview-source',
+  'starter-preview-activity',
+  'starter-preview-assignment',
+  'starter-preview-submit-boundary',
+  'feature-section',
+  'feature-structured-activities',
+  'feature-template-switching',
+  'feature-assignment-links',
+  'feature-teacher-results',
+  'signal-panel',
+  'signal-templates',
+  'signal-delivery',
+  'signal-results',
+  'activity-content-model',
+  'assignment-snapshot-boundary',
+  'student-runner-boundary',
+  'result-review-boundary',
+  'worksheet-extension-boundary',
+  'ai-draft-boundary',
+  'legacy-entrypoint-guard',
+  'indexing-scope',
+  'privacy-guard',
+] as const;
+
+export type HomePageProductLoopHandoffItemId =
+  (typeof HOME_PAGE_PRODUCT_LOOP_HANDOFF_ITEM_IDS)[number];
+
+export type HomePageProductLoopHandoffItemView = {
+  ariaLabel: string;
+  description: string;
+  id: HomePageProductLoopHandoffItemId;
+  label: string;
+  value: string;
+};
+
+export type HomePageProductLoopHandoffPrivacyContract = {
+  createsAssignmentLinks: false;
+  exposesAnswerKeys: false;
+  exposesRawAnonymousToken: false;
+  exposesSourceMaterialStorageKeys: false;
+  exposesStudentAttemptRecords: false;
+  exposesTeacherPrivateActivityContent: false;
+  itemIds: HomePageProductLoopHandoffItemId[];
+  keepsLegacyEntrypointsOut: true;
+  mutatesTeacherData: false;
+  previewIsStarterOnly: true;
+  routeActionsUseSharedConstants: true;
+  scope: 'public-home-product-loop';
+};
+
+export type HomePageProductLoopHandoffView = {
+  description: string;
+  itemViews: HomePageProductLoopHandoffItemView[];
+  privacy: HomePageProductLoopHandoffPrivacyContract;
   title: string;
 };
 
@@ -412,88 +479,101 @@ export function buildHomePageViewModel({
   const featureSectionDescription = m.home_features_description();
   const signalPanelTitle = m.home_signal_panel_title();
   const signalPanelDescription = m.home_signal_panel_description();
-
-  return {
-    features: [
-      buildHomePageFeatureView({
-        description: m.home_features_items_item_1_description(),
-        id: 'teacher-workflows',
-        title: m.home_features_items_item_1_title(),
-      }),
-      buildHomePageFeatureView({
-        description: m.home_features_items_item_2_description(),
-        id: 'activity-templates',
-        title: m.home_features_items_item_2_title(),
-      }),
-      buildHomePageFeatureView({
-        description: m.home_features_items_item_3_description(),
-        id: 'assignment-links',
-        title: m.home_features_items_item_3_title(),
-      }),
-      buildHomePageFeatureView({
-        description: m.home_features_items_item_4_description(),
-        id: 'results',
-        title: m.home_features_items_item_4_title(),
-      }),
-    ],
-    featureSection: {
-      ariaLabel: m.home_feature_section_aria_label({
-        description: featureSectionDescription,
-        title: featureSectionTitle,
-      }),
+  const features = [
+    buildHomePageFeatureView({
+      description: m.home_features_items_item_1_description(),
+      id: 'teacher-workflows',
+      title: m.home_features_items_item_1_title(),
+    }),
+    buildHomePageFeatureView({
+      description: m.home_features_items_item_2_description(),
+      id: 'activity-templates',
+      title: m.home_features_items_item_2_title(),
+    }),
+    buildHomePageFeatureView({
+      description: m.home_features_items_item_3_description(),
+      id: 'assignment-links',
+      title: m.home_features_items_item_3_title(),
+    }),
+    buildHomePageFeatureView({
+      description: m.home_features_items_item_4_description(),
+      id: 'results',
+      title: m.home_features_items_item_4_title(),
+    }),
+  ];
+  const featureSection = {
+    ariaLabel: m.home_feature_section_aria_label({
       description: featureSectionDescription,
-      eyebrowLabel: m.home_features_subtitle(),
       title: featureSectionTitle,
+    }),
+    description: featureSectionDescription,
+    eyebrowLabel: m.home_features_subtitle(),
+    title: featureSectionTitle,
+  };
+  const hero = {
+    badgeLabel: m.home_hero_introduction(),
+    browseTemplatesAction: {
+      ariaLabel: m.home_hero_browse_templates_aria_label(),
+      label: m.home_hero_browse_templates(),
+      to: Routes.Templates,
     },
-    hero: {
-      badgeLabel: m.home_hero_introduction(),
-      browseTemplatesAction: {
-        ariaLabel: m.home_hero_browse_templates_aria_label(),
-        label: m.home_hero_browse_templates(),
-        to: Routes.Templates,
-      },
-      description: m.home_hero_description(),
-      primaryAction: {
-        ariaLabel: m.home_hero_primary_aria_label(),
-        label: m.home_hero_primary(),
-        to: Routes.Create,
-      },
-      worksheetAction: {
-        ariaLabel: m.home_hero_secondary_aria_label(),
-        label: m.home_hero_secondary(),
-        to: Routes.Worksheets,
-      },
-      title: m.home_hero_title(),
+    description: m.home_hero_description(),
+    primaryAction: {
+      ariaLabel: m.home_hero_primary_aria_label(),
+      label: m.home_hero_primary(),
+      to: Routes.Create,
     },
-    preview,
-    signalPanel: {
-      ariaLabel: m.home_signal_panel_aria_label({
-        description: signalPanelDescription,
-        title: signalPanelTitle,
-      }),
+    worksheetAction: {
+      ariaLabel: m.home_hero_secondary_aria_label(),
+      label: m.home_hero_secondary(),
+      to: Routes.Worksheets,
+    },
+    title: m.home_hero_title(),
+  };
+  const signalPanel = {
+    ariaLabel: m.home_signal_panel_aria_label({
       description: signalPanelDescription,
       title: signalPanelTitle,
-    },
-    signals: [
-      buildHomePageSignalView({
-        description: m.home_signal_templates_description(),
-        id: 'templates',
-        label: m.home_signal_templates_label(),
-        value: m.home_signal_templates_value(),
-      }),
-      buildHomePageSignalView({
-        description: m.home_signal_delivery_description(),
-        id: 'delivery',
-        label: m.home_signal_delivery_label(),
-        value: m.home_signal_delivery_value(),
-      }),
-      buildHomePageSignalView({
-        description: m.home_signal_results_description(),
-        id: 'results',
-        label: m.home_signal_results_label(),
-        value: m.home_signal_results_value(),
-      }),
-    ],
+    }),
+    description: signalPanelDescription,
+    title: signalPanelTitle,
+  };
+  const signals = [
+    buildHomePageSignalView({
+      description: m.home_signal_templates_description(),
+      id: 'templates',
+      label: m.home_signal_templates_label(),
+      value: m.home_signal_templates_value(),
+    }),
+    buildHomePageSignalView({
+      description: m.home_signal_delivery_description(),
+      id: 'delivery',
+      label: m.home_signal_delivery_label(),
+      value: m.home_signal_delivery_value(),
+    }),
+    buildHomePageSignalView({
+      description: m.home_signal_results_description(),
+      id: 'results',
+      label: m.home_signal_results_label(),
+      value: m.home_signal_results_value(),
+    }),
+  ];
+
+  return {
+    features,
+    featureSection,
+    handoffView: buildHomePageProductLoopHandoffView({
+      features,
+      featureSection,
+      hero,
+      preview,
+      signalPanel,
+      signals,
+    }),
+    hero,
+    preview,
+    signalPanel,
+    signals,
   };
 }
 
@@ -542,6 +622,316 @@ export function buildHomePageStarterPreview(): HomePagePreviewView {
     assignment,
     source: 'starter-preview',
   };
+}
+
+export function buildHomePageProductLoopHandoffView({
+  features,
+  featureSection,
+  hero,
+  preview,
+  signalPanel,
+  signals,
+}: Pick<
+  HomePageViewModel,
+  'features' | 'featureSection' | 'hero' | 'preview' | 'signalPanel' | 'signals'
+>): HomePageProductLoopHandoffView {
+  const itemViews = HOME_PAGE_PRODUCT_LOOP_HANDOFF_ITEM_IDS.map((id) =>
+    buildHomePageProductLoopHandoffItemView({
+      features,
+      featureSection,
+      hero,
+      id,
+      preview,
+      signalPanel,
+      signals,
+    })
+  );
+
+  return {
+    description: m.home_handoff_description(),
+    itemViews,
+    privacy: buildHomePageProductLoopHandoffPrivacyContract(itemViews),
+    title: m.home_handoff_title(),
+  };
+}
+
+type HomePageProductLoopHandoffBuildContext = Pick<
+  HomePageViewModel,
+  'features' | 'featureSection' | 'hero' | 'preview' | 'signalPanel' | 'signals'
+> & {
+  id: HomePageProductLoopHandoffItemId;
+};
+
+function buildHomePageProductLoopHandoffItemView(
+  context: HomePageProductLoopHandoffBuildContext
+): HomePageProductLoopHandoffItemView {
+  const value = getHomePageProductLoopHandoffItemValue(context);
+  const label = getHomePageProductLoopHandoffItemLabel(context);
+  const description = getHomePageProductLoopHandoffItemDescription(context);
+
+  return {
+    ariaLabel: m.home_handoff_item_aria({
+      description,
+      label,
+      value,
+    }),
+    description,
+    id: context.id,
+    label,
+    value,
+  };
+}
+
+function getHomePageProductLoopHandoffItemValue(
+  context: HomePageProductLoopHandoffBuildContext
+) {
+  switch (context.id) {
+    case 'product-loop':
+      return 'Activity -> Assignment -> Attempt -> Results';
+    case 'homepage-surface':
+      return m.home_handoff_surface_value();
+    case 'hero-create-route':
+      return context.hero.primaryAction.to;
+    case 'hero-template-route':
+      return context.hero.browseTemplatesAction.to;
+    case 'hero-worksheet-route':
+      return context.hero.worksheetAction.to;
+    case 'create-route':
+      return Routes.Create;
+    case 'templates-route':
+      return Routes.Templates;
+    case 'worksheets-route':
+      return Routes.Worksheets;
+    case 'starter-preview-source':
+      return m.home_handoff_starter_preview_source_value();
+    case 'starter-preview-activity':
+      return m.home_handoff_starter_preview_activity_value();
+    case 'starter-preview-assignment':
+      return m.home_handoff_starter_preview_assignment_value();
+    case 'starter-preview-submit-boundary':
+      return m.home_handoff_starter_preview_submit_value();
+    case 'feature-section':
+      return formatHomePageHandoffCount(context.features.length);
+    case 'feature-structured-activities':
+      return getHomePageFeature(context.features, 'teacher-workflows').title;
+    case 'feature-template-switching':
+      return getHomePageFeature(context.features, 'activity-templates').title;
+    case 'feature-assignment-links':
+      return getHomePageFeature(context.features, 'assignment-links').title;
+    case 'feature-teacher-results':
+      return getHomePageFeature(context.features, 'results').title;
+    case 'signal-panel':
+      return formatHomePageHandoffCount(context.signals.length);
+    case 'signal-templates':
+      return getHomePageSignal(context.signals, 'templates').value;
+    case 'signal-delivery':
+      return getHomePageSignal(context.signals, 'delivery').value;
+    case 'signal-results':
+      return getHomePageSignal(context.signals, 'results').value;
+    case 'activity-content-model':
+      return 'ActivityContent';
+    case 'assignment-snapshot-boundary':
+      return 'AssignmentSnapshot';
+    case 'student-runner-boundary':
+      return m.home_handoff_student_runner_value();
+    case 'result-review-boundary':
+      return m.home_handoff_result_review_value();
+    case 'worksheet-extension-boundary':
+      return Routes.Worksheets;
+    case 'ai-draft-boundary':
+      return m.home_handoff_ai_draft_value();
+    case 'legacy-entrypoint-guard':
+      return m.home_handoff_legacy_guard_value();
+    case 'indexing-scope':
+      return m.home_handoff_indexing_value();
+    case 'privacy-guard':
+      return m.home_handoff_privacy_value();
+  }
+}
+
+function getHomePageProductLoopHandoffItemLabel(
+  context: HomePageProductLoopHandoffBuildContext
+) {
+  switch (context.id) {
+    case 'product-loop':
+      return m.home_handoff_product_loop_label();
+    case 'homepage-surface':
+      return m.home_handoff_surface_label();
+    case 'hero-create-route':
+      return context.hero.primaryAction.label;
+    case 'hero-template-route':
+      return context.hero.browseTemplatesAction.label;
+    case 'hero-worksheet-route':
+      return context.hero.worksheetAction.label;
+    case 'create-route':
+      return m.home_handoff_create_route_label();
+    case 'templates-route':
+      return m.home_handoff_templates_route_label();
+    case 'worksheets-route':
+      return m.home_handoff_worksheets_route_label();
+    case 'starter-preview-source':
+      return m.home_handoff_starter_preview_source_label();
+    case 'starter-preview-activity':
+      return m.home_handoff_starter_preview_activity_label();
+    case 'starter-preview-assignment':
+      return m.home_handoff_starter_preview_assignment_label();
+    case 'starter-preview-submit-boundary':
+      return m.home_handoff_starter_preview_submit_label();
+    case 'feature-section':
+      return context.featureSection.title;
+    case 'feature-structured-activities':
+      return getHomePageFeature(context.features, 'teacher-workflows').title;
+    case 'feature-template-switching':
+      return getHomePageFeature(context.features, 'activity-templates').title;
+    case 'feature-assignment-links':
+      return getHomePageFeature(context.features, 'assignment-links').title;
+    case 'feature-teacher-results':
+      return getHomePageFeature(context.features, 'results').title;
+    case 'signal-panel':
+      return context.signalPanel.title;
+    case 'signal-templates':
+      return getHomePageSignal(context.signals, 'templates').label;
+    case 'signal-delivery':
+      return getHomePageSignal(context.signals, 'delivery').label;
+    case 'signal-results':
+      return getHomePageSignal(context.signals, 'results').label;
+    case 'activity-content-model':
+      return m.home_handoff_activity_model_label();
+    case 'assignment-snapshot-boundary':
+      return m.home_handoff_snapshot_label();
+    case 'student-runner-boundary':
+      return m.home_handoff_student_runner_label();
+    case 'result-review-boundary':
+      return m.home_handoff_result_review_label();
+    case 'worksheet-extension-boundary':
+      return m.home_handoff_worksheet_extension_label();
+    case 'ai-draft-boundary':
+      return m.home_handoff_ai_draft_label();
+    case 'legacy-entrypoint-guard':
+      return m.home_handoff_legacy_guard_label();
+    case 'indexing-scope':
+      return m.home_handoff_indexing_label();
+    case 'privacy-guard':
+      return m.home_handoff_privacy_label();
+  }
+}
+
+function getHomePageProductLoopHandoffItemDescription(
+  context: HomePageProductLoopHandoffBuildContext
+) {
+  switch (context.id) {
+    case 'product-loop':
+      return m.home_handoff_product_loop_description();
+    case 'homepage-surface':
+      return m.home_handoff_surface_description();
+    case 'hero-create-route':
+      return context.hero.primaryAction.ariaLabel;
+    case 'hero-template-route':
+      return context.hero.browseTemplatesAction.ariaLabel;
+    case 'hero-worksheet-route':
+      return context.hero.worksheetAction.ariaLabel;
+    case 'create-route':
+      return m.home_handoff_create_route_description();
+    case 'templates-route':
+      return m.home_handoff_templates_route_description();
+    case 'worksheets-route':
+      return m.home_handoff_worksheets_route_description();
+    case 'starter-preview-source':
+      return m.home_handoff_starter_preview_source_description();
+    case 'starter-preview-activity':
+      return m.home_handoff_starter_preview_activity_description();
+    case 'starter-preview-assignment':
+      return m.home_handoff_starter_preview_assignment_description();
+    case 'starter-preview-submit-boundary':
+      return m.home_handoff_starter_preview_submit_description();
+    case 'feature-section':
+      return context.featureSection.description;
+    case 'feature-structured-activities':
+      return getHomePageFeature(context.features, 'teacher-workflows')
+        .description;
+    case 'feature-template-switching':
+      return getHomePageFeature(context.features, 'activity-templates')
+        .description;
+    case 'feature-assignment-links':
+      return getHomePageFeature(context.features, 'assignment-links')
+        .description;
+    case 'feature-teacher-results':
+      return getHomePageFeature(context.features, 'results').description;
+    case 'signal-panel':
+      return context.signalPanel.description;
+    case 'signal-templates':
+      return getHomePageSignal(context.signals, 'templates').description;
+    case 'signal-delivery':
+      return getHomePageSignal(context.signals, 'delivery').description;
+    case 'signal-results':
+      return getHomePageSignal(context.signals, 'results').description;
+    case 'activity-content-model':
+      return m.home_handoff_activity_model_description();
+    case 'assignment-snapshot-boundary':
+      return m.home_handoff_snapshot_description();
+    case 'student-runner-boundary':
+      return m.home_handoff_student_runner_description();
+    case 'result-review-boundary':
+      return m.home_handoff_result_review_description();
+    case 'worksheet-extension-boundary':
+      return m.home_handoff_worksheet_extension_description();
+    case 'ai-draft-boundary':
+      return m.home_handoff_ai_draft_description();
+    case 'legacy-entrypoint-guard':
+      return m.home_handoff_legacy_guard_description();
+    case 'indexing-scope':
+      return m.home_handoff_indexing_description();
+    case 'privacy-guard':
+      return m.home_handoff_privacy_description();
+  }
+}
+
+function buildHomePageProductLoopHandoffPrivacyContract(
+  itemViews: HomePageProductLoopHandoffItemView[]
+): HomePageProductLoopHandoffPrivacyContract {
+  return {
+    createsAssignmentLinks: false,
+    exposesAnswerKeys: false,
+    exposesRawAnonymousToken: false,
+    exposesSourceMaterialStorageKeys: false,
+    exposesStudentAttemptRecords: false,
+    exposesTeacherPrivateActivityContent: false,
+    itemIds: itemViews.map((itemView) => itemView.id),
+    keepsLegacyEntrypointsOut: true,
+    mutatesTeacherData: false,
+    previewIsStarterOnly: true,
+    routeActionsUseSharedConstants: true,
+    scope: 'public-home-product-loop',
+  };
+}
+
+function getHomePageFeature(
+  features: HomePageFeature[],
+  id: HomePageFeatureId
+) {
+  const feature = features.find((candidate) => candidate.id === id);
+
+  if (!feature) {
+    throw new Error(`Missing homepage feature: ${id}`);
+  }
+
+  return feature;
+}
+
+function getHomePageSignal(signals: HomePageSignal[], id: HomePageSignalId) {
+  const signal = signals.find((candidate) => candidate.id === id);
+
+  if (!signal) {
+    throw new Error(`Missing homepage signal: ${id}`);
+  }
+
+  return signal;
+}
+
+function formatHomePageHandoffCount(count: number) {
+  return m.home_handoff_count_value({
+    count: Math.max(0, Math.trunc(Number.isFinite(count) ? count : 0)),
+  });
 }
 
 export function buildRoadmapPageViewModel(): RoadmapPageViewModel {
