@@ -1,6 +1,7 @@
 import { buildAssignmentSharePath } from '@/assignments/share-link';
 import { getOrCreateAnonymousAttemptToken } from '@/assignments/identity';
 import { buildPublicAssignmentAccessHandoffView } from '@/assignments/public';
+import { buildPublicAssignmentUnavailableAccessHandoffView } from '@/assignments/unavailable-access';
 import {
   resolveStudentAttemptSubmissionFailureMessage,
   type StudentAnswerChange,
@@ -126,6 +127,15 @@ function PlayPage() {
           })
         : undefined,
     [data, normalizedShareId]
+  );
+  const unavailableAccessHandoffView = useMemo(
+    () =>
+      buildPublicAssignmentUnavailableAccessHandoffView({
+        lookupResult: data,
+        missingView: runnerPageView.missingView,
+        shareSlug: normalizedShareId,
+      }),
+    [data, normalizedShareId, runnerPageView.missingView]
   );
 
   useEffect(() => {
@@ -284,7 +294,13 @@ function PlayPage() {
   }
 
   if (runnerRouteState.status === 'missing') {
-    return <StudentRunnerMissingPanel view={runnerRouteState.missingView} />;
+    return (
+      <StudentRunnerMissingPanel
+        accessHandoffView={publicAccessHandoffView}
+        unavailableAccessHandoffView={unavailableAccessHandoffView}
+        view={runnerRouteState.missingView}
+      />
+    );
   }
 
   if (runnerRouteState.status !== 'ready') return null;
