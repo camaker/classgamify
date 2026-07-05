@@ -24,11 +24,16 @@ checks, Biome checks, and the production build. Use `pnpm deploy` only for a
 manual Cloudflare Workers deployment when the project owner explicitly chooses
 that path.
 
+After a deployment, health checks should use the configured ClassGamify
+`VITE_BASE_URL` origin. Do not verify against copied starter domains or retired
+learning-site URLs.
+
 ## Build-Time Values
 
 `VITE_*` values are build-time inputs. They are read by Vite during
 `pnpm dev`, `pnpm build`, or the Cloudflare build, then inlined into the client
-bundle. They should cover public configuration only:
+bundle. In production, set them in the Cloudflare project build environment.
+They should cover public configuration only:
 
 - `VITE_BASE_URL` for the ClassGamify site origin and assignment links.
 - `VITE_PAYMENT_PROVIDER` plus Stripe price IDs or Creem product IDs for
@@ -58,6 +63,9 @@ Required or optional runtime secrets include:
 
 Cloudflare owns these production secrets. Keep `.env.local` and
 `.env.production` local or build-only, and never commit real credentials.
+`pnpm sync-worker-secrets` is a local manual setup command for bulk syncing
+Worker secrets after the Worker exists; it is not a CI deploy path and is not a
+reason to commit real secrets.
 
 ## Data Bindings
 
@@ -75,6 +83,10 @@ Student assignment payloads should expose sanitized runtime prompts, choices,
 timers, and submission rules. They should not expose teacher source-material
 lists, R2 keys, storage URLs, payment metadata, OAuth metadata, or server-only
 provider settings.
+
+Regenerate Worker binding types with `pnpm cf-typegen` after binding shape
+changes. The `postinstall` hook also runs this command so local installs keep
+the generated `Env` interface aligned with `wrangler.jsonc`.
 
 ## Auth And Workspace Access
 
@@ -138,6 +150,15 @@ real UI locally when available, and run the relevant Playwright specs.
 - `docs/storage.md` documents the R2 source-material boundary.
 - `.env.example` and `.env.production.example` use ClassGamify placeholders.
 - `wrangler.jsonc` owns D1 and R2 bindings for the Worker.
-- `src/config/developer-configuration-handoff.ts` exposes the 20-slice
+- `pnpm predeploy` remains the local release gate:
+  `pnpm locale:check`, `pnpm check`, then `pnpm build`.
+- `pnpm deploy` remains the explicit manual Cloudflare Workers deploy command.
+- Health checks use the configured ClassGamify `VITE_BASE_URL`.
+- `pnpm sync-worker-secrets` is local-only manual secret setup after the Worker
+  exists.
+- `pnpm cf-typegen` keeps Worker binding types aligned with `wrangler.jsonc`.
+- E2E helpers stay local-first and guarded by the documented test mode.
+- `src/config/developer-configuration-handoff.ts` exposes the 30-slice
   developer configuration boundary used by fast tests to keep examples,
-  secrets, bindings, and provider copy aligned with the classroom product loop.
+  verification gates, secrets, bindings, and provider copy aligned with the
+  classroom product loop.

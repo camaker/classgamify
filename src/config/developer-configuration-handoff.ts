@@ -5,11 +5,20 @@ export const DEVELOPER_CONFIGURATION_HANDOFF_ITEM_IDS = [
   'configuration-product-loop',
   'cloudflare-deploy-owner',
   'github-actions-deploy-boundary',
+  'local-predeploy-gate',
+  'locale-check-command',
+  'biome-check-command',
+  'production-build-command',
+  'manual-deploy-command',
+  'health-check-origin',
+  'cloudflare-build-env',
   'build-runtime-env-split',
   'vite-public-config-boundary',
   'worker-runtime-secret-boundary',
+  'manual-secret-sync-boundary',
   'd1-binding',
   'r2-binding',
+  'worker-typegen-command',
   'auth-workspace-doc',
   'mail-workspace-doc',
   'payment-capability-doc',
@@ -20,6 +29,7 @@ export const DEVELOPER_CONFIGURATION_HANDOFF_ITEM_IDS = [
   'website-mail-sender',
   'website-storage-provider',
   'wrangler-keep-vars',
+  'e2e-local-guard',
   'legacy-provider-copy-guard',
 ] as const;
 
@@ -38,16 +48,25 @@ export type DeveloperConfigurationHandoffEvidence = {
   authDocsLinkConfigurationBoundary: boolean;
   buildRuntimeEnvSplitDocumented: boolean;
   cloudflareDeployOwnershipDocumented: boolean;
+  cloudflareBuildEnvDocumented: boolean;
+  biomeCheckCommandDocumented: boolean;
   configurationProductLoopDocumented: boolean;
   d1BindingName: string | null;
   envExamplesKeepSecretsBlank: boolean;
   envExamplesUseClassGamifyOrigin: boolean;
+  e2eLocalGuardDocumented: boolean;
+  healthCheckOriginDocumented: boolean;
   githubActionsDeployAbsent: boolean;
   imageGenerationProviderCopyExcluded: boolean;
   legacyStarterCopyExcluded: boolean;
+  localeCheckCommandDocumented: boolean;
   mailDocsWorkspaceBoundaryDocumented: boolean;
+  manualDeployCommandDocumented: boolean;
+  manualSecretSyncBoundaryDocumented: boolean;
   oauthCallbackUsesClassGamifyOrigin: boolean;
   paymentDocsCapabilityBoundaryDocumented: boolean;
+  predeployGateIncludesBuild: boolean;
+  productionBuildCommandDocumented: boolean;
   r2BindingName: string | null;
   readmeLinksConfigurationBoundary: boolean;
   storageDocsSourceMaterialBoundaryDocumented: boolean;
@@ -55,12 +74,16 @@ export type DeveloperConfigurationHandoffEvidence = {
   websiteConfigMailSenderUsesClassGamify: boolean;
   websiteConfigStorageProviderR2Enabled: boolean;
   workerRuntimeSecretBoundaryDocumented: boolean;
+  workerTypegenCommandDocumented: boolean;
   wranglerKeepVarsEnabled: boolean;
 };
 
 export type DeveloperConfigurationHandoffPrivacyContract = {
   documentsBuildTimeValues: true;
   documentsCloudflareDeployOwnership: true;
+  documentsHealthCheckOrigin: true;
+  documentsLocalVerificationGate: true;
+  documentsManualDeployBoundary: true;
   documentsRuntimeSecrets: true;
   exposesProviderApiTokens: false;
   exposesRawOauthSecrets: false;
@@ -68,6 +91,7 @@ export type DeveloperConfigurationHandoffPrivacyContract = {
   exposesStudentAttemptRecords: false;
   exposesTeacherPrivateActivityContent: false;
   itemIds: DeveloperConfigurationHandoffItemId[];
+  keepsE2eHelpersLocal: true;
   keepsImageGenerationProviderOut: true;
   keepsLegacyCopyOut: true;
   readsSourceMaterialFileBytes: false;
@@ -119,19 +143,28 @@ function buildDeveloperConfigurationHandoffItemView(
 
 function buildDeveloperConfigurationHandoffItem({
   authDocsLinkConfigurationBoundary,
+  biomeCheckCommandDocumented,
   buildRuntimeEnvSplitDocumented,
+  cloudflareBuildEnvDocumented,
   cloudflareDeployOwnershipDocumented,
   configurationProductLoopDocumented,
   d1BindingName,
   envExamplesKeepSecretsBlank,
   envExamplesUseClassGamifyOrigin,
+  e2eLocalGuardDocumented,
   githubActionsDeployAbsent,
+  healthCheckOriginDocumented,
   id,
   imageGenerationProviderCopyExcluded,
   legacyStarterCopyExcluded,
+  localeCheckCommandDocumented,
   mailDocsWorkspaceBoundaryDocumented,
+  manualDeployCommandDocumented,
+  manualSecretSyncBoundaryDocumented,
   oauthCallbackUsesClassGamifyOrigin,
   paymentDocsCapabilityBoundaryDocumented,
+  predeployGateIncludesBuild,
+  productionBuildCommandDocumented,
   r2BindingName,
   readmeLinksConfigurationBoundary,
   storageDocsSourceMaterialBoundaryDocumented,
@@ -139,6 +172,7 @@ function buildDeveloperConfigurationHandoffItem({
   websiteConfigMailSenderUsesClassGamify,
   websiteConfigStorageProviderR2Enabled,
   workerRuntimeSecretBoundaryDocumented,
+  workerTypegenCommandDocumented,
   wranglerKeepVarsEnabled,
 }: DeveloperConfigurationHandoffItemContext): Omit<
   DeveloperConfigurationHandoffItemView,
@@ -188,6 +222,77 @@ function buildDeveloperConfigurationHandoffItem({
           ? m.developer_configuration_handoff_absent_value()
           : m.developer_configuration_handoff_needs_review_value(),
       });
+    case 'local-predeploy-gate':
+      return buildDeveloperConfigurationHandoffStaticItem({
+        description:
+          m.developer_configuration_handoff_local_predeploy_gate_description(),
+        id,
+        label: m.developer_configuration_handoff_local_predeploy_gate_label(),
+        value: predeployGateIncludesBuild
+          ? m.developer_configuration_handoff_predeploy_gate_value()
+          : m.developer_configuration_handoff_needs_review_value(),
+      });
+    case 'locale-check-command':
+      return buildDeveloperConfigurationHandoffStaticItem({
+        description:
+          m.developer_configuration_handoff_locale_check_command_description(),
+        id,
+        label: m.developer_configuration_handoff_locale_check_command_label(),
+        value: localeCheckCommandDocumented
+          ? m.developer_configuration_handoff_locale_check_value()
+          : m.developer_configuration_handoff_needs_review_value(),
+      });
+    case 'biome-check-command':
+      return buildDeveloperConfigurationHandoffStaticItem({
+        description:
+          m.developer_configuration_handoff_biome_check_command_description(),
+        id,
+        label: m.developer_configuration_handoff_biome_check_command_label(),
+        value: biomeCheckCommandDocumented
+          ? m.developer_configuration_handoff_biome_check_value()
+          : m.developer_configuration_handoff_needs_review_value(),
+      });
+    case 'production-build-command':
+      return buildDeveloperConfigurationHandoffStaticItem({
+        description:
+          m.developer_configuration_handoff_production_build_command_description(),
+        id,
+        label:
+          m.developer_configuration_handoff_production_build_command_label(),
+        value: productionBuildCommandDocumented
+          ? m.developer_configuration_handoff_production_build_value()
+          : m.developer_configuration_handoff_needs_review_value(),
+      });
+    case 'manual-deploy-command':
+      return buildDeveloperConfigurationHandoffStaticItem({
+        description:
+          m.developer_configuration_handoff_manual_deploy_command_description(),
+        id,
+        label: m.developer_configuration_handoff_manual_deploy_command_label(),
+        value: manualDeployCommandDocumented
+          ? m.developer_configuration_handoff_manual_deploy_value()
+          : m.developer_configuration_handoff_needs_review_value(),
+      });
+    case 'health-check-origin':
+      return buildDeveloperConfigurationHandoffStaticItem({
+        description:
+          m.developer_configuration_handoff_health_check_origin_description(),
+        id,
+        label: m.developer_configuration_handoff_health_check_origin_label(),
+        value: healthCheckOriginDocumented
+          ? m.developer_configuration_handoff_base_url_value()
+          : m.developer_configuration_handoff_needs_review_value(),
+      });
+    case 'cloudflare-build-env':
+      return buildDeveloperConfigurationHandoffStaticItem({
+        description:
+          m.developer_configuration_handoff_cloudflare_build_env_description(),
+        id,
+        label: m.developer_configuration_handoff_cloudflare_build_env_label(),
+        value: cloudflareBuildEnvDocumented
+          ? m.developer_configuration_handoff_cloudflare_build_env_value()
+          : m.developer_configuration_handoff_needs_review_value(),
+      });
     case 'build-runtime-env-split':
       return buildDeveloperConfigurationHandoffStaticItem({
         description:
@@ -221,6 +326,17 @@ function buildDeveloperConfigurationHandoffItem({
           ? m.developer_configuration_handoff_worker_secrets_value()
           : m.developer_configuration_handoff_needs_review_value(),
       });
+    case 'manual-secret-sync-boundary':
+      return buildDeveloperConfigurationHandoffStaticItem({
+        description:
+          m.developer_configuration_handoff_manual_secret_sync_boundary_description(),
+        id,
+        label:
+          m.developer_configuration_handoff_manual_secret_sync_boundary_label(),
+        value: manualSecretSyncBoundaryDocumented
+          ? m.developer_configuration_handoff_local_secret_sync_value()
+          : m.developer_configuration_handoff_needs_review_value(),
+      });
     case 'd1-binding':
       return buildDeveloperConfigurationHandoffStaticItem({
         description: m.developer_configuration_handoff_d1_binding_description(),
@@ -236,6 +352,16 @@ function buildDeveloperConfigurationHandoffItem({
         label: m.developer_configuration_handoff_r2_binding_label(),
         value:
           r2BindingName ?? m.developer_configuration_handoff_missing_value(),
+      });
+    case 'worker-typegen-command':
+      return buildDeveloperConfigurationHandoffStaticItem({
+        description:
+          m.developer_configuration_handoff_worker_typegen_command_description(),
+        id,
+        label: m.developer_configuration_handoff_worker_typegen_command_label(),
+        value: workerTypegenCommandDocumented
+          ? m.developer_configuration_handoff_worker_typegen_value()
+          : m.developer_configuration_handoff_needs_review_value(),
       });
     case 'auth-workspace-doc':
       return buildDeveloperConfigurationHandoffStaticItem({
@@ -340,6 +466,16 @@ function buildDeveloperConfigurationHandoffItem({
           ? m.developer_configuration_handoff_keep_vars_enabled_value()
           : m.developer_configuration_handoff_needs_review_value(),
       });
+    case 'e2e-local-guard':
+      return buildDeveloperConfigurationHandoffStaticItem({
+        description:
+          m.developer_configuration_handoff_e2e_local_guard_description(),
+        id,
+        label: m.developer_configuration_handoff_e2e_local_guard_label(),
+        value: e2eLocalGuardDocumented
+          ? m.developer_configuration_handoff_local_e2e_value()
+          : m.developer_configuration_handoff_needs_review_value(),
+      });
     case 'legacy-provider-copy-guard':
       return buildDeveloperConfigurationHandoffStaticItem({
         description:
@@ -375,6 +511,9 @@ function buildDeveloperConfigurationHandoffPrivacyContract(
   return {
     documentsBuildTimeValues: true,
     documentsCloudflareDeployOwnership: true,
+    documentsHealthCheckOrigin: true,
+    documentsLocalVerificationGate: true,
+    documentsManualDeployBoundary: true,
     documentsRuntimeSecrets: true,
     exposesProviderApiTokens: false,
     exposesRawOauthSecrets: false,
@@ -382,6 +521,7 @@ function buildDeveloperConfigurationHandoffPrivacyContract(
     exposesStudentAttemptRecords: false,
     exposesTeacherPrivateActivityContent: false,
     itemIds: itemViews.map((itemView) => itemView.id),
+    keepsE2eHelpersLocal: true,
     keepsImageGenerationProviderOut: true,
     keepsLegacyCopyOut: true,
     readsSourceMaterialFileBytes: false,

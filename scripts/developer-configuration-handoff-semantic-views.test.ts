@@ -27,6 +27,7 @@ const SOURCES = {
   env: readFileSync('docs/env.md', 'utf8'),
   envExample: readFileSync('.env.example', 'utf8'),
   mail: readFileSync('docs/mail.md', 'utf8'),
+  packageJson: readFileSync('package.json', 'utf8'),
   payment: readFileSync('docs/payment.md', 'utf8'),
   productionEnvExample: readFileSync('.env.production.example', 'utf8'),
   readme: readFileSync('README.md', 'utf8'),
@@ -37,12 +38,12 @@ const SOURCES = {
 
 const EVIDENCE = buildDeveloperConfigurationEvidence();
 
-test('developer configuration handoff exposes 20 safe configuration slices', () => {
+test('developer configuration handoff exposes 30 safe configuration slices', () => {
   const handoffView = buildDeveloperConfigurationHandoffView(EVIDENCE);
   const itemIds = handoffView.itemViews.map((item) => item.id);
 
   assert.deepEqual(itemIds, [...DEVELOPER_CONFIGURATION_HANDOFF_ITEM_IDS]);
-  assert.equal(new Set(itemIds).size, 20);
+  assert.equal(new Set(itemIds).size, 30);
   assert.equal(
     handoffView.itemViews.every(
       (item) =>
@@ -56,6 +57,9 @@ test('developer configuration handoff exposes 20 safe configuration slices', () 
   assert.deepEqual(handoffView.privacy, {
     documentsBuildTimeValues: true,
     documentsCloudflareDeployOwnership: true,
+    documentsHealthCheckOrigin: true,
+    documentsLocalVerificationGate: true,
+    documentsManualDeployBoundary: true,
     documentsRuntimeSecrets: true,
     exposesProviderApiTokens: false,
     exposesRawOauthSecrets: false,
@@ -63,6 +67,7 @@ test('developer configuration handoff exposes 20 safe configuration slices', () 
     exposesStudentAttemptRecords: false,
     exposesTeacherPrivateActivityContent: false,
     itemIds,
+    keepsE2eHelpersLocal: true,
     keepsImageGenerationProviderOut: true,
     keepsLegacyCopyOut: true,
     readsSourceMaterialFileBytes: false,
@@ -85,11 +90,20 @@ test('developer configuration handoff summarizes docs and worker config state', 
       ],
       ['cloudflare-deploy-owner', 'Cloudflare Git'],
       ['github-actions-deploy-boundary', 'Absent'],
+      ['local-predeploy-gate', 'locale + check + build'],
+      ['locale-check-command', 'pnpm locale:check'],
+      ['biome-check-command', 'pnpm check'],
+      ['production-build-command', 'pnpm build'],
+      ['manual-deploy-command', 'pnpm deploy'],
+      ['health-check-origin', 'VITE_BASE_URL'],
+      ['cloudflare-build-env', 'Cloudflare build env'],
       ['build-runtime-env-split', 'Build/runtime split'],
       ['vite-public-config-boundary', 'VITE public only'],
       ['worker-runtime-secret-boundary', 'Worker secrets'],
+      ['manual-secret-sync-boundary', 'Local-only sync'],
       ['d1-binding', 'DB'],
       ['r2-binding', 'BUCKET'],
+      ['worker-typegen-command', 'pnpm cf-typegen'],
       ['auth-workspace-doc', 'Configuration linked'],
       ['mail-workspace-doc', 'Workspace boundary'],
       ['payment-capability-doc', 'Plan capabilities'],
@@ -100,6 +114,7 @@ test('developer configuration handoff summarizes docs and worker config state', 
       ['website-mail-sender', 'ClassGamify sender'],
       ['website-storage-provider', 'R2 enabled'],
       ['wrangler-keep-vars', 'keep_vars true'],
+      ['e2e-local-guard', 'Local e2e only'],
       ['legacy-provider-copy-guard', 'ClassGamify only'],
     ]
   );
@@ -112,7 +127,7 @@ test('developer configuration handoff localizes Chinese configuration boundaries
     const handoffView = buildDeveloperConfigurationHandoffView(EVIDENCE);
 
     assert.equal(handoffView.title, '开发者配置边界交接');
-    assert.match(handoffView.description, /20 切片开发者配置契约/);
+    assert.match(handoffView.description, /30 切片开发者配置契约/);
     assert.equal(
       getHandoffValue(handoffView, 'readme-boundary-link'),
       '已链接'
@@ -125,6 +140,15 @@ test('developer configuration handoff localizes Chinese configuration boundaries
       getHandoffValue(handoffView, 'worker-runtime-secret-boundary'),
       'Worker Secret'
     );
+    assert.equal(
+      getHandoffValue(handoffView, 'local-predeploy-gate'),
+      'locale + check + build'
+    );
+    assert.equal(
+      getHandoffValue(handoffView, 'manual-secret-sync-boundary'),
+      '仅本地同步'
+    );
+    assert.equal(getHandoffValue(handoffView, 'e2e-local-guard'), '仅本地 e2e');
     assert.equal(getHandoffValue(handoffView, 'd1-binding'), 'DB');
     assert.equal(
       getHandoffValue(handoffView, 'env-example-secret-placeholders'),
@@ -153,9 +177,13 @@ test('developer configuration contract stays Workers-safe and documented', () =>
   );
   assert.match(
     SOURCES.configuration,
-    /developer-configuration-handoff\.ts[\s\S]*20-slice[\s\S]*developer configuration boundary/
+    /developer-configuration-handoff\.ts[\s\S]*30-slice[\s\S]*developer configuration boundary/
   );
   assert.ok(EVIDENCE.githubActionsDeployAbsent);
+  assert.ok(EVIDENCE.predeployGateIncludesBuild);
+  assert.ok(EVIDENCE.manualDeployCommandDocumented);
+  assert.ok(EVIDENCE.healthCheckOriginDocumented);
+  assert.ok(EVIDENCE.workerTypegenCommandDocumented);
 });
 
 function buildDeveloperConfigurationEvidence(): DeveloperConfigurationHandoffEvidence {
@@ -166,6 +194,7 @@ function buildDeveloperConfigurationEvidence(): DeveloperConfigurationHandoffEvi
     SOURCES.env,
     SOURCES.envExample,
     SOURCES.productionEnvExample,
+    SOURCES.packageJson,
     SOURCES.websiteConfig,
     SOURCES.wrangler,
   ].join('\n');
@@ -179,6 +208,16 @@ function buildDeveloperConfigurationEvidence(): DeveloperConfigurationHandoffEvi
     buildRuntimeEnvSplitDocumented:
       /clientEnv[\s\S]*Build time[\s\S]*VITE_\*/.test(SOURCES.env) &&
       /serverEnv[\s\S]*Runtime[\s\S]*process\.env/.test(SOURCES.env),
+    biomeCheckCommandDocumented:
+      /"check":\s*"biome check"/.test(SOURCES.packageJson) &&
+      /pnpm check/.test(SOURCES.configuration),
+    cloudflareBuildEnvDocumented:
+      /set them in the Cloudflare project build environment/.test(
+        SOURCES.configuration
+      ) &&
+      /Set VITE_BASE_URL in the Cloudflare project build environment/.test(
+        SOURCES.productionEnvExample
+      ),
     cloudflareDeployOwnershipDocumented:
       /Cloudflare Git integration owns production builds and deploys/.test(
         SOURCES.configuration
@@ -198,7 +237,15 @@ function buildDeveloperConfigurationEvidence(): DeveloperConfigurationHandoffEvi
     envExamplesUseClassGamifyOrigin:
       envExampleUsesOrigin(SOURCES.envExample) &&
       envExampleUsesOrigin(SOURCES.productionEnvExample),
+    e2eLocalGuardDocumented:
+      /E2E helpers are local-first and disabled outside the guarded local test mode/.test(
+        SOURCES.configuration
+      ),
     githubActionsDeployAbsent: githubActionsDeployWorkflowIsAbsent(),
+    healthCheckOriginDocumented:
+      /health checks[\s\S]*configured ClassGamify[\s\S]*`VITE_BASE_URL`/.test(
+        SOURCES.configuration
+      ),
     imageGenerationProviderCopyExcluded:
       !/fal\.ai|image generation|AI image generation|图像生成/i.test(
         developerFacingSources
@@ -207,10 +254,27 @@ function buildDeveloperConfigurationEvidence(): DeveloperConfigurationHandoffEvi
       !/mksaas|tanstarter|getlangstudy|Lang Study|Hanzi|HSK/i.test(
         developerFacingSources
       ),
+    localeCheckCommandDocumented:
+      /"locale:check":\s*"tsx scripts\/check-locale-keys\.ts"/.test(
+        SOURCES.packageJson
+      ) && /pnpm locale:check/.test(SOURCES.configuration),
     mailDocsWorkspaceBoundaryDocumented:
       /workspace-boundary\.ts[\s\S]*saved activities[\s\S]*assignment links[\s\S]*student attempts\/results[\s\S]*teacher-reviewed AI drafts[\s\S]*source-material/.test(
         SOURCES.mail
       ),
+    manualDeployCommandDocumented:
+      /"deploy":\s*"pnpm run build && wrangler deploy --config dist\/server\/wrangler\.json --keep-vars/.test(
+        SOURCES.packageJson
+      ) &&
+      /Use `pnpm deploy` only for a\s+manual Cloudflare Workers deployment/.test(
+        SOURCES.configuration
+      ),
+    manualSecretSyncBoundaryDocumented:
+      /"sync-worker-secrets":\s*"wrangler secret bulk \.env\.production"/.test(
+        SOURCES.packageJson
+      ) &&
+      /For local manual secret sync only/.test(SOURCES.productionEnvExample) &&
+      /not a CI deploy path/.test(SOURCES.configuration),
     oauthCallbackUsesClassGamifyOrigin:
       /https:\/\/classgamify\.example\/api\/auth\/callback\/google/.test(
         envExamples
@@ -222,6 +286,20 @@ function buildDeveloperConfigurationEvidence(): DeveloperConfigurationHandoffEvi
       /activity creation[\s\S]*assignment publishing[\s\S]*AI drafts[\s\S]*source\s+materials[\s\S]*result review/i.test(
         SOURCES.payment
       ),
+    predeployGateIncludesBuild:
+      /"predeploy":\s*"pnpm locale:check && pnpm check && pnpm build"/.test(
+        SOURCES.packageJson
+      ) &&
+      /Run `pnpm predeploy` locally before release pushes/.test(
+        SOURCES.configuration
+      ) &&
+      /locale checks[\s\S]*Biome checks[\s\S]*production build/.test(
+        SOURCES.readme
+      ),
+    productionBuildCommandDocumented:
+      /"build":\s*"node --max-old-space-size=8192 \.\/node_modules\/vite\/bin\/vite\.js build"/.test(
+        SOURCES.packageJson
+      ) && /pnpm build/.test(SOURCES.configuration),
     r2BindingName: extractBindingName(SOURCES.wrangler, 'r2_buckets'),
     readmeLinksConfigurationBoundary: /docs\/configuration\.md/.test(
       SOURCES.readme
@@ -255,6 +333,14 @@ function buildDeveloperConfigurationEvidence(): DeveloperConfigurationHandoffEvi
       ) &&
       /runtime secrets[\s\S]*Cloudflare[\s\S]*Worker secrets/i.test(
         SOURCES.productionEnvExample
+      ),
+    workerTypegenCommandDocumented:
+      /"cf-typegen":\s*"wrangler types --include-runtime=false --env-interface Env"/.test(
+        SOURCES.packageJson
+      ) &&
+      /"postinstall":\s*"pnpm run cf-typegen"/.test(SOURCES.packageJson) &&
+      /Regenerate Worker binding types with `pnpm cf-typegen`/.test(
+        SOURCES.configuration
       ),
     wranglerKeepVarsEnabled: /"keep_vars":\s*true/.test(SOURCES.wrangler),
   };
