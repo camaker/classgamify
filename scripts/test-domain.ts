@@ -659,6 +659,7 @@ import {
 } from '@/assignments/printable-worksheet';
 import {
   PRINTABLE_WORKSHEET_BODY_PRINT_MODE,
+  PRINTABLE_WORKSHEET_HANDOFF_ITEM_IDS,
   buildPrintableWorksheetAnswerKeyAccessView,
   buildPrintableWorksheetAnswerKeyItemView,
   buildPrintableWorksheetErrorView,
@@ -25379,6 +25380,153 @@ assert.deepEqual(
     showAnswerKey: true,
   }
 );
+const printableWorksheetHandoffValues = new Map(
+  printableWorksheetPageView.handoffView.itemViews.map((item) => [
+    item.id,
+    item.value,
+  ])
+);
+assert.deepEqual(
+  printableWorksheetPageView.handoffView.itemViews.map((item) => item.id),
+  [...PRINTABLE_WORKSHEET_HANDOFF_ITEM_IDS],
+  'Printable worksheet page view-model should expose the stable 30-slice handoff order.'
+);
+assert.deepEqual(printableWorksheetPageView.handoffView.privacy, {
+  exposesAnswerKeyText: false,
+  exposesChoiceText: false,
+  exposesPromptText: false,
+  exposesStudentResponseText: false,
+  itemIds: [...PRINTABLE_WORKSHEET_HANDOFF_ITEM_IDS],
+});
+assert.equal(
+  printableWorksheetHandoffValues.get('handout-overview'),
+  'Ready to print'
+);
+assert.equal(
+  printableWorksheetHandoffValues.get('preparation-metric-count'),
+  '3 checks'
+);
+assert.equal(
+  printableWorksheetHandoffValues.get('student-fields'),
+  'Name, date, score'
+);
+assert.equal(
+  printableWorksheetHandoffValues.get('response-plan'),
+  '1 item · Multiple choice practice'
+);
+assert.equal(
+  printableWorksheetHandoffValues.get('answer-key'),
+  'Teacher-only key included'
+);
+assert.equal(
+  printableWorksheetHandoffValues.get('answer-key-access'),
+  'Teacher-only key included'
+);
+assert.equal(
+  printableWorksheetHandoffValues.get('answer-key-toggle-boundary'),
+  'Teacher toggle'
+);
+assert.equal(
+  printableWorksheetHandoffValues.get('printable-items'),
+  '1 item'
+);
+assert.equal(
+  printableWorksheetHandoffValues.get('response-modes'),
+  'Multiple choice practice'
+);
+assert.equal(
+  printableWorksheetHandoffValues.get('choice-bank-coverage'),
+  '1 item'
+);
+assert.equal(
+  printableWorksheetHandoffValues.get('choice-bank-choice-count'),
+  '3 choices'
+);
+assert.equal(
+  printableWorksheetHandoffValues.get('writing-area-coverage'),
+  '1 answer line'
+);
+assert.equal(
+  printableWorksheetHandoffValues.get('answer-line-count'),
+  '1 answer line'
+);
+assert.equal(
+  printableWorksheetHandoffValues.get('item-response-help'),
+  'Choose one'
+);
+assert.equal(
+  printableWorksheetHandoffValues.get('assignment-field-count'),
+  '8 fields'
+);
+assert.equal(
+  printableWorksheetHandoffValues.get('student-name-field'),
+  'Blank line'
+);
+assert.equal(
+  printableWorksheetHandoffValues.get('date-field'),
+  'Blank line'
+);
+assert.equal(
+  printableWorksheetHandoffValues.get('score-field'),
+  'Blank line'
+);
+assert.equal(
+  printableWorksheetHandoffValues.get('share-path'),
+  '/play/printable-1'
+);
+assert.equal(printableWorksheetHandoffValues.get('template'), 'Quiz');
+assert.equal(
+  printableWorksheetHandoffValues.get('snapshot-source'),
+  'Frozen from Frozen activity title for /play/printable-1'
+);
+assert.equal(
+  printableWorksheetHandoffValues.get('instructions'),
+  'Finish on paper.'
+);
+assert.equal(
+  printableWorksheetHandoffValues.get('answer-key-items'),
+  '1 item'
+);
+assert.equal(
+  printableWorksheetHandoffValues.get('answer-key-details'),
+  '3 items'
+);
+assert.equal(
+  printableWorksheetHandoffValues.get('results-return'),
+  'assignment-printable-1'
+);
+assert.equal(
+  printableWorksheetHandoffValues.get('print-action'),
+  'Printable practice'
+);
+assert.equal(
+  printableWorksheetHandoffValues.get('print-route-boundary'),
+  'Teacher print route'
+);
+assert.equal(
+  printableWorksheetHandoffValues.get('public-runner-boundary'),
+  'Runner unchanged'
+);
+assert.equal(
+  printableWorksheetHandoffValues.get('privacy-guard'),
+  'Private data omitted'
+);
+for (const privatePrintableHandoffValue of [
+  'q-frozen-prompt',
+  'Frozen prompt?',
+  'Frozen answer',
+  'Frozen accepted',
+  'Frozen explanation',
+  'Other',
+]) {
+  assert.equal(
+    JSON.stringify(printableWorksheetPageView.handoffView).includes(
+      privatePrintableHandoffValue
+    ),
+    false,
+    `Printable worksheet handoff leaked private text: ${privatePrintableHandoffValue}`
+  );
+}
 assert.deepEqual(
   simplifyPrintableAssignmentFieldViews([
     buildPrintableWorksheetSnapshotSourceFieldView(
@@ -34113,8 +34261,44 @@ assert.match(
 );
 assert.match(
   printableWorksheetViewSource,
-  /export type PrintableWorksheetHandoffItemId =(?=[\s\S]*'handout-overview')(?=[\s\S]*'preparation-metric-count')(?=[\s\S]*'student-fields')(?=[\s\S]*'response-plan')(?=[\s\S]*'answer-key-access')(?=[\s\S]*'answer-key-toggle-boundary')(?=[\s\S]*'printable-items')(?=[\s\S]*'choice-bank-coverage')(?=[\s\S]*'choice-bank-choice-count')(?=[\s\S]*'writing-area-coverage')(?=[\s\S]*'answer-line-count')(?=[\s\S]*'item-response-help')(?=[\s\S]*'assignment-field-count')(?=[\s\S]*'student-name-field')(?=[\s\S]*'delivery-policy')(?=[\s\S]*'answer-key-items')(?=[\s\S]*'answer-key-details')(?=[\s\S]*'print-action')(?=[\s\S]*'print-route-boundary')(?=[\s\S]*'public-runner-boundary')(?=[\s\S]*'privacy-guard')[\s\S]*export type PrintableWorksheetHandoffPrivacyContract = \{[\s\S]*exposesAnswerKeyText: false;[\s\S]*exposesChoiceText: false;[\s\S]*exposesPromptText: false;[\s\S]*exposesStudentResponseText: false;[\s\S]*itemIds: PrintableWorksheetHandoffItemId\[\];/,
-  'Printable worksheet handoff should expose a typed 30-slice paper handoff contract with explicit privacy flags.'
+  /export const PRINTABLE_WORKSHEET_HANDOFF_ITEM_IDS = \[[\s\S]*'handout-overview'[\s\S]*'preparation-metric-count'[\s\S]*'student-fields'[\s\S]*'response-plan'[\s\S]*'answer-key'[\s\S]*'answer-key-access'[\s\S]*'answer-key-toggle-boundary'[\s\S]*'printable-items'[\s\S]*'response-modes'[\s\S]*'choice-bank-coverage'[\s\S]*'choice-bank-choice-count'[\s\S]*'writing-area-coverage'[\s\S]*'answer-line-count'[\s\S]*'item-response-help'[\s\S]*'assignment-field-count'[\s\S]*'student-name-field'[\s\S]*'date-field'[\s\S]*'score-field'[\s\S]*'share-path'[\s\S]*'template'[\s\S]*'snapshot-source'[\s\S]*'instructions'[\s\S]*'delivery-policy'[\s\S]*'answer-key-items'[\s\S]*'answer-key-details'[\s\S]*'results-return'[\s\S]*'print-action'[\s\S]*'print-route-boundary'[\s\S]*'public-runner-boundary'[\s\S]*'privacy-guard'[\s\S]*\] as const;[\s\S]*export type PrintableWorksheetHandoffItemId =\s*\n\s*\(typeof PRINTABLE_WORKSHEET_HANDOFF_ITEM_IDS\)\[number\];[\s\S]*export type PrintableWorksheetHandoffPrivacyContract = \{[\s\S]*exposesAnswerKeyText: false;[\s\S]*exposesChoiceText: false;[\s\S]*exposesPromptText: false;[\s\S]*exposesStudentResponseText: false;[\s\S]*itemIds: PrintableWorksheetHandoffItemId\[\];/,
+  'Printable worksheet handoff should expose a typed 30-slice paper handoff contract derived from stable exported ids with explicit privacy flags.'
+);
+assert.deepEqual(
+  [...PRINTABLE_WORKSHEET_HANDOFF_ITEM_IDS],
+  [
+    'handout-overview',
+    'preparation-metric-count',
+    'student-fields',
+    'response-plan',
+    'answer-key',
+    'answer-key-access',
+    'answer-key-toggle-boundary',
+    'printable-items',
+    'response-modes',
+    'choice-bank-coverage',
+    'choice-bank-choice-count',
+    'writing-area-coverage',
+    'answer-line-count',
+    'item-response-help',
+    'assignment-field-count',
+    'student-name-field',
+    'date-field',
+    'score-field',
+    'share-path',
+    'template',
+    'snapshot-source',
+    'instructions',
+    'delivery-policy',
+    'answer-key-items',
+    'answer-key-details',
+    'results-return',
+    'print-action',
+    'print-route-boundary',
+    'public-runner-boundary',
+    'privacy-guard',
+  ],
+  'Printable worksheet handoff should expose exactly 30 stable slice ids.'
 );
 assert.match(
   printableWorksheetViewSource,
@@ -34123,8 +34307,8 @@ assert.match(
 );
 assert.match(
   printableWorksheetViewSource,
-  /export function buildPrintableWorksheetHandoffView(?=[\s\S]*answerKeyView: PrintableWorksheetAnswerKeyView)(?=[\s\S]*itemViews: PrintableWorksheetItemView\[\])[\s\S]*id: 'handout-overview'[\s\S]*id: 'preparation-metric-count'[\s\S]*id: 'answer-key-access'[\s\S]*id: 'answer-key-toggle-boundary'[\s\S]*id: 'choice-bank-coverage'[\s\S]*id: 'choice-bank-choice-count'[\s\S]*id: 'writing-area-coverage'[\s\S]*id: 'answer-line-count'[\s\S]*id: 'item-response-help'[\s\S]*id: 'assignment-field-count'[\s\S]*id: 'answer-key-items'[\s\S]*id: 'answer-key-details'[\s\S]*id: 'print-route-boundary'[\s\S]*id: 'public-runner-boundary'[\s\S]*id: 'privacy-guard'[\s\S]*privacy: buildPrintableWorksheetHandoffPrivacyContract/,
-  'Printable worksheet handoff should collect paper overview, response, field, answer-key, route-boundary, privacy, result-return, and print-action slices from prepared view state.'
+  /export function buildPrintableWorksheetHandoffView(?=[\s\S]*answerKeyView: PrintableWorksheetAnswerKeyView)(?=[\s\S]*itemViews: PrintableWorksheetItemView\[\])[\s\S]*const candidateItemViews = \[[\s\S]*id: 'handout-overview'[\s\S]*id: 'preparation-metric-count'[\s\S]*id: 'answer-key-access'[\s\S]*id: 'answer-key-toggle-boundary'[\s\S]*id: 'choice-bank-coverage'[\s\S]*id: 'choice-bank-choice-count'[\s\S]*id: 'writing-area-coverage'[\s\S]*id: 'answer-line-count'[\s\S]*id: 'item-response-help'[\s\S]*id: 'assignment-field-count'[\s\S]*id: 'answer-key-items'[\s\S]*id: 'answer-key-details'[\s\S]*id: 'print-route-boundary'[\s\S]*id: 'public-runner-boundary'[\s\S]*id: 'privacy-guard'[\s\S]*\]\.filter\(isPrintableWorksheetHandoffItemView\);[\s\S]*const itemViewById = new Map\([\s\S]*candidateItemViews\.map\(\(itemView\) => \[itemView\.id, itemView\] as const\)[\s\S]*const orderedItemViews = PRINTABLE_WORKSHEET_HANDOFF_ITEM_IDS\.map\(\(id\) => \{[\s\S]*Missing printable worksheet handoff item:[\s\S]*itemViews: orderedItemViews,[\s\S]*privacy: buildPrintableWorksheetHandoffPrivacyContract\(orderedItemViews\)/,
+  'Printable worksheet handoff should collect prepared paper slices, order them through the stable id contract, and fail loudly when a slice is missing.'
 );
 assert.match(
   printableWorksheetViewSource,

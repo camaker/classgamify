@@ -2,6 +2,7 @@ import assert from 'node:assert/strict';
 import test from 'node:test';
 import type { PrintableAssignmentWorksheet } from '@/assignments/printable-worksheet';
 import {
+  PRINTABLE_WORKSHEET_HANDOFF_ITEM_IDS,
   buildPrintableWorksheetPageViewModel,
   type PrintableWorksheetHandoffItemId,
 } from '@/assignments/printable-worksheet-view';
@@ -13,39 +14,6 @@ const SECRET_ANSWER_TEXT = 'SECRET_ANSWER_TEXT';
 const SECRET_CHOICE_TEXT = 'SECRET_CHOICE_TEXT';
 const SECRET_PROMPT_TEXT = 'SECRET_PROMPT_TEXT';
 
-const EXPECTED_HANDOFF_ITEM_IDS = [
-  'handout-overview',
-  'preparation-metric-count',
-  'student-fields',
-  'response-plan',
-  'answer-key',
-  'answer-key-access',
-  'answer-key-toggle-boundary',
-  'printable-items',
-  'response-modes',
-  'choice-bank-coverage',
-  'choice-bank-choice-count',
-  'writing-area-coverage',
-  'answer-line-count',
-  'item-response-help',
-  'assignment-field-count',
-  'student-name-field',
-  'date-field',
-  'score-field',
-  'share-path',
-  'template',
-  'snapshot-source',
-  'instructions',
-  'delivery-policy',
-  'answer-key-items',
-  'answer-key-details',
-  'results-return',
-  'print-action',
-  'print-route-boundary',
-  'public-runner-boundary',
-  'privacy-guard',
-] satisfies PrintableWorksheetHandoffItemId[];
-
 test('printable worksheet handoff exposes 30 paper handoff slices safely', () => {
   const pageView = buildPrintableWorksheetPageViewModel({
     answerKey: false,
@@ -55,7 +23,7 @@ test('printable worksheet handoff exposes 30 paper handoff slices safely', () =>
 
   assert.deepEqual(
     pageView.handoffView.itemViews.map((item) => item.id),
-    EXPECTED_HANDOFF_ITEM_IDS
+    [...PRINTABLE_WORKSHEET_HANDOFF_ITEM_IDS]
   );
   assert.equal(pageView.handoffView.itemViews.length, 30);
   assert.deepEqual(pageView.handoffView.privacy, {
@@ -63,7 +31,7 @@ test('printable worksheet handoff exposes 30 paper handoff slices safely', () =>
     exposesChoiceText: false,
     exposesPromptText: false,
     exposesStudentResponseText: false,
-    itemIds: EXPECTED_HANDOFF_ITEM_IDS,
+    itemIds: [...PRINTABLE_WORKSHEET_HANDOFF_ITEM_IDS],
   });
   assert.equal(
     getHandoffItemValue(pageView, 'answer-key'),
