@@ -1,7 +1,9 @@
 import {
   addActivitySourceMaterialPickerItem,
+  buildActivitySourceMaterialPickerHandoffView,
   buildActivitySourceMaterialPickerView,
   removeActivitySourceMaterialPickerItem,
+  type ActivitySourceMaterialPickerHandoffView,
   type ActivitySourceMaterialPickerItemView,
   type ActivitySourceMaterialPickerStatus,
   type ActivitySourceMaterialPickerView,
@@ -66,6 +68,10 @@ export function ActivitySourceMaterialsField({
       }),
     [canLoadFiles, data?.items, isError, isLoading, selectedMaterials]
   );
+  const handoffView = useMemo(
+    () => buildActivitySourceMaterialPickerHandoffView(pickerView),
+    [pickerView]
+  );
 
   function addMaterial(itemView: ActivitySourceMaterialPickerItemView) {
     onChange(
@@ -103,6 +109,7 @@ export function ActivitySourceMaterialsField({
       </div>
 
       <div className="mt-4 grid gap-4">
+        <ActivitySourceMaterialPickerHandoff handoffView={handoffView} />
         <ActivitySourceMaterialAttachedSection
           actionSlot={attachedSummaryActionSlot}
           pickerView={pickerView}
@@ -114,6 +121,38 @@ export function ActivitySourceMaterialsField({
         />
       </div>
     </div>
+  );
+}
+
+function ActivitySourceMaterialPickerHandoff({
+  handoffView,
+}: {
+  handoffView: ActivitySourceMaterialPickerHandoffView;
+}) {
+  const titleId = 'activity-source-material-picker-handoff-title';
+  const descriptionId = 'activity-source-material-picker-handoff-description';
+
+  return (
+    <section
+      aria-describedby={descriptionId}
+      aria-labelledby={titleId}
+      className="sr-only"
+      data-handoff="activity-source-material-picker"
+    >
+      <h4 id={titleId}>{handoffView.title}</h4>
+      <p id={descriptionId}>{handoffView.description}</p>
+      <dl>
+        {handoffView.itemViews.map((itemView) => (
+          <div data-handoff-item={itemView.id} key={itemView.id}>
+            <dt>{itemView.label}</dt>
+            <dd>
+              <output aria-label={itemView.ariaLabel}>{itemView.value}</output>
+              <span>{itemView.description}</span>
+            </dd>
+          </div>
+        ))}
+      </dl>
+    </section>
   );
 }
 

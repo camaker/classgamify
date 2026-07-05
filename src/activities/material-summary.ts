@@ -191,6 +191,83 @@ export type ActivitySourceMaterialPickerView = {
   statusMessage?: string;
 };
 
+export const ACTIVITY_SOURCE_MATERIAL_PICKER_HANDOFF_ITEM_IDS = [
+  'owner-scope',
+  'storage-load-gate',
+  'picker-status',
+  'selected-count',
+  'available-count',
+  'visible-available-limit',
+  'attachment-limit',
+  'at-limit-gate',
+  'attached-summary',
+  'attached-items',
+  'available-items',
+  'selected-state',
+  'attach-action',
+  'attach-disabled-reason',
+  'remove-action',
+  'upload-entry',
+  'loading-state',
+  'error-state',
+  'empty-state',
+  'signed-out-state',
+  'material-kind-meta',
+  'content-type-meta',
+  'size-meta',
+  'source-material-reference',
+  'ai-extraction-readiness',
+  'student-payload-guard',
+  'file-id-guard',
+  'filename-display-boundary',
+  'storage-key-guard',
+  'privacy-guard',
+] as const;
+
+export type ActivitySourceMaterialPickerHandoffItemId =
+  (typeof ACTIVITY_SOURCE_MATERIAL_PICKER_HANDOFF_ITEM_IDS)[number];
+
+export type ActivitySourceMaterialPickerHandoffItemView = {
+  ariaLabel: string;
+  description: string;
+  id: ActivitySourceMaterialPickerHandoffItemId;
+  label: string;
+  value: string;
+};
+
+export type ActivitySourceMaterialPickerHandoffPrivacyContract = {
+  attachesOnlyReferences: true;
+  deletesUploadedFiles: false;
+  exposesFileBytes: false;
+  exposesPermissionMetadata: false;
+  exposesSourceMaterialFileIds: false;
+  exposesSourceMaterialFilenames: false;
+  exposesSourceMaterialStorageKeys: false;
+  exposesStudentPayloadFileReferences: false;
+  itemIds: ActivitySourceMaterialPickerHandoffItemId[];
+  scope: 'activity-source-material-picker';
+  usesActivityContentSourceMaterials: true;
+};
+
+export type ActivitySourceMaterialPickerHandoffView = {
+  description: string;
+  itemViews: ActivitySourceMaterialPickerHandoffItemView[];
+  privacy: ActivitySourceMaterialPickerHandoffPrivacyContract;
+  title: string;
+};
+
+type ActivitySourceMaterialPickerHandoffSummary = {
+  activeStatus: ActivitySourceMaterialPickerStatus;
+  attachableCount: number;
+  attachedCount: number;
+  availableCount: number;
+  disabledAvailableCount: number;
+  extractionCapabilityCount: number;
+  isAtLimit: boolean;
+  limitLabel: string;
+  selectedAvailableCount: number;
+};
+
 export function summarizeActivitySourceMaterials(
   value: unknown
 ): ActivitySourceMaterialSummary {
@@ -401,6 +478,454 @@ export function buildActivitySourceMaterialPickerView({
     status,
     statusMessage: getActivitySourceMaterialPickerStatusMessage(status),
   };
+}
+
+export function buildActivitySourceMaterialPickerHandoffView(
+  pickerView: ActivitySourceMaterialPickerView
+): ActivitySourceMaterialPickerHandoffView {
+  const summary = buildActivitySourceMaterialPickerHandoffSummary(pickerView);
+  const itemViews = ACTIVITY_SOURCE_MATERIAL_PICKER_HANDOFF_ITEM_IDS.map((id) =>
+    buildActivitySourceMaterialPickerHandoffItemView(
+      buildActivitySourceMaterialPickerHandoffItem({ id, summary })
+    )
+  );
+
+  return {
+    description: m.activity_source_material_picker_handoff_description(),
+    itemViews,
+    privacy: buildActivitySourceMaterialPickerHandoffPrivacyContract(itemViews),
+    title: m.activity_source_material_picker_handoff_title(),
+  };
+}
+
+function buildActivitySourceMaterialPickerHandoffSummary(
+  pickerView: ActivitySourceMaterialPickerView
+): ActivitySourceMaterialPickerHandoffSummary {
+  const attachedCount = normalizeActivitySourceMaterialCount(
+    pickerView.attachedItems.length
+  );
+  const availableCount = normalizeActivitySourceMaterialCount(
+    pickerView.availableItems.length
+  );
+  const selectedAvailableCount = normalizeActivitySourceMaterialCount(
+    pickerView.availableItems.filter((item) => item.selected).length
+  );
+  const disabledAvailableCount = normalizeActivitySourceMaterialCount(
+    pickerView.availableItems.filter((item) => item.disabled).length
+  );
+  const attachableCount = normalizeActivitySourceMaterialCount(
+    pickerView.availableItems.filter((item) => !item.disabled).length
+  );
+
+  return {
+    activeStatus: pickerView.status,
+    attachableCount,
+    attachedCount,
+    availableCount,
+    disabledAvailableCount,
+    extractionCapabilityCount:
+      pickerView.attachedSummary.readiness.capabilities.length,
+    isAtLimit: pickerView.isAtLimit,
+    limitLabel: pickerView.limitLabel,
+    selectedAvailableCount,
+  };
+}
+
+function buildActivitySourceMaterialPickerHandoffItem({
+  id,
+  summary,
+}: {
+  id: ActivitySourceMaterialPickerHandoffItemId;
+  summary: ActivitySourceMaterialPickerHandoffSummary;
+}): Omit<ActivitySourceMaterialPickerHandoffItemView, 'ariaLabel'> {
+  switch (id) {
+    case 'owner-scope':
+      return buildActivitySourceMaterialPickerStaticItem({
+        description:
+          m.activity_source_material_picker_handoff_owner_scope_description(),
+        id,
+        label: m.activity_source_material_picker_handoff_owner_scope_label(),
+        value: m.activity_source_material_picker_handoff_owner_scope_value(),
+      });
+    case 'storage-load-gate':
+      return buildActivitySourceMaterialPickerStaticItem({
+        description:
+          m.activity_source_material_picker_handoff_storage_load_gate_description(),
+        id,
+        label:
+          m.activity_source_material_picker_handoff_storage_load_gate_label(),
+        value:
+          summary.activeStatus === 'signed-out'
+            ? m.activity_source_material_picker_handoff_sign_in_required_value()
+            : m.activity_source_material_picker_handoff_enabled_value(),
+      });
+    case 'picker-status':
+      return buildActivitySourceMaterialPickerStaticItem({
+        description:
+          m.activity_source_material_picker_handoff_picker_status_description(),
+        id,
+        label: m.activity_source_material_picker_handoff_picker_status_label(),
+        value: getActivitySourceMaterialPickerStatusValue(summary.activeStatus),
+      });
+    case 'selected-count':
+      return buildActivitySourceMaterialPickerCountItem({
+        description:
+          m.activity_source_material_picker_handoff_selected_count_description(),
+        id,
+        label: m.activity_source_material_picker_handoff_selected_count_label(),
+        value: summary.attachedCount,
+      });
+    case 'available-count':
+      return buildActivitySourceMaterialPickerCountItem({
+        description:
+          m.activity_source_material_picker_handoff_available_count_description(),
+        id,
+        label:
+          m.activity_source_material_picker_handoff_available_count_label(),
+        value: summary.availableCount,
+      });
+    case 'visible-available-limit':
+      return buildActivitySourceMaterialPickerStaticItem({
+        description:
+          m.activity_source_material_picker_handoff_visible_available_limit_description(),
+        id,
+        label:
+          m.activity_source_material_picker_handoff_visible_available_limit_label(),
+        value:
+          m.activity_source_material_picker_handoff_visible_available_limit_value(),
+      });
+    case 'attachment-limit':
+      return buildActivitySourceMaterialPickerStaticItem({
+        description:
+          m.activity_source_material_picker_handoff_attachment_limit_description(),
+        id,
+        label:
+          m.activity_source_material_picker_handoff_attachment_limit_label(),
+        value: summary.limitLabel,
+      });
+    case 'at-limit-gate':
+      return buildActivitySourceMaterialPickerStaticItem({
+        description:
+          m.activity_source_material_picker_handoff_at_limit_gate_description(),
+        id,
+        label: m.activity_source_material_picker_handoff_at_limit_gate_label(),
+        value: summary.isAtLimit
+          ? m.activity_source_material_picker_handoff_limit_reached_value()
+          : m.activity_source_material_picker_handoff_within_limit_value(),
+      });
+    case 'attached-summary':
+      return buildActivitySourceMaterialPickerStaticItem({
+        description:
+          m.activity_source_material_picker_handoff_attached_summary_description(),
+        id,
+        label:
+          m.activity_source_material_picker_handoff_attached_summary_label(),
+        value: String(summary.extractionCapabilityCount),
+      });
+    case 'attached-items':
+      return buildActivitySourceMaterialPickerCountItem({
+        description:
+          m.activity_source_material_picker_handoff_attached_items_description(),
+        id,
+        label: m.activity_source_material_picker_handoff_attached_items_label(),
+        value: summary.attachedCount,
+      });
+    case 'available-items':
+      return buildActivitySourceMaterialPickerCountItem({
+        description:
+          m.activity_source_material_picker_handoff_available_items_description(),
+        id,
+        label:
+          m.activity_source_material_picker_handoff_available_items_label(),
+        value: summary.availableCount,
+      });
+    case 'selected-state':
+      return buildActivitySourceMaterialPickerCountItem({
+        description:
+          m.activity_source_material_picker_handoff_selected_state_description(),
+        id,
+        label: m.activity_source_material_picker_handoff_selected_state_label(),
+        value: summary.selectedAvailableCount,
+      });
+    case 'attach-action':
+      return buildActivitySourceMaterialPickerCountItem({
+        description:
+          m.activity_source_material_picker_handoff_attach_action_description(),
+        id,
+        label: m.activity_source_material_picker_handoff_attach_action_label(),
+        value: summary.attachableCount,
+      });
+    case 'attach-disabled-reason':
+      return buildActivitySourceMaterialPickerCountItem({
+        description:
+          m.activity_source_material_picker_handoff_attach_disabled_reason_description(),
+        id,
+        label:
+          m.activity_source_material_picker_handoff_attach_disabled_reason_label(),
+        value: summary.disabledAvailableCount,
+      });
+    case 'remove-action':
+      return buildActivitySourceMaterialPickerStaticItem({
+        description:
+          m.activity_source_material_picker_handoff_remove_action_description(),
+        id,
+        label: m.activity_source_material_picker_handoff_remove_action_label(),
+        value:
+          m.activity_source_material_picker_handoff_reference_only_change_value(),
+      });
+    case 'upload-entry':
+      return buildActivitySourceMaterialPickerStaticItem({
+        description:
+          m.activity_source_material_picker_handoff_upload_entry_description(),
+        id,
+        label: m.activity_source_material_picker_handoff_upload_entry_label(),
+        value: m.activity_form_source_materials_upload_action(),
+      });
+    case 'loading-state':
+      return buildActivitySourceMaterialPickerStatusItem({
+        activeStatus: summary.activeStatus,
+        description:
+          m.activity_source_material_picker_handoff_loading_state_description(),
+        id,
+        label: m.activity_source_material_picker_handoff_loading_state_label(),
+        targetStatus: 'loading',
+      });
+    case 'error-state':
+      return buildActivitySourceMaterialPickerStatusItem({
+        activeStatus: summary.activeStatus,
+        description:
+          m.activity_source_material_picker_handoff_error_state_description(),
+        id,
+        label: m.activity_source_material_picker_handoff_error_state_label(),
+        targetStatus: 'error',
+      });
+    case 'empty-state':
+      return buildActivitySourceMaterialPickerStatusItem({
+        activeStatus: summary.activeStatus,
+        description:
+          m.activity_source_material_picker_handoff_empty_state_description(),
+        id,
+        label: m.activity_source_material_picker_handoff_empty_state_label(),
+        targetStatus: 'empty',
+      });
+    case 'signed-out-state':
+      return buildActivitySourceMaterialPickerStatusItem({
+        activeStatus: summary.activeStatus,
+        description:
+          m.activity_source_material_picker_handoff_signed_out_state_description(),
+        id,
+        label:
+          m.activity_source_material_picker_handoff_signed_out_state_label(),
+        targetStatus: 'signed-out',
+      });
+    case 'material-kind-meta':
+      return buildActivitySourceMaterialPickerStaticItem({
+        description:
+          m.activity_source_material_picker_handoff_material_kind_meta_description(),
+        id,
+        label:
+          m.activity_source_material_picker_handoff_material_kind_meta_label(),
+        value:
+          m.activity_source_material_picker_handoff_material_kind_meta_value(),
+      });
+    case 'content-type-meta':
+      return buildActivitySourceMaterialPickerStaticItem({
+        description:
+          m.activity_source_material_picker_handoff_content_type_meta_description(),
+        id,
+        label:
+          m.activity_source_material_picker_handoff_content_type_meta_label(),
+        value:
+          m.activity_source_material_picker_handoff_content_type_meta_value(),
+      });
+    case 'size-meta':
+      return buildActivitySourceMaterialPickerStaticItem({
+        description:
+          m.activity_source_material_picker_handoff_size_meta_description(),
+        id,
+        label: m.activity_source_material_picker_handoff_size_meta_label(),
+        value: m.activity_source_material_picker_handoff_size_meta_value(),
+      });
+    case 'source-material-reference':
+      return buildActivitySourceMaterialPickerStaticItem({
+        description:
+          m.activity_source_material_picker_handoff_source_material_reference_description(),
+        id,
+        label:
+          m.activity_source_material_picker_handoff_source_material_reference_label(),
+        value:
+          m.activity_source_material_picker_handoff_source_material_reference_value(),
+      });
+    case 'ai-extraction-readiness':
+      return buildActivitySourceMaterialPickerStaticItem({
+        description:
+          m.activity_source_material_picker_handoff_ai_extraction_readiness_description(),
+        id,
+        label:
+          m.activity_source_material_picker_handoff_ai_extraction_readiness_label(),
+        value: String(summary.extractionCapabilityCount),
+      });
+    case 'student-payload-guard':
+      return buildActivitySourceMaterialPickerStaticItem({
+        description:
+          m.activity_source_material_picker_handoff_student_payload_guard_description(),
+        id,
+        label:
+          m.activity_source_material_picker_handoff_student_payload_guard_label(),
+        value:
+          m.activity_source_material_picker_handoff_student_payload_guard_value(),
+      });
+    case 'file-id-guard':
+      return buildActivitySourceMaterialPickerStaticItem({
+        description:
+          m.activity_source_material_picker_handoff_file_id_guard_description(),
+        id,
+        label: m.activity_source_material_picker_handoff_file_id_guard_label(),
+        value: m.activity_source_material_picker_handoff_file_id_guard_value(),
+      });
+    case 'filename-display-boundary':
+      return buildActivitySourceMaterialPickerStaticItem({
+        description:
+          m.activity_source_material_picker_handoff_filename_display_boundary_description(),
+        id,
+        label:
+          m.activity_source_material_picker_handoff_filename_display_boundary_label(),
+        value:
+          m.activity_source_material_picker_handoff_filename_display_boundary_value(),
+      });
+    case 'storage-key-guard':
+      return buildActivitySourceMaterialPickerStaticItem({
+        description:
+          m.activity_source_material_picker_handoff_storage_key_guard_description(),
+        id,
+        label:
+          m.activity_source_material_picker_handoff_storage_key_guard_label(),
+        value:
+          m.activity_source_material_picker_handoff_storage_key_guard_value(),
+      });
+    case 'privacy-guard':
+      return buildActivitySourceMaterialPickerStaticItem({
+        description:
+          m.activity_source_material_picker_handoff_privacy_guard_description(),
+        id,
+        label: m.activity_source_material_picker_handoff_privacy_guard_label(),
+        value: m.activity_source_material_picker_handoff_privacy_guard_value(),
+      });
+  }
+}
+
+function buildActivitySourceMaterialPickerCountItem({
+  description,
+  id,
+  label,
+  value,
+}: {
+  description: string;
+  id: ActivitySourceMaterialPickerHandoffItemId;
+  label: string;
+  value: number;
+}) {
+  return buildActivitySourceMaterialPickerStaticItem({
+    description,
+    id,
+    label,
+    value: String(normalizeActivitySourceMaterialCount(value)),
+  });
+}
+
+function buildActivitySourceMaterialPickerStatusItem({
+  activeStatus,
+  description,
+  id,
+  label,
+  targetStatus,
+}: {
+  activeStatus: ActivitySourceMaterialPickerStatus;
+  description: string;
+  id: ActivitySourceMaterialPickerHandoffItemId;
+  label: string;
+  targetStatus: ActivitySourceMaterialPickerStatus;
+}) {
+  return buildActivitySourceMaterialPickerStaticItem({
+    description,
+    id,
+    label,
+    value:
+      activeStatus === targetStatus
+        ? m.activity_source_material_picker_handoff_active_value()
+        : m.activity_source_material_picker_handoff_inactive_value(),
+  });
+}
+
+function buildActivitySourceMaterialPickerStaticItem({
+  description,
+  id,
+  label,
+  value,
+}: Omit<ActivitySourceMaterialPickerHandoffItemView, 'ariaLabel'>) {
+  return {
+    description,
+    id,
+    label,
+    value,
+  };
+}
+
+function buildActivitySourceMaterialPickerHandoffItemView({
+  description,
+  id,
+  label,
+  value,
+}: Omit<
+  ActivitySourceMaterialPickerHandoffItemView,
+  'ariaLabel'
+>): ActivitySourceMaterialPickerHandoffItemView {
+  return {
+    ariaLabel: m.activity_source_material_picker_handoff_item_aria({
+      description,
+      label,
+      value,
+    }),
+    description,
+    id,
+    label,
+    value,
+  };
+}
+
+function buildActivitySourceMaterialPickerHandoffPrivacyContract(
+  itemViews: ActivitySourceMaterialPickerHandoffItemView[]
+): ActivitySourceMaterialPickerHandoffPrivacyContract {
+  return {
+    attachesOnlyReferences: true,
+    deletesUploadedFiles: false,
+    exposesFileBytes: false,
+    exposesPermissionMetadata: false,
+    exposesSourceMaterialFileIds: false,
+    exposesSourceMaterialFilenames: false,
+    exposesSourceMaterialStorageKeys: false,
+    exposesStudentPayloadFileReferences: false,
+    itemIds: itemViews.map((itemView) => itemView.id),
+    scope: 'activity-source-material-picker',
+    usesActivityContentSourceMaterials: true,
+  };
+}
+
+function getActivitySourceMaterialPickerStatusValue(
+  status: ActivitySourceMaterialPickerStatus
+) {
+  switch (status) {
+    case 'available':
+      return m.activity_source_material_picker_handoff_available_value();
+    case 'empty':
+      return m.activity_source_material_picker_handoff_empty_value();
+    case 'error':
+      return m.activity_source_material_picker_handoff_error_value();
+    case 'loading':
+      return m.activity_source_material_picker_handoff_loading_value();
+    case 'signed-out':
+      return m.activity_source_material_picker_handoff_signed_out_value();
+  }
 }
 
 export function addActivitySourceMaterialPickerItem({
