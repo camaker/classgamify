@@ -241,37 +241,41 @@ export type StudentRunnerSubmissionContractView = {
   title: string;
 };
 
+export const STUDENT_RUNNER_SUBMISSION_HANDOFF_ITEM_IDS = [
+  'share-link',
+  'runtime-items',
+  'answered-items',
+  'unanswered-items',
+  'progress',
+  'payload-summary',
+  'submit-readiness',
+  'partial-confirmation',
+  'submission-state',
+  'identity-mode',
+  'identity-privacy',
+  'timer-status',
+  'timer-limit',
+  'attempt-duration',
+  'attempt-clock',
+  'result-status',
+  'score-summary',
+  'result-accuracy',
+  'attempt-usage',
+  'retry-availability',
+  'review-summary',
+  'review-submitted',
+  'review-needs-review',
+  'review-unanswered',
+  'feedback-scope',
+  'feedback-visibility',
+  'feedback-items',
+  'feedback-detail-evidence',
+  'next-steps',
+  'privacy-guard',
+] as const;
+
 export type StudentRunnerSubmissionHandoffItemId =
-  | 'share-link'
-  | 'runtime-items'
-  | 'answered-items'
-  | 'unanswered-items'
-  | 'progress'
-  | 'payload-summary'
-  | 'submit-readiness'
-  | 'partial-confirmation'
-  | 'submission-state'
-  | 'identity-mode'
-  | 'identity-privacy'
-  | 'timer-status'
-  | 'timer-limit'
-  | 'attempt-duration'
-  | 'attempt-clock'
-  | 'result-status'
-  | 'score-summary'
-  | 'result-accuracy'
-  | 'attempt-usage'
-  | 'retry-availability'
-  | 'review-summary'
-  | 'review-submitted'
-  | 'review-needs-review'
-  | 'review-unanswered'
-  | 'feedback-scope'
-  | 'feedback-visibility'
-  | 'feedback-items'
-  | 'feedback-detail-evidence'
-  | 'next-steps'
-  | 'privacy-guard';
+  (typeof STUDENT_RUNNER_SUBMISSION_HANDOFF_ITEM_IDS)[number];
 
 export type StudentRunnerSubmissionHandoffItemView = {
   ariaLabel: string;

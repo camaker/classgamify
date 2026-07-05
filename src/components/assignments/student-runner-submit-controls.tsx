@@ -137,7 +137,7 @@ function StudentRunnerSubmissionHandoff({
       aria-describedby={descriptionId}
       aria-labelledby={titleId}
       className="sr-only"
-      data-handoff="student-runner-submission"
+      data-handoff="student-submission"
     >
       <h3 id={titleId}>{view.title}</h3>
       <p id={descriptionId}>{view.description}</p>

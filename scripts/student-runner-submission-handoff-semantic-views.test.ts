@@ -10,6 +10,7 @@ import {
   buildStudentRunnerPageViewModel,
   buildStudentRunnerReadyState,
   buildStudentRunnerStarterPreview,
+  STUDENT_RUNNER_SUBMISSION_HANDOFF_ITEM_IDS,
   type StudentRunnerAttemptResult,
   type StudentRunnerSubmissionHandoffItemId,
 } from '@/assignments/student-runner-state';
@@ -20,39 +21,6 @@ overwriteGetLocale(() => 'en');
 const SECRET_ANSWER_TEXT = 'SECRET_STUDENT_ANSWER';
 const SECRET_STUDENT_NAME = 'Student Private Name';
 const SECRET_TOKEN = 'raw-anonymous-token-value';
-
-const EXPECTED_HANDOFF_ITEM_IDS = [
-  'share-link',
-  'runtime-items',
-  'answered-items',
-  'unanswered-items',
-  'progress',
-  'payload-summary',
-  'submit-readiness',
-  'partial-confirmation',
-  'submission-state',
-  'identity-mode',
-  'identity-privacy',
-  'timer-status',
-  'timer-limit',
-  'attempt-duration',
-  'attempt-clock',
-  'result-status',
-  'score-summary',
-  'result-accuracy',
-  'attempt-usage',
-  'retry-availability',
-  'review-summary',
-  'review-submitted',
-  'review-needs-review',
-  'review-unanswered',
-  'feedback-scope',
-  'feedback-visibility',
-  'feedback-items',
-  'feedback-detail-evidence',
-  'next-steps',
-  'privacy-guard',
-] satisfies StudentRunnerSubmissionHandoffItemId[];
 
 test('student runner submission handoff exposes 30 safe pre-submit slices', () => {
   const starterPreview = buildStudentRunnerStarterPreview(
@@ -85,7 +53,7 @@ test('student runner submission handoff exposes 30 safe pre-submit slices', () =
 
   assert.deepEqual(
     pageView.submissionHandoffView.itemViews.map((item) => item.id),
-    EXPECTED_HANDOFF_ITEM_IDS
+    [...STUDENT_RUNNER_SUBMISSION_HANDOFF_ITEM_IDS]
   );
   assert.equal(pageView.submissionHandoffView.itemViews.length, 30);
   assert.deepEqual(pageView.submissionHandoffView.privacy, {
@@ -97,7 +65,7 @@ test('student runner submission handoff exposes 30 safe pre-submit slices', () =
     exposesTeacherOnlyAnswers: false,
     exposesTeacherSourceMaterials: false,
     feedbackMetricKeys: [],
-    itemIds: EXPECTED_HANDOFF_ITEM_IDS,
+    itemIds: [...STUDENT_RUNNER_SUBMISSION_HANDOFF_ITEM_IDS],
     payloadMetricKeys: ['share-link', 'items', 'answers', 'unanswered'],
     readinessItemIds: [
       'share-link',
@@ -204,7 +172,7 @@ test('student runner submission handoff summarizes safe post-submit review state
 
   assert.deepEqual(
     pageView.submissionHandoffView.itemViews.map((item) => item.id),
-    EXPECTED_HANDOFF_ITEM_IDS
+    [...STUDENT_RUNNER_SUBMISSION_HANDOFF_ITEM_IDS]
   );
   assert.equal(pageView.submissionHandoffView.itemViews.length, 30);
   assert.deepEqual(pageView.submissionHandoffView.privacy.reviewMetricKeys, [

@@ -1043,6 +1043,7 @@ import {
   buildStudentRunnerUnavailableSafetyView,
   getStudentRunnerAttemptStartedAt,
   STUDENT_RUNNER_START_HANDOFF_ITEM_IDS,
+  STUDENT_RUNNER_SUBMISSION_HANDOFF_ITEM_IDS,
   shouldResetStudentRunnerAttemptSession,
   shouldStartStudentRunnerAttemptClock,
 } from '@/assignments/student-runner-state';
@@ -14116,8 +14117,49 @@ assert.match(
 );
 assert.match(
   studentRunnerStateSource,
-  /export type StudentRunnerSubmissionHandoffItemId =(?=[\s\S]*'share-link')(?=[\s\S]*'runtime-items')(?=[\s\S]*'answered-items')(?=[\s\S]*'payload-summary')(?=[\s\S]*'submit-readiness')(?=[\s\S]*'identity-privacy')(?=[\s\S]*'timer-limit')(?=[\s\S]*'attempt-clock')(?=[\s\S]*'review-summary')(?=[\s\S]*'feedback-scope')(?=[\s\S]*'next-steps')[\s\S]*export type StudentRunnerSubmissionHandoffPrivacyContract = \{[\s\S]*exposesAnonymousToken: false;[\s\S]*exposesAnswerText: false;[\s\S]*exposesRawSubmissionPayload: false;[\s\S]*exposesRuntimeItemIds: false;[\s\S]*exposesStudentName: false;[\s\S]*exposesTeacherOnlyAnswers: false;[\s\S]*exposesTeacherSourceMaterials: false;/,
-  'Student runner submission handoff should expose a typed 20-slice contract with explicit privacy flags.'
+  /export const STUDENT_RUNNER_SUBMISSION_HANDOFF_ITEM_IDS = \[[\s\S]*'share-link'[\s\S]*'runtime-items'[\s\S]*'payload-summary'[\s\S]*'submit-readiness'[\s\S]*'identity-privacy'[\s\S]*'timer-limit'[\s\S]*'attempt-clock'[\s\S]*'review-summary'[\s\S]*'feedback-scope'[\s\S]*'next-steps'[\s\S]*'privacy-guard'[\s\S]*\] as const;[\s\S]*export type StudentRunnerSubmissionHandoffItemId =[\s\S]*typeof STUDENT_RUNNER_SUBMISSION_HANDOFF_ITEM_IDS/,
+  'Student runner submission handoff should derive its typed contract from a stable 30-slice id list.'
+);
+assert.deepEqual(
+  [...STUDENT_RUNNER_SUBMISSION_HANDOFF_ITEM_IDS],
+  [
+    'share-link',
+    'runtime-items',
+    'answered-items',
+    'unanswered-items',
+    'progress',
+    'payload-summary',
+    'submit-readiness',
+    'partial-confirmation',
+    'submission-state',
+    'identity-mode',
+    'identity-privacy',
+    'timer-status',
+    'timer-limit',
+    'attempt-duration',
+    'attempt-clock',
+    'result-status',
+    'score-summary',
+    'result-accuracy',
+    'attempt-usage',
+    'retry-availability',
+    'review-summary',
+    'review-submitted',
+    'review-needs-review',
+    'review-unanswered',
+    'feedback-scope',
+    'feedback-visibility',
+    'feedback-items',
+    'feedback-detail-evidence',
+    'next-steps',
+    'privacy-guard',
+  ],
+  'Student runner submission handoff should expose exactly 30 stable slice ids.'
+);
+assert.match(
+  studentRunnerStateSource,
+  /export type StudentRunnerSubmissionHandoffPrivacyContract = \{[\s\S]*exposesAnonymousToken: false;[\s\S]*exposesAnswerText: false;[\s\S]*exposesRawSubmissionPayload: false;[\s\S]*exposesRuntimeItemIds: false;[\s\S]*exposesStudentName: false;[\s\S]*exposesTeacherOnlyAnswers: false;[\s\S]*exposesTeacherSourceMaterials: false;[\s\S]*payloadMetricKeys: StudentRunnerSubmissionPayloadSummaryMetricKey\[\];[\s\S]*readinessItemIds: StudentRunnerSubmitReadinessItemId\[\];[\s\S]*reviewMetricKeys: StudentAttemptReviewSummaryMetricKey\[\];/,
+  'Student runner submission handoff should expose explicit privacy and metric-key contracts.'
 );
 assert.match(
   studentRunnerStateSource,
@@ -14129,6 +14171,113 @@ assert.match(
   /export function buildStudentRunnerSubmissionHandoffView(?=[\s\S]*payloadSummaryView)(?=[\s\S]*progressView)(?=[\s\S]*submitReadinessView)(?=[\s\S]*identityView)(?=[\s\S]*resultPanelView)[\s\S]*id: 'payload-summary'[\s\S]*id: 'submit-readiness'[\s\S]*buildStudentRunnerIdentityHandoffPrivacyItem\(identityView\)[\s\S]*id: 'attempt-duration'[\s\S]*id: 'review-summary'[\s\S]*id: 'feedback-scope'[\s\S]*id: 'next-steps'[\s\S]*privacy: buildStudentRunnerSubmissionHandoffPrivacyContract/,
   'Student runner submission handoff should collect progress, payload, readiness, identity, timer, result, review, feedback, and next-step slices.'
 );
+assert.match(
+  studentRunnerSubmitControlsSource,
+  /function StudentRunnerSubmissionHandoff[\s\S]*data-handoff="student-submission"[\s\S]*view\.itemViews\.map\(\(item\)[\s\S]*data-handoff-item=\{item\.id\}[\s\S]*<output aria-label=\{item\.ariaLabel\}>/,
+  'Student runner submit controls should render the hidden student-submission handoff outputs with the E2E catalog data-handoff marker.'
+);
+const studentSubmissionPrivateAnswer = 'DOMAIN_PRIVATE_STUDENT_ANSWER';
+const studentSubmissionPrivateToken = 'domain-private-anonymous-token';
+const studentSubmissionStarterPreview = buildStudentRunnerStarterPreview(
+  STARTER_FOOD_ASSIGNMENT_SHARE_ID
+);
+const studentSubmissionRuntimeItem =
+  studentSubmissionStarterPreview.runtimeItems[0];
+assert.ok(studentSubmissionRuntimeItem);
+const studentSubmissionPageView = buildStudentRunnerPageViewModel({
+  anonymousToken: studentSubmissionPrivateToken,
+  answers: {
+    [studentSubmissionRuntimeItem.id]: studentSubmissionPrivateAnswer,
+  },
+  confirmIncompleteSubmit: false,
+  fallbackStartedAt: 10_000,
+  isSubmitting: false,
+  pageState: buildStudentRunnerReadyState({
+    activity: studentSubmissionStarterPreview.activity,
+    assignment: {
+      ...studentSubmissionStarterPreview.assignment,
+      settings: {
+        ...studentSubmissionStarterPreview.assignment.settings,
+        collectStudentName: false,
+        showCorrectAnswers: false,
+        timeLimitSeconds: 120,
+      },
+    },
+    runtimeItems: studentSubmissionStarterPreview.runtimeItems,
+    source: 'public-assignment',
+  }),
+  shareId: STARTER_FOOD_ASSIGNMENT_SHARE_ID,
+  submittedAttemptCount: 0,
+});
+const studentSubmissionHandoffValues = new Map(
+  studentSubmissionPageView.submissionHandoffView.itemViews.map((item) => [
+    item.id,
+    item.value,
+  ])
+);
+assert.deepEqual(
+  studentSubmissionPageView.submissionHandoffView.itemViews.map(
+    (item) => item.id
+  ),
+  [...STUDENT_RUNNER_SUBMISSION_HANDOFF_ITEM_IDS],
+  'Student runner submission handoff should expose the stable 30-slice order from the page view-model.'
+);
+assert.deepEqual(studentSubmissionPageView.submissionHandoffView.privacy, {
+  exposesAnonymousToken: false,
+  exposesAnswerText: false,
+  exposesRawSubmissionPayload: false,
+  exposesRuntimeItemIds: false,
+  exposesStudentName: false,
+  exposesTeacherOnlyAnswers: false,
+  exposesTeacherSourceMaterials: false,
+  feedbackMetricKeys: [],
+  itemIds: [...STUDENT_RUNNER_SUBMISSION_HANDOFF_ITEM_IDS],
+  payloadMetricKeys: ['share-link', 'items', 'answers', 'unanswered'],
+  readinessItemIds: [
+    'share-link',
+    'runtime-items',
+    'completion',
+    'incomplete-confirmation',
+    'submission-state',
+  ],
+  reviewMetricKeys: [],
+});
+assert.equal(
+  studentSubmissionHandoffValues.get('share-link'),
+  STARTER_FOOD_ASSIGNMENT_SHARE_ID
+);
+assert.equal(studentSubmissionHandoffValues.get('answered-items'), '1');
+assert.equal(studentSubmissionHandoffValues.get('identity-mode'), 'anonymous');
+assert.equal(
+  studentSubmissionHandoffValues.get('identity-privacy'),
+  'Token hidden'
+);
+assert.equal(studentSubmissionHandoffValues.get('timer-limit'), '2:00');
+assert.equal(
+  studentSubmissionHandoffValues.get('result-accuracy'),
+  'Not submitted'
+);
+assert.equal(
+  studentSubmissionHandoffValues.get('feedback-detail-evidence'),
+  'Alternatives: Not submitted · Explanations: Not submitted'
+);
+assert.equal(
+  studentSubmissionHandoffValues.get('privacy-guard'),
+  'Private data omitted'
+);
+for (const privateValue of [
+  studentSubmissionPrivateAnswer,
+  studentSubmissionPrivateToken,
+  studentSubmissionRuntimeItem.id,
+]) {
+  assert.equal(
+    JSON.stringify(studentSubmissionPageView.submissionHandoffView).includes(
+      privateValue
+    ),
+    false,
+    `Student submission handoff leaked private text: ${privateValue}`
+  );
+}
 assert.match(
   studentRunnerSubmitControlsSource,
   /<StudentRunnerSubmitReadiness[\s\S]*view=\{controlView\.submitReadinessView\}[\s\S]*const titleId = 'student-runner-submit-readiness-title'[\s\S]*aria-describedby=\{`\$\{descriptionId\} \$\{statusValueId\}`\}[\s\S]*aria-label=\{view\.ariaLabel\}[\s\S]*aria-labelledby=\{titleId\}[\s\S]*data-status=\{view\.status\}[\s\S]*<output[\s\S]*aria-label=\{view\.ariaLabel\}[\s\S]*id=\{statusValueId\}[\s\S]*view\.statusLabel[\s\S]*view\.items\.map\(\(item\)[\s\S]*const labelId = `student-runner-submit-readiness-\$\{item\.id\}-label`[\s\S]*const valueId = `student-runner-submit-readiness-\$\{item\.id\}-value`[\s\S]*const descriptionId = `student-runner-submit-readiness-\$\{item\.id\}-description`[\s\S]*aria-label=\{item\.ariaLabel\}[\s\S]*data-status=\{item\.status\}[\s\S]*<output[\s\S]*aria-label=\{item\.ariaLabel\}[\s\S]*id=\{valueId\}[\s\S]*item\.statusLabel[\s\S]*item\.description/,
