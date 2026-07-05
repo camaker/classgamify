@@ -461,7 +461,7 @@ function buildSourceEvidence() {
         printableSource
       ),
     publicAccessExposesPolicy:
-      /buildPublicAssignmentAccessRuleHandoffItem\([\s\S]*'itemOrder'[\s\S]*'shuffle-policy'/.test(
+      /case 'shuffle-policy':[\s\S]*buildPublicAssignmentAccessRuleHandoffItem\([\s\S]*'itemOrder'[\s\S]*id/.test(
         publicSource
       ),
     publicPayloadUsesOrdering:

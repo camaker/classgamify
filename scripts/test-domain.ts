@@ -5105,6 +5105,10 @@ const activityLifecycleSource = readFileSync(
   'src/activities/lifecycle.ts',
   'utf8'
 );
+const activityLifecycleHandoffSemanticTestSource = readFileSync(
+  'scripts/activity-lifecycle-handoff-semantic-views.test.ts',
+  'utf8'
+);
 const activityScaffoldsSource = readFileSync(
   'src/activities/scaffolds.ts',
   'utf8'
@@ -5129,6 +5133,16 @@ assert.match(
   activityLibraryViewSource,
   /buildActivityLibraryActionStatusView[\s\S]*activity_library_action_status_label[\s\S]*activity_library_action_status_blocked_value[\s\S]*activity_library_action_status_ready_value[\s\S]*activity_library_action_status_aria_label/,
   'Activity library action status views should come from localized activity-domain copy.'
+);
+assert.match(
+  activityLifecycleHandoffSemanticTestSource,
+  /buildActivityLibraryCardDisplayView[\s\S]*buildAssignmentPublishDialogAccessView[\s\S]*buildActivityDerivativeActionExecutionPlan[\s\S]*buildActivityVisibilityActionExecutionPlan/,
+  'Activity lifecycle semantic coverage should exercise archived card display, publish access, derivative plans, and visibility plans together.'
+);
+assert.match(
+  activityLifecycleHandoffSemanticTestSource,
+  /assignment-snapshot-protection[\s\S]*Snapshots unchanged[\s\S]*public-assignment-continuity[\s\S]*Existing links unchanged[\s\S]*showPublishAction: false[\s\S]*showRestoreAction: true[\s\S]*buildAssignmentPublishDialogAccessView\('archived'\)[\s\S]*ACTIVITY_RESTORED_VISIBILITY/,
+  'Activity lifecycle semantic coverage should prove archived activities preserve assignment snapshots, keep existing links available, hide publish actions, show restore, and restore into draft readiness.'
 );
 assert.match(
   activityLibraryViewSource,
