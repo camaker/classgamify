@@ -252,6 +252,7 @@ export function ActivityCreateForm({
               onGenerateDraft={onGenerateDraft}
               onSyncSourceMaterials={syncAttachedMaterialsForDraft}
               panelView={aiDraftPanelView}
+              templateType={selectedTemplate}
             />
 
             <ActivityEditorPrimaryFields

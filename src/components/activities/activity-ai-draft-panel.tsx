@@ -2,7 +2,12 @@ import {
   ACTIVITY_AI_DRAFT_ITEM_COUNT_OPTIONS,
   type ActivityDraftResult,
 } from '@/activities/ai-draft';
+import {
+  buildActivityAiDraftBoundaryHandoffView,
+  type ActivityAiDraftBoundaryHandoffView,
+} from '@/activities/ai-draft-boundary';
 import type { ActivityAiDraftFocus } from '@/activities/ai-draft-focus';
+import type { ActivityTemplateType } from '@/activities/types';
 import type {
   ActivityEditorAiDraftPanelView,
   ActivityEditorAiDraftSourceCapabilityCardView,
@@ -36,6 +41,7 @@ type ActivityAiDraftPanelProps = {
   onGenerateDraft: () => void;
   onSyncSourceMaterials: () => void;
   panelView: ActivityEditorAiDraftPanelView;
+  templateType: ActivityTemplateType;
 };
 
 export function ActivityAiDraftPanel({
@@ -50,9 +56,19 @@ export function ActivityAiDraftPanel({
   onGenerateDraft,
   onSyncSourceMaterials,
   panelView,
+  templateType,
 }: ActivityAiDraftPanelProps) {
+  const boundaryHandoffView = buildActivityAiDraftBoundaryHandoffView({
+    draftFocus,
+    draftItemCount,
+    draftResult,
+    panelView,
+    templateType,
+  });
+
   return (
     <div className="space-y-3">
+      <ActivityAiDraftBoundaryHandoff view={boundaryHandoffView} />
       <div className="rounded-lg border border-primary/20 bg-primary/5 p-4">
         <div className="flex flex-col gap-4 lg:flex-row lg:items-end">
           <ActivityAiDraftSourceControls
@@ -88,6 +104,38 @@ export function ActivityAiDraftPanel({
         />
       ) : null}
     </div>
+  );
+}
+
+function ActivityAiDraftBoundaryHandoff({
+  view,
+}: {
+  view: ActivityAiDraftBoundaryHandoffView;
+}) {
+  const titleId = 'activity-ai-draft-boundary-handoff-title';
+  const descriptionId = 'activity-ai-draft-boundary-handoff-description';
+
+  return (
+    <section
+      aria-describedby={descriptionId}
+      aria-labelledby={titleId}
+      className="sr-only"
+      data-handoff="activity-ai-draft-boundary"
+    >
+      <h2 id={titleId}>{view.title}</h2>
+      <p id={descriptionId}>{view.description}</p>
+      <dl>
+        {view.itemViews.map((item) => (
+          <div data-handoff-item={item.id} key={item.id}>
+            <dt>{item.label}</dt>
+            <dd>
+              <output aria-label={item.ariaLabel}>{item.value}</output>
+              <span>{item.description}</span>
+            </dd>
+          </div>
+        ))}
+      </dl>
+    </section>
   );
 }
 
