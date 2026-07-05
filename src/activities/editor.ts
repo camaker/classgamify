@@ -12,6 +12,7 @@ import {
   ACTIVITY_DIFFICULTIES,
 } from '@/activities/types';
 import {
+  ACTIVITY_DRAFT_REVIEW_STATE,
   buildGenerateActivityDraftInputFromEditor,
   type GenerateActivityDraftInput,
 } from '@/activities/ai-draft';
@@ -297,27 +298,41 @@ export type ActivityEditorAiDraftSourceMaterialSafetyView = {
   title: string;
 };
 
+export const ACTIVITY_EDITOR_AI_DRAFT_SOURCE_HANDOFF_ITEM_IDS = [
+  'safe-source',
+  'source-textarea',
+  'source-readiness',
+  'source-length',
+  'source-warning',
+  'source-sanitization',
+  'teacher-review',
+  'item-count',
+  'focus',
+  'sync-action',
+  'generate-action',
+  'generation-gate',
+  'auth-boundary',
+  'input-schema',
+  'attached-materials',
+  'material-safety',
+  'safe-material-notes',
+  'omitted-material-notes',
+  'synced-material-provenance',
+  'capability-audio-extraction',
+  'capability-worksheet-extraction',
+  'capability-spreadsheet-import',
+  'create-input-contract',
+  'editor-application-boundary',
+  'persistence-boundary',
+  'save-boundary',
+  'publish-boundary',
+  'file-byte-guard',
+  'storage-key-guard',
+  'prompt-privacy',
+] as const;
+
 export type ActivityEditorAiDraftSourceHandoffItemId =
-  | 'attached-materials'
-  | 'capability-audio-extraction'
-  | 'capability-spreadsheet-import'
-  | 'capability-worksheet-extraction'
-  | 'focus'
-  | 'generate-action'
-  | 'generation-gate'
-  | 'item-count'
-  | 'material-safety'
-  | 'omitted-material-notes'
-  | 'prompt-privacy'
-  | 'safe-material-notes'
-  | 'safe-source'
-  | 'source-length'
-  | 'source-readiness'
-  | 'source-textarea'
-  | 'source-warning'
-  | 'sync-action'
-  | 'synced-material-provenance'
-  | 'teacher-review';
+  (typeof ACTIVITY_EDITOR_AI_DRAFT_SOURCE_HANDOFF_ITEM_IDS)[number];
 
 export type ActivityEditorAiDraftSourceHandoffItemView = {
   ariaLabel: string;
@@ -896,7 +911,7 @@ function buildActivityEditorAiDraftSourceHandoffView({
   const blockedValue = m.activity_form_ai_source_handoff_blocked_value();
   const warningValue = m.activity_form_ai_source_handoff_warning_value();
   const clearValue = m.activity_form_ai_source_handoff_clear_value();
-  const itemViews: ActivityEditorAiDraftSourceHandoffItemView[] = [
+  const candidateItemViews: ActivityEditorAiDraftSourceHandoffItemView[] = [
     buildActivityEditorAiDraftSourceHandoffItem({
       description: safeSourceDescription,
       id: 'safe-source',
@@ -927,6 +942,13 @@ function buildActivityEditorAiDraftSourceHandoffView({
       id: 'source-warning',
       label: sourceReadiness.title,
       value: sourceReadiness.hasWarnings ? warningValue : clearValue,
+    }),
+    buildActivityEditorAiDraftSourceHandoffItem({
+      description:
+        m.activity_ai_draft_boundary_handoff_source_sanitization_description(),
+      id: 'source-sanitization',
+      label: m.activity_ai_draft_boundary_handoff_source_sanitization_label(),
+      value: m.activity_ai_draft_boundary_handoff_source_sanitization_value(),
     }),
     buildActivityEditorAiDraftSourceHandoffItem({
       description: m.activity_form_ai_draft_review_note(),
@@ -976,6 +998,20 @@ function buildActivityEditorAiDraftSourceHandoffView({
     }),
     buildActivityEditorAiDraftSourceHandoffItem({
       description:
+        m.activity_ai_draft_boundary_handoff_auth_boundary_description(),
+      id: 'auth-boundary',
+      label: m.activity_ai_draft_boundary_handoff_auth_boundary_label(),
+      value: m.activity_ai_draft_boundary_handoff_auth_boundary_value(),
+    }),
+    buildActivityEditorAiDraftSourceHandoffItem({
+      description:
+        m.activity_ai_draft_boundary_handoff_input_schema_description(),
+      id: 'input-schema',
+      label: m.activity_ai_draft_boundary_handoff_input_schema_label(),
+      value: 'generateActivityDraftInputSchema',
+    }),
+    buildActivityEditorAiDraftSourceHandoffItem({
+      description:
         m.activity_form_ai_source_handoff_attached_materials_description(),
       id: 'attached-materials',
       label: m.activity_form_ai_source_handoff_attached_materials_label(),
@@ -1018,12 +1054,74 @@ function buildActivityEditorAiDraftSourceHandoffView({
     ),
     buildActivityEditorAiDraftSourceHandoffItem({
       description:
+        m.activity_ai_draft_boundary_handoff_create_input_description(),
+      id: 'create-input-contract',
+      label: m.activity_ai_draft_boundary_handoff_create_input_label(),
+      value: 'CreateActivityInput',
+    }),
+    buildActivityEditorAiDraftSourceHandoffItem({
+      description:
+        m.activity_ai_draft_boundary_handoff_editor_application_description(),
+      id: 'editor-application-boundary',
+      label: m.activity_ai_draft_boundary_handoff_editor_application_label(),
+      value: ACTIVITY_DRAFT_REVIEW_STATE.applicationMode,
+    }),
+    buildActivityEditorAiDraftSourceHandoffItem({
+      description:
+        m.activity_ai_draft_boundary_handoff_persistence_description(),
+      id: 'persistence-boundary',
+      label: m.activity_ai_draft_boundary_handoff_persistence_label(),
+      value: ACTIVITY_DRAFT_REVIEW_STATE.persistenceMode,
+    }),
+    buildActivityEditorAiDraftSourceHandoffItem({
+      description:
+        m.activity_ai_draft_boundary_handoff_save_boundary_description(),
+      id: 'save-boundary',
+      label: m.activity_ai_draft_boundary_handoff_save_boundary_label(),
+      value: m.activity_ai_draft_boundary_handoff_save_boundary_value(),
+    }),
+    buildActivityEditorAiDraftSourceHandoffItem({
+      description:
+        m.activity_ai_draft_boundary_handoff_publish_boundary_description(),
+      id: 'publish-boundary',
+      label: m.activity_ai_draft_boundary_handoff_publish_boundary_label(),
+      value: m.activity_ai_draft_boundary_handoff_publish_boundary_value(),
+    }),
+    buildActivityEditorAiDraftSourceHandoffItem({
+      description:
+        m.activity_ai_draft_boundary_handoff_file_byte_guard_description(),
+      id: 'file-byte-guard',
+      label: m.activity_ai_draft_boundary_handoff_file_byte_guard_label(),
+      value: m.activity_ai_draft_boundary_handoff_file_byte_guard_value(),
+    }),
+    buildActivityEditorAiDraftSourceHandoffItem({
+      description:
+        m.activity_ai_draft_boundary_handoff_storage_key_guard_description(),
+      id: 'storage-key-guard',
+      label: m.activity_ai_draft_boundary_handoff_storage_key_guard_label(),
+      value: m.activity_ai_draft_boundary_handoff_storage_key_guard_value(),
+    }),
+    buildActivityEditorAiDraftSourceHandoffItem({
+      description:
         m.activity_form_ai_source_handoff_prompt_privacy_description(),
       id: 'prompt-privacy',
       label: m.activity_form_ai_source_handoff_prompt_privacy_label(),
       value: m.activity_form_ai_source_handoff_prompt_privacy_value(),
     }),
   ];
+  const itemViewById = new Map(
+    candidateItemViews.map((itemView) => [itemView.id, itemView] as const)
+  );
+  const itemViews = ACTIVITY_EDITOR_AI_DRAFT_SOURCE_HANDOFF_ITEM_IDS.map(
+    (id) => {
+      const itemView = itemViewById.get(id);
+      if (!itemView) {
+        throw new Error(`Missing activity AI draft source handoff item: ${id}`);
+      }
+
+      return itemView;
+    }
+  );
 
   return {
     description: m.activity_form_ai_source_handoff_description(),

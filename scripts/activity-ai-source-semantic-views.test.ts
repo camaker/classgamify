@@ -1,6 +1,7 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 import {
+  ACTIVITY_EDITOR_AI_DRAFT_SOURCE_HANDOFF_ITEM_IDS,
   buildActivityEditorAiDraftPanelView,
   buildActivityEditorDraftSourceState,
 } from '@/activities/editor';
@@ -58,28 +59,9 @@ test('AI source panel exposes a complete safe handoff contract', () => {
   const itemIds = handoffView.itemViews.map((item) => item.id);
 
   assert.deepEqual(itemIds, [
-    'safe-source',
-    'source-textarea',
-    'source-readiness',
-    'source-length',
-    'source-warning',
-    'teacher-review',
-    'item-count',
-    'focus',
-    'sync-action',
-    'generate-action',
-    'generation-gate',
-    'attached-materials',
-    'material-safety',
-    'safe-material-notes',
-    'omitted-material-notes',
-    'synced-material-provenance',
-    'capability-audio-extraction',
-    'capability-worksheet-extraction',
-    'capability-spreadsheet-import',
-    'prompt-privacy',
+    ...ACTIVITY_EDITOR_AI_DRAFT_SOURCE_HANDOFF_ITEM_IDS,
   ]);
-  assert.equal(new Set(itemIds).size, 20);
+  assert.equal(new Set(itemIds).size, 30);
   assert.equal(
     handoffView.itemViews.every(
       (item) =>
@@ -99,7 +81,7 @@ test('AI source panel exposes a complete safe handoff contract', () => {
     exposesQueryTokens: false,
     exposesStorageKeys: false,
     exposesUrls: false,
-    itemIds,
+    itemIds: [...ACTIVITY_EDITOR_AI_DRAFT_SOURCE_HANDOFF_ITEM_IDS],
   });
 
   assert.equal(
@@ -136,6 +118,46 @@ test('AI source panel exposes a complete safe handoff contract', () => {
   assert.equal(
     getHandoffItemValue(handoffView.itemViews, 'generate-action'),
     'Ready'
+  );
+  assert.equal(
+    getHandoffItemValue(handoffView.itemViews, 'source-sanitization'),
+    'Sanitized source'
+  );
+  assert.equal(
+    getHandoffItemValue(handoffView.itemViews, 'auth-boundary'),
+    'Authenticated action'
+  );
+  assert.equal(
+    getHandoffItemValue(handoffView.itemViews, 'input-schema'),
+    'generateActivityDraftInputSchema'
+  );
+  assert.equal(
+    getHandoffItemValue(handoffView.itemViews, 'create-input-contract'),
+    'CreateActivityInput'
+  );
+  assert.equal(
+    getHandoffItemValue(handoffView.itemViews, 'editor-application-boundary'),
+    'editor-review'
+  );
+  assert.equal(
+    getHandoffItemValue(handoffView.itemViews, 'persistence-boundary'),
+    'not-persisted'
+  );
+  assert.equal(
+    getHandoffItemValue(handoffView.itemViews, 'save-boundary'),
+    'Teacher saves later'
+  );
+  assert.equal(
+    getHandoffItemValue(handoffView.itemViews, 'publish-boundary'),
+    'Publish later'
+  );
+  assert.equal(
+    getHandoffItemValue(handoffView.itemViews, 'file-byte-guard'),
+    'Bytes omitted'
+  );
+  assert.equal(
+    getHandoffItemValue(handoffView.itemViews, 'storage-key-guard'),
+    'Storage hidden'
   );
 
   const serializedHandoffView = JSON.stringify(handoffView);

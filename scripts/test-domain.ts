@@ -405,6 +405,7 @@ import {
   buildActivityEditPageViewModel,
   buildActivityEditRouteState,
   activityContentToEditorInput,
+  ACTIVITY_EDITOR_AI_DRAFT_SOURCE_HANDOFF_ITEM_IDS,
   ACTIVITY_EDITOR_SECTION_IDS,
   ACTIVITY_EDITOR_READINESS_PANEL_LIMITS,
   buildActivityEditorAiDraftPanelView,
@@ -5333,6 +5334,52 @@ assert.match(
   activityEditorSource,
   /export type ActivityEditorAiDraftSourceCapabilityView[\s\S]*export type ActivityEditorSourceMaterialDraftNoteView[\s\S]*export type ActivityEditorAiDraftSourceReadinessView[\s\S]*export type ActivityEditorAiDraftSourceMaterialSafetyMetricView[\s\S]*export type ActivityEditorAiDraftSourceMaterialSafetyView[\s\S]*export type ActivityEditorAiDraftPanelView[\s\S]*export type ActivityEditorAiDraftSourceCapabilityCardView =\s*ActivityEditorAiDraftSourceCapabilityView;/,
   'Activity editor domain should expose explicit AI draft panel view contracts.'
+);
+assert.match(
+  activityEditorSource,
+  /export const ACTIVITY_EDITOR_AI_DRAFT_SOURCE_HANDOFF_ITEM_IDS = \[[\s\S]*'safe-source'[\s\S]*'source-textarea'[\s\S]*'source-readiness'[\s\S]*'source-length'[\s\S]*'source-warning'[\s\S]*'source-sanitization'[\s\S]*'teacher-review'[\s\S]*'item-count'[\s\S]*'focus'[\s\S]*'sync-action'[\s\S]*'generate-action'[\s\S]*'generation-gate'[\s\S]*'auth-boundary'[\s\S]*'input-schema'[\s\S]*'attached-materials'[\s\S]*'material-safety'[\s\S]*'safe-material-notes'[\s\S]*'omitted-material-notes'[\s\S]*'synced-material-provenance'[\s\S]*'capability-audio-extraction'[\s\S]*'capability-worksheet-extraction'[\s\S]*'capability-spreadsheet-import'[\s\S]*'create-input-contract'[\s\S]*'editor-application-boundary'[\s\S]*'persistence-boundary'[\s\S]*'save-boundary'[\s\S]*'publish-boundary'[\s\S]*'file-byte-guard'[\s\S]*'storage-key-guard'[\s\S]*'prompt-privacy'[\s\S]*\] as const;[\s\S]*export type ActivityEditorAiDraftSourceHandoffItemId =\s*\n\s*\(typeof ACTIVITY_EDITOR_AI_DRAFT_SOURCE_HANDOFF_ITEM_IDS\)\[number\];/,
+  'Activity editor AI draft source handoff should expose stable exported 30-slice ids and derive its item id type from them.'
+);
+assert.deepEqual(
+  [...ACTIVITY_EDITOR_AI_DRAFT_SOURCE_HANDOFF_ITEM_IDS],
+  [
+    'safe-source',
+    'source-textarea',
+    'source-readiness',
+    'source-length',
+    'source-warning',
+    'source-sanitization',
+    'teacher-review',
+    'item-count',
+    'focus',
+    'sync-action',
+    'generate-action',
+    'generation-gate',
+    'auth-boundary',
+    'input-schema',
+    'attached-materials',
+    'material-safety',
+    'safe-material-notes',
+    'omitted-material-notes',
+    'synced-material-provenance',
+    'capability-audio-extraction',
+    'capability-worksheet-extraction',
+    'capability-spreadsheet-import',
+    'create-input-contract',
+    'editor-application-boundary',
+    'persistence-boundary',
+    'save-boundary',
+    'publish-boundary',
+    'file-byte-guard',
+    'storage-key-guard',
+    'prompt-privacy',
+  ],
+  'Activity editor AI draft source handoff should expose exactly 30 stable slice ids.'
+);
+assert.match(
+  activityEditorSource,
+  /function buildActivityEditorAiDraftSourceHandoffView[\s\S]*const candidateItemViews: ActivityEditorAiDraftSourceHandoffItemView\[\] = \[[\s\S]*id: 'source-sanitization'[\s\S]*id: 'auth-boundary'[\s\S]*id: 'input-schema'[\s\S]*id: 'create-input-contract'[\s\S]*id: 'editor-application-boundary'[\s\S]*id: 'persistence-boundary'[\s\S]*id: 'save-boundary'[\s\S]*id: 'publish-boundary'[\s\S]*id: 'file-byte-guard'[\s\S]*id: 'storage-key-guard'[\s\S]*const itemViewById = new Map\([\s\S]*candidateItemViews\.map\(\(itemView\) => \[itemView\.id, itemView\] as const\)[\s\S]*const itemViews = ACTIVITY_EDITOR_AI_DRAFT_SOURCE_HANDOFF_ITEM_IDS\.map[\s\S]*Missing activity AI draft source handoff item:[\s\S]*privacy: buildActivityEditorAiDraftSourcePrivacyContract\(itemViews\)/,
+  'Activity editor AI draft source handoff should order prepared slices through the stable id contract and fail loudly if a slice is missing.'
 );
 assert.match(
   activityEditorSource,
@@ -42796,14 +42843,86 @@ const safeMaterialAiDraftPanelView = buildActivityEditorAiDraftPanelView({
     sourceMaterials: [],
   }),
 });
+const safeMaterialAiDraftSourceHandoffItemIds =
+  safeMaterialAiDraftPanelView.sourceHandoffView.itemViews.map(
+    (item) => item.id
+  );
+const safeMaterialAiDraftSourceHandoffValues = new Map(
+  safeMaterialAiDraftPanelView.sourceHandoffView.itemViews.map((item) => [
+    item.id,
+    item.value,
+  ])
+);
+assert.deepEqual(safeMaterialAiDraftSourceHandoffItemIds, [
+  ...ACTIVITY_EDITOR_AI_DRAFT_SOURCE_HANDOFF_ITEM_IDS,
+]);
 assert.equal(
   safeMaterialAiDraftPanelView.sourceHandoffView.itemViews.length,
-  20
+  30
+);
+assert.deepEqual(safeMaterialAiDraftPanelView.sourceHandoffView.privacy, {
+  exposesFileBytes: false,
+  exposesFileIds: false,
+  exposesOmittedNotePayloads: false,
+  exposesPathSegments: false,
+  exposesPermissionMetadata: false,
+  exposesQueryTokens: false,
+  exposesStorageKeys: false,
+  exposesUrls: false,
+  itemIds: [...ACTIVITY_EDITOR_AI_DRAFT_SOURCE_HANDOFF_ITEM_IDS],
+});
+assert.equal(
+  safeMaterialAiDraftSourceHandoffValues.get('source-sanitization'),
+  'Sanitized source'
 );
 assert.equal(
-  safeMaterialAiDraftPanelView.sourceHandoffView.privacy.exposesStorageKeys,
-  false
+  safeMaterialAiDraftSourceHandoffValues.get('auth-boundary'),
+  'Authenticated action'
 );
+assert.equal(
+  safeMaterialAiDraftSourceHandoffValues.get('input-schema'),
+  'generateActivityDraftInputSchema'
+);
+assert.equal(
+  safeMaterialAiDraftSourceHandoffValues.get('create-input-contract'),
+  'CreateActivityInput'
+);
+assert.equal(
+  safeMaterialAiDraftSourceHandoffValues.get('editor-application-boundary'),
+  'editor-review'
+);
+assert.equal(
+  safeMaterialAiDraftSourceHandoffValues.get('persistence-boundary'),
+  'not-persisted'
+);
+assert.equal(
+  safeMaterialAiDraftSourceHandoffValues.get('save-boundary'),
+  'Teacher saves later'
+);
+assert.equal(
+  safeMaterialAiDraftSourceHandoffValues.get('publish-boundary'),
+  'Publish later'
+);
+assert.equal(
+  safeMaterialAiDraftSourceHandoffValues.get('file-byte-guard'),
+  'Bytes omitted'
+);
+assert.equal(
+  safeMaterialAiDraftSourceHandoffValues.get('storage-key-guard'),
+  'Storage hidden'
+);
+for (const privateAiSourceHandoffValue of [
+  'storageKey',
+  'classroom/private/worksheet.pdf',
+]) {
+  assert.equal(
+    JSON.stringify(safeMaterialAiDraftPanelView.sourceHandoffView).includes(
+      privateAiSourceHandoffValue
+    ),
+    false,
+    `AI source handoff leaked unsafe source text: ${privateAiSourceHandoffValue}`
+  );
+}
 assert.deepEqual(
   omitActivityEditorAiDraftSourceHandoffView(safeMaterialAiDraftPanelView),
   {
