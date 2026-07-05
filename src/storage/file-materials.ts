@@ -11,6 +11,18 @@ export const USER_FILE_MATERIAL_KINDS = [
 
 export type UserFileMaterialKind = (typeof USER_FILE_MATERIAL_KINDS)[number];
 
+export type UserFileMaterialClassificationBasis =
+  | 'content-type'
+  | 'extension'
+  | 'fallback';
+
+export type UserFileMaterialClassification = {
+  basis: UserFileMaterialClassificationBasis;
+  contentType?: string;
+  extension?: string;
+  kind: UserFileMaterialKind;
+};
+
 export function isUserFileMaterialKind(
   value: string | null | undefined
 ): value is UserFileMaterialKind {
@@ -74,11 +86,9 @@ export function normalizeUserFileContentType(
   return normalized === '' ? undefined : normalized;
 }
 
-export function resolveUserFileMaterialKind(
-  file: UserFileMaterialInput
-): UserFileMaterialKind {
-  const contentType = normalizeUserFileContentType(file.contentType);
-
+function resolveUserFileContentTypeMaterialKind(
+  contentType: string | undefined
+): UserFileMaterialKind | undefined {
   if (contentType?.startsWith('audio/')) return 'audio';
   if (contentType?.startsWith('image/')) return 'worksheet-image';
   if (contentType?.startsWith('video/')) return 'video';
@@ -100,6 +110,46 @@ export function resolveUserFileMaterialKind(
       return 'spreadsheet';
   }
 
+  return undefined;
+}
+
+export function classifyUserFileMaterial(
+  file: UserFileMaterialInput
+): UserFileMaterialClassification {
+  const contentType = normalizeUserFileContentType(file.contentType);
+  const contentTypeKind = resolveUserFileContentTypeMaterialKind(contentType);
+
+  if (contentTypeKind) {
+    return {
+      basis: 'content-type',
+      contentType,
+      extension: getUserFileExtension(file),
+      kind: contentTypeKind,
+    };
+  }
+
   const extension = getUserFileExtension(file);
-  return extension ? (EXTENSION_KIND_MAP[extension] ?? 'file') : 'file';
+  const extensionKind = extension ? EXTENSION_KIND_MAP[extension] : undefined;
+
+  if (extensionKind) {
+    return {
+      basis: 'extension',
+      contentType,
+      extension,
+      kind: extensionKind,
+    };
+  }
+
+  return {
+    basis: 'fallback',
+    contentType,
+    extension,
+    kind: 'file',
+  };
+}
+
+export function resolveUserFileMaterialKind(
+  file: UserFileMaterialInput
+): UserFileMaterialKind {
+  return classifyUserFileMaterial(file).kind;
 }

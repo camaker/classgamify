@@ -1,5 +1,6 @@
 import { m } from '@/locale/paraglide/messages';
 import { DataTablePagination } from '@/components/data-table/data-table-pagination';
+import { FilesMaterialClassificationHandoff } from '@/components/settings/files/files-material-classification-handoff';
 import { FilesSourceMaterialHandoffPanel } from '@/components/settings/files/files-source-material-handoff-panel';
 import { Button, buttonVariants } from '@/components/ui/button';
 import {
@@ -33,16 +34,13 @@ import type { UserFiles } from '@/db/types';
 import { formatBytes, formatDate } from '@/lib/formatter';
 import { getFileAccessUrl } from '@/lib/urls';
 import { cn } from '@/lib/utils';
-import {
-  normalizeUserFileContentType,
-  resolveUserFileMaterialKind,
-} from '@/storage/file-materials';
-import { formatUserFileMaterialKind } from '@/storage/file-material-labels';
+import { buildUserFileMaterialClassificationView } from '@/storage/file-material-classification';
 import {
   buildUserFileMaterialSummary,
   buildUserFileMaterialSummaryItems,
   type UserFileMaterialSummary,
 } from '@/storage/file-summary';
+import { buildSettingsFilesMaterialClassificationHandoffView } from '@/settings/files-material-classification-view';
 import { buildSettingsFilesSourceMaterialHandoffView } from '@/settings/files-view';
 import {
   type ColumnDef,
@@ -61,19 +59,18 @@ import {
 import { useMemo, useState } from 'react';
 
 function UserFileMaterialTypeCell({ file }: { file: UserFiles }) {
-  const kind = resolveUserFileMaterialKind({
+  const materialView = buildUserFileMaterialClassificationView({
     contentType: file.contentType,
     filename: file.filename,
     originalName: file.originalName,
   });
-  const contentType = normalizeUserFileContentType(file.contentType);
 
   return (
     <span className="flex min-w-0 flex-col">
-      <span className="font-medium">{formatUserFileMaterialKind(kind)}</span>
-      {contentType && (
+      <span className="font-medium">{materialView.label}</span>
+      {materialView.secondaryDetail && (
         <span className="text-muted-foreground truncate text-xs">
-          {contentType}
+          {materialView.secondaryDetail}
         </span>
       )}
     </span>
@@ -172,6 +169,16 @@ export function FilesTable({
       total,
       uploading,
     ]
+  );
+  const materialClassificationHandoffView = useMemo(
+    () =>
+      buildSettingsFilesMaterialClassificationHandoffView({
+        sampleFile: data[0],
+        summary: materialSummary,
+        total,
+        visibleItemCount: data.length,
+      }),
+    [data, materialSummary, total]
   );
   const columns: ColumnDef<UserFiles>[] = useMemo(
     () => [
@@ -426,6 +433,9 @@ export function FilesTable({
       <FilesSummaryStrip summary={materialSummary} />
 
       <FilesSourceMaterialHandoffPanel view={handoffView} />
+      <FilesMaterialClassificationHandoff
+        view={materialClassificationHandoffView}
+      />
 
       <div className="relative flex flex-col gap-4 overflow-auto">
         <div className="overflow-hidden rounded-lg border">

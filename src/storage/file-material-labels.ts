@@ -1,6 +1,9 @@
 import { m } from '@/locale/paraglide/messages';
 import type { Locale } from '@/locale/paraglide/runtime';
-import type { UserFileMaterialKind } from '@/storage/file-materials';
+import type {
+  UserFileMaterialClassificationBasis,
+  UserFileMaterialKind,
+} from '@/storage/file-materials';
 
 type UserFileMaterialKindFormatOptions = {
   locale?: Locale;
@@ -28,4 +31,21 @@ export function formatUserFileMaterialKind(
     default:
       return m.settings_files_material_type_file({}, options);
   }
+}
+
+export function formatUserFileMaterialClassificationBasis(
+  basis: UserFileMaterialClassificationBasis,
+  options?: UserFileMaterialKindFormatOptions
+): string {
+  switch (basis) {
+    case 'content-type':
+      return m.settings_files_material_basis_content_type({}, options);
+    case 'extension':
+      return m.settings_files_material_basis_extension({}, options);
+    case 'fallback':
+      return m.settings_files_material_basis_fallback({}, options);
+  }
+
+  const exhaustiveBasis: never = basis;
+  return exhaustiveBasis;
 }
