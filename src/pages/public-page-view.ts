@@ -228,9 +228,12 @@ type RoadmapValidationView = {
 
 export const ROADMAP_PUBLIC_HANDOFF_ITEM_IDS = [
   'current-loop',
+  'roadmap-surface',
   'available-count',
   'improving-count',
   'planned-count',
+  'column-board',
+  'status-label-boundary',
   'activity-assignment-loop',
   'template-foundation',
   'ai-draft-capability',
@@ -238,12 +241,19 @@ export const ROADMAP_PUBLIC_HANDOFF_ITEM_IDS = [
   'worksheet-delivery-focus',
   'worksheet-extraction-boundary',
   'school-workflow-boundary',
+  'task-evidence-boundary',
+  'task-next-step-boundary',
+  'hero-action-boundary',
   'create-route',
   'templates-route',
   'feedback-route',
+  'snapshot-panel',
   'snapshot-live-core',
   'snapshot-template-depth',
   'snapshot-ai-expansion',
+  'principle-focus-boundary',
+  'principle-model-boundary',
+  'validation-decision-boundary',
   'public-copy-boundary',
   'legacy-copy-guard',
   'privacy-guard',
@@ -264,6 +274,7 @@ export type RoadmapPublicHandoffItemView = {
 export type RoadmapPublicHandoffPrivacyContract = {
   createsAssignmentLinks: false;
   describesCurrentUsableLoop: true;
+  describesPublicRoadmapSurface: true;
   exposesAnswerKeys: false;
   exposesRawAnonymousToken: false;
   exposesSourceMaterialStorageKeys: false;
@@ -271,9 +282,15 @@ export type RoadmapPublicHandoffPrivacyContract = {
   exposesTeacherPrivateActivityContent: false;
   itemIds: RoadmapPublicHandoffItemId[];
   keepsLegacyCopyOut: true;
+  keepsPlannedBetsExploratory: true;
+  mutatesTeacherWorkspace: false;
   readsSourceMaterialFileBytes: false;
+  rendersTaskEvidence: true;
+  rendersTaskNextSteps: true;
+  rendersValidationCriteria: true;
   routeActionsUseSharedConstants: true;
   scope: 'public-roadmap-product-boundary';
+  usesPreparedViewModel: true;
 };
 
 export type RoadmapPublicHandoffView = {
@@ -1128,33 +1145,35 @@ export function buildRoadmapPageViewModel(): RoadmapPageViewModel {
     eyebrowLabel: m.roadmap_validation_eyebrow(),
     title: m.roadmap_validation_title(),
   };
+  const principles: RoadmapPrincipleView[] = [
+    {
+      description: m.roadmap_principle_focus_description(),
+      id: 'focus',
+      title: m.roadmap_principle_focus_title(),
+    },
+    {
+      description: m.roadmap_principle_learning_description(),
+      id: 'learning',
+      title: m.roadmap_principle_learning_title(),
+    },
+    {
+      description: m.roadmap_validation_item_workflow_description(),
+      id: 'validation',
+      title: m.roadmap_validation_item_workflow_title(),
+    },
+  ];
 
   return {
     columns,
     handoffView: buildRoadmapPublicHandoffView({
       columns,
       hero,
+      principles,
       snapshots,
       validation,
     }),
     hero,
-    principles: [
-      {
-        description: m.roadmap_principle_focus_description(),
-        id: 'focus',
-        title: m.roadmap_principle_focus_title(),
-      },
-      {
-        description: m.roadmap_principle_learning_description(),
-        id: 'learning',
-        title: m.roadmap_principle_learning_title(),
-      },
-      {
-        description: m.roadmap_validation_item_workflow_description(),
-        id: 'validation',
-        title: m.roadmap_validation_item_workflow_title(),
-      },
-    ],
+    principles,
     snapshots,
     validation,
   };
@@ -1163,17 +1182,19 @@ export function buildRoadmapPageViewModel(): RoadmapPageViewModel {
 export function buildRoadmapPublicHandoffView({
   columns,
   hero,
+  principles,
   snapshots,
   validation,
 }: Pick<
   RoadmapPageViewModel,
-  'columns' | 'hero' | 'snapshots' | 'validation'
+  'columns' | 'hero' | 'principles' | 'snapshots' | 'validation'
 >): RoadmapPublicHandoffView {
   const itemViews = ROADMAP_PUBLIC_HANDOFF_ITEM_IDS.map((id) =>
     buildRoadmapPublicHandoffItemView({
       columns,
       hero,
       id,
+      principles,
       snapshots,
       validation,
     })
@@ -1189,7 +1210,7 @@ export function buildRoadmapPublicHandoffView({
 
 type RoadmapPublicHandoffBuildContext = Pick<
   RoadmapPageViewModel,
-  'columns' | 'hero' | 'snapshots' | 'validation'
+  'columns' | 'hero' | 'principles' | 'snapshots' | 'validation'
 > & {
   id: RoadmapPublicHandoffItemId;
 };
@@ -1204,6 +1225,13 @@ function buildRoadmapPublicHandoffItemView(
         id: context.id,
         label: m.roadmap_handoff_current_loop_label(),
         value: m.roadmap_handoff_current_loop_value(),
+      });
+    case 'roadmap-surface':
+      return buildRoadmapPublicHandoffItem({
+        description: m.roadmap_handoff_roadmap_surface_description(),
+        id: context.id,
+        label: m.roadmap_handoff_roadmap_surface_label(),
+        value: m.roadmap_handoff_roadmap_surface_value(),
       });
     case 'available-count':
       return buildRoadmapPublicHandoffCountItem({
@@ -1222,6 +1250,24 @@ function buildRoadmapPublicHandoffItemView(
         column: getRoadmapPublicHandoffColumn(context.columns, 'backlog'),
         id: context.id,
         label: m.roadmap_handoff_planned_count_label(),
+      });
+    case 'column-board':
+      return buildRoadmapPublicHandoffItem({
+        description: m.roadmap_handoff_column_board_description({
+          columnCount: context.columns.length,
+        }),
+        id: context.id,
+        label: m.roadmap_handoff_column_board_label(),
+        value: m.roadmap_handoff_column_board_value({
+          columnCount: context.columns.length,
+        }),
+      });
+    case 'status-label-boundary':
+      return buildRoadmapPublicHandoffItem({
+        description: m.roadmap_handoff_status_label_boundary_description(),
+        id: context.id,
+        label: m.roadmap_handoff_status_label_boundary_label(),
+        value: m.roadmap_handoff_status_label_boundary_value(),
       });
     case 'activity-assignment-loop':
       return buildRoadmapPublicHandoffTaskItem({
@@ -1286,6 +1332,30 @@ function buildRoadmapPublicHandoffItemView(
           'school-team-workflows'
         ),
       });
+    case 'task-evidence-boundary':
+      return buildRoadmapPublicHandoffItem({
+        description: m.roadmap_handoff_task_evidence_boundary_description(),
+        id: context.id,
+        label: m.roadmap_handoff_task_evidence_boundary_label(),
+        value: m.roadmap_handoff_task_evidence_boundary_value(),
+      });
+    case 'task-next-step-boundary':
+      return buildRoadmapPublicHandoffItem({
+        description: m.roadmap_handoff_task_next_step_boundary_description(),
+        id: context.id,
+        label: m.roadmap_handoff_task_next_step_boundary_label(),
+        value: m.roadmap_handoff_task_next_step_boundary_value(),
+      });
+    case 'hero-action-boundary':
+      return buildRoadmapPublicHandoffItem({
+        description: m.roadmap_handoff_hero_action_boundary_description({
+          createRoute: context.hero.primaryAction.to,
+          templatesRoute: context.hero.secondaryAction.to,
+        }),
+        id: context.id,
+        label: m.roadmap_handoff_hero_action_boundary_label(),
+        value: m.roadmap_handoff_hero_action_boundary_value(),
+      });
     case 'create-route':
       return buildRoadmapPublicHandoffRouteItem({
         action: context.hero.primaryAction,
@@ -1303,6 +1373,17 @@ function buildRoadmapPublicHandoffItemView(
         action: context.validation.action,
         id: context.id,
         label: m.roadmap_handoff_feedback_route_label(),
+      });
+    case 'snapshot-panel':
+      return buildRoadmapPublicHandoffItem({
+        description: m.roadmap_handoff_snapshot_panel_description({
+          snapshotCount: context.snapshots.length,
+        }),
+        id: context.id,
+        label: m.roadmap_handoff_snapshot_panel_label(),
+        value: m.roadmap_handoff_snapshot_panel_value({
+          snapshotCount: context.snapshots.length,
+        }),
       });
     case 'snapshot-live-core':
       return buildRoadmapPublicHandoffSnapshotItem({
@@ -1324,6 +1405,31 @@ function buildRoadmapPublicHandoffItemView(
           context.snapshots,
           'expansion'
         ),
+      });
+    case 'principle-focus-boundary':
+      return buildRoadmapPublicHandoffPrincipleItem({
+        id: context.id,
+        label: m.roadmap_handoff_principle_focus_boundary_label(),
+        principle: getRoadmapPublicHandoffPrinciple(
+          context.principles,
+          'focus'
+        ),
+      });
+    case 'principle-model-boundary':
+      return buildRoadmapPublicHandoffPrincipleItem({
+        id: context.id,
+        label: m.roadmap_handoff_principle_model_boundary_label(),
+        principle: getRoadmapPublicHandoffPrinciple(
+          context.principles,
+          'learning'
+        ),
+      });
+    case 'validation-decision-boundary':
+      return buildRoadmapPublicHandoffItem({
+        description: context.validation.description,
+        id: context.id,
+        label: m.roadmap_handoff_validation_decision_boundary_label(),
+        value: context.validation.title,
       });
     case 'public-copy-boundary':
       return buildRoadmapPublicHandoffItem({
@@ -1443,12 +1549,30 @@ function buildRoadmapPublicHandoffSnapshotItem({
   });
 }
 
+function buildRoadmapPublicHandoffPrincipleItem({
+  id,
+  label,
+  principle,
+}: {
+  id: RoadmapPublicHandoffItemId;
+  label: string;
+  principle: RoadmapPrincipleView;
+}) {
+  return buildRoadmapPublicHandoffItem({
+    description: principle.description,
+    id,
+    label,
+    value: principle.title,
+  });
+}
+
 function buildRoadmapPublicHandoffPrivacyContract(
   itemViews: RoadmapPublicHandoffItemView[]
 ): RoadmapPublicHandoffPrivacyContract {
   return {
     createsAssignmentLinks: false,
     describesCurrentUsableLoop: true,
+    describesPublicRoadmapSurface: true,
     exposesAnswerKeys: false,
     exposesRawAnonymousToken: false,
     exposesSourceMaterialStorageKeys: false,
@@ -1456,9 +1580,15 @@ function buildRoadmapPublicHandoffPrivacyContract(
     exposesTeacherPrivateActivityContent: false,
     itemIds: itemViews.map((itemView) => itemView.id),
     keepsLegacyCopyOut: true,
+    keepsPlannedBetsExploratory: true,
+    mutatesTeacherWorkspace: false,
     readsSourceMaterialFileBytes: false,
+    rendersTaskEvidence: true,
+    rendersTaskNextSteps: true,
+    rendersValidationCriteria: true,
     routeActionsUseSharedConstants: true,
     scope: 'public-roadmap-product-boundary',
+    usesPreparedViewModel: true,
   };
 }
 
@@ -1501,6 +1631,19 @@ function getRoadmapPublicHandoffTask(
   }
 
   return task;
+}
+
+function getRoadmapPublicHandoffPrinciple(
+  principles: RoadmapPrincipleView[],
+  id: RoadmapPrincipleId
+) {
+  const principle = principles.find((candidate) => candidate.id === id);
+
+  if (!principle) {
+    throw new Error(`Missing roadmap principle: ${id}`);
+  }
+
+  return principle;
 }
 
 function buildRoadmapTaskView({

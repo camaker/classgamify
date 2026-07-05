@@ -7094,6 +7094,21 @@ assert.match(
 );
 assert.match(
   publicPageViewSource,
+  /ROADMAP_PUBLIC_HANDOFF_ITEM_IDS = \[(?=[\s\S]*'current-loop')(?=[\s\S]*'roadmap-surface')(?=[\s\S]*'available-count')(?=[\s\S]*'improving-count')(?=[\s\S]*'planned-count')(?=[\s\S]*'column-board')(?=[\s\S]*'status-label-boundary')(?=[\s\S]*'activity-assignment-loop')(?=[\s\S]*'template-foundation')(?=[\s\S]*'ai-draft-capability')(?=[\s\S]*'results-reteach-focus')(?=[\s\S]*'worksheet-delivery-focus')(?=[\s\S]*'worksheet-extraction-boundary')(?=[\s\S]*'school-workflow-boundary')(?=[\s\S]*'task-evidence-boundary')(?=[\s\S]*'task-next-step-boundary')(?=[\s\S]*'hero-action-boundary')(?=[\s\S]*'create-route')(?=[\s\S]*'templates-route')(?=[\s\S]*'feedback-route')(?=[\s\S]*'snapshot-panel')(?=[\s\S]*'snapshot-live-core')(?=[\s\S]*'snapshot-template-depth')(?=[\s\S]*'snapshot-ai-expansion')(?=[\s\S]*'principle-focus-boundary')(?=[\s\S]*'principle-model-boundary')(?=[\s\S]*'validation-decision-boundary')(?=[\s\S]*'public-copy-boundary')(?=[\s\S]*'legacy-copy-guard')(?=[\s\S]*'privacy-guard')/,
+  'Roadmap public handoff should expose stable 30-slice public product-boundary item ids.'
+);
+assert.match(
+  publicPageViewSource,
+  /export type RoadmapPublicHandoffPrivacyContract = \{[\s\S]*createsAssignmentLinks: false;[\s\S]*describesCurrentUsableLoop: true;[\s\S]*describesPublicRoadmapSurface: true;[\s\S]*exposesAnswerKeys: false;[\s\S]*exposesRawAnonymousToken: false;[\s\S]*exposesSourceMaterialStorageKeys: false;[\s\S]*exposesStudentAttemptRecords: false;[\s\S]*exposesTeacherPrivateActivityContent: false;[\s\S]*keepsLegacyCopyOut: true;[\s\S]*keepsPlannedBetsExploratory: true;[\s\S]*mutatesTeacherWorkspace: false;[\s\S]*readsSourceMaterialFileBytes: false;[\s\S]*rendersTaskEvidence: true;[\s\S]*rendersTaskNextSteps: true;[\s\S]*rendersValidationCriteria: true;[\s\S]*routeActionsUseSharedConstants: true;[\s\S]*scope: 'public-roadmap-product-boundary';[\s\S]*usesPreparedViewModel: true;/,
+  'Roadmap public handoff should publish explicit safe public roadmap behavior flags.'
+);
+assert.match(
+  publicPageViewSource,
+  /const principles: RoadmapPrincipleView\[\] = \[[\s\S]*buildRoadmapPublicHandoffView\(\{[\s\S]*principles[\s\S]*case 'principle-focus-boundary'[\s\S]*getRoadmapPublicHandoffPrinciple[\s\S]*case 'principle-model-boundary'/,
+  'Roadmap public handoff should include prepared roadmap principles from the page view model.'
+);
+assert.match(
+  publicPageViewSource,
   /export type RoadmapTaskStatus = 'available' \| 'improving' \| 'planned'/,
   'Roadmap task view models should expose explicit product status states.'
 );
@@ -36077,6 +36092,38 @@ const {
   handoffView: roadmapPublicHandoffView,
   ...roadmapPageViewModel
 } = buildRoadmapPageViewModel();
+assert.deepEqual(ROADMAP_PUBLIC_HANDOFF_ITEM_IDS, [
+  'current-loop',
+  'roadmap-surface',
+  'available-count',
+  'improving-count',
+  'planned-count',
+  'column-board',
+  'status-label-boundary',
+  'activity-assignment-loop',
+  'template-foundation',
+  'ai-draft-capability',
+  'results-reteach-focus',
+  'worksheet-delivery-focus',
+  'worksheet-extraction-boundary',
+  'school-workflow-boundary',
+  'task-evidence-boundary',
+  'task-next-step-boundary',
+  'hero-action-boundary',
+  'create-route',
+  'templates-route',
+  'feedback-route',
+  'snapshot-panel',
+  'snapshot-live-core',
+  'snapshot-template-depth',
+  'snapshot-ai-expansion',
+  'principle-focus-boundary',
+  'principle-model-boundary',
+  'validation-decision-boundary',
+  'public-copy-boundary',
+  'legacy-copy-guard',
+  'privacy-guard',
+]);
 assert.deepEqual(roadmapPageViewModel, {
   columns: [
     {
@@ -36285,10 +36332,68 @@ assert.deepEqual(
   roadmapPublicHandoffView.itemViews.map((itemView) => itemView.id),
   [...ROADMAP_PUBLIC_HANDOFF_ITEM_IDS]
 );
-assert.equal(roadmapPublicHandoffView.itemViews.length, 20);
-assert.equal(
-  roadmapPublicHandoffView.privacy.scope,
-  'public-roadmap-product-boundary'
+assert.equal(roadmapPublicHandoffView.itemViews.length, 30);
+assert.deepEqual(roadmapPublicHandoffView.privacy, {
+  createsAssignmentLinks: false,
+  describesCurrentUsableLoop: true,
+  describesPublicRoadmapSurface: true,
+  exposesAnswerKeys: false,
+  exposesRawAnonymousToken: false,
+  exposesSourceMaterialStorageKeys: false,
+  exposesStudentAttemptRecords: false,
+  exposesTeacherPrivateActivityContent: false,
+  itemIds: roadmapPublicHandoffView.itemViews.map((itemView) => itemView.id),
+  keepsLegacyCopyOut: true,
+  keepsPlannedBetsExploratory: true,
+  mutatesTeacherWorkspace: false,
+  readsSourceMaterialFileBytes: false,
+  rendersTaskEvidence: true,
+  rendersTaskNextSteps: true,
+  rendersValidationCriteria: true,
+  routeActionsUseSharedConstants: true,
+  scope: 'public-roadmap-product-boundary',
+  usesPreparedViewModel: true,
+});
+assert.deepEqual(
+  roadmapPublicHandoffView.itemViews.map((itemView) => [
+    itemView.id,
+    itemView.value,
+  ]),
+  [
+    ['current-loop', 'Activity -> Assignment -> Attempt -> Results'],
+    ['roadmap-surface', '/roadmap'],
+    ['available-count', '3'],
+    ['improving-count', '2'],
+    ['planned-count', '2'],
+    ['column-board', '3 columns'],
+    ['status-label-boundary', 'Prepared status labels'],
+    ['activity-assignment-loop', 'Live'],
+    ['template-foundation', 'Live'],
+    ['ai-draft-capability', 'Live'],
+    ['results-reteach-focus', 'Improving'],
+    ['worksheet-delivery-focus', 'Improving'],
+    ['worksheet-extraction-boundary', 'Exploring'],
+    ['school-workflow-boundary', 'Exploring'],
+    ['task-evidence-boundary', 'Public evidence only'],
+    ['task-next-step-boundary', 'Shared next steps'],
+    ['hero-action-boundary', 'Prepared CTA routes'],
+    ['create-route', Routes.Create],
+    ['templates-route', Routes.Templates],
+    ['feedback-route', Routes.ContactClassroom],
+    ['snapshot-panel', '3 snapshots'],
+    ['snapshot-live-core', 'Usable classroom core'],
+    ['snapshot-template-depth', 'Template depth now'],
+    ['snapshot-ai-expansion', 'AI drafts now, extraction next'],
+    ['principle-focus-boundary', 'Core loop before breadth'],
+    ['principle-model-boundary', 'One content model'],
+    [
+      'validation-decision-boundary',
+      'Every roadmap item needs classroom proof',
+    ],
+    ['public-copy-boundary', 'Prepared product copy'],
+    ['legacy-copy-guard', 'ClassGamify only'],
+    ['privacy-guard', 'Private data hidden'],
+  ]
 );
 assert.deepEqual(buildTeachersPageViewModel(), {
   hero: {
