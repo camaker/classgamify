@@ -2276,6 +2276,11 @@ assert.match(
 );
 assert.match(
   settingsFilesViewSource,
+  /export type SettingsFilesWorkspaceSummaryItemView = \{[\s\S]*ariaLabel: string;[\s\S]*description: string;[\s\S]*id: SettingsFilesWorkspaceSummaryItemId;[\s\S]*label: string;/,
+  'Files settings workspace summary items should expose prepared aria labels.'
+);
+assert.match(
+  settingsFilesViewSource,
   /export function isSettingsFilesEnabled\(\)[\s\S]*websiteConfig\.storage\?\.enable === true/,
   'Files settings feature visibility should be centralized in the settings files view helper.'
 );
@@ -2290,6 +2295,11 @@ assert.match(
   'Files settings view model should prepare localized classroom material boundary copy.'
 );
 assert.match(
+  settingsFilesViewSource,
+  /function buildSettingsFilesWorkspaceSummaryItemView[\s\S]*settings_files_workspace_summary_aria_label\(\{[\s\S]*description,[\s\S]*title: label/,
+  'Files settings view model should build item-level accessible labels from localized copy.'
+);
+assert.match(
   settingsFilesRouteProductSource,
   /const pageView = buildSettingsFilesPageViewModel\(\);[\s\S]*breadcrumbs=\{pageView\.breadcrumbs\}[\s\S]*title=\{pageView\.title\}[\s\S]*FilesWorkspaceSummary[\s\S]*view=\{pageView\.workspaceSummaryView\}[\s\S]*FilesPageContent/,
   'Files settings route should consume the settings files page view model and render the prepared material boundary summary.'
@@ -2301,7 +2311,7 @@ assert.doesNotMatch(
 );
 assert.match(
   filesWorkspaceSummarySource,
-  /view\.itemViews\.map\(\(itemView\) =>[\s\S]*key=\{itemView\.id\}[\s\S]*function FilesWorkspaceSummaryItem[\s\S]*itemView\.label[\s\S]*itemView\.description/,
+  /view\.itemViews\.map\(\(itemView\) =>[\s\S]*key=\{itemView\.id\}[\s\S]*function FilesWorkspaceSummaryItem[\s\S]*aria-label=\{itemView\.ariaLabel\}[\s\S]*itemView\.label[\s\S]*itemView\.description/,
   'Files workspace summary component should render prepared boundary views keyed by stable ids.'
 );
 assert.doesNotMatch(
@@ -10269,6 +10279,7 @@ const filesTableSource = readFileSync(
   'src/components/settings/files/files-table.tsx',
   'utf8'
 );
+const userFilesHookSource = readFileSync('src/hooks/use-user-files.ts', 'utf8');
 assert.doesNotMatch(
   filesPageContentSource,
   /err\.message|error\.message|err instanceof Error|error instanceof Error/,
@@ -10278,6 +10289,31 @@ assert.match(
   filesPageContentSource,
   /toast\.error\(m\.settings_files_upload_error\(\)\)/,
   'Classroom material upload failures should show the localized upload failure message.'
+);
+assert.match(
+  filesPageContentSource,
+  /onError: \(\) => toast\.error\(m\.settings_files_delete_error\(\)\)/,
+  'Classroom material delete failures should show the localized delete failure message.'
+);
+assert.match(
+  filesTableSource,
+  /summary \?\? buildUserFileMaterialSummary\(data\)/,
+  'Settings files table should prefer API full-library summaries over visible page rows.'
+);
+assert.match(
+  filesTableSource,
+  /buildSettingsFilesSourceMaterialHandoffView\(\{[\s\S]*summary: materialSummary,[\s\S]*visibleItemCount: data\.length/,
+  'Settings files table should expose the source-material handoff from table state.'
+);
+assert.match(
+  filesTableSource,
+  /buildSettingsFilesMaterialClassificationHandoffView\(\{[\s\S]*sampleFile: data\[0\],[\s\S]*summary: materialSummary,[\s\S]*visibleItemCount: data\.length/,
+  'Settings files table should expose the material-classification handoff from table state.'
+);
+assert.match(
+  filesTableSource,
+  /try \{[\s\S]*await onUpload\(\{[\s\S]*file: selectedFile,[\s\S]*isPublic,[\s\S]*description: description \|\| undefined,[\s\S]*\}\);[\s\S]*\} catch \{[\s\S]*return;[\s\S]*\}[\s\S]*setSelectedFile\(null\);[\s\S]*setDescription\(''\);[\s\S]*setIsPublic\(false\);[\s\S]*setUploadOpen\(false\);/,
+  'Settings files table should keep upload dialog state intact after failed uploads.'
 );
 assert.match(
   filesTableSource,
@@ -10303,6 +10339,26 @@ assert.doesNotMatch(
   filesTableSource,
   /['"]—['"]/,
   'Settings files table should not hard-code visible empty-value placeholders.'
+);
+assert.match(
+  userFilesHookSource,
+  /queryKey: userFilesKeys\.list\(\{ pageIndex, pageSize \}\)[\s\S]*queryFn: \(\) => listUserFiles\(\{ data: \{ pageIndex, pageSize \} \}\)/,
+  'User files hook should fetch the owner-scoped list with current page state.'
+);
+assert.match(
+  userFilesHookSource,
+  /queryKey: userFilesKeys\.materials\(\{ pageIndex, pageSize \}\)[\s\S]*queryFn: \(\) => listUserFileMaterials\(\{ data: \{ pageIndex, pageSize \} \}\)/,
+  'User file material hook should fetch the sanitized material picker list.'
+);
+assert.match(
+  userFilesHookSource,
+  /deleteUserFile\(\{ data: \{ id \} \}\)[\s\S]*invalidateQueries\(\{ queryKey: userFilesKeys\.all \}\)/,
+  'User file delete mutation should refresh the whole user-file query family.'
+);
+assert.match(
+  userFilesHookSource,
+  /form\.append\('file', params\.file\)[\s\S]*uploadUserFile\(\{ data: form \}\)[\s\S]*invalidateQueries\(\{ queryKey: userFilesKeys\.all \}\)/,
+  'User file upload mutation should use FormData and refresh the file library.'
 );
 const userFilesApiSource = readFileSync('src/api/user-files.ts', 'utf8');
 const userFileQuerySource = readFileSync('src/storage/file-query.ts', 'utf8');
@@ -10371,6 +10427,26 @@ assert.match(
   userFilesApiSource,
   /deleteUserFile[\s\S]*const where = buildUserFileDetailOwnerWhere\(\{[\s\S]*fileId: data\.id,[\s\S]*userId,[\s\S]*\.where\(where\)[\s\S]*delete\(userFiles\)\.where\(where\)/,
   'User file deletion should reuse owner-scoped detail rules for destructive file operations.'
+);
+assert.match(
+  userFilesApiSource,
+  /const summaryItems = await db[\s\S]*select\(\{[\s\S]*contentType: userFiles\.contentType,[\s\S]*filename: userFiles\.filename,[\s\S]*isPublic: userFiles\.isPublic,[\s\S]*originalName: userFiles\.originalName,[\s\S]*size: userFiles\.size,[\s\S]*\}\)[\s\S]*where\(where\)[\s\S]*summary: buildUserFileMaterialSummary\(summaryItems\)/,
+  'User file list API should summarize all owner rows, not only the visible page.'
+);
+assert.match(
+  userFilesApiSource,
+  /listUserFileMaterials[\s\S]*select\(\{[\s\S]*contentType: userFiles\.contentType,[\s\S]*filename: userFiles\.filename,[\s\S]*id: userFiles\.id,[\s\S]*originalName: userFiles\.originalName,[\s\S]*size: userFiles\.size,[\s\S]*\}\)[\s\S]*where\(where\)/,
+  'User file materials API should expose only safe picker fields.'
+);
+assert.doesNotMatch(
+  userFilesApiSource,
+  /listUserFileMaterials[\s\S]*r2Key: userFiles\.r2Key|listUserFileMaterials[\s\S]*isPublic: userFiles\.isPublic|listUserFileMaterials[\s\S]*description: userFiles\.description/,
+  'User file materials API should not expose storage keys, access flags, or private notes.'
+);
+assert.match(
+  userFilesApiSource,
+  /const publicFolder = isPublicFolder\(data\.folder\);[\s\S]*userId: publicFolder \? undefined : \(userId \?\? undefined\)[\s\S]*if \(!publicFolder && userId && result\.metadata\)/,
+  'User file upload API should persist metadata only for owner-scoped files.'
 );
 assert.doesNotMatch(
   userFilesApiSource,

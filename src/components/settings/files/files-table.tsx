@@ -334,11 +334,15 @@ export function FilesTable({
   });
   const handleUpload = async () => {
     if (!selectedFile) return;
-    await onUpload({
-      file: selectedFile,
-      isPublic,
-      description: description || undefined,
-    });
+    try {
+      await onUpload({
+        file: selectedFile,
+        isPublic,
+        description: description || undefined,
+      });
+    } catch {
+      return;
+    }
     setSelectedFile(null);
     setDescription('');
     setIsPublic(false);
