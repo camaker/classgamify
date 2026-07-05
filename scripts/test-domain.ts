@@ -470,6 +470,7 @@ import {
   buildPricingPageViewModel,
   buildRoadmapPageViewModel,
   buildTeachersPageViewModel,
+  HOME_PAGE_PRODUCT_LOOP_HANDOFF_ITEM_IDS,
   ROADMAP_PUBLIC_HANDOFF_ITEM_IDS,
 } from '@/pages/public-page-view';
 import {
@@ -6469,7 +6470,7 @@ assert.match(
 );
 assert.match(
   publicPageViewSource,
-  /export function buildHomePageViewModel\(\{[\s\S]*preview = buildHomePageStarterPreview\(\)[\s\S]*preview\?: HomePagePreviewView;[\s\S]*featureSection:[\s\S]*preview,[\s\S]*signalPanel:[\s\S]*signals:/,
+  /export function buildHomePageViewModel\(\{[\s\S]*preview = buildHomePageStarterPreview\(\)[\s\S]*preview\?: HomePagePreviewView;[\s\S]*const featureSection = \{[\s\S]*const signalPanel = \{[\s\S]*const signals = \[[\s\S]*handoffView: buildHomePageProductLoopHandoffView\(\{[\s\S]*features(?:,|: features)[\s\S]*featureSection(?:,|: featureSection)[\s\S]*hero(?:,|: hero)[\s\S]*preview(?:,|: preview)[\s\S]*signalPanel(?:,|: signalPanel)[\s\S]*signals(?:,|: signals)/,
   'Home page view model should own the default starter preview and semantic section composition.'
 );
 assert.match(
@@ -33929,7 +33930,14 @@ assert.deepEqual(
     source: 'starter-preview',
   }
 );
-assert.deepEqual(buildHomePageViewModel({ preview: homePageStarterPreview }), {
+const homePageView = buildHomePageViewModel({
+  preview: homePageStarterPreview,
+});
+const {
+  handoffView: homePageHandoffView,
+  ...homePageVisibleView
+} = homePageView;
+assert.deepEqual(homePageVisibleView, {
   features: [
     {
       ariaLabel:
@@ -34032,6 +34040,35 @@ assert.deepEqual(buildHomePageViewModel({ preview: homePageStarterPreview }), {
       value: 'Attempt log',
     },
   ],
+});
+assert.deepEqual(
+  homePageHandoffView.itemViews.map((itemView) => itemView.id),
+  [...HOME_PAGE_PRODUCT_LOOP_HANDOFF_ITEM_IDS]
+);
+assert.equal(homePageHandoffView.itemViews.length, 30);
+assert.equal(
+  homePageHandoffView.itemViews.every(
+    (itemView) =>
+      Boolean(itemView.ariaLabel) &&
+      Boolean(itemView.description) &&
+      Boolean(itemView.label) &&
+      Boolean(itemView.value)
+  ),
+  true
+);
+assert.deepEqual(homePageHandoffView.privacy, {
+  createsAssignmentLinks: false,
+  exposesAnswerKeys: false,
+  exposesRawAnonymousToken: false,
+  exposesSourceMaterialStorageKeys: false,
+  exposesStudentAttemptRecords: false,
+  exposesTeacherPrivateActivityContent: false,
+  itemIds: [...HOME_PAGE_PRODUCT_LOOP_HANDOFF_ITEM_IDS],
+  keepsLegacyEntrypointsOut: true,
+  mutatesTeacherData: false,
+  previewIsStarterOnly: true,
+  routeActionsUseSharedConstants: true,
+  scope: 'public-home-product-loop',
 });
 assert.equal(buildHomePageViewModel().preview.source, 'starter-preview');
 const contactPageView = buildContactPageViewModel();

@@ -6417,7 +6417,7 @@
   "open_box_reveal_handoff_student_identity_label": "学生身份",
   "open_box_reveal_handoff_submission_description": "翻盒仍按每个已作答运行题目提交一条规范化答案行。",
   "open_box_reveal_handoff_submission_label": "提交契约",
-  "open_box_reveal_handoff_surface_description": "runner surface 是 open-box，而不是选择题或 worksheet renderer。",
+  "open_box_reveal_handoff_surface_description": "运行界面是翻盒展示，而不是选择题或工作表渲染器。",
   "open_box_reveal_handoff_surface_label": "Runner surface",
   "open_box_reveal_handoff_teacher_review_value": "教师结果不变",
   "open_box_reveal_handoff_template_description": "模板类型会为翻盒 runner 保留。",
