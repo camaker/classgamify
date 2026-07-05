@@ -1,6 +1,9 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import { buildActivityLibraryPageViewModel } from '@/activities/library-view';
+import {
+  ACTIVITY_LIBRARY_PAGE_HANDOFF_ITEM_IDS,
+  buildActivityLibraryPageViewModel,
+} from '@/activities/library-view';
 import { summarizeActivityLibrary } from '@/activities/library-summary';
 import type { ActivityContent, ActivityVisibility } from '@/activities/types';
 import { overwriteGetLocale } from '@/locale/paraglide/runtime';
@@ -77,38 +80,7 @@ test('activity library page exposes a 30-slice owner-scoped handoff', () => {
   const handoffView = pageView.handoffView;
   const itemIds = handoffView.itemViews.map((item) => item.id);
 
-  assert.deepEqual(itemIds, [
-    'owner-scope',
-    'summary-total',
-    'summary-template-coverage',
-    'summary-remix-ready',
-    'summary-source-extraction',
-    'scope-range',
-    'scope-page',
-    'scope-status',
-    'scope-template',
-    'scope-source',
-    'scope-search',
-    'source-capability-audio-extraction',
-    'source-capability-worksheet-extraction',
-    'source-capability-spreadsheet-import',
-    'status-active',
-    'status-archived',
-    'filter-summary',
-    'visible-page-items',
-    'visible-publish-ready',
-    'visible-publish-blocked',
-    'visible-duplicate-ready',
-    'visible-duplicate-blocked',
-    'visible-remix-ready',
-    'visible-remix-blocked',
-    'visible-archive-ready',
-    'visible-restore-ready',
-    'visible-source-material-activities',
-    'visible-extractable-source-activities',
-    'pagination',
-    'starter-preview',
-  ]);
+  assert.deepEqual(itemIds, [...ACTIVITY_LIBRARY_PAGE_HANDOFF_ITEM_IDS]);
   assert.equal(new Set(itemIds).size, 30);
   assert.equal(
     handoffView.itemViews.every(

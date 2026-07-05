@@ -138,6 +138,7 @@ import {
 } from '@/activities/library-query';
 import {
   ACTIVITY_LIBRARY_COMPATIBILITY_LIMITS,
+  ACTIVITY_LIBRARY_PAGE_HANDOFF_ITEM_IDS,
   activityLibraryCardCopy,
   activityLibraryHeroCopy,
   activityLibraryPageCopy,
@@ -31177,6 +31178,52 @@ assert.doesNotMatch(
   'Activity library summary metrics should not count starter-preview activities.'
 );
 assert.match(
+  activityLibraryViewSource,
+  /export const ACTIVITY_LIBRARY_PAGE_HANDOFF_ITEM_IDS = \[[\s\S]*'owner-scope'[\s\S]*'summary-total'[\s\S]*'scope-range'[\s\S]*'source-capability-audio-extraction'[\s\S]*'status-active'[\s\S]*'visible-page-items'[\s\S]*'pagination'[\s\S]*'starter-preview'[\s\S]*\] as const;[\s\S]*export type ActivityLibraryPageHandoffItemId =[\s\S]*typeof ACTIVITY_LIBRARY_PAGE_HANDOFF_ITEM_IDS[\s\S]*export type ActivityLibraryPageHandoffPrivacyView = \{[\s\S]*broadensBeyondOwner: false;[\s\S]*countsStarterPreviewAsOwned: false;[\s\S]*exposesPrivateActivityContent: false;[\s\S]*exposesSourceMaterialFileIds: false;[\s\S]*exposesSourceMaterialStorageKeys: false;/,
+  'Activity library page handoff should derive its typed owner-scoped library contract from a stable 30-slice id list with explicit privacy flags.'
+);
+assert.deepEqual(
+  [...ACTIVITY_LIBRARY_PAGE_HANDOFF_ITEM_IDS],
+  [
+    'owner-scope',
+    'summary-total',
+    'summary-template-coverage',
+    'summary-remix-ready',
+    'summary-source-extraction',
+    'scope-range',
+    'scope-page',
+    'scope-status',
+    'scope-template',
+    'scope-source',
+    'scope-search',
+    'source-capability-audio-extraction',
+    'source-capability-worksheet-extraction',
+    'source-capability-spreadsheet-import',
+    'status-active',
+    'status-archived',
+    'filter-summary',
+    'visible-page-items',
+    'visible-publish-ready',
+    'visible-publish-blocked',
+    'visible-duplicate-ready',
+    'visible-duplicate-blocked',
+    'visible-remix-ready',
+    'visible-remix-blocked',
+    'visible-archive-ready',
+    'visible-restore-ready',
+    'visible-source-material-activities',
+    'visible-extractable-source-activities',
+    'pagination',
+    'starter-preview',
+  ],
+  'Activity library handoff should expose exactly 30 stable slice ids.'
+);
+assert.match(
+  activityLibraryViewSource,
+  /const candidateItemViews: ActivityLibraryPageHandoffItemView\[\] = \[[\s\S]*const itemViewById = new Map[\s\S]*ACTIVITY_LIBRARY_PAGE_HANDOFF_ITEM_IDS\.map\(\(id\) =>[\s\S]*Missing activity library handoff item/,
+  'Activity library handoff should order runtime item views through the stable id list and fail on missing slices.'
+);
+assert.match(
   dashboardActivitiesRouteSource,
   /buildActivityLibraryFilterRouteSearch/,
   'Activity dashboard route should update filters through the activity-domain filter route helper.'
@@ -45585,6 +45632,156 @@ assert.deepEqual(
     totalPages: 3,
   }
 );
+const filteredActivityLibraryHandoffValues = new Map(
+  filteredActivityLibraryPageView.handoffView.itemViews.map((item) => [
+    item.id,
+    item.value,
+  ])
+);
+assert.deepEqual(
+  filteredActivityLibraryPageView.handoffView.itemViews.map((item) => item.id),
+  [...ACTIVITY_LIBRARY_PAGE_HANDOFF_ITEM_IDS],
+  'Activity library page view-model should expose the stable 30-slice handoff order.'
+);
+assert.deepEqual(filteredActivityLibraryPageView.handoffView.privacy, {
+  broadensBeyondOwner: false,
+  countsStarterPreviewAsOwned: false,
+  exposesDerivativeDraftPayloads: false,
+  exposesPrivateActivityContent: false,
+  exposesSourceMaterialFileIds: false,
+  exposesSourceMaterialStorageKeys: false,
+  itemIds: [...ACTIVITY_LIBRARY_PAGE_HANDOFF_ITEM_IDS],
+});
+assert.equal(filteredActivityLibraryHandoffValues.get('summary-total'), '2');
+assert.equal(
+  filteredActivityLibraryHandoffValues.get('summary-template-coverage'),
+  `2/${ACTIVITY_TEMPLATE_TYPES.length}`
+);
+assert.equal(
+  filteredActivityLibraryHandoffValues.get('summary-remix-ready'),
+  '2'
+);
+assert.equal(
+  filteredActivityLibraryHandoffValues.get('summary-source-extraction'),
+  String(librarySummary.totalExtractableSourceMaterials)
+);
+assert.equal(
+  filteredActivityLibraryHandoffValues.get('scope-range'),
+  '25-25 of 31'
+);
+assert.equal(
+  filteredActivityLibraryHandoffValues.get('scope-page'),
+  'Page 3 of 3'
+);
+assert.equal(
+  filteredActivityLibraryHandoffValues.get('scope-status'),
+  'Archived'
+);
+assert.equal(filteredActivityLibraryHandoffValues.get('scope-template'), 'Quiz');
+assert.equal(
+  filteredActivityLibraryHandoffValues.get('scope-source'),
+  'Worksheet'
+);
+assert.equal(
+  filteredActivityLibraryHandoffValues.get('scope-search'),
+  'Food words'
+);
+assert.equal(
+  filteredActivityLibraryHandoffValues.get(
+    'source-capability-audio-extraction'
+  ),
+  '1'
+);
+assert.equal(
+  filteredActivityLibraryHandoffValues.get(
+    'source-capability-worksheet-extraction'
+  ),
+  '1'
+);
+assert.equal(
+  filteredActivityLibraryHandoffValues.get(
+    'source-capability-spreadsheet-import'
+  ),
+  '1'
+);
+assert.equal(filteredActivityLibraryHandoffValues.get('status-active'), '1');
+assert.equal(filteredActivityLibraryHandoffValues.get('status-archived'), '1');
+assert.equal(
+  filteredActivityLibraryHandoffValues.get('filter-summary'),
+  '31 matches'
+);
+assert.equal(
+  filteredActivityLibraryHandoffValues.get('visible-page-items'),
+  '1 visible activities'
+);
+assert.equal(
+  filteredActivityLibraryHandoffValues.get('visible-publish-ready'),
+  '0 visible activities'
+);
+assert.equal(
+  filteredActivityLibraryHandoffValues.get('visible-publish-blocked'),
+  '0 visible activities'
+);
+assert.equal(
+  filteredActivityLibraryHandoffValues.get('visible-duplicate-ready'),
+  '0 visible activities'
+);
+assert.equal(
+  filteredActivityLibraryHandoffValues.get('visible-duplicate-blocked'),
+  '0 visible activities'
+);
+assert.equal(
+  filteredActivityLibraryHandoffValues.get('visible-remix-ready'),
+  '0 visible activities'
+);
+assert.equal(
+  filteredActivityLibraryHandoffValues.get('visible-remix-blocked'),
+  '0 visible activities'
+);
+assert.equal(
+  filteredActivityLibraryHandoffValues.get('visible-archive-ready'),
+  '0 visible activities'
+);
+assert.equal(
+  filteredActivityLibraryHandoffValues.get('visible-restore-ready'),
+  '0 visible activities'
+);
+assert.equal(
+  filteredActivityLibraryHandoffValues.get(
+    'visible-source-material-activities'
+  ),
+  '0 visible activities'
+);
+assert.equal(
+  filteredActivityLibraryHandoffValues.get(
+    'visible-extractable-source-activities'
+  ),
+  '0 visible activities'
+);
+assert.equal(
+  filteredActivityLibraryHandoffValues.get('pagination'),
+  'Page 3 of 3; 31 owned activities'
+);
+assert.equal(
+  filteredActivityLibraryHandoffValues.get('starter-preview'),
+  '0 starter previews'
+);
+for (const privateActivityLibraryValue of [
+  'persisted-activity-1',
+  'file-worksheet-library',
+  'file-spreadsheet-library',
+  'library worksheet.pdf',
+  'library words.xlsx',
+  'Answer: rain',
+]) {
+  assert.equal(
+    JSON.stringify(filteredActivityLibraryPageView.handoffView).includes(
+      privateActivityLibraryValue
+    ),
+    false,
+    `Activity library handoff leaked private text: ${privateActivityLibraryValue}`
+  );
+}
 assert.equal(
   buildActivityLibraryPageViewModel({
     data: {

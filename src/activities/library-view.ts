@@ -336,37 +336,41 @@ export type ActivityLibraryPageScopeView = {
   summary: string;
 };
 
+export const ACTIVITY_LIBRARY_PAGE_HANDOFF_ITEM_IDS = [
+  'owner-scope',
+  'summary-total',
+  'summary-template-coverage',
+  'summary-remix-ready',
+  'summary-source-extraction',
+  'scope-range',
+  'scope-page',
+  'scope-status',
+  'scope-template',
+  'scope-source',
+  'scope-search',
+  'source-capability-audio-extraction',
+  'source-capability-worksheet-extraction',
+  'source-capability-spreadsheet-import',
+  'status-active',
+  'status-archived',
+  'filter-summary',
+  'visible-page-items',
+  'visible-publish-ready',
+  'visible-publish-blocked',
+  'visible-duplicate-ready',
+  'visible-duplicate-blocked',
+  'visible-remix-ready',
+  'visible-remix-blocked',
+  'visible-archive-ready',
+  'visible-restore-ready',
+  'visible-source-material-activities',
+  'visible-extractable-source-activities',
+  'pagination',
+  'starter-preview',
+] as const;
+
 export type ActivityLibraryPageHandoffItemId =
-  | 'filter-summary'
-  | 'owner-scope'
-  | 'pagination'
-  | 'scope-page'
-  | 'scope-range'
-  | 'scope-search'
-  | 'scope-source'
-  | 'scope-status'
-  | 'scope-template'
-  | 'source-capability-audio-extraction'
-  | 'source-capability-spreadsheet-import'
-  | 'source-capability-worksheet-extraction'
-  | 'starter-preview'
-  | 'status-active'
-  | 'status-archived'
-  | 'summary-remix-ready'
-  | 'summary-source-extraction'
-  | 'summary-template-coverage'
-  | 'summary-total'
-  | 'visible-archive-ready'
-  | 'visible-duplicate-blocked'
-  | 'visible-duplicate-ready'
-  | 'visible-extractable-source-activities'
-  | 'visible-page-items'
-  | 'visible-publish-blocked'
-  | 'visible-publish-ready'
-  | 'visible-remix-blocked'
-  | 'visible-remix-ready'
-  | 'visible-restore-ready'
-  | 'visible-source-material-activities';
+  (typeof ACTIVITY_LIBRARY_PAGE_HANDOFF_ITEM_IDS)[number];
 
 export type ActivityLibraryPageHandoffItemView = {
   ariaLabel: string;
@@ -1278,7 +1282,7 @@ function buildActivityLibraryPageHandoffView({
     activities,
     libraryStatus,
   });
-  const itemViews: ActivityLibraryPageHandoffItemView[] = [
+  const candidateItemViews: ActivityLibraryPageHandoffItemView[] = [
     buildActivityLibraryPageHandoffItem({
       description: m.activity_library_handoff_owner_scope_description(),
       id: 'owner-scope',
@@ -1358,6 +1362,19 @@ function buildActivityLibraryPageHandoffView({
       }),
     }),
   ];
+
+  const itemViewById = new Map(
+    candidateItemViews.map((itemView) => [itemView.id, itemView])
+  );
+  const itemViews = ACTIVITY_LIBRARY_PAGE_HANDOFF_ITEM_IDS.map((id) => {
+    const itemView = itemViewById.get(id);
+
+    if (!itemView) {
+      throw new Error(`Missing activity library handoff item: ${id}`);
+    }
+
+    return itemView;
+  });
 
   return {
     description: m.activity_library_handoff_description(),
