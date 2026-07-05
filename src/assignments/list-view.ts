@@ -104,37 +104,41 @@ export type AssignmentListSearchPanelView = {
   statusOptions: AssignmentListControlOption[];
 };
 
+export const ASSIGNMENT_LIST_PAGE_HANDOFF_ITEM_IDS = [
+  'owner-scope',
+  'summary-total',
+  'summary-open',
+  'summary-completions',
+  'summary-average',
+  'scope-range',
+  'scope-page',
+  'scope-status',
+  'scope-search',
+  'status-open',
+  'status-closed',
+  'status-expired',
+  'status-draft',
+  'filter-summary',
+  'visible-page-items',
+  'visible-open-links',
+  'visible-closed-links',
+  'visible-expired-links',
+  'visible-draft-assignments',
+  'visible-copy-ready',
+  'visible-copy-blocked',
+  'visible-preview-ready',
+  'visible-print-ready',
+  'visible-results-ready',
+  'visible-result-evidence',
+  'pagination',
+  'published-share-context',
+  'distribution-copy-link',
+  'distribution-preview-link',
+  'distribution-review-results',
+] as const;
+
 export type AssignmentListPageHandoffItemId =
-  | 'distribution-copy-link'
-  | 'distribution-preview-link'
-  | 'distribution-review-results'
-  | 'filter-summary'
-  | 'owner-scope'
-  | 'pagination'
-  | 'published-share-context'
-  | 'scope-page'
-  | 'scope-range'
-  | 'scope-search'
-  | 'scope-status'
-  | 'status-closed'
-  | 'status-draft'
-  | 'status-expired'
-  | 'status-open'
-  | 'summary-average'
-  | 'summary-completions'
-  | 'summary-open'
-  | 'summary-total'
-  | 'visible-closed-links'
-  | 'visible-copy-blocked'
-  | 'visible-copy-ready'
-  | 'visible-draft-assignments'
-  | 'visible-expired-links'
-  | 'visible-open-links'
-  | 'visible-page-items'
-  | 'visible-preview-ready'
-  | 'visible-print-ready'
-  | 'visible-result-evidence'
-  | 'visible-results-ready';
+  (typeof ASSIGNMENT_LIST_PAGE_HANDOFF_ITEM_IDS)[number];
 
 export type AssignmentListPageHandoffItemView = {
   ariaLabel: string;
@@ -1020,7 +1024,7 @@ function buildAssignmentListPageHandoffView<
     publishedPanelContext,
   });
   const visibleCardSummary = summarizeAssignmentListVisibleCards(assignments);
-  const itemViews: AssignmentListPageHandoffItemView[] = [
+  const candidateItemViews: AssignmentListPageHandoffItemView[] = [
     buildAssignmentListPageHandoffItem({
       description: m.assignment_list_handoff_owner_scope_description(),
       id: 'owner-scope',
@@ -1098,6 +1102,19 @@ function buildAssignmentListPageHandoffView<
       })
     ),
   ];
+
+  const itemViewById = new Map(
+    candidateItemViews.map((itemView) => [itemView.id, itemView])
+  );
+  const itemViews = ASSIGNMENT_LIST_PAGE_HANDOFF_ITEM_IDS.map((id) => {
+    const itemView = itemViewById.get(id);
+
+    if (!itemView) {
+      throw new Error(`Missing assignment list handoff item: ${id}`);
+    }
+
+    return itemView;
+  });
 
   return {
     description: m.assignment_list_handoff_description(),

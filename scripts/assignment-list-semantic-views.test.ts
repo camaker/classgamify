@@ -1,6 +1,7 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 import {
+  ASSIGNMENT_LIST_PAGE_HANDOFF_ITEM_IDS,
   buildAssignmentListPageViewModel,
   buildAssignmentListStarterPreview,
 } from '@/assignments/list-view';
@@ -63,38 +64,7 @@ test('assignment list page exposes a 30-slice distribution handoff', () => {
   const handoffView = pageView.handoffView;
   const itemIds = handoffView.itemViews.map((item) => item.id);
 
-  assert.deepEqual(itemIds, [
-    'owner-scope',
-    'summary-total',
-    'summary-open',
-    'summary-completions',
-    'summary-average',
-    'scope-range',
-    'scope-page',
-    'scope-status',
-    'scope-search',
-    'status-open',
-    'status-closed',
-    'status-expired',
-    'status-draft',
-    'filter-summary',
-    'visible-page-items',
-    'visible-open-links',
-    'visible-closed-links',
-    'visible-expired-links',
-    'visible-draft-assignments',
-    'visible-copy-ready',
-    'visible-copy-blocked',
-    'visible-preview-ready',
-    'visible-print-ready',
-    'visible-results-ready',
-    'visible-result-evidence',
-    'pagination',
-    'published-share-context',
-    'distribution-copy-link',
-    'distribution-preview-link',
-    'distribution-review-results',
-  ]);
+  assert.deepEqual(itemIds, [...ASSIGNMENT_LIST_PAGE_HANDOFF_ITEM_IDS]);
   assert.equal(new Set(itemIds).size, 30);
   assert.equal(
     handoffView.itemViews.every(

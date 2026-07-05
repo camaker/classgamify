@@ -698,6 +698,7 @@ import {
   normalizeAssignmentListSummaryCount,
 } from '@/assignments/list-summary';
 import {
+  ASSIGNMENT_LIST_PAGE_HANDOFF_ITEM_IDS,
   assignmentListActionCopy,
   assignmentListPageCopy,
   assignmentListPublishedPanelCopy,
@@ -32334,8 +32335,49 @@ assert.doesNotMatch(
 );
 assert.match(
   assignmentListViewSource,
-  /export type AssignmentListPageHandoffItemId =(?=[\s\S]*'owner-scope')(?=[\s\S]*'summary-total')(?=[\s\S]*'scope-range')(?=[\s\S]*'status-open')(?=[\s\S]*'published-share-context')(?=[\s\S]*'distribution-copy-link')[\s\S]*export type AssignmentListPageHandoffPrivacyView = \{[\s\S]*broadensBeyondOwner: false;[\s\S]*countsStarterPreviewAsOwned: false;[\s\S]*exposesRawAnonymousToken: false;[\s\S]*exposesStudentAnswerText: false;[\s\S]*export type AssignmentListPageHandoffView = \{/,
-  'Assignment list page handoff should expose a typed owner-scoped distribution contract with explicit privacy flags.'
+  /export const ASSIGNMENT_LIST_PAGE_HANDOFF_ITEM_IDS = \[[\s\S]*'owner-scope'[\s\S]*'summary-total'[\s\S]*'scope-range'[\s\S]*'status-open'[\s\S]*'published-share-context'[\s\S]*'distribution-copy-link'[\s\S]*'distribution-review-results'[\s\S]*\] as const;[\s\S]*export type AssignmentListPageHandoffItemId =[\s\S]*typeof ASSIGNMENT_LIST_PAGE_HANDOFF_ITEM_IDS[\s\S]*export type AssignmentListPageHandoffPrivacyView = \{[\s\S]*broadensBeyondOwner: false;[\s\S]*countsStarterPreviewAsOwned: false;[\s\S]*exposesRawAnonymousToken: false;[\s\S]*exposesStudentAnswerText: false;[\s\S]*export type AssignmentListPageHandoffView = \{/,
+  'Assignment list page handoff should derive its typed owner-scoped distribution contract from a stable 30-slice id list with explicit privacy flags.'
+);
+assert.deepEqual(
+  [...ASSIGNMENT_LIST_PAGE_HANDOFF_ITEM_IDS],
+  [
+    'owner-scope',
+    'summary-total',
+    'summary-open',
+    'summary-completions',
+    'summary-average',
+    'scope-range',
+    'scope-page',
+    'scope-status',
+    'scope-search',
+    'status-open',
+    'status-closed',
+    'status-expired',
+    'status-draft',
+    'filter-summary',
+    'visible-page-items',
+    'visible-open-links',
+    'visible-closed-links',
+    'visible-expired-links',
+    'visible-draft-assignments',
+    'visible-copy-ready',
+    'visible-copy-blocked',
+    'visible-preview-ready',
+    'visible-print-ready',
+    'visible-results-ready',
+    'visible-result-evidence',
+    'pagination',
+    'published-share-context',
+    'distribution-copy-link',
+    'distribution-preview-link',
+    'distribution-review-results',
+  ],
+  'Assignment list handoff should expose exactly 30 stable slice ids.'
+);
+assert.match(
+  assignmentListViewSource,
+  /const candidateItemViews: AssignmentListPageHandoffItemView\[\] = \[[\s\S]*const itemViewById = new Map[\s\S]*ASSIGNMENT_LIST_PAGE_HANDOFF_ITEM_IDS\.map\(\(id\) =>[\s\S]*Missing assignment list handoff item/,
+  'Assignment list handoff should order runtime item views through the stable id list and fail on missing slices.'
 );
 assert.match(
   assignmentListViewSource,
@@ -40419,6 +40461,127 @@ assert.deepEqual(
     totalPages: 3,
   }
 );
+const filteredAssignmentListHandoffValues = new Map(
+  filteredAssignmentListPageView.handoffView.itemViews.map((item) => [
+    item.id,
+    item.value,
+  ])
+);
+assert.deepEqual(
+  filteredAssignmentListPageView.handoffView.itemViews.map((item) => item.id),
+  [...ASSIGNMENT_LIST_PAGE_HANDOFF_ITEM_IDS],
+  'Assignment list page view-model should expose the stable 30-slice handoff order.'
+);
+assert.deepEqual(filteredAssignmentListPageView.handoffView.privacy, {
+  broadensBeyondOwner: false,
+  countsStarterPreviewAsOwned: false,
+  exposesInternalAssignmentIds: false,
+  exposesInternalOwnerId: false,
+  exposesPublicRuntimeContent: false,
+  exposesRawAnonymousToken: false,
+  exposesResultExportRows: false,
+  exposesSourceMaterialStorageKeys: false,
+  exposesStudentAnswerText: false,
+  exposesTeacherOnlyAnswers: false,
+  itemIds: [...ASSIGNMENT_LIST_PAGE_HANDOFF_ITEM_IDS],
+});
+assert.equal(filteredAssignmentListHandoffValues.get('summary-total'), '1');
+assert.equal(filteredAssignmentListHandoffValues.get('summary-open'), '1');
+assert.equal(
+  filteredAssignmentListHandoffValues.get('summary-completions'),
+  '9'
+);
+assert.equal(
+  filteredAssignmentListHandoffValues.get('summary-average'),
+  '76%'
+);
+assert.equal(
+  filteredAssignmentListHandoffValues.get('scope-range'),
+  '25-25 of 31'
+);
+assert.equal(
+  filteredAssignmentListHandoffValues.get('scope-page'),
+  'Page 3 of 3'
+);
+assert.equal(filteredAssignmentListHandoffValues.get('scope-status'), 'Open');
+assert.equal(
+  filteredAssignmentListHandoffValues.get('scope-search'),
+  'Week 1'
+);
+assert.equal(filteredAssignmentListHandoffValues.get('status-open'), '1');
+assert.equal(filteredAssignmentListHandoffValues.get('status-closed'), '0');
+assert.equal(filteredAssignmentListHandoffValues.get('status-expired'), '0');
+assert.equal(filteredAssignmentListHandoffValues.get('status-draft'), '0');
+assert.equal(
+  filteredAssignmentListHandoffValues.get('filter-summary'),
+  '31 matches'
+);
+assert.equal(
+  filteredAssignmentListHandoffValues.get('visible-page-items'),
+  '1 visible assignments'
+);
+assert.equal(
+  filteredAssignmentListHandoffValues.get('visible-open-links'),
+  '1 visible assignments'
+);
+assert.equal(
+  filteredAssignmentListHandoffValues.get('visible-copy-ready'),
+  '1 visible assignments'
+);
+assert.equal(
+  filteredAssignmentListHandoffValues.get('visible-copy-blocked'),
+  '0 visible assignments'
+);
+assert.equal(
+  filteredAssignmentListHandoffValues.get('visible-preview-ready'),
+  '1 visible assignments'
+);
+assert.equal(
+  filteredAssignmentListHandoffValues.get('visible-print-ready'),
+  '1 visible assignments'
+);
+assert.equal(
+  filteredAssignmentListHandoffValues.get('visible-results-ready'),
+  '1 visible assignments'
+);
+assert.equal(
+  filteredAssignmentListHandoffValues.get('visible-result-evidence'),
+  '1 visible assignments'
+);
+assert.equal(
+  filteredAssignmentListHandoffValues.get('pagination'),
+  'Page 3 of 3; 31 teacher assignments'
+);
+assert.equal(
+  filteredAssignmentListHandoffValues.get('published-share-context'),
+  'Ready: /play/share-1'
+);
+assert.equal(
+  filteredAssignmentListHandoffValues.get('distribution-copy-link'),
+  'Ready now'
+);
+assert.equal(
+  filteredAssignmentListHandoffValues.get('distribution-preview-link'),
+  'Ready now'
+);
+assert.equal(
+  filteredAssignmentListHandoffValues.get('distribution-review-results'),
+  'After submissions'
+);
+for (const privateAssignmentListValue of [
+  'persisted-assignment-1',
+  'raw-anonymous-token',
+  'private/source/storage-key',
+  'SECRET_STUDENT_ANSWER',
+]) {
+  assert.equal(
+    JSON.stringify(filteredAssignmentListPageView.handoffView).includes(
+      privateAssignmentListValue
+    ),
+    false,
+    `Assignment list handoff leaked private text: ${privateAssignmentListValue}`
+  );
+}
 assert.deepEqual(
   buildAssignmentListCardStats({
     averageScore: 83,
