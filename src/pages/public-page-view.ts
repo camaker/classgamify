@@ -301,6 +301,7 @@ export type RoadmapPublicHandoffView = {
 };
 
 export type TeachersPageViewModel = {
+  handoffView: TeachersPageHandoffView;
   hero: TeachersHeroView;
   schoolCta: TeachersSchoolCtaView;
   templatePanel: TeachersTemplatePanelView;
@@ -308,6 +309,73 @@ export type TeachersPageViewModel = {
   useCases: TeachersPageItemView<TeachersPageUseCaseId>[];
   workflowSection: TeachersPageSectionView;
   workflow: TeachersPageItemView<TeachersPageWorkflowId>[];
+};
+
+export const TEACHERS_PAGE_HANDOFF_ITEM_IDS = [
+  'teachers-route',
+  'teacher-audience',
+  'hero-positioning',
+  'primary-create-action',
+  'secondary-contact-action',
+  'workflow-section',
+  'workflow-draft',
+  'workflow-publish',
+  'workflow-share',
+  'use-case-section',
+  'use-case-classrooms',
+  'use-case-games',
+  'use-case-results',
+  'template-panel',
+  'template-count',
+  'template-classroom-mode-label',
+  'template-mode-coverage',
+  'template-quiz',
+  'template-match-up',
+  'template-group-sort',
+  'template-fill-blank',
+  'template-listening',
+  'template-matching-pairs',
+  'template-line-match',
+  'template-open-box',
+  'school-cta',
+  'school-contact-route',
+  'activity-assignment-loop',
+  'legacy-copy-guard',
+  'privacy-guard',
+] as const;
+
+export type TeachersPageHandoffItemId =
+  (typeof TEACHERS_PAGE_HANDOFF_ITEM_IDS)[number];
+
+export type TeachersPageHandoffItemView = {
+  ariaLabel: string;
+  description: string;
+  id: TeachersPageHandoffItemId;
+  label: string;
+  value: string;
+};
+
+export type TeachersPageHandoffPrivacyContract = {
+  createsAssignmentLinks: false;
+  exposesAnswerKeys: false;
+  exposesRawAnonymousToken: false;
+  exposesSourceMaterialStorageKeys: false;
+  exposesStudentAttemptRecords: false;
+  exposesTeacherPrivateActivityContent: false;
+  itemIds: TeachersPageHandoffItemId[];
+  mutatesTeacherWorkspace: false;
+  routeActionsUseSharedConstants: true;
+  scope: 'public-teachers-product-loop';
+  templateModesComeFromCatalog: true;
+  usesClassGamifyCopy: true;
+  usesPreparedViewModel: true;
+};
+
+export type TeachersPageHandoffView = {
+  description: string;
+  itemViews: TeachersPageHandoffItemView[];
+  privacy: TeachersPageHandoffPrivacyContract;
+  title: string;
 };
 
 export type ContactIntent = 'classroom' | 'general';
@@ -1698,96 +1766,112 @@ export function buildTeachersPageViewModel(): TeachersPageViewModel {
   const workflowSectionTitle = m.teachers_page_workflow_section_title();
   const workflowSectionDescription =
     m.teachers_page_workflow_section_description();
-
-  return {
-    hero: {
-      badgeLabel: m.teachers_page_eyebrow(),
-      description: m.teachers_page_description(),
-      primaryAction: {
-        ariaLabel: m.teachers_page_primary_cta_aria_label(),
-        label: m.teachers_page_primary_cta(),
-        to: Routes.Create,
-      },
-      secondaryAction: {
-        ariaLabel: m.teachers_page_secondary_cta_aria_label(),
-        label: m.teachers_page_secondary_cta(),
-        to: Routes.ContactClassroom,
-      },
-      title: m.teachers_page_title(),
+  const hero = {
+    badgeLabel: m.teachers_page_eyebrow(),
+    description: m.teachers_page_description(),
+    primaryAction: {
+      ariaLabel: m.teachers_page_primary_cta_aria_label(),
+      label: m.teachers_page_primary_cta(),
+      to: Routes.Create,
     },
-    schoolCta: {
-      action: {
-        ariaLabel: m.teachers_page_school_cta_aria_label(),
-        label: m.teachers_page_school_cta(),
-        to: Routes.ContactClassroom,
-      },
-      ariaLabel: m.teachers_page_school_cta_section_aria_label({
-        description: schoolCtaDescription,
-        title: schoolCtaTitle,
-      }),
+    secondaryAction: {
+      ariaLabel: m.teachers_page_secondary_cta_aria_label(),
+      label: m.teachers_page_secondary_cta(),
+      to: Routes.ContactClassroom,
+    },
+    title: m.teachers_page_title(),
+  };
+  const schoolCta = {
+    action: {
+      ariaLabel: m.teachers_page_school_cta_aria_label(),
+      label: m.teachers_page_school_cta(),
+      to: Routes.ContactClassroom,
+    },
+    ariaLabel: m.teachers_page_school_cta_section_aria_label({
       description: schoolCtaDescription,
       title: schoolCtaTitle,
-    },
-    templatePanel: {
-      ariaLabel: m.teachers_page_template_panel_aria_label({
-        description: templatePanelDescription,
-        title: templatePanelTitle,
-      }),
-      classroomModeLabel: m.teachers_page_template_panel_mode_label(),
+    }),
+    description: schoolCtaDescription,
+    title: schoolCtaTitle,
+  };
+  const templatePanel = {
+    ariaLabel: m.teachers_page_template_panel_aria_label({
       description: templatePanelDescription,
-      templates: getActivityTemplates().map(buildTeachersTemplatePanelItemView),
       title: templatePanelTitle,
-    },
-    useCaseSection: {
-      ariaLabel: m.teachers_page_use_case_section_aria_label({
-        description: useCaseSectionDescription,
-        title: useCaseSectionTitle,
-      }),
+    }),
+    classroomModeLabel: m.teachers_page_template_panel_mode_label(),
+    description: templatePanelDescription,
+    templates: getActivityTemplates().map(buildTeachersTemplatePanelItemView),
+    title: templatePanelTitle,
+  };
+  const useCaseSection = {
+    ariaLabel: m.teachers_page_use_case_section_aria_label({
       description: useCaseSectionDescription,
       title: useCaseSectionTitle,
-    },
-    useCases: [
-      buildTeachersPageItemView({
-        description: m.teachers_page_use_case_0_description(),
-        id: 'classrooms',
-        title: m.teachers_page_use_case_0_title(),
-      }),
-      buildTeachersPageItemView({
-        description: m.teachers_page_use_case_1_description(),
-        id: 'games',
-        title: m.teachers_page_use_case_1_title(),
-      }),
-      buildTeachersPageItemView({
-        description: m.teachers_page_use_case_2_description(),
-        id: 'results',
-        title: m.teachers_page_use_case_2_title(),
-      }),
-    ],
-    workflowSection: {
-      ariaLabel: m.teachers_page_workflow_section_aria_label({
-        description: workflowSectionDescription,
-        title: workflowSectionTitle,
-      }),
+    }),
+    description: useCaseSectionDescription,
+    title: useCaseSectionTitle,
+  };
+  const useCases = [
+    buildTeachersPageItemView({
+      description: m.teachers_page_use_case_0_description(),
+      id: 'classrooms',
+      title: m.teachers_page_use_case_0_title(),
+    }),
+    buildTeachersPageItemView({
+      description: m.teachers_page_use_case_1_description(),
+      id: 'games',
+      title: m.teachers_page_use_case_1_title(),
+    }),
+    buildTeachersPageItemView({
+      description: m.teachers_page_use_case_2_description(),
+      id: 'results',
+      title: m.teachers_page_use_case_2_title(),
+    }),
+  ];
+  const workflowSection = {
+    ariaLabel: m.teachers_page_workflow_section_aria_label({
       description: workflowSectionDescription,
       title: workflowSectionTitle,
-    },
-    workflow: [
-      buildTeachersPageItemView({
-        description: m.teachers_page_workflow_0_description(),
-        id: 'draft',
-        title: m.teachers_page_workflow_0_title(),
-      }),
-      buildTeachersPageItemView({
-        description: m.teachers_page_workflow_1_description(),
-        id: 'publish',
-        title: m.teachers_page_workflow_1_title(),
-      }),
-      buildTeachersPageItemView({
-        description: m.teachers_page_workflow_2_description(),
-        id: 'share',
-        title: m.teachers_page_workflow_2_title(),
-      }),
-    ],
+    }),
+    description: workflowSectionDescription,
+    title: workflowSectionTitle,
+  };
+  const workflow = [
+    buildTeachersPageItemView({
+      description: m.teachers_page_workflow_0_description(),
+      id: 'draft',
+      title: m.teachers_page_workflow_0_title(),
+    }),
+    buildTeachersPageItemView({
+      description: m.teachers_page_workflow_1_description(),
+      id: 'publish',
+      title: m.teachers_page_workflow_1_title(),
+    }),
+    buildTeachersPageItemView({
+      description: m.teachers_page_workflow_2_description(),
+      id: 'share',
+      title: m.teachers_page_workflow_2_title(),
+    }),
+  ];
+
+  return {
+    handoffView: buildTeachersPageHandoffView({
+      hero,
+      schoolCta,
+      templatePanel,
+      useCaseSection,
+      useCases,
+      workflow,
+      workflowSection,
+    }),
+    hero,
+    schoolCta,
+    templatePanel,
+    useCaseSection,
+    useCases,
+    workflow,
+    workflowSection,
   };
 }
 
@@ -1824,6 +1908,379 @@ function buildTeachersPageItemView<Id extends string>({
     id,
     title,
   };
+}
+
+export function buildTeachersPageHandoffView({
+  hero,
+  schoolCta,
+  templatePanel,
+  useCaseSection,
+  useCases,
+  workflow,
+  workflowSection,
+}: Pick<
+  TeachersPageViewModel,
+  | 'hero'
+  | 'schoolCta'
+  | 'templatePanel'
+  | 'useCaseSection'
+  | 'useCases'
+  | 'workflow'
+  | 'workflowSection'
+>): TeachersPageHandoffView {
+  const itemViews = TEACHERS_PAGE_HANDOFF_ITEM_IDS.map((id) =>
+    buildTeachersPageHandoffItemView({
+      hero,
+      id,
+      schoolCta,
+      templatePanel,
+      useCaseSection,
+      useCases,
+      workflow,
+      workflowSection,
+    })
+  );
+
+  return {
+    description: m.teachers_page_handoff_description(),
+    itemViews,
+    privacy: buildTeachersPageHandoffPrivacyContract(itemViews),
+    title: m.teachers_page_handoff_title(),
+  };
+}
+
+type TeachersPageHandoffBuildContext = Pick<
+  TeachersPageViewModel,
+  | 'hero'
+  | 'schoolCta'
+  | 'templatePanel'
+  | 'useCaseSection'
+  | 'useCases'
+  | 'workflow'
+  | 'workflowSection'
+> & {
+  id: TeachersPageHandoffItemId;
+};
+
+function buildTeachersPageHandoffItemView(
+  context: TeachersPageHandoffBuildContext
+): TeachersPageHandoffItemView {
+  const label = getTeachersPageHandoffItemLabel(context);
+  const description = getTeachersPageHandoffItemDescription(context);
+  const value = getTeachersPageHandoffItemValue(context);
+
+  return {
+    ariaLabel: m.home_handoff_item_aria({
+      description,
+      label,
+      value,
+    }),
+    description,
+    id: context.id,
+    label,
+    value,
+  };
+}
+
+function getTeachersPageHandoffItemLabel(
+  context: TeachersPageHandoffBuildContext
+) {
+  switch (context.id) {
+    case 'teachers-route':
+      return m.teachers_page_seo_title();
+    case 'teacher-audience':
+      return m.teachers_page_eyebrow();
+    case 'hero-positioning':
+      return m.teachers_page_handoff_hero_positioning_label();
+    case 'primary-create-action':
+      return context.hero.primaryAction.label;
+    case 'secondary-contact-action':
+      return context.hero.secondaryAction.label;
+    case 'workflow-section':
+      return context.workflowSection.title;
+    case 'workflow-draft':
+      return getTeachersPageWorkflowItem(context.workflow, 'draft').title;
+    case 'workflow-publish':
+      return getTeachersPageWorkflowItem(context.workflow, 'publish').title;
+    case 'workflow-share':
+      return getTeachersPageWorkflowItem(context.workflow, 'share').title;
+    case 'use-case-section':
+      return context.useCaseSection.title;
+    case 'use-case-classrooms':
+      return getTeachersPageUseCaseItem(context.useCases, 'classrooms').title;
+    case 'use-case-games':
+      return getTeachersPageUseCaseItem(context.useCases, 'games').title;
+    case 'use-case-results':
+      return getTeachersPageUseCaseItem(context.useCases, 'results').title;
+    case 'template-panel':
+      return context.templatePanel.title;
+    case 'template-count':
+      return m.teachers_page_handoff_template_count_label();
+    case 'template-classroom-mode-label':
+      return context.templatePanel.classroomModeLabel;
+    case 'template-mode-coverage':
+      return m.teachers_page_handoff_template_mode_coverage_label();
+    case 'template-quiz':
+    case 'template-match-up':
+    case 'template-group-sort':
+    case 'template-fill-blank':
+    case 'template-listening':
+    case 'template-matching-pairs':
+    case 'template-line-match':
+    case 'template-open-box':
+      return getTeachersPageTemplateHandoffItem(context).name;
+    case 'school-cta':
+      return context.schoolCta.title;
+    case 'school-contact-route':
+      return context.schoolCta.action.label;
+    case 'activity-assignment-loop':
+      return m.teachers_page_handoff_activity_assignment_loop_label();
+    case 'legacy-copy-guard':
+      return m.teachers_page_handoff_legacy_copy_guard_label();
+    case 'privacy-guard':
+      return m.teachers_page_handoff_privacy_guard_label();
+  }
+}
+
+function getTeachersPageHandoffItemDescription(
+  context: TeachersPageHandoffBuildContext
+) {
+  switch (context.id) {
+    case 'teachers-route':
+      return m.teachers_page_handoff_route_description();
+    case 'teacher-audience':
+      return m.teachers_page_handoff_teacher_audience_description();
+    case 'hero-positioning':
+      return context.hero.description;
+    case 'primary-create-action':
+      return context.hero.primaryAction.ariaLabel;
+    case 'secondary-contact-action':
+      return context.hero.secondaryAction.ariaLabel;
+    case 'workflow-section':
+      return context.workflowSection.description;
+    case 'workflow-draft':
+      return getTeachersPageWorkflowItem(context.workflow, 'draft').description;
+    case 'workflow-publish':
+      return getTeachersPageWorkflowItem(context.workflow, 'publish')
+        .description;
+    case 'workflow-share':
+      return getTeachersPageWorkflowItem(context.workflow, 'share').description;
+    case 'use-case-section':
+      return context.useCaseSection.description;
+    case 'use-case-classrooms':
+      return getTeachersPageUseCaseItem(context.useCases, 'classrooms')
+        .description;
+    case 'use-case-games':
+      return getTeachersPageUseCaseItem(context.useCases, 'games').description;
+    case 'use-case-results':
+      return getTeachersPageUseCaseItem(context.useCases, 'results')
+        .description;
+    case 'template-panel':
+      return context.templatePanel.description;
+    case 'template-count':
+      return m.teachers_page_handoff_template_count_description();
+    case 'template-classroom-mode-label':
+      return m.teachers_page_handoff_template_mode_label_description();
+    case 'template-mode-coverage':
+      return m.teachers_page_handoff_template_mode_coverage_description();
+    case 'template-quiz':
+    case 'template-match-up':
+    case 'template-group-sort':
+    case 'template-fill-blank':
+    case 'template-listening':
+    case 'template-matching-pairs':
+    case 'template-line-match':
+    case 'template-open-box':
+      return getTeachersPageTemplateHandoffItem(context).ariaLabel;
+    case 'school-cta':
+      return context.schoolCta.description;
+    case 'school-contact-route':
+      return context.schoolCta.action.ariaLabel;
+    case 'activity-assignment-loop':
+      return m.teachers_page_handoff_activity_assignment_loop_description();
+    case 'legacy-copy-guard':
+      return m.teachers_page_handoff_legacy_copy_guard_description();
+    case 'privacy-guard':
+      return m.teachers_page_handoff_privacy_guard_description();
+  }
+}
+
+function getTeachersPageHandoffItemValue(
+  context: TeachersPageHandoffBuildContext
+) {
+  switch (context.id) {
+    case 'teachers-route':
+      return Routes.Teachers;
+    case 'teacher-audience':
+      return m.teachers_page_audience_type();
+    case 'hero-positioning':
+      return context.hero.title;
+    case 'primary-create-action':
+      return context.hero.primaryAction.to;
+    case 'secondary-contact-action':
+      return context.hero.secondaryAction.to;
+    case 'workflow-section':
+      return formatHomePageHandoffCount(context.workflow.length);
+    case 'workflow-draft':
+      return getTeachersPageWorkflowItem(context.workflow, 'draft').title;
+    case 'workflow-publish':
+      return getTeachersPageWorkflowItem(context.workflow, 'publish').title;
+    case 'workflow-share':
+      return getTeachersPageWorkflowItem(context.workflow, 'share').title;
+    case 'use-case-section':
+      return formatHomePageHandoffCount(context.useCases.length);
+    case 'use-case-classrooms':
+      return getTeachersPageUseCaseItem(context.useCases, 'classrooms').title;
+    case 'use-case-games':
+      return getTeachersPageUseCaseItem(context.useCases, 'games').title;
+    case 'use-case-results':
+      return getTeachersPageUseCaseItem(context.useCases, 'results').title;
+    case 'template-panel':
+      return context.templatePanel.title;
+    case 'template-count':
+      return formatHomePageHandoffCount(context.templatePanel.templates.length);
+    case 'template-classroom-mode-label':
+      return context.templatePanel.classroomModeLabel;
+    case 'template-mode-coverage':
+      return m.teachers_page_handoff_template_mode_coverage_value({
+        count: context.templatePanel.templates.length,
+      });
+    case 'template-quiz':
+    case 'template-match-up':
+    case 'template-group-sort':
+    case 'template-fill-blank':
+    case 'template-listening':
+    case 'template-matching-pairs':
+    case 'template-line-match':
+    case 'template-open-box':
+      return getTeachersPageTemplateHandoffItem(context).name;
+    case 'school-cta':
+      return context.schoolCta.title;
+    case 'school-contact-route':
+      return context.schoolCta.action.to;
+    case 'activity-assignment-loop':
+      return 'Activity -> Assignment -> Attempt -> Results';
+    case 'legacy-copy-guard':
+      return m.teachers_page_handoff_legacy_copy_guard_value();
+    case 'privacy-guard':
+      return m.teachers_page_handoff_privacy_guard_value();
+  }
+}
+
+function buildTeachersPageHandoffPrivacyContract(
+  itemViews: TeachersPageHandoffItemView[]
+): TeachersPageHandoffPrivacyContract {
+  return {
+    createsAssignmentLinks: false,
+    exposesAnswerKeys: false,
+    exposesRawAnonymousToken: false,
+    exposesSourceMaterialStorageKeys: false,
+    exposesStudentAttemptRecords: false,
+    exposesTeacherPrivateActivityContent: false,
+    itemIds: itemViews.map((itemView) => itemView.id),
+    mutatesTeacherWorkspace: false,
+    routeActionsUseSharedConstants: true,
+    scope: 'public-teachers-product-loop',
+    templateModesComeFromCatalog: true,
+    usesClassGamifyCopy: true,
+    usesPreparedViewModel: true,
+  };
+}
+
+function getTeachersPageTemplateHandoffItem(
+  context: TeachersPageHandoffBuildContext
+) {
+  return getTeachersPageTemplatePanelItem(
+    context.templatePanel.templates,
+    getTeachersPageTemplateTypeForHandoffItem(context.id)
+  );
+}
+
+function getTeachersPageTemplateTypeForHandoffItem(
+  id: TeachersPageHandoffItemId
+): ActivityTemplateType {
+  switch (id) {
+    case 'template-quiz':
+      return 'quiz';
+    case 'template-match-up':
+      return 'match-up';
+    case 'template-group-sort':
+      return 'group-sort';
+    case 'template-fill-blank':
+      return 'fill-blank';
+    case 'template-listening':
+      return 'listening';
+    case 'template-matching-pairs':
+      return 'matching-pairs';
+    case 'template-line-match':
+      return 'line-match';
+    case 'template-open-box':
+      return 'open-box';
+    case 'activity-assignment-loop':
+    case 'hero-positioning':
+    case 'legacy-copy-guard':
+    case 'primary-create-action':
+    case 'privacy-guard':
+    case 'school-contact-route':
+    case 'school-cta':
+    case 'secondary-contact-action':
+    case 'teacher-audience':
+    case 'teachers-route':
+    case 'template-classroom-mode-label':
+    case 'template-count':
+    case 'template-mode-coverage':
+    case 'template-panel':
+    case 'use-case-classrooms':
+    case 'use-case-games':
+    case 'use-case-results':
+    case 'use-case-section':
+    case 'workflow-draft':
+    case 'workflow-publish':
+    case 'workflow-section':
+    case 'workflow-share':
+      throw new Error(`Unsupported teacher template handoff item: ${id}`);
+  }
+}
+
+function getTeachersPageTemplatePanelItem(
+  templates: TeachersTemplatePanelItemView[],
+  templateType: ActivityTemplateType
+) {
+  const template = templates.find((item) => item.templateType === templateType);
+
+  if (!template) {
+    throw new Error(
+      `Missing teacher page template handoff item: ${templateType}`
+    );
+  }
+
+  return template;
+}
+
+function getTeachersPageUseCaseItem(
+  useCases: TeachersPageItemView<TeachersPageUseCaseId>[],
+  id: TeachersPageUseCaseId
+) {
+  const useCase = useCases.find((item) => item.id === id);
+
+  if (!useCase) {
+    throw new Error(`Missing teacher page use case: ${id}`);
+  }
+
+  return useCase;
+}
+
+function getTeachersPageWorkflowItem(
+  workflow: TeachersPageItemView<TeachersPageWorkflowId>[],
+  id: TeachersPageWorkflowId
+) {
+  const workflowItem = workflow.find((item) => item.id === id);
+
+  if (!workflowItem) {
+    throw new Error(`Missing teacher page workflow item: ${id}`);
+  }
+
+  return workflowItem;
 }
 
 export function buildContactPageViewModel(

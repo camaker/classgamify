@@ -8,6 +8,7 @@ import { seo } from '@/lib/seo';
 import { jsonLdScript } from '@/lib/structured-data';
 import {
   buildTeachersPageViewModel,
+  type TeachersPageHandoffView,
   type TeachersPageUseCaseId,
   type TeachersPageWorkflowId,
 } from '@/pages/public-page-view';
@@ -171,6 +172,8 @@ function TeachersPage() {
           </Link>
         </section>
 
+        <TeachersPageHandoffPanel view={pageView.handoffView} />
+
         <section
           aria-label={pageView.useCaseSection.ariaLabel}
           className="space-y-4"
@@ -195,6 +198,34 @@ function TeachersPage() {
         </section>
       </div>
     </Container>
+  );
+}
+
+function TeachersPageHandoffPanel({ view }: { view: TeachersPageHandoffView }) {
+  const titleId = 'teachers-page-product-loop-handoff-title';
+  const descriptionId = 'teachers-page-product-loop-handoff-description';
+
+  return (
+    <section
+      aria-describedby={descriptionId}
+      aria-labelledby={titleId}
+      className="sr-only"
+      data-handoff="teachers-page-product-loop"
+    >
+      <h2 id={titleId}>{view.title}</h2>
+      <p id={descriptionId}>{view.description}</p>
+      <dl>
+        {view.itemViews.map((item) => (
+          <div data-handoff-item={item.id} key={item.id}>
+            <dt>{item.label}</dt>
+            <dd>
+              <output aria-label={item.ariaLabel}>{item.value}</output>
+              <span>{item.description}</span>
+            </dd>
+          </div>
+        ))}
+      </dl>
+    </section>
   );
 }
 

@@ -480,6 +480,7 @@ import {
   HOME_PAGE_PRODUCT_LOOP_HANDOFF_ITEM_IDS,
   PRICING_PAGE_HANDOFF_ITEM_IDS,
   ROADMAP_PUBLIC_HANDOFF_ITEM_IDS,
+  TEACHERS_PAGE_HANDOFF_ITEM_IDS,
 } from '@/pages/public-page-view';
 import {
   buildBlogListPageViewModel,
@@ -6536,6 +6537,31 @@ assert.equal(
     (item) => item.id === 'billing-return-path'
   )?.value,
   Routes.Payment
+);
+assert.match(
+  publicPageViewSource,
+  /export type TeachersPageViewModel = \{[\s\S]*handoffView: TeachersPageHandoffView;[\s\S]*templatePanel: TeachersTemplatePanelView;[\s\S]*workflow: TeachersPageItemView<TeachersPageWorkflowId>\[\];/,
+  'Teachers page view model should expose the prepared product-loop handoff alongside visible page sections.'
+);
+assert.match(
+  publicPageViewSource,
+  /export const TEACHERS_PAGE_HANDOFF_ITEM_IDS = \[(?=[\s\S]*'teachers-route')(?=[\s\S]*'teacher-audience')(?=[\s\S]*'primary-create-action')(?=[\s\S]*'secondary-contact-action')(?=[\s\S]*'workflow-section')(?=[\s\S]*'use-case-section')(?=[\s\S]*'template-panel')(?=[\s\S]*'template-count')(?=[\s\S]*'template-mode-coverage')(?=[\s\S]*'template-quiz')(?=[\s\S]*'template-open-box')(?=[\s\S]*'school-contact-route')(?=[\s\S]*'activity-assignment-loop')(?=[\s\S]*'legacy-copy-guard')(?=[\s\S]*'privacy-guard')/,
+  'Teachers page handoff should expose stable 30-slice public teacher-entry item ids.'
+);
+assert.match(
+  publicPageViewSource,
+  /export type TeachersPageHandoffPrivacyContract = \{[\s\S]*createsAssignmentLinks: false;[\s\S]*exposesAnswerKeys: false;[\s\S]*exposesRawAnonymousToken: false;[\s\S]*exposesSourceMaterialStorageKeys: false;[\s\S]*exposesStudentAttemptRecords: false;[\s\S]*exposesTeacherPrivateActivityContent: false;[\s\S]*mutatesTeacherWorkspace: false;[\s\S]*routeActionsUseSharedConstants: true;[\s\S]*scope: 'public-teachers-product-loop';[\s\S]*templateModesComeFromCatalog: true;[\s\S]*usesClassGamifyCopy: true;[\s\S]*usesPreparedViewModel: true;/,
+  'Teachers page handoff should publish explicit safe public teacher-page behavior flags.'
+);
+assert.match(
+  publicPageViewSource,
+  /const templatePanel = \{[\s\S]*templates: getActivityTemplates\(\)\.map\(buildTeachersTemplatePanelItemView\)[\s\S]*handoffView: buildTeachersPageHandoffView\(\{[\s\S]*templatePanel[\s\S]*workflowSection/,
+  'Teachers page handoff should reuse the prepared template catalog and visible page view model.'
+);
+assert.match(
+  teachersRouteSource,
+  /<TeachersPageHandoffPanel view=\{pageView\.handoffView\} \/>[\s\S]*data-handoff="teachers-page-product-loop"[\s\S]*view\.itemViews\.map\(\(item\) =>[\s\S]*data-handoff-item=\{item\.id\}[\s\S]*<output aria-label=\{item\.ariaLabel\}/,
+  'Teachers route should render the prepared product-loop handoff with stable item ids.'
 );
 const menuItemConfigSource = readFileSync('src/types/index.d.ts', 'utf8');
 const navbarSource = readFileSync('src/components/layout/navbar.tsx', 'utf8');
@@ -36474,7 +36500,104 @@ assert.deepEqual(
     ['privacy-guard', 'Private data hidden'],
   ]
 );
-assert.deepEqual(buildTeachersPageViewModel(), {
+const {
+  handoffView: teachersPageHandoffView,
+  ...teachersPageVisibleView
+} = buildTeachersPageViewModel();
+assert.deepEqual(TEACHERS_PAGE_HANDOFF_ITEM_IDS, [
+  'teachers-route',
+  'teacher-audience',
+  'hero-positioning',
+  'primary-create-action',
+  'secondary-contact-action',
+  'workflow-section',
+  'workflow-draft',
+  'workflow-publish',
+  'workflow-share',
+  'use-case-section',
+  'use-case-classrooms',
+  'use-case-games',
+  'use-case-results',
+  'template-panel',
+  'template-count',
+  'template-classroom-mode-label',
+  'template-mode-coverage',
+  'template-quiz',
+  'template-match-up',
+  'template-group-sort',
+  'template-fill-blank',
+  'template-listening',
+  'template-matching-pairs',
+  'template-line-match',
+  'template-open-box',
+  'school-cta',
+  'school-contact-route',
+  'activity-assignment-loop',
+  'legacy-copy-guard',
+  'privacy-guard',
+]);
+assert.deepEqual(
+  teachersPageHandoffView.itemViews.map((itemView) => itemView.id),
+  [...TEACHERS_PAGE_HANDOFF_ITEM_IDS]
+);
+assert.equal(teachersPageHandoffView.itemViews.length, 30);
+assert.deepEqual(teachersPageHandoffView.privacy, {
+  createsAssignmentLinks: false,
+  exposesAnswerKeys: false,
+  exposesRawAnonymousToken: false,
+  exposesSourceMaterialStorageKeys: false,
+  exposesStudentAttemptRecords: false,
+  exposesTeacherPrivateActivityContent: false,
+  itemIds: teachersPageHandoffView.itemViews.map((itemView) => itemView.id),
+  mutatesTeacherWorkspace: false,
+  routeActionsUseSharedConstants: true,
+  scope: 'public-teachers-product-loop',
+  templateModesComeFromCatalog: true,
+  usesClassGamifyCopy: true,
+  usesPreparedViewModel: true,
+});
+assert.deepEqual(
+  teachersPageHandoffView.itemViews.map((itemView) => [
+    itemView.id,
+    itemView.value,
+  ]),
+  [
+    ['teachers-route', Routes.Teachers],
+    ['teacher-audience', 'Teachers, tutors, schools, and learning centers'],
+    [
+      'hero-positioning',
+      'Build repeatable game-based assignments from the lessons you already teach.',
+    ],
+    ['primary-create-action', Routes.Create],
+    ['secondary-contact-action', Routes.ContactClassroom],
+    ['workflow-section', '3 items'],
+    ['workflow-draft', 'Start from lesson content'],
+    ['workflow-publish', 'Choose a game template'],
+    ['workflow-share', 'Publish an assignment'],
+    ['use-case-section', '3 items'],
+    ['use-case-classrooms', 'Classroom homework'],
+    ['use-case-games', 'Live classroom play'],
+    ['use-case-results', 'Result follow-up'],
+    ['template-panel', 'First template families'],
+    ['template-count', '8 items'],
+    ['template-classroom-mode-label', 'Classroom mode'],
+    ['template-mode-coverage', '8 catalog modes'],
+    ['template-quiz', 'Quiz'],
+    ['template-match-up', 'Match up'],
+    ['template-group-sort', 'Group sort'],
+    ['template-fill-blank', 'Complete the sentence'],
+    ['template-listening', 'Listening'],
+    ['template-matching-pairs', 'Matching pairs'],
+    ['template-line-match', 'Line match'],
+    ['template-open-box', 'Open the box'],
+    ['school-cta', 'Need a school or learning-center workflow?'],
+    ['school-contact-route', Routes.ContactClassroom],
+    ['activity-assignment-loop', 'Activity -> Assignment -> Attempt -> Results'],
+    ['legacy-copy-guard', 'ClassGamify only'],
+    ['privacy-guard', 'Private data hidden'],
+  ]
+);
+assert.deepEqual(teachersPageVisibleView, {
   hero: {
     badgeLabel: 'Teachers and learning teams',
     description:
