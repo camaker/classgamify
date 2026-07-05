@@ -8980,6 +8980,12 @@ const mailTemplateSourceText = [
   mailRenderSource,
   mailWorkspaceBoundarySource,
 ].join('\n');
+const transactionalMailTemplateComponentSourceText = [
+  contactEmailTemplateSource,
+  forgotPasswordEmailTemplateSource,
+  verifyEmailTemplateSource,
+  subscribeNewsletterEmailTemplateSource,
+].join('\n');
 assert.match(
   mailLocaleSource,
   /baseLocale[\s\S]*isLocale[\s\S]*export type MailLocale = Locale[\s\S]*normalizeMailLocale\(value: unknown\)[\s\S]*isLocale\(value\) \? value : baseLocale/,
@@ -9002,10 +9008,25 @@ assert.match(
   /export function getEmailSubject[\s\S]*mail_forgot_password_subject[\s\S]*mail_verify_email_subject[\s\S]*mail_subscribe_newsletter_subject[\s\S]*mail_contact_message_subject/,
   'Mail renderer should resolve every transactional subject from locale messages.'
 );
+assert.match(
+  mailRenderSource,
+  /const EmailTemplates = \{[\s\S]*forgotPassword: ForgotPassword,[\s\S]*verifyEmail: VerifyEmail,[\s\S]*subscribeNewsletter: SubscribeNewsletter,[\s\S]*contactMessage: ContactMessage,[\s\S]*\} as const;/,
+  'Mail renderer should keep every transactional template in the render registry.'
+);
+assert.match(
+  mailRenderSource,
+  /const html = await renderEmailHtml\(email\);[\s\S]*const text = toPlainText\(html\);[\s\S]*const subject = getEmailSubject[\s\S]*return \{ html, text, subject \};/,
+  'Mail renderer should return subject, HTML, and plain text from the same localized template render.'
+);
 assert.doesNotMatch(
   mailTemplateSourceText,
   /const en = \{ locale: 'en'/,
   'Mail rendering should not pin shared templates or subjects to the English locale.'
+);
+assert.doesNotMatch(
+  transactionalMailTemplateComponentSourceText,
+  /Lang Study|getlangstudy|HSK|Hanzi|Website Contact|Contact Message from Website|MyApp|TanStarter|mksaas|generic SaaS/,
+  'Transactional template source should not hard-code copied starter, Lang Study, HSK, Hanzi, or generic SaaS wording.'
 );
 assert.match(
   emailLayoutSource,
