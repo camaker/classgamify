@@ -1236,21 +1236,33 @@ function expectActivityDraftMetaHandoffPrivacy(
   const itemIds = view.itemViews.map((itemView) => itemView.id);
 
   assert.deepEqual(itemIds, [...ACTIVITY_DRAFT_META_HANDOFF_ITEM_IDS]);
-  assert.equal(new Set(itemIds).size, 20);
+  assert.equal(new Set(itemIds).size, 30);
   assert.deepEqual(view.privacy, {
     appliesToEditorBeforeSave: true,
+    createsAssignmentLinks: false,
     exposesAnswerText: false,
+    exposesExplanationText: false,
+    exposesOptionText: false,
     exposesQuestionPromptText: false,
     exposesRawDraftJson: false,
     exposesRawSourceText: false,
     exposesSourceMaterialFileIds: false,
     exposesSourceMaterialStorageKeys: false,
     exposesTeacherNotesText: false,
+    fillsEditorOnly: true,
     itemIds,
+    mutatesActivityLibraryBeforeSave: false,
+    persistsContentDirectly: false,
     publishesAssignmentWithoutTeacherAction: false,
+    readsSourceMaterialFileBytes: false,
     requiresTeacherReview: true,
     savesActivityWithoutTeacherAction: false,
     scope: 'teacher-reviewed-ai-draft',
+    usesCreateActivityInputContract: true,
+    usesDeterministicFallbackContract: true,
+    usesSafeSourceMaterialProvenance: true,
+    usesStructuredReviewChecklist: true,
+    usesTemplateReadinessDomain: true,
   });
 }
 
@@ -5890,12 +5902,12 @@ assert.match(
 );
 assert.match(
   activityDraftMetaSource,
-  /export const ACTIVITY_DRAFT_META_HANDOFF_ITEM_IDS = \[[\s\S]*'draft-provider'[\s\S]*'draft-model'[\s\S]*'generation-notice'[\s\S]*'teacher-review-gate'[\s\S]*'review-gate-status'[\s\S]*'action-needed-count'[\s\S]*'review-required-count'[\s\S]*'ready-check-count'[\s\S]*'ready-template-count'[\s\S]*'locked-template-count'[\s\S]*'suggested-remix-count'[\s\S]*'question-count'[\s\S]*'pair-count'[\s\S]*'group-count'[\s\S]*'vocabulary-count'[\s\S]*'teacher-note-count'[\s\S]*'quiz-choice-readiness'[\s\S]*'safe-source-count'[\s\S]*'omitted-source-count'[\s\S]*'save-boundary'/,
-  'AI draft meta domain should expose 20 stable save handoff item ids.'
+  /export const ACTIVITY_DRAFT_META_HANDOFF_ITEM_IDS = \[(?=[\s\S]*'draft-provider')(?=[\s\S]*'draft-model')(?=[\s\S]*'generation-notice')(?=[\s\S]*'fallback-stability-boundary')(?=[\s\S]*'teacher-review-gate')(?=[\s\S]*'editor-fill-boundary')(?=[\s\S]*'create-input-contract')(?=[\s\S]*'review-gate-status')(?=[\s\S]*'review-checklist-source')(?=[\s\S]*'action-needed-count')(?=[\s\S]*'review-required-count')(?=[\s\S]*'ready-check-count')(?=[\s\S]*'template-readiness-source')(?=[\s\S]*'ready-template-count')(?=[\s\S]*'locked-template-count')(?=[\s\S]*'suggested-remix-count')(?=[\s\S]*'coverage-field-count')(?=[\s\S]*'question-count')(?=[\s\S]*'pair-count')(?=[\s\S]*'group-count')(?=[\s\S]*'vocabulary-count')(?=[\s\S]*'teacher-note-count')(?=[\s\S]*'quiz-choice-readiness')(?=[\s\S]*'source-provenance-boundary')(?=[\s\S]*'safe-source-count')(?=[\s\S]*'omitted-source-count')(?=[\s\S]*'no-file-byte-read')(?=[\s\S]*'no-direct-persist')(?=[\s\S]*'no-assignment-publish')(?=[\s\S]*'save-boundary')/,
+  'AI draft meta domain should expose 30 stable save handoff item ids.'
 );
 assert.match(
   activityDraftMetaSource,
-  /export type ActivityDraftMetaHandoffItemView = \{[\s\S]*ariaLabel: string;[\s\S]*description: string;[\s\S]*id: ActivityDraftMetaHandoffItemId;[\s\S]*label: string;[\s\S]*value: string;[\s\S]*export type ActivityDraftMetaHandoffPrivacyContract = \{[\s\S]*appliesToEditorBeforeSave: true;[\s\S]*exposesAnswerText: false;[\s\S]*exposesQuestionPromptText: false;[\s\S]*exposesRawDraftJson: false;[\s\S]*exposesRawSourceText: false;[\s\S]*exposesSourceMaterialFileIds: false;[\s\S]*exposesSourceMaterialStorageKeys: false;[\s\S]*exposesTeacherNotesText: false;[\s\S]*publishesAssignmentWithoutTeacherAction: false;[\s\S]*requiresTeacherReview: true;[\s\S]*savesActivityWithoutTeacherAction: false;[\s\S]*scope: 'teacher-reviewed-ai-draft';[\s\S]*export type ActivityDraftMetaHandoffView = \{[\s\S]*itemViews: ActivityDraftMetaHandoffItemView\[\];[\s\S]*privacy: ActivityDraftMetaHandoffPrivacyContract;/,
+  /export type ActivityDraftMetaHandoffItemView = \{[\s\S]*ariaLabel: string;[\s\S]*description: string;[\s\S]*id: ActivityDraftMetaHandoffItemId;[\s\S]*label: string;[\s\S]*value: string;[\s\S]*export type ActivityDraftMetaHandoffPrivacyContract = \{[\s\S]*appliesToEditorBeforeSave: true;[\s\S]*createsAssignmentLinks: false;[\s\S]*exposesAnswerText: false;[\s\S]*exposesExplanationText: false;[\s\S]*exposesOptionText: false;[\s\S]*exposesQuestionPromptText: false;[\s\S]*exposesRawDraftJson: false;[\s\S]*exposesRawSourceText: false;[\s\S]*exposesSourceMaterialFileIds: false;[\s\S]*exposesSourceMaterialStorageKeys: false;[\s\S]*exposesTeacherNotesText: false;[\s\S]*fillsEditorOnly: true;[\s\S]*mutatesActivityLibraryBeforeSave: false;[\s\S]*persistsContentDirectly: false;[\s\S]*publishesAssignmentWithoutTeacherAction: false;[\s\S]*readsSourceMaterialFileBytes: false;[\s\S]*requiresTeacherReview: true;[\s\S]*savesActivityWithoutTeacherAction: false;[\s\S]*scope: 'teacher-reviewed-ai-draft';[\s\S]*usesCreateActivityInputContract: true;[\s\S]*usesDeterministicFallbackContract: true;[\s\S]*usesSafeSourceMaterialProvenance: true;[\s\S]*usesStructuredReviewChecklist: true;[\s\S]*usesTemplateReadinessDomain: true;[\s\S]*export type ActivityDraftMetaHandoffView = \{[\s\S]*itemViews: ActivityDraftMetaHandoffItemView\[\];[\s\S]*privacy: ActivityDraftMetaHandoffPrivacyContract;/,
   'AI draft meta domain should expose an explicit safe handoff privacy contract.'
 );
 assert.match(
@@ -5907,6 +5919,11 @@ assert.match(
   activityDraftMetaSource,
   /const handoffView = buildActivityDraftMetaHandoffView\(\{[\s\S]*coverageStats[\s\S]*modelName[\s\S]*notice: normalizedNotice[\s\S]*providerDescription[\s\S]*providerLabel[\s\S]*questionChoiceReadiness[\s\S]*reviewGateView[\s\S]*sourceMaterialSafetyView[\s\S]*suggestedTemplateCount/,
   'AI draft summary builder should construct the save handoff from prepared domain views.'
+);
+assert.match(
+  activityDraftMetaSource,
+  /buildActivityDraftMetaHandoffItem[\s\S]*activity_draft_meta_handoff_fallback_stability_boundary_description[\s\S]*activity_draft_meta_handoff_editor_fill_boundary_description[\s\S]*activity_draft_meta_handoff_create_input_contract_description[\s\S]*activity_draft_meta_handoff_review_checklist_source_description[\s\S]*activity_draft_meta_handoff_template_readiness_source_description[\s\S]*activity_draft_meta_handoff_source_provenance_boundary_description[\s\S]*activity_draft_meta_handoff_no_file_byte_read_description[\s\S]*activity_draft_meta_handoff_no_direct_persist_description[\s\S]*activity_draft_meta_handoff_no_assignment_publish_description/,
+  'AI draft meta handoff should prepare localized editor-fill, input-contract, checklist, source, and no-mutation boundaries.'
 );
 assert.match(
   activityDraftMetaSource,
@@ -49433,6 +49450,38 @@ assert.equal(
   1
 );
 assert.equal(actionNeededDraftGateSummary.sourceMaterialNoteViews.length, 1);
+assert.deepEqual(ACTIVITY_DRAFT_META_HANDOFF_ITEM_IDS, [
+  'draft-provider',
+  'draft-model',
+  'generation-notice',
+  'fallback-stability-boundary',
+  'teacher-review-gate',
+  'editor-fill-boundary',
+  'create-input-contract',
+  'review-gate-status',
+  'review-checklist-source',
+  'action-needed-count',
+  'review-required-count',
+  'ready-check-count',
+  'template-readiness-source',
+  'ready-template-count',
+  'locked-template-count',
+  'suggested-remix-count',
+  'coverage-field-count',
+  'question-count',
+  'pair-count',
+  'group-count',
+  'vocabulary-count',
+  'teacher-note-count',
+  'quiz-choice-readiness',
+  'source-provenance-boundary',
+  'safe-source-count',
+  'omitted-source-count',
+  'no-file-byte-read',
+  'no-direct-persist',
+  'no-assignment-publish',
+  'save-boundary',
+]);
 expectActivityDraftMetaHandoffPrivacy(
   actionNeededDraftGateSummary.handoffView
 );
@@ -49445,10 +49494,45 @@ assert.equal(
 );
 assert.equal(
   findActivityDraftMetaHandoffItem({
+    id: 'fallback-stability-boundary',
+    itemViews: actionNeededDraftGateSummary.handoffView.itemViews,
+  }).value,
+  'Deterministic fallback'
+);
+assert.equal(
+  findActivityDraftMetaHandoffItem({
+    id: 'editor-fill-boundary',
+    itemViews: actionNeededDraftGateSummary.handoffView.itemViews,
+  }).value,
+  'Editor fill only'
+);
+assert.equal(
+  findActivityDraftMetaHandoffItem({
+    id: 'create-input-contract',
+    itemViews: actionNeededDraftGateSummary.handoffView.itemViews,
+  }).value,
+  'CreateActivityInput'
+);
+assert.equal(
+  findActivityDraftMetaHandoffItem({
     id: 'review-gate-status',
     itemViews: actionNeededDraftGateSummary.handoffView.itemViews,
   }).value,
   'Action needed before save'
+);
+assert.equal(
+  findActivityDraftMetaHandoffItem({
+    id: 'review-checklist-source',
+    itemViews: actionNeededDraftGateSummary.handoffView.itemViews,
+  }).value,
+  'Structured checklist'
+);
+assert.equal(
+  findActivityDraftMetaHandoffItem({
+    id: 'template-readiness-source',
+    itemViews: actionNeededDraftGateSummary.handoffView.itemViews,
+  }).value,
+  'Template remix plan'
 );
 assert.equal(
   findActivityDraftMetaHandoffItem({
@@ -49476,6 +49560,13 @@ assert.equal(
 );
 assert.equal(
   findActivityDraftMetaHandoffItem({
+    id: 'coverage-field-count',
+    itemViews: actionNeededDraftGateSummary.handoffView.itemViews,
+  }).value,
+  '5 coverage fields'
+);
+assert.equal(
+  findActivityDraftMetaHandoffItem({
     id: 'safe-source-count',
     itemViews: actionNeededDraftGateSummary.handoffView.itemViews,
   }).value,
@@ -49487,6 +49578,34 @@ assert.equal(
     itemViews: actionNeededDraftGateSummary.handoffView.itemViews,
   }).value,
   '1 omitted source'
+);
+assert.equal(
+  findActivityDraftMetaHandoffItem({
+    id: 'source-provenance-boundary',
+    itemViews: actionNeededDraftGateSummary.handoffView.itemViews,
+  }).value,
+  'Safe material provenance'
+);
+assert.equal(
+  findActivityDraftMetaHandoffItem({
+    id: 'no-file-byte-read',
+    itemViews: actionNeededDraftGateSummary.handoffView.itemViews,
+  }).value,
+  'No file bytes'
+);
+assert.equal(
+  findActivityDraftMetaHandoffItem({
+    id: 'no-direct-persist',
+    itemViews: actionNeededDraftGateSummary.handoffView.itemViews,
+  }).value,
+  'No direct save'
+);
+assert.equal(
+  findActivityDraftMetaHandoffItem({
+    id: 'no-assignment-publish',
+    itemViews: actionNeededDraftGateSummary.handoffView.itemViews,
+  }).value,
+  'No assignment publish'
 );
 assert.equal(
   findActivityDraftMetaHandoffItem({

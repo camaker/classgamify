@@ -256,22 +256,32 @@ export const ACTIVITY_DRAFT_META_HANDOFF_ITEM_IDS = [
   'draft-provider',
   'draft-model',
   'generation-notice',
+  'fallback-stability-boundary',
   'teacher-review-gate',
+  'editor-fill-boundary',
+  'create-input-contract',
   'review-gate-status',
+  'review-checklist-source',
   'action-needed-count',
   'review-required-count',
   'ready-check-count',
+  'template-readiness-source',
   'ready-template-count',
   'locked-template-count',
   'suggested-remix-count',
+  'coverage-field-count',
   'question-count',
   'pair-count',
   'group-count',
   'vocabulary-count',
   'teacher-note-count',
   'quiz-choice-readiness',
+  'source-provenance-boundary',
   'safe-source-count',
   'omitted-source-count',
+  'no-file-byte-read',
+  'no-direct-persist',
+  'no-assignment-publish',
   'save-boundary',
 ] as const;
 
@@ -288,18 +298,30 @@ export type ActivityDraftMetaHandoffItemView = {
 
 export type ActivityDraftMetaHandoffPrivacyContract = {
   appliesToEditorBeforeSave: true;
+  createsAssignmentLinks: false;
   exposesAnswerText: false;
+  exposesExplanationText: false;
+  exposesOptionText: false;
   exposesQuestionPromptText: false;
   exposesRawDraftJson: false;
   exposesRawSourceText: false;
   exposesSourceMaterialFileIds: false;
   exposesSourceMaterialStorageKeys: false;
   exposesTeacherNotesText: false;
+  fillsEditorOnly: true;
   itemIds: ActivityDraftMetaHandoffItemId[];
+  mutatesActivityLibraryBeforeSave: false;
+  persistsContentDirectly: false;
   publishesAssignmentWithoutTeacherAction: false;
+  readsSourceMaterialFileBytes: false;
   requiresTeacherReview: true;
   savesActivityWithoutTeacherAction: false;
   scope: 'teacher-reviewed-ai-draft';
+  usesCreateActivityInputContract: true;
+  usesDeterministicFallbackContract: true;
+  usesSafeSourceMaterialProvenance: true;
+  usesStructuredReviewChecklist: true;
+  usesTemplateReadinessDomain: true;
 };
 
 export type ActivityDraftMetaHandoffView = {
@@ -681,6 +703,7 @@ function buildActivityDraftMetaSummaryCoverageStats(
 
 type ActivityDraftMetaHandoffSummary = {
   actionNeededCount: string;
+  coverageFieldCount: string;
   coverageStats: ActivityDraftMetaSummaryCoverageStatView[];
   generationNotice: string;
   lockedTemplateCount: string;
@@ -723,6 +746,10 @@ function buildActivityDraftMetaHandoffView({
       reviewGateView,
       'action-needed'
     ),
+    coverageFieldCount:
+      m.activity_draft_meta_handoff_coverage_field_count_value({
+        count: normalizeActivityDraftMetaCount(coverageStats.length),
+      }),
     coverageStats,
     generationNotice: notice ?? m.activity_draft_meta_trust_notice_none_value(),
     lockedTemplateCount: getActivityDraftMetaReviewGateMetricValue(
@@ -808,12 +835,42 @@ function buildActivityDraftMetaHandoffItem({
     };
   }
 
+  if (id === 'fallback-stability-boundary') {
+    return {
+      description:
+        m.activity_draft_meta_handoff_fallback_stability_boundary_description(),
+      id,
+      label: m.activity_draft_meta_handoff_fallback_stability_boundary_label(),
+      value: m.activity_draft_meta_handoff_fallback_stability_boundary_value(),
+    };
+  }
+
   if (id === 'teacher-review-gate') {
     return {
       description: m.activity_draft_meta_trust_review_description(),
       id,
       label: m.activity_draft_meta_trust_review_label(),
       value: m.activity_draft_meta_trust_review_value(),
+    };
+  }
+
+  if (id === 'editor-fill-boundary') {
+    return {
+      description:
+        m.activity_draft_meta_handoff_editor_fill_boundary_description(),
+      id,
+      label: m.activity_draft_meta_handoff_editor_fill_boundary_label(),
+      value: m.activity_draft_meta_handoff_editor_fill_boundary_value(),
+    };
+  }
+
+  if (id === 'create-input-contract') {
+    return {
+      description:
+        m.activity_draft_meta_handoff_create_input_contract_description(),
+      id,
+      label: m.activity_draft_meta_handoff_create_input_contract_label(),
+      value: m.activity_draft_meta_handoff_create_input_contract_value(),
     };
   }
 
@@ -824,6 +881,16 @@ function buildActivityDraftMetaHandoffItem({
       id,
       label: m.activity_draft_meta_handoff_review_gate_status_label(),
       value: summary.reviewGateStatus,
+    };
+  }
+
+  if (id === 'review-checklist-source') {
+    return {
+      description:
+        m.activity_draft_meta_handoff_review_checklist_source_description(),
+      id,
+      label: m.activity_draft_meta_handoff_review_checklist_source_label(),
+      value: m.activity_draft_meta_handoff_review_checklist_source_value(),
     };
   }
 
@@ -856,6 +923,16 @@ function buildActivityDraftMetaHandoffItem({
     };
   }
 
+  if (id === 'template-readiness-source') {
+    return {
+      description:
+        m.activity_draft_meta_handoff_template_readiness_source_description(),
+      id,
+      label: m.activity_draft_meta_handoff_template_readiness_source_label(),
+      value: m.activity_draft_meta_handoff_template_readiness_source_value(),
+    };
+  }
+
   if (id === 'ready-template-count') {
     return {
       description:
@@ -885,12 +962,32 @@ function buildActivityDraftMetaHandoffItem({
     };
   }
 
+  if (id === 'coverage-field-count') {
+    return {
+      description:
+        m.activity_draft_meta_handoff_coverage_field_count_description(),
+      id,
+      label: m.activity_draft_meta_handoff_coverage_field_count_label(),
+      value: summary.coverageFieldCount,
+    };
+  }
+
   if (id === 'quiz-choice-readiness') {
     return {
       description: m.activity_draft_meta_handoff_quiz_choice_description(),
       id,
       label: m.activity_draft_meta_handoff_quiz_choice_label(),
       value: summary.quizChoiceReadiness,
+    };
+  }
+
+  if (id === 'source-provenance-boundary') {
+    return {
+      description:
+        m.activity_draft_meta_handoff_source_provenance_boundary_description(),
+      id,
+      label: m.activity_draft_meta_handoff_source_provenance_boundary_label(),
+      value: m.activity_draft_meta_handoff_source_provenance_boundary_value(),
     };
   }
 
@@ -911,6 +1008,36 @@ function buildActivityDraftMetaHandoffItem({
       id,
       label: m.activity_draft_meta_source_material_safety_omitted_label(),
       value: summary.omittedSourceCount,
+    };
+  }
+
+  if (id === 'no-file-byte-read') {
+    return {
+      description:
+        m.activity_draft_meta_handoff_no_file_byte_read_description(),
+      id,
+      label: m.activity_draft_meta_handoff_no_file_byte_read_label(),
+      value: m.activity_draft_meta_handoff_no_file_byte_read_value(),
+    };
+  }
+
+  if (id === 'no-direct-persist') {
+    return {
+      description:
+        m.activity_draft_meta_handoff_no_direct_persist_description(),
+      id,
+      label: m.activity_draft_meta_handoff_no_direct_persist_label(),
+      value: m.activity_draft_meta_handoff_no_direct_persist_value(),
+    };
+  }
+
+  if (id === 'no-assignment-publish') {
+    return {
+      description:
+        m.activity_draft_meta_handoff_no_assignment_publish_description(),
+      id,
+      label: m.activity_draft_meta_handoff_no_assignment_publish_label(),
+      value: m.activity_draft_meta_handoff_no_assignment_publish_value(),
     };
   }
 
@@ -965,18 +1092,30 @@ function buildActivityDraftMetaHandoffPrivacyContract(
 ): ActivityDraftMetaHandoffPrivacyContract {
   return {
     appliesToEditorBeforeSave: true,
+    createsAssignmentLinks: false,
     exposesAnswerText: false,
+    exposesExplanationText: false,
+    exposesOptionText: false,
     exposesQuestionPromptText: false,
     exposesRawDraftJson: false,
     exposesRawSourceText: false,
     exposesSourceMaterialFileIds: false,
     exposesSourceMaterialStorageKeys: false,
     exposesTeacherNotesText: false,
+    fillsEditorOnly: true,
     itemIds: itemViews.map((itemView) => itemView.id),
+    mutatesActivityLibraryBeforeSave: false,
+    persistsContentDirectly: false,
     publishesAssignmentWithoutTeacherAction: false,
+    readsSourceMaterialFileBytes: false,
     requiresTeacherReview: true,
     savesActivityWithoutTeacherAction: false,
     scope: 'teacher-reviewed-ai-draft',
+    usesCreateActivityInputContract: true,
+    usesDeterministicFallbackContract: true,
+    usesSafeSourceMaterialProvenance: true,
+    usesStructuredReviewChecklist: true,
+    usesTemplateReadinessDomain: true,
   };
 }
 
