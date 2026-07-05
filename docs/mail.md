@@ -125,14 +125,18 @@ student attempts/results, teacher-reviewed AI drafts, and safe source-material
 provenance.
 
 The same module also exposes `buildMailTransactionalWorkspaceHandoffView()`, a
-localized 20-slice preflight contract for verifying transactional email
+localized 30-slice preflight contract for verifying transactional email
 boundaries without sending real mail. It covers the template set, individual
 subjects, normalized HTML language, HTML/plain-text rendering, shared layout,
 workspace boundary panel, activity/assignment/result/AI/source/worksheet
-scopes, structured classroom contact fields, action-link placement, legacy-copy
-guard, and private-data guard. Its privacy contract must stay false for
-recipient names, recipient emails, action URLs, contact message text, raw
-errors, raw student identifiers, and source-material storage keys.
+scopes, locale fallback, render-before-send/provider boundaries, structured
+classroom contact fields, action-link placement, no-mutation guarantees for
+activities, assignment links, attempts, result exports, source file bytes, and
+student notifications, plus provider-secret, legacy-copy, and private-data
+guards. Its privacy contract must stay false for recipient names, recipient
+emails, action URLs, contact message text, raw errors, raw student identifiers,
+source-material storage keys, provider API tokens, file-byte reads, learner
+notifications, product mutations, and result exports.
 
 **Adding a template:** extend `EmailTemplate` in `types.ts` → add to `EmailTemplates` and `getEmailSubject` in `render.ts` → add React component under `templates/`. Any new visible subject, heading, body, or button copy must be added to the locale message files before it is used by the template.
 

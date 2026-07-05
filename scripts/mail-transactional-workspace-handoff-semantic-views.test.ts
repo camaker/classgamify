@@ -204,14 +204,14 @@ const MAIL_RENDER_CASES = [
   },
 ] as const satisfies MailRenderCase[];
 
-test('transactional mail handoff exposes 20 localized workspace slices', () => {
+test('transactional mail handoff exposes 30 localized workspace slices', () => {
   const handoffView = buildMailTransactionalWorkspaceHandoffView({
     locale: 'en',
   });
   const itemIds = handoffView.itemViews.map((item) => item.id);
 
   assert.deepEqual(itemIds, [...MAIL_TRANSACTIONAL_WORKSPACE_HANDOFF_ITEM_IDS]);
-  assert.equal(new Set(itemIds).size, 20);
+  assert.equal(new Set(itemIds).size, 30);
   assert.equal(
     handoffView.itemViews.every(
       (item) =>
@@ -223,18 +223,28 @@ test('transactional mail handoff exposes 20 localized workspace slices', () => {
     true
   );
   assert.deepEqual(handoffView.privacy, {
+    exportsResultRecords: false,
     exposesActionUrls: false,
     exposesContactMessageText: false,
+    exposesProviderApiTokens: false,
     exposesRawErrors: false,
     exposesRecipientEmail: false,
     exposesRecipientName: false,
     exposesSourceMaterialStorageKeys: false,
     exposesStudentIdentifiers: false,
     itemIds,
+    mutatesActivities: false,
+    mutatesAssignmentLinks: false,
+    mutatesAttemptRecords: false,
+    normalizesUnsupportedLocales: true,
+    readsSourceMaterialFileBytes: false,
+    rendersBeforeProviderSend: true,
     rendersSharedBoundaryPanel: true,
     scope: 'transactional-email-workspace-boundary',
+    sendsLearnerNotifications: false,
     templateIds: [...MAIL_TRANSACTIONAL_TEMPLATE_IDS],
     usesLocalizedSubjects: true,
+    usesProviderRegistryBoundary: true,
   });
 
   assert.equal(getHandoffItemValue(handoffView, 'template-set'), '4 templates');
@@ -260,12 +270,24 @@ test('transactional mail handoff exposes 20 localized workspace slices', () => {
   );
   assert.equal(getHandoffItemValue(handoffView, 'html-language'), 'en');
   assert.equal(
+    getHandoffItemValue(handoffView, 'locale-fallback'),
+    'Base locale fallback'
+  );
+  assert.equal(
     getHandoffItemValue(handoffView, 'plain-text-render'),
     'HTML and text'
   );
   assert.equal(
+    getHandoffItemValue(handoffView, 'render-before-send'),
+    'Prepared render'
+  );
+  assert.equal(
     getHandoffItemValue(handoffView, 'shared-layout'),
     'EmailLayout'
+  );
+  assert.equal(
+    getHandoffItemValue(handoffView, 'provider-registry-boundary'),
+    'Shared provider'
   );
   assert.equal(
     getHandoffItemValue(handoffView, 'boundary-panel'),
@@ -292,6 +314,10 @@ test('transactional mail handoff exposes 20 localized workspace slices', () => {
     'No storage keys'
   );
   assert.equal(
+    getHandoffItemValue(handoffView, 'no-file-byte-read'),
+    'No file bytes'
+  );
+  assert.equal(
     getHandoffItemValue(handoffView, 'worksheet-workflow-scope'),
     'Worksheet workflows'
   );
@@ -302,6 +328,30 @@ test('transactional mail handoff exposes 20 localized workspace slices', () => {
   assert.equal(
     getHandoffItemValue(handoffView, 'action-link-placement'),
     'After boundary'
+  );
+  assert.equal(
+    getHandoffItemValue(handoffView, 'no-activity-mutation'),
+    'No activity changes'
+  );
+  assert.equal(
+    getHandoffItemValue(handoffView, 'no-assignment-mutation'),
+    'No link changes'
+  );
+  assert.equal(
+    getHandoffItemValue(handoffView, 'no-attempt-mutation'),
+    'No attempt changes'
+  );
+  assert.equal(
+    getHandoffItemValue(handoffView, 'no-result-export'),
+    'No export'
+  );
+  assert.equal(
+    getHandoffItemValue(handoffView, 'no-learner-notification'),
+    'Teacher email only'
+  );
+  assert.equal(
+    getHandoffItemValue(handoffView, 'provider-secret-guard'),
+    'Secrets hidden'
   );
   assert.equal(
     getHandoffItemValue(handoffView, 'legacy-copy-guard'),
@@ -321,11 +371,16 @@ test('transactional mail handoff localizes Chinese subjects and boundaries', () 
 
   assert.equal(handoffView.title, '事务邮件工作区交接');
   assert.equal(getHandoffItemValue(handoffView, 'template-set'), '4 个模板');
+  assert.match(handoffView.description, /30 切片/);
   assert.equal(
     getHandoffItemValue(handoffView, 'verify-email-template'),
     '验证你的 ClassGamify 教师工作区邮箱'
   );
   assert.equal(getHandoffItemValue(handoffView, 'html-language'), 'zh');
+  assert.equal(
+    getHandoffItemValue(handoffView, 'locale-fallback'),
+    '基础语言兜底'
+  );
   assert.equal(
     getHandoffItemValue(handoffView, 'boundary-panel'),
     '工作区边界'
@@ -333,6 +388,22 @@ test('transactional mail handoff localizes Chinese subjects and boundaries', () 
   assert.equal(
     getHandoffItemValue(handoffView, 'activities-scope'),
     '活动与模板'
+  );
+  assert.equal(
+    getHandoffItemValue(handoffView, 'no-file-byte-read'),
+    '不读文件'
+  );
+  assert.equal(
+    getHandoffItemValue(handoffView, 'no-assignment-mutation'),
+    '链接不变'
+  );
+  assert.equal(
+    getHandoffItemValue(handoffView, 'no-learner-notification'),
+    '仅老师邮件'
+  );
+  assert.equal(
+    getHandoffItemValue(handoffView, 'provider-secret-guard'),
+    '密钥已隐藏'
   );
   assert.equal(
     getHandoffItemValue(handoffView, 'private-data-guard'),

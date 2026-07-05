@@ -39,17 +39,27 @@ export const MAIL_TRANSACTIONAL_WORKSPACE_HANDOFF_ITEM_IDS = [
   'contact-template',
   'localized-subjects',
   'html-language',
+  'locale-fallback',
   'plain-text-render',
+  'render-before-send',
   'shared-layout',
+  'provider-registry-boundary',
   'boundary-panel',
   'activities-scope',
   'assignments-scope',
   'attempt-results-scope',
   'ai-draft-scope',
   'source-material-safety',
+  'no-file-byte-read',
   'worksheet-workflow-scope',
   'contact-classroom-fields',
   'action-link-placement',
+  'no-activity-mutation',
+  'no-assignment-mutation',
+  'no-attempt-mutation',
+  'no-result-export',
+  'no-learner-notification',
+  'provider-secret-guard',
   'legacy-copy-guard',
   'private-data-guard',
 ] as const;
@@ -69,18 +79,28 @@ export type MailTransactionalWorkspaceHandoffItemView = {
 };
 
 export type MailTransactionalWorkspaceHandoffPrivacyContract = {
+  exportsResultRecords: false;
   exposesActionUrls: false;
   exposesContactMessageText: false;
+  exposesProviderApiTokens: false;
   exposesRawErrors: false;
   exposesRecipientEmail: false;
   exposesRecipientName: false;
   exposesSourceMaterialStorageKeys: false;
   exposesStudentIdentifiers: false;
   itemIds: MailTransactionalWorkspaceHandoffItemId[];
+  mutatesActivities: false;
+  mutatesAssignmentLinks: false;
+  mutatesAttemptRecords: false;
+  normalizesUnsupportedLocales: true;
+  readsSourceMaterialFileBytes: false;
+  rendersBeforeProviderSend: true;
   rendersSharedBoundaryPanel: true;
   scope: 'transactional-email-workspace-boundary';
+  sendsLearnerNotifications: false;
   templateIds: MailTransactionalTemplateId[];
   usesLocalizedSubjects: true;
+  usesProviderRegistryBoundary: true;
 };
 
 export type MailTransactionalWorkspaceHandoffView = {
@@ -376,6 +396,44 @@ function buildMailTransactionalWorkspaceHandoffItem({
     });
   }
 
+  if (id === 'locale-fallback') {
+    return buildMailTransactionalWorkspaceStaticItem({
+      description: m.mail_transactional_handoff_locale_fallback_description(
+        undefined,
+        localeOptions
+      ),
+      id,
+      label: m.mail_transactional_handoff_locale_fallback_label(
+        undefined,
+        localeOptions
+      ),
+      localeOptions,
+      value: m.mail_transactional_handoff_locale_fallback_value(
+        undefined,
+        localeOptions
+      ),
+    });
+  }
+
+  if (id === 'render-before-send') {
+    return buildMailTransactionalWorkspaceStaticItem({
+      description: m.mail_transactional_handoff_render_before_send_description(
+        undefined,
+        localeOptions
+      ),
+      id,
+      label: m.mail_transactional_handoff_render_before_send_label(
+        undefined,
+        localeOptions
+      ),
+      localeOptions,
+      value: m.mail_transactional_handoff_render_before_send_value(
+        undefined,
+        localeOptions
+      ),
+    });
+  }
+
   if (id === 'shared-layout') {
     return buildMailTransactionalWorkspaceStaticItem({
       description: m.mail_transactional_handoff_shared_layout_description(
@@ -389,6 +447,26 @@ function buildMailTransactionalWorkspaceHandoffItem({
       ),
       localeOptions,
       value: m.mail_transactional_handoff_shared_layout_value(
+        undefined,
+        localeOptions
+      ),
+    });
+  }
+
+  if (id === 'provider-registry-boundary') {
+    return buildMailTransactionalWorkspaceStaticItem({
+      description:
+        m.mail_transactional_handoff_provider_registry_boundary_description(
+          undefined,
+          localeOptions
+        ),
+      id,
+      label: m.mail_transactional_handoff_provider_registry_boundary_label(
+        undefined,
+        localeOptions
+      ),
+      localeOptions,
+      value: m.mail_transactional_handoff_provider_registry_boundary_value(
         undefined,
         localeOptions
       ),
@@ -463,6 +541,25 @@ function buildMailTransactionalWorkspaceHandoffItem({
     });
   }
 
+  if (id === 'no-file-byte-read') {
+    return buildMailTransactionalWorkspaceStaticItem({
+      description: m.mail_transactional_handoff_no_file_byte_read_description(
+        undefined,
+        localeOptions
+      ),
+      id,
+      label: m.mail_transactional_handoff_no_file_byte_read_label(
+        undefined,
+        localeOptions
+      ),
+      localeOptions,
+      value: m.mail_transactional_handoff_no_file_byte_read_value(
+        undefined,
+        localeOptions
+      ),
+    });
+  }
+
   if (id === 'worksheet-workflow-scope') {
     return buildMailTransactionalWorkspaceStaticItem({
       description:
@@ -517,6 +614,124 @@ function buildMailTransactionalWorkspaceHandoffItem({
       ),
       localeOptions,
       value: m.mail_transactional_handoff_action_link_placement_value(
+        undefined,
+        localeOptions
+      ),
+    });
+  }
+
+  if (id === 'no-activity-mutation') {
+    return buildMailTransactionalWorkspaceStaticItem({
+      description:
+        m.mail_transactional_handoff_no_activity_mutation_description(
+          undefined,
+          localeOptions
+        ),
+      id,
+      label: m.mail_transactional_handoff_no_activity_mutation_label(
+        undefined,
+        localeOptions
+      ),
+      localeOptions,
+      value: m.mail_transactional_handoff_no_activity_mutation_value(
+        undefined,
+        localeOptions
+      ),
+    });
+  }
+
+  if (id === 'no-assignment-mutation') {
+    return buildMailTransactionalWorkspaceStaticItem({
+      description:
+        m.mail_transactional_handoff_no_assignment_mutation_description(
+          undefined,
+          localeOptions
+        ),
+      id,
+      label: m.mail_transactional_handoff_no_assignment_mutation_label(
+        undefined,
+        localeOptions
+      ),
+      localeOptions,
+      value: m.mail_transactional_handoff_no_assignment_mutation_value(
+        undefined,
+        localeOptions
+      ),
+    });
+  }
+
+  if (id === 'no-attempt-mutation') {
+    return buildMailTransactionalWorkspaceStaticItem({
+      description: m.mail_transactional_handoff_no_attempt_mutation_description(
+        undefined,
+        localeOptions
+      ),
+      id,
+      label: m.mail_transactional_handoff_no_attempt_mutation_label(
+        undefined,
+        localeOptions
+      ),
+      localeOptions,
+      value: m.mail_transactional_handoff_no_attempt_mutation_value(
+        undefined,
+        localeOptions
+      ),
+    });
+  }
+
+  if (id === 'no-result-export') {
+    return buildMailTransactionalWorkspaceStaticItem({
+      description: m.mail_transactional_handoff_no_result_export_description(
+        undefined,
+        localeOptions
+      ),
+      id,
+      label: m.mail_transactional_handoff_no_result_export_label(
+        undefined,
+        localeOptions
+      ),
+      localeOptions,
+      value: m.mail_transactional_handoff_no_result_export_value(
+        undefined,
+        localeOptions
+      ),
+    });
+  }
+
+  if (id === 'no-learner-notification') {
+    return buildMailTransactionalWorkspaceStaticItem({
+      description:
+        m.mail_transactional_handoff_no_learner_notification_description(
+          undefined,
+          localeOptions
+        ),
+      id,
+      label: m.mail_transactional_handoff_no_learner_notification_label(
+        undefined,
+        localeOptions
+      ),
+      localeOptions,
+      value: m.mail_transactional_handoff_no_learner_notification_value(
+        undefined,
+        localeOptions
+      ),
+    });
+  }
+
+  if (id === 'provider-secret-guard') {
+    return buildMailTransactionalWorkspaceStaticItem({
+      description:
+        m.mail_transactional_handoff_provider_secret_guard_description(
+          undefined,
+          localeOptions
+        ),
+      id,
+      label: m.mail_transactional_handoff_provider_secret_guard_label(
+        undefined,
+        localeOptions
+      ),
+      localeOptions,
+      value: m.mail_transactional_handoff_provider_secret_guard_value(
         undefined,
         localeOptions
       ),
@@ -616,18 +831,28 @@ function buildMailTransactionalWorkspaceHandoffPrivacyContract(
   itemViews: MailTransactionalWorkspaceHandoffItemView[]
 ): MailTransactionalWorkspaceHandoffPrivacyContract {
   return {
+    exportsResultRecords: false,
     exposesActionUrls: false,
     exposesContactMessageText: false,
+    exposesProviderApiTokens: false,
     exposesRawErrors: false,
     exposesRecipientEmail: false,
     exposesRecipientName: false,
     exposesSourceMaterialStorageKeys: false,
     exposesStudentIdentifiers: false,
     itemIds: itemViews.map((item) => item.id),
+    mutatesActivities: false,
+    mutatesAssignmentLinks: false,
+    mutatesAttemptRecords: false,
+    normalizesUnsupportedLocales: true,
+    readsSourceMaterialFileBytes: false,
+    rendersBeforeProviderSend: true,
     rendersSharedBoundaryPanel: true,
     scope: 'transactional-email-workspace-boundary',
+    sendsLearnerNotifications: false,
     templateIds: [...MAIL_TRANSACTIONAL_TEMPLATE_IDS],
     usesLocalizedSubjects: true,
+    usesProviderRegistryBoundary: true,
   };
 }
 
