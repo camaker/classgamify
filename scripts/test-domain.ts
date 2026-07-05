@@ -478,6 +478,7 @@ import {
   buildRoadmapPageViewModel,
   buildTeachersPageViewModel,
   HOME_PAGE_PRODUCT_LOOP_HANDOFF_ITEM_IDS,
+  PRICING_PAGE_HANDOFF_ITEM_IDS,
   ROADMAP_PUBLIC_HANDOFF_ITEM_IDS,
 } from '@/pages/public-page-view';
 import {
@@ -1659,6 +1660,11 @@ assert.match(
   pricingRouteSource,
   /aria-label=\{pageView\.valueSection\.ariaLabel\}[\s\S]*pageView\.valueCards\.map[\s\S]*<ValueCard[\s\S]*item=\{item\}/,
   'The pricing route should render value cards inside the prepared value section semantics.'
+);
+assert.match(
+  pricingRouteSource,
+  /<PricingPageHandoffPanel view=\{pageView\.handoffView\} \/>[\s\S]*data-handoff="public-pricing-plan-boundary"[\s\S]*view\.itemViews\.map\(\(item\) =>[\s\S]*data-handoff-item=\{item\.id\}/,
+  'The pricing route should render the prepared public pricing handoff with stable item ids.'
 );
 assert.match(
   pricingRouteSource,
@@ -6447,8 +6453,13 @@ const publicPageViewSource = readFileSync(
 );
 assert.match(
   publicPageViewSource,
-  /export type PricingPageViewModel[\s\S]*valueSection: PricingPageSectionView;[\s\S]*valueCards: PricingValueCardView\[\];[\s\S]*export type PricingFaqItemView = \{[\s\S]*ariaLabel: string;[\s\S]*type PricingValueCardView = \{[\s\S]*ariaLabel: string;/,
-  'Pricing page view models should expose prepared section, FAQ item, and value card semantics.'
+  /export type PricingPageViewModel[\s\S]*handoffView: PricingPageHandoffView;[\s\S]*valueSection: PricingPageSectionView;[\s\S]*valueCards: PricingValueCardView\[\];[\s\S]*export type PricingFaqItemView = \{[\s\S]*ariaLabel: string;[\s\S]*type PricingValueCardView = \{[\s\S]*ariaLabel: string;/,
+  'Pricing page view models should expose prepared section, FAQ item, value card, and plan-boundary handoff semantics.'
+);
+assert.match(
+  publicPageViewSource,
+  /export const PRICING_PAGE_HANDOFF_ITEM_IDS = \[(?=[\s\S]*'pricing-route')(?=[\s\S]*'product-loop')(?=[\s\S]*'plan-source')(?=[\s\S]*'free-plan-boundary')(?=[\s\S]*'pro-plan-boundary')(?=[\s\S]*'lifetime-plan-boundary')(?=[\s\S]*'subscription-price-path')(?=[\s\S]*'authenticated-checkout')(?=[\s\S]*'payment-provider-boundary')(?=[\s\S]*'school-cta-path')(?=[\s\S]*'student-account-boundary')(?=[\s\S]*'source-material-access')(?=[\s\S]*'privacy-guard')[\s\S]*export type PricingPageHandoffPrivacyContract = \{[\s\S]*exposesCheckoutSessionIds: false;[\s\S]*exposesPaymentProviderSecrets: false;[\s\S]*exposesRawAnonymousToken: false;[\s\S]*exposesSourceMaterialStorageKeys: false;[\s\S]*publishesAssignmentLinks: false;[\s\S]*scope: 'public-pricing-plan-boundary';/,
+  'Pricing page handoff should expose stable public plan-boundary item ids and privacy contract fields.'
 );
 assert.match(
   publicPageViewSource,
@@ -6459,6 +6470,48 @@ assert.match(
   publicPageViewSource,
   /m\.pricing_faq_section_aria_label\(\{[\s\S]*m\.pricing_value_section_aria_label\(\{[\s\S]*m\.pricing_faq_item_aria_label\(\{[\s\S]*m\.pricing_value_card_aria_label\(\{/,
   'Pricing page view model should prepare localized value, FAQ, and card aria labels.'
+);
+const pricingPlanBoundaryPageView = buildPricingPageViewModel();
+assert.deepEqual(
+  pricingPlanBoundaryPageView.handoffView.itemViews.map((item) => item.id),
+  [...PRICING_PAGE_HANDOFF_ITEM_IDS],
+  'Pricing page view model should expose the complete 30-slice pricing handoff.'
+);
+assert.deepEqual(
+  pricingPlanBoundaryPageView.handoffView.privacy,
+  {
+    exposesAnswerKeys: false,
+    exposesCheckoutSessionIds: false,
+    exposesPaymentProviderSecrets: false,
+    exposesRawAnonymousToken: false,
+    exposesSourceMaterialStorageKeys: false,
+    exposesStudentAttemptRecords: false,
+    exposesTeacherPrivateActivityContent: false,
+    itemIds: [...PRICING_PAGE_HANDOFF_ITEM_IDS],
+    mutatesTeacherData: false,
+    publishesAssignmentLinks: false,
+    routeActionsUseSharedConstants: true,
+    scope: 'public-pricing-plan-boundary',
+  },
+  'Pricing page handoff should summarize public pricing without private checkout, student, source-material, or activity data.'
+);
+assert.equal(
+  pricingPlanBoundaryPageView.handoffView.itemViews.find(
+    (item) => item.id === 'product-loop'
+  )?.value,
+  'Activity -> Assignment -> Attempt -> Results'
+);
+assert.equal(
+  pricingPlanBoundaryPageView.handoffView.itemViews.find(
+    (item) => item.id === 'school-cta-path'
+  )?.value,
+  Routes.ContactClassroom
+);
+assert.equal(
+  pricingPlanBoundaryPageView.handoffView.itemViews.find(
+    (item) => item.id === 'billing-return-path'
+  )?.value,
+  Routes.Payment
 );
 const menuItemConfigSource = readFileSync('src/types/index.d.ts', 'utf8');
 const navbarSource = readFileSync('src/components/layout/navbar.tsx', 'utf8');

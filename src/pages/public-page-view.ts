@@ -5,7 +5,9 @@ import {
   getActivityTemplates,
 } from '@/activities/catalog';
 import { m } from '@/locale/paraglide/messages';
+import { getAllPricePlans } from '@/lib/price-plan';
 import { Routes } from '@/lib/routes';
+import { PaymentTypes, type PricePlan } from '@/payment/types';
 import type {
   ActivitySeed,
   ActivityTemplateType,
@@ -378,6 +380,7 @@ export type PricingPageViewModel = {
     items: PricingFaqItemView[];
     title: string;
   };
+  handoffView: PricingPageHandoffView;
   hero: {
     eyebrow: string;
     subtitle: string;
@@ -420,6 +423,72 @@ type PricingValueCardView = {
   ariaLabel: string;
   description: string;
   id: PricingValueCardId;
+  title: string;
+};
+
+export const PRICING_PAGE_HANDOFF_ITEM_IDS = [
+  'pricing-route',
+  'product-loop',
+  'hero-positioning',
+  'value-section',
+  'template-value',
+  'assignment-value',
+  'ai-value',
+  'plan-source',
+  'plan-count',
+  'free-plan-boundary',
+  'pro-plan-boundary',
+  'lifetime-plan-boundary',
+  'subscription-price-path',
+  'one-time-price-path',
+  'free-preview-action',
+  'authenticated-checkout',
+  'hosted-checkout',
+  'payment-provider-boundary',
+  'current-plan-context',
+  'billing-return-path',
+  'school-cta-path',
+  'faq-boundary',
+  'student-account-boundary',
+  'activity-library-access',
+  'assignment-workflow-access',
+  'ai-draft-access',
+  'result-export-access',
+  'source-material-access',
+  'legacy-copy-guard',
+  'privacy-guard',
+] as const;
+
+export type PricingPageHandoffItemId =
+  (typeof PRICING_PAGE_HANDOFF_ITEM_IDS)[number];
+
+export type PricingPageHandoffItemView = {
+  ariaLabel: string;
+  description: string;
+  id: PricingPageHandoffItemId;
+  label: string;
+  value: string;
+};
+
+export type PricingPageHandoffPrivacyContract = {
+  exposesAnswerKeys: false;
+  exposesCheckoutSessionIds: false;
+  exposesPaymentProviderSecrets: false;
+  exposesRawAnonymousToken: false;
+  exposesSourceMaterialStorageKeys: false;
+  exposesStudentAttemptRecords: false;
+  exposesTeacherPrivateActivityContent: false;
+  itemIds: PricingPageHandoffItemId[];
+  mutatesTeacherData: false;
+  publishesAssignmentLinks: false;
+  routeActionsUseSharedConstants: true;
+  scope: 'public-pricing-plan-boundary';
+};
+
+export type PricingPageHandoffView = {
+  description: string;
+  itemViews: PricingPageHandoffItemView[];
+  privacy: PricingPageHandoffPrivacyContract;
   title: string;
 };
 
@@ -1723,6 +1792,32 @@ export function buildPricingPageViewModel(): PricingPageViewModel {
       items: buildPricingFaqItems(),
       title: faqTitle,
     },
+    handoffView: buildPricingPageHandoffView({
+      faqItems: buildPricingFaqItems(),
+      schoolCta: {
+        action: {
+          ariaLabel: m.pricing_school_cta_aria_label(),
+          label: schoolCtaLabel,
+          to: Routes.ContactClassroom,
+        },
+        ariaLabel: m.pricing_school_cta_section_aria_label({
+          description: schoolCtaDescription,
+          title: schoolCtaTitle,
+        }),
+        description: schoolCtaDescription,
+        eyebrow: m.pricing_school_eyebrow(),
+        title: schoolCtaTitle,
+      },
+      valueCards,
+      valueSection: {
+        ariaLabel: m.pricing_value_section_aria_label({
+          description: valueSectionDescription,
+          title: valueSectionTitle,
+        }),
+        description: valueSectionDescription,
+        title: valueSectionTitle,
+      },
+    }),
     hero: {
       eyebrow: m.pricing_eyebrow(),
       subtitle: m.pricing_subtitle(),
@@ -1752,6 +1847,334 @@ export function buildPricingPageViewModel(): PricingPageViewModel {
     },
     valueCards,
   };
+}
+
+export function buildPricingPageHandoffView({
+  faqItems,
+  schoolCta,
+  valueCards,
+  valueSection,
+}: Pick<PricingPageViewModel, 'schoolCta' | 'valueCards' | 'valueSection'> & {
+  faqItems: PricingFaqItemView[];
+}): PricingPageHandoffView {
+  const plans = getAllPricePlans();
+  const itemViews = PRICING_PAGE_HANDOFF_ITEM_IDS.map((id) =>
+    buildPricingPageHandoffItemView({
+      faqItems,
+      id,
+      plans,
+      schoolCta,
+      valueCards,
+      valueSection,
+    })
+  );
+
+  return {
+    description: m.pricing_subtitle(),
+    itemViews,
+    privacy: buildPricingPageHandoffPrivacyContract(itemViews),
+    title: m.pricing_title(),
+  };
+}
+
+type PricingPageHandoffBuildContext = Pick<
+  PricingPageViewModel,
+  'schoolCta' | 'valueCards' | 'valueSection'
+> & {
+  faqItems: PricingFaqItemView[];
+  id: PricingPageHandoffItemId;
+  plans: PricePlan[];
+};
+
+function buildPricingPageHandoffItemView(
+  context: PricingPageHandoffBuildContext
+): PricingPageHandoffItemView {
+  const label = getPricingPageHandoffItemLabel(context);
+  const description = getPricingPageHandoffItemDescription(context);
+  const value = getPricingPageHandoffItemValue(context);
+
+  return {
+    ariaLabel: m.home_handoff_item_aria({
+      description,
+      label,
+      value,
+    }),
+    description,
+    id: context.id,
+    label,
+    value,
+  };
+}
+
+function getPricingPageHandoffItemLabel(
+  context: PricingPageHandoffBuildContext
+) {
+  switch (context.id) {
+    case 'pricing-route':
+      return m.nav_pricing();
+    case 'product-loop':
+      return m.home_handoff_product_loop_label();
+    case 'hero-positioning':
+      return m.pricing_eyebrow();
+    case 'value-section':
+      return context.valueSection.title;
+    case 'template-value':
+      return getPricingValueCard(context.valueCards, 'templates').title;
+    case 'assignment-value':
+      return getPricingValueCard(context.valueCards, 'assignments').title;
+    case 'ai-value':
+      return getPricingValueCard(context.valueCards, 'ai').title;
+    case 'plan-source':
+    case 'plan-count':
+      return m.settings_billing_handoff_plan_source_label();
+    case 'free-plan-boundary':
+      return m.settings_billing_handoff_free_plan_boundary_label();
+    case 'pro-plan-boundary':
+      return m.settings_billing_handoff_pro_plan_boundary_label();
+    case 'lifetime-plan-boundary':
+      return m.settings_billing_handoff_lifetime_plan_boundary_label();
+    case 'subscription-price-path':
+    case 'one-time-price-path':
+    case 'authenticated-checkout':
+    case 'hosted-checkout':
+      return m.settings_billing_handoff_hosted_checkout_label();
+    case 'free-preview-action':
+      return m.pricing_card_get_started_for_free();
+    case 'payment-provider-boundary':
+      return m.settings_billing_handoff_provider_boundary_label();
+    case 'current-plan-context':
+      return m.settings_billing_handoff_current_plan_card_label();
+    case 'billing-return-path':
+      return m.settings_billing_handoff_payment_callback_label();
+    case 'school-cta-path':
+      return context.schoolCta.title;
+    case 'faq-boundary':
+      return m.pricing_faq_title();
+    case 'student-account-boundary':
+      return getPricingFaqItem(context.faqItems, 'student-accounts').question;
+    case 'activity-library-access':
+      return m.settings_billing_handoff_activity_library_access_label();
+    case 'assignment-workflow-access':
+      return m.settings_billing_handoff_assignment_workflow_access_label();
+    case 'ai-draft-access':
+      return m.settings_billing_handoff_ai_draft_access_label();
+    case 'result-export-access':
+      return m.settings_billing_handoff_result_export_access_label();
+    case 'source-material-access':
+      return m.settings_billing_handoff_source_material_access_label();
+    case 'legacy-copy-guard':
+      return m.home_handoff_legacy_guard_label();
+    case 'privacy-guard':
+      return m.settings_billing_handoff_privacy_guard_label();
+  }
+}
+
+function getPricingPageHandoffItemDescription(
+  context: PricingPageHandoffBuildContext
+) {
+  switch (context.id) {
+    case 'pricing-route':
+      return m.pricing_description();
+    case 'product-loop':
+      return m.home_handoff_product_loop_description();
+    case 'hero-positioning':
+      return m.pricing_subtitle();
+    case 'value-section':
+      return context.valueSection.description;
+    case 'template-value':
+      return getPricingValueCard(context.valueCards, 'templates').description;
+    case 'assignment-value':
+      return getPricingValueCard(context.valueCards, 'assignments').description;
+    case 'ai-value':
+      return getPricingValueCard(context.valueCards, 'ai').description;
+    case 'plan-source':
+    case 'plan-count':
+      return m.settings_billing_handoff_plan_source_description();
+    case 'free-plan-boundary':
+      return m.settings_billing_handoff_free_plan_boundary_description();
+    case 'pro-plan-boundary':
+      return m.settings_billing_handoff_pro_plan_boundary_description();
+    case 'lifetime-plan-boundary':
+      return m.settings_billing_handoff_lifetime_plan_boundary_description();
+    case 'subscription-price-path':
+    case 'one-time-price-path':
+    case 'authenticated-checkout':
+    case 'hosted-checkout':
+      return m.settings_billing_handoff_hosted_checkout_description();
+    case 'free-preview-action':
+      return m.pricing_faq_free_answer();
+    case 'payment-provider-boundary':
+      return m.settings_billing_handoff_provider_boundary_description();
+    case 'current-plan-context':
+      return m.settings_billing_handoff_current_plan_card_description();
+    case 'billing-return-path':
+      return m.settings_billing_handoff_payment_callback_description();
+    case 'school-cta-path':
+      return context.schoolCta.description;
+    case 'faq-boundary':
+      return m.pricing_faq_description();
+    case 'student-account-boundary':
+      return getPricingFaqItem(context.faqItems, 'student-accounts').answer;
+    case 'activity-library-access':
+      return m.settings_billing_handoff_activity_library_access_description();
+    case 'assignment-workflow-access':
+      return m.settings_billing_handoff_assignment_workflow_access_description();
+    case 'ai-draft-access':
+      return m.settings_billing_handoff_ai_draft_access_description();
+    case 'result-export-access':
+      return m.settings_billing_handoff_result_export_access_description();
+    case 'source-material-access':
+      return m.settings_billing_handoff_source_material_access_description();
+    case 'legacy-copy-guard':
+      return m.home_handoff_legacy_guard_description();
+    case 'privacy-guard':
+      return m.settings_billing_handoff_privacy_guard_description();
+  }
+}
+
+function getPricingPageHandoffItemValue(
+  context: PricingPageHandoffBuildContext
+) {
+  switch (context.id) {
+    case 'pricing-route':
+      return Routes.Pricing;
+    case 'product-loop':
+      return 'Activity -> Assignment -> Attempt -> Results';
+    case 'hero-positioning':
+      return m.pricing_title();
+    case 'value-section':
+      return formatPricingHandoffCount(context.valueCards.length);
+    case 'template-value':
+      return getPricingValueCard(context.valueCards, 'templates').title;
+    case 'assignment-value':
+      return getPricingValueCard(context.valueCards, 'assignments').title;
+    case 'ai-value':
+      return getPricingValueCard(context.valueCards, 'ai').title;
+    case 'plan-source':
+      return m.pricing_eyebrow();
+    case 'plan-count':
+      return formatPricingHandoffCount(countEnabledPricingPlans(context.plans));
+    case 'free-plan-boundary':
+      return getPricingPlanValue(context.plans, 'free');
+    case 'pro-plan-boundary':
+      return getPricingPlanValue(context.plans, 'pro');
+    case 'lifetime-plan-boundary':
+      return getPricingPlanValue(context.plans, 'lifetime');
+    case 'subscription-price-path':
+      return formatPricingHandoffCount(
+        countPricingPrices(context.plans, PaymentTypes.SUBSCRIPTION)
+      );
+    case 'one-time-price-path':
+      return formatPricingHandoffCount(
+        countPricingPrices(context.plans, PaymentTypes.ONE_TIME)
+      );
+    case 'free-preview-action':
+      return Routes.Create;
+    case 'authenticated-checkout':
+      return m.pricing_trust_checkout();
+    case 'hosted-checkout':
+      return m.pricing_trust_secure();
+    case 'payment-provider-boundary':
+      return m.settings_billing_handoff_provider_boundary_value();
+    case 'current-plan-context':
+      return m.pricing_card_your_current_plan();
+    case 'billing-return-path':
+      return Routes.Payment;
+    case 'school-cta-path':
+      return context.schoolCta.action.to;
+    case 'faq-boundary':
+      return formatPricingHandoffCount(context.faqItems.length);
+    case 'student-account-boundary':
+      return getPricingFaqItem(context.faqItems, 'student-accounts').question;
+    case 'activity-library-access':
+      return m.settings_billing_workspace_summary_activities_label();
+    case 'assignment-workflow-access':
+      return m.settings_billing_workspace_summary_assignments_label();
+    case 'ai-draft-access':
+      return m.settings_billing_handoff_ai_draft_access_value();
+    case 'result-export-access':
+      return m.settings_billing_handoff_result_export_access_value();
+    case 'source-material-access':
+      return m.settings_billing_handoff_source_material_access_value();
+    case 'legacy-copy-guard':
+      return m.home_handoff_legacy_guard_value();
+    case 'privacy-guard':
+      return m.settings_billing_handoff_privacy_guard_value();
+  }
+}
+
+function buildPricingPageHandoffPrivacyContract(
+  itemViews: PricingPageHandoffItemView[]
+): PricingPageHandoffPrivacyContract {
+  return {
+    exposesAnswerKeys: false,
+    exposesCheckoutSessionIds: false,
+    exposesPaymentProviderSecrets: false,
+    exposesRawAnonymousToken: false,
+    exposesSourceMaterialStorageKeys: false,
+    exposesStudentAttemptRecords: false,
+    exposesTeacherPrivateActivityContent: false,
+    itemIds: itemViews.map((itemView) => itemView.id),
+    mutatesTeacherData: false,
+    publishesAssignmentLinks: false,
+    routeActionsUseSharedConstants: true,
+    scope: 'public-pricing-plan-boundary',
+  };
+}
+
+function getPricingValueCard(
+  valueCards: PricingValueCardView[],
+  id: PricingValueCardId
+) {
+  const valueCard = valueCards.find((card) => card.id === id);
+
+  if (!valueCard) {
+    throw new Error(`Missing pricing value card: ${id}`);
+  }
+
+  return valueCard;
+}
+
+function getPricingFaqItem(
+  faqItems: PricingFaqItemView[],
+  id: PricingFaqItemId
+) {
+  const faqItem = faqItems.find((item) => item.id === id);
+
+  if (!faqItem) {
+    throw new Error(`Missing pricing FAQ item: ${id}`);
+  }
+
+  return faqItem;
+}
+
+function getPricingPlanValue(plans: PricePlan[], id: string) {
+  const plan = plans.find((item) => item.id === id);
+
+  return plan?.name ?? id;
+}
+
+function countEnabledPricingPlans(plans: PricePlan[]) {
+  return plans.filter((plan) => !plan.disabled).length;
+}
+
+function countPricingPrices(
+  plans: PricePlan[],
+  type: typeof PaymentTypes.ONE_TIME | typeof PaymentTypes.SUBSCRIPTION
+) {
+  return plans.reduce(
+    (total, plan) =>
+      total +
+      plan.prices.filter((price) => !price.disabled && price.type === type)
+        .length,
+    0
+  );
+}
+
+function formatPricingHandoffCount(count: number) {
+  return m.home_handoff_count_value({
+    count: Math.max(0, Math.trunc(Number.isFinite(count) ? count : 0)),
+  });
 }
 
 export function buildPricingFaqItems(): PricingFaqItemView[] {

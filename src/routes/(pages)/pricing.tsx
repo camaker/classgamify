@@ -18,6 +18,7 @@ import { jsonLdScript } from '@/lib/structured-data';
 import {
   buildPricingFaqItems,
   buildPricingPageViewModel,
+  type PricingPageHandoffView,
   type PricingValueCardId,
 } from '@/pages/public-page-view';
 import { cn } from '@/lib/utils';
@@ -94,6 +95,8 @@ function PricingPage() {
           ))}
         </section>
 
+        <PricingPageHandoffPanel view={pageView.handoffView} />
+
         <div id="plans" className="scroll-mt-24">
           <PricingTable
             currentPlan={currentPlan}
@@ -160,6 +163,34 @@ function PricingPage() {
         </section>
       </div>
     </Container>
+  );
+}
+
+function PricingPageHandoffPanel({ view }: { view: PricingPageHandoffView }) {
+  const titleId = 'public-pricing-plan-boundary-handoff-title';
+  const descriptionId = 'public-pricing-plan-boundary-handoff-description';
+
+  return (
+    <section
+      aria-describedby={descriptionId}
+      aria-labelledby={titleId}
+      className="sr-only"
+      data-handoff="public-pricing-plan-boundary"
+    >
+      <h2 id={titleId}>{view.title}</h2>
+      <p id={descriptionId}>{view.description}</p>
+      <dl>
+        {view.itemViews.map((item) => (
+          <div data-handoff-item={item.id} key={item.id}>
+            <dt>{item.label}</dt>
+            <dd>
+              <output aria-label={item.ariaLabel}>{item.value}</output>
+              <span>{item.description}</span>
+            </dd>
+          </div>
+        ))}
+      </dl>
+    </section>
   );
 }
 
