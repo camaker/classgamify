@@ -9221,10 +9221,16 @@ const notificationWorkspaceSummarySource = readFileSync(
   'src/components/settings/notification/notification-workspace-summary.tsx',
   'utf8'
 );
+const newsletterHookSource = readFileSync('src/hooks/use-newsletter.ts', 'utf8');
 assert.doesNotMatch(
   newsletterFormCardSource,
   /err\.message|error\.message|statusError\?\.message|subscribeMutation\.error\?\.message|unsubscribeMutation\.error\?\.message|err instanceof Error|error instanceof Error/,
   'Newsletter settings failures should use localized notification copy instead of raw status or mutation errors.'
+);
+assert.doesNotMatch(
+  newsletterFormCardSource,
+  /console\.error\([^)]*,/,
+  'Newsletter settings card should log stable failure events without raw mutation payloads.'
 );
 assert.match(
   newsletterFormCardSource,
@@ -9240,6 +9246,21 @@ assert.match(
   newsletterFormCardSource,
   /toast\.error\(view\.emailRequiredMessage\)[\s\S]*toast\.success\(view\.subscribeSuccessMessage\)[\s\S]*toast\.success\(view\.unsubscribeSuccessMessage\)[\s\S]*toast\.error\(view\.errorMessage\)/,
   'Newsletter settings toasts should use prepared localized email-required, success, and failure copy.'
+);
+assert.match(
+  newsletterFormCardSource,
+  /useNewsletterStatus\([\s\S]*notificationsEnabled \? currentUser\?\.email : undefined[\s\S]*await subscribeMutation\.mutateAsync\(currentUser\.email\);[\s\S]*await unsubscribeMutation\.mutateAsync\(currentUser\.email\);/,
+  'Newsletter settings card should scope status and mutations to the current teacher email.'
+);
+assert.match(
+  newsletterHookSource,
+  /queryKey: newsletterKeys\.status\(email \?\? ''\)[\s\S]*enabled: !!email[\s\S]*mutationFn: \(email: string\) => subscribeNewsletter\(\{ data: \{ email \} \}\)[\s\S]*mutationFn: \(email: string\) => unsubscribeNewsletter\(\{ data: \{ email \} \}\)/,
+  'Newsletter hooks should keep provider status and mutations scoped to a teacher email query key.'
+);
+assert.doesNotMatch(
+  newsletterHookSource,
+  /@\/(?:activities|assignments|storage|db)|activityId|assignmentId|attemptId|studentId|shareSlug|sourceMaterial|storageKey|publicLink|learner/i,
+  'Newsletter hooks should not touch activity, assignment, attempt, student, public-link, or source-material data.'
 );
 assert.match(
   newsletterFormCardSource,
@@ -10192,6 +10213,11 @@ assert.doesNotMatch(
   newsletterApiSource,
   /error instanceof Error \? error\.message|throw new Error\(\s*error\.message/,
   'Newsletter server functions should not expose raw provider errors to clients.'
+);
+assert.doesNotMatch(
+  newsletterApiSource,
+  /console\.error\([^)]*,/,
+  'Newsletter server functions should log stable failure events without raw provider errors.'
 );
 assert.match(
   newsletterApiSource,

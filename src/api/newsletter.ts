@@ -21,8 +21,8 @@ export const getNewsletterStatus = createServerFn({ method: 'GET' })
     try {
       const subscribed = await isSubscribed(data.email);
       return { subscribed };
-    } catch (error) {
-      console.error('Check newsletter status error:', error);
+    } catch {
+      console.error('Newsletter status check failed');
       throw new Error(m.newsletter_error_generic());
     }
   });
@@ -45,12 +45,12 @@ export const subscribeNewsletter = createServerFn({ method: 'POST' })
             template: 'subscribeNewsletter',
             context: { email: data.email, locale: getLocale() },
           });
-        } catch (e) {
-          console.error('Newsletter welcome email error:', e);
+        } catch {
+          console.error('Newsletter welcome email failed');
         }
       }
-    } catch (error) {
-      console.error('Subscribe newsletter error:', error);
+    } catch {
+      console.error('Newsletter subscribe failed');
       throw new Error(m.newsletter_error());
     }
   });
@@ -64,8 +64,8 @@ export const unsubscribeNewsletter = createServerFn({ method: 'POST' })
       if (!ok) {
         throw new Error(m.newsletter_error_unsubscribe());
       }
-    } catch (error) {
-      console.error('Unsubscribe newsletter error:', error);
+    } catch {
+      console.error('Newsletter unsubscribe failed');
       throw new Error(m.newsletter_error_unsubscribe());
     }
   });

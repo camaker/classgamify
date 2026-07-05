@@ -82,8 +82,8 @@ export function NewsletterFormCard({
         await unsubscribeMutation.mutateAsync(currentUser.email);
         toast.success(view.unsubscribeSuccessMessage);
       }
-    } catch (err) {
-      console.error('newsletter subscription error:', err);
+    } catch {
+      console.error('newsletter subscription update failed');
       toast.error(view.errorMessage);
       form.setValue('subscribed', newsletterStatus?.subscribed ?? false);
     }
