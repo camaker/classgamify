@@ -26,13 +26,23 @@ export const STUDENT_RUNTIME_IDENTITY_HANDOFF_ITEM_IDS = [
   'pair-count',
   'group-item-count',
   'choice-count',
+  'runtime-id-normalization-source',
+  'multilingual-id-collision-guard',
   'submission-contract',
+  'submission-validation-boundary',
+  'unknown-answer-id-policy',
+  'duplicate-answer-id-policy',
+  'answer-list-length-policy',
   'browser-answer-boundary',
   'scoring-lookup-boundary',
   'teacher-results-boundary',
   'public-payload-boundary',
+  'assignment-snapshot-boundary',
+  'activity-content-boundary',
   'prompt-choice-boundary',
   'answer-text-boundary',
+  'student-name-boundary',
+  'anonymous-token-boundary',
   'source-material-boundary',
   'privacy-guard',
 ] as const;
@@ -49,17 +59,24 @@ export type StudentRuntimeIdentityHandoffItemView = {
 };
 
 export type StudentRuntimeIdentityHandoffPrivacyContract = {
+  exposesActivityContentJson: false;
   exposesAnswerText: false;
+  exposesAnonymousToken: false;
   exposesRuntimeChoiceText: false;
   exposesRuntimeItemIds: false;
   exposesRuntimePromptText: false;
   exposesSourceMaterialMetadata: false;
+  exposesStudentName: false;
   itemIds: StudentRuntimeIdentityHandoffItemId[];
   normalizedRuntimeIdCount: number;
+  rejectsDuplicateAnswerIds: true;
+  rejectsOverlongAnswerRows: true;
+  rejectsUnknownRuntimeIds: true;
   runtimeItemCount: number;
   runtimeIdsUnique: boolean;
   runnerSurface: ActivityTemplateRunnerKind;
   templateType: ActivityTemplateType;
+  usesFrozenSnapshotIdentity: true;
 };
 
 export type StudentRuntimeIdentityHandoffView = {
@@ -261,6 +278,25 @@ function buildStudentRuntimeIdentityHandoffItem({
           count: summary.choiceCount,
         }),
       };
+    case 'runtime-id-normalization-source':
+      return {
+        description:
+          m.student_runtime_identity_handoff_normalization_source_description(),
+        id,
+        label: m.student_runtime_identity_handoff_normalization_source_label(),
+        value: m.student_runtime_identity_handoff_shared_helper_value(),
+      };
+    case 'multilingual-id-collision-guard':
+      return {
+        description:
+          m.student_runtime_identity_handoff_multilingual_collision_description(),
+        id,
+        label:
+          m.student_runtime_identity_handoff_multilingual_collision_label(),
+        value: summary.runtimeIdsUnique
+          ? m.student_runtime_identity_handoff_collision_safe_value()
+          : m.student_runtime_identity_handoff_collision_blocked_value(),
+      };
     case 'submission-contract':
       return {
         description:
@@ -268,6 +304,38 @@ function buildStudentRuntimeIdentityHandoffItem({
         id,
         label: m.student_runtime_interaction_handoff_answer_contract_label(),
         value: STUDENT_RUNTIME_IDENTITY_ANSWER_CONTRACT_VALUE,
+      };
+    case 'submission-validation-boundary':
+      return {
+        description:
+          m.student_runtime_identity_handoff_submission_validation_description(),
+        id,
+        label: m.student_runtime_identity_handoff_submission_validation_label(),
+        value: m.student_runtime_identity_handoff_server_validation_value(),
+      };
+    case 'unknown-answer-id-policy':
+      return {
+        description:
+          m.student_runtime_identity_handoff_unknown_answer_id_description(),
+        id,
+        label: m.student_runtime_identity_handoff_unknown_answer_id_label(),
+        value: m.student_runtime_identity_handoff_rejected_value(),
+      };
+    case 'duplicate-answer-id-policy':
+      return {
+        description:
+          m.student_runtime_identity_handoff_duplicate_answer_id_description(),
+        id,
+        label: m.student_runtime_identity_handoff_duplicate_answer_id_label(),
+        value: m.student_runtime_identity_handoff_rejected_value(),
+      };
+    case 'answer-list-length-policy':
+      return {
+        description:
+          m.student_runtime_identity_handoff_answer_list_length_description(),
+        id,
+        label: m.student_runtime_identity_handoff_answer_list_length_label(),
+        value: m.student_runtime_identity_handoff_rejected_value(),
       };
     case 'browser-answer-boundary':
       return {
@@ -301,6 +369,23 @@ function buildStudentRuntimeIdentityHandoffItem({
         label: m.student_runtime_interaction_handoff_public_payload_label(),
         value: m.student_runtime_interaction_handoff_public_payload_value(),
       };
+    case 'assignment-snapshot-boundary':
+      return {
+        description:
+          m.student_runtime_identity_handoff_assignment_snapshot_description(),
+        id,
+        label: m.student_runtime_identity_handoff_assignment_snapshot_label(),
+        value: m.student_runtime_identity_handoff_frozen_snapshot_value(),
+      };
+    case 'activity-content-boundary':
+      return {
+        description:
+          m.student_runtime_identity_handoff_activity_content_description(),
+        id,
+        label: m.student_runtime_identity_handoff_activity_content_label(),
+        value:
+          m.student_runtime_identity_handoff_activity_content_hidden_value(),
+      };
     case 'prompt-choice-boundary':
       return {
         description:
@@ -318,6 +403,23 @@ function buildStudentRuntimeIdentityHandoffItem({
           m.student_runtime_interaction_handoff_answer_text_boundary_label(),
         value:
           m.student_runtime_interaction_handoff_answer_text_boundary_value(),
+      };
+    case 'student-name-boundary':
+      return {
+        description:
+          m.student_runtime_identity_handoff_student_name_description(),
+        id,
+        label: m.student_runtime_identity_handoff_student_name_label(),
+        value: m.student_runtime_identity_handoff_student_name_hidden_value(),
+      };
+    case 'anonymous-token-boundary':
+      return {
+        description:
+          m.student_runtime_identity_handoff_anonymous_token_description(),
+        id,
+        label: m.student_runtime_identity_handoff_anonymous_token_label(),
+        value:
+          m.student_runtime_identity_handoff_anonymous_token_hidden_value(),
       };
     case 'source-material-boundary':
       return {
@@ -371,17 +473,24 @@ function buildStudentRuntimeIdentityHandoffPrivacyContract({
   templateType: ActivityTemplateType;
 }): StudentRuntimeIdentityHandoffPrivacyContract {
   return {
+    exposesActivityContentJson: false,
     exposesAnswerText: false,
+    exposesAnonymousToken: false,
     exposesRuntimeChoiceText: false,
     exposesRuntimeItemIds: false,
     exposesRuntimePromptText: false,
     exposesSourceMaterialMetadata: false,
+    exposesStudentName: false,
     itemIds: itemViews.map((itemView) => itemView.id),
     normalizedRuntimeIdCount: summary.normalizedRuntimeIdCount,
+    rejectsDuplicateAnswerIds: true,
+    rejectsOverlongAnswerRows: true,
+    rejectsUnknownRuntimeIds: true,
     runtimeItemCount: summary.runtimeItemCount,
     runtimeIdsUnique: summary.runtimeIdsUnique,
     runnerSurface,
     templateType,
+    usesFrozenSnapshotIdentity: true,
   };
 }
 

@@ -21,7 +21,7 @@ const SECRET_SOURCE_MATERIAL = 'secret-worksheet-storage-key.pdf';
 const SECRET_STUDENT_NAME = 'Private Student Name';
 const SECRET_TOKEN = 'raw-anonymous-token';
 
-test('student runtime identity handoff exposes 20 safe multilingual slices', () => {
+test('student runtime identity handoff exposes 30 safe multilingual slices', () => {
   const content = buildActivityContent({
     description: 'Chinese punctuation runtime identity coverage',
     difficulty: 'starter',
@@ -53,7 +53,7 @@ test('student runtime identity handoff exposes 20 safe multilingual slices', () 
   const itemIds = handoffView.itemViews.map((item) => item.id);
 
   assert.deepEqual(itemIds, [...STUDENT_RUNTIME_IDENTITY_HANDOFF_ITEM_IDS]);
-  assert.equal(new Set(itemIds).size, 20);
+  assert.equal(new Set(itemIds).size, 30);
   assert.equal(
     handoffView.itemViews.every(
       (item) =>
@@ -65,17 +65,24 @@ test('student runtime identity handoff exposes 20 safe multilingual slices', () 
     true
   );
   assert.deepEqual(handoffView.privacy, {
+    exposesActivityContentJson: false,
     exposesAnswerText: false,
+    exposesAnonymousToken: false,
     exposesRuntimeChoiceText: false,
     exposesRuntimeItemIds: false,
     exposesRuntimePromptText: false,
     exposesSourceMaterialMetadata: false,
+    exposesStudentName: false,
     itemIds,
     normalizedRuntimeIdCount: 3,
+    rejectsDuplicateAnswerIds: true,
+    rejectsOverlongAnswerRows: true,
+    rejectsUnknownRuntimeIds: true,
     runtimeIdsUnique: true,
     runtimeItemCount: 3,
     runnerSurface: 'group-sort',
     templateType: 'group-sort',
+    usesFrozenSnapshotIdentity: true,
   });
 
   assert.equal(getHandoffValue(handoffView, 'template-type'), 'Group sort');
@@ -105,8 +112,32 @@ test('student runtime identity handoff exposes 20 safe multilingual slices', () 
   );
   assert.equal(getHandoffValue(handoffView, 'choice-count'), '1 choices');
   assert.equal(
+    getHandoffValue(handoffView, 'runtime-id-normalization-source'),
+    'Shared helper'
+  );
+  assert.equal(
+    getHandoffValue(handoffView, 'multilingual-id-collision-guard'),
+    'Collision safe'
+  );
+  assert.equal(
     getHandoffValue(handoffView, 'submission-contract'),
     '{ itemId, answer }'
+  );
+  assert.equal(
+    getHandoffValue(handoffView, 'submission-validation-boundary'),
+    'Server validation'
+  );
+  assert.equal(
+    getHandoffValue(handoffView, 'unknown-answer-id-policy'),
+    'Rejected'
+  );
+  assert.equal(
+    getHandoffValue(handoffView, 'duplicate-answer-id-policy'),
+    'Rejected'
+  );
+  assert.equal(
+    getHandoffValue(handoffView, 'answer-list-length-policy'),
+    'Rejected'
   );
   assert.equal(
     getHandoffValue(handoffView, 'browser-answer-boundary'),
@@ -125,12 +156,28 @@ test('student runtime identity handoff exposes 20 safe multilingual slices', () 
     'Sanitized runtime'
   );
   assert.equal(
+    getHandoffValue(handoffView, 'assignment-snapshot-boundary'),
+    'Frozen snapshot'
+  );
+  assert.equal(
+    getHandoffValue(handoffView, 'activity-content-boundary'),
+    'ActivityContent hidden'
+  );
+  assert.equal(
     getHandoffValue(handoffView, 'prompt-choice-boundary'),
     'Text omitted'
   );
   assert.equal(
     getHandoffValue(handoffView, 'answer-text-boundary'),
     'Answers omitted'
+  );
+  assert.equal(
+    getHandoffValue(handoffView, 'student-name-boundary'),
+    'Student name hidden'
+  );
+  assert.equal(
+    getHandoffValue(handoffView, 'anonymous-token-boundary'),
+    'Token hidden'
   );
   assert.equal(
     getHandoffValue(handoffView, 'source-material-boundary'),
@@ -180,6 +227,10 @@ test('student runtime identity handoff blocks duplicate and blank runtime ids', 
     'Blocked'
   );
   assert.equal(
+    getHandoffValue(handoffView, 'multilingual-id-collision-guard'),
+    'Collision blocked'
+  );
+  assert.equal(
     getHandoffValue(handoffView, 'duplicate-runtime-id-count'),
     '1 duplicates'
   );
@@ -214,8 +265,20 @@ test('student runtime identity handoff localizes Chinese identity boundaries', (
     });
 
     assert.equal(handoffView.title, '运行身份交接');
-    assert.match(handoffView.description, /20 切片/);
+    assert.match(handoffView.description, /30 切片/);
     assert.equal(getHandoffValue(handoffView, 'template-type'), '分组分类');
+    assert.equal(
+      getHandoffValue(handoffView, 'runtime-id-normalization-source'),
+      '共享 helper'
+    );
+    assert.equal(
+      getHandoffValue(handoffView, 'submission-validation-boundary'),
+      '服务器校验'
+    );
+    assert.equal(
+      getHandoffValue(handoffView, 'unknown-answer-id-policy'),
+      '已拒绝'
+    );
     assert.equal(
       getHandoffValue(handoffView, 'unique-runtime-id-status'),
       '唯一'
@@ -231,6 +294,10 @@ test('student runtime identity handoff localizes Chinese identity boundaries', (
     assert.equal(
       getHandoffValue(handoffView, 'source-material-boundary'),
       '已隐藏'
+    );
+    assert.equal(
+      getHandoffValue(handoffView, 'anonymous-token-boundary'),
+      '匿名令牌已隐藏'
     );
 
     assertNoPrivateIdentityText(JSON.stringify(handoffView));

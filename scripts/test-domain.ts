@@ -618,6 +618,7 @@ import {
   stripRuntimeAnswer,
   stripRuntimeAnswers,
   summarizePublicAttemptReviewItemsForTotal,
+  type PublicRuntimeItem,
 } from '@/assignments/public';
 import {
   compareRuntimeDisplaySearchText,
@@ -1081,6 +1082,10 @@ import {
   buildStudentRuntimeSingleAnswerChanges,
   STUDENT_RUNTIME_INTERACTION_HANDOFF_ITEM_IDS,
 } from '@/assignments/student-runtime-item-list';
+import {
+  buildStudentRuntimeIdentityHandoffView,
+  STUDENT_RUNTIME_IDENTITY_HANDOFF_ITEM_IDS,
+} from '@/assignments/runtime-identity-handoff';
 import {
   ASSIGNMENT_MAX_ATTEMPTS_RANGE,
   ASSIGNMENT_PUBLISH_FIELD_LIMITS,
@@ -12998,6 +13003,10 @@ const studentRuntimeItemListDomainSource = readFileSync(
   'src/assignments/student-runtime-item-list.ts',
   'utf8'
 );
+const studentRuntimeIdentityHandoffSource = readFileSync(
+  'src/assignments/runtime-identity-handoff.ts',
+  'utf8'
+);
 const studentRunnerViewSource = readFileSync(
   'src/assignments/student-runner-view.ts',
   'utf8'
@@ -13285,15 +13294,66 @@ assert.deepEqual(
   ],
   'Student runtime interaction handoff should expose exactly 30 stable slice ids.'
 );
+assert.deepEqual(
+  [...STUDENT_RUNTIME_IDENTITY_HANDOFF_ITEM_IDS],
+  [
+    'template-type',
+    'runner-surface',
+    'runtime-item-count',
+    'normalized-runtime-id-count',
+    'unique-runtime-id-status',
+    'duplicate-runtime-id-count',
+    'blank-runtime-id-count',
+    'question-count',
+    'pair-count',
+    'group-item-count',
+    'choice-count',
+    'runtime-id-normalization-source',
+    'multilingual-id-collision-guard',
+    'submission-contract',
+    'submission-validation-boundary',
+    'unknown-answer-id-policy',
+    'duplicate-answer-id-policy',
+    'answer-list-length-policy',
+    'browser-answer-boundary',
+    'scoring-lookup-boundary',
+    'teacher-results-boundary',
+    'public-payload-boundary',
+    'assignment-snapshot-boundary',
+    'activity-content-boundary',
+    'prompt-choice-boundary',
+    'answer-text-boundary',
+    'student-name-boundary',
+    'anonymous-token-boundary',
+    'source-material-boundary',
+    'privacy-guard',
+  ],
+  'Student runtime identity handoff should expose exactly 30 stable slice ids.'
+);
 assert.match(
   studentRuntimeItemListDomainSource,
   /export type StudentRuntimeInteractionHandoffView = \{[\s\S]*description: string;[\s\S]*itemViews: StudentRuntimeInteractionHandoffItemView\[\];[\s\S]*privacy: StudentRuntimeInteractionHandoffPrivacyContract;[\s\S]*title: string;/,
   'Student runtime item list domain should expose an explicit runtime interaction handoff view contract.'
 );
 assert.match(
+  studentRuntimeIdentityHandoffSource,
+  /export type StudentRuntimeIdentityHandoffPrivacyContract = \{[\s\S]*exposesActivityContentJson: false;[\s\S]*exposesAnswerText: false;[\s\S]*exposesAnonymousToken: false;[\s\S]*exposesRuntimeChoiceText: false;[\s\S]*exposesRuntimeItemIds: false;[\s\S]*exposesRuntimePromptText: false;[\s\S]*exposesSourceMaterialMetadata: false;[\s\S]*exposesStudentName: false;[\s\S]*rejectsDuplicateAnswerIds: true;[\s\S]*rejectsOverlongAnswerRows: true;[\s\S]*rejectsUnknownRuntimeIds: true;[\s\S]*usesFrozenSnapshotIdentity: true;/,
+  'Student runtime identity handoff privacy should lock activity content, student name, anonymous token, submission validation, and frozen snapshot boundaries.'
+);
+assert.match(
+  studentRuntimeIdentityHandoffSource,
+  /getAttemptAnswerRuntimeItemEntries\(\{[\s\S]*includeEmpty: true,[\s\S]*runtimeItems: items,[\s\S]*\}\)/,
+  'Student runtime identity handoff should summarize ids through the shared attempt-answer normalizer.'
+);
+assert.match(
   studentRuntimeItemListDomainSource,
   /interactionHandoffView: StudentRuntimeInteractionHandoffView;/,
   'Student runtime item list view should include the prepared runtime interaction handoff view.'
+);
+assert.match(
+  studentRuntimeItemListDomainSource,
+  /runtimeIdentityHandoffView: StudentRuntimeIdentityHandoffView;[\s\S]*runtimeIdentityHandoffView: buildStudentRuntimeIdentityHandoffView\(\{[\s\S]*items,[\s\S]*templateType,[\s\S]*\}\)/,
+  'Student runtime item list view should include the prepared runtime identity handoff view from the current runtime items and template.'
 );
 assert.match(
   studentRuntimeItemListDomainSource,
@@ -13314,6 +13374,11 @@ assert.match(
   studentRuntimeItemListSource,
   /StudentRuntimeInteractionHandoffView[\s\S]*data-handoff="student-runtime-interaction"[\s\S]*view\.itemViews\.map[\s\S]*data-handoff-item=\{item\.id\}[\s\S]*<output aria-label=\{item\.ariaLabel\}>/,
   'Student runtime item-list component should render hidden stable runtime-interaction handoff outputs from the prepared view.'
+);
+assert.match(
+  studentRuntimeItemListSource,
+  /StudentRuntimeIdentityHandoffView[\s\S]*data-handoff="student-runtime-identity"[\s\S]*view\.itemViews\.map[\s\S]*data-handoff-item=\{item\.id\}[\s\S]*<output aria-label=\{item\.ariaLabel\}>/,
+  'Student runtime item-list component should render hidden stable runtime-identity handoff outputs from the prepared view.'
 );
 assert.match(
   studentRuntimeItemListSource,
@@ -15856,10 +15921,168 @@ assert.equal(
   false,
   'Student runtime interaction handoff should not expose runtime item ids.'
 );
+const quizRuntimeIdentityHandoffView =
+  quizRuntimeListView.runtimeIdentityHandoffView;
+const quizRuntimeIdentityHandoffValues = new Map(
+  quizRuntimeIdentityHandoffView.itemViews.map((item) => [
+    item.id,
+    item.value,
+  ])
+);
+assert.deepEqual(
+  quizRuntimeIdentityHandoffView.itemViews.map((item) => item.id),
+  [...STUDENT_RUNTIME_IDENTITY_HANDOFF_ITEM_IDS],
+  'Student runtime identity handoff should expose the stable 30 slice order.'
+);
+assert.deepEqual(quizRuntimeIdentityHandoffView.privacy, {
+  exposesActivityContentJson: false,
+  exposesAnswerText: false,
+  exposesAnonymousToken: false,
+  exposesRuntimeChoiceText: false,
+  exposesRuntimeItemIds: false,
+  exposesRuntimePromptText: false,
+  exposesSourceMaterialMetadata: false,
+  exposesStudentName: false,
+  itemIds: [...STUDENT_RUNTIME_IDENTITY_HANDOFF_ITEM_IDS],
+  normalizedRuntimeIdCount: 1,
+  rejectsDuplicateAnswerIds: true,
+  rejectsOverlongAnswerRows: true,
+  rejectsUnknownRuntimeIds: true,
+  runtimeItemCount: 1,
+  runtimeIdsUnique: true,
+  runnerSurface: 'choice-list',
+  templateType: 'quiz',
+  usesFrozenSnapshotIdentity: true,
+});
+assert.equal(quizRuntimeIdentityHandoffValues.get('template-type'), 'Quiz');
+assert.equal(
+  quizRuntimeIdentityHandoffValues.get('runtime-id-normalization-source'),
+  'Shared helper'
+);
+assert.equal(
+  quizRuntimeIdentityHandoffValues.get('multilingual-id-collision-guard'),
+  'Collision safe'
+);
+assert.equal(
+  quizRuntimeIdentityHandoffValues.get('submission-validation-boundary'),
+  'Server validation'
+);
+assert.equal(
+  quizRuntimeIdentityHandoffValues.get('unknown-answer-id-policy'),
+  'Rejected'
+);
+assert.equal(
+  quizRuntimeIdentityHandoffValues.get('duplicate-answer-id-policy'),
+  'Rejected'
+);
+assert.equal(
+  quizRuntimeIdentityHandoffValues.get('answer-list-length-policy'),
+  'Rejected'
+);
+assert.equal(
+  quizRuntimeIdentityHandoffValues.get('assignment-snapshot-boundary'),
+  'Frozen snapshot'
+);
+assert.equal(
+  quizRuntimeIdentityHandoffValues.get('activity-content-boundary'),
+  'ActivityContent hidden'
+);
+assert.equal(
+  quizRuntimeIdentityHandoffValues.get('student-name-boundary'),
+  'Student name hidden'
+);
+assert.equal(
+  quizRuntimeIdentityHandoffValues.get('anonymous-token-boundary'),
+  'Token hidden'
+);
+assert.equal(
+  JSON.stringify(quizRuntimeIdentityHandoffView).includes(
+    'Capital of France?'
+  ),
+  false,
+  'Student runtime identity handoff should not expose prompt text.'
+);
+assert.equal(
+  JSON.stringify(quizRuntimeIdentityHandoffView).includes('Paris'),
+  false,
+  'Student runtime identity handoff should not expose answer or choice text.'
+);
+assert.equal(
+  JSON.stringify(quizRuntimeIdentityHandoffView).includes('q-1'),
+  false,
+  'Student runtime identity handoff should not expose runtime item ids.'
+);
+const blockedRuntimeIdentityHandoffView =
+  buildStudentRuntimeIdentityHandoffView({
+    items: [
+      {
+        choices: ['Secret choice'],
+        id: 'item-1',
+        kind: 'question',
+        prompt: 'Secret prompt',
+      },
+      {
+        choices: ['Secret choice'],
+        id: ' ｉｔｅｍ－１ ',
+        kind: 'pair',
+        prompt: 'Secret prompt',
+      },
+      {
+        choices: ['Secret group'],
+        id: '   ',
+        kind: 'group-item',
+        prompt: 'Secret prompt',
+      },
+    ] satisfies PublicRuntimeItem[],
+    templateType: 'matching-pairs',
+  });
+const blockedRuntimeIdentityHandoffValues = new Map(
+  blockedRuntimeIdentityHandoffView.itemViews.map((item) => [
+    item.id,
+    item.value,
+  ])
+);
+assert.equal(blockedRuntimeIdentityHandoffView.privacy.runtimeIdsUnique, false);
+assert.equal(
+  blockedRuntimeIdentityHandoffView.privacy.normalizedRuntimeIdCount,
+  1
+);
+assert.equal(
+  blockedRuntimeIdentityHandoffValues.get('multilingual-id-collision-guard'),
+  'Collision blocked'
+);
+assert.equal(
+  blockedRuntimeIdentityHandoffValues.get('duplicate-runtime-id-count'),
+  '1 duplicates'
+);
+assert.equal(
+  blockedRuntimeIdentityHandoffValues.get('blank-runtime-id-count'),
+  '1 blank ids'
+);
+assert.equal(
+  JSON.stringify(blockedRuntimeIdentityHandoffView).includes('Secret prompt'),
+  false,
+  'Student runtime identity collision handoff should not expose prompt text.'
+);
+assert.equal(
+  JSON.stringify(blockedRuntimeIdentityHandoffView).includes('Secret choice'),
+  false,
+  'Student runtime identity collision handoff should not expose choice text.'
+);
+assert.equal(
+  JSON.stringify(blockedRuntimeIdentityHandoffView).includes('item-1'),
+  false,
+  'Student runtime identity collision handoff should not expose runtime item ids.'
+);
 assert.match(
   e2eTestCatalogText,
   /Student runtime interaction exposes a 30-slice handoff[\s\S]*student-runtime-interaction[\s\S]*renderer dispatch boundary[\s\S]*prompt\/choice\/answer text boundaries/,
   'E2E catalog should cover the hidden 30-slice student runtime interaction handoff contract.'
+);
+assert.match(
+  e2eTestCatalogText,
+  /Student runtime identity exposes a 30-slice handoff[\s\S]*runtime id normalization source[\s\S]*submission validation boundary[\s\S]*anonymous-token boundary/,
+  'E2E catalog should cover the hidden 30-slice student runtime identity handoff contract.'
 );
 const listeningRuntimeInteractionHandoffView =
   buildStudentRuntimeItemListView({
