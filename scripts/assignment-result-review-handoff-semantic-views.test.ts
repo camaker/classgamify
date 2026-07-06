@@ -1,4 +1,5 @@
 import assert from 'node:assert/strict';
+import { readFileSync } from 'node:fs';
 import test from 'node:test';
 import {
   ASSIGNMENT_RESULT_REVIEW_HANDOFF_ITEM_IDS,
@@ -268,6 +269,19 @@ test('assignment result review handoff localizes Chinese review boundaries', () 
   assert.equal(getHandoffValue(handoffView, 'privacy-guard'), '已隐藏');
 
   overwriteGetLocale(() => 'en');
+});
+
+test('assignment result review handoff renders stable page markers', () => {
+  const source = readFileSync(
+    'src/components/assignments/assignment-results-review-handoff-panel.tsx',
+    'utf8'
+  );
+
+  assert.match(
+    source,
+    /export function AssignmentResultsReviewHandoffPanel[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*aria-labelledby=\{titleId\}[\s\S]*data-handoff="assignment-result-review"[\s\S]*data-handoff-scope=\{view\.privacy\.scope\}[\s\S]*view\.itemViews\.map[\s\S]*<article[\s\S]*aria-label=\{itemView\.ariaLabel\}[\s\S]*data-handoff-item=\{itemView\.id\}[\s\S]*data-scope=\{itemView\.dataScope\}[\s\S]*<output[\s\S]*aria-label=\{itemView\.ariaLabel\}/,
+    'Assignment result review handoff should expose the localized result-page marker, privacy scope, item ids, data scopes, and accessible output labels.'
+  );
 });
 
 function buildResultReviewPageData(): AssignmentResultsPageData<AssignmentAttemptRowDisplayInput> {

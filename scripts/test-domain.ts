@@ -3839,8 +3839,21 @@ assert.match(
     'src/components/assignments/assignment-results-review-handoff-panel.tsx',
     'utf8'
   ),
+  /data-handoff="assignment-result-review"[\s\S]*data-handoff-scope=\{view\.privacy\.scope\}[\s\S]*view\.itemViews\.map[\s\S]*data-handoff-item=\{itemView\.id\}[\s\S]*data-scope=\{itemView\.dataScope\}[\s\S]*aria-label=\{itemView\.ariaLabel\}/,
+  'Assignment results review handoff panel should render the main result review semantic handoff with marker, privacy scope, item ids, data scopes, and accessible labels.'
+);
+assert.match(
+  readFileSync(
+    'src/components/assignments/assignment-results-review-handoff-panel.tsx',
+    'utf8'
+  ),
   /data-handoff="assignment-result-review-controls"[\s\S]*view\.itemViews\.map[\s\S]*data-handoff-item=\{itemView\.id\}[\s\S]*aria-label=\{itemView\.ariaLabel\}/,
   'Assignment results review handoff panel should render the hidden result review controls semantic handoff.'
+);
+assert.match(
+  readFileSync('tests/e2e/TEST-CATALOG.md', 'utf8'),
+  /\|\s*6b\s*\|\s*Result review scope exposes a 30-slice handoff\s*\|[\s\S]*`assignment-result-review`[\s\S]*`data-handoff-item`/,
+  'E2E catalog should include the result-review handoff marker and stable item marker acceptance journey.'
 );
 assert.match(
   readFileSync('src/routes/dashboard/assignments/$assignmentId.tsx', 'utf8'),
