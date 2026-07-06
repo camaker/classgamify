@@ -2,6 +2,10 @@ import type {
   PublicAttemptReviewItem,
   PublicRuntimeItem,
 } from '@/assignments/public';
+import {
+  buildGroupSortBoardHandoffView,
+  type GroupSortBoardHandoffView,
+} from '@/assignments/group-sort-board-handoff';
 import { getActivityRunnerKindCopy } from '@/activities/runner-copy';
 import {
   buildGroupSortRunnerView,
@@ -80,133 +84,174 @@ export function GroupSortBoard({
     }
   }
 
-  return (
-    <div className="rounded-lg border bg-card p-3">
-      <div className="flex flex-wrap items-center justify-between gap-2">
-        <div className="flex items-center gap-2 text-sm font-medium">
-          <IconCategory2 className="size-4 text-primary" />
-          {copy.title}
-        </div>
-        <Badge variant="outline" className="rounded-md">
-          {runnerView.progressLabel}
-        </Badge>
-      </div>
+  const handoffView = useMemo(
+    () =>
+      buildGroupSortBoardHandoffView({
+        disabled,
+        revealAnswer,
+        runnerView,
+      }),
+    [disabled, revealAnswer, runnerView]
+  );
 
-      <div className="mt-3 grid gap-3 lg:grid-cols-[minmax(14rem,18rem)_minmax(0,1fr)]">
-        <div className="rounded-lg border bg-muted/20 p-3">
-          <div className="flex items-center justify-between gap-2">
-            <div className="flex items-center gap-2 text-sm font-medium">
-              <IconLayoutColumns className="size-4 text-muted-foreground" />
-              {copy.itemListLabel}
+  return (
+    <>
+      <div className="rounded-lg border bg-card p-3">
+        <div className="flex flex-wrap items-center justify-between gap-2">
+          <div className="flex items-center gap-2 text-sm font-medium">
+            <IconCategory2 className="size-4 text-primary" />
+            {copy.title}
+          </div>
+          <Badge variant="outline" className="rounded-md">
+            {runnerView.progressLabel}
+          </Badge>
+        </div>
+
+        <div className="mt-3 grid gap-3 lg:grid-cols-[minmax(14rem,18rem)_minmax(0,1fr)]">
+          <div className="rounded-lg border bg-muted/20 p-3">
+            <div className="flex items-center justify-between gap-2">
+              <div className="flex items-center gap-2 text-sm font-medium">
+                <IconLayoutColumns className="size-4 text-muted-foreground" />
+                {copy.itemListLabel}
+              </div>
+              {runnerView.selectedItem ? (
+                <button
+                  type="button"
+                  disabled={disabled}
+                  className="rounded-md border bg-background px-2 py-1 text-xs font-medium text-muted-foreground transition-colors hover:border-primary/50 hover:text-primary disabled:cursor-default disabled:opacity-60"
+                  onClick={() =>
+                    runnerView.selectedClearAction
+                      ? handleRunnerAction(runnerView.selectedClearAction)
+                      : undefined
+                  }
+                >
+                  {copy.clearSelectionLabel}
+                </button>
+              ) : null}
             </div>
-            {runnerView.selectedItem ? (
-              <button
-                type="button"
-                disabled={disabled}
-                className="rounded-md border bg-background px-2 py-1 text-xs font-medium text-muted-foreground transition-colors hover:border-primary/50 hover:text-primary disabled:cursor-default disabled:opacity-60"
-                onClick={() =>
-                  runnerView.selectedClearAction
-                    ? handleRunnerAction(runnerView.selectedClearAction)
-                    : undefined
-                }
-              >
-                {copy.clearSelectionLabel}
-              </button>
-            ) : null}
+
+            <div className="mt-3 grid gap-2">
+              {runnerView.unplacedItemViews.length ? (
+                runnerView.unplacedItemViews.map(
+                  ({
+                    action,
+                    item,
+                    reviewItem,
+                    reviewStatusClassName,
+                    selected,
+                  }) => (
+                    <GroupSortItemButton
+                      action={action}
+                      correctLabel={copy.correctAnswerLabel}
+                      key={item.id}
+                      item={item}
+                      reviewItem={reviewItem}
+                      revealAnswer={revealAnswer}
+                      reviewStatusClassName={reviewStatusClassName}
+                      selected={selected}
+                      onSelect={handleRunnerAction}
+                      disabled={disabled}
+                    />
+                  )
+                )
+              ) : (
+                <div className="min-h-14 rounded-lg border border-dashed bg-background/60 p-3 text-sm text-muted-foreground">
+                  {copy.emptyItemsLabel}
+                </div>
+              )}
+            </div>
           </div>
 
-          <div className="mt-3 grid gap-2">
-            {runnerView.unplacedItemViews.length ? (
-              runnerView.unplacedItemViews.map(
-                ({
-                  action,
-                  item,
-                  reviewItem,
-                  reviewStatusClassName,
-                  selected,
-                }) => (
-                  <GroupSortItemButton
-                    action={action}
-                    correctLabel={copy.correctAnswerLabel}
-                    key={item.id}
-                    item={item}
-                    reviewItem={reviewItem}
-                    revealAnswer={revealAnswer}
-                    reviewStatusClassName={reviewStatusClassName}
-                    selected={selected}
-                    onSelect={handleRunnerAction}
-                    disabled={disabled}
-                  />
-                )
-              )
-            ) : (
-              <div className="min-h-14 rounded-lg border border-dashed bg-background/60 p-3 text-sm text-muted-foreground">
-                {copy.emptyItemsLabel}
-              </div>
+          <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-3">
+            {runnerView.groupViews.map(
+              ({ action, group, id, placedItemViews }) => {
+                return (
+                  <div key={id} className="rounded-lg border bg-background p-3">
+                    <button
+                      type="button"
+                      disabled={!selectedItemId || disabled}
+                      className={cn(
+                        'min-h-14 w-full rounded-lg border bg-muted/20 p-3 text-left transition-colors',
+                        'disabled:cursor-default disabled:opacity-100',
+                        selectedItemId &&
+                          !disabled &&
+                          'border-primary/40 hover:border-primary/60 hover:bg-primary/5'
+                      )}
+                      onClick={() => handleRunnerAction(action)}
+                    >
+                      <div className="flex items-center justify-between gap-2">
+                        <p className="text-sm font-semibold">{group}</p>
+                        <Badge variant="secondary" className="rounded-md">
+                          {placedItemViews.length}
+                        </Badge>
+                      </div>
+                    </button>
+
+                    <div className="mt-3 grid gap-2">
+                      {placedItemViews.map(
+                        ({
+                          action,
+                          item,
+                          reviewItem,
+                          reviewStatusClassName,
+                          selected,
+                        }) => (
+                          <GroupSortItemButton
+                            key={item.id}
+                            correctLabel={copy.correctAnswerLabel}
+                            action={action}
+                            item={item}
+                            reviewItem={reviewItem}
+                            revealAnswer={revealAnswer}
+                            reviewStatusClassName={reviewStatusClassName}
+                            selected={selected}
+                            onSelect={handleRunnerAction}
+                            disabled={disabled}
+                            compact
+                          />
+                        )
+                      )}
+                      {!placedItemViews.length ? (
+                        <div className="min-h-12 rounded-lg border border-dashed bg-muted/10 p-3" />
+                      ) : null}
+                    </div>
+                  </div>
+                );
+              }
             )}
           </div>
         </div>
-
-        <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-3">
-          {runnerView.groupViews.map(
-            ({ action, group, id, placedItemViews }) => {
-              return (
-                <div key={id} className="rounded-lg border bg-background p-3">
-                  <button
-                    type="button"
-                    disabled={!selectedItemId || disabled}
-                    className={cn(
-                      'min-h-14 w-full rounded-lg border bg-muted/20 p-3 text-left transition-colors',
-                      'disabled:cursor-default disabled:opacity-100',
-                      selectedItemId &&
-                        !disabled &&
-                        'border-primary/40 hover:border-primary/60 hover:bg-primary/5'
-                    )}
-                    onClick={() => handleRunnerAction(action)}
-                  >
-                    <div className="flex items-center justify-between gap-2">
-                      <p className="text-sm font-semibold">{group}</p>
-                      <Badge variant="secondary" className="rounded-md">
-                        {placedItemViews.length}
-                      </Badge>
-                    </div>
-                  </button>
-
-                  <div className="mt-3 grid gap-2">
-                    {placedItemViews.map(
-                      ({
-                        action,
-                        item,
-                        reviewItem,
-                        reviewStatusClassName,
-                        selected,
-                      }) => (
-                        <GroupSortItemButton
-                          key={item.id}
-                          correctLabel={copy.correctAnswerLabel}
-                          action={action}
-                          item={item}
-                          reviewItem={reviewItem}
-                          revealAnswer={revealAnswer}
-                          reviewStatusClassName={reviewStatusClassName}
-                          selected={selected}
-                          onSelect={handleRunnerAction}
-                          disabled={disabled}
-                          compact
-                        />
-                      )
-                    )}
-                    {!placedItemViews.length ? (
-                      <div className="min-h-12 rounded-lg border border-dashed bg-muted/10 p-3" />
-                    ) : null}
-                  </div>
-                </div>
-              );
-            }
-          )}
-        </div>
       </div>
-    </div>
+      <GroupSortBoardHandoff view={handoffView} />
+    </>
+  );
+}
+
+function GroupSortBoardHandoff({ view }: { view: GroupSortBoardHandoffView }) {
+  const titleId = 'group-sort-board-handoff-title';
+  const descriptionId = 'group-sort-board-handoff-description';
+
+  return (
+    <section
+      aria-describedby={descriptionId}
+      aria-labelledby={titleId}
+      className="sr-only"
+      data-handoff="group-sort-board"
+    >
+      <h2 id={titleId}>{view.title}</h2>
+      <p id={descriptionId}>{view.description}</p>
+      <dl>
+        {view.itemViews.map((item) => (
+          <div data-handoff-item={item.id} key={item.id}>
+            <dt>{item.label}</dt>
+            <dd>
+              <output aria-label={item.ariaLabel}>{item.value}</output>
+              <span>{item.description}</span>
+            </dd>
+          </div>
+        ))}
+      </dl>
+    </section>
   );
 }
 

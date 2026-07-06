@@ -105,14 +105,14 @@ test('public editorial handoff summarizes blog, release, route, and sitemap stat
       ['assignment-copy', 'Covered'],
       ['ai-authoring-copy', 'Covered'],
       ['teacher-results-copy', 'Covered'],
-      ['source-material-boundary', 'No storage keys'],
-      ['student-runner-boundary', 'Sanitized runner'],
-      ['release-notes-boundary', 'Release notes'],
+      ['source-material-boundary', 'Private file references hidden'],
+      ['student-runner-boundary', 'Safe student assignment'],
+      ['release-notes-boundary', 'Product updates'],
       ['legacy-copy-guard', 'ClassGamify only'],
       ['handwriting-copy-guard', 'Excluded'],
       ['course-copy-guard', 'Excluded'],
       ['image-generation-provider-guard', 'Excluded'],
-      ['public-route-helper', 'Routes constants'],
+      ['public-route-helper', 'Public links'],
       ['private-data-guard', 'Private data hidden'],
       ['editorial-privacy-guard', 'Private data hidden'],
     ]
@@ -158,25 +158,24 @@ test('public editorial handoff localizes Chinese content boundaries', () => {
   }
 });
 
-test('blog routes attach the shared public editorial handoff', () => {
-  const handoffComponentSource = readFileSync(
-    'src/components/blog/public-editorial-handoff.tsx',
-    'utf8'
-  );
+test('blog routes keep internal editorial handoff out of public DOM', () => {
   const blogListRouteSource = readFileSync('src/routes/blog/index.tsx', 'utf8');
   const blogPostRouteSource = readFileSync('src/routes/blog/$slug.tsx', 'utf8');
 
-  assert.match(
-    handoffComponentSource,
-    /data-handoff="public-editorial-content"[\s\S]*view\.itemViews\.map[\s\S]*data-handoff-item=\{itemView\.id\}[\s\S]*<output aria-label=\{itemView\.ariaLabel\}>/
-  );
-  assert.match(
+  assert.doesNotMatch(
     blogListRouteSource,
-    /buildBlogListPageViewModel[\s\S]*<PublicEditorialHandoff view=\{pageView\.handoffView\}/
+    /PublicEditorialHandoff|data-handoff|data-handoff-item|pageView\.handoffView/,
+    'Blog list route must not render internal editorial handoff markup.'
   );
-  assert.match(
+  assert.doesNotMatch(
+    blogListRouteSource,
+    /public-editorial-handoff/,
+    'Blog list route must not import the internal editorial handoff component.'
+  );
+  assert.doesNotMatch(
     blogPostRouteSource,
-    /buildPublicEditorialHandoffView[\s\S]*const handoffView = buildPublicEditorialHandoffView\(\)[\s\S]*<PublicEditorialHandoff view=\{handoffView\}/
+    /PublicEditorialHandoff|buildPublicEditorialHandoffView|data-handoff|data-handoff-item/,
+    'Blog post route must not render internal editorial handoff markup.'
   );
 });
 

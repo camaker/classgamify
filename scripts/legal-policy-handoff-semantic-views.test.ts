@@ -106,7 +106,7 @@ test('legal policy handoff resolves page-specific policy values', () => {
       ['image-generation-provider-guard', 'Excluded'],
       ['payment-provider-scope', 'Creem / Stripe'],
       ['auth-provider-scope', 'Better Auth / Google'],
-      ['storage-provider-scope', 'Cloudflare R2'],
+      ['storage-provider-scope', 'Classroom file storage'],
       ['analytics-provider-scope', 'Configured providers'],
       ['cookie-storage-scope', 'Browser storage'],
       ['anonymous-token-boundary', 'Raw tokens hidden'],

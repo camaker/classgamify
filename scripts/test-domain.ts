@@ -608,6 +608,10 @@ import {
   resolveSequentialStudentRunnerNavigationAction,
 } from '@/assignments/student-runner-view';
 import {
+  buildGroupSortBoardHandoffView,
+  GROUP_SORT_BOARD_HANDOFF_ITEM_IDS,
+} from '@/assignments/group-sort-board-handoff';
+import {
   formatAssignmentDisplayText,
   formatAssignmentDisplayTitle,
 } from '@/assignments/assignment-display';
@@ -9296,6 +9300,10 @@ const groupSortBoardSource = readFileSync(
   'src/components/activities/group-sort-board.tsx',
   'utf8'
 );
+const groupSortBoardHandoffSource = readFileSync(
+  'src/assignments/group-sort-board-handoff.ts',
+  'utf8'
+);
 const fillBlankWorksheetSource = readFileSync(
   'src/components/activities/fill-blank-worksheet.tsx',
   'utf8'
@@ -9329,6 +9337,31 @@ assert.match(
   groupSortBoardSource,
   /<GroupSortItemButton[\s\S]*correctLabel=\{copy\.correctAnswerLabel\}/,
   'Group-sort runner should pass the template-specific correct-answer label into item feedback.'
+);
+assert.match(
+  groupSortBoardHandoffSource,
+  /export const GROUP_SORT_BOARD_HANDOFF_ITEM_IDS = \[(?=[\s\S]*'template-type')(?=[\s\S]*'category-count')(?=[\s\S]*'selected-item-state')(?=[\s\S]*'group-placement-action')(?=[\s\S]*'public-payload-boundary')(?=[\s\S]*'privacy-guard')[\s\S]*\] as const;[\s\S]*export type GroupSortBoardHandoffPrivacyContract = \{[\s\S]*exposesAnswerText: false;[\s\S]*exposesCategoryText: false;[\s\S]*exposesRuntimeItemIds: false;[\s\S]*exposesRuntimePromptText: false;[\s\S]*scope: 'group-sort-category-board';/,
+  'Group-sort board handoff should expose a typed 30-slice category-board privacy contract.'
+);
+assert.match(
+  groupSortBoardHandoffSource,
+  /buildGroupSortBoardHandoffView[\s\S]*runnerView: GroupSortRunnerView[\s\S]*buildGroupSortBoardHandoffContext[\s\S]*runnerView\.groupViews\.reduce[\s\S]*runnerView\.completionSummary\.answeredItemCount[\s\S]*runnerView\.unplacedItemViews\.length/,
+  'Group-sort board handoff should derive category, placement, progress, and unplaced counts from the prepared runner view.'
+);
+assert.match(
+  groupSortBoardSource,
+  /buildGroupSortBoardHandoffView[\s\S]*disabled,[\s\S]*revealAnswer,[\s\S]*runnerView,/,
+  'Group-sort runner should build its category-board handoff from the prepared runner view.'
+);
+assert.match(
+  groupSortBoardSource,
+  /GroupSortBoardHandoff[\s\S]*view=\{handoffView\}/,
+  'Group-sort runner should render the prepared category-board handoff.'
+);
+assert.match(
+  groupSortBoardSource,
+  /data-handoff="group-sort-board"[\s\S]*view\.itemViews\.map\(\(item\) =>[\s\S]*data-handoff-item=\{item\.id\}[\s\S]*<output aria-label=\{item\.ariaLabel\}>/,
+  'Group-sort runner should expose stable hidden group-sort board item outputs.'
 );
 assert.match(
   groupSortBoardSource,
@@ -18015,6 +18048,11 @@ assert.match(
   e2eTestCatalogText,
   /Student runtime interaction exposes a 30-slice handoff[\s\S]*student-runtime-interaction[\s\S]*renderer dispatch boundary[\s\S]*prompt\/choice\/answer text boundaries/,
   'E2E catalog should cover the hidden 30-slice student runtime interaction handoff contract.'
+);
+assert.match(
+  e2eTestCatalogText,
+  /Student runner adapts to template content[\s\S]*group-sort-board handoff[\s\S]*category target readiness[\s\S]*runtime-id\/prompt\/answer\/student\/source-material guards/,
+  'E2E catalog should cover the hidden 30-slice group-sort board handoff contract.'
 );
 assert.match(
   e2eTestCatalogText,
@@ -30929,6 +30967,69 @@ assert.deepEqual(
     ],
   ]
 );
+const groupSortBoardHandoffView = buildGroupSortBoardHandoffView({
+  runnerView: groupSortBoardView,
+});
+const groupSortBoardHandoffValues = new Map(
+  groupSortBoardHandoffView.itemViews.map((item) => [item.id, item.value])
+);
+assert.deepEqual(
+  groupSortBoardHandoffView.itemViews.map((item) => item.id),
+  [...GROUP_SORT_BOARD_HANDOFF_ITEM_IDS]
+);
+assert.equal(groupSortBoardHandoffView.itemViews.length, 30);
+assert.deepEqual(groupSortBoardHandoffView.privacy, {
+  exposesAnswerKeys: false,
+  exposesAnswerText: false,
+  exposesCategoryText: false,
+  exposesRuntimeItemIds: false,
+  exposesRuntimePromptText: false,
+  exposesSourceMaterialMetadata: false,
+  exposesStudentIdentity: false,
+  itemIds: [...GROUP_SORT_BOARD_HANDOFF_ITEM_IDS],
+  runnerSurface: 'group-sort',
+  scope: 'group-sort-category-board',
+  templateType: 'group-sort',
+  usesSharedSubmissionContract: true,
+});
+assert.equal(groupSortBoardHandoffValues.get('category-count'), '2 categories');
+assert.equal(groupSortBoardHandoffValues.get('item-count'), '3 items');
+assert.equal(groupSortBoardHandoffValues.get('unplaced-item-count'), '1');
+assert.equal(groupSortBoardHandoffValues.get('placed-item-count'), '2');
+assert.equal(
+  groupSortBoardHandoffValues.get('selected-item-state'),
+  'Selected'
+);
+assert.equal(
+  groupSortBoardHandoffValues.get('available-category-count'),
+  '2 available categories'
+);
+assert.equal(
+  groupSortBoardHandoffValues.get('completion-progress'),
+  '2 of 3 sorted'
+);
+assert.equal(
+  groupSortBoardHandoffValues.get('public-payload-boundary'),
+  'Privacy-safe assignment content'
+);
+for (const privateGroupSortBoardValue of [
+  'Apple',
+  'Water',
+  'Pear',
+  'Fruit',
+  'Drink',
+  'group-fruit-apple',
+  'group-drink-water',
+  'group-fruit-pear',
+]) {
+  assert.equal(
+    JSON.stringify(groupSortBoardHandoffView).includes(
+      privateGroupSortBoardValue
+    ),
+    false,
+    `Group-sort board handoff leaked private text: ${privateGroupSortBoardValue}`
+  );
+}
 assert.deepEqual(
   resolveGroupSortRunnerAction({
     action: {
@@ -37716,7 +37817,7 @@ assert.deepEqual(
     ['worksheet-delivery-focus', 'Improving'],
     ['worksheet-extraction-boundary', 'Exploring'],
     ['school-workflow-boundary', 'Exploring'],
-    ['task-evidence-boundary', 'Public product summary'],
+    ['task-evidence-boundary', 'Public classroom summary'],
     ['task-next-step-boundary', 'Classroom direction'],
     ['hero-action-boundary', 'Ready teacher actions'],
     ['create-route', Routes.Create],

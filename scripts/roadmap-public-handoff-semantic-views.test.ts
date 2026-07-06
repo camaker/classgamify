@@ -79,7 +79,7 @@ test('roadmap handoff exposes 30 safe public product-boundary slices', () => {
       ['worksheet-delivery-focus', 'Improving'],
       ['worksheet-extraction-boundary', 'Exploring'],
       ['school-workflow-boundary', 'Exploring'],
-      ['task-evidence-boundary', 'Public product summary'],
+      ['task-evidence-boundary', 'Public classroom summary'],
       ['task-next-step-boundary', 'Classroom direction'],
       ['hero-action-boundary', 'Ready teacher actions'],
       ['create-route', Routes.Create],
@@ -134,7 +134,7 @@ test('roadmap handoff localizes Chinese product boundaries', () => {
     );
     assert.equal(
       getHandoffItemValue(handoffView, 'task-evidence-boundary'),
-      '公开产品摘要'
+      '公开课堂摘要'
     );
     assert.equal(
       getHandoffItemValue(handoffView, 'task-next-step-boundary'),
