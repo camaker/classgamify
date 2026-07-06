@@ -84,7 +84,7 @@ Plausible.
 Analytics may process information such as page URLs, referrers, browser and
 device type, approximate region, interaction events, performance data, error
 data, and technical identifiers. We use this information to improve reliability,
-usability, conversion, and product direction.
+usability, conversion, and service experience.
 
 Where consent is required for analytics cookies or similar technologies, we
 will rely on consent or provide the controls required by applicable law.

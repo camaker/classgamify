@@ -157,7 +157,7 @@ Analytics tools help us understand whether teachers and students can find, use,
 and complete the product flows. Depending on the provider, analytics may collect
 page URLs, browser details, device details, interaction events, approximate
 location, and technical identifiers. We use this data to improve reliability,
-usability, and product direction, not to sell personal information.
+usability, and service experience, not to sell personal information.
 
 ## Data Retention
 
