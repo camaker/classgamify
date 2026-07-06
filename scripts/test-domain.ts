@@ -412,6 +412,8 @@ import {
   ACTIVITY_EDITOR_AI_DRAFT_SOURCE_HANDOFF_ITEM_IDS,
   ACTIVITY_EDITOR_SECTION_IDS,
   ACTIVITY_EDITOR_READINESS_PANEL_LIMITS,
+  ACTIVITY_EDITOR_WORKFLOW_HANDOFF_ITEM_IDS,
+  ACTIVITY_EDITOR_WORKFLOW_STEP_IDS,
   buildActivityEditorAiDraftPanelView,
   buildActivityEditorDraftGenerationExecutionPlan,
   buildActivityEditorDraftGenerationGate,
@@ -432,9 +434,11 @@ import {
   buildActivityEditorTemplateSetupView,
   buildActivityEditorTemplateReadiness,
   buildActivityEditorTemplateView,
+  buildActivityEditorWorkflowView,
   ACTIVITY_EDITOR_TEMPLATE_HANDOFF_ITEM_IDS,
   formatActivityEditorDifficulty,
   formatActivityEditorVisibility,
+  getActivityEditorWorkflowStepView,
 } from '@/activities/editor';
 import {
   buildQuestionChoiceReadinessSummary,
@@ -1648,12 +1652,12 @@ assert.match(
 );
 assert.match(
   createRouteSource,
-  /pageView\.inputShape\.itemViews\.map[\s\S]*key=\{itemView\.id\}[\s\S]*itemView\.label/,
+  /<InputShapePanel inputShape=\{pageView\.inputShape\} \/>[\s\S]*function InputShapePanel[\s\S]*inputShape\.itemViews\.map\(\(itemView, index\) =>[\s\S]*key=\{itemView\.id\}[\s\S]*itemView\.label/,
   'The create route should render structured input-shape items with stable ids.'
 );
 assert.match(
   createRouteSource,
-  /pageView\.templateEntry\.sourceLabel[\s\S]*pageView\.templateEntry\.shortName[\s\S]*pageView\.templateEntry\.title[\s\S]*pageView\.templateEntry\.description[\s\S]*pageView\.templateEntry\.sourceDescription[\s\S]*pageView\.templateEntry\.metrics\.map[\s\S]*key=\{metric\.id\}[\s\S]*metric\.label[\s\S]*metric\.value[\s\S]*pageView\.templateEntry\.nextStep/,
+  /<TemplateEntryPanel templateEntry=\{pageView\.templateEntry\} \/>[\s\S]*function TemplateEntryPanel[\s\S]*templateEntry\.sourceLabel[\s\S]*templateEntry\.shortName[\s\S]*templateEntry\.title[\s\S]*templateEntry\.description[\s\S]*templateEntry\.sourceDescription[\s\S]*templateEntry\.metrics\.map[\s\S]*key=\{metric\.id\}[\s\S]*metric\.label[\s\S]*metric\.value[\s\S]*templateEntry\.nextStep/,
   'The create route should render prepared template-entry source, summary, metrics, and next-step guidance.'
 );
 assert.doesNotMatch(
@@ -5334,8 +5338,43 @@ assert.doesNotMatch(
 );
 assert.match(
   activityEditorSource,
-  /export const ACTIVITY_EDITOR_SECTION_IDS = \{[\s\S]*editor: 'activity-editor'[\s\S]*templateReadiness: 'activity-template-readiness'[\s\S]*export type ActivityEditorSectionHref = `#\$\{ActivityEditorSectionId\}`;/,
-  'Activity editor domain should expose stable section targets for scaffold review actions.'
+  /export const ACTIVITY_EDITOR_SECTION_IDS = \{[\s\S]*aiDraft: 'activity-editor-ai-draft'[\s\S]*content: 'activity-editor-content'[\s\S]*editor: 'activity-editor'[\s\S]*frame: 'activity-editor-frame'[\s\S]*sourceMaterials: 'activity-editor-source-materials'[\s\S]*templateReadiness: 'activity-template-readiness'[\s\S]*export type ActivityEditorSectionHref = `#\$\{ActivityEditorSectionId\}`;/,
+  'Activity editor domain should expose stable section targets for workflow navigation and scaffold review actions.'
+);
+assert.match(
+  activityEditorSource,
+  /export const ACTIVITY_EDITOR_WORKFLOW_STEP_IDS = \[(?=[\s\S]*'frame')(?=[\s\S]*'ai-draft')(?=[\s\S]*'content')(?=[\s\S]*'source-materials')(?=[\s\S]*'review')[\s\S]*export type ActivityEditorWorkflowStepView = \{[\s\S]*href: ActivityEditorSectionHref;[\s\S]*icon: ActivityEditorWorkflowStepIcon;[\s\S]*sectionId: ActivityEditorSectionId;[\s\S]*export const ACTIVITY_EDITOR_WORKFLOW_HANDOFF_ITEM_IDS = \[(?=[\s\S]*'workflow-source')(?=[\s\S]*'step-count')(?=[\s\S]*'workflow-order')(?=[\s\S]*'create-page-surface')(?=[\s\S]*'edit-page-surface')(?=[\s\S]*'nav-surface')(?=[\s\S]*'form-section-surface')(?=[\s\S]*'side-preview-surface')(?=[\s\S]*'frame-section')(?=[\s\S]*'primary-fields')(?=[\s\S]*'template-handoff')(?=[\s\S]*'scaffold-panel')(?=[\s\S]*'ai-draft-section')(?=[\s\S]*'ai-source-state')(?=[\s\S]*'ai-sync-action')(?=[\s\S]*'content-section')(?=[\s\S]*'details-fields')(?=[\s\S]*'structured-content-fields')(?=[\s\S]*'source-materials-section')(?=[\s\S]*'material-picker')(?=[\s\S]*'review-section')(?=[\s\S]*'readiness-panel')(?=[\s\S]*'save-footer')(?=[\s\S]*'auth-gate')(?=[\s\S]*'input-contract')(?=[\s\S]*'template-readiness-contract')(?=[\s\S]*'ai-editor-boundary')(?=[\s\S]*'source-privacy-boundary')(?=[\s\S]*'publish-boundary')(?=[\s\S]*'privacy-guard')/,
+  'Activity editor workflow should expose stable step and 30-slice handoff id contracts from the editor domain.'
+);
+assert.match(
+  activityEditorSource,
+  /export type ActivityEditorWorkflowHandoffPrivacyContract = \{[\s\S]*createsAssignmentLinks: false;[\s\S]*exposesAnswerText: false;[\s\S]*exposesPromptText: false;[\s\S]*exposesRawEditorInput: false;[\s\S]*exposesSourceMaterialFileIds: false;[\s\S]*exposesSourceMaterialStorageKeys: false;[\s\S]*exposesTeacherNotesText: false;[\s\S]*mutatesActivity: false;[\s\S]*persistsActivityWithoutTeacherSave: false;[\s\S]*publishesAssignment: false;[\s\S]*usesCreateActivityInputContract: true;/,
+  'Activity editor workflow handoff should expose explicit privacy, mutation, save, publish, and input-contract boundaries.'
+);
+assert.match(
+  activityEditorSource,
+  /export function buildActivityEditorWorkflowView\(\)[\s\S]*ACTIVITY_EDITOR_WORKFLOW_STEP_IDS\.map[\s\S]*buildActivityEditorWorkflowStepView[\s\S]*handoffView: buildActivityEditorWorkflowHandoffView\(steps\)[\s\S]*export function getActivityEditorWorkflowStepView/,
+  'Activity editor workflow view should build route/form steps and handoff from the stable domain-owned order.'
+);
+assert.match(
+  activityEditorSource,
+  /previewPanel: ActivityEditorPreviewPanel;[\s\S]*workflow: ActivityEditorWorkflowView;[\s\S]*workflow: buildActivityEditorWorkflowView\(\)/,
+  'Activity create page editor view-model should include the prepared workflow view for the create route.'
+);
+assert.match(
+  createRouteSource,
+  /<WorkflowNav workflow=\{pageView\.workflow\} \/>[\s\S]*<ActivityEditorWorkflowHandoff[\s\S]*handoffView=\{pageView\.workflow\.handoffView\}[\s\S]*data-handoff="activity-editor-workflow"[\s\S]*handoffView\.itemViews\.map[\s\S]*data-handoff-item=\{item\.id\}[\s\S]*<output aria-label=\{item\.ariaLabel\}>/,
+  'Create route should render workflow navigation and hidden 30-slice workflow handoff from the prepared page view.'
+);
+assert.doesNotMatch(
+  createRouteSource,
+  /const items = \[[\s\S]*activity_form_step_frame_title/,
+  'Create route should not maintain a local workflow-step array or localized step copy.'
+);
+assert.match(
+  activityEditorFormSource,
+  /const workflowView = useMemo\(\(\) => buildActivityEditorWorkflowView\(\), \[\]\)[\s\S]*getActivityEditorWorkflowStepView\(workflowView, 'frame'\)[\s\S]*getActivityEditorWorkflowStepView\([\s\S]*'ai-draft'[\s\S]*getActivityEditorWorkflowStepView\(workflowView, 'content'\)[\s\S]*getActivityEditorWorkflowStepView\([\s\S]*'source-materials'[\s\S]*getActivityEditorWorkflowStepView\(workflowView, 'review'\)[\s\S]*step: ActivityEditorWorkflowStepView/,
+  'Activity create form should render prepared workflow step views instead of hard-coded section ids and labels.'
 );
 assert.match(
   activityTemplateRemixSource,
@@ -5630,8 +5669,8 @@ assert.match(
 );
 assert.match(
   activityEditorFormSource,
-  /ACTIVITY_EDITOR_SECTION_IDS[\s\S]*CardContent[\s\S]*id=\{ACTIVITY_EDITOR_SECTION_IDS\.editor\}[\s\S]*ActivityTemplateReadinessPanel[\s\S]*sectionId=\{ACTIVITY_EDITOR_SECTION_IDS\.templateReadiness\}/,
-  'Activity editor form should wire stable editor and readiness section targets for scaffold review actions.'
+  /ACTIVITY_EDITOR_SECTION_IDS[\s\S]*CardContent[\s\S]*id=\{ACTIVITY_EDITOR_SECTION_IDS\.editor\}[\s\S]*getActivityEditorWorkflowStepView\(workflowView, 'review'\)[\s\S]*ActivityTemplateReadinessPanel/,
+  'Activity editor form should wire the stable editor container and workflow-owned readiness section target.'
 );
 assert.match(
   activityEditorFormSource,
@@ -43648,9 +43687,159 @@ assert.deepEqual(ACTIVITY_EDITOR_READINESS_PANEL_LIMITS, {
   lockedOptions: 4,
 });
 assert.deepEqual(ACTIVITY_EDITOR_SECTION_IDS, {
+  aiDraft: 'activity-editor-ai-draft',
+  content: 'activity-editor-content',
   editor: 'activity-editor',
+  frame: 'activity-editor-frame',
+  sourceMaterials: 'activity-editor-source-materials',
   templateReadiness: 'activity-template-readiness',
 });
+const activityEditorWorkflowView = buildActivityEditorWorkflowView();
+assert.deepEqual(ACTIVITY_EDITOR_WORKFLOW_STEP_IDS, [
+  'frame',
+  'ai-draft',
+  'content',
+  'source-materials',
+  'review',
+]);
+assert.deepEqual(ACTIVITY_EDITOR_WORKFLOW_HANDOFF_ITEM_IDS, [
+  'workflow-source',
+  'step-count',
+  'workflow-order',
+  'create-page-surface',
+  'edit-page-surface',
+  'nav-surface',
+  'form-section-surface',
+  'side-preview-surface',
+  'frame-section',
+  'primary-fields',
+  'template-handoff',
+  'scaffold-panel',
+  'ai-draft-section',
+  'ai-source-state',
+  'ai-sync-action',
+  'content-section',
+  'details-fields',
+  'structured-content-fields',
+  'source-materials-section',
+  'material-picker',
+  'review-section',
+  'readiness-panel',
+  'save-footer',
+  'auth-gate',
+  'input-contract',
+  'template-readiness-contract',
+  'ai-editor-boundary',
+  'source-privacy-boundary',
+  'publish-boundary',
+  'privacy-guard',
+]);
+assert.deepEqual(
+  activityEditorWorkflowView.steps.map((step) => [
+    step.id,
+    step.sectionId,
+    step.href,
+    step.icon,
+    step.title,
+  ]),
+  [
+    [
+      'frame',
+      'activity-editor-frame',
+      '#activity-editor-frame',
+      'pencil',
+      'Set the activity frame',
+    ],
+    [
+      'ai-draft',
+      'activity-editor-ai-draft',
+      '#activity-editor-ai-draft',
+      'sparkles',
+      'Draft from material',
+    ],
+    [
+      'content',
+      'activity-editor-content',
+      '#activity-editor-content',
+      'clipboard-list',
+      'Edit reusable content',
+    ],
+    [
+      'source-materials',
+      'activity-editor-source-materials',
+      '#activity-editor-source-materials',
+      'paperclip',
+      'Attach source materials',
+    ],
+    [
+      'review',
+      'activity-template-readiness',
+      '#activity-template-readiness',
+      'layout-grid',
+      'Review before saving',
+    ],
+  ]
+);
+assert.equal(
+  getActivityEditorWorkflowStepView(activityEditorWorkflowView, 'review').href,
+  '#activity-template-readiness'
+);
+assert.deepEqual(activityEditorWorkflowView.handoffView.privacy, {
+  createsAssignmentLinks: false,
+  exposesAnswerText: false,
+  exposesPromptText: false,
+  exposesRawEditorInput: false,
+  exposesSourceMaterialFileIds: false,
+  exposesSourceMaterialStorageKeys: false,
+  exposesTeacherNotesText: false,
+  itemIds: [...ACTIVITY_EDITOR_WORKFLOW_HANDOFF_ITEM_IDS],
+  mutatesActivity: false,
+  persistsActivityWithoutTeacherSave: false,
+  publishesAssignment: false,
+  scope: 'activity-editor-workflow',
+  usesCreateActivityInputContract: true,
+});
+assert.deepEqual(
+  activityEditorWorkflowView.handoffView.itemViews.map((item) => [
+    item.id,
+    item.value,
+  ]),
+  [
+    ['workflow-source', 'editor.ts'],
+    ['step-count', '5 steps'],
+    [
+      'workflow-order',
+      'frame -> ai-draft -> content -> source-materials -> review',
+    ],
+    ['create-page-surface', 'Create page'],
+    ['edit-page-surface', 'Create/edit form'],
+    ['nav-surface', 'Shared step nav'],
+    ['form-section-surface', 'ActivityCreateForm'],
+    ['side-preview-surface', 'Template + preview aside'],
+    ['frame-section', 'Set the activity frame'],
+    ['primary-fields', 'ActivityEditorPrimaryFields'],
+    ['template-handoff', 'ActivityEditorTemplateHandoffView'],
+    ['scaffold-panel', 'Template scaffold'],
+    ['ai-draft-section', 'Draft from material'],
+    ['ai-source-state', 'ActivityEditorAiDraftPanelView'],
+    ['ai-sync-action', 'Source material sync'],
+    ['content-section', 'Edit reusable content'],
+    ['details-fields', 'ActivityEditorDetailsFields'],
+    ['structured-content-fields', 'ActivityEditorStructuredContentFields'],
+    ['source-materials-section', 'Attach source materials'],
+    ['material-picker', 'Source material picker'],
+    ['review-section', 'Review before saving'],
+    ['readiness-panel', 'Template readiness'],
+    ['save-footer', 'Save action footer'],
+    ['auth-gate', 'Teacher sign-in required'],
+    ['input-contract', 'CreateActivityInput'],
+    ['template-readiness-contract', 'TemplateRemixPlan'],
+    ['ai-editor-boundary', 'Draft fills editor only'],
+    ['source-privacy-boundary', 'Private materials hidden'],
+    ['publish-boundary', 'Save before publish'],
+    ['privacy-guard', 'Private classroom text hidden'],
+  ]
+);
 assert.deepEqual(buildActivityEditorModeView('create'), {
   footerHint:
     'Saved activities appear in the teacher dashboard and can later be published as assignments.',

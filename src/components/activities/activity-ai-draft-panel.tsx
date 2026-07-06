@@ -217,6 +217,7 @@ function ActivityAiDraftSourceControls({
       </div>
       <Textarea
         id="activity-ai-source"
+        className="max-h-52"
         value={draftSourceText}
         onChange={(event) => onDraftSourceTextChange(event.currentTarget.value)}
         rows={3}

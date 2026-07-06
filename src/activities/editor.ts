@@ -101,7 +101,11 @@ export const ACTIVITY_EDITOR_READINESS_PANEL_LIMITS = {
 } as const;
 
 export const ACTIVITY_EDITOR_SECTION_IDS = {
+  aiDraft: 'activity-editor-ai-draft',
+  content: 'activity-editor-content',
   editor: 'activity-editor',
+  frame: 'activity-editor-frame',
+  sourceMaterials: 'activity-editor-source-materials',
   templateReadiness: 'activity-template-readiness',
 } as const;
 
@@ -109,6 +113,108 @@ export type ActivityEditorSectionId =
   (typeof ACTIVITY_EDITOR_SECTION_IDS)[keyof typeof ACTIVITY_EDITOR_SECTION_IDS];
 
 export type ActivityEditorSectionHref = `#${ActivityEditorSectionId}`;
+
+export const ACTIVITY_EDITOR_WORKFLOW_STEP_IDS = [
+  'frame',
+  'ai-draft',
+  'content',
+  'source-materials',
+  'review',
+] as const;
+
+export type ActivityEditorWorkflowStepId =
+  (typeof ACTIVITY_EDITOR_WORKFLOW_STEP_IDS)[number];
+
+export type ActivityEditorWorkflowStepIcon =
+  | 'clipboard-list'
+  | 'layout-grid'
+  | 'paperclip'
+  | 'pencil'
+  | 'sparkles';
+
+export type ActivityEditorWorkflowStepView = {
+  description: string;
+  href: ActivityEditorSectionHref;
+  icon: ActivityEditorWorkflowStepIcon;
+  id: ActivityEditorWorkflowStepId;
+  label: string;
+  number: number;
+  sectionId: ActivityEditorSectionId;
+  title: string;
+};
+
+export const ACTIVITY_EDITOR_WORKFLOW_HANDOFF_ITEM_IDS = [
+  'workflow-source',
+  'step-count',
+  'workflow-order',
+  'create-page-surface',
+  'edit-page-surface',
+  'nav-surface',
+  'form-section-surface',
+  'side-preview-surface',
+  'frame-section',
+  'primary-fields',
+  'template-handoff',
+  'scaffold-panel',
+  'ai-draft-section',
+  'ai-source-state',
+  'ai-sync-action',
+  'content-section',
+  'details-fields',
+  'structured-content-fields',
+  'source-materials-section',
+  'material-picker',
+  'review-section',
+  'readiness-panel',
+  'save-footer',
+  'auth-gate',
+  'input-contract',
+  'template-readiness-contract',
+  'ai-editor-boundary',
+  'source-privacy-boundary',
+  'publish-boundary',
+  'privacy-guard',
+] as const;
+
+export type ActivityEditorWorkflowHandoffItemId =
+  (typeof ACTIVITY_EDITOR_WORKFLOW_HANDOFF_ITEM_IDS)[number];
+
+export type ActivityEditorWorkflowHandoffItemView = {
+  ariaLabel: string;
+  description: string;
+  id: ActivityEditorWorkflowHandoffItemId;
+  label: string;
+  value: string;
+};
+
+export type ActivityEditorWorkflowHandoffPrivacyContract = {
+  createsAssignmentLinks: false;
+  exposesAnswerText: false;
+  exposesPromptText: false;
+  exposesRawEditorInput: false;
+  exposesSourceMaterialFileIds: false;
+  exposesSourceMaterialStorageKeys: false;
+  exposesTeacherNotesText: false;
+  itemIds: ActivityEditorWorkflowHandoffItemId[];
+  mutatesActivity: false;
+  persistsActivityWithoutTeacherSave: false;
+  publishesAssignment: false;
+  scope: 'activity-editor-workflow';
+  usesCreateActivityInputContract: true;
+};
+
+export type ActivityEditorWorkflowHandoffView = {
+  description: string;
+  itemViews: ActivityEditorWorkflowHandoffItemView[];
+  privacy: ActivityEditorWorkflowHandoffPrivacyContract;
+  title: string;
+};
+
+export type ActivityEditorWorkflowView = {
+  ariaLabel: string;
+  handoffView: ActivityEditorWorkflowHandoffView;
+  steps: ActivityEditorWorkflowStepView[];
+};
 
 type ActivityEditorSource = {
   content: ActivityContent;
@@ -545,6 +651,7 @@ export type ActivityCreatePageEditorViewModel = ActivityCreatePageViewModel & {
   initialValues?: CreateActivityInput;
   previewActivity: ActivitySeed;
   previewPanel: ActivityEditorPreviewPanel;
+  workflow: ActivityEditorWorkflowView;
 };
 
 type ActivityCreatePageEditorInput = {
@@ -703,6 +810,370 @@ export function getActivityEditorDefaultInput(): CreateActivityInput {
     title: m.activity_editor_default_title(),
     visibility: 'draft',
     vocabularyText: m.activity_editor_default_vocabulary_text(),
+  };
+}
+
+export function buildActivityEditorWorkflowView(): ActivityEditorWorkflowView {
+  const steps = ACTIVITY_EDITOR_WORKFLOW_STEP_IDS.map(
+    buildActivityEditorWorkflowStepView
+  );
+
+  return {
+    ariaLabel: m.activity_form_editor_badge(),
+    handoffView: buildActivityEditorWorkflowHandoffView(steps),
+    steps,
+  };
+}
+
+export function getActivityEditorWorkflowStepView(
+  workflowView: ActivityEditorWorkflowView,
+  id: ActivityEditorWorkflowStepId
+) {
+  const stepView = workflowView.steps.find((step) => step.id === id);
+
+  if (!stepView) {
+    throw new Error(`Missing activity editor workflow step: ${id}`);
+  }
+
+  return stepView;
+}
+
+function buildActivityEditorWorkflowStepView(
+  id: ActivityEditorWorkflowStepId,
+  index: number
+): ActivityEditorWorkflowStepView {
+  const number = index + 1;
+  const sectionId = getActivityEditorWorkflowSectionId(id);
+
+  return {
+    description: getActivityEditorWorkflowStepDescription(id),
+    href: `#${sectionId}`,
+    icon: getActivityEditorWorkflowStepIcon(id),
+    id,
+    label: m.activity_form_step_label({ number }),
+    number,
+    sectionId,
+    title: getActivityEditorWorkflowStepTitle(id),
+  };
+}
+
+function getActivityEditorWorkflowSectionId(
+  id: ActivityEditorWorkflowStepId
+): ActivityEditorSectionId {
+  switch (id) {
+    case 'ai-draft':
+      return ACTIVITY_EDITOR_SECTION_IDS.aiDraft;
+    case 'content':
+      return ACTIVITY_EDITOR_SECTION_IDS.content;
+    case 'frame':
+      return ACTIVITY_EDITOR_SECTION_IDS.frame;
+    case 'review':
+      return ACTIVITY_EDITOR_SECTION_IDS.templateReadiness;
+    case 'source-materials':
+      return ACTIVITY_EDITOR_SECTION_IDS.sourceMaterials;
+  }
+}
+
+function getActivityEditorWorkflowStepIcon(
+  id: ActivityEditorWorkflowStepId
+): ActivityEditorWorkflowStepIcon {
+  switch (id) {
+    case 'ai-draft':
+      return 'sparkles';
+    case 'content':
+      return 'clipboard-list';
+    case 'frame':
+      return 'pencil';
+    case 'review':
+      return 'layout-grid';
+    case 'source-materials':
+      return 'paperclip';
+  }
+}
+
+function getActivityEditorWorkflowStepTitle(id: ActivityEditorWorkflowStepId) {
+  switch (id) {
+    case 'ai-draft':
+      return m.activity_form_step_ai_title();
+    case 'content':
+      return m.activity_form_step_content_title();
+    case 'frame':
+      return m.activity_form_step_frame_title();
+    case 'review':
+      return m.activity_form_step_review_title();
+    case 'source-materials':
+      return m.activity_form_step_sources_title();
+  }
+}
+
+function getActivityEditorWorkflowStepDescription(
+  id: ActivityEditorWorkflowStepId
+) {
+  switch (id) {
+    case 'ai-draft':
+      return m.activity_form_step_ai_description();
+    case 'content':
+      return m.activity_form_step_content_description();
+    case 'frame':
+      return m.activity_form_step_frame_description();
+    case 'review':
+      return m.activity_form_step_review_description();
+    case 'source-materials':
+      return m.activity_form_step_sources_description();
+  }
+}
+
+type ActivityEditorWorkflowHandoffCopy = {
+  description: () => string;
+  label: () => string;
+  value: (steps: ActivityEditorWorkflowStepView[]) => string;
+};
+
+const ACTIVITY_EDITOR_WORKFLOW_HANDOFF_COPY = {
+  'workflow-source': {
+    description: () =>
+      m.activity_editor_workflow_handoff_workflow_source_description(),
+    label: () => m.activity_editor_workflow_handoff_workflow_source_label(),
+    value: () => m.activity_editor_workflow_handoff_workflow_source_value(),
+  },
+  'step-count': {
+    description: () =>
+      m.activity_editor_workflow_handoff_step_count_description(),
+    label: () => m.activity_editor_workflow_handoff_step_count_label(),
+    value: (steps) =>
+      m.activity_editor_workflow_handoff_step_count_value({
+        count: steps.length,
+      }),
+  },
+  'workflow-order': {
+    description: () =>
+      m.activity_editor_workflow_handoff_workflow_order_description(),
+    label: () => m.activity_editor_workflow_handoff_workflow_order_label(),
+    value: (steps) => steps.map((step) => step.id).join(' -> '),
+  },
+  'create-page-surface': {
+    description: () =>
+      m.activity_editor_workflow_handoff_create_page_surface_description(),
+    label: () => m.activity_editor_workflow_handoff_create_page_surface_label(),
+    value: () => m.activity_editor_workflow_handoff_create_page_surface_value(),
+  },
+  'edit-page-surface': {
+    description: () =>
+      m.activity_editor_workflow_handoff_edit_page_surface_description(),
+    label: () => m.activity_editor_workflow_handoff_edit_page_surface_label(),
+    value: () => m.activity_editor_workflow_handoff_edit_page_surface_value(),
+  },
+  'nav-surface': {
+    description: () =>
+      m.activity_editor_workflow_handoff_nav_surface_description(),
+    label: () => m.activity_editor_workflow_handoff_nav_surface_label(),
+    value: () => m.activity_editor_workflow_handoff_nav_surface_value(),
+  },
+  'form-section-surface': {
+    description: () =>
+      m.activity_editor_workflow_handoff_form_surface_description(),
+    label: () => m.activity_editor_workflow_handoff_form_surface_label(),
+    value: () => m.activity_editor_workflow_handoff_form_surface_value(),
+  },
+  'side-preview-surface': {
+    description: () =>
+      m.activity_editor_workflow_handoff_preview_surface_description(),
+    label: () => m.activity_editor_workflow_handoff_preview_surface_label(),
+    value: () => m.activity_editor_workflow_handoff_preview_surface_value(),
+  },
+  'frame-section': {
+    description: () =>
+      m.activity_editor_workflow_handoff_frame_section_description(),
+    label: () => m.activity_editor_workflow_handoff_frame_section_label(),
+    value: () => getActivityEditorWorkflowStepTitle('frame'),
+  },
+  'primary-fields': {
+    description: () =>
+      m.activity_editor_workflow_handoff_primary_fields_description(),
+    label: () => m.activity_editor_workflow_handoff_primary_fields_label(),
+    value: () => m.activity_editor_workflow_handoff_primary_fields_value(),
+  },
+  'template-handoff': {
+    description: () =>
+      m.activity_editor_workflow_handoff_template_handoff_description(),
+    label: () => m.activity_editor_workflow_handoff_template_handoff_label(),
+    value: () => m.activity_editor_workflow_handoff_template_handoff_value(),
+  },
+  'scaffold-panel': {
+    description: () =>
+      m.activity_editor_workflow_handoff_scaffold_panel_description(),
+    label: () => m.activity_editor_workflow_handoff_scaffold_panel_label(),
+    value: () => m.activity_editor_workflow_handoff_scaffold_panel_value(),
+  },
+  'ai-draft-section': {
+    description: () =>
+      m.activity_editor_workflow_handoff_ai_section_description(),
+    label: () => m.activity_editor_workflow_handoff_ai_section_label(),
+    value: () => getActivityEditorWorkflowStepTitle('ai-draft'),
+  },
+  'ai-source-state': {
+    description: () =>
+      m.activity_editor_workflow_handoff_ai_source_description(),
+    label: () => m.activity_editor_workflow_handoff_ai_source_label(),
+    value: () => m.activity_editor_workflow_handoff_ai_source_value(),
+  },
+  'ai-sync-action': {
+    description: () => m.activity_editor_workflow_handoff_ai_sync_description(),
+    label: () => m.activity_editor_workflow_handoff_ai_sync_label(),
+    value: () => m.activity_editor_workflow_handoff_ai_sync_value(),
+  },
+  'content-section': {
+    description: () =>
+      m.activity_editor_workflow_handoff_content_section_description(),
+    label: () => m.activity_editor_workflow_handoff_content_section_label(),
+    value: () => getActivityEditorWorkflowStepTitle('content'),
+  },
+  'details-fields': {
+    description: () =>
+      m.activity_editor_workflow_handoff_details_fields_description(),
+    label: () => m.activity_editor_workflow_handoff_details_fields_label(),
+    value: () => m.activity_editor_workflow_handoff_details_fields_value(),
+  },
+  'structured-content-fields': {
+    description: () =>
+      m.activity_editor_workflow_handoff_structured_fields_description(),
+    label: () => m.activity_editor_workflow_handoff_structured_fields_label(),
+    value: () => m.activity_editor_workflow_handoff_structured_fields_value(),
+  },
+  'source-materials-section': {
+    description: () =>
+      m.activity_editor_workflow_handoff_sources_section_description(),
+    label: () => m.activity_editor_workflow_handoff_sources_section_label(),
+    value: () => getActivityEditorWorkflowStepTitle('source-materials'),
+  },
+  'material-picker': {
+    description: () =>
+      m.activity_editor_workflow_handoff_material_picker_description(),
+    label: () => m.activity_editor_workflow_handoff_material_picker_label(),
+    value: () => m.activity_editor_workflow_handoff_material_picker_value(),
+  },
+  'review-section': {
+    description: () =>
+      m.activity_editor_workflow_handoff_review_section_description(),
+    label: () => m.activity_editor_workflow_handoff_review_section_label(),
+    value: () => getActivityEditorWorkflowStepTitle('review'),
+  },
+  'readiness-panel': {
+    description: () =>
+      m.activity_editor_workflow_handoff_readiness_panel_description(),
+    label: () => m.activity_editor_workflow_handoff_readiness_panel_label(),
+    value: () => m.activity_editor_workflow_handoff_readiness_panel_value(),
+  },
+  'save-footer': {
+    description: () =>
+      m.activity_editor_workflow_handoff_save_footer_description(),
+    label: () => m.activity_editor_workflow_handoff_save_footer_label(),
+    value: () => m.activity_editor_workflow_handoff_save_footer_value(),
+  },
+  'auth-gate': {
+    description: () =>
+      m.activity_editor_workflow_handoff_auth_gate_description(),
+    label: () => m.activity_editor_workflow_handoff_auth_gate_label(),
+    value: () => m.activity_editor_workflow_handoff_auth_gate_value(),
+  },
+  'input-contract': {
+    description: () =>
+      m.activity_editor_workflow_handoff_input_contract_description(),
+    label: () => m.activity_editor_workflow_handoff_input_contract_label(),
+    value: () => m.activity_editor_workflow_handoff_input_contract_value(),
+  },
+  'template-readiness-contract': {
+    description: () =>
+      m.activity_editor_workflow_handoff_readiness_contract_description(),
+    label: () => m.activity_editor_workflow_handoff_readiness_contract_label(),
+    value: () => m.activity_editor_workflow_handoff_readiness_contract_value(),
+  },
+  'ai-editor-boundary': {
+    description: () =>
+      m.activity_editor_workflow_handoff_ai_boundary_description(),
+    label: () => m.activity_editor_workflow_handoff_ai_boundary_label(),
+    value: () => m.activity_editor_workflow_handoff_ai_boundary_value(),
+  },
+  'source-privacy-boundary': {
+    description: () =>
+      m.activity_editor_workflow_handoff_source_privacy_description(),
+    label: () => m.activity_editor_workflow_handoff_source_privacy_label(),
+    value: () => m.activity_editor_workflow_handoff_source_privacy_value(),
+  },
+  'publish-boundary': {
+    description: () =>
+      m.activity_editor_workflow_handoff_publish_boundary_description(),
+    label: () => m.activity_editor_workflow_handoff_publish_boundary_label(),
+    value: () => m.activity_editor_workflow_handoff_publish_boundary_value(),
+  },
+  'privacy-guard': {
+    description: () =>
+      m.activity_editor_workflow_handoff_privacy_guard_description(),
+    label: () => m.activity_editor_workflow_handoff_privacy_guard_label(),
+    value: () => m.activity_editor_workflow_handoff_privacy_guard_value(),
+  },
+} satisfies Record<
+  ActivityEditorWorkflowHandoffItemId,
+  ActivityEditorWorkflowHandoffCopy
+>;
+
+function buildActivityEditorWorkflowHandoffView(
+  steps: ActivityEditorWorkflowStepView[]
+): ActivityEditorWorkflowHandoffView {
+  const itemViews = ACTIVITY_EDITOR_WORKFLOW_HANDOFF_ITEM_IDS.map((id) =>
+    buildActivityEditorWorkflowHandoffItemView({ id, steps })
+  );
+
+  return {
+    description: m.activity_editor_workflow_handoff_description(),
+    itemViews,
+    privacy: buildActivityEditorWorkflowHandoffPrivacyContract(itemViews),
+    title: m.activity_editor_workflow_handoff_title(),
+  };
+}
+
+function buildActivityEditorWorkflowHandoffItemView({
+  id,
+  steps,
+}: {
+  id: ActivityEditorWorkflowHandoffItemId;
+  steps: ActivityEditorWorkflowStepView[];
+}): ActivityEditorWorkflowHandoffItemView {
+  const copy = ACTIVITY_EDITOR_WORKFLOW_HANDOFF_COPY[id];
+  const description = copy.description();
+  const label = copy.label();
+  const value = copy.value(steps);
+
+  return {
+    ariaLabel: m.activity_editor_workflow_handoff_item_aria({
+      description,
+      label,
+      value,
+    }),
+    description,
+    id,
+    label,
+    value,
+  };
+}
+
+function buildActivityEditorWorkflowHandoffPrivacyContract(
+  itemViews: ActivityEditorWorkflowHandoffItemView[]
+): ActivityEditorWorkflowHandoffPrivacyContract {
+  return {
+    createsAssignmentLinks: false,
+    exposesAnswerText: false,
+    exposesPromptText: false,
+    exposesRawEditorInput: false,
+    exposesSourceMaterialFileIds: false,
+    exposesSourceMaterialStorageKeys: false,
+    exposesTeacherNotesText: false,
+    itemIds: itemViews.map((itemView) => itemView.id),
+    mutatesActivity: false,
+    persistsActivityWithoutTeacherSave: false,
+    publishesAssignment: false,
+    scope: 'activity-editor-workflow',
+    usesCreateActivityInputContract: true,
   };
 }
 
@@ -1715,6 +2186,7 @@ export function buildActivityCreatePageEditorViewModel(
     initialValues,
     previewActivity: buildActivityEditorPreviewSeed(initialValues),
     previewPanel: buildActivityEditorPreviewPanel(initialValues),
+    workflow: buildActivityEditorWorkflowView(),
   };
 }
 

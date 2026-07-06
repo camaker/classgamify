@@ -11,8 +11,11 @@ import {
   buildActivityEditorSyncedDraftSourceText,
   buildActivityEditorTemplateScaffoldApplication,
   buildActivityEditorTemplateView,
+  buildActivityEditorWorkflowView,
+  getActivityEditorWorkflowStepView,
   getActivityEditorDefaultInput,
   type ActivityEditorTemplateHandoffView,
+  type ActivityEditorWorkflowStepView,
 } from '@/activities/editor';
 import {
   ACTIVITY_AI_DRAFT_ITEM_COUNT_RANGE,
@@ -56,7 +59,7 @@ import { m } from '@/locale/paraglide/messages';
 import { getPathWithLocale } from '@/lib/urls';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useNavigate } from '@tanstack/react-router';
-import { useEffect, useMemo, useState } from 'react';
+import { type ReactNode, useEffect, useMemo, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
 
@@ -109,6 +112,7 @@ export function ActivityCreateForm({
   });
   const modeView = buildActivityEditorModeView(mode);
   const selectOptionsView = buildActivityEditorSelectOptions();
+  const workflowView = useMemo(() => buildActivityEditorWorkflowView(), []);
   const templateView = useMemo(
     () =>
       buildActivityEditorTemplateView({
@@ -229,72 +233,95 @@ export function ActivityCreateForm({
   }
 
   return (
-    <Card className="rounded-lg">
+    <Card className="overflow-hidden rounded-lg border-primary/10">
       <ActivityEditorHeader
         modeView={modeView}
         template={templateView.template}
       />
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)}>
-          <CardContent
-            id={ACTIVITY_EDITOR_SECTION_IDS.editor}
-            className="space-y-6"
-          >
-            <ActivityAiDraftPanel
-              draftFocus={draftFocus}
-              draftItemCount={draftItemCount}
-              draftResult={draftResult}
-              draftSourceText={draftSourceText}
-              isGeneratingDraft={isGeneratingDraft}
-              onDraftFocusChange={setDraftFocus}
-              onDraftItemCountChange={setDraftItemCount}
-              onDraftSourceTextChange={setDraftSourceText}
-              onGenerateDraft={onGenerateDraft}
-              onSyncSourceMaterials={syncAttachedMaterialsForDraft}
-              panelView={aiDraftPanelView}
-              templateType={selectedTemplate}
-            />
+          <CardContent id={ACTIVITY_EDITOR_SECTION_IDS.editor} className="p-0">
+            <ActivityEditorSection
+              step={getActivityEditorWorkflowStepView(workflowView, 'frame')}
+            >
+              <ActivityEditorPrimaryFields
+                control={form.control}
+                templateView={templateView}
+              />
 
-            <ActivityEditorPrimaryFields
-              control={form.control}
-              templateView={templateView}
-            />
+              <ActivityEditorTemplateHandoff
+                handoffView={templateView.handoffView}
+              />
 
-            <ActivityEditorTemplateHandoff
-              handoffView={templateView.handoffView}
-            />
+              <ActivityTemplateScaffoldPanel
+                setupView={templateView.setupView}
+                onApplyScaffold={applyTemplateScaffold}
+              />
+            </ActivityEditorSection>
 
-            <ActivityTemplateScaffoldPanel
-              setupView={templateView.setupView}
-              onApplyScaffold={applyTemplateScaffold}
-            />
+            <ActivityEditorSection
+              step={getActivityEditorWorkflowStepView(workflowView, 'ai-draft')}
+            >
+              <ActivityAiDraftPanel
+                draftFocus={draftFocus}
+                draftItemCount={draftItemCount}
+                draftResult={draftResult}
+                draftSourceText={draftSourceText}
+                isGeneratingDraft={isGeneratingDraft}
+                onDraftFocusChange={setDraftFocus}
+                onDraftItemCountChange={setDraftItemCount}
+                onDraftSourceTextChange={setDraftSourceText}
+                onGenerateDraft={onGenerateDraft}
+                onSyncSourceMaterials={syncAttachedMaterialsForDraft}
+                panelView={aiDraftPanelView}
+                templateType={selectedTemplate}
+              />
+            </ActivityEditorSection>
 
-            <ActivityTemplateReadinessPanel
-              sectionId={ACTIVITY_EDITOR_SECTION_IDS.templateReadiness}
-              summary={templateView.readinessSummary}
-            />
+            <ActivityEditorSection
+              step={getActivityEditorWorkflowStepView(workflowView, 'content')}
+            >
+              <ActivityEditorDetailsFields
+                control={form.control}
+                selectOptionsView={selectOptionsView}
+              />
 
-            <ActivityEditorDetailsFields
-              control={form.control}
-              selectOptionsView={selectOptionsView}
-            />
+              <ActivityEditorStructuredContentFields control={form.control} />
+            </ActivityEditorSection>
 
-            <ActivityEditorStructuredContentFields control={form.control} />
+            <ActivityEditorSection
+              step={getActivityEditorWorkflowStepView(
+                workflowView,
+                'source-materials'
+              )}
+            >
+              <ActivityEditorSourceMaterialsFormField
+                attachedSummaryActionSlot={
+                  <ActivityEditorSyncSourceMaterialsAction
+                    disabled={!aiDraftPanelView.canSyncDraftSourceMaterials}
+                    label={aiDraftPanelView.syncMaterialsLabel}
+                    onClick={syncAttachedMaterialsForDraft}
+                  />
+                }
+                canLoadFiles={Boolean(session?.user)}
+                control={form.control}
+              />
+            </ActivityEditorSection>
 
-            <ActivityEditorSourceMaterialsFormField
-              attachedSummaryActionSlot={
-                <ActivityEditorSyncSourceMaterialsAction
-                  disabled={!aiDraftPanelView.canSyncDraftSourceMaterials}
-                  label={aiDraftPanelView.syncMaterialsLabel}
-                  onClick={syncAttachedMaterialsForDraft}
-                />
-              }
-              canLoadFiles={Boolean(session?.user)}
-              control={form.control}
-            />
+            <ActivityEditorSection
+              step={getActivityEditorWorkflowStepView(workflowView, 'review')}
+            >
+              <ActivityTemplateReadinessPanel
+                summary={templateView.readinessSummary}
+              />
+            </ActivityEditorSection>
 
             {!session?.user && !sessionPending ? (
-              <FormError message={m.activity_form_sign_in_required_message()} />
+              <div className="border-t px-4 py-4 sm:px-6">
+                <FormError
+                  message={m.activity_form_sign_in_required_message()}
+                />
+              </div>
             ) : null}
           </CardContent>
           <ActivityEditorFooter
@@ -306,6 +333,36 @@ export function ActivityCreateForm({
         </form>
       </Form>
     </Card>
+  );
+}
+
+function ActivityEditorSection({
+  children,
+  step,
+}: {
+  children: ReactNode;
+  step: ActivityEditorWorkflowStepView;
+}) {
+  return (
+    <section
+      className="scroll-mt-24 border-t px-4 py-6 first:border-t-0 sm:px-6"
+      id={step.sectionId}
+    >
+      <div className="grid gap-4 lg:grid-cols-[9.5rem_minmax(0,1fr)]">
+        <div className="space-y-2">
+          <p className="w-fit rounded-md border bg-muted/40 px-2 py-1 font-medium text-[0.72rem] text-muted-foreground">
+            {step.label}
+          </p>
+          <div>
+            <h3 className="font-semibold text-base leading-6">{step.title}</h3>
+            <p className="mt-1 text-muted-foreground text-xs leading-5">
+              {step.description}
+            </p>
+          </div>
+        </div>
+        <div className="min-w-0 space-y-4">{children}</div>
+      </div>
+    </section>
   );
 }
 

@@ -88,7 +88,7 @@ export function ActivityEditorDetailsFields({
           <FormItem>
             <FormLabel>{m.activity_form_field_description()}</FormLabel>
             <FormControl>
-              <Textarea {...field} rows={2} />
+              <Textarea {...field} className="max-h-40" rows={2} />
             </FormControl>
             <FormMessage />
           </FormItem>
@@ -169,7 +169,7 @@ export function ActivityEditorDetailsFields({
           <FormItem>
             <FormLabel>{m.activity_form_field_learning_goal()}</FormLabel>
             <FormControl>
-              <Textarea {...field} rows={2} />
+              <Textarea {...field} className="max-h-40" rows={2} />
             </FormControl>
             <FormMessage />
           </FormItem>
@@ -194,6 +194,7 @@ export function ActivityEditorStructuredContentFields({
               <FormControl>
                 <Textarea
                   {...field}
+                  className="max-h-52"
                   rows={4}
                   placeholder={m.activity_form_vocabulary_placeholder()}
                 />
@@ -214,6 +215,7 @@ export function ActivityEditorStructuredContentFields({
               <FormControl>
                 <Textarea
                   {...field}
+                  className="max-h-60"
                   rows={4}
                   placeholder={m.activity_form_questions_placeholder()}
                 />
@@ -237,6 +239,7 @@ export function ActivityEditorStructuredContentFields({
               <FormControl>
                 <Textarea
                   {...field}
+                  className="max-h-52"
                   rows={4}
                   placeholder={m.activity_form_pairs_placeholder()}
                 />
@@ -257,6 +260,7 @@ export function ActivityEditorStructuredContentFields({
               <FormControl>
                 <Textarea
                   {...field}
+                  className="max-h-52"
                   rows={4}
                   placeholder={m.activity_form_groups_placeholder()}
                 />
@@ -278,7 +282,7 @@ export function ActivityEditorStructuredContentFields({
             <FormItem>
               <FormLabel>{m.activity_form_field_source_summary()}</FormLabel>
               <FormControl>
-                <Textarea {...field} rows={3} />
+                <Textarea {...field} className="max-h-44" rows={3} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -291,7 +295,7 @@ export function ActivityEditorStructuredContentFields({
             <FormItem>
               <FormLabel>{m.activity_form_field_teacher_notes()}</FormLabel>
               <FormControl>
-                <Textarea {...field} rows={3} />
+                <Textarea {...field} className="max-h-44" rows={3} />
               </FormControl>
               <FormDescription>
                 {m.activity_form_teacher_notes_description()}
