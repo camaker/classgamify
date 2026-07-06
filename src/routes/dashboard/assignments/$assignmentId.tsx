@@ -12,6 +12,7 @@ import {
 import { AssignmentResultsAttemptReviewCard } from '@/components/assignments/assignment-results-attempt-review-card';
 import { AssignmentResultsAttemptReviewFilterControl } from '@/components/assignments/assignment-results-attempt-review-filter-control';
 import { AssignmentResultsAttemptsTable } from '@/components/assignments/assignment-results-attempts-table';
+import { AssignmentResultsAttemptStatsHandoff } from '@/components/assignments/assignment-results-attempt-stats-handoff';
 import { AssignmentResultsClassroomBriefCard } from '@/components/assignments/assignment-results-classroom-brief-card';
 import { AssignmentResultsEmptyState } from '@/components/assignments/assignment-results-empty-state';
 import { AssignmentResultsHeaderCard } from '@/components/assignments/assignment-results-header-card';
@@ -143,6 +144,9 @@ function LoadedAssignmentResultsPage({
         {pageView.metricItems.map((metric) => (
           <AssignmentResultsMetricCard key={metric.key} metric={metric} />
         ))}
+        <AssignmentResultsAttemptStatsHandoff
+          view={pageView.attemptStatsHandoffView}
+        />
       </section>
 
       <AssignmentResultsHeaderCard

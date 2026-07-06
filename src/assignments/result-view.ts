@@ -8,6 +8,11 @@ import type {
 } from '@/assignments/results';
 import { formatAssignmentDisplayTitle } from '@/assignments/assignment-display';
 import { buildAssignmentAttemptStatsView } from '@/assignments/attempt-stats';
+import {
+  buildAssignmentAttemptStatsHandoffEvidence,
+  buildAssignmentAttemptStatsHandoffView,
+  type AssignmentAttemptStatsHandoffView,
+} from '@/assignments/attempt-stats-handoff';
 import { getAssignmentStatusLabel } from '@/assignments/lifecycle';
 import {
   buildAttemptDurationDisplayView,
@@ -810,6 +815,7 @@ export type AssignmentResultsPageViewModel<
   actionState: AssignmentResultActionState;
   attemptReviewCardViews: AssignmentResultAttemptReviewCardView[];
   attemptRowViews: AssignmentResultAttemptRowView[];
+  attemptStatsHandoffView: AssignmentAttemptStatsHandoffView;
   attemptTableView: AssignmentResultAttemptTableView;
   breadcrumbs: AssignmentResultPageBreadcrumb[];
   classroomBrief: AssignmentClassroomBrief | null;
@@ -2631,6 +2637,14 @@ export function buildAssignmentResultsPageViewModel<
     printAction: headerView?.printAction ?? null,
     reviewStatusView,
   });
+  const attemptStatsHandoffView = buildAssignmentAttemptStatsHandoffView(
+    buildAssignmentAttemptStatsHandoffEvidence({
+      attempts: data?.attempts ?? [],
+      stats: data?.stats ?? null,
+      timeLimitSeconds:
+        headerView?.settingsSummaryView.settings.timeLimitSeconds,
+    })
+  );
 
   return {
     actionButtons,
@@ -2639,6 +2653,7 @@ export function buildAssignmentResultsPageViewModel<
     actionState,
     attemptReviewCardViews,
     attemptRowViews,
+    attemptStatsHandoffView,
     attemptTableView,
     breadcrumbs: [
       {

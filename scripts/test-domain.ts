@@ -540,6 +540,11 @@ import {
   summarizeAssignmentAttemptsByAssignmentId,
   withAssignmentAttemptStatsSettings,
 } from '@/assignments/attempt-stats';
+import {
+  ASSIGNMENT_ATTEMPT_STATS_HANDOFF_ITEM_IDS,
+  buildAssignmentAttemptStatsHandoffEvidence,
+  buildAssignmentAttemptStatsHandoffView,
+} from '@/assignments/attempt-stats-handoff';
 import { buildScoredAttemptInsert } from '@/assignments/attempt-persistence';
 import {
   ASSIGNMENT_ATTEMPT_DURATION_UNITS,
@@ -3557,6 +3562,22 @@ const assignmentAttemptStatsSource = readFileSync(
   'src/assignments/attempt-stats.ts',
   'utf8'
 );
+const assignmentAttemptStatsHandoffSource = readFileSync(
+  'src/assignments/attempt-stats-handoff.ts',
+  'utf8'
+);
+const assignmentResultsAttemptStatsHandoffSource = readFileSync(
+  'src/components/assignments/assignment-results-attempt-stats-handoff.tsx',
+  'utf8'
+);
+const assignmentResultsExportStatsHandoffSource = readFileSync(
+  'src/assignments/results-export.ts',
+  'utf8'
+);
+const assignmentResultRouteStatsHandoffSource = readFileSync(
+  'src/routes/dashboard/assignments/$assignmentId.tsx',
+  'utf8'
+);
 const assignmentListSummarySource = readFileSync(
   'src/assignments/list-summary.ts',
   'utf8'
@@ -3584,6 +3605,21 @@ assert.match(
   assignmentAttemptStatsSource,
   /function getAttemptAccuracy[\s\S]*normalizeAttemptStatsPercent\(item\.resultJson\?\.accuracy\)[\s\S]*function getAttemptPoints[\s\S]*normalizeAttemptStatsNumber\(item\.score,[\s\S]*max: totalPoints[\s\S]*normalizeAttemptStatsNumber\(item\.resultJson\?\.earnedPoints/,
   'Assignment attempt stats should normalize accuracy and point values before averaging.'
+);
+assert.match(
+  assignmentAttemptStatsHandoffSource,
+  /ASSIGNMENT_ATTEMPT_STATS_HANDOFF_ITEM_IDS = \[[\s\S]*'stats-scope'[\s\S]*'completed-attempt-count'[\s\S]*'average-duration'[\s\S]*'csv-export-consumer'[\s\S]*'privacy-guard'/,
+  'Assignment attempt stats handoff should expose the 30 shared metric and privacy slices.'
+);
+assert.match(
+  assignmentAttemptStatsHandoffSource,
+  /buildAssignmentAttemptStatsHandoffEvidence[\s\S]*summarizeAssignmentAttempts[\s\S]*normalizeAssignmentAttemptStats[\s\S]*buildAssignmentAttemptStatsView/,
+  'Assignment attempt stats handoff evidence should derive from shared assignment stats helpers.'
+);
+assert.match(
+  assignmentAttemptStatsHandoffSource,
+  /exposesAcceptedAnswers: false[\s\S]*exposesCsvDataUrl: false[\s\S]*exposesPromptText: false[\s\S]*exposesRawAnonymousToken: false[\s\S]*exposesShareSlug: false[\s\S]*exposesStudentAnswerText: false[\s\S]*exposesStudentDisplayLabels: false[\s\S]*exposesTeacherAnswerKey: false/,
+  'Assignment attempt stats handoff privacy contract should keep private result data out of semantic output.'
 );
 assert.doesNotMatch(
   assignmentAttemptStatsSource,
@@ -3627,6 +3663,21 @@ assert.match(
 );
 assert.match(
   assignmentResultViewSource,
+  /attemptStatsHandoffView: AssignmentAttemptStatsHandoffView[\s\S]*buildAssignmentAttemptStatsHandoffView\(\s*buildAssignmentAttemptStatsHandoffEvidence\(\{[\s\S]*attempts: data\?\.attempts \?\? \[\],[\s\S]*stats: data\?\.stats \?\? null,[\s\S]*timeLimitSeconds:/,
+  'Assignment result pages should carry the shared attempt stats handoff view.'
+);
+assert.match(
+  assignmentResultsAttemptStatsHandoffSource,
+  /data-handoff="assignment-attempt-stats"[\s\S]*view\.itemViews\.map[\s\S]*data-handoff-item=\{itemView\.id\}[\s\S]*aria-label=\{itemView\.ariaLabel\}/,
+  'Assignment attempt stats handoff should render as hidden semantic output.'
+);
+assert.match(
+  assignmentResultRouteStatsHandoffSource,
+  /AssignmentResultsAttemptStatsHandoff[\s\S]*view=\{pageView\.attemptStatsHandoffView\}/,
+  'Assignment result route should render the attempt stats handoff beside metric cards.'
+);
+assert.match(
+  assignmentResultViewSource,
   /buildAssignmentResultControlOptions\([\s\S]*values\.map\(\(value\)/,
   'Assignment result control options should map directly from the domain enum values.'
 );
@@ -3664,6 +3715,21 @@ assert.match(
   assignmentListSummarySource,
   /buildAssignmentAttemptStatsView\(resolvedSummary\)/,
   'Assignment list summary metrics should format values through the shared attempt stats view.'
+);
+assert.match(
+  assignmentListViewStatsSource,
+  /buildAssignmentAttemptStatsView\(\{[\s\S]*averageScore,[\s\S]*completions,[\s\S]*\}\)/,
+  'Assignment list cards should format values through the shared attempt stats view.'
+);
+assert.match(
+  assignmentClassroomBriefSource,
+  /const statsView = buildAssignmentAttemptStatsView\(stats\)/,
+  'Assignment classroom briefs should format values through the shared attempt stats view.'
+);
+assert.match(
+  assignmentResultsExportStatsHandoffSource,
+  /const statsView = buildAssignmentAttemptStatsView\(\s*normalizeAssignmentResultsExportStats\(data\.stats\)\s*\)/,
+  'Assignment results export should format values through the shared attempt stats view.'
 );
 assert.match(
   assignmentListSummarySource,
@@ -53052,6 +53118,140 @@ assert.deepEqual(
     completions: 2,
   }
 );
+const assignmentAttemptStatsHandoffView =
+  buildAssignmentAttemptStatsHandoffView(
+    buildAssignmentAttemptStatsHandoffEvidence({
+      attempts: [
+        {
+          resultJson: {
+            accuracy: 80,
+            completedItemCount: 4,
+            correctItemCount: 4,
+            durationSeconds: 40,
+            earnedPoints: 7,
+            totalPoints: 10,
+          },
+          score: 8,
+        },
+        {
+          resultJson: {
+            accuracy: 50,
+            completedItemCount: 3,
+            correctItemCount: 2,
+            durationSeconds: 200,
+            earnedPoints: 5,
+            totalPoints: 10,
+          },
+          score: null,
+        },
+        {
+          resultJson: {
+            accuracy: 110,
+            completedItemCount: 5,
+            correctItemCount: 5,
+            durationSeconds: -5,
+            earnedPoints: 12,
+            totalPoints: 10,
+          },
+          score: 999,
+        },
+        {
+          resultJson: null,
+          score: null,
+        },
+      ],
+      timeLimitSeconds: 120,
+    })
+  );
+const assignmentAttemptStatsHandoffItemIds =
+  assignmentAttemptStatsHandoffView.itemViews.map((itemView) => itemView.id);
+const assignmentAttemptStatsHandoffValues = new Map(
+  assignmentAttemptStatsHandoffView.itemViews.map((itemView) => [
+    itemView.id,
+    itemView.value,
+  ])
+);
+assert.deepEqual(assignmentAttemptStatsHandoffItemIds, [
+  ...ASSIGNMENT_ATTEMPT_STATS_HANDOFF_ITEM_IDS,
+]);
+assert.equal(new Set(assignmentAttemptStatsHandoffItemIds).size, 30);
+assert.deepEqual(assignmentAttemptStatsHandoffView.privacy, {
+  exposesAcceptedAnswers: false,
+  exposesCsvDataUrl: false,
+  exposesPromptText: false,
+  exposesRawAnonymousToken: false,
+  exposesRuntimeItemIds: false,
+  exposesShareSlug: false,
+  exposesStudentAnswerText: false,
+  exposesStudentDisplayLabels: false,
+  exposesTeacherAnswerKey: false,
+  itemIds: assignmentAttemptStatsHandoffItemIds,
+  mutatesResultData: false,
+  scope: 'teacher-result-attempt-stats',
+  usesAssignmentDomainHelpers: true,
+});
+assert.equal(
+  assignmentAttemptStatsHandoffValues.get('stats-scope'),
+  'Assignment attempt metrics'
+);
+assert.equal(
+  assignmentAttemptStatsHandoffValues.get('source-attempt-count'),
+  '4'
+);
+assert.equal(
+  assignmentAttemptStatsHandoffValues.get('completed-attempt-count'),
+  '3'
+);
+assert.equal(
+  assignmentAttemptStatsHandoffValues.get('average-accuracy'),
+  '77%'
+);
+assert.equal(
+  assignmentAttemptStatsHandoffValues.get('average-points'),
+  '8'
+);
+assert.equal(
+  assignmentAttemptStatsHandoffValues.get('average-duration'),
+  '53s'
+);
+assert.equal(
+  assignmentAttemptStatsHandoffValues.get('duration-time-limit'),
+  '120s cap'
+);
+assert.equal(
+  assignmentAttemptStatsHandoffValues.get('nonfinite-number-guard'),
+  'Hidden'
+);
+assert.equal(
+  assignmentAttemptStatsHandoffValues.get('negative-number-guard'),
+  '0'
+);
+assert.equal(
+  assignmentAttemptStatsHandoffValues.get('fractional-count-guard'),
+  '2'
+);
+assert.equal(
+  assignmentAttemptStatsHandoffValues.get('result-metric-consumer'),
+  'Result metric cards'
+);
+assert.equal(
+  assignmentAttemptStatsHandoffValues.get('assignment-list-summary-consumer'),
+  'Assignment list summary'
+);
+assert.equal(
+  assignmentAttemptStatsHandoffValues.get('csv-export-consumer'),
+  'CSV export'
+);
+assert.equal(
+  assignmentAttemptStatsHandoffValues.get('privacy-guard'),
+  'Hidden'
+);
+assert.equal(
+  JSON.stringify(assignmentAttemptStatsHandoffView).includes(
+    'SECRET_RAW_ANONYMOUS_TOKEN'
+  ),
+  false
+);
 
 const resultRuntimeItems = [
   {
@@ -53672,6 +53872,50 @@ const noMatchResultsPageView = buildAssignmentResultsPageViewModel({
   data: scoredResultsPageData,
   search: { student: 'Nobody' },
 });
+const scoredResultsAttemptStatsHandoffValues = new Map(
+  scoredResultsPageView.attemptStatsHandoffView.itemViews.map((itemView) => [
+    itemView.id,
+    itemView.value,
+  ])
+);
+assert.equal(
+  scoredResultsAttemptStatsHandoffValues.get('source-attempt-count'),
+  '2'
+);
+assert.equal(
+  scoredResultsAttemptStatsHandoffValues.get('completed-attempt-count'),
+  '1'
+);
+assert.equal(
+  scoredResultsAttemptStatsHandoffValues.get('average-accuracy'),
+  scoredResultsPageView.metricItems.find(
+    (metric) => metric.key === 'average-accuracy'
+  )?.value
+);
+assert.equal(
+  scoredResultsAttemptStatsHandoffValues.get('average-points'),
+  scoredResultsPageView.metricItems.find(
+    (metric) => metric.key === 'average-points'
+  )?.value
+);
+assert.equal(
+  scoredResultsAttemptStatsHandoffValues.get('average-duration'),
+  scoredResultsPageView.metricItems.find(
+    (metric) => metric.key === 'average-time'
+  )?.value
+);
+assert.equal(
+  JSON.stringify(scoredResultsPageView.attemptStatsHandoffView).includes(
+    'Alice'
+  ),
+  false
+);
+assert.equal(
+  JSON.stringify(scoredResultsPageView.attemptStatsHandoffView).includes(
+    'result-share'
+  ),
+  false
+);
 assert.deepEqual(
   [
     defaultResultsPageView.reviewStatusView,
