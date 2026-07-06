@@ -878,8 +878,13 @@ import {
   getAssignmentResultActionGate,
   getAssignmentResultActionGateFromState,
   studentSummarySortOptions,
+  type AssignmentResultEmptyState,
   type AssignmentResultTableHeaderView,
 } from '@/assignments/result-view';
+import {
+  ASSIGNMENT_RESULT_EMPTY_STATE_HANDOFF_ITEM_IDS,
+  buildAssignmentResultEmptyStateHandoffView,
+} from '@/assignments/result-empty-state-handoff';
 import {
   ATTEMPT_REVIEW_FILTER_VALUES,
   DEFAULT_ATTEMPT_REVIEW_FILTER,
@@ -1196,6 +1201,19 @@ function summarizeAssignmentResultTableHeaders(
   headers: AssignmentResultTableHeaderView[]
 ) {
   return headers.map((header) => [header.id, header.label]);
+}
+
+function summarizeAssignmentResultEmptyState(
+  state: AssignmentResultEmptyState | undefined
+) {
+  if (!state) return undefined;
+
+  return {
+    description: state.description,
+    handoffScope: state.handoffView.privacy.scope,
+    handoffSliceCount: state.handoffView.itemViews.length,
+    title: state.title,
+  };
 }
 
 function getAttemptAnswerValidationError(action: () => void) {
@@ -8005,6 +8023,14 @@ const assignmentResultsEmptyStateSource = readFileSync(
   'src/components/assignments/assignment-results-empty-state.tsx',
   'utf8'
 );
+const assignmentResultEmptyStateHandoffSource = readFileSync(
+  'src/assignments/result-empty-state-handoff.ts',
+  'utf8'
+);
+const assignmentResultEmptyStateHandoffSemanticTestSource = readFileSync(
+  'scripts/assignment-result-empty-state-handoff-semantic-views.test.ts',
+  'utf8'
+);
 const assignmentResultDisplaySource = readFileSync(
   'src/assignments/result-display.ts',
   'utf8'
@@ -9109,6 +9135,107 @@ assert.match(
   assignmentResultsEmptyStateSource,
   /AssignmentResultEmptyState/,
   'Assignment result empty-state component should consume the assignment-domain empty-state view.'
+);
+overwriteGetLocale(() => 'en');
+assert.equal(ASSIGNMENT_RESULT_EMPTY_STATE_HANDOFF_ITEM_IDS.length, 30);
+const assignmentResultEmptyStateHandoffProbe =
+  buildAssignmentResultEmptyStateHandoffView({
+    description:
+      'Clear the search or try another student name from this assignment.',
+    reason: 'attempt-search-no-matches',
+    search: ' Private Student ',
+    surface: 'attempt-rows',
+    title: 'No matching attempts.',
+    totalAttempts: 3,
+  });
+const assignmentResultEmptyStateHandoffItemIds =
+  assignmentResultEmptyStateHandoffProbe.itemViews.map(
+    (itemView) => itemView.id
+  );
+assert.deepEqual(assignmentResultEmptyStateHandoffItemIds, [
+  ...ASSIGNMENT_RESULT_EMPTY_STATE_HANDOFF_ITEM_IDS,
+]);
+assert.deepEqual(assignmentResultEmptyStateHandoffProbe.privacy, {
+  exposesPublicRunnerContent: false,
+  exposesRawAnonymousToken: false,
+  exposesRawSearchText: false,
+  exposesStudentAnswerText: false,
+  exposesStudentDisplayLabels: false,
+  exposesTeacherAnswerKey: false,
+  itemIds: assignmentResultEmptyStateHandoffItemIds,
+  mutatesResultData: false,
+  scope: 'teacher-result-empty-state',
+  usesResultDomainHelpers: true,
+});
+const assignmentResultEmptyStateHandoffValues = new Map(
+  assignmentResultEmptyStateHandoffProbe.itemViews.map((itemView) => [
+    itemView.id,
+    itemView.value,
+  ])
+);
+assert.equal(
+  assignmentResultEmptyStateHandoffValues.get('empty-reason'),
+  'Attempt search no match'
+);
+assert.equal(
+  assignmentResultEmptyStateHandoffValues.get('search-state'),
+  'Adjusted'
+);
+assert.equal(
+  assignmentResultEmptyStateHandoffValues.get('search-normalization'),
+  'normalizeResultSearch'
+);
+assert.equal(
+  assignmentResultEmptyStateHandoffValues.get('no-match-next-step'),
+  'Clear search'
+);
+assert.equal(
+  assignmentResultEmptyStateHandoffValues.get('copy-brief-gate'),
+  'Current review scope'
+);
+assert.equal(
+  assignmentResultEmptyStateHandoffValues.get('export-csv-gate'),
+  'Full assignment scope'
+);
+assert.equal(
+  assignmentResultEmptyStateHandoffValues.get('anonymous-token-guard'),
+  'Hidden'
+);
+assert.equal(
+  JSON.stringify(assignmentResultEmptyStateHandoffProbe).includes(
+    'Private Student'
+  ),
+  false
+);
+assert.match(
+  assignmentResultEmptyStateHandoffSource,
+  /ASSIGNMENT_RESULT_EMPTY_STATE_HANDOFF_ITEM_IDS = \[(?=[\s\S]*'empty-surface')(?=[\s\S]*'visible-description')(?=[\s\S]*'student-summary-section')(?=[\s\S]*'attempt-table-section')(?=[\s\S]*'answer-review-section')(?=[\s\S]*'search-normalization')(?=[\s\S]*'copy-brief-gate')(?=[\s\S]*'export-csv-gate')(?=[\s\S]*'public-runner-boundary')(?=[\s\S]*'anonymous-token-guard')(?=[\s\S]*'student-answer-guard')(?=[\s\S]*'teacher-answer-guard')[\s\S]*\] as const/,
+  'Assignment result empty-state handoff should preserve the 30-slice item id contract.'
+);
+assert.match(
+  assignmentResultEmptyStateHandoffSource,
+  /export type AssignmentResultEmptyStateHandoffPrivacyContract = \{[\s\S]*exposesPublicRunnerContent: false;[\s\S]*exposesRawAnonymousToken: false;[\s\S]*exposesRawSearchText: false;[\s\S]*exposesStudentAnswerText: false;[\s\S]*exposesStudentDisplayLabels: false;[\s\S]*exposesTeacherAnswerKey: false;[\s\S]*mutatesResultData: false;[\s\S]*scope: 'teacher-result-empty-state';[\s\S]*usesResultDomainHelpers: true;/,
+  'Assignment result empty-state handoff should document the teacher-result privacy boundary.'
+);
+assert.match(
+  assignmentResultViewSource,
+  /from '@\/assignments\/result-empty-state-handoff'[\s\S]*handoffView: AssignmentResultEmptyStateHandoffView[\s\S]*function buildAssignmentResultEmptyStateView\([\s\S]*buildAssignmentResultEmptyStateHandoffView\(input\)/,
+  'Assignment result empty states should attach the prepared empty-state handoff from the dedicated domain module.'
+);
+assert.match(
+  assignmentResultsEmptyStateSource,
+  /data-handoff="assignment-result-empty-state"[\s\S]*data-handoff-scope=\{state\.handoffView\.privacy\.scope\}[\s\S]*state\.handoffView\.itemViews\.map[\s\S]*data-handoff-item=\{itemView\.id\}[\s\S]*<output aria-label=\{itemView\.ariaLabel\}>/,
+  'Assignment result empty-state component should render marker, privacy scope, item ids, and accessible values.'
+);
+assert.match(
+  authE2eCatalogSource,
+  /\|\s*6j\s*\|\s*Result empty states expose a 30-slice handoff\s*\|[\s\S]*`assignment-result-empty-state`[\s\S]*`data-handoff-item`/,
+  'E2E catalog should include the result empty-state handoff marker and stable item marker acceptance journey.'
+);
+assert.match(
+  assignmentResultEmptyStateHandoffSemanticTestSource,
+  /SECRET_PRIVATE_STUDENT[\s\S]*exposesRawSearchText: false[\s\S]*needs-review-no-matches[\s\S]*data-handoff="assignment-result-empty-state"/,
+  'Focused semantic test should exercise raw-search privacy, needs-review no matches, and component marker wiring.'
 );
 assert.match(
   assignmentResultViewSource,
@@ -28680,27 +28807,23 @@ function buildExpectedStudentRunnerPayloadSummaryView({
   unansweredItemCount: number;
 }) {
   return {
-    ariaLabel: 'Prepared browser submission payload',
-    description:
-      'Review the assignment link and answer counts this browser will send when you submit.',
+    ariaLabel: 'Submission check before sending',
+    description: 'Check the assignment link and answer counts before you submit.',
     metrics: [
       {
         ariaLabel:
-          `Share link: ${shareSlug}. ` +
-          'Frozen assignment link id used for this submission.',
-        description: 'Frozen assignment link id used for this submission.',
+          `Share link: ${shareSlug}. Assignment link for this attempt.`,
+        description: 'Assignment link for this attempt.',
         key: 'share-link',
         label: 'Share link',
         value: shareSlug,
       },
       {
         ariaLabel:
-          `Runtime items: ${itemCount}. ` +
-          'Frozen runtime items loaded from the teacher assignment snapshot.',
-        description:
-          'Frozen runtime items loaded from the teacher assignment snapshot.',
+          `Questions: ${itemCount}. Questions loaded for this assignment.`,
+        description: 'Questions loaded for this assignment.',
         key: 'items',
-        label: 'Runtime items',
+        label: 'Questions',
         value: String(itemCount),
       },
       {
@@ -28732,7 +28855,7 @@ function buildExpectedStudentRunnerPayloadSummaryView({
       exposesTeacherSourceMaterials: false,
       metricKeys: ['share-link', 'items', 'answers', 'unanswered'],
     },
-    title: 'Prepared browser payload',
+    title: 'Ready to submit',
   };
 }
 function buildExpectedStudentAttemptFeedbackScopeView({
@@ -59787,8 +59910,9 @@ assert.deepEqual(
       title: directAssignmentResultSectionViews.reteachPriorities.title,
     },
     studentAttempts: {
-      emptyState:
-        directAssignmentResultSectionViews.studentAttempts.emptyState,
+      emptyState: summarizeAssignmentResultEmptyState(
+        directAssignmentResultSectionViews.studentAttempts.emptyState
+      ),
       isVisible: directAssignmentResultSectionViews.studentAttempts.isVisible,
       title: directAssignmentResultSectionViews.studentAttempts.title,
     },
@@ -59799,7 +59923,9 @@ assert.deepEqual(
       title: directAssignmentResultSectionViews.studentFollowUp.title,
     },
     studentSummary: {
-      emptyState: directAssignmentResultSectionViews.studentSummary.emptyState,
+      emptyState: summarizeAssignmentResultEmptyState(
+        directAssignmentResultSectionViews.studentSummary.emptyState
+      ),
       isVisible: directAssignmentResultSectionViews.studentSummary.isVisible,
       title: directAssignmentResultSectionViews.studentSummary.title,
     },
@@ -59837,6 +59963,8 @@ assert.deepEqual(
       emptyState: {
         description:
           'Clear the search or try another student name from this assignment.',
+        handoffScope: 'teacher-result-empty-state',
+        handoffSliceCount: 30,
         title: 'No matching attempts.',
       },
       isVisible: true,
@@ -59851,6 +59979,8 @@ assert.deepEqual(
       emptyState: {
         description:
           'Clear the search or try another student name from this assignment.',
+        handoffScope: 'teacher-result-empty-state',
+        handoffSliceCount: 30,
         title: 'No matching students.',
       },
       isVisible: true,
@@ -60144,56 +60274,82 @@ assert.deepEqual(
   }
 );
 assert.deepEqual(
-  buildAssignmentResultEmptyState({
-    search: '',
-    surface: 'attempt-rows',
-    totalAttempts: 0,
-  }),
+  summarizeAssignmentResultEmptyState(
+    buildAssignmentResultEmptyState({
+      search: '',
+      surface: 'attempt-rows',
+      totalAttempts: 0,
+    })
+  ),
   {
     description:
       'Share the student link, then completed submissions will appear here.',
+    handoffScope: 'teacher-result-empty-state',
+    handoffSliceCount: 30,
     title: 'No student attempts yet.',
   }
 );
 assert.deepEqual(
-  buildAssignmentResultEmptyState({
-    search: ' alice ',
-    surface: 'student-summary',
-    totalStudents: 2,
-  }),
+  summarizeAssignmentResultEmptyState(
+    buildAssignmentResultEmptyState({
+      search: ' alice ',
+      surface: 'student-summary',
+      totalStudents: 2,
+    })
+  ),
   {
     description:
       'Clear the search or try another student name from this assignment.',
+    handoffScope: 'teacher-result-empty-state',
+    handoffSliceCount: 30,
     title: 'No matching students.',
   }
 );
 assert.deepEqual(
-  buildAssignmentResultEmptyState({
-    filter: 'needs-review',
-    search: '',
-    surface: 'attempt-review',
-    totalAttemptReviews: 2,
-  }),
+  summarizeAssignmentResultEmptyState(
+    buildAssignmentResultEmptyState({
+      filter: 'needs-review',
+      search: '',
+      surface: 'attempt-review',
+      totalAttemptReviews: 2,
+    })
+  ),
   {
     description:
       'Every shown submission is currently correct for this assignment snapshot.',
+    handoffScope: 'teacher-result-empty-state',
+    handoffSliceCount: 30,
     title: 'No answers need review.',
   }
 );
 assert.deepEqual(
-  buildAssignmentResultEmptyState({
-    filter: 'all',
-    search: ' nobody ',
-    surface: 'attempt-review',
-    totalAttemptReviews: 2,
-  }),
+  summarizeAssignmentResultEmptyState(
+    buildAssignmentResultEmptyState({
+      filter: 'all',
+      search: ' nobody ',
+      surface: 'attempt-review',
+      totalAttemptReviews: 2,
+    })
+  ),
   {
     description:
       'Clear the search or try another student name from this assignment.',
+    handoffScope: 'teacher-result-empty-state',
+    handoffSliceCount: 30,
     title: 'No matching answer reviews.',
   }
 );
 assert.equal(
+  summarizeAssignmentResultEmptyState(
+    buildAssignmentResultEmptyState({
+      search: '',
+      surface: 'student-summary',
+      totalStudents: 2,
+    })
+  ),
+  undefined
+);
+assert.deepEqual(
   buildAssignmentResultEmptyState({
     search: '',
     surface: 'student-summary',
@@ -60704,23 +60860,42 @@ assert.equal(
   assignmentResultViewModel.attemptReviewSubmissionSummary,
   'Showing 1 of 3 submissions.'
 );
-assert.deepEqual(assignmentResultViewModel.emptyStates, {
-  attemptReview: {
-    description:
-      'Clear the search or try another student name from this assignment.',
-    title: 'No matching answer reviews.',
+assert.deepEqual(
+  {
+    attemptReview: summarizeAssignmentResultEmptyState(
+      assignmentResultViewModel.emptyStates.attemptReview
+    ),
+    attemptRows: summarizeAssignmentResultEmptyState(
+      assignmentResultViewModel.emptyStates.attemptRows
+    ),
+    studentSummary: summarizeAssignmentResultEmptyState(
+      assignmentResultViewModel.emptyStates.studentSummary
+    ),
   },
-  attemptRows: {
-    description:
-      'Clear the search or try another student name from this assignment.',
-    title: 'No matching attempts.',
-  },
-  studentSummary: {
-    description:
-      'Clear the search or try another student name from this assignment.',
-    title: 'No matching students.',
-  },
-});
+  {
+    attemptReview: {
+      description:
+        'Clear the search or try another student name from this assignment.',
+      handoffScope: 'teacher-result-empty-state',
+      handoffSliceCount: 30,
+      title: 'No matching answer reviews.',
+    },
+    attemptRows: {
+      description:
+        'Clear the search or try another student name from this assignment.',
+      handoffScope: 'teacher-result-empty-state',
+      handoffSliceCount: 30,
+      title: 'No matching attempts.',
+    },
+    studentSummary: {
+      description:
+        'Clear the search or try another student name from this assignment.',
+      handoffScope: 'teacher-result-empty-state',
+      handoffSliceCount: 30,
+      title: 'No matching students.',
+    },
+  }
+);
 assert.deepEqual(
   getAssignmentResultActionGate({
     action: 'export-csv',

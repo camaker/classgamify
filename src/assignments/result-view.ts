@@ -124,6 +124,11 @@ import {
   type AssignmentResultActionState,
 } from '@/assignments/result-actions';
 import {
+  buildAssignmentResultEmptyStateHandoffView,
+  type AssignmentResultEmptyStateHandoffInput,
+  type AssignmentResultEmptyStateHandoffView,
+} from '@/assignments/result-empty-state-handoff';
+import {
   buildAssignmentResultsExportPreparationView,
   type AssignmentResultsExportPreparationView,
 } from '@/assignments/results-export';
@@ -220,6 +225,7 @@ export {
 
 export type AssignmentResultEmptyState = {
   description: string;
+  handoffView: AssignmentResultEmptyStateHandoffView;
   title: string;
 };
 
@@ -2437,17 +2443,25 @@ export function buildAssignmentResultEmptyState(
 
   if (input.surface === 'student-summary') {
     if (input.totalStudents === 0) {
-      return {
+      return buildAssignmentResultEmptyStateView({
         description: m.assignment_result_empty_student_summary_description(),
+        reason: 'no-student-summaries',
+        search: input.search,
+        surface: input.surface,
         title: m.assignment_result_empty_student_summary_title(),
-      };
+        totalStudents: input.totalStudents,
+      });
     }
 
     if (hasSearch) {
-      return {
+      return buildAssignmentResultEmptyStateView({
         description: m.assignment_result_empty_search_students_description(),
+        reason: 'student-search-no-matches',
+        search: input.search,
+        surface: input.surface,
         title: m.assignment_result_empty_search_students_title(),
-      };
+        totalStudents: input.totalStudents,
+      });
     }
 
     return undefined;
@@ -2455,45 +2469,78 @@ export function buildAssignmentResultEmptyState(
 
   if (input.surface === 'attempt-rows') {
     if (input.totalAttempts === 0) {
-      return {
+      return buildAssignmentResultEmptyStateView({
         description: m.assignment_result_empty_attempt_rows_description(),
+        reason: 'no-attempts',
+        search: input.search,
+        surface: input.surface,
         title: m.assignment_result_empty_attempt_rows_title(),
-      };
+        totalAttempts: input.totalAttempts,
+      });
     }
 
     if (hasSearch) {
-      return {
+      return buildAssignmentResultEmptyStateView({
         description: m.assignment_result_empty_search_attempts_description(),
+        reason: 'attempt-search-no-matches',
+        search: input.search,
+        surface: input.surface,
         title: m.assignment_result_empty_search_attempts_title(),
-      };
+        totalAttempts: input.totalAttempts,
+      });
     }
 
     return undefined;
   }
 
   if (input.totalAttemptReviews === 0) {
-    return {
+    return buildAssignmentResultEmptyStateView({
       description: m.assignment_result_empty_attempt_review_description(),
+      filter: input.filter,
+      reason: 'no-answer-reviews',
+      search: input.search,
+      surface: input.surface,
       title: m.assignment_result_empty_attempt_review_title(),
-    };
+      totalAttemptReviews: input.totalAttemptReviews,
+    });
   }
 
   if (hasSearch) {
-    return {
+    return buildAssignmentResultEmptyStateView({
       description:
         m.assignment_result_empty_search_answer_reviews_description(),
+      filter: input.filter,
+      reason: 'answer-review-search-no-matches',
+      search: input.search,
+      surface: input.surface,
       title: m.assignment_result_empty_search_answer_reviews_title(),
-    };
+      totalAttemptReviews: input.totalAttemptReviews,
+    });
   }
 
   if (input.filter === 'needs-review') {
-    return {
+    return buildAssignmentResultEmptyStateView({
       description: m.assignment_result_empty_needs_review_description(),
+      filter: input.filter,
+      reason: 'needs-review-no-matches',
+      search: input.search,
+      surface: input.surface,
       title: m.assignment_result_empty_needs_review_title(),
-    };
+      totalAttemptReviews: input.totalAttemptReviews,
+    });
   }
 
   return undefined;
+}
+
+function buildAssignmentResultEmptyStateView(
+  input: AssignmentResultEmptyStateHandoffInput
+): AssignmentResultEmptyState {
+  return {
+    description: input.description,
+    handoffView: buildAssignmentResultEmptyStateHandoffView(input),
+    title: input.title,
+  };
 }
 
 export function buildResultSearchSummary({
