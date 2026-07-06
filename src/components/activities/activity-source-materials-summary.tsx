@@ -151,6 +151,7 @@ function ActivitySourceExtractionAssistHandoff({
       aria-labelledby={titleId}
       className="sr-only"
       data-handoff="activity-source-extraction-assist"
+      data-handoff-scope={handoff.privacy.scope}
     >
       <h3 id={titleId}>{handoff.title}</h3>
       <p id={descriptionId}>{handoff.description}</p>
@@ -171,13 +172,24 @@ function ActivitySourceExtractionAssistHandoffItem({
 }: {
   item: ActivitySourceExtractionAssistHandoffItemView;
 }) {
+  const labelId = `activity-source-extraction-assist-${item.id}-label`;
+  const valueId = `activity-source-extraction-assist-${item.id}-value`;
+  const descriptionId = `activity-source-extraction-assist-${item.id}-description`;
+
   return (
     <div data-handoff-item={item.id}>
-      <dt>{item.label}</dt>
+      <dt id={labelId}>{item.label}</dt>
       <dd>
-        <output aria-label={item.ariaLabel}>{item.value}</output>
-        <span>{item.description}</span>
+        <output
+          aria-describedby={descriptionId}
+          aria-label={item.ariaLabel}
+          aria-labelledby={`${labelId} ${valueId}`}
+          id={valueId}
+        >
+          {item.value}
+        </output>
       </dd>
+      <dd id={descriptionId}>{item.description}</dd>
     </div>
   );
 }

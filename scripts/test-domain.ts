@@ -321,6 +321,10 @@ import {
   summarizeActivitySourceMaterials,
 } from '@/activities/material-summary';
 import {
+  ACTIVITY_SOURCE_EXTRACTION_ASSIST_HANDOFF_ITEM_IDS,
+  buildActivitySourceExtractionAssistHandoffView,
+} from '@/activities/source-extraction-assist';
+import {
   ACTIVITY_SOURCE_MATERIAL_REFERENCE_LIMITS,
   ACTIVITY_SOURCE_MATERIALS_MAX_COUNT,
   buildActivityMaterialReferenceFromUserFile,
@@ -5132,6 +5136,10 @@ const activitySourceMaterialsSummarySource = readFileSync(
   'src/components/activities/activity-source-materials-summary.tsx',
   'utf8'
 );
+const activitySourceExtractionAssistSource = readFileSync(
+  'src/activities/source-extraction-assist.ts',
+  'utf8'
+);
 const activityPreviewViewSource = readFileSync(
   'src/activities/preview-view.ts',
   'utf8'
@@ -5449,6 +5457,165 @@ assert.doesNotMatch(
   activitySourceMaterialsSummarySource,
   /Listening draft input|Worksheet extraction input|Structured import input|activity_source_material_next_step_/,
   'Activity source-material summary component should not hard-code or fetch extraction next-step copy locally.'
+);
+assert.deepEqual([...ACTIVITY_SOURCE_EXTRACTION_ASSIST_HANDOFF_ITEM_IDS], [
+  'source-material-count',
+  'extractable-material-count',
+  'audio-source-count',
+  'worksheet-source-count',
+  'spreadsheet-source-count',
+  'reference-only-count',
+  'capability-count',
+  'audio-draft-path',
+  'worksheet-extraction-path',
+  'spreadsheet-import-path',
+  'activity-content-target',
+  'question-target',
+  'pair-target',
+  'group-target',
+  'vocabulary-target',
+  'teacher-note-target',
+  'accepted-answer-target',
+  'template-readiness-target',
+  'assignment-snapshot-boundary',
+  'editor-review-gate',
+  'draft-output',
+  'persistence-boundary',
+  'publish-boundary',
+  'owner-scope',
+  'file-byte-guard',
+  'filename-guard',
+  'file-id-guard',
+  'storage-key-guard',
+  'parallel-model-guard',
+  'privacy-guard',
+]);
+assert.equal(
+  new Set(ACTIVITY_SOURCE_EXTRACTION_ASSIST_HANDOFF_ITEM_IDS).size,
+  30
+);
+const sourceExtractionAssistHandoffView =
+  buildActivitySourceExtractionAssistHandoffView({
+    extractableMaterialCount: 3,
+    sourceKindCounts: [
+      { count: 1, kind: 'audio' },
+      { count: 1, kind: 'worksheet-document' },
+      { count: 1, kind: 'worksheet-image' },
+      { count: 1, kind: 'spreadsheet' },
+      { count: 2, kind: 'file' },
+    ],
+  });
+const sourceExtractionAssistHandoffValues = new Map(
+  sourceExtractionAssistHandoffView.itemViews.map((item) => [
+    item.id,
+    item.value,
+  ])
+);
+assert.equal(sourceExtractionAssistHandoffView.itemViews.length, 30);
+assert.deepEqual(
+  sourceExtractionAssistHandoffView.itemViews.map((item) => item.id),
+  [...ACTIVITY_SOURCE_EXTRACTION_ASSIST_HANDOFF_ITEM_IDS]
+);
+assert.ok(
+  sourceExtractionAssistHandoffView.itemViews.every(
+    (item) => item.ariaLabel && item.description && item.label && item.value
+  )
+);
+assert.deepEqual(sourceExtractionAssistHandoffView.privacy, {
+  appliesBeforeActivitySave: true,
+  createsParallelWorksheetModel: false,
+  exposesActivityContentText: false,
+  exposesAcceptedAnswerText: false,
+  exposesFileBytes: false,
+  exposesSourceMaterialFileIds: false,
+  exposesSourceMaterialFilenames: false,
+  exposesSourceMaterialStorageKeys: false,
+  itemIds: [...ACTIVITY_SOURCE_EXTRACTION_ASSIST_HANDOFF_ITEM_IDS],
+  modifiesPublishedAssignmentSnapshots: false,
+  persistsActivityWithoutTeacherAction: false,
+  publishesAssignmentWithoutTeacherAction: false,
+  readsSourceMaterialBytes: false,
+  requiresEditorReview: true,
+  scope: 'teacher-reviewed-source-extraction-assist',
+  targetModel: 'ActivityContent',
+});
+assert.deepEqual(Object.fromEntries(sourceExtractionAssistHandoffValues), {
+  'accepted-answer-target': 'Accepted answers',
+  'activity-content-target': 'ActivityContent',
+  'assignment-snapshot-boundary': 'Snapshots unchanged',
+  'audio-draft-path': 'Listening draft ready',
+  'audio-source-count': '1',
+  'capability-count': '3',
+  'draft-output': 'Editor draft',
+  'editor-review-gate': 'Teacher review required',
+  'extractable-material-count': '3',
+  'file-byte-guard': 'Bytes not read',
+  'file-id-guard': 'File ids hidden',
+  'filename-guard': 'Filenames hidden',
+  'group-target': 'Groups',
+  'owner-scope': 'Current teacher',
+  'pair-target': 'Pairs',
+  'parallel-model-guard': 'No parallel worksheet model',
+  'persistence-boundary': 'Not auto-saved',
+  'privacy-guard': 'Private data hidden',
+  'publish-boundary': 'Save before publish',
+  'question-target': 'Questions',
+  'reference-only-count': '3',
+  'source-material-count': '6',
+  'spreadsheet-import-path': 'Structured import ready',
+  'spreadsheet-source-count': '1',
+  'storage-key-guard': 'Storage hidden',
+  'teacher-note-target': 'Teacher notes',
+  'template-readiness-target': 'Template readiness',
+  'vocabulary-target': 'Vocabulary',
+  'worksheet-extraction-path': 'Worksheet extraction ready',
+  'worksheet-source-count': '2',
+});
+const sourceExtractionAssistSensitiveHandoffView =
+  buildActivitySourceExtractionAssistHandoffView({
+    sourceMaterials: [
+      {
+        fileId: 'file-audio-id',
+        kind: 'audio',
+        originalName: 'private-listening.mp3',
+        storageKey: 'source-material/private/storage-key.mp3',
+      },
+      {
+        fileId: 'file-worksheet-id',
+        kind: 'worksheet-document',
+        originalName: 'teacher-answer-key.pdf',
+        storageKey: 'source-material/private/answer-key.pdf',
+      },
+    ],
+  });
+assert.doesNotMatch(
+  JSON.stringify(sourceExtractionAssistSensitiveHandoffView),
+  /file-audio-id|file-worksheet-id|private-listening|teacher-answer-key|source-material\/private|storage-key\.mp3|answer-key\.pdf/,
+  'Source extraction assist handoff should not leak filenames, file ids, storage keys, or answer-key hints.'
+);
+assert.match(
+  activitySourceExtractionAssistSource,
+  /export type ActivitySourceExtractionAssistHandoffPrivacyContract = \{[\s\S]*exposesActivityContentText: false;[\s\S]*exposesAcceptedAnswerText: false;[\s\S]*exposesFileBytes: false;[\s\S]*exposesSourceMaterialFileIds: false;[\s\S]*exposesSourceMaterialFilenames: false;[\s\S]*exposesSourceMaterialStorageKeys: false;[\s\S]*readsSourceMaterialBytes: false;[\s\S]*scope: 'teacher-reviewed-source-extraction-assist';[\s\S]*targetModel: 'ActivityContent';/,
+  'Source extraction assist should declare an ActivityContent privacy contract without file-byte or source-material identifier exposure.'
+);
+assert.match(
+  activitySourceMaterialsSummarySource,
+  /buildActivitySourceExtractionAssistHandoffView\(\{[\s\S]*extractableMaterialCount: summary\.readiness\.extractableCount,[\s\S]*extractionActions: summary\.extractionActions,[\s\S]*sourceKindCounts: summary\.kindBadges/,
+  'Activity source-material summary should build the extraction assist handoff from the prepared summary view.'
+);
+assert.match(
+  activitySourceMaterialsSummarySource,
+  /data-handoff="activity-source-extraction-assist"[\s\S]*data-handoff-scope=\{handoff\.privacy\.scope\}[\s\S]*handoff\.itemViews\.map\(\(item\) =>[\s\S]*ActivitySourceExtractionAssistHandoffItem[\s\S]*const labelId = `activity-source-extraction-assist-\$\{item\.id\}-label`[\s\S]*const valueId = `activity-source-extraction-assist-\$\{item\.id\}-value`[\s\S]*const descriptionId =[\s\S]*`activity-source-extraction-assist-\$\{item\.id\}-description`[\s\S]*data-handoff-item=\{item\.id\}[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*aria-label=\{item\.ariaLabel\}[\s\S]*aria-labelledby=\{`\$\{labelId\} \$\{valueId\}`\}[\s\S]*id=\{valueId\}[\s\S]*id=\{descriptionId\}/,
+  'Activity source extraction assist handoff should expose stable scope and label/value/description relationships for every item.'
+);
+const activitySourceExtractionAssistTestCatalogSource = readFileSync(
+  'tests/e2e/TEST-CATALOG.md',
+  'utf8'
+);
+assert.match(
+  activitySourceExtractionAssistTestCatalogSource,
+  /\|\s*7\s*\|(?=[\s\S]*source-extraction-assist handoff covers source-material count)(?=[\s\S]*worksheet extraction)(?=[\s\S]*storage-key)(?=[\s\S]*privacy guards)/,
+  'E2E catalog should cover the source-extraction-assist handoff acceptance journey.'
 );
 assert.doesNotMatch(
   activitySourceMaterialsFieldSource,
