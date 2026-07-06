@@ -112,6 +112,7 @@ function CreatePage() {
             </p>
             <ActivityPreview
               activity={pageView.previewActivity}
+              layout="stacked"
               panel={pageView.previewPanel}
             />
           </div>

@@ -69,15 +69,15 @@ export function ActivityAiDraftPanel({
   return (
     <div className="space-y-3">
       <ActivityAiDraftBoundaryHandoff view={boundaryHandoffView} />
-      <div className="rounded-lg border border-primary/20 bg-primary/5 p-4">
-        <div className="flex flex-col gap-4 lg:flex-row lg:items-end">
+      <div className="@container/ai-draft rounded-lg border border-primary/20 bg-primary/5 p-4">
+        <div className="flex flex-col gap-4 @3xl/ai-draft:flex-row @3xl/ai-draft:items-end">
           <ActivityAiDraftSourceControls
             draftSourceText={draftSourceText}
             onDraftSourceTextChange={onDraftSourceTextChange}
             onSyncSourceMaterials={onSyncSourceMaterials}
             panelView={panelView}
           />
-          <div className="grid gap-3 sm:grid-cols-[minmax(12rem,1fr)_8rem] lg:w-[28rem]">
+          <div className="grid gap-3 @sm/ai-draft:grid-cols-[minmax(12rem,1fr)_8rem] @3xl/ai-draft:w-[28rem]">
             <ActivityAiDraftFocusSelect
               draftFocus={draftFocus}
               onDraftFocusChange={onDraftFocusChange}

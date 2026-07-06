@@ -36,6 +36,7 @@ type ActivityPreviewProps = {
   assignment?: AssignmentSeed;
   compact?: boolean;
   hideAnswers?: boolean;
+  layout?: 'responsive' | 'stacked';
   panel?: ActivityPreviewPanel;
 };
 
@@ -44,6 +45,7 @@ export function ActivityPreview({
   assignment,
   compact = false,
   hideAnswers = false,
+  layout = 'responsive',
   panel,
 }: ActivityPreviewProps) {
   const previewView = buildActivityPreviewViewModel({
@@ -53,7 +55,12 @@ export function ActivityPreview({
   });
 
   return (
-    <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_22rem]">
+    <div
+      className={cn(
+        'grid gap-4',
+        layout === 'responsive' && 'lg:grid-cols-[minmax(0,1fr)_22rem]'
+      )}
+    >
       <Card className="rounded-lg">
         <CardHeader>
           <div className="flex flex-wrap items-center gap-2">
