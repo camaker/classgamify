@@ -1,4 +1,5 @@
 import assert from 'node:assert/strict';
+import { readFileSync } from 'node:fs';
 import test from 'node:test';
 import {
   ASSIGNMENT_RESULT_MATERIAL_HANDOFF_ITEM_IDS,
@@ -116,6 +117,19 @@ test('assignment result material handoff exposes 30 safe teacher-material slices
   );
 
   assertNoPrivateMaterialHandoffText(JSON.stringify(handoffView));
+});
+
+test('assignment result material handoff renders stable page markers', () => {
+  const source = readFileSync(
+    'src/components/assignments/assignment-results-header-actions.tsx',
+    'utf8'
+  );
+
+  assert.match(
+    source,
+    /function AssignmentResultsMaterialHandoff[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*aria-labelledby=\{titleId\}[\s\S]*data-handoff="assignment-result-material"[\s\S]*data-handoff-scope=\{materialHandoffView\.privacy\.scope\}[\s\S]*materialHandoffView\.itemViews\.map[\s\S]*<article[\s\S]*aria-label=\{itemView\.ariaLabel\}[\s\S]*data-handoff-item=\{itemView\.id\}[\s\S]*data-scope=\{itemView\.dataScope\}[\s\S]*<output[\s\S]*aria-label=\{itemView\.ariaLabel\}/,
+    'Assignment result material handoff should expose the localized result-page marker, privacy scope, item ids, data scopes, and accessible output labels.'
+  );
 });
 
 function buildCopyScopeView() {

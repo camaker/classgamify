@@ -8635,6 +8635,16 @@ assert.match(
   'Assignment result CSV export coverage should render prepared accessible labels for each full-export coverage item.'
 );
 assert.match(
+  assignmentResultsHeaderActionsSource,
+  /function AssignmentResultsMaterialHandoff[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*aria-labelledby=\{titleId\}[\s\S]*data-handoff="assignment-result-material"[\s\S]*data-handoff-scope=\{materialHandoffView\.privacy\.scope\}[\s\S]*materialHandoffView\.itemViews\.map[\s\S]*<article[\s\S]*aria-label=\{itemView\.ariaLabel\}[\s\S]*data-handoff-item=\{itemView\.id\}[\s\S]*data-scope=\{itemView\.dataScope\}[\s\S]*<output[\s\S]*aria-label=\{itemView\.ariaLabel\}/,
+  'Assignment result material handoff should render a stable page marker, privacy scope, item markers, data scopes, and accessible labels for teacher result materials.'
+);
+assert.match(
+  authE2eCatalogSource,
+  /\|\s*6a\s*\|\s*Result materials expose a 30-slice handoff\s*\|[\s\S]*`assignment-result-material`[\s\S]*`data-handoff-item`/,
+  'E2E catalog should include the result-material handoff marker and stable item marker acceptance journey.'
+);
+assert.match(
   authE2eCatalogSource,
   /\|\s*6c\s*\|\s*Result copy artifacts expose a 30-slice handoff\s*\|[\s\S]*`assignment-copy-artifact`[\s\S]*`data-handoff-item`/,
   'E2E catalog should include the result copy-artifact handoff marker acceptance journey.'
