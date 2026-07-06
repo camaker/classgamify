@@ -269,15 +269,15 @@ test('assignment attempt limit handoff is wired to shared source boundaries', ()
     /attemptLimitHandoffView: AssignmentAttemptLimitHandoffView;[\s\S]*buildAssignmentAttemptLimitHandoffView\([\s\S]*buildAssignmentAttemptLimitHandoffEvidence\(\{[\s\S]*attemptUsage: result\?\.attemptUsage,[\s\S]*maxAttempts:[\s\S]*assignment\?\.settings\.maxAttempts,[\s\S]*retryAvailable: showStartAnotherAttempt/,
     'Student runner page view-model should compose the attempt-limit handoff from server usage and assignment settings.'
   );
-  assert.match(
+  assert.doesNotMatch(
     SUBMIT_CONTROLS_SOURCE,
-    /function AssignmentAttemptLimitHandoff[\s\S]*data-handoff="assignment-attempt-limit"[\s\S]*view\.itemViews\.map\(\(item\)[\s\S]*data-handoff-item=\{item\.id\}[\s\S]*<output aria-label=\{item\.ariaLabel\}>/,
-    'Student submit controls should render the hidden attempt-limit handoff outputs.'
+    /data-handoff="assignment-attempt-limit"|function AssignmentAttemptLimitHandoff/,
+    'Student submit controls should keep attempt-limit handoff diagnostics out of the public student DOM.'
   );
-  assert.match(
+  assert.doesNotMatch(
     ROUTE_SOURCE,
     /attemptLimitHandoffView=\{runnerPageView\.attemptLimitHandoffView\}/,
-    'Student play route should pass the prepared attempt-limit handoff into submit controls.'
+    'Student play route should not pass attempt-limit handoff diagnostics into public submit controls.'
   );
   assert.match(
     DELIVERY_SUMMARY_SOURCE,

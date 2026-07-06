@@ -1,9 +1,4 @@
-import type { AssignmentAttemptLimitHandoffView } from '@/assignments/attempt-limit-handoff';
-import type { AssignmentSubmissionValidationHandoffView } from '@/assignments/submission-validation-handoff';
-import type {
-  StudentRunnerControlView,
-  StudentRunnerSubmissionHandoffView,
-} from '@/assignments/student-runner-state';
+import type { StudentRunnerControlView } from '@/assignments/student-runner-state';
 import { Button } from '@/components/ui/button';
 import {
   IconAlertTriangle,
@@ -13,11 +8,8 @@ import {
 } from '@tabler/icons-react';
 
 type StudentRunnerSubmitControlsProps = {
-  attemptLimitHandoffView: AssignmentAttemptLimitHandoffView;
   controlView: StudentRunnerControlView;
   onSubmit: () => void;
-  submissionHandoffView: StudentRunnerSubmissionHandoffView;
-  submissionValidationHandoffView: AssignmentSubmissionValidationHandoffView;
 };
 
 type StudentRunnerSubmitReadinessView =
@@ -26,11 +18,8 @@ type StudentRunnerSubmitReadinessItemView =
   StudentRunnerSubmitReadinessView['items'][number];
 
 export function StudentRunnerSubmitControls({
-  attemptLimitHandoffView,
   controlView,
   onSubmit,
-  submissionHandoffView,
-  submissionValidationHandoffView,
 }: StudentRunnerSubmitControlsProps) {
   const submitHintIds = controlView.submitHintViews.map((hintView) =>
     buildStudentRunnerSubmitHintId(hintView.id)
@@ -125,107 +114,6 @@ export function StudentRunnerSubmitControls({
           tone={hintView.tone}
         />
       ))}
-      <StudentRunnerSubmissionHandoff view={submissionHandoffView} />
-      <AssignmentSubmissionValidationHandoff
-        view={submissionValidationHandoffView}
-      />
-      <AssignmentAttemptLimitHandoff view={attemptLimitHandoffView} />
-    </section>
-  );
-}
-
-function AssignmentSubmissionValidationHandoff({
-  view,
-}: {
-  view: AssignmentSubmissionValidationHandoffView;
-}) {
-  const titleId = 'assignment-submission-validation-handoff-title';
-  const descriptionId = 'assignment-submission-validation-handoff-description';
-
-  return (
-    <section
-      aria-describedby={descriptionId}
-      aria-labelledby={titleId}
-      className="sr-only"
-      data-handoff="assignment-submission-validation"
-    >
-      <h3 id={titleId}>{view.title}</h3>
-      <p id={descriptionId}>{view.description}</p>
-      <dl>
-        {view.itemViews.map((item) => (
-          <div data-handoff-item={item.id} key={item.id}>
-            <dt>{item.label}</dt>
-            <dd>
-              <output aria-label={item.ariaLabel}>{item.value}</output>
-              <span>{item.description}</span>
-            </dd>
-          </div>
-        ))}
-      </dl>
-    </section>
-  );
-}
-
-function AssignmentAttemptLimitHandoff({
-  view,
-}: {
-  view: AssignmentAttemptLimitHandoffView;
-}) {
-  const titleId = 'assignment-attempt-limit-handoff-title';
-  const descriptionId = 'assignment-attempt-limit-handoff-description';
-
-  return (
-    <section
-      aria-describedby={descriptionId}
-      aria-labelledby={titleId}
-      className="sr-only"
-      data-handoff="assignment-attempt-limit"
-    >
-      <h3 id={titleId}>{view.title}</h3>
-      <p id={descriptionId}>{view.description}</p>
-      <dl>
-        {view.itemViews.map((item) => (
-          <div data-handoff-item={item.id} key={item.id}>
-            <dt>{item.label}</dt>
-            <dd>
-              <output aria-label={item.ariaLabel}>{item.value}</output>
-              <span>{item.description}</span>
-            </dd>
-          </div>
-        ))}
-      </dl>
-    </section>
-  );
-}
-
-function StudentRunnerSubmissionHandoff({
-  view,
-}: {
-  view: StudentRunnerSubmissionHandoffView;
-}) {
-  const titleId = 'student-runner-submission-handoff-title';
-  const descriptionId = 'student-runner-submission-handoff-description';
-
-  return (
-    <section
-      aria-describedby={descriptionId}
-      aria-labelledby={titleId}
-      className="sr-only"
-      data-handoff="student-submission"
-    >
-      <h3 id={titleId}>{view.title}</h3>
-      <p id={descriptionId}>{view.description}</p>
-      <dl>
-        {view.itemViews.map((item) => (
-          <div data-handoff-item={item.id} key={item.id}>
-            <dt>{item.label}</dt>
-            <dd>
-              <output aria-label={item.ariaLabel}>{item.value}</output>
-              <span>{item.description}</span>
-            </dd>
-          </div>
-        ))}
-      </dl>
     </section>
   );
 }

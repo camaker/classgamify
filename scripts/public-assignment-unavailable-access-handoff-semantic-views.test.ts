@@ -213,28 +213,32 @@ test('draft unavailable access localizes publish-first boundary', () => {
   }
 });
 
-test('student missing panel renders unavailable access semantic handoffs', () => {
+test('student missing panel omits unavailable access semantic handoffs from public DOM', () => {
   const panelSource = readFileSync(
     'src/components/assignments/student-runner-missing-panel.tsx',
     'utf8'
   );
   const routeSource = readFileSync('src/routes/play/$shareId.tsx', 'utf8');
 
-  assert.match(
+  assert.doesNotMatch(
     panelSource,
     /data-handoff="public-assignment-unavailable-access"[\s\S]*view\.itemViews\.map/
   );
-  assert.match(
+  assert.doesNotMatch(
     panelSource,
-    /<PublicAssignmentAccessHandoff view=\{accessHandoffView\} \/>/
+    /PublicAssignmentAccessHandoff|StudentRunnerUnavailableAccessHandoff/
   );
-  assert.match(
+  assert.doesNotMatch(
     routeSource,
     /buildPublicAssignmentUnavailableAccessHandoffView\(\{[\s\S]*lookupResult: data,[\s\S]*missingView: runnerPageView\.missingView,[\s\S]*shareSlug: normalizedShareId/
   );
-  assert.match(
+  assert.doesNotMatch(
     routeSource,
     /unavailableAccessHandoffView=\{unavailableAccessHandoffView\}/
+  );
+  assert.doesNotMatch(
+    routeSource,
+    /buildPublicAssignmentAccessHandoffView|accessHandoffView=/
   );
 });
 

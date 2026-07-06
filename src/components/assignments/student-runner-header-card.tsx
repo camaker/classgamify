@@ -1,4 +1,3 @@
-import type { StudentRunnerStartHandoffView } from '@/assignments/student-runner-state';
 import type {
   StudentRunnerHeaderView,
   StudentRunnerInstructionView,
@@ -14,13 +13,11 @@ import { Link } from '@tanstack/react-router';
 
 type StudentRunnerHeaderCardProps = {
   badgeLabel: string;
-  startHandoffView?: StudentRunnerStartHandoffView;
   view: StudentRunnerHeaderView;
 };
 
 export function StudentRunnerHeaderCard({
   badgeLabel,
-  startHandoffView,
   view,
 }: StudentRunnerHeaderCardProps) {
   return (
@@ -39,43 +36,8 @@ export function StudentRunnerHeaderCard({
         ) : null}
         <StudentRunnerPrepareCard prepareView={view.prepareView} />
         <PublicAssignmentRules summaryView={view.ruleSummaryView} />
-        {startHandoffView ? (
-          <StudentRunnerStartHandoff view={startHandoffView} />
-        ) : null}
       </div>
       <StudentRunnerTeacherActionLink action={view.teacherAction} />
-    </section>
-  );
-}
-
-function StudentRunnerStartHandoff({
-  view,
-}: {
-  view: StudentRunnerStartHandoffView;
-}) {
-  const titleId = 'student-runner-start-handoff-title';
-  const descriptionId = 'student-runner-start-handoff-description';
-
-  return (
-    <section
-      aria-describedby={descriptionId}
-      aria-labelledby={titleId}
-      className="sr-only"
-      data-handoff="student-runner-start"
-    >
-      <h2 id={titleId}>{view.title}</h2>
-      <p id={descriptionId}>{view.description}</p>
-      <dl>
-        {view.itemViews.map((item) => (
-          <div data-handoff-item={item.id} key={item.id}>
-            <dt>{item.label}</dt>
-            <dd>
-              <output aria-label={item.ariaLabel}>{item.value}</output>
-              <span>{item.description}</span>
-            </dd>
-          </div>
-        ))}
-      </dl>
     </section>
   );
 }

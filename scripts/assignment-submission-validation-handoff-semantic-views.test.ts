@@ -252,15 +252,15 @@ test('submission validation handoff is wired to source boundaries', () => {
     /submissionValidationHandoffView: AssignmentSubmissionValidationHandoffView;[\s\S]*buildAssignmentSubmissionValidationHandoffView\([\s\S]*buildAssignmentSubmissionValidationHandoffEvidence\(\{[\s\S]*runtimeItems: attemptState\.runtimeItems,[\s\S]*submittedAnswerCount: currentPayloadSummary\.answerCount/,
     'Student runner page view-model should compose the submission validation handoff from runtime and payload counts.'
   );
-  assert.match(
+  assert.doesNotMatch(
     SUBMIT_CONTROLS_SOURCE,
-    /data-handoff="assignment-submission-validation"[\s\S]*view\.itemViews\.map\(\(item\)[\s\S]*data-handoff-item=\{item\.id\}[\s\S]*<output aria-label=\{item\.ariaLabel\}>/,
-    'Student submit controls should render the hidden submission validation handoff outputs.'
+    /data-handoff="assignment-submission-validation"|function AssignmentSubmissionValidationHandoff/,
+    'Student submit controls should keep submission-validation handoff diagnostics out of the public student DOM.'
   );
-  assert.match(
+  assert.doesNotMatch(
     ROUTE_SOURCE,
     /submissionValidationHandoffView=\{\s*runnerPageView\.submissionValidationHandoffView\s*\}/,
-    'Student play route should pass the prepared submission validation handoff into submit controls.'
+    'Student play route should not pass submission-validation handoff diagnostics into public submit controls.'
   );
   assert.match(
     PUBLIC_ASSIGNMENT_SOURCE,

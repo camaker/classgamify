@@ -1,13 +1,7 @@
-import type { PublicAssignmentAccessHandoffView } from '@/assignments/public';
 import type {
   StudentRunnerMissingPageView,
   StudentRunnerUnavailableSafetyItemView,
 } from '@/assignments/student-runner-state';
-import type {
-  PublicAssignmentUnavailableAccessHandoffItemView,
-  PublicAssignmentUnavailableAccessHandoffView,
-} from '@/assignments/unavailable-access';
-import { PublicAssignmentAccessHandoff } from '@/components/assignments/public-assignment-access-handoff';
 import Container from '@/components/layout/container';
 import { Badge } from '@/components/ui/badge';
 import { buttonVariants } from '@/components/ui/button';
@@ -25,27 +19,15 @@ import {
 import { Link } from '@tanstack/react-router';
 
 type StudentRunnerMissingPanelProps = {
-  accessHandoffView?: PublicAssignmentAccessHandoffView;
-  unavailableAccessHandoffView?: PublicAssignmentUnavailableAccessHandoffView;
   view: StudentRunnerMissingPageView;
 };
 
 export function StudentRunnerMissingPanel({
-  accessHandoffView,
-  unavailableAccessHandoffView,
   view,
 }: StudentRunnerMissingPanelProps) {
   return (
     <Container className="px-4 py-10 md:py-14">
       <div className="mx-auto max-w-3xl rounded-lg border bg-card p-6">
-        {accessHandoffView ? (
-          <PublicAssignmentAccessHandoff view={accessHandoffView} />
-        ) : null}
-        {unavailableAccessHandoffView ? (
-          <StudentRunnerUnavailableAccessHandoff
-            view={unavailableAccessHandoffView}
-          />
-        ) : null}
         <Badge variant="outline" className="rounded-md border-primary/30">
           <IconDeviceGamepad2 className="size-3.5" />
           {view.badgeLabel}
@@ -113,52 +95,6 @@ export function StudentRunnerMissingPanel({
         </Link>
       </div>
     </Container>
-  );
-}
-
-function StudentRunnerUnavailableAccessHandoff({
-  view,
-}: {
-  view: PublicAssignmentUnavailableAccessHandoffView;
-}) {
-  const titleId = 'public-assignment-unavailable-access-handoff-title';
-  const descriptionId =
-    'public-assignment-unavailable-access-handoff-description';
-
-  return (
-    <section
-      aria-describedby={descriptionId}
-      aria-labelledby={titleId}
-      className="sr-only"
-      data-handoff="public-assignment-unavailable-access"
-    >
-      <h2 id={titleId}>{view.title}</h2>
-      <p id={descriptionId}>{view.description}</p>
-      <dl>
-        {view.itemViews.map((item) => (
-          <StudentRunnerUnavailableAccessHandoffItem
-            item={item}
-            key={item.id}
-          />
-        ))}
-      </dl>
-    </section>
-  );
-}
-
-function StudentRunnerUnavailableAccessHandoffItem({
-  item,
-}: {
-  item: PublicAssignmentUnavailableAccessHandoffItemView;
-}) {
-  return (
-    <div data-handoff-item={item.id}>
-      <dt>{item.label}</dt>
-      <dd>
-        <output aria-label={item.ariaLabel}>{item.value}</output>
-        <span>{item.description}</span>
-      </dd>
-    </div>
   );
 }
 

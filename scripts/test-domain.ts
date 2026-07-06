@@ -15065,8 +15065,13 @@ assert.match(
 );
 assert.match(
   playRouteSource,
-  /StudentRunnerHeaderCard[\s\S]*badgeLabel=\{runnerPageView\.routeBadgeLabel\}[\s\S]*startHandoffView=\{runnerPageView\.startHandoffView\}[\s\S]*view=\{runnerRouteState\.headerView\}/,
-  'Student play route should delegate student assignment header rendering and start handoff output.'
+  /StudentRunnerHeaderCard[\s\S]*badgeLabel=\{runnerPageView\.routeBadgeLabel\}[\s\S]*view=\{runnerRouteState\.headerView\}/,
+  'Student play route should delegate student assignment header rendering without public hidden handoff output.'
+);
+assert.doesNotMatch(
+  playRouteSource,
+  /startHandoffView=\{runnerPageView\.startHandoffView\}/,
+  'Student play route should not render the start handoff into the public student DOM.'
 );
 assert.match(
   playRouteSource,
@@ -15283,10 +15288,10 @@ assert.match(
   /export function buildStudentRunnerSubmissionHandoffView(?=[\s\S]*payloadSummaryView)(?=[\s\S]*progressView)(?=[\s\S]*submitReadinessView)(?=[\s\S]*identityView)(?=[\s\S]*resultPanelView)[\s\S]*id: 'payload-summary'[\s\S]*id: 'submit-readiness'[\s\S]*buildStudentRunnerIdentityHandoffPrivacyItem\(identityView\)[\s\S]*id: 'attempt-duration'[\s\S]*id: 'review-summary'[\s\S]*id: 'feedback-scope'[\s\S]*id: 'next-steps'[\s\S]*privacy: buildStudentRunnerSubmissionHandoffPrivacyContract/,
   'Student runner submission handoff should collect progress, payload, readiness, identity, timer, result, review, feedback, and next-step slices.'
 );
-assert.match(
+assert.doesNotMatch(
   studentRunnerSubmitControlsSource,
-  /function StudentRunnerSubmissionHandoff[\s\S]*data-handoff="student-submission"[\s\S]*view\.itemViews\.map\(\(item\)[\s\S]*data-handoff-item=\{item\.id\}[\s\S]*<output aria-label=\{item\.ariaLabel\}>/,
-  'Student runner submit controls should render the hidden student-submission handoff outputs with the E2E catalog data-handoff marker.'
+  /data-handoff="student-submission"|function StudentRunnerSubmissionHandoff/,
+  'Student runner submit controls should keep submission handoff diagnostics out of the public student DOM.'
 );
 const studentSubmissionPrivateAnswer = 'DOMAIN_PRIVATE_STUDENT_ANSWER';
 const studentSubmissionPrivateToken = 'domain-private-anonymous-token';
@@ -15550,15 +15555,15 @@ assert.match(
   /attemptLimitHandoffView: AssignmentAttemptLimitHandoffView;[\s\S]*buildAssignmentAttemptLimitHandoffView\([\s\S]*buildAssignmentAttemptLimitHandoffEvidence\(\{[\s\S]*attemptUsage: result\?\.attemptUsage,[\s\S]*maxAttempts:[\s\S]*assignment\?\.settings\.maxAttempts,[\s\S]*retryAvailable: showStartAnotherAttempt/,
   'Student runner page view-model should compose the attempt-limit handoff from server usage and assignment settings.'
 );
-assert.match(
+assert.doesNotMatch(
   studentRunnerSubmitControlsSource,
-  /function AssignmentAttemptLimitHandoff[\s\S]*data-handoff="assignment-attempt-limit"[\s\S]*view\.itemViews\.map\(\(item\)[\s\S]*data-handoff-item=\{item\.id\}[\s\S]*<output aria-label=\{item\.ariaLabel\}>/,
-  'Student runner submit controls should render the hidden assignment-attempt-limit handoff outputs.'
+  /data-handoff="assignment-attempt-limit"|function AssignmentAttemptLimitHandoff/,
+  'Student runner submit controls should keep attempt-limit handoff diagnostics out of the public student DOM.'
 );
-assert.match(
+assert.doesNotMatch(
   playRouteSource,
   /attemptLimitHandoffView=\{runnerPageView\.attemptLimitHandoffView\}/,
-  'Student play route should pass the prepared attempt-limit handoff into submit controls.'
+  'Student play route should not pass the prepared attempt-limit handoff into public submit controls.'
 );
 assert.match(
   assignmentAttemptLimitApiSource,
@@ -15781,15 +15786,15 @@ assert.match(
   /submissionValidationHandoffView: AssignmentSubmissionValidationHandoffView;[\s\S]*buildAssignmentSubmissionValidationHandoffView\([\s\S]*buildAssignmentSubmissionValidationHandoffEvidence\(\{[\s\S]*runtimeItems: attemptState\.runtimeItems,[\s\S]*submittedAnswerCount: currentPayloadSummary\.answerCount/,
   'Student runner page view-model should compose the submission validation handoff from runtime and payload counts.'
 );
-assert.match(
+assert.doesNotMatch(
   studentRunnerSubmitControlsSource,
-  /data-handoff="assignment-submission-validation"[\s\S]*view\.itemViews\.map\(\(item\)[\s\S]*data-handoff-item=\{item\.id\}[\s\S]*<output aria-label=\{item\.ariaLabel\}>/,
-  'Student runner submit controls should render the hidden submission-validation handoff outputs.'
+  /data-handoff="assignment-submission-validation"|function AssignmentSubmissionValidationHandoff/,
+  'Student runner submit controls should keep submission-validation handoff diagnostics out of the public student DOM.'
 );
-assert.match(
+assert.doesNotMatch(
   playRouteSource,
   /submissionValidationHandoffView=\{\s*runnerPageView\.submissionValidationHandoffView\s*\}/,
-  'Student play route should pass the prepared submission-validation handoff into submit controls.'
+  'Student play route should not pass the prepared submission-validation handoff into public submit controls.'
 );
 assert.match(
   assignmentAttemptLimitPublicSource,
@@ -15923,10 +15928,40 @@ assert.match(
   /StudentRunnerHeaderView[\s\S]*StudentRunnerTeacherAction[\s\S]*StudentRunnerPrepareView[\s\S]*StudentRunnerInstructionView/,
   'Student runner header card should consume explicit assignment-domain header sub-view contracts.'
 );
-assert.match(
+assert.doesNotMatch(
   studentRunnerHeaderCardSource,
-  /StudentRunnerStartHandoffView[\s\S]*startHandoffView\?: StudentRunnerStartHandoffView[\s\S]*data-handoff="student-runner-start"[\s\S]*data-handoff-item=\{item\.id\}/,
-  'Student runner header card should render the prepared start handoff as hidden semantic output.'
+  /StudentRunnerStartHandoffView|startHandoffView\?:|data-handoff="student-runner-start"|data-handoff-item=\{item\.id\}/,
+  'Student runner header card should keep start handoff diagnostics out of the public student DOM.'
+);
+assert.match(
+  e2eTestCatalogText,
+  /Teacher can publish and copy a configured student share link[\s\S]*student-runner-start and public-assignment-access 30-slice domain contracts[\s\S]*`data-handoff="student-runner-start"`[\s\S]*`data-handoff="public-assignment-access"`[\s\S]*visible public rule summary/,
+  'E2E catalog should document the source-level start/access contracts while requiring no public audit markers.'
+);
+assert.match(
+  e2eTestCatalogText,
+  /Student submission keeps a 30-slice domain contract without public audit DOM[\s\S]*source-level student-submission domain contract[\s\S]*`data-handoff="student-submission"`/,
+  'E2E catalog should document the student-submission domain contract without public audit DOM.'
+);
+assert.match(
+  e2eTestCatalogText,
+  /Assignment attempt limits keep a 30-slice domain contract without public audit DOM[\s\S]*source-level assignment-attempt-limit contract[\s\S]*`data-handoff="assignment-attempt-limit"`/,
+  'E2E catalog should document the attempt-limit domain contract without public audit DOM.'
+);
+assert.match(
+  e2eTestCatalogText,
+  /Assignment submission validation keeps a 30-slice domain contract without public audit DOM[\s\S]*source-level assignment-submission-validation contract[\s\S]*`data-handoff="assignment-submission-validation"`/,
+  'E2E catalog should document the submission-validation domain contract without public audit DOM.'
+);
+assert.match(
+  e2eTestCatalogText,
+  /Assignment close-after time blocks late submissions[\s\S]*public-assignment-unavailable-access 30-slice domain contract[\s\S]*`data-handoff="public-assignment-unavailable-access"`[\s\S]*`data-handoff="public-assignment-access"`/,
+  'E2E catalog should document unavailable-access domain coverage without public audit markers.'
+);
+assert.doesNotMatch(
+  e2eTestCatalogText,
+  /hidden localized (?:30-slice )?(?:student-runner-start|public-assignment-access|student-submission|assignment-attempt-limit|assignment-submission-validation|public-assignment-unavailable-access) handoff/,
+  'E2E catalog should not ask public student pages to render retired internal audit handoffs.'
 );
 assert.match(
   studentRunnerHeaderCardSource,

@@ -1,7 +1,5 @@
 import { buildAssignmentSharePath } from '@/assignments/share-link';
 import { getOrCreateAnonymousAttemptToken } from '@/assignments/identity';
-import { buildPublicAssignmentAccessHandoffView } from '@/assignments/public';
-import { buildPublicAssignmentUnavailableAccessHandoffView } from '@/assignments/unavailable-access';
 import {
   resolveStudentAttemptSubmissionFailureMessage,
   type StudentAnswerChange,
@@ -25,7 +23,6 @@ import {
 } from '@/assignments/student-runner-state';
 import { normalizeAssignmentShareSlug } from '@/assignments/share-slug';
 import { ActivityPreview } from '@/components/activities/activity-preview';
-import { PublicAssignmentAccessHandoff } from '@/components/assignments/public-assignment-access-handoff';
 import { StudentRuntimeItemList } from '@/components/activities/student-runtime-item-list';
 import { StudentRunnerAttemptShell } from '@/components/assignments/student-runner-attempt-shell';
 import { StudentRunnerHeaderCard } from '@/components/assignments/student-runner-header-card';
@@ -117,25 +114,6 @@ function PlayPage() {
   const runnerRouteState = useMemo(
     () => buildStudentRunnerRouteState(runnerPageView),
     [runnerPageView]
-  );
-  const publicAccessHandoffView = useMemo(
-    () =>
-      data
-        ? buildPublicAssignmentAccessHandoffView({
-            lookupResult: data,
-            shareSlug: normalizedShareId,
-          })
-        : undefined,
-    [data, normalizedShareId]
-  );
-  const unavailableAccessHandoffView = useMemo(
-    () =>
-      buildPublicAssignmentUnavailableAccessHandoffView({
-        lookupResult: data,
-        missingView: runnerPageView.missingView,
-        shareSlug: normalizedShareId,
-      }),
-    [data, normalizedShareId, runnerPageView.missingView]
   );
 
   useEffect(() => {
@@ -294,13 +272,7 @@ function PlayPage() {
   }
 
   if (runnerRouteState.status === 'missing') {
-    return (
-      <StudentRunnerMissingPanel
-        accessHandoffView={publicAccessHandoffView}
-        unavailableAccessHandoffView={unavailableAccessHandoffView}
-        view={runnerRouteState.missingView}
-      />
-    );
+    return <StudentRunnerMissingPanel view={runnerRouteState.missingView} />;
   }
 
   if (runnerRouteState.status !== 'ready') return null;
@@ -312,12 +284,8 @@ function PlayPage() {
       <div className="mx-auto max-w-6xl space-y-8 pb-16">
         <StudentRunnerHeaderCard
           badgeLabel={runnerPageView.routeBadgeLabel}
-          startHandoffView={runnerPageView.startHandoffView}
           view={runnerRouteState.headerView}
         />
-        {publicAccessHandoffView ? (
-          <PublicAssignmentAccessHandoff view={publicAccessHandoffView} />
-        ) : null}
 
         <StudentRunnerAttemptShell
           controlView={controlView}
@@ -339,13 +307,8 @@ function PlayPage() {
           />
 
           <StudentRunnerSubmitControls
-            attemptLimitHandoffView={runnerPageView.attemptLimitHandoffView}
             controlView={controlView}
             onSubmit={submitAnswers}
-            submissionHandoffView={runnerPageView.submissionHandoffView}
-            submissionValidationHandoffView={
-              runnerPageView.submissionValidationHandoffView
-            }
           />
         </StudentRunnerAttemptShell>
 
