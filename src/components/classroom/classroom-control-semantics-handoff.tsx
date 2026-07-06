@@ -28,6 +28,7 @@ export function ClassroomControlSemanticsHandoff() {
       aria-labelledby="classroom-control-semantics-handoff-title"
       className="sr-only"
       data-handoff="classroom-control-semantics"
+      data-handoff-scope={handoffView.privacy.scope}
     >
       <h2 id="classroom-control-semantics-handoff-title">
         {handoffView.title}
@@ -52,13 +53,24 @@ function ClassroomControlSemanticsHandoffItem({
 }: {
   itemView: ClassroomControlSemanticsHandoffItemView;
 }) {
+  const labelId = `classroom-control-semantics-handoff-${itemView.id}-label`;
+  const valueId = `classroom-control-semantics-handoff-${itemView.id}-value`;
+  const descriptionId = `classroom-control-semantics-handoff-${itemView.id}-description`;
+
   return (
     <div data-handoff-item={itemView.id}>
-      <dt>{itemView.label}</dt>
+      <dt id={labelId}>{itemView.label}</dt>
       <dd>
-        <output aria-label={itemView.ariaLabel}>{itemView.value}</output>
-        <span>{itemView.description}</span>
+        <output
+          aria-describedby={descriptionId}
+          aria-label={itemView.ariaLabel}
+          aria-labelledby={`${labelId} ${valueId}`}
+          id={valueId}
+        >
+          {itemView.value}
+        </output>
       </dd>
+      <dd id={descriptionId}>{itemView.description}</dd>
     </div>
   );
 }

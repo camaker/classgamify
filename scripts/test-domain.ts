@@ -4,7 +4,11 @@ import {
   baseLocale,
   overwriteGetLocale,
 } from '@/locale/paraglide/runtime';
-import { isLocalizedPath, LOCALIZED_PATHS } from '@/lib/locale';
+import {
+  getCanonicalPathname,
+  isLocalizedPath,
+  LOCALIZED_PATHS,
+} from '@/lib/locale';
 import { isLinkActive, isLinkSectionActive } from '@/lib/urls';
 import { Routes } from '@/lib/routes';
 import {
@@ -31,6 +35,12 @@ import {
   buildPublicNavigationHandoffView,
   PUBLIC_NAVIGATION_HANDOFF_ITEM_IDS,
 } from '@/navigation/public-navigation-handoff';
+import {
+  buildClassroomControlSemanticsHandoffView,
+  CLASSROOM_CONTROL_SEMANTICS_HANDOFF_ITEM_IDS,
+  CLASSROOM_CONTROL_SEMANTICS_HANDOFF_ROUTE_SCOPES,
+  shouldRenderClassroomControlSemanticsHandoff,
+} from '@/classroom/control-semantics';
 import {
   buildWebAppManifest,
   WEB_MANIFEST_HEADERS,
@@ -36976,6 +36986,135 @@ assert.match(
   e2eTestCatalogText,
   /student-name, date, and score lines/,
   'E2E catalog should cover the printable worksheet student, date, and score fields.'
+);
+const classroomControlSemanticsSource = readFileSync(
+  'src/classroom/control-semantics.ts',
+  'utf8'
+);
+const classroomControlSemanticsHandoffSource = readFileSync(
+  'src/components/classroom/classroom-control-semantics-handoff.tsx',
+  'utf8'
+);
+const classroomControlSemanticsHandoffView =
+  buildClassroomControlSemanticsHandoffView();
+assert.deepEqual(
+  [...CLASSROOM_CONTROL_SEMANTICS_HANDOFF_ITEM_IDS],
+  [
+    'ai-source-textarea',
+    'ai-safe-source-note',
+    'ai-source-readiness',
+    'ai-material-safety',
+    'ai-source-capabilities',
+    'ai-synced-provenance',
+    'ai-focus-control',
+    'ai-generate-action',
+    'ai-draft-summary',
+    'activity-source-filter',
+    'assignment-status-filter',
+    'publish-title-field',
+    'publish-instructions-field',
+    'publish-attempt-limit-field',
+    'publish-timer-field',
+    'publish-close-time-field',
+    'publish-delivery-toggles',
+    'publish-preview-region',
+    'result-student-search',
+    'result-student-sort',
+    'result-item-sort',
+    'result-answer-review-filter',
+    'result-review-scope',
+    'result-copy-scope',
+    'result-csv-coverage',
+    'printable-answer-key-toggle',
+    'printable-print-action',
+    'student-identity-input',
+    'student-submit-button',
+    'privacy-guard',
+  ],
+  'Classroom control semantics should expose exactly 30 stable control slice ids.'
+);
+assert.deepEqual([...CLASSROOM_CONTROL_SEMANTICS_HANDOFF_ROUTE_SCOPES], [
+  '/create',
+  '/dashboard',
+  '/play',
+  '/print',
+]);
+assert.equal(classroomControlSemanticsHandoffView.itemViews.length, 30);
+assert.deepEqual(
+  classroomControlSemanticsHandoffView.itemViews.map((itemView) => itemView.id),
+  [...CLASSROOM_CONTROL_SEMANTICS_HANDOFF_ITEM_IDS]
+);
+assert.deepEqual(classroomControlSemanticsHandoffView.privacy, {
+  exposesActivityContentText: false,
+  exposesAnswerKeys: false,
+  exposesAssignmentTitleText: false,
+  exposesCsvDataUrl: false,
+  exposesPromptText: false,
+  exposesRawAnonymousTokens: false,
+  exposesStudentAnswers: false,
+  exposesStudentName: false,
+  itemIds: [...CLASSROOM_CONTROL_SEMANTICS_HANDOFF_ITEM_IDS],
+  mutatesActivity: false,
+  mutatesAssignment: false,
+  scope: 'classroom-control-semantics',
+  submitsAttempt: false,
+  usesPreparedViewModels: true,
+});
+assert.deepEqual(
+  [
+    shouldRenderClassroomControlSemanticsHandoff('/create'),
+    shouldRenderClassroomControlSemanticsHandoff('/dashboard/assignments'),
+    shouldRenderClassroomControlSemanticsHandoff('/play/demo-food'),
+    shouldRenderClassroomControlSemanticsHandoff(
+      '/print/assignments/assignment-id'
+    ),
+    shouldRenderClassroomControlSemanticsHandoff('/templates'),
+    shouldRenderClassroomControlSemanticsHandoff('/worksheets'),
+    shouldRenderClassroomControlSemanticsHandoff('/pricing'),
+    shouldRenderClassroomControlSemanticsHandoff('/auth/login'),
+  ],
+  [true, true, true, true, false, false, false, false],
+  'Classroom control semantics should render only on create, dashboard, student-runner, and print routes.'
+);
+assert.equal(
+  shouldRenderClassroomControlSemanticsHandoff(
+    getCanonicalPathname('/zh/play/demo-food')
+  ),
+  true,
+  'Classroom control semantics mount should support localized student runner paths after canonicalization.'
+);
+assert.match(
+  classroomControlSemanticsSource,
+  /export const CLASSROOM_CONTROL_SEMANTICS_HANDOFF_ROUTE_SCOPES = \[[\s\S]*'\/create'[\s\S]*'\/dashboard'[\s\S]*'\/play'[\s\S]*'\/print'[\s\S]*\] as const;/,
+  'Classroom control semantics domain should keep an explicit route-scope allowlist.'
+);
+assert.match(
+  classroomControlSemanticsHandoffSource,
+  /useRouterState[\s\S]*getCanonicalPathname\(pathname\)[\s\S]*shouldRenderClassroomControlSemanticsHandoff\(canonicalPathname\)/,
+  'Classroom control semantics mount should canonicalize localized paths before applying the route allowlist.'
+);
+assert.match(
+  classroomControlSemanticsHandoffSource,
+  /data-handoff="classroom-control-semantics"[\s\S]*data-handoff-scope=\{handoffView\.privacy\.scope\}[\s\S]*handoffView\.itemViews\.map\(\(itemView\) =>[\s\S]*ClassroomControlSemanticsHandoffItem[\s\S]*const labelId = `classroom-control-semantics-handoff-\$\{itemView\.id\}-label`[\s\S]*const valueId = `classroom-control-semantics-handoff-\$\{itemView\.id\}-value`[\s\S]*const descriptionId = `classroom-control-semantics-handoff-\$\{itemView\.id\}-description`[\s\S]*data-handoff-item=\{itemView\.id\}[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*aria-label=\{itemView\.ariaLabel\}[\s\S]*aria-labelledby=\{`\$\{labelId\} \$\{valueId\}`\}[\s\S]*id=\{valueId\}[\s\S]*id=\{descriptionId\}/,
+  'Classroom control semantics handoff component should render stable hidden label, value, description, and scope outputs.'
+);
+assert.match(
+  rootRouteSource,
+  /import \{ ClassroomControlSemanticsHandoffMount \} from '@\/components\/classroom\/classroom-control-semantics-handoff';[\s\S]*<TooltipProvider>[\s\S]*\{children\}[\s\S]*<ClassroomControlSemanticsHandoffMount \/>[\s\S]*<GoogleOneTapPrompt \/>/,
+  'Root document should mount classroom control semantics globally while the component enforces the route allowlist.'
+);
+assert.doesNotMatch(
+  `${readFileSync('src/routes/index.tsx', 'utf8')}\n${readFileSync(
+    'src/routes/templates.tsx',
+    'utf8'
+  )}\n${readFileSync('src/routes/worksheets.tsx', 'utf8')}\n${pricingRouteSource}`,
+  /classroom-control-semantics|ClassroomControlSemanticsHandoffMount/,
+  'Public marketing, template, worksheet, and pricing routes should not render classroom control semantics directly.'
+);
+assert.match(
+  e2eTestCatalogText,
+  /Core classroom controls expose accessible descriptions[\s\S]*hidden localized 30-slice classroom-control-semantics handoff[\s\S]*AI source textarea[\s\S]*printable answer-key toggle[\s\S]*student identity input[\s\S]*privacy guard/,
+  'E2E catalog should cover the mounted classroom control semantics route contract.'
 );
 const activityTemplates = getActivityTemplates();
 const activityTypesSource = readFileSync('src/activities/types.ts', 'utf8');
