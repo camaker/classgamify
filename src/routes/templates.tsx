@@ -1,6 +1,5 @@
 import Container from '@/components/layout/container';
 import { TemplateDirectoryCard } from '@/components/activities/template-directory-card';
-import { PublicTemplateEntryHandoffPanel } from '@/components/activities/public-template-entry-handoff-panel';
 import { Badge } from '@/components/ui/badge';
 import { buildTemplatesPageViewModel } from '@/activities/entry-page-view';
 import { websiteConfig } from '@/config/website';
@@ -70,8 +69,6 @@ function TemplatesPage() {
             />
           ))}
         </div>
-
-        <PublicTemplateEntryHandoffPanel view={pageView.handoffView} />
 
         <div className="rounded-lg border bg-card p-5">
           <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">

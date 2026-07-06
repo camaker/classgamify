@@ -1,4 +1,5 @@
 import assert from 'node:assert/strict';
+import { readFileSync } from 'node:fs';
 import test from 'node:test';
 import {
   PUBLIC_TEMPLATE_ENTRY_HANDOFF_ITEM_IDS,
@@ -13,11 +14,25 @@ import { Routes } from '@/lib/routes';
 
 overwriteGetLocale(() => 'en');
 
+const TEMPLATES_ROUTE_SOURCE = readFileSync('src/routes/templates.tsx', 'utf8');
+const WORKSHEETS_ROUTE_SOURCE = readFileSync(
+  'src/routes/worksheets.tsx',
+  'utf8'
+);
+
 const SECRET_ACTIVITY_CONTENT = 'SECRET_ACTIVITY_CONTENT';
 const SECRET_ANSWER_KEY = 'SECRET_ANSWER_KEY';
 const SECRET_ATTEMPT = 'SECRET_ATTEMPT';
 const SECRET_STUDENT_IDENTITY = 'SECRET_STUDENT_IDENTITY';
 const SECRET_STORAGE_KEY = 'userfiles/teacher/private-template-source.pdf';
+
+test('public template entry routes keep internal handoff out of public DOM', () => {
+  assert.doesNotMatch(
+    `${TEMPLATES_ROUTE_SOURCE}\n${WORKSHEETS_ROUTE_SOURCE}`,
+    /PublicTemplateEntryHandoffPanel|public-template-entry-handoff-panel|data-handoff|data-handoff-item|pageView\.handoffView/,
+    'Template and worksheet public routes must not render internal template-entry handoff markup.'
+  );
+});
 
 test('public template entry handoff exposes 30 safe creation slices', () => {
   const handoffView = buildPublicTemplateEntryHandoffView({
@@ -148,7 +163,7 @@ test('public template entry handoff exposes 30 safe creation slices', () => {
   assertNoPrivateEntryText(JSON.stringify(handoffView));
 });
 
-test('template and worksheet pages attach the matching public entry surface', () => {
+test('template and worksheet page views retain the matching entry contract', () => {
   const templatesPage = buildTemplatesPageViewModel();
   const worksheetsPage = buildWorksheetsPageViewModel();
 

@@ -7311,6 +7311,11 @@ assert.doesNotMatch(
   /Routes\.StudentPreview/,
   'Templates route should not hardcode student preview route targets.'
 );
+assert.doesNotMatch(
+  templatesRouteSource,
+  /PublicTemplateEntryHandoffPanel|public-template-entry-handoff-panel|data-handoff="public-template-entry"|data-handoff-item|pageView\.handoffView/,
+  'Templates route should keep internal template-entry handoff markup out of the public page.'
+);
 assert.match(
   homeRouteSource,
   /pageView\.hero\.primaryAction\.to[\s\S]*pageView\.hero\.primaryAction\.ariaLabel[\s\S]*pageView\.hero\.primaryAction\.label[\s\S]*pageView\.hero\.browseTemplatesAction\.to[\s\S]*pageView\.hero\.browseTemplatesAction\.ariaLabel[\s\S]*pageView\.hero\.browseTemplatesAction\.label[\s\S]*pageView\.hero\.worksheetAction\.to[\s\S]*pageView\.hero\.worksheetAction\.ariaLabel[\s\S]*pageView\.hero\.worksheetAction\.label/,
@@ -7725,6 +7730,11 @@ assert.doesNotMatch(
   worksheetsRouteSource,
   /Routes\.Templates/,
   'Worksheets route should not hardcode the templates CTA route target.'
+);
+assert.doesNotMatch(
+  worksheetsRouteSource,
+  /PublicTemplateEntryHandoffPanel|public-template-entry-handoff-panel|data-handoff="public-template-entry"|data-handoff-item|pageView\.handoffView/,
+  'Worksheets route should keep internal template-entry handoff markup out of the public page.'
 );
 assert.match(
   authCardSource,
