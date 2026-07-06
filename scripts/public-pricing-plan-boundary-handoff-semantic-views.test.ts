@@ -157,21 +157,16 @@ test('public pricing handoff exposes 30 safe plan-boundary slices', () => {
   assertNoPrivatePricingText(JSON.stringify(handoffView));
 });
 
-test('public pricing route renders the prepared handoff view', () => {
-  assert.match(
+test('public pricing route keeps internal handoff out of public DOM', () => {
+  assert.doesNotMatch(
     PRICING_ROUTE_SOURCE,
-    /<PricingPageHandoffPanel view=\{pageView\.handoffView\} \/>/,
-    'Pricing route should render the prepared plan-boundary handoff view.'
-  );
-  assert.match(
-    PRICING_ROUTE_SOURCE,
-    /data-handoff="public-pricing-plan-boundary"[\s\S]*view\.itemViews\.map\(\(item\) =>[\s\S]*data-handoff-item=\{item\.id\}[\s\S]*aria-label=\{item\.ariaLabel\}/,
-    'Pricing handoff panel should expose stable handoff ids and item aria labels.'
+    /PricingPageHandoffPanel|data-handoff|data-handoff-item|pageView\.handoffView/,
+    'Pricing route must not render internal handoff markup on the public page.'
   );
   assert.doesNotMatch(
     PRICING_ROUTE_SOURCE,
-    /Routes\.ContactClassroom[\s\S]*PricingPageHandoffPanel/,
-    'Pricing route should keep handoff route values inside the prepared page model.'
+    /public-pricing-plan-boundary/,
+    'Pricing route must keep the internal handoff scope out of public source.'
   );
 });
 

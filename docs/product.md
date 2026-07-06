@@ -44,6 +44,11 @@ helpers: sitemap URLs, localized alternates, robots disallow rules, and the web
 app manifest must agree on which ClassGamify pages are public entry points and
 which teacher, student-runner, print, or retired legacy paths stay out of
 search indexing.
+Public marketing, editorial, and legal entry pages may keep stable semantic
+contracts in page-view or domain helpers, but should not render internal
+`data-handoff` audit output into public DOM. Authenticated teacher workspace,
+student runner, results, print, and authoring tool surfaces may still use
+hidden semantic outputs where they support workflow QA and accessibility.
 Developer-facing examples and active account/contact copy should follow the
 same product boundary: visible surfaces may refer to legacy URLs only when they
 are explicit migration entry points, while current forms, billing pages, and

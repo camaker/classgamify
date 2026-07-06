@@ -167,15 +167,16 @@ test('legal policy handoff localizes Chinese classroom boundaries', () => {
   }
 });
 
-test('legal routes attach the shared semantic policy handoff', () => {
+test('legal routes keep internal policy handoff out of public DOM', () => {
   const markdownPageSource = readFileSync(
     'src/components/page/markdown-page.tsx',
     'utf8'
   );
 
-  assert.match(
+  assert.doesNotMatch(
     markdownPageSource,
-    /data-handoff="legal-policy"[\s\S]*view\.itemViews\.map[\s\S]*data-handoff-item=\{itemView\.id\}[\s\S]*<output aria-label=\{itemView\.ariaLabel\}>/
+    /MarkdownPageHandoff|data-handoff|data-handoff-item/,
+    'Markdown legal pages must not render internal policy handoff markup.'
   );
 
   for (const [policyId, routePath] of Object.entries({
@@ -187,7 +188,11 @@ test('legal routes attach the shared semantic policy handoff', () => {
 
     assert.match(routeSource, /buildLegalPolicyPageViewModel/);
     assert.match(routeSource, new RegExp(`policyId: '${policyId}'`));
-    assert.match(routeSource, /handoffView=\{pageView\.handoffView\}/);
+    assert.doesNotMatch(
+      routeSource,
+      /handoffView=\{pageView\.handoffView\}|data-handoff/,
+      `${policyId} route must not pass internal handoff data into the public page.`
+    );
     assert.match(routeSource, /page=\{pageView\.page\}/);
     assert.equal(POLICY_ROUTES[policyId], getHandoffRoute(policyId));
   }

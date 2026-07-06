@@ -1722,10 +1722,10 @@ assert.match(
   /aria-label=\{pageView\.valueSection\.ariaLabel\}[\s\S]*pageView\.valueCards\.map[\s\S]*<ValueCard[\s\S]*item=\{item\}/,
   'The pricing route should render value cards inside the prepared value section semantics.'
 );
-assert.match(
+assert.doesNotMatch(
   pricingRouteSource,
-  /<PricingPageHandoffPanel view=\{pageView\.handoffView\} \/>[\s\S]*data-handoff="public-pricing-plan-boundary"[\s\S]*view\.itemViews\.map\(\(item\) =>[\s\S]*data-handoff-item=\{item\.id\}/,
-  'The pricing route should render the prepared public pricing handoff with stable item ids.'
+  /PricingPageHandoffPanel|data-handoff="public-pricing-plan-boundary"|data-handoff-item|pageView\.handoffView/,
+  'The pricing route should keep internal pricing handoff markup out of the public page.'
 );
 assert.match(
   pricingRouteSource,
@@ -6935,10 +6935,10 @@ assert.match(
   /const templatePanel = \{[\s\S]*templates: getActivityTemplates\(\)\.map\(buildTeachersTemplatePanelItemView\)[\s\S]*handoffView: buildTeachersPageHandoffView\(\{[\s\S]*templatePanel[\s\S]*workflowSection/,
   'Teachers page handoff should reuse the prepared template catalog and visible page view model.'
 );
-assert.match(
+assert.doesNotMatch(
   teachersRouteSource,
-  /<TeachersPageHandoffPanel view=\{pageView\.handoffView\} \/>[\s\S]*data-handoff="teachers-page-product-loop"[\s\S]*view\.itemViews\.map\(\(item\) =>[\s\S]*data-handoff-item=\{item\.id\}[\s\S]*<output aria-label=\{item\.ariaLabel\}/,
-  'Teachers route should render the prepared product-loop handoff with stable item ids.'
+  /TeachersPageHandoffPanel|data-handoff="teachers-page-product-loop"|data-handoff-item|pageView\.handoffView/,
+  'Teachers route should keep internal teacher handoff markup out of the public page.'
 );
 const menuItemConfigSource = readFileSync('src/types/index.d.ts', 'utf8');
 const navbarSource = readFileSync('src/components/layout/navbar.tsx', 'utf8');
@@ -7346,6 +7346,11 @@ assert.doesNotMatch(
   /getStarterActivity|getStarterAssignment|getStarterActivities|getStarterAssignments/,
   'Home route should not read starter catalog data directly.'
 );
+assert.doesNotMatch(
+  homeRouteSource,
+  /HomePageProductLoopHandoff|data-handoff="home-product-loop"|data-handoff-item|pageView\.handoffView/,
+  'Home route should keep internal homepage handoff markup out of the public page.'
+);
 assert.match(
   publicPageViewSource,
   /export type HomePagePreviewView = \{[\s\S]*activity: ActivitySeed;[\s\S]*assignment: AssignmentSeed;[\s\S]*source: 'starter-preview';[\s\S]*export type HomePageSignalId/,
@@ -7506,15 +7511,15 @@ assert.match(
   /RoadmapColumnView[\s\S]*RoadmapPrincipleView/,
   'Roadmap route should import focused roadmap child view contracts.'
 );
-assert.match(
+assert.doesNotMatch(
   roadmapRouteSource,
-  /<RoadmapPublicHandoff view=\{pageView\.handoffView\} \/>/,
-  'Roadmap route should render the prepared public roadmap handoff view.'
+  /RoadmapPublicHandoff|pageView\.handoffView/,
+  'Roadmap route should keep internal roadmap handoff markup out of the public page.'
 );
-assert.match(
+assert.doesNotMatch(
   roadmapRouteSource,
-  /data-handoff="roadmap-public-boundary"[\s\S]*view\.itemViews\.map[\s\S]*key=\{itemView\.id\}[\s\S]*<output aria-label=\{itemView\.ariaLabel\}/,
-  'Roadmap public handoff should render semantic item outputs keyed by stable ids.'
+  /data-handoff="roadmap-public-boundary"|data-handoff-item/,
+  'Roadmap route should keep hidden handoff attributes out of the public page.'
 );
 assert.match(
   publicPageViewSource,
@@ -12919,15 +12924,10 @@ assert.match(
   /const menuLinks = getNavbarLinks\(\)/,
   'Mobile navbar should use the shared public navbar config.'
 );
-assert.match(
+assert.doesNotMatch(
   footerSource,
-  /const footerLinks = getFooterLinks\(\)[\s\S]*buildPublicNavigationHandoffView\(\{ footerLinks \}\)[\s\S]*<PublicNavigationHandoffPanel view=\{navigationHandoff\} \/>/,
-  'Footer should build the public navigation handoff from shared footer config.'
-);
-assert.match(
-  footerSource,
-  /data-handoff="public-navigation-entrypoints"[\s\S]*view\.itemViews\.map\(\(item\) =>[\s\S]*data-handoff-item=\{item\.id\}[\s\S]*<output aria-label=\{item\.ariaLabel\}/,
-  'Footer should render the public navigation handoff with stable item ids.'
+  /buildPublicNavigationHandoffView|PublicNavigationHandoffPanel|data-handoff="public-navigation-entrypoints"|data-handoff-item/,
+  'Footer should keep internal public navigation handoff markup out of public pages.'
 );
 assert.match(
   menuItemConfigSource,

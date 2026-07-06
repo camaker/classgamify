@@ -137,13 +137,10 @@ test('public navigation handoff comes from shared navbar and footer configs', ()
   );
   assert.match(NAVBAR_SOURCE, /const menuLinks = getNavbarLinks\(\)/);
   assert.match(NAVBAR_MOBILE_SOURCE, /const menuLinks = getNavbarLinks\(\)/);
-  assert.match(
+  assert.doesNotMatch(
     FOOTER_SOURCE,
-    /const footerLinks = getFooterLinks\(\)[\s\S]*buildPublicNavigationHandoffView\(\{ footerLinks \}\)/
-  );
-  assert.match(
-    FOOTER_SOURCE,
-    /data-handoff="public-navigation-entrypoints"[\s\S]*view\.itemViews\.map\(\(item\) =>[\s\S]*data-handoff-item=\{item\.id\}[\s\S]*aria-label=\{item\.ariaLabel\}/
+    /buildPublicNavigationHandoffView|PublicNavigationHandoffPanel|data-handoff|data-handoff-item/,
+    'Footer must not render internal navigation handoff markup on public pages.'
   );
   assert.match(
     NAVBAR_CONFIG_SOURCE,

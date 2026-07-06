@@ -1,4 +1,5 @@
 import assert from 'node:assert/strict';
+import { readFileSync } from 'node:fs';
 import test from 'node:test';
 import {
   buildHomePageViewModel,
@@ -11,12 +12,22 @@ import { overwriteGetLocale } from '@/locale/paraglide/runtime';
 
 overwriteGetLocale(() => 'en');
 
+const HOME_ROUTE_SOURCE = readFileSync('src/routes/index.tsx', 'utf8');
+
 const SECRET_ANSWER_KEY = 'SECRET_TEACHER_ANSWER_KEY';
 const SECRET_ATTEMPT_RECORD = 'SECRET_STUDENT_ATTEMPT_RECORD';
 const SECRET_FILE_BYTES = 'raw-private-worksheet-bytes';
 const SECRET_SOURCE_STORAGE_KEY = 'source-materials/private/key.pdf';
 const SECRET_STUDENT_TOKEN = 'raw-anonymous-student-token';
 const SECRET_TEACHER_CONTENT = 'SECRET_TEACHER_ACTIVITY_CONTENT';
+
+test('homepage route keeps internal product-loop handoff out of public DOM', () => {
+  assert.doesNotMatch(
+    HOME_ROUTE_SOURCE,
+    /HomePageProductLoopHandoff|data-handoff|data-handoff-item|pageView\.handoffView/,
+    'Homepage route must not render internal product-loop handoff markup on the public page.'
+  );
+});
 
 test('homepage product-loop handoff exposes 30 public entry slices', () => {
   const pageView = buildHomePageViewModel();

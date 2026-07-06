@@ -147,21 +147,16 @@ test('teachers public handoff exposes 30 safe product-loop slices', () => {
   assertNoPrivateTeachersText(JSON.stringify(handoffView));
 });
 
-test('teachers route renders the prepared public handoff view', () => {
-  assert.match(
+test('teachers route keeps internal handoff out of public DOM', () => {
+  assert.doesNotMatch(
     TEACHERS_ROUTE_SOURCE,
-    /<TeachersPageHandoffPanel view=\{pageView\.handoffView\} \/>/,
-    'Teachers route should render the prepared product-loop handoff view.'
-  );
-  assert.match(
-    TEACHERS_ROUTE_SOURCE,
-    /data-handoff="teachers-page-product-loop"[\s\S]*view\.itemViews\.map\(\(item\) =>[\s\S]*data-handoff-item=\{item\.id\}[\s\S]*aria-label=\{item\.ariaLabel\}/,
-    'Teachers handoff panel should expose stable item ids and aria labels.'
+    /TeachersPageHandoffPanel|data-handoff|data-handoff-item|pageView\.handoffView/,
+    'Teachers route must not render internal handoff markup on the public page.'
   );
   assert.doesNotMatch(
     TEACHERS_ROUTE_SOURCE,
-    /data-handoff="teachers-page-product-loop"[\s\S]*Routes\./,
-    'Teachers handoff route values should stay inside the prepared page model.'
+    /teachers-page-product-loop/,
+    'Teachers route must keep the internal handoff scope out of public source.'
   );
 });
 

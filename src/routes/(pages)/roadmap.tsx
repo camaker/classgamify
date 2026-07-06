@@ -11,8 +11,6 @@ import {
   type RoadmapColumnView,
   type RoadmapPrincipleId,
   type RoadmapPrincipleView,
-  type RoadmapPublicHandoffItemView,
-  type RoadmapPublicHandoffView,
 } from '@/pages/public-page-view';
 import { cn } from '@/lib/utils';
 import {
@@ -130,49 +128,8 @@ function RoadmapPage() {
             {pageView.validation.action.label}
           </Link>
         </section>
-
-        <RoadmapPublicHandoff view={pageView.handoffView} />
       </div>
     </Container>
-  );
-}
-
-function RoadmapPublicHandoff({ view }: { view: RoadmapPublicHandoffView }) {
-  const titleId = 'roadmap-public-handoff-title';
-  const descriptionId = 'roadmap-public-handoff-description';
-
-  return (
-    <section
-      aria-describedby={descriptionId}
-      aria-labelledby={titleId}
-      className="sr-only"
-      data-handoff="roadmap-public-boundary"
-    >
-      <h2 id={titleId}>{view.title}</h2>
-      <p id={descriptionId}>{view.description}</p>
-      <dl>
-        {view.itemViews.map((itemView) => (
-          <RoadmapPublicHandoffItem itemView={itemView} key={itemView.id} />
-        ))}
-      </dl>
-    </section>
-  );
-}
-
-function RoadmapPublicHandoffItem({
-  itemView,
-}: {
-  itemView: RoadmapPublicHandoffItemView;
-}) {
-  return (
-    <div data-handoff-item={itemView.id}>
-      <dt>{itemView.label}</dt>
-      <dd>
-        <output aria-label={itemView.ariaLabel}>{itemView.value}</output>
-        {itemView.statusLabel ? <span>{itemView.statusLabel}</span> : null}
-        <span>{itemView.description}</span>
-      </dd>
-    </div>
   );
 }
 

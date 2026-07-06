@@ -3,25 +3,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import type { PageDoc } from '@/lib/pages';
 import { formatDate } from '@/lib/formatter';
 
-type MarkdownPageHandoffView = {
-  description: string;
-  itemViews: {
-    ariaLabel: string;
-    description: string;
-    id: string;
-    label: string;
-    value: string;
-  }[];
-  title: string;
-};
-
-export function MarkdownPage({
-  handoffView,
-  page,
-}: {
-  handoffView?: MarkdownPageHandoffView;
-  page: PageDoc;
-}) {
+export function MarkdownPage({ page }: { page: PageDoc }) {
   const { title, description, date, content } = page;
 
   return (
@@ -49,45 +31,6 @@ export function MarkdownPage({
           />
         </CardContent>
       </Card>
-      {handoffView ? <MarkdownPageHandoff view={handoffView} /> : null}
-    </div>
-  );
-}
-
-function MarkdownPageHandoff({ view }: { view: MarkdownPageHandoffView }) {
-  const titleId = 'markdown-page-legal-policy-handoff-title';
-  const descriptionId = 'markdown-page-legal-policy-handoff-description';
-
-  return (
-    <section
-      aria-describedby={descriptionId}
-      aria-labelledby={titleId}
-      className="sr-only"
-      data-handoff="legal-policy"
-    >
-      <h2 id={titleId}>{view.title}</h2>
-      <p id={descriptionId}>{view.description}</p>
-      <dl>
-        {view.itemViews.map((itemView) => (
-          <MarkdownPageHandoffItem itemView={itemView} key={itemView.id} />
-        ))}
-      </dl>
-    </section>
-  );
-}
-
-function MarkdownPageHandoffItem({
-  itemView,
-}: {
-  itemView: MarkdownPageHandoffView['itemViews'][number];
-}) {
-  return (
-    <div data-handoff-item={itemView.id}>
-      <dt>{itemView.label}</dt>
-      <dd>
-        <output aria-label={itemView.ariaLabel}>{itemView.value}</output>
-        <span>{itemView.description}</span>
-      </dd>
     </div>
   );
 }

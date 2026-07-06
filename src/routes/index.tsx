@@ -8,7 +8,6 @@ import { seo } from '@/lib/seo';
 import {
   buildHomePageViewModel,
   type HomePageFeatureId,
-  type HomePageProductLoopHandoffView,
   type HomePageSignalId,
 } from '@/pages/public-page-view';
 import * as m from '@/locale/paraglide/messages';
@@ -58,7 +57,6 @@ function HomePage() {
 
   return (
     <Container className="px-4 py-12 md:py-16">
-      <HomePageProductLoopHandoff view={pageView.handoffView} />
       <div className="mx-auto max-w-6xl space-y-12 pb-16">
         <section className="grid gap-8 lg:grid-cols-[minmax(0,0.9fr)_minmax(360px,1.1fr)] lg:items-center">
           <div className="min-w-0 space-y-6">
@@ -176,38 +174,6 @@ function HomePage() {
         </section>
       </div>
     </Container>
-  );
-}
-
-function HomePageProductLoopHandoff({
-  view,
-}: {
-  view: HomePageProductLoopHandoffView;
-}) {
-  const titleId = 'home-product-loop-handoff-title';
-  const descriptionId = 'home-product-loop-handoff-description';
-
-  return (
-    <section
-      aria-describedby={descriptionId}
-      aria-labelledby={titleId}
-      className="sr-only"
-      data-handoff="home-product-loop"
-    >
-      <h2 id={titleId}>{view.title}</h2>
-      <p id={descriptionId}>{view.description}</p>
-      <dl>
-        {view.itemViews.map((item) => (
-          <div data-handoff-item={item.id} key={item.id}>
-            <dt>{item.label}</dt>
-            <dd>
-              <output aria-label={item.ariaLabel}>{item.value}</output>
-              <span>{item.description}</span>
-            </dd>
-          </div>
-        ))}
-      </dl>
-    </section>
   );
 }
 

@@ -33,7 +33,7 @@ function CookiePage() {
 
   return (
     <Container className="py-16 px-4">
-      <MarkdownPage handoffView={pageView.handoffView} page={pageView.page} />
+      <MarkdownPage page={pageView.page} />
     </Container>
   );
 }

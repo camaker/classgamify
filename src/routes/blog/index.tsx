@@ -1,7 +1,6 @@
 import { BlogGrid } from '@/components/blog/blog-grid';
 import { BlogPagination } from '@/components/blog/blog-pagination';
 import { BlogCtaActionLink } from '@/components/blog/blog-cta-action-link';
-import { PublicEditorialHandoff } from '@/components/blog/public-editorial-handoff';
 import Container from '@/components/layout/container';
 import { websiteConfig } from '@/config/website';
 import { getPaginatedPosts } from '@/lib/blog';
@@ -48,7 +47,6 @@ function BlogListPage() {
         </div>
         <BlogGrid posts={posts} />
         <BlogPagination currentPage={currentPage} totalPages={totalPages} />
-        <PublicEditorialHandoff view={pageView.handoffView} />
       </div>
     </Container>
   );

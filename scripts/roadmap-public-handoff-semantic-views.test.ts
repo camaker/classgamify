@@ -1,4 +1,5 @@
 import assert from 'node:assert/strict';
+import { readFileSync } from 'node:fs';
 import test from 'node:test';
 import {
   buildRoadmapPageViewModel,
@@ -10,6 +11,11 @@ import { overwriteGetLocale } from '@/locale/paraglide/runtime';
 import { Routes } from '@/lib/routes';
 
 overwriteGetLocale(() => 'en');
+
+const ROADMAP_ROUTE_SOURCE = readFileSync(
+  'src/routes/(pages)/roadmap.tsx',
+  'utf8'
+);
 
 const SECRET_ANSWER_KEY = 'SECRET_TEACHER_ANSWER_KEY';
 const SECRET_ATTEMPT_RECORD = 'SECRET_STUDENT_ATTEMPT_RECORD';
@@ -160,6 +166,14 @@ test('roadmap handoff localizes Chinese product boundaries', () => {
   } finally {
     overwriteGetLocale(() => 'en');
   }
+});
+
+test('roadmap route keeps internal handoff out of public DOM', () => {
+  assert.doesNotMatch(
+    ROADMAP_ROUTE_SOURCE,
+    /RoadmapPublicHandoff|data-handoff|data-handoff-item|pageView\.handoffView/,
+    'Roadmap route must not render internal handoff markup on the public page.'
+  );
 });
 
 function getHandoffItemValue(

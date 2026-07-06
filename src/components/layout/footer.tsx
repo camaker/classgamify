@@ -9,10 +9,6 @@ import { Routes } from '@/lib/routes';
 import { isLinkSectionActive } from '@/lib/urls';
 import { cn } from '@/lib/utils';
 import {
-  buildPublicNavigationHandoffView,
-  type PublicNavigationHandoffView,
-} from '@/navigation/public-navigation-handoff';
-import {
   IconArrowRight,
   IconDeviceGamepad2,
   IconExternalLink,
@@ -25,7 +21,6 @@ import { Link, useLocation } from '@tanstack/react-router';
 export function Footer({ className }: React.HTMLAttributes<HTMLElement>) {
   const pathname = useLocation().pathname;
   const footerLinks = getFooterLinks();
-  const navigationHandoff = buildPublicNavigationHandoffView({ footerLinks });
 
   return (
     <footer
@@ -149,42 +144,8 @@ export function Footer({ className }: React.HTMLAttributes<HTMLElement>) {
             </Link>
           </div>
         </div>
-
-        <PublicNavigationHandoffPanel view={navigationHandoff} />
       </Container>
     </footer>
-  );
-}
-
-function PublicNavigationHandoffPanel({
-  view,
-}: {
-  view: PublicNavigationHandoffView;
-}) {
-  const titleId = 'public-navigation-handoff-title';
-  const descriptionId = 'public-navigation-handoff-description';
-
-  return (
-    <section
-      aria-describedby={descriptionId}
-      aria-labelledby={titleId}
-      className="sr-only"
-      data-handoff="public-navigation-entrypoints"
-    >
-      <h2 id={titleId}>{view.title}</h2>
-      <p id={descriptionId}>{view.description}</p>
-      <dl>
-        {view.itemViews.map((item) => (
-          <div data-handoff-item={item.id} key={item.id}>
-            <dt>{item.label}</dt>
-            <dd>
-              <output aria-label={item.ariaLabel}>{item.value}</output>
-              <span>{item.description}</span>
-            </dd>
-          </div>
-        ))}
-      </dl>
-    </section>
   );
 }
 
