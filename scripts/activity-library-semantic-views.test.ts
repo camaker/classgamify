@@ -1,4 +1,5 @@
 import assert from 'node:assert/strict';
+import { readFileSync } from 'node:fs';
 import test from 'node:test';
 import {
   ACTIVITY_LIBRARY_PAGE_HANDOFF_ITEM_IDS,
@@ -12,6 +13,24 @@ overwriteGetLocale(() => 'en');
 
 const SECRET_FILE_ID = 'SECRET_LIBRARY_FILE_ID_SHOULD_NOT_LEAK';
 const SECRET_STORAGE_KEY = 'classroom/private/source-material.pdf';
+
+test('activity dashboard route renders the page handoff marker and item outputs', () => {
+  const routeSource = readFileSync(
+    'src/routes/dashboard/activities.tsx',
+    'utf8'
+  );
+
+  assert.match(
+    routeSource,
+    /<ActivityLibraryPageHandoff[\s\S]*handoffView=\{activePageView\.handoffView\}[\s\S]*\/>/,
+    'Activity dashboard route should render the prepared activity-library page handoff view.'
+  );
+  assert.match(
+    routeSource,
+    /function ActivityLibraryPageHandoff[\s\S]*data-handoff="activity-library"[\s\S]*handoffView\.itemViews\.map\(\(item\) =>[\s\S]*ActivityLibraryPageHandoffItem[\s\S]*function ActivityLibraryPageHandoffItem[\s\S]*data-handoff-item=\{item\.id\}[\s\S]*<output aria-label=\{item\.ariaLabel\}>/,
+    'Activity dashboard route should expose the activity-library marker, stable item markers, and prepared item outputs.'
+  );
+});
 
 test('activity library page exposes a 30-slice owner-scoped handoff', () => {
   const activeActivities = [

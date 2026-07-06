@@ -32992,6 +32992,16 @@ assert.match(
 );
 assert.match(
   dashboardActivitiesRouteSource,
+  /<ActivityLibraryPageHandoff[\s\S]*handoffView=\{activePageView\.handoffView\}[\s\S]*\/>/,
+  'Activity dashboard route should render the prepared activity-library page handoff from the page view-model.'
+);
+assert.match(
+  dashboardActivitiesRouteSource,
+  /function ActivityLibraryPageHandoff[\s\S]*data-handoff="activity-library"[\s\S]*handoffView\.itemViews\.map\(\(item\) =>[\s\S]*ActivityLibraryPageHandoffItem[\s\S]*function ActivityLibraryPageHandoffItem[\s\S]*data-handoff-item=\{item\.id\}[\s\S]*<output aria-label=\{item\.ariaLabel\}>/,
+  'Activity dashboard route should expose the page handoff marker and stable activity-library item outputs.'
+);
+assert.match(
+  dashboardActivitiesRouteSource,
   /ActivityLibraryCard/,
   'Activity dashboard route should delegate activity card rendering to the activity library card component.'
 );

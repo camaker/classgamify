@@ -11,6 +11,8 @@ import {
 } from '@/activities/library-filters';
 import {
   activityLibraryPageCopy,
+  type ActivityLibraryPageHandoffItemView,
+  type ActivityLibraryPageHandoffView,
   buildActivityLibraryCardViewModel,
   buildActivityLibraryRouteState,
   buildStarterActivityLibraryCardViewModel,
@@ -30,7 +32,7 @@ import { Routes } from '@/lib/routes';
 import { cn } from '@/lib/utils';
 import { IconPlus, IconSparkles, IconX } from '@tabler/icons-react';
 import { Link, createFileRoute, useNavigate } from '@tanstack/react-router';
-import { useEffect, useMemo } from 'react';
+import { useEffect, useId, useMemo } from 'react';
 
 export const Route = createFileRoute('/dashboard/activities')({
   validateSearch: buildActivityLibraryValidatedSearch,
@@ -156,6 +158,8 @@ function DashboardActivitiesPage() {
       description={activePageView.description}
     >
       <div className="grid gap-6">
+        <ActivityLibraryPageHandoff handoffView={activePageView.handoffView} />
+
         <section className="grid gap-4 rounded-lg border bg-card p-4 lg:grid-cols-[minmax(0,1fr)_18rem]">
           <div className="min-w-0">
             <Badge variant="outline" className="rounded-md border-primary/30">
@@ -318,5 +322,47 @@ function DashboardActivitiesPage() {
         ) : null}
       </div>
     </DashboardLayout>
+  );
+}
+
+function ActivityLibraryPageHandoff({
+  handoffView,
+}: {
+  handoffView: ActivityLibraryPageHandoffView;
+}) {
+  const titleId = useId();
+  const descriptionId = useId();
+
+  return (
+    <section
+      aria-describedby={descriptionId}
+      aria-labelledby={titleId}
+      className="sr-only"
+      data-handoff="activity-library"
+    >
+      <h2 id={titleId}>{handoffView.title}</h2>
+      <p id={descriptionId}>{handoffView.description}</p>
+      <dl>
+        {handoffView.itemViews.map((item) => (
+          <ActivityLibraryPageHandoffItem item={item} key={item.id} />
+        ))}
+      </dl>
+    </section>
+  );
+}
+
+function ActivityLibraryPageHandoffItem({
+  item,
+}: {
+  item: ActivityLibraryPageHandoffItemView;
+}) {
+  return (
+    <div data-handoff-item={item.id}>
+      <dt>{item.label}</dt>
+      <dd>
+        <output aria-label={item.ariaLabel}>{item.value}</output>
+        <span>{item.description}</span>
+      </dd>
+    </div>
   );
 }
