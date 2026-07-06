@@ -97,6 +97,73 @@ export type PublicAssignmentRuleSummaryView = {
   title: string;
 };
 
+export const ASSIGNMENT_DELIVERY_POLICY_HANDOFF_ITEM_IDS = [
+  'domain-helper-source',
+  'settings-resolution',
+  'settings-summary-surface',
+  'public-rules-surface',
+  'publish-dialog-surface',
+  'assignment-card-surface',
+  'result-header-surface',
+  'student-runner-surface',
+  'item-count-rule',
+  'attempts-rule',
+  'timer-rule',
+  'close-time-rule',
+  'identity-rule',
+  'answer-reveal-rule',
+  'item-order-rule',
+  'instructions-rule',
+  'delivery-rule-order',
+  'public-rule-count',
+  'settings-rule-count',
+  'status-derivation',
+  'default-attempts',
+  'unlimited-attempts',
+  'timer-normalization',
+  'close-time-normalization',
+  'policy-text-export',
+  'snapshot-boundary',
+  'public-payload-boundary',
+  'result-export-boundary',
+  'legacy-copy-guard',
+  'privacy-guard',
+] as const;
+
+export type AssignmentDeliveryPolicyHandoffItemId =
+  (typeof ASSIGNMENT_DELIVERY_POLICY_HANDOFF_ITEM_IDS)[number];
+
+export type AssignmentDeliveryPolicyHandoffItemView = {
+  ariaLabel: string;
+  description: string;
+  id: AssignmentDeliveryPolicyHandoffItemId;
+  label: string;
+  value: string;
+};
+
+export type AssignmentDeliveryPolicyHandoffPrivacyContract = {
+  createsAssignmentLinks: false;
+  exposesAnswerKeys: false;
+  exposesRawSettingsJson: false;
+  exposesShareSlug: false;
+  exposesSourceMaterialStorageKeys: false;
+  exposesStudentAnswerText: false;
+  exposesStudentNames: false;
+  itemIds: AssignmentDeliveryPolicyHandoffItemId[];
+  mutatesAssignment: false;
+  publicRulesAreSanitized: true;
+  scope: 'assignment-delivery-policy-summary';
+  settingsResolveThroughDomain: true;
+  surfacesShareSummaryView: true;
+};
+
+export type AssignmentDeliveryPolicyHandoffView = {
+  description: string;
+  itemViews: AssignmentDeliveryPolicyHandoffItemView[];
+  privacy: AssignmentDeliveryPolicyHandoffPrivacyContract;
+  title: string;
+};
+
 type AssignmentDeliverySummaryInput = {
   collectStudentName?: boolean;
   expiresAt: AssignmentDate;
@@ -109,6 +176,19 @@ type AssignmentDeliverySummaryInput = {
 type AssignmentSettingsSummaryInput = AssignmentDeliverySummaryInput & {
   instructions?: string;
   settings?: AssignmentSettingsInput;
+};
+
+type AssignmentDeliveryPolicyHandoffInput = {
+  expiresAt?: AssignmentDate;
+  itemCount?: number;
+  settings?: AssignmentSettingsInput;
+};
+
+type AssignmentDeliveryPolicyHandoffContext = {
+  defaultSettingsSummary: AssignmentSettingsSummaryView;
+  policyText: string;
+  publicRuleSummary: PublicAssignmentRuleSummaryView;
+  settingsSummary: AssignmentSettingsSummaryView;
 };
 
 export type AssignmentInstructionSummary = {
@@ -261,6 +341,53 @@ export function formatAssignmentDeliveryPolicyText({
     .join(m.assignment_delivery_policy_separator());
 }
 
+export function buildAssignmentDeliveryPolicyHandoffView({
+  expiresAt,
+  itemCount = 4,
+  settings = {
+    collectStudentName: false,
+    instructions: 'Read rules before starting.',
+    maxAttempts: null,
+    showCorrectAnswers: false,
+    shuffleItems: false,
+    timeLimitSeconds: 15 * 60,
+  },
+}: AssignmentDeliveryPolicyHandoffInput = {}): AssignmentDeliveryPolicyHandoffView {
+  const settingsSummary = buildAssignmentSettingsSummaryView({
+    expiresAt,
+    settings,
+  });
+  const publicRuleSummary = buildPublicAssignmentRuleSummaryViewFromSettings({
+    expiresAt,
+    itemCount,
+    settings,
+  });
+  const defaultSettingsSummary = buildAssignmentSettingsSummaryView({
+    expiresAt,
+    settings: {},
+  });
+  const policyText = formatAssignmentDeliveryPolicyText({
+    expiresAt,
+    settings,
+  });
+  const context = {
+    defaultSettingsSummary,
+    policyText,
+    publicRuleSummary,
+    settingsSummary,
+  };
+  const itemViews = ASSIGNMENT_DELIVERY_POLICY_HANDOFF_ITEM_IDS.map((id) =>
+    buildAssignmentDeliveryPolicyHandoffItemView({ context, id })
+  );
+
+  return {
+    description: m.assignment_delivery_policy_handoff_description(),
+    itemViews,
+    privacy: buildAssignmentDeliveryPolicyHandoffPrivacyContract(itemViews),
+    title: m.assignment_delivery_policy_handoff_title(),
+  };
+}
+
 export function formatAssignmentDeliveryInstructions(
   instructions: string | null | undefined
 ) {
@@ -273,6 +400,294 @@ function formatAssignmentDeliveryPolicyItem(
   return m.assignment_delivery_policy_item({
     label: item.label,
     value: item.value,
+  });
+}
+
+function buildAssignmentDeliveryPolicyHandoffItemView({
+  context,
+  id,
+}: {
+  context: AssignmentDeliveryPolicyHandoffContext;
+  id: AssignmentDeliveryPolicyHandoffItemId;
+}): AssignmentDeliveryPolicyHandoffItemView {
+  const label = getAssignmentDeliveryPolicyHandoffItemLabel(id);
+  const description = getAssignmentDeliveryPolicyHandoffItemDescription(id);
+  const value = getAssignmentDeliveryPolicyHandoffItemValue({ context, id });
+
+  return {
+    ariaLabel: m.assignment_delivery_policy_handoff_item_aria({
+      description,
+      label,
+      value,
+    }),
+    description,
+    id,
+    label,
+    value,
+  };
+}
+
+function buildAssignmentDeliveryPolicyHandoffPrivacyContract(
+  itemViews: AssignmentDeliveryPolicyHandoffItemView[]
+): AssignmentDeliveryPolicyHandoffPrivacyContract {
+  return {
+    createsAssignmentLinks: false,
+    exposesAnswerKeys: false,
+    exposesRawSettingsJson: false,
+    exposesShareSlug: false,
+    exposesSourceMaterialStorageKeys: false,
+    exposesStudentAnswerText: false,
+    exposesStudentNames: false,
+    itemIds: itemViews.map((itemView) => itemView.id),
+    mutatesAssignment: false,
+    publicRulesAreSanitized: true,
+    scope: 'assignment-delivery-policy-summary',
+    settingsResolveThroughDomain: true,
+    surfacesShareSummaryView: true,
+  };
+}
+
+function getAssignmentDeliveryPolicyHandoffItemLabel(
+  id: AssignmentDeliveryPolicyHandoffItemId
+) {
+  switch (id) {
+    case 'domain-helper-source':
+      return m.assignment_delivery_policy_handoff_domain_helper_label();
+    case 'settings-resolution':
+      return m.assignment_delivery_policy_handoff_settings_resolution_label();
+    case 'settings-summary-surface':
+      return m.assignment_delivery_policy_handoff_settings_surface_label();
+    case 'public-rules-surface':
+      return m.assignment_delivery_policy_handoff_public_rules_surface_label();
+    case 'publish-dialog-surface':
+      return m.assignment_delivery_policy_handoff_publish_surface_label();
+    case 'assignment-card-surface':
+      return m.assignment_delivery_policy_handoff_card_surface_label();
+    case 'result-header-surface':
+      return m.assignment_delivery_policy_handoff_result_surface_label();
+    case 'student-runner-surface':
+      return m.assignment_delivery_policy_handoff_runner_surface_label();
+    case 'item-count-rule':
+      return m.assignment_delivery_label_items();
+    case 'attempts-rule':
+      return m.assignment_delivery_label_attempts();
+    case 'timer-rule':
+      return m.assignment_delivery_label_timer();
+    case 'close-time-rule':
+      return m.assignment_delivery_label_closes();
+    case 'identity-rule':
+      return m.assignment_delivery_label_identity();
+    case 'answer-reveal-rule':
+      return m.assignment_delivery_label_answer_reveal();
+    case 'item-order-rule':
+      return m.assignment_delivery_label_item_order();
+    case 'instructions-rule':
+      return m.assignment_delivery_label_instructions();
+    case 'delivery-rule-order':
+      return m.assignment_delivery_policy_handoff_rule_order_label();
+    case 'public-rule-count':
+      return m.assignment_delivery_policy_handoff_public_rule_count_label();
+    case 'settings-rule-count':
+      return m.assignment_delivery_policy_handoff_settings_rule_count_label();
+    case 'status-derivation':
+      return m.assignment_delivery_policy_handoff_status_label();
+    case 'default-attempts':
+      return m.assignment_delivery_policy_handoff_default_attempts_label();
+    case 'unlimited-attempts':
+      return m.assignment_delivery_policy_handoff_unlimited_attempts_label();
+    case 'timer-normalization':
+      return m.assignment_delivery_policy_handoff_timer_normalization_label();
+    case 'close-time-normalization':
+      return m.assignment_delivery_policy_handoff_close_normalization_label();
+    case 'policy-text-export':
+      return m.assignment_delivery_policy_handoff_policy_text_label();
+    case 'snapshot-boundary':
+      return m.assignment_delivery_policy_handoff_snapshot_boundary_label();
+    case 'public-payload-boundary':
+      return m.assignment_delivery_policy_handoff_public_payload_label();
+    case 'result-export-boundary':
+      return m.assignment_delivery_policy_handoff_result_export_label();
+    case 'legacy-copy-guard':
+      return m.assignment_delivery_policy_handoff_legacy_guard_label();
+    case 'privacy-guard':
+      return m.assignment_delivery_policy_handoff_privacy_guard_label();
+  }
+}
+
+function getAssignmentDeliveryPolicyHandoffItemDescription(
+  id: AssignmentDeliveryPolicyHandoffItemId
+) {
+  switch (id) {
+    case 'domain-helper-source':
+      return m.assignment_delivery_policy_handoff_domain_helper_description();
+    case 'settings-resolution':
+      return m.assignment_delivery_policy_handoff_settings_resolution_description();
+    case 'settings-summary-surface':
+      return m.assignment_delivery_policy_handoff_settings_surface_description();
+    case 'public-rules-surface':
+      return m.assignment_delivery_policy_handoff_public_rules_surface_description();
+    case 'publish-dialog-surface':
+      return m.assignment_delivery_policy_handoff_publish_surface_description();
+    case 'assignment-card-surface':
+      return m.assignment_delivery_policy_handoff_card_surface_description();
+    case 'result-header-surface':
+      return m.assignment_delivery_policy_handoff_result_surface_description();
+    case 'student-runner-surface':
+      return m.assignment_delivery_policy_handoff_runner_surface_description();
+    case 'item-count-rule':
+      return m.assignment_delivery_policy_handoff_item_count_description();
+    case 'attempts-rule':
+      return m.assignment_delivery_policy_handoff_attempts_description();
+    case 'timer-rule':
+      return m.assignment_delivery_policy_handoff_timer_description();
+    case 'close-time-rule':
+      return m.assignment_delivery_policy_handoff_close_time_description();
+    case 'identity-rule':
+      return m.assignment_delivery_policy_handoff_identity_description();
+    case 'answer-reveal-rule':
+      return m.assignment_delivery_policy_handoff_answer_reveal_description();
+    case 'item-order-rule':
+      return m.assignment_delivery_policy_handoff_item_order_description();
+    case 'instructions-rule':
+      return m.assignment_delivery_policy_handoff_instructions_description();
+    case 'delivery-rule-order':
+      return m.assignment_delivery_policy_handoff_rule_order_description();
+    case 'public-rule-count':
+      return m.assignment_delivery_policy_handoff_public_rule_count_description();
+    case 'settings-rule-count':
+      return m.assignment_delivery_policy_handoff_settings_rule_count_description();
+    case 'status-derivation':
+      return m.assignment_delivery_policy_handoff_status_description();
+    case 'default-attempts':
+      return m.assignment_delivery_policy_handoff_default_attempts_description();
+    case 'unlimited-attempts':
+      return m.assignment_delivery_policy_handoff_unlimited_attempts_description();
+    case 'timer-normalization':
+      return m.assignment_delivery_policy_handoff_timer_normalization_description();
+    case 'close-time-normalization':
+      return m.assignment_delivery_policy_handoff_close_normalization_description();
+    case 'policy-text-export':
+      return m.assignment_delivery_policy_handoff_policy_text_description();
+    case 'snapshot-boundary':
+      return m.assignment_delivery_policy_handoff_snapshot_boundary_description();
+    case 'public-payload-boundary':
+      return m.assignment_delivery_policy_handoff_public_payload_description();
+    case 'result-export-boundary':
+      return m.assignment_delivery_policy_handoff_result_export_description();
+    case 'legacy-copy-guard':
+      return m.assignment_delivery_policy_handoff_legacy_guard_description();
+    case 'privacy-guard':
+      return m.assignment_delivery_policy_handoff_privacy_guard_description();
+  }
+}
+
+function getAssignmentDeliveryPolicyHandoffItemValue({
+  context,
+  id,
+}: {
+  context: AssignmentDeliveryPolicyHandoffContext;
+  id: AssignmentDeliveryPolicyHandoffItemId;
+}) {
+  switch (id) {
+    case 'domain-helper-source':
+      return m.assignment_delivery_policy_handoff_domain_helper_value();
+    case 'settings-resolution':
+      return m.assignment_delivery_policy_handoff_settings_resolution_value();
+    case 'settings-summary-surface':
+      return m.assignment_delivery_policy_handoff_settings_surface_value();
+    case 'public-rules-surface':
+      return m.assignment_delivery_policy_handoff_public_rules_surface_value();
+    case 'publish-dialog-surface':
+      return m.assignment_delivery_policy_handoff_publish_surface_value();
+    case 'assignment-card-surface':
+      return m.assignment_delivery_policy_handoff_card_surface_value();
+    case 'result-header-surface':
+      return m.assignment_delivery_policy_handoff_result_surface_value();
+    case 'student-runner-surface':
+      return m.assignment_delivery_policy_handoff_runner_surface_value();
+    case 'item-count-rule':
+      return getPublicAssignmentRuleValue(context.publicRuleSummary, 'items');
+    case 'attempts-rule':
+      return getAssignmentSettingsItemValue(
+        context.settingsSummary,
+        'attempts'
+      );
+    case 'timer-rule':
+      return getAssignmentSettingsItemValue(context.settingsSummary, 'timer');
+    case 'close-time-rule':
+      return getAssignmentSettingsItemValue(context.settingsSummary, 'closes');
+    case 'identity-rule':
+      return getAssignmentSettingsItemValue(
+        context.settingsSummary,
+        'identity'
+      );
+    case 'answer-reveal-rule':
+      return getAssignmentSettingsItemValue(
+        context.settingsSummary,
+        'answerReveal'
+      );
+    case 'item-order-rule':
+      return getAssignmentSettingsItemValue(
+        context.settingsSummary,
+        'itemOrder'
+      );
+    case 'instructions-rule':
+      return context.settingsSummary.instructions.value;
+    case 'delivery-rule-order':
+      return context.settingsSummary.items.map((item) => item.id).join(' -> ');
+    case 'public-rule-count':
+      return formatAssignmentDeliveryPolicyHandoffRuleCount(
+        context.publicRuleSummary.summary.ruleCount
+      );
+    case 'settings-rule-count':
+      return formatAssignmentDeliveryPolicyHandoffRuleCount(
+        context.settingsSummary.summary.deliveryRuleCount
+      );
+    case 'status-derivation':
+      return context.settingsSummary.status.value;
+    case 'default-attempts':
+      return getAssignmentSettingsItemValue(
+        context.defaultSettingsSummary,
+        'attempts'
+      );
+    case 'unlimited-attempts':
+      return formatAssignmentAttempts(null);
+    case 'timer-normalization':
+      return getAssignmentSettingsItemValue(context.settingsSummary, 'timer');
+    case 'close-time-normalization':
+      return getAssignmentSettingsItemValue(context.settingsSummary, 'closes');
+    case 'policy-text-export':
+      return context.policyText;
+    case 'snapshot-boundary':
+      return m.assignment_delivery_policy_handoff_snapshot_boundary_value();
+    case 'public-payload-boundary':
+      return m.assignment_delivery_policy_handoff_public_payload_value();
+    case 'result-export-boundary':
+      return m.assignment_delivery_policy_handoff_result_export_value();
+    case 'legacy-copy-guard':
+      return m.assignment_delivery_policy_handoff_legacy_guard_value();
+    case 'privacy-guard':
+      return m.assignment_delivery_policy_handoff_privacy_guard_value();
+  }
+}
+
+function getAssignmentSettingsItemValue(
+  summary: AssignmentSettingsSummaryView,
+  id: AssignmentDeliverySummaryId
+) {
+  return summary.items.find((item) => item.id === id)?.value ?? '';
+}
+
+function getPublicAssignmentRuleValue(
+  summary: PublicAssignmentRuleSummaryView,
+  id: PublicAssignmentRuleSummaryId
+) {
+  return summary.items.find((item) => item.id === id)?.value ?? '';
+}
+
+function formatAssignmentDeliveryPolicyHandoffRuleCount(count: number) {
+  return m.assignment_delivery_policy_handoff_rule_count_value({
+    count: Math.max(0, Math.trunc(Number.isFinite(count) ? count : 0)),
   });
 }
 

@@ -592,7 +592,9 @@ import {
   formatAssignmentDisplayTitle,
 } from '@/assignments/assignment-display';
 import {
+  ASSIGNMENT_DELIVERY_POLICY_HANDOFF_ITEM_IDS,
   buildAssignmentDeliverySummary,
+  buildAssignmentDeliveryPolicyHandoffView,
   buildAssignmentSettingsSummaryView,
   buildPublicAssignmentRuleSummary,
   buildPublicAssignmentRuleSummaryFromSettings,
@@ -15290,6 +15292,21 @@ assert.doesNotMatch(
   /Assignment rules|Open link|Timer on|Close scheduled|Attempt limit|playable items|submitted attempts|activity is ready|stops accepting|work is identified|answers appear|作业规则|链接开放|已开启计时|可作答项目|次数限制|计时才会开始/,
   'Assignment delivery summary should not hard-code public rule descriptions or status copy.'
 );
+assert.match(
+  assignmentDeliverySummarySource,
+  /export const ASSIGNMENT_DELIVERY_POLICY_HANDOFF_ITEM_IDS = \[(?=[\s\S]*'domain-helper-source')(?=[\s\S]*'settings-resolution')(?=[\s\S]*'settings-summary-surface')(?=[\s\S]*'public-rules-surface')(?=[\s\S]*'publish-dialog-surface')(?=[\s\S]*'assignment-card-surface')(?=[\s\S]*'result-header-surface')(?=[\s\S]*'student-runner-surface')(?=[\s\S]*'item-count-rule')(?=[\s\S]*'attempts-rule')(?=[\s\S]*'timer-rule')(?=[\s\S]*'close-time-rule')(?=[\s\S]*'identity-rule')(?=[\s\S]*'answer-reveal-rule')(?=[\s\S]*'item-order-rule')(?=[\s\S]*'instructions-rule')(?=[\s\S]*'delivery-rule-order')(?=[\s\S]*'public-rule-count')(?=[\s\S]*'settings-rule-count')(?=[\s\S]*'status-derivation')(?=[\s\S]*'default-attempts')(?=[\s\S]*'unlimited-attempts')(?=[\s\S]*'timer-normalization')(?=[\s\S]*'close-time-normalization')(?=[\s\S]*'policy-text-export')(?=[\s\S]*'snapshot-boundary')(?=[\s\S]*'public-payload-boundary')(?=[\s\S]*'result-export-boundary')(?=[\s\S]*'legacy-copy-guard')(?=[\s\S]*'privacy-guard')/,
+  'Assignment delivery policy handoff should expose the full 30-slice item id contract.'
+);
+assert.match(
+  assignmentDeliverySummarySource,
+  /export type AssignmentDeliveryPolicyHandoffPrivacyContract = \{[\s\S]*createsAssignmentLinks: false;[\s\S]*exposesAnswerKeys: false;[\s\S]*exposesRawSettingsJson: false;[\s\S]*exposesShareSlug: false;[\s\S]*exposesSourceMaterialStorageKeys: false;[\s\S]*exposesStudentAnswerText: false;[\s\S]*exposesStudentNames: false;[\s\S]*mutatesAssignment: false;[\s\S]*publicRulesAreSanitized: true;[\s\S]*settingsResolveThroughDomain: true;[\s\S]*surfacesShareSummaryView: true;/,
+  'Assignment delivery policy handoff should expose an explicit privacy and domain-resolution contract.'
+);
+assert.match(
+  assignmentDeliverySummarySource,
+  /export function buildAssignmentDeliveryPolicyHandoffView[\s\S]*buildAssignmentSettingsSummaryView\(\{[\s\S]*buildPublicAssignmentRuleSummaryViewFromSettings\(\{[\s\S]*formatAssignmentDeliveryPolicyText\(\{[\s\S]*ASSIGNMENT_DELIVERY_POLICY_HANDOFF_ITEM_IDS\.map/,
+  'Assignment delivery policy handoff should compose existing settings, public-rule, and policy-text helpers.'
+);
 assert.doesNotMatch(
   playRouteSource,
   /buildDefaultRuntimeItemCardViews|getActivityTemplateRunnerKind|getActivityTemplateRunnerCopy|LineMatchBoard|MatchingPairsBoard|GroupSortBoard|FillBlankWorksheet|OpenBoxRunner|ListeningRunner|RuntimeItemList\(|RuntimeItemCard\(|ChoiceGrid\(/,
@@ -23460,6 +23477,161 @@ try {
       '答案显示：隐藏',
       '题目顺序：固定顺序',
     ].join('；')
+  );
+} finally {
+  overwriteGetLocale(() => 'en');
+}
+const assignmentDeliveryPolicyHandoffView =
+  buildAssignmentDeliveryPolicyHandoffView({
+    itemCount: 4,
+    settings: {
+      collectStudentName: false,
+      instructions: 'Read rules before starting.',
+      maxAttempts: null,
+      showCorrectAnswers: false,
+      shuffleItems: false,
+      timeLimitSeconds: 15 * 60,
+    },
+  });
+const assignmentDeliveryPolicyHandoffIds =
+  assignmentDeliveryPolicyHandoffView.itemViews.map((itemView) => itemView.id);
+assert.deepEqual(ASSIGNMENT_DELIVERY_POLICY_HANDOFF_ITEM_IDS, [
+  'domain-helper-source',
+  'settings-resolution',
+  'settings-summary-surface',
+  'public-rules-surface',
+  'publish-dialog-surface',
+  'assignment-card-surface',
+  'result-header-surface',
+  'student-runner-surface',
+  'item-count-rule',
+  'attempts-rule',
+  'timer-rule',
+  'close-time-rule',
+  'identity-rule',
+  'answer-reveal-rule',
+  'item-order-rule',
+  'instructions-rule',
+  'delivery-rule-order',
+  'public-rule-count',
+  'settings-rule-count',
+  'status-derivation',
+  'default-attempts',
+  'unlimited-attempts',
+  'timer-normalization',
+  'close-time-normalization',
+  'policy-text-export',
+  'snapshot-boundary',
+  'public-payload-boundary',
+  'result-export-boundary',
+  'legacy-copy-guard',
+  'privacy-guard',
+]);
+assert.deepEqual(
+  assignmentDeliveryPolicyHandoffIds,
+  ASSIGNMENT_DELIVERY_POLICY_HANDOFF_ITEM_IDS
+);
+assert.equal(assignmentDeliveryPolicyHandoffView.itemViews.length, 30);
+assert.deepEqual(assignmentDeliveryPolicyHandoffView.privacy, {
+  createsAssignmentLinks: false,
+  exposesAnswerKeys: false,
+  exposesRawSettingsJson: false,
+  exposesShareSlug: false,
+  exposesSourceMaterialStorageKeys: false,
+  exposesStudentAnswerText: false,
+  exposesStudentNames: false,
+  itemIds: assignmentDeliveryPolicyHandoffIds,
+  mutatesAssignment: false,
+  publicRulesAreSanitized: true,
+  scope: 'assignment-delivery-policy-summary',
+  settingsResolveThroughDomain: true,
+  surfacesShareSummaryView: true,
+});
+assert.deepEqual(
+  assignmentDeliveryPolicyHandoffView.itemViews.map((item) => [
+    item.id,
+    item.value,
+  ]),
+  [
+    ['domain-helper-source', 'delivery-summary.ts'],
+    ['settings-resolution', 'Resolved settings'],
+    [
+      'settings-summary-surface',
+      'Publish dialog + assignment card + result header',
+    ],
+    ['public-rules-surface', 'Student runner'],
+    ['publish-dialog-surface', 'Publish dialog'],
+    ['assignment-card-surface', 'AssignmentSettingsSummaryView'],
+    ['result-header-surface', 'AssignmentSettingsSummaryView'],
+    ['student-runner-surface', 'PublicAssignmentRuleSummaryView'],
+    ['item-count-rule', '4 items'],
+    ['attempts-rule', 'Open'],
+    ['timer-rule', '15 min'],
+    ['close-time-rule', 'No close time'],
+    ['identity-rule', 'Anonymous'],
+    ['answer-reveal-rule', 'Hidden'],
+    ['item-order-rule', 'Fixed order'],
+    ['instructions-rule', 'Read rules before starting.'],
+    [
+      'delivery-rule-order',
+      'attempts -> timer -> closes -> identity -> answerReveal -> itemOrder',
+    ],
+    ['public-rule-count', '7 rules'],
+    ['settings-rule-count', '6 rules'],
+    ['status-derivation', 'Timer on'],
+    ['default-attempts', '2 max'],
+    ['unlimited-attempts', 'Open'],
+    ['timer-normalization', '15 min'],
+    ['close-time-normalization', 'No close time'],
+    [
+      'policy-text-export',
+      'Student instructions: Read rules before starting.; Attempts: Open; Timer: 15 min; Closes: No close time; Student identity: Anonymous; Answer reveal: Hidden; Item order: Fixed order',
+    ],
+    ['snapshot-boundary', 'AssignmentSnapshot'],
+    ['public-payload-boundary', 'Sanitized rules'],
+    ['result-export-boundary', 'Policy text'],
+    ['legacy-copy-guard', 'ClassGamify delivery policy'],
+    ['privacy-guard', 'Private data hidden'],
+  ]
+);
+overwriteGetLocale(() => 'zh');
+try {
+  const zhAssignmentDeliveryPolicyHandoffView =
+    buildAssignmentDeliveryPolicyHandoffView({
+      itemCount: 4,
+      settings: {
+        collectStudentName: false,
+        instructions: '请先阅读规则。',
+        maxAttempts: null,
+        showCorrectAnswers: false,
+        shuffleItems: false,
+        timeLimitSeconds: 15 * 60,
+      },
+    });
+  const zhAssignmentDeliveryPolicyHandoffValue = (id: string) =>
+    zhAssignmentDeliveryPolicyHandoffView.itemViews.find(
+      (item) => item.id === id
+    )?.value;
+
+  assert.equal(
+    zhAssignmentDeliveryPolicyHandoffView.title,
+    '作业分发策略交接'
+  );
+  assert.equal(
+    zhAssignmentDeliveryPolicyHandoffValue('settings-summary-surface'),
+    '发布弹窗 + 作业卡片 + 结果页头'
+  );
+  assert.equal(
+    zhAssignmentDeliveryPolicyHandoffValue('public-rules-surface'),
+    '学生作答器'
+  );
+  assert.equal(
+    zhAssignmentDeliveryPolicyHandoffValue('policy-text-export'),
+    '学生说明：请先阅读规则。；作答次数：不限次数；计时：15 分钟；关闭时间：不设关闭时间；学生身份：匿名；答案显示：隐藏；题目顺序：固定顺序'
+  );
+  assert.equal(
+    zhAssignmentDeliveryPolicyHandoffValue('privacy-guard'),
+    '私密数据隐藏'
   );
 } finally {
   overwriteGetLocale(() => 'en');
