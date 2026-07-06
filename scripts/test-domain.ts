@@ -7540,7 +7540,12 @@ assert.match(
 assert.match(
   publicPageViewSource,
   /buildRoadmapTaskView\(\{[\s\S]*evidenceLabel: m\.roadmap_task_evidence_label\(\)[\s\S]*nextStepLabel: m\.roadmap_task_next_step_label\(\)[\s\S]*statusAriaLabel: m\.roadmap_task_status_aria/,
-  'Roadmap task status evidence and next-step labels should be prepared through localized page view helpers.'
+  'Roadmap task status, teacher-value, and product-direction labels should be prepared through localized page view helpers.'
+);
+assert.match(
+  readFileSync('tests/e2e/TEST-CATALOG.md', 'utf8'),
+  /\|\s*17\s*\|\s*Homepage and template routes enter ClassGamify product loops\s*\|[\s\S]*teacher-value label[\s\S]*product-direction next step[\s\S]*rather than internal classroom-evidence or task-board wording/,
+  'E2E catalog should require roadmap items to use teacher-value and product-direction wording instead of internal task-board language.'
 );
 assert.match(
   publicPageViewSource,
@@ -37454,19 +37459,19 @@ assert.deepEqual(roadmapPageViewModel, {
   columns: [
     {
       description:
-        'The teacher and student foundation that must stay reliable while older entry points are cleaned up.',
+        'Teacher and student workflows that are already useful in the classroom.',
       id: 'done',
       items: [
         {
           description:
             'Teachers can create reusable structured activities, publish assignment links, and keep snapshots stable for student attempts.',
           evidence:
-            'The current loop saves activities, publishes share links, freezes assignment snapshots, accepts public attempts, and shows teacher results.',
-          evidenceLabel: 'Classroom evidence',
+            'Teachers can save an activity, share a stable assignment link, collect responses, and review results from the same place.',
+          evidenceLabel: 'Teacher value',
           id: 'activity-assignment-loop',
           nextStep:
-            'Keep distribution and result review reliable while older entry points are cleaned up in small, careful updates.',
-          nextStepLabel: 'Next step',
+            'Keep sharing and review dependable as the product becomes easier to navigate.',
+          nextStepLabel: 'What improves next',
           status: 'available',
           statusAriaLabel: 'Activity to assignment loop status: Live',
           statusLabel: 'Live',
@@ -37476,12 +37481,12 @@ assert.deepEqual(roadmapPageViewModel, {
           description:
             'Quiz, matching games, group sorting, line matching, fill-ins, listening, pair matching, and box reveal modes share one content model.',
           evidence:
-            'The student runner uses the same runtime answer contract across quizzes, matching games, line matching, group sorting, fill-ins, listening, pair matching, and box reveal modes.',
-          evidenceLabel: 'Classroom evidence',
+            'The same activity content can become quizzes, matching games, sorting, fill-ins, listening, pair matching, line matching, or box reveal.',
+          evidenceLabel: 'Teacher value',
           id: 'playable-template-foundation',
           nextStep:
-            'Deepen each template interaction without splitting scoring, snapshots, or result review into separate data shapes.',
-          nextStepLabel: 'Next step',
+            'Make each mode smoother without asking teachers to rebuild the same lesson.',
+          nextStepLabel: 'What improves next',
           status: 'available',
           statusAriaLabel: 'Playable template foundation status: Live',
           statusLabel: 'Live',
@@ -37491,12 +37496,12 @@ assert.deepEqual(roadmapPageViewModel, {
           description:
             'Teachers can generate AI-assisted activity drafts, review coverage, inspect safe source-material provenance, and edit everything before saving.',
           evidence:
-            'AI drafts now fill the normal activity editor with teacher-reviewable questions, pairs, groups, vocabulary, notes, readiness, trust, and safety summaries.',
-          evidenceLabel: 'Classroom evidence',
+            'Drafts open in the normal editor so teachers can inspect, edit, and publish only what fits the class.',
+          evidenceLabel: 'Teacher value',
           id: 'ai-assisted-activity-drafting',
           nextStep:
-            'Extend from draft creation into deterministic remix assists, distractor generation, leveled variants, and worksheet extraction.',
-          nextStepLabel: 'Next step',
+            'Add safer remix help, distractor suggestions, leveled variants, and worksheet extraction.',
+          nextStepLabel: 'What improves next',
           status: 'available',
           statusAriaLabel: 'Teacher-reviewed AI drafts status: Live',
           statusLabel: 'Live',
@@ -37515,12 +37520,12 @@ assert.deepEqual(roadmapPageViewModel, {
           description:
             'Make completion, scores, item misses, exports, and review filters clearer for teacher follow-up.',
           evidence:
-            'Result pages already expose metrics, review filters, classroom briefs, reteach plans, item review summaries, student follow-up summaries, CSV export, and printable follow-up paths.',
-          evidenceLabel: 'Classroom evidence',
+            'Teachers can see class results, filter what needs attention, copy reteach notes, export results, and prepare follow-up materials.',
+          evidenceLabel: 'Teacher value',
           id: 'results-reteach-summaries',
           nextStep:
-            'Keep sharpening the current review scope, teacher-facing summaries, and offline export confidence around the same results data.',
-          nextStepLabel: 'Next step',
+            'Make the review view faster to scan and easier to turn into the next lesson.',
+          nextStepLabel: 'What improves next',
           status: 'improving',
           statusAriaLabel: 'Results and reteach summaries status: Improving',
           statusLabel: 'Improving',
@@ -37530,12 +37535,12 @@ assert.deepEqual(roadmapPageViewModel, {
           description:
             'Tighten printable follow-up, fill-in, line matching, and listening flows around the same assignment snapshot.',
           evidence:
-            'Worksheet-style modes and printable assignment pages already reuse frozen assignment snapshots, delivery settings, answer reveal rules, and accepted alternatives.',
-          evidenceLabel: 'Classroom evidence',
+            'Teachers can move the same assignment into printable practice, worksheet-style activities, and follow-up review.',
+          evidenceLabel: 'Teacher value',
           id: 'worksheet-style-delivery',
           nextStep:
-            'Improve worksheet preparation, audio setup, and future extraction without creating a parallel worksheet product.',
-          nextStepLabel: 'Next step',
+            'Make printing, audio setup, and worksheet follow-up feel like one classroom workflow.',
+          nextStepLabel: 'What improves next',
           status: 'improving',
           statusAriaLabel: 'Worksheet-style delivery status: Improving',
           statusLabel: 'Improving',
@@ -37547,19 +37552,19 @@ assert.deepEqual(roadmapPageViewModel, {
     },
     {
       description:
-        'Next product bets once the core classroom loop stays dependable.',
+        'Later improvements once the core classroom loop stays dependable.',
       id: 'backlog',
       items: [
         {
           description:
             'Read teacher-uploaded worksheets into structured prompts, accepted answers, and printable follow-up modes.',
           evidence:
-            'Uploaded worksheet files can already attach to activities as safe private source-material references.',
-          evidenceLabel: 'Classroom evidence',
+            'Teachers can already keep worksheet source material attached to an activity without showing it to students.',
+          evidenceLabel: 'Teacher value',
           id: 'worksheet-extraction',
           nextStep:
-            'Design teacher-reviewed extraction before reading file bytes or changing the shared activity schema.',
-          nextStepLabel: 'Next step',
+            'Make worksheet import teacher-reviewed, predictable, and easy to correct before it becomes a classroom activity.',
+          nextStepLabel: 'What improves next',
           status: 'planned',
           statusAriaLabel: 'Worksheet extraction status: Exploring',
           statusLabel: 'Exploring',
@@ -37569,12 +37574,12 @@ assert.deepEqual(roadmapPageViewModel, {
           description:
             'Add multi-teacher sharing, class-level result retention, and permission rules for schools and learning centers.',
           evidence:
-            'The product currently keeps teacher-owned activities, assignment links, student attempts, and result records scoped to the signed-in owner.',
-          evidenceLabel: 'Classroom evidence',
+            'Teachers can keep their own activities, assignment links, student attempts, and result records together in one signed-in workspace.',
+          evidenceLabel: 'Teacher value',
           id: 'school-team-workflows',
           nextStep:
-            'Validate school data rules, teacher seats, and permission boundaries before broadening workspace sharing.',
-          nextStepLabel: 'Next step',
+            'Make team sharing clear enough for schools before adding shared workspaces or teacher seats.',
+          nextStepLabel: 'What improves next',
           status: 'planned',
           statusAriaLabel: 'School team workflows status: Exploring',
           statusLabel: 'Exploring',
@@ -37582,7 +37587,7 @@ assert.deepEqual(roadmapPageViewModel, {
         },
       ],
       status: 'Exploring',
-      title: 'Next bets',
+      title: 'Planned next',
     },
   ],
   hero: {
@@ -37649,9 +37654,9 @@ assert.deepEqual(roadmapPageViewModel, {
       to: Routes.ContactClassroom,
     },
     description:
-      'We prioritize work that can be tested in the teacher flow, improves assignment delivery or review, and strengthens the data model instead of creating one-off demos.',
+      'We prioritize improvements that help teachers prepare, share, review, or reuse classroom activities with less friction.',
     eyebrowLabel: 'How we decide',
-    title: 'Every roadmap item needs classroom proof',
+    title: 'We choose work that saves teachers time',
   },
 });
 assert.deepEqual(
@@ -37700,8 +37705,8 @@ assert.deepEqual(
     ['worksheet-delivery-focus', 'Improving'],
     ['worksheet-extraction-boundary', 'Exploring'],
     ['school-workflow-boundary', 'Exploring'],
-    ['task-evidence-boundary', 'Public evidence only'],
-    ['task-next-step-boundary', 'Shared next steps'],
+    ['task-evidence-boundary', 'Public product summary'],
+    ['task-next-step-boundary', 'Product direction'],
     ['hero-action-boundary', 'Ready teacher actions'],
     ['create-route', Routes.Create],
     ['templates-route', Routes.Templates],
@@ -37714,7 +37719,7 @@ assert.deepEqual(
     ['principle-model-boundary', 'One content model'],
     [
       'validation-decision-boundary',
-      'Every roadmap item needs classroom proof',
+      'We choose work that saves teachers time',
     ],
     ['public-copy-boundary', 'Prepared product copy'],
     ['legacy-copy-guard', 'ClassGamify only'],

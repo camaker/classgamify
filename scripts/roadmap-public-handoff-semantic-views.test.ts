@@ -55,6 +55,13 @@ test('roadmap handoff exposes 30 safe public product-boundary slices', () => {
     scope: 'public-roadmap-product-boundary',
     usesPreparedViewModel: true,
   });
+  const serializedPageView = JSON.stringify(buildRoadmapPageViewModel());
+  assert.equal(serializedPageView.includes('Classroom evidence'), false);
+  assert.equal(
+    serializedPageView.includes('Every roadmap item needs classroom proof'),
+    false
+  );
+
   assert.deepEqual(
     handoffView.itemViews.map((item) => [item.id, item.value]),
     [
@@ -72,8 +79,8 @@ test('roadmap handoff exposes 30 safe public product-boundary slices', () => {
       ['worksheet-delivery-focus', 'Improving'],
       ['worksheet-extraction-boundary', 'Exploring'],
       ['school-workflow-boundary', 'Exploring'],
-      ['task-evidence-boundary', 'Public evidence only'],
-      ['task-next-step-boundary', 'Shared next steps'],
+      ['task-evidence-boundary', 'Public product summary'],
+      ['task-next-step-boundary', 'Product direction'],
       ['hero-action-boundary', 'Ready teacher actions'],
       ['create-route', Routes.Create],
       ['templates-route', Routes.Templates],
@@ -86,7 +93,7 @@ test('roadmap handoff exposes 30 safe public product-boundary slices', () => {
       ['principle-model-boundary', 'One content model'],
       [
         'validation-decision-boundary',
-        'Every roadmap item needs classroom proof',
+        'We choose work that saves teachers time',
       ],
       ['public-copy-boundary', 'Prepared product copy'],
       ['legacy-copy-guard', 'ClassGamify only'],
@@ -126,8 +133,16 @@ test('roadmap handoff localizes Chinese product boundaries', () => {
       '一套内容模型'
     );
     assert.equal(
+      getHandoffItemValue(handoffView, 'task-evidence-boundary'),
+      '公开产品摘要'
+    );
+    assert.equal(
+      getHandoffItemValue(handoffView, 'task-next-step-boundary'),
+      '产品方向'
+    );
+    assert.equal(
       getHandoffItemValue(handoffView, 'validation-decision-boundary'),
-      '每个路线图项目都需要课堂证据'
+      '我们选择真正节省老师时间的工作'
     );
     assert.equal(
       getHandoffItemValue(handoffView, 'public-copy-boundary'),
