@@ -594,6 +594,71 @@ export type AssignmentResultReviewStatusView = {
   title: string;
 };
 
+export const ASSIGNMENT_RESULT_REVIEW_CONTROLS_HANDOFF_ITEM_IDS = [
+  'route-parser',
+  'route-update-helper',
+  'route-default-elision',
+  'invalid-route-guard',
+  'search-normalization',
+  'resolved-student-search',
+  'student-search-status',
+  'student-search-match-count',
+  'student-sort-option',
+  'student-sort-status',
+  'student-sort-default',
+  'item-sort-option',
+  'item-sort-status',
+  'item-sort-default',
+  'answer-review-filter',
+  'answer-review-status',
+  'answer-review-default',
+  'filtered-students',
+  'filtered-attempt-rows',
+  'filtered-answer-reviews',
+  'sorted-performance-items',
+  'review-scope-summary',
+  'copy-scope-students',
+  'copy-scope-items',
+  'copy-scope-review',
+  'table-consumer',
+  'review-card-consumer',
+  'copy-artifact-consumer',
+  'anonymous-label-search',
+  'privacy-guard',
+] as const;
+
+export type AssignmentResultReviewControlsHandoffItemId =
+  (typeof ASSIGNMENT_RESULT_REVIEW_CONTROLS_HANDOFF_ITEM_IDS)[number];
+
+export type AssignmentResultReviewControlsHandoffPrivacyContract = {
+  exposesCopyArtifactText: false;
+  exposesRawAnonymousToken: false;
+  exposesRawRouteQuery: false;
+  exposesStudentAnswerText: false;
+  exposesStudentDisplayLabels: false;
+  exposesTeacherAnswerKey: false;
+  itemIds: AssignmentResultReviewControlsHandoffItemId[];
+  mutatesResultData: false;
+  scope: 'teacher-result-review-controls';
+  usesAssignmentDomainHelpers: true;
+};
+
+export type AssignmentResultReviewControlsHandoffItemView = {
+  ariaLabel: string;
+  description: string;
+  id: AssignmentResultReviewControlsHandoffItemId;
+  label: string;
+  statusLabel?: string;
+  value: string;
+};
+
+export type AssignmentResultReviewControlsHandoffView = {
+  description: string;
+  itemViews: AssignmentResultReviewControlsHandoffItemView[];
+  privacy: AssignmentResultReviewControlsHandoffPrivacyContract;
+  title: string;
+};
+
 export const ASSIGNMENT_RESULT_REVIEW_HANDOFF_ITEM_IDS = [
   'review-status',
   'review-next-step',
@@ -762,6 +827,7 @@ export type AssignmentResultsPageViewModel<
   materialHandoffView: AssignmentResultMaterialHandoffView;
   metricItems: AssignmentResultMetricItem[];
   resultView: AssignmentResultViewModel<TAttempt>;
+  reviewControlsHandoffView: AssignmentResultReviewControlsHandoffView;
   reviewHandoffView: AssignmentResultReviewHandoffView;
   reviewStatusView: AssignmentResultReviewStatusView;
   reviewScopeView: AssignmentResultReviewScopeView;
@@ -2413,6 +2479,13 @@ export function buildAssignmentResultsPageViewModel<
     controlViews,
     summary: resultView.reviewScope.summary,
   });
+  const reviewControlsHandoffView =
+    buildAssignmentResultReviewControlsHandoffView({
+      controlViews,
+      copyScopeView,
+      reviewScope: resultView.reviewScope,
+      viewState,
+    });
   const reviewStatusView = buildAssignmentResultReviewStatusView({
     controlViews,
     summary: resultView.reviewScope.summary,
@@ -2576,6 +2649,7 @@ export function buildAssignmentResultsPageViewModel<
         })
       : [],
     resultView,
+    reviewControlsHandoffView,
     reviewHandoffView,
     reviewStatusView,
     reviewScopeView,
@@ -2926,6 +3000,415 @@ export function buildAssignmentResultReviewScopeView({
     summaryLabel: assignmentResultReviewScopeCopy.matchedRecordsLabel,
     title: assignmentResultReviewScopeCopy.title,
   };
+}
+
+export function buildAssignmentResultReviewControlsHandoffView<
+  TAttempt extends AssignmentAttemptRowInput,
+>({
+  controlViews,
+  copyScopeView,
+  reviewScope,
+  viewState,
+}: {
+  controlViews: AssignmentResultControlViews;
+  copyScopeView: AssignmentResultCopyScopeView;
+  reviewScope: AssignmentResultReviewScope<TAttempt>;
+  viewState: AssignmentResultResolvedViewState;
+}): AssignmentResultReviewControlsHandoffView {
+  const itemViews = ASSIGNMENT_RESULT_REVIEW_CONTROLS_HANDOFF_ITEM_IDS.map(
+    (id) =>
+      buildAssignmentResultReviewControlsHandoffItem({
+        controlViews,
+        copyScopeView,
+        id,
+        reviewScope,
+        viewState,
+      })
+  );
+
+  return {
+    description: m.assignment_result_review_controls_handoff_description(),
+    itemViews,
+    privacy:
+      buildAssignmentResultReviewControlsHandoffPrivacyContract(itemViews),
+    title: m.assignment_result_review_controls_handoff_title(),
+  };
+}
+
+type AssignmentResultReviewControlsHandoffBuildContext<
+  TAttempt extends AssignmentAttemptRowInput,
+> = {
+  controlViews: AssignmentResultControlViews;
+  copyScopeView: AssignmentResultCopyScopeView;
+  id: AssignmentResultReviewControlsHandoffItemId;
+  reviewScope: AssignmentResultReviewScope<TAttempt>;
+  viewState: AssignmentResultResolvedViewState;
+};
+
+function buildAssignmentResultReviewControlsHandoffItem<
+  TAttempt extends AssignmentAttemptRowInput,
+>(
+  context: AssignmentResultReviewControlsHandoffBuildContext<TAttempt>
+): AssignmentResultReviewControlsHandoffItemView {
+  const { controlViews, copyScopeView, id, reviewScope, viewState } = context;
+  const summary = reviewScope.summary;
+
+  switch (id) {
+    case 'route-parser':
+      return buildAssignmentResultReviewControlsHandoffItemView({
+        description:
+          m.assignment_result_review_controls_handoff_route_parser_description(),
+        id,
+        label: m.assignment_result_review_controls_handoff_route_parser_label(),
+        value: 'buildAssignmentResultRouteSearch',
+      });
+    case 'route-update-helper':
+      return buildAssignmentResultReviewControlsHandoffItemView({
+        description:
+          m.assignment_result_review_controls_handoff_route_update_description(),
+        id,
+        label: m.assignment_result_review_controls_handoff_route_update_label(),
+        value: 'buildAssignmentResultControlSearchState',
+      });
+    case 'route-default-elision':
+      return buildAssignmentResultReviewControlsHandoffItemView({
+        description:
+          m.assignment_result_review_controls_handoff_default_elision_description(),
+        id,
+        label:
+          m.assignment_result_review_controls_handoff_default_elision_label(),
+        value:
+          m.assignment_result_review_controls_handoff_default_elision_value(),
+      });
+    case 'invalid-route-guard':
+      return buildAssignmentResultReviewControlsHandoffItemView({
+        description:
+          m.assignment_result_review_controls_handoff_invalid_route_description(),
+        id,
+        label:
+          m.assignment_result_review_controls_handoff_invalid_route_label(),
+        value:
+          m.assignment_result_review_controls_handoff_invalid_route_value(),
+      });
+    case 'search-normalization':
+      return buildAssignmentResultReviewControlsHandoffItemView({
+        description:
+          m.assignment_result_review_controls_handoff_search_normalization_description(),
+        id,
+        label:
+          m.assignment_result_review_controls_handoff_search_normalization_label(),
+        value: 'NFKC + trim',
+      });
+    case 'resolved-student-search':
+      return buildAssignmentResultReviewControlsHandoffItemView({
+        description: assignmentResultReviewScopeCopy.searchDescription,
+        id,
+        label: assignmentResultReviewScopeCopy.searchLabel,
+        statusLabel: controlViews.studentSearch.searchStatusView.value,
+        value: viewState.studentSearch
+          ? m.assignment_result_review_controls_handoff_search_applied_value()
+          : assignmentResultReviewScopeCopy.searchAllValue,
+      });
+    case 'student-search-status':
+      return buildAssignmentResultReviewControlsHandoffItemView({
+        description:
+          m.assignment_result_review_controls_handoff_student_search_status_description(),
+        id,
+        label: m.assignment_result_review_handoff_student_search_status_label(),
+        statusLabel: controlViews.studentSearch.searchStatusView.value,
+        value: controlViews.studentSearch.searchStatusView.value,
+      });
+    case 'student-search-match-count':
+      return buildAssignmentResultReviewControlsHandoffItemView({
+        description:
+          m.assignment_result_review_controls_handoff_student_search_match_description(),
+        id,
+        label:
+          m.assignment_result_review_controls_handoff_student_search_match_label(),
+        value: formatAssignmentResultCopyScopeSummaryCount(summary.students),
+      });
+    case 'student-sort-option':
+      return buildAssignmentResultReviewControlsHandoffItemView({
+        description: controlViews.studentSearch.selectedSortOption.description,
+        id,
+        label: assignmentResultReviewScopeCopy.studentSortLabel,
+        statusLabel: controlViews.studentSearch.sortStatusView.value,
+        value: controlViews.studentSearch.selectedSortOption.label,
+      });
+    case 'student-sort-status':
+      return buildAssignmentResultReviewControlsHandoffItemView({
+        description: controlViews.studentSearch.sortStatusView.description,
+        id,
+        label: m.assignment_result_review_handoff_student_sort_status_label(),
+        statusLabel: controlViews.studentSearch.sortStatusView.value,
+        value: controlViews.studentSearch.sortStatusView.value,
+      });
+    case 'student-sort-default':
+      return buildAssignmentResultReviewControlsHandoffItemView({
+        description:
+          m.assignment_result_review_controls_handoff_student_sort_default_description(),
+        id,
+        label:
+          m.assignment_result_review_controls_handoff_student_sort_default_label(),
+        value: formatAssignmentResultReviewControlDefaultValue(
+          viewState.studentSort === DEFAULT_STUDENT_SUMMARY_SORT
+        ),
+      });
+    case 'item-sort-option':
+      return buildAssignmentResultReviewControlsHandoffItemView({
+        description:
+          controlViews.itemPerformanceSort.selectedSortOption.description,
+        id,
+        label: assignmentResultReviewScopeCopy.itemSortLabel,
+        statusLabel: controlViews.itemPerformanceSort.statusView.value,
+        value: controlViews.itemPerformanceSort.selectedSortOption.label,
+      });
+    case 'item-sort-status':
+      return buildAssignmentResultReviewControlsHandoffItemView({
+        description: controlViews.itemPerformanceSort.statusView.description,
+        id,
+        label: m.assignment_result_review_handoff_item_sort_status_label(),
+        statusLabel: controlViews.itemPerformanceSort.statusView.value,
+        value: controlViews.itemPerformanceSort.statusView.value,
+      });
+    case 'item-sort-default':
+      return buildAssignmentResultReviewControlsHandoffItemView({
+        description:
+          m.assignment_result_review_controls_handoff_item_sort_default_description(),
+        id,
+        label:
+          m.assignment_result_review_controls_handoff_item_sort_default_label(),
+        value: formatAssignmentResultReviewControlDefaultValue(
+          viewState.itemPerformanceSort === DEFAULT_ITEM_PERFORMANCE_SORT
+        ),
+      });
+    case 'answer-review-filter':
+      return buildAssignmentResultReviewControlsHandoffItemView({
+        description:
+          controlViews.attemptReviewFilter.selectedFilterOption.description,
+        id,
+        label: assignmentResultReviewScopeCopy.answerReviewsLabel,
+        statusLabel: controlViews.attemptReviewFilter.statusView.value,
+        value: controlViews.attemptReviewFilter.selectedFilterOption.label,
+      });
+    case 'answer-review-status':
+      return buildAssignmentResultReviewControlsHandoffItemView({
+        description: controlViews.attemptReviewFilter.statusView.description,
+        id,
+        label: m.assignment_result_review_handoff_answer_review_status_label(),
+        statusLabel: controlViews.attemptReviewFilter.statusView.value,
+        value: controlViews.attemptReviewFilter.statusView.value,
+      });
+    case 'answer-review-default':
+      return buildAssignmentResultReviewControlsHandoffItemView({
+        description:
+          m.assignment_result_review_controls_handoff_answer_review_default_description(),
+        id,
+        label:
+          m.assignment_result_review_controls_handoff_answer_review_default_label(),
+        value: formatAssignmentResultReviewControlDefaultValue(
+          viewState.attemptReviewFilter === DEFAULT_ATTEMPT_REVIEW_FILTER
+        ),
+      });
+    case 'filtered-students':
+      return buildAssignmentResultReviewControlsHandoffItemView({
+        description:
+          m.assignment_result_review_scope_summary_students_description(),
+        id,
+        label: assignmentResultReviewScopeCopy.studentsLabel,
+        value: formatAssignmentResultCopyScopeSummaryCount(summary.students),
+      });
+    case 'filtered-attempt-rows':
+      return buildAssignmentResultReviewControlsHandoffItemView({
+        description:
+          m.assignment_result_review_scope_summary_attempts_description(),
+        id,
+        label: assignmentResultReviewScopeCopy.attemptsLabel,
+        value: formatAssignmentResultCopyScopeSummaryCount(summary.attemptRows),
+      });
+    case 'filtered-answer-reviews':
+      return buildAssignmentResultReviewControlsHandoffItemView({
+        description:
+          m.assignment_result_review_scope_summary_answer_reviews_description(),
+        id,
+        label: assignmentResultReviewScopeCopy.answerReviewsLabel,
+        value: formatAssignmentResultCopyScopeSummaryCount(
+          summary.attemptReviews
+        ),
+      });
+    case 'sorted-performance-items':
+      return buildAssignmentResultReviewControlsHandoffItemView({
+        description:
+          m.assignment_result_review_scope_summary_items_description(),
+        id,
+        label: assignmentResultReviewScopeCopy.itemsLabel,
+        value: formatAssignmentResultCopyScopeSummaryCount(
+          summary.itemPerformance
+        ),
+      });
+    case 'review-scope-summary':
+      return buildAssignmentResultReviewControlsHandoffItemView({
+        description: assignmentResultReviewScopeCopy.description,
+        id,
+        label: assignmentResultReviewScopeCopy.matchedRecordsLabel,
+        value: m.assignment_result_review_controls_handoff_scope_summary_value({
+          attempts: formatAssignmentResultCopyScopeSummaryCount(
+            summary.attemptRows
+          ),
+          items: formatAssignmentResultCopyScopeSummaryCount(
+            summary.itemPerformance
+          ),
+          reviews: formatAssignmentResultCopyScopeSummaryCount(
+            summary.attemptReviews
+          ),
+          students: formatAssignmentResultCopyScopeSummaryCount(
+            summary.students
+          ),
+        }),
+      });
+    case 'copy-scope-students':
+      return buildAssignmentResultReviewControlsCopyScopeItem({
+        copyScopeItemId: 'students',
+        copyScopeView,
+        id,
+      });
+    case 'copy-scope-items':
+      return buildAssignmentResultReviewControlsCopyScopeItem({
+        copyScopeItemId: 'items',
+        copyScopeView,
+        id,
+      });
+    case 'copy-scope-review':
+      return buildAssignmentResultReviewControlsCopyScopeItem({
+        copyScopeItemId: 'review',
+        copyScopeView,
+        id,
+      });
+    case 'table-consumer':
+      return buildAssignmentResultReviewControlsHandoffItemView({
+        description:
+          m.assignment_result_review_controls_handoff_table_consumer_description(),
+        id,
+        label:
+          m.assignment_result_review_controls_handoff_table_consumer_label(),
+        value:
+          m.assignment_result_review_controls_handoff_table_consumer_value(),
+      });
+    case 'review-card-consumer':
+      return buildAssignmentResultReviewControlsHandoffItemView({
+        description:
+          m.assignment_result_review_controls_handoff_review_card_consumer_description(),
+        id,
+        label:
+          m.assignment_result_review_controls_handoff_review_card_consumer_label(),
+        value:
+          m.assignment_result_review_controls_handoff_review_card_consumer_value(),
+      });
+    case 'copy-artifact-consumer':
+      return buildAssignmentResultReviewControlsHandoffItemView({
+        description:
+          m.assignment_result_review_controls_handoff_copy_artifact_consumer_description(),
+        id,
+        label:
+          m.assignment_result_review_controls_handoff_copy_artifact_consumer_label(),
+        value:
+          m.assignment_result_review_controls_handoff_copy_artifact_consumer_value(),
+      });
+    case 'anonymous-label-search':
+      return buildAssignmentResultReviewControlsHandoffItemView({
+        description:
+          m.assignment_result_review_controls_handoff_anonymous_label_description(),
+        id,
+        label:
+          m.assignment_result_review_controls_handoff_anonymous_label_label(),
+        value:
+          m.assignment_result_review_controls_handoff_anonymous_label_value(),
+      });
+    case 'privacy-guard':
+      return buildAssignmentResultReviewControlsHandoffItemView({
+        description:
+          m.assignment_result_review_controls_handoff_privacy_description(),
+        id,
+        label: m.assignment_result_review_handoff_privacy_label(),
+        value: m.assignment_result_review_handoff_hidden_value(),
+      });
+  }
+}
+
+function buildAssignmentResultReviewControlsCopyScopeItem({
+  copyScopeItemId,
+  copyScopeView,
+  id,
+}: {
+  copyScopeItemId: AssignmentResultCopyScopeItemId;
+  copyScopeView: AssignmentResultCopyScopeView;
+  id: AssignmentResultReviewControlsHandoffItemId;
+}) {
+  const itemView = copyScopeView.itemViews.find(
+    (item) => item.id === copyScopeItemId
+  );
+
+  return buildAssignmentResultReviewControlsHandoffItemView({
+    description:
+      itemView?.description ??
+      m.assignment_result_review_handoff_missing_description(),
+    id,
+    label:
+      itemView?.label ?? m.assignment_result_review_handoff_missing_label(),
+    value:
+      itemView?.value ?? m.assignment_result_review_handoff_missing_value(),
+  });
+}
+
+function buildAssignmentResultReviewControlsHandoffItemView({
+  description,
+  id,
+  label,
+  statusLabel,
+  value,
+}: Omit<AssignmentResultReviewControlsHandoffItemView, 'ariaLabel'>) {
+  return {
+    ariaLabel: statusLabel
+      ? m.assignment_result_review_scope_item_aria_label({
+          description,
+          label,
+          status: statusLabel,
+          value,
+        })
+      : m.assignment_result_copy_scope_summary_item_aria_label({
+          description,
+          label,
+          value,
+        }),
+    description,
+    id,
+    label,
+    ...(statusLabel ? { statusLabel } : {}),
+    value,
+  };
+}
+
+function buildAssignmentResultReviewControlsHandoffPrivacyContract(
+  itemViews: AssignmentResultReviewControlsHandoffItemView[]
+): AssignmentResultReviewControlsHandoffPrivacyContract {
+  return {
+    exposesCopyArtifactText: false,
+    exposesRawAnonymousToken: false,
+    exposesRawRouteQuery: false,
+    exposesStudentAnswerText: false,
+    exposesStudentDisplayLabels: false,
+    exposesTeacherAnswerKey: false,
+    itemIds: itemViews.map((itemView) => itemView.id),
+    mutatesResultData: false,
+    scope: 'teacher-result-review-controls',
+    usesAssignmentDomainHelpers: true,
+  };
+}
+
+function formatAssignmentResultReviewControlDefaultValue(isDefault: boolean) {
+  return isDefault
+    ? m.assignment_result_review_controls_handoff_default_kept_value()
+    : m.assignment_result_review_controls_handoff_default_omitted_value();
 }
 
 export function buildAssignmentResultReviewHandoffView({

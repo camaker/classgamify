@@ -766,6 +766,7 @@ import {
   assignmentResultSearchCopy,
   assignmentResultSectionCopy,
   assignmentResultTableHeaders,
+  ASSIGNMENT_RESULT_REVIEW_CONTROLS_HANDOFF_ITEM_IDS,
   assignmentResultActionDescriptors,
   assignmentResultActionOrder,
   buildAttemptReviewSubmissionSummary,
@@ -804,6 +805,7 @@ import {
   buildAssignmentResultControlViews,
   buildAssignmentResultControlStatusView,
   buildAssignmentResultCopyScopeView,
+  buildAssignmentResultReviewControlsHandoffView,
   buildAssignmentResultReviewHandoffView,
   buildAssignmentResultReviewScopeView,
   buildAssignmentResultReviewStatusView,
@@ -3699,6 +3701,34 @@ assert.match(
   assignmentResultViewSource,
   /buildResultSearchSummary\(\{[\s\S]*search,[\s\S]*summary: reviewScope\.summary/,
   'Assignment result view model should build search summaries from the shared review scope summary.'
+);
+assert.match(
+  assignmentResultViewSource,
+  /ASSIGNMENT_RESULT_REVIEW_CONTROLS_HANDOFF_ITEM_IDS = \[[\s\S]*'route-parser'[\s\S]*'student-search-status'[\s\S]*'copy-scope-students'[\s\S]*'anonymous-label-search'[\s\S]*'privacy-guard'/,
+  'Assignment result review controls handoff should name the route, control, copy-scope, anonymous-label, and privacy slices.'
+);
+assert.match(
+  assignmentResultViewSource,
+  /buildAssignmentResultReviewControlsHandoffView\(\{[\s\S]*controlViews,[\s\S]*copyScopeView,[\s\S]*reviewScope: resultView\.reviewScope,[\s\S]*viewState/,
+  'Assignment result page view should attach the review controls handoff from the same scope used by visible tables and copy artifacts.'
+);
+assert.match(
+  assignmentResultViewSource,
+  /buildAssignmentResultReviewControlsHandoffPrivacyContract[\s\S]*exposesRawRouteQuery: false[\s\S]*exposesStudentDisplayLabels: false[\s\S]*usesAssignmentDomainHelpers: true/,
+  'Assignment result review controls handoff should keep raw route queries and display labels out of semantic output while naming the domain-helper boundary.'
+);
+assert.match(
+  readFileSync(
+    'src/components/assignments/assignment-results-review-handoff-panel.tsx',
+    'utf8'
+  ),
+  /data-handoff="assignment-result-review-controls"[\s\S]*view\.itemViews\.map[\s\S]*data-handoff-item=\{itemView\.id\}[\s\S]*aria-label=\{itemView\.ariaLabel\}/,
+  'Assignment results review handoff panel should render the hidden result review controls semantic handoff.'
+);
+assert.match(
+  readFileSync('src/routes/dashboard/assignments/$assignmentId.tsx', 'utf8'),
+  /controlsView=\{pageView\.reviewControlsHandoffView\}/,
+  'Assignment results route should pass the prepared result review controls handoff into the review panel.'
 );
 assert.doesNotMatch(
   assignmentResultViewSource,
@@ -53440,6 +53470,102 @@ assert.equal(
   }).itemViews[0]?.value,
   'All students'
 );
+const scoredResultReviewControlsHandoffView =
+  scoredResultsPageView.reviewControlsHandoffView;
+const scoredResultReviewControlsHandoffValues = new Map(
+  scoredResultReviewControlsHandoffView.itemViews.map((itemView) => [
+    itemView.id,
+    itemView.value,
+  ])
+);
+assert.deepEqual(
+  scoredResultReviewControlsHandoffView.itemViews.map((itemView) => itemView.id),
+  [...ASSIGNMENT_RESULT_REVIEW_CONTROLS_HANDOFF_ITEM_IDS]
+);
+assert.equal(scoredResultReviewControlsHandoffView.itemViews.length, 30);
+assert.deepEqual(scoredResultReviewControlsHandoffView.privacy, {
+  exposesCopyArtifactText: false,
+  exposesRawAnonymousToken: false,
+  exposesRawRouteQuery: false,
+  exposesStudentAnswerText: false,
+  exposesStudentDisplayLabels: false,
+  exposesTeacherAnswerKey: false,
+  itemIds: [...ASSIGNMENT_RESULT_REVIEW_CONTROLS_HANDOFF_ITEM_IDS],
+  mutatesResultData: false,
+  scope: 'teacher-result-review-controls',
+  usesAssignmentDomainHelpers: true,
+});
+assert.deepEqual(
+  scoredResultReviewControlsHandoffView,
+  buildAssignmentResultReviewControlsHandoffView({
+    controlViews: scoredResultsPageView.controlViews,
+    copyScopeView: scoredResultsPageView.copyScopeView,
+    reviewScope: scoredResultsPageView.resultView.reviewScope,
+    viewState: scoredResultsPageView.viewState,
+  })
+);
+assert.deepEqual([...scoredResultReviewControlsHandoffValues.entries()], [
+  ['route-parser', 'buildAssignmentResultRouteSearch'],
+  ['route-update-helper', 'buildAssignmentResultControlSearchState'],
+  ['route-default-elision', 'Defaults omitted'],
+  ['invalid-route-guard', 'Invalid values cleared'],
+  ['search-normalization', 'NFKC + trim'],
+  ['resolved-student-search', 'Search applied'],
+  ['student-search-status', 'Adjusted'],
+  ['student-search-match-count', '1/1'],
+  ['student-sort-option', 'Student name'],
+  ['student-sort-status', 'Adjusted'],
+  ['student-sort-default', 'Non-default persisted'],
+  ['item-sort-option', 'Lowest accuracy'],
+  ['item-sort-status', 'Adjusted'],
+  ['item-sort-default', 'Non-default persisted'],
+  ['answer-review-filter', 'Needs review only'],
+  ['answer-review-status', 'Adjusted'],
+  ['answer-review-default', 'Non-default persisted'],
+  ['filtered-students', '1/1'],
+  ['filtered-attempt-rows', '1/1'],
+  ['filtered-answer-reviews', '1/1'],
+  ['sorted-performance-items', '2/2'],
+  [
+    'review-scope-summary',
+    'Students 1/1; attempts 1/1; items 2/2; reviews 1/1',
+  ],
+  ['copy-scope-students', '1 student · 1 attempt'],
+  ['copy-scope-items', 'Lowest accuracy'],
+  ['copy-scope-review', 'Needs review only'],
+  ['table-consumer', 'Result tables'],
+  ['review-card-consumer', 'Answer review cards'],
+  ['copy-artifact-consumer', 'Current copy scope'],
+  ['anonymous-label-search', 'Normalized labels only'],
+  ['privacy-guard', 'Hidden'],
+]);
+assert.equal(
+  defaultResultsPageView.reviewControlsHandoffView.itemViews.find(
+    (itemView) => itemView.id === 'resolved-student-search'
+  )?.value,
+  'All students'
+);
+assert.equal(
+  defaultResultsPageView.reviewControlsHandoffView.itemViews.find(
+    (itemView) => itemView.id === 'student-sort-default'
+  )?.value,
+  'Default kept'
+);
+for (const privateControlsHandoffValue of [
+  'Alice',
+  'answer-1',
+  'q-1',
+  'share-123',
+  'data:text/csv',
+]) {
+  assert.equal(
+    JSON.stringify(scoredResultReviewControlsHandoffView).includes(
+      privateControlsHandoffValue
+    ),
+    false,
+    `Result review controls handoff leaked private text: ${privateControlsHandoffValue}`
+  );
+}
 assert.deepEqual(
   {
     actionDisabled: scoredResultsPageView.actionButtons.map((button) => [

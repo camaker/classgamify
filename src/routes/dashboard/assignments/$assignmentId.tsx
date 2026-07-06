@@ -170,6 +170,7 @@ function LoadedAssignmentResultsPage({
           ) : null}
           <AssignmentResultsReviewScopePanel view={pageView.reviewScopeView} />
           <AssignmentResultsReviewHandoffPanel
+            controlsView={pageView.reviewControlsHandoffView}
             view={pageView.reviewHandoffView}
           />
           <AssignmentResultsStudentSearch

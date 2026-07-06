@@ -1,11 +1,17 @@
-import type { AssignmentResultReviewHandoffView } from '@/assignments/result-view';
+import type {
+  AssignmentResultReviewControlsHandoffItemView,
+  AssignmentResultReviewControlsHandoffView,
+  AssignmentResultReviewHandoffView,
+} from '@/assignments/result-view';
 import { Badge } from '@/components/ui/badge';
 
 type AssignmentResultsReviewHandoffPanelProps = {
+  controlsView: AssignmentResultReviewControlsHandoffView;
   view: AssignmentResultReviewHandoffView;
 };
 
 export function AssignmentResultsReviewHandoffPanel({
+  controlsView,
   view,
 }: AssignmentResultsReviewHandoffPanelProps) {
   const titleId = 'assignment-result-review-handoff-title';
@@ -50,6 +56,62 @@ export function AssignmentResultsReviewHandoffPanel({
           </article>
         ))}
       </div>
+      <AssignmentResultReviewControlsHandoff view={controlsView} />
     </section>
+  );
+}
+
+function AssignmentResultReviewControlsHandoff({
+  view,
+}: {
+  view: AssignmentResultReviewControlsHandoffView;
+}) {
+  const titleId = 'assignment-result-review-controls-handoff-title';
+  const descriptionId = 'assignment-result-review-controls-handoff-description';
+
+  return (
+    <section
+      aria-describedby={descriptionId}
+      aria-labelledby={titleId}
+      className="sr-only"
+      data-handoff="assignment-result-review-controls"
+    >
+      <h3 id={titleId}>{view.title}</h3>
+      <p id={descriptionId}>{view.description}</p>
+      {view.itemViews.map((itemView) => (
+        <AssignmentResultReviewControlsHandoffItem
+          itemView={itemView}
+          key={itemView.id}
+        />
+      ))}
+    </section>
+  );
+}
+
+function AssignmentResultReviewControlsHandoffItem({
+  itemView,
+}: {
+  itemView: AssignmentResultReviewControlsHandoffItemView;
+}) {
+  const labelId = `assignment-result-review-controls-${itemView.id}-label`;
+  const valueId = `assignment-result-review-controls-${itemView.id}-value`;
+  const descriptionId = `assignment-result-review-controls-${itemView.id}-description`;
+
+  return (
+    <div data-handoff-item={itemView.id}>
+      <span id={labelId}>{itemView.label}</span>
+      <output
+        aria-describedby={descriptionId}
+        aria-label={itemView.ariaLabel}
+        aria-labelledby={`${labelId} ${valueId}`}
+        id={valueId}
+      >
+        {itemView.value}
+      </output>
+      {itemView.statusLabel ? (
+        <span aria-hidden="true">{itemView.statusLabel}</span>
+      ) : null}
+      <span id={descriptionId}>{itemView.description}</span>
+    </div>
   );
 }
