@@ -907,6 +907,8 @@ import {
   sortAssignmentItemsByReviewPriority,
 } from '@/assignments/review-priority';
 import {
+  ASSIGNMENT_STUDENT_FOLLOW_UP_PRIORITY_HANDOFF_ITEM_IDS,
+  buildAssignmentStudentFollowUpPriorityHandoffView,
   compareAssignmentStudentsByDisplayLabel,
   getAssignmentStudentFollowUpPriorityStudents,
   sortAssignmentStudentsByFollowUpPriority,
@@ -3717,6 +3719,112 @@ assert.match(
   assignmentStudentFollowUpPrioritySource,
   /export function compareAssignmentStudentsByDisplayLabel[\s\S]*compareRuntimeDisplaySearchText/,
   'Assignment student follow-up ordering should expose a stable display-label comparator.'
+);
+const studentFollowUpPriorityFixture = [
+  {
+    attempts: 1,
+    averageAccuracy: 60,
+    bestAccuracy: 70,
+    lastCompletedAt: new Date('2026-01-01T09:00:00.000Z'),
+    latestAccuracy: 65,
+    needsReviewCount: 3,
+    studentKey: 'student-a',
+    studentLabel: 'Student A',
+  },
+  {
+    attempts: 1,
+    averageAccuracy: 70,
+    bestAccuracy: 80,
+    lastCompletedAt: new Date('2026-01-01T09:05:00.000Z'),
+    latestAccuracy: 80,
+    needsReviewCount: 3,
+    studentKey: 'student-b',
+    studentLabel: 'Student B',
+  },
+  {
+    attempts: 1,
+    averageAccuracy: 95,
+    bestAccuracy: 95,
+    lastCompletedAt: new Date('2026-01-01T09:10:00.000Z'),
+    latestAccuracy: 95,
+    needsReviewCount: 0,
+    studentKey: 'student-c',
+    studentLabel: 'Student C',
+  },
+];
+const studentFollowUpPriorityHandoff =
+  buildAssignmentStudentFollowUpPriorityHandoffView({
+    limit: 1,
+    selectedStudents: getAssignmentStudentFollowUpPriorityStudents(
+      studentFollowUpPriorityFixture,
+      {
+        limit: 1,
+      }
+    ),
+    students: studentFollowUpPriorityFixture,
+    surface: 'classroom-brief',
+  });
+assert.deepEqual(
+  studentFollowUpPriorityHandoff.itemViews.map((itemView) => itemView.id),
+  [...ASSIGNMENT_STUDENT_FOLLOW_UP_PRIORITY_HANDOFF_ITEM_IDS],
+  'Assignment student follow-up priority handoff should expose stable 30-slice ids.'
+);
+assert.equal(
+  studentFollowUpPriorityHandoff.itemViews.length,
+  30,
+  'Assignment student follow-up priority handoff should expose exactly 30 slices.'
+);
+assert.deepEqual(
+  studentFollowUpPriorityHandoff.privacy,
+  {
+    exposesRawAnonymousToken: false,
+    exposesStudentAnswerText: false,
+    exposesStudentDisplayLabels: false,
+    exposesStudentKeys: false,
+    exposesTeacherAnswerKey: false,
+    itemIds: [...ASSIGNMENT_STUDENT_FOLLOW_UP_PRIORITY_HANDOFF_ITEM_IDS],
+    mutatesResultData: false,
+    scope: 'teacher-student-follow-up-priority',
+    usesSharedPriorityHelper: true,
+  },
+  'Assignment student follow-up priority handoff should keep private result data out of semantic output.'
+);
+assert.deepEqual(
+  sortAssignmentStudentsByFollowUpPriority(
+    studentFollowUpPriorityFixture
+  ).map((student) => student.studentKey),
+  ['student-a', 'student-b', 'student-c'],
+  'Assignment student follow-up priority should order by review count, latest accuracy, then display label.'
+);
+assert.deepEqual(
+  getAssignmentStudentFollowUpPriorityStudents(
+    studentFollowUpPriorityFixture
+  ).map((student) => student.studentKey),
+  ['student-a', 'student-b'],
+  'Assignment student follow-up priority lists should exclude students with no review needs.'
+);
+assert.doesNotMatch(
+  JSON.stringify(studentFollowUpPriorityHandoff),
+  /Student A|student-a|SECRET_RAW_ANONYMOUS_TOKEN|SECRET_STUDENT_ANSWER/,
+  'Assignment student follow-up priority handoff should expose counts and policy, not student labels, keys, tokens, or answers.'
+);
+assert.match(
+  assignmentStudentFollowUpPrioritySource,
+  /ASSIGNMENT_STUDENT_FOLLOW_UP_PRIORITY_HANDOFF_ITEM_IDS = \[[\s\S]*'needs-review-sort'[\s\S]*'accuracy-tie-breaker'[\s\S]*'display-label-tie-breaker'[\s\S]*'anonymous-token-guard'[\s\S]*'privacy-guard'/,
+  'Assignment student follow-up priority should name the sorting, tie-breaker, and privacy slices.'
+);
+assert.match(
+  assignmentClassroomBriefSource,
+  /followUpPriorityHandoffView[\s\S]*buildAssignmentStudentFollowUpPriorityHandoffView\(\{[\s\S]*limit: ASSIGNMENT_CLASSROOM_BRIEF_LIMITS\.followUpStudents[\s\S]*selectedStudents: followUpStudents[\s\S]*surface: 'classroom-brief'/,
+  'Classroom brief should attach the prepared student follow-up priority handoff from the shared priority helper.'
+);
+assert.match(
+  readFileSync(
+    'src/components/assignments/assignment-results-classroom-brief-card.tsx',
+    'utf8'
+  ),
+  /data-handoff="assignment-student-follow-up-priority"[\s\S]*handoffView\.itemViews\.map[\s\S]*data-handoff-item=\{itemView\.id\}[\s\S]*aria-label=\{itemView\.ariaLabel\}/,
+  'Assignment results classroom brief card should render the hidden student follow-up priority semantic handoff.'
 );
 assert.match(
   assignmentReviewPrioritySource,

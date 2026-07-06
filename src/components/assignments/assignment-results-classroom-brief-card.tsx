@@ -7,6 +7,10 @@ import type {
   AssignmentClassroomBriefStatView,
 } from '@/assignments/classroom-brief';
 import type {
+  AssignmentStudentFollowUpPriorityHandoffItemView,
+  AssignmentStudentFollowUpPriorityHandoffView,
+} from '@/assignments/student-follow-up-priority';
+import type {
   AssignmentResultActionButton,
   AssignmentResultClassroomBriefSectionViews,
   AssignmentResultCopyArtifactPreview,
@@ -79,6 +83,9 @@ export function AssignmentResultsClassroomBriefCard({
       <CardContent className="grid gap-4">
         <AssignmentResultsClassroomBriefScope brief={brief} />
         <AssignmentResultsClassroomBriefStats brief={brief} />
+        <AssignmentStudentFollowUpPriorityHandoff
+          handoffView={brief.followUpPriorityHandoffView}
+        />
         <div className="grid gap-4 lg:grid-cols-2">
           <AssignmentResultsClassFocusPanel
             focusItemViews={brief.focusItemViews}
@@ -97,6 +104,63 @@ export function AssignmentResultsClassroomBriefCard({
         />
       </CardContent>
     </Card>
+  );
+}
+
+function AssignmentStudentFollowUpPriorityHandoff({
+  handoffView,
+}: {
+  handoffView: AssignmentStudentFollowUpPriorityHandoffView;
+}) {
+  const titleId = 'assignment-student-follow-up-priority-handoff-title';
+  const descriptionId =
+    'assignment-student-follow-up-priority-handoff-description';
+
+  return (
+    <section
+      aria-describedby={descriptionId}
+      aria-labelledby={titleId}
+      className="sr-only"
+      data-handoff="assignment-student-follow-up-priority"
+    >
+      <h3 id={titleId}>{handoffView.title}</h3>
+      <p id={descriptionId}>{handoffView.description}</p>
+      <dl>
+        {handoffView.itemViews.map((itemView) => (
+          <AssignmentStudentFollowUpPriorityHandoffItem
+            itemView={itemView}
+            key={itemView.id}
+          />
+        ))}
+      </dl>
+    </section>
+  );
+}
+
+function AssignmentStudentFollowUpPriorityHandoffItem({
+  itemView,
+}: {
+  itemView: AssignmentStudentFollowUpPriorityHandoffItemView;
+}) {
+  const labelId = `assignment-student-follow-up-priority-handoff-${itemView.id}-label`;
+  const valueId = `assignment-student-follow-up-priority-handoff-${itemView.id}-value`;
+  const descriptionId = `assignment-student-follow-up-priority-handoff-${itemView.id}-description`;
+
+  return (
+    <div data-handoff-item={itemView.id}>
+      <dt id={labelId}>{itemView.label}</dt>
+      <dd>
+        <output
+          aria-describedby={descriptionId}
+          aria-label={itemView.ariaLabel}
+          aria-labelledby={`${labelId} ${valueId}`}
+          id={valueId}
+        >
+          {itemView.value}
+        </output>
+      </dd>
+      <dd id={descriptionId}>{itemView.description}</dd>
+    </div>
   );
 }
 

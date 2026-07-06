@@ -29,7 +29,11 @@ import {
   formatStudentFollowUpSubmittedContext,
 } from '@/assignments/student-follow-up-summary';
 import { getAssignmentReviewPriorityItems } from '@/assignments/review-priority';
-import { getAssignmentStudentFollowUpPriorityStudents } from '@/assignments/student-follow-up-priority';
+import {
+  buildAssignmentStudentFollowUpPriorityHandoffView,
+  getAssignmentStudentFollowUpPriorityStudents,
+  type AssignmentStudentFollowUpPriorityHandoffView,
+} from '@/assignments/student-follow-up-priority';
 import {
   formatAssignmentResultCopyLine,
   formatAssignmentResultCopyOrdinal,
@@ -57,6 +61,7 @@ export type AssignmentClassroomBrief = {
   copyPreview: AssignmentClassroomBriefCopyPreview;
   focusItemViews: AssignmentClassroomBriefFocusItemView[];
   focusItems: AssignmentItemAnalysis[];
+  followUpPriorityHandoffView: AssignmentStudentFollowUpPriorityHandoffView;
   followUpStudentViews: AssignmentClassroomBriefFollowUpStudentView[];
   followUpStudents: AssignmentStudentSummary[];
   scopeLabel: string;
@@ -151,6 +156,13 @@ export function buildAssignmentClassroomBrief({
     buildAssignmentClassroomBriefFollowUpStudentViews(followUpStudents, {
       attempts,
     });
+  const followUpPriorityHandoffView =
+    buildAssignmentStudentFollowUpPriorityHandoffView({
+      limit: ASSIGNMENT_CLASSROOM_BRIEF_LIMITS.followUpStudents,
+      selectedStudents: followUpStudents,
+      students,
+      surface: 'classroom-brief',
+    });
   const scopeSummary = buildAssignmentClassroomBriefScopeSummary({
     attempts,
     focusItems,
@@ -179,6 +191,7 @@ export function buildAssignmentClassroomBrief({
     },
     focusItemViews,
     focusItems,
+    followUpPriorityHandoffView,
     followUpStudentViews,
     followUpStudents,
     scopeLabel: m.assignment_classroom_brief_scope_label(),
