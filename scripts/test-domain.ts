@@ -28,6 +28,10 @@ import {
   PUBLIC_METADATA_HANDOFF_ITEM_IDS,
 } from '@/seo/public-metadata-handoff';
 import {
+  buildPublicNavigationHandoffView,
+  PUBLIC_NAVIGATION_HANDOFF_ITEM_IDS,
+} from '@/navigation/public-navigation-handoff';
+import {
   buildWebAppManifest,
   WEB_MANIFEST_HEADERS,
 } from '@/seo/web-manifest';
@@ -6570,6 +6574,10 @@ const navbarMobileSource = readFileSync(
   'utf8'
 );
 const footerSource = readFileSync('src/components/layout/footer.tsx', 'utf8');
+const publicNavigationHandoffSource = readFileSync(
+  'src/navigation/public-navigation-handoff.ts',
+  'utf8'
+);
 const dashboardHeaderSource = readFileSync(
   'src/components/layout/dashboard-header.tsx',
   'utf8'
@@ -12309,6 +12317,145 @@ assert.equal(
     (itemView) => itemView.id === 'privacy-guard'
   )?.value,
   'Private data hidden'
+);
+const publicNavigationHandoffView = buildPublicNavigationHandoffView();
+const publicNavigationHandoffIds = publicNavigationHandoffView.itemViews.map(
+  (itemView) => itemView.id
+);
+assert.deepEqual(PUBLIC_NAVIGATION_HANDOFF_ITEM_IDS, [
+  'product-loop',
+  'navbar-surface',
+  'navbar-count',
+  'navbar-templates-route',
+  'navbar-worksheets-route',
+  'navbar-create-route',
+  'navbar-student-preview-route',
+  'navbar-pricing-route',
+  'navbar-blog-route',
+  'mobile-navbar-source',
+  'footer-surface',
+  'footer-section-count',
+  'footer-product-section',
+  'footer-product-templates-route',
+  'footer-product-worksheets-route',
+  'footer-product-create-route',
+  'footer-product-preview-route',
+  'footer-product-pricing-route',
+  'footer-platform-activities-route',
+  'footer-platform-assignments-route',
+  'footer-support-roadmap-route',
+  'footer-support-articles-route',
+  'footer-support-contact-route',
+  'footer-support-teachers-route',
+  'footer-legal-routes',
+  'footer-cta-actions',
+  'footer-loop-metrics',
+  'route-constant-boundary',
+  'legacy-copy-guard',
+  'privacy-guard',
+]);
+assert.deepEqual(publicNavigationHandoffIds, [
+  ...PUBLIC_NAVIGATION_HANDOFF_ITEM_IDS,
+]);
+assert.equal(publicNavigationHandoffView.itemViews.length, 30);
+assert.equal(
+  publicNavigationHandoffView.itemViews.every(
+    (itemView) =>
+      Boolean(itemView.ariaLabel) &&
+      Boolean(itemView.description) &&
+      Boolean(itemView.label) &&
+      Boolean(itemView.value)
+  ),
+  true
+);
+assert.deepEqual(publicNavigationHandoffView.privacy, {
+  createsAssignmentLinks: false,
+  exposesAnswerKeys: false,
+  exposesRawAnonymousToken: false,
+  exposesSourceMaterialStorageKeys: false,
+  exposesStudentAttemptRecords: false,
+  exposesTeacherPrivateActivityContent: false,
+  footerUsesSharedConfig: true,
+  itemIds: publicNavigationHandoffIds,
+  keepsLegacyCopyOut: true,
+  mobileNavUsesSharedConfig: true,
+  mutatesTeacherWorkspace: false,
+  navbarUsesSharedConfig: true,
+  routeActionsUseSharedConstants: true,
+  scope: 'public-navigation-entrypoints',
+});
+assert.match(
+  publicNavigationHandoffSource,
+  /export const PUBLIC_NAVIGATION_HANDOFF_ITEM_IDS = \[(?=[\s\S]*'product-loop')(?=[\s\S]*'navbar-surface')(?=[\s\S]*'navbar-count')(?=[\s\S]*'navbar-templates-route')(?=[\s\S]*'navbar-worksheets-route')(?=[\s\S]*'navbar-create-route')(?=[\s\S]*'navbar-student-preview-route')(?=[\s\S]*'navbar-pricing-route')(?=[\s\S]*'navbar-blog-route')(?=[\s\S]*'mobile-navbar-source')(?=[\s\S]*'footer-surface')(?=[\s\S]*'footer-section-count')(?=[\s\S]*'footer-product-section')(?=[\s\S]*'footer-product-templates-route')(?=[\s\S]*'footer-product-worksheets-route')(?=[\s\S]*'footer-product-create-route')(?=[\s\S]*'footer-product-preview-route')(?=[\s\S]*'footer-product-pricing-route')(?=[\s\S]*'footer-platform-activities-route')(?=[\s\S]*'footer-platform-assignments-route')(?=[\s\S]*'footer-support-roadmap-route')(?=[\s\S]*'footer-support-articles-route')(?=[\s\S]*'footer-support-contact-route')(?=[\s\S]*'footer-support-teachers-route')(?=[\s\S]*'footer-legal-routes')(?=[\s\S]*'footer-cta-actions')(?=[\s\S]*'footer-loop-metrics')(?=[\s\S]*'route-constant-boundary')(?=[\s\S]*'legacy-copy-guard')(?=[\s\S]*'privacy-guard')/,
+  'Public navigation handoff should expose stable 30-slice public navigation item ids.'
+);
+assert.match(
+  publicNavigationHandoffSource,
+  /export type PublicNavigationHandoffPrivacyContract = \{[\s\S]*createsAssignmentLinks: false;[\s\S]*exposesAnswerKeys: false;[\s\S]*exposesRawAnonymousToken: false;[\s\S]*exposesSourceMaterialStorageKeys: false;[\s\S]*exposesStudentAttemptRecords: false;[\s\S]*exposesTeacherPrivateActivityContent: false;[\s\S]*footerUsesSharedConfig: true;[\s\S]*mobileNavUsesSharedConfig: true;[\s\S]*mutatesTeacherWorkspace: false;[\s\S]*navbarUsesSharedConfig: true;[\s\S]*routeActionsUseSharedConstants: true;[\s\S]*scope: 'public-navigation-entrypoints';/,
+  'Public navigation handoff should publish explicit safe public navigation behavior flags.'
+);
+assert.match(
+  publicNavigationHandoffSource,
+  /getFooterLinks\(\)[\s\S]*getNavbarLinks\(\)[\s\S]*PUBLIC_NAVIGATION_HANDOFF_ITEM_IDS\.map\(\(id\) =>[\s\S]*buildPublicNavigationHandoffItemView\(\{ footerLinks, id, navbarLinks \}\)/,
+  'Public navigation handoff should derive slices from shared navbar and footer configs.'
+);
+assert.deepEqual(
+  publicNavigationHandoffView.itemViews.map((itemView) => [
+    itemView.id,
+    itemView.value,
+  ]),
+  [
+    ['product-loop', 'Activity -> Assignment -> Attempt -> Results'],
+    ['navbar-surface', 'Desktop and mobile navbar'],
+    ['navbar-count', '6 items'],
+    ['navbar-templates-route', Routes.Templates],
+    ['navbar-worksheets-route', Routes.Worksheets],
+    ['navbar-create-route', Routes.Create],
+    ['navbar-student-preview-route', Routes.StudentPreview],
+    ['navbar-pricing-route', Routes.Pricing],
+    ['navbar-blog-route', Routes.Blog],
+    ['mobile-navbar-source', 'Shared navbar config'],
+    ['footer-surface', 'Footer directory'],
+    ['footer-section-count', '4 items'],
+    ['footer-product-section', '5 items'],
+    ['footer-product-templates-route', Routes.Templates],
+    ['footer-product-worksheets-route', Routes.Worksheets],
+    ['footer-product-create-route', Routes.Create],
+    ['footer-product-preview-route', Routes.StudentPreview],
+    ['footer-product-pricing-route', Routes.Pricing],
+    ['footer-platform-activities-route', Routes.DashboardActivities],
+    ['footer-platform-assignments-route', Routes.DashboardAssignments],
+    ['footer-support-roadmap-route', Routes.Roadmap],
+    ['footer-support-articles-route', Routes.Blog],
+    ['footer-support-contact-route', Routes.Contact],
+    ['footer-support-teachers-route', Routes.Teachers],
+    ['footer-legal-routes', '3 items'],
+    ['footer-cta-actions', `${Routes.Create} + ${Routes.Templates}`],
+    ['footer-loop-metrics', '8 templates · Link assignments · Score results'],
+    ['route-constant-boundary', 'Shared route constants'],
+    ['legacy-copy-guard', 'ClassGamify navigation'],
+    ['privacy-guard', 'Private data hidden'],
+  ]
+);
+assert.match(
+  navbarSource,
+  /const menuLinks = getNavbarLinks\(\)/,
+  'Desktop navbar should use the shared public navbar config.'
+);
+assert.match(
+  navbarMobileSource,
+  /const menuLinks = getNavbarLinks\(\)/,
+  'Mobile navbar should use the shared public navbar config.'
+);
+assert.match(
+  footerSource,
+  /const footerLinks = getFooterLinks\(\)[\s\S]*buildPublicNavigationHandoffView\(\{ footerLinks \}\)[\s\S]*<PublicNavigationHandoffPanel view=\{navigationHandoff\} \/>/,
+  'Footer should build the public navigation handoff from shared footer config.'
+);
+assert.match(
+  footerSource,
+  /data-handoff="public-navigation-entrypoints"[\s\S]*view\.itemViews\.map\(\(item\) =>[\s\S]*data-handoff-item=\{item\.id\}[\s\S]*<output aria-label=\{item\.ariaLabel\}/,
+  'Footer should render the public navigation handoff with stable item ids.'
 );
 assert.match(
   menuItemConfigSource,
