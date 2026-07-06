@@ -1,7 +1,23 @@
+import { useRouterState } from '@tanstack/react-router';
 import {
   buildClassroomControlSemanticsHandoffView,
+  shouldRenderClassroomControlSemanticsHandoff,
   type ClassroomControlSemanticsHandoffItemView,
 } from '@/classroom/control-semantics';
+import { getCanonicalPathname } from '@/lib/locale';
+
+export function ClassroomControlSemanticsHandoffMount() {
+  const pathname = useRouterState({
+    select: (state) => state.location.pathname,
+  });
+  const canonicalPathname = getCanonicalPathname(pathname);
+
+  if (!shouldRenderClassroomControlSemanticsHandoff(canonicalPathname)) {
+    return null;
+  }
+
+  return <ClassroomControlSemanticsHandoff />;
+}
 
 export function ClassroomControlSemanticsHandoff() {
   const handoffView = buildClassroomControlSemanticsHandoffView();

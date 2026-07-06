@@ -3,7 +3,9 @@ import { readFileSync } from 'node:fs';
 import test from 'node:test';
 import {
   CLASSROOM_CONTROL_SEMANTICS_HANDOFF_ITEM_IDS,
+  CLASSROOM_CONTROL_SEMANTICS_HANDOFF_ROUTE_SCOPES,
   buildClassroomControlSemanticsHandoffView,
+  shouldRenderClassroomControlSemanticsHandoff,
   type ClassroomControlSemanticsHandoffItemId,
   type ClassroomControlSemanticsHandoffView,
 } from '@/classroom/control-semantics';
@@ -170,12 +172,71 @@ test('classroom control semantics handoff localizes Chinese control values', () 
 test('classroom control semantics handoff renders from the root document', () => {
   assert.match(
     ROOT_SOURCE,
-    /ClassroomControlSemanticsHandoff[\s\S]*<ClassroomControlSemanticsHandoff \/>/
+    /ClassroomControlSemanticsHandoffMount[\s\S]*<ClassroomControlSemanticsHandoffMount \/>/
+  );
+  assert.match(
+    CLASSROOM_CONTROL_COMPONENT_SOURCE,
+    /function ClassroomControlSemanticsHandoffMount[\s\S]*useRouterState[\s\S]*getCanonicalPathname[\s\S]*shouldRenderClassroomControlSemanticsHandoff[\s\S]*<ClassroomControlSemanticsHandoff \/>/
   );
   assert.match(
     CLASSROOM_CONTROL_COMPONENT_SOURCE,
     /data-handoff="classroom-control-semantics"[\s\S]*handoffView\.itemViews\.map[\s\S]*data-handoff-item=\{itemView\.id\}[\s\S]*<output aria-label=\{itemView\.ariaLabel\}>/
   );
+});
+
+test('classroom control semantics handoff is route gated', () => {
+  assert.deepEqual(CLASSROOM_CONTROL_SEMANTICS_HANDOFF_ROUTE_SCOPES, [
+    '/create',
+    '/dashboard',
+    '/play',
+    '/print',
+  ]);
+
+  for (const pathname of [
+    '/create',
+    '/create?template=quiz',
+    '/dashboard',
+    '/dashboard/',
+    '/dashboard/activities',
+    '/dashboard/assignments/classroom-results',
+    '/play/demo-food',
+    '/play/demo-food?attempt=2',
+    '/print/assignments/classroom-results',
+    '/print/assignments/classroom-results#answer-key',
+  ]) {
+    assert.equal(
+      shouldRenderClassroomControlSemanticsHandoff(pathname),
+      true,
+      `${pathname} should render classroom control semantics`
+    );
+  }
+
+  for (const pathname of [
+    '/',
+    '/templates',
+    '/templates/',
+    '/worksheets',
+    '/pricing',
+    '/teachers',
+    '/contact',
+    '/blog',
+    '/blog?utm_source=classroom',
+    '/terms',
+    '/privacy',
+    '/cookie',
+    '/auth/login',
+    '/auth/login#workspace',
+    '/auth/register',
+    '/settings',
+    '/settings/profile',
+    '/admin/users',
+  ]) {
+    assert.equal(
+      shouldRenderClassroomControlSemanticsHandoff(pathname),
+      false,
+      `${pathname} should keep public/internal pages free of control handoff`
+    );
+  }
 });
 
 test('classroom control semantics evidence comes from described controls', () => {

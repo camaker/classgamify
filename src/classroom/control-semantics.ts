@@ -33,8 +33,18 @@ export const CLASSROOM_CONTROL_SEMANTICS_HANDOFF_ITEM_IDS = [
   'privacy-guard',
 ] as const;
 
+export const CLASSROOM_CONTROL_SEMANTICS_HANDOFF_ROUTE_SCOPES = [
+  '/create',
+  '/dashboard',
+  '/play',
+  '/print',
+] as const;
+
 export type ClassroomControlSemanticsHandoffItemId =
   (typeof CLASSROOM_CONTROL_SEMANTICS_HANDOFF_ITEM_IDS)[number];
+
+export type ClassroomControlSemanticsHandoffRouteScope =
+  (typeof CLASSROOM_CONTROL_SEMANTICS_HANDOFF_ROUTE_SCOPES)[number];
 
 export type ClassroomControlSemanticsHandoffItemView = {
   ariaLabel: string;
@@ -87,6 +97,31 @@ export function buildClassroomControlSemanticsHandoffView(): ClassroomControlSem
     privacy: buildClassroomControlSemanticsHandoffPrivacyContract(itemViews),
     title: m.classroom_control_semantics_handoff_title(),
   };
+}
+
+export function shouldRenderClassroomControlSemanticsHandoff(pathname: string) {
+  const normalizedPathname =
+    normalizeClassroomControlSemanticsPathname(pathname);
+
+  return CLASSROOM_CONTROL_SEMANTICS_HANDOFF_ROUTE_SCOPES.some((scope) => {
+    if (scope === '/create') {
+      return normalizedPathname === scope;
+    }
+
+    return (
+      normalizedPathname === scope || normalizedPathname.startsWith(`${scope}/`)
+    );
+  });
+}
+
+function normalizeClassroomControlSemanticsPathname(pathname: string) {
+  const pathOnly = pathname.split('?')[0]?.split('#')[0] ?? '/';
+
+  if (pathOnly.length > 1 && pathOnly.endsWith('/')) {
+    return pathOnly.slice(0, -1);
+  }
+
+  return pathOnly || '/';
 }
 
 function buildClassroomControlSemanticsHandoffItemView(
