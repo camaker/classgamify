@@ -772,6 +772,10 @@ import {
   stableShuffle,
 } from '@/assignments/item-order';
 import {
+  ASSIGNMENT_ITEM_PERFORMANCE_SORT_HANDOFF_ITEM_IDS,
+  buildAssignmentItemPerformanceSortHandoffEvidence,
+} from '@/assignments/item-performance-sort-handoff';
+import {
   assignmentResultPageCopy,
   assignmentResultReviewCopy,
   assignmentResultSearchCopy,
@@ -3533,6 +3537,14 @@ const assignmentResultFiltersSource = readFileSync(
   'src/assignments/result-filters.ts',
   'utf8'
 );
+const assignmentItemPerformanceSortHandoffSource = readFileSync(
+  'src/assignments/item-performance-sort-handoff.ts',
+  'utf8'
+);
+const assignmentResultsItemPerformanceTableSource = readFileSync(
+  'src/components/assignments/assignment-results-item-performance-table.tsx',
+  'utf8'
+);
 const assignmentReviewPrioritySource = readFileSync(
   'src/assignments/review-priority.ts',
   'utf8'
@@ -3740,6 +3752,36 @@ assert.match(
   readFileSync('src/routes/dashboard/assignments/$assignmentId.tsx', 'utf8'),
   /controlsView=\{pageView\.reviewControlsHandoffView\}/,
   'Assignment results route should pass the prepared result review controls handoff into the review panel.'
+);
+assert.match(
+  assignmentItemPerformanceSortHandoffSource,
+  /ASSIGNMENT_ITEM_PERFORMANCE_SORT_HANDOFF_ITEM_IDS = \[[\s\S]*'sort-scope'[\s\S]*'submitted-count-order'[\s\S]*'copy-artifact-consumer'[\s\S]*'privacy-guard'/,
+  'Assignment item performance sort handoff should name the route, table, copy-scope, export, and privacy slices.'
+);
+assert.match(
+  assignmentResultFiltersSource,
+  /if \(sort === 'original'\)[\s\S]*if \(sort === 'accuracy'\)[\s\S]*if \(sort === 'submitted'\)[\s\S]*if \(sort === 'type'\)/,
+  'Assignment item performance sorting should preserve snapshot, lowest-accuracy, submitted-count, and item-type review passes.'
+);
+assert.match(
+  assignmentResultViewSource,
+  /buildAssignmentItemPerformanceTableView\(\{[\s\S]*controlView: controlViews\.itemPerformanceSort,[\s\S]*items: resultView\.sortedPerformanceItems,[\s\S]*reviewScopeSummary: resultView\.reviewScope\.summary,[\s\S]*sort: viewState\.itemPerformanceSort/,
+  'Assignment result page view should attach item-performance sort handoff evidence from the same sorted table rows and review scope.'
+);
+assert.match(
+  assignmentItemPerformanceSortHandoffSource,
+  /buildAssignmentItemPerformanceSortHandoffPrivacyContract[\s\S]*exposesPromptText: false[\s\S]*exposesShareSlug: false[\s\S]*usesSortedTableRows: true/,
+  'Assignment item performance sort handoff should keep prompts and share slugs out while proving sorted-row reuse.'
+);
+assert.match(
+  assignmentResultsItemPerformanceTableSource,
+  /data-handoff="assignment-item-performance-sort"[\s\S]*view\.itemViews\.map[\s\S]*data-handoff-item=\{itemView\.id\}[\s\S]*aria-label=\{itemView\.ariaLabel\}/,
+  'Assignment item performance table should render the hidden item sort semantic handoff.'
+);
+assert.match(
+  readFileSync('tests/e2e/TEST-CATALOG.md', 'utf8'),
+  /6e \| Result item performance sort exposes a 30-slice handoff[\s\S]*snapshot order, lowest accuracy, most answered, and item type[\s\S]*prompt text, expected or accepted answers/,
+  'E2E catalog should include the item performance sort handoff journey and privacy guard.'
 );
 assert.doesNotMatch(
   assignmentResultViewSource,
@@ -7774,10 +7816,6 @@ const assignmentResultsItemPerformanceSortSource = readFileSync(
   'src/components/assignments/assignment-results-item-performance-sort-control.tsx',
   'utf8'
 );
-const assignmentResultsItemPerformanceTableSource = readFileSync(
-  'src/components/assignments/assignment-results-item-performance-table.tsx',
-  'utf8'
-);
 const assignmentResultsTableHeaderSource = readFileSync(
   'src/components/assignments/assignment-results-table-header.tsx',
   'utf8'
@@ -8075,8 +8113,8 @@ assert.match(
 );
 assert.match(
   assignmentResultViewSource,
-  /itemPerformanceTableView:\s*AssignmentResultItemPerformanceTableView[\s\S]*buildAssignmentItemPerformanceTableView[\s\S]*headers: assignmentResultTableHeaders\.itemPerformance[\s\S]*rows: buildAssignmentItemPerformanceRowViews/,
-  'Assignment result page view-model should own formatted item performance table views.'
+  /itemPerformanceTableView:\s*AssignmentResultItemPerformanceTableView[\s\S]*buildAssignmentItemPerformanceTableView[\s\S]*headers: assignmentResultTableHeaders\.itemPerformance[\s\S]*rows,[\s\S]*sortHandoffView: buildAssignmentItemPerformanceSortHandoffView/,
+  'Assignment result page view-model should own formatted item performance table views and item sort handoff evidence.'
 );
 assert.match(
   assignmentResultRouteSource,
@@ -54022,6 +54060,105 @@ assert.equal(
   )?.value,
   'Default kept'
 );
+const scoredItemPerformanceSortHandoffView =
+  scoredResultsPageView.itemPerformanceTableView.sortHandoffView;
+const scoredItemPerformanceSortHandoffValues = new Map(
+  scoredItemPerformanceSortHandoffView.itemViews.map((itemView) => [
+    itemView.id,
+    itemView.value,
+  ])
+);
+assert.deepEqual(
+  scoredItemPerformanceSortHandoffView.itemViews.map((itemView) => itemView.id),
+  [...ASSIGNMENT_ITEM_PERFORMANCE_SORT_HANDOFF_ITEM_IDS]
+);
+assert.equal(scoredItemPerformanceSortHandoffView.itemViews.length, 30);
+assert.deepEqual(scoredItemPerformanceSortHandoffView.privacy, {
+  exposesAcceptedAnswers: false,
+  exposesCopyArtifactText: false,
+  exposesCsvDataUrl: false,
+  exposesPromptText: false,
+  exposesRawAnonymousToken: false,
+  exposesShareSlug: false,
+  exposesStudentAnswerText: false,
+  exposesStudentDisplayLabels: false,
+  exposesTeacherAnswerKey: false,
+  itemIds: [...ASSIGNMENT_ITEM_PERFORMANCE_SORT_HANDOFF_ITEM_IDS],
+  mutatesResultData: false,
+  scope: 'teacher-result-item-performance-sort',
+  usesAssignmentDomainHelpers: true,
+  usesSortedTableRows: true,
+});
+assert.deepEqual(
+  [
+    scoredItemPerformanceSortHandoffValues.get('selected-sort'),
+    scoredItemPerformanceSortHandoffValues.get('default-sort'),
+    scoredItemPerformanceSortHandoffValues.get('lowest-accuracy-order'),
+    scoredItemPerformanceSortHandoffValues.get('table-row-count'),
+    scoredItemPerformanceSortHandoffValues.get('matched-item-count'),
+    scoredItemPerformanceSortHandoffValues.get('copy-scope-row-count'),
+    scoredItemPerformanceSortHandoffValues.get('table-consumer'),
+    scoredItemPerformanceSortHandoffValues.get('copy-artifact-consumer'),
+    scoredItemPerformanceSortHandoffValues.get('csv-export-boundary'),
+    scoredItemPerformanceSortHandoffValues.get('privacy-guard'),
+  ],
+  [
+    'Lowest accuracy',
+    'Non-default persisted',
+    'Active',
+    '2',
+    '2/2',
+    '2',
+    'Item performance table',
+    'Current copy scope',
+    'Full export',
+    'Hidden',
+  ]
+);
+assert.deepEqual(
+  scoredResultsPageView.itemPerformanceTableView.rows.map(
+    (rowView) => rowView.id
+  ),
+  scoredResultsPageView.copyActionData?.analysis.perItem.map(
+    (item) => item.itemId
+  )
+);
+assert.deepEqual(
+  buildAssignmentItemPerformanceSortHandoffEvidence({
+    items: scoredResultsPageData.analysis.perItem,
+    reviewScopeSummary: {
+      attemptReviews: { matched: 1, total: 1 },
+      attemptRows: { matched: 1, total: 1 },
+      itemPerformance: { matched: 2.2, total: Number.NaN },
+      students: { matched: 1, total: 1 },
+    },
+    sort: 'submitted',
+    tableRowCount: Number.NEGATIVE_INFINITY,
+  }),
+  {
+    copyScopeRowCount: 2,
+    itemSort: 'submitted',
+    matchedItemCount: 2,
+    sortOptionCount: 4,
+    tableRowCount: 0,
+    totalItemCount: 0,
+  }
+);
+for (const privateSortHandoffValue of [
+  'Alice',
+  'answer-1',
+  'q-1',
+  'result-share',
+  'data:text/csv',
+]) {
+  assert.equal(
+    JSON.stringify(scoredItemPerformanceSortHandoffView).includes(
+      privateSortHandoffValue
+    ),
+    false,
+    `Item performance sort handoff leaked private text: ${privateSortHandoffValue}`
+  );
+}
 for (const privateControlsHandoffValue of [
   'Alice',
   'answer-1',
@@ -55149,16 +55286,48 @@ assert.deepEqual(
     ['pair-1', '2.', '2. Match "Hot" with its pair.', '50%'],
   ]
 );
+const resultItemPerformanceTableView = buildAssignmentItemPerformanceTableView({
+  controlView: buildAssignmentResultControlViews({
+    resultSearchSummary: 'All students',
+    viewState: {
+      attemptReviewFilter: 'all',
+      itemPerformanceSort: 'original',
+      studentSearch: '',
+      studentSort: 'needs-review',
+    },
+  }).itemPerformanceSort,
+  items: resultAnalysis.perItem,
+  reviewScopeSummary: {
+    attemptReviews: {
+      matched: resultAnalysis.attempts.length,
+      total: resultAnalysis.attempts.length,
+    },
+    attemptRows: {
+      matched: resultAnalysis.attempts.length,
+      total: resultAnalysis.attempts.length,
+    },
+    itemPerformance: {
+      matched: resultAnalysis.perItem.length,
+      total: resultAnalysis.perItem.length,
+    },
+    students: {
+      matched: resultAnalysis.students.length,
+      total: resultAnalysis.students.length,
+    },
+  },
+  sort: 'original',
+});
 assert.deepEqual(
   {
-    ariaLabel: buildAssignmentItemPerformanceTableView(resultAnalysis.perItem)
-      .ariaLabel,
-    caption: buildAssignmentItemPerformanceTableView(resultAnalysis.perItem)
-      .caption,
+    ariaLabel: resultItemPerformanceTableView.ariaLabel,
+    caption: resultItemPerformanceTableView.caption,
     headers: summarizeAssignmentResultTableHeaders(
-      buildAssignmentItemPerformanceTableView(resultAnalysis.perItem).headers
+      resultItemPerformanceTableView.headers
     ),
-    rows: buildAssignmentItemPerformanceTableView(resultAnalysis.perItem).rows.map(
+    handoffIds: resultItemPerformanceTableView.sortHandoffView.itemViews.map(
+      (itemView) => itemView.id
+    ),
+    rows: resultItemPerformanceTableView.rows.map(
       (row) => [row.id, row.itemNumberLabel, row.promptLabel, row.correctRateLabel]
     ),
   },
@@ -55169,6 +55338,7 @@ assert.deepEqual(
     headers: summarizeAssignmentResultTableHeaders(
       assignmentResultTableHeaders.itemPerformance
     ),
+    handoffIds: [...ASSIGNMENT_ITEM_PERFORMANCE_SORT_HANDOFF_ITEM_IDS],
     rows: [
       ['q-1', '1.', '1. Capital of France?', '67%'],
       ['pair-1', '2.', '2. Match "Hot" with its pair.', '50%'],
