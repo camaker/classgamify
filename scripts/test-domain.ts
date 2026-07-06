@@ -8621,8 +8621,13 @@ assert.match(
 );
 assert.match(
   assignmentResultsHeaderActionsSource,
-  /function AssignmentResultsExportPreparation[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*aria-labelledby=\{titleId\}[\s\S]*<article[\s\S]*aria-label=\{itemView\.ariaLabel\}[\s\S]*<output[\s\S]*aria-label=\{itemView\.ariaLabel\}/,
+  /function AssignmentResultsExportPreparation[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*aria-labelledby=\{titleId\}[\s\S]*data-handoff="assignment-results-export-preparation"[\s\S]*data-handoff-scope=\{exportPreparationView\.privacy\.scope\}[\s\S]*<article[\s\S]*aria-label=\{itemView\.ariaLabel\}[\s\S]*data-handoff-item=\{itemView\.id\}[\s\S]*<output[\s\S]*aria-label=\{itemView\.ariaLabel\}/,
   'Assignment result CSV export coverage should render prepared accessible labels for each full-export coverage item.'
+);
+assert.match(
+  authE2eCatalogSource,
+  /\|\s*6i\s*\|\s*Result CSV export preparation exposes a 30-slice handoff\s*\|/,
+  'E2E catalog should include the result CSV export-preparation handoff acceptance journey.'
 );
 assert.doesNotMatch(
   assignmentResultsHeaderActionsSource,

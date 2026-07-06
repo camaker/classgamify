@@ -1,4 +1,5 @@
 import assert from 'node:assert/strict';
+import { readFileSync } from 'node:fs';
 import test from 'node:test';
 import {
   ASSIGNMENT_RESULTS_EXPORT_PREPARATION_ITEM_IDS,
@@ -241,6 +242,26 @@ test('assignment results export preparation exposes 30 safe CSV coverage slices'
   assert.equal(getPreparationItemValue(preparationView, 'columns'), '54');
 
   assertNoPrivateExportPreparationText(JSON.stringify(preparationView));
+});
+
+test('assignment results export preparation renders stable handoff markers', () => {
+  const headerActionsSource = readFileSync(
+    'src/components/assignments/assignment-results-header-actions.tsx',
+    'utf8'
+  );
+  const catalogSource = readFileSync('tests/e2e/TEST-CATALOG.md', 'utf8');
+
+  assert.match(
+    headerActionsSource,
+    /data-handoff="assignment-results-export-preparation"/
+  );
+  assert.match(
+    headerActionsSource,
+    /data-handoff-scope=\{exportPreparationView\.privacy\.scope\}/
+  );
+  assert.match(headerActionsSource, /data-handoff-item=\{itemView\.id\}/);
+  assert.match(headerActionsSource, /aria-label=\{itemView\.ariaLabel\}/);
+  assert.match(catalogSource, /\|\s*6i\s*\|/);
 });
 
 function getPreparationItemValue(

@@ -469,6 +469,8 @@ function AssignmentResultsExportPreparation({
       aria-describedby={descriptionId}
       aria-labelledby={titleId}
       className="grid basis-full gap-3 rounded-lg border bg-muted/20 p-3"
+      data-handoff="assignment-results-export-preparation"
+      data-handoff-scope={exportPreparationView.privacy.scope}
     >
       <div className="grid gap-1">
         <h3 id={titleId} className="font-medium text-sm">
@@ -483,6 +485,7 @@ function AssignmentResultsExportPreparation({
           <article
             aria-label={itemView.ariaLabel}
             className="grid gap-1 rounded-md border bg-background p-3"
+            data-handoff-item={itemView.id}
             key={itemView.id}
           >
             <p className="text-muted-foreground text-xs">{itemView.label}</p>
