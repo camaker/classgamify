@@ -11,6 +11,10 @@ import type {
   AssignmentStudentFollowUpPriorityHandoffView,
 } from '@/assignments/student-follow-up-priority';
 import type {
+  AssignmentCopyArtifactHandoffItemView,
+  AssignmentCopyArtifactHandoffView,
+} from '@/assignments/copy-artifact-handoff';
+import type {
   AssignmentResultActionButton,
   AssignmentResultClassroomBriefSectionViews,
   AssignmentResultCopyArtifactPreview,
@@ -33,6 +37,7 @@ import { IconClipboardText, IconCopy } from '@tabler/icons-react';
 
 type AssignmentResultsClassroomBriefCardProps = {
   brief: AssignmentClassroomBrief;
+  copyArtifactHandoffView: AssignmentCopyArtifactHandoffView | null;
   copyArtifactPreviews: Array<
     AssignmentResultCopyArtifactPreview & {
       actionButton: AssignmentResultActionButton;
@@ -45,6 +50,7 @@ type AssignmentResultsClassroomBriefCardProps = {
 
 export function AssignmentResultsClassroomBriefCard({
   brief,
+  copyArtifactHandoffView,
   copyArtifactPreviews,
   copyScopeView,
   onResultAction,
@@ -97,6 +103,7 @@ export function AssignmentResultsClassroomBriefCard({
           />
         </div>
         <AssignmentResultsClassroomBriefCopyPreview
+          copyArtifactHandoffView={copyArtifactHandoffView}
           copyArtifactPreviews={copyArtifactPreviews}
           copyPreview={brief.copyPreview}
           copyScopeView={copyScopeView}
@@ -409,6 +416,7 @@ function AssignmentResultsFollowUpStudent({
 }
 
 function AssignmentResultsClassroomBriefCopyPreview({
+  copyArtifactHandoffView,
   copyArtifactPreviews,
   copyPreview,
   copyScopeView,
@@ -419,6 +427,7 @@ function AssignmentResultsClassroomBriefCopyPreview({
       actionButton: AssignmentResultActionButton;
     }
   >;
+  copyArtifactHandoffView: AssignmentCopyArtifactHandoffView | null;
   copyPreview: AssignmentClassroomBriefCopyPreview;
   copyScopeView: AssignmentResultCopyScopeView;
   onResultAction: (actionButton: AssignmentResultActionButton) => void;
@@ -433,6 +442,7 @@ function AssignmentResultsClassroomBriefCopyPreview({
       <h3 id={labelId} className="font-medium text-sm">
         {copyPreview.label}
       </h3>
+      <AssignmentCopyArtifactHandoff handoffView={copyArtifactHandoffView} />
       <AssignmentResultsCopyScopeView copyScopeView={copyScopeView} />
       <div className="grid gap-3 lg:grid-cols-2">
         {copyArtifactPreviews.map((preview) => (
@@ -444,6 +454,65 @@ function AssignmentResultsClassroomBriefCopyPreview({
         ))}
       </div>
     </section>
+  );
+}
+
+function AssignmentCopyArtifactHandoff({
+  handoffView,
+}: {
+  handoffView: AssignmentCopyArtifactHandoffView | null;
+}) {
+  if (!handoffView) return null;
+
+  const titleId = 'assignment-copy-artifact-handoff-title';
+  const descriptionId = 'assignment-copy-artifact-handoff-description';
+
+  return (
+    <section
+      aria-describedby={descriptionId}
+      aria-labelledby={titleId}
+      className="sr-only"
+      data-handoff="assignment-copy-artifact"
+      data-handoff-scope={handoffView.privacy.scope}
+    >
+      <h4 id={titleId}>{handoffView.title}</h4>
+      <p id={descriptionId}>{handoffView.description}</p>
+      <dl>
+        {handoffView.itemViews.map((itemView) => (
+          <AssignmentCopyArtifactHandoffItem
+            itemView={itemView}
+            key={itemView.id}
+          />
+        ))}
+      </dl>
+    </section>
+  );
+}
+
+function AssignmentCopyArtifactHandoffItem({
+  itemView,
+}: {
+  itemView: AssignmentCopyArtifactHandoffItemView;
+}) {
+  const labelId = `assignment-copy-artifact-handoff-${itemView.id}-label`;
+  const valueId = `assignment-copy-artifact-handoff-${itemView.id}-value`;
+  const descriptionId = `assignment-copy-artifact-handoff-${itemView.id}-description`;
+
+  return (
+    <div data-handoff-item={itemView.id}>
+      <dt id={labelId}>{itemView.label}</dt>
+      <dd>
+        <output
+          aria-describedby={descriptionId}
+          aria-label={itemView.ariaLabel}
+          aria-labelledby={`${labelId} ${valueId}`}
+          id={valueId}
+        >
+          {itemView.value}
+        </output>
+      </dd>
+      <dd id={descriptionId}>{itemView.description}</dd>
+    </div>
   );
 }
 

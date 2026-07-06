@@ -128,6 +128,10 @@ import {
   type AssignmentResultsExportPreparationView,
 } from '@/assignments/results-export';
 import type { AssignmentClassroomBrief } from '@/assignments/classroom-brief';
+import {
+  buildAssignmentCopyArtifactHandoffView,
+  type AssignmentCopyArtifactHandoffView,
+} from '@/assignments/copy-artifact-handoff';
 import type {
   ActivityTemplateType,
   AssignmentSettings,
@@ -843,6 +847,7 @@ export type AssignmentResultsPageViewModel<
       actionButton: AssignmentResultActionButton;
     }
   >;
+  copyArtifactHandoffView: AssignmentCopyArtifactHandoffView | null;
   copyScopeView: AssignmentResultCopyScopeView;
   description: string;
   headerView: AssignmentResultHeaderView | null;
@@ -2671,6 +2676,12 @@ export function buildAssignmentResultsPageViewModel<
           : [];
       })
     : [];
+  const copyArtifactHandoffView = copyArtifacts
+    ? buildAssignmentCopyArtifactHandoffView({
+        artifacts: copyArtifacts,
+        previews: copyArtifactPreviews,
+      })
+    : null;
   const reviewHandoffView = buildAssignmentResultReviewHandoffView({
     actionButtons,
     controlViews,
@@ -2726,6 +2737,7 @@ export function buildAssignmentResultsPageViewModel<
     controlViews,
     copyActionData,
     copyArtifactPreviews,
+    copyArtifactHandoffView,
     copyScopeView,
     description: assignmentResultPageCopy.description,
     headerView,

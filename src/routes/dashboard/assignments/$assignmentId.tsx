@@ -164,6 +164,7 @@ function LoadedAssignmentResultsPage({
           pageView.classroomBrief ? (
             <AssignmentResultsClassroomBriefCard
               brief={pageView.classroomBrief}
+              copyArtifactHandoffView={pageView.copyArtifactHandoffView}
               copyArtifactPreviews={pageView.copyArtifactPreviews}
               copyScopeView={pageView.copyScopeView}
               onResultAction={(actionButton) =>

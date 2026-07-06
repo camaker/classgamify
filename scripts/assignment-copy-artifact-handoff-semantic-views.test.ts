@@ -34,6 +34,14 @@ const CLASSROOM_BRIEF_SOURCE = readFileSync(
   'src/assignments/classroom-brief.ts',
   'utf8'
 );
+const ASSIGNMENT_RESULT_VIEW_SOURCE = readFileSync(
+  'src/assignments/result-view.ts',
+  'utf8'
+);
+const CLASSROOM_BRIEF_CARD_SOURCE = readFileSync(
+  'src/components/assignments/assignment-results-classroom-brief-card.tsx',
+  'utf8'
+);
 const COPY_ARTIFACT_HANDOFF_SOURCE = readFileSync(
   'src/assignments/copy-artifact-handoff.ts',
   'utf8'
@@ -54,6 +62,7 @@ const STUDENT_FOLLOW_UP_SOURCE = readFileSync(
   'src/assignments/student-follow-up-summary.ts',
   'utf8'
 );
+const TEST_CATALOG_SOURCE = readFileSync('tests/e2e/TEST-CATALOG.md', 'utf8');
 
 test('assignment copy artifact handoff exposes 30 safe slices', () => {
   const fixture = buildCopyArtifactFixture();
@@ -87,6 +96,29 @@ test('assignment copy artifact handoff exposes 30 safe slices', () => {
     usesSharedCopyArtifactHelpers: true,
   });
   assertNoPrivateCopyArtifactHandoffText(JSON.stringify(handoffView));
+});
+
+test('assignment copy artifact handoff renders stable result page markers', () => {
+  assert.match(
+    ASSIGNMENT_RESULT_VIEW_SOURCE,
+    /copyArtifactHandoffView: AssignmentCopyArtifactHandoffView \| null/
+  );
+  assert.match(
+    ASSIGNMENT_RESULT_VIEW_SOURCE,
+    /const copyArtifactHandoffView = copyArtifacts[\s\S]*buildAssignmentCopyArtifactHandoffView\(\{[\s\S]*artifacts: copyArtifacts,[\s\S]*previews: copyArtifactPreviews,[\s\S]*\}\)[\s\S]*copyArtifactHandoffView,/
+  );
+  assert.match(
+    CLASSROOM_BRIEF_CARD_SOURCE,
+    /function AssignmentCopyArtifactHandoff[\s\S]*data-handoff="assignment-copy-artifact"[\s\S]*data-handoff-scope=\{handoffView\.privacy\.scope\}[\s\S]*handoffView\.itemViews\.map/
+  );
+  assert.match(
+    CLASSROOM_BRIEF_CARD_SOURCE,
+    /function AssignmentCopyArtifactHandoffItem[\s\S]*data-handoff-item=\{itemView\.id\}[\s\S]*aria-label=\{itemView\.ariaLabel\}/
+  );
+  assert.match(
+    TEST_CATALOG_SOURCE,
+    /\|\s*6c\s*\|\s*Result copy artifacts expose a 30-slice handoff\s*\|[\s\S]*`assignment-copy-artifact`[\s\S]*`data-handoff-item`/
+  );
 });
 
 test('assignment copy artifact handoff summarizes copy coverage', () => {

@@ -3172,6 +3172,11 @@ assert.match(
 );
 assert.match(
   assignmentResultViewActionBoundarySource,
+  /from '@\/assignments\/copy-artifact-handoff'/,
+  'Assignment result page view-model should consume the copy artifact handoff from the dedicated domain module.'
+);
+assert.match(
+  assignmentResultViewActionBoundarySource,
   /const copyActionData = data[\s\S]*buildAssignmentResultCopyActionData\(\{[\s\S]*attempts: resultView\.filteredAttemptReviews,[\s\S]*copyScopeView,[\s\S]*items: resultView\.sortedPerformanceItems,[\s\S]*students: resultView\.filteredStudents,[\s\S]*\}\)[\s\S]*const copyArtifacts = copyActionData[\s\S]*buildAssignmentResultCopyArtifacts\(copyActionData\)/,
   'Assignment result page view-model should derive classroom brief previews from current sorted item, filtered student review data, filtered attempt reviews, and prepared copy scope.'
 );
@@ -3179,6 +3184,11 @@ assert.match(
   assignmentResultViewActionBoundarySource,
   /const copyArtifactPreviews = copyArtifacts[\s\S]*buildAssignmentResultCopyArtifactPreviews\(\{[\s\S]*artifacts: copyArtifacts,[\s\S]*copyScopeView,[\s\S]*\}\)[\s\S]*button\.id === preview\.actionButtonId[\s\S]*copyArtifactPreviews,/,
   'Assignment result page view-model should bind scoped copy previews to action buttons by stable action-button id.'
+);
+assert.match(
+  assignmentResultViewActionBoundarySource,
+  /copyArtifactHandoffView: AssignmentCopyArtifactHandoffView \| null[\s\S]*const copyArtifactHandoffView = copyArtifacts[\s\S]*buildAssignmentCopyArtifactHandoffView\(\{[\s\S]*artifacts: copyArtifacts,[\s\S]*previews: copyArtifactPreviews,[\s\S]*\}\)[\s\S]*copyArtifactHandoffView,/,
+  'Assignment result page view-model should expose the 30-slice copy artifact handoff from the same prepared artifacts and previews rendered on the page.'
 );
 assert.doesNotMatch(
   assignmentResultViewActionBoundarySource,
@@ -8266,8 +8276,8 @@ assert.doesNotMatch(
 );
 assert.match(
   assignmentResultRouteSource,
-  /<AssignmentResultsClassroomBriefCard[\s\S]*brief=\{pageView\.classroomBrief\}[\s\S]*copyArtifactPreviews=\{pageView\.copyArtifactPreviews\}[\s\S]*copyScopeView=\{pageView\.copyScopeView\}[\s\S]*onResultAction=\{\(actionButton\) =>[\s\S]*void onResultAction\(actionButton\)[\s\S]*sectionViews=\{sectionViews\}/,
-  'Assignment result route should pass prepared copy artifact previews, copy scope, section views, and the result action handler into the classroom brief card.'
+  /<AssignmentResultsClassroomBriefCard[\s\S]*brief=\{pageView\.classroomBrief\}[\s\S]*copyArtifactHandoffView=\{pageView\.copyArtifactHandoffView\}[\s\S]*copyArtifactPreviews=\{pageView\.copyArtifactPreviews\}[\s\S]*copyScopeView=\{pageView\.copyScopeView\}[\s\S]*onResultAction=\{\(actionButton\) =>[\s\S]*void onResultAction\(actionButton\)[\s\S]*sectionViews=\{sectionViews\}/,
+  'Assignment result route should pass prepared copy artifact handoff, previews, copy scope, section views, and the result action handler into the classroom brief card.'
 );
 assert.match(
   assignmentResultRouteSource,
@@ -8626,6 +8636,11 @@ assert.match(
 );
 assert.match(
   authE2eCatalogSource,
+  /\|\s*6c\s*\|\s*Result copy artifacts expose a 30-slice handoff\s*\|[\s\S]*`assignment-copy-artifact`[\s\S]*`data-handoff-item`/,
+  'E2E catalog should include the result copy-artifact handoff marker acceptance journey.'
+);
+assert.match(
+  authE2eCatalogSource,
   /\|\s*6i\s*\|\s*Result CSV export preparation exposes a 30-slice handoff\s*\|/,
   'E2E catalog should include the result CSV export-preparation handoff acceptance journey.'
 );
@@ -8656,8 +8671,8 @@ assert.doesNotMatch(
 );
 assert.match(
   assignmentResultsClassroomBriefCardSource,
-  /AssignmentResultsClassroomBriefScope[\s\S]*brief=\{brief\}[\s\S]*AssignmentResultsClassroomBriefStats[\s\S]*brief=\{brief\}[\s\S]*AssignmentResultsClassFocusPanel[\s\S]*focusItemViews=\{brief\.focusItemViews\}[\s\S]*sectionView=\{sectionViews\.classReviewFocus\}[\s\S]*AssignmentResultsFollowUpPanel[\s\S]*followUpStudentViews=\{brief\.followUpStudentViews\}[\s\S]*sectionView=\{sectionViews\.studentFollowUp\}[\s\S]*AssignmentResultsClassroomBriefCopyPreview[\s\S]*copyArtifactPreviews=\{copyArtifactPreviews\}[\s\S]*copyScopeView=\{copyScopeView\}[\s\S]*onResultAction=\{onResultAction\}/,
-  'Assignment classroom brief card should delegate prepared scope, stats, focus item, follow-up student, copy-scope, and copy-preview views to focused panels.'
+  /AssignmentResultsClassroomBriefScope[\s\S]*brief=\{brief\}[\s\S]*AssignmentResultsClassroomBriefStats[\s\S]*brief=\{brief\}[\s\S]*AssignmentResultsClassFocusPanel[\s\S]*focusItemViews=\{brief\.focusItemViews\}[\s\S]*sectionView=\{sectionViews\.classReviewFocus\}[\s\S]*AssignmentResultsFollowUpPanel[\s\S]*followUpStudentViews=\{brief\.followUpStudentViews\}[\s\S]*sectionView=\{sectionViews\.studentFollowUp\}[\s\S]*AssignmentResultsClassroomBriefCopyPreview[\s\S]*copyArtifactHandoffView=\{copyArtifactHandoffView\}[\s\S]*copyArtifactPreviews=\{copyArtifactPreviews\}[\s\S]*copyScopeView=\{copyScopeView\}[\s\S]*onResultAction=\{onResultAction\}/,
+  'Assignment classroom brief card should delegate prepared scope, stats, focus item, follow-up student, copy artifact handoff, copy-scope, and copy-preview views to focused panels.'
 );
 assert.match(
   assignmentResultsClassroomBriefCardSource,
@@ -8746,8 +8761,13 @@ assert.doesNotMatch(
 );
 assert.match(
   assignmentResultsClassroomBriefCardSource,
-  /function AssignmentResultsClassroomBriefCopyPreview[\s\S]*copyPreview\.label[\s\S]*AssignmentResultsCopyScopeView[\s\S]*copyScopeView=\{copyScopeView\}[\s\S]*copyArtifactPreviews\.map[\s\S]*AssignmentResultsCopyArtifactPreview[\s\S]*key=\{preview\.id\}[\s\S]*onResultAction=\{onResultAction\}/,
-  'Assignment classroom brief copy preview should render prepared copy scope and copy artifact previews with the prepared result action handler.'
+  /function AssignmentResultsClassroomBriefCopyPreview[\s\S]*copyPreview\.label[\s\S]*AssignmentCopyArtifactHandoff[\s\S]*handoffView=\{copyArtifactHandoffView\}[\s\S]*AssignmentResultsCopyScopeView[\s\S]*copyScopeView=\{copyScopeView\}[\s\S]*copyArtifactPreviews\.map[\s\S]*AssignmentResultsCopyArtifactPreview[\s\S]*key=\{preview\.id\}[\s\S]*onResultAction=\{onResultAction\}/,
+  'Assignment classroom brief copy preview should render prepared copy artifact handoff, copy scope, and copy artifact previews with the prepared result action handler.'
+);
+assert.match(
+  assignmentResultsClassroomBriefCardSource,
+  /function AssignmentCopyArtifactHandoff[\s\S]*data-handoff="assignment-copy-artifact"[\s\S]*data-handoff-scope=\{handoffView\.privacy\.scope\}[\s\S]*handoffView\.itemViews\.map[\s\S]*AssignmentCopyArtifactHandoffItem[\s\S]*function AssignmentCopyArtifactHandoffItem[\s\S]*data-handoff-item=\{itemView\.id\}[\s\S]*<output[\s\S]*aria-label=\{itemView\.ariaLabel\}/,
+  'Assignment classroom brief copy artifact handoff should render stable result-page handoff and item markers with prepared accessible labels.'
 );
 assert.doesNotMatch(
   assignmentResultsClassroomBriefCardSource,
