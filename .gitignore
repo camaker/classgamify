@@ -49,3 +49,5 @@ logs/security/
 playwright-report
 test-results
 docs/classgamify.txt
+.agents
+skills-lock.json
