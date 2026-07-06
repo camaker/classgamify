@@ -781,6 +781,11 @@ import {
   buildAssignmentItemPerformanceSortHandoffEvidence,
 } from '@/assignments/item-performance-sort-handoff';
 import {
+  ASSIGNMENT_STUDENT_SUMMARY_SORT_HANDOFF_ITEM_IDS,
+  buildAssignmentStudentSummarySortHandoffEvidence,
+  buildAssignmentStudentSummarySortHandoffView,
+} from '@/assignments/student-summary-sort-handoff';
+import {
   assignmentResultPageCopy,
   assignmentResultReviewCopy,
   assignmentResultSearchCopy,
@@ -3546,8 +3551,16 @@ const assignmentItemPerformanceSortHandoffSource = readFileSync(
   'src/assignments/item-performance-sort-handoff.ts',
   'utf8'
 );
+const assignmentStudentSummarySortHandoffSource = readFileSync(
+  'src/assignments/student-summary-sort-handoff.ts',
+  'utf8'
+);
 const assignmentResultsItemPerformanceTableSource = readFileSync(
   'src/components/assignments/assignment-results-item-performance-table.tsx',
+  'utf8'
+);
+const assignmentResultsStudentSummarySortTableSource = readFileSync(
+  'src/components/assignments/assignment-results-student-summary-table.tsx',
   'utf8'
 );
 const assignmentReviewPrioritySource = readFileSync(
@@ -3848,6 +3861,36 @@ assert.match(
   readFileSync('tests/e2e/TEST-CATALOG.md', 'utf8'),
   /6e \| Result item performance sort exposes a 30-slice handoff[\s\S]*snapshot order, lowest accuracy, most answered, and item type[\s\S]*prompt text, expected or accepted answers/,
   'E2E catalog should include the item performance sort handoff journey and privacy guard.'
+);
+assert.match(
+  assignmentStudentSummarySortHandoffSource,
+  /ASSIGNMENT_STUDENT_SUMMARY_SORT_HANDOFF_ITEM_IDS = \[[\s\S]*'sort-scope'[\s\S]*'attempt-count-order'[\s\S]*'copy-artifact-consumer'[\s\S]*'privacy-guard'/,
+  'Assignment student summary sort handoff should name the route, table, copy-scope, tie-breaker, and privacy slices.'
+);
+assert.match(
+  assignmentResultFiltersSource,
+  /export function sortStudentSummaries[\s\S]*if \(sort === 'best'\)[\s\S]*if \(sort === 'name'\)[\s\S]*if \(sort === 'attempts'\)[\s\S]*if \(sort === 'last-submitted'\)[\s\S]*compareAssignmentStudentsByFollowUpPriority/,
+  'Assignment student summary sorting should preserve needs-review, best-score, name, attempts, and last-submitted review passes.'
+);
+assert.match(
+  assignmentResultViewSource,
+  /buildAssignmentStudentSummaryTableView\(\{[\s\S]*controlView: controlViews\.studentSearch,[\s\S]*reviewScopeSummary: resultView\.reviewScope\.summary,[\s\S]*sort: viewState\.studentSort,[\s\S]*students: resultView\.filteredStudents/,
+  'Assignment result page view should attach student-summary sort handoff evidence from the same sorted table rows and review scope.'
+);
+assert.match(
+  assignmentStudentSummarySortHandoffSource,
+  /buildAssignmentStudentSummarySortHandoffPrivacyContract[\s\S]*exposesRawRouteQuery: false[\s\S]*exposesStudentDisplayLabels: false[\s\S]*exposesStudentKeys: false[\s\S]*usesSortedTableRows: true/,
+  'Assignment student summary sort handoff should keep route queries, display labels, and student keys out while proving sorted-row reuse.'
+);
+assert.match(
+  assignmentResultsStudentSummarySortTableSource,
+  /data-handoff="assignment-student-summary-sort"[\s\S]*view\.itemViews\.map[\s\S]*data-handoff-item=\{itemView\.id\}[\s\S]*aria-label=\{itemView\.ariaLabel\}/,
+  'Assignment student summary table should render the hidden student sort semantic handoff.'
+);
+assert.match(
+  readFileSync('tests/e2e/TEST-CATALOG.md', 'utf8'),
+  /6g \| Result student summary sort exposes a 30-slice handoff[\s\S]*needs review, best score, student name, attempts, and last submitted[\s\S]*student display labels, student keys, raw anonymous tokens/,
+  'E2E catalog should include the student summary sort handoff journey and privacy guard.'
 );
 assert.doesNotMatch(
   assignmentResultViewSource,
@@ -8164,8 +8207,8 @@ assert.match(
 );
 assert.match(
   assignmentResultViewSource,
-  /studentSummaryTableView:\s*AssignmentResultStudentSummaryTableView[\s\S]*buildAssignmentStudentSummaryTableView[\s\S]*headers: assignmentResultTableHeaders\.studentSummary[\s\S]*rows: buildAssignmentStudentSummaryRowViews/,
-  'Assignment result page view-model should own formatted student summary table views.'
+  /studentSummaryTableView:\s*AssignmentResultStudentSummaryTableView[\s\S]*buildAssignmentStudentSummaryTableView[\s\S]*headers: assignmentResultTableHeaders\.studentSummary[\s\S]*rows,[\s\S]*sortHandoffView: buildAssignmentStudentSummarySortHandoffView/,
+  'Assignment result page view-model should own formatted student summary table views and student sort handoff evidence.'
 );
 assert.match(
   assignmentResultViewSource,
@@ -54403,6 +54446,104 @@ for (const privateSortHandoffValue of [
     `Item performance sort handoff leaked private text: ${privateSortHandoffValue}`
   );
 }
+const scoredStudentSummarySortHandoffView =
+  scoredResultsPageView.studentSummaryTableView.sortHandoffView;
+const scoredStudentSummarySortHandoffValues = new Map(
+  scoredStudentSummarySortHandoffView.itemViews.map((itemView) => [
+    itemView.id,
+    itemView.value,
+  ])
+);
+assert.deepEqual(
+  scoredStudentSummarySortHandoffView.itemViews.map((itemView) => itemView.id),
+  [...ASSIGNMENT_STUDENT_SUMMARY_SORT_HANDOFF_ITEM_IDS]
+);
+assert.equal(scoredStudentSummarySortHandoffView.itemViews.length, 30);
+assert.deepEqual(scoredStudentSummarySortHandoffView.privacy, {
+  exposesCopyArtifactText: false,
+  exposesRawAnonymousToken: false,
+  exposesRawRouteQuery: false,
+  exposesStudentAnswerText: false,
+  exposesStudentDisplayLabels: false,
+  exposesStudentKeys: false,
+  exposesTeacherAnswerKey: false,
+  itemIds: [...ASSIGNMENT_STUDENT_SUMMARY_SORT_HANDOFF_ITEM_IDS],
+  mutatesResultData: false,
+  scope: 'teacher-result-student-summary-sort',
+  usesAssignmentDomainHelpers: true,
+  usesSortedTableRows: true,
+});
+assert.deepEqual(
+  [
+    scoredStudentSummarySortHandoffValues.get('selected-sort'),
+    scoredStudentSummarySortHandoffValues.get('default-sort'),
+    scoredStudentSummarySortHandoffValues.get('student-name-order'),
+    scoredStudentSummarySortHandoffValues.get('table-row-count'),
+    scoredStudentSummarySortHandoffValues.get('matched-student-count'),
+    scoredStudentSummarySortHandoffValues.get('copy-scope-row-count'),
+    scoredStudentSummarySortHandoffValues.get('table-consumer'),
+    scoredStudentSummarySortHandoffValues.get('copy-artifact-consumer'),
+    scoredStudentSummarySortHandoffValues.get('anonymous-label-guard'),
+    scoredStudentSummarySortHandoffValues.get('privacy-guard'),
+  ],
+  [
+    'Student name',
+    'Non-default persisted',
+    'Active',
+    '1',
+    '1/1',
+    '1',
+    'Student summary table',
+    'Current copy scope',
+    'Hidden',
+    'Hidden',
+  ]
+);
+assert.deepEqual(
+  scoredResultsPageView.studentSummaryTableView.rows.map(
+    (rowView) => rowView.id
+  ),
+  scoredResultsPageView.copyActionData?.analysis.students.map(
+    (student) => student.studentKey
+  )
+);
+assert.deepEqual(
+  buildAssignmentStudentSummarySortHandoffEvidence({
+    reviewScopeSummary: {
+      attemptReviews: { matched: 1, total: 1 },
+      attemptRows: { matched: 1, total: 1 },
+      itemPerformance: { matched: 2, total: 2 },
+      students: { matched: 3.8, total: Number.NaN },
+    },
+    sort: 'attempts',
+    students: scoredResultsPageData.analysis.students,
+    tableRowCount: Number.NEGATIVE_INFINITY,
+  }),
+  {
+    copyScopeRowCount: 3,
+    matchedStudentCount: 1,
+    sortOptionCount: 5,
+    studentSort: 'attempts',
+    tableRowCount: 0,
+    totalStudentCount: 0,
+  }
+);
+for (const privateStudentSortHandoffValue of [
+  'Alice',
+  'answer-1',
+  'q-1',
+  'name:alice',
+  'result-share',
+  'data:text/csv',
+]) {
+  assert.equal(
+    JSON.stringify(scoredStudentSummarySortHandoffView).includes(
+      privateStudentSortHandoffValue
+    ),
+    false,
+    `Student summary sort handoff leaked private text: ${privateStudentSortHandoffValue}`
+  );
+}
 for (const privateControlsHandoffValue of [
   'Alice',
   'answer-1',
@@ -55877,19 +56018,29 @@ assert.deepEqual(
     ['anonymous:empty', 'Anonymous student 2', '0'],
   ]
 );
-const studentSummaryTableView = buildAssignmentStudentSummaryTableView([
-  resultAnalysis.students[1]!,
-  {
-    attempts: 0,
-    averageAccuracy: 0,
-    bestAccuracy: 0,
-    lastCompletedAt: null,
-    latestAccuracy: 0,
-    needsReviewCount: 0,
-    studentKey: 'anonymous:empty',
-    studentLabel: 'Anonymous student 2',
+const studentSummaryTableView = buildAssignmentStudentSummaryTableView({
+  controlView: defaultResultsPageView.controlViews.studentSearch,
+  reviewScopeSummary: {
+    attemptReviews: { matched: 2, total: 2 },
+    attemptRows: { matched: 2, total: 2 },
+    itemPerformance: { matched: 2, total: 2 },
+    students: { matched: 2, total: 2 },
   },
-]);
+  sort: 'needs-review',
+  students: [
+    resultAnalysis.students[1]!,
+    {
+      attempts: 0,
+      averageAccuracy: 0,
+      bestAccuracy: 0,
+      lastCompletedAt: null,
+      latestAccuracy: 0,
+      needsReviewCount: 0,
+      studentKey: 'anonymous:empty',
+      studentLabel: 'Anonymous student 2',
+    },
+  ],
+});
 assert.deepEqual(
   {
     ariaLabel: studentSummaryTableView.ariaLabel,
@@ -55902,6 +56053,17 @@ assert.deepEqual(
       row.studentLabel,
       row.attemptsLabel,
     ]),
+    sortHandoffValues: [
+      studentSummaryTableView.sortHandoffView.itemViews.find(
+        (itemView) => itemView.id === 'selected-sort'
+      )?.value,
+      studentSummaryTableView.sortHandoffView.itemViews.find(
+        (itemView) => itemView.id === 'table-row-count'
+      )?.value,
+      studentSummaryTableView.sortHandoffView.itemViews.find(
+        (itemView) => itemView.id === 'privacy-guard'
+      )?.value,
+    ],
   },
   {
     ariaLabel: 'Student summary',
@@ -55914,6 +56076,7 @@ assert.deepEqual(
       ['name:alice', 'Alice', '2'],
       ['anonymous:empty', 'Anonymous student 2', '0'],
     ],
+    sortHandoffValues: ['Needs review', '2', 'Hidden'],
   }
 );
 const runtimeOrderedResultAnalysis = analyzeAssignmentResults({

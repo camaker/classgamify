@@ -83,6 +83,11 @@ import {
   type AssignmentItemPerformanceSortHandoffView,
 } from '@/assignments/item-performance-sort-handoff';
 import {
+  buildAssignmentStudentSummarySortHandoffEvidence,
+  buildAssignmentStudentSummarySortHandoffView,
+  type AssignmentStudentSummarySortHandoffView,
+} from '@/assignments/student-summary-sort-handoff';
+import {
   type AssignmentShareLinkActionView,
   buildAssignmentShareLinkAvailability,
   buildAssignmentShareLinkActionView,
@@ -382,7 +387,9 @@ export type AssignmentResultStudentSummaryRowView =
   };
 
 export type AssignmentResultStudentSummaryTableView =
-  AssignmentResultTableView<AssignmentResultStudentSummaryRowView>;
+  AssignmentResultTableView<AssignmentResultStudentSummaryRowView> & {
+    sortHandoffView: AssignmentStudentSummarySortHandoffView;
+  };
 
 export type AssignmentResultItemAnalysisCardDisplayView = {
   acceptedAnswersLabel: string;
@@ -2003,14 +2010,36 @@ export function buildAssignmentStudentSummaryRowViews(
   }));
 }
 
-export function buildAssignmentStudentSummaryTableView(
-  students: AssignmentStudentSummary[]
-): AssignmentResultStudentSummaryTableView {
+export function buildAssignmentStudentSummaryTableView({
+  controlView,
+  reviewScopeSummary,
+  sort,
+  students,
+}: {
+  controlView: AssignmentResultStudentSearchControlView;
+  reviewScopeSummary: AssignmentResultReviewScopeSummary;
+  sort: StudentSummarySort;
+  students: AssignmentStudentSummary[];
+}): AssignmentResultStudentSummaryTableView {
+  const rows = buildAssignmentStudentSummaryRowViews(students);
+
   return {
     ariaLabel: assignmentResultSectionCopy.studentSummary.title,
     caption: assignmentResultSectionCopy.studentSummary.description,
     headers: assignmentResultTableHeaders.studentSummary,
-    rows: buildAssignmentStudentSummaryRowViews(students),
+    rows,
+    sortHandoffView: buildAssignmentStudentSummarySortHandoffView({
+      evidence: buildAssignmentStudentSummarySortHandoffEvidence({
+        reviewScopeSummary,
+        sort,
+        students,
+        tableRowCount: rows.length,
+      }),
+      selectedSortDescription: controlView.selectedSortOption.description,
+      selectedSortLabel: controlView.selectedSortOption.label,
+      statusDescription: controlView.sortStatusView.description,
+      statusLabel: controlView.sortStatusView.value,
+    }),
   };
 }
 
@@ -2537,9 +2566,12 @@ export function buildAssignmentResultsPageViewModel<
         timeLimitSeconds:
           headerView?.settingsSummaryView.settings.timeLimitSeconds,
       });
-  const studentSummaryTableView = buildAssignmentStudentSummaryTableView(
-    resultView.filteredStudents
-  );
+  const studentSummaryTableView = buildAssignmentStudentSummaryTableView({
+    controlView: controlViews.studentSearch,
+    reviewScopeSummary: resultView.reviewScope.summary,
+    sort: viewState.studentSort,
+    students: resultView.filteredStudents,
+  });
   const itemPerformanceTableView = buildAssignmentItemPerformanceTableView({
     controlView: controlViews.itemPerformanceSort,
     items: resultView.sortedPerformanceItems,
