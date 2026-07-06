@@ -34190,6 +34190,16 @@ assert.match(
 );
 assert.match(
   dashboardAssignmentsRouteSource,
+  /<AssignmentListPageHandoff[\s\S]*handoffView=\{activePageView\.handoffView\}[\s\S]*\/>/,
+  'Assignment dashboard route should render the prepared assignment-list page handoff from the page view-model.'
+);
+assert.match(
+  dashboardAssignmentsRouteSource,
+  /function AssignmentListPageHandoff[\s\S]*data-handoff="assignment-list"[\s\S]*handoffView\.itemViews\.map\(\(item\) =>[\s\S]*AssignmentListPageHandoffItem[\s\S]*function AssignmentListPageHandoffItem[\s\S]*data-handoff-item=\{item\.id\}[\s\S]*<output aria-label=\{item\.ariaLabel\}>/,
+  'Assignment dashboard route should expose the page handoff marker and stable assignment-list item outputs.'
+);
+assert.match(
+  dashboardAssignmentsRouteSource,
   /AssignmentListCard/,
   'Assignment dashboard route should delegate assignment card rendering to the assignment list card component.'
 );

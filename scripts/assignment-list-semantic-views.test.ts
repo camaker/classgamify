@@ -1,4 +1,5 @@
 import assert from 'node:assert/strict';
+import { readFileSync } from 'node:fs';
 import test from 'node:test';
 import {
   ASSIGNMENT_LIST_PAGE_HANDOFF_ITEM_IDS,
@@ -14,6 +15,24 @@ const SECRET_OWNER_ID = 'SECRET_OWNER_ID';
 const SECRET_STORAGE_KEY = 'classroom/private/assignment-source.json';
 const SECRET_STUDENT_ANSWER = 'SECRET_STUDENT_ANSWER';
 const SECRET_TOKEN = 'raw-anonymous-token-value';
+
+test('assignment dashboard route renders the page handoff marker and item outputs', () => {
+  const routeSource = readFileSync(
+    'src/routes/dashboard/assignments.tsx',
+    'utf8'
+  );
+
+  assert.match(
+    routeSource,
+    /<AssignmentListPageHandoff[\s\S]*handoffView=\{activePageView\.handoffView\}[\s\S]*\/>/,
+    'Assignment dashboard route should render the prepared assignment-list page handoff view.'
+  );
+  assert.match(
+    routeSource,
+    /function AssignmentListPageHandoff[\s\S]*data-handoff="assignment-list"[\s\S]*handoffView\.itemViews\.map\(\(item\) =>[\s\S]*AssignmentListPageHandoffItem[\s\S]*function AssignmentListPageHandoffItem[\s\S]*data-handoff-item=\{item\.id\}[\s\S]*<output aria-label=\{item\.ariaLabel\}>/,
+    'Assignment dashboard route should expose the assignment-list marker, stable item markers, and prepared item outputs.'
+  );
+});
 
 test('assignment list page exposes a 30-slice distribution handoff', () => {
   const pageView = buildAssignmentListPageViewModel({

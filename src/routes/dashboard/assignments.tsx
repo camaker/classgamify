@@ -9,6 +9,8 @@ import {
 } from '@/assignments/list-filters';
 import {
   assignmentListActionCopy,
+  type AssignmentListPageHandoffItemView,
+  type AssignmentListPageHandoffView,
   buildAssignmentListCardViewModel,
   buildAssignmentListRouteState,
   buildStarterAssignmentListCardViewModel,
@@ -27,7 +29,7 @@ import { Routes } from '@/lib/routes';
 import { cn } from '@/lib/utils';
 import { IconListCheck, IconX } from '@tabler/icons-react';
 import { Link, createFileRoute, useNavigate } from '@tanstack/react-router';
-import { useEffect, useMemo } from 'react';
+import { useEffect, useId, useMemo } from 'react';
 
 export const Route = createFileRoute('/dashboard/assignments')({
   validateSearch: buildAssignmentListValidatedSearch,
@@ -137,6 +139,8 @@ function DashboardAssignmentsPage() {
       description={activePageView.description}
     >
       <div className="grid gap-6">
+        <AssignmentListPageHandoff handoffView={activePageView.handoffView} />
+
         <section className="grid gap-4 md:grid-cols-4">
           {activePageView.summaryMetrics.map((metric) => (
             <AssignmentListSummaryCard key={metric.id} metric={metric} />
@@ -269,5 +273,47 @@ function DashboardAssignmentsPage() {
         ) : null}
       </div>
     </DashboardLayout>
+  );
+}
+
+function AssignmentListPageHandoff({
+  handoffView,
+}: {
+  handoffView: AssignmentListPageHandoffView;
+}) {
+  const titleId = useId();
+  const descriptionId = useId();
+
+  return (
+    <section
+      aria-describedby={descriptionId}
+      aria-labelledby={titleId}
+      className="sr-only"
+      data-handoff="assignment-list"
+    >
+      <h2 id={titleId}>{handoffView.title}</h2>
+      <p id={descriptionId}>{handoffView.description}</p>
+      <dl>
+        {handoffView.itemViews.map((item) => (
+          <AssignmentListPageHandoffItem item={item} key={item.id} />
+        ))}
+      </dl>
+    </section>
+  );
+}
+
+function AssignmentListPageHandoffItem({
+  item,
+}: {
+  item: AssignmentListPageHandoffItemView;
+}) {
+  return (
+    <div data-handoff-item={item.id}>
+      <dt>{item.label}</dt>
+      <dd>
+        <output aria-label={item.ariaLabel}>{item.value}</output>
+        <span>{item.description}</span>
+      </dd>
+    </div>
   );
 }
