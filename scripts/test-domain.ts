@@ -7540,12 +7540,12 @@ assert.match(
 assert.match(
   publicPageViewSource,
   /buildRoadmapTaskView\(\{[\s\S]*evidenceLabel: m\.roadmap_task_evidence_label\(\)[\s\S]*nextStepLabel: m\.roadmap_task_next_step_label\(\)[\s\S]*statusAriaLabel: m\.roadmap_task_status_aria/,
-  'Roadmap task status, teacher-value, and product-direction labels should be prepared through localized page view helpers.'
+  'Roadmap task status, teacher-value, and classroom-direction labels should be prepared through localized page view helpers.'
 );
 assert.match(
   readFileSync('tests/e2e/TEST-CATALOG.md', 'utf8'),
-  /\|\s*17\s*\|\s*Homepage and template routes enter ClassGamify product loops\s*\|[\s\S]*teacher-value label[\s\S]*product-direction next step[\s\S]*rather than internal classroom-evidence or task-board wording/,
-  'E2E catalog should require roadmap items to use teacher-value and product-direction wording instead of internal task-board language.'
+  /\|\s*17\s*\|\s*Homepage and template routes enter ClassGamify product loops\s*\|[\s\S]*teacher-value label[\s\S]*classroom-direction next step[\s\S]*rather than internal classroom-evidence or task-board wording/,
+  'E2E catalog should require roadmap items to use teacher-value and classroom-direction wording instead of internal task-board language.'
 );
 assert.match(
   publicPageViewSource,
@@ -9410,6 +9410,16 @@ assert.match(
   listeningRunnerSource,
   /buildListeningPromptView/,
   'Listening runner should delegate speech language and transcript visibility to the listening prompt view helper.'
+);
+assert.match(
+  listeningRunnerSource,
+  /buildListeningSpeechHandoffView[\s\S]*promptView: activePromptView[\s\S]*runnerView[\s\S]*speechSupported/,
+  'Listening runner should expose the prepared listening speech handoff from the shared runner and prompt views.'
+);
+assert.match(
+  listeningRunnerSource,
+  /data-handoff="listening-speech"[\s\S]*view\.itemViews\.map[\s\S]*data-handoff-item=\{item\.id\}/,
+  'Listening runner should render stable listening speech handoff markers and item outputs.'
 );
 assert.match(
   listeningRunnerSource,
@@ -37260,9 +37270,9 @@ assert.deepEqual(buildPricingFaqItems(), [
   },
   {
     answer:
-      'That is part of the product direction. School use needs teacher seats, student data rules, permissions, and rollout details, so contact us before a larger deployment.',
+      'That is part of the classroom direction. School use needs teacher seats, student data rules, permissions, and rollout details, so contact us before a larger deployment.',
     ariaLabel:
-      'Can schools or tutoring teams use it?: That is part of the product direction. School use needs teacher seats, student data rules, permissions, and rollout details, so contact us before a larger deployment.',
+      'Can schools or tutoring teams use it?: That is part of the classroom direction. School use needs teacher seats, student data rules, permissions, and rollout details, so contact us before a larger deployment.',
     id: 'schools',
     question: 'Can schools or tutoring teams use it?',
   },
@@ -37591,7 +37601,7 @@ assert.deepEqual(roadmapPageViewModel, {
     },
   ],
   hero: {
-    badgeLabel: 'Product direction',
+    badgeLabel: 'Classroom direction',
     description:
       'A practical view of what is already usable, what is being tightened now, and how teacher-reviewed AI creation expands next.',
     primaryAction: {
@@ -37605,7 +37615,7 @@ assert.deepEqual(roadmapPageViewModel, {
       label: 'Browse templates',
       to: Routes.Templates,
     },
-    title: 'ClassGamify product roadmap',
+    title: 'ClassGamify classroom journey',
   },
   principles: [
     {
@@ -37649,7 +37659,8 @@ assert.deepEqual(roadmapPageViewModel, {
   ],
   validation: {
     action: {
-      ariaLabel: 'Share classroom feedback about the ClassGamify roadmap.',
+      ariaLabel:
+        'Share classroom feedback about the ClassGamify classroom direction.',
       label: 'Share classroom feedback',
       to: Routes.ContactClassroom,
     },
@@ -37706,7 +37717,7 @@ assert.deepEqual(
     ['worksheet-extraction-boundary', 'Exploring'],
     ['school-workflow-boundary', 'Exploring'],
     ['task-evidence-boundary', 'Public product summary'],
-    ['task-next-step-boundary', 'Product direction'],
+    ['task-next-step-boundary', 'Classroom direction'],
     ['hero-action-boundary', 'Ready teacher actions'],
     ['create-route', Routes.Create],
     ['templates-route', Routes.Templates],
@@ -37721,7 +37732,7 @@ assert.deepEqual(
       'validation-decision-boundary',
       'We choose work that saves teachers time',
     ],
-    ['public-copy-boundary', 'Prepared product copy'],
+    ['public-copy-boundary', 'Prepared classroom copy'],
     ['legacy-copy-guard', 'ClassGamify only'],
     ['privacy-guard', 'Private data hidden'],
   ]

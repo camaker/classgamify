@@ -9,6 +9,13 @@ export type ListeningPromptStatusItemView = {
   value: string;
 };
 
+export type ListeningPromptView = {
+  speechLanguage: string | undefined;
+  speechText: string;
+  statusItemViews: ListeningPromptStatusItemView[];
+  transcriptText: string | undefined;
+};
+
 const SPEECH_LANGUAGE_ALIASES = new Map<string, string>([
   ['chinese', 'zh-CN'],
   ['mandarin', 'zh-CN'],
@@ -52,7 +59,7 @@ export function buildListeningPromptView({
   prompt: string;
   revealAnswer: boolean;
   speechSupported?: boolean;
-}) {
+}): ListeningPromptView {
   const speechLanguage = normalizeListeningSpeechLanguage(language);
 
   return {

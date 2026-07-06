@@ -80,7 +80,7 @@ test('roadmap handoff exposes 30 safe public product-boundary slices', () => {
       ['worksheet-extraction-boundary', 'Exploring'],
       ['school-workflow-boundary', 'Exploring'],
       ['task-evidence-boundary', 'Public product summary'],
-      ['task-next-step-boundary', 'Product direction'],
+      ['task-next-step-boundary', 'Classroom direction'],
       ['hero-action-boundary', 'Ready teacher actions'],
       ['create-route', Routes.Create],
       ['templates-route', Routes.Templates],
@@ -95,7 +95,7 @@ test('roadmap handoff exposes 30 safe public product-boundary slices', () => {
         'validation-decision-boundary',
         'We choose work that saves teachers time',
       ],
-      ['public-copy-boundary', 'Prepared product copy'],
+      ['public-copy-boundary', 'Prepared classroom copy'],
       ['legacy-copy-guard', 'ClassGamify only'],
       ['privacy-guard', 'Private data hidden'],
     ]
@@ -108,8 +108,8 @@ test('roadmap handoff localizes Chinese product boundaries', () => {
   try {
     const handoffView = buildRoadmapPageViewModel().handoffView;
 
-    assert.equal(handoffView.title, '路线图摘要');
-    assert.match(handoffView.description, /公开路线图摘要/);
+    assert.equal(handoffView.title, '课堂旅程摘要');
+    assert.match(handoffView.description, /公开课堂旅程摘要/);
     assert.equal(
       getHandoffItemValue(handoffView, 'current-loop'),
       'Activity -> Assignment -> Attempt -> Results'
@@ -138,7 +138,7 @@ test('roadmap handoff localizes Chinese product boundaries', () => {
     );
     assert.equal(
       getHandoffItemValue(handoffView, 'task-next-step-boundary'),
-      '产品方向'
+      '课堂方向'
     );
     assert.equal(
       getHandoffItemValue(handoffView, 'validation-decision-boundary'),
@@ -146,7 +146,7 @@ test('roadmap handoff localizes Chinese product boundaries', () => {
     );
     assert.equal(
       getHandoffItemValue(handoffView, 'public-copy-boundary'),
-      '已准备产品文案'
+      '已准备课堂文案'
     );
     assert.equal(
       getHandoffItemValue(handoffView, 'legacy-copy-guard'),

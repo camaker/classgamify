@@ -10,6 +10,10 @@ import {
   resolveSequentialStudentRunnerNavigationAction,
   type SequentialStudentRunnerNavigationAction,
 } from '@/assignments/student-runner-view';
+import {
+  buildListeningSpeechHandoffView,
+  type ListeningSpeechHandoffView,
+} from '@/assignments/listening-speech-handoff';
 import { buildListeningPromptView } from '@/activities/listening-speech';
 import { PublicAnswerFeedback } from '@/components/activities/public-answer-feedback';
 import { Badge } from '@/components/ui/badge';
@@ -104,6 +108,25 @@ export function ListeningRunner({
         : undefined,
     [activeItem, language, revealAnswer, speechSupported]
   );
+  const speechHandoffView = useMemo(
+    () =>
+      buildListeningSpeechHandoffView({
+        disabled,
+        language,
+        promptView: activePromptView,
+        revealAnswer,
+        runnerView,
+        speechSupported,
+      }),
+    [
+      activePromptView,
+      disabled,
+      language,
+      revealAnswer,
+      runnerView,
+      speechSupported,
+    ]
+  );
 
   useEffect(() => {
     setSpeechSupported(
@@ -143,178 +166,213 @@ export function ListeningRunner({
   const describedBy = `${helpId} ${statusId}`;
 
   return (
-    <div className="rounded-lg border bg-card p-3">
-      <div className="flex flex-wrap items-center justify-between gap-2">
-        <div className="flex items-center gap-2 text-sm font-medium">
-          <IconVolume className="size-4 text-primary" />
-          {copy.title}
+    <>
+      <div className="rounded-lg border bg-card p-3">
+        <div className="flex flex-wrap items-center justify-between gap-2">
+          <div className="flex items-center gap-2 text-sm font-medium">
+            <IconVolume className="size-4 text-primary" />
+            {copy.title}
+          </div>
+          <Badge variant="outline" className="rounded-md">
+            {runnerView.progressLabel}
+          </Badge>
         </div>
-        <Badge variant="outline" className="rounded-md">
-          {runnerView.progressLabel}
-        </Badge>
-      </div>
 
-      <div className="mt-3 grid gap-3 lg:grid-cols-[minmax(12rem,18rem)_minmax(0,1fr)]">
-        <div className="grid content-start gap-2">
-          {navigationView.itemViews.map((itemView) => {
-            const {
-              answered,
-              item,
-              reviewStatusClassName,
-              selected,
-              sequenceLabel,
-            } = itemView;
+        <div className="mt-3 grid gap-3 lg:grid-cols-[minmax(12rem,18rem)_minmax(0,1fr)]">
+          <div className="grid content-start gap-2">
+            {navigationView.itemViews.map((itemView) => {
+              const {
+                answered,
+                item,
+                reviewStatusClassName,
+                selected,
+                sequenceLabel,
+              } = itemView;
 
-            return (
-              <button
-                key={item.id}
-                type="button"
-                className={cn(
-                  'min-h-14 rounded-lg border bg-background p-3 text-left transition-colors',
-                  'hover:border-primary/50 hover:bg-primary/5',
-                  selected && 'border-primary bg-primary/10',
-                  reviewStatusClassName
-                )}
-                onClick={() => handleNavigationAction(itemView.selectAction)}
-              >
-                <div className="flex items-center justify-between gap-2">
-                  <span className="text-sm font-medium">{sequenceLabel}</span>
-                  {answered ? (
-                    <IconCheck className="size-4 text-primary" />
-                  ) : (
-                    <IconVolume className="size-4 text-muted-foreground" />
+              return (
+                <button
+                  key={item.id}
+                  type="button"
+                  className={cn(
+                    'min-h-14 rounded-lg border bg-background p-3 text-left transition-colors',
+                    'hover:border-primary/50 hover:bg-primary/5',
+                    selected && 'border-primary bg-primary/10',
+                    reviewStatusClassName
                   )}
-                </div>
-              </button>
-            );
-          })}
-        </div>
-
-        <div
-          className={cn(
-            'rounded-lg border bg-background p-4',
-            navigationView.activePanelStatusClassName
-          )}
-        >
-          <div className="flex flex-wrap items-center justify-between gap-2">
-            <Badge variant="secondary" className="rounded-md">
-              {sequenceView.activeLabel}
-            </Badge>
-            <Button
-              type="button"
-              variant="outline"
-              aria-describedby={`${playDescriptionId} ${describedBy}`}
-              disabled={!speechSupported}
-              onClick={playPrompt}
-            >
-              {speechSupported ? (
-                <IconPlayerPlay className="size-4" />
-              ) : (
-                <IconVolumeOff className="size-4" />
-              )}
-              {copy.playAudioLabel}
-            </Button>
-          </div>
-
-          <p id={playDescriptionId} className="sr-only">
-            {
-              activePromptView?.statusItemViews.find(
-                (itemView) => itemView.id === 'speech'
-              )?.description
-            }
-          </p>
-
-          <div className="mt-6 rounded-lg border bg-muted/20 p-4">
-            <p className="text-xs font-medium uppercase text-muted-foreground">
-              {copy.listeningPromptLabel}
-            </p>
-            <p
-              id={helpId}
-              className="mt-2 text-sm leading-6 text-muted-foreground"
-            >
-              {copy.helpText}
-            </p>
-            {activePromptView ? (
-              <dl
-                id={statusId}
-                aria-label={copy.listeningReadinessLabel}
-                className="mt-4 grid gap-2 sm:grid-cols-3"
-              >
-                {activePromptView.statusItemViews.map((itemView) => (
-                  <div
-                    key={itemView.id}
-                    className="rounded-md border bg-background px-3 py-2"
-                  >
-                    <dt className="text-xs font-medium text-muted-foreground">
-                      {itemView.label}
-                    </dt>
-                    <dd className="mt-1 text-sm font-semibold">
-                      {itemView.value}
-                    </dd>
-                    <dd className="sr-only">{itemView.description}</dd>
-                  </div>
-                ))}
-              </dl>
-            ) : null}
-            {activePromptView?.transcriptText ? (
-              <p className="mt-4 text-base font-semibold leading-7">
-                {activePromptView.transcriptText}
-              </p>
-            ) : null}
-          </div>
-
-          {runnerView.activeChoiceViews.length ? (
-            <div className="mt-4 grid gap-2 sm:grid-cols-2">
-              {runnerView.activeChoiceViews.map((choiceView) => {
-                return (
-                  <button
-                    key={choiceView.id}
-                    type="button"
-                    disabled={disabled}
-                    className={cn(
-                      'min-h-10 rounded-lg border bg-background px-3 py-2 text-left text-sm transition-colors',
-                      'hover:border-primary/50 hover:bg-primary/5 disabled:cursor-default disabled:opacity-100',
-                      choiceView.selected &&
-                        'border-primary bg-primary/10 text-primary'
+                  onClick={() => handleNavigationAction(itemView.selectAction)}
+                >
+                  <div className="flex items-center justify-between gap-2">
+                    <span className="text-sm font-medium">{sequenceLabel}</span>
+                    {answered ? (
+                      <IconCheck className="size-4 text-primary" />
+                    ) : (
+                      <IconVolume className="size-4 text-muted-foreground" />
                     )}
-                    onClick={() =>
-                      onAnswerChange(activeItem.id, choiceView.choice)
-                    }
-                  >
-                    {choiceView.choice}
-                  </button>
-                );
-              })}
+                  </div>
+                </button>
+              );
+            })}
+          </div>
+
+          <div
+            className={cn(
+              'rounded-lg border bg-background p-4',
+              navigationView.activePanelStatusClassName
+            )}
+          >
+            <div className="flex flex-wrap items-center justify-between gap-2">
+              <Badge variant="secondary" className="rounded-md">
+                {sequenceView.activeLabel}
+              </Badge>
+              <Button
+                type="button"
+                variant="outline"
+                aria-describedby={`${playDescriptionId} ${describedBy}`}
+                disabled={!speechSupported}
+                onClick={playPrompt}
+              >
+                {speechSupported ? (
+                  <IconPlayerPlay className="size-4" />
+                ) : (
+                  <IconVolumeOff className="size-4" />
+                )}
+                {copy.playAudioLabel}
+              </Button>
             </div>
-          ) : (
-            <Input
-              value={runnerView.activeAnswer}
-              disabled={disabled}
-              aria-describedby={`${inputDescriptionId} ${describedBy}`}
-              onChange={(event) =>
-                onAnswerChange(activeItem.id, event.target.value)
+
+            <p id={playDescriptionId} className="sr-only">
+              {
+                activePromptView?.statusItemViews.find(
+                  (itemView) => itemView.id === 'speech'
+                )?.description
               }
-              placeholder={copy.inputPlaceholder}
-              className="mt-4"
-            />
-          )}
+            </p>
 
-          <p id={inputDescriptionId} className="sr-only">
-            {
-              activePromptView?.statusItemViews.find(
-                (itemView) => itemView.id === 'transcript'
-              )?.description
-            }
-          </p>
+            <div className="mt-6 rounded-lg border bg-muted/20 p-4">
+              <p className="text-xs font-medium uppercase text-muted-foreground">
+                {copy.listeningPromptLabel}
+              </p>
+              <p
+                id={helpId}
+                className="mt-2 text-sm leading-6 text-muted-foreground"
+              >
+                {copy.helpText}
+              </p>
+              {activePromptView ? (
+                <dl
+                  id={statusId}
+                  aria-label={copy.listeningReadinessLabel}
+                  className="mt-4 grid gap-2 sm:grid-cols-3"
+                >
+                  {activePromptView.statusItemViews.map((itemView) => (
+                    <div
+                      key={itemView.id}
+                      className="rounded-md border bg-background px-3 py-2"
+                    >
+                      <dt className="text-xs font-medium text-muted-foreground">
+                        {itemView.label}
+                      </dt>
+                      <dd className="mt-1 text-sm font-semibold">
+                        {itemView.value}
+                      </dd>
+                      <dd className="sr-only">{itemView.description}</dd>
+                    </div>
+                  ))}
+                </dl>
+              ) : null}
+              {activePromptView?.transcriptText ? (
+                <p className="mt-4 text-base font-semibold leading-7">
+                  {activePromptView.transcriptText}
+                </p>
+              ) : null}
+            </div>
 
-          {revealAnswer && runnerView.activeReviewItem ? (
-            <PublicAnswerFeedback
-              correctLabel={copy.correctAnswerLabel}
-              reviewItem={runnerView.activeReviewItem}
-            />
-          ) : null}
+            {runnerView.activeChoiceViews.length ? (
+              <div className="mt-4 grid gap-2 sm:grid-cols-2">
+                {runnerView.activeChoiceViews.map((choiceView) => {
+                  return (
+                    <button
+                      key={choiceView.id}
+                      type="button"
+                      disabled={disabled}
+                      className={cn(
+                        'min-h-10 rounded-lg border bg-background px-3 py-2 text-left text-sm transition-colors',
+                        'hover:border-primary/50 hover:bg-primary/5 disabled:cursor-default disabled:opacity-100',
+                        choiceView.selected &&
+                          'border-primary bg-primary/10 text-primary'
+                      )}
+                      onClick={() =>
+                        onAnswerChange(activeItem.id, choiceView.choice)
+                      }
+                    >
+                      {choiceView.choice}
+                    </button>
+                  );
+                })}
+              </div>
+            ) : (
+              <Input
+                value={runnerView.activeAnswer}
+                disabled={disabled}
+                aria-describedby={`${inputDescriptionId} ${describedBy}`}
+                onChange={(event) =>
+                  onAnswerChange(activeItem.id, event.target.value)
+                }
+                placeholder={copy.inputPlaceholder}
+                className="mt-4"
+              />
+            )}
+
+            <p id={inputDescriptionId} className="sr-only">
+              {
+                activePromptView?.statusItemViews.find(
+                  (itemView) => itemView.id === 'transcript'
+                )?.description
+              }
+            </p>
+
+            {revealAnswer && runnerView.activeReviewItem ? (
+              <PublicAnswerFeedback
+                correctLabel={copy.correctAnswerLabel}
+                reviewItem={runnerView.activeReviewItem}
+              />
+            ) : null}
+          </div>
         </div>
       </div>
-    </div>
+      <ListeningSpeechHandoff view={speechHandoffView} />
+    </>
+  );
+}
+
+function ListeningSpeechHandoff({
+  view,
+}: {
+  view: ListeningSpeechHandoffView;
+}) {
+  const titleId = 'listening-speech-handoff-title';
+  const descriptionId = 'listening-speech-handoff-description';
+
+  return (
+    <section
+      aria-describedby={descriptionId}
+      aria-labelledby={titleId}
+      className="sr-only"
+      data-handoff="listening-speech"
+    >
+      <h2 id={titleId}>{view.title}</h2>
+      <p id={descriptionId}>{view.description}</p>
+      <dl>
+        {view.itemViews.map((item) => (
+          <div data-handoff-item={item.id} key={item.id}>
+            <dt>{item.label}</dt>
+            <dd>
+              <output aria-label={item.ariaLabel}>{item.value}</output>
+              <span>{item.description}</span>
+            </dd>
+          </div>
+        ))}
+      </dl>
+    </section>
   );
 }
