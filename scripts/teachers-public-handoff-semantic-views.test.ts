@@ -33,8 +33,8 @@ test('teachers public handoff exposes 30 safe product-loop slices', () => {
 
   assert.deepEqual(itemIds, [...TEACHERS_PAGE_HANDOFF_ITEM_IDS]);
   assert.equal(new Set(itemIds).size, 30);
-  assert.equal(handoffView.title, 'Teachers page product-loop handoff');
-  assert.match(handoffView.description, /30-slice teachers page/);
+  assert.equal(handoffView.title, 'Teachers page classroom flow summary');
+  assert.match(handoffView.description, /Teachers page summary/);
   assert.equal(
     handoffView.itemViews.every(
       (item) =>
@@ -170,8 +170,8 @@ test('teachers public handoff localizes Chinese product boundaries', () => {
   try {
     const handoffView = buildTeachersPageViewModel().handoffView;
 
-    assert.equal(handoffView.title, '教师页产品闭环交接');
-    assert.match(handoffView.description, /30 切片教师页产品闭环交接/);
+    assert.equal(handoffView.title, '教师页课堂流程摘要');
+    assert.match(handoffView.description, /教师页摘要/);
     assert.equal(getHandoffValue(handoffView, 'teachers-route'), '/teachers');
     assert.equal(
       getHandoffValue(handoffView, 'teacher-audience'),

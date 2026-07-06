@@ -98,7 +98,7 @@ test('public template entry handoff exposes 30 safe creation slices', () => {
   );
   assert.equal(
     getHandoffValue(handoffView, 'scaffold-loading'),
-    'Scaffold loaded'
+    'Example loaded'
   );
   assert.equal(
     getHandoffValue(handoffView, 'shared-editor-contract'),
@@ -137,7 +137,7 @@ test('public template entry handoff exposes 30 safe creation slices', () => {
   );
   assert.equal(
     getHandoffValue(handoffView, 'legacy-product-guard'),
-    'No legacy product'
+    'Current classroom product'
   );
   assert.equal(getHandoffValue(handoffView, 'indexing-scope'), 'Public entry');
   assert.equal(

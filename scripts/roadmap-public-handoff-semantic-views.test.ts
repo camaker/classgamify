@@ -64,7 +64,7 @@ test('roadmap handoff exposes 30 safe public product-boundary slices', () => {
       ['improving-count', '2'],
       ['planned-count', '2'],
       ['column-board', '3 columns'],
-      ['status-label-boundary', 'Prepared status labels'],
+      ['status-label-boundary', 'Clear status labels'],
       ['activity-assignment-loop', 'Live'],
       ['template-foundation', 'Live'],
       ['ai-draft-capability', 'Live'],
@@ -74,7 +74,7 @@ test('roadmap handoff exposes 30 safe public product-boundary slices', () => {
       ['school-workflow-boundary', 'Exploring'],
       ['task-evidence-boundary', 'Public evidence only'],
       ['task-next-step-boundary', 'Shared next steps'],
-      ['hero-action-boundary', 'Prepared CTA routes'],
+      ['hero-action-boundary', 'Ready teacher actions'],
       ['create-route', Routes.Create],
       ['templates-route', Routes.Templates],
       ['feedback-route', Routes.ContactClassroom],
@@ -101,8 +101,8 @@ test('roadmap handoff localizes Chinese product boundaries', () => {
   try {
     const handoffView = buildRoadmapPageViewModel().handoffView;
 
-    assert.equal(handoffView.title, '公开路线图交接');
-    assert.match(handoffView.description, /30 切片公开路线图边界/);
+    assert.equal(handoffView.title, '路线图摘要');
+    assert.match(handoffView.description, /公开路线图摘要/);
     assert.equal(
       getHandoffItemValue(handoffView, 'current-loop'),
       'Activity -> Assignment -> Attempt -> Results'
@@ -115,7 +115,7 @@ test('roadmap handoff localizes Chinese product boundaries', () => {
     assert.equal(getHandoffItemValue(handoffView, 'column-board'), '3 个栏目');
     assert.equal(
       getHandoffItemValue(handoffView, 'status-label-boundary'),
-      '已准备状态标签'
+      '清晰状态标签'
     );
     assert.equal(
       getHandoffItemValue(handoffView, 'snapshot-panel'),

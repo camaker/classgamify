@@ -61,10 +61,10 @@ test('homepage product-loop handoff exposes 30 public entry slices', () => {
       ['create-route', Routes.Create],
       ['templates-route', Routes.Templates],
       ['worksheets-route', Routes.Worksheets],
-      ['starter-preview-source', 'Starter preview'],
-      ['starter-preview-activity', 'Starter activity'],
-      ['starter-preview-assignment', 'Starter assignment'],
-      ['starter-preview-submit-boundary', 'Read-only preview'],
+      ['starter-preview-source', 'Sample preview'],
+      ['starter-preview-activity', 'Sample activity'],
+      ['starter-preview-assignment', 'Sample assignment'],
+      ['starter-preview-submit-boundary', 'Read-only sample'],
       ['feature-section', '4 items'],
       ['feature-structured-activities', 'Structured activities'],
       ['feature-template-switching', 'Template switching'],
@@ -76,11 +76,11 @@ test('homepage product-loop handoff exposes 30 public entry slices', () => {
       ['signal-results', 'Attempt log'],
       ['activity-content-model', 'ActivityContent'],
       ['assignment-snapshot-boundary', 'AssignmentSnapshot'],
-      ['student-runner-boundary', 'Public runner'],
+      ['student-runner-boundary', 'Public practice'],
       ['result-review-boundary', 'Teacher results'],
       ['worksheet-extension-boundary', Routes.Worksheets],
       ['ai-draft-boundary', 'Teacher-reviewed'],
-      ['legacy-entrypoint-guard', 'ClassGamify entrypoints'],
+      ['legacy-entrypoint-guard', 'ClassGamify paths'],
       ['indexing-scope', 'Public entrypoint'],
       ['privacy-guard', 'Private data hidden'],
     ]
@@ -93,8 +93,8 @@ test('homepage product-loop handoff localizes Chinese public boundaries', () => 
   try {
     const handoffView = buildHomePageViewModel().handoffView;
 
-    assert.equal(handoffView.title, '首页产品闭环交接');
-    assert.match(handoffView.description, /30 切片首页产品闭环交接/);
+    assert.equal(handoffView.title, '首页课堂流程摘要');
+    assert.match(handoffView.description, /首页摘要/);
     assert.equal(
       getHandoffValue(handoffView, 'product-loop'),
       'Activity -> Assignment -> Attempt -> Results'
@@ -104,7 +104,7 @@ test('homepage product-loop handoff localizes Chinese public boundaries', () => 
     assert.equal(getHandoffValue(handoffView, 'signal-panel'), '3 个项目');
     assert.equal(
       getHandoffValue(handoffView, 'starter-preview-submit-boundary'),
-      '只读预览'
+      '只读示例'
     );
     assert.equal(
       getHandoffValue(handoffView, 'legacy-entrypoint-guard'),

@@ -786,6 +786,11 @@ import {
   buildAssignmentStudentSummarySortHandoffView,
 } from '@/assignments/student-summary-sort-handoff';
 import {
+  ASSIGNMENT_ATTEMPT_REVIEW_CARD_HANDOFF_ITEM_IDS,
+  buildAssignmentAttemptReviewCardHandoffEvidence,
+  buildAssignmentAttemptReviewCardHandoffView,
+} from '@/assignments/attempt-review-card-handoff';
+import {
   assignmentResultPageCopy,
   assignmentResultReviewCopy,
   assignmentResultSearchCopy,
@@ -7961,6 +7966,10 @@ const assignmentResultAnswerViewSource = readFileSync(
   'src/assignments/result-answer-view.ts',
   'utf8'
 );
+const assignmentAttemptReviewCardHandoffSource = readFileSync(
+  'src/assignments/attempt-review-card-handoff.ts',
+  'utf8'
+);
 assert.doesNotMatch(
   assignmentResultRouteSource,
   /attemptCount:\s*data\?\.attempts\.length/,
@@ -8989,6 +8998,36 @@ assert.match(
   assignmentResultsAttemptReviewCardSource,
   /metricView\.ariaLabel[\s\S]*function AssignmentResultsAttemptAnswerReview[\s\S]*aria-label=\{answerView\.ariaLabel\}[\s\S]*answerView\.studentAnswerLineText[\s\S]*answerView\.expectedAnswerLineText[\s\S]*answerView\.acceptedAnswersLineText/,
   'Assignment result attempt answer review item should render prepared metric labels, answer-review accessible labels, and text lines.'
+);
+assert.match(
+  assignmentAttemptReviewCardHandoffSource,
+  /export const ASSIGNMENT_ATTEMPT_REVIEW_CARD_HANDOFF_ITEM_IDS = \[(?=[\s\S]*'review-card-scope')(?=[\s\S]*'student-display-boundary')(?=[\s\S]*'submitted-time-display')(?=[\s\S]*'score-badge')(?=[\s\S]*'summary-metric-count')(?=[\s\S]*'submitted-count')(?=[\s\S]*'correct-count')(?=[\s\S]*'needs-review-count')(?=[\s\S]*'unanswered-count')(?=[\s\S]*'answer-card-count')(?=[\s\S]*'answer-sequence')(?=[\s\S]*'prompt-labels')(?=[\s\S]*'status-labels')(?=[\s\S]*'correct-status-count')(?=[\s\S]*'needs-review-status-count')(?=[\s\S]*'unanswered-status-count')(?=[\s\S]*'student-answer-lines')(?=[\s\S]*'expected-answer-lines')(?=[\s\S]*'accepted-alternatives-lines')(?=[\s\S]*'explanation-lines')(?=[\s\S]*'unsubmitted-answer-guard')(?=[\s\S]*'answer-text-view-helper')(?=[\s\S]*'answer-status-helper')(?=[\s\S]*'attempt-summary-helper')(?=[\s\S]*'review-card-consumer')(?=[\s\S]*'review-filter-consumer')(?=[\s\S]*'copy-scope-boundary')(?=[\s\S]*'csv-export-boundary')(?=[\s\S]*'anonymous-token-guard')(?=[\s\S]*'privacy-guard')/,
+  'Attempt review card handoff should preserve the 30-slice item id contract.'
+);
+assert.match(
+  assignmentAttemptReviewCardHandoffSource,
+  /export type AssignmentAttemptReviewCardHandoffPrivacyContract = \{[\s\S]*exposesAcceptedAnswerText: false;[\s\S]*exposesAttemptId: false;[\s\S]*exposesPromptText: false;[\s\S]*exposesRawAnonymousToken: false;[\s\S]*exposesStudentAnswerText: false;[\s\S]*exposesStudentDisplayLabel: false;[\s\S]*exposesTeacherAnswerText: false;[\s\S]*mutatesResultData: false;[\s\S]*scope: 'teacher-result-attempt-review-card';[\s\S]*usesAssignmentDomainHelpers: true;/,
+  'Attempt review card handoff should keep raw card text and identity out of hidden semantic output.'
+);
+assert.match(
+  assignmentResultViewSource,
+  /buildAssignmentAttemptReviewCardHandoffEvidence\(\{[\s\S]*answers: attempt\.answers,[\s\S]*answerViews,[\s\S]*badgeLabel,[\s\S]*submittedAtLabel,[\s\S]*summaryMetricCount: summaryMetricViews\.length/,
+  'Attempt review card handoff evidence should be built from the prepared card view and attempt answers.'
+);
+assert.match(
+  assignmentResultsAttemptReviewCardSource,
+  /data-handoff="assignment-attempt-review-card"[\s\S]*view\.itemViews\.map[\s\S]*data-handoff-item=\{itemView\.id\}[\s\S]*aria-label=\{itemView\.ariaLabel\}/,
+  'Attempt review card component should render the hidden handoff output beside the visible review card.'
+);
+assert.match(
+  assignmentResultsAttemptReviewCardSource,
+  /const baseId = useId\(\)[\s\S]*baseId=\{baseId\}[\s\S]*const itemId = `\$\{baseId\}-\$\{itemView\.id\}`/,
+  'Attempt review card handoff should use generated DOM id prefixes instead of leaking attempt ids or repeating static ids.'
+);
+assert.match(
+  authE2eCatalogSource,
+  /\|\s*6h\s*\|\s*Result attempt review cards expose a 30-slice handoff\s*\|/,
+  'E2E catalog should include the attempt review card handoff acceptance journey.'
 );
 assert.match(
   assignmentResultsEmptyStateSource,
@@ -12751,7 +12790,7 @@ assert.deepEqual(
     ['navbar-student-preview-route', Routes.StudentPreview],
     ['navbar-pricing-route', Routes.Pricing],
     ['navbar-blog-route', Routes.Blog],
-    ['mobile-navbar-source', 'Shared navbar config'],
+    ['mobile-navbar-source', 'Shared navigation choices'],
     ['footer-surface', 'Footer directory'],
     ['footer-section-count', '4 items'],
     ['footer-product-section', '5 items'],
@@ -12769,7 +12808,7 @@ assert.deepEqual(
     ['footer-legal-routes', '3 items'],
     ['footer-cta-actions', `${Routes.Create} + ${Routes.Templates}`],
     ['footer-loop-metrics', '8 templates · Link assignments · Score results'],
-    ['route-constant-boundary', 'Shared route constants'],
+    ['route-constant-boundary', 'Consistent product links'],
     ['legacy-copy-guard', 'ClassGamify navigation'],
     ['privacy-guard', 'Private data hidden'],
   ]
@@ -37347,7 +37386,7 @@ assert.deepEqual(roadmapPageViewModel, {
   columns: [
     {
       description:
-        'The teacher and student foundation that must stay reliable while copied starter surfaces are retired.',
+        'The teacher and student foundation that must stay reliable while older entry points are cleaned up.',
       id: 'done',
       items: [
         {
@@ -37358,7 +37397,7 @@ assert.deepEqual(roadmapPageViewModel, {
           evidenceLabel: 'Classroom evidence',
           id: 'activity-assignment-loop',
           nextStep:
-            'Keep distribution and result handoff reliable while retiring copied starter surfaces in small verified waves.',
+            'Keep distribution and result review reliable while older entry points are cleaned up in small, careful updates.',
           nextStepLabel: 'Next step',
           status: 'available',
           statusAriaLabel: 'Activity to assignment loop status: Live',
@@ -37408,11 +37447,11 @@ assert.deepEqual(roadmapPageViewModel, {
           description:
             'Make completion, scores, item misses, exports, and review filters clearer for teacher follow-up.',
           evidence:
-            'Result pages already expose metrics, review filters, classroom briefs, reteach plans, item review summaries, student follow-up summaries, CSV export, and printable handoff paths.',
+            'Result pages already expose metrics, review filters, classroom briefs, reteach plans, item review summaries, student follow-up summaries, CSV export, and printable follow-up paths.',
           evidenceLabel: 'Classroom evidence',
           id: 'results-reteach-summaries',
           nextStep:
-            'Keep sharpening the current review scope, copy artifacts, and offline export confidence around the same results data.',
+            'Keep sharpening the current review scope, teacher-facing summaries, and offline export confidence around the same results data.',
           nextStepLabel: 'Next step',
           status: 'improving',
           statusAriaLabel: 'Results and reteach summaries status: Improving',
@@ -37427,7 +37466,7 @@ assert.deepEqual(roadmapPageViewModel, {
           evidenceLabel: 'Classroom evidence',
           id: 'worksheet-style-delivery',
           nextStep:
-            'Improve worksheet preparation, audio handoff, and future extraction without creating a parallel worksheet product.',
+            'Improve worksheet preparation, audio setup, and future extraction without creating a parallel worksheet product.',
           nextStepLabel: 'Next step',
           status: 'improving',
           statusAriaLabel: 'Worksheet-style delivery status: Improving',
@@ -37585,7 +37624,7 @@ assert.deepEqual(
     ['improving-count', '2'],
     ['planned-count', '2'],
     ['column-board', '3 columns'],
-    ['status-label-boundary', 'Prepared status labels'],
+    ['status-label-boundary', 'Clear status labels'],
     ['activity-assignment-loop', 'Live'],
     ['template-foundation', 'Live'],
     ['ai-draft-capability', 'Live'],
@@ -37595,7 +37634,7 @@ assert.deepEqual(
     ['school-workflow-boundary', 'Exploring'],
     ['task-evidence-boundary', 'Public evidence only'],
     ['task-next-step-boundary', 'Shared next steps'],
-    ['hero-action-boundary', 'Prepared CTA routes'],
+    ['hero-action-boundary', 'Ready teacher actions'],
     ['create-route', Routes.Create],
     ['templates-route', Routes.Templates],
     ['feedback-route', Routes.ContactClassroom],
@@ -58442,124 +58481,227 @@ try {
 } finally {
   overwriteGetLocale(() => 'en');
 }
+const detailedAttemptReviewCardView = buildAssignmentAttemptReviewCardView({
+  accuracy: 67,
+  answers: [
+    {
+      acceptedAnswers: ['Paris'],
+      answer: 'Paris',
+      correct: true,
+      expectedAnswer: 'Paris',
+      itemId: 'q-1',
+      prompt: 'Capital?',
+      submitted: true,
+    },
+  ],
+  completedAt: attemptRowCompletedAt,
+  id: 'attempt-1',
+  score: 2,
+  studentLabel: 'Alice',
+});
+const {
+  handoffView: detailedAttemptReviewCardHandoffView,
+  ...detailedAttemptReviewCardDisplayView
+} = detailedAttemptReviewCardView;
+assert.deepEqual(detailedAttemptReviewCardDisplayView, {
+  answerViews: [
+    {
+      acceptedAnswersLabel: 'Accepted answers',
+      acceptedAnswersLineText: null,
+      acceptedAnswersText: null,
+      ariaLabel: '1. Capital?. Status Correct. Student: Paris Expected: Paris',
+      expectedAnswerLabel: 'Expected',
+      expectedAnswerLineText: 'Expected: Paris',
+      expectedAnswerText: 'Paris',
+      explanationText: null,
+      id: 'q-1',
+      promptLabel: '1. Capital?',
+      statusLabel: 'Correct',
+      statusTone: 'correct',
+      studentAnswerLabel: 'Student',
+      studentAnswerLineText: 'Student: Paris',
+      studentAnswerText: 'Paris',
+    },
+  ],
+  ariaLabel: `Alice. Submitted ${formatAssignmentResultDate(
+    attemptRowCompletedAt
+  )}. 2 pts · 67%.`,
+  badgeLabel: '2 pts · 67%',
+  id: 'attempt-1',
+  summaryMetricViews: [
+    {
+      ariaLabel: 'Submitted: 1/1.',
+      key: 'submitted',
+      label: 'Submitted',
+      value: '1/1',
+    },
+    {
+      ariaLabel: 'Correct: 1.',
+      key: 'correct',
+      label: 'Correct',
+      value: '1',
+    },
+    {
+      ariaLabel: 'Needs review: 0.',
+      key: 'needs-review',
+      label: 'Needs review',
+      value: '0',
+    },
+    {
+      ariaLabel: 'Unanswered: 0.',
+      key: 'unanswered',
+      label: 'Unanswered',
+      value: '0',
+    },
+  ],
+  studentLabel: 'Alice',
+  submittedAtLabel: formatAssignmentResultDate(attemptRowCompletedAt),
+});
 assert.deepEqual(
-  buildAssignmentAttemptReviewCardView({
-    accuracy: 67,
-    answers: [
-      {
-        acceptedAnswers: ['Paris'],
-        answer: 'Paris',
-        correct: true,
-        expectedAnswer: 'Paris',
-        itemId: 'q-1',
-        prompt: 'Capital?',
-        submitted: true,
-      },
+  detailedAttemptReviewCardHandoffView.itemViews.map((itemView) => [
+    itemView.id,
+    itemView.value,
+  ]),
+  [
+    ['review-card-scope', 'Teacher answer review card'],
+    ['student-display-boundary', 'Display label prepared'],
+    ['submitted-time-display', 'Prepared'],
+    ['score-badge', 'Prepared'],
+    ['summary-metric-count', '4'],
+    ['submitted-count', '1/1'],
+    ['correct-count', '1'],
+    ['needs-review-count', '0'],
+    ['unanswered-count', '0'],
+    ['answer-card-count', '1'],
+    ['answer-sequence', 'Snapshot order'],
+    ['prompt-labels', 'Numbered'],
+    ['status-labels', '1'],
+    ['correct-status-count', '1'],
+    ['needs-review-status-count', '0'],
+    ['unanswered-status-count', '0'],
+    ['student-answer-lines', '1'],
+    ['expected-answer-lines', '1'],
+    ['accepted-alternatives-lines', '0'],
+    ['explanation-lines', '0'],
+    ['unsubmitted-answer-guard', 'Unanswered label'],
+    [
+      'answer-text-view-helper',
+      'buildAssignmentResultAttemptAnswerTextView',
     ],
-    completedAt: attemptRowCompletedAt,
-    id: 'attempt-1',
-    score: 2,
-    studentLabel: 'Alice',
-  }),
-  {
-    answerViews: [
-      {
-        acceptedAnswersLabel: 'Accepted answers',
-        acceptedAnswersLineText: null,
-        acceptedAnswersText: null,
-        ariaLabel:
-          '1. Capital?. Status Correct. Student: Paris Expected: Paris',
-        expectedAnswerLabel: 'Expected',
-        expectedAnswerLineText: 'Expected: Paris',
-        expectedAnswerText: 'Paris',
-        explanationText: null,
-        id: 'q-1',
-        promptLabel: '1. Capital?',
-        statusLabel: 'Correct',
-        statusTone: 'correct',
-        studentAnswerLabel: 'Student',
-        studentAnswerLineText: 'Student: Paris',
-        studentAnswerText: 'Paris',
-      },
-    ],
-    ariaLabel: `Alice. Submitted ${formatAssignmentResultDate(
-      attemptRowCompletedAt
-    )}. 2 pts · 67%.`,
-    badgeLabel: '2 pts · 67%',
-    id: 'attempt-1',
-    summaryMetricViews: [
-      {
-        ariaLabel: 'Submitted: 1/1.',
-        key: 'submitted',
-        label: 'Submitted',
-        value: '1/1',
-      },
-      {
-        ariaLabel: 'Correct: 1.',
-        key: 'correct',
-        label: 'Correct',
-        value: '1',
-      },
-      {
-        ariaLabel: 'Needs review: 0.',
-        key: 'needs-review',
-        label: 'Needs review',
-        value: '0',
-      },
-      {
-        ariaLabel: 'Unanswered: 0.',
-        key: 'unanswered',
-        label: 'Unanswered',
-        value: '0',
-      },
-    ],
-    studentLabel: 'Alice',
-    submittedAtLabel: formatAssignmentResultDate(attemptRowCompletedAt),
-  }
+    ['answer-status-helper', 'buildAssignmentResultAnswerStatusView'],
+    ['attempt-summary-helper', 'buildAssignmentAttemptReviewSummary'],
+    ['review-card-consumer', 'Answer review card'],
+    ['review-filter-consumer', 'Attempt review filter'],
+    ['copy-scope-boundary', 'Current copy scope'],
+    ['csv-export-boundary', 'Full CSV export'],
+    ['anonymous-token-guard', 'Hidden'],
+    ['privacy-guard', 'Hidden'],
+  ]
 );
 assert.deepEqual(
-  buildAssignmentAttemptReviewCardView({
-    accuracy: 0,
-    answers: [],
-    completedAt: null,
-    id: 'attempt-empty',
-    score: 0,
-    studentLabel: '   ',
-  }),
-  {
-    answerViews: [],
-    ariaLabel: 'Anonymous student. Submitted -. 0 pts · 0%.',
-    badgeLabel: '0 pts · 0%',
-    id: 'attempt-empty',
-    summaryMetricViews: [
-      {
-        ariaLabel: 'Submitted: 0/0.',
-        key: 'submitted',
-        label: 'Submitted',
-        value: '0/0',
-      },
-      {
-        ariaLabel: 'Correct: 0.',
-        key: 'correct',
-        label: 'Correct',
-        value: '0',
-      },
-      {
-        ariaLabel: 'Needs review: 0.',
-        key: 'needs-review',
-        label: 'Needs review',
-        value: '0',
-      },
-      {
-        ariaLabel: 'Unanswered: 0.',
-        key: 'unanswered',
-        label: 'Unanswered',
-        value: '0',
-      },
-    ],
-    studentLabel: 'Anonymous student',
-    submittedAtLabel: '-',
-  }
+  detailedAttemptReviewCardHandoffView.privacy.itemIds,
+  [...ASSIGNMENT_ATTEMPT_REVIEW_CARD_HANDOFF_ITEM_IDS]
+);
+const emptyAttemptReviewCardView = buildAssignmentAttemptReviewCardView({
+  accuracy: 0,
+  answers: [],
+  completedAt: null,
+  id: 'attempt-empty',
+  score: 0,
+  studentLabel: '   ',
+});
+const {
+  handoffView: emptyAttemptReviewCardHandoffView,
+  ...emptyAttemptReviewCardDisplayView
+} = emptyAttemptReviewCardView;
+assert.deepEqual(emptyAttemptReviewCardDisplayView, {
+  answerViews: [],
+  ariaLabel: 'Anonymous student. Submitted -. 0 pts · 0%.',
+  badgeLabel: '0 pts · 0%',
+  id: 'attempt-empty',
+  summaryMetricViews: [
+    {
+      ariaLabel: 'Submitted: 0/0.',
+      key: 'submitted',
+      label: 'Submitted',
+      value: '0/0',
+    },
+    {
+      ariaLabel: 'Correct: 0.',
+      key: 'correct',
+      label: 'Correct',
+      value: '0',
+    },
+    {
+      ariaLabel: 'Needs review: 0.',
+      key: 'needs-review',
+      label: 'Needs review',
+      value: '0',
+    },
+    {
+      ariaLabel: 'Unanswered: 0.',
+      key: 'unanswered',
+      label: 'Unanswered',
+      value: '0',
+    },
+  ],
+  studentLabel: 'Anonymous student',
+  submittedAtLabel: '-',
+});
+assert.equal(
+  emptyAttemptReviewCardHandoffView.itemViews.find(
+    (itemView) => itemView.id === 'answer-card-count'
+  )?.value,
+  '0'
+);
+const normalizedAttemptReviewCardHandoffView =
+  buildAssignmentAttemptReviewCardHandoffView(
+    buildAssignmentAttemptReviewCardHandoffEvidence({
+      answers: [
+        {
+          acceptedAnswers: ['Paris'],
+          answer: '',
+          correct: false,
+          expectedAnswer: 'Paris',
+          itemId: 'q-empty',
+          prompt: 'Hidden prompt',
+          submitted: false,
+        },
+      ],
+      answerViews: [
+        {
+          acceptedAnswersLineText: null,
+          expectedAnswerLineText: 'Expected: Paris',
+          explanationText: null,
+          statusLabel: 'Unanswered',
+          statusTone: 'idle',
+          studentAnswerLineText: 'Student: Unanswered',
+        },
+      ],
+      badgeLabel: '',
+      submittedAtLabel: '',
+      summaryMetricCount: Number.NaN,
+    })
+  );
+assert.deepEqual(
+  normalizedAttemptReviewCardHandoffView.itemViews
+    .filter((itemView) =>
+      [
+        'summary-metric-count',
+        'submitted-count',
+        'needs-review-count',
+        'unanswered-status-count',
+        'score-badge',
+      ].includes(itemView.id)
+    )
+    .map((itemView) => [itemView.id, itemView.value]),
+  [
+    ['score-badge', 'Missing'],
+    ['summary-metric-count', '0'],
+    ['submitted-count', '0/1'],
+    ['needs-review-count', '1'],
+    ['unanswered-status-count', '1'],
+  ]
 );
 assert.deepEqual(
   buildAssignmentAttemptReviewCardViews(resultAnalysis.attempts).map(

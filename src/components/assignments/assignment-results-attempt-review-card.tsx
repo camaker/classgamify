@@ -1,9 +1,15 @@
+import { IconListDetails } from '@tabler/icons-react';
+import { useId } from 'react';
+
 import type {
   AssignmentResultAttemptAnswerReviewView,
   AssignmentResultAttemptReviewCardView,
 } from '@/assignments/result-view';
+import type {
+  AssignmentAttemptReviewCardHandoffItemView,
+  AssignmentAttemptReviewCardHandoffView,
+} from '@/assignments/attempt-review-card-handoff';
 import { Badge } from '@/components/ui/badge';
-import { IconListDetails } from '@tabler/icons-react';
 
 type AssignmentResultsAttemptReviewCardProps = {
   attemptView: AssignmentResultAttemptReviewCardView;
@@ -56,7 +62,67 @@ export function AssignmentResultsAttemptReviewCard({
           />
         ))}
       </div>
+      <AssignmentResultsAttemptReviewCardHandoff
+        view={attemptView.handoffView}
+      />
     </article>
+  );
+}
+
+function AssignmentResultsAttemptReviewCardHandoff({
+  view,
+}: {
+  view: AssignmentAttemptReviewCardHandoffView;
+}) {
+  const baseId = useId();
+  const titleId = `${baseId}-title`;
+  const descriptionId = `${baseId}-description`;
+
+  return (
+    <section
+      aria-describedby={descriptionId}
+      aria-labelledby={titleId}
+      className="sr-only"
+      data-handoff="assignment-attempt-review-card"
+    >
+      <h3 id={titleId}>{view.title}</h3>
+      <p id={descriptionId}>{view.description}</p>
+      {view.itemViews.map((itemView) => (
+        <AssignmentResultsAttemptReviewCardHandoffItem
+          baseId={baseId}
+          itemView={itemView}
+          key={itemView.id}
+        />
+      ))}
+    </section>
+  );
+}
+
+function AssignmentResultsAttemptReviewCardHandoffItem({
+  baseId,
+  itemView,
+}: {
+  baseId: string;
+  itemView: AssignmentAttemptReviewCardHandoffItemView;
+}) {
+  const itemId = `${baseId}-${itemView.id}`;
+  const labelId = `${itemId}-label`;
+  const valueId = `${itemId}-value`;
+  const descriptionId = `${itemId}-description`;
+
+  return (
+    <div data-handoff-item={itemView.id}>
+      <span id={labelId}>{itemView.label}</span>
+      <output
+        aria-describedby={descriptionId}
+        aria-label={itemView.ariaLabel}
+        aria-labelledby={`${labelId} ${valueId}`}
+        id={valueId}
+      >
+        {itemView.value}
+      </output>
+      <span id={descriptionId}>{itemView.description}</span>
+    </div>
   );
 }
 

@@ -88,6 +88,11 @@ import {
   type AssignmentStudentSummarySortHandoffView,
 } from '@/assignments/student-summary-sort-handoff';
 import {
+  buildAssignmentAttemptReviewCardHandoffEvidence,
+  buildAssignmentAttemptReviewCardHandoffView,
+  type AssignmentAttemptReviewCardHandoffView,
+} from '@/assignments/attempt-review-card-handoff';
+import {
   type AssignmentShareLinkActionView,
   buildAssignmentShareLinkAvailability,
   buildAssignmentShareLinkActionView,
@@ -364,6 +369,7 @@ export type AssignmentResultAttemptReviewCardView = {
   answerViews: AssignmentResultAttemptAnswerReviewView[];
   ariaLabel: string;
   badgeLabel: string;
+  handoffView: AssignmentAttemptReviewCardHandoffView;
   id: string;
   summaryMetricViews: AssignmentResultAttemptReviewSummaryMetricView[];
   studentLabel: string;
@@ -1876,20 +1882,32 @@ export function buildAssignmentAttemptReviewCardView(
     'accuracy' | 'answers' | 'completedAt' | 'id' | 'score' | 'studentLabel'
   >
 ): AssignmentResultAttemptReviewCardView {
+  const answerViews = buildAssignmentAttemptAnswerReviewViews(attempt.answers);
   const badgeLabel = formatAssignmentAttemptReviewBadge(attempt);
   const studentLabel = formatAssignmentResultStudentLabel(attempt.studentLabel);
   const submittedAtLabel = formatAssignmentResultDate(attempt.completedAt);
+  const summaryMetricViews =
+    buildAssignmentAttemptReviewSummaryMetricViews(attempt);
 
   return {
-    answerViews: buildAssignmentAttemptAnswerReviewViews(attempt.answers),
+    answerViews,
     ariaLabel: m.assignment_result_attempt_review_card_aria_label({
       badge: badgeLabel,
       student: studentLabel,
       submitted: submittedAtLabel,
     }),
     badgeLabel,
+    handoffView: buildAssignmentAttemptReviewCardHandoffView(
+      buildAssignmentAttemptReviewCardHandoffEvidence({
+        answers: attempt.answers,
+        answerViews,
+        badgeLabel,
+        submittedAtLabel,
+        summaryMetricCount: summaryMetricViews.length,
+      })
+    ),
     id: attempt.id,
-    summaryMetricViews: buildAssignmentAttemptReviewSummaryMetricViews(attempt),
+    summaryMetricViews,
     studentLabel,
     submittedAtLabel,
   };

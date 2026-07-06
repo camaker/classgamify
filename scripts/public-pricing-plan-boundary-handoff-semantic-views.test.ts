@@ -148,7 +148,7 @@ test('public pricing handoff exposes 30 safe plan-boundary slices', () => {
   );
   assert.equal(
     getHandoffValue(handoffView, 'legacy-copy-guard'),
-    'ClassGamify entrypoints'
+    'ClassGamify paths'
   );
   assert.equal(
     getHandoffValue(handoffView, 'privacy-guard'),

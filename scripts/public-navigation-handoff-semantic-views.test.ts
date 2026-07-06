@@ -42,8 +42,8 @@ test('public navigation handoff exposes 30 safe entrypoint slices', () => {
 
   assert.deepEqual(itemIds, [...PUBLIC_NAVIGATION_HANDOFF_ITEM_IDS]);
   assert.equal(new Set(itemIds).size, 30);
-  assert.equal(handoffView.title, 'Public navigation handoff');
-  assert.match(handoffView.description, /30-slice public navigation/);
+  assert.equal(handoffView.title, 'Public navigation summary');
+  assert.match(handoffView.description, /Public navigation summary/);
   assert.equal(
     handoffView.itemViews.every(
       (item) =>
@@ -82,7 +82,7 @@ test('public navigation handoff exposes 30 safe entrypoint slices', () => {
       ['navbar-student-preview-route', Routes.StudentPreview],
       ['navbar-pricing-route', Routes.Pricing],
       ['navbar-blog-route', Routes.Blog],
-      ['mobile-navbar-source', 'Shared navbar config'],
+      ['mobile-navbar-source', 'Shared navigation choices'],
       ['footer-surface', 'Footer directory'],
       ['footer-section-count', '4 items'],
       ['footer-product-section', '5 items'],
@@ -100,7 +100,7 @@ test('public navigation handoff exposes 30 safe entrypoint slices', () => {
       ['footer-legal-routes', '3 items'],
       ['footer-cta-actions', `${Routes.Create} + ${Routes.Templates}`],
       ['footer-loop-metrics', '8 templates · Link assignments · Score results'],
-      ['route-constant-boundary', 'Shared route constants'],
+      ['route-constant-boundary', 'Consistent product links'],
       ['legacy-copy-guard', 'ClassGamify navigation'],
       ['privacy-guard', 'Private data hidden'],
     ]
@@ -160,8 +160,8 @@ test('public navigation handoff localizes Chinese entrypoint boundaries', () => 
   try {
     const handoffView = buildPublicNavigationHandoffView();
 
-    assert.equal(handoffView.title, '公共导航交接');
-    assert.match(handoffView.description, /30 切片公共导航交接/);
+    assert.equal(handoffView.title, '公开导航摘要');
+    assert.match(handoffView.description, /公开导航摘要/);
     assert.equal(
       getHandoffValue(handoffView, 'product-loop'),
       'Activity -> Assignment -> Attempt -> Results'
@@ -173,7 +173,7 @@ test('public navigation handoff localizes Chinese entrypoint boundaries', () => 
     assert.equal(getHandoffValue(handoffView, 'navbar-count'), '6 个项目');
     assert.equal(
       getHandoffValue(handoffView, 'mobile-navbar-source'),
-      '共享导航配置'
+      '共享导航选择'
     );
     assert.equal(
       getHandoffValue(handoffView, 'footer-section-count'),
@@ -193,7 +193,7 @@ test('public navigation handoff localizes Chinese entrypoint boundaries', () => 
     );
     assert.equal(
       getHandoffValue(handoffView, 'route-constant-boundary'),
-      '共享路由常量'
+      '一致的产品链接'
     );
     assert.equal(
       getHandoffValue(handoffView, 'legacy-copy-guard'),
