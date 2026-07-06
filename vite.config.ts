@@ -55,6 +55,7 @@ const config = defineConfig(({ mode }) => {
         ],
         emitTsDeclarations: true,
         isServer: 'import.meta.env?.SSR === true',
+        outputStructure: 'locale-modules',
       }),
       // https://developers.cloudflare.com/workers/vite-plugin/
       cloudflare({

@@ -46,7 +46,11 @@ pnpm locale:check     # verify en/zh key parity and JSON leaf values
 pnpm locale:compile   # compile Paraglide runtime manually
 ```
 
-`pnpm dev` and `pnpm build` also compile the Paraglide runtime via Vite.
+`pnpm dev` and `pnpm build` also compile the Paraglide runtime via Vite. Keep
+both the manual script and Vite plugin on Paraglide `locale-modules` output;
+the generated runtime is ignored by git, and this output structure avoids
+empty generated `messages/package.json` files breaking local script and
+production build resolution on Windows.
 
 ## Message Access
 

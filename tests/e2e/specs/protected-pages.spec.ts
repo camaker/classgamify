@@ -24,6 +24,12 @@ const protectedPages = [
   { path: '/settings/profile', name: 'profile settings' },
   { path: '/settings/security', name: 'security settings' },
   { path: '/settings/files', name: 'files settings' },
+  ...(process.env.VITE_PAYMENT_PROVIDER
+    ? ([
+        { path: '/settings/billing', name: 'billing settings' },
+        { path: '/settings/payment', name: 'payment status' },
+      ] as const)
+    : []),
 ] as const;
 
 const smokeMatrix: Array<{ locale: LocaleMode; theme: ThemeMode }> = [
@@ -136,6 +142,43 @@ test.describe('protected page smoke coverage', () => {
                 )
               )
             ).toBeVisible();
+          }
+          if (protectedPage.path === '/settings/billing') {
+            await expect(
+              page.getByText(
+                getLocaleMessage(
+                  locale,
+                  'settings_billing_workspace_summary_title'
+                )
+              )
+            ).toBeVisible();
+            await expect(
+              page.getByText(
+                getLocaleMessage(
+                  locale,
+                  'settings_billing_workspace_summary_assignments_label'
+                )
+              )
+            ).toBeVisible();
+            await expect(
+              page.getByText(
+                getLocaleMessage(locale, 'settings_billing_handoff_title')
+              )
+            ).toBeVisible();
+          }
+          if (protectedPage.path === '/settings/payment') {
+            await expect(
+              page.getByText(
+                getLocaleMessage(locale, 'settings_payment_failed_title')
+              )
+            ).toBeVisible();
+            const paymentHandoff = page.locator(
+              '[data-handoff="settings-payment-callback"]'
+            );
+            await expect(paymentHandoff).toHaveCount(1);
+            await expect(paymentHandoff).toContainText(
+              getLocaleMessage(locale, 'settings_payment_handoff_title')
+            );
           }
         });
       }

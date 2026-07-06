@@ -13,6 +13,8 @@ import {
   buildPaymentStatusView,
   getInitialPaymentConfirmationStatus,
   type PaymentConfirmationStatus,
+  type PaymentStatusHandoffItemView,
+  type PaymentStatusHandoffView,
   type PaymentStatusNextStepView,
   type PaymentStatusIconKey,
   type PaymentStatusTone,
@@ -108,7 +110,9 @@ export function PaymentCard({
     };
     run();
   }, [status, callback, queryClient, navigate]);
-  const statusView = buildPaymentStatusView(status);
+  const statusView = buildPaymentStatusView(status, {
+    hasSessionId: Boolean(sessionId),
+  });
   return (
     <div className="flex min-h-[60vh] items-center justify-center">
       <Card className="w-full max-w-md">
@@ -119,6 +123,7 @@ export function PaymentCard({
           <CardTitle>{statusView.title}</CardTitle>
           <CardDescription>{statusView.description}</CardDescription>
           <PaymentStatusNextStep nextStep={statusView.nextStep} />
+          <PaymentStatusHandoff view={statusView.handoffView} />
         </CardHeader>
       </Card>
     </div>
@@ -140,5 +145,39 @@ function PaymentStatusNextStep({
         {nextStep.description}
       </p>
     </section>
+  );
+}
+
+function PaymentStatusHandoff({ view }: { view: PaymentStatusHandoffView }) {
+  return (
+    <section
+      aria-label={view.title}
+      className="sr-only"
+      data-handoff="settings-payment-callback"
+    >
+      <h2>{view.title}</h2>
+      <p>{view.description}</p>
+      <dl>
+        {view.itemViews.map((itemView) => (
+          <PaymentStatusHandoffItem itemView={itemView} key={itemView.id} />
+        ))}
+      </dl>
+    </section>
+  );
+}
+
+function PaymentStatusHandoffItem({
+  itemView,
+}: {
+  itemView: PaymentStatusHandoffItemView;
+}) {
+  return (
+    <div data-handoff-item={itemView.id}>
+      <dt>{itemView.label}</dt>
+      <dd>
+        <output aria-label={itemView.ariaLabel}>{itemView.value}</output>
+        <p>{itemView.description}</p>
+      </dd>
+    </div>
   );
 }

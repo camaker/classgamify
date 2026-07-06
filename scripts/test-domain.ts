@@ -10992,20 +10992,28 @@ assert.match(
 );
 assert.equal(getInitialPaymentConfirmationStatus(undefined), 'failed');
 assert.equal(getInitialPaymentConfirmationStatus('cs_test'), 'processing');
-assert.deepEqual(buildPaymentStatusView('processing'), {
-  description:
-    'Please wait while we verify ClassGamify plan access for your teacher workspace, saved activities, assignments, and results.',
-  icon: 'loader',
-  nextStep: {
+const processingPaymentStatusView = buildPaymentStatusView('processing', {
+  hasSessionId: true,
+});
+assert.equal(
+  processingPaymentStatusView.description,
+  'Please wait while we verify ClassGamify plan access for your teacher workspace, saved activities, assignments, and results.'
+);
+assert.equal(processingPaymentStatusView.icon, 'loader');
+assert.deepEqual(processingPaymentStatusView.nextStep, {
     ariaLabel:
       'What happens next. ClassGamify keeps checking the hosted payment result, then refreshes your billing access for activities, assignments, AI drafts, and result workflows.',
     description:
       'ClassGamify keeps checking the hosted payment result, then refreshes your billing access for activities, assignments, AI drafts, and result workflows.',
     label: 'What happens next',
-  },
-  title: 'Confirming your payment',
-  tone: 'working',
 });
+assert.equal(processingPaymentStatusView.title, 'Confirming your payment');
+assert.equal(processingPaymentStatusView.tone, 'working');
+assert.equal(processingPaymentStatusView.handoffView.itemViews.length, 30);
+assert.equal(
+  processingPaymentStatusView.handoffView.privacy.scope,
+  'teacher-payment-callback'
+);
 assert.equal(buildPaymentStatusView('success').tone, 'success');
 assert.match(
   buildPaymentStatusView('success').description,
@@ -13297,8 +13305,13 @@ assert.doesNotMatch(
 );
 assert.doesNotMatch(
   protectedPagesSpecSource,
-  /\/settings\/(?:apikeys|billing|payment|notifications)/,
-  'Protected smoke tests should only require active default settings pages.'
+  /\/settings\/(?:apikeys|notifications)/,
+  'Protected smoke tests should not require retired or inactive default settings pages.'
+);
+assert.match(
+  protectedPagesSpecSource,
+  /process\.env\.VITE_PAYMENT_PROVIDER[\s\S]*\/settings\/billing[\s\S]*\/settings\/payment/,
+  'Protected smoke tests should include billing and payment pages only when payment is configured.'
 );
 assert.doesNotMatch(
   routeConstantsSource,

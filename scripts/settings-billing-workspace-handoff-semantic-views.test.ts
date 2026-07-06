@@ -13,8 +13,12 @@ import {
 } from '@/settings/billing-view';
 import { buildSettingsBillingCardViewModel } from '@/payment/billing-view';
 import {
+  PAYMENT_STATUS_HANDOFF_ITEM_IDS,
+  buildPaymentStatusHandoffView,
   buildPaymentStatusView,
   getInitialPaymentConfirmationStatus,
+  type PaymentStatusHandoffItemId,
+  type PaymentStatusHandoffView,
 } from '@/payment/payment-status-view';
 import type { PricePlan, Subscription } from '@/payment/types';
 import { overwriteGetLocale } from '@/locale/paraglide/runtime';
@@ -279,10 +283,12 @@ test('payment status view keeps hosted checkout states classroom-scoped', () => 
   assert.equal(getInitialPaymentConfirmationStatus(undefined), 'failed');
   assert.equal(getInitialPaymentConfirmationStatus('cs_test'), 'processing');
 
-  const processing = buildPaymentStatusView('processing');
-  const success = buildPaymentStatusView('success');
-  const failed = buildPaymentStatusView('failed');
-  const timeout = buildPaymentStatusView('timeout');
+  const processing = buildPaymentStatusView('processing', {
+    hasSessionId: true,
+  });
+  const success = buildPaymentStatusView('success', { hasSessionId: true });
+  const failed = buildPaymentStatusView('failed', { hasSessionId: false });
+  const timeout = buildPaymentStatusView('timeout', { hasSessionId: true });
 
   assert.deepEqual(
     [processing.tone, success.tone, failed.tone, timeout.tone],
@@ -298,6 +304,134 @@ test('payment status view keeps hosted checkout states classroom-scoped', () => 
   assert.match(timeout.description, /assignment workflow limits/);
   assert.match(processing.nextStep.description, /result workflows/);
   assert.match(timeout.nextStep.description, /source of truth/);
+});
+
+test('payment callback handoff exposes 30 hosted checkout slices', () => {
+  const processing = buildPaymentStatusView('processing', {
+    hasSessionId: true,
+  });
+  const success = buildPaymentStatusView('success', { hasSessionId: true });
+  const failed = buildPaymentStatusView('failed', { hasSessionId: false });
+  const timeout = buildPaymentStatusView('timeout', { hasSessionId: true });
+  const directHandoff = buildPaymentStatusHandoffView({
+    hasSessionId: true,
+    icon: processing.icon,
+    status: 'processing',
+    title: processing.title,
+    tone: processing.tone,
+  });
+  const itemIds = processing.handoffView.itemViews.map((item) => item.id);
+
+  assert.deepEqual(itemIds, [...PAYMENT_STATUS_HANDOFF_ITEM_IDS]);
+  assert.deepEqual(
+    directHandoff.itemViews.map((item) => item.id),
+    [...PAYMENT_STATUS_HANDOFF_ITEM_IDS]
+  );
+  assert.equal(new Set(itemIds).size, 30);
+  assert.equal(
+    processing.handoffView.itemViews.every(
+      (item) =>
+        Boolean(item.ariaLabel) &&
+        Boolean(item.description) &&
+        Boolean(item.label) &&
+        Boolean(item.value)
+    ),
+    true
+  );
+  assert.deepEqual(processing.handoffView.privacy, {
+    changesActivityContent: false,
+    changesAssignmentLinks: false,
+    exposesActivityContent: false,
+    exposesPaymentProviderSecrets: false,
+    exposesRawCheckoutSession: false,
+    exposesSourceMaterialStorageKeys: false,
+    exposesStudentAnswers: false,
+    exposesStudentIdentifiers: false,
+    exposesTeacherEmail: false,
+    hostedCheckoutStatusOnly: true,
+    itemIds,
+    modifiesAssignmentSnapshots: false,
+    refreshesPlanCacheOnlyAfterSuccess: true,
+    scope: 'teacher-payment-callback',
+  });
+
+  assert.equal(
+    getPaymentHandoffValue(processing.handoffView, 'workspace-scope'),
+    'Teacher payment callback'
+  );
+  assert.equal(
+    getPaymentHandoffValue(processing.handoffView, 'route-gate'),
+    'Protected payment route'
+  );
+  assert.equal(
+    getPaymentHandoffValue(processing.handoffView, 'session-id-presence'),
+    'Session present'
+  );
+  assert.equal(
+    getPaymentHandoffValue(failed.handoffView, 'session-id-presence'),
+    'Session missing'
+  );
+  assert.equal(
+    getPaymentHandoffValue(processing.handoffView, 'session-id-privacy'),
+    'Raw session id omitted'
+  );
+  assert.equal(
+    getPaymentHandoffValue(processing.handoffView, 'payment-polling'),
+    'Polling active'
+  );
+  assert.equal(
+    getPaymentHandoffValue(success.handoffView, 'payment-polling'),
+    'Polling stopped'
+  );
+  assert.equal(
+    getPaymentHandoffValue(processing.handoffView, 'poll-interval'),
+    'Every 2 seconds'
+  );
+  assert.equal(
+    getPaymentHandoffValue(processing.handoffView, 'poll-timeout'),
+    'Up to 60 seconds'
+  );
+  assert.equal(
+    getPaymentHandoffValue(success.handoffView, 'current-plan-cache'),
+    'Plan cache refresh queued'
+  );
+  assert.equal(
+    getPaymentHandoffValue(processing.handoffView, 'current-plan-cache'),
+    'Waiting for confirmation'
+  );
+  assert.equal(
+    getPaymentHandoffValue(success.handoffView, 'redirect-callback'),
+    'Redirect ready'
+  );
+  assert.equal(
+    getPaymentHandoffValue(failed.handoffView, 'pricing-retry'),
+    'Restart checkout'
+  );
+  assert.equal(
+    getPaymentHandoffValue(timeout.handoffView, 'timeout-recovery'),
+    'Check Billing later'
+  );
+  assert.equal(
+    getPaymentHandoffValue(processing.handoffView, 'assignment-link-boundary'),
+    'Links unchanged'
+  );
+  assert.equal(
+    getPaymentHandoffValue(processing.handoffView, 'student-data-boundary'),
+    'Student data unchanged'
+  );
+  assert.equal(
+    getPaymentHandoffValue(processing.handoffView, 'provider-secret-boundary'),
+    'Provider secrets hidden'
+  );
+  assert.equal(
+    getPaymentHandoffValue(processing.handoffView, 'raw-session-boundary'),
+    'Raw session omitted'
+  );
+  assert.equal(
+    getPaymentHandoffValue(processing.handoffView, 'privacy-guard'),
+    'Private payment data omitted'
+  );
+  assertNoPrivateBillingText(JSON.stringify(processing.handoffView));
 });
 
 test('billing and payment routes consume prepared view models', () => {
@@ -323,8 +457,8 @@ test('billing and payment routes consume prepared view models', () => {
   );
   assert.match(
     PAYMENT_CARD_SOURCE,
-    /buildPaymentStatusView\(status\)[\s\S]*PaymentStatusNextStep[\s\S]*nextStep=\{statusView\.nextStep\}/,
-    'Payment card should render prepared payment status and next-step views.'
+    /buildPaymentStatusView\(status,[\s\S]*hasSessionId:[\s\S]*Boolean\(sessionId\)[\s\S]*PaymentStatusNextStep[\s\S]*PaymentStatusHandoff[\s\S]*view=\{statusView\.handoffView\}/,
+    'Payment card should render prepared payment status, next-step, and handoff views.'
   );
 });
 
@@ -359,6 +493,15 @@ function getHandoffValue(
 ) {
   const itemView = view.itemViews.find((item) => item.id === id);
   assert.ok(itemView, `Missing billing handoff item ${id}`);
+  return itemView.value;
+}
+
+function getPaymentHandoffValue(
+  view: PaymentStatusHandoffView,
+  id: PaymentStatusHandoffItemId
+) {
+  const itemView = view.itemViews.find((item) => item.id === id);
+  assert.ok(itemView, `Missing payment handoff item ${id}`);
   return itemView.value;
 }
 
