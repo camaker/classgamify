@@ -14,6 +14,11 @@ import {
   type AttemptTimerState,
 } from '@/assignments/attempt-duration';
 import {
+  buildAssignmentAttemptLimitHandoffEvidence,
+  buildAssignmentAttemptLimitHandoffView,
+  type AssignmentAttemptLimitHandoffView,
+} from '@/assignments/attempt-limit-handoff';
+import {
   normalizeAssignmentAttemptCount,
   type AssignmentAttemptUsage,
 } from '@/assignments/attempt-limits';
@@ -462,6 +467,7 @@ export type StudentRunnerPageViewModel = {
   activity: ActivitySeed | undefined;
   anonymousAttemptCopy: AnonymousAttemptCopy;
   assignment: AssignmentSeed | undefined;
+  attemptLimitHandoffView: AssignmentAttemptLimitHandoffView;
   attemptControlState: StudentAttemptControlState;
   attemptResultDisplay?: StudentAttemptResultDisplay;
   attemptState: StudentRunnerAttemptState;
@@ -951,6 +957,28 @@ export function buildStudentRunnerPageViewModel({
     reviewSummary: result?.reviewSummary,
     showStartAnotherAttempt,
   });
+  const attemptLimitHandoffView = buildAssignmentAttemptLimitHandoffView(
+    buildAssignmentAttemptLimitHandoffEvidence({
+      attemptUsage: result?.attemptUsage,
+      attemptUsageLabel,
+      deliverySummaryUsesAttemptLimit: Boolean(
+        headerView?.ruleSummaryView.items.some(
+          (item) => item.id === 'attempt-limit'
+        )
+      ),
+      identityMode: identityView?.mode ?? 'unknown',
+      maxAttempts:
+        result?.attemptUsage.maxAttempts ?? assignment?.settings.maxAttempts,
+      resultExportUsesAttemptLimit: true,
+      retryAvailable: showStartAnotherAttempt,
+      runnerResultUsesAttemptUsage:
+        !result ||
+        Boolean(resultPanelView.show && resultPanelView.attemptUsageLabel),
+      serverEnforcesLimit: true,
+      submittedAttemptCount: effectiveSubmittedAttemptCount,
+      submissionGateUsesLimitHelper: true,
+    })
+  );
   const submissionContractView = buildStudentRunnerSubmissionContractView({
     identityView,
     payloadSummaryView: currentPayloadSummaryView,
@@ -990,6 +1018,7 @@ export function buildStudentRunnerPageViewModel({
         : getAnonymousBrowserLabel(anonymousToken),
     }),
     assignment,
+    attemptLimitHandoffView,
     attemptControlState,
     attemptResultDisplay,
     attemptState,

@@ -339,6 +339,7 @@ function PlayPage() {
           />
 
           <StudentRunnerSubmitControls
+            attemptLimitHandoffView={runnerPageView.attemptLimitHandoffView}
             controlView={controlView}
             onSubmit={submitAnswers}
             submissionHandoffView={runnerPageView.submissionHandoffView}

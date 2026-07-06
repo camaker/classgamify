@@ -48,7 +48,9 @@ export function normalizeAssignmentAttemptCount(value: number) {
   return Number.isFinite(value) ? Math.max(0, Math.trunc(value)) : 0;
 }
 
-function normalizeAssignmentMaxAttempts(value: number | null | undefined) {
+export function normalizeAssignmentMaxAttempts(
+  value: number | null | undefined
+) {
   if (value === null || value === undefined || !Number.isFinite(value)) {
     return undefined;
   }

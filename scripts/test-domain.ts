@@ -555,8 +555,14 @@ import {
   buildAssignmentAttemptUsage,
   canUseAnotherAssignmentAttempt,
   normalizeAssignmentAttemptCount,
+  normalizeAssignmentMaxAttempts,
   normalizeAssignmentRemainingAttempts,
 } from '@/assignments/attempt-limits';
+import {
+  ASSIGNMENT_ATTEMPT_LIMIT_HANDOFF_ITEM_IDS,
+  buildAssignmentAttemptLimitHandoffEvidence,
+  buildAssignmentAttemptLimitHandoffView,
+} from '@/assignments/attempt-limit-handoff';
 import {
   buildChoicePairingRunnerView,
   buildDefaultRuntimeItemCardViews,
@@ -14045,6 +14051,34 @@ const studentRunnerSubmissionSource = readFileSync(
   'src/assignments/student-submission.ts',
   'utf8'
 );
+const attemptLimitHandoffSource = readFileSync(
+  'src/assignments/attempt-limit-handoff.ts',
+  'utf8'
+);
+const attemptLimitsSource = readFileSync(
+  'src/assignments/attempt-limits.ts',
+  'utf8'
+);
+const assignmentAttemptLimitApiSource = readFileSync(
+  'src/api/assignments.ts',
+  'utf8'
+);
+const assignmentAttemptLimitDeliverySummarySource = readFileSync(
+  'src/assignments/delivery-summary.ts',
+  'utf8'
+);
+const assignmentAttemptLimitPublicSource = readFileSync(
+  'src/assignments/public.ts',
+  'utf8'
+);
+const assignmentAttemptLimitResultExportSource = readFileSync(
+  'src/assignments/results-export.ts',
+  'utf8'
+);
+const assignmentAttemptLimitResultViewSource = readFileSync(
+  'src/assignments/result-view.ts',
+  'utf8'
+);
 const attemptDurationSource = readFileSync(
   'src/assignments/attempt-duration.ts',
   'utf8'
@@ -15016,6 +15050,217 @@ for (const privateValue of [
     ),
     false,
     `Student submission handoff leaked private text: ${privateValue}`
+  );
+}
+const assignmentAttemptLimitUsage = buildAssignmentAttemptUsage({
+  maxAttempts: 3.8,
+  previousAttemptCount: 1.9,
+});
+const assignmentAttemptLimitHandoffView =
+  buildAssignmentAttemptLimitHandoffView(
+    buildAssignmentAttemptLimitHandoffEvidence({
+      apiPreviousCountUsesIdentityQuery: /countPreviousIdentityAttempts/.test(
+        assignmentAttemptLimitApiSource
+      ),
+      attemptUsage: assignmentAttemptLimitUsage,
+      attemptUsageLabel: formatStudentAttemptUsageLabel(
+        assignmentAttemptLimitUsage
+      ),
+      attemptCounterUsesPreviousCount: /previousAttemptCount/.test(
+        assignmentAttemptLimitApiSource
+      ),
+      deliverySummaryUsesAttemptLimit:
+        /hasAttemptLimit[\s\S]*maxAttempts/.test(
+          assignmentAttemptLimitDeliverySummarySource
+        ),
+      identityMode: 'student-name',
+      maxAttemptParserUsesSharedHelper: /normalizeAssignmentMaxAttempts/.test(
+        attemptLimitsSource
+      ),
+      publicRulesUseAttemptLimit:
+        /case 'attempt-limit':[\s\S]*assignment_delivery_label_attempts/.test(
+          assignmentAttemptLimitPublicSource
+        ),
+      resultExportUsesAttemptLimit: /delivery-attempt-limit/.test(
+        assignmentAttemptLimitResultExportSource
+      ),
+      resultPageUsesAttemptLimit:
+        /settingsSummaryView: buildAssignmentSettingsSummaryView\(\{[\s\S]*settings: assignment\.settingsJson/.test(
+          assignmentAttemptLimitResultViewSource
+        ),
+      retryAvailable: canStartAnotherStudentAttempt({
+        canSubmit: true,
+        hasResult: true,
+        maxAttempts: assignmentAttemptLimitUsage.maxAttempts,
+        submittedAttemptCount: assignmentAttemptLimitUsage.usedAttempts,
+      }),
+      retryButtonUsesLimitDecision:
+        /showStartAnotherAttempt = canStartAnotherStudentAttempt/.test(
+          studentRunnerStateSource
+        ),
+      runnerResultUsesAttemptUsage:
+        /formatStudentAttemptUsageLabel\(result\.attemptUsage\)/.test(
+          studentRunnerStateSource
+        ),
+      serverEnforcesLimit:
+        /canUseAnotherAssignmentAttempt\(\{[\s\S]*maxAttempts: settings\.maxAttempts/.test(
+          assignmentAttemptLimitApiSource
+        ),
+      scoredAttemptWriteGatedByLimit:
+        /canUseAnotherAssignmentAttempt[\s\S]*throw new Error\(m\.assignment_api_error_attempt_limit_reached\(\)\)[\s\S]*await db\.insert\(attempt\)/.test(
+          assignmentAttemptLimitApiSource
+        ),
+      submittedAttemptCount: assignmentAttemptLimitUsage.usedAttempts,
+      submissionGateUsesLimitHelper:
+        /canStartAnotherStudentAttempt[\s\S]*canUseAnotherAssignmentAttempt/.test(
+          studentRunnerSubmissionSource
+        ),
+    })
+  );
+const assignmentAttemptLimitHandoffValues = new Map(
+  assignmentAttemptLimitHandoffView.itemViews.map((item) => [
+    item.id,
+    item.value,
+  ])
+);
+assert.match(
+  attemptLimitHandoffSource,
+  /export const ASSIGNMENT_ATTEMPT_LIMIT_HANDOFF_ITEM_IDS = \[(?=[\s\S]*'attempt-scope')(?=[\s\S]*'max-attempt-normalization')(?=[\s\S]*'previous-count-normalization')(?=[\s\S]*'used-attempts')(?=[\s\S]*'remaining-attempts')(?=[\s\S]*'unlimited-attempts')(?=[\s\S]*'limit-reached')(?=[\s\S]*'retry-availability')(?=[\s\S]*'result-usage-label')(?=[\s\S]*'student-name-identity')(?=[\s\S]*'anonymous-token-identity')(?=[\s\S]*'identity-mode')(?=[\s\S]*'attempt-counter-source')(?=[\s\S]*'max-attempt-parser')(?=[\s\S]*'api-previous-count-query')(?=[\s\S]*'server-enforcement')(?=[\s\S]*'scored-attempt-write-gate')(?=[\s\S]*'runner-result-boundary')(?=[\s\S]*'retry-button-boundary')(?=[\s\S]*'submission-gate-boundary')(?=[\s\S]*'delivery-summary-boundary')(?=[\s\S]*'public-rule-boundary')(?=[\s\S]*'result-page-boundary')(?=[\s\S]*'result-export-boundary')(?=[\s\S]*'negative-count-guard')(?=[\s\S]*'fractional-count-guard')(?=[\s\S]*'nonfinite-max-guard')(?=[\s\S]*'zero-max-guard')(?=[\s\S]*'raw-token-guard')(?=[\s\S]*'privacy-guard')[\s\S]*\] as const;/,
+  'Assignment attempt-limit handoff should declare exactly the 30 product and architecture slice ids.'
+);
+assert.deepEqual(
+  assignmentAttemptLimitHandoffView.itemViews.map((item) => item.id),
+  [...ASSIGNMENT_ATTEMPT_LIMIT_HANDOFF_ITEM_IDS],
+  'Assignment attempt-limit handoff should expose the stable 30-slice order.'
+);
+assert.equal(assignmentAttemptLimitHandoffView.itemViews.length, 30);
+assert.deepEqual(assignmentAttemptLimitHandoffView.privacy, {
+  exposesAnonymousToken: false,
+  exposesAnswerText: false,
+  exposesRawIdentityKey: false,
+  exposesRawSubmissionPayload: false,
+  exposesStudentName: false,
+  exposesTeacherOnlyAnswers: false,
+  itemIds: [...ASSIGNMENT_ATTEMPT_LIMIT_HANDOFF_ITEM_IDS],
+  mutatesAttempts: false,
+  readsBrowserStorage: false,
+  scope: 'assignment-attempt-limit-boundary',
+  usesSharedAttemptLimitHelpers: true,
+});
+assert.equal(
+  assignmentAttemptLimitHandoffValues.get('max-attempt-normalization'),
+  '3 max'
+);
+assert.equal(
+  assignmentAttemptLimitHandoffValues.get('previous-count-normalization'),
+  '1 previous'
+);
+assert.equal(assignmentAttemptLimitHandoffValues.get('used-attempts'), '2 used');
+assert.equal(
+  assignmentAttemptLimitHandoffValues.get('remaining-attempts'),
+  '1 attempt left'
+);
+assert.equal(
+  assignmentAttemptLimitHandoffValues.get('limit-reached'),
+  'Blocked'
+);
+assert.equal(
+  assignmentAttemptLimitHandoffValues.get('retry-availability'),
+  'Available'
+);
+assert.equal(
+  assignmentAttemptLimitHandoffValues.get('student-name-identity'),
+  'Normalized name'
+);
+assert.equal(
+  assignmentAttemptLimitHandoffValues.get('anonymous-token-identity'),
+  'Normalized token'
+);
+assert.equal(
+  assignmentAttemptLimitHandoffValues.get('identity-mode'),
+  'Student name'
+);
+assert.equal(
+  assignmentAttemptLimitHandoffValues.get('attempt-counter-source'),
+  'Previous count'
+);
+assert.equal(
+  assignmentAttemptLimitHandoffValues.get('retry-button-boundary'),
+  'Available'
+);
+assert.equal(
+  assignmentAttemptLimitHandoffValues.get('nonfinite-max-guard'),
+  'Unlimited'
+);
+assert.equal(
+  assignmentAttemptLimitHandoffValues.get('zero-max-guard'),
+  'Unlimited'
+);
+assert.equal(
+  assignmentAttemptLimitHandoffValues.get('raw-token-guard'),
+  'Raw token hidden'
+);
+assert.equal(
+  assignmentAttemptLimitHandoffValues.get('privacy-guard'),
+  'Private data hidden'
+);
+assert.equal(normalizeAssignmentMaxAttempts(3.8), 3);
+assert.equal(normalizeAssignmentMaxAttempts(0), undefined);
+assert.equal(normalizeAssignmentMaxAttempts(Number.NaN), undefined);
+assert.match(
+  studentRunnerStateSource,
+  /attemptLimitHandoffView: AssignmentAttemptLimitHandoffView;[\s\S]*buildAssignmentAttemptLimitHandoffView\([\s\S]*buildAssignmentAttemptLimitHandoffEvidence\(\{[\s\S]*attemptUsage: result\?\.attemptUsage,[\s\S]*maxAttempts:[\s\S]*assignment\?\.settings\.maxAttempts,[\s\S]*retryAvailable: showStartAnotherAttempt/,
+  'Student runner page view-model should compose the attempt-limit handoff from server usage and assignment settings.'
+);
+assert.match(
+  studentRunnerSubmitControlsSource,
+  /function AssignmentAttemptLimitHandoff[\s\S]*data-handoff="assignment-attempt-limit"[\s\S]*view\.itemViews\.map\(\(item\)[\s\S]*data-handoff-item=\{item\.id\}[\s\S]*<output aria-label=\{item\.ariaLabel\}>/,
+  'Student runner submit controls should render the hidden assignment-attempt-limit handoff outputs.'
+);
+assert.match(
+  playRouteSource,
+  /attemptLimitHandoffView=\{runnerPageView\.attemptLimitHandoffView\}/,
+  'Student play route should pass the prepared attempt-limit handoff into submit controls.'
+);
+assert.match(
+  assignmentAttemptLimitApiSource,
+  /export const submitAttempt[\s\S]*canUseAnotherAssignmentAttempt\(\{[\s\S]*maxAttempts: settings\.maxAttempts,[\s\S]*usedAttempts: previousAttemptCount/,
+  'Submit attempt API should enforce attempt limits through the shared helper.'
+);
+assert.match(
+  studentRunnerSubmissionSource,
+  /canStartAnotherStudentAttempt[\s\S]*canUseAnotherAssignmentAttempt\(\{[\s\S]*maxAttempts,[\s\S]*usedAttempts: submittedAttemptCount/,
+  'Student retry availability should use the shared attempt-limit helper.'
+);
+assert.match(
+  assignmentAttemptLimitDeliverySummarySource,
+  /hasAttemptLimit[\s\S]*maxAttempts/,
+  'Delivery summaries should derive attempt-limit status from assignment settings.'
+);
+assert.match(
+  assignmentAttemptLimitPublicSource,
+  /case 'attempt-limit':[\s\S]*assignment_delivery_label_attempts/,
+  'Public assignment rule summaries should expose the attempt-limit delivery policy.'
+);
+assert.match(
+  assignmentAttemptLimitResultViewSource,
+  /settingsSummaryView: buildAssignmentSettingsSummaryView\(\{[\s\S]*settings: assignment\.settingsJson/,
+  'Teacher result pages should retain the delivery attempt-limit policy.'
+);
+assert.match(
+  assignmentAttemptLimitResultExportSource,
+  /delivery-attempt-limit/,
+  'Result exports should preserve the assignment delivery attempt-limit field.'
+);
+for (const privateValue of [
+  studentSubmissionPrivateAnswer,
+  studentSubmissionPrivateToken,
+  studentSubmissionRuntimeItem.id,
+]) {
+  assert.equal(
+    JSON.stringify(assignmentAttemptLimitHandoffView).includes(privateValue),
+    false,
+    `Assignment attempt-limit handoff leaked private text: ${privateValue}`
   );
 }
 assert.match(

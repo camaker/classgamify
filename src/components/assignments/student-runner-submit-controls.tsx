@@ -1,3 +1,4 @@
+import type { AssignmentAttemptLimitHandoffView } from '@/assignments/attempt-limit-handoff';
 import type {
   StudentRunnerControlView,
   StudentRunnerSubmissionHandoffView,
@@ -11,6 +12,7 @@ import {
 } from '@tabler/icons-react';
 
 type StudentRunnerSubmitControlsProps = {
+  attemptLimitHandoffView: AssignmentAttemptLimitHandoffView;
   controlView: StudentRunnerControlView;
   onSubmit: () => void;
   submissionHandoffView: StudentRunnerSubmissionHandoffView;
@@ -22,6 +24,7 @@ type StudentRunnerSubmitReadinessItemView =
   StudentRunnerSubmitReadinessView['items'][number];
 
 export function StudentRunnerSubmitControls({
+  attemptLimitHandoffView,
   controlView,
   onSubmit,
   submissionHandoffView,
@@ -120,6 +123,39 @@ export function StudentRunnerSubmitControls({
         />
       ))}
       <StudentRunnerSubmissionHandoff view={submissionHandoffView} />
+      <AssignmentAttemptLimitHandoff view={attemptLimitHandoffView} />
+    </section>
+  );
+}
+
+function AssignmentAttemptLimitHandoff({
+  view,
+}: {
+  view: AssignmentAttemptLimitHandoffView;
+}) {
+  const titleId = 'assignment-attempt-limit-handoff-title';
+  const descriptionId = 'assignment-attempt-limit-handoff-description';
+
+  return (
+    <section
+      aria-describedby={descriptionId}
+      aria-labelledby={titleId}
+      className="sr-only"
+      data-handoff="assignment-attempt-limit"
+    >
+      <h3 id={titleId}>{view.title}</h3>
+      <p id={descriptionId}>{view.description}</p>
+      <dl>
+        {view.itemViews.map((item) => (
+          <div data-handoff-item={item.id} key={item.id}>
+            <dt>{item.label}</dt>
+            <dd>
+              <output aria-label={item.ariaLabel}>{item.value}</output>
+              <span>{item.description}</span>
+            </dd>
+          </div>
+        ))}
+      </dl>
     </section>
   );
 }
