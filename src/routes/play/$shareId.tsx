@@ -343,6 +343,9 @@ function PlayPage() {
             controlView={controlView}
             onSubmit={submitAnswers}
             submissionHandoffView={runnerPageView.submissionHandoffView}
+            submissionValidationHandoffView={
+              runnerPageView.submissionValidationHandoffView
+            }
           />
         </StudentRunnerAttemptShell>
 

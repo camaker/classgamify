@@ -19,6 +19,11 @@ import {
   type AssignmentAttemptLimitHandoffView,
 } from '@/assignments/attempt-limit-handoff';
 import {
+  buildAssignmentSubmissionValidationHandoffEvidence,
+  buildAssignmentSubmissionValidationHandoffView,
+  type AssignmentSubmissionValidationHandoffView,
+} from '@/assignments/submission-validation-handoff';
+import {
   normalizeAssignmentAttemptCount,
   type AssignmentAttemptUsage,
 } from '@/assignments/attempt-limits';
@@ -492,6 +497,7 @@ export type StudentRunnerPageViewModel = {
   startHandoffView?: StudentRunnerStartHandoffView;
   submissionContractView: StudentRunnerSubmissionContractView;
   submissionHandoffView: StudentRunnerSubmissionHandoffView;
+  submissionValidationHandoffView: AssignmentSubmissionValidationHandoffView;
   submissionSuccessMessage: string;
   timeLimitSeconds?: number;
 };
@@ -916,6 +922,18 @@ export function buildStudentRunnerPageViewModel({
   });
   const currentPayloadSummaryView =
     buildStudentRunnerSubmissionPayloadSummaryView(currentPayloadSummary);
+  const submissionValidationHandoffView =
+    buildAssignmentSubmissionValidationHandoffView(
+      buildAssignmentSubmissionValidationHandoffEvidence({
+        clientPayloadUsesRuntimeItems: true,
+        clientProgressUsesRuntimeItems: true,
+        publicPayloadExcludesTeacherAnswers: true,
+        runtimeItems: attemptState.runtimeItems,
+        runtimeSourceUsesFrozenItems: pageState.status === 'ready',
+        submittedAnswerCount: currentPayloadSummary.answerCount,
+        teacherResultsUseStoredScoredAnswers: true,
+      })
+    );
   const submitReadinessView = buildStudentRunnerSubmitReadinessView({
     attemptControlState,
     hasResult: Boolean(result),
@@ -1103,6 +1121,7 @@ export function buildStudentRunnerPageViewModel({
     startHandoffView,
     submissionContractView,
     submissionHandoffView,
+    submissionValidationHandoffView,
     submissionSuccessMessage: runnerCopy.submissionSuccessMessage,
     timeLimitSeconds,
   };

@@ -564,6 +564,11 @@ import {
   buildAssignmentAttemptLimitHandoffView,
 } from '@/assignments/attempt-limit-handoff';
 import {
+  ASSIGNMENT_SUBMISSION_VALIDATION_HANDOFF_ITEM_IDS,
+  buildAssignmentSubmissionValidationHandoffEvidence,
+  buildAssignmentSubmissionValidationHandoffView,
+} from '@/assignments/submission-validation-handoff';
+import {
   buildChoicePairingRunnerView,
   buildDefaultRuntimeItemCardViews,
   buildFillBlankWorksheetView,
@@ -14055,12 +14060,20 @@ const attemptLimitHandoffSource = readFileSync(
   'src/assignments/attempt-limit-handoff.ts',
   'utf8'
 );
+const submissionValidationHandoffSource = readFileSync(
+  'src/assignments/submission-validation-handoff.ts',
+  'utf8'
+);
 const attemptLimitsSource = readFileSync(
   'src/assignments/attempt-limits.ts',
   'utf8'
 );
 const assignmentAttemptLimitApiSource = readFileSync(
   'src/api/assignments.ts',
+  'utf8'
+);
+const assignmentSubmissionValidationAttemptAnswersSource = readFileSync(
+  'src/assignments/attempt-answers.ts',
   'utf8'
 );
 const assignmentAttemptLimitDeliverySummarySource = readFileSync(
@@ -15261,6 +15274,219 @@ for (const privateValue of [
     JSON.stringify(assignmentAttemptLimitHandoffView).includes(privateValue),
     false,
     `Assignment attempt-limit handoff leaked private text: ${privateValue}`
+  );
+}
+const assignmentSubmissionValidationHandoffView =
+  buildAssignmentSubmissionValidationHandoffView(
+    buildAssignmentSubmissionValidationHandoffEvidence({
+      apiNormalizesAnswersBeforeValidation:
+        /const submittedAnswers = normalizeSubmittedAttemptAnswers/.test(
+          assignmentAttemptLimitApiSource
+        ),
+      apiValidatesBeforeScoring:
+        /assertSubmittedAnswersMatchRuntimeItems[\s\S]*evaluateRuntimeAnswers/.test(
+          assignmentAttemptLimitApiSource
+        ),
+      clientPayloadUsesRuntimeItems:
+        /buildAttemptSubmissionAnswers[\s\S]*getUniqueSubmissionRuntimeItemEntries/.test(
+          studentRunnerSubmissionSource
+        ),
+      clientProgressUsesRuntimeItems:
+        /getAttemptCompletionSummary[\s\S]*getUniqueSubmissionRuntimeItemEntries/.test(
+          studentRunnerSubmissionSource
+        ),
+      persistenceUsesNormalizedAnswers:
+        /const evaluation = evaluateRuntimeAnswers\(\{[\s\S]*answers: submittedAnswers[\s\S]*buildScoredAttemptInsert\(\{[\s\S]*evaluation,/.test(
+          assignmentAttemptLimitApiSource
+        ),
+      publicPayloadExcludesTeacherAnswers: /stripRuntimeAnswers/.test(
+        assignmentAttemptLimitPublicSource
+      ),
+      runtimeItems: [
+        { id: 'item-1' },
+        { id: 'item-2' },
+        { id: 'item-3' },
+      ],
+      safeFailureMapping:
+        /isSafeStudentAttemptAnswerValidationErrorCode[\s\S]*unknown-item/.test(
+          studentRunnerSubmissionSource
+        ),
+      scoringUsesNormalizedAnswers:
+        /evaluateRuntimeAnswers\(\{[\s\S]*answers: submittedAnswers/.test(
+          assignmentAttemptLimitApiSource
+        ),
+      submittedAnswerCount: 2,
+      teacherResultsUseStoredScoredAnswers:
+        /buildAssignmentResultsPageViewModel[\s\S]*reviews: data\?\.analysis\.attempts/.test(
+          assignmentAttemptLimitResultViewSource
+        ),
+    })
+  );
+const assignmentSubmissionValidationHandoffValues = new Map(
+  assignmentSubmissionValidationHandoffView.itemViews.map((item) => [
+    item.id,
+    item.value,
+  ])
+);
+assert.match(
+  submissionValidationHandoffSource,
+  /export const ASSIGNMENT_SUBMISSION_VALIDATION_HANDOFF_ITEM_IDS = \[(?=[\s\S]*'validation-scope')(?=[\s\S]*'runtime-source')(?=[\s\S]*'runtime-item-count')(?=[\s\S]*'submitted-answer-count')(?=[\s\S]*'partial-submission')(?=[\s\S]*'empty-answer-omission')(?=[\s\S]*'runtime-id-normalization')(?=[\s\S]*'submitted-id-normalization')(?=[\s\S]*'runtime-id-uniqueness')(?=[\s\S]*'blank-id-rejection')(?=[\s\S]*'unknown-item-rejection')(?=[\s\S]*'duplicate-item-rejection')(?=[\s\S]*'too-many-rejection')(?=[\s\S]*'duplicate-runtime-rejection')(?=[\s\S]*'fullwidth-id-normalization')(?=[\s\S]*'api-answer-limit')(?=[\s\S]*'api-item-id-limit')(?=[\s\S]*'api-answer-text-limit')(?=[\s\S]*'api-max-answers-limit')(?=[\s\S]*'api-normalizes-answers')(?=[\s\S]*'api-validates-before-scoring')(?=[\s\S]*'scoring-normalized-answers')(?=[\s\S]*'persistence-normalized-answers')(?=[\s\S]*'client-payload-builder')(?=[\s\S]*'client-progress-source')(?=[\s\S]*'safe-failure-mapping')(?=[\s\S]*'teacher-result-boundary')(?=[\s\S]*'public-payload-boundary')(?=[\s\S]*'raw-payload-guard')(?=[\s\S]*'privacy-guard')[\s\S]*\] as const;/,
+  'Assignment submission-validation handoff should declare exactly the 30 submission contract slice ids.'
+);
+assert.deepEqual(
+  assignmentSubmissionValidationHandoffView.itemViews.map((item) => item.id),
+  [...ASSIGNMENT_SUBMISSION_VALIDATION_HANDOFF_ITEM_IDS],
+  'Assignment submission-validation handoff should expose the stable 30-slice order.'
+);
+assert.equal(assignmentSubmissionValidationHandoffView.itemViews.length, 30);
+assert.deepEqual(assignmentSubmissionValidationHandoffView.privacy, {
+  exposesAnswerText: false,
+  exposesRawAnonymousToken: false,
+  exposesRawPayloadRows: false,
+  exposesRuntimeItemIds: false,
+  exposesStudentName: false,
+  exposesTeacherOnlyAnswers: false,
+  itemIds: [...ASSIGNMENT_SUBMISSION_VALIDATION_HANDOFF_ITEM_IDS],
+  mutatesAttempts: false,
+  scope: 'assignment-submission-validation-boundary',
+  usesSharedAttemptAnswerHelpers: true,
+});
+assert.equal(
+  assignmentSubmissionValidationHandoffValues.get('validation-scope'),
+  'Frozen runtime validation'
+);
+assert.equal(
+  assignmentSubmissionValidationHandoffValues.get('runtime-source'),
+  'Frozen runtime'
+);
+assert.equal(
+  assignmentSubmissionValidationHandoffValues.get('runtime-item-count'),
+  '3 runtime items'
+);
+assert.equal(
+  assignmentSubmissionValidationHandoffValues.get('submitted-answer-count'),
+  '2 answers'
+);
+assert.equal(
+  assignmentSubmissionValidationHandoffValues.get('partial-submission'),
+  'Partial attempts allowed'
+);
+assert.equal(
+  assignmentSubmissionValidationHandoffValues.get('empty-answer-omission'),
+  'Empty answers omitted'
+);
+assert.equal(
+  assignmentSubmissionValidationHandoffValues.get('runtime-id-uniqueness'),
+  'Unique ids'
+);
+assert.equal(
+  assignmentSubmissionValidationHandoffValues.get('blank-id-rejection'),
+  'Rejected'
+);
+assert.equal(
+  assignmentSubmissionValidationHandoffValues.get('unknown-item-rejection'),
+  'Rejected'
+);
+assert.equal(
+  assignmentSubmissionValidationHandoffValues.get('duplicate-item-rejection'),
+  'Rejected'
+);
+assert.equal(
+  assignmentSubmissionValidationHandoffValues.get('too-many-rejection'),
+  'Rejected'
+);
+assert.equal(
+  assignmentSubmissionValidationHandoffValues.get(
+    'duplicate-runtime-rejection'
+  ),
+  'Rejected'
+);
+assert.equal(
+  assignmentSubmissionValidationHandoffValues.get(
+    'fullwidth-id-normalization'
+  ),
+  'Normalized'
+);
+assert.equal(
+  assignmentSubmissionValidationHandoffValues.get('api-answer-limit'),
+  '200 max'
+);
+assert.equal(
+  assignmentSubmissionValidationHandoffValues.get('api-item-id-limit'),
+  '120 max'
+);
+assert.equal(
+  assignmentSubmissionValidationHandoffValues.get('api-answer-text-limit'),
+  '500 chars'
+);
+assert.equal(
+  assignmentSubmissionValidationHandoffValues.get('safe-failure-mapping'),
+  'Safe failure messages'
+);
+assert.equal(
+  assignmentSubmissionValidationHandoffValues.get('raw-payload-guard'),
+  'Raw payload hidden'
+);
+assert.equal(
+  assignmentSubmissionValidationHandoffValues.get('privacy-guard'),
+  'Private data hidden'
+);
+assert.match(
+  assignmentSubmissionValidationAttemptAnswersSource,
+  /assertSubmittedAnswersMatchRuntimeItems[\s\S]*answers\.length > runtimeItems\.length[\s\S]*unknown-item[\s\S]*duplicate-item[\s\S]*duplicate-runtime-item/,
+  'Attempt-answer helper should reject too-many, unknown, duplicate, and duplicate-runtime ids.'
+);
+assert.match(
+  assignmentAttemptLimitApiSource,
+  /const submittedAnswers = normalizeSubmittedAttemptAnswers\(data\.answers\)[\s\S]*assertSubmittedAnswersMatchRuntimeItems\(\{[\s\S]*answers: submittedAnswers,[\s\S]*runtimeItems: orderedRuntimeItems,[\s\S]*\}\)[\s\S]*evaluateRuntimeAnswers\(\{[\s\S]*answers: submittedAnswers/,
+  'Submit attempt API should normalize and validate answers before scoring.'
+);
+assert.match(
+  assignmentAttemptLimitApiSource,
+  /const evaluation = evaluateRuntimeAnswers\(\{[\s\S]*answers: submittedAnswers[\s\S]*buildScoredAttemptInsert\(\{[\s\S]*evaluation,/,
+  'Scored attempt persistence should receive the evaluation produced from normalized submitted answers.'
+);
+assert.match(
+  studentRunnerSubmissionSource,
+  /buildAttemptSubmissionAnswers[\s\S]*getUniqueSubmissionRuntimeItemEntries\(runtimeItems\)[\s\S]*if \(!isStudentAnswerFilled\(answer\)\) return \[\]/,
+  'Browser payload builder should derive rows from runtime items and omit empty answers.'
+);
+assert.match(
+  studentRunnerStateSource,
+  /submissionValidationHandoffView: AssignmentSubmissionValidationHandoffView;[\s\S]*buildAssignmentSubmissionValidationHandoffView\([\s\S]*buildAssignmentSubmissionValidationHandoffEvidence\(\{[\s\S]*runtimeItems: attemptState\.runtimeItems,[\s\S]*submittedAnswerCount: currentPayloadSummary\.answerCount/,
+  'Student runner page view-model should compose the submission validation handoff from runtime and payload counts.'
+);
+assert.match(
+  studentRunnerSubmitControlsSource,
+  /data-handoff="assignment-submission-validation"[\s\S]*view\.itemViews\.map\(\(item\)[\s\S]*data-handoff-item=\{item\.id\}[\s\S]*<output aria-label=\{item\.ariaLabel\}>/,
+  'Student runner submit controls should render the hidden submission-validation handoff outputs.'
+);
+assert.match(
+  playRouteSource,
+  /submissionValidationHandoffView=\{\s*runnerPageView\.submissionValidationHandoffView\s*\}/,
+  'Student play route should pass the prepared submission-validation handoff into submit controls.'
+);
+assert.match(
+  assignmentAttemptLimitPublicSource,
+  /stripRuntimeAnswers[\s\S]*answer:[\s\S]*undefined/,
+  'Public assignment payloads should strip teacher-only answers before student delivery.'
+);
+assert.match(
+  assignmentAttemptLimitResultViewSource,
+  /buildAssignmentResultsPageViewModel[\s\S]*reviews: data\?\.analysis\.attempts/,
+  'Teacher result pages should rely on stored attempt analysis rather than public payload internals.'
+);
+for (const privateValue of [
+  studentSubmissionPrivateAnswer,
+  studentSubmissionPrivateToken,
+  studentSubmissionRuntimeItem.id,
+]) {
+  assert.equal(
+    JSON.stringify(assignmentSubmissionValidationHandoffView).includes(
+      privateValue
+    ),
+    false,
+    `Submission validation handoff leaked private text: ${privateValue}`
   );
 }
 assert.match(
