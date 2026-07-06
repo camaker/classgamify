@@ -3,6 +3,10 @@ import type {
   PublicRuntimeItem,
 } from '@/assignments/public';
 import type { StudentAnswerChange } from '@/assignments/student-submission';
+import {
+  buildMatchingPairsBoardHandoffView,
+  type MatchingPairsBoardHandoffView,
+} from '@/assignments/matching-pairs-board-handoff';
 import { getActivityRunnerKindCopy } from '@/activities/runner-copy';
 import {
   buildChoicePairingRunnerView,
@@ -78,87 +82,134 @@ export function MatchingPairsBoard({
     }
   }
 
+  const handoffView = useMemo(
+    () =>
+      buildMatchingPairsBoardHandoffView({
+        disabled,
+        revealAnswer,
+        runnerView,
+      }),
+    [disabled, revealAnswer, runnerView]
+  );
+
   return (
-    <div className="rounded-lg border bg-card p-3">
-      <div className="flex flex-wrap items-center justify-between gap-2">
-        <div className="flex items-center gap-2 text-sm font-medium">
-          <IconArrowsExchange className="size-4 text-primary" />
-          {copy.title}
+    <>
+      <div className="rounded-lg border bg-card p-3">
+        <div className="flex flex-wrap items-center justify-between gap-2">
+          <div className="flex items-center gap-2 text-sm font-medium">
+            <IconArrowsExchange className="size-4 text-primary" />
+            {copy.title}
+          </div>
+          <Badge variant="outline" className="rounded-md">
+            {runnerView.progressLabel}
+          </Badge>
         </div>
-        <Badge variant="outline" className="rounded-md">
-          {runnerView.progressLabel}
-        </Badge>
-      </div>
 
-      <div className="mt-3 grid gap-3 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]">
-        <div className="grid gap-2">
-          {runnerView.promptItemViews.map((itemView) => {
-            const { answer, item, reviewItem, reviewStatusClassName } =
-              itemView;
+        <div className="mt-3 grid gap-3 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]">
+          <div className="grid gap-2">
+            {runnerView.promptItemViews.map((itemView) => {
+              const { answer, item, reviewItem, reviewStatusClassName } =
+                itemView;
 
-            return (
-              <button
-                key={item.id}
-                type="button"
-                disabled={disabled}
-                className={cn(
-                  'min-h-20 rounded-lg border bg-background p-3 text-left transition-colors',
-                  'hover:border-primary/50 hover:bg-primary/5 disabled:cursor-default disabled:opacity-100',
-                  itemView.selected && 'border-primary bg-primary/10',
-                  reviewStatusClassName
-                )}
-                onClick={() => handleRunnerAction(itemView.action)}
-              >
-                <div className="flex items-start justify-between gap-2">
-                  <p className="text-sm font-medium">{itemView.promptLabel}</p>
-                  {itemView.selected ? (
-                    <IconCheck className="mt-0.5 size-4 text-primary" />
-                  ) : (
-                    <IconCircle className="mt-0.5 size-4 text-muted-foreground" />
+              return (
+                <button
+                  key={item.id}
+                  type="button"
+                  disabled={disabled}
+                  className={cn(
+                    'min-h-20 rounded-lg border bg-background p-3 text-left transition-colors',
+                    'hover:border-primary/50 hover:bg-primary/5 disabled:cursor-default disabled:opacity-100',
+                    itemView.selected && 'border-primary bg-primary/10',
+                    reviewStatusClassName
                   )}
-                </div>
-                {answer ? (
-                  <span className="mt-3 inline-flex max-w-full rounded-md bg-secondary px-2 py-1 text-xs font-medium text-secondary-foreground">
-                    {answer}
-                  </span>
-                ) : null}
-                {revealAnswer && reviewItem ? (
-                  <PublicAnswerFeedback
-                    correctLabel={copy.correctAnswerLabel}
-                    reviewItem={reviewItem}
-                  />
-                ) : null}
-              </button>
-            );
-          })}
-        </div>
+                  onClick={() => handleRunnerAction(itemView.action)}
+                >
+                  <div className="flex items-start justify-between gap-2">
+                    <p className="text-sm font-medium">
+                      {itemView.promptLabel}
+                    </p>
+                    {itemView.selected ? (
+                      <IconCheck className="mt-0.5 size-4 text-primary" />
+                    ) : (
+                      <IconCircle className="mt-0.5 size-4 text-muted-foreground" />
+                    )}
+                  </div>
+                  {answer ? (
+                    <span className="mt-3 inline-flex max-w-full rounded-md bg-secondary px-2 py-1 text-xs font-medium text-secondary-foreground">
+                      {answer}
+                    </span>
+                  ) : null}
+                  {revealAnswer && reviewItem ? (
+                    <PublicAnswerFeedback
+                      correctLabel={copy.correctAnswerLabel}
+                      reviewItem={reviewItem}
+                    />
+                  ) : null}
+                </button>
+              );
+            })}
+          </div>
 
-        <div className="grid content-start gap-2">
-          {runnerView.choiceViews.map(
-            ({ action, choice, id, selected, usedByItemId }) => (
-              <button
-                key={id}
-                type="button"
-                disabled={!selectedItemId || disabled}
-                className={cn(
-                  'min-h-14 rounded-lg border bg-background p-3 text-left text-sm transition-colors',
-                  'hover:border-primary/50 hover:bg-primary/5 disabled:cursor-default disabled:opacity-70',
-                  usedByItemId && 'bg-muted/30',
-                  selected && 'border-primary bg-primary/10 text-primary'
-                )}
-                onClick={() => handleRunnerAction(action)}
-              >
-                <span className="font-medium">{choice}</span>
-                {usedByItemId ? (
-                  <Badge variant="outline" className="ml-2 rounded-md">
-                    {copy.usedChoiceLabel}
-                  </Badge>
-                ) : null}
-              </button>
-            )
-          )}
+          <div className="grid content-start gap-2">
+            {runnerView.choiceViews.map(
+              ({ action, choice, id, selected, usedByItemId }) => (
+                <button
+                  key={id}
+                  type="button"
+                  disabled={!selectedItemId || disabled}
+                  className={cn(
+                    'min-h-14 rounded-lg border bg-background p-3 text-left text-sm transition-colors',
+                    'hover:border-primary/50 hover:bg-primary/5 disabled:cursor-default disabled:opacity-70',
+                    usedByItemId && 'bg-muted/30',
+                    selected && 'border-primary bg-primary/10 text-primary'
+                  )}
+                  onClick={() => handleRunnerAction(action)}
+                >
+                  <span className="font-medium">{choice}</span>
+                  {usedByItemId ? (
+                    <Badge variant="outline" className="ml-2 rounded-md">
+                      {copy.usedChoiceLabel}
+                    </Badge>
+                  ) : null}
+                </button>
+              )
+            )}
+          </div>
         </div>
       </div>
-    </div>
+      <MatchingPairsBoardHandoff view={handoffView} />
+    </>
+  );
+}
+
+function MatchingPairsBoardHandoff({
+  view,
+}: {
+  view: MatchingPairsBoardHandoffView;
+}) {
+  const titleId = 'matching-pairs-board-handoff-title';
+  const descriptionId = 'matching-pairs-board-handoff-description';
+
+  return (
+    <section
+      aria-describedby={descriptionId}
+      aria-labelledby={titleId}
+      className="sr-only"
+      data-handoff="matching-pairs-board"
+    >
+      <h2 id={titleId}>{view.title}</h2>
+      <p id={descriptionId}>{view.description}</p>
+      <dl>
+        {view.itemViews.map((item) => (
+          <div data-handoff-item={item.id} key={item.id}>
+            <dt>{item.label}</dt>
+            <dd>
+              <output aria-label={item.ariaLabel}>{item.value}</output>
+              <span>{item.description}</span>
+            </dd>
+          </div>
+        ))}
+      </dl>
+    </section>
   );
 }

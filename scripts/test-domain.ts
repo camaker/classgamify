@@ -612,6 +612,10 @@ import {
   GROUP_SORT_BOARD_HANDOFF_ITEM_IDS,
 } from '@/assignments/group-sort-board-handoff';
 import {
+  buildMatchingPairsBoardHandoffView,
+  MATCHING_PAIRS_BOARD_HANDOFF_ITEM_IDS,
+} from '@/assignments/matching-pairs-board-handoff';
+import {
   formatAssignmentDisplayText,
   formatAssignmentDisplayTitle,
 } from '@/assignments/assignment-display';
@@ -9315,8 +9319,16 @@ const groupSortBoardSource = readFileSync(
   'src/components/activities/group-sort-board.tsx',
   'utf8'
 );
+const matchingPairsBoardSource = readFileSync(
+  'src/components/activities/matching-pairs-board.tsx',
+  'utf8'
+);
 const groupSortBoardHandoffSource = readFileSync(
   'src/assignments/group-sort-board-handoff.ts',
+  'utf8'
+);
+const matchingPairsBoardHandoffSource = readFileSync(
+  'src/assignments/matching-pairs-board-handoff.ts',
   'utf8'
 );
 const fillBlankWorksheetSource = readFileSync(
@@ -9377,6 +9389,31 @@ assert.match(
   groupSortBoardSource,
   /data-handoff="group-sort-board"[\s\S]*view\.itemViews\.map\(\(item\) =>[\s\S]*data-handoff-item=\{item\.id\}[\s\S]*<output aria-label=\{item\.ariaLabel\}>/,
   'Group-sort runner should expose stable hidden group-sort board item outputs.'
+);
+assert.match(
+  matchingPairsBoardHandoffSource,
+  /export const MATCHING_PAIRS_BOARD_HANDOFF_ITEM_IDS = \[(?=[\s\S]*'template-type')(?=[\s\S]*'prompt-card-count')(?=[\s\S]*'choice-card-count')(?=[\s\S]*'reassignment-policy')(?=[\s\S]*'public-payload-boundary')(?=[\s\S]*'privacy-guard')[\s\S]*\] as const;[\s\S]*export type MatchingPairsBoardHandoffPrivacyContract = \{[\s\S]*exposesAnswerText: false;[\s\S]*exposesChoiceText: false;[\s\S]*exposesRuntimeItemIds: false;[\s\S]*exposesRuntimePromptText: false;[\s\S]*scope: 'matching-pairs-card-board';/,
+  'Matching-pairs board handoff should expose a typed 30-slice card-board privacy contract.'
+);
+assert.match(
+  matchingPairsBoardHandoffSource,
+  /buildMatchingPairsBoardHandoffView[\s\S]*runnerView: ChoicePairingRunnerView[\s\S]*buildMatchingPairsBoardHandoffContext[\s\S]*runnerView\.promptItemViews\.length[\s\S]*runnerView\.choiceViews\.length[\s\S]*runnerView\.completionSummary\.answeredItemCount/,
+  'Matching-pairs board handoff should derive card, choice, selection, and progress state from the prepared runner view.'
+);
+assert.match(
+  matchingPairsBoardSource,
+  /buildMatchingPairsBoardHandoffView[\s\S]*disabled,[\s\S]*revealAnswer,[\s\S]*runnerView,/,
+  'Matching-pairs runner should build its card-board handoff from the prepared runner view.'
+);
+assert.match(
+  matchingPairsBoardSource,
+  /MatchingPairsBoardHandoff[\s\S]*view=\{handoffView\}/,
+  'Matching-pairs runner should render the prepared card-board handoff.'
+);
+assert.match(
+  matchingPairsBoardSource,
+  /data-handoff="matching-pairs-board"[\s\S]*view\.itemViews\.map\(\(item\) =>[\s\S]*data-handoff-item=\{item\.id\}[\s\S]*<output aria-label=\{item\.ariaLabel\}>/,
+  'Matching-pairs runner should expose stable hidden matching-pairs board item outputs.'
 );
 assert.match(
   groupSortBoardSource,
@@ -14412,10 +14449,6 @@ const lineMatchBoardSource = readFileSync(
   'src/components/activities/line-match-board.tsx',
   'utf8'
 );
-const matchingPairsBoardSource = readFileSync(
-  'src/components/activities/matching-pairs-board.tsx',
-  'utf8'
-);
 assert.match(
   studentRunnerSubmissionSource,
   /m\.student_runner_result_score_line[\s\S]*m\.student_runner_result_accuracy_line[\s\S]*m\.student_runner_result_time_line/,
@@ -18061,8 +18094,8 @@ assert.match(
 );
 assert.match(
   e2eTestCatalogText,
-  /Student runner adapts to template content[\s\S]*group-sort-board handoff[\s\S]*category target readiness[\s\S]*runtime-id\/prompt\/answer\/student\/source-material guards/,
-  'E2E catalog should cover the hidden 30-slice group-sort board handoff contract.'
+  /Student runner adapts to template content[\s\S]*group-sort-board handoff[\s\S]*category target readiness[\s\S]*runtime-id\/prompt\/answer\/student\/source-material guards[\s\S]*matching-pairs-board handoff[\s\S]*left prompt card and right choice card counts[\s\S]*runtime-id\/prompt\/choice\/answer\/student\/source-material guards/,
+  'E2E catalog should cover the hidden 30-slice group-sort and matching-pairs board handoff contracts.'
 );
 assert.match(
   e2eTestCatalogText,
@@ -31038,6 +31071,99 @@ for (const privateGroupSortBoardValue of [
     ),
     false,
     `Group-sort board handoff leaked private text: ${privateGroupSortBoardValue}`
+  );
+}
+const matchingPairsBoardView = buildChoicePairingRunnerView({
+  answers: {
+    'pair-one': 'Right answer',
+  },
+  items: [
+    {
+      choices: ['Right answer', 'Second choice'],
+      id: 'pair-one',
+      kind: 'pair',
+      prompt: 'Secret left prompt',
+    },
+    {
+      choices: ['Right answer', 'Second choice'],
+      id: 'pair-two',
+      kind: 'pair',
+      prompt: 'Second secret prompt',
+    },
+  ],
+  selectedItemId: 'pair-two',
+});
+const matchingPairsBoardHandoffView = buildMatchingPairsBoardHandoffView({
+  runnerView: matchingPairsBoardView,
+});
+const matchingPairsBoardHandoffValues = new Map(
+  matchingPairsBoardHandoffView.itemViews.map((item) => [item.id, item.value])
+);
+assert.deepEqual(
+  matchingPairsBoardHandoffView.itemViews.map((item) => item.id),
+  [...MATCHING_PAIRS_BOARD_HANDOFF_ITEM_IDS]
+);
+assert.equal(matchingPairsBoardHandoffView.itemViews.length, 30);
+assert.deepEqual(matchingPairsBoardHandoffView.privacy, {
+  exposesAnswerKeys: false,
+  exposesAnswerText: false,
+  exposesChoiceText: false,
+  exposesRuntimeItemIds: false,
+  exposesRuntimePromptText: false,
+  exposesSourceMaterialMetadata: false,
+  exposesStudentIdentity: false,
+  itemIds: [...MATCHING_PAIRS_BOARD_HANDOFF_ITEM_IDS],
+  runnerSurface: 'matching-pairs',
+  scope: 'matching-pairs-card-board',
+  templateType: 'matching-pairs',
+  usesSharedSubmissionContract: true,
+});
+assert.equal(
+  matchingPairsBoardHandoffValues.get('prompt-card-count'),
+  '2 prompts'
+);
+assert.equal(
+  matchingPairsBoardHandoffValues.get('choice-card-count'),
+  '2 choices'
+);
+assert.equal(
+  matchingPairsBoardHandoffValues.get('selected-prompt-state'),
+  'Selected'
+);
+assert.equal(
+  matchingPairsBoardHandoffValues.get('available-choice-count'),
+  '2 available choices'
+);
+assert.equal(
+  matchingPairsBoardHandoffValues.get('used-choice-count'),
+  '1 used choice'
+);
+assert.equal(
+  matchingPairsBoardHandoffValues.get('unused-choice-count'),
+  '1 unused choice'
+);
+assert.equal(
+  matchingPairsBoardHandoffValues.get('completion-progress'),
+  '1 of 2 paired'
+);
+assert.equal(
+  matchingPairsBoardHandoffValues.get('public-payload-boundary'),
+  'Privacy-safe assignment content'
+);
+for (const privateMatchingPairsBoardValue of [
+  'Secret left prompt',
+  'Second secret prompt',
+  'Right answer',
+  'Second choice',
+  'pair-one',
+  'pair-two',
+]) {
+  assert.equal(
+    JSON.stringify(matchingPairsBoardHandoffView).includes(
+      privateMatchingPairsBoardValue
+    ),
+    false,
+    `Matching-pairs board handoff leaked private text: ${privateMatchingPairsBoardValue}`
   );
 }
 assert.deepEqual(
