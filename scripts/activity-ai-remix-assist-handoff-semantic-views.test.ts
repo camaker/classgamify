@@ -1,4 +1,5 @@
 import assert from 'node:assert/strict';
+import { readFileSync } from 'node:fs';
 import test from 'node:test';
 import {
   ACTIVITY_AI_REMIX_ASSIST_HANDOFF_ITEM_IDS,
@@ -19,6 +20,12 @@ const SECRET_PROMPT = 'SECRET_AI_REMIX_PROMPT';
 const SECRET_SOURCE_SUMMARY = 'SECRET_AI_REMIX_SOURCE_SUMMARY';
 const SECRET_STORAGE_KEY = 'userfiles/teacher/ai-remix-private-key.pdf';
 const SECRET_TEACHER_NOTE = 'SECRET_AI_REMIX_TEACHER_NOTE';
+
+const ACTIVITY_LIBRARY_COMPATIBILITY_PANEL_SOURCE = readFileSync(
+  'src/components/activities/activity-library-compatibility-panel.tsx',
+  'utf8'
+);
+const TEST_CATALOG_SOURCE = readFileSync('tests/e2e/TEST-CATALOG.md', 'utf8');
 
 const questionOnlyContent: ActivityContent = {
   difficulty: 'core',
@@ -212,6 +219,39 @@ test('AI remix assist handoff localizes Chinese target readiness', () => {
     assertNoPrivateAiRemixAssistText(JSON.stringify(handoffView));
   } finally {
     overwriteGetLocale(() => 'en');
+  }
+});
+
+test('AI remix assist handoff renders stable DOM relationships', () => {
+  assert.match(
+    ACTIVITY_LIBRARY_COMPATIBILITY_PANEL_SOURCE,
+    /ActivityAiRemixAssistHandoffItemView[\s\S]*ActivityAiRemixAssistHandoffView[\s\S]*function ActivityLibraryAiRemixAssistHandoff[\s\S]*const titleId = useId\(\)[\s\S]*const descriptionId = useId\(\)[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*aria-labelledby=\{titleId\}[\s\S]*className="sr-only"[\s\S]*data-handoff="activity-ai-remix-assist"[\s\S]*id=\{titleId\}[\s\S]*id=\{descriptionId\}[\s\S]*handoff\.itemViews\.map[\s\S]*ActivityLibraryAiRemixAssistHandoffItem[\s\S]*function ActivityLibraryAiRemixAssistHandoffItem[\s\S]*const labelId = `activity-ai-remix-assist-handoff-\$\{item\.id\}-label`[\s\S]*const valueId = `activity-ai-remix-assist-handoff-\$\{item\.id\}-value`[\s\S]*const descriptionId = `activity-ai-remix-assist-handoff-\$\{item\.id\}-description`[\s\S]*data-handoff-item=\{item\.id\}[\s\S]*id=\{labelId\}[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*aria-label=\{item\.ariaLabel\}[\s\S]*aria-labelledby=\{`\$\{labelId\} \$\{valueId\}`\}[\s\S]*id=\{valueId\}[\s\S]*id=\{descriptionId\}/,
+    'AI remix assist handoff should render each teacher-reviewed assist slice with stable label, value, and description relationships.'
+  );
+});
+
+test('AI remix assist focused gate is documented', () => {
+  assert.match(
+    TEST_CATALOG_SOURCE,
+    /pnpm exec tsx --test scripts\/activity-ai-remix-assist-handoff-semantic-views\.test\.ts/,
+    'E2E catalog should point AI remix assist work at the focused script gate.'
+  );
+  for (const boundary of [
+    'source/target template diagnosis',
+    'target readiness',
+    'missing structured requirements',
+    'deterministic-remix versus AI-completion paths',
+    'editor-review gates',
+    'draft/persist/publish boundaries',
+    'source-material provenance guards',
+    'content coverage counts',
+    'hidden AI remix assist handoff',
+  ]) {
+    assert.match(
+      TEST_CATALOG_SOURCE,
+      new RegExp(boundary.replace(/[ /-]+/g, '[\\s/-]+')),
+      `E2E catalog should mention AI remix assist boundary: ${boundary}`
+    );
   }
 });
 

@@ -84,6 +84,13 @@ ready-target-only gating, archived restore gates, remixed draft title
 strategy/limit, content and source-material clone counts, assignment snapshot
 protection, original-activity protection, or the activity-card compatibility
 handoff.
+AI remix assist boundaries have a fast script-level gate via
+`pnpm exec tsx --test scripts/activity-ai-remix-assist-handoff-semantic-views.test.ts`;
+run it when changing source/target template diagnosis, target readiness,
+missing structured requirements, deterministic-remix versus AI-completion
+paths, editor-review gates, draft/persist/publish boundaries, source-material
+provenance guards, content coverage counts, or the hidden AI remix assist
+handoff.
 Assignment list filter and distribution boundaries have a fast script-level gate
 via `pnpm exec tsx --test scripts/assignment-list-semantic-views.test.ts`; run
 it when changing assignment list overview metrics, status/search filters,
