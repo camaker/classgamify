@@ -404,6 +404,55 @@ export type ActivityEditorAiDraftSourceMaterialSafetyView = {
   title: string;
 };
 
+export const ACTIVITY_EDITOR_AI_DRAFT_SOURCE_CONTROL_IDS = {
+  generationDisabledReason: 'activity-ai-generate-disabled-reason',
+  safeSourceDescription: 'activity-ai-safe-source-description',
+  sourceCapabilityTitle: 'activity-ai-source-capability-title',
+  sourceInput: 'activity-ai-source',
+  sourceMaterialNotesLabel: 'activity-ai-source-material-notes-label',
+  sourceMaterialSafetyDescription:
+    'activity-ai-source-material-safety-description',
+  sourceMaterialSafetyTitle: 'activity-ai-source-material-safety-title',
+  sourceReadinessDescription: 'activity-ai-source-readiness-description',
+  sourceReadinessTitle: 'activity-ai-source-readiness-title',
+  syncMaterialsHelp: 'activity-ai-sync-materials-help',
+} as const;
+
+export type ActivityEditorAiDraftSourceControlIds =
+  typeof ACTIVITY_EDITOR_AI_DRAFT_SOURCE_CONTROL_IDS;
+
+export type ActivityEditorAiDraftSourceControlBoundaryView = {
+  attachedSourceMaterialCount: number;
+  canGenerateDraft: boolean;
+  canSyncDraftSourceMaterials: boolean;
+  controlIds: ActivityEditorAiDraftSourceControlIds;
+  describesGenerateActionWithReadiness: true;
+  describesSourceTextareaWithReadiness: true;
+  describesSourceTextareaWithSafeSource: true;
+  describesSyncActionWithSafeMaterialHelp: true;
+  exposesFileBytes: false;
+  exposesFileIds: false;
+  exposesOmittedNotePayloads: false;
+  exposesStorageKeys: false;
+  generateActionUsesDisabledReason: boolean;
+  generateButtonDescribedByIds: string[];
+  hasCapabilityDescription: boolean;
+  hasMaterialSafetyDescription: boolean;
+  hasSyncedMaterialNoteDescription: boolean;
+  omittedSourceMaterialNoteCount: number;
+  safeSourceMaterialNoteCount: number;
+  scope: 'activity-ai-draft-source-controls';
+  sourceMaterialCapabilityCount: number;
+  sourceMaterialNoteInputCount: number;
+  sourceMaterialNoteViewCount: number;
+  sourceReadinessHasWarnings: boolean;
+  sourceReadinessStatus: ActivityEditorAiDraftSourceReadinessView['status'];
+  sourceTextMaxLength: number;
+  syncButtonDescribedByIds: string[];
+  textareaDescribedByIds: string[];
+  usesPreparedControlIds: true;
+};
+
 export const ACTIVITY_EDITOR_AI_DRAFT_SOURCE_HANDOFF_ITEM_IDS = [
   'safe-source',
   'source-textarea',
@@ -480,6 +529,7 @@ export type ActivityEditorAiDraftPanelView = {
   itemCountLabel: string;
   reviewNote: string;
   safeSourceDescription: string;
+  sourceControlBoundary: ActivityEditorAiDraftSourceControlBoundaryView;
   sourceCapabilityTitle: string;
   sourceCapabilityViews: ActivityEditorAiDraftSourceCapabilityView[];
   sourceHandoffView: ActivityEditorAiDraftSourceHandoffView;
@@ -1279,6 +1329,18 @@ export function buildActivityEditorAiDraftPanelView({
         )
       : undefined;
   const syncMaterialsHelpText = m.activity_form_ai_sync_materials_help();
+  const sourceControlBoundary = buildActivityEditorAiDraftSourceControlBoundary(
+    {
+      canGenerateDraft,
+      canSyncDraftSourceMaterials: sourceState.canSyncDraftSourceMaterials,
+      generationDisabledReason,
+      sourceMaterialSafetyView,
+      sourceMaterialNoteViews,
+      sourceMaterialSummaryLabel,
+      sourceReadiness,
+      sourceState,
+    }
+  );
 
   return {
     badgeLabel: m.activity_form_ai_draft_badge(),
@@ -1292,6 +1354,7 @@ export function buildActivityEditorAiDraftPanelView({
     itemCountLabel,
     reviewNote: m.activity_form_ai_draft_review_note(),
     safeSourceDescription,
+    sourceControlBoundary,
     sourceCapabilityTitle: m.activity_form_ai_source_capabilities_title(),
     sourceCapabilityViews,
     sourceHandoffView: buildActivityEditorAiDraftSourceHandoffView({
@@ -1345,6 +1408,84 @@ function buildActivityEditorAiDraftSourceCapabilityViews(
     },
     includeZero: options.includeZero,
   });
+}
+
+function buildActivityEditorAiDraftSourceControlBoundary({
+  canGenerateDraft,
+  canSyncDraftSourceMaterials,
+  generationDisabledReason,
+  sourceMaterialSafetyView,
+  sourceMaterialNoteViews,
+  sourceMaterialSummaryLabel,
+  sourceReadiness,
+  sourceState,
+}: {
+  canGenerateDraft: boolean;
+  canSyncDraftSourceMaterials: boolean;
+  generationDisabledReason?: string;
+  sourceMaterialSafetyView: ActivityEditorAiDraftSourceMaterialSafetyView;
+  sourceMaterialNoteViews: ActivityEditorSourceMaterialDraftNoteView[];
+  sourceMaterialSummaryLabel?: string;
+  sourceReadiness: ActivityEditorAiDraftSourceReadinessView;
+  sourceState: ActivityEditorDraftSourceState;
+}): ActivityEditorAiDraftSourceControlBoundaryView {
+  const controlIds = ACTIVITY_EDITOR_AI_DRAFT_SOURCE_CONTROL_IDS;
+  const sourceMaterialCapabilityCount =
+    countActivityEditorAiDraftSourceCapabilities(
+      sourceState.sourceMaterialCapabilityCounts
+    );
+  const hasMaterialSafetyDescription = sourceMaterialSafetyView.hasInput;
+  const hasCapabilityDescription = sourceMaterialCapabilityCount > 0;
+  const hasSyncedMaterialNoteDescription =
+    sourceMaterialNoteViews.length > 0 && Boolean(sourceMaterialSummaryLabel);
+  const generateActionUsesDisabledReason = Boolean(generationDisabledReason);
+
+  return {
+    attachedSourceMaterialCount: sourceState.attachedSourceMaterialCount,
+    canGenerateDraft,
+    canSyncDraftSourceMaterials,
+    controlIds,
+    describesGenerateActionWithReadiness: true,
+    describesSourceTextareaWithReadiness: true,
+    describesSourceTextareaWithSafeSource: true,
+    describesSyncActionWithSafeMaterialHelp: true,
+    exposesFileBytes: false,
+    exposesFileIds: false,
+    exposesOmittedNotePayloads: false,
+    exposesStorageKeys: false,
+    generateActionUsesDisabledReason,
+    generateButtonDescribedByIds: [
+      controlIds.sourceReadinessDescription,
+      ...(generateActionUsesDisabledReason
+        ? [controlIds.generationDisabledReason]
+        : []),
+    ],
+    hasCapabilityDescription,
+    hasMaterialSafetyDescription,
+    hasSyncedMaterialNoteDescription,
+    omittedSourceMaterialNoteCount: sourceState.omittedSourceMaterialNoteCount,
+    safeSourceMaterialNoteCount: sourceState.safeSourceMaterialNoteCount,
+    scope: 'activity-ai-draft-source-controls',
+    sourceMaterialCapabilityCount,
+    sourceMaterialNoteInputCount: sourceState.sourceMaterialNoteInputCount,
+    sourceMaterialNoteViewCount: sourceMaterialNoteViews.length,
+    sourceReadinessHasWarnings: sourceReadiness.hasWarnings,
+    sourceReadinessStatus: sourceReadiness.status,
+    sourceTextMaxLength: ACTIVITY_DRAFT_SOURCE_MAX_LENGTH,
+    syncButtonDescribedByIds: [controlIds.syncMaterialsHelp],
+    textareaDescribedByIds: [
+      controlIds.safeSourceDescription,
+      controlIds.sourceReadinessDescription,
+      ...(hasMaterialSafetyDescription
+        ? [controlIds.sourceMaterialSafetyDescription]
+        : []),
+      ...(hasCapabilityDescription ? [controlIds.sourceCapabilityTitle] : []),
+      ...(hasSyncedMaterialNoteDescription
+        ? [controlIds.sourceMaterialNotesLabel]
+        : []),
+    ],
+    usesPreparedControlIds: true,
+  };
 }
 
 function buildActivityEditorAiDraftSourceHandoffView({
@@ -1646,6 +1787,12 @@ function toActivityEditorAiDraftSourceCapabilityHandoffItemId(
   capability: ActivitySourceMaterialReadinessCapability
 ): ActivityEditorAiDraftSourceHandoffItemId {
   return `capability-${capability}`;
+}
+
+function countActivityEditorAiDraftSourceCapabilities(
+  capabilityCounts: ActivitySourceMaterialCapabilityCounts
+) {
+  return Object.values(capabilityCounts).filter((count) => count > 0).length;
 }
 
 function buildActivityEditorAiDraftSourcePrivacyContract(

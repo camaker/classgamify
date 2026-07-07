@@ -425,6 +425,7 @@ import {
   buildActivityEditPageViewModel,
   buildActivityEditRouteState,
   activityContentToEditorInput,
+  ACTIVITY_EDITOR_AI_DRAFT_SOURCE_CONTROL_IDS,
   ACTIVITY_EDITOR_AI_DRAFT_SOURCE_HANDOFF_ITEM_IDS,
   ACTIVITY_EDITOR_SECTION_IDS,
   ACTIVITY_EDITOR_READINESS_PANEL_LIMITS,
@@ -5963,8 +5964,13 @@ assert.match(
 );
 assert.match(
   activityEditorSource,
-  /export type ActivityEditorAiDraftSourceCapabilityView[\s\S]*export type ActivityEditorSourceMaterialDraftNoteView[\s\S]*export type ActivityEditorAiDraftSourceReadinessView[\s\S]*export type ActivityEditorAiDraftSourceMaterialSafetyMetricView[\s\S]*export type ActivityEditorAiDraftSourceMaterialSafetyView[\s\S]*export type ActivityEditorAiDraftPanelView[\s\S]*export type ActivityEditorAiDraftSourceCapabilityCardView =\s*ActivityEditorAiDraftSourceCapabilityView;/,
+  /export type ActivityEditorAiDraftSourceCapabilityView[\s\S]*export type ActivityEditorSourceMaterialDraftNoteView[\s\S]*export type ActivityEditorAiDraftSourceReadinessView[\s\S]*export type ActivityEditorAiDraftSourceMaterialSafetyMetricView[\s\S]*export type ActivityEditorAiDraftSourceMaterialSafetyView[\s\S]*export const ACTIVITY_EDITOR_AI_DRAFT_SOURCE_CONTROL_IDS[\s\S]*export type ActivityEditorAiDraftSourceControlBoundaryView = \{[\s\S]*scope: 'activity-ai-draft-source-controls';[\s\S]*textareaDescribedByIds: string\[\];[\s\S]*usesPreparedControlIds: true;[\s\S]*export const ACTIVITY_EDITOR_AI_DRAFT_SOURCE_HANDOFF_ITEM_IDS/,
   'Activity editor domain should expose explicit AI draft panel view contracts.'
+);
+assert.match(
+  activityEditorSource,
+  /function buildActivityEditorAiDraftSourceControlBoundary[\s\S]*const controlIds = ACTIVITY_EDITOR_AI_DRAFT_SOURCE_CONTROL_IDS[\s\S]*generateButtonDescribedByIds:[\s\S]*controlIds\.sourceReadinessDescription[\s\S]*controlIds\.generationDisabledReason[\s\S]*syncButtonDescribedByIds: \[controlIds\.syncMaterialsHelp\][\s\S]*textareaDescribedByIds:[\s\S]*controlIds\.safeSourceDescription[\s\S]*controlIds\.sourceReadinessDescription[\s\S]*controlIds\.sourceMaterialSafetyDescription[\s\S]*controlIds\.sourceCapabilityTitle[\s\S]*controlIds\.sourceMaterialNotesLabel/,
+  'Activity editor AI source control boundary should derive textarea, sync, and generate aria descriptions from prepared control ids.'
 );
 assert.match(
   activityEditorSource,
@@ -6084,12 +6090,12 @@ assert.match(
 );
 assert.match(
   activityAiDraftPanelSource,
-  /const syncMaterialsHelpTextId = 'activity-ai-sync-materials-help'[\s\S]*aria-describedby=\{syncMaterialsHelpTextId\}[\s\S]*id=\{syncMaterialsHelpTextId\}[\s\S]*panelView\.syncMaterialsHelpText/,
+  /const \{ controlIds \} = panelView\.sourceControlBoundary[\s\S]*const syncMaterialsDescriptionIds = joinDomIds\(\s*panelView\.sourceControlBoundary\.syncButtonDescribedByIds\s*\)[\s\S]*aria-describedby=\{syncMaterialsDescriptionIds\}[\s\S]*id=\{controlIds\.syncMaterialsHelp\}[\s\S]*panelView\.syncMaterialsHelpText/,
   'Activity AI draft source sync controls should associate the sync button with the prepared help text.'
 );
 assert.match(
   activityAiDraftPanelSource,
-  /const safeSourceDescriptionId = 'activity-ai-safe-source-description'[\s\S]*const sourceDescriptionIds = joinDomIds\(\[[\s\S]*safeSourceDescriptionId[\s\S]*ACTIVITY_AI_SOURCE_READINESS_DESCRIPTION_ID[\s\S]*sourceMaterialSafetyDescriptionId[\s\S]*sourceCapabilityTitleId[\s\S]*sourceMaterialNotesLabelId[\s\S]*<Textarea[\s\S]*aria-describedby=\{sourceDescriptionIds\}/,
+  /const sourceDescriptionIds = joinDomIds\(\s*panelView\.sourceControlBoundary\.textareaDescribedByIds\s*\)[\s\S]*id=\{controlIds\.safeSourceDescription\}[\s\S]*htmlFor=\{controlIds\.sourceInput\}[\s\S]*<Textarea[\s\S]*id=\{controlIds\.sourceInput\}[\s\S]*aria-describedby=\{sourceDescriptionIds\}/,
   'Activity AI draft source textarea should be described by safe-source, readiness, source-material safety, capability, and material-note context.'
 );
 assert.match(
@@ -6099,7 +6105,7 @@ assert.match(
 );
 assert.match(
   activityAiDraftPanelSource,
-  /sourceMaterialNotesLabelId[\s\S]*aria-labelledby=\{[\s\S]*sourceMaterialNotesLabelId[\s\S]*id=\{sourceMaterialNotesLabelId\}[\s\S]*panelView\.sourceMaterialSummaryLabel/,
+  /aria-labelledby=\{[\s\S]*controlIds\.sourceMaterialNotesLabel[\s\S]*id=\{controlIds\.sourceMaterialNotesLabel\}[\s\S]*panelView\.sourceMaterialSummaryLabel/,
   'Activity AI draft source material notes should expose a labelled region tied to prepared summary copy.'
 );
 assert.doesNotMatch(
@@ -6194,8 +6200,13 @@ assert.match(
 );
 assert.match(
   activityAiDraftPanelSource,
-  /const generationDescriptionIds = joinDomIds\(\[[\s\S]*ACTIVITY_AI_SOURCE_READINESS_DESCRIPTION_ID[\s\S]*generationDisabledReasonId[\s\S]*aria-describedby=\{generationDescriptionIds\}/,
+  /function ActivityAiDraftGenerateButton[\s\S]*const \{ controlIds \} = panelView\.sourceControlBoundary[\s\S]*const generationDescriptionIds = joinDomIds\(\s*panelView\.sourceControlBoundary\.generateButtonDescribedByIds\s*\)[\s\S]*aria-describedby=\{generationDescriptionIds\}[\s\S]*id=\{controlIds\.generationDisabledReason\}/,
   'Activity AI draft generate button should stay described by source readiness and any prepared disabled reason.'
+);
+assert.doesNotMatch(
+  activityAiDraftPanelSource,
+  /ACTIVITY_AI_SOURCE_READINESS_DESCRIPTION_ID|syncMaterialsHelpTextId|safeSourceDescriptionId|generationDisabledReasonId/,
+  'Activity AI draft panel should consume prepared source-control ids instead of keeping local control id constants.'
 );
 assert.match(
   activityAiDraftPanelSource,
@@ -45831,6 +45842,42 @@ assert.deepEqual(safeMaterialAiDraftPanelView.sourceHandoffView.privacy, {
   exposesUrls: false,
   itemIds: [...ACTIVITY_EDITOR_AI_DRAFT_SOURCE_HANDOFF_ITEM_IDS],
 });
+assert.deepEqual(safeMaterialAiDraftPanelView.sourceControlBoundary, {
+  attachedSourceMaterialCount: 0,
+  canGenerateDraft: true,
+  canSyncDraftSourceMaterials: true,
+  controlIds: ACTIVITY_EDITOR_AI_DRAFT_SOURCE_CONTROL_IDS,
+  describesGenerateActionWithReadiness: true,
+  describesSourceTextareaWithReadiness: true,
+  describesSourceTextareaWithSafeSource: true,
+  describesSyncActionWithSafeMaterialHelp: true,
+  exposesFileBytes: false,
+  exposesFileIds: false,
+  exposesOmittedNotePayloads: false,
+  exposesStorageKeys: false,
+  generateActionUsesDisabledReason: false,
+  generateButtonDescribedByIds: ['activity-ai-source-readiness-description'],
+  hasCapabilityDescription: false,
+  hasMaterialSafetyDescription: true,
+  hasSyncedMaterialNoteDescription: true,
+  omittedSourceMaterialNoteCount: 1,
+  safeSourceMaterialNoteCount: 2,
+  scope: 'activity-ai-draft-source-controls',
+  sourceMaterialCapabilityCount: 0,
+  sourceMaterialNoteInputCount: 3,
+  sourceMaterialNoteViewCount: 2,
+  sourceReadinessHasWarnings: true,
+  sourceReadinessStatus: 'synced-materials',
+  sourceTextMaxLength: ACTIVITY_DRAFT_SOURCE_MAX_LENGTH,
+  syncButtonDescribedByIds: ['activity-ai-sync-materials-help'],
+  textareaDescribedByIds: [
+    'activity-ai-safe-source-description',
+    'activity-ai-source-readiness-description',
+    'activity-ai-source-material-safety-description',
+    'activity-ai-source-material-notes-label',
+  ],
+  usesPreparedControlIds: true,
+});
 assert.equal(
   safeMaterialAiDraftSourceHandoffValues.get('source-sanitization'),
   'Sanitized source'
@@ -46581,8 +46628,11 @@ assert.deepEqual(
 function omitActivityEditorAiDraftSourceHandoffView(
   view: ReturnType<typeof buildActivityEditorAiDraftPanelView>
 ) {
-  const { sourceHandoffView: _sourceHandoffView, ...viewWithoutHandoff } =
-    view;
+  const {
+    sourceControlBoundary: _sourceControlBoundary,
+    sourceHandoffView: _sourceHandoffView,
+    ...viewWithoutHandoff
+  } = view;
   return viewWithoutHandoff;
 }
 

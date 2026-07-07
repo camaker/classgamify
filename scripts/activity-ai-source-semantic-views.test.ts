@@ -1,6 +1,7 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 import {
+  ACTIVITY_EDITOR_AI_DRAFT_SOURCE_CONTROL_IDS,
   ACTIVITY_EDITOR_AI_DRAFT_SOURCE_HANDOFF_ITEM_IDS,
   buildActivityEditorAiDraftPanelView,
   buildActivityEditorDraftSourceState,
@@ -82,6 +83,43 @@ test('AI source panel exposes a complete safe handoff contract', () => {
     exposesStorageKeys: false,
     exposesUrls: false,
     itemIds: [...ACTIVITY_EDITOR_AI_DRAFT_SOURCE_HANDOFF_ITEM_IDS],
+  });
+  assert.deepEqual(panelView.sourceControlBoundary, {
+    attachedSourceMaterialCount: 4,
+    canGenerateDraft: true,
+    canSyncDraftSourceMaterials: true,
+    controlIds: ACTIVITY_EDITOR_AI_DRAFT_SOURCE_CONTROL_IDS,
+    describesGenerateActionWithReadiness: true,
+    describesSourceTextareaWithReadiness: true,
+    describesSourceTextareaWithSafeSource: true,
+    describesSyncActionWithSafeMaterialHelp: true,
+    exposesFileBytes: false,
+    exposesFileIds: false,
+    exposesOmittedNotePayloads: false,
+    exposesStorageKeys: false,
+    generateActionUsesDisabledReason: false,
+    generateButtonDescribedByIds: ['activity-ai-source-readiness-description'],
+    hasCapabilityDescription: true,
+    hasMaterialSafetyDescription: true,
+    hasSyncedMaterialNoteDescription: true,
+    omittedSourceMaterialNoteCount: 1,
+    safeSourceMaterialNoteCount: 3,
+    scope: 'activity-ai-draft-source-controls',
+    sourceMaterialCapabilityCount: 3,
+    sourceMaterialNoteInputCount: 4,
+    sourceMaterialNoteViewCount: 3,
+    sourceReadinessHasWarnings: true,
+    sourceReadinessStatus: 'synced-materials',
+    sourceTextMaxLength: 2000,
+    syncButtonDescribedByIds: ['activity-ai-sync-materials-help'],
+    textareaDescribedByIds: [
+      'activity-ai-safe-source-description',
+      'activity-ai-source-readiness-description',
+      'activity-ai-source-material-safety-description',
+      'activity-ai-source-capability-title',
+      'activity-ai-source-material-notes-label',
+    ],
+    usesPreparedControlIds: true,
   });
 
   assert.equal(
@@ -196,6 +234,43 @@ test('AI source handoff exposes zero-count extraction readiness', () => {
     ),
     'Sign in to generate an AI draft.'
   );
+  assert.deepEqual(panelView.sourceControlBoundary, {
+    attachedSourceMaterialCount: 0,
+    canGenerateDraft: false,
+    canSyncDraftSourceMaterials: false,
+    controlIds: ACTIVITY_EDITOR_AI_DRAFT_SOURCE_CONTROL_IDS,
+    describesGenerateActionWithReadiness: true,
+    describesSourceTextareaWithReadiness: true,
+    describesSourceTextareaWithSafeSource: true,
+    describesSyncActionWithSafeMaterialHelp: true,
+    exposesFileBytes: false,
+    exposesFileIds: false,
+    exposesOmittedNotePayloads: false,
+    exposesStorageKeys: false,
+    generateActionUsesDisabledReason: true,
+    generateButtonDescribedByIds: [
+      'activity-ai-source-readiness-description',
+      'activity-ai-generate-disabled-reason',
+    ],
+    hasCapabilityDescription: false,
+    hasMaterialSafetyDescription: false,
+    hasSyncedMaterialNoteDescription: false,
+    omittedSourceMaterialNoteCount: 0,
+    safeSourceMaterialNoteCount: 0,
+    scope: 'activity-ai-draft-source-controls',
+    sourceMaterialCapabilityCount: 0,
+    sourceMaterialNoteInputCount: 0,
+    sourceMaterialNoteViewCount: 0,
+    sourceReadinessHasWarnings: false,
+    sourceReadinessStatus: 'ready',
+    sourceTextMaxLength: 2000,
+    syncButtonDescribedByIds: ['activity-ai-sync-materials-help'],
+    textareaDescribedByIds: [
+      'activity-ai-safe-source-description',
+      'activity-ai-source-readiness-description',
+    ],
+    usesPreparedControlIds: true,
+  });
 });
 
 function getHandoffItemValue(

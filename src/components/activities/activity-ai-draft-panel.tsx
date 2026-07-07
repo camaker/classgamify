@@ -25,11 +25,6 @@ import {
 import { Textarea } from '@/components/ui/textarea';
 import { IconLoader2, IconPaperclip, IconSparkles } from '@tabler/icons-react';
 
-const ACTIVITY_AI_SOURCE_READINESS_DESCRIPTION_ID =
-  'activity-ai-source-readiness-description';
-const ACTIVITY_AI_SOURCE_READINESS_TITLE_ID =
-  'activity-ai-source-readiness-title';
-
 type ActivityAiDraftPanelProps = {
   draftFocus: ActivityAiDraftFocus;
   draftItemCount: number;
@@ -175,28 +170,13 @@ function ActivityAiDraftSourceControls({
   onSyncSourceMaterials: () => void;
   panelView: ActivityEditorAiDraftPanelView;
 }) {
-  const syncMaterialsHelpTextId = 'activity-ai-sync-materials-help';
-  const safeSourceDescriptionId = 'activity-ai-safe-source-description';
-  const sourceMaterialSafetyTitleId =
-    'activity-ai-source-material-safety-title';
-  const sourceMaterialSafetyDescriptionId =
-    'activity-ai-source-material-safety-description';
-  const sourceCapabilityTitleId = 'activity-ai-source-capability-title';
-  const sourceMaterialNotesLabelId = 'activity-ai-source-material-notes-label';
-  const sourceDescriptionIds = joinDomIds([
-    safeSourceDescriptionId,
-    ACTIVITY_AI_SOURCE_READINESS_DESCRIPTION_ID,
-    panelView.sourceMaterialSafetyView.hasInput
-      ? sourceMaterialSafetyDescriptionId
-      : undefined,
-    panelView.sourceCapabilityViews.length > 0
-      ? sourceCapabilityTitleId
-      : undefined,
-    panelView.sourceMaterialNoteViews.length > 0 &&
-    panelView.sourceMaterialSummaryLabel
-      ? sourceMaterialNotesLabelId
-      : undefined,
-  ]);
+  const { controlIds } = panelView.sourceControlBoundary;
+  const sourceDescriptionIds = joinDomIds(
+    panelView.sourceControlBoundary.textareaDescribedByIds
+  );
+  const syncMaterialsDescriptionIds = joinDomIds(
+    panelView.sourceControlBoundary.syncButtonDescribedByIds
+  );
 
   return (
     <div className="min-w-0 flex-1 space-y-2">
@@ -210,13 +190,13 @@ function ActivityAiDraftSourceControls({
         </span>
       </div>
       <p
-        id={safeSourceDescriptionId}
+        id={controlIds.safeSourceDescription}
         className="text-xs leading-5 text-muted-foreground"
       >
         {panelView.safeSourceDescription}
       </p>
       <div className="flex flex-wrap items-center justify-between gap-2">
-        <label htmlFor="activity-ai-source" className="font-medium text-sm">
+        <label htmlFor={controlIds.sourceInput} className="font-medium text-sm">
           {panelView.sourceTextLabel}
         </label>
         <div className="flex flex-col items-start gap-1 sm:items-end">
@@ -227,13 +207,13 @@ function ActivityAiDraftSourceControls({
             className="bg-background"
             onClick={onSyncSourceMaterials}
             disabled={!panelView.canSyncDraftSourceMaterials}
-            aria-describedby={syncMaterialsHelpTextId}
+            aria-describedby={syncMaterialsDescriptionIds}
           >
             <IconPaperclip className="size-3.5" />
             {panelView.syncMaterialsLabel}
           </Button>
           <span
-            id={syncMaterialsHelpTextId}
+            id={controlIds.syncMaterialsHelp}
             className="text-xs text-muted-foreground"
           >
             {panelView.syncMaterialsHelpText}
@@ -241,7 +221,7 @@ function ActivityAiDraftSourceControls({
         </div>
       </div>
       <Textarea
-        id="activity-ai-source"
+        id={controlIds.sourceInput}
         className="max-h-52"
         value={draftSourceText}
         onChange={(event) => onDraftSourceTextChange(event.currentTarget.value)}
@@ -250,21 +230,21 @@ function ActivityAiDraftSourceControls({
         aria-describedby={sourceDescriptionIds}
       />
       <ActivityAiDraftSourceReadiness
-        descriptionId={ACTIVITY_AI_SOURCE_READINESS_DESCRIPTION_ID}
+        descriptionId={controlIds.sourceReadinessDescription}
         panelView={panelView}
-        titleId={ACTIVITY_AI_SOURCE_READINESS_TITLE_ID}
+        titleId={controlIds.sourceReadinessTitle}
       />
       {panelView.sourceMaterialSafetyView.hasInput ? (
         <ActivityAiDraftSourceMaterialSafety
-          descriptionId={sourceMaterialSafetyDescriptionId}
+          descriptionId={controlIds.sourceMaterialSafetyDescription}
           safetyView={panelView.sourceMaterialSafetyView}
-          titleId={sourceMaterialSafetyTitleId}
+          titleId={controlIds.sourceMaterialSafetyTitle}
         />
       ) : null}
       {panelView.sourceCapabilityViews.length > 0 ? (
         <ActivityAiDraftSourceCapabilities
           panelView={panelView}
-          titleId={sourceCapabilityTitleId}
+          titleId={controlIds.sourceCapabilityTitle}
         />
       ) : null}
       {panelView.sourceMaterialNoteViews.length > 0 ? (
@@ -276,13 +256,16 @@ function ActivityAiDraftSourceControls({
           }
           aria-labelledby={
             panelView.sourceMaterialSummaryLabel
-              ? sourceMaterialNotesLabelId
+              ? controlIds.sourceMaterialNotesLabel
               : undefined
           }
           className="space-y-2 rounded-md border bg-background p-3"
         >
           {panelView.sourceMaterialSummaryLabel ? (
-            <p id={sourceMaterialNotesLabelId} className="font-medium text-xs">
+            <p
+              id={controlIds.sourceMaterialNotesLabel}
+              className="font-medium text-xs"
+            >
               {panelView.sourceMaterialSummaryLabel}
             </p>
           ) : null}
@@ -559,11 +542,10 @@ function ActivityAiDraftGenerateButton({
   onGenerateDraft: () => void;
   panelView: ActivityEditorAiDraftPanelView;
 }) {
-  const generationDisabledReasonId = 'activity-ai-generate-disabled-reason';
-  const generationDescriptionIds = joinDomIds([
-    ACTIVITY_AI_SOURCE_READINESS_DESCRIPTION_ID,
-    panelView.generationDisabledReason ? generationDisabledReasonId : undefined,
-  ]);
+  const { controlIds } = panelView.sourceControlBoundary;
+  const generationDescriptionIds = joinDomIds(
+    panelView.sourceControlBoundary.generateButtonDescribedByIds
+  );
 
   return (
     <>
@@ -584,7 +566,7 @@ function ActivityAiDraftGenerateButton({
       </Button>
       {panelView.generationDisabledReason ? (
         <p
-          id={generationDisabledReasonId}
+          id={controlIds.generationDisabledReason}
           className="sm:col-span-2 text-xs text-muted-foreground"
         >
           {panelView.generationDisabledReason}
