@@ -82,6 +82,11 @@ run it when changing submit-attempt persistence, scored-attempt inserts,
 answer/result JSON cloning, identity fields, score/maxScore mapping,
 duration persistence, result-analysis consumers, stats consumers, or CSV export
 consumers.
+Quiz choice generation has a fast script-level gate via
+`pnpm exec tsx --test scripts/question-choice-generation-handoff-semantic-views.test.ts`;
+run it when changing deterministic distractor generation, question option
+normalization, editor quiz-choice readiness, runtime quiz choices, validation
+of `ActivityQuestion.options`, or future AI distractor write targets.
 
 ## Test Harness
 
