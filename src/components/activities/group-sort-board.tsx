@@ -4,6 +4,7 @@ import type {
 } from '@/assignments/public';
 import {
   buildGroupSortBoardHandoffView,
+  type GroupSortBoardHandoffItemView,
   type GroupSortBoardHandoffView,
 } from '@/assignments/group-sort-board-handoff';
 import { getActivityRunnerKindCopy } from '@/activities/runner-copy';
@@ -242,16 +243,37 @@ function GroupSortBoardHandoff({ view }: { view: GroupSortBoardHandoffView }) {
       <p id={descriptionId}>{view.description}</p>
       <dl>
         {view.itemViews.map((item) => (
-          <div data-handoff-item={item.id} key={item.id}>
-            <dt>{item.label}</dt>
-            <dd>
-              <output aria-label={item.ariaLabel}>{item.value}</output>
-              <span>{item.description}</span>
-            </dd>
-          </div>
+          <GroupSortBoardHandoffItem item={item} key={item.id} />
         ))}
       </dl>
     </section>
+  );
+}
+
+function GroupSortBoardHandoffItem({
+  item,
+}: {
+  item: GroupSortBoardHandoffItemView;
+}) {
+  const labelId = `group-sort-board-handoff-${item.id}-label`;
+  const valueId = `group-sort-board-handoff-${item.id}-value`;
+  const descriptionId = `group-sort-board-handoff-${item.id}-description`;
+
+  return (
+    <div data-handoff-item={item.id}>
+      <dt id={labelId}>{item.label}</dt>
+      <dd>
+        <output
+          aria-describedby={descriptionId}
+          aria-label={item.ariaLabel}
+          aria-labelledby={`${labelId} ${valueId}`}
+          id={valueId}
+        >
+          {item.value}
+        </output>
+        <span id={descriptionId}>{item.description}</span>
+      </dd>
+    </div>
   );
 }
 

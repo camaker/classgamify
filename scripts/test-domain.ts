@@ -9710,8 +9710,8 @@ assert.match(
 );
 assert.match(
   groupSortBoardSource,
-  /data-handoff="group-sort-board"[\s\S]*view\.itemViews\.map\(\(item\) =>[\s\S]*data-handoff-item=\{item\.id\}[\s\S]*<output aria-label=\{item\.ariaLabel\}>/,
-  'Group-sort runner should expose stable hidden group-sort board item outputs.'
+  /GroupSortBoardHandoffItemView[\s\S]*GroupSortBoardHandoffView[\s\S]*data-handoff="group-sort-board"[\s\S]*view\.itemViews\.map\(\(item\) =>[\s\S]*GroupSortBoardHandoffItem[\s\S]*function GroupSortBoardHandoffItem[\s\S]*const labelId = `group-sort-board-handoff-\$\{item\.id\}-label`[\s\S]*const valueId = `group-sort-board-handoff-\$\{item\.id\}-value`[\s\S]*const descriptionId = `group-sort-board-handoff-\$\{item\.id\}-description`[\s\S]*data-handoff-item=\{item\.id\}[\s\S]*id=\{labelId\}[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*aria-label=\{item\.ariaLabel\}[\s\S]*aria-labelledby=\{`\$\{labelId\} \$\{valueId\}`\}[\s\S]*id=\{valueId\}[\s\S]*id=\{descriptionId\}/,
+  'Group-sort runner should expose stable hidden group-sort board label, value, and description relationships.'
 );
 assert.match(
   matchingPairsBoardHandoffSource,
