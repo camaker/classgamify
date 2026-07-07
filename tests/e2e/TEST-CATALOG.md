@@ -85,6 +85,12 @@ title/description/template/visibility/learning-goal fields, structured content
 row counts, source-material reference hydration, readiness after load, future
 assignment boundaries, snapshot protection, save targets, or the hidden activity
 edit-route handoff.
+Activity editor workflow has a fast script-level gate via
+`pnpm exec tsx --test scripts/activity-editor-workflow-handoff-semantic-views.test.ts`;
+run it when changing page layout, workflow navigation, form sections, AI draft
+boundaries, source-material safety, readiness review, save gating,
+CreateActivityInput contracts, template-readiness contracts, publish boundaries,
+or the hidden activity-editor-workflow handoff.
 Activity duplicate safety has a fast script-level gate via
 `pnpm exec tsx --test scripts/activity-duplicate-handoff-semantic-views.test.ts`;
 run it when changing owner-scoped duplicate availability, persisted-source

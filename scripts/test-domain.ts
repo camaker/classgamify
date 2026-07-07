@@ -5922,7 +5922,7 @@ assert.match(
 );
 assert.match(
   createRouteSource,
-  /<WorkflowNav workflow=\{pageView\.workflow\} \/>[\s\S]*<ActivityEditorWorkflowHandoff[\s\S]*handoffView=\{pageView\.workflow\.handoffView\}[\s\S]*data-handoff="activity-editor-workflow"[\s\S]*handoffView\.itemViews\.map[\s\S]*data-handoff-item=\{item\.id\}[\s\S]*<output aria-label=\{item\.ariaLabel\}>/,
+  /<WorkflowNav workflow=\{pageView\.workflow\} \/>[\s\S]*<ActivityEditorWorkflowHandoff[\s\S]*handoffView=\{pageView\.workflow\.handoffView\}[\s\S]*data-handoff="activity-editor-workflow"[\s\S]*handoffView\.itemViews\.map[\s\S]*ActivityEditorWorkflowHandoffItem[\s\S]*const labelId = `activity-editor-workflow-handoff-\$\{item\.id\}-label`[\s\S]*const valueId = `activity-editor-workflow-handoff-\$\{item\.id\}-value`[\s\S]*const descriptionId =[\s\S]*`activity-editor-workflow-handoff-\$\{item\.id\}-description`[\s\S]*data-handoff-item=\{item\.id\}[\s\S]*id=\{labelId\}[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*aria-label=\{item\.ariaLabel\}[\s\S]*aria-labelledby=\{`\$\{labelId\} \$\{valueId\}`\}[\s\S]*id=\{valueId\}[\s\S]*id=\{descriptionId\}/,
   'Create route should render workflow navigation and hidden 30-slice workflow handoff from the prepared page view.'
 );
 assert.doesNotMatch(

@@ -183,12 +183,23 @@ function ActivityEditorWorkflowHandoffItem({
 }: {
   item: ActivityEditorWorkflowHandoffView['itemViews'][number];
 }) {
+  const labelId = `activity-editor-workflow-handoff-${item.id}-label`;
+  const valueId = `activity-editor-workflow-handoff-${item.id}-value`;
+  const descriptionId = `activity-editor-workflow-handoff-${item.id}-description`;
+
   return (
     <div data-handoff-item={item.id}>
-      <dt>{item.label}</dt>
+      <dt id={labelId}>{item.label}</dt>
       <dd>
-        <output aria-label={item.ariaLabel}>{item.value}</output>
-        <span>{item.description}</span>
+        <output
+          aria-describedby={descriptionId}
+          aria-label={item.ariaLabel}
+          aria-labelledby={`${labelId} ${valueId}`}
+          id={valueId}
+        >
+          {item.value}
+        </output>
+        <span id={descriptionId}>{item.description}</span>
       </dd>
     </div>
   );
