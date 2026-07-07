@@ -85,6 +85,7 @@ export type AuthWorkspaceHandoffPrivacyContract = {
   itemIds: AuthWorkspaceHandoffItemId[];
   modifiesActivityContent: false;
   modifiesStudentResults: false;
+  rendersInPublicDom: false;
   requiresTeacherSessionForWorkspace: true;
   scope: 'auth-workspace-entry';
   usesSafeCallbackPaths: true;
@@ -467,6 +468,7 @@ function buildAuthWorkspaceHandoffPrivacyContract(
     itemIds: itemViews.map((item) => item.id),
     modifiesActivityContent: false,
     modifiesStudentResults: false,
+    rendersInPublicDom: false,
     requiresTeacherSessionForWorkspace: true,
     scope: 'auth-workspace-entry',
     usesSafeCallbackPaths: true,

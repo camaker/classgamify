@@ -1,4 +1,5 @@
 import assert from 'node:assert/strict';
+import { readFileSync } from 'node:fs';
 import test from 'node:test';
 import {
   AUTH_WORKSPACE_BOUNDARY_ITEM_IDS,
@@ -11,6 +12,11 @@ import { overwriteGetLocale } from '@/locale/paraglide/runtime';
 import { DEFAULT_LOGIN_REDIRECT, Routes } from '@/lib/routes';
 
 overwriteGetLocale(() => 'en');
+
+const AUTH_CARD_SOURCE = readFileSync(
+  'src/components/auth/auth-card.tsx',
+  'utf8'
+);
 
 const SECRET_ANSWER_KEY = 'SECRET_TEACHER_ANSWER_KEY';
 const SECRET_CALLBACK_URL = 'https://evil.example/auth?callback=secret';
@@ -59,6 +65,7 @@ test('auth workspace handoff exposes 30 safe entry slices', () => {
     itemIds,
     modifiesActivityContent: false,
     modifiesStudentResults: false,
+    rendersInPublicDom: false,
     requiresTeacherSessionForWorkspace: true,
     scope: 'auth-workspace-entry',
     usesSafeCallbackPaths: true,
@@ -99,6 +106,19 @@ test('auth workspace handoff exposes 30 safe entry slices', () => {
     ]
   );
   assertNoPrivateAuthHandoffText(JSON.stringify(handoffView));
+});
+
+test('auth pages keep internal workspace handoff out of public DOM', () => {
+  assert.match(
+    AUTH_CARD_SOURCE,
+    /AuthWorkspaceBoundaryView[\s\S]*workspaceBoundary\?: AuthWorkspaceBoundaryView[\s\S]*AuthWorkspaceBoundaryPanel[\s\S]*view\.items\.map\(\(item\) =>[\s\S]*key=\{item\.id\}[\s\S]*item\.label[\s\S]*item\.description/,
+    'AuthCard should keep the visible teacher workspace boundary panel.'
+  );
+  assert.doesNotMatch(
+    AUTH_CARD_SOURCE,
+    /auth-workspace-handoff|data-handoff|data-handoff-item|view\.itemViews\.map/,
+    'Public auth pages must not render internal workspace handoff audit markup.'
+  );
 });
 
 test('auth workspace handoff keeps disabled providers explicit', () => {

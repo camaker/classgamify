@@ -7965,6 +7965,11 @@ assert.match(
   /AuthWorkspaceBoundaryView[\s\S]*workspaceBoundary\?: AuthWorkspaceBoundaryView[\s\S]*AuthWorkspaceBoundaryPanel[\s\S]*view\.items\.map\(\(item\) =>[\s\S]*key=\{item\.id\}[\s\S]*item\.label[\s\S]*item\.description/,
   'Auth cards should render the prepared workspace-boundary view from stable item ids.'
 );
+assert.doesNotMatch(
+  authCardSource,
+  /auth-workspace-handoff|data-handoff="auth-workspace-boundary"|data-handoff-item|view\.itemViews\.map/,
+  'Auth cards should keep internal workspace handoff diagnostics out of the public auth DOM.'
+);
 assert.match(
   authErrorRecoverySource,
   /AUTH_ERROR_RECOVERY_STEP_IDS[\s\S]*'retry-sign-in'[\s\S]*'check-email'[\s\S]*'protect-workspace'/,
@@ -10101,7 +10106,7 @@ assert.match(
 );
 assert.match(
   contactInquiryViewSource,
-  /export type ContactClassroomIntakeHandoffPrivacyContract = \{[\s\S]*createsActivities: false;[\s\S]*createsAssignmentLinks: false;[\s\S]*createsStudentRecords: false;[\s\S]*exposesContactMessageTextInHandoff: false;[\s\S]*exposesPrivateFileUrls: false;[\s\S]*exposesRawProviderErrors: false;[\s\S]*exposesRawStudentIdentifiers: false;[\s\S]*exposesRecipientEmailInView: false;[\s\S]*exposesSourceMaterialStorageKeys: false;[\s\S]*forwardsLocaleToMail: true;[\s\S]*mutatesTeacherWorkspace: false;[\s\S]*notifiesLearners: false;[\s\S]*persistsActivityContent: false;[\s\S]*readsFileBytes: false;[\s\S]*rendersStructuredFieldsInMail: true;[\s\S]*scope: 'public-classroom-inquiry-intake';[\s\S]*usesClassroomRouteIntent: true;[\s\S]*usesStructuredFields: true;/,
+  /export type ContactClassroomIntakeHandoffPrivacyContract = \{[\s\S]*createsActivities: false;[\s\S]*createsAssignmentLinks: false;[\s\S]*createsStudentRecords: false;[\s\S]*exposesContactMessageTextInHandoff: false;[\s\S]*exposesPrivateFileUrls: false;[\s\S]*exposesRawProviderErrors: false;[\s\S]*exposesRawStudentIdentifiers: false;[\s\S]*exposesRecipientEmailInView: false;[\s\S]*exposesSourceMaterialStorageKeys: false;[\s\S]*forwardsLocaleToMail: true;[\s\S]*mutatesTeacherWorkspace: false;[\s\S]*notifiesLearners: false;[\s\S]*persistsActivityContent: false;[\s\S]*readsFileBytes: false;[\s\S]*rendersInPublicDom: false;[\s\S]*rendersStructuredFieldsInMail: true;[\s\S]*scope: 'public-classroom-inquiry-intake';[\s\S]*usesClassroomRouteIntent: true;[\s\S]*usesStructuredFields: true;/,
   'Contact classroom intake handoff should publish explicit safety and behavior flags.'
 );
 assert.match(
@@ -10119,10 +10124,10 @@ assert.doesNotMatch(
   /Classroom inquiry intake|Classroom workflow|Prompted context|Trimmed NFKC text|Bounded fields|Safe classroom context|Private data omitted|Learners and class|Activity material|Assignment routine|Template or worksheet need|Result review|storage keys|private file URLs/,
   'Contact inquiry view should read visible classroom scope copy from locale messages.'
 );
-assert.match(
+assert.doesNotMatch(
   contactFormCardSource,
-  /buildContactClassroomIntakeHandoffView\(\{ scopeView: classroomScope \}\)[\s\S]*<ClassroomIntakeHandoff view=\{classroomIntakeHandoff\} \/>[\s\S]*function ClassroomIntakeHandoff[\s\S]*aria-label=\{view\.title\}[\s\S]*view\.description[\s\S]*view\.itemViews\.map[\s\S]*function ClassroomIntakeHandoffItem[\s\S]*<output aria-label=\{itemView\.ariaLabel\}/,
-  'Contact classroom form should render the prepared intake handoff title, description, item views, and semantic output values.'
+  /ClassroomIntakeHandoff|ContactClassroomIntakeHandoffItemView|ContactClassroomIntakeHandoffView|buildContactClassroomIntakeHandoffView|data-handoff|data-handoff-item/,
+  'Contact classroom form should keep the internal intake handoff out of the public DOM.'
 );
 assert.doesNotMatch(
   contactFormCardSource,
@@ -37848,6 +37853,7 @@ assert.deepEqual(contactClassroomIntakeHandoffView.privacy, {
   notifiesLearners: false,
   persistsActivityContent: false,
   readsFileBytes: false,
+  rendersInPublicDom: false,
   rendersStructuredFieldsInMail: true,
   scope: 'public-classroom-inquiry-intake',
   usesClassroomRouteIntent: true,
