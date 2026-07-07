@@ -91,6 +91,14 @@ run it when changing page layout, workflow navigation, form sections, AI draft
 boundaries, source-material safety, readiness review, save gating,
 CreateActivityInput contracts, template-readiness contracts, publish boundaries,
 or the hidden activity-editor-workflow handoff.
+Activity editor template handoff has a fast script-level gate via
+`pnpm exec tsx --test scripts/activity-editor-template-handoff-semantic-views.test.ts`;
+run it when changing selected-template badges, required content, current template
+readiness, ready/locked template options, suggested remixes, quiz-choice
+readiness, scaffold action, scaffold runtime items, scaffold ready modes,
+reusable coverage, scaffold field counts, scaffold review steps, shared editor
+contract, parsed content status, save-before-publish boundaries, or the hidden
+activity-editor-template handoff.
 Activity duplicate safety has a fast script-level gate via
 `pnpm exec tsx --test scripts/activity-duplicate-handoff-semantic-views.test.ts`;
 run it when changing owner-scoped duplicate availability, persisted-source

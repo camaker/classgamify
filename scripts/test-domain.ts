@@ -5887,7 +5887,7 @@ assert.match(
 );
 assert.match(
   activityEditorFormSource,
-  /ActivityEditorTemplateHandoff[\s\S]*data-handoff="activity-editor-template"[\s\S]*data-handoff-item=\{item\.id\}/,
+  /ActivityEditorTemplateHandoff[\s\S]*data-handoff="activity-editor-template"[\s\S]*handoffView\.itemViews\.map[\s\S]*ActivityEditorTemplateHandoffItem[\s\S]*const labelId = `activity-editor-template-handoff-\$\{item\.id\}-label`[\s\S]*const valueId = `activity-editor-template-handoff-\$\{item\.id\}-value`[\s\S]*const descriptionId = `activity-editor-template-handoff-\$\{item\.id\}-description`[\s\S]*data-handoff-item=\{item\.id\}[\s\S]*id=\{labelId\}[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*aria-label=\{item\.ariaLabel\}[\s\S]*aria-labelledby=\{`\$\{labelId\} \$\{valueId\}`\}[\s\S]*id=\{valueId\}[\s\S]*id=\{descriptionId\}/,
   'Activity editor form should render the template handoff in the real create/edit surface.'
 );
 assert.doesNotMatch(

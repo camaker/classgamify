@@ -1,4 +1,5 @@
 import assert from 'node:assert/strict';
+import { readFileSync } from 'node:fs';
 import test from 'node:test';
 import {
   ACTIVITY_EDITOR_TEMPLATE_HANDOFF_ITEM_IDS,
@@ -14,6 +15,11 @@ const SECRET_PROMPT = 'SECRET_TEMPLATE_PROMPT_SHOULD_NOT_LEAK';
 const SECRET_ANSWER = 'SECRET_TEMPLATE_ANSWER_SHOULD_NOT_LEAK';
 const SECRET_FILE_ID = 'SECRET_TEMPLATE_FILE_ID_SHOULD_NOT_LEAK';
 const SECRET_STORAGE_KEY = 'classroom/private/template-source.pdf';
+const ACTIVITY_CREATE_FORM_SOURCE = readFileSync(
+  'src/components/activities/activity-create-form.tsx',
+  'utf8'
+);
+const TEST_CATALOG_SOURCE = readFileSync('tests/e2e/TEST-CATALOG.md', 'utf8');
 
 test('activity editor template view exposes a 30-slice handoff contract', () => {
   const templateView = buildActivityEditorTemplateView({
@@ -162,6 +168,42 @@ test('activity editor template view exposes a 30-slice handoff contract', () => 
   );
 
   assertNoPrivateTemplateText(JSON.stringify(handoffView));
+});
+
+test('activity editor template handoff renders stable semantic outputs', () => {
+  assert.match(
+    ACTIVITY_CREATE_FORM_SOURCE,
+    /ActivityEditorTemplateHandoffView[\s\S]*function ActivityEditorTemplateHandoff[\s\S]*const titleId = 'activity-editor-template-handoff-title'[\s\S]*const descriptionId = 'activity-editor-template-handoff-description'[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*aria-labelledby=\{titleId\}[\s\S]*className="sr-only"[\s\S]*data-handoff="activity-editor-template"[\s\S]*id=\{titleId\}[\s\S]*id=\{descriptionId\}[\s\S]*handoffView\.itemViews\.map[\s\S]*ActivityEditorTemplateHandoffItem[\s\S]*function ActivityEditorTemplateHandoffItem[\s\S]*item: ActivityEditorTemplateHandoffView\['itemViews'\]\[number\][\s\S]*const labelId = `activity-editor-template-handoff-\$\{item\.id\}-label`[\s\S]*const valueId = `activity-editor-template-handoff-\$\{item\.id\}-value`[\s\S]*const descriptionId = `activity-editor-template-handoff-\$\{item\.id\}-description`[\s\S]*data-handoff-item=\{item\.id\}[\s\S]*id=\{labelId\}[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*aria-label=\{item\.ariaLabel\}[\s\S]*aria-labelledby=\{`\$\{labelId\} \$\{valueId\}`\}[\s\S]*id=\{valueId\}[\s\S]*id=\{descriptionId\}/
+  );
+});
+
+test('activity editor template focused gate is documented', () => {
+  const normalizedCatalog = TEST_CATALOG_SOURCE.replace(/\s+/g, ' ');
+
+  assert.match(
+    TEST_CATALOG_SOURCE,
+    /pnpm exec tsx --test scripts\/activity-editor-template-handoff-semantic-views\.test\.ts/
+  );
+  for (const boundary of [
+    'selected-template badges',
+    'required content',
+    'current template readiness',
+    'ready/locked template options',
+    'suggested remixes',
+    'quiz-choice readiness',
+    'scaffold action',
+    'scaffold runtime items',
+    'scaffold ready modes',
+    'reusable coverage',
+    'scaffold field counts',
+    'scaffold review steps',
+    'shared editor contract',
+    'parsed content status',
+    'save-before-publish boundaries',
+    'hidden activity-editor-template handoff',
+  ]) {
+    assert.match(normalizedCatalog, new RegExp(boundary));
+  }
 });
 
 test('invalid editor fields still produce a safe template handoff', () => {
