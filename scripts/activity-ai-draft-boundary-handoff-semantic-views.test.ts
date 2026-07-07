@@ -33,6 +33,7 @@ const ACTIVITY_AI_DRAFT_PANEL_SOURCE = readFileSync(
   'src/components/activities/activity-ai-draft-panel.tsx',
   'utf8'
 );
+const TEST_CATALOG_SOURCE = readFileSync('tests/e2e/TEST-CATALOG.md', 'utf8');
 
 test('AI draft boundary handoff exposes 30 safe pre-generation slices', () => {
   const panelView = buildSourcePanelView({
@@ -276,6 +277,28 @@ test('AI draft boundary handoff renders stable DOM relationships', () => {
     /ActivityAiDraftBoundaryHandoffItemView[\s\S]*ActivityAiDraftBoundaryHandoffView[\s\S]*data-handoff="activity-ai-draft-boundary"[\s\S]*view\.itemViews\.map[\s\S]*ActivityAiDraftBoundaryHandoffItem[\s\S]*function ActivityAiDraftBoundaryHandoffItem[\s\S]*const labelId = `activity-ai-draft-boundary-handoff-\$\{itemView\.id\}-label`[\s\S]*const valueId = `activity-ai-draft-boundary-handoff-\$\{itemView\.id\}-value`[\s\S]*const descriptionId = `activity-ai-draft-boundary-handoff-\$\{itemView\.id\}-description`[\s\S]*data-handoff-item=\{itemView\.id\}[\s\S]*id=\{labelId\}[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*aria-label=\{itemView\.ariaLabel\}[\s\S]*aria-labelledby=\{`\$\{labelId\} \$\{valueId\}`\}[\s\S]*id=\{valueId\}[\s\S]*id=\{descriptionId\}/,
     'AI draft boundary handoff should render each safe source/generation boundary slice with stable label, value, and description relationships.'
   );
+});
+
+test('AI draft boundary focused gate is documented', () => {
+  assert.match(
+    TEST_CATALOG_SOURCE,
+    /pnpm exec tsx --test scripts\/activity-ai-draft-boundary-handoff-semantic-views\.test\.ts/,
+    'E2E catalog should point AI draft boundary work at the focused script gate.'
+  );
+  for (const boundary of [
+    'provider/model/notice provenance',
+    'source sanitization',
+    'safe material provenance',
+    'CreateActivityInput mapping',
+    'teacher-review requirements',
+    'persistence/publish boundaries',
+  ]) {
+    assert.match(
+      TEST_CATALOG_SOURCE,
+      new RegExp(boundary.replace(/[ /]+/g, '[ /]+')),
+      `E2E catalog should mention AI draft boundary: ${boundary}`
+    );
+  }
 });
 
 function buildSourcePanelView({

@@ -87,6 +87,12 @@ AI source panel control boundaries have a fast script-level gate via
 when changing AI source textarea descriptions, source-readiness, safe/omitted
 material provenance, attached-material capability summaries, sync-material
 controls, generate-button gating, or the hidden AI source handoff.
+AI draft boundary handoff has a fast script-level gate via
+`pnpm exec tsx --test scripts/activity-ai-draft-boundary-handoff-semantic-views.test.ts`;
+run it when changing AI generation gates, authenticated server-function input
+schemas, provider/model/notice provenance, fallback handling, source
+sanitization, safe material provenance, CreateActivityInput mapping, editor
+application, teacher-review requirements, or persistence/publish boundaries.
 Assignment publish control boundaries have fast script-level gates via
 `pnpm exec tsx --test scripts/assignment-publish-handoff-semantic-views.test.ts`
 and `pnpm exec tsx --test scripts/classroom-control-semantics-handoff.test.ts`;
