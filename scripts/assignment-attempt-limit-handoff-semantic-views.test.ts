@@ -10,7 +10,10 @@ import {
   type AssignmentAttemptLimitHandoffItemId,
   type AssignmentAttemptLimitHandoffView,
 } from '@/assignments/attempt-limit-handoff';
-import { buildAssignmentAttemptUsage } from '@/assignments/attempt-limits';
+import {
+  buildAssignmentAttemptUsage,
+  canUseAnotherAssignmentAttempt,
+} from '@/assignments/attempt-limits';
 import type {
   PublicAttemptReviewItem,
   PublicAttemptReviewSummary,
@@ -67,6 +70,7 @@ const SUBMIT_CONTROLS_SOURCE = readFileSync(
   'src/components/assignments/student-runner-submit-controls.tsx',
   'utf8'
 );
+const TEST_CATALOG_SOURCE = readFileSync('tests/e2e/TEST-CATALOG.md', 'utf8');
 
 test('assignment attempt limit handoff exposes 30 safe limit slices', () => {
   const evidence = buildAttemptLimitEvidence();
@@ -179,6 +183,84 @@ test('assignment attempt limit handoff localizes unlimited Chinese state', () =>
   }
 });
 
+test('assignment attempt limit helpers preserve finite and unlimited retries', () => {
+  const firstFiniteAttempt = buildAssignmentAttemptUsage({
+    maxAttempts: 2,
+    previousAttemptCount: 0,
+  });
+  const limitReachedAttempt = buildAssignmentAttemptUsage({
+    maxAttempts: 2,
+    previousAttemptCount: 1,
+  });
+  const unlimitedAttempt = buildAssignmentAttemptUsage({
+    maxAttempts: null,
+    previousAttemptCount: 48.7,
+  });
+
+  assert.deepEqual(firstFiniteAttempt, {
+    maxAttempts: 2,
+    remainingAttempts: 1,
+    usedAttempts: 1,
+  });
+  assert.deepEqual(limitReachedAttempt, {
+    maxAttempts: 2,
+    remainingAttempts: 0,
+    usedAttempts: 2,
+  });
+  assert.deepEqual(unlimitedAttempt, {
+    maxAttempts: undefined,
+    remainingAttempts: undefined,
+    usedAttempts: 49,
+  });
+  assert.equal(
+    canUseAnotherAssignmentAttempt({
+      maxAttempts: firstFiniteAttempt.maxAttempts,
+      usedAttempts: firstFiniteAttempt.usedAttempts,
+    }),
+    true
+  );
+  assert.equal(
+    canUseAnotherAssignmentAttempt({
+      maxAttempts: limitReachedAttempt.maxAttempts,
+      usedAttempts: limitReachedAttempt.usedAttempts,
+    }),
+    false
+  );
+  assert.equal(
+    canUseAnotherAssignmentAttempt({
+      maxAttempts: unlimitedAttempt.maxAttempts,
+      usedAttempts: unlimitedAttempt.usedAttempts,
+    }),
+    true
+  );
+
+  const handoffView = buildAssignmentAttemptLimitHandoffView(
+    buildAssignmentAttemptLimitHandoffEvidence({
+      attemptUsage: unlimitedAttempt,
+      attemptUsageLabel: formatStudentAttemptUsageLabel(unlimitedAttempt),
+      identityMode: 'anonymous',
+      retryAvailable: true,
+      submittedAttemptCount: unlimitedAttempt.usedAttempts,
+    })
+  );
+
+  assert.equal(
+    getHandoffValue(handoffView, 'max-attempt-normalization'),
+    'Open'
+  );
+  assert.equal(
+    getHandoffValue(handoffView, 'remaining-attempts'),
+    'Additional attempts allowed'
+  );
+  assert.equal(getHandoffValue(handoffView, 'unlimited-attempts'), 'Unlimited');
+  assert.equal(
+    getHandoffValue(handoffView, 'result-usage-label'),
+    'Additional attempts allowed'
+  );
+  assert.equal(getHandoffValue(handoffView, 'retry-availability'), 'Available');
+  assertNoPrivateAttemptLimitText(JSON.stringify(handoffView));
+});
+
 test('student runner renders the attempt-limit handoff from page state', () => {
   const starterPreview = buildStudentRunnerStarterPreview(
     STARTER_FOOD_ASSIGNMENT_SHARE_ID
@@ -259,6 +341,29 @@ test('assignment attempt limit handoff is wired to shared source boundaries', ()
     /export const submitAttempt[\s\S]*canUseAnotherAssignmentAttempt\(\{[\s\S]*maxAttempts: settings\.maxAttempts,[\s\S]*usedAttempts: previousAttemptCount/,
     'Submit attempt API should enforce attempt limits through the shared helper.'
   );
+  const apiIdentityBeforeAttemptLimitGate = new RegExp(
+    [
+      'const submissionIdentity = resolveAttemptSubmissionIdentity\\(\\{',
+      'studentName: data\\.studentName,',
+      '\\}\\);',
+      'if \\(settings\\.collectStudentName && ' +
+        '!submissionIdentity\\.studentName\\)',
+      'if \\(!settings\\.collectStudentName && ' +
+        '!submissionIdentity\\.anonymousToken\\)',
+      'if \\(settings\\.maxAttempts\\) \\{',
+      'previousAttemptCount = await countPreviousIdentityAttempts\\(\\{',
+      "anonymousToken: submissionIdentity\\.anonymousToken \\?\\? '',",
+      "studentName: submissionIdentity\\.studentName \\?\\? '',",
+      'canUseAnotherAssignmentAttempt\\(\\{',
+      'usedAttempts: previousAttemptCount,',
+      'await db\\.insert\\(attempt\\)',
+    ].join('[\\s\\S]*')
+  );
+  assert.match(
+    API_ASSIGNMENTS_SOURCE,
+    apiIdentityBeforeAttemptLimitGate,
+    'Submit attempt API should normalize identity before counting previous attempts and before writing the scored attempt.'
+  );
   assert.match(
     STUDENT_SUBMISSION_SOURCE,
     /canStartAnotherStudentAttempt[\s\S]*canUseAnotherAssignmentAttempt\(\{[\s\S]*maxAttempts,[\s\S]*usedAttempts: submittedAttemptCount/,
@@ -298,6 +403,19 @@ test('assignment attempt limit handoff is wired to shared source boundaries', ()
     RESULT_EXPORT_SOURCE,
     /delivery-attempt-limit/,
     'Result exports should retain the assignment delivery attempt-limit field.'
+  );
+});
+
+test('assignment attempt limit focused gate is documented', () => {
+  assert.match(
+    TEST_CATALOG_SOURCE,
+    /pnpm exec tsx --test scripts\/assignment-attempt-limit-handoff-semantic-views\.test\.ts/,
+    'E2E catalog should point attempt-limit work at the focused script gate.'
+  );
+  assert.match(
+    TEST_CATALOG_SOURCE,
+    /max-attempt parsing[\s\S]*per-student attempt counters[\s\S]*retry availability[\s\S]*CSV\/export delivery-policy fields/,
+    'E2E catalog should say which attempt-limit product boundaries need the focused gate.'
   );
 });
 

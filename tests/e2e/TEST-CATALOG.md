@@ -35,6 +35,11 @@ AI draft metadata,
 template scaffold validity, template runtime ids, assignment item ordering, or
 exclusive runtime choice assignment, or deterministic AI draft fallback result
 behavior.
+Assignment attempt limits have a fast script-level gate via
+`pnpm exec tsx --test scripts/assignment-attempt-limit-handoff-semantic-views.test.ts`;
+run it when changing max-attempt parsing, per-student attempt counters,
+retry availability, public rule summaries, result usage labels, delivery
+summaries, or CSV/export delivery-policy fields.
 Storage upload readiness has a fast script-level gate via
 `pnpm exec tsx --test scripts/storage-upload-readiness.test.ts`; run it when
 changing classroom source-material upload validation, filename sanitization,
