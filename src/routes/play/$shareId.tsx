@@ -28,6 +28,7 @@ import { StudentRunnerAttemptShell } from '@/components/assignments/student-runn
 import { StudentRunnerHeaderCard } from '@/components/assignments/student-runner-header-card';
 import { StudentRunnerLoadingPanel } from '@/components/assignments/student-runner-loading-panel';
 import { StudentRunnerMissingPanel } from '@/components/assignments/student-runner-missing-panel';
+import { StudentRunnerStartHandoff } from '@/components/assignments/student-runner-start-handoff';
 import { StudentRunnerSubmissionHandoff } from '@/components/assignments/student-runner-submission-handoff';
 import { StudentRunnerSubmitControls } from '@/components/assignments/student-runner-submit-controls';
 import Container from '@/components/layout/container';
@@ -287,6 +288,10 @@ function PlayPage() {
           badgeLabel={runnerPageView.routeBadgeLabel}
           view={runnerRouteState.headerView}
         />
+
+        {runnerPageView.startHandoffView ? (
+          <StudentRunnerStartHandoff view={runnerPageView.startHandoffView} />
+        ) : null}
 
         <StudentRunnerAttemptShell
           controlView={controlView}

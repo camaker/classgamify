@@ -14690,6 +14690,10 @@ const studentRunnerSubmitControlsSource = readFileSync(
   'src/components/assignments/student-runner-submit-controls.tsx',
   'utf8'
 );
+const studentRunnerStartHandoffSource = readFileSync(
+  'src/components/assignments/student-runner-start-handoff.tsx',
+  'utf8'
+);
 const studentRunnerSubmissionHandoffSource = readFileSync(
   'src/components/assignments/student-runner-submission-handoff.tsx',
   'utf8'
@@ -15391,12 +15395,17 @@ assert.match(
 assert.match(
   playRouteSource,
   /StudentRunnerHeaderCard[\s\S]*badgeLabel=\{runnerPageView\.routeBadgeLabel\}[\s\S]*view=\{runnerRouteState\.headerView\}/,
-  'Student play route should delegate student assignment header rendering without public hidden handoff output.'
+  'Student play route should delegate student assignment header rendering from the page view-model.'
 );
-assert.doesNotMatch(
+assert.match(
+  studentRunnerStartHandoffSource,
+  /StudentRunnerStartHandoffItemView[\s\S]*StudentRunnerStartHandoffView[\s\S]*data-handoff="student-runner-start"[\s\S]*view\.itemViews\.map[\s\S]*StudentRunnerStartHandoffItem[\s\S]*function StudentRunnerStartHandoffItem[\s\S]*const labelId = `student-runner-start-handoff-\$\{itemView\.id\}-label`[\s\S]*const valueId = `student-runner-start-handoff-\$\{itemView\.id\}-value`[\s\S]*const descriptionId = `student-runner-start-handoff-\$\{itemView\.id\}-description`[\s\S]*data-handoff-item=\{itemView\.id\}[\s\S]*id=\{labelId\}[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*aria-label=\{itemView\.ariaLabel\}[\s\S]*aria-labelledby=\{`\$\{labelId\} \$\{valueId\}`\}[\s\S]*id=\{valueId\}[\s\S]*id=\{descriptionId\}/,
+  'Student runner start handoff component should render hidden safe outputs with prepared label, value, and description relationships.'
+);
+assert.match(
   playRouteSource,
-  /startHandoffView=\{runnerPageView\.startHandoffView\}/,
-  'Student play route should not render the start handoff into the public student DOM.'
+  /StudentRunnerStartHandoff[\s\S]*from '@\/components\/assignments\/student-runner-start-handoff'[\s\S]*runnerPageView\.startHandoffView[\s\S]*<StudentRunnerStartHandoff[\s\S]*view=\{runnerPageView\.startHandoffView\}/,
+  'Student play route should render the prepared hidden start handoff view.'
 );
 assert.match(
   playRouteSource,
@@ -16265,13 +16274,13 @@ assert.doesNotMatch(
 );
 assert.match(
   e2eTestCatalogText,
-  /Teacher can publish and copy a configured student share link[\s\S]*student-runner-start and public-assignment-access 30-slice domain contracts[\s\S]*`data-handoff="student-runner-start"`[\s\S]*`data-handoff="public-assignment-access"`[\s\S]*visible public rule summary/,
-  'E2E catalog should document the source-level start/access contracts while requiring no public audit markers.'
+  /Teacher can publish and copy a configured student share link[\s\S]*hidden localized `data-handoff="student-runner-start"`[\s\S]*public-assignment-access 30-slice domain contract[\s\S]*`data-handoff="public-assignment-access"`[\s\S]*visible public rule summary/,
+  'E2E catalog should document the hidden safe start handoff and source-level public access contract.'
 );
 assert.match(
   e2eTestCatalogText,
-  /Student submission keeps a 30-slice domain contract without public audit DOM[\s\S]*source-level student-submission domain contract[\s\S]*`data-handoff="student-submission"`/,
-  'E2E catalog should document the student-submission domain contract without public audit DOM.'
+  /Student submission exposes a hidden 30-slice safe handoff[\s\S]*hidden localized `data-handoff="student-runner-submission"`/,
+  'E2E catalog should document the hidden safe student-submission handoff.'
 );
 assert.match(
   e2eTestCatalogText,

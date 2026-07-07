@@ -1,4 +1,5 @@
 import assert from 'node:assert/strict';
+import { readFileSync } from 'node:fs';
 import test from 'node:test';
 import { STARTER_FOOD_ASSIGNMENT_SHARE_ID } from '@/activities/starter-ids';
 import type { AssignmentSeed } from '@/activities/types';
@@ -262,6 +263,25 @@ test('student runner start handoff marks starter previews as read-only', () => {
     'Student data omitted'
   );
   assertNoPrivateStartText(JSON.stringify(handoffView));
+});
+
+test('student runner start handoff renders hidden DOM relationships', () => {
+  const componentSource = readFileSync(
+    'src/components/assignments/student-runner-start-handoff.tsx',
+    'utf8'
+  );
+  const routeSource = readFileSync('src/routes/play/$shareId.tsx', 'utf8');
+
+  assert.match(
+    componentSource,
+    /StudentRunnerStartHandoffItemView[\s\S]*StudentRunnerStartHandoffView[\s\S]*data-handoff="student-runner-start"[\s\S]*view\.itemViews\.map[\s\S]*StudentRunnerStartHandoffItem[\s\S]*function StudentRunnerStartHandoffItem[\s\S]*const labelId = `student-runner-start-handoff-\$\{itemView\.id\}-label`[\s\S]*const valueId = `student-runner-start-handoff-\$\{itemView\.id\}-value`[\s\S]*const descriptionId = `student-runner-start-handoff-\$\{itemView\.id\}-description`[\s\S]*data-handoff-item=\{itemView\.id\}[\s\S]*id=\{labelId\}[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*aria-label=\{itemView\.ariaLabel\}[\s\S]*aria-labelledby=\{`\$\{labelId\} \$\{valueId\}`\}[\s\S]*id=\{valueId\}[\s\S]*id=\{descriptionId\}/,
+    'Student runner start handoff should render each safe start slice with stable label, value, and description relationships.'
+  );
+  assert.match(
+    routeSource,
+    /StudentRunnerStartHandoff[\s\S]*from '@\/components\/assignments\/student-runner-start-handoff'[\s\S]*runnerPageView\.startHandoffView[\s\S]*<StudentRunnerStartHandoff[\s\S]*view=\{runnerPageView\.startHandoffView\}/,
+    'Student runner route should render the prepared hidden start handoff view.'
+  );
 });
 
 function withAssignmentSettings(
