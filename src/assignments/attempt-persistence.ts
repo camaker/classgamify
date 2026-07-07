@@ -5,7 +5,7 @@ import type {
   AttemptResult,
 } from '@/activities/types';
 
-type ScoredAttemptInsert = {
+export type ScoredAttemptInsert = {
   anonymousToken: string | null;
   answersJson: AttemptAnswers;
   assignmentId: string;
@@ -18,12 +18,12 @@ type ScoredAttemptInsert = {
   studentName: string | null;
 };
 
-type ScoredAttemptEvaluation = {
+export type ScoredAttemptEvaluation = {
   answers: AttemptAnswer[];
   result: AttemptResult;
 };
 
-type ScoredAttemptIdentity = {
+export type ScoredAttemptIdentity = {
   anonymousToken: string | null;
   studentName: string | null;
 };
@@ -48,16 +48,24 @@ export function buildScoredAttemptInsert({
   return {
     anonymousToken: identity.anonymousToken,
     answersJson: {
-      answers: evaluation.answers,
+      answers: cloneAttemptAnswerRows(evaluation.answers),
       templateType,
     },
     assignmentId,
     completedAt,
     id,
     maxScore: evaluation.result.totalPoints,
-    resultJson: evaluation.result,
+    resultJson: cloneAttemptResult(evaluation.result),
     score: evaluation.result.earnedPoints,
     startedAt,
     studentName: identity.studentName,
   };
+}
+
+function cloneAttemptAnswerRows(answers: AttemptAnswer[]) {
+  return answers.map((answer) => ({ ...answer }));
+}
+
+function cloneAttemptResult(result: AttemptResult) {
+  return { ...result };
 }

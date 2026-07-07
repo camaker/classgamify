@@ -567,6 +567,11 @@ import {
 } from '@/assignments/attempt-stats-handoff';
 import { buildScoredAttemptInsert } from '@/assignments/attempt-persistence';
 import {
+  ASSIGNMENT_ATTEMPT_PERSISTENCE_HANDOFF_ITEM_IDS,
+  buildAssignmentAttemptPersistenceHandoffEvidence,
+  buildAssignmentAttemptPersistenceHandoffView,
+} from '@/assignments/attempt-persistence-handoff';
+import {
   ASSIGNMENT_ATTEMPT_DURATION_UNITS,
   buildAttemptDurationDisplayView,
   buildAttemptStartedAt,
@@ -25926,6 +25931,10 @@ const assignmentAttemptPersistenceSource = readFileSync(
   'src/assignments/attempt-persistence.ts',
   'utf8'
 );
+const assignmentAttemptPersistenceHandoffSource = readFileSync(
+  'src/assignments/attempt-persistence-handoff.ts',
+  'utf8'
+);
 assert.match(
   assignmentSnapshotSource,
   /resolveAssignmentSnapshotSource[\s\S]*normalizeOptionalRuntimeDisplayText\([\s\S]*activityDescription[\s\S]*normalizeRuntimeDisplayText\(activityTitle\)/,
@@ -26009,35 +26018,59 @@ const scoredAttemptEvaluation = {
     totalPoints: 2,
   },
 };
+const scoredAttemptInsert = buildScoredAttemptInsert({
+  assignmentId: 'assignment-published-1',
+  completedAt: assignmentSnapshotCreatedAt,
+  evaluation: scoredAttemptEvaluation,
+  id: 'attempt-scored-1',
+  identity: {
+    anonymousToken: null,
+    studentName: 'Ada Lovelace',
+  },
+  startedAt: new Date('2026-01-15T12:28:45.000Z'),
+  templateType: 'quiz',
+});
 assert.deepEqual(
-  buildScoredAttemptInsert({
-    assignmentId: 'assignment-published-1',
-    completedAt: assignmentSnapshotCreatedAt,
-    evaluation: scoredAttemptEvaluation,
-    id: 'attempt-scored-1',
-    identity: {
-      anonymousToken: null,
-      studentName: 'Ada Lovelace',
-    },
-    startedAt: new Date('2026-01-15T12:28:45.000Z'),
-    templateType: 'quiz',
-  }),
+  scoredAttemptInsert,
   {
     anonymousToken: null,
     answersJson: {
-      answers: scoredAttemptEvaluation.answers,
+      answers: [
+        {
+          answer: 'Frozen answer',
+          correct: true,
+          itemId: 'item-1',
+        },
+        {
+          answer: 'Other answer',
+          correct: false,
+          itemId: 'item-2',
+        },
+      ],
       templateType: 'quiz',
     },
     assignmentId: 'assignment-published-1',
     completedAt: assignmentSnapshotCreatedAt,
     id: 'attempt-scored-1',
     maxScore: 2,
-    resultJson: scoredAttemptEvaluation.result,
+    resultJson: {
+      accuracy: 50,
+      completedItemCount: 2,
+      correctItemCount: 1,
+      durationSeconds: 75,
+      earnedPoints: 1,
+      totalPoints: 2,
+    },
     score: 1,
     startedAt: new Date('2026-01-15T12:28:45.000Z'),
     studentName: 'Ada Lovelace',
   }
 );
+assert.notEqual(scoredAttemptInsert.answersJson.answers, scoredAttemptEvaluation.answers);
+assert.notEqual(scoredAttemptInsert.answersJson.answers[0], scoredAttemptEvaluation.answers[0]);
+assert.notEqual(scoredAttemptInsert.resultJson, scoredAttemptEvaluation.result);
+assert.equal(scoredAttemptInsert.score, scoredAttemptInsert.resultJson.earnedPoints);
+assert.equal(scoredAttemptInsert.maxScore, scoredAttemptInsert.resultJson.totalPoints);
 assert.match(
   assignmentPersistenceSource,
   /buildPublishedAssignmentInsert[\s\S]*activityId: sourceActivity\.id[\s\S]*settingsJson: settings[\s\S]*shareSlug: normalizeAssignmentShareSlug\(shareSlug\)[\s\S]*status: 'published'[\s\S]*title: formatAssignmentDisplayTitle\(title\)[\s\S]*buildPublishedAssignmentSnapshotInsert[\s\S]*buildAssignmentSnapshotInsert[\s\S]*buildAssignmentStatusUpdateSet[\s\S]*status: nextStatus[\s\S]*updatedAt/,
@@ -26045,8 +26078,177 @@ assert.match(
 );
 assert.match(
   assignmentAttemptPersistenceSource,
-  /buildScoredAttemptInsert[\s\S]*answersJson: \{[\s\S]*answers: evaluation\.answers[\s\S]*templateType[\s\S]*maxScore: evaluation\.result\.totalPoints[\s\S]*resultJson: evaluation\.result[\s\S]*score: evaluation\.result\.earnedPoints/,
-  'Attempt persistence should own scored attempt insert payload shapes.'
+  /answers: cloneAttemptAnswerRows\(evaluation\.answers\)[\s\S]*maxScore: evaluation\.result\.totalPoints[\s\S]*resultJson: cloneAttemptResult\(evaluation\.result\)[\s\S]*score: evaluation\.result\.earnedPoints/,
+  'Attempt persistence should own cloned scored attempt insert payload shapes.'
+);
+const scoredAttemptPersistenceSourceChecks = {
+  apiIdentityGate:
+    /resolveAttemptSubmissionIdentity\(\{[\s\S]*studentName: data\.studentName/.test(
+      assignmentAttemptLimitApiSource
+    ) &&
+    /assignment_api_error_student_name_required[\s\S]*assignment_api_error_anonymous_token_required/.test(
+      assignmentAttemptLimitApiSource
+    ),
+  apiLifecycleGate:
+    /assertAssignmentAcceptsSubmissions\(\{[\s\S]*expiresAt: row\.assignment\.expiresAt,[\s\S]*status: row\.assignment\.status/.test(
+      assignmentAttemptLimitApiSource
+    ),
+  apiUsesPersistenceHelper:
+    /buildScoredAttemptInsert\(\{[\s\S]*assignmentId: row\.assignment\.id[\s\S]*evaluation,[\s\S]*identity: submissionIdentity/.test(
+      assignmentAttemptLimitApiSource
+    ),
+  attemptLimitGate:
+    /countPreviousIdentityAttempts\(\{[\s\S]*canUseAnotherAssignmentAttempt\(\{[\s\S]*usedAttempts: previousAttemptCount/.test(
+      assignmentAttemptLimitApiSource
+    ),
+  attemptStatsUsesResultJson:
+    /summarizeAssignmentAttempts[\s\S]*resultJson/.test(
+      assignmentAttemptStatsSource
+    ),
+  csvExportUsesStoredAttempts:
+    /const storedAttempt = exportContext\.attemptsById\.get\(attempt\.id\)/.test(
+      assignmentResultsExportSource
+    ) &&
+    /storedAttempt\?\.score \?\? attempt\.score[\s\S]*storedAttempt\?\.maxScore[\s\S]*storedAttempt\?\.resultJson\?\.completedItemCount/.test(
+      assignmentResultsExportSource
+    ),
+  publicResultUsesSanitizedResult:
+    /buildPublicAttemptResult\(evaluation\.result\)/.test(
+      assignmentAttemptLimitApiSource
+    ),
+  resultAnalysisUsesStoredAnswers:
+    /buildAttemptAnswerMapByItemId\(\s*attempt\.answersJson\.answers\s*\)/.test(
+      assignmentResultsSource
+    ) && /attempt\.resultJson/.test(assignmentResultsSource),
+  reviewSummaryUsesEvaluation:
+    /buildPublicAttemptReviewSummaryView\(\{[\s\S]*answers: evaluation\.answers,[\s\S]*runtimeItems: orderedRuntimeItems/.test(
+      assignmentAttemptLimitApiSource
+    ),
+  runtimeValidationGate:
+    /normalizeSubmittedAttemptAnswers\(data\.answers\)[\s\S]*assertSubmittedAnswersMatchRuntimeItems\(\{[\s\S]*answers: submittedAnswers,[\s\S]*runtimeItems: orderedRuntimeItems[\s\S]*evaluateRuntimeAnswers\(\{[\s\S]*answers: submittedAnswers/.test(
+      assignmentAttemptLimitApiSource
+    ),
+};
+assert.deepEqual(scoredAttemptPersistenceSourceChecks, {
+  apiIdentityGate: true,
+  apiLifecycleGate: true,
+  apiUsesPersistenceHelper: true,
+  attemptLimitGate: true,
+  attemptStatsUsesResultJson: true,
+  csvExportUsesStoredAttempts: true,
+  publicResultUsesSanitizedResult: true,
+  resultAnalysisUsesStoredAnswers: true,
+  reviewSummaryUsesEvaluation: true,
+  runtimeValidationGate: true,
+});
+const scoredAttemptPersistenceHandoffView =
+  buildAssignmentAttemptPersistenceHandoffView(
+    buildAssignmentAttemptPersistenceHandoffEvidence({
+      answersJsonCloned:
+        scoredAttemptInsert.answersJson.answers !==
+          scoredAttemptEvaluation.answers &&
+        scoredAttemptInsert.answersJson.answers.every(
+          (answer, index) => answer !== scoredAttemptEvaluation.answers[index]
+        ),
+      insert: scoredAttemptInsert,
+      resultJsonCloned:
+        scoredAttemptInsert.resultJson !== scoredAttemptEvaluation.result,
+      sourceChecks: scoredAttemptPersistenceSourceChecks,
+    })
+  );
+const scoredAttemptPersistenceHandoffValues = new Map(
+  scoredAttemptPersistenceHandoffView.itemViews.map((item) => [
+    item.id,
+    item.value,
+  ])
+);
+assert.match(
+  assignmentAttemptPersistenceHandoffSource,
+  /export const ASSIGNMENT_ATTEMPT_PERSISTENCE_HANDOFF_ITEM_IDS = \[(?=[\s\S]*'persistence-scope')(?=[\s\S]*'api-lifecycle-gate')(?=[\s\S]*'api-identity-gate')(?=[\s\S]*'scoring-source')(?=[\s\S]*'insert-builder')(?=[\s\S]*'answers-json')(?=[\s\S]*'result-json')(?=[\s\S]*'score-source')(?=[\s\S]*'immutable-answer-copy')(?=[\s\S]*'immutable-result-copy')(?=[\s\S]*'csv-export-boundary')(?=[\s\S]*'source-material-guard')(?=[\s\S]*'raw-payload-guard')(?=[\s\S]*'privacy-guard')[\s\S]*\] as const;/,
+  'Attempt persistence handoff should declare stable scored-attempt persistence slice ids.'
+);
+assert.deepEqual(
+  scoredAttemptPersistenceHandoffView.itemViews.map((item) => item.id),
+  [...ASSIGNMENT_ATTEMPT_PERSISTENCE_HANDOFF_ITEM_IDS],
+  'Attempt persistence handoff should expose the stable 30-slice order.'
+);
+assert.equal(scoredAttemptPersistenceHandoffView.itemViews.length, 30);
+assert.deepEqual(scoredAttemptPersistenceHandoffView.privacy, {
+  exposesAnswerText: false,
+  exposesRawAnonymousToken: false,
+  exposesRawSubmissionPayload: false,
+  exposesRuntimeItemIds: false,
+  exposesSourceMaterialMetadata: false,
+  exposesStudentName: false,
+  exposesTeacherOnlyAnswers: false,
+  itemIds: [...ASSIGNMENT_ATTEMPT_PERSISTENCE_HANDOFF_ITEM_IDS],
+  mutatesEvaluationAfterInsert: false,
+  scope: 'assignment-attempt-persistence-boundary',
+  storesScoredAttemptRows: true,
+  usesScoredAttemptInsertHelper: true,
+});
+assert.equal(
+  scoredAttemptPersistenceHandoffValues.get('persistence-scope'),
+  'Scored attempt insert'
+);
+assert.equal(
+  scoredAttemptPersistenceHandoffValues.get('insert-builder'),
+  'buildScoredAttemptInsert'
+);
+assert.equal(
+  scoredAttemptPersistenceHandoffValues.get('answers-json'),
+  '2 answer rows'
+);
+assert.equal(
+  scoredAttemptPersistenceHandoffValues.get('score-source'),
+  '1 earned'
+);
+assert.equal(
+  scoredAttemptPersistenceHandoffValues.get('max-score-source'),
+  '2 max'
+);
+assert.equal(
+  scoredAttemptPersistenceHandoffValues.get('duration-source'),
+  '75s'
+);
+assert.equal(
+  scoredAttemptPersistenceHandoffValues.get('immutable-answer-copy'),
+  'Cloned'
+);
+assert.equal(
+  scoredAttemptPersistenceHandoffValues.get('immutable-result-copy'),
+  'Cloned'
+);
+assert.equal(
+  scoredAttemptPersistenceHandoffValues.get('csv-export-boundary'),
+  'Full assignment results'
+);
+assert.equal(
+  scoredAttemptPersistenceHandoffValues.get('privacy-guard'),
+  'Private data hidden'
+);
+for (const privateValue of [
+  'Ada Lovelace',
+  'Frozen answer',
+  'Other answer',
+  'raw-private-anonymous-token',
+  'source-materials/private/key.pdf',
+]) {
+  assert.equal(
+    JSON.stringify(scoredAttemptPersistenceHandoffView).includes(privateValue),
+    false,
+    `Attempt persistence handoff leaked private text: ${privateValue}`
+  );
+}
+assert.doesNotMatch(
+  assignmentAttemptPersistenceHandoffSource,
+  /exposesAnswerText: true|exposesRawAnonymousToken: true|exposesRawSubmissionPayload: true|exposesRuntimeItemIds: true|exposesSourceMaterialMetadata: true|exposesStudentName: true|exposesTeacherOnlyAnswers: true/,
+  'Attempt persistence handoff privacy flags should stay closed for private classroom attempt data.'
+);
+assert.match(
+  e2eTestCatalogText,
+  /assignment-attempt-persistence-handoff-semantic-views\.test\.ts[\s\S]*Assignment attempt persistence keeps a 30-slice source-level contract/,
+  'E2E catalog should document the attempt persistence source-level handoff gate.'
 );
 assignmentSnapshotSourceActivity.description = 'Edited after publish';
 assignmentSnapshotSourceActivity.templateType = 'match-up';
