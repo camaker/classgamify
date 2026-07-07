@@ -1,4 +1,5 @@
 import assert from 'node:assert/strict';
+import { readFileSync } from 'node:fs';
 import test from 'node:test';
 import {
   ACTIVITY_EDIT_ROUTE_HANDOFF_ITEM_IDS,
@@ -23,6 +24,12 @@ const SECRET_SOURCE_SUMMARY = 'SECRET_SOURCE_SUMMARY_TEXT';
 const SECRET_STORAGE_KEY = 'userfiles/teacher/private-storage-key.pdf';
 const SECRET_TEACHER_NOTE = 'SECRET_TEACHER_NOTE_TEXT';
 const SECRET_TITLE = 'SECRET_TITLE_TEXT';
+
+const ACTIVITY_EDIT_ROUTE_SOURCE = readFileSync(
+  'src/routes/dashboard/activities/$activityId.tsx',
+  'utf8'
+);
+const TEST_CATALOG_SOURCE = readFileSync('tests/e2e/TEST-CATALOG.md', 'utf8');
 
 const editableActivityContent: ActivityContent = {
   difficulty: 'core',
@@ -287,6 +294,108 @@ test('activity edit route handoff keeps loading state non-editable', () => {
     'Unavailable'
   );
   assertNoPrivateEditRouteHandoffText(JSON.stringify(handoffView));
+});
+
+test('activity edit route handoff localizes Chinese editor hydration boundaries', () => {
+  overwriteGetLocale(() => 'zh');
+  try {
+    const handoffView = buildActivityEditRouteHandoffView({
+      activity: editableActivity,
+      routeStatus: 'ready',
+    });
+
+    assert.equal(handoffView.title, '活动编辑路由交接');
+    assert.match(handoffView.description, /重新打开已保存活动/);
+    assert.equal(getEditRouteHandoffValue(handoffView, 'route-status'), '就绪');
+    assert.equal(
+      getEditRouteHandoffValue(handoffView, 'activity-source'),
+      '已加载保存活动'
+    );
+    assert.equal(
+      getEditRouteHandoffValue(handoffView, 'persisted-source'),
+      '已保存来源'
+    );
+    assert.equal(
+      getEditRouteHandoffValue(handoffView, 'lifecycle-gate'),
+      '可编辑'
+    );
+    assert.equal(
+      getEditRouteHandoffValue(handoffView, 'archived-restore-action'),
+      '无需恢复'
+    );
+    assert.equal(
+      getEditRouteHandoffValue(handoffView, 'editor-mode'),
+      '编辑模式'
+    );
+    assert.equal(
+      getEditRouteHandoffValue(handoffView, 'shared-input-contract'),
+      'CreateActivityInput'
+    );
+    assert.equal(
+      getEditRouteHandoffValue(handoffView, 'source-reference-hydration'),
+      '引用已回填'
+    );
+    assert.equal(
+      getEditRouteHandoffValue(handoffView, 'readiness-after-load'),
+      '8 个可用模式'
+    );
+    assert.equal(
+      getEditRouteHandoffValue(handoffView, 'future-assignment-boundary'),
+      '仅影响未来链接'
+    );
+    assert.equal(
+      getEditRouteHandoffValue(handoffView, 'snapshot-protection'),
+      '快照不变'
+    );
+    assert.equal(
+      getEditRouteHandoffValue(handoffView, 'save-target'),
+      '更新已保存活动'
+    );
+    assert.equal(
+      getEditRouteHandoffValue(handoffView, 'privacy-guard'),
+      '私有内容隐藏'
+    );
+    assertNoPrivateEditRouteHandoffText(JSON.stringify(handoffView));
+  } finally {
+    overwriteGetLocale(() => 'en');
+  }
+});
+
+test('activity edit route handoff renders stable DOM relationships', () => {
+  assert.match(
+    ACTIVITY_EDIT_ROUTE_SOURCE,
+    /ActivityEditRouteHandoffView[\s\S]*function ActivityEditRouteHandoff[\s\S]*const titleId = 'activity-edit-route-handoff-title'[\s\S]*const descriptionId = 'activity-edit-route-handoff-description'[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*aria-labelledby=\{titleId\}[\s\S]*className="sr-only"[\s\S]*data-handoff="activity-edit-route"[\s\S]*id=\{titleId\}[\s\S]*id=\{descriptionId\}[\s\S]*handoffView\.itemViews\.map[\s\S]*ActivityEditRouteHandoffItem[\s\S]*function ActivityEditRouteHandoffItem[\s\S]*item: ActivityEditRouteHandoffView\['itemViews'\]\[number\][\s\S]*const labelId = `activity-edit-route-handoff-\$\{item\.id\}-label`[\s\S]*const valueId = `activity-edit-route-handoff-\$\{item\.id\}-value`[\s\S]*const descriptionId = `activity-edit-route-handoff-\$\{item\.id\}-description`[\s\S]*data-handoff-item=\{item\.id\}[\s\S]*id=\{labelId\}[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*aria-label=\{item\.ariaLabel\}[\s\S]*aria-labelledby=\{`\$\{labelId\} \$\{valueId\}`\}[\s\S]*id=\{valueId\}[\s\S]*id=\{descriptionId\}/,
+    'Activity edit route handoff should render each hydration slice with stable label, value, and description relationships.'
+  );
+});
+
+test('activity edit route focused gate is documented', () => {
+  assert.match(
+    TEST_CATALOG_SOURCE,
+    /pnpm exec tsx --test scripts\/activity-edit-route-handoff-semantic-views\.test\.ts/,
+    'E2E catalog should point activity edit route work at the focused script gate.'
+  );
+  for (const boundary of [
+    'saved-activity loading',
+    'owner-scoped edit access',
+    'archived restore gates',
+    'editor mode selection',
+    'CreateActivityInput hydration',
+    'title/description/template/visibility/learning-goal fields',
+    'structured content row counts',
+    'source-material reference hydration',
+    'readiness after load',
+    'future assignment boundaries',
+    'snapshot protection',
+    'save targets',
+    'hidden activity edit-route handoff',
+  ]) {
+    assert.match(
+      TEST_CATALOG_SOURCE,
+      new RegExp(boundary.replace(/[ /-]+/g, '[\\s/-]+')),
+      `E2E catalog should mention activity edit route boundary: ${boundary}`
+    );
+  }
 });
 
 function getEditRouteHandoffValue(

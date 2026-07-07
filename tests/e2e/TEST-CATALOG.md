@@ -77,6 +77,14 @@ gate via
 run it when changing activity library overview metrics, current-view scope,
 source-material filters, starter-preview boundaries, visible-card counts, or the
 hidden activity-library handoff.
+Activity edit route hydration has a fast script-level gate via
+`pnpm exec tsx --test scripts/activity-edit-route-handoff-semantic-views.test.ts`;
+run it when changing saved-activity loading, owner-scoped edit access,
+archived restore gates, editor mode selection, CreateActivityInput hydration,
+title/description/template/visibility/learning-goal fields, structured content
+row counts, source-material reference hydration, readiness after load, future
+assignment boundaries, snapshot protection, save targets, or the hidden activity
+edit-route handoff.
 Activity duplicate safety has a fast script-level gate via
 `pnpm exec tsx --test scripts/activity-duplicate-handoff-semantic-views.test.ts`;
 run it when changing owner-scoped duplicate availability, persisted-source

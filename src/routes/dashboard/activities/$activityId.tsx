@@ -117,15 +117,36 @@ function ActivityEditRouteHandoff({
       <p id={descriptionId}>{handoffView.description}</p>
       <dl>
         {handoffView.itemViews.map((item) => (
-          <div data-handoff-item={item.id} key={item.id}>
-            <dt>{item.label}</dt>
-            <dd>
-              <output aria-label={item.ariaLabel}>{item.value}</output>
-              <span>{item.description}</span>
-            </dd>
-          </div>
+          <ActivityEditRouteHandoffItem item={item} key={item.id} />
         ))}
       </dl>
     </section>
+  );
+}
+
+function ActivityEditRouteHandoffItem({
+  item,
+}: {
+  item: ActivityEditRouteHandoffView['itemViews'][number];
+}) {
+  const labelId = `activity-edit-route-handoff-${item.id}-label`;
+  const valueId = `activity-edit-route-handoff-${item.id}-value`;
+  const descriptionId = `activity-edit-route-handoff-${item.id}-description`;
+
+  return (
+    <div data-handoff-item={item.id}>
+      <dt id={labelId}>{item.label}</dt>
+      <dd>
+        <output
+          aria-describedby={descriptionId}
+          aria-label={item.ariaLabel}
+          aria-labelledby={`${labelId} ${valueId}`}
+          id={valueId}
+        >
+          {item.value}
+        </output>
+        <span id={descriptionId}>{item.description}</span>
+      </dd>
+    </div>
   );
 }
