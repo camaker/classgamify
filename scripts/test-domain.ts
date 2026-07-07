@@ -6070,6 +6070,11 @@ assert.doesNotMatch(
 );
 assert.match(
   activityAiDraftPanelSource,
+  /ActivityAiDraftBoundaryHandoffItemView[\s\S]*ActivityAiDraftBoundaryHandoffView[\s\S]*data-handoff="activity-ai-draft-boundary"[\s\S]*view\.itemViews\.map[\s\S]*ActivityAiDraftBoundaryHandoffItem[\s\S]*function ActivityAiDraftBoundaryHandoffItem[\s\S]*const labelId = `activity-ai-draft-boundary-handoff-\$\{itemView\.id\}-label`[\s\S]*const valueId = `activity-ai-draft-boundary-handoff-\$\{itemView\.id\}-value`[\s\S]*const descriptionId = `activity-ai-draft-boundary-handoff-\$\{itemView\.id\}-description`[\s\S]*data-handoff-item=\{itemView\.id\}[\s\S]*id=\{labelId\}[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*aria-label=\{itemView\.ariaLabel\}[\s\S]*aria-labelledby=\{`\$\{labelId\} \$\{valueId\}`\}[\s\S]*id=\{valueId\}[\s\S]*id=\{descriptionId\}/,
+  'Activity AI draft boundary handoff should render stable label, value, and description relationships.'
+);
+assert.match(
+  activityAiDraftPanelSource,
   /function ActivityAiDraftSourceControls[\s\S]*panelView\.badgeLabel[\s\S]*panelView\.reviewNote[\s\S]*panelView\.safeSourceDescription[\s\S]*panelView\.sourceTextLabel[\s\S]*panelView\.canSyncDraftSourceMaterials[\s\S]*panelView\.syncMaterialsHelpText[\s\S]*panelView\.sourcePlaceholder[\s\S]*panelView\.sourceMaterialNoteViews/,
   'Activity AI draft source controls should render prepared labels and sync gate state.'
 );

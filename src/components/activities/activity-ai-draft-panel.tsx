@@ -4,6 +4,7 @@ import {
 } from '@/activities/ai-draft';
 import {
   buildActivityAiDraftBoundaryHandoffView,
+  type ActivityAiDraftBoundaryHandoffItemView,
   type ActivityAiDraftBoundaryHandoffView,
 } from '@/activities/ai-draft-boundary';
 import type { ActivityAiDraftFocus } from '@/activities/ai-draft-focus';
@@ -125,17 +126,41 @@ function ActivityAiDraftBoundaryHandoff({
       <h2 id={titleId}>{view.title}</h2>
       <p id={descriptionId}>{view.description}</p>
       <dl>
-        {view.itemViews.map((item) => (
-          <div data-handoff-item={item.id} key={item.id}>
-            <dt>{item.label}</dt>
-            <dd>
-              <output aria-label={item.ariaLabel}>{item.value}</output>
-              <span>{item.description}</span>
-            </dd>
-          </div>
+        {view.itemViews.map((itemView) => (
+          <ActivityAiDraftBoundaryHandoffItem
+            itemView={itemView}
+            key={itemView.id}
+          />
         ))}
       </dl>
     </section>
+  );
+}
+
+function ActivityAiDraftBoundaryHandoffItem({
+  itemView,
+}: {
+  itemView: ActivityAiDraftBoundaryHandoffItemView;
+}) {
+  const labelId = `activity-ai-draft-boundary-handoff-${itemView.id}-label`;
+  const valueId = `activity-ai-draft-boundary-handoff-${itemView.id}-value`;
+  const descriptionId = `activity-ai-draft-boundary-handoff-${itemView.id}-description`;
+
+  return (
+    <div data-handoff-item={itemView.id}>
+      <dt id={labelId}>{itemView.label}</dt>
+      <dd>
+        <output
+          aria-describedby={descriptionId}
+          aria-label={itemView.ariaLabel}
+          aria-labelledby={`${labelId} ${valueId}`}
+          id={valueId}
+        >
+          {itemView.value}
+        </output>
+        <span id={descriptionId}>{itemView.description}</span>
+      </dd>
+    </div>
   );
 }
 
