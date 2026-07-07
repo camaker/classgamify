@@ -9315,6 +9315,10 @@ assert.match(
 );
 overwriteGetLocale(() => 'en');
 assert.equal(ASSIGNMENT_RESULT_EMPTY_STATE_HANDOFF_ITEM_IDS.length, 30);
+assert.equal(
+  new Set(ASSIGNMENT_RESULT_EMPTY_STATE_HANDOFF_ITEM_IDS).size,
+  30
+);
 const assignmentResultEmptyStateHandoffProbe =
   buildAssignmentResultEmptyStateHandoffView({
     description:
@@ -9401,8 +9405,8 @@ assert.match(
 );
 assert.match(
   assignmentResultsEmptyStateSource,
-  /data-handoff="assignment-result-empty-state"[\s\S]*data-handoff-scope=\{state\.handoffView\.privacy\.scope\}[\s\S]*state\.handoffView\.itemViews\.map[\s\S]*data-handoff-item=\{itemView\.id\}[\s\S]*<output aria-label=\{itemView\.ariaLabel\}>/,
-  'Assignment result empty-state component should render marker, privacy scope, item ids, and accessible values.'
+  /useId[\s\S]*const baseId = useId\(\)[\s\S]*data-handoff="assignment-result-empty-state"[\s\S]*data-handoff-scope=\{state\.handoffView\.privacy\.scope\}[\s\S]*state\.handoffView\.itemViews\.map[\s\S]*AssignmentResultEmptyStateHandoffItem[\s\S]*baseId=\{baseId\}[\s\S]*function AssignmentResultEmptyStateHandoffItem[\s\S]*const itemId = `\$\{baseId\}-assignment-result-empty-state-\$\{itemView\.id\}`[\s\S]*const labelId = `\$\{itemId\}-label`[\s\S]*const valueId = `\$\{itemId\}-value`[\s\S]*const descriptionId = `\$\{itemId\}-description`[\s\S]*data-handoff-item=\{itemView\.id\}[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*aria-label=\{itemView\.ariaLabel\}[\s\S]*aria-labelledby=\{`\$\{labelId\} \$\{valueId\}`\}[\s\S]*id=\{valueId\}[\s\S]*id=\{descriptionId\}/,
+  'Assignment result empty-state component should render marker, privacy scope, item ids, and stable label/value/description relationships without repeated static ids.'
 );
 assert.match(
   authE2eCatalogSource,

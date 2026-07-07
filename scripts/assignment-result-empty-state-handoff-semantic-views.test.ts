@@ -257,8 +257,8 @@ test('assignment result empty-state component renders stable handoff markers', (
 
   assert.match(
     source,
-    /function AssignmentResultEmptyStateHandoff[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*aria-labelledby=\{titleId\}[\s\S]*data-handoff="assignment-result-empty-state"[\s\S]*data-handoff-scope=\{state\.handoffView\.privacy\.scope\}[\s\S]*state\.handoffView\.itemViews\.map[\s\S]*data-handoff-item=\{itemView\.id\}[\s\S]*<output aria-label=\{itemView\.ariaLabel\}>/,
-    'Assignment result empty-state handoff should expose the localized result-page marker, privacy scope, item ids, and accessible output labels.'
+    /function AssignmentResultEmptyStateHandoff[\s\S]*const baseId = useId\(\)[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*aria-labelledby=\{titleId\}[\s\S]*data-handoff="assignment-result-empty-state"[\s\S]*data-handoff-scope=\{state\.handoffView\.privacy\.scope\}[\s\S]*state\.handoffView\.itemViews\.map[\s\S]*AssignmentResultEmptyStateHandoffItem[\s\S]*baseId=\{baseId\}[\s\S]*function AssignmentResultEmptyStateHandoffItem[\s\S]*const itemId = `\$\{baseId\}-assignment-result-empty-state-\$\{itemView\.id\}`[\s\S]*data-handoff-item=\{itemView\.id\}[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*aria-label=\{itemView\.ariaLabel\}[\s\S]*aria-labelledby=\{`\$\{labelId\} \$\{valueId\}`\}[\s\S]*id=\{valueId\}[\s\S]*id=\{descriptionId\}/,
+    'Assignment result empty-state handoff should expose the localized result-page marker, privacy scope, item ids, and stable label/value/description output relationships.'
   );
 });
 

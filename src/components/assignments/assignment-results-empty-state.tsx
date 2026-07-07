@@ -1,4 +1,6 @@
 import type { AssignmentResultEmptyState } from '@/assignments/result-view';
+import type { AssignmentResultEmptyStateHandoffItemView } from '@/assignments/result-empty-state-handoff';
+import { useId } from 'react';
 
 type AssignmentResultsEmptyStateProps = {
   state: AssignmentResultEmptyState | undefined;
@@ -25,8 +27,9 @@ function AssignmentResultEmptyStateHandoff({
 }: {
   state: AssignmentResultEmptyState;
 }) {
-  const titleId = 'assignment-result-empty-state-handoff-title';
-  const descriptionId = 'assignment-result-empty-state-handoff-description';
+  const baseId = useId();
+  const titleId = `${baseId}-assignment-result-empty-state-handoff-title`;
+  const descriptionId = `${baseId}-assignment-result-empty-state-handoff-description`;
 
   return (
     <section
@@ -40,15 +43,43 @@ function AssignmentResultEmptyStateHandoff({
       <p id={descriptionId}>{state.handoffView.description}</p>
       <dl>
         {state.handoffView.itemViews.map((itemView) => (
-          <div data-handoff-item={itemView.id} key={itemView.id}>
-            <dt>{itemView.label}</dt>
-            <dd>
-              <output aria-label={itemView.ariaLabel}>{itemView.value}</output>
-              <span>{itemView.description}</span>
-            </dd>
-          </div>
+          <AssignmentResultEmptyStateHandoffItem
+            baseId={baseId}
+            itemView={itemView}
+            key={itemView.id}
+          />
         ))}
       </dl>
     </section>
+  );
+}
+
+function AssignmentResultEmptyStateHandoffItem({
+  baseId,
+  itemView,
+}: {
+  baseId: string;
+  itemView: AssignmentResultEmptyStateHandoffItemView;
+}) {
+  const itemId = `${baseId}-assignment-result-empty-state-${itemView.id}`;
+  const labelId = `${itemId}-label`;
+  const valueId = `${itemId}-value`;
+  const descriptionId = `${itemId}-description`;
+
+  return (
+    <div data-handoff-item={itemView.id}>
+      <dt id={labelId}>{itemView.label}</dt>
+      <dd>
+        <output
+          aria-describedby={descriptionId}
+          aria-label={itemView.ariaLabel}
+          aria-labelledby={`${labelId} ${valueId}`}
+          id={valueId}
+        >
+          {itemView.value}
+        </output>
+      </dd>
+      <dd id={descriptionId}>{itemView.description}</dd>
+    </div>
   );
 }
