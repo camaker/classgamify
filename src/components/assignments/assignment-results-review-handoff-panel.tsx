@@ -1,6 +1,7 @@
 import type {
   AssignmentResultReviewControlsHandoffItemView,
   AssignmentResultReviewControlsHandoffView,
+  AssignmentResultReviewHandoffItemView,
   AssignmentResultReviewHandoffView,
 } from '@/assignments/result-view';
 import { Badge } from '@/components/ui/badge';
@@ -35,32 +36,57 @@ export function AssignmentResultsReviewHandoffPanel({
       </div>
       <div className="grid gap-2 sm:grid-cols-2 xl:grid-cols-5">
         {view.itemViews.map((itemView) => (
-          <article
-            aria-label={itemView.ariaLabel}
-            className="grid gap-1 rounded-md border bg-background p-3"
-            data-handoff-item={itemView.id}
-            data-scope={itemView.dataScope}
+          <AssignmentResultReviewHandoffItem
+            itemView={itemView}
             key={itemView.id}
-          >
-            <div className="flex min-w-0 items-center justify-between gap-2">
-              <p className="text-muted-foreground text-xs">{itemView.label}</p>
-              {itemView.statusLabel ? (
-                <Badge variant="secondary" className="rounded-md">
-                  {itemView.statusLabel}
-                </Badge>
-              ) : null}
-            </div>
-            <output aria-label={itemView.ariaLabel}>
-              <span className="font-semibold text-base">{itemView.value}</span>
-            </output>
-            <p className="text-muted-foreground text-xs leading-5">
-              {itemView.description}
-            </p>
-          </article>
+          />
         ))}
       </div>
       <AssignmentResultReviewControlsHandoff view={controlsView} />
     </section>
+  );
+}
+
+function AssignmentResultReviewHandoffItem({
+  itemView,
+}: {
+  itemView: AssignmentResultReviewHandoffItemView;
+}) {
+  const labelId = `assignment-result-review-${itemView.id}-label`;
+  const valueId = `assignment-result-review-${itemView.id}-value`;
+  const descriptionId = `assignment-result-review-${itemView.id}-description`;
+
+  return (
+    <article
+      aria-describedby={descriptionId}
+      aria-label={itemView.ariaLabel}
+      aria-labelledby={`${labelId} ${valueId}`}
+      className="grid gap-1 rounded-md border bg-background p-3"
+      data-handoff-item={itemView.id}
+      data-scope={itemView.dataScope}
+    >
+      <div className="flex min-w-0 items-center justify-between gap-2">
+        <p className="text-muted-foreground text-xs" id={labelId}>
+          {itemView.label}
+        </p>
+        {itemView.statusLabel ? (
+          <Badge aria-hidden="true" variant="secondary" className="rounded-md">
+            {itemView.statusLabel}
+          </Badge>
+        ) : null}
+      </div>
+      <output
+        aria-describedby={descriptionId}
+        aria-label={itemView.ariaLabel}
+        aria-labelledby={`${labelId} ${valueId}`}
+        id={valueId}
+      >
+        <span className="font-semibold text-base">{itemView.value}</span>
+      </output>
+      <p className="text-muted-foreground text-xs leading-5" id={descriptionId}>
+        {itemView.description}
+      </p>
+    </article>
   );
 }
 

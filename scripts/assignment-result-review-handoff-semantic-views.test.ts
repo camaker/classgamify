@@ -279,8 +279,8 @@ test('assignment result review handoff renders stable page markers', () => {
 
   assert.match(
     source,
-    /export function AssignmentResultsReviewHandoffPanel[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*aria-labelledby=\{titleId\}[\s\S]*data-handoff="assignment-result-review"[\s\S]*data-handoff-scope=\{view\.privacy\.scope\}[\s\S]*view\.itemViews\.map[\s\S]*<article[\s\S]*aria-label=\{itemView\.ariaLabel\}[\s\S]*data-handoff-item=\{itemView\.id\}[\s\S]*data-scope=\{itemView\.dataScope\}[\s\S]*<output[\s\S]*aria-label=\{itemView\.ariaLabel\}/,
-    'Assignment result review handoff should expose the localized result-page marker, privacy scope, item ids, data scopes, and accessible output labels.'
+    /export function AssignmentResultsReviewHandoffPanel[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*aria-labelledby=\{titleId\}[\s\S]*data-handoff="assignment-result-review"[\s\S]*data-handoff-scope=\{view\.privacy\.scope\}[\s\S]*view\.itemViews\.map[\s\S]*AssignmentResultReviewHandoffItem[\s\S]*function AssignmentResultReviewHandoffItem[\s\S]*const labelId = `assignment-result-review-\$\{itemView\.id\}-label`[\s\S]*const valueId = `assignment-result-review-\$\{itemView\.id\}-value`[\s\S]*const descriptionId = `assignment-result-review-\$\{itemView\.id\}-description`[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*aria-label=\{itemView\.ariaLabel\}[\s\S]*aria-labelledby=\{`\$\{labelId\} \$\{valueId\}`\}[\s\S]*data-handoff-item=\{itemView\.id\}[\s\S]*data-scope=\{itemView\.dataScope\}[\s\S]*id=\{labelId\}[\s\S]*aria-hidden="true"[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*aria-label=\{itemView\.ariaLabel\}[\s\S]*aria-labelledby=\{`\$\{labelId\} \$\{valueId\}`\}[\s\S]*id=\{valueId\}[\s\S]*id=\{descriptionId\}/,
+    'Assignment result review handoff should expose the localized result-page marker, privacy scope, item ids, data scopes, and stable label/value/description output relationships.'
   );
 });
 
