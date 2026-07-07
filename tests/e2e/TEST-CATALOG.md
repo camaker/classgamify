@@ -35,6 +35,11 @@ AI draft metadata,
 template scaffold validity, template runtime ids, assignment item ordering, or
 exclusive runtime choice assignment, or deterministic AI draft fallback result
 behavior.
+Storage upload readiness has a fast script-level gate via
+`pnpm exec tsx --test scripts/storage-upload-readiness.test.ts`; run it when
+changing classroom source-material upload validation, filename sanitization,
+content-type/extension safety, owner/public folder planning, same-origin file
+proxy URLs, or the R2 provider upload plan.
 
 ## Test Harness
 
@@ -173,7 +178,7 @@ These flows should be added after their dependencies are made deterministic:
 | Area | Reason |
 |---|---|
 | Payment checkout and portal | Requires Stripe or Creem test fixtures, webhook simulation, and provider-specific env. |
-| R2 file uploads | Requires deterministic local storage assertions and small fixture files. Include audio, worksheet image, document, spreadsheet, and unknown-material fixtures so upload behavior and material labels can be verified together. |
+| R2 file uploads | Real browser-to-R2 upload E2E still requires deterministic local storage assertions and small fixture files. The script-level storage upload readiness gate already covers upload validation, filename sanitization, content-type/extension safety, owner/public folder planning, same-origin proxy URLs, and provider wiring; future E2E should add audio, worksheet image, document, spreadsheet, and unknown-material fixtures so browser upload behavior and material labels are verified together. |
 | Transactional email | Requires a fake mail provider or captured verification links. |
 | Interactive template runners | Requires deterministic runner fixtures and attempt submission assertions. |
 | AI provider quality checks | Requires provider mocks or stable fake responses to avoid cost and flake. |

@@ -7,29 +7,18 @@ import {
 import {
   type FileMetadata,
   type R2BucketInterface,
-  type StorageErrorCode,
-  type StorageErrorDetails,
   type StorageProvider,
   type UploadFileParams,
   type UploadFileResult,
-  type ValidationResult,
   ConfigurationError,
-  STORAGE_ERROR_CODES,
   StorageError,
   UploadError,
 } from '../types';
-import { sanitizeFolder } from '../utils';
+import {
+  buildStorageUploadObjectPlan,
+  validateStorageUploadFile,
+} from '@/storage/upload-readiness';
 import { websiteConfig } from '@/config/website';
-
-const success = <T>(data: T): ValidationResult<T> => ({ success: true, data });
-const fail = (
-  code: StorageErrorCode,
-  details?: StorageErrorDetails
-): ValidationResult<never> => ({
-  success: false,
-  code,
-  details,
-});
 
 interface FileValidatorConfig {
   maxFileSize: number;
@@ -44,114 +33,16 @@ type FileValidator = ReturnType<typeof createFileValidator>;
 function createFileValidator(config: FileValidatorConfig) {
   const { maxFileSize, allowedTypes } = config;
   return {
-    validateFile(
-      file: File | Blob,
-      originalName: string
-    ): ValidationResult<true> {
-      const size = file.size;
-      if (size > maxFileSize) {
-        const maxMB = Math.round(maxFileSize / (1024 * 1024));
-        return fail(STORAGE_ERROR_CODES.FILE_TOO_LARGE, {
-          maxMegabytes: maxMB,
-        });
-      }
-      if (allowedTypes.length > 0 && originalName) {
-        const ext =
-          originalName.lastIndexOf('.') === -1
-            ? ''
-            : originalName
-                .slice(originalName.lastIndexOf('.') + 1)
-                .toLowerCase();
-        const normalized = allowedTypes.map((t: string) =>
-          t.startsWith('.') ? t.slice(1).toLowerCase() : t.toLowerCase()
-        );
-        if (!ext || !normalized.includes(ext)) {
-          const formatted = allowedTypes
-            .map((t: string) => (t.startsWith('.') ? t : `.${t}`))
-            .join(', ');
-          return fail(STORAGE_ERROR_CODES.INVALID_FILE_TYPE, {
-            supportedExtensions: formatted,
-          });
-        }
-      }
-      return success(true);
+    validateFile(file: File | Blob, originalName: string, contentType: string) {
+      return validateStorageUploadFile({
+        allowedTypes,
+        contentType,
+        file,
+        filename: originalName,
+        maxFileSize,
+      });
     },
   };
-}
-
-/**
- * Common MIME-type-to-extension mapping for content-type validation.
- * Only covers types typically allowed for user uploads.
- */
-const MIME_TO_EXTENSIONS: Record<string, string[]> = {
-  'image/jpeg': ['jpg', 'jpeg'],
-  'image/png': ['png'],
-  'image/gif': ['gif'],
-  'image/webp': ['webp'],
-  'image/svg+xml': ['svg'],
-  'image/bmp': ['bmp'],
-  'image/x-icon': ['ico'],
-  'application/pdf': ['pdf'],
-  'text/plain': ['txt'],
-  'text/csv': ['csv'],
-  'application/json': ['json'],
-  'application/zip': ['zip'],
-  'application/gzip': ['gz'],
-  'video/mp4': ['mp4'],
-  'video/webm': ['webm'],
-  'audio/mpeg': ['mp3'],
-  'audio/wav': ['wav'],
-  'application/msword': ['doc'],
-  'application/vnd.openxmlformats-officedocument.wordprocessingml.document': [
-    'docx',
-  ],
-  'application/vnd.ms-excel': ['xls'],
-  'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet': ['xlsx'],
-};
-
-/**
- * Validate that contentType is consistent with filename extension.
- * Prevents uploading e.g. text/html with a .jpg extension (stored XSS risk).
- */
-function validateContentType(
-  contentType: string,
-  filename: string
-): ValidationResult<true> {
-  const ext = filename.includes('.')
-    ? filename.slice(filename.lastIndexOf('.') + 1).toLowerCase()
-    : '';
-  if (!ext) return success(true); // no extension to cross-check
-
-  const allowedExts = MIME_TO_EXTENSIONS[contentType.toLowerCase()];
-  if (allowedExts && !allowedExts.includes(ext)) {
-    return fail(STORAGE_ERROR_CODES.CONTENT_TYPE_MISMATCH, {
-      contentType,
-      extension: ext,
-    });
-  }
-
-  // Block dangerous MIME types regardless of extension
-  const dangerousTypes = [
-    'text/html',
-    'application/javascript',
-    'text/javascript',
-    'application/x-httpd-php',
-    'application/xhtml+xml',
-  ];
-  if (dangerousTypes.includes(contentType.toLowerCase())) {
-    return fail(STORAGE_ERROR_CODES.DANGEROUS_CONTENT_TYPE, {
-      contentType,
-    });
-  }
-
-  return success(true);
-}
-
-/**
- * Sanitize filename to prevent path traversal and keep storage key safe
- */
-function sanitizeFilename(filename: string): string {
-  return filename.replace(/[^a-zA-Z0-9._-]/g, '_').slice(0, 255);
 }
 
 function generateId(): string {
@@ -176,8 +67,7 @@ export class R2Provider implements StorageProvider {
       );
     }
     this.userFilesFolder =
-      sanitizeFolder(websiteConfig.storage?.userFilesFolder) ??
-      DEFAULT_USER_FILES_FOLDER;
+      websiteConfig.storage?.userFilesFolder ?? DEFAULT_USER_FILES_FOLDER;
     this.validator = createFileValidator({
       maxFileSize: websiteConfig.storage?.maxFileSize ?? DEFAULT_MAX_FILE_SIZE,
       allowedTypes:
@@ -210,54 +100,43 @@ export class R2Provider implements StorageProvider {
       file instanceof File
         ? file
         : new File([file], filename, { type: contentType });
-    const validation = this.validator.validateFile(fileForValidation, filename);
+    const validation = this.validator.validateFile(
+      fileForValidation,
+      filename,
+      contentType
+    );
     if (!validation.success) {
       throw new UploadError(validation.code, validation.details);
     }
 
-    const contentTypeValidation = validateContentType(contentType, filename);
-    if (!contentTypeValidation.success) {
-      throw new UploadError(
-        contentTypeValidation.code,
-        contentTypeValidation.details
-      );
-    }
-
     const fileId = generateId();
-    const sanitized = sanitizeFilename(filename);
-    const storedFilename = `${fileId}-${sanitized}`;
-    const sanitizedFolder = sanitizeFolder(folder);
+    const uploadPlan = buildStorageUploadObjectPlan({
+      fileId,
+      filename,
+      folder,
+      requestOrigin,
+      userFilesFolder: this.userFilesFolder,
+      userId,
+    });
 
-    let r2Key: string;
-    if (userId !== undefined) {
-      if (sanitizedFolder) {
-        r2Key = `${sanitizedFolder}/${userId}/${storedFilename}`;
-      } else {
-        r2Key = `${this.userFilesFolder}/${userId}/${storedFilename}`;
-      }
-    } else {
-      r2Key = sanitizedFolder
-        ? `${sanitizedFolder}/${storedFilename}`
-        : storedFilename;
-    }
-
-    await bucket.put(r2Key, file, {
+    await bucket.put(uploadPlan.r2Key, file, {
       httpMetadata: { contentType },
     });
 
-    const url = this.getPublicUrl(r2Key, requestOrigin);
-
-    const result: UploadFileResult = { url, key: r2Key };
+    const result: UploadFileResult = {
+      key: uploadPlan.r2Key,
+      url: uploadPlan.url,
+    };
 
     if (userId !== undefined) {
       result.metadata = {
         id: fileId,
         userId,
-        filename: storedFilename,
+        filename: uploadPlan.storedFilename,
         originalName: filename,
         contentType,
         size: file.size,
-        r2Key,
+        r2Key: uploadPlan.r2Key,
         uploadedAt: new Date(),
       };
     }

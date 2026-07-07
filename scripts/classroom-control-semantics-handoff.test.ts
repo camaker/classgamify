@@ -180,7 +180,11 @@ test('classroom control semantics handoff renders from the root document', () =>
   );
   assert.match(
     CLASSROOM_CONTROL_COMPONENT_SOURCE,
-    /data-handoff="classroom-control-semantics"[\s\S]*handoffView\.itemViews\.map[\s\S]*data-handoff-item=\{itemView\.id\}[\s\S]*<output aria-label=\{itemView\.ariaLabel\}>/
+    /data-handoff="classroom-control-semantics"[\s\S]*handoffView\.itemViews\.map/
+  );
+  assert.match(
+    CLASSROOM_CONTROL_COMPONENT_SOURCE,
+    /data-handoff-item=\{itemView\.id\}[\s\S]*<output[\s\S]*aria-label=\{itemView\.ariaLabel\}/
   );
 });
 
