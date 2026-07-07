@@ -43,6 +43,7 @@ import {
 } from '@/classroom/control-semantics';
 import {
   buildWebAppManifest,
+  buildWebAppManifestInstallBoundary,
   WEB_MANIFEST_HEADERS,
 } from '@/seo/web-manifest';
 import { getPricePlans } from '@/lib/price-plan';
@@ -13071,8 +13072,13 @@ assert.doesNotMatch(
 );
 assert.match(
   manifestRouteSource,
-  /JSON\.stringify\(buildWebAppManifest\(\)\)[\s\S]*headers: WEB_MANIFEST_HEADERS/,
+  /GET: async \(\) => \{[\s\S]*JSON\.stringify\(buildWebAppManifest\(\)\)[\s\S]*headers: WEB_MANIFEST_HEADERS/,
   'Manifest route should delegate install metadata and headers to the shared web-manifest helper.'
+);
+assert.match(
+  manifestRouteSource,
+  /HEAD: async \(\) => \{[\s\S]*new Response\(null,[\s\S]*headers: WEB_MANIFEST_HEADERS/,
+  'Manifest route should expose shared install metadata headers for HEAD requests.'
 );
 assert.doesNotMatch(
   manifestRouteSource,
@@ -13096,8 +13102,8 @@ assert.match(
 );
 assert.match(
   webManifestSource,
-  /metadata = websiteConfig\.metadata(?=[\s\S]*description: metadata\?\.description)(?=[\s\S]*name: metadata\?\.name)(?=[\s\S]*scope: '\/')(?=[\s\S]*start_url: '\/')/,
-  'Web manifest helper should derive install name and description from ClassGamify site metadata while keeping public root start and scope.'
+  /metadata = websiteConfig\.metadata(?=[\s\S]*description: metadata\?\.description)(?=[\s\S]*name: metadata\?\.name)(?=[\s\S]*scope: Routes\.Root)(?=[\s\S]*start_url: Routes\.Root)(?=[\s\S]*buildWebAppManifestInstallBoundary)/,
+  'Web manifest helper should derive install name and description from ClassGamify site metadata while keeping public root start and scope through shared route constants.'
 );
 const publicMetadataHandoffView = buildPublicMetadataHandoffView({
   baseUrl: 'https://classgamify.example/',
@@ -13129,6 +13135,9 @@ assert.deepEqual(publicMetadataHandoffView.privacy, {
   includesLocalizedAlternates: true,
   itemIds: publicMetadataHandoffIds,
   keepsDashboardOutOfIndex: true,
+  keepsManifestOnPublicRoot: true,
+  keepsManifestProtectedSurfacesOut: true,
+  keepsManifestRetiredLegacyOut: true,
   keepsPrintViewsOutOfIndex: true,
   keepsRetiredLegacyOutOfIndex: true,
   keepsStudentRunnerOutOfIndex: true,
@@ -14508,6 +14517,11 @@ assert.match(
   /buildWebAppManifest[\s\S]*WEB_MANIFEST_HEADERS/,
   'Manifest route should delegate platform metadata to the manifest domain helper.'
 );
+assert.match(
+  manifestRouteSource,
+  /HEAD: async \(\) => \{[\s\S]*headers: WEB_MANIFEST_HEADERS/,
+  'Manifest route should reuse manifest headers for HEAD requests.'
+);
 assert.doesNotMatch(
   manifestRouteSource,
   /websiteConfig|metadata\?\.name|background_color|theme_color/,
@@ -14664,8 +14678,19 @@ assert.deepEqual(WEB_MANIFEST_HEADERS, {
 });
 assert.match(webManifestSource, /websiteConfig\.metadata/);
 const webAppManifest = buildWebAppManifest();
-assert.equal(webAppManifest.start_url, '/');
-assert.equal(webAppManifest.scope, '/');
+assert.deepEqual(buildWebAppManifestInstallBoundary(webAppManifest), {
+  hasConfiguredDescription: true,
+  hasConfiguredName: true,
+  hasMaskableIcons: true,
+  keepsProtectedSurfacesOut: true,
+  keepsRetiredLegacyOut: true,
+  maskableIconCount: 2,
+  scope: 'public-web-app-install-metadata',
+  usesPublicRootScope: true,
+  usesPublicRootStartUrl: true,
+});
+assert.equal(webAppManifest.start_url, Routes.Root);
+assert.equal(webAppManifest.scope, Routes.Root);
 assert.equal(webAppManifest.display, 'standalone');
 assert.equal(webAppManifest.theme_color, '#09090b');
 assert.ok(
@@ -14675,6 +14700,11 @@ assert.ok(
       icon.purpose === 'maskable'
   ),
   'Web manifest should keep ClassGamify install metadata in the domain helper.'
+);
+assert.doesNotMatch(
+  JSON.stringify(webAppManifest),
+  /\/auth|\/admin|\/settings|\/dashboard|\/play|\/print|\/learn|\/hsk|\/hanzi|\/waitlist/i,
+  'Web manifest should not directly target private or retired paths.'
 );
 assert.doesNotMatch(routeConstantsSource, /['"]\/play\/demo-food['"]/);
 assert.equal(isLocalizedPath('/worksheets'), true);

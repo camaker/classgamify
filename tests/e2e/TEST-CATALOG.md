@@ -45,6 +45,11 @@ Assignment result student search has a fast script-level gate via
 run it when changing result-page student search route parsing, query
 normalization, student/attempt/review filtering, copy-scope alignment, search
 empty states, or the hidden student-search handoff.
+Public indexing and install metadata have a fast source-level gate via
+`pnpm exec tsx --test scripts/public-metadata-handoff-semantic-views.test.ts`;
+run it when changing the public route registry, sitemap helpers, robots rules,
+web app manifest metadata, manifest GET/HEAD route headers, retired legacy
+path inventory, or public/private install entry boundaries.
 
 ## Test Harness
 

@@ -15,6 +15,11 @@ export const Route = createFileRoute('/manifest.json')({
           headers: WEB_MANIFEST_HEADERS,
         });
       },
+      HEAD: async () => {
+        return new Response(null, {
+          headers: WEB_MANIFEST_HEADERS,
+        });
+      },
     },
   },
 });

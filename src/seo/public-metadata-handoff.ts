@@ -14,7 +14,10 @@ import {
   RETIRED_LEGACY_PUBLIC_PATHS,
   type PublicIndexableRouteId,
 } from '@/seo/public-routes';
-import { buildWebAppManifest } from '@/seo/web-manifest';
+import {
+  buildWebAppManifest,
+  buildWebAppManifestInstallBoundary,
+} from '@/seo/web-manifest';
 import { baseLocale, locales, localizeHref } from '@/lib/locale';
 
 export const PUBLIC_METADATA_HANDOFF_ITEM_IDS = [
@@ -71,6 +74,9 @@ export type PublicMetadataHandoffPrivacyContract = {
   includesLocalizedAlternates: true;
   itemIds: PublicMetadataHandoffItemId[];
   keepsDashboardOutOfIndex: true;
+  keepsManifestOnPublicRoot: true;
+  keepsManifestProtectedSurfacesOut: true;
+  keepsManifestRetiredLegacyOut: true;
   keepsPrintViewsOutOfIndex: true;
   keepsRetiredLegacyOutOfIndex: true;
   keepsStudentRunnerOutOfIndex: true;
@@ -121,6 +127,7 @@ type PublicMetadataHandoffContext = {
   blogUrlCount: number;
   disallowPaths: string[];
   manifest: ReturnType<typeof buildWebAppManifest>;
+  manifestBoundary: ReturnType<typeof buildWebAppManifestInstallBoundary>;
   sitemapEntries: ReturnType<typeof buildSitemapUrlEntries>;
   sitemapUrls: ReturnType<typeof getSitemapUrls>;
 };
@@ -135,6 +142,7 @@ function buildPublicMetadataHandoffContext({
   baseUrl: string;
 }): PublicMetadataHandoffContext {
   const normalizedBaseUrl = normalizePublicMetadataBaseUrl(baseUrl);
+  const manifest = buildWebAppManifest();
   const sitemapUrls = getSitemapUrls();
 
   return {
@@ -143,7 +151,8 @@ function buildPublicMetadataHandoffContext({
       url.path.startsWith(`${PUBLIC_INDEXED_BLOG_BASE_PATH}/`)
     ).length,
     disallowPaths: getRobotsDisallowPaths(),
-    manifest: buildWebAppManifest(),
+    manifest,
+    manifestBoundary: buildWebAppManifestInstallBoundary(manifest),
     sitemapEntries: buildSitemapUrlEntries({ baseUrl: normalizedBaseUrl }),
     sitemapUrls,
   };
@@ -343,7 +352,7 @@ function buildPublicMetadataHandoffItemView(
         description: m.public_metadata_handoff_manifest_name_description(),
         id: context.id,
         label: m.public_metadata_handoff_manifest_name_label(),
-        value: context.manifest.name
+        value: context.manifestBoundary.hasConfiguredName
           ? m.public_metadata_handoff_configured_value()
           : m.public_metadata_handoff_missing_value(),
       });
@@ -353,7 +362,7 @@ function buildPublicMetadataHandoffItemView(
           m.public_metadata_handoff_manifest_description_description(),
         id: context.id,
         label: m.public_metadata_handoff_manifest_description_label(),
-        value: context.manifest.description
+        value: context.manifestBoundary.hasConfiguredDescription
           ? m.public_metadata_handoff_configured_value()
           : m.public_metadata_handoff_missing_value(),
       });
@@ -362,14 +371,24 @@ function buildPublicMetadataHandoffItemView(
         description: m.public_metadata_handoff_manifest_start_url_description(),
         id: context.id,
         label: m.public_metadata_handoff_manifest_start_url_label(),
-        value: context.manifest.start_url,
+        value:
+          context.manifestBoundary.usesPublicRootStartUrl &&
+          context.manifestBoundary.keepsProtectedSurfacesOut &&
+          context.manifestBoundary.keepsRetiredLegacyOut
+            ? context.manifest.start_url
+            : m.public_metadata_handoff_needs_review_value(),
       });
     case 'manifest-scope':
       return buildPublicMetadataHandoffItem({
         description: m.public_metadata_handoff_manifest_scope_description(),
         id: context.id,
         label: m.public_metadata_handoff_manifest_scope_label(),
-        value: context.manifest.scope,
+        value:
+          context.manifestBoundary.usesPublicRootScope &&
+          context.manifestBoundary.keepsProtectedSurfacesOut &&
+          context.manifestBoundary.keepsRetiredLegacyOut
+            ? context.manifest.scope
+            : m.public_metadata_handoff_needs_review_value(),
       });
     case 'manifest-display':
       return buildPublicMetadataHandoffItem({
@@ -384,10 +403,9 @@ function buildPublicMetadataHandoffItemView(
           m.public_metadata_handoff_manifest_maskable_icons_description(),
         id: context.id,
         label: m.public_metadata_handoff_manifest_maskable_icons_label(),
-        value: String(
-          context.manifest.icons.filter((icon) => icon.purpose === 'maskable')
-            .length
-        ),
+        value: context.manifestBoundary.hasMaskableIcons
+          ? String(context.manifestBoundary.maskableIconCount)
+          : m.public_metadata_handoff_needs_review_value(),
       });
     case 'privacy-guard':
       return buildPublicMetadataHandoffItem({
@@ -454,6 +472,9 @@ function buildPublicMetadataHandoffPrivacyContract(
     includesLocalizedAlternates: true,
     itemIds: itemViews.map((itemView) => itemView.id),
     keepsDashboardOutOfIndex: true,
+    keepsManifestOnPublicRoot: true,
+    keepsManifestProtectedSurfacesOut: true,
+    keepsManifestRetiredLegacyOut: true,
     keepsPrintViewsOutOfIndex: true,
     keepsRetiredLegacyOutOfIndex: true,
     keepsStudentRunnerOutOfIndex: true,
