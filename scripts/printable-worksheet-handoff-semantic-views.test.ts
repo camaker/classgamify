@@ -1,4 +1,5 @@
 import assert from 'node:assert/strict';
+import { readFileSync } from 'node:fs';
 import test from 'node:test';
 import type { PrintableAssignmentWorksheet } from '@/assignments/printable-worksheet';
 import {
@@ -139,6 +140,19 @@ test('printable worksheet handoff keeps unavailable answer keys explicit', () =>
   assert.equal(
     getHandoffItemValue(pageView, 'answer-key-details'),
     'No answer key available'
+  );
+});
+
+test('printable worksheet handoff renders stable DOM item relationships', () => {
+  const source = readFileSync(
+    'src/components/assignments/printable-worksheet-handoff.tsx',
+    'utf8'
+  );
+
+  assert.match(
+    source,
+    /PrintableWorksheetHandoffItemView[\s\S]*PrintableWorksheetHandoffView[\s\S]*data-handoff="printable-worksheet"[\s\S]*view\.itemViews\.map[\s\S]*PrintableWorksheetHandoffItem[\s\S]*function PrintableWorksheetHandoffItem[\s\S]*const labelId = `printable-worksheet-handoff-\$\{itemView\.id\}-label`[\s\S]*const valueId = `printable-worksheet-handoff-\$\{itemView\.id\}-value`[\s\S]*const descriptionId = `printable-worksheet-handoff-\$\{itemView\.id\}-description`[\s\S]*data-handoff-item=\{itemView\.id\}[\s\S]*id=\{labelId\}[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*aria-label=\{itemView\.ariaLabel\}[\s\S]*aria-labelledby=\{`\$\{labelId\} \$\{valueId\}`\}[\s\S]*id=\{valueId\}[\s\S]*id=\{descriptionId\}/,
+    'Printable worksheet handoff should render each paper handoff item with stable label, value, and description relationships.'
   );
 });
 

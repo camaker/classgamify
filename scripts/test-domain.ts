@@ -36704,8 +36704,8 @@ assert.doesNotMatch(
 );
 assert.match(
   printableWorksheetHandoffSource,
-  /PrintableWorksheetHandoffView[\s\S]*data-handoff="printable-worksheet"[\s\S]*view\.itemViews\.map[\s\S]*data-handoff-item=\{item\.id\}[\s\S]*<output aria-label=\{item\.ariaLabel\}>/,
-  'Printable worksheet handoff component should render hidden stable handoff outputs from the prepared handoff view.'
+  /PrintableWorksheetHandoffItemView[\s\S]*PrintableWorksheetHandoffView[\s\S]*data-handoff="printable-worksheet"[\s\S]*view\.itemViews\.map[\s\S]*PrintableWorksheetHandoffItem[\s\S]*function PrintableWorksheetHandoffItem[\s\S]*const labelId = `printable-worksheet-handoff-\$\{itemView\.id\}-label`[\s\S]*const valueId = `printable-worksheet-handoff-\$\{itemView\.id\}-value`[\s\S]*const descriptionId = `printable-worksheet-handoff-\$\{itemView\.id\}-description`[\s\S]*data-handoff-item=\{itemView\.id\}[\s\S]*id=\{labelId\}[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*aria-label=\{itemView\.ariaLabel\}[\s\S]*aria-labelledby=\{`\$\{labelId\} \$\{valueId\}`\}[\s\S]*id=\{valueId\}[\s\S]*id=\{descriptionId\}/,
+  'Printable worksheet handoff component should render hidden stable handoff outputs with prepared label, value, and description relationships.'
 );
 assert.match(
   printableWorksheetToolbarSource,
