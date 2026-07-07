@@ -275,13 +275,22 @@ function ActivityDraftMetaHandoff({
 }: {
   handoffView: ActivityDraftMetaHandoffView;
 }) {
+  const titleId = 'activity-draft-meta-handoff-title';
+  const descriptionId = 'activity-draft-meta-handoff-description';
+
   return (
     <section
-      aria-label={handoffView.title}
+      aria-describedby={descriptionId}
+      aria-labelledby={titleId}
       className="mt-4 rounded-lg border bg-background p-3"
     >
-      <h4 className="font-medium text-sm">{handoffView.title}</h4>
-      <p className="mt-1 text-muted-foreground text-xs leading-5">
+      <h4 className="font-medium text-sm" id={titleId}>
+        {handoffView.title}
+      </h4>
+      <p
+        className="mt-1 text-muted-foreground text-xs leading-5"
+        id={descriptionId}
+      >
         {handoffView.description}
       </p>
       <dl className="mt-3 grid gap-2 sm:grid-cols-2 lg:grid-cols-5">
@@ -298,13 +307,32 @@ function ActivityDraftMetaHandoffItem({
 }: {
   item: ActivityDraftMetaHandoffItemView;
 }) {
+  const labelId = `activity-draft-meta-handoff-${item.id}-label`;
+  const valueId = `activity-draft-meta-handoff-${item.id}-value`;
+  const descriptionId = `activity-draft-meta-handoff-${item.id}-description`;
+
   return (
-    <div className="rounded-md border bg-muted/20 p-2.5">
-      <dt className="text-muted-foreground text-xs leading-5">{item.label}</dt>
+    <div
+      className="rounded-md border bg-muted/20 p-2.5"
+      data-handoff-item={item.id}
+    >
+      <dt className="text-muted-foreground text-xs leading-5" id={labelId}>
+        {item.label}
+      </dt>
       <dd className="mt-1 break-words font-medium text-xs leading-5">
-        <output aria-label={item.ariaLabel}>{item.value}</output>
+        <output
+          aria-describedby={descriptionId}
+          aria-label={item.ariaLabel}
+          aria-labelledby={`${labelId} ${valueId}`}
+          id={valueId}
+        >
+          {item.value}
+        </output>
       </dd>
-      <dd className="mt-1 text-muted-foreground text-xs leading-5">
+      <dd
+        className="mt-1 text-muted-foreground text-xs leading-5"
+        id={descriptionId}
+      >
         {item.description}
       </dd>
     </div>

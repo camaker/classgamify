@@ -6669,13 +6669,13 @@ assert.doesNotMatch(
 );
 assert.match(
   activityDraftMetaSummarySource,
-  /function ActivityDraftMetaHandoff[\s\S]*handoffView\.title[\s\S]*handoffView\.description[\s\S]*handoffView\.itemViews\.map[\s\S]*ActivityDraftMetaHandoffItem[\s\S]*key=\{item\.id\}/,
-  'AI draft handoff component should render prepared title, description, and item views keyed by stable ids.'
+  /function ActivityDraftMetaHandoff[\s\S]*const titleId = 'activity-draft-meta-handoff-title'[\s\S]*const descriptionId = 'activity-draft-meta-handoff-description'[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*aria-labelledby=\{titleId\}[\s\S]*id=\{titleId\}[\s\S]*handoffView\.title[\s\S]*id=\{descriptionId\}[\s\S]*handoffView\.description[\s\S]*handoffView\.itemViews\.map[\s\S]*ActivityDraftMetaHandoffItem[\s\S]*key=\{item\.id\}/,
+  'AI draft handoff component should render prepared title, description, and item views with stable section relationships.'
 );
 assert.match(
   activityDraftMetaSummarySource,
-  /function ActivityDraftMetaHandoffItem[\s\S]*item\.label[\s\S]*<output aria-label=\{item\.ariaLabel\}>\{item\.value\}<\/output>[\s\S]*item\.description/,
-  'AI draft handoff items should render prepared label, aria value, and description fields.'
+  /function ActivityDraftMetaHandoffItem[\s\S]*const labelId = `activity-draft-meta-handoff-\$\{item\.id\}-label`[\s\S]*const valueId = `activity-draft-meta-handoff-\$\{item\.id\}-value`[\s\S]*const descriptionId = `activity-draft-meta-handoff-\$\{item\.id\}-description`[\s\S]*data-handoff-item=\{item\.id\}[\s\S]*id=\{labelId\}[\s\S]*item\.label[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*aria-label=\{item\.ariaLabel\}[\s\S]*aria-labelledby=\{`\$\{labelId\} \$\{valueId\}`\}[\s\S]*id=\{valueId\}[\s\S]*item\.value[\s\S]*id=\{descriptionId\}[\s\S]*item\.description/,
+  'AI draft handoff items should render stable label, value, and description relationships.'
 );
 assert.doesNotMatch(
   activityDraftMetaSummarySource,
