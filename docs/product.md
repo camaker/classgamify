@@ -250,6 +250,11 @@ worksheet-style two-column connection flow. Fill-blank uses a worksheet-style
 renderer that places the answer input into the sentence blank when possible.
 Open-box uses a reveal-card flow where students choose a box, answer the prompt,
 and move between boxes.
+Line-match board state should expose the same prepared connection counts,
+selection readiness, exclusive-choice policy, review-feedback visibility, and
+privacy guards as stable hidden semantic outputs, without copying prompt text,
+choice text, answer text, runtime item ids, student identity, or source
+material metadata into the handoff summary.
 Listening uses a browser-spoken track flow that hides the transcript until
 review, then records the student's selected or typed answer against the same
 question item. The spoken track should set the browser speech language from the

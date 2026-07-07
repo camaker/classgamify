@@ -16940,6 +16940,11 @@ assert.match(
 );
 assert.match(
   lineMatchBoardSource,
+  /buildLineMatchBoardHandoffView\(\{[\s\S]*disabled,[\s\S]*revealAnswer,[\s\S]*runnerView,[\s\S]*data-handoff="line-match-board"/,
+  'Line-match should expose the hidden connection-board handoff from the assignment-domain view model.'
+);
+assert.match(
+  lineMatchBoardSource,
   /resolveChoicePairingSelectedItemId[\s\S]*setSelectedItemId\(\(current\) =>[\s\S]*items,[\s\S]*selectedItemId: current,/,
   'Line-match should keep stale selected prompt state aligned through the assignment-domain helper.'
 );
@@ -18488,8 +18493,8 @@ assert.match(
 );
 assert.match(
   e2eTestCatalogText,
-  /Student runner adapts to template content[\s\S]*group-sort-board handoff[\s\S]*category target readiness[\s\S]*runtime-id\/prompt\/answer\/student\/source-material guards[\s\S]*matching-pairs-board handoff[\s\S]*left prompt card and right choice card counts[\s\S]*runtime-id\/prompt\/choice\/answer\/student\/source-material guards/,
-  'E2E catalog should cover the hidden 30-slice group-sort and matching-pairs board handoff contracts.'
+  /Student runner adapts to template content[\s\S]*line-match-board handoff[\s\S]*available\/used\/unused choice counts[\s\S]*group-sort-board handoff[\s\S]*category target readiness[\s\S]*runtime-id\/prompt\/answer\/student\/source-material guards[\s\S]*matching-pairs-board handoff[\s\S]*left prompt card and right choice card counts[\s\S]*runtime-id\/prompt\/choice\/answer\/student\/source-material guards/,
+  'E2E catalog should cover the hidden 30-slice line-match, group-sort, and matching-pairs board handoff contracts.'
 );
 assert.match(
   e2eTestCatalogText,
