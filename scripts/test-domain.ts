@@ -15127,13 +15127,18 @@ assert.match(
 );
 assert.match(
   studentRuntimeItemListSource,
-  /StudentRuntimeInteractionHandoffView[\s\S]*data-handoff="student-runtime-interaction"[\s\S]*view\.itemViews\.map[\s\S]*data-handoff-item=\{item\.id\}[\s\S]*<output aria-label=\{item\.ariaLabel\}>/,
-  'Student runtime item-list component should render hidden stable runtime-interaction handoff outputs from the prepared view.'
+  /StudentRuntimeInteractionHandoffItemView[\s\S]*StudentRuntimeInteractionHandoffView[\s\S]*data-handoff="student-runtime-interaction"[\s\S]*view\.itemViews\.map[\s\S]*StudentRuntimeInteractionHandoffItem[\s\S]*function StudentRuntimeInteractionHandoffItem[\s\S]*const labelId = `student-runtime-interaction-handoff-\$\{itemView\.id\}-label`[\s\S]*const valueId = `student-runtime-interaction-handoff-\$\{itemView\.id\}-value`[\s\S]*const descriptionId = `student-runtime-interaction-handoff-\$\{itemView\.id\}-description`[\s\S]*data-handoff-item=\{itemView\.id\}[\s\S]*id=\{labelId\}[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*aria-label=\{itemView\.ariaLabel\}[\s\S]*aria-labelledby=\{`\$\{labelId\} \$\{valueId\}`\}[\s\S]*id=\{valueId\}[\s\S]*id=\{descriptionId\}/,
+  'Student runtime item-list component should render hidden stable runtime-interaction handoff outputs with label, value, and description relationships.'
 );
 assert.match(
   studentRuntimeItemListSource,
-  /StudentRuntimeIdentityHandoffView[\s\S]*data-handoff="student-runtime-identity"[\s\S]*view\.itemViews\.map[\s\S]*data-handoff-item=\{item\.id\}[\s\S]*<output aria-label=\{item\.ariaLabel\}>/,
-  'Student runtime item-list component should render hidden stable runtime-identity handoff outputs from the prepared view.'
+  /StudentRuntimeChoiceAssignmentHandoffItemView[\s\S]*StudentRuntimeChoiceAssignmentHandoffView[\s\S]*data-handoff="student-runtime-choice-assignment"[\s\S]*view\.itemViews\.map[\s\S]*StudentRuntimeChoiceAssignmentHandoffItem[\s\S]*function StudentRuntimeChoiceAssignmentHandoffItem[\s\S]*const labelId = `student-runtime-choice-assignment-handoff-\$\{itemView\.id\}-label`[\s\S]*const valueId = `student-runtime-choice-assignment-handoff-\$\{itemView\.id\}-value`[\s\S]*const descriptionId = `student-runtime-choice-assignment-handoff-\$\{itemView\.id\}-description`[\s\S]*data-handoff-item=\{itemView\.id\}[\s\S]*id=\{labelId\}[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*aria-label=\{itemView\.ariaLabel\}[\s\S]*aria-labelledby=\{`\$\{labelId\} \$\{valueId\}`\}[\s\S]*id=\{valueId\}[\s\S]*id=\{descriptionId\}/,
+  'Student runtime item-list component should render hidden stable choice-assignment handoff outputs with label, value, and description relationships.'
+);
+assert.match(
+  studentRuntimeItemListSource,
+  /StudentRuntimeIdentityHandoffItemView[\s\S]*StudentRuntimeIdentityHandoffView[\s\S]*data-handoff="student-runtime-identity"[\s\S]*view\.itemViews\.map[\s\S]*StudentRuntimeIdentityHandoffItem[\s\S]*function StudentRuntimeIdentityHandoffItem[\s\S]*const labelId = `student-runtime-identity-handoff-\$\{itemView\.id\}-label`[\s\S]*const valueId = `student-runtime-identity-handoff-\$\{itemView\.id\}-value`[\s\S]*const descriptionId = `student-runtime-identity-handoff-\$\{itemView\.id\}-description`[\s\S]*data-handoff-item=\{itemView\.id\}[\s\S]*id=\{labelId\}[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*aria-label=\{itemView\.ariaLabel\}[\s\S]*aria-labelledby=\{`\$\{labelId\} \$\{valueId\}`\}[\s\S]*id=\{valueId\}[\s\S]*id=\{descriptionId\}/,
+  'Student runtime item-list component should render hidden stable runtime-identity handoff outputs with label, value, and description relationships.'
 );
 assert.match(
   studentRuntimeItemListSource,

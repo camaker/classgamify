@@ -7,10 +7,17 @@ import {
   buildStudentRuntimeItemListView,
   buildStudentRuntimeSingleAnswerChanges,
   type StudentAnswerChange,
-  type StudentRuntimeChoiceAssignmentHandoffView,
+  type StudentRuntimeInteractionHandoffItemView,
   type StudentRuntimeInteractionHandoffView,
 } from '@/assignments/student-runtime-item-list';
-import type { StudentRuntimeIdentityHandoffView } from '@/assignments/runtime-identity-handoff';
+import type {
+  StudentRuntimeChoiceAssignmentHandoffItemView,
+  StudentRuntimeChoiceAssignmentHandoffView,
+} from '@/assignments/runtime-choice-assignment-handoff';
+import type {
+  StudentRuntimeIdentityHandoffItemView,
+  StudentRuntimeIdentityHandoffView,
+} from '@/assignments/runtime-identity-handoff';
 import type { RuntimeChoiceButtonView } from '@/assignments/student-runner-view';
 import { PublicAnswerFeedback } from '@/components/activities/public-answer-feedback';
 import { FillBlankWorksheet } from '@/components/activities/fill-blank-worksheet';
@@ -280,17 +287,41 @@ function StudentRuntimeInteractionHandoff({
       <h2 id={titleId}>{view.title}</h2>
       <p id={descriptionId}>{view.description}</p>
       <dl>
-        {view.itemViews.map((item) => (
-          <div data-handoff-item={item.id} key={item.id}>
-            <dt>{item.label}</dt>
-            <dd>
-              <output aria-label={item.ariaLabel}>{item.value}</output>
-              <span>{item.description}</span>
-            </dd>
-          </div>
+        {view.itemViews.map((itemView) => (
+          <StudentRuntimeInteractionHandoffItem
+            itemView={itemView}
+            key={itemView.id}
+          />
         ))}
       </dl>
     </section>
+  );
+}
+
+function StudentRuntimeInteractionHandoffItem({
+  itemView,
+}: {
+  itemView: StudentRuntimeInteractionHandoffItemView;
+}) {
+  const labelId = `student-runtime-interaction-handoff-${itemView.id}-label`;
+  const valueId = `student-runtime-interaction-handoff-${itemView.id}-value`;
+  const descriptionId = `student-runtime-interaction-handoff-${itemView.id}-description`;
+
+  return (
+    <div data-handoff-item={itemView.id}>
+      <dt id={labelId}>{itemView.label}</dt>
+      <dd>
+        <output
+          aria-describedby={descriptionId}
+          aria-label={itemView.ariaLabel}
+          aria-labelledby={`${labelId} ${valueId}`}
+          id={valueId}
+        >
+          {itemView.value}
+        </output>
+        <span id={descriptionId}>{itemView.description}</span>
+      </dd>
+    </div>
   );
 }
 
@@ -312,17 +343,41 @@ function StudentRuntimeChoiceAssignmentHandoff({
       <h2 id={titleId}>{view.title}</h2>
       <p id={descriptionId}>{view.description}</p>
       <dl>
-        {view.itemViews.map((item) => (
-          <div data-handoff-item={item.id} key={item.id}>
-            <dt>{item.label}</dt>
-            <dd>
-              <output aria-label={item.ariaLabel}>{item.value}</output>
-              <span>{item.description}</span>
-            </dd>
-          </div>
+        {view.itemViews.map((itemView) => (
+          <StudentRuntimeChoiceAssignmentHandoffItem
+            itemView={itemView}
+            key={itemView.id}
+          />
         ))}
       </dl>
     </section>
+  );
+}
+
+function StudentRuntimeChoiceAssignmentHandoffItem({
+  itemView,
+}: {
+  itemView: StudentRuntimeChoiceAssignmentHandoffItemView;
+}) {
+  const labelId = `student-runtime-choice-assignment-handoff-${itemView.id}-label`;
+  const valueId = `student-runtime-choice-assignment-handoff-${itemView.id}-value`;
+  const descriptionId = `student-runtime-choice-assignment-handoff-${itemView.id}-description`;
+
+  return (
+    <div data-handoff-item={itemView.id}>
+      <dt id={labelId}>{itemView.label}</dt>
+      <dd>
+        <output
+          aria-describedby={descriptionId}
+          aria-label={itemView.ariaLabel}
+          aria-labelledby={`${labelId} ${valueId}`}
+          id={valueId}
+        >
+          {itemView.value}
+        </output>
+        <span id={descriptionId}>{itemView.description}</span>
+      </dd>
+    </div>
   );
 }
 
@@ -344,17 +399,41 @@ function StudentRuntimeIdentityHandoff({
       <h2 id={titleId}>{view.title}</h2>
       <p id={descriptionId}>{view.description}</p>
       <dl>
-        {view.itemViews.map((item) => (
-          <div data-handoff-item={item.id} key={item.id}>
-            <dt>{item.label}</dt>
-            <dd>
-              <output aria-label={item.ariaLabel}>{item.value}</output>
-              <span>{item.description}</span>
-            </dd>
-          </div>
+        {view.itemViews.map((itemView) => (
+          <StudentRuntimeIdentityHandoffItem
+            itemView={itemView}
+            key={itemView.id}
+          />
         ))}
       </dl>
     </section>
+  );
+}
+
+function StudentRuntimeIdentityHandoffItem({
+  itemView,
+}: {
+  itemView: StudentRuntimeIdentityHandoffItemView;
+}) {
+  const labelId = `student-runtime-identity-handoff-${itemView.id}-label`;
+  const valueId = `student-runtime-identity-handoff-${itemView.id}-value`;
+  const descriptionId = `student-runtime-identity-handoff-${itemView.id}-description`;
+
+  return (
+    <div data-handoff-item={itemView.id}>
+      <dt id={labelId}>{itemView.label}</dt>
+      <dd>
+        <output
+          aria-describedby={descriptionId}
+          aria-label={itemView.ariaLabel}
+          aria-labelledby={`${labelId} ${valueId}`}
+          id={valueId}
+        >
+          {itemView.value}
+        </output>
+        <span id={descriptionId}>{itemView.description}</span>
+      </dd>
+    </div>
   );
 }
 

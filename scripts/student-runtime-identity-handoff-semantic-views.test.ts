@@ -1,4 +1,5 @@
 import assert from 'node:assert/strict';
+import { readFileSync } from 'node:fs';
 import test from 'node:test';
 import { getRuntimeItems } from '@/activities/runtime';
 import { buildActivityContent } from '@/activities/validation';
@@ -304,6 +305,19 @@ test('student runtime identity handoff localizes Chinese identity boundaries', (
   } finally {
     overwriteGetLocale(() => 'en');
   }
+});
+
+test('student runtime identity handoff renders hidden DOM relationships', () => {
+  const componentSource = readFileSync(
+    'src/components/activities/student-runtime-item-list.tsx',
+    'utf8'
+  );
+
+  assert.match(
+    componentSource,
+    /StudentRuntimeIdentityHandoffItemView[\s\S]*StudentRuntimeIdentityHandoffView[\s\S]*data-handoff="student-runtime-identity"[\s\S]*view\.itemViews\.map[\s\S]*StudentRuntimeIdentityHandoffItem[\s\S]*function StudentRuntimeIdentityHandoffItem[\s\S]*const labelId = `student-runtime-identity-handoff-\$\{itemView\.id\}-label`[\s\S]*const valueId = `student-runtime-identity-handoff-\$\{itemView\.id\}-value`[\s\S]*const descriptionId = `student-runtime-identity-handoff-\$\{itemView\.id\}-description`[\s\S]*data-handoff-item=\{itemView\.id\}[\s\S]*id=\{labelId\}[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*aria-label=\{itemView\.ariaLabel\}[\s\S]*aria-labelledby=\{`\$\{labelId\} \$\{valueId\}`\}[\s\S]*id=\{valueId\}[\s\S]*id=\{descriptionId\}/,
+    'Student runtime identity handoff should render each safe identity slice with stable label, value, and description relationships.'
+  );
 });
 
 function getHandoffValue(
