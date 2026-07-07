@@ -38,6 +38,11 @@ const SECRET_RUNTIME_ITEM_ID = 'private-runtime-item-id';
 const SECRET_STUDENT_NAME = 'Private Student';
 const SECRET_TEACHER_ANSWER = 'SECRET_TEACHER_ANSWER';
 
+const API_ASSIGNMENTS_SOURCE = readFileSync('src/api/assignments.ts', 'utf8');
+const ATTEMPT_DURATION_SOURCE = readFileSync(
+  'src/attempts/duration.ts',
+  'utf8'
+);
 const RESULTS_SOURCE = readFileSync('src/assignments/results.ts', 'utf8');
 const RESULT_VIEW_SOURCE = readFileSync(
   'src/assignments/result-view.ts',
@@ -52,6 +57,7 @@ const RUNNER_STATE_SOURCE = readFileSync(
   'src/assignments/student-runner-state.ts',
   'utf8'
 );
+const TEST_CATALOG_SOURCE = readFileSync('tests/e2e/TEST-CATALOG.md', 'utf8');
 
 const EVIDENCE = buildAttemptDurationEvidence();
 
@@ -173,6 +179,49 @@ test('assignment attempt duration evidence comes from shared runner and result h
   assert.equal(EVIDENCE.exportAverageUsesDisplayContract, true);
   assert.equal(EVIDENCE.exportAttemptUsesDisplayContract, true);
   assertNoPrivateAttemptDurationText(JSON.stringify(EVIDENCE));
+});
+
+test('assignment attempt duration submit path normalizes before scoring and persistence', () => {
+  assert.match(
+    ATTEMPT_DURATION_SOURCE,
+    /export function normalizeAttemptDurationSeconds[\s\S]*Math\.round\(durationSeconds\)[\s\S]*normalizeAttemptTimeLimitSeconds\(timeLimitSeconds\)[\s\S]*Math\.min\(normalizedDuration, normalizedTimeLimit\)/,
+    'Attempt duration helper should round submitted seconds and cap them at the normalized timer.'
+  );
+
+  const apiDurationBeforeScoringAndPersistence = new RegExp(
+    [
+      'const settings = resolveAssignmentSettings\\(',
+      'const durationSeconds = normalizeAttemptDurationSeconds\\(\\{',
+      'durationSeconds: data\\.durationSeconds,',
+      'timeLimitSeconds: settings\\.timeLimitSeconds,',
+      '\\}\\);',
+      'const evaluation = evaluateRuntimeAnswers\\(\\{',
+      'durationSeconds,',
+      'const startedAt = buildAttemptStartedAt\\(\\{',
+      'durationSeconds,',
+      'buildScoredAttemptInsert\\(\\{',
+      'evaluation,',
+    ].join('[\\s\\S]*')
+  );
+
+  assert.match(
+    API_ASSIGNMENTS_SOURCE,
+    apiDurationBeforeScoringAndPersistence,
+    'Submit attempt API should normalize the browser duration with assignment timer settings before scoring, startedAt derivation, and scored-attempt persistence.'
+  );
+});
+
+test('assignment attempt duration focused gate is documented', () => {
+  assert.match(
+    TEST_CATALOG_SOURCE,
+    /pnpm exec tsx --test scripts\/assignment-attempt-duration-handoff-semantic-views\.test\.ts/,
+    'E2E catalog should point duration work at the focused script gate.'
+  );
+  assert.match(
+    TEST_CATALOG_SOURCE,
+    /timer start plans[\s\S]*submission duration normalization[\s\S]*result duration labels[\s\S]*CSV[\s\S]*duration fields/,
+    'E2E catalog should say which duration product boundaries need the focused gate.'
+  );
 });
 
 function buildAttemptDurationEvidence(): AssignmentAttemptDurationHandoffEvidence {
