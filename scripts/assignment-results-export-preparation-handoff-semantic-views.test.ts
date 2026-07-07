@@ -260,7 +260,10 @@ test('assignment results export preparation renders stable handoff markers', () 
     /data-handoff-scope=\{exportPreparationView\.privacy\.scope\}/
   );
   assert.match(headerActionsSource, /data-handoff-item=\{itemView\.id\}/);
-  assert.match(headerActionsSource, /aria-label=\{itemView\.ariaLabel\}/);
+  assert.match(
+    headerActionsSource,
+    /AssignmentResultsExportPreparationItem[\s\S]*const labelId = `assignment-results-export-preparation-\$\{itemView\.id\}-label`[\s\S]*const valueId = `assignment-results-export-preparation-\$\{itemView\.id\}-value`[\s\S]*const descriptionId = `assignment-results-export-preparation-\$\{itemView\.id\}-description`[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*aria-label=\{itemView\.ariaLabel\}[\s\S]*aria-labelledby=\{`\$\{labelId\} \$\{valueId\}`\}[\s\S]*data-handoff-item=\{itemView\.id\}[\s\S]*id=\{labelId\}[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*aria-label=\{itemView\.ariaLabel\}[\s\S]*aria-labelledby=\{`\$\{labelId\} \$\{valueId\}`\}[\s\S]*id=\{valueId\}[\s\S]*id=\{descriptionId\}/
+  );
   assert.match(catalogSource, /\|\s*6i\s*\|/);
 });
 

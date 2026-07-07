@@ -3,7 +3,10 @@ import type {
   AssignmentResultActionButton,
   AssignmentResultMaterialHandoffView,
 } from '@/assignments/result-actions';
-import type { AssignmentResultsExportPreparationView } from '@/assignments/results-export';
+import type {
+  AssignmentResultsExportPreparationItemView,
+  AssignmentResultsExportPreparationView,
+} from '@/assignments/results-export';
 import type {
   AssignmentResultHeaderPrintAction,
   AssignmentResultHeaderShareAction,
@@ -482,23 +485,48 @@ function AssignmentResultsExportPreparation({
       </div>
       <div className="grid gap-2 sm:grid-cols-2 xl:grid-cols-5">
         {exportPreparationView.itemViews.map((itemView) => (
-          <article
-            aria-label={itemView.ariaLabel}
-            className="grid gap-1 rounded-md border bg-background p-3"
-            data-handoff-item={itemView.id}
+          <AssignmentResultsExportPreparationItem
+            itemView={itemView}
             key={itemView.id}
-          >
-            <p className="text-muted-foreground text-xs">{itemView.label}</p>
-            <output aria-label={itemView.ariaLabel}>
-              <span className="font-semibold text-lg">{itemView.value}</span>
-            </output>
-            <p className="text-muted-foreground text-xs">
-              {itemView.description}
-            </p>
-          </article>
+          />
         ))}
       </div>
     </section>
+  );
+}
+
+function AssignmentResultsExportPreparationItem({
+  itemView,
+}: {
+  itemView: AssignmentResultsExportPreparationItemView;
+}) {
+  const labelId = `assignment-results-export-preparation-${itemView.id}-label`;
+  const valueId = `assignment-results-export-preparation-${itemView.id}-value`;
+  const descriptionId = `assignment-results-export-preparation-${itemView.id}-description`;
+
+  return (
+    <article
+      aria-describedby={descriptionId}
+      aria-label={itemView.ariaLabel}
+      aria-labelledby={`${labelId} ${valueId}`}
+      className="grid gap-1 rounded-md border bg-background p-3"
+      data-handoff-item={itemView.id}
+    >
+      <p className="text-muted-foreground text-xs" id={labelId}>
+        {itemView.label}
+      </p>
+      <output
+        aria-describedby={descriptionId}
+        aria-label={itemView.ariaLabel}
+        aria-labelledby={`${labelId} ${valueId}`}
+        id={valueId}
+      >
+        <span className="font-semibold text-lg">{itemView.value}</span>
+      </output>
+      <p className="text-muted-foreground text-xs" id={descriptionId}>
+        {itemView.description}
+      </p>
+    </article>
   );
 }
 

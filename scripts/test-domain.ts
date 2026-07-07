@@ -8875,8 +8875,8 @@ assert.match(
 );
 assert.match(
   assignmentResultsHeaderActionsSource,
-  /function AssignmentResultsExportPreparation[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*aria-labelledby=\{titleId\}[\s\S]*data-handoff="assignment-results-export-preparation"[\s\S]*data-handoff-scope=\{exportPreparationView\.privacy\.scope\}[\s\S]*<article[\s\S]*aria-label=\{itemView\.ariaLabel\}[\s\S]*data-handoff-item=\{itemView\.id\}[\s\S]*<output[\s\S]*aria-label=\{itemView\.ariaLabel\}/,
-  'Assignment result CSV export coverage should render prepared accessible labels for each full-export coverage item.'
+  /function AssignmentResultsExportPreparation[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*aria-labelledby=\{titleId\}[\s\S]*data-handoff="assignment-results-export-preparation"[\s\S]*data-handoff-scope=\{exportPreparationView\.privacy\.scope\}[\s\S]*exportPreparationView\.itemViews\.map[\s\S]*AssignmentResultsExportPreparationItem[\s\S]*function AssignmentResultsExportPreparationItem[\s\S]*const labelId = `assignment-results-export-preparation-\$\{itemView\.id\}-label`[\s\S]*const valueId = `assignment-results-export-preparation-\$\{itemView\.id\}-value`[\s\S]*const descriptionId = `assignment-results-export-preparation-\$\{itemView\.id\}-description`[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*aria-label=\{itemView\.ariaLabel\}[\s\S]*aria-labelledby=\{`\$\{labelId\} \$\{valueId\}`\}[\s\S]*data-handoff-item=\{itemView\.id\}[\s\S]*id=\{labelId\}[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*aria-label=\{itemView\.ariaLabel\}[\s\S]*aria-labelledby=\{`\$\{labelId\} \$\{valueId\}`\}[\s\S]*id=\{valueId\}[\s\S]*id=\{descriptionId\}/,
+  'Assignment result CSV export coverage should render prepared accessible labels, values, and descriptions for each full-export coverage item.'
 );
 assert.match(
   assignmentResultsHeaderActionsSource,
