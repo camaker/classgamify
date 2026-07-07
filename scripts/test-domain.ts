@@ -168,6 +168,7 @@ import {
   buildCreatedActivityPanelContext,
   buildActivityLibraryEmptyStateView,
   buildActivityLibraryPageScopeView,
+  buildActivityLibrarySourceScopeBoundary,
   buildActivityLibraryPageViewModel,
   buildActivityLibraryRouteState,
   buildActivityLibraryRemixActionLabel,
@@ -33625,6 +33626,16 @@ assert.match(
   /export const ACTIVITY_LIBRARY_PAGE_HANDOFF_ITEM_IDS = \[[\s\S]*'owner-scope'[\s\S]*'summary-total'[\s\S]*'scope-range'[\s\S]*'source-capability-audio-extraction'[\s\S]*'status-active'[\s\S]*'visible-page-items'[\s\S]*'pagination'[\s\S]*'starter-preview'[\s\S]*\] as const;[\s\S]*export type ActivityLibraryPageHandoffItemId =[\s\S]*typeof ACTIVITY_LIBRARY_PAGE_HANDOFF_ITEM_IDS[\s\S]*export type ActivityLibraryPageHandoffPrivacyView = \{[\s\S]*broadensBeyondOwner: false;[\s\S]*countsStarterPreviewAsOwned: false;[\s\S]*exposesPrivateActivityContent: false;[\s\S]*exposesSourceMaterialFileIds: false;[\s\S]*exposesSourceMaterialStorageKeys: false;/,
   'Activity library page handoff should derive its typed owner-scoped library contract from a stable 30-slice id list with explicit privacy flags.'
 );
+assert.match(
+  activityLibraryViewSource,
+  /export type ActivityLibrarySourceScopeBoundary = \{[\s\S]*fullFilteredActivityCount: number;[\s\S]*keepsVisiblePageCountsSeparate: true;[\s\S]*overviewActivityCount: number;[\s\S]*scope: 'owner-activity-library-source-scope';[\s\S]*usesFullFilteredSummaryForOverview: true;[\s\S]*visiblePageActivityCount: number;/,
+  'Activity library page should expose a source-scope boundary that separates full filtered overview counts from visible page counts.'
+);
+assert.match(
+  activityLibraryViewSource,
+  /exposesSourceMaterialFilenames: false;[\s\S]*keepsVisiblePageCountsSeparate: true;[\s\S]*usesFullFilteredSummaryForOverview: true;[\s\S]*usesOwnerScopedSourceFilters: true;/,
+  'Activity library handoff privacy should name source-material filename, owner-scoped source-filter, and visible-page separation guards.'
+);
 assert.deepEqual(
   [...ACTIVITY_LIBRARY_PAGE_HANDOFF_ITEM_IDS],
   [
@@ -48655,6 +48666,7 @@ assert.deepEqual(
     hasActivities: filteredActivityLibraryPageView.hasActivities,
     resolvedSearch: filteredActivityLibraryPageView.resolvedSearch,
     scopeView: filteredActivityLibraryPageView.scopeView,
+    sourceScopeBoundary: filteredActivityLibraryPageView.sourceScopeBoundary,
     starterPreviewActivityIds:
       filteredActivityLibraryPageView.starterPreview.activities.map(
         (item) => item.id
@@ -48769,6 +48781,20 @@ assert.deepEqual(
       label: 'Current view',
       summary: 'Showing 25-25 of 31 activities on page 3 of 3.',
     },
+    sourceScopeBoundary: {
+      broadensBeyondOwner: false,
+      countsStarterPreviewAsOwned: false,
+      fullFilteredActivityCount: 31,
+      keepsVisiblePageCountsSeparate: true,
+      normalizedSearchQuery: 'Food words',
+      overviewActivityCount: 2,
+      scope: 'owner-activity-library-source-scope',
+      sourceFilter: 'worksheet',
+      statusFilter: 'archived',
+      templateFilter: 'quiz',
+      usesFullFilteredSummaryForOverview: true,
+      visiblePageActivityCount: 1,
+    },
     starterPreviewActivityIds: [],
     summaryMetrics: [
       {
@@ -48826,9 +48852,13 @@ assert.deepEqual(filteredActivityLibraryPageView.handoffView.privacy, {
   countsStarterPreviewAsOwned: false,
   exposesDerivativeDraftPayloads: false,
   exposesPrivateActivityContent: false,
+  exposesSourceMaterialFilenames: false,
   exposesSourceMaterialFileIds: false,
   exposesSourceMaterialStorageKeys: false,
   itemIds: [...ACTIVITY_LIBRARY_PAGE_HANDOFF_ITEM_IDS],
+  keepsVisiblePageCountsSeparate: true,
+  usesFullFilteredSummaryForOverview: true,
+  usesOwnerScopedSourceFilters: true,
 });
 assert.equal(filteredActivityLibraryHandoffValues.get('summary-total'), '2');
 assert.equal(
@@ -48943,6 +48973,28 @@ assert.equal(
 assert.equal(
   filteredActivityLibraryHandoffValues.get('starter-preview'),
   '0 starter previews'
+);
+assert.deepEqual(
+  buildActivityLibrarySourceScopeBoundary({
+    sourceFilter: 'audio',
+    statusFilter: 'active',
+    templateFilter: 'all',
+    totalActivities: Number.POSITIVE_INFINITY,
+    visibleCount: 5,
+  }),
+  {
+    broadensBeyondOwner: false,
+    countsStarterPreviewAsOwned: false,
+    fullFilteredActivityCount: 0,
+    keepsVisiblePageCountsSeparate: true,
+    overviewActivityCount: 0,
+    scope: 'owner-activity-library-source-scope',
+    sourceFilter: 'audio',
+    statusFilter: 'active',
+    templateFilter: 'all',
+    usesFullFilteredSummaryForOverview: true,
+    visiblePageActivityCount: 0,
+  }
 );
 for (const privateActivityLibraryValue of [
   'persisted-activity-1',

@@ -336,6 +336,21 @@ export type ActivityLibraryPageScopeView = {
   summary: string;
 };
 
+export type ActivityLibrarySourceScopeBoundary = {
+  broadensBeyondOwner: false;
+  countsStarterPreviewAsOwned: false;
+  fullFilteredActivityCount: number;
+  keepsVisiblePageCountsSeparate: true;
+  normalizedSearchQuery?: string;
+  overviewActivityCount: number;
+  scope: 'owner-activity-library-source-scope';
+  sourceFilter: ActivitySourceMaterialFilter;
+  statusFilter: ActivityLibraryStatus;
+  templateFilter: ActivityTemplateFilter;
+  usesFullFilteredSummaryForOverview: true;
+  visiblePageActivityCount: number;
+};
+
 export const ACTIVITY_LIBRARY_PAGE_HANDOFF_ITEM_IDS = [
   'owner-scope',
   'summary-total',
@@ -385,9 +400,13 @@ export type ActivityLibraryPageHandoffPrivacyView = {
   countsStarterPreviewAsOwned: false;
   exposesDerivativeDraftPayloads: false;
   exposesPrivateActivityContent: false;
+  exposesSourceMaterialFilenames: false;
   exposesSourceMaterialFileIds: false;
   exposesSourceMaterialStorageKeys: false;
   itemIds: ActivityLibraryPageHandoffItemId[];
+  keepsVisiblePageCountsSeparate: true;
+  usesFullFilteredSummaryForOverview: true;
+  usesOwnerScopedSourceFilters: true;
 };
 
 export type ActivityLibraryPageHandoffView = {
@@ -475,6 +494,7 @@ type ActivityLibraryPageViewModel<TItem extends ActivityLibraryPageItem> = {
   loadErrorMessage: string;
   resolvedSearch: ActivityLibraryPageResolvedSearch;
   scopeView: ActivityLibraryPageScopeView;
+  sourceScopeBoundary: ActivityLibrarySourceScopeBoundary;
   starterPreview: ActivityLibraryStarterPreview;
   summaryMetrics: ActivityLibrarySummaryMetric[];
   title: string;
@@ -815,6 +835,15 @@ export function buildActivityLibraryPageViewModel<
     template: resolvedSearch.templateFilter,
     total: totalActivities,
   });
+  const sourceScopeBoundary = buildActivityLibrarySourceScopeBoundary({
+    normalizedSearchQuery: resolvedSearch.normalizedSearchQuery,
+    sourceFilter: resolvedSearch.sourceFilter,
+    statusFilter: resolvedSearch.libraryStatus,
+    summary: data?.summary,
+    templateFilter: resolvedSearch.templateFilter,
+    totalActivities,
+    visibleCount: activities.length,
+  });
 
   return {
     activities,
@@ -851,6 +880,7 @@ export function buildActivityLibraryPageViewModel<
     loadErrorMessage: activityLibraryPageCopy.loadErrorMessage,
     resolvedSearch,
     scopeView,
+    sourceScopeBoundary,
     starterPreview: resolvedStarterPreview,
     summaryMetrics,
     title: activityLibraryPageCopy.title,
@@ -917,6 +947,47 @@ export function buildActivityLibraryRouteState<
     pageView,
     showLoadError: isError,
     status: 'ready',
+  };
+}
+
+export function buildActivityLibrarySourceScopeBoundary({
+  normalizedSearchQuery,
+  sourceFilter,
+  statusFilter,
+  summary,
+  templateFilter,
+  totalActivities,
+  visibleCount,
+}: {
+  normalizedSearchQuery?: string;
+  sourceFilter: ActivitySourceMaterialFilter;
+  statusFilter: ActivityLibraryStatus;
+  summary?: ActivityLibrarySummary;
+  templateFilter: ActivityTemplateFilter;
+  totalActivities: number;
+  visibleCount: number;
+}): ActivityLibrarySourceScopeBoundary {
+  const fullFilteredActivityCount =
+    normalizeActivityLibraryListCount(totalActivities);
+
+  return {
+    broadensBeyondOwner: false,
+    countsStarterPreviewAsOwned: false,
+    fullFilteredActivityCount,
+    keepsVisiblePageCountsSeparate: true,
+    ...(normalizedSearchQuery ? { normalizedSearchQuery } : {}),
+    overviewActivityCount: normalizeActivityLibraryListCount(
+      summary?.totalActivities ?? fullFilteredActivityCount
+    ),
+    scope: 'owner-activity-library-source-scope',
+    sourceFilter,
+    statusFilter,
+    templateFilter,
+    usesFullFilteredSummaryForOverview: true,
+    visiblePageActivityCount: Math.min(
+      normalizeActivityLibraryListCount(visibleCount),
+      fullFilteredActivityCount
+    ),
   };
 }
 
@@ -1445,9 +1516,13 @@ function buildActivityLibraryPageHandoffPrivacyView(
     countsStarterPreviewAsOwned: false,
     exposesDerivativeDraftPayloads: false,
     exposesPrivateActivityContent: false,
+    exposesSourceMaterialFilenames: false,
     exposesSourceMaterialFileIds: false,
     exposesSourceMaterialStorageKeys: false,
     itemIds: itemViews.map((item) => item.id),
+    keepsVisiblePageCountsSeparate: true,
+    usesFullFilteredSummaryForOverview: true,
+    usesOwnerScopedSourceFilters: true,
   };
 }
 
