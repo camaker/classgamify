@@ -34,6 +34,10 @@ const SECRET_RUNTIME_ITEM_ID = 'secret-runtime-id';
 const SECRET_TEACHER_ANSWER = 'SECRET_TEACHER_ANSWER';
 
 const PUBLIC_SOURCE = readFileSync('src/assignments/public.ts', 'utf8');
+const PUBLIC_ANSWER_FEEDBACK_SOURCE = readFileSync(
+  'src/components/activities/public-answer-feedback.tsx',
+  'utf8'
+);
 const RESULT_ANSWER_VIEW_SOURCE = readFileSync(
   'src/assignments/result-answer-view.ts',
   'utf8'
@@ -177,6 +181,24 @@ test('assignment answer feedback evidence comes from shared parser, review, and 
   assert.match(RESULT_FORMAT_SOURCE, /getUniqueAcceptedAnswers/);
   assert.match(STUDENT_RUNNER_VIEW_SOURCE, /buildPublicAnswerFeedbackView/);
   assertNoPrivateAnswerFeedbackText(JSON.stringify(EVIDENCE));
+});
+
+test('public answer feedback renders stable semantic DOM relationships', () => {
+  assert.match(
+    PUBLIC_ANSWER_FEEDBACK_SOURCE,
+    /useId[\s\S]*const feedbackId = useId\(\)[\s\S]*const descriptionId = `\$\{feedbackId\}-description`[\s\S]*const statusLabelId = `\$\{feedbackId\}-status-label`[\s\S]*const statusValueId = `\$\{feedbackId\}-status-value`[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*aria-label=\{feedback\.ariaLabel\}[\s\S]*id=\{statusLabelId\}[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*aria-label=\{feedback\.statusAriaLabel\}[\s\S]*aria-labelledby=\{`\$\{statusLabelId\} \$\{statusValueId\}`\}[\s\S]*id=\{statusValueId\}[\s\S]*id=\{descriptionId\}/,
+    'Public answer feedback should expose the shared status with stable label, value, and description relationships without using raw runtime item ids.'
+  );
+  assert.match(
+    PUBLIC_ANSWER_FEEDBACK_SOURCE,
+    /PublicAnswerFeedbackDetailLine[\s\S]*PublicAnswerFeedbackDetailLineItem[\s\S]*descriptionId=\{descriptionId\}[\s\S]*feedbackId=\{feedbackId\}[\s\S]*line=\{line\}[\s\S]*function PublicAnswerFeedbackDetailLineItem[\s\S]*const labelId = `\$\{feedbackId\}-\$\{line\.id\}-label`[\s\S]*const valueId = `\$\{feedbackId\}-\$\{line\.id\}-value`[\s\S]*data-feedback-detail=\{line\.id\}[\s\S]*id=\{labelId\}[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*aria-label=\{line\.ariaLabel\}[\s\S]*aria-labelledby=\{`\$\{labelId\} \$\{valueId\}`\}[\s\S]*id=\{valueId\}/,
+    'Public answer feedback detail lines should expose submitted answer, correct answer, accepted alternatives, and explanations as stable labelled outputs.'
+  );
+  assert.doesNotMatch(
+    PUBLIC_ANSWER_FEEDBACK_SOURCE,
+    /reviewItem\.itemId/,
+    'Public answer feedback DOM ids should not be derived from raw runtime item ids.'
+  );
 });
 
 function buildAnswerFeedbackEvidence(): AssignmentAnswerFeedbackHandoffEvidence {

@@ -9606,8 +9606,18 @@ assert.doesNotMatch(
 );
 assert.match(
   publicAnswerFeedbackSource,
-  /<section[\s\S]*aria-label=\{feedback\.ariaLabel\}[\s\S]*aria-label=\{feedback\.statusAriaLabel\}[\s\S]*feedback\.description[\s\S]*<dl[\s\S]*feedback\.detailLines\.map[\s\S]*line\.id[\s\S]*line\.label[\s\S]*<output aria-label=\{line\.ariaLabel\}>\{line\.text\}<\/output>/,
-  'Public answer feedback component should render ordered semantic feedback detail lines prepared by the assignment-domain feedback view.'
+  /useId[\s\S]*const feedbackId = useId\(\)[\s\S]*const descriptionId = `\$\{feedbackId\}-description`[\s\S]*const statusLabelId = `\$\{feedbackId\}-status-label`[\s\S]*const statusValueId = `\$\{feedbackId\}-status-value`[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*aria-label=\{feedback\.ariaLabel\}[\s\S]*id=\{statusLabelId\}[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*aria-label=\{feedback\.statusAriaLabel\}[\s\S]*aria-labelledby=\{`\$\{statusLabelId\} \$\{statusValueId\}`\}[\s\S]*id=\{statusValueId\}[\s\S]*id=\{descriptionId\}/,
+  'Public answer feedback component should render the shared status as a stable label, value, and description relationship.'
+);
+assert.match(
+  publicAnswerFeedbackSource,
+  /PublicAnswerFeedbackDetailLine[\s\S]*PublicAnswerFeedbackDetailLineItem[\s\S]*descriptionId=\{descriptionId\}[\s\S]*feedbackId=\{feedbackId\}[\s\S]*line=\{line\}[\s\S]*function PublicAnswerFeedbackDetailLineItem[\s\S]*const labelId = `\$\{feedbackId\}-\$\{line\.id\}-label`[\s\S]*const valueId = `\$\{feedbackId\}-\$\{line\.id\}-value`[\s\S]*data-feedback-detail=\{line\.id\}[\s\S]*id=\{labelId\}[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*aria-label=\{line\.ariaLabel\}[\s\S]*aria-labelledby=\{`\$\{labelId\} \$\{valueId\}`\}[\s\S]*id=\{valueId\}/,
+  'Public answer feedback component should render ordered semantic feedback detail lines with stable label, value, and description relationships.'
+);
+assert.doesNotMatch(
+  publicAnswerFeedbackSource,
+  /reviewItem\.itemId/,
+  'Public answer feedback DOM relationships should not derive ids from raw runtime item ids.'
 );
 const earlyStudentRunnerViewSource = readFileSync(
   'src/assignments/student-runner-view.ts',
