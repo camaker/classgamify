@@ -6943,13 +6943,13 @@ assert.match(
 );
 assert.match(
   activityTemplateReadinessPanelSource,
-  /function ActivityTemplateQuizChoiceGenerationHandoff[\s\S]*data-handoff="question-choice-generation"[\s\S]*handoffView\.title[\s\S]*handoffView\.description[\s\S]*handoffView\.itemViews\.map[\s\S]*ActivityTemplateQuizChoiceGenerationHandoffItem[\s\S]*key=\{item\.id\}/,
-  'Activity template readiness panel should render prepared quiz choice generation handoff views.'
+  /function ActivityTemplateQuizChoiceGenerationHandoff[\s\S]*const titleId = 'question-choice-generation-handoff-title'[\s\S]*const descriptionId = 'question-choice-generation-handoff-description'[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*aria-labelledby=\{titleId\}[\s\S]*data-handoff="question-choice-generation"[\s\S]*id=\{titleId\}[\s\S]*id=\{descriptionId\}[\s\S]*handoffView\.itemViews\.map[\s\S]*ActivityTemplateQuizChoiceGenerationHandoffItem[\s\S]*key=\{item\.id\}/,
+  'Activity template readiness panel should render prepared quiz choice generation handoff views as labelled sections.'
 );
 assert.match(
   activityTemplateReadinessPanelSource,
-  /function ActivityTemplateQuizChoiceGenerationHandoffItem[\s\S]*data-handoff-item=\{item\.id\}[\s\S]*item\.label[\s\S]*<output aria-label=\{item\.ariaLabel\}>\{item\.value\}<\/output>[\s\S]*item\.description/,
-  'Activity template readiness panel should render quiz choice generation handoff items with label, output, and description.'
+  /function ActivityTemplateQuizChoiceGenerationHandoffItem[\s\S]*const labelId = `question-choice-generation-handoff-\$\{item\.id\}-label`[\s\S]*const valueId = `question-choice-generation-handoff-\$\{item\.id\}-value`[\s\S]*const descriptionId = `question-choice-generation-handoff-\$\{item\.id\}-description`[\s\S]*data-handoff-item=\{item\.id\}[\s\S]*id=\{labelId\}[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*aria-label=\{item\.ariaLabel\}[\s\S]*aria-labelledby=\{`\$\{labelId\} \$\{valueId\}`\}[\s\S]*id=\{valueId\}[\s\S]*id=\{descriptionId\}/,
+  'Activity template readiness panel should render quiz choice generation handoff items with stable label, value, and description relationships.'
 );
 assert.doesNotMatch(
   activityTemplateReadinessPanelSource,

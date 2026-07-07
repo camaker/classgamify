@@ -142,14 +142,23 @@ function ActivityTemplateQuizChoiceGenerationHandoff({
 }: {
   handoffView: QuestionChoiceGenerationHandoffView;
 }) {
+  const titleId = 'question-choice-generation-handoff-title';
+  const descriptionId = 'question-choice-generation-handoff-description';
+
   return (
     <section
-      aria-label={handoffView.title}
+      aria-describedby={descriptionId}
+      aria-labelledby={titleId}
       className="mt-4 rounded-lg border bg-background/70 p-3"
       data-handoff="question-choice-generation"
     >
-      <h5 className="font-medium text-xs leading-5">{handoffView.title}</h5>
-      <p className="mt-1 text-muted-foreground text-xs leading-5">
+      <h5 className="font-medium text-xs leading-5" id={titleId}>
+        {handoffView.title}
+      </h5>
+      <p
+        className="mt-1 text-muted-foreground text-xs leading-5"
+        id={descriptionId}
+      >
         {handoffView.description}
       </p>
       <dl className="mt-3 grid gap-2 sm:grid-cols-2 lg:grid-cols-5">
@@ -169,16 +178,32 @@ function ActivityTemplateQuizChoiceGenerationHandoffItem({
 }: {
   item: QuestionChoiceGenerationHandoffItemView;
 }) {
+  const labelId = `question-choice-generation-handoff-${item.id}-label`;
+  const valueId = `question-choice-generation-handoff-${item.id}-value`;
+  const descriptionId = `question-choice-generation-handoff-${item.id}-description`;
+
   return (
     <div
       className="rounded-md border bg-muted/20 p-2.5"
       data-handoff-item={item.id}
     >
-      <dt className="text-muted-foreground text-xs leading-5">{item.label}</dt>
+      <dt className="text-muted-foreground text-xs leading-5" id={labelId}>
+        {item.label}
+      </dt>
       <dd className="mt-1 break-words font-medium text-xs leading-5">
-        <output aria-label={item.ariaLabel}>{item.value}</output>
+        <output
+          aria-describedby={descriptionId}
+          aria-label={item.ariaLabel}
+          aria-labelledby={`${labelId} ${valueId}`}
+          id={valueId}
+        >
+          {item.value}
+        </output>
       </dd>
-      <dd className="mt-1 text-muted-foreground text-xs leading-5">
+      <dd
+        className="mt-1 text-muted-foreground text-xs leading-5"
+        id={descriptionId}
+      >
         {item.description}
       </dd>
     </div>

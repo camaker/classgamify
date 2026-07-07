@@ -1,4 +1,5 @@
 import assert from 'node:assert/strict';
+import { readFileSync } from 'node:fs';
 import test from 'node:test';
 import {
   buildQuestionChoiceGenerationHandoffView,
@@ -21,6 +22,11 @@ const SECRET_PROMPT_ONE = 'SECRET_PROMPT_ONE';
 const SECRET_PROMPT_TWO = 'SECRET_PROMPT_TWO';
 const SECRET_PROMPT_THREE = 'SECRET_PROMPT_THREE';
 const SECRET_VOCABULARY = 'SECRET_VOCABULARY';
+
+const TEMPLATE_READINESS_PANEL_SOURCE = readFileSync(
+  'src/components/activities/activity-template-readiness-panel.tsx',
+  'utf8'
+);
 
 const mixedChoiceContent: ActivityContent = {
   difficulty: 'starter',
@@ -242,6 +248,19 @@ test('question choice generation handoff keeps empty content safe', () => {
   assert.equal(
     getHandoffValue(handoffView, 'privacy-guard'),
     'Choice text hidden'
+  );
+});
+
+test('question choice generation handoff renders stable DOM relationships', () => {
+  assert.match(
+    TEMPLATE_READINESS_PANEL_SOURCE,
+    /QuestionChoiceGenerationHandoffItemView[\s\S]*QuestionChoiceGenerationHandoffView[\s\S]*function ActivityTemplateQuizChoiceGenerationHandoff[\s\S]*const titleId = 'question-choice-generation-handoff-title'[\s\S]*const descriptionId = 'question-choice-generation-handoff-description'[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*aria-labelledby=\{titleId\}[\s\S]*data-handoff="question-choice-generation"[\s\S]*id=\{titleId\}[\s\S]*id=\{descriptionId\}[\s\S]*handoffView\.itemViews\.map[\s\S]*ActivityTemplateQuizChoiceGenerationHandoffItem/,
+    'Question choice generation handoff should render a labelled section tied to its prepared description.'
+  );
+  assert.match(
+    TEMPLATE_READINESS_PANEL_SOURCE,
+    /function ActivityTemplateQuizChoiceGenerationHandoffItem[\s\S]*const labelId = `question-choice-generation-handoff-\$\{item\.id\}-label`[\s\S]*const valueId = `question-choice-generation-handoff-\$\{item\.id\}-value`[\s\S]*const descriptionId = `question-choice-generation-handoff-\$\{item\.id\}-description`[\s\S]*data-handoff-item=\{item\.id\}[\s\S]*id=\{labelId\}[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*aria-label=\{item\.ariaLabel\}[\s\S]*aria-labelledby=\{`\$\{labelId\} \$\{valueId\}`\}[\s\S]*id=\{valueId\}[\s\S]*id=\{descriptionId\}/,
+    'Question choice generation handoff should render each safe slice with stable label, value, and description relationships.'
   );
 });
 
