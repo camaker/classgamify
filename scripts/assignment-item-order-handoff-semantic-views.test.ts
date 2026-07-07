@@ -25,6 +25,9 @@ const SECRET_PROMPT = 'SECRET_ORDER_PROMPT_SHOULD_NOT_LEAK';
 const SECRET_SHARE_SLUG = 'SECRET_SHARE_SLUG_SHOULD_NOT_LEAK';
 const SECRET_SOURCE_MATERIAL = 'SECRET_SOURCE_MATERIAL_SHOULD_NOT_LEAK';
 
+const ITEM_ORDER_SOURCE = readProjectFile('src/assignments/item-order.ts');
+const TEST_CATALOG_SOURCE = readProjectFile('tests/e2e/TEST-CATALOG.md');
+
 const activityContent: ActivityContent = {
   difficulty: 'starter',
   gradeBand: 'Grade 4',
@@ -293,6 +296,51 @@ test('assignment item order handoff keeps missing integration evidence explicit'
   assertNoPrivateOrderingText(JSON.stringify(handoffView));
 });
 
+test('assignment item order helper preserves stable normalized delivery order', () => {
+  const runtimeItems = getRuntimeItems('quiz', activityContent);
+  const snapshotIds = getRuntimeItemIds(runtimeItems);
+  const shuffledFromTrimmedSeed = orderAssignmentRuntimeItems({
+    items: runtimeItems,
+    shareSlug: ' class-a-share ',
+    shuffleItems: true,
+  });
+  const shuffledFromNormalizedSeed = orderAssignmentRuntimeItems({
+    items: runtimeItems,
+    shareSlug: ' ｃｌａｓｓ-a-share ',
+    shuffleItems: true,
+  });
+  const shuffledFromAlternateSeed = orderAssignmentRuntimeItems({
+    items: runtimeItems,
+    shareSlug: 'class-a-share-2',
+    shuffleItems: true,
+  });
+  const fixedOrder = orderAssignmentRuntimeItems({
+    items: runtimeItems,
+    shareSlug: 'class-a-share',
+    shuffleItems: false,
+  });
+
+  assert.deepEqual(
+    getRuntimeItemIds(shuffledFromTrimmedSeed),
+    getRuntimeItemIds(shuffledFromNormalizedSeed)
+  );
+  assert.notDeepEqual(
+    getRuntimeItemIds(shuffledFromTrimmedSeed),
+    getRuntimeItemIds(shuffledFromAlternateSeed)
+  );
+  assert.deepEqual(getRuntimeItemIds(fixedOrder), snapshotIds);
+  assert.notEqual(fixedOrder, runtimeItems);
+  assert.deepEqual(getRuntimeItemIds(runtimeItems), snapshotIds);
+  assertNoPrivateOrderingText(
+    JSON.stringify(
+      buildAssignmentItemOrderHandoffView({
+        ...buildPassingEvidence(),
+        itemCount: runtimeItems.length,
+      })
+    )
+  );
+});
+
 test('assignment item order handoff localizes Chinese order boundaries', () => {
   overwriteGetLocale(() => 'zh');
 
@@ -323,6 +371,31 @@ test('assignment item order handoff localizes Chinese order boundaries', () => {
   assert.equal(getHandoffValue(handoffView, 'privacy-guard'), '已隐藏');
 
   overwriteGetLocale(() => 'en');
+});
+
+test('assignment item order focused gate and helper source stay documented', () => {
+  assert.match(
+    ITEM_ORDER_SOURCE,
+    /export function orderAssignmentRuntimeItems[\s\S]*stableShuffle\(items, normalizeAssignmentShareSlug\(shareSlug\)\)[\s\S]*: \[\.\.\.items\]/,
+    'Assignment item ordering should seed shuffle through normalized share slugs and preserve fixed snapshot order through a copied array.'
+  );
+  assert.match(
+    TEST_CATALOG_SOURCE,
+    /pnpm exec tsx --test scripts\/assignment-item-order-handoff-semantic-views\.test\.ts/,
+    'E2E catalog should point item-order work at the focused script gate.'
+  );
+  for (const boundary of [
+    'share-slug normalization',
+    'public payload ordering',
+    'student submit/review ordering',
+    'printable worksheet ordering',
+  ]) {
+    assert.match(
+      TEST_CATALOG_SOURCE,
+      new RegExp(boundary.replace('/', '\\/').replace(/\s+/g, '\\s+')),
+      `E2E catalog should mention item-order boundary: ${boundary}`
+    );
+  }
 });
 
 function buildQuestion(id: string) {

@@ -45,6 +45,12 @@ Assignment attempt duration has a fast script-level gate via
 run it when changing timer start plans, submission duration normalization,
 student timer badges, result duration labels, result average duration, or CSV
 duration fields.
+Assignment item ordering has a fast script-level gate via
+`pnpm exec tsx --test scripts/assignment-item-order-handoff-semantic-views.test.ts`;
+run it when changing shuffle helper logic, share-slug normalization, public
+payload ordering, student submit/review ordering, printable worksheet ordering,
+delivery summaries, publish previews, public rule summaries, or CSV/export
+delivery-policy fields.
 Storage upload readiness has a fast script-level gate via
 `pnpm exec tsx --test scripts/storage-upload-readiness.test.ts`; run it when
 changing classroom source-material upload validation, filename sanitization,
