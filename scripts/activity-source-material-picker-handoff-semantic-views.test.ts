@@ -27,6 +27,7 @@ const COMPONENT_SOURCE = readFileSync(
   'src/components/activities/activity-source-materials-field.tsx',
   'utf8'
 );
+const TEST_CATALOG_SOURCE = readFileSync('tests/e2e/TEST-CATALOG.md', 'utf8');
 
 const selectedMaterials = normalizeActivityMaterialReferences([
   {
@@ -255,8 +256,40 @@ test('source material picker handoff renders inside the activity editor field', 
   );
   assert.match(
     COMPONENT_SOURCE,
-    /data-handoff="activity-source-material-picker"[\s\S]*handoffView\.itemViews\.map[\s\S]*data-handoff-item=\{itemView\.id\}/
+    /ActivitySourceMaterialPickerHandoffView[\s\S]*function ActivitySourceMaterialPickerHandoff[\s\S]*const titleId = 'activity-source-material-picker-handoff-title'[\s\S]*const descriptionId = 'activity-source-material-picker-handoff-description'[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*aria-labelledby=\{titleId\}[\s\S]*className="sr-only"[\s\S]*data-handoff="activity-source-material-picker"[\s\S]*id=\{titleId\}[\s\S]*id=\{descriptionId\}[\s\S]*handoffView\.itemViews\.map[\s\S]*ActivitySourceMaterialPickerHandoffItem[\s\S]*function ActivitySourceMaterialPickerHandoffItem[\s\S]*itemView: ActivitySourceMaterialPickerHandoffView\['itemViews'\]\[number\][\s\S]*const labelId = `activity-source-material-picker-handoff-\$\{itemView\.id\}-label`[\s\S]*const valueId = `activity-source-material-picker-handoff-\$\{itemView\.id\}-value`[\s\S]*const descriptionId =[\s\S]*`activity-source-material-picker-handoff-\$\{itemView\.id\}-description`[\s\S]*data-handoff-item=\{itemView\.id\}[\s\S]*id=\{labelId\}[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*aria-label=\{itemView\.ariaLabel\}[\s\S]*aria-labelledby=\{`\$\{labelId\} \$\{valueId\}`\}[\s\S]*id=\{valueId\}[\s\S]*id=\{descriptionId\}/
   );
+});
+
+test('source material picker focused gate is documented', () => {
+  const normalizedCatalog = TEST_CATALOG_SOURCE.replace(/\s+/g, ' ');
+
+  assert.match(
+    TEST_CATALOG_SOURCE,
+    /pnpm exec tsx --test scripts\/activity-source-material-picker-handoff-semantic-views\.test\.ts/
+  );
+  for (const boundary of [
+    'owner scope',
+    'storage load gate',
+    'picker status',
+    'selected count',
+    'available count',
+    'attachment limit',
+    'attached summary',
+    'attach/remove actions',
+    'upload entry',
+    'material kind metadata',
+    'content-type metadata',
+    'size metadata',
+    'ActivityContent.sourceMaterials reference',
+    'AI extraction readiness',
+    'student payload guard',
+    'file-id guard',
+    'filename display boundary',
+    'storage-key guard',
+    'hidden activity-source-material-picker handoff',
+  ]) {
+    assert.match(normalizedCatalog, new RegExp(boundary));
+  }
 });
 
 function getPickerHandoffValues(view: ActivitySourceMaterialPickerHandoffView) {

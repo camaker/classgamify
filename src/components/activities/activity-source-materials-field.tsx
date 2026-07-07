@@ -143,16 +143,40 @@ function ActivitySourceMaterialPickerHandoff({
       <p id={descriptionId}>{handoffView.description}</p>
       <dl>
         {handoffView.itemViews.map((itemView) => (
-          <div data-handoff-item={itemView.id} key={itemView.id}>
-            <dt>{itemView.label}</dt>
-            <dd>
-              <output aria-label={itemView.ariaLabel}>{itemView.value}</output>
-              <span>{itemView.description}</span>
-            </dd>
-          </div>
+          <ActivitySourceMaterialPickerHandoffItem
+            itemView={itemView}
+            key={itemView.id}
+          />
         ))}
       </dl>
     </section>
+  );
+}
+
+function ActivitySourceMaterialPickerHandoffItem({
+  itemView,
+}: {
+  itemView: ActivitySourceMaterialPickerHandoffView['itemViews'][number];
+}) {
+  const labelId = `activity-source-material-picker-handoff-${itemView.id}-label`;
+  const valueId = `activity-source-material-picker-handoff-${itemView.id}-value`;
+  const descriptionId = `activity-source-material-picker-handoff-${itemView.id}-description`;
+
+  return (
+    <div data-handoff-item={itemView.id}>
+      <dt id={labelId}>{itemView.label}</dt>
+      <dd>
+        <output
+          aria-describedby={descriptionId}
+          aria-label={itemView.ariaLabel}
+          aria-labelledby={`${labelId} ${valueId}`}
+          id={valueId}
+        >
+          {itemView.value}
+        </output>
+        <span id={descriptionId}>{itemView.description}</span>
+      </dd>
+    </div>
   );
 }
 

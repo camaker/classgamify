@@ -61,6 +61,14 @@ Storage upload readiness has a fast script-level gate via
 changing classroom source-material upload validation, filename sanitization,
 content-type/extension safety, owner/public folder planning, same-origin file
 proxy URLs, or the R2 provider upload plan.
+Activity source-material picker has a fast script-level gate via
+`pnpm exec tsx --test scripts/activity-source-material-picker-handoff-semantic-views.test.ts`;
+run it when changing owner scope, storage load gate, picker status, selected
+count, available count, attachment limit, attached summary, attach/remove
+actions, upload entry, material kind metadata, content-type metadata, size
+metadata, ActivityContent.sourceMaterials reference, AI extraction readiness,
+student payload guard, file-id guard, filename display boundary, storage-key
+guard, or the hidden activity-source-material-picker handoff.
 Assignment result student search has a fast script-level gate via
 `pnpm exec tsx --test scripts/assignment-result-student-search-handoff-semantic-views.test.ts`;
 run it when changing result-page student search route parsing, query
