@@ -77,6 +77,13 @@ gate via
 run it when changing activity library overview metrics, current-view scope,
 source-material filters, starter-preview boundaries, visible-card counts, or the
 hidden activity-library handoff.
+Activity duplicate safety has a fast script-level gate via
+`pnpm exec tsx --test scripts/activity-duplicate-handoff-semantic-views.test.ts`;
+run it when changing owner-scoped duplicate availability, persisted-source
+requirements, archived restore gates, draft visibility reset, duplicate title
+strategy/limit, template preservation, structured content cloning, source
+material reference normalization, assignment snapshot protection, original
+activity protection, or the hidden activity duplicate handoff.
 Deterministic template remix safety has a fast script-level gate via
 `pnpm exec tsx --test scripts/activity-template-remix-handoff-semantic-views.test.ts`;
 run it when changing template readiness, suggested Copy as actions,

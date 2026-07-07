@@ -1,4 +1,5 @@
 import assert from 'node:assert/strict';
+import { readFileSync } from 'node:fs';
 import test from 'node:test';
 import {
   ACTIVITY_DUPLICATE_HANDOFF_ITEM_IDS,
@@ -21,6 +22,12 @@ const SECRET_PROMPT = 'SECRET_PROMPT_TEXT';
 const SECRET_SOURCE_SUMMARY = 'SECRET_SOURCE_SUMMARY_TEXT';
 const SECRET_STORAGE_KEY = 'userfiles/teacher/private-key.pdf';
 const SECRET_TEACHER_NOTE = 'SECRET_TEACHER_NOTE';
+
+const ACTIVITY_LIBRARY_CARD_SOURCE = readFileSync(
+  'src/components/activities/activity-library-card.tsx',
+  'utf8'
+);
+const TEST_CATALOG_SOURCE = readFileSync('tests/e2e/TEST-CATALOG.md', 'utf8');
 
 const duplicateSourceContent: ActivityContent = {
   difficulty: 'core',
@@ -276,6 +283,81 @@ test('activity duplicate handoff keeps archived and preview sources blocked', ()
   );
   assertNoPrivateDuplicateHandoffText(JSON.stringify(archivedHandoffView));
   assertNoPrivateDuplicateHandoffText(JSON.stringify(previewHandoffView));
+});
+
+test('activity duplicate handoff localizes Chinese draft-copy boundaries', () => {
+  overwriteGetLocale(() => 'zh');
+  try {
+    const handoffView = buildActivityDuplicateHandoffView({
+      content: duplicateSourceContent,
+      description: SECRET_DESCRIPTION,
+      persisted: true,
+      status: 'private',
+      templateType: 'group-sort',
+      title: '食物词汇复习',
+    });
+
+    assert.equal(handoffView.title, '复制安全检查');
+    assert.match(handoffView.description, /可编辑草稿/);
+    assert.equal(
+      getDuplicateHandoffValue(handoffView, 'action-availability'),
+      '可执行'
+    );
+    assert.equal(
+      getDuplicateHandoffValue(handoffView, 'lifecycle-gate'),
+      '可派生活动'
+    );
+    assert.equal(
+      getDuplicateHandoffValue(handoffView, 'draft-output'),
+      '草稿副本'
+    );
+    assert.equal(
+      getDuplicateHandoffValue(handoffView, 'visibility-reset'),
+      '草稿可见性'
+    );
+    assert.equal(
+      getDuplicateHandoffValue(handoffView, 'template-transform'),
+      '不转换'
+    );
+    assertNoPrivateDuplicateHandoffText(JSON.stringify(handoffView));
+  } finally {
+    overwriteGetLocale(() => 'en');
+  }
+});
+
+test('activity duplicate handoff renders stable DOM relationships', () => {
+  assert.match(
+    ACTIVITY_LIBRARY_CARD_SOURCE,
+    /ActivityDuplicateHandoffItemView[\s\S]*ActivityDuplicateHandoffView[\s\S]*function ActivityLibraryDuplicateHandoff[\s\S]*const titleId = useId\(\)[\s\S]*const descriptionId = useId\(\)[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*aria-labelledby=\{titleId\}[\s\S]*className="sr-only"[\s\S]*data-handoff="activity-duplicate"[\s\S]*id=\{titleId\}[\s\S]*id=\{descriptionId\}[\s\S]*handoff\.itemViews\.map[\s\S]*ActivityLibraryDuplicateHandoffItem[\s\S]*function ActivityLibraryDuplicateHandoffItem[\s\S]*const labelId = `activity-duplicate-handoff-\$\{item\.id\}-label`[\s\S]*const valueId = `activity-duplicate-handoff-\$\{item\.id\}-value`[\s\S]*const descriptionId = `activity-duplicate-handoff-\$\{item\.id\}-description`[\s\S]*data-handoff-item=\{item\.id\}[\s\S]*id=\{labelId\}[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*aria-label=\{item\.ariaLabel\}[\s\S]*aria-labelledby=\{`\$\{labelId\} \$\{valueId\}`\}[\s\S]*id=\{valueId\}[\s\S]*id=\{descriptionId\}/,
+    'Activity duplicate handoff should render each draft-copy slice with stable label, value, and description relationships.'
+  );
+});
+
+test('activity duplicate focused gate is documented', () => {
+  assert.match(
+    TEST_CATALOG_SOURCE,
+    /pnpm exec tsx --test scripts\/activity-duplicate-handoff-semantic-views\.test\.ts/,
+    'E2E catalog should point activity duplicate work at the focused script gate.'
+  );
+  for (const boundary of [
+    'owner-scoped duplicate availability',
+    'persisted-source requirements',
+    'archived restore gates',
+    'draft visibility reset',
+    'duplicate title strategy/limit',
+    'template preservation',
+    'structured content cloning',
+    'source material reference normalization',
+    'assignment snapshot protection',
+    'original activity protection',
+    'hidden activity duplicate handoff',
+  ]) {
+    assert.match(
+      TEST_CATALOG_SOURCE,
+      new RegExp(boundary.replace(/[ /-]+/g, '[\\s/-]+')),
+      `E2E catalog should mention activity duplicate boundary: ${boundary}`
+    );
+  }
 });
 
 function getDuplicateHandoffValue(
