@@ -27,6 +27,7 @@ const ACTIVITY_DRAFT_META_SUMMARY_SOURCE = readFileSync(
   'src/components/activities/activity-draft-meta-summary.tsx',
   'utf8'
 );
+const TEST_CATALOG_SOURCE = readFileSync('tests/e2e/TEST-CATALOG.md', 'utf8');
 
 const reviewedDraftInput: CreateActivityInput = {
   description: 'Weather vocabulary review',
@@ -372,6 +373,29 @@ test('AI draft meta handoff renders stable DOM relationships', () => {
     /ActivityDraftMetaHandoffItemView[\s\S]*ActivityDraftMetaHandoffView[\s\S]*function ActivityDraftMetaHandoff[\s\S]*const titleId = 'activity-draft-meta-handoff-title'[\s\S]*const descriptionId = 'activity-draft-meta-handoff-description'[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*aria-labelledby=\{titleId\}[\s\S]*id=\{titleId\}[\s\S]*id=\{descriptionId\}[\s\S]*handoffView\.itemViews\.map[\s\S]*ActivityDraftMetaHandoffItem[\s\S]*function ActivityDraftMetaHandoffItem[\s\S]*const labelId = `activity-draft-meta-handoff-\$\{item\.id\}-label`[\s\S]*const valueId = `activity-draft-meta-handoff-\$\{item\.id\}-value`[\s\S]*const descriptionId = `activity-draft-meta-handoff-\$\{item\.id\}-description`[\s\S]*data-handoff-item=\{item\.id\}[\s\S]*id=\{labelId\}[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*aria-label=\{item\.ariaLabel\}[\s\S]*aria-labelledby=\{`\$\{labelId\} \$\{valueId\}`\}[\s\S]*id=\{valueId\}[\s\S]*id=\{descriptionId\}/,
     'AI draft meta save handoff should render each review-before-save slice with stable label, value, and description relationships.'
   );
+});
+
+test('AI draft meta focused gate is documented', () => {
+  assert.match(
+    TEST_CATALOG_SOURCE,
+    /pnpm exec tsx --test scripts\/activity-draft-meta-handoff-semantic-views\.test\.ts/,
+    'E2E catalog should point AI draft metadata work at the focused script gate.'
+  );
+  for (const boundary of [
+    'draft coverage counts',
+    'provider/model/notice trust provenance',
+    'structured review checklists',
+    'ready/locked template diagnostics',
+    'quiz-choice readiness',
+    'safe/omitted source provenance',
+    'save/publish boundaries',
+  ]) {
+    assert.match(
+      TEST_CATALOG_SOURCE,
+      new RegExp(boundary.replace(/[ /-]+/g, '[\\s/-]+')),
+      `E2E catalog should mention AI draft meta boundary: ${boundary}`
+    );
+  }
 });
 
 function getHandoffValue(
