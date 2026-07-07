@@ -40,6 +40,11 @@ Storage upload readiness has a fast script-level gate via
 changing classroom source-material upload validation, filename sanitization,
 content-type/extension safety, owner/public folder planning, same-origin file
 proxy URLs, or the R2 provider upload plan.
+Assignment result student search has a fast script-level gate via
+`pnpm exec tsx --test scripts/assignment-result-student-search-handoff-semantic-views.test.ts`;
+run it when changing result-page student search route parsing, query
+normalization, student/attempt/review filtering, copy-scope alignment, search
+empty states, or the hidden student-search handoff.
 
 ## Test Harness
 

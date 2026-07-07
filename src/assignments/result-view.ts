@@ -88,6 +88,10 @@ import {
   type AssignmentStudentSummarySortHandoffView,
 } from '@/assignments/student-summary-sort-handoff';
 import {
+  buildAssignmentResultStudentSearchHandoffView,
+  type AssignmentResultStudentSearchHandoffView,
+} from '@/assignments/result-student-search-handoff';
+import {
   buildAssignmentAttemptReviewCardHandoffEvidence,
   buildAssignmentAttemptReviewCardHandoffView,
   type AssignmentAttemptReviewCardHandoffView,
@@ -870,6 +874,7 @@ export type AssignmentResultsPageViewModel<
   reviewScopeView: AssignmentResultReviewScopeView;
   sectionState: AssignmentResultSectionState;
   sectionViews: AssignmentResultSectionViews;
+  studentSearchHandoffView: AssignmentResultStudentSearchHandoffView;
   studentSummaryRowViews: AssignmentResultStudentSummaryRowView[];
   studentSummaryTableView: AssignmentResultStudentSummaryTableView;
   title: string;
@@ -2625,6 +2630,15 @@ export function buildAssignmentResultsPageViewModel<
     summary: resultView.reviewScope.summary,
     viewState,
   });
+  const studentSearchHandoffView =
+    buildAssignmentResultStudentSearchHandoffView({
+      search: viewState.studentSearch,
+      searchDescription: controlViews.studentSearch.searchDescription,
+      searchStatusDescription:
+        controlViews.studentSearch.searchStatusView.description,
+      searchStatusLabel: controlViews.studentSearch.searchStatusView.value,
+      summary: resultView.reviewScope.summary,
+    });
   const attemptTableView = data
     ? buildAssignmentAttemptTableView({
         rows: resultView.filteredAttemptRows,
@@ -2811,6 +2825,7 @@ export function buildAssignmentResultsPageViewModel<
     reviewScopeView,
     sectionState,
     sectionViews,
+    studentSearchHandoffView,
     studentSummaryRowViews,
     studentSummaryTableView,
     title,

@@ -188,6 +188,7 @@ function LoadedAssignmentResultsPage({
             onSortChange={(value) =>
               onControlChange({ control: 'student-sort', value })
             }
+            searchHandoffView={pageView.studentSearchHandoffView}
             view={pageView.controlViews.studentSearch}
           />
         </>
