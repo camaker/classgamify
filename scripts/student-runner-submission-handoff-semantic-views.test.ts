@@ -1,4 +1,5 @@
 import assert from 'node:assert/strict';
+import { readFileSync } from 'node:fs';
 import test from 'node:test';
 import { STARTER_FOOD_ASSIGNMENT_SHARE_ID } from '@/activities/starter-ids';
 import type { AssignmentSeed } from '@/activities/types';
@@ -257,6 +258,25 @@ test('student runner submission handoff summarizes safe post-submit review state
     /Review your score/
   );
   assertNoPrivateSubmissionText(JSON.stringify(pageView.submissionHandoffView));
+});
+
+test('student runner submission handoff renders hidden DOM relationships', () => {
+  const componentSource = readFileSync(
+    'src/components/assignments/student-runner-submission-handoff.tsx',
+    'utf8'
+  );
+  const routeSource = readFileSync('src/routes/play/$shareId.tsx', 'utf8');
+
+  assert.match(
+    componentSource,
+    /StudentRunnerSubmissionHandoffItemView[\s\S]*StudentRunnerSubmissionHandoffView[\s\S]*data-handoff="student-runner-submission"[\s\S]*view\.itemViews\.map[\s\S]*StudentRunnerSubmissionHandoffItem[\s\S]*function StudentRunnerSubmissionHandoffItem[\s\S]*const labelId = `student-runner-submission-handoff-\$\{itemView\.id\}-label`[\s\S]*const valueId = `student-runner-submission-handoff-\$\{itemView\.id\}-value`[\s\S]*const descriptionId = `student-runner-submission-handoff-\$\{itemView\.id\}-description`[\s\S]*data-handoff-item=\{itemView\.id\}[\s\S]*id=\{labelId\}[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*aria-label=\{itemView\.ariaLabel\}[\s\S]*aria-labelledby=\{`\$\{labelId\} \$\{valueId\}`\}[\s\S]*id=\{valueId\}[\s\S]*id=\{descriptionId\}/,
+    'Student runner submission handoff should render each safe submission slice with stable label, value, and description relationships.'
+  );
+  assert.match(
+    routeSource,
+    /StudentRunnerSubmissionHandoff[\s\S]*from '@\/components\/assignments\/student-runner-submission-handoff'[\s\S]*<StudentRunnerSubmissionHandoff[\s\S]*view=\{runnerPageView\.submissionHandoffView\}/,
+    'Student runner route should render the prepared hidden submission handoff view.'
+  );
 });
 
 function withAssignmentSettings(

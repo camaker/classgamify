@@ -14690,6 +14690,10 @@ const studentRunnerSubmitControlsSource = readFileSync(
   'src/components/assignments/student-runner-submit-controls.tsx',
   'utf8'
 );
+const studentRunnerSubmissionHandoffSource = readFileSync(
+  'src/components/assignments/student-runner-submission-handoff.tsx',
+  'utf8'
+);
 const studentRunnerLoadingPanelSource = readFileSync(
   'src/components/assignments/student-runner-loading-panel.tsx',
   'utf8'
@@ -15609,10 +15613,15 @@ assert.match(
   /export function buildStudentRunnerSubmissionHandoffView(?=[\s\S]*payloadSummaryView)(?=[\s\S]*progressView)(?=[\s\S]*submitReadinessView)(?=[\s\S]*identityView)(?=[\s\S]*resultPanelView)[\s\S]*id: 'payload-summary'[\s\S]*id: 'submit-readiness'[\s\S]*buildStudentRunnerIdentityHandoffPrivacyItem\(identityView\)[\s\S]*id: 'attempt-duration'[\s\S]*id: 'review-summary'[\s\S]*id: 'feedback-scope'[\s\S]*id: 'next-steps'[\s\S]*privacy: buildStudentRunnerSubmissionHandoffPrivacyContract/,
   'Student runner submission handoff should collect progress, payload, readiness, identity, timer, result, review, feedback, and next-step slices.'
 );
-assert.doesNotMatch(
-  studentRunnerSubmitControlsSource,
-  /data-handoff="student-submission"|function StudentRunnerSubmissionHandoff/,
-  'Student runner submit controls should keep submission handoff diagnostics out of the public student DOM.'
+assert.match(
+  studentRunnerSubmissionHandoffSource,
+  /StudentRunnerSubmissionHandoffItemView[\s\S]*StudentRunnerSubmissionHandoffView[\s\S]*data-handoff="student-runner-submission"[\s\S]*view\.itemViews\.map[\s\S]*StudentRunnerSubmissionHandoffItem[\s\S]*function StudentRunnerSubmissionHandoffItem[\s\S]*const labelId = `student-runner-submission-handoff-\$\{itemView\.id\}-label`[\s\S]*const valueId = `student-runner-submission-handoff-\$\{itemView\.id\}-value`[\s\S]*const descriptionId = `student-runner-submission-handoff-\$\{itemView\.id\}-description`[\s\S]*data-handoff-item=\{itemView\.id\}[\s\S]*id=\{labelId\}[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*aria-label=\{itemView\.ariaLabel\}[\s\S]*aria-labelledby=\{`\$\{labelId\} \$\{valueId\}`\}[\s\S]*id=\{valueId\}[\s\S]*id=\{descriptionId\}/,
+  'Student runner submission handoff component should render hidden safe outputs with prepared label, value, and description relationships.'
+);
+assert.match(
+  playRouteSource,
+  /StudentRunnerSubmissionHandoff[\s\S]*from '@\/components\/assignments\/student-runner-submission-handoff'[\s\S]*<StudentRunnerSubmissionHandoff[\s\S]*view=\{runnerPageView\.submissionHandoffView\}/,
+  'Student runner route should render the prepared hidden submission handoff view.'
 );
 const studentSubmissionPrivateAnswer = 'DOMAIN_PRIVATE_STUDENT_ANSWER';
 const studentSubmissionPrivateToken = 'domain-private-anonymous-token';

@@ -28,6 +28,7 @@ import { StudentRunnerAttemptShell } from '@/components/assignments/student-runn
 import { StudentRunnerHeaderCard } from '@/components/assignments/student-runner-header-card';
 import { StudentRunnerLoadingPanel } from '@/components/assignments/student-runner-loading-panel';
 import { StudentRunnerMissingPanel } from '@/components/assignments/student-runner-missing-panel';
+import { StudentRunnerSubmissionHandoff } from '@/components/assignments/student-runner-submission-handoff';
 import { StudentRunnerSubmitControls } from '@/components/assignments/student-runner-submit-controls';
 import Container from '@/components/layout/container';
 import { websiteConfig } from '@/config/website';
@@ -311,6 +312,10 @@ function PlayPage() {
             onSubmit={submitAnswers}
           />
         </StudentRunnerAttemptShell>
+
+        <StudentRunnerSubmissionHandoff
+          view={runnerPageView.submissionHandoffView}
+        />
 
         <ActivityPreview
           activity={previewView.activity}
