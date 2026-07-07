@@ -3,6 +3,7 @@ import { readFileSync } from 'node:fs';
 import test from 'node:test';
 import {
   ASSIGNMENT_LIST_PAGE_HANDOFF_ITEM_IDS,
+  buildAssignmentListFilterScopeBoundary,
   buildAssignmentListPageViewModel,
   buildAssignmentListStarterPreview,
 } from '@/assignments/list-view';
@@ -107,6 +108,30 @@ test('assignment list page exposes a 30-slice distribution handoff', () => {
     exposesStudentAnswerText: false,
     exposesTeacherOnlyAnswers: false,
     itemIds,
+    keepsDistributionStepsPrepared: true,
+    keepsVisiblePageCountsSeparate: true,
+    searchMatchesAssignmentTitle: true,
+    searchMatchesShareSlug: true,
+    searchMatchesSourceActivityText: true,
+    usesFullFilteredSummaryForOverview: true,
+    usesOwnerScopedStatusFilters: true,
+  });
+  assert.deepEqual(pageView.filterScopeBoundary, {
+    broadensBeyondOwner: false,
+    countsStarterPreviewAsOwned: false,
+    fullFilteredAssignmentCount: 31,
+    keepsDistributionStepsPrepared: true,
+    keepsVisiblePageCountsSeparate: true,
+    normalizedSearchQuery: 'Week 1',
+    overviewAssignmentCount: 31,
+    publishedShareContextStatus: 'found',
+    scope: 'owner-assignment-list-filter-scope',
+    searchMatchesAssignmentTitle: true,
+    searchMatchesShareSlug: true,
+    searchMatchesSourceActivityText: true,
+    statusFilter: 'open',
+    usesFullFilteredSummaryForOverview: true,
+    visiblePageAssignmentCount: 2,
   });
 
   assert.equal(getHandoffValue(handoffView.itemViews, 'summary-total'), '31');
@@ -305,6 +330,48 @@ test('starter previews remain outside owned assignment metrics', () => {
     'Not ready'
   );
   assert.equal(pageView.handoffView.privacy.countsStarterPreviewAsOwned, false);
+  assert.deepEqual(pageView.filterScopeBoundary, {
+    broadensBeyondOwner: false,
+    countsStarterPreviewAsOwned: false,
+    fullFilteredAssignmentCount: 0,
+    keepsDistributionStepsPrepared: true,
+    keepsVisiblePageCountsSeparate: true,
+    overviewAssignmentCount: 0,
+    publishedShareContextStatus: 'none',
+    scope: 'owner-assignment-list-filter-scope',
+    searchMatchesAssignmentTitle: true,
+    searchMatchesShareSlug: true,
+    searchMatchesSourceActivityText: true,
+    statusFilter: 'all',
+    usesFullFilteredSummaryForOverview: true,
+    visiblePageAssignmentCount: 0,
+  });
+});
+
+test('assignment list filter scope boundary normalizes unsafe counts', () => {
+  assert.deepEqual(
+    buildAssignmentListFilterScopeBoundary({
+      statusFilter: 'closed',
+      totalAssignments: Number.NaN,
+      visibleCount: 5,
+    }),
+    {
+      broadensBeyondOwner: false,
+      countsStarterPreviewAsOwned: false,
+      fullFilteredAssignmentCount: 0,
+      keepsDistributionStepsPrepared: true,
+      keepsVisiblePageCountsSeparate: true,
+      overviewAssignmentCount: 0,
+      publishedShareContextStatus: 'none',
+      scope: 'owner-assignment-list-filter-scope',
+      searchMatchesAssignmentTitle: true,
+      searchMatchesShareSlug: true,
+      searchMatchesSourceActivityText: true,
+      statusFilter: 'closed',
+      usesFullFilteredSummaryForOverview: true,
+      visiblePageAssignmentCount: 0,
+    }
+  );
 });
 
 function buildAssignmentListItem({

@@ -766,6 +766,7 @@ import {
   buildAssignmentListCardViewModel,
   buildAssignmentListDistributionView,
   buildAssignmentListEmptyStateView,
+  buildAssignmentListFilterScopeBoundary,
   buildAssignmentListPageScopeView,
   buildAssignmentListPageViewModel,
   buildAssignmentListRouteState,
@@ -34504,6 +34505,26 @@ assert.match(
 );
 assert.match(
   assignmentListQuerySource,
+  /sqlLikeContains\(assignment\.shareSlug, normalizedSearch\)/,
+  'Assignment list search should include the share id while staying in the assignment query domain.'
+);
+assert.match(
+  assignmentListQuerySource,
+  /sqlLikeContains\(activity\.title, normalizedSearch\)/,
+  'Assignment list search should include current source activity titles.'
+);
+assert.match(
+  assignmentListQuerySource,
+  /sqlLikeContains\(activity\.description, normalizedSearch\)/,
+  'Assignment list search should include current source activity descriptions.'
+);
+assert.match(
+  assignmentListQuerySource,
+  /sqlLikeContains\(assignmentSnapshot\.activityTitle, normalizedSearch\)/,
+  'Assignment list search should include frozen source activity titles.'
+);
+assert.match(
+  assignmentListQuerySource,
   /sqlLikeContains\(activity\.contentJson, normalizedSearch\)/,
   'Assignment list search should include current source activity structured text.'
 );
@@ -34846,7 +34867,12 @@ assert.doesNotMatch(
 );
 assert.match(
   assignmentListViewSource,
-  /export const ASSIGNMENT_LIST_PAGE_HANDOFF_ITEM_IDS = \[[\s\S]*'owner-scope'[\s\S]*'summary-total'[\s\S]*'scope-range'[\s\S]*'status-open'[\s\S]*'published-share-context'[\s\S]*'distribution-copy-link'[\s\S]*'distribution-review-results'[\s\S]*\] as const;[\s\S]*export type AssignmentListPageHandoffItemId =[\s\S]*typeof ASSIGNMENT_LIST_PAGE_HANDOFF_ITEM_IDS[\s\S]*export type AssignmentListPageHandoffPrivacyView = \{[\s\S]*broadensBeyondOwner: false;[\s\S]*countsStarterPreviewAsOwned: false;[\s\S]*exposesRawAnonymousToken: false;[\s\S]*exposesStudentAnswerText: false;[\s\S]*export type AssignmentListPageHandoffView = \{/,
+  /export type AssignmentListFilterScopeBoundary = \{[\s\S]*fullFilteredAssignmentCount: number;[\s\S]*keepsDistributionStepsPrepared: true;[\s\S]*keepsVisiblePageCountsSeparate: true;[\s\S]*overviewAssignmentCount: number;[\s\S]*publishedShareContextStatus:[\s\S]*scope: 'owner-assignment-list-filter-scope';[\s\S]*searchMatchesAssignmentTitle: true;[\s\S]*searchMatchesShareSlug: true;[\s\S]*searchMatchesSourceActivityText: true;[\s\S]*usesFullFilteredSummaryForOverview: true;[\s\S]*visiblePageAssignmentCount: number;[\s\S]*export type AssignmentListSearchPanelView/,
+  'Assignment list page view-model should expose a typed owner-scoped filter boundary for overview, visible-page, search, and distribution scope.'
+);
+assert.match(
+  assignmentListViewSource,
+  /export const ASSIGNMENT_LIST_PAGE_HANDOFF_ITEM_IDS = \[[\s\S]*'owner-scope'[\s\S]*'summary-total'[\s\S]*'scope-range'[\s\S]*'status-open'[\s\S]*'published-share-context'[\s\S]*'distribution-copy-link'[\s\S]*'distribution-review-results'[\s\S]*\] as const;[\s\S]*export type AssignmentListPageHandoffItemId =[\s\S]*typeof ASSIGNMENT_LIST_PAGE_HANDOFF_ITEM_IDS[\s\S]*export type AssignmentListPageHandoffPrivacyView = \{[\s\S]*broadensBeyondOwner: false;[\s\S]*countsStarterPreviewAsOwned: false;[\s\S]*exposesRawAnonymousToken: false;[\s\S]*exposesStudentAnswerText: false;[\s\S]*itemIds: AssignmentListPageHandoffItemId\[\];[\s\S]*keepsVisiblePageCountsSeparate: true;[\s\S]*searchMatchesAssignmentTitle: true;[\s\S]*searchMatchesShareSlug: true;[\s\S]*searchMatchesSourceActivityText: true;[\s\S]*usesOwnerScopedStatusFilters: true;[\s\S]*export type AssignmentListPageHandoffView = \{/,
   'Assignment list page handoff should derive its typed owner-scoped distribution contract from a stable 30-slice id list with explicit privacy flags.'
 );
 assert.deepEqual(
@@ -43329,6 +43355,7 @@ assert.deepEqual(
       (item) => item.assignment.id
     ),
     emptyState: filteredAssignmentListPageView.emptyState,
+    filterScopeBoundary: filteredAssignmentListPageView.filterScopeBoundary,
     hasAssignments: filteredAssignmentListPageView.hasAssignments,
     publishedPanelContext: filteredAssignmentListPageView.publishedPanelContext,
     resolvedSearch: filteredAssignmentListPageView.resolvedSearch,
@@ -43348,6 +43375,23 @@ assert.deepEqual(
         'No assignments match the Open status filter yet. Clear filters or switch status to review other classroom links.',
       showStarterAssignments: false,
       title: 'No matching assignments.',
+    },
+    filterScopeBoundary: {
+      broadensBeyondOwner: false,
+      countsStarterPreviewAsOwned: false,
+      fullFilteredAssignmentCount: 31,
+      keepsDistributionStepsPrepared: true,
+      keepsVisiblePageCountsSeparate: true,
+      normalizedSearchQuery: 'Week 1',
+      overviewAssignmentCount: 1,
+      publishedShareContextStatus: 'found',
+      scope: 'owner-assignment-list-filter-scope',
+      searchMatchesAssignmentTitle: true,
+      searchMatchesShareSlug: true,
+      searchMatchesSourceActivityText: true,
+      statusFilter: 'open',
+      usesFullFilteredSummaryForOverview: true,
+      visiblePageAssignmentCount: 1,
     },
     hasAssignments: true,
     publishedPanelContext: {
@@ -43498,7 +43542,37 @@ assert.deepEqual(filteredAssignmentListPageView.handoffView.privacy, {
   exposesStudentAnswerText: false,
   exposesTeacherOnlyAnswers: false,
   itemIds: [...ASSIGNMENT_LIST_PAGE_HANDOFF_ITEM_IDS],
+  keepsDistributionStepsPrepared: true,
+  keepsVisiblePageCountsSeparate: true,
+  searchMatchesAssignmentTitle: true,
+  searchMatchesShareSlug: true,
+  searchMatchesSourceActivityText: true,
+  usesFullFilteredSummaryForOverview: true,
+  usesOwnerScopedStatusFilters: true,
 });
+assert.deepEqual(
+  buildAssignmentListFilterScopeBoundary({
+    statusFilter: 'closed',
+    totalAssignments: Number.NaN,
+    visibleCount: 5,
+  }),
+  {
+    broadensBeyondOwner: false,
+    countsStarterPreviewAsOwned: false,
+    fullFilteredAssignmentCount: 0,
+    keepsDistributionStepsPrepared: true,
+    keepsVisiblePageCountsSeparate: true,
+    overviewAssignmentCount: 0,
+    publishedShareContextStatus: 'none',
+    scope: 'owner-assignment-list-filter-scope',
+    searchMatchesAssignmentTitle: true,
+    searchMatchesShareSlug: true,
+    searchMatchesSourceActivityText: true,
+    statusFilter: 'closed',
+    usesFullFilteredSummaryForOverview: true,
+    visiblePageAssignmentCount: 0,
+  }
+);
 assert.equal(filteredAssignmentListHandoffValues.get('summary-total'), '1');
 assert.equal(filteredAssignmentListHandoffValues.get('summary-open'), '1');
 assert.equal(

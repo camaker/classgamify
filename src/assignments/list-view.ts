@@ -94,6 +94,26 @@ export type AssignmentListPageScopeView = {
   summary: string;
 };
 
+export type AssignmentListFilterScopeBoundary = {
+  broadensBeyondOwner: false;
+  countsStarterPreviewAsOwned: false;
+  fullFilteredAssignmentCount: number;
+  keepsDistributionStepsPrepared: true;
+  keepsVisiblePageCountsSeparate: true;
+  normalizedSearchQuery?: string;
+  overviewAssignmentCount: number;
+  publishedShareContextStatus:
+    | PublishedAssignmentPanelContext['status']
+    | 'none';
+  scope: 'owner-assignment-list-filter-scope';
+  searchMatchesAssignmentTitle: true;
+  searchMatchesShareSlug: true;
+  searchMatchesSourceActivityText: true;
+  statusFilter: AssignmentStatusFilter;
+  usesFullFilteredSummaryForOverview: true;
+  visiblePageAssignmentCount: number;
+};
+
 export type AssignmentListSearchPanelView = {
   filterSummary: AssignmentListFilterSummary;
   hasSearchValue: boolean;
@@ -160,6 +180,13 @@ export type AssignmentListPageHandoffPrivacyView = {
   exposesStudentAnswerText: false;
   exposesTeacherOnlyAnswers: false;
   itemIds: AssignmentListPageHandoffItemId[];
+  keepsDistributionStepsPrepared: true;
+  keepsVisiblePageCountsSeparate: true;
+  searchMatchesAssignmentTitle: true;
+  searchMatchesShareSlug: true;
+  searchMatchesSourceActivityText: true;
+  usesFullFilteredSummaryForOverview: true;
+  usesOwnerScopedStatusFilters: true;
 };
 
 export type AssignmentListPageHandoffView = {
@@ -379,6 +406,7 @@ type AssignmentListPageViewModel<TItem extends AssignmentListPageItem> = {
   breadcrumbs: AssignmentListPageBreadcrumb[];
   description: string;
   emptyState: AssignmentListEmptyStateView;
+  filterScopeBoundary: AssignmentListFilterScopeBoundary;
   handoffView: AssignmentListPageHandoffView;
   hasAssignments: boolean;
   loadErrorMessage: string;
@@ -833,6 +861,14 @@ export function buildAssignmentListPageViewModel<
     summary: data?.summary,
     total: totalAssignments,
   });
+  const filterScopeBoundary = buildAssignmentListFilterScopeBoundary({
+    normalizedSearchQuery: resolvedSearch.normalizedSearchQuery,
+    publishedPanelContext,
+    statusFilter: resolvedSearch.statusFilter,
+    summary: data?.summary,
+    totalAssignments,
+    visibleCount: assignments.length,
+  });
 
   return {
     assignments,
@@ -850,6 +886,7 @@ export function buildAssignmentListPageViewModel<
     ],
     description: assignmentListPageCopy.description,
     emptyState,
+    filterScopeBoundary,
     handoffView: buildAssignmentListPageHandoffView({
       assignments,
       publishedPanelContext,
@@ -932,6 +969,48 @@ export function buildAssignmentListRouteState<
     pageView,
     showLoadError: isError,
     status: 'ready',
+  };
+}
+
+export function buildAssignmentListFilterScopeBoundary({
+  normalizedSearchQuery,
+  publishedPanelContext,
+  statusFilter,
+  summary,
+  totalAssignments,
+  visibleCount,
+}: {
+  normalizedSearchQuery?: string;
+  publishedPanelContext?: PublishedAssignmentPanelContext;
+  statusFilter: AssignmentStatusFilter;
+  summary?: AssignmentListSummary;
+  totalAssignments: number;
+  visibleCount: number;
+}): AssignmentListFilterScopeBoundary {
+  const fullFilteredAssignmentCount =
+    normalizeAssignmentListSummaryCount(totalAssignments);
+
+  return {
+    broadensBeyondOwner: false,
+    countsStarterPreviewAsOwned: false,
+    fullFilteredAssignmentCount,
+    keepsDistributionStepsPrepared: true,
+    keepsVisiblePageCountsSeparate: true,
+    ...(normalizedSearchQuery ? { normalizedSearchQuery } : {}),
+    overviewAssignmentCount: normalizeAssignmentListSummaryCount(
+      summary?.totalAssignments ?? fullFilteredAssignmentCount
+    ),
+    publishedShareContextStatus: publishedPanelContext?.status ?? 'none',
+    scope: 'owner-assignment-list-filter-scope',
+    searchMatchesAssignmentTitle: true,
+    searchMatchesShareSlug: true,
+    searchMatchesSourceActivityText: true,
+    statusFilter,
+    usesFullFilteredSummaryForOverview: true,
+    visiblePageAssignmentCount: Math.min(
+      normalizeAssignmentListSummaryCount(visibleCount),
+      fullFilteredAssignmentCount
+    ),
   };
 }
 
@@ -1307,6 +1386,13 @@ function buildAssignmentListPageHandoffPrivacyView(
     exposesStudentAnswerText: false,
     exposesTeacherOnlyAnswers: false,
     itemIds: itemViews.map((item) => item.id),
+    keepsDistributionStepsPrepared: true,
+    keepsVisiblePageCountsSeparate: true,
+    searchMatchesAssignmentTitle: true,
+    searchMatchesShareSlug: true,
+    searchMatchesSourceActivityText: true,
+    usesFullFilteredSummaryForOverview: true,
+    usesOwnerScopedStatusFilters: true,
   };
 }
 
