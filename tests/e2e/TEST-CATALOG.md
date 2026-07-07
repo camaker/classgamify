@@ -51,6 +51,11 @@ run it when changing shuffle helper logic, share-slug normalization, public
 payload ordering, student submit/review ordering, printable worksheet ordering,
 delivery summaries, publish previews, public rule summaries, or CSV/export
 delivery-policy fields.
+Assignment results CSV export preparation has a fast script-level gate via
+`pnpm exec tsx --test scripts/assignment-results-export-preparation-handoff-semantic-views.test.ts`;
+run it when changing delivery-policy columns, accepted-answer columns,
+submitted-date formatting, timer-aware duration normalization, formula-injection
+guards, CSV data URL boundaries, or the export coverage handoff.
 Storage upload readiness has a fast script-level gate via
 `pnpm exec tsx --test scripts/storage-upload-readiness.test.ts`; run it when
 changing classroom source-material upload validation, filename sanitization,
