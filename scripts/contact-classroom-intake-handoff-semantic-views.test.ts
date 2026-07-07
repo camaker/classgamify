@@ -1,4 +1,5 @@
 import assert from 'node:assert/strict';
+import { readFileSync } from 'node:fs';
 import test from 'node:test';
 import {
   buildContactClassroomIntakeHandoffView,
@@ -16,6 +17,15 @@ const SECRET_PRIVATE_FILE_URL =
 const SECRET_PROVIDER_ERROR = 'raw-provider-stack-trace';
 const SECRET_SOURCE_STORAGE_KEY = 'source-material/private/storage-key.pdf';
 const SECRET_STUDENT_TOKEN = 'raw-student-token';
+const CONTACT_FORM_SOURCE = readFileSync(
+  'src/components/contact/contact-form-card.tsx',
+  'utf8'
+);
+const CONTACT_ROUTE_SOURCE = readFileSync(
+  'src/routes/(pages)/contact.tsx',
+  'utf8'
+);
+const TEST_CATALOG_SOURCE = readFileSync('tests/e2e/TEST-CATALOG.md', 'utf8');
 
 test('contact classroom intake handoff exposes 30 safe intake slices', () => {
   const handoffView = buildContactClassroomIntakeHandoffView();
@@ -49,6 +59,7 @@ test('contact classroom intake handoff exposes 30 safe intake slices', () => {
     notifiesLearners: false,
     persistsActivityContent: false,
     readsFileBytes: false,
+    rendersInPublicDom: false,
     rendersStructuredFieldsInMail: true,
     scope: 'public-classroom-inquiry-intake',
     usesClassroomRouteIntent: true,
@@ -90,6 +101,24 @@ test('contact classroom intake handoff exposes 30 safe intake slices', () => {
     ]
   );
   assertNoPrivateContactText(JSON.stringify(handoffView));
+});
+
+test('contact classroom intake keeps internal handoff out of public DOM', () => {
+  assert.doesNotMatch(
+    CONTACT_FORM_SOURCE,
+    /ClassroomIntakeHandoff|ContactClassroomIntakeHandoffItemView|ContactClassroomIntakeHandoffView|buildContactClassroomIntakeHandoffView|data-handoff|data-handoff-item/,
+    'The public contact form should render the classroom scope panel and structured fields without exposing the internal 30-slice intake handoff.'
+  );
+  assert.doesNotMatch(
+    CONTACT_ROUTE_SOURCE,
+    /ClassroomIntakeHandoff|contact-classroom-intake-handoff|data-handoff|data-handoff-item|pageView\.handoffView/,
+    'The public contact route should not render contact intake audit handoff markup.'
+  );
+  assert.match(
+    TEST_CATALOG_SOURCE,
+    /On `\/contact\?subject=classroom`, verify the localized 30-slice classroom inquiry intake contract remains covered by source-level semantic tests[\s\S]*does not render internal intake handoff markup/,
+    'The public page catalog should describe contact intake as a source-level contract, not a public DOM audit panel.'
+  );
 });
 
 test('contact classroom intake handoff localizes Chinese boundaries', () => {

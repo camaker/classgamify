@@ -90,6 +90,7 @@ export type ContactClassroomIntakeHandoffPrivacyContract = {
   notifiesLearners: false;
   persistsActivityContent: false;
   readsFileBytes: false;
+  rendersInPublicDom: false;
   rendersStructuredFieldsInMail: true;
   scope: 'public-classroom-inquiry-intake';
   usesClassroomRouteIntent: true;
@@ -565,6 +566,7 @@ function buildContactClassroomIntakeHandoffPrivacyContract(
     notifiesLearners: false,
     persistsActivityContent: false,
     readsFileBytes: false,
+    rendersInPublicDom: false,
     rendersStructuredFieldsInMail: true,
     scope: 'public-classroom-inquiry-intake',
     usesClassroomRouteIntent: true,
