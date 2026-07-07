@@ -136,6 +136,13 @@ export type AssignmentPublishPreviewContextTone = 'blocked' | 'ready';
 
 export type AssignmentPublishDialogAccessStatus = 'blocked' | 'ready';
 
+export type AssignmentPublishFieldControlKey =
+  | 'closeAfter'
+  | 'instructions'
+  | 'maxAttempts'
+  | 'timeLimit'
+  | 'title';
+
 export type AssignmentPublishDialogAccessView = {
   ariaLabel: string;
   canOpen: boolean;
@@ -183,6 +190,126 @@ export type AssignmentPublishPreviewContextView = {
   status: AssignmentPublishPreviewContextStatusView;
   summary: AssignmentPublishPreviewContextSummary;
   title: string;
+};
+
+export const ASSIGNMENT_PUBLISH_CONTROL_BOUNDARY_ITEM_IDS = [
+  'title-input',
+  'title-help',
+  'instructions-input',
+  'instructions-help',
+  'attempt-limit-input',
+  'attempt-limit-help',
+  'timer-input',
+  'timer-help',
+  'close-time-input',
+  'close-time-help',
+  'delivery-toggle-group',
+  'identity-toggle',
+  'answer-reveal-toggle',
+  'item-order-toggle',
+  'preview-region',
+  'preview-title',
+  'frozen-link-status',
+  'delivery-rule-stats',
+  'instructions-stat',
+  'timer-stat',
+  'close-time-stat',
+  'settings-summary',
+  'review-checklist',
+  'snapshot-freeze',
+  'student-link-rules',
+  'results-policy',
+  'validation-alert',
+  'field-limits',
+  'publish-action',
+  'privacy-guard',
+] as const;
+
+export type AssignmentPublishControlBoundaryItemId =
+  (typeof ASSIGNMENT_PUBLISH_CONTROL_BOUNDARY_ITEM_IDS)[number];
+
+export type AssignmentPublishFieldControlIds = {
+  describedByIds: string[];
+  helpId: string;
+  inputId: string;
+};
+
+export type AssignmentPublishToggleControlIds = {
+  describedByIds: string[];
+  descriptionId: string;
+  inputId: string;
+};
+
+export type AssignmentPublishPreviewStatControlIds = {
+  labelId: string;
+  valueId: string;
+};
+
+export type AssignmentPublishPreviewReviewControlIds = {
+  describedByIds: string[];
+  descriptionId: string;
+  labelledByIds: string[];
+  labelId: string;
+};
+
+export type AssignmentPublishControlBoundaryIds = {
+  fieldIds: Record<
+    AssignmentPublishFieldControlKey,
+    AssignmentPublishFieldControlIds
+  >;
+  previewContextDescription: string;
+  previewContextStatusMessage: string;
+  previewContextTitle: string;
+  previewLabel: string;
+  previewReviewLabel: string;
+  reviewItemIds: Record<
+    AssignmentPublishPreviewReviewItemId,
+    AssignmentPublishPreviewReviewControlIds
+  >;
+  statItemIds: Record<
+    AssignmentPublishPreviewContextStatId,
+    AssignmentPublishPreviewStatControlIds
+  >;
+  toggleGroup: string;
+  toggleIds: Record<
+    AssignmentPublishToggleKey,
+    AssignmentPublishToggleControlIds
+  >;
+  validationAlert: string;
+};
+
+export type AssignmentPublishControlBoundaryView = {
+  closeAfterStatus: AssignmentPublishCloseAfterStatus;
+  controlIdBase: string;
+  controlIds: AssignmentPublishControlBoundaryIds;
+  deliveryRuleCount: number;
+  describesCloseTimeWithHelp: true;
+  describesInstructionsWithHelp: true;
+  describesMaxAttemptsWithHelp: true;
+  describesPreviewWithStatus: true;
+  describesPublishTogglesWithHelp: true;
+  describesTimeLimitWithHelp: true;
+  describesTitleWithHelp: true;
+  exposesActivityContent: false;
+  exposesAnswerKeys: false;
+  exposesAssignmentTitle: false;
+  exposesInternalActivityIds: false;
+  exposesRawSettingsJson: false;
+  exposesShareSlug: false;
+  exposesStudentInstructions: false;
+  fieldCount: number;
+  itemIds: AssignmentPublishControlBoundaryItemId[];
+  previewRegionDescribedByIds: string[];
+  previewRegionLabelledByIds: string[];
+  previewStatCount: number;
+  publishDisabled: boolean;
+  reviewChecklistLabelledByIds: string[];
+  reviewItemCount: number;
+  scope: 'assignment-publish-control-semantics';
+  status: AssignmentPublishPreviewContextTone;
+  toggleCount: number;
+  usesOpaqueControlScope: true;
+  usesPreparedControlIds: true;
 };
 
 export const ASSIGNMENT_PUBLISH_HANDOFF_ITEM_IDS = [
@@ -272,6 +399,7 @@ export type AssignmentPublishDraftValues = Partial<
 
 export type AssignmentPublishDialogViewModel = {
   accessView: AssignmentPublishDialogAccessView;
+  controlBoundary: AssignmentPublishControlBoundaryView;
   dialogState: AssignmentPublishDialogState;
   draft: AssignmentPublishDraft;
   handoffView: AssignmentPublishHandoffView;
@@ -443,12 +571,14 @@ export function buildAssignmentPublishDraft({
 }
 
 export function buildAssignmentPublishDialogViewModel({
+  controlIdBase = 'assignment-publish-control',
   defaults,
   isPublishing = false,
   now,
   values,
   visibility = 'draft',
 }: {
+  controlIdBase?: string;
   defaults: AssignmentPublishDraft;
   isPublishing?: boolean;
   now?: Date;
@@ -476,6 +606,12 @@ export function buildAssignmentPublishDialogViewModel({
 
   return {
     accessView,
+    controlBoundary: buildAssignmentPublishControlBoundary({
+      controlIdBase,
+      dialogState,
+      preview,
+      toggleViews,
+    }),
     dialogState,
     draft,
     handoffView: buildAssignmentPublishHandoffView({
@@ -632,6 +768,174 @@ export function buildAssignmentPublishPreviewContextView({
       status,
     },
     title: m.assignment_publish_preview_context_title(),
+  };
+}
+
+function buildAssignmentPublishControlBoundary({
+  controlIdBase,
+  dialogState,
+  preview,
+  toggleViews,
+}: {
+  controlIdBase: string;
+  dialogState: AssignmentPublishDialogState;
+  preview: AssignmentPublishPreview;
+  toggleViews: AssignmentPublishToggleView[];
+}): AssignmentPublishControlBoundaryView {
+  const controlIds = buildAssignmentPublishControlIds(controlIdBase);
+
+  return {
+    closeAfterStatus: preview.closeAfter.status,
+    controlIdBase,
+    controlIds,
+    deliveryRuleCount: preview.context.summary.deliveryRuleCount,
+    describesCloseTimeWithHelp: true,
+    describesInstructionsWithHelp: true,
+    describesMaxAttemptsWithHelp: true,
+    describesPreviewWithStatus: true,
+    describesPublishTogglesWithHelp: true,
+    describesTimeLimitWithHelp: true,
+    describesTitleWithHelp: true,
+    exposesActivityContent: false,
+    exposesAnswerKeys: false,
+    exposesAssignmentTitle: false,
+    exposesInternalActivityIds: false,
+    exposesRawSettingsJson: false,
+    exposesShareSlug: false,
+    exposesStudentInstructions: false,
+    fieldCount: Object.keys(controlIds.fieldIds).length,
+    itemIds: [...ASSIGNMENT_PUBLISH_CONTROL_BOUNDARY_ITEM_IDS],
+    previewRegionDescribedByIds: [
+      controlIds.previewContextDescription,
+      controlIds.previewContextStatusMessage,
+    ],
+    previewRegionLabelledByIds: [controlIds.previewLabel],
+    previewStatCount: preview.context.statItems.length,
+    publishDisabled: dialogState.publishDisabled,
+    reviewChecklistLabelledByIds: [controlIds.previewReviewLabel],
+    reviewItemCount: preview.context.reviewItems.length,
+    scope: 'assignment-publish-control-semantics',
+    status: preview.context.summary.status,
+    toggleCount: toggleViews.length,
+    usesOpaqueControlScope: true,
+    usesPreparedControlIds: true,
+  };
+}
+
+function buildAssignmentPublishControlIds(
+  controlIdBase: string
+): AssignmentPublishControlBoundaryIds {
+  const id = (suffix: string) => `${controlIdBase}-${suffix}`;
+
+  return {
+    fieldIds: {
+      closeAfter: buildAssignmentPublishFieldControlIds(id, 'expires-at'),
+      instructions: buildAssignmentPublishFieldControlIds(
+        id,
+        'assignment-instructions'
+      ),
+      maxAttempts: buildAssignmentPublishFieldControlIds(id, 'max-attempts'),
+      timeLimit: buildAssignmentPublishFieldControlIds(id, 'time-limit'),
+      title: buildAssignmentPublishFieldControlIds(id, 'assignment-title'),
+    },
+    previewContextDescription: id('preview-context-description'),
+    previewContextStatusMessage: id('preview-context-status-message'),
+    previewContextTitle: id('preview-context-title'),
+    previewLabel: id('preview-label'),
+    previewReviewLabel: id('preview-review-label'),
+    reviewItemIds: {
+      'results-policy': buildAssignmentPublishReviewControlIds(
+        id,
+        'results-policy'
+      ),
+      'snapshot-freeze': buildAssignmentPublishReviewControlIds(
+        id,
+        'snapshot-freeze'
+      ),
+      'student-link-rules': buildAssignmentPublishReviewControlIds(
+        id,
+        'student-link-rules'
+      ),
+    },
+    statItemIds: {
+      closeAfter: buildAssignmentPublishPreviewStatControlIds(
+        id,
+        'close-after'
+      ),
+      deliveryRules: buildAssignmentPublishPreviewStatControlIds(
+        id,
+        'delivery-rules'
+      ),
+      studentInstructions: buildAssignmentPublishPreviewStatControlIds(
+        id,
+        'student-instructions'
+      ),
+      timer: buildAssignmentPublishPreviewStatControlIds(id, 'timer'),
+    },
+    toggleGroup: id('delivery-toggle-group'),
+    toggleIds: {
+      collectStudentName: buildAssignmentPublishToggleControlIds(
+        id,
+        'collect-student-name'
+      ),
+      showCorrectAnswers: buildAssignmentPublishToggleControlIds(
+        id,
+        'show-correct-answers'
+      ),
+      shuffleItems: buildAssignmentPublishToggleControlIds(id, 'shuffle-items'),
+    },
+    validationAlert: id('validation-alert'),
+  };
+}
+
+function buildAssignmentPublishFieldControlIds(
+  id: (suffix: string) => string,
+  key: string
+): AssignmentPublishFieldControlIds {
+  const helpId = id(`${key}-help`);
+
+  return {
+    describedByIds: [helpId],
+    helpId,
+    inputId: id(key),
+  };
+}
+
+function buildAssignmentPublishToggleControlIds(
+  id: (suffix: string) => string,
+  key: string
+): AssignmentPublishToggleControlIds {
+  const descriptionId = id(`${key}-description`);
+
+  return {
+    describedByIds: [descriptionId],
+    descriptionId,
+    inputId: id(`${key}-toggle`),
+  };
+}
+
+function buildAssignmentPublishPreviewStatControlIds(
+  id: (suffix: string) => string,
+  key: string
+): AssignmentPublishPreviewStatControlIds {
+  return {
+    labelId: id(`preview-stat-${key}-label`),
+    valueId: id(`preview-stat-${key}-value`),
+  };
+}
+
+function buildAssignmentPublishReviewControlIds(
+  id: (suffix: string) => string,
+  key: string
+): AssignmentPublishPreviewReviewControlIds {
+  const labelId = id(`preview-review-${key}-label`);
+  const descriptionId = id(`preview-review-${key}-description`);
+
+  return {
+    describedByIds: [descriptionId],
+    descriptionId,
+    labelledByIds: [labelId],
+    labelId,
   };
 }
 

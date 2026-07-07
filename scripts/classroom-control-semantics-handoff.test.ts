@@ -246,12 +246,18 @@ test('classroom control semantics handoff is route gated', () => {
 test('classroom control semantics evidence comes from described controls', () => {
   assert.match(
     ACTIVITY_AI_PANEL_SOURCE,
-    /Textarea[\s\S]*id="activity-ai-source"[\s\S]*aria-describedby=\{sourceDescriptionIds\}/
+    /sourceControlBoundary\.textareaDescribedByIds[\s\S]*Textarea[\s\S]*id=\{controlIds\.sourceInput\}[\s\S]*aria-describedby=\{sourceDescriptionIds\}/
   );
-  assert.match(ACTIVITY_AI_PANEL_SOURCE, /safeSourceDescriptionId/);
-  assert.match(ACTIVITY_AI_PANEL_SOURCE, /sourceMaterialSafetyDescriptionId/);
-  assert.match(ACTIVITY_AI_PANEL_SOURCE, /sourceCapabilityTitleId/);
-  assert.match(ACTIVITY_AI_PANEL_SOURCE, /sourceMaterialNotesLabelId/);
+  assert.match(ACTIVITY_AI_PANEL_SOURCE, /controlIds\.safeSourceDescription/);
+  assert.match(
+    ACTIVITY_AI_PANEL_SOURCE,
+    /controlIds\.sourceMaterialSafetyDescription/
+  );
+  assert.match(ACTIVITY_AI_PANEL_SOURCE, /controlIds\.sourceCapabilityTitle/);
+  assert.match(
+    ACTIVITY_AI_PANEL_SOURCE,
+    /controlIds\.sourceMaterialNotesLabel/
+  );
   assert.match(
     ACTIVITY_AI_PANEL_SOURCE,
     /aria-describedby=\{focusDescriptionId\}/
@@ -273,29 +279,32 @@ test('classroom control semantics evidence comes from described controls', () =>
 
   assert.match(
     PUBLISH_SETTINGS_FORM_SOURCE,
-    /aria-describedby=\{titleHelpId\}/
+    /fieldIds\.title\.inputId[\s\S]*aria-describedby=\{joinDomIds\(fieldIds\.title\.describedByIds\)\}/
   );
   assert.match(
     PUBLISH_SETTINGS_FORM_SOURCE,
-    /aria-describedby=\{instructionsHelpId\}/
+    /fieldIds\.instructions\.inputId[\s\S]*aria-describedby=\{joinDomIds\([\s\S]*fieldIds\.instructions\.describedByIds/
   );
   assert.match(
     PUBLISH_SETTINGS_FORM_SOURCE,
-    /aria-describedby=\{maxAttemptsHelpId\}/
+    /fieldIds\.maxAttempts\.inputId[\s\S]*aria-describedby=\{joinDomIds\(fieldIds\.maxAttempts\.describedByIds\)\}/
   );
   assert.match(
     PUBLISH_SETTINGS_FORM_SOURCE,
-    /aria-describedby=\{timeLimitHelpId\}/
+    /fieldIds\.timeLimit\.inputId[\s\S]*aria-describedby=\{joinDomIds\(fieldIds\.timeLimit\.describedByIds\)\}/
   );
   assert.match(
     PUBLISH_SETTINGS_FORM_SOURCE,
-    /aria-describedby=\{closeAfterHelpId\}/
+    /fieldIds\.closeAfter\.inputId[\s\S]*aria-describedby=\{joinDomIds\(fieldIds\.closeAfter\.describedByIds\)\}/
   );
   assert.match(
     PUBLISH_SETTINGS_FORM_SOURCE,
-    /Switch[\s\S]*aria-describedby=\{descriptionId\}/
+    /descriptionId=\{controlIds\.toggleIds\[option\.key\]\.descriptionId\}[\s\S]*Switch[\s\S]*aria-describedby=\{joinDomIds\(describedByIds\)\}/
   );
-  assert.match(PUBLISH_SETTINGS_FORM_SOURCE, /ActivityPublishPreviewContext/);
+  assert.match(
+    PUBLISH_SETTINGS_FORM_SOURCE,
+    /ActivityPublishPreviewContext[\s\S]*controlBoundary=\{controlBoundary\}/
+  );
 
   assert.match(
     ASSIGNMENT_RESULTS_STUDENT_SEARCH_SOURCE,

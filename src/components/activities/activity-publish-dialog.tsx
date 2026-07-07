@@ -47,6 +47,7 @@ export function ActivityPublishDialog({
 }) {
   const publishMutation = usePublishAssignment();
   const accessDescriptionId = useId();
+  const controlIdBase = useId();
   const publishDraftDefaults = useMemo(
     () =>
       buildAssignmentPublishDraftDefaults({
@@ -57,6 +58,7 @@ export function ActivityPublishDialog({
   );
   const [publishDraft, setPublishDraft] = useState(publishDraftDefaults);
   const publishView = buildAssignmentPublishDialogViewModel({
+    controlIdBase,
     defaults: publishDraftDefaults,
     isPublishing: publishMutation.isPending,
     values: publishDraft,
@@ -148,7 +150,6 @@ export function ActivityPublishDialog({
           </Badge>
         </section>
         <ActivityPublishSettingsForm
-          activityId={activity.id}
           draft={publishView.draft}
           onDraftChange={updatePublishDraft}
           view={publishView}

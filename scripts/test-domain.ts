@@ -1019,6 +1019,7 @@ import {
 import {
   assignmentPublishDialogCopy,
   assignmentPublishToggleOptions,
+  ASSIGNMENT_PUBLISH_CONTROL_BOUNDARY_ITEM_IDS,
   ASSIGNMENT_PUBLISH_HANDOFF_ITEM_IDS,
   buildAssignmentPublishDraft,
   buildAssignmentPublishDraftDefaults,
@@ -4524,6 +4525,21 @@ assert.match(
 );
 assert.match(
   assignmentPublishSource,
+  /ASSIGNMENT_PUBLISH_CONTROL_BOUNDARY_ITEM_IDS = \[(?=[\s\S]*'title-input')(?=[\s\S]*'instructions-input')(?=[\s\S]*'attempt-limit-input')(?=[\s\S]*'timer-input')(?=[\s\S]*'close-time-input')(?=[\s\S]*'delivery-toggle-group')(?=[\s\S]*'preview-region')(?=[\s\S]*'frozen-link-status')(?=[\s\S]*'review-checklist')(?=[\s\S]*'validation-alert')(?=[\s\S]*'privacy-guard')[\s\S]*export type AssignmentPublishControlBoundaryView = \{[\s\S]*scope: 'assignment-publish-control-semantics';[\s\S]*usesOpaqueControlScope: true;[\s\S]*usesPreparedControlIds: true;/,
+  'Assignment publish control boundary should expose a typed 30-slice control semantics contract.'
+);
+assert.match(
+  assignmentPublishSource,
+  /controlBoundary: AssignmentPublishControlBoundaryView;[\s\S]*controlIdBase = 'assignment-publish-control'[\s\S]*controlBoundary: buildAssignmentPublishControlBoundary\(\{[\s\S]*controlIdBase,[\s\S]*dialogState,[\s\S]*preview,[\s\S]*toggleViews,[\s\S]*\}\)/,
+  'Assignment publish dialog view-model should compose the control boundary from the opaque control scope, dialog state, preview, and toggles.'
+);
+assert.match(
+  assignmentPublishSource,
+  /function buildAssignmentPublishControlBoundary[\s\S]*buildAssignmentPublishControlIds\(controlIdBase\)[\s\S]*itemIds: \[\.\.\.ASSIGNMENT_PUBLISH_CONTROL_BOUNDARY_ITEM_IDS\][\s\S]*previewRegionDescribedByIds:[\s\S]*controlIds\.previewContextDescription[\s\S]*controlIds\.previewContextStatusMessage[\s\S]*reviewChecklistLabelledByIds: \[controlIds\.previewReviewLabel\]/,
+  'Assignment publish control boundary should derive field, toggle, preview, stat, and review ids from prepared control ids.'
+);
+assert.match(
+  assignmentPublishSource,
   /export function buildAssignmentPublishHandoffView(?=[\s\S]*accessView: AssignmentPublishDialogAccessView)(?=[\s\S]*dialogState: AssignmentPublishDialogState)(?=[\s\S]*preview: AssignmentPublishPreview)[\s\S]*id: 'publish-access'[\s\S]*id: 'activity-lifecycle-gate'[\s\S]*id: 'validation-message'[\s\S]*id: 'draft-field-count'[\s\S]*id: 'field-limit-boundary'[\s\S]*id: 'delivery-rule-count'[\s\S]*id: 'settings-summary-status'[\s\S]*id: 'student-instructions'[\s\S]*id: 'review-checklist-count'[\s\S]*id: 'delivery-defaults'[\s\S]*id: 'attempts-policy'[\s\S]*id: 'attempt-limit-parser'[\s\S]*id: 'timer-parser'[\s\S]*id: 'settings-json'[\s\S]*id: 'close-time-parser'[\s\S]*id: 'snapshot-freeze'[\s\S]*id: 'public-payload-boundary'[\s\S]*id: 'results-policy'[\s\S]*id: 'privacy-guard'[\s\S]*privacy: buildAssignmentPublishHandoffPrivacyContract/,
   'Assignment publish handoff should collect publish access, validation, delivery rules, defaults, parsers, payload, privacy, and review checklist slices.'
 );
@@ -7297,7 +7313,7 @@ assert.doesNotMatch(
 );
 assert.match(
   activityPublishDialogSource,
-  /buildAssignmentPublishDialogViewModel\(\{[\s\S]*defaults: publishDraftDefaults,[\s\S]*isPublishing: publishMutation\.isPending,[\s\S]*values: publishDraft,[\s\S]*visibility: activity\.visibility/,
+  /const controlIdBase = useId\(\)[\s\S]*buildAssignmentPublishDialogViewModel\(\{[\s\S]*controlIdBase,[\s\S]*defaults: publishDraftDefaults,[\s\S]*isPublishing: publishMutation\.isPending,[\s\S]*values: publishDraft,[\s\S]*visibility: activity\.visibility/,
   'Assignment publish dialog should consume the assignment-domain dialog view-model with activity lifecycle visibility.'
 );
 assert.match(
@@ -7322,8 +7338,8 @@ assert.match(
 );
 assert.match(
   activityPublishSettingsFormSource,
-  /AssignmentPublishDialogViewModel[\s\S]*AssignmentPublishDraft[\s\S]*AssignmentPublishDraftValues[\s\S]*AssignmentPublishHandoffView[\s\S]*AssignmentPublishToggleView/,
-  'Assignment publish settings form should import the explicit assignment-domain handoff and toggle view contracts.'
+  /AssignmentPublishControlBoundaryView[\s\S]*AssignmentPublishDialogViewModel[\s\S]*AssignmentPublishDraft[\s\S]*AssignmentPublishDraftValues[\s\S]*AssignmentPublishHandoffView[\s\S]*AssignmentPublishToggleView/,
+  'Assignment publish settings form should import the explicit assignment-domain control, handoff, and toggle view contracts.'
 );
 assert.match(
   activityPublishSettingsFormSource,
@@ -7347,7 +7363,7 @@ assert.match(
 );
 assert.match(
   activityPublishSettingsFormSource,
-  /function ActivityPublishPreview[\s\S]*aria-labelledby="assignment-publish-preview-label"[\s\S]*id="assignment-publish-preview-label"[\s\S]*assignmentPublishDialogCopy\.previewLabel[\s\S]*role="alert"[\s\S]*view\.dialogState\.errorMessage/,
+  /function ActivityPublishPreview[\s\S]*const \{ controlBoundary \} = view[\s\S]*const \{ controlIds \} = controlBoundary[\s\S]*aria-describedby=\{joinDomIds\(controlBoundary\.previewRegionDescribedByIds\)\}[\s\S]*aria-labelledby=\{joinDomIds\(controlBoundary\.previewRegionLabelledByIds\)\}[\s\S]*id=\{controlIds\.previewLabel\}[\s\S]*assignmentPublishDialogCopy\.previewLabel[\s\S]*id=\{controlIds\.validationAlert\}[\s\S]*role="alert"[\s\S]*view\.dialogState\.errorMessage/,
   'Assignment publish preview should expose the prepared preview label and validation errors as semantic status for teachers before publishing.'
 );
 assert.match(
@@ -7357,22 +7373,22 @@ assert.match(
 );
 assert.match(
   activityPublishSettingsFormSource,
-  /function ActivityPublishPreviewContext[\s\S]*const titleId = 'assignment-publish-preview-context-title'[\s\S]*const descriptionId = 'assignment-publish-preview-context-description'[\s\S]*const statusMessageId = 'assignment-publish-preview-context-status-message'[\s\S]*aria-labelledby=\{titleId\}[\s\S]*aria-describedby=\{`\$\{descriptionId\} \$\{statusMessageId\}`\}[\s\S]*id=\{titleId\}[\s\S]*context\.title[\s\S]*id=\{descriptionId\}[\s\S]*context\.description/,
+  /function ActivityPublishPreviewContext[\s\S]*controlBoundary: AssignmentPublishControlBoundaryView[\s\S]*const \{ controlIds \} = controlBoundary[\s\S]*aria-labelledby=\{controlIds\.previewContextTitle\}[\s\S]*aria-describedby=\{joinDomIds\(controlBoundary\.previewRegionDescribedByIds\)\}[\s\S]*id=\{controlIds\.previewContextTitle\}[\s\S]*context\.title[\s\S]*id=\{controlIds\.previewContextDescription\}[\s\S]*context\.description/,
   'Assignment publish preview context should bind its prepared title, description, and status message to the preview region.'
 );
 assert.match(
   activityPublishSettingsFormSource,
-  /aria-describedby=\{statusMessageId\}[\s\S]*context\.status\.label[\s\S]*id=\{statusMessageId\}[\s\S]*role=\{context\.status\.tone === 'blocked'[\s\S]*'alert'[\s\S]*'status'\}[\s\S]*context\.status\.message/,
+  /aria-describedby=\{controlIds\.previewContextStatusMessage\}[\s\S]*context\.status\.label[\s\S]*id=\{controlIds\.previewContextStatusMessage\}[\s\S]*role=\{context\.status\.tone === 'blocked'[\s\S]*'alert'[\s\S]*'status'\}[\s\S]*context\.status\.message/,
   'Assignment publish preview status should associate the visible status badge with the prepared ready or blocked message.'
 );
 assert.match(
   activityPublishSettingsFormSource,
-  /function AssignmentPublishPreviewStatItem[\s\S]*item: AssignmentPublishPreviewContextStatView[\s\S]*const labelId = `assignment-publish-preview-stat-\$\{item\.id\}-label`[\s\S]*const valueId = `assignment-publish-preview-stat-\$\{item\.id\}-value`[\s\S]*<fieldset[\s\S]*aria-labelledby=\{`\$\{labelId\} \$\{valueId\}`\}[\s\S]*<legend id=\{labelId\}[\s\S]*item\.label[\s\S]*id=\{valueId\}[\s\S]*<output>\{item\.value\}<\/output>[\s\S]*<\/fieldset>/,
+  /function AssignmentPublishPreviewStatItem[\s\S]*controlIds: AssignmentPublishStatControlIds[\s\S]*<fieldset[\s\S]*aria-labelledby=\{`\$\{controlIds\.labelId\} \$\{controlIds\.valueId\}`\}[\s\S]*<legend id=\{controlIds\.labelId\}[\s\S]*item\.label[\s\S]*id=\{controlIds\.valueId\}[\s\S]*<output>\{item\.value\}<\/output>[\s\S]*<\/fieldset>/,
   'Assignment publish preview stat items should expose prepared label/value pairs as native semantic grouped outputs.'
 );
 assert.match(
   activityPublishSettingsFormSource,
-  /const reviewLabelId = 'assignment-publish-preview-review-label'[\s\S]*id=\{reviewLabelId\}[\s\S]*context\.reviewLabel[\s\S]*<ul aria-labelledby=\{reviewLabelId\}/,
+  /id=\{controlIds\.previewReviewLabel\}[\s\S]*context\.reviewLabel[\s\S]*<ul[\s\S]*aria-labelledby=\{joinDomIds\([\s\S]*controlBoundary\.reviewChecklistLabelledByIds[\s\S]*\)\}/,
   'Assignment publish preview review checklist should be labelled by the prepared review label.'
 );
 assert.match(
@@ -7382,7 +7398,7 @@ assert.match(
 );
 assert.match(
   activityPublishSettingsFormSource,
-  /function AssignmentPublishPreviewReviewItem[\s\S]*const labelId = `assignment-publish-preview-review-\$\{item\.id\}-label`[\s\S]*const descriptionId = `assignment-publish-preview-review-\$\{item\.id\}-description`[\s\S]*aria-labelledby=\{labelId\}[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*id=\{labelId\}[\s\S]*item\.label[\s\S]*id=\{descriptionId\}[\s\S]*item\.description/,
+  /function AssignmentPublishPreviewReviewItem[\s\S]*controlIds: AssignmentPublishReviewControlIds[\s\S]*aria-labelledby=\{joinDomIds\(controlIds\.labelledByIds\)\}[\s\S]*aria-describedby=\{joinDomIds\(controlIds\.describedByIds\)\}[\s\S]*id=\{controlIds\.labelId\}[\s\S]*item\.label[\s\S]*id=\{controlIds\.descriptionId\}[\s\S]*item\.description/,
   'Assignment publish preview review rows should bind prepared labels and descriptions to each checklist item.'
 );
 assert.doesNotMatch(
@@ -7392,7 +7408,7 @@ assert.doesNotMatch(
 );
 assert.match(
   activityPublishSettingsFormSource,
-  /ActivityPublishSettingsForm[\s\S]*ActivityPublishIdentityFields[\s\S]*draft=\{draft\}[\s\S]*ActivityPublishToggleGroup[\s\S]*toggleViews=\{view\.toggleViews\}[\s\S]*ActivityPublishDeliveryLimitFields[\s\S]*ActivityPublishPreview[\s\S]*view=\{view\}/,
+  /ActivityPublishSettingsForm[\s\S]*ActivityPublishIdentityFields[\s\S]*controlBoundary=\{view\.controlBoundary\}[\s\S]*draft=\{draft\}[\s\S]*ActivityPublishToggleGroup[\s\S]*controlBoundary=\{view\.controlBoundary\}[\s\S]*toggleViews=\{view\.toggleViews\}[\s\S]*ActivityPublishDeliveryLimitFields[\s\S]*controlBoundary=\{view\.controlBoundary\}[\s\S]*ActivityPublishPreview[\s\S]*view=\{view\}/,
   'Assignment publish settings form should delegate identity, toggles, delivery limits, and preview sections.'
 );
 assert.match(
@@ -7407,17 +7423,17 @@ assert.match(
 );
 assert.match(
   activityPublishSettingsFormSource,
-  /const maxAttemptsHelpId = `max-attempts-\$\{activityId\}-help`[\s\S]*aria-describedby=\{maxAttemptsHelpId\}[\s\S]*id=\{maxAttemptsHelpId\}[\s\S]*assignmentPublishDialogCopy\.maxAttemptsHelp/,
+  /fieldIds\.maxAttempts\.inputId[\s\S]*aria-describedby=\{joinDomIds\(fieldIds\.maxAttempts\.describedByIds\)\}[\s\S]*id=\{fieldIds\.maxAttempts\.helpId\}[\s\S]*assignmentPublishDialogCopy\.maxAttemptsHelp/,
   'Assignment publish max-attempts input should be associated with its prepared help text.'
 );
 assert.match(
   activityPublishSettingsFormSource,
-  /const timeLimitHelpId = `time-limit-\$\{activityId\}-help`[\s\S]*aria-describedby=\{timeLimitHelpId\}[\s\S]*id=\{timeLimitHelpId\}[\s\S]*assignmentPublishDialogCopy\.timeLimitHelp/,
+  /fieldIds\.timeLimit\.inputId[\s\S]*aria-describedby=\{joinDomIds\(fieldIds\.timeLimit\.describedByIds\)\}[\s\S]*id=\{fieldIds\.timeLimit\.helpId\}[\s\S]*assignmentPublishDialogCopy\.timeLimitHelp/,
   'Assignment publish timer input should be associated with its prepared help text.'
 );
 assert.match(
   activityPublishSettingsFormSource,
-  /const closeAfterHelpId = `expires-at-\$\{activityId\}-help`[\s\S]*aria-describedby=\{closeAfterHelpId\}[\s\S]*id=\{closeAfterHelpId\}[\s\S]*assignmentPublishDialogCopy\.closeAfterHelp/,
+  /fieldIds\.closeAfter\.inputId[\s\S]*aria-describedby=\{joinDomIds\(fieldIds\.closeAfter\.describedByIds\)\}[\s\S]*id=\{fieldIds\.closeAfter\.helpId\}[\s\S]*assignmentPublishDialogCopy\.closeAfterHelp/,
   'Assignment publish close-time input should be associated with its prepared help text.'
 );
 assert.match(
@@ -7427,8 +7443,13 @@ assert.match(
 );
 assert.match(
   activityPublishSettingsFormSource,
-  /function PublishSetting[\s\S]*const descriptionId = `\$\{id\}-description`[\s\S]*id=\{descriptionId\}[\s\S]*description[\s\S]*aria-describedby=\{descriptionId\}/,
+  /function PublishSetting[\s\S]*describedByIds: string\[\][\s\S]*descriptionId: string[\s\S]*id=\{descriptionId\}[\s\S]*description[\s\S]*aria-describedby=\{joinDomIds\(describedByIds\)\}/,
   'Assignment publish toggle controls should be associated with their prepared descriptions.'
+);
+assert.doesNotMatch(
+  activityPublishSettingsFormSource,
+  /assignment-title-\$\{activityId\}|assignment-instructions-\$\{activityId\}|max-attempts-\$\{activityId\}|time-limit-\$\{activityId\}|expires-at-\$\{activityId\}|\$\{option\.key\}-\$\{activityId\}/,
+  'Assignment publish settings form should use opaque prepared control ids instead of activity ids in DOM ids.'
 );
 assert.doesNotMatch(
   activityPublishSettingsFormSource,
@@ -23628,6 +23649,122 @@ assert.equal(
 );
 assert.equal(
   JSON.stringify(assignmentPublishDialogViewModel.handoffView).includes(
+    'Finish before class.'
+  ),
+  false
+);
+assert.deepEqual(
+  {
+    closeAfterStatus: assignmentPublishDialogViewModel.controlBoundary
+      .closeAfterStatus,
+    deliveryRuleCount:
+      assignmentPublishDialogViewModel.controlBoundary.deliveryRuleCount,
+    fieldCount: assignmentPublishDialogViewModel.controlBoundary.fieldCount,
+    itemIds: assignmentPublishDialogViewModel.controlBoundary.itemIds,
+    previewRegionDescribedByIds:
+      assignmentPublishDialogViewModel.controlBoundary
+        .previewRegionDescribedByIds,
+    previewRegionLabelledByIds:
+      assignmentPublishDialogViewModel.controlBoundary
+        .previewRegionLabelledByIds,
+    previewStatCount:
+      assignmentPublishDialogViewModel.controlBoundary.previewStatCount,
+    publishDisabled:
+      assignmentPublishDialogViewModel.controlBoundary.publishDisabled,
+    reviewChecklistLabelledByIds:
+      assignmentPublishDialogViewModel.controlBoundary
+        .reviewChecklistLabelledByIds,
+    reviewItemCount:
+      assignmentPublishDialogViewModel.controlBoundary.reviewItemCount,
+    scope: assignmentPublishDialogViewModel.controlBoundary.scope,
+    status: assignmentPublishDialogViewModel.controlBoundary.status,
+    toggleCount: assignmentPublishDialogViewModel.controlBoundary.toggleCount,
+    usesOpaqueControlScope:
+      assignmentPublishDialogViewModel.controlBoundary.usesOpaqueControlScope,
+    usesPreparedControlIds:
+      assignmentPublishDialogViewModel.controlBoundary.usesPreparedControlIds,
+  },
+  {
+    closeAfterStatus: 'ready',
+    deliveryRuleCount: 6,
+    fieldCount: 5,
+    itemIds: [...ASSIGNMENT_PUBLISH_CONTROL_BOUNDARY_ITEM_IDS],
+    previewRegionDescribedByIds: [
+      'assignment-publish-control-preview-context-description',
+      'assignment-publish-control-preview-context-status-message',
+    ],
+    previewRegionLabelledByIds: ['assignment-publish-control-preview-label'],
+    previewStatCount: 4,
+    publishDisabled: false,
+    reviewChecklistLabelledByIds: [
+      'assignment-publish-control-preview-review-label',
+    ],
+    reviewItemCount: 3,
+    scope: 'assignment-publish-control-semantics',
+    status: 'ready',
+    toggleCount: 3,
+    usesOpaqueControlScope: true,
+    usesPreparedControlIds: true,
+  }
+);
+assert.deepEqual(
+  assignmentPublishDialogViewModel.controlBoundary.controlIds.fieldIds.title,
+  {
+    describedByIds: ['assignment-publish-control-assignment-title-help'],
+    helpId: 'assignment-publish-control-assignment-title-help',
+    inputId: 'assignment-publish-control-assignment-title',
+  }
+);
+assert.deepEqual(
+  assignmentPublishDialogViewModel.controlBoundary.controlIds.toggleIds
+    .collectStudentName,
+  {
+    describedByIds: [
+      'assignment-publish-control-collect-student-name-description',
+    ],
+    descriptionId:
+      'assignment-publish-control-collect-student-name-description',
+    inputId: 'assignment-publish-control-collect-student-name-toggle',
+  }
+);
+assert.deepEqual(
+  assignmentPublishDialogViewModel.controlBoundary.controlIds.statItemIds
+    .deliveryRules,
+  {
+    labelId: 'assignment-publish-control-preview-stat-delivery-rules-label',
+    valueId: 'assignment-publish-control-preview-stat-delivery-rules-value',
+  }
+);
+assert.deepEqual(
+  assignmentPublishDialogViewModel.controlBoundary.controlIds.reviewItemIds[
+    'snapshot-freeze'
+  ],
+  {
+    describedByIds: [
+      'assignment-publish-control-preview-review-snapshot-freeze-description',
+    ],
+    descriptionId:
+      'assignment-publish-control-preview-review-snapshot-freeze-description',
+    labelledByIds: [
+      'assignment-publish-control-preview-review-snapshot-freeze-label',
+    ],
+    labelId: 'assignment-publish-control-preview-review-snapshot-freeze-label',
+  }
+);
+assert.equal(
+  JSON.stringify(assignmentPublishDialogViewModel.controlBoundary).includes(
+    'activity-1'
+  ),
+  false
+);
+assert.equal(
+  JSON.stringify(assignmentPublishDialogViewModel.controlBoundary).includes(
+    'Week 1 review'
+  ),
+  false
+);
+assert.equal(
+  JSON.stringify(assignmentPublishDialogViewModel.controlBoundary).includes(
     'Finish before class.'
   ),
   false

@@ -1,5 +1,6 @@
 import {
   assignmentPublishDialogCopy,
+  type AssignmentPublishControlBoundaryView,
   type AssignmentPublishDialogViewModel,
   type AssignmentPublishDraft,
   type AssignmentPublishDraftValues,
@@ -29,15 +30,19 @@ type ActivityPublishDraftFieldChange = <
   value: AssignmentPublishDraftValues[TKey]
 ) => void;
 
+type AssignmentPublishStatControlIds =
+  AssignmentPublishControlBoundaryView['controlIds']['statItemIds'][AssignmentPublishPreviewContextStatView['id']];
+
+type AssignmentPublishReviewControlIds =
+  AssignmentPublishControlBoundaryView['controlIds']['reviewItemIds'][AssignmentPublishPreviewReviewItemView['id']];
+
 type ActivityPublishSettingsFormProps = {
-  activityId: string;
   draft: AssignmentPublishDraft;
   onDraftChange: ActivityPublishDraftFieldChange;
   view: AssignmentPublishDialogViewModel;
 };
 
 export function ActivityPublishSettingsForm({
-  activityId,
   draft,
   onDraftChange,
   view,
@@ -45,17 +50,17 @@ export function ActivityPublishSettingsForm({
   return (
     <div className="grid gap-4">
       <ActivityPublishIdentityFields
-        activityId={activityId}
+        controlBoundary={view.controlBoundary}
         draft={draft}
         onDraftChange={onDraftChange}
       />
       <ActivityPublishToggleGroup
-        activityId={activityId}
+        controlBoundary={view.controlBoundary}
         onDraftChange={onDraftChange}
         toggleViews={view.toggleViews}
       />
       <ActivityPublishDeliveryLimitFields
-        activityId={activityId}
+        controlBoundary={view.controlBoundary}
         draft={draft}
         onDraftChange={onDraftChange}
       />
@@ -65,52 +70,54 @@ export function ActivityPublishSettingsForm({
 }
 
 function ActivityPublishIdentityFields({
-  activityId,
+  controlBoundary,
   draft,
   onDraftChange,
 }: {
-  activityId: string;
+  controlBoundary: AssignmentPublishControlBoundaryView;
   draft: AssignmentPublishDraft;
   onDraftChange: ActivityPublishDraftFieldChange;
 }) {
-  const titleHelpId = `assignment-title-${activityId}-help`;
-  const instructionsHelpId = `assignment-instructions-${activityId}-help`;
+  const { fieldIds } = controlBoundary.controlIds;
 
   return (
     <>
       <div className="grid gap-2">
-        <label htmlFor={`assignment-title-${activityId}`}>
+        <label htmlFor={fieldIds.title.inputId}>
           {assignmentPublishDialogCopy.titleLabel}
         </label>
         <Input
-          id={`assignment-title-${activityId}`}
+          id={fieldIds.title.inputId}
           value={draft.title}
-          aria-describedby={titleHelpId}
+          aria-describedby={joinDomIds(fieldIds.title.describedByIds)}
           onChange={(event) =>
             onDraftChange('title', event.currentTarget.value)
           }
         />
-        <p id={titleHelpId} className="text-xs leading-5 text-muted-foreground">
+        <p
+          id={fieldIds.title.helpId}
+          className="text-xs leading-5 text-muted-foreground"
+        >
           {assignmentPublishDialogCopy.titleHelp}
         </p>
       </div>
       <div className="grid gap-2">
-        <label htmlFor={`assignment-instructions-${activityId}`}>
+        <label htmlFor={fieldIds.instructions.inputId}>
           {assignmentPublishDialogCopy.instructionsLabel}
         </label>
         <Textarea
-          id={`assignment-instructions-${activityId}`}
+          id={fieldIds.instructions.inputId}
           rows={3}
           maxLength={ASSIGNMENT_PUBLISH_FIELD_LIMITS.instructionsMaxLength}
           value={draft.instructions}
           placeholder={assignmentPublishDialogCopy.instructionsPlaceholder}
-          aria-describedby={instructionsHelpId}
+          aria-describedby={joinDomIds(fieldIds.instructions.describedByIds)}
           onChange={(event) =>
             onDraftChange('instructions', event.currentTarget.value)
           }
         />
         <p
-          id={instructionsHelpId}
+          id={fieldIds.instructions.helpId}
           className="text-xs leading-5 text-muted-foreground"
         >
           {assignmentPublishDialogCopy.instructionsHelp}
@@ -121,22 +128,29 @@ function ActivityPublishIdentityFields({
 }
 
 function ActivityPublishToggleGroup({
-  activityId,
+  controlBoundary,
   onDraftChange,
   toggleViews,
 }: {
-  activityId: string;
+  controlBoundary: AssignmentPublishControlBoundaryView;
   onDraftChange: ActivityPublishDraftFieldChange;
   toggleViews: AssignmentPublishToggleView[];
 }) {
+  const { controlIds } = controlBoundary;
+
   return (
-    <div className="grid gap-3 rounded-lg border bg-muted/20 p-3">
+    <div
+      id={controlIds.toggleGroup}
+      className="grid gap-3 rounded-lg border bg-muted/20 p-3"
+    >
       {toggleViews.map((option) => (
         <PublishSetting
           key={option.key}
           checked={option.checked}
           description={option.description}
-          id={`${option.key}-${activityId}`}
+          descriptionId={controlIds.toggleIds[option.key].descriptionId}
+          describedByIds={controlIds.toggleIds[option.key].describedByIds}
+          id={controlIds.toggleIds[option.key].inputId}
           label={option.label}
           onCheckedChange={(checked) => onDraftChange(option.key, checked)}
         />
@@ -146,81 +160,79 @@ function ActivityPublishToggleGroup({
 }
 
 function ActivityPublishDeliveryLimitFields({
-  activityId,
+  controlBoundary,
   draft,
   onDraftChange,
 }: {
-  activityId: string;
+  controlBoundary: AssignmentPublishControlBoundaryView;
   draft: AssignmentPublishDraft;
   onDraftChange: ActivityPublishDraftFieldChange;
 }) {
-  const maxAttemptsHelpId = `max-attempts-${activityId}-help`;
-  const timeLimitHelpId = `time-limit-${activityId}-help`;
-  const closeAfterHelpId = `expires-at-${activityId}-help`;
+  const { fieldIds } = controlBoundary.controlIds;
 
   return (
     <>
       <div className="grid gap-2">
-        <label htmlFor={`max-attempts-${activityId}`}>
+        <label htmlFor={fieldIds.maxAttempts.inputId}>
           {assignmentPublishDialogCopy.maxAttemptsLabel}
         </label>
         <Input
-          id={`max-attempts-${activityId}`}
+          id={fieldIds.maxAttempts.inputId}
           type="number"
           min={ASSIGNMENT_MAX_ATTEMPTS_RANGE.min}
           max={ASSIGNMENT_MAX_ATTEMPTS_RANGE.max}
           value={draft.maxAttempts}
-          aria-describedby={maxAttemptsHelpId}
+          aria-describedby={joinDomIds(fieldIds.maxAttempts.describedByIds)}
           onChange={(event) =>
             onDraftChange('maxAttempts', event.currentTarget.value)
           }
         />
         <p
-          id={maxAttemptsHelpId}
+          id={fieldIds.maxAttempts.helpId}
           className="text-xs leading-5 text-muted-foreground"
         >
           {assignmentPublishDialogCopy.maxAttemptsHelp}
         </p>
       </div>
       <div className="grid gap-2">
-        <label htmlFor={`time-limit-${activityId}`}>
+        <label htmlFor={fieldIds.timeLimit.inputId}>
           {assignmentPublishDialogCopy.timeLimitLabel}
         </label>
         <Input
-          id={`time-limit-${activityId}`}
+          id={fieldIds.timeLimit.inputId}
           type="number"
           min={ASSIGNMENT_TIME_LIMIT_MINUTES_RANGE.min}
           max={ASSIGNMENT_TIME_LIMIT_MINUTES_RANGE.max}
           value={draft.timeLimitMinutes}
           placeholder={assignmentPublishDialogCopy.timeLimitPlaceholder}
-          aria-describedby={timeLimitHelpId}
+          aria-describedby={joinDomIds(fieldIds.timeLimit.describedByIds)}
           onChange={(event) =>
             onDraftChange('timeLimitMinutes', event.currentTarget.value)
           }
         />
         <p
-          id={timeLimitHelpId}
+          id={fieldIds.timeLimit.helpId}
           className="text-xs leading-5 text-muted-foreground"
         >
           {assignmentPublishDialogCopy.timeLimitHelp}
         </p>
       </div>
       <div className="grid gap-2">
-        <label htmlFor={`expires-at-${activityId}`}>
+        <label htmlFor={fieldIds.closeAfter.inputId}>
           {assignmentPublishDialogCopy.closeAfterLabel}
         </label>
         <Input
-          id={`expires-at-${activityId}`}
+          id={fieldIds.closeAfter.inputId}
           type="datetime-local"
           min={buildAssignmentPublishCloseAfterMinLocal()}
           value={draft.expiresAtLocal}
-          aria-describedby={closeAfterHelpId}
+          aria-describedby={joinDomIds(fieldIds.closeAfter.describedByIds)}
           onChange={(event) =>
             onDraftChange('expiresAtLocal', event.currentTarget.value)
           }
         />
         <p
-          id={closeAfterHelpId}
+          id={fieldIds.closeAfter.helpId}
           className="text-xs leading-5 text-muted-foreground"
         >
           {assignmentPublishDialogCopy.closeAfterHelp}
@@ -235,19 +247,27 @@ function ActivityPublishPreview({
 }: {
   view: AssignmentPublishDialogViewModel;
 }) {
+  const { controlBoundary } = view;
+  const { controlIds } = controlBoundary;
+
   return (
     <section
-      aria-labelledby="assignment-publish-preview-label"
+      aria-describedby={joinDomIds(controlBoundary.previewRegionDescribedByIds)}
+      aria-labelledby={joinDomIds(controlBoundary.previewRegionLabelledByIds)}
       className="grid gap-2"
     >
-      <p id="assignment-publish-preview-label" className="font-medium text-sm">
+      <p id={controlIds.previewLabel} className="font-medium text-sm">
         {assignmentPublishDialogCopy.previewLabel}
       </p>
-      <ActivityPublishPreviewContext context={view.preview.context} />
+      <ActivityPublishPreviewContext
+        context={view.preview.context}
+        controlBoundary={controlBoundary}
+      />
       <AssignmentSettingsSummary view={view.preview.settingsSummaryView} />
       <AssignmentPublishHandoff view={view.handoffView} />
       {view.dialogState.errorMessage ? (
         <p
+          id={controlIds.validationAlert}
           className="rounded-md border border-destructive/30 bg-destructive/5 px-3 py-2 text-destructive text-sm"
           role="alert"
         >
@@ -292,27 +312,29 @@ function AssignmentPublishHandoff({
 
 function ActivityPublishPreviewContext({
   context,
+  controlBoundary,
 }: {
   context: AssignmentPublishPreviewContextView;
+  controlBoundary: AssignmentPublishControlBoundaryView;
 }) {
-  const titleId = 'assignment-publish-preview-context-title';
-  const descriptionId = 'assignment-publish-preview-context-description';
-  const statusMessageId = 'assignment-publish-preview-context-status-message';
-  const reviewLabelId = 'assignment-publish-preview-review-label';
+  const { controlIds } = controlBoundary;
 
   return (
     <section
-      aria-labelledby={titleId}
-      aria-describedby={`${descriptionId} ${statusMessageId}`}
+      aria-labelledby={controlIds.previewContextTitle}
+      aria-describedby={joinDomIds(controlBoundary.previewRegionDescribedByIds)}
       className="grid gap-3 rounded-lg border bg-muted/20 p-3"
     >
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div className="min-w-0">
-          <p id={titleId} className="font-medium text-sm">
+          <p
+            id={controlIds.previewContextTitle}
+            className="font-medium text-sm"
+          >
             {context.title}
           </p>
           <p
-            id={descriptionId}
+            id={controlIds.previewContextDescription}
             className="mt-1 text-muted-foreground text-xs leading-5"
           >
             {context.description}
@@ -323,7 +345,7 @@ function ActivityPublishPreviewContext({
             'shrink-0 rounded-md px-2 py-1 font-medium text-xs',
             getActivityPublishPreviewStatusClass(context.status.tone)
           )}
-          aria-describedby={statusMessageId}
+          aria-describedby={controlIds.previewContextStatusMessage}
         >
           {context.status.label}
         </span>
@@ -333,23 +355,36 @@ function ActivityPublishPreviewContext({
           'rounded-md border px-3 py-2 text-sm',
           getActivityPublishPreviewMessageClass(context.status.tone)
         )}
-        id={statusMessageId}
+        id={controlIds.previewContextStatusMessage}
         role={context.status.tone === 'blocked' ? 'alert' : 'status'}
       >
         {context.status.message}
       </p>
       <div className="grid gap-2 sm:grid-cols-2">
         {context.statItems.map((item) => (
-          <AssignmentPublishPreviewStatItem item={item} key={item.id} />
+          <AssignmentPublishPreviewStatItem
+            controlIds={controlIds.statItemIds[item.id]}
+            item={item}
+            key={item.id}
+          />
         ))}
       </div>
       <div className="border-t pt-3">
-        <p id={reviewLabelId} className="font-medium text-xs">
+        <p id={controlIds.previewReviewLabel} className="font-medium text-xs">
           {context.reviewLabel}
         </p>
-        <ul aria-labelledby={reviewLabelId} className="mt-2 grid gap-2">
+        <ul
+          aria-labelledby={joinDomIds(
+            controlBoundary.reviewChecklistLabelledByIds
+          )}
+          className="mt-2 grid gap-2"
+        >
           {context.reviewItems.map((item) => (
-            <AssignmentPublishPreviewReviewItem item={item} key={item.id} />
+            <AssignmentPublishPreviewReviewItem
+              controlIds={controlIds.reviewItemIds[item.id]}
+              item={item}
+              key={item.id}
+            />
           ))}
         </ul>
       </div>
@@ -358,22 +393,21 @@ function ActivityPublishPreviewContext({
 }
 
 function AssignmentPublishPreviewStatItem({
+  controlIds,
   item,
 }: {
+  controlIds: AssignmentPublishStatControlIds;
   item: AssignmentPublishPreviewContextStatView;
 }) {
-  const labelId = `assignment-publish-preview-stat-${item.id}-label`;
-  const valueId = `assignment-publish-preview-stat-${item.id}-value`;
-
   return (
     <fieldset
-      aria-labelledby={`${labelId} ${valueId}`}
+      aria-labelledby={`${controlIds.labelId} ${controlIds.valueId}`}
       className="rounded-md border bg-background p-2"
     >
-      <legend id={labelId} className="text-muted-foreground text-xs">
+      <legend id={controlIds.labelId} className="text-muted-foreground text-xs">
         {item.label}
       </legend>
-      <div id={valueId} className="mt-1 font-medium text-sm">
+      <div id={controlIds.valueId} className="mt-1 font-medium text-sm">
         <output>{item.value}</output>
       </div>
     </fieldset>
@@ -381,25 +415,27 @@ function AssignmentPublishPreviewStatItem({
 }
 
 function AssignmentPublishPreviewReviewItem({
+  controlIds,
   item,
 }: {
+  controlIds: AssignmentPublishReviewControlIds;
   item: AssignmentPublishPreviewReviewItemView;
 }) {
-  const labelId = `assignment-publish-preview-review-${item.id}-label`;
-  const descriptionId = `assignment-publish-preview-review-${item.id}-description`;
-
   return (
     <li
       aria-label={item.ariaLabel}
-      aria-labelledby={labelId}
-      aria-describedby={descriptionId}
+      aria-labelledby={joinDomIds(controlIds.labelledByIds)}
+      aria-describedby={joinDomIds(controlIds.describedByIds)}
       className="rounded-md border bg-background px-3 py-2 text-xs"
     >
       <span className="sr-only">{item.ariaLabel}</span>
-      <p id={labelId} className="font-medium">
+      <p id={controlIds.labelId} className="font-medium">
         {item.label}
       </p>
-      <p id={descriptionId} className="mt-1 leading-5 text-muted-foreground">
+      <p
+        id={controlIds.descriptionId}
+        className="mt-1 leading-5 text-muted-foreground"
+      >
         {item.description}
       </p>
     </li>
@@ -425,18 +461,20 @@ function getActivityPublishPreviewMessageClass(
 function PublishSetting({
   checked,
   description,
+  describedByIds,
+  descriptionId,
   id,
   label,
   onCheckedChange,
 }: {
   checked: boolean;
   description: string;
+  describedByIds: string[];
+  descriptionId: string;
   id: string;
   label: string;
   onCheckedChange: (checked: boolean) => void;
 }) {
-  const descriptionId = `${id}-description`;
-
   return (
     <div className="flex items-start justify-between gap-3">
       <div className="min-w-0">
@@ -453,9 +491,13 @@ function PublishSetting({
       <Switch
         id={id}
         checked={checked}
-        aria-describedby={descriptionId}
+        aria-describedby={joinDomIds(describedByIds)}
         onCheckedChange={onCheckedChange}
       />
     </div>
   );
+}
+
+function joinDomIds(ids: string[]) {
+  return ids.filter(Boolean).join(' ');
 }
