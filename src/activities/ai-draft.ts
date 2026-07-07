@@ -81,6 +81,71 @@ export const ACTIVITY_AI_DRAFT_SOURCE_TERM_LIMITS = {
   minWordLength: 3,
 } as const;
 
+export const ACTIVITY_AI_FALLBACK_SOURCE_TERM_PLAN_ITEM_IDS = [
+  'source-term-scope',
+  'input-schema',
+  'source-sanitization',
+  'material-notes-detected',
+  'material-notes-omitted',
+  'safe-material-note-boundary',
+  'content-source',
+  'phrase-extraction',
+  'word-extraction',
+  'subject-fallback',
+  'unique-normalization',
+  'vocabulary-limit',
+  'item-target',
+  'minimum-source-terms',
+  'source-term-count',
+  'source-term-selection',
+  'fallback-padding',
+  'fallback-key-word',
+  'fallback-example',
+  'fallback-meaning',
+  'fallback-category',
+  'fallback-review',
+  'output-term-count',
+  'vocabulary-consumer',
+  'question-consumer',
+  'pair-consumer',
+  'group-consumer',
+  'teacher-note-consumer',
+  'privacy-source-text',
+  'privacy-material-identifiers',
+] as const;
+
+export type ActivityAiFallbackSourceTermPlanItemId =
+  (typeof ACTIVITY_AI_FALLBACK_SOURCE_TERM_PLAN_ITEM_IDS)[number];
+
+export type ActivityAiFallbackSourceTermPlanItemView = {
+  id: ActivityAiFallbackSourceTermPlanItemId;
+  value: string;
+};
+
+export type ActivityAiFallbackSourceTermPlanPrivacyContract = {
+  excludesDraftSourceText: true;
+  excludesRawSourceMaterialNotes: true;
+  exposesSourceMaterialFileIds: false;
+  exposesSourceMaterialStorageKeys: false;
+  itemIds: ActivityAiFallbackSourceTermPlanItemId[];
+  scope: 'deterministic-ai-fallback-source-terms';
+};
+
+export type ActivityAiFallbackSourceTermPlan = {
+  fallbackPaddingTerms: string[];
+  itemViews: ActivityAiFallbackSourceTermPlanItemView[];
+  minimumSourceTerms: number;
+  privacy: ActivityAiFallbackSourceTermPlanPrivacyContract;
+  safeSourceText: string;
+  selectedSourceTerms: string[];
+  sourceMaterialNotesDetected: boolean;
+  sourceMaterialNotesOmitted: boolean;
+  sourceTerms: string[];
+  targetItemCount: number;
+  terms: string[];
+  usedFallbackPadding: boolean;
+};
+
 export const ACTIVITY_AI_DRAFT_FIELD_LIMITS = {
   answer: {
     max: 120,
@@ -1349,16 +1414,68 @@ export function buildFallbackActivityDraftTerms({
   input: GenerateActivityDraftInput;
   locale: Locale;
 }) {
+  return buildFallbackActivityDraftSourceTermPlan({ input, locale }).terms;
+}
+
+export function buildFallbackActivityDraftSourceTermPlan({
+  input,
+  locale,
+}: {
+  input: GenerateActivityDraftInput;
+  locale: Locale;
+}): ActivityAiFallbackSourceTermPlan {
   const data = generateActivityDraftInputSchema.parse(input);
   const safeSourceText = sanitizeActivityDraftSourceTextForAi(data.sourceText);
   const sourceTerms = extractActivityDraftSourceTerms({
     sourceText: safeSourceText,
     subject: data.subject,
-  }).slice(0, data.itemCount);
+  });
+  const selectedSourceTerms = sourceTerms.slice(0, data.itemCount);
+  const minimumSourceTerms = ACTIVITY_AI_DRAFT_ITEM_COUNT_RANGE.min;
+  const usedFallbackPadding = selectedSourceTerms.length < minimumSourceTerms;
+  const fallbackPaddingTerms = usedFallbackPadding
+    ? buildFallbackActivityDraftPaddingTerms(locale)
+    : [];
+  const terms = usedFallbackPadding
+    ? unique([...sourceTerms, ...fallbackPaddingTerms]).slice(
+        0,
+        Math.max(ACTIVITY_AI_DRAFT_ITEM_COUNT_RANGE.default, data.itemCount)
+      )
+    : selectedSourceTerms;
+  const sourceMaterialNotesDetected = hasActivitySourceMaterialDraftNotes(
+    data.sourceText
+  );
+  const sourceMaterialNotesOmitted = sourceMaterialNotesDetected;
+  const context = {
+    data,
+    fallbackPaddingTerms,
+    minimumSourceTerms,
+    safeSourceText,
+    selectedSourceTerms,
+    sourceMaterialNotesDetected,
+    sourceMaterialNotesOmitted,
+    sourceTerms,
+    terms,
+    usedFallbackPadding,
+  };
+  const itemViews = ACTIVITY_AI_FALLBACK_SOURCE_TERM_PLAN_ITEM_IDS.map((id) =>
+    buildActivityAiFallbackSourceTermPlanItemView(id, context)
+  );
 
-  return sourceTerms.length >= ACTIVITY_AI_DRAFT_ITEM_COUNT_RANGE.min
-    ? sourceTerms
-    : fallbackTerms(data, locale);
+  return {
+    fallbackPaddingTerms,
+    itemViews,
+    minimumSourceTerms,
+    privacy: buildActivityAiFallbackSourceTermPlanPrivacyContract(itemViews),
+    safeSourceText,
+    selectedSourceTerms,
+    sourceMaterialNotesDetected,
+    sourceMaterialNotesOmitted,
+    sourceTerms,
+    targetItemCount: data.itemCount,
+    terms,
+    usedFallbackPadding,
+  };
 }
 
 export function extractActivityDraftSourceTerms({
@@ -1394,26 +1511,174 @@ export function extractActivityDraftSourceTerms({
   );
 }
 
-function fallbackTerms(
-  input: NormalizedGenerateActivityDraftInput,
-  locale: Locale
-) {
-  const safeSourceText = sanitizeActivityDraftSourceTextForAi(input.sourceText);
-
-  return unique([
-    ...extractActivityDraftSourceTerms({
-      sourceText: safeSourceText,
-      subject: input.subject,
-    }),
+function buildFallbackActivityDraftPaddingTerms(locale: Locale) {
+  return [
     m.activity_ai_fallback_term_key_word({}, { locale }),
     m.activity_ai_fallback_term_example({}, { locale }),
     m.activity_ai_fallback_term_meaning({}, { locale }),
     m.activity_ai_fallback_term_category({}, { locale }),
     m.activity_ai_fallback_term_review({}, { locale }),
-  ]).slice(
-    0,
-    Math.max(ACTIVITY_AI_DRAFT_ITEM_COUNT_RANGE.default, input.itemCount)
-  );
+  ];
+}
+
+type ActivityAiFallbackSourceTermPlanContext = {
+  data: NormalizedGenerateActivityDraftInput;
+  fallbackPaddingTerms: string[];
+  minimumSourceTerms: number;
+  safeSourceText: string;
+  selectedSourceTerms: string[];
+  sourceMaterialNotesDetected: boolean;
+  sourceMaterialNotesOmitted: boolean;
+  sourceTerms: string[];
+  terms: string[];
+  usedFallbackPadding: boolean;
+};
+
+function buildActivityAiFallbackSourceTermPlanItemView(
+  id: ActivityAiFallbackSourceTermPlanItemId,
+  context: ActivityAiFallbackSourceTermPlanContext
+): ActivityAiFallbackSourceTermPlanItemView {
+  return {
+    id,
+    value: getActivityAiFallbackSourceTermPlanItemValue(id, context),
+  };
+}
+
+function getActivityAiFallbackSourceTermPlanItemValue(
+  id: ActivityAiFallbackSourceTermPlanItemId,
+  context: ActivityAiFallbackSourceTermPlanContext
+) {
+  switch (id) {
+    case 'source-term-scope':
+      return 'Deterministic fallback source terms';
+    case 'input-schema':
+      return 'GenerateActivityDraftInput';
+    case 'source-sanitization':
+      return context.safeSourceText ? 'Sanitized' : 'Empty';
+    case 'material-notes-detected':
+      return context.sourceMaterialNotesDetected ? 'Detected' : 'None';
+    case 'material-notes-omitted':
+      return context.sourceMaterialNotesOmitted ? 'Omitted' : 'None';
+    case 'safe-material-note-boundary':
+      return 'Kind and basename only';
+    case 'content-source':
+      return 'Teacher source notes';
+    case 'phrase-extraction':
+      return formatActivityAiFallbackSourceTermPlanCount(
+        countActivityAiFallbackPhraseTerms(context.safeSourceText)
+      );
+    case 'word-extraction':
+      return formatActivityAiFallbackSourceTermPlanCount(
+        countActivityAiFallbackWordTerms(context.safeSourceText)
+      );
+    case 'subject-fallback':
+      return context.sourceTerms.some(
+        (term) =>
+          normalizeAiDraftCompletionKey(term) ===
+          normalizeAiDraftCompletionKey(context.data.subject)
+      )
+        ? 'Included'
+        : 'Not needed';
+    case 'unique-normalization':
+      return 'NFKC + whitespace';
+    case 'vocabulary-limit':
+      return String(ACTIVITY_AI_DRAFT_COMPLETION_LIMITS.vocabulary);
+    case 'item-target':
+      return String(context.data.itemCount);
+    case 'minimum-source-terms':
+      return String(context.minimumSourceTerms);
+    case 'source-term-count':
+      return formatActivityAiFallbackSourceTermPlanCount(
+        context.sourceTerms.length
+      );
+    case 'source-term-selection':
+      return formatActivityAiFallbackSourceTermPlanCount(
+        context.selectedSourceTerms.length
+      );
+    case 'fallback-padding':
+      return context.usedFallbackPadding ? 'Used' : 'Not needed';
+    case 'fallback-key-word':
+      return formatActivityAiFallbackPaddingItemStatus(context, 0);
+    case 'fallback-example':
+      return formatActivityAiFallbackPaddingItemStatus(context, 1);
+    case 'fallback-meaning':
+      return formatActivityAiFallbackPaddingItemStatus(context, 2);
+    case 'fallback-category':
+      return formatActivityAiFallbackPaddingItemStatus(context, 3);
+    case 'fallback-review':
+      return formatActivityAiFallbackPaddingItemStatus(context, 4);
+    case 'output-term-count':
+      return formatActivityAiFallbackSourceTermPlanCount(context.terms.length);
+    case 'vocabulary-consumer':
+      return 'vocabularyText';
+    case 'question-consumer':
+      return 'questionsText';
+    case 'pair-consumer':
+      return 'pairsText';
+    case 'group-consumer':
+      return 'groupsText';
+    case 'teacher-note-consumer':
+      return 'teacherNotesText';
+    case 'privacy-source-text':
+      return 'Hidden';
+    case 'privacy-material-identifiers':
+      return 'Hidden';
+  }
+}
+
+function buildActivityAiFallbackSourceTermPlanPrivacyContract(
+  itemViews: ActivityAiFallbackSourceTermPlanItemView[]
+): ActivityAiFallbackSourceTermPlanPrivacyContract {
+  return {
+    excludesDraftSourceText: true,
+    excludesRawSourceMaterialNotes: true,
+    exposesSourceMaterialFileIds: false,
+    exposesSourceMaterialStorageKeys: false,
+    itemIds: itemViews.map((itemView) => itemView.id),
+    scope: 'deterministic-ai-fallback-source-terms',
+  };
+}
+
+function countActivityAiFallbackPhraseTerms(sourceText: string) {
+  const contentSourceText = hasActivitySourceMaterialDraftNotes(sourceText)
+    ? removeActivitySourceMaterialDraftNotes(sourceText)
+    : sourceText;
+
+  return contentSourceText
+    .split(/[\n,;|，。；、:：!?！？()[\]{}]+/u)
+    .map((value) => value.trim())
+    .filter(
+      (value) =>
+        value.length >= ACTIVITY_AI_DRAFT_SOURCE_TERM_LIMITS.minPhraseLength &&
+        value.length <= ACTIVITY_AI_DRAFT_SOURCE_TERM_LIMITS.maxPhraseLength
+    ).length;
+}
+
+function countActivityAiFallbackWordTerms(sourceText: string) {
+  const contentSourceText = hasActivitySourceMaterialDraftNotes(sourceText)
+    ? removeActivitySourceMaterialDraftNotes(sourceText)
+    : sourceText;
+
+  return contentSourceText
+    .split(/\s+/u)
+    .map((value) => value.replace(/^[^\p{L}\p{N}]+|[^\p{L}\p{N}]+$/gu, ''))
+    .filter(
+      (value) =>
+        value.length >= ACTIVITY_AI_DRAFT_SOURCE_TERM_LIMITS.minWordLength &&
+        value.length <= ACTIVITY_AI_DRAFT_SOURCE_TERM_LIMITS.maxWordLength
+    ).length;
+}
+
+function formatActivityAiFallbackPaddingItemStatus(
+  context: ActivityAiFallbackSourceTermPlanContext,
+  index: number
+) {
+  if (!context.usedFallbackPadding) return 'Not needed';
+  return context.fallbackPaddingTerms[index] ? 'Available' : 'Missing';
+}
+
+function formatActivityAiFallbackSourceTermPlanCount(count: number) {
+  return String(Number.isFinite(count) ? Math.max(0, Math.floor(count)) : 0);
 }
 
 function buildFallbackGroups(

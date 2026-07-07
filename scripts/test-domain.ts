@@ -210,9 +210,11 @@ import {
   ACTIVITY_AI_DRAFT_FIELD_LIMITS,
   ACTIVITY_AI_DRAFT_ITEM_COUNT_RANGE,
   ACTIVITY_AI_DRAFT_SOURCE_TERM_LIMITS,
+  ACTIVITY_AI_FALLBACK_SOURCE_TERM_PLAN_ITEM_IDS,
   buildActivityDraftPrompt,
   buildAiDraftQuestionOptionId,
   buildAiDraftQuestionOptionViews,
+  buildFallbackActivityDraftSourceTermPlan,
   buildFallbackActivityDraftTerms,
   buildGenerateActivityDraftInputFromEditor,
   canApplyActivityDraftResultToEditor,
@@ -36266,10 +36268,66 @@ assert.match(
   /ACTIVITY_AI_DRAFT_SOURCE_TERM_LIMITS[\s\S]*maxPhraseLength: 48[\s\S]*maxWordLength: 32[\s\S]*minPhraseLength: 2[\s\S]*minWordLength: 3/,
   'AI draft source-term extraction should expose named source-term limits.'
 );
+assert.deepEqual(
+  [...ACTIVITY_AI_FALLBACK_SOURCE_TERM_PLAN_ITEM_IDS],
+  [
+    'source-term-scope',
+    'input-schema',
+    'source-sanitization',
+    'material-notes-detected',
+    'material-notes-omitted',
+    'safe-material-note-boundary',
+    'content-source',
+    'phrase-extraction',
+    'word-extraction',
+    'subject-fallback',
+    'unique-normalization',
+    'vocabulary-limit',
+    'item-target',
+    'minimum-source-terms',
+    'source-term-count',
+    'source-term-selection',
+    'fallback-padding',
+    'fallback-key-word',
+    'fallback-example',
+    'fallback-meaning',
+    'fallback-category',
+    'fallback-review',
+    'output-term-count',
+    'vocabulary-consumer',
+    'question-consumer',
+    'pair-consumer',
+    'group-consumer',
+    'teacher-note-consumer',
+    'privacy-source-text',
+    'privacy-material-identifiers',
+  ],
+  'AI fallback source-term planning should expose exactly 30 stable slices.'
+);
+assert.equal(
+  new Set(ACTIVITY_AI_FALLBACK_SOURCE_TERM_PLAN_ITEM_IDS).size,
+  ACTIVITY_AI_FALLBACK_SOURCE_TERM_PLAN_ITEM_IDS.length,
+  'AI fallback source-term planning should not repeat slice ids.'
+);
 assert.match(
   activityAiDraftSource,
-  /export function buildFallbackActivityDraftTerms[\s\S]*generateActivityDraftInputSchema\.parse\(input\)[\s\S]*extractActivityDraftSourceTerms\([\s\S]*slice\(0, data\.itemCount\)/,
-  'Fallback activity drafts should choose source terms through the shared source-term helper.'
+  /export type ActivityAiFallbackSourceTermPlanPrivacyContract[\s\S]*excludesDraftSourceText: true[\s\S]*excludesRawSourceMaterialNotes: true[\s\S]*exposesSourceMaterialFileIds: false[\s\S]*exposesSourceMaterialStorageKeys: false[\s\S]*scope: 'deterministic-ai-fallback-source-terms'/,
+  'AI fallback source-term planning should type its privacy contract explicitly.'
+);
+assert.match(
+  activityAiDraftSource,
+  /export function buildFallbackActivityDraftTerms[\s\S]*return buildFallbackActivityDraftSourceTermPlan\(\{ input, locale \}\)\.terms;/,
+  'Fallback activity draft terms should delegate to the shared source-term plan.'
+);
+assert.match(
+  activityAiDraftSource,
+  /export function buildFallbackActivityDraftSourceTermPlan[\s\S]*generateActivityDraftInputSchema\.parse\(input\)[\s\S]*sanitizeActivityDraftSourceTextForAi\(data\.sourceText\)[\s\S]*extractActivityDraftSourceTerms\(\{[\s\S]*sourceText: safeSourceText[\s\S]*sourceTerms\.slice\(0, data\.itemCount\)[\s\S]*ACTIVITY_AI_DRAFT_ITEM_COUNT_RANGE\.min[\s\S]*buildFallbackActivityDraftPaddingTerms\(locale\)[\s\S]*ACTIVITY_AI_FALLBACK_SOURCE_TERM_PLAN_ITEM_IDS\.map[\s\S]*buildActivityAiFallbackSourceTermPlanItemView/,
+  'Fallback source-term planning should sanitize, select, pad, and expose item views through one domain helper.'
+);
+assert.match(
+  activityAiDraftSource,
+  /function buildActivityAiFallbackSourceTermPlanPrivacyContract[\s\S]*excludesDraftSourceText: true[\s\S]*excludesRawSourceMaterialNotes: true[\s\S]*exposesSourceMaterialFileIds: false[\s\S]*exposesSourceMaterialStorageKeys: false[\s\S]*scope: 'deterministic-ai-fallback-source-terms'/,
+  'Fallback source-term planning should keep source text and material identifiers out of public planning views.'
 );
 assert.match(
   activityAiDraftSource,
@@ -50377,21 +50435,87 @@ assert.equal(
   ),
   false
 );
+const sourceMaterialFallbackInput = {
+  difficulty: 'starter',
+  draftFocus: ACTIVITY_AI_DRAFT_DEFAULT_FOCUS,
+  gradeBand: 'Grade 2',
+  itemCount: 3,
+  language: 'en',
+  sourceText: sourceMaterialDraftNotesText,
+  subject: 'Science',
+  templateType: 'quiz',
+} as const;
+const sourceMaterialFallbackPlan = buildFallbackActivityDraftSourceTermPlan({
+  input: sourceMaterialFallbackInput,
+  locale: 'en',
+});
+const sourceMaterialFallbackPlanViews = new Map(
+  sourceMaterialFallbackPlan.itemViews.map((itemView) => [
+    itemView.id,
+    itemView.value,
+  ])
+);
+assert.deepEqual(sourceMaterialFallbackPlan.terms, [
+  'weather',
+  'sunny',
+  'rainy',
+]);
+assert.deepEqual(
+  sourceMaterialFallbackPlan.itemViews.map((itemView) => itemView.id),
+  [...ACTIVITY_AI_FALLBACK_SOURCE_TERM_PLAN_ITEM_IDS]
+);
+assert.deepEqual(sourceMaterialFallbackPlan.privacy, {
+  excludesDraftSourceText: true,
+  excludesRawSourceMaterialNotes: true,
+  exposesSourceMaterialFileIds: false,
+  exposesSourceMaterialStorageKeys: false,
+  itemIds: [...ACTIVITY_AI_FALLBACK_SOURCE_TERM_PLAN_ITEM_IDS],
+  scope: 'deterministic-ai-fallback-source-terms',
+});
+assert.equal(
+  sourceMaterialFallbackPlanViews.get('material-notes-detected'),
+  'Detected'
+);
+assert.equal(
+  sourceMaterialFallbackPlanViews.get('material-notes-omitted'),
+  'Omitted'
+);
+assert.equal(
+  sourceMaterialFallbackPlanViews.get('fallback-padding'),
+  'Not needed'
+);
+assert.equal(
+  sourceMaterialFallbackPlanViews.get('privacy-source-text'),
+  'Hidden'
+);
+assert.equal(
+  sourceMaterialFallbackPlanViews.get('privacy-material-identifiers'),
+  'Hidden'
+);
+const serializedSourceMaterialFallbackPlanView = JSON.stringify({
+  itemViews: sourceMaterialFallbackPlan.itemViews,
+  privacy: sourceMaterialFallbackPlan.privacy,
+});
+for (const privateSourceTermPlanText of [
+  'weather, sunny, rainy, cloudy',
+  'Attached classroom source materials',
+  'Weather worksheet.pdf',
+  'Weather listening.mp3',
+]) {
+  assert.equal(
+    serializedSourceMaterialFallbackPlanView.includes(
+      privateSourceTermPlanText
+    ),
+    false,
+    `AI fallback source-term plan leaked ${privateSourceTermPlanText}`
+  );
+}
 assert.deepEqual(
   buildFallbackActivityDraftTerms({
-    input: {
-      difficulty: 'starter',
-      draftFocus: ACTIVITY_AI_DRAFT_DEFAULT_FOCUS,
-      gradeBand: 'Grade 2',
-      itemCount: 3,
-      language: 'en',
-      sourceText: sourceMaterialDraftNotesText,
-      subject: 'Science',
-      templateType: 'quiz',
-    },
+    input: sourceMaterialFallbackInput,
     locale: 'en',
   }),
-  ['weather', 'sunny', 'rainy']
+  sourceMaterialFallbackPlan.terms
 );
 assert.deepEqual(
   buildFallbackActivityDraftTerms({
@@ -50489,13 +50613,13 @@ assert.match(
 );
 assert.match(
   aiDraftSource,
-  /buildFallbackActivityDraftTerms[\s\S]*const safeSourceText = sanitizeActivityDraftSourceTextForAi\(data\.sourceText\)[\s\S]*sourceText: safeSourceText/,
-  'AI fallback source-term extraction should sanitize direct source-note input before deriving classroom terms.'
+  /buildFallbackActivityDraftTerms[\s\S]*buildFallbackActivityDraftSourceTermPlan\(\{ input, locale \}\)\.terms/,
+  'AI fallback source-term extraction should share the explicit source-term plan.'
 );
 assert.match(
   aiDraftSource,
-  /function fallbackTerms[\s\S]*const safeSourceText = sanitizeActivityDraftSourceTextForAi\(input\.sourceText\)[\s\S]*sourceText: safeSourceText/,
-  'AI fallback supplemental terms should sanitize direct source-note input before deriving classroom terms.'
+  /buildFallbackActivityDraftSourceTermPlan[\s\S]*const safeSourceText = sanitizeActivityDraftSourceTextForAi\(data\.sourceText\)[\s\S]*sourceText: safeSourceText[\s\S]*buildFallbackActivityDraftPaddingTerms\(locale\)/,
+  'AI fallback supplemental terms should sanitize source notes inside the shared plan before padding classroom terms.'
 );
 assert.match(
   aiDraftSource,
