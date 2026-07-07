@@ -77,6 +77,13 @@ gate via
 run it when changing activity library overview metrics, current-view scope,
 source-material filters, starter-preview boundaries, visible-card counts, or the
 hidden activity-library handoff.
+Deterministic template remix safety has a fast script-level gate via
+`pnpm exec tsx --test scripts/activity-template-remix-handoff-semantic-views.test.ts`;
+run it when changing template readiness, suggested Copy as actions,
+ready-target-only gating, archived restore gates, remixed draft title
+strategy/limit, content and source-material clone counts, assignment snapshot
+protection, original-activity protection, or the activity-card compatibility
+handoff.
 Assignment list filter and distribution boundaries have a fast script-level gate
 via `pnpm exec tsx --test scripts/assignment-list-semantic-views.test.ts`; run
 it when changing assignment list overview metrics, status/search filters,

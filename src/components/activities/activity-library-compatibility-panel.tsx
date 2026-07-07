@@ -144,16 +144,32 @@ function ActivityLibraryTemplateRemixHandoffItem({
 }: {
   item: ActivityTemplateRemixHandoffItemView;
 }) {
+  const labelId = `activity-template-remix-handoff-${item.id}-label`;
+  const valueId = `activity-template-remix-handoff-${item.id}-value`;
+  const descriptionId = `activity-template-remix-handoff-${item.id}-description`;
+
   return (
     <div className="min-w-0" data-handoff-item={item.id}>
-      <span className="sr-only">{item.ariaLabel}</span>
-      <dt className="text-[0.68rem] font-medium uppercase tracking-normal text-muted-foreground">
+      <dt
+        className="text-[0.68rem] font-medium uppercase tracking-normal text-muted-foreground"
+        id={labelId}
+      >
         {item.label}
       </dt>
       <dd className="break-words text-xs font-medium text-foreground">
-        {item.value}
+        <output
+          aria-describedby={descriptionId}
+          aria-label={item.ariaLabel}
+          aria-labelledby={`${labelId} ${valueId}`}
+          id={valueId}
+        >
+          {item.value}
+        </output>
       </dd>
-      <p className="mt-0.5 text-[0.68rem] leading-4 text-muted-foreground">
+      <p
+        className="mt-0.5 text-[0.68rem] leading-4 text-muted-foreground"
+        id={descriptionId}
+      >
         {item.description}
       </p>
     </div>

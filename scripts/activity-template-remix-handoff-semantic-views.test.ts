@@ -1,4 +1,5 @@
 import assert from 'node:assert/strict';
+import { readFileSync } from 'node:fs';
 import test from 'node:test';
 import {
   ACTIVITY_TEMPLATE_REMIX_HANDOFF_ITEM_IDS,
@@ -18,6 +19,12 @@ const SECRET_PROMPT = 'SECRET_PROMPT_TEXT';
 const SECRET_SOURCE_SUMMARY = 'SECRET_SOURCE_SUMMARY_TEXT';
 const SECRET_STORAGE_KEY = 'userfiles/teacher/remix-private-key.pdf';
 const SECRET_TEACHER_NOTE = 'SECRET_TEACHER_NOTE';
+
+const ACTIVITY_LIBRARY_COMPATIBILITY_PANEL_SOURCE = readFileSync(
+  'src/components/activities/activity-library-compatibility-panel.tsx',
+  'utf8'
+);
+const TEST_CATALOG_SOURCE = readFileSync('tests/e2e/TEST-CATALOG.md', 'utf8');
 
 const remixReadyContent: ActivityContent = {
   difficulty: 'core',
@@ -236,6 +243,71 @@ test('activity template remix handoff handles restore and no-target gates', () =
   );
   assertNoPrivateRemixHandoffText(JSON.stringify(archivedHandoffView));
   assertNoPrivateRemixHandoffText(JSON.stringify(sparseHandoffView));
+});
+
+test('activity template remix handoff localizes Chinese draft-copy boundaries', () => {
+  overwriteGetLocale(() => 'zh');
+  try {
+    const handoffView = buildActivityTemplateRemixHandoffView({
+      content: remixReadyContent,
+      currentTemplateType: 'quiz',
+      sourceTitle: '食物词汇复习',
+      visibility: 'private',
+    });
+
+    assert.equal(handoffView.title, '模板改编安全检查');
+    assert.match(handoffView.description, /草稿副本/);
+    assert.equal(getRemixHandoffValue(handoffView, 'lifecycle-gate'), '可改编');
+    assert.equal(
+      getRemixHandoffValue(handoffView, 'ready-target-only'),
+      '仅可用目标'
+    );
+    assert.equal(getRemixHandoffValue(handoffView, 'draft-output'), '草稿副本');
+    assert.equal(
+      getRemixHandoffValue(handoffView, 'content-clone'),
+      '相同结构化内容'
+    );
+    assert.equal(
+      getRemixHandoffValue(handoffView, 'privacy-guard'),
+      '内容隐藏'
+    );
+    assertNoPrivateRemixHandoffText(JSON.stringify(handoffView));
+  } finally {
+    overwriteGetLocale(() => 'en');
+  }
+});
+
+test('activity template remix handoff renders stable DOM relationships', () => {
+  assert.match(
+    ACTIVITY_LIBRARY_COMPATIBILITY_PANEL_SOURCE,
+    /ActivityTemplateRemixHandoffItemView[\s\S]*ActivityTemplateRemixHandoffView[\s\S]*function ActivityLibraryTemplateRemixHandoff[\s\S]*const titleId = useId\(\)[\s\S]*const descriptionId = useId\(\)[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*aria-labelledby=\{titleId\}[\s\S]*data-handoff="activity-template-remix"[\s\S]*id=\{titleId\}[\s\S]*id=\{descriptionId\}[\s\S]*handoff\.itemViews\.map[\s\S]*ActivityLibraryTemplateRemixHandoffItem[\s\S]*function ActivityLibraryTemplateRemixHandoffItem[\s\S]*const labelId = `activity-template-remix-handoff-\$\{item\.id\}-label`[\s\S]*const valueId = `activity-template-remix-handoff-\$\{item\.id\}-value`[\s\S]*const descriptionId = `activity-template-remix-handoff-\$\{item\.id\}-description`[\s\S]*data-handoff-item=\{item\.id\}[\s\S]*id=\{labelId\}[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*aria-label=\{item\.ariaLabel\}[\s\S]*aria-labelledby=\{`\$\{labelId\} \$\{valueId\}`\}[\s\S]*id=\{valueId\}[\s\S]*id=\{descriptionId\}/,
+    'Template remix handoff should render each draft-copy slice with stable label, value, and description relationships.'
+  );
+});
+
+test('activity template remix focused gate is documented', () => {
+  assert.match(
+    TEST_CATALOG_SOURCE,
+    /pnpm exec tsx --test scripts\/activity-template-remix-handoff-semantic-views\.test\.ts/,
+    'E2E catalog should point deterministic template remix work at the focused script gate.'
+  );
+  for (const boundary of [
+    'template readiness',
+    'suggested Copy as actions',
+    'ready-target-only gating',
+    'archived restore gates',
+    'remixed draft title strategy/limit',
+    'content and source-material clone counts',
+    'assignment snapshot protection',
+    'original-activity protection',
+    'activity-card compatibility handoff',
+  ]) {
+    assert.match(
+      TEST_CATALOG_SOURCE,
+      new RegExp(boundary.replace(/[ /-]+/g, '[\\s/-]+')),
+      `E2E catalog should mention template remix boundary: ${boundary}`
+    );
+  }
 });
 
 function getRemixHandoffValue(
