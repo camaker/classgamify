@@ -3,6 +3,7 @@ import test from 'node:test';
 import {
   DASHBOARD_OVERVIEW_HANDOFF_ITEM_IDS,
   buildDashboardOverviewPageViewModel,
+  buildDashboardOverviewQueryBoundary,
   buildDashboardOverviewRouteViewModel,
   buildDashboardOverviewStarterPreview,
   type DashboardOverviewHandoffItemId,
@@ -67,7 +68,19 @@ test('dashboard overview handoff exposes 30 owner-scoped loop slices', () => {
     exposesStudentAnswerText: false,
     exposesTeacherPrivateActivityContent: false,
     itemIds,
+    keepsActivityLoadingIndependent: true,
+    keepsAssignmentLoadingIndependent: true,
     scope: 'teacher-dashboard-overview',
+    usesOwnerScopedSummaries: true,
+  });
+  assert.deepEqual(pageView.queryBoundary, {
+    activitiesResolved: true,
+    assignmentsResolved: true,
+    countsStarterPreviewAsOwnedMetrics: false,
+    loadingState: 'both-ready',
+    ownerActivityCount: 3,
+    ownerAssignmentCount: 2,
+    scope: 'teacher-dashboard-query-boundary',
   });
 
   assert.equal(getHandoffValue(handoffView, 'owner-activity-scope'), '3');
@@ -153,6 +166,7 @@ test('dashboard overview handoff exposes 30 owner-scoped loop slices', () => {
   );
 
   assertNoPrivateDashboardHandoffText(JSON.stringify(handoffView));
+  assertNoPrivateDashboardHandoffText(JSON.stringify(pageView.queryBoundary));
 });
 
 test('dashboard overview handoff keeps activity and assignment loading independent', () => {
@@ -183,6 +197,108 @@ test('dashboard overview handoff keeps activity and assignment loading independe
   assert.equal(
     getHandoffValue(pageView.handoffView, 'loading-independence'),
     'Split loading'
+  );
+  assert.deepEqual(pageView.queryBoundary, {
+    activitiesResolved: false,
+    assignmentsResolved: true,
+    countsStarterPreviewAsOwnedMetrics: false,
+    loadingState: 'activity-loading',
+    ownerActivityCount: 0,
+    ownerAssignmentCount: 1,
+    scope: 'teacher-dashboard-query-boundary',
+  });
+});
+
+test('dashboard overview handoff keeps assignment loading independent', () => {
+  const pageView = buildDashboardOverviewRouteViewModel({
+    activitiesData: {
+      summary: {
+        draftActivities: 1,
+        templateCoverage: 2,
+        totalActivities: 3,
+      },
+    },
+    activitiesLoading: false,
+    assignmentsData: null,
+    assignmentsLoading: true,
+  });
+
+  assert.equal(
+    getHandoffValue(pageView.handoffView, 'activity-loading-state'),
+    'Ready'
+  );
+  assert.equal(
+    getHandoffValue(pageView.handoffView, 'assignment-loading-state'),
+    'Loading'
+  );
+  assert.equal(getHandoffValue(pageView.handoffView, 'activity-metric'), '3');
+  assert.equal(getHandoffValue(pageView.handoffView, 'assignment-metric'), '-');
+  assert.equal(
+    getHandoffValue(pageView.handoffView, 'loading-independence'),
+    'Split loading'
+  );
+  assert.deepEqual(pageView.queryBoundary, {
+    activitiesResolved: true,
+    assignmentsResolved: false,
+    countsStarterPreviewAsOwnedMetrics: false,
+    loadingState: 'assignment-loading',
+    ownerActivityCount: 3,
+    ownerAssignmentCount: 0,
+    scope: 'teacher-dashboard-query-boundary',
+  });
+});
+
+test('dashboard overview query boundary represents both loading state', () => {
+  const pageView = buildDashboardOverviewRouteViewModel({
+    activitiesData: null,
+    activitiesLoading: true,
+    assignmentsData: null,
+    assignmentsLoading: true,
+  });
+
+  assert.equal(getHandoffValue(pageView.handoffView, 'activity-metric'), '-');
+  assert.equal(getHandoffValue(pageView.handoffView, 'assignment-metric'), '-');
+  assert.equal(
+    getHandoffValue(pageView.handoffView, 'loading-independence'),
+    'Both loading'
+  );
+  assert.deepEqual(pageView.queryBoundary, {
+    activitiesResolved: false,
+    assignmentsResolved: false,
+    countsStarterPreviewAsOwnedMetrics: false,
+    loadingState: 'both-loading',
+    ownerActivityCount: 0,
+    ownerAssignmentCount: 0,
+    scope: 'teacher-dashboard-query-boundary',
+  });
+});
+
+test('dashboard overview query boundary ignores starter preview metrics', () => {
+  assert.deepEqual(
+    buildDashboardOverviewQueryBoundary({
+      activitiesLoading: false,
+      activitySummary: {
+        draftActivities: 0,
+        templateCoverage: 8,
+        totalActivities: 12,
+      },
+      assignmentSummary: {
+        averageScore: 91,
+        completions: 6,
+        openAssignments: 4,
+        totalAssignments: 5,
+      },
+      assignmentsLoading: false,
+    }),
+    {
+      activitiesResolved: true,
+      assignmentsResolved: true,
+      countsStarterPreviewAsOwnedMetrics: false,
+      loadingState: 'both-ready',
+      ownerActivityCount: 12,
+      ownerAssignmentCount: 5,
+      scope: 'teacher-dashboard-query-boundary',
+    }
   );
 });
 

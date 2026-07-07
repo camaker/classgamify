@@ -483,6 +483,7 @@ import {
   buildDashboardOverviewLoopStatus,
   buildDashboardOverviewMetrics,
   buildDashboardOverviewPageViewModel,
+  buildDashboardOverviewQueryBoundary,
   buildDashboardOverviewRouteViewModel,
   buildDashboardOverviewStarterPreview,
   buildDashboardCoreLoopReadinessView,
@@ -39535,6 +39536,26 @@ const partiallyLoadedDashboardOverviewRouteView =
     },
     assignmentsLoading: false,
   });
+const assignmentLoadingDashboardOverviewRouteView =
+  buildDashboardOverviewRouteViewModel({
+    activitiesData: {
+      summary: {
+        draftActivities: 1,
+        templateCoverage: 2,
+        totalActivities: 4,
+      },
+    },
+    activitiesLoading: false,
+    assignmentsData: null,
+    assignmentsLoading: true,
+  });
+const bothLoadingDashboardOverviewRouteView =
+  buildDashboardOverviewRouteViewModel({
+    activitiesData: null,
+    activitiesLoading: true,
+    assignmentsData: null,
+    assignmentsLoading: true,
+  });
 const dashboardOverviewStarterPreview = buildDashboardOverviewStarterPreview();
 const dashboardStarterPreviewOnlyPageView = buildDashboardOverviewPageViewModel(
   {
@@ -39758,6 +39779,78 @@ assert.deepEqual(
       ],
     ],
     resultMetric: '83%',
+  }
+);
+assert.deepEqual(
+  {
+    assignmentLoadingQueryBoundary:
+      assignmentLoadingDashboardOverviewRouteView.queryBoundary,
+    bothLoadingQueryBoundary: bothLoadingDashboardOverviewRouteView.queryBoundary,
+    directQueryBoundary: buildDashboardOverviewQueryBoundary({
+      activitiesLoading: false,
+      activitySummary: {
+        draftActivities: 1,
+        templateCoverage: 3,
+        totalActivities: 7,
+      },
+      assignmentSummary: {
+        averageScore: 88,
+        completions: 2,
+        openAssignments: 1,
+        totalAssignments: 2,
+      },
+      assignmentsLoading: false,
+    }),
+    partialQueryBoundary:
+      partiallyLoadedDashboardOverviewRouteView.queryBoundary,
+    routeQueryBoundary: dashboardOverviewRouteView.queryBoundary,
+  },
+  {
+    assignmentLoadingQueryBoundary: {
+      activitiesResolved: true,
+      assignmentsResolved: false,
+      countsStarterPreviewAsOwnedMetrics: false,
+      loadingState: 'assignment-loading',
+      ownerActivityCount: 4,
+      ownerAssignmentCount: 0,
+      scope: 'teacher-dashboard-query-boundary',
+    },
+    bothLoadingQueryBoundary: {
+      activitiesResolved: false,
+      assignmentsResolved: false,
+      countsStarterPreviewAsOwnedMetrics: false,
+      loadingState: 'both-loading',
+      ownerActivityCount: 0,
+      ownerAssignmentCount: 0,
+      scope: 'teacher-dashboard-query-boundary',
+    },
+    directQueryBoundary: {
+      activitiesResolved: true,
+      assignmentsResolved: true,
+      countsStarterPreviewAsOwnedMetrics: false,
+      loadingState: 'both-ready',
+      ownerActivityCount: 7,
+      ownerAssignmentCount: 2,
+      scope: 'teacher-dashboard-query-boundary',
+    },
+    partialQueryBoundary: {
+      activitiesResolved: false,
+      assignmentsResolved: true,
+      countsStarterPreviewAsOwnedMetrics: false,
+      loadingState: 'activity-loading',
+      ownerActivityCount: 0,
+      ownerAssignmentCount: 1,
+      scope: 'teacher-dashboard-query-boundary',
+    },
+    routeQueryBoundary: {
+      activitiesResolved: true,
+      assignmentsResolved: true,
+      countsStarterPreviewAsOwnedMetrics: false,
+      loadingState: 'both-ready',
+      ownerActivityCount: 9,
+      ownerAssignmentCount: 6,
+      scope: 'teacher-dashboard-query-boundary',
+    },
   }
 );
 assert.deepEqual(
@@ -40420,6 +40513,11 @@ assert.match(
   'Dashboard overview should name owner-scoped real-data summary contracts explicitly.'
 );
 assert.match(
+  dashboardOverviewDomainSource,
+  /export type DashboardOverviewQueryBoundaryState[\s\S]*export type DashboardOverviewQueryBoundary[\s\S]*scope: 'teacher-dashboard-query-boundary'/,
+  'Dashboard overview should expose a query boundary for independently resolved owner summaries.'
+);
+assert.match(
   dashboardOverviewStarterPreviewSource,
   /getStarterAssignment\(\)[\s\S]*getStarterActivity\(assignment\.activityId\)[\s\S]*source: 'starter-preview'/,
   'Dashboard overview should isolate starter catalog reads inside the preview builder.'
@@ -40433,6 +40531,16 @@ assert.match(
   dashboardOverviewMetricsSource,
   /activitiesLoading[\s\S]*assignmentsLoading[\s\S]*resolvedActivitiesLoading[\s\S]*resolvedAssignmentsLoading/,
   'Dashboard metrics should keep activity and assignment loading states separate so loaded owner-scoped summaries are not hidden by unrelated queries.'
+);
+assert.match(
+  dashboardOverviewDomainSource,
+  /buildDashboardOverviewQueryBoundary\(\{[\s\S]*activitiesResolved[\s\S]*assignmentsResolved[\s\S]*countsStarterPreviewAsOwnedMetrics: false[\s\S]*ownerActivityCount[\s\S]*ownerAssignmentCount/,
+  'Dashboard query boundary should derive owner counts from resolved summaries without counting starter preview data.'
+);
+assert.match(
+  dashboardOverviewDomainSource,
+  /getDashboardOverviewLoadingIndependenceValue\(\s*context\.queryBoundary\.loadingState\s*\)/,
+  'Dashboard handoff loading-independence copy should read the prepared query boundary state.'
 );
 assert.match(
   dashboardOverviewReadinessSource,

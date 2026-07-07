@@ -24,6 +24,22 @@ export type DashboardOverviewOwnerAssignmentSummary = {
   totalAssignments: number;
 };
 
+export type DashboardOverviewQueryBoundaryState =
+  | 'activity-loading'
+  | 'assignment-loading'
+  | 'both-loading'
+  | 'both-ready';
+
+export type DashboardOverviewQueryBoundary = {
+  activitiesResolved: boolean;
+  assignmentsResolved: boolean;
+  countsStarterPreviewAsOwnedMetrics: false;
+  loadingState: DashboardOverviewQueryBoundaryState;
+  ownerActivityCount: number;
+  ownerAssignmentCount: number;
+  scope: 'teacher-dashboard-query-boundary';
+};
+
 export type DashboardOverviewMetricId =
   | 'activities'
   | 'templates'
@@ -81,6 +97,7 @@ type DashboardOverviewPageViewModel = {
   loopStatus: DashboardOverviewLoopStatusView;
   metrics: DashboardOverviewMetric[];
   preview: DashboardOverviewPreview;
+  queryBoundary: DashboardOverviewQueryBoundary;
   readinessView: DashboardCoreLoopReadinessView;
   readinessRows: DashboardCoreLoopReadinessRow[];
 };
@@ -194,7 +211,10 @@ export type DashboardOverviewHandoffPrivacyContract = {
   exposesStudentAnswerText: false;
   exposesTeacherPrivateActivityContent: false;
   itemIds: DashboardOverviewHandoffItemId[];
+  keepsActivityLoadingIndependent: true;
+  keepsAssignmentLoadingIndependent: true;
   scope: 'teacher-dashboard-overview';
+  usesOwnerScopedSummaries: true;
 };
 
 export type DashboardOverviewHandoffView = {
@@ -292,6 +312,12 @@ export function buildDashboardOverviewPageViewModel({
 }): DashboardOverviewPageViewModel {
   const resolvedActivitiesLoading = activitiesLoading ?? isLoading ?? false;
   const resolvedAssignmentsLoading = assignmentsLoading ?? isLoading ?? false;
+  const queryBoundary = buildDashboardOverviewQueryBoundary({
+    activitiesLoading: resolvedActivitiesLoading,
+    activitySummary,
+    assignmentSummary,
+    assignmentsLoading: resolvedAssignmentsLoading,
+  });
   const readinessView = buildDashboardCoreLoopReadinessView({
     activitySummary,
     assignmentSummary,
@@ -319,11 +345,13 @@ export function buildDashboardOverviewPageViewModel({
       loopStatus,
       metrics,
       preview,
+      queryBoundary,
       readinessView,
     }),
     loopStatus,
     metrics,
     preview,
+    queryBoundary,
     readinessView,
     readinessRows: readinessView.rows,
   };
@@ -338,6 +366,7 @@ export function buildDashboardOverviewHandoffView({
   loopStatus,
   metrics,
   preview,
+  queryBoundary,
   readinessView,
 }: {
   actionCards: DashboardOverviewActionCard[];
@@ -348,6 +377,7 @@ export function buildDashboardOverviewHandoffView({
   loopStatus: DashboardOverviewLoopStatusView;
   metrics: DashboardOverviewMetric[];
   preview: DashboardOverviewPreview;
+  queryBoundary: DashboardOverviewQueryBoundary;
   readinessView: DashboardCoreLoopReadinessView;
 }): DashboardOverviewHandoffView {
   const itemViews = DASHBOARD_OVERVIEW_HANDOFF_ITEM_IDS.map((id) =>
@@ -361,6 +391,7 @@ export function buildDashboardOverviewHandoffView({
       loopStatus,
       metrics,
       preview,
+      queryBoundary,
       readinessView,
     })
   );
@@ -383,6 +414,7 @@ type DashboardOverviewHandoffBuildContext = {
   loopStatus: DashboardOverviewLoopStatusView;
   metrics: DashboardOverviewMetric[];
   preview: DashboardOverviewPreview;
+  queryBoundary: DashboardOverviewQueryBoundary;
   readinessView: DashboardCoreLoopReadinessView;
 };
 
@@ -397,9 +429,7 @@ function buildDashboardOverviewHandoffItemView(
         id: context.id,
         label: m.dashboard_overview_handoff_owner_activity_scope_label(),
         value: formatDashboardMetricValue(
-          normalizeDashboardSummaryCount(
-            context.activitySummary?.totalActivities
-          )
+          context.queryBoundary.ownerActivityCount
         ),
       });
     case 'owner-assignment-scope':
@@ -409,9 +439,7 @@ function buildDashboardOverviewHandoffItemView(
         id: context.id,
         label: m.dashboard_overview_handoff_owner_assignment_scope_label(),
         value: formatDashboardMetricValue(
-          normalizeDashboardSummaryCount(
-            context.assignmentSummary?.totalAssignments
-          )
+          context.queryBoundary.ownerAssignmentCount
         ),
       });
     case 'starter-preview-boundary':
@@ -609,10 +637,9 @@ function buildDashboardOverviewHandoffItemView(
           m.dashboard_overview_handoff_loading_independence_description(),
         id: context.id,
         label: m.dashboard_overview_handoff_loading_independence_label(),
-        value: getDashboardOverviewLoadingIndependenceValue({
-          activitiesLoading: context.activitiesLoading,
-          assignmentsLoading: context.assignmentsLoading,
-        }),
+        value: getDashboardOverviewLoadingIndependenceValue(
+          context.queryBoundary.loadingState
+        ),
       });
     case 'privacy-guard':
       return buildDashboardOverviewHandoffItem({
@@ -760,7 +787,10 @@ function buildDashboardOverviewHandoffPrivacyContract(
     exposesStudentAnswerText: false,
     exposesTeacherPrivateActivityContent: false,
     itemIds: itemViews.map((itemView) => itemView.id),
+    keepsActivityLoadingIndependent: true,
+    keepsAssignmentLoadingIndependent: true,
     scope: 'teacher-dashboard-overview',
+    usesOwnerScopedSummaries: true,
   };
 }
 
@@ -829,20 +859,65 @@ function getDashboardOverviewPreviewSourceValue(
     : m.dashboard_overview_handoff_unknown_value();
 }
 
-function getDashboardOverviewLoadingIndependenceValue({
+function getDashboardOverviewLoadingIndependenceValue(
+  loadingState: DashboardOverviewQueryBoundaryState
+) {
+  if (
+    loadingState === 'activity-loading' ||
+    loadingState === 'assignment-loading'
+  ) {
+    return m.dashboard_overview_handoff_split_loading_value();
+  }
+
+  return loadingState === 'both-loading'
+    ? m.dashboard_overview_handoff_both_loading_value()
+    : m.dashboard_overview_handoff_both_ready_value();
+}
+
+export function buildDashboardOverviewQueryBoundary({
+  activitySummary,
+  assignmentSummary,
+  activitiesLoading,
+  assignmentsLoading,
+}: {
+  activitySummary?: DashboardOverviewOwnerActivitySummary;
+  assignmentSummary?: DashboardOverviewOwnerAssignmentSummary;
+  activitiesLoading: boolean;
+  assignmentsLoading: boolean;
+}): DashboardOverviewQueryBoundary {
+  const activitiesResolved = !activitiesLoading;
+  const assignmentsResolved = !assignmentsLoading;
+
+  return {
+    activitiesResolved,
+    assignmentsResolved,
+    countsStarterPreviewAsOwnedMetrics: false,
+    loadingState: getDashboardOverviewQueryBoundaryState({
+      activitiesLoading,
+      assignmentsLoading,
+    }),
+    ownerActivityCount: activitiesResolved
+      ? normalizeDashboardSummaryCount(activitySummary?.totalActivities)
+      : 0,
+    ownerAssignmentCount: assignmentsResolved
+      ? normalizeDashboardSummaryCount(assignmentSummary?.totalAssignments)
+      : 0,
+    scope: 'teacher-dashboard-query-boundary',
+  };
+}
+
+function getDashboardOverviewQueryBoundaryState({
   activitiesLoading,
   assignmentsLoading,
 }: {
   activitiesLoading: boolean;
   assignmentsLoading: boolean;
-}) {
-  if (activitiesLoading !== assignmentsLoading) {
-    return m.dashboard_overview_handoff_split_loading_value();
-  }
+}): DashboardOverviewQueryBoundaryState {
+  if (activitiesLoading && assignmentsLoading) return 'both-loading';
+  if (activitiesLoading) return 'activity-loading';
+  if (assignmentsLoading) return 'assignment-loading';
 
-  return activitiesLoading
-    ? m.dashboard_overview_handoff_both_loading_value()
-    : m.dashboard_overview_handoff_both_ready_value();
+  return 'both-ready';
 }
 
 export function buildDashboardOverviewRouteViewModel({
