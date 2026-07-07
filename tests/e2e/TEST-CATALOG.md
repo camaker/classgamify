@@ -93,6 +93,12 @@ run it when changing AI generation gates, authenticated server-function input
 schemas, provider/model/notice provenance, fallback handling, source
 sanitization, safe material provenance, CreateActivityInput mapping, editor
 application, teacher-review requirements, or persistence/publish boundaries.
+Source extraction assist has a fast script-level gate via
+`pnpm exec tsx --test scripts/activity-source-extraction-assist-handoff-semantic-views.test.ts`;
+run it when changing attached-material extraction readiness, audio draft paths,
+worksheet extraction paths, spreadsheet import paths, ActivityContent write
+targets, editor-review gates, source-material privacy guards, or parallel
+worksheet-model boundaries.
 Assignment publish control boundaries have fast script-level gates via
 `pnpm exec tsx --test scripts/assignment-publish-handoff-semantic-views.test.ts`
 and `pnpm exec tsx --test scripts/classroom-control-semantics-handoff.test.ts`;

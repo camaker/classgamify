@@ -1,4 +1,5 @@
 import assert from 'node:assert/strict';
+import { readFileSync } from 'node:fs';
 import test from 'node:test';
 import {
   ACTIVITY_SOURCE_EXTRACTION_ASSIST_HANDOFF_ITEM_IDS,
@@ -17,6 +18,12 @@ const SECRET_STORAGE_KEY = 'source-materials/private/extraction-key.pdf';
 const SECRET_ACTIVITY_CONTENT = 'SECRET_ACTIVITY_CONTENT';
 const SECRET_ACCEPTED_ANSWER = 'SECRET_ACCEPTED_ANSWER';
 const SECRET_FILE_BYTES = 'SECRET_FILE_BYTES';
+
+const SOURCE_MATERIALS_SUMMARY_SOURCE = readFileSync(
+  'src/components/activities/activity-source-materials-summary.tsx',
+  'utf8'
+);
+const TEST_CATALOG_SOURCE = readFileSync('tests/e2e/TEST-CATALOG.md', 'utf8');
 
 const mixedSourceMaterials: Array<
   ActivityMaterialReference & {
@@ -224,6 +231,38 @@ test('source extraction assist handoff localizes Chinese extraction paths', () =
     assertNoPrivateExtractionAssistText(JSON.stringify(handoffView));
   } finally {
     overwriteGetLocale(() => 'en');
+  }
+});
+
+test('source extraction assist handoff renders stable DOM relationships', () => {
+  assert.match(
+    SOURCE_MATERIALS_SUMMARY_SOURCE,
+    /data-handoff="activity-source-extraction-assist"[\s\S]*data-handoff-scope=\{handoff\.privacy\.scope\}[\s\S]*handoff\.itemViews\.map\(\(item\) =>[\s\S]*ActivitySourceExtractionAssistHandoffItem[\s\S]*const labelId = `activity-source-extraction-assist-\$\{item\.id\}-label`[\s\S]*const valueId = `activity-source-extraction-assist-\$\{item\.id\}-value`[\s\S]*const descriptionId = `activity-source-extraction-assist-\$\{item\.id\}-description`[\s\S]*data-handoff-item=\{item\.id\}[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*aria-label=\{item\.ariaLabel\}[\s\S]*aria-labelledby=\{`\$\{labelId\} \$\{valueId\}`\}[\s\S]*id=\{valueId\}[\s\S]*id=\{descriptionId\}/,
+    'Source extraction assist handoff should render each slice with stable label, value, and description relationships.'
+  );
+});
+
+test('source extraction assist focused gate is documented', () => {
+  assert.match(
+    TEST_CATALOG_SOURCE,
+    /pnpm exec tsx --test scripts\/activity-source-extraction-assist-handoff-semantic-views\.test\.ts/,
+    'E2E catalog should point source extraction assist work at the focused script gate.'
+  );
+  for (const boundary of [
+    'attached-material extraction readiness',
+    'audio draft paths',
+    'worksheet extraction paths',
+    'spreadsheet import paths',
+    'ActivityContent write targets',
+    'editor-review gates',
+    'source-material privacy guards',
+    'parallel worksheet-model boundaries',
+  ]) {
+    assert.match(
+      TEST_CATALOG_SOURCE,
+      new RegExp(boundary.replace(/[ -]+/g, '[\\s-]+')),
+      `E2E catalog should mention source extraction boundary: ${boundary}`
+    );
   }
 });
 
