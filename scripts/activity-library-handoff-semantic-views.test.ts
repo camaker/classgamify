@@ -1,4 +1,5 @@
 import assert from 'node:assert/strict';
+import { readFileSync } from 'node:fs';
 import test from 'node:test';
 import {
   ACTIVITY_LIBRARY_PAGE_HANDOFF_ITEM_IDS,
@@ -19,6 +20,11 @@ const SECRET_FILE_ID = 'secret-library-file-id';
 const SECRET_FILENAME = 'secret-library-worksheet.pdf';
 const SECRET_PROMPT = 'SECRET_LIBRARY_PROMPT';
 const SECRET_STORAGE_KEY = 'userfiles/teacher/source-material.pdf';
+const DASHBOARD_ACTIVITIES_ROUTE_SOURCE = readFileSync(
+  'src/routes/dashboard/activities.tsx',
+  'utf8'
+);
+const TEST_CATALOG_SOURCE = readFileSync('tests/e2e/TEST-CATALOG.md', 'utf8');
 
 const worksheetContent = buildActivityContentFixture({
   fileId: SECRET_FILE_ID,
@@ -197,6 +203,36 @@ test('activity library source boundary normalizes unsafe count inputs', () => {
       visiblePageActivityCount: 0,
     }
   );
+});
+
+test('activity library handoff renders stable semantic outputs in the route', () => {
+  assert.match(
+    DASHBOARD_ACTIVITIES_ROUTE_SOURCE,
+    /<ActivityLibraryPageHandoff[\s\S]*handoffView=\{activePageView\.handoffView\}[\s\S]*\/>/
+  );
+  assert.match(
+    DASHBOARD_ACTIVITIES_ROUTE_SOURCE,
+    /function ActivityLibraryPageHandoff[\s\S]*const titleId = useId\(\)[\s\S]*const descriptionId = useId\(\)[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*aria-labelledby=\{titleId\}[\s\S]*className="sr-only"[\s\S]*data-handoff="activity-library"[\s\S]*id=\{titleId\}[\s\S]*id=\{descriptionId\}[\s\S]*handoffView\.itemViews\.map\(\(item\) =>[\s\S]*ActivityLibraryPageHandoffItem[\s\S]*function ActivityLibraryPageHandoffItem[\s\S]*item: ActivityLibraryPageHandoffItemView[\s\S]*const labelId = `activity-library-handoff-\$\{item\.id\}-label`[\s\S]*const valueId = `activity-library-handoff-\$\{item\.id\}-value`[\s\S]*const descriptionId = `activity-library-handoff-\$\{item\.id\}-description`[\s\S]*data-handoff-item=\{item\.id\}[\s\S]*id=\{labelId\}[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*aria-label=\{item\.ariaLabel\}[\s\S]*aria-labelledby=\{`\$\{labelId\} \$\{valueId\}`\}[\s\S]*id=\{valueId\}[\s\S]*id=\{descriptionId\}/
+  );
+});
+
+test('activity library focused gate is documented', () => {
+  const normalizedCatalog = TEST_CATALOG_SOURCE.replace(/\s+/g, ' ');
+
+  assert.match(
+    TEST_CATALOG_SOURCE,
+    /pnpm exec tsx --test scripts\/activity-library-handoff-semantic-views\.test\.ts/
+  );
+  for (const boundary of [
+    'activity library overview metrics',
+    'current-view scope',
+    'source-material filters',
+    'starter-preview boundaries',
+    'visible-card counts',
+    'hidden activity-library handoff',
+  ]) {
+    assert.match(normalizedCatalog, new RegExp(boundary));
+  }
 });
 
 function getHandoffValues(view: ActivityLibraryPageHandoffView) {
