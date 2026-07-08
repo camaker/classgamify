@@ -8968,8 +8968,13 @@ assert.match(
 );
 assert.match(
   authE2eCatalogSource,
-  /\|\s*6c\s*\|\s*Result copy artifacts expose a 30-slice handoff\s*\|[\s\S]*`assignment-copy-artifact`[\s\S]*`data-handoff-item`/,
-  'E2E catalog should include the result copy-artifact handoff marker acceptance journey.'
+  /\|\s*6c\s*\|\s*Result copy artifacts expose a 30-slice handoff\s*\|[\s\S]*`assignment-copy-artifact`[\s\S]*hidden `dl\/dt\/dd`[\s\S]*label\/value\/description[\s\S]*`data-handoff-item`/,
+  'E2E catalog should include the result copy-artifact marker, hidden semantic structure, and stable item marker acceptance journey.'
+);
+assert.match(
+  authE2eCatalogSource,
+  /Assignment copy artifacts have a fast script-level gate via[\s\S]*scripts\/assignment-copy-artifact-handoff-semantic-views\.test\.ts[\s\S]*classroom brief[\s\S]*assignment-copy-artifact\s+handoff/,
+  'E2E catalog should document the result copy-artifact focused gate.'
 );
 assert.match(
   authE2eCatalogSource,
@@ -9098,8 +9103,8 @@ assert.match(
 );
 assert.match(
   assignmentResultsClassroomBriefCardSource,
-  /function AssignmentCopyArtifactHandoff[\s\S]*data-handoff="assignment-copy-artifact"[\s\S]*data-handoff-scope=\{handoffView\.privacy\.scope\}[\s\S]*handoffView\.itemViews\.map[\s\S]*AssignmentCopyArtifactHandoffItem[\s\S]*function AssignmentCopyArtifactHandoffItem[\s\S]*data-handoff-item=\{itemView\.id\}[\s\S]*<output[\s\S]*aria-label=\{itemView\.ariaLabel\}/,
-  'Assignment classroom brief copy artifact handoff should render stable result-page handoff and item markers with prepared accessible labels.'
+  /function AssignmentCopyArtifactHandoff[\s\S]*const titleId = 'assignment-copy-artifact-handoff-title'[\s\S]*const descriptionId = 'assignment-copy-artifact-handoff-description'[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*aria-labelledby=\{titleId\}[\s\S]*className="sr-only"[\s\S]*data-handoff="assignment-copy-artifact"[\s\S]*data-handoff-scope=\{handoffView\.privacy\.scope\}[\s\S]*id=\{titleId\}[\s\S]*id=\{descriptionId\}[\s\S]*<dl>[\s\S]*handoffView\.itemViews\.map[\s\S]*AssignmentCopyArtifactHandoffItem[\s\S]*function AssignmentCopyArtifactHandoffItem[\s\S]*itemView: AssignmentCopyArtifactHandoffItemView[\s\S]*const labelId = `assignment-copy-artifact-handoff-\$\{itemView\.id\}-label`[\s\S]*const valueId = `assignment-copy-artifact-handoff-\$\{itemView\.id\}-value`[\s\S]*const descriptionId = `assignment-copy-artifact-handoff-\$\{itemView\.id\}-description`[\s\S]*data-handoff-item=\{itemView\.id\}[\s\S]*id=\{labelId\}[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*aria-label=\{itemView\.ariaLabel\}[\s\S]*aria-labelledby=\{`\$\{labelId\} \$\{valueId\}`\}[\s\S]*id=\{valueId\}[\s\S]*id=\{descriptionId\}/,
+  'Assignment classroom brief copy artifact handoff should render stable result-page handoff, item markers, and accessible label/value/description relationships.'
 );
 assert.doesNotMatch(
   assignmentResultsClassroomBriefCardSource,

@@ -511,8 +511,8 @@ function AssignmentCopyArtifactHandoffItem({
         >
           {itemView.value}
         </output>
+        <p id={descriptionId}>{itemView.description}</p>
       </dd>
-      <dd id={descriptionId}>{itemView.description}</dd>
     </div>
   );
 }

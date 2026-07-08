@@ -109,15 +109,19 @@ test('assignment copy artifact handoff renders stable result page markers', () =
   );
   assert.match(
     CLASSROOM_BRIEF_CARD_SOURCE,
-    /function AssignmentCopyArtifactHandoff[\s\S]*data-handoff="assignment-copy-artifact"[\s\S]*data-handoff-scope=\{handoffView\.privacy\.scope\}[\s\S]*handoffView\.itemViews\.map/
+    /function AssignmentCopyArtifactHandoff[\s\S]*const titleId = 'assignment-copy-artifact-handoff-title'[\s\S]*const descriptionId = 'assignment-copy-artifact-handoff-description'[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*aria-labelledby=\{titleId\}[\s\S]*className="sr-only"[\s\S]*data-handoff="assignment-copy-artifact"[\s\S]*data-handoff-scope=\{handoffView\.privacy\.scope\}[\s\S]*id=\{titleId\}[\s\S]*id=\{descriptionId\}[\s\S]*<dl>[\s\S]*handoffView\.itemViews\.map[\s\S]*AssignmentCopyArtifactHandoffItem/
   );
   assert.match(
     CLASSROOM_BRIEF_CARD_SOURCE,
-    /function AssignmentCopyArtifactHandoffItem[\s\S]*data-handoff-item=\{itemView\.id\}[\s\S]*aria-label=\{itemView\.ariaLabel\}/
+    /function AssignmentCopyArtifactHandoffItem[\s\S]*itemView: AssignmentCopyArtifactHandoffItemView[\s\S]*const labelId = `assignment-copy-artifact-handoff-\$\{itemView\.id\}-label`[\s\S]*const valueId = `assignment-copy-artifact-handoff-\$\{itemView\.id\}-value`[\s\S]*const descriptionId = `assignment-copy-artifact-handoff-\$\{itemView\.id\}-description`[\s\S]*data-handoff-item=\{itemView\.id\}[\s\S]*id=\{labelId\}[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*aria-label=\{itemView\.ariaLabel\}[\s\S]*aria-labelledby=\{`\$\{labelId\} \$\{valueId\}`\}[\s\S]*id=\{valueId\}[\s\S]*id=\{descriptionId\}/
   );
   assert.match(
     TEST_CATALOG_SOURCE,
-    /\|\s*6c\s*\|\s*Result copy artifacts expose a 30-slice handoff\s*\|[\s\S]*`assignment-copy-artifact`[\s\S]*`data-handoff-item`/
+    /Assignment copy artifacts have a fast script-level gate via[\s\S]*scripts\/assignment-copy-artifact-handoff-semantic-views\.test\.ts[\s\S]*classroom brief[\s\S]*assignment-copy-artifact\s+handoff/
+  );
+  assert.match(
+    TEST_CATALOG_SOURCE,
+    /\|\s*6c\s*\|\s*Result copy artifacts expose a 30-slice handoff\s*\|[\s\S]*`assignment-copy-artifact`[\s\S]*hidden `dl\/dt\/dd`[\s\S]*label\/value\/description[\s\S]*`data-handoff-item`/
   );
 });
 
