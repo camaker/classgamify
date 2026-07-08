@@ -134,8 +134,8 @@ test('settings files table wires full-library summaries and safe handoff panels'
   );
   assert.match(
     FILES_MATERIAL_HANDOFF_SOURCE,
-    /sr-only[\s\S]*view\.itemViews\.map\(\(itemView\) =>[\s\S]*key=\{itemView\.id\}[\s\S]*<output aria-label=\{itemView\.ariaLabel\}/,
-    'Material-classification handoff should remain available semantically.'
+    /SettingsFilesMaterialClassificationHandoffView[\s\S]*data-handoff="settings-files-material-classification"[\s\S]*view\.itemViews\.map\(\(itemView\) =>[\s\S]*FilesMaterialClassificationHandoffItem[\s\S]*function FilesMaterialClassificationHandoffItem[\s\S]*const labelId = `settings-files-material-classification-handoff-\$\{itemView\.id\}-label`[\s\S]*const valueId = `settings-files-material-classification-handoff-\$\{itemView\.id\}-value`[\s\S]*const descriptionId = `settings-files-material-classification-handoff-\$\{itemView\.id\}-description`[\s\S]*data-handoff-item=\{itemView\.id\}[\s\S]*id=\{labelId\}[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*aria-label=\{itemView\.ariaLabel\}[\s\S]*aria-labelledby=\{`\$\{labelId\} \$\{valueId\}`\}[\s\S]*id=\{valueId\}[\s\S]*id=\{descriptionId\}/,
+    'Material-classification handoff should render stable label, value, and description relationships.'
   );
 });
 
