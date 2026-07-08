@@ -5,6 +5,7 @@ import type {
 import { getActivityRunnerKindCopy } from '@/activities/runner-copy';
 import {
   buildOpenBoxRevealHandoffView,
+  type OpenBoxRevealHandoffItemView,
   type OpenBoxRevealHandoffView,
 } from '@/assignments/open-box-reveal-handoff';
 import {
@@ -235,15 +236,36 @@ function OpenBoxRevealHandoff({ view }: { view: OpenBoxRevealHandoffView }) {
       <p id={descriptionId}>{view.description}</p>
       <dl>
         {view.itemViews.map((item) => (
-          <div data-handoff-item={item.id} key={item.id}>
-            <dt>{item.label}</dt>
-            <dd>
-              <output aria-label={item.ariaLabel}>{item.value}</output>
-              <span>{item.description}</span>
-            </dd>
-          </div>
+          <OpenBoxRevealHandoffItem item={item} key={item.id} />
         ))}
       </dl>
     </section>
+  );
+}
+
+function OpenBoxRevealHandoffItem({
+  item,
+}: {
+  item: OpenBoxRevealHandoffItemView;
+}) {
+  const labelId = `open-box-reveal-handoff-${item.id}-label`;
+  const valueId = `open-box-reveal-handoff-${item.id}-value`;
+  const descriptionId = `open-box-reveal-handoff-${item.id}-description`;
+
+  return (
+    <div data-handoff-item={item.id}>
+      <dt id={labelId}>{item.label}</dt>
+      <dd>
+        <output
+          aria-describedby={descriptionId}
+          aria-label={item.ariaLabel}
+          aria-labelledby={`${labelId} ${valueId}`}
+          id={valueId}
+        >
+          {item.value}
+        </output>
+        <span id={descriptionId}>{item.description}</span>
+      </dd>
+    </div>
   );
 }

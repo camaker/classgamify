@@ -9926,6 +9926,11 @@ assert.doesNotMatch(
   /activeIndex \+ offset|getSequentialRunnerItemIdByOffset|getStudentRunnerReviewStatusClassName|answers\[activeItem\.id\]/,
   'Open-box runner should not hand-roll sequence wrapping, review styles, or active answer state.'
 );
+assert.match(
+  openBoxRunnerSource,
+  /OpenBoxRevealHandoffView[\s\S]*OpenBoxRevealHandoffItemView[\s\S]*data-handoff="open-box-reveal-card"[\s\S]*view\.itemViews\.map\(\(item\) =>[\s\S]*OpenBoxRevealHandoffItem[\s\S]*function OpenBoxRevealHandoffItem[\s\S]*item: OpenBoxRevealHandoffItemView[\s\S]*const labelId = `open-box-reveal-handoff-\$\{item\.id\}-label`[\s\S]*const valueId = `open-box-reveal-handoff-\$\{item\.id\}-value`[\s\S]*const descriptionId = `open-box-reveal-handoff-\$\{item\.id\}-description`[\s\S]*data-handoff-item=\{item\.id\}[\s\S]*id=\{labelId\}[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*aria-label=\{item\.ariaLabel\}[\s\S]*aria-labelledby=\{`\$\{labelId\} \$\{valueId\}`\}[\s\S]*id=\{valueId\}[\s\S]*id=\{descriptionId\}/,
+  'Open-box runner should render reveal-card handoff items as stable label, value, and description outputs.'
+);
 for (const filePath of [
   'src/components/activities/line-match-board.tsx',
   'src/components/activities/matching-pairs-board.tsx',
