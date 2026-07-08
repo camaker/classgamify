@@ -197,6 +197,12 @@ Open-box reveal-card runtime has a fast script-level gate via
 run it when changing reveal-card state, box and prompt counts, navigation
 actions, answer-input state, review feedback, prompt/item-id/answer/student/source-material
 guards, or the hidden open-box-reveal-card handoff.
+Listening speech runtime has a fast script-level gate via
+`pnpm exec tsx --test scripts/listening-speech-handoff-semantic-views.test.ts`;
+run it when changing speech language source, browser voice language, speech
+support, transcript visibility, answer input, review feedback,
+prompt/runtime-id/student/source-material guards, or the hidden
+listening-speech handoff.
 
 ## Test Harness
 

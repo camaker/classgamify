@@ -289,8 +289,30 @@ test('listening runner attaches the speech handoff to the component', () => {
   assert.match(source, /data-handoff="listening-speech"/);
   assert.match(
     source,
-    /view\.itemViews\.map[\s\S]*data-handoff-item=\{item\.id\}[\s\S]*<output aria-label=\{item\.ariaLabel\}>/
+    /view\.itemViews\.map\(\(item\) =>[\s\S]*ListeningSpeechHandoffItem[\s\S]*function ListeningSpeechHandoffItem[\s\S]*item: ListeningSpeechHandoffItemView[\s\S]*const labelId = `listening-speech-handoff-\$\{item\.id\}-label`[\s\S]*const valueId = `listening-speech-handoff-\$\{item\.id\}-value`[\s\S]*const descriptionId = `listening-speech-handoff-\$\{item\.id\}-description`[\s\S]*data-handoff-item=\{item\.id\}[\s\S]*id=\{labelId\}[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*aria-label=\{item\.ariaLabel\}[\s\S]*aria-labelledby=\{`\$\{labelId\} \$\{valueId\}`\}[\s\S]*id=\{valueId\}[\s\S]*id=\{descriptionId\}/
   );
+});
+
+test('listening speech focused gate is documented', () => {
+  const catalogSource = readFileSync('tests/e2e/TEST-CATALOG.md', 'utf8');
+  const normalizedCatalog = catalogSource.replace(/\s+/g, ' ');
+
+  assert.match(
+    catalogSource,
+    /pnpm exec tsx --test scripts\/listening-speech-handoff-semantic-views\.test\.ts/
+  );
+  for (const boundary of [
+    'speech language source',
+    'browser voice language',
+    'speech support',
+    'transcript visibility',
+    'answer input',
+    'review feedback',
+    'prompt/runtime-id/student/source-material guards',
+    'hidden listening-speech handoff',
+  ]) {
+    assert.match(normalizedCatalog, new RegExp(boundary));
+  }
 });
 
 function buildListeningSequentialRunnerView({

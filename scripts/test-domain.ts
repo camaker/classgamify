@@ -9879,7 +9879,7 @@ assert.match(
 );
 assert.match(
   listeningRunnerSource,
-  /data-handoff="listening-speech"[\s\S]*view\.itemViews\.map[\s\S]*data-handoff-item=\{item\.id\}/,
+  /ListeningSpeechHandoffView[\s\S]*ListeningSpeechHandoffItemView[\s\S]*data-handoff="listening-speech"[\s\S]*view\.itemViews\.map\(\(item\) =>[\s\S]*ListeningSpeechHandoffItem[\s\S]*function ListeningSpeechHandoffItem[\s\S]*item: ListeningSpeechHandoffItemView[\s\S]*const labelId = `listening-speech-handoff-\$\{item\.id\}-label`[\s\S]*const valueId = `listening-speech-handoff-\$\{item\.id\}-value`[\s\S]*const descriptionId = `listening-speech-handoff-\$\{item\.id\}-description`[\s\S]*data-handoff-item=\{item\.id\}[\s\S]*id=\{labelId\}[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*aria-label=\{item\.ariaLabel\}[\s\S]*aria-labelledby=\{`\$\{labelId\} \$\{valueId\}`\}[\s\S]*id=\{valueId\}[\s\S]*id=\{descriptionId\}/,
   'Listening runner should render stable listening speech handoff markers and item outputs.'
 );
 assert.match(

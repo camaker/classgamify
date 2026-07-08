@@ -12,6 +12,7 @@ import {
 } from '@/assignments/student-runner-view';
 import {
   buildListeningSpeechHandoffView,
+  type ListeningSpeechHandoffItemView,
   type ListeningSpeechHandoffView,
 } from '@/assignments/listening-speech-handoff';
 import { buildListeningPromptView } from '@/activities/listening-speech';
@@ -364,15 +365,36 @@ function ListeningSpeechHandoff({
       <p id={descriptionId}>{view.description}</p>
       <dl>
         {view.itemViews.map((item) => (
-          <div data-handoff-item={item.id} key={item.id}>
-            <dt>{item.label}</dt>
-            <dd>
-              <output aria-label={item.ariaLabel}>{item.value}</output>
-              <span>{item.description}</span>
-            </dd>
-          </div>
+          <ListeningSpeechHandoffItem item={item} key={item.id} />
         ))}
       </dl>
     </section>
+  );
+}
+
+function ListeningSpeechHandoffItem({
+  item,
+}: {
+  item: ListeningSpeechHandoffItemView;
+}) {
+  const labelId = `listening-speech-handoff-${item.id}-label`;
+  const valueId = `listening-speech-handoff-${item.id}-value`;
+  const descriptionId = `listening-speech-handoff-${item.id}-description`;
+
+  return (
+    <div data-handoff-item={item.id}>
+      <dt id={labelId}>{item.label}</dt>
+      <dd>
+        <output
+          aria-describedby={descriptionId}
+          aria-label={item.ariaLabel}
+          aria-labelledby={`${labelId} ${valueId}`}
+          id={valueId}
+        >
+          {item.value}
+        </output>
+        <span id={descriptionId}>{item.description}</span>
+      </dd>
+    </div>
   );
 }
