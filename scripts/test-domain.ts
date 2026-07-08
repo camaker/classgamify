@@ -10381,8 +10381,8 @@ assert.match(
 );
 assert.match(
   notificationWorkspaceSummarySource,
-  /SettingsNotificationUpdateHandoffItemView[\s\S]*SettingsNotificationUpdateHandoffView[\s\S]*<NotificationUpdateHandoff handoffView=\{view\.handoffView\} \/>[\s\S]*function NotificationUpdateHandoff[\s\S]*aria-label=\{handoffView\.title\}[\s\S]*handoffView\.description[\s\S]*handoffView\.itemViews\.map[\s\S]*function NotificationUpdateHandoffItem[\s\S]*<output aria-label=\{itemView\.ariaLabel\}/,
-  'Notification workspace summary component should render prepared handoff title, description, item views, and semantic output values.'
+  /SettingsNotificationUpdateHandoffItemView[\s\S]*SettingsNotificationUpdateHandoffView[\s\S]*<NotificationUpdateHandoff handoffView=\{view\.handoffView\} \/>[\s\S]*function NotificationUpdateHandoff[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*aria-labelledby=\{titleId\}[\s\S]*data-handoff="settings-notification-update"[\s\S]*data-handoff-scope=\{handoffView\.privacy\.scope\}[\s\S]*id=\{titleId\}[\s\S]*handoffView\.title[\s\S]*id=\{descriptionId\}[\s\S]*handoffView\.description[\s\S]*handoffView\.itemViews\.map[\s\S]*function NotificationUpdateHandoffItem[\s\S]*const labelId = `settings-notification-update-handoff-\$\{itemView\.id\}-label`[\s\S]*const valueId = `settings-notification-update-handoff-\$\{itemView\.id\}-value`[\s\S]*const descriptionId = `settings-notification-update-handoff-\$\{itemView\.id\}-description`[\s\S]*data-handoff-item=\{itemView\.id\}[\s\S]*id=\{labelId\}[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*aria-label=\{itemView\.ariaLabel\}[\s\S]*aria-labelledby=\{`\$\{labelId\} \$\{valueId\}`\}[\s\S]*id=\{valueId\}[\s\S]*id=\{descriptionId\}/,
+  'Notification workspace summary component should render prepared handoff marker, privacy scope, item ids, and stable label/value/description relationships.'
 );
 assert.doesNotMatch(
   notificationWorkspaceSummarySource,

@@ -73,6 +73,13 @@ run it when changing plan access, current-plan card semantics, activity library
 access, assignment workflow access, AI draft access, result export access,
 source-material access, hosted checkout, customer portal, payment callback, or
 the settings-billing-workspace handoff.
+Settings notification update handoff has a fast script-level gate via
+`pnpm exec tsx --test scripts/settings-notification-update-handoff-semantic-views.test.ts`;
+run it when changing teacher-controlled product updates, template updates,
+worksheet workflows, assignment review updates, newsletter subscription
+controls, provider visibility, student-reminder boundaries, public-link
+boundaries, learner-notification boundaries, private-data guards, or the
+settings-notification-update handoff.
 Settings files source-material library has a fast script-level gate via
 `pnpm exec tsx --test scripts/settings-files-source-material-handoff-semantic-views.test.ts`;
 run it when changing source-material library, activity attachments, AI draft

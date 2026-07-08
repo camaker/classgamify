@@ -35,6 +35,7 @@ const NEWSLETTER_HOOK_SOURCE = readFileSync(
   'utf8'
 );
 const NEWSLETTER_API_SOURCE = readFileSync('src/api/newsletter.ts', 'utf8');
+const TEST_CATALOG_SOURCE = readFileSync('tests/e2e/TEST-CATALOG.md', 'utf8');
 
 const LEGACY_NOTIFICATION_COPY_MARKERS = [
   'Lang Study',
@@ -164,8 +165,13 @@ test('notification settings page wires update boundary before newsletter control
   );
   assert.match(
     NOTIFICATION_SUMMARY_SOURCE,
-    /<NotificationUpdateHandoff handoffView=\{view\.handoffView\} \/>[\s\S]*handoffView\.itemViews\.map[\s\S]*key=\{itemView\.id\}[\s\S]*<output aria-label=\{itemView\.ariaLabel\}/,
-    'Notification workspace summary should render the 30-slice handoff outputs.'
+    /<NotificationUpdateHandoff handoffView=\{view\.handoffView\} \/>[\s\S]*data-handoff="settings-notification-update"[\s\S]*data-handoff-scope=\{handoffView\.privacy\.scope\}[\s\S]*handoffView\.itemViews\.map[\s\S]*NotificationUpdateHandoffItem[\s\S]*const labelId = `settings-notification-update-handoff-\$\{itemView\.id\}-label`[\s\S]*const valueId = `settings-notification-update-handoff-\$\{itemView\.id\}-value`[\s\S]*const descriptionId = `settings-notification-update-handoff-\$\{itemView\.id\}-description`[\s\S]*data-handoff-item=\{itemView\.id\}[\s\S]*id=\{labelId\}[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*aria-label=\{itemView\.ariaLabel\}[\s\S]*aria-labelledby=\{`\$\{labelId\} \$\{valueId\}`\}[\s\S]*id=\{valueId\}[\s\S]*id=\{descriptionId\}/,
+    'Notification workspace summary should render the 30-slice handoff marker, privacy scope, item ids, and stable label/value/description relationships.'
+  );
+  assert.match(
+    TEST_CATALOG_SOURCE,
+    /Settings notification update handoff has a fast script-level gate via[\s\S]*scripts\/settings-notification-update-handoff-semantic-views\.test\.ts[\s\S]*teacher-controlled product updates[\s\S]*settings-notification-update handoff/,
+    'E2E catalog should document the settings notification update focused gate.'
   );
   assertNoLegacyNotificationCopy(NOTIFICATION_ROUTE_SOURCE);
   assertNoLegacyNotificationCopy(NOTIFICATION_SUMMARY_SOURCE);
