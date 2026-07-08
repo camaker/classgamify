@@ -1,4 +1,5 @@
 import assert from 'node:assert/strict';
+import { readFileSync } from 'node:fs';
 import test from 'node:test';
 import {
   ASSIGNMENT_PUBLISH_CONTROL_BOUNDARY_ITEM_IDS,
@@ -17,6 +18,11 @@ const SECRET_SHARE_SLUG = 'SECRET_SHARE_SLUG_SHOULD_NOT_LEAK';
 const SECRET_ACTIVITY_ID = 'activity-publish-ready';
 const SECRET_BLOCKED_ACTIVITY_ID = 'activity-publish-blocked';
 const NOW = new Date('2026-01-01T00:00:00.000Z');
+const ACTIVITY_PUBLISH_SETTINGS_FORM_SOURCE = readFileSync(
+  'src/components/activities/activity-publish-settings-form.tsx',
+  'utf8'
+);
+const TEST_CATALOG_SOURCE = readFileSync('tests/e2e/TEST-CATALOG.md', 'utf8');
 
 test('publish dialog exposes a safe 30-slice preview handoff', () => {
   const defaults = buildAssignmentPublishDraftDefaults({
@@ -329,6 +335,38 @@ test('publish handoff keeps blocked access and invalid drafts explicit', () => {
   );
   assertNoPrivatePublishText(JSON.stringify(handoffView));
   assertNoPrivatePublishText(JSON.stringify(publishView.controlBoundary));
+});
+
+test('publish handoff renders stable semantic outputs in the dialog', () => {
+  assert.match(
+    ACTIVITY_PUBLISH_SETTINGS_FORM_SOURCE,
+    /<AssignmentPublishHandoff view=\{view\.handoffView\} \/>/
+  );
+  assert.match(
+    ACTIVITY_PUBLISH_SETTINGS_FORM_SOURCE,
+    /function AssignmentPublishHandoff[\s\S]*const titleId = 'assignment-publish-handoff-title'[\s\S]*const descriptionId = 'assignment-publish-handoff-description'[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*aria-labelledby=\{titleId\}[\s\S]*className="sr-only"[\s\S]*data-handoff="assignment-publish"[\s\S]*id=\{titleId\}[\s\S]*id=\{descriptionId\}[\s\S]*view\.itemViews\.map\(\(item\) =>[\s\S]*AssignmentPublishHandoffItem[\s\S]*function AssignmentPublishHandoffItem[\s\S]*item: AssignmentPublishHandoffView\['itemViews'\]\[number\][\s\S]*const labelId = `assignment-publish-handoff-\$\{item\.id\}-label`[\s\S]*const valueId = `assignment-publish-handoff-\$\{item\.id\}-value`[\s\S]*const descriptionId = `assignment-publish-handoff-\$\{item\.id\}-description`[\s\S]*data-handoff-item=\{item\.id\}[\s\S]*id=\{labelId\}[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*aria-label=\{item\.ariaLabel\}[\s\S]*aria-labelledby=\{`\$\{labelId\} \$\{valueId\}`\}[\s\S]*id=\{valueId\}[\s\S]*id=\{descriptionId\}/
+  );
+});
+
+test('publish handoff focused gate is documented', () => {
+  const normalizedCatalog = TEST_CATALOG_SOURCE.replace(/\s+/g, ' ');
+
+  assert.match(
+    TEST_CATALOG_SOURCE,
+    /pnpm exec tsx --test scripts\/assignment-publish-handoff-semantic-views\.test\.ts/
+  );
+  for (const boundary of [
+    'publish-setting input IDs',
+    'help text associations',
+    'delivery toggles',
+    'frozen-link preview regions',
+    'delivery-rule stats',
+    'review checklists',
+    'validation alerts',
+    'opaque control scope handling',
+  ]) {
+    assert.match(normalizedCatalog, new RegExp(boundary));
+  }
 });
 
 function getHandoffItemValue(

@@ -7370,7 +7370,7 @@ assert.match(
 );
 assert.match(
   activityPublishSettingsFormSource,
-  /AssignmentPublishHandoff[\s\S]*view=\{view\.handoffView\}[\s\S]*data-handoff="assignment-publish"[\s\S]*data-handoff-item=\{item\.id\}/,
+  /AssignmentPublishHandoff[\s\S]*view=\{view\.handoffView\}[\s\S]*data-handoff="assignment-publish"[\s\S]*view\.itemViews\.map\(\(item\) =>[\s\S]*AssignmentPublishHandoffItem[\s\S]*function AssignmentPublishHandoffItem[\s\S]*const labelId = `assignment-publish-handoff-\$\{item\.id\}-label`[\s\S]*const valueId = `assignment-publish-handoff-\$\{item\.id\}-value`[\s\S]*const descriptionId = `assignment-publish-handoff-\$\{item\.id\}-description`[\s\S]*data-handoff-item=\{item\.id\}[\s\S]*id=\{labelId\}[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*aria-label=\{item\.ariaLabel\}[\s\S]*aria-labelledby=\{`\$\{labelId\} \$\{valueId\}`\}[\s\S]*id=\{valueId\}[\s\S]*id=\{descriptionId\}/,
   'Assignment publish settings form should render the prepared publish handoff as hidden semantic output.'
 );
 assert.match(

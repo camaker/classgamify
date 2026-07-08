@@ -297,16 +297,37 @@ function AssignmentPublishHandoff({
       <p id={descriptionId}>{view.description}</p>
       <dl>
         {view.itemViews.map((item) => (
-          <div data-handoff-item={item.id} key={item.id}>
-            <dt>{item.label}</dt>
-            <dd>
-              <output aria-label={item.ariaLabel}>{item.value}</output>
-              <span>{item.description}</span>
-            </dd>
-          </div>
+          <AssignmentPublishHandoffItem item={item} key={item.id} />
         ))}
       </dl>
     </section>
+  );
+}
+
+function AssignmentPublishHandoffItem({
+  item,
+}: {
+  item: AssignmentPublishHandoffView['itemViews'][number];
+}) {
+  const labelId = `assignment-publish-handoff-${item.id}-label`;
+  const valueId = `assignment-publish-handoff-${item.id}-value`;
+  const descriptionId = `assignment-publish-handoff-${item.id}-description`;
+
+  return (
+    <div data-handoff-item={item.id}>
+      <dt id={labelId}>{item.label}</dt>
+      <dd>
+        <output
+          aria-describedby={descriptionId}
+          aria-label={item.ariaLabel}
+          aria-labelledby={`${labelId} ${valueId}`}
+          id={valueId}
+        >
+          {item.value}
+        </output>
+        <span id={descriptionId}>{item.description}</span>
+      </dd>
+    </div>
   );
 }
 
