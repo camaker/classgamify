@@ -9368,18 +9368,23 @@ assert.match(
 );
 assert.match(
   assignmentResultsAttemptReviewCardSource,
-  /data-handoff="assignment-attempt-review-card"[\s\S]*view\.itemViews\.map[\s\S]*data-handoff-item=\{itemView\.id\}[\s\S]*aria-label=\{itemView\.ariaLabel\}/,
-  'Attempt review card component should render the hidden handoff output beside the visible review card.'
+  /function AssignmentResultsAttemptReviewCardHandoff[\s\S]*const baseId = useId\(\)[\s\S]*const titleId = `\$\{baseId\}-assignment-attempt-review-card-handoff-title`[\s\S]*const descriptionId = `\$\{baseId\}-assignment-attempt-review-card-handoff-description`[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*aria-labelledby=\{titleId\}[\s\S]*data-handoff="assignment-attempt-review-card"[\s\S]*data-handoff-scope=\{view\.privacy\.scope\}[\s\S]*id=\{titleId\}[\s\S]*id=\{descriptionId\}[\s\S]*<dl>[\s\S]*view\.itemViews\.map[\s\S]*AssignmentResultsAttemptReviewCardHandoffItem[\s\S]*baseId=\{baseId\}[\s\S]*function AssignmentResultsAttemptReviewCardHandoffItem[\s\S]*const itemId = `\$\{baseId\}-assignment-attempt-review-card-\$\{itemView\.id\}`[\s\S]*const labelId = `\$\{itemId\}-label`[\s\S]*const valueId = `\$\{itemId\}-value`[\s\S]*const descriptionId = `\$\{itemId\}-description`[\s\S]*data-handoff-item=\{itemView\.id\}[\s\S]*id=\{labelId\}[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*aria-label=\{itemView\.ariaLabel\}[\s\S]*aria-labelledby=\{`\$\{labelId\} \$\{valueId\}`\}[\s\S]*id=\{valueId\}[\s\S]*id=\{descriptionId\}/,
+  'Attempt review card component should render the hidden handoff marker, privacy scope, item ids, and stable label/value/description relationships beside the visible review card.'
 );
 assert.match(
   assignmentResultsAttemptReviewCardSource,
-  /const baseId = useId\(\)[\s\S]*baseId=\{baseId\}[\s\S]*const itemId = `\$\{baseId\}-\$\{itemView\.id\}`/,
+  /const baseId = useId\(\)[\s\S]*baseId=\{baseId\}[\s\S]*const itemId = `\$\{baseId\}-assignment-attempt-review-card-\$\{itemView\.id\}`/,
   'Attempt review card handoff should use generated DOM id prefixes instead of leaking attempt ids or repeating static ids.'
 );
 assert.match(
   authE2eCatalogSource,
   /\|\s*6h\s*\|\s*Result attempt review cards expose a 30-slice handoff\s*\|/,
   'E2E catalog should include the attempt review card handoff acceptance journey.'
+);
+assert.match(
+  authE2eCatalogSource,
+  /Assignment attempt review cards has a fast script-level gate via[\s\S]*scripts\/assignment-attempt-review-card-handoff-semantic-views\.test\.ts[\s\S]*answer review cards[\s\S]*assignment-attempt-review-card[\s\S]*handoff/,
+  'E2E catalog should document the attempt review card focused gate.'
 );
 assert.match(
   assignmentResultsEmptyStateSource,

@@ -146,6 +146,13 @@ last-submitted student summary ordering, route default elision, invalid-route
 guards, review-scope alignment, copy-scope row counts, result tables, copy
 artifacts, anonymous-label guards, or the assignment-student-summary-sort
 handoff.
+Assignment attempt review cards has a fast script-level gate via
+`pnpm exec tsx --test scripts/assignment-attempt-review-card-handoff-semantic-views.test.ts`;
+run it when changing answer review cards, review filters, submitted, correct,
+needs-review, or unanswered counts, answer text/status/summary helpers,
+accepted alternatives, explanations, copy-scope boundaries, CSV export
+boundaries, anonymous-token guards, or the assignment-attempt-review-card
+handoff.
 Public indexing and install metadata have a fast source-level gate via
 `pnpm exec tsx --test scripts/public-metadata-handoff-semantic-views.test.ts`;
 run it when changing the public route registry, sitemap helpers, robots rules,

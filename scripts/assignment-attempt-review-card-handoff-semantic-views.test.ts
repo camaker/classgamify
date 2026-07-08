@@ -239,11 +239,15 @@ test('assignment attempt review card handoff is wired into result card rendering
     resultViewSource,
     /handoffView: buildAssignmentAttemptReviewCardHandoffView/
   );
-  assert.match(cardSource, /const baseId = useId\(\)/);
-  assert.match(cardSource, /baseId=\{baseId\}/);
-  assert.match(cardSource, /data-handoff="assignment-attempt-review-card"/);
-  assert.match(cardSource, /data-handoff-item=\{itemView\.id\}/);
+  assert.match(
+    cardSource,
+    /function AssignmentResultsAttemptReviewCardHandoff[\s\S]*const baseId = useId\(\)[\s\S]*const titleId = `\$\{baseId\}-assignment-attempt-review-card-handoff-title`[\s\S]*const descriptionId = `\$\{baseId\}-assignment-attempt-review-card-handoff-description`[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*aria-labelledby=\{titleId\}[\s\S]*data-handoff="assignment-attempt-review-card"[\s\S]*data-handoff-scope=\{view\.privacy\.scope\}[\s\S]*id=\{titleId\}[\s\S]*id=\{descriptionId\}[\s\S]*<dl>[\s\S]*view\.itemViews\.map[\s\S]*AssignmentResultsAttemptReviewCardHandoffItem[\s\S]*baseId=\{baseId\}[\s\S]*function AssignmentResultsAttemptReviewCardHandoffItem[\s\S]*const itemId = `\$\{baseId\}-assignment-attempt-review-card-\$\{itemView\.id\}`[\s\S]*const labelId = `\$\{itemId\}-label`[\s\S]*const valueId = `\$\{itemId\}-value`[\s\S]*const descriptionId = `\$\{itemId\}-description`[\s\S]*data-handoff-item=\{itemView\.id\}[\s\S]*id=\{labelId\}[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*aria-label=\{itemView\.ariaLabel\}[\s\S]*aria-labelledby=\{`\$\{labelId\} \$\{valueId\}`\}[\s\S]*id=\{valueId\}[\s\S]*id=\{descriptionId\}/
+  );
   assert.match(catalogSource, /\|\s*6h\s*\|/);
+  assert.match(
+    catalogSource,
+    /Assignment attempt review cards has a fast script-level gate via[\s\S]*scripts\/assignment-attempt-review-card-handoff-semantic-views\.test\.ts[\s\S]*answer review cards[\s\S]*assignment-attempt-review-card[\s\S]*handoff/
+  );
 });
 
 function buildAttemptReviewCardPageData(): AssignmentResultsPageData<AssignmentAttemptRowDisplayInput> {

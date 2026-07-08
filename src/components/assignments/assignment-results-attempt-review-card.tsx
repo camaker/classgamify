@@ -75,8 +75,8 @@ function AssignmentResultsAttemptReviewCardHandoff({
   view: AssignmentAttemptReviewCardHandoffView;
 }) {
   const baseId = useId();
-  const titleId = `${baseId}-title`;
-  const descriptionId = `${baseId}-description`;
+  const titleId = `${baseId}-assignment-attempt-review-card-handoff-title`;
+  const descriptionId = `${baseId}-assignment-attempt-review-card-handoff-description`;
 
   return (
     <section
@@ -84,16 +84,19 @@ function AssignmentResultsAttemptReviewCardHandoff({
       aria-labelledby={titleId}
       className="sr-only"
       data-handoff="assignment-attempt-review-card"
+      data-handoff-scope={view.privacy.scope}
     >
       <h3 id={titleId}>{view.title}</h3>
       <p id={descriptionId}>{view.description}</p>
-      {view.itemViews.map((itemView) => (
-        <AssignmentResultsAttemptReviewCardHandoffItem
-          baseId={baseId}
-          itemView={itemView}
-          key={itemView.id}
-        />
-      ))}
+      <dl>
+        {view.itemViews.map((itemView) => (
+          <AssignmentResultsAttemptReviewCardHandoffItem
+            baseId={baseId}
+            itemView={itemView}
+            key={itemView.id}
+          />
+        ))}
+      </dl>
     </section>
   );
 }
@@ -105,23 +108,25 @@ function AssignmentResultsAttemptReviewCardHandoffItem({
   baseId: string;
   itemView: AssignmentAttemptReviewCardHandoffItemView;
 }) {
-  const itemId = `${baseId}-${itemView.id}`;
+  const itemId = `${baseId}-assignment-attempt-review-card-${itemView.id}`;
   const labelId = `${itemId}-label`;
   const valueId = `${itemId}-value`;
   const descriptionId = `${itemId}-description`;
 
   return (
     <div data-handoff-item={itemView.id}>
-      <span id={labelId}>{itemView.label}</span>
-      <output
-        aria-describedby={descriptionId}
-        aria-label={itemView.ariaLabel}
-        aria-labelledby={`${labelId} ${valueId}`}
-        id={valueId}
-      >
-        {itemView.value}
-      </output>
-      <span id={descriptionId}>{itemView.description}</span>
+      <dt id={labelId}>{itemView.label}</dt>
+      <dd>
+        <output
+          aria-describedby={descriptionId}
+          aria-label={itemView.ariaLabel}
+          aria-labelledby={`${labelId} ${valueId}`}
+          id={valueId}
+        >
+          {itemView.value}
+        </output>
+        <p id={descriptionId}>{itemView.description}</p>
+      </dd>
     </div>
   );
 }
