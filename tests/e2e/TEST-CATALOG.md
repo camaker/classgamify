@@ -67,6 +67,12 @@ run it when changing owner-scoped activity/assignment summaries,
 starter-preview boundaries, independent loading states, top metrics, loop
 status, next actions, readiness rows, action cards, route targets, or the
 dashboard-overview handoff.
+Settings billing workspace handoff has a fast script-level gate via
+`pnpm exec tsx --test scripts/settings-billing-workspace-handoff-semantic-views.test.ts`;
+run it when changing plan access, current-plan card semantics, activity library
+access, assignment workflow access, AI draft access, result export access,
+source-material access, hosted checkout, customer portal, payment callback, or
+the settings-billing-workspace handoff.
 Settings files source-material library has a fast script-level gate via
 `pnpm exec tsx --test scripts/settings-files-source-material-handoff-semantic-views.test.ts`;
 run it when changing source-material library, activity attachments, AI draft

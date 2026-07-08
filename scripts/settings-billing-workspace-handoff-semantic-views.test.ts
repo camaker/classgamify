@@ -52,6 +52,7 @@ const PAYMENT_CARD_SOURCE = readFileSync(
   'src/components/payment/payment-card.tsx',
   'utf8'
 );
+const TEST_CATALOG_SOURCE = readFileSync('tests/e2e/TEST-CATALOG.md', 'utf8');
 
 test('settings billing handoff exposes 30 hosted classroom billing slices', () => {
   const pageView = buildSettingsBillingPageViewModel();
@@ -447,8 +448,13 @@ test('billing and payment routes consume prepared view models', () => {
   );
   assert.match(
     BILLING_WORKSPACE_SUMMARY_SOURCE,
-    /view\.itemViews\.map\(\(itemView\) =>[\s\S]*key=\{itemView\.id\}[\s\S]*aria-label=\{itemView\.ariaLabel\}[\s\S]*handoffView\.itemViews\.map/,
+    /view\.itemViews\.map\(\(itemView\) =>[\s\S]*key=\{itemView\.id\}[\s\S]*aria-label=\{itemView\.ariaLabel\}[\s\S]*data-handoff="settings-billing-workspace"[\s\S]*data-handoff-scope=\{handoffView\.privacy\.scope\}[\s\S]*handoffView\.itemViews\.map[\s\S]*BillingWorkspaceHandoffItem[\s\S]*const labelId = `settings-billing-workspace-handoff-\$\{itemView\.id\}-label`[\s\S]*const valueId = `settings-billing-workspace-handoff-\$\{itemView\.id\}-value`[\s\S]*const descriptionId = `settings-billing-workspace-handoff-\$\{itemView\.id\}-description`[\s\S]*data-handoff-item=\{itemView\.id\}[\s\S]*id=\{labelId\}[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*aria-label=\{itemView\.ariaLabel\}[\s\S]*aria-labelledby=\{`\$\{labelId\} \$\{valueId\}`\}[\s\S]*id=\{valueId\}[\s\S]*id=\{descriptionId\}/,
     'Billing workspace component should render prepared summary and handoff items.'
+  );
+  assert.match(
+    TEST_CATALOG_SOURCE,
+    /Settings billing workspace handoff has a fast script-level gate via[\s\S]*scripts\/settings-billing-workspace-handoff-semantic-views\.test\.ts[\s\S]*plan access[\s\S]*settings-billing-workspace handoff/,
+    'E2E catalog should document the settings billing handoff focused gate.'
   );
   assert.match(
     BILLING_CARD_SOURCE,

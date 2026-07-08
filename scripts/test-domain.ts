@@ -10539,8 +10539,8 @@ assert.match(
 );
 assert.match(
   billingWorkspaceSummarySource,
-  /SettingsBillingWorkspaceHandoffItemView[\s\S]*SettingsBillingWorkspaceHandoffView[\s\S]*<BillingWorkspaceHandoff handoffView=\{view\.handoffView\} \/>[\s\S]*function BillingWorkspaceHandoff[\s\S]*aria-label=\{handoffView\.title\}[\s\S]*handoffView\.description[\s\S]*handoffView\.itemViews\.map[\s\S]*function BillingWorkspaceHandoffItem[\s\S]*<output aria-label=\{itemView\.ariaLabel\}/,
-  'Billing workspace summary component should render prepared billing handoff semantic outputs.'
+  /SettingsBillingWorkspaceHandoffItemView[\s\S]*SettingsBillingWorkspaceHandoffView[\s\S]*<BillingWorkspaceHandoff handoffView=\{view\.handoffView\} \/>[\s\S]*function BillingWorkspaceHandoff[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*aria-labelledby=\{titleId\}[\s\S]*data-handoff="settings-billing-workspace"[\s\S]*data-handoff-scope=\{handoffView\.privacy\.scope\}[\s\S]*id=\{titleId\}[\s\S]*handoffView\.title[\s\S]*id=\{descriptionId\}[\s\S]*handoffView\.description[\s\S]*handoffView\.itemViews\.map[\s\S]*function BillingWorkspaceHandoffItem[\s\S]*const labelId = `settings-billing-workspace-handoff-\$\{itemView\.id\}-label`[\s\S]*const valueId = `settings-billing-workspace-handoff-\$\{itemView\.id\}-value`[\s\S]*const descriptionId = `settings-billing-workspace-handoff-\$\{itemView\.id\}-description`[\s\S]*data-handoff-item=\{itemView\.id\}[\s\S]*id=\{labelId\}[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*aria-label=\{itemView\.ariaLabel\}[\s\S]*aria-labelledby=\{`\$\{labelId\} \$\{valueId\}`\}[\s\S]*id=\{valueId\}[\s\S]*id=\{descriptionId\}/,
+  'Billing workspace summary component should render prepared billing handoff marker, privacy scope, item ids, and stable label/value/description relationships.'
 );
 assert.doesNotMatch(
   billingWorkspaceSummarySource,

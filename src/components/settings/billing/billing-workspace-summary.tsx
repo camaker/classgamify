@@ -57,14 +57,25 @@ function BillingWorkspaceHandoff({
 }: {
   handoffView: SettingsBillingWorkspaceHandoffView;
 }) {
+  const titleId = 'settings-billing-workspace-handoff-title';
+  const descriptionId = 'settings-billing-workspace-handoff-description';
+
   return (
     <section
-      aria-label={handoffView.title}
+      aria-describedby={descriptionId}
+      aria-labelledby={titleId}
       className="grid gap-3 rounded-md border bg-background/80 p-3"
+      data-handoff="settings-billing-workspace"
+      data-handoff-scope={handoffView.privacy.scope}
     >
       <div>
-        <h3 className="font-medium text-sm">{handoffView.title}</h3>
-        <p className="mt-1 text-muted-foreground text-xs leading-5">
+        <h3 className="font-medium text-sm" id={titleId}>
+          {handoffView.title}
+        </h3>
+        <p
+          className="mt-1 text-muted-foreground text-xs leading-5"
+          id={descriptionId}
+        >
           {handoffView.description}
         </p>
       </div>
@@ -82,14 +93,32 @@ function BillingWorkspaceHandoffItem({
 }: {
   itemView: SettingsBillingWorkspaceHandoffItemView;
 }) {
+  const labelId = `settings-billing-workspace-handoff-${itemView.id}-label`;
+  const valueId = `settings-billing-workspace-handoff-${itemView.id}-value`;
+  const descriptionId = `settings-billing-workspace-handoff-${itemView.id}-description`;
+
   return (
-    <div className="rounded-md border bg-muted/20 px-3 py-2">
-      <dt className="font-medium text-xs">{itemView.label}</dt>
+    <div
+      className="rounded-md border bg-muted/20 px-3 py-2"
+      data-handoff-item={itemView.id}
+    >
+      <dt className="font-medium text-xs" id={labelId}>
+        {itemView.label}
+      </dt>
       <dd className="mt-1">
-        <output aria-label={itemView.ariaLabel} className="text-sm">
+        <output
+          aria-describedby={descriptionId}
+          aria-label={itemView.ariaLabel}
+          aria-labelledby={`${labelId} ${valueId}`}
+          className="text-sm"
+          id={valueId}
+        >
           {itemView.value}
         </output>
-        <p className="mt-1 text-muted-foreground text-xs leading-5">
+        <p
+          className="mt-1 text-muted-foreground text-xs leading-5"
+          id={descriptionId}
+        >
           {itemView.description}
         </p>
       </dd>
