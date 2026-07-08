@@ -4111,8 +4111,13 @@ assert.match(
     'src/components/assignments/assignment-results-classroom-brief-card.tsx',
     'utf8'
   ),
-  /data-handoff="assignment-student-follow-up-priority"[\s\S]*handoffView\.itemViews\.map[\s\S]*data-handoff-item=\{itemView\.id\}[\s\S]*aria-label=\{itemView\.ariaLabel\}/,
-  'Assignment results classroom brief card should render the hidden student follow-up priority semantic handoff.'
+  /function AssignmentStudentFollowUpPriorityHandoff[\s\S]*const titleId = 'assignment-student-follow-up-priority-handoff-title'[\s\S]*const descriptionId =[\s\S]*'assignment-student-follow-up-priority-handoff-description'[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*aria-labelledby=\{titleId\}[\s\S]*data-handoff="assignment-student-follow-up-priority"[\s\S]*data-handoff-scope=\{handoffView\.privacy\.scope\}[\s\S]*id=\{titleId\}[\s\S]*id=\{descriptionId\}[\s\S]*<dl>[\s\S]*handoffView\.itemViews\.map[\s\S]*AssignmentStudentFollowUpPriorityHandoffItem[\s\S]*function AssignmentStudentFollowUpPriorityHandoffItem[\s\S]*const labelId = `assignment-student-follow-up-priority-handoff-\$\{itemView\.id\}-label`[\s\S]*const valueId = `assignment-student-follow-up-priority-handoff-\$\{itemView\.id\}-value`[\s\S]*const descriptionId = `assignment-student-follow-up-priority-handoff-\$\{itemView\.id\}-description`[\s\S]*data-handoff-item=\{itemView\.id\}[\s\S]*id=\{labelId\}[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*aria-label=\{itemView\.ariaLabel\}[\s\S]*aria-labelledby=\{`\$\{labelId\} \$\{valueId\}`\}[\s\S]*id=\{valueId\}[\s\S]*id=\{descriptionId\}/,
+  'Assignment results classroom brief card should render the hidden student follow-up priority marker, privacy scope, item ids, and stable label/value/description relationships.'
+);
+assert.match(
+  readFileSync('tests/e2e/TEST-CATALOG.md', 'utf8'),
+  /Assignment student follow-up priority has a fast script-level gate via[\s\S]*scripts\/assignment-student-follow-up-priority-handoff-semantic-views\.test\.ts[\s\S]*needs-review[\s\S]*assignment-student-follow-up-priority[\s\S]*handoff/,
+  'E2E catalog should document the student follow-up priority focused gate.'
 );
 assert.match(
   assignmentReviewPrioritySource,

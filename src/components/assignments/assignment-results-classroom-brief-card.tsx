@@ -129,6 +129,7 @@ function AssignmentStudentFollowUpPriorityHandoff({
       aria-labelledby={titleId}
       className="sr-only"
       data-handoff="assignment-student-follow-up-priority"
+      data-handoff-scope={handoffView.privacy.scope}
     >
       <h3 id={titleId}>{handoffView.title}</h3>
       <p id={descriptionId}>{handoffView.description}</p>
@@ -165,8 +166,8 @@ function AssignmentStudentFollowUpPriorityHandoffItem({
         >
           {itemView.value}
         </output>
+        <p id={descriptionId}>{itemView.description}</p>
       </dd>
-      <dd id={descriptionId}>{itemView.description}</dd>
     </div>
   );
 }

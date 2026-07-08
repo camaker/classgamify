@@ -154,6 +154,12 @@ needs-review, or unanswered counts, answer text/status/summary helpers,
 accepted alternatives, explanations, copy-scope boundaries, CSV export
 boundaries, anonymous-token guards, or the assignment-attempt-review-card
 handoff.
+Assignment student follow-up priority has a fast script-level gate via
+`pnpm exec tsx --test scripts/assignment-student-follow-up-priority-handoff-semantic-views.test.ts`;
+run it when changing needs-review follow-up sorting, latest-accuracy or
+display-label tie-breakers, classroom brief follow-up limits, reteach-plan
+student lines, student follow-up summaries, copy-artifact ordering,
+anonymous-token guards, or the assignment-student-follow-up-priority handoff.
 Public indexing and install metadata have a fast source-level gate via
 `pnpm exec tsx --test scripts/public-metadata-handoff-semantic-views.test.ts`;
 run it when changing the public route registry, sitemap helpers, robots rules,
