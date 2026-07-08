@@ -9788,8 +9788,8 @@ assert.match(
 );
 assert.match(
   matchingPairsBoardSource,
-  /data-handoff="matching-pairs-board"[\s\S]*view\.itemViews\.map\(\(item\) =>[\s\S]*data-handoff-item=\{item\.id\}[\s\S]*<output aria-label=\{item\.ariaLabel\}>/,
-  'Matching-pairs runner should expose stable hidden matching-pairs board item outputs.'
+  /MatchingPairsBoardHandoffItemView[\s\S]*MatchingPairsBoardHandoffView[\s\S]*data-handoff="matching-pairs-board"[\s\S]*view\.itemViews\.map\(\(item\) =>[\s\S]*MatchingPairsBoardHandoffItem[\s\S]*function MatchingPairsBoardHandoffItem[\s\S]*const labelId = `matching-pairs-board-handoff-\$\{item\.id\}-label`[\s\S]*const valueId = `matching-pairs-board-handoff-\$\{item\.id\}-value`[\s\S]*const descriptionId = `matching-pairs-board-handoff-\$\{item\.id\}-description`[\s\S]*data-handoff-item=\{item\.id\}[\s\S]*id=\{labelId\}[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*aria-label=\{item\.ariaLabel\}[\s\S]*aria-labelledby=\{`\$\{labelId\} \$\{valueId\}`\}[\s\S]*id=\{valueId\}[\s\S]*id=\{descriptionId\}/,
+  'Matching-pairs runner should expose stable hidden matching-pairs board label, value, and description relationships.'
 );
 assert.match(
   groupSortBoardSource,

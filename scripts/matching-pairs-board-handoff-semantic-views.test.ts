@@ -267,8 +267,29 @@ test('matching-pairs board attaches the card-board handoff to the component', ()
   assert.match(source, /data-handoff="matching-pairs-board"/);
   assert.match(
     source,
-    /view\.itemViews\.map\(\(item\) =>[\s\S]*data-handoff-item=\{item\.id\}[\s\S]*<output aria-label=\{item\.ariaLabel\}>/
+    /MatchingPairsBoardHandoffItemView[\s\S]*MatchingPairsBoardHandoffView[\s\S]*view\.itemViews\.map\(\(item\) =>[\s\S]*MatchingPairsBoardHandoffItem[\s\S]*function MatchingPairsBoardHandoffItem[\s\S]*const labelId = `matching-pairs-board-handoff-\$\{item\.id\}-label`[\s\S]*const valueId = `matching-pairs-board-handoff-\$\{item\.id\}-value`[\s\S]*const descriptionId = `matching-pairs-board-handoff-\$\{item\.id\}-description`[\s\S]*data-handoff-item=\{item\.id\}[\s\S]*id=\{labelId\}[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*aria-label=\{item\.ariaLabel\}[\s\S]*aria-labelledby=\{`\$\{labelId\} \$\{valueId\}`\}[\s\S]*id=\{valueId\}[\s\S]*id=\{descriptionId\}/
   );
+});
+
+test('matching-pairs board focused gate is documented', () => {
+  const catalogSource = readFileSync('tests/e2e/TEST-CATALOG.md', 'utf8');
+  const normalizedCatalog = catalogSource.replace(/\s+/g, ' ');
+
+  assert.match(
+    catalogSource,
+    /pnpm exec tsx --test scripts\/matching-pairs-board-handoff-semantic-views\.test\.ts/
+  );
+  for (const boundary of [
+    'prompt and choice card counts',
+    'selected prompt state',
+    'choice target readiness',
+    'exclusive choice and reassignment policy',
+    'review feedback',
+    'runtime-id/prompt/choice/answer/student/source-material guards',
+    'hidden matching-pairs-board handoff',
+  ]) {
+    assert.match(normalizedCatalog, new RegExp(boundary));
+  }
 });
 
 function buildMatchingPairsItems(): PublicRuntimeItem[] {

@@ -5,6 +5,7 @@ import type {
 import type { StudentAnswerChange } from '@/assignments/student-submission';
 import {
   buildMatchingPairsBoardHandoffView,
+  type MatchingPairsBoardHandoffItemView,
   type MatchingPairsBoardHandoffView,
 } from '@/assignments/matching-pairs-board-handoff';
 import { getActivityRunnerKindCopy } from '@/activities/runner-copy';
@@ -201,15 +202,36 @@ function MatchingPairsBoardHandoff({
       <p id={descriptionId}>{view.description}</p>
       <dl>
         {view.itemViews.map((item) => (
-          <div data-handoff-item={item.id} key={item.id}>
-            <dt>{item.label}</dt>
-            <dd>
-              <output aria-label={item.ariaLabel}>{item.value}</output>
-              <span>{item.description}</span>
-            </dd>
-          </div>
+          <MatchingPairsBoardHandoffItem item={item} key={item.id} />
         ))}
       </dl>
     </section>
+  );
+}
+
+function MatchingPairsBoardHandoffItem({
+  item,
+}: {
+  item: MatchingPairsBoardHandoffItemView;
+}) {
+  const labelId = `matching-pairs-board-handoff-${item.id}-label`;
+  const valueId = `matching-pairs-board-handoff-${item.id}-value`;
+  const descriptionId = `matching-pairs-board-handoff-${item.id}-description`;
+
+  return (
+    <div data-handoff-item={item.id}>
+      <dt id={labelId}>{item.label}</dt>
+      <dd>
+        <output
+          aria-describedby={descriptionId}
+          aria-label={item.ariaLabel}
+          aria-labelledby={`${labelId} ${valueId}`}
+          id={valueId}
+        >
+          {item.value}
+        </output>
+        <span id={descriptionId}>{item.description}</span>
+      </dd>
+    </div>
   );
 }
