@@ -22,6 +22,7 @@ const SECRET_EXPECTED_ANSWER = 'SECRET_EXPECTED_ANSWER';
 const SECRET_PROMPT = 'SECRET_PROMPT';
 const SECRET_SHARE_SLUG = 'stats-share-slug';
 const SECRET_STUDENT_ANSWER = 'SECRET_STUDENT_ANSWER';
+const TEST_CATALOG_SOURCE = readFileSync('tests/e2e/TEST-CATALOG.md', 'utf8');
 
 test('assignment attempt stats handoff exposes 30 safe shared metric slices', () => {
   overwriteGetLocale(() => 'en');
@@ -263,7 +264,11 @@ test('assignment attempt stats handoff is wired to shared consumers and hidden r
   );
   assert.match(
     handoffComponentSource,
-    /data-handoff="assignment-attempt-stats"[\s\S]*view\.itemViews\.map[\s\S]*data-handoff-item=\{itemView\.id\}[\s\S]*aria-label=\{itemView\.ariaLabel\}/
+    /function AssignmentResultsAttemptStatsHandoff[\s\S]*const titleId = 'assignment-attempt-stats-handoff-title'[\s\S]*const descriptionId = 'assignment-attempt-stats-handoff-description'[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*aria-labelledby=\{titleId\}[\s\S]*data-handoff="assignment-attempt-stats"[\s\S]*data-handoff-scope=\{view\.privacy\.scope\}[\s\S]*id=\{titleId\}[\s\S]*id=\{descriptionId\}[\s\S]*<dl>[\s\S]*view\.itemViews\.map[\s\S]*AssignmentAttemptStatsHandoffItem[\s\S]*function AssignmentAttemptStatsHandoffItem[\s\S]*const labelId = `assignment-attempt-stats-handoff-\$\{itemView\.id\}-label`[\s\S]*const valueId = `assignment-attempt-stats-handoff-\$\{itemView\.id\}-value`[\s\S]*const descriptionId = `assignment-attempt-stats-handoff-\$\{itemView\.id\}-description`[\s\S]*data-handoff-item=\{itemView\.id\}[\s\S]*id=\{labelId\}[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*aria-label=\{itemView\.ariaLabel\}[\s\S]*aria-labelledby=\{`\$\{labelId\} \$\{valueId\}`\}[\s\S]*id=\{valueId\}[\s\S]*id=\{descriptionId\}/
+  );
+  assert.match(
+    TEST_CATALOG_SOURCE,
+    /Assignment attempt stats has a fast script-level gate via[\s\S]*scripts\/assignment-attempt-stats-handoff-semantic-views\.test\.ts[\s\S]*average accuracy[\s\S]*assignment-attempt-stats handoff/
   );
   assert.match(
     routeSource,

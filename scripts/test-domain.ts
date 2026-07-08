@@ -3749,8 +3749,8 @@ assert.match(
 );
 assert.match(
   assignmentResultsAttemptStatsHandoffSource,
-  /data-handoff="assignment-attempt-stats"[\s\S]*view\.itemViews\.map[\s\S]*data-handoff-item=\{itemView\.id\}[\s\S]*aria-label=\{itemView\.ariaLabel\}/,
-  'Assignment attempt stats handoff should render as hidden semantic output.'
+  /function AssignmentResultsAttemptStatsHandoff[\s\S]*const titleId = 'assignment-attempt-stats-handoff-title'[\s\S]*const descriptionId = 'assignment-attempt-stats-handoff-description'[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*aria-labelledby=\{titleId\}[\s\S]*data-handoff="assignment-attempt-stats"[\s\S]*data-handoff-scope=\{view\.privacy\.scope\}[\s\S]*id=\{titleId\}[\s\S]*id=\{descriptionId\}[\s\S]*<dl>[\s\S]*view\.itemViews\.map[\s\S]*AssignmentAttemptStatsHandoffItem[\s\S]*function AssignmentAttemptStatsHandoffItem[\s\S]*const labelId = `assignment-attempt-stats-handoff-\$\{itemView\.id\}-label`[\s\S]*const valueId = `assignment-attempt-stats-handoff-\$\{itemView\.id\}-value`[\s\S]*const descriptionId = `assignment-attempt-stats-handoff-\$\{itemView\.id\}-description`[\s\S]*data-handoff-item=\{itemView\.id\}[\s\S]*id=\{labelId\}[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*aria-label=\{itemView\.ariaLabel\}[\s\S]*aria-labelledby=\{`\$\{labelId\} \$\{valueId\}`\}[\s\S]*id=\{valueId\}[\s\S]*id=\{descriptionId\}/,
+  'Assignment attempt stats handoff should render marker, privacy scope, item ids, and stable label/value/description relationships.'
 );
 assert.match(
   assignmentResultRouteStatsHandoffSource,

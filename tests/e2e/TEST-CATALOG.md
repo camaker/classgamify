@@ -56,6 +56,12 @@ Assignment results CSV export preparation has a fast script-level gate via
 run it when changing delivery-policy columns, accepted-answer columns,
 submitted-date formatting, timer-aware duration normalization, formula-injection
 guards, CSV data URL boundaries, or the export coverage handoff.
+Assignment attempt stats has a fast script-level gate via
+`pnpm exec tsx --test scripts/assignment-attempt-stats-handoff-semantic-views.test.ts`;
+run it when changing completions, average accuracy, average points, average
+duration, timer caps, result metric cards, assignment list summaries,
+assignment cards, classroom briefs, copy artifacts, CSV exports, or the
+assignment-attempt-stats handoff.
 Storage upload readiness has a fast script-level gate via
 `pnpm exec tsx --test scripts/storage-upload-readiness.test.ts`; run it when
 changing classroom source-material upload validation, filename sanitization,
