@@ -34352,8 +34352,8 @@ assert.match(
 );
 assert.match(
   activityLibraryCardComponentSource,
-  /ActivityLibraryLifecycleHandoff[\s\S]*handoff=\{cardDisplayView\.lifecycleHandoffView\}[\s\S]*function ActivityLibraryLifecycleHandoff\([\s\S]*handoff: ActivityLifecycleHandoffView[\s\S]*data-handoff="activity-lifecycle"[\s\S]*handoff\.title[\s\S]*handoff\.description[\s\S]*handoff\.itemViews\.map[\s\S]*ActivityLibraryLifecycleHandoffItem[\s\S]*function ActivityLibraryLifecycleHandoffItem[\s\S]*item: ActivityLifecycleHandoffItemView[\s\S]*data-handoff-item=\{item\.id\}[\s\S]*item\.label[\s\S]*aria-label=\{item\.ariaLabel\}[\s\S]*item\.value[\s\S]*item\.description/,
-  'Activity library card component should render the prepared activity lifecycle handoff as stable hidden semantic output.'
+  /ActivityLifecycleHandoffItemView[\s\S]*ActivityLifecycleHandoffView[\s\S]*ActivityLibraryLifecycleHandoff[\s\S]*handoff=\{cardDisplayView\.lifecycleHandoffView\}[\s\S]*function ActivityLibraryLifecycleHandoff\([\s\S]*data-handoff="activity-lifecycle"[\s\S]*handoff\.title[\s\S]*handoff\.description[\s\S]*handoff\.itemViews\.map[\s\S]*ActivityLibraryLifecycleHandoffItem[\s\S]*function ActivityLibraryLifecycleHandoffItem[\s\S]*const labelId = `activity-lifecycle-handoff-\$\{item\.id\}-label`[\s\S]*const valueId = `activity-lifecycle-handoff-\$\{item\.id\}-value`[\s\S]*const descriptionId = `activity-lifecycle-handoff-\$\{item\.id\}-description`[\s\S]*data-handoff-item=\{item\.id\}[\s\S]*id=\{labelId\}[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*aria-label=\{item\.ariaLabel\}[\s\S]*aria-labelledby=\{`\$\{labelId\} \$\{valueId\}`\}[\s\S]*id=\{valueId\}[\s\S]*id=\{descriptionId\}/,
+  'Activity library card component should render the prepared activity lifecycle handoff as stable hidden label, value, and description relationships.'
 );
 assert.match(
   activityLibraryCardComponentSource,

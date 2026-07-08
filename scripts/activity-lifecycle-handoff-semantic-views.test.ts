@@ -1,4 +1,5 @@
 import assert from 'node:assert/strict';
+import { readFileSync } from 'node:fs';
 import test from 'node:test';
 import {
   ACTIVITY_RESTORED_VISIBILITY,
@@ -20,6 +21,11 @@ import { overwriteGetLocale } from '@/locale/paraglide/runtime';
 
 overwriteGetLocale(() => 'en');
 
+const ACTIVITY_LIBRARY_CARD_SOURCE = readFileSync(
+  'src/components/activities/activity-library-card.tsx',
+  'utf8'
+);
+const TEST_CATALOG_SOURCE = readFileSync('tests/e2e/TEST-CATALOG.md', 'utf8');
 const SECRET_ACTIVITY_CONTENT = 'SECRET_ACTIVITY_CONTENT_SHOULD_NOT_LEAK';
 const SECRET_ACTIVITY_ID = 'SECRET_ACTIVITY_ID_SHOULD_NOT_LEAK';
 const SECRET_ASSIGNMENT_SNAPSHOT = 'SECRET_ASSIGNMENT_SNAPSHOT_SHOULD_NOT_LEAK';
@@ -391,6 +397,38 @@ test('preview activity lifecycle stays semantic but blocks persisted actions', (
     'Save activity first'
   );
   assertNoPrivateLifecycleHandoffText(JSON.stringify(handoffView));
+});
+
+test('activity lifecycle handoff renders stable DOM relationships', () => {
+  assert.match(
+    ACTIVITY_LIBRARY_CARD_SOURCE,
+    /ActivityLifecycleHandoffItemView[\s\S]*ActivityLifecycleHandoffView[\s\S]*function ActivityLibraryLifecycleHandoff\([\s\S]*const titleId = useId\(\)[\s\S]*const descriptionId = useId\(\)[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*aria-labelledby=\{titleId\}[\s\S]*className="sr-only"[\s\S]*data-handoff="activity-lifecycle"[\s\S]*id=\{titleId\}[\s\S]*id=\{descriptionId\}[\s\S]*handoff\.itemViews\.map[\s\S]*ActivityLibraryLifecycleHandoffItem[\s\S]*function ActivityLibraryLifecycleHandoffItem[\s\S]*const labelId = `activity-lifecycle-handoff-\$\{item\.id\}-label`[\s\S]*const valueId = `activity-lifecycle-handoff-\$\{item\.id\}-value`[\s\S]*const descriptionId = `activity-lifecycle-handoff-\$\{item\.id\}-description`[\s\S]*data-handoff-item=\{item\.id\}[\s\S]*id=\{labelId\}[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*aria-label=\{item\.ariaLabel\}[\s\S]*aria-labelledby=\{`\$\{labelId\} \$\{valueId\}`\}[\s\S]*id=\{valueId\}[\s\S]*id=\{descriptionId\}/,
+    'Activity lifecycle handoff should render each lifecycle slice with stable label, value, and description relationships.'
+  );
+});
+
+test('activity lifecycle focused gate is documented', () => {
+  assert.match(
+    TEST_CATALOG_SOURCE,
+    /pnpm exec tsx --test scripts\/activity-lifecycle-handoff-semantic-views\.test\.ts/,
+    'E2E catalog should point activity lifecycle work at the focused script gate.'
+  );
+  for (const boundary of [
+    'owner-scoped archive and restore actions',
+    'active and archived library visibility',
+    'edit/publish/duplicate/remix gates',
+    'restore-before-derive policy',
+    'assignment snapshot protection',
+    'public assignment continuity',
+    'server archive/restore/derivative guards',
+    'hidden activity-lifecycle handoff',
+  ]) {
+    assert.match(
+      TEST_CATALOG_SOURCE,
+      new RegExp(boundary.replace(/[ /-]+/g, '[\\s/-]+')),
+      `E2E catalog should mention activity lifecycle boundary: ${boundary}`
+    );
+  }
 });
 
 function buildLifecycleActivity(
