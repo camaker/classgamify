@@ -8958,13 +8958,13 @@ assert.match(
 );
 assert.match(
   assignmentResultsHeaderActionsSource,
-  /function AssignmentResultsMaterialHandoff[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*aria-labelledby=\{titleId\}[\s\S]*data-handoff="assignment-result-material"[\s\S]*data-handoff-scope=\{materialHandoffView\.privacy\.scope\}[\s\S]*materialHandoffView\.itemViews\.map[\s\S]*<article[\s\S]*aria-label=\{itemView\.ariaLabel\}[\s\S]*data-handoff-item=\{itemView\.id\}[\s\S]*data-scope=\{itemView\.dataScope\}[\s\S]*<output[\s\S]*aria-label=\{itemView\.ariaLabel\}/,
-  'Assignment result material handoff should render a stable page marker, privacy scope, item markers, data scopes, and accessible labels for teacher result materials.'
+  /function AssignmentResultsMaterialHandoff[\s\S]*const titleId = 'assignment-results-material-handoff-title'[\s\S]*const descriptionId = 'assignment-results-material-handoff-description'[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*aria-labelledby=\{titleId\}[\s\S]*className="sr-only"[\s\S]*data-handoff="assignment-result-material"[\s\S]*data-handoff-scope=\{materialHandoffView\.privacy\.scope\}[\s\S]*id=\{titleId\}[\s\S]*id=\{descriptionId\}[\s\S]*<dl>[\s\S]*materialHandoffView\.itemViews\.map[\s\S]*AssignmentResultsMaterialHandoffItem[\s\S]*function AssignmentResultsMaterialHandoffItem[\s\S]*itemView: AssignmentResultMaterialHandoffView\['itemViews'\]\[number\][\s\S]*const labelId = `assignment-result-material-handoff-\$\{itemView\.id\}-label`[\s\S]*const valueId = `assignment-result-material-handoff-\$\{itemView\.id\}-value`[\s\S]*const descriptionId =[\s\S]*`assignment-result-material-handoff-\$\{itemView\.id\}-description`[\s\S]*data-handoff-item=\{itemView\.id\}[\s\S]*data-scope=\{itemView\.dataScope\}[\s\S]*id=\{labelId\}[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*aria-label=\{itemView\.ariaLabel\}[\s\S]*aria-labelledby=\{`\$\{labelId\} \$\{valueId\}`\}[\s\S]*id=\{valueId\}[\s\S]*id=\{descriptionId\}/,
+  'Assignment result material handoff should render a stable page marker, privacy scope, item markers, data scopes, and accessible label/value/description relationships for teacher result materials.'
 );
 assert.match(
   authE2eCatalogSource,
-  /\|\s*6a\s*\|\s*Result materials expose a 30-slice handoff\s*\|[\s\S]*`assignment-result-material`[\s\S]*`data-handoff-item`/,
-  'E2E catalog should include the result-material handoff marker and stable item marker acceptance journey.'
+  /\|\s*6a\s*\|\s*Result materials expose a 30-slice handoff\s*\|[\s\S]*`assignment-result-material`[\s\S]*`dl\/dt\/dd`[\s\S]*label\/value\/description[\s\S]*`data-handoff-item`/,
+  'E2E catalog should include the result-material handoff marker, hidden semantic structure, and stable item marker acceptance journey.'
 );
 assert.match(
   authE2eCatalogSource,

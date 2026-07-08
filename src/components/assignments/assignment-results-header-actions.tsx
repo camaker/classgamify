@@ -542,45 +542,48 @@ function AssignmentResultsMaterialHandoff({
     <section
       aria-describedby={descriptionId}
       aria-labelledby={titleId}
-      className="grid basis-full gap-3 rounded-lg border bg-muted/20 p-3"
+      className="sr-only"
       data-handoff="assignment-result-material"
       data-handoff-scope={materialHandoffView.privacy.scope}
     >
-      <div className="grid gap-1">
-        <h3 id={titleId} className="font-medium text-sm">
-          {materialHandoffView.title}
-        </h3>
-        <p id={descriptionId} className="text-muted-foreground text-xs">
-          {materialHandoffView.description}
-        </p>
-      </div>
-      <div className="grid gap-2 sm:grid-cols-2 xl:grid-cols-5">
+      <h3 id={titleId}>{materialHandoffView.title}</h3>
+      <p id={descriptionId}>{materialHandoffView.description}</p>
+      <dl>
         {materialHandoffView.itemViews.map((itemView) => (
-          <article
-            aria-label={itemView.ariaLabel}
-            className="grid gap-1 rounded-md border bg-background p-3"
-            data-handoff-item={itemView.id}
-            data-scope={itemView.dataScope}
+          <AssignmentResultsMaterialHandoffItem
+            itemView={itemView}
             key={itemView.id}
-          >
-            <div className="flex min-w-0 items-center justify-between gap-2">
-              <p className="text-muted-foreground text-xs">{itemView.label}</p>
-              {itemView.statusLabel ? (
-                <Badge variant="secondary" className="rounded-md">
-                  {itemView.statusLabel}
-                </Badge>
-              ) : null}
-            </div>
-            <output aria-label={itemView.ariaLabel}>
-              <span className="font-semibold text-base">{itemView.value}</span>
-            </output>
-            <p className="text-muted-foreground text-xs">
-              {itemView.description}
-            </p>
-          </article>
+          />
         ))}
-      </div>
+      </dl>
     </section>
+  );
+}
+
+function AssignmentResultsMaterialHandoffItem({
+  itemView,
+}: {
+  itemView: AssignmentResultMaterialHandoffView['itemViews'][number];
+}) {
+  const labelId = `assignment-result-material-handoff-${itemView.id}-label`;
+  const valueId = `assignment-result-material-handoff-${itemView.id}-value`;
+  const descriptionId = `assignment-result-material-handoff-${itemView.id}-description`;
+
+  return (
+    <div data-handoff-item={itemView.id} data-scope={itemView.dataScope}>
+      <dt id={labelId}>{itemView.label}</dt>
+      <dd>
+        <output
+          aria-describedby={descriptionId}
+          aria-label={itemView.ariaLabel}
+          aria-labelledby={`${labelId} ${valueId}`}
+          id={valueId}
+        >
+          {itemView.value}
+        </output>
+        <p id={descriptionId}>{itemView.description}</p>
+      </dd>
+    </div>
   );
 }
 
