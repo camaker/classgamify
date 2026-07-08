@@ -149,14 +149,20 @@ function PaymentStatusNextStep({
 }
 
 function PaymentStatusHandoff({ view }: { view: PaymentStatusHandoffView }) {
+  const titleId = 'settings-payment-callback-handoff-title';
+  const descriptionId = 'settings-payment-callback-handoff-description';
+
   return (
     <section
       aria-label={view.title}
+      aria-labelledby={titleId}
+      aria-describedby={descriptionId}
       className="sr-only"
       data-handoff="settings-payment-callback"
+      data-handoff-scope={view.privacy.scope}
     >
-      <h2>{view.title}</h2>
-      <p>{view.description}</p>
+      <h2 id={titleId}>{view.title}</h2>
+      <p id={descriptionId}>{view.description}</p>
       <dl>
         {view.itemViews.map((itemView) => (
           <PaymentStatusHandoffItem itemView={itemView} key={itemView.id} />
@@ -171,12 +177,23 @@ function PaymentStatusHandoffItem({
 }: {
   itemView: PaymentStatusHandoffItemView;
 }) {
+  const labelId = `settings-payment-callback-handoff-${itemView.id}-label`;
+  const valueId = `settings-payment-callback-handoff-${itemView.id}-value`;
+  const descriptionId = `settings-payment-callback-handoff-${itemView.id}-description`;
+
   return (
     <div data-handoff-item={itemView.id}>
-      <dt>{itemView.label}</dt>
+      <dt id={labelId}>{itemView.label}</dt>
       <dd>
-        <output aria-label={itemView.ariaLabel}>{itemView.value}</output>
-        <p>{itemView.description}</p>
+        <output
+          aria-describedby={descriptionId}
+          aria-label={itemView.ariaLabel}
+          aria-labelledby={`${labelId} ${valueId}`}
+          id={valueId}
+        >
+          {itemView.value}
+        </output>
+        <p id={descriptionId}>{itemView.description}</p>
       </dd>
     </div>
   );

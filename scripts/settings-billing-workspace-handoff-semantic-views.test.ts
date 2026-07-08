@@ -457,6 +457,11 @@ test('billing and payment routes consume prepared view models', () => {
     'E2E catalog should document the settings billing handoff focused gate.'
   );
   assert.match(
+    TEST_CATALOG_SOURCE,
+    /Settings payment callback handoff has a fast script-level gate via[\s\S]*scripts\/settings-billing-workspace-handoff-semantic-views\.test\.ts[\s\S]*hosted checkout confirmation[\s\S]*settings-payment-callback handoff/,
+    'E2E catalog should document the settings payment callback handoff focused gate.'
+  );
+  assert.match(
     BILLING_CARD_SOURCE,
     /buildSettingsBillingCardViewModel\(\{[\s\S]*canManageBilling:[\s\S]*currentPlan,[\s\S]*hasLoadError:[\s\S]*plans,[\s\S]*subscription,[\s\S]*\}\)/,
     'Billing card should delegate plan state to the payment billing view model.'
@@ -465,6 +470,11 @@ test('billing and payment routes consume prepared view models', () => {
     PAYMENT_CARD_SOURCE,
     /buildPaymentStatusView\(status,[\s\S]*hasSessionId:[\s\S]*Boolean\(sessionId\)[\s\S]*PaymentStatusNextStep[\s\S]*PaymentStatusHandoff[\s\S]*view=\{statusView\.handoffView\}/,
     'Payment card should render prepared payment status, next-step, and handoff views.'
+  );
+  assert.match(
+    PAYMENT_CARD_SOURCE,
+    /function PaymentStatusHandoff[\s\S]*const titleId = 'settings-payment-callback-handoff-title'[\s\S]*const descriptionId = 'settings-payment-callback-handoff-description'[\s\S]*data-handoff="settings-payment-callback"[\s\S]*data-handoff-scope=\{view\.privacy\.scope\}[\s\S]*id=\{titleId\}[\s\S]*id=\{descriptionId\}[\s\S]*view\.itemViews\.map[\s\S]*PaymentStatusHandoffItem[\s\S]*function PaymentStatusHandoffItem[\s\S]*const labelId = `settings-payment-callback-handoff-\$\{itemView\.id\}-label`[\s\S]*const valueId = `settings-payment-callback-handoff-\$\{itemView\.id\}-value`[\s\S]*const descriptionId = `settings-payment-callback-handoff-\$\{itemView\.id\}-description`[\s\S]*data-handoff-item=\{itemView\.id\}[\s\S]*id=\{labelId\}[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*aria-label=\{itemView\.ariaLabel\}[\s\S]*aria-labelledby=\{`\$\{labelId\} \$\{valueId\}`\}[\s\S]*id=\{valueId\}[\s\S]*id=\{descriptionId\}/,
+    'Payment status handoff should render marker, privacy scope, item ids, and stable label/value/description relationships.'
   );
 });
 

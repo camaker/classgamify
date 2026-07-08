@@ -10608,6 +10608,11 @@ assert.match(
 );
 assert.match(
   paymentCardSource,
+  /function PaymentStatusHandoff[\s\S]*const titleId = 'settings-payment-callback-handoff-title'[\s\S]*const descriptionId = 'settings-payment-callback-handoff-description'[\s\S]*data-handoff="settings-payment-callback"[\s\S]*data-handoff-scope=\{view\.privacy\.scope\}[\s\S]*id=\{titleId\}[\s\S]*id=\{descriptionId\}[\s\S]*view\.itemViews\.map[\s\S]*PaymentStatusHandoffItem[\s\S]*function PaymentStatusHandoffItem[\s\S]*const labelId = `settings-payment-callback-handoff-\$\{itemView\.id\}-label`[\s\S]*const valueId = `settings-payment-callback-handoff-\$\{itemView\.id\}-value`[\s\S]*const descriptionId = `settings-payment-callback-handoff-\$\{itemView\.id\}-description`[\s\S]*data-handoff-item=\{itemView\.id\}[\s\S]*id=\{labelId\}[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*aria-label=\{itemView\.ariaLabel\}[\s\S]*aria-labelledby=\{`\$\{labelId\} \$\{valueId\}`\}[\s\S]*id=\{valueId\}[\s\S]*id=\{descriptionId\}/,
+  'Payment status handoff should render stable label/value/description relationships for the settings payment callback.'
+);
+assert.match(
+  paymentCardSource,
   /getInitialPaymentConfirmationStatus/,
   'PaymentCard should derive its initial status through the payment status helper.'
 );

@@ -80,6 +80,13 @@ run it when changing plan access, current-plan card semantics, activity library
 access, assignment workflow access, AI draft access, result export access,
 source-material access, hosted checkout, customer portal, payment callback, or
 the settings-billing-workspace handoff.
+Settings payment callback handoff has a fast script-level gate via
+`pnpm exec tsx --test scripts/settings-billing-workspace-handoff-semantic-views.test.ts`;
+run it when changing hosted checkout confirmation, session-id privacy, polling
+interval or timeout, server completion checks, current-plan cache refresh, safe
+callback normalization, billing return, pricing retry, timeout recovery,
+classroom access boundaries, provider-secret guards, raw-session guards, or the
+settings-payment-callback handoff.
 Settings notification update handoff has a fast script-level gate via
 `pnpm exec tsx --test scripts/settings-notification-update-handoff-semantic-views.test.ts`;
 run it when changing teacher-controlled product updates, template updates,
