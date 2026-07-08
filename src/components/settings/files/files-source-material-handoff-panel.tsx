@@ -16,6 +16,7 @@ export function FilesSourceMaterialHandoffPanel({
       aria-describedby={descriptionId}
       aria-labelledby={titleId}
       className="grid gap-3 rounded-lg border bg-muted/20 p-4"
+      data-handoff="settings-files-source-material"
     >
       <div className="grid gap-1">
         <div className="flex flex-wrap items-center gap-2">
@@ -32,21 +33,46 @@ export function FilesSourceMaterialHandoffPanel({
       </div>
       <div className="grid gap-2 sm:grid-cols-2 xl:grid-cols-5">
         {view.itemViews.map((itemView) => (
-          <article
-            aria-label={itemView.ariaLabel}
-            className="grid gap-1 rounded-md border bg-background p-3"
+          <FilesSourceMaterialHandoffItem
+            itemView={itemView}
             key={itemView.id}
-          >
-            <p className="text-muted-foreground text-xs">{itemView.label}</p>
-            <output aria-label={itemView.ariaLabel}>
-              <span className="font-semibold text-base">{itemView.value}</span>
-            </output>
-            <p className="text-muted-foreground text-xs leading-5">
-              {itemView.description}
-            </p>
-          </article>
+          />
         ))}
       </div>
     </section>
+  );
+}
+
+function FilesSourceMaterialHandoffItem({
+  itemView,
+}: {
+  itemView: SettingsFilesSourceMaterialHandoffView['itemViews'][number];
+}) {
+  const labelId = `settings-files-source-material-handoff-${itemView.id}-label`;
+  const valueId = `settings-files-source-material-handoff-${itemView.id}-value`;
+  const descriptionId = `settings-files-source-material-handoff-${itemView.id}-description`;
+
+  return (
+    <article
+      aria-describedby={descriptionId}
+      aria-label={itemView.ariaLabel}
+      className="grid gap-1 rounded-md border bg-background p-3"
+      data-handoff-item={itemView.id}
+    >
+      <p className="text-muted-foreground text-xs" id={labelId}>
+        {itemView.label}
+      </p>
+      <output
+        aria-describedby={descriptionId}
+        aria-label={itemView.ariaLabel}
+        aria-labelledby={`${labelId} ${valueId}`}
+        id={valueId}
+      >
+        <span className="font-semibold text-base">{itemView.value}</span>
+      </output>
+      <p className="text-muted-foreground text-xs leading-5" id={descriptionId}>
+        {itemView.description}
+      </p>
+    </article>
   );
 }

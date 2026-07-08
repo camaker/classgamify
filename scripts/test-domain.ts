@@ -11349,6 +11349,10 @@ const filesTableSource = readFileSync(
   'src/components/settings/files/files-table.tsx',
   'utf8'
 );
+const filesSourceMaterialHandoffPanelSource = readFileSync(
+  'src/components/settings/files/files-source-material-handoff-panel.tsx',
+  'utf8'
+);
 const filesMaterialClassificationHandoffSource = readFileSync(
   'src/components/settings/files/files-material-classification-handoff.tsx',
   'utf8'
@@ -11378,6 +11382,11 @@ assert.match(
   filesTableSource,
   /buildSettingsFilesSourceMaterialHandoffView\(\{[\s\S]*summary: materialSummary,[\s\S]*visibleItemCount: data\.length/,
   'Settings files table should expose the source-material handoff from table state.'
+);
+assert.match(
+  filesSourceMaterialHandoffPanelSource,
+  /SettingsFilesSourceMaterialHandoffView[\s\S]*data-handoff="settings-files-source-material"[\s\S]*view\.itemViews\.map\(\(itemView\) =>[\s\S]*FilesSourceMaterialHandoffItem[\s\S]*function FilesSourceMaterialHandoffItem[\s\S]*const labelId = `settings-files-source-material-handoff-\$\{itemView\.id\}-label`[\s\S]*const valueId = `settings-files-source-material-handoff-\$\{itemView\.id\}-value`[\s\S]*const descriptionId = `settings-files-source-material-handoff-\$\{itemView\.id\}-description`[\s\S]*data-handoff-item=\{itemView\.id\}[\s\S]*id=\{labelId\}[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*aria-label=\{itemView\.ariaLabel\}[\s\S]*aria-labelledby=\{`\$\{labelId\} \$\{valueId\}`\}[\s\S]*id=\{valueId\}[\s\S]*id=\{descriptionId\}/,
+  'Settings files source-material handoff panel should render stable label, value, and description relationships.'
 );
 assert.match(
   filesTableSource,

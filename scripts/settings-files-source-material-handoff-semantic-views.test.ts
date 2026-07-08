@@ -129,8 +129,8 @@ test('settings files table wires full-library summaries and safe handoff panels'
   );
   assert.match(
     FILES_SOURCE_HANDOFF_PANEL_SOURCE,
-    /view\.itemViews\.map\(\(itemView\) =>[\s\S]*key=\{itemView\.id\}[\s\S]*<output aria-label=\{itemView\.ariaLabel\}/,
-    'Source-material handoff panel should render stable semantic outputs.'
+    /SettingsFilesSourceMaterialHandoffView[\s\S]*data-handoff="settings-files-source-material"[\s\S]*view\.itemViews\.map\(\(itemView\) =>[\s\S]*FilesSourceMaterialHandoffItem[\s\S]*function FilesSourceMaterialHandoffItem[\s\S]*const labelId = `settings-files-source-material-handoff-\$\{itemView\.id\}-label`[\s\S]*const valueId = `settings-files-source-material-handoff-\$\{itemView\.id\}-value`[\s\S]*const descriptionId = `settings-files-source-material-handoff-\$\{itemView\.id\}-description`[\s\S]*data-handoff-item=\{itemView\.id\}[\s\S]*id=\{labelId\}[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*aria-label=\{itemView\.ariaLabel\}[\s\S]*aria-labelledby=\{`\$\{labelId\} \$\{valueId\}`\}[\s\S]*id=\{valueId\}[\s\S]*id=\{descriptionId\}/,
+    'Source-material handoff panel should render stable label, value, and description relationships.'
   );
   assert.match(
     FILES_MATERIAL_HANDOFF_SOURCE,
@@ -410,6 +410,32 @@ test('settings files handoff localizes Chinese boundaries', () => {
     assertNoPrivateFilesText(JSON.stringify(handoffView));
   } finally {
     overwriteGetLocale(() => 'en');
+  }
+});
+
+test('settings files source material focused gate is documented', () => {
+  const catalogSource = readFileSync('tests/e2e/TEST-CATALOG.md', 'utf8');
+
+  assert.match(
+    catalogSource,
+    /pnpm exec tsx --test scripts\/settings-files-source-material-handoff-semantic-views\.test\.ts/,
+    'E2E catalog should point settings files source-material work at the focused script gate.'
+  );
+  for (const boundary of [
+    'source-material library',
+    'activity attachments',
+    'AI draft provenance',
+    'student payload privacy',
+    'full-library summaries',
+    'owner-scoped user files',
+    'storage-key guard',
+    'settings-files-source-material handoff',
+  ]) {
+    assert.match(
+      catalogSource,
+      new RegExp(boundary.replace(/[ /.-]+/g, '[\\s/.-]+')),
+      `E2E catalog should mention source-material boundary: ${boundary}`
+    );
   }
 });
 
