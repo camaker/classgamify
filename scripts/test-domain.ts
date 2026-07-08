@@ -35485,7 +35485,7 @@ assert.match(
 );
 assert.match(
   assignmentListCardComponentSource,
-  /AssignmentListLifecycleHandoff[\s\S]*handoff=\{assignment\.lifecycleHandoffView\}[\s\S]*function AssignmentListLifecycleHandoff\([\s\S]*handoff: AssignmentLifecycleHandoffView[\s\S]*data-handoff="assignment-lifecycle"[\s\S]*handoff\.title[\s\S]*handoff\.description[\s\S]*handoff\.itemViews\.map[\s\S]*AssignmentListLifecycleHandoffItem[\s\S]*function AssignmentListLifecycleHandoffItem[\s\S]*item: AssignmentLifecycleHandoffItemView[\s\S]*data-handoff-item=\{item\.id\}[\s\S]*item\.label[\s\S]*aria-label=\{item\.ariaLabel\}[\s\S]*item\.value[\s\S]*item\.description/,
+  /AssignmentListLifecycleHandoff[\s\S]*handoff=\{assignment\.lifecycleHandoffView\}[\s\S]*function AssignmentListLifecycleHandoff\([\s\S]*handoff: AssignmentLifecycleHandoffView[\s\S]*data-handoff="assignment-lifecycle"[\s\S]*handoff\.title[\s\S]*handoff\.description[\s\S]*handoff\.itemViews\.map[\s\S]*AssignmentListLifecycleHandoffItem[\s\S]*function AssignmentListLifecycleHandoffItem[\s\S]*item: AssignmentLifecycleHandoffItemView[\s\S]*const labelId = `assignment-lifecycle-handoff-\$\{item\.id\}-label`[\s\S]*const valueId = `assignment-lifecycle-handoff-\$\{item\.id\}-value`[\s\S]*const descriptionId = `assignment-lifecycle-handoff-\$\{item\.id\}-description`[\s\S]*data-handoff-item=\{item\.id\}[\s\S]*id=\{labelId\}[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*aria-label=\{item\.ariaLabel\}[\s\S]*aria-labelledby=\{`\$\{labelId\} \$\{valueId\}`\}[\s\S]*id=\{valueId\}[\s\S]*id=\{descriptionId\}/,
   'Assignment list card component should render the prepared assignment lifecycle handoff as stable hidden semantic output.'
 );
 assert.match(

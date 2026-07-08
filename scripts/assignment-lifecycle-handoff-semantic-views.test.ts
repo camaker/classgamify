@@ -1,4 +1,5 @@
 import assert from 'node:assert/strict';
+import { readFileSync } from 'node:fs';
 import test from 'node:test';
 import {
   ASSIGNMENT_LIFECYCLE_HANDOFF_ITEM_IDS,
@@ -17,6 +18,11 @@ const SECRET_STUDENT_NAME = 'SECRET_STUDENT_NAME_SHOULD_NOT_LEAK';
 const SECRET_TEACHER_NOTE = 'SECRET_TEACHER_NOTE_SHOULD_NOT_LEAK';
 const SECRET_TOKEN = 'SECRET_ANONYMOUS_TOKEN_SHOULD_NOT_LEAK';
 const NOW = new Date('2026-01-01T00:00:00.000Z').getTime();
+const ASSIGNMENT_LIST_CARD_COMPONENT_SOURCE = readFileSync(
+  'src/components/assignments/assignment-list-card.tsx',
+  'utf8'
+);
+const TEST_CATALOG_SOURCE = readFileSync('tests/e2e/TEST-CATALOG.md', 'utf8');
 
 test('open assignment lifecycle exposes a safe 30-slice handoff', () => {
   const handoffView = buildAssignmentLifecycleHandoffView({
@@ -288,6 +294,37 @@ test('preview assignment lifecycle is semantic but blocks persisted link actions
     'blocked'
   );
   assertNoPrivateLifecycleText(JSON.stringify(handoffView));
+});
+
+test('lifecycle handoff renders stable semantic outputs in assignment cards', () => {
+  assert.match(
+    ASSIGNMENT_LIST_CARD_COMPONENT_SOURCE,
+    /<AssignmentListLifecycleHandoffItem item=\{item\} key=\{item\.id\} \/>/
+  );
+  assert.match(
+    ASSIGNMENT_LIST_CARD_COMPONENT_SOURCE,
+    /function AssignmentListLifecycleHandoff[\s\S]*data-handoff="assignment-lifecycle"[\s\S]*handoff\.itemViews\.map\(\(item\) =>[\s\S]*AssignmentListLifecycleHandoffItem[\s\S]*function AssignmentListLifecycleHandoffItem[\s\S]*item: AssignmentLifecycleHandoffItemView[\s\S]*const labelId = `assignment-lifecycle-handoff-\$\{item\.id\}-label`[\s\S]*const valueId = `assignment-lifecycle-handoff-\$\{item\.id\}-value`[\s\S]*const descriptionId = `assignment-lifecycle-handoff-\$\{item\.id\}-description`[\s\S]*data-handoff-item=\{item\.id\}[\s\S]*id=\{labelId\}[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*aria-label=\{item\.ariaLabel\}[\s\S]*aria-labelledby=\{`\$\{labelId\} \$\{valueId\}`\}[\s\S]*id=\{valueId\}[\s\S]*id=\{descriptionId\}/
+  );
+});
+
+test('lifecycle focused gate is documented', () => {
+  const normalizedCatalog = TEST_CATALOG_SOURCE.replace(/\s+/g, ' ');
+
+  assert.match(
+    TEST_CATALOG_SOURCE,
+    /pnpm exec tsx --test scripts\/assignment-lifecycle-handoff-semantic-views\.test\.ts/
+  );
+  for (const boundary of [
+    'open/closed/expired/draft status resolution',
+    'close/reopen actions',
+    'public-route access',
+    'submission gates',
+    'result retention',
+    'close-window policy',
+    'hidden assignment-lifecycle handoff',
+  ]) {
+    assert.match(normalizedCatalog, new RegExp(boundary));
+  }
 });
 
 function getHandoffItemValue(

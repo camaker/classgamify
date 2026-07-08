@@ -133,6 +133,11 @@ via `pnpm exec tsx --test scripts/assignment-list-semantic-views.test.ts`; run
 it when changing assignment list overview metrics, status/search filters,
 published share context, visible-card counts, or the hidden assignment-list
 handoff.
+Assignment lifecycle boundaries have a fast script-level gate via
+`pnpm exec tsx --test scripts/assignment-lifecycle-handoff-semantic-views.test.ts`;
+run it when changing open/closed/expired/draft status resolution, close/reopen
+actions, public-route access, submission gates, result retention,
+close-window policy, or the hidden assignment-lifecycle handoff.
 Assignment share-link distribution boundaries have a fast script-level gate via
 `pnpm exec tsx --test scripts/assignment-share-link-handoff-semantic-views.test.ts`;
 run it when changing share-slug normalization, `/play/:shareId` path encoding,
