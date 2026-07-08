@@ -51,15 +51,18 @@ function AssignmentStudentSummarySortHandoff({
       aria-labelledby={titleId}
       className="sr-only"
       data-handoff="assignment-student-summary-sort"
+      data-handoff-scope={view.privacy.scope}
     >
       <h3 id={titleId}>{view.title}</h3>
       <p id={descriptionId}>{view.description}</p>
-      {view.itemViews.map((itemView) => (
-        <AssignmentStudentSummarySortHandoffItem
-          itemView={itemView}
-          key={itemView.id}
-        />
-      ))}
+      <dl>
+        {view.itemViews.map((itemView) => (
+          <AssignmentStudentSummarySortHandoffItem
+            itemView={itemView}
+            key={itemView.id}
+          />
+        ))}
+      </dl>
     </section>
   );
 }
@@ -69,25 +72,27 @@ function AssignmentStudentSummarySortHandoffItem({
 }: {
   itemView: AssignmentResultStudentSummaryTableView['sortHandoffView']['itemViews'][number];
 }) {
-  const labelId = `assignment-student-summary-sort-${itemView.id}-label`;
-  const valueId = `assignment-student-summary-sort-${itemView.id}-value`;
-  const descriptionId = `assignment-student-summary-sort-${itemView.id}-description`;
+  const labelId = `assignment-student-summary-sort-handoff-${itemView.id}-label`;
+  const valueId = `assignment-student-summary-sort-handoff-${itemView.id}-value`;
+  const descriptionId = `assignment-student-summary-sort-handoff-${itemView.id}-description`;
 
   return (
     <div data-handoff-item={itemView.id}>
-      <span id={labelId}>{itemView.label}</span>
-      <output
-        aria-describedby={descriptionId}
-        aria-label={itemView.ariaLabel}
-        aria-labelledby={`${labelId} ${valueId}`}
-        id={valueId}
-      >
-        {itemView.value}
-      </output>
-      {itemView.statusLabel ? (
-        <span aria-hidden="true">{itemView.statusLabel}</span>
-      ) : null}
-      <span id={descriptionId}>{itemView.description}</span>
+      <dt id={labelId}>{itemView.label}</dt>
+      <dd>
+        <output
+          aria-describedby={descriptionId}
+          aria-label={itemView.ariaLabel}
+          aria-labelledby={`${labelId} ${valueId}`}
+          id={valueId}
+        >
+          {itemView.value}
+        </output>
+        {itemView.statusLabel ? (
+          <span aria-hidden="true">{itemView.statusLabel}</span>
+        ) : null}
+        <p id={descriptionId}>{itemView.description}</p>
+      </dd>
     </div>
   );
 }

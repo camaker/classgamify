@@ -3970,13 +3970,18 @@ assert.match(
 );
 assert.match(
   assignmentResultsStudentSummarySortTableSource,
-  /data-handoff="assignment-student-summary-sort"[\s\S]*view\.itemViews\.map[\s\S]*data-handoff-item=\{itemView\.id\}[\s\S]*aria-label=\{itemView\.ariaLabel\}/,
-  'Assignment student summary table should render the hidden student sort semantic handoff.'
+  /function AssignmentStudentSummarySortHandoff[\s\S]*const titleId = 'assignment-student-summary-sort-handoff-title'[\s\S]*const descriptionId = 'assignment-student-summary-sort-handoff-description'[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*aria-labelledby=\{titleId\}[\s\S]*data-handoff="assignment-student-summary-sort"[\s\S]*data-handoff-scope=\{view\.privacy\.scope\}[\s\S]*id=\{titleId\}[\s\S]*id=\{descriptionId\}[\s\S]*<dl>[\s\S]*view\.itemViews\.map[\s\S]*AssignmentStudentSummarySortHandoffItem[\s\S]*function AssignmentStudentSummarySortHandoffItem[\s\S]*const labelId = `assignment-student-summary-sort-handoff-\$\{itemView\.id\}-label`[\s\S]*const valueId = `assignment-student-summary-sort-handoff-\$\{itemView\.id\}-value`[\s\S]*const descriptionId = `assignment-student-summary-sort-handoff-\$\{itemView\.id\}-description`[\s\S]*data-handoff-item=\{itemView\.id\}[\s\S]*id=\{labelId\}[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*aria-label=\{itemView\.ariaLabel\}[\s\S]*aria-labelledby=\{`\$\{labelId\} \$\{valueId\}`\}[\s\S]*id=\{valueId\}[\s\S]*id=\{descriptionId\}/,
+  'Assignment student summary table should render the hidden student sort marker, privacy scope, item ids, and stable label/value/description relationships.'
 );
 assert.match(
   readFileSync('tests/e2e/TEST-CATALOG.md', 'utf8'),
   /6g \| Result student summary sort exposes a 30-slice handoff[\s\S]*needs review, best score, student name, attempts, and last submitted[\s\S]*student display labels, student keys, raw anonymous tokens/,
   'E2E catalog should include the student summary sort handoff journey and privacy guard.'
+);
+assert.match(
+  readFileSync('tests/e2e/TEST-CATALOG.md', 'utf8'),
+  /Assignment student summary sort has a fast script-level gate via[\s\S]*scripts\/assignment-student-summary-sort-handoff-semantic-views\.test\.ts[\s\S]*needs review[\s\S]*assignment-student-summary-sort[\s\S]*handoff/,
+  'E2E catalog should document the student summary sort focused gate.'
 );
 assert.doesNotMatch(
   assignmentResultViewSource,

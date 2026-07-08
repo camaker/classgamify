@@ -132,6 +132,13 @@ item-performance sorting, answer-review filtering, route default elision,
 invalid-route guards, review-scope summaries, copy-scope alignment, result
 tables, answer review cards, copy artifacts, anonymous-label search, or the
 assignment-result-review-controls handoff.
+Assignment student summary sort has a fast script-level gate via
+`pnpm exec tsx --test scripts/assignment-student-summary-sort-handoff-semantic-views.test.ts`;
+run it when changing needs review, best score, student name, attempt count, or
+last-submitted student summary ordering, route default elision, invalid-route
+guards, review-scope alignment, copy-scope row counts, result tables, copy
+artifacts, anonymous-label guards, or the assignment-student-summary-sort
+handoff.
 Public indexing and install metadata have a fast source-level gate via
 `pnpm exec tsx --test scripts/public-metadata-handoff-semantic-views.test.ts`;
 run it when changing the public route registry, sitemap helpers, robots rules,
