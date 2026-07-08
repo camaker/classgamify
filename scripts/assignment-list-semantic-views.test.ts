@@ -16,23 +16,41 @@ const SECRET_OWNER_ID = 'SECRET_OWNER_ID';
 const SECRET_STORAGE_KEY = 'classroom/private/assignment-source.json';
 const SECRET_STUDENT_ANSWER = 'SECRET_STUDENT_ANSWER';
 const SECRET_TOKEN = 'raw-anonymous-token-value';
+const DASHBOARD_ASSIGNMENTS_ROUTE_SOURCE = readFileSync(
+  'src/routes/dashboard/assignments.tsx',
+  'utf8'
+);
+const TEST_CATALOG_SOURCE = readFileSync('tests/e2e/TEST-CATALOG.md', 'utf8');
 
 test('assignment dashboard route renders the page handoff marker and item outputs', () => {
-  const routeSource = readFileSync(
-    'src/routes/dashboard/assignments.tsx',
-    'utf8'
-  );
-
   assert.match(
-    routeSource,
+    DASHBOARD_ASSIGNMENTS_ROUTE_SOURCE,
     /<AssignmentListPageHandoff[\s\S]*handoffView=\{activePageView\.handoffView\}[\s\S]*\/>/,
     'Assignment dashboard route should render the prepared assignment-list page handoff view.'
   );
   assert.match(
-    routeSource,
-    /function AssignmentListPageHandoff[\s\S]*data-handoff="assignment-list"[\s\S]*handoffView\.itemViews\.map\(\(item\) =>[\s\S]*AssignmentListPageHandoffItem[\s\S]*function AssignmentListPageHandoffItem[\s\S]*data-handoff-item=\{item\.id\}[\s\S]*<output aria-label=\{item\.ariaLabel\}>/,
+    DASHBOARD_ASSIGNMENTS_ROUTE_SOURCE,
+    /function AssignmentListPageHandoff[\s\S]*const titleId = useId\(\)[\s\S]*const descriptionId = useId\(\)[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*aria-labelledby=\{titleId\}[\s\S]*className="sr-only"[\s\S]*data-handoff="assignment-list"[\s\S]*id=\{titleId\}[\s\S]*id=\{descriptionId\}[\s\S]*handoffView\.itemViews\.map\(\(item\) =>[\s\S]*AssignmentListPageHandoffItem[\s\S]*function AssignmentListPageHandoffItem[\s\S]*item: AssignmentListPageHandoffItemView[\s\S]*const labelId = `assignment-list-handoff-\$\{item\.id\}-label`[\s\S]*const valueId = `assignment-list-handoff-\$\{item\.id\}-value`[\s\S]*const descriptionId = `assignment-list-handoff-\$\{item\.id\}-description`[\s\S]*data-handoff-item=\{item\.id\}[\s\S]*id=\{labelId\}[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*aria-label=\{item\.ariaLabel\}[\s\S]*aria-labelledby=\{`\$\{labelId\} \$\{valueId\}`\}[\s\S]*id=\{valueId\}[\s\S]*id=\{descriptionId\}/,
     'Assignment dashboard route should expose the assignment-list marker, stable item markers, and prepared item outputs.'
   );
+});
+
+test('assignment list focused gate is documented', () => {
+  const normalizedCatalog = TEST_CATALOG_SOURCE.replace(/\s+/g, ' ');
+
+  assert.match(
+    TEST_CATALOG_SOURCE,
+    /pnpm exec tsx --test scripts\/assignment-list-semantic-views\.test\.ts/
+  );
+  for (const boundary of [
+    'assignment list overview metrics',
+    'status/search filters',
+    'published share context',
+    'visible-card counts',
+    'hidden assignment-list handoff',
+  ]) {
+    assert.match(normalizedCatalog, new RegExp(boundary));
+  }
 });
 
 test('assignment list page exposes a 30-slice distribution handoff', () => {
