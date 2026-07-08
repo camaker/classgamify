@@ -3940,13 +3940,18 @@ assert.match(
 );
 assert.match(
   assignmentResultsItemPerformanceTableSource,
-  /data-handoff="assignment-item-performance-sort"[\s\S]*view\.itemViews\.map[\s\S]*data-handoff-item=\{itemView\.id\}[\s\S]*aria-label=\{itemView\.ariaLabel\}/,
-  'Assignment item performance table should render the hidden item sort semantic handoff.'
+  /function AssignmentItemPerformanceSortHandoff[\s\S]*const titleId = 'assignment-item-performance-sort-handoff-title'[\s\S]*const descriptionId = 'assignment-item-performance-sort-handoff-description'[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*aria-labelledby=\{titleId\}[\s\S]*data-handoff="assignment-item-performance-sort"[\s\S]*data-handoff-scope=\{view\.privacy\.scope\}[\s\S]*id=\{titleId\}[\s\S]*id=\{descriptionId\}[\s\S]*<dl>[\s\S]*view\.itemViews\.map[\s\S]*AssignmentItemPerformanceSortHandoffItem[\s\S]*function AssignmentItemPerformanceSortHandoffItem[\s\S]*const labelId = `assignment-item-performance-sort-handoff-\$\{itemView\.id\}-label`[\s\S]*const valueId = `assignment-item-performance-sort-handoff-\$\{itemView\.id\}-value`[\s\S]*const descriptionId = `assignment-item-performance-sort-handoff-\$\{itemView\.id\}-description`[\s\S]*data-handoff-item=\{itemView\.id\}[\s\S]*id=\{labelId\}[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*aria-label=\{itemView\.ariaLabel\}[\s\S]*aria-labelledby=\{`\$\{labelId\} \$\{valueId\}`\}[\s\S]*id=\{valueId\}[\s\S]*id=\{descriptionId\}/,
+  'Assignment item performance table should render the hidden item sort marker, privacy scope, item ids, and stable label/value/description relationships.'
 );
 assert.match(
   readFileSync('tests/e2e/TEST-CATALOG.md', 'utf8'),
   /6e \| Result item performance sort exposes a 30-slice handoff[\s\S]*snapshot order, lowest accuracy, most answered, and item type[\s\S]*prompt text, expected or accepted answers/,
   'E2E catalog should include the item performance sort handoff journey and privacy guard.'
+);
+assert.match(
+  readFileSync('tests/e2e/TEST-CATALOG.md', 'utf8'),
+  /Assignment item performance sort has a fast script-level gate via[\s\S]*scripts\/assignment-item-performance-sort-handoff-semantic-views\.test\.ts[\s\S]*snapshot order[\s\S]*assignment-item-performance-sort[\s\S]*handoff/,
+  'E2E catalog should document the item performance sort focused gate.'
 );
 assert.match(
   assignmentStudentSummarySortHandoffSource,

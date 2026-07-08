@@ -132,6 +132,13 @@ item-performance sorting, answer-review filtering, route default elision,
 invalid-route guards, review-scope summaries, copy-scope alignment, result
 tables, answer review cards, copy artifacts, anonymous-label search, or the
 assignment-result-review-controls handoff.
+Assignment item performance sort has a fast script-level gate via
+`pnpm exec tsx --test scripts/assignment-item-performance-sort-handoff-semantic-views.test.ts`;
+run it when changing snapshot order, lowest accuracy, most answered, or item
+type sort modes, route default elision, invalid-route guards, review-scope
+alignment, copy-scope row counts, result tables, copy artifacts, CSV export
+boundaries, prompt/answer guards, or the assignment-item-performance-sort
+handoff.
 Assignment student summary sort has a fast script-level gate via
 `pnpm exec tsx --test scripts/assignment-student-summary-sort-handoff-semantic-views.test.ts`;
 run it when changing needs review, best score, student name, attempt count, or

@@ -23,6 +23,7 @@ const SECRET_RAW_ANONYMOUS_TOKEN = 'SECRET_RAW_ANONYMOUS_TOKEN';
 const SECRET_EXPECTED_ANSWER = 'SECRET_EXPECTED_ANSWER';
 const SECRET_PROMPT = 'SECRET_PROMPT';
 const SECRET_STUDENT_ANSWER = 'SECRET_STUDENT_ANSWER';
+const TEST_CATALOG_SOURCE = readFileSync('tests/e2e/TEST-CATALOG.md', 'utf8');
 
 test('assignment item performance sort handoff exposes 30 safe table slices', () => {
   overwriteGetLocale(() => 'en');
@@ -315,7 +316,11 @@ test('assignment item performance sort handoff is rendered as hidden semantic ou
   );
   assert.match(
     tableSource,
-    /data-handoff="assignment-item-performance-sort"[\s\S]*view\.itemViews\.map[\s\S]*data-handoff-item=\{itemView\.id\}[\s\S]*aria-label=\{itemView\.ariaLabel\}/
+    /function AssignmentItemPerformanceSortHandoff[\s\S]*const titleId = 'assignment-item-performance-sort-handoff-title'[\s\S]*const descriptionId = 'assignment-item-performance-sort-handoff-description'[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*aria-labelledby=\{titleId\}[\s\S]*data-handoff="assignment-item-performance-sort"[\s\S]*data-handoff-scope=\{view\.privacy\.scope\}[\s\S]*id=\{titleId\}[\s\S]*id=\{descriptionId\}[\s\S]*<dl>[\s\S]*view\.itemViews\.map[\s\S]*AssignmentItemPerformanceSortHandoffItem[\s\S]*function AssignmentItemPerformanceSortHandoffItem[\s\S]*const labelId = `assignment-item-performance-sort-handoff-\$\{itemView\.id\}-label`[\s\S]*const valueId = `assignment-item-performance-sort-handoff-\$\{itemView\.id\}-value`[\s\S]*const descriptionId = `assignment-item-performance-sort-handoff-\$\{itemView\.id\}-description`[\s\S]*data-handoff-item=\{itemView\.id\}[\s\S]*id=\{labelId\}[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*aria-label=\{itemView\.ariaLabel\}[\s\S]*aria-labelledby=\{`\$\{labelId\} \$\{valueId\}`\}[\s\S]*id=\{valueId\}[\s\S]*id=\{descriptionId\}/
+  );
+  assert.match(
+    TEST_CATALOG_SOURCE,
+    /Assignment item performance sort has a fast script-level gate via[\s\S]*scripts\/assignment-item-performance-sort-handoff-semantic-views\.test\.ts[\s\S]*snapshot order[\s\S]*assignment-item-performance-sort[\s\S]*handoff/
   );
   assert.match(
     routeSource,
