@@ -3900,13 +3900,18 @@ assert.match(
     'src/components/assignments/assignment-results-review-handoff-panel.tsx',
     'utf8'
   ),
-  /data-handoff="assignment-result-review-controls"[\s\S]*view\.itemViews\.map[\s\S]*data-handoff-item=\{itemView\.id\}[\s\S]*aria-label=\{itemView\.ariaLabel\}/,
-  'Assignment results review handoff panel should render the hidden result review controls semantic handoff.'
+  /function AssignmentResultReviewControlsHandoff[\s\S]*const titleId = 'assignment-result-review-controls-handoff-title'[\s\S]*const descriptionId = 'assignment-result-review-controls-handoff-description'[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*aria-labelledby=\{titleId\}[\s\S]*data-handoff="assignment-result-review-controls"[\s\S]*data-handoff-scope=\{view\.privacy\.scope\}[\s\S]*id=\{titleId\}[\s\S]*id=\{descriptionId\}[\s\S]*<dl>[\s\S]*view\.itemViews\.map[\s\S]*AssignmentResultReviewControlsHandoffItem[\s\S]*function AssignmentResultReviewControlsHandoffItem[\s\S]*const labelId = `assignment-result-review-controls-handoff-\$\{itemView\.id\}-label`[\s\S]*const valueId = `assignment-result-review-controls-handoff-\$\{itemView\.id\}-value`[\s\S]*const descriptionId = `assignment-result-review-controls-handoff-\$\{itemView\.id\}-description`[\s\S]*data-handoff-item=\{itemView\.id\}[\s\S]*id=\{labelId\}[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*aria-label=\{itemView\.ariaLabel\}[\s\S]*aria-labelledby=\{`\$\{labelId\} \$\{valueId\}`\}[\s\S]*id=\{valueId\}[\s\S]*id=\{descriptionId\}/,
+  'Assignment results review handoff panel should render the hidden result review controls marker, privacy scope, item ids, and stable label/value/description relationships.'
 );
 assert.match(
   readFileSync('tests/e2e/TEST-CATALOG.md', 'utf8'),
   /\|\s*6b\s*\|\s*Result review scope exposes a 30-slice handoff\s*\|[\s\S]*`assignment-result-review`[\s\S]*`data-handoff-item`/,
   'E2E catalog should include the result-review handoff marker and stable item marker acceptance journey.'
+);
+assert.match(
+  readFileSync('tests/e2e/TEST-CATALOG.md', 'utf8'),
+  /Assignment result review controls has a fast script-level gate via[\s\S]*scripts\/assignment-result-review-controls-handoff-semantic-views\.test\.ts[\s\S]*student search[\s\S]*assignment-result-review-controls handoff/,
+  'E2E catalog should document the result review controls focused gate.'
 );
 assert.match(
   readFileSync('src/routes/dashboard/assignments/$assignmentId.tsx', 'utf8'),

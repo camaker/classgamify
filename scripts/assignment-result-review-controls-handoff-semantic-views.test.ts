@@ -19,6 +19,7 @@ const SECRET_RAW_ANONYMOUS_TOKEN = 'SECRET_RAW_ANONYMOUS_TOKEN';
 const SECRET_EXPECTED_ANSWER = 'SECRET_EXPECTED_ANSWER';
 const SECRET_PROMPT = 'SECRET_PROMPT';
 const SECRET_STUDENT_ANSWER = 'SECRET_STUDENT_ANSWER';
+const TEST_CATALOG_SOURCE = readFileSync('tests/e2e/TEST-CATALOG.md', 'utf8');
 
 test('assignment result review controls handoff exposes 30 safe scope slices', () => {
   overwriteGetLocale(() => 'en');
@@ -232,8 +233,14 @@ test('assignment result review controls handoff is rendered as hidden semantic o
     'utf8'
   );
 
-  assert.match(panelSource, /data-handoff="assignment-result-review-controls"/);
-  assert.match(panelSource, /data-handoff-item=\{itemView\.id\}/);
+  assert.match(
+    panelSource,
+    /function AssignmentResultReviewControlsHandoff[\s\S]*const titleId = 'assignment-result-review-controls-handoff-title'[\s\S]*const descriptionId = 'assignment-result-review-controls-handoff-description'[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*aria-labelledby=\{titleId\}[\s\S]*data-handoff="assignment-result-review-controls"[\s\S]*data-handoff-scope=\{view\.privacy\.scope\}[\s\S]*id=\{titleId\}[\s\S]*id=\{descriptionId\}[\s\S]*<dl>[\s\S]*view\.itemViews\.map[\s\S]*AssignmentResultReviewControlsHandoffItem[\s\S]*function AssignmentResultReviewControlsHandoffItem[\s\S]*const labelId = `assignment-result-review-controls-handoff-\$\{itemView\.id\}-label`[\s\S]*const valueId = `assignment-result-review-controls-handoff-\$\{itemView\.id\}-value`[\s\S]*const descriptionId = `assignment-result-review-controls-handoff-\$\{itemView\.id\}-description`[\s\S]*data-handoff-item=\{itemView\.id\}[\s\S]*id=\{labelId\}[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*aria-label=\{itemView\.ariaLabel\}[\s\S]*aria-labelledby=\{`\$\{labelId\} \$\{valueId\}`\}[\s\S]*id=\{valueId\}[\s\S]*id=\{descriptionId\}/
+  );
+  assert.match(
+    TEST_CATALOG_SOURCE,
+    /Assignment result review controls has a fast script-level gate via[\s\S]*scripts\/assignment-result-review-controls-handoff-semantic-views\.test\.ts[\s\S]*student search[\s\S]*assignment-result-review-controls handoff/
+  );
   assert.match(
     routeSource,
     /controlsView=\{pageView\.reviewControlsHandoffView\}/

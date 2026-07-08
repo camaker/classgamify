@@ -125,6 +125,13 @@ Assignment result student search has a fast script-level gate via
 run it when changing result-page student search route parsing, query
 normalization, student/attempt/review filtering, copy-scope alignment, search
 empty states, or the hidden student-search handoff.
+Assignment result review controls has a fast script-level gate via
+`pnpm exec tsx --test scripts/assignment-result-review-controls-handoff-semantic-views.test.ts`;
+run it when changing result-page student search, student summary sorting,
+item-performance sorting, answer-review filtering, route default elision,
+invalid-route guards, review-scope summaries, copy-scope alignment, result
+tables, answer review cards, copy artifacts, anonymous-label search, or the
+assignment-result-review-controls handoff.
 Public indexing and install metadata have a fast source-level gate via
 `pnpm exec tsx --test scripts/public-metadata-handoff-semantic-views.test.ts`;
 run it when changing the public route registry, sitemap helpers, robots rules,
