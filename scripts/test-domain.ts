@@ -40866,6 +40866,10 @@ const dashboardOverviewReadinessRowSource = readFileSync(
   'src/components/dashboard/dashboard-overview-readiness-row.tsx',
   'utf8'
 );
+const dashboardOverviewHandoffPanelSource = readFileSync(
+  'src/components/dashboard/dashboard-overview-handoff-panel.tsx',
+  'utf8'
+);
 assert.match(
   dashboardOverviewRouteSource,
   /useActivities\(\{[\s\S]*pageIndex: 0,[\s\S]*pageSize: 1,[\s\S]*status: 'active'/,
@@ -40945,6 +40949,11 @@ assert.match(
   dashboardOverviewActionCardSource,
   /dashboardActionIcons/,
   'Dashboard overview action component should own action icon presentation.'
+);
+assert.match(
+  dashboardOverviewHandoffPanelSource,
+  /DashboardOverviewHandoffView[\s\S]*data-handoff="dashboard-overview"[\s\S]*data-handoff-scope=\{view\.privacy\.scope\}[\s\S]*view\.itemViews\.map\(\(itemView\) =>[\s\S]*DashboardOverviewHandoffItem[\s\S]*function DashboardOverviewHandoffItem[\s\S]*const labelId = `dashboard-overview-handoff-\$\{itemView\.id\}-label`[\s\S]*const valueId = `dashboard-overview-handoff-\$\{itemView\.id\}-value`[\s\S]*const descriptionId = `dashboard-overview-handoff-\$\{itemView\.id\}-description`[\s\S]*data-handoff-item=\{itemView\.id\}[\s\S]*id=\{labelId\}[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*aria-label=\{itemView\.ariaLabel\}[\s\S]*aria-labelledby=\{`\$\{labelId\} \$\{valueId\}`\}[\s\S]*id=\{valueId\}[\s\S]*id=\{descriptionId\}/,
+  'Dashboard overview handoff panel should render marker, item ids, and stable label/value/description relationships.'
 );
 assert.doesNotMatch(
   dashboardOverviewActionCardSource,

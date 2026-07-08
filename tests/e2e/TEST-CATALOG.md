@@ -61,6 +61,12 @@ Storage upload readiness has a fast script-level gate via
 changing classroom source-material upload validation, filename sanitization,
 content-type/extension safety, owner/public folder planning, same-origin file
 proxy URLs, or the R2 provider upload plan.
+Dashboard overview owner-loop handoff has a fast script-level gate via
+`pnpm exec tsx --test scripts/dashboard-overview-handoff-semantic-views.test.ts`;
+run it when changing owner-scoped activity/assignment summaries,
+starter-preview boundaries, independent loading states, top metrics, loop
+status, next actions, readiness rows, action cards, route targets, or the
+dashboard-overview handoff.
 Settings files source-material library has a fast script-level gate via
 `pnpm exec tsx --test scripts/settings-files-source-material-handoff-semantic-views.test.ts`;
 run it when changing source-material library, activity attachments, AI draft

@@ -1,4 +1,5 @@
 import assert from 'node:assert/strict';
+import { readFileSync } from 'node:fs';
 import test from 'node:test';
 import {
   DASHBOARD_OVERVIEW_HANDOFF_ITEM_IDS,
@@ -19,6 +20,24 @@ const SECRET_ASSIGNMENT_TITLE = 'SECRET_ASSIGNMENT_TITLE';
 const SECRET_STUDENT_ANSWER = 'SECRET_STUDENT_ANSWER';
 const SECRET_TOKEN = 'raw-anonymous-token-value';
 const SECRET_STORAGE_KEY = 'userfiles/teacher-secret/private.pdf';
+const DASHBOARD_OVERVIEW_HANDOFF_PANEL_SOURCE = readFileSync(
+  'src/components/dashboard/dashboard-overview-handoff-panel.tsx',
+  'utf8'
+);
+const TEST_CATALOG_SOURCE = readFileSync('tests/e2e/TEST-CATALOG.md', 'utf8');
+
+test('dashboard overview handoff panel renders stable semantic outputs', () => {
+  assert.match(
+    DASHBOARD_OVERVIEW_HANDOFF_PANEL_SOURCE,
+    /DashboardOverviewHandoffView[\s\S]*data-handoff="dashboard-overview"[\s\S]*data-handoff-scope=\{view\.privacy\.scope\}[\s\S]*view\.itemViews\.map\(\(itemView\) =>[\s\S]*DashboardOverviewHandoffItem[\s\S]*function DashboardOverviewHandoffItem[\s\S]*const labelId = `dashboard-overview-handoff-\$\{itemView\.id\}-label`[\s\S]*const valueId = `dashboard-overview-handoff-\$\{itemView\.id\}-value`[\s\S]*const descriptionId = `dashboard-overview-handoff-\$\{itemView\.id\}-description`[\s\S]*data-handoff-item=\{itemView\.id\}[\s\S]*id=\{labelId\}[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*aria-label=\{itemView\.ariaLabel\}[\s\S]*aria-labelledby=\{`\$\{labelId\} \$\{valueId\}`\}[\s\S]*id=\{valueId\}[\s\S]*id=\{descriptionId\}/,
+    'Dashboard overview handoff panel should render marker, item ids, and stable label/value/description relationships.'
+  );
+  assert.match(
+    TEST_CATALOG_SOURCE,
+    /Dashboard overview owner-loop handoff has a fast script-level gate via[\s\S]*scripts\/dashboard-overview-handoff-semantic-views\.test\.ts[\s\S]*owner-scoped activity\/assignment summaries[\s\S]*dashboard-overview handoff/,
+    'E2E catalog should document the dashboard overview handoff focused gate.'
+  );
+});
 
 test('dashboard overview handoff exposes 30 owner-scoped loop slices', () => {
   const starterPreview = buildDashboardOverviewStarterPreview();
