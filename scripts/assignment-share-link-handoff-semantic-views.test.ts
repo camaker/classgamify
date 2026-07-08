@@ -1,4 +1,5 @@
 import assert from 'node:assert/strict';
+import { readFileSync } from 'node:fs';
 import test from 'node:test';
 import {
   buildAssignmentListCardViewModel,
@@ -23,6 +24,11 @@ const SECRET_LABEL = 'SECRET_ACTION_LABEL_SHOULD_NOT_LEAK';
 const SECRET_STORAGE_KEY = 'SECRET_STORAGE_KEY_SHOULD_NOT_LEAK';
 const SECRET_STUDENT_NAME = 'SECRET_STUDENT_NAME_SHOULD_NOT_LEAK';
 const SECRET_TOKEN = 'SECRET_ANONYMOUS_TOKEN_SHOULD_NOT_LEAK';
+const ASSIGNMENT_SHARE_LINK_HANDOFF_COMPONENT_SOURCE = readFileSync(
+  'src/components/assignments/assignment-share-link-handoff.tsx',
+  'utf8'
+);
+const TEST_CATALOG_SOURCE = readFileSync('tests/e2e/TEST-CATALOG.md', 'utf8');
 
 test('share-link helper exposes a safe 30-slice handoff', () => {
   const actionView = buildAssignmentShareLinkActionView({
@@ -319,6 +325,36 @@ test('publish panel, assignment list, and result page share one link contract', 
       'Consistent'
     );
     assertNoPrivateShareText(JSON.stringify(handoffView));
+  }
+});
+
+test('share-link handoff renders stable semantic outputs in surfaces', () => {
+  assert.match(
+    ASSIGNMENT_SHARE_LINK_HANDOFF_COMPONENT_SOURCE,
+    /<AssignmentShareLinkHandoffItem item=\{item\} key=\{item\.id\} \/>/
+  );
+  assert.match(
+    ASSIGNMENT_SHARE_LINK_HANDOFF_COMPONENT_SOURCE,
+    /function AssignmentShareLinkHandoff[\s\S]*data-handoff="assignment-share-link"[\s\S]*handoff\.itemViews\.map\(\(item\) =>[\s\S]*AssignmentShareLinkHandoffItem[\s\S]*function AssignmentShareLinkHandoffItem[\s\S]*item: AssignmentShareLinkHandoffItemView[\s\S]*const labelId = `assignment-share-link-handoff-\$\{item\.id\}-label`[\s\S]*const valueId = `assignment-share-link-handoff-\$\{item\.id\}-value`[\s\S]*const descriptionId = `assignment-share-link-handoff-\$\{item\.id\}-description`[\s\S]*data-handoff-item=\{item\.id\}[\s\S]*id=\{labelId\}[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*aria-label=\{item\.ariaLabel\}[\s\S]*aria-labelledby=\{`\$\{labelId\} \$\{valueId\}`\}[\s\S]*id=\{valueId\}[\s\S]*id=\{descriptionId\}/
+  );
+});
+
+test('share-link focused gate is documented', () => {
+  const normalizedCatalog = TEST_CATALOG_SOURCE.replace(/\s+/g, ' ');
+
+  assert.match(
+    TEST_CATALOG_SOURCE,
+    /pnpm exec tsx --test scripts\/assignment-share-link-handoff-semantic-views\.test\.ts/
+  );
+  for (const boundary of [
+    'share-slug normalization',
+    '`/play/:shareId` path encoding',
+    'absolute share URLs',
+    'copy/preview disabled gates',
+    'publish-success/list/result surfaces',
+    'hidden assignment-share-link handoff',
+  ]) {
+    assert.match(normalizedCatalog, new RegExp(boundary));
   }
 });
 

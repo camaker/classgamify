@@ -35490,7 +35490,7 @@ assert.match(
 );
 assert.match(
   assignmentShareLinkHandoffComponentSource,
-  /AssignmentShareLinkHandoffView[\s\S]*useId[\s\S]*export function AssignmentShareLinkHandoff[\s\S]*data-handoff="assignment-share-link"[\s\S]*handoff\.title[\s\S]*handoff\.description[\s\S]*handoff\.itemViews\.map\(\(item\) => \([\s\S]*AssignmentShareLinkHandoffItem[\s\S]*item=\{item\}[\s\S]*key=\{item\.id\}[\s\S]*function AssignmentShareLinkHandoffItem[\s\S]*item: AssignmentShareLinkHandoffItemView[\s\S]*data-handoff-item=\{item\.id\}[\s\S]*item\.label[\s\S]*aria-label=\{item\.ariaLabel\}[\s\S]*item\.value[\s\S]*item\.description/,
+  /AssignmentShareLinkHandoffView[\s\S]*useId[\s\S]*export function AssignmentShareLinkHandoff[\s\S]*data-handoff="assignment-share-link"[\s\S]*handoff\.title[\s\S]*handoff\.description[\s\S]*handoff\.itemViews\.map\(\(item\) => \([\s\S]*AssignmentShareLinkHandoffItem[\s\S]*item=\{item\}[\s\S]*key=\{item\.id\}[\s\S]*function AssignmentShareLinkHandoffItem[\s\S]*item: AssignmentShareLinkHandoffItemView[\s\S]*const labelId = `assignment-share-link-handoff-\$\{item\.id\}-label`[\s\S]*const valueId = `assignment-share-link-handoff-\$\{item\.id\}-value`[\s\S]*const descriptionId = `assignment-share-link-handoff-\$\{item\.id\}-description`[\s\S]*data-handoff-item=\{item\.id\}[\s\S]*id=\{labelId\}[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*aria-label=\{item\.ariaLabel\}[\s\S]*aria-labelledby=\{`\$\{labelId\} \$\{valueId\}`\}[\s\S]*id=\{valueId\}[\s\S]*id=\{descriptionId\}/,
   'Assignment share-link handoff component should render prepared share-link item views as stable hidden semantic output.'
 );
 assert.match(

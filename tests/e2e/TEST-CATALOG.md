@@ -133,6 +133,11 @@ via `pnpm exec tsx --test scripts/assignment-list-semantic-views.test.ts`; run
 it when changing assignment list overview metrics, status/search filters,
 published share context, visible-card counts, or the hidden assignment-list
 handoff.
+Assignment share-link distribution boundaries have a fast script-level gate via
+`pnpm exec tsx --test scripts/assignment-share-link-handoff-semantic-views.test.ts`;
+run it when changing share-slug normalization, `/play/:shareId` path encoding,
+absolute share URLs, copy/preview disabled gates, publish-success/list/result
+surfaces, or the hidden assignment-share-link handoff.
 AI source panel control boundaries have a fast script-level gate via
 `pnpm exec tsx --test scripts/activity-ai-source-semantic-views.test.ts`; run it
 when changing AI source textarea descriptions, source-readiness, safe/omitted
