@@ -56,14 +56,22 @@ function AccountWorkspaceHandoff({
 }: {
   handoffView: SettingsAccountWorkspaceHandoffView;
 }) {
+  const titleId = 'settings-account-workspace-handoff-title';
+  const descriptionId = 'settings-account-workspace-handoff-description';
+
   return (
     <section
-      aria-label={handoffView.title}
+      aria-describedby={descriptionId}
+      aria-labelledby={titleId}
       className="grid gap-3 border-t pt-3"
+      data-handoff="settings-account-workspace"
+      data-handoff-scope={handoffView.privacy.scope}
     >
       <div>
-        <h3 className="font-medium text-sm">{handoffView.title}</h3>
-        <p className="mt-1 text-muted-foreground text-sm">
+        <h3 className="font-medium text-sm" id={titleId}>
+          {handoffView.title}
+        </h3>
+        <p className="mt-1 text-muted-foreground text-sm" id={descriptionId}>
           {handoffView.description}
         </p>
       </div>
@@ -81,14 +89,32 @@ function AccountWorkspaceHandoffItem({
 }: {
   itemView: SettingsAccountWorkspaceHandoffItemView;
 }) {
+  const labelId = `settings-account-workspace-handoff-${itemView.id}-label`;
+  const valueId = `settings-account-workspace-handoff-${itemView.id}-value`;
+  const descriptionId = `settings-account-workspace-handoff-${itemView.id}-description`;
+
   return (
-    <div className="rounded-md border bg-background px-3 py-2">
-      <dt className="font-medium text-xs">{itemView.label}</dt>
+    <div
+      className="rounded-md border bg-background px-3 py-2"
+      data-handoff-item={itemView.id}
+    >
+      <dt className="font-medium text-xs" id={labelId}>
+        {itemView.label}
+      </dt>
       <dd className="mt-1">
-        <output aria-label={itemView.ariaLabel} className="text-sm">
+        <output
+          aria-describedby={descriptionId}
+          aria-label={itemView.ariaLabel}
+          aria-labelledby={`${labelId} ${valueId}`}
+          className="text-sm"
+          id={valueId}
+        >
           {itemView.value}
         </output>
-        <p className="mt-1 text-muted-foreground text-xs leading-5">
+        <p
+          className="mt-1 text-muted-foreground text-xs leading-5"
+          id={descriptionId}
+        >
           {itemView.description}
         </p>
       </dd>

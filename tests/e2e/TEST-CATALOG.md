@@ -67,6 +67,13 @@ run it when changing owner-scoped activity/assignment summaries,
 starter-preview boundaries, independent loading states, top metrics, loop
 status, next actions, readiness rows, action cards, route targets, or the
 dashboard-overview handoff.
+Settings account workspace handoff has a fast script-level gate via
+`pnpm exec tsx --test scripts/settings-account-workspace-handoff-semantic-views.test.ts`;
+run it when changing teacher identity scope, account access, profile display
+name or avatar boundaries, assignment handoff identity, student recognition,
+result-review identity, credential-login gates, account deletion gates,
+source-material boundaries, anonymous-token guards, storage-key guards, or the
+settings-account-workspace handoff.
 Settings billing workspace handoff has a fast script-level gate via
 `pnpm exec tsx --test scripts/settings-billing-workspace-handoff-semantic-views.test.ts`;
 run it when changing plan access, current-plan card semantics, activity library

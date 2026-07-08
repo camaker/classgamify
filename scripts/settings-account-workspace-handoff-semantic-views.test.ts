@@ -1,4 +1,5 @@
 import assert from 'node:assert/strict';
+import { readFileSync } from 'node:fs';
 import test from 'node:test';
 import {
   buildSettingsAccountWorkspaceHandoffView,
@@ -16,6 +17,15 @@ const SECRET_AUTH_TOKEN = 'raw-auth-provider-secret';
 const SECRET_EMAIL = 'teacher-private@example.test';
 const SECRET_SOURCE_STORAGE_KEY = 'source-materials/private/key.pdf';
 const SECRET_STUDENT_TOKEN = 'anonymous-browser-token';
+const PROFILE_WORKSPACE_SUMMARY_SOURCE = readFileSync(
+  'src/components/settings/profile/profile-workspace-summary.tsx',
+  'utf8'
+);
+const SECURITY_WORKSPACE_SUMMARY_SOURCE = readFileSync(
+  'src/components/settings/security/security-workspace-summary.tsx',
+  'utf8'
+);
+const TEST_CATALOG_SOURCE = readFileSync('tests/e2e/TEST-CATALOG.md', 'utf8');
 
 test('account settings handoff exposes 30 safe teacher-account slices', () => {
   const handoffView = buildSettingsAccountWorkspaceHandoffView({
@@ -124,6 +134,24 @@ test('profile and security settings attach account handoff views', () => {
   );
   assertNoPrivateAccountHandoffText(
     JSON.stringify(securityPageView.workspaceSummaryView.handoffView)
+  );
+});
+
+test('profile and security account handoffs render stable semantic outputs', () => {
+  for (const [sourceName, source] of [
+    ['profile', PROFILE_WORKSPACE_SUMMARY_SOURCE],
+    ['security', SECURITY_WORKSPACE_SUMMARY_SOURCE],
+  ] as const) {
+    assert.match(
+      source,
+      /<AccountWorkspaceHandoff handoffView=\{view\.handoffView\} \/>[\s\S]*data-handoff="settings-account-workspace"[\s\S]*data-handoff-scope=\{handoffView\.privacy\.scope\}[\s\S]*handoffView\.itemViews\.map[\s\S]*AccountWorkspaceHandoffItem[\s\S]*const labelId = `settings-account-workspace-handoff-\$\{itemView\.id\}-label`[\s\S]*const valueId = `settings-account-workspace-handoff-\$\{itemView\.id\}-value`[\s\S]*const descriptionId = `settings-account-workspace-handoff-\$\{itemView\.id\}-description`[\s\S]*data-handoff-item=\{itemView\.id\}[\s\S]*id=\{labelId\}[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*aria-label=\{itemView\.ariaLabel\}[\s\S]*aria-labelledby=\{`\$\{labelId\} \$\{valueId\}`\}[\s\S]*id=\{valueId\}[\s\S]*id=\{descriptionId\}/,
+      `${sourceName} account handoff should render marker, privacy scope, item ids, and stable label/value/description relationships.`
+    );
+  }
+  assert.match(
+    TEST_CATALOG_SOURCE,
+    /Settings account workspace handoff has a fast script-level gate via[\s\S]*scripts\/settings-account-workspace-handoff-semantic-views\.test\.ts[\s\S]*teacher identity scope[\s\S]*settings-account-workspace handoff/,
+    'E2E catalog should document the settings account handoff focused gate.'
   );
 });
 

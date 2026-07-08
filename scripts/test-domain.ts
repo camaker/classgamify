@@ -2277,8 +2277,8 @@ assert.match(
 );
 assert.match(
   profileWorkspaceSummarySource,
-  /SettingsAccountWorkspaceHandoffItemView[\s\S]*SettingsAccountWorkspaceHandoffView[\s\S]*<AccountWorkspaceHandoff handoffView=\{view\.handoffView\} \/>[\s\S]*function AccountWorkspaceHandoff[\s\S]*handoffView\.description[\s\S]*handoffView\.itemViews\.map[\s\S]*function AccountWorkspaceHandoffItem[\s\S]*<output aria-label=\{itemView\.ariaLabel\}/,
-  'Profile workspace summary component should render prepared account handoff semantic outputs.'
+  /SettingsAccountWorkspaceHandoffItemView[\s\S]*SettingsAccountWorkspaceHandoffView[\s\S]*<AccountWorkspaceHandoff handoffView=\{view\.handoffView\} \/>[\s\S]*function AccountWorkspaceHandoff[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*aria-labelledby=\{titleId\}[\s\S]*data-handoff="settings-account-workspace"[\s\S]*data-handoff-scope=\{handoffView\.privacy\.scope\}[\s\S]*id=\{titleId\}[\s\S]*handoffView\.title[\s\S]*id=\{descriptionId\}[\s\S]*handoffView\.description[\s\S]*handoffView\.itemViews\.map[\s\S]*function AccountWorkspaceHandoffItem[\s\S]*const labelId = `settings-account-workspace-handoff-\$\{itemView\.id\}-label`[\s\S]*const valueId = `settings-account-workspace-handoff-\$\{itemView\.id\}-value`[\s\S]*const descriptionId = `settings-account-workspace-handoff-\$\{itemView\.id\}-description`[\s\S]*data-handoff-item=\{itemView\.id\}[\s\S]*id=\{labelId\}[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*aria-label=\{itemView\.ariaLabel\}[\s\S]*aria-labelledby=\{`\$\{labelId\} \$\{valueId\}`\}[\s\S]*id=\{valueId\}[\s\S]*id=\{descriptionId\}/,
+  'Profile workspace summary component should render prepared account handoff marker, privacy scope, item ids, and stable label/value/description relationships.'
 );
 assert.doesNotMatch(
   profileWorkspaceSummarySource,
@@ -2385,8 +2385,8 @@ assert.match(
 );
 assert.match(
   securityWorkspaceSummarySource,
-  /SettingsAccountWorkspaceHandoffItemView[\s\S]*SettingsAccountWorkspaceHandoffView[\s\S]*<AccountWorkspaceHandoff handoffView=\{view\.handoffView\} \/>[\s\S]*function AccountWorkspaceHandoff[\s\S]*handoffView\.description[\s\S]*handoffView\.itemViews\.map[\s\S]*function AccountWorkspaceHandoffItem[\s\S]*<output aria-label=\{itemView\.ariaLabel\}/,
-  'Security workspace summary component should render prepared account handoff semantic outputs.'
+  /SettingsAccountWorkspaceHandoffItemView[\s\S]*SettingsAccountWorkspaceHandoffView[\s\S]*<AccountWorkspaceHandoff handoffView=\{view\.handoffView\} \/>[\s\S]*function AccountWorkspaceHandoff[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*aria-labelledby=\{titleId\}[\s\S]*data-handoff="settings-account-workspace"[\s\S]*data-handoff-scope=\{handoffView\.privacy\.scope\}[\s\S]*id=\{titleId\}[\s\S]*handoffView\.title[\s\S]*id=\{descriptionId\}[\s\S]*handoffView\.description[\s\S]*handoffView\.itemViews\.map[\s\S]*function AccountWorkspaceHandoffItem[\s\S]*const labelId = `settings-account-workspace-handoff-\$\{itemView\.id\}-label`[\s\S]*const valueId = `settings-account-workspace-handoff-\$\{itemView\.id\}-value`[\s\S]*const descriptionId = `settings-account-workspace-handoff-\$\{itemView\.id\}-description`[\s\S]*data-handoff-item=\{itemView\.id\}[\s\S]*id=\{labelId\}[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*aria-label=\{itemView\.ariaLabel\}[\s\S]*aria-labelledby=\{`\$\{labelId\} \$\{valueId\}`\}[\s\S]*id=\{valueId\}[\s\S]*id=\{descriptionId\}/,
+  'Security workspace summary component should render prepared account handoff marker, privacy scope, item ids, and stable label/value/description relationships.'
 );
 assert.doesNotMatch(
   securityWorkspaceSummarySource,
