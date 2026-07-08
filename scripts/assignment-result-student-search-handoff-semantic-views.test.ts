@@ -22,6 +22,7 @@ const SECRET_RAW_ANONYMOUS_TOKEN = 'SECRET_RAW_ANONYMOUS_TOKEN';
 const SECRET_EXPECTED_ANSWER = 'SECRET_EXPECTED_ANSWER';
 const SECRET_PROMPT = 'SECRET_PROMPT';
 const SECRET_STUDENT_ANSWER = 'SECRET_STUDENT_ANSWER';
+const TEST_CATALOG_SOURCE = readFileSync('tests/e2e/TEST-CATALOG.md', 'utf8');
 
 test('assignment result student search handoff exposes 30 safe search slices', () => {
   overwriteGetLocale(() => 'en');
@@ -233,7 +234,11 @@ test('assignment result student search handoff is rendered beside the search con
 
   assert.match(
     componentSource,
-    /data-handoff="assignment-result-student-search"[\s\S]*view\.itemViews\.map[\s\S]*data-handoff-item=\{itemView\.id\}[\s\S]*aria-label=\{itemView\.ariaLabel\}/
+    /function AssignmentResultStudentSearchHandoff[\s\S]*const titleId = 'assignment-result-student-search-handoff-title'[\s\S]*const descriptionId = 'assignment-result-student-search-handoff-description'[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*aria-labelledby=\{titleId\}[\s\S]*data-handoff="assignment-result-student-search"[\s\S]*data-handoff-scope=\{view\.privacy\.scope\}[\s\S]*id=\{titleId\}[\s\S]*id=\{descriptionId\}[\s\S]*<dl>[\s\S]*view\.itemViews\.map[\s\S]*AssignmentResultStudentSearchHandoffItem[\s\S]*function AssignmentResultStudentSearchHandoffItem[\s\S]*const labelId = `assignment-result-student-search-handoff-\$\{itemView\.id\}-label`[\s\S]*const valueId = `assignment-result-student-search-handoff-\$\{itemView\.id\}-value`[\s\S]*const descriptionId = `assignment-result-student-search-handoff-\$\{itemView\.id\}-description`[\s\S]*data-handoff-item=\{itemView\.id\}[\s\S]*id=\{labelId\}[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*aria-label=\{itemView\.ariaLabel\}[\s\S]*aria-labelledby=\{`\$\{labelId\} \$\{valueId\}`\}[\s\S]*id=\{valueId\}[\s\S]*id=\{descriptionId\}/
+  );
+  assert.match(
+    TEST_CATALOG_SOURCE,
+    /Assignment result student search has a fast script-level gate via[\s\S]*scripts\/assignment-result-student-search-handoff-semantic-views\.test\.ts[\s\S]*query[\s\S]*normalization[\s\S]*assignment-result-student-search[\s\S]*handoff/
   );
   assert.match(
     routeSource,

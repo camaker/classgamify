@@ -9191,6 +9191,16 @@ assert.match(
   /IconSearch[\s\S]*aria-hidden="true"/,
   'Assignment result student search decorative search icon should be hidden from assistive technology.'
 );
+assert.match(
+  assignmentResultsStudentSearchSource,
+  /function AssignmentResultStudentSearchHandoff[\s\S]*const titleId = 'assignment-result-student-search-handoff-title'[\s\S]*const descriptionId = 'assignment-result-student-search-handoff-description'[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*aria-labelledby=\{titleId\}[\s\S]*data-handoff="assignment-result-student-search"[\s\S]*data-handoff-scope=\{view\.privacy\.scope\}[\s\S]*id=\{titleId\}[\s\S]*id=\{descriptionId\}[\s\S]*<dl>[\s\S]*view\.itemViews\.map[\s\S]*AssignmentResultStudentSearchHandoffItem[\s\S]*function AssignmentResultStudentSearchHandoffItem[\s\S]*const labelId = `assignment-result-student-search-handoff-\$\{itemView\.id\}-label`[\s\S]*const valueId = `assignment-result-student-search-handoff-\$\{itemView\.id\}-value`[\s\S]*const descriptionId = `assignment-result-student-search-handoff-\$\{itemView\.id\}-description`[\s\S]*data-handoff-item=\{itemView\.id\}[\s\S]*id=\{labelId\}[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*aria-label=\{itemView\.ariaLabel\}[\s\S]*aria-labelledby=\{`\$\{labelId\} \$\{valueId\}`\}[\s\S]*id=\{valueId\}[\s\S]*id=\{descriptionId\}/,
+  'Assignment result student search handoff should render the hidden search marker, privacy scope, item ids, and stable label/value/description relationships.'
+);
+assert.match(
+  authE2eCatalogSource,
+  /Assignment result student search has a fast script-level gate via[\s\S]*scripts\/assignment-result-student-search-handoff-semantic-views\.test\.ts[\s\S]*query[\s\S]*normalization[\s\S]*assignment-result-student-search[\s\S]*handoff/,
+  'E2E catalog should document the result student search focused gate.'
+);
 assert.doesNotMatch(
   `${assignmentResultsStudentSearchSource}\n${assignmentResultsAttemptReviewFilterSource}\n${assignmentResultsItemPerformanceSortSource}`,
   /assignmentResultSearchCopy/,
