@@ -15784,8 +15784,8 @@ assert.deepEqual(
 );
 assert.match(
   studentRunnerStateSource,
-  /export type StudentRunnerSubmissionHandoffPrivacyContract = \{[\s\S]*exposesAnonymousToken: false;[\s\S]*exposesAnswerText: false;[\s\S]*exposesRawSubmissionPayload: false;[\s\S]*exposesRuntimeItemIds: false;[\s\S]*exposesStudentName: false;[\s\S]*exposesTeacherOnlyAnswers: false;[\s\S]*exposesTeacherSourceMaterials: false;[\s\S]*payloadMetricKeys: StudentRunnerSubmissionPayloadSummaryMetricKey\[\];[\s\S]*readinessItemIds: StudentRunnerSubmitReadinessItemId\[\];[\s\S]*reviewMetricKeys: StudentAttemptReviewSummaryMetricKey\[\];/,
-  'Student runner submission handoff should expose explicit privacy and metric-key contracts.'
+  /export type StudentRunnerSubmissionHandoffPrivacyContract = \{[\s\S]*exposesAnonymousToken: false;[\s\S]*exposesAnswerText: false;[\s\S]*exposesRawSubmissionPayload: false;[\s\S]*exposesRuntimeItemIds: false;[\s\S]*exposesStudentName: false;[\s\S]*exposesTeacherOnlyAnswers: false;[\s\S]*exposesTeacherSourceMaterials: false;[\s\S]*payloadMetricKeys: StudentRunnerSubmissionPayloadSummaryMetricKey\[\];[\s\S]*readinessItemIds: StudentRunnerSubmitReadinessItemId\[\];[\s\S]*reviewMetricKeys: StudentAttemptReviewSummaryMetricKey\[\];[\s\S]*scope: 'public-student-runner-submission';/,
+  'Student runner submission handoff should expose explicit privacy, metric-key, and scope contracts.'
 );
 assert.match(
   studentRunnerStateSource,
@@ -15799,8 +15799,8 @@ assert.match(
 );
 assert.match(
   studentRunnerSubmissionHandoffSource,
-  /StudentRunnerSubmissionHandoffItemView[\s\S]*StudentRunnerSubmissionHandoffView[\s\S]*data-handoff="student-runner-submission"[\s\S]*view\.itemViews\.map[\s\S]*StudentRunnerSubmissionHandoffItem[\s\S]*function StudentRunnerSubmissionHandoffItem[\s\S]*const labelId = `student-runner-submission-handoff-\$\{itemView\.id\}-label`[\s\S]*const valueId = `student-runner-submission-handoff-\$\{itemView\.id\}-value`[\s\S]*const descriptionId = `student-runner-submission-handoff-\$\{itemView\.id\}-description`[\s\S]*data-handoff-item=\{itemView\.id\}[\s\S]*id=\{labelId\}[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*aria-label=\{itemView\.ariaLabel\}[\s\S]*aria-labelledby=\{`\$\{labelId\} \$\{valueId\}`\}[\s\S]*id=\{valueId\}[\s\S]*id=\{descriptionId\}/,
-  'Student runner submission handoff component should render hidden safe outputs with prepared label, value, and description relationships.'
+  /StudentRunnerSubmissionHandoffItemView[\s\S]*StudentRunnerSubmissionHandoffView[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*aria-labelledby=\{titleId\}[\s\S]*data-handoff="student-runner-submission"[\s\S]*data-handoff-scope=\{view\.privacy\.scope\}[\s\S]*view\.itemViews\.map[\s\S]*StudentRunnerSubmissionHandoffItem[\s\S]*function StudentRunnerSubmissionHandoffItem[\s\S]*const labelId = `student-runner-submission-handoff-\$\{itemView\.id\}-label`[\s\S]*const valueId = `student-runner-submission-handoff-\$\{itemView\.id\}-value`[\s\S]*const descriptionId = `student-runner-submission-handoff-\$\{itemView\.id\}-description`[\s\S]*data-handoff-item=\{itemView\.id\}[\s\S]*id=\{labelId\}[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*aria-label=\{itemView\.ariaLabel\}[\s\S]*aria-labelledby=\{`\$\{labelId\} \$\{valueId\}`\}[\s\S]*id=\{valueId\}[\s\S]*id=\{descriptionId\}/,
+  'Student runner submission handoff component should render hidden safe outputs with privacy scope plus prepared label, value, and description relationships.'
 );
 assert.match(
   playRouteSource,
@@ -15872,6 +15872,7 @@ assert.deepEqual(studentSubmissionPageView.submissionHandoffView.privacy, {
     'submission-state',
   ],
   reviewMetricKeys: [],
+  scope: 'public-student-runner-submission',
 });
 assert.equal(
   studentSubmissionHandoffValues.get('share-link'),
@@ -16461,6 +16462,11 @@ assert.match(
   e2eTestCatalogText,
   /Student submission exposes a hidden 30-slice safe handoff[\s\S]*hidden localized `data-handoff="student-runner-submission"`/,
   'E2E catalog should document the hidden safe student-submission handoff.'
+);
+assert.match(
+  e2eTestCatalogText,
+  /scripts\/student-runner-submission-handoff-semantic-views\.test\.ts[\s\S]*public runner submission privacy-scope boundaries/,
+  'E2E catalog should document the student runner safe-submission privacy-scope fast gate.'
 );
 assert.match(
   e2eTestCatalogText,

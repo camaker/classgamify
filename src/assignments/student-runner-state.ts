@@ -308,6 +308,7 @@ export type StudentRunnerSubmissionHandoffPrivacyContract = {
   payloadMetricKeys: StudentRunnerSubmissionPayloadSummaryMetricKey[];
   readinessItemIds: StudentRunnerSubmitReadinessItemId[];
   reviewMetricKeys: StudentAttemptReviewSummaryMetricKey[];
+  scope: 'public-student-runner-submission';
 };
 
 export type StudentRunnerSubmissionHandoffView = {
@@ -3117,6 +3118,7 @@ function buildStudentRunnerSubmissionHandoffPrivacyContract({
     reviewMetricKeys: resultPanelView.show
       ? resultPanelView.reviewSummaryView.metrics.map((metric) => metric.key)
       : [],
+    scope: 'public-student-runner-submission',
   };
 }
 
