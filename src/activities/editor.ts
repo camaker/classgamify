@@ -3173,7 +3173,7 @@ export function buildActivityEditorTemplateView({
   };
 }
 
-export function buildActivityEditorTemplateHandoffView({
+function buildActivityEditorTemplateHandoffView({
   currentContent,
   readinessSummary,
   remixPlan,

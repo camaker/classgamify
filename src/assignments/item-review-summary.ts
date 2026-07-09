@@ -61,7 +61,7 @@ export function buildAssignmentItemReviewSummary({
   };
 }
 
-export function buildAssignmentItemReviewSummaryItemViews(
+function buildAssignmentItemReviewSummaryItemViews(
   items: AssignmentItemAnalysis[]
 ): AssignmentItemReviewSummaryItemView[] {
   return items.map((item, index) =>

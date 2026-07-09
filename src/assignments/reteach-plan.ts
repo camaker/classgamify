@@ -120,7 +120,7 @@ export function buildAssignmentReteachPlan({
   };
 }
 
-export function buildAssignmentReteachPlanItemViews(
+function buildAssignmentReteachPlanItemViews(
   items: AssignmentItemAnalysis[]
 ): AssignmentReteachPlanItemView[] {
   return items.map((item, index) =>
@@ -152,7 +152,7 @@ export function buildAssignmentReteachPlanItemView({
   };
 }
 
-export function buildAssignmentReteachPlanStudentViews(
+function buildAssignmentReteachPlanStudentViews(
   students: AssignmentStudentSummary[],
   options?: {
     attempts?: AssignmentAttemptReview[];

@@ -778,7 +778,7 @@ export function buildHomePageStarterPreview(): HomePagePreviewView {
   };
 }
 
-export function buildHomePageProductLoopHandoffView({
+function buildHomePageProductLoopHandoffView({
   features,
   featureSection,
   hero,
@@ -1247,7 +1247,7 @@ export function buildRoadmapPageViewModel(): RoadmapPageViewModel {
   };
 }
 
-export function buildRoadmapPublicHandoffView({
+function buildRoadmapPublicHandoffView({
   columns,
   hero,
   principles,
@@ -1910,7 +1910,7 @@ function buildTeachersPageItemView<Id extends string>({
   };
 }
 
-export function buildTeachersPageHandoffView({
+function buildTeachersPageHandoffView({
   hero,
   schoolCta,
   templatePanel,
@@ -2449,7 +2449,7 @@ export function buildPricingPageViewModel(): PricingPageViewModel {
   };
 }
 
-export function buildPricingPageHandoffView({
+function buildPricingPageHandoffView({
   faqItems,
   schoolCta,
   valueCards,

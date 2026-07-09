@@ -1325,7 +1325,7 @@ function hasAssignmentCloseTime(expiresAt: AssignmentDate) {
   return normalizeAssignmentLifecycleTimestamp(expiresAt) !== undefined;
 }
 
-export function formatAssignmentAttempts(maxAttempts?: number | null) {
+function formatAssignmentAttempts(maxAttempts?: number | null) {
   return isPositiveWholeNumber(maxAttempts)
     ? m.assignment_delivery_attempts_max({ count: maxAttempts })
     : m.assignment_delivery_attempts_open();

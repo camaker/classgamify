@@ -341,7 +341,7 @@ export function buildAssignmentClassroomBriefStatViews(
   ];
 }
 
-export function buildAssignmentClassroomBriefFocusItemViews(
+function buildAssignmentClassroomBriefFocusItemViews(
   items: AssignmentItemAnalysis[]
 ) {
   return items.map((item, index) =>
@@ -352,7 +352,7 @@ export function buildAssignmentClassroomBriefFocusItemViews(
   );
 }
 
-export function buildAssignmentClassroomBriefFollowUpStudentViews(
+function buildAssignmentClassroomBriefFollowUpStudentViews(
   students: AssignmentStudentSummary[],
   options?: {
     attempts?: AssignmentAttemptReview[];

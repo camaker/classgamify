@@ -270,7 +270,7 @@ export function canRestoreActivity(visibility: ActivityVisibility) {
   return isActivityArchived(visibility);
 }
 
-export function getSameTemplateRemixError() {
+function getSameTemplateRemixError() {
   return m.activity_api_error_remix_same_template();
 }
 

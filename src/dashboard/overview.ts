@@ -357,7 +357,7 @@ export function buildDashboardOverviewPageViewModel({
   };
 }
 
-export function buildDashboardOverviewHandoffView({
+function buildDashboardOverviewHandoffView({
   actionCards,
   activitiesLoading,
   activitySummary,

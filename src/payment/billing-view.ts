@@ -174,7 +174,7 @@ export function buildSettingsBillingCardViewModel({
   };
 }
 
-export function resolveSettingsBillingPlan({
+function resolveSettingsBillingPlan({
   currentPlan,
   plans,
 }: {

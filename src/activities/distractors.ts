@@ -144,7 +144,7 @@ export function buildQuestionChoices({
   });
 }
 
-export function buildQuestionChoiceReadiness({
+function buildQuestionChoiceReadiness({
   content,
   targetCount = DEFAULT_QUESTION_CHOICE_COUNT,
 }: {

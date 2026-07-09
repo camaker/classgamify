@@ -39,7 +39,7 @@ export const ACTIVITY_SOURCE_MATERIAL_FILTERS = [
   'spreadsheet',
   'worksheet',
 ] as const satisfies readonly ActivitySourceMaterialFilter[];
-export const ACTIVITY_FILTERABLE_SOURCE_MATERIALS = [
+const ACTIVITY_FILTERABLE_SOURCE_MATERIALS = [
   'audio',
   'extractable',
   'spreadsheet',

@@ -53,7 +53,7 @@ ${getRobotsDisallowLines().join('\n')}
 Sitemap: ${base}/sitemap.xml`;
 }
 
-export function getRobotsDisallowLines() {
+function getRobotsDisallowLines() {
   return getRobotsDisallowPaths().map((path) => `Disallow: ${path}`);
 }
 
@@ -96,7 +96,7 @@ export function getSitemapUrls(): SitemapUrl[] {
   ];
 }
 
-export function getLocalizedPublicPathVariants(path: string) {
+function getLocalizedPublicPathVariants(path: string) {
   return [
     path,
     ...locales
@@ -171,7 +171,7 @@ function formatSitemapUrlEntry(entry: SitemapUrlEntry) {
   return `  <url>\n    <loc>${escapeSitemapXml(entry.loc)}</loc>${alternateLinks}${lastmod}${changefreq}${priority}\n  </url>`;
 }
 
-export function escapeSitemapXml(value: string) {
+function escapeSitemapXml(value: string) {
   return value
     .replace(/&/g, '&amp;')
     .replace(/"/g, '&quot;')

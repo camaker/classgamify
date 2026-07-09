@@ -102,7 +102,7 @@ export function buildWebAppManifestInstallBoundary(
   };
 }
 
-export function getWebAppManifestMaskableIconCount(manifest: WebAppManifest) {
+function getWebAppManifestMaskableIconCount(manifest: WebAppManifest) {
   return manifest.icons.filter((icon) => icon.purpose === 'maskable').length;
 }
 

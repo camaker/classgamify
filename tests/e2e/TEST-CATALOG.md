@@ -45,6 +45,12 @@ adding, renaming, splitting, or trimming exported `*_HANDOFF_ITEM_IDS`
 contracts, changing 30-item handoff arrays, or editing semantic item id
 boundaries that should remain unique kebab-case item ids and keep focused
 script-level coverage.
+Product-domain export surface has a source-level gate via
+`pnpm exec tsx --test scripts/product-domain-export-surface.test.ts`; run it
+when changing product-domain helper exports, public indexing helpers, dashboard
+overview view helpers, public-page handoff builders, result copy/view helper
+internals, assignment delivery formatting helpers, activity library filter
+constants, or editor template handoff builder visibility.
 Public DOM handoff boundary has a fast script-level gate via
 `pnpm exec tsx --test scripts/public-dom-handoff-boundary.test.ts`; run it when
 changing marketing, editorial, legal, contact, auth, root document, or shared
