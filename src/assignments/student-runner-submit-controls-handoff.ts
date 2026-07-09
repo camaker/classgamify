@@ -10,16 +10,26 @@ export const STUDENT_RUNNER_SUBMIT_CONTROLS_HANDOFF_ITEM_IDS = [
   'controls-region',
   'readiness-status',
   'readiness-items',
+  'readiness-share-link',
+  'readiness-runtime-items',
+  'readiness-completion',
+  'readiness-confirmation',
+  'readiness-submission-state',
   'payload-summary',
   'payload-metrics',
+  'payload-share-link',
+  'payload-item-count',
+  'payload-answer-count',
   'completion-counts',
   'unanswered-count',
   'button-label',
   'button-aria',
   'button-disabled',
+  'disabled-policy',
   'button-describedby',
   'confirm-incomplete-state',
   'hint-count',
+  'hint-order',
   'unanswered-hint',
   'confirm-incomplete-hint',
   'read-only-hint',
@@ -71,6 +81,8 @@ type StudentRunnerSubmitControlsHandoffBuildContext = {
   hasUnansweredHint: boolean;
   itemValue: string;
   readinessItemSummary: string;
+  submitDisabledPolicy: string;
+  submitHintOrder: string;
   unansweredValue: string;
 };
 
@@ -85,17 +97,23 @@ export function buildStudentRunnerSubmitControlsHandoffView(
   const answeredValue = getPayloadMetricValue(controlView, 'answers');
   const itemValue = getPayloadMetricValue(controlView, 'items');
   const unansweredValue = getPayloadMetricValue(controlView, 'unanswered');
+  const hasReadOnlyHint = hasSubmitHint(controlView, 'read-only');
   const context: StudentRunnerSubmitControlsHandoffBuildContext = {
     answeredValue,
     controlView,
     hasButtonDescriptions: true,
     hasConfirmIncompleteHint: hasSubmitHint(controlView, 'confirm-incomplete'),
-    hasReadOnlyHint: hasSubmitHint(controlView, 'read-only'),
+    hasReadOnlyHint,
     hasUnansweredHint: hasSubmitHint(controlView, 'unanswered'),
     itemValue,
     readinessItemSummary: formatSubmitControlsIdSummary(
       controlView.submitReadinessView.items.map((item) => item.id)
     ),
+    submitDisabledPolicy: formatSubmitDisabledPolicy({
+      hasReadOnlyHint,
+      submitDisabled: controlView.submitDisabled,
+    }),
+    submitHintOrder: formatSubmitHintOrder(controlView),
     unansweredValue,
   };
   const itemViews = STUDENT_RUNNER_SUBMIT_CONTROLS_HANDOFF_ITEM_IDS.map((id) =>
@@ -107,8 +125,8 @@ export function buildStudentRunnerSubmitControlsHandoffView(
 
   return {
     description: submitControlsCopy({
-      en: '20-slice safe submit-control handoff for progress, prepared payload metrics, incomplete confirmation, button state, hints, and privacy boundaries before the student runner submits.',
-      zh: '学生 runner 提交前，覆盖进度、已准备载荷指标、未完成确认、按钮状态、提示和隐私边界的 20 切片安全提交控件交接。',
+      en: '30-slice safe submit-control handoff for progress, prepared payload metrics, incomplete confirmation, button state, hints, and privacy boundaries before the student runner submits.',
+      zh: '学生 runner 提交前，覆盖进度、已准备载荷指标、未完成确认、按钮状态、提示和隐私边界的 30 切片安全提交控件交接。',
     }),
     itemViews,
     privacy: buildStudentRunnerSubmitControlsHandoffPrivacyContract({
@@ -178,10 +196,50 @@ function getSubmitControlsHandoffLabel(
       return submitControlsCopy({ en: 'Readiness status', zh: '就绪状态' });
     case 'readiness-items':
       return submitControlsCopy({ en: 'Readiness checks', zh: '就绪检查' });
+    case 'readiness-share-link':
+      return submitControlsCopy({
+        en: 'Share-link readiness',
+        zh: '分享链接就绪',
+      });
+    case 'readiness-runtime-items':
+      return submitControlsCopy({
+        en: 'Runtime-item readiness',
+        zh: '运行题目就绪',
+      });
+    case 'readiness-completion':
+      return submitControlsCopy({
+        en: 'Completion readiness',
+        zh: '完成状态就绪',
+      });
+    case 'readiness-confirmation':
+      return submitControlsCopy({
+        en: 'Confirmation readiness',
+        zh: '确认状态就绪',
+      });
+    case 'readiness-submission-state':
+      return submitControlsCopy({
+        en: 'Submission-state readiness',
+        zh: '提交状态就绪',
+      });
     case 'payload-summary':
       return submitControlsCopy({ en: 'Payload summary', zh: '载荷摘要' });
     case 'payload-metrics':
       return submitControlsCopy({ en: 'Payload metrics', zh: '载荷指标' });
+    case 'payload-share-link':
+      return submitControlsCopy({
+        en: 'Payload share-link',
+        zh: '载荷分享链接',
+      });
+    case 'payload-item-count':
+      return submitControlsCopy({
+        en: 'Payload item count',
+        zh: '载荷题目计数',
+      });
+    case 'payload-answer-count':
+      return submitControlsCopy({
+        en: 'Payload answer count',
+        zh: '载荷答案计数',
+      });
     case 'completion-counts':
       return submitControlsCopy({ en: 'Completion counts', zh: '完成计数' });
     case 'unanswered-count':
@@ -192,6 +250,8 @@ function getSubmitControlsHandoffLabel(
       return submitControlsCopy({ en: 'Button aria', zh: '按钮 aria' });
     case 'button-disabled':
       return submitControlsCopy({ en: 'Button disabled', zh: '按钮禁用' });
+    case 'disabled-policy':
+      return submitControlsCopy({ en: 'Disabled policy', zh: '禁用策略' });
     case 'button-describedby':
       return submitControlsCopy({
         en: 'Button descriptions',
@@ -204,6 +264,8 @@ function getSubmitControlsHandoffLabel(
       });
     case 'hint-count':
       return submitControlsCopy({ en: 'Hint count', zh: '提示数量' });
+    case 'hint-order':
+      return submitControlsCopy({ en: 'Hint order', zh: '提示顺序' });
     case 'unanswered-hint':
       return submitControlsCopy({ en: 'Unanswered hint', zh: '未答提示' });
     case 'confirm-incomplete-hint':
@@ -246,6 +308,31 @@ function getSubmitControlsHandoffDescription(
         en: 'The handoff records readiness check ids, not runtime item ids or prompt text.',
         zh: '交接记录就绪检查 ID，而不是运行题目 ID 或题干文本。',
       });
+    case 'readiness-share-link':
+      return submitControlsCopy({
+        en: 'The share-link check exposes only prepared status, not the share slug.',
+        zh: '分享链接检查只暴露已准备状态，不暴露分享 slug。',
+      });
+    case 'readiness-runtime-items':
+      return submitControlsCopy({
+        en: 'Runtime-item readiness exposes only status so item ids and prompts stay hidden.',
+        zh: '运行题目就绪只暴露状态，题目 ID 和题干保持隐藏。',
+      });
+    case 'readiness-completion':
+      return submitControlsCopy({
+        en: 'Completion readiness mirrors the prepared answered/unanswered status.',
+        zh: '完成状态就绪镜像已准备的已答/未答状态。',
+      });
+    case 'readiness-confirmation':
+      return submitControlsCopy({
+        en: 'Confirmation readiness records whether partial-submit confirmation is armed.',
+        zh: '确认状态就绪记录部分提交确认是否已进入准备状态。',
+      });
+    case 'readiness-submission-state':
+      return submitControlsCopy({
+        en: 'Submission-state readiness mirrors whether the prepared action is available or blocked.',
+        zh: '提交状态就绪镜像已准备动作是否可用或被阻止。',
+      });
     case 'payload-summary':
       return submitControlsCopy({
         en: 'The payload summary is reduced to safe counts and omits answer rows.',
@@ -255,6 +342,21 @@ function getSubmitControlsHandoffDescription(
       return submitControlsCopy({
         en: 'Metric keys identify which safe payload counters are visible beside the submit button.',
         zh: '指标键说明提交按钮旁展示了哪些安全载荷计数。',
+      });
+    case 'payload-share-link':
+      return submitControlsCopy({
+        en: 'The share-link metric is reduced to present or missing without serializing the slug.',
+        zh: '分享链接指标收敛为存在或缺失，不序列化 slug。',
+      });
+    case 'payload-item-count':
+      return submitControlsCopy({
+        en: 'The item counter mirrors the safe total runtime item count.',
+        zh: '题目计数镜像安全的运行题目总数。',
+      });
+    case 'payload-answer-count':
+      return submitControlsCopy({
+        en: 'The answer counter mirrors the safe submitted-answer count.',
+        zh: '答案计数镜像安全的已提交答案数量。',
       });
     case 'completion-counts':
       return submitControlsCopy({
@@ -281,6 +383,11 @@ function getSubmitControlsHandoffDescription(
         en: 'Disabled state is exposed as a boolean boundary for read-only or blocked submissions.',
         zh: '禁用状态作为只读或阻止提交的布尔边界暴露。',
       });
+    case 'disabled-policy':
+      return submitControlsCopy({
+        en: 'The disabled policy separates enabled, blocked, and read-only submit boundaries.',
+        zh: '禁用策略区分可提交、已阻止和只读提交边界。',
+      });
     case 'button-describedby':
       return submitControlsCopy({
         en: 'The submit button is described by readiness, payload summary, and any active hint notes.',
@@ -295,6 +402,11 @@ function getSubmitControlsHandoffDescription(
       return submitControlsCopy({
         en: 'Hint count summarizes persistent submit guidance beside the action.',
         zh: '提示数量概括动作旁持续展示的提交指导。',
+      });
+    case 'hint-order':
+      return submitControlsCopy({
+        en: 'Hint order preserves the prepared guidance sequence using safe hint ids.',
+        zh: '提示顺序使用安全提示 ID 保留已准备的指导顺序。',
       });
     case 'unanswered-hint':
       return submitControlsCopy({
@@ -344,6 +456,22 @@ function getSubmitControlsHandoffValue(
       return context.controlView.submitReadinessView.statusLabel;
     case 'readiness-items':
       return context.readinessItemSummary;
+    case 'readiness-share-link':
+      return getReadinessItemStatusLabel(context.controlView, 'share-link');
+    case 'readiness-runtime-items':
+      return getReadinessItemStatusLabel(context.controlView, 'runtime-items');
+    case 'readiness-completion':
+      return getReadinessItemStatusLabel(context.controlView, 'completion');
+    case 'readiness-confirmation':
+      return getReadinessItemStatusLabel(
+        context.controlView,
+        'incomplete-confirmation'
+      );
+    case 'readiness-submission-state':
+      return getReadinessItemStatusLabel(
+        context.controlView,
+        'submission-state'
+      );
     case 'payload-summary':
       return context.controlView.payloadSummaryView.title;
     case 'payload-metrics':
@@ -352,6 +480,12 @@ function getSubmitControlsHandoffValue(
           (metric) => metric.key
         )
       );
+    case 'payload-share-link':
+      return formatPayloadShareLinkPresence(context.controlView);
+    case 'payload-item-count':
+      return context.itemValue;
+    case 'payload-answer-count':
+      return context.answeredValue;
     case 'completion-counts':
       return submitControlsCopy({
         en: `${context.answeredValue}/${context.itemValue}`,
@@ -365,6 +499,8 @@ function getSubmitControlsHandoffValue(
       return context.controlView.submitButtonAriaLabel;
     case 'button-disabled':
       return formatSubmitControlsBoolean(context.controlView.submitDisabled);
+    case 'disabled-policy':
+      return context.submitDisabledPolicy;
     case 'button-describedby':
       return context.hasButtonDescriptions
         ? submitControlsCopy({ en: 'Ready', zh: '已准备' })
@@ -375,6 +511,8 @@ function getSubmitControlsHandoffValue(
       );
     case 'hint-count':
       return String(context.controlView.submitHintViews.length);
+    case 'hint-order':
+      return context.submitHintOrder;
     case 'unanswered-hint':
       return formatSubmitControlsBoolean(context.hasUnansweredHint);
     case 'confirm-incomplete-hint':
@@ -405,6 +543,26 @@ function getPayloadMetricValue(
   );
 }
 
+function getReadinessItemStatusLabel(
+  controlView: StudentRunnerControlView,
+  id: StudentRunnerSubmitReadinessItemId
+) {
+  return (
+    controlView.submitReadinessView.items.find((item) => item.id === id)
+      ?.statusLabel ?? submitControlsCopy({ en: 'Missing', zh: '缺失' })
+  );
+}
+
+function formatPayloadShareLinkPresence(controlView: StudentRunnerControlView) {
+  const shareLinkValue = controlView.payloadSummaryView.metrics.find(
+    (metric) => metric.key === 'share-link'
+  )?.value;
+
+  return shareLinkValue
+    ? submitControlsCopy({ en: 'Present', zh: '存在' })
+    : submitControlsCopy({ en: 'Missing', zh: '缺失' });
+}
+
 function hasSubmitHint(
   controlView: StudentRunnerControlView,
   id: StudentRunnerSubmitHintId
@@ -416,6 +574,33 @@ function formatSubmitControlsBoolean(value: boolean) {
   return value
     ? submitControlsCopy({ en: 'Yes', zh: '是' })
     : submitControlsCopy({ en: 'No', zh: '否' });
+}
+
+function formatSubmitDisabledPolicy({
+  hasReadOnlyHint,
+  submitDisabled,
+}: {
+  hasReadOnlyHint: boolean;
+  submitDisabled: boolean;
+}) {
+  if (hasReadOnlyHint) {
+    return submitControlsCopy({
+      en: 'Read-only blocked',
+      zh: '只读阻止',
+    });
+  }
+
+  if (submitDisabled) {
+    return submitControlsCopy({ en: 'Blocked', zh: '已阻止' });
+  }
+
+  return submitControlsCopy({ en: 'Enabled', zh: '可提交' });
+}
+
+function formatSubmitHintOrder(controlView: StudentRunnerControlView) {
+  return formatSubmitControlsIdSummary(
+    controlView.submitHintViews.map((hint) => hint.id)
+  );
 }
 
 function formatSubmitControlsIdSummary(ids: string[]) {

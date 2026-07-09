@@ -23,7 +23,7 @@ const SECRET_ANSWER_TEXT = 'SECRET_SUBMIT_CONTROL_ANSWER';
 const SECRET_STUDENT_NAME = 'Secret Submit Control Student';
 const SECRET_TOKEN = 'raw-submit-control-token';
 
-test('student runner submit controls handoff exposes 20 safe ready slices', () => {
+test('student runner submit controls handoff exposes 30 safe ready slices', () => {
   const starterPreview = buildStudentRunnerStarterPreview(
     STARTER_FOOD_ASSIGNMENT_SHARE_ID
   );
@@ -59,7 +59,7 @@ test('student runner submit controls handoff exposes 20 safe ready slices', () =
     handoffView.itemViews.map((item) => item.id),
     [...STUDENT_RUNNER_SUBMIT_CONTROLS_HANDOFF_ITEM_IDS]
   );
-  assert.equal(handoffView.itemViews.length, 20);
+  assert.equal(handoffView.itemViews.length, 30);
   assert.deepEqual(handoffView.privacy, {
     exposesAnonymousToken: false,
     exposesAnswerText: false,
@@ -82,6 +82,38 @@ test('student runner submit controls handoff exposes 20 safe ready slices', () =
   });
   assert.equal(getHandoffItemValue(handoffView, 'readiness-status'), 'Ready');
   assert.equal(
+    getHandoffItemValue(handoffView, 'readiness-share-link'),
+    'Ready'
+  );
+  assert.equal(
+    getHandoffItemValue(handoffView, 'readiness-runtime-items'),
+    'Ready'
+  );
+  assert.equal(
+    getHandoffItemValue(handoffView, 'readiness-completion'),
+    'Ready'
+  );
+  assert.equal(
+    getHandoffItemValue(handoffView, 'readiness-confirmation'),
+    'Ready'
+  );
+  assert.equal(
+    getHandoffItemValue(handoffView, 'readiness-submission-state'),
+    'Ready'
+  );
+  assert.equal(
+    getHandoffItemValue(handoffView, 'payload-share-link'),
+    'Present'
+  );
+  assert.equal(
+    getHandoffItemValue(handoffView, 'payload-item-count'),
+    String(starterPreview.runtimeItems.length)
+  );
+  assert.equal(
+    getHandoffItemValue(handoffView, 'payload-answer-count'),
+    String(starterPreview.runtimeItems.length)
+  );
+  assert.equal(
     getHandoffItemValue(handoffView, 'completion-counts'),
     `${starterPreview.runtimeItems.length}/${starterPreview.runtimeItems.length}`
   );
@@ -95,7 +127,9 @@ test('student runner submit controls handoff exposes 20 safe ready slices', () =
     getHandoffItemValue(handoffView, 'confirm-incomplete-state'),
     'No'
   );
+  assert.equal(getHandoffItemValue(handoffView, 'disabled-policy'), 'Enabled');
   assert.equal(getHandoffItemValue(handoffView, 'hint-count'), '0');
+  assert.equal(getHandoffItemValue(handoffView, 'hint-order'), 'None');
   assert.equal(
     getHandoffItemValue(handoffView, 'submit-action-boundary'),
     'No mutation'
@@ -142,6 +176,26 @@ test('student runner submit controls handoff reports incomplete confirmation sta
   assert.equal(
     getHandoffItemValue(beforeConfirmHandoff, 'unanswered-count'),
     String(starterPreview.runtimeItems.length - 1)
+  );
+  assert.equal(
+    getHandoffItemValue(beforeConfirmHandoff, 'readiness-completion'),
+    'Needs review'
+  );
+  assert.equal(
+    getHandoffItemValue(beforeConfirmHandoff, 'readiness-confirmation'),
+    'Needs review'
+  );
+  assert.equal(
+    getHandoffItemValue(beforeConfirmHandoff, 'payload-answer-count'),
+    '1'
+  );
+  assert.equal(
+    getHandoffItemValue(beforeConfirmHandoff, 'disabled-policy'),
+    'Enabled'
+  );
+  assert.equal(
+    getHandoffItemValue(beforeConfirmHandoff, 'hint-order'),
+    'unanswered'
   );
   assert.equal(
     getHandoffItemValue(beforeConfirmHandoff, 'unanswered-hint'),
@@ -191,8 +245,16 @@ test('student runner submit controls handoff reports incomplete confirmation sta
     'Yes'
   );
   assert.equal(
+    getHandoffItemValue(confirmHandoff, 'readiness-confirmation'),
+    'Ready'
+  );
+  assert.equal(
     getHandoffItemValue(confirmHandoff, 'confirm-incomplete-hint'),
     'Yes'
+  );
+  assert.equal(
+    getHandoffItemValue(confirmHandoff, 'hint-order'),
+    'unanswered · confirm-incomplete'
   );
   assert.deepEqual(confirmHandoff.privacy.hintIds, [
     'unanswered',
@@ -229,8 +291,14 @@ test('student runner submit controls handoff reports submitted locked state', ()
     getHandoffItemValue(handoffView, 'readiness-status'),
     'Needs review'
   );
+  assert.equal(
+    getHandoffItemValue(handoffView, 'readiness-submission-state'),
+    'Ready'
+  );
   assert.equal(getHandoffItemValue(handoffView, 'button-disabled'), 'Yes');
+  assert.equal(getHandoffItemValue(handoffView, 'disabled-policy'), 'Blocked');
   assert.equal(getHandoffItemValue(handoffView, 'hint-count'), '0');
+  assert.equal(getHandoffItemValue(handoffView, 'hint-order'), 'None');
   assert.equal(getHandoffItemValue(handoffView, 'read-only-hint'), 'No');
   assert.deepEqual(handoffView.privacy.hintIds, []);
   assertNoPrivateSubmitControlText(JSON.stringify(handoffView));

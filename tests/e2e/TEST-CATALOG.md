@@ -85,8 +85,9 @@ feedback scope, next steps, public runner submission privacy-scope boundaries,
 or the hidden student-runner-submission handoff.
 Student runner submit controls have a fast script-level gate via
 `pnpm exec tsx --test scripts/student-runner-submit-controls-handoff-semantic-views.test.ts`;
-run it when changing submit-control readiness, payload metric labels, button
-disabled or confirmation state, aria descriptions, persistent submit hints,
+run it when changing the 30-slice submit-control readiness details, safe
+payload counters, share-link presence boundary, button disabled or confirmation
+state, hint ordering, aria descriptions, persistent submit hints,
 submit-control privacy-scope boundaries, or the hidden
 student-runner-submit-controls handoff.
 Student runner identity has a fast script-level gate via

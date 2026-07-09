@@ -15828,8 +15828,8 @@ assert.match(
 );
 assert.match(
   studentRunnerSubmitControlsHandoffSource,
-  /export const STUDENT_RUNNER_SUBMIT_CONTROLS_HANDOFF_ITEM_IDS = \[(?=[\s\S]*'controls-region')(?=[\s\S]*'readiness-status')(?=[\s\S]*'readiness-items')(?=[\s\S]*'payload-summary')(?=[\s\S]*'payload-metrics')(?=[\s\S]*'completion-counts')(?=[\s\S]*'unanswered-count')(?=[\s\S]*'button-label')(?=[\s\S]*'button-aria')(?=[\s\S]*'button-disabled')(?=[\s\S]*'button-describedby')(?=[\s\S]*'confirm-incomplete-state')(?=[\s\S]*'hint-count')(?=[\s\S]*'unanswered-hint')(?=[\s\S]*'confirm-incomplete-hint')(?=[\s\S]*'read-only-hint')(?=[\s\S]*'submit-action-boundary')(?=[\s\S]*'identity-privacy')(?=[\s\S]*'payload-privacy')(?=[\s\S]*'privacy-guard')[\s\S]*export type StudentRunnerSubmitControlsHandoffPrivacyContract = \{[\s\S]*exposesAnonymousToken: false;[\s\S]*exposesAnswerText: false;[\s\S]*exposesRawSubmissionPayload: false;[\s\S]*exposesRuntimeItemIds: false;[\s\S]*exposesStudentName: false;[\s\S]*exposesTeacherOnlyAnswers: false;[\s\S]*exposesTeacherSourceMaterials: false;[\s\S]*scope: 'public-student-runner-submit-controls';/,
-  'Student runner submit controls handoff should expose a typed 20-slice contract with explicit privacy flags and scope.'
+  /export const STUDENT_RUNNER_SUBMIT_CONTROLS_HANDOFF_ITEM_IDS = \[(?=[\s\S]*'controls-region')(?=[\s\S]*'readiness-status')(?=[\s\S]*'readiness-items')(?=[\s\S]*'readiness-share-link')(?=[\s\S]*'readiness-runtime-items')(?=[\s\S]*'readiness-completion')(?=[\s\S]*'readiness-confirmation')(?=[\s\S]*'readiness-submission-state')(?=[\s\S]*'payload-summary')(?=[\s\S]*'payload-metrics')(?=[\s\S]*'payload-share-link')(?=[\s\S]*'payload-item-count')(?=[\s\S]*'payload-answer-count')(?=[\s\S]*'completion-counts')(?=[\s\S]*'unanswered-count')(?=[\s\S]*'button-label')(?=[\s\S]*'button-aria')(?=[\s\S]*'button-disabled')(?=[\s\S]*'disabled-policy')(?=[\s\S]*'button-describedby')(?=[\s\S]*'confirm-incomplete-state')(?=[\s\S]*'hint-count')(?=[\s\S]*'hint-order')(?=[\s\S]*'unanswered-hint')(?=[\s\S]*'confirm-incomplete-hint')(?=[\s\S]*'read-only-hint')(?=[\s\S]*'submit-action-boundary')(?=[\s\S]*'identity-privacy')(?=[\s\S]*'payload-privacy')(?=[\s\S]*'privacy-guard')[\s\S]*export type StudentRunnerSubmitControlsHandoffPrivacyContract = \{[\s\S]*exposesAnonymousToken: false;[\s\S]*exposesAnswerText: false;[\s\S]*exposesRawSubmissionPayload: false;[\s\S]*exposesRuntimeItemIds: false;[\s\S]*exposesStudentName: false;[\s\S]*exposesTeacherOnlyAnswers: false;[\s\S]*exposesTeacherSourceMaterials: false;[\s\S]*scope: 'public-student-runner-submit-controls';/,
+  'Student runner submit controls handoff should expose a typed 30-slice contract with explicit privacy flags and scope.'
 );
 assert.deepEqual(
   [...STUDENT_RUNNER_SUBMIT_CONTROLS_HANDOFF_ITEM_IDS],
@@ -15837,16 +15837,26 @@ assert.deepEqual(
     'controls-region',
     'readiness-status',
     'readiness-items',
+    'readiness-share-link',
+    'readiness-runtime-items',
+    'readiness-completion',
+    'readiness-confirmation',
+    'readiness-submission-state',
     'payload-summary',
     'payload-metrics',
+    'payload-share-link',
+    'payload-item-count',
+    'payload-answer-count',
     'completion-counts',
     'unanswered-count',
     'button-label',
     'button-aria',
     'button-disabled',
+    'disabled-policy',
     'button-describedby',
     'confirm-incomplete-state',
     'hint-count',
+    'hint-order',
     'unanswered-hint',
     'confirm-incomplete-hint',
     'read-only-hint',
@@ -15855,12 +15865,12 @@ assert.deepEqual(
     'payload-privacy',
     'privacy-guard',
   ],
-  'Student runner submit controls handoff should expose exactly 20 stable slice ids.'
+  'Student runner submit controls handoff should expose exactly 30 stable slice ids.'
 );
 assert.match(
   studentRunnerSubmitControlsHandoffSource,
-  /export function buildStudentRunnerSubmitControlsHandoffView\([\s\S]*controlView: StudentRunnerControlView[\s\S]*answeredValue = getPayloadMetricValue\(controlView, 'answers'\)[\s\S]*itemValue = getPayloadMetricValue\(controlView, 'items'\)[\s\S]*unansweredValue = getPayloadMetricValue\(controlView, 'unanswered'\)[\s\S]*hasConfirmIncompleteHint: hasSubmitHint\(controlView, 'confirm-incomplete'\)[\s\S]*hasReadOnlyHint: hasSubmitHint\(controlView, 'read-only'\)[\s\S]*hasUnansweredHint: hasSubmitHint\(controlView, 'unanswered'\)[\s\S]*privacy: buildStudentRunnerSubmitControlsHandoffPrivacyContract/,
-  'Student runner submit controls handoff should derive safe counts, hint state, and privacy from the prepared control view.'
+  /export function buildStudentRunnerSubmitControlsHandoffView\([\s\S]*controlView: StudentRunnerControlView[\s\S]*answeredValue = getPayloadMetricValue\(controlView, 'answers'\)[\s\S]*itemValue = getPayloadMetricValue\(controlView, 'items'\)[\s\S]*unansweredValue = getPayloadMetricValue\(controlView, 'unanswered'\)[\s\S]*const hasReadOnlyHint = hasSubmitHint\(controlView, 'read-only'\)[\s\S]*hasConfirmIncompleteHint: hasSubmitHint\(controlView, 'confirm-incomplete'\)[\s\S]*hasReadOnlyHint,[\s\S]*hasUnansweredHint: hasSubmitHint\(controlView, 'unanswered'\)[\s\S]*submitDisabledPolicy: formatSubmitDisabledPolicy[\s\S]*submitHintOrder: formatSubmitHintOrder\(controlView\)[\s\S]*privacy: buildStudentRunnerSubmitControlsHandoffPrivacyContract/,
+  'Student runner submit controls handoff should derive safe counts, readiness details, hint order, disabled policy, and privacy from the prepared control view.'
 );
 assert.match(
   studentRunnerSubmitControlsSource,
@@ -16078,7 +16088,7 @@ const studentSubmitControlsHandoffValues = new Map(
 assert.deepEqual(
   studentSubmitControlsHandoffView.itemViews.map((item) => item.id),
   [...STUDENT_RUNNER_SUBMIT_CONTROLS_HANDOFF_ITEM_IDS],
-  'Student runner submit controls handoff should expose the stable 20-slice order from the prepared control view.'
+  'Student runner submit controls handoff should expose the stable 30-slice order from the prepared control view.'
 );
 assert.deepEqual(studentSubmitControlsHandoffView.privacy, {
   exposesAnonymousToken: false,
@@ -16105,6 +16115,30 @@ assert.equal(
   'Needs review'
 );
 assert.equal(
+  studentSubmitControlsHandoffValues.get('readiness-share-link'),
+  'Ready'
+);
+assert.equal(
+  studentSubmitControlsHandoffValues.get('readiness-completion'),
+  'Needs review'
+);
+assert.equal(
+  studentSubmitControlsHandoffValues.get('readiness-confirmation'),
+  'Ready'
+);
+assert.equal(
+  studentSubmitControlsHandoffValues.get('payload-share-link'),
+  'Present'
+);
+assert.equal(
+  studentSubmitControlsHandoffValues.get('payload-item-count'),
+  String(studentSubmissionStarterPreview.runtimeItems.length)
+);
+assert.equal(
+  studentSubmitControlsHandoffValues.get('payload-answer-count'),
+  '1'
+);
+assert.equal(
   studentSubmitControlsHandoffValues.get('completion-counts'),
   `1/${studentSubmissionStarterPreview.runtimeItems.length}`
 );
@@ -16115,6 +16149,14 @@ assert.equal(
 assert.equal(
   studentSubmitControlsHandoffValues.get('confirm-incomplete-hint'),
   'Yes'
+);
+assert.equal(
+  studentSubmitControlsHandoffValues.get('disabled-policy'),
+  'Enabled'
+);
+assert.equal(
+  studentSubmitControlsHandoffValues.get('hint-order'),
+  'unanswered · confirm-incomplete'
 );
 assert.equal(
   studentSubmitControlsHandoffValues.get('submit-action-boundary'),
