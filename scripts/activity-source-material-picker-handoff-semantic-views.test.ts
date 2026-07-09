@@ -256,7 +256,7 @@ test('source material picker handoff renders inside the activity editor field', 
   );
   assert.match(
     COMPONENT_SOURCE,
-    /ActivitySourceMaterialPickerHandoffView[\s\S]*function ActivitySourceMaterialPickerHandoff[\s\S]*const titleId = 'activity-source-material-picker-handoff-title'[\s\S]*const descriptionId = 'activity-source-material-picker-handoff-description'[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*aria-labelledby=\{titleId\}[\s\S]*className="sr-only"[\s\S]*data-handoff="activity-source-material-picker"[\s\S]*id=\{titleId\}[\s\S]*id=\{descriptionId\}[\s\S]*handoffView\.itemViews\.map[\s\S]*ActivitySourceMaterialPickerHandoffItem[\s\S]*function ActivitySourceMaterialPickerHandoffItem[\s\S]*itemView: ActivitySourceMaterialPickerHandoffView\['itemViews'\]\[number\][\s\S]*const labelId = `activity-source-material-picker-handoff-\$\{itemView\.id\}-label`[\s\S]*const valueId = `activity-source-material-picker-handoff-\$\{itemView\.id\}-value`[\s\S]*const descriptionId =[\s\S]*`activity-source-material-picker-handoff-\$\{itemView\.id\}-description`[\s\S]*data-handoff-item=\{itemView\.id\}[\s\S]*id=\{labelId\}[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*aria-label=\{itemView\.ariaLabel\}[\s\S]*aria-labelledby=\{`\$\{labelId\} \$\{valueId\}`\}[\s\S]*id=\{valueId\}[\s\S]*id=\{descriptionId\}/
+    /ActivitySourceMaterialPickerHandoffView[\s\S]*function ActivitySourceMaterialPickerHandoff[\s\S]*const titleId = 'activity-source-material-picker-handoff-title'[\s\S]*const descriptionId = 'activity-source-material-picker-handoff-description'[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*aria-labelledby=\{titleId\}[\s\S]*className="sr-only"[\s\S]*data-handoff="activity-source-material-picker"[\s\S]*data-handoff-scope=\{handoffView\.privacy\.scope\}[\s\S]*id=\{titleId\}[\s\S]*id=\{descriptionId\}[\s\S]*handoffView\.itemViews\.map[\s\S]*ActivitySourceMaterialPickerHandoffItem[\s\S]*function ActivitySourceMaterialPickerHandoffItem[\s\S]*itemView: ActivitySourceMaterialPickerHandoffView\['itemViews'\]\[number\][\s\S]*const labelId = `activity-source-material-picker-handoff-\$\{itemView\.id\}-label`[\s\S]*const valueId = `activity-source-material-picker-handoff-\$\{itemView\.id\}-value`[\s\S]*const descriptionId =[\s\S]*`activity-source-material-picker-handoff-\$\{itemView\.id\}-description`[\s\S]*data-handoff-item=\{itemView\.id\}[\s\S]*id=\{labelId\}[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*aria-label=\{itemView\.ariaLabel\}[\s\S]*aria-labelledby=\{`\$\{labelId\} \$\{valueId\}`\}[\s\S]*id=\{valueId\}[\s\S]*id=\{descriptionId\}/
   );
 });
 
@@ -286,6 +286,7 @@ test('source material picker focused gate is documented', () => {
     'file-id guard',
     'filename display boundary',
     'storage-key guard',
+    'source material picker privacy-scope boundaries',
     'hidden activity-source-material-picker handoff',
   ]) {
     assert.match(normalizedCatalog, new RegExp(boundary));

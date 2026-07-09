@@ -138,6 +138,7 @@ function ActivitySourceMaterialPickerHandoff({
       aria-labelledby={titleId}
       className="sr-only"
       data-handoff="activity-source-material-picker"
+      data-handoff-scope={handoffView.privacy.scope}
     >
       <h4 id={titleId}>{handoffView.title}</h4>
       <p id={descriptionId}>{handoffView.description}</p>

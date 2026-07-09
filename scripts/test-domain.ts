@@ -5408,7 +5408,7 @@ assert.match(
 );
 assert.match(
   activitySourceMaterialsFieldSource,
-  /ActivitySourceMaterialPickerHandoff[\s\S]*data-handoff="activity-source-material-picker"[\s\S]*handoffView\.itemViews\.map[\s\S]*ActivitySourceMaterialPickerHandoffItem[\s\S]*const labelId = `activity-source-material-picker-handoff-\$\{itemView\.id\}-label`[\s\S]*const valueId = `activity-source-material-picker-handoff-\$\{itemView\.id\}-value`[\s\S]*const descriptionId =[\s\S]*`activity-source-material-picker-handoff-\$\{itemView\.id\}-description`[\s\S]*data-handoff-item=\{itemView\.id\}[\s\S]*id=\{labelId\}[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*aria-label=\{itemView\.ariaLabel\}[\s\S]*aria-labelledby=\{`\$\{labelId\} \$\{valueId\}`\}[\s\S]*id=\{valueId\}[\s\S]*id=\{descriptionId\}/,
+  /ActivitySourceMaterialPickerHandoff[\s\S]*data-handoff="activity-source-material-picker"[\s\S]*data-handoff-scope=\{handoffView\.privacy\.scope\}[\s\S]*handoffView\.itemViews\.map[\s\S]*ActivitySourceMaterialPickerHandoffItem[\s\S]*const labelId = `activity-source-material-picker-handoff-\$\{itemView\.id\}-label`[\s\S]*const valueId = `activity-source-material-picker-handoff-\$\{itemView\.id\}-value`[\s\S]*const descriptionId =[\s\S]*`activity-source-material-picker-handoff-\$\{itemView\.id\}-description`[\s\S]*data-handoff-item=\{itemView\.id\}[\s\S]*id=\{labelId\}[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*aria-label=\{itemView\.ariaLabel\}[\s\S]*aria-labelledby=\{`\$\{labelId\} \$\{valueId\}`\}[\s\S]*id=\{valueId\}[\s\S]*id=\{descriptionId\}/,
   'Activity source-material picker handoff should render stable label/value/description output relationships.'
 );
 assert.match(
