@@ -112,6 +112,7 @@ function ActivityEditRouteHandoff({
       aria-labelledby={titleId}
       className="sr-only"
       data-handoff="activity-edit-route"
+      data-handoff-scope={handoffView.privacy.scope}
     >
       <h2 id={titleId}>{handoffView.title}</h2>
       <p id={descriptionId}>{handoffView.description}</p>

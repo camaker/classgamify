@@ -1812,6 +1812,11 @@ assert.match(
 );
 assert.match(
   activityEditRouteSource,
+  /ActivityEditRouteHandoffView[\s\S]*function ActivityEditRouteHandoff[\s\S]*const titleId = 'activity-edit-route-handoff-title'[\s\S]*const descriptionId = 'activity-edit-route-handoff-description'[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*aria-labelledby=\{titleId\}[\s\S]*className="sr-only"[\s\S]*data-handoff="activity-edit-route"[\s\S]*data-handoff-scope=\{handoffView\.privacy\.scope\}[\s\S]*id=\{titleId\}[\s\S]*id=\{descriptionId\}[\s\S]*handoffView\.itemViews\.map[\s\S]*ActivityEditRouteHandoffItem[\s\S]*function ActivityEditRouteHandoffItem[\s\S]*item: ActivityEditRouteHandoffView\['itemViews'\]\[number\][\s\S]*const labelId = `activity-edit-route-handoff-\$\{item\.id\}-label`[\s\S]*const valueId = `activity-edit-route-handoff-\$\{item\.id\}-value`[\s\S]*const descriptionId = `activity-edit-route-handoff-\$\{item\.id\}-description`[\s\S]*data-handoff-item=\{item\.id\}[\s\S]*id=\{labelId\}[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*aria-label=\{item\.ariaLabel\}[\s\S]*aria-labelledby=\{`\$\{labelId\} \$\{valueId\}`\}[\s\S]*id=\{valueId\}[\s\S]*id=\{descriptionId\}/,
+  'The activity edit route should render its hidden 30-slice handoff with privacy scope and stable label, value, and description relationships.'
+);
+assert.match(
+  activityEditRouteSource,
   /routeState\.status === 'loading'[\s\S]*routeState\.status === 'error'[\s\S]*routeState\.status === 'blocked'[\s\S]*routeState\.status === 'ready'/,
   'The activity edit route should render loading, error, blocked, and ready states from the activity-domain route state.'
 );

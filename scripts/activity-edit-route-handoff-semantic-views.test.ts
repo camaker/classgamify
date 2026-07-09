@@ -364,7 +364,7 @@ test('activity edit route handoff localizes Chinese editor hydration boundaries'
 test('activity edit route handoff renders stable DOM relationships', () => {
   assert.match(
     ACTIVITY_EDIT_ROUTE_SOURCE,
-    /ActivityEditRouteHandoffView[\s\S]*function ActivityEditRouteHandoff[\s\S]*const titleId = 'activity-edit-route-handoff-title'[\s\S]*const descriptionId = 'activity-edit-route-handoff-description'[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*aria-labelledby=\{titleId\}[\s\S]*className="sr-only"[\s\S]*data-handoff="activity-edit-route"[\s\S]*id=\{titleId\}[\s\S]*id=\{descriptionId\}[\s\S]*handoffView\.itemViews\.map[\s\S]*ActivityEditRouteHandoffItem[\s\S]*function ActivityEditRouteHandoffItem[\s\S]*item: ActivityEditRouteHandoffView\['itemViews'\]\[number\][\s\S]*const labelId = `activity-edit-route-handoff-\$\{item\.id\}-label`[\s\S]*const valueId = `activity-edit-route-handoff-\$\{item\.id\}-value`[\s\S]*const descriptionId = `activity-edit-route-handoff-\$\{item\.id\}-description`[\s\S]*data-handoff-item=\{item\.id\}[\s\S]*id=\{labelId\}[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*aria-label=\{item\.ariaLabel\}[\s\S]*aria-labelledby=\{`\$\{labelId\} \$\{valueId\}`\}[\s\S]*id=\{valueId\}[\s\S]*id=\{descriptionId\}/,
+    /ActivityEditRouteHandoffView[\s\S]*function ActivityEditRouteHandoff[\s\S]*const titleId = 'activity-edit-route-handoff-title'[\s\S]*const descriptionId = 'activity-edit-route-handoff-description'[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*aria-labelledby=\{titleId\}[\s\S]*className="sr-only"[\s\S]*data-handoff="activity-edit-route"[\s\S]*data-handoff-scope=\{handoffView\.privacy\.scope\}[\s\S]*id=\{titleId\}[\s\S]*id=\{descriptionId\}[\s\S]*handoffView\.itemViews\.map[\s\S]*ActivityEditRouteHandoffItem[\s\S]*function ActivityEditRouteHandoffItem[\s\S]*item: ActivityEditRouteHandoffView\['itemViews'\]\[number\][\s\S]*const labelId = `activity-edit-route-handoff-\$\{item\.id\}-label`[\s\S]*const valueId = `activity-edit-route-handoff-\$\{item\.id\}-value`[\s\S]*const descriptionId = `activity-edit-route-handoff-\$\{item\.id\}-description`[\s\S]*data-handoff-item=\{item\.id\}[\s\S]*id=\{labelId\}[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*aria-label=\{item\.ariaLabel\}[\s\S]*aria-labelledby=\{`\$\{labelId\} \$\{valueId\}`\}[\s\S]*id=\{valueId\}[\s\S]*id=\{descriptionId\}/,
     'Activity edit route handoff should render each hydration slice with stable label, value, and description relationships.'
   );
 });
@@ -388,6 +388,7 @@ test('activity edit route focused gate is documented', () => {
     'future assignment boundaries',
     'snapshot protection',
     'save targets',
+    'activity edit-route privacy-scope boundaries',
     'hidden activity edit-route handoff',
   ]) {
     assert.match(

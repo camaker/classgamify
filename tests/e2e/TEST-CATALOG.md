@@ -225,8 +225,8 @@ run it when changing saved-activity loading, owner-scoped edit access,
 archived restore gates, editor mode selection, CreateActivityInput hydration,
 title/description/template/visibility/learning-goal fields, structured content
 row counts, source-material reference hydration, readiness after load, future
-assignment boundaries, snapshot protection, save targets, or the hidden activity
-edit-route handoff.
+assignment boundaries, snapshot protection, save targets, activity edit-route
+privacy-scope boundaries, or the hidden activity edit-route handoff.
 Activity editor workflow has a fast script-level gate via
 `pnpm exec tsx --test scripts/activity-editor-workflow-handoff-semantic-views.test.ts`;
 run it when changing page layout, workflow navigation, form sections, AI draft
