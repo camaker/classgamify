@@ -249,7 +249,8 @@ run it when changing owner-scoped duplicate availability, persisted-source
 requirements, archived restore gates, draft visibility reset, duplicate title
 strategy/limit, template preservation, structured content cloning, source
 material reference normalization, assignment snapshot protection, original
-activity protection, or the hidden activity duplicate handoff.
+activity protection, activity duplicate privacy-scope boundaries, or the hidden
+activity duplicate handoff.
 Activity lifecycle archive and restore boundaries have a fast script-level gate
 via `pnpm exec tsx --test scripts/activity-lifecycle-handoff-semantic-views.test.ts`;
 run it when changing owner-scoped archive and restore actions, active and

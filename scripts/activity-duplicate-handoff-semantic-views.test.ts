@@ -328,7 +328,7 @@ test('activity duplicate handoff localizes Chinese draft-copy boundaries', () =>
 test('activity duplicate handoff renders stable DOM relationships', () => {
   assert.match(
     ACTIVITY_LIBRARY_CARD_SOURCE,
-    /ActivityDuplicateHandoffItemView[\s\S]*ActivityDuplicateHandoffView[\s\S]*function ActivityLibraryDuplicateHandoff[\s\S]*const titleId = useId\(\)[\s\S]*const descriptionId = useId\(\)[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*aria-labelledby=\{titleId\}[\s\S]*className="sr-only"[\s\S]*data-handoff="activity-duplicate"[\s\S]*id=\{titleId\}[\s\S]*id=\{descriptionId\}[\s\S]*handoff\.itemViews\.map[\s\S]*ActivityLibraryDuplicateHandoffItem[\s\S]*function ActivityLibraryDuplicateHandoffItem[\s\S]*const labelId = `activity-duplicate-handoff-\$\{item\.id\}-label`[\s\S]*const valueId = `activity-duplicate-handoff-\$\{item\.id\}-value`[\s\S]*const descriptionId = `activity-duplicate-handoff-\$\{item\.id\}-description`[\s\S]*data-handoff-item=\{item\.id\}[\s\S]*id=\{labelId\}[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*aria-label=\{item\.ariaLabel\}[\s\S]*aria-labelledby=\{`\$\{labelId\} \$\{valueId\}`\}[\s\S]*id=\{valueId\}[\s\S]*id=\{descriptionId\}/,
+    /ActivityDuplicateHandoffItemView[\s\S]*ActivityDuplicateHandoffView[\s\S]*function ActivityLibraryDuplicateHandoff[\s\S]*const titleId = useId\(\)[\s\S]*const descriptionId = useId\(\)[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*aria-labelledby=\{titleId\}[\s\S]*className="sr-only"[\s\S]*data-handoff="activity-duplicate"[\s\S]*data-handoff-scope=\{handoff\.privacy\.scope\}[\s\S]*id=\{titleId\}[\s\S]*id=\{descriptionId\}[\s\S]*handoff\.itemViews\.map[\s\S]*ActivityLibraryDuplicateHandoffItem[\s\S]*function ActivityLibraryDuplicateHandoffItem[\s\S]*const labelId = `activity-duplicate-handoff-\$\{item\.id\}-label`[\s\S]*const valueId = `activity-duplicate-handoff-\$\{item\.id\}-value`[\s\S]*const descriptionId = `activity-duplicate-handoff-\$\{item\.id\}-description`[\s\S]*data-handoff-item=\{item\.id\}[\s\S]*id=\{labelId\}[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*aria-label=\{item\.ariaLabel\}[\s\S]*aria-labelledby=\{`\$\{labelId\} \$\{valueId\}`\}[\s\S]*id=\{valueId\}[\s\S]*id=\{descriptionId\}/,
     'Activity duplicate handoff should render each draft-copy slice with stable label, value, and description relationships.'
   );
 });
@@ -350,6 +350,7 @@ test('activity duplicate focused gate is documented', () => {
     'source material reference normalization',
     'assignment snapshot protection',
     'original activity protection',
+    'activity duplicate privacy-scope boundaries',
     'hidden activity duplicate handoff',
   ]) {
     assert.match(

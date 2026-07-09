@@ -50156,6 +50156,11 @@ assert.match(
   'Activity duplicate handoff should build stable item views and privacy from the duplicate domain.'
 );
 assert.match(
+  activityLibraryCardComponentSource,
+  /ActivityDuplicateHandoffItemView[\s\S]*ActivityDuplicateHandoffView[\s\S]*function ActivityLibraryDuplicateHandoff[\s\S]*const titleId = useId\(\)[\s\S]*const descriptionId = useId\(\)[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*aria-labelledby=\{titleId\}[\s\S]*className="sr-only"[\s\S]*data-handoff="activity-duplicate"[\s\S]*data-handoff-scope=\{handoff\.privacy\.scope\}[\s\S]*id=\{titleId\}[\s\S]*id=\{descriptionId\}[\s\S]*handoff\.itemViews\.map[\s\S]*ActivityLibraryDuplicateHandoffItem[\s\S]*function ActivityLibraryDuplicateHandoffItem[\s\S]*const labelId = `activity-duplicate-handoff-\$\{item\.id\}-label`[\s\S]*const valueId = `activity-duplicate-handoff-\$\{item\.id\}-value`[\s\S]*const descriptionId = `activity-duplicate-handoff-\$\{item\.id\}-description`[\s\S]*data-handoff-item=\{item\.id\}[\s\S]*id=\{labelId\}[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*aria-label=\{item\.ariaLabel\}[\s\S]*aria-labelledby=\{`\$\{labelId\} \$\{valueId\}`\}[\s\S]*id=\{valueId\}[\s\S]*id=\{descriptionId\}/,
+  'Activity duplicate handoff should render privacy scope plus stable label, value, and description relationships.'
+);
+assert.match(
   activityDuplicateSource,
   /function buildActivityDuplicateHandoffSummary[\s\S]*normalizeActivityMaterialReferences\([\s\S]*content\.sourceMaterials[\s\S]*buildDuplicatedActivityTitle\(title\)[\s\S]*getTemplateByType\(templateType\)\.name[\s\S]*ACTIVITY_TITLE_LENGTH\.max/,
   'Activity duplicate handoff summary should derive title, content counts, template label, material references, and title limits from existing activity-domain helpers.'
