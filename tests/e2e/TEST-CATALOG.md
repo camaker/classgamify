@@ -39,6 +39,11 @@ Fast-gate inventory has a script-level gate via
 `pnpm exec tsx --test scripts/test-catalog-fast-gate-inventory.test.ts`; run it
 when changing TEST-CATALOG script references, adding or removing local
 product-gate scripts, or renaming focused script-level checks.
+Handoff item inventory has a script-level gate via
+`pnpm exec tsx --test scripts/handoff-item-inventory.test.ts`; run it when
+adding, renaming, splitting, or trimming exported `*_HANDOFF_ITEM_IDS`
+contracts, changing 30-item handoff arrays, or editing semantic item id
+boundaries that should remain unique kebab-case item ids.
 Public product entry gates include
 `pnpm exec tsx --test scripts/home-product-loop-handoff-semantic-views.test.ts`,
 `pnpm exec tsx --test scripts/public-navigation-handoff-semantic-views.test.ts`,
