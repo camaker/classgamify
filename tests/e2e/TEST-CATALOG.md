@@ -297,7 +297,8 @@ Printable worksheet handoff has a fast script-level gate via
 `pnpm exec tsx --test scripts/printable-worksheet-handoff-semantic-views.test.ts`;
 run it when changing print-route search parsing, worksheet response policies,
 frozen snapshot worksheet generation, delivery-policy printing, answer-key
-toggle behavior, accepted-answer/explanation rendering, or the print toolbar.
+toggle behavior, privacy-scope boundaries, accepted-answer/explanation
+rendering, or the print toolbar.
 Open-box reveal-card runtime has a fast script-level gate via
 `pnpm exec tsx --test scripts/open-box-reveal-handoff-semantic-views.test.ts`;
 run it when changing reveal-card state, box and prompt counts, navigation

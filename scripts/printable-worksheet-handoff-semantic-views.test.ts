@@ -61,6 +61,7 @@ test('printable worksheet handoff exposes 30 paper handoff slices safely', () =>
     exposesPromptText: false,
     exposesStudentResponseText: false,
     itemIds: [...PRINTABLE_WORKSHEET_HANDOFF_ITEM_IDS],
+    scope: 'teacher-printable-worksheet',
   });
   assert.equal(
     getHandoffItemValue(pageView, 'answer-key'),
@@ -359,8 +360,8 @@ test('printable worksheet handoff renders stable DOM item relationships', () => 
 
   assert.match(
     source,
-    /PrintableWorksheetHandoffItemView[\s\S]*PrintableWorksheetHandoffView[\s\S]*data-handoff="printable-worksheet"[\s\S]*view\.itemViews\.map[\s\S]*PrintableWorksheetHandoffItem[\s\S]*function PrintableWorksheetHandoffItem[\s\S]*const labelId = `printable-worksheet-handoff-\$\{itemView\.id\}-label`[\s\S]*const valueId = `printable-worksheet-handoff-\$\{itemView\.id\}-value`[\s\S]*const descriptionId = `printable-worksheet-handoff-\$\{itemView\.id\}-description`[\s\S]*data-handoff-item=\{itemView\.id\}[\s\S]*id=\{labelId\}[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*aria-label=\{itemView\.ariaLabel\}[\s\S]*aria-labelledby=\{`\$\{labelId\} \$\{valueId\}`\}[\s\S]*id=\{valueId\}[\s\S]*id=\{descriptionId\}/,
-    'Printable worksheet handoff should render each paper handoff item with stable label, value, and description relationships.'
+    /PrintableWorksheetHandoffItemView[\s\S]*PrintableWorksheetHandoffView[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*aria-labelledby=\{titleId\}[\s\S]*data-handoff="printable-worksheet"[\s\S]*data-handoff-scope=\{view\.privacy\.scope\}[\s\S]*view\.itemViews\.map[\s\S]*PrintableWorksheetHandoffItem[\s\S]*function PrintableWorksheetHandoffItem[\s\S]*const labelId = `printable-worksheet-handoff-\$\{itemView\.id\}-label`[\s\S]*const valueId = `printable-worksheet-handoff-\$\{itemView\.id\}-value`[\s\S]*const descriptionId = `printable-worksheet-handoff-\$\{itemView\.id\}-description`[\s\S]*data-handoff-item=\{itemView\.id\}[\s\S]*id=\{labelId\}[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*aria-label=\{itemView\.ariaLabel\}[\s\S]*aria-labelledby=\{`\$\{labelId\} \$\{valueId\}`\}[\s\S]*id=\{valueId\}[\s\S]*id=\{descriptionId\}/,
+    'Printable worksheet handoff should render each paper handoff item with privacy scope plus stable label, value, and description relationships.'
   );
 });
 

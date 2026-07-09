@@ -27972,6 +27972,7 @@ assert.deepEqual(printableWorksheetPageView.handoffView.privacy, {
   exposesPromptText: false,
   exposesStudentResponseText: false,
   itemIds: [...PRINTABLE_WORKSHEET_HANDOFF_ITEM_IDS],
+  scope: 'teacher-printable-worksheet',
 });
 assert.equal(
   printableWorksheetHandoffValues.get('handout-overview'),
@@ -37099,8 +37100,8 @@ assert.match(
 );
 assert.match(
   printableWorksheetViewSource,
-  /export const PRINTABLE_WORKSHEET_HANDOFF_ITEM_IDS = \[[\s\S]*'handout-overview'[\s\S]*'preparation-metric-count'[\s\S]*'student-fields'[\s\S]*'response-plan'[\s\S]*'answer-key'[\s\S]*'answer-key-access'[\s\S]*'answer-key-toggle-boundary'[\s\S]*'printable-items'[\s\S]*'response-modes'[\s\S]*'choice-bank-coverage'[\s\S]*'choice-bank-choice-count'[\s\S]*'writing-area-coverage'[\s\S]*'answer-line-count'[\s\S]*'item-response-help'[\s\S]*'assignment-field-count'[\s\S]*'student-name-field'[\s\S]*'date-field'[\s\S]*'score-field'[\s\S]*'share-path'[\s\S]*'template'[\s\S]*'snapshot-source'[\s\S]*'instructions'[\s\S]*'delivery-policy'[\s\S]*'answer-key-items'[\s\S]*'answer-key-details'[\s\S]*'results-return'[\s\S]*'print-action'[\s\S]*'print-route-boundary'[\s\S]*'public-runner-boundary'[\s\S]*'privacy-guard'[\s\S]*\] as const;[\s\S]*export type PrintableWorksheetHandoffItemId =\s*\n\s*\(typeof PRINTABLE_WORKSHEET_HANDOFF_ITEM_IDS\)\[number\];[\s\S]*export type PrintableWorksheetHandoffPrivacyContract = \{[\s\S]*exposesAnswerKeyText: false;[\s\S]*exposesChoiceText: false;[\s\S]*exposesPromptText: false;[\s\S]*exposesStudentResponseText: false;[\s\S]*itemIds: PrintableWorksheetHandoffItemId\[\];/,
-  'Printable worksheet handoff should expose a typed 30-slice paper handoff contract derived from stable exported ids with explicit privacy flags.'
+  /export const PRINTABLE_WORKSHEET_HANDOFF_ITEM_IDS = \[[\s\S]*'handout-overview'[\s\S]*'preparation-metric-count'[\s\S]*'student-fields'[\s\S]*'response-plan'[\s\S]*'answer-key'[\s\S]*'answer-key-access'[\s\S]*'answer-key-toggle-boundary'[\s\S]*'printable-items'[\s\S]*'response-modes'[\s\S]*'choice-bank-coverage'[\s\S]*'choice-bank-choice-count'[\s\S]*'writing-area-coverage'[\s\S]*'answer-line-count'[\s\S]*'item-response-help'[\s\S]*'assignment-field-count'[\s\S]*'student-name-field'[\s\S]*'date-field'[\s\S]*'score-field'[\s\S]*'share-path'[\s\S]*'template'[\s\S]*'snapshot-source'[\s\S]*'instructions'[\s\S]*'delivery-policy'[\s\S]*'answer-key-items'[\s\S]*'answer-key-details'[\s\S]*'results-return'[\s\S]*'print-action'[\s\S]*'print-route-boundary'[\s\S]*'public-runner-boundary'[\s\S]*'privacy-guard'[\s\S]*\] as const;[\s\S]*export type PrintableWorksheetHandoffItemId =\s*\n\s*\(typeof PRINTABLE_WORKSHEET_HANDOFF_ITEM_IDS\)\[number\];[\s\S]*export type PrintableWorksheetHandoffPrivacyContract = \{[\s\S]*exposesAnswerKeyText: false;[\s\S]*exposesChoiceText: false;[\s\S]*exposesPromptText: false;[\s\S]*exposesStudentResponseText: false;[\s\S]*itemIds: PrintableWorksheetHandoffItemId\[\];[\s\S]*scope: 'teacher-printable-worksheet';/,
+  'Printable worksheet handoff should expose a typed 30-slice paper handoff contract derived from stable exported ids with explicit privacy flags and scope.'
 );
 assert.deepEqual(
   [...PRINTABLE_WORKSHEET_HANDOFF_ITEM_IDS],
@@ -37306,8 +37307,8 @@ assert.doesNotMatch(
 );
 assert.match(
   printableWorksheetHandoffSource,
-  /PrintableWorksheetHandoffItemView[\s\S]*PrintableWorksheetHandoffView[\s\S]*data-handoff="printable-worksheet"[\s\S]*view\.itemViews\.map[\s\S]*PrintableWorksheetHandoffItem[\s\S]*function PrintableWorksheetHandoffItem[\s\S]*const labelId = `printable-worksheet-handoff-\$\{itemView\.id\}-label`[\s\S]*const valueId = `printable-worksheet-handoff-\$\{itemView\.id\}-value`[\s\S]*const descriptionId = `printable-worksheet-handoff-\$\{itemView\.id\}-description`[\s\S]*data-handoff-item=\{itemView\.id\}[\s\S]*id=\{labelId\}[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*aria-label=\{itemView\.ariaLabel\}[\s\S]*aria-labelledby=\{`\$\{labelId\} \$\{valueId\}`\}[\s\S]*id=\{valueId\}[\s\S]*id=\{descriptionId\}/,
-  'Printable worksheet handoff component should render hidden stable handoff outputs with prepared label, value, and description relationships.'
+  /PrintableWorksheetHandoffItemView[\s\S]*PrintableWorksheetHandoffView[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*aria-labelledby=\{titleId\}[\s\S]*data-handoff="printable-worksheet"[\s\S]*data-handoff-scope=\{view\.privacy\.scope\}[\s\S]*view\.itemViews\.map[\s\S]*PrintableWorksheetHandoffItem[\s\S]*function PrintableWorksheetHandoffItem[\s\S]*const labelId = `printable-worksheet-handoff-\$\{itemView\.id\}-label`[\s\S]*const valueId = `printable-worksheet-handoff-\$\{itemView\.id\}-value`[\s\S]*const descriptionId = `printable-worksheet-handoff-\$\{itemView\.id\}-description`[\s\S]*data-handoff-item=\{itemView\.id\}[\s\S]*id=\{labelId\}[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*aria-label=\{itemView\.ariaLabel\}[\s\S]*aria-labelledby=\{`\$\{labelId\} \$\{valueId\}`\}[\s\S]*id=\{valueId\}[\s\S]*id=\{descriptionId\}/,
+  'Printable worksheet handoff component should render hidden stable handoff outputs with privacy scope plus prepared label, value, and description relationships.'
 );
 assert.match(
   printableWorksheetToolbarSource,
@@ -37749,6 +37750,11 @@ assert.match(
   e2eTestCatalogText,
   /hidden localized 30-slice printable worksheet handoff[\s\S]*handout overview[\s\S]*public-runner boundary[\s\S]*privacy guard/,
   'E2E catalog should cover the printable worksheet hidden 30-slice handoff contract.'
+);
+assert.match(
+  e2eTestCatalogText,
+  /scripts\/printable-worksheet-handoff-semantic-views\.test\.ts[\s\S]*privacy-scope boundaries/,
+  'E2E catalog should document the printable worksheet privacy-scope fast gate.'
 );
 assert.match(
   e2eTestCatalogText,

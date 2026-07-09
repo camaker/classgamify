@@ -119,6 +119,7 @@ export type PrintableWorksheetHandoffPrivacyContract = {
   exposesPromptText: false;
   exposesStudentResponseText: false;
   itemIds: PrintableWorksheetHandoffItemId[];
+  scope: 'teacher-printable-worksheet';
 };
 
 export type PrintableWorksheetHandoffView = {
@@ -990,6 +991,7 @@ function buildPrintableWorksheetHandoffPrivacyContract(
     exposesPromptText: false,
     exposesStudentResponseText: false,
     itemIds: itemViews.map((itemView) => itemView.id),
+    scope: 'teacher-printable-worksheet',
   };
 }
 
