@@ -11,6 +11,55 @@ export const ACTIVITY_SOURCE_MATERIAL_REFERENCE_LIMITS = {
   originalNameMaxLength: 200,
 } as const;
 
+export const ACTIVITY_SOURCE_MATERIAL_REFERENCE_ITEM_IDS = [
+  'reference-entry',
+  'user-file-input',
+  'selected-input-normalization',
+  'file-id-required',
+  'file-id-nfkc',
+  'file-id-trim',
+  'file-id-max-length',
+  'file-id-url-guard',
+  'file-id-path-guard',
+  'file-id-token-guard',
+  'original-name-required',
+  'original-name-nfkc',
+  'filename-url-decode',
+  'filename-query-hash-strip',
+  'filename-path-basename',
+  'filename-sensitive-fragment-removal',
+  'filename-control-guard',
+  'original-name-max-length',
+  'content-type-normalization',
+  'kind-content-type-resolution',
+  'kind-extension-resolution',
+  'invalid-kind-fallback',
+  'size-floor',
+  'size-nonnegative',
+  'duplicate-file-id-collapse',
+  'max-count-limit',
+  'input-order-preservation',
+  'compact-shape-only',
+  'storage-key-omission',
+  'student-payload-boundary',
+] as const;
+
+export type ActivitySourceMaterialReferenceItemId =
+  (typeof ACTIVITY_SOURCE_MATERIAL_REFERENCE_ITEM_IDS)[number];
+
+export const ACTIVITY_SOURCE_MATERIAL_REFERENCE_PRIVACY_CONTRACT = {
+  exposesFileBytes: false,
+  exposesPermissionMetadata: false,
+  exposesSourceMaterialStorageKeys: false,
+  exposesStudentPayloadFileReferences: false,
+  itemIds: [...ACTIVITY_SOURCE_MATERIAL_REFERENCE_ITEM_IDS],
+  keepsOnlyCompactReferenceShape: true,
+  maxReferences: ACTIVITY_SOURCE_MATERIALS_MAX_COUNT,
+  normalizesSafeFilenameBasenames: true,
+  rejectsUnsafeFileIds: true,
+  scope: 'activity-source-material-reference-boundary',
+} as const;
+
 const SENSITIVE_REFERENCE_FILENAME_KEYS = [
   'auth',
   'authorization',
@@ -45,10 +94,7 @@ type ActivityMaterialReferenceDraft = Omit<
 export function buildActivityMaterialReferenceFromUserFile(
   file: UserFileMaterialReferenceInput
 ): ActivityMaterialReference | null {
-  const fileId = normalizeReferenceText(
-    file.id,
-    ACTIVITY_SOURCE_MATERIAL_REFERENCE_LIMITS.fileIdMaxLength
-  );
+  const fileId = normalizeActivityMaterialReferenceFileId(file.id);
   const originalName = normalizeReferenceText(
     file.originalName ?? file.filename,
     ACTIVITY_SOURCE_MATERIAL_REFERENCE_LIMITS.originalNameMaxLength,
@@ -90,10 +136,7 @@ function normalizeActivityMaterialReference(
 ): ActivityMaterialReference | null {
   if (!isRecord(value)) return null;
 
-  const fileId = normalizeReferenceText(
-    value.fileId,
-    ACTIVITY_SOURCE_MATERIAL_REFERENCE_LIMITS.fileIdMaxLength
-  );
+  const fileId = normalizeActivityMaterialReferenceFileId(value.fileId);
   const originalName = normalizeReferenceText(
     value.originalName,
     ACTIVITY_SOURCE_MATERIAL_REFERENCE_LIMITS.originalNameMaxLength,
@@ -139,6 +182,18 @@ export function normalizeActivityMaterialReferenceFilename(value: unknown) {
     ACTIVITY_SOURCE_MATERIAL_REFERENCE_LIMITS.originalNameMaxLength,
     { filename: true }
   );
+}
+
+export function normalizeActivityMaterialReferenceFileId(value: unknown) {
+  const fileId = normalizeReferenceText(
+    value,
+    ACTIVITY_SOURCE_MATERIAL_REFERENCE_LIMITS.fileIdMaxLength
+  );
+  if (!fileId || isUnsafeActivityMaterialReferenceFileId(fileId)) {
+    return undefined;
+  }
+
+  return fileId;
 }
 
 export function getActivityMaterialReferenceKey(value: unknown) {
@@ -231,6 +286,31 @@ function isSensitiveReferenceFilenamePart(value: string) {
         key.includes(sensitiveKey)
       )
   );
+}
+
+function isUnsafeActivityMaterialReferenceFileId(value: string) {
+  if (hasUnsafeReferenceControlCharacter(value)) return true;
+  if (/[\\/]/u.test(value)) return true;
+  if (/[?#]/u.test(value)) return true;
+  if (/^[a-z][a-z0-9+.-]*:/iu.test(value)) return true;
+  if (
+    value
+      .split(/[\s,;&]+/u)
+      .some((part) => isSensitiveReferenceFilenamePart(part))
+  ) {
+    return true;
+  }
+
+  return false;
+}
+
+function hasUnsafeReferenceControlCharacter(value: string) {
+  for (const character of value) {
+    const code = character.charCodeAt(0);
+    if (code <= 31 || code === 127) return true;
+  }
+
+  return false;
 }
 
 function normalizeReferenceKey(value: unknown) {

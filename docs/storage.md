@@ -70,7 +70,7 @@ src/storage/
     └── r2.ts          # R2Provider (upload, delete, download, list, …)
 
 src/activities/
-└── material-references.ts # Activity source-material reference normalization
+└── material-references.ts # Activity source-material reference boundary
 ```
 
 ## Configuration
@@ -150,7 +150,11 @@ Files are always served via the same-origin route `/api/storage/file?key=...`.
   into compact `ActivityContent.sourceMaterials` references. These references
   keep activity drafts linked to teacher audio, worksheet images, worksheet
   documents, or spreadsheets for future AI extraction and editing workflows
-  without duplicating R2 keys or file-permission data inside activity JSON.
+  without duplicating R2 keys or file-permission data inside activity JSON. The
+  activity source-material reference boundary is a 30-slice contract for safe
+  file ids, safe filename basenames, content-type normalization, material-kind
+  fallback, size normalization, duplicate collapse, the 12-reference limit,
+  compact JSON shape, storage-key omission, and student-payload privacy.
 
 - **buildAttachmentContentDisposition** (shared helper, in
   `@/storage/content-disposition`): Builds safe attachment headers that preserve

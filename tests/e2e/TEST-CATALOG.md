@@ -279,6 +279,13 @@ metadata, ActivityContent.sourceMaterials reference, AI extraction readiness,
 student payload guard, file-id guard, filename display boundary, storage-key
 guard, source material picker privacy-scope boundaries, or the hidden
 activity-source-material-picker handoff.
+Activity source-material reference boundary has a fast script-level gate via
+`pnpm exec tsx --test scripts/activity-source-material-reference-boundary.test.ts`;
+run it when changing compact ActivityContent.sourceMaterials references,
+user-file-to-activity reference mapping, selected-material normalization, safe
+file id rules, safe filename basenames, content-type normalization,
+material-kind fallback, size normalization, duplicate collapse, reference
+limits, compact JSON shape, storage-key omission, or student-payload privacy.
 Assignment result student search has a fast script-level gate via
 `pnpm exec tsx --test scripts/assignment-result-student-search-handoff-semantic-views.test.ts`;
 run it when changing result-page student search route parsing, query
@@ -651,7 +658,7 @@ These flows should be added after their dependencies are made deterministic:
 | Area | Reason |
 |---|---|
 | Payment checkout and portal | Requires Stripe or Creem test fixtures, webhook simulation, and provider-specific env. |
-| R2 file uploads | Real browser-to-R2 upload E2E still requires deterministic local storage assertions and small fixture files. The script-level storage upload readiness gate already covers the 20-slice upload contract: validation, filename/folder sanitization, content-type/extension normalization and safety, owner/public folder planning, R2 key planning, same-origin proxy URLs, privacy guards, and provider helper reuse. The storage file access boundary gate covers same-origin proxy key validation, owner checks, missing-object behavior, cache headers, attachment filenames, and `nosniff`; future E2E should add audio, worksheet image, document, spreadsheet, and unknown-material fixtures so browser upload/download behavior and material labels are verified together. |
+| R2 file uploads | Real browser-to-R2 upload E2E still requires deterministic local storage assertions and small fixture files. The script-level storage upload readiness gate already covers the 20-slice upload contract: validation, filename/folder sanitization, content-type/extension normalization and safety, owner/public folder planning, R2 key planning, same-origin proxy URLs, privacy guards, and provider helper reuse. The storage file access boundary gate covers same-origin proxy key validation, owner checks, missing-object behavior, cache headers, attachment filenames, and `nosniff`. The activity source-material reference boundary gate covers compact `ActivityContent.sourceMaterials` references, safe file ids, safe filename basenames, duplicate collapse, storage-key omission, and student-payload privacy; future E2E should add audio, worksheet image, document, spreadsheet, and unknown-material fixtures so browser upload/download behavior, activity attachment, and material labels are verified together. |
 | Transactional email | Requires a fake mail provider or captured verification links. |
 | Interactive template runners | Requires deterministic runner fixtures and attempt submission assertions. |
 | AI provider quality checks | Requires provider mocks or stable fake responses to avoid cost and flake. |

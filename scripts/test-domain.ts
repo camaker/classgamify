@@ -11821,7 +11821,7 @@ assert.match(
 );
 assert.match(
   activityMaterialReferencesSource,
-  /ACTIVITY_SOURCE_MATERIAL_REFERENCE_LIMITS\.fileIdMaxLength[\s\S]*ACTIVITY_SOURCE_MATERIAL_REFERENCE_LIMITS\.originalNameMaxLength/,
+  /(?=[\s\S]*ACTIVITY_SOURCE_MATERIAL_REFERENCE_LIMITS\.fileIdMaxLength)(?=[\s\S]*ACTIVITY_SOURCE_MATERIAL_REFERENCE_LIMITS\.originalNameMaxLength)/,
   'Activity source material reference normalization should reuse named text limits.'
 );
 assert.match(
