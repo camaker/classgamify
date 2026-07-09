@@ -82,6 +82,7 @@ test('student runtime identity handoff exposes 30 safe multilingual slices', () 
     runtimeIdsUnique: true,
     runtimeItemCount: 3,
     runnerSurface: 'group-sort',
+    scope: 'public-student-runtime-identity',
     templateType: 'group-sort',
     usesFrozenSnapshotIdentity: true,
   });
@@ -315,8 +316,8 @@ test('student runtime identity handoff renders hidden DOM relationships', () => 
 
   assert.match(
     componentSource,
-    /StudentRuntimeIdentityHandoffItemView[\s\S]*StudentRuntimeIdentityHandoffView[\s\S]*data-handoff="student-runtime-identity"[\s\S]*view\.itemViews\.map[\s\S]*StudentRuntimeIdentityHandoffItem[\s\S]*function StudentRuntimeIdentityHandoffItem[\s\S]*const labelId = `student-runtime-identity-handoff-\$\{itemView\.id\}-label`[\s\S]*const valueId = `student-runtime-identity-handoff-\$\{itemView\.id\}-value`[\s\S]*const descriptionId = `student-runtime-identity-handoff-\$\{itemView\.id\}-description`[\s\S]*data-handoff-item=\{itemView\.id\}[\s\S]*id=\{labelId\}[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*aria-label=\{itemView\.ariaLabel\}[\s\S]*aria-labelledby=\{`\$\{labelId\} \$\{valueId\}`\}[\s\S]*id=\{valueId\}[\s\S]*id=\{descriptionId\}/,
-    'Student runtime identity handoff should render each safe identity slice with stable label, value, and description relationships.'
+    /StudentRuntimeIdentityHandoffItemView[\s\S]*StudentRuntimeIdentityHandoffView[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*aria-labelledby=\{titleId\}[\s\S]*data-handoff="student-runtime-identity"[\s\S]*data-handoff-scope=\{view\.privacy\.scope\}[\s\S]*view\.itemViews\.map[\s\S]*StudentRuntimeIdentityHandoffItem[\s\S]*function StudentRuntimeIdentityHandoffItem[\s\S]*const labelId = `student-runtime-identity-handoff-\$\{itemView\.id\}-label`[\s\S]*const valueId = `student-runtime-identity-handoff-\$\{itemView\.id\}-value`[\s\S]*const descriptionId = `student-runtime-identity-handoff-\$\{itemView\.id\}-description`[\s\S]*data-handoff-item=\{itemView\.id\}[\s\S]*id=\{labelId\}[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*aria-label=\{itemView\.ariaLabel\}[\s\S]*aria-labelledby=\{`\$\{labelId\} \$\{valueId\}`\}[\s\S]*id=\{valueId\}[\s\S]*id=\{descriptionId\}/,
+    'Student runtime identity handoff should render each safe identity slice with privacy scope plus stable label, value, and description relationships.'
   );
 });
 

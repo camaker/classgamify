@@ -15262,8 +15262,8 @@ assert.match(
 );
 assert.match(
   studentRuntimeIdentityHandoffSource,
-  /export type StudentRuntimeIdentityHandoffPrivacyContract = \{[\s\S]*exposesActivityContentJson: false;[\s\S]*exposesAnswerText: false;[\s\S]*exposesAnonymousToken: false;[\s\S]*exposesRuntimeChoiceText: false;[\s\S]*exposesRuntimeItemIds: false;[\s\S]*exposesRuntimePromptText: false;[\s\S]*exposesSourceMaterialMetadata: false;[\s\S]*exposesStudentName: false;[\s\S]*rejectsDuplicateAnswerIds: true;[\s\S]*rejectsOverlongAnswerRows: true;[\s\S]*rejectsUnknownRuntimeIds: true;[\s\S]*usesFrozenSnapshotIdentity: true;/,
-  'Student runtime identity handoff privacy should lock activity content, student name, anonymous token, submission validation, and frozen snapshot boundaries.'
+  /export type StudentRuntimeIdentityHandoffPrivacyContract = \{[\s\S]*exposesActivityContentJson: false;[\s\S]*exposesAnswerText: false;[\s\S]*exposesAnonymousToken: false;[\s\S]*exposesRuntimeChoiceText: false;[\s\S]*exposesRuntimeItemIds: false;[\s\S]*exposesRuntimePromptText: false;[\s\S]*exposesSourceMaterialMetadata: false;[\s\S]*exposesStudentName: false;[\s\S]*rejectsDuplicateAnswerIds: true;[\s\S]*rejectsOverlongAnswerRows: true;[\s\S]*rejectsUnknownRuntimeIds: true;[\s\S]*scope: 'public-student-runtime-identity';[\s\S]*usesFrozenSnapshotIdentity: true;/,
+  'Student runtime identity handoff privacy should lock activity content, student name, anonymous token, submission validation, frozen snapshot, and stable public runtime identity scope boundaries.'
 );
 assert.match(
   studentRuntimeIdentityHandoffSource,
@@ -15307,8 +15307,8 @@ assert.match(
 );
 assert.match(
   studentRuntimeItemListSource,
-  /StudentRuntimeIdentityHandoffItemView[\s\S]*StudentRuntimeIdentityHandoffView[\s\S]*data-handoff="student-runtime-identity"[\s\S]*view\.itemViews\.map[\s\S]*StudentRuntimeIdentityHandoffItem[\s\S]*function StudentRuntimeIdentityHandoffItem[\s\S]*const labelId = `student-runtime-identity-handoff-\$\{itemView\.id\}-label`[\s\S]*const valueId = `student-runtime-identity-handoff-\$\{itemView\.id\}-value`[\s\S]*const descriptionId = `student-runtime-identity-handoff-\$\{itemView\.id\}-description`[\s\S]*data-handoff-item=\{itemView\.id\}[\s\S]*id=\{labelId\}[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*aria-label=\{itemView\.ariaLabel\}[\s\S]*aria-labelledby=\{`\$\{labelId\} \$\{valueId\}`\}[\s\S]*id=\{valueId\}[\s\S]*id=\{descriptionId\}/,
-  'Student runtime item-list component should render hidden stable runtime-identity handoff outputs with label, value, and description relationships.'
+  /StudentRuntimeIdentityHandoffItemView[\s\S]*StudentRuntimeIdentityHandoffView[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*aria-labelledby=\{titleId\}[\s\S]*data-handoff="student-runtime-identity"[\s\S]*data-handoff-scope=\{view\.privacy\.scope\}[\s\S]*view\.itemViews\.map[\s\S]*StudentRuntimeIdentityHandoffItem[\s\S]*function StudentRuntimeIdentityHandoffItem[\s\S]*const labelId = `student-runtime-identity-handoff-\$\{itemView\.id\}-label`[\s\S]*const valueId = `student-runtime-identity-handoff-\$\{itemView\.id\}-value`[\s\S]*const descriptionId = `student-runtime-identity-handoff-\$\{itemView\.id\}-description`[\s\S]*data-handoff-item=\{itemView\.id\}[\s\S]*id=\{labelId\}[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*aria-label=\{itemView\.ariaLabel\}[\s\S]*aria-labelledby=\{`\$\{labelId\} \$\{valueId\}`\}[\s\S]*id=\{valueId\}[\s\S]*id=\{descriptionId\}/,
+  'Student runtime item-list component should render hidden stable runtime-identity handoff outputs with privacy scope plus label, value, and description relationships.'
 );
 assert.match(
   studentRuntimeItemListSource,
@@ -18530,6 +18530,7 @@ assert.deepEqual(quizRuntimeIdentityHandoffView.privacy, {
   runtimeItemCount: 1,
   runtimeIdsUnique: true,
   runnerSurface: 'choice-list',
+  scope: 'public-student-runtime-identity',
   templateType: 'quiz',
   usesFrozenSnapshotIdentity: true,
 });
@@ -18672,6 +18673,11 @@ assert.match(
   e2eTestCatalogText,
   /Student runtime identity exposes a 30-slice handoff[\s\S]*runtime id normalization source[\s\S]*submission validation boundary[\s\S]*anonymous-token boundary/,
   'E2E catalog should cover the hidden 30-slice student runtime identity handoff contract.'
+);
+assert.match(
+  e2eTestCatalogText,
+  /scripts\/student-runtime-identity-handoff-semantic-views\.test\.ts[\s\S]*runtime identity\s+privacy-scope boundaries/,
+  'E2E catalog should document the student runtime identity privacy-scope fast gate.'
 );
 assert.match(
   e2eTestCatalogText,

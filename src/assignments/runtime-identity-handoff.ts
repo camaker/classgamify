@@ -75,6 +75,7 @@ export type StudentRuntimeIdentityHandoffPrivacyContract = {
   runtimeItemCount: number;
   runtimeIdsUnique: boolean;
   runnerSurface: ActivityTemplateRunnerKind;
+  scope: 'public-student-runtime-identity';
   templateType: ActivityTemplateType;
   usesFrozenSnapshotIdentity: true;
 };
@@ -489,6 +490,7 @@ function buildStudentRuntimeIdentityHandoffPrivacyContract({
     runtimeItemCount: summary.runtimeItemCount,
     runtimeIdsUnique: summary.runtimeIdsUnique,
     runnerSurface,
+    scope: 'public-student-runtime-identity',
     templateType,
     usesFrozenSnapshotIdentity: true,
   };
