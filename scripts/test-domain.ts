@@ -1186,6 +1186,7 @@ import {
   buildStudentRuntimeItemListView,
   buildStudentRuntimeSingleAnswerChanges,
   STUDENT_RUNTIME_INTERACTION_HANDOFF_ITEM_IDS,
+  STUDENT_RUNTIME_SEMANTIC_BUNDLE_HANDOFF_ITEM_IDS,
 } from '@/assignments/student-runtime-item-list';
 import {
   buildStudentRuntimeIdentityHandoffView,
@@ -15288,10 +15289,51 @@ assert.deepEqual(
   ],
   'Student runtime identity handoff should expose exactly 30 stable slice ids.'
 );
+assert.deepEqual(
+  [...STUDENT_RUNTIME_SEMANTIC_BUNDLE_HANDOFF_ITEM_IDS],
+  [
+    'interaction-template-type',
+    'interaction-runner-surface',
+    'interaction-renderer-dispatch',
+    'interaction-runtime-items',
+    'interaction-kind-summary',
+    'interaction-answer-contract',
+    'interaction-selection-scope',
+    'interaction-review-feedback',
+    'interaction-disabled-state',
+    'interaction-privacy-guard',
+    'choice-runner-surface',
+    'choice-exclusive-state',
+    'choice-group-placement',
+    'choice-choice-list',
+    'choice-normalized-count',
+    'choice-selected-state',
+    'choice-answer-change-contract',
+    'choice-normalized-answer-scope',
+    'choice-public-payload',
+    'choice-privacy-guard',
+    'identity-template-type',
+    'identity-runner-surface',
+    'identity-runtime-count',
+    'identity-normalized-id-count',
+    'identity-unique-id-status',
+    'identity-collision-guard',
+    'identity-submission-validation',
+    'identity-public-payload',
+    'identity-snapshot-boundary',
+    'identity-privacy-guard',
+  ],
+  'Student runtime semantic bundle handoff should expose exactly 30 stable sourced slice ids.'
+);
 assert.match(
   studentRuntimeItemListDomainSource,
   /export type StudentRuntimeInteractionHandoffView = \{[\s\S]*description: string;[\s\S]*itemViews: StudentRuntimeInteractionHandoffItemView\[\];[\s\S]*privacy: StudentRuntimeInteractionHandoffPrivacyContract;[\s\S]*title: string;/,
   'Student runtime item list domain should expose an explicit runtime interaction handoff view contract.'
+);
+assert.match(
+  studentRuntimeItemListDomainSource,
+  /export type StudentRuntimeSemanticBundleHandoffItemView = \{[\s\S]*ariaLabel: string;[\s\S]*description: string;[\s\S]*id: StudentRuntimeSemanticBundleHandoffItemId;[\s\S]*label: string;[\s\S]*sourceItemId:[\s\S]*sourceScope: StudentRuntimeSemanticBundleSourceScope;[\s\S]*value: string;[\s\S]*export type StudentRuntimeSemanticBundleHandoffPrivacyContract = \{[\s\S]*exposesAnswerText: false;[\s\S]*exposesAnonymousToken: false;[\s\S]*exposesRuntimeChoiceText: false;[\s\S]*exposesRuntimeItemIds: false;[\s\S]*exposesRuntimePromptText: false;[\s\S]*exposesSourceMaterialMetadata: false;[\s\S]*exposesStudentNames: false;[\s\S]*exposesTeacherOnlyAnswers: false;[\s\S]*sourceScopes: StudentRuntimeSemanticBundleSourceScope\[\];[\s\S]*scope: 'public-student-runtime-semantic-bundle';/,
+  'Student runtime item list domain should expose an explicit semantic bundle handoff item, source, and privacy contract.'
 );
 assert.match(
   studentRuntimeIdentityHandoffSource,
@@ -15310,7 +15352,12 @@ assert.match(
 );
 assert.match(
   studentRuntimeItemListDomainSource,
-  /runtimeIdentityHandoffView: StudentRuntimeIdentityHandoffView;[\s\S]*runtimeIdentityHandoffView: buildStudentRuntimeIdentityHandoffView\(\{[\s\S]*items,[\s\S]*templateType,[\s\S]*\}\)/,
+  /semanticBundleHandoffView: StudentRuntimeSemanticBundleHandoffView;[\s\S]*const interactionHandoffView = buildStudentRuntimeInteractionHandoffView\(\{[\s\S]*const runtimeChoiceAssignmentHandoffView =[\s\S]*buildStudentRuntimeChoiceAssignmentHandoffView\(\{[\s\S]*const runtimeIdentityHandoffView = buildStudentRuntimeIdentityHandoffView\(\{[\s\S]*semanticBundleHandoffView: buildStudentRuntimeSemanticBundleHandoffView\(\{[\s\S]*interactionHandoffView,[\s\S]*runtimeChoiceAssignmentHandoffView,[\s\S]*runtimeIdentityHandoffView,[\s\S]*templateType,/,
+  'Student runtime item list view should build the semantic bundle from the same prepared interaction, choice-assignment, and identity handoffs.'
+);
+assert.match(
+  studentRuntimeItemListDomainSource,
+  /runtimeIdentityHandoffView: StudentRuntimeIdentityHandoffView;[\s\S]*const runtimeIdentityHandoffView = buildStudentRuntimeIdentityHandoffView\(\{[\s\S]*items,[\s\S]*templateType,[\s\S]*\}\);[\s\S]*runtimeIdentityHandoffView,/,
   'Student runtime item list view should include the prepared runtime identity handoff view from the current runtime items and template.'
 );
 assert.match(
@@ -15327,6 +15374,16 @@ assert.match(
   studentRuntimeItemListDomainSource,
   /getTemplateByType\(templateType\)\.name[\s\S]*STUDENT_RUNTIME_RENDERER_SURFACES[\s\S]*normalizeListeningSpeechLanguage\(language\)[\s\S]*formatStudentRuntimeAnswerChangeContract\(surface\)[\s\S]*formatStudentRuntimeSelectionScope\(surface\)[\s\S]*formatStudentRuntimeReviewItemCount\(reviewItems\)/,
   'Student runtime interaction handoff should derive template, renderer-count, listening language, answer-update, selection-scope, and review-count semantics from shared helpers.'
+);
+assert.match(
+  studentRuntimeItemListDomainSource,
+  /export function buildStudentRuntimeSemanticBundleHandoffView\(\{[\s\S]*interactionHandoffView,[\s\S]*runtimeChoiceAssignmentHandoffView,[\s\S]*runtimeIdentityHandoffView,[\s\S]*STUDENT_RUNTIME_SEMANTIC_BUNDLE_HANDOFF_ITEM_IDS\.map[\s\S]*getStudentRuntimeSemanticBundleSource\([\s\S]*getStudentRuntimeSemanticBundleSourceItem\([\s\S]*sourceItem\.description[\s\S]*sourceItem\.label[\s\S]*sourceItem\.value[\s\S]*data/,
+  'Student runtime semantic bundle should derive its 30 slices from existing safe child handoff items instead of recalculating prompt, choice, answer, or runtime-id data.'
+);
+assert.match(
+  studentRuntimeItemListSource,
+  /StudentRuntimeSemanticBundleHandoffItemView[\s\S]*StudentRuntimeSemanticBundleHandoffView[\s\S]*data-handoff="student-runtime-semantic-bundle"[\s\S]*data-handoff-scope=\{view\.privacy\.scope\}[\s\S]*view\.itemViews\.map[\s\S]*StudentRuntimeSemanticBundleHandoffItem[\s\S]*function StudentRuntimeSemanticBundleHandoffItem[\s\S]*const labelId = `student-runtime-semantic-bundle-handoff-\$\{itemView\.id\}-label`[\s\S]*const valueId = `student-runtime-semantic-bundle-handoff-\$\{itemView\.id\}-value`[\s\S]*const descriptionId = `student-runtime-semantic-bundle-handoff-\$\{itemView\.id\}-description`[\s\S]*data-handoff-item=\{itemView\.id\}[\s\S]*data-source-handoff=\{itemView\.sourceScope\}[\s\S]*data-source-handoff-item=\{itemView\.sourceItemId\}[\s\S]*id=\{labelId\}[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*aria-label=\{itemView\.ariaLabel\}[\s\S]*aria-labelledby=\{`\$\{labelId\} \$\{valueId\}`\}[\s\S]*id=\{valueId\}[\s\S]*id=\{descriptionId\}/,
+  'Student runtime item-list component should render hidden stable semantic-bundle handoff outputs with privacy scope, source markers, label, value, and description relationships.'
 );
 assert.match(
   studentRuntimeItemListSource,
@@ -18991,6 +19048,16 @@ assert.match(
   e2eTestCatalogText,
   /scripts\/student-runtime-choice-assignment-handoff-semantic-views\.test\.ts[\s\S]*runtime choice\s+assignment privacy-scope boundaries/,
   'E2E catalog should document the student runtime choice-assignment privacy-scope fast gate.'
+);
+assert.match(
+  e2eTestCatalogText,
+  /Student runtime semantic bundle mirrors 30 safe child handoff slices[\s\S]*student-runtime-semantic-bundle[\s\S]*source-scope and source-item markers[\s\S]*does not expose raw prompts, choice text, runtime item ids, student names, anonymous tokens/,
+  'E2E catalog should cover the hidden 30-slice student runtime semantic bundle handoff contract.'
+);
+assert.match(
+  e2eTestCatalogText,
+  /scripts\/student-runtime-semantic-bundle-handoff-semantic-views\.test\.ts[\s\S]*semantic bundle\s+privacy-scope boundaries/,
+  'E2E catalog should document the student runtime semantic bundle privacy-scope fast gate.'
 );
 const listeningRuntimeInteractionHandoffView =
   buildStudentRuntimeItemListView({

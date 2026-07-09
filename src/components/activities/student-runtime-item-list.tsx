@@ -9,6 +9,9 @@ import {
   type StudentAnswerChange,
   type StudentRuntimeInteractionHandoffItemView,
   type StudentRuntimeInteractionHandoffView,
+  type StudentRuntimeItemListView,
+  type StudentRuntimeSemanticBundleHandoffItemView,
+  type StudentRuntimeSemanticBundleHandoffView,
 } from '@/assignments/student-runtime-item-list';
 import type {
   StudentRuntimeChoiceAssignmentHandoffItemView,
@@ -73,13 +76,7 @@ export function StudentRuntimeItemList({
 
   if (listView.surface === 'line-match') {
     return (
-      <StudentRuntimeInteractionRegion
-        handoffView={listView.interactionHandoffView}
-        choiceAssignmentHandoffView={
-          listView.runtimeChoiceAssignmentHandoffView
-        }
-        identityHandoffView={listView.runtimeIdentityHandoffView}
-      >
+      <StudentRuntimeInteractionRegion listView={listView}>
         <div className="mt-4">
           <LineMatchBoard
             answers={answers}
@@ -96,13 +93,7 @@ export function StudentRuntimeItemList({
 
   if (listView.surface === 'matching-pairs') {
     return (
-      <StudentRuntimeInteractionRegion
-        handoffView={listView.interactionHandoffView}
-        choiceAssignmentHandoffView={
-          listView.runtimeChoiceAssignmentHandoffView
-        }
-        identityHandoffView={listView.runtimeIdentityHandoffView}
-      >
+      <StudentRuntimeInteractionRegion listView={listView}>
         <div className="mt-4">
           <MatchingPairsBoard
             answers={answers}
@@ -119,13 +110,7 @@ export function StudentRuntimeItemList({
 
   if (listView.surface === 'group-sort') {
     return (
-      <StudentRuntimeInteractionRegion
-        handoffView={listView.interactionHandoffView}
-        choiceAssignmentHandoffView={
-          listView.runtimeChoiceAssignmentHandoffView
-        }
-        identityHandoffView={listView.runtimeIdentityHandoffView}
-      >
+      <StudentRuntimeInteractionRegion listView={listView}>
         <div className="mt-4">
           <GroupSortBoard
             answers={answers}
@@ -142,13 +127,7 @@ export function StudentRuntimeItemList({
 
   if (listView.surface === 'fill-blank') {
     return (
-      <StudentRuntimeInteractionRegion
-        handoffView={listView.interactionHandoffView}
-        choiceAssignmentHandoffView={
-          listView.runtimeChoiceAssignmentHandoffView
-        }
-        identityHandoffView={listView.runtimeIdentityHandoffView}
-      >
+      <StudentRuntimeInteractionRegion listView={listView}>
         <div className="mt-4">
           <FillBlankWorksheet
             answers={answers}
@@ -165,13 +144,7 @@ export function StudentRuntimeItemList({
 
   if (listView.surface === 'open-box') {
     return (
-      <StudentRuntimeInteractionRegion
-        handoffView={listView.interactionHandoffView}
-        choiceAssignmentHandoffView={
-          listView.runtimeChoiceAssignmentHandoffView
-        }
-        identityHandoffView={listView.runtimeIdentityHandoffView}
-      >
+      <StudentRuntimeInteractionRegion listView={listView}>
         <div className="mt-4">
           <OpenBoxRunner
             answers={answers}
@@ -188,13 +161,7 @@ export function StudentRuntimeItemList({
 
   if (listView.surface === 'listening') {
     return (
-      <StudentRuntimeInteractionRegion
-        handoffView={listView.interactionHandoffView}
-        choiceAssignmentHandoffView={
-          listView.runtimeChoiceAssignmentHandoffView
-        }
-        identityHandoffView={listView.runtimeIdentityHandoffView}
-      >
+      <StudentRuntimeInteractionRegion listView={listView}>
         <div className="mt-4">
           <ListeningRunner
             answers={answers}
@@ -212,13 +179,7 @@ export function StudentRuntimeItemList({
 
   if (listView.surface === 'choice-list') {
     return (
-      <StudentRuntimeInteractionRegion
-        handoffView={listView.interactionHandoffView}
-        choiceAssignmentHandoffView={
-          listView.runtimeChoiceAssignmentHandoffView
-        }
-        identityHandoffView={listView.runtimeIdentityHandoffView}
-      >
+      <StudentRuntimeInteractionRegion listView={listView}>
         <div className="mt-4 grid gap-3">
           {listView.defaultItemCardViews.map((itemView) => (
             <RuntimeItemCard
@@ -248,24 +209,88 @@ export function StudentRuntimeItemList({
 
 function StudentRuntimeInteractionRegion({
   children,
-  choiceAssignmentHandoffView,
-  handoffView,
-  identityHandoffView,
+  listView,
 }: {
   children: ReactNode;
-  choiceAssignmentHandoffView: StudentRuntimeChoiceAssignmentHandoffView;
-  handoffView: StudentRuntimeInteractionHandoffView;
-  identityHandoffView: StudentRuntimeIdentityHandoffView;
+  listView: StudentRuntimeItemListView;
 }) {
   return (
     <>
-      <StudentRuntimeInteractionHandoff view={handoffView} />
-      <StudentRuntimeChoiceAssignmentHandoff
-        view={choiceAssignmentHandoffView}
+      <StudentRuntimeSemanticBundleHandoff
+        view={listView.semanticBundleHandoffView}
       />
-      <StudentRuntimeIdentityHandoff view={identityHandoffView} />
+      <StudentRuntimeInteractionHandoff
+        view={listView.interactionHandoffView}
+      />
+      <StudentRuntimeChoiceAssignmentHandoff
+        view={listView.runtimeChoiceAssignmentHandoffView}
+      />
+      <StudentRuntimeIdentityHandoff
+        view={listView.runtimeIdentityHandoffView}
+      />
       {children}
     </>
+  );
+}
+
+function StudentRuntimeSemanticBundleHandoff({
+  view,
+}: {
+  view: StudentRuntimeSemanticBundleHandoffView;
+}) {
+  const titleId = 'student-runtime-semantic-bundle-handoff-title';
+  const descriptionId = 'student-runtime-semantic-bundle-handoff-description';
+
+  return (
+    <section
+      aria-describedby={descriptionId}
+      aria-labelledby={titleId}
+      className="sr-only"
+      data-handoff="student-runtime-semantic-bundle"
+      data-handoff-scope={view.privacy.scope}
+    >
+      <h2 id={titleId}>{view.title}</h2>
+      <p id={descriptionId}>{view.description}</p>
+      <dl>
+        {view.itemViews.map((itemView) => (
+          <StudentRuntimeSemanticBundleHandoffItem
+            itemView={itemView}
+            key={itemView.id}
+          />
+        ))}
+      </dl>
+    </section>
+  );
+}
+
+function StudentRuntimeSemanticBundleHandoffItem({
+  itemView,
+}: {
+  itemView: StudentRuntimeSemanticBundleHandoffItemView;
+}) {
+  const labelId = `student-runtime-semantic-bundle-handoff-${itemView.id}-label`;
+  const valueId = `student-runtime-semantic-bundle-handoff-${itemView.id}-value`;
+  const descriptionId = `student-runtime-semantic-bundle-handoff-${itemView.id}-description`;
+
+  return (
+    <div
+      data-handoff-item={itemView.id}
+      data-source-handoff={itemView.sourceScope}
+      data-source-handoff-item={itemView.sourceItemId}
+    >
+      <dt id={labelId}>{itemView.label}</dt>
+      <dd>
+        <output
+          aria-describedby={descriptionId}
+          aria-label={itemView.ariaLabel}
+          aria-labelledby={`${labelId} ${valueId}`}
+          id={valueId}
+        >
+          {itemView.value}
+        </output>
+        <span id={descriptionId}>{itemView.description}</span>
+      </dd>
+    </div>
   );
 }
 

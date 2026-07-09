@@ -17,10 +17,14 @@ import {
 } from '@/assignments/runtime-display';
 import {
   buildStudentRuntimeIdentityHandoffView,
+  type StudentRuntimeIdentityHandoffItemId,
+  type StudentRuntimeIdentityHandoffItemView,
   type StudentRuntimeIdentityHandoffView,
 } from '@/assignments/runtime-identity-handoff';
 import {
   buildStudentRuntimeChoiceAssignmentHandoffView,
+  type StudentRuntimeChoiceAssignmentHandoffItemId,
+  type StudentRuntimeChoiceAssignmentHandoffItemView,
   type StudentRuntimeChoiceAssignmentHandoffView,
 } from '@/assignments/runtime-choice-assignment-handoff';
 import {
@@ -112,11 +116,88 @@ export type StudentRuntimeInteractionHandoffView = {
   title: string;
 };
 
+export const STUDENT_RUNTIME_SEMANTIC_BUNDLE_HANDOFF_ITEM_IDS = [
+  'interaction-template-type',
+  'interaction-runner-surface',
+  'interaction-renderer-dispatch',
+  'interaction-runtime-items',
+  'interaction-kind-summary',
+  'interaction-answer-contract',
+  'interaction-selection-scope',
+  'interaction-review-feedback',
+  'interaction-disabled-state',
+  'interaction-privacy-guard',
+  'choice-runner-surface',
+  'choice-exclusive-state',
+  'choice-group-placement',
+  'choice-choice-list',
+  'choice-normalized-count',
+  'choice-selected-state',
+  'choice-answer-change-contract',
+  'choice-normalized-answer-scope',
+  'choice-public-payload',
+  'choice-privacy-guard',
+  'identity-template-type',
+  'identity-runner-surface',
+  'identity-runtime-count',
+  'identity-normalized-id-count',
+  'identity-unique-id-status',
+  'identity-collision-guard',
+  'identity-submission-validation',
+  'identity-public-payload',
+  'identity-snapshot-boundary',
+  'identity-privacy-guard',
+] as const;
+
+export type StudentRuntimeSemanticBundleHandoffItemId =
+  (typeof STUDENT_RUNTIME_SEMANTIC_BUNDLE_HANDOFF_ITEM_IDS)[number];
+
+export type StudentRuntimeSemanticBundleHandoffItemView = {
+  ariaLabel: string;
+  description: string;
+  id: StudentRuntimeSemanticBundleHandoffItemId;
+  label: string;
+  sourceItemId:
+    | StudentRuntimeChoiceAssignmentHandoffItemId
+    | StudentRuntimeIdentityHandoffItemId
+    | StudentRuntimeInteractionHandoffItemId;
+  sourceScope: StudentRuntimeSemanticBundleSourceScope;
+  value: string;
+};
+
+export type StudentRuntimeSemanticBundleSourceScope =
+  | 'choice-assignment'
+  | 'identity'
+  | 'interaction';
+
+export type StudentRuntimeSemanticBundleHandoffPrivacyContract = {
+  exposesAnswerText: false;
+  exposesAnonymousToken: false;
+  exposesRuntimeChoiceText: false;
+  exposesRuntimeItemIds: false;
+  exposesRuntimePromptText: false;
+  exposesSourceMaterialMetadata: false;
+  exposesStudentNames: false;
+  exposesTeacherOnlyAnswers: false;
+  itemIds: StudentRuntimeSemanticBundleHandoffItemId[];
+  sourceScopes: StudentRuntimeSemanticBundleSourceScope[];
+  scope: 'public-student-runtime-semantic-bundle';
+  templateType: ActivityTemplateType;
+};
+
+export type StudentRuntimeSemanticBundleHandoffView = {
+  description: string;
+  itemViews: StudentRuntimeSemanticBundleHandoffItemView[];
+  privacy: StudentRuntimeSemanticBundleHandoffPrivacyContract;
+  title: string;
+};
+
 export type StudentRuntimeItemListView = {
   defaultItemCardViews: DefaultRuntimeItemCardView[];
   interactionHandoffView: StudentRuntimeInteractionHandoffView;
   runtimeChoiceAssignmentHandoffView: StudentRuntimeChoiceAssignmentHandoffView;
   runtimeIdentityHandoffView: StudentRuntimeIdentityHandoffView;
+  semanticBundleHandoffView: StudentRuntimeSemanticBundleHandoffView;
   runnerCopy: ActivityRunnerCopy;
   surface: StudentRuntimeItemListSurface;
 };
@@ -148,32 +229,41 @@ export function buildStudentRuntimeItemListView({
     progressVerb: runnerCopy.progressVerb,
     reviewItems,
   });
+  const interactionHandoffView = buildStudentRuntimeInteractionHandoffView({
+    disabled,
+    items,
+    language,
+    revealAnswer,
+    reviewItems,
+    runnerCopy,
+    surface,
+    templateType,
+  });
+  const runtimeChoiceAssignmentHandoffView =
+    buildStudentRuntimeChoiceAssignmentHandoffView({
+      answers,
+      disabled,
+      items,
+      surface,
+      templateType,
+    });
+  const runtimeIdentityHandoffView = buildStudentRuntimeIdentityHandoffView({
+    items,
+    templateType,
+  });
 
   return {
     defaultItemCardViews,
-    interactionHandoffView: buildStudentRuntimeInteractionHandoffView({
-      disabled,
-      items,
-      language,
-      revealAnswer,
-      reviewItems,
-      runnerCopy,
-      surface,
-      templateType,
-    }),
-    runtimeChoiceAssignmentHandoffView:
-      buildStudentRuntimeChoiceAssignmentHandoffView({
-        answers,
-        disabled,
-        items,
-        surface,
-        templateType,
-      }),
-    runtimeIdentityHandoffView: buildStudentRuntimeIdentityHandoffView({
-      items,
-      templateType,
-    }),
+    interactionHandoffView,
+    runtimeChoiceAssignmentHandoffView,
+    runtimeIdentityHandoffView,
     runnerCopy,
+    semanticBundleHandoffView: buildStudentRuntimeSemanticBundleHandoffView({
+      interactionHandoffView,
+      runtimeChoiceAssignmentHandoffView,
+      runtimeIdentityHandoffView,
+      templateType,
+    }),
     surface,
   };
 }
@@ -233,6 +323,261 @@ export function buildStudentRuntimeSingleAnswerChanges({
   itemId: string;
 }): StudentAnswerChange[] {
   return buildStudentAnswerChanges({ answer, itemId });
+}
+
+export function buildStudentRuntimeSemanticBundleHandoffView({
+  interactionHandoffView,
+  runtimeChoiceAssignmentHandoffView,
+  runtimeIdentityHandoffView,
+  templateType,
+}: {
+  interactionHandoffView: StudentRuntimeInteractionHandoffView;
+  runtimeChoiceAssignmentHandoffView: StudentRuntimeChoiceAssignmentHandoffView;
+  runtimeIdentityHandoffView: StudentRuntimeIdentityHandoffView;
+  templateType: ActivityTemplateType;
+}): StudentRuntimeSemanticBundleHandoffView {
+  const context = {
+    interactionHandoffView,
+    runtimeChoiceAssignmentHandoffView,
+    runtimeIdentityHandoffView,
+  };
+  const itemViews = STUDENT_RUNTIME_SEMANTIC_BUNDLE_HANDOFF_ITEM_IDS.map((id) =>
+    buildStudentRuntimeSemanticBundleHandoffItemView(id, context)
+  );
+
+  return {
+    description: [
+      interactionHandoffView.description,
+      runtimeChoiceAssignmentHandoffView.description,
+      runtimeIdentityHandoffView.description,
+    ].join(' '),
+    itemViews,
+    privacy: buildStudentRuntimeSemanticBundleHandoffPrivacyContract({
+      itemViews,
+      templateType,
+    }),
+    title: [
+      interactionHandoffView.title,
+      runtimeChoiceAssignmentHandoffView.title,
+      runtimeIdentityHandoffView.title,
+    ].join(' / '),
+  };
+}
+
+type StudentRuntimeSemanticBundleSourceItem =
+  | StudentRuntimeChoiceAssignmentHandoffItemView
+  | StudentRuntimeIdentityHandoffItemView
+  | StudentRuntimeInteractionHandoffItemView;
+
+type StudentRuntimeSemanticBundleBuildContext = {
+  interactionHandoffView: StudentRuntimeInteractionHandoffView;
+  runtimeChoiceAssignmentHandoffView: StudentRuntimeChoiceAssignmentHandoffView;
+  runtimeIdentityHandoffView: StudentRuntimeIdentityHandoffView;
+};
+
+function buildStudentRuntimeSemanticBundleHandoffItemView(
+  id: StudentRuntimeSemanticBundleHandoffItemId,
+  context: StudentRuntimeSemanticBundleBuildContext
+): StudentRuntimeSemanticBundleHandoffItemView {
+  const source = getStudentRuntimeSemanticBundleSource(id);
+  const sourceItem = getStudentRuntimeSemanticBundleSourceItem({
+    context,
+    sourceItemId: source.sourceItemId,
+    sourceScope: source.sourceScope,
+  });
+
+  return {
+    ariaLabel: m.student_runtime_interaction_handoff_item_aria({
+      description: sourceItem.description,
+      label: sourceItem.label,
+      value: sourceItem.value,
+    }),
+    description: sourceItem.description,
+    id,
+    label: sourceItem.label,
+    sourceItemId: source.sourceItemId,
+    sourceScope: source.sourceScope,
+    value: sourceItem.value,
+  };
+}
+
+function getStudentRuntimeSemanticBundleSource(
+  id: StudentRuntimeSemanticBundleHandoffItemId
+): {
+  sourceItemId:
+    | StudentRuntimeChoiceAssignmentHandoffItemId
+    | StudentRuntimeIdentityHandoffItemId
+    | StudentRuntimeInteractionHandoffItemId;
+  sourceScope: StudentRuntimeSemanticBundleSourceScope;
+} {
+  switch (id) {
+    case 'interaction-template-type':
+      return { sourceItemId: 'template-type', sourceScope: 'interaction' };
+    case 'interaction-runner-surface':
+      return { sourceItemId: 'runner-surface', sourceScope: 'interaction' };
+    case 'interaction-renderer-dispatch':
+      return {
+        sourceItemId: 'renderer-dispatch-boundary',
+        sourceScope: 'interaction',
+      };
+    case 'interaction-runtime-items':
+      return { sourceItemId: 'runtime-items', sourceScope: 'interaction' };
+    case 'interaction-kind-summary':
+      return {
+        sourceItemId: 'runtime-kind-summary',
+        sourceScope: 'interaction',
+      };
+    case 'interaction-answer-contract':
+      return { sourceItemId: 'answer-contract', sourceScope: 'interaction' };
+    case 'interaction-selection-scope':
+      return { sourceItemId: 'selection-scope', sourceScope: 'interaction' };
+    case 'interaction-review-feedback':
+      return { sourceItemId: 'review-feedback', sourceScope: 'interaction' };
+    case 'interaction-disabled-state':
+      return { sourceItemId: 'disabled-state', sourceScope: 'interaction' };
+    case 'interaction-privacy-guard':
+      return { sourceItemId: 'privacy-guard', sourceScope: 'interaction' };
+    case 'choice-runner-surface':
+      return {
+        sourceItemId: 'runner-surface',
+        sourceScope: 'choice-assignment',
+      };
+    case 'choice-exclusive-state':
+      return {
+        sourceItemId: 'exclusive-surface-state',
+        sourceScope: 'choice-assignment',
+      };
+    case 'choice-group-placement':
+      return {
+        sourceItemId: 'group-placement-state',
+        sourceScope: 'choice-assignment',
+      };
+    case 'choice-choice-list':
+      return {
+        sourceItemId: 'choice-list-state',
+        sourceScope: 'choice-assignment',
+      };
+    case 'choice-normalized-count':
+      return {
+        sourceItemId: 'normalized-choice-count',
+        sourceScope: 'choice-assignment',
+      };
+    case 'choice-selected-state':
+      return {
+        sourceItemId: 'selected-item-state',
+        sourceScope: 'choice-assignment',
+      };
+    case 'choice-answer-change-contract':
+      return {
+        sourceItemId: 'answer-change-contract',
+        sourceScope: 'choice-assignment',
+      };
+    case 'choice-normalized-answer-scope':
+      return {
+        sourceItemId: 'normalized-answer-scope',
+        sourceScope: 'choice-assignment',
+      };
+    case 'choice-public-payload':
+      return {
+        sourceItemId: 'public-payload-boundary',
+        sourceScope: 'choice-assignment',
+      };
+    case 'choice-privacy-guard':
+      return {
+        sourceItemId: 'privacy-guard',
+        sourceScope: 'choice-assignment',
+      };
+    case 'identity-template-type':
+      return { sourceItemId: 'template-type', sourceScope: 'identity' };
+    case 'identity-runner-surface':
+      return { sourceItemId: 'runner-surface', sourceScope: 'identity' };
+    case 'identity-runtime-count':
+      return { sourceItemId: 'runtime-item-count', sourceScope: 'identity' };
+    case 'identity-normalized-id-count':
+      return {
+        sourceItemId: 'normalized-runtime-id-count',
+        sourceScope: 'identity',
+      };
+    case 'identity-unique-id-status':
+      return {
+        sourceItemId: 'unique-runtime-id-status',
+        sourceScope: 'identity',
+      };
+    case 'identity-collision-guard':
+      return {
+        sourceItemId: 'multilingual-id-collision-guard',
+        sourceScope: 'identity',
+      };
+    case 'identity-submission-validation':
+      return {
+        sourceItemId: 'submission-validation-boundary',
+        sourceScope: 'identity',
+      };
+    case 'identity-public-payload':
+      return {
+        sourceItemId: 'public-payload-boundary',
+        sourceScope: 'identity',
+      };
+    case 'identity-snapshot-boundary':
+      return {
+        sourceItemId: 'assignment-snapshot-boundary',
+        sourceScope: 'identity',
+      };
+    case 'identity-privacy-guard':
+      return { sourceItemId: 'privacy-guard', sourceScope: 'identity' };
+  }
+}
+
+function getStudentRuntimeSemanticBundleSourceItem({
+  context,
+  sourceItemId,
+  sourceScope,
+}: {
+  context: StudentRuntimeSemanticBundleBuildContext;
+  sourceItemId:
+    | StudentRuntimeChoiceAssignmentHandoffItemId
+    | StudentRuntimeIdentityHandoffItemId
+    | StudentRuntimeInteractionHandoffItemId;
+  sourceScope: StudentRuntimeSemanticBundleSourceScope;
+}): StudentRuntimeSemanticBundleSourceItem {
+  const itemViews =
+    sourceScope === 'interaction'
+      ? context.interactionHandoffView.itemViews
+      : sourceScope === 'choice-assignment'
+        ? context.runtimeChoiceAssignmentHandoffView.itemViews
+        : context.runtimeIdentityHandoffView.itemViews;
+  const sourceItem = itemViews.find((itemView) => itemView.id === sourceItemId);
+
+  if (!sourceItem) {
+    throw new Error(
+      `Missing student runtime semantic bundle source item: ${sourceScope}:${sourceItemId}`
+    );
+  }
+
+  return sourceItem;
+}
+
+function buildStudentRuntimeSemanticBundleHandoffPrivacyContract({
+  itemViews,
+  templateType,
+}: {
+  itemViews: StudentRuntimeSemanticBundleHandoffItemView[];
+  templateType: ActivityTemplateType;
+}): StudentRuntimeSemanticBundleHandoffPrivacyContract {
+  return {
+    exposesAnswerText: false,
+    exposesAnonymousToken: false,
+    exposesRuntimeChoiceText: false,
+    exposesRuntimeItemIds: false,
+    exposesRuntimePromptText: false,
+    exposesSourceMaterialMetadata: false,
+    exposesStudentNames: false,
+    exposesTeacherOnlyAnswers: false,
+    itemIds: itemViews.map((item) => item.id),
+    scope: 'public-student-runtime-semantic-bundle',
+    sourceScopes: [...new Set(itemViews.map((item) => item.sourceScope))],
+    templateType,
+  };
 }
 
 function buildStudentRuntimeInteractionHandoffItem({
