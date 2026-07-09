@@ -1144,6 +1144,10 @@ import {
   STUDENT_RUNNER_SUBMIT_CONTROLS_HANDOFF_ITEM_IDS,
 } from '@/assignments/student-runner-submit-controls-handoff';
 import {
+  buildStudentRunnerIdentityHandoffView,
+  STUDENT_RUNNER_IDENTITY_HANDOFF_ITEM_IDS,
+} from '@/assignments/student-runner-identity-handoff';
+import {
   buildAttemptCompletionCopy,
   applyStudentAnswerChanges,
   buildAnonymousAttemptCopy,
@@ -14879,6 +14883,10 @@ const studentRunnerSubmitControlsSource = readFileSync(
   'src/components/assignments/student-runner-submit-controls.tsx',
   'utf8'
 );
+const studentRunnerIdentityHandoffSource = readFileSync(
+  'src/assignments/student-runner-identity-handoff.ts',
+  'utf8'
+);
 const studentRunnerSubmitControlsHandoffSource = readFileSync(
   'src/assignments/student-runner-submit-controls-handoff.ts',
   'utf8'
@@ -16751,6 +16759,62 @@ assert.match(
   studentRunnerAttemptShellSource,
   /function StudentRunnerAnonymousSummaryItem[\s\S]*const labelId = `student-runner-anonymous-summary-\$\{summaryItem\.id\}-label`[\s\S]*const valueId = `student-runner-anonymous-summary-\$\{summaryItem\.id\}-value`[\s\S]*const descriptionId = `student-runner-anonymous-summary-\$\{summaryItem\.id\}-description`[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*aria-label=\{summaryItem\.ariaLabel\}[\s\S]*aria-labelledby=\{`\$\{labelId\} \$\{valueId\}`\}[\s\S]*summaryItem\.label[\s\S]*<output[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*aria-label=\{summaryItem\.ariaLabel\}[\s\S]*id=\{valueId\}[\s\S]*summaryItem\.value[\s\S]*summaryItem\.description/,
   'Student runner anonymous identity summary items should render prepared label, value, and privacy descriptions as stable semantic outputs.'
+);
+assert.match(
+  studentRunnerIdentityHandoffSource,
+  /export const STUDENT_RUNNER_IDENTITY_HANDOFF_ITEM_IDS = \[(?=[\s\S]*'identity-region')(?=[\s\S]*'identity-mode')(?=[\s\S]*'collection-policy')(?=[\s\S]*'student-name-field')(?=[\s\S]*'student-name-disabled')(?=[\s\S]*'anonymous-panel')(?=[\s\S]*'browser-label')(?=[\s\S]*'anonymous-summary-count')(?=[\s\S]*'token-privacy-summary')(?=[\s\S]*'submission-identity-source')(?=[\s\S]*'attempt-limit-identity-boundary')(?=[\s\S]*'result-review-identity-boundary')(?=[\s\S]*'anonymous-token-boundary')(?=[\s\S]*'privacy-guard')[\s\S]*export type StudentRunnerIdentityHandoffPrivacyContract = \{[\s\S]*exposesAnonymousBrowserLabel: boolean;[\s\S]*exposesAnonymousToken: false;[\s\S]*exposesAnswerText: false;[\s\S]*exposesRawSubmissionPayload: false;[\s\S]*exposesSourceMaterialMetadata: false;[\s\S]*exposesStudentName: false;[\s\S]*exposesStudentNameInputValue: false;[\s\S]*exposesTeacherOnlyAnswers: false;[\s\S]*scope: 'public-student-runner-identity';/,
+  'Student runner identity handoff should expose a typed 30-slice contract with explicit identity privacy flags and scope.'
+);
+assert.deepEqual(
+  [...STUDENT_RUNNER_IDENTITY_HANDOFF_ITEM_IDS],
+  [
+    'identity-region',
+    'identity-mode',
+    'collection-policy',
+    'student-name-field',
+    'student-name-label',
+    'student-name-placeholder',
+    'student-name-description',
+    'student-name-disabled',
+    'student-name-lock-policy',
+    'student-name-value-guard',
+    'anonymous-panel',
+    'browser-label',
+    'browser-label-caption',
+    'browser-label-aria',
+    'anonymous-summary-count',
+    'anonymous-summary-ids',
+    'browser-summary',
+    'retry-summary',
+    'token-privacy-summary',
+    'retry-description',
+    'submission-identity-source',
+    'attempt-limit-identity-boundary',
+    'result-review-identity-boundary',
+    'browser-token-storage-boundary',
+    'normalized-name-boundary',
+    'anonymous-token-boundary',
+    'answer-text-boundary',
+    'teacher-answer-boundary',
+    'source-material-boundary',
+    'privacy-guard',
+  ],
+  'Student runner identity handoff should expose exactly 30 stable slice ids.'
+);
+assert.match(
+  studentRunnerIdentityHandoffSource,
+  /export function buildStudentRunnerIdentityHandoffView\([\s\S]*identityView: StudentRunnerIdentityView[\s\S]*identityView\.mode === 'anonymous'[\s\S]*identityView\.copy\.summaryItems\.map\(\(summaryItem\) => summaryItem\.id\)[\s\S]*privacy: buildStudentRunnerIdentityHandoffPrivacyContract/,
+  'Student runner identity handoff should derive anonymous summary ids and privacy from the prepared identity view.'
+);
+assert.match(
+  studentRunnerAttemptShellSource,
+  /buildStudentRunnerIdentityHandoffView[\s\S]*const identityHandoffView =[\s\S]*buildStudentRunnerIdentityHandoffView\(identityView\)[\s\S]*<StudentRunnerIdentityHandoff view=\{identityHandoffView\} \/>/,
+  'Student runner identity panel should render the prepared hidden identity handoff.'
+);
+assert.match(
+  studentRunnerAttemptShellSource,
+  /function StudentRunnerIdentityHandoff[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*aria-labelledby=\{titleId\}[\s\S]*data-handoff="student-runner-identity"[\s\S]*data-handoff-scope=\{view\.privacy\.scope\}[\s\S]*view\.itemViews\.map\(\(itemView\)[\s\S]*StudentRunnerIdentityHandoffItem[\s\S]*function StudentRunnerIdentityHandoffItem[\s\S]*const labelId = `student-runner-identity-handoff-\$\{itemView\.id\}-label`[\s\S]*const valueId = `student-runner-identity-handoff-\$\{itemView\.id\}-value`[\s\S]*const descriptionId = `student-runner-identity-handoff-\$\{itemView\.id\}-description`[\s\S]*data-handoff-item=\{itemView\.id\}[\s\S]*id=\{labelId\}[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*aria-label=\{itemView\.ariaLabel\}[\s\S]*aria-labelledby=\{`\$\{labelId\} \$\{valueId\}`\}[\s\S]*id=\{valueId\}[\s\S]*id=\{descriptionId\}/,
+  'Student runner identity handoff should render hidden safe outputs with privacy scope plus prepared label, value, and description relationships.'
 );
 assert.doesNotMatch(
   getSourceSlice(
@@ -29211,7 +29275,7 @@ assert.deepEqual(
 const studentRunnerPageView = buildStudentRunnerPageViewModel({
   anonymousToken: 'browser-1',
   answers: {
-    [publicRunnerState.runtimeItems[0]!.id]: 'Student answer',
+    [publicRunnerState.runtimeItems[0]!.id]: 'DOMAIN_PRIVATE_IDENTITY_ANSWER',
   },
   attemptClock: {
     shareId: ' share-public ',
@@ -29232,12 +29296,12 @@ const studentRunnerPageView = buildStudentRunnerPageViewModel({
     earnedPoints: 1,
     reviewItems: [
       {
-        acceptedAnswers: ['Student answer'],
+        acceptedAnswers: ['DOMAIN_PRIVATE_IDENTITY_ANSWER'],
         correct: true,
-        correctAnswer: 'Student answer',
+        correctAnswer: 'DOMAIN_PRIVATE_IDENTITY_ANSWER',
         itemId: publicRunnerState.runtimeItems[0]!.id,
         submitted: true,
-        submittedAnswer: 'Student answer',
+        submittedAnswer: 'DOMAIN_PRIVATE_IDENTITY_ANSWER',
       },
     ],
     reviewSummary: {
@@ -29285,6 +29349,66 @@ assert.equal(
   JSON.stringify(studentRunnerAnonymousAttemptCopy).includes('browser-1'),
   false
 );
+const studentRunnerIdentityHandoffView =
+  buildStudentRunnerIdentityHandoffView(
+    readyStudentRunnerRouteState.identityView
+  );
+const studentRunnerIdentityHandoffValues = new Map(
+  studentRunnerIdentityHandoffView.itemViews.map((item) => [
+    item.id,
+    item.value,
+  ])
+);
+assert.deepEqual(
+  studentRunnerIdentityHandoffView.itemViews.map((item) => item.id),
+  [...STUDENT_RUNNER_IDENTITY_HANDOFF_ITEM_IDS],
+  'Student runner identity handoff should expose the stable 30-slice order from the prepared identity view.'
+);
+assert.deepEqual(studentRunnerIdentityHandoffView.privacy, {
+  exposesAnonymousBrowserLabel: true,
+  exposesAnonymousToken: false,
+  exposesAnswerText: false,
+  exposesRawSubmissionPayload: false,
+  exposesSourceMaterialMetadata: false,
+  exposesStudentName: false,
+  exposesStudentNameInputValue: false,
+  exposesTeacherOnlyAnswers: false,
+  itemIds: [...STUDENT_RUNNER_IDENTITY_HANDOFF_ITEM_IDS],
+  mode: 'anonymous',
+  scope: 'public-student-runner-identity',
+  summaryItemIds: ['browser-label', 'retry-browser', 'token-privacy'],
+});
+assert.equal(
+  studentRunnerIdentityHandoffValues.get('identity-mode'),
+  'Anonymous'
+);
+assert.equal(
+  studentRunnerIdentityHandoffValues.get('browser-label'),
+  studentRunnerAnonymousBrowserLabel
+);
+assert.equal(
+  studentRunnerIdentityHandoffValues.get('anonymous-summary-ids'),
+  'browser-label · retry-browser · token-privacy'
+);
+assert.equal(
+  studentRunnerIdentityHandoffValues.get('token-privacy-summary'),
+  'Token hidden'
+);
+assert.equal(
+  studentRunnerIdentityHandoffValues.get('anonymous-token-boundary'),
+  'Raw token omitted'
+);
+assert.equal(
+  studentRunnerIdentityHandoffValues.get('privacy-guard'),
+  'Private data omitted'
+);
+for (const privateValue of ['browser-1', 'DOMAIN_PRIVATE_IDENTITY_ANSWER']) {
+  assert.equal(
+    JSON.stringify(studentRunnerIdentityHandoffView).includes(privateValue),
+    false,
+    `Student runner identity handoff leaked private text: ${privateValue}`
+  );
+}
 assert.deepEqual(
   {
     activeShareId: studentRunnerPageView.activeShareId,
@@ -29516,12 +29640,12 @@ assert.deepEqual(
       revealAnswer: true,
       reviewItems: [
         {
-          acceptedAnswers: ['Student answer'],
+          acceptedAnswers: ['DOMAIN_PRIVATE_IDENTITY_ANSWER'],
           correct: true,
-          correctAnswer: 'Student answer',
+          correctAnswer: 'DOMAIN_PRIVATE_IDENTITY_ANSWER',
           itemId: publicRunnerState.runtimeItems[0]!.id,
           submitted: true,
-          submittedAnswer: 'Student answer',
+          submittedAnswer: 'DOMAIN_PRIVATE_IDENTITY_ANSWER',
         },
       ],
       templateType: 'quiz',
@@ -30688,6 +30812,42 @@ assert.deepEqual(namedStudentRunnerPageView.identityView, {
   mode: 'student-name',
   placeholder: 'Type your name',
 });
+const namedStudentRunnerIdentityHandoffView =
+  buildStudentRunnerIdentityHandoffView(
+    namedStudentRunnerPageView.identityView!
+  );
+assert.deepEqual(namedStudentRunnerIdentityHandoffView.privacy, {
+  exposesAnonymousBrowserLabel: false,
+  exposesAnonymousToken: false,
+  exposesAnswerText: false,
+  exposesRawSubmissionPayload: false,
+  exposesSourceMaterialMetadata: false,
+  exposesStudentName: false,
+  exposesStudentNameInputValue: false,
+  exposesTeacherOnlyAnswers: false,
+  itemIds: [...STUDENT_RUNNER_IDENTITY_HANDOFF_ITEM_IDS],
+  mode: 'student-name',
+  scope: 'public-student-runner-identity',
+  summaryItemIds: [],
+});
+assert.equal(
+  namedStudentRunnerIdentityHandoffView.itemViews.find(
+    (item) => item.id === 'student-name-lock-policy'
+  )?.value,
+  'Editable'
+);
+assert.equal(
+  namedStudentRunnerIdentityHandoffView.itemViews.find(
+    (item) => item.id === 'student-name-value-guard'
+  )?.value,
+  'Input value omitted'
+);
+assert.equal(
+  JSON.stringify(namedStudentRunnerIdentityHandoffView).includes(
+    'Private Student'
+  ),
+  false
+);
 const submittedNamedStudentRunnerPageView = buildStudentRunnerPageViewModel({
   answers: {},
   attemptClock: undefined,
@@ -30732,6 +30892,22 @@ assert.deepEqual(
     mode: 'student-name',
     placeholder: 'Type your name',
   }
+);
+const lockedNamedStudentRunnerIdentityHandoffView =
+  buildStudentRunnerIdentityHandoffView(
+    submittedNamedStudentRunnerPageView.identityView!
+  );
+assert.equal(
+  lockedNamedStudentRunnerIdentityHandoffView.itemViews.find(
+    (item) => item.id === 'student-name-disabled'
+  )?.value,
+  'Yes'
+);
+assert.equal(
+  lockedNamedStudentRunnerIdentityHandoffView.itemViews.find(
+    (item) => item.id === 'student-name-lock-policy'
+  )?.value,
+  'Locked'
 );
 const invalidAttemptUsageStudentRunnerPageView =
   buildStudentRunnerPageViewModel({

@@ -83,6 +83,12 @@ run it when changing submit-control readiness, payload metric labels, button
 disabled or confirmation state, aria descriptions, persistent submit hints,
 submit-control privacy-scope boundaries, or the hidden
 student-runner-submit-controls handoff.
+Student runner identity has a fast script-level gate via
+`pnpm exec tsx --test scripts/student-runner-identity-handoff-semantic-views.test.ts`;
+run it when changing named-student input state, anonymous browser labels,
+anonymous retry guidance, student identity normalization boundaries,
+student-runner identity privacy-scope boundaries, or the hidden
+student-runner-identity handoff.
 Student runtime interaction has a fast script-level gate via
 `pnpm exec tsx --test scripts/student-runtime-interaction-handoff-semantic-views.test.ts`;
 run it when changing template renderer dispatch, runner surface selection,
