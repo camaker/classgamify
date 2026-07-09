@@ -299,8 +299,9 @@ AI draft metadata summary has a fast script-level gate via
 `pnpm exec tsx --test scripts/activity-draft-meta-handoff-semantic-views.test.ts`;
 run it when changing draft coverage counts, provider/model/notice trust
 provenance, structured review checklists, ready/locked template diagnostics,
-quiz-choice readiness, safe/omitted source provenance, or save/publish
-boundaries before teacher review.
+quiz-choice readiness, AI draft metadata privacy-scope boundaries,
+safe/omitted source provenance, or save/publish boundaries before teacher
+review.
 Source extraction assist has a fast script-level gate via
 `pnpm exec tsx --test scripts/activity-source-extraction-assist-handoff-semantic-views.test.ts`;
 run it when changing attached-material extraction readiness, audio draft paths,

@@ -283,6 +283,8 @@ function ActivityDraftMetaHandoff({
       aria-describedby={descriptionId}
       aria-labelledby={titleId}
       className="mt-4 rounded-lg border bg-background p-3"
+      data-handoff="activity-draft-meta"
+      data-handoff-scope={handoffView.privacy.scope}
     >
       <h4 className="font-medium text-sm" id={titleId}>
         {handoffView.title}

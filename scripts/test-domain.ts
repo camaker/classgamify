@@ -6746,7 +6746,7 @@ assert.doesNotMatch(
 );
 assert.match(
   activityDraftMetaSummarySource,
-  /function ActivityDraftMetaHandoff[\s\S]*const titleId = 'activity-draft-meta-handoff-title'[\s\S]*const descriptionId = 'activity-draft-meta-handoff-description'[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*aria-labelledby=\{titleId\}[\s\S]*id=\{titleId\}[\s\S]*handoffView\.title[\s\S]*id=\{descriptionId\}[\s\S]*handoffView\.description[\s\S]*handoffView\.itemViews\.map[\s\S]*ActivityDraftMetaHandoffItem[\s\S]*key=\{item\.id\}/,
+  /function ActivityDraftMetaHandoff[\s\S]*const titleId = 'activity-draft-meta-handoff-title'[\s\S]*const descriptionId = 'activity-draft-meta-handoff-description'[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*aria-labelledby=\{titleId\}[\s\S]*data-handoff="activity-draft-meta"[\s\S]*data-handoff-scope=\{handoffView\.privacy\.scope\}[\s\S]*id=\{titleId\}[\s\S]*handoffView\.title[\s\S]*id=\{descriptionId\}[\s\S]*handoffView\.description[\s\S]*handoffView\.itemViews\.map[\s\S]*ActivityDraftMetaHandoffItem[\s\S]*key=\{item\.id\}/,
   'AI draft handoff component should render prepared title, description, and item views with stable section relationships.'
 );
 assert.match(
