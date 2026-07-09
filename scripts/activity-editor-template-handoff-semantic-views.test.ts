@@ -64,6 +64,7 @@ test('activity editor template view exposes a 30-slice handoff contract', () => 
     exposesSourceMaterialStorageKeys: false,
     exposesTeacherNotesText: false,
     itemIds,
+    scope: 'activity-editor-template-readiness',
   });
 
   assert.equal(
@@ -173,7 +174,7 @@ test('activity editor template view exposes a 30-slice handoff contract', () => 
 test('activity editor template handoff renders stable semantic outputs', () => {
   assert.match(
     ACTIVITY_CREATE_FORM_SOURCE,
-    /ActivityEditorTemplateHandoffView[\s\S]*function ActivityEditorTemplateHandoff[\s\S]*const titleId = 'activity-editor-template-handoff-title'[\s\S]*const descriptionId = 'activity-editor-template-handoff-description'[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*aria-labelledby=\{titleId\}[\s\S]*className="sr-only"[\s\S]*data-handoff="activity-editor-template"[\s\S]*id=\{titleId\}[\s\S]*id=\{descriptionId\}[\s\S]*handoffView\.itemViews\.map[\s\S]*ActivityEditorTemplateHandoffItem[\s\S]*function ActivityEditorTemplateHandoffItem[\s\S]*item: ActivityEditorTemplateHandoffView\['itemViews'\]\[number\][\s\S]*const labelId = `activity-editor-template-handoff-\$\{item\.id\}-label`[\s\S]*const valueId = `activity-editor-template-handoff-\$\{item\.id\}-value`[\s\S]*const descriptionId = `activity-editor-template-handoff-\$\{item\.id\}-description`[\s\S]*data-handoff-item=\{item\.id\}[\s\S]*id=\{labelId\}[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*aria-label=\{item\.ariaLabel\}[\s\S]*aria-labelledby=\{`\$\{labelId\} \$\{valueId\}`\}[\s\S]*id=\{valueId\}[\s\S]*id=\{descriptionId\}/
+    /ActivityEditorTemplateHandoffView[\s\S]*function ActivityEditorTemplateHandoff[\s\S]*const titleId = 'activity-editor-template-handoff-title'[\s\S]*const descriptionId = 'activity-editor-template-handoff-description'[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*aria-labelledby=\{titleId\}[\s\S]*className="sr-only"[\s\S]*data-handoff="activity-editor-template"[\s\S]*data-handoff-scope=\{handoffView\.privacy\.scope\}[\s\S]*id=\{titleId\}[\s\S]*id=\{descriptionId\}[\s\S]*handoffView\.itemViews\.map[\s\S]*ActivityEditorTemplateHandoffItem[\s\S]*function ActivityEditorTemplateHandoffItem[\s\S]*item: ActivityEditorTemplateHandoffView\['itemViews'\]\[number\][\s\S]*const labelId = `activity-editor-template-handoff-\$\{item\.id\}-label`[\s\S]*const valueId = `activity-editor-template-handoff-\$\{item\.id\}-value`[\s\S]*const descriptionId = `activity-editor-template-handoff-\$\{item\.id\}-description`[\s\S]*data-handoff-item=\{item\.id\}[\s\S]*id=\{labelId\}[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*aria-label=\{item\.ariaLabel\}[\s\S]*aria-labelledby=\{`\$\{labelId\} \$\{valueId\}`\}[\s\S]*id=\{valueId\}[\s\S]*id=\{descriptionId\}/
   );
 });
 
@@ -200,6 +201,7 @@ test('activity editor template focused gate is documented', () => {
     'shared editor contract',
     'parsed content status',
     'save-before-publish boundaries',
+    'activity-editor-template privacy-scope boundaries',
     'hidden activity-editor-template handoff',
   ]) {
     assert.match(normalizedCatalog, new RegExp(boundary));

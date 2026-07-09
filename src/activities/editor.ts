@@ -303,6 +303,7 @@ export type ActivityEditorTemplateHandoffPrivacyContract = {
   exposesSourceMaterialStorageKeys: false;
   exposesTeacherNotesText: false;
   itemIds: ActivityEditorTemplateHandoffItemId[];
+  scope: 'activity-editor-template-readiness';
 };
 
 export type ActivityEditorTemplateHandoffView = {
@@ -3526,6 +3527,7 @@ function buildActivityEditorTemplateHandoffPrivacyContract(
     exposesSourceMaterialStorageKeys: false,
     exposesTeacherNotesText: false,
     itemIds: itemViews.map((item) => item.id),
+    scope: 'activity-editor-template-readiness',
   };
 }
 

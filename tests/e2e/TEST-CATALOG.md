@@ -235,7 +235,8 @@ run it when changing selected-template badges, required content, current templat
 readiness, ready/locked template options, suggested remixes, quiz-choice
 readiness, scaffold action, scaffold runtime items, scaffold ready modes,
 reusable coverage, scaffold field counts, scaffold review steps, shared editor
-contract, parsed content status, save-before-publish boundaries, or the hidden
+contract, parsed content status, save-before-publish boundaries,
+activity-editor-template privacy-scope boundaries, or the hidden
 activity-editor-template handoff.
 Activity duplicate safety has a fast script-level gate via
 `pnpm exec tsx --test scripts/activity-duplicate-handoff-semantic-views.test.ts`;

@@ -5902,8 +5902,8 @@ assert.match(
 );
 assert.match(
   activityEditorSource,
-  /export const ACTIVITY_EDITOR_TEMPLATE_HANDOFF_ITEM_IDS = \[(?=[\s\S]*'selected-template')(?=[\s\S]*'template-short-name')(?=[\s\S]*'current-template-readiness')(?=[\s\S]*'suggested-remix-options')(?=[\s\S]*'locked-template-options')(?=[\s\S]*'question-choice-readiness')(?=[\s\S]*'scaffold-reusable-coverage')(?=[\s\S]*'scaffold-teacher-notes')(?=[\s\S]*'shared-editor-contract')(?=[\s\S]*'parsed-content-status')(?=[\s\S]*'current-question-count')(?=[\s\S]*'current-pair-count')(?=[\s\S]*'current-group-count')(?=[\s\S]*'current-vocabulary-count')(?=[\s\S]*'current-teacher-note-count')(?=[\s\S]*'scaffold-review-steps')(?=[\s\S]*'save-before-publish-boundary')(?=[\s\S]*'privacy-guard')[\s\S]*export type ActivityEditorTemplateHandoffPrivacyContract = \{[\s\S]*exposesAnswerText: false;[\s\S]*exposesCurrentFieldText: false;[\s\S]*exposesQuestionPromptText: false;[\s\S]*exposesRawEditorInput: false;[\s\S]*exposesRawScaffoldContent: false;[\s\S]*exposesSourceMaterialFileIds: false;[\s\S]*exposesSourceMaterialStorageKeys: false;[\s\S]*exposesTeacherNotesText: false;[\s\S]*itemIds: ActivityEditorTemplateHandoffItemId\[\];/,
-  'Activity editor template handoff should expose a typed 30-slice contract with explicit privacy flags.'
+  /export const ACTIVITY_EDITOR_TEMPLATE_HANDOFF_ITEM_IDS = \[(?=[\s\S]*'selected-template')(?=[\s\S]*'template-short-name')(?=[\s\S]*'current-template-readiness')(?=[\s\S]*'suggested-remix-options')(?=[\s\S]*'locked-template-options')(?=[\s\S]*'question-choice-readiness')(?=[\s\S]*'scaffold-reusable-coverage')(?=[\s\S]*'scaffold-teacher-notes')(?=[\s\S]*'shared-editor-contract')(?=[\s\S]*'parsed-content-status')(?=[\s\S]*'current-question-count')(?=[\s\S]*'current-pair-count')(?=[\s\S]*'current-group-count')(?=[\s\S]*'current-vocabulary-count')(?=[\s\S]*'current-teacher-note-count')(?=[\s\S]*'scaffold-review-steps')(?=[\s\S]*'save-before-publish-boundary')(?=[\s\S]*'privacy-guard')[\s\S]*export type ActivityEditorTemplateHandoffPrivacyContract = \{[\s\S]*exposesAnswerText: false;[\s\S]*exposesCurrentFieldText: false;[\s\S]*exposesQuestionPromptText: false;[\s\S]*exposesRawEditorInput: false;[\s\S]*exposesRawScaffoldContent: false;[\s\S]*exposesSourceMaterialFileIds: false;[\s\S]*exposesSourceMaterialStorageKeys: false;[\s\S]*exposesTeacherNotesText: false;[\s\S]*itemIds: ActivityEditorTemplateHandoffItemId\[\];[\s\S]*scope: 'activity-editor-template-readiness';/,
+  'Activity editor template handoff should expose a typed 30-slice contract with explicit privacy flags and scope.'
 );
 assert.match(
   activityEditorSource,
@@ -5917,8 +5917,8 @@ assert.match(
 );
 assert.match(
   activityEditorFormSource,
-  /ActivityEditorTemplateHandoff[\s\S]*data-handoff="activity-editor-template"[\s\S]*handoffView\.itemViews\.map[\s\S]*ActivityEditorTemplateHandoffItem[\s\S]*const labelId = `activity-editor-template-handoff-\$\{item\.id\}-label`[\s\S]*const valueId = `activity-editor-template-handoff-\$\{item\.id\}-value`[\s\S]*const descriptionId = `activity-editor-template-handoff-\$\{item\.id\}-description`[\s\S]*data-handoff-item=\{item\.id\}[\s\S]*id=\{labelId\}[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*aria-label=\{item\.ariaLabel\}[\s\S]*aria-labelledby=\{`\$\{labelId\} \$\{valueId\}`\}[\s\S]*id=\{valueId\}[\s\S]*id=\{descriptionId\}/,
-  'Activity editor form should render the template handoff in the real create/edit surface.'
+  /ActivityEditorTemplateHandoff[\s\S]*data-handoff="activity-editor-template"[\s\S]*data-handoff-scope=\{handoffView\.privacy\.scope\}[\s\S]*handoffView\.itemViews\.map[\s\S]*ActivityEditorTemplateHandoffItem[\s\S]*const labelId = `activity-editor-template-handoff-\$\{item\.id\}-label`[\s\S]*const valueId = `activity-editor-template-handoff-\$\{item\.id\}-value`[\s\S]*const descriptionId = `activity-editor-template-handoff-\$\{item\.id\}-description`[\s\S]*data-handoff-item=\{item\.id\}[\s\S]*id=\{labelId\}[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*aria-label=\{item\.ariaLabel\}[\s\S]*aria-labelledby=\{`\$\{labelId\} \$\{valueId\}`\}[\s\S]*id=\{valueId\}[\s\S]*id=\{descriptionId\}/,
+  'Activity editor form should render the template handoff privacy scope in the real create/edit surface.'
 );
 assert.doesNotMatch(
   activityEditorSource,
@@ -47267,6 +47267,7 @@ assert.deepEqual(editorTemplateView.handoffView.privacy, {
   exposesSourceMaterialStorageKeys: false,
   exposesTeacherNotesText: false,
   itemIds: editorTemplateHandoffItemIds,
+  scope: 'activity-editor-template-readiness',
 });
 assert.deepEqual(
   editorTemplateView.handoffView.itemViews.map((item) => [
