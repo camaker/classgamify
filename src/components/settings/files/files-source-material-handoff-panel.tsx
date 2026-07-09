@@ -17,6 +17,7 @@ export function FilesSourceMaterialHandoffPanel({
       aria-labelledby={titleId}
       className="grid gap-3 rounded-lg border bg-muted/20 p-4"
       data-handoff="settings-files-source-material"
+      data-handoff-scope={view.privacy.scope}
     >
       <div className="grid gap-1">
         <div className="flex flex-wrap items-center gap-2">

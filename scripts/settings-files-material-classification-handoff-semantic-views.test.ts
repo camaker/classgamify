@@ -258,7 +258,7 @@ test('settings files material classification handoff localizes Chinese labels', 
 test('settings files material classification renders stable DOM relationships', () => {
   assert.match(
     FILES_MATERIAL_HANDOFF_SOURCE,
-    /SettingsFilesMaterialClassificationHandoffView[\s\S]*function FilesMaterialClassificationHandoff\([\s\S]*const titleId = 'settings-files-material-classification-handoff-title'[\s\S]*const descriptionId =[\s\S]*'settings-files-material-classification-handoff-description'[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*aria-labelledby=\{titleId\}[\s\S]*className="sr-only"[\s\S]*data-handoff="settings-files-material-classification"[\s\S]*id=\{titleId\}[\s\S]*id=\{descriptionId\}[\s\S]*view\.itemViews\.map\(\(itemView\) =>[\s\S]*FilesMaterialClassificationHandoffItem[\s\S]*function FilesMaterialClassificationHandoffItem[\s\S]*itemView: SettingsFilesMaterialClassificationHandoffView\['itemViews'\]\[number\][\s\S]*const labelId = `settings-files-material-classification-handoff-\$\{itemView\.id\}-label`[\s\S]*const valueId = `settings-files-material-classification-handoff-\$\{itemView\.id\}-value`[\s\S]*const descriptionId = `settings-files-material-classification-handoff-\$\{itemView\.id\}-description`[\s\S]*data-handoff-item=\{itemView\.id\}[\s\S]*id=\{labelId\}[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*aria-label=\{itemView\.ariaLabel\}[\s\S]*aria-labelledby=\{`\$\{labelId\} \$\{valueId\}`\}[\s\S]*id=\{valueId\}[\s\S]*id=\{descriptionId\}/,
+    /SettingsFilesMaterialClassificationHandoffView[\s\S]*function FilesMaterialClassificationHandoff\([\s\S]*const titleId = 'settings-files-material-classification-handoff-title'[\s\S]*const descriptionId =[\s\S]*'settings-files-material-classification-handoff-description'[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*aria-labelledby=\{titleId\}[\s\S]*className="sr-only"[\s\S]*data-handoff="settings-files-material-classification"[\s\S]*data-handoff-scope=\{view\.privacy\.scope\}[\s\S]*id=\{titleId\}[\s\S]*id=\{descriptionId\}[\s\S]*view\.itemViews\.map\(\(itemView\) =>[\s\S]*FilesMaterialClassificationHandoffItem[\s\S]*function FilesMaterialClassificationHandoffItem[\s\S]*itemView: SettingsFilesMaterialClassificationHandoffView\['itemViews'\]\[number\][\s\S]*const labelId = `settings-files-material-classification-handoff-\$\{itemView\.id\}-label`[\s\S]*const valueId = `settings-files-material-classification-handoff-\$\{itemView\.id\}-value`[\s\S]*const descriptionId = `settings-files-material-classification-handoff-\$\{itemView\.id\}-description`[\s\S]*data-handoff-item=\{itemView\.id\}[\s\S]*id=\{labelId\}[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*aria-label=\{itemView\.ariaLabel\}[\s\S]*aria-labelledby=\{`\$\{labelId\} \$\{valueId\}`\}[\s\S]*id=\{valueId\}[\s\S]*id=\{descriptionId\}/,
     'Material-classification handoff should render each file-material slice with stable label, value, and description relationships.'
   );
 });
@@ -278,6 +278,7 @@ test('settings files material classification focused gate is documented', () => 
     'student-payload guard',
     'file-byte/storage-key/filename/permission guards',
     'full-library summary',
+    'settings files material-classification privacy-scope boundaries',
     'hidden settings-files-material-classification handoff',
   ]) {
     assert.match(

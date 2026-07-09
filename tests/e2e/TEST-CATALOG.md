@@ -135,14 +135,16 @@ Settings files source-material library has a fast script-level gate via
 `pnpm exec tsx --test scripts/settings-files-source-material-handoff-semantic-views.test.ts`;
 run it when changing source-material library, activity attachments, AI draft
 provenance, student payload privacy, full-library summaries, owner-scoped user
-files, storage-key guard, or the settings-files-source-material handoff.
+files, storage-key guard, settings-files source-material privacy-scope
+boundaries, or the settings-files-source-material handoff.
 Settings files material classification has a fast script-level gate via
 `pnpm exec tsx --test scripts/settings-files-material-classification-handoff-semantic-views.test.ts`;
 run it when changing content-type normalization, extension fallback,
 audio/worksheet/spreadsheet/video/file detection, ActivityContent.sourceMaterials
 references, AI draft provenance, student-payload guard,
-file-byte/storage-key/filename/permission guards, full-library summary, or the
-hidden settings-files-material-classification handoff.
+file-byte/storage-key/filename/permission guards, full-library summary, settings
+files material-classification privacy-scope boundaries, or the hidden
+settings-files-material-classification handoff.
 Activity source-material picker has a fast script-level gate via
 `pnpm exec tsx --test scripts/activity-source-material-picker-handoff-semantic-views.test.ts`;
 run it when changing owner scope, storage load gate, picker status, selected
