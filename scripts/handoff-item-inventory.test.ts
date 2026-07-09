@@ -4,6 +4,7 @@ import { join } from 'node:path';
 import test from 'node:test';
 
 const SOURCE_ROOT = 'src';
+const SCRIPT_ROOT = 'scripts';
 const TEST_CATALOG_PATH = 'tests/e2e/TEST-CATALOG.md';
 const EXPECTED_HANDOFF_ITEM_COUNT = 30;
 const HANDOFF_ARRAY_PATTERN =
@@ -18,6 +19,7 @@ type HandoffInventoryEntry = {
 };
 
 const inventoryEntries = discoverHandoffInventory();
+const scriptGateSources = readScriptGateSources();
 const testCatalogSource = readFileSync(TEST_CATALOG_PATH, 'utf8');
 
 test('handoff inventory discovers product-loop contracts', () => {
@@ -88,6 +90,23 @@ test('handoff item ids remain stable kebab-case semantic slices', () => {
   );
 });
 
+test('every handoff item contract is covered by a focused script gate', () => {
+  const untestedContracts = inventoryEntries
+    .filter(
+      (entry) =>
+        !scriptGateSources.some((scriptSource) =>
+          scriptSource.source.includes(entry.constName)
+        )
+    )
+    .map((entry) => `${entry.filePath}:${entry.constName}`);
+
+  assert.deepEqual(
+    untestedContracts,
+    [],
+    'Each exported *_HANDOFF_ITEM_IDS contract should be referenced by a focused script-level gate.'
+  );
+});
+
 test('handoff inventory check is documented for future contract edits', () => {
   assert.match(
     testCatalogSource,
@@ -98,6 +117,11 @@ test('handoff inventory check is documented for future contract edits', () => {
     testCatalogSource,
     /30-item handoff arrays[\s\S]*unique kebab-case item ids/,
     'TEST-CATALOG should document the handoff inventory trigger scope.'
+  );
+  assert.match(
+    testCatalogSource,
+    /focused\s+script-level coverage/,
+    'TEST-CATALOG should document the focused gate coverage boundary.'
   );
 });
 
@@ -128,6 +152,20 @@ function listSourceFiles(directoryPath: string): string[] {
       return [];
     })
     .sort();
+}
+
+function readScriptGateSources() {
+  return readdirSync(SCRIPT_ROOT)
+    .filter((fileName) => fileName.endsWith('.test.ts'))
+    .map((fileName) => {
+      const filePath = `${SCRIPT_ROOT}/${fileName}`;
+
+      return {
+        filePath,
+        source: readFileSync(filePath, 'utf8'),
+      };
+    })
+    .sort((left, right) => left.filePath.localeCompare(right.filePath));
 }
 
 function parseHandoffInventoryEntries(
