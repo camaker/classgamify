@@ -7025,7 +7025,7 @@ assert.match(
 );
 assert.match(
   activityTemplateReadinessPanelSource,
-  /function ActivityTemplateQuizChoiceGenerationHandoff[\s\S]*const titleId = 'question-choice-generation-handoff-title'[\s\S]*const descriptionId = 'question-choice-generation-handoff-description'[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*aria-labelledby=\{titleId\}[\s\S]*data-handoff="question-choice-generation"[\s\S]*id=\{titleId\}[\s\S]*id=\{descriptionId\}[\s\S]*handoffView\.itemViews\.map[\s\S]*ActivityTemplateQuizChoiceGenerationHandoffItem[\s\S]*key=\{item\.id\}/,
+  /function ActivityTemplateQuizChoiceGenerationHandoff[\s\S]*const titleId = 'question-choice-generation-handoff-title'[\s\S]*const descriptionId = 'question-choice-generation-handoff-description'[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*aria-labelledby=\{titleId\}[\s\S]*data-handoff="question-choice-generation"[\s\S]*data-handoff-scope=\{handoffView\.privacy\.scope\}[\s\S]*id=\{titleId\}[\s\S]*id=\{descriptionId\}[\s\S]*handoffView\.itemViews\.map[\s\S]*ActivityTemplateQuizChoiceGenerationHandoffItem[\s\S]*key=\{item\.id\}/,
   'Activity template readiness panel should render prepared quiz choice generation handoff views as labelled sections.'
 );
 assert.match(

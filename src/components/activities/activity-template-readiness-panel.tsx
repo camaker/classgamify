@@ -151,6 +151,7 @@ function ActivityTemplateQuizChoiceGenerationHandoff({
       aria-labelledby={titleId}
       className="mt-4 rounded-lg border bg-background/70 p-3"
       data-handoff="question-choice-generation"
+      data-handoff-scope={handoffView.privacy.scope}
     >
       <h5 className="font-medium text-xs leading-5" id={titleId}>
         {handoffView.title}

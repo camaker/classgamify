@@ -331,7 +331,8 @@ Quiz choice generation has a fast script-level gate via
 `pnpm exec tsx --test scripts/question-choice-generation-handoff-semantic-views.test.ts`;
 run it when changing deterministic distractor generation, question option
 normalization, editor quiz-choice readiness, runtime quiz choices, validation
-of `ActivityQuestion.options`, or future AI distractor write targets.
+of `ActivityQuestion.options`, future AI distractor write targets, or
+quiz-choice generation privacy-scope boundaries.
 Printable worksheet handoff has a fast script-level gate via
 `pnpm exec tsx --test scripts/printable-worksheet-handoff-semantic-views.test.ts`;
 run it when changing print-route search parsing, worksheet response policies,

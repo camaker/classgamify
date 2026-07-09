@@ -367,12 +367,17 @@ test('question choice generation keeps runtime and draft option contracts aligne
     /scripts\/question-choice-generation-handoff-semantic-views\.test\.ts/,
     'The E2E catalog should list the fast gate for quiz-choice contract changes.'
   );
+  assert.match(
+    TEST_CATALOG_SOURCE,
+    /quiz-choice generation privacy-scope boundaries/,
+    'The E2E catalog should document the quiz-choice privacy-scope fast gate.'
+  );
 });
 
 test('question choice generation handoff renders stable DOM relationships', () => {
   assert.match(
     TEMPLATE_READINESS_PANEL_SOURCE,
-    /QuestionChoiceGenerationHandoffItemView[\s\S]*QuestionChoiceGenerationHandoffView[\s\S]*function ActivityTemplateQuizChoiceGenerationHandoff[\s\S]*const titleId = 'question-choice-generation-handoff-title'[\s\S]*const descriptionId = 'question-choice-generation-handoff-description'[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*aria-labelledby=\{titleId\}[\s\S]*data-handoff="question-choice-generation"[\s\S]*id=\{titleId\}[\s\S]*id=\{descriptionId\}[\s\S]*handoffView\.itemViews\.map[\s\S]*ActivityTemplateQuizChoiceGenerationHandoffItem/,
+    /QuestionChoiceGenerationHandoffItemView[\s\S]*QuestionChoiceGenerationHandoffView[\s\S]*function ActivityTemplateQuizChoiceGenerationHandoff[\s\S]*const titleId = 'question-choice-generation-handoff-title'[\s\S]*const descriptionId = 'question-choice-generation-handoff-description'[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*aria-labelledby=\{titleId\}[\s\S]*data-handoff="question-choice-generation"[\s\S]*data-handoff-scope=\{handoffView\.privacy\.scope\}[\s\S]*id=\{titleId\}[\s\S]*id=\{descriptionId\}[\s\S]*handoffView\.itemViews\.map[\s\S]*ActivityTemplateQuizChoiceGenerationHandoffItem/,
     'Question choice generation handoff should render a labelled section tied to its prepared description.'
   );
   assert.match(
