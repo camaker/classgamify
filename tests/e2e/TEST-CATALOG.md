@@ -59,6 +59,13 @@ run it when changing shuffle helper logic, share-slug normalization, public
 payload ordering, student submit/review ordering, printable worksheet ordering,
 delivery summaries, publish previews, public rule summaries, or CSV/export
 delivery-policy fields.
+Student runner loading readiness has a fast script-level gate via
+`pnpm exec tsx --test scripts/student-runner-loading-handoff-semantic-views.test.ts`;
+run it when changing public assignment lookup loading, sanitized payload
+preparation, timer-start boundaries, attempt-clock start plans, submit blocking,
+identity preparation, starter-preview fallback timing, public runner noindex
+policy, loading privacy-scope boundaries, or the hidden student-runner-loading
+handoff.
 Student runner safe start has a fast script-level gate via
 `pnpm exec tsx --test scripts/student-runner-start-handoff-semantic-views.test.ts`;
 run it when changing public rule summaries, before-start guidance, identity or

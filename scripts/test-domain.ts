@@ -1138,6 +1138,7 @@ import {
   shouldResetStudentRunnerAttemptSession,
   shouldStartStudentRunnerAttemptClock,
 } from '@/assignments/student-runner-state';
+import { STUDENT_RUNNER_LOADING_HANDOFF_ITEM_IDS } from '@/assignments/student-runner-loading-handoff';
 import {
   buildAttemptCompletionCopy,
   applyStudentAnswerChanges,
@@ -29154,7 +29155,13 @@ assert.deepEqual(
     headerView: studentRunnerPageView.headerView,
     identityView: studentRunnerPageView.identityView,
     itemCount: studentRunnerPageView.itemCount,
-    loadingView: studentRunnerPageView.loadingView,
+    loadingView: {
+      message: studentRunnerPageView.loadingView.message,
+      handoffScope: studentRunnerPageView.loadingView.handoffView.privacy.scope,
+      handoffItemIds: studentRunnerPageView.loadingView.handoffView.itemViews.map(
+        (item) => item.id
+      ),
+    },
     missingView: studentRunnerPageView.missingView,
     previewView: studentRunnerPageView.previewView,
     resultPanelView: studentRunnerPageView.resultPanelView,
@@ -29265,6 +29272,8 @@ assert.deepEqual(
     },
     itemCount: publicRunnerState.runtimeItems.length,
     loadingView: {
+      handoffItemIds: [...STUDENT_RUNNER_LOADING_HANDOFF_ITEM_IDS],
+      handoffScope: 'public-student-runner-loading',
       message: 'Loading student activity...',
     },
     missingView: undefined,
@@ -30301,13 +30310,63 @@ const loadingStudentRunnerRouteState = buildStudentRunnerRouteState(
 );
 assert.deepEqual(
   {
+    loadingHandoffItemIds:
+      loadingStudentRunnerRouteState.pageView.loadingView.handoffView.itemViews.map(
+        (item) => item.id
+      ),
+    loadingHandoffPrivacy:
+      loadingStudentRunnerRouteState.pageView.loadingView.handoffView.privacy,
     loadingMessage: loadingStudentRunnerRouteState.pageView.loadingView.message,
     status: loadingStudentRunnerRouteState.status,
   },
   {
+    loadingHandoffItemIds: [...STUDENT_RUNNER_LOADING_HANDOFF_ITEM_IDS],
+    loadingHandoffPrivacy: {
+      allowsSubmission: false,
+      exposesActivityContent: false,
+      exposesActualShareSlug: false,
+      exposesAnonymousToken: false,
+      exposesAnswerKeys: false,
+      exposesAssignmentTitle: false,
+      exposesBrowserLabel: false,
+      exposesExplanations: false,
+      exposesRawSettingsJson: false,
+      exposesRuntimeChoiceText: false,
+      exposesRuntimeItemIds: false,
+      exposesRuntimePromptText: false,
+      exposesSourceMaterialMetadata: false,
+      exposesStudentAnswerText: false,
+      exposesStudentName: false,
+      itemIds: [...STUDENT_RUNNER_LOADING_HANDOFF_ITEM_IDS],
+      scope: 'public-student-runner-loading',
+      startsAttemptClock: false,
+    },
     loadingMessage: 'Loading student activity...',
     status: 'loading',
   }
+);
+const studentRunnerLoadingHandoffValues = new Map(
+  loadingStudentRunnerRouteState.pageView.loadingView.handoffView.itemViews.map(
+    (item) => [item.id, item.value]
+  )
+);
+assert.equal(
+  studentRunnerLoadingHandoffValues.get('share-link'),
+  'Share id hidden'
+);
+assert.equal(studentRunnerLoadingHandoffValues.get('lookup-state'), 'Pending');
+assert.equal(
+  studentRunnerLoadingHandoffValues.get('timer-start-boundary'),
+  'After runtime load'
+);
+assert.equal(
+  studentRunnerLoadingHandoffValues.get('attempt-clock-status'),
+  'Not started'
+);
+assert.equal(studentRunnerLoadingHandoffValues.get('submit-gate'), 'Blocked');
+assert.equal(
+  studentRunnerLoadingHandoffValues.get('privacy-guard'),
+  'Private data omitted'
 );
 assert.deepEqual(
   buildStudentRunnerPageViewModel({
@@ -30343,9 +30402,20 @@ const missingStudentRunnerPageView = buildStudentRunnerPageViewModel({
   shareId: 'missing-share',
   submittedAttemptCount: 0,
 });
-assert.deepEqual(missingStudentRunnerPageView.loadingView, {
-  message: 'Loading student activity...',
-});
+assert.deepEqual(
+  {
+    itemIds: missingStudentRunnerPageView.loadingView.handoffView.itemViews.map(
+      (item) => item.id
+    ),
+    message: missingStudentRunnerPageView.loadingView.message,
+    scope: missingStudentRunnerPageView.loadingView.handoffView.privacy.scope,
+  },
+  {
+    itemIds: [...STUDENT_RUNNER_LOADING_HANDOFF_ITEM_IDS],
+    message: 'Loading student activity...',
+    scope: 'public-student-runner-loading',
+  }
+);
 assert.equal(missingStudentRunnerPageView.missingReason, 'closed');
 const missingStudentRunnerRouteState = buildStudentRunnerRouteState(
   missingStudentRunnerPageView

@@ -92,6 +92,10 @@ import {
 } from '@/assignments/runtime-display';
 import { normalizeAssignmentShareSlug } from '@/assignments/share-slug';
 import {
+  buildStudentRunnerLoadingHandoffView,
+  type StudentRunnerLoadingHandoffView,
+} from '@/assignments/student-runner-loading-handoff';
+import {
   buildStudentRunnerHeaderView,
   type StudentRunnerHeaderView,
   type StudentRunnerPrepareStepId,
@@ -145,6 +149,7 @@ export type StudentRunnerAttemptResult = PublicAttemptResult & {
 };
 
 export type StudentRunnerLoadingView = {
+  handoffView: StudentRunnerLoadingHandoffView;
   message: string;
 };
 
@@ -1089,6 +1094,10 @@ export function buildStudentRunnerPageViewModel({
     identityView,
     itemCount: attemptState.itemCount,
     loadingView: {
+      handoffView: buildStudentRunnerLoadingHandoffView({
+        message: runnerCopy.loadingMessage,
+        shareId: activeShareId,
+      }),
       message: runnerCopy.loadingMessage,
     },
     missingReason:
