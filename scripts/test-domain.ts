@@ -2258,7 +2258,7 @@ assert.equal(
 );
 assert.match(
   settingsProfileViewSource,
-  /export type SettingsProfileWorkspaceSummaryItemId =[\s\S]*'activities'[\s\S]*'assignments'[\s\S]*'results'[\s\S]*'student-recognition'/,
+  /type SettingsProfileWorkspaceSummaryItemId =[\s\S]*'activities'[\s\S]*'assignments'[\s\S]*'results'[\s\S]*'student-recognition'/,
   'Profile settings view model should expose stable teacher identity scope item ids.'
 );
 assert.match(
@@ -2811,12 +2811,12 @@ assert.match(
 );
 assert.match(
   activityTemplateRemixSource,
-  /export class TemplateRemixReadinessError extends Error[\s\S]*readonly code: TemplateRemixReadinessErrorCode[\s\S]*readonly diagnosis: string[\s\S]*readonly missingRequirements: ActivityTemplateContentRequirement\[\][\s\S]*readonly templateType: ActivityTemplateType[\s\S]*export function assertTemplateRemixOptionReady\(option: TemplateRemixOption\)/,
+  /class TemplateRemixReadinessError extends Error[\s\S]*readonly code: TemplateRemixReadinessErrorCode[\s\S]*readonly diagnosis: string[\s\S]*readonly missingRequirements: ActivityTemplateContentRequirement\[\][\s\S]*readonly templateType: ActivityTemplateType[\s\S]*export function assertTemplateRemixOptionReady\(option: TemplateRemixOption\)/,
   'Template remix readiness failures should expose a structured domain error contract.'
 );
 assert.match(
   activityTemplateRemixSource,
-  /export const ACTIVITY_TEMPLATE_REMIX_HANDOFF_ITEM_IDS = \[(?=[\s\S]*'current-template')(?=[\s\S]*'current-readiness')(?=[\s\S]*'ready-template-count')(?=[\s\S]*'suggested-remix-count')(?=[\s\S]*'suggested-remix-actions')(?=[\s\S]*'locked-template-count')(?=[\s\S]*'locked-diagnostics')(?=[\s\S]*'missing-requirements')(?=[\s\S]*'owner-scope')(?=[\s\S]*'source-status')(?=[\s\S]*'lifecycle-gate')(?=[\s\S]*'ready-target-only')(?=[\s\S]*'current-template-excluded')(?=[\s\S]*'visible-action-limit')(?=[\s\S]*'draft-output')(?=[\s\S]*'title-strategy')(?=[\s\S]*'title-limit')(?=[\s\S]*'template-switch')(?=[\s\S]*'content-clone')(?=[\s\S]*'questions')(?=[\s\S]*'pairs')(?=[\s\S]*'groups')(?=[\s\S]*'vocabulary')(?=[\s\S]*'teacher-notes')(?=[\s\S]*'source-materials')(?=[\s\S]*'source-material-kinds')(?=[\s\S]*'source-material-privacy')(?=[\s\S]*'assignment-snapshot-protection')(?=[\s\S]*'original-activity-protection')(?=[\s\S]*'privacy-guard')[\s\S]*export type ActivityTemplateRemixHandoffPrivacyContract = \{[\s\S]*clonesSourceMaterialReferences: true;[\s\S]*excludesCurrentTemplate: true;[\s\S]*exposesActivityContentText: false;[\s\S]*exposesAnswerText: false;[\s\S]*exposesQuestionPromptText: false;[\s\S]*exposesSourceMaterialFilenames: false;[\s\S]*exposesSourceMaterialFileIds: false;[\s\S]*exposesSourceMaterialStorageKeys: false;[\s\S]*exposesSourceSummaryText: false;[\s\S]*exposesTeacherNotesText: false;[\s\S]*modifiesOriginalActivity: false;[\s\S]*modifiesPublishedAssignmentSnapshots: false;[\s\S]*outputVisibility: 'draft';[\s\S]*requiresOwnerScopedSource: true;[\s\S]*scope: 'deterministic-template-remix';[\s\S]*targetTemplatesAreReadyOnly: true;/,
+  /export const ACTIVITY_TEMPLATE_REMIX_HANDOFF_ITEM_IDS = \[(?=[\s\S]*'current-template')(?=[\s\S]*'current-readiness')(?=[\s\S]*'ready-template-count')(?=[\s\S]*'suggested-remix-count')(?=[\s\S]*'suggested-remix-actions')(?=[\s\S]*'locked-template-count')(?=[\s\S]*'locked-diagnostics')(?=[\s\S]*'missing-requirements')(?=[\s\S]*'owner-scope')(?=[\s\S]*'source-status')(?=[\s\S]*'lifecycle-gate')(?=[\s\S]*'ready-target-only')(?=[\s\S]*'current-template-excluded')(?=[\s\S]*'visible-action-limit')(?=[\s\S]*'draft-output')(?=[\s\S]*'title-strategy')(?=[\s\S]*'title-limit')(?=[\s\S]*'template-switch')(?=[\s\S]*'content-clone')(?=[\s\S]*'questions')(?=[\s\S]*'pairs')(?=[\s\S]*'groups')(?=[\s\S]*'vocabulary')(?=[\s\S]*'teacher-notes')(?=[\s\S]*'source-materials')(?=[\s\S]*'source-material-kinds')(?=[\s\S]*'source-material-privacy')(?=[\s\S]*'assignment-snapshot-protection')(?=[\s\S]*'original-activity-protection')(?=[\s\S]*'privacy-guard')[\s\S]*type ActivityTemplateRemixHandoffPrivacyContract = \{[\s\S]*clonesSourceMaterialReferences: true;[\s\S]*excludesCurrentTemplate: true;[\s\S]*exposesActivityContentText: false;[\s\S]*exposesAnswerText: false;[\s\S]*exposesQuestionPromptText: false;[\s\S]*exposesSourceMaterialFilenames: false;[\s\S]*exposesSourceMaterialFileIds: false;[\s\S]*exposesSourceMaterialStorageKeys: false;[\s\S]*exposesSourceSummaryText: false;[\s\S]*exposesTeacherNotesText: false;[\s\S]*modifiesOriginalActivity: false;[\s\S]*modifiesPublishedAssignmentSnapshots: false;[\s\S]*outputVisibility: 'draft';[\s\S]*requiresOwnerScopedSource: true;[\s\S]*scope: 'deterministic-template-remix';[\s\S]*targetTemplatesAreReadyOnly: true;/,
   'Template remix handoff should expose 30 stable slice ids for the deterministic draft-copy contract.'
 );
 assert.match(
@@ -2826,7 +2826,7 @@ assert.match(
 );
 assert.match(
   activityTemplateRemixSource,
-  /export type ActivityTemplateRemixHandoffPrivacyContract = \{[\s\S]*clonesSourceMaterialReferences: true;[\s\S]*excludesCurrentTemplate: true;[\s\S]*exposesActivityContentText: false;[\s\S]*exposesAnswerText: false;[\s\S]*exposesQuestionPromptText: false;[\s\S]*exposesSourceMaterialFilenames: false;[\s\S]*exposesSourceMaterialFileIds: false;[\s\S]*exposesSourceMaterialStorageKeys: false;[\s\S]*exposesSourceSummaryText: false;[\s\S]*exposesTeacherNotesText: false;[\s\S]*modifiesOriginalActivity: false;[\s\S]*modifiesPublishedAssignmentSnapshots: false;[\s\S]*outputVisibility: 'draft';[\s\S]*requiresOwnerScopedSource: true;[\s\S]*scope: 'deterministic-template-remix';[\s\S]*targetTemplatesAreReadyOnly: true;/,
+  /type ActivityTemplateRemixHandoffPrivacyContract = \{[\s\S]*clonesSourceMaterialReferences: true;[\s\S]*excludesCurrentTemplate: true;[\s\S]*exposesActivityContentText: false;[\s\S]*exposesAnswerText: false;[\s\S]*exposesQuestionPromptText: false;[\s\S]*exposesSourceMaterialFilenames: false;[\s\S]*exposesSourceMaterialFileIds: false;[\s\S]*exposesSourceMaterialStorageKeys: false;[\s\S]*exposesSourceSummaryText: false;[\s\S]*exposesTeacherNotesText: false;[\s\S]*modifiesOriginalActivity: false;[\s\S]*modifiesPublishedAssignmentSnapshots: false;[\s\S]*outputVisibility: 'draft';[\s\S]*requiresOwnerScopedSource: true;[\s\S]*scope: 'deterministic-template-remix';[\s\S]*targetTemplatesAreReadyOnly: true;/,
   'Template remix handoff should publish an explicit privacy and draft-output contract.'
 );
 assert.match(
@@ -3016,12 +3016,12 @@ assert.doesNotMatch(
 );
 assert.match(
   assignmentResultActionsSource,
-  /export type AssignmentResultActionData = AssignmentResultsExportData/,
+  /type AssignmentResultActionData = AssignmentResultsExportData/,
   'Assignment result actions should share the CSV export data contract.'
 );
 assert.match(
   assignmentResultActionsSource,
-  /AssignmentItemAnalysis[\s\S]*AssignmentResultsAnalysis[\s\S]*AssignmentStudentSummary[\s\S]*export type AssignmentResultCopyActionAnalysis = AssignmentResultsAnalysis & \{[\s\S]*perItem: AssignmentItemAnalysis\[\];[\s\S]*students: AssignmentStudentSummary\[\];[\s\S]*analysis: AssignmentResultCopyActionAnalysis;/,
+  /AssignmentItemAnalysis[\s\S]*AssignmentResultsAnalysis[\s\S]*AssignmentStudentSummary[\s\S]*type AssignmentResultCopyActionAnalysis = AssignmentResultsAnalysis & \{[\s\S]*perItem: AssignmentItemAnalysis\[\];[\s\S]*students: AssignmentStudentSummary\[\];[\s\S]*analysis: AssignmentResultCopyActionAnalysis;/,
   'Assignment result copy actions should expose explicit analysis child contracts.'
 );
 assert.match(
@@ -3031,7 +3031,7 @@ assert.match(
 );
 assert.match(
   assignmentResultActionsSource,
-  /export type AssignmentResultCopyArtifactPreviewMetaItem = \{[\s\S]*key: AssignmentResultCopyArtifactPreviewMetaKey;[\s\S]*export type AssignmentResultCopyArtifactPreviewMetaKey =[\s\S]*'focus-items'[\s\S]*'latest-attempt-times'[\s\S]*'latest-attempts'[\s\S]*'student-last-submitted'[\s\S]*'students';/,
+  /export type AssignmentResultCopyArtifactPreviewMetaItem = \{[\s\S]*key: AssignmentResultCopyArtifactPreviewMetaKey;[\s\S]*type AssignmentResultCopyArtifactPreviewMetaKey =[\s\S]*'focus-items'[\s\S]*'latest-attempt-times'[\s\S]*'latest-attempts'[\s\S]*'student-last-submitted'[\s\S]*'students';/,
   'Assignment result copy artifact metadata should expose an explicit meta-key contract.'
 );
 assert.doesNotMatch(
@@ -3066,7 +3066,7 @@ assert.match(
 );
 assert.match(
   assignmentResultActionsSource,
-  /export type AssignmentResultActionBlockedReason =[\s\S]*'brief-not-ready'[\s\S]*'missing-attempts'[\s\S]*'missing-items'[\s\S]*'missing-students'/,
+  /type AssignmentResultActionBlockedReason =[\s\S]*'brief-not-ready'[\s\S]*'missing-attempts'[\s\S]*'missing-items'[\s\S]*'missing-students'/,
   'Assignment result action gates should expose stable blocked-reason codes separately from localized messages.'
 );
 assert.match(
@@ -5992,7 +5992,7 @@ assert.match(
 );
 assert.match(
   activityTemplateRemixSource,
-  /export type TemplateRemixSummary = \{[\s\S]*readyTemplateOptions: TemplateRemixTemplateOption\[\];/,
+  /type TemplateRemixSummary = \{[\s\S]*readyTemplateOptions: TemplateRemixTemplateOption\[\];/,
   'Template remix domain should expose an explicit remix summary contract for scaffold readiness.'
 );
 assert.match(
@@ -15529,7 +15529,7 @@ assert.match(
 );
 assert.match(
   studentRuntimeItemListDomainSource,
-  /export function buildStudentRuntimeSemanticBundleHandoffView\(\{[\s\S]*interactionHandoffView,[\s\S]*runtimeChoiceAssignmentHandoffView,[\s\S]*runtimeIdentityHandoffView,[\s\S]*STUDENT_RUNTIME_SEMANTIC_BUNDLE_HANDOFF_ITEM_IDS\.map[\s\S]*getStudentRuntimeSemanticBundleSource\([\s\S]*getStudentRuntimeSemanticBundleSourceItem\([\s\S]*sourceItem\.description[\s\S]*sourceItem\.label[\s\S]*sourceItem\.value[\s\S]*data/,
+  /function buildStudentRuntimeSemanticBundleHandoffView\(\{[\s\S]*interactionHandoffView,[\s\S]*runtimeChoiceAssignmentHandoffView,[\s\S]*runtimeIdentityHandoffView,[\s\S]*STUDENT_RUNTIME_SEMANTIC_BUNDLE_HANDOFF_ITEM_IDS\.map[\s\S]*getStudentRuntimeSemanticBundleSource\([\s\S]*getStudentRuntimeSemanticBundleSourceItem\([\s\S]*sourceItem\.description[\s\S]*sourceItem\.label[\s\S]*sourceItem\.value[\s\S]*data/,
   'Student runtime semantic bundle should derive its 30 slices from existing safe child handoff items instead of recalculating prompt, choice, answer, or runtime-id data.'
 );
 assert.match(

@@ -325,7 +325,7 @@ export function buildStudentRuntimeSingleAnswerChanges({
   return buildStudentAnswerChanges({ answer, itemId });
 }
 
-export function buildStudentRuntimeSemanticBundleHandoffView({
+function buildStudentRuntimeSemanticBundleHandoffView({
   interactionHandoffView,
   runtimeChoiceAssignmentHandoffView,
   runtimeIdentityHandoffView,

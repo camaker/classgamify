@@ -68,7 +68,7 @@ export type StorageUploadReadinessIssue = {
   details?: StorageErrorDetails;
 };
 
-export type StorageUploadObjectPlan = {
+type StorageUploadObjectPlan = {
   isPublicFolder: boolean;
   r2Key: string;
   sanitizedFolder?: string;
@@ -90,7 +90,7 @@ export type StorageUploadReadinessPlan = {
   validation: ValidationResult<true>;
 };
 
-export type StorageUploadReadinessPrivacyContract = {
+type StorageUploadReadinessPrivacyContract = {
   exposesFileBytes: false;
   exposesOriginalFilename: false;
   exposesPermissionMetadata: false;
@@ -132,7 +132,7 @@ export const STORAGE_UPLOAD_DANGEROUS_CONTENT_TYPES = [
   'text/javascript',
 ] as const;
 
-export const STORAGE_UPLOAD_MIME_EXTENSIONS: Record<string, string[]> = {
+const STORAGE_UPLOAD_MIME_EXTENSIONS: Record<string, string[]> = {
   'application/gzip': ['gz'],
   'application/json': ['json'],
   'application/msword': ['doc'],

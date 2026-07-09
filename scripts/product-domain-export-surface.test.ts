@@ -3,7 +3,7 @@ import { readFileSync } from 'node:fs';
 import test from 'node:test';
 
 type InternalHelperDeclaration = {
-  declaration: 'const' | 'function';
+  declaration: 'class' | 'const' | 'function' | 'type';
   filePath: string;
   name: string;
 };
@@ -255,6 +255,157 @@ const INTERNAL_PRODUCT_DOMAIN_HELPERS = [
     filePath: 'src/assignments/student-runtime-item-list.ts',
     name: 'buildStudentRuntimeInteractionHandoffView',
   },
+  {
+    declaration: 'type',
+    filePath: 'src/activities/template-remix.ts',
+    name: 'TemplateRemixReadinessErrorCode',
+  },
+  {
+    declaration: 'class',
+    filePath: 'src/activities/template-remix.ts',
+    name: 'TemplateRemixReadinessError',
+  },
+  {
+    declaration: 'type',
+    filePath: 'src/activities/template-remix.ts',
+    name: 'TemplateRemixSummary',
+  },
+  {
+    declaration: 'type',
+    filePath: 'src/activities/template-remix.ts',
+    name: 'ActivityTemplateRemixHandoffItemId',
+  },
+  {
+    declaration: 'type',
+    filePath: 'src/activities/template-remix.ts',
+    name: 'ActivityTemplateRemixHandoffItemView',
+  },
+  {
+    declaration: 'type',
+    filePath: 'src/activities/template-remix.ts',
+    name: 'ActivityTemplateRemixHandoffPrivacyContract',
+  },
+  {
+    declaration: 'type',
+    filePath: 'src/activities/template-remix.ts',
+    name: 'ActivityTemplateRemixHandoffView',
+  },
+  {
+    declaration: 'type',
+    filePath: 'src/activities/template-remix.ts',
+    name: 'ActivityTemplateRemixHandoffSource',
+  },
+  {
+    declaration: 'function',
+    filePath: 'src/assignments/student-runtime-item-list.ts',
+    name: 'buildStudentRuntimeSemanticBundleHandoffView',
+  },
+  {
+    declaration: 'type',
+    filePath: 'src/assignments/result-actions.ts',
+    name: 'AssignmentResultActionBlockedReason',
+  },
+  {
+    declaration: 'type',
+    filePath: 'src/assignments/result-actions.ts',
+    name: 'AssignmentResultActionStatusTone',
+  },
+  {
+    declaration: 'type',
+    filePath: 'src/assignments/result-actions.ts',
+    name: 'AssignmentResultActionDescriptor',
+  },
+  {
+    declaration: 'type',
+    filePath: 'src/assignments/result-actions.ts',
+    name: 'AssignmentResultActionPayload',
+  },
+  {
+    declaration: 'type',
+    filePath: 'src/assignments/result-actions.ts',
+    name: 'AssignmentResultActionExecutionPlan',
+  },
+  {
+    declaration: 'type',
+    filePath: 'src/assignments/result-actions.ts',
+    name: 'AssignmentResultActionData',
+  },
+  {
+    declaration: 'type',
+    filePath: 'src/assignments/result-actions.ts',
+    name: 'AssignmentResultCopyActionAnalysis',
+  },
+  {
+    declaration: 'type',
+    filePath: 'src/assignments/result-actions.ts',
+    name: 'AssignmentResultCopyArtifactPreviewScopeItemId',
+  },
+  {
+    declaration: 'type',
+    filePath: 'src/assignments/result-actions.ts',
+    name: 'AssignmentResultCopyArtifactPreviewScopeSummaryItemId',
+  },
+  {
+    declaration: 'type',
+    filePath: 'src/assignments/result-actions.ts',
+    name: 'AssignmentResultCopyArtifactPreviewMetaKey',
+  },
+  {
+    declaration: 'function',
+    filePath: 'src/assignments/result-actions.ts',
+    name: 'getAssignmentResultCopyArtifactPreviewSummary',
+  },
+  {
+    declaration: 'function',
+    filePath: 'src/assignments/result-actions.ts',
+    name: 'buildAssignmentResultCopyArtifactPreviewMetaItems',
+  },
+  {
+    declaration: 'function',
+    filePath: 'src/assignments/result-actions.ts',
+    name: 'buildAssignmentResultClassroomBriefStats',
+  },
+  {
+    declaration: 'type',
+    filePath: 'src/pages/legal-policy-view.ts',
+    name: 'LegalPolicyHandoffPrivacyContract',
+  },
+  {
+    declaration: 'function',
+    filePath: 'src/pages/legal-policy-view.ts',
+    name: 'buildLegalPolicyHandoffView',
+  },
+  {
+    declaration: 'type',
+    filePath: 'src/settings/profile-view.ts',
+    name: 'SettingsProfileWorkspaceSummaryItemId',
+  },
+  {
+    declaration: 'function',
+    filePath: 'src/settings/profile-view.ts',
+    name: 'buildSettingsProfileWorkspaceSummaryView',
+  },
+  {
+    declaration: 'type',
+    filePath: 'src/storage/upload-readiness.ts',
+    name: 'StorageUploadObjectPlan',
+  },
+  {
+    declaration: 'type',
+    filePath: 'src/storage/upload-readiness.ts',
+    name: 'StorageUploadReadinessPrivacyContract',
+  },
+  {
+    declaration: 'const',
+    filePath: 'src/storage/upload-readiness.ts',
+    name: 'STORAGE_UPLOAD_MIME_EXTENSIONS',
+  },
+  {
+    declaration: 'function',
+    filePath:
+      'src/components/classroom/classroom-control-semantics-handoff.tsx',
+    name: 'ClassroomControlSemanticsHandoff',
+  },
 ] satisfies InternalHelperDeclaration[];
 
 const RESULT_VIEW_REEXPORT_BOUNDARIES = [
@@ -363,15 +514,10 @@ const RESULT_VIEW_REEXPORT_BOUNDARIES = [
     name: 'buildAssignmentResultMaterialHandoffView',
     sourceFilePath: 'src/assignments/result-actions.ts',
   },
-  {
-    aggregatorFilePath: 'src/assignments/result-view.ts',
-    name: 'buildAssignmentResultClassroomBriefStats',
-    sourceFilePath: 'src/assignments/result-actions.ts',
-  },
 ] satisfies ReExportBoundary[];
 
-test('product-domain export surface keeps 48 helpers internal', () => {
-  assert.equal(INTERNAL_PRODUCT_DOMAIN_HELPERS.length, 48);
+test('product-domain export surface keeps 78 helpers and types internal', () => {
+  assert.equal(INTERNAL_PRODUCT_DOMAIN_HELPERS.length, 78);
 
   for (const helper of INTERNAL_PRODUCT_DOMAIN_HELPERS) {
     const source = readFileSync(helper.filePath, 'utf8');
@@ -404,8 +550,8 @@ test('product-domain export surface keeps 48 helpers internal', () => {
   }
 });
 
-test('result-view export surface keeps 22 domain helpers on their source modules', () => {
-  assert.equal(RESULT_VIEW_REEXPORT_BOUNDARIES.length, 22);
+test('result-view export surface keeps 21 domain helpers on their source modules', () => {
+  assert.equal(RESULT_VIEW_REEXPORT_BOUNDARIES.length, 21);
 
   for (const boundary of RESULT_VIEW_REEXPORT_BOUNDARIES) {
     const aggregatorSource = readFileSync(boundary.aggregatorFilePath, 'utf8');

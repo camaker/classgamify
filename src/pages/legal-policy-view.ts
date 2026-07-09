@@ -50,7 +50,7 @@ export type LegalPolicyHandoffItemView = {
   value: string;
 };
 
-export type LegalPolicyHandoffPrivacyContract = {
+type LegalPolicyHandoffPrivacyContract = {
   createsAssignmentLinks: false;
   describesAiDraftDataModel: true;
   describesAssignmentSnapshots: true;
@@ -111,7 +111,7 @@ export function buildLegalPolicyPageViewModel({
   };
 }
 
-export function buildLegalPolicyHandoffView({
+function buildLegalPolicyHandoffView({
   page,
   policyId,
 }: {

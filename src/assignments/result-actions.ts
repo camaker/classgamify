@@ -62,13 +62,13 @@ export type AssignmentResultActionScopeView = {
   value: string;
 };
 
-export type AssignmentResultActionBlockedReason =
+type AssignmentResultActionBlockedReason =
   | 'brief-not-ready'
   | 'missing-attempts'
   | 'missing-items'
   | 'missing-students';
 
-export type AssignmentResultActionStatusTone = 'blocked' | 'ready';
+type AssignmentResultActionStatusTone = 'blocked' | 'ready';
 
 export type AssignmentResultActionStatusView = {
   ariaLabel: string;
@@ -95,7 +95,7 @@ type AssignmentResultActionCopy = {
   successMessage: string;
 };
 
-export type AssignmentResultActionDescriptor =
+type AssignmentResultActionDescriptor =
   | {
       action: AssignmentResultCopyAction;
       dataScope: Extract<AssignmentResultActionDataScope, 'current-review'>;
@@ -147,7 +147,7 @@ export type AssignmentResultActionButton =
       successMessage: string;
     };
 
-export type AssignmentResultActionPayload =
+type AssignmentResultActionPayload =
   | {
       kind: 'copy-text';
       text: string;
@@ -158,7 +158,7 @@ export type AssignmentResultActionPayload =
       kind: 'download-csv';
     };
 
-export type AssignmentResultActionExecutionPlan =
+type AssignmentResultActionExecutionPlan =
   | {
       dataScope: AssignmentResultActionDataScope;
       failureMessage: string;
@@ -209,9 +209,9 @@ type AssignmentResultActionStats = {
   completions: number;
 };
 
-export type AssignmentResultActionData = AssignmentResultsExportData;
+type AssignmentResultActionData = AssignmentResultsExportData;
 
-export type AssignmentResultCopyActionAnalysis = AssignmentResultsAnalysis & {
+type AssignmentResultCopyActionAnalysis = AssignmentResultsAnalysis & {
   perItem: AssignmentItemAnalysis[];
   students: AssignmentStudentSummary[];
 };
@@ -273,7 +273,7 @@ export type AssignmentResultCopyArtifactPreview = {
 export type AssignmentResultCopyArtifactPreviewId =
   `preview:${AssignmentResultCopyAction}`;
 
-export type AssignmentResultCopyArtifactPreviewScopeItemId =
+type AssignmentResultCopyArtifactPreviewScopeItemId =
   | 'items'
   | 'review'
   | 'students';
@@ -285,7 +285,7 @@ export type AssignmentResultCopyArtifactPreviewScopeItem = {
   value: string;
 };
 
-export type AssignmentResultCopyArtifactPreviewScopeSummaryItemId =
+type AssignmentResultCopyArtifactPreviewScopeSummaryItemId =
   | 'answer-reviews'
   | 'attempts'
   | 'items'
@@ -312,7 +312,7 @@ export type AssignmentResultCopyArtifactPreviewMetaItem = {
   value: string;
 };
 
-export type AssignmentResultCopyArtifactPreviewMetaKey =
+type AssignmentResultCopyArtifactPreviewMetaKey =
   | 'focus-items'
   | 'follow-up-students'
   | 'latest-attempt-times'
@@ -1373,7 +1373,7 @@ export function getAssignmentResultCopyArtifactPreviewId(
   return `preview:${action}`;
 }
 
-export function getAssignmentResultCopyArtifactPreviewSummary({
+function getAssignmentResultCopyArtifactPreviewSummary({
   action,
   artifacts,
 }: {
@@ -1423,7 +1423,7 @@ export function getAssignmentResultCopyArtifactPreviewSummary({
   });
 }
 
-export function buildAssignmentResultCopyArtifactPreviewMetaItems({
+function buildAssignmentResultCopyArtifactPreviewMetaItems({
   action,
   artifacts,
 }: {
@@ -1820,7 +1820,7 @@ export function getAssignmentResultActionCopy(
   }
 }
 
-export function buildAssignmentResultClassroomBriefStats({
+function buildAssignmentResultClassroomBriefStats({
   averageDurationSeconds,
   averagePoints,
   averageScore,

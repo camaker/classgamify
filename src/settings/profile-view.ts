@@ -5,7 +5,7 @@ import {
 } from '@/settings/account-handoff';
 import { m } from '@/locale/paraglide/messages';
 
-export type SettingsProfileWorkspaceSummaryItemId =
+type SettingsProfileWorkspaceSummaryItemId =
   | 'activities'
   | 'assignments'
   | 'results'
@@ -47,7 +47,7 @@ export function buildSettingsProfilePageViewModel(): SettingsProfilePageViewMode
   };
 }
 
-export function buildSettingsProfileWorkspaceSummaryView(): SettingsProfileWorkspaceSummaryView {
+function buildSettingsProfileWorkspaceSummaryView(): SettingsProfileWorkspaceSummaryView {
   const title = m.settings_profile_workspace_summary_title();
   const description = m.settings_profile_workspace_summary_description();
 

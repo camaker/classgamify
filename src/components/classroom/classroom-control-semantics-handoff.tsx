@@ -19,7 +19,7 @@ export function ClassroomControlSemanticsHandoffMount() {
   return <ClassroomControlSemanticsHandoff />;
 }
 
-export function ClassroomControlSemanticsHandoff() {
+function ClassroomControlSemanticsHandoff() {
   const handoffView = buildClassroomControlSemanticsHandoffView();
 
   return (

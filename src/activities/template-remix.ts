@@ -45,9 +45,9 @@ export type TemplateRemixPlan = {
   suggestedOptions: TemplateRemixOption[];
 };
 
-export type TemplateRemixReadinessErrorCode = 'missing-content';
+type TemplateRemixReadinessErrorCode = 'missing-content';
 
-export class TemplateRemixReadinessError extends Error {
+class TemplateRemixReadinessError extends Error {
   readonly code: TemplateRemixReadinessErrorCode;
   readonly diagnosis: string;
   readonly missingRequirements: ActivityTemplateContentRequirement[];
@@ -63,7 +63,7 @@ export class TemplateRemixReadinessError extends Error {
   }
 }
 
-export type TemplateRemixSummary = {
+type TemplateRemixSummary = {
   lockedTemplateDiagnostics: string[];
   lockedTemplateOptions: TemplateRemixLockedOption[];
   readyTemplateOptions: TemplateRemixTemplateOption[];
@@ -105,10 +105,10 @@ export const ACTIVITY_TEMPLATE_REMIX_HANDOFF_ITEM_IDS = [
 
 export const ACTIVITY_TEMPLATE_REMIX_HANDOFF_VISIBLE_ACTION_LIMIT = 3;
 
-export type ActivityTemplateRemixHandoffItemId =
+type ActivityTemplateRemixHandoffItemId =
   (typeof ACTIVITY_TEMPLATE_REMIX_HANDOFF_ITEM_IDS)[number];
 
-export type ActivityTemplateRemixHandoffItemView = {
+type ActivityTemplateRemixHandoffItemView = {
   ariaLabel: string;
   description: string;
   id: ActivityTemplateRemixHandoffItemId;
@@ -116,7 +116,7 @@ export type ActivityTemplateRemixHandoffItemView = {
   value: string;
 };
 
-export type ActivityTemplateRemixHandoffPrivacyContract = {
+type ActivityTemplateRemixHandoffPrivacyContract = {
   clonesSourceMaterialReferences: true;
   excludesCurrentTemplate: true;
   exposesActivityContentText: false;
@@ -136,14 +136,14 @@ export type ActivityTemplateRemixHandoffPrivacyContract = {
   targetTemplatesAreReadyOnly: true;
 };
 
-export type ActivityTemplateRemixHandoffView = {
+type ActivityTemplateRemixHandoffView = {
   description: string;
   itemViews: ActivityTemplateRemixHandoffItemView[];
   privacy: ActivityTemplateRemixHandoffPrivacyContract;
   title: string;
 };
 
-export type ActivityTemplateRemixHandoffSource = {
+type ActivityTemplateRemixHandoffSource = {
   content: ActivityContent;
   currentTemplateType: ActivityTemplateType;
   sourceTitle: string;
