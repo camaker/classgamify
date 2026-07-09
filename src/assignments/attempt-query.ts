@@ -38,7 +38,7 @@ export function buildScoredAttemptWhere(...filters: SQL[]) {
   return and(...filters, isNotNull(attempt.resultJson));
 }
 
-export function buildAssignmentAttemptWhere({
+function buildAssignmentAttemptWhere({
   assignmentId,
 }: {
   assignmentId: string;

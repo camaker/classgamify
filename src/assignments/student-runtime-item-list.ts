@@ -268,7 +268,7 @@ export function buildStudentRuntimeItemListView({
   };
 }
 
-export function buildStudentRuntimeInteractionHandoffView({
+function buildStudentRuntimeInteractionHandoffView({
   disabled = false,
   items,
   language,

@@ -151,30 +151,10 @@ import { Routes } from '@/lib/routes';
 import { m } from '@/locale/paraglide/messages';
 
 export {
-  ATTEMPT_REVIEW_FILTER_VALUES,
-  DEFAULT_ATTEMPT_REVIEW_FILTER,
-  DEFAULT_ITEM_PERFORMANCE_SORT,
-  DEFAULT_STUDENT_SUMMARY_SORT,
-  ITEM_PERFORMANCE_SORT_VALUES,
-  STUDENT_SUMMARY_SORT_VALUES,
-  buildAssignmentResultReviewScope,
   buildAssignmentResultReviewScopeSummary,
-  buildAssignmentResultControlRouteSearch,
   buildAssignmentResultControlSearchState,
   buildAssignmentResultRouteSearch,
-  buildAssignmentResultSearchState,
-  buildFilteredAttemptRows,
-  filterAndSortStudentSummaries,
-  filterAssignmentResultCompletedAttemptRows,
-  filterAttemptReviews,
-  matchesResultSearch,
   normalizeAssignmentResultScopeCount,
-  normalizeResultSearch,
-  normalizeResultSearchQuery,
-  parseAttemptReviewFilter,
-  parseItemPerformanceSort,
-  parseResultStudentSearch,
-  parseStudentSummarySort,
   resolveAssignmentResultViewState,
   sortItemPerformance,
   sortStudentSummaries,
@@ -199,11 +179,9 @@ export {
   buildAssignmentResultActionState,
   buildAssignmentResultActionScopeView,
   buildAssignmentResultActionStatusView,
-  buildAssignmentResultMaterialHandoffView,
   buildAssignmentResultCopyActionData,
   buildAssignmentResultCopyArtifacts,
   buildAssignmentResultCopyArtifactPreviews,
-  buildAssignmentResultClassroomBriefStats,
   buildAssignmentResultCopyText,
   getAssignmentResultActionExecutionData,
   getAssignmentResultActionExecutionDataScope,
@@ -955,7 +933,7 @@ export const assignmentResultSearchCopy = {
   },
 } as const;
 
-export const assignmentResultCopyScopeCopy = {
+const assignmentResultCopyScopeCopy = {
   get answerReviewsLabel() {
     return m.assignment_result_copy_scope_summary_answer_reviews();
   },
@@ -988,7 +966,7 @@ export const assignmentResultCopyScopeCopy = {
   },
 } as const;
 
-export const assignmentResultReviewScopeCopy = {
+const assignmentResultReviewScopeCopy = {
   get attemptsLabel() {
     return m.assignment_result_review_scope_attempts_label();
   },
@@ -1027,13 +1005,13 @@ export const assignmentResultReviewScopeCopy = {
   },
 } as const;
 
-export const assignmentResultReviewStatusCopy = {
+const assignmentResultReviewStatusCopy = {
   get summaryLabel() {
     return m.assignment_result_review_status_summary_label();
   },
 } as const;
 
-export const assignmentResultActionRegionCopy = {
+const assignmentResultActionRegionCopy = {
   get label() {
     return m.assignment_result_actions_label();
   },

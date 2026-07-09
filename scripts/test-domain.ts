@@ -16092,7 +16092,7 @@ assert.match(
 );
 assert.match(
   studentRunnerStateSource,
-  /export function buildStudentRunnerSubmissionHandoffView(?=[\s\S]*payloadSummaryView)(?=[\s\S]*progressView)(?=[\s\S]*submitReadinessView)(?=[\s\S]*identityView)(?=[\s\S]*resultPanelView)[\s\S]*id: 'payload-summary'[\s\S]*id: 'submit-readiness'[\s\S]*buildStudentRunnerIdentityHandoffPrivacyItem\(identityView\)[\s\S]*id: 'attempt-duration'[\s\S]*id: 'review-summary'[\s\S]*id: 'feedback-scope'[\s\S]*id: 'next-steps'[\s\S]*privacy: buildStudentRunnerSubmissionHandoffPrivacyContract/,
+  /function buildStudentRunnerSubmissionHandoffView(?=[\s\S]*payloadSummaryView)(?=[\s\S]*progressView)(?=[\s\S]*submitReadinessView)(?=[\s\S]*identityView)(?=[\s\S]*resultPanelView)[\s\S]*id: 'payload-summary'[\s\S]*id: 'submit-readiness'[\s\S]*buildStudentRunnerIdentityHandoffPrivacyItem\(identityView\)[\s\S]*id: 'attempt-duration'[\s\S]*id: 'review-summary'[\s\S]*id: 'feedback-scope'[\s\S]*id: 'next-steps'[\s\S]*privacy: buildStudentRunnerSubmissionHandoffPrivacyContract/,
   'Student runner submission handoff should collect progress, payload, readiness, identity, timer, result, review, feedback, and next-step slices.'
 );
 assert.match(

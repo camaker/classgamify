@@ -8,6 +8,12 @@ type InternalHelperDeclaration = {
   name: string;
 };
 
+type ReExportBoundary = {
+  aggregatorFilePath: string;
+  name: string;
+  sourceFilePath: string;
+};
+
 const INTERNAL_PRODUCT_DOMAIN_HELPERS = [
   {
     declaration: 'function',
@@ -209,10 +215,163 @@ const INTERNAL_PRODUCT_DOMAIN_HELPERS = [
     filePath: 'src/assignments/student-follow-up-summary.ts',
     name: 'buildAssignmentStudentFollowUpSummaryStudentViews',
   },
+  {
+    declaration: 'const',
+    filePath: 'src/assignments/result-view.ts',
+    name: 'assignmentResultCopyScopeCopy',
+  },
+  {
+    declaration: 'const',
+    filePath: 'src/assignments/result-view.ts',
+    name: 'assignmentResultReviewScopeCopy',
+  },
+  {
+    declaration: 'const',
+    filePath: 'src/assignments/result-view.ts',
+    name: 'assignmentResultReviewStatusCopy',
+  },
+  {
+    declaration: 'const',
+    filePath: 'src/assignments/result-view.ts',
+    name: 'assignmentResultActionRegionCopy',
+  },
+  {
+    declaration: 'function',
+    filePath: 'src/assignments/attempt-query.ts',
+    name: 'buildAssignmentAttemptWhere',
+  },
+  {
+    declaration: 'function',
+    filePath: 'src/assignments/student-runner-state.ts',
+    name: 'buildStudentRunnerSubmissionContractView',
+  },
+  {
+    declaration: 'function',
+    filePath: 'src/assignments/student-runner-state.ts',
+    name: 'buildStudentRunnerSubmissionHandoffView',
+  },
+  {
+    declaration: 'function',
+    filePath: 'src/assignments/student-runtime-item-list.ts',
+    name: 'buildStudentRuntimeInteractionHandoffView',
+  },
 ] satisfies InternalHelperDeclaration[];
 
-test('product-domain export surface keeps 40 helpers internal', () => {
-  assert.equal(INTERNAL_PRODUCT_DOMAIN_HELPERS.length, 40);
+const RESULT_VIEW_REEXPORT_BOUNDARIES = [
+  {
+    aggregatorFilePath: 'src/assignments/result-view.ts',
+    name: 'ATTEMPT_REVIEW_FILTER_VALUES',
+    sourceFilePath: 'src/assignments/result-filters.ts',
+  },
+  {
+    aggregatorFilePath: 'src/assignments/result-view.ts',
+    name: 'DEFAULT_ATTEMPT_REVIEW_FILTER',
+    sourceFilePath: 'src/assignments/result-filters.ts',
+  },
+  {
+    aggregatorFilePath: 'src/assignments/result-view.ts',
+    name: 'DEFAULT_ITEM_PERFORMANCE_SORT',
+    sourceFilePath: 'src/assignments/result-filters.ts',
+  },
+  {
+    aggregatorFilePath: 'src/assignments/result-view.ts',
+    name: 'DEFAULT_STUDENT_SUMMARY_SORT',
+    sourceFilePath: 'src/assignments/result-filters.ts',
+  },
+  {
+    aggregatorFilePath: 'src/assignments/result-view.ts',
+    name: 'ITEM_PERFORMANCE_SORT_VALUES',
+    sourceFilePath: 'src/assignments/result-filters.ts',
+  },
+  {
+    aggregatorFilePath: 'src/assignments/result-view.ts',
+    name: 'STUDENT_SUMMARY_SORT_VALUES',
+    sourceFilePath: 'src/assignments/result-filters.ts',
+  },
+  {
+    aggregatorFilePath: 'src/assignments/result-view.ts',
+    name: 'buildAssignmentResultReviewScope',
+    sourceFilePath: 'src/assignments/result-filters.ts',
+  },
+  {
+    aggregatorFilePath: 'src/assignments/result-view.ts',
+    name: 'buildAssignmentResultControlRouteSearch',
+    sourceFilePath: 'src/assignments/result-filters.ts',
+  },
+  {
+    aggregatorFilePath: 'src/assignments/result-view.ts',
+    name: 'buildAssignmentResultSearchState',
+    sourceFilePath: 'src/assignments/result-filters.ts',
+  },
+  {
+    aggregatorFilePath: 'src/assignments/result-view.ts',
+    name: 'buildFilteredAttemptRows',
+    sourceFilePath: 'src/assignments/result-filters.ts',
+  },
+  {
+    aggregatorFilePath: 'src/assignments/result-view.ts',
+    name: 'filterAndSortStudentSummaries',
+    sourceFilePath: 'src/assignments/result-filters.ts',
+  },
+  {
+    aggregatorFilePath: 'src/assignments/result-view.ts',
+    name: 'filterAssignmentResultCompletedAttemptRows',
+    sourceFilePath: 'src/assignments/result-filters.ts',
+  },
+  {
+    aggregatorFilePath: 'src/assignments/result-view.ts',
+    name: 'filterAttemptReviews',
+    sourceFilePath: 'src/assignments/result-filters.ts',
+  },
+  {
+    aggregatorFilePath: 'src/assignments/result-view.ts',
+    name: 'matchesResultSearch',
+    sourceFilePath: 'src/assignments/result-filters.ts',
+  },
+  {
+    aggregatorFilePath: 'src/assignments/result-view.ts',
+    name: 'normalizeResultSearch',
+    sourceFilePath: 'src/assignments/result-filters.ts',
+  },
+  {
+    aggregatorFilePath: 'src/assignments/result-view.ts',
+    name: 'normalizeResultSearchQuery',
+    sourceFilePath: 'src/assignments/result-filters.ts',
+  },
+  {
+    aggregatorFilePath: 'src/assignments/result-view.ts',
+    name: 'parseAttemptReviewFilter',
+    sourceFilePath: 'src/assignments/result-filters.ts',
+  },
+  {
+    aggregatorFilePath: 'src/assignments/result-view.ts',
+    name: 'parseItemPerformanceSort',
+    sourceFilePath: 'src/assignments/result-filters.ts',
+  },
+  {
+    aggregatorFilePath: 'src/assignments/result-view.ts',
+    name: 'parseResultStudentSearch',
+    sourceFilePath: 'src/assignments/result-filters.ts',
+  },
+  {
+    aggregatorFilePath: 'src/assignments/result-view.ts',
+    name: 'parseStudentSummarySort',
+    sourceFilePath: 'src/assignments/result-filters.ts',
+  },
+  {
+    aggregatorFilePath: 'src/assignments/result-view.ts',
+    name: 'buildAssignmentResultMaterialHandoffView',
+    sourceFilePath: 'src/assignments/result-actions.ts',
+  },
+  {
+    aggregatorFilePath: 'src/assignments/result-view.ts',
+    name: 'buildAssignmentResultClassroomBriefStats',
+    sourceFilePath: 'src/assignments/result-actions.ts',
+  },
+] satisfies ReExportBoundary[];
+
+test('product-domain export surface keeps 48 helpers internal', () => {
+  assert.equal(INTERNAL_PRODUCT_DOMAIN_HELPERS.length, 48);
 
   for (const helper of INTERNAL_PRODUCT_DOMAIN_HELPERS) {
     const source = readFileSync(helper.filePath, 'utf8');
@@ -241,6 +400,33 @@ test('product-domain export surface keeps 40 helpers internal', () => {
       source,
       exportedNamedPattern,
       `${helper.filePath} should not re-export ${helper.name}.`
+    );
+  }
+});
+
+test('result-view export surface keeps 22 domain helpers on their source modules', () => {
+  assert.equal(RESULT_VIEW_REEXPORT_BOUNDARIES.length, 22);
+
+  for (const boundary of RESULT_VIEW_REEXPORT_BOUNDARIES) {
+    const aggregatorSource = readFileSync(boundary.aggregatorFilePath, 'utf8');
+    const sourceModule = readFileSync(boundary.sourceFilePath, 'utf8');
+    const helperName = escapeRegExp(boundary.name);
+    const sourceExportPattern = new RegExp(
+      `\\bexport\\s+[^\\n;]*\\b${helperName}\\b`
+    );
+    const aggregatorReExportPattern = new RegExp(
+      `\\bexport\\s*\\{[^}]*\\b${helperName}\\b[^}]*\\}\\s*from`
+    );
+
+    assert.match(
+      sourceModule,
+      sourceExportPattern,
+      `${boundary.sourceFilePath} should keep ${boundary.name} on the source domain module.`
+    );
+    assert.doesNotMatch(
+      aggregatorSource,
+      aggregatorReExportPattern,
+      `${boundary.aggregatorFilePath} should not re-export ${boundary.name}.`
     );
   }
 });

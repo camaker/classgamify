@@ -2332,7 +2332,7 @@ function buildStudentRunnerSubmissionPayloadSummaryView(
   };
 }
 
-export function buildStudentRunnerSubmissionContractView({
+function buildStudentRunnerSubmissionContractView({
   identityView,
   payloadSummaryView,
   resultPanelView,
@@ -2384,7 +2384,7 @@ export function buildStudentRunnerSubmissionContractView({
   };
 }
 
-export function buildStudentRunnerSubmissionHandoffView({
+function buildStudentRunnerSubmissionHandoffView({
   activeShareId,
   attemptResultDisplay,
   attemptState,
