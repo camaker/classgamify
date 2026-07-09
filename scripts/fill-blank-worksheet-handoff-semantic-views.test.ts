@@ -26,7 +26,7 @@ const SECRET_SOURCE_MATERIAL = 'secret-fill-blank-source.pdf';
 const SECRET_STUDENT_NAME = 'Private Fill Blank Student';
 const SECRET_TOKEN = 'raw-fill-blank-token';
 
-test('fill-blank worksheet handoff exposes 20 safe worksheet slices', () => {
+test('fill-blank worksheet handoff exposes 30 safe worksheet slices', () => {
   const handoffView = buildFillBlankWorksheetHandoffView({
     revealAnswer: true,
     runnerView: buildFillBlankRunnerView({
@@ -42,7 +42,7 @@ test('fill-blank worksheet handoff exposes 20 safe worksheet slices', () => {
   const itemIds = handoffView.itemViews.map((item) => item.id);
 
   assert.deepEqual(itemIds, [...FILL_BLANK_WORKSHEET_HANDOFF_ITEM_IDS]);
-  assert.equal(new Set(itemIds).size, 20);
+  assert.equal(new Set(itemIds).size, 30);
   assert.equal(
     handoffView.itemViews.every(
       (item) =>
@@ -74,15 +74,35 @@ test('fill-blank worksheet handoff exposes 20 safe worksheet slices', () => {
   assert.equal(getHandoffValue(handoffView, 'runtime-item-count'), '2 items');
   assert.equal(getHandoffValue(handoffView, 'inline-blank-count'), '1 blank');
   assert.equal(
+    getHandoffValue(handoffView, 'inline-input-coverage'),
+    '1 of 2 inline'
+  );
+  assert.equal(
     getHandoffValue(handoffView, 'standalone-prompt-count'),
     '1 standalone prompt'
+  );
+  assert.equal(
+    getHandoffValue(handoffView, 'standalone-fallback-coverage'),
+    '1 of 2 standalone'
   );
   assert.equal(
     getHandoffValue(handoffView, 'word-bank-row-count'),
     '1 word bank row'
   );
+  assert.equal(
+    getHandoffValue(handoffView, 'word-bank-coverage'),
+    '1 of 2 with word bank'
+  );
   assert.equal(getHandoffValue(handoffView, 'answered-item-count'), '1');
+  assert.equal(
+    getHandoffValue(handoffView, 'answer-row-scope'),
+    'Answers summarized'
+  );
   assert.equal(getHandoffValue(handoffView, 'unanswered-item-count'), '1');
+  assert.equal(
+    getHandoffValue(handoffView, 'partial-submit-boundary'),
+    'Partial attempt available'
+  );
   assert.equal(
     getHandoffValue(handoffView, 'completion-progress'),
     '1 of 2 completed'
@@ -100,13 +120,25 @@ test('fill-blank worksheet handoff exposes 20 safe worksheet slices', () => {
     getHandoffValue(handoffView, 'review-feedback-state'),
     'Visible'
   );
+  assert.equal(
+    getHandoffValue(handoffView, 'review-visibility-policy'),
+    'Visible'
+  );
   assert.equal(getHandoffValue(handoffView, 'review-item-count'), '2');
   assert.equal(
     getHandoffValue(handoffView, 'accepted-answer-boundary'),
     'Post-submit only'
   );
   assert.equal(
+    getHandoffValue(handoffView, 'accepted-answer-visibility'),
+    'Post-submit only'
+  );
+  assert.equal(
     getHandoffValue(handoffView, 'explanation-boundary'),
+    'Post-submit only'
+  );
+  assert.equal(
+    getHandoffValue(handoffView, 'explanation-visibility'),
     'Post-submit only'
   );
   assert.equal(
@@ -116,6 +148,14 @@ test('fill-blank worksheet handoff exposes 20 safe worksheet slices', () => {
   assert.equal(
     getHandoffValue(handoffView, 'submission-contract'),
     '{ itemId, answer }'
+  );
+  assert.equal(
+    getHandoffValue(handoffView, 'runtime-id-boundary'),
+    'Runtime ids hidden'
+  );
+  assert.equal(
+    getHandoffValue(handoffView, 'prompt-word-bank-boundary'),
+    'Prompts and word banks hidden'
   );
   assert.equal(
     getHandoffValue(handoffView, 'privacy-guard'),
@@ -137,6 +177,18 @@ test('fill-blank worksheet handoff reports locked empty state', () => {
   assert.equal(getHandoffValue(handoffView, 'runtime-item-count'), '0 items');
   assert.equal(getHandoffValue(handoffView, 'inline-blank-count'), '0 blanks');
   assert.equal(
+    getHandoffValue(handoffView, 'inline-input-coverage'),
+    '0 of 0 inline'
+  );
+  assert.equal(
+    getHandoffValue(handoffView, 'standalone-fallback-coverage'),
+    '0 of 0 standalone'
+  );
+  assert.equal(
+    getHandoffValue(handoffView, 'word-bank-coverage'),
+    '0 of 0 with word bank'
+  );
+  assert.equal(
     getHandoffValue(handoffView, 'answer-input-state'),
     'Unavailable'
   );
@@ -145,7 +197,15 @@ test('fill-blank worksheet handoff reports locked empty state', () => {
     'Actions locked'
   );
   assert.equal(getHandoffValue(handoffView, 'review-feedback-state'), 'Hidden');
+  assert.equal(
+    getHandoffValue(handoffView, 'review-visibility-policy'),
+    'Hidden'
+  );
   assert.equal(getHandoffValue(handoffView, 'review-item-count'), '0');
+  assert.equal(
+    getHandoffValue(handoffView, 'partial-submit-boundary'),
+    'All items answered'
+  );
 
   assertNoPrivateFillBlankText(JSON.stringify(handoffView));
 });
@@ -167,7 +227,7 @@ test('fill-blank worksheet handoff localizes Chinese worksheet boundaries', () =
     });
 
     assert.equal(handoffView.title, '填空练习纸交接');
-    assert.match(handoffView.description, /20 切片/);
+    assert.match(handoffView.description, /30 切片/);
     assert.equal(getHandoffValue(handoffView, 'worksheet-state'), '已启用');
     assert.equal(
       getHandoffValue(handoffView, 'runtime-item-count'),
@@ -178,12 +238,32 @@ test('fill-blank worksheet handoff localizes Chinese worksheet boundaries', () =
       '1 个空格'
     );
     assert.equal(
+      getHandoffValue(handoffView, 'inline-input-coverage'),
+      '1/2 项行内'
+    );
+    assert.equal(
       getHandoffValue(handoffView, 'standalone-prompt-count'),
       '1 个独立提示'
     );
     assert.equal(
+      getHandoffValue(handoffView, 'standalone-fallback-coverage'),
+      '1/2 项独立'
+    );
+    assert.equal(
       getHandoffValue(handoffView, 'word-bank-row-count'),
       '1 行词库'
+    );
+    assert.equal(
+      getHandoffValue(handoffView, 'word-bank-coverage'),
+      '1/2 项含词库'
+    );
+    assert.equal(
+      getHandoffValue(handoffView, 'answer-row-scope'),
+      '答案已摘要'
+    );
+    assert.equal(
+      getHandoffValue(handoffView, 'partial-submit-boundary'),
+      '可部分提交'
     );
     assert.equal(
       getHandoffValue(handoffView, 'completion-progress'),
@@ -196,6 +276,14 @@ test('fill-blank worksheet handoff localizes Chinese worksheet boundaries', () =
     assert.equal(
       getHandoffValue(handoffView, 'public-payload-boundary'),
       '清理后的运行内容'
+    );
+    assert.equal(
+      getHandoffValue(handoffView, 'runtime-id-boundary'),
+      '运行 ID 已隐藏'
+    );
+    assert.equal(
+      getHandoffValue(handoffView, 'prompt-word-bank-boundary'),
+      '题干和词库已隐藏'
     );
     assert.equal(
       getHandoffValue(handoffView, 'privacy-guard'),
@@ -234,13 +322,17 @@ test('fill-blank worksheet focused gate is documented', () => {
     /pnpm exec tsx --test scripts\/fill-blank-worksheet-handoff-semantic-views\.test\.ts/
   );
   for (const boundary of [
-    'worksheet state',
-    'inline blank and standalone prompt counts',
-    'word-bank row counts',
+    '30-slice worksheet handoff',
+    'inline blank coverage',
+    'standalone fallback coverage',
+    'word-bank coverage',
+    'answer-row scope',
+    'partial-submit boundaries',
     'answer-input state',
-    'review feedback',
+    'review visibility',
+    'accepted-answer or explanation visibility',
     'fill-blank worksheet privacy-scope boundaries',
-    'prompt/answer/word-bank/student/source-material guards',
+    'runtime-id/prompt/answer/word-bank/student/source-material guards',
     'hidden fill-blank-worksheet handoff',
   ]) {
     assert.match(normalizedCatalog, new RegExp(boundary));

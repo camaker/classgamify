@@ -633,6 +633,10 @@ import {
   resolveSequentialStudentRunnerNavigationAction,
 } from '@/assignments/student-runner-view';
 import {
+  buildFillBlankWorksheetHandoffView,
+  FILL_BLANK_WORKSHEET_HANDOFF_ITEM_IDS,
+} from '@/assignments/fill-blank-worksheet-handoff';
+import {
   buildGroupSortBoardHandoffView,
   GROUP_SORT_BOARD_HANDOFF_ITEM_IDS,
 } from '@/assignments/group-sort-board-handoff';
@@ -14974,6 +14978,10 @@ const studentRunnerViewSource = readFileSync(
   'src/assignments/student-runner-view.ts',
   'utf8'
 );
+const fillBlankWorksheetHandoffSource = readFileSync(
+  'src/assignments/fill-blank-worksheet-handoff.ts',
+  'utf8'
+);
 const studentRuntimeItemListSource = readFileSync(
   'src/components/activities/student-runtime-item-list.tsx',
   'utf8'
@@ -15197,6 +15205,137 @@ assert.match(
   /export type InlineBlankPromptView =[\s\S]*mode: 'inline';[\s\S]*mode: 'standalone';[\s\S]*prompt: string;[\s\S]*export type FillBlankWorksheetItemView = StudentRunnerItemView & \{[\s\S]*promptView: InlineBlankPromptView;[\s\S]*export type FillBlankWorksheetView = StudentRunnerView & \{[\s\S]*fillBlankItemViews: FillBlankWorksheetItemView\[\];/,
   'Student runner domain should expose explicit fill-blank worksheet prompt and item view contracts.'
 );
+assert.deepEqual(
+  [...FILL_BLANK_WORKSHEET_HANDOFF_ITEM_IDS],
+  [
+    'template-type',
+    'runner-surface',
+    'worksheet-state',
+    'runtime-item-count',
+    'inline-blank-count',
+    'inline-input-coverage',
+    'standalone-prompt-count',
+    'standalone-fallback-coverage',
+    'word-bank-row-count',
+    'word-bank-coverage',
+    'answered-item-count',
+    'answer-row-scope',
+    'unanswered-item-count',
+    'partial-submit-boundary',
+    'completion-progress',
+    'input-placement-policy',
+    'answer-input-state',
+    'disabled-action-policy',
+    'review-feedback-state',
+    'review-visibility-policy',
+    'review-item-count',
+    'accepted-answer-boundary',
+    'accepted-answer-visibility',
+    'explanation-boundary',
+    'explanation-visibility',
+    'public-payload-boundary',
+    'submission-contract',
+    'runtime-id-boundary',
+    'prompt-word-bank-boundary',
+    'privacy-guard',
+  ],
+  'Fill-blank worksheet handoff should expose exactly 30 stable slice ids.'
+);
+assert.match(
+  fillBlankWorksheetHandoffSource,
+  /export const FILL_BLANK_WORKSHEET_HANDOFF_ITEM_IDS = \[(?=[\s\S]*'inline-input-coverage')(?=[\s\S]*'standalone-fallback-coverage')(?=[\s\S]*'word-bank-coverage')(?=[\s\S]*'answer-row-scope')(?=[\s\S]*'partial-submit-boundary')(?=[\s\S]*'review-visibility-policy')(?=[\s\S]*'accepted-answer-visibility')(?=[\s\S]*'explanation-visibility')(?=[\s\S]*'runtime-id-boundary')(?=[\s\S]*'prompt-word-bank-boundary')[\s\S]*export type FillBlankWorksheetHandoffPrivacyContract = \{[\s\S]*exposesAnswerKeys: false;[\s\S]*exposesAnswerText: false;[\s\S]*exposesRuntimeItemIds: false;[\s\S]*exposesRuntimePromptText: false;[\s\S]*exposesSourceMaterialMetadata: false;[\s\S]*exposesStudentIdentity: false;[\s\S]*exposesWordBankText: false;[\s\S]*usesSharedSubmissionContract: true;/,
+  'Fill-blank worksheet handoff should expose a typed 30-slice privacy contract.'
+);
+const domainFillBlankPrivateAnswer = 'DOMAIN_FILL_BLANK_PRIVATE_ANSWER';
+const domainFillBlankPrivatePrompt = 'DOMAIN_FILL_BLANK_PRIVATE_PROMPT ___';
+const domainFillBlankPrivateChoice = 'DOMAIN_FILL_BLANK_PRIVATE_CHOICE';
+const domainFillBlankPrivateItemId = 'domain-fill-blank-private-item';
+const domainFillBlankView = buildFillBlankWorksheetView({
+  answers: {
+    [domainFillBlankPrivateItemId]: domainFillBlankPrivateAnswer,
+  },
+  items: [
+    {
+      choices: [domainFillBlankPrivateChoice],
+      id: domainFillBlankPrivateItemId,
+      kind: 'question',
+      prompt: domainFillBlankPrivatePrompt,
+    },
+    {
+      id: 'domain-fill-blank-safe-standalone',
+      kind: 'question',
+      prompt: 'SAFE_DOMAIN_FILL_BLANK_STANDALONE',
+    },
+  ],
+  progressVerb: 'completed',
+  revealAnswer: false,
+  wordBankLabel: 'Word bank',
+});
+const domainFillBlankHandoffView = buildFillBlankWorksheetHandoffView({
+  runnerView: domainFillBlankView,
+});
+const domainFillBlankHandoffValues = new Map(
+  domainFillBlankHandoffView.itemViews.map((item) => [item.id, item.value])
+);
+assert.deepEqual(
+  domainFillBlankHandoffView.itemViews.map((item) => item.id),
+  [...FILL_BLANK_WORKSHEET_HANDOFF_ITEM_IDS],
+  'Fill-blank worksheet handoff should build item views from the stable 30-slice id list.'
+);
+assert.deepEqual(domainFillBlankHandoffView.privacy, {
+  exposesAnswerKeys: false,
+  exposesAnswerText: false,
+  exposesRuntimeItemIds: false,
+  exposesRuntimePromptText: false,
+  exposesSourceMaterialMetadata: false,
+  exposesStudentIdentity: false,
+  exposesWordBankText: false,
+  itemIds: [...FILL_BLANK_WORKSHEET_HANDOFF_ITEM_IDS],
+  runnerSurface: 'fill-blank',
+  scope: 'fill-blank-worksheet',
+  templateType: 'fill-blank',
+  usesSharedSubmissionContract: true,
+});
+assert.equal(
+  domainFillBlankHandoffValues.get('inline-input-coverage'),
+  '1 of 2 inline'
+);
+assert.equal(
+  domainFillBlankHandoffValues.get('standalone-fallback-coverage'),
+  '1 of 2 standalone'
+);
+assert.equal(
+  domainFillBlankHandoffValues.get('word-bank-coverage'),
+  '1 of 2 with word bank'
+);
+assert.equal(
+  domainFillBlankHandoffValues.get('answer-row-scope'),
+  'Answers summarized'
+);
+assert.equal(
+  domainFillBlankHandoffValues.get('partial-submit-boundary'),
+  'Partial attempt available'
+);
+assert.equal(
+  domainFillBlankHandoffValues.get('runtime-id-boundary'),
+  'Runtime ids hidden'
+);
+assert.equal(
+  domainFillBlankHandoffValues.get('prompt-word-bank-boundary'),
+  'Prompts and word banks hidden'
+);
+for (const privateValue of [
+  domainFillBlankPrivateAnswer,
+  domainFillBlankPrivatePrompt,
+  domainFillBlankPrivateChoice,
+  domainFillBlankPrivateItemId,
+]) {
+  assert.equal(
+    JSON.stringify(domainFillBlankHandoffView).includes(privateValue),
+    false,
+    `Fill-blank worksheet handoff leaked private text: ${privateValue}`
+  );
+}
 assert.match(
   studentRunnerViewSource,
   /export function buildChoicePairingRunnerView\([\s\S]*\): ChoicePairingRunnerView[\s\S]*export function buildGroupSortRunnerView\([\s\S]*\): GroupSortRunnerView/,
