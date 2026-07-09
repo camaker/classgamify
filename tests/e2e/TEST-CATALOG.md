@@ -54,8 +54,9 @@ constants, or editor template handoff builder visibility.
 Public DOM handoff boundary has a fast script-level gate via
 `pnpm exec tsx --test scripts/public-dom-handoff-boundary.test.ts`; run it when
 changing marketing, editorial, legal, contact, auth, root document, or shared
-public layout route sources that must keep internal `data-handoff` audit DOM out
-of public pages while preserving source-level handoff contracts.
+public layout route sources and shared public components that must keep internal
+`data-handoff` audit DOM out of public pages while preserving source-level
+handoff contracts.
 Public product entry gates include
 `pnpm exec tsx --test scripts/home-product-loop-handoff-semantic-views.test.ts`,
 `pnpm exec tsx --test scripts/public-navigation-handoff-semantic-views.test.ts`,

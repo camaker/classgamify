@@ -3,6 +3,7 @@ import { existsSync, readFileSync } from 'node:fs';
 import test from 'node:test';
 import {
   PUBLIC_DOM_HANDOFF_ALLOWED_ROUTE_SCOPES,
+  PUBLIC_DOM_HANDOFF_BLOCKED_COMPONENT_FILES,
   PUBLIC_DOM_HANDOFF_BLOCKED_ROUTE_FILES,
   PUBLIC_DOM_HANDOFF_BOUNDARY_ITEM_IDS,
   buildPublicDomHandoffBoundaryView,
@@ -14,6 +15,9 @@ import { Routes } from '@/lib/routes';
 
 const TEST_CATALOG_SOURCE = readFileSync('tests/e2e/TEST-CATALOG.md', 'utf8');
 const ROOT_ROUTE_SOURCE = readFileSync('src/routes/__root.tsx', 'utf8');
+const PROTECTED_PUBLIC_DOM_SOURCE_FILE_COUNT =
+  PUBLIC_DOM_HANDOFF_BLOCKED_ROUTE_FILES.length +
+  PUBLIC_DOM_HANDOFF_BLOCKED_COMPONENT_FILES.length;
 const PUBLIC_ROUTE_INTERNAL_HANDOFF_PATTERN =
   /data-handoff|data-handoff-item|HandoffPanel|handoffView\.itemViews|<[^>]*Handoff\b/;
 
@@ -51,7 +55,9 @@ test('public DOM handoff boundary exposes 30 route and privacy slices', () => {
     itemIds,
     keepsPublicHandoffsSourceLevel: true,
     protectsPrivateClassroomData: true,
+    protectedSourceFileCount: PROTECTED_PUBLIC_DOM_SOURCE_FILE_COUNT,
     routeFiles: [...PUBLIC_DOM_HANDOFF_BLOCKED_ROUTE_FILES],
+    sharedComponentFiles: [...PUBLIC_DOM_HANDOFF_BLOCKED_COMPONENT_FILES],
     scope: 'public-dom-handoff-boundary',
   });
   assertNoPrivatePublicDomBoundaryText(JSON.stringify(boundaryView));
@@ -60,11 +66,14 @@ test('public DOM handoff boundary exposes 30 route and privacy slices', () => {
 test('public DOM handoff boundary summarizes public and allowed route scopes', () => {
   const boundaryView = buildPublicDomHandoffBoundaryView();
 
+  assert.equal(PROTECTED_PUBLIC_DOM_SOURCE_FILE_COUNT, 30);
+  assert.equal(PUBLIC_DOM_HANDOFF_BLOCKED_ROUTE_FILES.length, 18);
+  assert.equal(PUBLIC_DOM_HANDOFF_BLOCKED_COMPONENT_FILES.length, 12);
   assert.deepEqual(
     boundaryView.itemViews.map((itemView) => [itemView.id, itemView.value]),
     [
       ['product-loop', 'Activity -> Assignment -> Attempt -> Results'],
-      ['public-route-set', '18 route files'],
+      ['public-route-set', '30 source files'],
       ['home-route', Routes.Root],
       ['template-directory-route', Routes.Templates],
       ['worksheet-entry-route', Routes.Worksheets],
@@ -96,6 +105,25 @@ test('public DOM handoff boundary summarizes public and allowed route scopes', (
     ]
   );
   assertNoPrivatePublicDomBoundaryText(JSON.stringify(boundaryView));
+});
+
+test('shared public component sources keep internal handoff audit markup out of DOM', () => {
+  const publicComponentLeaks =
+    PUBLIC_DOM_HANDOFF_BLOCKED_COMPONENT_FILES.filter((filePath) => {
+      assert.ok(
+        existsSync(filePath),
+        `Missing public component file ${filePath}`
+      );
+      return PUBLIC_ROUTE_INTERNAL_HANDOFF_PATTERN.test(
+        readFileSync(filePath, 'utf8')
+      );
+    });
+
+  assert.deepEqual(
+    publicComponentLeaks,
+    [],
+    'Shared public navigation, entry-card, editorial, contact, and auth components must not render internal handoff audit markup.'
+  );
 });
 
 test('public route sources keep internal handoff audit markup out of DOM', () => {
@@ -186,7 +214,7 @@ test('public DOM handoff boundary focused gate is documented', () => {
   );
   assert.match(
     TEST_CATALOG_SOURCE,
-    /marketing[\s\S]*editorial[\s\S]*legal[\s\S]*contact[\s\S]*auth[\s\S]*data-handoff/,
+    /marketing[\s\S]*editorial[\s\S]*legal[\s\S]*contact[\s\S]*auth[\s\S]*shared public components[\s\S]*data-handoff/,
     'TEST-CATALOG should document which public surfaces must keep internal audit DOM out.'
   );
 });

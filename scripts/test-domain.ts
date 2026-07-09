@@ -32,6 +32,11 @@ import {
   PUBLIC_METADATA_HANDOFF_ITEM_IDS,
 } from '@/seo/public-metadata-handoff';
 import {
+  PUBLIC_DOM_HANDOFF_BLOCKED_COMPONENT_FILES,
+  PUBLIC_DOM_HANDOFF_BLOCKED_ROUTE_FILES,
+  buildPublicDomHandoffBoundaryView,
+} from '@/seo/public-dom-handoff-boundary';
+import {
   buildPublicNavigationHandoffView,
   PUBLIC_NAVIGATION_HANDOFF_ITEM_IDS,
 } from '@/navigation/public-navigation-handoff';
@@ -13349,6 +13354,29 @@ assert.equal(
     (itemView) => itemView.id === 'privacy-guard'
   )?.value,
   'Private data hidden'
+);
+const publicDomHandoffBoundaryView = buildPublicDomHandoffBoundaryView();
+const publicDomProtectedSourceFileCount =
+  PUBLIC_DOM_HANDOFF_BLOCKED_ROUTE_FILES.length +
+  PUBLIC_DOM_HANDOFF_BLOCKED_COMPONENT_FILES.length;
+assert.equal(PUBLIC_DOM_HANDOFF_BLOCKED_ROUTE_FILES.length, 18);
+assert.equal(PUBLIC_DOM_HANDOFF_BLOCKED_COMPONENT_FILES.length, 12);
+assert.equal(publicDomProtectedSourceFileCount, 30);
+assert.equal(
+  publicDomHandoffBoundaryView.itemViews.find(
+    (itemView) => itemView.id === 'public-route-set'
+  )?.value,
+  '30 source files'
+);
+assert.deepEqual(publicDomHandoffBoundaryView.privacy.routeFiles, [
+  ...PUBLIC_DOM_HANDOFF_BLOCKED_ROUTE_FILES,
+]);
+assert.deepEqual(publicDomHandoffBoundaryView.privacy.sharedComponentFiles, [
+  ...PUBLIC_DOM_HANDOFF_BLOCKED_COMPONENT_FILES,
+]);
+assert.equal(
+  publicDomHandoffBoundaryView.privacy.protectedSourceFileCount,
+  publicDomProtectedSourceFileCount
 );
 const publicNavigationHandoffView = buildPublicNavigationHandoffView();
 const publicNavigationHandoffIds = publicNavigationHandoffView.itemViews.map(

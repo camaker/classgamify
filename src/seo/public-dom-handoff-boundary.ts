@@ -54,6 +54,21 @@ export const PUBLIC_DOM_HANDOFF_BLOCKED_ROUTE_FILES = [
   'src/routes/auth/error.tsx',
 ] as const;
 
+export const PUBLIC_DOM_HANDOFF_BLOCKED_COMPONENT_FILES = [
+  'src/components/layout/navbar.tsx',
+  'src/components/layout/navbar-mobile.tsx',
+  'src/components/layout/footer.tsx',
+  'src/components/activities/template-directory-card.tsx',
+  'src/components/activities/worksheet-mode-card.tsx',
+  'src/components/contact/contact-form-card.tsx',
+  'src/components/blog/blog-cta-action-link.tsx',
+  'src/components/blog/blog-post-visual.tsx',
+  'src/components/auth/auth-card.tsx',
+  'src/components/auth/login-form.tsx',
+  'src/components/auth/register-form.tsx',
+  'src/components/auth/forgot-password-form.tsx',
+] as const;
+
 export const PUBLIC_DOM_HANDOFF_ALLOWED_ROUTE_SCOPES = [
   Routes.Create,
   Routes.Dashboard,
@@ -82,6 +97,8 @@ export type PublicDomHandoffBoundaryPrivacyContract = {
   itemIds: PublicDomHandoffBoundaryItemId[];
   keepsPublicHandoffsSourceLevel: boolean;
   protectsPrivateClassroomData: boolean;
+  sharedComponentFiles: string[];
+  protectedSourceFileCount: number;
   routeFiles: string[];
   scope: 'public-dom-handoff-boundary';
 };
@@ -112,7 +129,11 @@ export function buildPublicDomHandoffBoundaryView(): PublicDomHandoffBoundaryVie
       itemIds: [...PUBLIC_DOM_HANDOFF_BOUNDARY_ITEM_IDS],
       keepsPublicHandoffsSourceLevel: true,
       protectsPrivateClassroomData: true,
+      protectedSourceFileCount:
+        PUBLIC_DOM_HANDOFF_BLOCKED_ROUTE_FILES.length +
+        PUBLIC_DOM_HANDOFF_BLOCKED_COMPONENT_FILES.length,
       routeFiles: [...PUBLIC_DOM_HANDOFF_BLOCKED_ROUTE_FILES],
+      sharedComponentFiles: [...PUBLIC_DOM_HANDOFF_BLOCKED_COMPONENT_FILES],
       scope: 'public-dom-handoff-boundary',
     },
     title: 'Public DOM handoff boundary',
@@ -146,8 +167,11 @@ function getPublicDomHandoffBoundaryItem(
     case 'public-route-set':
       return item(
         'Public route set',
-        `${PUBLIC_DOM_HANDOFF_BLOCKED_ROUTE_FILES.length} route files`,
-        'Marketing, editorial, legal, contact, and auth route files stay free of internal audit DOM.'
+        `${
+          PUBLIC_DOM_HANDOFF_BLOCKED_ROUTE_FILES.length +
+          PUBLIC_DOM_HANDOFF_BLOCKED_COMPONENT_FILES.length
+        } source files`,
+        'Marketing, editorial, legal, contact, auth, and shared public component files stay free of internal audit DOM.'
       );
     case 'home-route':
       return item(
