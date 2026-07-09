@@ -158,7 +158,7 @@ test('activity create page and form consume the shared workflow view', () => {
   );
   assert.match(
     CREATE_ROUTE_SOURCE,
-    /ActivityEditorWorkflowHandoffView[\s\S]*function ActivityEditorWorkflowHandoff[\s\S]*const titleId = 'activity-editor-workflow-handoff-title'[\s\S]*const descriptionId = 'activity-editor-workflow-handoff-description'[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*aria-labelledby=\{titleId\}[\s\S]*className="sr-only"[\s\S]*data-handoff="activity-editor-workflow"[\s\S]*id=\{titleId\}[\s\S]*id=\{descriptionId\}[\s\S]*handoffView\.itemViews\.map[\s\S]*ActivityEditorWorkflowHandoffItem[\s\S]*function ActivityEditorWorkflowHandoffItem[\s\S]*item: ActivityEditorWorkflowHandoffView\['itemViews'\]\[number\][\s\S]*const labelId = `activity-editor-workflow-handoff-\$\{item\.id\}-label`[\s\S]*const valueId = `activity-editor-workflow-handoff-\$\{item\.id\}-value`[\s\S]*const descriptionId =[\s\S]*`activity-editor-workflow-handoff-\$\{item\.id\}-description`[\s\S]*data-handoff-item=\{item\.id\}[\s\S]*id=\{labelId\}[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*aria-label=\{item\.ariaLabel\}[\s\S]*aria-labelledby=\{`\$\{labelId\} \$\{valueId\}`\}[\s\S]*id=\{valueId\}[\s\S]*id=\{descriptionId\}/
+    /ActivityEditorWorkflowHandoffView[\s\S]*function ActivityEditorWorkflowHandoff[\s\S]*const titleId = 'activity-editor-workflow-handoff-title'[\s\S]*const descriptionId = 'activity-editor-workflow-handoff-description'[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*aria-labelledby=\{titleId\}[\s\S]*className="sr-only"[\s\S]*data-handoff="activity-editor-workflow"[\s\S]*data-handoff-scope=\{handoffView\.privacy\.scope\}[\s\S]*id=\{titleId\}[\s\S]*id=\{descriptionId\}[\s\S]*handoffView\.itemViews\.map[\s\S]*ActivityEditorWorkflowHandoffItem[\s\S]*function ActivityEditorWorkflowHandoffItem[\s\S]*item: ActivityEditorWorkflowHandoffView\['itemViews'\]\[number\][\s\S]*const labelId = `activity-editor-workflow-handoff-\$\{item\.id\}-label`[\s\S]*const valueId = `activity-editor-workflow-handoff-\$\{item\.id\}-value`[\s\S]*const descriptionId =[\s\S]*`activity-editor-workflow-handoff-\$\{item\.id\}-description`[\s\S]*data-handoff-item=\{item\.id\}[\s\S]*id=\{labelId\}[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*aria-label=\{item\.ariaLabel\}[\s\S]*aria-labelledby=\{`\$\{labelId\} \$\{valueId\}`\}[\s\S]*id=\{valueId\}[\s\S]*id=\{descriptionId\}/
   );
   assert.match(
     ACTIVITY_CREATE_FORM_SOURCE,
@@ -188,6 +188,7 @@ test('activity editor workflow focused gate is documented', () => {
     'CreateActivityInput contracts',
     'template-readiness contracts',
     'publish boundaries',
+    'activity-editor-workflow privacy-scope boundaries',
     'hidden activity-editor-workflow handoff',
   ]) {
     assert.match(normalizedCatalog, new RegExp(boundary));

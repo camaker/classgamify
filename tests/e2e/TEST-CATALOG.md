@@ -232,7 +232,8 @@ Activity editor workflow has a fast script-level gate via
 run it when changing page layout, workflow navigation, form sections, AI draft
 boundaries, source-material safety, readiness review, save gating,
 CreateActivityInput contracts, template-readiness contracts, publish boundaries,
-or the hidden activity-editor-workflow handoff.
+activity-editor-workflow privacy-scope boundaries, or the hidden
+activity-editor-workflow handoff.
 Activity editor template handoff has a fast script-level gate via
 `pnpm exec tsx --test scripts/activity-editor-template-handoff-semantic-views.test.ts`;
 run it when changing selected-template badges, required content, current template

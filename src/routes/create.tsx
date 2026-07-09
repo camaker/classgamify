@@ -166,6 +166,7 @@ function ActivityEditorWorkflowHandoff({
       aria-labelledby={titleId}
       className="sr-only"
       data-handoff="activity-editor-workflow"
+      data-handoff-scope={handoffView.privacy.scope}
     >
       <h2 id={titleId}>{handoffView.title}</h2>
       <p id={descriptionId}>{handoffView.description}</p>
