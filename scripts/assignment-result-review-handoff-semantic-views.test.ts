@@ -18,6 +18,7 @@ const SECRET_ANONYMOUS_TOKEN = 'SECRET_RAW_ANONYMOUS_TOKEN';
 const SECRET_EXPECTED_ANSWER = 'SECRET_REVIEW_EXPECTED_ANSWER';
 const SECRET_PROMPT = 'SECRET_REVIEW_PROMPT';
 const SECRET_STUDENT_ANSWER = 'SECRET_REVIEW_STUDENT_ANSWER';
+const TEST_CATALOG_SOURCE = readFileSync('tests/e2e/TEST-CATALOG.md', 'utf8');
 
 test('assignment result review handoff exposes 30 safe current-review slices', () => {
   overwriteGetLocale(() => 'en');
@@ -279,8 +280,16 @@ test('assignment result review handoff renders stable page markers', () => {
 
   assert.match(
     source,
-    /export function AssignmentResultsReviewHandoffPanel[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*aria-labelledby=\{titleId\}[\s\S]*data-handoff="assignment-result-review"[\s\S]*data-handoff-scope=\{view\.privacy\.scope\}[\s\S]*view\.itemViews\.map[\s\S]*AssignmentResultReviewHandoffItem[\s\S]*function AssignmentResultReviewHandoffItem[\s\S]*const labelId = `assignment-result-review-\$\{itemView\.id\}-label`[\s\S]*const valueId = `assignment-result-review-\$\{itemView\.id\}-value`[\s\S]*const descriptionId = `assignment-result-review-\$\{itemView\.id\}-description`[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*aria-label=\{itemView\.ariaLabel\}[\s\S]*aria-labelledby=\{`\$\{labelId\} \$\{valueId\}`\}[\s\S]*data-handoff-item=\{itemView\.id\}[\s\S]*data-scope=\{itemView\.dataScope\}[\s\S]*id=\{labelId\}[\s\S]*aria-hidden="true"[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*aria-label=\{itemView\.ariaLabel\}[\s\S]*aria-labelledby=\{`\$\{labelId\} \$\{valueId\}`\}[\s\S]*id=\{valueId\}[\s\S]*id=\{descriptionId\}/,
-    'Assignment result review handoff should expose the localized result-page marker, privacy scope, item ids, data scopes, and stable label/value/description output relationships.'
+    /export function AssignmentResultsReviewHandoffPanel[\s\S]*const titleId = 'assignment-result-review-handoff-title'[\s\S]*const descriptionId = 'assignment-result-review-handoff-description'[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*aria-labelledby=\{titleId\}[\s\S]*className="sr-only"[\s\S]*data-handoff="assignment-result-review"[\s\S]*data-handoff-scope=\{view\.privacy\.scope\}[\s\S]*id=\{titleId\}[\s\S]*id=\{descriptionId\}[\s\S]*<dl>[\s\S]*view\.itemViews\.map[\s\S]*AssignmentResultReviewHandoffItem[\s\S]*function AssignmentResultReviewHandoffItem[\s\S]*const labelId = `assignment-result-review-\$\{itemView\.id\}-label`[\s\S]*const valueId = `assignment-result-review-\$\{itemView\.id\}-value`[\s\S]*const descriptionId = `assignment-result-review-\$\{itemView\.id\}-description`[\s\S]*data-handoff-item=\{itemView\.id\}[\s\S]*data-scope=\{itemView\.dataScope\}[\s\S]*id=\{labelId\}[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*aria-label=\{itemView\.ariaLabel\}[\s\S]*aria-labelledby=\{`\$\{labelId\} \$\{valueId\}`\}[\s\S]*id=\{valueId\}[\s\S]*aria-hidden="true"[\s\S]*id=\{descriptionId\}/,
+    'Assignment result review handoff should expose the hidden localized result-page marker, privacy scope, item ids, data scopes, and stable label/value/description output relationships.'
+  );
+  assert.match(
+    TEST_CATALOG_SOURCE,
+    /Assignment result review handoff has a fast script-level gate via[\s\S]*scripts\/assignment-result-review-handoff-semantic-views\.test\.ts[\s\S]*copy-scope alignment[\s\S]*assignment-result-review\s+handoff/
+  );
+  assert.match(
+    TEST_CATALOG_SOURCE,
+    /\|\s*6b\s*\|\s*Result review scope exposes a 30-slice handoff\s*\|[\s\S]*`assignment-result-review`[\s\S]*hidden `dl\/dt\/dd`[\s\S]*label\/value\/description[\s\S]*`data-handoff-item`/
   );
 });
 

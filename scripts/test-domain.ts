@@ -3892,8 +3892,8 @@ assert.match(
     'src/components/assignments/assignment-results-review-handoff-panel.tsx',
     'utf8'
   ),
-  /data-handoff="assignment-result-review"[\s\S]*data-handoff-scope=\{view\.privacy\.scope\}[\s\S]*view\.itemViews\.map[\s\S]*AssignmentResultReviewHandoffItem[\s\S]*function AssignmentResultReviewHandoffItem[\s\S]*const labelId = `assignment-result-review-\$\{itemView\.id\}-label`[\s\S]*const valueId = `assignment-result-review-\$\{itemView\.id\}-value`[\s\S]*const descriptionId = `assignment-result-review-\$\{itemView\.id\}-description`[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*aria-label=\{itemView\.ariaLabel\}[\s\S]*aria-labelledby=\{`\$\{labelId\} \$\{valueId\}`\}[\s\S]*data-handoff-item=\{itemView\.id\}[\s\S]*data-scope=\{itemView\.dataScope\}[\s\S]*id=\{labelId\}[\s\S]*aria-hidden="true"[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*aria-label=\{itemView\.ariaLabel\}[\s\S]*aria-labelledby=\{`\$\{labelId\} \$\{valueId\}`\}[\s\S]*id=\{valueId\}[\s\S]*id=\{descriptionId\}/,
-  'Assignment results review handoff panel should render the main result review semantic handoff with marker, privacy scope, item ids, data scopes, and stable label/value/description relationships.'
+  /export function AssignmentResultsReviewHandoffPanel[\s\S]*const titleId = 'assignment-result-review-handoff-title'[\s\S]*const descriptionId = 'assignment-result-review-handoff-description'[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*aria-labelledby=\{titleId\}[\s\S]*className="sr-only"[\s\S]*data-handoff="assignment-result-review"[\s\S]*data-handoff-scope=\{view\.privacy\.scope\}[\s\S]*id=\{titleId\}[\s\S]*id=\{descriptionId\}[\s\S]*<dl>[\s\S]*view\.itemViews\.map[\s\S]*AssignmentResultReviewHandoffItem[\s\S]*function AssignmentResultReviewHandoffItem[\s\S]*const labelId = `assignment-result-review-\$\{itemView\.id\}-label`[\s\S]*const valueId = `assignment-result-review-\$\{itemView\.id\}-value`[\s\S]*const descriptionId = `assignment-result-review-\$\{itemView\.id\}-description`[\s\S]*data-handoff-item=\{itemView\.id\}[\s\S]*data-scope=\{itemView\.dataScope\}[\s\S]*id=\{labelId\}[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*aria-label=\{itemView\.ariaLabel\}[\s\S]*aria-labelledby=\{`\$\{labelId\} \$\{valueId\}`\}[\s\S]*id=\{valueId\}[\s\S]*aria-hidden="true"[\s\S]*id=\{descriptionId\}/,
+  'Assignment results review handoff panel should render the hidden main result review semantic handoff with marker, privacy scope, item ids, data scopes, and stable label/value/description relationships.'
 );
 assert.match(
   readFileSync(
@@ -3905,8 +3905,13 @@ assert.match(
 );
 assert.match(
   readFileSync('tests/e2e/TEST-CATALOG.md', 'utf8'),
-  /\|\s*6b\s*\|\s*Result review scope exposes a 30-slice handoff\s*\|[\s\S]*`assignment-result-review`[\s\S]*`data-handoff-item`/,
-  'E2E catalog should include the result-review handoff marker and stable item marker acceptance journey.'
+  /\|\s*6b\s*\|\s*Result review scope exposes a 30-slice handoff\s*\|[\s\S]*`assignment-result-review`[\s\S]*hidden `dl\/dt\/dd`[\s\S]*label\/value\/description[\s\S]*`data-handoff-item`/,
+  'E2E catalog should include the result-review handoff marker, hidden semantic structure, and stable item marker acceptance journey.'
+);
+assert.match(
+  readFileSync('tests/e2e/TEST-CATALOG.md', 'utf8'),
+  /Assignment result review handoff has a fast script-level gate via[\s\S]*scripts\/assignment-result-review-handoff-semantic-views\.test\.ts[\s\S]*copy-scope alignment[\s\S]*assignment-result-review\s+handoff/,
+  'E2E catalog should document the result review focused gate.'
 );
 assert.match(
   readFileSync('tests/e2e/TEST-CATALOG.md', 'utf8'),
