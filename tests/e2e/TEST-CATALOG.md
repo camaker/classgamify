@@ -213,8 +213,9 @@ Activity library overview and source-scope boundaries have a fast script-level
 gate via
 `pnpm exec tsx --test scripts/activity-library-handoff-semantic-views.test.ts`;
 run it when changing activity library overview metrics, current-view scope,
-source-material filters, starter-preview boundaries, visible-card counts, or the
-hidden activity-library handoff.
+source-material filters, starter-preview boundaries, visible-card counts,
+activity library privacy-scope boundaries, or the hidden activity-library
+handoff.
 Activity edit route hydration has a fast script-level gate via
 `pnpm exec tsx --test scripts/activity-edit-route-handoff-semantic-views.test.ts`;
 run it when changing saved-activity loading, owner-scoped edit access,
@@ -250,22 +251,23 @@ via `pnpm exec tsx --test scripts/activity-lifecycle-handoff-semantic-views.test
 run it when changing owner-scoped archive and restore actions, active and
 archived library visibility, edit/publish/duplicate/remix gates,
 restore-before-derive policy, assignment snapshot protection, public assignment
-continuity, server archive/restore/derivative guards, or the hidden
-activity-lifecycle handoff.
+continuity, server archive/restore/derivative guards,
+activity lifecycle privacy-scope boundaries, or the hidden activity-lifecycle
+handoff.
 Deterministic template remix safety has a fast script-level gate via
 `pnpm exec tsx --test scripts/activity-template-remix-handoff-semantic-views.test.ts`;
 run it when changing template readiness, suggested Copy as actions,
 ready-target-only gating, archived restore gates, remixed draft title
 strategy/limit, content and source-material clone counts, assignment snapshot
-protection, original-activity protection, or the activity-card compatibility
-handoff.
+protection, original-activity protection, template remix privacy-scope
+boundaries, or the activity-card compatibility handoff.
 AI remix assist boundaries have a fast script-level gate via
 `pnpm exec tsx --test scripts/activity-ai-remix-assist-handoff-semantic-views.test.ts`;
 run it when changing source/target template diagnosis, target readiness,
 missing structured requirements, deterministic-remix versus AI-completion
 paths, editor-review gates, draft/persist/publish boundaries, source-material
-provenance guards, content coverage counts, or the hidden AI remix assist
-handoff.
+provenance guards, content coverage counts, AI remix assist privacy-scope
+boundaries, or the hidden AI remix assist handoff.
 Assignment list filter and distribution boundaries have a fast script-level gate
 via `pnpm exec tsx --test scripts/assignment-list-semantic-views.test.ts`; run
 it when changing assignment list overview metrics, status/search filters,

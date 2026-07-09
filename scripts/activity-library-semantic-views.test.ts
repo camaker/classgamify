@@ -27,7 +27,7 @@ test('activity dashboard route renders the page handoff marker and item outputs'
   );
   assert.match(
     routeSource,
-    /function ActivityLibraryPageHandoff[\s\S]*data-handoff="activity-library"[\s\S]*handoffView\.itemViews\.map\(\(item\) =>[\s\S]*ActivityLibraryPageHandoffItem[\s\S]*function ActivityLibraryPageHandoffItem[\s\S]*data-handoff-item=\{item\.id\}[\s\S]*<output aria-label=\{item\.ariaLabel\}>/,
+    /function ActivityLibraryPageHandoff[\s\S]*data-handoff="activity-library"[\s\S]*data-handoff-scope=\{handoffView\.privacy\.scope\}[\s\S]*handoffView\.itemViews\.map\(\(item\) =>[\s\S]*ActivityLibraryPageHandoffItem[\s\S]*function ActivityLibraryPageHandoffItem[\s\S]*data-handoff-item=\{item\.id\}[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*aria-label=\{item\.ariaLabel\}[\s\S]*aria-labelledby=\{`\$\{labelId\} \$\{valueId\}`\}/,
     'Activity dashboard route should expose the activity-library marker, stable item markers, and prepared item outputs.'
   );
 });
@@ -116,9 +116,14 @@ test('activity library page exposes a 30-slice owner-scoped handoff', () => {
     countsStarterPreviewAsOwned: false,
     exposesDerivativeDraftPayloads: false,
     exposesPrivateActivityContent: false,
+    exposesSourceMaterialFilenames: false,
     exposesSourceMaterialFileIds: false,
     exposesSourceMaterialStorageKeys: false,
     itemIds,
+    keepsVisiblePageCountsSeparate: true,
+    scope: 'owner-activity-library-source-scope',
+    usesFullFilteredSummaryForOverview: true,
+    usesOwnerScopedSourceFilters: true,
   });
 
   assert.equal(getHandoffValue(handoffView.itemViews, 'summary-total'), '2');

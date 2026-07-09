@@ -34131,7 +34131,7 @@ assert.doesNotMatch(
 );
 assert.match(
   activityLibraryViewSource,
-  /export const ACTIVITY_LIBRARY_PAGE_HANDOFF_ITEM_IDS = \[[\s\S]*'owner-scope'[\s\S]*'summary-total'[\s\S]*'scope-range'[\s\S]*'source-capability-audio-extraction'[\s\S]*'status-active'[\s\S]*'visible-page-items'[\s\S]*'pagination'[\s\S]*'starter-preview'[\s\S]*\] as const;[\s\S]*export type ActivityLibraryPageHandoffItemId =[\s\S]*typeof ACTIVITY_LIBRARY_PAGE_HANDOFF_ITEM_IDS[\s\S]*export type ActivityLibraryPageHandoffPrivacyView = \{[\s\S]*broadensBeyondOwner: false;[\s\S]*countsStarterPreviewAsOwned: false;[\s\S]*exposesPrivateActivityContent: false;[\s\S]*exposesSourceMaterialFileIds: false;[\s\S]*exposesSourceMaterialStorageKeys: false;/,
+  /export const ACTIVITY_LIBRARY_PAGE_HANDOFF_ITEM_IDS = \[[\s\S]*'owner-scope'[\s\S]*'summary-total'[\s\S]*'scope-range'[\s\S]*'source-capability-audio-extraction'[\s\S]*'status-active'[\s\S]*'visible-page-items'[\s\S]*'pagination'[\s\S]*'starter-preview'[\s\S]*\] as const;[\s\S]*export type ActivityLibraryPageHandoffItemId =[\s\S]*typeof ACTIVITY_LIBRARY_PAGE_HANDOFF_ITEM_IDS[\s\S]*export type ActivityLibraryPageHandoffPrivacyView = \{[\s\S]*broadensBeyondOwner: false;[\s\S]*countsStarterPreviewAsOwned: false;[\s\S]*exposesPrivateActivityContent: false;[\s\S]*exposesSourceMaterialFileIds: false;[\s\S]*exposesSourceMaterialStorageKeys: false;[\s\S]*scope: 'owner-activity-library-source-scope';/,
   'Activity library page handoff should derive its typed owner-scoped library contract from a stable 30-slice id list with explicit privacy flags.'
 );
 assert.match(
@@ -34141,7 +34141,7 @@ assert.match(
 );
 assert.match(
   activityLibraryViewSource,
-  /exposesSourceMaterialFilenames: false;[\s\S]*keepsVisiblePageCountsSeparate: true;[\s\S]*usesFullFilteredSummaryForOverview: true;[\s\S]*usesOwnerScopedSourceFilters: true;/,
+  /exposesSourceMaterialFilenames: false;[\s\S]*keepsVisiblePageCountsSeparate: true;[\s\S]*scope: 'owner-activity-library-source-scope';[\s\S]*usesFullFilteredSummaryForOverview: true;[\s\S]*usesOwnerScopedSourceFilters: true;/,
   'Activity library handoff privacy should name source-material filename, owner-scoped source-filter, and visible-page separation guards.'
 );
 assert.deepEqual(
@@ -34222,7 +34222,7 @@ assert.match(
 );
 assert.match(
   dashboardActivitiesRouteSource,
-  /function ActivityLibraryPageHandoff[\s\S]*data-handoff="activity-library"[\s\S]*handoffView\.itemViews\.map\(\(item\) =>[\s\S]*ActivityLibraryPageHandoffItem[\s\S]*function ActivityLibraryPageHandoffItem[\s\S]*const labelId = `activity-library-handoff-\$\{item\.id\}-label`[\s\S]*const valueId = `activity-library-handoff-\$\{item\.id\}-value`[\s\S]*const descriptionId = `activity-library-handoff-\$\{item\.id\}-description`[\s\S]*data-handoff-item=\{item\.id\}[\s\S]*id=\{labelId\}[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*aria-label=\{item\.ariaLabel\}[\s\S]*aria-labelledby=\{`\$\{labelId\} \$\{valueId\}`\}[\s\S]*id=\{valueId\}[\s\S]*id=\{descriptionId\}/,
+  /function ActivityLibraryPageHandoff[\s\S]*data-handoff="activity-library"[\s\S]*data-handoff-scope=\{handoffView\.privacy\.scope\}[\s\S]*handoffView\.itemViews\.map\(\(item\) =>[\s\S]*ActivityLibraryPageHandoffItem[\s\S]*function ActivityLibraryPageHandoffItem[\s\S]*const labelId = `activity-library-handoff-\$\{item\.id\}-label`[\s\S]*const valueId = `activity-library-handoff-\$\{item\.id\}-value`[\s\S]*const descriptionId = `activity-library-handoff-\$\{item\.id\}-description`[\s\S]*data-handoff-item=\{item\.id\}[\s\S]*id=\{labelId\}[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*aria-label=\{item\.ariaLabel\}[\s\S]*aria-labelledby=\{`\$\{labelId\} \$\{valueId\}`\}[\s\S]*id=\{valueId\}[\s\S]*id=\{descriptionId\}/,
   'Activity dashboard route should expose the page handoff marker and stable activity-library item outputs.'
 );
 assert.match(
@@ -34497,7 +34497,7 @@ assert.match(
 );
 assert.match(
   activityLibraryCardComponentSource,
-  /ActivityLifecycleHandoffItemView[\s\S]*ActivityLifecycleHandoffView[\s\S]*ActivityLibraryLifecycleHandoff[\s\S]*handoff=\{cardDisplayView\.lifecycleHandoffView\}[\s\S]*function ActivityLibraryLifecycleHandoff\([\s\S]*data-handoff="activity-lifecycle"[\s\S]*handoff\.title[\s\S]*handoff\.description[\s\S]*handoff\.itemViews\.map[\s\S]*ActivityLibraryLifecycleHandoffItem[\s\S]*function ActivityLibraryLifecycleHandoffItem[\s\S]*const labelId = `activity-lifecycle-handoff-\$\{item\.id\}-label`[\s\S]*const valueId = `activity-lifecycle-handoff-\$\{item\.id\}-value`[\s\S]*const descriptionId = `activity-lifecycle-handoff-\$\{item\.id\}-description`[\s\S]*data-handoff-item=\{item\.id\}[\s\S]*id=\{labelId\}[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*aria-label=\{item\.ariaLabel\}[\s\S]*aria-labelledby=\{`\$\{labelId\} \$\{valueId\}`\}[\s\S]*id=\{valueId\}[\s\S]*id=\{descriptionId\}/,
+  /ActivityLifecycleHandoffItemView[\s\S]*ActivityLifecycleHandoffView[\s\S]*ActivityLibraryLifecycleHandoff[\s\S]*handoff=\{cardDisplayView\.lifecycleHandoffView\}[\s\S]*function ActivityLibraryLifecycleHandoff\([\s\S]*data-handoff="activity-lifecycle"[\s\S]*data-handoff-scope=\{handoff\.privacy\.scope\}[\s\S]*handoff\.title[\s\S]*handoff\.description[\s\S]*handoff\.itemViews\.map[\s\S]*ActivityLibraryLifecycleHandoffItem[\s\S]*function ActivityLibraryLifecycleHandoffItem[\s\S]*const labelId = `activity-lifecycle-handoff-\$\{item\.id\}-label`[\s\S]*const valueId = `activity-lifecycle-handoff-\$\{item\.id\}-value`[\s\S]*const descriptionId = `activity-lifecycle-handoff-\$\{item\.id\}-description`[\s\S]*data-handoff-item=\{item\.id\}[\s\S]*id=\{labelId\}[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*aria-label=\{item\.ariaLabel\}[\s\S]*aria-labelledby=\{`\$\{labelId\} \$\{valueId\}`\}[\s\S]*id=\{valueId\}[\s\S]*id=\{descriptionId\}/,
   'Activity library card component should render the prepared activity lifecycle handoff as stable hidden label, value, and description relationships.'
 );
 assert.match(
@@ -34672,7 +34672,7 @@ assert.match(
 );
 assert.match(
   activityLibraryCompatibilityPanelSource,
-  /<ActivityLibraryTemplateRemixHandoff[\s\S]*handoff=\{compatibility\.remixHandoffView\}[\s\S]*function ActivityLibraryTemplateRemixHandoff[\s\S]*handoff: ActivityTemplateRemixHandoffView[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*aria-labelledby=\{titleId\}[\s\S]*data-handoff="activity-template-remix"[\s\S]*\{handoff\.title\}[\s\S]*\{handoff\.description\}[\s\S]*handoff\.itemViews\.map\(\(item\) => \([\s\S]*ActivityLibraryTemplateRemixHandoffItem[\s\S]*item=\{item\}/,
+  /<ActivityLibraryTemplateRemixHandoff[\s\S]*handoff=\{compatibility\.remixHandoffView\}[\s\S]*function ActivityLibraryTemplateRemixHandoff[\s\S]*handoff: ActivityTemplateRemixHandoffView[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*aria-labelledby=\{titleId\}[\s\S]*data-handoff="activity-template-remix"[\s\S]*data-handoff-scope=\{handoff\.privacy\.scope\}[\s\S]*\{handoff\.title\}[\s\S]*\{handoff\.description\}[\s\S]*handoff\.itemViews\.map\(\(item\) => \([\s\S]*ActivityLibraryTemplateRemixHandoffItem[\s\S]*item=\{item\}/,
   'Activity library compatibility panel should render the prepared template-remix handoff title, description, and item views.'
 );
 assert.match(
@@ -34682,7 +34682,7 @@ assert.match(
 );
 assert.match(
   activityLibraryCompatibilityPanelSource,
-  /<ActivityLibraryAiRemixAssistHandoff[\s\S]*handoff=\{compatibility\.aiRemixAssistHandoffView\}[\s\S]*function ActivityLibraryAiRemixAssistHandoff[\s\S]*handoff: ActivityAiRemixAssistHandoffView[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*aria-labelledby=\{titleId\}[\s\S]*data-handoff="activity-ai-remix-assist"[\s\S]*handoff\.itemViews\.map\(\(item\) => \([\s\S]*ActivityLibraryAiRemixAssistHandoffItem[\s\S]*item=\{item\}/,
+  /<ActivityLibraryAiRemixAssistHandoff[\s\S]*handoff=\{compatibility\.aiRemixAssistHandoffView\}[\s\S]*function ActivityLibraryAiRemixAssistHandoff[\s\S]*handoff: ActivityAiRemixAssistHandoffView[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*aria-labelledby=\{titleId\}[\s\S]*data-handoff="activity-ai-remix-assist"[\s\S]*data-handoff-scope=\{handoff\.privacy\.scope\}[\s\S]*handoff\.itemViews\.map\(\(item\) => \([\s\S]*ActivityLibraryAiRemixAssistHandoffItem[\s\S]*item=\{item\}/,
   'Activity library compatibility panel should render the prepared AI remix assist handoff as a stable semantic region.'
 );
 assert.match(
@@ -49548,6 +49548,7 @@ assert.deepEqual(filteredActivityLibraryPageView.handoffView.privacy, {
   exposesSourceMaterialStorageKeys: false,
   itemIds: [...ACTIVITY_LIBRARY_PAGE_HANDOFF_ITEM_IDS],
   keepsVisiblePageCountsSeparate: true,
+  scope: 'owner-activity-library-source-scope',
   usesFullFilteredSummaryForOverview: true,
   usesOwnerScopedSourceFilters: true,
 });

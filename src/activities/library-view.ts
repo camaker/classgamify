@@ -405,6 +405,7 @@ export type ActivityLibraryPageHandoffPrivacyView = {
   exposesSourceMaterialStorageKeys: false;
   itemIds: ActivityLibraryPageHandoffItemId[];
   keepsVisiblePageCountsSeparate: true;
+  scope: 'owner-activity-library-source-scope';
   usesFullFilteredSummaryForOverview: true;
   usesOwnerScopedSourceFilters: true;
 };
@@ -1521,6 +1522,7 @@ function buildActivityLibraryPageHandoffPrivacyView(
     exposesSourceMaterialStorageKeys: false,
     itemIds: itemViews.map((item) => item.id),
     keepsVisiblePageCountsSeparate: true,
+    scope: 'owner-activity-library-source-scope',
     usesFullFilteredSummaryForOverview: true,
     usesOwnerScopedSourceFilters: true,
   };

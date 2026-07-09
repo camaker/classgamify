@@ -402,7 +402,7 @@ test('preview activity lifecycle stays semantic but blocks persisted actions', (
 test('activity lifecycle handoff renders stable DOM relationships', () => {
   assert.match(
     ACTIVITY_LIBRARY_CARD_SOURCE,
-    /ActivityLifecycleHandoffItemView[\s\S]*ActivityLifecycleHandoffView[\s\S]*function ActivityLibraryLifecycleHandoff\([\s\S]*const titleId = useId\(\)[\s\S]*const descriptionId = useId\(\)[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*aria-labelledby=\{titleId\}[\s\S]*className="sr-only"[\s\S]*data-handoff="activity-lifecycle"[\s\S]*id=\{titleId\}[\s\S]*id=\{descriptionId\}[\s\S]*handoff\.itemViews\.map[\s\S]*ActivityLibraryLifecycleHandoffItem[\s\S]*function ActivityLibraryLifecycleHandoffItem[\s\S]*const labelId = `activity-lifecycle-handoff-\$\{item\.id\}-label`[\s\S]*const valueId = `activity-lifecycle-handoff-\$\{item\.id\}-value`[\s\S]*const descriptionId = `activity-lifecycle-handoff-\$\{item\.id\}-description`[\s\S]*data-handoff-item=\{item\.id\}[\s\S]*id=\{labelId\}[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*aria-label=\{item\.ariaLabel\}[\s\S]*aria-labelledby=\{`\$\{labelId\} \$\{valueId\}`\}[\s\S]*id=\{valueId\}[\s\S]*id=\{descriptionId\}/,
+    /ActivityLifecycleHandoffItemView[\s\S]*ActivityLifecycleHandoffView[\s\S]*function ActivityLibraryLifecycleHandoff\([\s\S]*const titleId = useId\(\)[\s\S]*const descriptionId = useId\(\)[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*aria-labelledby=\{titleId\}[\s\S]*className="sr-only"[\s\S]*data-handoff="activity-lifecycle"[\s\S]*data-handoff-scope=\{handoff\.privacy\.scope\}[\s\S]*id=\{titleId\}[\s\S]*id=\{descriptionId\}[\s\S]*handoff\.itemViews\.map[\s\S]*ActivityLibraryLifecycleHandoffItem[\s\S]*function ActivityLibraryLifecycleHandoffItem[\s\S]*const labelId = `activity-lifecycle-handoff-\$\{item\.id\}-label`[\s\S]*const valueId = `activity-lifecycle-handoff-\$\{item\.id\}-value`[\s\S]*const descriptionId = `activity-lifecycle-handoff-\$\{item\.id\}-description`[\s\S]*data-handoff-item=\{item\.id\}[\s\S]*id=\{labelId\}[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*aria-label=\{item\.ariaLabel\}[\s\S]*aria-labelledby=\{`\$\{labelId\} \$\{valueId\}`\}[\s\S]*id=\{valueId\}[\s\S]*id=\{descriptionId\}/,
     'Activity lifecycle handoff should render each lifecycle slice with stable label, value, and description relationships.'
   );
 });
@@ -421,6 +421,7 @@ test('activity lifecycle focused gate is documented', () => {
     'assignment snapshot protection',
     'public assignment continuity',
     'server archive/restore/derivative guards',
+    'activity lifecycle privacy-scope boundaries',
     'hidden activity-lifecycle handoff',
   ]) {
     assert.match(

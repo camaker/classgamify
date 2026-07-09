@@ -119,6 +119,7 @@ function ActivityLibraryTemplateRemixHandoff({
       aria-labelledby={titleId}
       className="mt-3 border-t pt-3"
       data-handoff="activity-template-remix"
+      data-handoff-scope={handoff.privacy.scope}
     >
       <div className="flex min-w-0 items-center gap-2 text-xs font-medium">
         <IconShieldCheck aria-hidden="true" className="size-4 text-primary" />
@@ -190,6 +191,7 @@ function ActivityLibraryAiRemixAssistHandoff({
       aria-labelledby={titleId}
       className="sr-only"
       data-handoff="activity-ai-remix-assist"
+      data-handoff-scope={handoff.privacy.scope}
     >
       <h3 id={titleId}>{handoff.title}</h3>
       <p id={descriptionId}>{handoff.description}</p>
