@@ -310,7 +310,8 @@ Assignment publish control boundaries have fast script-level gates via
 and `pnpm exec tsx --test scripts/classroom-control-semantics-handoff.test.ts`;
 run them when changing publish-setting input IDs, help text associations,
 delivery toggles, frozen-link preview regions, delivery-rule stats, review
-checklists, validation alerts, or opaque control scope handling.
+checklists, validation alerts, assignment publish privacy-scope boundaries, or
+opaque control scope handling.
 AI fallback source-term planning has a fast script-level gate via
 `pnpm exec tsx --test scripts/activity-ai-fallback-source-term-plan.test.ts`;
 run it when changing deterministic fallback source extraction, material-note

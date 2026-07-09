@@ -371,6 +371,7 @@ export type AssignmentPublishHandoffPrivacyContract = {
   exposesStudentNames: false;
   exposesTeacherNotes: false;
   itemIds: AssignmentPublishHandoffItemId[];
+  scope: 'assignment-publish-preflight-boundary';
 };
 
 export type AssignmentPublishHandoffView = {
@@ -1311,6 +1312,7 @@ function buildAssignmentPublishHandoffPrivacyContract(
     exposesStudentNames: false,
     exposesTeacherNotes: false,
     itemIds: itemViews.map((item) => item.id),
+    scope: 'assignment-publish-preflight-boundary',
   };
 }
 

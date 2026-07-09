@@ -292,6 +292,7 @@ function AssignmentPublishHandoff({
       aria-labelledby={titleId}
       className="sr-only"
       data-handoff="assignment-publish"
+      data-handoff-scope={view.privacy.scope}
     >
       <h3 id={titleId}>{view.title}</h3>
       <p id={descriptionId}>{view.description}</p>

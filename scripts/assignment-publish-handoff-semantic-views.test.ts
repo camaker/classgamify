@@ -73,6 +73,7 @@ test('publish dialog exposes a safe 30-slice preview handoff', () => {
     exposesStudentNames: false,
     exposesTeacherNotes: false,
     itemIds,
+    scope: 'assignment-publish-preflight-boundary',
   });
   assert.deepEqual(
     handoffView.itemViews.map((item) => [item.id, item.value]),
@@ -344,7 +345,7 @@ test('publish handoff renders stable semantic outputs in the dialog', () => {
   );
   assert.match(
     ACTIVITY_PUBLISH_SETTINGS_FORM_SOURCE,
-    /function AssignmentPublishHandoff[\s\S]*const titleId = 'assignment-publish-handoff-title'[\s\S]*const descriptionId = 'assignment-publish-handoff-description'[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*aria-labelledby=\{titleId\}[\s\S]*className="sr-only"[\s\S]*data-handoff="assignment-publish"[\s\S]*id=\{titleId\}[\s\S]*id=\{descriptionId\}[\s\S]*view\.itemViews\.map\(\(item\) =>[\s\S]*AssignmentPublishHandoffItem[\s\S]*function AssignmentPublishHandoffItem[\s\S]*item: AssignmentPublishHandoffView\['itemViews'\]\[number\][\s\S]*const labelId = `assignment-publish-handoff-\$\{item\.id\}-label`[\s\S]*const valueId = `assignment-publish-handoff-\$\{item\.id\}-value`[\s\S]*const descriptionId = `assignment-publish-handoff-\$\{item\.id\}-description`[\s\S]*data-handoff-item=\{item\.id\}[\s\S]*id=\{labelId\}[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*aria-label=\{item\.ariaLabel\}[\s\S]*aria-labelledby=\{`\$\{labelId\} \$\{valueId\}`\}[\s\S]*id=\{valueId\}[\s\S]*id=\{descriptionId\}/
+    /function AssignmentPublishHandoff[\s\S]*const titleId = 'assignment-publish-handoff-title'[\s\S]*const descriptionId = 'assignment-publish-handoff-description'[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*aria-labelledby=\{titleId\}[\s\S]*className="sr-only"[\s\S]*data-handoff="assignment-publish"[\s\S]*data-handoff-scope=\{view\.privacy\.scope\}[\s\S]*id=\{titleId\}[\s\S]*id=\{descriptionId\}[\s\S]*view\.itemViews\.map\(\(item\) =>[\s\S]*AssignmentPublishHandoffItem[\s\S]*function AssignmentPublishHandoffItem[\s\S]*item: AssignmentPublishHandoffView\['itemViews'\]\[number\][\s\S]*const labelId = `assignment-publish-handoff-\$\{item\.id\}-label`[\s\S]*const valueId = `assignment-publish-handoff-\$\{item\.id\}-value`[\s\S]*const descriptionId = `assignment-publish-handoff-\$\{item\.id\}-description`[\s\S]*data-handoff-item=\{item\.id\}[\s\S]*id=\{labelId\}[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*aria-label=\{item\.ariaLabel\}[\s\S]*aria-labelledby=\{`\$\{labelId\} \$\{valueId\}`\}[\s\S]*id=\{valueId\}[\s\S]*id=\{descriptionId\}/
   );
 });
 
@@ -363,6 +364,7 @@ test('publish handoff focused gate is documented', () => {
     'delivery-rule stats',
     'review checklists',
     'validation alerts',
+    'assignment publish privacy-scope boundaries',
     'opaque control scope handling',
   ]) {
     assert.match(normalizedCatalog, new RegExp(boundary));

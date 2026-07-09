@@ -4547,8 +4547,8 @@ assert.doesNotMatch(
 );
 assert.match(
   assignmentPublishSource,
-  /export const ASSIGNMENT_PUBLISH_HANDOFF_ITEM_IDS = \[(?=[\s\S]*'publish-access')(?=[\s\S]*'activity-lifecycle-gate')(?=[\s\S]*'validation-message')(?=[\s\S]*'draft-field-count')(?=[\s\S]*'field-limit-boundary')(?=[\s\S]*'delivery-rule-count')(?=[\s\S]*'settings-summary-status')(?=[\s\S]*'student-instructions')(?=[\s\S]*'review-checklist-count')(?=[\s\S]*'delivery-defaults')(?=[\s\S]*'attempts-policy')(?=[\s\S]*'attempt-limit-parser')(?=[\s\S]*'timer-parser')(?=[\s\S]*'settings-json')(?=[\s\S]*'close-time-parser')(?=[\s\S]*'snapshot-freeze')(?=[\s\S]*'public-payload-boundary')(?=[\s\S]*'results-policy')(?=[\s\S]*'privacy-guard')[\s\S]*export type AssignmentPublishHandoffPrivacyContract = \{[\s\S]*exposesActivityContent: false;[\s\S]*exposesAnswerKeys: false;[\s\S]*exposesAssignmentTitle: false;[\s\S]*exposesInternalActivityIds: false;[\s\S]*exposesPublicRuntimeContent: false;[\s\S]*exposesRawSettingsJson: false;[\s\S]*exposesShareSlug: false;[\s\S]*exposesSourceMaterialStorageKeys: false;[\s\S]*exposesStudentAnswerText: false;[\s\S]*exposesStudentInstructions: false;[\s\S]*exposesStudentNames: false;[\s\S]*exposesTeacherNotes: false;/,
-  'Assignment publish handoff should expose a typed 30-slice contract with explicit privacy flags.'
+  /export const ASSIGNMENT_PUBLISH_HANDOFF_ITEM_IDS = \[(?=[\s\S]*'publish-access')(?=[\s\S]*'activity-lifecycle-gate')(?=[\s\S]*'validation-message')(?=[\s\S]*'draft-field-count')(?=[\s\S]*'field-limit-boundary')(?=[\s\S]*'delivery-rule-count')(?=[\s\S]*'settings-summary-status')(?=[\s\S]*'student-instructions')(?=[\s\S]*'review-checklist-count')(?=[\s\S]*'delivery-defaults')(?=[\s\S]*'attempts-policy')(?=[\s\S]*'attempt-limit-parser')(?=[\s\S]*'timer-parser')(?=[\s\S]*'settings-json')(?=[\s\S]*'close-time-parser')(?=[\s\S]*'snapshot-freeze')(?=[\s\S]*'public-payload-boundary')(?=[\s\S]*'results-policy')(?=[\s\S]*'privacy-guard')[\s\S]*export type AssignmentPublishHandoffPrivacyContract = \{[\s\S]*exposesActivityContent: false;[\s\S]*exposesAnswerKeys: false;[\s\S]*exposesAssignmentTitle: false;[\s\S]*exposesInternalActivityIds: false;[\s\S]*exposesPublicRuntimeContent: false;[\s\S]*exposesRawSettingsJson: false;[\s\S]*exposesShareSlug: false;[\s\S]*exposesSourceMaterialStorageKeys: false;[\s\S]*exposesStudentAnswerText: false;[\s\S]*exposesStudentInstructions: false;[\s\S]*exposesStudentNames: false;[\s\S]*exposesTeacherNotes: false;[\s\S]*scope: 'assignment-publish-preflight-boundary';/,
+  'Assignment publish handoff should expose a typed 30-slice contract with explicit privacy flags and scope.'
 );
 assert.match(
   assignmentPublishSource,
@@ -7395,8 +7395,8 @@ assert.match(
 );
 assert.match(
   activityPublishSettingsFormSource,
-  /AssignmentPublishHandoff[\s\S]*view=\{view\.handoffView\}[\s\S]*data-handoff="assignment-publish"[\s\S]*view\.itemViews\.map\(\(item\) =>[\s\S]*AssignmentPublishHandoffItem[\s\S]*function AssignmentPublishHandoffItem[\s\S]*const labelId = `assignment-publish-handoff-\$\{item\.id\}-label`[\s\S]*const valueId = `assignment-publish-handoff-\$\{item\.id\}-value`[\s\S]*const descriptionId = `assignment-publish-handoff-\$\{item\.id\}-description`[\s\S]*data-handoff-item=\{item\.id\}[\s\S]*id=\{labelId\}[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*aria-label=\{item\.ariaLabel\}[\s\S]*aria-labelledby=\{`\$\{labelId\} \$\{valueId\}`\}[\s\S]*id=\{valueId\}[\s\S]*id=\{descriptionId\}/,
-  'Assignment publish settings form should render the prepared publish handoff as hidden semantic output.'
+  /AssignmentPublishHandoff[\s\S]*view=\{view\.handoffView\}[\s\S]*data-handoff="assignment-publish"[\s\S]*data-handoff-scope=\{view\.privacy\.scope\}[\s\S]*view\.itemViews\.map\(\(item\) =>[\s\S]*AssignmentPublishHandoffItem[\s\S]*function AssignmentPublishHandoffItem[\s\S]*const labelId = `assignment-publish-handoff-\$\{item\.id\}-label`[\s\S]*const valueId = `assignment-publish-handoff-\$\{item\.id\}-value`[\s\S]*const descriptionId = `assignment-publish-handoff-\$\{item\.id\}-description`[\s\S]*data-handoff-item=\{item\.id\}[\s\S]*id=\{labelId\}[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*aria-label=\{item\.ariaLabel\}[\s\S]*aria-labelledby=\{`\$\{labelId\} \$\{valueId\}`\}[\s\S]*id=\{valueId\}[\s\S]*id=\{descriptionId\}/,
+  'Assignment publish settings form should render the prepared publish handoff, privacy scope, and hidden semantic output.'
 );
 assert.match(
   activityPublishSettingsFormSource,
@@ -23752,6 +23752,7 @@ assert.deepEqual(assignmentPublishDialogViewModel.handoffView.privacy, {
   exposesStudentNames: false,
   exposesTeacherNotes: false,
   itemIds: assignmentPublishHandoffItemIds,
+  scope: 'assignment-publish-preflight-boundary',
 });
 assert.deepEqual(
   assignmentPublishDialogViewModel.handoffView.itemViews.map((item) => [
