@@ -330,6 +330,13 @@ run it when changing print-route search parsing, worksheet response policies,
 frozen snapshot worksheet generation, delivery-policy printing, answer-key
 toggle behavior, privacy-scope boundaries, accepted-answer/explanation
 rendering, or the print toolbar.
+Line-match board runtime has a fast script-level gate via
+`pnpm exec tsx --test scripts/line-match-board-handoff-semantic-views.test.ts`;
+run it when changing prompt and choice card counts, selected prompt state,
+choice target readiness, available/used/unused choice counts, exclusive choice
+and reassignment policy, review feedback, line-match board privacy-scope
+boundaries, runtime-id/prompt/choice/answer/student/source-material guards, or
+the hidden line-match-board handoff.
 Open-box reveal-card runtime has a fast script-level gate via
 `pnpm exec tsx --test scripts/open-box-reveal-handoff-semantic-views.test.ts`;
 run it when changing reveal-card state, box and prompt counts, navigation

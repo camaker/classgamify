@@ -263,7 +263,7 @@ test('line-match board attaches the connection-board handoff to the component', 
   assert.match(source, /data-handoff="line-match-board"/);
   assert.match(
     source,
-    /LineMatchBoardHandoffItemView[\s\S]*LineMatchBoardHandoffView[\s\S]*view\.itemViews\.map\(\(item\) =>[\s\S]*LineMatchBoardHandoffItem[\s\S]*function LineMatchBoardHandoffItem[\s\S]*const labelId = `line-match-board-handoff-\$\{item\.id\}-label`[\s\S]*const valueId = `line-match-board-handoff-\$\{item\.id\}-value`[\s\S]*const descriptionId = `line-match-board-handoff-\$\{item\.id\}-description`[\s\S]*data-handoff-item=\{item\.id\}[\s\S]*id=\{labelId\}[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*aria-label=\{item\.ariaLabel\}[\s\S]*aria-labelledby=\{`\$\{labelId\} \$\{valueId\}`\}[\s\S]*id=\{valueId\}[\s\S]*id=\{descriptionId\}/
+    /LineMatchBoardHandoffItemView[\s\S]*LineMatchBoardHandoffView[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*aria-labelledby=\{titleId\}[\s\S]*data-handoff="line-match-board"[\s\S]*data-handoff-scope=\{view\.privacy\.scope\}[\s\S]*view\.itemViews\.map\(\(item\) =>[\s\S]*LineMatchBoardHandoffItem[\s\S]*function LineMatchBoardHandoffItem[\s\S]*const labelId = `line-match-board-handoff-\$\{item\.id\}-label`[\s\S]*const valueId = `line-match-board-handoff-\$\{item\.id\}-value`[\s\S]*const descriptionId = `line-match-board-handoff-\$\{item\.id\}-description`[\s\S]*data-handoff-item=\{item\.id\}[\s\S]*id=\{labelId\}[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*aria-label=\{item\.ariaLabel\}[\s\S]*aria-labelledby=\{`\$\{labelId\} \$\{valueId\}`\}[\s\S]*id=\{valueId\}[\s\S]*id=\{descriptionId\}/
   );
 });
 
