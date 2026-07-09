@@ -4,6 +4,10 @@ import {
   buildSettingsAccountWorkspaceHandoffView,
   type SettingsAccountWorkspaceHandoffView,
 } from '@/settings/account-handoff';
+import {
+  buildSettingsSecurityWorkspaceHandoffView,
+  type SettingsSecurityWorkspaceHandoffView,
+} from '@/settings/security-handoff';
 import { m } from '@/locale/paraglide/messages';
 
 export type SettingsSecurityWorkspaceSummaryItemId =
@@ -40,6 +44,7 @@ export type SettingsSecurityWorkspaceSummaryView = {
   description: string;
   handoffView: SettingsAccountWorkspaceHandoffView;
   itemViews: SettingsSecurityWorkspaceSummaryItemView[];
+  securityHandoffView: SettingsSecurityWorkspaceHandoffView;
   title: string;
 };
 
@@ -142,6 +147,10 @@ export function buildSettingsSecurityWorkspaceSummaryView({
         label: m.settings_security_workspace_summary_results_label(),
       },
     ],
+    securityHandoffView: buildSettingsSecurityWorkspaceHandoffView({
+      credentialLoginEnabled,
+      deleteAccountEnabled,
+    }),
     title,
   };
 }

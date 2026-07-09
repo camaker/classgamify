@@ -221,6 +221,14 @@ name or avatar boundaries, assignment handoff identity, student recognition,
 result-review identity, credential-login gates, account deletion gates,
 source-material boundaries, anonymous-token guards, storage-key guards, or the
 settings-account-workspace handoff.
+Settings security workspace boundary has a fast script-level gate via
+`pnpm exec tsx --test scripts/settings-security-workspace-handoff-semantic-views.test.ts`;
+run it when changing workspace security summary, credential-login gate,
+password fields, password update action, password reset boundary, connected
+provider boundary, account deletion gate, delete confirmation dialog, activity
+and source-material protections, assignment link and snapshot protections,
+student result protection, raw auth/provider error guards, or the hidden
+settings-security-workspace handoff.
 Settings billing workspace handoff has a fast script-level gate via
 `pnpm exec tsx --test scripts/settings-billing-workspace-handoff-semantic-views.test.ts`;
 run it when changing plan access, current-plan card semantics, activity library
