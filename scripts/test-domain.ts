@@ -2908,7 +2908,7 @@ assert.match(
 );
 assert.match(
   assignmentShareLinkSource,
-  /export const ASSIGNMENT_SHARE_LINK_HANDOFF_ITEM_IDS = \[(?=[\s\S]*'route-target')(?=[\s\S]*'normalized-share-slug')(?=[\s\S]*'normalized-slug-component')(?=[\s\S]*'encoded-share-path')(?=[\s\S]*'encoded-route-param')(?=[\s\S]*'absolute-share-url')(?=[\s\S]*'preview-route-params')(?=[\s\S]*'public-delivery-contract')(?=[\s\S]*'copy-disabled-gate')(?=[\s\S]*'copy-action')(?=[\s\S]*'clipboard-payload')(?=[\s\S]*'copy-execution-plan')(?=[\s\S]*'preview-disabled-gate')(?=[\s\S]*'preview-action')(?=[\s\S]*'path-encoding-guard')(?=[\s\S]*'publish-success-surface')(?=[\s\S]*'assignment-list-surface')(?=[\s\S]*'result-page-surface')(?=[\s\S]*'surface-consistency')(?=[\s\S]*'privacy-guard')[\s\S]*export type AssignmentShareLinkHandoffPrivacyContract = \{[\s\S]*exposesActivityContent: false;[\s\S]*exposesAnswerKeys: false;[\s\S]*exposesClipboardPrivateData: false;[\s\S]*exposesInternalAssignmentIds: false;[\s\S]*exposesInternalBaseUrlConfig: false;[\s\S]*exposesRawAnonymousToken: false;[\s\S]*exposesSourceMaterialStorageKeys: false;[\s\S]*exposesStudentAnswerText: false;[\s\S]*shareUrlIsPublicDeliveryLink: true;/,
+  /export const ASSIGNMENT_SHARE_LINK_HANDOFF_ITEM_IDS = \[(?=[\s\S]*'route-target')(?=[\s\S]*'normalized-share-slug')(?=[\s\S]*'normalized-slug-component')(?=[\s\S]*'encoded-share-path')(?=[\s\S]*'encoded-route-param')(?=[\s\S]*'absolute-share-url')(?=[\s\S]*'preview-route-params')(?=[\s\S]*'public-delivery-contract')(?=[\s\S]*'copy-disabled-gate')(?=[\s\S]*'copy-action')(?=[\s\S]*'clipboard-payload')(?=[\s\S]*'copy-execution-plan')(?=[\s\S]*'preview-disabled-gate')(?=[\s\S]*'preview-action')(?=[\s\S]*'path-encoding-guard')(?=[\s\S]*'publish-success-surface')(?=[\s\S]*'assignment-list-surface')(?=[\s\S]*'result-page-surface')(?=[\s\S]*'surface-consistency')(?=[\s\S]*'privacy-guard')[\s\S]*export type AssignmentShareLinkHandoffPrivacyContract = \{[\s\S]*exposesActivityContent: false;[\s\S]*exposesAnswerKeys: false;[\s\S]*exposesClipboardPrivateData: false;[\s\S]*exposesInternalAssignmentIds: false;[\s\S]*exposesInternalBaseUrlConfig: false;[\s\S]*exposesRawAnonymousToken: false;[\s\S]*exposesSourceMaterialStorageKeys: false;[\s\S]*exposesStudentAnswerText: false;[\s\S]*scope: 'assignment-share-link-distribution';[\s\S]*shareUrlIsPublicDeliveryLink: true;/,
   'Share-link handoff should expose a typed 30-slice distribution contract with explicit privacy flags.'
 );
 assert.match(
@@ -16455,6 +16455,11 @@ assert.match(
 );
 assert.match(
   e2eTestCatalogText,
+  /scripts\/assignment-share-link-handoff-semantic-views\.test\.ts[\s\S]*assignment share-link\s+privacy-scope\s+boundaries/,
+  'E2E catalog should document the assignment share-link privacy-scope fast gate.'
+);
+assert.match(
+  e2eTestCatalogText,
   /scripts\/student-runner-start-handoff-semantic-views\.test\.ts[\s\S]*public runner start privacy-scope\s+boundaries/,
   'E2E catalog should document the student runner safe-start privacy-scope fast gate.'
 );
@@ -22973,6 +22978,7 @@ assert.deepEqual(assignmentShareLinkHandoffView.privacy, {
   exposesStudentNames: false,
   exposesTeacherNotes: false,
   itemIds: assignmentShareLinkHandoffItemIds,
+  scope: 'assignment-share-link-distribution',
   shareUrlIsPublicDeliveryLink: true,
 });
 assert.deepEqual(
@@ -35618,8 +35624,8 @@ assert.match(
 );
 assert.match(
   assignmentShareLinkHandoffComponentSource,
-  /AssignmentShareLinkHandoffView[\s\S]*useId[\s\S]*export function AssignmentShareLinkHandoff[\s\S]*data-handoff="assignment-share-link"[\s\S]*handoff\.title[\s\S]*handoff\.description[\s\S]*handoff\.itemViews\.map\(\(item\) => \([\s\S]*AssignmentShareLinkHandoffItem[\s\S]*item=\{item\}[\s\S]*key=\{item\.id\}[\s\S]*function AssignmentShareLinkHandoffItem[\s\S]*item: AssignmentShareLinkHandoffItemView[\s\S]*const labelId = `assignment-share-link-handoff-\$\{item\.id\}-label`[\s\S]*const valueId = `assignment-share-link-handoff-\$\{item\.id\}-value`[\s\S]*const descriptionId = `assignment-share-link-handoff-\$\{item\.id\}-description`[\s\S]*data-handoff-item=\{item\.id\}[\s\S]*id=\{labelId\}[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*aria-label=\{item\.ariaLabel\}[\s\S]*aria-labelledby=\{`\$\{labelId\} \$\{valueId\}`\}[\s\S]*id=\{valueId\}[\s\S]*id=\{descriptionId\}/,
-  'Assignment share-link handoff component should render prepared share-link item views as stable hidden semantic output.'
+  /AssignmentShareLinkHandoffView[\s\S]*useId[\s\S]*export function AssignmentShareLinkHandoff[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*aria-labelledby=\{titleId\}[\s\S]*data-handoff="assignment-share-link"[\s\S]*data-handoff-scope=\{handoff\.privacy\.scope\}[\s\S]*handoff\.title[\s\S]*handoff\.description[\s\S]*handoff\.itemViews\.map\(\(item\) => \([\s\S]*AssignmentShareLinkHandoffItem[\s\S]*item=\{item\}[\s\S]*key=\{item\.id\}[\s\S]*function AssignmentShareLinkHandoffItem[\s\S]*item: AssignmentShareLinkHandoffItemView[\s\S]*const labelId = `assignment-share-link-handoff-\$\{item\.id\}-label`[\s\S]*const valueId = `assignment-share-link-handoff-\$\{item\.id\}-value`[\s\S]*const descriptionId = `assignment-share-link-handoff-\$\{item\.id\}-description`[\s\S]*data-handoff-item=\{item\.id\}[\s\S]*id=\{labelId\}[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*aria-label=\{item\.ariaLabel\}[\s\S]*aria-labelledby=\{`\$\{labelId\} \$\{valueId\}`\}[\s\S]*id=\{valueId\}[\s\S]*id=\{descriptionId\}/,
+  'Assignment share-link handoff component should render prepared share-link privacy scope and item views as stable hidden semantic output.'
 );
 assert.match(
   assignmentListCardComponentSource,

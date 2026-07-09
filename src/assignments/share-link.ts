@@ -98,6 +98,7 @@ export type AssignmentShareLinkHandoffPrivacyContract = {
   exposesStudentNames: false;
   exposesTeacherNotes: false;
   itemIds: AssignmentShareLinkHandoffItemId[];
+  scope: 'assignment-share-link-distribution';
   shareUrlIsPublicDeliveryLink: true;
 };
 
@@ -569,6 +570,7 @@ function buildAssignmentShareLinkHandoffPrivacyContract(
     exposesStudentNames: false,
     exposesTeacherNotes: false,
     itemIds: itemViews.map((item) => item.id),
+    scope: 'assignment-share-link-distribution',
     shareUrlIsPublicDeliveryLink: true,
   };
 }

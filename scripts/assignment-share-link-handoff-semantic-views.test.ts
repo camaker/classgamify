@@ -65,6 +65,7 @@ test('share-link helper exposes a safe 30-slice handoff', () => {
     exposesStudentNames: false,
     exposesTeacherNotes: false,
     itemIds,
+    scope: 'assignment-share-link-distribution',
     shareUrlIsPublicDeliveryLink: true,
   });
   assert.deepEqual(
@@ -335,7 +336,7 @@ test('share-link handoff renders stable semantic outputs in surfaces', () => {
   );
   assert.match(
     ASSIGNMENT_SHARE_LINK_HANDOFF_COMPONENT_SOURCE,
-    /function AssignmentShareLinkHandoff[\s\S]*data-handoff="assignment-share-link"[\s\S]*handoff\.itemViews\.map\(\(item\) =>[\s\S]*AssignmentShareLinkHandoffItem[\s\S]*function AssignmentShareLinkHandoffItem[\s\S]*item: AssignmentShareLinkHandoffItemView[\s\S]*const labelId = `assignment-share-link-handoff-\$\{item\.id\}-label`[\s\S]*const valueId = `assignment-share-link-handoff-\$\{item\.id\}-value`[\s\S]*const descriptionId = `assignment-share-link-handoff-\$\{item\.id\}-description`[\s\S]*data-handoff-item=\{item\.id\}[\s\S]*id=\{labelId\}[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*aria-label=\{item\.ariaLabel\}[\s\S]*aria-labelledby=\{`\$\{labelId\} \$\{valueId\}`\}[\s\S]*id=\{valueId\}[\s\S]*id=\{descriptionId\}/
+    /AssignmentShareLinkHandoffView[\s\S]*function AssignmentShareLinkHandoff[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*aria-labelledby=\{titleId\}[\s\S]*data-handoff="assignment-share-link"[\s\S]*data-handoff-scope=\{handoff\.privacy\.scope\}[\s\S]*handoff\.itemViews\.map\(\(item\) =>[\s\S]*AssignmentShareLinkHandoffItem[\s\S]*function AssignmentShareLinkHandoffItem[\s\S]*item: AssignmentShareLinkHandoffItemView[\s\S]*const labelId = `assignment-share-link-handoff-\$\{item\.id\}-label`[\s\S]*const valueId = `assignment-share-link-handoff-\$\{item\.id\}-value`[\s\S]*const descriptionId = `assignment-share-link-handoff-\$\{item\.id\}-description`[\s\S]*data-handoff-item=\{item\.id\}[\s\S]*id=\{labelId\}[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*aria-label=\{item\.ariaLabel\}[\s\S]*aria-labelledby=\{`\$\{labelId\} \$\{valueId\}`\}[\s\S]*id=\{valueId\}[\s\S]*id=\{descriptionId\}/
   );
 });
 
@@ -352,6 +353,7 @@ test('share-link focused gate is documented', () => {
     'absolute share URLs',
     'copy/preview disabled gates',
     'publish-success/list/result surfaces',
+    'assignment share-link privacy-scope boundaries',
     'hidden assignment-share-link handoff',
   ]) {
     assert.match(normalizedCatalog, new RegExp(boundary));
