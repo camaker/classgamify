@@ -4,6 +4,7 @@ import test from 'node:test';
 import {
   STORAGE_UPLOAD_READINESS_ITEM_IDS,
   buildStorageUploadObjectPlan,
+  buildStorageUploadProxyUrl,
   buildStorageUploadReadinessPlan,
   normalizeStorageAllowedExtensions,
   sanitizeStorageFilename,
@@ -26,7 +27,7 @@ test('storage upload readiness plans owner-scoped classroom materials safely', (
   });
 
   assert.deepEqual(plan.itemIds, [...STORAGE_UPLOAD_READINESS_ITEM_IDS]);
-  assert.equal(new Set(plan.itemIds).size, 15);
+  assert.equal(new Set(plan.itemIds).size, 20);
   assert.deepEqual(plan.privacy, {
     exposesFileBytes: false,
     exposesOriginalFilename: false,
@@ -37,6 +38,7 @@ test('storage upload readiness plans owner-scoped classroom materials safely', (
     readsFileBytesForClassification: false,
     tracksOwnerScopedUserFiles: true,
   });
+  assert.deepEqual(plan.allowedExtensions, []);
   assert.deepEqual(plan.validation, { data: true, success: true });
   assert.equal(plan.classification.kind, 'audio');
   assert.equal(plan.classification.basis, 'content-type');
@@ -165,6 +167,17 @@ test('storage upload helpers normalize filename and extension contracts', () => 
     'pdf',
     'mp3',
   ]);
+  assert.equal(
+    buildStorageUploadProxyUrl(
+      'userfiles/teacher-1/worksheet.pdf',
+      'https://classgamify.example'
+    ),
+    'https://classgamify.example/api/storage/file?key=userfiles%2Fteacher-1%2Fworksheet.pdf'
+  );
+  assert.equal(
+    buildStorageUploadProxyUrl('userfiles/teacher-1/worksheet.pdf'),
+    'userfiles/teacher-1/worksheet.pdf'
+  );
 });
 
 test('r2 provider consumes shared upload readiness helpers', () => {
@@ -176,9 +189,17 @@ test('r2 provider consumes shared upload readiness helpers', () => {
     R2_PROVIDER_SOURCE,
     /buildStorageUploadObjectPlan\(\{[\s\S]*fileId,[\s\S]*filename,[\s\S]*folder,[\s\S]*requestOrigin,[\s\S]*userFilesFolder: this\.userFilesFolder,[\s\S]*userId/
   );
+  assert.match(
+    R2_PROVIDER_SOURCE,
+    /buildStorageUploadProxyUrl\(key,\s*requestOrigin\)/
+  );
   assert.doesNotMatch(
     R2_PROVIDER_SOURCE,
     /MIME_TO_EXTENSIONS|DANGEROUS_CONTENT_TYPE|sanitizeFilename\(/
+  );
+  assert.doesNotMatch(
+    R2_PROVIDER_SOURCE,
+    /\/api\/storage\/file\?key=\$\{encodeURIComponent\(key\)\}/
   );
 });
 

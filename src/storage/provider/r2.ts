@@ -16,6 +16,7 @@ import {
 } from '../types';
 import {
   buildStorageUploadObjectPlan,
+  buildStorageUploadProxyUrl,
   validateStorageUploadFile,
 } from '@/storage/upload-readiness';
 import { websiteConfig } from '@/config/website';
@@ -85,10 +86,7 @@ export class R2Provider implements StorageProvider {
 
   /** Build same-origin proxy URL for a key */
   getPublicUrl(key: string, requestOrigin?: string): string {
-    if (requestOrigin) {
-      return `${requestOrigin}/api/storage/file?key=${encodeURIComponent(key)}`;
-    }
-    return key;
+    return buildStorageUploadProxyUrl(key, requestOrigin);
   }
 
   async uploadFile(params: UploadFileParams): Promise<UploadFileResult> {

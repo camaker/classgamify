@@ -45,13 +45,18 @@ export type StorageUploadReadinessItemId =
   | 'activity-source-reference'
   | 'allowed-extension-check'
   | 'content-type-match'
+  | 'content-type-normalization'
   | 'dangerous-content-type'
+  | 'extension-normalization'
   | 'file-byte-boundary'
   | 'filename-sanitization'
+  | 'folder-sanitization'
   | 'material-classification'
   | 'metadata-persistence'
   | 'owner-scope'
+  | 'provider-helper-reuse'
   | 'public-folder-boundary'
+  | 'r2-key-planning'
   | 'same-origin-proxy-url'
   | 'size-check'
   | 'storage-key-boundary'
@@ -72,6 +77,7 @@ export type StorageUploadObjectPlan = {
 };
 
 export type StorageUploadReadinessPlan = {
+  allowedExtensions: string[];
   classification: UserFileMaterialClassification;
   contentType?: string;
   extension?: string;
@@ -99,18 +105,23 @@ export const STORAGE_UPLOAD_READINESS_ITEM_IDS = [
   'upload-validation',
   'size-check',
   'allowed-extension-check',
+  'content-type-normalization',
+  'extension-normalization',
   'content-type-match',
   'dangerous-content-type',
   'filename-sanitization',
+  'folder-sanitization',
   'material-classification',
   'owner-scope',
   'public-folder-boundary',
   'metadata-persistence',
+  'r2-key-planning',
   'same-origin-proxy-url',
   'activity-source-reference',
   'student-payload-boundary',
   'storage-key-boundary',
   'file-byte-boundary',
+  'provider-helper-reuse',
 ] as const satisfies readonly StorageUploadReadinessItemId[];
 
 export const STORAGE_UPLOAD_DANGEROUS_CONTENT_TYPES = [
@@ -158,6 +169,7 @@ export function buildStorageUploadReadinessPlan({
   userFilesFolder,
   userId,
 }: StorageUploadReadinessInput): StorageUploadReadinessPlan {
+  const allowedExtensions = normalizeStorageAllowedExtensions(allowedTypes);
   const validation = validateStorageUploadFile({
     allowedTypes,
     contentType,
@@ -180,6 +192,7 @@ export function buildStorageUploadReadinessPlan({
   const itemIds = [...STORAGE_UPLOAD_READINESS_ITEM_IDS];
 
   return {
+    allowedExtensions,
     classification: classifyUserFileMaterial({
       contentType,
       originalName: filename,

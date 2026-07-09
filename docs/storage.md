@@ -63,6 +63,7 @@ src/storage/
 ├── file-summary.ts    # Classroom material summary metrics
 ├── index.ts           # getStorageProvider, uploadFile, deleteFile, getFile, …
 ├── types.ts           # R2BucketInterface, UploadFileResult, errors
+├── upload-readiness.ts # Upload validation, R2 key, and same-origin URL plan
 ├── utils.ts           # Folder and public-folder helpers
 └── provider/
     └── r2.ts          # R2Provider (upload, delete, download, list, …)
@@ -94,6 +95,13 @@ Files are always served via the same-origin route `/api/storage/file?key=...`.
 - **uploadFile(file, filename, contentType, folder?)** (server, in `@/storage`)
   - Uploads to R2; returns `Promise<{ url, key, metadata? }>`. Used by the
     `uploadUserFile` server function.
+
+- **buildStorageUploadReadinessPlan** (shared helper, in
+  `@/storage/upload-readiness`): Builds the 20-slice classroom material upload
+  contract for validation, content-type and extension normalization, filename
+  and folder sanitization, owner/public persistence, R2 key planning,
+  same-origin proxy URLs, provider helper reuse, and privacy guards around file
+  bytes, original filenames, storage keys, and student payloads.
 
 - **deleteFile(key)** (server)
   - Deletes the object from R2. Used by `deleteUserFile` server function (e.g.
