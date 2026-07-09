@@ -414,7 +414,7 @@ test('assignment attempt limit focused gate is documented', () => {
   );
   assert.match(
     TEST_CATALOG_SOURCE,
-    /max-attempt parsing[\s\S]*per-student attempt counters[\s\S]*retry availability[\s\S]*CSV\/export delivery-policy fields/,
+    /max-attempt parsing[\s\S]*per-student attempt counters[\s\S]*retry availability[\s\S]*CSV\/export delivery-policy fields[\s\S]*attempt-limit privacy-scope\s+boundaries[\s\S]*no-public-audit DOM boundaries/,
     'E2E catalog should say which attempt-limit product boundaries need the focused gate.'
   );
 });

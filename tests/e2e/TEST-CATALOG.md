@@ -39,7 +39,15 @@ Assignment attempt limits have a fast script-level gate via
 `pnpm exec tsx --test scripts/assignment-attempt-limit-handoff-semantic-views.test.ts`;
 run it when changing max-attempt parsing, per-student attempt counters,
 retry availability, public rule summaries, result usage labels, delivery
-summaries, or CSV/export delivery-policy fields.
+summaries, CSV/export delivery-policy fields, attempt-limit privacy-scope
+boundaries, or no-public-audit DOM boundaries.
+Assignment submission validation has a fast script-level gate via
+`pnpm exec tsx --test scripts/assignment-submission-validation-handoff-semantic-views.test.ts`;
+run it when changing frozen runtime validation, partial-submission payloads,
+runtime id normalization, unknown/duplicate/too-many rejection, API answer
+limits, safe failure mapping, teacher-result/public-payload boundaries,
+submission-validation privacy-scope boundaries, or no-public-audit DOM
+boundaries.
 Assignment attempt duration has a fast script-level gate via
 `pnpm exec tsx --test scripts/assignment-attempt-duration-handoff-semantic-views.test.ts`;
 run it when changing timer start plans, submission duration normalization,

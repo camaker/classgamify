@@ -53,6 +53,7 @@ const SUBMIT_CONTROLS_SOURCE = readFileSync(
   'src/components/assignments/student-runner-submit-controls.tsx',
   'utf8'
 );
+const TEST_CATALOG_SOURCE = readFileSync('tests/e2e/TEST-CATALOG.md', 'utf8');
 
 test('submission validation handoff exposes 30 safe validation slices', () => {
   const handoffView = buildAssignmentSubmissionValidationHandoffView(
@@ -271,6 +272,19 @@ test('submission validation handoff is wired to source boundaries', () => {
     RESULT_VIEW_SOURCE,
     /buildAssignmentResultsPageViewModel[\s\S]*reviews: data\?\.analysis\.attempts/,
     'Teacher result views should rely on stored attempt analysis rather than public payload internals.'
+  );
+});
+
+test('submission validation focused gate is documented', () => {
+  assert.match(
+    TEST_CATALOG_SOURCE,
+    /pnpm exec tsx --test scripts\/assignment-submission-validation-handoff-semantic-views\.test\.ts/,
+    'E2E catalog should point submission-validation work at the focused script gate.'
+  );
+  assert.match(
+    TEST_CATALOG_SOURCE,
+    /frozen runtime validation[\s\S]*partial-submission payloads[\s\S]*runtime id normalization[\s\S]*unknown\/duplicate\/too-many rejection[\s\S]*API answer\s+limits[\s\S]*safe failure mapping[\s\S]*teacher-result\/public-payload boundaries[\s\S]*submission-validation privacy-scope\s+boundaries[\s\S]*no-public-audit DOM\s+boundaries/,
+    'E2E catalog should say which submission-validation product boundaries need the focused gate.'
   );
 });
 

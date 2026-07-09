@@ -16494,13 +16494,13 @@ assert.match(
 );
 assert.match(
   e2eTestCatalogText,
-  /Assignment attempt limits keep a 30-slice domain contract without public audit DOM[\s\S]*source-level assignment-attempt-limit contract[\s\S]*`data-handoff="assignment-attempt-limit"`/,
-  'E2E catalog should document the attempt-limit domain contract without public audit DOM.'
+  /Assignment attempt limits have a fast script-level gate[\s\S]*attempt-limit privacy-scope\s+boundaries[\s\S]*no-public-audit DOM boundaries[\s\S]*Assignment attempt limits keep a 30-slice domain contract without public audit DOM[\s\S]*source-level assignment-attempt-limit contract[\s\S]*`data-handoff="assignment-attempt-limit"`/,
+  'E2E catalog should document the attempt-limit focused gate, privacy scope, and no-public-audit DOM contract.'
 );
 assert.match(
   e2eTestCatalogText,
-  /Assignment submission validation keeps a 30-slice domain contract without public audit DOM[\s\S]*source-level assignment-submission-validation contract[\s\S]*`data-handoff="assignment-submission-validation"`/,
-  'E2E catalog should document the submission-validation domain contract without public audit DOM.'
+  /Assignment submission validation has a fast script-level gate[\s\S]*submission-validation privacy-scope\s+boundaries[\s\S]*no-public-audit DOM\s+boundaries[\s\S]*Assignment submission validation keeps a 30-slice domain contract without public audit DOM[\s\S]*source-level assignment-submission-validation contract[\s\S]*`data-handoff="assignment-submission-validation"`/,
+  'E2E catalog should document the submission-validation focused gate, privacy scope, and no-public-audit DOM contract.'
 );
 assert.match(
   e2eTestCatalogText,
