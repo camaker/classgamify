@@ -556,7 +556,7 @@ export const activityLibraryPageCopy = {
   },
 } as const;
 
-export const activityLibraryActionCopy = {
+const activityLibraryActionCopy = {
   get dismiss() {
     return m.activity_library_action_dismiss();
   },
@@ -1287,7 +1287,7 @@ export function buildActivityLibraryTemplateFilterOptions(): ActivityLibraryTemp
   ];
 }
 
-export function resolveActivityLibraryPageSearch(
+function resolveActivityLibraryPageSearch(
   search: ActivityLibraryPageSearchState
 ): ActivityLibraryPageResolvedSearch {
   const searchQuery = search.q ?? '';
@@ -2044,7 +2044,7 @@ function getActivityLifecycleHandoffSurface(
   return libraryStatus === 'archived' ? 'archived-library' : 'active-library';
 }
 
-export function buildActivityLibraryCardStatusSummaryView({
+function buildActivityLibraryCardStatusSummaryView({
   activity,
   actionView,
   compatibility,

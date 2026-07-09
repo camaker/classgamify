@@ -61,7 +61,7 @@ type ActivityPreviewViewModel = {
   title: string;
 };
 
-export const ACTIVITY_PREVIEW_CONTENT_LIMITS = {
+const ACTIVITY_PREVIEW_CONTENT_LIMITS = {
   groups: 3,
   pairs: 4,
   questions: 3,

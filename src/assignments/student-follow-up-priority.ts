@@ -179,7 +179,7 @@ export function buildAssignmentStudentFollowUpPriorityHandoffView({
   };
 }
 
-export function buildAssignmentStudentFollowUpPriorityHandoffEvidence({
+function buildAssignmentStudentFollowUpPriorityHandoffEvidence({
   limit,
   selectedStudents,
   students,

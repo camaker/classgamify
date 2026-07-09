@@ -299,7 +299,7 @@ export type PrintableWorksheetRouteState =
 
 export const PRINTABLE_WORKSHEET_BODY_PRINT_MODE = 'worksheet';
 
-export const printableWorksheetPageCopy = {
+const printableWorksheetPageCopy = {
   get answerKeyDescription() {
     return m.assignment_printable_answer_key_description();
   },
@@ -425,7 +425,7 @@ export const printableWorksheetPageCopy = {
   },
 } as const;
 
-export function buildPrintableWorksheetHeaderView(
+function buildPrintableWorksheetHeaderView(
   worksheet: PrintableAssignmentWorksheet,
   options?: {
     answerKeyAccessView?: PrintableWorksheetAnswerKeyAccessView;
@@ -656,7 +656,7 @@ function buildPrintableWorksheetPreparationItemView({
   };
 }
 
-export function buildPrintableWorksheetHandoffView({
+function buildPrintableWorksheetHandoffView({
   answerKeyView,
   assignmentFieldViews,
   controlView,
@@ -1147,7 +1147,7 @@ export function buildPrintableWorksheetErrorView(): PrintableWorksheetLoadStateV
   };
 }
 
-export function buildPrintableWorksheetControlView({
+function buildPrintableWorksheetControlView({
   answerKey,
   answerKeyAccessView,
   assignmentId,
@@ -1175,7 +1175,7 @@ export function buildPrintableWorksheetControlView({
   };
 }
 
-export function buildPrintableWorksheetAssignmentFieldViews(
+function buildPrintableWorksheetAssignmentFieldViews(
   headerView: PrintableWorksheetHeaderView
 ): PrintableWorksheetAssignmentFieldView[] {
   return [
@@ -1280,14 +1280,14 @@ export function buildPrintableWorksheetSnapshotSourceFieldView(
   });
 }
 
-export function buildPrintableWorksheetEmptyState(): PrintableWorksheetEmptyState {
+function buildPrintableWorksheetEmptyState(): PrintableWorksheetEmptyState {
   return {
     description: printableWorksheetPageCopy.emptyDescription,
     title: printableWorksheetPageCopy.emptyTitle,
   };
 }
 
-export function buildPrintableWorksheetAnswerKeyView({
+function buildPrintableWorksheetAnswerKeyView({
   accessView,
   answerKey,
   itemViews,
@@ -1631,7 +1631,7 @@ function shouldShowPrintableWorksheetChoiceBank(item: PrintableWorksheetItem) {
   return item.choicePresentation !== 'none';
 }
 
-export function getPrintableWorksheetAnswerLines(
+function getPrintableWorksheetAnswerLines(
   item: PrintableWorksheetItem
 ): PrintableWorksheetAnswerLineView[] {
   const answerSpaceLines = normalizeRuntimeDisplayCount(item.answerSpaceLines, {
@@ -1644,7 +1644,7 @@ export function getPrintableWorksheetAnswerLines(
   }));
 }
 
-export function formatPrintableWorksheetAcceptedAnswers(values: string[]) {
+function formatPrintableWorksheetAcceptedAnswers(values: string[]) {
   return formatAcceptedAnswerAlternatives(values, {
     emptyValue: '',
     includePrimary: false,
@@ -1652,11 +1652,11 @@ export function formatPrintableWorksheetAcceptedAnswers(values: string[]) {
   });
 }
 
-export function formatPrintableWorksheetValue(value: string | undefined) {
+function formatPrintableWorksheetValue(value: string | undefined) {
   return formatAssignmentResultValue(value);
 }
 
-export function formatPrintableWorksheetAnswerKeyPrompt({
+function formatPrintableWorksheetAnswerKeyPrompt({
   kind,
   prompt,
 }: Pick<PrintableWorksheetAnswerKeyItem, 'kind' | 'prompt'>) {

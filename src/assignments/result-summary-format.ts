@@ -110,9 +110,7 @@ export function normalizeAssignmentSummaryCount(count: number) {
   return Math.max(0, Math.floor(count));
 }
 
-export function normalizeAssignmentSummaryPercent(
-  value: number | null | undefined
-) {
+function normalizeAssignmentSummaryPercent(value: number | null | undefined) {
   if (value === null || value === undefined || !Number.isFinite(value)) {
     return Number.NaN;
   }

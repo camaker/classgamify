@@ -167,7 +167,7 @@ function buildAssignmentStudentFollowUpSummaryCoverage(input: {
   };
 }
 
-export function buildAssignmentStudentFollowUpSummaryStudentViews(
+function buildAssignmentStudentFollowUpSummaryStudentViews(
   students: AssignmentStudentSummary[],
   options?: {
     attempts?: AssignmentAttemptReview[];

@@ -1054,7 +1054,7 @@ function resolveAssignmentListStarterPreview<TItem>({
   return starterPreview ?? buildAssignmentListStarterPreview();
 }
 
-export function resolveAssignmentListPageSearch(
+function resolveAssignmentListPageSearch(
   search: AssignmentListPageSearchState
 ): AssignmentListPageResolvedSearch {
   const searchQuery = search.q ?? '';

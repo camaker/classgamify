@@ -940,7 +940,7 @@ function buildAssignmentPublishReviewControlIds(
   };
 }
 
-export function buildAssignmentPublishHandoffView({
+function buildAssignmentPublishHandoffView({
   accessView,
   dialogState,
   draft,

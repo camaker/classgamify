@@ -4593,7 +4593,7 @@ assert.match(
 );
 assert.match(
   assignmentPublishSource,
-  /export function buildAssignmentPublishHandoffView(?=[\s\S]*accessView: AssignmentPublishDialogAccessView)(?=[\s\S]*dialogState: AssignmentPublishDialogState)(?=[\s\S]*preview: AssignmentPublishPreview)[\s\S]*id: 'publish-access'[\s\S]*id: 'activity-lifecycle-gate'[\s\S]*id: 'validation-message'[\s\S]*id: 'draft-field-count'[\s\S]*id: 'field-limit-boundary'[\s\S]*id: 'delivery-rule-count'[\s\S]*id: 'settings-summary-status'[\s\S]*id: 'student-instructions'[\s\S]*id: 'review-checklist-count'[\s\S]*id: 'delivery-defaults'[\s\S]*id: 'attempts-policy'[\s\S]*id: 'attempt-limit-parser'[\s\S]*id: 'timer-parser'[\s\S]*id: 'settings-json'[\s\S]*id: 'close-time-parser'[\s\S]*id: 'snapshot-freeze'[\s\S]*id: 'public-payload-boundary'[\s\S]*id: 'results-policy'[\s\S]*id: 'privacy-guard'[\s\S]*privacy: buildAssignmentPublishHandoffPrivacyContract/,
+  /function buildAssignmentPublishHandoffView(?=[\s\S]*accessView: AssignmentPublishDialogAccessView)(?=[\s\S]*dialogState: AssignmentPublishDialogState)(?=[\s\S]*preview: AssignmentPublishPreview)[\s\S]*id: 'publish-access'[\s\S]*id: 'activity-lifecycle-gate'[\s\S]*id: 'validation-message'[\s\S]*id: 'draft-field-count'[\s\S]*id: 'field-limit-boundary'[\s\S]*id: 'delivery-rule-count'[\s\S]*id: 'settings-summary-status'[\s\S]*id: 'student-instructions'[\s\S]*id: 'review-checklist-count'[\s\S]*id: 'delivery-defaults'[\s\S]*id: 'attempts-policy'[\s\S]*id: 'attempt-limit-parser'[\s\S]*id: 'timer-parser'[\s\S]*id: 'settings-json'[\s\S]*id: 'close-time-parser'[\s\S]*id: 'snapshot-freeze'[\s\S]*id: 'public-payload-boundary'[\s\S]*id: 'results-policy'[\s\S]*id: 'privacy-guard'[\s\S]*privacy: buildAssignmentPublishHandoffPrivacyContract/,
   'Assignment publish handoff should collect publish access, validation, delivery rules, defaults, parsers, payload, privacy, and review checklist slices.'
 );
 assert.doesNotMatch(
@@ -35166,7 +35166,7 @@ assert.match(
 );
 assert.match(
   activityLibraryViewSource,
-  /export function buildActivityLibraryCardStatusSummaryView[\s\S]*id: 'library-status'[\s\S]*id: 'publish'[\s\S]*id: 'remix'[\s\S]*id: 'source-materials'[\s\S]*activity_library_card_status_summary_item_aria[\s\S]*activity_library_card_status_summary_status_archived_description[\s\S]*activity_library_card_status_summary_status_saved_description/,
+  /function buildActivityLibraryCardStatusSummaryView[\s\S]*id: 'library-status'[\s\S]*id: 'publish'[\s\S]*id: 'remix'[\s\S]*id: 'source-materials'[\s\S]*activity_library_card_status_summary_item_aria[\s\S]*activity_library_card_status_summary_status_archived_description[\s\S]*activity_library_card_status_summary_status_saved_description/,
   'Activity library card status summary should prepare stable status, publish, remix, and source-material items with localized copy.'
 );
 assert.match(
@@ -38021,7 +38021,7 @@ assert.match(
 );
 assert.match(
   printableWorksheetViewSource,
-  /export function buildPrintableWorksheetHandoffView(?=[\s\S]*answerKeyView: PrintableWorksheetAnswerKeyView)(?=[\s\S]*itemViews: PrintableWorksheetItemView\[\])[\s\S]*const candidateItemViews = \[[\s\S]*id: 'handout-overview'[\s\S]*id: 'preparation-metric-count'[\s\S]*id: 'answer-key-access'[\s\S]*id: 'answer-key-toggle-boundary'[\s\S]*id: 'choice-bank-coverage'[\s\S]*id: 'choice-bank-choice-count'[\s\S]*id: 'writing-area-coverage'[\s\S]*id: 'answer-line-count'[\s\S]*id: 'item-response-help'[\s\S]*id: 'assignment-field-count'[\s\S]*id: 'answer-key-items'[\s\S]*id: 'answer-key-details'[\s\S]*id: 'print-route-boundary'[\s\S]*id: 'public-runner-boundary'[\s\S]*id: 'privacy-guard'[\s\S]*\]\.filter\(isPrintableWorksheetHandoffItemView\);[\s\S]*const itemViewById = new Map\([\s\S]*candidateItemViews\.map\(\(itemView\) => \[itemView\.id, itemView\] as const\)[\s\S]*const orderedItemViews = PRINTABLE_WORKSHEET_HANDOFF_ITEM_IDS\.map\(\(id\) => \{[\s\S]*Missing printable worksheet handoff item:[\s\S]*itemViews: orderedItemViews,[\s\S]*privacy: buildPrintableWorksheetHandoffPrivacyContract\(orderedItemViews\)/,
+  /function buildPrintableWorksheetHandoffView(?=[\s\S]*answerKeyView: PrintableWorksheetAnswerKeyView)(?=[\s\S]*itemViews: PrintableWorksheetItemView\[\])[\s\S]*const candidateItemViews = \[[\s\S]*id: 'handout-overview'[\s\S]*id: 'preparation-metric-count'[\s\S]*id: 'answer-key-access'[\s\S]*id: 'answer-key-toggle-boundary'[\s\S]*id: 'choice-bank-coverage'[\s\S]*id: 'choice-bank-choice-count'[\s\S]*id: 'writing-area-coverage'[\s\S]*id: 'answer-line-count'[\s\S]*id: 'item-response-help'[\s\S]*id: 'assignment-field-count'[\s\S]*id: 'answer-key-items'[\s\S]*id: 'answer-key-details'[\s\S]*id: 'print-route-boundary'[\s\S]*id: 'public-runner-boundary'[\s\S]*id: 'privacy-guard'[\s\S]*\]\.filter\(isPrintableWorksheetHandoffItemView\);[\s\S]*const itemViewById = new Map\([\s\S]*candidateItemViews\.map\(\(itemView\) => \[itemView\.id, itemView\] as const\)[\s\S]*const orderedItemViews = PRINTABLE_WORKSHEET_HANDOFF_ITEM_IDS\.map\(\(id\) => \{[\s\S]*Missing printable worksheet handoff item:[\s\S]*itemViews: orderedItemViews,[\s\S]*privacy: buildPrintableWorksheetHandoffPrivacyContract\(orderedItemViews\)/,
   'Printable worksheet handoff should collect prepared paper slices, order them through the stable id contract, and fail loudly when a slice is missing.'
 );
 assert.match(
@@ -38172,7 +38172,7 @@ assert.match(
 );
 assert.match(
   printableWorksheetViewSource,
-  /export function buildPrintableWorksheetHeaderView\([\s\S]*\): PrintableWorksheetHeaderView[\s\S]*export function buildPrintableWorksheetItemView\([\s\S]*\): PrintableWorksheetItemView[\s\S]*export function buildPrintableWorksheetAnswerKeyItemView\([\s\S]*\): PrintableWorksheetAnswerKeyItemView[\s\S]*getPrintableWorksheetAnswerLines\([\s\S]*\): PrintableWorksheetAnswerLineView\[\]/,
+  /function buildPrintableWorksheetHeaderView\([\s\S]*\): PrintableWorksheetHeaderView[\s\S]*export function buildPrintableWorksheetItemView\([\s\S]*\): PrintableWorksheetItemView[\s\S]*export function buildPrintableWorksheetAnswerKeyItemView\([\s\S]*\): PrintableWorksheetAnswerKeyItemView[\s\S]*function getPrintableWorksheetAnswerLines\([\s\S]*\): PrintableWorksheetAnswerLineView\[\]/,
   'Printable worksheet builders should return explicit printable view contracts.'
 );
 assert.doesNotMatch(
