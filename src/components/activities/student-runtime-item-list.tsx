@@ -340,6 +340,7 @@ function StudentRuntimeChoiceAssignmentHandoff({
       aria-labelledby={titleId}
       className="sr-only"
       data-handoff="student-runtime-choice-assignment"
+      data-handoff-scope={view.privacy.scope}
     >
       <h2 id={titleId}>{view.title}</h2>
       <p id={descriptionId}>{view.description}</p>

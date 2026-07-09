@@ -15302,8 +15302,8 @@ assert.match(
 );
 assert.match(
   studentRuntimeItemListSource,
-  /StudentRuntimeChoiceAssignmentHandoffItemView[\s\S]*StudentRuntimeChoiceAssignmentHandoffView[\s\S]*data-handoff="student-runtime-choice-assignment"[\s\S]*view\.itemViews\.map[\s\S]*StudentRuntimeChoiceAssignmentHandoffItem[\s\S]*function StudentRuntimeChoiceAssignmentHandoffItem[\s\S]*const labelId = `student-runtime-choice-assignment-handoff-\$\{itemView\.id\}-label`[\s\S]*const valueId = `student-runtime-choice-assignment-handoff-\$\{itemView\.id\}-value`[\s\S]*const descriptionId = `student-runtime-choice-assignment-handoff-\$\{itemView\.id\}-description`[\s\S]*data-handoff-item=\{itemView\.id\}[\s\S]*id=\{labelId\}[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*aria-label=\{itemView\.ariaLabel\}[\s\S]*aria-labelledby=\{`\$\{labelId\} \$\{valueId\}`\}[\s\S]*id=\{valueId\}[\s\S]*id=\{descriptionId\}/,
-  'Student runtime item-list component should render hidden stable choice-assignment handoff outputs with label, value, and description relationships.'
+  /StudentRuntimeChoiceAssignmentHandoffItemView[\s\S]*StudentRuntimeChoiceAssignmentHandoffView[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*aria-labelledby=\{titleId\}[\s\S]*data-handoff="student-runtime-choice-assignment"[\s\S]*data-handoff-scope=\{view\.privacy\.scope\}[\s\S]*view\.itemViews\.map[\s\S]*StudentRuntimeChoiceAssignmentHandoffItem[\s\S]*function StudentRuntimeChoiceAssignmentHandoffItem[\s\S]*const labelId = `student-runtime-choice-assignment-handoff-\$\{itemView\.id\}-label`[\s\S]*const valueId = `student-runtime-choice-assignment-handoff-\$\{itemView\.id\}-value`[\s\S]*const descriptionId = `student-runtime-choice-assignment-handoff-\$\{itemView\.id\}-description`[\s\S]*data-handoff-item=\{itemView\.id\}[\s\S]*id=\{labelId\}[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*aria-label=\{itemView\.ariaLabel\}[\s\S]*aria-labelledby=\{`\$\{labelId\} \$\{valueId\}`\}[\s\S]*id=\{valueId\}[\s\S]*id=\{descriptionId\}/,
+  'Student runtime item-list component should render hidden stable choice-assignment handoff outputs with privacy scope plus label, value, and description relationships.'
 );
 assert.match(
   studentRuntimeItemListSource,
@@ -18672,6 +18672,11 @@ assert.match(
   e2eTestCatalogText,
   /Student runtime identity exposes a 30-slice handoff[\s\S]*runtime id normalization source[\s\S]*submission validation boundary[\s\S]*anonymous-token boundary/,
   'E2E catalog should cover the hidden 30-slice student runtime identity handoff contract.'
+);
+assert.match(
+  e2eTestCatalogText,
+  /scripts\/student-runtime-choice-assignment-handoff-semantic-views\.test\.ts[\s\S]*runtime choice\s+assignment privacy-scope boundaries/,
+  'E2E catalog should document the student runtime choice-assignment privacy-scope fast gate.'
 );
 const listeningRuntimeInteractionHandoffView =
   buildStudentRuntimeItemListView({

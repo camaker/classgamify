@@ -68,6 +68,13 @@ run it when changing template renderer dispatch, runner surface selection,
 runtime item or kind counts, choice counts, listening language, answer-change
 contracts, selection scope, review feedback, public runtime interaction
 privacy-scope boundaries, or the hidden student-runtime-interaction handoff.
+Student runtime choice assignment has a fast script-level gate via
+`pnpm exec tsx --test scripts/student-runtime-choice-assignment-handoff-semantic-views.test.ts`;
+run it when changing exclusive pairing, group placement, choice-list behavior,
+choice-key normalization, selected item validity, occupied/unassigned choice
+counts, answer-change contracts, disabled action policies, runtime choice
+assignment privacy-scope boundaries, or the hidden
+student-runtime-choice-assignment handoff.
 Assignment results CSV export preparation has a fast script-level gate via
 `pnpm exec tsx --test scripts/assignment-results-export-preparation-handoff-semantic-views.test.ts`;
 run it when changing delivery-policy columns, accepted-answer columns,
