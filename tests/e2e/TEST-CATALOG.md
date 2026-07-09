@@ -271,8 +271,8 @@ boundaries, or the hidden AI remix assist handoff.
 Assignment list filter and distribution boundaries have a fast script-level gate
 via `pnpm exec tsx --test scripts/assignment-list-semantic-views.test.ts`; run
 it when changing assignment list overview metrics, status/search filters,
-published share context, visible-card counts, or the hidden assignment-list
-handoff.
+published share context, visible-card counts, assignment list privacy-scope
+boundaries, or the hidden assignment-list handoff.
 Assignment lifecycle boundaries have a fast script-level gate via
 `pnpm exec tsx --test scripts/assignment-lifecycle-handoff-semantic-views.test.ts`;
 run it when changing open/closed/expired/draft status resolution, close/reopen

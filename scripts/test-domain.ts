@@ -35379,7 +35379,7 @@ assert.match(
 );
 assert.match(
   assignmentListViewSource,
-  /export const ASSIGNMENT_LIST_PAGE_HANDOFF_ITEM_IDS = \[[\s\S]*'owner-scope'[\s\S]*'summary-total'[\s\S]*'scope-range'[\s\S]*'status-open'[\s\S]*'published-share-context'[\s\S]*'distribution-copy-link'[\s\S]*'distribution-review-results'[\s\S]*\] as const;[\s\S]*export type AssignmentListPageHandoffItemId =[\s\S]*typeof ASSIGNMENT_LIST_PAGE_HANDOFF_ITEM_IDS[\s\S]*export type AssignmentListPageHandoffPrivacyView = \{[\s\S]*broadensBeyondOwner: false;[\s\S]*countsStarterPreviewAsOwned: false;[\s\S]*exposesRawAnonymousToken: false;[\s\S]*exposesStudentAnswerText: false;[\s\S]*itemIds: AssignmentListPageHandoffItemId\[\];[\s\S]*keepsVisiblePageCountsSeparate: true;[\s\S]*searchMatchesAssignmentTitle: true;[\s\S]*searchMatchesShareSlug: true;[\s\S]*searchMatchesSourceActivityText: true;[\s\S]*usesOwnerScopedStatusFilters: true;[\s\S]*export type AssignmentListPageHandoffView = \{/,
+  /export const ASSIGNMENT_LIST_PAGE_HANDOFF_ITEM_IDS = \[[\s\S]*'owner-scope'[\s\S]*'summary-total'[\s\S]*'scope-range'[\s\S]*'status-open'[\s\S]*'published-share-context'[\s\S]*'distribution-copy-link'[\s\S]*'distribution-review-results'[\s\S]*\] as const;[\s\S]*export type AssignmentListPageHandoffItemId =[\s\S]*typeof ASSIGNMENT_LIST_PAGE_HANDOFF_ITEM_IDS[\s\S]*export type AssignmentListPageHandoffPrivacyView = \{[\s\S]*broadensBeyondOwner: false;[\s\S]*countsStarterPreviewAsOwned: false;[\s\S]*exposesRawAnonymousToken: false;[\s\S]*exposesStudentAnswerText: false;[\s\S]*itemIds: AssignmentListPageHandoffItemId\[\];[\s\S]*keepsVisiblePageCountsSeparate: true;[\s\S]*searchMatchesAssignmentTitle: true;[\s\S]*searchMatchesShareSlug: true;[\s\S]*searchMatchesSourceActivityText: true;[\s\S]*scope: 'owner-assignment-list-filter-scope';[\s\S]*usesOwnerScopedStatusFilters: true;[\s\S]*export type AssignmentListPageHandoffView = \{/,
   'Assignment list page handoff should derive its typed owner-scoped distribution contract from a stable 30-slice id list with explicit privacy flags.'
 );
 assert.deepEqual(
@@ -35455,7 +35455,7 @@ assert.match(
 );
 assert.match(
   dashboardAssignmentsRouteSource,
-  /function AssignmentListPageHandoff[\s\S]*data-handoff="assignment-list"[\s\S]*handoffView\.itemViews\.map\(\(item\) =>[\s\S]*AssignmentListPageHandoffItem[\s\S]*function AssignmentListPageHandoffItem[\s\S]*const labelId = `assignment-list-handoff-\$\{item\.id\}-label`[\s\S]*const valueId = `assignment-list-handoff-\$\{item\.id\}-value`[\s\S]*const descriptionId = `assignment-list-handoff-\$\{item\.id\}-description`[\s\S]*data-handoff-item=\{item\.id\}[\s\S]*id=\{labelId\}[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*aria-label=\{item\.ariaLabel\}[\s\S]*aria-labelledby=\{`\$\{labelId\} \$\{valueId\}`\}[\s\S]*id=\{valueId\}[\s\S]*id=\{descriptionId\}/,
+  /function AssignmentListPageHandoff[\s\S]*data-handoff="assignment-list"[\s\S]*data-handoff-scope=\{handoffView\.privacy\.scope\}[\s\S]*handoffView\.itemViews\.map\(\(item\) =>[\s\S]*AssignmentListPageHandoffItem[\s\S]*function AssignmentListPageHandoffItem[\s\S]*const labelId = `assignment-list-handoff-\$\{item\.id\}-label`[\s\S]*const valueId = `assignment-list-handoff-\$\{item\.id\}-value`[\s\S]*const descriptionId = `assignment-list-handoff-\$\{item\.id\}-description`[\s\S]*data-handoff-item=\{item\.id\}[\s\S]*id=\{labelId\}[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*aria-label=\{item\.ariaLabel\}[\s\S]*aria-labelledby=\{`\$\{labelId\} \$\{valueId\}`\}[\s\S]*id=\{valueId\}[\s\S]*id=\{descriptionId\}/,
   'Assignment dashboard route should expose the page handoff marker and stable assignment-list item outputs.'
 );
 assert.match(
@@ -44124,6 +44124,7 @@ assert.deepEqual(filteredAssignmentListPageView.handoffView.privacy, {
   searchMatchesAssignmentTitle: true,
   searchMatchesShareSlug: true,
   searchMatchesSourceActivityText: true,
+  scope: 'owner-assignment-list-filter-scope',
   usesFullFilteredSummaryForOverview: true,
   usesOwnerScopedStatusFilters: true,
 });

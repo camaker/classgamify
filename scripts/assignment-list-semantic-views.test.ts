@@ -30,7 +30,7 @@ test('assignment dashboard route renders the page handoff marker and item output
   );
   assert.match(
     DASHBOARD_ASSIGNMENTS_ROUTE_SOURCE,
-    /function AssignmentListPageHandoff[\s\S]*const titleId = useId\(\)[\s\S]*const descriptionId = useId\(\)[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*aria-labelledby=\{titleId\}[\s\S]*className="sr-only"[\s\S]*data-handoff="assignment-list"[\s\S]*id=\{titleId\}[\s\S]*id=\{descriptionId\}[\s\S]*handoffView\.itemViews\.map\(\(item\) =>[\s\S]*AssignmentListPageHandoffItem[\s\S]*function AssignmentListPageHandoffItem[\s\S]*item: AssignmentListPageHandoffItemView[\s\S]*const labelId = `assignment-list-handoff-\$\{item\.id\}-label`[\s\S]*const valueId = `assignment-list-handoff-\$\{item\.id\}-value`[\s\S]*const descriptionId = `assignment-list-handoff-\$\{item\.id\}-description`[\s\S]*data-handoff-item=\{item\.id\}[\s\S]*id=\{labelId\}[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*aria-label=\{item\.ariaLabel\}[\s\S]*aria-labelledby=\{`\$\{labelId\} \$\{valueId\}`\}[\s\S]*id=\{valueId\}[\s\S]*id=\{descriptionId\}/,
+    /function AssignmentListPageHandoff[\s\S]*const titleId = useId\(\)[\s\S]*const descriptionId = useId\(\)[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*aria-labelledby=\{titleId\}[\s\S]*className="sr-only"[\s\S]*data-handoff="assignment-list"[\s\S]*data-handoff-scope=\{handoffView\.privacy\.scope\}[\s\S]*id=\{titleId\}[\s\S]*id=\{descriptionId\}[\s\S]*handoffView\.itemViews\.map\(\(item\) =>[\s\S]*AssignmentListPageHandoffItem[\s\S]*function AssignmentListPageHandoffItem[\s\S]*item: AssignmentListPageHandoffItemView[\s\S]*const labelId = `assignment-list-handoff-\$\{item\.id\}-label`[\s\S]*const valueId = `assignment-list-handoff-\$\{item\.id\}-value`[\s\S]*const descriptionId = `assignment-list-handoff-\$\{item\.id\}-description`[\s\S]*data-handoff-item=\{item\.id\}[\s\S]*id=\{labelId\}[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*aria-label=\{item\.ariaLabel\}[\s\S]*aria-labelledby=\{`\$\{labelId\} \$\{valueId\}`\}[\s\S]*id=\{valueId\}[\s\S]*id=\{descriptionId\}/,
     'Assignment dashboard route should expose the assignment-list marker, stable item markers, and prepared item outputs.'
   );
 });
@@ -47,6 +47,7 @@ test('assignment list focused gate is documented', () => {
     'status/search filters',
     'published share context',
     'visible-card counts',
+    'assignment list privacy-scope boundaries',
     'hidden assignment-list handoff',
   ]) {
     assert.match(normalizedCatalog, new RegExp(boundary));
@@ -131,6 +132,7 @@ test('assignment list page exposes a 30-slice distribution handoff', () => {
     searchMatchesAssignmentTitle: true,
     searchMatchesShareSlug: true,
     searchMatchesSourceActivityText: true,
+    scope: 'owner-assignment-list-filter-scope',
     usesFullFilteredSummaryForOverview: true,
     usesOwnerScopedStatusFilters: true,
   });

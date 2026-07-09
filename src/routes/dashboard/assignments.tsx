@@ -290,6 +290,7 @@ function AssignmentListPageHandoff({
       aria-labelledby={titleId}
       className="sr-only"
       data-handoff="assignment-list"
+      data-handoff-scope={handoffView.privacy.scope}
     >
       <h2 id={titleId}>{handoffView.title}</h2>
       <p id={descriptionId}>{handoffView.description}</p>

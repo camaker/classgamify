@@ -185,6 +185,7 @@ export type AssignmentListPageHandoffPrivacyView = {
   searchMatchesAssignmentTitle: true;
   searchMatchesShareSlug: true;
   searchMatchesSourceActivityText: true;
+  scope: 'owner-assignment-list-filter-scope';
   usesFullFilteredSummaryForOverview: true;
   usesOwnerScopedStatusFilters: true;
 };
@@ -1391,6 +1392,7 @@ function buildAssignmentListPageHandoffPrivacyView(
     searchMatchesAssignmentTitle: true,
     searchMatchesShareSlug: true,
     searchMatchesSourceActivityText: true,
+    scope: 'owner-assignment-list-filter-scope',
     usesFullFilteredSummaryForOverview: true,
     usesOwnerScopedStatusFilters: true,
   };
