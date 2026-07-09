@@ -37,6 +37,12 @@ import {
   buildPublicDomHandoffBoundaryView,
 } from '@/seo/public-dom-handoff-boundary';
 import {
+  ACTIVE_SURFACE_ALLOWED_LEGACY_MIGRATION_FILES,
+  ACTIVE_SURFACE_PRODUCT_BOUNDARY_ITEM_IDS,
+  ACTIVE_SURFACE_PRODUCT_BOUNDARY_SOURCE_FILES,
+  buildActiveSurfaceProductBoundaryView,
+} from '@/config/active-surface-product-boundary';
+import {
   buildPublicNavigationHandoffView,
   PUBLIC_NAVIGATION_HANDOFF_ITEM_IDS,
 } from '@/navigation/public-navigation-handoff';
@@ -2128,6 +2134,112 @@ assert.match(
   /buildMailTransactionalWorkspaceHandoffView\(\)[\s\S]*30-slice preflight contract[\s\S]*template set[\s\S]*HTML\/plain-text rendering[\s\S]*provider boundaries[\s\S]*no-mutation guarantees[\s\S]*provider-secret[\s\S]*private-data[\s\S]*provider API tokens[\s\S]*result exports/,
   'Mail docs should document the transactional email handoff privacy contract.'
 );
+const activeSurfaceProductBoundaryView =
+  buildActiveSurfaceProductBoundaryView();
+const activeSurfaceProductBoundaryItemIds =
+  activeSurfaceProductBoundaryView.itemViews.map((item) => item.id);
+assert.deepEqual(activeSurfaceProductBoundaryItemIds, [
+  ...ACTIVE_SURFACE_PRODUCT_BOUNDARY_ITEM_IDS,
+]);
+assert.equal(new Set(activeSurfaceProductBoundaryItemIds).size, 30);
+assert.equal(ACTIVE_SURFACE_PRODUCT_BOUNDARY_SOURCE_FILES.length, 30);
+assert.deepEqual(activeSurfaceProductBoundaryView.privacy, {
+  activeSourceFileCount: ACTIVE_SURFACE_PRODUCT_BOUNDARY_SOURCE_FILES.length,
+  allowsLegacyMigrationCopyOnlyIn: [
+    ...ACTIVE_SURFACE_ALLOWED_LEGACY_MIGRATION_FILES,
+  ],
+  currentSurfacesUseClassGamifyCopy: true,
+  exposesProviderSecrets: false,
+  exposesRawCheckoutSessions: false,
+  exposesSourceMaterialStorageKeys: false,
+  exposesStudentAnswers: false,
+  exposesStudentIdentifiers: false,
+  exposesTeacherEmail: false,
+  itemIds: activeSurfaceProductBoundaryItemIds,
+  keepsCurrentFormsProductScoped: true,
+  keepsDeveloperExamplesProductScoped: true,
+  keepsProviderCopyOut: true,
+  protectsClassroomProductLoop: true,
+  sourceFiles: [...ACTIVE_SURFACE_PRODUCT_BOUNDARY_SOURCE_FILES],
+});
+assert.deepEqual(
+  activeSurfaceProductBoundaryView.itemViews.map((item) => [
+    item.id,
+    item.value,
+  ]),
+  [
+    ['developer-configuration', '30 configuration slices'],
+    ['env-example-origin', 'https://classgamify.example'],
+    ['env-secret-placeholders', 'Blank placeholders'],
+    ['auth-entry-copy', 'Teacher workspace'],
+    [
+      'auth-workspace-boundary',
+      'Account -> Activities -> Assignments -> Results',
+    ],
+    ['contact-form-copy', 'Classroom inquiry'],
+    ['contact-classroom-intake', '30 intake slices'],
+    ['contact-email-routing', 'Structured contact email'],
+    ['profile-settings-copy', 'Teacher identity'],
+    ['security-settings-copy', 'Workspace access'],
+    ['account-settings-handoff', '30 account slices'],
+    ['notification-settings-copy', 'Classroom updates'],
+    ['notification-update-handoff', '30 update slices'],
+    ['billing-settings-copy', 'Plan access'],
+    ['billing-workspace-handoff', '30 billing slices'],
+    ['payment-callback-copy', '/settings/payment'],
+    ['hosted-billing-boundary', 'Hosted checkout and portal'],
+    [
+      'mail-workspace-boundary',
+      'Activities, assignments, results, AI sources',
+    ],
+    ['mail-template-copy', 'ClassGamify transactional mail'],
+    ['newsletter-settings-copy', 'Teacher product email'],
+    ['configuration-docs', 'Cloudflare-owned deploy path'],
+    ['auth-docs', 'Teacher workspace secrets'],
+    ['mail-docs', 'Transactional workspace'],
+    ['payment-docs', 'Classroom capability boundary'],
+    ['newsletter-docs', 'Logged-in settings card'],
+    ['storage-docs', 'Source-material privacy'],
+    ['website-config-sender', 'ClassGamify support sender'],
+    ['worker-config-bindings', 'DB and BUCKET'],
+    ['legacy-copy-guard', 'Current surfaces: ClassGamify only'],
+    ['provider-copy-guard', 'No unused provider copy'],
+  ]
+);
+const activeSurfaceLegacyCopyPattern =
+  /mksaas|getlangstudy|Lang Study|Hanzi|HSK|TanStarter|MyApp/i;
+const activeSurfaceUnusedProviderCopyPattern =
+  /fal\.ai|AI image generation|image generation provider/i;
+const activeSurfaceLegacyLeaks =
+  ACTIVE_SURFACE_PRODUCT_BOUNDARY_SOURCE_FILES.filter(
+    (filePath) =>
+      !ACTIVE_SURFACE_ALLOWED_LEGACY_MIGRATION_FILES.includes(
+        filePath as (typeof ACTIVE_SURFACE_ALLOWED_LEGACY_MIGRATION_FILES)[number]
+      ) &&
+      activeSurfaceLegacyCopyPattern.test(readFileSync(filePath, 'utf8'))
+  );
+const activeSurfaceUnusedProviderLeaks =
+  ACTIVE_SURFACE_PRODUCT_BOUNDARY_SOURCE_FILES.filter((filePath) =>
+    activeSurfaceUnusedProviderCopyPattern.test(
+      readFileSync(filePath, 'utf8')
+    )
+  );
+assert.deepEqual(
+  activeSurfaceLegacyLeaks,
+  [],
+  'Current active account, contact, billing, mail, notification, and configuration sources should not reintroduce legacy learning-site or starter copy.'
+);
+assert.deepEqual(
+  activeSurfaceUnusedProviderLeaks,
+  [],
+  'Current active account, contact, billing, mail, notification, and configuration sources should not describe unused image-generation provider copy.'
+);
+for (const filePath of ACTIVE_SURFACE_PRODUCT_BOUNDARY_SOURCE_FILES) {
+  assert.ok(
+    existsSync(filePath),
+    `Active surface product boundary file should exist: ${filePath}`
+  );
+}
 assert.doesNotMatch(
   blogPostVisualSource,
   />ClassGamify</,
