@@ -244,6 +244,9 @@ import {
   buildActivityAiDraftFocusPromptLine,
 } from '@/activities/ai-draft-focus';
 import {
+  ACTIVITY_AI_DRAFT_BOUNDARY_HANDOFF_ITEM_IDS,
+} from '@/activities/ai-draft-boundary';
+import {
   ACTIVITY_AI_REMIX_ASSIST_HANDOFF_ITEM_IDS,
   buildActivityAiRemixAssistHandoffView,
   buildActivityAiRemixAssistPlan,
@@ -316,6 +319,7 @@ import {
 } from '@/activities/draft-meta';
 import {
   ACTIVITY_SOURCE_MATERIAL_EXTRACTION_ACTIONS,
+  ACTIVITY_SOURCE_MATERIAL_PICKER_HANDOFF_ITEM_IDS,
   ACTIVITY_SOURCE_MATERIAL_READINESS_CAPABILITIES,
   addActivitySourceMaterialPickerItem,
   buildActivitySourceMaterialCapabilityCountsFromActions,
@@ -341,12 +345,19 @@ import {
 } from '@/activities/source-extraction-assist';
 import {
   ACTIVITY_SOURCE_MATERIAL_REFERENCE_LIMITS,
+  ACTIVITY_SOURCE_MATERIAL_REFERENCE_ITEM_IDS,
+  ACTIVITY_SOURCE_MATERIAL_REFERENCE_PRIVACY_CONTRACT,
   ACTIVITY_SOURCE_MATERIALS_MAX_COUNT,
   buildActivityMaterialReferenceFromUserFile,
   getActivityMaterialReferenceKey,
   normalizeActivityMaterialReferenceFilename,
   normalizeActivityMaterialReferences,
 } from '@/activities/material-references';
+import {
+  SOURCE_MATERIAL_PRIVACY_CHAIN_HANDOFF_ITEM_IDS,
+  SOURCE_MATERIAL_PRIVACY_CHAIN_SOURCE_FILES,
+  buildSourceMaterialPrivacyChainHandoffView,
+} from '@/activities/source-material-privacy-chain';
 import {
   ACTIVITY_LIFECYCLE_HANDOFF_ITEM_IDS,
   ACTIVITY_RESTORED_VISIBILITY,
@@ -545,7 +556,9 @@ import {
 } from '@/settings/billing-view';
 import {
   buildSettingsFilesPageViewModel,
+  buildSettingsFilesSourceMaterialHandoffView,
   buildSettingsFilesWorkspaceSummaryView,
+  SETTINGS_FILES_SOURCE_MATERIAL_HANDOFF_ITEM_IDS,
 } from '@/settings/files-view';
 import {
   buildSettingsNotificationNewsletterCardView,
@@ -703,6 +716,9 @@ import {
   summarizePublicAttemptReviewItemsForTotal,
   type PublicRuntimeItem,
 } from '@/assignments/public';
+import {
+  PUBLIC_ASSIGNMENT_UNAVAILABLE_ACCESS_HANDOFF_ITEM_IDS,
+} from '@/assignments/unavailable-access';
 import {
   compareRuntimeDisplaySearchText,
   getRuntimeDisplayAcceptedAnswers,
@@ -1228,6 +1244,14 @@ import {
   buildUserFileMaterialSummaryItems,
 } from '@/storage/file-summary';
 import { buildAttachmentContentDisposition } from '@/storage/content-disposition';
+import {
+  STORAGE_FILE_ACCESS_ITEM_IDS,
+  STORAGE_FILE_ACCESS_PRIVACY_CONTRACT,
+} from '@/storage/file-access';
+import {
+  STORAGE_UPLOAD_READINESS_ITEM_IDS,
+  buildStorageUploadReadinessPlan,
+} from '@/storage/upload-readiness';
 import { STORAGE_ERROR_CODES, UploadError } from '@/storage/types';
 import type { RuntimeItem } from '@/activities/runtime';
 import type {
@@ -5812,6 +5836,228 @@ assert.match(
   activitySourceExtractionAssistTestCatalogSource,
   /\|\s*7\s*\|(?=[\s\S]*source-extraction-assist handoff covers source-material count)(?=[\s\S]*worksheet extraction)(?=[\s\S]*storage-key)(?=[\s\S]*privacy guards)/,
   'E2E catalog should cover the source-extraction-assist handoff acceptance journey.'
+);
+const sourceMaterialPrivacyChainView =
+  buildSourceMaterialPrivacyChainHandoffView();
+const sourceMaterialPrivacyChainValues = new Map(
+  sourceMaterialPrivacyChainView.itemViews.map((item) => [item.id, item.value])
+);
+assert.deepEqual(
+  sourceMaterialPrivacyChainView.itemViews.map((item) => item.id),
+  [...SOURCE_MATERIAL_PRIVACY_CHAIN_HANDOFF_ITEM_IDS],
+  'Source-material privacy chain should expose the stable cross-module 30-slice order.'
+);
+assert.equal(sourceMaterialPrivacyChainView.itemViews.length, 30);
+assert.equal(
+  new Set(SOURCE_MATERIAL_PRIVACY_CHAIN_HANDOFF_ITEM_IDS).size,
+  30
+);
+assert.equal(SOURCE_MATERIAL_PRIVACY_CHAIN_SOURCE_FILES.length, 30);
+for (const filePath of SOURCE_MATERIAL_PRIVACY_CHAIN_SOURCE_FILES) {
+  assert.ok(
+    existsSync(filePath),
+    `Missing source material chain file ${filePath}`
+  );
+}
+assert.ok(
+  sourceMaterialPrivacyChainView.itemViews.every(
+    (item) => item.ariaLabel && item.description && item.label && item.value
+  )
+);
+assert.deepEqual(sourceMaterialPrivacyChainView.privacy, {
+  allowsSafeFilenameBasenamesInTeacherAiNotes: true,
+  chainSourceFileCount: SOURCE_MATERIAL_PRIVACY_CHAIN_SOURCE_FILES.length,
+  exposesFileBytesToAi: false,
+  exposesPermissionMetadataToActivityContent: false,
+  exposesRawSourceMaterialListToStudents: false,
+  exposesStorageKeysToActivityContent: false,
+  exposesStorageKeysToStudents: false,
+  itemIds: [...SOURCE_MATERIAL_PRIVACY_CHAIN_HANDOFF_ITEM_IDS],
+  keepsReferencesCompact: true,
+  publicPayloadIncludesSourceMaterials: false,
+  requiresTeacherReviewBeforeExtractionPersistence: true,
+  sourceFiles: [...SOURCE_MATERIAL_PRIVACY_CHAIN_SOURCE_FILES],
+});
+assert.deepEqual(Object.fromEntries(sourceMaterialPrivacyChainValues), {
+  'activity-reference-shape': 'Compact reference',
+  'activity-validation-normalization': 'CreateActivityInput normalized',
+  'ai-draft-file-byte-guard': 'Bytes omitted',
+  'ai-draft-source-sanitization': 'Sanitized source',
+  'ai-draft-storage-key-guard': 'Storage hidden',
+  'draft-source-omitted-notes': 'Unsafe notes omitted',
+  'draft-source-safe-notes': 'Safe material provenance',
+  'extraction-editor-review': 'Teacher review required',
+  'extraction-parallel-model-guard': 'No parallel worksheet model',
+  'extraction-readiness': 'Future extraction paths',
+  'file-byte-stream-boundary': 'Stream only from storage',
+  'filename-disposition-boundary': 'Attachment header only',
+  'material-classification': 'Kind from metadata',
+  'picker-attachment-limit': 'Up to 12 files',
+  'picker-owner-scope': 'Current teacher files',
+  'picker-reference-write': 'ActivityContent.sourceMaterials',
+  'privacy-chain-gate': '30 source files',
+  'private-owner-access': 'Owner required',
+  'public-assignment-source-guard': 'Teacher materials hidden',
+  'reference-duplicate-collapse': 'First 12 safe references',
+  'reference-file-id-safety': 'Unsafe ids rejected',
+  'reference-filename-safety': 'Safe basename',
+  'same-origin-access-proxy': '30 access slices',
+  'settings-library-summary': 'Full owner library',
+  'settings-material-handoff': '30 library slices',
+  'storage-key-planning': 'Server-side R2 key',
+  'storage-owner-metadata': 'Owner-scoped userFiles',
+  'storage-upload-validation': '20 upload slices',
+  'student-runtime-source-guard': 'Source metadata hidden',
+  'unavailable-link-content-guard': 'Runtime hidden',
+});
+const sourceMaterialPrivacyUploadPlan = buildStorageUploadReadinessPlan({
+  contentType: 'application/pdf',
+  file: new Blob(['safe source material fixture'], {
+    type: 'application/pdf',
+  }),
+  filename: 'unit worksheet.pdf',
+  userId: 'teacher-1',
+});
+assert.deepEqual(sourceMaterialPrivacyUploadPlan.privacy, {
+  exposesFileBytes: false,
+  exposesOriginalFilename: false,
+  exposesPermissionMetadata: false,
+  exposesSourceMaterialStorageKeysToStudents: false,
+  itemIds: [...STORAGE_UPLOAD_READINESS_ITEM_IDS],
+  publicPayloadIncludesFileList: false,
+  readsFileBytesForClassification: false,
+  tracksOwnerScopedUserFiles: true,
+});
+assert.deepEqual(
+  [
+    STORAGE_UPLOAD_READINESS_ITEM_IDS.length,
+    STORAGE_FILE_ACCESS_ITEM_IDS.length,
+    ACTIVITY_SOURCE_MATERIAL_REFERENCE_ITEM_IDS.length,
+    SETTINGS_FILES_SOURCE_MATERIAL_HANDOFF_ITEM_IDS.length,
+    ACTIVITY_SOURCE_MATERIAL_PICKER_HANDOFF_ITEM_IDS.length,
+    ACTIVITY_AI_DRAFT_BOUNDARY_HANDOFF_ITEM_IDS.length,
+    ACTIVITY_SOURCE_EXTRACTION_ASSIST_HANDOFF_ITEM_IDS.length,
+    PUBLIC_ASSIGNMENT_ACCESS_HANDOFF_ITEM_IDS.length,
+    STUDENT_RUNTIME_SEMANTIC_BUNDLE_HANDOFF_ITEM_IDS.length,
+    PUBLIC_ASSIGNMENT_UNAVAILABLE_ACCESS_HANDOFF_ITEM_IDS.length,
+  ],
+  [20, 30, 30, 30, 30, 30, 30, 30, 30, 30],
+  'Source-material privacy chain should stay backed by the focused gates it links together.'
+);
+assert.deepEqual(STORAGE_FILE_ACCESS_PRIVACY_CONTRACT, {
+  exposesFileBytesInDecision: false,
+  exposesOriginalFilenameOnlyInAttachmentHeader: true,
+  exposesPermissionMetadata: false,
+  exposesStorageKeysToStudentPayloads: false,
+  itemIds: [...STORAGE_FILE_ACCESS_ITEM_IDS],
+  permitsPublicSharedFoldersWithoutUserRecord: true,
+  requiresOwnerForPrivateUserFiles: true,
+  returnsNoStoreForPrivateFiles: true,
+  returnsNosniffHeader: true,
+  scope: 'same-origin-storage-file-access',
+});
+assert.deepEqual(ACTIVITY_SOURCE_MATERIAL_REFERENCE_PRIVACY_CONTRACT, {
+  exposesFileBytes: false,
+  exposesPermissionMetadata: false,
+  exposesSourceMaterialStorageKeys: false,
+  exposesStudentPayloadFileReferences: false,
+  itemIds: [...ACTIVITY_SOURCE_MATERIAL_REFERENCE_ITEM_IDS],
+  keepsOnlyCompactReferenceShape: true,
+  maxReferences: ACTIVITY_SOURCE_MATERIALS_MAX_COUNT,
+  normalizesSafeFilenameBasenames: true,
+  rejectsUnsafeFileIds: true,
+  scope: 'activity-source-material-reference-boundary',
+});
+assert.deepEqual(
+  buildSettingsFilesSourceMaterialHandoffView().privacy,
+  {
+    exposesActivityContent: false,
+    exposesFileBytes: false,
+    exposesPermissionMetadata: false,
+    exposesRawStudentIdentity: false,
+    exposesSourceMaterialStorageKeys: false,
+    exposesTeacherPrivateFilenames: false,
+    itemIds: [...SETTINGS_FILES_SOURCE_MATERIAL_HANDOFF_ITEM_IDS],
+    publicPayloadIncludesFileList: false,
+    scope: 'teacher-source-material-library',
+    storageKeysStayServerSide: true,
+    tracksOwnerScopedUserFiles: true,
+  }
+);
+const publicAssignmentPayloadTypeSource = getSourceSlice(
+  publicAssignmentSource,
+  'export type PublicAssignmentPayload = {',
+  'export type PublicAssignmentUnavailableReason'
+);
+assert.doesNotMatch(
+  publicAssignmentPayloadTypeSource,
+  /\b(sourceMaterials|r2Key|storageKey|fileId|originalName|permission|bytes|fileList)\b/,
+  'PublicAssignmentPayload should not expose teacher source-material lists, storage keys, filenames, permissions, or bytes.'
+);
+const studentRuntimePrivacySource = readFileSync(
+  'src/assignments/student-runtime-item-list.ts',
+  'utf8'
+);
+const activityDraftSourceBoundarySource = readFileSync(
+  'src/activities/draft-source.ts',
+  'utf8'
+);
+const sourcePrivacyActivityMaterialReferencesSource = readFileSync(
+  'src/activities/material-references.ts',
+  'utf8'
+);
+const sourcePrivacyActivityValidationSource = readFileSync(
+  'src/activities/validation.ts',
+  'utf8'
+);
+const storageUploadReadinessSource = readFileSync(
+  'src/storage/upload-readiness.ts',
+  'utf8'
+);
+const storageFileAccessPrivacySource = readFileSync(
+  'src/storage/file-access.ts',
+  'utf8'
+);
+assert.match(publicAssignmentSource, /exposesTeacherSourceMaterials: false/);
+assert.match(
+  studentRuntimePrivacySource,
+  /exposesSourceMaterialMetadata: false/
+);
+assert.match(
+  activityDraftSourceBoundarySource,
+  /sanitizeActivityDraftSourceTextForAi[\s\S]*removeActivitySourceMaterialDraftNotes[\s\S]*buildActivitySourceMaterialDraftNoteViewsFromSourceText/
+);
+assert.match(
+  activityDraftSourceBoundarySource,
+  /buildActivitySourceMaterialDraftNoteSafetySummary[\s\S]*omittedCount/
+);
+assert.match(
+  activityDraftSourceBoundarySource,
+  /normalizeActivityMaterialReferenceFilename\(noteView\.name\)/
+);
+assert.match(
+  sourcePrivacyActivityMaterialReferencesSource,
+  /ACTIVITY_SOURCE_MATERIAL_REFERENCE_PRIVACY_CONTRACT[\s\S]*exposesFileBytes: false[\s\S]*exposesPermissionMetadata: false[\s\S]*exposesSourceMaterialStorageKeys: false/
+);
+assert.match(
+  sourcePrivacyActivityValidationSource,
+  /sourceMaterials:\s*normalizeActivityMaterialReferences\(input\.sourceMaterials\)/
+);
+assert.match(
+  settingsFilesViewSource,
+  /publicPayloadIncludesFileList: false[\s\S]*storageKeysStayServerSide: true/
+);
+assert.match(
+  storageUploadReadinessSource,
+  /publicPayloadIncludesFileList: false[\s\S]*readsFileBytesForClassification: false/
+);
+assert.match(
+  storageFileAccessPrivacySource,
+  /exposesStorageKeysToStudentPayloads: false[\s\S]*returnsNoStoreForPrivateFiles: true/
+);
+assert.match(
+  activitySourceExtractionAssistTestCatalogSource,
+  /Source-material privacy chain has a fast script-level gate via[\s\S]*scripts\/source-material-privacy-chain-handoff\.test\.ts/
 );
 assert.doesNotMatch(
   activitySourceMaterialsFieldSource,

@@ -298,6 +298,12 @@ user-file-to-activity reference mapping, selected-material normalization, safe
 file id rules, safe filename basenames, content-type normalization,
 material-kind fallback, size normalization, duplicate collapse, reference
 limits, compact JSON shape, storage-key omission, or student-payload privacy.
+Source-material privacy chain has a fast script-level gate via
+`pnpm exec tsx --test scripts/source-material-privacy-chain-handoff.test.ts`;
+run it when changing storage upload/access, ActivityContent.sourceMaterials
+references, settings files, source-material picker, AI draft source notes,
+extraction readiness, public assignment payloads, or student runtime
+source-material metadata guards.
 Assignment result student search has a fast script-level gate via
 `pnpm exec tsx --test scripts/assignment-result-student-search-handoff-semantic-views.test.ts`;
 run it when changing result-page student search route parsing, query
