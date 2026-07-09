@@ -197,6 +197,7 @@ function MatchingPairsBoardHandoff({
       aria-labelledby={titleId}
       className="sr-only"
       data-handoff="matching-pairs-board"
+      data-handoff-scope={view.privacy.scope}
     >
       <h2 id={titleId}>{view.title}</h2>
       <p id={descriptionId}>{view.description}</p>
