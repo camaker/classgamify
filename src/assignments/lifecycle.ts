@@ -98,6 +98,7 @@ export type AssignmentLifecycleHandoffPrivacyContract = {
   exposesStudentNames: false;
   exposesTeacherNotes: false;
   itemIds: AssignmentLifecycleHandoffItemId[];
+  scope: 'assignment-lifecycle-state';
 };
 
 export type AssignmentLifecycleHandoffView = {
@@ -706,6 +707,7 @@ function buildAssignmentLifecycleHandoffPrivacyContract(
     exposesStudentNames: false,
     exposesTeacherNotes: false,
     itemIds: itemViews.map((item) => item.id),
+    scope: 'assignment-lifecycle-state',
   };
 }
 

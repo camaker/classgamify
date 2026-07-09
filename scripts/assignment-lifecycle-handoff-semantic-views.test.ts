@@ -56,6 +56,7 @@ test('open assignment lifecycle exposes a safe 30-slice handoff', () => {
     exposesStudentNames: false,
     exposesTeacherNotes: false,
     itemIds,
+    scope: 'assignment-lifecycle-state',
   });
   assert.deepEqual(
     handoffView.itemViews.map((item) => [item.id, item.value]),
@@ -303,7 +304,7 @@ test('lifecycle handoff renders stable semantic outputs in assignment cards', ()
   );
   assert.match(
     ASSIGNMENT_LIST_CARD_COMPONENT_SOURCE,
-    /function AssignmentListLifecycleHandoff[\s\S]*data-handoff="assignment-lifecycle"[\s\S]*handoff\.itemViews\.map\(\(item\) =>[\s\S]*AssignmentListLifecycleHandoffItem[\s\S]*function AssignmentListLifecycleHandoffItem[\s\S]*item: AssignmentLifecycleHandoffItemView[\s\S]*const labelId = `assignment-lifecycle-handoff-\$\{item\.id\}-label`[\s\S]*const valueId = `assignment-lifecycle-handoff-\$\{item\.id\}-value`[\s\S]*const descriptionId = `assignment-lifecycle-handoff-\$\{item\.id\}-description`[\s\S]*data-handoff-item=\{item\.id\}[\s\S]*id=\{labelId\}[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*aria-label=\{item\.ariaLabel\}[\s\S]*aria-labelledby=\{`\$\{labelId\} \$\{valueId\}`\}[\s\S]*id=\{valueId\}[\s\S]*id=\{descriptionId\}/
+    /AssignmentLifecycleHandoffView[\s\S]*function AssignmentListLifecycleHandoff[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*aria-labelledby=\{titleId\}[\s\S]*data-handoff="assignment-lifecycle"[\s\S]*data-handoff-scope=\{handoff\.privacy\.scope\}[\s\S]*handoff\.itemViews\.map\(\(item\) =>[\s\S]*AssignmentListLifecycleHandoffItem[\s\S]*function AssignmentListLifecycleHandoffItem[\s\S]*item: AssignmentLifecycleHandoffItemView[\s\S]*const labelId = `assignment-lifecycle-handoff-\$\{item\.id\}-label`[\s\S]*const valueId = `assignment-lifecycle-handoff-\$\{item\.id\}-value`[\s\S]*const descriptionId = `assignment-lifecycle-handoff-\$\{item\.id\}-description`[\s\S]*data-handoff-item=\{item\.id\}[\s\S]*id=\{labelId\}[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*aria-label=\{item\.ariaLabel\}[\s\S]*aria-labelledby=\{`\$\{labelId\} \$\{valueId\}`\}[\s\S]*id=\{valueId\}[\s\S]*id=\{descriptionId\}/
   );
 });
 
@@ -321,6 +322,7 @@ test('lifecycle focused gate is documented', () => {
     'submission gates',
     'result retention',
     'close-window policy',
+    'assignment lifecycle privacy-scope boundaries',
     'hidden assignment-lifecycle handoff',
   ]) {
     assert.match(normalizedCatalog, new RegExp(boundary));

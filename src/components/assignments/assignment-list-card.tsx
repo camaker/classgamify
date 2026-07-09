@@ -110,6 +110,7 @@ function AssignmentListLifecycleHandoff({
       aria-labelledby={titleId}
       className="sr-only"
       data-handoff="assignment-lifecycle"
+      data-handoff-scope={handoff.privacy.scope}
     >
       <h3 id={titleId}>{handoff.title}</h3>
       <p id={descriptionId}>{handoff.description}</p>

@@ -16460,6 +16460,11 @@ assert.match(
 );
 assert.match(
   e2eTestCatalogText,
+  /scripts\/assignment-lifecycle-handoff-semantic-views\.test\.ts[\s\S]*assignment lifecycle\s+privacy-scope\s+boundaries/,
+  'E2E catalog should document the assignment lifecycle privacy-scope fast gate.'
+);
+assert.match(
+  e2eTestCatalogText,
   /scripts\/student-runner-start-handoff-semantic-views\.test\.ts[\s\S]*public runner start privacy-scope\s+boundaries/,
   'E2E catalog should document the student runner safe-start privacy-scope fast gate.'
 );
@@ -21688,7 +21693,7 @@ assert.match(
 );
 assert.match(
   assignmentLifecycleSource,
-  /export const ASSIGNMENT_LIFECYCLE_HANDOFF_ITEM_IDS = \[(?=[\s\S]*'current-status')(?=[\s\S]*'source-status')(?=[\s\S]*'persisted-source')(?=[\s\S]*'student-access')(?=[\s\S]*'public-payload')(?=[\s\S]*'public-route-contract')(?=[\s\S]*'submission-gate')(?=[\s\S]*'teacher-list-state')(?=[\s\S]*'status-filter-alignment')(?=[\s\S]*'result-page-state')(?=[\s\S]*'close-action')(?=[\s\S]*'reopen-action')(?=[\s\S]*'copy-link-action')(?=[\s\S]*'preview-link-action')(?=[\s\S]*'close-transition')(?=[\s\S]*'reopen-transition')(?=[\s\S]*'close-window-policy')(?=[\s\S]*'draft-snapshot-gate')(?=[\s\S]*'snapshot-retention')(?=[\s\S]*'privacy-guard')[\s\S]*export type AssignmentLifecycleHandoffPrivacyContract = \{[\s\S]*exposesActivityContent: false;[\s\S]*exposesAnswerKeys: false;[\s\S]*exposesInternalAssignmentIds: false;[\s\S]*exposesPublicRouteUrl: false;[\s\S]*exposesPublicShareSlug: false;[\s\S]*exposesRawAnonymousToken: false;[\s\S]*exposesStudentAnswerText: false;[\s\S]*exposesStudentNames: false;[\s\S]*exposesTeacherNotes: false;/,
+  /export const ASSIGNMENT_LIFECYCLE_HANDOFF_ITEM_IDS = \[(?=[\s\S]*'current-status')(?=[\s\S]*'source-status')(?=[\s\S]*'persisted-source')(?=[\s\S]*'student-access')(?=[\s\S]*'public-payload')(?=[\s\S]*'public-route-contract')(?=[\s\S]*'submission-gate')(?=[\s\S]*'teacher-list-state')(?=[\s\S]*'status-filter-alignment')(?=[\s\S]*'result-page-state')(?=[\s\S]*'close-action')(?=[\s\S]*'reopen-action')(?=[\s\S]*'copy-link-action')(?=[\s\S]*'preview-link-action')(?=[\s\S]*'close-transition')(?=[\s\S]*'reopen-transition')(?=[\s\S]*'close-window-policy')(?=[\s\S]*'draft-snapshot-gate')(?=[\s\S]*'snapshot-retention')(?=[\s\S]*'privacy-guard')[\s\S]*export type AssignmentLifecycleHandoffPrivacyContract = \{[\s\S]*exposesActivityContent: false;[\s\S]*exposesAnswerKeys: false;[\s\S]*exposesInternalAssignmentIds: false;[\s\S]*exposesPublicRouteUrl: false;[\s\S]*exposesPublicShareSlug: false;[\s\S]*exposesRawAnonymousToken: false;[\s\S]*exposesStudentAnswerText: false;[\s\S]*exposesStudentNames: false;[\s\S]*exposesTeacherNotes: false;[\s\S]*scope: 'assignment-lifecycle-state';/,
   'Assignment lifecycle handoff should expose a typed 30-slice lifecycle contract with explicit privacy flags.'
 );
 assert.match(
@@ -21907,6 +21912,7 @@ assert.deepEqual(openLifecycleHandoffView.privacy, {
   exposesStudentNames: false,
   exposesTeacherNotes: false,
   itemIds: openLifecycleHandoffItemIds,
+  scope: 'assignment-lifecycle-state',
 });
 assert.deepEqual(
   openLifecycleHandoffView.itemViews.map((item) => [item.id, item.value]),
@@ -35619,8 +35625,8 @@ assert.match(
 );
 assert.match(
   assignmentListCardComponentSource,
-  /AssignmentListLifecycleHandoff[\s\S]*handoff=\{assignment\.lifecycleHandoffView\}[\s\S]*function AssignmentListLifecycleHandoff\([\s\S]*handoff: AssignmentLifecycleHandoffView[\s\S]*data-handoff="assignment-lifecycle"[\s\S]*handoff\.title[\s\S]*handoff\.description[\s\S]*handoff\.itemViews\.map[\s\S]*AssignmentListLifecycleHandoffItem[\s\S]*function AssignmentListLifecycleHandoffItem[\s\S]*item: AssignmentLifecycleHandoffItemView[\s\S]*const labelId = `assignment-lifecycle-handoff-\$\{item\.id\}-label`[\s\S]*const valueId = `assignment-lifecycle-handoff-\$\{item\.id\}-value`[\s\S]*const descriptionId = `assignment-lifecycle-handoff-\$\{item\.id\}-description`[\s\S]*data-handoff-item=\{item\.id\}[\s\S]*id=\{labelId\}[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*aria-label=\{item\.ariaLabel\}[\s\S]*aria-labelledby=\{`\$\{labelId\} \$\{valueId\}`\}[\s\S]*id=\{valueId\}[\s\S]*id=\{descriptionId\}/,
-  'Assignment list card component should render the prepared assignment lifecycle handoff as stable hidden semantic output.'
+  /AssignmentListLifecycleHandoff[\s\S]*handoff=\{assignment\.lifecycleHandoffView\}[\s\S]*function AssignmentListLifecycleHandoff\([\s\S]*handoff: AssignmentLifecycleHandoffView[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*aria-labelledby=\{titleId\}[\s\S]*data-handoff="assignment-lifecycle"[\s\S]*data-handoff-scope=\{handoff\.privacy\.scope\}[\s\S]*handoff\.title[\s\S]*handoff\.description[\s\S]*handoff\.itemViews\.map[\s\S]*AssignmentListLifecycleHandoffItem[\s\S]*function AssignmentListLifecycleHandoffItem[\s\S]*item: AssignmentLifecycleHandoffItemView[\s\S]*const labelId = `assignment-lifecycle-handoff-\$\{item\.id\}-label`[\s\S]*const valueId = `assignment-lifecycle-handoff-\$\{item\.id\}-value`[\s\S]*const descriptionId = `assignment-lifecycle-handoff-\$\{item\.id\}-description`[\s\S]*data-handoff-item=\{item\.id\}[\s\S]*id=\{labelId\}[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*aria-label=\{item\.ariaLabel\}[\s\S]*aria-labelledby=\{`\$\{labelId\} \$\{valueId\}`\}[\s\S]*id=\{valueId\}[\s\S]*id=\{descriptionId\}/,
+  'Assignment list card component should render the prepared assignment lifecycle privacy scope as stable hidden semantic output.'
 );
 assert.match(
   assignmentShareLinkHandoffComponentSource,
