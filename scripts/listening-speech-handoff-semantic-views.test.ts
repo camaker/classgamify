@@ -289,7 +289,7 @@ test('listening runner attaches the speech handoff to the component', () => {
   assert.match(source, /data-handoff="listening-speech"/);
   assert.match(
     source,
-    /view\.itemViews\.map\(\(item\) =>[\s\S]*ListeningSpeechHandoffItem[\s\S]*function ListeningSpeechHandoffItem[\s\S]*item: ListeningSpeechHandoffItemView[\s\S]*const labelId = `listening-speech-handoff-\$\{item\.id\}-label`[\s\S]*const valueId = `listening-speech-handoff-\$\{item\.id\}-value`[\s\S]*const descriptionId = `listening-speech-handoff-\$\{item\.id\}-description`[\s\S]*data-handoff-item=\{item\.id\}[\s\S]*id=\{labelId\}[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*aria-label=\{item\.ariaLabel\}[\s\S]*aria-labelledby=\{`\$\{labelId\} \$\{valueId\}`\}[\s\S]*id=\{valueId\}[\s\S]*id=\{descriptionId\}/
+    /ListeningSpeechHandoffView[\s\S]*ListeningSpeechHandoffItemView[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*aria-labelledby=\{titleId\}[\s\S]*data-handoff="listening-speech"[\s\S]*data-handoff-scope=\{view\.privacy\.scope\}[\s\S]*view\.itemViews\.map\(\(item\) =>[\s\S]*ListeningSpeechHandoffItem[\s\S]*function ListeningSpeechHandoffItem[\s\S]*item: ListeningSpeechHandoffItemView[\s\S]*const labelId = `listening-speech-handoff-\$\{item\.id\}-label`[\s\S]*const valueId = `listening-speech-handoff-\$\{item\.id\}-value`[\s\S]*const descriptionId = `listening-speech-handoff-\$\{item\.id\}-description`[\s\S]*data-handoff-item=\{item\.id\}[\s\S]*id=\{labelId\}[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*aria-label=\{item\.ariaLabel\}[\s\S]*aria-labelledby=\{`\$\{labelId\} \$\{valueId\}`\}[\s\S]*id=\{valueId\}[\s\S]*id=\{descriptionId\}/
   );
 });
 
@@ -308,6 +308,7 @@ test('listening speech focused gate is documented', () => {
     'transcript visibility',
     'answer input',
     'review feedback',
+    'listening speech privacy-scope boundaries',
     'prompt/runtime-id/student/source-material guards',
     'hidden listening-speech handoff',
   ]) {

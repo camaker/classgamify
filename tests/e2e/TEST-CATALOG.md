@@ -352,8 +352,8 @@ Listening speech runtime has a fast script-level gate via
 `pnpm exec tsx --test scripts/listening-speech-handoff-semantic-views.test.ts`;
 run it when changing speech language source, browser voice language, speech
 support, transcript visibility, answer input, review feedback,
-prompt/runtime-id/student/source-material guards, or the hidden
-listening-speech handoff.
+listening speech privacy-scope boundaries, prompt/runtime-id/student/source-material
+guards, or the hidden listening-speech handoff.
 Matching-pairs board runtime has a fast script-level gate via
 `pnpm exec tsx --test scripts/matching-pairs-board-handoff-semantic-views.test.ts`;
 run it when changing prompt and choice card counts, selected prompt state,

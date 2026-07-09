@@ -9924,8 +9924,8 @@ assert.match(
 );
 assert.match(
   listeningRunnerSource,
-  /ListeningSpeechHandoffView[\s\S]*ListeningSpeechHandoffItemView[\s\S]*data-handoff="listening-speech"[\s\S]*view\.itemViews\.map\(\(item\) =>[\s\S]*ListeningSpeechHandoffItem[\s\S]*function ListeningSpeechHandoffItem[\s\S]*item: ListeningSpeechHandoffItemView[\s\S]*const labelId = `listening-speech-handoff-\$\{item\.id\}-label`[\s\S]*const valueId = `listening-speech-handoff-\$\{item\.id\}-value`[\s\S]*const descriptionId = `listening-speech-handoff-\$\{item\.id\}-description`[\s\S]*data-handoff-item=\{item\.id\}[\s\S]*id=\{labelId\}[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*aria-label=\{item\.ariaLabel\}[\s\S]*aria-labelledby=\{`\$\{labelId\} \$\{valueId\}`\}[\s\S]*id=\{valueId\}[\s\S]*id=\{descriptionId\}/,
-  'Listening runner should render stable listening speech handoff markers and item outputs.'
+  /ListeningSpeechHandoffView[\s\S]*ListeningSpeechHandoffItemView[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*aria-labelledby=\{titleId\}[\s\S]*data-handoff="listening-speech"[\s\S]*data-handoff-scope=\{view\.privacy\.scope\}[\s\S]*view\.itemViews\.map\(\(item\) =>[\s\S]*ListeningSpeechHandoffItem[\s\S]*function ListeningSpeechHandoffItem[\s\S]*item: ListeningSpeechHandoffItemView[\s\S]*const labelId = `listening-speech-handoff-\$\{item\.id\}-label`[\s\S]*const valueId = `listening-speech-handoff-\$\{item\.id\}-value`[\s\S]*const descriptionId = `listening-speech-handoff-\$\{item\.id\}-description`[\s\S]*data-handoff-item=\{item\.id\}[\s\S]*id=\{labelId\}[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*aria-label=\{item\.ariaLabel\}[\s\S]*aria-labelledby=\{`\$\{labelId\} \$\{valueId\}`\}[\s\S]*id=\{valueId\}[\s\S]*id=\{descriptionId\}/,
+  'Listening runner should render stable listening speech privacy scope plus handoff markers and item outputs.'
 );
 assert.match(
   listeningRunnerSource,
@@ -18683,6 +18683,11 @@ assert.match(
   e2eTestCatalogText,
   /scripts\/matching-pairs-board-handoff-semantic-views\.test\.ts[\s\S]*matching-pairs board\s+privacy-scope\s+boundaries/,
   'E2E catalog should document the matching-pairs board privacy-scope fast gate.'
+);
+assert.match(
+  e2eTestCatalogText,
+  /scripts\/listening-speech-handoff-semantic-views\.test\.ts[\s\S]*listening speech\s+privacy-scope\s+boundaries/,
+  'E2E catalog should document the listening speech privacy-scope fast gate.'
 );
 assert.match(
   e2eTestCatalogText,
