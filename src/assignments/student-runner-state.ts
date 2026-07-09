@@ -172,6 +172,7 @@ export type StudentRunnerUnavailableSafetyItemId =
   | 'submissions';
 
 export type StudentRunnerUnavailableSafetyItemView = {
+  ariaLabel: string;
   description: string;
   id: StudentRunnerUnavailableSafetyItemId;
   label: string;
@@ -1293,53 +1294,72 @@ function buildStudentRunnerUnavailableSafetyItems(
 ): StudentRunnerUnavailableSafetyItemView[] {
   return [
     unavailable.contentPolicy.runtimeItemsHidden
-      ? {
+      ? buildStudentRunnerUnavailableSafetyItemView({
           description:
             m.student_runner_unavailable_safety_activity_content_description(),
           id: 'activity-content',
           label: m.student_runner_unavailable_safety_activity_content_label(),
           value: m.student_runner_unavailable_safety_activity_content_value(),
-        }
+        })
       : null,
     unavailable.contentPolicy.answerKeysHidden &&
     unavailable.contentPolicy.explanationsHidden
-      ? {
+      ? buildStudentRunnerUnavailableSafetyItemView({
           description:
             m.student_runner_unavailable_safety_answer_feedback_description(),
           id: 'answer-feedback',
           label: m.student_runner_unavailable_safety_answer_feedback_label(),
           value: m.student_runner_unavailable_safety_answer_feedback_value(),
-        }
+        })
       : null,
     unavailable.identityPolicy.browserLabelHidden &&
     unavailable.identityPolicy.rawAnonymousTokenHidden
-      ? {
+      ? buildStudentRunnerUnavailableSafetyItemView({
           description:
             m.student_runner_unavailable_safety_browser_identity_description(),
           id: 'browser-identity',
           label: m.student_runner_unavailable_safety_browser_identity_label(),
           value: m.student_runner_unavailable_safety_browser_identity_value(),
-        }
+        })
       : null,
     unavailable.contentPolicy.teacherMaterialsHidden
-      ? {
+      ? buildStudentRunnerUnavailableSafetyItemView({
           description:
             m.student_runner_unavailable_safety_source_materials_description(),
           id: 'source-materials',
           label: m.student_runner_unavailable_safety_source_materials_label(),
           value: m.student_runner_unavailable_safety_source_materials_value(),
-        }
+        })
       : null,
     unavailable.submissionPolicy.submissionsBlocked
-      ? {
+      ? buildStudentRunnerUnavailableSafetyItemView({
           description:
             m.student_runner_unavailable_safety_submissions_description(),
           id: 'submissions',
           label: m.student_runner_unavailable_safety_submissions_label(),
           value: m.student_runner_unavailable_safety_submissions_value(),
-        }
+        })
       : null,
   ].flatMap((item) => (item ? [item] : []));
+}
+
+function buildStudentRunnerUnavailableSafetyItemView({
+  description,
+  id,
+  label,
+  value,
+}: Omit<StudentRunnerUnavailableSafetyItemView, 'ariaLabel'>) {
+  return {
+    ariaLabel: m.public_assignment_unavailable_access_handoff_item_aria({
+      description,
+      label,
+      value,
+    }),
+    description,
+    id,
+    label,
+    value,
+  };
 }
 
 export function buildStudentRunnerStartHandoffView({

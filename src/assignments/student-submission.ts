@@ -376,6 +376,7 @@ export type StudentRunnerMissingScopeItemId =
   | 'submissions';
 
 export type StudentRunnerMissingScopeItem = {
+  ariaLabel: string;
   description: string;
   id: StudentRunnerMissingScopeItemId;
   label: string;
@@ -728,39 +729,58 @@ function buildStudentRunnerMissingScopeItems(
   const statusView = getStudentRunnerMissingStatusScopeItem(reason);
 
   return [
-    {
+    buildStudentRunnerMissingScopeItem({
       description: statusView.description,
       id: 'link-status',
       label: m.student_runner_missing_scope_status_label(),
       value: statusView.value,
-    },
-    {
+    }),
+    buildStudentRunnerMissingScopeItem({
       description:
         m.student_runner_missing_scope_activity_content_description(),
       id: 'activity-content',
       label: m.student_runner_missing_scope_activity_content_label(),
       value: m.student_runner_missing_scope_activity_content_value(),
-    },
-    {
+    }),
+    buildStudentRunnerMissingScopeItem({
       description: m.student_runner_missing_scope_submissions_description(),
       id: 'submissions',
       label: m.student_runner_missing_scope_submissions_label(),
       value: m.student_runner_missing_scope_submissions_value(),
-    },
-    {
+    }),
+    buildStudentRunnerMissingScopeItem({
       description:
         m.student_runner_missing_scope_browser_identity_description(),
       id: 'browser-identity',
       label: m.student_runner_missing_scope_browser_identity_label(),
       value: m.student_runner_missing_scope_browser_identity_value(),
-    },
-    {
+    }),
+    buildStudentRunnerMissingScopeItem({
       description: getStudentRunnerMissingNextStepDescription(reason),
       id: 'next-step',
       label: m.student_runner_missing_scope_next_step_label(),
       value: m.student_runner_missing_scope_next_step_value(),
-    },
+    }),
   ];
+}
+
+function buildStudentRunnerMissingScopeItem({
+  description,
+  id,
+  label,
+  value,
+}: Omit<StudentRunnerMissingScopeItem, 'ariaLabel'>) {
+  return {
+    ariaLabel: m.public_assignment_unavailable_access_handoff_item_aria({
+      description,
+      label,
+      value,
+    }),
+    description,
+    id,
+    label,
+    value,
+  };
 }
 
 function getStudentRunnerMissingStatusScopeItem(

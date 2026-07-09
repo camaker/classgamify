@@ -25,66 +25,65 @@ type StudentRunnerMissingPanelProps = {
 export function StudentRunnerMissingPanel({
   view,
 }: StudentRunnerMissingPanelProps) {
+  const titleId = 'student-runner-missing-title';
+  const descriptionId = 'student-runner-missing-description';
+  const safetyTitleId = 'student-runner-unavailable-safety-title';
+  const safetyDescriptionId = 'student-runner-unavailable-safety-description';
+
   return (
     <Container className="px-4 py-10 md:py-14">
-      <div className="mx-auto max-w-3xl rounded-lg border bg-card p-6">
+      <section
+        aria-describedby={descriptionId}
+        aria-labelledby={titleId}
+        className="mx-auto max-w-3xl rounded-lg border bg-card p-6"
+      >
         <Badge variant="outline" className="rounded-md border-primary/30">
           <IconDeviceGamepad2 className="size-3.5" />
           {view.badgeLabel}
         </Badge>
-        <h1 className="mt-4 text-3xl font-bold tracking-tight">{view.title}</h1>
-        <p className="mt-3 text-sm leading-6 text-muted-foreground">
+        <h1 id={titleId} className="mt-4 text-3xl font-bold tracking-tight">
+          {view.title}
+        </h1>
+        <p
+          id={descriptionId}
+          className="mt-3 text-sm leading-6 text-muted-foreground"
+        >
           {view.description}
         </p>
-        <div className="mt-5 grid gap-2 sm:grid-cols-2">
+        <dl
+          aria-labelledby={titleId}
+          className="mt-5 grid gap-2 sm:grid-cols-2"
+        >
           {view.scopeItems.map((item) => (
-            <div
-              className="flex min-w-0 gap-3 rounded-lg border bg-background p-3"
-              key={item.id}
-            >
-              <StudentRunnerMissingScopeIcon id={item.id} />
-              <div className="min-w-0">
-                <p className="text-muted-foreground text-xs">{item.label}</p>
-                <p className="font-medium text-sm">{item.value}</p>
-                <p className="mt-1 text-muted-foreground text-xs leading-5">
-                  {item.description}
-                </p>
-              </div>
-            </div>
+            <StudentRunnerMissingScopeItem item={item} key={item.id} />
           ))}
-        </div>
+        </dl>
         {view.unavailableSafetyView ? (
           <section
-            aria-labelledby="student-runner-unavailable-safety-title"
+            aria-describedby={safetyDescriptionId}
+            aria-labelledby={safetyTitleId}
             className="mt-5 border-t pt-5"
           >
             <div>
-              <h2
-                className="font-semibold text-base"
-                id="student-runner-unavailable-safety-title"
-              >
+              <h2 className="font-semibold text-base" id={safetyTitleId}>
                 {view.unavailableSafetyView.title}
               </h2>
-              <p className="mt-2 text-muted-foreground text-sm leading-6">
+              <p
+                id={safetyDescriptionId}
+                className="mt-2 text-muted-foreground text-sm leading-6"
+              >
                 {view.unavailableSafetyView.description}
               </p>
             </div>
-            <div className="mt-4 grid gap-3 sm:grid-cols-2">
+            <dl
+              aria-describedby={safetyDescriptionId}
+              aria-labelledby={safetyTitleId}
+              className="mt-4 grid gap-3 sm:grid-cols-2"
+            >
               {view.unavailableSafetyView.items.map((item) => (
-                <div className="flex min-w-0 gap-3 border-l pl-3" key={item.id}>
-                  <StudentRunnerUnavailableSafetyIcon id={item.id} />
-                  <div className="min-w-0">
-                    <p className="text-muted-foreground text-xs">
-                      {item.label}
-                    </p>
-                    <p className="font-medium text-sm">{item.value}</p>
-                    <p className="mt-1 text-muted-foreground text-xs leading-5">
-                      {item.description}
-                    </p>
-                  </div>
-                </div>
+                <StudentRunnerUnavailableSafetyItem item={item} key={item.id} />
               ))}
-            </div>
+            </dl>
           </section>
         ) : null}
         <Link
@@ -93,8 +92,90 @@ export function StudentRunnerMissingPanel({
         >
           {view.browseTemplatesLabel}
         </Link>
-      </div>
+      </section>
     </Container>
+  );
+}
+
+function StudentRunnerMissingScopeItem({
+  item,
+}: {
+  item: StudentRunnerMissingPageView['scopeItems'][number];
+}) {
+  const labelId = `student-runner-missing-scope-${item.id}-label`;
+  const valueId = `student-runner-missing-scope-${item.id}-value`;
+  const descriptionId = `student-runner-missing-scope-${item.id}-description`;
+
+  return (
+    <div
+      className="flex min-w-0 gap-3 rounded-lg border bg-background p-3"
+      data-missing-scope-item={item.id}
+    >
+      <StudentRunnerMissingScopeIcon id={item.id} />
+      <div className="min-w-0">
+        <dt id={labelId} className="text-muted-foreground text-xs">
+          {item.label}
+        </dt>
+        <dd>
+          <output
+            aria-describedby={descriptionId}
+            aria-label={item.ariaLabel}
+            aria-labelledby={`${labelId} ${valueId}`}
+            className="font-medium text-sm"
+            id={valueId}
+          >
+            {item.value}
+          </output>
+          <p
+            id={descriptionId}
+            className="mt-1 text-muted-foreground text-xs leading-5"
+          >
+            {item.description}
+          </p>
+        </dd>
+      </div>
+    </div>
+  );
+}
+
+function StudentRunnerUnavailableSafetyItem({
+  item,
+}: {
+  item: StudentRunnerUnavailableSafetyItemView;
+}) {
+  const labelId = `student-runner-unavailable-safety-${item.id}-label`;
+  const valueId = `student-runner-unavailable-safety-${item.id}-value`;
+  const descriptionId = `student-runner-unavailable-safety-${item.id}-description`;
+
+  return (
+    <div
+      className="flex min-w-0 gap-3 border-l pl-3"
+      data-unavailable-safety-item={item.id}
+    >
+      <StudentRunnerUnavailableSafetyIcon id={item.id} />
+      <div className="min-w-0">
+        <dt id={labelId} className="text-muted-foreground text-xs">
+          {item.label}
+        </dt>
+        <dd>
+          <output
+            aria-describedby={descriptionId}
+            aria-label={item.ariaLabel}
+            aria-labelledby={`${labelId} ${valueId}`}
+            className="font-medium text-sm"
+            id={valueId}
+          >
+            {item.value}
+          </output>
+          <p
+            id={descriptionId}
+            className="mt-1 text-muted-foreground text-xs leading-5"
+          >
+            {item.description}
+          </p>
+        </dd>
+      </div>
+    </div>
   );
 }
 

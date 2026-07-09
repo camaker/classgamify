@@ -213,6 +213,95 @@ test('draft unavailable access localizes publish-first boundary', () => {
   }
 });
 
+test('student missing panel renders 20 visible unavailable DOM semantics', () => {
+  const panelSource = readFileSync(
+    'src/components/assignments/student-runner-missing-panel.tsx',
+    'utf8'
+  );
+  const visibleDomSlices: Array<[string, RegExp]> = [
+    [
+      'imports prepared safety item contract',
+      /StudentRunnerUnavailableSafetyItemView/,
+    ],
+    [
+      'prepares stable title id',
+      /const titleId = 'student-runner-missing-title'/,
+    ],
+    [
+      'prepares stable description id',
+      /const descriptionId = 'student-runner-missing-description'/,
+    ],
+    [
+      'prepares stable safety title id',
+      /const safetyTitleId = 'student-runner-unavailable-safety-title'/,
+    ],
+    [
+      'prepares stable safety description id',
+      /const safetyDescriptionId =[\s\S]*'student-runner-unavailable-safety-description'/,
+    ],
+    [
+      'binds main unavailable section',
+      /<section[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*aria-labelledby=\{titleId\}/,
+    ],
+    ['renders prepared badge label', /view\.badgeLabel/],
+    ['binds missing title heading', /<h1 id=\{titleId\}[\s\S]*view\.title/],
+    [
+      'binds missing description',
+      /id=\{descriptionId\}[\s\S]*view\.description/,
+    ],
+    [
+      'renders missing scope as labelled dl',
+      /<dl[\s\S]*aria-labelledby=\{titleId\}[\s\S]*view\.scopeItems\.map/,
+    ],
+    [
+      'delegates missing scope item',
+      /StudentRunnerMissingScopeItem item=\{item\} key=\{item\.id\}/,
+    ],
+    [
+      'derives missing item dom ids',
+      /const labelId = `student-runner-missing-scope-\$\{item\.id\}-label`[\s\S]*const valueId = `student-runner-missing-scope-\$\{item\.id\}-value`[\s\S]*const descriptionId = `student-runner-missing-scope-\$\{item\.id\}-description`/,
+    ],
+    [
+      'marks missing scope item identity',
+      /data-missing-scope-item=\{item\.id\}/,
+    ],
+    [
+      'renders missing label as dt',
+      /<dt id=\{labelId\}[\s\S]*item\.label[\s\S]*<\/dt>/,
+    ],
+    [
+      'renders missing value as accessible output',
+      /<output[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*aria-label=\{item\.ariaLabel\}[\s\S]*aria-labelledby=\{`\$\{labelId\} \$\{valueId\}`\}[\s\S]*id=\{valueId\}[\s\S]*item\.value/,
+    ],
+    [
+      'renders missing description',
+      /id=\{descriptionId\}[\s\S]*item\.description/,
+    ],
+    [
+      'binds safety section',
+      /view\.unavailableSafetyView[\s\S]*aria-describedby=\{safetyDescriptionId\}[\s\S]*aria-labelledby=\{safetyTitleId\}/,
+    ],
+    [
+      'renders safety items as labelled dl',
+      /<dl[\s\S]*aria-describedby=\{safetyDescriptionId\}[\s\S]*aria-labelledby=\{safetyTitleId\}[\s\S]*view\.unavailableSafetyView\.items\.map/,
+    ],
+    [
+      'derives safety item dom ids',
+      /const labelId = `student-runner-unavailable-safety-\$\{item\.id\}-label`[\s\S]*const valueId = `student-runner-unavailable-safety-\$\{item\.id\}-value`[\s\S]*const descriptionId = `student-runner-unavailable-safety-\$\{item\.id\}-description`/,
+    ],
+    [
+      'renders safety value as accessible output',
+      /data-unavailable-safety-item=\{item\.id\}[\s\S]*<dt id=\{labelId\}[\s\S]*item\.label[\s\S]*<output[\s\S]*aria-label=\{item\.ariaLabel\}[\s\S]*item\.value[\s\S]*item\.description/,
+    ],
+  ];
+
+  assert.equal(visibleDomSlices.length, 20);
+  for (const [sliceName, pattern] of visibleDomSlices) {
+    assert.match(panelSource, pattern, sliceName);
+  }
+  assert.doesNotMatch(panelSource, /data-handoff=/);
+});
+
 test('student missing panel omits unavailable access semantic handoffs from public DOM', () => {
   const panelSource = readFileSync(
     'src/components/assignments/student-runner-missing-panel.tsx',

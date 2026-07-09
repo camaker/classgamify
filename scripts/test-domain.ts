@@ -15681,7 +15681,7 @@ assert.match(
 );
 assert.match(
   studentRunnerStateSource,
-  /export type StudentRunnerUnavailableSafetyItemId =[\s\S]*'activity-content'[\s\S]*'answer-feedback'[\s\S]*'browser-identity'[\s\S]*'source-materials'[\s\S]*'submissions'[\s\S]*export type StudentRunnerUnavailableSafetyItemView = \{[\s\S]*description: string;[\s\S]*id: StudentRunnerUnavailableSafetyItemId;[\s\S]*label: string;[\s\S]*value: string;[\s\S]*export type StudentRunnerUnavailableSafetyView = \{[\s\S]*description: string;[\s\S]*items: StudentRunnerUnavailableSafetyItemView\[\];[\s\S]*title: string;/,
+  /export type StudentRunnerUnavailableSafetyItemId =[\s\S]*'activity-content'[\s\S]*'answer-feedback'[\s\S]*'browser-identity'[\s\S]*'source-materials'[\s\S]*'submissions'[\s\S]*export type StudentRunnerUnavailableSafetyItemView = \{[\s\S]*ariaLabel: string;[\s\S]*description: string;[\s\S]*id: StudentRunnerUnavailableSafetyItemId;[\s\S]*label: string;[\s\S]*value: string;[\s\S]*export type StudentRunnerUnavailableSafetyView = \{[\s\S]*description: string;[\s\S]*items: StudentRunnerUnavailableSafetyItemView\[\];[\s\S]*title: string;/,
   'Student runner state should expose an explicit unavailable-link safety view contract.'
 );
 assert.match(
@@ -15696,12 +15696,12 @@ assert.match(
 );
 assert.match(
   studentRunnerSubmissionSource,
-  /export type StudentRunnerMissingScopeItemId =[\s\S]*'activity-content'[\s\S]*'browser-identity'[\s\S]*'link-status'[\s\S]*'next-step'[\s\S]*'submissions'[\s\S]*export type StudentRunnerMissingScopeItem = \{[\s\S]*description: string;[\s\S]*id: StudentRunnerMissingScopeItemId;[\s\S]*label: string;[\s\S]*value: string;[\s\S]*export type StudentRunnerMissingView = \{[\s\S]*reason: StudentRunnerMissingReason;[\s\S]*scopeItems: StudentRunnerMissingScopeItem\[\];[\s\S]*unavailable\?: PublicAssignmentUnavailablePayload;/,
+  /export type StudentRunnerMissingScopeItemId =[\s\S]*'activity-content'[\s\S]*'browser-identity'[\s\S]*'link-status'[\s\S]*'next-step'[\s\S]*'submissions'[\s\S]*export type StudentRunnerMissingScopeItem = \{[\s\S]*ariaLabel: string;[\s\S]*description: string;[\s\S]*id: StudentRunnerMissingScopeItemId;[\s\S]*label: string;[\s\S]*value: string;[\s\S]*export type StudentRunnerMissingView = \{[\s\S]*reason: StudentRunnerMissingReason;[\s\S]*scopeItems: StudentRunnerMissingScopeItem\[\];[\s\S]*unavailable\?: PublicAssignmentUnavailablePayload;/,
   'Student submission domain should expose explicit missing-link scope item and view contracts.'
 );
 assert.match(
   studentRunnerSubmissionSource,
-  /buildStudentRunnerMissingScopeItems[\s\S]*student_runner_missing_scope_status_label[\s\S]*student_runner_missing_scope_activity_content_label[\s\S]*student_runner_missing_scope_submissions_label[\s\S]*student_runner_missing_scope_browser_identity_label[\s\S]*student_runner_missing_scope_next_step_label/,
+  /buildStudentRunnerMissingScopeItems[\s\S]*buildStudentRunnerMissingScopeItem[\s\S]*student_runner_missing_scope_status_label[\s\S]*student_runner_missing_scope_activity_content_label[\s\S]*student_runner_missing_scope_submissions_label[\s\S]*student_runner_missing_scope_browser_identity_label[\s\S]*student_runner_missing_scope_next_step_label[\s\S]*function buildStudentRunnerMissingScopeItem[\s\S]*public_assignment_unavailable_access_handoff_item_aria/,
   'Student missing-link scope items should be prepared from localized assignment-domain messages.'
 );
 assert.match(
@@ -16520,12 +16520,12 @@ assert.match(
 );
 assert.match(
   studentRunnerStateSource,
-  /buildStudentRunnerUnavailableSafetyItems[\s\S]*contentPolicy\.runtimeItemsHidden[\s\S]*student_runner_unavailable_safety_activity_content_label[\s\S]*contentPolicy\.answerKeysHidden[\s\S]*contentPolicy\.explanationsHidden[\s\S]*student_runner_unavailable_safety_answer_feedback_label[\s\S]*identityPolicy\.browserLabelHidden[\s\S]*identityPolicy\.rawAnonymousTokenHidden[\s\S]*student_runner_unavailable_safety_browser_identity_label[\s\S]*contentPolicy\.teacherMaterialsHidden[\s\S]*student_runner_unavailable_safety_source_materials_label[\s\S]*submissionPolicy\.submissionsBlocked[\s\S]*student_runner_unavailable_safety_submissions_label/,
+  /buildStudentRunnerUnavailableSafetyItems[\s\S]*contentPolicy\.runtimeItemsHidden[\s\S]*buildStudentRunnerUnavailableSafetyItemView[\s\S]*student_runner_unavailable_safety_activity_content_label[\s\S]*contentPolicy\.answerKeysHidden[\s\S]*contentPolicy\.explanationsHidden[\s\S]*student_runner_unavailable_safety_answer_feedback_label[\s\S]*identityPolicy\.browserLabelHidden[\s\S]*identityPolicy\.rawAnonymousTokenHidden[\s\S]*student_runner_unavailable_safety_browser_identity_label[\s\S]*contentPolicy\.teacherMaterialsHidden[\s\S]*student_runner_unavailable_safety_source_materials_label[\s\S]*submissionPolicy\.submissionsBlocked[\s\S]*student_runner_unavailable_safety_submissions_label[\s\S]*function buildStudentRunnerUnavailableSafetyItemView[\s\S]*public_assignment_unavailable_access_handoff_item_aria/,
   'Student runner unavailable safety items should be derived from explicit public payload privacy and submission policies.'
 );
 assert.match(
   studentRunnerMissingPanelSource,
-  /view\.unavailableSafetyView[\s\S]*aria-labelledby="student-runner-unavailable-safety-title"[\s\S]*view\.unavailableSafetyView\.title[\s\S]*view\.unavailableSafetyView\.description[\s\S]*view\.unavailableSafetyView\.items\.map\(\(item\)[\s\S]*StudentRunnerUnavailableSafetyIcon[\s\S]*item\.label[\s\S]*item\.value[\s\S]*item\.description/,
+  /view\.unavailableSafetyView[\s\S]*aria-labelledby=\{safetyTitleId\}[\s\S]*view\.unavailableSafetyView\.title[\s\S]*view\.unavailableSafetyView\.description[\s\S]*<dl[\s\S]*aria-describedby=\{safetyDescriptionId\}[\s\S]*view\.unavailableSafetyView\.items\.map\(\(item\)[\s\S]*StudentRunnerUnavailableSafetyIcon[\s\S]*<dt id=\{labelId\}[\s\S]*item\.label[\s\S]*aria-label=\{item\.ariaLabel\}[\s\S]*item\.value[\s\S]*item\.description/,
   'Student runner missing panel should render the prepared unavailable-link safety view without rebuilding copy.'
 );
 assert.match(
@@ -16684,7 +16684,7 @@ assert.match(
 );
 assert.match(
   studentRunnerMissingPanelSource,
-  /view\.scopeItems\.map[\s\S]*key=\{item\.id\}[\s\S]*StudentRunnerMissingScopeIcon[\s\S]*item\.label[\s\S]*item\.value[\s\S]*item\.description/,
+  /<dl[\s\S]*aria-labelledby=\{titleId\}[\s\S]*view\.scopeItems\.map[\s\S]*key=\{item\.id\}[\s\S]*StudentRunnerMissingScopeIcon[\s\S]*<dt id=\{labelId\}[\s\S]*item\.label[\s\S]*aria-label=\{item\.ariaLabel\}[\s\S]*item\.value[\s\S]*item\.description/,
   'Student runner missing panel should render prepared missing-link scope labels, values, and descriptions.'
 );
 assert.match(
@@ -18365,7 +18365,7 @@ assert.equal(
   resolveStudentAttemptSubmissionFailureCode('network closed'),
   undefined
 );
-assert.deepEqual(buildStudentRunnerMissingView('not-found'), {
+assert.deepEqual(stripMissingScopeAriaLabels(buildStudentRunnerMissingView('not-found')), {
   description:
     'This link may have been unpublished, closed, or typed incorrectly.',
   reason: 'not-found',
@@ -18408,7 +18408,7 @@ assert.deepEqual(buildStudentRunnerMissingView('not-found'), {
   ],
   title: 'Assignment not found',
 });
-assert.deepEqual(buildStudentRunnerMissingView('closed'), {
+assert.deepEqual(stripMissingScopeAriaLabels(buildStudentRunnerMissingView('closed')), {
   description:
     'This assignment link has been closed by the teacher. Ask your teacher for a reopened or new link.',
   reason: 'closed',
@@ -18450,7 +18450,7 @@ assert.deepEqual(buildStudentRunnerMissingView('closed'), {
   ],
   title: 'Assignment closed',
 });
-assert.deepEqual(buildStudentRunnerMissingView('expired'), {
+assert.deepEqual(stripMissingScopeAriaLabels(buildStudentRunnerMissingView('expired')), {
   description:
     'This assignment link has expired. Students can no longer open the activity from this link.',
   reason: 'expired',
@@ -18493,7 +18493,7 @@ assert.deepEqual(buildStudentRunnerMissingView('expired'), {
   ],
   title: 'Assignment expired',
 });
-assert.deepEqual(buildStudentRunnerMissingView('draft'), {
+assert.deepEqual(stripMissingScopeAriaLabels(buildStudentRunnerMissingView('draft')), {
   description:
     'This assignment has not been published for students yet. Ask your teacher to share the published link.',
   reason: 'draft',
@@ -18536,7 +18536,7 @@ assert.deepEqual(buildStudentRunnerMissingView('draft'), {
 });
 overwriteGetLocale(() => 'zh');
 try {
-  assert.deepEqual(buildStudentRunnerMissingView('closed'), {
+  assert.deepEqual(stripMissingScopeAriaLabels(buildStudentRunnerMissingView('closed')), {
     description:
       '这份作业链接已由老师关闭。请向老师确认是否重新开放，或获取新的链接。',
     reason: 'closed',
@@ -18576,6 +18576,19 @@ try {
     ],
     title: '作业已关闭',
   });
+} finally {
+  overwriteGetLocale(() => 'en');
+}
+assert.equal(
+  buildStudentRunnerMissingView('closed').scopeItems[0]?.ariaLabel,
+  'Link status: Closed. The teacher closed this published assignment link.'
+);
+overwriteGetLocale(() => 'zh');
+try {
+  assert.equal(
+    buildStudentRunnerMissingView('closed').scopeItems[0]?.ariaLabel,
+    '链接状态：已关闭。老师已关闭这个已发布作业链接。'
+  );
 } finally {
   overwriteGetLocale(() => 'en');
 }
@@ -26892,7 +26905,11 @@ assert.deepEqual(publicAssignmentUnavailableClosedPayload, {
   },
 });
 assert.deepEqual(
-  buildStudentRunnerUnavailableSafetyView(publicAssignmentUnavailableClosedPayload),
+  stripUnavailableSafetyAriaLabels(
+    buildStudentRunnerUnavailableSafetyView(
+      publicAssignmentUnavailableClosedPayload
+    )
+  ),
   {
     description:
       'This link is not open, so ClassGamify keeps student-facing content, teacher-only answers, browser identity, source materials, and submissions closed.',
@@ -26935,6 +26952,11 @@ assert.deepEqual(
     ],
     title: 'What stays private',
   }
+);
+assert.equal(
+  buildStudentRunnerUnavailableSafetyView(publicAssignmentUnavailableClosedPayload)
+    .items[0]?.ariaLabel,
+  'Activity content: Hidden. Runtime prompts and playable items are not returned for this link state.'
 );
 assert.equal(normalizeRuntimeDisplayText('  Ｎｅｗ   York  '), 'New York');
 assert.equal(
@@ -30793,7 +30815,9 @@ const missingStudentRunnerRouteState = buildStudentRunnerRouteState(
 if (missingStudentRunnerRouteState.status !== 'missing') {
   throw new Error('Expected student runner route state to be missing.');
 }
-assert.deepEqual(missingStudentRunnerPageView.missingView, {
+assert.deepEqual(
+  stripMissingPageAriaLabels(missingStudentRunnerPageView.missingView!),
+  {
   badgeLabel: 'Student play route',
   browseTemplatesLabel: 'Browse templates',
   description:
@@ -30879,7 +30903,8 @@ assert.deepEqual(missingStudentRunnerPageView.missingView, {
     ],
     title: 'What stays private',
   },
-});
+  }
+);
 assert.deepEqual(missingStudentRunnerPageView.resultPanelView, {
   show: false,
 });
@@ -66032,6 +66057,46 @@ assert.deepEqual(
     type: 'blocked',
   }
 );
+
+function stripMissingScopeAriaLabels(
+  view: ReturnType<typeof buildStudentRunnerMissingView>
+) {
+  return {
+    ...view,
+    scopeItems: view.scopeItems.map(({ ariaLabel: _ariaLabel, ...item }) =>
+      item
+    ),
+  };
+}
+
+function stripUnavailableSafetyAriaLabels(
+  view: ReturnType<typeof buildStudentRunnerUnavailableSafetyView>
+) {
+  return {
+    ...view,
+    items: view.items.map(({ ariaLabel: _ariaLabel, ...item }) => item),
+  };
+}
+
+function stripMissingPageAriaLabels(
+  view: NonNullable<
+    ReturnType<typeof buildStudentRunnerPageViewModel>['missingView']
+  >
+) {
+  return {
+    ...view,
+    scopeItems: view.scopeItems.map(({ ariaLabel: _ariaLabel, ...item }) =>
+      item
+    ),
+    ...(view.unavailableSafetyView
+      ? {
+          unavailableSafetyView: stripUnavailableSafetyAriaLabels(
+            view.unavailableSafetyView
+          ),
+        }
+      : {}),
+  };
+}
 
 function parseCsvRows(csvText: string) {
   const normalizedCsv = csvText.replace(/^\uFEFF/u, '');
