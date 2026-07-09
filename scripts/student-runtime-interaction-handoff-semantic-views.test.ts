@@ -59,6 +59,7 @@ test('student runtime interaction handoff exposes 30 safe choice-list slices', (
     exposesTeacherOnlyAnswers: false,
     itemIds,
     runnerSurface: 'choice-list',
+    scope: 'public-student-runtime-interaction',
     templateType: 'quiz',
   });
 
@@ -253,8 +254,8 @@ test('student runtime interaction handoff renders hidden DOM relationships', () 
 
   assert.match(
     componentSource,
-    /StudentRuntimeInteractionHandoffItemView[\s\S]*StudentRuntimeInteractionHandoffView[\s\S]*data-handoff="student-runtime-interaction"[\s\S]*view\.itemViews\.map[\s\S]*StudentRuntimeInteractionHandoffItem[\s\S]*function StudentRuntimeInteractionHandoffItem[\s\S]*const labelId = `student-runtime-interaction-handoff-\$\{itemView\.id\}-label`[\s\S]*const valueId = `student-runtime-interaction-handoff-\$\{itemView\.id\}-value`[\s\S]*const descriptionId = `student-runtime-interaction-handoff-\$\{itemView\.id\}-description`[\s\S]*data-handoff-item=\{itemView\.id\}[\s\S]*id=\{labelId\}[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*aria-label=\{itemView\.ariaLabel\}[\s\S]*aria-labelledby=\{`\$\{labelId\} \$\{valueId\}`\}[\s\S]*id=\{valueId\}[\s\S]*id=\{descriptionId\}/,
-    'Student runtime interaction handoff should render each safe interaction slice with stable label, value, and description relationships.'
+    /StudentRuntimeInteractionHandoffItemView[\s\S]*StudentRuntimeInteractionHandoffView[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*aria-labelledby=\{titleId\}[\s\S]*data-handoff="student-runtime-interaction"[\s\S]*data-handoff-scope=\{view\.privacy\.scope\}[\s\S]*view\.itemViews\.map[\s\S]*StudentRuntimeInteractionHandoffItem[\s\S]*function StudentRuntimeInteractionHandoffItem[\s\S]*const labelId = `student-runtime-interaction-handoff-\$\{itemView\.id\}-label`[\s\S]*const valueId = `student-runtime-interaction-handoff-\$\{itemView\.id\}-value`[\s\S]*const descriptionId = `student-runtime-interaction-handoff-\$\{itemView\.id\}-description`[\s\S]*data-handoff-item=\{itemView\.id\}[\s\S]*id=\{labelId\}[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*aria-label=\{itemView\.ariaLabel\}[\s\S]*aria-labelledby=\{`\$\{labelId\} \$\{valueId\}`\}[\s\S]*id=\{valueId\}[\s\S]*id=\{descriptionId\}/,
+    'Student runtime interaction handoff should render each safe interaction slice with privacy scope plus stable label, value, and description relationships.'
   );
 });
 

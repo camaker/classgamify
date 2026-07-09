@@ -15287,8 +15287,8 @@ assert.match(
 );
 assert.match(
   studentRuntimeItemListDomainSource,
-  /exposesAnswerText: false,[\s\S]*exposesRuntimeChoiceText: false,[\s\S]*exposesRuntimeItemIds: false,[\s\S]*exposesRuntimePromptText: false,[\s\S]*exposesStudentNames: false,[\s\S]*exposesTeacherOnlyAnswers: false,/,
-  'Student runtime interaction handoff privacy should forbid answer, prompt, choice, runtime id, student name, and teacher-only answer exposure.'
+  /exposesAnswerText: false[;,][\s\S]*exposesRuntimeChoiceText: false[;,][\s\S]*exposesRuntimeItemIds: false[;,][\s\S]*exposesRuntimePromptText: false[;,][\s\S]*exposesStudentNames: false[;,][\s\S]*exposesTeacherOnlyAnswers: false[;,][\s\S]*scope: 'public-student-runtime-interaction'[;,]/,
+  'Student runtime interaction handoff privacy should forbid answer, prompt, choice, runtime id, student name, and teacher-only answer exposure while exposing a stable scope.'
 );
 assert.match(
   studentRuntimeItemListDomainSource,
@@ -15297,8 +15297,8 @@ assert.match(
 );
 assert.match(
   studentRuntimeItemListSource,
-  /StudentRuntimeInteractionHandoffItemView[\s\S]*StudentRuntimeInteractionHandoffView[\s\S]*data-handoff="student-runtime-interaction"[\s\S]*view\.itemViews\.map[\s\S]*StudentRuntimeInteractionHandoffItem[\s\S]*function StudentRuntimeInteractionHandoffItem[\s\S]*const labelId = `student-runtime-interaction-handoff-\$\{itemView\.id\}-label`[\s\S]*const valueId = `student-runtime-interaction-handoff-\$\{itemView\.id\}-value`[\s\S]*const descriptionId = `student-runtime-interaction-handoff-\$\{itemView\.id\}-description`[\s\S]*data-handoff-item=\{itemView\.id\}[\s\S]*id=\{labelId\}[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*aria-label=\{itemView\.ariaLabel\}[\s\S]*aria-labelledby=\{`\$\{labelId\} \$\{valueId\}`\}[\s\S]*id=\{valueId\}[\s\S]*id=\{descriptionId\}/,
-  'Student runtime item-list component should render hidden stable runtime-interaction handoff outputs with label, value, and description relationships.'
+  /StudentRuntimeInteractionHandoffItemView[\s\S]*StudentRuntimeInteractionHandoffView[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*aria-labelledby=\{titleId\}[\s\S]*data-handoff="student-runtime-interaction"[\s\S]*data-handoff-scope=\{view\.privacy\.scope\}[\s\S]*view\.itemViews\.map[\s\S]*StudentRuntimeInteractionHandoffItem[\s\S]*function StudentRuntimeInteractionHandoffItem[\s\S]*const labelId = `student-runtime-interaction-handoff-\$\{itemView\.id\}-label`[\s\S]*const valueId = `student-runtime-interaction-handoff-\$\{itemView\.id\}-value`[\s\S]*const descriptionId = `student-runtime-interaction-handoff-\$\{itemView\.id\}-description`[\s\S]*data-handoff-item=\{itemView\.id\}[\s\S]*id=\{labelId\}[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*aria-label=\{itemView\.ariaLabel\}[\s\S]*aria-labelledby=\{`\$\{labelId\} \$\{valueId\}`\}[\s\S]*id=\{valueId\}[\s\S]*id=\{descriptionId\}/,
+  'Student runtime item-list component should render hidden stable runtime-interaction handoff outputs with privacy scope plus label, value, and description relationships.'
 );
 assert.match(
   studentRuntimeItemListSource,
@@ -18411,6 +18411,7 @@ assert.deepEqual(quizRuntimeInteractionHandoffView.privacy, {
   exposesTeacherOnlyAnswers: false,
   itemIds: [...STUDENT_RUNTIME_INTERACTION_HANDOFF_ITEM_IDS],
   runnerSurface: 'choice-list',
+  scope: 'public-student-runtime-interaction',
   templateType: 'quiz',
 });
 assert.equal(quizRuntimeInteractionHandoffValues.get('template-type'), 'Quiz');
@@ -18656,6 +18657,11 @@ assert.match(
   e2eTestCatalogText,
   /Student runtime interaction exposes a 30-slice handoff[\s\S]*student-runtime-interaction[\s\S]*renderer dispatch boundary[\s\S]*prompt\/choice\/answer text boundaries/,
   'E2E catalog should cover the hidden 30-slice student runtime interaction handoff contract.'
+);
+assert.match(
+  e2eTestCatalogText,
+  /scripts\/student-runtime-interaction-handoff-semantic-views\.test\.ts[\s\S]*public runtime interaction\s+privacy-scope boundaries/,
+  'E2E catalog should document the student runtime interaction privacy-scope fast gate.'
 );
 assert.match(
   e2eTestCatalogText,

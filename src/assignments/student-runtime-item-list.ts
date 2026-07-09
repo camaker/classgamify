@@ -101,6 +101,7 @@ export type StudentRuntimeInteractionHandoffPrivacyContract = {
   exposesTeacherOnlyAnswers: false;
   itemIds: StudentRuntimeInteractionHandoffItemId[];
   runnerSurface: StudentRuntimeItemListSurface;
+  scope: 'public-student-runtime-interaction';
   templateType: ActivityTemplateType;
 };
 
@@ -635,6 +636,7 @@ function buildStudentRuntimeInteractionHandoffPrivacyContract({
     exposesTeacherOnlyAnswers: false,
     itemIds: itemViews.map((item) => item.id),
     runnerSurface: surface,
+    scope: 'public-student-runtime-interaction',
     templateType,
   };
 }

@@ -62,6 +62,12 @@ run it when changing progress counts, payload summaries, submit-readiness,
 partial-submit confirmation, identity or timer state, post-submit review,
 feedback scope, next steps, public runner submission privacy-scope boundaries,
 or the hidden student-runner-submission handoff.
+Student runtime interaction has a fast script-level gate via
+`pnpm exec tsx --test scripts/student-runtime-interaction-handoff-semantic-views.test.ts`;
+run it when changing template renderer dispatch, runner surface selection,
+runtime item or kind counts, choice counts, listening language, answer-change
+contracts, selection scope, review feedback, public runtime interaction
+privacy-scope boundaries, or the hidden student-runtime-interaction handoff.
 Assignment results CSV export preparation has a fast script-level gate via
 `pnpm exec tsx --test scripts/assignment-results-export-preparation-handoff-semantic-views.test.ts`;
 run it when changing delivery-policy columns, accepted-answer columns,
