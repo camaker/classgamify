@@ -373,6 +373,7 @@ export type StudentRunnerStartHandoffPrivacyContract = {
   itemIds: StudentRunnerStartHandoffItemId[];
   prepareStepIds: StudentRunnerPrepareStepId[];
   ruleIds: PublicAssignmentRuleSummaryId[];
+  scope: 'public-student-runner-start';
 };
 
 export type StudentRunnerStartHandoffView = {
@@ -1751,6 +1752,7 @@ function buildStudentRunnerStartHandoffPrivacyContract({
     itemIds: itemViews.map((item) => item.id),
     prepareStepIds: headerView.prepareView.stepViews.map((step) => step.id),
     ruleIds: headerView.ruleSummaryView.summary.ruleIds,
+    scope: 'public-student-runner-start',
   };
 }
 

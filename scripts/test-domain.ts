@@ -15574,8 +15574,8 @@ assert.match(
 );
 assert.match(
   studentRunnerStartHandoffSource,
-  /StudentRunnerStartHandoffItemView[\s\S]*StudentRunnerStartHandoffView[\s\S]*data-handoff="student-runner-start"[\s\S]*view\.itemViews\.map[\s\S]*StudentRunnerStartHandoffItem[\s\S]*function StudentRunnerStartHandoffItem[\s\S]*const labelId = `student-runner-start-handoff-\$\{itemView\.id\}-label`[\s\S]*const valueId = `student-runner-start-handoff-\$\{itemView\.id\}-value`[\s\S]*const descriptionId = `student-runner-start-handoff-\$\{itemView\.id\}-description`[\s\S]*data-handoff-item=\{itemView\.id\}[\s\S]*id=\{labelId\}[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*aria-label=\{itemView\.ariaLabel\}[\s\S]*aria-labelledby=\{`\$\{labelId\} \$\{valueId\}`\}[\s\S]*id=\{valueId\}[\s\S]*id=\{descriptionId\}/,
-  'Student runner start handoff component should render hidden safe outputs with prepared label, value, and description relationships.'
+  /StudentRunnerStartHandoffItemView[\s\S]*StudentRunnerStartHandoffView[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*aria-labelledby=\{titleId\}[\s\S]*data-handoff="student-runner-start"[\s\S]*data-handoff-scope=\{view\.privacy\.scope\}[\s\S]*view\.itemViews\.map[\s\S]*StudentRunnerStartHandoffItem[\s\S]*function StudentRunnerStartHandoffItem[\s\S]*const labelId = `student-runner-start-handoff-\$\{itemView\.id\}-label`[\s\S]*const valueId = `student-runner-start-handoff-\$\{itemView\.id\}-value`[\s\S]*const descriptionId = `student-runner-start-handoff-\$\{itemView\.id\}-description`[\s\S]*data-handoff-item=\{itemView\.id\}[\s\S]*id=\{labelId\}[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*aria-label=\{itemView\.ariaLabel\}[\s\S]*aria-labelledby=\{`\$\{labelId\} \$\{valueId\}`\}[\s\S]*id=\{valueId\}[\s\S]*id=\{descriptionId\}/,
+  'Student runner start handoff component should render hidden safe outputs with privacy scope plus prepared label, value, and description relationships.'
 );
 assert.match(
   playRouteSource,
@@ -15698,8 +15698,8 @@ assert.match(
 );
 assert.match(
   studentRunnerStateSource,
-  /export const STUDENT_RUNNER_START_HANDOFF_ITEM_IDS = \[(?=[\s\S]*'share-link')(?=[\s\S]*'assignment-title')(?=[\s\S]*'runner-source')(?=[\s\S]*'source-boundary')(?=[\s\S]*'runtime-availability')(?=[\s\S]*'submit-gate')(?=[\s\S]*'read-only-state')(?=[\s\S]*'rule-status')(?=[\s\S]*'rule-count')(?=[\s\S]*'item-count')(?=[\s\S]*'attempt-limit')(?=[\s\S]*'timer-policy')(?=[\s\S]*'timer-start-boundary')(?=[\s\S]*'close-time')(?=[\s\S]*'identity-mode')(?=[\s\S]*'identity-privacy')(?=[\s\S]*'review-behavior')(?=[\s\S]*'item-order')(?=[\s\S]*'instructions')(?=[\s\S]*'prepare-review-rules')(?=[\s\S]*'prepare-identity')(?=[\s\S]*'prepare-timer')(?=[\s\S]*'prepare-submit')(?=[\s\S]*'prepare-step-count')(?=[\s\S]*'browser-label')(?=[\s\S]*'teacher-action')(?=[\s\S]*'runtime-content-guard')(?=[\s\S]*'answer-key-guard')(?=[\s\S]*'student-data-guard')(?=[\s\S]*'privacy-guard')[\s\S]*export type StudentRunnerStartHandoffPrivacyContract = \{[\s\S]*exposesAnonymousToken: false;[\s\S]*exposesAnswerText: false;[\s\S]*exposesRuntimeChoiceText: false;[\s\S]*exposesRuntimeItemIds: false;[\s\S]*exposesRuntimePromptText: false;[\s\S]*exposesStudentName: false;[\s\S]*exposesTeacherOnlyAnswers: false;[\s\S]*exposesTeacherSourceMaterials: false;/,
-  'Student runner start handoff should expose a typed 30-slice contract with explicit privacy flags.'
+  /export const STUDENT_RUNNER_START_HANDOFF_ITEM_IDS = \[(?=[\s\S]*'share-link')(?=[\s\S]*'assignment-title')(?=[\s\S]*'runner-source')(?=[\s\S]*'source-boundary')(?=[\s\S]*'runtime-availability')(?=[\s\S]*'submit-gate')(?=[\s\S]*'read-only-state')(?=[\s\S]*'rule-status')(?=[\s\S]*'rule-count')(?=[\s\S]*'item-count')(?=[\s\S]*'attempt-limit')(?=[\s\S]*'timer-policy')(?=[\s\S]*'timer-start-boundary')(?=[\s\S]*'close-time')(?=[\s\S]*'identity-mode')(?=[\s\S]*'identity-privacy')(?=[\s\S]*'review-behavior')(?=[\s\S]*'item-order')(?=[\s\S]*'instructions')(?=[\s\S]*'prepare-review-rules')(?=[\s\S]*'prepare-identity')(?=[\s\S]*'prepare-timer')(?=[\s\S]*'prepare-submit')(?=[\s\S]*'prepare-step-count')(?=[\s\S]*'browser-label')(?=[\s\S]*'teacher-action')(?=[\s\S]*'runtime-content-guard')(?=[\s\S]*'answer-key-guard')(?=[\s\S]*'student-data-guard')(?=[\s\S]*'privacy-guard')[\s\S]*export type StudentRunnerStartHandoffPrivacyContract = \{[\s\S]*exposesAnonymousToken: false;[\s\S]*exposesAnswerText: false;[\s\S]*exposesRuntimeChoiceText: false;[\s\S]*exposesRuntimeItemIds: false;[\s\S]*exposesRuntimePromptText: false;[\s\S]*exposesStudentName: false;[\s\S]*exposesTeacherOnlyAnswers: false;[\s\S]*exposesTeacherSourceMaterials: false;[\s\S]*scope: 'public-student-runner-start';/,
+  'Student runner start handoff should expose a typed 30-slice contract with explicit privacy flags and scope.'
 );
 assert.match(
   studentRunnerStateSource,
@@ -16451,6 +16451,11 @@ assert.match(
   e2eTestCatalogText,
   /Teacher can publish and copy a configured student share link[\s\S]*hidden localized `data-handoff="student-runner-start"`[\s\S]*public-assignment-access 30-slice domain contract[\s\S]*`data-handoff="public-assignment-access"`[\s\S]*visible public rule summary/,
   'E2E catalog should document the hidden safe start handoff and source-level public access contract.'
+);
+assert.match(
+  e2eTestCatalogText,
+  /scripts\/student-runner-start-handoff-semantic-views\.test\.ts[\s\S]*public runner start privacy-scope\s+boundaries/,
+  'E2E catalog should document the student runner safe-start privacy-scope fast gate.'
 );
 assert.match(
   e2eTestCatalogText,
@@ -29429,6 +29434,7 @@ assert.deepEqual(studentRunnerStartHandoffView.privacy, {
     'answerReveal',
     'itemOrder',
   ],
+  scope: 'public-student-runner-start',
 });
 assert.deepEqual(
   [

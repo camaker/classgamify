@@ -82,6 +82,7 @@ test('student runner start handoff exposes 30 safe public-start slices', () => {
       'answerReveal',
       'itemOrder',
     ],
+    scope: 'public-student-runner-start',
   });
 
   assert.equal(
@@ -274,8 +275,8 @@ test('student runner start handoff renders hidden DOM relationships', () => {
 
   assert.match(
     componentSource,
-    /StudentRunnerStartHandoffItemView[\s\S]*StudentRunnerStartHandoffView[\s\S]*data-handoff="student-runner-start"[\s\S]*view\.itemViews\.map[\s\S]*StudentRunnerStartHandoffItem[\s\S]*function StudentRunnerStartHandoffItem[\s\S]*const labelId = `student-runner-start-handoff-\$\{itemView\.id\}-label`[\s\S]*const valueId = `student-runner-start-handoff-\$\{itemView\.id\}-value`[\s\S]*const descriptionId = `student-runner-start-handoff-\$\{itemView\.id\}-description`[\s\S]*data-handoff-item=\{itemView\.id\}[\s\S]*id=\{labelId\}[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*aria-label=\{itemView\.ariaLabel\}[\s\S]*aria-labelledby=\{`\$\{labelId\} \$\{valueId\}`\}[\s\S]*id=\{valueId\}[\s\S]*id=\{descriptionId\}/,
-    'Student runner start handoff should render each safe start slice with stable label, value, and description relationships.'
+    /StudentRunnerStartHandoffItemView[\s\S]*StudentRunnerStartHandoffView[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*aria-labelledby=\{titleId\}[\s\S]*data-handoff="student-runner-start"[\s\S]*data-handoff-scope=\{view\.privacy\.scope\}[\s\S]*view\.itemViews\.map[\s\S]*StudentRunnerStartHandoffItem[\s\S]*function StudentRunnerStartHandoffItem[\s\S]*const labelId = `student-runner-start-handoff-\$\{itemView\.id\}-label`[\s\S]*const valueId = `student-runner-start-handoff-\$\{itemView\.id\}-value`[\s\S]*const descriptionId = `student-runner-start-handoff-\$\{itemView\.id\}-description`[\s\S]*data-handoff-item=\{itemView\.id\}[\s\S]*id=\{labelId\}[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*aria-label=\{itemView\.ariaLabel\}[\s\S]*aria-labelledby=\{`\$\{labelId\} \$\{valueId\}`\}[\s\S]*id=\{valueId\}[\s\S]*id=\{descriptionId\}/,
+    'Student runner start handoff should render each safe start slice with privacy scope plus stable label, value, and description relationships.'
   );
   assert.match(
     routeSource,
