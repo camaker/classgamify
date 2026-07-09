@@ -1140,6 +1140,10 @@ import {
 } from '@/assignments/student-runner-state';
 import { STUDENT_RUNNER_LOADING_HANDOFF_ITEM_IDS } from '@/assignments/student-runner-loading-handoff';
 import {
+  buildStudentRunnerSubmitControlsHandoffView,
+  STUDENT_RUNNER_SUBMIT_CONTROLS_HANDOFF_ITEM_IDS,
+} from '@/assignments/student-runner-submit-controls-handoff';
+import {
   buildAttemptCompletionCopy,
   applyStudentAnswerChanges,
   buildAnonymousAttemptCopy,
@@ -14875,6 +14879,10 @@ const studentRunnerSubmitControlsSource = readFileSync(
   'src/components/assignments/student-runner-submit-controls.tsx',
   'utf8'
 );
+const studentRunnerSubmitControlsHandoffSource = readFileSync(
+  'src/assignments/student-runner-submit-controls-handoff.ts',
+  'utf8'
+);
 const studentRunnerStartHandoffSource = readFileSync(
   'src/components/assignments/student-runner-start-handoff.tsx',
   'utf8'
@@ -15752,6 +15760,52 @@ assert.match(
   'Student runner submit controls should render the prepared browser payload summary as semantic labelled outputs.'
 );
 assert.match(
+  studentRunnerSubmitControlsHandoffSource,
+  /export const STUDENT_RUNNER_SUBMIT_CONTROLS_HANDOFF_ITEM_IDS = \[(?=[\s\S]*'controls-region')(?=[\s\S]*'readiness-status')(?=[\s\S]*'readiness-items')(?=[\s\S]*'payload-summary')(?=[\s\S]*'payload-metrics')(?=[\s\S]*'completion-counts')(?=[\s\S]*'unanswered-count')(?=[\s\S]*'button-label')(?=[\s\S]*'button-aria')(?=[\s\S]*'button-disabled')(?=[\s\S]*'button-describedby')(?=[\s\S]*'confirm-incomplete-state')(?=[\s\S]*'hint-count')(?=[\s\S]*'unanswered-hint')(?=[\s\S]*'confirm-incomplete-hint')(?=[\s\S]*'read-only-hint')(?=[\s\S]*'submit-action-boundary')(?=[\s\S]*'identity-privacy')(?=[\s\S]*'payload-privacy')(?=[\s\S]*'privacy-guard')[\s\S]*export type StudentRunnerSubmitControlsHandoffPrivacyContract = \{[\s\S]*exposesAnonymousToken: false;[\s\S]*exposesAnswerText: false;[\s\S]*exposesRawSubmissionPayload: false;[\s\S]*exposesRuntimeItemIds: false;[\s\S]*exposesStudentName: false;[\s\S]*exposesTeacherOnlyAnswers: false;[\s\S]*exposesTeacherSourceMaterials: false;[\s\S]*scope: 'public-student-runner-submit-controls';/,
+  'Student runner submit controls handoff should expose a typed 20-slice contract with explicit privacy flags and scope.'
+);
+assert.deepEqual(
+  [...STUDENT_RUNNER_SUBMIT_CONTROLS_HANDOFF_ITEM_IDS],
+  [
+    'controls-region',
+    'readiness-status',
+    'readiness-items',
+    'payload-summary',
+    'payload-metrics',
+    'completion-counts',
+    'unanswered-count',
+    'button-label',
+    'button-aria',
+    'button-disabled',
+    'button-describedby',
+    'confirm-incomplete-state',
+    'hint-count',
+    'unanswered-hint',
+    'confirm-incomplete-hint',
+    'read-only-hint',
+    'submit-action-boundary',
+    'identity-privacy',
+    'payload-privacy',
+    'privacy-guard',
+  ],
+  'Student runner submit controls handoff should expose exactly 20 stable slice ids.'
+);
+assert.match(
+  studentRunnerSubmitControlsHandoffSource,
+  /export function buildStudentRunnerSubmitControlsHandoffView\([\s\S]*controlView: StudentRunnerControlView[\s\S]*answeredValue = getPayloadMetricValue\(controlView, 'answers'\)[\s\S]*itemValue = getPayloadMetricValue\(controlView, 'items'\)[\s\S]*unansweredValue = getPayloadMetricValue\(controlView, 'unanswered'\)[\s\S]*hasConfirmIncompleteHint: hasSubmitHint\(controlView, 'confirm-incomplete'\)[\s\S]*hasReadOnlyHint: hasSubmitHint\(controlView, 'read-only'\)[\s\S]*hasUnansweredHint: hasSubmitHint\(controlView, 'unanswered'\)[\s\S]*privacy: buildStudentRunnerSubmitControlsHandoffPrivacyContract/,
+  'Student runner submit controls handoff should derive safe counts, hint state, and privacy from the prepared control view.'
+);
+assert.match(
+  studentRunnerSubmitControlsSource,
+  /buildStudentRunnerSubmitControlsHandoffView[\s\S]*const submitControlsHandoffView =[\s\S]*buildStudentRunnerSubmitControlsHandoffView\(controlView\)[\s\S]*<StudentRunnerSubmitControlsHandoff view=\{submitControlsHandoffView\} \/>/,
+  'Student runner submit controls should render the prepared hidden submit-controls handoff.'
+);
+assert.match(
+  studentRunnerSubmitControlsSource,
+  /function StudentRunnerSubmitControlsHandoff[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*aria-labelledby=\{titleId\}[\s\S]*data-handoff="student-runner-submit-controls"[\s\S]*data-handoff-scope=\{view\.privacy\.scope\}[\s\S]*view\.itemViews\.map\(\(itemView\)[\s\S]*StudentRunnerSubmitControlsHandoffItem[\s\S]*function StudentRunnerSubmitControlsHandoffItem[\s\S]*const labelId = `student-runner-submit-controls-handoff-\$\{itemView\.id\}-label`[\s\S]*const valueId = `student-runner-submit-controls-handoff-\$\{itemView\.id\}-value`[\s\S]*const descriptionId = `student-runner-submit-controls-handoff-\$\{itemView\.id\}-description`[\s\S]*data-handoff-item=\{itemView\.id\}[\s\S]*id=\{labelId\}[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*aria-label=\{itemView\.ariaLabel\}[\s\S]*aria-labelledby=\{`\$\{labelId\} \$\{valueId\}`\}[\s\S]*id=\{valueId\}[\s\S]*id=\{descriptionId\}/,
+  'Student runner submit controls handoff should render hidden safe outputs with privacy scope plus prepared label, value, and description relationships.'
+);
+assert.match(
   studentRunnerStateSource,
   /export type StudentRunnerSubmitReadinessStatus =[\s\S]*'blocked'[\s\S]*'needs-action'[\s\S]*'ready'[\s\S]*export type StudentRunnerSubmitReadinessItemId =[\s\S]*'completion'[\s\S]*'incomplete-confirmation'[\s\S]*'runtime-items'[\s\S]*'share-link'[\s\S]*'submission-state'[\s\S]*export type StudentRunnerSubmitReadinessView = \{[\s\S]*items: StudentRunnerSubmitReadinessItemView\[\];[\s\S]*status: StudentRunnerSubmitReadinessStatus;[\s\S]*statusLabel: string;/,
   'Student runner state should expose an explicit submit-readiness view contract.'
@@ -15923,6 +15977,96 @@ for (const privateValue of [
     ),
     false,
     `Student submission handoff leaked private text: ${privateValue}`
+  );
+}
+const studentSubmitControlsPrivateAnswer =
+  'DOMAIN_PRIVATE_SUBMIT_CONTROL_ANSWER';
+const studentSubmitControlsPageView = buildStudentRunnerPageViewModel({
+  anonymousToken: studentSubmissionPrivateToken,
+  answers: {
+    [studentSubmissionRuntimeItem.id]: studentSubmitControlsPrivateAnswer,
+  },
+  confirmIncompleteSubmit: true,
+  fallbackStartedAt: 10_000,
+  isSubmitting: false,
+  pageState: buildStudentRunnerReadyState({
+    activity: studentSubmissionStarterPreview.activity,
+    assignment: studentSubmissionStarterPreview.assignment,
+    runtimeItems: studentSubmissionStarterPreview.runtimeItems,
+    source: 'public-assignment',
+  }),
+  shareId: STARTER_FOOD_ASSIGNMENT_SHARE_ID,
+  submittedAttemptCount: 0,
+});
+const studentSubmitControlsHandoffView =
+  buildStudentRunnerSubmitControlsHandoffView(
+    studentSubmitControlsPageView.controlView
+  );
+const studentSubmitControlsHandoffValues = new Map(
+  studentSubmitControlsHandoffView.itemViews.map((item) => [
+    item.id,
+    item.value,
+  ])
+);
+assert.deepEqual(
+  studentSubmitControlsHandoffView.itemViews.map((item) => item.id),
+  [...STUDENT_RUNNER_SUBMIT_CONTROLS_HANDOFF_ITEM_IDS],
+  'Student runner submit controls handoff should expose the stable 20-slice order from the prepared control view.'
+);
+assert.deepEqual(studentSubmitControlsHandoffView.privacy, {
+  exposesAnonymousToken: false,
+  exposesAnswerText: false,
+  exposesRawSubmissionPayload: false,
+  exposesRuntimeItemIds: false,
+  exposesStudentName: false,
+  exposesTeacherOnlyAnswers: false,
+  exposesTeacherSourceMaterials: false,
+  hintIds: ['unanswered', 'confirm-incomplete'],
+  itemIds: [...STUDENT_RUNNER_SUBMIT_CONTROLS_HANDOFF_ITEM_IDS],
+  payloadMetricKeys: ['share-link', 'items', 'answers', 'unanswered'],
+  readinessItemIds: [
+    'share-link',
+    'runtime-items',
+    'completion',
+    'incomplete-confirmation',
+    'submission-state',
+  ],
+  scope: 'public-student-runner-submit-controls',
+});
+assert.equal(
+  studentSubmitControlsHandoffValues.get('readiness-status'),
+  'Needs review'
+);
+assert.equal(
+  studentSubmitControlsHandoffValues.get('completion-counts'),
+  `1/${studentSubmissionStarterPreview.runtimeItems.length}`
+);
+assert.equal(
+  studentSubmitControlsHandoffValues.get('confirm-incomplete-state'),
+  'Yes'
+);
+assert.equal(
+  studentSubmitControlsHandoffValues.get('confirm-incomplete-hint'),
+  'Yes'
+);
+assert.equal(
+  studentSubmitControlsHandoffValues.get('submit-action-boundary'),
+  'No mutation'
+);
+assert.equal(
+  studentSubmitControlsHandoffValues.get('privacy-guard'),
+  'Private data omitted'
+);
+for (const privateValue of [
+  studentSubmitControlsPrivateAnswer,
+  studentSubmissionPrivateToken,
+  studentSubmissionRuntimeItem.id,
+  STARTER_FOOD_ASSIGNMENT_SHARE_ID,
+]) {
+  assert.equal(
+    JSON.stringify(studentSubmitControlsHandoffView).includes(privateValue),
+    false,
+    `Student submit controls handoff leaked private text: ${privateValue}`
   );
 }
 const assignmentAttemptLimitUsage = buildAssignmentAttemptUsage({

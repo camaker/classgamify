@@ -1,4 +1,9 @@
 import type { StudentRunnerControlView } from '@/assignments/student-runner-state';
+import {
+  buildStudentRunnerSubmitControlsHandoffView,
+  type StudentRunnerSubmitControlsHandoffItemView,
+  type StudentRunnerSubmitControlsHandoffView,
+} from '@/assignments/student-runner-submit-controls-handoff';
 import { Button } from '@/components/ui/button';
 import {
   IconAlertTriangle,
@@ -21,6 +26,8 @@ export function StudentRunnerSubmitControls({
   controlView,
   onSubmit,
 }: StudentRunnerSubmitControlsProps) {
+  const submitControlsHandoffView =
+    buildStudentRunnerSubmitControlsHandoffView(controlView);
   const submitHintIds = controlView.submitHintViews.map((hintView) =>
     buildStudentRunnerSubmitHintId(hintView.id)
   );
@@ -114,6 +121,7 @@ export function StudentRunnerSubmitControls({
           tone={hintView.tone}
         />
       ))}
+      <StudentRunnerSubmitControlsHandoff view={submitControlsHandoffView} />
     </section>
   );
 }
@@ -288,6 +296,63 @@ function StudentRunnerSubmitHint({
     >
       {text}
     </p>
+  );
+}
+
+function StudentRunnerSubmitControlsHandoff({
+  view,
+}: {
+  view: StudentRunnerSubmitControlsHandoffView;
+}) {
+  const titleId = 'student-runner-submit-controls-handoff-title';
+  const descriptionId = 'student-runner-submit-controls-handoff-description';
+
+  return (
+    <section
+      aria-describedby={descriptionId}
+      aria-labelledby={titleId}
+      className="sr-only"
+      data-handoff="student-runner-submit-controls"
+      data-handoff-scope={view.privacy.scope}
+    >
+      <h3 id={titleId}>{view.title}</h3>
+      <p id={descriptionId}>{view.description}</p>
+      <dl>
+        {view.itemViews.map((itemView) => (
+          <StudentRunnerSubmitControlsHandoffItem
+            itemView={itemView}
+            key={itemView.id}
+          />
+        ))}
+      </dl>
+    </section>
+  );
+}
+
+function StudentRunnerSubmitControlsHandoffItem({
+  itemView,
+}: {
+  itemView: StudentRunnerSubmitControlsHandoffItemView;
+}) {
+  const labelId = `student-runner-submit-controls-handoff-${itemView.id}-label`;
+  const valueId = `student-runner-submit-controls-handoff-${itemView.id}-value`;
+  const descriptionId = `student-runner-submit-controls-handoff-${itemView.id}-description`;
+
+  return (
+    <div data-handoff-item={itemView.id}>
+      <dt id={labelId}>{itemView.label}</dt>
+      <dd>
+        <output
+          aria-describedby={descriptionId}
+          aria-label={itemView.ariaLabel}
+          aria-labelledby={`${labelId} ${valueId}`}
+          id={valueId}
+        >
+          {itemView.value}
+        </output>
+        <span id={descriptionId}>{itemView.description}</span>
+      </dd>
+    </div>
   );
 }
 

@@ -77,6 +77,12 @@ run it when changing progress counts, payload summaries, submit-readiness,
 partial-submit confirmation, identity or timer state, post-submit review,
 feedback scope, next steps, public runner submission privacy-scope boundaries,
 or the hidden student-runner-submission handoff.
+Student runner submit controls have a fast script-level gate via
+`pnpm exec tsx --test scripts/student-runner-submit-controls-handoff-semantic-views.test.ts`;
+run it when changing submit-control readiness, payload metric labels, button
+disabled or confirmation state, aria descriptions, persistent submit hints,
+submit-control privacy-scope boundaries, or the hidden
+student-runner-submit-controls handoff.
 Student runtime interaction has a fast script-level gate via
 `pnpm exec tsx --test scripts/student-runtime-interaction-handoff-semantic-views.test.ts`;
 run it when changing template renderer dispatch, runner surface selection,
