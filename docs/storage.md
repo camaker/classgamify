@@ -59,6 +59,7 @@ privacy, and student payload safety, see [Configuration](./configuration.md).
 src/storage/
 ├── content-disposition.ts # Safe attachment filename headers
 ├── constants.ts       # Default size, folder, and allowed-type settings
+├── file-access.ts     # Same-origin file access and response header policy
 ├── file-materials.ts  # Classroom material kind classification
 ├── file-summary.ts    # Classroom material summary metrics
 ├── index.ts           # getStorageProvider, uploadFile, deleteFile, getFile, …
@@ -102,6 +103,15 @@ Files are always served via the same-origin route `/api/storage/file?key=...`.
   and folder sanitization, owner/public persistence, R2 key planning,
   same-origin proxy URLs, provider helper reuse, and privacy guards around file
   bytes, original filenames, storage keys, and student payloads.
+
+- **resolveStorageFileAccessDecision** and
+  **buildStorageFileResponseHeaders** (shared helpers, in
+  `@/storage/file-access`): Build the 30-slice same-origin storage file access
+  contract for `/api/storage/file?key=...`, including key validation, public
+  folder access, private `userFiles` owner checks, storage-missing fallback,
+  safe inline content types, attachment download headers, cache headers,
+  `nosniff`, and privacy guards around file bytes, storage keys, permission
+  metadata, and student payloads.
 
 - **deleteFile(key)** (server)
   - Deletes the object from R2. Used by `deleteUserFile` server function (e.g.
@@ -159,7 +169,10 @@ Files are always served via the same-origin route `/api/storage/file?key=...`.
 - **GET /api/storage/file?key=...**
   - Streams the object from R2. Private `userFiles` entries require session and
     ownership check. Public shared folders such as `avatars` remain accessible
-    by key.
+    by key. Access decisions and response headers are delegated to
+    `src/storage/file-access.ts` so the same-origin proxy keeps public cache,
+    private no-store, attachment filename, and `nosniff` behavior aligned with
+    the source-material privacy contract.
 
 Upload is implemented as a **server function** (`uploadUserFile` in `src/api/user-files.ts`), not an API route.
 

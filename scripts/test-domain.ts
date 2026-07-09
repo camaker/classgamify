@@ -13141,6 +13141,7 @@ assert.doesNotMatch(
 const storageModuleDocs = readFileSync('docs/storage.md', 'utf8');
 assert.match(storageModuleDocs, /teacher-managed classroom\s+materials/);
 assert.match(storageModuleDocs, /content-disposition\.ts/);
+assert.match(storageModuleDocs, /file-access\.ts/);
 assert.match(storageModuleDocs, /file-materials\.ts/);
 assert.match(storageModuleDocs, /file-summary\.ts/);
 assert.match(storageModuleDocs, /material-references\.ts/);
@@ -13185,10 +13186,22 @@ const storageFileRouteSource = readFileSync(
   'src/routes/api/storage/file.ts',
   'utf8'
 );
+const storageFileAccessSource = readFileSync(
+  'src/storage/file-access.ts',
+  'utf8'
+);
 assert.match(storageFileRouteSource, /originalName: userFiles\.originalName/);
 assert.match(
   storageFileRouteSource,
-  /buildAttachmentContentDisposition\(fileRecord\?\.originalName\)/
+  /resolveStorageFileAccessDecision\(\{[\s\S]*fileRecord,[\s\S]*key,[\s\S]*requesterUserId: userId/
+);
+assert.match(
+  storageFileRouteSource,
+  /buildStorageFileResponseHeaders\(\{[\s\S]*contentType: file\.contentType,[\s\S]*fileRecord,[\s\S]*isPublicFile: accessDecision\.isPublicFile/
+);
+assert.match(
+  storageFileAccessSource,
+  /buildAttachmentContentDisposition\(\s*fileRecord\?\.originalName\s*\)/
 );
 assert.doesNotMatch(
   storageFileRouteSource,

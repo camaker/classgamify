@@ -209,6 +209,12 @@ changing classroom source-material upload validation, filename sanitization,
 content-type/extension normalization and safety, owner/public folder planning,
 R2 key planning, same-origin file proxy URLs, provider helper reuse, or the
 20-slice storage-upload readiness contract.
+Storage file access boundary has a fast script-level gate via
+`pnpm exec tsx --test scripts/storage-file-access-boundary.test.ts`; run it
+when changing same-origin file proxy access, key validation, public folder
+access, private `userFiles` owner checks, missing-object handling, safe inline
+content types, attachment filename headers, public/private cache headers,
+`nosniff`, or the 30-slice storage-file access contract.
 Dashboard overview owner-loop handoff has a fast script-level gate via
 `pnpm exec tsx --test scripts/dashboard-overview-handoff-semantic-views.test.ts`;
 run it when changing owner-scoped activity/assignment summaries,
@@ -645,7 +651,7 @@ These flows should be added after their dependencies are made deterministic:
 | Area | Reason |
 |---|---|
 | Payment checkout and portal | Requires Stripe or Creem test fixtures, webhook simulation, and provider-specific env. |
-| R2 file uploads | Real browser-to-R2 upload E2E still requires deterministic local storage assertions and small fixture files. The script-level storage upload readiness gate already covers the 20-slice upload contract: validation, filename/folder sanitization, content-type/extension normalization and safety, owner/public folder planning, R2 key planning, same-origin proxy URLs, privacy guards, and provider helper reuse; future E2E should add audio, worksheet image, document, spreadsheet, and unknown-material fixtures so browser upload behavior and material labels are verified together. |
+| R2 file uploads | Real browser-to-R2 upload E2E still requires deterministic local storage assertions and small fixture files. The script-level storage upload readiness gate already covers the 20-slice upload contract: validation, filename/folder sanitization, content-type/extension normalization and safety, owner/public folder planning, R2 key planning, same-origin proxy URLs, privacy guards, and provider helper reuse. The storage file access boundary gate covers same-origin proxy key validation, owner checks, missing-object behavior, cache headers, attachment filenames, and `nosniff`; future E2E should add audio, worksheet image, document, spreadsheet, and unknown-material fixtures so browser upload/download behavior and material labels are verified together. |
 | Transactional email | Requires a fake mail provider or captured verification links. |
 | Interactive template runners | Requires deterministic runner fixtures and attempt submission assertions. |
 | AI provider quality checks | Requires provider mocks or stable fake responses to avoid cost and flake. |

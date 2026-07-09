@@ -5,8 +5,11 @@ import { auth } from '@/auth/auth';
 import { getDb } from '@/db';
 import { userFiles } from '@/db/app.schema';
 import { getFile } from '@/storage';
-import { buildAttachmentContentDisposition } from '@/storage/content-disposition';
-import { isPublicFolder } from '@/storage/utils';
+import {
+  buildStorageFileResponseHeaders,
+  resolveStorageFileAccessDecision,
+  validateStorageFileProxyKey,
+} from '@/storage/file-access';
 import { ConfigurationError } from '@/storage/types';
 
 /**
@@ -18,16 +21,18 @@ export const Route = createFileRoute('/api/storage/file')({
     handlers: {
       GET: async ({ request }) => {
         const url = new URL(request.url);
-        const key = url.searchParams.get('key');
-        if (!key || key.includes('..')) {
+        const keyValidation = validateStorageFileProxyKey(
+          url.searchParams.get('key')
+        );
+        if (!keyValidation.success) {
           return new Response('Bad Request', { status: 400 });
         }
+        const { key } = keyValidation;
 
         try {
           const headers = getRequestHeaders();
           const session = await auth.api.getSession({ headers });
           const userId = session?.user?.id;
-          const isPublicKey = isPublicFolder(key);
 
           const db = getDb();
           const [fileRecord] = await db
@@ -40,14 +45,15 @@ export const Route = createFileRoute('/api/storage/file')({
             .where(eq(userFiles.r2Key, key))
             .limit(1);
 
-          if (!fileRecord && !isPublicKey) {
-            return new Response('Not Found', { status: 404 });
-          }
-
-          if (fileRecord && !fileRecord.isPublic) {
-            if (!userId || fileRecord.userId !== userId) {
-              return new Response('Forbidden', { status: 403 });
-            }
+          const accessDecision = resolveStorageFileAccessDecision({
+            fileRecord,
+            key,
+            requesterUserId: userId,
+          });
+          if (!accessDecision.allowed) {
+            const message =
+              accessDecision.status === 403 ? 'Forbidden' : 'Not Found';
+            return new Response(message, { status: accessDecision.status });
           }
 
           const file = await getFile(key);
@@ -55,30 +61,11 @@ export const Route = createFileRoute('/api/storage/file')({
             return new Response('Not Found', { status: 404 });
           }
 
-          // Only allow safe content types to be rendered inline;
-          // force download for everything else to prevent stored XSS.
-          const safeInlineTypes = [
-            'image/jpeg',
-            'image/png',
-            'image/gif',
-            'image/webp',
-            'image/bmp',
-            'image/x-icon',
-            'image/svg+xml',
-            'application/pdf',
-          ];
-          const isPublicFile = fileRecord?.isPublic === true || isPublicKey;
-          const responseHeaders: Record<string, string> = {
-            'Content-Type': file.contentType,
-            'Cache-Control': isPublicFile
-              ? 'public, max-age=31536000, immutable'
-              : 'private, no-store',
-            'X-Content-Type-Options': 'nosniff',
-          };
-          if (!safeInlineTypes.includes(file.contentType)) {
-            responseHeaders['Content-Disposition'] =
-              buildAttachmentContentDisposition(fileRecord?.originalName);
-          }
+          const responseHeaders = buildStorageFileResponseHeaders({
+            contentType: file.contentType,
+            fileRecord,
+            isPublicFile: accessDecision.isPublicFile,
+          });
 
           return new Response(file.body, { headers: responseHeaders });
         } catch (e) {
