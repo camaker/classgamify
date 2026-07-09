@@ -225,7 +225,7 @@ test('open-box runner attaches the reveal-card handoff to the component', () => 
   assert.match(source, /data-handoff="open-box-reveal-card"/);
   assert.match(
     source,
-    /view\.itemViews\.map\(\(item\) =>[\s\S]*OpenBoxRevealHandoffItem[\s\S]*function OpenBoxRevealHandoffItem[\s\S]*item: OpenBoxRevealHandoffItemView[\s\S]*const labelId = `open-box-reveal-handoff-\$\{item\.id\}-label`[\s\S]*const valueId = `open-box-reveal-handoff-\$\{item\.id\}-value`[\s\S]*const descriptionId = `open-box-reveal-handoff-\$\{item\.id\}-description`[\s\S]*data-handoff-item=\{item\.id\}[\s\S]*id=\{labelId\}[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*aria-label=\{item\.ariaLabel\}[\s\S]*aria-labelledby=\{`\$\{labelId\} \$\{valueId\}`\}[\s\S]*id=\{valueId\}[\s\S]*id=\{descriptionId\}/
+    /OpenBoxRevealHandoffView[\s\S]*OpenBoxRevealHandoffItemView[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*aria-labelledby=\{titleId\}[\s\S]*data-handoff="open-box-reveal-card"[\s\S]*data-handoff-scope=\{view\.privacy\.scope\}[\s\S]*view\.itemViews\.map\(\(item\) =>[\s\S]*OpenBoxRevealHandoffItem[\s\S]*function OpenBoxRevealHandoffItem[\s\S]*item: OpenBoxRevealHandoffItemView[\s\S]*const labelId = `open-box-reveal-handoff-\$\{item\.id\}-label`[\s\S]*const valueId = `open-box-reveal-handoff-\$\{item\.id\}-value`[\s\S]*const descriptionId = `open-box-reveal-handoff-\$\{item\.id\}-description`[\s\S]*data-handoff-item=\{item\.id\}[\s\S]*id=\{labelId\}[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*aria-label=\{item\.ariaLabel\}[\s\S]*aria-labelledby=\{`\$\{labelId\} \$\{valueId\}`\}[\s\S]*id=\{valueId\}[\s\S]*id=\{descriptionId\}/
   );
 });
 
@@ -243,6 +243,7 @@ test('open-box reveal focused gate is documented', () => {
     'navigation actions',
     'answer-input state',
     'review feedback',
+    'open-box reveal-card privacy-scope boundaries',
     'prompt/item-id/answer/student/source-material guards',
     'hidden open-box-reveal-card handoff',
   ]) {

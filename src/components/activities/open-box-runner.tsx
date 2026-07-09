@@ -231,6 +231,7 @@ function OpenBoxRevealHandoff({ view }: { view: OpenBoxRevealHandoffView }) {
       aria-labelledby={titleId}
       className="sr-only"
       data-handoff="open-box-reveal-card"
+      data-handoff-scope={view.privacy.scope}
     >
       <h2 id={titleId}>{view.title}</h2>
       <p id={descriptionId}>{view.description}</p>
