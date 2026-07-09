@@ -9808,8 +9808,8 @@ assert.match(
 );
 assert.match(
   groupSortBoardSource,
-  /GroupSortBoardHandoffItemView[\s\S]*GroupSortBoardHandoffView[\s\S]*data-handoff="group-sort-board"[\s\S]*view\.itemViews\.map\(\(item\) =>[\s\S]*GroupSortBoardHandoffItem[\s\S]*function GroupSortBoardHandoffItem[\s\S]*const labelId = `group-sort-board-handoff-\$\{item\.id\}-label`[\s\S]*const valueId = `group-sort-board-handoff-\$\{item\.id\}-value`[\s\S]*const descriptionId = `group-sort-board-handoff-\$\{item\.id\}-description`[\s\S]*data-handoff-item=\{item\.id\}[\s\S]*id=\{labelId\}[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*aria-label=\{item\.ariaLabel\}[\s\S]*aria-labelledby=\{`\$\{labelId\} \$\{valueId\}`\}[\s\S]*id=\{valueId\}[\s\S]*id=\{descriptionId\}/,
-  'Group-sort runner should expose stable hidden group-sort board label, value, and description relationships.'
+  /GroupSortBoardHandoffItemView[\s\S]*GroupSortBoardHandoffView[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*aria-labelledby=\{titleId\}[\s\S]*data-handoff="group-sort-board"[\s\S]*data-handoff-scope=\{view\.privacy\.scope\}[\s\S]*view\.itemViews\.map\(\(item\) =>[\s\S]*GroupSortBoardHandoffItem[\s\S]*function GroupSortBoardHandoffItem[\s\S]*const labelId = `group-sort-board-handoff-\$\{item\.id\}-label`[\s\S]*const valueId = `group-sort-board-handoff-\$\{item\.id\}-value`[\s\S]*const descriptionId = `group-sort-board-handoff-\$\{item\.id\}-description`[\s\S]*data-handoff-item=\{item\.id\}[\s\S]*id=\{labelId\}[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*aria-label=\{item\.ariaLabel\}[\s\S]*aria-labelledby=\{`\$\{labelId\} \$\{valueId\}`\}[\s\S]*id=\{valueId\}[\s\S]*id=\{descriptionId\}/,
+  'Group-sort runner should expose stable hidden group-sort board privacy scope plus label, value, and description relationships.'
 );
 assert.match(
   matchingPairsBoardHandoffSource,
@@ -18673,6 +18673,11 @@ assert.match(
   e2eTestCatalogText,
   /scripts\/line-match-board-handoff-semantic-views\.test\.ts[\s\S]*line-match board\s+privacy-scope\s+boundaries/,
   'E2E catalog should document the line-match board privacy-scope fast gate.'
+);
+assert.match(
+  e2eTestCatalogText,
+  /scripts\/group-sort-board-handoff-semantic-views\.test\.ts[\s\S]*group-sort board\s+privacy-scope\s+boundaries/,
+  'E2E catalog should document the group-sort board privacy-scope fast gate.'
 );
 assert.match(
   e2eTestCatalogText,

@@ -238,6 +238,7 @@ function GroupSortBoardHandoff({ view }: { view: GroupSortBoardHandoffView }) {
       aria-labelledby={titleId}
       className="sr-only"
       data-handoff="group-sort-board"
+      data-handoff-scope={view.privacy.scope}
     >
       <h2 id={titleId}>{view.title}</h2>
       <p id={descriptionId}>{view.description}</p>

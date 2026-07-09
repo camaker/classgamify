@@ -337,6 +337,12 @@ choice target readiness, available/used/unused choice counts, exclusive choice
 and reassignment policy, review feedback, line-match board privacy-scope
 boundaries, runtime-id/prompt/choice/answer/student/source-material guards, or
 the hidden line-match-board handoff.
+Group-sort board runtime has a fast script-level gate via
+`pnpm exec tsx --test scripts/group-sort-board-handoff-semantic-views.test.ts`;
+run it when changing category and item counts, selected item state, category
+target readiness, unplaced/placed item counts, placement actions, review
+feedback, group-sort board privacy-scope boundaries, runtime-id/prompt/answer
+or student/source-material guards, or the hidden group-sort-board handoff.
 Open-box reveal-card runtime has a fast script-level gate via
 `pnpm exec tsx --test scripts/open-box-reveal-handoff-semantic-views.test.ts`;
 run it when changing reveal-card state, box and prompt counts, navigation
