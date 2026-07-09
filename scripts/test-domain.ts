@@ -646,6 +646,7 @@ import {
 } from '@/assignments/assignment-display';
 import {
   ASSIGNMENT_DELIVERY_POLICY_HANDOFF_ITEM_IDS,
+  PUBLIC_ASSIGNMENT_RULES_HANDOFF_ITEM_IDS,
   buildAssignmentDeliverySummary,
   buildAssignmentDeliveryPolicyHandoffView,
   buildAssignmentSettingsSummaryView,
@@ -653,6 +654,7 @@ import {
   buildPublicAssignmentRuleSummaryFromSettings,
   buildPublicAssignmentRuleSummaryView,
   buildPublicAssignmentRuleSummaryViewFromSettings,
+  buildPublicAssignmentRulesHandoffView,
   formatAssignmentDeliveryInstructions,
   formatAssignmentDeliveryPolicyText,
   formatAssignmentExpiry,
@@ -16945,6 +16947,26 @@ assert.match(
   /PublicAssignmentRuleIcon[\s\S]*publicAssignmentRuleIcons\[id\]/,
   'Public assignment rules component should own rule icon mapping for student-facing delivery policy.'
 );
+assert.match(
+  publicAssignmentRulesComponentSource,
+  /<PublicAssignmentRulesHandoff view=\{summaryView\.handoffView\} \/>/,
+  'Public assignment rules component should render the prepared hidden rule handoff from the same summary view.'
+);
+assert.match(
+  publicAssignmentRulesComponentSource,
+  /function PublicAssignmentRulesHandoff[\s\S]*className="sr-only"[\s\S]*data-handoff="public-assignment-rules"[\s\S]*data-handoff-scope=\{view\.privacy\.scope\}[\s\S]*<dl>[\s\S]*view\.itemViews\.map\(\(itemView\) =>[\s\S]*PublicAssignmentRulesHandoffItem/,
+  'Public assignment rules handoff should render a hidden scoped dl from prepared item views.'
+);
+assert.match(
+  publicAssignmentRulesComponentSource,
+  /function PublicAssignmentRulesHandoffItem[\s\S]*const labelId = `public-assignment-rules-handoff-\$\{itemView\.id\}-label`[\s\S]*const valueId = `public-assignment-rules-handoff-\$\{itemView\.id\}-value`[\s\S]*const descriptionId = `public-assignment-rules-handoff-\$\{itemView\.id\}-description`[\s\S]*data-handoff-item=\{itemView\.id\}[\s\S]*id=\{labelId\}[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*aria-label=\{itemView\.ariaLabel\}[\s\S]*aria-labelledby=\{`\$\{labelId\} \$\{valueId\}`\}[\s\S]*id=\{valueId\}[\s\S]*id=\{descriptionId\}/,
+  'Public assignment rules handoff items should keep stable label, value, and description relationships.'
+);
+assert.match(
+  e2eTestCatalogText,
+  /scripts\/public-assignment-rules-handoff-semantic-views\.test\.ts[\s\S]*public rule panel[\s\S]*timer and identity boundaries[\s\S]*answer-key guard/,
+  'E2E catalog should document the public assignment rules handoff fast gate.'
+);
 const assignmentDeliverySummarySource = readFileSync(
   'src/assignments/delivery-summary.ts',
   'utf8'
@@ -16966,8 +16988,23 @@ assert.match(
 );
 assert.match(
   assignmentDeliverySummarySource,
-  /export function buildPublicAssignmentRuleSummaryView[\s\S]*const summary = buildPublicAssignmentRuleSummaryStats[\s\S]*description: m\.assignment_delivery_public_rules_description\(\),[\s\S]*items,[\s\S]*status: buildPublicAssignmentRuleSummaryStatusView\(summary\),[\s\S]*summary,[\s\S]*title: m\.assignment_delivery_public_rules_title\(\)/,
-  'Public assignment rule summary views should centralize rule items, heading copy, status, and rule summary metadata.'
+  /export const PUBLIC_ASSIGNMENT_RULES_HANDOFF_ITEM_IDS = \[(?=[\s\S]*'summary-source')(?=[\s\S]*'visible-rule-panel')(?=[\s\S]*'status-badge')(?=[\s\S]*'rule-count')(?=[\s\S]*'item-count')(?=[\s\S]*'attempt-limit')(?=[\s\S]*'timer-policy')(?=[\s\S]*'close-time-policy')(?=[\s\S]*'identity-mode')(?=[\s\S]*'review-behavior')(?=[\s\S]*'item-order')(?=[\s\S]*'timer-start-boundary')(?=[\s\S]*'anonymous-browser-boundary')(?=[\s\S]*'normalized-identity-boundary')(?=[\s\S]*'post-submit-review-boundary')(?=[\s\S]*'public-payload-boundary')(?=[\s\S]*'runtime-content-guard')(?=[\s\S]*'teacher-settings-guard')(?=[\s\S]*'answer-key-guard')(?=[\s\S]*'privacy-guard')/,
+  'Public assignment rules handoff should expose the full 20-slice item id contract.'
+);
+assert.match(
+  assignmentDeliverySummarySource,
+  /export type PublicAssignmentRulesHandoffPrivacyContract = \{[\s\S]*exposesAcceptedAlternatives: false;[\s\S]*exposesAnswerKeys: false;[\s\S]*exposesRawSettingsJson: false;[\s\S]*exposesRuntimeChoiceText: false;[\s\S]*exposesRuntimeItemIds: false;[\s\S]*exposesRuntimePromptText: false;[\s\S]*exposesShareSlug: false;[\s\S]*exposesStudentAnswerText: false;[\s\S]*exposesStudentNames: false;[\s\S]*exposesTeacherSourceMaterials: false;[\s\S]*mutatesAssignment: false;[\s\S]*scope: 'public-assignment-rules';[\s\S]*usesResolvedSettings: true;/,
+  'Public assignment rules handoff should expose a student-runner privacy and settings-resolution contract.'
+);
+assert.match(
+  assignmentDeliverySummarySource,
+  /export function buildPublicAssignmentRuleSummaryView[\s\S]*const summary = buildPublicAssignmentRuleSummaryStats[\s\S]*const status = buildPublicAssignmentRuleSummaryStatusView\(summary\)[\s\S]*const summaryView = \{[\s\S]*description: m\.assignment_delivery_public_rules_description\(\),[\s\S]*items,[\s\S]*status,[\s\S]*summary,[\s\S]*title: m\.assignment_delivery_public_rules_title\(\)[\s\S]*handoffView: buildPublicAssignmentRulesHandoffView\(summaryView\)/,
+  'Public assignment rule summary views should centralize rule items, heading copy, status, summary metadata, and the hidden rule handoff.'
+);
+assert.match(
+  assignmentDeliverySummarySource,
+  /export function buildPublicAssignmentRulesHandoffView[\s\S]*PUBLIC_ASSIGNMENT_RULES_HANDOFF_ITEM_IDS\.map[\s\S]*buildPublicAssignmentRulesHandoffItemView[\s\S]*privacy: buildPublicAssignmentRulesHandoffPrivacyContract\(itemViews\)/,
+  'Public assignment rules handoff should build item views from the stable 20-slice id list.'
 );
 assert.match(
   assignmentDeliverySummarySource,
@@ -25125,6 +25162,71 @@ assert.deepEqual(
     },
     title: 'Assignment rules',
   }
+);
+assert.deepEqual(
+  scheduledPublicRuleSummaryView.handoffView.itemViews.map((item) => item.id),
+  [...PUBLIC_ASSIGNMENT_RULES_HANDOFF_ITEM_IDS]
+);
+assert.equal(
+  scheduledPublicRuleSummaryView.handoffView.itemViews.length,
+  20
+);
+assert.deepEqual(scheduledPublicRuleSummaryView.handoffView.privacy, {
+  exposesAcceptedAlternatives: false,
+  exposesAnswerKeys: false,
+  exposesRawSettingsJson: false,
+  exposesRuntimeChoiceText: false,
+  exposesRuntimeItemIds: false,
+  exposesRuntimePromptText: false,
+  exposesShareSlug: false,
+  exposesStudentAnswerText: false,
+  exposesStudentNames: false,
+  exposesTeacherSourceMaterials: false,
+  itemIds: [...PUBLIC_ASSIGNMENT_RULES_HANDOFF_ITEM_IDS],
+  mutatesAssignment: false,
+  scope: 'public-assignment-rules',
+  usesResolvedSettings: true,
+});
+assert.deepEqual(
+  scheduledPublicRuleSummaryView.handoffView.itemViews.map((item) => [
+    item.id,
+    item.value,
+  ]),
+  [
+    ['summary-source', 'PublicAssignmentRuleSummaryView'],
+    ['visible-rule-panel', 'Assignment rules'],
+    ['status-badge', 'Close scheduled'],
+    ['rule-count', '7 rules'],
+    ['item-count', '2 items'],
+    ['attempt-limit', '2 max'],
+    ['timer-policy', 'No timer'],
+    [
+      'close-time-policy',
+      formatAssignmentExpiry('2026-02-01T00:00:00.000Z'),
+    ],
+    ['identity-mode', 'Names'],
+    ['review-behavior', 'After submit'],
+    ['item-order', 'Shuffled'],
+    ['timer-start-boundary', 'No timer'],
+    ['anonymous-browser-boundary', 'Name entry visible'],
+    ['normalized-identity-boundary', 'Normalized before attempts'],
+    ['post-submit-review-boundary', 'After scoring'],
+    ['public-payload-boundary', 'Sanitized rules'],
+    ['runtime-content-guard', 'Prompts and choices hidden'],
+    ['teacher-settings-guard', 'Raw settings hidden'],
+    ['answer-key-guard', 'Answer keys hidden'],
+    ['privacy-guard', 'Private data hidden'],
+  ]
+);
+assert.deepEqual(
+  buildPublicAssignmentRulesHandoffView({
+    description: scheduledPublicRuleSummaryView.description,
+    items: scheduledPublicRuleSummaryView.items,
+    status: scheduledPublicRuleSummaryView.status,
+    summary: scheduledPublicRuleSummaryView.summary,
+    title: scheduledPublicRuleSummaryView.title,
+  }),
+  scheduledPublicRuleSummaryView.handoffView
 );
 assert.equal(formatAssignmentExpiry('not-a-date'), 'No close time');
 assert.deepEqual(

@@ -1,4 +1,6 @@
 import type {
+  PublicAssignmentRulesHandoffItemView,
+  PublicAssignmentRulesHandoffView,
   PublicAssignmentRuleSummaryId,
   PublicAssignmentRuleSummaryItem,
   PublicAssignmentRuleSummaryStatusView,
@@ -39,7 +41,65 @@ export function PublicAssignmentRules({
           <PublicAssignmentRuleItem key={rule.id} rule={rule} />
         ))}
       </div>
+      <PublicAssignmentRulesHandoff view={summaryView.handoffView} />
     </section>
+  );
+}
+
+function PublicAssignmentRulesHandoff({
+  view,
+}: {
+  view: PublicAssignmentRulesHandoffView;
+}) {
+  const titleId = 'public-assignment-rules-handoff-title';
+  const descriptionId = 'public-assignment-rules-handoff-description';
+
+  return (
+    <section
+      aria-describedby={descriptionId}
+      aria-labelledby={titleId}
+      className="sr-only"
+      data-handoff="public-assignment-rules"
+      data-handoff-scope={view.privacy.scope}
+    >
+      <h2 id={titleId}>{view.title}</h2>
+      <p id={descriptionId}>{view.description}</p>
+      <dl>
+        {view.itemViews.map((itemView) => (
+          <PublicAssignmentRulesHandoffItem
+            itemView={itemView}
+            key={itemView.id}
+          />
+        ))}
+      </dl>
+    </section>
+  );
+}
+
+function PublicAssignmentRulesHandoffItem({
+  itemView,
+}: {
+  itemView: PublicAssignmentRulesHandoffItemView;
+}) {
+  const labelId = `public-assignment-rules-handoff-${itemView.id}-label`;
+  const valueId = `public-assignment-rules-handoff-${itemView.id}-value`;
+  const descriptionId = `public-assignment-rules-handoff-${itemView.id}-description`;
+
+  return (
+    <div data-handoff-item={itemView.id}>
+      <dt id={labelId}>{itemView.label}</dt>
+      <dd>
+        <output
+          aria-describedby={descriptionId}
+          aria-label={itemView.ariaLabel}
+          aria-labelledby={`${labelId} ${valueId}`}
+          id={valueId}
+        >
+          {itemView.value}
+        </output>
+        <span id={descriptionId}>{itemView.description}</span>
+      </dd>
+    </div>
   );
 }
 

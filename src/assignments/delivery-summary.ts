@@ -91,11 +91,75 @@ export type PublicAssignmentRuleSummaryStatusView = {
 
 export type PublicAssignmentRuleSummaryView = {
   description: string;
+  handoffView: PublicAssignmentRulesHandoffView;
   items: PublicAssignmentRuleSummaryItem[];
   status: PublicAssignmentRuleSummaryStatusView;
   summary: PublicAssignmentRuleSummaryStats;
   title: string;
 };
+
+export const PUBLIC_ASSIGNMENT_RULES_HANDOFF_ITEM_IDS = [
+  'summary-source',
+  'visible-rule-panel',
+  'status-badge',
+  'rule-count',
+  'item-count',
+  'attempt-limit',
+  'timer-policy',
+  'close-time-policy',
+  'identity-mode',
+  'review-behavior',
+  'item-order',
+  'timer-start-boundary',
+  'anonymous-browser-boundary',
+  'normalized-identity-boundary',
+  'post-submit-review-boundary',
+  'public-payload-boundary',
+  'runtime-content-guard',
+  'teacher-settings-guard',
+  'answer-key-guard',
+  'privacy-guard',
+] as const;
+
+export type PublicAssignmentRulesHandoffItemId =
+  (typeof PUBLIC_ASSIGNMENT_RULES_HANDOFF_ITEM_IDS)[number];
+
+export type PublicAssignmentRulesHandoffItemView = {
+  ariaLabel: string;
+  description: string;
+  id: PublicAssignmentRulesHandoffItemId;
+  label: string;
+  value: string;
+};
+
+export type PublicAssignmentRulesHandoffPrivacyContract = {
+  exposesAcceptedAlternatives: false;
+  exposesAnswerKeys: false;
+  exposesRawSettingsJson: false;
+  exposesRuntimeChoiceText: false;
+  exposesRuntimeItemIds: false;
+  exposesRuntimePromptText: false;
+  exposesShareSlug: false;
+  exposesStudentAnswerText: false;
+  exposesStudentNames: false;
+  exposesTeacherSourceMaterials: false;
+  itemIds: PublicAssignmentRulesHandoffItemId[];
+  mutatesAssignment: false;
+  scope: 'public-assignment-rules';
+  usesResolvedSettings: true;
+};
+
+export type PublicAssignmentRulesHandoffView = {
+  description: string;
+  itemViews: PublicAssignmentRulesHandoffItemView[];
+  privacy: PublicAssignmentRulesHandoffPrivacyContract;
+  title: string;
+};
+
+type PublicAssignmentRulesHandoffSource = Omit<
+  PublicAssignmentRuleSummaryView,
+  'handoffView'
+>;
 
 export const ASSIGNMENT_DELIVERY_POLICY_HANDOFF_ITEM_IDS = [
   'domain-helper-source',
@@ -691,6 +755,260 @@ function formatAssignmentDeliveryPolicyHandoffRuleCount(count: number) {
   });
 }
 
+export function buildPublicAssignmentRulesHandoffView(
+  summaryView: PublicAssignmentRulesHandoffSource
+): PublicAssignmentRulesHandoffView {
+  const itemViews = PUBLIC_ASSIGNMENT_RULES_HANDOFF_ITEM_IDS.map((id) =>
+    buildPublicAssignmentRulesHandoffItemView({ id, summaryView })
+  );
+
+  return {
+    description: m.assignment_delivery_public_rules_handoff_description(),
+    itemViews,
+    privacy: buildPublicAssignmentRulesHandoffPrivacyContract(itemViews),
+    title: m.assignment_delivery_public_rules_handoff_title(),
+  };
+}
+
+function buildPublicAssignmentRulesHandoffItemView({
+  id,
+  summaryView,
+}: {
+  id: PublicAssignmentRulesHandoffItemId;
+  summaryView: PublicAssignmentRulesHandoffSource;
+}): PublicAssignmentRulesHandoffItemView {
+  const label = getPublicAssignmentRulesHandoffItemLabel(id);
+  const description = getPublicAssignmentRulesHandoffItemDescription({
+    id,
+    summaryView,
+  });
+  const value = getPublicAssignmentRulesHandoffItemValue({
+    id,
+    summaryView,
+  });
+
+  return {
+    ariaLabel: m.assignment_delivery_public_rules_handoff_item_aria({
+      description,
+      label,
+      value,
+    }),
+    description,
+    id,
+    label,
+    value,
+  };
+}
+
+function buildPublicAssignmentRulesHandoffPrivacyContract(
+  itemViews: PublicAssignmentRulesHandoffItemView[]
+): PublicAssignmentRulesHandoffPrivacyContract {
+  return {
+    exposesAcceptedAlternatives: false,
+    exposesAnswerKeys: false,
+    exposesRawSettingsJson: false,
+    exposesRuntimeChoiceText: false,
+    exposesRuntimeItemIds: false,
+    exposesRuntimePromptText: false,
+    exposesShareSlug: false,
+    exposesStudentAnswerText: false,
+    exposesStudentNames: false,
+    exposesTeacherSourceMaterials: false,
+    itemIds: itemViews.map((itemView) => itemView.id),
+    mutatesAssignment: false,
+    scope: 'public-assignment-rules',
+    usesResolvedSettings: true,
+  };
+}
+
+function getPublicAssignmentRulesHandoffItemLabel(
+  id: PublicAssignmentRulesHandoffItemId
+) {
+  switch (id) {
+    case 'summary-source':
+      return m.assignment_delivery_public_rules_handoff_summary_source_label();
+    case 'visible-rule-panel':
+      return m.assignment_delivery_public_rules_handoff_visible_panel_label();
+    case 'status-badge':
+      return m.assignment_delivery_public_rules_handoff_status_badge_label();
+    case 'rule-count':
+      return m.assignment_delivery_public_rules_handoff_rule_count_label();
+    case 'item-count':
+      return m.assignment_delivery_label_items();
+    case 'attempt-limit':
+      return m.assignment_delivery_label_attempts();
+    case 'timer-policy':
+      return m.assignment_delivery_label_timer();
+    case 'close-time-policy':
+      return m.assignment_delivery_label_closes();
+    case 'identity-mode':
+      return m.assignment_delivery_label_identity();
+    case 'review-behavior':
+      return m.assignment_delivery_label_review();
+    case 'item-order':
+      return m.assignment_delivery_label_item_order();
+    case 'timer-start-boundary':
+      return m.assignment_delivery_public_rules_handoff_timer_start_label();
+    case 'anonymous-browser-boundary':
+      return m.assignment_delivery_public_rules_handoff_anonymous_browser_label();
+    case 'normalized-identity-boundary':
+      return m.assignment_delivery_public_rules_handoff_normalized_identity_label();
+    case 'post-submit-review-boundary':
+      return m.assignment_delivery_public_rules_handoff_post_submit_review_label();
+    case 'public-payload-boundary':
+      return m.assignment_delivery_policy_handoff_public_payload_label();
+    case 'runtime-content-guard':
+      return m.assignment_delivery_public_rules_handoff_runtime_content_label();
+    case 'teacher-settings-guard':
+      return m.assignment_delivery_public_rules_handoff_teacher_settings_label();
+    case 'answer-key-guard':
+      return m.assignment_delivery_public_rules_handoff_answer_key_label();
+    case 'privacy-guard':
+      return m.assignment_delivery_policy_handoff_privacy_guard_label();
+  }
+}
+
+function getPublicAssignmentRulesHandoffItemDescription({
+  id,
+  summaryView,
+}: {
+  id: PublicAssignmentRulesHandoffItemId;
+  summaryView: PublicAssignmentRulesHandoffSource;
+}) {
+  const ruleDescription = getPublicAssignmentRulesHandoffRuleDescription({
+    id,
+    summaryView,
+  });
+  if (ruleDescription) return ruleDescription;
+  if (getPublicAssignmentRulesHandoffRuleId(id)) {
+    return summaryView.description;
+  }
+
+  switch (id) {
+    case 'summary-source':
+      return m.assignment_delivery_public_rules_handoff_summary_source_description();
+    case 'visible-rule-panel':
+      return m.assignment_delivery_public_rules_handoff_visible_panel_description();
+    case 'status-badge':
+      return m.assignment_delivery_public_rules_handoff_status_badge_description();
+    case 'rule-count':
+      return m.assignment_delivery_public_rules_handoff_rule_count_description();
+    case 'timer-start-boundary':
+      return m.assignment_delivery_public_rules_handoff_timer_start_description();
+    case 'anonymous-browser-boundary':
+      return m.assignment_delivery_public_rules_handoff_anonymous_browser_description();
+    case 'normalized-identity-boundary':
+      return m.assignment_delivery_public_rules_handoff_normalized_identity_description();
+    case 'post-submit-review-boundary':
+      return m.assignment_delivery_public_rules_handoff_post_submit_review_description();
+    case 'public-payload-boundary':
+      return m.assignment_delivery_policy_handoff_public_payload_description();
+    case 'runtime-content-guard':
+      return m.assignment_delivery_public_rules_handoff_runtime_content_description();
+    case 'teacher-settings-guard':
+      return m.assignment_delivery_public_rules_handoff_teacher_settings_description();
+    case 'answer-key-guard':
+      return m.assignment_delivery_public_rules_handoff_answer_key_description();
+    case 'privacy-guard':
+      return m.assignment_delivery_public_rules_handoff_privacy_guard_description();
+  }
+}
+
+function getPublicAssignmentRulesHandoffRuleDescription({
+  id,
+  summaryView,
+}: {
+  id: PublicAssignmentRulesHandoffItemId;
+  summaryView: PublicAssignmentRulesHandoffSource;
+}) {
+  const ruleId = getPublicAssignmentRulesHandoffRuleId(id);
+  if (!ruleId) return null;
+
+  return summaryView.items.find((item) => item.id === ruleId)?.description;
+}
+
+function getPublicAssignmentRulesHandoffItemValue({
+  id,
+  summaryView,
+}: {
+  id: PublicAssignmentRulesHandoffItemId;
+  summaryView: PublicAssignmentRulesHandoffSource;
+}) {
+  switch (id) {
+    case 'summary-source':
+      return m.assignment_delivery_public_rules_handoff_summary_source_value();
+    case 'visible-rule-panel':
+      return summaryView.title;
+    case 'status-badge':
+      return summaryView.status.label;
+    case 'rule-count':
+      return formatAssignmentDeliveryPolicyHandoffRuleCount(
+        summaryView.summary.ruleCount
+      );
+    case 'item-count':
+      return getPublicAssignmentRuleValue(summaryView, 'items');
+    case 'attempt-limit':
+      return getPublicAssignmentRuleValue(summaryView, 'attempts');
+    case 'timer-policy':
+      return getPublicAssignmentRuleValue(summaryView, 'timer');
+    case 'close-time-policy':
+      return getPublicAssignmentRuleValue(summaryView, 'closes');
+    case 'identity-mode':
+      return getPublicAssignmentRuleValue(summaryView, 'identity');
+    case 'review-behavior':
+      return getPublicAssignmentRuleValue(summaryView, 'answerReveal');
+    case 'item-order':
+      return getPublicAssignmentRuleValue(summaryView, 'itemOrder');
+    case 'timer-start-boundary':
+      return summaryView.summary.hasTimer
+        ? m.assignment_delivery_public_rules_handoff_timer_starts_after_ready_value()
+        : getPublicAssignmentRuleValue(summaryView, 'timer');
+    case 'anonymous-browser-boundary':
+      return summaryView.summary.collectsStudentName
+        ? m.assignment_delivery_public_rules_handoff_name_entry_visible_value()
+        : m.assignment_delivery_public_rules_handoff_browser_token_hidden_value();
+    case 'normalized-identity-boundary':
+      return m.assignment_delivery_public_rules_handoff_normalized_identity_value();
+    case 'post-submit-review-boundary':
+      return summaryView.summary.showsCorrectAnswers
+        ? m.assignment_delivery_public_rules_handoff_after_scoring_value()
+        : m.assignment_delivery_public_rules_handoff_review_hidden_value();
+    case 'public-payload-boundary':
+      return m.assignment_delivery_policy_handoff_public_payload_value();
+    case 'runtime-content-guard':
+      return m.assignment_delivery_public_rules_handoff_runtime_content_value();
+    case 'teacher-settings-guard':
+      return m.assignment_delivery_public_rules_handoff_teacher_settings_value();
+    case 'answer-key-guard':
+      return m.assignment_delivery_public_rules_handoff_answer_key_value();
+    case 'privacy-guard':
+      return m.assignment_delivery_policy_handoff_privacy_guard_value();
+  }
+}
+
+function getPublicAssignmentRulesHandoffRuleId(
+  id: PublicAssignmentRulesHandoffItemId
+): PublicAssignmentRuleSummaryId | null {
+  switch (id) {
+    case 'item-count':
+      return 'items';
+    case 'attempt-limit':
+      return 'attempts';
+    case 'timer-policy':
+      return 'timer';
+    case 'close-time-policy':
+      return 'closes';
+    case 'identity-mode':
+      return 'identity';
+    case 'review-behavior':
+      return 'answerReveal';
+    case 'item-order':
+      return 'itemOrder';
+    default:
+      return null;
+  }
+}
+
 export function buildPublicAssignmentRuleSummary({
   itemCount,
   ...input
@@ -778,13 +1096,18 @@ export function buildPublicAssignmentRuleSummaryView({
     shuffleItems,
     timeLimitSeconds,
   });
-
-  return {
+  const status = buildPublicAssignmentRuleSummaryStatusView(summary);
+  const summaryView = {
     description: m.assignment_delivery_public_rules_description(),
     items,
-    status: buildPublicAssignmentRuleSummaryStatusView(summary),
+    status,
     summary,
     title: m.assignment_delivery_public_rules_title(),
+  };
+
+  return {
+    ...summaryView,
+    handoffView: buildPublicAssignmentRulesHandoffView(summaryView),
   };
 }
 
