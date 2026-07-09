@@ -73,10 +73,11 @@ timer prepare steps, submit availability, public runner start privacy-scope
 boundaries, or the hidden student-runner-start handoff.
 Public assignment rules have a fast script-level gate via
 `pnpm exec tsx --test scripts/public-assignment-rules-handoff-semantic-views.test.ts`;
-run it when changing the public rule panel, status badge, item count, attempt
-limit, timer and identity boundaries, answer-review behavior, item-order
-policy, public-payload boundary, answer-key guard, runtime-content guard, raw
-settings guard, or the hidden public-assignment-rules handoff.
+run it when changing the 30-slice public rule panel handoff, status badge,
+public rule order, item count, attempt limit, timer and identity boundaries,
+answer-review behavior, item-order policy, settings resolution, status
+derivation, public-payload boundary, answer-key guard, runtime-content guard,
+raw settings guard, or the hidden public-assignment-rules handoff.
 Student runner safe submission has a fast script-level gate via
 `pnpm exec tsx --test scripts/student-runner-submission-handoff-semantic-views.test.ts`;
 run it when changing progress counts, payload summaries, submit-readiness,

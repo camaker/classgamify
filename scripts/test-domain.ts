@@ -17087,8 +17087,8 @@ assert.match(
 );
 assert.match(
   assignmentDeliverySummarySource,
-  /export const PUBLIC_ASSIGNMENT_RULES_HANDOFF_ITEM_IDS = \[(?=[\s\S]*'summary-source')(?=[\s\S]*'visible-rule-panel')(?=[\s\S]*'status-badge')(?=[\s\S]*'rule-count')(?=[\s\S]*'item-count')(?=[\s\S]*'attempt-limit')(?=[\s\S]*'timer-policy')(?=[\s\S]*'close-time-policy')(?=[\s\S]*'identity-mode')(?=[\s\S]*'review-behavior')(?=[\s\S]*'item-order')(?=[\s\S]*'timer-start-boundary')(?=[\s\S]*'anonymous-browser-boundary')(?=[\s\S]*'normalized-identity-boundary')(?=[\s\S]*'post-submit-review-boundary')(?=[\s\S]*'public-payload-boundary')(?=[\s\S]*'runtime-content-guard')(?=[\s\S]*'teacher-settings-guard')(?=[\s\S]*'answer-key-guard')(?=[\s\S]*'privacy-guard')/,
-  'Public assignment rules handoff should expose the full 20-slice item id contract.'
+  /export const PUBLIC_ASSIGNMENT_RULES_HANDOFF_ITEM_IDS = \[(?=[\s\S]*'summary-source')(?=[\s\S]*'visible-rule-panel')(?=[\s\S]*'status-badge')(?=[\s\S]*'rule-count')(?=[\s\S]*'delivery-rule-order')(?=[\s\S]*'item-count')(?=[\s\S]*'items-rule-state')(?=[\s\S]*'attempt-limit')(?=[\s\S]*'attempts-rule-state')(?=[\s\S]*'timer-policy')(?=[\s\S]*'timer-rule-state')(?=[\s\S]*'close-time-policy')(?=[\s\S]*'close-time-rule-state')(?=[\s\S]*'identity-mode')(?=[\s\S]*'identity-rule-state')(?=[\s\S]*'review-behavior')(?=[\s\S]*'review-rule-state')(?=[\s\S]*'item-order')(?=[\s\S]*'item-order-rule-state')(?=[\s\S]*'timer-start-boundary')(?=[\s\S]*'anonymous-browser-boundary')(?=[\s\S]*'normalized-identity-boundary')(?=[\s\S]*'post-submit-review-boundary')(?=[\s\S]*'settings-resolution-boundary')(?=[\s\S]*'status-derivation-boundary')(?=[\s\S]*'public-payload-boundary')(?=[\s\S]*'runtime-content-guard')(?=[\s\S]*'teacher-settings-guard')(?=[\s\S]*'answer-key-guard')(?=[\s\S]*'privacy-guard')/,
+  'Public assignment rules handoff should expose the full 30-slice item id contract.'
 );
 assert.match(
   assignmentDeliverySummarySource,
@@ -17103,7 +17103,7 @@ assert.match(
 assert.match(
   assignmentDeliverySummarySource,
   /export function buildPublicAssignmentRulesHandoffView[\s\S]*PUBLIC_ASSIGNMENT_RULES_HANDOFF_ITEM_IDS\.map[\s\S]*buildPublicAssignmentRulesHandoffItemView[\s\S]*privacy: buildPublicAssignmentRulesHandoffPrivacyContract\(itemViews\)/,
-  'Public assignment rules handoff should build item views from the stable 20-slice id list.'
+  'Public assignment rules handoff should build item views from the stable 30-slice id list.'
 );
 assert.match(
   assignmentDeliverySummarySource,
@@ -25291,7 +25291,7 @@ assert.deepEqual(
 );
 assert.equal(
   scheduledPublicRuleSummaryView.handoffView.itemViews.length,
-  20
+  30
 );
 assert.deepEqual(scheduledPublicRuleSummaryView.handoffView.privacy, {
   exposesAcceptedAlternatives: false,
@@ -25319,20 +25319,36 @@ assert.deepEqual(
     ['visible-rule-panel', 'Assignment rules'],
     ['status-badge', 'Close scheduled'],
     ['rule-count', '7 rules'],
+    [
+      'delivery-rule-order',
+      'items · attempts · timer · closes · identity · answerReveal · itemOrder',
+    ],
     ['item-count', '2 items'],
+    ['items-rule-state', '2 items'],
     ['attempt-limit', '2 max'],
+    ['attempts-rule-state', '2 max'],
     ['timer-policy', 'No timer'],
+    ['timer-rule-state', 'No timer'],
     [
       'close-time-policy',
       formatAssignmentExpiry('2026-02-01T00:00:00.000Z'),
     ],
+    [
+      'close-time-rule-state',
+      formatAssignmentExpiry('2026-02-01T00:00:00.000Z'),
+    ],
     ['identity-mode', 'Names'],
+    ['identity-rule-state', 'Names'],
     ['review-behavior', 'After submit'],
+    ['review-rule-state', 'After submit'],
     ['item-order', 'Shuffled'],
+    ['item-order-rule-state', 'Shuffled'],
     ['timer-start-boundary', 'No timer'],
     ['anonymous-browser-boundary', 'Name entry visible'],
     ['normalized-identity-boundary', 'Normalized before attempts'],
     ['post-submit-review-boundary', 'After scoring'],
+    ['settings-resolution-boundary', 'Resolved settings'],
+    ['status-derivation-boundary', 'scheduled'],
     ['public-payload-boundary', 'Sanitized rules'],
     ['runtime-content-guard', 'Prompts and choices hidden'],
     ['teacher-settings-guard', 'Raw settings hidden'],

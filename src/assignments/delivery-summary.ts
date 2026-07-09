@@ -103,17 +103,27 @@ export const PUBLIC_ASSIGNMENT_RULES_HANDOFF_ITEM_IDS = [
   'visible-rule-panel',
   'status-badge',
   'rule-count',
+  'delivery-rule-order',
   'item-count',
+  'items-rule-state',
   'attempt-limit',
+  'attempts-rule-state',
   'timer-policy',
+  'timer-rule-state',
   'close-time-policy',
+  'close-time-rule-state',
   'identity-mode',
+  'identity-rule-state',
   'review-behavior',
+  'review-rule-state',
   'item-order',
+  'item-order-rule-state',
   'timer-start-boundary',
   'anonymous-browser-boundary',
   'normalized-identity-boundary',
   'post-submit-review-boundary',
+  'settings-resolution-boundary',
+  'status-derivation-boundary',
   'public-payload-boundary',
   'runtime-content-guard',
   'teacher-settings-guard',
@@ -755,6 +765,12 @@ function formatAssignmentDeliveryPolicyHandoffRuleCount(count: number) {
   });
 }
 
+function formatPublicAssignmentRulesHandoffIdSummary(
+  ids: PublicAssignmentRuleSummaryId[]
+) {
+  return ids.join(' · ');
+}
+
 export function buildPublicAssignmentRulesHandoffView(
   summaryView: PublicAssignmentRulesHandoffSource
 ): PublicAssignmentRulesHandoffView {
@@ -833,19 +849,28 @@ function getPublicAssignmentRulesHandoffItemLabel(
       return m.assignment_delivery_public_rules_handoff_status_badge_label();
     case 'rule-count':
       return m.assignment_delivery_public_rules_handoff_rule_count_label();
+    case 'delivery-rule-order':
+      return m.assignment_delivery_policy_handoff_rule_order_label();
     case 'item-count':
+    case 'items-rule-state':
       return m.assignment_delivery_label_items();
     case 'attempt-limit':
+    case 'attempts-rule-state':
       return m.assignment_delivery_label_attempts();
     case 'timer-policy':
+    case 'timer-rule-state':
       return m.assignment_delivery_label_timer();
     case 'close-time-policy':
+    case 'close-time-rule-state':
       return m.assignment_delivery_label_closes();
     case 'identity-mode':
+    case 'identity-rule-state':
       return m.assignment_delivery_label_identity();
     case 'review-behavior':
+    case 'review-rule-state':
       return m.assignment_delivery_label_review();
     case 'item-order':
+    case 'item-order-rule-state':
       return m.assignment_delivery_label_item_order();
     case 'timer-start-boundary':
       return m.assignment_delivery_public_rules_handoff_timer_start_label();
@@ -855,6 +880,10 @@ function getPublicAssignmentRulesHandoffItemLabel(
       return m.assignment_delivery_public_rules_handoff_normalized_identity_label();
     case 'post-submit-review-boundary':
       return m.assignment_delivery_public_rules_handoff_post_submit_review_label();
+    case 'settings-resolution-boundary':
+      return m.assignment_delivery_policy_handoff_settings_resolution_label();
+    case 'status-derivation-boundary':
+      return m.assignment_delivery_policy_handoff_status_label();
     case 'public-payload-boundary':
       return m.assignment_delivery_policy_handoff_public_payload_label();
     case 'runtime-content-guard':
@@ -893,6 +922,8 @@ function getPublicAssignmentRulesHandoffItemDescription({
       return m.assignment_delivery_public_rules_handoff_status_badge_description();
     case 'rule-count':
       return m.assignment_delivery_public_rules_handoff_rule_count_description();
+    case 'delivery-rule-order':
+      return m.assignment_delivery_policy_handoff_rule_order_description();
     case 'timer-start-boundary':
       return m.assignment_delivery_public_rules_handoff_timer_start_description();
     case 'anonymous-browser-boundary':
@@ -901,6 +932,10 @@ function getPublicAssignmentRulesHandoffItemDescription({
       return m.assignment_delivery_public_rules_handoff_normalized_identity_description();
     case 'post-submit-review-boundary':
       return m.assignment_delivery_public_rules_handoff_post_submit_review_description();
+    case 'settings-resolution-boundary':
+      return m.assignment_delivery_policy_handoff_settings_resolution_description();
+    case 'status-derivation-boundary':
+      return m.assignment_delivery_policy_handoff_status_description();
     case 'public-payload-boundary':
       return m.assignment_delivery_policy_handoff_public_payload_description();
     case 'runtime-content-guard':
@@ -945,19 +980,30 @@ function getPublicAssignmentRulesHandoffItemValue({
       return formatAssignmentDeliveryPolicyHandoffRuleCount(
         summaryView.summary.ruleCount
       );
+    case 'delivery-rule-order':
+      return formatPublicAssignmentRulesHandoffIdSummary(
+        summaryView.summary.ruleIds
+      );
     case 'item-count':
+    case 'items-rule-state':
       return getPublicAssignmentRuleValue(summaryView, 'items');
     case 'attempt-limit':
+    case 'attempts-rule-state':
       return getPublicAssignmentRuleValue(summaryView, 'attempts');
     case 'timer-policy':
+    case 'timer-rule-state':
       return getPublicAssignmentRuleValue(summaryView, 'timer');
     case 'close-time-policy':
+    case 'close-time-rule-state':
       return getPublicAssignmentRuleValue(summaryView, 'closes');
     case 'identity-mode':
+    case 'identity-rule-state':
       return getPublicAssignmentRuleValue(summaryView, 'identity');
     case 'review-behavior':
+    case 'review-rule-state':
       return getPublicAssignmentRuleValue(summaryView, 'answerReveal');
     case 'item-order':
+    case 'item-order-rule-state':
       return getPublicAssignmentRuleValue(summaryView, 'itemOrder');
     case 'timer-start-boundary':
       return summaryView.summary.hasTimer
@@ -973,6 +1019,10 @@ function getPublicAssignmentRulesHandoffItemValue({
       return summaryView.summary.showsCorrectAnswers
         ? m.assignment_delivery_public_rules_handoff_after_scoring_value()
         : m.assignment_delivery_public_rules_handoff_review_hidden_value();
+    case 'settings-resolution-boundary':
+      return m.assignment_delivery_policy_handoff_settings_resolution_value();
+    case 'status-derivation-boundary':
+      return summaryView.status.status;
     case 'public-payload-boundary':
       return m.assignment_delivery_policy_handoff_public_payload_value();
     case 'runtime-content-guard':
@@ -991,18 +1041,25 @@ function getPublicAssignmentRulesHandoffRuleId(
 ): PublicAssignmentRuleSummaryId | null {
   switch (id) {
     case 'item-count':
+    case 'items-rule-state':
       return 'items';
     case 'attempt-limit':
+    case 'attempts-rule-state':
       return 'attempts';
     case 'timer-policy':
+    case 'timer-rule-state':
       return 'timer';
     case 'close-time-policy':
+    case 'close-time-rule-state':
       return 'closes';
     case 'identity-mode':
+    case 'identity-rule-state':
       return 'identity';
     case 'review-behavior':
+    case 'review-rule-state':
       return 'answerReveal';
     case 'item-order':
+    case 'item-order-rule-state':
       return 'itemOrder';
     default:
       return null;

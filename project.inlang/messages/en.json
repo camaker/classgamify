@@ -2791,7 +2791,7 @@
   "assignment_delivery_public_rules_handoff_answer_key_label": "Answer-key guard",
   "assignment_delivery_public_rules_handoff_answer_key_value": "Answer keys hidden",
   "assignment_delivery_public_rules_handoff_browser_token_hidden_value": "Browser token hidden",
-  "assignment_delivery_public_rules_handoff_description": "20-slice public assignment rules handoff for the student runner rule panel, status badge, item count, delivery rules, timer and identity boundaries, public-payload guard, answer-key guard, and privacy guard.",
+  "assignment_delivery_public_rules_handoff_description": "30-slice public assignment rules handoff for the student runner rule panel, status badge, item count, delivery rules, timer and identity boundaries, public-payload guard, answer-key guard, and privacy guard.",
   "assignment_delivery_public_rules_handoff_item_aria": "{label}: {value}. {description}",
   "assignment_delivery_public_rules_handoff_name_entry_visible_value": "Name entry visible",
   "assignment_delivery_public_rules_handoff_normalized_identity_description": "Attempt checks use normalized identity rules instead of the visible rule card rebuilding identity logic.",

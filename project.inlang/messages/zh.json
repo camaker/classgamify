@@ -2791,7 +2791,7 @@
   "assignment_delivery_public_rules_handoff_answer_key_label": "答案 key 防护",
   "assignment_delivery_public_rules_handoff_answer_key_value": "答案 key 隐藏",
   "assignment_delivery_public_rules_handoff_browser_token_hidden_value": "浏览器 token 隐藏",
-  "assignment_delivery_public_rules_handoff_description": "20 切片公开作业规则交接，覆盖学生作答器规则面板、状态徽章、题目数量、分发规则、计时与身份边界、公开载荷防护、答案 key 防护和隐私防护。",
+  "assignment_delivery_public_rules_handoff_description": "30 切片公开作业规则交接，覆盖学生作答器规则面板、状态徽章、题目数量、分发规则、计时与身份边界、公开载荷防护、答案 key 防护和隐私防护。",
   "assignment_delivery_public_rules_handoff_item_aria": "{label}：{value}。{description}",
   "assignment_delivery_public_rules_handoff_name_entry_visible_value": "姓名输入可见",
   "assignment_delivery_public_rules_handoff_normalized_identity_description": "作答次数检查使用规范化身份规则，而不是让可见规则卡片重建身份逻辑。",
