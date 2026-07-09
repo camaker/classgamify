@@ -70,6 +70,7 @@ export type ActivityAiDraftBoundaryHandoffPrivacyContract = {
   persistsActivity: false;
   publishesAssignment: false;
   requiresTeacherReview: true;
+  scope: 'teacher-reviewed-ai-draft-boundary';
 };
 
 export type ActivityAiDraftBoundaryHandoffView = {
@@ -386,6 +387,7 @@ function buildActivityAiDraftBoundaryHandoffPrivacyContract(
     persistsActivity: false,
     publishesAssignment: false,
     requiresTeacherReview: true,
+    scope: 'teacher-reviewed-ai-draft-boundary',
   };
 }
 

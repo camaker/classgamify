@@ -293,7 +293,8 @@ AI draft boundary handoff has a fast script-level gate via
 run it when changing AI generation gates, authenticated server-function input
 schemas, provider/model/notice provenance, fallback handling, source
 sanitization, safe material provenance, CreateActivityInput mapping, editor
-application, teacher-review requirements, or persistence/publish boundaries.
+application, teacher-review requirements,
+AI draft boundary privacy-scope boundaries, or persistence/publish boundaries.
 AI draft metadata summary has a fast script-level gate via
 `pnpm exec tsx --test scripts/activity-draft-meta-handoff-semantic-views.test.ts`;
 run it when changing draft coverage counts, provider/model/notice trust

@@ -79,6 +79,7 @@ test('AI draft boundary handoff exposes 30 safe pre-generation slices', () => {
     persistsActivity: false,
     publishesAssignment: false,
     requiresTeacherReview: true,
+    scope: 'teacher-reviewed-ai-draft-boundary',
   });
 
   assert.equal(getHandoffValue(handoffView, 'source-panel'), 'AI draft panel');
@@ -274,7 +275,7 @@ test('AI draft boundary handoff localizes Chinese editor-review boundaries', () 
 test('AI draft boundary handoff renders stable DOM relationships', () => {
   assert.match(
     ACTIVITY_AI_DRAFT_PANEL_SOURCE,
-    /ActivityAiDraftBoundaryHandoffItemView[\s\S]*ActivityAiDraftBoundaryHandoffView[\s\S]*data-handoff="activity-ai-draft-boundary"[\s\S]*view\.itemViews\.map[\s\S]*ActivityAiDraftBoundaryHandoffItem[\s\S]*function ActivityAiDraftBoundaryHandoffItem[\s\S]*const labelId = `activity-ai-draft-boundary-handoff-\$\{itemView\.id\}-label`[\s\S]*const valueId = `activity-ai-draft-boundary-handoff-\$\{itemView\.id\}-value`[\s\S]*const descriptionId = `activity-ai-draft-boundary-handoff-\$\{itemView\.id\}-description`[\s\S]*data-handoff-item=\{itemView\.id\}[\s\S]*id=\{labelId\}[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*aria-label=\{itemView\.ariaLabel\}[\s\S]*aria-labelledby=\{`\$\{labelId\} \$\{valueId\}`\}[\s\S]*id=\{valueId\}[\s\S]*id=\{descriptionId\}/,
+    /ActivityAiDraftBoundaryHandoffItemView[\s\S]*ActivityAiDraftBoundaryHandoffView[\s\S]*data-handoff="activity-ai-draft-boundary"[\s\S]*data-handoff-scope=\{view\.privacy\.scope\}[\s\S]*view\.itemViews\.map[\s\S]*ActivityAiDraftBoundaryHandoffItem[\s\S]*function ActivityAiDraftBoundaryHandoffItem[\s\S]*const labelId = `activity-ai-draft-boundary-handoff-\$\{itemView\.id\}-label`[\s\S]*const valueId = `activity-ai-draft-boundary-handoff-\$\{itemView\.id\}-value`[\s\S]*const descriptionId = `activity-ai-draft-boundary-handoff-\$\{itemView\.id\}-description`[\s\S]*data-handoff-item=\{itemView\.id\}[\s\S]*id=\{labelId\}[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*aria-label=\{itemView\.ariaLabel\}[\s\S]*aria-labelledby=\{`\$\{labelId\} \$\{valueId\}`\}[\s\S]*id=\{valueId\}[\s\S]*id=\{descriptionId\}/,
     'AI draft boundary handoff should render each safe source/generation boundary slice with stable label, value, and description relationships.'
   );
 });
@@ -292,6 +293,7 @@ test('AI draft boundary focused gate is documented', () => {
     'CreateActivityInput mapping',
     'teacher-review requirements',
     'persistence/publish boundaries',
+    'AI draft boundary privacy-scope boundaries',
   ]) {
     assert.match(
       TEST_CATALOG_SOURCE,

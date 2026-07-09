@@ -5750,6 +5750,10 @@ const activityScaffoldsSource = readFileSync(
   'utf8'
 );
 const activityEditorSource = readFileSync('src/activities/editor.ts', 'utf8');
+const activityAiDraftBoundarySource = readFileSync(
+  'src/activities/ai-draft-boundary.ts',
+  'utf8'
+);
 assert.match(
   activityLifecycleSource,
   /export type ActivityLifecycleActionCopy = \{[\s\S]*failureMessage: string;[\s\S]*successMessage: string;[\s\S]*export type ActivityDerivativeBlockedReason =[\s\S]*'activity-archived'[\s\S]*'same-template'[\s\S]*export type ActivityDerivativeActionGate =[\s\S]*reason: Extract<ActivityDerivativeBlockedReason, 'activity-archived'>;[\s\S]*export type ActivityLifecycleActionView = ActivityLifecycleActionCopy & \{[\s\S]*gate: ActivityDerivativeActionGate;/,
@@ -6133,8 +6137,13 @@ assert.doesNotMatch(
 );
 assert.match(
   activityAiDraftPanelSource,
-  /ActivityAiDraftBoundaryHandoffItemView[\s\S]*ActivityAiDraftBoundaryHandoffView[\s\S]*data-handoff="activity-ai-draft-boundary"[\s\S]*view\.itemViews\.map[\s\S]*ActivityAiDraftBoundaryHandoffItem[\s\S]*function ActivityAiDraftBoundaryHandoffItem[\s\S]*const labelId = `activity-ai-draft-boundary-handoff-\$\{itemView\.id\}-label`[\s\S]*const valueId = `activity-ai-draft-boundary-handoff-\$\{itemView\.id\}-value`[\s\S]*const descriptionId = `activity-ai-draft-boundary-handoff-\$\{itemView\.id\}-description`[\s\S]*data-handoff-item=\{itemView\.id\}[\s\S]*id=\{labelId\}[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*aria-label=\{itemView\.ariaLabel\}[\s\S]*aria-labelledby=\{`\$\{labelId\} \$\{valueId\}`\}[\s\S]*id=\{valueId\}[\s\S]*id=\{descriptionId\}/,
-  'Activity AI draft boundary handoff should render stable label, value, and description relationships.'
+  /ActivityAiDraftBoundaryHandoffItemView[\s\S]*ActivityAiDraftBoundaryHandoffView[\s\S]*data-handoff="activity-ai-draft-boundary"[\s\S]*data-handoff-scope=\{view\.privacy\.scope\}[\s\S]*view\.itemViews\.map[\s\S]*ActivityAiDraftBoundaryHandoffItem[\s\S]*function ActivityAiDraftBoundaryHandoffItem[\s\S]*const labelId = `activity-ai-draft-boundary-handoff-\$\{itemView\.id\}-label`[\s\S]*const valueId = `activity-ai-draft-boundary-handoff-\$\{itemView\.id\}-value`[\s\S]*const descriptionId = `activity-ai-draft-boundary-handoff-\$\{itemView\.id\}-description`[\s\S]*data-handoff-item=\{itemView\.id\}[\s\S]*id=\{labelId\}[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*aria-label=\{itemView\.ariaLabel\}[\s\S]*aria-labelledby=\{`\$\{labelId\} \$\{valueId\}`\}[\s\S]*id=\{valueId\}[\s\S]*id=\{descriptionId\}/,
+  'Activity AI draft boundary handoff should render privacy scope plus stable label, value, and description relationships.'
+);
+assert.match(
+  activityAiDraftBoundarySource,
+  /export const ACTIVITY_AI_DRAFT_BOUNDARY_HANDOFF_ITEM_IDS = \[(?=[\s\S]*'source-panel')(?=[\s\S]*'generation-gate')(?=[\s\S]*'server-function')(?=[\s\S]*'input-schema')(?=[\s\S]*'safe-material-provenance')(?=[\s\S]*'file-byte-guard')(?=[\s\S]*'storage-key-guard')(?=[\s\S]*'create-input-contract')(?=[\s\S]*'editor-review-gate')(?=[\s\S]*'persistence-boundary')(?=[\s\S]*'save-boundary')(?=[\s\S]*'publish-boundary')(?=[\s\S]*'coverage-summary')(?=[\s\S]*'template-readiness')(?=[\s\S]*'privacy-guard')[\s\S]*export type ActivityAiDraftBoundaryHandoffPrivacyContract = \{[\s\S]*exposesActivityDraftText: false;[\s\S]*exposesAnswerText: false;[\s\S]*exposesFileBytes: false;[\s\S]*exposesFileIds: false;[\s\S]*exposesOmittedNotePayloads: false;[\s\S]*exposesRawProviderResponse: false;[\s\S]*exposesSourceText: false;[\s\S]*exposesStorageKeys: false;[\s\S]*persistsActivity: false;[\s\S]*publishesAssignment: false;[\s\S]*requiresTeacherReview: true;[\s\S]*scope: 'teacher-reviewed-ai-draft-boundary';/,
+  'Activity AI draft boundary should expose a typed 30-slice teacher-reviewed privacy scope.'
 );
 assert.match(
   activityAiDraftPanelSource,
