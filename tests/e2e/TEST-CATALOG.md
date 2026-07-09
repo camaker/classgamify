@@ -35,6 +35,58 @@ AI draft metadata,
 template scaffold validity, template runtime ids, assignment item ordering, or
 exclusive runtime choice assignment, or deterministic AI draft fallback result
 behavior.
+Fast-gate inventory has a script-level gate via
+`pnpm exec tsx --test scripts/test-catalog-fast-gate-inventory.test.ts`; run it
+when changing TEST-CATALOG script references, adding or removing local
+product-gate scripts, or renaming focused script-level checks.
+Public product entry gates include
+`pnpm exec tsx --test scripts/home-product-loop-handoff-semantic-views.test.ts`,
+`pnpm exec tsx --test scripts/public-navigation-handoff-semantic-views.test.ts`,
+`pnpm exec tsx --test scripts/public-template-entry-handoff-semantic-views.test.ts`,
+`pnpm exec tsx --test scripts/teachers-public-handoff-semantic-views.test.ts`,
+`pnpm exec tsx --test scripts/roadmap-public-handoff-semantic-views.test.ts`,
+and
+`pnpm exec tsx --test scripts/public-pricing-plan-boundary-handoff-semantic-views.test.ts`;
+run the matching gate when changing homepage loops, navigation, template or
+worksheet entry routes, teacher-facing public copy, roadmap status wording, or
+pricing plan boundaries.
+Public content, policy, and communication gates include
+`pnpm exec tsx --test scripts/public-editorial-content-handoff-semantic-views.test.ts`,
+`pnpm exec tsx --test scripts/legal-policy-handoff-semantic-views.test.ts`,
+`pnpm exec tsx --test scripts/contact-classroom-intake-handoff-semantic-views.test.ts`,
+`pnpm exec tsx --test scripts/auth-workspace-handoff-semantic-views.test.ts`,
+`pnpm exec tsx --test scripts/mail-transactional-workspace-handoff-semantic-views.test.ts`,
+and
+`pnpm exec tsx --test scripts/developer-configuration-handoff-semantic-views.test.ts`;
+run the matching gate when changing editorial, legal, contact, auth,
+transactional mail, or developer-facing product-boundary copy.
+Activity foundation gates include
+`pnpm exec tsx --test scripts/activity-library-semantic-views.test.ts`,
+`pnpm exec tsx --test scripts/activity-template-scaffold-quality-handoff-semantic-views.test.ts`,
+and
+`pnpm exec tsx --test scripts/activity-ai-fallback-handoff-semantic-views.test.ts`;
+run the matching gate when changing owner-scoped library summaries, reusable
+template scaffold quality, or deterministic local AI fallback draft semantics.
+Assignment shared-boundary gates include
+`pnpm exec tsx --test scripts/assignment-semantic-views.test.ts`,
+`pnpm exec tsx --test scripts/assignment-delivery-policy-handoff-semantic-views.test.ts`,
+`pnpm exec tsx --test scripts/assignment-identity-handoff-semantic-views.test.ts`,
+`pnpm exec tsx --test scripts/assignment-answer-feedback-handoff-semantic-views.test.ts`,
+`pnpm exec tsx --test scripts/assignment-result-empty-state-handoff-semantic-views.test.ts`,
+`pnpm exec tsx --test scripts/assignment-result-material-handoff-semantic-views.test.ts`,
+`pnpm exec tsx --test scripts/public-assignment-access-semantic-views.test.ts`,
+and
+`pnpm exec tsx --test scripts/public-assignment-unavailable-access-handoff-semantic-views.test.ts`;
+run the matching gate when changing shared assignment view models, delivery
+policy propagation, identity normalization, answer feedback, result empty
+states, result materials, public assignment access, or unavailable-link
+boundaries.
+Workspace governance and utility gates include
+`pnpm exec tsx --test scripts/admin-users-handoff-semantic-views.test.ts`,
+`pnpm exec tsx --test scripts/billing-semantic-views.test.ts`, and
+`pnpm exec tsx --test scripts/tabler-icons-proxy.test.ts`; run the matching
+gate when changing admin user governance, billing workspace behavior, or the
+icon proxy used by classroom controls.
 Assignment attempt limits have a fast script-level gate via
 `pnpm exec tsx --test scripts/assignment-attempt-limit-handoff-semantic-views.test.ts`;
 run it when changing max-attempt parsing, per-student attempt counters,
@@ -134,6 +186,12 @@ run it when changing completions, average accuracy, average points, average
 duration, timer caps, result metric cards, assignment list summaries,
 assignment cards, classroom briefs, copy artifacts, CSV exports, or the
 assignment-attempt-stats handoff.
+Legacy public route retirement has a fast script-level gate via
+`pnpm exec tsx --test scripts/legacy-public-route-handoff-semantic-views.test.ts`;
+run it when changing retired copied-learning routes, route-tree cleanup,
+noindex migration entrypoints, sitemap exclusion, localized sitemap exclusion,
+navigation exclusion, robots protected-surface rules, legacy-copy guards, or
+the legacy-public-route handoff.
 Storage upload readiness has a fast script-level gate via
 `pnpm exec tsx --test scripts/storage-upload-readiness.test.ts`; run it when
 changing classroom source-material upload validation, filename sanitization,

@@ -36,6 +36,7 @@ type RetiredLegacyPath = (typeof RETIRED_LEGACY_PUBLIC_PATHS)[number];
 
 const ROUTE_TREE_SOURCE = readFileSync('src/routeTree.gen.ts', 'utf8');
 const PUBLIC_ROUTES_SOURCE = readFileSync('src/seo/public-routes.ts', 'utf8');
+const TEST_CATALOG_SOURCE = readFileSync('tests/e2e/TEST-CATALOG.md', 'utf8');
 
 const RETIRED_ROUTE_MODULE_CANDIDATES = {
   '/about': ['src/routes/(pages)/about.tsx', 'src/routes/about.tsx'],
@@ -190,6 +191,14 @@ test('retired legacy route evidence comes from generated routes and public helpe
     ]
   );
   assert.match(PUBLIC_ROUTES_SOURCE, /RETIRED_LEGACY_PUBLIC_PATHS/);
+});
+
+test('legacy public route focused gate is documented', () => {
+  assert.match(
+    TEST_CATALOG_SOURCE,
+    /Legacy public route retirement has a fast script-level gate via[\s\S]*scripts\/legacy-public-route-handoff-semantic-views\.test\.ts[\s\S]*retired copied-learning routes[\s\S]*route-tree cleanup[\s\S]*noindex migration entrypoints[\s\S]*sitemap exclusion[\s\S]*localized sitemap exclusion[\s\S]*navigation exclusion[\s\S]*robots protected-surface rules[\s\S]*legacy-copy guards[\s\S]*legacy-public-route handoff/,
+    'E2E catalog should point retired legacy route work at the focused script gate.'
+  );
 });
 
 function buildLegacyPublicRouteEvidence(): LegacyPublicRouteHandoffEvidence {
