@@ -535,10 +535,16 @@ import {
   buildDashboardOverviewStarterPreview,
   buildDashboardCoreLoopReadinessView,
   dashboardOverviewPageCopy,
+  DASHBOARD_OVERVIEW_HANDOFF_ITEM_IDS,
   formatDashboardMetricValue,
   formatDashboardTemplateCoverageValue,
   getDashboardOverviewActionCards,
 } from '@/dashboard/overview';
+import {
+  TEACHER_WORKSPACE_OPERATIONS_CHAIN_HANDOFF_ITEM_IDS,
+  TEACHER_WORKSPACE_OPERATIONS_CHAIN_SOURCE_FILES,
+  buildTeacherWorkspaceOperationsChainHandoffView,
+} from '@/dashboard/teacher-workspace-operations-chain';
 import { buildDashboardPaginationView } from '@/dashboard/pagination';
 import {
   buildContactPageViewModel,
@@ -584,6 +590,7 @@ import {
   buildSettingsFilesWorkspaceSummaryView,
   SETTINGS_FILES_SOURCE_MATERIAL_HANDOFF_ITEM_IDS,
 } from '@/settings/files-view';
+import { SETTINGS_FILES_MATERIAL_CLASSIFICATION_HANDOFF_ITEM_IDS } from '@/settings/files-material-classification-view';
 import {
   buildSettingsNotificationNewsletterCardView,
   buildSettingsNotificationPageViewModel,
@@ -591,6 +598,7 @@ import {
   buildSettingsNotificationWorkspaceSummaryView,
   SETTINGS_NOTIFICATION_UPDATE_HANDOFF_ITEM_IDS,
 } from '@/settings/notifications-view';
+import { SETTINGS_SECURITY_WORKSPACE_HANDOFF_ITEM_IDS } from '@/settings/security-handoff';
 import type { PricePlan, Subscription } from '@/payment/types';
 import {
   AssignmentAttemptAnswerValidationError,
@@ -14291,6 +14299,111 @@ assert.match(
   readFileSync('tests/e2e/TEST-CATALOG.md', 'utf8'),
   /Public discovery\/indexing chain has a fast script-level gate via[\s\S]*scripts\/public-discovery-indexing-chain-handoff\.test\.ts/,
   'TEST-CATALOG should document the public discovery/indexing chain gate.'
+);
+const teacherWorkspaceOperationsChainView =
+  buildTeacherWorkspaceOperationsChainHandoffView();
+const teacherWorkspaceOperationsChainValues = new Map(
+  teacherWorkspaceOperationsChainView.itemViews.map((item) => [
+    item.id,
+    item.value,
+  ])
+);
+assert.deepEqual(
+  teacherWorkspaceOperationsChainView.itemViews.map((item) => item.id),
+  [...TEACHER_WORKSPACE_OPERATIONS_CHAIN_HANDOFF_ITEM_IDS],
+  'Teacher workspace operations chain should expose the stable 30-slice dashboard, library, assignment-list, and settings order.'
+);
+assert.equal(teacherWorkspaceOperationsChainView.itemViews.length, 30);
+assert.equal(
+  new Set(TEACHER_WORKSPACE_OPERATIONS_CHAIN_HANDOFF_ITEM_IDS).size,
+  30
+);
+assert.equal(TEACHER_WORKSPACE_OPERATIONS_CHAIN_SOURCE_FILES.length, 30);
+for (const filePath of TEACHER_WORKSPACE_OPERATIONS_CHAIN_SOURCE_FILES) {
+  assert.ok(
+    existsSync(filePath),
+    `Missing teacher workspace operations chain file ${filePath}`
+  );
+}
+assert.ok(
+  teacherWorkspaceOperationsChainView.itemViews.every(
+    (item) => item.ariaLabel && item.description && item.label && item.value
+  )
+);
+assert.deepEqual(teacherWorkspaceOperationsChainView.privacy, {
+  chainSourceFileCount: TEACHER_WORKSPACE_OPERATIONS_CHAIN_SOURCE_FILES.length,
+  countsStarterPreviewAsOwned: false,
+  exposesAssignmentRuntimeContent: false,
+  exposesAuthSecrets: false,
+  exposesPrivateActivityContent: false,
+  exposesProviderSecrets: false,
+  exposesRawAnonymousTokens: false,
+  exposesResultExportRows: false,
+  exposesSourceMaterialFileIds: false,
+  exposesSourceMaterialFilenames: false,
+  exposesSourceMaterialStorageKeys: false,
+  exposesStudentAnswerText: false,
+  exposesTeacherEmail: false,
+  itemIds: [...TEACHER_WORKSPACE_OPERATIONS_CHAIN_HANDOFF_ITEM_IDS],
+  keepsActivityLibraryOwnerScoped: true,
+  keepsAssignmentListOwnerScoped: true,
+  keepsDashboardOwnerScoped: true,
+  keepsSettingsFromMutatingClassroomData: true,
+  keepsVisiblePageCountsSeparate: true,
+  sourceFiles: [...TEACHER_WORKSPACE_OPERATIONS_CHAIN_SOURCE_FILES],
+  usesFullFilteredSummariesForOverview: true,
+});
+assert.deepEqual(
+  [
+    DASHBOARD_OVERVIEW_HANDOFF_ITEM_IDS.length,
+    ACTIVITY_LIBRARY_PAGE_HANDOFF_ITEM_IDS.length,
+    ASSIGNMENT_LIST_PAGE_HANDOFF_ITEM_IDS.length,
+    SETTINGS_ACCOUNT_WORKSPACE_HANDOFF_ITEM_IDS.length,
+    SETTINGS_SECURITY_WORKSPACE_HANDOFF_ITEM_IDS.length,
+    SETTINGS_FILES_SOURCE_MATERIAL_HANDOFF_ITEM_IDS.length,
+    SETTINGS_FILES_MATERIAL_CLASSIFICATION_HANDOFF_ITEM_IDS.length,
+    SETTINGS_BILLING_WORKSPACE_HANDOFF_ITEM_IDS.length,
+    SETTINGS_NOTIFICATION_UPDATE_HANDOFF_ITEM_IDS.length,
+  ],
+  Array.from({ length: 9 }, () => 30),
+  'Teacher workspace operations chain should stay backed by focused dashboard, list, and settings gates.'
+);
+assert.deepEqual(Object.fromEntries(teacherWorkspaceOperationsChainValues), {
+  'activity-library-actions': 'Edit/publish/duplicate/remix/archive',
+  'activity-library-owner-scope': 'Owner activities only',
+  'activity-library-route': Routes.DashboardActivities,
+  'activity-library-search-filter': 'Search/status/template/source',
+  'activity-library-starter-preview': 'Preview only',
+  'activity-library-summary': 'Full filtered summary',
+  'activity-library-visible-page': 'Visible page separate',
+  'assignment-list-distribution': 'Copy/preview/print/review',
+  'assignment-list-owner-scope': 'Owner assignments only',
+  'assignment-list-published-context': 'Post-publish handoff',
+  'assignment-list-route': Routes.DashboardAssignments,
+  'assignment-list-search-status': 'Search/status',
+  'assignment-list-summary': 'Full filtered summary',
+  'assignment-list-visible-page': 'Visible page separate',
+  'dashboard-independent-loading': 'Split loading',
+  'dashboard-loop-status': 'Core loop status',
+  'dashboard-next-actions': 'Create/publish/share/review',
+  'dashboard-owner-scope': 'Owner summaries only',
+  'dashboard-readiness': 'Activity/link/runner/results',
+  'dashboard-starter-preview-boundary': 'Preview only',
+  'dashboard-top-metrics': 'Activities/templates/assignments/results',
+  'legacy-copy-guard': 'ClassGamify only',
+  'settings-account-boundary': Routes.SettingsProfile,
+  'settings-billing-boundary': Routes.SettingsBilling,
+  'settings-files-boundary': Routes.SettingsFiles,
+  'settings-files-classification': 'Safe material labels',
+  'settings-notification-boundary': Routes.SettingsNotifications,
+  'settings-security-boundary': Routes.SettingsSecurity,
+  'teacher-workspace-chain-gate': '30 source files',
+  'workspace-private-data-guard': 'Private data hidden',
+});
+assert.match(
+  readFileSync('tests/e2e/TEST-CATALOG.md', 'utf8'),
+  /Teacher workspace operations chain has a fast script-level gate via[\s\S]*scripts\/teacher-workspace-operations-chain-handoff\.test\.ts/,
+  'TEST-CATALOG should document the teacher workspace operations chain gate.'
 );
 const publicDomHandoffBoundaryView = buildPublicDomHandoffBoundaryView();
 const publicDomProtectedSourceFileCount =

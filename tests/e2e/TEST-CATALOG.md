@@ -244,6 +244,11 @@ run it when changing owner-scoped activity/assignment summaries,
 starter-preview boundaries, independent loading states, top metrics, loop
 status, next actions, readiness rows, action cards, route targets, or the
 dashboard-overview handoff.
+Teacher workspace operations chain has a fast script-level gate via
+`pnpm exec tsx --test scripts/teacher-workspace-operations-chain-handoff.test.ts`;
+run it when changing dashboard owner summaries, activity library
+filters/summaries/actions, assignment list filters/distribution, or teacher
+settings account/security/files/billing/notification boundaries.
 Settings account workspace handoff has a fast script-level gate via
 `pnpm exec tsx --test scripts/settings-account-workspace-handoff-semantic-views.test.ts`;
 run it when changing teacher identity scope, account access, profile display
