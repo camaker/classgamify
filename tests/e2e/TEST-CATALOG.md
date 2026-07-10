@@ -104,6 +104,12 @@ run the matching gate when changing shared assignment view models, delivery
 policy propagation, identity normalization, answer feedback, result empty
 states, result materials, public assignment access, or unavailable-link
 boundaries.
+Published assignment delivery chain has a fast script-level gate via
+`pnpm exec tsx --test scripts/published-assignment-delivery-chain-handoff.test.ts`;
+run it when changing publish preflight, frozen snapshots, share links,
+assignment list distribution, public student rules, lifecycle access,
+validated submissions, attempt persistence, timer duration policy, answer
+feedback, result stats, or results export handoffs.
 Workspace governance and utility gates include
 `pnpm exec tsx --test scripts/admin-users-handoff-semantic-views.test.ts`,
 `pnpm exec tsx --test scripts/billing-semantic-views.test.ts`, and

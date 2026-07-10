@@ -605,6 +605,7 @@ import {
   normalizeAttemptTimeLimitSeconds,
   resolveAttemptSubmissionDurationSeconds,
 } from '@/assignments/attempt-duration';
+import { ASSIGNMENT_ATTEMPT_DURATION_HANDOFF_ITEM_IDS } from '@/assignments/attempt-duration-handoff';
 import {
   buildAssignmentAttemptUsage,
   canUseAnotherAssignmentAttempt,
@@ -843,6 +844,7 @@ import {
   orderAssignmentRuntimeItems,
   stableShuffle,
 } from '@/assignments/item-order';
+import { ASSIGNMENT_ITEM_ORDER_HANDOFF_ITEM_IDS } from '@/assignments/item-order-handoff';
 import {
   ASSIGNMENT_ITEM_PERFORMANCE_SORT_HANDOFF_ITEM_IDS,
   buildAssignmentItemPerformanceSortHandoffEvidence,
@@ -992,6 +994,7 @@ import {
   buildAssignmentResultAnswerStatusView,
   buildAssignmentResultAttemptAnswerTextView,
 } from '@/assignments/result-answer-view';
+import { ASSIGNMENT_ANSWER_FEEDBACK_HANDOFF_ITEM_IDS } from '@/assignments/answer-feedback-handoff';
 import { buildAssignmentAttemptReviewSummary } from '@/assignments/result-review-summary';
 import {
   formatAssignmentSummaryAccuracy,
@@ -1037,6 +1040,11 @@ import {
   findPublishedAssignmentInList,
   resolvePublishedAssignmentPanelAssignment,
 } from '@/assignments/published-assignment';
+import {
+  PUBLISHED_ASSIGNMENT_DELIVERY_CHAIN_HANDOFF_ITEM_IDS,
+  PUBLISHED_ASSIGNMENT_DELIVERY_CHAIN_SOURCE_FILES,
+  buildPublishedAssignmentDeliveryChainHandoffView,
+} from '@/assignments/published-assignment-delivery-chain';
 import {
   ASSIGNMENT_SHARE_LINK_HANDOFF_ITEM_IDS,
   ASSIGNMENT_SHARE_ROUTE_TARGET,
@@ -4745,6 +4753,112 @@ assert.doesNotMatch(
 const publicAssignmentSource = readFileSync(
   'src/assignments/public.ts',
   'utf8'
+);
+const publishedAssignmentDeliveryChainView =
+  buildPublishedAssignmentDeliveryChainHandoffView();
+const publishedAssignmentDeliveryChainValues = new Map(
+  publishedAssignmentDeliveryChainView.itemViews.map((item) => [
+    item.id,
+    item.value,
+  ])
+);
+assert.deepEqual(
+  publishedAssignmentDeliveryChainView.itemViews.map((item) => item.id),
+  [...PUBLISHED_ASSIGNMENT_DELIVERY_CHAIN_HANDOFF_ITEM_IDS],
+  'Published assignment delivery chain should expose the stable 30-slice product-loop order.'
+);
+assert.equal(publishedAssignmentDeliveryChainView.itemViews.length, 30);
+assert.equal(
+  new Set(PUBLISHED_ASSIGNMENT_DELIVERY_CHAIN_HANDOFF_ITEM_IDS).size,
+  30
+);
+assert.equal(PUBLISHED_ASSIGNMENT_DELIVERY_CHAIN_SOURCE_FILES.length, 30);
+for (const filePath of PUBLISHED_ASSIGNMENT_DELIVERY_CHAIN_SOURCE_FILES) {
+  assert.ok(
+    existsSync(filePath),
+    `Missing published assignment delivery chain file ${filePath}`
+  );
+}
+assert.ok(
+  publishedAssignmentDeliveryChainView.itemViews.every(
+    (item) => item.ariaLabel && item.description && item.label && item.value
+  )
+);
+assert.deepEqual(publishedAssignmentDeliveryChainView.privacy, {
+  chainSourceFileCount: PUBLISHED_ASSIGNMENT_DELIVERY_CHAIN_SOURCE_FILES.length,
+  deliveryPolicyResolvedBeforeSurfaces: true,
+  exposesActivityContentToPublicPayload: false,
+  exposesAnswerKeysBeforeAllowedReview: false,
+  exposesRawAnonymousTokens: false,
+  exposesRawSettingsJson: false,
+  exposesSourceMaterialStorageKeys: false,
+  freezesAssignmentSnapshots: true,
+  itemIds: [...PUBLISHED_ASSIGNMENT_DELIVERY_CHAIN_HANDOFF_ITEM_IDS],
+  publicPayloadUsesRuntimeItemsOnly: true,
+  rejectsInvalidSubmissions: true,
+  resultExportsIncludeDeliveryPolicy: true,
+  resultsPreserveAttempts: true,
+  sourceFiles: [...PUBLISHED_ASSIGNMENT_DELIVERY_CHAIN_SOURCE_FILES],
+});
+assert.deepEqual(
+  [
+    ASSIGNMENT_PUBLISH_HANDOFF_ITEM_IDS.length,
+    ASSIGNMENT_DELIVERY_POLICY_HANDOFF_ITEM_IDS.length,
+    PUBLIC_ASSIGNMENT_RULES_HANDOFF_ITEM_IDS.length,
+    ASSIGNMENT_SHARE_LINK_HANDOFF_ITEM_IDS.length,
+    ASSIGNMENT_LIST_PAGE_HANDOFF_ITEM_IDS.length,
+    ASSIGNMENT_LIFECYCLE_HANDOFF_ITEM_IDS.length,
+    PUBLIC_ASSIGNMENT_ACCESS_HANDOFF_ITEM_IDS.length,
+    PUBLIC_ASSIGNMENT_UNAVAILABLE_ACCESS_HANDOFF_ITEM_IDS.length,
+    ASSIGNMENT_ITEM_ORDER_HANDOFF_ITEM_IDS.length,
+    ASSIGNMENT_ATTEMPT_LIMIT_HANDOFF_ITEM_IDS.length,
+    ASSIGNMENT_SUBMISSION_VALIDATION_HANDOFF_ITEM_IDS.length,
+    ASSIGNMENT_ATTEMPT_PERSISTENCE_HANDOFF_ITEM_IDS.length,
+    ASSIGNMENT_ATTEMPT_DURATION_HANDOFF_ITEM_IDS.length,
+    STUDENT_RUNNER_SUBMISSION_HANDOFF_ITEM_IDS.length,
+    ASSIGNMENT_ANSWER_FEEDBACK_HANDOFF_ITEM_IDS.length,
+    ASSIGNMENT_ATTEMPT_STATS_HANDOFF_ITEM_IDS.length,
+    ASSIGNMENT_RESULTS_EXPORT_PREPARATION_ITEM_IDS.length,
+  ],
+  Array.from({ length: 17 }, () => 30),
+  'Published assignment delivery chain should stay backed by focused assignment gates.'
+);
+assert.deepEqual(Object.fromEntries(publishedAssignmentDeliveryChainValues), {
+  'answer-feedback-gate': 'Reveal policy respected',
+  'assignment-persistence': 'Published row',
+  'attempt-limit-policy': 'Per-student cap',
+  'attempt-persistence': 'Scored attempt row',
+  'close-time-lifecycle': 'Closed or expired blocked',
+  'csv-export-policy': 'Delivery rules included',
+  'delivery-chain-gate': '30 source files',
+  'delivery-policy-summary': 'Teacher-visible rules',
+  'item-order-policy': 'Stable shuffled order',
+  'list-filter-owner-scope': 'Owner assignments only',
+  'post-publish-list-surface': 'Immediate distribution',
+  'public-access-lifecycle': 'Open links only',
+  'public-rules-summary': 'Student-visible rules',
+  'publish-delivery-preview': 'Rules before freeze',
+  'publish-preflight-validation': '30 publish slices',
+  'publish-settings-json': 'Resolved settings',
+  'raw-token-guard': 'Anonymous tokens hidden',
+  'result-copy-boundary': 'Teacher-only artifacts',
+  'result-review-scope': 'Teacher review state',
+  'result-stats': 'Shared attempt metrics',
+  'share-link-distribution': 'Public play URL',
+  'snapshot-freeze': 'Frozen ActivityContent',
+  'snapshot-results-retention': 'Attempts retained',
+  'source-material-guard': 'Storage keys hidden',
+  'student-identity-policy': 'Name or browser token',
+  'student-start-readiness': 'Payload ready first',
+  'student-submit-readiness': 'Explicit partial confirmation',
+  'submission-validation': 'Unknown and duplicate guard',
+  'timer-duration-policy': 'Normalized seconds',
+  'unavailable-content-guard': 'Runtime hidden',
+});
+assert.match(
+  readFileSync('tests/e2e/TEST-CATALOG.md', 'utf8'),
+  /Published assignment delivery chain has a fast script-level gate via[\s\S]*scripts\/published-assignment-delivery-chain-handoff\.test\.ts/,
+  'TEST-CATALOG should document the published assignment delivery chain gate.'
 );
 assert.doesNotMatch(
   [
