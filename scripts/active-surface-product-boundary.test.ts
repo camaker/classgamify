@@ -9,10 +9,12 @@ import {
   type ActiveSurfaceProductBoundaryItemId,
   type ActiveSurfaceProductBoundaryView,
 } from '@/config/active-surface-product-boundary';
+import { ACCOUNT_GOVERNANCE_LIFECYCLE_CHAIN_HANDOFF_ITEM_IDS } from '@/auth/account-governance-lifecycle-chain';
 import { AUTH_WORKSPACE_HANDOFF_ITEM_IDS } from '@/auth/workspace-boundary';
 import { CONTACT_CLASSROOM_INTAKE_HANDOFF_ITEM_IDS } from '@/contact/inquiry-view';
 import { DEVELOPER_CONFIGURATION_HANDOFF_ITEM_IDS } from '@/config/developer-configuration-handoff';
 import { MAIL_TRANSACTIONAL_WORKSPACE_HANDOFF_ITEM_IDS } from '@/mail/workspace-boundary';
+import { PAYMENT_STATUS_HANDOFF_ITEM_IDS } from '@/payment/payment-status-view';
 import { SETTINGS_ACCOUNT_WORKSPACE_HANDOFF_ITEM_IDS } from '@/settings/account-handoff';
 import { SETTINGS_BILLING_WORKSPACE_HANDOFF_ITEM_IDS } from '@/settings/billing-view';
 import { SETTINGS_NOTIFICATION_UPDATE_HANDOFF_ITEM_IDS } from '@/settings/notifications-view';
@@ -37,7 +39,10 @@ test('active surface product boundary exposes 30 current-surface slices', () => 
   assert.deepEqual(itemIds, [...ACTIVE_SURFACE_PRODUCT_BOUNDARY_ITEM_IDS]);
   assert.equal(new Set(itemIds).size, 30);
   assert.equal(boundaryView.title, 'Active surface product boundary');
-  assert.match(boundaryView.description, /account, contact, billing/);
+  assert.match(
+    boundaryView.description,
+    /account governance, contact, billing\/payment callback/
+  );
   assert.equal(
     boundaryView.itemViews.every(
       (itemView) =>
@@ -66,6 +71,8 @@ test('active surface product boundary exposes 30 current-surface slices', () => 
     keepsProviderCopyOut: true,
     protectsClassroomProductLoop: true,
     sourceFiles: [...ACTIVE_SURFACE_PRODUCT_BOUNDARY_SOURCE_FILES],
+    usesAccountGovernanceLifecycleChain: true,
+    usesPaymentCallbackHandoff: true,
   });
   assertNoPrivateActiveSurfaceText(JSON.stringify(boundaryView));
 });
@@ -90,12 +97,12 @@ test('active surface product boundary summarizes current account and configurati
       ['contact-email-routing', 'Structured contact email'],
       ['profile-settings-copy', 'Teacher identity'],
       ['security-settings-copy', 'Workspace access'],
-      ['account-settings-handoff', '30 account slices'],
+      ['account-governance-lifecycle-chain', '30 governance slices'],
       ['notification-settings-copy', 'Classroom updates'],
       ['notification-update-handoff', '30 update slices'],
       ['billing-settings-copy', 'Plan access'],
       ['billing-workspace-handoff', '30 billing slices'],
-      ['payment-callback-copy', '/settings/payment'],
+      ['payment-callback-handoff', '30 callback slices'],
       ['hosted-billing-boundary', 'Hosted checkout and portal'],
       [
         'mail-workspace-boundary',
@@ -120,10 +127,15 @@ test('active surface product boundary summarizes current account and configurati
 
 test('active surface source inventory stays tied to existing 30-slice focused contracts', () => {
   const focusedContractLengths = new Map<string, number>([
+    [
+      'account-governance',
+      ACCOUNT_GOVERNANCE_LIFECYCLE_CHAIN_HANDOFF_ITEM_IDS.length,
+    ],
     ['auth', AUTH_WORKSPACE_HANDOFF_ITEM_IDS.length],
     ['contact', CONTACT_CLASSROOM_INTAKE_HANDOFF_ITEM_IDS.length],
     ['developer-config', DEVELOPER_CONFIGURATION_HANDOFF_ITEM_IDS.length],
     ['mail', MAIL_TRANSACTIONAL_WORKSPACE_HANDOFF_ITEM_IDS.length],
+    ['payment-callback', PAYMENT_STATUS_HANDOFF_ITEM_IDS.length],
     ['settings-account', SETTINGS_ACCOUNT_WORKSPACE_HANDOFF_ITEM_IDS.length],
     ['settings-billing', SETTINGS_BILLING_WORKSPACE_HANDOFF_ITEM_IDS.length],
     [
@@ -134,7 +146,7 @@ test('active surface source inventory stays tied to existing 30-slice focused co
 
   assert.deepEqual(
     [...focusedContractLengths.values()],
-    [30, 30, 30, 30, 30, 30, 30]
+    [30, 30, 30, 30, 30, 30, 30, 30, 30]
   );
 
   for (const filePath of ACTIVE_SURFACE_PRODUCT_BOUNDARY_SOURCE_FILES) {
@@ -178,7 +190,7 @@ test('active surface focused gate is documented', () => {
   );
   assert.match(
     TEST_CATALOG_SOURCE,
-    /account[\s\S]*contact[\s\S]*billing[\s\S]*mail[\s\S]*notification[\s\S]*developer configuration[\s\S]*ClassGamify terms/,
+    /account governance[\s\S]*contact[\s\S]*billing\/payment callback[\s\S]*mail[\s\S]*notification[\s\S]*developer configuration[\s\S]*ClassGamify terms/,
     'TEST-CATALOG should document the active account/contact/billing/mail/notification/configuration boundary scope.'
   );
 });

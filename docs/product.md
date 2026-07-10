@@ -66,6 +66,10 @@ status, polling, safe callback normalization, plan-cache refresh, provider
 session privacy, and retry/timeout recovery should stay inside the teacher
 workspace boundary without mutating activities, assignment links, snapshots,
 attempts, results, or source-material records.
+The active surface product boundary should absorb both the account governance
+lifecycle and payment callback handoff contracts so current account, contact,
+billing, mail, notification, and developer configuration surfaces stay aligned
+with the same ClassGamify teacher-workspace model.
 Transactional email surfaces follow the same lifecycle boundary: verification,
 password reset, newsletter confirmation, and contact-message templates should
 render the shared teacher workspace context before provider send while keeping

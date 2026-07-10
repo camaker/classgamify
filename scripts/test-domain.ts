@@ -2402,7 +2402,17 @@ assert.deepEqual(activeSurfaceProductBoundaryView.privacy, {
   keepsProviderCopyOut: true,
   protectsClassroomProductLoop: true,
   sourceFiles: [...ACTIVE_SURFACE_PRODUCT_BOUNDARY_SOURCE_FILES],
+  usesAccountGovernanceLifecycleChain: true,
+  usesPaymentCallbackHandoff: true,
 });
+assert.deepEqual(
+  [
+    ACCOUNT_GOVERNANCE_LIFECYCLE_CHAIN_HANDOFF_ITEM_IDS.length,
+    PAYMENT_STATUS_HANDOFF_ITEM_IDS.length,
+  ],
+  [30, 30],
+  'Active surface product boundary should absorb account governance and payment callback handoff contracts.'
+);
 assert.deepEqual(
   activeSurfaceProductBoundaryView.itemViews.map((item) => [
     item.id,
@@ -2422,12 +2432,12 @@ assert.deepEqual(
     ['contact-email-routing', 'Structured contact email'],
     ['profile-settings-copy', 'Teacher identity'],
     ['security-settings-copy', 'Workspace access'],
-    ['account-settings-handoff', '30 account slices'],
+    ['account-governance-lifecycle-chain', '30 governance slices'],
     ['notification-settings-copy', 'Classroom updates'],
     ['notification-update-handoff', '30 update slices'],
     ['billing-settings-copy', 'Plan access'],
     ['billing-workspace-handoff', '30 billing slices'],
-    ['payment-callback-copy', '/settings/payment'],
+    ['payment-callback-handoff', '30 callback slices'],
     ['hosted-billing-boundary', 'Hosted checkout and portal'],
     [
       'mail-workspace-boundary',

@@ -9,12 +9,12 @@ export const ACTIVE_SURFACE_PRODUCT_BOUNDARY_ITEM_IDS = [
   'contact-email-routing',
   'profile-settings-copy',
   'security-settings-copy',
-  'account-settings-handoff',
+  'account-governance-lifecycle-chain',
   'notification-settings-copy',
   'notification-update-handoff',
   'billing-settings-copy',
   'billing-workspace-handoff',
-  'payment-callback-copy',
+  'payment-callback-handoff',
   'hosted-billing-boundary',
   'mail-workspace-boundary',
   'mail-template-copy',
@@ -50,13 +50,13 @@ export const ACTIVE_SURFACE_PRODUCT_BOUNDARY_SOURCE_FILES = [
   'src/contact/inquiry-view.ts',
   'src/api/contact.ts',
   'src/components/contact/contact-form-card.tsx',
-  'src/settings/account-handoff.ts',
+  'src/auth/account-governance-lifecycle-chain.ts',
   'src/settings/profile-view.ts',
   'src/settings/security-view.ts',
   'src/settings/notifications-view.ts',
   'src/settings/billing-view.ts',
   'src/routes/settings/billing.tsx',
-  'src/routes/settings/payment.tsx',
+  'src/payment/payment-status-view.ts',
   'src/mail/workspace-boundary.ts',
   'src/mail/templates/verify-email.tsx',
   'src/mail/templates/forgot-password.tsx',
@@ -99,6 +99,8 @@ export type ActiveSurfaceProductBoundaryPrivacyContract = {
   keepsProviderCopyOut: true;
   protectsClassroomProductLoop: true;
   sourceFiles: string[];
+  usesAccountGovernanceLifecycleChain: true;
+  usesPaymentCallbackHandoff: true;
 };
 
 export type ActiveSurfaceProductBoundaryView = {
@@ -115,7 +117,7 @@ export function buildActiveSurfaceProductBoundaryView(): ActiveSurfaceProductBou
 
   return {
     description:
-      'Thirty-slice source boundary for active account, contact, billing, mail, notification, and developer configuration surfaces that must speak in ClassGamify classroom terms.',
+      'Thirty-slice source boundary for active account governance, contact, billing/payment callback, mail, notification, and developer configuration surfaces that must speak in ClassGamify classroom terms.',
     itemViews,
     privacy: {
       activeSourceFileCount:
@@ -136,6 +138,8 @@ export function buildActiveSurfaceProductBoundaryView(): ActiveSurfaceProductBou
       keepsProviderCopyOut: true,
       protectsClassroomProductLoop: true,
       sourceFiles: [...ACTIVE_SURFACE_PRODUCT_BOUNDARY_SOURCE_FILES],
+      usesAccountGovernanceLifecycleChain: true,
+      usesPaymentCallbackHandoff: true,
     },
     title: 'Active surface product boundary',
   };
@@ -226,12 +230,12 @@ function getActiveSurfaceProductBoundaryItem(
         'Workspace access',
         'Security settings frame passwords and deletion as teacher workspace controls.'
       );
-    case 'account-settings-handoff':
+    case 'account-governance-lifecycle-chain':
       return item(
         id,
-        'Account settings handoff',
-        '30 account slices',
-        'Account handoff semantics keep source materials, assignment links, student tokens, and auth secrets private.'
+        'Account governance lifecycle chain',
+        '30 governance slices',
+        'Account governance semantics connect auth, profile/security, deletion, admin users, billing/payment callback, files, and privacy guards.'
       );
     case 'notification-settings-copy':
       return item(
@@ -261,12 +265,12 @@ function getActiveSurfaceProductBoundaryItem(
         '30 billing slices',
         'Billing handoff semantics keep hosted provider flows away from classroom data mutation.'
       );
-    case 'payment-callback-copy':
+    case 'payment-callback-handoff':
       return item(
         id,
-        'Payment callback copy',
-        '/settings/payment',
-        'Payment callback copy returns teachers to safe ClassGamify workspace paths.'
+        'Payment callback handoff',
+        '30 callback slices',
+        'Payment callback semantics keep hosted checkout status, polling, safe returns, plan refresh, provider sessions, and classroom data guards aligned.'
       );
     case 'hosted-billing-boundary':
       return item(

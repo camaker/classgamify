@@ -84,9 +84,10 @@ teacher result review, copy/export/print handoffs, dashboard/public entry
 alignment, or privacy guards.
 Active surface product boundary has a fast script-level gate via
 `pnpm exec tsx --test scripts/active-surface-product-boundary.test.ts`; run it
-when changing active account, contact, billing, mail, notification, or
-developer configuration sources that should speak in current ClassGamify terms
-rather than copied learning-site, starter, or unused provider copy.
+when changing active account governance, contact, billing/payment callback,
+mail, notification, or developer configuration sources that should speak in
+current ClassGamify terms rather than copied learning-site, starter, or unused
+provider copy.
 Public product entry gates include
 `pnpm exec tsx --test scripts/home-product-loop-handoff-semantic-views.test.ts`,
 `pnpm exec tsx --test scripts/public-navigation-handoff-semantic-views.test.ts`,
