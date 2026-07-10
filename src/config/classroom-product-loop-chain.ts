@@ -22,7 +22,7 @@ export const CLASSROOM_PRODUCT_LOOP_CHAIN_HANDOFF_ITEM_IDS = [
   'result-submitted-date-boundary',
   'teacher-result-review-boundary',
   'result-accepted-answer-boundary',
-  'csv-export',
+  'csv-export-boundary',
   'result-explanation-boundary',
   'dashboard-loop-status',
   'teacher-workspace-routes',
@@ -81,16 +81,21 @@ export type ClassroomProductLoopChainPrivacyContract = {
   copyArtifactsUseFormattedExplanations: true;
   csvExportsUseSharedAnswerView: true;
   csvExportsUseFormattedExplanations: true;
+  csvFormulaInjectionGuardEnabled: true;
   createsAssignmentLinksWithoutTeacherAction: false;
   csvDatesUseIsoFormatter: true;
   deliveryPolicyResolvedBeforeAssignmentSurfaces: true;
   exposesAcceptedAlternativesToTeachersOnly: true;
   exposesActivityContentJsonToPublicPayload: false;
+  exposesAssignmentTitle: false;
   exposesAnswerKeysToPublicRunner: false;
   exposesAnswerKeysBeforeAllowedReview: false;
+  exposesCopyArtifactText: false;
+  exposesCsvFilename: false;
   exposesCsvDataUrlInHandoff: false;
   exposesPrivateActivityContent: false;
   exposesRawAnonymousTokens: false;
+  exposesRawAnonymousToken: false;
   exposesRawCopyArtifactsInHandoff: false;
   exposesRawCsvDataUrlInHandoff: false;
   exposesRawRuntimeItemIdsInHandoff: false;
@@ -98,11 +103,16 @@ export type ClassroomProductLoopChainPrivacyContract = {
   exposesResultExportRows: false;
   exposesRuntimeItemIdsInHandoff: false;
   exposesSourceMaterialStorageKeys: false;
+  exposesPromptText: false;
   exposesPromptTextInHandoff: false;
+  exposesStudentAnswerText: false;
   exposesStudentAnswerTextInHandoff: false;
+  exposesStudentInstructions: false;
   exposesStudentNamesInHandoff: false;
+  exposesTeacherAnswerText: false;
   exposesTeacherAnswerTextInHandoff: false;
   exposesTeacherExplanationTextInHandoff: false;
+  exportPreparationScope: 'full-assignment-results';
   exportIncludesSubmittedDateColumns: true;
   freezesAssignmentSnapshots: true;
   itemIds: ClassroomProductLoopChainHandoffItemId[];
@@ -142,6 +152,7 @@ export type ClassroomProductLoopChainPrivacyContract = {
   usesActivityLifecycleGovernanceChain: true;
   usesPublishedAssignmentDeliveryChain: true;
   usesPublicDiscoveryIndexingChain: true;
+  usesAssignmentResultsExportPreparation: true;
   usesResultAcceptedAnswerChain: true;
   usesResultExplanationChain: true;
   usesResultSubmittedDateChain: true;
@@ -177,16 +188,21 @@ export function buildClassroomProductLoopChainHandoffView(): ClassroomProductLoo
       copyArtifactsUseFormattedExplanations: true,
       csvExportsUseSharedAnswerView: true,
       csvExportsUseFormattedExplanations: true,
+      csvFormulaInjectionGuardEnabled: true,
       createsAssignmentLinksWithoutTeacherAction: false,
       csvDatesUseIsoFormatter: true,
       deliveryPolicyResolvedBeforeAssignmentSurfaces: true,
       exposesAcceptedAlternativesToTeachersOnly: true,
       exposesActivityContentJsonToPublicPayload: false,
+      exposesAssignmentTitle: false,
       exposesAnswerKeysToPublicRunner: false,
       exposesAnswerKeysBeforeAllowedReview: false,
+      exposesCopyArtifactText: false,
+      exposesCsvFilename: false,
       exposesCsvDataUrlInHandoff: false,
       exposesPrivateActivityContent: false,
       exposesRawAnonymousTokens: false,
+      exposesRawAnonymousToken: false,
       exposesRawCopyArtifactsInHandoff: false,
       exposesRawCsvDataUrlInHandoff: false,
       exposesRawRuntimeItemIdsInHandoff: false,
@@ -194,11 +210,16 @@ export function buildClassroomProductLoopChainHandoffView(): ClassroomProductLoo
       exposesResultExportRows: false,
       exposesRuntimeItemIdsInHandoff: false,
       exposesSourceMaterialStorageKeys: false,
+      exposesPromptText: false,
       exposesPromptTextInHandoff: false,
+      exposesStudentAnswerText: false,
       exposesStudentAnswerTextInHandoff: false,
+      exposesStudentInstructions: false,
       exposesStudentNamesInHandoff: false,
+      exposesTeacherAnswerText: false,
       exposesTeacherAnswerTextInHandoff: false,
       exposesTeacherExplanationTextInHandoff: false,
+      exportPreparationScope: 'full-assignment-results',
       exportIncludesSubmittedDateColumns: true,
       freezesAssignmentSnapshots: true,
       itemIds: [...CLASSROOM_PRODUCT_LOOP_CHAIN_HANDOFF_ITEM_IDS],
@@ -238,6 +259,7 @@ export function buildClassroomProductLoopChainHandoffView(): ClassroomProductLoo
       usesActivityLifecycleGovernanceChain: true,
       usesPublishedAssignmentDeliveryChain: true,
       usesPublicDiscoveryIndexingChain: true,
+      usesAssignmentResultsExportPreparation: true,
       usesResultAcceptedAnswerChain: true,
       usesResultExplanationChain: true,
       usesResultSubmittedDateChain: true,
@@ -430,12 +452,12 @@ function getClassroomProductLoopChainHandoffItem(
         '30 answer slices',
         'Shared accepted-answer parsing, display normalization, primary-vs-alternative formatting, result cards, item performance tables, attempt review cards, CSV accepted-answer columns, printable review, and privacy guards stay aligned.'
       );
-    case 'csv-export':
+    case 'csv-export-boundary':
       return item(
         id,
-        'CSV export',
-        'Private offline records',
-        'CSV exports preserve delivery policy and scored result context while guarding formula-like text.'
+        'CSV export boundary',
+        '30 export slices',
+        'Full-assignment export scope, frozen snapshot context, delivery policy columns, result metrics, answer rows, accepted alternatives, submitted dates, durations, formula guards, and CSV privacy stay aligned.'
       );
     case 'result-explanation-boundary':
       return item(
