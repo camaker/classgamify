@@ -1217,6 +1217,11 @@ import {
   buildAssignmentDistributionLifecycleChainHandoffView,
 } from '@/assignments/assignment-distribution-lifecycle-chain';
 import {
+  ASSIGNMENT_SOURCE_ACTIVITY_CONTEXT_CHAIN_HANDOFF_ITEM_IDS,
+  ASSIGNMENT_SOURCE_ACTIVITY_CONTEXT_CHAIN_SOURCE_FILES,
+  buildAssignmentSourceActivityContextChainHandoffView,
+} from '@/assignments/source-activity-context-chain';
+import {
   ASSIGNMENT_LIFECYCLE_GOVERNANCE_CHAIN_HANDOFF_ITEM_IDS,
   ASSIGNMENT_LIFECYCLE_GOVERNANCE_CHAIN_SOURCE_FILES,
   buildAssignmentLifecycleGovernanceChainHandoffView,
@@ -5149,6 +5154,114 @@ assert.match(
   readFileSync('tests/e2e/TEST-CATALOG.md', 'utf8'),
   /Assignment distribution lifecycle chain has a fast script-level gate via[\s\S]*scripts\/assignment-distribution-lifecycle-chain-handoff\.test\.ts/,
   'TEST-CATALOG should document the assignment distribution lifecycle chain gate.'
+);
+const assignmentSourceActivityContextChainView =
+  buildAssignmentSourceActivityContextChainHandoffView();
+const assignmentSourceActivityContextChainValues = new Map(
+  assignmentSourceActivityContextChainView.itemViews.map((item) => [
+    item.id,
+    item.value,
+  ])
+);
+assert.deepEqual(
+  assignmentSourceActivityContextChainView.itemViews.map((item) => item.id),
+  [...ASSIGNMENT_SOURCE_ACTIVITY_CONTEXT_CHAIN_HANDOFF_ITEM_IDS],
+  'Assignment source activity context chain should expose the stable 30-slice source-context order.'
+);
+assert.equal(assignmentSourceActivityContextChainView.itemViews.length, 30);
+assert.equal(
+  new Set(ASSIGNMENT_SOURCE_ACTIVITY_CONTEXT_CHAIN_HANDOFF_ITEM_IDS).size,
+  30
+);
+assert.equal(
+  ASSIGNMENT_SOURCE_ACTIVITY_CONTEXT_CHAIN_SOURCE_FILES.length,
+  30
+);
+for (const filePath of ASSIGNMENT_SOURCE_ACTIVITY_CONTEXT_CHAIN_SOURCE_FILES) {
+  assert.ok(
+    existsSync(filePath),
+    `Missing assignment source activity context chain file ${filePath}`
+  );
+}
+assert.ok(
+  assignmentSourceActivityContextChainView.itemViews.every(
+    (item) => item.ariaLabel && item.description && item.label && item.value
+  )
+);
+assert.deepEqual(assignmentSourceActivityContextChainView.privacy, {
+  chainSourceFileCount:
+    ASSIGNMENT_SOURCE_ACTIVITY_CONTEXT_CHAIN_SOURCE_FILES.length,
+  changesAttemptsOrResults: false,
+  changesPublicRunner: false,
+  exposesAnswerKeys: false,
+  exposesRuntimePromptTextInHandoff: false,
+  exposesSourceMaterialStorageKeys: false,
+  exposesStudentAnswerText: false,
+  exposesStudentNames: false,
+  exposesTeacherNotes: false,
+  includesAssignmentListSearch: true,
+  includesPrintableWorksheet: true,
+  includesResultsExport: true,
+  itemIds: [...ASSIGNMENT_SOURCE_ACTIVITY_CONTEXT_CHAIN_HANDOFF_ITEM_IDS],
+  keepsLiveActivityFallback: true,
+  requiresAssignmentSnapshotBoundary: true,
+  sourceFiles: [...ASSIGNMENT_SOURCE_ACTIVITY_CONTEXT_CHAIN_SOURCE_FILES],
+  usesFrozenSnapshotSource: true,
+});
+assert.deepEqual(
+  [
+    ASSIGNMENT_LIST_PAGE_HANDOFF_ITEM_IDS.length,
+    ASSIGNMENT_RESULTS_EXPORT_PREPARATION_ITEM_IDS.length,
+    PRINTABLE_WORKSHEET_HANDOFF_ITEM_IDS.length,
+    PRINTABLE_WORKSHEET_REVIEW_LIFECYCLE_CHAIN_HANDOFF_ITEM_IDS.length,
+    ASSIGNMENT_DISTRIBUTION_LIFECYCLE_CHAIN_HANDOFF_ITEM_IDS.length,
+    WORKSHEET_MODE_DELIVERY_CHAIN_HANDOFF_ITEM_IDS.length,
+    CLASSROOM_DATA_LIFECYCLE_CHAIN_HANDOFF_ITEM_IDS.length,
+    TEACHER_RESULTS_REVIEW_CHAIN_HANDOFF_ITEM_IDS.length,
+    SCORED_ATTEMPT_RESULT_CHAIN_HANDOFF_ITEM_IDS.length,
+  ],
+  Array.from({ length: 9 }, () => 30),
+  'Assignment source activity context chain should stay backed by list, export, printable, distribution, worksheet, data, results, and scored-result gates.'
+);
+assert.deepEqual(
+  Object.fromEntries(assignmentSourceActivityContextChainValues),
+  {
+    'product-source-policy': 'Source context first-class',
+    'snapshot-schema-fields': 'Title and description',
+    'snapshot-freeze-insert': 'Copied from activity',
+    'snapshot-source-resolver': 'Snapshot before live',
+    'runtime-source-resolver': 'Runtime from source',
+    'list-search-current-title': 'Current title searchable',
+    'list-search-current-description': 'Current description searchable',
+    'list-search-snapshot-title': 'Frozen title searchable',
+    'list-search-snapshot-description': 'Frozen description searchable',
+    'list-card-source-description': 'Frozen description shown',
+    'public-payload-source-summary': 'Sanitized source summary',
+    'public-snapshot-summary': 'Snapshot metadata only',
+    'result-header-source-context': 'Teacher result context',
+    'result-print-action-context': 'Print from result source',
+    'export-source-title-column': 'activity_title',
+    'export-source-description-column': 'activity_description',
+    'export-template-context': 'activity_template',
+    'printable-builder-source-context': 'Worksheet source',
+    'printable-header-description': 'Header description',
+    'printable-assignment-field-description': 'Paper source field',
+    'printable-handoff-field-count': '9 print fields',
+    'distribution-chain-alignment': 'Distribution aligned',
+    'worksheet-chain-alignment': 'Worksheet aligned',
+    'data-lifecycle-alignment': 'Snapshot retained',
+    'teacher-results-chain-alignment': 'Results aligned',
+    'copy-lifecycle-alignment': 'Copy aligned',
+    'scored-result-chain-alignment': 'Scoring aligned',
+    'source-material-storage-guard': 'Storage keys omitted',
+    'student-data-privacy-guard': 'Student data omitted',
+    'source-context-gate': '30 source files',
+  }
+);
+assert.match(
+  readFileSync('tests/e2e/TEST-CATALOG.md', 'utf8'),
+  /Assignment source-activity context chain has a fast script-level gate via[\s\S]*scripts\/assignment-source-activity-context-chain-handoff\.test\.ts/,
+  'TEST-CATALOG should document the assignment source-activity context chain gate.'
 );
 const answerFeedbackLifecycleChainView =
   buildAnswerFeedbackLifecycleChainHandoffView();
