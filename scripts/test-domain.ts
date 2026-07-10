@@ -1012,6 +1012,11 @@ import {
   buildTeacherResultsReviewChainHandoffView,
 } from '@/assignments/teacher-results-review-chain';
 import {
+  TEACHER_RESULT_COPY_LIFECYCLE_CHAIN_HANDOFF_ITEM_IDS,
+  TEACHER_RESULT_COPY_LIFECYCLE_CHAIN_SOURCE_FILES,
+  buildTeacherResultCopyLifecycleChainHandoffView,
+} from '@/assignments/teacher-result-copy-lifecycle-chain';
+import {
   ASSIGNMENT_RESULT_EMPTY_STATE_HANDOFF_ITEM_IDS,
   buildAssignmentResultEmptyStateHandoffView,
 } from '@/assignments/result-empty-state-handoff';
@@ -5332,6 +5337,92 @@ assert.match(
   readFileSync('tests/e2e/TEST-CATALOG.md', 'utf8'),
   /Teacher results review chain has a fast script-level gate via[\s\S]*scripts\/teacher-results-review-chain-handoff\.test\.ts/,
   'TEST-CATALOG should document the teacher results review chain gate.'
+);
+const teacherResultCopyLifecycleChainView =
+  buildTeacherResultCopyLifecycleChainHandoffView();
+const teacherResultCopyLifecycleChainValues = new Map(
+  teacherResultCopyLifecycleChainView.itemViews.map((item) => [
+    item.id,
+    item.value,
+  ])
+);
+assert.deepEqual(
+  teacherResultCopyLifecycleChainView.itemViews.map((item) => item.id),
+  [...TEACHER_RESULT_COPY_LIFECYCLE_CHAIN_HANDOFF_ITEM_IDS],
+  'Teacher result copy lifecycle chain should expose the stable 30-slice copy artifact order.'
+);
+assert.equal(teacherResultCopyLifecycleChainView.itemViews.length, 30);
+assert.equal(
+  new Set(TEACHER_RESULT_COPY_LIFECYCLE_CHAIN_HANDOFF_ITEM_IDS).size,
+  30
+);
+assert.equal(TEACHER_RESULT_COPY_LIFECYCLE_CHAIN_SOURCE_FILES.length, 30);
+for (const filePath of TEACHER_RESULT_COPY_LIFECYCLE_CHAIN_SOURCE_FILES) {
+  assert.ok(
+    existsSync(filePath),
+    `Missing teacher result copy lifecycle chain file ${filePath}`
+  );
+}
+assert.ok(
+  teacherResultCopyLifecycleChainView.itemViews.every(
+    (item) => item.ariaLabel && item.description && item.label && item.value
+  )
+);
+assert.deepEqual(teacherResultCopyLifecycleChainView.privacy, {
+  appendsCopyScopeToArtifacts: true,
+  chainSourceFileCount:
+    TEACHER_RESULT_COPY_LIFECYCLE_CHAIN_SOURCE_FILES.length,
+  exposesAcceptedAnswerTextInHandoff: false,
+  exposesCsvDataUrlInHandoff: false,
+  exposesExpectedAnswerTextInHandoff: false,
+  exposesPromptTextInHandoff: false,
+  exposesRawAnonymousTokensInHandoff: false,
+  exposesRawCopyArtifactTextInHandoff: false,
+  exposesStudentAnswerTextInHandoff: false,
+  exposesStudentLabelsInHandoff: false,
+  itemIds: [...TEACHER_RESULT_COPY_LIFECYCLE_CHAIN_HANDOFF_ITEM_IDS],
+  keepsCsvExportFullAssignment: true,
+  mutatesPublicRunner: false,
+  sourceFiles: [...TEACHER_RESULT_COPY_LIFECYCLE_CHAIN_SOURCE_FILES],
+  usesCurrentReviewScopeForCopyActions: true,
+  usesSharedCopyArtifactBuilders: true,
+});
+assert.deepEqual(Object.fromEntries(teacherResultCopyLifecycleChainValues), {
+  'classroom-brief-builder': 'Brief artifact',
+  'classroom-brief-focus-items': 'Lowest items',
+  'classroom-brief-follow-up-students': 'Support list',
+  'classroom-brief-metrics': 'Shared stats',
+  'copy-action-buttons': 'Four copy actions',
+  'copy-action-execution-plan': 'Copy text',
+  'copy-action-gates': 'Ready or blocked',
+  'copy-action-scope': 'Current review',
+  'copy-handoff-hidden-dom': 'sr-only dl',
+  'copy-lifecycle-gate': '30 source files',
+  'copy-line-normalization': 'Line joiner',
+  'copy-preview-builder': 'Preview cards',
+  'copy-preview-meta': 'Preview counts',
+  'copy-scope-appended': 'Scope block',
+  'copy-title-normalization': 'NFKC title',
+  'current-review-data-set': 'Filtered copy data',
+  'item-review-answer-coverage': 'Answer evidence',
+  'item-review-summary-builder': 'Prompt summary',
+  'latest-attempt-context': 'Latest attempt',
+  'privacy-guards': 'Private text hidden',
+  'product-copy-artifact-policy': 'Teacher copy loop',
+  'result-page-card-consumer': 'Brief card',
+  'result-view-assembly': 'View model',
+  'reteach-plan-builder': 'Classroom script',
+  'reteach-plan-review-items': 'Priority items',
+  'reteach-plan-student-follow-up': 'Priority students',
+  'review-scope-source': 'Search/sort/filter',
+  'student-follow-up-priority-order': 'Needs review first',
+  'student-follow-up-summary-builder': 'Student support',
+  'teacher-results-chain-alignment': 'Results chain',
+});
+assert.match(
+  readFileSync('tests/e2e/TEST-CATALOG.md', 'utf8'),
+  /Teacher result copy lifecycle chain has a fast script-level gate via[\s\S]*scripts\/teacher-result-copy-lifecycle-chain-handoff\.test\.ts/,
+  'TEST-CATALOG should document the teacher result copy lifecycle chain gate.'
 );
 assert.doesNotMatch(
   [
