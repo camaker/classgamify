@@ -32,7 +32,10 @@ import {
   PUBLISHED_ASSIGNMENT_DELIVERY_CHAIN_HANDOFF_ITEM_IDS,
   PUBLISHED_ASSIGNMENT_DELIVERY_CHAIN_SOURCE_FILES,
 } from '@/assignments/published-assignment-delivery-chain';
-import { ASSIGNMENT_RESULT_ACCEPTED_ANSWER_CHAIN_HANDOFF_ITEM_IDS } from '@/assignments/result-accepted-answer-chain';
+import {
+  ASSIGNMENT_RESULT_ACCEPTED_ANSWER_CHAIN_HANDOFF_ITEM_IDS,
+  ASSIGNMENT_RESULT_ACCEPTED_ANSWER_CHAIN_SOURCE_FILES,
+} from '@/assignments/result-accepted-answer-chain';
 import { ASSIGNMENT_RESULT_EXPLANATION_CHAIN_HANDOFF_ITEM_IDS } from '@/assignments/result-explanation-chain';
 import {
   ASSIGNMENT_RESULT_SUBMITTED_DATE_CHAIN_HANDOFF_ITEM_IDS,
@@ -104,6 +107,7 @@ test('classroom product loop chain exposes 30 safe product slices', () => {
   assert.deepEqual(handoffView.privacy, {
     chainSourceFileCount: CLASSROOM_PRODUCT_LOOP_CHAIN_SOURCE_FILES.length,
     copyArtifactsUseFormattedDates: true,
+    csvExportsUseSharedAnswerView: true,
     createsAssignmentLinksWithoutTeacherAction: false,
     csvDatesUseIsoFormatter: true,
     deliveryPolicyResolvedBeforeAssignmentSurfaces: true,
@@ -112,12 +116,15 @@ test('classroom product loop chain exposes 30 safe product slices', () => {
     exposesCsvDataUrlInHandoff: false,
     exposesPrivateActivityContent: false,
     exposesRawAnonymousTokens: false,
+    exposesRawRuntimeItemIdsInHandoff: false,
     exposesRawSubmissionPayload: false,
     exposesResultExportRows: false,
     exposesRuntimeItemIdsInHandoff: false,
     exposesSourceMaterialStorageKeys: false,
+    exposesPromptTextInHandoff: false,
     exposesStudentAnswerTextInHandoff: false,
     exposesStudentNamesInHandoff: false,
+    exposesTeacherAnswerTextInHandoff: false,
     exportIncludesSubmittedDateColumns: true,
     freezesAssignmentSnapshots: true,
     itemIds,
@@ -135,12 +142,15 @@ test('classroom product loop chain exposes 30 safe product slices', () => {
     publicStudentRunnerPayloadUsesSanitizedRuntimeItems: true,
     rejectsClosedOrExpiredStudentRunnerSubmissions: true,
     rejectsInvalidSubmissions: true,
+    resultPagesUseSharedAnswerView: true,
     resultSubmittedDateSortingUsesTimestampParsing: true,
     resultUiDatesUseLocalizedFormatter: true,
     requiresTeacherReviewForAiEnhancements: true,
     requiresTeacherReviewForAiDrafts: true,
     resultConsumersUseScoredAttempts: true,
+    scoringUsesSharedAcceptedAnswerParser: true,
     sourceFiles: [...CLASSROOM_PRODUCT_LOOP_CHAIN_SOURCE_FILES],
+    splitsPrimaryFromAlternatives: true,
     storesImmutableScoredAttemptAnswerJson: true,
     storesImmutableScoredAttemptResultJson: true,
     usesAiEnhancementLifecycleChain: true,
@@ -149,6 +159,7 @@ test('classroom product loop chain exposes 30 safe product slices', () => {
     usesActivityLifecycleGovernanceChain: true,
     usesPublishedAssignmentDeliveryChain: true,
     usesPublicDiscoveryIndexingChain: true,
+    usesResultAcceptedAnswerChain: true,
     usesResultSubmittedDateChain: true,
     usesScoredAttemptResultChain: true,
     usesSharedAttemptStats: true,
@@ -188,7 +199,7 @@ test('classroom product loop chain summarizes activity to results flow', () => {
       ['answer-feedback-policy', 'Reveal if allowed'],
       ['result-submitted-date-boundary', '30 date slices'],
       ['teacher-result-review', 'Reteach evidence'],
-      ['result-accepted-answer-continuity', 'Accepted alternatives'],
+      ['result-accepted-answer-boundary', '30 answer slices'],
       ['csv-export', 'Private offline records'],
       ['result-explanation-continuity', 'Answer explanations'],
       ['dashboard-loop-status', 'Create/publish/play/review'],
@@ -242,6 +253,7 @@ test('classroom product loop chain is backed by adjacent focused gates', () => {
       ASSIGNMENT_RESULT_SUBMITTED_DATE_CHAIN_HANDOFF_ITEM_IDS.length,
       ASSIGNMENT_RESULT_SUBMITTED_DATE_CHAIN_SOURCE_FILES.length,
       ASSIGNMENT_RESULT_ACCEPTED_ANSWER_CHAIN_HANDOFF_ITEM_IDS.length,
+      ASSIGNMENT_RESULT_ACCEPTED_ANSWER_CHAIN_SOURCE_FILES.length,
       ASSIGNMENT_RESULT_EXPLANATION_CHAIN_HANDOFF_ITEM_IDS.length,
       TEACHER_RESULTS_REVIEW_CHAIN_HANDOFF_ITEM_IDS.length,
       TEACHER_RESULT_COPY_LIFECYCLE_CHAIN_HANDOFF_ITEM_IDS.length,
@@ -251,7 +263,7 @@ test('classroom product loop chain is backed by adjacent focused gates', () => {
       PUBLIC_DISCOVERY_INDEXING_CHAIN_SOURCE_FILES.length,
       CLASSROOM_TRUST_COMMUNICATION_CHAIN_HANDOFF_ITEM_IDS.length,
     ],
-    Array.from({ length: 35 }, () => 30)
+    Array.from({ length: 36 }, () => 30)
   );
 });
 
@@ -268,7 +280,7 @@ test('classroom product loop chain is documented in product and catalog', () => 
   );
   assert.match(
     NORMALIZED_PRODUCT_SOURCE,
-    /src\/config\/classroom-product-loop-chain\.ts` owns the cross-surface product-loop handoff[\s\S]*teacher-owned activities[\s\S]*activity authoring\/library[\s\S]*source extraction lifecycle[\s\S]*activity lifecycle governance[\s\S]*template roadmap capability[\s\S]*AI enhancement lifecycle[\s\S]*published assignment delivery[\s\S]*student runner play[\s\S]*validated attempts[\s\S]*scored attempt results[\s\S]*submitted-date continuity[\s\S]*accepted-answer[\s\S]*explanation continuity[\s\S]*teacher result review[\s\S]*copy\/export\/print handoffs[\s\S]*public discovery\/indexing[\s\S]*privacy guards/,
+    /src\/config\/classroom-product-loop-chain\.ts` owns the cross-surface product-loop handoff[\s\S]*teacher-owned activities[\s\S]*activity authoring\/library[\s\S]*source extraction lifecycle[\s\S]*activity lifecycle governance[\s\S]*template roadmap capability[\s\S]*AI enhancement lifecycle[\s\S]*published assignment delivery[\s\S]*student runner play[\s\S]*validated attempts[\s\S]*scored attempt results[\s\S]*submitted-date continuity[\s\S]*accepted-answer continuity[\s\S]*explanation continuity[\s\S]*teacher result review[\s\S]*copy\/export\/print handoffs[\s\S]*public discovery\/indexing[\s\S]*privacy guards/,
     'docs/product.md should document the classroom product loop chain owner.'
   );
   assert.match(

@@ -21,7 +21,7 @@ export const CLASSROOM_PRODUCT_LOOP_CHAIN_HANDOFF_ITEM_IDS = [
   'answer-feedback-policy',
   'result-submitted-date-boundary',
   'teacher-result-review',
-  'result-accepted-answer-continuity',
+  'result-accepted-answer-boundary',
   'csv-export',
   'result-explanation-continuity',
   'dashboard-loop-status',
@@ -78,6 +78,7 @@ export type ClassroomProductLoopChainHandoffItemView = {
 export type ClassroomProductLoopChainPrivacyContract = {
   chainSourceFileCount: number;
   copyArtifactsUseFormattedDates: true;
+  csvExportsUseSharedAnswerView: true;
   createsAssignmentLinksWithoutTeacherAction: false;
   csvDatesUseIsoFormatter: true;
   deliveryPolicyResolvedBeforeAssignmentSurfaces: true;
@@ -86,12 +87,15 @@ export type ClassroomProductLoopChainPrivacyContract = {
   exposesCsvDataUrlInHandoff: false;
   exposesPrivateActivityContent: false;
   exposesRawAnonymousTokens: false;
+  exposesRawRuntimeItemIdsInHandoff: false;
   exposesRawSubmissionPayload: false;
   exposesResultExportRows: false;
   exposesRuntimeItemIdsInHandoff: false;
   exposesSourceMaterialStorageKeys: false;
+  exposesPromptTextInHandoff: false;
   exposesStudentAnswerTextInHandoff: false;
   exposesStudentNamesInHandoff: false;
+  exposesTeacherAnswerTextInHandoff: false;
   exportIncludesSubmittedDateColumns: true;
   freezesAssignmentSnapshots: true;
   itemIds: ClassroomProductLoopChainHandoffItemId[];
@@ -109,12 +113,15 @@ export type ClassroomProductLoopChainPrivacyContract = {
   publicStudentRunnerPayloadUsesSanitizedRuntimeItems: true;
   rejectsClosedOrExpiredStudentRunnerSubmissions: true;
   rejectsInvalidSubmissions: true;
+  resultPagesUseSharedAnswerView: true;
   resultSubmittedDateSortingUsesTimestampParsing: true;
   resultUiDatesUseLocalizedFormatter: true;
   requiresTeacherReviewForAiEnhancements: true;
   requiresTeacherReviewForAiDrafts: true;
   resultConsumersUseScoredAttempts: true;
+  scoringUsesSharedAcceptedAnswerParser: true;
   sourceFiles: string[];
+  splitsPrimaryFromAlternatives: true;
   storesImmutableScoredAttemptAnswerJson: true;
   storesImmutableScoredAttemptResultJson: true;
   usesAiEnhancementLifecycleChain: true;
@@ -123,6 +130,7 @@ export type ClassroomProductLoopChainPrivacyContract = {
   usesActivityLifecycleGovernanceChain: true;
   usesPublishedAssignmentDeliveryChain: true;
   usesPublicDiscoveryIndexingChain: true;
+  usesResultAcceptedAnswerChain: true;
   usesResultSubmittedDateChain: true;
   usesScoredAttemptResultChain: true;
   usesSharedAttemptStats: true;
@@ -146,11 +154,12 @@ export function buildClassroomProductLoopChainHandoffView(): ClassroomProductLoo
 
   return {
     description:
-      'Thirty-slice classroom product loop chain from teacher-owned activities and reusable content through activity authoring/library workflow, source extraction lifecycle boundaries, activity lifecycle governance, template roadmap capability alignment, AI enhancement lifecycle review, published assignment delivery, student runner play, validated attempts, scored attempt results, submitted-date continuity, accepted-answer, and explanation continuity, teacher review, copy/export/print handoffs, dashboard status, public discovery/indexing metadata, and privacy guards.',
+      'Thirty-slice classroom product loop chain from teacher-owned activities and reusable content through activity authoring/library workflow, source extraction lifecycle boundaries, activity lifecycle governance, template roadmap capability alignment, AI enhancement lifecycle review, published assignment delivery, student runner play, validated attempts, scored attempt results, submitted-date continuity, accepted-answer continuity, and explanation continuity, teacher review, copy/export/print handoffs, dashboard status, public discovery/indexing metadata, and privacy guards.',
     itemViews,
     privacy: {
       chainSourceFileCount: CLASSROOM_PRODUCT_LOOP_CHAIN_SOURCE_FILES.length,
       copyArtifactsUseFormattedDates: true,
+      csvExportsUseSharedAnswerView: true,
       createsAssignmentLinksWithoutTeacherAction: false,
       csvDatesUseIsoFormatter: true,
       deliveryPolicyResolvedBeforeAssignmentSurfaces: true,
@@ -159,12 +168,15 @@ export function buildClassroomProductLoopChainHandoffView(): ClassroomProductLoo
       exposesCsvDataUrlInHandoff: false,
       exposesPrivateActivityContent: false,
       exposesRawAnonymousTokens: false,
+      exposesRawRuntimeItemIdsInHandoff: false,
       exposesRawSubmissionPayload: false,
       exposesResultExportRows: false,
       exposesRuntimeItemIdsInHandoff: false,
       exposesSourceMaterialStorageKeys: false,
+      exposesPromptTextInHandoff: false,
       exposesStudentAnswerTextInHandoff: false,
       exposesStudentNamesInHandoff: false,
+      exposesTeacherAnswerTextInHandoff: false,
       exportIncludesSubmittedDateColumns: true,
       freezesAssignmentSnapshots: true,
       itemIds: [...CLASSROOM_PRODUCT_LOOP_CHAIN_HANDOFF_ITEM_IDS],
@@ -182,12 +194,15 @@ export function buildClassroomProductLoopChainHandoffView(): ClassroomProductLoo
       publicStudentRunnerPayloadUsesSanitizedRuntimeItems: true,
       rejectsClosedOrExpiredStudentRunnerSubmissions: true,
       rejectsInvalidSubmissions: true,
+      resultPagesUseSharedAnswerView: true,
       resultSubmittedDateSortingUsesTimestampParsing: true,
       resultUiDatesUseLocalizedFormatter: true,
       requiresTeacherReviewForAiEnhancements: true,
       requiresTeacherReviewForAiDrafts: true,
       resultConsumersUseScoredAttempts: true,
+      scoringUsesSharedAcceptedAnswerParser: true,
       sourceFiles: [...CLASSROOM_PRODUCT_LOOP_CHAIN_SOURCE_FILES],
+      splitsPrimaryFromAlternatives: true,
       storesImmutableScoredAttemptAnswerJson: true,
       storesImmutableScoredAttemptResultJson: true,
       usesAiEnhancementLifecycleChain: true,
@@ -196,6 +211,7 @@ export function buildClassroomProductLoopChainHandoffView(): ClassroomProductLoo
       usesActivityLifecycleGovernanceChain: true,
       usesPublishedAssignmentDeliveryChain: true,
       usesPublicDiscoveryIndexingChain: true,
+      usesResultAcceptedAnswerChain: true,
       usesResultSubmittedDateChain: true,
       usesScoredAttemptResultChain: true,
       usesSharedAttemptStats: true,
@@ -377,12 +393,12 @@ function getClassroomProductLoopChainHandoffItem(
         'Reteach evidence',
         'Teacher result pages combine frozen runtime items with stored attempts for item performance and student follow-up.'
       );
-    case 'result-accepted-answer-continuity':
+    case 'result-accepted-answer-boundary':
       return item(
         id,
-        'Result accepted-answer continuity',
-        'Accepted alternatives',
-        'Scoring, feedback, teacher review, CSV exports, and printable answer keys share primary and alternative answer formatting.'
+        'Result accepted-answer boundary',
+        '30 answer slices',
+        'Shared accepted-answer parsing, display normalization, primary-vs-alternative formatting, result cards, item performance tables, attempt review cards, CSV accepted-answer columns, printable review, and privacy guards stay aligned.'
       );
     case 'csv-export':
       return item(
