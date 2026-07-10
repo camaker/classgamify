@@ -16636,9 +16636,11 @@ assert.deepEqual(classroomProductLoopChainView.privacy, {
   keepsDashboardOwnerScoped: true,
   publicPayloadUsesRuntimeItemsOnly: true,
   rejectsInvalidSubmissions: true,
+  requiresTeacherReviewForAiEnhancements: true,
   requiresTeacherReviewForAiDrafts: true,
   resultConsumersUseScoredAttempts: true,
   sourceFiles: [...CLASSROOM_PRODUCT_LOOP_CHAIN_SOURCE_FILES],
+  usesAiEnhancementLifecycleChain: true,
   usesActivityAssignmentAttemptResultsLoop: true,
 });
 assert.deepEqual(
@@ -16651,6 +16653,8 @@ assert.deepEqual(
     ACTIVITY_LIFECYCLE_GOVERNANCE_CHAIN_HANDOFF_ITEM_IDS.length,
     ACTIVITY_AI_AUTHORING_CHAIN_HANDOFF_ITEM_IDS.length,
     ACTIVITY_AI_AUTHORING_CHAIN_SOURCE_FILES.length,
+    ACTIVITY_AI_ENHANCEMENT_LIFECYCLE_CHAIN_ITEM_IDS.length,
+    ACTIVITY_AI_ENHANCEMENT_LIFECYCLE_CHAIN_SOURCE_FILES.length,
     SOURCE_MATERIAL_PRIVACY_CHAIN_HANDOFF_ITEM_IDS.length,
     PUBLISHED_ASSIGNMENT_DELIVERY_CHAIN_HANDOFF_ITEM_IDS.length,
     STUDENT_RUNNER_PLAY_CHAIN_HANDOFF_ITEM_IDS.length,
@@ -16665,8 +16669,8 @@ assert.deepEqual(
     PRINTABLE_WORKSHEET_REVIEW_LIFECYCLE_CHAIN_HANDOFF_ITEM_IDS.length,
     CLASSROOM_TRUST_COMMUNICATION_CHAIN_HANDOFF_ITEM_IDS.length,
   ],
-  Array.from({ length: 21 }, () => 30),
-  'Classroom product loop chain should stay backed by adjacent public entry, workspace, data, authoring, delivery, runner, result continuity, export, print, and trust gates.'
+  Array.from({ length: 23 }, () => 30),
+  'Classroom product loop chain should stay backed by adjacent public entry, workspace, data, authoring, AI enhancement lifecycle, delivery, runner, result continuity, export, print, and trust gates.'
 );
 assert.deepEqual(Object.fromEntries(classroomProductLoopChainValues), {
   'activity-authoring-entry': 'Create editor',
@@ -16674,7 +16678,7 @@ assert.deepEqual(Object.fromEntries(classroomProductLoopChainValues), {
   'activity-library-owner-scope': 'Owner activities only',
   'activity-lifecycle-derivative-guard': 'Restore before derive',
   'activity-model': 'Teacher-owned activity',
-  'ai-authoring-draft-boundary': 'Teacher-reviewed draft',
+  'ai-enhancement-lifecycle-boundary': 'Policy-to-publish review',
   'answer-feedback-policy': 'Reveal if allowed',
   'assignment-publish-preflight': 'Delivery settings review',
   'assignment-snapshot-freeze': 'Frozen ActivityContent',
@@ -16707,7 +16711,7 @@ assert.match(
 );
 assert.match(
   readFileSync('tests/e2e/TEST-CATALOG.md', 'utf8').replace(/\s+/g, ' '),
-  /Activity -> Assignment -> Attempt -> Results[\s\S]*activity authoring[\s\S]*assignment publish[\s\S]*student runner[\s\S]*scored attempts[\s\S]*submitted-date continuity[\s\S]*accepted-answer continuity[\s\S]*explanation continuity[\s\S]*teacher result review[\s\S]*copy\/export\/print handoffs[\s\S]*privacy guards/,
+  /Activity -> Assignment -> Attempt -> Results[\s\S]*activity authoring[\s\S]*AI enhancement lifecycle[\s\S]*assignment publish[\s\S]*student runner[\s\S]*scored attempts[\s\S]*submitted-date continuity[\s\S]*accepted-answer continuity[\s\S]*explanation continuity[\s\S]*teacher result review[\s\S]*copy\/export\/print handoffs[\s\S]*privacy guards/,
   'TEST-CATALOG should describe the full classroom product loop chain scope.'
 );
 const classroomTrustCommunicationChainView =

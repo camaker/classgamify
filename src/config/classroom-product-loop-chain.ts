@@ -5,7 +5,7 @@ export const CLASSROOM_PRODUCT_LOOP_CHAIN_HANDOFF_ITEM_IDS = [
   'activity-library-owner-scope',
   'activity-authoring-entry',
   'template-scaffold-entry',
-  'ai-authoring-draft-boundary',
+  'ai-enhancement-lifecycle-boundary',
   'source-material-reference-boundary',
   'activity-lifecycle-derivative-guard',
   'assignment-publish-preflight',
@@ -40,7 +40,7 @@ export const CLASSROOM_PRODUCT_LOOP_CHAIN_SOURCE_FILES = [
   'src/activities/types.ts',
   'src/activities/validation.ts',
   'src/activities/scaffolds.ts',
-  'src/activities/ai-authoring-chain.ts',
+  'src/activities/ai-enhancement-lifecycle-chain.ts',
   'src/activities/authoring-library-chain.ts',
   'src/activities/activity-lifecycle-governance-chain.ts',
   'src/activities/source-material-privacy-chain.ts',
@@ -96,9 +96,11 @@ export type ClassroomProductLoopChainPrivacyContract = {
   keepsDashboardOwnerScoped: true;
   publicPayloadUsesRuntimeItemsOnly: true;
   rejectsInvalidSubmissions: true;
+  requiresTeacherReviewForAiEnhancements: true;
   requiresTeacherReviewForAiDrafts: true;
   resultConsumersUseScoredAttempts: true;
   sourceFiles: string[];
+  usesAiEnhancementLifecycleChain: true;
   usesActivityAssignmentAttemptResultsLoop: true;
 };
 
@@ -116,7 +118,7 @@ export function buildClassroomProductLoopChainHandoffView(): ClassroomProductLoo
 
   return {
     description:
-      'Thirty-slice classroom product loop chain from teacher-owned activities and reusable content through assignment publish, frozen snapshots, public student play, validated attempts, scored results, submitted-date, accepted-answer, and explanation continuity, teacher review, copy/export/print handoffs, dashboard status, public entry points, and privacy guards.',
+      'Thirty-slice classroom product loop chain from teacher-owned activities and reusable content through AI enhancement lifecycle review, assignment publish, frozen snapshots, public student play, validated attempts, scored results, submitted-date, accepted-answer, and explanation continuity, teacher review, copy/export/print handoffs, dashboard status, public entry points, and privacy guards.',
     itemViews,
     privacy: {
       chainSourceFileCount: CLASSROOM_PRODUCT_LOOP_CHAIN_SOURCE_FILES.length,
@@ -139,9 +141,11 @@ export function buildClassroomProductLoopChainHandoffView(): ClassroomProductLoo
       keepsDashboardOwnerScoped: true,
       publicPayloadUsesRuntimeItemsOnly: true,
       rejectsInvalidSubmissions: true,
+      requiresTeacherReviewForAiEnhancements: true,
       requiresTeacherReviewForAiDrafts: true,
       resultConsumersUseScoredAttempts: true,
       sourceFiles: [...CLASSROOM_PRODUCT_LOOP_CHAIN_SOURCE_FILES],
+      usesAiEnhancementLifecycleChain: true,
       usesActivityAssignmentAttemptResultsLoop: true,
     },
     title: 'Classroom product loop chain',
@@ -205,12 +209,12 @@ function getClassroomProductLoopChainHandoffItem(
         'Reviewed scaffold',
         'Template scaffolds demonstrate playable structured content without bypassing teacher review.'
       );
-    case 'ai-authoring-draft-boundary':
+    case 'ai-enhancement-lifecycle-boundary':
       return item(
         id,
-        'AI authoring draft boundary',
-        'Teacher-reviewed draft',
-        'AI drafts fill CreateActivityInput for editor review and cannot persist or publish directly.'
+        'AI enhancement lifecycle boundary',
+        'Policy-to-publish review',
+        'AI enhancements stay inside policy, execution, draft output, editor application, teacher review, save, publish, snapshot, public payload, and result-continuity gates.'
       );
     case 'source-material-reference-boundary':
       return item(
