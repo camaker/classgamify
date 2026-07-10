@@ -141,6 +141,10 @@ import {
   buildAssignmentCopyArtifactHandoffView,
   type AssignmentCopyArtifactHandoffView,
 } from '@/assignments/copy-artifact-handoff';
+import {
+  buildTeacherResultsReviewChainHandoffView,
+  type TeacherResultsReviewChainHandoffView,
+} from '@/assignments/teacher-results-review-chain';
 import type {
   ActivityTemplateType,
   AssignmentSettings,
@@ -855,6 +859,7 @@ export type AssignmentResultsPageViewModel<
   studentSearchHandoffView: AssignmentResultStudentSearchHandoffView;
   studentSummaryRowViews: AssignmentResultStudentSummaryRowView[];
   studentSummaryTableView: AssignmentResultStudentSummaryTableView;
+  teacherResultsReviewChainHandoffView: TeacherResultsReviewChainHandoffView;
   title: string;
   viewState: AssignmentResultResolvedViewState;
 };
@@ -2745,6 +2750,8 @@ export function buildAssignmentResultsPageViewModel<
         headerView?.settingsSummaryView.settings.timeLimitSeconds,
     })
   );
+  const teacherResultsReviewChainHandoffView =
+    buildTeacherResultsReviewChainHandoffView();
 
   return {
     actionButtons,
@@ -2806,6 +2813,7 @@ export function buildAssignmentResultsPageViewModel<
     studentSearchHandoffView,
     studentSummaryRowViews,
     studentSummaryTableView,
+    teacherResultsReviewChainHandoffView,
     title,
     viewState,
   };

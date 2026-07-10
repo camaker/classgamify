@@ -176,6 +176,9 @@ function LoadedAssignmentResultsPage({
           <AssignmentResultsReviewScopePanel view={pageView.reviewScopeView} />
           <AssignmentResultsReviewHandoffPanel
             controlsView={pageView.reviewControlsHandoffView}
+            teacherResultsReviewChainView={
+              pageView.teacherResultsReviewChainHandoffView
+            }
             view={pageView.reviewHandoffView}
           />
           <AssignmentResultsStudentSearch

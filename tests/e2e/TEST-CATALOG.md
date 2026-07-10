@@ -329,6 +329,13 @@ item-performance sorting, answer-review filtering, route default elision,
 invalid-route guards, review-scope summaries, copy-scope alignment, result
 tables, answer review cards, copy artifacts, anonymous-label search, or the
 assignment-result-review-controls handoff.
+Teacher results review chain has a fast script-level gate via
+`pnpm exec tsx --test scripts/teacher-results-review-chain-handoff.test.ts`;
+run it when changing owner-scoped result routes, frozen snapshots, attempt
+stats, review controls, student search/sort rules, item performance sorting,
+copy artifacts, CSV exports, result-material privacy, empty-result guidance,
+anonymous-token guards, source-material guards, or the hidden
+teacher-results-review-chain handoff.
 Assignment item performance sort has a fast script-level gate via
 `pnpm exec tsx --test scripts/assignment-item-performance-sort-handoff-semantic-views.test.ts`;
 run it when changing snapshot order, lowest accuracy, most answered, or item

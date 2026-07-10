@@ -869,6 +869,8 @@ import {
   buildAssignmentAttemptReviewCardHandoffEvidence,
   buildAssignmentAttemptReviewCardHandoffView,
 } from '@/assignments/attempt-review-card-handoff';
+import { ASSIGNMENT_COPY_ARTIFACT_HANDOFF_ITEM_IDS } from '@/assignments/copy-artifact-handoff';
+import { ASSIGNMENT_RESULT_STUDENT_SEARCH_HANDOFF_ITEM_IDS } from '@/assignments/result-student-search-handoff';
 import {
   assignmentResultPageCopy,
   assignmentResultReviewCopy,
@@ -876,6 +878,7 @@ import {
   assignmentResultSectionCopy,
   assignmentResultTableHeaders,
   ASSIGNMENT_RESULT_REVIEW_CONTROLS_HANDOFF_ITEM_IDS,
+  ASSIGNMENT_RESULT_REVIEW_HANDOFF_ITEM_IDS,
   assignmentResultActionDescriptors,
   assignmentResultActionOrder,
   buildAttemptReviewSubmissionSummary,
@@ -953,6 +956,11 @@ import {
   type AssignmentResultTableHeaderView,
 } from '@/assignments/result-view';
 import {
+  TEACHER_RESULTS_REVIEW_CHAIN_HANDOFF_ITEM_IDS,
+  TEACHER_RESULTS_REVIEW_CHAIN_SOURCE_FILES,
+  buildTeacherResultsReviewChainHandoffView,
+} from '@/assignments/teacher-results-review-chain';
+import {
   ASSIGNMENT_RESULT_EMPTY_STATE_HANDOFF_ITEM_IDS,
   buildAssignmentResultEmptyStateHandoffView,
 } from '@/assignments/result-empty-state-handoff';
@@ -1005,6 +1013,7 @@ import {
   buildAssignmentResultAttemptAnswerTextView,
 } from '@/assignments/result-answer-view';
 import { ASSIGNMENT_ANSWER_FEEDBACK_HANDOFF_ITEM_IDS } from '@/assignments/answer-feedback-handoff';
+import { ASSIGNMENT_RESULT_MATERIAL_HANDOFF_ITEM_IDS } from '@/assignments/result-actions';
 import { buildAssignmentAttemptReviewSummary } from '@/assignments/result-review-summary';
 import {
   formatAssignmentSummaryAccuracy,
@@ -4875,6 +4884,106 @@ assert.match(
   readFileSync('tests/e2e/TEST-CATALOG.md', 'utf8'),
   /Published assignment delivery chain has a fast script-level gate via[\s\S]*scripts\/published-assignment-delivery-chain-handoff\.test\.ts/,
   'TEST-CATALOG should document the published assignment delivery chain gate.'
+);
+const teacherResultsReviewChainView =
+  buildTeacherResultsReviewChainHandoffView();
+const teacherResultsReviewChainValues = new Map(
+  teacherResultsReviewChainView.itemViews.map((item) => [item.id, item.value])
+);
+assert.deepEqual(
+  teacherResultsReviewChainView.itemViews.map((item) => item.id),
+  [...TEACHER_RESULTS_REVIEW_CHAIN_HANDOFF_ITEM_IDS],
+  'Teacher results review chain should expose the stable teacher-review 30-slice order.'
+);
+assert.equal(teacherResultsReviewChainView.itemViews.length, 30);
+assert.equal(
+  new Set(TEACHER_RESULTS_REVIEW_CHAIN_HANDOFF_ITEM_IDS).size,
+  30
+);
+assert.equal(TEACHER_RESULTS_REVIEW_CHAIN_SOURCE_FILES.length, 30);
+for (const filePath of TEACHER_RESULTS_REVIEW_CHAIN_SOURCE_FILES) {
+  assert.ok(
+    existsSync(filePath),
+    `Missing teacher results review chain file ${filePath}`
+  );
+}
+assert.ok(
+  teacherResultsReviewChainView.itemViews.every(
+    (item) => item.ariaLabel && item.description && item.label && item.value
+  )
+);
+assert.deepEqual(teacherResultsReviewChainView.privacy, {
+  chainSourceFileCount: TEACHER_RESULTS_REVIEW_CHAIN_SOURCE_FILES.length,
+  exposesAcceptedAlternativesToTeachersOnly: true,
+  exposesAnswerKeysToPublicRunner: false,
+  exposesRawAnonymousTokens: false,
+  exposesRawCopyArtifactsInHandoff: false,
+  exposesRawCsvDataUrlInHandoff: false,
+  exposesSourceMaterialStorageKeys: false,
+  exposesStudentAnswerTextInHandoff: false,
+  itemIds: [...TEACHER_RESULTS_REVIEW_CHAIN_HANDOFF_ITEM_IDS],
+  preservesFrozenSnapshots: true,
+  resultExportsIncludeDeliveryPolicy: true,
+  sourceFiles: [...TEACHER_RESULTS_REVIEW_CHAIN_SOURCE_FILES],
+  usesSharedAttemptStats: true,
+  usesTeacherOnlyResultScope: true,
+});
+assert.deepEqual(
+  [
+    ASSIGNMENT_ATTEMPT_STATS_HANDOFF_ITEM_IDS.length,
+    ASSIGNMENT_RESULT_REVIEW_HANDOFF_ITEM_IDS.length,
+    ASSIGNMENT_RESULT_REVIEW_CONTROLS_HANDOFF_ITEM_IDS.length,
+    ASSIGNMENT_RESULT_STUDENT_SEARCH_HANDOFF_ITEM_IDS.length,
+    ASSIGNMENT_ITEM_PERFORMANCE_SORT_HANDOFF_ITEM_IDS.length,
+    ASSIGNMENT_STUDENT_SUMMARY_SORT_HANDOFF_ITEM_IDS.length,
+    ASSIGNMENT_ATTEMPT_REVIEW_CARD_HANDOFF_ITEM_IDS.length,
+    ASSIGNMENT_STUDENT_FOLLOW_UP_PRIORITY_HANDOFF_ITEM_IDS.length,
+    ASSIGNMENT_COPY_ARTIFACT_HANDOFF_ITEM_IDS.length,
+    ASSIGNMENT_RESULTS_EXPORT_PREPARATION_ITEM_IDS.length,
+    ASSIGNMENT_RESULT_MATERIAL_HANDOFF_ITEM_IDS.length,
+    ASSIGNMENT_RESULT_EMPTY_STATE_HANDOFF_ITEM_IDS.length,
+    ASSIGNMENT_ATTEMPT_DURATION_HANDOFF_ITEM_IDS.length,
+    ASSIGNMENT_ANSWER_FEEDBACK_HANDOFF_ITEM_IDS.length,
+  ],
+  Array.from({ length: 14 }, () => 30),
+  'Teacher results review chain should stay backed by focused result-review gates.'
+);
+assert.deepEqual(Object.fromEntries(teacherResultsReviewChainValues), {
+  'accepted-alternatives-format': 'Shared formatter',
+  'anonymous-token-guard': 'Raw token hidden',
+  'answer-review-status': 'Correct or needs review',
+  'assignment-metric-cards': 'Prepared metrics',
+  'attempt-review-cards': 'Item-level review',
+  'attempt-review-filter': 'All or missed',
+  'attempt-stats-summary': 'Shared metrics',
+  'classroom-brief': 'Teacher-only brief',
+  'copy-artifact-boundary': 'Handoff hidden',
+  'csv-export-preparation': 'Private export',
+  'delivery-policy-export': 'Rules included',
+  'duration-formatting': 'Shared duration labels',
+  'empty-state-guidance': 'No attempts yet',
+  'frozen-snapshot-source': 'AssignmentSnapshot',
+  'item-analysis-priority': 'Reteach priorities',
+  'item-performance-sort': 'Lowest accuracy first',
+  'item-review-copy': 'Prompt summary',
+  'lowest-performing-items': 'Top reteach focus',
+  'public-runner-boundary': 'Teacher-only results',
+  'result-material-handoff': 'Teacher material scope',
+  'result-route-owner-scope': 'Teacher assignment only',
+  'reteach-plan-copy': 'Classroom script',
+  'review-scope-controls': 'URL-backed controls',
+  'review-status-summary': 'Current review state',
+  'source-material-guard': 'Storage keys hidden',
+  'student-follow-up-copy': 'Support list',
+  'student-follow-up-priority': 'Needs support first',
+  'student-search-normalization': 'Anonymous labels',
+  'student-summary-sort': 'Review order',
+  'teacher-results-chain-gate': '30 source files',
+});
+assert.match(
+  readFileSync('tests/e2e/TEST-CATALOG.md', 'utf8'),
+  /Teacher results review chain has a fast script-level gate via[\s\S]*scripts\/teacher-results-review-chain-handoff\.test\.ts/,
+  'TEST-CATALOG should document the teacher results review chain gate.'
 );
 assert.doesNotMatch(
   [
