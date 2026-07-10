@@ -1136,6 +1136,11 @@ import {
   buildPublishedAssignmentDeliveryChainHandoffView,
 } from '@/assignments/published-assignment-delivery-chain';
 import {
+  ASSIGNMENT_DISTRIBUTION_LIFECYCLE_CHAIN_HANDOFF_ITEM_IDS,
+  ASSIGNMENT_DISTRIBUTION_LIFECYCLE_CHAIN_SOURCE_FILES,
+  buildAssignmentDistributionLifecycleChainHandoffView,
+} from '@/assignments/assignment-distribution-lifecycle-chain';
+import {
   ASSIGNMENT_LIFECYCLE_GOVERNANCE_CHAIN_HANDOFF_ITEM_IDS,
   ASSIGNMENT_LIFECYCLE_GOVERNANCE_CHAIN_SOURCE_FILES,
   buildAssignmentLifecycleGovernanceChainHandoffView,
@@ -4965,6 +4970,109 @@ assert.match(
   readFileSync('tests/e2e/TEST-CATALOG.md', 'utf8'),
   /Published assignment delivery chain has a fast script-level gate via[\s\S]*scripts\/published-assignment-delivery-chain-handoff\.test\.ts/,
   'TEST-CATALOG should document the published assignment delivery chain gate.'
+);
+const assignmentDistributionLifecycleChainView =
+  buildAssignmentDistributionLifecycleChainHandoffView();
+const assignmentDistributionLifecycleChainValues = new Map(
+  assignmentDistributionLifecycleChainView.itemViews.map((item) => [
+    item.id,
+    item.value,
+  ])
+);
+assert.deepEqual(
+  assignmentDistributionLifecycleChainView.itemViews.map((item) => item.id),
+  [...ASSIGNMENT_DISTRIBUTION_LIFECYCLE_CHAIN_HANDOFF_ITEM_IDS],
+  'Assignment distribution lifecycle chain should expose the stable post-publish 30-slice order.'
+);
+assert.equal(assignmentDistributionLifecycleChainView.itemViews.length, 30);
+assert.equal(
+  new Set(ASSIGNMENT_DISTRIBUTION_LIFECYCLE_CHAIN_HANDOFF_ITEM_IDS).size,
+  30
+);
+assert.equal(ASSIGNMENT_DISTRIBUTION_LIFECYCLE_CHAIN_SOURCE_FILES.length, 30);
+for (const filePath of ASSIGNMENT_DISTRIBUTION_LIFECYCLE_CHAIN_SOURCE_FILES) {
+  assert.ok(
+    existsSync(filePath),
+    `Missing assignment distribution lifecycle chain file ${filePath}`
+  );
+}
+assert.ok(
+  assignmentDistributionLifecycleChainView.itemViews.every(
+    (item) => item.ariaLabel && item.description && item.label && item.value
+  )
+);
+assert.deepEqual(assignmentDistributionLifecycleChainView.privacy, {
+  chainSourceFileCount:
+    ASSIGNMENT_DISTRIBUTION_LIFECYCLE_CHAIN_SOURCE_FILES.length,
+  changesAttemptsOrResults: false,
+  changesPublicRunner: false,
+  createsAssignments: false,
+  exposesAnswerKeys: false,
+  exposesInternalAssignmentIds: false,
+  exposesRawAnonymousTokens: false,
+  exposesRawSettingsJson: false,
+  exposesSourceMaterialStorageKeys: false,
+  exposesStudentAnswerText: false,
+  exposesStudentNames: false,
+  exposesTeacherNotes: false,
+  itemIds: [...ASSIGNMENT_DISTRIBUTION_LIFECYCLE_CHAIN_HANDOFF_ITEM_IDS],
+  requiresOwnerScopedAssignmentList: true,
+  sourceFiles: [...ASSIGNMENT_DISTRIBUTION_LIFECYCLE_CHAIN_SOURCE_FILES],
+  usesAbsoluteStudentUrl: true,
+  usesNormalizedShareSlug: true,
+  usesPreparedShareActions: true,
+  usesSharedCopyPlan: true,
+});
+assert.deepEqual(
+  [
+    ASSIGNMENT_LIST_PAGE_HANDOFF_ITEM_IDS.length,
+    ASSIGNMENT_SHARE_LINK_HANDOFF_ITEM_IDS.length,
+    ASSIGNMENT_PUBLISH_HANDOFF_ITEM_IDS.length,
+    ASSIGNMENT_DELIVERY_POLICY_HANDOFF_ITEM_IDS.length,
+    PUBLISHED_ASSIGNMENT_DELIVERY_CHAIN_HANDOFF_ITEM_IDS.length,
+    STUDENT_RUNNER_START_HANDOFF_ITEM_IDS.length,
+    PRINTABLE_WORKSHEET_HANDOFF_ITEM_IDS.length,
+    TEACHER_RESULTS_REVIEW_CHAIN_HANDOFF_ITEM_IDS.length,
+  ],
+  Array.from({ length: 8 }, () => 30),
+  'Assignment distribution lifecycle chain should stay backed by assignment list, share-link, publish, delivery, runner, print, and results gates.'
+);
+assert.deepEqual(Object.fromEntries(assignmentDistributionLifecycleChainValues), {
+  'absolute-share-url': 'Student URL',
+  'copy-execution-plan': 'Shared copy plan',
+  'copy-feedback': 'Toast mapped',
+  'copy-step-readiness': 'Copy step',
+  'delivery-policy-summary': 'Shared settings',
+  'distribution-lifecycle-gate': '30 source files',
+  'distribution-status': 'Ready or collecting',
+  'filter-scope-alignment': 'Owner scope',
+  'hidden-share-handoff': '30 share slices',
+  'list-card-action-parity': 'Card actions',
+  'owner-scoped-published-lookup': 'Owner list query',
+  'preview-route-action': 'Student runner link',
+  'preview-step-readiness': 'Preview step',
+  'print-step-readiness': 'Print step',
+  'printable-handout-boundary': 'Teacher print',
+  'product-distribution-policy': 'Immediate next step',
+  'publish-redirect-context': 'published=:shareId',
+  'published-dismiss-search': 'Context removed',
+  'published-list-fallback': 'Visible list fallback',
+  'published-panel-action-parity': 'Panel actions',
+  'published-panel-found-state': 'Found',
+  'published-panel-loading-state': 'Loading',
+  'published-panel-missing-state': 'Missing',
+  'published-query-parser': 'Validated search',
+  'result-review-boundary': 'Teacher results',
+  'results-step-readiness': 'Results step',
+  'share-link-availability': 'Lifecycle guarded',
+  'share-path-builder': '/play/:shareId',
+  'share-slug-normalization': 'normalizeAssignmentShareSlug',
+  'student-runner-boundary': 'Public /play',
+});
+assert.match(
+  readFileSync('tests/e2e/TEST-CATALOG.md', 'utf8'),
+  /Assignment distribution lifecycle chain has a fast script-level gate via[\s\S]*scripts\/assignment-distribution-lifecycle-chain-handoff\.test\.ts/,
+  'TEST-CATALOG should document the assignment distribution lifecycle chain gate.'
 );
 const answerFeedbackLifecycleChainView =
   buildAnswerFeedbackLifecycleChainHandoffView();
