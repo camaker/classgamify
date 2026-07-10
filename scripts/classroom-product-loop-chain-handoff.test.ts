@@ -36,7 +36,10 @@ import {
   ASSIGNMENT_RESULT_ACCEPTED_ANSWER_CHAIN_HANDOFF_ITEM_IDS,
   ASSIGNMENT_RESULT_ACCEPTED_ANSWER_CHAIN_SOURCE_FILES,
 } from '@/assignments/result-accepted-answer-chain';
-import { ASSIGNMENT_RESULT_EXPLANATION_CHAIN_HANDOFF_ITEM_IDS } from '@/assignments/result-explanation-chain';
+import {
+  ASSIGNMENT_RESULT_EXPLANATION_CHAIN_HANDOFF_ITEM_IDS,
+  ASSIGNMENT_RESULT_EXPLANATION_CHAIN_SOURCE_FILES,
+} from '@/assignments/result-explanation-chain';
 import {
   ASSIGNMENT_RESULT_SUBMITTED_DATE_CHAIN_HANDOFF_ITEM_IDS,
   ASSIGNMENT_RESULT_SUBMITTED_DATE_CHAIN_SOURCE_FILES,
@@ -107,7 +110,9 @@ test('classroom product loop chain exposes 30 safe product slices', () => {
   assert.deepEqual(handoffView.privacy, {
     chainSourceFileCount: CLASSROOM_PRODUCT_LOOP_CHAIN_SOURCE_FILES.length,
     copyArtifactsUseFormattedDates: true,
+    copyArtifactsUseFormattedExplanations: true,
     csvExportsUseSharedAnswerView: true,
+    csvExportsUseFormattedExplanations: true,
     createsAssignmentLinksWithoutTeacherAction: false,
     csvDatesUseIsoFormatter: true,
     deliveryPolicyResolvedBeforeAssignmentSurfaces: true,
@@ -125,6 +130,7 @@ test('classroom product loop chain exposes 30 safe product slices', () => {
     exposesStudentAnswerTextInHandoff: false,
     exposesStudentNamesInHandoff: false,
     exposesTeacherAnswerTextInHandoff: false,
+    exposesTeacherExplanationTextInHandoff: false,
     exportIncludesSubmittedDateColumns: true,
     freezesAssignmentSnapshots: true,
     itemIds,
@@ -137,12 +143,15 @@ test('classroom product loop chain exposes 30 safe product slices', () => {
     keepsAssignmentListOwnerScoped: true,
     keepsDashboardOwnerScoped: true,
     keepsTemplateRoadmapOnSharedActivityModel: true,
+    printableAnswerKeysUseFormattedExplanations: true,
+    publicFeedbackRespectsAnswerReveal: true,
     publicPayloadUsesRuntimeItemsOnly: true,
     publicResponseUsesSanitizedScoredResult: true,
     publicStudentRunnerPayloadUsesSanitizedRuntimeItems: true,
     rejectsClosedOrExpiredStudentRunnerSubmissions: true,
     rejectsInvalidSubmissions: true,
     resultPagesUseSharedAnswerView: true,
+    resultPagesUseFormattedExplanations: true,
     resultSubmittedDateSortingUsesTimestampParsing: true,
     resultUiDatesUseLocalizedFormatter: true,
     requiresTeacherReviewForAiEnhancements: true,
@@ -160,6 +169,7 @@ test('classroom product loop chain exposes 30 safe product slices', () => {
     usesPublishedAssignmentDeliveryChain: true,
     usesPublicDiscoveryIndexingChain: true,
     usesResultAcceptedAnswerChain: true,
+    usesResultExplanationChain: true,
     usesResultSubmittedDateChain: true,
     usesScoredAttemptResultChain: true,
     usesSharedAttemptStats: true,
@@ -201,7 +211,7 @@ test('classroom product loop chain summarizes activity to results flow', () => {
       ['teacher-result-review', 'Reteach evidence'],
       ['result-accepted-answer-boundary', '30 answer slices'],
       ['csv-export', 'Private offline records'],
-      ['result-explanation-continuity', 'Answer explanations'],
+      ['result-explanation-boundary', '30 explanation slices'],
       ['dashboard-loop-status', 'Create/publish/play/review'],
       ['teacher-workspace-routes', 'Dashboard workspace'],
       ['public-discovery-indexing-boundary', '30 discovery slices'],
@@ -255,6 +265,7 @@ test('classroom product loop chain is backed by adjacent focused gates', () => {
       ASSIGNMENT_RESULT_ACCEPTED_ANSWER_CHAIN_HANDOFF_ITEM_IDS.length,
       ASSIGNMENT_RESULT_ACCEPTED_ANSWER_CHAIN_SOURCE_FILES.length,
       ASSIGNMENT_RESULT_EXPLANATION_CHAIN_HANDOFF_ITEM_IDS.length,
+      ASSIGNMENT_RESULT_EXPLANATION_CHAIN_SOURCE_FILES.length,
       TEACHER_RESULTS_REVIEW_CHAIN_HANDOFF_ITEM_IDS.length,
       TEACHER_RESULT_COPY_LIFECYCLE_CHAIN_HANDOFF_ITEM_IDS.length,
       ASSIGNMENT_RESULTS_EXPORT_PREPARATION_ITEM_IDS.length,
@@ -263,7 +274,7 @@ test('classroom product loop chain is backed by adjacent focused gates', () => {
       PUBLIC_DISCOVERY_INDEXING_CHAIN_SOURCE_FILES.length,
       CLASSROOM_TRUST_COMMUNICATION_CHAIN_HANDOFF_ITEM_IDS.length,
     ],
-    Array.from({ length: 36 }, () => 30)
+    Array.from({ length: 37 }, () => 30)
   );
 });
 
