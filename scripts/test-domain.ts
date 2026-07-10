@@ -298,6 +298,12 @@ import {
   buildActivityAiEnhancementDraftOutputView,
 } from '@/activities/ai-enhancement-draft-output';
 import {
+  ACTIVITY_AI_ENHANCEMENT_EDITOR_REVIEW_CHECK_IDS,
+  ACTIVITY_AI_ENHANCEMENT_EDITOR_REVIEW_ITEM_IDS,
+  buildActivityAiEnhancementEditorReviewPlan,
+  buildActivityAiEnhancementEditorReviewView,
+} from '@/activities/ai-enhancement-editor-review';
+import {
   TEMPLATE_ROADMAP_CAPABILITY_CHAIN_HANDOFF_ITEM_IDS,
   TEMPLATE_ROADMAP_CAPABILITY_CHAIN_SOURCE_FILES,
   buildTemplateRoadmapCapabilityChainHandoffView,
@@ -6949,12 +6955,13 @@ assert.deepEqual(
     ACTIVITY_AI_ENHANCEMENT_EXECUTION_ITEM_IDS.length,
     ACTIVITY_AI_ENHANCEMENT_DRAFT_OUTPUT_ITEM_IDS.length,
     ACTIVITY_AI_ENHANCEMENT_DRAFT_APPLICATION_ITEM_IDS.length,
+    ACTIVITY_AI_ENHANCEMENT_EDITOR_REVIEW_ITEM_IDS.length,
     TEMPLATE_ROADMAP_CAPABILITY_CHAIN_HANDOFF_ITEM_IDS.length,
     WORKSHEET_MODE_DELIVERY_CHAIN_HANDOFF_ITEM_IDS.length,
     ASSIGNMENT_RESULTS_EXPORT_PREPARATION_ITEM_IDS.length,
   ],
-  Array.from({ length: 15 }, () => 30),
-  'Activity AI enhancement roadmap chain should stay backed by authoring, remix, extraction, policy, execution, draft output, draft application, roadmap, worksheet, and result-export gates.'
+  Array.from({ length: 16 }, () => 30),
+  'Activity AI enhancement roadmap chain should stay backed by authoring, remix, extraction, policy, execution, draft output, draft application, editor review, roadmap, worksheet, and result-export gates.'
 );
 assert.deepEqual(
   Object.fromEntries(activityAiEnhancementRoadmapChainValues),
@@ -7604,6 +7611,115 @@ assert.match(
   readFileSync('tests/e2e/TEST-CATALOG.md', 'utf8'),
   /Activity AI enhancement draft application has a fast script-level gate via[\s\S]*scripts\/activity-ai-enhancement-draft-application\.test\.ts[\s\S]*execution plans[\s\S]*CreateActivityInput validation[\s\S]*editor-only application[\s\S]*coverage\/readiness refresh[\s\S]*privacy guards/,
   'TEST-CATALOG should document the activity AI enhancement draft application gate.'
+);
+const activityAiEnhancementEditorReviewView =
+  buildActivityAiEnhancementEditorReviewView({
+    content: activityAiEnhancementPolicyContent,
+    currentTemplateType: 'quiz',
+    enhancementKind: 'answer-explanation',
+    hasAuthenticatedTeacher: true,
+    proposedDraft: activityAiEnhancementDraftApplicationDraft,
+    providerConfigured: true,
+    reviewedCheckIds: ACTIVITY_AI_ENHANCEMENT_EDITOR_REVIEW_CHECK_IDS,
+  });
+const activityAiEnhancementEditorReviewValues = new Map(
+  activityAiEnhancementEditorReviewView.itemViews.map((item) => [
+    item.id,
+    item.value,
+  ])
+);
+assert.deepEqual(
+  activityAiEnhancementEditorReviewView.itemViews.map((item) => item.id),
+  [...ACTIVITY_AI_ENHANCEMENT_EDITOR_REVIEW_ITEM_IDS],
+  'Activity AI enhancement editor review should expose the stable 30-slice review order.'
+);
+assert.equal(activityAiEnhancementEditorReviewView.itemViews.length, 30);
+assert.equal(new Set(ACTIVITY_AI_ENHANCEMENT_EDITOR_REVIEW_ITEM_IDS).size, 30);
+assert.equal(activityAiEnhancementEditorReviewView.plan.requiredReviewCount, 12);
+assert.equal(
+  activityAiEnhancementEditorReviewView.plan.status,
+  'ready-for-manual-save'
+);
+assert.equal(
+  activityAiEnhancementEditorReviewView.plan.canReachManualSave,
+  true
+);
+assert.equal(
+  activityAiEnhancementEditorReviewValues.get('review-status'),
+  'ready-for-manual-save'
+);
+assert.equal(
+  activityAiEnhancementEditorReviewValues.get('manual-save-boundary'),
+  'Manual save enabled'
+);
+assert.equal(
+  JSON.stringify(activityAiEnhancementEditorReviewView).includes(
+    'secret-policy-file-id'
+  ),
+  false,
+  'Activity AI enhancement editor review view should not leak source material file ids.'
+);
+assert.deepEqual(activityAiEnhancementEditorReviewView.privacy, {
+  appliesAfterDraftApplication: true,
+  blocksSaveUntilTeacherReview: true,
+  createsAssignmentLinksWithoutTeacherAction: false,
+  exposesAnswerKeysToPublicPayload: false,
+  exposesAnswerText: false,
+  exposesDraftText: false,
+  exposesFileBytesToAi: false,
+  exposesQuestionPromptText: false,
+  exposesRawAiOutput: false,
+  exposesRawSourceText: false,
+  exposesSourceMaterialFileIds: false,
+  exposesSourceMaterialFilenames: false,
+  exposesSourceMaterialStorageKeys: false,
+  itemIds: [...ACTIVITY_AI_ENHANCEMENT_EDITOR_REVIEW_ITEM_IDS],
+  mutatesExistingAssignmentSnapshots: false,
+  persistsActivityWithoutTeacherAction: false,
+  publishesAssignmentWithoutTeacherAction: false,
+  readsSourceMaterialBytes: false,
+  requiresEditorReview: true,
+  scope: 'activity-ai-enhancement-editor-review',
+  usesDraftApplicationPlan: true,
+});
+assert.equal(
+  buildActivityAiEnhancementEditorReviewPlan({
+    content: activityAiEnhancementPolicyContent,
+    currentTemplateType: 'quiz',
+    enhancementKind: 'answer-explanation',
+    hasAuthenticatedTeacher: true,
+    proposedDraft: activityAiEnhancementDraftApplicationDraft,
+    providerConfigured: true,
+    reviewedCheckIds: ['title', 'questions', 'answers'],
+  }).status,
+  'needs-teacher-review'
+);
+assert.equal(
+  buildActivityAiEnhancementEditorReviewPlan({
+    content: activityAiEnhancementPolicyContent,
+    currentTemplateType: 'quiz',
+    enhancementKind: 'answer-explanation',
+    hasAuthenticatedTeacher: false,
+    proposedDraft: activityAiEnhancementDraftApplicationDraft,
+    providerConfigured: true,
+    teacherConfirmedReview: true,
+  }).status,
+  'blocked-before-review'
+);
+assert.match(
+  readFileSync('src/activities/ai-enhancement-editor-review.ts', 'utf8'),
+  /export const ACTIVITY_AI_ENHANCEMENT_EDITOR_REVIEW_ITEM_IDS = \[[\s\S]*'review-scope'[\s\S]*'application-plan-source'[\s\S]*'teacher-review-required'[\s\S]*'ready-to-save-gate'[\s\S]*'manual-save-boundary'[\s\S]*'review-chain-gate'/,
+  'Activity AI enhancement editor review source should preserve the review slices.'
+);
+assert.match(
+  readFileSync('docs/product.md', 'utf8'),
+  /src\/activities\/ai-enhancement-editor-review\.ts` owns the teacher review gate[\s\S]*review checklist coverage[\s\S]*reviewed\/missing check counts[\s\S]*manual-save readiness[\s\S]*editor-only boundaries[\s\S]*snapshot protection[\s\S]*private\s+draft\/source-material privacy/,
+  'docs/product.md should document the activity AI enhancement editor review owner.'
+);
+assert.match(
+  readFileSync('tests/e2e/TEST-CATALOG.md', 'utf8'),
+  /Activity AI enhancement editor review has a fast script-level gate via[\s\S]*scripts\/activity-ai-enhancement-editor-review\.test\.ts[\s\S]*teacher review checklists[\s\S]*manual-save readiness[\s\S]*editor-only boundaries[\s\S]*snapshot protection[\s\S]*privacy guards/,
+  'TEST-CATALOG should document the activity AI enhancement editor review gate.'
 );
 const activityAuthoringLibraryChainView =
   buildActivityAuthoringLibraryChainHandoffView();

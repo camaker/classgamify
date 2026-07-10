@@ -584,6 +584,11 @@ run it when changing execution plans, CreateActivityInput validation,
 editor-only application, field-target coverage, coverage/readiness refresh,
 teacher-review/save/publish boundaries, snapshot protection, public-payload
 continuity, fallback/provider application modes, or privacy guards.
+Activity AI enhancement editor review has a fast script-level gate via
+`pnpm exec tsx --test scripts/activity-ai-enhancement-editor-review.test.ts`;
+run it when changing teacher review checklists, reviewed/missing check counts,
+manual-save readiness, editor-only boundaries, publish blocking, snapshot
+protection, public-payload guards, source-material privacy, or privacy guards.
 Template roadmap capability chain has a fast script-level gate via
 `pnpm exec tsx --test scripts/template-roadmap-capability-chain-handoff.test.ts`;
 run it when changing roadmap template promises, Wordwall-style templates,

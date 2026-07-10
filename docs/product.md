@@ -464,6 +464,11 @@ Implementation boundaries:
   field-target coverage, refreshed draft metadata, template readiness,
   source-provenance counts, teacher-review/save/publish boundaries, privacy
   guards, snapshot protection, and result-export continuity.
+- `src/activities/ai-enhancement-editor-review.ts` owns the teacher review gate
+  after draft application and before manual save: review checklist coverage,
+  reviewed/missing check counts, manual-save readiness, editor-only boundaries,
+  publish blocking, snapshot protection, public-payload guards, and private
+  draft/source-material privacy.
 - `src/api/activity-ai.ts` exposes the authenticated server function.
 - `src/components/activities/activity-create-form.tsx` only collects draft
   inputs and fills the existing form.
