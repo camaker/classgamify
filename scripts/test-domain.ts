@@ -1116,6 +1116,11 @@ import {
   buildPublishedAssignmentDeliveryChainHandoffView,
 } from '@/assignments/published-assignment-delivery-chain';
 import {
+  ASSIGNMENT_LIFECYCLE_GOVERNANCE_CHAIN_HANDOFF_ITEM_IDS,
+  ASSIGNMENT_LIFECYCLE_GOVERNANCE_CHAIN_SOURCE_FILES,
+  buildAssignmentLifecycleGovernanceChainHandoffView,
+} from '@/assignments/assignment-lifecycle-governance-chain';
+import {
   ASSIGNMENT_SHARE_LINK_HANDOFF_ITEM_IDS,
   ASSIGNMENT_SHARE_ROUTE_TARGET,
   assignmentShareLinkActionCopy,
@@ -4940,6 +4945,94 @@ assert.match(
   readFileSync('tests/e2e/TEST-CATALOG.md', 'utf8'),
   /Published assignment delivery chain has a fast script-level gate via[\s\S]*scripts\/published-assignment-delivery-chain-handoff\.test\.ts/,
   'TEST-CATALOG should document the published assignment delivery chain gate.'
+);
+const assignmentLifecycleGovernanceChainView =
+  buildAssignmentLifecycleGovernanceChainHandoffView();
+const assignmentLifecycleGovernanceChainValues = new Map(
+  assignmentLifecycleGovernanceChainView.itemViews.map((item) => [
+    item.id,
+    item.value,
+  ])
+);
+assert.deepEqual(
+  assignmentLifecycleGovernanceChainView.itemViews.map((item) => item.id),
+  [...ASSIGNMENT_LIFECYCLE_GOVERNANCE_CHAIN_HANDOFF_ITEM_IDS],
+  'Assignment lifecycle governance chain should expose the stable 30-slice status, list, public, submission, result, and privacy order.'
+);
+assert.equal(assignmentLifecycleGovernanceChainView.itemViews.length, 30);
+assert.equal(
+  new Set(ASSIGNMENT_LIFECYCLE_GOVERNANCE_CHAIN_HANDOFF_ITEM_IDS).size,
+  30
+);
+assert.equal(ASSIGNMENT_LIFECYCLE_GOVERNANCE_CHAIN_SOURCE_FILES.length, 30);
+for (const filePath of ASSIGNMENT_LIFECYCLE_GOVERNANCE_CHAIN_SOURCE_FILES) {
+  assert.ok(
+    existsSync(filePath),
+    `Missing assignment lifecycle governance chain file ${filePath}`
+  );
+}
+assert.ok(
+  assignmentLifecycleGovernanceChainView.itemViews.every(
+    (item) => item.ariaLabel && item.description && item.label && item.value
+  )
+);
+assert.deepEqual(assignmentLifecycleGovernanceChainView.privacy, {
+  blocksClosedOrExpiredSubmissions: true,
+  blocksDraftPublicAccess: true,
+  chainSourceFileCount:
+    ASSIGNMENT_LIFECYCLE_GOVERNANCE_CHAIN_SOURCE_FILES.length,
+  exposesActivityContentInLifecycleHandoff: false,
+  exposesAnswerKeysInLifecycleHandoff: false,
+  exposesInternalAssignmentIdsInLifecycleHandoff: false,
+  exposesPublicShareSlugsInLifecycleHandoff: false,
+  exposesRawAnonymousTokensInLifecycleHandoff: false,
+  exposesStudentAnswerTextInLifecycleHandoff: false,
+  exposesStudentNamesInLifecycleHandoff: false,
+  itemIds: [...ASSIGNMENT_LIFECYCLE_GOVERNANCE_CHAIN_HANDOFF_ITEM_IDS],
+  keepsExpiredReopenBlocked: true,
+  preservesAttemptsAfterClose: true,
+  preservesSnapshotsAfterClose: true,
+  publicUnavailablePayloadHidesRuntime: true,
+  requiresOwnerScopedTeacherQueries: true,
+  sourceFiles: [...ASSIGNMENT_LIFECYCLE_GOVERNANCE_CHAIN_SOURCE_FILES],
+  statusFiltersUseLifecycleStatus: true,
+});
+assert.deepEqual(Object.fromEntries(assignmentLifecycleGovernanceChainValues), {
+  'api-list-owner-scope': 'Owner scoped',
+  'api-status-filter': 'Lifecycle SQL filter',
+  'assignment-card-lifecycle-handoff': 'Hidden card handoff',
+  'assignment-lifecycle-governance-gate': '30 source files',
+  'attempt-review-retention': 'Scored attempts',
+  'close-transition-rule': 'Published -> closed',
+  'expired-reopen-block': 'Expired blocked',
+  'expiry-timestamp-normalization': 'Finite timestamp',
+  'lifecycle-privacy-guard': 'Private data hidden',
+  'lifecycle-status-resolution': 'getAssignmentLifecycleStatus',
+  'list-route-status-filter': 'URL status state',
+  'list-summary-status-metrics': 'Open/closed/expired/draft',
+  'managed-status-boundary': 'published + closed',
+  'open-access-policy': 'Open only',
+  'product-lifecycle-policy': 'Open, closed, expired, draft',
+  'public-access-handoff-alignment': 'Public access handoff',
+  'public-lookup-lifecycle': 'Available or unavailable',
+  'public-unavailable-policy': 'Runtime hidden',
+  'published-delivery-chain-alignment': 'Delivery chain',
+  'reopen-transition-rule': 'Closed -> published',
+  'result-page-owner-scope': 'Owner results only',
+  'result-page-retention': 'Closed attempts retained',
+  'share-link-availability': 'Open persisted links',
+  'snapshot-retention': 'Frozen snapshot',
+  'status-action-execution-plan': 'update-status or blocked',
+  'status-action-view': 'Prepared action',
+  'status-filter-open-alias': 'published -> open',
+  'submission-error-policy': 'Reasoned rejection',
+  'submit-api-lifecycle-gate': 'assertAssignmentAcceptsSubmissions',
+  'unavailable-access-handoff-alignment': 'Unavailable handoff',
+});
+assert.match(
+  readFileSync('tests/e2e/TEST-CATALOG.md', 'utf8'),
+  /Assignment lifecycle governance chain has a fast script-level gate via[\s\S]*scripts\/assignment-lifecycle-governance-chain-handoff\.test\.ts/,
+  'TEST-CATALOG should document the assignment lifecycle governance chain gate.'
 );
 const classroomDataLifecycleChainView =
   buildClassroomDataLifecycleChainHandoffView();
