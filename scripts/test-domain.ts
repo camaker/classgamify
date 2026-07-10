@@ -238,6 +238,11 @@ import {
   type AiActivityDraft,
 } from '@/activities/ai-draft';
 import {
+  ACTIVITY_AI_AUTHORING_CHAIN_HANDOFF_ITEM_IDS,
+  ACTIVITY_AI_AUTHORING_CHAIN_SOURCE_FILES,
+  buildActivityAiAuthoringChainHandoffView,
+} from '@/activities/ai-authoring-chain';
+import {
   ACTIVITY_AI_DRAFT_DEFAULT_FOCUS,
   ACTIVITY_AI_DRAFT_FOCUSES,
   buildActivityAiDraftFocusOptions,
@@ -246,6 +251,7 @@ import {
 import {
   ACTIVITY_AI_DRAFT_BOUNDARY_HANDOFF_ITEM_IDS,
 } from '@/activities/ai-draft-boundary';
+import { ACTIVITY_AI_FALLBACK_HANDOFF_ITEM_IDS } from '@/activities/ai-draft-fallback-handoff';
 import {
   ACTIVITY_AI_REMIX_ASSIST_HANDOFF_ITEM_IDS,
   buildActivityAiRemixAssistHandoffView,
@@ -493,6 +499,7 @@ import {
 } from '@/activities/distractors';
 import { buildQuestionOptionTexts } from '@/activities/question-options';
 import {
+  ACTIVITY_TEMPLATE_SCAFFOLD_QUALITY_HANDOFF_ITEM_IDS,
   ACTIVITY_TEMPLATE_SCAFFOLD_QUALITY_TARGETS,
   buildActivityTemplateScaffoldInput,
   buildActivityTemplateScaffoldReadinessSummary,
@@ -5950,6 +5957,112 @@ assert.match(
   activitySourceExtractionAssistTestCatalogSource,
   /\|\s*7\s*\|(?=[\s\S]*source-extraction-assist handoff covers source-material count)(?=[\s\S]*worksheet extraction)(?=[\s\S]*storage-key)(?=[\s\S]*privacy guards)/,
   'E2E catalog should cover the source-extraction-assist handoff acceptance journey.'
+);
+const activityAiAuthoringChainView =
+  buildActivityAiAuthoringChainHandoffView();
+const activityAiAuthoringChainValues = new Map(
+  activityAiAuthoringChainView.itemViews.map((item) => [
+    item.id,
+    item.value,
+  ])
+);
+assert.deepEqual(
+  activityAiAuthoringChainView.itemViews.map((item) => item.id),
+  [...ACTIVITY_AI_AUTHORING_CHAIN_HANDOFF_ITEM_IDS],
+  'Activity AI authoring chain should expose the stable source-to-editor 30-slice order.'
+);
+assert.equal(activityAiAuthoringChainView.itemViews.length, 30);
+assert.equal(
+  new Set(ACTIVITY_AI_AUTHORING_CHAIN_HANDOFF_ITEM_IDS).size,
+  30
+);
+assert.equal(ACTIVITY_AI_AUTHORING_CHAIN_SOURCE_FILES.length, 30);
+for (const filePath of ACTIVITY_AI_AUTHORING_CHAIN_SOURCE_FILES) {
+  assert.ok(
+    existsSync(filePath),
+    `Missing activity AI authoring chain file ${filePath}`
+  );
+}
+assert.ok(
+  activityAiAuthoringChainView.itemViews.every(
+    (item) => item.ariaLabel && item.description && item.label && item.value
+  )
+);
+assert.deepEqual(activityAiAuthoringChainView.privacy, {
+  chainSourceFileCount: ACTIVITY_AI_AUTHORING_CHAIN_SOURCE_FILES.length,
+  createsAssignmentLinks: false,
+  exposesActivityContentBeforeTeacherReview: false,
+  exposesAnswerText: false,
+  exposesFileBytesToAi: false,
+  exposesRawProviderResponse: false,
+  exposesRawSourceText: false,
+  exposesSourceMaterialFileIds: false,
+  exposesSourceMaterialStorageKeys: false,
+  itemIds: [...ACTIVITY_AI_AUTHORING_CHAIN_HANDOFF_ITEM_IDS],
+  persistsActivityWithoutTeacherAction: false,
+  publishesAssignmentWithoutTeacherAction: false,
+  requiresAuthenticatedTeacher: true,
+  requiresCreateActivityInputContract: true,
+  requiresDeterministicFallback: true,
+  requiresTeacherReview: true,
+  sourceFiles: [...ACTIVITY_AI_AUTHORING_CHAIN_SOURCE_FILES],
+});
+assert.deepEqual(
+  [
+    ACTIVITY_EDITOR_AI_DRAFT_SOURCE_HANDOFF_ITEM_IDS.length,
+    ACTIVITY_EDITOR_TEMPLATE_HANDOFF_ITEM_IDS.length,
+    ACTIVITY_EDITOR_WORKFLOW_HANDOFF_ITEM_IDS.length,
+    ACTIVITY_AI_DRAFT_BOUNDARY_HANDOFF_ITEM_IDS.length,
+    ACTIVITY_AI_FALLBACK_HANDOFF_ITEM_IDS.length,
+    ACTIVITY_AI_FALLBACK_SOURCE_TERM_PLAN_ITEM_IDS.length,
+    ACTIVITY_DRAFT_META_HANDOFF_ITEM_IDS.length,
+    ACTIVITY_TEMPLATE_REMIX_HANDOFF_ITEM_IDS.length,
+    ACTIVITY_AI_REMIX_ASSIST_HANDOFF_ITEM_IDS.length,
+    QUESTION_CHOICE_GENERATION_HANDOFF_ITEM_IDS.length,
+    ACTIVITY_SOURCE_MATERIAL_PICKER_HANDOFF_ITEM_IDS.length,
+    ACTIVITY_SOURCE_EXTRACTION_ASSIST_HANDOFF_ITEM_IDS.length,
+    SOURCE_MATERIAL_PRIVACY_CHAIN_HANDOFF_ITEM_IDS.length,
+    ACTIVITY_TEMPLATE_SCAFFOLD_QUALITY_HANDOFF_ITEM_IDS.length,
+  ],
+  Array.from({ length: 14 }, () => 30),
+  'Activity AI authoring chain should stay backed by focused authoring gates.'
+);
+assert.deepEqual(Object.fromEntries(activityAiAuthoringChainValues), {
+  'activity-persistence-handoff': 'Create/update helpers',
+  'ai-authoring-chain-gate': '30 source files',
+  'ai-remix-assist-boundary': 'Completion before save',
+  'assignment-snapshot-protection': 'Future links only',
+  'auth-server-boundary': 'Authenticated teacher',
+  'create-input-contract': 'CreateActivityInput',
+  'direct-persistence-guard': 'No direct save',
+  'distractor-write-target': 'ActivityQuestion.options',
+  'draft-coverage-summary': 'Coverage counts',
+  'editor-application': 'Apply to form',
+  'editor-review-gate': 'Review before save',
+  'fallback-draft-path': 'Deterministic local draft',
+  'fallback-source-term-plan': 'Safe terms only',
+  'generate-input-schema': 'GenerateActivityDraftInput',
+  'local-completion-contract': 'Complete classroom fields',
+  'model-selection': 'Configured model',
+  'provider-selection': 'Workers AI or fallback',
+  'publish-boundary': 'No assignment link',
+  'quiz-choice-readiness': 'Distractors checked',
+  'raw-provider-response-guard': 'Parsed JSON only',
+  'safe-material-provenance': 'Kind and basename only',
+  'save-gate-review': 'Teacher action required',
+  'source-byte-guard': 'No file bytes',
+  'source-panel-readiness': 'Teacher source gate',
+  'source-text-priority': 'Structured notes first',
+  'storage-key-guard': 'Storage hidden',
+  'template-readiness-diagnosis': 'Ready and locked modes',
+  'template-remix-foundation': 'Deterministic readiness',
+  'template-scaffold-context': 'Shared editor model',
+  'unsafe-material-omission': 'Unsafe notes omitted',
+});
+assert.match(
+  readFileSync('tests/e2e/TEST-CATALOG.md', 'utf8'),
+  /Activity AI authoring chain has a fast script-level gate via[\s\S]*scripts\/activity-ai-authoring-chain-handoff\.test\.ts/,
+  'TEST-CATALOG should document the activity AI authoring chain gate.'
 );
 const sourceMaterialPrivacyChainView =
   buildSourceMaterialPrivacyChainHandoffView();

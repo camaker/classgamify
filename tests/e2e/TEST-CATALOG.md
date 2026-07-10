@@ -465,6 +465,12 @@ provenance, structured review checklists, ready/locked template diagnostics,
 quiz-choice readiness, AI draft metadata privacy-scope boundaries,
 safe/omitted source provenance, or save/publish boundaries before teacher
 review.
+Activity AI authoring chain has a fast script-level gate via
+`pnpm exec tsx --test scripts/activity-ai-authoring-chain-handoff.test.ts`;
+run it when changing AI source safety, authenticated draft generation,
+deterministic fallback, CreateActivityInput mapping, draft coverage,
+template readiness, quiz-choice readiness, AI remix assist, editor review,
+source-material privacy guards, or save/publish boundaries.
 Source extraction assist has a fast script-level gate via
 `pnpm exec tsx --test scripts/activity-source-extraction-assist-handoff-semantic-views.test.ts`;
 run it when changing attached-material extraction readiness, audio draft paths,
