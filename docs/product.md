@@ -16,8 +16,8 @@ product-loop handoff that keeps teacher-owned activities, reusable content,
 template roadmap capability alignment, AI enhancement lifecycle review,
 assignment links, public student play, validated attempts, submitted-date,
 accepted-answer, and explanation continuity, teacher result review,
-copy/export/print handoffs, dashboard status, public entry routes, and privacy
-guards aligned with this sequence.
+copy/export/print handoffs, dashboard status, public discovery/indexing
+metadata, and privacy guards aligned with this sequence.
 
 Copied-template surfaces should be retired in narrow, verified waves. Public
 navigation and homepage entry points should point at ClassGamify templates,

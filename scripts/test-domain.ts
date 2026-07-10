@@ -16631,6 +16631,8 @@ assert.deepEqual(classroomProductLoopChainView.privacy, {
   exposesStudentNamesInHandoff: false,
   freezesAssignmentSnapshots: true,
   itemIds: [...CLASSROOM_PRODUCT_LOOP_CHAIN_HANDOFF_ITEM_IDS],
+  keepsProtectedRoutesOutOfIndex: true,
+  keepsPublicDiscoverySourceLevel: true,
   keepsActivityLibraryOwnerScoped: true,
   keepsAssignmentListOwnerScoped: true,
   keepsDashboardOwnerScoped: true,
@@ -16643,6 +16645,7 @@ assert.deepEqual(classroomProductLoopChainView.privacy, {
   sourceFiles: [...CLASSROOM_PRODUCT_LOOP_CHAIN_SOURCE_FILES],
   usesAiEnhancementLifecycleChain: true,
   usesActivityAssignmentAttemptResultsLoop: true,
+  usesPublicDiscoveryIndexingChain: true,
   usesTemplateRoadmapCapabilityChain: true,
 });
 assert.deepEqual(
@@ -16671,10 +16674,12 @@ assert.deepEqual(
     TEACHER_RESULT_COPY_LIFECYCLE_CHAIN_HANDOFF_ITEM_IDS.length,
     ASSIGNMENT_RESULTS_EXPORT_PREPARATION_ITEM_IDS.length,
     PRINTABLE_WORKSHEET_REVIEW_LIFECYCLE_CHAIN_HANDOFF_ITEM_IDS.length,
+    PUBLIC_DISCOVERY_INDEXING_CHAIN_HANDOFF_ITEM_IDS.length,
+    PUBLIC_DISCOVERY_INDEXING_CHAIN_SOURCE_FILES.length,
     CLASSROOM_TRUST_COMMUNICATION_CHAIN_HANDOFF_ITEM_IDS.length,
   ],
-  Array.from({ length: 25 }, () => 30),
-  'Classroom product loop chain should stay backed by adjacent public entry, workspace, data, authoring, template roadmap, AI enhancement lifecycle, delivery, runner, result continuity, export, print, and trust gates.'
+  Array.from({ length: 27 }, () => 30),
+  'Classroom product loop chain should stay backed by adjacent public entry, public discovery/indexing, workspace, data, authoring, template roadmap, AI enhancement lifecycle, delivery, runner, result continuity, export, print, and trust gates.'
 );
 assert.deepEqual(Object.fromEntries(classroomProductLoopChainValues), {
   'activity-authoring-entry': 'Create editor',
@@ -16693,7 +16698,7 @@ assert.deepEqual(Object.fromEntries(classroomProductLoopChainValues), {
   'product-loop-chain-gate': '30 source files',
   'product-loop-contract': 'Activity -> Assignment -> Attempt -> Results',
   'progress-submit-readiness': 'Explicit partial confirm',
-  'public-entry-routes': 'Home/templates/worksheets',
+  'public-discovery-indexing-boundary': '30 discovery slices',
   'public-rules-summary': 'Student-visible rules',
   'public-runner-access': 'Open links only',
   'result-accepted-answer-continuity': 'Accepted alternatives',
@@ -16715,7 +16720,7 @@ assert.match(
 );
 assert.match(
   readFileSync('tests/e2e/TEST-CATALOG.md', 'utf8').replace(/\s+/g, ' '),
-  /Activity -> Assignment -> Attempt -> Results[\s\S]*activity authoring[\s\S]*template roadmap capability[\s\S]*AI enhancement lifecycle[\s\S]*assignment publish[\s\S]*student runner[\s\S]*scored attempts[\s\S]*submitted-date continuity[\s\S]*accepted-answer continuity[\s\S]*explanation continuity[\s\S]*teacher result review[\s\S]*copy\/export\/print handoffs[\s\S]*privacy guards/,
+  /Activity -> Assignment -> Attempt -> Results[\s\S]*activity authoring[\s\S]*template roadmap capability[\s\S]*AI enhancement lifecycle[\s\S]*assignment publish[\s\S]*student runner[\s\S]*scored attempts[\s\S]*submitted-date continuity[\s\S]*accepted-answer continuity[\s\S]*explanation continuity[\s\S]*teacher result review[\s\S]*copy\/export\/print handoffs[\s\S]*dashboard\/public discovery[\s\S]*privacy guards/,
   'TEST-CATALOG should describe the full classroom product loop chain scope.'
 );
 const classroomTrustCommunicationChainView =

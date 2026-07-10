@@ -81,8 +81,8 @@ run it when changing the Activity -> Assignment -> Attempt -> Results contract,
 activity authoring, template roadmap capability alignment, AI enhancement
 lifecycle review, assignment publish, student runner, scored attempts,
 submitted-date continuity, accepted-answer continuity, explanation continuity,
-teacher result review, copy/export/print handoffs, dashboard/public entry
-alignment, or privacy guards.
+teacher result review, copy/export/print handoffs, dashboard/public discovery
+and indexing alignment, or privacy guards.
 Active surface product boundary has a fast script-level gate via
 `pnpm exec tsx --test scripts/active-surface-product-boundary.test.ts`; run it
 when changing active account governance, contact, billing/payment callback,

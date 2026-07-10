@@ -26,14 +26,14 @@ export const CLASSROOM_PRODUCT_LOOP_CHAIN_HANDOFF_ITEM_IDS = [
   'result-explanation-continuity',
   'dashboard-loop-status',
   'teacher-workspace-routes',
-  'public-entry-routes',
+  'public-discovery-indexing-boundary',
   'privacy-guards',
   'product-loop-chain-gate',
 ] as const;
 
 export const CLASSROOM_PRODUCT_LOOP_CHAIN_SOURCE_FILES = [
   'docs/product.md',
-  'src/pages/public-page-view.ts',
+  'src/seo/public-discovery-indexing-chain.ts',
   'src/dashboard/overview.ts',
   'src/dashboard/teacher-workspace-operations-chain.ts',
   'src/db/classroom-data-lifecycle-chain.ts',
@@ -91,6 +91,8 @@ export type ClassroomProductLoopChainPrivacyContract = {
   exposesStudentNamesInHandoff: false;
   freezesAssignmentSnapshots: true;
   itemIds: ClassroomProductLoopChainHandoffItemId[];
+  keepsProtectedRoutesOutOfIndex: true;
+  keepsPublicDiscoverySourceLevel: true;
   keepsActivityLibraryOwnerScoped: true;
   keepsAssignmentListOwnerScoped: true;
   keepsDashboardOwnerScoped: true;
@@ -103,6 +105,7 @@ export type ClassroomProductLoopChainPrivacyContract = {
   sourceFiles: string[];
   usesAiEnhancementLifecycleChain: true;
   usesActivityAssignmentAttemptResultsLoop: true;
+  usesPublicDiscoveryIndexingChain: true;
   usesTemplateRoadmapCapabilityChain: true;
 };
 
@@ -120,7 +123,7 @@ export function buildClassroomProductLoopChainHandoffView(): ClassroomProductLoo
 
   return {
     description:
-      'Thirty-slice classroom product loop chain from teacher-owned activities and reusable content through template roadmap capability alignment, AI enhancement lifecycle review, assignment publish, frozen snapshots, public student play, validated attempts, scored results, submitted-date, accepted-answer, and explanation continuity, teacher review, copy/export/print handoffs, dashboard status, public entry points, and privacy guards.',
+      'Thirty-slice classroom product loop chain from teacher-owned activities and reusable content through template roadmap capability alignment, AI enhancement lifecycle review, assignment publish, frozen snapshots, public student play, validated attempts, scored results, submitted-date, accepted-answer, and explanation continuity, teacher review, copy/export/print handoffs, dashboard status, public discovery/indexing metadata, and privacy guards.',
     itemViews,
     privacy: {
       chainSourceFileCount: CLASSROOM_PRODUCT_LOOP_CHAIN_SOURCE_FILES.length,
@@ -138,6 +141,8 @@ export function buildClassroomProductLoopChainHandoffView(): ClassroomProductLoo
       exposesStudentNamesInHandoff: false,
       freezesAssignmentSnapshots: true,
       itemIds: [...CLASSROOM_PRODUCT_LOOP_CHAIN_HANDOFF_ITEM_IDS],
+      keepsProtectedRoutesOutOfIndex: true,
+      keepsPublicDiscoverySourceLevel: true,
       keepsActivityLibraryOwnerScoped: true,
       keepsAssignmentListOwnerScoped: true,
       keepsDashboardOwnerScoped: true,
@@ -150,6 +155,7 @@ export function buildClassroomProductLoopChainHandoffView(): ClassroomProductLoo
       sourceFiles: [...CLASSROOM_PRODUCT_LOOP_CHAIN_SOURCE_FILES],
       usesAiEnhancementLifecycleChain: true,
       usesActivityAssignmentAttemptResultsLoop: true,
+      usesPublicDiscoveryIndexingChain: true,
       usesTemplateRoadmapCapabilityChain: true,
     },
     title: 'Classroom product loop chain',
@@ -360,12 +366,12 @@ function getClassroomProductLoopChainHandoffItem(
         'Dashboard workspace',
         'Authenticated dashboard, activity library, assignment list, results, print, and settings surfaces keep owner scope.'
       );
-    case 'public-entry-routes':
+    case 'public-discovery-indexing-boundary':
       return item(
         id,
-        'Public entry routes',
-        'Home/templates/worksheets',
-        'Public pages point teachers toward the real ClassGamify creation and assignment loop.'
+        'Public discovery indexing boundary',
+        '30 discovery slices',
+        'Public entry routes, sitemap, robots, manifest, legacy route retirement, public DOM handoff blocking, and privacy/indexing guards stay aligned.'
       );
     case 'privacy-guards':
       return item(
