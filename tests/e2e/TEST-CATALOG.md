@@ -80,8 +80,8 @@ Classroom product loop chain has a fast script-level gate via
 run it when changing the Activity -> Assignment -> Attempt -> Results contract,
 activity authoring/library workflow, source extraction lifecycle, activity
 lifecycle governance, template roadmap capability alignment, AI
-enhancement lifecycle review, published assignment delivery, student runner play, scored
-attempts, submitted-date continuity, accepted-answer continuity, explanation
+enhancement lifecycle review, published assignment delivery, student runner play,
+scored attempt results, submitted-date continuity, accepted-answer continuity, explanation
 continuity, teacher result review, copy/export/print handoffs,
 dashboard/public discovery and indexing alignment, or privacy guards.
 Active surface product boundary has a fast script-level gate via

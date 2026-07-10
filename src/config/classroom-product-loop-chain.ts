@@ -17,7 +17,7 @@ export const CLASSROOM_PRODUCT_LOOP_CHAIN_HANDOFF_ITEM_IDS = [
   'runtime-item-contract',
   'progress-submit-readiness',
   'submission-validation',
-  'attempt-persistence',
+  'scored-attempt-result-boundary',
   'answer-feedback-policy',
   'result-submitted-date-continuity',
   'teacher-result-review',
@@ -102,6 +102,7 @@ export type ClassroomProductLoopChainPrivacyContract = {
   keepsDashboardOwnerScoped: true;
   keepsTemplateRoadmapOnSharedActivityModel: true;
   publicPayloadUsesRuntimeItemsOnly: true;
+  publicResponseUsesSanitizedScoredResult: true;
   publicStudentRunnerPayloadUsesSanitizedRuntimeItems: true;
   rejectsClosedOrExpiredStudentRunnerSubmissions: true;
   rejectsInvalidSubmissions: true;
@@ -109,12 +110,17 @@ export type ClassroomProductLoopChainPrivacyContract = {
   requiresTeacherReviewForAiDrafts: true;
   resultConsumersUseScoredAttempts: true;
   sourceFiles: string[];
+  storesImmutableScoredAttemptAnswerJson: true;
+  storesImmutableScoredAttemptResultJson: true;
   usesAiEnhancementLifecycleChain: true;
   usesActivityAuthoringLibraryChain: true;
   usesActivityAssignmentAttemptResultsLoop: true;
   usesActivityLifecycleGovernanceChain: true;
   usesPublishedAssignmentDeliveryChain: true;
   usesPublicDiscoveryIndexingChain: true;
+  usesScoredAttemptResultChain: true;
+  usesSharedAttemptStats: true;
+  usesSharedDurationFormatting: true;
   usesSourceExtractionLifecycleChain: true;
   usesStudentRunnerPlayChain: true;
   usesTemplateRoadmapCapabilityChain: true;
@@ -134,7 +140,7 @@ export function buildClassroomProductLoopChainHandoffView(): ClassroomProductLoo
 
   return {
     description:
-      'Thirty-slice classroom product loop chain from teacher-owned activities and reusable content through activity authoring/library workflow, source extraction lifecycle boundaries, activity lifecycle governance, template roadmap capability alignment, AI enhancement lifecycle review, published assignment delivery, student runner play, validated attempts, scored results, submitted-date, accepted-answer, and explanation continuity, teacher review, copy/export/print handoffs, dashboard status, public discovery/indexing metadata, and privacy guards.',
+      'Thirty-slice classroom product loop chain from teacher-owned activities and reusable content through activity authoring/library workflow, source extraction lifecycle boundaries, activity lifecycle governance, template roadmap capability alignment, AI enhancement lifecycle review, published assignment delivery, student runner play, validated attempts, scored attempt results, submitted-date, accepted-answer, and explanation continuity, teacher review, copy/export/print handoffs, dashboard status, public discovery/indexing metadata, and privacy guards.',
     itemViews,
     privacy: {
       chainSourceFileCount: CLASSROOM_PRODUCT_LOOP_CHAIN_SOURCE_FILES.length,
@@ -163,6 +169,7 @@ export function buildClassroomProductLoopChainHandoffView(): ClassroomProductLoo
       keepsDashboardOwnerScoped: true,
       keepsTemplateRoadmapOnSharedActivityModel: true,
       publicPayloadUsesRuntimeItemsOnly: true,
+      publicResponseUsesSanitizedScoredResult: true,
       publicStudentRunnerPayloadUsesSanitizedRuntimeItems: true,
       rejectsClosedOrExpiredStudentRunnerSubmissions: true,
       rejectsInvalidSubmissions: true,
@@ -170,12 +177,17 @@ export function buildClassroomProductLoopChainHandoffView(): ClassroomProductLoo
       requiresTeacherReviewForAiDrafts: true,
       resultConsumersUseScoredAttempts: true,
       sourceFiles: [...CLASSROOM_PRODUCT_LOOP_CHAIN_SOURCE_FILES],
+      storesImmutableScoredAttemptAnswerJson: true,
+      storesImmutableScoredAttemptResultJson: true,
       usesAiEnhancementLifecycleChain: true,
       usesActivityAuthoringLibraryChain: true,
       usesActivityAssignmentAttemptResultsLoop: true,
       usesActivityLifecycleGovernanceChain: true,
       usesPublishedAssignmentDeliveryChain: true,
       usesPublicDiscoveryIndexingChain: true,
+      usesScoredAttemptResultChain: true,
+      usesSharedAttemptStats: true,
+      usesSharedDurationFormatting: true,
       usesSourceExtractionLifecycleChain: true,
       usesStudentRunnerPlayChain: true,
       usesTemplateRoadmapCapabilityChain: true,
@@ -325,12 +337,12 @@ function getClassroomProductLoopChainHandoffItem(
         'Unknown duplicate guard',
         'The submit API rejects unknown runtime ids, duplicate ids, and answer lists longer than the frozen runtime.'
       );
-    case 'attempt-persistence':
+    case 'scored-attempt-result-boundary':
       return item(
         id,
-        'Attempt persistence',
-        'Scored attempt row',
-        'Validated submissions persist through the shared scored-attempt helper after lifecycle and identity gates pass.'
+        'Scored attempt result boundary',
+        '30 result slices',
+        'Validated submissions, lifecycle and identity gates, runtime scoring, immutable attempt rows, sanitized public feedback, shared stats, teacher review, copy artifacts, CSV export, printable return, and privacy guards stay aligned.'
       );
     case 'answer-feedback-policy':
       return item(
