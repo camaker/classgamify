@@ -98,6 +98,11 @@ import {
   buildAccountGovernanceLifecycleChainHandoffView,
 } from '@/auth/account-governance-lifecycle-chain';
 import {
+  CLASSROOM_DATA_LIFECYCLE_CHAIN_HANDOFF_ITEM_IDS,
+  CLASSROOM_DATA_LIFECYCLE_CHAIN_SOURCE_FILES,
+  buildClassroomDataLifecycleChainHandoffView,
+} from '@/db/classroom-data-lifecycle-chain';
+import {
   AUTH_ERROR_RECOVERY_STEP_IDS,
   buildAuthErrorDisplayView,
   buildAuthErrorRecoveryView,
@@ -4930,6 +4935,117 @@ assert.match(
   readFileSync('tests/e2e/TEST-CATALOG.md', 'utf8'),
   /Published assignment delivery chain has a fast script-level gate via[\s\S]*scripts\/published-assignment-delivery-chain-handoff\.test\.ts/,
   'TEST-CATALOG should document the published assignment delivery chain gate.'
+);
+const classroomDataLifecycleChainView =
+  buildClassroomDataLifecycleChainHandoffView();
+const classroomDataLifecycleChainValues = new Map(
+  classroomDataLifecycleChainView.itemViews.map((item) => [
+    item.id,
+    item.value,
+  ])
+);
+assert.deepEqual(
+  classroomDataLifecycleChainView.itemViews.map((item) => item.id),
+  [...CLASSROOM_DATA_LIFECYCLE_CHAIN_HANDOFF_ITEM_IDS],
+  'Classroom data lifecycle chain should expose the stable 30-slice schema, persistence, snapshot, attempt, and result order.'
+);
+assert.equal(classroomDataLifecycleChainView.itemViews.length, 30);
+assert.equal(
+  new Set(CLASSROOM_DATA_LIFECYCLE_CHAIN_HANDOFF_ITEM_IDS).size,
+  30
+);
+assert.equal(CLASSROOM_DATA_LIFECYCLE_CHAIN_SOURCE_FILES.length, 30);
+for (const filePath of CLASSROOM_DATA_LIFECYCLE_CHAIN_SOURCE_FILES) {
+  assert.ok(
+    existsSync(filePath),
+    `Missing classroom data lifecycle chain file ${filePath}`
+  );
+}
+assert.ok(
+  classroomDataLifecycleChainView.itemViews.every(
+    (item) => item.ariaLabel && item.description && item.label && item.value
+  )
+);
+assert.deepEqual(classroomDataLifecycleChainView.privacy, {
+  chainSourceFileCount: CLASSROOM_DATA_LIFECYCLE_CHAIN_SOURCE_FILES.length,
+  createsParallelWorksheetTables: false,
+  exposesActivityContentJsonToPublicPayload: false,
+  exposesRawAnonymousTokens: false,
+  exposesSnapshotContentJsonToPublicPayload: false,
+  exposesSourceMaterialStorageKeys: false,
+  exposesStudentAnswerTextInHandoff: false,
+  exposesTeacherAnswerKeysBeforeReview: false,
+  freezesSnapshotContent: true,
+  itemIds: [...CLASSROOM_DATA_LIFECYCLE_CHAIN_HANDOFF_ITEM_IDS],
+  persistsAttemptsAfterValidation: true,
+  publicPayloadUsesRuntimeItemsOnly: true,
+  publishesAssignmentAndSnapshotTogether: true,
+  requiresOwnerScopedActivities: true,
+  requiresOwnerScopedAssignments: true,
+  resultConsumersUseScoredAttempts: true,
+  sourceFiles: [...CLASSROOM_DATA_LIFECYCLE_CHAIN_SOURCE_FILES],
+  usesD1AppSchema: true,
+  usesSnapshotForPublicRuntime: true,
+});
+assert.deepEqual(
+  [
+    ACTIVITY_AUTHORING_LIBRARY_CHAIN_HANDOFF_ITEM_IDS.length,
+    ACTIVITY_AUTHORING_LIBRARY_CHAIN_SOURCE_FILES.length,
+    PUBLISHED_ASSIGNMENT_DELIVERY_CHAIN_HANDOFF_ITEM_IDS.length,
+    PUBLISHED_ASSIGNMENT_DELIVERY_CHAIN_SOURCE_FILES.length,
+    STUDENT_RUNNER_PLAY_CHAIN_HANDOFF_ITEM_IDS.length,
+    STUDENT_RUNNER_PLAY_CHAIN_SOURCE_FILES.length,
+    TEACHER_RESULTS_REVIEW_CHAIN_HANDOFF_ITEM_IDS.length,
+    TEACHER_RESULTS_REVIEW_CHAIN_SOURCE_FILES.length,
+    ASSIGNMENT_ATTEMPT_PERSISTENCE_HANDOFF_ITEM_IDS.length,
+    ASSIGNMENT_RESULTS_EXPORT_PREPARATION_ITEM_IDS.length,
+    PUBLIC_ASSIGNMENT_ACCESS_HANDOFF_ITEM_IDS.length,
+    PRINTABLE_WORKSHEET_HANDOFF_ITEM_IDS.length,
+  ],
+  Array.from({ length: 12 }, () => 30),
+  'Classroom data lifecycle chain should stay backed by adjacent activity, delivery, student-runner, result, export, public, and print gates.'
+);
+assert.deepEqual(Object.fromEntries(classroomDataLifecycleChainValues), {
+  'activity-content-json': 'ActivityContent',
+  'activity-create-persistence': 'buildActivityCreateInsert',
+  'activity-derivative-draft-persistence': 'draft clone',
+  'activity-owner-query-scope': 'Owner where helpers',
+  'activity-table-owner-scope': 'owner_id',
+  'activity-template-visibility-indexes': 'template + visibility',
+  'activity-update-persistence': 'buildActivityUpdateSet',
+  'assignment-lifecycle-fields': 'status + expiresAt',
+  'assignment-publish-transaction': 'assignment + snapshot',
+  'assignment-settings-json': 'AssignmentSettings',
+  'assignment-share-slug-uniqueness': 'unique share_slug',
+  'assignment-snapshot-table': 'assignment_snapshot',
+  'assignment-table-owner-scope': 'owner_id + activity_id',
+  'attempt-answer-result-json': 'answersJson + resultJson',
+  'attempt-limit-identity-count': 'Normalized identity',
+  'attempt-persistence-helper': 'buildScoredAttemptInsert',
+  'attempt-query-scored-filter': 'resultJson required',
+  'attempt-table-identity': 'name or browser token',
+  'classroom-data-chain-gate': '30 source files',
+  'd1-app-schema-boundary': 'app.schema.ts',
+  'printable-worksheet-consumer': 'Frozen runtime items',
+  'product-data-model': 'Activity -> Assignment -> Attempt -> Results',
+  'public-payload-sanitization': 'Runtime items only',
+  'public-unavailable-guard': 'Runtime hidden',
+  'raw-student-token-guard': 'Anonymous token hidden',
+  'result-analysis-consumer': 'runtime items + attempts',
+  'result-export-consumer': 'Private CSV',
+  'snapshot-content-clone': 'structuredClone',
+  'snapshot-runtime-source': 'resolveAssignmentRuntimeSource',
+  'source-material-storage-key-guard': 'Storage keys hidden',
+});
+assert.match(
+  readFileSync('tests/e2e/TEST-CATALOG.md', 'utf8'),
+  /Classroom data lifecycle chain has a fast script-level gate via[\s\S]*scripts\/classroom-data-lifecycle-chain-handoff\.test\.ts/,
+  'TEST-CATALOG should document the classroom data lifecycle chain gate.'
+);
+assert.match(
+  readFileSync('tests/e2e/TEST-CATALOG.md', 'utf8').replace(/\s+/g, ' '),
+  /D1 app schema[\s\S]*activity\/assignment persistence helpers[\s\S]*owner-scoped activity or assignment queries[\s\S]*assignment snapshot freezing[\s\S]*public assignment payload sanitization[\s\S]*attempt persistence[\s\S]*scored-attempt queries[\s\S]*result analysis\/export\/print consumers[\s\S]*source-material\/token privacy guards/,
+  'TEST-CATALOG should describe the classroom data lifecycle chain scope.'
 );
 const teacherResultsReviewChainView =
   buildTeacherResultsReviewChainHandoffView();
