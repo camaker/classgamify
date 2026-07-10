@@ -118,6 +118,10 @@ library and prevents casual republishing, but it does not delete structured
 content or alter existing assignment snapshots. Archived activities cannot be
 published, duplicated, or remixed into another template until they are restored;
 this rule is enforced by server functions, not only by dashboard buttons.
+Activity lifecycle governance should flow through shared domain helpers across
+library cards, edit access, publish dialogs, duplicate/remix draft creation, and
+server functions, so UI affordances and backend enforcement keep the same
+restore-before-derive contract.
 
 The activity editor should make the selected template legible. When teachers
 choose quiz, match-up, line-match, group sort, fill-blank, listening, matching

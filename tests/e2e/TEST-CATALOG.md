@@ -478,6 +478,13 @@ restore-before-derive policy, assignment snapshot protection, public assignment
 continuity, server archive/restore/derivative guards,
 activity lifecycle privacy-scope boundaries, or the hidden activity-lifecycle
 handoff.
+Activity lifecycle governance chain has a fast script-level gate via
+`pnpm exec tsx --test scripts/activity-lifecycle-governance-chain-handoff.test.ts`;
+run it when changing owner-scoped archive and restore, edit, publish,
+duplicate, and remix gates, server lifecycle enforcement, content and
+source-material retention, assignment snapshot protection, public assignment
+continuity, lifecycle mutation cache refresh, created-panel publish access, or
+archive/restore privacy guards.
 Deterministic template remix safety has a fast script-level gate via
 `pnpm exec tsx --test scripts/activity-template-remix-handoff-semantic-views.test.ts`;
 run it when changing template readiness, suggested Copy as actions,

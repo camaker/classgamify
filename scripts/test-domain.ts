@@ -276,6 +276,11 @@ import {
   buildActivityAuthoringLibraryChainHandoffView,
 } from '@/activities/authoring-library-chain';
 import {
+  ACTIVITY_LIFECYCLE_GOVERNANCE_CHAIN_HANDOFF_ITEM_IDS,
+  ACTIVITY_LIFECYCLE_GOVERNANCE_CHAIN_SOURCE_FILES,
+  buildActivityLifecycleGovernanceChainHandoffView,
+} from '@/activities/activity-lifecycle-governance-chain';
+import {
   ACTIVITY_AI_DRAFT_DEFAULT_FOCUS,
   ACTIVITY_AI_DRAFT_FOCUSES,
   buildActivityAiDraftFocusOptions,
@@ -37072,6 +37077,160 @@ assert.match(
   activitiesApiSource,
   /export const updateActivity[\s\S]*assertActivityCanEdit\(existingActivity\.visibility\)/,
   'Update activity API should block edits to archived activities server-side.'
+);
+const activityLifecycleGovernanceChainView =
+  buildActivityLifecycleGovernanceChainHandoffView();
+const activityLifecycleGovernanceChainValues = new Map(
+  activityLifecycleGovernanceChainView.itemViews.map((item) => [
+    item.id,
+    item.value,
+  ])
+);
+assert.deepEqual(
+  activityLifecycleGovernanceChainView.itemViews.map((item) => item.id),
+  [...ACTIVITY_LIFECYCLE_GOVERNANCE_CHAIN_HANDOFF_ITEM_IDS],
+  'Activity lifecycle governance chain should expose the stable 30-slice order.'
+);
+assert.equal(activityLifecycleGovernanceChainView.itemViews.length, 30);
+assert.equal(
+  new Set(ACTIVITY_LIFECYCLE_GOVERNANCE_CHAIN_HANDOFF_ITEM_IDS).size,
+  30
+);
+assert.equal(ACTIVITY_LIFECYCLE_GOVERNANCE_CHAIN_SOURCE_FILES.length, 30);
+for (const filePath of ACTIVITY_LIFECYCLE_GOVERNANCE_CHAIN_SOURCE_FILES) {
+  assert.ok(
+    existsSync(filePath),
+    `Missing activity lifecycle governance chain file ${filePath}`
+  );
+}
+assert.ok(
+  activityLifecycleGovernanceChainView.itemViews.every(
+    (item) => item.ariaLabel && item.description && item.label && item.value
+  )
+);
+assert.deepEqual(activityLifecycleGovernanceChainView.privacy, {
+  archivedActivitiesBlockDerivatives: true,
+  chainSourceFileCount: ACTIVITY_LIFECYCLE_GOVERNANCE_CHAIN_SOURCE_FILES.length,
+  deletesActivityContentOnArchive: false,
+  exposesActivityContentText: false,
+  exposesAssignmentSnapshotContent: false,
+  exposesInternalActivityIds: false,
+  exposesSourceMaterialFileIds: false,
+  exposesSourceMaterialStorageKeys: false,
+  exposesTeacherNotesText: false,
+  itemIds: [...ACTIVITY_LIFECYCLE_GOVERNANCE_CHAIN_HANDOFF_ITEM_IDS],
+  mutatesPublishedAssignmentSnapshots: false,
+  requiresOwnerScope: true,
+  restoredVisibility: 'draft',
+  sourceFiles: [...ACTIVITY_LIFECYCLE_GOVERNANCE_CHAIN_SOURCE_FILES],
+});
+assert.deepEqual(
+  [
+    ACTIVITY_LIFECYCLE_HANDOFF_ITEM_IDS.length,
+    ACTIVITY_LIBRARY_PAGE_HANDOFF_ITEM_IDS.length,
+    ACTIVITY_DUPLICATE_HANDOFF_ITEM_IDS.length,
+    ACTIVITY_TEMPLATE_REMIX_HANDOFF_ITEM_IDS.length,
+    ACTIVITY_AUTHORING_LIBRARY_CHAIN_HANDOFF_ITEM_IDS.length,
+    ACTIVITY_AUTHORING_LIBRARY_CHAIN_SOURCE_FILES.length,
+    ASSIGNMENT_PUBLISH_HANDOFF_ITEM_IDS.length,
+  ],
+  Array.from({ length: 7 }, () => 30),
+  'Activity lifecycle governance chain should stay backed by lifecycle, library, duplicate, remix, authoring, and publish gates.'
+);
+assert.deepEqual(Object.fromEntries(activityLifecycleGovernanceChainValues), {
+  'archive-execution-plan': 'Validated transition',
+  'archive-server-guard': 'Already archived blocked',
+  'card-action-state': 'Restore-only archived',
+  'content-retention': 'Content retained',
+  'created-panel-publish-gate': 'Same access view',
+  'duplicate-api-gate': 'Server enforced',
+  'duplicate-ui-plan': 'Blocked or draft',
+  'edit-access-gate': 'Archived blocked',
+  'hidden-lifecycle-handoff': '30 semantic items',
+  'library-active-scope': 'Archived hidden',
+  'library-archived-scope': 'Archived only',
+  'library-owner-query': 'Owner scoped',
+  'library-status-parser': 'active/archived',
+  'library-status-summary': 'Full filtered result',
+  'lifecycle-domain-source': 'activities/lifecycle',
+  'lifecycle-governance-gate': '30 source files',
+  'product-archive-policy': 'Restore before derive',
+  'public-assignment-continuity': 'Existing links unchanged',
+  'publish-access-gate': 'Archived blocked',
+  'publish-api-derivation-gate': 'Server enforced',
+  'ready-template-remix-guard': 'Missing content blocked',
+  'remix-api-gate': 'Server enforced',
+  'remix-ui-plan': 'Ready target only',
+  'restore-execution-plan': 'Validated transition',
+  'restore-server-guard': 'Not archived blocked',
+  'restored-visibility-contract': 'draft',
+  'same-template-remix-guard': 'Blocked',
+  'snapshot-protection': 'Snapshots unchanged',
+  'source-material-retention': 'References retained',
+  'visibility-update-helper': 'Visibility only',
+});
+assert.match(
+  readFileSync('docs/product.md', 'utf8'),
+  /Teachers can soft-archive activities[\s\S]*restore them\s+later[\s\S]*Archived activities cannot be\s+published, duplicated, or remixed[\s\S]*server functions/,
+  'docs/product.md should preserve the restore-before-derive lifecycle policy.'
+);
+assert.match(
+  readFileSync('docs/product.md', 'utf8'),
+  /Activity lifecycle governance should flow through shared domain helpers[\s\S]*library cards[\s\S]*server functions[\s\S]*restore-before-derive contract/,
+  'docs/product.md should keep lifecycle governance shared across UI and server enforcement.'
+);
+assert.match(
+  activityLifecycleSource,
+  /export const ACTIVITY_RESTORED_VISIBILITY = 'draft'[\s\S]*canDeriveActivityWork\(visibility: ActivityVisibility\)[\s\S]*return !isActivityArchived\(visibility\)[\s\S]*buildActivityDerivativeActionGate[\s\S]*reason: 'activity-archived'[\s\S]*buildActivityDerivativeActionExecutionPlan[\s\S]*reason: actionView\.gate\.reason/,
+  'Activity lifecycle domain should restore to draft and block archived derivative work.'
+);
+assert.match(
+  activityLibraryQuerySource,
+  /const filters: SQL\[\] = \[eq\(activity\.ownerId, userId\)\][\s\S]*status === 'archived'[\s\S]*eq\(activity\.visibility, 'archived'\)[\s\S]*ne\(activity\.visibility, 'archived'\)/,
+  'Activity library query should keep owner scope and split active versus archived visibility.'
+);
+assert.match(
+  activityLibraryViewSource,
+  /buildActivityLibraryCardActionState[\s\S]*canCreateDerivedWork = canDeriveActivityWork\(visibility\)[\s\S]*showPublishAction: persisted && showActiveActions && canCreateDerivedWork[\s\S]*showRestoreAction: persisted && archived[\s\S]*showRestoreRequiredMessage: persisted && archived/,
+  'Activity library card state should hide derivative actions and show restore guidance for archived cards.'
+);
+assert.match(
+  activitiesApiSource,
+  /export const archiveActivity[\s\S]*nextVisibility: 'archived'[\s\S]*export const restoreActivity[\s\S]*nextVisibility: ACTIVITY_RESTORED_VISIBILITY[\s\S]*function updateActivityVisibility[\s\S]*assertActivityCanArchive\(row\.visibility\)[\s\S]*assertActivityCanRestore\(row\.visibility\)[\s\S]*buildActivityVisibilityUpdateSet/,
+  'Archive and restore server functions should share one visibility update helper with lifecycle guards.'
+);
+assert.match(
+  assignmentAttemptLimitApiSource,
+  /export const publishAssignment[\s\S]*buildActivityDetailOwnerWhere[\s\S]*assertActivityCanDeriveWork\(sourceActivity\.visibility\)[\s\S]*buildPublishedAssignmentSnapshotInsert/,
+  'Assignment publish API should enforce source lifecycle before freezing a snapshot.'
+);
+assert.match(
+  activityPersistenceSource,
+  /buildActivityVisibilityUpdateSet[\s\S]*updatedAt,[\s\S]*visibility: nextVisibility[\s\S]*buildDuplicatedActivityInsert[\s\S]*contentJson: cloneActivityContentForDerivative\(sourceActivity\.contentJson\)[\s\S]*visibility: 'draft'[\s\S]*buildRemixedActivityInsert[\s\S]*contentJson: cloneActivityContentForDerivative\(sourceActivity\.contentJson\)[\s\S]*visibility: 'draft'/,
+  'Lifecycle visibility updates should avoid content mutation while derivative inserts clone content into drafts.'
+);
+const activityLifecycleGovernanceCardSource = readFileSync(
+  'src/components/activities/activity-library-card.tsx',
+  'utf8'
+);
+const activityLifecycleGovernanceCreatedPanelSource = readFileSync(
+  'src/components/activities/created-activity-panel.tsx',
+  'utf8'
+);
+assert.match(
+  activityLifecycleGovernanceCardSource,
+  /buildActivityDerivativeActionExecutionPlan[\s\S]*buildActivityVisibilityActionExecutionPlan[\s\S]*openPublishDialog\(\)[\s\S]*buildAssignmentPublishDialogAccessView\(activity\.status\)[\s\S]*ActivityLibraryLifecycleHandoff/,
+  'Activity cards should use shared lifecycle plans for archive, restore, duplicate, remix, and publish access.'
+);
+assert.match(
+  activityLifecycleGovernanceCreatedPanelSource,
+  /buildAssignmentPublishDialogAccessView\([\s\S]*activity\.visibility[\s\S]*!accessView\.canOpen[\s\S]*ActivityPublishDialog[\s\S]*visibility: activity\.visibility/,
+  'Created activity panel should use the same publish access gate as library cards.'
+);
+assert.match(
+  e2eTestCatalogText.replace(/\s+/g, ' '),
+  /Activity lifecycle governance chain has a fast script-level gate via[\s\S]*scripts\/activity-lifecycle-governance-chain-handoff\.test\.ts[\s\S]*owner-scoped archive and restore[\s\S]*edit, publish, duplicate, and remix gates[\s\S]*server lifecycle enforcement[\s\S]*content and source-material retention[\s\S]*assignment snapshot protection[\s\S]*public assignment continuity/,
+  'E2E catalog should document the activity lifecycle governance chain gate.'
 );
 const useActivitiesSource = readFileSync('src/hooks/use-activities.ts', 'utf8');
 assert.match(
