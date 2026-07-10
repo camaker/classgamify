@@ -117,6 +117,11 @@ import {
   MAIL_TRANSACTIONAL_TEMPLATE_IDS,
   MAIL_TRANSACTIONAL_WORKSPACE_HANDOFF_ITEM_IDS,
 } from '@/mail/workspace-boundary';
+import {
+  TRANSACTIONAL_MAIL_LIFECYCLE_CHAIN_HANDOFF_ITEM_IDS,
+  TRANSACTIONAL_MAIL_LIFECYCLE_CHAIN_SOURCE_FILES,
+  buildTransactionalMailLifecycleChainHandoffView,
+} from '@/mail/transactional-mail-lifecycle-chain';
 import { normalizeMailLocale } from '@/mail/locale';
 import { getEmailSubject } from '@/mail/render';
 import { getAvatarLinks } from '@/config/avatar-config';
@@ -11520,6 +11525,8 @@ assert.match(
   /buildActivityLibraryRouteSearch\(\{[\s\S]*created: activity\.id,[\s\S]*createdFrom: 'create'[\s\S]*\}\)/,
   'Activity create form should route saved activities through the activity-domain created-panel search helper.'
 );
+const productSource = readFileSync('docs/product.md', 'utf8');
+const mailDocsSource = readFileSync('docs/mail.md', 'utf8');
 const contactFormCardSource = readFileSync(
   'src/components/contact/contact-form-card.tsx',
   'utf8'
@@ -16065,6 +16072,142 @@ assert.equal(
     locale: 'not-supported',
   }).title,
   mailTransactionalHandoffView.title
+);
+const transactionalMailLifecycleChainView =
+  buildTransactionalMailLifecycleChainHandoffView();
+const transactionalMailLifecycleChainValues = new Map(
+  transactionalMailLifecycleChainView.itemViews.map((item) => [
+    item.id,
+    item.value,
+  ])
+);
+assert.deepEqual(
+  transactionalMailLifecycleChainView.itemViews.map((item) => item.id),
+  [...TRANSACTIONAL_MAIL_LIFECYCLE_CHAIN_HANDOFF_ITEM_IDS],
+  'Transactional mail lifecycle chain should expose the stable 30-slice order.'
+);
+assert.equal(transactionalMailLifecycleChainView.itemViews.length, 30);
+assert.equal(
+  new Set(TRANSACTIONAL_MAIL_LIFECYCLE_CHAIN_HANDOFF_ITEM_IDS).size,
+  30
+);
+assert.equal(TRANSACTIONAL_MAIL_LIFECYCLE_CHAIN_SOURCE_FILES.length, 30);
+for (const filePath of TRANSACTIONAL_MAIL_LIFECYCLE_CHAIN_SOURCE_FILES) {
+  assert.ok(
+    existsSync(filePath),
+    `Missing transactional mail lifecycle chain file ${filePath}`
+  );
+}
+assert.ok(
+  transactionalMailLifecycleChainView.itemViews.every(
+    (item) => item.ariaLabel && item.description && item.label && item.value
+  )
+);
+assert.deepEqual(transactionalMailLifecycleChainView.privacy, {
+  chainSourceFileCount: TRANSACTIONAL_MAIL_LIFECYCLE_CHAIN_SOURCE_FILES.length,
+  contactCreatesActivities: false,
+  contactCreatesAssignmentLinks: false,
+  contactCreatesStudentRecords: false,
+  exposesActionUrls: false,
+  exposesContactMessageText: false,
+  exposesProviderApiTokens: false,
+  exposesRawProviderErrors: false,
+  exposesRecipientEmails: false,
+  exposesRecipientNames: false,
+  exposesSourceMaterialStorageKeys: false,
+  exposesStudentIdentifiers: false,
+  itemIds: [...TRANSACTIONAL_MAIL_LIFECYCLE_CHAIN_HANDOFF_ITEM_IDS],
+  mutatesActivities: false,
+  mutatesAssignmentLinks: false,
+  mutatesAttemptRecords: false,
+  normalizesUnsupportedLocales: true,
+  readsSourceMaterialFileBytes: false,
+  rendersBeforeProviderSend: true,
+  rendersSharedWorkspaceBoundary: true,
+  sendsLearnerNotifications: false,
+  sourceFiles: [...TRANSACTIONAL_MAIL_LIFECYCLE_CHAIN_SOURCE_FILES],
+  templateSetSize: 4,
+  usesProviderRegistry: true,
+});
+assert.deepEqual(Object.fromEntries(transactionalMailLifecycleChainValues), {
+  'action-url-guard': 'Not in handoff',
+  'boundary-activities-scope': 'Activities/templates',
+  'boundary-ai-source-scope': 'AI drafts/materials',
+  'boundary-assignments-scope': 'Assignment links',
+  'boundary-results-scope': 'Attempts/results',
+  'cloudflare-template-render': 'getTemplate first',
+  'contact-consumer': 'Support inbox',
+  'contact-structured-fields': 'Classroom context',
+  'forgot-password-consumer': 'Better Auth',
+  'html-render-path': 'React email',
+  'learner-notification-guard': 'Teacher email only',
+  'locale-normalization': 'Base fallback',
+  'mail-disabled-guard': 'No provider send',
+  'mail-doc-provider-registry': 'Provider registry',
+  'newsletter-consumer': 'Teacher updates',
+  'no-workspace-mutation': 'Mail sends only',
+  'plain-text-render-path': 'HTML to text',
+  'product-mail-boundary': 'Teacher workspace',
+  'provider-registry': 'Resend/Cloudflare',
+  'provider-secret-guard': 'Secrets server-side',
+  'recipient-privacy-guard': 'Recipients hidden',
+  'render-before-send': 'Prepared payload',
+  'resend-template-render': 'getTemplate first',
+  'shared-email-layout': 'Localized HTML',
+  'subject-localization': 'Message keys',
+  'template-set-registry': 'Render registry',
+  'template-type-union': '4 templates',
+  'transactional-mail-chain-gate': '30 source files',
+  'verify-email-consumer': 'Better Auth',
+  'workspace-boundary-panel': 'Shared panel',
+});
+assert.deepEqual(
+  [
+    MAIL_TRANSACTIONAL_WORKSPACE_HANDOFF_ITEM_IDS.length,
+    MAIL_TRANSACTIONAL_TEMPLATE_IDS.length,
+  ],
+  [30, 4],
+  'Transactional mail lifecycle chain should stay backed by the transactional workspace handoff and four current templates.'
+);
+assert.match(
+  productSource,
+  /Transactional email surfaces follow the same lifecycle boundary[\s\S]*verification[\s\S]*password reset[\s\S]*newsletter confirmation[\s\S]*contact-message templates[\s\S]*provider send[\s\S]*action URLs[\s\S]*recipient data[\s\S]*provider secrets[\s\S]*handoff contracts/,
+  'docs/product.md should keep transactional email inside the same teacher workspace lifecycle boundary.'
+);
+assert.match(
+  mailDocsSource,
+  /Transactional email[\s\S]*provider registry[\s\S]*context\.locale[\s\S]*fallback to the base locale[\s\S]*shared workspace boundary panel[\s\S]*buildMailTransactionalWorkspaceHandoffView\(\)[\s\S]*30-slice preflight contract/,
+  'Mail docs should preserve the transactional template, locale, provider, and handoff lifecycle contract.'
+);
+assert.match(
+  mailRenderSource,
+  /const EmailTemplates = \{[\s\S]*forgotPassword: ForgotPassword,[\s\S]*verifyEmail: VerifyEmail,[\s\S]*subscribeNewsletter: SubscribeNewsletter,[\s\S]*contactMessage: ContactMessage,[\s\S]*\} as const[\s\S]*normalizeMailLocale\(context\.locale\)[\s\S]*renderEmailHtml\(email\)[\s\S]*toPlainText\(html\)[\s\S]*getEmailSubject\(\{/,
+  'Mail renderer should preserve the template registry, locale normalization, HTML render, text render, and localized subject chain.'
+);
+assert.match(
+  mailWorkspaceBoundarySource,
+  /MAIL_TRANSACTIONAL_WORKSPACE_HANDOFF_ITEM_IDS[\s\S]*'template-set'[\s\S]*'private-data-guard'[\s\S]*buildMailTransactionalWorkspaceHandoffView[\s\S]*rendersBeforeProviderSend: true[\s\S]*usesProviderRegistryBoundary: true/,
+  'Mail workspace boundary should keep the 30-slice transactional handoff backing this lifecycle chain.'
+);
+assert.match(
+  authMailLocaleSource,
+  /sendResetPassword[\s\S]*template: 'forgotPassword'[\s\S]*sendVerificationEmail[\s\S]*template: 'verifyEmail'/,
+  'Auth should keep password reset and verification on transactional mail templates.'
+);
+assert.match(
+  newsletterMailLocaleApiSource,
+  /subscribeNewsletter[\s\S]*template: 'subscribeNewsletter'[\s\S]*locale: getLocale\(\)/,
+  'Newsletter subscribe should keep confirmation mail localized through transactional mail.'
+);
+assert.match(
+  contactApiSource,
+  /normalizeContactInquiryIntent\(data\.intent\)[\s\S]*buildContactClassroomInquiryPayload[\s\S]*template: 'contactMessage'[\s\S]*locale: getLocale\(\)/,
+  'Contact API should keep structured classroom inquiry mail localized and non-mutating.'
+);
+assert.match(
+  e2eTestCatalogText.replace(/\s+/g, ' '),
+  /Transactional mail lifecycle chain has a fast script-level gate via[\s\S]*scripts\/transactional-mail-lifecycle-chain-handoff\.test\.ts[\s\S]*template set[\s\S]*locale fallback[\s\S]*HTML\/plain-text rendering[\s\S]*shared workspace boundary[\s\S]*auth reset\/verification[\s\S]*provider registry[\s\S]*privacy guards/,
+  'E2E catalog should document the transactional mail lifecycle chain gate.'
 );
 assert.deepEqual(AUTH_WORKSPACE_BOUNDARY_ITEM_IDS, [
   'account-access',

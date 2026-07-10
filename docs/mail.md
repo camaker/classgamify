@@ -104,7 +104,7 @@ mail: {
 | **getTemplate({ template, context })** | Normalizes optional `context.locale`, renders `{ html, text, subject }`, and passes the same locale into the template component and subject resolver. Used by providers internally. |
 
 `context.locale` accepts the configured Paraglide locale values (`en`, `zh`).
-Missing or unsupported values fall back to the base locale before rendering.
+Missing or unsupported values fallback to the base locale before rendering.
 
 **Types (re-exported):** `EmailTemplate`, `MailProviderName`, `SendTemplateParams`, `SendRawEmailParams`.
 

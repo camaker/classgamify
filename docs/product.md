@@ -54,6 +54,12 @@ Developer-facing examples and active account/contact copy should follow the
 same product boundary: visible surfaces may refer to legacy URLs only when they
 are explicit migration entry points, while current forms, billing pages, and
 configuration examples should speak in ClassGamify terms.
+Transactional email surfaces follow the same lifecycle boundary: verification,
+password reset, newsletter confirmation, and contact-message templates should
+render the shared teacher workspace context before provider send while keeping
+action URLs, recipient data, provider secrets, source-material storage keys,
+student identifiers, learner notifications, and product mutations out of
+handoff contracts.
 
 - `Activity` is the teacher-owned reusable content object.
 - `ActivityContent` is template-neutral lesson material: questions, pairs,
