@@ -490,6 +490,10 @@ Implementation boundaries:
   application, teacher review, manual save, saved activity records, assignment
   publish actions, share-link and snapshot boundaries, public-payload guards,
   privacy guards, and result-export continuity.
+- `src/activities/ai-fallback-draft-chain.ts` owns the deterministic AI
+  fallback draft chain for missing Workers AI credentials, invalid provider
+  JSON, sanitized source-term planning, local classroom draft completion,
+  teacher review, and save/publish boundaries.
 - `src/api/activity-ai.ts` exposes the authenticated server function.
 - `src/components/activities/activity-create-form.tsx` only collects draft
   inputs and fills the existing form.

@@ -276,6 +276,11 @@ import {
   buildActivityAiAuthoringChainHandoffView,
 } from '@/activities/ai-authoring-chain';
 import {
+  ACTIVITY_AI_FALLBACK_DRAFT_CHAIN_HANDOFF_ITEM_IDS,
+  ACTIVITY_AI_FALLBACK_DRAFT_CHAIN_SOURCE_FILES,
+  buildActivityAiFallbackDraftChainHandoffView,
+} from '@/activities/ai-fallback-draft-chain';
+import {
   ACTIVITY_AI_ENHANCEMENT_ROADMAP_CHAIN_HANDOFF_ITEM_IDS,
   ACTIVITY_AI_ENHANCEMENT_ROADMAP_CHAIN_SOURCE_FILES,
   buildActivityAiEnhancementRoadmapChainHandoffView,
@@ -6908,6 +6913,121 @@ assert.match(
   readFileSync('tests/e2e/TEST-CATALOG.md', 'utf8'),
   /Activity AI authoring chain has a fast script-level gate via[\s\S]*scripts\/activity-ai-authoring-chain-handoff\.test\.ts/,
   'TEST-CATALOG should document the activity AI authoring chain gate.'
+);
+const activityAiFallbackDraftChainView =
+  buildActivityAiFallbackDraftChainHandoffView();
+const activityAiFallbackDraftChainValues = new Map(
+  activityAiFallbackDraftChainView.itemViews.map((item) => [
+    item.id,
+    item.value,
+  ])
+);
+assert.deepEqual(
+  activityAiFallbackDraftChainView.itemViews.map((item) => item.id),
+  [...ACTIVITY_AI_FALLBACK_DRAFT_CHAIN_HANDOFF_ITEM_IDS],
+  'Activity AI fallback draft chain should expose the stable provider-failure-to-editor-review 30-slice order.'
+);
+assert.equal(activityAiFallbackDraftChainView.itemViews.length, 30);
+assert.equal(
+  new Set(ACTIVITY_AI_FALLBACK_DRAFT_CHAIN_HANDOFF_ITEM_IDS).size,
+  30
+);
+assert.equal(ACTIVITY_AI_FALLBACK_DRAFT_CHAIN_SOURCE_FILES.length, 30);
+for (const filePath of ACTIVITY_AI_FALLBACK_DRAFT_CHAIN_SOURCE_FILES) {
+  assert.ok(
+    existsSync(filePath),
+    `Missing activity AI fallback draft chain file ${filePath}`
+  );
+}
+assert.ok(
+  activityAiFallbackDraftChainView.itemViews.every(
+    (item) => item.ariaLabel && item.description && item.label && item.value
+  )
+);
+assert.deepEqual(activityAiFallbackDraftChainView.privacy, {
+  callsWorkersAiWithoutCredentials: false,
+  chainSourceFileCount:
+    ACTIVITY_AI_FALLBACK_DRAFT_CHAIN_SOURCE_FILES.length,
+  createsAssignmentLinks: false,
+  exposesActivityContentBeforeTeacherReview: false,
+  exposesAnswerText: false,
+  exposesFileBytesToAi: false,
+  exposesProviderApiTokens: false,
+  exposesRawFallbackDraft: false,
+  exposesRawProviderResponse: false,
+  exposesRawSourceMaterialNotes: false,
+  exposesRawSourceText: false,
+  exposesSourceMaterialFileIds: false,
+  exposesSourceMaterialStorageKeys: false,
+  itemIds: [...ACTIVITY_AI_FALLBACK_DRAFT_CHAIN_HANDOFF_ITEM_IDS],
+  keepsLocalCiStable: true,
+  persistsActivityWithoutTeacherAction: false,
+  providerCredentialsServerSide: true,
+  publishesAssignmentWithoutTeacherAction: false,
+  requiresCreateActivityInputContract: true,
+  requiresDeterministicFallback: true,
+  requiresEditorApplication: true,
+  requiresTeacherReview: true,
+  sourceFiles: [...ACTIVITY_AI_FALLBACK_DRAFT_CHAIN_SOURCE_FILES],
+  usesSanitizedSourceText: true,
+});
+assert.deepEqual(
+  [
+    ACTIVITY_AI_FALLBACK_HANDOFF_ITEM_IDS.length,
+    ACTIVITY_AI_FALLBACK_SOURCE_TERM_PLAN_ITEM_IDS.length,
+    ACTIVITY_AI_DRAFT_BOUNDARY_HANDOFF_ITEM_IDS.length,
+    ACTIVITY_DRAFT_META_HANDOFF_ITEM_IDS.length,
+    ACTIVITY_TEMPLATE_REMIX_HANDOFF_ITEM_IDS.length,
+    QUESTION_CHOICE_GENERATION_HANDOFF_ITEM_IDS.length,
+    ACTIVITY_EDITOR_AI_DRAFT_SOURCE_HANDOFF_ITEM_IDS.length,
+    ACTIVITY_EDITOR_WORKFLOW_HANDOFF_ITEM_IDS.length,
+    ACTIVITY_SOURCE_MATERIAL_PICKER_HANDOFF_ITEM_IDS.length,
+    ACTIVITY_SOURCE_EXTRACTION_ASSIST_HANDOFF_ITEM_IDS.length,
+    SOURCE_EXTRACTION_LIFECYCLE_CHAIN_HANDOFF_ITEM_IDS.length,
+    SOURCE_MATERIAL_PRIVACY_CHAIN_HANDOFF_ITEM_IDS.length,
+    ACTIVITY_AI_AUTHORING_CHAIN_HANDOFF_ITEM_IDS.length,
+    ACTIVITY_AI_AUTHORING_CHAIN_SOURCE_FILES.length,
+    ACTIVITY_AI_ENHANCEMENT_EXECUTION_ITEM_IDS.length,
+  ],
+  Array.from({ length: 15 }, () => 30),
+  'Activity AI fallback draft chain should stay backed by fallback, source-term, draft boundary, metadata, template, question-choice, editor, source-material, extraction, authoring, and execution gates.'
+);
+assert.deepEqual(Object.fromEntries(activityAiFallbackDraftChainValues), {
+  'complete-group-fields': 'Groups ready',
+  'complete-pair-fields': 'Pairs ready',
+  'complete-question-fields': 'Questions with explanations',
+  'create-input-mapping': 'CreateActivityInput',
+  'credential-missing-path': 'Missing credentials -> fallback',
+  'draft-focus-preservation': 'Selected focus kept',
+  'draft-metadata-summary': 'Coverage + trust',
+  'editor-application': 'Apply to editor',
+  'explanation-coverage': 'Answer explanations',
+  'fallback-chain-gate': '30 source files',
+  'fallback-contract-owner': 'ai-draft.ts',
+  'fallback-padding': 'Deterministic classroom terms',
+  'input-schema-boundary': 'GenerateActivityDraftInput',
+  'invalid-json-path': 'Invalid provider JSON -> fallback',
+  'local-draft-generator': 'createFallbackActivityDraft',
+  'material-note-omission': 'Raw material notes omitted',
+  'provider-call-boundary': 'Workers AI only when configured',
+  'provider-secret-guard': 'Worker secrets only',
+  'publish-boundary': 'Save before publish',
+  'quiz-choice-readiness': 'Local choices checked',
+  'safe-provenance-boundary': 'Kind and basename only',
+  'save-boundary': 'Teacher saves first',
+  'source-sanitization': 'sanitizeActivityDraftSourceTextForAi',
+  'source-term-plan': '30 planning slices',
+  'target-item-count': 'Bounded item target',
+  'teacher-note-coverage': 'Review notes',
+  'teacher-review-gate': 'Review required',
+  'template-preservation': 'Selected template kept',
+  'template-readiness-preview': 'Ready and locked modes',
+  'vocabulary-coverage': 'Vocabulary terms',
+});
+assert.match(
+  readFileSync('tests/e2e/TEST-CATALOG.md', 'utf8'),
+  /Activity AI fallback draft chain has a fast script-level gate via[\s\S]*scripts\/activity-ai-fallback-draft-chain-handoff\.test\.ts/,
+  'TEST-CATALOG should document the activity AI fallback draft chain gate.'
 );
 const activityAiEnhancementRoadmapChainView =
   buildActivityAiEnhancementRoadmapChainHandoffView();

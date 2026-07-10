@@ -559,6 +559,12 @@ run it when changing AI source safety, authenticated draft generation,
 deterministic fallback, CreateActivityInput mapping, draft coverage,
 template readiness, quiz-choice readiness, AI remix assist, editor review,
 source-material privacy guards, or save/publish boundaries.
+Activity AI fallback draft chain has a fast script-level gate via
+`pnpm exec tsx --test scripts/activity-ai-fallback-draft-chain-handoff.test.ts`;
+run it when changing missing Workers AI credentials, invalid provider JSON,
+deterministic local draft generation, source-term planning, fallback padding,
+CreateActivityInput mapping, teacher review, editor application,
+save/publish boundaries, provider-secret guards, or fallback privacy guards.
 Activity AI enhancement roadmap chain has a fast script-level gate via
 `pnpm exec tsx --test scripts/activity-ai-enhancement-roadmap-chain-handoff.test.ts`;
 run it when changing template transforms, AI remix completion, distractor write
