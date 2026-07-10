@@ -552,6 +552,13 @@ run it when changing attached-material extraction readiness, audio draft paths,
 worksheet extraction paths, spreadsheet import paths, ActivityContent write
 targets, editor-review gates, source-material privacy guards, or parallel
 worksheet-model boundaries.
+Source extraction lifecycle chain has a fast script-level gate via
+`pnpm exec tsx --test scripts/source-extraction-lifecycle-chain-handoff.test.ts`;
+run it when changing compact source-material references, material-kind
+classification, extraction readiness action maps, audio/worksheet/spreadsheet
+readiness, source summary handoffs, AI source provenance, ActivityContent write
+targets, editor-review/persistence/publish boundaries, assignment snapshot
+protection, public payload privacy, or source-extraction lifecycle guards.
 Assignment publish control boundaries have fast script-level gates via
 `pnpm exec tsx --test scripts/assignment-publish-handoff-semantic-views.test.ts`
 and `pnpm exec tsx --test scripts/classroom-control-semantics-handoff.test.ts`;

@@ -383,6 +383,11 @@ import {
   buildActivitySourceExtractionAssistHandoffView,
 } from '@/activities/source-extraction-assist';
 import {
+  SOURCE_EXTRACTION_LIFECYCLE_CHAIN_HANDOFF_ITEM_IDS,
+  SOURCE_EXTRACTION_LIFECYCLE_CHAIN_SOURCE_FILES,
+  buildSourceExtractionLifecycleChainHandoffView,
+} from '@/activities/source-extraction-lifecycle-chain';
+import {
   ACTIVITY_SOURCE_MATERIAL_REFERENCE_LIMITS,
   ACTIVITY_SOURCE_MATERIAL_REFERENCE_ITEM_IDS,
   ACTIVITY_SOURCE_MATERIAL_REFERENCE_PRIVACY_CONTRACT,
@@ -6514,6 +6519,105 @@ assert.match(
   activitySourceExtractionAssistTestCatalogSource,
   /\|\s*7\s*\|(?=[\s\S]*source-extraction-assist handoff covers source-material count)(?=[\s\S]*worksheet extraction)(?=[\s\S]*storage-key)(?=[\s\S]*privacy guards)/,
   'E2E catalog should cover the source-extraction-assist handoff acceptance journey.'
+);
+const sourceExtractionLifecycleChainView =
+  buildSourceExtractionLifecycleChainHandoffView();
+const sourceExtractionLifecycleChainValues = new Map(
+  sourceExtractionLifecycleChainView.itemViews.map((item) => [
+    item.id,
+    item.value,
+  ])
+);
+assert.deepEqual(
+  sourceExtractionLifecycleChainView.itemViews.map((item) => item.id),
+  [...SOURCE_EXTRACTION_LIFECYCLE_CHAIN_HANDOFF_ITEM_IDS],
+  'Source extraction lifecycle chain should expose the stable extraction-readiness 30-slice order.'
+);
+assert.equal(sourceExtractionLifecycleChainView.itemViews.length, 30);
+assert.equal(
+  new Set(SOURCE_EXTRACTION_LIFECYCLE_CHAIN_HANDOFF_ITEM_IDS).size,
+  30
+);
+assert.equal(SOURCE_EXTRACTION_LIFECYCLE_CHAIN_SOURCE_FILES.length, 30);
+for (const filePath of SOURCE_EXTRACTION_LIFECYCLE_CHAIN_SOURCE_FILES) {
+  assert.ok(
+    existsSync(filePath),
+    `Missing source extraction lifecycle chain file ${filePath}`
+  );
+}
+assert.ok(
+  sourceExtractionLifecycleChainView.itemViews.every(
+    (item) => item.ariaLabel && item.description && item.label && item.value
+  )
+);
+assert.deepEqual(sourceExtractionLifecycleChainView.privacy, {
+  chainSourceFileCount: SOURCE_EXTRACTION_LIFECYCLE_CHAIN_SOURCE_FILES.length,
+  createsParallelWorksheetModel: false,
+  exposesAcceptedAnswerTextInHandoff: false,
+  exposesActivityContentTextInHandoff: false,
+  exposesFileBytesToAi: false,
+  exposesRawSourceMaterialFileIdsInHandoff: false,
+  exposesSourceMaterialFilenamesInHandoff: false,
+  exposesSourceMaterialStorageKeys: false,
+  exposesSourceMaterialsToPublicPayload: false,
+  itemIds: [...SOURCE_EXTRACTION_LIFECYCLE_CHAIN_HANDOFF_ITEM_IDS],
+  persistsActivityWithoutTeacherAction: false,
+  publishesAssignmentWithoutTeacherAction: false,
+  readsSourceMaterialBytes: false,
+  requiresEditorReview: true,
+  sourceFiles: [...SOURCE_EXTRACTION_LIFECYCLE_CHAIN_SOURCE_FILES],
+  targetsActivityContent: true,
+  usesCompactSourceMaterialReferences: true,
+});
+assert.deepEqual(
+  [
+    ACTIVITY_SOURCE_EXTRACTION_ASSIST_HANDOFF_ITEM_IDS.length,
+    ACTIVITY_SOURCE_MATERIAL_REFERENCE_ITEM_IDS.length,
+    ACTIVITY_SOURCE_MATERIAL_PICKER_HANDOFF_ITEM_IDS.length,
+    SOURCE_MATERIAL_PRIVACY_CHAIN_HANDOFF_ITEM_IDS.length,
+    ACTIVITY_AI_AUTHORING_CHAIN_HANDOFF_ITEM_IDS.length,
+    TEMPLATE_ROADMAP_CAPABILITY_CHAIN_HANDOFF_ITEM_IDS.length,
+    ACTIVITY_AUTHORING_LIBRARY_CHAIN_HANDOFF_ITEM_IDS.length,
+  ],
+  Array.from({ length: 7 }, () => 30),
+  'Source extraction lifecycle chain should stay backed by source-material, AI, roadmap, and authoring gates.'
+);
+assert.deepEqual(Object.fromEntries(sourceExtractionLifecycleChainValues), {
+  'accepted-answer-target': 'Accepted answers',
+  'activity-content-source-materials': 'ActivityContent.sourceMaterials',
+  'activity-content-target': 'ActivityContent target',
+  'ai-authoring-chain-alignment': 'AI authoring aligned',
+  'ai-draft-boundary-sanitization': 'Sanitized AI source',
+  'ai-source-omitted-notes': 'Unsafe notes omitted',
+  'ai-source-safe-provenance': 'Kind and basename only',
+  'assignment-snapshot-boundary': 'Snapshots unchanged',
+  'audio-extraction-readiness': 'Audio draft ready',
+  'compact-reference-boundary': 'Compact references',
+  'editor-review-gate': 'Teacher review required',
+  'material-kind-classification': 'Metadata classification',
+  'persistence-boundary': 'Not auto-saved',
+  'picker-owner-scope': 'Current teacher files',
+  'picker-reference-write': 'Writes compact refs',
+  'product-extraction-policy': 'Product policy',
+  'public-payload-privacy': 'Public payload hidden',
+  'publish-boundary': 'No auto-publish',
+  'question-pair-group-targets': 'Structured field targets',
+  'readiness-action-map': 'Three readiness actions',
+  'reference-only-state': 'Reference-only explicit',
+  'settings-library-provenance': 'Settings provenance',
+  'source-extraction-lifecycle-gate': '30 source files',
+  'source-material-privacy-chain-alignment': 'Privacy chain aligned',
+  'source-summary-hidden-handoff': 'Hidden dl handoff',
+  'source-summary-view': 'Summary view model',
+  'spreadsheet-import-readiness': 'Spreadsheet import ready',
+  'template-readiness-target': 'Template readiness',
+  'template-roadmap-chain-alignment': 'Roadmap aligned',
+  'worksheet-extraction-readiness': 'Worksheet extraction ready',
+});
+assert.match(
+  readFileSync('tests/e2e/TEST-CATALOG.md', 'utf8'),
+  /Source extraction lifecycle chain has a fast script-level gate via[\s\S]*scripts\/source-extraction-lifecycle-chain-handoff\.test\.ts/,
+  'TEST-CATALOG should document the source extraction lifecycle chain gate.'
 );
 const activityAiAuthoringChainView =
   buildActivityAiAuthoringChainHandoffView();
