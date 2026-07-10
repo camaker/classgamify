@@ -62,6 +62,12 @@ Public discovery/indexing chain has a fast script-level gate via
 run it when changing public entry routes, navigation, template/worksheet
 entries, public page copy, sitemap/robots/manifest helpers, legacy route
 retirement, public DOM handoff boundaries, or privacy/indexing guards.
+Classroom trust communication chain has a fast script-level gate via
+`pnpm exec tsx --test scripts/classroom-trust-communication-chain-handoff.test.ts`;
+run it when changing public classroom contact intake, auth workspace entry,
+transactional mail, teacher notification settings, hosted billing,
+legal/provider copy, developer configuration secrets, storage source-material
+boundaries, or public DOM handoff boundaries.
 Active surface product boundary has a fast script-level gate via
 `pnpm exec tsx --test scripts/active-surface-product-boundary.test.ts`; run it
 when changing active account, contact, billing, mail, notification, or

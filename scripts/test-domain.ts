@@ -49,6 +49,12 @@ import {
   buildActiveSurfaceProductBoundaryView,
 } from '@/config/active-surface-product-boundary';
 import {
+  CLASSROOM_TRUST_COMMUNICATION_CHAIN_HANDOFF_ITEM_IDS,
+  CLASSROOM_TRUST_COMMUNICATION_CHAIN_SOURCE_FILES,
+  buildClassroomTrustCommunicationChainHandoffView,
+} from '@/config/classroom-trust-communication-chain';
+import { DEVELOPER_CONFIGURATION_HANDOFF_ITEM_IDS } from '@/config/developer-configuration-handoff';
+import {
   buildPublicNavigationHandoffView,
   PUBLIC_NAVIGATION_HANDOFF_ITEM_IDS,
 } from '@/navigation/public-navigation-handoff';
@@ -14299,6 +14305,121 @@ assert.match(
   readFileSync('tests/e2e/TEST-CATALOG.md', 'utf8'),
   /Public discovery\/indexing chain has a fast script-level gate via[\s\S]*scripts\/public-discovery-indexing-chain-handoff\.test\.ts/,
   'TEST-CATALOG should document the public discovery/indexing chain gate.'
+);
+const classroomTrustCommunicationChainView =
+  buildClassroomTrustCommunicationChainHandoffView();
+const classroomTrustCommunicationChainValues = new Map(
+  classroomTrustCommunicationChainView.itemViews.map((item) => [
+    item.id,
+    item.value,
+  ])
+);
+assert.deepEqual(
+  classroomTrustCommunicationChainView.itemViews.map((item) => item.id),
+  [...CLASSROOM_TRUST_COMMUNICATION_CHAIN_HANDOFF_ITEM_IDS],
+  'Classroom trust communication chain should expose the stable 30-slice contact, auth, mail, notification, billing, legal, config, storage, and public DOM order.'
+);
+assert.equal(classroomTrustCommunicationChainView.itemViews.length, 30);
+assert.equal(
+  new Set(CLASSROOM_TRUST_COMMUNICATION_CHAIN_HANDOFF_ITEM_IDS).size,
+  30
+);
+assert.equal(CLASSROOM_TRUST_COMMUNICATION_CHAIN_SOURCE_FILES.length, 30);
+for (const filePath of CLASSROOM_TRUST_COMMUNICATION_CHAIN_SOURCE_FILES) {
+  assert.ok(
+    existsSync(filePath),
+    `Missing classroom trust communication chain file ${filePath}`
+  );
+}
+assert.ok(
+  classroomTrustCommunicationChainView.itemViews.every(
+    (item) => item.ariaLabel && item.description && item.label && item.value
+  )
+);
+assert.deepEqual(classroomTrustCommunicationChainView.privacy, {
+  chainSourceFileCount: CLASSROOM_TRUST_COMMUNICATION_CHAIN_SOURCE_FILES.length,
+  contactCreatesActivities: false,
+  contactCreatesAssignmentLinks: false,
+  contactCreatesStudentRecords: false,
+  exposesActionUrls: false,
+  exposesAnswerKeys: false,
+  exposesAuthSecrets: false,
+  exposesContactMessageText: false,
+  exposesOAuthClientSecrets: false,
+  exposesPaymentProviderSecrets: false,
+  exposesProviderApiTokens: false,
+  exposesRawAnonymousTokens: false,
+  exposesRawProviderErrors: false,
+  exposesRecipientEmail: false,
+  exposesSourceMaterialStorageKeys: false,
+  exposesStudentAttemptRecords: false,
+  exposesStudentIdentifiers: false,
+  exposesTeacherEmail: false,
+  exposesTeacherPrivateActivityContent: false,
+  itemIds: [...CLASSROOM_TRUST_COMMUNICATION_CHAIN_HANDOFF_ITEM_IDS],
+  keepsCloudflareDeployOwnerDocumented: true,
+  keepsRuntimeSecretsServerSide: true,
+  keepsTrustHandoffsSourceLevelForPublicDom: true,
+  normalizesUnsupportedMailLocales: true,
+  sendsLearnerNotifications: false,
+  sourceFiles: [...CLASSROOM_TRUST_COMMUNICATION_CHAIN_SOURCE_FILES],
+  usesClassGamifyProductModel: true,
+});
+assert.deepEqual(
+  [
+    CONTACT_CLASSROOM_INTAKE_HANDOFF_ITEM_IDS.length,
+    AUTH_WORKSPACE_HANDOFF_ITEM_IDS.length,
+    MAIL_TRANSACTIONAL_WORKSPACE_HANDOFF_ITEM_IDS.length,
+    SETTINGS_NOTIFICATION_UPDATE_HANDOFF_ITEM_IDS.length,
+    SETTINGS_BILLING_WORKSPACE_HANDOFF_ITEM_IDS.length,
+    LEGAL_POLICY_HANDOFF_ITEM_IDS.length,
+    DEVELOPER_CONFIGURATION_HANDOFF_ITEM_IDS.length,
+    PUBLIC_DOM_HANDOFF_BOUNDARY_ITEM_IDS.length,
+  ],
+  Array.from({ length: 8 }, () => 30),
+  'Classroom trust communication chain should stay backed by focused contact, auth, mail, notification, billing, legal, config, and public DOM gates.'
+);
+assert.deepEqual(Object.fromEntries(classroomTrustCommunicationChainValues), {
+  'auth-callback-safety': 'Safe callback paths',
+  'auth-entry-boundary': Routes.Login,
+  'auth-provider-gates': 'Credential/Google gates',
+  'auth-workspace-access': Routes.Dashboard,
+  'billing-hosted-boundary': Routes.SettingsBilling,
+  'billing-plan-capabilities': 'Classroom loop access',
+  'billing-provider-secret-guard': 'Provider secrets hidden',
+  'classroom-trust-chain-gate': '30 source files',
+  'contact-classroom-intent': 'Classroom inquiry',
+  'contact-mail-context': 'Structured mail context',
+  'contact-no-workspace-mutation': 'No workspace mutation',
+  'contact-structured-fields': 'Learners/material/routine/need',
+  'developer-config-deploy-owner': 'Cloudflare Git',
+  'developer-config-env-split': 'Build/runtime split',
+  'developer-config-secret-boundary': 'Worker secrets',
+  'legal-policy-product-model': 'Teacher/student data model',
+  'legal-provider-scope': 'Configured providers',
+  'legal-student-data-boundary': 'Student data protected',
+  'legacy-copy-guard': 'ClassGamify only',
+  'mail-provider-registry': 'Provider boundary',
+  'notification-no-learner-reminders': 'No learner reminders',
+  'notification-teacher-updates': Routes.SettingsNotifications,
+  'private-data-guard': 'Private data hidden',
+  'product-boundary': 'Activity -> Assignment -> Attempt -> Results',
+  'public-contact-entry': Routes.ContactClassroom,
+  'public-dom-handoff-boundary': 'Source-level public gates',
+  'storage-source-material-boundary': 'R2 owner files',
+  'transactional-mail-boundary-panel': 'Workspace boundary panel',
+  'transactional-mail-localization': 'Localized subjects',
+  'transactional-mail-template-set': 'Verify/reset/newsletter/contact',
+});
+assert.match(
+  readFileSync('tests/e2e/TEST-CATALOG.md', 'utf8'),
+  /Classroom trust communication chain has a fast script-level gate via[\s\S]*scripts\/classroom-trust-communication-chain-handoff\.test\.ts/,
+  'TEST-CATALOG should document the classroom trust communication chain gate.'
+);
+assert.match(
+  readFileSync('tests/e2e/TEST-CATALOG.md', 'utf8').replace(/\s+/g, ' '),
+  /public classroom contact intake[\s\S]*auth workspace entry[\s\S]*transactional mail[\s\S]*teacher notification settings[\s\S]*hosted billing[\s\S]*legal\/provider copy[\s\S]*developer configuration secrets[\s\S]*public DOM handoff boundaries/,
+  'TEST-CATALOG should describe the full classroom trust communication chain scope.'
 );
 const teacherWorkspaceOperationsChainView =
   buildTeacherWorkspaceOperationsChainHandoffView();
