@@ -19,8 +19,9 @@ AI enhancement lifecycle review,
 published assignment delivery, student runner play, validated attempts,
 scored attempt results, submitted-date continuity,
 accepted-answer continuity, and explanation continuity, teacher result review,
-copy/export/print handoffs, dashboard status, public discovery/indexing
-metadata, and privacy guards aligned with this sequence.
+teacher result copy lifecycle, copy/export/print handoffs, dashboard status,
+public discovery/indexing metadata, and privacy guards aligned with this
+sequence.
 
 Copied-template surfaces should be retired in narrow, verified waves. Public
 navigation and homepage entry points should point at ClassGamify templates,
