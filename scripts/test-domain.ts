@@ -293,6 +293,11 @@ import {
   buildActivityAiEnhancementDraftApplicationView,
 } from '@/activities/ai-enhancement-draft-application';
 import {
+  ACTIVITY_AI_ENHANCEMENT_DRAFT_OUTPUT_ITEM_IDS,
+  buildActivityAiEnhancementDraftOutputPlan,
+  buildActivityAiEnhancementDraftOutputView,
+} from '@/activities/ai-enhancement-draft-output';
+import {
   TEMPLATE_ROADMAP_CAPABILITY_CHAIN_HANDOFF_ITEM_IDS,
   TEMPLATE_ROADMAP_CAPABILITY_CHAIN_SOURCE_FILES,
   buildTemplateRoadmapCapabilityChainHandoffView,
@@ -6942,13 +6947,14 @@ assert.deepEqual(
     SOURCE_MATERIAL_PRIVACY_CHAIN_HANDOFF_ITEM_IDS.length,
     ACTIVITY_AI_ENHANCEMENT_POLICY_ITEM_IDS.length,
     ACTIVITY_AI_ENHANCEMENT_EXECUTION_ITEM_IDS.length,
+    ACTIVITY_AI_ENHANCEMENT_DRAFT_OUTPUT_ITEM_IDS.length,
     ACTIVITY_AI_ENHANCEMENT_DRAFT_APPLICATION_ITEM_IDS.length,
     TEMPLATE_ROADMAP_CAPABILITY_CHAIN_HANDOFF_ITEM_IDS.length,
     WORKSHEET_MODE_DELIVERY_CHAIN_HANDOFF_ITEM_IDS.length,
     ASSIGNMENT_RESULTS_EXPORT_PREPARATION_ITEM_IDS.length,
   ],
-  Array.from({ length: 14 }, () => 30),
-  'Activity AI enhancement roadmap chain should stay backed by authoring, remix, extraction, policy, execution, draft application, roadmap, worksheet, and result-export gates.'
+  Array.from({ length: 15 }, () => 30),
+  'Activity AI enhancement roadmap chain should stay backed by authoring, remix, extraction, policy, execution, draft output, draft application, roadmap, worksheet, and result-export gates.'
 );
 assert.deepEqual(
   Object.fromEntries(activityAiEnhancementRoadmapChainValues),
@@ -7344,7 +7350,7 @@ assert.match(
   /Activity AI enhancement execution has a fast script-level gate via[\s\S]*scripts\/activity-ai-enhancement-execution\.test\.ts[\s\S]*provider-ready[\s\S]*local-fallback[\s\S]*deterministic-draft[\s\S]*blocked-reason[\s\S]*editor-only draft targets[\s\S]*privacy\s+guards/,
   'TEST-CATALOG should document the activity AI enhancement execution gate.'
 );
-const activityAiEnhancementDraftApplicationDraft = {
+const activityAiEnhancementDraftOutputDraft = {
   description: 'Reviewable water cycle draft.',
   difficulty: 'starter',
   gradeBand: 'Grade 5',
@@ -7369,6 +7375,114 @@ const activityAiEnhancementDraftApplicationDraft = {
   visibility: 'draft',
   vocabularyText: 'evaporation, condensation, precipitation',
 } satisfies CreateActivityInput;
+const activityAiEnhancementDraftOutputView =
+  buildActivityAiEnhancementDraftOutputView({
+    content: activityAiEnhancementPolicyContent,
+    currentTemplateType: 'quiz',
+    enhancementKind: 'answer-explanation',
+    hasAuthenticatedTeacher: true,
+    parsedDraft: activityAiEnhancementDraftOutputDraft,
+    providerConfigured: true,
+  });
+const activityAiEnhancementDraftOutputValues = new Map(
+  activityAiEnhancementDraftOutputView.itemViews.map((item) => [
+    item.id,
+    item.value,
+  ])
+);
+assert.deepEqual(
+  activityAiEnhancementDraftOutputView.itemViews.map((item) => item.id),
+  [...ACTIVITY_AI_ENHANCEMENT_DRAFT_OUTPUT_ITEM_IDS],
+  'Activity AI enhancement draft output should expose the stable 30-slice output order.'
+);
+assert.equal(activityAiEnhancementDraftOutputView.itemViews.length, 30);
+assert.equal(new Set(ACTIVITY_AI_ENHANCEMENT_DRAFT_OUTPUT_ITEM_IDS).size, 30);
+assert.equal(
+  activityAiEnhancementDraftOutputView.plan.status,
+  'normalized-draft-ready'
+);
+assert.equal(activityAiEnhancementDraftOutputView.plan.validationStatus, 'valid');
+assert.equal(
+  activityAiEnhancementDraftOutputView.plan.canPassToEditorApplication,
+  true
+);
+assert.equal(
+  activityAiEnhancementDraftOutputValues.get('field-target-coverage'),
+  '2/2 targets'
+);
+assert.equal(
+  activityAiEnhancementDraftOutputValues.get('source-material-guard'),
+  '1 references / storage hidden'
+);
+assert.equal(
+  JSON.stringify(activityAiEnhancementDraftOutputView).includes(
+    'secret-policy-file-id'
+  ),
+  false,
+  'Activity AI enhancement draft output view should not leak source material file ids.'
+);
+assert.deepEqual(activityAiEnhancementDraftOutputView.privacy, {
+  appliesAfterExecutionPlan: true,
+  appliesBeforeEditorApplication: true,
+  createsAssignmentLinksWithoutTeacherAction: false,
+  exposesAnswerKeysToPublicPayload: false,
+  exposesAnswerText: false,
+  exposesDraftText: false,
+  exposesFileBytesToAi: false,
+  exposesQuestionPromptText: false,
+  exposesRawAiOutput: false,
+  exposesRawSourceText: false,
+  exposesSourceMaterialFileIds: false,
+  exposesSourceMaterialFilenames: false,
+  exposesSourceMaterialStorageKeys: false,
+  itemIds: [...ACTIVITY_AI_ENHANCEMENT_DRAFT_OUTPUT_ITEM_IDS],
+  mutatesExistingAssignmentSnapshots: false,
+  normalizesCreateActivityInput: true,
+  persistsActivityWithoutTeacherAction: false,
+  publishesAssignmentWithoutTeacherAction: false,
+  readsSourceMaterialBytes: false,
+  requiresEditorReview: true,
+  scope: 'activity-ai-enhancement-draft-output',
+  usesDraftMeta: true,
+  usesExecutionPlan: true,
+});
+assert.equal(
+  buildActivityAiEnhancementDraftOutputPlan({
+    content: activityAiEnhancementPolicyContent,
+    currentTemplateType: 'quiz',
+    hasAuthenticatedTeacher: true,
+    parsedDraft: null,
+    providerConfigured: true,
+  }).status,
+  'awaiting-output'
+);
+assert.equal(
+  buildActivityAiEnhancementDraftOutputPlan({
+    content: activityAiEnhancementPolicyContent,
+    currentTemplateType: 'quiz',
+    hasAuthenticatedTeacher: false,
+    parsedDraft: activityAiEnhancementDraftOutputDraft,
+    providerConfigured: true,
+  }).status,
+  'blocked-before-output'
+);
+assert.match(
+  readFileSync('src/activities/ai-enhancement-draft-output.ts', 'utf8'),
+  /export const ACTIVITY_AI_ENHANCEMENT_DRAFT_OUTPUT_ITEM_IDS = \[[\s\S]*'output-scope'[\s\S]*'execution-plan-source'[\s\S]*'parser-boundary'[\s\S]*'schema-validation'[\s\S]*'normalized-draft'[\s\S]*'snapshot-result-continuity'/,
+  'Activity AI enhancement draft output source should preserve the output slices.'
+);
+assert.match(
+  readFileSync('docs/product.md', 'utf8'),
+  /src\/activities\/ai-enhancement-draft-output\.ts` owns parsed AI enhancement draft output[\s\S]*provider\/fallback\/deterministic output source[\s\S]*CreateActivityInput parsing[\s\S]*normalized output counts[\s\S]*template\s+readiness previews[\s\S]*editor-application boundaries[\s\S]*result continuity/,
+  'docs/product.md should document the activity AI enhancement draft output owner.'
+);
+assert.match(
+  readFileSync('tests/e2e/TEST-CATALOG.md', 'utf8'),
+  /Activity AI enhancement draft output has a fast script-level gate via[\s\S]*scripts\/activity-ai-enhancement-draft-output\.test\.ts[\s\S]*provider\/fallback\/deterministic output[\s\S]*CreateActivityInput parsing[\s\S]*normalized output counts[\s\S]*editor-application boundaries[\s\S]*privacy guards/,
+  'TEST-CATALOG should document the activity AI enhancement draft output gate.'
+);
+const activityAiEnhancementDraftApplicationDraft =
+  activityAiEnhancementDraftOutputDraft;
 const activityAiEnhancementDraftApplicationView =
   buildActivityAiEnhancementDraftApplicationView({
     content: activityAiEnhancementPolicyContent,

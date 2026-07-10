@@ -454,6 +454,11 @@ Implementation boundaries:
   local-fallback, deterministic-draft, or blocked states while preserving
   editor-only draft targets, structured blocked reasons, provider-call
   boundaries, privacy guards, save/publish boundaries, and snapshot protection.
+- `src/activities/ai-enhancement-draft-output.ts` owns parsed AI enhancement draft output
+  before editor application: provider/fallback/deterministic output source
+  tracking, CreateActivityInput parsing, normalized output counts, template
+  readiness previews, raw-output/source-material privacy guards,
+  editor-application boundaries, snapshot protection, and result continuity.
 - `src/activities/ai-enhancement-draft-application.ts` owns the editor-only draft application
   contract after execution planning: CreateActivityInput validation,
   field-target coverage, refreshed draft metadata, template readiness,
