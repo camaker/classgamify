@@ -122,6 +122,12 @@ run the matching gate when changing shared assignment view models, delivery
 policy propagation, identity normalization, answer feedback, result empty
 states, result materials, public assignment access, or unavailable-link
 boundaries.
+Answer feedback lifecycle chain has a fast script-level gate via
+`pnpm exec tsx --test scripts/answer-feedback-lifecycle-chain-handoff.test.ts`;
+run it when changing accepted-answer parsing, answer normalization, runtime
+scoring, public post-submit feedback, template feedback surfaces, teacher
+result analysis, result answer text views, CSV answer columns, server review
+summaries, or feedback privacy guards.
 Published assignment delivery chain has a fast script-level gate via
 `pnpm exec tsx --test scripts/published-assignment-delivery-chain-handoff.test.ts`;
 run it when changing publish preflight, frozen snapshots, share links,

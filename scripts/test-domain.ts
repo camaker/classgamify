@@ -1064,6 +1064,11 @@ import {
   buildAssignmentResultAttemptAnswerTextView,
 } from '@/assignments/result-answer-view';
 import { ASSIGNMENT_ANSWER_FEEDBACK_HANDOFF_ITEM_IDS } from '@/assignments/answer-feedback-handoff';
+import {
+  ANSWER_FEEDBACK_LIFECYCLE_CHAIN_HANDOFF_ITEM_IDS,
+  ANSWER_FEEDBACK_LIFECYCLE_CHAIN_SOURCE_FILES,
+  buildAnswerFeedbackLifecycleChainHandoffView,
+} from '@/assignments/answer-feedback-lifecycle-chain';
 import { ASSIGNMENT_RESULT_MATERIAL_HANDOFF_ITEM_IDS } from '@/assignments/result-actions';
 import { buildAssignmentAttemptReviewSummary } from '@/assignments/result-review-summary';
 import {
@@ -4945,6 +4950,89 @@ assert.match(
   readFileSync('tests/e2e/TEST-CATALOG.md', 'utf8'),
   /Published assignment delivery chain has a fast script-level gate via[\s\S]*scripts\/published-assignment-delivery-chain-handoff\.test\.ts/,
   'TEST-CATALOG should document the published assignment delivery chain gate.'
+);
+const answerFeedbackLifecycleChainView =
+  buildAnswerFeedbackLifecycleChainHandoffView();
+const answerFeedbackLifecycleChainValues = new Map(
+  answerFeedbackLifecycleChainView.itemViews.map((item) => [
+    item.id,
+    item.value,
+  ])
+);
+assert.deepEqual(
+  answerFeedbackLifecycleChainView.itemViews.map((item) => item.id),
+  [...ANSWER_FEEDBACK_LIFECYCLE_CHAIN_HANDOFF_ITEM_IDS],
+  'Answer feedback lifecycle chain should expose the stable 30-slice answer parsing, scoring, feedback, result, export, and privacy order.'
+);
+assert.equal(answerFeedbackLifecycleChainView.itemViews.length, 30);
+assert.equal(
+  new Set(ANSWER_FEEDBACK_LIFECYCLE_CHAIN_HANDOFF_ITEM_IDS).size,
+  30
+);
+assert.equal(ANSWER_FEEDBACK_LIFECYCLE_CHAIN_SOURCE_FILES.length, 30);
+for (const filePath of ANSWER_FEEDBACK_LIFECYCLE_CHAIN_SOURCE_FILES) {
+  assert.ok(
+    existsSync(filePath),
+    `Missing answer feedback lifecycle chain file ${filePath}`
+  );
+}
+assert.ok(
+  answerFeedbackLifecycleChainView.itemViews.every(
+    (item) => item.ariaLabel && item.description && item.label && item.value
+  )
+);
+assert.deepEqual(answerFeedbackLifecycleChainView.privacy, {
+  chainSourceFileCount: ANSWER_FEEDBACK_LIFECYCLE_CHAIN_SOURCE_FILES.length,
+  exposesAcceptedAlternativesAfterReview: true,
+  exposesAnswerKeysBeforeReview: false,
+  exposesPromptTextInFeedbackHandoff: false,
+  exposesRawRuntimeItemIdsInFeedbackHandoff: false,
+  exposesStudentAnswerTextInFeedbackHandoff: false,
+  exposesStudentNamesInFeedbackHandoff: false,
+  exposesTeacherExplanationsBeforeReview: false,
+  itemIds: [...ANSWER_FEEDBACK_LIFECYCLE_CHAIN_HANDOFF_ITEM_IDS],
+  preservesTeacherResultEvidence: true,
+  publicFeedbackRespectsAnswerReveal: true,
+  runtimeScoringUsesSharedMatcher: true,
+  sourceFiles: [...ANSWER_FEEDBACK_LIFECYCLE_CHAIN_SOURCE_FILES],
+  templateFeedbackUsesSharedComponent: true,
+});
+assert.deepEqual(Object.fromEntries(answerFeedbackLifecycleChainValues), {
+  'accepted-answer-parser': 'getAcceptedAnswers',
+  'answer-feedback-lifecycle-gate': '30 source files',
+  'answer-normalization': 'NFKC + punctuation',
+  'blank-answer-guard': 'Blank is incorrect',
+  'csv-export-feedback': 'Answer columns',
+  'feedback-dom-semantics': 'Label/value/details',
+  'feedback-privacy-guard': 'Private data hidden',
+  'fill-blank-feedback-boundary': 'Blank review',
+  'group-sort-feedback-boundary': 'Category review',
+  'line-match-feedback-boundary': 'Connection review',
+  'listening-feedback-boundary': 'Transcript review',
+  'matching-pairs-feedback-boundary': 'Pair review',
+  'open-box-feedback-boundary': 'Reveal review',
+  'product-scoring-policy': 'Shared scoring',
+  'public-feedback-view': 'Shared feedback view',
+  'public-review-policy': 'Reveal if allowed',
+  'quiz-choice-completion': 'Deterministic choices',
+  'result-answer-text-view': 'Expected/alternatives',
+  'result-formatting-shared': 'Shared accepted formatting',
+  'runtime-item-source': 'Questions/pairs/groups',
+  'runtime-scoring-evaluation': 'evaluateRuntimeAnswers',
+  'scored-result-metrics': 'Accuracy/points/completed',
+  'separator-coverage': 'Slash/semicolon/Chinese',
+  'server-review-summary': 'Scored review payload',
+  'submitted-answer-normalization': 'Display text',
+  'teacher-analysis-feedback': 'Accepted answers retained',
+  'teacher-results-chain-alignment': 'Results chain',
+  'template-feedback-surfaces': 'Shared component',
+  'template-runner-map': 'Seven runners',
+  'unique-alternative-dedup': 'Normalized unique',
+});
+assert.match(
+  readFileSync('tests/e2e/TEST-CATALOG.md', 'utf8'),
+  /Answer feedback lifecycle chain has a fast script-level gate via[\s\S]*scripts\/answer-feedback-lifecycle-chain-handoff\.test\.ts/,
+  'TEST-CATALOG should document the answer feedback lifecycle chain gate.'
 );
 const assignmentLifecycleGovernanceChainView =
   buildAssignmentLifecycleGovernanceChainHandoffView();
