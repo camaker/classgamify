@@ -57,6 +57,11 @@ changing marketing, editorial, legal, contact, auth, root document, or shared
 public layout route sources and shared public components that must keep internal
 `data-handoff` audit DOM out of public pages while preserving source-level
 handoff contracts.
+Public discovery/indexing chain has a fast script-level gate via
+`pnpm exec tsx --test scripts/public-discovery-indexing-chain-handoff.test.ts`;
+run it when changing public entry routes, navigation, template/worksheet
+entries, public page copy, sitemap/robots/manifest helpers, legacy route
+retirement, public DOM handoff boundaries, or privacy/indexing guards.
 Active surface product boundary has a fast script-level gate via
 `pnpm exec tsx --test scripts/active-surface-product-boundary.test.ts`; run it
 when changing active account, contact, billing, mail, notification, or

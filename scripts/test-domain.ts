@@ -32,8 +32,14 @@ import {
   PUBLIC_METADATA_HANDOFF_ITEM_IDS,
 } from '@/seo/public-metadata-handoff';
 import {
+  PUBLIC_DISCOVERY_INDEXING_CHAIN_HANDOFF_ITEM_IDS,
+  PUBLIC_DISCOVERY_INDEXING_CHAIN_SOURCE_FILES,
+  buildPublicDiscoveryIndexingChainHandoffView,
+} from '@/seo/public-discovery-indexing-chain';
+import {
   PUBLIC_DOM_HANDOFF_BLOCKED_COMPONENT_FILES,
   PUBLIC_DOM_HANDOFF_BLOCKED_ROUTE_FILES,
+  PUBLIC_DOM_HANDOFF_BOUNDARY_ITEM_IDS,
   buildPublicDomHandoffBoundaryView,
 } from '@/seo/public-dom-handoff-boundary';
 import {
@@ -77,6 +83,7 @@ import {
 } from '@/contact/inquiry-view';
 import {
   AUTH_WORKSPACE_BOUNDARY_ITEM_IDS,
+  AUTH_WORKSPACE_HANDOFF_ITEM_IDS,
   buildAuthWorkspaceBoundaryView,
 } from '@/auth/workspace-boundary';
 import {
@@ -551,6 +558,9 @@ import {
   buildBlogPostCtaViewModel,
   getBlogCtaActions,
 } from '@/pages/blog-page-view';
+import { PUBLIC_EDITORIAL_HANDOFF_ITEM_IDS } from '@/pages/public-editorial-content-view';
+import { LEGAL_POLICY_HANDOFF_ITEM_IDS } from '@/pages/legal-policy-view';
+import { LEGACY_PUBLIC_ROUTE_HANDOFF_ITEM_IDS } from '@/seo/legacy-public-route-handoff';
 import {
   buildPaymentStatusView,
   getInitialPaymentConfirmationStatus,
@@ -14173,6 +14183,114 @@ assert.equal(
     (itemView) => itemView.id === 'privacy-guard'
   )?.value,
   'Private data hidden'
+);
+const publicDiscoveryIndexingChainView =
+  buildPublicDiscoveryIndexingChainHandoffView();
+const publicDiscoveryIndexingChainValues = new Map(
+  publicDiscoveryIndexingChainView.itemViews.map((item) => [
+    item.id,
+    item.value,
+  ])
+);
+assert.deepEqual(
+  publicDiscoveryIndexingChainView.itemViews.map((item) => item.id),
+  [...PUBLIC_DISCOVERY_INDEXING_CHAIN_HANDOFF_ITEM_IDS],
+  'Public discovery/indexing chain should expose the stable 30-slice public route, indexing, DOM, and legacy-retirement order.'
+);
+assert.equal(publicDiscoveryIndexingChainView.itemViews.length, 30);
+assert.equal(
+  new Set(PUBLIC_DISCOVERY_INDEXING_CHAIN_HANDOFF_ITEM_IDS).size,
+  30
+);
+assert.equal(PUBLIC_DISCOVERY_INDEXING_CHAIN_SOURCE_FILES.length, 30);
+for (const filePath of PUBLIC_DISCOVERY_INDEXING_CHAIN_SOURCE_FILES) {
+  assert.ok(
+    existsSync(filePath),
+    `Missing public discovery/indexing chain file ${filePath}`
+  );
+}
+assert.ok(
+  publicDiscoveryIndexingChainView.itemViews.every(
+    (item) => item.ariaLabel && item.description && item.label && item.value
+  )
+);
+assert.deepEqual(publicDiscoveryIndexingChainView.privacy, {
+  chainSourceFileCount: PUBLIC_DISCOVERY_INDEXING_CHAIN_SOURCE_FILES.length,
+  createsAssignmentLinks: false,
+  exposesAnswerKeys: false,
+  exposesPublicDomHandoffMarkup: false,
+  exposesRawAnonymousTokens: false,
+  exposesSourceMaterialStorageKeys: false,
+  exposesStudentAttemptRecords: false,
+  exposesTeacherPrivateActivityContent: false,
+  includesLocalizedAlternates: true,
+  itemIds: [...PUBLIC_DISCOVERY_INDEXING_CHAIN_HANDOFF_ITEM_IDS],
+  keepsAuthEntryOutOfIndex: true,
+  keepsPrintRoutesOutOfIndex: true,
+  keepsPublicHandoffsSourceLevel: true,
+  keepsRetiredLegacyOutOfIndex: true,
+  keepsStudentRunnerOutOfIndex: true,
+  manifestTargetsPublicRoot: true,
+  routeActionsUseSharedConstants: true,
+  sourceFiles: [...PUBLIC_DISCOVERY_INDEXING_CHAIN_SOURCE_FILES],
+  usesSharedIndexingHelpers: true,
+});
+assert.deepEqual(
+  [
+    HOME_PAGE_PRODUCT_LOOP_HANDOFF_ITEM_IDS.length,
+    PUBLIC_NAVIGATION_HANDOFF_ITEM_IDS.length,
+    PUBLIC_TEMPLATE_ENTRY_HANDOFF_ITEM_IDS.length,
+    TEACHERS_PAGE_HANDOFF_ITEM_IDS.length,
+    ROADMAP_PUBLIC_HANDOFF_ITEM_IDS.length,
+    PRICING_PAGE_HANDOFF_ITEM_IDS.length,
+    PUBLIC_EDITORIAL_HANDOFF_ITEM_IDS.length,
+    LEGAL_POLICY_HANDOFF_ITEM_IDS.length,
+    CONTACT_CLASSROOM_INTAKE_HANDOFF_ITEM_IDS.length,
+    AUTH_WORKSPACE_HANDOFF_ITEM_IDS.length,
+    ACTIVE_SURFACE_PRODUCT_BOUNDARY_ITEM_IDS.length,
+    PUBLIC_METADATA_HANDOFF_ITEM_IDS.length,
+    PUBLIC_DOM_HANDOFF_BOUNDARY_ITEM_IDS.length,
+    LEGACY_PUBLIC_ROUTE_HANDOFF_ITEM_IDS.length,
+  ],
+  Array.from({ length: 14 }, () => 30),
+  'Public discovery/indexing chain should stay backed by focused public route, content, metadata, DOM, and legacy-route gates.'
+);
+assert.deepEqual(Object.fromEntries(publicDiscoveryIndexingChainValues), {
+  'active-surface-copy-boundary': 'ClassGamify copy',
+  'auth-entry-boundary': Routes.Auth,
+  'classroom-control-route-gate': 'Create/dashboard/play/print',
+  'contact-classroom-entry': Routes.ContactClassroom,
+  'editorial-content-boundary': Routes.Blog,
+  'home-product-entry': Routes.Root,
+  'legacy-copy-guard': 'ClassGamify only',
+  'legacy-navigation-exclusion': 'Navigation excluded',
+  'legacy-noindex-boundary': 'Noindex when mounted',
+  'legacy-route-inventory': 'Retired path list',
+  'legal-policy-boundary': 'Terms/privacy/cookie',
+  'localized-alternates': 'hreflang + x-default',
+  'manifest-install-boundary': Routes.Root,
+  'navigation-entrypoints': 'Navbar and footer',
+  'pricing-plan-boundary': Routes.Pricing,
+  'print-route-index-guard': '/print',
+  'private-data-guard': 'Private data hidden',
+  'public-discovery-chain-gate': '30 source files',
+  'public-dom-component-guard': 'Shared components blocked',
+  'public-dom-route-guard': 'Route files blocked',
+  'public-route-registry': 'PUBLIC_INDEXABLE_STATIC_ROUTES',
+  'roadmap-status-boundary': Routes.Roadmap,
+  'robots-protected-boundaries': 'dashboard/settings/play/print/auth',
+  'sitemap-blog-routes': 'Published posts',
+  'sitemap-static-routes': 'Shared registry',
+  'source-level-handoff-contracts': 'Focused gates only',
+  'student-runner-index-guard': Routes.Play,
+  'teachers-page-entry': Routes.Teachers,
+  'template-directory-entry': Routes.Templates,
+  'worksheet-entry': Routes.Worksheets,
+});
+assert.match(
+  readFileSync('tests/e2e/TEST-CATALOG.md', 'utf8'),
+  /Public discovery\/indexing chain has a fast script-level gate via[\s\S]*scripts\/public-discovery-indexing-chain-handoff\.test\.ts/,
+  'TEST-CATALOG should document the public discovery/indexing chain gate.'
 );
 const publicDomHandoffBoundaryView = buildPublicDomHandoffBoundaryView();
 const publicDomProtectedSourceFileCount =
