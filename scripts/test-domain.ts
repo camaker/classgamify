@@ -1108,6 +1108,11 @@ import {
   buildAssignmentResultSubmittedDateChainHandoffView,
 } from '@/assignments/result-submitted-date-chain';
 import {
+  ASSIGNMENT_RESULT_ACCEPTED_ANSWER_CHAIN_HANDOFF_ITEM_IDS,
+  ASSIGNMENT_RESULT_ACCEPTED_ANSWER_CHAIN_SOURCE_FILES,
+  buildAssignmentResultAcceptedAnswerChainHandoffView,
+} from '@/assignments/result-accepted-answer-chain';
+import {
   ASSIGNMENT_RESULT_EMPTY_STATE_HANDOFF_ITEM_IDS,
   buildAssignmentResultEmptyStateHandoffView,
 } from '@/assignments/result-empty-state-handoff';
@@ -59883,6 +59888,45 @@ assert.equal(
     (itemView) => itemView.id === 'csv-date-iso-output'
   )?.value,
   'ISO string'
+);
+assert.equal(
+  ASSIGNMENT_RESULT_ACCEPTED_ANSWER_CHAIN_HANDOFF_ITEM_IDS.length,
+  30
+);
+assert.equal(
+  ASSIGNMENT_RESULT_ACCEPTED_ANSWER_CHAIN_SOURCE_FILES.length,
+  30
+);
+for (const filePath of ASSIGNMENT_RESULT_ACCEPTED_ANSWER_CHAIN_SOURCE_FILES) {
+  assert.ok(existsSync(filePath), `Missing accepted-answer chain ${filePath}`);
+}
+const acceptedAnswerChainView =
+  buildAssignmentResultAcceptedAnswerChainHandoffView();
+assert.deepEqual(
+  acceptedAnswerChainView.itemViews.map((itemView) => itemView.id),
+  [...ASSIGNMENT_RESULT_ACCEPTED_ANSWER_CHAIN_HANDOFF_ITEM_IDS]
+);
+assert.deepEqual(acceptedAnswerChainView.privacy, {
+  chainSourceFileCount:
+    ASSIGNMENT_RESULT_ACCEPTED_ANSWER_CHAIN_SOURCE_FILES.length,
+  csvExportsUseSharedAnswerView: true,
+  exposesCsvDataUrlInHandoff: false,
+  exposesPromptTextInHandoff: false,
+  exposesRawRuntimeItemIdsInHandoff: false,
+  exposesStudentAnswerTextInHandoff: false,
+  exposesStudentNamesInHandoff: false,
+  exposesTeacherAnswerTextInHandoff: false,
+  itemIds: [...ASSIGNMENT_RESULT_ACCEPTED_ANSWER_CHAIN_HANDOFF_ITEM_IDS],
+  resultPagesUseSharedAnswerView: true,
+  scoringUsesSharedAcceptedAnswerParser: true,
+  sourceFiles: [...ASSIGNMENT_RESULT_ACCEPTED_ANSWER_CHAIN_SOURCE_FILES],
+  splitsPrimaryFromAlternatives: true,
+});
+assert.equal(
+  acceptedAnswerChainView.itemViews.find(
+    (itemView) => itemView.id === 'accepted-alternatives-text'
+  )?.value,
+  'Alternatives only'
 );
 assert.equal(formatAcceptedAnswerAlternatives([]), '-');
 assert.equal(formatAcceptedAnswerAlternatives(['Paris']), '-');

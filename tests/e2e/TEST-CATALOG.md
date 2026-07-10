@@ -267,6 +267,13 @@ via
 run it when changing result date formatting, attempt submitted labels, student
 last-submitted labels, latest-attempt copy context, completed-at sorting, CSV
 submitted-date columns, or submitted-date privacy guards.
+Assignment result accepted-answer continuity chain has a fast script-level gate
+via
+`pnpm exec tsx --test scripts/assignment-result-accepted-answer-chain-handoff.test.ts`;
+run it when changing the accepted-answer parser, primary-vs-alternatives
+formatting, result cards, item performance columns, attempt review cards, CSV
+accepted-answer columns, printable review alignment, or accepted-answer privacy
+guards.
 Assignment source-activity context chain has a fast script-level gate via
 `pnpm exec tsx --test scripts/assignment-source-activity-context-chain-handoff.test.ts`;
 run it when changing source-activity snapshot resolution, assignment-list
