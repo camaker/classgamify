@@ -49,6 +49,11 @@ import {
   buildActiveSurfaceProductBoundaryView,
 } from '@/config/active-surface-product-boundary';
 import {
+  CLASSROOM_PRODUCT_LOOP_CHAIN_HANDOFF_ITEM_IDS,
+  CLASSROOM_PRODUCT_LOOP_CHAIN_SOURCE_FILES,
+  buildClassroomProductLoopChainHandoffView,
+} from '@/config/classroom-product-loop-chain';
+import {
   CLASSROOM_TRUST_COMMUNICATION_CHAIN_HANDOFF_ITEM_IDS,
   CLASSROOM_TRUST_COMMUNICATION_CHAIN_SOURCE_FILES,
   buildClassroomTrustCommunicationChainHandoffView,
@@ -16312,6 +16317,128 @@ assert.match(
   readFileSync('tests/e2e/TEST-CATALOG.md', 'utf8'),
   /Public discovery\/indexing chain has a fast script-level gate via[\s\S]*scripts\/public-discovery-indexing-chain-handoff\.test\.ts/,
   'TEST-CATALOG should document the public discovery/indexing chain gate.'
+);
+const classroomProductLoopChainView =
+  buildClassroomProductLoopChainHandoffView();
+const classroomProductLoopChainValues = new Map(
+  classroomProductLoopChainView.itemViews.map((item) => [
+    item.id,
+    item.value,
+  ])
+);
+assert.deepEqual(
+  classroomProductLoopChainView.itemViews.map((item) => item.id),
+  [...CLASSROOM_PRODUCT_LOOP_CHAIN_HANDOFF_ITEM_IDS],
+  'Classroom product loop chain should expose the stable 30-slice activity, assignment, attempt, results, workspace, public entry, and privacy order.'
+);
+assert.equal(classroomProductLoopChainView.itemViews.length, 30);
+assert.equal(
+  new Set(CLASSROOM_PRODUCT_LOOP_CHAIN_HANDOFF_ITEM_IDS).size,
+  30
+);
+assert.equal(CLASSROOM_PRODUCT_LOOP_CHAIN_SOURCE_FILES.length, 30);
+for (const filePath of CLASSROOM_PRODUCT_LOOP_CHAIN_SOURCE_FILES) {
+  assert.ok(
+    existsSync(filePath),
+    `Missing classroom product loop chain file ${filePath}`
+  );
+}
+assert.ok(
+  classroomProductLoopChainView.itemViews.every(
+    (item) => item.ariaLabel && item.description && item.label && item.value
+  )
+);
+assert.deepEqual(classroomProductLoopChainView.privacy, {
+  chainSourceFileCount: CLASSROOM_PRODUCT_LOOP_CHAIN_SOURCE_FILES.length,
+  createsAssignmentLinksWithoutTeacherAction: false,
+  exposesActivityContentJsonToPublicPayload: false,
+  exposesAnswerKeysBeforeAllowedReview: false,
+  exposesCsvDataUrlInHandoff: false,
+  exposesPrivateActivityContent: false,
+  exposesRawAnonymousTokens: false,
+  exposesRawSubmissionPayload: false,
+  exposesResultExportRows: false,
+  exposesRuntimeItemIdsInHandoff: false,
+  exposesSourceMaterialStorageKeys: false,
+  exposesStudentAnswerTextInHandoff: false,
+  exposesStudentNamesInHandoff: false,
+  freezesAssignmentSnapshots: true,
+  itemIds: [...CLASSROOM_PRODUCT_LOOP_CHAIN_HANDOFF_ITEM_IDS],
+  keepsActivityLibraryOwnerScoped: true,
+  keepsAssignmentListOwnerScoped: true,
+  keepsDashboardOwnerScoped: true,
+  publicPayloadUsesRuntimeItemsOnly: true,
+  rejectsInvalidSubmissions: true,
+  requiresTeacherReviewForAiDrafts: true,
+  resultConsumersUseScoredAttempts: true,
+  sourceFiles: [...CLASSROOM_PRODUCT_LOOP_CHAIN_SOURCE_FILES],
+  usesActivityAssignmentAttemptResultsLoop: true,
+});
+assert.deepEqual(
+  [
+    HOME_PAGE_PRODUCT_LOOP_HANDOFF_ITEM_IDS.length,
+    DASHBOARD_OVERVIEW_HANDOFF_ITEM_IDS.length,
+    TEACHER_WORKSPACE_OPERATIONS_CHAIN_HANDOFF_ITEM_IDS.length,
+    CLASSROOM_DATA_LIFECYCLE_CHAIN_HANDOFF_ITEM_IDS.length,
+    ACTIVITY_AUTHORING_LIBRARY_CHAIN_HANDOFF_ITEM_IDS.length,
+    ACTIVITY_LIFECYCLE_GOVERNANCE_CHAIN_HANDOFF_ITEM_IDS.length,
+    ACTIVITY_AI_AUTHORING_CHAIN_HANDOFF_ITEM_IDS.length,
+    ACTIVITY_AI_AUTHORING_CHAIN_SOURCE_FILES.length,
+    SOURCE_MATERIAL_PRIVACY_CHAIN_HANDOFF_ITEM_IDS.length,
+    PUBLISHED_ASSIGNMENT_DELIVERY_CHAIN_HANDOFF_ITEM_IDS.length,
+    STUDENT_RUNNER_PLAY_CHAIN_HANDOFF_ITEM_IDS.length,
+    STUDENT_IDENTITY_LIFECYCLE_CHAIN_HANDOFF_ITEM_IDS.length,
+    SCORED_ATTEMPT_RESULT_CHAIN_HANDOFF_ITEM_IDS.length,
+    TEACHER_RESULTS_REVIEW_CHAIN_HANDOFF_ITEM_IDS.length,
+    TEACHER_RESULT_COPY_LIFECYCLE_CHAIN_HANDOFF_ITEM_IDS.length,
+    ASSIGNMENT_RESULTS_EXPORT_PREPARATION_ITEM_IDS.length,
+    PRINTABLE_WORKSHEET_REVIEW_LIFECYCLE_CHAIN_HANDOFF_ITEM_IDS.length,
+    CLASSROOM_TRUST_COMMUNICATION_CHAIN_HANDOFF_ITEM_IDS.length,
+  ],
+  Array.from({ length: 18 }, () => 30),
+  'Classroom product loop chain should stay backed by adjacent public entry, workspace, data, authoring, delivery, runner, result, export, print, and trust gates.'
+);
+assert.deepEqual(Object.fromEntries(classroomProductLoopChainValues), {
+  'activity-authoring-entry': 'Create editor',
+  'activity-content-contract': 'Template-neutral content',
+  'activity-library-owner-scope': 'Owner activities only',
+  'activity-lifecycle-derivative-guard': 'Restore before derive',
+  'activity-model': 'Teacher-owned activity',
+  'ai-authoring-draft-boundary': 'Teacher-reviewed draft',
+  'answer-feedback-policy': 'Reveal if allowed',
+  'assignment-publish-preflight': 'Delivery settings review',
+  'assignment-snapshot-freeze': 'Frozen ActivityContent',
+  'attempt-persistence': 'Scored attempt row',
+  'attempt-stats': 'Shared metrics',
+  'classroom-brief-copy': 'Teacher-only artifacts',
+  'csv-export': 'Private offline records',
+  'dashboard-loop-status': 'Create/publish/play/review',
+  'printable-review': 'Frozen handout',
+  'privacy-guards': 'Private data hidden',
+  'product-loop-chain-gate': '30 source files',
+  'product-loop-contract': 'Activity -> Assignment -> Attempt -> Results',
+  'progress-submit-readiness': 'Explicit partial confirm',
+  'public-entry-routes': 'Home/templates/worksheets',
+  'public-rules-summary': 'Student-visible rules',
+  'public-runner-access': 'Open links only',
+  'runtime-item-contract': '{ itemId, answer }',
+  'share-link-distribution': 'Copy/preview/print/review',
+  'source-material-reference-boundary': 'Compact references',
+  'student-identity-boundary': 'Name or browser token',
+  'submission-validation': 'Unknown duplicate guard',
+  'teacher-result-review': 'Reteach evidence',
+  'teacher-workspace-routes': 'Dashboard workspace',
+  'template-scaffold-entry': 'Reviewed scaffold',
+});
+assert.match(
+  readFileSync('tests/e2e/TEST-CATALOG.md', 'utf8'),
+  /Classroom product loop chain has a fast script-level gate via[\s\S]*scripts\/classroom-product-loop-chain-handoff\.test\.ts/,
+  'TEST-CATALOG should document the classroom product loop chain gate.'
+);
+assert.match(
+  readFileSync('tests/e2e/TEST-CATALOG.md', 'utf8').replace(/\s+/g, ' '),
+  /Activity -> Assignment -> Attempt -> Results[\s\S]*activity authoring[\s\S]*assignment publish[\s\S]*student runner[\s\S]*scored attempts[\s\S]*teacher result review[\s\S]*copy\/export\/print handoffs[\s\S]*privacy guards/,
+  'TEST-CATALOG should describe the full classroom product loop chain scope.'
 );
 const classroomTrustCommunicationChainView =
   buildClassroomTrustCommunicationChainHandoffView();
