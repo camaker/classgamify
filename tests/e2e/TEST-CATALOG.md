@@ -68,6 +68,13 @@ run it when changing public classroom contact intake, auth workspace entry,
 transactional mail, teacher notification settings, hosted billing,
 legal/provider copy, developer configuration secrets, storage source-material
 boundaries, or public DOM handoff boundaries.
+Account governance lifecycle chain has a fast script-level gate via
+`pnpm exec tsx --test scripts/account-governance-lifecycle-chain-handoff.test.ts`;
+run it when changing auth session and email verification, profile and security
+settings, explicit account deletion, admin user governance,
+billing/notification/files boundaries, storage owner checks, provider-secret
+and student-data guards, or account lifecycle copy that should stay tied to the
+ClassGamify teacher workspace.
 Active surface product boundary has a fast script-level gate via
 `pnpm exec tsx --test scripts/active-surface-product-boundary.test.ts`; run it
 when changing active account, contact, billing, mail, notification, or

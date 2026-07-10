@@ -93,6 +93,11 @@ import {
   buildAuthWorkspaceBoundaryView,
 } from '@/auth/workspace-boundary';
 import {
+  ACCOUNT_GOVERNANCE_LIFECYCLE_CHAIN_HANDOFF_ITEM_IDS,
+  ACCOUNT_GOVERNANCE_LIFECYCLE_CHAIN_SOURCE_FILES,
+  buildAccountGovernanceLifecycleChainHandoffView,
+} from '@/auth/account-governance-lifecycle-chain';
+import {
   AUTH_ERROR_RECOVERY_STEP_IDS,
   buildAuthErrorDisplayView,
   buildAuthErrorRecoveryView,
@@ -14425,6 +14430,117 @@ assert.match(
   readFileSync('tests/e2e/TEST-CATALOG.md', 'utf8').replace(/\s+/g, ' '),
   /public classroom contact intake[\s\S]*auth workspace entry[\s\S]*transactional mail[\s\S]*teacher notification settings[\s\S]*hosted billing[\s\S]*legal\/provider copy[\s\S]*developer configuration secrets[\s\S]*public DOM handoff boundaries/,
   'TEST-CATALOG should describe the full classroom trust communication chain scope.'
+);
+const accountGovernanceLifecycleChainView =
+  buildAccountGovernanceLifecycleChainHandoffView();
+const accountGovernanceLifecycleChainValues = new Map(
+  accountGovernanceLifecycleChainView.itemViews.map((item) => [
+    item.id,
+    item.value,
+  ])
+);
+assert.deepEqual(
+  accountGovernanceLifecycleChainView.itemViews.map((item) => item.id),
+  [...ACCOUNT_GOVERNANCE_LIFECYCLE_CHAIN_HANDOFF_ITEM_IDS],
+  'Account governance lifecycle chain should expose the stable 30-slice auth, settings, admin, file, and provider-boundary order.'
+);
+assert.equal(accountGovernanceLifecycleChainView.itemViews.length, 30);
+assert.equal(
+  new Set(ACCOUNT_GOVERNANCE_LIFECYCLE_CHAIN_HANDOFF_ITEM_IDS).size,
+  30
+);
+assert.equal(ACCOUNT_GOVERNANCE_LIFECYCLE_CHAIN_SOURCE_FILES.length, 30);
+for (const filePath of ACCOUNT_GOVERNANCE_LIFECYCLE_CHAIN_SOURCE_FILES) {
+  assert.ok(
+    existsSync(filePath),
+    `Missing account governance lifecycle chain file ${filePath}`
+  );
+}
+assert.ok(
+  accountGovernanceLifecycleChainView.itemViews.every(
+    (item) => item.ariaLabel && item.description && item.label && item.value
+  )
+);
+assert.deepEqual(accountGovernanceLifecycleChainView.privacy, {
+  chainSourceFileCount:
+    ACCOUNT_GOVERNANCE_LIFECYCLE_CHAIN_SOURCE_FILES.length,
+  deletesWorkspaceDataWithoutExplicitAction: false,
+  exposesAdminSearchText: false,
+  exposesAuthSecrets: false,
+  exposesOAuthClientSecrets: false,
+  exposesPasswordValues: false,
+  exposesPaymentProviderSecrets: false,
+  exposesProviderErrors: false,
+  exposesRawAnonymousTokens: false,
+  exposesRawUserEmails: false,
+  exposesSourceMaterialStorageKeys: false,
+  exposesStudentAnswers: false,
+  exposesStudentIdentifiers: false,
+  exposesTeacherPrivateActivityContent: false,
+  itemIds: [...ACCOUNT_GOVERNANCE_LIFECYCLE_CHAIN_HANDOFF_ITEM_IDS],
+  keepsAccountSettingsFromMutatingClassroomData: true,
+  keepsAdminActionsAwayFromClassroomLinks: true,
+  keepsRuntimeSecretsServerSide: true,
+  requiresAdminRoleForUserGovernance: true,
+  requiresTeacherSessionForAccountSettings: true,
+  sourceFiles: [...ACCOUNT_GOVERNANCE_LIFECYCLE_CHAIN_SOURCE_FILES],
+  usesClassGamifyAccountCopy: true,
+});
+assert.deepEqual(
+  [
+    AUTH_WORKSPACE_HANDOFF_ITEM_IDS.length,
+    SETTINGS_ACCOUNT_WORKSPACE_HANDOFF_ITEM_IDS.length,
+    SETTINGS_SECURITY_WORKSPACE_HANDOFF_ITEM_IDS.length,
+    ADMIN_USERS_HANDOFF_ITEM_IDS.length,
+    SETTINGS_BILLING_WORKSPACE_HANDOFF_ITEM_IDS.length,
+    SETTINGS_NOTIFICATION_UPDATE_HANDOFF_ITEM_IDS.length,
+    SETTINGS_FILES_SOURCE_MATERIAL_HANDOFF_ITEM_IDS.length,
+    STORAGE_FILE_ACCESS_ITEM_IDS.length,
+  ],
+  Array.from({ length: 8 }, () => 30),
+  'Account governance lifecycle chain should stay backed by focused auth, settings, admin, files, billing, notification, and storage gates.'
+);
+assert.deepEqual(Object.fromEntries(accountGovernanceLifecycleChainValues), {
+  'account-delete-feature-gate': 'Feature gated',
+  'account-governance-chain-gate': '30 source files',
+  'admin-api-gate': '401/403 protected',
+  'admin-route-gate': Routes.AdminUsers,
+  'admin-user-ban-actions': 'Ban/unban only',
+  'admin-user-list-query': 'Search/filter/sort/page',
+  'auth-error-recovery': Routes.Login,
+  'auth-session-runtime': 'Better Auth + D1',
+  'billing-plan-access-boundary': Routes.SettingsBilling,
+  'credential-login-provider': 'Feature gated',
+  'delete-confirmation-required': 'Explicit confirmation',
+  'delete-no-silent-data-loss': 'No implicit classroom deletion',
+  'email-verification-gate': 'Verified teachers only',
+  'files-owner-scope-boundary': Routes.SettingsFiles,
+  'google-oauth-provider': 'Runtime secret gated',
+  'google-one-tap-provider': 'Auth routes skipped',
+  'legacy-copy-guard': 'ClassGamify only',
+  'notification-email-preference': Routes.SettingsNotifications,
+  'password-reset-mail': 'Forgot-password email',
+  'password-update-gate': 'Credential gate',
+  'product-account-boundary': 'Teacher account lifecycle',
+  'profile-avatar-update': 'Avatar only',
+  'profile-identity-update': 'Display name only',
+  'profile-no-classroom-mutation': 'No classroom mutation',
+  'profile-route': Routes.SettingsProfile,
+  'provider-secret-guard': 'Runtime secrets hidden',
+  'safe-callback-redirect': Routes.Dashboard,
+  'security-route': Routes.SettingsSecurity,
+  'storage-private-owner-check': 'Private owner required',
+  'student-data-guard': 'Student data hidden',
+});
+assert.match(
+  readFileSync('tests/e2e/TEST-CATALOG.md', 'utf8'),
+  /Account governance lifecycle chain has a fast script-level gate via[\s\S]*scripts\/account-governance-lifecycle-chain-handoff\.test\.ts/,
+  'TEST-CATALOG should document the account governance lifecycle chain gate.'
+);
+assert.match(
+  readFileSync('tests/e2e/TEST-CATALOG.md', 'utf8').replace(/\s+/g, ' '),
+  /auth session and email verification[\s\S]*profile and security settings[\s\S]*explicit account deletion[\s\S]*admin user governance[\s\S]*billing\/notification\/files boundaries[\s\S]*storage owner checks[\s\S]*provider-secret and student-data guards/,
+  'TEST-CATALOG should describe the full account governance lifecycle chain scope.'
 );
 const teacherWorkspaceOperationsChainView =
   buildTeacherWorkspaceOperationsChainHandoffView();
