@@ -256,6 +256,11 @@ import {
   buildActivityAiAuthoringChainHandoffView,
 } from '@/activities/ai-authoring-chain';
 import {
+  TEMPLATE_ROADMAP_CAPABILITY_CHAIN_HANDOFF_ITEM_IDS,
+  TEMPLATE_ROADMAP_CAPABILITY_CHAIN_SOURCE_FILES,
+  buildTemplateRoadmapCapabilityChainHandoffView,
+} from '@/activities/template-roadmap-capability-chain';
+import {
   ACTIVITY_AUTHORING_LIBRARY_CHAIN_HANDOFF_ITEM_IDS,
   ACTIVITY_AUTHORING_LIBRARY_CHAIN_SOURCE_FILES,
   buildActivityAuthoringLibraryChainHandoffView,
@@ -41995,6 +42000,120 @@ assert.match(
   readFileSync('tests/e2e/TEST-CATALOG.md', 'utf8'),
   /Worksheet-mode delivery chain has a fast script-level gate via[\s\S]*scripts\/worksheet-mode-delivery-chain-handoff\.test\.ts/,
   'TEST-CATALOG should document the worksheet-mode delivery chain gate.'
+);
+const templateRoadmapCapabilityChainView =
+  buildTemplateRoadmapCapabilityChainHandoffView();
+const templateRoadmapCapabilityChainValues = new Map(
+  templateRoadmapCapabilityChainView.itemViews.map((item) => [
+    item.id,
+    item.value,
+  ])
+);
+assert.deepEqual(
+  templateRoadmapCapabilityChainView.itemViews.map((item) => item.id),
+  [...TEMPLATE_ROADMAP_CAPABILITY_CHAIN_HANDOFF_ITEM_IDS],
+  'Template roadmap capability chain should expose the stable 30-slice roadmap, template, worksheet, AI, runtime, print, and export order.'
+);
+assert.equal(templateRoadmapCapabilityChainView.itemViews.length, 30);
+assert.equal(
+  new Set(TEMPLATE_ROADMAP_CAPABILITY_CHAIN_HANDOFF_ITEM_IDS).size,
+  30
+);
+assert.equal(TEMPLATE_ROADMAP_CAPABILITY_CHAIN_SOURCE_FILES.length, 30);
+for (const filePath of TEMPLATE_ROADMAP_CAPABILITY_CHAIN_SOURCE_FILES) {
+  assert.ok(
+    existsSync(filePath),
+    `Missing template roadmap capability chain file ${filePath}`
+  );
+}
+assert.ok(
+  templateRoadmapCapabilityChainView.itemViews.every(
+    (item) => item.ariaLabel && item.description && item.label && item.value
+  )
+);
+assert.deepEqual(templateRoadmapCapabilityChainView.privacy, {
+  chainSourceFileCount: TEMPLATE_ROADMAP_CAPABILITY_CHAIN_SOURCE_FILES.length,
+  createsAssignmentLinksWithoutTeacherAction: false,
+  createsParallelWorksheetModel: false,
+  exposesAnswerKeysToPublicPayload: false,
+  exposesPromptTextInHandoff: false,
+  exposesRawAiOutput: false,
+  exposesRawSourceText: false,
+  exposesSourceMaterialFileIds: false,
+  exposesSourceMaterialStorageKeys: false,
+  itemIds: [...TEMPLATE_ROADMAP_CAPABILITY_CHAIN_HANDOFF_ITEM_IDS],
+  mutatesExistingAssignmentSnapshots: false,
+  readsSourceMaterialFileBytes: false,
+  requiresCreateActivityInputContract: true,
+  requiresTeacherReviewBeforePersistence: true,
+  sourceFiles: [...TEMPLATE_ROADMAP_CAPABILITY_CHAIN_SOURCE_FILES],
+  usesSharedActivityAssignmentModel: true,
+});
+assert.deepEqual(
+  [
+    ROADMAP_PUBLIC_HANDOFF_ITEM_IDS.length,
+    PUBLIC_TEMPLATE_ENTRY_HANDOFF_ITEM_IDS.length,
+    ACTIVITY_TEMPLATE_SCAFFOLD_QUALITY_HANDOFF_ITEM_IDS.length,
+    ACTIVITY_TEMPLATE_REMIX_HANDOFF_ITEM_IDS.length,
+    QUESTION_CHOICE_GENERATION_HANDOFF_ITEM_IDS.length,
+    ACTIVITY_AI_AUTHORING_CHAIN_HANDOFF_ITEM_IDS.length,
+    ACTIVITY_AI_REMIX_ASSIST_HANDOFF_ITEM_IDS.length,
+    ACTIVITY_SOURCE_EXTRACTION_ASSIST_HANDOFF_ITEM_IDS.length,
+    WORKSHEET_MODE_DELIVERY_CHAIN_HANDOFF_ITEM_IDS.length,
+    STUDENT_RUNNER_PLAY_CHAIN_HANDOFF_ITEM_IDS.length,
+    FILL_BLANK_WORKSHEET_HANDOFF_ITEM_IDS.length,
+    LINE_MATCH_BOARD_HANDOFF_ITEM_IDS.length,
+    GROUP_SORT_BOARD_HANDOFF_ITEM_IDS.length,
+    MATCHING_PAIRS_BOARD_HANDOFF_ITEM_IDS.length,
+    LISTENING_SPEECH_HANDOFF_ITEM_IDS.length,
+    OPEN_BOX_REVEAL_HANDOFF_ITEM_IDS.length,
+    PRINTABLE_WORKSHEET_HANDOFF_ITEM_IDS.length,
+    ASSIGNMENT_RESULTS_EXPORT_PREPARATION_ITEM_IDS.length,
+  ],
+  Array.from({ length: 18 }, () => 30),
+  'Template roadmap capability chain should stay backed by focused roadmap, template, AI, worksheet, runtime, print, and export gates.'
+);
+assert.deepEqual(Object.fromEntries(templateRoadmapCapabilityChainValues), {
+  'ai-draft-capability': 'Teacher-reviewed draft',
+  'ai-remix-assist': 'Missing-field completion',
+  'assignment-snapshot-extension': 'AssignmentSnapshot',
+  'create-input-contract': 'CreateActivityInput',
+  'current-loop-signal': 'Create -> publish -> play -> results',
+  'deterministic-remix-foundation': 'Ready targets first',
+  'fill-blank-runtime': 'Inline blanks',
+  'group-sort-runtime': 'Category board',
+  'line-match-runtime': 'Connection board',
+  'listening-runtime': 'Speech track',
+  'liveworksheets-mode-set': '4 worksheet modes',
+  'matching-pairs-runtime': 'Left/right cards',
+  'open-box-runtime': 'Reveal flow',
+  'printable-follow-up': 'Teacher print route',
+  'privacy-model-guard': 'No parallel model',
+  'product-roadmap-boundary': Routes.Roadmap,
+  'public-template-entry': Routes.Templates,
+  'public-worksheet-entry': Routes.Worksheets,
+  'quiz-choice-generation': 'ActivityQuestion.options',
+  'result-export-continuity': 'Shared result export',
+  'shared-create-editor': Routes.Create,
+  'source-extraction-readiness': 'Future extraction paths',
+  'spreadsheet-import-path': 'Structured import readiness',
+  'student-runtime-routing': 'Runtime item kind',
+  'teacher-audio-path': 'Listening draft readiness',
+  'template-readiness-diagnosis': 'Ready and locked modes',
+  'template-roadmap-chain-gate': '30 source files',
+  'template-scaffold-coverage': 'All template scaffolds',
+  'wordwall-template-set': '8 template modes',
+  'worksheet-extraction-path': 'Worksheet import readiness',
+});
+assert.match(
+  readFileSync('tests/e2e/TEST-CATALOG.md', 'utf8'),
+  /Template roadmap capability chain has a fast script-level gate via[\s\S]*scripts\/template-roadmap-capability-chain-handoff\.test\.ts/,
+  'TEST-CATALOG should document the template roadmap capability chain gate.'
+);
+assert.match(
+  readFileSync('tests/e2e/TEST-CATALOG.md', 'utf8'),
+  /roadmap template promises[\s\S]*Wordwall-style templates[\s\S]*Liveworksheets-style modes[\s\S]*AI enhancements[\s\S]*worksheet delivery[\s\S]*print follow-up[\s\S]*result\s+export\s+continuity/,
+  'TEST-CATALOG should describe the full template roadmap capability chain scope.'
 );
 const templateEntrySource = readFileSync(
   'src/activities/template-entry.ts',

@@ -494,6 +494,12 @@ run it when changing AI source safety, authenticated draft generation,
 deterministic fallback, CreateActivityInput mapping, draft coverage,
 template readiness, quiz-choice readiness, AI remix assist, editor review,
 source-material privacy guards, or save/publish boundaries.
+Template roadmap capability chain has a fast script-level gate via
+`pnpm exec tsx --test scripts/template-roadmap-capability-chain-handoff.test.ts`;
+run it when changing roadmap template promises, Wordwall-style templates,
+Liveworksheets-style modes, shared editor scaffolds, AI enhancements, source
+extraction readiness, worksheet delivery, print follow-up, result export
+continuity, or template capability privacy guards.
 Activity authoring/library chain has a fast script-level gate via
 `pnpm exec tsx --test scripts/activity-authoring-library-chain-handoff.test.ts`;
 run it when changing public template and worksheet entries, shared editor save,
