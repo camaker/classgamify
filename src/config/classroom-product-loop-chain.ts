@@ -7,7 +7,7 @@ export const CLASSROOM_PRODUCT_LOOP_CHAIN_HANDOFF_ITEM_IDS = [
   'template-roadmap-capability-boundary',
   'ai-enhancement-lifecycle-boundary',
   'source-extraction-lifecycle-boundary',
-  'activity-lifecycle-derivative-guard',
+  'activity-lifecycle-governance-boundary',
   'assignment-publish-preflight',
   'assignment-snapshot-freeze',
   'share-link-distribution',
@@ -93,6 +93,7 @@ export type ClassroomProductLoopChainPrivacyContract = {
   itemIds: ClassroomProductLoopChainHandoffItemId[];
   requiresTeacherSaveBeforeActivityPersistence: true;
   keepsSourceMaterialExtractionEditorReviewed: true;
+  archivedActivitiesRequireRestoreBeforeDerive: true;
   keepsProtectedRoutesOutOfIndex: true;
   keepsPublicDiscoverySourceLevel: true;
   keepsActivityLibraryOwnerScoped: true;
@@ -108,6 +109,7 @@ export type ClassroomProductLoopChainPrivacyContract = {
   usesAiEnhancementLifecycleChain: true;
   usesActivityAuthoringLibraryChain: true;
   usesActivityAssignmentAttemptResultsLoop: true;
+  usesActivityLifecycleGovernanceChain: true;
   usesPublicDiscoveryIndexingChain: true;
   usesSourceExtractionLifecycleChain: true;
   usesTemplateRoadmapCapabilityChain: true;
@@ -127,7 +129,7 @@ export function buildClassroomProductLoopChainHandoffView(): ClassroomProductLoo
 
   return {
     description:
-      'Thirty-slice classroom product loop chain from teacher-owned activities and reusable content through activity authoring/library workflow, source extraction lifecycle boundaries, template roadmap capability alignment, AI enhancement lifecycle review, assignment publish, frozen snapshots, public student play, validated attempts, scored results, submitted-date, accepted-answer, and explanation continuity, teacher review, copy/export/print handoffs, dashboard status, public discovery/indexing metadata, and privacy guards.',
+      'Thirty-slice classroom product loop chain from teacher-owned activities and reusable content through activity authoring/library workflow, source extraction lifecycle boundaries, activity lifecycle governance, template roadmap capability alignment, AI enhancement lifecycle review, assignment publish, frozen snapshots, public student play, validated attempts, scored results, submitted-date, accepted-answer, and explanation continuity, teacher review, copy/export/print handoffs, dashboard status, public discovery/indexing metadata, and privacy guards.',
     itemViews,
     privacy: {
       chainSourceFileCount: CLASSROOM_PRODUCT_LOOP_CHAIN_SOURCE_FILES.length,
@@ -147,6 +149,7 @@ export function buildClassroomProductLoopChainHandoffView(): ClassroomProductLoo
       itemIds: [...CLASSROOM_PRODUCT_LOOP_CHAIN_HANDOFF_ITEM_IDS],
       requiresTeacherSaveBeforeActivityPersistence: true,
       keepsSourceMaterialExtractionEditorReviewed: true,
+      archivedActivitiesRequireRestoreBeforeDerive: true,
       keepsProtectedRoutesOutOfIndex: true,
       keepsPublicDiscoverySourceLevel: true,
       keepsActivityLibraryOwnerScoped: true,
@@ -162,6 +165,7 @@ export function buildClassroomProductLoopChainHandoffView(): ClassroomProductLoo
       usesAiEnhancementLifecycleChain: true,
       usesActivityAuthoringLibraryChain: true,
       usesActivityAssignmentAttemptResultsLoop: true,
+      usesActivityLifecycleGovernanceChain: true,
       usesPublicDiscoveryIndexingChain: true,
       usesSourceExtractionLifecycleChain: true,
       usesTemplateRoadmapCapabilityChain: true,
@@ -241,12 +245,12 @@ function getClassroomProductLoopChainHandoffItem(
         '30 extraction slices',
         'Compact source-material references, material classification, audio/worksheet/spreadsheet readiness, AI-safe provenance, editor review, snapshot protection, and public payload privacy stay aligned.'
       );
-    case 'activity-lifecycle-derivative-guard':
+    case 'activity-lifecycle-governance-boundary':
       return item(
         id,
-        'Activity lifecycle derivative guard',
-        'Restore before derive',
-        'Archive, restore, duplicate, remix, and publish actions share the restore-before-derive lifecycle rule.'
+        'Activity lifecycle governance boundary',
+        '30 lifecycle slices',
+        'Owner-scoped archive and restore, edit/publish/duplicate/remix gates, server enforcement, content/source-material retention, snapshot protection, and public assignment continuity stay aligned.'
       );
     case 'assignment-publish-preflight':
       return item(
