@@ -19,7 +19,7 @@ export const CLASSROOM_PRODUCT_LOOP_CHAIN_HANDOFF_ITEM_IDS = [
   'submission-validation',
   'scored-attempt-result-boundary',
   'answer-feedback-policy',
-  'result-submitted-date-continuity',
+  'result-submitted-date-boundary',
   'teacher-result-review',
   'result-accepted-answer-continuity',
   'csv-export',
@@ -77,7 +77,9 @@ export type ClassroomProductLoopChainHandoffItemView = {
 
 export type ClassroomProductLoopChainPrivacyContract = {
   chainSourceFileCount: number;
+  copyArtifactsUseFormattedDates: true;
   createsAssignmentLinksWithoutTeacherAction: false;
+  csvDatesUseIsoFormatter: true;
   deliveryPolicyResolvedBeforeAssignmentSurfaces: true;
   exposesActivityContentJsonToPublicPayload: false;
   exposesAnswerKeysBeforeAllowedReview: false;
@@ -90,6 +92,7 @@ export type ClassroomProductLoopChainPrivacyContract = {
   exposesSourceMaterialStorageKeys: false;
   exposesStudentAnswerTextInHandoff: false;
   exposesStudentNamesInHandoff: false;
+  exportIncludesSubmittedDateColumns: true;
   freezesAssignmentSnapshots: true;
   itemIds: ClassroomProductLoopChainHandoffItemId[];
   requiresTeacherSaveBeforeActivityPersistence: true;
@@ -106,6 +109,8 @@ export type ClassroomProductLoopChainPrivacyContract = {
   publicStudentRunnerPayloadUsesSanitizedRuntimeItems: true;
   rejectsClosedOrExpiredStudentRunnerSubmissions: true;
   rejectsInvalidSubmissions: true;
+  resultSubmittedDateSortingUsesTimestampParsing: true;
+  resultUiDatesUseLocalizedFormatter: true;
   requiresTeacherReviewForAiEnhancements: true;
   requiresTeacherReviewForAiDrafts: true;
   resultConsumersUseScoredAttempts: true;
@@ -118,6 +123,7 @@ export type ClassroomProductLoopChainPrivacyContract = {
   usesActivityLifecycleGovernanceChain: true;
   usesPublishedAssignmentDeliveryChain: true;
   usesPublicDiscoveryIndexingChain: true;
+  usesResultSubmittedDateChain: true;
   usesScoredAttemptResultChain: true;
   usesSharedAttemptStats: true;
   usesSharedDurationFormatting: true;
@@ -140,11 +146,13 @@ export function buildClassroomProductLoopChainHandoffView(): ClassroomProductLoo
 
   return {
     description:
-      'Thirty-slice classroom product loop chain from teacher-owned activities and reusable content through activity authoring/library workflow, source extraction lifecycle boundaries, activity lifecycle governance, template roadmap capability alignment, AI enhancement lifecycle review, published assignment delivery, student runner play, validated attempts, scored attempt results, submitted-date, accepted-answer, and explanation continuity, teacher review, copy/export/print handoffs, dashboard status, public discovery/indexing metadata, and privacy guards.',
+      'Thirty-slice classroom product loop chain from teacher-owned activities and reusable content through activity authoring/library workflow, source extraction lifecycle boundaries, activity lifecycle governance, template roadmap capability alignment, AI enhancement lifecycle review, published assignment delivery, student runner play, validated attempts, scored attempt results, submitted-date continuity, accepted-answer, and explanation continuity, teacher review, copy/export/print handoffs, dashboard status, public discovery/indexing metadata, and privacy guards.',
     itemViews,
     privacy: {
       chainSourceFileCount: CLASSROOM_PRODUCT_LOOP_CHAIN_SOURCE_FILES.length,
+      copyArtifactsUseFormattedDates: true,
       createsAssignmentLinksWithoutTeacherAction: false,
+      csvDatesUseIsoFormatter: true,
       deliveryPolicyResolvedBeforeAssignmentSurfaces: true,
       exposesActivityContentJsonToPublicPayload: false,
       exposesAnswerKeysBeforeAllowedReview: false,
@@ -157,6 +165,7 @@ export function buildClassroomProductLoopChainHandoffView(): ClassroomProductLoo
       exposesSourceMaterialStorageKeys: false,
       exposesStudentAnswerTextInHandoff: false,
       exposesStudentNamesInHandoff: false,
+      exportIncludesSubmittedDateColumns: true,
       freezesAssignmentSnapshots: true,
       itemIds: [...CLASSROOM_PRODUCT_LOOP_CHAIN_HANDOFF_ITEM_IDS],
       requiresTeacherSaveBeforeActivityPersistence: true,
@@ -173,6 +182,8 @@ export function buildClassroomProductLoopChainHandoffView(): ClassroomProductLoo
       publicStudentRunnerPayloadUsesSanitizedRuntimeItems: true,
       rejectsClosedOrExpiredStudentRunnerSubmissions: true,
       rejectsInvalidSubmissions: true,
+      resultSubmittedDateSortingUsesTimestampParsing: true,
+      resultUiDatesUseLocalizedFormatter: true,
       requiresTeacherReviewForAiEnhancements: true,
       requiresTeacherReviewForAiDrafts: true,
       resultConsumersUseScoredAttempts: true,
@@ -185,6 +196,7 @@ export function buildClassroomProductLoopChainHandoffView(): ClassroomProductLoo
       usesActivityLifecycleGovernanceChain: true,
       usesPublishedAssignmentDeliveryChain: true,
       usesPublicDiscoveryIndexingChain: true,
+      usesResultSubmittedDateChain: true,
       usesScoredAttemptResultChain: true,
       usesSharedAttemptStats: true,
       usesSharedDurationFormatting: true,
@@ -351,12 +363,12 @@ function getClassroomProductLoopChainHandoffItem(
         'Reveal if allowed',
         'Student feedback exposes accepted answers and explanations only after scoring and only when policy allows review.'
       );
-    case 'result-submitted-date-continuity':
+    case 'result-submitted-date-boundary':
       return item(
         id,
-        'Result submitted date continuity',
-        'Submitted dates',
-        'Teacher result tables, review cards, follow-up copy, sorting, and CSV columns share submitted-date formatting.'
+        'Result submitted-date boundary',
+        '30 date slices',
+        'Shared UI and CSV date formatters, attempt rows, review cards, student summaries, latest-attempt copy context, completed-at sorting, submitted-date export columns, and privacy guards stay aligned.'
       );
     case 'teacher-result-review':
       return item(

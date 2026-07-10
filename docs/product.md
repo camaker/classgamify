@@ -17,7 +17,7 @@ activity authoring/library workflow, source extraction lifecycle boundaries,
 activity lifecycle governance, template roadmap capability alignment,
 AI enhancement lifecycle review,
 published assignment delivery, student runner play, validated attempts,
-scored attempt results, submitted-date,
+scored attempt results, submitted-date continuity,
 accepted-answer, and explanation continuity, teacher result review,
 copy/export/print handoffs, dashboard status, public discovery/indexing
 metadata, and privacy guards aligned with this sequence.

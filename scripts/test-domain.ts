@@ -16617,7 +16617,9 @@ assert.ok(
 );
 assert.deepEqual(classroomProductLoopChainView.privacy, {
   chainSourceFileCount: CLASSROOM_PRODUCT_LOOP_CHAIN_SOURCE_FILES.length,
+  copyArtifactsUseFormattedDates: true,
   createsAssignmentLinksWithoutTeacherAction: false,
+  csvDatesUseIsoFormatter: true,
   deliveryPolicyResolvedBeforeAssignmentSurfaces: true,
   exposesActivityContentJsonToPublicPayload: false,
   exposesAnswerKeysBeforeAllowedReview: false,
@@ -16630,6 +16632,7 @@ assert.deepEqual(classroomProductLoopChainView.privacy, {
   exposesSourceMaterialStorageKeys: false,
   exposesStudentAnswerTextInHandoff: false,
   exposesStudentNamesInHandoff: false,
+  exportIncludesSubmittedDateColumns: true,
   freezesAssignmentSnapshots: true,
   itemIds: [...CLASSROOM_PRODUCT_LOOP_CHAIN_HANDOFF_ITEM_IDS],
   requiresTeacherSaveBeforeActivityPersistence: true,
@@ -16646,6 +16649,8 @@ assert.deepEqual(classroomProductLoopChainView.privacy, {
   publicStudentRunnerPayloadUsesSanitizedRuntimeItems: true,
   rejectsClosedOrExpiredStudentRunnerSubmissions: true,
   rejectsInvalidSubmissions: true,
+  resultSubmittedDateSortingUsesTimestampParsing: true,
+  resultUiDatesUseLocalizedFormatter: true,
   requiresTeacherReviewForAiEnhancements: true,
   requiresTeacherReviewForAiDrafts: true,
   resultConsumersUseScoredAttempts: true,
@@ -16658,6 +16663,7 @@ assert.deepEqual(classroomProductLoopChainView.privacy, {
   usesActivityLifecycleGovernanceChain: true,
   usesPublishedAssignmentDeliveryChain: true,
   usesPublicDiscoveryIndexingChain: true,
+  usesResultSubmittedDateChain: true,
   usesScoredAttemptResultChain: true,
   usesSharedAttemptStats: true,
   usesSharedDurationFormatting: true,
@@ -16692,6 +16698,7 @@ assert.deepEqual(
     SCORED_ATTEMPT_RESULT_CHAIN_HANDOFF_ITEM_IDS.length,
     SCORED_ATTEMPT_RESULT_CHAIN_SOURCE_FILES.length,
     ASSIGNMENT_RESULT_SUBMITTED_DATE_CHAIN_HANDOFF_ITEM_IDS.length,
+    ASSIGNMENT_RESULT_SUBMITTED_DATE_CHAIN_SOURCE_FILES.length,
     ASSIGNMENT_RESULT_ACCEPTED_ANSWER_CHAIN_HANDOFF_ITEM_IDS.length,
     ASSIGNMENT_RESULT_EXPLANATION_CHAIN_HANDOFF_ITEM_IDS.length,
     TEACHER_RESULTS_REVIEW_CHAIN_HANDOFF_ITEM_IDS.length,
@@ -16702,7 +16709,7 @@ assert.deepEqual(
     PUBLIC_DISCOVERY_INDEXING_CHAIN_SOURCE_FILES.length,
     CLASSROOM_TRUST_COMMUNICATION_CHAIN_HANDOFF_ITEM_IDS.length,
   ],
-  Array.from({ length: 34 }, () => 30),
+  Array.from({ length: 35 }, () => 30),
   'Classroom product loop chain should stay backed by adjacent public entry, public discovery/indexing, workspace, data, authoring, source extraction, lifecycle governance, template roadmap, AI enhancement lifecycle, delivery, runner, result continuity, export, print, and trust gates.'
 );
 assert.deepEqual(Object.fromEntries(classroomProductLoopChainValues), {
@@ -16727,7 +16734,7 @@ assert.deepEqual(Object.fromEntries(classroomProductLoopChainValues), {
   'student-runner-play-boundary': '30 runner slices',
   'result-accepted-answer-continuity': 'Accepted alternatives',
   'result-explanation-continuity': 'Answer explanations',
-  'result-submitted-date-continuity': 'Submitted dates',
+  'result-submitted-date-boundary': '30 date slices',
   'runtime-item-contract': '{ itemId, answer }',
   'share-link-distribution': 'Copy/preview/print/review',
   'source-extraction-lifecycle-boundary': '30 extraction slices',
