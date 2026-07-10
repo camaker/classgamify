@@ -243,6 +243,11 @@ import {
   buildActivityAiAuthoringChainHandoffView,
 } from '@/activities/ai-authoring-chain';
 import {
+  ACTIVITY_AUTHORING_LIBRARY_CHAIN_HANDOFF_ITEM_IDS,
+  ACTIVITY_AUTHORING_LIBRARY_CHAIN_SOURCE_FILES,
+  buildActivityAuthoringLibraryChainHandoffView,
+} from '@/activities/authoring-library-chain';
+import {
   ACTIVITY_AI_DRAFT_DEFAULT_FOCUS,
   ACTIVITY_AI_DRAFT_FOCUSES,
   buildActivityAiDraftFocusOptions,
@@ -456,6 +461,7 @@ import {
   buildActivityEditPageViewModel,
   buildActivityEditRouteState,
   activityContentToEditorInput,
+  ACTIVITY_EDIT_ROUTE_HANDOFF_ITEM_IDS,
   ACTIVITY_EDITOR_AI_DRAFT_SOURCE_CONTROL_IDS,
   ACTIVITY_EDITOR_AI_DRAFT_SOURCE_HANDOFF_ITEM_IDS,
   ACTIVITY_EDITOR_SECTION_IDS,
@@ -6187,6 +6193,110 @@ assert.match(
   readFileSync('tests/e2e/TEST-CATALOG.md', 'utf8'),
   /Activity AI authoring chain has a fast script-level gate via[\s\S]*scripts\/activity-ai-authoring-chain-handoff\.test\.ts/,
   'TEST-CATALOG should document the activity AI authoring chain gate.'
+);
+const activityAuthoringLibraryChainView =
+  buildActivityAuthoringLibraryChainHandoffView();
+const activityAuthoringLibraryChainValues = new Map(
+  activityAuthoringLibraryChainView.itemViews.map((item) => [
+    item.id,
+    item.value,
+  ])
+);
+assert.deepEqual(
+  activityAuthoringLibraryChainView.itemViews.map((item) => item.id),
+  [...ACTIVITY_AUTHORING_LIBRARY_CHAIN_HANDOFF_ITEM_IDS],
+  'Activity authoring/library chain should expose the stable public-entry to library-management 30-slice order.'
+);
+assert.equal(activityAuthoringLibraryChainView.itemViews.length, 30);
+assert.equal(
+  new Set(ACTIVITY_AUTHORING_LIBRARY_CHAIN_HANDOFF_ITEM_IDS).size,
+  30
+);
+assert.equal(ACTIVITY_AUTHORING_LIBRARY_CHAIN_SOURCE_FILES.length, 30);
+for (const filePath of ACTIVITY_AUTHORING_LIBRARY_CHAIN_SOURCE_FILES) {
+  assert.ok(
+    existsSync(filePath),
+    `Missing activity authoring/library chain file ${filePath}`
+  );
+}
+assert.ok(
+  activityAuthoringLibraryChainView.itemViews.every(
+    (item) => item.ariaLabel && item.description && item.label && item.value
+  )
+);
+assert.deepEqual(activityAuthoringLibraryChainView.privacy, {
+  chainSourceFileCount: ACTIVITY_AUTHORING_LIBRARY_CHAIN_SOURCE_FILES.length,
+  createsAssignmentLinksWithoutTeacherAction: false,
+  editsPublishedAssignmentSnapshots: false,
+  exposesAnswerText: false,
+  exposesPromptTextInHandoff: false,
+  exposesRawEditorInput: false,
+  exposesSourceMaterialFileIds: false,
+  exposesSourceMaterialFilenames: false,
+  exposesSourceMaterialStorageKeys: false,
+  itemIds: [...ACTIVITY_AUTHORING_LIBRARY_CHAIN_HANDOFF_ITEM_IDS],
+  requiresAuthenticatedTeacherForPersistence: true,
+  requiresCreateActivityInputContract: true,
+  requiresOwnerScopedLibrary: true,
+  requiresTeacherSave: true,
+  sourceFiles: [...ACTIVITY_AUTHORING_LIBRARY_CHAIN_SOURCE_FILES],
+  usesAssignmentSnapshotsForExistingLinks: true,
+  usesSharedTemplateReadiness: true,
+});
+assert.deepEqual(
+  [
+    PUBLIC_TEMPLATE_ENTRY_HANDOFF_ITEM_IDS.length,
+    ACTIVITY_EDITOR_WORKFLOW_HANDOFF_ITEM_IDS.length,
+    ACTIVITY_EDITOR_TEMPLATE_HANDOFF_ITEM_IDS.length,
+    ACTIVITY_TEMPLATE_SCAFFOLD_QUALITY_HANDOFF_ITEM_IDS.length,
+    ACTIVITY_SOURCE_MATERIAL_PICKER_HANDOFF_ITEM_IDS.length,
+    ACTIVITY_SOURCE_MATERIAL_REFERENCE_ITEM_IDS.length,
+    ACTIVITY_EDIT_ROUTE_HANDOFF_ITEM_IDS.length,
+    ACTIVITY_LIBRARY_PAGE_HANDOFF_ITEM_IDS.length,
+    ACTIVITY_DUPLICATE_HANDOFF_ITEM_IDS.length,
+    ACTIVITY_TEMPLATE_REMIX_HANDOFF_ITEM_IDS.length,
+    ACTIVITY_LIFECYCLE_HANDOFF_ITEM_IDS.length,
+    ASSIGNMENT_PUBLISH_HANDOFF_ITEM_IDS.length,
+  ],
+  Array.from({ length: 12 }, () => 30),
+  'Activity authoring/library chain should stay backed by focused public-entry, editor, library, derivative, lifecycle, and publish gates.'
+);
+assert.deepEqual(Object.fromEntries(activityAuthoringLibraryChainValues), {
+  'activity-persistence': 'Create/update helpers',
+  'activity-workflow-chain-gate': '30 source files',
+  'archive-lifecycle-gate': 'Archive blocks derive',
+  'card-readiness-summary': 'Ready/locked modes',
+  'card-source-materials': 'Kind/count badges',
+  'create-editor-entry': '/create',
+  'duplicate-draft-boundary': 'Draft copy',
+  'edit-contract-roundtrip': 'Content to editor input',
+  'edit-route-owner-scope': 'Authenticated owner',
+  'editor-readiness-preview': 'TemplateRemixPlan',
+  'editor-scaffold-loading': 'Reviewed scaffolds',
+  'library-owner-scope': 'Owner-scoped API',
+  'library-pagination': 'Bounded pages',
+  'library-search-normalization': 'NFKC trimmed search',
+  'library-source-filter': 'Material kind filter',
+  'library-status-filter': 'Active/archived',
+  'library-summary-metrics': 'Full filtered result',
+  'library-template-filter': 'Exact template',
+  'publish-access-boundary': 'Publish dialog only',
+  'public-template-entry': '/templates',
+  'remix-readiness-boundary': 'Ready target only',
+  'restore-lifecycle-gate': 'Restore before derive',
+  'save-validation': 'Zod validation',
+  'shared-create-input': 'CreateActivityInput',
+  'snapshot-protection': 'AssignmentSnapshot',
+  'source-material-picker': 'Owner files',
+  'source-material-summary': 'Kind/count only',
+  'structured-content-fields': 'Questions/pairs/groups',
+  'template-source-search': 'template/source params',
+  'worksheet-entry': '/worksheets',
+});
+assert.match(
+  readFileSync('tests/e2e/TEST-CATALOG.md', 'utf8'),
+  /Activity authoring\/library chain has a fast script-level gate via[\s\S]*scripts\/activity-authoring-library-chain-handoff\.test\.ts/,
+  'TEST-CATALOG should document the activity authoring/library chain gate.'
 );
 const sourceMaterialPrivacyChainView =
   buildSourceMaterialPrivacyChainHandoffView();

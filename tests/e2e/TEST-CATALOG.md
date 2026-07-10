@@ -478,6 +478,12 @@ run it when changing AI source safety, authenticated draft generation,
 deterministic fallback, CreateActivityInput mapping, draft coverage,
 template readiness, quiz-choice readiness, AI remix assist, editor review,
 source-material privacy guards, or save/publish boundaries.
+Activity authoring/library chain has a fast script-level gate via
+`pnpm exec tsx --test scripts/activity-authoring-library-chain-handoff.test.ts`;
+run it when changing public template and worksheet entries, shared editor save,
+edit hydration, owner-scoped library management, derivative drafts, lifecycle
+gates, publish snapshot boundaries, or the end-to-end activity creation to
+library workflow contract.
 Source extraction assist has a fast script-level gate via
 `pnpm exec tsx --test scripts/activity-source-extraction-assist-handoff-semantic-views.test.ts`;
 run it when changing attached-material extraction readiness, audio draft paths,
