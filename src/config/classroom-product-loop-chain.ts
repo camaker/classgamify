@@ -8,7 +8,7 @@ export const CLASSROOM_PRODUCT_LOOP_CHAIN_HANDOFF_ITEM_IDS = [
   'ai-enhancement-lifecycle-boundary',
   'source-extraction-lifecycle-boundary',
   'activity-lifecycle-governance-boundary',
-  'assignment-publish-preflight',
+  'published-assignment-delivery-boundary',
   'assignment-snapshot-freeze',
   'share-link-distribution',
   'public-runner-access',
@@ -78,6 +78,7 @@ export type ClassroomProductLoopChainHandoffItemView = {
 export type ClassroomProductLoopChainPrivacyContract = {
   chainSourceFileCount: number;
   createsAssignmentLinksWithoutTeacherAction: false;
+  deliveryPolicyResolvedBeforeAssignmentSurfaces: true;
   exposesActivityContentJsonToPublicPayload: false;
   exposesAnswerKeysBeforeAllowedReview: false;
   exposesCsvDataUrlInHandoff: false;
@@ -110,6 +111,7 @@ export type ClassroomProductLoopChainPrivacyContract = {
   usesActivityAuthoringLibraryChain: true;
   usesActivityAssignmentAttemptResultsLoop: true;
   usesActivityLifecycleGovernanceChain: true;
+  usesPublishedAssignmentDeliveryChain: true;
   usesPublicDiscoveryIndexingChain: true;
   usesSourceExtractionLifecycleChain: true;
   usesTemplateRoadmapCapabilityChain: true;
@@ -129,11 +131,12 @@ export function buildClassroomProductLoopChainHandoffView(): ClassroomProductLoo
 
   return {
     description:
-      'Thirty-slice classroom product loop chain from teacher-owned activities and reusable content through activity authoring/library workflow, source extraction lifecycle boundaries, activity lifecycle governance, template roadmap capability alignment, AI enhancement lifecycle review, assignment publish, frozen snapshots, public student play, validated attempts, scored results, submitted-date, accepted-answer, and explanation continuity, teacher review, copy/export/print handoffs, dashboard status, public discovery/indexing metadata, and privacy guards.',
+      'Thirty-slice classroom product loop chain from teacher-owned activities and reusable content through activity authoring/library workflow, source extraction lifecycle boundaries, activity lifecycle governance, template roadmap capability alignment, AI enhancement lifecycle review, published assignment delivery, public student play, validated attempts, scored results, submitted-date, accepted-answer, and explanation continuity, teacher review, copy/export/print handoffs, dashboard status, public discovery/indexing metadata, and privacy guards.',
     itemViews,
     privacy: {
       chainSourceFileCount: CLASSROOM_PRODUCT_LOOP_CHAIN_SOURCE_FILES.length,
       createsAssignmentLinksWithoutTeacherAction: false,
+      deliveryPolicyResolvedBeforeAssignmentSurfaces: true,
       exposesActivityContentJsonToPublicPayload: false,
       exposesAnswerKeysBeforeAllowedReview: false,
       exposesCsvDataUrlInHandoff: false,
@@ -166,6 +169,7 @@ export function buildClassroomProductLoopChainHandoffView(): ClassroomProductLoo
       usesActivityAuthoringLibraryChain: true,
       usesActivityAssignmentAttemptResultsLoop: true,
       usesActivityLifecycleGovernanceChain: true,
+      usesPublishedAssignmentDeliveryChain: true,
       usesPublicDiscoveryIndexingChain: true,
       usesSourceExtractionLifecycleChain: true,
       usesTemplateRoadmapCapabilityChain: true,
@@ -252,12 +256,12 @@ function getClassroomProductLoopChainHandoffItem(
         '30 lifecycle slices',
         'Owner-scoped archive and restore, edit/publish/duplicate/remix gates, server enforcement, content/source-material retention, snapshot protection, and public assignment continuity stay aligned.'
       );
-    case 'assignment-publish-preflight':
+    case 'published-assignment-delivery-boundary':
       return item(
         id,
-        'Assignment publish preflight',
-        'Delivery settings review',
-        'Teachers review title, instructions, identity, attempt, timer, close-time, and answer-reveal settings before publishing.'
+        'Published assignment delivery boundary',
+        '30 delivery slices',
+        'Publish preflight, frozen snapshots, share links, delivery policy, public student rules, validated submissions, attempt persistence, result review, export policy, and privacy guards stay aligned.'
       );
     case 'assignment-snapshot-freeze':
       return item(

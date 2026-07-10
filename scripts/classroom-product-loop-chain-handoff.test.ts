@@ -28,7 +28,10 @@ import {
 } from '@/activities/template-roadmap-capability-chain';
 import { ASSIGNMENT_RESULTS_EXPORT_PREPARATION_ITEM_IDS } from '@/assignments/results-export';
 import { PRINTABLE_WORKSHEET_REVIEW_LIFECYCLE_CHAIN_HANDOFF_ITEM_IDS } from '@/assignments/printable-worksheet-review-lifecycle-chain';
-import { PUBLISHED_ASSIGNMENT_DELIVERY_CHAIN_HANDOFF_ITEM_IDS } from '@/assignments/published-assignment-delivery-chain';
+import {
+  PUBLISHED_ASSIGNMENT_DELIVERY_CHAIN_HANDOFF_ITEM_IDS,
+  PUBLISHED_ASSIGNMENT_DELIVERY_CHAIN_SOURCE_FILES,
+} from '@/assignments/published-assignment-delivery-chain';
 import { ASSIGNMENT_RESULT_ACCEPTED_ANSWER_CHAIN_HANDOFF_ITEM_IDS } from '@/assignments/result-accepted-answer-chain';
 import { ASSIGNMENT_RESULT_EXPLANATION_CHAIN_HANDOFF_ITEM_IDS } from '@/assignments/result-explanation-chain';
 import { ASSIGNMENT_RESULT_SUBMITTED_DATE_CHAIN_HANDOFF_ITEM_IDS } from '@/assignments/result-submitted-date-chain';
@@ -92,6 +95,7 @@ test('classroom product loop chain exposes 30 safe product slices', () => {
   assert.deepEqual(handoffView.privacy, {
     chainSourceFileCount: CLASSROOM_PRODUCT_LOOP_CHAIN_SOURCE_FILES.length,
     createsAssignmentLinksWithoutTeacherAction: false,
+    deliveryPolicyResolvedBeforeAssignmentSurfaces: true,
     exposesActivityContentJsonToPublicPayload: false,
     exposesAnswerKeysBeforeAllowedReview: false,
     exposesCsvDataUrlInHandoff: false,
@@ -124,6 +128,7 @@ test('classroom product loop chain exposes 30 safe product slices', () => {
     usesActivityAuthoringLibraryChain: true,
     usesActivityAssignmentAttemptResultsLoop: true,
     usesActivityLifecycleGovernanceChain: true,
+    usesPublishedAssignmentDeliveryChain: true,
     usesPublicDiscoveryIndexingChain: true,
     usesSourceExtractionLifecycleChain: true,
     usesTemplateRoadmapCapabilityChain: true,
@@ -146,7 +151,7 @@ test('classroom product loop chain summarizes activity to results flow', () => {
       ['ai-enhancement-lifecycle-boundary', 'Policy-to-publish review'],
       ['source-extraction-lifecycle-boundary', '30 extraction slices'],
       ['activity-lifecycle-governance-boundary', '30 lifecycle slices'],
-      ['assignment-publish-preflight', 'Delivery settings review'],
+      ['published-assignment-delivery-boundary', '30 delivery slices'],
       ['assignment-snapshot-freeze', 'Frozen ActivityContent'],
       ['share-link-distribution', 'Copy/preview/print/review'],
       ['public-runner-access', 'Open links only'],
@@ -204,6 +209,7 @@ test('classroom product loop chain is backed by adjacent focused gates', () => {
       SOURCE_EXTRACTION_LIFECYCLE_CHAIN_SOURCE_FILES.length,
       SOURCE_MATERIAL_PRIVACY_CHAIN_HANDOFF_ITEM_IDS.length,
       PUBLISHED_ASSIGNMENT_DELIVERY_CHAIN_HANDOFF_ITEM_IDS.length,
+      PUBLISHED_ASSIGNMENT_DELIVERY_CHAIN_SOURCE_FILES.length,
       STUDENT_RUNNER_PLAY_CHAIN_HANDOFF_ITEM_IDS.length,
       STUDENT_IDENTITY_LIFECYCLE_CHAIN_HANDOFF_ITEM_IDS.length,
       SCORED_ATTEMPT_RESULT_CHAIN_HANDOFF_ITEM_IDS.length,
@@ -218,7 +224,7 @@ test('classroom product loop chain is backed by adjacent focused gates', () => {
       PUBLIC_DISCOVERY_INDEXING_CHAIN_SOURCE_FILES.length,
       CLASSROOM_TRUST_COMMUNICATION_CHAIN_HANDOFF_ITEM_IDS.length,
     ],
-    Array.from({ length: 31 }, () => 30)
+    Array.from({ length: 32 }, () => 30)
   );
 });
 
@@ -235,12 +241,12 @@ test('classroom product loop chain is documented in product and catalog', () => 
   );
   assert.match(
     NORMALIZED_PRODUCT_SOURCE,
-    /src\/config\/classroom-product-loop-chain\.ts` owns the cross-surface product-loop handoff[\s\S]*teacher-owned activities[\s\S]*activity authoring\/library[\s\S]*source extraction lifecycle[\s\S]*activity lifecycle governance[\s\S]*template roadmap capability[\s\S]*AI enhancement lifecycle[\s\S]*assignment links[\s\S]*validated attempts[\s\S]*submitted-date[\s\S]*accepted-answer[\s\S]*explanation continuity[\s\S]*teacher result review[\s\S]*copy\/export\/print handoffs[\s\S]*public discovery\/indexing[\s\S]*privacy guards/,
+    /src\/config\/classroom-product-loop-chain\.ts` owns the cross-surface product-loop handoff[\s\S]*teacher-owned activities[\s\S]*activity authoring\/library[\s\S]*source extraction lifecycle[\s\S]*activity lifecycle governance[\s\S]*template roadmap capability[\s\S]*AI enhancement lifecycle[\s\S]*published assignment delivery[\s\S]*validated attempts[\s\S]*submitted-date[\s\S]*accepted-answer[\s\S]*explanation continuity[\s\S]*teacher result review[\s\S]*copy\/export\/print handoffs[\s\S]*public discovery\/indexing[\s\S]*privacy guards/,
     'docs/product.md should document the classroom product loop chain owner.'
   );
   assert.match(
     NORMALIZED_TEST_CATALOG_SOURCE,
-    /Classroom product loop chain has a fast script-level gate via[\s\S]*scripts\/classroom-product-loop-chain-handoff\.test\.ts[\s\S]*Activity -> Assignment -> Attempt -> Results[\s\S]*activity authoring\/library workflow[\s\S]*source extraction lifecycle[\s\S]*activity lifecycle governance[\s\S]*template roadmap capability[\s\S]*AI enhancement lifecycle[\s\S]*assignment publish[\s\S]*student runner[\s\S]*scored attempts[\s\S]*submitted-date continuity[\s\S]*accepted-answer continuity[\s\S]*explanation continuity[\s\S]*teacher result review[\s\S]*copy\/export\/print handoffs[\s\S]*dashboard\/public discovery[\s\S]*privacy guards/,
+    /Classroom product loop chain has a fast script-level gate via[\s\S]*scripts\/classroom-product-loop-chain-handoff\.test\.ts[\s\S]*Activity -> Assignment -> Attempt -> Results[\s\S]*activity authoring\/library workflow[\s\S]*source extraction lifecycle[\s\S]*activity lifecycle governance[\s\S]*template roadmap capability[\s\S]*AI enhancement lifecycle[\s\S]*published assignment delivery[\s\S]*student runner[\s\S]*scored attempts[\s\S]*submitted-date continuity[\s\S]*accepted-answer continuity[\s\S]*explanation continuity[\s\S]*teacher result review[\s\S]*copy\/export\/print handoffs[\s\S]*dashboard\/public discovery[\s\S]*privacy guards/,
     'TEST-CATALOG should document the classroom product loop chain gate.'
   );
 });
