@@ -64133,7 +64133,7 @@ function expectedAssignmentResultsExportPreparationItemsEn({
   activitySnapshot,
   answerRows,
   attempts,
-  columns = '54',
+  columns = '55',
   deliveryAnswerReveal,
   deliveryAttemptLimit,
   deliveryCloseTime,
@@ -64372,7 +64372,7 @@ function expectedAssignmentResultsExportPreparationItemsZh({
   activitySnapshot,
   answerRows,
   attempts,
-  columns = '54',
+  columns = '55',
   deliveryAnswerReveal,
   deliveryAttemptLimit,
   deliveryCloseTime,
@@ -68374,6 +68374,7 @@ assert.match(
   csv,
   /"collect_student_name_raw","show_correct_answers_raw","shuffle_items_raw","max_attempts_raw","time_limit_seconds_raw"/
 );
+assert.match(csv, /"activity_title","activity_description","template_type"/);
 assert.match(
   csv,
   /"completed_items","total_items","attempt_correct_items","attempt_needs_review_items","attempt_unanswered_items","duration_seconds"[\s\S]*"student_last_submitted","item_number"/
@@ -68404,7 +68405,7 @@ assert.match(
   stringSettingsCsv,
   /"Use ""complete sentences"", then submit\.","Names","After submit","Fixed order","2","60","true","true","false","2","60"/
 );
-assert.match(csv, /"Snapshot Capitals","Quiz"/);
+assert.match(csv, /"Snapshot Capitals","Snapshot description","Quiz"/);
 assert.match(csv, /"attempt-1","Alice","2026-01-01T10:00:00\.000Z"/);
 assert.match(
   csv,
@@ -68554,6 +68555,7 @@ const formulaLikeCsv = buildAssignmentResultsCsv({
   ],
   snapshot: {
     ...csvExportData.snapshot!,
+    activityDescription: '@Activity description',
     activityTitle: '-Activity title',
   },
 });
@@ -68567,7 +68569,7 @@ assert.match(
 );
 assert.match(
   formulaLikeCsv,
-  /"'-Activity title","Quiz","1","50","1","45","attempt-formula","'\+Student"/
+  /"'-Activity title","'@Activity description","Quiz","1","50","1","45","attempt-formula","'\+Student"/
 );
 assert.match(
   formulaLikeCsv,
@@ -68700,7 +68702,7 @@ const zeroAverageDurationCsv = buildAssignmentResultsCsv({
 });
 assert.match(
   zeroAverageDurationCsv,
-  /"Snapshot Capitals","Quiz","1","50","1","0","attempt-1"/
+  /"Snapshot Capitals","Snapshot description","Quiz","1","50","1","0","attempt-1"/
 );
 const invalidStatsCsv = buildAssignmentResultsCsv({
   ...csvExportData,
@@ -68714,7 +68716,7 @@ const invalidStatsCsv = buildAssignmentResultsCsv({
 assert.doesNotMatch(invalidStatsCsv, /NaN|Infinity/);
 assert.match(
   invalidStatsCsv,
-  /"Snapshot Capitals","Quiz","0","","","","attempt-1"/
+  /"Snapshot Capitals","Snapshot description","Quiz","0","","","","attempt-1"/
 );
 const fractionalCompletionStatsCsv = buildAssignmentResultsCsv({
   ...csvExportData,
@@ -68727,7 +68729,7 @@ const fractionalCompletionStatsCsv = buildAssignmentResultsCsv({
 });
 assert.match(
   fractionalCompletionStatsCsv,
-  /"Snapshot Capitals","Quiz","2","66","5","60","attempt-1"/
+  /"Snapshot Capitals","Snapshot description","Quiz","2","66","5","60","attempt-1"/
 );
 const invalidStoredAttemptCsv = buildAssignmentResultsCsv({
   ...csvExportData,
@@ -68759,7 +68761,7 @@ const activityTemplateFallbackCsv = buildAssignmentResultsCsv({
 });
 assert.match(
   activityTemplateFallbackCsv,
-  /"Original Capitals","Line match","1","50","1","45","attempt-1"/
+  /"Original Capitals","Original activity","Line match","1","50","1","45","attempt-1"/
 );
 const expiredAssignmentStatusCsv = buildAssignmentResultsCsv({
   ...csvExportData,

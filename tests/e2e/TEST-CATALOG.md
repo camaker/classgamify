@@ -257,9 +257,10 @@ privacy-scope boundaries, or the hidden student-runtime-semantic-bundle
 handoff.
 Assignment results CSV export preparation has a fast script-level gate via
 `pnpm exec tsx --test scripts/assignment-results-export-preparation-handoff-semantic-views.test.ts`;
-run it when changing delivery-policy columns, accepted-answer columns,
-submitted-date formatting, timer-aware duration normalization, formula-injection
-guards, CSV data URL boundaries, or the export coverage handoff.
+run it when changing source-activity context columns, delivery-policy columns,
+accepted-answer columns, submitted-date formatting, timer-aware duration
+normalization, formula-injection guards, CSV data URL boundaries, or the export
+coverage handoff.
 Assignment attempt stats has a fast script-level gate via
 `pnpm exec tsx --test scripts/assignment-attempt-stats-handoff-semantic-views.test.ts`;
 run it when changing completions, average accuracy, average points, average

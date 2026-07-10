@@ -4114,6 +4114,7 @@
   "assignment_result_table_header_time": "用时",
   "assignment_result_table_header_type": "类型",
   "assignment_results_export_column_accepted_answers": "可接受答案",
+  "assignment_results_export_column_activity_description": "活动说明",
   "assignment_results_export_column_activity_title": "活动标题",
   "assignment_results_export_column_assignment_id": "作业 ID",
   "assignment_results_export_column_assignment_status": "作业状态",

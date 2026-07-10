@@ -254,7 +254,7 @@ test('assignment results export preparation exposes 30 safe CSV coverage slices'
     getPreparationItemValue(preparationView, 'explanation-column'),
     'Explanation column'
   );
-  assert.equal(getPreparationItemValue(preparationView, 'columns'), '54');
+  assert.equal(getPreparationItemValue(preparationView, 'columns'), '55');
 
   assertNoPrivateExportPreparationText(JSON.stringify(preparationView));
 });
@@ -362,6 +362,11 @@ test('assignment results CSV shares result formatting for dates, duration, and a
 
   assert.match(csv, /"2026-01-02T03:04:05\.000Z"/);
   assert.match(csv, /"60"/);
+  assert.match(
+    csv,
+    /"Snapshot title","Snapshot description","Complete the sentence"/
+  );
+  assert.doesNotMatch(csv, /"Live activity title","Live activity description"/);
   assert.match(csv, /"Paris"/);
   assert.match(csv, /"City of Light"/);
   assert.doesNotMatch(csv, /"Paris \/ City of Light"/);
@@ -369,6 +374,11 @@ test('assignment results CSV shares result formatting for dates, duration, and a
 });
 
 test('assignment results export preparation keeps shared source boundaries', () => {
+  assert.match(
+    RESULTS_EXPORT_SOURCE,
+    /resolvedSource\.activityTitle,[\s\S]*formatAssignmentExportText\(resolvedSource\.activityDescription\),[\s\S]*formatAssignmentExportTemplateLabel\(resolvedSource\.templateType\)/,
+    'CSV source columns should export frozen activity title, description, and template from the shared snapshot resolver.'
+  );
   assert.match(
     RESULTS_EXPORT_SOURCE,
     /buildAssignmentResultsExportAnswerRow[\s\S]*buildAssignmentResultAttemptAnswerTextView\(answer,[\s\S]*answerView\.exportStudentAnswerText[\s\S]*answerView\.expectedAnswerText[\s\S]*answerView\.acceptedAlternativesText[\s\S]*answerView\.exportStatusLabel/,
@@ -431,6 +441,7 @@ test('assignment results export preparation focused gate is documented', () => {
     'E2E catalog should point CSV export work at the focused script gate.'
   );
   for (const boundary of [
+    'source-activity context columns',
     'delivery-policy columns',
     'accepted-answer columns',
     'submitted-date formatting',

@@ -4114,6 +4114,7 @@
   "assignment_result_table_header_time": "Time",
   "assignment_result_table_header_type": "Type",
   "assignment_results_export_column_accepted_answers": "accepted_answers",
+  "assignment_results_export_column_activity_description": "activity_description",
   "assignment_results_export_column_activity_title": "activity_title",
   "assignment_results_export_column_assignment_id": "assignment_id",
   "assignment_results_export_column_assignment_status": "assignment_status",
