@@ -513,6 +513,12 @@ run it when changing print-route search parsing, worksheet response policies,
 frozen snapshot worksheet generation, delivery-policy printing, answer-key
 toggle behavior, privacy-scope boundaries, accepted-answer/explanation
 rendering, or the print toolbar.
+Worksheet-mode delivery chain has a fast script-level gate via
+`pnpm exec tsx --test scripts/worksheet-mode-delivery-chain-handoff.test.ts`;
+run it when changing `/worksheets` creation entry points, shared create editor
+scaffolds, assignment snapshots, worksheet-style student runtimes, printable
+handouts, result exports, worksheet extraction boundaries, or source-material
+and student-identity privacy guards.
 Student runner play chain has a fast script-level gate via
 `pnpm exec tsx --test scripts/student-runner-play-chain-handoff.test.ts`;
 run it when changing public payload access, public rule summary, runner loading

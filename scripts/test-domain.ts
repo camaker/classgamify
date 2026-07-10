@@ -431,6 +431,7 @@ import {
   buildPublicTemplateEntryHandoffView,
   buildTemplatesPageViewModel,
   buildWorksheetsPageViewModel,
+  PUBLIC_TEMPLATE_ENTRY_HANDOFF_ITEM_IDS,
 } from '@/activities/entry-page-view';
 import {
   ACTIVITY_CREATABLE_VISIBILITIES,
@@ -779,6 +780,11 @@ import {
   buildPrintableWorksheetSnapshotSourceFieldView,
   getPrintableWorksheetChoiceIndexValue,
 } from '@/assignments/printable-worksheet-view';
+import {
+  WORKSHEET_MODE_DELIVERY_CHAIN_HANDOFF_ITEM_IDS,
+  WORKSHEET_MODE_DELIVERY_CHAIN_SOURCE_FILES,
+  buildWorksheetModeDeliveryChainHandoffView,
+} from '@/assignments/worksheet-mode-delivery-chain';
 import {
   ASSIGNMENT_LIST_INPUT_LIMITS,
   ASSIGNMENT_LIST_PAGE_SIZE,
@@ -41420,6 +41426,113 @@ assert.deepEqual(
   }).modeCards.find((card) => card.template === 'listening')
     ?.contentRequirements,
   []
+);
+const worksheetModeDeliveryChainView =
+  buildWorksheetModeDeliveryChainHandoffView();
+const worksheetModeDeliveryChainValues = new Map(
+  worksheetModeDeliveryChainView.itemViews.map((item) => [
+    item.id,
+    item.value,
+  ])
+);
+assert.deepEqual(
+  worksheetModeDeliveryChainView.itemViews.map((item) => item.id),
+  [...WORKSHEET_MODE_DELIVERY_CHAIN_HANDOFF_ITEM_IDS],
+  'Worksheet-mode delivery chain should expose the stable worksheet-loop 30-slice order.'
+);
+assert.equal(worksheetModeDeliveryChainView.itemViews.length, 30);
+assert.equal(
+  new Set(WORKSHEET_MODE_DELIVERY_CHAIN_HANDOFF_ITEM_IDS).size,
+  30
+);
+assert.equal(WORKSHEET_MODE_DELIVERY_CHAIN_SOURCE_FILES.length, 30);
+for (const filePath of WORKSHEET_MODE_DELIVERY_CHAIN_SOURCE_FILES) {
+  assert.ok(
+    existsSync(filePath),
+    `Missing worksheet-mode delivery chain file ${filePath}`
+  );
+}
+assert.ok(
+  worksheetModeDeliveryChainView.itemViews.every(
+    (item) => item.ariaLabel && item.description && item.label && item.value
+  )
+);
+assert.deepEqual(worksheetModeDeliveryChainView.privacy, {
+  chainSourceFileCount: WORKSHEET_MODE_DELIVERY_CHAIN_SOURCE_FILES.length,
+  createsParallelWorksheetModel: false,
+  exposesAnswerKeysToPublicPayload: false,
+  exposesPromptTextInHandoff: false,
+  exposesRawAnonymousTokens: false,
+  exposesRawStudentIdentity: false,
+  exposesSourceMaterialStorageKeys: false,
+  itemIds: [...WORKSHEET_MODE_DELIVERY_CHAIN_HANDOFF_ITEM_IDS],
+  printRouteRequiresTeacherAuth: true,
+  publicPayloadUsesSanitizedRuntimeItems: true,
+  requiresAssignmentSnapshot: true,
+  requiresCreateActivityInputContract: true,
+  sourceFiles: [...WORKSHEET_MODE_DELIVERY_CHAIN_SOURCE_FILES],
+});
+assert.deepEqual(
+  [
+    PUBLIC_TEMPLATE_ENTRY_HANDOFF_ITEM_IDS.length,
+    ACTIVITY_TEMPLATE_SCAFFOLD_QUALITY_HANDOFF_ITEM_IDS.length,
+    ACTIVITY_SOURCE_EXTRACTION_ASSIST_HANDOFF_ITEM_IDS.length,
+    ASSIGNMENT_DELIVERY_POLICY_HANDOFF_ITEM_IDS.length,
+    PUBLIC_ASSIGNMENT_RULES_HANDOFF_ITEM_IDS.length,
+    PUBLIC_ASSIGNMENT_ACCESS_HANDOFF_ITEM_IDS.length,
+    ASSIGNMENT_ITEM_ORDER_HANDOFF_ITEM_IDS.length,
+    STUDENT_RUNTIME_INTERACTION_HANDOFF_ITEM_IDS.length,
+    STUDENT_RUNTIME_SEMANTIC_BUNDLE_HANDOFF_ITEM_IDS.length,
+    FILL_BLANK_WORKSHEET_HANDOFF_ITEM_IDS.length,
+    LINE_MATCH_BOARD_HANDOFF_ITEM_IDS.length,
+    LISTENING_SPEECH_HANDOFF_ITEM_IDS.length,
+    GROUP_SORT_BOARD_HANDOFF_ITEM_IDS.length,
+    STUDENT_RUNNER_SUBMISSION_HANDOFF_ITEM_IDS.length,
+    ASSIGNMENT_SUBMISSION_VALIDATION_HANDOFF_ITEM_IDS.length,
+    ASSIGNMENT_ATTEMPT_DURATION_HANDOFF_ITEM_IDS.length,
+    ASSIGNMENT_ANSWER_FEEDBACK_HANDOFF_ITEM_IDS.length,
+    PRINTABLE_WORKSHEET_HANDOFF_ITEM_IDS.length,
+    ASSIGNMENT_RESULTS_EXPORT_PREPARATION_ITEM_IDS.length,
+  ],
+  Array.from({ length: 19 }, () => 30),
+  'Worksheet-mode delivery chain should stay backed by focused worksheet, runtime, print, and export gates.'
+);
+assert.deepEqual(Object.fromEntries(worksheetModeDeliveryChainValues), {
+  'answer-feedback-policy': 'Reveal if allowed',
+  'assignment-publish-boundary': 'Explicit freeze step',
+  'attempt-duration-policy': 'Normalized seconds',
+  'delivery-policy-summary': 'Shared delivery rules',
+  'editor-readiness-preview': 'Template readiness',
+  'editor-scaffold-loading': 'Reviewed example',
+  'fill-blank-runtime': 'Inline blanks',
+  'group-sort-runtime': 'Category board',
+  'line-match-runtime': 'Connection board',
+  'listening-runtime': 'Speech track',
+  'print-answer-key-toggle': 'Teacher-only key',
+  'print-response-policy': 'Paper response plan',
+  'print-route-boundary': 'Teacher print route',
+  'public-payload-sanitization': 'Runtime only',
+  'raw-identity-guard': 'Identity hidden',
+  'result-export-policy': 'Delivery rules included',
+  'runtime-item-order': 'Stable order',
+  'shared-create-input': 'CreateActivityInput',
+  'snapshot-freeze': 'AssignmentSnapshot',
+  'source-material-guard': 'Storage keys hidden',
+  'source-material-provenance': 'Compact references',
+  'student-rules-summary': 'Student-visible rules',
+  'submission-contract': '{ itemId, answer }',
+  'template-search-param': 'template',
+  'worksheet-chain-gate': '30 source files',
+  'worksheet-create-actions': 'Create editor links',
+  'worksheet-extraction-boundary': 'No parallel model',
+  'worksheet-mode-catalog': '4 worksheet modes',
+  'worksheet-source-param': 'source=worksheets',
+  'worksheets-entry-route': '/worksheets',
+});
+assert.match(
+  readFileSync('tests/e2e/TEST-CATALOG.md', 'utf8'),
+  /Worksheet-mode delivery chain has a fast script-level gate via[\s\S]*scripts\/worksheet-mode-delivery-chain-handoff\.test\.ts/,
+  'TEST-CATALOG should document the worksheet-mode delivery chain gate.'
 );
 const templateEntrySource = readFileSync(
   'src/activities/template-entry.ts',
