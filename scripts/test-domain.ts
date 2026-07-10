@@ -288,6 +288,11 @@ import {
   buildActivityAiEnhancementExecutionView,
 } from '@/activities/ai-enhancement-execution';
 import {
+  ACTIVITY_AI_ENHANCEMENT_DRAFT_APPLICATION_ITEM_IDS,
+  buildActivityAiEnhancementDraftApplicationPlan,
+  buildActivityAiEnhancementDraftApplicationView,
+} from '@/activities/ai-enhancement-draft-application';
+import {
   TEMPLATE_ROADMAP_CAPABILITY_CHAIN_HANDOFF_ITEM_IDS,
   TEMPLATE_ROADMAP_CAPABILITY_CHAIN_SOURCE_FILES,
   buildTemplateRoadmapCapabilityChainHandoffView,
@@ -515,6 +520,7 @@ import {
   activityVisibilitySchema,
   buildActivityContent,
   createActivityInputSchema,
+  type CreateActivityInput,
 } from '@/activities/validation';
 import {
   buildActivityCreatePageEditorViewModel,
@@ -6936,12 +6942,13 @@ assert.deepEqual(
     SOURCE_MATERIAL_PRIVACY_CHAIN_HANDOFF_ITEM_IDS.length,
     ACTIVITY_AI_ENHANCEMENT_POLICY_ITEM_IDS.length,
     ACTIVITY_AI_ENHANCEMENT_EXECUTION_ITEM_IDS.length,
+    ACTIVITY_AI_ENHANCEMENT_DRAFT_APPLICATION_ITEM_IDS.length,
     TEMPLATE_ROADMAP_CAPABILITY_CHAIN_HANDOFF_ITEM_IDS.length,
     WORKSHEET_MODE_DELIVERY_CHAIN_HANDOFF_ITEM_IDS.length,
     ASSIGNMENT_RESULTS_EXPORT_PREPARATION_ITEM_IDS.length,
   ],
-  Array.from({ length: 13 }, () => 30),
-  'Activity AI enhancement roadmap chain should stay backed by authoring, remix, extraction, policy, execution, roadmap, worksheet, and result-export gates.'
+  Array.from({ length: 14 }, () => 30),
+  'Activity AI enhancement roadmap chain should stay backed by authoring, remix, extraction, policy, execution, draft application, roadmap, worksheet, and result-export gates.'
 );
 assert.deepEqual(
   Object.fromEntries(activityAiEnhancementRoadmapChainValues),
@@ -7336,6 +7343,153 @@ assert.match(
   readFileSync('tests/e2e/TEST-CATALOG.md', 'utf8'),
   /Activity AI enhancement execution has a fast script-level gate via[\s\S]*scripts\/activity-ai-enhancement-execution\.test\.ts[\s\S]*provider-ready[\s\S]*local-fallback[\s\S]*deterministic-draft[\s\S]*blocked-reason[\s\S]*editor-only draft targets[\s\S]*privacy\s+guards/,
   'TEST-CATALOG should document the activity AI enhancement execution gate.'
+);
+const activityAiEnhancementDraftApplicationDraft = {
+  description: 'Reviewable water cycle draft.',
+  difficulty: 'starter',
+  gradeBand: 'Grade 5',
+  groupsText: 'Water cycle | evaporation, condensation',
+  language: 'en',
+  learningGoal: 'Review water cycle vocabulary.',
+  pairsText: 'evaporation | Liquid water becomes vapor',
+  questionsText:
+    'Which process turns liquid water into vapor? | evaporation | evaporation; condensation; precipitation; collection | Evaporation changes liquid water into vapor.',
+  sourceMaterials: [
+    {
+      fileId: 'secret-policy-file-id',
+      kind: 'audio',
+      originalName: 'speaking prompt.mp3',
+    },
+  ],
+  sourceSummary: 'Teacher notes about the water cycle.',
+  subject: 'Science',
+  teacherNotesText: 'Ask students to explain their reasoning.',
+  templateType: 'quiz',
+  title: 'Water Cycle Review',
+  visibility: 'draft',
+  vocabularyText: 'evaporation, condensation, precipitation',
+} satisfies CreateActivityInput;
+const activityAiEnhancementDraftApplicationView =
+  buildActivityAiEnhancementDraftApplicationView({
+    content: activityAiEnhancementPolicyContent,
+    currentTemplateType: 'quiz',
+    enhancementKind: 'answer-explanation',
+    hasAuthenticatedTeacher: true,
+    proposedDraft: activityAiEnhancementDraftApplicationDraft,
+    providerConfigured: true,
+  });
+const activityAiEnhancementDraftApplicationValues = new Map(
+  activityAiEnhancementDraftApplicationView.itemViews.map((item) => [
+    item.id,
+    item.value,
+  ])
+);
+assert.deepEqual(
+  activityAiEnhancementDraftApplicationView.itemViews.map((item) => item.id),
+  [...ACTIVITY_AI_ENHANCEMENT_DRAFT_APPLICATION_ITEM_IDS],
+  'Activity AI enhancement draft application should expose the stable 30-slice application order.'
+);
+assert.equal(activityAiEnhancementDraftApplicationView.itemViews.length, 30);
+assert.equal(
+  new Set(ACTIVITY_AI_ENHANCEMENT_DRAFT_APPLICATION_ITEM_IDS).size,
+  30
+);
+assert.equal(
+  activityAiEnhancementDraftApplicationView.plan.applicationStatus,
+  'ready-for-editor-review'
+);
+assert.equal(
+  activityAiEnhancementDraftApplicationView.plan.validationStatus,
+  'valid'
+);
+assert.equal(
+  activityAiEnhancementDraftApplicationView.plan.canApplyToEditor,
+  true
+);
+assert.equal(
+  activityAiEnhancementDraftApplicationValues.get('field-target-coverage'),
+  '2/2 targets'
+);
+assert.equal(
+  activityAiEnhancementDraftApplicationValues.get('create-input-contract'),
+  'CreateActivityInput valid'
+);
+assert.equal(
+  activityAiEnhancementDraftApplicationValues.get(
+    'source-provenance-summary'
+  ),
+  '3 references / 3 kinds'
+);
+assert.equal(
+  JSON.stringify(activityAiEnhancementDraftApplicationView).includes(
+    'secret-policy-file-id'
+  ),
+  false,
+  'Activity AI enhancement draft application view should not leak source material file ids.'
+);
+assert.deepEqual(activityAiEnhancementDraftApplicationView.privacy, {
+  appliesAfterExecutionPlan: true,
+  createsAssignmentLinksWithoutTeacherAction: false,
+  exposesAnswerKeysToPublicPayload: false,
+  exposesAnswerText: false,
+  exposesDraftText: false,
+  exposesFileBytesToAi: false,
+  exposesQuestionPromptText: false,
+  exposesRawAiOutput: false,
+  exposesRawSourceText: false,
+  exposesSourceMaterialFileIds: false,
+  exposesSourceMaterialFilenames: false,
+  exposesSourceMaterialStorageKeys: false,
+  fillsEditorOnly: true,
+  itemIds: [...ACTIVITY_AI_ENHANCEMENT_DRAFT_APPLICATION_ITEM_IDS],
+  mutatesExistingAssignmentSnapshots: false,
+  persistsActivityWithoutTeacherAction: false,
+  publishesAssignmentWithoutTeacherAction: false,
+  readsSourceMaterialBytes: false,
+  requiresCreateActivityInputContract: true,
+  requiresEditorReview: true,
+  scope: 'activity-ai-enhancement-draft-application',
+  usesDraftMeta: true,
+  usesExecutionPlan: true,
+  usesTemplateReadinessDomain: true,
+});
+assert.equal(
+  buildActivityAiEnhancementDraftApplicationPlan({
+    content: activityAiEnhancementPolicyContent,
+    currentTemplateType: 'quiz',
+    hasAuthenticatedTeacher: true,
+    proposedDraft: null,
+    providerConfigured: true,
+  }).applicationStatus,
+  'awaiting-draft-output'
+);
+assert.equal(
+  buildActivityAiEnhancementDraftApplicationPlan({
+    content: activityAiEnhancementPolicyContent,
+    currentTemplateType: 'quiz',
+    hasAuthenticatedTeacher: false,
+    proposedDraft: activityAiEnhancementDraftApplicationDraft,
+    providerConfigured: true,
+  }).applicationStatus,
+  'blocked-before-draft'
+);
+assert.match(
+  readFileSync(
+    'src/activities/ai-enhancement-draft-application.ts',
+    'utf8'
+  ),
+  /export const ACTIVITY_AI_ENHANCEMENT_DRAFT_APPLICATION_ITEM_IDS = \[[\s\S]*'application-scope'[\s\S]*'execution-plan-source'[\s\S]*'draft-contract-validation'[\s\S]*'field-target-coverage'[\s\S]*'teacher-review-gate'[\s\S]*'result-export-continuity'/,
+  'Activity AI enhancement draft application source should preserve the application slices.'
+);
+assert.match(
+  readFileSync('docs/product.md', 'utf8'),
+  /src\/activities\/ai-enhancement-draft-application\.ts` owns the editor-only draft application\s+contract[\s\S]*CreateActivityInput validation[\s\S]*field-target coverage[\s\S]*refreshed draft metadata[\s\S]*template readiness[\s\S]*teacher-review\/save\/publish boundaries[\s\S]*result-export continuity/,
+  'docs/product.md should document the activity AI enhancement draft application owner.'
+);
+assert.match(
+  readFileSync('tests/e2e/TEST-CATALOG.md', 'utf8'),
+  /Activity AI enhancement draft application has a fast script-level gate via[\s\S]*scripts\/activity-ai-enhancement-draft-application\.test\.ts[\s\S]*execution plans[\s\S]*CreateActivityInput validation[\s\S]*editor-only application[\s\S]*coverage\/readiness refresh[\s\S]*privacy guards/,
+  'TEST-CATALOG should document the activity AI enhancement draft application gate.'
 );
 const activityAuthoringLibraryChainView =
   buildActivityAuthoringLibraryChainHandoffView();

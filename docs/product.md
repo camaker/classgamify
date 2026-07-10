@@ -454,6 +454,11 @@ Implementation boundaries:
   local-fallback, deterministic-draft, or blocked states while preserving
   editor-only draft targets, structured blocked reasons, provider-call
   boundaries, privacy guards, save/publish boundaries, and snapshot protection.
+- `src/activities/ai-enhancement-draft-application.ts` owns the editor-only draft application
+  contract after execution planning: CreateActivityInput validation,
+  field-target coverage, refreshed draft metadata, template readiness,
+  source-provenance counts, teacher-review/save/publish boundaries, privacy
+  guards, snapshot protection, and result-export continuity.
 - `src/api/activity-ai.ts` exposes the authenticated server function.
 - `src/components/activities/activity-create-form.tsx` only collects draft
   inputs and fills the existing form.
