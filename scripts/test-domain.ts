@@ -276,6 +276,13 @@ import {
   buildActivityAiEnhancementRoadmapChainHandoffView,
 } from '@/activities/ai-enhancement-roadmap-chain';
 import {
+  ACTIVITY_AI_ENHANCEMENT_KINDS,
+  ACTIVITY_AI_ENHANCEMENT_POLICY_ITEM_IDS,
+  buildActivityAiEnhancementPolicyDecision,
+  buildActivityAiEnhancementPolicyTargetFields,
+  buildActivityAiEnhancementPolicyView,
+} from '@/activities/ai-enhancement-policy';
+import {
   TEMPLATE_ROADMAP_CAPABILITY_CHAIN_HANDOFF_ITEM_IDS,
   TEMPLATE_ROADMAP_CAPABILITY_CHAIN_SOURCE_FILES,
   buildTemplateRoadmapCapabilityChainHandoffView,
@@ -494,6 +501,7 @@ import {
   ACTIVITY_TEMPLATE_TYPES,
   ACTIVITY_TITLE_LENGTH,
   isActivityTemplateType,
+  type ActivityContent,
   type ActivityTemplateType,
 } from '@/activities/types';
 import {
@@ -6921,12 +6929,13 @@ assert.deepEqual(
     ACTIVITY_SOURCE_EXTRACTION_ASSIST_HANDOFF_ITEM_IDS.length,
     SOURCE_EXTRACTION_LIFECYCLE_CHAIN_HANDOFF_ITEM_IDS.length,
     SOURCE_MATERIAL_PRIVACY_CHAIN_HANDOFF_ITEM_IDS.length,
+    ACTIVITY_AI_ENHANCEMENT_POLICY_ITEM_IDS.length,
     TEMPLATE_ROADMAP_CAPABILITY_CHAIN_HANDOFF_ITEM_IDS.length,
     WORKSHEET_MODE_DELIVERY_CHAIN_HANDOFF_ITEM_IDS.length,
     ASSIGNMENT_RESULTS_EXPORT_PREPARATION_ITEM_IDS.length,
   ],
-  Array.from({ length: 11 }, () => 30),
-  'Activity AI enhancement roadmap chain should stay backed by authoring, remix, extraction, roadmap, worksheet, and result-export gates.'
+  Array.from({ length: 12 }, () => 30),
+  'Activity AI enhancement roadmap chain should stay backed by authoring, remix, extraction, policy, roadmap, worksheet, and result-export gates.'
 );
 assert.deepEqual(
   Object.fromEntries(activityAiEnhancementRoadmapChainValues),
@@ -6972,6 +6981,232 @@ assert.match(
   readFileSync('tests/e2e/TEST-CATALOG.md', 'utf8'),
   /Activity AI enhancement roadmap chain has a fast script-level gate via[\s\S]*scripts\/activity-ai-enhancement-roadmap-chain-handoff\.test\.ts[\s\S]*template\s+transforms[\s\S]*distractor write\s+targets[\s\S]*leveled variants[\s\S]*answer\s+explanations[\s\S]*listening\s+scripts[\s\S]*worksheet\/audio\/spreadsheet\s+extraction[\s\S]*source-material privacy[\s\S]*editor-review\/save\/publish boundaries[\s\S]*snapshot\s+protection[\s\S]*result-export continuity/,
   'TEST-CATALOG should document the activity AI enhancement roadmap chain gate.'
+);
+const activityAiEnhancementPolicyContent = {
+  difficulty: 'starter',
+  gradeBand: 'Grade 5',
+  groups: [
+    {
+      id: 'g1',
+      items: ['evaporation', 'condensation'],
+      label: 'Water cycle',
+    },
+  ],
+  language: 'en',
+  learningGoal: 'Review water cycle vocabulary.',
+  pairs: [
+    {
+      id: 'p1',
+      left: 'evaporation',
+      right: 'Liquid water becomes vapor',
+    },
+  ],
+  questions: [
+    {
+      answer: 'evaporation',
+      explanation: 'Evaporation changes liquid water into vapor.',
+      id: 'q1',
+      options: [
+        { id: 'q1-a', text: 'evaporation' },
+        { id: 'q1-b', text: 'condensation' },
+        { id: 'q1-c', text: 'precipitation' },
+        { id: 'q1-d', text: 'collection' },
+      ],
+      prompt: 'Which process turns liquid water into vapor?',
+    },
+  ],
+  sourceMaterials: [
+    {
+      fileId: 'secret-policy-file-id',
+      kind: 'audio',
+      originalName: 'speaking prompt.mp3',
+    },
+    {
+      fileId: 'worksheet-file-id',
+      kind: 'worksheet-document',
+      originalName: 'worksheet.pdf',
+    },
+    {
+      fileId: 'spreadsheet-file-id',
+      kind: 'spreadsheet',
+      originalName: 'class-list.csv',
+    },
+  ],
+  sourceSummary: 'Teacher notes about the water cycle.',
+  subject: 'Science',
+  teacherNotes: ['Ask students to explain their reasoning.'],
+  vocabulary: ['evaporation', 'condensation', 'precipitation'],
+} satisfies ActivityContent;
+const activityAiEnhancementPolicyView =
+  buildActivityAiEnhancementPolicyView({
+    content: activityAiEnhancementPolicyContent,
+    currentTemplateType: 'quiz',
+    enhancementKind: 'worksheet-extraction',
+    providerConfigured: true,
+    targetTemplateType: 'group-sort',
+  });
+const activityAiEnhancementPolicyValues = new Map(
+  activityAiEnhancementPolicyView.itemViews.map((item) => [
+    item.id,
+    item.value,
+  ])
+);
+assert.deepEqual(
+  ACTIVITY_AI_ENHANCEMENT_KINDS,
+  [
+    'source-to-activity-draft',
+    'template-transform',
+    'ai-remix-completion',
+    'distractor-generation',
+    'leveled-variant',
+    'answer-explanation',
+    'listening-script',
+    'worksheet-extraction',
+    'audio-extraction',
+    'spreadsheet-import',
+  ],
+  'Activity AI enhancement policy should enumerate current and future enhancement kinds.'
+);
+assert.deepEqual(
+  activityAiEnhancementPolicyView.itemViews.map((item) => item.id),
+  [...ACTIVITY_AI_ENHANCEMENT_POLICY_ITEM_IDS],
+  'Activity AI enhancement policy should expose the stable 30-slice request boundary.'
+);
+assert.equal(activityAiEnhancementPolicyView.itemViews.length, 30);
+assert.equal(new Set(ACTIVITY_AI_ENHANCEMENT_POLICY_ITEM_IDS).size, 30);
+assert.ok(
+  activityAiEnhancementPolicyView.itemViews.every(
+    (item) => item.ariaLabel && item.description && item.label && item.value
+  )
+);
+assert.deepEqual(activityAiEnhancementPolicyView.privacy, {
+  appliesBeforeActivitySave: true,
+  createsAssignmentLinksWithoutTeacherAction: false,
+  exposesActivityContentText: false,
+  exposesAnswerKeysToPublicPayload: false,
+  exposesFileBytesToAi: false,
+  exposesRawAiOutput: false,
+  exposesRawSourceText: false,
+  exposesSourceMaterialFileIds: false,
+  exposesSourceMaterialFilenames: false,
+  exposesSourceMaterialStorageKeys: false,
+  itemIds: [...ACTIVITY_AI_ENHANCEMENT_POLICY_ITEM_IDS],
+  mutatesExistingAssignmentSnapshots: false,
+  persistsActivityWithoutTeacherAction: false,
+  publishesAssignmentWithoutTeacherAction: false,
+  readsSourceMaterialBytes: false,
+  requiresAuthenticatedTeacher: true,
+  requiresCreateActivityInputContract: true,
+  requiresEditorReview: true,
+  scope: 'activity-ai-enhancement-policy',
+  usesActivityContentModel: true,
+  usesDeterministicReadinessFirst: true,
+  writesDistractorsToQuestionOptions: true,
+});
+assert.equal(
+  activityAiEnhancementPolicyView.decision.sourceMaterialCount,
+  3
+);
+assert.equal(activityAiEnhancementPolicyView.decision.audioSourceCount, 1);
+assert.equal(activityAiEnhancementPolicyView.decision.worksheetSourceCount, 1);
+assert.equal(
+  activityAiEnhancementPolicyView.decision.spreadsheetSourceCount,
+  1
+);
+assert.equal(
+  activityAiEnhancementPolicyValues.get('source-material-capability'),
+  '1 audio / 1 worksheet / 1 spreadsheet'
+);
+assert.equal(
+  activityAiEnhancementPolicyValues.get('worksheet-extraction-target'),
+  'ActivityContent extraction'
+);
+assert.equal(
+  JSON.stringify(activityAiEnhancementPolicyView).includes(
+    'secret-policy-file-id'
+  ),
+  false,
+  'Activity AI enhancement policy view should not leak source material file ids.'
+);
+const archivedActivityAiEnhancementPolicyDecision =
+  buildActivityAiEnhancementPolicyDecision({
+    content: activityAiEnhancementPolicyContent,
+    currentTemplateType: 'quiz',
+    enhancementKind: 'leveled-variant',
+    providerConfigured: true,
+    visibility: 'archived',
+  });
+assert.equal(
+  archivedActivityAiEnhancementPolicyDecision.status,
+  'restore-source-first'
+);
+assert.equal(
+  archivedActivityAiEnhancementPolicyDecision.canEnterEditorDraftFlow,
+  false
+);
+assert.equal(
+  archivedActivityAiEnhancementPolicyDecision.canCallExternalProvider,
+  false
+);
+const sparseActivityAiEnhancementPolicyContent = {
+  ...activityAiEnhancementPolicyContent,
+  groups: [],
+  pairs: [],
+  questions: [
+    {
+      answer: 'evaporation',
+      id: 'q1',
+      prompt: 'Which process turns liquid water into vapor?',
+    },
+  ],
+  sourceMaterials: [],
+  vocabulary: ['water cycle'],
+};
+const distractorActivityAiEnhancementPolicyDecision =
+  buildActivityAiEnhancementPolicyDecision({
+    content: sparseActivityAiEnhancementPolicyContent,
+    currentTemplateType: 'quiz',
+    enhancementKind: 'distractor-generation',
+  });
+assert.equal(
+  distractorActivityAiEnhancementPolicyDecision.questionChoiceNeedsCandidateCount,
+  1
+);
+assert.deepEqual(
+  buildActivityAiEnhancementPolicyTargetFields({
+    kind: 'distractor-generation',
+  }),
+  ['questionOptions']
+);
+const remixActivityAiEnhancementPolicyDecision =
+  buildActivityAiEnhancementPolicyDecision({
+    content: sparseActivityAiEnhancementPolicyContent,
+    currentTemplateType: 'quiz',
+    enhancementKind: 'ai-remix-completion',
+    targetTemplateType: 'group-sort',
+  });
+assert.equal(remixActivityAiEnhancementPolicyDecision.targetTemplateType, 'group-sort');
+assert.ok(
+  buildActivityAiEnhancementPolicyTargetFields({
+    kind: 'ai-remix-completion',
+    missingRequirements:
+      remixActivityAiEnhancementPolicyDecision.missingRequirements,
+  }).includes('groups')
+);
+assert.match(
+  readFileSync('src/activities/ai-enhancement-policy.ts', 'utf8'),
+  /export const ACTIVITY_AI_ENHANCEMENT_POLICY_ITEM_IDS = \[[\s\S]*'enhancement-kind'[\s\S]*'teacher-auth-gate'[\s\S]*'deterministic-readiness'[\s\S]*'question-option-target'[\s\S]*'source-byte-guard'[\s\S]*'publish-boundary'[\s\S]*'result-export-continuity'/,
+  'Activity AI enhancement policy source should preserve the request policy slices.'
+);
+assert.match(
+  readFileSync('docs/product.md', 'utf8'),
+  /src\/activities\/ai-enhancement-policy\.ts` owns the shared request policy[\s\S]*teacher-auth gates[\s\S]*deterministic readiness[\s\S]*structured draft targets[\s\S]*source-material capability counts[\s\S]*save\/publish\s+boundaries[\s\S]*result-export\s+continuity/,
+  'docs/product.md should document the activity AI enhancement policy owner.'
+);
+assert.match(
+  readFileSync('tests/e2e/TEST-CATALOG.md', 'utf8'),
+  /Activity AI enhancement policy has a fast script-level gate via[\s\S]*scripts\/activity-ai-enhancement-policy\.test\.ts[\s\S]*teacher-auth gates[\s\S]*deterministic readiness[\s\S]*structured\s+draft targets[\s\S]*source-material capability counts[\s\S]*editor-review\/save\/publish boundaries[\s\S]*result-export continuity/,
+  'TEST-CATALOG should document the activity AI enhancement policy gate.'
 );
 const activityAuthoringLibraryChainView =
   buildActivityAuthoringLibraryChainHandoffView();
@@ -43550,6 +43785,7 @@ assert.deepEqual(
     QUESTION_CHOICE_GENERATION_HANDOFF_ITEM_IDS.length,
     ACTIVITY_AI_AUTHORING_CHAIN_HANDOFF_ITEM_IDS.length,
     ACTIVITY_AI_ENHANCEMENT_ROADMAP_CHAIN_HANDOFF_ITEM_IDS.length,
+    ACTIVITY_AI_ENHANCEMENT_POLICY_ITEM_IDS.length,
     ACTIVITY_AI_REMIX_ASSIST_HANDOFF_ITEM_IDS.length,
     ACTIVITY_SOURCE_EXTRACTION_ASSIST_HANDOFF_ITEM_IDS.length,
     WORKSHEET_MODE_DELIVERY_CHAIN_HANDOFF_ITEM_IDS.length,
@@ -43563,7 +43799,7 @@ assert.deepEqual(
     PRINTABLE_WORKSHEET_HANDOFF_ITEM_IDS.length,
     ASSIGNMENT_RESULTS_EXPORT_PREPARATION_ITEM_IDS.length,
   ],
-  Array.from({ length: 19 }, () => 30),
+  Array.from({ length: 20 }, () => 30),
   'Template roadmap capability chain should stay backed by focused roadmap, template, AI, worksheet, runtime, print, and export gates.'
 );
 assert.deepEqual(Object.fromEntries(templateRoadmapCapabilityChainValues), {

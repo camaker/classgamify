@@ -443,6 +443,12 @@ Implementation boundaries:
 - `src/activities/distractors.ts` owns deterministic quiz choice completion.
   AI distractor generation should write into the same question option structure
   instead of changing the student submission contract.
+- `src/activities/ai-enhancement-policy.ts` owns the shared request policy
+  for future AI enhancements before they enter the editor-reviewed draft flow:
+  teacher-auth gates, deterministic readiness, structured draft targets,
+  source-material capability counts, provider/fallback posture, save/publish
+  boundaries, snapshot protection, public-payload guards, and result-export
+  continuity.
 - `src/api/activity-ai.ts` exposes the authenticated server function.
 - `src/components/activities/activity-create-form.tsx` only collects draft
   inputs and fills the existing form.
