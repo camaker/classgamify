@@ -3,7 +3,7 @@ export const CLASSROOM_PRODUCT_LOOP_CHAIN_HANDOFF_ITEM_IDS = [
   'activity-model',
   'activity-content-contract',
   'activity-library-owner-scope',
-  'activity-authoring-entry',
+  'activity-authoring-library-boundary',
   'template-roadmap-capability-boundary',
   'ai-enhancement-lifecycle-boundary',
   'source-material-reference-boundary',
@@ -91,6 +91,7 @@ export type ClassroomProductLoopChainPrivacyContract = {
   exposesStudentNamesInHandoff: false;
   freezesAssignmentSnapshots: true;
   itemIds: ClassroomProductLoopChainHandoffItemId[];
+  requiresTeacherSaveBeforeActivityPersistence: true;
   keepsProtectedRoutesOutOfIndex: true;
   keepsPublicDiscoverySourceLevel: true;
   keepsActivityLibraryOwnerScoped: true;
@@ -104,6 +105,7 @@ export type ClassroomProductLoopChainPrivacyContract = {
   resultConsumersUseScoredAttempts: true;
   sourceFiles: string[];
   usesAiEnhancementLifecycleChain: true;
+  usesActivityAuthoringLibraryChain: true;
   usesActivityAssignmentAttemptResultsLoop: true;
   usesPublicDiscoveryIndexingChain: true;
   usesTemplateRoadmapCapabilityChain: true;
@@ -123,7 +125,7 @@ export function buildClassroomProductLoopChainHandoffView(): ClassroomProductLoo
 
   return {
     description:
-      'Thirty-slice classroom product loop chain from teacher-owned activities and reusable content through template roadmap capability alignment, AI enhancement lifecycle review, assignment publish, frozen snapshots, public student play, validated attempts, scored results, submitted-date, accepted-answer, and explanation continuity, teacher review, copy/export/print handoffs, dashboard status, public discovery/indexing metadata, and privacy guards.',
+      'Thirty-slice classroom product loop chain from teacher-owned activities and reusable content through activity authoring/library workflow, template roadmap capability alignment, AI enhancement lifecycle review, assignment publish, frozen snapshots, public student play, validated attempts, scored results, submitted-date, accepted-answer, and explanation continuity, teacher review, copy/export/print handoffs, dashboard status, public discovery/indexing metadata, and privacy guards.',
     itemViews,
     privacy: {
       chainSourceFileCount: CLASSROOM_PRODUCT_LOOP_CHAIN_SOURCE_FILES.length,
@@ -141,6 +143,7 @@ export function buildClassroomProductLoopChainHandoffView(): ClassroomProductLoo
       exposesStudentNamesInHandoff: false,
       freezesAssignmentSnapshots: true,
       itemIds: [...CLASSROOM_PRODUCT_LOOP_CHAIN_HANDOFF_ITEM_IDS],
+      requiresTeacherSaveBeforeActivityPersistence: true,
       keepsProtectedRoutesOutOfIndex: true,
       keepsPublicDiscoverySourceLevel: true,
       keepsActivityLibraryOwnerScoped: true,
@@ -154,6 +157,7 @@ export function buildClassroomProductLoopChainHandoffView(): ClassroomProductLoo
       resultConsumersUseScoredAttempts: true,
       sourceFiles: [...CLASSROOM_PRODUCT_LOOP_CHAIN_SOURCE_FILES],
       usesAiEnhancementLifecycleChain: true,
+      usesActivityAuthoringLibraryChain: true,
       usesActivityAssignmentAttemptResultsLoop: true,
       usesPublicDiscoveryIndexingChain: true,
       usesTemplateRoadmapCapabilityChain: true,
@@ -205,12 +209,12 @@ function getClassroomProductLoopChainHandoffItem(
         'Owner activities only',
         'Activity library search, filters, pagination, and summaries stay scoped to the authenticated teacher.'
       );
-    case 'activity-authoring-entry':
+    case 'activity-authoring-library-boundary':
       return item(
         id,
-        'Activity authoring entry',
-        'Create editor',
-        'Public template and worksheet entry points land in the shared teacher-reviewed create editor.'
+        'Activity authoring/library boundary',
+        '30 authoring slices',
+        'Public template and worksheet entries, shared editor save, edit hydration, owner-scoped library management, derivative drafts, lifecycle gates, and publish snapshot boundaries stay aligned.'
       );
     case 'template-roadmap-capability-boundary':
       return item(

@@ -9,7 +9,10 @@ import {
   ACTIVITY_AI_ENHANCEMENT_LIFECYCLE_CHAIN_ITEM_IDS,
   ACTIVITY_AI_ENHANCEMENT_LIFECYCLE_CHAIN_SOURCE_FILES,
 } from '@/activities/ai-enhancement-lifecycle-chain';
-import { ACTIVITY_AUTHORING_LIBRARY_CHAIN_HANDOFF_ITEM_IDS } from '@/activities/authoring-library-chain';
+import {
+  ACTIVITY_AUTHORING_LIBRARY_CHAIN_HANDOFF_ITEM_IDS,
+  ACTIVITY_AUTHORING_LIBRARY_CHAIN_SOURCE_FILES,
+} from '@/activities/authoring-library-chain';
 import { ACTIVITY_LIFECYCLE_GOVERNANCE_CHAIN_HANDOFF_ITEM_IDS } from '@/activities/activity-lifecycle-governance-chain';
 import { SOURCE_MATERIAL_PRIVACY_CHAIN_HANDOFF_ITEM_IDS } from '@/activities/source-material-privacy-chain';
 import {
@@ -95,6 +98,7 @@ test('classroom product loop chain exposes 30 safe product slices', () => {
     exposesStudentNamesInHandoff: false,
     freezesAssignmentSnapshots: true,
     itemIds,
+    requiresTeacherSaveBeforeActivityPersistence: true,
     keepsProtectedRoutesOutOfIndex: true,
     keepsPublicDiscoverySourceLevel: true,
     keepsActivityLibraryOwnerScoped: true,
@@ -108,6 +112,7 @@ test('classroom product loop chain exposes 30 safe product slices', () => {
     resultConsumersUseScoredAttempts: true,
     sourceFiles: [...CLASSROOM_PRODUCT_LOOP_CHAIN_SOURCE_FILES],
     usesAiEnhancementLifecycleChain: true,
+    usesActivityAuthoringLibraryChain: true,
     usesActivityAssignmentAttemptResultsLoop: true,
     usesPublicDiscoveryIndexingChain: true,
     usesTemplateRoadmapCapabilityChain: true,
@@ -125,7 +130,7 @@ test('classroom product loop chain summarizes activity to results flow', () => {
       ['activity-model', 'Teacher-owned activity'],
       ['activity-content-contract', 'Template-neutral content'],
       ['activity-library-owner-scope', 'Owner activities only'],
-      ['activity-authoring-entry', 'Create editor'],
+      ['activity-authoring-library-boundary', '30 authoring slices'],
       ['template-roadmap-capability-boundary', '30 roadmap slices'],
       ['ai-enhancement-lifecycle-boundary', 'Policy-to-publish review'],
       ['source-material-reference-boundary', 'Compact references'],
@@ -175,6 +180,7 @@ test('classroom product loop chain is backed by adjacent focused gates', () => {
       TEACHER_WORKSPACE_OPERATIONS_CHAIN_HANDOFF_ITEM_IDS.length,
       CLASSROOM_DATA_LIFECYCLE_CHAIN_HANDOFF_ITEM_IDS.length,
       ACTIVITY_AUTHORING_LIBRARY_CHAIN_HANDOFF_ITEM_IDS.length,
+      ACTIVITY_AUTHORING_LIBRARY_CHAIN_SOURCE_FILES.length,
       ACTIVITY_LIFECYCLE_GOVERNANCE_CHAIN_HANDOFF_ITEM_IDS.length,
       TEMPLATE_ROADMAP_CAPABILITY_CHAIN_HANDOFF_ITEM_IDS.length,
       TEMPLATE_ROADMAP_CAPABILITY_CHAIN_SOURCE_FILES.length,
@@ -198,7 +204,7 @@ test('classroom product loop chain is backed by adjacent focused gates', () => {
       PUBLIC_DISCOVERY_INDEXING_CHAIN_SOURCE_FILES.length,
       CLASSROOM_TRUST_COMMUNICATION_CHAIN_HANDOFF_ITEM_IDS.length,
     ],
-    Array.from({ length: 27 }, () => 30)
+    Array.from({ length: 28 }, () => 30)
   );
 });
 
@@ -215,12 +221,12 @@ test('classroom product loop chain is documented in product and catalog', () => 
   );
   assert.match(
     NORMALIZED_PRODUCT_SOURCE,
-    /src\/config\/classroom-product-loop-chain\.ts` owns the cross-surface product-loop handoff[\s\S]*teacher-owned activities[\s\S]*template roadmap capability[\s\S]*AI enhancement lifecycle[\s\S]*assignment links[\s\S]*validated attempts[\s\S]*submitted-date[\s\S]*accepted-answer[\s\S]*explanation continuity[\s\S]*teacher result review[\s\S]*copy\/export\/print handoffs[\s\S]*public discovery\/indexing[\s\S]*privacy guards/,
+    /src\/config\/classroom-product-loop-chain\.ts` owns the cross-surface product-loop handoff[\s\S]*teacher-owned activities[\s\S]*activity authoring\/library[\s\S]*template roadmap capability[\s\S]*AI enhancement lifecycle[\s\S]*assignment links[\s\S]*validated attempts[\s\S]*submitted-date[\s\S]*accepted-answer[\s\S]*explanation continuity[\s\S]*teacher result review[\s\S]*copy\/export\/print handoffs[\s\S]*public discovery\/indexing[\s\S]*privacy guards/,
     'docs/product.md should document the classroom product loop chain owner.'
   );
   assert.match(
     NORMALIZED_TEST_CATALOG_SOURCE,
-    /Classroom product loop chain has a fast script-level gate via[\s\S]*scripts\/classroom-product-loop-chain-handoff\.test\.ts[\s\S]*Activity -> Assignment -> Attempt -> Results[\s\S]*activity authoring[\s\S]*template roadmap capability[\s\S]*AI enhancement lifecycle[\s\S]*assignment publish[\s\S]*student runner[\s\S]*scored attempts[\s\S]*submitted-date continuity[\s\S]*accepted-answer continuity[\s\S]*explanation continuity[\s\S]*teacher result review[\s\S]*copy\/export\/print handoffs[\s\S]*dashboard\/public discovery[\s\S]*privacy guards/,
+    /Classroom product loop chain has a fast script-level gate via[\s\S]*scripts\/classroom-product-loop-chain-handoff\.test\.ts[\s\S]*Activity -> Assignment -> Attempt -> Results[\s\S]*activity authoring\/library workflow[\s\S]*template roadmap capability[\s\S]*AI enhancement lifecycle[\s\S]*assignment publish[\s\S]*student runner[\s\S]*scored attempts[\s\S]*submitted-date continuity[\s\S]*accepted-answer continuity[\s\S]*explanation continuity[\s\S]*teacher result review[\s\S]*copy\/export\/print handoffs[\s\S]*dashboard\/public discovery[\s\S]*privacy guards/,
     'TEST-CATALOG should document the classroom product loop chain gate.'
   );
 });
