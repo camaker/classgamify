@@ -6,7 +6,7 @@ export const CLASSROOM_PRODUCT_LOOP_CHAIN_HANDOFF_ITEM_IDS = [
   'activity-authoring-library-boundary',
   'template-roadmap-capability-boundary',
   'ai-enhancement-lifecycle-boundary',
-  'source-material-reference-boundary',
+  'source-extraction-lifecycle-boundary',
   'activity-lifecycle-derivative-guard',
   'assignment-publish-preflight',
   'assignment-snapshot-freeze',
@@ -41,9 +41,9 @@ export const CLASSROOM_PRODUCT_LOOP_CHAIN_SOURCE_FILES = [
   'src/activities/validation.ts',
   'src/activities/template-roadmap-capability-chain.ts',
   'src/activities/ai-enhancement-lifecycle-chain.ts',
+  'src/activities/source-extraction-lifecycle-chain.ts',
   'src/activities/authoring-library-chain.ts',
   'src/activities/activity-lifecycle-governance-chain.ts',
-  'src/activities/source-material-privacy-chain.ts',
   'src/assignments/publish-input.ts',
   'src/assignments/published-assignment-delivery-chain.ts',
   'src/assignments/result-submitted-date-chain.ts',
@@ -92,6 +92,7 @@ export type ClassroomProductLoopChainPrivacyContract = {
   freezesAssignmentSnapshots: true;
   itemIds: ClassroomProductLoopChainHandoffItemId[];
   requiresTeacherSaveBeforeActivityPersistence: true;
+  keepsSourceMaterialExtractionEditorReviewed: true;
   keepsProtectedRoutesOutOfIndex: true;
   keepsPublicDiscoverySourceLevel: true;
   keepsActivityLibraryOwnerScoped: true;
@@ -108,6 +109,7 @@ export type ClassroomProductLoopChainPrivacyContract = {
   usesActivityAuthoringLibraryChain: true;
   usesActivityAssignmentAttemptResultsLoop: true;
   usesPublicDiscoveryIndexingChain: true;
+  usesSourceExtractionLifecycleChain: true;
   usesTemplateRoadmapCapabilityChain: true;
 };
 
@@ -125,7 +127,7 @@ export function buildClassroomProductLoopChainHandoffView(): ClassroomProductLoo
 
   return {
     description:
-      'Thirty-slice classroom product loop chain from teacher-owned activities and reusable content through activity authoring/library workflow, template roadmap capability alignment, AI enhancement lifecycle review, assignment publish, frozen snapshots, public student play, validated attempts, scored results, submitted-date, accepted-answer, and explanation continuity, teacher review, copy/export/print handoffs, dashboard status, public discovery/indexing metadata, and privacy guards.',
+      'Thirty-slice classroom product loop chain from teacher-owned activities and reusable content through activity authoring/library workflow, source extraction lifecycle boundaries, template roadmap capability alignment, AI enhancement lifecycle review, assignment publish, frozen snapshots, public student play, validated attempts, scored results, submitted-date, accepted-answer, and explanation continuity, teacher review, copy/export/print handoffs, dashboard status, public discovery/indexing metadata, and privacy guards.',
     itemViews,
     privacy: {
       chainSourceFileCount: CLASSROOM_PRODUCT_LOOP_CHAIN_SOURCE_FILES.length,
@@ -144,6 +146,7 @@ export function buildClassroomProductLoopChainHandoffView(): ClassroomProductLoo
       freezesAssignmentSnapshots: true,
       itemIds: [...CLASSROOM_PRODUCT_LOOP_CHAIN_HANDOFF_ITEM_IDS],
       requiresTeacherSaveBeforeActivityPersistence: true,
+      keepsSourceMaterialExtractionEditorReviewed: true,
       keepsProtectedRoutesOutOfIndex: true,
       keepsPublicDiscoverySourceLevel: true,
       keepsActivityLibraryOwnerScoped: true,
@@ -160,6 +163,7 @@ export function buildClassroomProductLoopChainHandoffView(): ClassroomProductLoo
       usesActivityAuthoringLibraryChain: true,
       usesActivityAssignmentAttemptResultsLoop: true,
       usesPublicDiscoveryIndexingChain: true,
+      usesSourceExtractionLifecycleChain: true,
       usesTemplateRoadmapCapabilityChain: true,
     },
     title: 'Classroom product loop chain',
@@ -230,12 +234,12 @@ function getClassroomProductLoopChainHandoffItem(
         'Policy-to-publish review',
         'AI enhancements stay inside policy, execution, draft output, editor application, teacher review, save, publish, snapshot, public payload, and result-continuity gates.'
       );
-    case 'source-material-reference-boundary':
+    case 'source-extraction-lifecycle-boundary':
       return item(
         id,
-        'Source material reference boundary',
-        'Compact references',
-        'Teacher-uploaded materials remain compact owner-scoped references and stay out of public student payloads.'
+        'Source extraction lifecycle boundary',
+        '30 extraction slices',
+        'Compact source-material references, material classification, audio/worksheet/spreadsheet readiness, AI-safe provenance, editor review, snapshot protection, and public payload privacy stay aligned.'
       );
     case 'activity-lifecycle-derivative-guard':
       return item(

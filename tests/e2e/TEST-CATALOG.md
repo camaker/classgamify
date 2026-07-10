@@ -78,11 +78,12 @@ stay tied to the ClassGamify teacher workspace.
 Classroom product loop chain has a fast script-level gate via
 `pnpm exec tsx --test scripts/classroom-product-loop-chain-handoff.test.ts`;
 run it when changing the Activity -> Assignment -> Attempt -> Results contract,
-activity authoring/library workflow, template roadmap capability alignment,
-AI enhancement lifecycle review, assignment publish, student runner, scored
-attempts, submitted-date continuity, accepted-answer continuity, explanation
-continuity, teacher result review, copy/export/print handoffs,
-dashboard/public discovery and indexing alignment, or privacy guards.
+activity authoring/library workflow, source extraction lifecycle, template
+roadmap capability alignment, AI enhancement lifecycle review, assignment
+publish, student runner, scored attempts, submitted-date continuity,
+accepted-answer continuity, explanation continuity, teacher result review,
+copy/export/print handoffs, dashboard/public discovery and indexing alignment,
+or privacy guards.
 Active surface product boundary has a fast script-level gate via
 `pnpm exec tsx --test scripts/active-surface-product-boundary.test.ts`; run it
 when changing active account governance, contact, billing/payment callback,
