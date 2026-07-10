@@ -14,7 +14,7 @@ export const CLASSROOM_TRUST_COMMUNICATION_CHAIN_HANDOFF_ITEM_IDS = [
   'transactional-mail-template-set',
   'transactional-mail-localization',
   'transactional-mail-boundary-panel',
-  'mail-provider-registry',
+  'transactional-mail-lifecycle-chain',
   'notification-teacher-updates',
   'notification-no-learner-reminders',
   'billing-hosted-boundary',
@@ -50,7 +50,7 @@ export const CLASSROOM_TRUST_COMMUNICATION_CHAIN_SOURCE_FILES = [
   'src/routes/auth/register.tsx',
   'src/mail/workspace-boundary.ts',
   'src/mail/render.ts',
-  'src/mail/provider/resend.ts',
+  'src/mail/transactional-mail-lifecycle-chain.ts',
   'src/settings/notifications-view.ts',
   'src/routes/settings/notifications.tsx',
   'src/settings/billing-view.ts',
@@ -104,6 +104,7 @@ export type ClassroomTrustCommunicationChainPrivacyContract = {
   normalizesUnsupportedMailLocales: true;
   sendsLearnerNotifications: false;
   sourceFiles: string[];
+  usesTransactionalMailLifecycleChain: true;
   usesClassGamifyProductModel: true;
 };
 
@@ -121,7 +122,7 @@ export function buildClassroomTrustCommunicationChainHandoffView(): ClassroomTru
 
   return {
     description:
-      'Thirty-slice classroom trust and communication chain from public classroom contact intake through auth, transactional mail, teacher notifications, hosted billing, legal/config provider boundaries, and public-DOM privacy guards.',
+      'Thirty-slice classroom trust and communication chain from public classroom contact intake through auth, the transactional mail lifecycle, teacher notifications, hosted billing, legal/config provider boundaries, and public-DOM privacy guards.',
     itemViews,
     privacy: {
       chainSourceFileCount:
@@ -151,6 +152,7 @@ export function buildClassroomTrustCommunicationChainHandoffView(): ClassroomTru
       normalizesUnsupportedMailLocales: true,
       sendsLearnerNotifications: false,
       sourceFiles: [...CLASSROOM_TRUST_COMMUNICATION_CHAIN_SOURCE_FILES],
+      usesTransactionalMailLifecycleChain: true,
       usesClassGamifyProductModel: true,
     },
     title: 'Classroom trust communication chain',
@@ -263,12 +265,12 @@ function getClassroomTrustCommunicationChainHandoffItem(
         'Workspace boundary panel',
         'Email templates render shared classroom boundary context before provider send.'
       );
-    case 'mail-provider-registry':
+    case 'transactional-mail-lifecycle-chain':
       return item(
         id,
-        'Mail provider registry',
-        'Provider boundary',
-        'Mail delivery uses the provider registry without leaking provider API tokens.'
+        'Transactional mail lifecycle',
+        '30 mail slices',
+        'The trust chain absorbs the transactional mail lifecycle for templates, locale fallback, render-before-send, providers, privacy, and no-mutation guards.'
       );
     case 'notification-teacher-updates':
       return item(

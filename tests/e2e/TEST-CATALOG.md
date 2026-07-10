@@ -65,7 +65,7 @@ retirement, public DOM handoff boundaries, or privacy/indexing guards.
 Classroom trust communication chain has a fast script-level gate via
 `pnpm exec tsx --test scripts/classroom-trust-communication-chain-handoff.test.ts`;
 run it when changing public classroom contact intake, auth workspace entry,
-transactional mail, teacher notification settings, hosted billing,
+transactional mail lifecycle, teacher notification settings, hosted billing,
 legal/provider copy, developer configuration secrets, storage source-material
 boundaries, or public DOM handoff boundaries.
 Account governance lifecycle chain has a fast script-level gate via

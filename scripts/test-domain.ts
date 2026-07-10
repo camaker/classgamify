@@ -16756,12 +16756,14 @@ assert.deepEqual(classroomTrustCommunicationChainView.privacy, {
   normalizesUnsupportedMailLocales: true,
   sendsLearnerNotifications: false,
   sourceFiles: [...CLASSROOM_TRUST_COMMUNICATION_CHAIN_SOURCE_FILES],
+  usesTransactionalMailLifecycleChain: true,
   usesClassGamifyProductModel: true,
 });
 assert.deepEqual(
   [
     CONTACT_CLASSROOM_INTAKE_HANDOFF_ITEM_IDS.length,
     AUTH_WORKSPACE_HANDOFF_ITEM_IDS.length,
+    TRANSACTIONAL_MAIL_LIFECYCLE_CHAIN_HANDOFF_ITEM_IDS.length,
     MAIL_TRANSACTIONAL_WORKSPACE_HANDOFF_ITEM_IDS.length,
     SETTINGS_NOTIFICATION_UPDATE_HANDOFF_ITEM_IDS.length,
     SETTINGS_BILLING_WORKSPACE_HANDOFF_ITEM_IDS.length,
@@ -16769,8 +16771,13 @@ assert.deepEqual(
     DEVELOPER_CONFIGURATION_HANDOFF_ITEM_IDS.length,
     PUBLIC_DOM_HANDOFF_BOUNDARY_ITEM_IDS.length,
   ],
-  Array.from({ length: 8 }, () => 30),
-  'Classroom trust communication chain should stay backed by focused contact, auth, mail, notification, billing, legal, config, and public DOM gates.'
+  Array.from({ length: 9 }, () => 30),
+  'Classroom trust communication chain should stay backed by focused contact, auth, transactional mail lifecycle, mail workspace, notification, billing, legal, config, and public DOM gates.'
+);
+assert.equal(
+  TRANSACTIONAL_MAIL_LIFECYCLE_CHAIN_SOURCE_FILES.length,
+  30,
+  'Classroom trust communication chain should absorb the full transactional mail lifecycle source chain.'
 );
 assert.deepEqual(Object.fromEntries(classroomTrustCommunicationChainValues), {
   'auth-callback-safety': 'Safe callback paths',
@@ -16792,7 +16799,6 @@ assert.deepEqual(Object.fromEntries(classroomTrustCommunicationChainValues), {
   'legal-provider-scope': 'Configured providers',
   'legal-student-data-boundary': 'Student data protected',
   'legacy-copy-guard': 'ClassGamify only',
-  'mail-provider-registry': 'Provider boundary',
   'notification-no-learner-reminders': 'No learner reminders',
   'notification-teacher-updates': Routes.SettingsNotifications,
   'private-data-guard': 'Private data hidden',
@@ -16801,6 +16807,7 @@ assert.deepEqual(Object.fromEntries(classroomTrustCommunicationChainValues), {
   'public-dom-handoff-boundary': 'Source-level public gates',
   'storage-source-material-boundary': 'R2 owner files',
   'transactional-mail-boundary-panel': 'Workspace boundary panel',
+  'transactional-mail-lifecycle-chain': '30 mail slices',
   'transactional-mail-localization': 'Localized subjects',
   'transactional-mail-template-set': 'Verify/reset/newsletter/contact',
 });
@@ -16811,7 +16818,7 @@ assert.match(
 );
 assert.match(
   readFileSync('tests/e2e/TEST-CATALOG.md', 'utf8').replace(/\s+/g, ' '),
-  /public classroom contact intake[\s\S]*auth workspace entry[\s\S]*transactional mail[\s\S]*teacher notification settings[\s\S]*hosted billing[\s\S]*legal\/provider copy[\s\S]*developer configuration secrets[\s\S]*public DOM handoff boundaries/,
+  /public classroom contact intake[\s\S]*auth workspace entry[\s\S]*transactional mail lifecycle[\s\S]*teacher notification settings[\s\S]*hosted billing[\s\S]*legal\/provider copy[\s\S]*developer configuration secrets[\s\S]*public DOM handoff boundaries/,
   'TEST-CATALOG should describe the full classroom trust communication chain scope.'
 );
 const accountGovernanceLifecycleChainView =

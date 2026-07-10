@@ -13,6 +13,10 @@ import { DEVELOPER_CONFIGURATION_HANDOFF_ITEM_IDS } from '@/config/developer-con
 import { CONTACT_CLASSROOM_INTAKE_HANDOFF_ITEM_IDS } from '@/contact/inquiry-view';
 import { Routes } from '@/lib/routes';
 import { MAIL_TRANSACTIONAL_WORKSPACE_HANDOFF_ITEM_IDS } from '@/mail/workspace-boundary';
+import {
+  TRANSACTIONAL_MAIL_LIFECYCLE_CHAIN_HANDOFF_ITEM_IDS,
+  TRANSACTIONAL_MAIL_LIFECYCLE_CHAIN_SOURCE_FILES,
+} from '@/mail/transactional-mail-lifecycle-chain';
 import { LEGAL_POLICY_HANDOFF_ITEM_IDS } from '@/pages/legal-policy-view';
 import { PUBLIC_DOM_HANDOFF_BOUNDARY_ITEM_IDS } from '@/seo/public-dom-handoff-boundary';
 import { SETTINGS_BILLING_WORKSPACE_HANDOFF_ITEM_IDS } from '@/settings/billing-view';
@@ -34,6 +38,10 @@ const AUTH_WORKSPACE_SOURCE = readFileSync(
 );
 const MAIL_WORKSPACE_SOURCE = readFileSync(
   'src/mail/workspace-boundary.ts',
+  'utf8'
+);
+const TRANSACTIONAL_MAIL_LIFECYCLE_SOURCE = readFileSync(
+  'src/mail/transactional-mail-lifecycle-chain.ts',
   'utf8'
 );
 const NOTIFICATION_SOURCE = readFileSync(
@@ -123,6 +131,7 @@ test('classroom trust communication chain exposes 30 safe trust slices', () => {
     normalizesUnsupportedMailLocales: true,
     sendsLearnerNotifications: false,
     sourceFiles: [...CLASSROOM_TRUST_COMMUNICATION_CHAIN_SOURCE_FILES],
+    usesTransactionalMailLifecycleChain: true,
     usesClassGamifyProductModel: true,
   });
   assertNoPrivateClassroomTrustText(JSON.stringify(handoffView));
@@ -147,7 +156,7 @@ test('classroom trust communication chain summarizes contact through configurati
       ['transactional-mail-template-set', 'Verify/reset/newsletter/contact'],
       ['transactional-mail-localization', 'Localized subjects'],
       ['transactional-mail-boundary-panel', 'Workspace boundary panel'],
-      ['mail-provider-registry', 'Provider boundary'],
+      ['transactional-mail-lifecycle-chain', '30 mail slices'],
       ['notification-teacher-updates', Routes.SettingsNotifications],
       ['notification-no-learner-reminders', 'No learner reminders'],
       ['billing-hosted-boundary', Routes.SettingsBilling],
@@ -193,6 +202,7 @@ test('classroom trust communication chain is backed by focused trust gates', () 
     [
       CONTACT_CLASSROOM_INTAKE_HANDOFF_ITEM_IDS.length,
       AUTH_WORKSPACE_HANDOFF_ITEM_IDS.length,
+      TRANSACTIONAL_MAIL_LIFECYCLE_CHAIN_HANDOFF_ITEM_IDS.length,
       MAIL_TRANSACTIONAL_WORKSPACE_HANDOFF_ITEM_IDS.length,
       SETTINGS_NOTIFICATION_UPDATE_HANDOFF_ITEM_IDS.length,
       SETTINGS_BILLING_WORKSPACE_HANDOFF_ITEM_IDS.length,
@@ -200,8 +210,9 @@ test('classroom trust communication chain is backed by focused trust gates', () 
       DEVELOPER_CONFIGURATION_HANDOFF_ITEM_IDS.length,
       PUBLIC_DOM_HANDOFF_BOUNDARY_ITEM_IDS.length,
     ],
-    Array.from({ length: 8 }, () => 30)
+    Array.from({ length: 9 }, () => 30)
   );
+  assert.equal(TRANSACTIONAL_MAIL_LIFECYCLE_CHAIN_SOURCE_FILES.length, 30);
 });
 
 test('classroom trust communication chain preserves product-doc trust boundaries', () => {
@@ -247,6 +258,11 @@ test('classroom trust communication sources preserve privacy and mutation bounda
     MAIL_WORKSPACE_SOURCE,
     /exposesActionUrls: false[\s\S]*exposesContactMessageText: false[\s\S]*exposesProviderApiTokens: false[\s\S]*normalizesUnsupportedLocales: true[\s\S]*rendersBeforeProviderSend: true[\s\S]*sendsLearnerNotifications: false/,
     'Transactional mail handoff should render safe localized boundaries before provider send.'
+  );
+  assert.match(
+    TRANSACTIONAL_MAIL_LIFECYCLE_SOURCE,
+    /TRANSACTIONAL_MAIL_LIFECYCLE_CHAIN_HANDOFF_ITEM_IDS[\s\S]*'template-set-registry'[\s\S]*'render-before-send'[\s\S]*'provider-registry'[\s\S]*'no-workspace-mutation'[\s\S]*'learner-notification-guard'/,
+    'Classroom trust chain should absorb the full transactional mail lifecycle contract.'
   );
   assert.match(
     NOTIFICATION_SOURCE,
@@ -311,7 +327,7 @@ test('classroom trust communication chain focused gate is documented', () => {
   );
   assert.match(
     TEST_CATALOG_SOURCE.replace(/\s+/g, ' '),
-    /public classroom contact intake[\s\S]*auth workspace entry[\s\S]*transactional mail[\s\S]*teacher notification settings[\s\S]*hosted billing[\s\S]*legal\/provider copy[\s\S]*developer configuration secrets[\s\S]*public DOM handoff boundaries/,
+    /public classroom contact intake[\s\S]*auth workspace entry[\s\S]*transactional mail lifecycle[\s\S]*teacher notification settings[\s\S]*hosted billing[\s\S]*legal\/provider copy[\s\S]*developer configuration secrets[\s\S]*public DOM handoff boundaries/,
     'TEST-CATALOG should describe the full classroom trust communication chain scope.'
   );
 });

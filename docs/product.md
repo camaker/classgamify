@@ -67,6 +67,11 @@ render the shared teacher workspace context before provider send while keeping
 action URLs, recipient data, provider secrets, source-material storage keys,
 student identifiers, learner notifications, and product mutations out of
 handoff contracts.
+`src/config/classroom-trust-communication-chain.ts` absorbs that
+transactional mail lifecycle alongside public contact intake, auth workspace
+entry, teacher notification settings, hosted billing, legal/provider copy,
+developer configuration, storage, and public-DOM boundaries, so trust copy and
+provider behavior stay aligned without adding public audit output.
 
 - `Activity` is the teacher-owned reusable content object.
 - `ActivityContent` is template-neutral lesson material: questions, pairs,
