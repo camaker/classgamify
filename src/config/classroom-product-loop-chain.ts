@@ -11,7 +11,7 @@ export const CLASSROOM_PRODUCT_LOOP_CHAIN_HANDOFF_ITEM_IDS = [
   'published-assignment-delivery-boundary',
   'assignment-snapshot-freeze',
   'share-link-distribution',
-  'public-runner-access',
+  'student-runner-play-boundary',
   'public-rules-summary',
   'student-identity-boundary',
   'runtime-item-contract',
@@ -102,6 +102,8 @@ export type ClassroomProductLoopChainPrivacyContract = {
   keepsDashboardOwnerScoped: true;
   keepsTemplateRoadmapOnSharedActivityModel: true;
   publicPayloadUsesRuntimeItemsOnly: true;
+  publicStudentRunnerPayloadUsesSanitizedRuntimeItems: true;
+  rejectsClosedOrExpiredStudentRunnerSubmissions: true;
   rejectsInvalidSubmissions: true;
   requiresTeacherReviewForAiEnhancements: true;
   requiresTeacherReviewForAiDrafts: true;
@@ -114,6 +116,7 @@ export type ClassroomProductLoopChainPrivacyContract = {
   usesPublishedAssignmentDeliveryChain: true;
   usesPublicDiscoveryIndexingChain: true;
   usesSourceExtractionLifecycleChain: true;
+  usesStudentRunnerPlayChain: true;
   usesTemplateRoadmapCapabilityChain: true;
 };
 
@@ -131,7 +134,7 @@ export function buildClassroomProductLoopChainHandoffView(): ClassroomProductLoo
 
   return {
     description:
-      'Thirty-slice classroom product loop chain from teacher-owned activities and reusable content through activity authoring/library workflow, source extraction lifecycle boundaries, activity lifecycle governance, template roadmap capability alignment, AI enhancement lifecycle review, published assignment delivery, public student play, validated attempts, scored results, submitted-date, accepted-answer, and explanation continuity, teacher review, copy/export/print handoffs, dashboard status, public discovery/indexing metadata, and privacy guards.',
+      'Thirty-slice classroom product loop chain from teacher-owned activities and reusable content through activity authoring/library workflow, source extraction lifecycle boundaries, activity lifecycle governance, template roadmap capability alignment, AI enhancement lifecycle review, published assignment delivery, student runner play, validated attempts, scored results, submitted-date, accepted-answer, and explanation continuity, teacher review, copy/export/print handoffs, dashboard status, public discovery/indexing metadata, and privacy guards.',
     itemViews,
     privacy: {
       chainSourceFileCount: CLASSROOM_PRODUCT_LOOP_CHAIN_SOURCE_FILES.length,
@@ -160,6 +163,8 @@ export function buildClassroomProductLoopChainHandoffView(): ClassroomProductLoo
       keepsDashboardOwnerScoped: true,
       keepsTemplateRoadmapOnSharedActivityModel: true,
       publicPayloadUsesRuntimeItemsOnly: true,
+      publicStudentRunnerPayloadUsesSanitizedRuntimeItems: true,
+      rejectsClosedOrExpiredStudentRunnerSubmissions: true,
       rejectsInvalidSubmissions: true,
       requiresTeacherReviewForAiEnhancements: true,
       requiresTeacherReviewForAiDrafts: true,
@@ -172,6 +177,7 @@ export function buildClassroomProductLoopChainHandoffView(): ClassroomProductLoo
       usesPublishedAssignmentDeliveryChain: true,
       usesPublicDiscoveryIndexingChain: true,
       usesSourceExtractionLifecycleChain: true,
+      usesStudentRunnerPlayChain: true,
       usesTemplateRoadmapCapabilityChain: true,
     },
     title: 'Classroom product loop chain',
@@ -277,12 +283,12 @@ function getClassroomProductLoopChainHandoffItem(
         'Copy/preview/print/review',
         'Assignment list and result surfaces keep copy, preview, printable, and review actions aligned.'
       );
-    case 'public-runner-access':
+    case 'student-runner-play-boundary':
       return item(
         id,
-        'Public runner access',
-        'Open links only',
-        'Public student payloads are returned only for open assignment links.'
+        'Student runner play boundary',
+        '30 runner slices',
+        'Sanitized public payloads, rule summaries, unavailable-link handling, identity, timers, template renderers, partial-submit controls, validated submissions, attempt persistence, answer feedback, and privacy guards stay aligned.'
       );
     case 'public-rules-summary':
       return item(

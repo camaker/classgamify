@@ -267,6 +267,7 @@ test('printable worksheet page view exposes a complete handoff contract', () => 
     exposesPromptText: false,
     exposesStudentResponseText: false,
     itemIds: hiddenPageView.handoffView.itemViews.map((item) => item.id),
+    scope: 'teacher-printable-worksheet',
   });
   assert.equal(hiddenPageView.showAnswerKey, false);
   assert.equal(hiddenPageView.answerKeyView.accessView.state, 'hidden');

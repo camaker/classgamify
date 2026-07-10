@@ -16642,6 +16642,8 @@ assert.deepEqual(classroomProductLoopChainView.privacy, {
   keepsDashboardOwnerScoped: true,
   keepsTemplateRoadmapOnSharedActivityModel: true,
   publicPayloadUsesRuntimeItemsOnly: true,
+  publicStudentRunnerPayloadUsesSanitizedRuntimeItems: true,
+  rejectsClosedOrExpiredStudentRunnerSubmissions: true,
   rejectsInvalidSubmissions: true,
   requiresTeacherReviewForAiEnhancements: true,
   requiresTeacherReviewForAiDrafts: true,
@@ -16654,6 +16656,7 @@ assert.deepEqual(classroomProductLoopChainView.privacy, {
   usesPublishedAssignmentDeliveryChain: true,
   usesPublicDiscoveryIndexingChain: true,
   usesSourceExtractionLifecycleChain: true,
+  usesStudentRunnerPlayChain: true,
   usesTemplateRoadmapCapabilityChain: true,
 });
 assert.deepEqual(
@@ -16678,6 +16681,7 @@ assert.deepEqual(
     PUBLISHED_ASSIGNMENT_DELIVERY_CHAIN_HANDOFF_ITEM_IDS.length,
     PUBLISHED_ASSIGNMENT_DELIVERY_CHAIN_SOURCE_FILES.length,
     STUDENT_RUNNER_PLAY_CHAIN_HANDOFF_ITEM_IDS.length,
+    STUDENT_RUNNER_PLAY_CHAIN_SOURCE_FILES.length,
     STUDENT_IDENTITY_LIFECYCLE_CHAIN_HANDOFF_ITEM_IDS.length,
     SCORED_ATTEMPT_RESULT_CHAIN_HANDOFF_ITEM_IDS.length,
     ASSIGNMENT_RESULT_SUBMITTED_DATE_CHAIN_HANDOFF_ITEM_IDS.length,
@@ -16691,7 +16695,7 @@ assert.deepEqual(
     PUBLIC_DISCOVERY_INDEXING_CHAIN_SOURCE_FILES.length,
     CLASSROOM_TRUST_COMMUNICATION_CHAIN_HANDOFF_ITEM_IDS.length,
   ],
-  Array.from({ length: 32 }, () => 30),
+  Array.from({ length: 33 }, () => 30),
   'Classroom product loop chain should stay backed by adjacent public entry, public discovery/indexing, workspace, data, authoring, source extraction, lifecycle governance, template roadmap, AI enhancement lifecycle, delivery, runner, result continuity, export, print, and trust gates.'
 );
 assert.deepEqual(Object.fromEntries(classroomProductLoopChainValues), {
@@ -16713,7 +16717,7 @@ assert.deepEqual(Object.fromEntries(classroomProductLoopChainValues), {
   'progress-submit-readiness': 'Explicit partial confirm',
   'public-discovery-indexing-boundary': '30 discovery slices',
   'public-rules-summary': 'Student-visible rules',
-  'public-runner-access': 'Open links only',
+  'student-runner-play-boundary': '30 runner slices',
   'result-accepted-answer-continuity': 'Accepted alternatives',
   'result-explanation-continuity': 'Answer explanations',
   'result-submitted-date-continuity': 'Submitted dates',
@@ -16733,7 +16737,7 @@ assert.match(
 );
 assert.match(
   readFileSync('tests/e2e/TEST-CATALOG.md', 'utf8').replace(/\s+/g, ' '),
-  /Activity -> Assignment -> Attempt -> Results[\s\S]*activity authoring\/library workflow[\s\S]*source extraction lifecycle[\s\S]*activity lifecycle governance[\s\S]*template roadmap capability[\s\S]*AI enhancement lifecycle[\s\S]*published assignment delivery[\s\S]*student runner[\s\S]*scored attempts[\s\S]*submitted-date continuity[\s\S]*accepted-answer continuity[\s\S]*explanation continuity[\s\S]*teacher result review[\s\S]*copy\/export\/print handoffs[\s\S]*dashboard\/public discovery[\s\S]*privacy guards/,
+  /Activity -> Assignment -> Attempt -> Results[\s\S]*activity authoring\/library workflow[\s\S]*source extraction lifecycle[\s\S]*activity lifecycle governance[\s\S]*template roadmap capability[\s\S]*AI enhancement lifecycle[\s\S]*published assignment delivery[\s\S]*student runner play[\s\S]*scored attempts[\s\S]*submitted-date continuity[\s\S]*accepted-answer continuity[\s\S]*explanation continuity[\s\S]*teacher result review[\s\S]*copy\/export\/print handoffs[\s\S]*dashboard\/public discovery[\s\S]*privacy guards/,
   'TEST-CATALOG should describe the full classroom product loop chain scope.'
 );
 const classroomTrustCommunicationChainView =
