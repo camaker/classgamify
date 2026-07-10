@@ -654,6 +654,11 @@ import {
   buildAssignmentAttemptPersistenceHandoffView,
 } from '@/assignments/attempt-persistence-handoff';
 import {
+  SCORED_ATTEMPT_RESULT_CHAIN_HANDOFF_ITEM_IDS,
+  SCORED_ATTEMPT_RESULT_CHAIN_SOURCE_FILES,
+  buildScoredAttemptResultChainHandoffView,
+} from '@/assignments/scored-attempt-result-chain';
+import {
   ASSIGNMENT_ATTEMPT_DURATION_UNITS,
   buildAttemptDurationDisplayView,
   buildAttemptStartedAt,
@@ -29149,6 +29154,135 @@ assert.match(
   e2eTestCatalogText,
   /assignment-attempt-persistence-handoff-semantic-views\.test\.ts[\s\S]*Assignment attempt persistence keeps a 30-slice source-level contract/,
   'E2E catalog should document the attempt persistence source-level handoff gate.'
+);
+const scoredAttemptResultChainView =
+  buildScoredAttemptResultChainHandoffView();
+const scoredAttemptResultChainValues = new Map(
+  scoredAttemptResultChainView.itemViews.map((item) => [item.id, item.value])
+);
+assert.deepEqual(
+  scoredAttemptResultChainView.itemViews.map((item) => item.id),
+  [...SCORED_ATTEMPT_RESULT_CHAIN_HANDOFF_ITEM_IDS],
+  'Scored attempt result chain should expose the stable post-submit 30-slice order.'
+);
+assert.equal(scoredAttemptResultChainView.itemViews.length, 30);
+assert.equal(
+  new Set(SCORED_ATTEMPT_RESULT_CHAIN_HANDOFF_ITEM_IDS).size,
+  30
+);
+assert.equal(SCORED_ATTEMPT_RESULT_CHAIN_SOURCE_FILES.length, 30);
+for (const filePath of SCORED_ATTEMPT_RESULT_CHAIN_SOURCE_FILES) {
+  assert.ok(
+    existsSync(filePath),
+    `Missing scored attempt result chain file ${filePath}`
+  );
+}
+assert.ok(
+  scoredAttemptResultChainView.itemViews.every(
+    (item) => item.ariaLabel && item.description && item.label && item.value
+  )
+);
+assert.deepEqual(scoredAttemptResultChainView.privacy, {
+  chainSourceFileCount: SCORED_ATTEMPT_RESULT_CHAIN_SOURCE_FILES.length,
+  exposesAnswerKeysBeforeAllowedReview: false,
+  exposesCsvDataUrlInHandoff: false,
+  exposesRawAnonymousTokens: false,
+  exposesRawSubmissionPayload: false,
+  exposesRuntimeItemIdsInHandoff: false,
+  exposesSourceMaterialStorageKeys: false,
+  exposesStudentAnswerTextInHandoff: false,
+  exposesStudentNamesInHandoff: false,
+  itemIds: [...SCORED_ATTEMPT_RESULT_CHAIN_HANDOFF_ITEM_IDS],
+  publicResponseUsesSanitizedResult: true,
+  resultConsumersUseScoredAttempts: true,
+  sourceFiles: [...SCORED_ATTEMPT_RESULT_CHAIN_SOURCE_FILES],
+  storesImmutableAnswerJson: true,
+  storesImmutableResultJson: true,
+  usesSharedAttemptStats: true,
+  usesSharedDurationFormatting: true,
+});
+assert.deepEqual(
+  [
+    ASSIGNMENT_ATTEMPT_PERSISTENCE_HANDOFF_ITEM_IDS.length,
+    ASSIGNMENT_ATTEMPT_DURATION_HANDOFF_ITEM_IDS.length,
+    STUDENT_RUNNER_SUBMISSION_HANDOFF_ITEM_IDS.length,
+    STUDENT_RUNNER_PLAY_CHAIN_HANDOFF_ITEM_IDS.length,
+    ASSIGNMENT_ANSWER_FEEDBACK_HANDOFF_ITEM_IDS.length,
+    ANSWER_FEEDBACK_LIFECYCLE_CHAIN_HANDOFF_ITEM_IDS.length,
+    ASSIGNMENT_ATTEMPT_STATS_HANDOFF_ITEM_IDS.length,
+    TEACHER_RESULTS_REVIEW_CHAIN_HANDOFF_ITEM_IDS.length,
+    TEACHER_RESULT_COPY_LIFECYCLE_CHAIN_HANDOFF_ITEM_IDS.length,
+    ASSIGNMENT_RESULTS_EXPORT_PREPARATION_ITEM_IDS.length,
+  ],
+  Array.from({ length: 10 }, () => 30),
+  'Scored attempt result chain should stay backed by persistence, duration, runner, feedback, stats, results, copy, and export gates.'
+);
+assert.deepEqual(Object.fromEntries(scoredAttemptResultChainValues), {
+  'accepted-alternatives-consistency': 'Shared formatting',
+  'anonymous-token-guard': 'Raw token hidden',
+  'answers-json-clone': 'Immutable answer rows',
+  'assignment-list-stats-consumer': 'Card/list metrics',
+  'attempt-limit-gate': 'Per identity',
+  'attempt-query-scored-filter': 'resultJson required',
+  'attempt-review-cards': 'Answer review',
+  'attempt-stats-consumer': 'Shared metrics',
+  'classroom-brief-consumer': 'Reteach evidence',
+  'copy-artifact-consumer': 'Current review copy',
+  'csv-export-consumer': 'Full assignment export',
+  'csv-formula-guard': 'Formula prefix',
+  'duration-display-consistency': 'Shared duration view',
+  'duration-normalization': 'Timer capped seconds',
+  'product-scored-attempt-policy': 'Submit -> review',
+  'printable-result-return': 'Back to results',
+  'public-feedback-policy': 'Reveal if allowed',
+  'public-result-sanitization': 'Public score view',
+  'public-review-summary': 'Review summary',
+  'result-analysis-consumer': 'Stored answers',
+  'result-json-clone': 'Immutable result',
+  'runtime-answer-validation': 'Frozen runtime ids',
+  'runtime-scoring-evaluation': 'evaluateRuntimeAnswers',
+  'score-field-mapping': 'earned/max points',
+  'scored-insert-builder': 'buildScoredAttemptInsert',
+  'scored-result-chain-gate': '30 source files',
+  'source-material-guard': 'Storage keys hidden',
+  'submit-api-identity-gate': 'Name or browser token',
+  'submit-api-lifecycle-gate': 'Open assignment only',
+  'teacher-review-state': 'Current review',
+});
+assert.match(
+  readFileSync('docs/product.md', 'utf8'),
+  /post-submit result boundary[\s\S]*scored-attempt\s+persistence[\s\S]*public feedback[\s\S]*assignment stats[\s\S]*teacher result analysis[\s\S]*copy artifacts[\s\S]*CSV export[\s\S]*printable review return/,
+  'docs/product.md should document the shared post-submit scored-result boundary.'
+);
+assert.match(
+  assignmentAttemptLimitApiSource,
+  /(?=[\s\S]*assertAssignmentAcceptsSubmissions\(\{)(?=[\s\S]*resolveAttemptSubmissionIdentity\(\{)(?=[\s\S]*countPreviousIdentityAttempts\(\{)(?=[\s\S]*canUseAnotherAssignmentAttempt\(\{)(?=[\s\S]*normalizeSubmittedAttemptAnswers\(data\.answers\))(?=[\s\S]*assertSubmittedAnswersMatchRuntimeItems\(\{)(?=[\s\S]*evaluateRuntimeAnswers\(\{)(?=[\s\S]*buildScoredAttemptInsert\(\{)(?=[\s\S]*buildPublicAttemptResult\(evaluation\.result\))(?=[\s\S]*buildPublicAttemptReviewSummaryView\(\{)/,
+  'Submit-attempt API should keep lifecycle, identity, validation, scoring, persistence, public result, and review summary connected.'
+);
+assert.match(
+  assignmentAttemptPersistenceSource,
+  /(?=[\s\S]*score: evaluation\.result\.earnedPoints)(?=[\s\S]*maxScore: evaluation\.result\.totalPoints)(?=[\s\S]*answers:\s*cloneAttemptAnswerRows\(evaluation\.answers\))(?=[\s\S]*resultJson:\s*cloneAttemptResult\(evaluation\.result\))/,
+  'Scored-attempt insert should map score fields and clone answer/result JSON.'
+);
+assert.match(
+  assignmentAttemptStatsSource,
+  /const completedAttempts = attempts\.filter\(hasAttemptResult\)[\s\S]*averageDurationSeconds[\s\S]*getAttemptDurationSeconds[\s\S]*averagePoints[\s\S]*getAttemptPoints[\s\S]*averageScore[\s\S]*getAttemptAccuracy/,
+  'Attempt stats should derive shared metrics from scored result rows.'
+);
+assert.match(
+  assignmentResultsSource,
+  /(?=[\s\S]*const completedAttempts = attempts\.filter\(hasAttemptResult\))(?=[\s\S]*buildAttemptAnswerMapByItemId\(\s*attempt\.answersJson\.answers\s*\))(?=[\s\S]*attempt\.resultJson)(?=[\s\S]*normalizeAttemptDurationSeconds)/,
+  'Teacher result analysis should read stored answers and result JSON.'
+);
+assert.match(
+  assignmentResultsExportSource,
+  /const storedAttempt = exportContext\.attemptsById\.get\(attempt\.id\)[\s\S]*storedAttempt\?\.score \?\? attempt\.score[\s\S]*storedAttempt\?\.maxScore[\s\S]*storedAttempt\?\.resultJson\?\.completedItemCount[\s\S]*CSV_FORMULA_PREFIX_PATTERN/,
+  'CSV export should consume stored scored attempts and keep formula injection protection.'
+);
+assert.match(
+  e2eTestCatalogText,
+  /Scored attempt result lifecycle chain has a fast script-level gate via[\s\S]*scripts\/scored-attempt-result-chain-handoff\.test\.ts[\s\S]*post-submit scored-result boundary[\s\S]*public\s+feedback[\s\S]*attempt\s+stats[\s\S]*teacher\s+result\s+review[\s\S]*copy\s+artifacts[\s\S]*CSV\s+export[\s\S]*printable\s+review\s+return/,
+  'E2E catalog should document the scored attempt result lifecycle chain gate.'
 );
 assignmentSnapshotSourceActivity.description = 'Edited after publish';
 assignmentSnapshotSourceActivity.templateType = 'match-up';

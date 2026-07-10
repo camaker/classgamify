@@ -277,6 +277,9 @@ Student progress counts, browser submission payloads, and incomplete-submit
 decisions should be derived from shared assignment-domain helpers, not
 per-template route math, so every runner counts answered items, submits frozen
 runtime item ids, and prompts for partial attempts consistently.
+The post-submit result boundary should also stay shared from scored-attempt
+persistence through public feedback, assignment stats, teacher result analysis,
+copy artifacts, CSV export, and printable review return links.
 Student runner submission surfaces should expose those prepared progress,
 payload, submit-readiness, identity, result, review-summary, feedback-scope,
 and post-submit next-step views as stable semantic label/value/description
