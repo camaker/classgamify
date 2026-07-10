@@ -19,11 +19,11 @@ export const CLASSROOM_PRODUCT_LOOP_CHAIN_HANDOFF_ITEM_IDS = [
   'submission-validation',
   'attempt-persistence',
   'answer-feedback-policy',
-  'attempt-stats',
+  'result-submitted-date-continuity',
   'teacher-result-review',
-  'classroom-brief-copy',
+  'result-accepted-answer-continuity',
   'csv-export',
-  'printable-review',
+  'result-explanation-continuity',
   'dashboard-loop-status',
   'teacher-workspace-routes',
   'public-entry-routes',
@@ -46,10 +46,10 @@ export const CLASSROOM_PRODUCT_LOOP_CHAIN_SOURCE_FILES = [
   'src/activities/source-material-privacy-chain.ts',
   'src/assignments/publish-input.ts',
   'src/assignments/published-assignment-delivery-chain.ts',
-  'src/assignments/snapshot.ts',
-  'src/assignments/public.ts',
+  'src/assignments/result-submitted-date-chain.ts',
+  'src/assignments/result-accepted-answer-chain.ts',
   'src/assignments/student-runner-play-chain.ts',
-  'src/assignments/student-runner-state.ts',
+  'src/assignments/result-explanation-chain.ts',
   'src/assignments/student-identity-lifecycle-chain.ts',
   'src/assignments/runtime-identity-handoff.ts',
   'src/assignments/submission-validation-handoff.ts',
@@ -116,7 +116,7 @@ export function buildClassroomProductLoopChainHandoffView(): ClassroomProductLoo
 
   return {
     description:
-      'Thirty-slice classroom product loop chain from teacher-owned activities and reusable content through assignment publish, frozen snapshots, public student play, validated attempts, scored results, teacher review, copy/export/print handoffs, dashboard status, public entry points, and privacy guards.',
+      'Thirty-slice classroom product loop chain from teacher-owned activities and reusable content through assignment publish, frozen snapshots, public student play, validated attempts, scored results, submitted-date, accepted-answer, and explanation continuity, teacher review, copy/export/print handoffs, dashboard status, public entry points, and privacy guards.',
     itemViews,
     privacy: {
       chainSourceFileCount: CLASSROOM_PRODUCT_LOOP_CHAIN_SOURCE_FILES.length,
@@ -303,12 +303,12 @@ function getClassroomProductLoopChainHandoffItem(
         'Reveal if allowed',
         'Student feedback exposes accepted answers and explanations only after scoring and only when policy allows review.'
       );
-    case 'attempt-stats':
+    case 'result-submitted-date-continuity':
       return item(
         id,
-        'Attempt stats',
-        'Shared metrics',
-        'Assignment lists, result pages, and classroom briefs consume the same completion, accuracy, points, and duration stats.'
+        'Result submitted date continuity',
+        'Submitted dates',
+        'Teacher result tables, review cards, follow-up copy, sorting, and CSV columns share submitted-date formatting.'
       );
     case 'teacher-result-review':
       return item(
@@ -317,12 +317,12 @@ function getClassroomProductLoopChainHandoffItem(
         'Reteach evidence',
         'Teacher result pages combine frozen runtime items with stored attempts for item performance and student follow-up.'
       );
-    case 'classroom-brief-copy':
+    case 'result-accepted-answer-continuity':
       return item(
         id,
-        'Classroom brief copy',
-        'Teacher-only artifacts',
-        'Reteach plans, item review summaries, and student follow-up copy remain teacher-only result artifacts.'
+        'Result accepted-answer continuity',
+        'Accepted alternatives',
+        'Scoring, feedback, teacher review, CSV exports, and printable answer keys share primary and alternative answer formatting.'
       );
     case 'csv-export':
       return item(
@@ -331,12 +331,12 @@ function getClassroomProductLoopChainHandoffItem(
         'Private offline records',
         'CSV exports preserve delivery policy and scored result context while guarding formula-like text.'
       );
-    case 'printable-review':
+    case 'result-explanation-continuity':
       return item(
         id,
-        'Printable review',
-        'Frozen handout',
-        'Printable worksheets derive from frozen assignment snapshots and keep answer keys teacher-controlled.'
+        'Result explanation continuity',
+        'Answer explanations',
+        'Explanations stay hidden before review, then flow through feedback, result cards, copy artifacts, CSV exports, and printable answer keys.'
       );
     case 'dashboard-loop-status':
       return item(
@@ -371,7 +371,7 @@ function getClassroomProductLoopChainHandoffItem(
         id,
         'Product loop chain gate',
         '30 source files',
-        'A focused gate keeps activity, assignment, attempt, results, workspace, public entry, and privacy boundaries connected.'
+        'A focused gate keeps activity, assignment, attempt, result continuity, workspace, public entry, and privacy boundaries connected.'
       );
   }
 }

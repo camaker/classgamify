@@ -13,9 +13,10 @@ Activity -> Assignment -> Attempt -> Results
 
 `src/config/classroom-product-loop-chain.ts` owns the cross-surface
 product-loop handoff that keeps teacher-owned activities, reusable content,
-assignment links, public student play, validated attempts, teacher result
-review, copy/export/print handoffs, dashboard status, public entry routes, and
-privacy guards aligned with this sequence.
+assignment links, public student play, validated attempts, submitted-date,
+accepted-answer, and explanation continuity, teacher result review,
+copy/export/print handoffs, dashboard status, public entry routes, and privacy
+guards aligned with this sequence.
 
 Copied-template surfaces should be retired in narrow, verified waves. Public
 navigation and homepage entry points should point at ClassGamify templates,

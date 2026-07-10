@@ -16638,14 +16638,17 @@ assert.deepEqual(
     STUDENT_RUNNER_PLAY_CHAIN_HANDOFF_ITEM_IDS.length,
     STUDENT_IDENTITY_LIFECYCLE_CHAIN_HANDOFF_ITEM_IDS.length,
     SCORED_ATTEMPT_RESULT_CHAIN_HANDOFF_ITEM_IDS.length,
+    ASSIGNMENT_RESULT_SUBMITTED_DATE_CHAIN_HANDOFF_ITEM_IDS.length,
+    ASSIGNMENT_RESULT_ACCEPTED_ANSWER_CHAIN_HANDOFF_ITEM_IDS.length,
+    ASSIGNMENT_RESULT_EXPLANATION_CHAIN_HANDOFF_ITEM_IDS.length,
     TEACHER_RESULTS_REVIEW_CHAIN_HANDOFF_ITEM_IDS.length,
     TEACHER_RESULT_COPY_LIFECYCLE_CHAIN_HANDOFF_ITEM_IDS.length,
     ASSIGNMENT_RESULTS_EXPORT_PREPARATION_ITEM_IDS.length,
     PRINTABLE_WORKSHEET_REVIEW_LIFECYCLE_CHAIN_HANDOFF_ITEM_IDS.length,
     CLASSROOM_TRUST_COMMUNICATION_CHAIN_HANDOFF_ITEM_IDS.length,
   ],
-  Array.from({ length: 18 }, () => 30),
-  'Classroom product loop chain should stay backed by adjacent public entry, workspace, data, authoring, delivery, runner, result, export, print, and trust gates.'
+  Array.from({ length: 21 }, () => 30),
+  'Classroom product loop chain should stay backed by adjacent public entry, workspace, data, authoring, delivery, runner, result continuity, export, print, and trust gates.'
 );
 assert.deepEqual(Object.fromEntries(classroomProductLoopChainValues), {
   'activity-authoring-entry': 'Create editor',
@@ -16658,11 +16661,8 @@ assert.deepEqual(Object.fromEntries(classroomProductLoopChainValues), {
   'assignment-publish-preflight': 'Delivery settings review',
   'assignment-snapshot-freeze': 'Frozen ActivityContent',
   'attempt-persistence': 'Scored attempt row',
-  'attempt-stats': 'Shared metrics',
-  'classroom-brief-copy': 'Teacher-only artifacts',
   'csv-export': 'Private offline records',
   'dashboard-loop-status': 'Create/publish/play/review',
-  'printable-review': 'Frozen handout',
   'privacy-guards': 'Private data hidden',
   'product-loop-chain-gate': '30 source files',
   'product-loop-contract': 'Activity -> Assignment -> Attempt -> Results',
@@ -16670,6 +16670,9 @@ assert.deepEqual(Object.fromEntries(classroomProductLoopChainValues), {
   'public-entry-routes': 'Home/templates/worksheets',
   'public-rules-summary': 'Student-visible rules',
   'public-runner-access': 'Open links only',
+  'result-accepted-answer-continuity': 'Accepted alternatives',
+  'result-explanation-continuity': 'Answer explanations',
+  'result-submitted-date-continuity': 'Submitted dates',
   'runtime-item-contract': '{ itemId, answer }',
   'share-link-distribution': 'Copy/preview/print/review',
   'source-material-reference-boundary': 'Compact references',
@@ -16686,7 +16689,7 @@ assert.match(
 );
 assert.match(
   readFileSync('tests/e2e/TEST-CATALOG.md', 'utf8').replace(/\s+/g, ' '),
-  /Activity -> Assignment -> Attempt -> Results[\s\S]*activity authoring[\s\S]*assignment publish[\s\S]*student runner[\s\S]*scored attempts[\s\S]*teacher result review[\s\S]*copy\/export\/print handoffs[\s\S]*privacy guards/,
+  /Activity -> Assignment -> Attempt -> Results[\s\S]*activity authoring[\s\S]*assignment publish[\s\S]*student runner[\s\S]*scored attempts[\s\S]*submitted-date continuity[\s\S]*accepted-answer continuity[\s\S]*explanation continuity[\s\S]*teacher result review[\s\S]*copy\/export\/print handoffs[\s\S]*privacy guards/,
   'TEST-CATALOG should describe the full classroom product loop chain scope.'
 );
 const classroomTrustCommunicationChainView =

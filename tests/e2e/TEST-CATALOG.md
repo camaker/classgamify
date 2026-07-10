@@ -79,6 +79,7 @@ Classroom product loop chain has a fast script-level gate via
 `pnpm exec tsx --test scripts/classroom-product-loop-chain-handoff.test.ts`;
 run it when changing the Activity -> Assignment -> Attempt -> Results contract,
 activity authoring, assignment publish, student runner, scored attempts,
+submitted-date continuity, accepted-answer continuity, explanation continuity,
 teacher result review, copy/export/print handoffs, dashboard/public entry
 alignment, or privacy guards.
 Active surface product boundary has a fast script-level gate via
