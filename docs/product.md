@@ -469,6 +469,11 @@ Implementation boundaries:
   reviewed/missing check counts, manual-save readiness, editor-only boundaries,
   publish blocking, snapshot protection, public-payload guards, and private
   draft/source-material privacy.
+- `src/activities/ai-enhancement-save-boundary.ts` owns the manual save boundary
+  after teacher review: teacher save actions, create/edit save plans,
+  activity-id gates, manual persistence boundaries, activity-record targets,
+  publish blocking, snapshot protection, result continuity, and private
+  draft/source-material privacy.
 - `src/api/activity-ai.ts` exposes the authenticated server function.
 - `src/components/activities/activity-create-form.tsx` only collects draft
   inputs and fills the existing form.

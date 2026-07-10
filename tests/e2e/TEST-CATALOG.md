@@ -589,6 +589,12 @@ Activity AI enhancement editor review has a fast script-level gate via
 run it when changing teacher review checklists, reviewed/missing check counts,
 manual-save readiness, editor-only boundaries, publish blocking, snapshot
 protection, public-payload guards, source-material privacy, or privacy guards.
+Activity AI enhancement save boundary has a fast script-level gate via
+`pnpm exec tsx --test scripts/activity-ai-enhancement-save-boundary.test.ts`;
+run it when changing teacher save actions, create/edit save plans, activity-id
+gates, manual persistence boundaries, activity-record targets, publish
+blocking, snapshot protection, result continuity, source-material privacy, or
+privacy guards.
 Template roadmap capability chain has a fast script-level gate via
 `pnpm exec tsx --test scripts/template-roadmap-capability-chain-handoff.test.ts`;
 run it when changing roadmap template promises, Wordwall-style templates,
