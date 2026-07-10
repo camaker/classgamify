@@ -261,6 +261,12 @@ run it when changing source-activity context columns, delivery-policy columns,
 accepted-answer columns, submitted-date formatting, timer-aware duration
 normalization, formula-injection guards, CSV data URL boundaries, or the export
 coverage handoff.
+Assignment result submitted-date continuity chain has a fast script-level gate
+via
+`pnpm exec tsx --test scripts/assignment-result-submitted-date-chain-handoff.test.ts`;
+run it when changing result date formatting, attempt submitted labels, student
+last-submitted labels, latest-attempt copy context, completed-at sorting, CSV
+submitted-date columns, or submitted-date privacy guards.
 Assignment source-activity context chain has a fast script-level gate via
 `pnpm exec tsx --test scripts/assignment-source-activity-context-chain-handoff.test.ts`;
 run it when changing source-activity snapshot resolution, assignment-list

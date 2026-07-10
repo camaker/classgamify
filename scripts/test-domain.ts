@@ -1103,6 +1103,11 @@ import {
   buildTeacherResultCopyLifecycleChainHandoffView,
 } from '@/assignments/teacher-result-copy-lifecycle-chain';
 import {
+  ASSIGNMENT_RESULT_SUBMITTED_DATE_CHAIN_HANDOFF_ITEM_IDS,
+  ASSIGNMENT_RESULT_SUBMITTED_DATE_CHAIN_SOURCE_FILES,
+  buildAssignmentResultSubmittedDateChainHandoffView,
+} from '@/assignments/result-submitted-date-chain';
+import {
   ASSIGNMENT_RESULT_EMPTY_STATE_HANDOFF_ITEM_IDS,
   buildAssignmentResultEmptyStateHandoffView,
 } from '@/assignments/result-empty-state-handoff';
@@ -1143,6 +1148,7 @@ import {
 } from '@/assignments/result-filters';
 import {
   formatAcceptedAnswerAlternatives,
+  formatAssignmentResultCsvDate,
   formatAssignmentResultCsvNumber,
   formatAssignmentResultDate,
   formatAssignmentResultValue,
@@ -59819,6 +59825,12 @@ assert.deepEqual(
 );
 assert.equal(formatAssignmentResultDate(null), '-');
 assert.equal(formatAssignmentResultDate('not-a-date'), '-');
+assert.equal(formatAssignmentResultCsvDate(null), '');
+assert.equal(formatAssignmentResultCsvDate('not-a-date'), '');
+assert.equal(
+  formatAssignmentResultCsvDate(new Date('2026-01-01T10:00:00.000Z')),
+  '2026-01-01T10:00:00.000Z'
+);
 assert.equal(formatAssignmentResultCsvNumber(null), '');
 assert.equal(formatAssignmentResultCsvNumber(Number.NaN), '');
 assert.equal(formatAssignmentResultCsvNumber(-3, { min: 0 }), 0);
@@ -59830,6 +59842,47 @@ assert.match(
     timeZone: 'UTC',
   }),
   /Jan 1, 2026, 10:00 AM/
+);
+assert.equal(
+  ASSIGNMENT_RESULT_SUBMITTED_DATE_CHAIN_HANDOFF_ITEM_IDS.length,
+  30
+);
+assert.equal(
+  ASSIGNMENT_RESULT_SUBMITTED_DATE_CHAIN_SOURCE_FILES.length,
+  30
+);
+for (const filePath of ASSIGNMENT_RESULT_SUBMITTED_DATE_CHAIN_SOURCE_FILES) {
+  assert.ok(existsSync(filePath), `Missing submitted-date chain ${filePath}`);
+}
+const submittedDateChainView =
+  buildAssignmentResultSubmittedDateChainHandoffView();
+assert.deepEqual(
+  submittedDateChainView.itemViews.map((itemView) => itemView.id),
+  [...ASSIGNMENT_RESULT_SUBMITTED_DATE_CHAIN_HANDOFF_ITEM_IDS]
+);
+assert.deepEqual(submittedDateChainView.privacy, {
+  chainSourceFileCount:
+    ASSIGNMENT_RESULT_SUBMITTED_DATE_CHAIN_SOURCE_FILES.length,
+  copyArtifactsUseFormattedDates: true,
+  csvDatesUseIsoFormatter: true,
+  exportIncludesSubmittedDateColumns: true,
+  exposesCsvDataUrlInHandoff: false,
+  exposesRawAnonymousTokensInHandoff: false,
+  exposesRawCompletedAtValuesInHandoff: false,
+  exposesStudentAnswerTextInHandoff: false,
+  exposesStudentLabelsInHandoff: false,
+  exposesStudentNamesInHandoff: false,
+  itemIds: [...ASSIGNMENT_RESULT_SUBMITTED_DATE_CHAIN_HANDOFF_ITEM_IDS],
+  preservesTeacherOnlyResultScope: true,
+  sortingUsesTimestampParsing: true,
+  sourceFiles: [...ASSIGNMENT_RESULT_SUBMITTED_DATE_CHAIN_SOURCE_FILES],
+  uiDatesUseLocalizedFormatter: true,
+});
+assert.equal(
+  submittedDateChainView.itemViews.find(
+    (itemView) => itemView.id === 'csv-date-iso-output'
+  )?.value,
+  'ISO string'
 );
 assert.equal(formatAcceptedAnswerAlternatives([]), '-');
 assert.equal(formatAcceptedAnswerAlternatives(['Paris']), '-');
