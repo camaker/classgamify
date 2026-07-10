@@ -320,8 +320,9 @@ dashboard-overview handoff.
 Teacher workspace operations chain has a fast script-level gate via
 `pnpm exec tsx --test scripts/teacher-workspace-operations-chain-handoff.test.ts`;
 run it when changing dashboard owner summaries, activity library
-filters/summaries/actions, assignment list filters/distribution, or teacher
-settings account/security/files/billing/notification boundaries.
+filters/summaries/actions, assignment list filters/distribution, account
+governance, teacher settings security/files/billing/payment callback/notification
+boundaries, or the active surface product boundary.
 Settings account workspace handoff has a fast script-level gate via
 `pnpm exec tsx --test scripts/settings-account-workspace-handoff-semantic-views.test.ts`;
 run it when changing teacher identity scope, account access, profile display

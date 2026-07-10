@@ -17001,13 +17001,19 @@ assert.deepEqual(teacherWorkspaceOperationsChainView.privacy, {
   keepsSettingsFromMutatingClassroomData: true,
   keepsVisiblePageCountsSeparate: true,
   sourceFiles: [...TEACHER_WORKSPACE_OPERATIONS_CHAIN_SOURCE_FILES],
+  usesAccountGovernanceLifecycleChain: true,
+  usesActiveSurfaceProductBoundary: true,
   usesFullFilteredSummariesForOverview: true,
+  usesPaymentCallbackHandoff: true,
 });
 assert.deepEqual(
   [
     DASHBOARD_OVERVIEW_HANDOFF_ITEM_IDS.length,
     ACTIVITY_LIBRARY_PAGE_HANDOFF_ITEM_IDS.length,
     ASSIGNMENT_LIST_PAGE_HANDOFF_ITEM_IDS.length,
+    ACCOUNT_GOVERNANCE_LIFECYCLE_CHAIN_HANDOFF_ITEM_IDS.length,
+    ACTIVE_SURFACE_PRODUCT_BOUNDARY_ITEM_IDS.length,
+    PAYMENT_STATUS_HANDOFF_ITEM_IDS.length,
     SETTINGS_ACCOUNT_WORKSPACE_HANDOFF_ITEM_IDS.length,
     SETTINGS_SECURITY_WORKSPACE_HANDOFF_ITEM_IDS.length,
     SETTINGS_FILES_SOURCE_MATERIAL_HANDOFF_ITEM_IDS.length,
@@ -17015,10 +17021,11 @@ assert.deepEqual(
     SETTINGS_BILLING_WORKSPACE_HANDOFF_ITEM_IDS.length,
     SETTINGS_NOTIFICATION_UPDATE_HANDOFF_ITEM_IDS.length,
   ],
-  Array.from({ length: 9 }, () => 30),
-  'Teacher workspace operations chain should stay backed by focused dashboard, list, and settings gates.'
+  Array.from({ length: 12 }, () => 30),
+  'Teacher workspace operations chain should stay backed by focused dashboard, list, account governance, active surface, payment callback, and settings gates.'
 );
 assert.deepEqual(Object.fromEntries(teacherWorkspaceOperationsChainValues), {
+  'account-governance-lifecycle-chain': '30 governance slices',
   'activity-library-actions': 'Edit/publish/duplicate/remix/archive',
   'activity-library-owner-scope': 'Owner activities only',
   'activity-library-route': Routes.DashboardActivities,
@@ -17040,9 +17047,8 @@ assert.deepEqual(Object.fromEntries(teacherWorkspaceOperationsChainValues), {
   'dashboard-readiness': 'Activity/link/runner/results',
   'dashboard-starter-preview-boundary': 'Preview only',
   'dashboard-top-metrics': 'Activities/templates/assignments/results',
-  'legacy-copy-guard': 'ClassGamify only',
-  'settings-account-boundary': Routes.SettingsProfile,
-  'settings-billing-boundary': Routes.SettingsBilling,
+  'active-surface-product-boundary': '30 active-surface slices',
+  'settings-billing-payment-boundary': 'Billing + callback',
   'settings-files-boundary': Routes.SettingsFiles,
   'settings-files-classification': 'Safe material labels',
   'settings-notification-boundary': Routes.SettingsNotifications,
@@ -17054,6 +17060,11 @@ assert.match(
   readFileSync('tests/e2e/TEST-CATALOG.md', 'utf8'),
   /Teacher workspace operations chain has a fast script-level gate via[\s\S]*scripts\/teacher-workspace-operations-chain-handoff\.test\.ts/,
   'TEST-CATALOG should document the teacher workspace operations chain gate.'
+);
+assert.match(
+  readFileSync('tests/e2e/TEST-CATALOG.md', 'utf8').replace(/\s+/g, ' '),
+  /dashboard owner summaries[\s\S]*activity library filters\/summaries\/actions[\s\S]*assignment list filters\/distribution[\s\S]*account governance[\s\S]*teacher settings security\/files\/billing\/payment callback\/notification boundaries[\s\S]*active surface product boundary/,
+  'TEST-CATALOG should describe the full teacher workspace operations chain scope.'
 );
 const publicDomHandoffBoundaryView = buildPublicDomHandoffBoundaryView();
 const publicDomProtectedSourceFileCount =

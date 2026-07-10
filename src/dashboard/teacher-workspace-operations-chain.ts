@@ -22,14 +22,14 @@ export const TEACHER_WORKSPACE_OPERATIONS_CHAIN_HANDOFF_ITEM_IDS = [
   'assignment-list-visible-page',
   'assignment-list-distribution',
   'assignment-list-published-context',
-  'settings-account-boundary',
+  'account-governance-lifecycle-chain',
   'settings-security-boundary',
   'settings-files-boundary',
   'settings-files-classification',
-  'settings-billing-boundary',
+  'settings-billing-payment-boundary',
   'settings-notification-boundary',
   'workspace-private-data-guard',
-  'legacy-copy-guard',
+  'active-surface-product-boundary',
   'teacher-workspace-chain-gate',
 ] as const;
 
@@ -54,14 +54,14 @@ export const TEACHER_WORKSPACE_OPERATIONS_CHAIN_SOURCE_FILES = [
   'src/routes/dashboard/assignments.tsx',
   'src/components/assignments/assignment-list-filters.tsx',
   'src/components/assignments/assignment-list-card.tsx',
-  'src/settings/account-handoff.ts',
+  'src/auth/account-governance-lifecycle-chain.ts',
   'src/settings/security-handoff.ts',
   'src/settings/files-view.ts',
   'src/settings/files-material-classification-view.ts',
   'src/settings/billing-view.ts',
   'src/settings/notifications-view.ts',
-  'src/routes/settings/profile.tsx',
-  'src/routes/settings/security.tsx',
+  'src/payment/payment-status-view.ts',
+  'src/config/active-surface-product-boundary.ts',
   'src/routes/settings/files.tsx',
   'tests/e2e/TEST-CATALOG.md',
 ] as const;
@@ -98,7 +98,10 @@ export type TeacherWorkspaceOperationsChainPrivacyContract = {
   keepsSettingsFromMutatingClassroomData: true;
   keepsVisiblePageCountsSeparate: true;
   sourceFiles: string[];
+  usesAccountGovernanceLifecycleChain: true;
+  usesActiveSurfaceProductBoundary: true;
   usesFullFilteredSummariesForOverview: true;
+  usesPaymentCallbackHandoff: true;
 };
 
 export type TeacherWorkspaceOperationsChainHandoffView = {
@@ -115,7 +118,7 @@ export function buildTeacherWorkspaceOperationsChainHandoffView(): TeacherWorksp
 
   return {
     description:
-      'Thirty-slice authenticated teacher workspace operations chain from owner-scoped dashboard metrics through activity library filters, assignment list distribution, and settings account/security/files/billing/notification boundaries.',
+      'Thirty-slice authenticated teacher workspace operations chain from owner-scoped dashboard metrics through activity library filters, assignment list distribution, account governance, billing/payment callback, files, notification, and active-surface boundaries.',
     itemViews,
     privacy: {
       chainSourceFileCount:
@@ -139,7 +142,10 @@ export function buildTeacherWorkspaceOperationsChainHandoffView(): TeacherWorksp
       keepsSettingsFromMutatingClassroomData: true,
       keepsVisiblePageCountsSeparate: true,
       sourceFiles: [...TEACHER_WORKSPACE_OPERATIONS_CHAIN_SOURCE_FILES],
+      usesAccountGovernanceLifecycleChain: true,
+      usesActiveSurfaceProductBoundary: true,
       usesFullFilteredSummariesForOverview: true,
+      usesPaymentCallbackHandoff: true,
     },
     title: 'Teacher workspace operations chain',
   };
@@ -307,12 +313,12 @@ function getTeacherWorkspaceOperationsChainHandoffItem(
         'Post-publish handoff',
         'Recently published assignments surface copy, preview, and results follow-up.'
       );
-    case 'settings-account-boundary':
+    case 'account-governance-lifecycle-chain':
       return item(
         id,
-        'Settings account boundary',
-        Routes.SettingsProfile,
-        'Profile and account controls stay scoped to teacher identity and access.'
+        'Account governance lifecycle chain',
+        '30 governance slices',
+        'Account governance keeps auth, profile/security, deletion, admin users, billing/payment callback, files, and privacy guards aligned with teacher workspace operations.'
       );
     case 'settings-security-boundary':
       return item(
@@ -335,12 +341,12 @@ function getTeacherWorkspaceOperationsChainHandoffItem(
         'Safe material labels',
         'Material classification uses safe labels without exposing filenames or bytes.'
       );
-    case 'settings-billing-boundary':
+    case 'settings-billing-payment-boundary':
       return item(
         id,
-        'Settings billing boundary',
-        Routes.SettingsBilling,
-        'Billing exposes hosted plan controls without classroom data mutation.'
+        'Settings billing/payment boundary',
+        'Billing + callback',
+        'Billing and payment callback handoffs expose hosted plan status without classroom data mutation or provider-session leaks.'
       );
     case 'settings-notification-boundary':
       return item(
@@ -356,12 +362,12 @@ function getTeacherWorkspaceOperationsChainHandoffItem(
         'Private data hidden',
         'The workspace chain omits activity content, runtime payloads, answers, tokens, storage keys, secrets, and teacher email.'
       );
-    case 'legacy-copy-guard':
+    case 'active-surface-product-boundary':
       return item(
         id,
-        'Legacy copy guard',
-        'ClassGamify only',
-        'Authenticated workspace surfaces describe ClassGamify classroom loops.'
+        'Active surface product boundary',
+        '30 active-surface slices',
+        'Authenticated workspace operations inherit the active-surface guard against legacy learning-site, starter, or unused provider copy.'
       );
     case 'teacher-workspace-chain-gate':
       return item(

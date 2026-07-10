@@ -3,6 +3,8 @@ import { existsSync, readFileSync } from 'node:fs';
 import test from 'node:test';
 import { ACTIVITY_LIBRARY_PAGE_HANDOFF_ITEM_IDS } from '@/activities/library-view';
 import { ASSIGNMENT_LIST_PAGE_HANDOFF_ITEM_IDS } from '@/assignments/list-view';
+import { ACCOUNT_GOVERNANCE_LIFECYCLE_CHAIN_HANDOFF_ITEM_IDS } from '@/auth/account-governance-lifecycle-chain';
+import { ACTIVE_SURFACE_PRODUCT_BOUNDARY_ITEM_IDS } from '@/config/active-surface-product-boundary';
 import {
   DASHBOARD_OVERVIEW_HANDOFF_ITEM_IDS,
   buildDashboardOverviewPageViewModel,
@@ -16,6 +18,7 @@ import {
 } from '@/dashboard/teacher-workspace-operations-chain';
 import { overwriteGetLocale } from '@/locale/paraglide/runtime';
 import { Routes } from '@/lib/routes';
+import { PAYMENT_STATUS_HANDOFF_ITEM_IDS } from '@/payment/payment-status-view';
 import { SETTINGS_ACCOUNT_WORKSPACE_HANDOFF_ITEM_IDS } from '@/settings/account-handoff';
 import { SETTINGS_BILLING_WORKSPACE_HANDOFF_ITEM_IDS } from '@/settings/billing-view';
 import { SETTINGS_FILES_MATERIAL_CLASSIFICATION_HANDOFF_ITEM_IDS } from '@/settings/files-material-classification-view';
@@ -46,8 +49,8 @@ const ASSIGNMENT_LIST_QUERY_SOURCE = readFileSync(
   'src/assignments/list-query.ts',
   'utf8'
 );
-const SETTINGS_ACCOUNT_SOURCE = readFileSync(
-  'src/settings/account-handoff.ts',
+const ACCOUNT_GOVERNANCE_SOURCE = readFileSync(
+  'src/auth/account-governance-lifecycle-chain.ts',
   'utf8'
 );
 const SETTINGS_SECURITY_SOURCE = readFileSync(
@@ -66,8 +69,16 @@ const SETTINGS_BILLING_SOURCE = readFileSync(
   'src/settings/billing-view.ts',
   'utf8'
 );
+const PAYMENT_STATUS_SOURCE = readFileSync(
+  'src/payment/payment-status-view.ts',
+  'utf8'
+);
 const SETTINGS_NOTIFICATION_SOURCE = readFileSync(
   'src/settings/notifications-view.ts',
+  'utf8'
+);
+const ACTIVE_SURFACE_SOURCE = readFileSync(
+  'src/config/active-surface-product-boundary.ts',
   'utf8'
 );
 const TEST_CATALOG_SOURCE = readFileSync('tests/e2e/TEST-CATALOG.md', 'utf8');
@@ -133,7 +144,10 @@ test('teacher workspace operations chain exposes 30 safe authenticated slices', 
     keepsSettingsFromMutatingClassroomData: true,
     keepsVisiblePageCountsSeparate: true,
     sourceFiles: [...TEACHER_WORKSPACE_OPERATIONS_CHAIN_SOURCE_FILES],
+    usesAccountGovernanceLifecycleChain: true,
+    usesActiveSurfaceProductBoundary: true,
     usesFullFilteredSummariesForOverview: true,
+    usesPaymentCallbackHandoff: true,
   });
   assertNoPrivateTeacherWorkspaceText(JSON.stringify(handoffView));
 });
@@ -165,14 +179,14 @@ test('teacher workspace operations chain summarizes dashboard through settings f
       ['assignment-list-visible-page', 'Visible page separate'],
       ['assignment-list-distribution', 'Copy/preview/print/review'],
       ['assignment-list-published-context', 'Post-publish handoff'],
-      ['settings-account-boundary', Routes.SettingsProfile],
+      ['account-governance-lifecycle-chain', '30 governance slices'],
       ['settings-security-boundary', Routes.SettingsSecurity],
       ['settings-files-boundary', Routes.SettingsFiles],
       ['settings-files-classification', 'Safe material labels'],
-      ['settings-billing-boundary', Routes.SettingsBilling],
+      ['settings-billing-payment-boundary', 'Billing + callback'],
       ['settings-notification-boundary', Routes.SettingsNotifications],
       ['workspace-private-data-guard', 'Private data hidden'],
-      ['legacy-copy-guard', 'ClassGamify only'],
+      ['active-surface-product-boundary', '30 active-surface slices'],
       ['teacher-workspace-chain-gate', '30 source files'],
     ]
   );
@@ -204,6 +218,9 @@ test('teacher workspace operations chain is backed by focused workspace gates', 
       DASHBOARD_OVERVIEW_HANDOFF_ITEM_IDS.length,
       ACTIVITY_LIBRARY_PAGE_HANDOFF_ITEM_IDS.length,
       ASSIGNMENT_LIST_PAGE_HANDOFF_ITEM_IDS.length,
+      ACCOUNT_GOVERNANCE_LIFECYCLE_CHAIN_HANDOFF_ITEM_IDS.length,
+      ACTIVE_SURFACE_PRODUCT_BOUNDARY_ITEM_IDS.length,
+      PAYMENT_STATUS_HANDOFF_ITEM_IDS.length,
       SETTINGS_ACCOUNT_WORKSPACE_HANDOFF_ITEM_IDS.length,
       SETTINGS_SECURITY_WORKSPACE_HANDOFF_ITEM_IDS.length,
       SETTINGS_FILES_SOURCE_MATERIAL_HANDOFF_ITEM_IDS.length,
@@ -211,7 +228,7 @@ test('teacher workspace operations chain is backed by focused workspace gates', 
       SETTINGS_BILLING_WORKSPACE_HANDOFF_ITEM_IDS.length,
       SETTINGS_NOTIFICATION_UPDATE_HANDOFF_ITEM_IDS.length,
     ],
-    Array.from({ length: 9 }, () => 30)
+    Array.from({ length: 12 }, () => 30)
   );
 });
 
@@ -250,6 +267,11 @@ test('teacher workspace operations chain preserves docs product boundaries', () 
     PRODUCT_SOURCE,
     /active account\/contact copy[\s\S]*current forms, billing pages, and[\s\S]*configuration examples should speak in ClassGamify terms/i,
     'docs/product.md should keep settings and billing copy on ClassGamify terms.'
+  );
+  assert.match(
+    PRODUCT_SOURCE,
+    /active surface product boundary should absorb both the account governance[\s\S]*payment callback handoff contracts[\s\S]*current account, contact,[\s\S]*billing, mail, notification, and developer configuration surfaces/i,
+    'docs/product.md should keep active surfaces aligned with account governance and payment callbacks.'
   );
 });
 
@@ -320,9 +342,9 @@ test('teacher workspace operations sources preserve owner scope and preview boun
 
 test('teacher workspace settings boundaries do not mutate classroom data', () => {
   assert.match(
-    SETTINGS_ACCOUNT_SOURCE,
-    /changesActivityContent: false[\s\S]*changesPublicAssignmentLinks: false[\s\S]*exposesAuthSecrets: false[\s\S]*modifiesAssignmentSnapshots: false[\s\S]*modifiesStudentAttempts: false/,
-    'Account settings handoff should not mutate classroom content, links, snapshots, or attempts.'
+    ACCOUNT_GOVERNANCE_SOURCE,
+    /ACCOUNT_GOVERNANCE_LIFECYCLE_CHAIN_HANDOFF_ITEM_IDS[\s\S]*'billing-payment-callback-boundary'[\s\S]*usesPaymentCallbackHandoff: true[\s\S]*keepsAccountSettingsFromMutatingClassroomData: true/,
+    'Account governance lifecycle chain should cover account settings and payment callback boundaries without classroom data mutation.'
   );
   assert.match(
     SETTINGS_SECURITY_SOURCE,
@@ -345,9 +367,19 @@ test('teacher workspace settings boundaries do not mutate classroom data', () =>
     'Billing settings should expose hosted billing controls without classroom data mutation.'
   );
   assert.match(
+    PAYMENT_STATUS_SOURCE,
+    /PAYMENT_STATUS_HANDOFF_ITEM_IDS[\s\S]*'hosted-checkout'[\s\S]*'completion-check'[\s\S]*'current-plan-cache'[\s\S]*'callback-normalization'[\s\S]*'raw-session-boundary'[\s\S]*hostedCheckoutStatusOnly: true/,
+    'Payment callback handoff should keep hosted checkout callbacks inside teacher workspace operations.'
+  );
+  assert.match(
     SETTINGS_NOTIFICATION_SOURCE,
     /changesActivityContent: false[\s\S]*changesActivityLibrary: false[\s\S]*changesAssignmentSnapshots: false[\s\S]*changesAttemptRecords: false[\s\S]*changesPublicAssignmentLinks: false[\s\S]*notifiesLearners: false[\s\S]*sendsStudentAssignmentReminders: false/,
     'Notification settings should remain teacher product-email preferences, not learner notifications.'
+  );
+  assert.match(
+    ACTIVE_SURFACE_SOURCE,
+    /ACTIVE_SURFACE_PRODUCT_BOUNDARY_ITEM_IDS[\s\S]*'account-governance-lifecycle-chain'[\s\S]*'payment-callback-handoff'[\s\S]*usesAccountGovernanceLifecycleChain: true[\s\S]*usesPaymentCallbackHandoff: true/,
+    'Active surface boundary should preserve account governance and payment callback product-copy guards.'
   );
 });
 
@@ -359,7 +391,7 @@ test('teacher workspace operations chain focused gate is documented', () => {
   );
   assert.match(
     TEST_CATALOG_SOURCE.replace(/\s+/g, ' '),
-    /dashboard owner summaries[\s\S]*activity library filters\/summaries\/actions[\s\S]*assignment list filters\/distribution[\s\S]*teacher settings account\/security\/files\/billing\/notification boundaries/,
+    /dashboard owner summaries[\s\S]*activity library filters\/summaries\/actions[\s\S]*assignment list filters\/distribution[\s\S]*account governance[\s\S]*teacher settings security\/files\/billing\/payment callback\/notification boundaries[\s\S]*active surface product boundary/,
     'TEST-CATALOG should describe the full teacher workspace operations chain scope.'
   );
 });
