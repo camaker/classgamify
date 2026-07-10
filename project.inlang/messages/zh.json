@@ -3267,6 +3267,8 @@
   "assignment_printable_answer_key_title": "答案键",
   "assignment_printable_answer_line_summary_many": "{count} 条作答线",
   "assignment_printable_answer_line_summary_one": "{count} 条作答线",
+  "assignment_printable_activity_description_fallback": "暂无活动说明",
+  "assignment_printable_activity_description_label": "活动说明",
   "assignment_printable_answer_separator": "，",
   "assignment_printable_back_to_results": "返回结果",
   "assignment_printable_brand_label": "ClassGamify 练习纸",

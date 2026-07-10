@@ -32584,6 +32584,12 @@ assert.deepEqual(
           'Frozen from Frozen activity title for /play/printable-1',
       },
       {
+        id: 'activity-description',
+        kind: 'text',
+        label: 'Activity description',
+        value: 'Frozen activity description',
+      },
+      {
         id: 'instructions',
         kind: 'text',
         label: 'Instructions',
@@ -32762,7 +32768,7 @@ assert.equal(
 );
 assert.equal(
   printableWorksheetHandoffValues.get('assignment-field-count'),
-  '8 fields'
+  '9 fields'
 );
 assert.equal(
   printableWorksheetHandoffValues.get('student-name-field'),
@@ -42245,8 +42251,8 @@ assert.match(
 );
 assert.match(
   printableWorksheetViewSource,
-  /get snapshotSourceLabel\(\)[\s\S]*assignment_printable_snapshot_source_label[\s\S]*buildPrintableWorksheetAssignmentFieldViews[\s\S]*buildPrintableWorksheetSnapshotSourceFieldView\(headerView\)[\s\S]*export function buildPrintableWorksheetSnapshotSourceFieldView[\s\S]*snapshotSourceLabel[\s\S]*assignment_printable_snapshot_source_value/,
-  'Printable worksheet assignment fields should expose a localized frozen-snapshot source row from the domain view model.'
+  /get activityDescriptionLabel\(\)[\s\S]*assignment_printable_activity_description_label[\s\S]*get snapshotSourceLabel\(\)[\s\S]*assignment_printable_snapshot_source_label[\s\S]*buildPrintableWorksheetAssignmentFieldViews[\s\S]*buildPrintableWorksheetSnapshotSourceFieldView\(headerView\)[\s\S]*buildPrintableWorksheetActivityDescriptionFieldView\(headerView\)[\s\S]*export function buildPrintableWorksheetActivityDescriptionFieldView[\s\S]*activityDescriptionLabel[\s\S]*activityDescriptionFallback[\s\S]*export function buildPrintableWorksheetSnapshotSourceFieldView[\s\S]*snapshotSourceLabel[\s\S]*assignment_printable_snapshot_source_value/,
+  'Printable worksheet assignment fields should expose localized frozen-snapshot source and source activity description rows from the domain view model.'
 );
 assert.match(
   printableWorksheetViewSource,
@@ -42908,7 +42914,7 @@ assert.deepEqual(
     'answer-key-search-builder': 'answerKey=true only',
     'answer-key-search-parser': 'answerKey parser',
     'answer-key-unavailable-state': 'No answer key available',
-    'assignment-field-handoff': '8 print fields',
+    'assignment-field-handoff': '9 print fields',
     'choice-bank-policy': 'Choice bank from runtime',
     'delivery-policy-printing': 'Shared delivery policy',
     'header-overview-chips': '3 overview chips',

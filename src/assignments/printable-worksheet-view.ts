@@ -215,6 +215,7 @@ export type PrintableWorksheetTextFieldView = {
   ariaLabel: string;
   description: string;
   id:
+    | 'activity-description'
     | 'delivery-policy'
     | 'instructions'
     | 'share-path'
@@ -300,6 +301,12 @@ export type PrintableWorksheetRouteState =
 export const PRINTABLE_WORKSHEET_BODY_PRINT_MODE = 'worksheet';
 
 const printableWorksheetPageCopy = {
+  get activityDescriptionFallback() {
+    return m.assignment_printable_activity_description_fallback();
+  },
+  get activityDescriptionLabel() {
+    return m.assignment_printable_activity_description_label();
+  },
   get answerKeyDescription() {
     return m.assignment_printable_answer_key_description();
   },
@@ -1207,6 +1214,7 @@ function buildPrintableWorksheetAssignmentFieldViews(
       value: headerView.templateLabel,
     }),
     buildPrintableWorksheetSnapshotSourceFieldView(headerView),
+    buildPrintableWorksheetActivityDescriptionFieldView(headerView),
     buildPrintableWorksheetTextFieldView({
       id: 'instructions',
       kind: 'text',
@@ -1264,6 +1272,19 @@ function buildPrintableWorksheetTextFieldView({
     label,
     value,
   };
+}
+
+export function buildPrintableWorksheetActivityDescriptionFieldView(
+  headerView: PrintableWorksheetHeaderView
+): PrintableWorksheetAssignmentFieldView {
+  return buildPrintableWorksheetTextFieldView({
+    id: 'activity-description',
+    kind: 'text',
+    label: printableWorksheetPageCopy.activityDescriptionLabel,
+    value:
+      normalizeOptionalRuntimeDisplayText(headerView.activityDescription) ??
+      printableWorksheetPageCopy.activityDescriptionFallback,
+  });
 }
 
 export function buildPrintableWorksheetSnapshotSourceFieldView(

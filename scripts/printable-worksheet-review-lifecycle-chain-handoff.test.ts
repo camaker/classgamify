@@ -153,7 +153,7 @@ test('printable worksheet review lifecycle summarizes each review boundary', () 
       ['printable-item-mapping', 'Student handout items'],
       ['choice-bank-policy', 'Choice bank from runtime'],
       ['writing-area-policy', 'Bounded answer lines'],
-      ['assignment-field-handoff', '8 print fields'],
+      ['assignment-field-handoff', '9 print fields'],
       ['preparation-summary', '3 preparation checks'],
       ['header-overview-chips', '3 overview chips'],
       ['answer-key-hidden-state', 'Hidden by default'],

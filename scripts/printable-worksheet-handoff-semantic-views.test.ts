@@ -85,7 +85,7 @@ test('printable worksheet handoff exposes 30 paper handoff slices safely', () =>
   );
   assert.equal(
     getHandoffItemValue(pageView, 'assignment-field-count'),
-    '8 fields'
+    '9 fields'
   );
   assert.equal(getHandoffItemValue(pageView, 'printable-items'), '1 item');
   assert.equal(getHandoffItemValue(pageView, 'choice-bank-coverage'), '1 item');
@@ -194,6 +194,21 @@ test('printable worksheet builder preserves snapshot, delivery, and answer-key c
 
   assert.equal(hiddenWorksheet.activityTitle, 'Frozen Snapshot Title');
   assert.equal(hiddenWorksheet.activityDescription, 'Frozen snapshot copy.');
+  assert.deepEqual(
+    hiddenPageView.assignmentFieldViews.find(
+      (fieldView) => fieldView.id === 'activity-description'
+    ),
+    {
+      ariaLabel:
+        'Activity description: Frozen snapshot copy.. Printed context copied from the frozen assignment snapshot.',
+      description:
+        'Printed context copied from the frozen assignment snapshot.',
+      id: 'activity-description',
+      kind: 'text',
+      label: 'Activity description',
+      value: 'Frozen snapshot copy.',
+    }
+  );
   assert.equal(hiddenWorksheet.templateType, 'quiz');
   assert.equal(hiddenWorksheet.shareSlug, 'paper-review');
   assert.equal(hiddenWorksheet.sharePath, '/play/paper-review');

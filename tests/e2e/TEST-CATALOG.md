@@ -677,15 +677,16 @@ quiz-choice generation privacy-scope boundaries.
 Printable worksheet handoff has a fast script-level gate via
 `pnpm exec tsx --test scripts/printable-worksheet-handoff-semantic-views.test.ts`;
 run it when changing print-route search parsing, worksheet response policies,
-frozen snapshot worksheet generation, delivery-policy printing, answer-key
-toggle behavior, privacy-scope boundaries, accepted-answer/explanation
-rendering, or the print toolbar.
+frozen snapshot worksheet generation, source activity description fields,
+delivery-policy printing, answer-key toggle behavior, privacy-scope boundaries,
+accepted-answer/explanation rendering, or the print toolbar.
 Printable worksheet review lifecycle chain has a fast script-level gate via
 `pnpm exec tsx --test scripts/printable-worksheet-review-lifecycle-chain-handoff.test.ts`;
 run it when changing result-page print actions, teacher-only print routes,
-frozen snapshot handouts, answer-key hidden/included/unavailable states,
-toolbar toggles, print actions, return-to-results links, printable handoff
-privacy, worksheet delivery chain alignment, or CSV export alignment.
+frozen snapshot handouts, answer-key hidden/included/unavailable states, source
+activity description fields, toolbar toggles, print actions,
+return-to-results links, printable handoff privacy, worksheet delivery chain
+alignment, or CSV export alignment.
 Worksheet-mode delivery chain has a fast script-level gate via
 `pnpm exec tsx --test scripts/worksheet-mode-delivery-chain-handoff.test.ts`;
 run it when changing `/worksheets` creation entry points, shared create editor

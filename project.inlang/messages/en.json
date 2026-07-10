@@ -3267,6 +3267,8 @@
   "assignment_printable_answer_key_title": "Answer key",
   "assignment_printable_answer_line_summary_many": "{count} answer lines",
   "assignment_printable_answer_line_summary_one": "{count} answer line",
+  "assignment_printable_activity_description_fallback": "No activity description",
+  "assignment_printable_activity_description_label": "Activity description",
   "assignment_printable_answer_separator": ", ",
   "assignment_printable_back_to_results": "Back to results",
   "assignment_printable_brand_label": "ClassGamify worksheet",

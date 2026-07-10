@@ -277,8 +277,8 @@ function getPrintableWorksheetReviewLifecycleChainHandoffItem(
       return item(
         id,
         'Assignment field handoff',
-        '8 print fields',
-        'Printed assignment fields include student name, date, score, share path, template, snapshot source, instructions, and delivery policy.'
+        '9 print fields',
+        'Printed assignment fields include student name, date, score, share path, template, snapshot source, activity description, instructions, and delivery policy.'
       );
     case 'preparation-summary':
       return item(
