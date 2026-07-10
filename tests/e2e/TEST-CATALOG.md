@@ -72,9 +72,9 @@ Account governance lifecycle chain has a fast script-level gate via
 `pnpm exec tsx --test scripts/account-governance-lifecycle-chain-handoff.test.ts`;
 run it when changing auth session and email verification, profile and security
 settings, explicit account deletion, admin user governance,
-billing/notification/files boundaries, storage owner checks, provider-secret
-and student-data guards, or account lifecycle copy that should stay tied to the
-ClassGamify teacher workspace.
+billing/payment callback/notification/files boundaries, storage owner checks,
+provider-secret and student-data guards, or account lifecycle copy that should
+stay tied to the ClassGamify teacher workspace.
 Classroom product loop chain has a fast script-level gate via
 `pnpm exec tsx --test scripts/classroom-product-loop-chain-handoff.test.ts`;
 run it when changing the Activity -> Assignment -> Attempt -> Results contract,

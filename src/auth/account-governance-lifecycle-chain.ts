@@ -23,7 +23,7 @@ export const ACCOUNT_GOVERNANCE_LIFECYCLE_CHAIN_HANDOFF_ITEM_IDS = [
   'admin-api-gate',
   'admin-user-list-query',
   'admin-user-ban-actions',
-  'billing-plan-access-boundary',
+  'billing-payment-callback-boundary',
   'notification-email-preference',
   'files-owner-scope-boundary',
   'storage-private-owner-check',
@@ -60,9 +60,9 @@ export const ACCOUNT_GOVERNANCE_LIFECYCLE_CHAIN_SOURCE_FILES = [
   'src/settings/notifications-view.ts',
   'src/settings/files-view.ts',
   'src/storage/file-access.ts',
+  'src/payment/payment-status-view.ts',
   'src/config/website.ts',
   'src/db/auth.schema.ts',
-  'src/lib/routes.ts',
   'tests/e2e/TEST-CATALOG.md',
 ] as const;
 
@@ -100,6 +100,7 @@ export type AccountGovernanceLifecycleChainPrivacyContract = {
   requiresTeacherSessionForAccountSettings: true;
   sourceFiles: string[];
   usesClassGamifyAccountCopy: true;
+  usesPaymentCallbackHandoff: true;
 };
 
 export type AccountGovernanceLifecycleChainHandoffView = {
@@ -116,7 +117,7 @@ export function buildAccountGovernanceLifecycleChainHandoffView(): AccountGovern
 
   return {
     description:
-      'Thirty-slice teacher account governance and lifecycle chain from auth session entry through profile/security settings, explicit deletion, admin user governance, billing/notification/file boundaries, and private classroom data guards.',
+      'Thirty-slice teacher account governance and lifecycle chain from auth session entry through profile/security settings, explicit deletion, admin user governance, billing/payment callback, notification/file boundaries, and private classroom data guards.',
     itemViews,
     privacy: {
       chainSourceFileCount:
@@ -142,6 +143,7 @@ export function buildAccountGovernanceLifecycleChainHandoffView(): AccountGovern
       requiresTeacherSessionForAccountSettings: true,
       sourceFiles: [...ACCOUNT_GOVERNANCE_LIFECYCLE_CHAIN_SOURCE_FILES],
       usesClassGamifyAccountCopy: true,
+      usesPaymentCallbackHandoff: true,
     },
     title: 'Account governance lifecycle chain',
   };
@@ -316,12 +318,12 @@ function getAccountGovernanceLifecycleChainHandoffItem(
         'Ban/unban only',
         'Admin user actions govern account access without changing classroom content or assignment links.'
       );
-    case 'billing-plan-access-boundary':
+    case 'billing-payment-callback-boundary':
       return item(
         id,
-        'Billing plan access boundary',
-        Routes.SettingsBilling,
-        'Billing affects plan access through hosted checkout and portal flows without mutating classroom records.'
+        'Billing payment callback boundary',
+        'Billing + callback',
+        'Hosted billing and payment callback status refresh plan access without exposing provider sessions or mutating classroom records.'
       );
     case 'notification-email-preference':
       return item(

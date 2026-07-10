@@ -61,6 +61,11 @@ Developer-facing examples and active account/contact copy should follow the
 same product boundary: visible surfaces may refer to legacy URLs only when they
 are explicit migration entry points, while current forms, billing pages, and
 configuration examples should speak in ClassGamify terms.
+Account governance also covers the hosted billing return path: payment callback
+status, polling, safe callback normalization, plan-cache refresh, provider
+session privacy, and retry/timeout recovery should stay inside the teacher
+workspace boundary without mutating activities, assignment links, snapshots,
+attempts, results, or source-material records.
 Transactional email surfaces follow the same lifecycle boundary: verification,
 password reset, newsletter confirmation, and contact-message templates should
 render the shared teacher workspace context before provider send while keeping

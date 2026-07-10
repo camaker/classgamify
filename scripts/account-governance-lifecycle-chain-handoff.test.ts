@@ -11,6 +11,7 @@ import {
 import { AUTH_ERROR_RECOVERY_STEP_IDS } from '@/auth/error-recovery';
 import { AUTH_WORKSPACE_HANDOFF_ITEM_IDS } from '@/auth/workspace-boundary';
 import { Routes } from '@/lib/routes';
+import { PAYMENT_STATUS_HANDOFF_ITEM_IDS } from '@/payment/payment-status-view';
 import { ADMIN_USERS_HANDOFF_ITEM_IDS } from '@/admin/users-view';
 import { SETTINGS_ACCOUNT_WORKSPACE_HANDOFF_ITEM_IDS } from '@/settings/account-handoff';
 import { SETTINGS_BILLING_WORKSPACE_HANDOFF_ITEM_IDS } from '@/settings/billing-view';
@@ -82,6 +83,10 @@ const STORAGE_FILE_ACCESS_SOURCE = readFileSync(
   'src/storage/file-access.ts',
   'utf8'
 );
+const PAYMENT_STATUS_SOURCE = readFileSync(
+  'src/payment/payment-status-view.ts',
+  'utf8'
+);
 const WEBSITE_CONFIG_SOURCE = readFileSync('src/config/website.ts', 'utf8');
 const AUTH_SCHEMA_SOURCE = readFileSync('src/db/auth.schema.ts', 'utf8');
 const TEST_CATALOG_SOURCE = readFileSync('tests/e2e/TEST-CATALOG.md', 'utf8');
@@ -150,6 +155,7 @@ test('account governance lifecycle chain exposes 30 safe lifecycle slices', () =
     requiresTeacherSessionForAccountSettings: true,
     sourceFiles: [...ACCOUNT_GOVERNANCE_LIFECYCLE_CHAIN_SOURCE_FILES],
     usesClassGamifyAccountCopy: true,
+    usesPaymentCallbackHandoff: true,
   });
   assertNoPrivateAccountGovernanceText(JSON.stringify(handoffView));
 });
@@ -182,7 +188,7 @@ test('account governance lifecycle chain summarizes auth through admin and setti
       ['admin-api-gate', '401/403 protected'],
       ['admin-user-list-query', 'Search/filter/sort/page'],
       ['admin-user-ban-actions', 'Ban/unban only'],
-      ['billing-plan-access-boundary', Routes.SettingsBilling],
+      ['billing-payment-callback-boundary', 'Billing + callback'],
       ['notification-email-preference', Routes.SettingsNotifications],
       ['files-owner-scope-boundary', Routes.SettingsFiles],
       ['storage-private-owner-check', 'Private owner required'],
@@ -222,11 +228,12 @@ test('account governance lifecycle chain is backed by focused governance gates',
       SETTINGS_SECURITY_WORKSPACE_HANDOFF_ITEM_IDS.length,
       ADMIN_USERS_HANDOFF_ITEM_IDS.length,
       SETTINGS_BILLING_WORKSPACE_HANDOFF_ITEM_IDS.length,
+      PAYMENT_STATUS_HANDOFF_ITEM_IDS.length,
       SETTINGS_NOTIFICATION_UPDATE_HANDOFF_ITEM_IDS.length,
       SETTINGS_FILES_SOURCE_MATERIAL_HANDOFF_ITEM_IDS.length,
       STORAGE_FILE_ACCESS_ITEM_IDS.length,
     ],
-    Array.from({ length: 8 }, () => 30)
+    Array.from({ length: 9 }, () => 30)
   );
   assert.ok(
     AUTH_ERROR_RECOVERY_STEP_IDS.length >= 3,
@@ -377,6 +384,16 @@ test('account governance lifecycle sources preserve admin, storage, and provider
     'Billing should preserve hosted provider boundaries without classroom data mutation.'
   );
   assert.match(
+    PAYMENT_STATUS_SOURCE,
+    /PAYMENT_STATUS_HANDOFF_ITEM_IDS[\s\S]*'hosted-checkout'[\s\S]*'completion-check'[\s\S]*'current-plan-cache'[\s\S]*'callback-normalization'[\s\S]*'provider-secret-boundary'[\s\S]*'raw-session-boundary'/,
+    'Payment callback handoff should preserve hosted checkout status and provider-session privacy boundaries.'
+  );
+  assert.match(
+    PAYMENT_STATUS_SOURCE,
+    /hostedCheckoutStatusOnly: true[\s\S]*refreshesPlanCacheOnlyAfterSuccess: true[\s\S]*scope: 'teacher-payment-callback'/,
+    'Payment callback privacy contract should stay scoped to teacher payment callbacks.'
+  );
+  assert.match(
     NOTIFICATION_SOURCE,
     /updatesTeacherProductEmailOnly: true[\s\S]*notifiesLearners: false[\s\S]*sendsStudentAssignmentReminders: false/,
     'Notification settings should remain teacher product-email preferences.'
@@ -411,7 +428,7 @@ test('account governance lifecycle chain focused gate is documented', () => {
   );
   assert.match(
     TEST_CATALOG_SOURCE.replace(/\s+/g, ' '),
-    /auth session and email verification[\s\S]*profile and security settings[\s\S]*explicit account deletion[\s\S]*admin user governance[\s\S]*billing\/notification\/files boundaries[\s\S]*storage owner checks[\s\S]*provider-secret and student-data guards/,
+    /auth session and email verification[\s\S]*profile and security settings[\s\S]*explicit account deletion[\s\S]*admin user governance[\s\S]*billing\/payment callback\/notification\/files boundaries[\s\S]*storage owner checks[\s\S]*provider-secret and student-data guards/,
     'TEST-CATALOG should describe the full account governance lifecycle chain scope.'
   );
 });

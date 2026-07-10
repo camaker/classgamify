@@ -667,6 +667,7 @@ import { LEGACY_PUBLIC_ROUTE_HANDOFF_ITEM_IDS } from '@/seo/legacy-public-route-
 import {
   buildPaymentStatusView,
   getInitialPaymentConfirmationStatus,
+  PAYMENT_STATUS_HANDOFF_ITEM_IDS,
 } from '@/payment/payment-status-view';
 import { buildSettingsBillingCardViewModel } from '@/payment/billing-view';
 import {
@@ -16875,6 +16876,7 @@ assert.deepEqual(accountGovernanceLifecycleChainView.privacy, {
   requiresTeacherSessionForAccountSettings: true,
   sourceFiles: [...ACCOUNT_GOVERNANCE_LIFECYCLE_CHAIN_SOURCE_FILES],
   usesClassGamifyAccountCopy: true,
+  usesPaymentCallbackHandoff: true,
 });
 assert.deepEqual(
   [
@@ -16883,12 +16885,18 @@ assert.deepEqual(
     SETTINGS_SECURITY_WORKSPACE_HANDOFF_ITEM_IDS.length,
     ADMIN_USERS_HANDOFF_ITEM_IDS.length,
     SETTINGS_BILLING_WORKSPACE_HANDOFF_ITEM_IDS.length,
+    PAYMENT_STATUS_HANDOFF_ITEM_IDS.length,
     SETTINGS_NOTIFICATION_UPDATE_HANDOFF_ITEM_IDS.length,
     SETTINGS_FILES_SOURCE_MATERIAL_HANDOFF_ITEM_IDS.length,
     STORAGE_FILE_ACCESS_ITEM_IDS.length,
   ],
-  Array.from({ length: 8 }, () => 30),
-  'Account governance lifecycle chain should stay backed by focused auth, settings, admin, files, billing, notification, and storage gates.'
+  Array.from({ length: 9 }, () => 30),
+  'Account governance lifecycle chain should stay backed by focused auth, settings, admin, files, billing, payment callback, notification, and storage gates.'
+);
+assert.match(
+  paymentStatusViewSource,
+  /PAYMENT_STATUS_HANDOFF_ITEM_IDS[\s\S]*'hosted-checkout'[\s\S]*'completion-check'[\s\S]*'current-plan-cache'[\s\S]*'callback-normalization'[\s\S]*'provider-secret-boundary'[\s\S]*'raw-session-boundary'[\s\S]*hostedCheckoutStatusOnly: true[\s\S]*scope: 'teacher-payment-callback'/,
+  'Account governance lifecycle chain should absorb the settings payment callback handoff privacy boundary.'
 );
 assert.deepEqual(Object.fromEntries(accountGovernanceLifecycleChainValues), {
   'account-delete-feature-gate': 'Feature gated',
@@ -16899,7 +16907,7 @@ assert.deepEqual(Object.fromEntries(accountGovernanceLifecycleChainValues), {
   'admin-user-list-query': 'Search/filter/sort/page',
   'auth-error-recovery': Routes.Login,
   'auth-session-runtime': 'Better Auth + D1',
-  'billing-plan-access-boundary': Routes.SettingsBilling,
+  'billing-payment-callback-boundary': 'Billing + callback',
   'credential-login-provider': 'Feature gated',
   'delete-confirmation-required': 'Explicit confirmation',
   'delete-no-silent-data-loss': 'No implicit classroom deletion',
@@ -16929,7 +16937,7 @@ assert.match(
 );
 assert.match(
   readFileSync('tests/e2e/TEST-CATALOG.md', 'utf8').replace(/\s+/g, ' '),
-  /auth session and email verification[\s\S]*profile and security settings[\s\S]*explicit account deletion[\s\S]*admin user governance[\s\S]*billing\/notification\/files boundaries[\s\S]*storage owner checks[\s\S]*provider-secret and student-data guards/,
+  /auth session and email verification[\s\S]*profile and security settings[\s\S]*explicit account deletion[\s\S]*admin user governance[\s\S]*billing\/payment callback\/notification\/files boundaries[\s\S]*storage owner checks[\s\S]*provider-secret and student-data guards/,
   'TEST-CATALOG should describe the full account governance lifecycle chain scope.'
 );
 const teacherWorkspaceOperationsChainView =
