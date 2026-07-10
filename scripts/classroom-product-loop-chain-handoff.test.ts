@@ -54,7 +54,10 @@ import {
   STUDENT_RUNNER_PLAY_CHAIN_SOURCE_FILES,
 } from '@/assignments/student-runner-play-chain';
 import { TEACHER_RESULT_COPY_LIFECYCLE_CHAIN_HANDOFF_ITEM_IDS } from '@/assignments/teacher-result-copy-lifecycle-chain';
-import { TEACHER_RESULTS_REVIEW_CHAIN_HANDOFF_ITEM_IDS } from '@/assignments/teacher-results-review-chain';
+import {
+  TEACHER_RESULTS_REVIEW_CHAIN_HANDOFF_ITEM_IDS,
+  TEACHER_RESULTS_REVIEW_CHAIN_SOURCE_FILES,
+} from '@/assignments/teacher-results-review-chain';
 import {
   CLASSROOM_PRODUCT_LOOP_CHAIN_HANDOFF_ITEM_IDS,
   CLASSROOM_PRODUCT_LOOP_CHAIN_SOURCE_FILES,
@@ -116,11 +119,15 @@ test('classroom product loop chain exposes 30 safe product slices', () => {
     createsAssignmentLinksWithoutTeacherAction: false,
     csvDatesUseIsoFormatter: true,
     deliveryPolicyResolvedBeforeAssignmentSurfaces: true,
+    exposesAcceptedAlternativesToTeachersOnly: true,
     exposesActivityContentJsonToPublicPayload: false,
+    exposesAnswerKeysToPublicRunner: false,
     exposesAnswerKeysBeforeAllowedReview: false,
     exposesCsvDataUrlInHandoff: false,
     exposesPrivateActivityContent: false,
     exposesRawAnonymousTokens: false,
+    exposesRawCopyArtifactsInHandoff: false,
+    exposesRawCsvDataUrlInHandoff: false,
     exposesRawRuntimeItemIdsInHandoff: false,
     exposesRawSubmissionPayload: false,
     exposesResultExportRows: false,
@@ -134,6 +141,7 @@ test('classroom product loop chain exposes 30 safe product slices', () => {
     exportIncludesSubmittedDateColumns: true,
     freezesAssignmentSnapshots: true,
     itemIds,
+    preservesFrozenSnapshots: true,
     requiresTeacherSaveBeforeActivityPersistence: true,
     keepsSourceMaterialExtractionEditorReviewed: true,
     archivedActivitiesRequireRestoreBeforeDerive: true,
@@ -152,6 +160,7 @@ test('classroom product loop chain exposes 30 safe product slices', () => {
     rejectsInvalidSubmissions: true,
     resultPagesUseSharedAnswerView: true,
     resultPagesUseFormattedExplanations: true,
+    resultExportsIncludeDeliveryPolicy: true,
     resultSubmittedDateSortingUsesTimestampParsing: true,
     resultUiDatesUseLocalizedFormatter: true,
     requiresTeacherReviewForAiEnhancements: true,
@@ -177,6 +186,8 @@ test('classroom product loop chain exposes 30 safe product slices', () => {
     usesSourceExtractionLifecycleChain: true,
     usesStudentRunnerPlayChain: true,
     usesTemplateRoadmapCapabilityChain: true,
+    usesTeacherOnlyResultScope: true,
+    usesTeacherResultsReviewChain: true,
   });
   assertNoPrivateProductLoopText(JSON.stringify(handoffView));
 });
@@ -208,7 +219,7 @@ test('classroom product loop chain summarizes activity to results flow', () => {
       ['scored-attempt-result-boundary', '30 result slices'],
       ['answer-feedback-policy', 'Reveal if allowed'],
       ['result-submitted-date-boundary', '30 date slices'],
-      ['teacher-result-review', 'Reteach evidence'],
+      ['teacher-result-review-boundary', '30 review slices'],
       ['result-accepted-answer-boundary', '30 answer slices'],
       ['csv-export', 'Private offline records'],
       ['result-explanation-boundary', '30 explanation slices'],
@@ -267,6 +278,7 @@ test('classroom product loop chain is backed by adjacent focused gates', () => {
       ASSIGNMENT_RESULT_EXPLANATION_CHAIN_HANDOFF_ITEM_IDS.length,
       ASSIGNMENT_RESULT_EXPLANATION_CHAIN_SOURCE_FILES.length,
       TEACHER_RESULTS_REVIEW_CHAIN_HANDOFF_ITEM_IDS.length,
+      TEACHER_RESULTS_REVIEW_CHAIN_SOURCE_FILES.length,
       TEACHER_RESULT_COPY_LIFECYCLE_CHAIN_HANDOFF_ITEM_IDS.length,
       ASSIGNMENT_RESULTS_EXPORT_PREPARATION_ITEM_IDS.length,
       PRINTABLE_WORKSHEET_REVIEW_LIFECYCLE_CHAIN_HANDOFF_ITEM_IDS.length,
@@ -274,7 +286,7 @@ test('classroom product loop chain is backed by adjacent focused gates', () => {
       PUBLIC_DISCOVERY_INDEXING_CHAIN_SOURCE_FILES.length,
       CLASSROOM_TRUST_COMMUNICATION_CHAIN_HANDOFF_ITEM_IDS.length,
     ],
-    Array.from({ length: 37 }, () => 30)
+    Array.from({ length: 38 }, () => 30)
   );
 });
 

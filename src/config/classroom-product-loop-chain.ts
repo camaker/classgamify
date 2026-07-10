@@ -20,7 +20,7 @@ export const CLASSROOM_PRODUCT_LOOP_CHAIN_HANDOFF_ITEM_IDS = [
   'scored-attempt-result-boundary',
   'answer-feedback-policy',
   'result-submitted-date-boundary',
-  'teacher-result-review',
+  'teacher-result-review-boundary',
   'result-accepted-answer-boundary',
   'csv-export',
   'result-explanation-boundary',
@@ -84,11 +84,15 @@ export type ClassroomProductLoopChainPrivacyContract = {
   createsAssignmentLinksWithoutTeacherAction: false;
   csvDatesUseIsoFormatter: true;
   deliveryPolicyResolvedBeforeAssignmentSurfaces: true;
+  exposesAcceptedAlternativesToTeachersOnly: true;
   exposesActivityContentJsonToPublicPayload: false;
+  exposesAnswerKeysToPublicRunner: false;
   exposesAnswerKeysBeforeAllowedReview: false;
   exposesCsvDataUrlInHandoff: false;
   exposesPrivateActivityContent: false;
   exposesRawAnonymousTokens: false;
+  exposesRawCopyArtifactsInHandoff: false;
+  exposesRawCsvDataUrlInHandoff: false;
   exposesRawRuntimeItemIdsInHandoff: false;
   exposesRawSubmissionPayload: false;
   exposesResultExportRows: false;
@@ -102,6 +106,7 @@ export type ClassroomProductLoopChainPrivacyContract = {
   exportIncludesSubmittedDateColumns: true;
   freezesAssignmentSnapshots: true;
   itemIds: ClassroomProductLoopChainHandoffItemId[];
+  preservesFrozenSnapshots: true;
   requiresTeacherSaveBeforeActivityPersistence: true;
   keepsSourceMaterialExtractionEditorReviewed: true;
   archivedActivitiesRequireRestoreBeforeDerive: true;
@@ -120,6 +125,7 @@ export type ClassroomProductLoopChainPrivacyContract = {
   rejectsInvalidSubmissions: true;
   resultPagesUseSharedAnswerView: true;
   resultPagesUseFormattedExplanations: true;
+  resultExportsIncludeDeliveryPolicy: true;
   resultSubmittedDateSortingUsesTimestampParsing: true;
   resultUiDatesUseLocalizedFormatter: true;
   requiresTeacherReviewForAiEnhancements: true;
@@ -145,6 +151,8 @@ export type ClassroomProductLoopChainPrivacyContract = {
   usesSourceExtractionLifecycleChain: true;
   usesStudentRunnerPlayChain: true;
   usesTemplateRoadmapCapabilityChain: true;
+  usesTeacherOnlyResultScope: true;
+  usesTeacherResultsReviewChain: true;
 };
 
 export type ClassroomProductLoopChainHandoffView = {
@@ -172,11 +180,15 @@ export function buildClassroomProductLoopChainHandoffView(): ClassroomProductLoo
       createsAssignmentLinksWithoutTeacherAction: false,
       csvDatesUseIsoFormatter: true,
       deliveryPolicyResolvedBeforeAssignmentSurfaces: true,
+      exposesAcceptedAlternativesToTeachersOnly: true,
       exposesActivityContentJsonToPublicPayload: false,
+      exposesAnswerKeysToPublicRunner: false,
       exposesAnswerKeysBeforeAllowedReview: false,
       exposesCsvDataUrlInHandoff: false,
       exposesPrivateActivityContent: false,
       exposesRawAnonymousTokens: false,
+      exposesRawCopyArtifactsInHandoff: false,
+      exposesRawCsvDataUrlInHandoff: false,
       exposesRawRuntimeItemIdsInHandoff: false,
       exposesRawSubmissionPayload: false,
       exposesResultExportRows: false,
@@ -190,6 +202,7 @@ export function buildClassroomProductLoopChainHandoffView(): ClassroomProductLoo
       exportIncludesSubmittedDateColumns: true,
       freezesAssignmentSnapshots: true,
       itemIds: [...CLASSROOM_PRODUCT_LOOP_CHAIN_HANDOFF_ITEM_IDS],
+      preservesFrozenSnapshots: true,
       requiresTeacherSaveBeforeActivityPersistence: true,
       keepsSourceMaterialExtractionEditorReviewed: true,
       archivedActivitiesRequireRestoreBeforeDerive: true,
@@ -208,6 +221,7 @@ export function buildClassroomProductLoopChainHandoffView(): ClassroomProductLoo
       rejectsInvalidSubmissions: true,
       resultPagesUseSharedAnswerView: true,
       resultPagesUseFormattedExplanations: true,
+      resultExportsIncludeDeliveryPolicy: true,
       resultSubmittedDateSortingUsesTimestampParsing: true,
       resultUiDatesUseLocalizedFormatter: true,
       requiresTeacherReviewForAiEnhancements: true,
@@ -233,6 +247,8 @@ export function buildClassroomProductLoopChainHandoffView(): ClassroomProductLoo
       usesSourceExtractionLifecycleChain: true,
       usesStudentRunnerPlayChain: true,
       usesTemplateRoadmapCapabilityChain: true,
+      usesTeacherOnlyResultScope: true,
+      usesTeacherResultsReviewChain: true,
     },
     title: 'Classroom product loop chain',
   };
@@ -400,12 +416,12 @@ function getClassroomProductLoopChainHandoffItem(
         '30 date slices',
         'Shared UI and CSV date formatters, attempt rows, review cards, student summaries, latest-attempt copy context, completed-at sorting, submitted-date export columns, and privacy guards stay aligned.'
       );
-    case 'teacher-result-review':
+    case 'teacher-result-review-boundary':
       return item(
         id,
-        'Teacher result review',
-        'Reteach evidence',
-        'Teacher result pages combine frozen runtime items with stored attempts for item performance and student follow-up.'
+        'Teacher result review boundary',
+        '30 review slices',
+        'Owner-scoped result routes, frozen snapshots, attempt stats, review controls, reteach priorities, copy artifacts, CSV exports, result-material handoffs, and privacy guards stay aligned.'
       );
     case 'result-accepted-answer-boundary':
       return item(
