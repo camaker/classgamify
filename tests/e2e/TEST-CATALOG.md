@@ -566,6 +566,12 @@ run it when changing teacher-auth gates, deterministic readiness, structured
 draft targets, source-material capability counts, provider/fallback posture,
 editor-review/save/publish boundaries, snapshot protection, public-payload
 guards, or result-export continuity.
+Activity AI enhancement execution has a fast script-level gate via
+`pnpm exec tsx --test scripts/activity-ai-enhancement-execution.test.ts`;
+run it when changing provider-ready, local-fallback, deterministic-draft, or
+blocked-reason execution states, editor-only draft targets, source-material
+readiness, provider-call boundaries, fallback stability, auth gates, or privacy
+guards.
 Template roadmap capability chain has a fast script-level gate via
 `pnpm exec tsx --test scripts/template-roadmap-capability-chain-handoff.test.ts`;
 run it when changing roadmap template promises, Wordwall-style templates,

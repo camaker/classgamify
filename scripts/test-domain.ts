@@ -283,6 +283,11 @@ import {
   buildActivityAiEnhancementPolicyView,
 } from '@/activities/ai-enhancement-policy';
 import {
+  ACTIVITY_AI_ENHANCEMENT_EXECUTION_ITEM_IDS,
+  buildActivityAiEnhancementExecutionPlan,
+  buildActivityAiEnhancementExecutionView,
+} from '@/activities/ai-enhancement-execution';
+import {
   TEMPLATE_ROADMAP_CAPABILITY_CHAIN_HANDOFF_ITEM_IDS,
   TEMPLATE_ROADMAP_CAPABILITY_CHAIN_SOURCE_FILES,
   buildTemplateRoadmapCapabilityChainHandoffView,
@@ -6930,12 +6935,13 @@ assert.deepEqual(
     SOURCE_EXTRACTION_LIFECYCLE_CHAIN_HANDOFF_ITEM_IDS.length,
     SOURCE_MATERIAL_PRIVACY_CHAIN_HANDOFF_ITEM_IDS.length,
     ACTIVITY_AI_ENHANCEMENT_POLICY_ITEM_IDS.length,
+    ACTIVITY_AI_ENHANCEMENT_EXECUTION_ITEM_IDS.length,
     TEMPLATE_ROADMAP_CAPABILITY_CHAIN_HANDOFF_ITEM_IDS.length,
     WORKSHEET_MODE_DELIVERY_CHAIN_HANDOFF_ITEM_IDS.length,
     ASSIGNMENT_RESULTS_EXPORT_PREPARATION_ITEM_IDS.length,
   ],
-  Array.from({ length: 12 }, () => 30),
-  'Activity AI enhancement roadmap chain should stay backed by authoring, remix, extraction, policy, roadmap, worksheet, and result-export gates.'
+  Array.from({ length: 13 }, () => 30),
+  'Activity AI enhancement roadmap chain should stay backed by authoring, remix, extraction, policy, execution, roadmap, worksheet, and result-export gates.'
 );
 assert.deepEqual(
   Object.fromEntries(activityAiEnhancementRoadmapChainValues),
@@ -7207,6 +7213,129 @@ assert.match(
   readFileSync('tests/e2e/TEST-CATALOG.md', 'utf8'),
   /Activity AI enhancement policy has a fast script-level gate via[\s\S]*scripts\/activity-ai-enhancement-policy\.test\.ts[\s\S]*teacher-auth gates[\s\S]*deterministic readiness[\s\S]*structured\s+draft targets[\s\S]*source-material capability counts[\s\S]*editor-review\/save\/publish boundaries[\s\S]*result-export continuity/,
   'TEST-CATALOG should document the activity AI enhancement policy gate.'
+);
+const activityAiEnhancementExecutionView =
+  buildActivityAiEnhancementExecutionView({
+    content: activityAiEnhancementPolicyContent,
+    currentTemplateType: 'quiz',
+    enhancementKind: 'answer-explanation',
+    hasAuthenticatedTeacher: true,
+    providerConfigured: true,
+  });
+const activityAiEnhancementExecutionValues = new Map(
+  activityAiEnhancementExecutionView.itemViews.map((item) => [
+    item.id,
+    item.value,
+  ])
+);
+assert.deepEqual(
+  activityAiEnhancementExecutionView.itemViews.map((item) => item.id),
+  [...ACTIVITY_AI_ENHANCEMENT_EXECUTION_ITEM_IDS],
+  'Activity AI enhancement execution should expose the stable 30-slice execution-plan order.'
+);
+assert.equal(activityAiEnhancementExecutionView.itemViews.length, 30);
+assert.equal(new Set(ACTIVITY_AI_ENHANCEMENT_EXECUTION_ITEM_IDS).size, 30);
+assert.ok(
+  activityAiEnhancementExecutionView.itemViews.every(
+    (item) => item.ariaLabel && item.description && item.label && item.value
+  )
+);
+assert.equal(activityAiEnhancementExecutionView.plan.status, 'provider-ready');
+assert.equal(activityAiEnhancementExecutionView.plan.mode, 'provider');
+assert.equal(activityAiEnhancementExecutionView.plan.canExecute, true);
+assert.equal(
+  activityAiEnhancementExecutionValues.get('provider-call-boundary'),
+  'Provider call allowed'
+);
+assert.equal(
+  JSON.stringify(activityAiEnhancementExecutionView).includes(
+    'secret-policy-file-id'
+  ),
+  false,
+  'Activity AI enhancement execution view should not leak source material file ids.'
+);
+assert.deepEqual(activityAiEnhancementExecutionView.privacy, {
+  blocksWithoutAuthenticatedTeacher: true,
+  createsAssignmentLinksWithoutTeacherAction: false,
+  exposesActivityContentText: false,
+  exposesAnswerKeysToPublicPayload: false,
+  exposesDraftText: false,
+  exposesFileBytesToAi: false,
+  exposesRawAiOutput: false,
+  exposesRawSourceText: false,
+  exposesSourceMaterialFileIds: false,
+  exposesSourceMaterialFilenames: false,
+  exposesSourceMaterialStorageKeys: false,
+  itemIds: [...ACTIVITY_AI_ENHANCEMENT_EXECUTION_ITEM_IDS],
+  mutatesExistingAssignmentSnapshots: false,
+  persistsActivityWithoutTeacherAction: false,
+  publishesAssignmentWithoutTeacherAction: false,
+  readsSourceMaterialBytes: false,
+  requiresEditorReview: true,
+  scope: 'activity-ai-enhancement-execution',
+  usesPolicyDecision: true,
+});
+assert.equal(
+  buildActivityAiEnhancementExecutionPlan({
+    content: activityAiEnhancementPolicyContent,
+    currentTemplateType: 'quiz',
+    enhancementKind: 'answer-explanation',
+    hasAuthenticatedTeacher: true,
+    providerConfigured: false,
+  }).status,
+  'local-fallback-ready'
+);
+assert.equal(
+  buildActivityAiEnhancementExecutionPlan({
+    content: activityAiEnhancementPolicyContent,
+    currentTemplateType: 'quiz',
+    enhancementKind: 'ai-remix-completion',
+    hasAuthenticatedTeacher: true,
+    providerConfigured: true,
+    targetTemplateType: 'match-up',
+  }).status,
+  'deterministic-draft'
+);
+assert.deepEqual(
+  [
+    buildActivityAiEnhancementExecutionPlan({
+      content: activityAiEnhancementPolicyContent,
+      currentTemplateType: 'quiz',
+      hasAuthenticatedTeacher: false,
+      providerConfigured: true,
+    }).blockedReason,
+    buildActivityAiEnhancementExecutionPlan({
+      content: activityAiEnhancementPolicyContent,
+      currentTemplateType: 'quiz',
+      enhancementKind: 'leveled-variant',
+      hasAuthenticatedTeacher: true,
+      providerConfigured: true,
+      visibility: 'archived',
+    }).blockedReason,
+    buildActivityAiEnhancementExecutionPlan({
+      content: sparseActivityAiEnhancementPolicyContent,
+      currentTemplateType: 'quiz',
+      enhancementKind: 'worksheet-extraction',
+      hasAuthenticatedTeacher: true,
+      providerConfigured: true,
+    }).blockedReason,
+  ],
+  ['teacher-auth-required', 'restore-source-first', 'source-material-required']
+);
+assert.match(
+  readFileSync('src/activities/ai-enhancement-execution.ts', 'utf8'),
+  /export const ACTIVITY_AI_ENHANCEMENT_EXECUTION_ITEM_IDS = \[[\s\S]*'execution-scope'[\s\S]*'policy-source'[\s\S]*'provider-mode'[\s\S]*'local-fallback-mode'[\s\S]*'deterministic-draft-mode'[\s\S]*'auth-gate'[\s\S]*'source-byte-guard'[\s\S]*'result-export-continuity'/,
+  'Activity AI enhancement execution source should preserve the execution plan slices.'
+);
+assert.match(
+  readFileSync('docs/product.md', 'utf8'),
+  /src\/activities\/ai-enhancement-execution\.ts` owns the structured execution\s+plan[\s\S]*provider-ready[\s\S]*local-fallback[\s\S]*deterministic-draft[\s\S]*blocked states[\s\S]*editor-only draft targets[\s\S]*provider-call\s+boundaries[\s\S]*snapshot protection/,
+  'docs/product.md should document the activity AI enhancement execution owner.'
+);
+assert.match(
+  readFileSync('tests/e2e/TEST-CATALOG.md', 'utf8'),
+  /Activity AI enhancement execution has a fast script-level gate via[\s\S]*scripts\/activity-ai-enhancement-execution\.test\.ts[\s\S]*provider-ready[\s\S]*local-fallback[\s\S]*deterministic-draft[\s\S]*blocked-reason[\s\S]*editor-only draft targets[\s\S]*privacy\s+guards/,
+  'TEST-CATALOG should document the activity AI enhancement execution gate.'
 );
 const activityAuthoringLibraryChainView =
   buildActivityAuthoringLibraryChainHandoffView();
@@ -43786,6 +43915,7 @@ assert.deepEqual(
     ACTIVITY_AI_AUTHORING_CHAIN_HANDOFF_ITEM_IDS.length,
     ACTIVITY_AI_ENHANCEMENT_ROADMAP_CHAIN_HANDOFF_ITEM_IDS.length,
     ACTIVITY_AI_ENHANCEMENT_POLICY_ITEM_IDS.length,
+    ACTIVITY_AI_ENHANCEMENT_EXECUTION_ITEM_IDS.length,
     ACTIVITY_AI_REMIX_ASSIST_HANDOFF_ITEM_IDS.length,
     ACTIVITY_SOURCE_EXTRACTION_ASSIST_HANDOFF_ITEM_IDS.length,
     WORKSHEET_MODE_DELIVERY_CHAIN_HANDOFF_ITEM_IDS.length,
@@ -43799,7 +43929,7 @@ assert.deepEqual(
     PRINTABLE_WORKSHEET_HANDOFF_ITEM_IDS.length,
     ASSIGNMENT_RESULTS_EXPORT_PREPARATION_ITEM_IDS.length,
   ],
-  Array.from({ length: 20 }, () => 30),
+  Array.from({ length: 21 }, () => 30),
   'Template roadmap capability chain should stay backed by focused roadmap, template, AI, worksheet, runtime, print, and export gates.'
 );
 assert.deepEqual(Object.fromEntries(templateRoadmapCapabilityChainValues), {

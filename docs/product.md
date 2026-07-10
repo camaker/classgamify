@@ -449,6 +449,11 @@ Implementation boundaries:
   source-material capability counts, provider/fallback posture, save/publish
   boundaries, snapshot protection, public-payload guards, and result-export
   continuity.
+- `src/activities/ai-enhancement-execution.ts` owns the structured execution
+  plan that turns the shared policy decision into provider-ready,
+  local-fallback, deterministic-draft, or blocked states while preserving
+  editor-only draft targets, structured blocked reasons, provider-call
+  boundaries, privacy guards, save/publish boundaries, and snapshot protection.
 - `src/api/activity-ai.ts` exposes the authenticated server function.
 - `src/components/activities/activity-create-form.tsx` only collects draft
   inputs and fills the existing form.
