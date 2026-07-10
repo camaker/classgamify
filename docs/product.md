@@ -420,6 +420,14 @@ Current flow:
 Teacher source notes -> AI draft service -> CreateActivityInput -> Editor -> Save Activity
 ```
 
+Future AI enhancement work follows the same execution boundary: template
+transforms, distractor generation, leveled variants, answer explanations,
+listening scripts, and worksheet extraction may propose `CreateActivityInput`
+or `ActivityContent` edits, but they remain draft/editor-reviewed work. They
+must not create assignment links, mutate existing assignment snapshots, read
+source-material file bytes or storage keys, expose raw provider output, or add
+answer keys to public student payloads.
+
 Implementation boundaries:
 
 - `src/ai/` owns provider helpers such as Cloudflare Workers AI REST calls.

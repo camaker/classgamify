@@ -271,6 +271,11 @@ import {
   buildActivityAiAuthoringChainHandoffView,
 } from '@/activities/ai-authoring-chain';
 import {
+  ACTIVITY_AI_ENHANCEMENT_ROADMAP_CHAIN_HANDOFF_ITEM_IDS,
+  ACTIVITY_AI_ENHANCEMENT_ROADMAP_CHAIN_SOURCE_FILES,
+  buildActivityAiEnhancementRoadmapChainHandoffView,
+} from '@/activities/ai-enhancement-roadmap-chain';
+import {
   TEMPLATE_ROADMAP_CAPABILITY_CHAIN_HANDOFF_ITEM_IDS,
   TEMPLATE_ROADMAP_CAPABILITY_CHAIN_SOURCE_FILES,
   buildTemplateRoadmapCapabilityChainHandoffView,
@@ -6852,6 +6857,121 @@ assert.match(
   readFileSync('tests/e2e/TEST-CATALOG.md', 'utf8'),
   /Activity AI authoring chain has a fast script-level gate via[\s\S]*scripts\/activity-ai-authoring-chain-handoff\.test\.ts/,
   'TEST-CATALOG should document the activity AI authoring chain gate.'
+);
+const activityAiEnhancementRoadmapChainView =
+  buildActivityAiEnhancementRoadmapChainHandoffView();
+const activityAiEnhancementRoadmapChainValues = new Map(
+  activityAiEnhancementRoadmapChainView.itemViews.map((item) => [
+    item.id,
+    item.value,
+  ])
+);
+assert.deepEqual(
+  activityAiEnhancementRoadmapChainView.itemViews.map((item) => item.id),
+  [...ACTIVITY_AI_ENHANCEMENT_ROADMAP_CHAIN_HANDOFF_ITEM_IDS],
+  'Activity AI enhancement roadmap chain should expose the stable future-enhancement 30-slice order.'
+);
+assert.equal(activityAiEnhancementRoadmapChainView.itemViews.length, 30);
+assert.equal(
+  new Set(ACTIVITY_AI_ENHANCEMENT_ROADMAP_CHAIN_HANDOFF_ITEM_IDS).size,
+  30
+);
+assert.equal(ACTIVITY_AI_ENHANCEMENT_ROADMAP_CHAIN_SOURCE_FILES.length, 30);
+for (const filePath of ACTIVITY_AI_ENHANCEMENT_ROADMAP_CHAIN_SOURCE_FILES) {
+  assert.ok(
+    existsSync(filePath),
+    `Missing activity AI enhancement roadmap chain file ${filePath}`
+  );
+}
+assert.ok(
+  activityAiEnhancementRoadmapChainView.itemViews.every(
+    (item) => item.ariaLabel && item.description && item.label && item.value
+  )
+);
+assert.deepEqual(activityAiEnhancementRoadmapChainView.privacy, {
+  chainSourceFileCount:
+    ACTIVITY_AI_ENHANCEMENT_ROADMAP_CHAIN_SOURCE_FILES.length,
+  createsAssignmentLinksWithoutTeacherAction: false,
+  exposesAnswerKeysToPublicPayload: false,
+  exposesFileBytesToAi: false,
+  exposesRawAiOutput: false,
+  exposesRawSourceText: false,
+  exposesSourceMaterialFileIds: false,
+  exposesSourceMaterialStorageKeys: false,
+  itemIds: [...ACTIVITY_AI_ENHANCEMENT_ROADMAP_CHAIN_HANDOFF_ITEM_IDS],
+  keepsLeveledVariantsAsDrafts: true,
+  mutatesExistingAssignmentSnapshots: false,
+  persistsActivityWithoutTeacherAction: false,
+  publishesAssignmentWithoutTeacherAction: false,
+  readsSourceMaterialBytes: false,
+  requiresCreateActivityInputContract: true,
+  requiresEditorReview: true,
+  sourceFiles: [...ACTIVITY_AI_ENHANCEMENT_ROADMAP_CHAIN_SOURCE_FILES],
+  usesDeterministicFallback: true,
+  usesSharedActivityAssignmentModel: true,
+  writesDistractorsToQuestionOptions: true,
+});
+assert.deepEqual(
+  [
+    ACTIVITY_AI_AUTHORING_CHAIN_HANDOFF_ITEM_IDS.length,
+    ACTIVITY_AI_REMIX_ASSIST_HANDOFF_ITEM_IDS.length,
+    ACTIVITY_DRAFT_META_HANDOFF_ITEM_IDS.length,
+    ACTIVITY_TEMPLATE_REMIX_HANDOFF_ITEM_IDS.length,
+    QUESTION_CHOICE_GENERATION_HANDOFF_ITEM_IDS.length,
+    ACTIVITY_SOURCE_EXTRACTION_ASSIST_HANDOFF_ITEM_IDS.length,
+    SOURCE_EXTRACTION_LIFECYCLE_CHAIN_HANDOFF_ITEM_IDS.length,
+    SOURCE_MATERIAL_PRIVACY_CHAIN_HANDOFF_ITEM_IDS.length,
+    TEMPLATE_ROADMAP_CAPABILITY_CHAIN_HANDOFF_ITEM_IDS.length,
+    WORKSHEET_MODE_DELIVERY_CHAIN_HANDOFF_ITEM_IDS.length,
+    ASSIGNMENT_RESULTS_EXPORT_PREPARATION_ITEM_IDS.length,
+  ],
+  Array.from({ length: 11 }, () => 30),
+  'Activity AI enhancement roadmap chain should stay backed by authoring, remix, extraction, roadmap, worksheet, and result-export gates.'
+);
+assert.deepEqual(
+  Object.fromEntries(activityAiEnhancementRoadmapChainValues),
+  {
+    'activity-content-target': 'Questions/pairs/groups',
+    'ai-enhancement-chain-gate': '30 source files',
+    'ai-remix-completion': 'Missing fields only',
+    'answer-explanation-target': 'Question explanations',
+    'assignment-snapshot-protection': 'Frozen links protected',
+    'audio-extraction-readiness': 'Listening draft path',
+    'create-input-contract': 'CreateActivityInput',
+    'deterministic-fallback': 'Local stable draft',
+    'deterministic-remix-precheck': 'Readiness first',
+    'distractor-generation-target': 'ActivityQuestion.options',
+    'draft-coverage-summary': 'Coverage counts',
+    'editor-review-gate': 'Review before save',
+    'leveled-variant-boundary': 'Draft copy variant',
+    'listening-script-boundary': 'Listening prompt draft',
+    'product-ai-enhancement-boundary': 'Teacher-reviewed roadmap',
+    'provider-credential-gate': 'Configured provider only',
+    'public-payload-guard': 'Sanitized runtime only',
+    'publish-boundary': 'No assignment link',
+    'question-option-contract': 'Four-choice readiness',
+    'raw-provider-output-guard': 'Parsed fields only',
+    'result-export-continuity': 'Shared export model',
+    'save-gate': 'Teacher action required',
+    'source-byte-guard': 'No file bytes',
+    'source-material-provenance': 'Kind and basename only',
+    'source-to-activity-draft': 'CreateActivityInput draft',
+    'spreadsheet-import-readiness': 'Structured import path',
+    'storage-key-guard': 'Storage hidden',
+    'template-readiness-diagnosis': 'Ready and locked modes',
+    'template-transform-boundary': 'Structured field proposal',
+    'worksheet-extraction-boundary': 'ActivityContent target',
+  }
+);
+assert.match(
+  readFileSync('docs/product.md', 'utf8'),
+  /Future AI enhancement work follows the same execution boundary[\s\S]*template\s+transforms[\s\S]*distractor\s+generation[\s\S]*leveled variants[\s\S]*answer\s+explanations[\s\S]*listening\s+scripts[\s\S]*worksheet\s+extraction[\s\S]*CreateActivityInput[\s\S]*must not create assignment links[\s\S]*mutate existing assignment snapshots[\s\S]*read\s+source-material file bytes or storage keys/,
+  'docs/product.md should preserve the future AI enhancement execution boundary.'
+);
+assert.match(
+  readFileSync('tests/e2e/TEST-CATALOG.md', 'utf8'),
+  /Activity AI enhancement roadmap chain has a fast script-level gate via[\s\S]*scripts\/activity-ai-enhancement-roadmap-chain-handoff\.test\.ts[\s\S]*template\s+transforms[\s\S]*distractor write\s+targets[\s\S]*leveled variants[\s\S]*answer\s+explanations[\s\S]*listening\s+scripts[\s\S]*worksheet\/audio\/spreadsheet\s+extraction[\s\S]*source-material privacy[\s\S]*editor-review\/save\/publish boundaries[\s\S]*snapshot\s+protection[\s\S]*result-export continuity/,
+  'TEST-CATALOG should document the activity AI enhancement roadmap chain gate.'
 );
 const activityAuthoringLibraryChainView =
   buildActivityAuthoringLibraryChainHandoffView();
@@ -43429,6 +43549,7 @@ assert.deepEqual(
     ACTIVITY_TEMPLATE_REMIX_HANDOFF_ITEM_IDS.length,
     QUESTION_CHOICE_GENERATION_HANDOFF_ITEM_IDS.length,
     ACTIVITY_AI_AUTHORING_CHAIN_HANDOFF_ITEM_IDS.length,
+    ACTIVITY_AI_ENHANCEMENT_ROADMAP_CHAIN_HANDOFF_ITEM_IDS.length,
     ACTIVITY_AI_REMIX_ASSIST_HANDOFF_ITEM_IDS.length,
     ACTIVITY_SOURCE_EXTRACTION_ASSIST_HANDOFF_ITEM_IDS.length,
     WORKSHEET_MODE_DELIVERY_CHAIN_HANDOFF_ITEM_IDS.length,
@@ -43442,7 +43563,7 @@ assert.deepEqual(
     PRINTABLE_WORKSHEET_HANDOFF_ITEM_IDS.length,
     ASSIGNMENT_RESULTS_EXPORT_PREPARATION_ITEM_IDS.length,
   ],
-  Array.from({ length: 18 }, () => 30),
+  Array.from({ length: 19 }, () => 30),
   'Template roadmap capability chain should stay backed by focused roadmap, template, AI, worksheet, runtime, print, and export gates.'
 );
 assert.deepEqual(Object.fromEntries(templateRoadmapCapabilityChainValues), {
