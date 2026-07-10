@@ -1113,6 +1113,11 @@ import {
   buildAssignmentResultAcceptedAnswerChainHandoffView,
 } from '@/assignments/result-accepted-answer-chain';
 import {
+  ASSIGNMENT_RESULT_EXPLANATION_CHAIN_HANDOFF_ITEM_IDS,
+  ASSIGNMENT_RESULT_EXPLANATION_CHAIN_SOURCE_FILES,
+  buildAssignmentResultExplanationChainHandoffView,
+} from '@/assignments/result-explanation-chain';
+import {
   ASSIGNMENT_RESULT_EMPTY_STATE_HANDOFF_ITEM_IDS,
   buildAssignmentResultEmptyStateHandoffView,
 } from '@/assignments/result-empty-state-handoff';
@@ -59927,6 +59932,38 @@ assert.equal(
     (itemView) => itemView.id === 'accepted-alternatives-text'
   )?.value,
   'Alternatives only'
+);
+assert.equal(ASSIGNMENT_RESULT_EXPLANATION_CHAIN_HANDOFF_ITEM_IDS.length, 30);
+assert.equal(ASSIGNMENT_RESULT_EXPLANATION_CHAIN_SOURCE_FILES.length, 30);
+for (const filePath of ASSIGNMENT_RESULT_EXPLANATION_CHAIN_SOURCE_FILES) {
+  assert.ok(existsSync(filePath), `Missing explanation chain ${filePath}`);
+}
+const explanationChainView = buildAssignmentResultExplanationChainHandoffView();
+assert.deepEqual(
+  explanationChainView.itemViews.map((itemView) => itemView.id),
+  [...ASSIGNMENT_RESULT_EXPLANATION_CHAIN_HANDOFF_ITEM_IDS]
+);
+assert.deepEqual(explanationChainView.privacy, {
+  chainSourceFileCount: ASSIGNMENT_RESULT_EXPLANATION_CHAIN_SOURCE_FILES.length,
+  copyArtifactsUseFormattedExplanations: true,
+  csvExportsUseFormattedExplanations: true,
+  exposesCsvDataUrlInHandoff: false,
+  exposesPromptTextInHandoff: false,
+  exposesRawRuntimeItemIdsInHandoff: false,
+  exposesStudentAnswerTextInHandoff: false,
+  exposesStudentNamesInHandoff: false,
+  exposesTeacherExplanationTextInHandoff: false,
+  itemIds: [...ASSIGNMENT_RESULT_EXPLANATION_CHAIN_HANDOFF_ITEM_IDS],
+  printableAnswerKeysUseFormattedExplanations: true,
+  publicFeedbackRespectsAnswerReveal: true,
+  resultPagesUseFormattedExplanations: true,
+  sourceFiles: [...ASSIGNMENT_RESULT_EXPLANATION_CHAIN_SOURCE_FILES],
+});
+assert.equal(
+  explanationChainView.itemViews.find(
+    (itemView) => itemView.id === 'csv-answer-row-explanation'
+  )?.value,
+  'Formatted text'
 );
 assert.equal(formatAcceptedAnswerAlternatives([]), '-');
 assert.equal(formatAcceptedAnswerAlternatives(['Paris']), '-');

@@ -274,6 +274,11 @@ run it when changing the accepted-answer parser, primary-vs-alternatives
 formatting, result cards, item performance columns, attempt review cards, CSV
 accepted-answer columns, printable review alignment, or accepted-answer privacy
 guards.
+Assignment result explanation continuity chain has a fast script-level gate via
+`pnpm exec tsx --test scripts/assignment-result-explanation-chain-handoff.test.ts`;
+run it when changing result explanations, post-submit review visibility,
+student feedback explanations, item review copy notes, CSV explanation columns,
+printable answer-key explanations, or explanation privacy guards.
 Assignment source-activity context chain has a fast script-level gate via
 `pnpm exec tsx --test scripts/assignment-source-activity-context-chain-handoff.test.ts`;
 run it when changing source-activity snapshot resolution, assignment-list
