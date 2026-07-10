@@ -340,8 +340,9 @@ stable semantic outputs so teachers can verify the current review evidence
 before copying reteach artifacts or exporting results.
 Printable worksheet pages should do the same for handout overview chips,
 student/date/score and delivery fields, answer-key access state, item response
-help, choice banks, writing areas, and teacher-only answer-key details, so
-paper handoffs remain reviewable without depending on visual badges alone.
+help, choice banks, writing areas, teacher-only answer-key details,
+return-to-results links, and print controls, so paper handoffs remain
+reviewable without depending on visual badges alone.
 The teacher result page should show the student summary, the top reteach
 priorities, and the full item performance table so a teacher can scan the
 class before opening individual student answers. The full item performance

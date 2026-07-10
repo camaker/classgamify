@@ -831,6 +831,11 @@ import {
   getPrintableWorksheetChoiceIndexValue,
 } from '@/assignments/printable-worksheet-view';
 import {
+  PRINTABLE_WORKSHEET_REVIEW_LIFECYCLE_CHAIN_HANDOFF_ITEM_IDS,
+  PRINTABLE_WORKSHEET_REVIEW_LIFECYCLE_CHAIN_SOURCE_FILES,
+  buildPrintableWorksheetReviewLifecycleChainHandoffView,
+} from '@/assignments/printable-worksheet-review-lifecycle-chain';
+import {
   WORKSHEET_MODE_DELIVERY_CHAIN_HANDOFF_ITEM_IDS,
   WORKSHEET_MODE_DELIVERY_CHAIN_SOURCE_FILES,
   buildWorksheetModeDeliveryChainHandoffView,
@@ -40668,6 +40673,110 @@ assert.match(
   e2eTestCatalogText,
   /student-name, date, and score lines/,
   'E2E catalog should cover the printable worksheet student, date, and score fields.'
+);
+const printableWorksheetReviewLifecycleChainView =
+  buildPrintableWorksheetReviewLifecycleChainHandoffView();
+const printableWorksheetReviewLifecycleChainValues = new Map(
+  printableWorksheetReviewLifecycleChainView.itemViews.map((item) => [
+    item.id,
+    item.value,
+  ])
+);
+assert.deepEqual(
+  printableWorksheetReviewLifecycleChainView.itemViews.map((item) => item.id),
+  [...PRINTABLE_WORKSHEET_REVIEW_LIFECYCLE_CHAIN_HANDOFF_ITEM_IDS],
+  'Printable worksheet review lifecycle chain should expose the stable result-to-print 30-slice order.'
+);
+assert.equal(printableWorksheetReviewLifecycleChainView.itemViews.length, 30);
+assert.equal(
+  new Set(PRINTABLE_WORKSHEET_REVIEW_LIFECYCLE_CHAIN_HANDOFF_ITEM_IDS).size,
+  30
+);
+assert.equal(
+  PRINTABLE_WORKSHEET_REVIEW_LIFECYCLE_CHAIN_SOURCE_FILES.length,
+  30
+);
+for (const filePath of PRINTABLE_WORKSHEET_REVIEW_LIFECYCLE_CHAIN_SOURCE_FILES) {
+  assert.ok(
+    existsSync(filePath),
+    `Missing printable worksheet review lifecycle chain file ${filePath}`
+  );
+}
+assert.ok(
+  printableWorksheetReviewLifecycleChainView.itemViews.every(
+    (item) => item.ariaLabel && item.description && item.label && item.value
+  )
+);
+assert.deepEqual(printableWorksheetReviewLifecycleChainView.privacy, {
+  answerKeyHiddenByDefault: true,
+  chainSourceFileCount:
+    PRINTABLE_WORKSHEET_REVIEW_LIFECYCLE_CHAIN_SOURCE_FILES.length,
+  changesAttemptsOrResults: false,
+  changesPublicRunner: false,
+  exposesAnswerKeyTextInHandoff: false,
+  exposesChoiceTextInHandoff: false,
+  exposesPromptTextInHandoff: false,
+  exposesRawAnonymousTokens: false,
+  exposesSourceMaterialStorageKeys: false,
+  exposesStudentResponseTextInHandoff: false,
+  itemIds: [...PRINTABLE_WORKSHEET_REVIEW_LIFECYCLE_CHAIN_HANDOFF_ITEM_IDS],
+  requiresAuthenticatedTeacher: true,
+  requiresAssignmentSnapshot: true,
+  requiresOwnerScopedAssignment: true,
+  sourceFiles: [...PRINTABLE_WORKSHEET_REVIEW_LIFECYCLE_CHAIN_SOURCE_FILES],
+  usesSharedDeliveryPolicy: true,
+  usesSharedRuntimeItems: true,
+});
+assert.deepEqual(
+  [
+    PRINTABLE_WORKSHEET_HANDOFF_ITEM_IDS.length,
+    WORKSHEET_MODE_DELIVERY_CHAIN_HANDOFF_ITEM_IDS.length,
+    ASSIGNMENT_RESULTS_EXPORT_PREPARATION_ITEM_IDS.length,
+    ASSIGNMENT_DELIVERY_POLICY_HANDOFF_ITEM_IDS.length,
+    ASSIGNMENT_RESULT_MATERIAL_HANDOFF_ITEM_IDS.length,
+  ],
+  Array.from({ length: 5 }, () => 30),
+  'Printable worksheet review lifecycle chain should stay backed by printable, worksheet delivery, delivery policy, result material, and export gates.'
+);
+assert.deepEqual(
+  Object.fromEntries(printableWorksheetReviewLifecycleChainValues),
+  {
+    'answer-key-detail-boundary': 'Detail ids stable',
+    'answer-key-hidden-state': 'Hidden by default',
+    'answer-key-included-state': 'Teacher-only key included',
+    'answer-key-search-builder': 'answerKey=true only',
+    'answer-key-search-parser': 'answerKey parser',
+    'answer-key-unavailable-state': 'No answer key available',
+    'assignment-field-handoff': '8 print fields',
+    'choice-bank-policy': 'Choice bank from runtime',
+    'delivery-policy-printing': 'Shared delivery policy',
+    'header-overview-chips': '3 overview chips',
+    'owner-scoped-print-api': 'Owner assignment row',
+    'preparation-summary': '3 preparation checks',
+    'prepared-print-link': '/print/assignments/:assignmentId',
+    'print-action-boundary': 'window.print action',
+    'print-route-auth-boundary': 'Authenticated teacher',
+    'print-route-noindex': 'noindex nofollow',
+    'printable-item-mapping': 'Student handout items',
+    'printable-review-lifecycle-gate': '30 source files',
+    'response-policy-map': 'Template response policy',
+    'result-export-alignment': 'CSV stays full export',
+    'result-page-print-action': 'Teacher result action',
+    'results-return-action': 'Back to results',
+    'robots-print-disallow': 'Disallow /print',
+    'runtime-item-order': 'Shared item order',
+    'share-path-printing': '/play share path',
+    'snapshot-source-resolution': 'Frozen snapshot',
+    'toolbar-toggle-boundary': 'Answer-key switch',
+    'worksheet-delivery-chain-alignment': 'Worksheet chain aligned',
+    'worksheet-query-key': 'Keyed by answer key',
+    'writing-area-policy': 'Bounded answer lines',
+  }
+);
+assert.match(
+  e2eTestCatalogText,
+  /Printable worksheet review lifecycle chain has a fast script-level gate via[\s\S]*scripts\/printable-worksheet-review-lifecycle-chain-handoff\.test\.ts/,
+  'TEST-CATALOG should document the printable worksheet review lifecycle chain gate.'
 );
 const classroomControlSemanticsSource = readFileSync(
   'src/classroom/control-semantics.ts',
