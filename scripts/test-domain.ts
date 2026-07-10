@@ -672,10 +672,13 @@ import {
   buildGroupSortBoardHandoffView,
   GROUP_SORT_BOARD_HANDOFF_ITEM_IDS,
 } from '@/assignments/group-sort-board-handoff';
+import { LINE_MATCH_BOARD_HANDOFF_ITEM_IDS } from '@/assignments/line-match-board-handoff';
+import { LISTENING_SPEECH_HANDOFF_ITEM_IDS } from '@/assignments/listening-speech-handoff';
 import {
   buildMatchingPairsBoardHandoffView,
   MATCHING_PAIRS_BOARD_HANDOFF_ITEM_IDS,
 } from '@/assignments/matching-pairs-board-handoff';
+import { OPEN_BOX_REVEAL_HANDOFF_ITEM_IDS } from '@/assignments/open-box-reveal-handoff';
 import {
   formatAssignmentDisplayText,
   formatAssignmentDisplayTitle,
@@ -1186,6 +1189,11 @@ import {
   shouldResetStudentRunnerAttemptSession,
   shouldStartStudentRunnerAttemptClock,
 } from '@/assignments/student-runner-state';
+import {
+  STUDENT_RUNNER_PLAY_CHAIN_HANDOFF_ITEM_IDS,
+  STUDENT_RUNNER_PLAY_CHAIN_SOURCE_FILES,
+  buildStudentRunnerPlayChainHandoffView,
+} from '@/assignments/student-runner-play-chain';
 import { STUDENT_RUNNER_LOADING_HANDOFF_ITEM_IDS } from '@/assignments/student-runner-loading-handoff';
 import {
   buildStudentRunnerSubmitControlsHandoffView,
@@ -1238,6 +1246,7 @@ import {
   buildStudentRuntimeIdentityHandoffView,
   STUDENT_RUNTIME_IDENTITY_HANDOFF_ITEM_IDS,
 } from '@/assignments/runtime-identity-handoff';
+import { STUDENT_RUNTIME_CHOICE_ASSIGNMENT_HANDOFF_ITEM_IDS } from '@/assignments/runtime-choice-assignment-handoff';
 import {
   ASSIGNMENT_MAX_ATTEMPTS_RANGE,
   ASSIGNMENT_PUBLISH_FIELD_LIMITS,
@@ -16089,6 +16098,111 @@ assert.deepEqual(
     'identity-privacy-guard',
   ],
   'Student runtime semantic bundle handoff should expose exactly 30 stable sourced slice ids.'
+);
+const studentRunnerPlayChainView = buildStudentRunnerPlayChainHandoffView();
+const studentRunnerPlayChainValues = new Map(
+  studentRunnerPlayChainView.itemViews.map((item) => [item.id, item.value])
+);
+assert.deepEqual(
+  studentRunnerPlayChainView.itemViews.map((item) => item.id),
+  [...STUDENT_RUNNER_PLAY_CHAIN_HANDOFF_ITEM_IDS],
+  'Student runner play chain should expose the stable public-runner 30-slice order.'
+);
+assert.equal(studentRunnerPlayChainView.itemViews.length, 30);
+assert.equal(new Set(STUDENT_RUNNER_PLAY_CHAIN_HANDOFF_ITEM_IDS).size, 30);
+assert.equal(STUDENT_RUNNER_PLAY_CHAIN_SOURCE_FILES.length, 30);
+for (const filePath of STUDENT_RUNNER_PLAY_CHAIN_SOURCE_FILES) {
+  assert.ok(
+    existsSync(filePath),
+    `Missing student runner play chain file ${filePath}`
+  );
+}
+assert.ok(
+  studentRunnerPlayChainView.itemViews.every(
+    (item) => item.ariaLabel && item.description && item.label && item.value
+  )
+);
+assert.deepEqual(studentRunnerPlayChainView.privacy, {
+  chainSourceFileCount: STUDENT_RUNNER_PLAY_CHAIN_SOURCE_FILES.length,
+  exposesAnswerKeysBeforeReview: false,
+  exposesRawAnonymousTokens: false,
+  exposesRuntimeItemIdsInHandoffs: false,
+  exposesSourceMaterialMetadata: false,
+  exposesStudentAnswersBeforeSubmit: false,
+  exposesStudentNameInHandoffs: false,
+  itemIds: [...STUDENT_RUNNER_PLAY_CHAIN_HANDOFF_ITEM_IDS],
+  preservesTeacherReviewBoundary: true,
+  publicPayloadUsesSanitizedRuntimeItems: true,
+  rejectsClosedOrExpiredSubmissions: true,
+  rejectsInvalidSubmittedAnswers: true,
+  sourceFiles: [...STUDENT_RUNNER_PLAY_CHAIN_SOURCE_FILES],
+  submissionPayloadUsesRuntimeItemIds: true,
+});
+assert.deepEqual(
+  [
+    PUBLIC_ASSIGNMENT_ACCESS_HANDOFF_ITEM_IDS.length,
+    PUBLIC_ASSIGNMENT_RULES_HANDOFF_ITEM_IDS.length,
+    PUBLIC_ASSIGNMENT_UNAVAILABLE_ACCESS_HANDOFF_ITEM_IDS.length,
+    STUDENT_RUNNER_LOADING_HANDOFF_ITEM_IDS.length,
+    STUDENT_RUNNER_START_HANDOFF_ITEM_IDS.length,
+    STUDENT_RUNNER_IDENTITY_HANDOFF_ITEM_IDS.length,
+    STUDENT_RUNNER_SUBMIT_CONTROLS_HANDOFF_ITEM_IDS.length,
+    STUDENT_RUNNER_SUBMISSION_HANDOFF_ITEM_IDS.length,
+    STUDENT_RUNTIME_INTERACTION_HANDOFF_ITEM_IDS.length,
+    STUDENT_RUNTIME_CHOICE_ASSIGNMENT_HANDOFF_ITEM_IDS.length,
+    STUDENT_RUNTIME_IDENTITY_HANDOFF_ITEM_IDS.length,
+    STUDENT_RUNTIME_SEMANTIC_BUNDLE_HANDOFF_ITEM_IDS.length,
+    FILL_BLANK_WORKSHEET_HANDOFF_ITEM_IDS.length,
+    LINE_MATCH_BOARD_HANDOFF_ITEM_IDS.length,
+    GROUP_SORT_BOARD_HANDOFF_ITEM_IDS.length,
+    MATCHING_PAIRS_BOARD_HANDOFF_ITEM_IDS.length,
+    LISTENING_SPEECH_HANDOFF_ITEM_IDS.length,
+    OPEN_BOX_REVEAL_HANDOFF_ITEM_IDS.length,
+    ASSIGNMENT_ATTEMPT_LIMIT_HANDOFF_ITEM_IDS.length,
+    ASSIGNMENT_ATTEMPT_DURATION_HANDOFF_ITEM_IDS.length,
+    ASSIGNMENT_ANSWER_FEEDBACK_HANDOFF_ITEM_IDS.length,
+    ASSIGNMENT_SUBMISSION_VALIDATION_HANDOFF_ITEM_IDS.length,
+    ASSIGNMENT_ATTEMPT_PERSISTENCE_HANDOFF_ITEM_IDS.length,
+  ],
+  Array.from({ length: 23 }, () => 30),
+  'Student runner play chain should stay backed by focused public-runner gates.'
+);
+assert.deepEqual(Object.fromEntries(studentRunnerPlayChainValues), {
+  'anonymous-token-guard': 'Raw token hidden',
+  'answer-feedback-policy': 'Reveal if allowed',
+  'attempt-limit-enforcement': 'Per identity',
+  'attempt-persistence': 'Scored attempt',
+  'choice-assignment-contract': '{ itemId, answer }',
+  'duration-normalization': 'Whole seconds',
+  'fill-blank-renderer': 'Worksheet blanks',
+  'group-sort-renderer': 'Category board',
+  'lifecycle-access-check': 'Published and open',
+  'line-match-renderer': 'Connection flow',
+  'listening-renderer': 'Speech track',
+  'matching-pairs-renderer': 'Left/right cards',
+  'open-box-renderer': 'Reveal flow',
+  'partial-submit-confirmation': 'Explicit second action',
+  'post-submit-next-steps': 'Review or retry',
+  'progress-counts': 'Answered items',
+  'public-payload-gate': 'Open links only',
+  'public-rules-summary': 'Student-visible policy',
+  'runner-identity-policy': 'Name or browser',
+  'runner-loading-state': 'Payload pending',
+  'runner-start-readiness': 'Rules before play',
+  'runtime-interaction-routing': 'Template renderer',
+  'runtime-item-order': 'Stable order',
+  'runtime-identity-contract': 'Identity hidden',
+  'semantic-bundle-guard': 'Safe handoff bundle',
+  'student-runner-chain-gate': '30 source files',
+  'submit-controls-readiness': 'Prepared controls',
+  'submission-validation': 'Shared answer guard',
+  'timer-start-boundary': 'After readiness',
+  'unavailable-link-policy': 'Runtime hidden',
+});
+assert.match(
+  readFileSync('tests/e2e/TEST-CATALOG.md', 'utf8'),
+  /Student runner play chain has a fast script-level gate via[\s\S]*scripts\/student-runner-play-chain-handoff\.test\.ts/,
+  'TEST-CATALOG should document the student runner play chain gate.'
 );
 assert.match(
   studentRuntimeItemListDomainSource,

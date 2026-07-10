@@ -506,6 +506,12 @@ run it when changing print-route search parsing, worksheet response policies,
 frozen snapshot worksheet generation, delivery-policy printing, answer-key
 toggle behavior, privacy-scope boundaries, accepted-answer/explanation
 rendering, or the print toolbar.
+Student runner play chain has a fast script-level gate via
+`pnpm exec tsx --test scripts/student-runner-play-chain-handoff.test.ts`;
+run it when changing public payload access, public rule summary, runner loading
+or start readiness, identity and anonymous-token policy, attempt limits,
+timers/duration, template renderers, progress counts, partial-submit controls,
+submission validation, attempt persistence, or answer feedback.
 Fill-blank worksheet runtime has a fast script-level gate via
 `pnpm exec tsx --test scripts/fill-blank-worksheet-handoff-semantic-views.test.ts`;
 run it when changing the 30-slice worksheet handoff, inline blank coverage,
