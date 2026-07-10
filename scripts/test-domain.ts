@@ -314,6 +314,12 @@ import {
   buildActivityAiEnhancementPublishBoundaryView,
 } from '@/activities/ai-enhancement-publish-boundary';
 import {
+  ACTIVITY_AI_ENHANCEMENT_LIFECYCLE_CHAIN_ITEM_IDS,
+  ACTIVITY_AI_ENHANCEMENT_LIFECYCLE_CHAIN_SOURCE_FILES,
+  buildActivityAiEnhancementLifecycleChainPlan,
+  buildActivityAiEnhancementLifecycleChainView,
+} from '@/activities/ai-enhancement-lifecycle-chain';
+import {
   TEMPLATE_ROADMAP_CAPABILITY_CHAIN_HANDOFF_ITEM_IDS,
   TEMPLATE_ROADMAP_CAPABILITY_CHAIN_SOURCE_FILES,
   buildTemplateRoadmapCapabilityChainHandoffView,
@@ -6968,12 +6974,13 @@ assert.deepEqual(
     ACTIVITY_AI_ENHANCEMENT_EDITOR_REVIEW_ITEM_IDS.length,
     ACTIVITY_AI_ENHANCEMENT_SAVE_BOUNDARY_ITEM_IDS.length,
     ACTIVITY_AI_ENHANCEMENT_PUBLISH_BOUNDARY_ITEM_IDS.length,
+    ACTIVITY_AI_ENHANCEMENT_LIFECYCLE_CHAIN_ITEM_IDS.length,
     TEMPLATE_ROADMAP_CAPABILITY_CHAIN_HANDOFF_ITEM_IDS.length,
     WORKSHEET_MODE_DELIVERY_CHAIN_HANDOFF_ITEM_IDS.length,
     ASSIGNMENT_RESULTS_EXPORT_PREPARATION_ITEM_IDS.length,
   ],
-  Array.from({ length: 18 }, () => 30),
-  'Activity AI enhancement roadmap chain should stay backed by authoring, remix, extraction, policy, execution, draft output, draft application, editor review, save boundary, publish boundary, roadmap, worksheet, and result-export gates.'
+  Array.from({ length: 19 }, () => 30),
+  'Activity AI enhancement roadmap chain should stay backed by authoring, remix, extraction, policy, execution, draft output, draft application, editor review, save boundary, publish boundary, lifecycle, roadmap, worksheet, and result-export gates.'
 );
 assert.deepEqual(
   Object.fromEntries(activityAiEnhancementRoadmapChainValues),
@@ -8047,6 +8054,174 @@ assert.match(
   readFileSync('tests/e2e/TEST-CATALOG.md', 'utf8'),
   /Activity AI enhancement publish boundary has a fast script-level gate via[\s\S]*scripts\/activity-ai-enhancement-publish-boundary\.test\.ts[\s\S]*saved activity records[\s\S]*teacher publish actions[\s\S]*assignment publish preflight[\s\S]*share-link creation boundaries[\s\S]*snapshot\s+freezing[\s\S]*privacy guards/,
   'TEST-CATALOG should document the activity AI enhancement publish boundary gate.'
+);
+const activityAiEnhancementLifecycleChainView =
+  buildActivityAiEnhancementLifecycleChainView({
+    activityPersisted: true,
+    content: activityAiEnhancementPolicyContent,
+    currentTemplateType: 'quiz',
+    enhancementKind: 'answer-explanation',
+    existingAssignmentSnapshotCount: 3,
+    existingPublishedAssignmentCount: 4,
+    hasAuthenticatedTeacher: true,
+    parsedDraft: activityAiEnhancementDraftApplicationDraft,
+    proposedDraft: activityAiEnhancementDraftApplicationDraft,
+    providerConfigured: true,
+    publishSubmitted: true,
+    publishValues: {
+      instructions: 'secret lifecycle instructions',
+      maxAttempts: '3',
+      timeLimitMinutes: '15',
+    },
+    reviewedCheckIds: ACTIVITY_AI_ENHANCEMENT_EDITOR_REVIEW_CHECK_IDS,
+    savedActivityId: 'secret-lifecycle-activity-id',
+    teacherSubmittedSave: true,
+  });
+const activityAiEnhancementLifecycleValues = new Map(
+  activityAiEnhancementLifecycleChainView.itemViews.map((item) => [
+    item.id,
+    item.value,
+  ])
+);
+assert.deepEqual(
+  activityAiEnhancementLifecycleChainView.itemViews.map((item) => item.id),
+  [...ACTIVITY_AI_ENHANCEMENT_LIFECYCLE_CHAIN_ITEM_IDS],
+  'Activity AI enhancement lifecycle chain should expose the stable policy-to-publish 30-slice order.'
+);
+assert.equal(activityAiEnhancementLifecycleChainView.itemViews.length, 30);
+assert.equal(
+  new Set(ACTIVITY_AI_ENHANCEMENT_LIFECYCLE_CHAIN_ITEM_IDS).size,
+  30
+);
+assert.equal(ACTIVITY_AI_ENHANCEMENT_LIFECYCLE_CHAIN_SOURCE_FILES.length, 30);
+for (const filePath of ACTIVITY_AI_ENHANCEMENT_LIFECYCLE_CHAIN_SOURCE_FILES) {
+  assert.ok(
+    existsSync(filePath),
+    `Missing activity AI enhancement lifecycle source ${filePath}`
+  );
+}
+assert.equal(
+  activityAiEnhancementLifecycleChainView.plan.chainStatus,
+  'ready-for-assignment-publish'
+);
+assert.equal(
+  activityAiEnhancementLifecycleChainView.plan.canPassDraftOutputToApplication,
+  true
+);
+assert.equal(
+  activityAiEnhancementLifecycleChainView.plan.canCreateAssignmentLink,
+  true
+);
+assert.equal(
+  activityAiEnhancementLifecycleValues.get('chain-state-stage'),
+  'ready-for-assignment-publish'
+);
+assert.equal(
+  activityAiEnhancementLifecycleValues.get('share-link-stage'),
+  'Publish flow creates link'
+);
+assert.equal(
+  activityAiEnhancementLifecycleValues.get('snapshot-freeze-stage'),
+  'Saved activity snapshot'
+);
+assert.equal(
+  JSON.stringify(activityAiEnhancementLifecycleChainView).includes(
+    'secret-policy-file-id'
+  ),
+  false,
+  'Activity AI enhancement lifecycle view should not leak source material file ids.'
+);
+assert.equal(
+  JSON.stringify(activityAiEnhancementLifecycleChainView).includes(
+    'secret-lifecycle-activity-id'
+  ),
+  false,
+  'Activity AI enhancement lifecycle view should not leak saved activity ids.'
+);
+assert.equal(
+  JSON.stringify(activityAiEnhancementLifecycleChainView).includes(
+    'secret lifecycle instructions'
+  ),
+  false,
+  'Activity AI enhancement lifecycle view should not leak student instructions.'
+);
+assert.deepEqual(activityAiEnhancementLifecycleChainView.privacy, {
+  chainSourceFileCount:
+    ACTIVITY_AI_ENHANCEMENT_LIFECYCLE_CHAIN_SOURCE_FILES.length,
+  createsAssignmentLinksWithoutTeacherAction: false,
+  exposesActivityContentText: false,
+  exposesAnswerKeysToPublicPayload: false,
+  exposesAssignmentTitle: false,
+  exposesDraftText: false,
+  exposesFileBytesToAi: false,
+  exposesInternalActivityIds: false,
+  exposesQuestionPromptText: false,
+  exposesRawAiOutput: false,
+  exposesRawSourceText: false,
+  exposesShareSlug: false,
+  exposesSourceMaterialFileIds: false,
+  exposesSourceMaterialFilenames: false,
+  exposesSourceMaterialStorageKeys: false,
+  exposesStudentInstructions: false,
+  itemIds: [...ACTIVITY_AI_ENHANCEMENT_LIFECYCLE_CHAIN_ITEM_IDS],
+  mutatesExistingAssignmentSnapshots: false,
+  persistsActivityWithoutTeacherAction: false,
+  publishesAssignmentWithoutTeacherAction: false,
+  readsSourceMaterialBytes: false,
+  requiresCreateActivityInputContract: true,
+  requiresEditorReview: true,
+  requiresTeacherPublishAction: true,
+  requiresTeacherSaveAction: true,
+  sourceFiles: [...ACTIVITY_AI_ENHANCEMENT_LIFECYCLE_CHAIN_SOURCE_FILES],
+  usesAssignmentPublishPreflight: true,
+  usesAssignmentSnapshotFreeze: true,
+  usesDraftOutputPlan: true,
+  usesPublishBoundaryPlan: true,
+  usesSaveBoundaryPlan: true,
+});
+assert.equal(
+  buildActivityAiEnhancementLifecycleChainPlan({
+    content: activityAiEnhancementPolicyContent,
+    currentTemplateType: 'quiz',
+    enhancementKind: 'answer-explanation',
+    hasAuthenticatedTeacher: true,
+    parsedDraft: null,
+    proposedDraft: activityAiEnhancementDraftApplicationDraft,
+    providerConfigured: true,
+    reviewedCheckIds: ACTIVITY_AI_ENHANCEMENT_EDITOR_REVIEW_CHECK_IDS,
+    teacherSubmittedSave: true,
+  }).chainStatus,
+  'awaiting-draft-output'
+);
+assert.equal(
+  buildActivityAiEnhancementLifecycleChainPlan({
+    activityPersisted: true,
+    content: activityAiEnhancementPolicyContent,
+    currentTemplateType: 'quiz',
+    enhancementKind: 'answer-explanation',
+    hasAuthenticatedTeacher: true,
+    proposedDraft: activityAiEnhancementDraftApplicationDraft,
+    providerConfigured: true,
+    reviewedCheckIds: ACTIVITY_AI_ENHANCEMENT_EDITOR_REVIEW_CHECK_IDS,
+    savedActivityId: 'secret-lifecycle-activity-id',
+    teacherSubmittedSave: true,
+  }).chainStatus,
+  'awaiting-teacher-publish'
+);
+assert.match(
+  readFileSync('src/activities/ai-enhancement-lifecycle-chain.ts', 'utf8'),
+  /buildActivityAiEnhancementPolicyDecision[\s\S]*buildActivityAiEnhancementExecutionPlan[\s\S]*buildActivityAiEnhancementDraftOutputPlan[\s\S]*buildActivityAiEnhancementDraftApplicationPlan[\s\S]*buildActivityAiEnhancementEditorReviewPlan[\s\S]*buildActivityAiEnhancementSaveBoundaryPlan[\s\S]*buildActivityAiEnhancementPublishBoundaryPlan/,
+  'Activity AI enhancement lifecycle source should compose the existing policy-to-publish stages.'
+);
+assert.match(
+  readFileSync('docs/product.md', 'utf8'),
+  /src\/activities\/ai-enhancement-lifecycle-chain\.ts` owns the full AI enhancement lifecycle handoff[\s\S]*request policy[\s\S]*parsed draft output[\s\S]*teacher review[\s\S]*manual save[\s\S]*assignment\s+publish actions[\s\S]*result-export continuity/,
+  'docs/product.md should document the activity AI enhancement lifecycle owner.'
+);
+assert.match(
+  readFileSync('tests/e2e/TEST-CATALOG.md', 'utf8'),
+  /Activity AI enhancement lifecycle chain has a fast script-level gate via[\s\S]*scripts\/activity-ai-enhancement-lifecycle-chain\.test\.ts[\s\S]*policy-to-publish ordering[\s\S]*draft output handoffs[\s\S]*teacher review[\s\S]*manual save[\s\S]*assignment\s+publish actions[\s\S]*share-link\/snapshot boundaries[\s\S]*result-export continuity/,
+  'TEST-CATALOG should document the activity AI enhancement lifecycle chain gate.'
 );
 const activityAuthoringLibraryChainView =
   buildActivityAuthoringLibraryChainHandoffView();

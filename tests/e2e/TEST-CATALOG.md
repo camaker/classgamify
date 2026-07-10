@@ -601,6 +601,12 @@ run it when changing saved activity records, teacher publish actions,
 assignment publish preflight, share-link creation boundaries, snapshot
 freezing, public-payload guards, result continuity, source-material privacy, or
 privacy guards.
+Activity AI enhancement lifecycle chain has a fast script-level gate via
+`pnpm exec tsx --test scripts/activity-ai-enhancement-lifecycle-chain.test.ts`;
+run it when changing policy-to-publish ordering, draft output handoffs, editor
+application, teacher review, manual save, saved activity records, assignment
+publish actions, share-link/snapshot boundaries, public payload/privacy guards,
+or result-export continuity.
 Template roadmap capability chain has a fast script-level gate via
 `pnpm exec tsx --test scripts/template-roadmap-capability-chain-handoff.test.ts`;
 run it when changing roadmap template promises, Wordwall-style templates,

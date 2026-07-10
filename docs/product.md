@@ -479,6 +479,11 @@ Implementation boundaries:
   teacher publish actions, assignment publish preflight, share-link creation
   boundaries, snapshot freezing, public-payload guards, result continuity, and
   private draft/source-material privacy.
+- `src/activities/ai-enhancement-lifecycle-chain.ts` owns the full AI enhancement lifecycle handoff
+  from request policy through execution, parsed draft output, editor
+  application, teacher review, manual save, saved activity records, assignment
+  publish actions, share-link and snapshot boundaries, public-payload guards,
+  privacy guards, and result-export continuity.
 - `src/api/activity-ai.ts` exposes the authenticated server function.
 - `src/components/activities/activity-create-form.tsx` only collects draft
   inputs and fills the existing form.
