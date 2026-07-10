@@ -1254,6 +1254,11 @@ import {
   STUDENT_RUNNER_PLAY_CHAIN_SOURCE_FILES,
   buildStudentRunnerPlayChainHandoffView,
 } from '@/assignments/student-runner-play-chain';
+import {
+  STUDENT_IDENTITY_LIFECYCLE_CHAIN_HANDOFF_ITEM_IDS,
+  STUDENT_IDENTITY_LIFECYCLE_CHAIN_SOURCE_FILES,
+  buildStudentIdentityLifecycleChainHandoffView,
+} from '@/assignments/student-identity-lifecycle-chain';
 import { STUDENT_RUNNER_LOADING_HANDOFF_ITEM_IDS } from '@/assignments/student-runner-loading-handoff';
 import {
   buildStudentRunnerSubmitControlsHandoffView,
@@ -17017,6 +17022,112 @@ assert.match(
   readFileSync('tests/e2e/TEST-CATALOG.md', 'utf8'),
   /Student runner play chain has a fast script-level gate via[\s\S]*scripts\/student-runner-play-chain-handoff\.test\.ts/,
   'TEST-CATALOG should document the student runner play chain gate.'
+);
+const studentIdentityLifecycleChainView =
+  buildStudentIdentityLifecycleChainHandoffView();
+const studentIdentityLifecycleChainValues = new Map(
+  studentIdentityLifecycleChainView.itemViews.map((item) => [
+    item.id,
+    item.value,
+  ])
+);
+assert.deepEqual(
+  studentIdentityLifecycleChainView.itemViews.map((item) => item.id),
+  [...STUDENT_IDENTITY_LIFECYCLE_CHAIN_HANDOFF_ITEM_IDS],
+  'Student identity lifecycle chain should expose the stable 30-slice order.'
+);
+assert.equal(studentIdentityLifecycleChainView.itemViews.length, 30);
+assert.equal(
+  new Set(STUDENT_IDENTITY_LIFECYCLE_CHAIN_HANDOFF_ITEM_IDS).size,
+  30
+);
+assert.equal(STUDENT_IDENTITY_LIFECYCLE_CHAIN_SOURCE_FILES.length, 30);
+for (const filePath of STUDENT_IDENTITY_LIFECYCLE_CHAIN_SOURCE_FILES) {
+  assert.ok(
+    existsSync(filePath),
+    `Missing student identity lifecycle chain file ${filePath}`
+  );
+}
+assert.ok(
+  studentIdentityLifecycleChainView.itemViews.every(
+    (item) => item.ariaLabel && item.description && item.label && item.value
+  )
+);
+assert.deepEqual(studentIdentityLifecycleChainView.privacy, {
+  chainSourceFileCount: STUDENT_IDENTITY_LIFECYCLE_CHAIN_SOURCE_FILES.length,
+  exposesAnonymousBrowserLabel: true,
+  exposesRawAnonymousTokens: false,
+  exposesRawSubmissionPayloads: false,
+  exposesSourceMaterialMetadataInIdentityHandoff: false,
+  exposesStudentAnswerTextInIdentityHandoff: false,
+  exposesStudentNameInputValues: false,
+  exposesStudentNamesInHandoff: false,
+  exposesTeacherAnswerKeysInIdentityHandoff: false,
+  itemIds: [...STUDENT_IDENTITY_LIFECYCLE_CHAIN_HANDOFF_ITEM_IDS],
+  keepsNameAndTokenModesExclusive: true,
+  requiresNormalizedAnonymousTokens: true,
+  requiresNormalizedStudentNames: true,
+  resultConsumersUseNormalizedIdentity: true,
+  sourceFiles: [...STUDENT_IDENTITY_LIFECYCLE_CHAIN_SOURCE_FILES],
+  usesBrowserTokenForAnonymousAttempts: true,
+  usesDisplayLabelsForAnonymousResults: true,
+  usesScoredAttemptsForAttemptLimits: true,
+});
+assert.deepEqual(
+  [
+    STUDENT_RUNNER_IDENTITY_HANDOFF_ITEM_IDS.length,
+    STUDENT_RUNNER_START_HANDOFF_ITEM_IDS.length,
+    STUDENT_RUNNER_SUBMISSION_HANDOFF_ITEM_IDS.length,
+    STUDENT_RUNNER_SUBMIT_CONTROLS_HANDOFF_ITEM_IDS.length,
+    STUDENT_RUNTIME_IDENTITY_HANDOFF_ITEM_IDS.length,
+    ASSIGNMENT_ATTEMPT_LIMIT_HANDOFF_ITEM_IDS.length,
+    ASSIGNMENT_ATTEMPT_PERSISTENCE_HANDOFF_ITEM_IDS.length,
+    ASSIGNMENT_RESULT_STUDENT_SEARCH_HANDOFF_ITEM_IDS.length,
+    ASSIGNMENT_STUDENT_SUMMARY_SORT_HANDOFF_ITEM_IDS.length,
+    ASSIGNMENT_ATTEMPT_REVIEW_CARD_HANDOFF_ITEM_IDS.length,
+    ASSIGNMENT_RESULTS_EXPORT_PREPARATION_ITEM_IDS.length,
+    STUDENT_RUNNER_PLAY_CHAIN_HANDOFF_ITEM_IDS.length,
+    TEACHER_RESULTS_REVIEW_CHAIN_HANDOFF_ITEM_IDS.length,
+  ],
+  Array.from({ length: 13 }, () => 30),
+  'Student identity lifecycle chain should stay backed by adjacent identity, runner, attempt, result, and export gates.'
+);
+assert.deepEqual(Object.fromEntries(studentIdentityLifecycleChainValues), {
+  'anonymous-browser-label': '6-char browser code',
+  'anonymous-identity-key': 'anonymous:*',
+  'anonymous-token-create-reuse': 'Reuse or create',
+  'anonymous-token-normalization': 'NFKC + no whitespace',
+  'anonymous-token-storage-key': 'classgamify:attempt-token',
+  'api-submission-identity': 'Resolved identity',
+  'attempt-count-strategy': 'Normalized strategy',
+  'attempt-limit-count-query': 'Scored attempts',
+  'attempt-persistence-identity-fields': 'Name or token',
+  'attempt-review-identity': 'Review label only',
+  'identity-grouping-priority': 'Name before token',
+  'identity-resolver-display': 'Safe labels',
+  'product-identity-policy': 'Name or browser token',
+  'result-analysis-identity': 'Identity resolver',
+  'result-export-token-guard': 'Raw token hidden',
+  'result-search-anonymous-label': 'Normalized labels',
+  'runner-anonymous-guidance': 'Browser guidance',
+  'runner-identity-handoff': '30 identity slices',
+  'runner-identity-view': 'Prepared identity view',
+  'runner-start-privacy': 'Start handoff hidden',
+  'runner-submission-privacy': 'Submission handoff hidden',
+  'scored-attempt-query-identity': 'Identity selects',
+  'student-identity-chain-gate': '30 source files',
+  'student-name-identity-key': 'name:*',
+  'student-name-normalization': 'NFKC + collapsed spaces',
+  'student-summary-sort-identity': 'Student label sort',
+  'submission-anonymous-mode': 'Token only',
+  'submission-input-builder': 'Sanitized input',
+  'submission-name-mode': 'Name only',
+  'submission-plan-token-resolution': 'Anonymous only',
+});
+assert.match(
+  readFileSync('tests/e2e/TEST-CATALOG.md', 'utf8'),
+  /Student identity lifecycle chain has a fast script-level gate via[\s\S]*scripts\/student-identity-lifecycle-chain-handoff\.test\.ts/,
+  'TEST-CATALOG should document the student identity lifecycle chain gate.'
 );
 assert.match(
   studentRuntimeItemListDomainSource,
