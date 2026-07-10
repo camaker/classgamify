@@ -41,6 +41,7 @@ import {
   buildAssignmentSharePath,
 } from '@/assignments/share-link';
 import { normalizeAssignmentShareSlug } from '@/assignments/share-slug';
+import { ASSIGNMENT_SOURCE_ACTIVITY_CONTEXT_CHAIN_HANDOFF_ITEM_IDS } from '@/assignments/source-activity-context-chain';
 import { STUDENT_RUNNER_START_HANDOFF_ITEM_IDS } from '@/assignments/student-runner-state';
 import { TEACHER_RESULTS_REVIEW_CHAIN_HANDOFF_ITEM_IDS } from '@/assignments/teacher-results-review-chain';
 import { overwriteGetLocale } from '@/locale/paraglide/runtime';
@@ -130,6 +131,7 @@ test('assignment distribution lifecycle chain exposes 30 safe slices', () => {
     requiresOwnerScopedAssignmentList: true,
     sourceFiles: [...ASSIGNMENT_DISTRIBUTION_LIFECYCLE_CHAIN_SOURCE_FILES],
     usesAbsoluteStudentUrl: true,
+    usesFrozenSourceActivityContext: true,
     usesNormalizedShareSlug: true,
     usesPreparedShareActions: true,
     usesSharedCopyPlan: true,
@@ -168,7 +170,7 @@ test('assignment distribution lifecycle summarizes each handoff boundary', () =>
       ['published-panel-action-parity', 'Panel actions'],
       ['hidden-share-handoff', '30 share slices'],
       ['filter-scope-alignment', 'Owner scope'],
-      ['delivery-policy-summary', 'Shared settings'],
+      ['source-activity-context', 'Frozen source shown'],
       ['student-runner-boundary', 'Public /play'],
       ['printable-handout-boundary', 'Teacher print'],
       ['result-review-boundary', 'Teacher results'],
@@ -198,11 +200,12 @@ test('assignment distribution lifecycle is backed by adjacent gates', () => {
       ASSIGNMENT_PUBLISH_HANDOFF_ITEM_IDS.length,
       ASSIGNMENT_DELIVERY_POLICY_HANDOFF_ITEM_IDS.length,
       PUBLISHED_ASSIGNMENT_DELIVERY_CHAIN_HANDOFF_ITEM_IDS.length,
+      ASSIGNMENT_SOURCE_ACTIVITY_CONTEXT_CHAIN_HANDOFF_ITEM_IDS.length,
       STUDENT_RUNNER_START_HANDOFF_ITEM_IDS.length,
       PRINTABLE_WORKSHEET_HANDOFF_ITEM_IDS.length,
       TEACHER_RESULTS_REVIEW_CHAIN_HANDOFF_ITEM_IDS.length,
     ],
-    Array.from({ length: 8 }, () => 30)
+    Array.from({ length: 9 }, () => 30)
   );
 });
 
@@ -243,6 +246,7 @@ test('published assignment context keeps distribution states and actions aligned
   });
 
   assert.equal(cardView.shareSlug, 'classroom-link');
+  assert.equal(cardView.activityDescription, 'Frozen distribution snapshot.');
   assert.equal(cardView.distributionView.status, 'ready-to-share');
   assert.deepEqual(
     cardView.distributionView.stepViews.map((step) => [step.id, step.status]),
@@ -486,6 +490,11 @@ test('assignment distribution lifecycle sources preserve route, DOM, and API bou
     'docs/product.md should keep post-publish distribution as a first-class teacher workflow.'
   );
   assert.match(
+    PRODUCT_SOURCE,
+    /filter their own assignments by title,[\s\S]*source activity text[\s\S]*Assignment list overview cards[\s\S]*distribution steps/,
+    'docs/product.md should keep source activity context connected to assignment list distribution.'
+  );
+  assert.match(
     API_ASSIGNMENTS_SOURCE,
     /publishedShareSlug[\s\S]*buildPublishedAssignmentListItemSelect\(\)[\s\S]*buildAssignmentDetailOwnerShareWhere\(\{[\s\S]*shareSlug: data\.publishedShareSlug,[\s\S]*userId/,
     'Assignments API should resolve published share context through owner-scoped share lookup.'
@@ -517,8 +526,8 @@ test('assignment distribution lifecycle sources preserve route, DOM, and API bou
   );
   assert.match(
     LIST_VIEW_SOURCE,
-    /publishedPanelContext[\s\S]*buildAssignmentListFilterScopeBoundary[\s\S]*publishedShareContextStatus[\s\S]*buildAssignmentListDistributionView[\s\S]*copy-link[\s\S]*preview-link[\s\S]*print-worksheet[\s\S]*review-results[\s\S]*buildAssignmentListCardActionView/,
-    'Assignment list view model should keep published context, distribution steps, and action preparation together.'
+    /(?=[\s\S]*resolveAssignmentSnapshotSource\(\{[\s\S]*activity,[\s\S]*snapshot[\s\S]*activityDescription: resolvedSource\.activityDescription \?\? '')(?=[\s\S]*publishedPanelContext[\s\S]*buildAssignmentListFilterScopeBoundary[\s\S]*publishedShareContextStatus)(?=[\s\S]*buildAssignmentListDistributionView[\s\S]*copy-link[\s\S]*preview-link[\s\S]*print-worksheet[\s\S]*review-results[\s\S]*buildAssignmentListCardActionView)/,
+    'Assignment list view model should keep frozen source context, published context, distribution steps, and action preparation together.'
   );
   assert.match(
     PUBLISHED_PANEL_SOURCE,
@@ -550,7 +559,7 @@ test('assignment distribution lifecycle focused gate is documented', () => {
   );
   assert.match(
     TEST_CATALOG_SOURCE,
-    /post-publish route context[\s\S]*owner-scoped published lookup[\s\S]*absolute student URLs[\s\S]*copy[\s\S]*preview[\s\S]*print[\s\S]*results actions[\s\S]*assignment-list[\s\S]*distribution steps/,
+    /post-publish route context[\s\S]*owner-scoped published lookup[\s\S]*absolute student URLs[\s\S]*frozen source activity context[\s\S]*copy[\s\S]*preview[\s\S]*print[\s\S]*results actions[\s\S]*assignment-list[\s\S]*distribution steps/,
     'TEST-CATALOG should describe the distribution lifecycle scope.'
   );
 });

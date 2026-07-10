@@ -5116,6 +5116,7 @@ assert.deepEqual(assignmentDistributionLifecycleChainView.privacy, {
   requiresOwnerScopedAssignmentList: true,
   sourceFiles: [...ASSIGNMENT_DISTRIBUTION_LIFECYCLE_CHAIN_SOURCE_FILES],
   usesAbsoluteStudentUrl: true,
+  usesFrozenSourceActivityContext: true,
   usesNormalizedShareSlug: true,
   usesPreparedShareActions: true,
   usesSharedCopyPlan: true,
@@ -5127,19 +5128,19 @@ assert.deepEqual(
     ASSIGNMENT_PUBLISH_HANDOFF_ITEM_IDS.length,
     ASSIGNMENT_DELIVERY_POLICY_HANDOFF_ITEM_IDS.length,
     PUBLISHED_ASSIGNMENT_DELIVERY_CHAIN_HANDOFF_ITEM_IDS.length,
+    ASSIGNMENT_SOURCE_ACTIVITY_CONTEXT_CHAIN_HANDOFF_ITEM_IDS.length,
     STUDENT_RUNNER_START_HANDOFF_ITEM_IDS.length,
     PRINTABLE_WORKSHEET_HANDOFF_ITEM_IDS.length,
     TEACHER_RESULTS_REVIEW_CHAIN_HANDOFF_ITEM_IDS.length,
   ],
-  Array.from({ length: 8 }, () => 30),
-  'Assignment distribution lifecycle chain should stay backed by assignment list, share-link, publish, delivery, runner, print, and results gates.'
+  Array.from({ length: 9 }, () => 30),
+  'Assignment distribution lifecycle chain should stay backed by assignment list, share-link, publish, delivery, source context, runner, print, and results gates.'
 );
 assert.deepEqual(Object.fromEntries(assignmentDistributionLifecycleChainValues), {
   'absolute-share-url': 'Student URL',
   'copy-execution-plan': 'Shared copy plan',
   'copy-feedback': 'Toast mapped',
   'copy-step-readiness': 'Copy step',
-  'delivery-policy-summary': 'Shared settings',
   'distribution-lifecycle-gate': '30 source files',
   'distribution-status': 'Ready or collecting',
   'filter-scope-alignment': 'Owner scope',
@@ -5164,12 +5165,18 @@ assert.deepEqual(Object.fromEntries(assignmentDistributionLifecycleChainValues),
   'share-link-availability': 'Lifecycle guarded',
   'share-path-builder': '/play/:shareId',
   'share-slug-normalization': 'normalizeAssignmentShareSlug',
+  'source-activity-context': 'Frozen source shown',
   'student-runner-boundary': 'Public /play',
 });
 assert.match(
   readFileSync('tests/e2e/TEST-CATALOG.md', 'utf8'),
   /Assignment distribution lifecycle chain has a fast script-level gate via[\s\S]*scripts\/assignment-distribution-lifecycle-chain-handoff\.test\.ts/,
   'TEST-CATALOG should document the assignment distribution lifecycle chain gate.'
+);
+assert.match(
+  readFileSync('tests/e2e/TEST-CATALOG.md', 'utf8'),
+  /post-publish route context[\s\S]*owner-scoped published lookup[\s\S]*absolute student URLs[\s\S]*frozen source activity context[\s\S]*copy\/preview\/print\/results actions[\s\S]*assignment-list distribution steps/,
+  'TEST-CATALOG should describe source-aware distribution lifecycle scope.'
 );
 const assignmentSourceActivityContextChainView =
   buildAssignmentSourceActivityContextChainHandoffView();

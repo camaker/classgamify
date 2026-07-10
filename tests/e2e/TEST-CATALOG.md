@@ -539,9 +539,9 @@ boundaries, or the hidden assignment-list handoff.
 Assignment distribution lifecycle chain has a fast script-level gate via
 `pnpm exec tsx --test scripts/assignment-distribution-lifecycle-chain-handoff.test.ts`;
 run it when changing post-publish route context, owner-scoped published lookup,
-absolute student URLs, copy/preview/print/results actions, assignment-list
-distribution steps, share-link handoff surfaces, or published-panel privacy
-guards.
+absolute student URLs, frozen source activity context,
+copy/preview/print/results actions, assignment-list distribution steps,
+share-link handoff surfaces, or published-panel privacy guards.
 Assignment lifecycle boundaries have a fast script-level gate via
 `pnpm exec tsx --test scripts/assignment-lifecycle-handoff-semantic-views.test.ts`;
 run it when changing open/closed/expired/draft status resolution, close/reopen

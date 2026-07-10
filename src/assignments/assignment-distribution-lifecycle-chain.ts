@@ -24,7 +24,7 @@ export const ASSIGNMENT_DISTRIBUTION_LIFECYCLE_CHAIN_HANDOFF_ITEM_IDS = [
   'published-panel-action-parity',
   'hidden-share-handoff',
   'filter-scope-alignment',
-  'delivery-policy-summary',
+  'source-activity-context',
   'student-runner-boundary',
   'printable-handout-boundary',
   'result-review-boundary',
@@ -42,7 +42,7 @@ export const ASSIGNMENT_DISTRIBUTION_LIFECYCLE_CHAIN_SOURCE_FILES = [
   'src/assignments/published-assignment.ts',
   'src/assignments/share-link.ts',
   'src/assignments/share-slug.ts',
-  'src/assignments/assignment-display.ts',
+  'src/assignments/source-activity-context-chain.ts',
   'src/assignments/lifecycle.ts',
   'src/assignments/delivery-summary.ts',
   'src/assignments/printable-worksheet.ts',
@@ -92,6 +92,7 @@ export type AssignmentDistributionLifecycleChainPrivacyContract = {
   requiresOwnerScopedAssignmentList: true;
   sourceFiles: string[];
   usesAbsoluteStudentUrl: true;
+  usesFrozenSourceActivityContext: true;
   usesNormalizedShareSlug: true;
   usesPreparedShareActions: true;
   usesSharedCopyPlan: true;
@@ -112,7 +113,7 @@ export function buildAssignmentDistributionLifecycleChainHandoffView(): Assignme
 
   return {
     description:
-      'Thirty-slice assignment distribution lifecycle chain from post-publish route context and owner-scoped assignment list lookup through absolute student links, preview/copy/print/result actions, list card parity, and privacy guards.',
+      'Thirty-slice assignment distribution lifecycle chain from post-publish route context and owner-scoped assignment list lookup through absolute student links, frozen source activity context, preview/copy/print/result actions, list card parity, and privacy guards.',
     itemViews,
     privacy: {
       chainSourceFileCount:
@@ -132,6 +133,7 @@ export function buildAssignmentDistributionLifecycleChainHandoffView(): Assignme
       requiresOwnerScopedAssignmentList: true,
       sourceFiles: [...ASSIGNMENT_DISTRIBUTION_LIFECYCLE_CHAIN_SOURCE_FILES],
       usesAbsoluteStudentUrl: true,
+      usesFrozenSourceActivityContext: true,
       usesNormalizedShareSlug: true,
       usesPreparedShareActions: true,
       usesSharedCopyPlan: true,
@@ -333,12 +335,12 @@ function getAssignmentDistributionLifecycleChainHandoffItem(
         'Owner scope',
         'Assignment list handoff keeps full filtered counts, visible page counts, filters, and published context aligned.'
       );
-    case 'delivery-policy-summary':
+    case 'source-activity-context':
       return item(
         id,
-        'Delivery policy summary',
-        'Shared settings',
-        'Assignment cards keep delivery settings visible beside distribution actions so teachers can verify link rules.'
+        'Source activity context',
+        'Frozen source shown',
+        'Assignment list distribution cards keep the frozen source activity description aligned with copy, preview, print, and result actions.'
       );
     case 'student-runner-boundary':
       return item(
@@ -366,7 +368,7 @@ function getAssignmentDistributionLifecycleChainHandoffItem(
         id,
         'Distribution lifecycle gate',
         '30 source files',
-        'A focused gate keeps publish redirect context, assignment list distribution, share-link actions, student preview, print, and results boundaries connected.'
+        'A focused gate keeps publish redirect context, assignment list distribution, source activity context, share-link actions, student preview, print, and results boundaries connected.'
       );
   }
 }
