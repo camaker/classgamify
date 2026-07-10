@@ -309,6 +309,11 @@ import {
   buildActivityAiEnhancementSaveBoundaryView,
 } from '@/activities/ai-enhancement-save-boundary';
 import {
+  ACTIVITY_AI_ENHANCEMENT_PUBLISH_BOUNDARY_ITEM_IDS,
+  buildActivityAiEnhancementPublishBoundaryPlan,
+  buildActivityAiEnhancementPublishBoundaryView,
+} from '@/activities/ai-enhancement-publish-boundary';
+import {
   TEMPLATE_ROADMAP_CAPABILITY_CHAIN_HANDOFF_ITEM_IDS,
   TEMPLATE_ROADMAP_CAPABILITY_CHAIN_SOURCE_FILES,
   buildTemplateRoadmapCapabilityChainHandoffView,
@@ -6962,12 +6967,13 @@ assert.deepEqual(
     ACTIVITY_AI_ENHANCEMENT_DRAFT_APPLICATION_ITEM_IDS.length,
     ACTIVITY_AI_ENHANCEMENT_EDITOR_REVIEW_ITEM_IDS.length,
     ACTIVITY_AI_ENHANCEMENT_SAVE_BOUNDARY_ITEM_IDS.length,
+    ACTIVITY_AI_ENHANCEMENT_PUBLISH_BOUNDARY_ITEM_IDS.length,
     TEMPLATE_ROADMAP_CAPABILITY_CHAIN_HANDOFF_ITEM_IDS.length,
     WORKSHEET_MODE_DELIVERY_CHAIN_HANDOFF_ITEM_IDS.length,
     ASSIGNMENT_RESULTS_EXPORT_PREPARATION_ITEM_IDS.length,
   ],
-  Array.from({ length: 17 }, () => 30),
-  'Activity AI enhancement roadmap chain should stay backed by authoring, remix, extraction, policy, execution, draft output, draft application, editor review, save boundary, roadmap, worksheet, and result-export gates.'
+  Array.from({ length: 18 }, () => 30),
+  'Activity AI enhancement roadmap chain should stay backed by authoring, remix, extraction, policy, execution, draft output, draft application, editor review, save boundary, publish boundary, roadmap, worksheet, and result-export gates.'
 );
 assert.deepEqual(
   Object.fromEntries(activityAiEnhancementRoadmapChainValues),
@@ -7863,6 +7869,184 @@ assert.match(
   readFileSync('tests/e2e/TEST-CATALOG.md', 'utf8'),
   /Activity AI enhancement save boundary has a fast script-level gate via[\s\S]*scripts\/activity-ai-enhancement-save-boundary\.test\.ts[\s\S]*teacher save actions[\s\S]*create\/edit save plans[\s\S]*activity-id\s+gates[\s\S]*manual persistence boundaries[\s\S]*snapshot protection[\s\S]*privacy guards/,
   'TEST-CATALOG should document the activity AI enhancement save boundary gate.'
+);
+const activityAiEnhancementPublishBoundaryView =
+  buildActivityAiEnhancementPublishBoundaryView({
+    activityPersisted: true,
+    content: activityAiEnhancementPolicyContent,
+    currentTemplateType: 'quiz',
+    enhancementKind: 'answer-explanation',
+    existingPublishedAssignmentCount: 4,
+    hasAuthenticatedTeacher: true,
+    proposedDraft: activityAiEnhancementDraftApplicationDraft,
+    providerConfigured: true,
+    publishSubmitted: true,
+    publishValues: {
+      instructions: 'secret publish instructions',
+      maxAttempts: '3',
+      timeLimitMinutes: '15',
+    },
+    reviewedCheckIds: ACTIVITY_AI_ENHANCEMENT_EDITOR_REVIEW_CHECK_IDS,
+    savedActivityId: 'secret-publish-activity-id',
+    teacherSubmittedSave: true,
+  });
+const activityAiEnhancementPublishBoundaryValues = new Map(
+  activityAiEnhancementPublishBoundaryView.itemViews.map((item) => [
+    item.id,
+    item.value,
+  ])
+);
+assert.deepEqual(
+  activityAiEnhancementPublishBoundaryView.itemViews.map((item) => item.id),
+  [...ACTIVITY_AI_ENHANCEMENT_PUBLISH_BOUNDARY_ITEM_IDS],
+  'Activity AI enhancement publish boundary should expose the stable 30-slice publish order.'
+);
+assert.equal(activityAiEnhancementPublishBoundaryView.itemViews.length, 30);
+assert.equal(
+  new Set(ACTIVITY_AI_ENHANCEMENT_PUBLISH_BOUNDARY_ITEM_IDS).size,
+  30
+);
+assert.equal(
+  activityAiEnhancementPublishBoundaryView.plan.status,
+  'ready-for-assignment-publish'
+);
+assert.equal(
+  activityAiEnhancementPublishBoundaryView.plan.canPublishAssignment,
+  true
+);
+assert.equal(
+  activityAiEnhancementPublishBoundaryView.plan.canCreateAssignmentLink,
+  true
+);
+assert.equal(
+  activityAiEnhancementPublishBoundaryValues.get('teacher-publish-action'),
+  'Publish clicked'
+);
+assert.equal(
+  activityAiEnhancementPublishBoundaryValues.get('assignment-link-boundary'),
+  'Publish flow creates link'
+);
+assert.equal(
+  activityAiEnhancementPublishBoundaryValues.get(
+    'protected-existing-snapshots'
+  ),
+  '4 existing links protected'
+);
+assert.equal(
+  JSON.stringify(activityAiEnhancementPublishBoundaryView).includes(
+    'secret-policy-file-id'
+  ),
+  false,
+  'Activity AI enhancement publish boundary view should not leak source material file ids.'
+);
+assert.equal(
+  JSON.stringify(activityAiEnhancementPublishBoundaryView).includes(
+    'secret-publish-activity-id'
+  ),
+  false,
+  'Activity AI enhancement publish boundary view should not leak saved activity ids.'
+);
+assert.equal(
+  JSON.stringify(activityAiEnhancementPublishBoundaryView).includes(
+    'secret publish instructions'
+  ),
+  false,
+  'Activity AI enhancement publish boundary view should not leak student instructions.'
+);
+assert.deepEqual(activityAiEnhancementPublishBoundaryView.privacy, {
+  appliesAfterActivitySave: true,
+  createsAssignmentLinksWithoutTeacherAction: false,
+  createsAssignmentSnapshotsWithoutTeacherAction: false,
+  exposesActivityContentText: false,
+  exposesAnswerKeysToPublicPayload: false,
+  exposesAssignmentTitle: false,
+  exposesDraftText: false,
+  exposesFileBytesToAi: false,
+  exposesInternalActivityIds: false,
+  exposesQuestionPromptText: false,
+  exposesRawAiOutput: false,
+  exposesRawSourceText: false,
+  exposesShareSlug: false,
+  exposesSourceMaterialFileIds: false,
+  exposesSourceMaterialFilenames: false,
+  exposesSourceMaterialStorageKeys: false,
+  exposesStudentInstructions: false,
+  itemIds: [...ACTIVITY_AI_ENHANCEMENT_PUBLISH_BOUNDARY_ITEM_IDS],
+  mutatesExistingAssignmentSnapshots: false,
+  publishesAssignmentWithoutTeacherAction: false,
+  readsSourceMaterialBytes: false,
+  requiresAssignmentPublishFlow: true,
+  requiresSavedActivityRecord: true,
+  requiresTeacherPublishAction: true,
+  scope: 'activity-ai-enhancement-publish-boundary',
+  usesAssignmentPublishPreflight: true,
+  usesAssignmentSnapshotFreeze: true,
+  usesSaveBoundaryPlan: true,
+});
+assert.equal(
+  buildActivityAiEnhancementPublishBoundaryPlan({
+    activityPersisted: true,
+    content: activityAiEnhancementPolicyContent,
+    currentTemplateType: 'quiz',
+    enhancementKind: 'answer-explanation',
+    hasAuthenticatedTeacher: true,
+    proposedDraft: activityAiEnhancementDraftApplicationDraft,
+    providerConfigured: true,
+    reviewedCheckIds: ACTIVITY_AI_ENHANCEMENT_EDITOR_REVIEW_CHECK_IDS,
+    savedActivityId: 'secret-publish-activity-id',
+    teacherSubmittedSave: true,
+  }).status,
+  'awaiting-publish-action'
+);
+assert.equal(
+  buildActivityAiEnhancementPublishBoundaryPlan({
+    activityPersisted: false,
+    content: activityAiEnhancementPolicyContent,
+    currentTemplateType: 'quiz',
+    enhancementKind: 'answer-explanation',
+    hasAuthenticatedTeacher: true,
+    proposedDraft: activityAiEnhancementDraftApplicationDraft,
+    providerConfigured: true,
+    publishSubmitted: true,
+    reviewedCheckIds: ACTIVITY_AI_ENHANCEMENT_EDITOR_REVIEW_CHECK_IDS,
+    savedActivityId: 'secret-publish-activity-id',
+    teacherSubmittedSave: true,
+  }).status,
+  'awaiting-activity-record'
+);
+assert.equal(
+  buildActivityAiEnhancementPublishBoundaryPlan({
+    activityPersisted: true,
+    content: activityAiEnhancementPolicyContent,
+    currentTemplateType: 'quiz',
+    enhancementKind: 'answer-explanation',
+    hasAuthenticatedTeacher: true,
+    proposedDraft: activityAiEnhancementDraftApplicationDraft,
+    providerConfigured: true,
+    publishSubmitted: true,
+    publishValues: {
+      title: '',
+    },
+    reviewedCheckIds: ACTIVITY_AI_ENHANCEMENT_EDITOR_REVIEW_CHECK_IDS,
+    savedActivityId: 'secret-publish-activity-id',
+    teacherSubmittedSave: true,
+  }).status,
+  'blocked-before-publish'
+);
+assert.match(
+  readFileSync('src/activities/ai-enhancement-publish-boundary.ts', 'utf8'),
+  /export const ACTIVITY_AI_ENHANCEMENT_PUBLISH_BOUNDARY_ITEM_IDS = \[[\s\S]*'publish-scope'[\s\S]*'teacher-publish-action'[\s\S]*'publish-execution-plan'[\s\S]*'assignment-link-boundary'[\s\S]*'snapshot-freeze'[\s\S]*'publish-chain-gate'/,
+  'Activity AI enhancement publish boundary source should preserve the publish slices.'
+);
+assert.match(
+  readFileSync('docs/product.md', 'utf8'),
+  /src\/activities\/ai-enhancement-publish-boundary\.ts` owns the assignment publish boundary[\s\S]*saved activity records[\s\S]*teacher publish actions[\s\S]*assignment publish preflight[\s\S]*share-link creation\s+boundaries[\s\S]*snapshot freezing[\s\S]*private\s+draft\/source-material privacy/,
+  'docs/product.md should document the activity AI enhancement publish boundary owner.'
+);
+assert.match(
+  readFileSync('tests/e2e/TEST-CATALOG.md', 'utf8'),
+  /Activity AI enhancement publish boundary has a fast script-level gate via[\s\S]*scripts\/activity-ai-enhancement-publish-boundary\.test\.ts[\s\S]*saved activity records[\s\S]*teacher publish actions[\s\S]*assignment publish preflight[\s\S]*share-link creation boundaries[\s\S]*snapshot\s+freezing[\s\S]*privacy guards/,
+  'TEST-CATALOG should document the activity AI enhancement publish boundary gate.'
 );
 const activityAuthoringLibraryChainView =
   buildActivityAuthoringLibraryChainHandoffView();

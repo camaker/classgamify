@@ -474,6 +474,11 @@ Implementation boundaries:
   activity-id gates, manual persistence boundaries, activity-record targets,
   publish blocking, snapshot protection, result continuity, and private
   draft/source-material privacy.
+- `src/activities/ai-enhancement-publish-boundary.ts` owns the assignment publish boundary
+  after a reviewed AI enhancement draft is saved: saved activity records,
+  teacher publish actions, assignment publish preflight, share-link creation
+  boundaries, snapshot freezing, public-payload guards, result continuity, and
+  private draft/source-material privacy.
 - `src/api/activity-ai.ts` exposes the authenticated server function.
 - `src/components/activities/activity-create-form.tsx` only collects draft
   inputs and fills the existing form.
