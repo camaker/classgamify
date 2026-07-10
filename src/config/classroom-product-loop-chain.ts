@@ -4,7 +4,7 @@ export const CLASSROOM_PRODUCT_LOOP_CHAIN_HANDOFF_ITEM_IDS = [
   'activity-content-contract',
   'activity-library-owner-scope',
   'activity-authoring-entry',
-  'template-scaffold-entry',
+  'template-roadmap-capability-boundary',
   'ai-enhancement-lifecycle-boundary',
   'source-material-reference-boundary',
   'activity-lifecycle-derivative-guard',
@@ -39,7 +39,7 @@ export const CLASSROOM_PRODUCT_LOOP_CHAIN_SOURCE_FILES = [
   'src/db/classroom-data-lifecycle-chain.ts',
   'src/activities/types.ts',
   'src/activities/validation.ts',
-  'src/activities/scaffolds.ts',
+  'src/activities/template-roadmap-capability-chain.ts',
   'src/activities/ai-enhancement-lifecycle-chain.ts',
   'src/activities/authoring-library-chain.ts',
   'src/activities/activity-lifecycle-governance-chain.ts',
@@ -94,6 +94,7 @@ export type ClassroomProductLoopChainPrivacyContract = {
   keepsActivityLibraryOwnerScoped: true;
   keepsAssignmentListOwnerScoped: true;
   keepsDashboardOwnerScoped: true;
+  keepsTemplateRoadmapOnSharedActivityModel: true;
   publicPayloadUsesRuntimeItemsOnly: true;
   rejectsInvalidSubmissions: true;
   requiresTeacherReviewForAiEnhancements: true;
@@ -102,6 +103,7 @@ export type ClassroomProductLoopChainPrivacyContract = {
   sourceFiles: string[];
   usesAiEnhancementLifecycleChain: true;
   usesActivityAssignmentAttemptResultsLoop: true;
+  usesTemplateRoadmapCapabilityChain: true;
 };
 
 export type ClassroomProductLoopChainHandoffView = {
@@ -118,7 +120,7 @@ export function buildClassroomProductLoopChainHandoffView(): ClassroomProductLoo
 
   return {
     description:
-      'Thirty-slice classroom product loop chain from teacher-owned activities and reusable content through AI enhancement lifecycle review, assignment publish, frozen snapshots, public student play, validated attempts, scored results, submitted-date, accepted-answer, and explanation continuity, teacher review, copy/export/print handoffs, dashboard status, public entry points, and privacy guards.',
+      'Thirty-slice classroom product loop chain from teacher-owned activities and reusable content through template roadmap capability alignment, AI enhancement lifecycle review, assignment publish, frozen snapshots, public student play, validated attempts, scored results, submitted-date, accepted-answer, and explanation continuity, teacher review, copy/export/print handoffs, dashboard status, public entry points, and privacy guards.',
     itemViews,
     privacy: {
       chainSourceFileCount: CLASSROOM_PRODUCT_LOOP_CHAIN_SOURCE_FILES.length,
@@ -139,6 +141,7 @@ export function buildClassroomProductLoopChainHandoffView(): ClassroomProductLoo
       keepsActivityLibraryOwnerScoped: true,
       keepsAssignmentListOwnerScoped: true,
       keepsDashboardOwnerScoped: true,
+      keepsTemplateRoadmapOnSharedActivityModel: true,
       publicPayloadUsesRuntimeItemsOnly: true,
       rejectsInvalidSubmissions: true,
       requiresTeacherReviewForAiEnhancements: true,
@@ -147,6 +150,7 @@ export function buildClassroomProductLoopChainHandoffView(): ClassroomProductLoo
       sourceFiles: [...CLASSROOM_PRODUCT_LOOP_CHAIN_SOURCE_FILES],
       usesAiEnhancementLifecycleChain: true,
       usesActivityAssignmentAttemptResultsLoop: true,
+      usesTemplateRoadmapCapabilityChain: true,
     },
     title: 'Classroom product loop chain',
   };
@@ -202,12 +206,12 @@ function getClassroomProductLoopChainHandoffItem(
         'Create editor',
         'Public template and worksheet entry points land in the shared teacher-reviewed create editor.'
       );
-    case 'template-scaffold-entry':
+    case 'template-roadmap-capability-boundary':
       return item(
         id,
-        'Template scaffold entry',
-        'Reviewed scaffold',
-        'Template scaffolds demonstrate playable structured content without bypassing teacher review.'
+        'Template roadmap capability boundary',
+        '30 roadmap slices',
+        'Wordwall-style templates, Liveworksheets-style modes, shared editor scaffolds, AI enhancements, worksheet delivery, print follow-up, and result exports stay on the shared activity-assignment model.'
       );
     case 'ai-enhancement-lifecycle-boundary':
       return item(
