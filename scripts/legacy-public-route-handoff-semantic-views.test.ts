@@ -36,6 +36,7 @@ type RetiredLegacyPath = (typeof RETIRED_LEGACY_PUBLIC_PATHS)[number];
 
 const ROUTE_TREE_SOURCE = readFileSync('src/routeTree.gen.ts', 'utf8');
 const PUBLIC_ROUTES_SOURCE = readFileSync('src/seo/public-routes.ts', 'utf8');
+const SERVER_SOURCE = readFileSync('src/server.ts', 'utf8');
 const TEST_CATALOG_SOURCE = readFileSync('tests/e2e/TEST-CATALOG.md', 'utf8');
 
 const RETIRED_ROUTE_MODULE_CANDIDATES = {
@@ -53,6 +54,13 @@ const RETIRED_ROUTE_MODULE_CANDIDATES = {
 } as const satisfies Record<RetiredLegacyPath, readonly string[]>;
 
 const EVIDENCE = buildLegacyPublicRouteEvidence();
+
+test('leaked route-group URLs redirect only to their canonical public pages', () => {
+  assert.match(SERVER_SOURCE, /\['\/\(pages\)\/roadmap', '\/roadmap'\]/);
+  assert.match(SERVER_SOURCE, /\['\/\(legals\)\/terms', '\/terms'\]/);
+  assert.match(SERVER_SOURCE, /\['\/\(legals\)\/terms\/terms', '\/terms'\]/);
+  assert.match(SERVER_SOURCE, /Response\.redirect\(url, 308\)/);
+});
 
 test('legacy public route handoff exposes 30 safe retirement slices', () => {
   const handoffView = buildLegacyPublicRouteHandoffView(EVIDENCE);

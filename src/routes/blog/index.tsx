@@ -13,7 +13,7 @@ export const Route = createFileRoute('/blog/')({
   validateSearch: (search: Record<string, unknown>) => ({
     page: parseBlogPageSearch(search.page),
   }),
-  loaderDeps: ({ search }) => ({ page: search.page }),
+  loaderDeps: ({ search }) => ({ page: search.page ?? 1 }),
   loader: ({ deps }) => getPaginatedPosts(deps.page),
   head: () => {
     const pageView = buildBlogListPageViewModel();
@@ -59,5 +59,7 @@ function parseBlogPageSearch(value: unknown) {
       ? normalizedValue
       : Number(normalizedValue);
 
-  return Number.isInteger(parsedValue) && parsedValue > 0 ? parsedValue : 1;
+  return Number.isInteger(parsedValue) && parsedValue > 1
+    ? parsedValue
+    : undefined;
 }
