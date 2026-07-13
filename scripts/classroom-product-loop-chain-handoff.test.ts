@@ -27,7 +27,10 @@ import {
   TEMPLATE_ROADMAP_CAPABILITY_CHAIN_SOURCE_FILES,
 } from '@/activities/template-roadmap-capability-chain';
 import { ASSIGNMENT_RESULTS_EXPORT_PREPARATION_ITEM_IDS } from '@/assignments/results-export';
-import { PRINTABLE_WORKSHEET_REVIEW_LIFECYCLE_CHAIN_HANDOFF_ITEM_IDS } from '@/assignments/printable-worksheet-review-lifecycle-chain';
+import {
+  PRINTABLE_WORKSHEET_REVIEW_LIFECYCLE_CHAIN_HANDOFF_ITEM_IDS,
+  PRINTABLE_WORKSHEET_REVIEW_LIFECYCLE_CHAIN_SOURCE_FILES,
+} from '@/assignments/printable-worksheet-review-lifecycle-chain';
 import {
   PUBLISHED_ASSIGNMENT_DELIVERY_CHAIN_HANDOFF_ITEM_IDS,
   PUBLISHED_ASSIGNMENT_DELIVERY_CHAIN_SOURCE_FILES,
@@ -115,7 +118,10 @@ test('classroom product loop chain exposes 30 safe product slices', () => {
   );
   assert.deepEqual(handoffView.privacy, {
     appendsCopyScopeToArtifacts: true,
+    answerKeyHiddenByDefault: true,
     chainSourceFileCount: CLASSROOM_PRODUCT_LOOP_CHAIN_SOURCE_FILES.length,
+    changesAttemptsOrResults: false,
+    changesPublicRunner: false,
     copyArtifactsUseFormattedDates: true,
     copyArtifactsUseFormattedExplanations: true,
     csvExportsUseSharedAnswerView: true,
@@ -128,8 +134,10 @@ test('classroom product loop chain exposes 30 safe product slices', () => {
     exposesAcceptedAnswerTextInHandoff: false,
     exposesActivityContentJsonToPublicPayload: false,
     exposesAssignmentTitle: false,
+    exposesAnswerKeyTextInHandoff: false,
     exposesAnswerKeysToPublicRunner: false,
     exposesAnswerKeysBeforeAllowedReview: false,
+    exposesChoiceTextInHandoff: false,
     exposesCopyArtifactText: false,
     exposesCsvFilename: false,
     exposesCsvDataUrlInHandoff: false,
@@ -151,6 +159,7 @@ test('classroom product loop chain exposes 30 safe product slices', () => {
     exposesStudentInstructions: false,
     exposesStudentLabelsInHandoff: false,
     exposesStudentNamesInHandoff: false,
+    exposesStudentResponseTextInHandoff: false,
     exposesTeacherAnswerText: false,
     exposesTeacherAnswerTextInHandoff: false,
     exposesTeacherExplanationTextInHandoff: false,
@@ -186,6 +195,9 @@ test('classroom product loop chain exposes 30 safe product slices', () => {
     resultUiDatesUseLocalizedFormatter: true,
     requiresTeacherReviewForAiEnhancements: true,
     requiresTeacherReviewForAiDrafts: true,
+    requiresAuthenticatedTeacher: true,
+    requiresAssignmentSnapshot: true,
+    requiresOwnerScopedAssignment: true,
     resultConsumersUseScoredAttempts: true,
     scoringUsesSharedAcceptedAnswerParser: true,
     sourceFiles: [...CLASSROOM_PRODUCT_LOOP_CHAIN_SOURCE_FILES],
@@ -199,6 +211,7 @@ test('classroom product loop chain exposes 30 safe product slices', () => {
     usesPublishedAssignmentDeliveryChain: true,
     usesPublicDiscoveryIndexingChain: true,
     usesAssignmentResultsExportPreparation: true,
+    usesPrintableWorksheetReviewLifecycleChain: true,
     usesResultAcceptedAnswerChain: true,
     usesResultExplanationChain: true,
     usesResultSubmittedDateChain: true,
@@ -211,6 +224,8 @@ test('classroom product loop chain exposes 30 safe product slices', () => {
     usesTeacherOnlyResultScope: true,
     usesCurrentReviewScopeForCopyActions: true,
     usesSharedCopyArtifactBuilders: true,
+    usesSharedDeliveryPolicy: true,
+    usesSharedRuntimeItems: true,
     usesTeacherResultCopyLifecycleChain: true,
     usesTeacherResultsReviewChain: true,
   });
@@ -249,7 +264,7 @@ test('classroom product loop chain summarizes activity to results flow', () => {
       ['result-explanation-boundary', '30 explanation slices'],
       ['teacher-result-copy-lifecycle-boundary', '30 copy slices'],
       ['dashboard-loop-status', 'Create/publish/play/review'],
-      ['teacher-workspace-routes', 'Dashboard workspace'],
+      ['printable-worksheet-review-lifecycle-boundary', '30 print slices'],
       ['public-discovery-indexing-boundary', '30 discovery slices'],
       ['privacy-guards', 'Private data hidden'],
       ['product-loop-chain-gate', '30 source files'],
@@ -308,11 +323,12 @@ test('classroom product loop chain is backed by adjacent focused gates', () => {
       TEACHER_RESULT_COPY_LIFECYCLE_CHAIN_SOURCE_FILES.length,
       ASSIGNMENT_RESULTS_EXPORT_PREPARATION_ITEM_IDS.length,
       PRINTABLE_WORKSHEET_REVIEW_LIFECYCLE_CHAIN_HANDOFF_ITEM_IDS.length,
+      PRINTABLE_WORKSHEET_REVIEW_LIFECYCLE_CHAIN_SOURCE_FILES.length,
       PUBLIC_DISCOVERY_INDEXING_CHAIN_HANDOFF_ITEM_IDS.length,
       PUBLIC_DISCOVERY_INDEXING_CHAIN_SOURCE_FILES.length,
       CLASSROOM_TRUST_COMMUNICATION_CHAIN_HANDOFF_ITEM_IDS.length,
     ],
-    Array.from({ length: 39 }, () => 30)
+    Array.from({ length: 40 }, () => 30)
   );
 });
 
@@ -329,12 +345,12 @@ test('classroom product loop chain is documented in product and catalog', () => 
   );
   assert.match(
     NORMALIZED_PRODUCT_SOURCE,
-    /src\/config\/classroom-product-loop-chain\.ts` owns the cross-surface product-loop handoff[\s\S]*teacher-owned activities[\s\S]*activity authoring\/library[\s\S]*source extraction lifecycle[\s\S]*activity lifecycle governance[\s\S]*template roadmap capability[\s\S]*AI enhancement lifecycle[\s\S]*published assignment delivery[\s\S]*student runner play[\s\S]*validated attempts[\s\S]*scored attempt results[\s\S]*submitted-date continuity[\s\S]*accepted-answer continuity[\s\S]*explanation continuity[\s\S]*teacher result review[\s\S]*teacher result copy lifecycle[\s\S]*copy\/export\/print handoffs[\s\S]*public discovery\/indexing[\s\S]*privacy guards/,
+    /src\/config\/classroom-product-loop-chain\.ts` owns the cross-surface product-loop handoff[\s\S]*teacher-owned activities[\s\S]*activity authoring\/library[\s\S]*source extraction lifecycle[\s\S]*activity lifecycle governance[\s\S]*template roadmap capability[\s\S]*AI enhancement lifecycle[\s\S]*published assignment delivery[\s\S]*student runner play[\s\S]*validated attempts[\s\S]*scored attempt results[\s\S]*submitted-date continuity[\s\S]*accepted-answer continuity[\s\S]*explanation continuity[\s\S]*teacher result review[\s\S]*teacher result copy lifecycle[\s\S]*printable worksheet review lifecycle[\s\S]*copy\/export\/print handoffs[\s\S]*public discovery\/indexing[\s\S]*privacy guards/,
     'docs/product.md should document the classroom product loop chain owner.'
   );
   assert.match(
     NORMALIZED_TEST_CATALOG_SOURCE,
-    /Classroom product loop chain has a fast script-level gate via[\s\S]*scripts\/classroom-product-loop-chain-handoff\.test\.ts[\s\S]*Activity -> Assignment -> Attempt -> Results[\s\S]*activity authoring\/library workflow[\s\S]*source extraction lifecycle[\s\S]*activity lifecycle governance[\s\S]*template roadmap capability[\s\S]*AI enhancement lifecycle[\s\S]*published assignment delivery[\s\S]*student runner play[\s\S]*scored attempt results[\s\S]*submitted-date continuity[\s\S]*accepted-answer continuity[\s\S]*explanation continuity[\s\S]*teacher result review[\s\S]*teacher result copy lifecycle[\s\S]*copy\/export\/print handoffs[\s\S]*dashboard\/public discovery[\s\S]*privacy guards/,
+    /Classroom product loop chain has a fast script-level gate via[\s\S]*scripts\/classroom-product-loop-chain-handoff\.test\.ts[\s\S]*Activity -> Assignment -> Attempt -> Results[\s\S]*activity authoring\/library workflow[\s\S]*source extraction lifecycle[\s\S]*activity lifecycle governance[\s\S]*template roadmap capability[\s\S]*AI enhancement lifecycle[\s\S]*published assignment delivery[\s\S]*student runner play[\s\S]*scored attempt results[\s\S]*submitted-date continuity[\s\S]*accepted-answer continuity[\s\S]*explanation continuity[\s\S]*teacher result review[\s\S]*teacher result copy lifecycle[\s\S]*printable worksheet review lifecycle[\s\S]*copy\/export\/print handoffs[\s\S]*dashboard\/public discovery[\s\S]*privacy guards/,
     'TEST-CATALOG should document the classroom product loop chain gate.'
   );
 });

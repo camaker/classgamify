@@ -25,7 +25,7 @@ export const CLASSROOM_PRODUCT_LOOP_CHAIN_HANDOFF_ITEM_IDS = [
   'result-explanation-boundary',
   'teacher-result-copy-lifecycle-boundary',
   'dashboard-loop-status',
-  'teacher-workspace-routes',
+  'printable-worksheet-review-lifecycle-boundary',
   'public-discovery-indexing-boundary',
   'privacy-guards',
   'product-loop-chain-gate',
@@ -77,7 +77,10 @@ export type ClassroomProductLoopChainHandoffItemView = {
 
 export type ClassroomProductLoopChainPrivacyContract = {
   appendsCopyScopeToArtifacts: true;
+  answerKeyHiddenByDefault: true;
   chainSourceFileCount: number;
+  changesAttemptsOrResults: false;
+  changesPublicRunner: false;
   copyArtifactsUseFormattedDates: true;
   copyArtifactsUseFormattedExplanations: true;
   csvExportsUseSharedAnswerView: true;
@@ -90,8 +93,10 @@ export type ClassroomProductLoopChainPrivacyContract = {
   exposesAcceptedAnswerTextInHandoff: false;
   exposesActivityContentJsonToPublicPayload: false;
   exposesAssignmentTitle: false;
+  exposesAnswerKeyTextInHandoff: false;
   exposesAnswerKeysToPublicRunner: false;
   exposesAnswerKeysBeforeAllowedReview: false;
+  exposesChoiceTextInHandoff: false;
   exposesCopyArtifactText: false;
   exposesCsvFilename: false;
   exposesCsvDataUrlInHandoff: false;
@@ -113,6 +118,7 @@ export type ClassroomProductLoopChainPrivacyContract = {
   exposesStudentInstructions: false;
   exposesStudentLabelsInHandoff: false;
   exposesStudentNamesInHandoff: false;
+  exposesStudentResponseTextInHandoff: false;
   exposesTeacherAnswerText: false;
   exposesTeacherAnswerTextInHandoff: false;
   exposesTeacherExplanationTextInHandoff: false;
@@ -148,6 +154,9 @@ export type ClassroomProductLoopChainPrivacyContract = {
   resultUiDatesUseLocalizedFormatter: true;
   requiresTeacherReviewForAiEnhancements: true;
   requiresTeacherReviewForAiDrafts: true;
+  requiresAuthenticatedTeacher: true;
+  requiresAssignmentSnapshot: true;
+  requiresOwnerScopedAssignment: true;
   resultConsumersUseScoredAttempts: true;
   scoringUsesSharedAcceptedAnswerParser: true;
   sourceFiles: string[];
@@ -161,6 +170,7 @@ export type ClassroomProductLoopChainPrivacyContract = {
   usesPublishedAssignmentDeliveryChain: true;
   usesPublicDiscoveryIndexingChain: true;
   usesAssignmentResultsExportPreparation: true;
+  usesPrintableWorksheetReviewLifecycleChain: true;
   usesResultAcceptedAnswerChain: true;
   usesResultExplanationChain: true;
   usesResultSubmittedDateChain: true;
@@ -173,6 +183,8 @@ export type ClassroomProductLoopChainPrivacyContract = {
   usesTeacherOnlyResultScope: true;
   usesCurrentReviewScopeForCopyActions: true;
   usesSharedCopyArtifactBuilders: true;
+  usesSharedDeliveryPolicy: true;
+  usesSharedRuntimeItems: true;
   usesTeacherResultCopyLifecycleChain: true;
   usesTeacherResultsReviewChain: true;
 };
@@ -191,11 +203,14 @@ export function buildClassroomProductLoopChainHandoffView(): ClassroomProductLoo
 
   return {
     description:
-      'Thirty-slice classroom product loop chain from teacher-owned activities and reusable content through activity authoring/library workflow, source extraction lifecycle boundaries, activity lifecycle governance, template roadmap capability alignment, AI enhancement lifecycle review, published assignment delivery, student runner play, validated attempts, scored attempt results, submitted-date continuity, accepted-answer continuity, and explanation continuity, teacher review, teacher result copy lifecycle, copy/export/print handoffs, dashboard status, public discovery/indexing metadata, and privacy guards.',
+      'Thirty-slice classroom product loop chain from teacher-owned activities and reusable content through activity authoring/library workflow, source extraction lifecycle boundaries, activity lifecycle governance, template roadmap capability alignment, AI enhancement lifecycle review, published assignment delivery, student runner play, validated attempts, scored attempt results, submitted-date continuity, accepted-answer continuity, and explanation continuity, teacher review, teacher result copy lifecycle, printable worksheet review lifecycle, copy/export/print handoffs, dashboard status, public discovery/indexing metadata, and privacy guards.',
     itemViews,
     privacy: {
       appendsCopyScopeToArtifacts: true,
+      answerKeyHiddenByDefault: true,
       chainSourceFileCount: CLASSROOM_PRODUCT_LOOP_CHAIN_SOURCE_FILES.length,
+      changesAttemptsOrResults: false,
+      changesPublicRunner: false,
       copyArtifactsUseFormattedDates: true,
       copyArtifactsUseFormattedExplanations: true,
       csvExportsUseSharedAnswerView: true,
@@ -208,8 +223,10 @@ export function buildClassroomProductLoopChainHandoffView(): ClassroomProductLoo
       exposesAcceptedAnswerTextInHandoff: false,
       exposesActivityContentJsonToPublicPayload: false,
       exposesAssignmentTitle: false,
+      exposesAnswerKeyTextInHandoff: false,
       exposesAnswerKeysToPublicRunner: false,
       exposesAnswerKeysBeforeAllowedReview: false,
+      exposesChoiceTextInHandoff: false,
       exposesCopyArtifactText: false,
       exposesCsvFilename: false,
       exposesCsvDataUrlInHandoff: false,
@@ -231,6 +248,7 @@ export function buildClassroomProductLoopChainHandoffView(): ClassroomProductLoo
       exposesStudentInstructions: false,
       exposesStudentLabelsInHandoff: false,
       exposesStudentNamesInHandoff: false,
+      exposesStudentResponseTextInHandoff: false,
       exposesTeacherAnswerText: false,
       exposesTeacherAnswerTextInHandoff: false,
       exposesTeacherExplanationTextInHandoff: false,
@@ -266,6 +284,9 @@ export function buildClassroomProductLoopChainHandoffView(): ClassroomProductLoo
       resultUiDatesUseLocalizedFormatter: true,
       requiresTeacherReviewForAiEnhancements: true,
       requiresTeacherReviewForAiDrafts: true,
+      requiresAuthenticatedTeacher: true,
+      requiresAssignmentSnapshot: true,
+      requiresOwnerScopedAssignment: true,
       resultConsumersUseScoredAttempts: true,
       scoringUsesSharedAcceptedAnswerParser: true,
       sourceFiles: [...CLASSROOM_PRODUCT_LOOP_CHAIN_SOURCE_FILES],
@@ -279,6 +300,7 @@ export function buildClassroomProductLoopChainHandoffView(): ClassroomProductLoo
       usesPublishedAssignmentDeliveryChain: true,
       usesPublicDiscoveryIndexingChain: true,
       usesAssignmentResultsExportPreparation: true,
+      usesPrintableWorksheetReviewLifecycleChain: true,
       usesResultAcceptedAnswerChain: true,
       usesResultExplanationChain: true,
       usesResultSubmittedDateChain: true,
@@ -291,6 +313,8 @@ export function buildClassroomProductLoopChainHandoffView(): ClassroomProductLoo
       usesTeacherOnlyResultScope: true,
       usesCurrentReviewScopeForCopyActions: true,
       usesSharedCopyArtifactBuilders: true,
+      usesSharedDeliveryPolicy: true,
+      usesSharedRuntimeItems: true,
       usesTeacherResultCopyLifecycleChain: true,
       usesTeacherResultsReviewChain: true,
     },
@@ -495,12 +519,12 @@ function getClassroomProductLoopChainHandoffItem(
         'Create/publish/play/review',
         'Dashboard status and next actions summarize where the teacher is in the classroom loop.'
       );
-    case 'teacher-workspace-routes':
+    case 'printable-worksheet-review-lifecycle-boundary':
       return item(
         id,
-        'Teacher workspace routes',
-        'Dashboard workspace',
-        'Authenticated dashboard, activity library, assignment list, results, print, and settings surfaces keep owner scope.'
+        'Printable worksheet review lifecycle boundary',
+        '30 print slices',
+        'Teacher-only print routes, frozen worksheet snapshots, hidden answer-key defaults, handout fields, print actions, return links, and printable privacy guards stay aligned.'
       );
     case 'public-discovery-indexing-boundary':
       return item(
