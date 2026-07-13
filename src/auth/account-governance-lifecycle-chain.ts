@@ -30,7 +30,7 @@ export const ACCOUNT_GOVERNANCE_LIFECYCLE_CHAIN_HANDOFF_ITEM_IDS = [
   'provider-secret-guard',
   'student-data-guard',
   'legacy-copy-guard',
-  'account-governance-chain-gate',
+  'security-workspace-handoff-boundary',
 ] as const;
 
 export const ACCOUNT_GOVERNANCE_LIFECYCLE_CHAIN_SOURCE_FILES = [
@@ -101,6 +101,7 @@ export type AccountGovernanceLifecycleChainPrivacyContract = {
   sourceFiles: string[];
   usesClassGamifyAccountCopy: true;
   usesPaymentCallbackHandoff: true;
+  usesSettingsSecurityWorkspaceHandoff: true;
 };
 
 export type AccountGovernanceLifecycleChainHandoffView = {
@@ -144,6 +145,7 @@ export function buildAccountGovernanceLifecycleChainHandoffView(): AccountGovern
       sourceFiles: [...ACCOUNT_GOVERNANCE_LIFECYCLE_CHAIN_SOURCE_FILES],
       usesClassGamifyAccountCopy: true,
       usesPaymentCallbackHandoff: true,
+      usesSettingsSecurityWorkspaceHandoff: true,
     },
     title: 'Account governance lifecycle chain',
   };
@@ -367,12 +369,12 @@ function getAccountGovernanceLifecycleChainHandoffItem(
         'ClassGamify only',
         'Account lifecycle copy stays tied to teacher workspace access instead of copied starter or learning-site terms.'
       );
-    case 'account-governance-chain-gate':
+    case 'security-workspace-handoff-boundary':
       return item(
         id,
-        'Account governance chain gate',
-        '30 source files',
-        'A focused gate keeps auth, profile, security, deletion, admin user, billing, notification, file, storage, and privacy boundaries aligned.'
+        'Security workspace handoff boundary',
+        '30 security workspace slices',
+        'Authenticated access, credential controls, providers and sessions, explicit deletion, classroom data protections, billing access, owner scope, secret and private-data guards stay aligned.'
       );
   }
 }

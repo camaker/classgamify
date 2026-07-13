@@ -73,7 +73,8 @@ handoff boundaries.
 Account governance lifecycle chain has a fast script-level gate via
 `pnpm exec tsx --test scripts/account-governance-lifecycle-chain-handoff.test.ts`;
 run it when changing auth session and email verification, profile and security
-settings, explicit account deletion, admin user governance,
+settings, the 30-slice security workspace handoff boundary, explicit account
+deletion, admin user governance,
 billing/payment callback/notification/files boundaries, storage owner checks,
 provider-secret and student-data guards, or account lifecycle copy that should
 stay tied to the ClassGamify teacher workspace.

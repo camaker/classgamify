@@ -156,6 +156,7 @@ test('account governance lifecycle chain exposes 30 safe lifecycle slices', () =
     sourceFiles: [...ACCOUNT_GOVERNANCE_LIFECYCLE_CHAIN_SOURCE_FILES],
     usesClassGamifyAccountCopy: true,
     usesPaymentCallbackHandoff: true,
+    usesSettingsSecurityWorkspaceHandoff: true,
   });
   assertNoPrivateAccountGovernanceText(JSON.stringify(handoffView));
 });
@@ -195,7 +196,7 @@ test('account governance lifecycle chain summarizes auth through admin and setti
       ['provider-secret-guard', 'Runtime secrets hidden'],
       ['student-data-guard', 'Student data hidden'],
       ['legacy-copy-guard', 'ClassGamify only'],
-      ['account-governance-chain-gate', '30 source files'],
+      ['security-workspace-handoff-boundary', '30 security workspace slices'],
     ]
   );
   assert.equal(
@@ -422,13 +423,18 @@ test('account governance lifecycle sources preserve admin, storage, and provider
 
 test('account governance lifecycle chain focused gate is documented', () => {
   assert.match(
+    PRODUCT_SOURCE,
+    /account governance lifecycle[\s\S]*security workspace's 30[\s\S]*credential controls[\s\S]*explicit account deletion[\s\S]*must not expose passwords[\s\S]*must not silently mutate or delete classroom records/,
+    'docs/product.md should describe the security workspace handoff and classroom-record boundary.'
+  );
+  assert.match(
     TEST_CATALOG_SOURCE,
     /Account governance lifecycle chain has a fast script-level gate via[\s\S]*scripts\/account-governance-lifecycle-chain-handoff\.test\.ts/,
     'TEST-CATALOG should document the account governance lifecycle chain gate.'
   );
   assert.match(
     TEST_CATALOG_SOURCE.replace(/\s+/g, ' '),
-    /auth session and email verification[\s\S]*profile and security settings[\s\S]*explicit account deletion[\s\S]*admin user governance[\s\S]*billing\/payment callback\/notification\/files boundaries[\s\S]*storage owner checks[\s\S]*provider-secret and student-data guards/,
+    /auth session and email verification[\s\S]*profile and security settings[\s\S]*30-slice security workspace handoff boundary[\s\S]*explicit account deletion[\s\S]*admin user governance[\s\S]*billing\/payment callback\/notification\/files boundaries[\s\S]*storage owner checks[\s\S]*provider-secret and student-data guards/,
     'TEST-CATALOG should describe the full account governance lifecycle chain scope.'
   );
 });

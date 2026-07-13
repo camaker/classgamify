@@ -17225,6 +17225,7 @@ assert.deepEqual(accountGovernanceLifecycleChainView.privacy, {
   sourceFiles: [...ACCOUNT_GOVERNANCE_LIFECYCLE_CHAIN_SOURCE_FILES],
   usesClassGamifyAccountCopy: true,
   usesPaymentCallbackHandoff: true,
+  usesSettingsSecurityWorkspaceHandoff: true,
 });
 assert.deepEqual(
   [
@@ -17248,7 +17249,7 @@ assert.match(
 );
 assert.deepEqual(Object.fromEntries(accountGovernanceLifecycleChainValues), {
   'account-delete-feature-gate': 'Feature gated',
-  'account-governance-chain-gate': '30 source files',
+  'security-workspace-handoff-boundary': '30 security workspace slices',
   'admin-api-gate': '401/403 protected',
   'admin-route-gate': Routes.AdminUsers,
   'admin-user-ban-actions': 'Ban/unban only',

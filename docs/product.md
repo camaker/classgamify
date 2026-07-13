@@ -92,6 +92,13 @@ status, polling, safe callback normalization, plan-cache refresh, provider
 session privacy, and retry/timeout recovery should stay inside the teacher
 workspace boundary without mutating activities, assignment links, snapshots,
 attempts, results, or source-material records.
+The account governance lifecycle should also carry the security workspace's 30
+slices for authenticated access, credential controls, linked providers and
+sessions, explicit account deletion, activity/source-material/assignment/result
+protections, billing access, owner scope, secret guards, legacy-copy guards, and
+privacy. Security handoffs must not expose passwords, teacher email, auth
+secrets, provider errors, raw anonymous tokens, student identifiers, or storage
+keys, and must not silently mutate or delete classroom records.
 The active surface product boundary should absorb both the account governance
 lifecycle and payment callback handoff contracts so current account, contact,
 billing, mail, notification, and developer configuration surfaces stay aligned
