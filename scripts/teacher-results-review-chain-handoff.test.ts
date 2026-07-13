@@ -72,16 +72,24 @@ test('teacher results review chain exposes 30 teacher-review slices', () => {
     chainSourceFileCount: TEACHER_RESULTS_REVIEW_CHAIN_SOURCE_FILES.length,
     exposesAcceptedAlternativesToTeachersOnly: true,
     exposesAnswerKeysToPublicRunner: false,
+    exposesCopyArtifactText: false,
+    exposesRawAnonymousToken: false,
     exposesRawAnonymousTokens: false,
+    exposesRawRouteQuery: false,
     exposesRawCopyArtifactsInHandoff: false,
     exposesRawCsvDataUrlInHandoff: false,
     exposesSourceMaterialStorageKeys: false,
     exposesStudentAnswerTextInHandoff: false,
+    exposesStudentDisplayLabels: false,
+    exposesTeacherAnswerKey: false,
     itemIds,
+    mutatesResultData: false,
     preservesFrozenSnapshots: true,
     resultExportsIncludeDeliveryPolicy: true,
     sourceFiles: [...TEACHER_RESULTS_REVIEW_CHAIN_SOURCE_FILES],
     usesSharedAttemptStats: true,
+    usesAssignmentDomainHelpers: true,
+    usesResultReviewControlsHandoff: true,
     usesTeacherOnlyResultScope: true,
   });
   assertNoPrivateTeacherResultsText(JSON.stringify(handoffView));
@@ -122,7 +130,7 @@ test('teacher results review chain summarizes each linked result step', () => {
       ['anonymous-token-guard', 'Raw token hidden'],
       ['source-material-guard', 'Storage keys hidden'],
       ['public-runner-boundary', 'Teacher-only results'],
-      ['teacher-results-chain-gate', '30 source files'],
+      ['result-review-controls-boundary', '30 control slices'],
     ]
   );
   assert.equal(
@@ -164,7 +172,7 @@ test('teacher results review chain stays backed by focused contracts', () => {
 test('teacher results review sources preserve private review boundaries', () => {
   assert.match(
     PRODUCT_SOURCE,
-    /Teacher results should answer the classroom question[\s\S]*per-item correct rates[\s\S]*student-level follow-up summaries[\s\S]*CSV exports should include the assignment\s+delivery policy[\s\S]*Result pages and CSV exports should share\s+assignment-domain formatting/,
+    /result review controls boundary[\s\S]*Teacher results should answer the classroom question[\s\S]*per-item correct rates[\s\S]*student-level follow-up summaries[\s\S]*CSV exports should include the assignment\s+delivery policy[\s\S]*Result pages and CSV exports should share\s+assignment-domain formatting/,
     'docs/product.md should define the teacher result-review and export boundary.'
   );
   assert.match(
@@ -210,7 +218,7 @@ test('teacher results review chain focused gate is documented', () => {
   );
   assert.match(
     TEST_CATALOG_SOURCE,
-    /owner-scoped result routes[\s\S]*frozen snapshots[\s\S]*attempt\s+stats[\s\S]*review controls[\s\S]*copy artifacts[\s\S]*CSV exports[\s\S]*result-material privacy/,
+    /owner-scoped result routes[\s\S]*frozen snapshots[\s\S]*attempt\s+stats[\s\S]*review controls[\s\S]*result review controls boundary[\s\S]*copy artifacts[\s\S]*CSV exports[\s\S]*result-material privacy/,
     'TEST-CATALOG should document the teacher results review-chain scope.'
   );
 });

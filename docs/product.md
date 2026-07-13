@@ -28,7 +28,7 @@ assignment attempt persistence boundary, scored attempt results, assignment
 attempt stats boundary, answer feedback lifecycle, assignment attempt duration
 boundary, submitted-date continuity,
 accepted-answer continuity, and explanation continuity, teacher result review,
-teacher result copy lifecycle,
+result review controls boundary, teacher result copy lifecycle,
 worksheet-mode delivery boundary, printable worksheet review lifecycle,
 copy/export/print handoffs, teacher workspace
 operations, public discovery/indexing metadata, and privacy guards aligned with

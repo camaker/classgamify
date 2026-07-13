@@ -28,7 +28,7 @@ export const TEACHER_RESULTS_REVIEW_CHAIN_HANDOFF_ITEM_IDS = [
   'anonymous-token-guard',
   'source-material-guard',
   'public-runner-boundary',
-  'teacher-results-chain-gate',
+  'result-review-controls-boundary',
 ] as const;
 
 export const TEACHER_RESULTS_REVIEW_CHAIN_SOURCE_FILES = [
@@ -79,16 +79,24 @@ export type TeacherResultsReviewChainPrivacyContract = {
   chainSourceFileCount: number;
   exposesAcceptedAlternativesToTeachersOnly: true;
   exposesAnswerKeysToPublicRunner: false;
+  exposesCopyArtifactText: false;
+  exposesRawAnonymousToken: false;
   exposesRawAnonymousTokens: false;
+  exposesRawRouteQuery: false;
   exposesRawCopyArtifactsInHandoff: false;
   exposesRawCsvDataUrlInHandoff: false;
   exposesSourceMaterialStorageKeys: false;
   exposesStudentAnswerTextInHandoff: false;
+  exposesStudentDisplayLabels: false;
+  exposesTeacherAnswerKey: false;
   itemIds: TeacherResultsReviewChainHandoffItemId[];
+  mutatesResultData: false;
   preservesFrozenSnapshots: true;
   resultExportsIncludeDeliveryPolicy: true;
   sourceFiles: string[];
   usesSharedAttemptStats: true;
+  usesAssignmentDomainHelpers: true;
+  usesResultReviewControlsHandoff: true;
   usesTeacherOnlyResultScope: true;
 };
 
@@ -106,22 +114,30 @@ export function buildTeacherResultsReviewChainHandoffView(): TeacherResultsRevie
 
   return {
     description:
-      'Thirty-slice teacher results review chain from owner-scoped frozen assignments and shared attempt stats through review filters, reteach priorities, classroom briefs, copy artifacts, CSV exports, and private result-review boundaries.',
+      'Thirty-slice teacher results review chain from owner-scoped frozen assignments and shared attempt stats through result review controls, review filters, reteach priorities, classroom briefs, copy artifacts, CSV exports, and private result-review boundaries.',
     itemViews,
     privacy: {
       chainSourceFileCount: TEACHER_RESULTS_REVIEW_CHAIN_SOURCE_FILES.length,
       exposesAcceptedAlternativesToTeachersOnly: true,
       exposesAnswerKeysToPublicRunner: false,
+      exposesCopyArtifactText: false,
+      exposesRawAnonymousToken: false,
       exposesRawAnonymousTokens: false,
+      exposesRawRouteQuery: false,
       exposesRawCopyArtifactsInHandoff: false,
       exposesRawCsvDataUrlInHandoff: false,
       exposesSourceMaterialStorageKeys: false,
       exposesStudentAnswerTextInHandoff: false,
+      exposesStudentDisplayLabels: false,
+      exposesTeacherAnswerKey: false,
       itemIds: [...TEACHER_RESULTS_REVIEW_CHAIN_HANDOFF_ITEM_IDS],
+      mutatesResultData: false,
       preservesFrozenSnapshots: true,
       resultExportsIncludeDeliveryPolicy: true,
       sourceFiles: [...TEACHER_RESULTS_REVIEW_CHAIN_SOURCE_FILES],
       usesSharedAttemptStats: true,
+      usesAssignmentDomainHelpers: true,
+      usesResultReviewControlsHandoff: true,
       usesTeacherOnlyResultScope: true,
     },
     title: 'Teacher results review chain',
@@ -346,12 +362,12 @@ function getTeacherResultsReviewChainHandoffItem(
         'Teacher-only results',
         'Result review and copy/export artifacts do not mutate or expose the public student runner.'
       );
-    case 'teacher-results-chain-gate':
+    case 'result-review-controls-boundary':
       return item(
         id,
-        'Teacher results chain gate',
-        '30 source files',
-        'The teacher results review chain keeps result stats, review, copy, export, and privacy gates connected.'
+        'Result review controls boundary',
+        '30 control slices',
+        'Route parsing, default elision, search and sort status, attempt filters, review and copy scope summaries, table/card/copy consumers, anonymous-label search, and control privacy guards stay aligned.'
       );
   }
 }

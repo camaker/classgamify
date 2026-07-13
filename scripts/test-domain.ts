@@ -5610,16 +5610,24 @@ assert.deepEqual(teacherResultsReviewChainView.privacy, {
   chainSourceFileCount: TEACHER_RESULTS_REVIEW_CHAIN_SOURCE_FILES.length,
   exposesAcceptedAlternativesToTeachersOnly: true,
   exposesAnswerKeysToPublicRunner: false,
+  exposesCopyArtifactText: false,
+  exposesRawAnonymousToken: false,
   exposesRawAnonymousTokens: false,
+  exposesRawRouteQuery: false,
   exposesRawCopyArtifactsInHandoff: false,
   exposesRawCsvDataUrlInHandoff: false,
   exposesSourceMaterialStorageKeys: false,
   exposesStudentAnswerTextInHandoff: false,
+  exposesStudentDisplayLabels: false,
+  exposesTeacherAnswerKey: false,
   itemIds: [...TEACHER_RESULTS_REVIEW_CHAIN_HANDOFF_ITEM_IDS],
+  mutatesResultData: false,
   preservesFrozenSnapshots: true,
   resultExportsIncludeDeliveryPolicy: true,
   sourceFiles: [...TEACHER_RESULTS_REVIEW_CHAIN_SOURCE_FILES],
   usesSharedAttemptStats: true,
+  usesAssignmentDomainHelpers: true,
+  usesResultReviewControlsHandoff: true,
   usesTeacherOnlyResultScope: true,
 });
 assert.deepEqual(
@@ -5672,11 +5680,11 @@ assert.deepEqual(Object.fromEntries(teacherResultsReviewChainValues), {
   'student-follow-up-priority': 'Needs support first',
   'student-search-normalization': 'Anonymous labels',
   'student-summary-sort': 'Review order',
-  'teacher-results-chain-gate': '30 source files',
+  'result-review-controls-boundary': '30 control slices',
 });
 assert.match(
   readFileSync('tests/e2e/TEST-CATALOG.md', 'utf8'),
-  /Teacher results review chain has a fast script-level gate via[\s\S]*scripts\/teacher-results-review-chain-handoff\.test\.ts/,
+  /Teacher results review chain has a fast script-level gate via[\s\S]*scripts\/teacher-results-review-chain-handoff\.test\.ts[\s\S]*result review controls boundary/,
   'TEST-CATALOG should document the teacher results review chain gate.'
 );
 const teacherResultCopyLifecycleChainView =

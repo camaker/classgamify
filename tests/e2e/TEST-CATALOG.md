@@ -430,7 +430,8 @@ assignment-result-review-controls handoff.
 Teacher results review chain has a fast script-level gate via
 `pnpm exec tsx --test scripts/teacher-results-review-chain-handoff.test.ts`;
 run it when changing owner-scoped result routes, frozen snapshots, attempt
-stats, review controls, student search/sort rules, item performance sorting,
+stats, review controls, result review controls boundary, student search/sort
+rules, item performance sorting,
 copy artifacts, CSV exports, result-material privacy, empty-result guidance,
 anonymous-token guards, source-material guards, or the hidden
 teacher-results-review-chain handoff.
