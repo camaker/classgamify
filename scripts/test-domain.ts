@@ -31473,6 +31473,7 @@ assert.deepEqual(scoredAttemptResultChainView.privacy, {
   exposesSourceMaterialStorageKeys: false,
   exposesStudentAnswerTextInHandoff: false,
   exposesStudentNamesInHandoff: false,
+  exposesTeacherOnlyAnswersInHandoff: false,
   itemIds: [...SCORED_ATTEMPT_RESULT_CHAIN_HANDOFF_ITEM_IDS],
   publicResponseUsesSanitizedResult: true,
   resultConsumersUseScoredAttempts: true,
@@ -31481,6 +31482,7 @@ assert.deepEqual(scoredAttemptResultChainView.privacy, {
   storesImmutableResultJson: true,
   usesSharedAttemptStats: true,
   usesSharedDurationFormatting: true,
+  usesAttemptReviewCardHandoff: true,
 });
 assert.deepEqual(
   [
@@ -31494,8 +31496,9 @@ assert.deepEqual(
     TEACHER_RESULTS_REVIEW_CHAIN_HANDOFF_ITEM_IDS.length,
     TEACHER_RESULT_COPY_LIFECYCLE_CHAIN_HANDOFF_ITEM_IDS.length,
     ASSIGNMENT_RESULTS_EXPORT_PREPARATION_ITEM_IDS.length,
+    ASSIGNMENT_ATTEMPT_REVIEW_CARD_HANDOFF_ITEM_IDS.length,
   ],
-  Array.from({ length: 10 }, () => 30),
+  Array.from({ length: 11 }, () => 30),
   'Scored attempt result chain should stay backed by persistence, duration, runner, feedback, stats, results, copy, and export gates.'
 );
 assert.deepEqual(Object.fromEntries(scoredAttemptResultChainValues), {
@@ -31524,7 +31527,7 @@ assert.deepEqual(Object.fromEntries(scoredAttemptResultChainValues), {
   'runtime-scoring-evaluation': 'evaluateRuntimeAnswers',
   'score-field-mapping': 'earned/max points',
   'scored-insert-builder': 'buildScoredAttemptInsert',
-  'scored-result-chain-gate': '30 source files',
+  'attempt-review-card-handoff-boundary': '30 review card slices',
   'source-material-guard': 'Storage keys hidden',
   'submit-api-identity-gate': 'Name or browser token',
   'submit-api-lifecycle-gate': 'Open assignment only',
@@ -31532,7 +31535,7 @@ assert.deepEqual(Object.fromEntries(scoredAttemptResultChainValues), {
 });
 assert.match(
   readFileSync('docs/product.md', 'utf8'),
-  /post-submit result boundary[\s\S]*scored-attempt\s+persistence[\s\S]*public feedback[\s\S]*assignment stats[\s\S]*teacher result analysis[\s\S]*copy artifacts[\s\S]*CSV export[\s\S]*printable review return/,
+  /post-submit result boundary[\s\S]*scored-attempt\s+persistence[\s\S]*public feedback[\s\S]*assignment stats[\s\S]*teacher result analysis[\s\S]*30-slice attempt review card handoff[\s\S]*copy artifacts[\s\S]*CSV export[\s\S]*printable\s+review\s+return/,
   'docs/product.md should document the shared post-submit scored-result boundary.'
 );
 assert.match(

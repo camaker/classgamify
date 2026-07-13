@@ -337,7 +337,12 @@ per-template route math, so every runner counts answered items, submits frozen
 runtime item ids, and prompts for partial attempts consistently.
 The post-submit result boundary should also stay shared from scored-attempt
 persistence through public feedback, assignment stats, teacher result analysis,
-copy artifacts, CSV export, and printable review return links.
+a 30-slice attempt review card handoff, copy artifacts, CSV export, and printable
+review return links. The attempt review card handoff keeps prepared slices for
+student display, submitted time, score and answer summaries, snapshot-ordered
+answers, statuses, accepted alternatives, explanations, filters, copy/export
+scope, and privacy guards connected without exposing answer text or teacher-only
+answers in the scored-result chain summary.
 Student runner submission surfaces should expose those prepared progress,
 payload, submit-readiness, identity, result, review-summary, feedback-scope,
 and post-submit next-step views as stable semantic label/value/description

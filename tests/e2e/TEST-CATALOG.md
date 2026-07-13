@@ -717,9 +717,9 @@ consumers.
 Scored attempt result lifecycle chain has a fast script-level gate via
 `pnpm exec tsx --test scripts/scored-attempt-result-chain-handoff.test.ts`;
 run it when changing the post-submit scored-result boundary, sanitized public
-feedback, attempt stats, teacher result review, copy artifacts, CSV export,
-printable review return links, duration display, accepted-answer formatting, or
-scored-result privacy guards.
+feedback, attempt stats, teacher result review, the 30-slice attempt review card
+handoff boundary, copy artifacts, CSV export, printable review return links,
+duration display, accepted-answer formatting, or scored-result privacy guards.
 Quiz choice generation has a fast script-level gate via
 `pnpm exec tsx --test scripts/question-choice-generation-handoff-semantic-views.test.ts`;
 run it when changing deterministic distractor generation, question option

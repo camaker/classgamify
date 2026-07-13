@@ -28,7 +28,7 @@ export const SCORED_ATTEMPT_RESULT_CHAIN_HANDOFF_ITEM_IDS = [
   'accepted-alternatives-consistency',
   'anonymous-token-guard',
   'source-material-guard',
-  'scored-result-chain-gate',
+  'attempt-review-card-handoff-boundary',
 ] as const;
 
 export const SCORED_ATTEMPT_RESULT_CHAIN_SOURCE_FILES = [
@@ -85,6 +85,7 @@ export type ScoredAttemptResultChainPrivacyContract = {
   exposesSourceMaterialStorageKeys: false;
   exposesStudentAnswerTextInHandoff: false;
   exposesStudentNamesInHandoff: false;
+  exposesTeacherOnlyAnswersInHandoff: false;
   itemIds: ScoredAttemptResultChainHandoffItemId[];
   publicResponseUsesSanitizedResult: true;
   resultConsumersUseScoredAttempts: true;
@@ -93,6 +94,7 @@ export type ScoredAttemptResultChainPrivacyContract = {
   storesImmutableResultJson: true;
   usesSharedAttemptStats: true;
   usesSharedDurationFormatting: true;
+  usesAttemptReviewCardHandoff: true;
 };
 
 export type ScoredAttemptResultChainHandoffView = {
@@ -121,6 +123,7 @@ export function buildScoredAttemptResultChainHandoffView(): ScoredAttemptResultC
       exposesSourceMaterialStorageKeys: false,
       exposesStudentAnswerTextInHandoff: false,
       exposesStudentNamesInHandoff: false,
+      exposesTeacherOnlyAnswersInHandoff: false,
       itemIds: [...SCORED_ATTEMPT_RESULT_CHAIN_HANDOFF_ITEM_IDS],
       publicResponseUsesSanitizedResult: true,
       resultConsumersUseScoredAttempts: true,
@@ -129,6 +132,7 @@ export function buildScoredAttemptResultChainHandoffView(): ScoredAttemptResultC
       storesImmutableResultJson: true,
       usesSharedAttemptStats: true,
       usesSharedDurationFormatting: true,
+      usesAttemptReviewCardHandoff: true,
     },
     title: 'Scored attempt result chain',
   };
@@ -352,12 +356,12 @@ function getScoredAttemptResultChainHandoffItem(
         'Storage keys hidden',
         'Scored-attempt result handoffs do not expose source-material storage keys, file ids, or metadata.'
       );
-    case 'scored-result-chain-gate':
+    case 'attempt-review-card-handoff-boundary':
       return item(
         id,
-        'Scored result chain gate',
-        '30 source files',
-        'A focused gate keeps submission, scoring, persistence, public feedback, stats, results, copy, export, print, and privacy boundaries connected.'
+        'Attempt review card handoff boundary',
+        '30 review card slices',
+        'Student display, submission time, score and answer summaries, snapshot-ordered answer cards, statuses, accepted alternatives, explanations, review filters, copy/export scope, and privacy guards stay aligned.'
       );
   }
 }
