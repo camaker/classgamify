@@ -5508,13 +5508,20 @@ assert.deepEqual(classroomDataLifecycleChainView.privacy, {
   chainSourceFileCount: CLASSROOM_DATA_LIFECYCLE_CHAIN_SOURCE_FILES.length,
   createsParallelWorksheetTables: false,
   exposesActivityContentJsonToPublicPayload: false,
+  exposesAnswerTextInPersistenceHandoff: false,
   exposesRawAnonymousTokens: false,
+  exposesRawSubmissionPayloadInPersistenceHandoff: false,
+  exposesRuntimeItemIdsInPersistenceHandoff: false,
   exposesSnapshotContentJsonToPublicPayload: false,
   exposesSourceMaterialStorageKeys: false,
+  exposesSourceMaterialMetadataInPersistenceHandoff: false,
   exposesStudentAnswerTextInHandoff: false,
+  exposesStudentNameInPersistenceHandoff: false,
   exposesTeacherAnswerKeysBeforeReview: false,
+  exposesTeacherOnlyAnswersInPersistenceHandoff: false,
   freezesSnapshotContent: true,
   itemIds: [...CLASSROOM_DATA_LIFECYCLE_CHAIN_HANDOFF_ITEM_IDS],
+  mutatesEvaluationAfterInsert: false,
   persistsAttemptsAfterValidation: true,
   publicPayloadUsesRuntimeItemsOnly: true,
   publishesAssignmentAndSnapshotTogether: true,
@@ -5522,8 +5529,11 @@ assert.deepEqual(classroomDataLifecycleChainView.privacy, {
   requiresOwnerScopedAssignments: true,
   resultConsumersUseScoredAttempts: true,
   sourceFiles: [...CLASSROOM_DATA_LIFECYCLE_CHAIN_SOURCE_FILES],
+  storesScoredAttemptRows: true,
+  usesAttemptPersistenceHandoff: true,
   usesD1AppSchema: true,
   usesSnapshotForPublicRuntime: true,
+  usesScoredAttemptInsertHelper: true,
 });
 assert.deepEqual(
   [
@@ -5562,7 +5572,7 @@ assert.deepEqual(Object.fromEntries(classroomDataLifecycleChainValues), {
   'attempt-persistence-helper': 'buildScoredAttemptInsert',
   'attempt-query-scored-filter': 'resultJson required',
   'attempt-table-identity': 'name or browser token',
-  'classroom-data-chain-gate': '30 source files',
+  'attempt-persistence-handoff-boundary': '30 persistence handoff slices',
   'd1-app-schema-boundary': 'app.schema.ts',
   'printable-worksheet-consumer': 'Frozen runtime items',
   'product-data-model': 'Activity -> Assignment -> Attempt -> Results',
@@ -5577,7 +5587,7 @@ assert.deepEqual(Object.fromEntries(classroomDataLifecycleChainValues), {
 });
 assert.match(
   readFileSync('tests/e2e/TEST-CATALOG.md', 'utf8'),
-  /Classroom data lifecycle chain has a fast script-level gate via[\s\S]*scripts\/classroom-data-lifecycle-chain-handoff\.test\.ts/,
+  /Classroom data lifecycle chain has a fast script-level gate via[\s\S]*scripts\/classroom-data-lifecycle-chain-handoff\.test\.ts[\s\S]*attempt persistence handoff boundary/,
   'TEST-CATALOG should document the classroom data lifecycle chain gate.'
 );
 assert.match(

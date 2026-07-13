@@ -80,7 +80,8 @@ stay tied to the ClassGamify teacher workspace.
 Classroom product loop chain has a fast script-level gate via
 `pnpm exec tsx --test scripts/classroom-product-loop-chain-handoff.test.ts`;
 run it when changing the Activity -> Assignment -> Attempt -> Results contract,
-assignment source activity context boundary, classroom data lifecycle,
+assignment source activity context boundary, classroom data lifecycle and its
+attempt persistence handoff boundary,
 activity library page boundary,
 activity authoring/library workflow, source
 extraction lifecycle, activity lifecycle governance, template roadmap
@@ -171,11 +172,11 @@ lifecycle gates, result retention, snapshot retention, or lifecycle privacy
 guards.
 Classroom data lifecycle chain has a fast script-level gate via
 `pnpm exec tsx --test scripts/classroom-data-lifecycle-chain-handoff.test.ts`;
-run it when changing D1 app schema, activity/assignment persistence helpers,
-owner-scoped activity or assignment queries, assignment snapshot freezing,
-public assignment payload sanitization, attempt persistence, scored-attempt
-queries, result analysis/export/print consumers, or source-material/token
-privacy guards.
+run it when changing the 30-slice attempt persistence handoff boundary, D1 app
+schema, activity/assignment persistence helpers, owner-scoped activity or
+assignment queries, assignment snapshot freezing, public assignment payload
+sanitization, attempt persistence, scored-attempt queries, result
+analysis/export/print consumers, or source-material/token privacy guards.
 Workspace governance and utility gates include
 `pnpm exec tsx --test scripts/admin-users-handoff-semantic-views.test.ts`,
 `pnpm exec tsx --test scripts/billing-semantic-views.test.ts`, and

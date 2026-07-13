@@ -28,7 +28,7 @@ export const CLASSROOM_DATA_LIFECYCLE_CHAIN_HANDOFF_ITEM_IDS = [
   'printable-worksheet-consumer',
   'source-material-storage-key-guard',
   'raw-student-token-guard',
-  'classroom-data-chain-gate',
+  'attempt-persistence-handoff-boundary',
 ] as const;
 
 export const CLASSROOM_DATA_LIFECYCLE_CHAIN_SOURCE_FILES = [
@@ -79,13 +79,20 @@ export type ClassroomDataLifecycleChainPrivacyContract = {
   chainSourceFileCount: number;
   createsParallelWorksheetTables: false;
   exposesActivityContentJsonToPublicPayload: false;
+  exposesAnswerTextInPersistenceHandoff: false;
   exposesRawAnonymousTokens: false;
+  exposesRawSubmissionPayloadInPersistenceHandoff: false;
+  exposesRuntimeItemIdsInPersistenceHandoff: false;
   exposesSnapshotContentJsonToPublicPayload: false;
   exposesSourceMaterialStorageKeys: false;
+  exposesSourceMaterialMetadataInPersistenceHandoff: false;
   exposesStudentAnswerTextInHandoff: false;
+  exposesStudentNameInPersistenceHandoff: false;
   exposesTeacherAnswerKeysBeforeReview: false;
+  exposesTeacherOnlyAnswersInPersistenceHandoff: false;
   freezesSnapshotContent: true;
   itemIds: ClassroomDataLifecycleChainHandoffItemId[];
+  mutatesEvaluationAfterInsert: false;
   persistsAttemptsAfterValidation: true;
   publicPayloadUsesRuntimeItemsOnly: true;
   publishesAssignmentAndSnapshotTogether: true;
@@ -93,8 +100,11 @@ export type ClassroomDataLifecycleChainPrivacyContract = {
   requiresOwnerScopedAssignments: true;
   resultConsumersUseScoredAttempts: true;
   sourceFiles: string[];
+  storesScoredAttemptRows: true;
+  usesAttemptPersistenceHandoff: true;
   usesD1AppSchema: true;
   usesSnapshotForPublicRuntime: true;
+  usesScoredAttemptInsertHelper: true;
 };
 
 export type ClassroomDataLifecycleChainHandoffView = {
@@ -118,13 +128,20 @@ export function buildClassroomDataLifecycleChainHandoffView(): ClassroomDataLife
         CLASSROOM_DATA_LIFECYCLE_CHAIN_SOURCE_FILES.length,
       createsParallelWorksheetTables: false,
       exposesActivityContentJsonToPublicPayload: false,
+      exposesAnswerTextInPersistenceHandoff: false,
       exposesRawAnonymousTokens: false,
+      exposesRawSubmissionPayloadInPersistenceHandoff: false,
+      exposesRuntimeItemIdsInPersistenceHandoff: false,
       exposesSnapshotContentJsonToPublicPayload: false,
       exposesSourceMaterialStorageKeys: false,
+      exposesSourceMaterialMetadataInPersistenceHandoff: false,
       exposesStudentAnswerTextInHandoff: false,
+      exposesStudentNameInPersistenceHandoff: false,
       exposesTeacherAnswerKeysBeforeReview: false,
+      exposesTeacherOnlyAnswersInPersistenceHandoff: false,
       freezesSnapshotContent: true,
       itemIds: [...CLASSROOM_DATA_LIFECYCLE_CHAIN_HANDOFF_ITEM_IDS],
+      mutatesEvaluationAfterInsert: false,
       persistsAttemptsAfterValidation: true,
       publicPayloadUsesRuntimeItemsOnly: true,
       publishesAssignmentAndSnapshotTogether: true,
@@ -132,8 +149,11 @@ export function buildClassroomDataLifecycleChainHandoffView(): ClassroomDataLife
       requiresOwnerScopedAssignments: true,
       resultConsumersUseScoredAttempts: true,
       sourceFiles: [...CLASSROOM_DATA_LIFECYCLE_CHAIN_SOURCE_FILES],
+      storesScoredAttemptRows: true,
+      usesAttemptPersistenceHandoff: true,
       usesD1AppSchema: true,
       usesSnapshotForPublicRuntime: true,
+      usesScoredAttemptInsertHelper: true,
     },
     title: 'Classroom data lifecycle chain',
   };
@@ -357,12 +377,12 @@ function getClassroomDataLifecycleChainHandoffItem(
         'Anonymous token hidden',
         'Raw anonymous browser tokens enforce limits but stay out of public and teacher-facing handoff summaries.'
       );
-    case 'classroom-data-chain-gate':
+    case 'attempt-persistence-handoff-boundary':
       return item(
         id,
-        'Classroom data chain gate',
-        '30 source files',
-        'A focused gate keeps schema, persistence, snapshots, public payloads, attempts, results, exports, and privacy guards connected.'
+        'Attempt persistence handoff boundary',
+        '30 persistence handoff slices',
+        'Submission lifecycle, identity, attempt-limit and runtime-validation gates, scoring output, immutable answer/result JSON, scored rows, result consumers, source-material guards, and raw-payload privacy stay aligned.'
       );
   }
 }

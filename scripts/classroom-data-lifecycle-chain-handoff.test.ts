@@ -130,13 +130,20 @@ test('classroom data lifecycle chain exposes 30 safe data slices', () => {
     chainSourceFileCount: CLASSROOM_DATA_LIFECYCLE_CHAIN_SOURCE_FILES.length,
     createsParallelWorksheetTables: false,
     exposesActivityContentJsonToPublicPayload: false,
+    exposesAnswerTextInPersistenceHandoff: false,
     exposesRawAnonymousTokens: false,
+    exposesRawSubmissionPayloadInPersistenceHandoff: false,
+    exposesRuntimeItemIdsInPersistenceHandoff: false,
     exposesSnapshotContentJsonToPublicPayload: false,
     exposesSourceMaterialStorageKeys: false,
+    exposesSourceMaterialMetadataInPersistenceHandoff: false,
     exposesStudentAnswerTextInHandoff: false,
+    exposesStudentNameInPersistenceHandoff: false,
     exposesTeacherAnswerKeysBeforeReview: false,
+    exposesTeacherOnlyAnswersInPersistenceHandoff: false,
     freezesSnapshotContent: true,
     itemIds,
+    mutatesEvaluationAfterInsert: false,
     persistsAttemptsAfterValidation: true,
     publicPayloadUsesRuntimeItemsOnly: true,
     publishesAssignmentAndSnapshotTogether: true,
@@ -144,8 +151,11 @@ test('classroom data lifecycle chain exposes 30 safe data slices', () => {
     requiresOwnerScopedAssignments: true,
     resultConsumersUseScoredAttempts: true,
     sourceFiles: [...CLASSROOM_DATA_LIFECYCLE_CHAIN_SOURCE_FILES],
+    storesScoredAttemptRows: true,
+    usesAttemptPersistenceHandoff: true,
     usesD1AppSchema: true,
     usesSnapshotForPublicRuntime: true,
+    usesScoredAttemptInsertHelper: true,
   });
   assertNoPrivateClassroomDataText(JSON.stringify(handoffView));
 });
@@ -185,7 +195,7 @@ test('classroom data lifecycle chain summarizes persistence flow', () => {
       ['printable-worksheet-consumer', 'Frozen runtime items'],
       ['source-material-storage-key-guard', 'Storage keys hidden'],
       ['raw-student-token-guard', 'Anonymous token hidden'],
-      ['classroom-data-chain-gate', '30 source files'],
+      ['attempt-persistence-handoff-boundary', '30 persistence handoff slices'],
     ]
   );
   assert.equal(
@@ -465,6 +475,11 @@ test('classroom data lifecycle chain focused gate is documented', () => {
     normalizedCatalog,
     /D1 app schema[\s\S]*activity\/assignment persistence helpers[\s\S]*owner-scoped activity or assignment queries[\s\S]*assignment snapshot freezing[\s\S]*public assignment payload sanitization[\s\S]*attempt persistence[\s\S]*scored-attempt queries[\s\S]*result analysis\/export\/print consumers[\s\S]*source-material\/token privacy guards/,
     'TEST-CATALOG should describe the classroom data lifecycle gate scope.'
+  );
+  assert.match(
+    normalizedCatalog,
+    /attempt persistence handoff boundary/,
+    'TEST-CATALOG should document the concrete attempt persistence handoff boundary.'
   );
 });
 
