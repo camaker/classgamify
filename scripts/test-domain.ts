@@ -17287,6 +17287,8 @@ assert.ok(
 assert.deepEqual(teacherWorkspaceOperationsChainView.privacy, {
   chainSourceFileCount: TEACHER_WORKSPACE_OPERATIONS_CHAIN_SOURCE_FILES.length,
   countsStarterPreviewAsOwned: false,
+  countsStarterPreviewAsOwnedMetrics: false,
+  exposesAssignmentAttemptDetailsInDashboard: false,
   exposesAssignmentRuntimeContent: false,
   exposesAuthSecrets: false,
   exposesPrivateActivityContent: false,
@@ -17298,15 +17300,19 @@ assert.deepEqual(teacherWorkspaceOperationsChainView.privacy, {
   exposesSourceMaterialStorageKeys: false,
   exposesStudentAnswerText: false,
   exposesTeacherEmail: false,
+  exposesTeacherPrivateActivityContentInDashboard: false,
   itemIds: [...TEACHER_WORKSPACE_OPERATIONS_CHAIN_HANDOFF_ITEM_IDS],
   keepsActivityLibraryOwnerScoped: true,
   keepsAssignmentListOwnerScoped: true,
+  keepsDashboardActivityLoadingIndependent: true,
+  keepsDashboardAssignmentLoadingIndependent: true,
   keepsDashboardOwnerScoped: true,
   keepsSettingsFromMutatingClassroomData: true,
   keepsVisiblePageCountsSeparate: true,
   sourceFiles: [...TEACHER_WORKSPACE_OPERATIONS_CHAIN_SOURCE_FILES],
   usesAccountGovernanceLifecycleChain: true,
   usesActiveSurfaceProductBoundary: true,
+  usesDashboardOverviewHandoff: true,
   usesFullFilteredSummariesForOverview: true,
   usesPaymentCallbackHandoff: true,
 });
@@ -17357,12 +17363,12 @@ assert.deepEqual(Object.fromEntries(teacherWorkspaceOperationsChainValues), {
   'settings-files-classification': 'Safe material labels',
   'settings-notification-boundary': Routes.SettingsNotifications,
   'settings-security-boundary': Routes.SettingsSecurity,
-  'teacher-workspace-chain-gate': '30 source files',
+  'dashboard-overview-boundary': '30 dashboard slices',
   'workspace-private-data-guard': 'Private data hidden',
 });
 assert.match(
   readFileSync('tests/e2e/TEST-CATALOG.md', 'utf8'),
-  /Teacher workspace operations chain has a fast script-level gate via[\s\S]*scripts\/teacher-workspace-operations-chain-handoff\.test\.ts/,
+  /Teacher workspace operations chain has a fast script-level gate via[\s\S]*scripts\/teacher-workspace-operations-chain-handoff\.test\.ts[\s\S]*dashboard overview boundary/,
   'TEST-CATALOG should document the teacher workspace operations chain gate.'
 );
 assert.match(

@@ -96,7 +96,8 @@ continuity, teacher result review,
 teacher result copy lifecycle and its copy artifact handoff boundary,
 worksheet-mode delivery boundary,
 printable worksheet review lifecycle, copy/export/print handoffs,
-teacher workspace operations, public discovery and indexing alignment, or
+teacher workspace operations and its dashboard overview boundary, public
+discovery and indexing alignment, or
 privacy guards.
 Active surface product boundary has a fast script-level gate via
 `pnpm exec tsx --test scripts/active-surface-product-boundary.test.ts`; run it
@@ -336,10 +337,11 @@ status, next actions, readiness rows, action cards, route targets, or the
 dashboard-overview handoff.
 Teacher workspace operations chain has a fast script-level gate via
 `pnpm exec tsx --test scripts/teacher-workspace-operations-chain-handoff.test.ts`;
-run it when changing dashboard owner summaries, activity library
-filters/summaries/actions, assignment list filters/distribution, account
-governance, teacher settings security/files/billing/payment callback/notification
-boundaries, or the active surface product boundary.
+run it when changing the 30-slice dashboard overview boundary, dashboard owner
+summaries, activity library filters/summaries/actions, assignment list
+filters/distribution, account governance, teacher settings
+security/files/billing/payment callback/notification boundaries, or the active
+surface product boundary.
 Settings account workspace handoff has a fast script-level gate via
 `pnpm exec tsx --test scripts/settings-account-workspace-handoff-semantic-views.test.ts`;
 run it when changing teacher identity scope, account access, profile display

@@ -30,7 +30,7 @@ export const TEACHER_WORKSPACE_OPERATIONS_CHAIN_HANDOFF_ITEM_IDS = [
   'settings-notification-boundary',
   'workspace-private-data-guard',
   'active-surface-product-boundary',
-  'teacher-workspace-chain-gate',
+  'dashboard-overview-boundary',
 ] as const;
 
 export const TEACHER_WORKSPACE_OPERATIONS_CHAIN_SOURCE_FILES = [
@@ -80,6 +80,8 @@ export type TeacherWorkspaceOperationsChainHandoffItemView = {
 export type TeacherWorkspaceOperationsChainPrivacyContract = {
   chainSourceFileCount: number;
   countsStarterPreviewAsOwned: false;
+  countsStarterPreviewAsOwnedMetrics: false;
+  exposesAssignmentAttemptDetailsInDashboard: false;
   exposesAssignmentRuntimeContent: false;
   exposesAuthSecrets: false;
   exposesPrivateActivityContent: false;
@@ -91,15 +93,19 @@ export type TeacherWorkspaceOperationsChainPrivacyContract = {
   exposesSourceMaterialStorageKeys: false;
   exposesStudentAnswerText: false;
   exposesTeacherEmail: false;
+  exposesTeacherPrivateActivityContentInDashboard: false;
   itemIds: TeacherWorkspaceOperationsChainHandoffItemId[];
   keepsActivityLibraryOwnerScoped: true;
   keepsAssignmentListOwnerScoped: true;
   keepsDashboardOwnerScoped: true;
+  keepsDashboardActivityLoadingIndependent: true;
+  keepsDashboardAssignmentLoadingIndependent: true;
   keepsSettingsFromMutatingClassroomData: true;
   keepsVisiblePageCountsSeparate: true;
   sourceFiles: string[];
   usesAccountGovernanceLifecycleChain: true;
   usesActiveSurfaceProductBoundary: true;
+  usesDashboardOverviewHandoff: true;
   usesFullFilteredSummariesForOverview: true;
   usesPaymentCallbackHandoff: true;
 };
@@ -124,6 +130,8 @@ export function buildTeacherWorkspaceOperationsChainHandoffView(): TeacherWorksp
       chainSourceFileCount:
         TEACHER_WORKSPACE_OPERATIONS_CHAIN_SOURCE_FILES.length,
       countsStarterPreviewAsOwned: false,
+      countsStarterPreviewAsOwnedMetrics: false,
+      exposesAssignmentAttemptDetailsInDashboard: false,
       exposesAssignmentRuntimeContent: false,
       exposesAuthSecrets: false,
       exposesPrivateActivityContent: false,
@@ -135,15 +143,19 @@ export function buildTeacherWorkspaceOperationsChainHandoffView(): TeacherWorksp
       exposesSourceMaterialStorageKeys: false,
       exposesStudentAnswerText: false,
       exposesTeacherEmail: false,
+      exposesTeacherPrivateActivityContentInDashboard: false,
       itemIds: [...TEACHER_WORKSPACE_OPERATIONS_CHAIN_HANDOFF_ITEM_IDS],
       keepsActivityLibraryOwnerScoped: true,
       keepsAssignmentListOwnerScoped: true,
       keepsDashboardOwnerScoped: true,
+      keepsDashboardActivityLoadingIndependent: true,
+      keepsDashboardAssignmentLoadingIndependent: true,
       keepsSettingsFromMutatingClassroomData: true,
       keepsVisiblePageCountsSeparate: true,
       sourceFiles: [...TEACHER_WORKSPACE_OPERATIONS_CHAIN_SOURCE_FILES],
       usesAccountGovernanceLifecycleChain: true,
       usesActiveSurfaceProductBoundary: true,
+      usesDashboardOverviewHandoff: true,
       usesFullFilteredSummariesForOverview: true,
       usesPaymentCallbackHandoff: true,
     },
@@ -369,12 +381,12 @@ function getTeacherWorkspaceOperationsChainHandoffItem(
         '30 active-surface slices',
         'Authenticated workspace operations inherit the active-surface guard against legacy learning-site, starter, or unused provider copy.'
       );
-    case 'teacher-workspace-chain-gate':
+    case 'dashboard-overview-boundary':
       return item(
         id,
-        'Teacher workspace chain gate',
-        '30 source files',
-        'A focused gate keeps dashboard, library, assignment list, and settings boundaries aligned.'
+        'Dashboard overview boundary',
+        '30 dashboard slices',
+        'Owner activity and assignment summaries, starter preview isolation, independent loading, top metrics, core-loop status, next actions, readiness rows, route targets, and dashboard privacy guards stay aligned.'
       );
   }
 }

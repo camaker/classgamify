@@ -126,6 +126,8 @@ test('teacher workspace operations chain exposes 30 safe authenticated slices', 
     chainSourceFileCount:
       TEACHER_WORKSPACE_OPERATIONS_CHAIN_SOURCE_FILES.length,
     countsStarterPreviewAsOwned: false,
+    countsStarterPreviewAsOwnedMetrics: false,
+    exposesAssignmentAttemptDetailsInDashboard: false,
     exposesAssignmentRuntimeContent: false,
     exposesAuthSecrets: false,
     exposesPrivateActivityContent: false,
@@ -137,15 +139,19 @@ test('teacher workspace operations chain exposes 30 safe authenticated slices', 
     exposesSourceMaterialStorageKeys: false,
     exposesStudentAnswerText: false,
     exposesTeacherEmail: false,
+    exposesTeacherPrivateActivityContentInDashboard: false,
     itemIds,
     keepsActivityLibraryOwnerScoped: true,
     keepsAssignmentListOwnerScoped: true,
     keepsDashboardOwnerScoped: true,
+    keepsDashboardActivityLoadingIndependent: true,
+    keepsDashboardAssignmentLoadingIndependent: true,
     keepsSettingsFromMutatingClassroomData: true,
     keepsVisiblePageCountsSeparate: true,
     sourceFiles: [...TEACHER_WORKSPACE_OPERATIONS_CHAIN_SOURCE_FILES],
     usesAccountGovernanceLifecycleChain: true,
     usesActiveSurfaceProductBoundary: true,
+    usesDashboardOverviewHandoff: true,
     usesFullFilteredSummariesForOverview: true,
     usesPaymentCallbackHandoff: true,
   });
@@ -187,7 +193,7 @@ test('teacher workspace operations chain summarizes dashboard through settings f
       ['settings-notification-boundary', Routes.SettingsNotifications],
       ['workspace-private-data-guard', 'Private data hidden'],
       ['active-surface-product-boundary', '30 active-surface slices'],
-      ['teacher-workspace-chain-gate', '30 source files'],
+      ['dashboard-overview-boundary', '30 dashboard slices'],
     ]
   );
   assert.equal(
@@ -393,6 +399,11 @@ test('teacher workspace operations chain focused gate is documented', () => {
     TEST_CATALOG_SOURCE.replace(/\s+/g, ' '),
     /dashboard owner summaries[\s\S]*activity library filters\/summaries\/actions[\s\S]*assignment list filters\/distribution[\s\S]*account governance[\s\S]*teacher settings security\/files\/billing\/payment callback\/notification boundaries[\s\S]*active surface product boundary/,
     'TEST-CATALOG should describe the full teacher workspace operations chain scope.'
+  );
+  assert.match(
+    TEST_CATALOG_SOURCE.replace(/\s+/g, ' '),
+    /dashboard overview boundary/,
+    'TEST-CATALOG should document the concrete dashboard overview boundary.'
   );
 });
 
