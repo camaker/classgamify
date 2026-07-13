@@ -81,10 +81,11 @@ run it when changing the Activity -> Assignment -> Attempt -> Results contract,
 classroom data lifecycle, activity authoring/library workflow, source
 extraction lifecycle, activity lifecycle governance, template roadmap
 capability alignment, AI
-enhancement lifecycle review, published assignment delivery, student runner play,
-student identity lifecycle, student runtime identity boundary, assignment
-submission validation boundary, assignment attempt persistence boundary, scored
-attempt results, answer feedback lifecycle, submitted-date continuity,
+enhancement lifecycle review, published assignment delivery, assignment publish
+preflight boundary, student runner play, student identity lifecycle, student
+runtime identity boundary, assignment submission validation boundary,
+assignment attempt persistence boundary, scored attempt results, answer feedback
+lifecycle, submitted-date continuity,
 accepted-answer continuity, explanation continuity, teacher result review,
 teacher result copy lifecycle,
 printable worksheet review lifecycle, copy/export/print handoffs,
