@@ -28,7 +28,7 @@ export const CLASSROOM_PRODUCT_LOOP_CHAIN_HANDOFF_ITEM_IDS = [
   'worksheet-mode-delivery-boundary',
   'public-discovery-indexing-boundary',
   'assignment-distribution-lifecycle-boundary',
-  'product-loop-chain-gate',
+  'assignment-attempt-stats-boundary',
 ] as const;
 
 export const CLASSROOM_PRODUCT_LOOP_CHAIN_SOURCE_FILES = [
@@ -114,6 +114,7 @@ export type ClassroomProductLoopChainPrivacyContract = {
   exposesAcceptedAlternativesToTeachersOnly: true;
   exposesAcceptedAlternativesAfterReview: true;
   exposesAcceptedAnswerTextInHandoff: false;
+  exposesAcceptedAnswers: false;
   exposesActivityContentJsonToPublicPayload: false;
   exposesActivityContentJson: false;
   exposesInternalActivityIds: false;
@@ -128,6 +129,7 @@ export type ClassroomProductLoopChainPrivacyContract = {
   exposesAnswerKeysBeforeAllowedReview: false;
   exposesChoiceTextInHandoff: false;
   exposesCopyArtifactText: false;
+  exposesCsvDataUrl: false;
   exposesCsvFilename: false;
   exposesCsvDataUrlInHandoff: false;
   exposesPrivateActivityContent: false;
@@ -166,6 +168,7 @@ export type ClassroomProductLoopChainPrivacyContract = {
   exposesStudentAnswerTextInLifecycleHandoff: false;
   exposesStudentInstructions: false;
   exposesStudentLabelsInHandoff: false;
+  exposesStudentDisplayLabels: false;
   exposesStudentName: false;
   exposesStudentNameInputValues: false;
   exposesStudentNames: false;
@@ -174,6 +177,7 @@ export type ClassroomProductLoopChainPrivacyContract = {
   exposesStudentNamesInLifecycleHandoff: false;
   exposesStudentResponseTextInHandoff: false;
   exposesTeacherOnlyAnswers: false;
+  exposesTeacherAnswerKey: false;
   exposesTeacherAnswerText: false;
   exposesTeacherAnswerKeysInIdentityHandoff: false;
   exposesTeacherAnswerTextInHandoff: false;
@@ -222,6 +226,7 @@ export type ClassroomProductLoopChainPrivacyContract = {
   mutatesAttemptsFromValidationHandoff: false;
   mutatesAttempts: false;
   mutatesEvaluationAfterInsert: false;
+  mutatesResultData: false;
   mutatesPublicRunner: false;
   partialSubmissionAllowed: true;
   persistenceUsesNormalizedAnswers: true;
@@ -288,12 +293,14 @@ export type ClassroomProductLoopChainPrivacyContract = {
   usesAssignmentPublishHandoff: true;
   usesAssignmentAttemptPersistenceHandoff: true;
   usesAssignmentAttemptDurationHandoff: true;
+  usesAssignmentAttemptStatsHandoff: true;
   usesAssignmentSubmissionValidationHandoff: true;
   usesAssignmentSourceActivityContextChain: true;
   usesAssignmentLifecycleGovernanceChain: true;
   usesAssignmentDistributionLifecycleChain: true;
   usesClassroomDataLifecycleChain: true;
   usesD1AppSchema: true;
+  usesAssignmentDomainHelpers: true;
   usesPublishedAssignmentDeliveryChain: true;
   usesPublicAssignmentRulesHandoff: true;
   usesPublicDiscoveryIndexingChain: true;
@@ -354,7 +361,7 @@ export function buildClassroomProductLoopChainHandoffView(): ClassroomProductLoo
 
   return {
     description:
-      'Thirty-slice Activity -> Assignment -> Attempt -> Results classroom product loop from teacher-owned activities and reusable content through classroom data lifecycle, activity authoring/library workflow, source extraction lifecycle boundaries, activity lifecycle governance, template roadmap capability alignment, AI enhancement lifecycle review, published assignment delivery, assignment publish preflight boundary, assignment lifecycle governance, assignment distribution lifecycle, public assignment rules boundary, student runner play, student identity lifecycle, student runtime identity boundary, assignment submission validation boundary, assignment attempt persistence boundary, scored attempt results, answer feedback lifecycle, assignment attempt duration, submitted-date continuity, accepted-answer continuity, and explanation continuity, teacher review, teacher result copy lifecycle, worksheet-mode delivery, printable worksheet review lifecycle, copy/export/print handoffs, teacher workspace operations, public discovery/indexing metadata, and privacy guards.',
+      'Thirty-slice Activity -> Assignment -> Attempt -> Results classroom product loop from teacher-owned activities and reusable content through classroom data lifecycle, activity authoring/library workflow, source extraction lifecycle boundaries, activity lifecycle governance, template roadmap capability alignment, AI enhancement lifecycle review, published assignment delivery, assignment publish preflight boundary, assignment lifecycle governance, assignment distribution lifecycle, public assignment rules boundary, student runner play, student identity lifecycle, student runtime identity boundary, assignment submission validation boundary, assignment attempt persistence boundary, scored attempt results, assignment attempt stats, answer feedback lifecycle, assignment attempt duration, submitted-date continuity, accepted-answer continuity, and explanation continuity, teacher review, teacher result copy lifecycle, worksheet-mode delivery, printable worksheet review lifecycle, copy/export/print handoffs, teacher workspace operations, public discovery/indexing metadata, and privacy guards.',
     itemViews,
     privacy: {
       appendsCopyScopeToArtifacts: true,
@@ -395,6 +402,7 @@ export function buildClassroomProductLoopChainHandoffView(): ClassroomProductLoo
       exposesAcceptedAlternativesToTeachersOnly: true,
       exposesAcceptedAlternativesAfterReview: true,
       exposesAcceptedAnswerTextInHandoff: false,
+      exposesAcceptedAnswers: false,
       exposesActivityContentJsonToPublicPayload: false,
       exposesActivityContentJson: false,
       exposesInternalActivityIds: false,
@@ -409,6 +417,7 @@ export function buildClassroomProductLoopChainHandoffView(): ClassroomProductLoo
       exposesAnswerKeysBeforeAllowedReview: false,
       exposesChoiceTextInHandoff: false,
       exposesCopyArtifactText: false,
+      exposesCsvDataUrl: false,
       exposesCsvFilename: false,
       exposesCsvDataUrlInHandoff: false,
       exposesPrivateActivityContent: false,
@@ -447,6 +456,7 @@ export function buildClassroomProductLoopChainHandoffView(): ClassroomProductLoo
       exposesStudentAnswerTextInLifecycleHandoff: false,
       exposesStudentInstructions: false,
       exposesStudentLabelsInHandoff: false,
+      exposesStudentDisplayLabels: false,
       exposesStudentName: false,
       exposesStudentNameInputValues: false,
       exposesStudentNames: false,
@@ -455,6 +465,7 @@ export function buildClassroomProductLoopChainHandoffView(): ClassroomProductLoo
       exposesStudentNamesInLifecycleHandoff: false,
       exposesStudentResponseTextInHandoff: false,
       exposesTeacherOnlyAnswers: false,
+      exposesTeacherAnswerKey: false,
       exposesTeacherAnswerText: false,
       exposesTeacherAnswerKeysInIdentityHandoff: false,
       exposesTeacherAnswerTextInHandoff: false,
@@ -503,6 +514,7 @@ export function buildClassroomProductLoopChainHandoffView(): ClassroomProductLoo
       mutatesAttemptsFromValidationHandoff: false,
       mutatesAttempts: false,
       mutatesEvaluationAfterInsert: false,
+      mutatesResultData: false,
       mutatesPublicRunner: false,
       partialSubmissionAllowed: true,
       persistenceUsesNormalizedAnswers: true,
@@ -569,12 +581,14 @@ export function buildClassroomProductLoopChainHandoffView(): ClassroomProductLoo
       usesAssignmentPublishHandoff: true,
       usesAssignmentAttemptPersistenceHandoff: true,
       usesAssignmentAttemptDurationHandoff: true,
+      usesAssignmentAttemptStatsHandoff: true,
       usesAssignmentSubmissionValidationHandoff: true,
       usesAssignmentSourceActivityContextChain: true,
       usesAssignmentLifecycleGovernanceChain: true,
       usesAssignmentDistributionLifecycleChain: true,
       usesClassroomDataLifecycleChain: true,
       usesD1AppSchema: true,
+      usesAssignmentDomainHelpers: true,
       usesPublishedAssignmentDeliveryChain: true,
       usesPublicAssignmentRulesHandoff: true,
       usesPublicDiscoveryIndexingChain: true,
@@ -842,12 +856,12 @@ function getClassroomProductLoopChainHandoffItem(
         '30 distribution slices',
         'Post-publish context, owner-scoped published lookup, normalized share links, copy feedback, student preview, printable worksheet, result actions, list-card parity, and distribution privacy guards stay aligned.'
       );
-    case 'product-loop-chain-gate':
+    case 'assignment-attempt-stats-boundary':
       return item(
         id,
-        'Product loop chain gate',
-        '30 source files',
-        'A focused gate keeps activity, assignment, attempt, result continuity, workspace, public entry, and privacy boundaries connected.'
+        'Assignment attempt stats boundary',
+        '30 stats slices',
+        'Completed-attempt filtering, average accuracy, points and duration, numeric guards, empty states, result metrics, assignment summaries, classroom briefs, copy artifacts, CSV exports, and stats privacy guards stay aligned.'
       );
   }
 }
