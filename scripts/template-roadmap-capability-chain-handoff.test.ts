@@ -3,6 +3,7 @@ import { existsSync, readFileSync } from 'node:fs';
 import test from 'node:test';
 import { ACTIVITY_AI_AUTHORING_CHAIN_HANDOFF_ITEM_IDS } from '@/activities/ai-authoring-chain';
 import { ACTIVITY_AI_REMIX_ASSIST_HANDOFF_ITEM_IDS } from '@/activities/ai-remix-assist';
+import { ACTIVITY_AUTHORING_LIBRARY_CHAIN_HANDOFF_ITEM_IDS } from '@/activities/authoring-library-chain';
 import { ACTIVITY_TEMPLATE_SCAFFOLD_QUALITY_HANDOFF_ITEM_IDS } from '@/activities/scaffolds';
 import { ACTIVITY_SOURCE_EXTRACTION_ASSIST_HANDOFF_ITEM_IDS } from '@/activities/source-extraction-assist';
 import { ACTIVITY_TEMPLATE_REMIX_HANDOFF_ITEM_IDS } from '@/activities/template-remix';
@@ -109,6 +110,7 @@ test('template roadmap capability chain exposes 30 roadmap slices', () => {
     requiresTeacherReviewBeforePersistence: true,
     sourceFiles: [...TEMPLATE_ROADMAP_CAPABILITY_CHAIN_SOURCE_FILES],
     usesSharedActivityAssignmentModel: true,
+    usesAuthoringLibraryChain: true,
   });
   assertNoPrivateTemplateRoadmapText(JSON.stringify(handoffView));
 });
@@ -154,7 +156,7 @@ test('template roadmap capability chain summarizes roadmap through delivery', ()
       ['printable-follow-up', 'Teacher print route'],
       ['result-export-continuity', 'Shared result export'],
       ['privacy-model-guard', 'No parallel model'],
-      ['template-roadmap-chain-gate', '30 source files'],
+      ['authoring-library-chain-boundary', '30 authoring slices'],
     ]
   );
   assert.equal(
@@ -195,6 +197,7 @@ test('template roadmap capability chain is backed by focused gates', () => {
     [
       ROADMAP_PUBLIC_HANDOFF_ITEM_IDS.length,
       PUBLIC_TEMPLATE_ENTRY_HANDOFF_ITEM_IDS.length,
+      ACTIVITY_AUTHORING_LIBRARY_CHAIN_HANDOFF_ITEM_IDS.length,
       ACTIVITY_TEMPLATE_SCAFFOLD_QUALITY_HANDOFF_ITEM_IDS.length,
       ACTIVITY_TEMPLATE_REMIX_HANDOFF_ITEM_IDS.length,
       QUESTION_CHOICE_GENERATION_HANDOFF_ITEM_IDS.length,
@@ -212,7 +215,7 @@ test('template roadmap capability chain is backed by focused gates', () => {
       PRINTABLE_WORKSHEET_HANDOFF_ITEM_IDS.length,
       ASSIGNMENT_RESULTS_EXPORT_PREPARATION_ITEM_IDS.length,
     ],
-    Array.from({ length: 18 }, () => 30)
+    Array.from({ length: 19 }, () => 30)
   );
 });
 

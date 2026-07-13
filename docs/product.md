@@ -614,6 +614,14 @@ Production should still configure `CLOUDFLARE_ACCOUNT_ID` and
 
 ## Near-Term Template Roadmap
 
+The template roadmap capability chain should explicitly carry the 30-slice
+authoring/library chain across public template entries, the shared create and
+edit contract, persistence, owner-scoped library search and filters, readiness
+summaries, derivative drafts, archive and restore gates, publish access, and
+assignment snapshot protection. Its aggregate summary must not expose prompts,
+answers, teacher notes, raw editor input, source-material filenames, file ids,
+or storage keys, and it must not create assignment links without teacher action.
+
 - Wordwall-style: quiz, match-up, group sort, matching pairs, open box.
 - Liveworksheets-style: fill blanks, worksheet layout, first listening prompts,
   drag/drop classification, line matching, teacher audio upload, printable

@@ -32,7 +32,7 @@ export const TEMPLATE_ROADMAP_CAPABILITY_CHAIN_HANDOFF_ITEM_IDS = [
   'printable-follow-up',
   'result-export-continuity',
   'privacy-model-guard',
-  'template-roadmap-chain-gate',
+  'authoring-library-chain-boundary',
 ] as const;
 
 export const TEMPLATE_ROADMAP_CAPABILITY_CHAIN_SOURCE_FILES = [
@@ -96,6 +96,7 @@ export type TemplateRoadmapCapabilityChainPrivacyContract = {
   requiresTeacherReviewBeforePersistence: true;
   sourceFiles: string[];
   usesSharedActivityAssignmentModel: true;
+  usesAuthoringLibraryChain: true;
 };
 
 export type TemplateRoadmapCapabilityChainHandoffView = {
@@ -132,6 +133,7 @@ export function buildTemplateRoadmapCapabilityChainHandoffView(): TemplateRoadma
       requiresTeacherReviewBeforePersistence: true,
       sourceFiles: [...TEMPLATE_ROADMAP_CAPABILITY_CHAIN_SOURCE_FILES],
       usesSharedActivityAssignmentModel: true,
+      usesAuthoringLibraryChain: true,
     },
     title: 'Template roadmap capability chain',
   };
@@ -355,12 +357,12 @@ function getTemplateRoadmapCapabilityChainHandoffItem(
         'No parallel model',
         'The template roadmap avoids parallel worksheet models, direct AI persistence, raw source text, storage keys, and public answer keys.'
       );
-    case 'template-roadmap-chain-gate':
+    case 'authoring-library-chain-boundary':
       return item(
         id,
-        'Template roadmap chain gate',
-        '30 source files',
-        'A focused gate keeps roadmap copy, template entries, editor scaffolds, AI enhancements, runtimes, print, and exports aligned.'
+        'Authoring library chain',
+        '30 authoring slices',
+        'Template roadmap capabilities stay connected to public entries, shared authoring, persistence, owner-scoped libraries, lifecycle actions, publish access, and snapshot protection.'
       );
   }
 }

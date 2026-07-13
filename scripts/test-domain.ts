@@ -45575,11 +45575,13 @@ assert.deepEqual(templateRoadmapCapabilityChainView.privacy, {
   requiresTeacherReviewBeforePersistence: true,
   sourceFiles: [...TEMPLATE_ROADMAP_CAPABILITY_CHAIN_SOURCE_FILES],
   usesSharedActivityAssignmentModel: true,
+  usesAuthoringLibraryChain: true,
 });
 assert.deepEqual(
   [
     ROADMAP_PUBLIC_HANDOFF_ITEM_IDS.length,
     PUBLIC_TEMPLATE_ENTRY_HANDOFF_ITEM_IDS.length,
+    ACTIVITY_AUTHORING_LIBRARY_CHAIN_HANDOFF_ITEM_IDS.length,
     ACTIVITY_TEMPLATE_SCAFFOLD_QUALITY_HANDOFF_ITEM_IDS.length,
     ACTIVITY_TEMPLATE_REMIX_HANDOFF_ITEM_IDS.length,
     QUESTION_CHOICE_GENERATION_HANDOFF_ITEM_IDS.length,
@@ -45600,7 +45602,7 @@ assert.deepEqual(
     PRINTABLE_WORKSHEET_HANDOFF_ITEM_IDS.length,
     ASSIGNMENT_RESULTS_EXPORT_PREPARATION_ITEM_IDS.length,
   ],
-  Array.from({ length: 21 }, () => 30),
+  Array.from({ length: 22 }, () => 30),
   'Template roadmap capability chain should stay backed by focused roadmap, template, AI, worksheet, runtime, print, and export gates.'
 );
 assert.deepEqual(Object.fromEntries(templateRoadmapCapabilityChainValues), {
@@ -45630,7 +45632,7 @@ assert.deepEqual(Object.fromEntries(templateRoadmapCapabilityChainValues), {
   'student-runtime-routing': 'Runtime item kind',
   'teacher-audio-path': 'Listening draft readiness',
   'template-readiness-diagnosis': 'Ready and locked modes',
-  'template-roadmap-chain-gate': '30 source files',
+  'authoring-library-chain-boundary': '30 authoring slices',
   'template-scaffold-coverage': 'All template scaffolds',
   'wordwall-template-set': '8 template modes',
   'worksheet-extraction-path': 'Worksheet import readiness',

@@ -692,7 +692,11 @@ Template roadmap capability chain has a fast script-level gate via
 run it when changing roadmap template promises, Wordwall-style templates,
 Liveworksheets-style modes, shared editor scaffolds, AI enhancements, source
 extraction readiness, worksheet delivery, print follow-up, result export
-continuity, or template capability privacy guards.
+continuity, or template capability privacy guards. The chain also carries the
+30-slice authoring/library handoff for shared create and edit contracts,
+persistence, owner-scoped library management, readiness, derivative drafts,
+lifecycle gates, publish access, snapshot protection, and privacy while its
+independent source file gate remains intact.
 Activity authoring/library chain has a fast script-level gate via
 `pnpm exec tsx --test scripts/activity-authoring-library-chain-handoff.test.ts`;
 run it when changing public template and worksheet entries, shared editor save,
