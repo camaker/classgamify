@@ -747,7 +747,8 @@ Worksheet-mode delivery chain has a fast script-level gate via
 `pnpm exec tsx --test scripts/worksheet-mode-delivery-chain-handoff.test.ts`;
 run it when changing `/worksheets` creation entry points, shared create editor
 scaffolds, assignment snapshots, worksheet-style student runtimes, printable
-handouts, result exports, worksheet extraction boundaries, or source-material
+handouts and their 30-slice printable worksheet handoff boundary, result
+exports, worksheet extraction boundaries, or source-material
 and student-identity privacy guards.
 Student runner play chain has a fast script-level gate via
 `pnpm exec tsx --test scripts/student-runner-play-chain-handoff.test.ts`;

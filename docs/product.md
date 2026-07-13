@@ -444,6 +444,13 @@ student/date/score and delivery fields, answer-key access state, item response
 help, choice banks, writing areas, teacher-only answer-key details,
 return-to-results links, and print controls, so paper handoffs remain
 reviewable without depending on visual badges alone.
+The worksheet-mode delivery chain should explicitly carry this printable
+worksheet handoff as 30 slices spanning handout overview, student fields,
+response planning, choice-bank and writing-area coverage, answer lines,
+assignment and delivery context, answer-key access and details, results return,
+print action, route/public-runner boundaries, and privacy. Its aggregate summary
+must not expose prompt, choice, answer-key, student-response, student-identity,
+or source-material storage-key text.
 The teacher result page should show the student summary, the top reteach
 priorities, and the full item performance table so a teacher can scan the
 class before opening individual student answers. The full item performance

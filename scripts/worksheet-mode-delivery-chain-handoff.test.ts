@@ -98,12 +98,14 @@ test('worksheet-mode delivery chain exposes 30 worksheet-loop slices', () => {
     exposesRawAnonymousTokens: false,
     exposesRawStudentIdentity: false,
     exposesSourceMaterialStorageKeys: false,
+    exposesStudentResponseTextInHandoff: false,
     itemIds,
     printRouteRequiresTeacherAuth: true,
     publicPayloadUsesSanitizedRuntimeItems: true,
     requiresAssignmentSnapshot: true,
     requiresCreateActivityInputContract: true,
     sourceFiles: [...WORKSHEET_MODE_DELIVERY_CHAIN_SOURCE_FILES],
+    usesPrintableWorksheetHandoff: true,
   });
   assertNoPrivateWorksheetChainText(JSON.stringify(handoffView));
 });
@@ -143,7 +145,7 @@ test('worksheet-mode delivery chain summarizes each worksheet handoff step', () 
       ['result-export-policy', 'Delivery rules included'],
       ['source-material-guard', 'Storage keys hidden'],
       ['raw-identity-guard', 'Identity hidden'],
-      ['worksheet-chain-gate', '30 source files'],
+      ['printable-worksheet-handoff-boundary', '30 printable worksheet slices'],
     ]
   );
   assert.equal(
@@ -274,14 +276,21 @@ test('worksheet-mode delivery sources preserve runtime, print, and export bounda
 });
 
 test('worksheet-mode delivery chain focused gate is documented', () => {
+  const normalizedCatalog = TEST_CATALOG_SOURCE.replace(/\s+/g, ' ');
+
+  assert.match(
+    PRODUCT_SOURCE,
+    /worksheet-mode delivery chain[\s\S]*printable[\s\S]*30 slices[\s\S]*choice-bank and writing-area coverage[\s\S]*answer-key access[\s\S]*must not expose prompt[\s\S]*student-response[\s\S]*source-material storage-key text/,
+    'docs/product.md should describe the printable worksheet handoff and student-response privacy boundary.'
+  );
   assert.match(
     TEST_CATALOG_SOURCE,
     /Worksheet-mode delivery chain has a fast script-level gate via[\s\S]*scripts\/worksheet-mode-delivery-chain-handoff\.test\.ts/,
     'TEST-CATALOG should document the worksheet-mode delivery chain gate.'
   );
   assert.match(
-    TEST_CATALOG_SOURCE,
-    /\/worksheets[\s\S]*shared create editor[\s\S]*assignment snapshots[\s\S]*worksheet-style student runtimes[\s\S]*printable\s+handouts[\s\S]*result exports/,
+    normalizedCatalog,
+    /\/worksheets[\s\S]*shared create editor[\s\S]*assignment snapshots[\s\S]*worksheet-style student runtimes[\s\S]*printable handouts[\s\S]*30-slice printable worksheet handoff boundary[\s\S]*result exports/,
     'TEST-CATALOG should document the worksheet-mode chain scope.'
   );
 });

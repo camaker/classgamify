@@ -28,7 +28,7 @@ export const WORKSHEET_MODE_DELIVERY_CHAIN_HANDOFF_ITEM_IDS = [
   'result-export-policy',
   'source-material-guard',
   'raw-identity-guard',
-  'worksheet-chain-gate',
+  'printable-worksheet-handoff-boundary',
 ] as const;
 
 export const WORKSHEET_MODE_DELIVERY_CHAIN_SOURCE_FILES = [
@@ -83,12 +83,14 @@ export type WorksheetModeDeliveryChainPrivacyContract = {
   exposesRawAnonymousTokens: false;
   exposesRawStudentIdentity: false;
   exposesSourceMaterialStorageKeys: false;
+  exposesStudentResponseTextInHandoff: false;
   itemIds: WorksheetModeDeliveryChainHandoffItemId[];
   printRouteRequiresTeacherAuth: true;
   publicPayloadUsesSanitizedRuntimeItems: true;
   requiresAssignmentSnapshot: true;
   requiresCreateActivityInputContract: true;
   sourceFiles: string[];
+  usesPrintableWorksheetHandoff: true;
 };
 
 export type WorksheetModeDeliveryChainHandoffView = {
@@ -115,12 +117,14 @@ export function buildWorksheetModeDeliveryChainHandoffView(): WorksheetModeDeliv
       exposesRawAnonymousTokens: false,
       exposesRawStudentIdentity: false,
       exposesSourceMaterialStorageKeys: false,
+      exposesStudentResponseTextInHandoff: false,
       itemIds: [...WORKSHEET_MODE_DELIVERY_CHAIN_HANDOFF_ITEM_IDS],
       printRouteRequiresTeacherAuth: true,
       publicPayloadUsesSanitizedRuntimeItems: true,
       requiresAssignmentSnapshot: true,
       requiresCreateActivityInputContract: true,
       sourceFiles: [...WORKSHEET_MODE_DELIVERY_CHAIN_SOURCE_FILES],
+      usesPrintableWorksheetHandoff: true,
     },
     title: 'Worksheet-mode delivery chain',
   };
@@ -344,12 +348,12 @@ function getWorksheetModeDeliveryChainHandoffItem(
         'Identity hidden',
         'Student names and anonymous browser tokens are normalized before limits and results without being exposed in handoff summaries.'
       );
-    case 'worksheet-chain-gate':
+    case 'printable-worksheet-handoff-boundary':
       return item(
         id,
-        'Worksheet chain gate',
-        '30 source files',
-        'The worksheet-mode delivery chain keeps public entry, editor scaffolds, student runtime, print handoff, and result export gates connected.'
+        'Printable worksheet handoff boundary',
+        '30 printable worksheet slices',
+        'Handout overview, student fields, response modes, choice banks, writing areas, answer lines, delivery policy, answer-key access and details, results return, print controls, and privacy stay aligned.'
       );
   }
 }

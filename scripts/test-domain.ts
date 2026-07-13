@@ -45457,12 +45457,14 @@ assert.deepEqual(worksheetModeDeliveryChainView.privacy, {
   exposesRawAnonymousTokens: false,
   exposesRawStudentIdentity: false,
   exposesSourceMaterialStorageKeys: false,
+  exposesStudentResponseTextInHandoff: false,
   itemIds: [...WORKSHEET_MODE_DELIVERY_CHAIN_HANDOFF_ITEM_IDS],
   printRouteRequiresTeacherAuth: true,
   publicPayloadUsesSanitizedRuntimeItems: true,
   requiresAssignmentSnapshot: true,
   requiresCreateActivityInputContract: true,
   sourceFiles: [...WORKSHEET_MODE_DELIVERY_CHAIN_SOURCE_FILES],
+  usesPrintableWorksheetHandoff: true,
 });
 assert.deepEqual(
   [
@@ -45514,7 +45516,7 @@ assert.deepEqual(Object.fromEntries(worksheetModeDeliveryChainValues), {
   'student-rules-summary': 'Student-visible rules',
   'submission-contract': '{ itemId, answer }',
   'template-search-param': 'template',
-  'worksheet-chain-gate': '30 source files',
+  'printable-worksheet-handoff-boundary': '30 printable worksheet slices',
   'worksheet-create-actions': 'Create editor links',
   'worksheet-extraction-boundary': 'No parallel model',
   'worksheet-mode-catalog': '4 worksheet modes',
