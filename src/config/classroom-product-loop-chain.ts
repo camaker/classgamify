@@ -2,7 +2,7 @@ export const CLASSROOM_PRODUCT_LOOP_CHAIN_HANDOFF_ITEM_IDS = [
   'product-loop-contract',
   'activity-model',
   'classroom-data-lifecycle-boundary',
-  'activity-library-owner-scope',
+  'activity-library-page-boundary',
   'activity-authoring-library-boundary',
   'template-roadmap-capability-boundary',
   'ai-enhancement-lifecycle-boundary',
@@ -91,6 +91,7 @@ export type ClassroomProductLoopChainPrivacyContract = {
   copyArtifactsUseFormattedDates: true;
   copyArtifactsUseFormattedExplanations: true;
   countsStarterPreviewAsOwned: false;
+  exposesDerivativeDraftPayloads: false;
   createsParallelWorksheetTables: false;
   clientPayloadUsesRuntimeItems: true;
   clientProgressUsesRuntimeItems: true;
@@ -265,6 +266,8 @@ export type ClassroomProductLoopChainPrivacyContract = {
   usesBrowserTokenForAnonymousAttempts: true;
   usesDisplayLabelsForAnonymousResults: true;
   usesFullFilteredSummariesForOverview: true;
+  usesActivityLibraryPageHandoff: true;
+  usesOwnerScopedSourceFilters: true;
   usesPaymentCallbackHandoff: true;
   usesPrintableWorksheetReviewLifecycleChain: true;
   usesResultAcceptedAnswerChain: true;
@@ -328,6 +331,7 @@ export function buildClassroomProductLoopChainHandoffView(): ClassroomProductLoo
       copyArtifactsUseFormattedDates: true,
       copyArtifactsUseFormattedExplanations: true,
       countsStarterPreviewAsOwned: false,
+      exposesDerivativeDraftPayloads: false,
       createsParallelWorksheetTables: false,
       csvExportsUseSharedAnswerView: true,
       csvExportsUseFormattedExplanations: true,
@@ -500,6 +504,8 @@ export function buildClassroomProductLoopChainHandoffView(): ClassroomProductLoo
       usesBrowserTokenForAnonymousAttempts: true,
       usesDisplayLabelsForAnonymousResults: true,
       usesFullFilteredSummariesForOverview: true,
+      usesActivityLibraryPageHandoff: true,
+      usesOwnerScopedSourceFilters: true,
       usesPaymentCallbackHandoff: true,
       usesPrintableWorksheetReviewLifecycleChain: true,
       usesResultAcceptedAnswerChain: true,
@@ -568,12 +574,12 @@ function getClassroomProductLoopChainHandoffItem(
         '30 data slices',
         'D1 app schema, owner-scoped activity and assignment persistence, frozen snapshots, sanitized public payloads, scored attempts, result consumers, exports, printable worksheets, and data privacy guards stay aligned.'
       );
-    case 'activity-library-owner-scope':
+    case 'activity-library-page-boundary':
       return item(
         id,
-        'Activity library owner scope',
-        'Owner activities only',
-        'Activity library search, filters, pagination, and summaries stay scoped to the authenticated teacher.'
+        'Activity library page boundary',
+        '30 library slices',
+        'Owner scope, full filtered summaries, visible-page counts, search, status, template and source filters, lifecycle actions, pagination, starter previews, and source-material privacy guards stay aligned.'
       );
     case 'activity-authoring-library-boundary':
       return item(
