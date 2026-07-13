@@ -85,7 +85,8 @@ student identity lifecycle, scored attempt results, answer feedback lifecycle,
 submitted-date continuity, accepted-answer continuity, explanation continuity,
 teacher result review, teacher result copy lifecycle,
 printable worksheet review lifecycle, copy/export/print handoffs,
-dashboard/public discovery and indexing alignment, or privacy guards.
+teacher workspace operations, public discovery and indexing alignment, or
+privacy guards.
 Active surface product boundary has a fast script-level gate via
 `pnpm exec tsx --test scripts/active-surface-product-boundary.test.ts`; run it
 when changing active account governance, contact, billing/payment callback,

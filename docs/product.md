@@ -20,9 +20,9 @@ published assignment delivery, student runner play, student identity lifecycle,
 validated attempts, scored attempt results, answer feedback lifecycle,
 submitted-date continuity, accepted-answer continuity, and explanation
 continuity, teacher result review, teacher result copy lifecycle, printable
-worksheet review lifecycle, copy/export/print handoffs, dashboard status,
-public discovery/indexing metadata, and privacy guards aligned with this
-sequence.
+worksheet review lifecycle, copy/export/print handoffs, teacher workspace
+operations, public discovery/indexing metadata, and privacy guards aligned with
+this sequence.
 
 Copied-template surfaces should be retired in narrow, verified waves. Public
 navigation and homepage entry points should point at ClassGamify templates,
