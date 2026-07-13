@@ -84,8 +84,8 @@ activity authoring/library workflow, source
 extraction lifecycle, activity lifecycle governance, template roadmap
 capability alignment, AI
 enhancement lifecycle review, published assignment delivery, assignment publish
-preflight boundary, assignment lifecycle governance boundary, public assignment
-rules boundary, student runner play,
+preflight boundary, assignment lifecycle governance boundary, assignment
+distribution lifecycle boundary, public assignment rules boundary, student runner play,
 student identity lifecycle, student runtime identity boundary, assignment
 submission validation boundary, assignment attempt persistence boundary, scored
 attempt results, answer feedback lifecycle, submitted-date continuity,
