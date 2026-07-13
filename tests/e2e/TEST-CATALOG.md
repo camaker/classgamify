@@ -637,6 +637,10 @@ run it when changing missing Workers AI credentials, invalid provider JSON,
 deterministic local draft generation, source-term planning, fallback padding,
 CreateActivityInput mapping, teacher review, editor application,
 save/publish boundaries, provider-secret guards, or fallback privacy guards.
+The chain also carries the 30-slice authoring/library lifecycle for shared
+create and edit contracts, persistence, teacher-owned library management,
+readiness, lifecycle gates, publish access, snapshot protection, and privacy
+while its independent source file gate remains intact.
 Activity AI enhancement roadmap chain has a fast script-level gate via
 `pnpm exec tsx --test scripts/activity-ai-enhancement-roadmap-chain-handoff.test.ts`;
 run it when changing template transforms, AI remix completion, distractor write

@@ -7151,6 +7151,7 @@ assert.deepEqual(activityAiFallbackDraftChainView.privacy, {
   requiresEditorApplication: true,
   requiresTeacherReview: true,
   sourceFiles: [...ACTIVITY_AI_FALLBACK_DRAFT_CHAIN_SOURCE_FILES],
+  usesAuthoringLibraryChain: true,
   usesSanitizedSourceText: true,
 });
 assert.deepEqual(
@@ -7170,8 +7171,9 @@ assert.deepEqual(
     ACTIVITY_AI_AUTHORING_CHAIN_HANDOFF_ITEM_IDS.length,
     ACTIVITY_AI_AUTHORING_CHAIN_SOURCE_FILES.length,
     ACTIVITY_AI_ENHANCEMENT_EXECUTION_ITEM_IDS.length,
+    ACTIVITY_AUTHORING_LIBRARY_CHAIN_HANDOFF_ITEM_IDS.length,
   ],
-  Array.from({ length: 15 }, () => 30),
+  Array.from({ length: 16 }, () => 30),
   'Activity AI fallback draft chain should stay backed by fallback, source-term, draft boundary, metadata, template, question-choice, editor, source-material, extraction, authoring, and execution gates.'
 );
 assert.deepEqual(Object.fromEntries(activityAiFallbackDraftChainValues), {
@@ -7184,7 +7186,7 @@ assert.deepEqual(Object.fromEntries(activityAiFallbackDraftChainValues), {
   'draft-metadata-summary': 'Coverage + trust',
   'editor-application': 'Apply to editor',
   'explanation-coverage': 'Answer explanations',
-  'fallback-chain-gate': '30 source files',
+  'authoring-library-chain-boundary': '30 authoring slices',
   'fallback-contract-owner': 'ai-draft.ts',
   'fallback-padding': 'Deterministic classroom terms',
   'input-schema-boundary': 'GenerateActivityDraftInput',

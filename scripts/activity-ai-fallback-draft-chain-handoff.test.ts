@@ -19,6 +19,7 @@ import {
   ACTIVITY_DRAFT_REVIEW_STATE,
 } from '@/activities/ai-draft';
 import { ACTIVITY_AI_ENHANCEMENT_EXECUTION_ITEM_IDS } from '@/activities/ai-enhancement-execution';
+import { ACTIVITY_AUTHORING_LIBRARY_CHAIN_HANDOFF_ITEM_IDS } from '@/activities/authoring-library-chain';
 import { ACTIVITY_DRAFT_META_HANDOFF_ITEM_IDS } from '@/activities/draft-meta';
 import { ACTIVITY_SOURCE_EXTRACTION_ASSIST_HANDOFF_ITEM_IDS } from '@/activities/source-extraction-assist';
 import { SOURCE_EXTRACTION_LIFECYCLE_CHAIN_HANDOFF_ITEM_IDS } from '@/activities/source-extraction-lifecycle-chain';
@@ -99,6 +100,7 @@ test('activity AI fallback draft chain exposes 30 stable slices', () => {
     requiresEditorApplication: true,
     requiresTeacherReview: true,
     sourceFiles: [...ACTIVITY_AI_FALLBACK_DRAFT_CHAIN_SOURCE_FILES],
+    usesAuthoringLibraryChain: true,
     usesSanitizedSourceText: true,
   });
   assertNoPrivateFallbackChainText(JSON.stringify(handoffView));
@@ -139,7 +141,7 @@ test('activity AI fallback draft chain summarizes the fallback lifecycle', () =>
       ['save-boundary', 'Teacher saves first'],
       ['publish-boundary', 'Save before publish'],
       ['provider-secret-guard', 'Worker secrets only'],
-      ['fallback-chain-gate', '30 source files'],
+      ['authoring-library-chain-boundary', '30 authoring slices'],
     ]
   );
   assert.equal(
@@ -174,8 +176,9 @@ test('activity AI fallback draft chain is backed by adjacent focused gates', () 
       ACTIVITY_AI_AUTHORING_CHAIN_HANDOFF_ITEM_IDS.length,
       ACTIVITY_AI_AUTHORING_CHAIN_SOURCE_FILES.length,
       ACTIVITY_AI_ENHANCEMENT_EXECUTION_ITEM_IDS.length,
+      ACTIVITY_AUTHORING_LIBRARY_CHAIN_HANDOFF_ITEM_IDS.length,
     ],
-    Array.from({ length: 15 }, () => 30)
+    Array.from({ length: 16 }, () => 30)
   );
   assert.deepEqual(ACTIVITY_DRAFT_REVIEW_STATE, {
     applicationMode: 'editor-review',

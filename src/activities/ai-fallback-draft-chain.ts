@@ -28,7 +28,7 @@ export const ACTIVITY_AI_FALLBACK_DRAFT_CHAIN_HANDOFF_ITEM_IDS = [
   'save-boundary',
   'publish-boundary',
   'provider-secret-guard',
-  'fallback-chain-gate',
+  'authoring-library-chain-boundary',
 ] as const;
 
 export const ACTIVITY_AI_FALLBACK_DRAFT_CHAIN_SOURCE_FILES = [
@@ -99,6 +99,7 @@ export type ActivityAiFallbackDraftChainPrivacyContract = {
   requiresEditorApplication: true;
   requiresTeacherReview: true;
   sourceFiles: string[];
+  usesAuthoringLibraryChain: true;
   usesSanitizedSourceText: true;
 };
 
@@ -143,6 +144,7 @@ export function buildActivityAiFallbackDraftChainHandoffView(): ActivityAiFallba
       requiresEditorApplication: true,
       requiresTeacherReview: true,
       sourceFiles: [...ACTIVITY_AI_FALLBACK_DRAFT_CHAIN_SOURCE_FILES],
+      usesAuthoringLibraryChain: true,
       usesSanitizedSourceText: true,
     },
     title: 'Activity AI fallback draft chain',
@@ -367,12 +369,12 @@ function getActivityAiFallbackDraftChainHandoffItem(
         'Worker secrets only',
         'Cloudflare account id and API token remain server-side and are not exposed through fallback handoffs.'
       );
-    case 'fallback-chain-gate':
+    case 'authoring-library-chain-boundary':
       return item(
         id,
-        'Fallback chain gate',
-        '30 source files',
-        'A focused gate keeps missing-credential, invalid-provider, fallback draft, editor review, save/publish, and privacy boundaries connected.'
+        'Authoring library chain',
+        '30 authoring slices',
+        'Fallback drafts remain inside shared authoring, teacher-owned persistence, activity library management, lifecycle gates, publish access, and assignment snapshot protection.'
       );
   }
 }

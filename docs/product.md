@@ -606,7 +606,12 @@ Implementation boundaries:
 - `src/activities/ai-fallback-draft-chain.ts` owns the deterministic AI
   fallback draft chain for missing Workers AI credentials, invalid provider
   JSON, sanitized source-term planning, local classroom draft completion,
-  teacher review, and save/publish boundaries.
+  teacher review, and save/publish boundaries. It explicitly carries the
+  30-slice authoring/library chain so fallback drafts remain inside shared
+  create and edit contracts, teacher-owned persistence and library management,
+  lifecycle gates, publish access, and assignment snapshot protection without
+  exposing raw editor input, answers, teacher notes, filenames, file ids, or
+  storage keys.
 - `src/api/activity-ai.ts` exposes the authenticated server function.
 - `src/components/activities/activity-create-form.tsx` only collects draft
   inputs and fills the existing form.
