@@ -29,7 +29,8 @@ attempt stats boundary, answer feedback lifecycle and its answer feedback
 handoff boundary, assignment attempt duration
 boundary, submitted-date continuity,
 accepted-answer continuity, and explanation continuity, teacher result review,
-result review controls boundary, teacher result copy lifecycle,
+result review controls boundary, teacher result copy lifecycle and its copy
+artifact handoff boundary,
 worksheet-mode delivery boundary, printable worksheet review lifecycle,
 copy/export/print handoffs, teacher workspace
 operations, public discovery/indexing metadata, and privacy guards aligned with

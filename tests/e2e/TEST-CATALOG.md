@@ -93,7 +93,8 @@ and its answer feedback handoff boundary,
 assignment attempt duration
 boundary, submitted-date continuity, accepted-answer continuity, explanation
 continuity, teacher result review,
-teacher result copy lifecycle, worksheet-mode delivery boundary,
+teacher result copy lifecycle and its copy artifact handoff boundary,
+worksheet-mode delivery boundary,
 printable worksheet review lifecycle, copy/export/print handoffs,
 teacher workspace operations, public discovery and indexing alignment, or
 privacy guards.
@@ -439,10 +440,11 @@ anonymous-token guards, source-material guards, or the hidden
 teacher-results-review-chain handoff.
 Teacher result copy lifecycle chain has a fast script-level gate via
 `pnpm exec tsx --test scripts/teacher-result-copy-lifecycle-chain-handoff.test.ts`;
-run it when changing classroom brief builders, reteach plan builders,
-item-review summaries, student follow-up summaries, copy preview metadata,
-current-review copy data, the full-assignment CSV boundary, action execution,
-hidden copy-artifact DOM handoff, or copy-artifact privacy guards.
+run it when changing the 30-slice copy artifact handoff boundary, classroom
+brief builders, reteach plan builders, item-review summaries, student follow-up
+summaries, copy preview metadata, current-review copy data, the full-assignment
+CSV boundary, action execution, hidden copy-artifact DOM handoff, or
+copy-artifact privacy guards.
 Assignment item performance sort has a fast script-level gate via
 `pnpm exec tsx --test scripts/assignment-item-performance-sort-handoff-semantic-views.test.ts`;
 run it when changing snapshot order, lowest accuracy, most answered, or item

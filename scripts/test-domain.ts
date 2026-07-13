@@ -5728,6 +5728,7 @@ assert.deepEqual(teacherResultCopyLifecycleChainView.privacy, {
   chainSourceFileCount:
     TEACHER_RESULT_COPY_LIFECYCLE_CHAIN_SOURCE_FILES.length,
   exposesAcceptedAnswerTextInHandoff: false,
+  exposesArtifactTextInHandoff: false,
   exposesCsvDataUrlInHandoff: false,
   exposesExpectedAnswerTextInHandoff: false,
   exposesPromptTextInHandoff: false,
@@ -5735,12 +5736,16 @@ assert.deepEqual(teacherResultCopyLifecycleChainView.privacy, {
   exposesRawCopyArtifactTextInHandoff: false,
   exposesStudentAnswerTextInHandoff: false,
   exposesStudentLabelsInHandoff: false,
+  exposesTeacherNotesTextInHandoff: false,
   itemIds: [...TEACHER_RESULT_COPY_LIFECYCLE_CHAIN_HANDOFF_ITEM_IDS],
   keepsCsvExportFullAssignment: true,
   mutatesPublicRunner: false,
+  mutatesResultArtifacts: false,
   sourceFiles: [...TEACHER_RESULT_COPY_LIFECYCLE_CHAIN_SOURCE_FILES],
   usesCurrentReviewScopeForCopyActions: true,
+  usesCopyArtifactHandoff: true,
   usesSharedCopyArtifactBuilders: true,
+  usesSharedCopyArtifactHelpers: true,
 });
 assert.deepEqual(Object.fromEntries(teacherResultCopyLifecycleChainValues), {
   'classroom-brief-builder': 'Brief artifact',
@@ -5752,7 +5757,7 @@ assert.deepEqual(Object.fromEntries(teacherResultCopyLifecycleChainValues), {
   'copy-action-gates': 'Ready or blocked',
   'copy-action-scope': 'Current review',
   'copy-handoff-hidden-dom': 'sr-only dl',
-  'copy-lifecycle-gate': '30 source files',
+  'copy-artifact-handoff-boundary': '30 artifact handoff slices',
   'copy-line-normalization': 'Line joiner',
   'copy-preview-builder': 'Preview cards',
   'copy-preview-meta': 'Preview counts',
@@ -5776,7 +5781,7 @@ assert.deepEqual(Object.fromEntries(teacherResultCopyLifecycleChainValues), {
 });
 assert.match(
   readFileSync('tests/e2e/TEST-CATALOG.md', 'utf8'),
-  /Teacher result copy lifecycle chain has a fast script-level gate via[\s\S]*scripts\/teacher-result-copy-lifecycle-chain-handoff\.test\.ts/,
+  /Teacher result copy lifecycle chain has a fast script-level gate via[\s\S]*scripts\/teacher-result-copy-lifecycle-chain-handoff\.test\.ts[\s\S]*copy artifact handoff boundary/,
   'TEST-CATALOG should document the teacher result copy lifecycle chain gate.'
 );
 assert.doesNotMatch(

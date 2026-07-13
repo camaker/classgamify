@@ -96,6 +96,7 @@ test('teacher result copy lifecycle chain exposes 30 safe copy slices', () => {
     chainSourceFileCount:
       TEACHER_RESULT_COPY_LIFECYCLE_CHAIN_SOURCE_FILES.length,
     exposesAcceptedAnswerTextInHandoff: false,
+    exposesArtifactTextInHandoff: false,
     exposesCsvDataUrlInHandoff: false,
     exposesExpectedAnswerTextInHandoff: false,
     exposesPromptTextInHandoff: false,
@@ -103,12 +104,16 @@ test('teacher result copy lifecycle chain exposes 30 safe copy slices', () => {
     exposesRawCopyArtifactTextInHandoff: false,
     exposesStudentAnswerTextInHandoff: false,
     exposesStudentLabelsInHandoff: false,
+    exposesTeacherNotesTextInHandoff: false,
     itemIds,
     keepsCsvExportFullAssignment: true,
     mutatesPublicRunner: false,
+    mutatesResultArtifacts: false,
     sourceFiles: [...TEACHER_RESULT_COPY_LIFECYCLE_CHAIN_SOURCE_FILES],
     usesCurrentReviewScopeForCopyActions: true,
+    usesCopyArtifactHandoff: true,
     usesSharedCopyArtifactBuilders: true,
+    usesSharedCopyArtifactHelpers: true,
   });
   assertNoPrivateCopyLifecycleText(JSON.stringify(handoffView));
 });
@@ -148,7 +153,7 @@ test('teacher result copy lifecycle chain summarizes each copy boundary', () => 
       ['copy-handoff-hidden-dom', 'sr-only dl'],
       ['teacher-results-chain-alignment', 'Results chain'],
       ['privacy-guards', 'Private text hidden'],
-      ['copy-lifecycle-gate', '30 source files'],
+      ['copy-artifact-handoff-boundary', '30 artifact handoff slices'],
     ]
   );
   assert.equal(
@@ -315,6 +320,11 @@ test('teacher result copy lifecycle focused gate is documented', () => {
   assert.match(
     normalizedCatalog,
     /classroom brief builders[\s\S]*reteach plan builders[\s\S]*item-review summaries[\s\S]*student follow-up summaries[\s\S]*copy preview metadata[\s\S]*current-review copy data[\s\S]*full-assignment CSV boundary[\s\S]*copy-artifact privacy guards/
+  );
+  assert.match(
+    normalizedCatalog,
+    /copy artifact handoff boundary/,
+    'TEST-CATALOG should document the concrete copy artifact handoff boundary.'
   );
 });
 

@@ -28,7 +28,7 @@ export const TEACHER_RESULT_COPY_LIFECYCLE_CHAIN_HANDOFF_ITEM_IDS = [
   'copy-handoff-hidden-dom',
   'teacher-results-chain-alignment',
   'privacy-guards',
-  'copy-lifecycle-gate',
+  'copy-artifact-handoff-boundary',
 ] as const;
 
 export const TEACHER_RESULT_COPY_LIFECYCLE_CHAIN_SOURCE_FILES = [
@@ -79,6 +79,7 @@ export type TeacherResultCopyLifecycleChainPrivacyContract = {
   appendsCopyScopeToArtifacts: true;
   chainSourceFileCount: number;
   exposesAcceptedAnswerTextInHandoff: false;
+  exposesArtifactTextInHandoff: false;
   exposesCsvDataUrlInHandoff: false;
   exposesExpectedAnswerTextInHandoff: false;
   exposesPromptTextInHandoff: false;
@@ -86,12 +87,16 @@ export type TeacherResultCopyLifecycleChainPrivacyContract = {
   exposesRawCopyArtifactTextInHandoff: false;
   exposesStudentAnswerTextInHandoff: false;
   exposesStudentLabelsInHandoff: false;
+  exposesTeacherNotesTextInHandoff: false;
   itemIds: TeacherResultCopyLifecycleChainHandoffItemId[];
   keepsCsvExportFullAssignment: true;
   mutatesPublicRunner: false;
+  mutatesResultArtifacts: false;
   sourceFiles: string[];
   usesCurrentReviewScopeForCopyActions: true;
+  usesCopyArtifactHandoff: true;
   usesSharedCopyArtifactBuilders: true;
+  usesSharedCopyArtifactHelpers: true;
 };
 
 export type TeacherResultCopyLifecycleChainHandoffView = {
@@ -115,6 +120,7 @@ export function buildTeacherResultCopyLifecycleChainHandoffView(): TeacherResult
       chainSourceFileCount:
         TEACHER_RESULT_COPY_LIFECYCLE_CHAIN_SOURCE_FILES.length,
       exposesAcceptedAnswerTextInHandoff: false,
+      exposesArtifactTextInHandoff: false,
       exposesCsvDataUrlInHandoff: false,
       exposesExpectedAnswerTextInHandoff: false,
       exposesPromptTextInHandoff: false,
@@ -122,12 +128,16 @@ export function buildTeacherResultCopyLifecycleChainHandoffView(): TeacherResult
       exposesRawCopyArtifactTextInHandoff: false,
       exposesStudentAnswerTextInHandoff: false,
       exposesStudentLabelsInHandoff: false,
+      exposesTeacherNotesTextInHandoff: false,
       itemIds: [...TEACHER_RESULT_COPY_LIFECYCLE_CHAIN_HANDOFF_ITEM_IDS],
       keepsCsvExportFullAssignment: true,
       mutatesPublicRunner: false,
+      mutatesResultArtifacts: false,
       sourceFiles: [...TEACHER_RESULT_COPY_LIFECYCLE_CHAIN_SOURCE_FILES],
       usesCurrentReviewScopeForCopyActions: true,
+      usesCopyArtifactHandoff: true,
       usesSharedCopyArtifactBuilders: true,
+      usesSharedCopyArtifactHelpers: true,
     },
     title: 'Teacher result copy lifecycle chain',
   };
@@ -351,12 +361,12 @@ function getTeacherResultCopyLifecycleChainHandoffItem(
         'Private text hidden',
         'Handoff summaries hide artifact text, prompts, expected answers, accepted answers, student answers, labels, tokens, and CSV URLs.'
       );
-    case 'copy-lifecycle-gate':
+    case 'copy-artifact-handoff-boundary':
       return item(
         id,
-        'Copy lifecycle gate',
-        '30 source files',
-        'A focused gate keeps result copy artifacts, preview metadata, action execution, current review scope, and privacy connected.'
+        'Copy artifact handoff boundary',
+        '30 artifact handoff slices',
+        'Artifact readiness, normalized titles and lines, appended review scope, classroom metrics, focus and follow-up evidence, latest-attempt context, priority ordering, current-review preview scope, and copy privacy guards stay aligned.'
       );
   }
 }
