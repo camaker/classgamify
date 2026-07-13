@@ -314,6 +314,13 @@ limits or aggregating results. Whitespace and case differences in a typed
 student name should not create a new attempt identity, while anonymous browser
 tokens should remain separate students in teacher summaries without exposing the
 raw token.
+The student identity lifecycle should also carry the runtime identity handoff's
+30 slices for template/runtime scope, item-kind counts, normalized and unique
+runtime ids, collision and blank-id guards, submission validation, browser
+answers, scoring lookups, teacher results, public payload, and frozen snapshot
+boundaries. Its aggregate identity summary must not expose runtime item ids,
+prompts, choices, answer text, student names, raw browser tokens, teacher-only
+answers, or source-material metadata.
 
 Student runners should use the runtime item kind and template type to choose the
 interaction. Multiple-choice questions and match-up pairs render as tap/click

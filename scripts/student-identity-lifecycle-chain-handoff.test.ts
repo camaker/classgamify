@@ -130,6 +130,7 @@ test('student identity lifecycle chain exposes 30 safe identity slices', () => {
     exposesAnonymousBrowserLabel: true,
     exposesRawAnonymousTokens: false,
     exposesRawSubmissionPayloads: false,
+    exposesRuntimeItemIdsInIdentityHandoff: false,
     exposesSourceMaterialMetadataInIdentityHandoff: false,
     exposesStudentAnswerTextInIdentityHandoff: false,
     exposesStudentNameInputValues: false,
@@ -144,6 +145,7 @@ test('student identity lifecycle chain exposes 30 safe identity slices', () => {
     usesBrowserTokenForAnonymousAttempts: true,
     usesDisplayLabelsForAnonymousResults: true,
     usesScoredAttemptsForAttemptLimits: true,
+    usesStudentRuntimeIdentityHandoff: true,
   });
   assertNoPrivateStudentIdentityText(JSON.stringify(handoffView));
 });
@@ -183,7 +185,7 @@ test('student identity lifecycle chain summarizes each identity step', () => {
       ['student-summary-sort-identity', 'Student label sort'],
       ['attempt-review-identity', 'Review label only'],
       ['result-export-token-guard', 'Raw token hidden'],
-      ['student-identity-chain-gate', '30 source files'],
+      ['runtime-identity-handoff-boundary', '30 runtime identity slices'],
     ]
   );
   assert.equal(
@@ -433,13 +435,18 @@ test('student identity lifecycle chain focused gate is documented', () => {
   const normalizedCatalog = TEST_CATALOG_SOURCE.replace(/\s+/g, ' ');
 
   assert.match(
+    PRODUCT_SOURCE,
+    /student identity lifecycle[\s\S]*runtime identity handoff's[\s\S]*30 slices[\s\S]*normalized and unique[\s\S]*collision and blank-id guards[\s\S]*must not expose runtime item ids[\s\S]*raw browser tokens[\s\S]*source-material metadata/,
+    'docs/product.md should describe the runtime identity handoff and its private-id boundary.'
+  );
+  assert.match(
     TEST_CATALOG_SOURCE,
     /Student identity lifecycle chain has a fast script-level gate via[\s\S]*scripts\/student-identity-lifecycle-chain-handoff\.test\.ts/,
     'TEST-CATALOG should document the student identity lifecycle chain gate.'
   );
   assert.match(
     normalizedCatalog,
-    /student-name normalization[\s\S]*anonymous browser tokens[\s\S]*identity grouping[\s\S]*attempt-limit identity counting[\s\S]*student runner identity views[\s\S]*submission input identity[\s\S]*attempt persistence identity fields[\s\S]*teacher result identity labels\/search\/sort\/review[\s\S]*result export privacy[\s\S]*raw-token guards/,
+    /student-name normalization[\s\S]*anonymous browser tokens[\s\S]*identity grouping[\s\S]*30-slice runtime identity handoff boundary[\s\S]*attempt-limit identity counting[\s\S]*student runner identity views[\s\S]*submission input identity[\s\S]*attempt persistence identity fields[\s\S]*teacher result identity labels\/search\/sort\/review[\s\S]*result export privacy[\s\S]*raw-token guards/,
     'TEST-CATALOG should describe the student identity chain gate scope.'
   );
 });

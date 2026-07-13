@@ -250,8 +250,9 @@ student-runner-identity handoff.
 Student identity lifecycle chain has a fast script-level gate via
 `pnpm exec tsx --test scripts/student-identity-lifecycle-chain-handoff.test.ts`;
 run it when changing student-name normalization, anonymous browser tokens,
-identity grouping, attempt-limit identity counting, student runner identity
-views, submission input identity, attempt persistence identity fields, teacher
+identity grouping, the 30-slice runtime identity handoff boundary, attempt-limit
+identity counting, student runner identity views, submission input identity,
+attempt persistence identity fields, teacher
 result identity labels/search/sort/review, result export privacy, or raw-token
 guards.
 Student runtime interaction has a fast script-level gate via

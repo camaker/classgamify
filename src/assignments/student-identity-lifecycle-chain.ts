@@ -28,7 +28,7 @@ export const STUDENT_IDENTITY_LIFECYCLE_CHAIN_HANDOFF_ITEM_IDS = [
   'student-summary-sort-identity',
   'attempt-review-identity',
   'result-export-token-guard',
-  'student-identity-chain-gate',
+  'runtime-identity-handoff-boundary',
 ] as const;
 
 export const STUDENT_IDENTITY_LIFECYCLE_CHAIN_SOURCE_FILES = [
@@ -80,6 +80,7 @@ export type StudentIdentityLifecycleChainPrivacyContract = {
   exposesAnonymousBrowserLabel: true;
   exposesRawAnonymousTokens: false;
   exposesRawSubmissionPayloads: false;
+  exposesRuntimeItemIdsInIdentityHandoff: false;
   exposesSourceMaterialMetadataInIdentityHandoff: false;
   exposesStudentAnswerTextInIdentityHandoff: false;
   exposesStudentNameInputValues: false;
@@ -94,6 +95,7 @@ export type StudentIdentityLifecycleChainPrivacyContract = {
   usesBrowserTokenForAnonymousAttempts: true;
   usesDisplayLabelsForAnonymousResults: true;
   usesScoredAttemptsForAttemptLimits: true;
+  usesStudentRuntimeIdentityHandoff: true;
 };
 
 export type StudentIdentityLifecycleChainHandoffView = {
@@ -118,6 +120,7 @@ export function buildStudentIdentityLifecycleChainHandoffView(): StudentIdentity
       exposesAnonymousBrowserLabel: true,
       exposesRawAnonymousTokens: false,
       exposesRawSubmissionPayloads: false,
+      exposesRuntimeItemIdsInIdentityHandoff: false,
       exposesSourceMaterialMetadataInIdentityHandoff: false,
       exposesStudentAnswerTextInIdentityHandoff: false,
       exposesStudentNameInputValues: false,
@@ -132,6 +135,7 @@ export function buildStudentIdentityLifecycleChainHandoffView(): StudentIdentity
       usesBrowserTokenForAnonymousAttempts: true,
       usesDisplayLabelsForAnonymousResults: true,
       usesScoredAttemptsForAttemptLimits: true,
+      usesStudentRuntimeIdentityHandoff: true,
     },
     title: 'Student identity lifecycle chain',
   };
@@ -355,12 +359,12 @@ function getStudentIdentityLifecycleChainHandoffItem(
         'Raw token hidden',
         'Result export preparation covers identity policy while keeping raw anonymous tokens out of handoff summaries.'
       );
-    case 'student-identity-chain-gate':
+    case 'runtime-identity-handoff-boundary':
       return item(
         id,
-        'Student identity chain gate',
-        '30 source files',
-        'A focused gate keeps runner identity, submission, persistence, results, export, and privacy guards connected.'
+        'Runtime identity handoff boundary',
+        '30 runtime identity slices',
+        'Runtime kind counts, normalized and unique ids, collision and blank-id guards, submission validation, browser answers, scoring lookups, teacher results, public payload, assignment snapshot, and privacy stay aligned.'
       );
   }
 }

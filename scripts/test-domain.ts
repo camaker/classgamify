@@ -19839,6 +19839,7 @@ assert.deepEqual(studentIdentityLifecycleChainView.privacy, {
   exposesAnonymousBrowserLabel: true,
   exposesRawAnonymousTokens: false,
   exposesRawSubmissionPayloads: false,
+  exposesRuntimeItemIdsInIdentityHandoff: false,
   exposesSourceMaterialMetadataInIdentityHandoff: false,
   exposesStudentAnswerTextInIdentityHandoff: false,
   exposesStudentNameInputValues: false,
@@ -19853,6 +19854,7 @@ assert.deepEqual(studentIdentityLifecycleChainView.privacy, {
   usesBrowserTokenForAnonymousAttempts: true,
   usesDisplayLabelsForAnonymousResults: true,
   usesScoredAttemptsForAttemptLimits: true,
+  usesStudentRuntimeIdentityHandoff: true,
 });
 assert.deepEqual(
   [
@@ -19896,7 +19898,7 @@ assert.deepEqual(Object.fromEntries(studentIdentityLifecycleChainValues), {
   'runner-start-privacy': 'Start handoff hidden',
   'runner-submission-privacy': 'Submission handoff hidden',
   'scored-attempt-query-identity': 'Identity selects',
-  'student-identity-chain-gate': '30 source files',
+  'runtime-identity-handoff-boundary': '30 runtime identity slices',
   'student-name-identity-key': 'name:*',
   'student-name-normalization': 'NFKC + collapsed spaces',
   'student-summary-sort-identity': 'Student label sort',
