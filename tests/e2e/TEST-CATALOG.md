@@ -83,9 +83,10 @@ extraction lifecycle, activity lifecycle governance, template roadmap
 capability alignment, AI
 enhancement lifecycle review, published assignment delivery, student runner play,
 student identity lifecycle, student runtime identity boundary, assignment
-submission validation boundary, scored attempt results, answer feedback
-lifecycle, submitted-date continuity, accepted-answer continuity, explanation
-continuity, teacher result review, teacher result copy lifecycle,
+submission validation boundary, assignment attempt persistence boundary, scored
+attempt results, answer feedback lifecycle, submitted-date continuity,
+accepted-answer continuity, explanation continuity, teacher result review,
+teacher result copy lifecycle,
 printable worksheet review lifecycle, copy/export/print handoffs,
 teacher workspace operations, public discovery and indexing alignment, or
 privacy guards.

@@ -16711,6 +16711,13 @@ assert.deepEqual(classroomProductLoopChainView.privacy, {
   requiresTeacherSaveBeforeActivityPersistence: true,
   keepsSourceMaterialExtractionEditorReviewed: true,
   archivedActivitiesRequireRestoreBeforeDerive: true,
+  attemptPersistenceKeepsSourceMaterialsOutOfRows: true,
+  attemptPersistenceUsesAttemptLimitGate: true,
+  attemptPersistenceUsesIdentityGate: true,
+  attemptPersistenceUsesImmutableAnswerCopy: true,
+  attemptPersistenceUsesImmutableResultCopy: true,
+  attemptPersistenceUsesLifecycleGate: true,
+  attemptPersistenceUsesRuntimeValidationGate: true,
   keepsProtectedRoutesOutOfIndex: true,
   keepsPublicDiscoverySourceLevel: true,
   keepsActivityLibraryOwnerScoped: true,
@@ -16722,6 +16729,7 @@ assert.deepEqual(classroomProductLoopChainView.privacy, {
   keepsVisiblePageCountsSeparate: true,
   keepsNameAndTokenModesExclusive: true,
   mutatesAttemptsFromValidationHandoff: false,
+  mutatesEvaluationAfterInsert: false,
   mutatesPublicRunner: false,
   partialSubmissionAllowed: true,
   persistenceUsesNormalizedAnswers: true,
@@ -16764,6 +16772,7 @@ assert.deepEqual(classroomProductLoopChainView.privacy, {
   splitsPrimaryFromAlternatives: true,
   storesImmutableScoredAttemptAnswerJson: true,
   storesImmutableScoredAttemptResultJson: true,
+  storesScoredAttemptRows: true,
   usesAiEnhancementLifecycleChain: true,
   usesActivityAuthoringLibraryChain: true,
   usesActivityAssignmentAttemptResultsLoop: true,
@@ -16771,6 +16780,7 @@ assert.deepEqual(classroomProductLoopChainView.privacy, {
   usesAccountGovernanceLifecycleChain: true,
   usesActiveSurfaceProductBoundary: true,
   usesAnswerFeedbackLifecycleChain: true,
+  usesAssignmentAttemptPersistenceHandoff: true,
   usesAssignmentSubmissionValidationHandoff: true,
   usesClassroomDataLifecycleChain: true,
   usesD1AppSchema: true,
@@ -16798,6 +16808,7 @@ assert.deepEqual(classroomProductLoopChainView.privacy, {
   usesSharedDeliveryPolicy: true,
   usesSharedRuntimeItems: true,
   usesSharedAttemptAnswerHelpers: true,
+  usesScoredAttemptInsertHelper: true,
   usesScoredAttemptsForAttemptLimits: true,
   usesSnapshotForPublicRuntime: true,
   submissionValidationUsesFrozenRuntimeItems: true,
@@ -16836,6 +16847,7 @@ assert.deepEqual(
     STUDENT_IDENTITY_LIFECYCLE_CHAIN_SOURCE_FILES.length,
     STUDENT_RUNTIME_IDENTITY_HANDOFF_ITEM_IDS.length,
     ASSIGNMENT_SUBMISSION_VALIDATION_HANDOFF_ITEM_IDS.length,
+    ASSIGNMENT_ATTEMPT_PERSISTENCE_HANDOFF_ITEM_IDS.length,
     ANSWER_FEEDBACK_LIFECYCLE_CHAIN_HANDOFF_ITEM_IDS.length,
     ANSWER_FEEDBACK_LIFECYCLE_CHAIN_SOURCE_FILES.length,
     SCORED_ATTEMPT_RESULT_CHAIN_HANDOFF_ITEM_IDS.length,
@@ -16857,7 +16869,7 @@ assert.deepEqual(
     PUBLIC_DISCOVERY_INDEXING_CHAIN_SOURCE_FILES.length,
     CLASSROOM_TRUST_COMMUNICATION_CHAIN_HANDOFF_ITEM_IDS.length,
   ],
-  Array.from({ length: 47 }, () => 30),
+  Array.from({ length: 48 }, () => 30),
   'Classroom product loop chain should stay backed by adjacent public entry, public discovery/indexing, workspace, data, authoring, source extraction, lifecycle governance, template roadmap, AI enhancement lifecycle, delivery, runner, result continuity, export, print, and trust gates.'
 );
 assert.deepEqual(Object.fromEntries(classroomProductLoopChainValues), {
@@ -16876,7 +16888,7 @@ assert.deepEqual(Object.fromEntries(classroomProductLoopChainValues), {
   'privacy-guards': 'Private data hidden',
   'product-loop-chain-gate': '30 source files',
   'product-loop-contract': 'Activity -> Assignment -> Attempt -> Results',
-  'progress-submit-readiness': 'Explicit partial confirm',
+  'assignment-attempt-persistence-boundary': '30 persistence slices',
   'public-discovery-indexing-boundary': '30 discovery slices',
   'public-rules-summary': 'Student-visible rules',
   'student-runner-play-boundary': '30 runner slices',
@@ -16899,7 +16911,7 @@ assert.match(
 );
 assert.match(
   readFileSync('tests/e2e/TEST-CATALOG.md', 'utf8').replace(/\s+/g, ' '),
-  /Activity -> Assignment -> Attempt -> Results[\s\S]*classroom data lifecycle[\s\S]*activity authoring\/library workflow[\s\S]*source extraction lifecycle[\s\S]*activity lifecycle governance[\s\S]*template roadmap capability[\s\S]*AI enhancement lifecycle[\s\S]*published assignment delivery[\s\S]*student runner play[\s\S]*student identity lifecycle[\s\S]*student runtime identity boundary[\s\S]*assignment submission validation boundary[\s\S]*scored attempt results[\s\S]*answer feedback lifecycle[\s\S]*submitted-date continuity[\s\S]*accepted-answer continuity[\s\S]*explanation continuity[\s\S]*teacher result review[\s\S]*teacher result copy lifecycle[\s\S]*printable worksheet review lifecycle[\s\S]*copy\/export\/print handoffs[\s\S]*teacher workspace operations[\s\S]*public discovery[\s\S]*privacy guards/,
+  /Activity -> Assignment -> Attempt -> Results[\s\S]*classroom data lifecycle[\s\S]*activity authoring\/library workflow[\s\S]*source extraction lifecycle[\s\S]*activity lifecycle governance[\s\S]*template roadmap capability[\s\S]*AI enhancement lifecycle[\s\S]*published assignment delivery[\s\S]*student runner play[\s\S]*student identity lifecycle[\s\S]*student runtime identity boundary[\s\S]*assignment submission validation boundary[\s\S]*assignment attempt persistence boundary[\s\S]*scored attempt results[\s\S]*answer feedback lifecycle[\s\S]*submitted-date continuity[\s\S]*accepted-answer continuity[\s\S]*explanation continuity[\s\S]*teacher result review[\s\S]*teacher result copy lifecycle[\s\S]*printable worksheet review lifecycle[\s\S]*copy\/export\/print handoffs[\s\S]*teacher workspace operations[\s\S]*public discovery[\s\S]*privacy guards/,
   'TEST-CATALOG should describe the full classroom product loop chain scope.'
 );
 const classroomTrustCommunicationChainView =
