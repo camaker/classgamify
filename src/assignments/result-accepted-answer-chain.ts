@@ -28,7 +28,7 @@ export const ASSIGNMENT_RESULT_ACCEPTED_ANSWER_CHAIN_HANDOFF_ITEM_IDS = [
   'answer-feedback-chain-alignment',
   'scored-result-chain-alignment',
   'accepted-answer-privacy-guard',
-  'accepted-answer-chain-gate',
+  'result-review-handoff-boundary',
 ] as const;
 
 export const ASSIGNMENT_RESULT_ACCEPTED_ANSWER_CHAIN_SOURCE_FILES = [
@@ -89,6 +89,7 @@ export type AssignmentResultAcceptedAnswerChainPrivacyContract = {
   scoringUsesSharedAcceptedAnswerParser: true;
   sourceFiles: string[];
   splitsPrimaryFromAlternatives: true;
+  usesResultReviewHandoff: true;
 };
 
 export type AssignmentResultAcceptedAnswerChainHandoffView = {
@@ -123,6 +124,7 @@ export function buildAssignmentResultAcceptedAnswerChainHandoffView(): Assignmen
       scoringUsesSharedAcceptedAnswerParser: true,
       sourceFiles: [...ASSIGNMENT_RESULT_ACCEPTED_ANSWER_CHAIN_SOURCE_FILES],
       splitsPrimaryFromAlternatives: true,
+      usesResultReviewHandoff: true,
     },
     title: 'Assignment result accepted-answer chain',
   };
@@ -349,12 +351,12 @@ function getAssignmentResultAcceptedAnswerChainHandoffItem(
         'Raw data hidden',
         'Accepted-answer handoffs omit prompt text, raw runtime ids, student answers, student names, teacher answers, and CSV URLs.'
       );
-    case 'accepted-answer-chain-gate':
+    case 'result-review-handoff-boundary':
       return item(
         id,
-        'Accepted-answer gate',
-        '30 source files',
-        'A focused gate keeps parsing, formatting, result consumers, CSV columns, printable review, and privacy aligned.'
+        'Result review handoff',
+        '30 review slices',
+        'Accepted-answer formatting stays connected to result review status, controls, matched scope, copy previews, export actions, route state, and privacy.'
       );
   }
 }

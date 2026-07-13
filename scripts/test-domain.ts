@@ -60329,7 +60329,15 @@ assert.deepEqual(acceptedAnswerChainView.privacy, {
   scoringUsesSharedAcceptedAnswerParser: true,
   sourceFiles: [...ASSIGNMENT_RESULT_ACCEPTED_ANSWER_CHAIN_SOURCE_FILES],
   splitsPrimaryFromAlternatives: true,
+  usesResultReviewHandoff: true,
 });
+assert.equal(ASSIGNMENT_RESULT_REVIEW_HANDOFF_ITEM_IDS.length, 30);
+assert.equal(
+  acceptedAnswerChainView.itemViews.find(
+    (itemView) => itemView.id === 'result-review-handoff-boundary'
+  )?.value,
+  '30 review slices'
+);
 assert.equal(
   acceptedAnswerChainView.itemViews.find(
     (itemView) => itemView.id === 'accepted-alternatives-text'

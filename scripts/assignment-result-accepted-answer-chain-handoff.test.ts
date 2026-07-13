@@ -24,6 +24,7 @@ import {
   buildAssignmentResultAcceptedAnswerView,
   buildAssignmentResultAttemptAnswerTextView,
 } from '@/assignments/result-answer-view';
+import { ASSIGNMENT_RESULT_REVIEW_HANDOFF_ITEM_IDS } from '@/assignments/result-view';
 import { SCORED_ATTEMPT_RESULT_CHAIN_HANDOFF_ITEM_IDS } from '@/assignments/scored-attempt-result-chain';
 import { TEACHER_RESULTS_REVIEW_CHAIN_HANDOFF_ITEM_IDS } from '@/assignments/teacher-results-review-chain';
 import { overwriteGetLocale } from '@/locale/paraglide/runtime';
@@ -109,6 +110,7 @@ test('assignment result accepted-answer chain exposes 30 safe slices', () => {
     scoringUsesSharedAcceptedAnswerParser: true,
     sourceFiles: [...ASSIGNMENT_RESULT_ACCEPTED_ANSWER_CHAIN_SOURCE_FILES],
     splitsPrimaryFromAlternatives: true,
+    usesResultReviewHandoff: true,
   });
   assertNoPrivateAcceptedAnswerText(JSON.stringify(handoffView));
 });
@@ -148,7 +150,7 @@ test('assignment result accepted-answer chain summarizes each boundary', () => {
       ['answer-feedback-chain-alignment', 'Answer feedback'],
       ['scored-result-chain-alignment', 'Scored attempts'],
       ['accepted-answer-privacy-guard', 'Raw data hidden'],
-      ['accepted-answer-chain-gate', '30 source files'],
+      ['result-review-handoff-boundary', '30 review slices'],
     ]
   );
   assert.equal(
@@ -172,10 +174,11 @@ test('assignment result accepted-answer chain is backed by adjacent gates', () =
       ANSWER_FEEDBACK_LIFECYCLE_CHAIN_HANDOFF_ITEM_IDS.length,
       ASSIGNMENT_ATTEMPT_REVIEW_CARD_HANDOFF_ITEM_IDS.length,
       ASSIGNMENT_RESULTS_EXPORT_PREPARATION_ITEM_IDS.length,
+      ASSIGNMENT_RESULT_REVIEW_HANDOFF_ITEM_IDS.length,
       SCORED_ATTEMPT_RESULT_CHAIN_HANDOFF_ITEM_IDS.length,
       TEACHER_RESULTS_REVIEW_CHAIN_HANDOFF_ITEM_IDS.length,
     ],
-    Array.from({ length: 6 }, () => 30)
+    Array.from({ length: 7 }, () => 30)
   );
 });
 

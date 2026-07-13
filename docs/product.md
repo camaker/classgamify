@@ -430,6 +430,12 @@ assignment-domain formatting for submitted dates and accepted-answer
 alternatives so teacher-facing tables, review cards, and offline records stay
 consistent. This keeps the results loop useful for deciding what to explain
 again after homework.
+The accepted-answer continuity chain should explicitly carry the result review
+handoff as 30 slices spanning review status and next steps, search and sort
+controls, answer-review filters, matched and copy scope, copy previews, CSV
+actions, route state, current-review and full-export boundaries, and privacy.
+Its aggregate summary must not expose prompts, runtime item ids, student
+answers, student names, teacher answers, or CSV data URLs.
 Assignment attempt metrics such as completions, average accuracy, average
 points, and average duration should be computed through shared assignment-domain
 stats helpers before they reach assignment lists, result pages, classroom

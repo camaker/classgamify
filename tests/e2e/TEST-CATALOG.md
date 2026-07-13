@@ -300,7 +300,10 @@ via
 run it when changing the accepted-answer parser, primary-vs-alternatives
 formatting, result cards, item performance columns, attempt review cards, CSV
 accepted-answer columns, printable review alignment, or accepted-answer privacy
-guards.
+guards. The chain also carries the 30-slice result review handoff for review
+status, controls, matched and copy scope, previews, export actions, route state,
+current-review/full-export boundaries, and privacy while its independent source
+file gate remains intact.
 Assignment result explanation continuity chain has a fast script-level gate via
 `pnpm exec tsx --test scripts/assignment-result-explanation-chain-handoff.test.ts`;
 run it when changing result explanations, post-submit review visibility,
