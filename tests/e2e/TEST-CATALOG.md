@@ -81,9 +81,9 @@ run it when changing the Activity -> Assignment -> Attempt -> Results contract,
 activity authoring/library workflow, source extraction lifecycle, activity
 lifecycle governance, template roadmap capability alignment, AI
 enhancement lifecycle review, published assignment delivery, student runner play,
-scored attempt results, answer feedback lifecycle, submitted-date continuity,
-accepted-answer continuity, explanation continuity, teacher result review,
-teacher result copy lifecycle,
+student identity lifecycle, scored attempt results, answer feedback lifecycle,
+submitted-date continuity, accepted-answer continuity, explanation continuity,
+teacher result review, teacher result copy lifecycle,
 printable worksheet review lifecycle, copy/export/print handoffs,
 dashboard/public discovery and indexing alignment, or privacy guards.
 Active surface product boundary has a fast script-level gate via
