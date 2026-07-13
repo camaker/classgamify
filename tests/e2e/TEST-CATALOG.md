@@ -626,7 +626,11 @@ Activity AI authoring chain has a fast script-level gate via
 run it when changing AI source safety, authenticated draft generation,
 deterministic fallback, CreateActivityInput mapping, draft coverage,
 template readiness, quiz-choice readiness, AI remix assist, editor review,
-source-material privacy guards, or save/publish boundaries.
+source-material privacy guards, or save/publish boundaries. The chain also
+carries the 30-slice fallback draft lifecycle for missing credentials, invalid
+provider JSON, sanitized term planning, complete classroom fields, editor
+application, teacher review, persistence boundaries, provider secrets, and
+privacy while its independent source file gate remains intact.
 Activity AI fallback draft chain has a fast script-level gate via
 `pnpm exec tsx --test scripts/activity-ai-fallback-draft-chain-handoff.test.ts`;
 run it when changing missing Workers AI credentials, invalid provider JSON,

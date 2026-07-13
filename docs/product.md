@@ -503,6 +503,13 @@ anonymous tokens.
 
 AI-assisted creation drafts teacher-reviewable `CreateActivityInput` payloads.
 The AI layer must not bypass the activity editor or persist content directly.
+The AI authoring chain should explicitly carry the 30-slice deterministic
+fallback draft chain across missing credentials, invalid provider JSON, source
+sanitization, material-note omission, safe provenance, term planning, complete
+classroom fields, CreateActivityInput mapping, metadata and readiness previews,
+editor application, teacher review, save and publish boundaries, and provider
+secret guards. Its aggregate summary must not expose raw source text, material
+notes, file ids, storage keys, provider output, answer text, or API tokens.
 Teachers should always see and edit the generated title, learning goal,
 vocabulary, questions, answer explanations, pairs, groups, and notes before
 saving. AI draft responses should also expose a lightweight coverage summary:

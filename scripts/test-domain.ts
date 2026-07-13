@@ -7036,6 +7036,7 @@ assert.deepEqual(activityAiAuthoringChainView.privacy, {
   requiresDeterministicFallback: true,
   requiresTeacherReview: true,
   sourceFiles: [...ACTIVITY_AI_AUTHORING_CHAIN_SOURCE_FILES],
+  usesFallbackDraftChain: true,
 });
 assert.deepEqual(
   [
@@ -7044,6 +7045,7 @@ assert.deepEqual(
     ACTIVITY_EDITOR_WORKFLOW_HANDOFF_ITEM_IDS.length,
     ACTIVITY_AI_DRAFT_BOUNDARY_HANDOFF_ITEM_IDS.length,
     ACTIVITY_AI_FALLBACK_HANDOFF_ITEM_IDS.length,
+    ACTIVITY_AI_FALLBACK_DRAFT_CHAIN_HANDOFF_ITEM_IDS.length,
     ACTIVITY_AI_FALLBACK_SOURCE_TERM_PLAN_ITEM_IDS.length,
     ACTIVITY_DRAFT_META_HANDOFF_ITEM_IDS.length,
     ACTIVITY_TEMPLATE_REMIX_HANDOFF_ITEM_IDS.length,
@@ -7054,12 +7056,12 @@ assert.deepEqual(
     SOURCE_MATERIAL_PRIVACY_CHAIN_HANDOFF_ITEM_IDS.length,
     ACTIVITY_TEMPLATE_SCAFFOLD_QUALITY_HANDOFF_ITEM_IDS.length,
   ],
-  Array.from({ length: 14 }, () => 30),
+  Array.from({ length: 15 }, () => 30),
   'Activity AI authoring chain should stay backed by focused authoring gates.'
 );
 assert.deepEqual(Object.fromEntries(activityAiAuthoringChainValues), {
   'activity-persistence-handoff': 'Create/update helpers',
-  'ai-authoring-chain-gate': '30 source files',
+  'fallback-draft-chain-boundary': '30 fallback slices',
   'ai-remix-assist-boundary': 'Completion before save',
   'assignment-snapshot-protection': 'Future links only',
   'auth-server-boundary': 'Authenticated teacher',

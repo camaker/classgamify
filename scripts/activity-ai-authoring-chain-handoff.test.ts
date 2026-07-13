@@ -14,6 +14,7 @@ import {
 } from '@/activities/ai-draft';
 import { ACTIVITY_AI_DRAFT_BOUNDARY_HANDOFF_ITEM_IDS } from '@/activities/ai-draft-boundary';
 import { ACTIVITY_AI_FALLBACK_HANDOFF_ITEM_IDS } from '@/activities/ai-draft-fallback-handoff';
+import { ACTIVITY_AI_FALLBACK_DRAFT_CHAIN_HANDOFF_ITEM_IDS } from '@/activities/ai-fallback-draft-chain';
 import { ACTIVITY_AI_REMIX_ASSIST_HANDOFF_ITEM_IDS } from '@/activities/ai-remix-assist';
 import { ACTIVITY_DRAFT_META_HANDOFF_ITEM_IDS } from '@/activities/draft-meta';
 import {
@@ -97,6 +98,7 @@ test('activity AI authoring chain exposes 30 teacher-reviewed slices', () => {
     requiresDeterministicFallback: true,
     requiresTeacherReview: true,
     sourceFiles: [...ACTIVITY_AI_AUTHORING_CHAIN_SOURCE_FILES],
+    usesFallbackDraftChain: true,
   });
   assertNoPrivateAiAuthoringText(JSON.stringify(handoffView));
 });
@@ -136,7 +138,7 @@ test('activity AI authoring chain summarizes the source-to-editor contract', () 
       ['activity-persistence-handoff', 'Create/update helpers'],
       ['assignment-snapshot-protection', 'Future links only'],
       ['distractor-write-target', 'ActivityQuestion.options'],
-      ['ai-authoring-chain-gate', '30 source files'],
+      ['fallback-draft-chain-boundary', '30 fallback slices'],
     ]
   );
   assert.equal(
@@ -161,6 +163,7 @@ test('activity AI authoring chain stays backed by focused gates', () => {
       ACTIVITY_EDITOR_WORKFLOW_HANDOFF_ITEM_IDS.length,
       ACTIVITY_AI_DRAFT_BOUNDARY_HANDOFF_ITEM_IDS.length,
       ACTIVITY_AI_FALLBACK_HANDOFF_ITEM_IDS.length,
+      ACTIVITY_AI_FALLBACK_DRAFT_CHAIN_HANDOFF_ITEM_IDS.length,
       ACTIVITY_AI_FALLBACK_SOURCE_TERM_PLAN_ITEM_IDS.length,
       ACTIVITY_DRAFT_META_HANDOFF_ITEM_IDS.length,
       ACTIVITY_TEMPLATE_REMIX_HANDOFF_ITEM_IDS.length,
@@ -171,7 +174,7 @@ test('activity AI authoring chain stays backed by focused gates', () => {
       SOURCE_MATERIAL_PRIVACY_CHAIN_HANDOFF_ITEM_IDS.length,
       ACTIVITY_TEMPLATE_SCAFFOLD_QUALITY_HANDOFF_ITEM_IDS.length,
     ],
-    Array.from({ length: 14 }, () => 30)
+    Array.from({ length: 15 }, () => 30)
   );
   assert.deepEqual(ACTIVITY_DRAFT_REVIEW_STATE, {
     applicationMode: 'editor-review',

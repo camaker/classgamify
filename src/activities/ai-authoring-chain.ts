@@ -28,7 +28,7 @@ export const ACTIVITY_AI_AUTHORING_CHAIN_HANDOFF_ITEM_IDS = [
   'activity-persistence-handoff',
   'assignment-snapshot-protection',
   'distractor-write-target',
-  'ai-authoring-chain-gate',
+  'fallback-draft-chain-boundary',
 ] as const;
 
 export const ACTIVITY_AI_AUTHORING_CHAIN_SOURCE_FILES = [
@@ -93,6 +93,7 @@ export type ActivityAiAuthoringChainPrivacyContract = {
   requiresDeterministicFallback: true;
   requiresTeacherReview: true;
   sourceFiles: string[];
+  usesFallbackDraftChain: true;
 };
 
 export type ActivityAiAuthoringChainHandoffView = {
@@ -129,6 +130,7 @@ export function buildActivityAiAuthoringChainHandoffView(): ActivityAiAuthoringC
       requiresDeterministicFallback: true,
       requiresTeacherReview: true,
       sourceFiles: [...ACTIVITY_AI_AUTHORING_CHAIN_SOURCE_FILES],
+      usesFallbackDraftChain: true,
     },
     title: 'Activity AI authoring chain',
   };
@@ -352,12 +354,12 @@ function getActivityAiAuthoringChainHandoffItem(
         'ActivityQuestion.options',
         'Future AI distractors must write into the existing question option structure and keep the student submission contract unchanged.'
       );
-    case 'ai-authoring-chain-gate':
+    case 'fallback-draft-chain-boundary':
       return item(
         id,
-        'AI authoring chain gate',
-        '30 source files',
-        'The AI authoring chain keeps source safety, generation, fallback, metadata, remix, editor, persistence, and publish gates connected.'
+        'Fallback draft chain',
+        '30 fallback slices',
+        'AI authoring stays connected to credential and invalid-output fallback paths, sanitized source planning, complete classroom fields, editor application, teacher review, and provider-secret guards.'
       );
   }
 }
