@@ -60369,7 +60369,15 @@ assert.deepEqual(explanationChainView.privacy, {
   publicFeedbackRespectsAnswerReveal: true,
   resultPagesUseFormattedExplanations: true,
   sourceFiles: [...ASSIGNMENT_RESULT_EXPLANATION_CHAIN_SOURCE_FILES],
+  usesResultMaterialHandoff: true,
 });
+assert.equal(ASSIGNMENT_RESULT_MATERIAL_HANDOFF_ITEM_IDS.length, 30);
+assert.equal(
+  explanationChainView.itemViews.find(
+    (itemView) => itemView.id === 'result-material-handoff-boundary'
+  )?.value,
+  '30 material slices'
+);
 assert.equal(
   explanationChainView.itemViews.find(
     (itemView) => itemView.id === 'csv-answer-row-explanation'

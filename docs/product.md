@@ -436,6 +436,12 @@ controls, answer-review filters, matched and copy scope, copy previews, CSV
 actions, route state, current-review and full-export boundaries, and privacy.
 Its aggregate summary must not expose prompts, runtime item ids, student
 answers, student names, teacher answers, or CSV data URLs.
+The explanation continuity chain should explicitly carry the result material
+handoff as 30 slices spanning current review scope, matched result counts, copy
+actions and previews, CSV preparation and answer columns, worksheet and answer
+key printing, current-review and full-assignment data scopes, snapshot sources,
+and privacy. Its aggregate summary must not expose prompts, runtime item ids,
+student answers, student names, teacher explanation text, or CSV data URLs.
 Assignment attempt metrics such as completions, average accuracy, average
 points, and average duration should be computed through shared assignment-domain
 stats helpers before they reach assignment lists, result pages, classroom

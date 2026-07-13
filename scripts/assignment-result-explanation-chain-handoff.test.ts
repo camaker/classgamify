@@ -10,6 +10,7 @@ import {
   buildAssignmentItemPerformanceRowView,
 } from '@/assignments/result-view';
 import { buildAssignmentItemReviewSummaryItemView } from '@/assignments/item-review-summary';
+import { ASSIGNMENT_RESULT_MATERIAL_HANDOFF_ITEM_IDS } from '@/assignments/result-actions';
 import {
   ASSIGNMENT_RESULTS_EXPORT_PREPARATION_ITEM_IDS,
   buildAssignmentResultsCsv,
@@ -129,6 +130,7 @@ test('assignment result explanation chain exposes 30 safe slices', () => {
     publicFeedbackRespectsAnswerReveal: true,
     resultPagesUseFormattedExplanations: true,
     sourceFiles: [...ASSIGNMENT_RESULT_EXPLANATION_CHAIN_SOURCE_FILES],
+    usesResultMaterialHandoff: true,
   });
   assertNoPrivateExplanationText(JSON.stringify(handoffView));
 });
@@ -168,7 +170,7 @@ test('assignment result explanation chain summarizes each boundary', () => {
       ['scored-result-chain-alignment', 'Scored attempts'],
       ['printable-review-chain-alignment', 'Printable review'],
       ['explanation-privacy-guard', 'Raw data hidden'],
-      ['explanation-chain-gate', '30 source files'],
+      ['result-material-handoff-boundary', '30 material slices'],
     ]
   );
   assert.equal(
@@ -189,12 +191,13 @@ test('assignment result explanation chain is backed by adjacent gates', () => {
       ANSWER_FEEDBACK_LIFECYCLE_CHAIN_HANDOFF_ITEM_IDS.length,
       ASSIGNMENT_ATTEMPT_REVIEW_CARD_HANDOFF_ITEM_IDS.length,
       ASSIGNMENT_RESULTS_EXPORT_PREPARATION_ITEM_IDS.length,
+      ASSIGNMENT_RESULT_MATERIAL_HANDOFF_ITEM_IDS.length,
       TEACHER_RESULTS_REVIEW_CHAIN_HANDOFF_ITEM_IDS.length,
       TEACHER_RESULT_COPY_LIFECYCLE_CHAIN_HANDOFF_ITEM_IDS.length,
       SCORED_ATTEMPT_RESULT_CHAIN_HANDOFF_ITEM_IDS.length,
       PRINTABLE_WORKSHEET_REVIEW_LIFECYCLE_CHAIN_HANDOFF_ITEM_IDS.length,
     ],
-    Array.from({ length: 8 }, () => 30)
+    Array.from({ length: 9 }, () => 30)
   );
 });
 

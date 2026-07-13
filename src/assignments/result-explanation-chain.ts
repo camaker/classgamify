@@ -28,7 +28,7 @@ export const ASSIGNMENT_RESULT_EXPLANATION_CHAIN_HANDOFF_ITEM_IDS = [
   'scored-result-chain-alignment',
   'printable-review-chain-alignment',
   'explanation-privacy-guard',
-  'explanation-chain-gate',
+  'result-material-handoff-boundary',
 ] as const;
 
 export const ASSIGNMENT_RESULT_EXPLANATION_CHAIN_SOURCE_FILES = [
@@ -90,6 +90,7 @@ export type AssignmentResultExplanationChainPrivacyContract = {
   publicFeedbackRespectsAnswerReveal: true;
   resultPagesUseFormattedExplanations: true;
   sourceFiles: string[];
+  usesResultMaterialHandoff: true;
 };
 
 export type AssignmentResultExplanationChainHandoffView = {
@@ -124,6 +125,7 @@ export function buildAssignmentResultExplanationChainHandoffView(): AssignmentRe
       publicFeedbackRespectsAnswerReveal: true,
       resultPagesUseFormattedExplanations: true,
       sourceFiles: [...ASSIGNMENT_RESULT_EXPLANATION_CHAIN_SOURCE_FILES],
+      usesResultMaterialHandoff: true,
     },
     title: 'Assignment result explanation chain',
   };
@@ -347,12 +349,12 @@ function getAssignmentResultExplanationChainHandoffItem(
         'Raw data hidden',
         'Explanation handoffs omit prompt text, runtime ids, student answers, names, teacher explanation text, and CSV URLs.'
       );
-    case 'explanation-chain-gate':
+    case 'result-material-handoff-boundary':
       return item(
         id,
-        'Explanation gate',
-        '30 source files',
-        'A focused gate keeps explanation normalization, feedback, result review, copy, export, printable, and privacy connected.'
+        'Result material handoff',
+        '30 material slices',
+        'Formatted explanations stay connected to review scope, copy materials, CSV preparation, print actions, snapshot sources, data-scope boundaries, and privacy.'
       );
   }
 }

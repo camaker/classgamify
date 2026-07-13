@@ -308,7 +308,11 @@ Assignment result explanation continuity chain has a fast script-level gate via
 `pnpm exec tsx --test scripts/assignment-result-explanation-chain-handoff.test.ts`;
 run it when changing result explanations, post-submit review visibility,
 student feedback explanations, item review copy notes, CSV explanation columns,
-printable answer-key explanations, or explanation privacy guards.
+printable answer-key explanations, or explanation privacy guards. The chain
+also carries the 30-slice result material handoff for review scope, matched
+counts, copy actions and previews, CSV preparation, print actions, data-scope
+boundaries, snapshot sources, and privacy while its independent source file
+gate remains intact.
 Assignment source-activity context chain has a fast script-level gate via
 `pnpm exec tsx --test scripts/assignment-source-activity-context-chain-handoff.test.ts`;
 run it when changing source-activity snapshot resolution, assignment-list
