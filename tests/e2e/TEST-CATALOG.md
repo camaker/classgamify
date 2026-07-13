@@ -293,7 +293,11 @@ via
 `pnpm exec tsx --test scripts/assignment-result-submitted-date-chain-handoff.test.ts`;
 run it when changing result date formatting, attempt submitted labels, student
 last-submitted labels, latest-attempt copy context, completed-at sorting, CSV
-submitted-date columns, or submitted-date privacy guards.
+submitted-date columns, or submitted-date privacy guards. The chain also
+carries the 30-slice copy artifact handoff for review scope, teacher copy
+materials, latest-attempt and last-submitted context, preview scope, normalized
+copy lines, ordering, and privacy while its independent source file gate remains
+intact.
 Assignment result accepted-answer continuity chain has a fast script-level gate
 via
 `pnpm exec tsx --test scripts/assignment-result-accepted-answer-chain-handoff.test.ts`;

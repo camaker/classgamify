@@ -1,6 +1,7 @@
 import assert from 'node:assert/strict';
 import { existsSync, readFileSync } from 'node:fs';
 import test from 'node:test';
+import { ASSIGNMENT_COPY_ARTIFACT_HANDOFF_ITEM_IDS } from '@/assignments/copy-artifact-handoff';
 import { ASSIGNMENT_RESULTS_EXPORT_PREPARATION_ITEM_IDS } from '@/assignments/results-export';
 import {
   ASSIGNMENT_RESULT_SUBMITTED_DATE_CHAIN_HANDOFF_ITEM_IDS,
@@ -100,6 +101,7 @@ test('assignment result submitted-date chain exposes 30 safe slices', () => {
     sortingUsesTimestampParsing: true,
     sourceFiles: [...ASSIGNMENT_RESULT_SUBMITTED_DATE_CHAIN_SOURCE_FILES],
     uiDatesUseLocalizedFormatter: true,
+    usesCopyArtifactHandoff: true,
   });
   assertNoPrivateSubmittedDateText(JSON.stringify(handoffView));
 });
@@ -139,7 +141,7 @@ test('assignment result submitted-date chain summarizes each boundary', () => {
       ['teacher-results-chain-alignment', 'Results chain'],
       ['scored-result-chain-alignment', 'Scored attempts'],
       ['submitted-date-privacy-guard', 'Raw data hidden'],
-      ['submitted-date-chain-gate', '30 source files'],
+      ['copy-artifact-handoff-boundary', '30 artifact slices'],
     ]
   );
   assert.equal(
@@ -159,12 +161,13 @@ test('assignment result submitted-date chain is backed by adjacent gates', () =>
 
   assert.deepEqual(
     [
+      ASSIGNMENT_COPY_ARTIFACT_HANDOFF_ITEM_IDS.length,
       ASSIGNMENT_RESULTS_EXPORT_PREPARATION_ITEM_IDS.length,
       SCORED_ATTEMPT_RESULT_CHAIN_HANDOFF_ITEM_IDS.length,
       TEACHER_RESULT_COPY_LIFECYCLE_CHAIN_HANDOFF_ITEM_IDS.length,
       TEACHER_RESULTS_REVIEW_CHAIN_HANDOFF_ITEM_IDS.length,
     ],
-    Array.from({ length: 4 }, () => 30)
+    Array.from({ length: 5 }, () => 30)
   );
 });
 

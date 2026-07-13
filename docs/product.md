@@ -430,6 +430,12 @@ assignment-domain formatting for submitted dates and accepted-answer
 alternatives so teacher-facing tables, review cards, and offline records stay
 consistent. This keeps the results loop useful for deciding what to explain
 again after homework.
+The submitted-date continuity chain should explicitly carry the copy artifact
+handoff as 30 slices spanning classroom and review scope, four teacher copy
+artifacts, latest-attempt details, last-submitted and duration context, priority
+ordering, artifact previews, normalized copy lines, and privacy. Its aggregate
+summary must not expose raw completed-at values, student labels or names,
+anonymous tokens, student answers, copy artifact text, or CSV data URLs.
 The accepted-answer continuity chain should explicitly carry the result review
 handoff as 30 slices spanning review status and next steps, search and sort
 controls, answer-review filters, matched and copy scope, copy previews, CSV

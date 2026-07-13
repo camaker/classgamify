@@ -28,7 +28,7 @@ export const ASSIGNMENT_RESULT_SUBMITTED_DATE_CHAIN_HANDOFF_ITEM_IDS = [
   'teacher-results-chain-alignment',
   'scored-result-chain-alignment',
   'submitted-date-privacy-guard',
-  'submitted-date-chain-gate',
+  'copy-artifact-handoff-boundary',
 ] as const;
 
 export const ASSIGNMENT_RESULT_SUBMITTED_DATE_CHAIN_SOURCE_FILES = [
@@ -91,6 +91,7 @@ export type AssignmentResultSubmittedDateChainPrivacyContract = {
   sortingUsesTimestampParsing: true;
   sourceFiles: string[];
   uiDatesUseLocalizedFormatter: true;
+  usesCopyArtifactHandoff: true;
 };
 
 export type AssignmentResultSubmittedDateChainHandoffView = {
@@ -126,6 +127,7 @@ export function buildAssignmentResultSubmittedDateChainHandoffView(): Assignment
       sortingUsesTimestampParsing: true,
       sourceFiles: [...ASSIGNMENT_RESULT_SUBMITTED_DATE_CHAIN_SOURCE_FILES],
       uiDatesUseLocalizedFormatter: true,
+      usesCopyArtifactHandoff: true,
     },
     title: 'Assignment result submitted-date chain',
   };
@@ -349,12 +351,12 @@ function getAssignmentResultSubmittedDateChainHandoffItem(
         'Raw data hidden',
         'Submitted-date handoffs omit raw completed-at values, names, labels, tokens, answers, and CSV URLs.'
       );
-    case 'submitted-date-chain-gate':
+    case 'copy-artifact-handoff-boundary':
       return item(
         id,
-        'Submitted date gate',
-        '30 source files',
-        'A focused gate keeps submitted-date formatters, result consumers, copy artifacts, CSV columns, and privacy aligned.'
+        'Copy artifact handoff',
+        '30 artifact slices',
+        'Formatted submitted dates stay connected to latest-attempt details, last-submitted context, teacher copy artifacts, current-review scope, and privacy.'
       );
   }
 }

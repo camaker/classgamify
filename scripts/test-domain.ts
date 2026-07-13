@@ -60290,7 +60290,15 @@ assert.deepEqual(submittedDateChainView.privacy, {
   sortingUsesTimestampParsing: true,
   sourceFiles: [...ASSIGNMENT_RESULT_SUBMITTED_DATE_CHAIN_SOURCE_FILES],
   uiDatesUseLocalizedFormatter: true,
+  usesCopyArtifactHandoff: true,
 });
+assert.equal(ASSIGNMENT_COPY_ARTIFACT_HANDOFF_ITEM_IDS.length, 30);
+assert.equal(
+  submittedDateChainView.itemViews.find(
+    (itemView) => itemView.id === 'copy-artifact-handoff-boundary'
+  )?.value,
+  '30 artifact slices'
+);
 assert.equal(
   submittedDateChainView.itemViews.find(
     (itemView) => itemView.id === 'csv-date-iso-output'
