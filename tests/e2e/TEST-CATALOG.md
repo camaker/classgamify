@@ -90,7 +90,7 @@ student identity lifecycle, student runtime identity boundary, assignment
 submission validation boundary, assignment attempt persistence boundary, scored
 attempt results, answer feedback lifecycle, submitted-date continuity,
 accepted-answer continuity, explanation continuity, teacher result review,
-teacher result copy lifecycle,
+teacher result copy lifecycle, worksheet-mode delivery boundary,
 printable worksheet review lifecycle, copy/export/print handoffs,
 teacher workspace operations, public discovery and indexing alignment, or
 privacy guards.

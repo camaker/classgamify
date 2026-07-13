@@ -27,8 +27,8 @@ student runtime identity boundary, assignment submission validation boundary,
 assignment attempt persistence boundary, scored attempt results, answer feedback
 lifecycle, submitted-date continuity, accepted-answer continuity, and
 explanation continuity, teacher result review, teacher result copy lifecycle,
-printable
-worksheet review lifecycle, copy/export/print handoffs, teacher workspace
+worksheet-mode delivery boundary, printable worksheet review lifecycle,
+copy/export/print handoffs, teacher workspace
 operations, public discovery/indexing metadata, and privacy guards aligned with
 this sequence.
 
