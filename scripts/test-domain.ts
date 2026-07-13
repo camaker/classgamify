@@ -16538,13 +16538,18 @@ assert.deepEqual(publicDiscoveryIndexingChainView.privacy, {
   includesLocalizedAlternates: true,
   itemIds: [...PUBLIC_DISCOVERY_INDEXING_CHAIN_HANDOFF_ITEM_IDS],
   keepsAuthEntryOutOfIndex: true,
+  keepsDashboardOutOfIndex: true,
+  keepsManifestProtectedSurfacesOut: true,
+  keepsManifestRetiredLegacyOut: true,
   keepsPrintRoutesOutOfIndex: true,
   keepsPublicHandoffsSourceLevel: true,
   keepsRetiredLegacyOutOfIndex: true,
   keepsStudentRunnerOutOfIndex: true,
   manifestTargetsPublicRoot: true,
+  readsSourceMaterialFileBytes: false,
   routeActionsUseSharedConstants: true,
   sourceFiles: [...PUBLIC_DISCOVERY_INDEXING_CHAIN_SOURCE_FILES],
+  usesPublicMetadataHandoff: true,
   usesSharedIndexingHelpers: true,
 });
 assert.deepEqual(
@@ -16585,7 +16590,7 @@ assert.deepEqual(Object.fromEntries(publicDiscoveryIndexingChainValues), {
   'pricing-plan-boundary': Routes.Pricing,
   'print-route-index-guard': '/print',
   'private-data-guard': 'Private data hidden',
-  'public-discovery-chain-gate': '30 source files',
+  'public-metadata-handoff-boundary': '30 metadata slices',
   'public-dom-component-guard': 'Shared components blocked',
   'public-dom-route-guard': 'Route files blocked',
   'public-route-registry': 'PUBLIC_INDEXABLE_STATIC_ROUTES',
@@ -16601,7 +16606,7 @@ assert.deepEqual(Object.fromEntries(publicDiscoveryIndexingChainValues), {
 });
 assert.match(
   readFileSync('tests/e2e/TEST-CATALOG.md', 'utf8'),
-  /Public discovery\/indexing chain has a fast script-level gate via[\s\S]*scripts\/public-discovery-indexing-chain-handoff\.test\.ts/,
+  /Public discovery\/indexing chain has a fast script-level gate via[\s\S]*scripts\/public-discovery-indexing-chain-handoff\.test\.ts[\s\S]*public metadata handoff boundary/,
   'TEST-CATALOG should document the public discovery/indexing chain gate.'
 );
 const classroomProductLoopChainView =

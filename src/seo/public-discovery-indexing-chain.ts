@@ -30,7 +30,7 @@ export const PUBLIC_DISCOVERY_INDEXING_CHAIN_HANDOFF_ITEM_IDS = [
   'print-route-index-guard',
   'private-data-guard',
   'legacy-copy-guard',
-  'public-discovery-chain-gate',
+  'public-metadata-handoff-boundary',
 ] as const;
 
 export const PUBLIC_DISCOVERY_INDEXING_CHAIN_SOURCE_FILES = [
@@ -89,13 +89,18 @@ export type PublicDiscoveryIndexingChainPrivacyContract = {
   includesLocalizedAlternates: true;
   itemIds: PublicDiscoveryIndexingChainHandoffItemId[];
   keepsAuthEntryOutOfIndex: true;
+  keepsDashboardOutOfIndex: true;
+  keepsManifestProtectedSurfacesOut: true;
+  keepsManifestRetiredLegacyOut: true;
   keepsPrintRoutesOutOfIndex: true;
   keepsPublicHandoffsSourceLevel: true;
   keepsRetiredLegacyOutOfIndex: true;
   keepsStudentRunnerOutOfIndex: true;
   manifestTargetsPublicRoot: true;
+  readsSourceMaterialFileBytes: false;
   routeActionsUseSharedConstants: true;
   sourceFiles: string[];
+  usesPublicMetadataHandoff: true;
   usesSharedIndexingHelpers: true;
 };
 
@@ -127,13 +132,18 @@ export function buildPublicDiscoveryIndexingChainHandoffView(): PublicDiscoveryI
       includesLocalizedAlternates: true,
       itemIds: [...PUBLIC_DISCOVERY_INDEXING_CHAIN_HANDOFF_ITEM_IDS],
       keepsAuthEntryOutOfIndex: true,
+      keepsDashboardOutOfIndex: true,
+      keepsManifestProtectedSurfacesOut: true,
+      keepsManifestRetiredLegacyOut: true,
       keepsPrintRoutesOutOfIndex: true,
       keepsPublicHandoffsSourceLevel: true,
       keepsRetiredLegacyOutOfIndex: true,
       keepsStudentRunnerOutOfIndex: true,
       manifestTargetsPublicRoot: true,
+      readsSourceMaterialFileBytes: false,
       routeActionsUseSharedConstants: true,
       sourceFiles: [...PUBLIC_DISCOVERY_INDEXING_CHAIN_SOURCE_FILES],
+      usesPublicMetadataHandoff: true,
       usesSharedIndexingHelpers: true,
     },
     title: 'Public discovery/indexing chain',
@@ -358,12 +368,12 @@ function getPublicDiscoveryIndexingChainHandoffItem(
         'ClassGamify only',
         'Public discovery surfaces describe ClassGamify instead of retired copied-template pages.'
       );
-    case 'public-discovery-chain-gate':
+    case 'public-metadata-handoff-boundary':
       return item(
         id,
-        'Public discovery chain gate',
-        '30 source files',
-        'A focused gate keeps public entry routes, indexing helpers, DOM boundaries, and legacy-route retirement aligned.'
+        'Public metadata handoff boundary',
+        '30 metadata slices',
+        'Static and localized route registries, sitemap counts and headers, robots disallow boundaries, retired legacy inventory, manifest install metadata, and private classroom-data guards stay aligned.'
       );
   }
 }

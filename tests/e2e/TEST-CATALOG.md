@@ -59,9 +59,10 @@ public layout route sources and shared public components that must keep internal
 handoff contracts.
 Public discovery/indexing chain has a fast script-level gate via
 `pnpm exec tsx --test scripts/public-discovery-indexing-chain-handoff.test.ts`;
-run it when changing public entry routes, navigation, template/worksheet
-entries, public page copy, sitemap/robots/manifest helpers, legacy route
-retirement, public DOM handoff boundaries, or privacy/indexing guards.
+run it when changing the 30-slice public metadata handoff boundary, public entry
+routes, navigation, template/worksheet entries, public page copy,
+sitemap/robots/manifest helpers, legacy route retirement, public DOM handoff
+boundaries, or privacy/indexing guards.
 Classroom trust communication chain has a fast script-level gate via
 `pnpm exec tsx --test scripts/classroom-trust-communication-chain-handoff.test.ts`;
 run it when changing public classroom contact intake, auth workspace entry,
@@ -97,7 +98,7 @@ teacher result copy lifecycle and its copy artifact handoff boundary,
 worksheet-mode delivery boundary,
 printable worksheet review lifecycle, copy/export/print handoffs,
 teacher workspace operations and its dashboard overview boundary, public
-discovery and indexing alignment, or
+discovery and indexing alignment with its public metadata handoff boundary, or
 privacy guards.
 Active surface product boundary has a fast script-level gate via
 `pnpm exec tsx --test scripts/active-surface-product-boundary.test.ts`; run it

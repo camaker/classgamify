@@ -33,7 +33,8 @@ result review controls boundary, teacher result copy lifecycle and its copy
 artifact handoff boundary,
 worksheet-mode delivery boundary, printable worksheet review lifecycle,
 copy/export/print handoffs, teacher workspace operations and its dashboard
-overview boundary, public discovery/indexing metadata, and privacy guards aligned with
+overview boundary, public discovery/indexing metadata and its public metadata
+handoff boundary, and privacy guards aligned with
 this sequence.
 
 Copied-template surfaces should be retired in narrow, verified waves. Public

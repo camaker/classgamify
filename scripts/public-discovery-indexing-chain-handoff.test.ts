@@ -111,13 +111,18 @@ test('public discovery/indexing chain exposes 30 safe public slices', () => {
     includesLocalizedAlternates: true,
     itemIds,
     keepsAuthEntryOutOfIndex: true,
+    keepsDashboardOutOfIndex: true,
+    keepsManifestProtectedSurfacesOut: true,
+    keepsManifestRetiredLegacyOut: true,
     keepsPrintRoutesOutOfIndex: true,
     keepsPublicHandoffsSourceLevel: true,
     keepsRetiredLegacyOutOfIndex: true,
     keepsStudentRunnerOutOfIndex: true,
     manifestTargetsPublicRoot: true,
+    readsSourceMaterialFileBytes: false,
     routeActionsUseSharedConstants: true,
     sourceFiles: [...PUBLIC_DISCOVERY_INDEXING_CHAIN_SOURCE_FILES],
+    usesPublicMetadataHandoff: true,
     usesSharedIndexingHelpers: true,
   });
   assertNoPrivatePublicDiscoveryText(JSON.stringify(handoffView));
@@ -158,7 +163,7 @@ test('public discovery/indexing chain summarizes the route and indexing flow', (
       ['print-route-index-guard', '/print'],
       ['private-data-guard', 'Private data hidden'],
       ['legacy-copy-guard', 'ClassGamify only'],
-      ['public-discovery-chain-gate', '30 source files'],
+      ['public-metadata-handoff-boundary', '30 metadata slices'],
     ]
   );
   assert.equal(
@@ -409,6 +414,11 @@ test('public discovery/indexing chain focused gate is documented', () => {
     TEST_CATALOG_SOURCE.replace(/\s+/g, ' '),
     /public entry routes[\s\S]*navigation[\s\S]*template\/worksheet entries[\s\S]*sitemap\/robots\/manifest[\s\S]*legacy route retirement[\s\S]*public DOM handoff boundaries[\s\S]*privacy\/indexing guards/,
     'TEST-CATALOG should describe the full public discovery/indexing chain scope.'
+  );
+  assert.match(
+    TEST_CATALOG_SOURCE.replace(/\s+/g, ' '),
+    /public metadata handoff boundary/,
+    'TEST-CATALOG should document the concrete public metadata handoff boundary.'
   );
 });
 
