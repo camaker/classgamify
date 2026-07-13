@@ -190,6 +190,12 @@ many playable modes" model instead of only satisfying the selected template's
 minimum fields. The editor should also preview template readiness from the
 current structured text fields before save, using the same parser and
 deterministic remix model as persisted activities.
+The authoring/library chain should explicitly carry the editor workflow's 30
+prepared slices for workflow order, create and edit surfaces, templates,
+scaffolds, AI draft source, structured content, source materials, review
+readiness, save controls, authentication, publish boundaries, and privacy. Its
+handoff summary must not expose raw editor input, prompts, answers, teacher
+notes, filenames, file ids, or storage keys.
 The public template directory should act as a real creation entry point:
 teachers can start from any template card and land in `/create` with that
 primary template selected and its template-specific scaffold loaded, while the

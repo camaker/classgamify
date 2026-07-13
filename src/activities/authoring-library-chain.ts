@@ -28,7 +28,7 @@ export const ACTIVITY_AUTHORING_LIBRARY_CHAIN_HANDOFF_ITEM_IDS = [
   'restore-lifecycle-gate',
   'publish-access-boundary',
   'snapshot-protection',
-  'activity-workflow-chain-gate',
+  'editor-workflow-handoff-boundary',
 ] as const;
 
 export const ACTIVITY_AUTHORING_LIBRARY_CHAIN_SOURCE_FILES = [
@@ -85,6 +85,7 @@ export type ActivityAuthoringLibraryChainPrivacyContract = {
   exposesSourceMaterialFileIds: false;
   exposesSourceMaterialFilenames: false;
   exposesSourceMaterialStorageKeys: false;
+  exposesTeacherNotesInHandoff: false;
   itemIds: ActivityAuthoringLibraryChainHandoffItemId[];
   requiresAuthenticatedTeacherForPersistence: true;
   requiresCreateActivityInputContract: true;
@@ -92,6 +93,7 @@ export type ActivityAuthoringLibraryChainPrivacyContract = {
   requiresTeacherSave: true;
   sourceFiles: string[];
   usesAssignmentSnapshotsForExistingLinks: true;
+  usesActivityEditorWorkflowHandoff: true;
   usesSharedTemplateReadiness: true;
 };
 
@@ -122,6 +124,7 @@ export function buildActivityAuthoringLibraryChainHandoffView(): ActivityAuthori
       exposesSourceMaterialFileIds: false,
       exposesSourceMaterialFilenames: false,
       exposesSourceMaterialStorageKeys: false,
+      exposesTeacherNotesInHandoff: false,
       itemIds: [...ACTIVITY_AUTHORING_LIBRARY_CHAIN_HANDOFF_ITEM_IDS],
       requiresAuthenticatedTeacherForPersistence: true,
       requiresCreateActivityInputContract: true,
@@ -129,6 +132,7 @@ export function buildActivityAuthoringLibraryChainHandoffView(): ActivityAuthori
       requiresTeacherSave: true,
       sourceFiles: [...ACTIVITY_AUTHORING_LIBRARY_CHAIN_SOURCE_FILES],
       usesAssignmentSnapshotsForExistingLinks: true,
+      usesActivityEditorWorkflowHandoff: true,
       usesSharedTemplateReadiness: true,
     },
     title: 'Activity authoring/library chain',
@@ -353,12 +357,12 @@ function getActivityAuthoringLibraryChainHandoffItem(
         'AssignmentSnapshot',
         'Editing, duplicating, archiving, or remixing an activity does not mutate already published assignment snapshots.'
       );
-    case 'activity-workflow-chain-gate':
+    case 'editor-workflow-handoff-boundary':
       return item(
         id,
-        'Activity workflow chain gate',
-        '30 source files',
-        'The activity authoring/library chain keeps public entries, editor save, edit hydration, library management, lifecycle, and publish boundaries connected.'
+        'Editor workflow handoff boundary',
+        '30 editor workflow slices',
+        'Workflow source and order, create/edit surfaces, template and scaffold state, AI draft source, structured content, source materials, review readiness, save controls, auth, publish boundaries, and privacy guards stay aligned.'
       );
   }
 }

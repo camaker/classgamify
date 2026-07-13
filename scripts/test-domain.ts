@@ -8564,6 +8564,7 @@ assert.deepEqual(activityAuthoringLibraryChainView.privacy, {
   exposesSourceMaterialFileIds: false,
   exposesSourceMaterialFilenames: false,
   exposesSourceMaterialStorageKeys: false,
+  exposesTeacherNotesInHandoff: false,
   itemIds: [...ACTIVITY_AUTHORING_LIBRARY_CHAIN_HANDOFF_ITEM_IDS],
   requiresAuthenticatedTeacherForPersistence: true,
   requiresCreateActivityInputContract: true,
@@ -8571,6 +8572,7 @@ assert.deepEqual(activityAuthoringLibraryChainView.privacy, {
   requiresTeacherSave: true,
   sourceFiles: [...ACTIVITY_AUTHORING_LIBRARY_CHAIN_SOURCE_FILES],
   usesAssignmentSnapshotsForExistingLinks: true,
+  usesActivityEditorWorkflowHandoff: true,
   usesSharedTemplateReadiness: true,
 });
 assert.deepEqual(
@@ -8593,7 +8595,7 @@ assert.deepEqual(
 );
 assert.deepEqual(Object.fromEntries(activityAuthoringLibraryChainValues), {
   'activity-persistence': 'Create/update helpers',
-  'activity-workflow-chain-gate': '30 source files',
+  'editor-workflow-handoff-boundary': '30 editor workflow slices',
   'archive-lifecycle-gate': 'Archive blocks derive',
   'card-readiness-summary': 'Ready/locked modes',
   'card-source-materials': 'Kind/count badges',

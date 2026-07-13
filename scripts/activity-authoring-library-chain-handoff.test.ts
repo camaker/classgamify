@@ -97,6 +97,7 @@ test('activity authoring/library chain exposes 30 safe workflow slices', () => {
     exposesSourceMaterialFileIds: false,
     exposesSourceMaterialFilenames: false,
     exposesSourceMaterialStorageKeys: false,
+    exposesTeacherNotesInHandoff: false,
     itemIds,
     requiresAuthenticatedTeacherForPersistence: true,
     requiresCreateActivityInputContract: true,
@@ -104,6 +105,7 @@ test('activity authoring/library chain exposes 30 safe workflow slices', () => {
     requiresTeacherSave: true,
     sourceFiles: [...ACTIVITY_AUTHORING_LIBRARY_CHAIN_SOURCE_FILES],
     usesAssignmentSnapshotsForExistingLinks: true,
+    usesActivityEditorWorkflowHandoff: true,
     usesSharedTemplateReadiness: true,
   });
   assertNoPrivateActivityWorkflowText(JSON.stringify(handoffView));
@@ -144,7 +146,7 @@ test('activity authoring/library chain summarizes authoring to library flow', ()
       ['restore-lifecycle-gate', 'Restore before derive'],
       ['publish-access-boundary', 'Publish dialog only'],
       ['snapshot-protection', 'AssignmentSnapshot'],
-      ['activity-workflow-chain-gate', '30 source files'],
+      ['editor-workflow-handoff-boundary', '30 editor workflow slices'],
     ]
   );
   assert.equal(
@@ -200,6 +202,11 @@ test('activity authoring/library sources preserve product boundaries', () => {
     PRODUCT_SOURCE,
     /The public `\/worksheets` route[\s\S]*send teachers into `\/create\?template=\.\.\.`[\s\S]*normal activity editor/,
     'docs/product.md should keep worksheet entries inside the normal activity editor.'
+  );
+  assert.match(
+    PRODUCT_SOURCE,
+    /authoring\/library chain[\s\S]*editor workflow's 30[\s\S]*AI draft source[\s\S]*review[\s\S]*save controls[\s\S]*publish boundaries[\s\S]*teacher\s+notes[\s\S]*storage keys/,
+    'docs/product.md should describe the 30-slice editor workflow handoff and its privacy boundary.'
   );
   assert.match(
     CREATE_ROUTE_SOURCE,
@@ -299,7 +306,7 @@ test('activity authoring/library chain focused gate is documented', () => {
   );
   assert.match(
     normalizedCatalog,
-    /public template and worksheet entries[\s\S]*shared editor save[\s\S]*edit hydration[\s\S]*owner-scoped library management[\s\S]*derivative drafts[\s\S]*lifecycle gates[\s\S]*publish snapshot boundaries/,
+    /public template and worksheet entries[\s\S]*shared editor save[\s\S]*30-slice editor workflow handoff boundary[\s\S]*edit hydration[\s\S]*owner-scoped library management[\s\S]*derivative drafts[\s\S]*lifecycle gates[\s\S]*publish snapshot boundaries/,
     'TEST-CATALOG should document the public-entry to library-management chain scope.'
   );
 });
