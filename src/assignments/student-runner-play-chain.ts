@@ -28,7 +28,7 @@ export const STUDENT_RUNNER_PLAY_CHAIN_HANDOFF_ITEM_IDS = [
   'attempt-persistence',
   'answer-feedback-policy',
   'post-submit-next-steps',
-  'student-runner-chain-gate',
+  'submit-controls-handoff-boundary',
 ] as const;
 
 export const STUDENT_RUNNER_PLAY_CHAIN_SOURCE_FILES = [
@@ -78,11 +78,15 @@ export type StudentRunnerPlayChainHandoffItemView = {
 export type StudentRunnerPlayChainPrivacyContract = {
   chainSourceFileCount: number;
   exposesAnswerKeysBeforeReview: false;
+  exposesAnswerTextInSubmitControls: false;
   exposesRawAnonymousTokens: false;
+  exposesRawSubmissionPayloadInSubmitControls: false;
   exposesRuntimeItemIdsInHandoffs: false;
   exposesSourceMaterialMetadata: false;
   exposesStudentAnswersBeforeSubmit: false;
   exposesStudentNameInHandoffs: false;
+  exposesTeacherOnlyAnswersInSubmitControls: false;
+  exposesTeacherSourceMaterialsInSubmitControls: false;
   itemIds: StudentRunnerPlayChainHandoffItemId[];
   preservesTeacherReviewBoundary: true;
   publicPayloadUsesSanitizedRuntimeItems: true;
@@ -90,6 +94,7 @@ export type StudentRunnerPlayChainPrivacyContract = {
   rejectsInvalidSubmittedAnswers: true;
   sourceFiles: string[];
   submissionPayloadUsesRuntimeItemIds: true;
+  usesSubmitControlsHandoff: true;
 };
 
 export type StudentRunnerPlayChainHandoffView = {
@@ -111,11 +116,15 @@ export function buildStudentRunnerPlayChainHandoffView(): StudentRunnerPlayChain
     privacy: {
       chainSourceFileCount: STUDENT_RUNNER_PLAY_CHAIN_SOURCE_FILES.length,
       exposesAnswerKeysBeforeReview: false,
+      exposesAnswerTextInSubmitControls: false,
       exposesRawAnonymousTokens: false,
+      exposesRawSubmissionPayloadInSubmitControls: false,
       exposesRuntimeItemIdsInHandoffs: false,
       exposesSourceMaterialMetadata: false,
       exposesStudentAnswersBeforeSubmit: false,
       exposesStudentNameInHandoffs: false,
+      exposesTeacherOnlyAnswersInSubmitControls: false,
+      exposesTeacherSourceMaterialsInSubmitControls: false,
       itemIds: [...STUDENT_RUNNER_PLAY_CHAIN_HANDOFF_ITEM_IDS],
       preservesTeacherReviewBoundary: true,
       publicPayloadUsesSanitizedRuntimeItems: true,
@@ -123,6 +132,7 @@ export function buildStudentRunnerPlayChainHandoffView(): StudentRunnerPlayChain
       rejectsInvalidSubmittedAnswers: true,
       sourceFiles: [...STUDENT_RUNNER_PLAY_CHAIN_SOURCE_FILES],
       submissionPayloadUsesRuntimeItemIds: true,
+      usesSubmitControlsHandoff: true,
     },
     title: 'Student runner play chain',
   };
@@ -346,12 +356,12 @@ function getStudentRunnerPlayChainHandoffItem(
         'Review or retry',
         'Post-submit runner state prepares score review, feedback visibility, retry availability, and done-state guidance.'
       );
-    case 'student-runner-chain-gate':
+    case 'submit-controls-handoff-boundary':
       return item(
         id,
-        'Student runner chain gate',
-        '30 source files',
-        'The student runner play chain keeps public payload, template runtime, submission, attempt, and feedback gates connected.'
+        'Submit controls handoff boundary',
+        '30 submit control slices',
+        'Readiness and payload summaries, completion counts, button and disabled policy, incomplete confirmation, ordered hints, submit action scope, identity privacy, and payload guards stay aligned.'
       );
   }
 }

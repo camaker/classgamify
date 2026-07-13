@@ -85,11 +85,15 @@ test('student runner play chain exposes 30 public-runner slices', () => {
   assert.deepEqual(handoffView.privacy, {
     chainSourceFileCount: STUDENT_RUNNER_PLAY_CHAIN_SOURCE_FILES.length,
     exposesAnswerKeysBeforeReview: false,
+    exposesAnswerTextInSubmitControls: false,
     exposesRawAnonymousTokens: false,
+    exposesRawSubmissionPayloadInSubmitControls: false,
     exposesRuntimeItemIdsInHandoffs: false,
     exposesSourceMaterialMetadata: false,
     exposesStudentAnswersBeforeSubmit: false,
     exposesStudentNameInHandoffs: false,
+    exposesTeacherOnlyAnswersInSubmitControls: false,
+    exposesTeacherSourceMaterialsInSubmitControls: false,
     itemIds,
     preservesTeacherReviewBoundary: true,
     publicPayloadUsesSanitizedRuntimeItems: true,
@@ -97,6 +101,7 @@ test('student runner play chain exposes 30 public-runner slices', () => {
     rejectsInvalidSubmittedAnswers: true,
     sourceFiles: [...STUDENT_RUNNER_PLAY_CHAIN_SOURCE_FILES],
     submissionPayloadUsesRuntimeItemIds: true,
+    usesSubmitControlsHandoff: true,
   });
   assertNoPrivateStudentRunnerText(JSON.stringify(handoffView));
 });
@@ -136,7 +141,7 @@ test('student runner play chain summarizes each runner step', () => {
       ['attempt-persistence', 'Scored attempt'],
       ['answer-feedback-policy', 'Reveal if allowed'],
       ['post-submit-next-steps', 'Review or retry'],
-      ['student-runner-chain-gate', '30 source files'],
+      ['submit-controls-handoff-boundary', '30 submit control slices'],
     ]
   );
   assert.equal(
@@ -262,9 +267,14 @@ test('student runner play chain focused gate is documented', () => {
     'TEST-CATALOG should document the student runner play chain gate.'
   );
   assert.match(
-    TEST_CATALOG_SOURCE,
+    TEST_CATALOG_SOURCE.replace(/\s+/g, ' '),
     /public payload[\s\S]*rule summary[\s\S]*identity[\s\S]*template renderers[\s\S]*partial-submit[\s\S]*attempt persistence[\s\S]*answer feedback/,
     'TEST-CATALOG should document the student runner play-chain scope.'
+  );
+  assert.match(
+    TEST_CATALOG_SOURCE.replace(/\s+/g, ' '),
+    /submit controls handoff boundary/,
+    'TEST-CATALOG should document the concrete submit controls handoff boundary.'
   );
 });
 

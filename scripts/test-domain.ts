@@ -19714,11 +19714,15 @@ assert.ok(
 assert.deepEqual(studentRunnerPlayChainView.privacy, {
   chainSourceFileCount: STUDENT_RUNNER_PLAY_CHAIN_SOURCE_FILES.length,
   exposesAnswerKeysBeforeReview: false,
+  exposesAnswerTextInSubmitControls: false,
   exposesRawAnonymousTokens: false,
+  exposesRawSubmissionPayloadInSubmitControls: false,
   exposesRuntimeItemIdsInHandoffs: false,
   exposesSourceMaterialMetadata: false,
   exposesStudentAnswersBeforeSubmit: false,
   exposesStudentNameInHandoffs: false,
+  exposesTeacherOnlyAnswersInSubmitControls: false,
+  exposesTeacherSourceMaterialsInSubmitControls: false,
   itemIds: [...STUDENT_RUNNER_PLAY_CHAIN_HANDOFF_ITEM_IDS],
   preservesTeacherReviewBoundary: true,
   publicPayloadUsesSanitizedRuntimeItems: true,
@@ -19726,6 +19730,7 @@ assert.deepEqual(studentRunnerPlayChainView.privacy, {
   rejectsInvalidSubmittedAnswers: true,
   sourceFiles: [...STUDENT_RUNNER_PLAY_CHAIN_SOURCE_FILES],
   submissionPayloadUsesRuntimeItemIds: true,
+  usesSubmitControlsHandoff: true,
 });
 assert.deepEqual(
   [
@@ -19782,7 +19787,7 @@ assert.deepEqual(Object.fromEntries(studentRunnerPlayChainValues), {
   'runtime-item-order': 'Stable order',
   'runtime-identity-contract': 'Identity hidden',
   'semantic-bundle-guard': 'Safe handoff bundle',
-  'student-runner-chain-gate': '30 source files',
+  'submit-controls-handoff-boundary': '30 submit control slices',
   'submit-controls-readiness': 'Prepared controls',
   'submission-validation': 'Shared answer guard',
   'timer-start-boundary': 'After readiness',
@@ -19790,7 +19795,7 @@ assert.deepEqual(Object.fromEntries(studentRunnerPlayChainValues), {
 });
 assert.match(
   readFileSync('tests/e2e/TEST-CATALOG.md', 'utf8'),
-  /Student runner play chain has a fast script-level gate via[\s\S]*scripts\/student-runner-play-chain-handoff\.test\.ts/,
+  /Student runner play chain has a fast script-level gate via[\s\S]*scripts\/student-runner-play-chain-handoff\.test\.ts[\s\S]*submit controls handoff boundary/,
   'TEST-CATALOG should document the student runner play chain gate.'
 );
 const studentIdentityLifecycleChainView =

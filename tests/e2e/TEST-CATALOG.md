@@ -88,7 +88,8 @@ extraction lifecycle, activity lifecycle governance, template roadmap
 capability alignment, AI
 enhancement lifecycle review, published assignment delivery, assignment publish
 preflight boundary, assignment lifecycle governance boundary, assignment
-distribution lifecycle boundary, public assignment rules boundary, student runner play,
+distribution lifecycle boundary, public assignment rules boundary, student
+runner play and its submit controls handoff boundary,
 student identity lifecycle, student runtime identity boundary, assignment
 submission validation boundary, assignment attempt persistence boundary, scored
 attempt results, assignment attempt stats boundary, answer feedback lifecycle
@@ -746,10 +747,11 @@ handouts, result exports, worksheet extraction boundaries, or source-material
 and student-identity privacy guards.
 Student runner play chain has a fast script-level gate via
 `pnpm exec tsx --test scripts/student-runner-play-chain-handoff.test.ts`;
-run it when changing public payload access, public rule summary, runner loading
-or start readiness, identity and anonymous-token policy, attempt limits,
-timers/duration, template renderers, progress counts, partial-submit controls,
-submission validation, attempt persistence, or answer feedback.
+run it when changing the 30-slice submit controls handoff boundary, public
+payload access, public rule summary, runner loading or start readiness, identity
+and anonymous-token policy, attempt limits, timers/duration, template renderers,
+progress counts, partial-submit controls, submission validation, attempt
+persistence, or answer feedback.
 Fill-blank worksheet runtime has a fast script-level gate via
 `pnpm exec tsx --test scripts/fill-blank-worksheet-handoff-semantic-views.test.ts`;
 run it when changing the 30-slice worksheet handoff, inline blank coverage,

@@ -22,7 +22,8 @@ template roadmap capability alignment,
 AI enhancement lifecycle review,
 published assignment delivery, assignment publish preflight boundary,
 assignment lifecycle governance boundary, assignment distribution lifecycle
-boundary, public assignment rules boundary, student runner play, student
+boundary, public assignment rules boundary, student runner play and its submit
+controls handoff boundary, student
 identity lifecycle,
 student runtime identity boundary, assignment submission validation boundary,
 assignment attempt persistence boundary, scored attempt results, assignment
