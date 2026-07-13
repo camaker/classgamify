@@ -131,6 +131,13 @@ the owner-scoped `userFiles` rows. Those references preserve draft provenance
 for editing, AI extraction, and future worksheet/audio tooling, but public
 student payloads still expose only sanitized runtime prompts and choices, not
 the teacher's file list or storage keys.
+The source-material privacy chain should explicitly carry the compact material
+reference handoff's 30 slices for reference shape, safe file ids and filename
+basenames, content-type, material kind and size normalization, duplicate
+collapse, the 12-reference limit, editor and AI consumers, public-payload
+guards, and privacy. Its aggregate summary must not expose file ids, original
+filenames, file bytes, storage keys, permission metadata, private activity
+content, or student payload file references.
 
 Teachers must be able to reopen and edit saved activities from the activity
 library. Editing uses the same `CreateActivityInput` contract as creation, with

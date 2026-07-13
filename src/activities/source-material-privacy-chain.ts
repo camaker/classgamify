@@ -28,7 +28,7 @@ export const SOURCE_MATERIAL_PRIVACY_CHAIN_HANDOFF_ITEM_IDS = [
   'public-assignment-source-guard',
   'student-runtime-source-guard',
   'unavailable-link-content-guard',
-  'privacy-chain-gate',
+  'material-reference-handoff-boundary',
 ] as const;
 
 export const SOURCE_MATERIAL_PRIVACY_CHAIN_SOURCE_FILES = [
@@ -79,6 +79,7 @@ export type SourceMaterialPrivacyChainPrivacyContract = {
   allowsSafeFilenameBasenamesInTeacherAiNotes: true;
   chainSourceFileCount: number;
   exposesFileBytesToAi: false;
+  exposesFileIdsInHandoff: false;
   exposesPermissionMetadataToActivityContent: false;
   exposesRawSourceMaterialListToStudents: false;
   exposesStorageKeysToActivityContent: false;
@@ -88,6 +89,7 @@ export type SourceMaterialPrivacyChainPrivacyContract = {
   publicPayloadIncludesSourceMaterials: false;
   requiresTeacherReviewBeforeExtractionPersistence: true;
   sourceFiles: string[];
+  usesSourceMaterialReferenceHandoff: true;
 };
 
 export type SourceMaterialPrivacyChainHandoffView = {
@@ -110,6 +112,7 @@ export function buildSourceMaterialPrivacyChainHandoffView(): SourceMaterialPriv
       allowsSafeFilenameBasenamesInTeacherAiNotes: true,
       chainSourceFileCount: SOURCE_MATERIAL_PRIVACY_CHAIN_SOURCE_FILES.length,
       exposesFileBytesToAi: false,
+      exposesFileIdsInHandoff: false,
       exposesPermissionMetadataToActivityContent: false,
       exposesRawSourceMaterialListToStudents: false,
       exposesStorageKeysToActivityContent: false,
@@ -119,6 +122,7 @@ export function buildSourceMaterialPrivacyChainHandoffView(): SourceMaterialPriv
       publicPayloadIncludesSourceMaterials: false,
       requiresTeacherReviewBeforeExtractionPersistence: true,
       sourceFiles: [...SOURCE_MATERIAL_PRIVACY_CHAIN_SOURCE_FILES],
+      usesSourceMaterialReferenceHandoff: true,
     },
     title: 'Source material privacy chain',
   };
@@ -342,12 +346,12 @@ function getSourceMaterialPrivacyChainHandoffItem(
         'Runtime hidden',
         'Closed or expired links hide runtime content, teacher materials, answers, and browser identity.'
       );
-    case 'privacy-chain-gate':
+    case 'material-reference-handoff-boundary':
       return item(
         id,
-        'Privacy chain gate',
-        '30 source files',
-        'The source-material privacy chain keeps focused gates connected across storage, activity, AI, settings, and public assignment modules.'
+        'Material reference handoff boundary',
+        '30 reference slices',
+        'Compact reference shape, safe file ids and basenames, metadata normalization, duplicate collapse, reference limits, editor and AI consumers, public-payload guards, and privacy stay aligned.'
       );
   }
 }

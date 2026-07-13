@@ -54,6 +54,7 @@ const STORAGE_FILE_ACCESS_SOURCE = readFileSync(
   'src/storage/file-access.ts',
   'utf8'
 );
+const PRODUCT_SOURCE = readFileSync('docs/product.md', 'utf8');
 const TEST_CATALOG_SOURCE = readFileSync('tests/e2e/TEST-CATALOG.md', 'utf8');
 
 const PRIVATE_FILE_BYTES = 'SECRET_PRIVATE_FILE_BYTES';
@@ -87,6 +88,7 @@ test('source-material privacy chain exposes 30 cross-module slices', () => {
     allowsSafeFilenameBasenamesInTeacherAiNotes: true,
     chainSourceFileCount: SOURCE_MATERIAL_PRIVACY_CHAIN_SOURCE_FILES.length,
     exposesFileBytesToAi: false,
+    exposesFileIdsInHandoff: false,
     exposesPermissionMetadataToActivityContent: false,
     exposesRawSourceMaterialListToStudents: false,
     exposesStorageKeysToActivityContent: false,
@@ -96,6 +98,7 @@ test('source-material privacy chain exposes 30 cross-module slices', () => {
     publicPayloadIncludesSourceMaterials: false,
     requiresTeacherReviewBeforeExtractionPersistence: true,
     sourceFiles: [...SOURCE_MATERIAL_PRIVACY_CHAIN_SOURCE_FILES],
+    usesSourceMaterialReferenceHandoff: true,
   });
 
   assertNoPrivateSourceMaterialChainText(JSON.stringify(handoffView));
@@ -136,7 +139,7 @@ test('source-material privacy chain summarizes every linked product slice', () =
       ['public-assignment-source-guard', 'Teacher materials hidden'],
       ['student-runtime-source-guard', 'Source metadata hidden'],
       ['unavailable-link-content-guard', 'Runtime hidden'],
-      ['privacy-chain-gate', '30 source files'],
+      ['material-reference-handoff-boundary', '30 reference slices'],
     ]
   );
   assert.equal(
@@ -261,14 +264,21 @@ test('public, student-runtime, AI, and storage sources keep private material dat
 });
 
 test('source-material privacy chain focused gate is documented', () => {
+  const normalizedCatalog = TEST_CATALOG_SOURCE.replace(/\s+/g, ' ');
+
+  assert.match(
+    PRODUCT_SOURCE,
+    /source-material privacy chain[\s\S]*compact material[\s\S]*30 slices[\s\S]*safe file ids[\s\S]*12-reference limit[\s\S]*must not expose file ids[\s\S]*storage keys[\s\S]*student payload file references/,
+    'docs/product.md should describe the compact material-reference handoff and file privacy boundary.'
+  );
   assert.match(
     TEST_CATALOG_SOURCE,
     /Source-material privacy chain has a fast script-level gate via[\s\S]*scripts\/source-material-privacy-chain-handoff\.test\.ts/,
     'TEST-CATALOG should document the source-material privacy chain gate.'
   );
   assert.match(
-    TEST_CATALOG_SOURCE,
-    /storage upload\/access[\s\S]*ActivityContent\.sourceMaterials[\s\S]*settings files[\s\S]*source-material picker[\s\S]*AI draft source notes[\s\S]*student runtime[\s\S]*source-material metadata guards/,
+    normalizedCatalog,
+    /storage upload\/access[\s\S]*ActivityContent\.sourceMaterials[\s\S]*30-slice compact material reference handoff boundary[\s\S]*settings files[\s\S]*source-material picker[\s\S]*AI draft source notes[\s\S]*student runtime[\s\S]*source-material metadata guards/,
     'TEST-CATALOG should document the cross-module source-material privacy chain scope.'
   );
 });

@@ -8665,6 +8665,7 @@ assert.deepEqual(sourceMaterialPrivacyChainView.privacy, {
   allowsSafeFilenameBasenamesInTeacherAiNotes: true,
   chainSourceFileCount: SOURCE_MATERIAL_PRIVACY_CHAIN_SOURCE_FILES.length,
   exposesFileBytesToAi: false,
+  exposesFileIdsInHandoff: false,
   exposesPermissionMetadataToActivityContent: false,
   exposesRawSourceMaterialListToStudents: false,
   exposesStorageKeysToActivityContent: false,
@@ -8674,6 +8675,7 @@ assert.deepEqual(sourceMaterialPrivacyChainView.privacy, {
   publicPayloadIncludesSourceMaterials: false,
   requiresTeacherReviewBeforeExtractionPersistence: true,
   sourceFiles: [...SOURCE_MATERIAL_PRIVACY_CHAIN_SOURCE_FILES],
+  usesSourceMaterialReferenceHandoff: true,
 });
 assert.deepEqual(Object.fromEntries(sourceMaterialPrivacyChainValues), {
   'activity-reference-shape': 'Compact reference',
@@ -8692,7 +8694,7 @@ assert.deepEqual(Object.fromEntries(sourceMaterialPrivacyChainValues), {
   'picker-attachment-limit': 'Up to 12 files',
   'picker-owner-scope': 'Current teacher files',
   'picker-reference-write': 'ActivityContent.sourceMaterials',
-  'privacy-chain-gate': '30 source files',
+  'material-reference-handoff-boundary': '30 reference slices',
   'private-owner-access': 'Owner required',
   'public-assignment-source-guard': 'Teacher materials hidden',
   'reference-duplicate-collapse': 'First 12 safe references',

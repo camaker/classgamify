@@ -416,7 +416,8 @@ limits, compact JSON shape, storage-key omission, or student-payload privacy.
 Source-material privacy chain has a fast script-level gate via
 `pnpm exec tsx --test scripts/source-material-privacy-chain-handoff.test.ts`;
 run it when changing storage upload/access, ActivityContent.sourceMaterials
-references, settings files, source-material picker, AI draft source notes,
+references, the 30-slice compact material reference handoff boundary, settings
+files, source-material picker, AI draft source notes,
 extraction readiness, public assignment payloads, or student runtime
 source-material metadata guards.
 Assignment result student search has a fast script-level gate via
