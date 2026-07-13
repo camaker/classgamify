@@ -88,8 +88,9 @@ preflight boundary, assignment lifecycle governance boundary, assignment
 distribution lifecycle boundary, public assignment rules boundary, student runner play,
 student identity lifecycle, student runtime identity boundary, assignment
 submission validation boundary, assignment attempt persistence boundary, scored
-attempt results, answer feedback lifecycle, submitted-date continuity,
-accepted-answer continuity, explanation continuity, teacher result review,
+attempt results, answer feedback lifecycle, assignment attempt duration
+boundary, submitted-date continuity, accepted-answer continuity, explanation
+continuity, teacher result review,
 teacher result copy lifecycle, worksheet-mode delivery boundary,
 printable worksheet review lifecycle, copy/export/print handoffs,
 teacher workspace operations, public discovery and indexing alignment, or
