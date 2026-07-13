@@ -30,7 +30,7 @@ export const CLASSROOM_TRUST_COMMUNICATION_CHAIN_HANDOFF_ITEM_IDS = [
   'public-dom-handoff-boundary',
   'private-data-guard',
   'legacy-copy-guard',
-  'classroom-trust-chain-gate',
+  'transactional-mail-workspace-boundary',
 ] as const;
 
 export const CLASSROOM_TRUST_COMMUNICATION_CHAIN_SOURCE_FILES = [
@@ -82,6 +82,7 @@ export type ClassroomTrustCommunicationChainPrivacyContract = {
   contactCreatesActivities: false;
   contactCreatesAssignmentLinks: false;
   contactCreatesStudentRecords: false;
+  exportsResultRecords: false;
   exposesActionUrls: false;
   exposesAnswerKeys: false;
   exposesAuthSecrets: false;
@@ -92,6 +93,7 @@ export type ClassroomTrustCommunicationChainPrivacyContract = {
   exposesRawAnonymousTokens: false;
   exposesRawProviderErrors: false;
   exposesRecipientEmail: false;
+  exposesRecipientName: false;
   exposesSourceMaterialStorageKeys: false;
   exposesStudentAttemptRecords: false;
   exposesStudentIdentifiers: false;
@@ -102,8 +104,17 @@ export type ClassroomTrustCommunicationChainPrivacyContract = {
   keepsRuntimeSecretsServerSide: true;
   keepsTrustHandoffsSourceLevelForPublicDom: true;
   normalizesUnsupportedMailLocales: true;
+  mutatesActivities: false;
+  mutatesAssignmentLinks: false;
+  mutatesAttemptRecords: false;
+  readsSourceMaterialFileBytes: false;
+  rendersBeforeProviderSend: true;
+  rendersSharedMailBoundaryPanel: true;
   sendsLearnerNotifications: false;
   sourceFiles: string[];
+  usesLocalizedMailSubjects: true;
+  usesMailProviderRegistryBoundary: true;
+  usesTransactionalMailWorkspaceHandoff: true;
   usesTransactionalMailLifecycleChain: true;
   usesClassGamifyProductModel: true;
 };
@@ -130,6 +141,7 @@ export function buildClassroomTrustCommunicationChainHandoffView(): ClassroomTru
       contactCreatesActivities: false,
       contactCreatesAssignmentLinks: false,
       contactCreatesStudentRecords: false,
+      exportsResultRecords: false,
       exposesActionUrls: false,
       exposesAnswerKeys: false,
       exposesAuthSecrets: false,
@@ -140,6 +152,7 @@ export function buildClassroomTrustCommunicationChainHandoffView(): ClassroomTru
       exposesRawAnonymousTokens: false,
       exposesRawProviderErrors: false,
       exposesRecipientEmail: false,
+      exposesRecipientName: false,
       exposesSourceMaterialStorageKeys: false,
       exposesStudentAttemptRecords: false,
       exposesStudentIdentifiers: false,
@@ -150,8 +163,17 @@ export function buildClassroomTrustCommunicationChainHandoffView(): ClassroomTru
       keepsRuntimeSecretsServerSide: true,
       keepsTrustHandoffsSourceLevelForPublicDom: true,
       normalizesUnsupportedMailLocales: true,
+      mutatesActivities: false,
+      mutatesAssignmentLinks: false,
+      mutatesAttemptRecords: false,
+      readsSourceMaterialFileBytes: false,
+      rendersBeforeProviderSend: true,
+      rendersSharedMailBoundaryPanel: true,
       sendsLearnerNotifications: false,
       sourceFiles: [...CLASSROOM_TRUST_COMMUNICATION_CHAIN_SOURCE_FILES],
+      usesLocalizedMailSubjects: true,
+      usesMailProviderRegistryBoundary: true,
+      usesTransactionalMailWorkspaceHandoff: true,
       usesTransactionalMailLifecycleChain: true,
       usesClassGamifyProductModel: true,
     },
@@ -377,12 +399,12 @@ function getClassroomTrustCommunicationChainHandoffItem(
         'ClassGamify only',
         'Trust, mail, legal, and configuration surfaces avoid inherited learning-site or image-generation provider copy.'
       );
-    case 'classroom-trust-chain-gate':
+    case 'transactional-mail-workspace-boundary':
       return item(
         id,
-        'Classroom trust chain gate',
-        '30 source files',
-        'A focused gate keeps public contact, auth, mail, notifications, billing, legal, config, storage, and public-DOM boundaries aligned.'
+        'Transactional mail workspace boundary',
+        '30 mail handoff slices',
+        'Template coverage, localized subjects and HTML language, locale fallback, plain-text and provider rendering, shared workspace scope, action-link placement, no-mutation rules, and mail privacy guards stay aligned.'
       );
   }
 }

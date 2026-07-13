@@ -17054,6 +17054,7 @@ assert.deepEqual(classroomTrustCommunicationChainView.privacy, {
   contactCreatesActivities: false,
   contactCreatesAssignmentLinks: false,
   contactCreatesStudentRecords: false,
+  exportsResultRecords: false,
   exposesActionUrls: false,
   exposesAnswerKeys: false,
   exposesAuthSecrets: false,
@@ -17064,6 +17065,7 @@ assert.deepEqual(classroomTrustCommunicationChainView.privacy, {
   exposesRawAnonymousTokens: false,
   exposesRawProviderErrors: false,
   exposesRecipientEmail: false,
+  exposesRecipientName: false,
   exposesSourceMaterialStorageKeys: false,
   exposesStudentAttemptRecords: false,
   exposesStudentIdentifiers: false,
@@ -17074,8 +17076,17 @@ assert.deepEqual(classroomTrustCommunicationChainView.privacy, {
   keepsRuntimeSecretsServerSide: true,
   keepsTrustHandoffsSourceLevelForPublicDom: true,
   normalizesUnsupportedMailLocales: true,
+  mutatesActivities: false,
+  mutatesAssignmentLinks: false,
+  mutatesAttemptRecords: false,
+  readsSourceMaterialFileBytes: false,
+  rendersBeforeProviderSend: true,
+  rendersSharedMailBoundaryPanel: true,
   sendsLearnerNotifications: false,
   sourceFiles: [...CLASSROOM_TRUST_COMMUNICATION_CHAIN_SOURCE_FILES],
+  usesLocalizedMailSubjects: true,
+  usesMailProviderRegistryBoundary: true,
+  usesTransactionalMailWorkspaceHandoff: true,
   usesTransactionalMailLifecycleChain: true,
   usesClassGamifyProductModel: true,
 });
@@ -17107,7 +17118,7 @@ assert.deepEqual(Object.fromEntries(classroomTrustCommunicationChainValues), {
   'billing-hosted-boundary': Routes.SettingsBilling,
   'billing-plan-capabilities': 'Classroom loop access',
   'billing-provider-secret-guard': 'Provider secrets hidden',
-  'classroom-trust-chain-gate': '30 source files',
+  'transactional-mail-workspace-boundary': '30 mail handoff slices',
   'contact-classroom-intent': 'Classroom inquiry',
   'contact-mail-context': 'Structured mail context',
   'contact-no-workspace-mutation': 'No workspace mutation',
@@ -17133,7 +17144,7 @@ assert.deepEqual(Object.fromEntries(classroomTrustCommunicationChainValues), {
 });
 assert.match(
   readFileSync('tests/e2e/TEST-CATALOG.md', 'utf8'),
-  /Classroom trust communication chain has a fast script-level gate via[\s\S]*scripts\/classroom-trust-communication-chain-handoff\.test\.ts/,
+  /Classroom trust communication chain has a fast script-level gate via[\s\S]*scripts\/classroom-trust-communication-chain-handoff\.test\.ts[\s\S]*transactional mail workspace boundary/,
   'TEST-CATALOG should document the classroom trust communication chain gate.'
 );
 assert.match(

@@ -109,6 +109,7 @@ test('classroom trust communication chain exposes 30 safe trust slices', () => {
     contactCreatesActivities: false,
     contactCreatesAssignmentLinks: false,
     contactCreatesStudentRecords: false,
+    exportsResultRecords: false,
     exposesActionUrls: false,
     exposesAnswerKeys: false,
     exposesAuthSecrets: false,
@@ -119,6 +120,7 @@ test('classroom trust communication chain exposes 30 safe trust slices', () => {
     exposesRawAnonymousTokens: false,
     exposesRawProviderErrors: false,
     exposesRecipientEmail: false,
+    exposesRecipientName: false,
     exposesSourceMaterialStorageKeys: false,
     exposesStudentAttemptRecords: false,
     exposesStudentIdentifiers: false,
@@ -129,8 +131,17 @@ test('classroom trust communication chain exposes 30 safe trust slices', () => {
     keepsRuntimeSecretsServerSide: true,
     keepsTrustHandoffsSourceLevelForPublicDom: true,
     normalizesUnsupportedMailLocales: true,
+    mutatesActivities: false,
+    mutatesAssignmentLinks: false,
+    mutatesAttemptRecords: false,
+    readsSourceMaterialFileBytes: false,
+    rendersBeforeProviderSend: true,
+    rendersSharedMailBoundaryPanel: true,
     sendsLearnerNotifications: false,
     sourceFiles: [...CLASSROOM_TRUST_COMMUNICATION_CHAIN_SOURCE_FILES],
+    usesLocalizedMailSubjects: true,
+    usesMailProviderRegistryBoundary: true,
+    usesTransactionalMailWorkspaceHandoff: true,
     usesTransactionalMailLifecycleChain: true,
     usesClassGamifyProductModel: true,
   });
@@ -172,7 +183,7 @@ test('classroom trust communication chain summarizes contact through configurati
       ['public-dom-handoff-boundary', 'Source-level public gates'],
       ['private-data-guard', 'Private data hidden'],
       ['legacy-copy-guard', 'ClassGamify only'],
-      ['classroom-trust-chain-gate', '30 source files'],
+      ['transactional-mail-workspace-boundary', '30 mail handoff slices'],
     ]
   );
   assert.equal(
@@ -329,6 +340,11 @@ test('classroom trust communication chain focused gate is documented', () => {
     TEST_CATALOG_SOURCE.replace(/\s+/g, ' '),
     /public classroom contact intake[\s\S]*auth workspace entry[\s\S]*transactional mail lifecycle[\s\S]*teacher notification settings[\s\S]*hosted billing[\s\S]*legal\/provider copy[\s\S]*developer configuration secrets[\s\S]*public DOM handoff boundaries/,
     'TEST-CATALOG should describe the full classroom trust communication chain scope.'
+  );
+  assert.match(
+    TEST_CATALOG_SOURCE.replace(/\s+/g, ' '),
+    /transactional mail workspace boundary/,
+    'TEST-CATALOG should document the concrete transactional mail workspace boundary.'
   );
 });
 
