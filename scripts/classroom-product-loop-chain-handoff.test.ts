@@ -79,7 +79,10 @@ import {
   type ClassroomProductLoopChainHandoffView,
 } from '@/config/classroom-product-loop-chain';
 import { CLASSROOM_TRUST_COMMUNICATION_CHAIN_HANDOFF_ITEM_IDS } from '@/config/classroom-trust-communication-chain';
-import { CLASSROOM_DATA_LIFECYCLE_CHAIN_HANDOFF_ITEM_IDS } from '@/db/classroom-data-lifecycle-chain';
+import {
+  CLASSROOM_DATA_LIFECYCLE_CHAIN_HANDOFF_ITEM_IDS,
+  CLASSROOM_DATA_LIFECYCLE_CHAIN_SOURCE_FILES,
+} from '@/db/classroom-data-lifecycle-chain';
 import { DASHBOARD_OVERVIEW_HANDOFF_ITEM_IDS } from '@/dashboard/overview';
 import {
   TEACHER_WORKSPACE_OPERATIONS_CHAIN_HANDOFF_ITEM_IDS,
@@ -135,6 +138,7 @@ test('classroom product loop chain exposes 30 safe product slices', () => {
     copyArtifactsUseFormattedDates: true,
     copyArtifactsUseFormattedExplanations: true,
     countsStarterPreviewAsOwned: false,
+    createsParallelWorksheetTables: false,
     csvExportsUseSharedAnswerView: true,
     csvExportsUseFormattedExplanations: true,
     csvFormulaInjectionGuardEnabled: true,
@@ -168,6 +172,7 @@ test('classroom product loop chain exposes 30 safe product slices', () => {
     exposesRawSubmissionPayloads: false,
     exposesResultExportRows: false,
     exposesRuntimeItemIdsInHandoff: false,
+    exposesSnapshotContentJsonToPublicPayload: false,
     exposesSourceMaterialMetadataInIdentityHandoff: false,
     exposesSourceMaterialFileIds: false,
     exposesSourceMaterialFilenames: false,
@@ -198,6 +203,7 @@ test('classroom product loop chain exposes 30 safe product slices', () => {
     exportPreparationScope: 'full-assignment-results',
     exportIncludesSubmittedDateColumns: true,
     freezesAssignmentSnapshots: true,
+    freezesSnapshotContent: true,
     itemIds,
     preservesFrozenSnapshots: true,
     requiresTeacherSaveBeforeActivityPersistence: true,
@@ -216,6 +222,8 @@ test('classroom product loop chain exposes 30 safe product slices', () => {
     mutatesPublicRunner: false,
     printableAnswerKeysUseFormattedExplanations: true,
     preservesTeacherResultEvidence: true,
+    persistsAttemptsAfterValidation: true,
+    publishesAssignmentAndSnapshotTogether: true,
     publicFeedbackRespectsAnswerReveal: true,
     publicPayloadUsesRuntimeItemsOnly: true,
     publicResponseUsesSanitizedScoredResult: true,
@@ -233,6 +241,8 @@ test('classroom product loop chain exposes 30 safe product slices', () => {
     requiresAssignmentSnapshot: true,
     requiresNormalizedAnonymousTokens: true,
     requiresNormalizedStudentNames: true,
+    requiresOwnerScopedActivities: true,
+    requiresOwnerScopedAssignments: true,
     requiresOwnerScopedAssignment: true,
     resultConsumersUseNormalizedIdentity: true,
     resultConsumersUseScoredAttempts: true,
@@ -249,6 +259,8 @@ test('classroom product loop chain exposes 30 safe product slices', () => {
     usesAccountGovernanceLifecycleChain: true,
     usesActiveSurfaceProductBoundary: true,
     usesAnswerFeedbackLifecycleChain: true,
+    usesClassroomDataLifecycleChain: true,
+    usesD1AppSchema: true,
     usesPublishedAssignmentDeliveryChain: true,
     usesPublicDiscoveryIndexingChain: true,
     usesAssignmentResultsExportPreparation: true,
@@ -272,6 +284,7 @@ test('classroom product loop chain exposes 30 safe product slices', () => {
     usesSharedDeliveryPolicy: true,
     usesSharedRuntimeItems: true,
     usesScoredAttemptsForAttemptLimits: true,
+    usesSnapshotForPublicRuntime: true,
     usesStudentIdentityLifecycleChain: true,
     usesTeacherWorkspaceOperationsChain: true,
     templateFeedbackUsesSharedComponent: true,
@@ -289,7 +302,7 @@ test('classroom product loop chain summarizes activity to results flow', () => {
     [
       ['product-loop-contract', 'Activity -> Assignment -> Attempt -> Results'],
       ['activity-model', 'Teacher-owned activity'],
-      ['activity-content-contract', 'Template-neutral content'],
+      ['classroom-data-lifecycle-boundary', '30 data slices'],
       ['activity-library-owner-scope', 'Owner activities only'],
       ['activity-authoring-library-boundary', '30 authoring slices'],
       ['template-roadmap-capability-boundary', '30 roadmap slices'],
@@ -341,6 +354,7 @@ test('classroom product loop chain is backed by adjacent focused gates', () => {
       TEACHER_WORKSPACE_OPERATIONS_CHAIN_HANDOFF_ITEM_IDS.length,
       TEACHER_WORKSPACE_OPERATIONS_CHAIN_SOURCE_FILES.length,
       CLASSROOM_DATA_LIFECYCLE_CHAIN_HANDOFF_ITEM_IDS.length,
+      CLASSROOM_DATA_LIFECYCLE_CHAIN_SOURCE_FILES.length,
       ACTIVITY_AUTHORING_LIBRARY_CHAIN_HANDOFF_ITEM_IDS.length,
       ACTIVITY_AUTHORING_LIBRARY_CHAIN_SOURCE_FILES.length,
       ACTIVITY_LIFECYCLE_GOVERNANCE_CHAIN_HANDOFF_ITEM_IDS.length,
@@ -381,7 +395,7 @@ test('classroom product loop chain is backed by adjacent focused gates', () => {
       PUBLIC_DISCOVERY_INDEXING_CHAIN_SOURCE_FILES.length,
       CLASSROOM_TRUST_COMMUNICATION_CHAIN_HANDOFF_ITEM_IDS.length,
     ],
-    Array.from({ length: 44 }, () => 30)
+    Array.from({ length: 45 }, () => 30)
   );
 });
 
@@ -398,12 +412,12 @@ test('classroom product loop chain is documented in product and catalog', () => 
   );
   assert.match(
     NORMALIZED_PRODUCT_SOURCE,
-    /src\/config\/classroom-product-loop-chain\.ts` owns the cross-surface product-loop handoff[\s\S]*teacher-owned activities[\s\S]*activity authoring\/library[\s\S]*source extraction lifecycle[\s\S]*activity lifecycle governance[\s\S]*template roadmap capability[\s\S]*AI enhancement lifecycle[\s\S]*published assignment delivery[\s\S]*student runner play[\s\S]*student identity lifecycle[\s\S]*validated attempts[\s\S]*scored attempt results[\s\S]*answer feedback lifecycle[\s\S]*submitted-date continuity[\s\S]*accepted-answer continuity[\s\S]*explanation continuity[\s\S]*teacher result review[\s\S]*teacher result copy lifecycle[\s\S]*printable worksheet review lifecycle[\s\S]*copy\/export\/print handoffs[\s\S]*teacher workspace operations[\s\S]*public discovery\/indexing[\s\S]*privacy guards/,
+    /src\/config\/classroom-product-loop-chain\.ts` owns the cross-surface product-loop handoff[\s\S]*teacher-owned activities[\s\S]*classroom data lifecycle[\s\S]*activity authoring\/library[\s\S]*source extraction lifecycle[\s\S]*activity lifecycle governance[\s\S]*template roadmap capability[\s\S]*AI enhancement lifecycle[\s\S]*published assignment delivery[\s\S]*student runner play[\s\S]*student identity lifecycle[\s\S]*validated attempts[\s\S]*scored attempt results[\s\S]*answer feedback lifecycle[\s\S]*submitted-date continuity[\s\S]*accepted-answer continuity[\s\S]*explanation continuity[\s\S]*teacher result review[\s\S]*teacher result copy lifecycle[\s\S]*printable worksheet review lifecycle[\s\S]*copy\/export\/print handoffs[\s\S]*teacher workspace operations[\s\S]*public discovery\/indexing[\s\S]*privacy guards/,
     'docs/product.md should document the classroom product loop chain owner.'
   );
   assert.match(
     NORMALIZED_TEST_CATALOG_SOURCE,
-    /Classroom product loop chain has a fast script-level gate via[\s\S]*scripts\/classroom-product-loop-chain-handoff\.test\.ts[\s\S]*Activity -> Assignment -> Attempt -> Results[\s\S]*activity authoring\/library workflow[\s\S]*source extraction lifecycle[\s\S]*activity lifecycle governance[\s\S]*template roadmap capability[\s\S]*AI enhancement lifecycle[\s\S]*published assignment delivery[\s\S]*student runner play[\s\S]*student identity lifecycle[\s\S]*scored attempt results[\s\S]*answer feedback lifecycle[\s\S]*submitted-date continuity[\s\S]*accepted-answer continuity[\s\S]*explanation continuity[\s\S]*teacher result review[\s\S]*teacher result copy lifecycle[\s\S]*printable worksheet review lifecycle[\s\S]*copy\/export\/print handoffs[\s\S]*teacher workspace operations[\s\S]*public discovery[\s\S]*privacy guards/,
+    /Classroom product loop chain has a fast script-level gate via[\s\S]*scripts\/classroom-product-loop-chain-handoff\.test\.ts[\s\S]*Activity -> Assignment -> Attempt -> Results[\s\S]*classroom data lifecycle[\s\S]*activity authoring\/library workflow[\s\S]*source extraction lifecycle[\s\S]*activity lifecycle governance[\s\S]*template roadmap capability[\s\S]*AI enhancement lifecycle[\s\S]*published assignment delivery[\s\S]*student runner play[\s\S]*student identity lifecycle[\s\S]*scored attempt results[\s\S]*answer feedback lifecycle[\s\S]*submitted-date continuity[\s\S]*accepted-answer continuity[\s\S]*explanation continuity[\s\S]*teacher result review[\s\S]*teacher result copy lifecycle[\s\S]*printable worksheet review lifecycle[\s\S]*copy\/export\/print handoffs[\s\S]*teacher workspace operations[\s\S]*public discovery[\s\S]*privacy guards/,
     'TEST-CATALOG should document the classroom product loop chain gate.'
   );
 });

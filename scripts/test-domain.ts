@@ -16624,6 +16624,7 @@ assert.deepEqual(classroomProductLoopChainView.privacy, {
   copyArtifactsUseFormattedDates: true,
   copyArtifactsUseFormattedExplanations: true,
   countsStarterPreviewAsOwned: false,
+  createsParallelWorksheetTables: false,
   csvExportsUseSharedAnswerView: true,
   csvExportsUseFormattedExplanations: true,
   csvFormulaInjectionGuardEnabled: true,
@@ -16657,6 +16658,7 @@ assert.deepEqual(classroomProductLoopChainView.privacy, {
   exposesRawSubmissionPayloads: false,
   exposesResultExportRows: false,
   exposesRuntimeItemIdsInHandoff: false,
+  exposesSnapshotContentJsonToPublicPayload: false,
   exposesSourceMaterialMetadataInIdentityHandoff: false,
   exposesSourceMaterialFileIds: false,
   exposesSourceMaterialFilenames: false,
@@ -16687,6 +16689,7 @@ assert.deepEqual(classroomProductLoopChainView.privacy, {
   exportPreparationScope: 'full-assignment-results',
   exportIncludesSubmittedDateColumns: true,
   freezesAssignmentSnapshots: true,
+  freezesSnapshotContent: true,
   itemIds: [...CLASSROOM_PRODUCT_LOOP_CHAIN_HANDOFF_ITEM_IDS],
   preservesFrozenSnapshots: true,
   requiresTeacherSaveBeforeActivityPersistence: true,
@@ -16705,6 +16708,8 @@ assert.deepEqual(classroomProductLoopChainView.privacy, {
   mutatesPublicRunner: false,
   printableAnswerKeysUseFormattedExplanations: true,
   preservesTeacherResultEvidence: true,
+  persistsAttemptsAfterValidation: true,
+  publishesAssignmentAndSnapshotTogether: true,
   publicFeedbackRespectsAnswerReveal: true,
   publicPayloadUsesRuntimeItemsOnly: true,
   publicResponseUsesSanitizedScoredResult: true,
@@ -16722,6 +16727,8 @@ assert.deepEqual(classroomProductLoopChainView.privacy, {
   requiresAssignmentSnapshot: true,
   requiresNormalizedAnonymousTokens: true,
   requiresNormalizedStudentNames: true,
+  requiresOwnerScopedActivities: true,
+  requiresOwnerScopedAssignments: true,
   requiresOwnerScopedAssignment: true,
   resultConsumersUseNormalizedIdentity: true,
   resultConsumersUseScoredAttempts: true,
@@ -16738,6 +16745,8 @@ assert.deepEqual(classroomProductLoopChainView.privacy, {
   usesAccountGovernanceLifecycleChain: true,
   usesActiveSurfaceProductBoundary: true,
   usesAnswerFeedbackLifecycleChain: true,
+  usesClassroomDataLifecycleChain: true,
+  usesD1AppSchema: true,
   usesPublishedAssignmentDeliveryChain: true,
   usesPublicDiscoveryIndexingChain: true,
   usesAssignmentResultsExportPreparation: true,
@@ -16761,6 +16770,7 @@ assert.deepEqual(classroomProductLoopChainView.privacy, {
   usesSharedDeliveryPolicy: true,
   usesSharedRuntimeItems: true,
   usesScoredAttemptsForAttemptLimits: true,
+  usesSnapshotForPublicRuntime: true,
   usesStudentIdentityLifecycleChain: true,
   usesTeacherWorkspaceOperationsChain: true,
   templateFeedbackUsesSharedComponent: true,
@@ -16774,6 +16784,7 @@ assert.deepEqual(
     TEACHER_WORKSPACE_OPERATIONS_CHAIN_HANDOFF_ITEM_IDS.length,
     TEACHER_WORKSPACE_OPERATIONS_CHAIN_SOURCE_FILES.length,
     CLASSROOM_DATA_LIFECYCLE_CHAIN_HANDOFF_ITEM_IDS.length,
+    CLASSROOM_DATA_LIFECYCLE_CHAIN_SOURCE_FILES.length,
     ACTIVITY_AUTHORING_LIBRARY_CHAIN_HANDOFF_ITEM_IDS.length,
     ACTIVITY_AUTHORING_LIBRARY_CHAIN_SOURCE_FILES.length,
     ACTIVITY_LIFECYCLE_GOVERNANCE_CHAIN_HANDOFF_ITEM_IDS.length,
@@ -16814,12 +16825,12 @@ assert.deepEqual(
     PUBLIC_DISCOVERY_INDEXING_CHAIN_SOURCE_FILES.length,
     CLASSROOM_TRUST_COMMUNICATION_CHAIN_HANDOFF_ITEM_IDS.length,
   ],
-  Array.from({ length: 44 }, () => 30),
+  Array.from({ length: 45 }, () => 30),
   'Classroom product loop chain should stay backed by adjacent public entry, public discovery/indexing, workspace, data, authoring, source extraction, lifecycle governance, template roadmap, AI enhancement lifecycle, delivery, runner, result continuity, export, print, and trust gates.'
 );
 assert.deepEqual(Object.fromEntries(classroomProductLoopChainValues), {
   'activity-authoring-library-boundary': '30 authoring slices',
-  'activity-content-contract': 'Template-neutral content',
+  'classroom-data-lifecycle-boundary': '30 data slices',
   'activity-library-owner-scope': 'Owner activities only',
   'activity-lifecycle-governance-boundary': '30 lifecycle slices',
   'activity-model': 'Teacher-owned activity',
@@ -16856,7 +16867,7 @@ assert.match(
 );
 assert.match(
   readFileSync('tests/e2e/TEST-CATALOG.md', 'utf8').replace(/\s+/g, ' '),
-  /Activity -> Assignment -> Attempt -> Results[\s\S]*activity authoring\/library workflow[\s\S]*source extraction lifecycle[\s\S]*activity lifecycle governance[\s\S]*template roadmap capability[\s\S]*AI enhancement lifecycle[\s\S]*published assignment delivery[\s\S]*student runner play[\s\S]*student identity lifecycle[\s\S]*scored attempt results[\s\S]*answer feedback lifecycle[\s\S]*submitted-date continuity[\s\S]*accepted-answer continuity[\s\S]*explanation continuity[\s\S]*teacher result review[\s\S]*teacher result copy lifecycle[\s\S]*printable worksheet review lifecycle[\s\S]*copy\/export\/print handoffs[\s\S]*teacher workspace operations[\s\S]*public discovery[\s\S]*privacy guards/,
+  /Activity -> Assignment -> Attempt -> Results[\s\S]*classroom data lifecycle[\s\S]*activity authoring\/library workflow[\s\S]*source extraction lifecycle[\s\S]*activity lifecycle governance[\s\S]*template roadmap capability[\s\S]*AI enhancement lifecycle[\s\S]*published assignment delivery[\s\S]*student runner play[\s\S]*student identity lifecycle[\s\S]*scored attempt results[\s\S]*answer feedback lifecycle[\s\S]*submitted-date continuity[\s\S]*accepted-answer continuity[\s\S]*explanation continuity[\s\S]*teacher result review[\s\S]*teacher result copy lifecycle[\s\S]*printable worksheet review lifecycle[\s\S]*copy\/export\/print handoffs[\s\S]*teacher workspace operations[\s\S]*public discovery[\s\S]*privacy guards/,
   'TEST-CATALOG should describe the full classroom product loop chain scope.'
 );
 const classroomTrustCommunicationChainView =
