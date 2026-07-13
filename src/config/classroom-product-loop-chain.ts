@@ -11,7 +11,7 @@ export const CLASSROOM_PRODUCT_LOOP_CHAIN_HANDOFF_ITEM_IDS = [
   'published-assignment-delivery-boundary',
   'assignment-publish-preflight-boundary',
   'student-runner-play-boundary',
-  'public-rules-summary',
+  'public-assignment-rules-boundary',
   'student-identity-lifecycle-boundary',
   'student-runtime-identity-boundary',
   'assignment-attempt-persistence-boundary',
@@ -206,6 +206,10 @@ export type ClassroomProductLoopChainPrivacyContract = {
   preservesTeacherResultEvidence: true;
   persistsAttemptsAfterValidation: true;
   publishesAssignmentAndSnapshotTogether: true;
+  publicRulesDoNotMutateAssignment: true;
+  publicRulesHideRuntimeContent: true;
+  publicRulesHideTeacherSettings: true;
+  publicRulesUseResolvedSettings: true;
   publicFeedbackRespectsAnswerReveal: true;
   publicPayloadUsesRuntimeItemsOnly: true;
   publicResponseUsesSanitizedScoredResult: true;
@@ -255,6 +259,7 @@ export type ClassroomProductLoopChainPrivacyContract = {
   usesClassroomDataLifecycleChain: true;
   usesD1AppSchema: true;
   usesPublishedAssignmentDeliveryChain: true;
+  usesPublicAssignmentRulesHandoff: true;
   usesPublicDiscoveryIndexingChain: true;
   usesAssignmentResultsExportPreparation: true;
   usesBrowserTokenForAnonymousAttempts: true;
@@ -303,7 +308,7 @@ export function buildClassroomProductLoopChainHandoffView(): ClassroomProductLoo
 
   return {
     description:
-      'Thirty-slice classroom product loop chain from teacher-owned activities and reusable content through classroom data lifecycle, activity authoring/library workflow, source extraction lifecycle boundaries, activity lifecycle governance, template roadmap capability alignment, AI enhancement lifecycle review, published assignment delivery, assignment publish preflight boundary, student runner play, student identity lifecycle, student runtime identity boundary, assignment submission validation boundary, assignment attempt persistence boundary, scored attempt results, answer feedback lifecycle, submitted-date continuity, accepted-answer continuity, and explanation continuity, teacher review, teacher result copy lifecycle, printable worksheet review lifecycle, copy/export/print handoffs, teacher workspace operations, public discovery/indexing metadata, and privacy guards.',
+      'Thirty-slice classroom product loop chain from teacher-owned activities and reusable content through classroom data lifecycle, activity authoring/library workflow, source extraction lifecycle boundaries, activity lifecycle governance, template roadmap capability alignment, AI enhancement lifecycle review, published assignment delivery, assignment publish preflight boundary, public assignment rules boundary, student runner play, student identity lifecycle, student runtime identity boundary, assignment submission validation boundary, assignment attempt persistence boundary, scored attempt results, answer feedback lifecycle, submitted-date continuity, accepted-answer continuity, and explanation continuity, teacher review, teacher result copy lifecycle, printable worksheet review lifecycle, copy/export/print handoffs, teacher workspace operations, public discovery/indexing metadata, and privacy guards.',
     itemViews,
     privacy: {
       appendsCopyScopeToArtifacts: true,
@@ -436,6 +441,10 @@ export function buildClassroomProductLoopChainHandoffView(): ClassroomProductLoo
       preservesTeacherResultEvidence: true,
       persistsAttemptsAfterValidation: true,
       publishesAssignmentAndSnapshotTogether: true,
+      publicRulesDoNotMutateAssignment: true,
+      publicRulesHideRuntimeContent: true,
+      publicRulesHideTeacherSettings: true,
+      publicRulesUseResolvedSettings: true,
       publicFeedbackRespectsAnswerReveal: true,
       publicPayloadUsesRuntimeItemsOnly: true,
       publicResponseUsesSanitizedScoredResult: true,
@@ -485,6 +494,7 @@ export function buildClassroomProductLoopChainHandoffView(): ClassroomProductLoo
       usesClassroomDataLifecycleChain: true,
       usesD1AppSchema: true,
       usesPublishedAssignmentDeliveryChain: true,
+      usesPublicAssignmentRulesHandoff: true,
       usesPublicDiscoveryIndexingChain: true,
       usesAssignmentResultsExportPreparation: true,
       usesBrowserTokenForAnonymousAttempts: true,
@@ -628,12 +638,12 @@ function getClassroomProductLoopChainHandoffItem(
         '30 runner slices',
         'Sanitized public payloads, rule summaries, unavailable-link handling, identity, timers, template renderers, partial-submit controls, validated submissions, attempt persistence, answer feedback, and privacy guards stay aligned.'
       );
-    case 'public-rules-summary':
+    case 'public-assignment-rules-boundary':
       return item(
         id,
-        'Public rules summary',
-        'Student-visible rules',
-        'Student runners show safe delivery rules without answer keys or teacher-only content.'
+        'Public assignment rules boundary',
+        '30 rule slices',
+        'Visible rule panels, status badges, item counts, attempts, timers, close times, identity, review behavior, item order, timer start, public payload, runtime-content, teacher-settings, answer-key, and privacy guards stay aligned.'
       );
     case 'student-identity-lifecycle-boundary':
       return item(
