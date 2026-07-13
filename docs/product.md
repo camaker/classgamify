@@ -13,7 +13,8 @@ Activity -> Assignment -> Attempt -> Results
 
 `src/config/classroom-product-loop-chain.ts` owns the cross-surface
 product-loop handoff that keeps teacher-owned activities, reusable content,
-classroom data lifecycle, activity library page boundary,
+assignment source activity context boundary, classroom data lifecycle,
+activity library page boundary,
 activity authoring/library workflow,
 source extraction lifecycle boundaries, activity lifecycle governance,
 template roadmap capability alignment,

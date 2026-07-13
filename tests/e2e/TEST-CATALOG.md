@@ -78,7 +78,8 @@ stay tied to the ClassGamify teacher workspace.
 Classroom product loop chain has a fast script-level gate via
 `pnpm exec tsx --test scripts/classroom-product-loop-chain-handoff.test.ts`;
 run it when changing the Activity -> Assignment -> Attempt -> Results contract,
-classroom data lifecycle, activity library page boundary,
+assignment source activity context boundary, classroom data lifecycle,
+activity library page boundary,
 activity authoring/library workflow, source
 extraction lifecycle, activity lifecycle governance, template roadmap
 capability alignment, AI

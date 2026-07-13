@@ -1,6 +1,6 @@
 export const CLASSROOM_PRODUCT_LOOP_CHAIN_HANDOFF_ITEM_IDS = [
   'product-loop-contract',
-  'activity-model',
+  'assignment-source-activity-context-boundary',
   'classroom-data-lifecycle-boundary',
   'activity-library-page-boundary',
   'activity-authoring-library-boundary',
@@ -176,6 +176,9 @@ export type ClassroomProductLoopChainPrivacyContract = {
   exportIncludesSubmittedDateColumns: true;
   freezesAssignmentSnapshots: true;
   freezesSnapshotContent: true;
+  includesAssignmentListSearch: true;
+  includesPrintableWorksheet: true;
+  includesResultsExport: true;
   itemIds: ClassroomProductLoopChainHandoffItemId[];
   preservesFrozenSnapshots: true;
   requiresTeacherSaveBeforeActivityPersistence: true;
@@ -191,6 +194,7 @@ export type ClassroomProductLoopChainPrivacyContract = {
   keepsProtectedRoutesOutOfIndex: true;
   keepsPublicDiscoverySourceLevel: true;
   keepsActivityLibraryOwnerScoped: true;
+  keepsLiveActivityFallback: true;
   keepsAssignmentListOwnerScoped: true;
   keepsDashboardOwnerScoped: true;
   keepsCsvExportFullAssignment: true;
@@ -232,6 +236,7 @@ export type ClassroomProductLoopChainPrivacyContract = {
   requiresTeacherReviewForAiDrafts: true;
   requiresAuthenticatedTeacher: true;
   requiresAssignmentSnapshot: true;
+  requiresAssignmentSnapshotBoundary: true;
   requiresNormalizedAnonymousTokens: true;
   requiresNormalizedStudentNames: true;
   requiresOwnerScopedActivities: true;
@@ -257,6 +262,7 @@ export type ClassroomProductLoopChainPrivacyContract = {
   usesAssignmentPublishHandoff: true;
   usesAssignmentAttemptPersistenceHandoff: true;
   usesAssignmentSubmissionValidationHandoff: true;
+  usesAssignmentSourceActivityContextChain: true;
   usesClassroomDataLifecycleChain: true;
   usesD1AppSchema: true;
   usesPublishedAssignmentDeliveryChain: true;
@@ -266,6 +272,7 @@ export type ClassroomProductLoopChainPrivacyContract = {
   usesBrowserTokenForAnonymousAttempts: true;
   usesDisplayLabelsForAnonymousResults: true;
   usesFullFilteredSummariesForOverview: true;
+  usesFrozenSnapshotSource: true;
   usesActivityLibraryPageHandoff: true;
   usesOwnerScopedSourceFilters: true;
   usesPaymentCallbackHandoff: true;
@@ -414,6 +421,9 @@ export function buildClassroomProductLoopChainHandoffView(): ClassroomProductLoo
       exportIncludesSubmittedDateColumns: true,
       freezesAssignmentSnapshots: true,
       freezesSnapshotContent: true,
+      includesAssignmentListSearch: true,
+      includesPrintableWorksheet: true,
+      includesResultsExport: true,
       itemIds: [...CLASSROOM_PRODUCT_LOOP_CHAIN_HANDOFF_ITEM_IDS],
       preservesFrozenSnapshots: true,
       requiresTeacherSaveBeforeActivityPersistence: true,
@@ -429,6 +439,7 @@ export function buildClassroomProductLoopChainHandoffView(): ClassroomProductLoo
       keepsProtectedRoutesOutOfIndex: true,
       keepsPublicDiscoverySourceLevel: true,
       keepsActivityLibraryOwnerScoped: true,
+      keepsLiveActivityFallback: true,
       keepsAssignmentListOwnerScoped: true,
       keepsDashboardOwnerScoped: true,
       keepsCsvExportFullAssignment: true,
@@ -470,6 +481,7 @@ export function buildClassroomProductLoopChainHandoffView(): ClassroomProductLoo
       requiresTeacherReviewForAiDrafts: true,
       requiresAuthenticatedTeacher: true,
       requiresAssignmentSnapshot: true,
+      requiresAssignmentSnapshotBoundary: true,
       requiresNormalizedAnonymousTokens: true,
       requiresNormalizedStudentNames: true,
       requiresOwnerScopedActivities: true,
@@ -495,6 +507,7 @@ export function buildClassroomProductLoopChainHandoffView(): ClassroomProductLoo
       usesAssignmentPublishHandoff: true,
       usesAssignmentAttemptPersistenceHandoff: true,
       usesAssignmentSubmissionValidationHandoff: true,
+      usesAssignmentSourceActivityContextChain: true,
       usesClassroomDataLifecycleChain: true,
       usesD1AppSchema: true,
       usesPublishedAssignmentDeliveryChain: true,
@@ -504,6 +517,7 @@ export function buildClassroomProductLoopChainHandoffView(): ClassroomProductLoo
       usesBrowserTokenForAnonymousAttempts: true,
       usesDisplayLabelsForAnonymousResults: true,
       usesFullFilteredSummariesForOverview: true,
+      usesFrozenSnapshotSource: true,
       usesActivityLibraryPageHandoff: true,
       usesOwnerScopedSourceFilters: true,
       usesPaymentCallbackHandoff: true,
@@ -560,12 +574,12 @@ function getClassroomProductLoopChainHandoffItem(
         'Activity -> Assignment -> Attempt -> Results',
         'The top-level product loop stays grounded in teacher activities, assignment links, student attempts, and teacher results.'
       );
-    case 'activity-model':
+    case 'assignment-source-activity-context-boundary':
       return item(
         id,
-        'Activity model',
-        'Teacher-owned activity',
-        'Reusable activities remain owner-scoped classroom content rather than public demo rows.'
+        'Assignment source activity context boundary',
+        '30 source context slices',
+        'Snapshot freezing, current and frozen source search, sanitized public summaries, result context, CSV columns, printable fields, live fallback, and source-context privacy guards stay aligned.'
       );
     case 'classroom-data-lifecycle-boundary':
       return item(
