@@ -25,7 +25,8 @@ boundary, public assignment rules boundary, student runner play, student
 identity lifecycle,
 student runtime identity boundary, assignment submission validation boundary,
 assignment attempt persistence boundary, scored attempt results, assignment
-attempt stats boundary, answer feedback lifecycle, assignment attempt duration
+attempt stats boundary, answer feedback lifecycle and its answer feedback
+handoff boundary, assignment attempt duration
 boundary, submitted-date continuity,
 accepted-answer continuity, and explanation continuity, teacher result review,
 result review controls boundary, teacher result copy lifecycle,

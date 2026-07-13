@@ -88,7 +88,8 @@ preflight boundary, assignment lifecycle governance boundary, assignment
 distribution lifecycle boundary, public assignment rules boundary, student runner play,
 student identity lifecycle, student runtime identity boundary, assignment
 submission validation boundary, assignment attempt persistence boundary, scored
-attempt results, assignment attempt stats boundary, answer feedback lifecycle,
+attempt results, assignment attempt stats boundary, answer feedback lifecycle
+and its answer feedback handoff boundary,
 assignment attempt duration
 boundary, submitted-date continuity, accepted-answer continuity, explanation
 continuity, teacher result review,
@@ -146,10 +147,11 @@ states, result materials, public assignment access, or unavailable-link
 boundaries.
 Answer feedback lifecycle chain has a fast script-level gate via
 `pnpm exec tsx --test scripts/answer-feedback-lifecycle-chain-handoff.test.ts`;
-run it when changing accepted-answer parsing, answer normalization, runtime
-scoring, public post-submit feedback, template feedback surfaces, teacher
-result analysis, result answer text views, CSV answer columns, server review
-summaries, or feedback privacy guards.
+run it when changing the 30-slice answer feedback handoff boundary,
+accepted-answer parsing, answer normalization, runtime scoring, public
+post-submit feedback, template feedback surfaces, teacher result analysis,
+result answer text views, CSV answer columns, server review summaries, or
+feedback privacy guards.
 Published assignment delivery chain has a fast script-level gate via
 `pnpm exec tsx --test scripts/published-assignment-delivery-chain-handoff.test.ts`;
 run it when changing publish preflight, frozen snapshots, share links,

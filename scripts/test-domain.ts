@@ -5330,22 +5330,28 @@ assert.ok(
 assert.deepEqual(answerFeedbackLifecycleChainView.privacy, {
   chainSourceFileCount: ANSWER_FEEDBACK_LIFECYCLE_CHAIN_SOURCE_FILES.length,
   exposesAcceptedAlternativesAfterReview: true,
+  exposesAnonymousTokenInFeedbackHandoff: false,
   exposesAnswerKeysBeforeReview: false,
   exposesPromptTextInFeedbackHandoff: false,
   exposesRawRuntimeItemIdsInFeedbackHandoff: false,
   exposesStudentAnswerTextInFeedbackHandoff: false,
   exposesStudentNamesInFeedbackHandoff: false,
   exposesTeacherExplanationsBeforeReview: false,
+  exposesTeacherOnlyAnswerTextInFeedbackHandoff: false,
   itemIds: [...ANSWER_FEEDBACK_LIFECYCLE_CHAIN_HANDOFF_ITEM_IDS],
+  mutatesAttempts: false,
   preservesTeacherResultEvidence: true,
   publicFeedbackRespectsAnswerReveal: true,
   runtimeScoringUsesSharedMatcher: true,
   sourceFiles: [...ANSWER_FEEDBACK_LIFECYCLE_CHAIN_SOURCE_FILES],
   templateFeedbackUsesSharedComponent: true,
+  usesAnswerFeedbackHandoff: true,
+  usesSharedAcceptedAnswerParser: true,
+  usesSharedFeedbackViews: true,
 });
 assert.deepEqual(Object.fromEntries(answerFeedbackLifecycleChainValues), {
   'accepted-answer-parser': 'getAcceptedAnswers',
-  'answer-feedback-lifecycle-gate': '30 source files',
+  'answer-feedback-handoff-boundary': '30 feedback handoff slices',
   'answer-normalization': 'NFKC + punctuation',
   'blank-answer-guard': 'Blank is incorrect',
   'csv-export-feedback': 'Answer columns',
@@ -5377,7 +5383,7 @@ assert.deepEqual(Object.fromEntries(answerFeedbackLifecycleChainValues), {
 });
 assert.match(
   readFileSync('tests/e2e/TEST-CATALOG.md', 'utf8'),
-  /Answer feedback lifecycle chain has a fast script-level gate via[\s\S]*scripts\/answer-feedback-lifecycle-chain-handoff\.test\.ts/,
+  /Answer feedback lifecycle chain has a fast script-level gate via[\s\S]*scripts\/answer-feedback-lifecycle-chain-handoff\.test\.ts[\s\S]*answer feedback handoff boundary/,
   'TEST-CATALOG should document the answer feedback lifecycle chain gate.'
 );
 const assignmentLifecycleGovernanceChainView =

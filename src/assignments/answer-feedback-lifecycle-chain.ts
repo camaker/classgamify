@@ -28,7 +28,7 @@ export const ANSWER_FEEDBACK_LIFECYCLE_CHAIN_HANDOFF_ITEM_IDS = [
   'server-review-summary',
   'teacher-results-chain-alignment',
   'feedback-privacy-guard',
-  'answer-feedback-lifecycle-gate',
+  'answer-feedback-handoff-boundary',
 ] as const;
 
 export const ANSWER_FEEDBACK_LIFECYCLE_CHAIN_SOURCE_FILES = [
@@ -78,18 +78,24 @@ export type AnswerFeedbackLifecycleChainHandoffItemView = {
 export type AnswerFeedbackLifecycleChainPrivacyContract = {
   chainSourceFileCount: number;
   exposesAcceptedAlternativesAfterReview: true;
+  exposesAnonymousTokenInFeedbackHandoff: false;
   exposesAnswerKeysBeforeReview: false;
   exposesPromptTextInFeedbackHandoff: false;
   exposesRawRuntimeItemIdsInFeedbackHandoff: false;
   exposesStudentAnswerTextInFeedbackHandoff: false;
   exposesStudentNamesInFeedbackHandoff: false;
   exposesTeacherExplanationsBeforeReview: false;
+  exposesTeacherOnlyAnswerTextInFeedbackHandoff: false;
   itemIds: AnswerFeedbackLifecycleChainHandoffItemId[];
+  mutatesAttempts: false;
   preservesTeacherResultEvidence: true;
   publicFeedbackRespectsAnswerReveal: true;
   runtimeScoringUsesSharedMatcher: true;
   sourceFiles: string[];
   templateFeedbackUsesSharedComponent: true;
+  usesAnswerFeedbackHandoff: true;
+  usesSharedAcceptedAnswerParser: true;
+  usesSharedFeedbackViews: true;
 };
 
 export type AnswerFeedbackLifecycleChainHandoffView = {
@@ -111,18 +117,24 @@ export function buildAnswerFeedbackLifecycleChainHandoffView(): AnswerFeedbackLi
     privacy: {
       chainSourceFileCount: ANSWER_FEEDBACK_LIFECYCLE_CHAIN_SOURCE_FILES.length,
       exposesAcceptedAlternativesAfterReview: true,
+      exposesAnonymousTokenInFeedbackHandoff: false,
       exposesAnswerKeysBeforeReview: false,
       exposesPromptTextInFeedbackHandoff: false,
       exposesRawRuntimeItemIdsInFeedbackHandoff: false,
       exposesStudentAnswerTextInFeedbackHandoff: false,
       exposesStudentNamesInFeedbackHandoff: false,
       exposesTeacherExplanationsBeforeReview: false,
+      exposesTeacherOnlyAnswerTextInFeedbackHandoff: false,
       itemIds: [...ANSWER_FEEDBACK_LIFECYCLE_CHAIN_HANDOFF_ITEM_IDS],
+      mutatesAttempts: false,
       preservesTeacherResultEvidence: true,
       publicFeedbackRespectsAnswerReveal: true,
       runtimeScoringUsesSharedMatcher: true,
       sourceFiles: [...ANSWER_FEEDBACK_LIFECYCLE_CHAIN_SOURCE_FILES],
       templateFeedbackUsesSharedComponent: true,
+      usesAnswerFeedbackHandoff: true,
+      usesSharedAcceptedAnswerParser: true,
+      usesSharedFeedbackViews: true,
     },
     title: 'Answer feedback lifecycle chain',
   };
@@ -346,12 +358,12 @@ function getAnswerFeedbackLifecycleChainHandoffItem(
         'Private data hidden',
         'Feedback lifecycle handoffs hide prompts, raw runtime ids, student answers, student names, tokens, and teacher-only answers before review.'
       );
-    case 'answer-feedback-lifecycle-gate':
+    case 'answer-feedback-handoff-boundary':
       return item(
         id,
-        'Answer feedback lifecycle gate',
-        '30 source files',
-        'A focused gate keeps answer parsing, scoring, public feedback, template surfaces, teacher results, CSV export, and privacy connected.'
+        'Answer feedback handoff boundary',
+        '30 feedback handoff slices',
+        'Accepted-answer parser evidence, separator and normalization coverage, runtime scoring metrics, public review visibility, student feedback details, teacher analysis, CSV answer views, and feedback privacy guards stay aligned.'
       );
   }
 }

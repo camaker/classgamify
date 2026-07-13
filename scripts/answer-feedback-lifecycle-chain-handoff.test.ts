@@ -137,18 +137,24 @@ test('answer feedback lifecycle chain exposes 30 safe scoring slices', () => {
   assert.deepEqual(handoffView.privacy, {
     chainSourceFileCount: ANSWER_FEEDBACK_LIFECYCLE_CHAIN_SOURCE_FILES.length,
     exposesAcceptedAlternativesAfterReview: true,
+    exposesAnonymousTokenInFeedbackHandoff: false,
     exposesAnswerKeysBeforeReview: false,
     exposesPromptTextInFeedbackHandoff: false,
     exposesRawRuntimeItemIdsInFeedbackHandoff: false,
     exposesStudentAnswerTextInFeedbackHandoff: false,
     exposesStudentNamesInFeedbackHandoff: false,
     exposesTeacherExplanationsBeforeReview: false,
+    exposesTeacherOnlyAnswerTextInFeedbackHandoff: false,
     itemIds,
+    mutatesAttempts: false,
     preservesTeacherResultEvidence: true,
     publicFeedbackRespectsAnswerReveal: true,
     runtimeScoringUsesSharedMatcher: true,
     sourceFiles: [...ANSWER_FEEDBACK_LIFECYCLE_CHAIN_SOURCE_FILES],
     templateFeedbackUsesSharedComponent: true,
+    usesAnswerFeedbackHandoff: true,
+    usesSharedAcceptedAnswerParser: true,
+    usesSharedFeedbackViews: true,
   });
   assertNoPrivateFeedbackText(JSON.stringify(handoffView));
 });
@@ -188,7 +194,7 @@ test('answer feedback lifecycle chain summarizes each feedback boundary', () => 
       ['server-review-summary', 'Scored review payload'],
       ['teacher-results-chain-alignment', 'Results chain'],
       ['feedback-privacy-guard', 'Private data hidden'],
-      ['answer-feedback-lifecycle-gate', '30 source files'],
+      ['answer-feedback-handoff-boundary', '30 feedback handoff slices'],
     ]
   );
   assert.equal(
@@ -495,6 +501,11 @@ test('answer feedback lifecycle focused gate is documented', () => {
     normalizedCatalog,
     /accepted-answer parsing[\s\S]*answer normalization[\s\S]*runtime scoring[\s\S]*public post-submit feedback[\s\S]*template feedback surfaces[\s\S]*teacher result analysis[\s\S]*result answer text views[\s\S]*CSV answer columns[\s\S]*server review summaries[\s\S]*feedback privacy guards/,
     'TEST-CATALOG should describe the answer feedback lifecycle scope.'
+  );
+  assert.match(
+    normalizedCatalog,
+    /answer feedback handoff boundary/,
+    'TEST-CATALOG should document the concrete answer feedback handoff boundary.'
   );
 });
 
