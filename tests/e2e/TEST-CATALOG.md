@@ -160,8 +160,9 @@ result answer text views, CSV answer columns, server review summaries, or
 feedback privacy guards.
 Published assignment delivery chain has a fast script-level gate via
 `pnpm exec tsx --test scripts/published-assignment-delivery-chain-handoff.test.ts`;
-run it when changing publish preflight, frozen snapshots, share links,
-assignment list distribution, public student rules, lifecycle access,
+run it when changing publish preflight, the 30-slice publish control handoff
+boundary, frozen snapshots, share links, assignment list distribution, public
+student rules, lifecycle access,
 validated submissions, attempt persistence, timer duration policy, answer
 feedback, result stats, or results export handoffs.
 Assignment lifecycle governance chain has a fast script-level gate via

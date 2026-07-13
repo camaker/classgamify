@@ -8,7 +8,10 @@ import {
   type PublishedAssignmentDeliveryChainHandoffItemId,
   type PublishedAssignmentDeliveryChainHandoffView,
 } from '@/assignments/published-assignment-delivery-chain';
-import { ASSIGNMENT_PUBLISH_HANDOFF_ITEM_IDS } from '@/assignments/publish-input';
+import {
+  ASSIGNMENT_PUBLISH_CONTROL_BOUNDARY_ITEM_IDS,
+  ASSIGNMENT_PUBLISH_HANDOFF_ITEM_IDS,
+} from '@/assignments/publish-input';
 import {
   ASSIGNMENT_DELIVERY_POLICY_HANDOFF_ITEM_IDS,
   PUBLIC_ASSIGNMENT_RULES_HANDOFF_ITEM_IDS,
@@ -54,6 +57,7 @@ const RESULTS_EXPORT_SOURCE = readFileSync(
   'src/assignments/results-export.ts',
   'utf8'
 );
+const PRODUCT_SOURCE = readFileSync('docs/product.md', 'utf8');
 const TEST_CATALOG_SOURCE = readFileSync('tests/e2e/TEST-CATALOG.md', 'utf8');
 
 const PRIVATE_ACTIVITY_CONTENT = 'SECRET_ACTIVITY_CONTENT_JSON';
@@ -93,6 +97,7 @@ test('published assignment delivery chain exposes 30 product-loop slices', () =>
     exposesRawAnonymousTokens: false,
     exposesRawSettingsJson: false,
     exposesSourceMaterialStorageKeys: false,
+    exposesPreparedControlIdsInHandoff: false,
     freezesAssignmentSnapshots: true,
     itemIds,
     publicPayloadUsesRuntimeItemsOnly: true,
@@ -100,6 +105,8 @@ test('published assignment delivery chain exposes 30 product-loop slices', () =>
     resultExportsIncludeDeliveryPolicy: true,
     resultsPreserveAttempts: true,
     sourceFiles: [...PUBLISHED_ASSIGNMENT_DELIVERY_CHAIN_SOURCE_FILES],
+    usesOpaquePublishControlScope: true,
+    usesPublishControlHandoff: true,
   });
   assertNoPrivateDeliveryChainText(JSON.stringify(handoffView));
 });
@@ -139,7 +146,7 @@ test('published assignment delivery chain summarizes each linked delivery step',
       ['source-material-guard', 'Storage keys hidden'],
       ['raw-token-guard', 'Anonymous tokens hidden'],
       ['snapshot-results-retention', 'Attempts retained'],
-      ['delivery-chain-gate', '30 source files'],
+      ['publish-control-handoff-boundary', '30 publish control slices'],
     ]
   );
   assert.equal(
@@ -176,8 +183,9 @@ test('published assignment delivery chain stays backed by focused contracts', ()
       ASSIGNMENT_ANSWER_FEEDBACK_HANDOFF_ITEM_IDS.length,
       ASSIGNMENT_ATTEMPT_STATS_HANDOFF_ITEM_IDS.length,
       ASSIGNMENT_RESULTS_EXPORT_PREPARATION_ITEM_IDS.length,
+      ASSIGNMENT_PUBLISH_CONTROL_BOUNDARY_ITEM_IDS.length,
     ],
-    Array.from({ length: 17 }, () => 30)
+    Array.from({ length: 18 }, () => 30)
   );
 });
 
@@ -247,14 +255,21 @@ test('published assignment delivery privacy contracts stay explicit across surfa
 });
 
 test('published assignment delivery chain focused gate is documented', () => {
+  const normalizedCatalog = TEST_CATALOG_SOURCE.replace(/\s+/g, ' ');
+
+  assert.match(
+    PRODUCT_SOURCE,
+    /published-assignment delivery chain[\s\S]*publish dialog's 30[\s\S]*review checklist[\s\S]*opaque[\s\S]*omit generated control ids[\s\S]*raw settings[\s\S]*source-material storage keys/,
+    'docs/product.md should describe the publish-control handoff and opaque-id privacy boundary.'
+  );
   assert.match(
     TEST_CATALOG_SOURCE,
     /Published assignment delivery chain has a fast script-level gate via[\s\S]*scripts\/published-assignment-delivery-chain-handoff\.test\.ts/,
     'TEST-CATALOG should document the published assignment delivery chain gate.'
   );
   assert.match(
-    TEST_CATALOG_SOURCE,
-    /publish preflight[\s\S]*frozen snapshots[\s\S]*share links[\s\S]*public student rules[\s\S]*validated submissions[\s\S]*results export/,
+    normalizedCatalog,
+    /publish preflight[\s\S]*30-slice publish control handoff boundary[\s\S]*frozen snapshots[\s\S]*share links[\s\S]*public student rules[\s\S]*validated submissions[\s\S]*results export/,
     'TEST-CATALOG should document the cross-module assignment delivery chain scope.'
   );
 });

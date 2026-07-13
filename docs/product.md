@@ -243,6 +243,13 @@ keyboard users can verify the same assignment policy before publishing.
 Publish-dialog timer and close-time parsing should also live in assignment
 domain helpers so preview values and submitted settings use the same input
 rules.
+The published-assignment delivery chain should carry the publish dialog's 30
+control slices for title, instructions, attempt limit, timer, close time,
+delivery toggles, preview state, frozen-link status, rule stats, settings
+summary, review checklist, validation, field limits, and publish action state.
+Prepared field/help and preview/checklist relationships should use an opaque
+control scope, while aggregate handoffs omit generated control ids, assignment
+copy, raw settings, student data, answers, and source-material storage keys.
 Assignment item ordering is also delivery policy. Shuffle behavior should use a
 stable assignment-domain helper keyed by the share link so the same frozen
 assignment loads in a predictable order while preserving the original snapshot

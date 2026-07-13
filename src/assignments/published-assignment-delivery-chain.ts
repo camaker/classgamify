@@ -28,7 +28,7 @@ export const PUBLISHED_ASSIGNMENT_DELIVERY_CHAIN_HANDOFF_ITEM_IDS = [
   'source-material-guard',
   'raw-token-guard',
   'snapshot-results-retention',
-  'delivery-chain-gate',
+  'publish-control-handoff-boundary',
 ] as const;
 
 export const PUBLISHED_ASSIGNMENT_DELIVERY_CHAIN_SOURCE_FILES = [
@@ -83,6 +83,7 @@ export type PublishedAssignmentDeliveryChainPrivacyContract = {
   exposesRawAnonymousTokens: false;
   exposesRawSettingsJson: false;
   exposesSourceMaterialStorageKeys: false;
+  exposesPreparedControlIdsInHandoff: false;
   freezesAssignmentSnapshots: true;
   itemIds: PublishedAssignmentDeliveryChainHandoffItemId[];
   publicPayloadUsesRuntimeItemsOnly: true;
@@ -90,6 +91,8 @@ export type PublishedAssignmentDeliveryChainPrivacyContract = {
   resultExportsIncludeDeliveryPolicy: true;
   resultsPreserveAttempts: true;
   sourceFiles: string[];
+  usesOpaquePublishControlScope: true;
+  usesPublishControlHandoff: true;
 };
 
 export type PublishedAssignmentDeliveryChainHandoffView = {
@@ -117,6 +120,7 @@ export function buildPublishedAssignmentDeliveryChainHandoffView(): PublishedAss
       exposesRawAnonymousTokens: false,
       exposesRawSettingsJson: false,
       exposesSourceMaterialStorageKeys: false,
+      exposesPreparedControlIdsInHandoff: false,
       freezesAssignmentSnapshots: true,
       itemIds: [...PUBLISHED_ASSIGNMENT_DELIVERY_CHAIN_HANDOFF_ITEM_IDS],
       publicPayloadUsesRuntimeItemsOnly: true,
@@ -124,6 +128,8 @@ export function buildPublishedAssignmentDeliveryChainHandoffView(): PublishedAss
       resultExportsIncludeDeliveryPolicy: true,
       resultsPreserveAttempts: true,
       sourceFiles: [...PUBLISHED_ASSIGNMENT_DELIVERY_CHAIN_SOURCE_FILES],
+      usesOpaquePublishControlScope: true,
+      usesPublishControlHandoff: true,
     },
     title: 'Published assignment delivery chain',
   };
@@ -347,12 +353,12 @@ function getPublishedAssignmentDeliveryChainHandoffItem(
         'Attempts retained',
         'Closing or expiring a link blocks new public access while preserving prior attempts for teacher review.'
       );
-    case 'delivery-chain-gate':
+    case 'publish-control-handoff-boundary':
       return item(
         id,
-        'Delivery chain gate',
-        '30 source files',
-        'The published assignment delivery chain keeps publish, public runner, submission, and result/export gates connected.'
+        'Publish control handoff boundary',
+        '30 publish control slices',
+        'Publish fields and help, delivery toggles, preview state, frozen-link status, rule stats, settings summary, review checklist, validation, limits, action state, opaque control ids, and privacy guards stay aligned.'
       );
   }
 }

@@ -5011,6 +5011,7 @@ assert.deepEqual(publishedAssignmentDeliveryChainView.privacy, {
   exposesRawAnonymousTokens: false,
   exposesRawSettingsJson: false,
   exposesSourceMaterialStorageKeys: false,
+  exposesPreparedControlIdsInHandoff: false,
   freezesAssignmentSnapshots: true,
   itemIds: [...PUBLISHED_ASSIGNMENT_DELIVERY_CHAIN_HANDOFF_ITEM_IDS],
   publicPayloadUsesRuntimeItemsOnly: true,
@@ -5018,6 +5019,8 @@ assert.deepEqual(publishedAssignmentDeliveryChainView.privacy, {
   resultExportsIncludeDeliveryPolicy: true,
   resultsPreserveAttempts: true,
   sourceFiles: [...PUBLISHED_ASSIGNMENT_DELIVERY_CHAIN_SOURCE_FILES],
+  usesOpaquePublishControlScope: true,
+  usesPublishControlHandoff: true,
 });
 assert.deepEqual(
   [
@@ -5038,8 +5041,9 @@ assert.deepEqual(
     ASSIGNMENT_ANSWER_FEEDBACK_HANDOFF_ITEM_IDS.length,
     ASSIGNMENT_ATTEMPT_STATS_HANDOFF_ITEM_IDS.length,
     ASSIGNMENT_RESULTS_EXPORT_PREPARATION_ITEM_IDS.length,
+    ASSIGNMENT_PUBLISH_CONTROL_BOUNDARY_ITEM_IDS.length,
   ],
-  Array.from({ length: 17 }, () => 30),
+  Array.from({ length: 18 }, () => 30),
   'Published assignment delivery chain should stay backed by focused assignment gates.'
 );
 assert.deepEqual(Object.fromEntries(publishedAssignmentDeliveryChainValues), {
@@ -5049,7 +5053,7 @@ assert.deepEqual(Object.fromEntries(publishedAssignmentDeliveryChainValues), {
   'attempt-persistence': 'Scored attempt row',
   'close-time-lifecycle': 'Closed or expired blocked',
   'csv-export-policy': 'Delivery rules included',
-  'delivery-chain-gate': '30 source files',
+  'publish-control-handoff-boundary': '30 publish control slices',
   'delivery-policy-summary': 'Teacher-visible rules',
   'item-order-policy': 'Stable shuffled order',
   'list-filter-owner-scope': 'Owner assignments only',
