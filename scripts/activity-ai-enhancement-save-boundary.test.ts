@@ -7,7 +7,10 @@ import {
   buildActivityAiEnhancementSaveBoundaryView,
   type ActivityAiEnhancementSaveBoundarySource,
 } from '@/activities/ai-enhancement-save-boundary';
-import { ACTIVITY_AI_ENHANCEMENT_EDITOR_REVIEW_CHECK_IDS } from '@/activities/ai-enhancement-editor-review';
+import {
+  ACTIVITY_AI_ENHANCEMENT_EDITOR_REVIEW_CHECK_IDS,
+  ACTIVITY_AI_ENHANCEMENT_EDITOR_REVIEW_ITEM_IDS,
+} from '@/activities/ai-enhancement-editor-review';
 import type {
   ActivityContent,
   ActivityMaterialReference,
@@ -72,6 +75,7 @@ test('activity AI enhancement save boundary exposes 30 stable save slices', () =
     requiresTeacherSaveAction: true,
     scope: 'activity-ai-enhancement-save-boundary',
     usesActivityEditorSaveGate: true,
+    usesEditorReviewHandoff: true,
     usesEditorReviewPlan: true,
     writesOnlyActivityRecord: true,
   });
@@ -97,6 +101,11 @@ test('activity AI enhancement save boundary waits for teacher save action', () =
   );
   assert.equal(values.get('blocked-reason'), 'teacher-save-action-required');
   assert.equal(values.get('protected-snapshot-count'), '2 snapshots protected');
+  assert.equal(
+    values.get('editor-review-handoff-boundary'),
+    '30 editor review slices'
+  );
+  assert.equal(ACTIVITY_AI_ENHANCEMENT_EDITOR_REVIEW_ITEM_IDS.length, 30);
   assertNoPrivateSaveText(JSON.stringify(view));
 });
 
@@ -192,18 +201,23 @@ test('activity AI enhancement save boundary gate is wired into docs and coverage
   );
   assert.match(
     SAVE_BOUNDARY_SOURCE,
-    /export const ACTIVITY_AI_ENHANCEMENT_SAVE_BOUNDARY_ITEM_IDS = \[[\s\S]*'save-scope'[\s\S]*'teacher-save-action'[\s\S]*'save-execution-plan'[\s\S]*'activity-record-target'[\s\S]*'manual-persistence-boundary'[\s\S]*'save-chain-gate'/,
+    /export const ACTIVITY_AI_ENHANCEMENT_SAVE_BOUNDARY_ITEM_IDS = \[[\s\S]*'save-scope'[\s\S]*'teacher-save-action'[\s\S]*'save-execution-plan'[\s\S]*'activity-record-target'[\s\S]*'manual-persistence-boundary'[\s\S]*'editor-review-handoff-boundary'/,
     'Save boundary source should preserve the 30-slice save boundary.'
   );
   assert.match(
     PRODUCT_SOURCE,
-    /src\/activities\/ai-enhancement-save-boundary\.ts` owns the manual save boundary/,
+    /src\/activities\/ai-enhancement-save-boundary\.ts` owns the manual save boundary[\s\S]*30-slice teacher editor-review handoff/,
     'docs/product.md should document the AI enhancement save boundary owner.'
   );
   assert.match(
     TEST_CATALOG_SOURCE,
     /Activity AI enhancement save boundary has a fast script-level gate via[\s\S]*scripts\/activity-ai-enhancement-save-boundary\.test\.ts[\s\S]*teacher save actions[\s\S]*create\/edit save plans[\s\S]*activity-id\s+gates[\s\S]*manual persistence boundaries[\s\S]*snapshot protection[\s\S]*privacy guards/,
     'TEST-CATALOG should document the AI enhancement save boundary gate.'
+  );
+  assert.match(
+    TEST_CATALOG_SOURCE,
+    /30-slice\s+editor-review\s+handoff/,
+    'TEST-CATALOG should document the editor-review handoff.'
   );
 });
 

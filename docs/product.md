@@ -606,7 +606,10 @@ Implementation boundaries:
   after teacher review: teacher save actions, create/edit save plans,
   activity-id gates, manual persistence boundaries, activity-record targets,
   publish blocking, snapshot protection, result continuity, and private
-  draft/source-material privacy.
+  draft/source-material privacy. Its final boundary explicitly carries the
+  30-slice teacher editor-review handoff so incomplete checklists, invalid draft
+  applications, hidden source details, or missing teacher confirmation cannot
+  reach create/edit persistence, assignment publishing, or snapshot mutation.
 - `src/activities/ai-enhancement-publish-boundary.ts` owns the assignment publish boundary
   after a reviewed AI enhancement draft is saved: saved activity records,
   teacher publish actions, assignment publish preflight, share-link creation

@@ -691,8 +691,8 @@ Activity AI enhancement save boundary has a fast script-level gate via
 `pnpm exec tsx --test scripts/activity-ai-enhancement-save-boundary.test.ts`;
 run it when changing teacher save actions, create/edit save plans, activity-id
 gates, manual persistence boundaries, activity-record targets, publish
-blocking, snapshot protection, result continuity, source-material privacy, or
-privacy guards.
+blocking, snapshot protection, result continuity, source-material privacy, the
+30-slice editor-review handoff, or privacy guards.
 Activity AI enhancement publish boundary has a fast script-level gate via
 `pnpm exec tsx --test scripts/activity-ai-enhancement-publish-boundary.test.ts`;
 run it when changing saved activity records, teacher publish actions,

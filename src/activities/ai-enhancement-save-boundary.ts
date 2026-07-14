@@ -3,6 +3,7 @@ import {
   type ActivityEditorSaveBlockedReason,
 } from '@/activities/editor';
 import {
+  ACTIVITY_AI_ENHANCEMENT_EDITOR_REVIEW_ITEM_IDS,
   buildActivityAiEnhancementEditorReviewPlan,
   type ActivityAiEnhancementEditorReviewPlan,
   type ActivityAiEnhancementEditorReviewSource,
@@ -38,7 +39,7 @@ export const ACTIVITY_AI_ENHANCEMENT_SAVE_BOUNDARY_ITEM_IDS = [
   'review-checklist-continuity',
   'fallback-provider-continuity',
   'blocked-reason',
-  'save-chain-gate',
+  'editor-review-handoff-boundary',
 ] as const;
 
 export type ActivityAiEnhancementSaveBoundaryItemId =
@@ -119,6 +120,7 @@ export type ActivityAiEnhancementSaveBoundaryPrivacyContract = {
   requiresTeacherSaveAction: true;
   scope: 'activity-ai-enhancement-save-boundary';
   usesActivityEditorSaveGate: true;
+  usesEditorReviewHandoff: true;
   usesEditorReviewPlan: true;
   writesOnlyActivityRecord: true;
 };
@@ -141,6 +143,7 @@ type ActivityAiEnhancementSaveBoundarySummary = {
   draftTextPrivacy: string;
   editActivityIdGate: string;
   editorOnlySource: string;
+  editorReviewHandoffBoundary: string;
   editorReviewSource: string;
   fallbackProviderContinuity: string;
   fileByteGuard: string;
@@ -152,7 +155,6 @@ type ActivityAiEnhancementSaveBoundarySummary = {
   resultExportContinuity: string;
   reviewChecklistContinuity: string;
   reviewStatus: string;
-  saveChainGate: string;
   saveExecutionPlan: string;
   saveMode: string;
   saveScope: string;
@@ -327,6 +329,9 @@ function buildActivityAiEnhancementSaveBoundarySummary(
         : 'Activity id required'
       : 'Create mode',
     editorOnlySource: 'Reviewed editor draft',
+    editorReviewHandoffBoundary:
+      `${ACTIVITY_AI_ENHANCEMENT_EDITOR_REVIEW_ITEM_IDS.length} ` +
+      'editor review slices',
     editorReviewSource: plan.review.status,
     fallbackProviderContinuity:
       formatActivityAiEnhancementSaveSourceContinuity(plan),
@@ -343,7 +348,6 @@ function buildActivityAiEnhancementSaveBoundarySummary(
       `${plan.review.reviewedCheckCount}/` +
       `${plan.review.requiredReviewCount} reviewed`,
     reviewStatus: plan.review.status,
-    saveChainGate: '30 save slices',
     saveExecutionPlan: plan.saveExecution?.type ?? 'not-built',
     saveMode: plan.mode,
     saveScope: 'Manual activity save',
@@ -603,12 +607,12 @@ function buildActivityAiEnhancementSaveBoundaryItem({
         summary.blockedReason,
         'Blocked save states keep one structured reason for diagnostics.'
       );
-    case 'save-chain-gate':
+    case 'editor-review-handoff-boundary':
       return item(
         id,
-        'Save chain gate',
-        summary.saveChainGate,
-        'A focused gate keeps review, manual save, persistence, publish, snapshot, and privacy boundaries aligned.'
+        'Editor review handoff boundary',
+        summary.editorReviewHandoffBoundary,
+        'Manual save remains backed by the complete teacher editor-review contract.'
       );
   }
 }
@@ -653,6 +657,7 @@ function buildActivityAiEnhancementSaveBoundaryPrivacyContract(
     requiresTeacherSaveAction: true,
     scope: 'activity-ai-enhancement-save-boundary',
     usesActivityEditorSaveGate: true,
+    usesEditorReviewHandoff: true,
     usesEditorReviewPlan: true,
     writesOnlyActivityRecord: true,
   };
