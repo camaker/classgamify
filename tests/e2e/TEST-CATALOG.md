@@ -199,6 +199,12 @@ Source-material write/delete races have a fast script-level gate via
 run it when changing activity or snapshot source-material writes, file metadata
 deletion order, D1 integrity triggers, R2 delete recovery, nested trigger-error
 mapping, or concurrent reference safety.
+Private file upload persistence has a fast script-level gate via
+`pnpm exec tsx --test scripts/user-file-upload-persistence-contract.test.ts`;
+run it when changing private R2 uploads, `user_files` metadata insertion,
+ambiguous-commit probes, post-upload compensation, object-presence probes,
+bounded cleanup retries, public-folder bypass, localized cleanup errors, or
+upload-path privacy.
 Assignment lifecycle governance chain has a fast script-level gate via
 `pnpm exec tsx --test scripts/assignment-lifecycle-governance-chain-handoff.test.ts`;
 run it when changing open/closed/expired/draft status resolution,

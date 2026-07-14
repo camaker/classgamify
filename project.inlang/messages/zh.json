@@ -8168,6 +8168,7 @@
   "user_files_api_error_invalid_file_type": "暂不支持这种文件类型。支持的类型：{supportedExtensions}。",
   "user_files_api_error_storage_unavailable": "文件存储暂时不可用，请稍后再试。",
   "user_files_api_error_supported_file_types_unknown": "已配置的课堂文件类型",
+  "user_files_api_error_upload_cleanup_failed": "上传记录未能保存，且无法确认存储清理结果。请稍后再试。",
   "user_files_api_error_upload_failed": "上传文件时发生错误",
   "worksheets_page_browse_templates": "浏览模板",
   "worksheets_page_delivery_loop_aria_label": "{title}：{description}",

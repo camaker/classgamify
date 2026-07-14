@@ -132,6 +132,14 @@ Files are always served via the same-origin route `/api/storage/file?key=...`.
   uploads to R2; inserts private user-scoped uploads into the `userFiles`
   table; and returns `{ url, key }`. Used by `useUploadUserFile()` and
   `useUploadUserAvatar()`.
+  - Private upload success is returned only after D1 metadata persistence. If
+    metadata insertion reports failure after R2 accepted the object, the server
+    first probes D1 by the exact owner, file id, and R2 key. A committed row keeps
+    the object; confirmed absence starts object deletion as compensation. A failed
+    cleanup delete uses one presence probe and at most one retry. Unknown D1 or R2
+    state returns a localized cleanup failure without deleting blindly or exposing
+    the object key. Public folders bypass this private metadata compensation
+    because they intentionally have no `userFiles` row.
 
 - **formatUserFileUploadError** (server/domain helper, in
   `@/api/user-file-errors`): Converts structured storage error codes into

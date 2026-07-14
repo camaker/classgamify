@@ -184,6 +184,17 @@ activity write cannot attach a disappearing object. If R2 reports a delete error
 the server probes object presence: an absent object completes deletion, a present
 object attempts metadata restoration for retry, and an unknown or failed recovery
 stays unavailable rather than allowing a broken classroom reference.
+Private source-material uploads must also compensate across the R2 and D1
+boundary. A successful private R2 write is not returned until its owner-scoped
+`userFiles` metadata is persisted. If that insert reports failure, the server
+first probes the exact owner, file id, and R2 key because a committed insert may
+have lost its response. Confirmed persistence keeps the object and completes the
+upload; confirmed absence starts compensation. A failed cleanup delete is checked
+with one object-presence probe: confirmed absence completes cleanup, confirmed
+presence receives one bounded delete retry, and retained or unknown results return
+one localized cleanup error. An unknown D1 probe never deletes the object blindly.
+Public avatar and product-asset folders keep their existing metadata-free path
+and are not included in private upload compensation.
 The source-material privacy chain should explicitly carry the compact material
 reference handoff's 30 slices for reference shape, safe file ids and filename
 basenames, content-type, material kind and size normalization, duplicate

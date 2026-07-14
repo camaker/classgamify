@@ -163,6 +163,10 @@ test('settings files upload errors stay localized and do not clear failed input'
 });
 
 test('settings files hooks and APIs keep owner scope and sanitized material lists', () => {
+  const materialListApiSource = USER_FILES_API_SOURCE.slice(
+    USER_FILES_API_SOURCE.indexOf('export const listUserFileMaterials'),
+    USER_FILES_API_SOURCE.indexOf('const deleteSchema')
+  );
   assert.match(
     USER_FILES_HOOK_SOURCE,
     /queryKey: userFilesKeys\.list\(\{ pageIndex, pageSize \}\)[\s\S]*queryFn: \(\) => listUserFiles\(\{ data: \{ pageIndex, pageSize \} \}\)/,
@@ -194,24 +198,24 @@ test('settings files hooks and APIs keep owner scope and sanitized material list
     'File list API should summarize all owner rows, not only visible items.'
   );
   assert.match(
-    USER_FILES_API_SOURCE,
-    /listUserFileMaterials[\s\S]*select\(\{[\s\S]*contentType: userFiles\.contentType,[\s\S]*filename: userFiles\.filename,[\s\S]*id: userFiles\.id,[\s\S]*originalName: userFiles\.originalName,[\s\S]*size: userFiles\.size,[\s\S]*\}\)[\s\S]*where\(where\)/,
+    materialListApiSource,
+    /select\(\{[\s\S]*contentType: userFiles\.contentType,[\s\S]*filename: userFiles\.filename,[\s\S]*id: userFiles\.id,[\s\S]*originalName: userFiles\.originalName,[\s\S]*size: userFiles\.size,[\s\S]*\}\)[\s\S]*where\(where\)/,
     'Material list API should select only safe picker fields.'
   );
   assert.doesNotMatch(
-    USER_FILES_API_SOURCE,
-    /listUserFileMaterials[\s\S]*r2Key: userFiles\.r2Key|listUserFileMaterials[\s\S]*isPublic: userFiles\.isPublic|listUserFileMaterials[\s\S]*description: userFiles\.description/,
+    materialListApiSource,
+    /r2Key: userFiles\.r2Key|isPublic: userFiles\.isPublic|description: userFiles\.description/,
     'Material list API should not expose storage keys, access flags, or notes.'
   );
   assert.match(
     USER_FILES_API_SOURCE,
-    /const where = buildUserFileDetailOwnerWhere\(\{[\s\S]*fileId: data\.id,[\s\S]*userId,[\s\S]*\}\);[\s\S]*await deleteFile\(row\.r2Key\);[\s\S]*await db\.delete\(userFiles\)\.where\(where\);/,
-    'Delete API should delete storage and DB rows through owner scope.'
+    /const where = buildUserFileDetailOwnerWhere\(\{[\s\S]*fileId: data\.id,[\s\S]*userId,[\s\S]*\}\);[\s\S]*\.delete\(userFiles\)[\s\S]*\.where\(where\)[\s\S]*await deleteFile\(deletedRow\.r2Key\)/,
+    'Delete API should claim owner-scoped metadata before deleting storage.'
   );
   assert.match(
     USER_FILES_API_SOURCE,
-    /const publicFolder = isPublicFolder\(data\.folder\);[\s\S]*userId: publicFolder \? undefined : \(userId \?\? undefined\)[\s\S]*if \(!publicFolder && userId && result\.metadata\) \{[\s\S]*userId,[\s\S]*r2Key: result\.metadata\.r2Key/,
-    'Upload API should only persist metadata for owner-scoped files.'
+    /const publicFolder = isPublicFolder\(data\.folder\);[\s\S]*userId: publicFolder \? undefined : \(userId \?\? undefined\)[\s\S]*if \(!publicFolder\) \{[\s\S]*const metadata = result\.metadata[\s\S]*userId,[\s\S]*r2Key: metadata\.r2Key/,
+    'Upload API should only persist required metadata for owner-scoped files.'
   );
 });
 

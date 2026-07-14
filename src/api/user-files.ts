@@ -26,6 +26,11 @@ import {
   USER_FILE_LIST_INPUT_LIMITS,
 } from '@/storage/file-query';
 import { buildUserFileMaterialSummary } from '@/storage/file-summary';
+import {
+  cleanupUploadedObjectAfterMetadataFailure,
+  recoverUserFileUploadAfterMetadataFailure,
+  type UploadedObjectCleanupResult,
+} from '@/storage/upload-persistence';
 import { StorageError, UploadError } from '@/storage/types';
 import { isPublicFolder } from '@/storage/utils';
 import { createServerFn } from '@tanstack/react-start';
@@ -220,48 +225,91 @@ export const uploadUserFile = createServerFn({ method: 'POST' })
   .middleware([authApiMiddleware])
   .handler(async ({ data, context }) => {
     const { userId } = context;
-    try {
-      const requestOrigin = getBaseUrl();
-      const publicFolder = isPublicFolder(data.folder);
+    const requestOrigin = getBaseUrl();
+    const publicFolder = isPublicFolder(data.folder);
+    let result: Awaited<ReturnType<typeof uploadFile>>;
 
+    try {
       // Public folders (avatars, product logos/og-images) are shared resources:
       // no userId → stored directly under folder → no userFiles DB record.
       // Private files get userId scoping and are tracked in userFiles.
-      const result = await uploadFile(
-        data.file,
-        data.file.name,
-        data.file.type,
-        {
-          folder: data.folder,
-          userId: publicFolder ? undefined : (userId ?? undefined),
-          requestOrigin,
-        }
-      );
-
-      // Only user-scoped uploads produce metadata; record them in DB
-      if (!publicFolder && userId && result.metadata) {
-        const db = getDb();
-        const now = result.metadata.uploadedAt;
-        await db.insert(userFiles).values({
-          id: result.metadata.id,
-          userId,
-          filename: result.metadata.filename,
-          originalName: result.metadata.originalName,
-          contentType: result.metadata.contentType,
-          size: result.metadata.size,
-          r2Key: result.metadata.r2Key,
-          createdAt: now,
-          updatedAt: now,
-          isPublic: data.isPublic ?? null,
-          description: data.description ?? null,
-        });
-      }
-
-      return result;
+      result = await uploadFile(data.file, data.file.name, data.file.type, {
+        folder: data.folder,
+        userId: publicFolder ? undefined : (userId ?? undefined),
+        requestOrigin,
+      });
     } catch (error) {
       if (error instanceof UploadError || error instanceof StorageError) {
         throw new Error(formatUserFileUploadError(error));
       }
       throw new Error(m.user_files_api_error_upload_failed());
     }
+
+    // Only user-scoped uploads produce metadata; record them in DB.
+    if (!publicFolder) {
+      const metadata = result.metadata;
+      if (!userId || !metadata) {
+        await throwUserFileUploadPersistenceFailure(result.key);
+      }
+      const db = getDb();
+      const now = metadata.uploadedAt;
+      try {
+        await db.insert(userFiles).values({
+          id: metadata.id,
+          userId,
+          filename: metadata.filename,
+          originalName: metadata.originalName,
+          contentType: metadata.contentType,
+          size: metadata.size,
+          r2Key: metadata.r2Key,
+          createdAt: now,
+          updatedAt: now,
+          isPublic: data.isPublic ?? null,
+          description: data.description ?? null,
+        });
+      } catch {
+        const recovery = await recoverUserFileUploadAfterMetadataFailure({
+          deleteObject: () => deleteFile(metadata.r2Key),
+          probeMetadata: async () => {
+            const [persistedRow] = await db
+              .select({ r2Key: userFiles.r2Key })
+              .from(userFiles)
+              .where(
+                buildUserFileDetailOwnerWhere({
+                  fileId: metadata.id,
+                  userId,
+                })
+              )
+              .limit(1);
+            return persistedRow?.r2Key === metadata.r2Key;
+          },
+          probeObject: () => getFileInfo(metadata.r2Key),
+        });
+        if (recovery !== 'persisted') {
+          throwUserFileUploadPersistenceError(recovery);
+        }
+      }
+    }
+
+    return result;
   });
+
+async function throwUserFileUploadPersistenceFailure(
+  r2Key: string
+): Promise<never> {
+  const cleanup = await cleanupUploadedObjectAfterMetadataFailure({
+    deleteObject: () => deleteFile(r2Key),
+    probeObject: () => getFileInfo(r2Key),
+  });
+  throwUserFileUploadPersistenceError(cleanup);
+}
+
+function throwUserFileUploadPersistenceError(
+  cleanup: UploadedObjectCleanupResult
+): never {
+  throw new Error(
+    cleanup === 'cleaned'
+      ? m.user_files_api_error_upload_failed()
+      : m.user_files_api_error_upload_cleanup_failed()
+  );
+}

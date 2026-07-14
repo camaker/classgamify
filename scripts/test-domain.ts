@@ -119,6 +119,7 @@ import { ACTIVITY_DERIVATIVE_SOURCE_WRITE_GUARD_STAGES } from '@/activities/deri
 import { SOURCE_MATERIAL_INTEGRITY_STAGES } from '@/activities/source-material-integrity';
 import { ACTIVITY_SOURCE_MATERIAL_WRITE_STAGES } from '@/activities/source-material-write';
 import { ACTIVITY_SOURCE_MATERIAL_DELETE_STAGES } from '@/activities/source-material-delete';
+import { USER_FILE_UPLOAD_PERSISTENCE_STAGES } from '@/storage/upload-persistence';
 import {
   AUTH_ERROR_RECOVERY_STEP_IDS,
   buildAuthErrorDisplayView,
@@ -5512,6 +5513,17 @@ assert.equal(ACTIVITY_DERIVATIVE_SOURCE_WRITE_GUARD_STAGES.length, 30);
 assert.equal(ACTIVITY_SOURCE_MATERIAL_WRITE_STAGES.length, 30);
 assert.equal(ACTIVITY_SOURCE_MATERIAL_DELETE_STAGES.length, 30);
 assert.equal(SOURCE_MATERIAL_INTEGRITY_STAGES.length, 30);
+assert.equal(USER_FILE_UPLOAD_PERSISTENCE_STAGES.length, 30);
+assert.equal(
+  new Set(USER_FILE_UPLOAD_PERSISTENCE_STAGES.map((stage) => stage.id)).size,
+  30
+);
+assert.equal(
+  USER_FILE_UPLOAD_PERSISTENCE_STAGES.filter(
+    (stage) => stage.layer === 'storage'
+  ).length,
+  8
+);
 assert.equal(
   new Set(SOURCE_MATERIAL_INTEGRITY_STAGES.map((stage) => stage.id)).size,
   30
@@ -14916,6 +14928,10 @@ assert.match(
   'User file upload mutation should use FormData and refresh the file library.'
 );
 const userFilesApiSource = readFileSync('src/api/user-files.ts', 'utf8');
+const userFileMaterialsApiSource = userFilesApiSource.slice(
+  userFilesApiSource.indexOf('export const listUserFileMaterials'),
+  userFilesApiSource.indexOf('const deleteSchema')
+);
 const userFileQuerySource = readFileSync('src/storage/file-query.ts', 'utf8');
 assert.deepEqual(USER_FILE_LIST_INPUT_LIMITS, {
   pageSizeMax: 100,
@@ -14996,19 +15012,19 @@ assert.match(
   'User file list API should summarize all owner rows, not only the visible page.'
 );
 assert.match(
-  userFilesApiSource,
-  /listUserFileMaterials[\s\S]*select\(\{[\s\S]*contentType: userFiles\.contentType,[\s\S]*filename: userFiles\.filename,[\s\S]*id: userFiles\.id,[\s\S]*originalName: userFiles\.originalName,[\s\S]*size: userFiles\.size,[\s\S]*\}\)[\s\S]*where\(where\)/,
+  userFileMaterialsApiSource,
+  /select\(\{[\s\S]*contentType: userFiles\.contentType,[\s\S]*filename: userFiles\.filename,[\s\S]*id: userFiles\.id,[\s\S]*originalName: userFiles\.originalName,[\s\S]*size: userFiles\.size,[\s\S]*\}\)[\s\S]*where\(where\)/,
   'User file materials API should expose only safe picker fields.'
 );
 assert.doesNotMatch(
-  userFilesApiSource,
-  /listUserFileMaterials[\s\S]*r2Key: userFiles\.r2Key|listUserFileMaterials[\s\S]*isPublic: userFiles\.isPublic|listUserFileMaterials[\s\S]*description: userFiles\.description/,
+  userFileMaterialsApiSource,
+  /r2Key: userFiles\.r2Key|isPublic: userFiles\.isPublic|description: userFiles\.description/,
   'User file materials API should not expose storage keys, access flags, or private notes.'
 );
 assert.match(
   userFilesApiSource,
-  /const publicFolder = isPublicFolder\(data\.folder\);[\s\S]*userId: publicFolder \? undefined : \(userId \?\? undefined\)[\s\S]*if \(!publicFolder && userId && result\.metadata\)/,
-  'User file upload API should persist metadata only for owner-scoped files.'
+  /const publicFolder = isPublicFolder\(data\.folder\);[\s\S]*userId: publicFolder \? undefined : \(userId \?\? undefined\)[\s\S]*if \(!publicFolder\) \{[\s\S]*const metadata = result\.metadata[\s\S]*if \(!userId \|\| !metadata\)[\s\S]*throwUserFileUploadPersistenceFailure\(result\.key\)[\s\S]*insert\(userFiles\)\.values[\s\S]*recoverUserFileUploadAfterMetadataFailure[\s\S]*fileId: metadata\.id,[\s\S]*userId,[\s\S]*persistedRow\?\.r2Key === metadata\.r2Key[\s\S]*recovery !== 'persisted'[\s\S]*return result/,
+  'User file upload API should require owner metadata, resolve ambiguous commits, compensate confirmed failures, and return afterward.'
 );
 assert.doesNotMatch(
   userFilesApiSource,

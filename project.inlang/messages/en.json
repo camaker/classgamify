@@ -8168,6 +8168,7 @@
   "user_files_api_error_invalid_file_type": "This file type is not supported. Supported types: {supportedExtensions}.",
   "user_files_api_error_storage_unavailable": "File storage is temporarily unavailable. Please try again later.",
   "user_files_api_error_supported_file_types_unknown": "configured classroom file types",
+  "user_files_api_error_upload_cleanup_failed": "The upload could not be saved, and storage cleanup could not be confirmed. Try again later.",
   "user_files_api_error_upload_failed": "Something went wrong while uploading the file",
   "worksheets_page_browse_templates": "Browse templates",
   "worksheets_page_delivery_loop_aria_label": "{title}: {description}",
