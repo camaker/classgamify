@@ -6,6 +6,8 @@ import type {
 import type { ActivityLibrarySummary } from '@/activities/library-summary';
 import {
   activityLibrarySearchCopy,
+  type ActivityLibraryFilterHandoffItemView,
+  type ActivityLibraryFilterHandoffView,
   buildActivityLibrarySearchPanelView,
 } from '@/activities/library-view';
 import { Button } from '@/components/ui/button';
@@ -72,6 +74,9 @@ export function ActivityLibrarySearch({
 
   return (
     <section className="grid gap-4 rounded-lg border bg-card p-4 xl:grid-cols-[minmax(0,1fr)_13rem_13rem_13rem_auto] xl:items-end">
+      <ActivityLibraryFilterHandoff
+        handoffView={searchPanelView.filterHandoffView}
+      />
       <div className="grid gap-2">
         <label
           htmlFor="activity-library-search"
@@ -235,5 +240,54 @@ export function ActivityLibrarySearch({
         ) : null}
       </div>
     </section>
+  );
+}
+
+function ActivityLibraryFilterHandoff({
+  handoffView,
+}: {
+  handoffView: ActivityLibraryFilterHandoffView;
+}) {
+  return (
+    <div
+      className="sr-only"
+      data-handoff="activity-library-filter-state"
+      data-handoff-scope={handoffView.privacy.scope}
+    >
+      <h2>{handoffView.title}</h2>
+      <p>{handoffView.description}</p>
+      <dl>
+        {handoffView.itemViews.map((item) => (
+          <ActivityLibraryFilterHandoffItem item={item} key={item.id} />
+        ))}
+      </dl>
+    </div>
+  );
+}
+
+function ActivityLibraryFilterHandoffItem({
+  item,
+}: {
+  item: ActivityLibraryFilterHandoffItemView;
+}) {
+  const labelId = `activity-library-filter-state-${item.id}-label`;
+  const valueId = `activity-library-filter-state-${item.id}-value`;
+  const descriptionId = `activity-library-filter-state-${item.id}-description`;
+
+  return (
+    <div data-handoff-item={item.id}>
+      <dt id={labelId}>{item.label}</dt>
+      <dd>
+        <output
+          aria-describedby={descriptionId}
+          aria-label={item.ariaLabel}
+          aria-labelledby={`${labelId} ${valueId}`}
+          id={valueId}
+        >
+          {item.value}
+        </output>
+        <span id={descriptionId}>{item.description}</span>
+      </dd>
+    </div>
   );
 }

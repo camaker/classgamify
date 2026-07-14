@@ -228,6 +228,7 @@ import {
   buildActivityLibraryCardViewModel,
   buildActivityLibraryCompatibilityView,
   buildCreatedActivityPanelContext,
+  ACTIVITY_LIBRARY_FILTER_HANDOFF_ITEM_IDS,
   buildActivityLibraryEmptyStateView,
   buildActivityLibraryPageScopeView,
   buildActivityLibrarySourceScopeBoundary,
@@ -38938,6 +38939,8 @@ assert.deepEqual(ACTIVITY_SOURCE_MATERIAL_FILTERS, [
   'spreadsheet',
   'worksheet',
 ]);
+assert.equal(ACTIVITY_LIBRARY_FILTER_HANDOFF_ITEM_IDS.length, 30);
+assert.equal(new Set(ACTIVITY_LIBRARY_FILTER_HANDOFF_ITEM_IDS).size, 30);
 assert.equal(getActivityLibraryTotalPages({ pageSize: 12, total: 31 }), 3);
 assert.equal(getActivityLibraryTotalPages({ pageSize: 0, total: 31 }), 3);
 assert.equal(getActivityLibraryTotalPages({ pageSize: 12, total: 0 }), 1);
@@ -47967,15 +47970,19 @@ assert.deepEqual(
     'open-box',
   ]
 );
-assert.deepEqual(
-  buildActivityLibrarySearchPanelView({
+const {
+  filterHandoffView: activityLibraryFilterHandoffView,
+  ...activityLibrarySearchPanelView
+} = buildActivityLibrarySearchPanelView({
     isLoading: false,
     search: '  food  ',
     source: 'worksheet',
     status: 'active',
     template: 'quiz',
     total: 3,
-  }),
+  });
+assert.deepEqual(
+  activityLibrarySearchPanelView,
   {
     filterSummary: { hasFilters: true, text: '3 matches' },
     hasSearchValue: true,
@@ -48034,7 +48041,22 @@ assert.deepEqual(
   }
 );
 assert.deepEqual(
-  buildActivityLibrarySearchPanelView({
+  activityLibraryFilterHandoffView.itemViews.map((item) => item.id),
+  [...ACTIVITY_LIBRARY_FILTER_HANDOFF_ITEM_IDS]
+);
+assert.equal(activityLibraryFilterHandoffView.itemViews.length, 30);
+assert.equal(
+  activityLibraryFilterHandoffView.privacy.scope,
+  'owner-activity-library-filter-state'
+);
+assert.equal(
+  activityLibraryFilterHandoffView.privacy.usesDomainSearchNormalization,
+  true
+);
+const {
+  filterHandoffView: sourceFilteredLibraryFilterHandoffView,
+  ...sourceFilteredLibrarySearchPanelView
+} = buildActivityLibrarySearchPanelView({
     isLoading: false,
     search: '',
     source: 'extractable',
@@ -48073,7 +48095,9 @@ assert.deepEqual(
     },
     template: 'all',
     total: 2,
-  }),
+  });
+assert.deepEqual(
+  sourceFilteredLibrarySearchPanelView,
   {
     filterSummary: { hasFilters: true, text: '2 matches' },
     hasSearchValue: false,
@@ -48130,6 +48154,14 @@ assert.deepEqual(
       'Limit the activity library to one exact template family, or show every template.',
     templateOptions: buildActivityLibraryTemplateFilterOptions(),
   }
+);
+assert.deepEqual(
+  sourceFilteredLibraryFilterHandoffView.itemViews.map((item) => item.id),
+  [...ACTIVITY_LIBRARY_FILTER_HANDOFF_ITEM_IDS]
+);
+assert.equal(
+  sourceFilteredLibraryFilterHandoffView.privacy.sharesRulesWithListApi,
+  true
 );
 assert.deepEqual(
   buildActivityLibrarySearchPanelView({

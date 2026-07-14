@@ -266,6 +266,18 @@ bytes, storage keys, permission metadata, or student payload file references.
 Activity library filter parsing and search normalization should also live in
 activity-domain helpers so URL state, dashboard controls, and list API queries
 share the same activity status and template-family rules.
+The activity-library filter-state chain should explicitly carry 30 slices for
+URL validation, default-route elision, NFKC search normalization, whitespace
+collapse, empty-search defaults, owner-scoped search fields, status parsing,
+active and archived lifecycle filters, template parsing, all-template defaults,
+exact template families, source-material filter parsing, all/audio/extractable/
+spreadsheet/worksheet source filters, page parsing, page-size bounds, page reset
+on filter changes, filter preservation on page changes, created-activity return
+context, clear-search and clear-filter controls, dashboard control options, list
+API owner scope, source-material post-filtering, and privacy guards. Its summary
+may expose route state, option labels, safe aggregate match counts, and helper
+contract status, but must not expose activity ids, answer text, private activity
+content, source-material filenames, file ids, storage keys, or student data.
 Teachers can soft-archive activities from the active library and restore them
 later from an archived view. Archiving hides an activity from the default
 library and prevents casual republishing, but it does not delete structured

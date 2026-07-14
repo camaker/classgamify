@@ -4,7 +4,9 @@ import {
   getTemplateByType,
 } from '@/activities/catalog';
 import {
+  ACTIVITY_LIBRARY_STATUSES,
   ACTIVITY_LIBRARY_PAGE_SIZE,
+  ACTIVITY_SOURCE_MATERIAL_FILTERS,
   type ActivityLibraryCreatedSource,
   type ActivityLibraryStatus,
   type ActivitySourceMaterialFilter,
@@ -301,6 +303,7 @@ type ActivityLibraryPageResolvedSearch = {
 
 type ActivityLibrarySearchPanelView = {
   filterSummary: ActivityLibraryFilterSummary;
+  filterHandoffView: ActivityLibraryFilterHandoffView;
   hasSearchValue: boolean;
   searchDescription: string;
   sourceCapabilityMetrics: ActivityLibrarySourceCapabilityMetric[];
@@ -349,6 +352,77 @@ export type ActivityLibrarySourceScopeBoundary = {
   templateFilter: ActivityTemplateFilter;
   usesFullFilteredSummaryForOverview: true;
   visiblePageActivityCount: number;
+};
+
+export const ACTIVITY_LIBRARY_FILTER_HANDOFF_ITEM_IDS = [
+  'route-validate-search',
+  'route-default-elision',
+  'search-normalized-query',
+  'search-width-normalization',
+  'search-whitespace-collapse',
+  'search-empty-default',
+  'search-owner-fields',
+  'status-parser',
+  'status-active-default',
+  'status-archived-filter',
+  'template-parser',
+  'template-all-default',
+  'template-exact-family',
+  'source-parser',
+  'source-all-default',
+  'source-audio-filter',
+  'source-extractable-filter',
+  'source-spreadsheet-filter',
+  'source-worksheet-filter',
+  'page-parser',
+  'page-size-boundary',
+  'filter-change-page-reset',
+  'page-change-filter-preservation',
+  'created-activity-context',
+  'clear-search-control',
+  'clear-filter-control',
+  'dashboard-control-options',
+  'list-api-owner-scope',
+  'list-api-source-post-filter',
+  'privacy-guard',
+] as const;
+
+export type ActivityLibraryFilterHandoffItemId =
+  (typeof ACTIVITY_LIBRARY_FILTER_HANDOFF_ITEM_IDS)[number];
+
+export type ActivityLibraryFilterHandoffItemView = {
+  ariaLabel: string;
+  description: string;
+  id: ActivityLibraryFilterHandoffItemId;
+  label: string;
+  value: string;
+};
+
+export type ActivityLibraryFilterHandoffPrivacyView = {
+  exposesActivityIds: false;
+  exposesAnswerText: false;
+  exposesPrivateActivityContent: false;
+  exposesSourceMaterialFileIds: false;
+  exposesSourceMaterialFilenames: false;
+  exposesSourceMaterialStorageKeys: false;
+  exposesStudentData: false;
+  itemIds: ActivityLibraryFilterHandoffItemId[];
+  resetsPageOnFilterChange: true;
+  routesThroughValidatedSearch: true;
+  scope: 'owner-activity-library-filter-state';
+  sharesRulesWithDashboardControls: true;
+  sharesRulesWithListApi: true;
+  statusFilters: ActivityLibraryStatus[];
+  sourceFilters: ActivitySourceMaterialFilter[];
+  templateFilter: ActivityTemplateFilter;
+  usesDomainSearchNormalization: true;
+};
+
+export type ActivityLibraryFilterHandoffView = {
+  description: string;
+  itemViews: ActivityLibraryFilterHandoffItemView[];
+  privacy: ActivityLibraryFilterHandoffPrivacyView;
+  title: string;
 };
 
 export const ACTIVITY_LIBRARY_PAGE_HANDOFF_ITEM_IDS = [
@@ -1046,15 +1120,26 @@ export function buildActivityLibrarySearchPanelView({
   const normalizedSearch = normalizeActivityLibrarySearch(search);
   const sourceFilterView = buildActivityLibrarySourceFilterView(source);
   const statusFilterView = buildActivityLibraryStatusFilterView(status);
+  const templateFilterView = buildActivityLibraryTemplateScopeView(template);
+  const filterSummary = buildActivityLibraryFilterSummary({
+    isLoading,
+    search: normalizedSearch,
+    source,
+    status,
+    template,
+    total,
+  });
 
   return {
-    filterSummary: buildActivityLibraryFilterSummary({
-      isLoading,
-      search: normalizedSearch,
+    filterSummary,
+    filterHandoffView: buildActivityLibraryFilterHandoffView({
+      filterSummary,
+      normalizedSearch,
       source,
-      status,
+      sourceFilterView,
+      statusFilterView,
       template,
-      total,
+      templateFilterView,
     }),
     hasSearchValue: Boolean(normalizedSearch),
     searchDescription: activityLibrarySearchCopy.searchDescription,
@@ -1076,6 +1161,359 @@ export function buildActivityLibrarySearchPanelView({
     statusOptions: activityLibrarySearchCopy.statusOptions,
     templateDescription: activityLibrarySearchCopy.templateDescription,
     templateOptions: buildActivityLibraryTemplateFilterOptions(),
+  };
+}
+
+export function buildActivityLibraryFilterHandoffView({
+  filterSummary,
+  normalizedSearch,
+  source,
+  sourceFilterView,
+  statusFilterView,
+  template,
+  templateFilterView,
+}: {
+  filterSummary: ActivityLibraryFilterSummary;
+  normalizedSearch?: string;
+  source: ActivitySourceMaterialFilter;
+  sourceFilterView: ReturnType<typeof buildActivityLibrarySourceFilterView>;
+  statusFilterView: ReturnType<typeof buildActivityLibraryStatusFilterView>;
+  template: ActivityTemplateFilter;
+  templateFilterView: ReturnType<typeof buildActivityLibraryTemplateScopeView>;
+}): ActivityLibraryFilterHandoffView {
+  const itemViews = ACTIVITY_LIBRARY_FILTER_HANDOFF_ITEM_IDS.map((id) =>
+    buildActivityLibraryFilterHandoffItem({
+      filterSummary,
+      id,
+      normalizedSearch,
+      source,
+      sourceFilterView,
+      statusFilterView,
+      templateFilterView,
+    })
+  );
+
+  return {
+    description: m.activity_library_filter_handoff_description(),
+    itemViews,
+    privacy: {
+      exposesActivityIds: false,
+      exposesAnswerText: false,
+      exposesPrivateActivityContent: false,
+      exposesSourceMaterialFileIds: false,
+      exposesSourceMaterialFilenames: false,
+      exposesSourceMaterialStorageKeys: false,
+      exposesStudentData: false,
+      itemIds: [...ACTIVITY_LIBRARY_FILTER_HANDOFF_ITEM_IDS],
+      resetsPageOnFilterChange: true,
+      routesThroughValidatedSearch: true,
+      scope: 'owner-activity-library-filter-state',
+      sharesRulesWithDashboardControls: true,
+      sharesRulesWithListApi: true,
+      statusFilters: [...ACTIVITY_LIBRARY_STATUSES],
+      sourceFilters: [...ACTIVITY_SOURCE_MATERIAL_FILTERS],
+      templateFilter: template,
+      usesDomainSearchNormalization: true,
+    },
+    title: m.activity_library_filter_handoff_title(),
+  };
+}
+
+function buildActivityLibraryFilterHandoffItem({
+  filterSummary,
+  id,
+  normalizedSearch,
+  source,
+  sourceFilterView,
+  statusFilterView,
+  templateFilterView,
+}: {
+  filterSummary: ActivityLibraryFilterSummary;
+  id: ActivityLibraryFilterHandoffItemId;
+  normalizedSearch?: string;
+  source: ActivitySourceMaterialFilter;
+  sourceFilterView: ReturnType<typeof buildActivityLibrarySourceFilterView>;
+  statusFilterView: ReturnType<typeof buildActivityLibraryStatusFilterView>;
+  templateFilterView: ReturnType<typeof buildActivityLibraryTemplateScopeView>;
+}): ActivityLibraryFilterHandoffItemView {
+  const item = getActivityLibraryFilterHandoffItem({
+    filterSummary,
+    id,
+    normalizedSearch,
+    source,
+    sourceFilterView,
+    statusFilterView,
+    templateFilterView,
+  });
+
+  return {
+    ...item,
+    ariaLabel: m.activity_library_filter_handoff_item_aria({
+      description: item.description,
+      label: item.label,
+      value: item.value,
+    }),
+  };
+}
+
+function getActivityLibraryFilterHandoffItem({
+  filterSummary,
+  id,
+  normalizedSearch,
+  source,
+  sourceFilterView,
+  statusFilterView,
+  templateFilterView,
+}: {
+  filterSummary: ActivityLibraryFilterSummary;
+  id: ActivityLibraryFilterHandoffItemId;
+  normalizedSearch?: string;
+  source: ActivitySourceMaterialFilter;
+  sourceFilterView: ReturnType<typeof buildActivityLibrarySourceFilterView>;
+  statusFilterView: ReturnType<typeof buildActivityLibraryStatusFilterView>;
+  templateFilterView: ReturnType<typeof buildActivityLibraryTemplateScopeView>;
+}): Omit<ActivityLibraryFilterHandoffItemView, 'ariaLabel' | 'id'> & {
+  id: ActivityLibraryFilterHandoffItemId;
+} {
+  switch (id) {
+    case 'route-validate-search':
+      return filterItem(
+        id,
+        m.activity_library_filter_handoff_route_validate_search_label(),
+        m.activity_library_filter_handoff_route_validate_search_value(),
+        m.activity_library_filter_handoff_route_validate_search_description()
+      );
+    case 'route-default-elision':
+      return filterItem(
+        id,
+        m.activity_library_filter_handoff_route_default_elision_label(),
+        m.activity_library_filter_handoff_route_default_elision_value(),
+        m.activity_library_filter_handoff_route_default_elision_description()
+      );
+    case 'search-normalized-query':
+      return filterItem(
+        id,
+        m.activity_library_filter_handoff_search_normalized_query_label(),
+        normalizedSearch ?? m.activity_library_scope_search_all_value(),
+        m.activity_library_filter_handoff_search_normalized_query_description()
+      );
+    case 'search-width-normalization':
+      return filterItem(
+        id,
+        m.activity_library_filter_handoff_search_width_normalization_label(),
+        m.activity_library_filter_handoff_search_width_normalization_value(),
+        m.activity_library_filter_handoff_search_width_normalization_description()
+      );
+    case 'search-whitespace-collapse':
+      return filterItem(
+        id,
+        m.activity_library_filter_handoff_search_whitespace_collapse_label(),
+        m.activity_library_filter_handoff_search_whitespace_collapse_value(),
+        m.activity_library_filter_handoff_search_whitespace_collapse_description()
+      );
+    case 'search-empty-default':
+      return filterItem(
+        id,
+        m.activity_library_filter_handoff_search_empty_default_label(),
+        normalizedSearch
+          ? m.activity_library_filter_handoff_search_filtered_value()
+          : m.activity_library_scope_search_all_value(),
+        m.activity_library_filter_handoff_search_empty_default_description()
+      );
+    case 'search-owner-fields':
+      return filterItem(
+        id,
+        m.activity_library_filter_handoff_search_owner_fields_label(),
+        m.activity_library_filter_handoff_search_owner_fields_value(),
+        m.activity_library_filter_handoff_search_owner_fields_description()
+      );
+    case 'status-parser':
+      return filterItem(
+        id,
+        m.activity_library_filter_handoff_status_parser_label(),
+        m.activity_library_filter_handoff_status_parser_value(),
+        m.activity_library_filter_handoff_status_parser_description()
+      );
+    case 'status-active-default':
+      return filterItem(
+        id,
+        m.activity_library_filter_handoff_status_active_default_label(),
+        activityLibrarySearchCopy.statusOptions[0].label,
+        m.activity_library_filter_handoff_status_active_default_description()
+      );
+    case 'status-archived-filter':
+      return filterItem(
+        id,
+        m.activity_library_filter_handoff_status_archived_filter_label(),
+        statusFilterView.label,
+        m.activity_library_filter_handoff_status_archived_filter_description()
+      );
+    case 'template-parser':
+      return filterItem(
+        id,
+        m.activity_library_filter_handoff_template_parser_label(),
+        m.activity_library_filter_handoff_template_parser_value({
+          count: String(getActivityTemplates().length),
+        }),
+        m.activity_library_filter_handoff_template_parser_description()
+      );
+    case 'template-all-default':
+      return filterItem(
+        id,
+        m.activity_library_filter_handoff_template_all_default_label(),
+        activityLibrarySearchCopy.templatePlaceholder,
+        m.activity_library_filter_handoff_template_all_default_description()
+      );
+    case 'template-exact-family':
+      return filterItem(
+        id,
+        m.activity_library_filter_handoff_template_exact_family_label(),
+        templateFilterView.label,
+        m.activity_library_filter_handoff_template_exact_family_description()
+      );
+    case 'source-parser':
+      return filterItem(
+        id,
+        m.activity_library_filter_handoff_source_parser_label(),
+        m.activity_library_filter_handoff_source_parser_value(),
+        m.activity_library_filter_handoff_source_parser_description()
+      );
+    case 'source-all-default':
+      return filterItem(
+        id,
+        m.activity_library_filter_handoff_source_all_default_label(),
+        activityLibrarySearchCopy.sourceOptions[0].label,
+        m.activity_library_filter_handoff_source_all_default_description()
+      );
+    case 'source-audio-filter':
+      return filterItem(
+        id,
+        m.activity_library_filter_handoff_source_audio_filter_label(),
+        source === 'audio'
+          ? sourceFilterView.label
+          : m.activity_library_filter_source_audio(),
+        m.activity_library_filter_handoff_source_audio_filter_description()
+      );
+    case 'source-extractable-filter':
+      return filterItem(
+        id,
+        m.activity_library_filter_handoff_source_extractable_filter_label(),
+        source === 'extractable'
+          ? sourceFilterView.label
+          : m.activity_library_filter_source_extractable(),
+        m.activity_library_filter_handoff_source_extractable_filter_description()
+      );
+    case 'source-spreadsheet-filter':
+      return filterItem(
+        id,
+        m.activity_library_filter_handoff_source_spreadsheet_filter_label(),
+        source === 'spreadsheet'
+          ? sourceFilterView.label
+          : m.activity_library_filter_source_spreadsheet(),
+        m.activity_library_filter_handoff_source_spreadsheet_filter_description()
+      );
+    case 'source-worksheet-filter':
+      return filterItem(
+        id,
+        m.activity_library_filter_handoff_source_worksheet_filter_label(),
+        source === 'worksheet'
+          ? sourceFilterView.label
+          : m.activity_library_filter_source_worksheet(),
+        m.activity_library_filter_handoff_source_worksheet_filter_description()
+      );
+    case 'page-parser':
+      return filterItem(
+        id,
+        m.activity_library_filter_handoff_page_parser_label(),
+        m.activity_library_filter_handoff_page_parser_value(),
+        m.activity_library_filter_handoff_page_parser_description()
+      );
+    case 'page-size-boundary':
+      return filterItem(
+        id,
+        m.activity_library_filter_handoff_page_size_boundary_label(),
+        m.activity_library_filter_handoff_page_size_boundary_value({
+          count: String(ACTIVITY_LIBRARY_PAGE_SIZE),
+        }),
+        m.activity_library_filter_handoff_page_size_boundary_description()
+      );
+    case 'filter-change-page-reset':
+      return filterItem(
+        id,
+        m.activity_library_filter_handoff_filter_change_page_reset_label(),
+        m.activity_library_filter_handoff_filter_change_page_reset_value(),
+        m.activity_library_filter_handoff_filter_change_page_reset_description()
+      );
+    case 'page-change-filter-preservation':
+      return filterItem(
+        id,
+        m.activity_library_filter_handoff_page_change_filter_preservation_label(),
+        m.activity_library_filter_handoff_page_change_filter_preservation_value(),
+        m.activity_library_filter_handoff_page_change_filter_preservation_description()
+      );
+    case 'created-activity-context':
+      return filterItem(
+        id,
+        m.activity_library_filter_handoff_created_activity_context_label(),
+        m.activity_library_filter_handoff_created_activity_context_value(),
+        m.activity_library_filter_handoff_created_activity_context_description()
+      );
+    case 'clear-search-control':
+      return filterItem(
+        id,
+        m.activity_library_filter_handoff_clear_search_control_label(),
+        m.activity_library_filter_handoff_clear_search_control_value(),
+        m.activity_library_filter_handoff_clear_search_control_description()
+      );
+    case 'clear-filter-control':
+      return filterItem(
+        id,
+        m.activity_library_filter_handoff_clear_filter_control_label(),
+        m.activity_library_filter_handoff_clear_filter_control_value(),
+        m.activity_library_filter_handoff_clear_filter_control_description()
+      );
+    case 'dashboard-control-options':
+      return filterItem(
+        id,
+        m.activity_library_filter_handoff_dashboard_control_options_label(),
+        m.activity_library_filter_handoff_dashboard_control_options_value(),
+        m.activity_library_filter_handoff_dashboard_control_options_description()
+      );
+    case 'list-api-owner-scope':
+      return filterItem(
+        id,
+        m.activity_library_filter_handoff_list_api_owner_scope_label(),
+        m.activity_library_filter_handoff_list_api_owner_scope_value(),
+        m.activity_library_filter_handoff_list_api_owner_scope_description()
+      );
+    case 'list-api-source-post-filter':
+      return filterItem(
+        id,
+        m.activity_library_filter_handoff_list_api_source_post_filter_label(),
+        filterSummary.text,
+        m.activity_library_filter_handoff_list_api_source_post_filter_description()
+      );
+    case 'privacy-guard':
+      return filterItem(
+        id,
+        m.activity_library_filter_handoff_privacy_guard_label(),
+        m.activity_library_filter_handoff_privacy_guard_value(),
+        m.activity_library_filter_handoff_privacy_guard_description()
+      );
+  }
+}
+
+function filterItem(
+  id: ActivityLibraryFilterHandoffItemId,
+  label: string,
+  value: string,
+  description: string
+): Omit<ActivityLibraryFilterHandoffItemView, 'ariaLabel'> {
+  return {
+    description,
+    id,
+    label,
+    value,
   };
 }
 

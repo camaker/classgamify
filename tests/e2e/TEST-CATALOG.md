@@ -599,6 +599,12 @@ run it when changing activity library overview metrics, current-view scope,
 source-material filters, starter-preview boundaries, visible-card counts,
 activity library privacy-scope boundaries, or the hidden activity-library
 handoff.
+Activity library filter state has a fast script-level gate via
+`pnpm exec tsx --test scripts/activity-library-filter-state-handoff-semantic-views.test.ts`;
+run it when changing the activity library filter-state handoff, URL validation,
+default route elision, search normalization, page reset, page preservation,
+dashboard controls, list API owner scope, source-material post-filter behavior,
+or privacy guards.
 Activity source-material card summary has a fast script-level gate via
 `pnpm exec tsx --test scripts/activity-source-material-card-handoff-semantic-views.test.ts`;
 run it when changing activity card source-material count summaries,
