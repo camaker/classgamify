@@ -123,6 +123,7 @@ test('activity lifecycle governance chain exposes 30 safe lifecycle slices', () 
     requiresOwnerScope: true,
     restoredVisibility: 'draft',
     sourceFiles: [...ACTIVITY_LIFECYCLE_GOVERNANCE_CHAIN_SOURCE_FILES],
+    usesAssignmentPublishHandoff: true,
   });
   assertNoPrivateLifecycleGovernanceText(JSON.stringify(handoffView));
 });
@@ -162,7 +163,7 @@ test('activity lifecycle governance chain summarizes archive and restore boundar
       ['snapshot-protection', 'Snapshots unchanged'],
       ['public-assignment-continuity', 'Existing links unchanged'],
       ['created-panel-publish-gate', 'Same access view'],
-      ['lifecycle-governance-gate', '30 source files'],
+      ['assignment-publish-handoff-boundary', '30 assignment publish slices'],
     ]
   );
   assert.equal(
@@ -172,6 +173,10 @@ test('activity lifecycle governance chain summarizes archive and restore boundar
   assert.equal(
     getHandoffValue(handoffView, 'snapshot-protection'),
     'Snapshots unchanged'
+  );
+  assert.equal(
+    getHandoffValue(handoffView, 'assignment-publish-handoff-boundary'),
+    `${ASSIGNMENT_PUBLISH_HANDOFF_ITEM_IDS.length} assignment publish slices`
   );
 });
 
@@ -253,6 +258,11 @@ test('activity lifecycle sources keep library scopes and UI gates aligned', () =
     PRODUCT_SOURCE,
     /Activity lifecycle governance should flow through shared domain helpers[\s\S]*library cards[\s\S]*server functions[\s\S]*restore-before-derive contract/,
     'docs/product.md should keep lifecycle governance shared across UI and server enforcement.'
+  );
+  assert.match(
+    PRODUCT_SOURCE,
+    /activity\s+lifecycle\s+governance\s+chain[\s\S]*30-slice\s+assignment\s+publish\s+handoff[\s\S]*publish\s+access[\s\S]*snapshot\s+freeze[\s\S]*public-payload[\s\S]*privacy/,
+    'docs/product.md should return restored activity lifecycle work to the shared assignment publish contract.'
   );
   assert.match(
     LIFECYCLE_SOURCE,
@@ -370,7 +380,7 @@ test('activity lifecycle persistence preserves content, source references, and s
 test('activity lifecycle governance focused gate is documented', () => {
   assert.match(
     TEST_CATALOG_SOURCE,
-    /Activity lifecycle governance chain has a fast script-level gate via[\s\S]*scripts\/activity-lifecycle-governance-chain-handoff\.test\.ts/,
+    /Activity lifecycle governance chain has a fast script-level gate via[\s\S]*scripts\/activity-lifecycle-governance-chain-handoff\.test\.ts[\s\S]*30-slice assignment publish boundary/,
     'TEST-CATALOG should document the activity lifecycle governance chain gate.'
   );
   assert.match(

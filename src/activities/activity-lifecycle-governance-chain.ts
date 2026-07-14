@@ -1,3 +1,5 @@
+import { ASSIGNMENT_PUBLISH_HANDOFF_ITEM_IDS } from '@/assignments/publish-input';
+
 export const ACTIVITY_LIFECYCLE_GOVERNANCE_CHAIN_HANDOFF_ITEM_IDS = [
   'product-archive-policy',
   'lifecycle-domain-source',
@@ -28,7 +30,7 @@ export const ACTIVITY_LIFECYCLE_GOVERNANCE_CHAIN_HANDOFF_ITEM_IDS = [
   'snapshot-protection',
   'public-assignment-continuity',
   'created-panel-publish-gate',
-  'lifecycle-governance-gate',
+  'assignment-publish-handoff-boundary',
 ] as const;
 
 export const ACTIVITY_LIFECYCLE_GOVERNANCE_CHAIN_SOURCE_FILES = [
@@ -90,6 +92,7 @@ export type ActivityLifecycleGovernanceChainPrivacyContract = {
   requiresOwnerScope: true;
   restoredVisibility: 'draft';
   sourceFiles: string[];
+  usesAssignmentPublishHandoff: true;
 };
 
 export type ActivityLifecycleGovernanceChainHandoffView = {
@@ -124,6 +127,7 @@ export function buildActivityLifecycleGovernanceChainHandoffView(): ActivityLife
       requiresOwnerScope: true,
       restoredVisibility: 'draft',
       sourceFiles: [...ACTIVITY_LIFECYCLE_GOVERNANCE_CHAIN_SOURCE_FILES],
+      usesAssignmentPublishHandoff: true,
     },
     title: 'Activity lifecycle governance chain',
   };
@@ -347,12 +351,12 @@ function getActivityLifecycleGovernanceChainHandoffItem(
         'Same access view',
         'The post-save created-activity panel uses the same publish access boundary as library cards.'
       );
-    case 'lifecycle-governance-gate':
+    case 'assignment-publish-handoff-boundary':
       return item(
         id,
-        'Lifecycle governance gate',
-        '30 source files',
-        'A focused gate keeps archive, restore, edit, publish, duplicate, remix, retention, snapshot, and privacy boundaries connected.'
+        'Assignment publish handoff boundary',
+        `${ASSIGNMENT_PUBLISH_HANDOFF_ITEM_IDS.length} assignment publish slices`,
+        'Restored activities must enter the shared assignment publish access, validation, delivery settings, review checklist, snapshot freeze, public payload, result policy, and privacy contracts.'
       );
   }
 }

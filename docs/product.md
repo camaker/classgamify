@@ -203,6 +203,13 @@ Activity lifecycle governance should flow through shared domain helpers across
 library cards, edit access, publish dialogs, duplicate/remix draft creation, and
 server functions, so UI affordances and backend enforcement keep the same
 restore-before-derive contract.
+The activity lifecycle governance chain should explicitly carry the 30-slice
+assignment publish handoff so restored activities return to the shared publish
+access, field validation, delivery settings, review checklist, snapshot freeze,
+public-payload, result-policy, and privacy contracts. Its independent 30-file
+gate should continue to verify archive, restore, edit, duplicate, remix,
+retention, and snapshot surfaces without replacing that downstream product
+boundary.
 
 The activity editor should make the selected template legible. When teachers
 choose quiz, match-up, line-match, group sort, fill-blank, listening, matching

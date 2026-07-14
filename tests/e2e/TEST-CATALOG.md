@@ -557,8 +557,10 @@ Activity lifecycle governance chain has a fast script-level gate via
 run it when changing owner-scoped archive and restore, edit, publish,
 duplicate, and remix gates, server lifecycle enforcement, content and
 source-material retention, assignment snapshot protection, public assignment
-continuity, lifecycle mutation cache refresh, created-panel publish access, or
-archive/restore privacy guards.
+continuity, lifecycle mutation cache refresh, created-panel publish access, the
+30-slice assignment publish boundary that returns restored activities to shared
+publish access, validation, delivery settings, review, snapshot freeze, public
+payload, result policy, and privacy contracts, or archive/restore privacy guards.
 Deterministic template remix safety has a fast script-level gate via
 `pnpm exec tsx --test scripts/activity-template-remix-handoff-semantic-views.test.ts`;
 run it when changing template readiness, suggested Copy as actions,

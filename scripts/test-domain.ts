@@ -39464,6 +39464,7 @@ assert.deepEqual(activityLifecycleGovernanceChainView.privacy, {
   requiresOwnerScope: true,
   restoredVisibility: 'draft',
   sourceFiles: [...ACTIVITY_LIFECYCLE_GOVERNANCE_CHAIN_SOURCE_FILES],
+  usesAssignmentPublishHandoff: true,
 });
 assert.deepEqual(
   [
@@ -39494,7 +39495,7 @@ assert.deepEqual(Object.fromEntries(activityLifecycleGovernanceChainValues), {
   'library-status-parser': 'active/archived',
   'library-status-summary': 'Full filtered result',
   'lifecycle-domain-source': 'activities/lifecycle',
-  'lifecycle-governance-gate': '30 source files',
+  'assignment-publish-handoff-boundary': '30 assignment publish slices',
   'product-archive-policy': 'Restore before derive',
   'public-assignment-continuity': 'Existing links unchanged',
   'publish-access-gate': 'Archived blocked',
