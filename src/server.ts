@@ -11,6 +11,9 @@ console.log("[server-entry]: using custom server entry in 'src/server.ts'");
 
 export default {
   async fetch(request: Request) {
+    const legacyRedirect = redirectLegacyPublicRoute(request);
+    if (legacyRedirect) return legacyRedirect;
+
     const response = await localeMiddleware(request, () =>
       handler.fetch(request, {
         context: {
@@ -22,6 +25,21 @@ export default {
     return withSeoHeaders(request, response);
   },
 };
+
+const LEGACY_PUBLIC_REDIRECTS = new Map([
+  ['/(pages)/roadmap', '/roadmap'],
+  ['/(legals)/terms', '/terms'],
+  ['/(legals)/terms/terms', '/terms'],
+]);
+
+function redirectLegacyPublicRoute(request: Request) {
+  const url = new URL(request.url);
+  const destination = LEGACY_PUBLIC_REDIRECTS.get(url.pathname);
+  if (!destination) return null;
+
+  url.pathname = destination;
+  return Response.redirect(url, 308);
+}
 
 function withSeoHeaders(request: Request, response: Response) {
   const headers = new Headers(response.headers);

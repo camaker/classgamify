@@ -177,6 +177,16 @@ test('blog routes keep internal editorial handoff out of public DOM', () => {
     /PublicEditorialHandoff|buildPublicEditorialHandoffView|data-handoff|data-handoff-item/,
     'Blog post route must not render internal editorial handoff markup.'
   );
+  assert.match(
+    blogListRouteSource,
+    /loaderDeps:\s*\(\{ search \}\) => \(\{ page: search\.page \?\? 1 \}\)/,
+    'The first blog page must load without forcing ?page=1 into its URL.'
+  );
+  assert.match(
+    blogListRouteSource,
+    /Number\.isInteger\(parsedValue\) && parsedValue > 1[\s\S]*: undefined/,
+    'Only page 2 and later should survive blog search normalization.'
+  );
 });
 
 function getHandoffValue(
