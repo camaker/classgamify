@@ -1,4 +1,5 @@
 import { expect, test, type Page } from '@playwright/test';
+import { readFile } from 'node:fs/promises';
 import {
   cleanupE2EUsers,
   loginByForm,
@@ -17,6 +18,24 @@ async function expectNoBrowserErrors(
   await test.step(`health: ${context}`, async () => {
     monitor.expectNoErrors(context);
   });
+}
+
+async function expectThirtySliceHandoff(page: Page, handoffName: string) {
+  const handoff = page.locator(`[data-handoff="${handoffName}"]`);
+  const itemViews = handoff.locator(':scope > dl > [data-handoff-item]');
+
+  await expect(handoff).toHaveCount(1);
+  await expect(handoff).toHaveClass(/sr-only/);
+  await expect(handoff).toHaveAttribute('data-handoff-scope', /.+/);
+  await expect(itemViews).toHaveCount(30);
+  await expect(itemViews.locator(':scope > dt')).toHaveCount(30);
+  await expect(itemViews.locator(':scope > dd > output')).toHaveCount(30);
+
+  const itemIds = await itemViews.evaluateAll((items) =>
+    items.map((item) => item.getAttribute('data-handoff-item'))
+  );
+  expect(itemIds.every(Boolean)).toBe(true);
+  expect(new Set(itemIds).size).toBe(30);
 }
 
 async function saveActivityFromCreatePage(page: Page, title: string) {
@@ -159,6 +178,107 @@ test.describe('activity authoring', () => {
       page.getByText(
         'Download gradebook-ready results with delivery policy and item-level answers.'
       )
+    ).toBeVisible();
+
+    await expectThirtySliceHandoff(page, 'assignment-result-material');
+    await expectThirtySliceHandoff(page, 'assignment-result-review');
+    await expectThirtySliceHandoff(page, 'assignment-copy-artifact');
+
+    await expect(
+      page.getByRole('heading', { name: 'Ready to review the full class.' })
+    ).toBeVisible();
+    await expect(
+      page.getByRole('heading', { name: 'Current review scope' })
+    ).toBeVisible();
+    await expect(
+      page.getByRole('heading', { name: 'Classroom brief' })
+    ).toBeVisible();
+    await expect(
+      page.getByRole('heading', { name: 'Item performance' })
+    ).toBeVisible();
+    await expect(
+      page.getByRole('heading', { name: 'Student summary' })
+    ).toBeVisible();
+    await expect(
+      page.getByRole('heading', { name: 'Student attempts' })
+    ).toBeVisible();
+    await expect(
+      page.getByRole('heading', { name: 'Answer review' })
+    ).toBeVisible();
+
+    await page.getByLabel('Find student').fill('E2E Student');
+    await expect(page).toHaveURL(/student=E2E(?:\+|%20)Student/);
+    await page.getByLabel('Sort students').selectOption('name');
+    await expect(page).toHaveURL(/sort=name/);
+    await page.getByLabel('Sort items').selectOption('accuracy');
+    await expect(page).toHaveURL(/itemSort=accuracy/);
+    await page.getByLabel('Review view').selectOption('needs-review');
+    await expect(page).toHaveURL(/review=needs-review/);
+    await expect(
+      page
+        .locator('[data-handoff="assignment-result-review"]')
+        .locator(
+          ':scope > dl > [data-handoff-item="student-search-status"] output'
+        )
+    ).toHaveText('Adjusted');
+    await expect(
+      page
+        .locator('[data-handoff="assignment-result-review"]')
+        .locator(
+          ':scope > dl > [data-handoff-item="answer-review-status"] output'
+        )
+    ).toHaveText('Adjusted');
+
+    await page.getByRole('button', { name: 'Clear student search' }).click();
+    await expect(page).not.toHaveURL(/student=/);
+    await page.getByLabel('Review view').selectOption('all');
+    await expect(page).not.toHaveURL(/review=/);
+
+    await page
+      .context()
+      .grantPermissions(['clipboard-read', 'clipboard-write']);
+    await page.getByRole('button', { name: /^Copy brief\./ }).click();
+    await expect(page.getByText('Classroom brief copied.')).toBeVisible();
+    const copiedBrief = await page.evaluate(() =>
+      navigator.clipboard.readText()
+    );
+    expect(copiedBrief).toContain(assignmentTitle);
+    expect(copiedBrief).toContain('E2E Student');
+
+    const csvDownloadPromise = page.waitForEvent('download');
+    await page.getByRole('button', { name: /^Download CSV\./ }).click();
+    const csvDownload = await csvDownloadPromise;
+    expect(csvDownload.suggestedFilename()).toMatch(
+      /classgamify-.*-results\.csv/
+    );
+    const csvPath = await csvDownload.path();
+    expect(csvPath).not.toBeNull();
+    const csvText = await readFile(csvPath as string, 'utf8');
+    expect(csvText).toContain('assignment_title');
+    expect(csvText).toContain('student_answer');
+    expect(csvText).toContain('E2E Student');
+
+    await page.getByRole('link', { name: 'Print worksheet' }).click();
+    await expect(page).toHaveURL(/\/print\/assignments\/[^/?]+$/);
+    await expect(
+      page.getByRole('heading', { name: assignmentTitle })
+    ).toBeVisible();
+    await expect(page.getByText('Before printing')).toBeVisible();
+    await expect(page.getByText('Hidden by default').first()).toBeVisible();
+    await expectThirtySliceHandoff(page, 'printable-worksheet');
+
+    await page.getByRole('switch', { name: 'Include answer key' }).click();
+    await expect(page).toHaveURL(/answerKey=true/);
+    await expect(
+      page.getByText('Teacher-only key included').first()
+    ).toBeVisible();
+    await expect(
+      page.getByRole('heading', { name: 'Answer key' })
+    ).toBeVisible();
+    await page.getByRole('link', { name: 'Back to results' }).click();
+    await expect(page).toHaveURL(/\/dashboard\/assignments\/[^/?]+$/);
+    await expect(
+      page.getByRole('heading', { name: assignmentTitle })
     ).toBeVisible();
 
     await expectNoBrowserErrors(monitor, 'publish assignment from saved panel');

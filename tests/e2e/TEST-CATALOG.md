@@ -910,8 +910,11 @@ Verifies the signed-in profile update flow.
 
 **File:** `specs/activity-authoring.spec.ts` | **Priority:** P1
 
-Verifies the core teacher loop for creating reusable activities before
-assignment publishing is enabled.
+Verifies the core teacher loop from reusable activity creation through
+assignment publishing, student submission, teacher result review, and the
+printable worksheet return path. The persisted browser journey exercises the
+30-slice result-material, result-review, copy-artifact, and printable-worksheet
+handoffs rather than relying only on source-level contract tests.
 
 | # | Test name | Flow |
 |---|---|---|

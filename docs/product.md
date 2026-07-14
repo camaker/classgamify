@@ -517,6 +517,14 @@ controls, route boundaries, and privacy remain connected to teacher result
 review. Its independent 30-file gate should continue to verify result actions,
 teacher-only print routes, frozen snapshot rendering, answer-key states,
 navigation, and export alignment without replacing that paper handoff contract.
+The local persisted browser journey should complete this same teacher loop in
+one data set: save an activity, publish an assignment, submit a student attempt,
+review and filter the result, copy a classroom brief, download the full CSV,
+open the printable worksheet, explicitly include the teacher answer key, and
+return to results. It should verify the result-material, result-review,
+copy-artifact, and printable-worksheet 30-slice handoffs in the rendered DOM so
+the source contracts remain connected to the real Activity -> Assignment ->
+Attempt -> Results workflow.
 The teacher result page should show the student summary, the top reteach
 priorities, and the full item performance table so a teacher can scan the
 class before opening individual student answers. The full item performance
