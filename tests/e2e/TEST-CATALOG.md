@@ -647,7 +647,11 @@ run it when changing template transforms, AI remix completion, distractor write
 targets, leveled variants, answer explanations, listening scripts,
 worksheet/audio/spreadsheet extraction, provider and fallback gates,
 source-material privacy, editor-review/save/publish boundaries, snapshot
-protection, public-payload guards, or result-export continuity.
+protection, public-payload guards, or result-export continuity. The roadmap
+chain also carries the full 30-slice enhancement lifecycle across policy,
+execution, parsed output, editor application, teacher review, manual save,
+publish, snapshots, public payloads, privacy, and result exports while its
+independent source file gate remains intact.
 Activity AI enhancement policy has a fast script-level gate via
 `pnpm exec tsx --test scripts/activity-ai-enhancement-policy.test.ts`;
 run it when changing teacher-auth gates, deterministic readiness, structured

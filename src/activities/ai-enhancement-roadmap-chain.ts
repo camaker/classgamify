@@ -28,7 +28,7 @@ export const ACTIVITY_AI_ENHANCEMENT_ROADMAP_CHAIN_HANDOFF_ITEM_IDS = [
   'result-export-continuity',
   'deterministic-fallback',
   'provider-credential-gate',
-  'ai-enhancement-chain-gate',
+  'enhancement-lifecycle-chain-boundary',
 ] as const;
 
 export const ACTIVITY_AI_ENHANCEMENT_ROADMAP_CHAIN_SOURCE_FILES = [
@@ -94,6 +94,7 @@ export type ActivityAiEnhancementRoadmapChainPrivacyContract = {
   requiresEditorReview: true;
   sourceFiles: string[];
   usesDeterministicFallback: true;
+  usesEnhancementLifecycleChain: true;
   usesSharedActivityAssignmentModel: true;
   writesDistractorsToQuestionOptions: true;
 };
@@ -134,6 +135,7 @@ export function buildActivityAiEnhancementRoadmapChainHandoffView(): ActivityAiE
       requiresEditorReview: true,
       sourceFiles: [...ACTIVITY_AI_ENHANCEMENT_ROADMAP_CHAIN_SOURCE_FILES],
       usesDeterministicFallback: true,
+      usesEnhancementLifecycleChain: true,
       usesSharedActivityAssignmentModel: true,
       writesDistractorsToQuestionOptions: true,
     },
@@ -359,12 +361,12 @@ function getActivityAiEnhancementRoadmapChainHandoffItem(
         'Configured provider only',
         'Workers AI or future providers run only through configured server-side credentials and authenticated server functions.'
       );
-    case 'ai-enhancement-chain-gate':
+    case 'enhancement-lifecycle-chain-boundary':
       return item(
         id,
-        'AI enhancement chain gate',
-        '30 source files',
-        'A focused gate keeps AI enhancement roadmap promises aligned with source privacy, editor review, save/publish boundaries, snapshots, public payloads, and result exports.'
+        'Enhancement lifecycle chain',
+        '30 lifecycle slices',
+        'AI enhancement roadmap promises remain inside policy, execution, parsed output, editor application, teacher review, manual save, publish, snapshot, public-payload, privacy, and result-export stages.'
       );
   }
 }

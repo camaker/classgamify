@@ -602,7 +602,12 @@ Implementation boundaries:
   from request policy through execution, parsed draft output, editor
   application, teacher review, manual save, saved activity records, assignment
   publish actions, share-link and snapshot boundaries, public-payload guards,
-  privacy guards, and result-export continuity.
+  privacy guards, and result-export continuity. The AI enhancement roadmap
+  explicitly carries these 30 lifecycle slices so future transforms,
+  distractors, variants, explanations, listening scripts, and extraction paths
+  cannot bypass blocked reasons, editor-only draft targets, teacher review,
+  manual save, explicit publish, frozen snapshots, sanitized public payloads,
+  or result exports.
 - `src/activities/ai-fallback-draft-chain.ts` owns the deterministic AI
   fallback draft chain for missing Workers AI credentials, invalid provider
   JSON, sanitized source-term planning, local classroom draft completion,

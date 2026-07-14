@@ -5,6 +5,7 @@ import {
   ACTIVITY_AI_AUTHORING_CHAIN_HANDOFF_ITEM_IDS,
   ACTIVITY_AI_AUTHORING_CHAIN_SOURCE_FILES,
 } from '@/activities/ai-authoring-chain';
+import { ACTIVITY_AI_ENHANCEMENT_LIFECYCLE_CHAIN_ITEM_IDS } from '@/activities/ai-enhancement-lifecycle-chain';
 import {
   ACTIVITY_AI_ENHANCEMENT_ROADMAP_CHAIN_HANDOFF_ITEM_IDS,
   ACTIVITY_AI_ENHANCEMENT_ROADMAP_CHAIN_SOURCE_FILES,
@@ -117,6 +118,7 @@ test('activity AI enhancement roadmap chain exposes 30 safe enhancement slices',
     requiresEditorReview: true,
     sourceFiles: [...ACTIVITY_AI_ENHANCEMENT_ROADMAP_CHAIN_SOURCE_FILES],
     usesDeterministicFallback: true,
+    usesEnhancementLifecycleChain: true,
     usesSharedActivityAssignmentModel: true,
     writesDistractorsToQuestionOptions: true,
   });
@@ -158,7 +160,7 @@ test('activity AI enhancement roadmap chain summarizes future execution boundari
       ['result-export-continuity', 'Shared export model'],
       ['deterministic-fallback', 'Local stable draft'],
       ['provider-credential-gate', 'Configured provider only'],
-      ['ai-enhancement-chain-gate', '30 source files'],
+      ['enhancement-lifecycle-chain-boundary', '30 lifecycle slices'],
     ]
   );
   assert.equal(
@@ -185,6 +187,7 @@ test('activity AI enhancement roadmap chain is backed by focused product gates',
   assert.deepEqual(
     [
       ACTIVITY_AI_AUTHORING_CHAIN_HANDOFF_ITEM_IDS.length,
+      ACTIVITY_AI_ENHANCEMENT_LIFECYCLE_CHAIN_ITEM_IDS.length,
       ACTIVITY_AI_REMIX_ASSIST_HANDOFF_ITEM_IDS.length,
       ACTIVITY_DRAFT_META_HANDOFF_ITEM_IDS.length,
       ACTIVITY_TEMPLATE_REMIX_HANDOFF_ITEM_IDS.length,
@@ -196,7 +199,7 @@ test('activity AI enhancement roadmap chain is backed by focused product gates',
       WORKSHEET_MODE_DELIVERY_CHAIN_HANDOFF_ITEM_IDS.length,
       ASSIGNMENT_RESULTS_EXPORT_PREPARATION_ITEM_IDS.length,
     ],
-    Array.from({ length: 11 }, () => 30)
+    Array.from({ length: 12 }, () => 30)
   );
 });
 

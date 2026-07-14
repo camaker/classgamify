@@ -7263,6 +7263,7 @@ assert.deepEqual(activityAiEnhancementRoadmapChainView.privacy, {
   requiresEditorReview: true,
   sourceFiles: [...ACTIVITY_AI_ENHANCEMENT_ROADMAP_CHAIN_SOURCE_FILES],
   usesDeterministicFallback: true,
+  usesEnhancementLifecycleChain: true,
   usesSharedActivityAssignmentModel: true,
   writesDistractorsToQuestionOptions: true,
 });
@@ -7295,7 +7296,7 @@ assert.deepEqual(
   Object.fromEntries(activityAiEnhancementRoadmapChainValues),
   {
     'activity-content-target': 'Questions/pairs/groups',
-    'ai-enhancement-chain-gate': '30 source files',
+    'enhancement-lifecycle-chain-boundary': '30 lifecycle slices',
     'ai-remix-completion': 'Missing fields only',
     'answer-explanation-target': 'Question explanations',
     'assignment-snapshot-protection': 'Frozen links protected',
