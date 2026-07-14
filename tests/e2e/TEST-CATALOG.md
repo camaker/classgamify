@@ -587,7 +587,10 @@ Assignment distribution lifecycle chain has a fast script-level gate via
 run it when changing post-publish route context, owner-scoped published lookup,
 absolute student URLs, frozen source activity context,
 copy/preview/print/results actions, assignment-list distribution steps,
-share-link handoff surfaces, or published-panel privacy guards.
+share-link handoff surfaces, the 30-slice student-runner-start boundary for
+sanitized source, runtime availability, delivery rules, attempts, timer,
+identity, submission preparation, and privacy, or published-panel privacy
+guards.
 Assignment lifecycle boundaries have a fast script-level gate via
 `pnpm exec tsx --test scripts/assignment-lifecycle-handoff-semantic-views.test.ts`;
 run it when changing open/closed/expired/draft status resolution, close/reopen

@@ -135,6 +135,7 @@ test('assignment distribution lifecycle chain exposes 30 safe slices', () => {
     usesNormalizedShareSlug: true,
     usesPreparedShareActions: true,
     usesSharedCopyPlan: true,
+    usesStudentRunnerStartHandoff: true,
   });
   assertNoPrivateDistributionText(JSON.stringify(handoffView));
 });
@@ -174,12 +175,16 @@ test('assignment distribution lifecycle summarizes each handoff boundary', () =>
       ['student-runner-boundary', 'Public /play'],
       ['printable-handout-boundary', 'Teacher print'],
       ['result-review-boundary', 'Teacher results'],
-      ['distribution-lifecycle-gate', '30 source files'],
+      ['student-runner-start-handoff-boundary', '30 runner start slices'],
     ]
   );
   assert.equal(
     getHandoffValue(handoffView, 'published-panel-action-parity'),
     'Panel actions'
+  );
+  assert.equal(
+    getHandoffValue(handoffView, 'student-runner-start-handoff-boundary'),
+    `${STUDENT_RUNNER_START_HANDOFF_ITEM_IDS.length} runner start slices`
   );
 });
 
@@ -495,6 +500,11 @@ test('assignment distribution lifecycle sources preserve route, DOM, and API bou
     'docs/product.md should keep source activity context connected to assignment list distribution.'
   );
   assert.match(
+    PRODUCT_SOURCE,
+    /assignment\s+distribution\s+lifecycle\s+chain[\s\S]*30-slice\s+student-runner-start\s+handoff[\s\S]*sanitized\s+source[\s\S]*delivery\s+rules[\s\S]*identity[\s\S]*submission\s+preparation[\s\S]*privacy/,
+    'docs/product.md should connect distributed student links to the shared runner-start contract.'
+  );
+  assert.match(
     API_ASSIGNMENTS_SOURCE,
     /publishedShareSlug[\s\S]*buildPublishedAssignmentListItemSelect\(\)[\s\S]*buildAssignmentDetailOwnerShareWhere\(\{[\s\S]*shareSlug: data\.publishedShareSlug,[\s\S]*userId/,
     'Assignments API should resolve published share context through owner-scoped share lookup.'
@@ -554,7 +564,7 @@ test('assignment distribution lifecycle sources preserve route, DOM, and API bou
 test('assignment distribution lifecycle focused gate is documented', () => {
   assert.match(
     TEST_CATALOG_SOURCE,
-    /Assignment distribution lifecycle chain has a fast script-level gate via[\s\S]*scripts\/assignment-distribution-lifecycle-chain-handoff\.test\.ts/,
+    /Assignment distribution lifecycle chain has a fast script-level gate via[\s\S]*scripts\/assignment-distribution-lifecycle-chain-handoff\.test\.ts[\s\S]*30-slice\s+student-runner-start\s+boundary/,
     'TEST-CATALOG should document the assignment distribution lifecycle gate.'
   );
   assert.match(

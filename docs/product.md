@@ -300,6 +300,13 @@ not ad hoc route code, because pagination and filters may change how much of the
 list is visible. Absolute share-link URL construction and `/play/:id` path
 encoding should also live in assignment-domain helpers so copied links are
 consistent across publish success panels, list cards, and result pages. The
+assignment distribution lifecycle chain should explicitly carry the 30-slice
+student-runner-start handoff so copied and previewed links enter the shared
+sanitized source, runtime availability, delivery rules, attempt limit, timer,
+identity, item order, instructions, submission preparation, and privacy
+contracts. Its independent 30-file gate should continue to verify post-publish
+context, owner lookup, share actions, print, and result surfaces without
+substituting for that student-facing start boundary. The
 assignment list should remain searchable as teachers reuse
 the product across classes: teachers can filter their own assignments by title,
 share id, source activity text, or assignment status without broadening outside

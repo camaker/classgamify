@@ -1,3 +1,5 @@
+import { STUDENT_RUNNER_START_HANDOFF_ITEM_IDS } from '@/assignments/student-runner-state';
+
 export const ASSIGNMENT_DISTRIBUTION_LIFECYCLE_CHAIN_HANDOFF_ITEM_IDS = [
   'product-distribution-policy',
   'publish-redirect-context',
@@ -28,7 +30,7 @@ export const ASSIGNMENT_DISTRIBUTION_LIFECYCLE_CHAIN_HANDOFF_ITEM_IDS = [
   'student-runner-boundary',
   'printable-handout-boundary',
   'result-review-boundary',
-  'distribution-lifecycle-gate',
+  'student-runner-start-handoff-boundary',
 ] as const;
 
 export const ASSIGNMENT_DISTRIBUTION_LIFECYCLE_CHAIN_SOURCE_FILES = [
@@ -96,6 +98,7 @@ export type AssignmentDistributionLifecycleChainPrivacyContract = {
   usesNormalizedShareSlug: true;
   usesPreparedShareActions: true;
   usesSharedCopyPlan: true;
+  usesStudentRunnerStartHandoff: true;
 };
 
 export type AssignmentDistributionLifecycleChainHandoffView = {
@@ -137,6 +140,7 @@ export function buildAssignmentDistributionLifecycleChainHandoffView(): Assignme
       usesNormalizedShareSlug: true,
       usesPreparedShareActions: true,
       usesSharedCopyPlan: true,
+      usesStudentRunnerStartHandoff: true,
     },
     title: 'Assignment distribution lifecycle chain',
   };
@@ -363,12 +367,12 @@ function getAssignmentDistributionLifecycleChainHandoffItem(
         'Teacher results',
         'Result actions stay teacher-only review surfaces backed by the frozen assignment snapshot and attempts.'
       );
-    case 'distribution-lifecycle-gate':
+    case 'student-runner-start-handoff-boundary':
       return item(
         id,
-        'Distribution lifecycle gate',
-        '30 source files',
-        'A focused gate keeps publish redirect context, assignment list distribution, source activity context, share-link actions, student preview, print, and results boundaries connected.'
+        'Student runner start handoff boundary',
+        `${STUDENT_RUNNER_START_HANDOFF_ITEM_IDS.length} runner start slices`,
+        'Copied and previewed student links must enter the shared runner-start contract for sanitized source, runtime availability, delivery rules, attempts, timer, identity, submission preparation, and privacy.'
       );
   }
 }

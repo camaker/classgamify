@@ -5135,6 +5135,7 @@ assert.deepEqual(assignmentDistributionLifecycleChainView.privacy, {
   usesNormalizedShareSlug: true,
   usesPreparedShareActions: true,
   usesSharedCopyPlan: true,
+  usesStudentRunnerStartHandoff: true,
 });
 assert.deepEqual(
   [
@@ -5156,7 +5157,7 @@ assert.deepEqual(Object.fromEntries(assignmentDistributionLifecycleChainValues),
   'copy-execution-plan': 'Shared copy plan',
   'copy-feedback': 'Toast mapped',
   'copy-step-readiness': 'Copy step',
-  'distribution-lifecycle-gate': '30 source files',
+  'student-runner-start-handoff-boundary': '30 runner start slices',
   'distribution-status': 'Ready or collecting',
   'filter-scope-alignment': 'Owner scope',
   'hidden-share-handoff': '30 share slices',
