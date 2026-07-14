@@ -147,7 +147,7 @@ test('snapshot query compiles owner, join-scope, and JSON reference predicates',
   assert.deepEqual(query.params, ['teacher-1', 'file-target']);
 });
 
-test('delete API blocks references before touching R2 or metadata', () => {
+test('delete API blocks references before claiming metadata or touching R2', () => {
   const handler = getSourceSlice(
     API_SOURCE,
     'export const deleteUserFile',
@@ -158,14 +158,14 @@ test('delete API blocks references before touching R2 or metadata', () => {
     'const [activityReferences, snapshotReferences] = await Promise.all'
   );
   const inUseIndex = handler.indexOf('user_files_api_error_file_in_use');
-  const storageDeleteIndex = handler.indexOf('deleteFile(row.r2Key)');
-  const metadataDeleteIndex = handler.indexOf('delete(userFiles).where(where)');
+  const storageDeleteIndex = handler.indexOf('deleteFile(deletedRow.r2Key)');
+  const metadataDeleteIndex = handler.indexOf('.delete(userFiles)');
 
   assert.ok(fileReadIndex >= 0);
   assert.ok(referenceCheckIndex > fileReadIndex);
   assert.ok(inUseIndex > referenceCheckIndex);
-  assert.ok(storageDeleteIndex > inUseIndex);
-  assert.ok(metadataDeleteIndex > storageDeleteIndex);
+  assert.ok(metadataDeleteIndex > inUseIndex);
+  assert.ok(storageDeleteIndex > metadataDeleteIndex);
   assert.match(
     handler,
     /select\(\{ id: activity\.id \}\)[\s\S]*select\(\{ assignmentId: assignmentSnapshot\.assignmentId \}\)/

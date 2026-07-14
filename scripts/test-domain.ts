@@ -116,6 +116,7 @@ import { ASSIGNMENT_STATUS_TRANSITION_CONCURRENCY_STAGES } from '@/assignments/s
 import { ASSIGNMENT_PUBLISH_SOURCE_WRITE_GUARD_STAGES } from '@/assignments/publish-source-write';
 import { ACTIVITY_MUTATION_CONCURRENCY_STAGES } from '@/activities/mutation-concurrency';
 import { ACTIVITY_DERIVATIVE_SOURCE_WRITE_GUARD_STAGES } from '@/activities/derivative-source-write';
+import { SOURCE_MATERIAL_INTEGRITY_STAGES } from '@/activities/source-material-integrity';
 import { ACTIVITY_SOURCE_MATERIAL_WRITE_STAGES } from '@/activities/source-material-write';
 import { ACTIVITY_SOURCE_MATERIAL_DELETE_STAGES } from '@/activities/source-material-delete';
 import {
@@ -5510,6 +5511,17 @@ assert.equal(ACTIVITY_MUTATION_CONCURRENCY_STAGES.length, 30);
 assert.equal(ACTIVITY_DERIVATIVE_SOURCE_WRITE_GUARD_STAGES.length, 30);
 assert.equal(ACTIVITY_SOURCE_MATERIAL_WRITE_STAGES.length, 30);
 assert.equal(ACTIVITY_SOURCE_MATERIAL_DELETE_STAGES.length, 30);
+assert.equal(SOURCE_MATERIAL_INTEGRITY_STAGES.length, 30);
+assert.equal(
+  new Set(SOURCE_MATERIAL_INTEGRITY_STAGES.map((stage) => stage.id)).size,
+  30
+);
+assert.equal(
+  SOURCE_MATERIAL_INTEGRITY_STAGES.filter(
+    (stage) => stage.layer === 'database'
+  ).length,
+  12
+);
 assert.equal(
   new Set(ACTIVITY_SOURCE_MATERIAL_DELETE_STAGES.map((stage) => stage.id)).size,
   30
@@ -14975,8 +14987,8 @@ assert.doesNotMatch(
 );
 assert.match(
   userFilesApiSource,
-  /deleteUserFile[\s\S]*const where = buildUserFileDetailOwnerWhere\(\{[\s\S]*fileId: data\.id,[\s\S]*userId,[\s\S]*const \[activityReferences, snapshotReferences\] = await Promise\.all[\s\S]*buildActivitySourceMaterialFileReferenceWhere[\s\S]*buildAssignmentSnapshotSourceMaterialFileReferenceWhere[\s\S]*user_files_api_error_file_in_use[\s\S]*deleteFile\(row\.r2Key\)[\s\S]*delete\(userFiles\)\.where\(where\)/,
-  'User file deletion should keep owner scope and block activity or snapshot references before storage deletion.'
+  /deleteUserFile[\s\S]*const where = buildUserFileDetailOwnerWhere\(\{[\s\S]*fileId: data\.id,[\s\S]*userId,[\s\S]*const \[activityReferences, snapshotReferences\] = await Promise\.all[\s\S]*buildActivitySourceMaterialFileReferenceWhere[\s\S]*buildAssignmentSnapshotSourceMaterialFileReferenceWhere[\s\S]*user_files_api_error_file_in_use[\s\S]*delete\(userFiles\)[\s\S]*returning\(\)[\s\S]*deleteFile\(deletedRow\.r2Key\)[\s\S]*recoverUserFileDeleteAfterStorageFailure/,
+  'User file deletion should keep owner scope, claim guarded metadata, and recover storage failures.'
 );
 assert.match(
   userFilesApiSource,

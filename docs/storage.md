@@ -120,6 +120,11 @@ Files are always served via the same-origin route `/api/storage/file?key=...`.
     assignment snapshots for the compact file id. Referenced files are blocked
     before this provider method runs, so active/archived activities and published
     snapshot provenance do not become broken references.
+  - The final D1 metadata delete is trigger-guarded and happens before R2 cleanup
+    so concurrent activity writes cannot attach a disappearing object. If R2
+    deletion reports an error, object presence is checked: existing objects get
+    a metadata-restore attempt, confirmed-absent objects count as deleted, and
+    unknown or failed recovery remains unavailable to new activity references.
 
 - **uploadUserFile** (server function, in `@/api/user-files`): Accepts
   `FormData` (file, optional folder, isPublic, description). Requires session

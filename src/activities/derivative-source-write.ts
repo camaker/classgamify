@@ -1,4 +1,5 @@
 import { getArchivedActivityDerivationError } from '@/activities/lifecycle';
+import { getSourceMaterialIntegrityErrorMessage } from '@/activities/source-material-integrity';
 import { getErrorTextChain } from '@/lib/error-text';
 import { m } from '@/locale/paraglide/messages';
 
@@ -45,6 +46,8 @@ export const ACTIVITY_DERIVATIVE_SOURCE_WRITE_GUARD_STAGES = [
 ] as const;
 
 export function getActivityDerivativeSourceWriteErrorMessage(error: unknown) {
+  const sourceMaterialMessage = getSourceMaterialIntegrityErrorMessage(error);
+  if (sourceMaterialMessage) return sourceMaterialMessage;
   const errorText = getErrorTextChain(error);
   if (errorText.includes(ACTIVITY_DERIVATIVE_SOURCE_OWNER_MARKER)) {
     return m.activity_api_error_activity_not_found();

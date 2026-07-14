@@ -194,6 +194,11 @@ Source-material deletion has a fast script-level gate via
 run it when changing file deletion, activity/snapshot JSON reference queries,
 active or archived material retention, R2 delete ordering, in-use errors,
 owner-scoped reference checks, or delete-path privacy.
+Source-material write/delete races have a fast script-level gate via
+`pnpm exec tsx --test scripts/source-material-integrity-guard-contract.test.ts`;
+run it when changing activity or snapshot source-material writes, file metadata
+deletion order, D1 integrity triggers, R2 delete recovery, nested trigger-error
+mapping, or concurrent reference safety.
 Assignment lifecycle governance chain has a fast script-level gate via
 `pnpm exec tsx --test scripts/assignment-lifecycle-governance-chain-handoff.test.ts`;
 run it when changing open/closed/expired/draft status resolution,

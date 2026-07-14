@@ -99,6 +99,13 @@
       "when": 1784013516609,
       "tag": "0013_activity_derivative_source_guard",
       "breakpoints": true
+    },
+    {
+      "idx": 14,
+      "version": "6",
+      "when": 1784023535509,
+      "tag": "0014_source_material_integrity_guard",
+      "breakpoints": true
     }
   ]
 }

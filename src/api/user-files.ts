@@ -2,6 +2,10 @@ import {
   buildActivitySourceMaterialFileReferenceWhere,
   buildAssignmentSnapshotSourceMaterialFileReferenceWhere,
 } from '@/activities/source-material-delete';
+import {
+  recoverUserFileDeleteAfterStorageFailure,
+  rethrowSourceMaterialIntegrityError,
+} from '@/activities/source-material-integrity';
 import { buildAssignmentSnapshotJoin } from '@/assignments/detail-query';
 import { getDb } from '@/db';
 import {
@@ -13,7 +17,7 @@ import {
 import { getBaseUrl } from '@/lib/urls';
 import { m } from '@/locale/paraglide/messages';
 import { authApiMiddleware } from '@/middlewares/auth-middleware';
-import { deleteFile, uploadFile } from '@/storage';
+import { deleteFile, getFileInfo, uploadFile } from '@/storage';
 import {
   buildUserFileDetailOwnerWhere,
   buildUserFileListOrderBy,
@@ -163,8 +167,27 @@ export const deleteUserFile = createServerFn({ method: 'POST' })
       throw new Error(m.user_files_api_error_file_in_use());
     }
 
-    await deleteFile(row.r2Key);
-    await db.delete(userFiles).where(where);
+    const [deletedRow] = await db
+      .delete(userFiles)
+      .where(where)
+      .returning()
+      .catch(rethrowSourceMaterialIntegrityError);
+    if (!deletedRow) {
+      throw new Error(m.user_files_api_error_file_not_found());
+    }
+
+    try {
+      await deleteFile(deletedRow.r2Key);
+    } catch {
+      const recovery = await recoverUserFileDeleteAfterStorageFailure({
+        probeObject: () => getFileInfo(deletedRow.r2Key),
+        restoreMetadata: async () => {
+          await db.insert(userFiles).values(deletedRow);
+        },
+      });
+      if (recovery === 'already-deleted') return;
+      throw new Error(m.user_files_api_error_delete_failed());
+    }
   });
 
 const uploadSchema = z

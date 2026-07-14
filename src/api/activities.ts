@@ -22,6 +22,7 @@ import {
   getActivitySourceMaterialWriteFileIds,
   resolveActivitySourceMaterialWrite,
 } from '@/activities/source-material-write';
+import { rethrowSourceMaterialIntegrityError } from '@/activities/source-material-integrity';
 import {
   ACTIVITY_LIBRARY_INPUT_LIMITS,
   ACTIVITY_LIBRARY_PAGE_SIZE,
@@ -193,7 +194,8 @@ export const createActivity = createServerFn({ method: 'POST' })
 
     await db
       .insert(activity)
-      .values(buildActivityCreateInsert({ id, input, now, userId }));
+      .values(buildActivityCreateInsert({ id, input, now, userId }))
+      .catch(rethrowSourceMaterialIntegrityError);
 
     const [row] = await db
       .select(buildActivityDetailSelect())
@@ -370,7 +372,8 @@ export const updateActivity = createServerFn({ method: 'POST' })
           userId,
         })
       )
-      .returning(buildActivityDetailSelect());
+      .returning(buildActivityDetailSelect())
+      .catch(rethrowSourceMaterialIntegrityError);
 
     if (!updatedActivity) {
       await throwActivityMutationConflict({

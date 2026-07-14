@@ -175,6 +175,15 @@ minimal ids, never return activity or snapshot content, and do not inspect stude
 attempts. Teachers can remove ordinary saved-activity references before deleting
 the underlying file, while published snapshot provenance remains retained and
 continues to block deletion.
+Source-material reference integrity must also hold when activity saves, assignment
+publishes, and file deletion race. Database write guards recheck owner-scoped file
+existence on activity and frozen-snapshot inserts or content updates, while file
+metadata deletion is blocked atomically if either JSON document still references
+the file. The delete path claims the metadata before touching R2 so a later
+activity write cannot attach a disappearing object. If R2 reports a delete error,
+the server probes object presence: an absent object completes deletion, a present
+object attempts metadata restoration for retry, and an unknown or failed recovery
+stays unavailable rather than allowing a broken classroom reference.
 The source-material privacy chain should explicitly carry the compact material
 reference handoff's 30 slices for reference shape, safe file ids and filename
 basenames, content-type, material kind and size normalization, duplicate

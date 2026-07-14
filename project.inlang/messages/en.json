@@ -8160,6 +8160,7 @@
   "templates_page_title": "Pick a game format for the same lesson content.",
   "user_files_api_error_content_type_mismatch": "The file extension does not match the uploaded content. Choose the original file or export it again.",
   "user_files_api_error_dangerous_content_type": "This file type cannot be uploaded for classroom safety.",
+  "user_files_api_error_delete_failed": "File deletion could not be confirmed. Refresh your files before trying again.",
   "user_files_api_error_file_not_found": "File not found",
   "user_files_api_error_file_in_use": "This source material is still used by a saved activity or assignment snapshot and cannot be deleted.",
   "user_files_api_error_file_not_provided": "File not provided",

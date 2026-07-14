@@ -100,6 +100,17 @@ minimal id as existence evidence; no activity content, assignment content,
 student data, filename, or storage key is returned. Any reference blocks both R2
 and `user_files` deletion with one safe in-use result.
 
+Migration `0014_source_material_integrity_guard.sql` closes the write/delete race
+with six database triggers. Activity and assignment-snapshot inserts or content
+updates reject source-material ids that do not resolve to `user_files` for the
+same owner. Two file-delete triggers atomically reject active, archived, or frozen
+snapshot references. The API therefore deletes metadata with `RETURNING` before
+R2 cleanup; D1 serialization makes either the reference write or metadata claim
+win, never both. Trigger markers are mapped to existing localized unavailable or
+in-use errors and are not returned to clients. File-delete guards apply while
+the owner row exists, so deleting the whole teacher account can still use the
+schema's existing owner-scoped cascade.
+
 ## Activity mutation concurrency
 
 Activity edit, archive, and restore writes use one compare-and-set `UPDATE`.
