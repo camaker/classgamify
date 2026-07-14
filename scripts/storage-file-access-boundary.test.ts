@@ -217,11 +217,11 @@ test('storage file response headers keep inline, download, and cache rules expli
 test('storage file route delegates access and header policy to storage domain helpers', () => {
   assert.match(
     ROUTE_SOURCE,
-    /validateStorageFileProxyKey\([\s\S]*url\.searchParams\.get\('key'\)/
+    /const requestedKey = url\.searchParams\.get\('key'\)[\s\S]*validateStorageFileProxyKey\(key\)/
   );
   assert.match(
     ROUTE_SOURCE,
-    /resolveStorageFileAccessDecision\(\{[\s\S]*fileRecord,[\s\S]*key,[\s\S]*requesterUserId: userId/
+    /resolveStorageFileAccessDecision\(\{[\s\S]*fileRecord,[\s\S]*key: keyValidation\.key,[\s\S]*requesterUserId: userId/
   );
   assert.match(
     ROUTE_SOURCE,

@@ -121,6 +121,7 @@ import { ACTIVITY_SOURCE_MATERIAL_WRITE_STAGES } from '@/activities/source-mater
 import { ACTIVITY_SOURCE_MATERIAL_DELETE_STAGES } from '@/activities/source-material-delete';
 import { USER_FILE_UPLOAD_PERSISTENCE_STAGES } from '@/storage/upload-persistence';
 import { R2_UPLOAD_PUT_RECOVERY_STAGES } from '@/storage/upload-put-recovery';
+import { USER_FILE_RESPONSE_BOUNDARY_STAGES } from '@/storage/user-file-response';
 import {
   AUTH_ERROR_RECOVERY_STEP_IDS,
   buildAuthErrorDisplayView,
@@ -5516,6 +5517,17 @@ assert.equal(ACTIVITY_SOURCE_MATERIAL_DELETE_STAGES.length, 30);
 assert.equal(SOURCE_MATERIAL_INTEGRITY_STAGES.length, 30);
 assert.equal(USER_FILE_UPLOAD_PERSISTENCE_STAGES.length, 30);
 assert.equal(R2_UPLOAD_PUT_RECOVERY_STAGES.length, 30);
+assert.equal(USER_FILE_RESPONSE_BOUNDARY_STAGES.length, 30);
+assert.equal(
+  new Set(USER_FILE_RESPONSE_BOUNDARY_STAGES.map((stage) => stage.id)).size,
+  30
+);
+assert.equal(
+  USER_FILE_RESPONSE_BOUNDARY_STAGES.filter(
+    (stage) => stage.layer === 'privacy'
+  ).length,
+  5
+);
 assert.equal(
   new Set(R2_UPLOAD_PUT_RECOVERY_STAGES.map((stage) => stage.id)).size,
   30
@@ -15008,6 +15020,11 @@ assert.match(
   /getUserFileListOffset\(\{[\s\S]*pageIndex: data\.pageIndex,[\s\S]*pageSize: data\.pageSize/,
   'User file list APIs should delegate offset calculation to the storage query domain.'
 );
+assert.match(
+  userFilesApiSource,
+  /listUserFiles[\s\S]*select\(buildUserFileClientSelect\(\)\)[\s\S]*orderBy\(\.\.\.buildUserFileListOrderBy\(\)\)/,
+  'User file list responses should use the explicit safe client select.'
+);
 assert.doesNotMatch(
   userFilesApiSource,
   /desc\(userFiles\.createdAt\)|data\.pageIndex \* data\.pageSize|const pageIndex = data\.pageIndex|const pageSize = data\.pageSize/,
@@ -15035,8 +15052,8 @@ assert.doesNotMatch(
 );
 assert.match(
   userFilesApiSource,
-  /const publicFolder = isPublicFolder\(data\.folder\);[\s\S]*userId: publicFolder \? undefined : \(userId \?\? undefined\)[\s\S]*if \(!publicFolder\) \{[\s\S]*const metadata = result\.metadata[\s\S]*if \(!userId \|\| !metadata\)[\s\S]*throwUserFileUploadPersistenceFailure\(result\.key\)[\s\S]*insert\(userFiles\)\.values[\s\S]*recoverUserFileUploadAfterMetadataFailure[\s\S]*fileId: metadata\.id,[\s\S]*userId,[\s\S]*persistedRow\?\.r2Key === metadata\.r2Key[\s\S]*recovery !== 'persisted'[\s\S]*return result/,
-  'User file upload API should require owner metadata, resolve ambiguous commits, compensate confirmed failures, and return afterward.'
+  /const publicFolder = isPublicFolder\(data\.folder\);[\s\S]*userId: publicFolder \? undefined : \(userId \?\? undefined\)[\s\S]*if \(!publicFolder\) \{[\s\S]*const metadata = result\.metadata[\s\S]*if \(!userId \|\| !metadata\)[\s\S]*throwUserFileUploadPersistenceFailure\(result\.key\)[\s\S]*insert\(userFiles\)\.values[\s\S]*recoverUserFileUploadAfterMetadataFailure[\s\S]*fileId: metadata\.id,[\s\S]*userId,[\s\S]*persistedRow\?\.r2Key === metadata\.r2Key[\s\S]*recovery !== 'persisted'[\s\S]*file: buildUserFileClientItem[\s\S]*return \{ url: result\.url \}/,
+  'User file upload API should resolve persistence before returning private safe items or public URLs.'
 );
 assert.doesNotMatch(
   userFilesApiSource,

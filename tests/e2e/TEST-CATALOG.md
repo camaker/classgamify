@@ -210,6 +210,11 @@ Ambiguous R2 upload writes have a fast script-level gate via
 when changing R2 `put`, custom upload metadata, exact-key `head` recovery,
 file-id/size/content-type evidence, original-error rethrows, no-second-put
 behavior, provider metadata construction, or upload-recovery privacy.
+Teacher file responses have a fast script-level gate via
+`pnpm exec tsx --test scripts/user-file-response-boundary-contract.test.ts`;
+run it when changing full file lists, private upload responses, public avatar
+responses, safe file item fields, ID-based file links, server-side R2 key
+resolution, settings table types, owner access decisions, or response privacy.
 Assignment lifecycle governance chain has a fast script-level gate via
 `pnpm exec tsx --test scripts/assignment-lifecycle-governance-chain-handoff.test.ts`;
 run it when changing open/closed/expired/draft status resolution,

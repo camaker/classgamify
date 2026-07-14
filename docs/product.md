@@ -203,6 +203,14 @@ the current upload. A missing object, mismatched evidence, or failed probe keeps
 the original upload error. The provider never issues a blind second `put`, reads
 file bytes for recovery, exposes the marker, or constructs `userFiles` metadata
 from partial evidence.
+Teacher-facing file responses must keep private R2 keys server-only. The full
+file list selects only safe display metadata and a stable file id; private upload
+responses return the same safe item shape instead of provider `key` or
+`metadata.r2Key`. File-table open actions use `/api/storage/file?id=...`; that
+route validates the id, resolves the key in D1, and then applies the existing
+owner/public access decision before fetching R2. Public shared-folder uploads
+still return their public URL, while neither response exposes owner ids, private
+descriptions, permission metadata, provider metadata, or storage keys.
 The source-material privacy chain should explicitly carry the compact material
 reference handoff's 30 slices for reference shape, safe file ids and filename
 basenames, content-type, material kind and size normalization, duplicate

@@ -171,7 +171,7 @@ test('private API persists metadata before returning upload success', () => {
   const privateBranchIndex = handler.indexOf('if (!publicFolder)');
   const metadataIndex = handler.indexOf('const metadata = result.metadata');
   const insertIndex = handler.indexOf('db.insert(userFiles).values');
-  const returnIndex = handler.lastIndexOf('return result');
+  const returnIndex = handler.indexOf('file: buildUserFileClientItem');
 
   assert.ok(uploadIndex >= 0);
   assert.ok(privateBranchIndex > uploadIndex);
@@ -205,7 +205,7 @@ test('public folders bypass private metadata persistence and compensation', () =
   );
   assert.match(
     handler,
-    /if \(!publicFolder\) \{[\s\S]*db\.insert\(userFiles\)[\s\S]*return result/
+    /if \(!publicFolder\) \{[\s\S]*db\.insert\(userFiles\)[\s\S]*file: buildUserFileClientItem[\s\S]*return \{ url: result\.url \}/
   );
   assert.doesNotMatch(
     handler.slice(0, handler.indexOf('if (!publicFolder)')),

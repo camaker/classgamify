@@ -11,9 +11,10 @@ import {
   validateStorageFileProxyKey,
 } from '@/storage/file-access';
 import { ConfigurationError } from '@/storage/types';
+import { isValidUserFileAccessId } from '@/storage/user-file-response';
 
 /**
- * Serves a file by key via the storage provider (same-origin proxy URL).
+ * Serves a file by server-resolved id or public key through the storage provider.
  * Shared asset folders stay public; private user files require ownership.
  */
 export const Route = createFileRoute('/api/storage/file')({
@@ -21,13 +22,14 @@ export const Route = createFileRoute('/api/storage/file')({
     handlers: {
       GET: async ({ request }) => {
         const url = new URL(request.url);
-        const keyValidation = validateStorageFileProxyKey(
-          url.searchParams.get('key')
-        );
-        if (!keyValidation.success) {
+        const fileId = url.searchParams.get('id');
+        const requestedKey = url.searchParams.get('key');
+        if (!fileId && !requestedKey) {
           return new Response('Bad Request', { status: 400 });
         }
-        const { key } = keyValidation;
+        if (fileId && !isValidUserFileAccessId(fileId)) {
+          return new Response('Bad Request', { status: 400 });
+        }
 
         try {
           const headers = getRequestHeaders();
@@ -35,19 +37,42 @@ export const Route = createFileRoute('/api/storage/file')({
           const userId = session?.user?.id;
 
           const db = getDb();
-          const [fileRecord] = await db
-            .select({
-              isPublic: userFiles.isPublic,
-              originalName: userFiles.originalName,
-              userId: userFiles.userId,
-            })
-            .from(userFiles)
-            .where(eq(userFiles.r2Key, key))
-            .limit(1);
+          const [resolvedRecord] = fileId
+            ? await db
+                .select({
+                  isPublic: userFiles.isPublic,
+                  originalName: userFiles.originalName,
+                  r2Key: userFiles.r2Key,
+                  userId: userFiles.userId,
+                })
+                .from(userFiles)
+                .where(eq(userFiles.id, fileId))
+                .limit(1)
+            : [];
+          const key = fileId ? resolvedRecord?.r2Key : requestedKey;
+          const keyValidation = validateStorageFileProxyKey(key);
+          if (!keyValidation.success) {
+            return new Response(fileId ? 'Not Found' : 'Bad Request', {
+              status: fileId ? 404 : 400,
+            });
+          }
+          const fileRecord =
+            resolvedRecord ??
+            (
+              await db
+                .select({
+                  isPublic: userFiles.isPublic,
+                  originalName: userFiles.originalName,
+                  userId: userFiles.userId,
+                })
+                .from(userFiles)
+                .where(eq(userFiles.r2Key, keyValidation.key))
+                .limit(1)
+            )[0];
 
           const accessDecision = resolveStorageFileAccessDecision({
             fileRecord,
-            key,
+            key: keyValidation.key,
             requesterUserId: userId,
           });
           if (!accessDecision.allowed) {
@@ -56,7 +81,7 @@ export const Route = createFileRoute('/api/storage/file')({
             return new Response(message, { status: accessDecision.status });
           }
 
-          const file = await getFile(key);
+          const file = await getFile(accessDecision.key);
           if (!file) {
             return new Response('Not Found', { status: 404 });
           }

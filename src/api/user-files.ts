@@ -27,6 +27,10 @@ import {
 } from '@/storage/file-query';
 import { buildUserFileMaterialSummary } from '@/storage/file-summary';
 import {
+  buildUserFileClientItem,
+  buildUserFileClientSelect,
+} from '@/storage/user-file-response';
+import {
   cleanupUploadedObjectAfterMetadataFailure,
   recoverUserFileUploadAfterMetadataFailure,
   type UploadedObjectCleanupResult,
@@ -58,7 +62,7 @@ export const listUserFiles = createServerFn({ method: 'GET' })
     const [totalRows, items, summaryItems] = await Promise.all([
       db.select({ count: count() }).from(userFiles).where(where),
       db
-        .select()
+        .select(buildUserFileClientSelect())
         .from(userFiles)
         .where(where)
         .orderBy(...buildUserFileListOrderBy())
@@ -289,9 +293,20 @@ export const uploadUserFile = createServerFn({ method: 'POST' })
           throwUserFileUploadPersistenceError(recovery);
         }
       }
+      return {
+        file: buildUserFileClientItem({
+          contentType: metadata.contentType,
+          createdAt: metadata.uploadedAt,
+          filename: metadata.filename,
+          id: metadata.id,
+          isPublic: data.isPublic ?? null,
+          originalName: metadata.originalName,
+          size: metadata.size,
+        }),
+      };
     }
 
-    return result;
+    return { url: result.url };
   });
 
 async function throwUserFileUploadPersistenceFailure(

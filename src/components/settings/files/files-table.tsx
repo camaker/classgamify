@@ -30,9 +30,7 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
-import type { UserFiles } from '@/db/types';
 import { formatBytes, formatDate } from '@/lib/formatter';
-import { getFileAccessUrl } from '@/lib/urls';
 import { cn } from '@/lib/utils';
 import { buildUserFileMaterialClassificationView } from '@/storage/file-material-classification';
 import {
@@ -42,6 +40,10 @@ import {
 } from '@/storage/file-summary';
 import { buildSettingsFilesMaterialClassificationHandoffView } from '@/settings/files-material-classification-view';
 import { buildSettingsFilesSourceMaterialHandoffView } from '@/settings/files-view';
+import {
+  buildUserFileIdAccessPath,
+  type UserFileClientItem,
+} from '@/storage/user-file-response';
 import {
   type ColumnDef,
   type VisibilityState,
@@ -58,7 +60,7 @@ import {
 } from '@tabler/icons-react';
 import { useMemo, useState } from 'react';
 
-function UserFileMaterialTypeCell({ file }: { file: UserFiles }) {
+function UserFileMaterialTypeCell({ file }: { file: UserFileClientItem }) {
   const materialView = buildUserFileMaterialClassificationView({
     contentType: file.contentType,
     filename: file.filename,
@@ -106,12 +108,12 @@ function FilesSummaryStrip({ summary }: { summary: UserFileMaterialSummary }) {
   );
 }
 
-function toDate(value: number | Date | undefined | null): Date | null {
+function toDate(value: Date | number | string | undefined | null): Date | null {
   if (value == null) return null;
   return value instanceof Date ? value : new Date(value);
 }
 interface FilesTableProps {
-  data: UserFiles[];
+  data: UserFileClientItem[];
   summary?: UserFileMaterialSummary;
   total: number;
   pageIndex: number;
@@ -180,7 +182,7 @@ export function FilesTable({
       }),
     [data, materialSummary, total]
   );
-  const columns: ColumnDef<UserFiles>[] = useMemo(
+  const columns: ColumnDef<UserFileClientItem>[] = useMemo(
     () => [
       {
         id: 'originalName',
@@ -251,7 +253,7 @@ export function FilesTable({
         id: 'accessLink',
         header: m.settings_files_columns_access_link(),
         cell: ({ row }) => {
-          const url = getFileAccessUrl(row.original.r2Key);
+          const url = buildUserFileIdAccessPath(row.original.id);
           return (
             <a
               href={url}

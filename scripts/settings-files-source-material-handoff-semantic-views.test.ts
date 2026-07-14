@@ -124,7 +124,7 @@ test('settings files table wires full-library summaries and safe handoff panels'
   );
   assert.match(
     FILES_TABLE_SOURCE,
-    /const url = getFileAccessUrl\(row\.original\.r2Key\);[\s\S]*target="_blank"[\s\S]*rel="noopener noreferrer"/,
+    /const url = buildUserFileIdAccessPath\(row\.original\.id\);[\s\S]*target="_blank"[\s\S]*rel="noopener noreferrer"/,
     'Teacher table open links should stay explicit and browser-safe.'
   );
   assert.match(
@@ -189,7 +189,7 @@ test('settings files hooks and APIs keep owner scope and sanitized material list
   );
   assert.match(
     USER_FILES_API_SOURCE,
-    /const where = buildUserFileOwnerWhere\(\{ userId \}\);[\s\S]*select\(\)[\s\S]*from\(userFiles\)[\s\S]*where\(where\)[\s\S]*orderBy\(\.\.\.buildUserFileListOrderBy\(\)\)/,
+    /const where = buildUserFileOwnerWhere\(\{ userId \}\);[\s\S]*select\(buildUserFileClientSelect\(\)\)[\s\S]*from\(userFiles\)[\s\S]*where\(where\)[\s\S]*orderBy\(\.\.\.buildUserFileListOrderBy\(\)\)/,
     'File list API should use a reusable owner-scoped where clause.'
   );
   assert.match(
