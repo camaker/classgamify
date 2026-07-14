@@ -18270,6 +18270,7 @@ assert.deepEqual(transactionalMailLifecycleChainView.privacy, {
   sourceFiles: [...TRANSACTIONAL_MAIL_LIFECYCLE_CHAIN_SOURCE_FILES],
   templateSetSize: 4,
   usesProviderRegistry: true,
+  usesTeacherNotificationUpdateHandoff: true,
 });
 assert.deepEqual(Object.fromEntries(transactionalMailLifecycleChainValues), {
   'action-url-guard': 'Not in handoff',
@@ -18299,7 +18300,7 @@ assert.deepEqual(Object.fromEntries(transactionalMailLifecycleChainValues), {
   'subject-localization': 'Message keys',
   'template-set-registry': 'Render registry',
   'template-type-union': '4 templates',
-  'transactional-mail-chain-gate': '30 source files',
+  'teacher-notification-update-boundary': '30 notification slices',
   'verify-email-consumer': 'Better Auth',
   'workspace-boundary-panel': 'Shared panel',
 });
@@ -18307,9 +18308,10 @@ assert.deepEqual(
   [
     MAIL_TRANSACTIONAL_WORKSPACE_HANDOFF_ITEM_IDS.length,
     MAIL_TRANSACTIONAL_TEMPLATE_IDS.length,
+    SETTINGS_NOTIFICATION_UPDATE_HANDOFF_ITEM_IDS.length,
   ],
-  [30, 4],
-  'Transactional mail lifecycle chain should stay backed by the transactional workspace handoff and four current templates.'
+  [30, 4, 30],
+  'Transactional mail lifecycle chain should stay backed by the workspace handoff, four current templates, and teacher notification updates.'
 );
 assert.match(
   productSource,

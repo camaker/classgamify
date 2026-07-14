@@ -109,6 +109,12 @@ render the shared teacher workspace context before provider send while keeping
 action URLs, recipient data, provider secrets, source-material storage keys,
 student identifiers, learner notifications, and product mutations out of
 handoff contracts.
+The transactional mail lifecycle should explicitly carry the 30-slice teacher
+notification update handoff across subscription status, pause controls,
+template and worksheet updates, assignment review context, provider visibility,
+and email-channel scope. It must not mutate activities, assignment snapshots,
+attempts, result exports, or public links, read source-material files, expose
+recipient or student data, or send learner assignment reminders.
 `src/config/classroom-trust-communication-chain.ts` absorbs that
 transactional mail lifecycle and its transactional mail workspace boundary
 alongside public contact intake, auth workspace

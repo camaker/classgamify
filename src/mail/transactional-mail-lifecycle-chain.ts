@@ -28,7 +28,7 @@ export const TRANSACTIONAL_MAIL_LIFECYCLE_CHAIN_HANDOFF_ITEM_IDS = [
   'recipient-privacy-guard',
   'no-workspace-mutation',
   'learner-notification-guard',
-  'transactional-mail-chain-gate',
+  'teacher-notification-update-boundary',
 ] as const;
 
 export const TRANSACTIONAL_MAIL_LIFECYCLE_CHAIN_SOURCE_FILES = [
@@ -100,6 +100,7 @@ export type TransactionalMailLifecycleChainPrivacyContract = {
   sourceFiles: string[];
   templateSetSize: number;
   usesProviderRegistry: true;
+  usesTeacherNotificationUpdateHandoff: true;
 };
 
 export type TransactionalMailLifecycleChainHandoffView = {
@@ -144,6 +145,7 @@ export function buildTransactionalMailLifecycleChainHandoffView(): Transactional
       sourceFiles: [...TRANSACTIONAL_MAIL_LIFECYCLE_CHAIN_SOURCE_FILES],
       templateSetSize: 4,
       usesProviderRegistry: true,
+      usesTeacherNotificationUpdateHandoff: true,
     },
     title: 'Transactional mail lifecycle chain',
   };
@@ -367,12 +369,12 @@ function getTransactionalMailLifecycleChainHandoffItem(
         'Teacher email only',
         'Current transactional and newsletter flows do not send direct student assignment reminders.'
       );
-    case 'transactional-mail-chain-gate':
+    case 'teacher-notification-update-boundary':
       return item(
         id,
-        'Transactional mail chain gate',
-        '30 source files',
-        'A focused gate keeps docs, render, templates, auth, contact, newsletter, provider, and privacy boundaries connected.'
+        'Teacher notification updates',
+        '30 notification slices',
+        'Transactional mail stays connected to teacher update subscriptions, pause controls, classroom scope, no-mutation guarantees, learner-notification guards, and provider privacy.'
       );
   }
 }

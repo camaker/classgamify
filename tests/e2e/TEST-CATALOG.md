@@ -621,6 +621,10 @@ run it when changing the transactional template set, locale fallback,
 HTML/plain-text rendering, shared workspace boundary, auth reset/verification,
 newsletter confirmation, contact classroom inquiry, provider registry, mail
 disabled/provider-secret guards, no-mutation guarantees, or mail privacy guards.
+The chain also carries the 30-slice teacher notification update handoff for
+subscription controls, classroom update scope, provider visibility,
+activity/snapshot/attempt/result isolation, no learner reminders, and privacy
+while its independent source file gate remains intact.
 Activity AI authoring chain has a fast script-level gate via
 `pnpm exec tsx --test scripts/activity-ai-authoring-chain-handoff.test.ts`;
 run it when changing AI source safety, authenticated draft generation,

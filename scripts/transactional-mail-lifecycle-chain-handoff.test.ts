@@ -14,6 +14,7 @@ import {
   type TransactionalMailLifecycleChainHandoffItemId,
   type TransactionalMailLifecycleChainHandoffView,
 } from '@/mail/transactional-mail-lifecycle-chain';
+import { SETTINGS_NOTIFICATION_UPDATE_HANDOFF_ITEM_IDS } from '@/settings/notifications-view';
 
 const PRODUCT_SOURCE = readFileSync('docs/product.md', 'utf8');
 const MAIL_DOC_SOURCE = readFileSync('docs/mail.md', 'utf8');
@@ -119,6 +120,7 @@ test('transactional mail lifecycle chain exposes 30 safe mail slices', () => {
     sourceFiles: [...TRANSACTIONAL_MAIL_LIFECYCLE_CHAIN_SOURCE_FILES],
     templateSetSize: 4,
     usesProviderRegistry: true,
+    usesTeacherNotificationUpdateHandoff: true,
   });
   assertNoPrivateTransactionalMailChainText(JSON.stringify(handoffView));
 });
@@ -158,7 +160,7 @@ test('transactional mail lifecycle chain summarizes each linked mail boundary', 
       ['recipient-privacy-guard', 'Recipients hidden'],
       ['no-workspace-mutation', 'Mail sends only'],
       ['learner-notification-guard', 'Teacher email only'],
-      ['transactional-mail-chain-gate', '30 source files'],
+      ['teacher-notification-update-boundary', '30 notification slices'],
     ]
   );
   assert.equal(
@@ -177,6 +179,7 @@ test('transactional mail lifecycle chain is backed by focused mail contracts', (
   }
 
   assert.equal(MAIL_TRANSACTIONAL_WORKSPACE_HANDOFF_ITEM_IDS.length, 30);
+  assert.equal(SETTINGS_NOTIFICATION_UPDATE_HANDOFF_ITEM_IDS.length, 30);
   assert.equal(MAIL_TRANSACTIONAL_TEMPLATE_IDS.length, 4);
   assert.match(
     MAIL_WORKSPACE_BOUNDARY_SOURCE,
