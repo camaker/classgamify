@@ -685,7 +685,8 @@ Activity AI enhancement editor review has a fast script-level gate via
 `pnpm exec tsx --test scripts/activity-ai-enhancement-editor-review.test.ts`;
 run it when changing teacher review checklists, reviewed/missing check counts,
 manual-save readiness, editor-only boundaries, publish blocking, snapshot
-protection, public-payload guards, source-material privacy, or privacy guards.
+protection, public-payload guards, source-material privacy, the 30-slice
+draft-application handoff, or privacy guards.
 Activity AI enhancement save boundary has a fast script-level gate via
 `pnpm exec tsx --test scripts/activity-ai-enhancement-save-boundary.test.ts`;
 run it when changing teacher save actions, create/edit save plans, activity-id

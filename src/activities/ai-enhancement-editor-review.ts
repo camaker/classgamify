@@ -1,4 +1,5 @@
 import {
+  ACTIVITY_AI_ENHANCEMENT_DRAFT_APPLICATION_ITEM_IDS,
   buildActivityAiEnhancementDraftApplicationPlan,
   type ActivityAiEnhancementDraftApplicationPlan,
   type ActivityAiEnhancementDraftApplicationSource,
@@ -34,7 +35,7 @@ export const ACTIVITY_AI_ENHANCEMENT_EDITOR_REVIEW_ITEM_IDS = [
   'publish-boundary',
   'snapshot-protection',
   'public-payload-guard',
-  'review-chain-gate',
+  'draft-application-handoff-boundary',
 ] as const;
 
 export const ACTIVITY_AI_ENHANCEMENT_EDITOR_REVIEW_CHECK_IDS = [
@@ -109,6 +110,7 @@ export type ActivityAiEnhancementEditorReviewPrivacyContract = {
   readsSourceMaterialBytes: false;
   requiresEditorReview: true;
   scope: 'activity-ai-enhancement-editor-review';
+  usesDraftApplicationHandoff: true;
   usesDraftApplicationPlan: true;
 };
 
@@ -125,6 +127,7 @@ type ActivityAiEnhancementEditorReviewSummary = {
   applicationPlanSource: string;
   applicationStatus: string;
   blockedReason: string;
+  draftApplicationHandoffBoundary: string;
   editorOnlyBoundary: string;
   explanationReview: string;
   fieldTargetReview: string;
@@ -138,7 +141,6 @@ type ActivityAiEnhancementEditorReviewSummary = {
   questionChoiceReview: string;
   questionReview: string;
   readyToSaveGate: string;
-  reviewChainGate: string;
   reviewChecklistCount: string;
   reviewScope: string;
   reviewStatus: string;
@@ -251,6 +253,9 @@ function buildActivityAiEnhancementEditorReviewSummary(
     applicationPlanSource: plan.application.applicationStatus,
     applicationStatus: plan.application.validationStatus,
     blockedReason: plan.application.execution.blockedReason ?? 'None',
+    draftApplicationHandoffBoundary:
+      `${ACTIVITY_AI_ENHANCEMENT_DRAFT_APPLICATION_ITEM_IDS.length} ` +
+      'draft application slices',
     editorOnlyBoundary: 'Editor-only draft',
     explanationReview: getReviewCheckStatus(plan, 'explanations'),
     fieldTargetReview:
@@ -272,7 +277,6 @@ function buildActivityAiEnhancementEditorReviewSummary(
     readyToSaveGate: plan.canReachManualSave
       ? 'Ready for manual save'
       : 'Review required',
-    reviewChainGate: '30 review slices',
     reviewChecklistCount: String(plan.requiredReviewCount),
     reviewScope: 'Teacher editor review',
     reviewStatus: plan.status,
@@ -511,12 +515,12 @@ function buildActivityAiEnhancementEditorReviewItem({
         summary.publicPayloadGuard,
         'Student payloads remain separate from reviewed draft data.'
       );
-    case 'review-chain-gate':
+    case 'draft-application-handoff-boundary':
       return item(
         id,
-        'Review chain gate',
-        summary.reviewChainGate,
-        'A focused gate keeps review, save, publish, snapshot, and privacy boundaries aligned.'
+        'Draft application handoff boundary',
+        summary.draftApplicationHandoffBoundary,
+        'Teacher review remains backed by the complete editor-only draft application contract.'
       );
   }
 }
@@ -560,6 +564,7 @@ function buildActivityAiEnhancementEditorReviewPrivacyContract(
     readsSourceMaterialBytes: false,
     requiresEditorReview: true,
     scope: 'activity-ai-enhancement-editor-review',
+    usesDraftApplicationHandoff: true,
     usesDraftApplicationPlan: true,
   };
 }

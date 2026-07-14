@@ -8015,6 +8015,7 @@ assert.deepEqual(activityAiEnhancementEditorReviewView.privacy, {
   readsSourceMaterialBytes: false,
   requiresEditorReview: true,
   scope: 'activity-ai-enhancement-editor-review',
+  usesDraftApplicationHandoff: true,
   usesDraftApplicationPlan: true,
 });
 assert.equal(
@@ -8043,18 +8044,23 @@ assert.equal(
 );
 assert.match(
   readFileSync('src/activities/ai-enhancement-editor-review.ts', 'utf8'),
-  /export const ACTIVITY_AI_ENHANCEMENT_EDITOR_REVIEW_ITEM_IDS = \[[\s\S]*'review-scope'[\s\S]*'application-plan-source'[\s\S]*'teacher-review-required'[\s\S]*'ready-to-save-gate'[\s\S]*'manual-save-boundary'[\s\S]*'review-chain-gate'/,
+  /export const ACTIVITY_AI_ENHANCEMENT_EDITOR_REVIEW_ITEM_IDS = \[[\s\S]*'review-scope'[\s\S]*'application-plan-source'[\s\S]*'teacher-review-required'[\s\S]*'ready-to-save-gate'[\s\S]*'manual-save-boundary'[\s\S]*'draft-application-handoff-boundary'/,
   'Activity AI enhancement editor review source should preserve the review slices.'
 );
 assert.match(
   readFileSync('docs/product.md', 'utf8'),
-  /src\/activities\/ai-enhancement-editor-review\.ts` owns the teacher review gate[\s\S]*review checklist coverage[\s\S]*reviewed\/missing check counts[\s\S]*manual-save readiness[\s\S]*editor-only boundaries[\s\S]*snapshot protection[\s\S]*private\s+draft\/source-material privacy/,
+  /src\/activities\/ai-enhancement-editor-review\.ts` owns the teacher review gate[\s\S]*review checklist coverage[\s\S]*reviewed\/missing check counts[\s\S]*manual-save readiness[\s\S]*editor-only boundaries[\s\S]*snapshot protection[\s\S]*private\s+draft\/source-material privacy[\s\S]*30-slice editor-only draft-application handoff/,
   'docs/product.md should document the activity AI enhancement editor review owner.'
 );
 assert.match(
   readFileSync('tests/e2e/TEST-CATALOG.md', 'utf8'),
   /Activity AI enhancement editor review has a fast script-level gate via[\s\S]*scripts\/activity-ai-enhancement-editor-review\.test\.ts[\s\S]*teacher review checklists[\s\S]*manual-save readiness[\s\S]*editor-only boundaries[\s\S]*snapshot protection[\s\S]*privacy guards/,
   'TEST-CATALOG should document the activity AI enhancement editor review gate.'
+);
+assert.match(
+  readFileSync('tests/e2e/TEST-CATALOG.md', 'utf8'),
+  /30-slice\s+draft-application\s+handoff/,
+  'TEST-CATALOG should document the activity AI enhancement draft-application handoff.'
 );
 const activityAiEnhancementSaveBoundaryView =
   buildActivityAiEnhancementSaveBoundaryView({

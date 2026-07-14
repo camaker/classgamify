@@ -597,7 +597,11 @@ Implementation boundaries:
   after draft application and before manual save: review checklist coverage,
   reviewed/missing check counts, manual-save readiness, editor-only boundaries,
   publish blocking, snapshot protection, public-payload guards, and private
-  draft/source-material privacy.
+  draft/source-material privacy. Its final boundary explicitly carries the
+  30-slice editor-only draft-application handoff so invalid or incomplete
+  application plans cannot bypass CreateActivityInput validation, field-target
+  coverage, refreshed readiness, source privacy, or save/publish isolation when
+  entering teacher review.
 - `src/activities/ai-enhancement-save-boundary.ts` owns the manual save boundary
   after teacher review: teacher save actions, create/edit save plans,
   activity-id gates, manual persistence boundaries, activity-record targets,

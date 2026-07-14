@@ -1,6 +1,7 @@
 import assert from 'node:assert/strict';
 import { existsSync, readFileSync } from 'node:fs';
 import test from 'node:test';
+import { ACTIVITY_AI_ENHANCEMENT_DRAFT_APPLICATION_ITEM_IDS } from '@/activities/ai-enhancement-draft-application';
 import {
   ACTIVITY_AI_ENHANCEMENT_EDITOR_REVIEW_CHECK_IDS,
   ACTIVITY_AI_ENHANCEMENT_EDITOR_REVIEW_ITEM_IDS,
@@ -67,6 +68,7 @@ test('activity AI enhancement editor review exposes 30 stable review slices', ()
     readsSourceMaterialBytes: false,
     requiresEditorReview: true,
     scope: 'activity-ai-enhancement-editor-review',
+    usesDraftApplicationHandoff: true,
     usesDraftApplicationPlan: true,
   });
   assertNoPrivateReviewText(JSON.stringify(view));
@@ -110,6 +112,11 @@ test('activity AI enhancement editor review reports review status without leakin
   assert.equal(values.get('manual-save-boundary'), 'Manual save blocked');
   assert.equal(values.get('publish-boundary'), 'No assignment link');
   assert.equal(values.get('snapshot-protection'), 'Frozen snapshots protected');
+  assert.equal(
+    values.get('draft-application-handoff-boundary'),
+    '30 draft application slices'
+  );
+  assert.equal(ACTIVITY_AI_ENHANCEMENT_DRAFT_APPLICATION_ITEM_IDS.length, 30);
   assertNoPrivateReviewText(JSON.stringify(view));
 });
 
@@ -145,18 +152,23 @@ test('activity AI enhancement editor review gate is wired into docs and coverage
   );
   assert.match(
     REVIEW_SOURCE,
-    /export const ACTIVITY_AI_ENHANCEMENT_EDITOR_REVIEW_ITEM_IDS = \[[\s\S]*'review-scope'[\s\S]*'application-plan-source'[\s\S]*'teacher-review-required'[\s\S]*'ready-to-save-gate'[\s\S]*'manual-save-boundary'[\s\S]*'review-chain-gate'/,
+    /export const ACTIVITY_AI_ENHANCEMENT_EDITOR_REVIEW_ITEM_IDS = \[[\s\S]*'review-scope'[\s\S]*'application-plan-source'[\s\S]*'teacher-review-required'[\s\S]*'ready-to-save-gate'[\s\S]*'manual-save-boundary'[\s\S]*'draft-application-handoff-boundary'/,
     'Editor review source should preserve the 30-slice review boundary.'
   );
   assert.match(
     PRODUCT_SOURCE,
-    /src\/activities\/ai-enhancement-editor-review\.ts` owns the teacher review gate/,
+    /src\/activities\/ai-enhancement-editor-review\.ts` owns the teacher review gate[\s\S]*30-slice editor-only draft-application handoff/,
     'docs/product.md should document the AI enhancement editor review owner.'
   );
   assert.match(
     TEST_CATALOG_SOURCE,
     /Activity AI enhancement editor review has a fast script-level gate via[\s\S]*scripts\/activity-ai-enhancement-editor-review\.test\.ts[\s\S]*teacher review checklists[\s\S]*manual-save readiness[\s\S]*editor-only boundaries[\s\S]*snapshot protection[\s\S]*privacy guards/,
     'TEST-CATALOG should document the AI enhancement editor review gate.'
+  );
+  assert.match(
+    TEST_CATALOG_SOURCE,
+    /30-slice\s+draft-application\s+handoff/,
+    'TEST-CATALOG should document the draft-application handoff.'
   );
 });
 
