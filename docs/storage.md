@@ -116,6 +116,10 @@ Files are always served via the same-origin route `/api/storage/file?key=...`.
 - **deleteFile(key)** (server)
   - Deletes the object from R2. Used by `deleteUserFile` server function (e.g.
     Settings → Files).
+  - `deleteUserFile` first checks current-owner activity content and frozen
+    assignment snapshots for the compact file id. Referenced files are blocked
+    before this provider method runs, so active/archived activities and published
+    snapshot provenance do not become broken references.
 
 - **uploadUserFile** (server function, in `@/api/user-files`): Accepts
   `FormData` (file, optional folder, isPublic, description). Requires session

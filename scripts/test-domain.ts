@@ -117,6 +117,7 @@ import { ASSIGNMENT_PUBLISH_SOURCE_WRITE_GUARD_STAGES } from '@/assignments/publ
 import { ACTIVITY_MUTATION_CONCURRENCY_STAGES } from '@/activities/mutation-concurrency';
 import { ACTIVITY_DERIVATIVE_SOURCE_WRITE_GUARD_STAGES } from '@/activities/derivative-source-write';
 import { ACTIVITY_SOURCE_MATERIAL_WRITE_STAGES } from '@/activities/source-material-write';
+import { ACTIVITY_SOURCE_MATERIAL_DELETE_STAGES } from '@/activities/source-material-delete';
 import {
   AUTH_ERROR_RECOVERY_STEP_IDS,
   buildAuthErrorDisplayView,
@@ -5508,6 +5509,17 @@ assert.equal(ASSIGNMENT_PUBLISH_SOURCE_WRITE_GUARD_STAGES.length, 30);
 assert.equal(ACTIVITY_MUTATION_CONCURRENCY_STAGES.length, 30);
 assert.equal(ACTIVITY_DERIVATIVE_SOURCE_WRITE_GUARD_STAGES.length, 30);
 assert.equal(ACTIVITY_SOURCE_MATERIAL_WRITE_STAGES.length, 30);
+assert.equal(ACTIVITY_SOURCE_MATERIAL_DELETE_STAGES.length, 30);
+assert.equal(
+  new Set(ACTIVITY_SOURCE_MATERIAL_DELETE_STAGES.map((stage) => stage.id)).size,
+  30
+);
+assert.equal(
+  ACTIVITY_SOURCE_MATERIAL_DELETE_STAGES.filter(
+    (stage) => stage.layer === 'database'
+  ).length,
+  8
+);
 assert.equal(
   new Set(ACTIVITY_SOURCE_MATERIAL_WRITE_STAGES.map((stage) => stage.id)).size,
   30
@@ -14963,8 +14975,8 @@ assert.doesNotMatch(
 );
 assert.match(
   userFilesApiSource,
-  /deleteUserFile[\s\S]*const where = buildUserFileDetailOwnerWhere\(\{[\s\S]*fileId: data\.id,[\s\S]*userId,[\s\S]*\.where\(where\)[\s\S]*delete\(userFiles\)\.where\(where\)/,
-  'User file deletion should reuse owner-scoped detail rules for destructive file operations.'
+  /deleteUserFile[\s\S]*const where = buildUserFileDetailOwnerWhere\(\{[\s\S]*fileId: data\.id,[\s\S]*userId,[\s\S]*const \[activityReferences, snapshotReferences\] = await Promise\.all[\s\S]*buildActivitySourceMaterialFileReferenceWhere[\s\S]*buildAssignmentSnapshotSourceMaterialFileReferenceWhere[\s\S]*user_files_api_error_file_in_use[\s\S]*deleteFile\(row\.r2Key\)[\s\S]*delete\(userFiles\)\.where\(where\)/,
+  'User file deletion should keep owner scope and block activity or snapshot references before storage deletion.'
 );
 assert.match(
   userFilesApiSource,

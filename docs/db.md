@@ -89,6 +89,17 @@ rebuilt from those authoritative rows in request order. Missing and other-owner
 ids share one safe unavailable result, while empty reference lists avoid the
 database query entirely.
 
+## Source-material deletion reference guard
+
+Owner-scoped file deletion checks `activity.content_json` and
+`assignment_snapshot.content_json` with SQLite `json_each` before touching R2.
+The activity query includes active and archived rows for the current owner. The
+snapshot query joins `assignment` to retain the same owner boundary and protects
+frozen provenance even after an activity is edited. Each query selects only one
+minimal id as existence evidence; no activity content, assignment content,
+student data, filename, or storage key is returned. Any reference blocks both R2
+and `user_files` deletion with one safe in-use result.
+
 ## Activity mutation concurrency
 
 Activity edit, archive, and restore writes use one compare-and-set `UPDATE`.

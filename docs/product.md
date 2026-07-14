@@ -166,6 +166,15 @@ references are rebuilt from authoritative database filename, content-type, and
 size metadata in the teacher's requested order rather than trusting client
 metadata. Empty reference lists skip the query, duplicate ids stay collapsed,
 and validation never selects R2 keys, permission metadata, URLs, or file bytes.
+Source-material deletion must preserve the same reference lifecycle. Before
+deleting an owner-scoped `userFiles` object, the server checks both saved activity
+content and frozen assignment snapshots for the file id. Active and archived
+activity references, plus historical snapshot references, block deletion before
+R2 is touched and return one localized in-use message. The checks select only
+minimal ids, never return activity or snapshot content, and do not inspect student
+attempts. Teachers can remove ordinary saved-activity references before deleting
+the underlying file, while published snapshot provenance remains retained and
+continues to block deletion.
 The source-material privacy chain should explicitly carry the compact material
 reference handoff's 30 slices for reference shape, safe file ids and filename
 basenames, content-type, material kind and size normalization, duplicate

@@ -8161,6 +8161,7 @@
   "user_files_api_error_content_type_mismatch": "文件扩展名和上传内容类型不一致，请选择原始文件或重新导出后再上传。",
   "user_files_api_error_dangerous_content_type": "出于课堂安全考虑，这类文件不能上传。",
   "user_files_api_error_file_not_found": "未找到文件",
+  "user_files_api_error_file_in_use": "这份来源素材仍被已保存活动或作业快照使用，无法删除。",
   "user_files_api_error_file_not_provided": "未提供文件",
   "user_files_api_error_file_too_large": "文件过大，请选择不超过 {maxMegabytes} MB 的文件。",
   "user_files_api_error_invalid_file_type": "暂不支持这种文件类型。支持的类型：{supportedExtensions}。",

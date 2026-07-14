@@ -1,5 +1,15 @@
+import {
+  buildActivitySourceMaterialFileReferenceWhere,
+  buildAssignmentSnapshotSourceMaterialFileReferenceWhere,
+} from '@/activities/source-material-delete';
+import { buildAssignmentSnapshotJoin } from '@/assignments/detail-query';
 import { getDb } from '@/db';
-import { userFiles } from '@/db/app.schema';
+import {
+  activity,
+  assignment,
+  assignmentSnapshot,
+  userFiles,
+} from '@/db/app.schema';
 import { getBaseUrl } from '@/lib/urls';
 import { m } from '@/locale/paraglide/messages';
 import { authApiMiddleware } from '@/middlewares/auth-middleware';
@@ -124,6 +134,33 @@ export const deleteUserFile = createServerFn({ method: 'POST' })
 
     if (!row) {
       throw new Error(m.user_files_api_error_file_not_found());
+    }
+
+    const [activityReferences, snapshotReferences] = await Promise.all([
+      db
+        .select({ id: activity.id })
+        .from(activity)
+        .where(
+          buildActivitySourceMaterialFileReferenceWhere({
+            fileId: row.id,
+            userId,
+          })
+        )
+        .limit(1),
+      db
+        .select({ assignmentId: assignmentSnapshot.assignmentId })
+        .from(assignmentSnapshot)
+        .innerJoin(assignment, buildAssignmentSnapshotJoin())
+        .where(
+          buildAssignmentSnapshotSourceMaterialFileReferenceWhere({
+            fileId: row.id,
+            userId,
+          })
+        )
+        .limit(1),
+    ]);
+    if (activityReferences.length > 0 || snapshotReferences.length > 0) {
+      throw new Error(m.user_files_api_error_file_in_use());
     }
 
     await deleteFile(row.r2Key);

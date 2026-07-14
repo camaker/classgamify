@@ -8161,6 +8161,7 @@
   "user_files_api_error_content_type_mismatch": "The file extension does not match the uploaded content. Choose the original file or export it again.",
   "user_files_api_error_dangerous_content_type": "This file type cannot be uploaded for classroom safety.",
   "user_files_api_error_file_not_found": "File not found",
+  "user_files_api_error_file_in_use": "This source material is still used by a saved activity or assignment snapshot and cannot be deleted.",
   "user_files_api_error_file_not_provided": "File not provided",
   "user_files_api_error_file_too_large": "The file is too large. Choose a file up to {maxMegabytes} MB.",
   "user_files_api_error_invalid_file_type": "This file type is not supported. Supported types: {supportedExtensions}.",
