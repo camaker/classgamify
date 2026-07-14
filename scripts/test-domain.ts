@@ -5246,10 +5246,12 @@ assert.deepEqual(assignmentSourceActivityContextChainView.privacy, {
   requiresAssignmentSnapshotBoundary: true,
   sourceFiles: [...ASSIGNMENT_SOURCE_ACTIVITY_CONTEXT_CHAIN_SOURCE_FILES],
   usesFrozenSnapshotSource: true,
+  usesResultMaterialHandoff: true,
 });
 assert.deepEqual(
   [
     ASSIGNMENT_LIST_PAGE_HANDOFF_ITEM_IDS.length,
+    ASSIGNMENT_RESULT_MATERIAL_HANDOFF_ITEM_IDS.length,
     ASSIGNMENT_RESULTS_EXPORT_PREPARATION_ITEM_IDS.length,
     PRINTABLE_WORKSHEET_HANDOFF_ITEM_IDS.length,
     PRINTABLE_WORKSHEET_REVIEW_LIFECYCLE_CHAIN_HANDOFF_ITEM_IDS.length,
@@ -5259,7 +5261,7 @@ assert.deepEqual(
     TEACHER_RESULTS_REVIEW_CHAIN_HANDOFF_ITEM_IDS.length,
     SCORED_ATTEMPT_RESULT_CHAIN_HANDOFF_ITEM_IDS.length,
   ],
-  Array.from({ length: 9 }, () => 30),
+  Array.from({ length: 10 }, () => 30),
   'Assignment source activity context chain should stay backed by list, export, printable, distribution, worksheet, data, results, and scored-result gates.'
 );
 assert.deepEqual(
@@ -5294,12 +5296,12 @@ assert.deepEqual(
     'scored-result-chain-alignment': 'Scoring aligned',
     'source-material-storage-guard': 'Storage keys omitted',
     'student-data-privacy-guard': 'Student data omitted',
-    'source-context-gate': '30 source files',
+    'result-material-handoff-boundary': '30 result material slices',
   }
 );
 assert.match(
   readFileSync('tests/e2e/TEST-CATALOG.md', 'utf8'),
-  /Assignment source-activity context chain has a fast script-level gate via[\s\S]*scripts\/assignment-source-activity-context-chain-handoff\.test\.ts/,
+  /Assignment source-activity context chain has a fast script-level gate via[\s\S]*scripts\/assignment-source-activity-context-chain-handoff\.test\.ts[\s\S]*30-slice\s+result-material\s+boundary/,
   'TEST-CATALOG should document the assignment source-activity context chain gate.'
 );
 const answerFeedbackLifecycleChainView =

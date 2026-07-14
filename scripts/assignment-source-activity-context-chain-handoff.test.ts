@@ -10,6 +10,7 @@ import {
   ASSIGNMENT_LIST_PAGE_HANDOFF_ITEM_IDS,
   buildAssignmentListCardViewModel,
 } from '@/assignments/list-view';
+import { ASSIGNMENT_RESULT_MATERIAL_HANDOFF_ITEM_IDS } from '@/assignments/result-actions';
 import { ASSIGNMENT_RESULTS_EXPORT_PREPARATION_ITEM_IDS } from '@/assignments/results-export';
 import {
   ASSIGNMENT_SOURCE_ACTIVITY_CONTEXT_CHAIN_HANDOFF_ITEM_IDS,
@@ -115,6 +116,7 @@ test('assignment source activity context chain exposes 30 safe slices', () => {
     requiresAssignmentSnapshotBoundary: true,
     sourceFiles: [...ASSIGNMENT_SOURCE_ACTIVITY_CONTEXT_CHAIN_SOURCE_FILES],
     usesFrozenSnapshotSource: true,
+    usesResultMaterialHandoff: true,
   });
   assertNoPrivateSourceContextText(JSON.stringify(handoffView));
 });
@@ -154,12 +156,16 @@ test('assignment source activity context summarizes each lifecycle boundary', ()
       ['scored-result-chain-alignment', 'Scoring aligned'],
       ['source-material-storage-guard', 'Storage keys omitted'],
       ['student-data-privacy-guard', 'Student data omitted'],
-      ['source-context-gate', '30 source files'],
+      ['result-material-handoff-boundary', '30 result material slices'],
     ]
   );
   assert.equal(
     getHandoffValue(handoffView, 'export-source-description-column'),
     'activity_description'
+  );
+  assert.equal(
+    getHandoffValue(handoffView, 'result-material-handoff-boundary'),
+    `${ASSIGNMENT_RESULT_MATERIAL_HANDOFF_ITEM_IDS.length} result material slices`
   );
 });
 
@@ -179,6 +185,7 @@ test('assignment source activity context is backed by adjacent gates', () => {
   assert.deepEqual(
     [
       ASSIGNMENT_LIST_PAGE_HANDOFF_ITEM_IDS.length,
+      ASSIGNMENT_RESULT_MATERIAL_HANDOFF_ITEM_IDS.length,
       ASSIGNMENT_RESULTS_EXPORT_PREPARATION_ITEM_IDS.length,
       PRINTABLE_WORKSHEET_HANDOFF_ITEM_IDS.length,
       PRINTABLE_WORKSHEET_REVIEW_LIFECYCLE_CHAIN_HANDOFF_ITEM_IDS.length,
@@ -188,7 +195,7 @@ test('assignment source activity context is backed by adjacent gates', () => {
       TEACHER_RESULTS_REVIEW_CHAIN_HANDOFF_ITEM_IDS.length,
       SCORED_ATTEMPT_RESULT_CHAIN_HANDOFF_ITEM_IDS.length,
     ],
-    Array.from({ length: 9 }, () => 30)
+    Array.from({ length: 10 }, () => 30)
   );
 });
 
@@ -355,8 +362,13 @@ test('assignment source activity context focused gate is documented', () => {
   const normalizedCatalog = TEST_CATALOG_SOURCE.replace(/\s+/g, ' ');
 
   assert.match(
+    PRODUCT_SOURCE,
+    /assignment\s+source\s+activity\s+context\s+chain[\s\S]*30-slice\s+result-material\s+handoff[\s\S]*frozen\s+source\s+title[\s\S]*teacher\s+copy\s+artifacts[\s\S]*CSV\s+preparation[\s\S]*printable\s+worksheets[\s\S]*snapshot-source\s+evidence[\s\S]*privacy/,
+    'docs/product.md should carry frozen source context into the shared teacher result-material contract.'
+  );
+  assert.match(
     TEST_CATALOG_SOURCE,
-    /Assignment source-activity context chain has a fast script-level gate via[\s\S]*scripts\/assignment-source-activity-context-chain-handoff\.test\.ts/,
+    /Assignment source-activity context chain has a fast script-level gate via[\s\S]*scripts\/assignment-source-activity-context-chain-handoff\.test\.ts[\s\S]*30-slice\s+result-material\s+boundary/,
     'TEST-CATALOG should document the assignment source-activity context chain gate.'
   );
   assert.match(

@@ -1,3 +1,5 @@
+import { ASSIGNMENT_RESULT_MATERIAL_HANDOFF_ITEM_IDS } from '@/assignments/result-actions';
+
 export const ASSIGNMENT_SOURCE_ACTIVITY_CONTEXT_CHAIN_HANDOFF_ITEM_IDS = [
   'product-source-policy',
   'snapshot-schema-fields',
@@ -28,7 +30,7 @@ export const ASSIGNMENT_SOURCE_ACTIVITY_CONTEXT_CHAIN_HANDOFF_ITEM_IDS = [
   'scored-result-chain-alignment',
   'source-material-storage-guard',
   'student-data-privacy-guard',
-  'source-context-gate',
+  'result-material-handoff-boundary',
 ] as const;
 
 export const ASSIGNMENT_SOURCE_ACTIVITY_CONTEXT_CHAIN_SOURCE_FILES = [
@@ -93,6 +95,7 @@ export type AssignmentSourceActivityContextChainPrivacyContract = {
   requiresAssignmentSnapshotBoundary: true;
   sourceFiles: string[];
   usesFrozenSnapshotSource: true;
+  usesResultMaterialHandoff: true;
 };
 
 export type AssignmentSourceActivityContextChainHandoffView = {
@@ -131,6 +134,7 @@ export function buildAssignmentSourceActivityContextChainHandoffView(): Assignme
       requiresAssignmentSnapshotBoundary: true,
       sourceFiles: [...ASSIGNMENT_SOURCE_ACTIVITY_CONTEXT_CHAIN_SOURCE_FILES],
       usesFrozenSnapshotSource: true,
+      usesResultMaterialHandoff: true,
     },
     title: 'Assignment source activity context chain',
   };
@@ -357,12 +361,12 @@ function getAssignmentSourceActivityContextChainHandoffItem(
         'Student data omitted',
         'Source context handoffs never expose student names, anonymous tokens, student answers, or teacher-only answer keys.'
       );
-    case 'source-context-gate':
+    case 'result-material-handoff-boundary':
       return item(
         id,
-        'Source context gate',
-        '30 source files',
-        'The focused gate keeps assignment source context, search, public payloads, result headers, CSV export, and printable worksheet contracts connected.'
+        'Result material handoff boundary',
+        `${ASSIGNMENT_RESULT_MATERIAL_HANDOFF_ITEM_IDS.length} result material slices`,
+        'Frozen source context must continue through shared teacher copy, CSV preparation, printable worksheet, current/full data scope, snapshot source, and privacy contracts.'
       );
   }
 }

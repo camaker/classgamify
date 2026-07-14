@@ -323,6 +323,13 @@ card layout alone.
 Assignment list filter parsing and search normalization should live in
 assignment-domain helpers so route URLs, list API filters, and dashboard filter
 controls stay aligned.
+The assignment source activity context chain should explicitly carry the
+30-slice result-material handoff so frozen source title, description, template,
+and snapshot provenance remain connected to teacher copy artifacts, CSV
+preparation, printable worksheets, current-review and full-assignment scopes,
+snapshot-source evidence, and privacy guards. Its independent 30-file gate
+should continue to verify list search, public summaries, result headers, export,
+and print surfaces without replacing that teacher-material output contract.
 Teachers can close and reopen published assignment links without changing the
 frozen snapshot, so public student access and submissions respect the assignment
 lifecycle while existing attempts remain available for review. Assignment

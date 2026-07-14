@@ -323,8 +323,9 @@ Assignment source-activity context chain has a fast script-level gate via
 `pnpm exec tsx --test scripts/assignment-source-activity-context-chain-handoff.test.ts`;
 run it when changing source-activity snapshot resolution, assignment-list
 search, public student payloads, result headers, CSV source columns, printable
-worksheet fields, source-context chain alignment, or source-context privacy
-guards.
+worksheet fields, source-context chain alignment, the 30-slice result-material
+boundary for teacher copy, CSV preparation, print, current/full data scope,
+snapshot source, and privacy, or other source-context privacy guards.
 Assignment attempt stats has a fast script-level gate via
 `pnpm exec tsx --test scripts/assignment-attempt-stats-handoff-semantic-views.test.ts`;
 run it when changing completions, average accuracy, average points, average
