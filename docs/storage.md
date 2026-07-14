@@ -96,6 +96,11 @@ Files are always served via the same-origin route `/api/storage/file?key=...`.
 - **uploadFile(file, filename, contentType, folder?)** (server, in `@/storage`)
   - Uploads to R2; returns `Promise<{ url, key, metadata? }>`. Used by the
     `uploadUserFile` server function.
+  - Every object carries its server-generated file id in R2 custom metadata. If
+    `put` reports an error, the provider performs one exact-key `head` and only
+    recovers success when the marker, byte size, and normalized content type all
+    match. Missing, mismatched, or unknown evidence rethrows the original error;
+    recovery never retries `put` or reads object bytes.
 
 - **buildStorageUploadReadinessPlan** (shared helper, in
   `@/storage/upload-readiness`): Builds the 20-slice classroom material upload

@@ -120,6 +120,7 @@ import { SOURCE_MATERIAL_INTEGRITY_STAGES } from '@/activities/source-material-i
 import { ACTIVITY_SOURCE_MATERIAL_WRITE_STAGES } from '@/activities/source-material-write';
 import { ACTIVITY_SOURCE_MATERIAL_DELETE_STAGES } from '@/activities/source-material-delete';
 import { USER_FILE_UPLOAD_PERSISTENCE_STAGES } from '@/storage/upload-persistence';
+import { R2_UPLOAD_PUT_RECOVERY_STAGES } from '@/storage/upload-put-recovery';
 import {
   AUTH_ERROR_RECOVERY_STEP_IDS,
   buildAuthErrorDisplayView,
@@ -5514,6 +5515,17 @@ assert.equal(ACTIVITY_SOURCE_MATERIAL_WRITE_STAGES.length, 30);
 assert.equal(ACTIVITY_SOURCE_MATERIAL_DELETE_STAGES.length, 30);
 assert.equal(SOURCE_MATERIAL_INTEGRITY_STAGES.length, 30);
 assert.equal(USER_FILE_UPLOAD_PERSISTENCE_STAGES.length, 30);
+assert.equal(R2_UPLOAD_PUT_RECOVERY_STAGES.length, 30);
+assert.equal(
+  new Set(R2_UPLOAD_PUT_RECOVERY_STAGES.map((stage) => stage.id)).size,
+  30
+);
+assert.equal(
+  R2_UPLOAD_PUT_RECOVERY_STAGES.filter(
+    (stage) => stage.layer === 'evidence'
+  ).length,
+  10
+);
 assert.equal(
   new Set(USER_FILE_UPLOAD_PERSISTENCE_STAGES.map((stage) => stage.id)).size,
   30

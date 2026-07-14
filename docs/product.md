@@ -195,6 +195,14 @@ presence receives one bounded delete retry, and retained or unknown results retu
 one localized cleanup error. An unknown D1 probe never deletes the object blindly.
 Public avatar and product-asset folders keep their existing metadata-free path
 and are not included in private upload compensation.
+R2 upload providers must also resolve an ambiguous `put` response before the D1
+metadata phase. Each new object stores the server-generated file id in R2 custom
+metadata. If `put` throws, one `head` request against the exact key may recover
+success only when that marker, byte size, and normalized content type all match
+the current upload. A missing object, mismatched evidence, or failed probe keeps
+the original upload error. The provider never issues a blind second `put`, reads
+file bytes for recovery, exposes the marker, or constructs `userFiles` metadata
+from partial evidence.
 The source-material privacy chain should explicitly carry the compact material
 reference handoff's 30 slices for reference shape, safe file ids and filename
 basenames, content-type, material kind and size normalization, duplicate

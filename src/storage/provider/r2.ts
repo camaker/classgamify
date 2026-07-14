@@ -19,6 +19,10 @@ import {
   buildStorageUploadProxyUrl,
   validateStorageUploadFile,
 } from '@/storage/upload-readiness';
+import {
+  R2_UPLOAD_FILE_ID_METADATA_KEY,
+  recoverR2UploadPutAfterFailure,
+} from '@/storage/upload-put-recovery';
 import { websiteConfig } from '@/config/website';
 
 interface FileValidatorConfig {
@@ -117,9 +121,20 @@ export class R2Provider implements StorageProvider {
       userId,
     });
 
-    await bucket.put(uploadPlan.r2Key, file, {
-      httpMetadata: { contentType },
-    });
+    try {
+      await bucket.put(uploadPlan.r2Key, file, {
+        customMetadata: { [R2_UPLOAD_FILE_ID_METADATA_KEY]: fileId },
+        httpMetadata: { contentType },
+      });
+    } catch (error) {
+      const recovery = await recoverR2UploadPutAfterFailure({
+        contentType,
+        fileId,
+        probeObject: () => bucket.head(uploadPlan.r2Key),
+        size: file.size,
+      });
+      if (recovery !== 'committed') throw error;
+    }
 
     const result: UploadFileResult = {
       key: uploadPlan.r2Key,
