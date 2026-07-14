@@ -632,7 +632,11 @@ Implementation boundaries:
   distractors, variants, explanations, listening scripts, and extraction paths
   cannot bypass blocked reasons, editor-only draft targets, teacher review,
   manual save, explicit publish, frozen snapshots, sanitized public payloads,
-  or result exports.
+  or result exports. Its final boundary explicitly carries the 30-slice core
+  assignment-publish handoff so AI-enhanced activities return to the shared
+  publish access, validation, delivery settings, review checklist, snapshot
+  freeze, public-payload, result-policy, and privacy contracts instead of
+  creating an AI-specific assignment path.
 - `src/activities/ai-fallback-draft-chain.ts` owns the deterministic AI
   fallback draft chain for missing Workers AI credentials, invalid provider
   JSON, sanitized source-term planning, local classroom draft completion,

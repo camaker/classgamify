@@ -8513,6 +8513,7 @@ assert.deepEqual(activityAiEnhancementLifecycleChainView.privacy, {
   requiresTeacherPublishAction: true,
   requiresTeacherSaveAction: true,
   sourceFiles: [...ACTIVITY_AI_ENHANCEMENT_LIFECYCLE_CHAIN_SOURCE_FILES],
+  usesAssignmentPublishHandoff: true,
   usesAssignmentPublishPreflight: true,
   usesAssignmentSnapshotFreeze: true,
   usesDraftOutputPlan: true,
@@ -8555,13 +8556,19 @@ assert.match(
 );
 assert.match(
   readFileSync('docs/product.md', 'utf8'),
-  /src\/activities\/ai-enhancement-lifecycle-chain\.ts` owns the full AI enhancement lifecycle handoff[\s\S]*request policy[\s\S]*parsed draft output[\s\S]*teacher review[\s\S]*manual save[\s\S]*assignment\s+publish actions[\s\S]*result-export continuity/,
+  /src\/activities\/ai-enhancement-lifecycle-chain\.ts` owns the full AI enhancement lifecycle handoff[\s\S]*request policy[\s\S]*parsed draft output[\s\S]*teacher review[\s\S]*manual save[\s\S]*assignment\s+publish actions[\s\S]*result-export continuity[\s\S]*30-slice core\s+assignment-publish handoff/,
   'docs/product.md should document the activity AI enhancement lifecycle owner.'
 );
 assert.match(
   readFileSync('tests/e2e/TEST-CATALOG.md', 'utf8'),
   /Activity AI enhancement lifecycle chain has a fast script-level gate via[\s\S]*scripts\/activity-ai-enhancement-lifecycle-chain\.test\.ts[\s\S]*policy-to-publish ordering[\s\S]*draft output handoffs[\s\S]*teacher review[\s\S]*manual save[\s\S]*assignment\s+publish actions[\s\S]*share-link\/snapshot boundaries[\s\S]*result-export continuity/,
   'TEST-CATALOG should document the activity AI enhancement lifecycle chain gate.'
+);
+assert.equal(ASSIGNMENT_PUBLISH_HANDOFF_ITEM_IDS.length, 30);
+assert.match(
+  readFileSync('tests/e2e/TEST-CATALOG.md', 'utf8'),
+  /30-slice\s+assignment-publish\s+handoff/,
+  'TEST-CATALOG should document the activity AI enhancement assignment-publish handoff.'
 );
 const activityAuthoringLibraryChainView =
   buildActivityAuthoringLibraryChainHandoffView();

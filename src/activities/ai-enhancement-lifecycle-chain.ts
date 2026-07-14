@@ -32,6 +32,7 @@ import {
   type ActivityAiEnhancementSaveBoundaryStatus,
 } from '@/activities/ai-enhancement-save-boundary';
 import type { CreateActivityInput } from '@/activities/validation';
+import { ASSIGNMENT_PUBLISH_HANDOFF_ITEM_IDS } from '@/assignments/publish-input';
 
 export const ACTIVITY_AI_ENHANCEMENT_LIFECYCLE_CHAIN_ITEM_IDS = [
   'policy-stage',
@@ -63,7 +64,7 @@ export const ACTIVITY_AI_ENHANCEMENT_LIFECYCLE_CHAIN_ITEM_IDS = [
   'result-export-stage',
   'chain-state-stage',
   'documentation-stage',
-  'lifecycle-chain-gate',
+  'assignment-publish-handoff-boundary',
 ] as const;
 
 export const ACTIVITY_AI_ENHANCEMENT_LIFECYCLE_CHAIN_SOURCE_FILES = [
@@ -193,6 +194,7 @@ export type ActivityAiEnhancementLifecycleChainPrivacyContract = {
   requiresTeacherPublishAction: true;
   requiresTeacherSaveAction: true;
   sourceFiles: string[];
+  usesAssignmentPublishHandoff: true;
   usesAssignmentPublishPreflight: true;
   usesAssignmentSnapshotFreeze: true;
   usesDraftOutputPlan: true;
@@ -211,6 +213,7 @@ export type ActivityAiEnhancementLifecycleChainView = {
 type ActivityAiEnhancementLifecycleChainSummary = {
   activityRecordStage: string;
   answerKeyStage: string;
+  assignmentPublishHandoffBoundary: string;
   assignmentPublishStage: string;
   blockedReasonStage: string;
   chainStateStage: string;
@@ -222,7 +225,6 @@ type ActivityAiEnhancementLifecycleChainSummary = {
   executionStage: string;
   fallbackModeStage: string;
   fieldTargetStage: string;
-  lifecycleChainGate: string;
   manualSaveStage: string;
   policyStage: string;
   providerModeStage: string;
@@ -430,6 +432,7 @@ function buildActivityAiEnhancementLifecycleChainSummary(
       ? 'Saved activity record'
       : 'Activity save pending',
     answerKeyStage: 'No public answer keys',
+    assignmentPublishHandoffBoundary: `${ASSIGNMENT_PUBLISH_HANDOFF_ITEM_IDS.length} assignment publish slices`,
     assignmentPublishStage: plan.publishStatus,
     blockedReasonStage: plan.blockedReason,
     chainStateStage: plan.chainStatus,
@@ -445,7 +448,6 @@ function buildActivityAiEnhancementLifecycleChainSummary(
       ? 'Fallback selected'
       : 'Fallback available',
     fieldTargetStage: `${plan.fieldTargetCount} targets`,
-    lifecycleChainGate: `${plan.stageCount} lifecycle slices`,
     manualSaveStage: plan.saveStatus,
     policyStage: plan.policyStatus,
     providerModeStage: plan.usesExternalProvider
@@ -689,12 +691,12 @@ function buildActivityAiEnhancementLifecycleChainItem({
         summary.documentationStage,
         'The lifecycle is backed by product, domain, assignment, and catalog sources.'
       );
-    case 'lifecycle-chain-gate':
+    case 'assignment-publish-handoff-boundary':
       return item(
         id,
-        'Lifecycle chain gate',
-        summary.lifecycleChainGate,
-        'A focused gate keeps policy, execution, output, review, save, publish, snapshot, privacy, and result boundaries aligned.'
+        'Assignment publish handoff boundary',
+        summary.assignmentPublishHandoffBoundary,
+        'The AI lifecycle returns to the complete core assignment publish contract.'
       );
   }
 }
@@ -745,6 +747,7 @@ function buildActivityAiEnhancementLifecycleChainPrivacyContract(
     requiresTeacherPublishAction: true,
     requiresTeacherSaveAction: true,
     sourceFiles: [...ACTIVITY_AI_ENHANCEMENT_LIFECYCLE_CHAIN_SOURCE_FILES],
+    usesAssignmentPublishHandoff: true,
     usesAssignmentPublishPreflight: true,
     usesAssignmentSnapshotFreeze: true,
     usesDraftOutputPlan: true,

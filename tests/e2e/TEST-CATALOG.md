@@ -704,7 +704,7 @@ Activity AI enhancement lifecycle chain has a fast script-level gate via
 run it when changing policy-to-publish ordering, draft output handoffs, editor
 application, teacher review, manual save, saved activity records, assignment
 publish actions, share-link/snapshot boundaries, public payload/privacy guards,
-or result-export continuity.
+result-export continuity, or the 30-slice assignment-publish handoff.
 Template roadmap capability chain has a fast script-level gate via
 `pnpm exec tsx --test scripts/template-roadmap-capability-chain-handoff.test.ts`;
 run it when changing roadmap template promises, Wordwall-style templates,

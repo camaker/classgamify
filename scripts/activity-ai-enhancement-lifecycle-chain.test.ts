@@ -22,6 +22,7 @@ import type {
   ActivityMaterialReference,
 } from '@/activities/types';
 import type { CreateActivityInput } from '@/activities/validation';
+import { ASSIGNMENT_PUBLISH_HANDOFF_ITEM_IDS } from '@/assignments/publish-input';
 import { overwriteGetLocale } from '@/locale/paraglide/runtime';
 
 overwriteGetLocale(() => 'en');
@@ -111,6 +112,7 @@ test('activity AI enhancement lifecycle chain exposes 30 stable slices', () => {
     requiresTeacherPublishAction: true,
     requiresTeacherSaveAction: true,
     sourceFiles: [...ACTIVITY_AI_ENHANCEMENT_LIFECYCLE_CHAIN_SOURCE_FILES],
+    usesAssignmentPublishHandoff: true,
     usesAssignmentPublishPreflight: true,
     usesAssignmentSnapshotFreeze: true,
     usesDraftOutputPlan: true,
@@ -164,7 +166,7 @@ test('activity AI enhancement lifecycle chain summarizes ordered gates', () => {
       ['result-export-stage', 'Shared result model'],
       ['chain-state-stage', 'ready-for-assignment-publish'],
       ['documentation-stage', '30 source files'],
-      ['lifecycle-chain-gate', '30 lifecycle slices'],
+      ['assignment-publish-handoff-boundary', '30 assignment publish slices'],
     ]
   );
 });
@@ -262,8 +264,9 @@ test('activity AI enhancement lifecycle chain is backed by focused gates', () =>
       ACTIVITY_AI_ENHANCEMENT_EDITOR_REVIEW_CHECK_IDS.length,
       ACTIVITY_AI_ENHANCEMENT_SAVE_BOUNDARY_ITEM_IDS.length,
       ACTIVITY_AI_ENHANCEMENT_PUBLISH_BOUNDARY_ITEM_IDS.length,
+      ASSIGNMENT_PUBLISH_HANDOFF_ITEM_IDS.length,
     ],
-    [30, 30, 30, 30, 12, 30, 30]
+    [30, 30, 30, 30, 12, 30, 30, 30]
   );
 });
 
@@ -275,13 +278,18 @@ test('activity AI enhancement lifecycle chain gate is wired into docs and catalo
   );
   assert.match(
     PRODUCT_SOURCE,
-    /src\/activities\/ai-enhancement-lifecycle-chain\.ts` owns the full AI enhancement lifecycle handoff/,
+    /src\/activities\/ai-enhancement-lifecycle-chain\.ts` owns the full AI enhancement lifecycle handoff[\s\S]*30-slice core\s+assignment-publish handoff/,
     'docs/product.md should document the AI enhancement lifecycle owner.'
   );
   assert.match(
     TEST_CATALOG_SOURCE,
     /Activity AI enhancement lifecycle chain has a fast script-level gate via[\s\S]*scripts\/activity-ai-enhancement-lifecycle-chain\.test\.ts[\s\S]*policy-to-publish ordering[\s\S]*draft output handoffs[\s\S]*teacher review[\s\S]*manual save[\s\S]*assignment\s+publish actions[\s\S]*share-link\/snapshot boundaries[\s\S]*result-export continuity/,
     'TEST-CATALOG should document the AI enhancement lifecycle chain gate.'
+  );
+  assert.match(
+    TEST_CATALOG_SOURCE,
+    /30-slice\s+assignment-publish\s+handoff/,
+    'TEST-CATALOG should document the core assignment-publish handoff.'
   );
 });
 
