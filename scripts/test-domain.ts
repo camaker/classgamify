@@ -6936,6 +6936,7 @@ assert.deepEqual(sourceExtractionLifecycleChainView.privacy, {
   requiresEditorReview: true,
   sourceFiles: [...SOURCE_EXTRACTION_LIFECYCLE_CHAIN_SOURCE_FILES],
   targetsActivityContent: true,
+  usesAuthoringLibraryChain: true,
   usesCompactSourceMaterialReferences: true,
 });
 assert.deepEqual(
@@ -6974,7 +6975,7 @@ assert.deepEqual(Object.fromEntries(sourceExtractionLifecycleChainValues), {
   'readiness-action-map': 'Three readiness actions',
   'reference-only-state': 'Reference-only explicit',
   'settings-library-provenance': 'Settings provenance',
-  'source-extraction-lifecycle-gate': '30 source files',
+  'authoring-library-chain-boundary': '30 authoring slices',
   'source-material-privacy-chain-alignment': 'Privacy chain aligned',
   'source-summary-hidden-handoff': 'Hidden dl handoff',
   'source-summary-view': 'Summary view model',
@@ -6985,7 +6986,7 @@ assert.deepEqual(Object.fromEntries(sourceExtractionLifecycleChainValues), {
 });
 assert.match(
   readFileSync('tests/e2e/TEST-CATALOG.md', 'utf8'),
-  /Source extraction lifecycle chain has a fast script-level gate via[\s\S]*scripts\/source-extraction-lifecycle-chain-handoff\.test\.ts/,
+  /Source extraction lifecycle chain has a fast script-level gate via[\s\S]*scripts\/source-extraction-lifecycle-chain-handoff\.test\.ts[\s\S]*30-slice authoring\/library boundary/,
   'TEST-CATALOG should document the source extraction lifecycle chain gate.'
 );
 const activityAiAuthoringChainView =

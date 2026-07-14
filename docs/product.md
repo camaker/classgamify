@@ -151,6 +151,13 @@ collapse, the 12-reference limit, editor and AI consumers, public-payload
 guards, and privacy. Its aggregate summary must not expose file ids, original
 filenames, file bytes, storage keys, permission metadata, private activity
 content, or student payload file references.
+The source extraction lifecycle should explicitly carry the 30-slice activity
+authoring/library chain so future audio, worksheet, and spreadsheet extraction
+output returns to the shared create and edit contracts, teacher save action,
+owner-scoped library, lifecycle controls, publish access, and assignment
+snapshot protection. Its independent 30-file gate should continue to verify
+the product, activity, AI, storage, settings, assignment, and catalog surfaces
+without becoming a substitute for that downstream product contract.
 
 Teachers must be able to reopen and edit saved activities from the activity
 library. Editing uses the same `CreateActivityInput` contract as creation, with

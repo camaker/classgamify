@@ -1,3 +1,5 @@
+import { ACTIVITY_AUTHORING_LIBRARY_CHAIN_HANDOFF_ITEM_IDS } from '@/activities/authoring-library-chain';
+
 export const SOURCE_EXTRACTION_LIFECYCLE_CHAIN_HANDOFF_ITEM_IDS = [
   'product-extraction-policy',
   'activity-content-source-materials',
@@ -28,7 +30,7 @@ export const SOURCE_EXTRACTION_LIFECYCLE_CHAIN_HANDOFF_ITEM_IDS = [
   'ai-authoring-chain-alignment',
   'template-roadmap-chain-alignment',
   'public-payload-privacy',
-  'source-extraction-lifecycle-gate',
+  'authoring-library-chain-boundary',
 ] as const;
 
 export const SOURCE_EXTRACTION_LIFECYCLE_CHAIN_SOURCE_FILES = [
@@ -92,6 +94,7 @@ export type SourceExtractionLifecycleChainPrivacyContract = {
   requiresEditorReview: true;
   sourceFiles: string[];
   targetsActivityContent: true;
+  usesAuthoringLibraryChain: true;
   usesCompactSourceMaterialReferences: true;
 };
 
@@ -129,6 +132,7 @@ export function buildSourceExtractionLifecycleChainHandoffView(): SourceExtracti
       requiresEditorReview: true,
       sourceFiles: [...SOURCE_EXTRACTION_LIFECYCLE_CHAIN_SOURCE_FILES],
       targetsActivityContent: true,
+      usesAuthoringLibraryChain: true,
       usesCompactSourceMaterialReferences: true,
     },
     title: 'Source extraction lifecycle chain',
@@ -353,12 +357,12 @@ function getSourceExtractionLifecycleChainHandoffItem(
         'Public payload hidden',
         'Public student payloads expose runtime prompts and choices, not teacher source-material lists or storage keys.'
       );
-    case 'source-extraction-lifecycle-gate':
+    case 'authoring-library-chain-boundary':
       return item(
         id,
-        'Source extraction lifecycle gate',
-        '30 source files',
-        'The focused gate keeps source extraction readiness discoverable across product docs, activity, AI, storage, settings, assignment, and catalog surfaces.'
+        'Authoring library chain boundary',
+        `${ACTIVITY_AUTHORING_LIBRARY_CHAIN_HANDOFF_ITEM_IDS.length} authoring slices`,
+        'Extraction output must return to the shared create and edit contract, teacher save action, owner-scoped activity library, lifecycle controls, publish access, and assignment snapshot protection.'
       );
   }
 }

@@ -733,7 +733,10 @@ run it when changing compact source-material references, material-kind
 classification, extraction readiness action maps, audio/worksheet/spreadsheet
 readiness, source summary handoffs, AI source provenance, ActivityContent write
 targets, editor-review/persistence/publish boundaries, assignment snapshot
-protection, public payload privacy, or source-extraction lifecycle guards.
+protection, public payload privacy, or the 30-slice authoring/library boundary
+that returns extraction output to shared create/edit, teacher save,
+owner-scoped library, lifecycle, publish access, and snapshot contracts while
+the independent 30-file source gate remains intact.
 Assignment publish control boundaries have fast script-level gates via
 `pnpm exec tsx --test scripts/assignment-publish-handoff-semantic-views.test.ts`
 and `pnpm exec tsx --test scripts/classroom-control-semantics-handoff.test.ts`;

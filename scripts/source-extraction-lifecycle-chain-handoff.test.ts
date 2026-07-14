@@ -140,6 +140,7 @@ test('source extraction lifecycle chain exposes 30 safe slices', () => {
     requiresEditorReview: true,
     sourceFiles: [...SOURCE_EXTRACTION_LIFECYCLE_CHAIN_SOURCE_FILES],
     targetsActivityContent: true,
+    usesAuthoringLibraryChain: true,
     usesCompactSourceMaterialReferences: true,
   });
 
@@ -181,12 +182,16 @@ test('source extraction lifecycle chain summarizes every boundary', () => {
       ['ai-authoring-chain-alignment', 'AI authoring aligned'],
       ['template-roadmap-chain-alignment', 'Roadmap aligned'],
       ['public-payload-privacy', 'Public payload hidden'],
-      ['source-extraction-lifecycle-gate', '30 source files'],
+      ['authoring-library-chain-boundary', '30 authoring slices'],
     ]
   );
   assert.equal(
     getHandoffValue(handoffView, 'activity-content-target'),
     'ActivityContent target'
+  );
+  assert.equal(
+    getHandoffValue(handoffView, 'authoring-library-chain-boundary'),
+    `${ACTIVITY_AUTHORING_LIBRARY_CHAIN_HANDOFF_ITEM_IDS.length} authoring slices`
   );
 });
 
@@ -228,6 +233,11 @@ test('source extraction lifecycle follows docs product policy', () => {
     PRODUCT_SOURCE,
     /AI draft source\s+notes[\s\S]*safe material provenance[\s\S]*filename basenames[\s\S]*must not read file bytes, storage keys,\s+URLs, path segments, query tokens, or permission metadata/,
     'docs/product.md should limit AI draft source material provenance before a dedicated extraction pipeline exists.'
+  );
+  assert.match(
+    PRODUCT_SOURCE,
+    /source\s+extraction\s+lifecycle[\s\S]*30-slice\s+activity\s+authoring\/library\s+chain[\s\S]*shared\s+create\s+and\s+edit\s+contracts[\s\S]*owner-scoped\s+library[\s\S]*assignment\s+snapshot\s+protection/,
+    'docs/product.md should return source extraction output to the shared authoring and library lifecycle.'
   );
 });
 
