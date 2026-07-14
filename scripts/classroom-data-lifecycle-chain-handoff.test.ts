@@ -370,8 +370,8 @@ test('assignment publish, snapshot, and public payload sources stay frozen', () 
   );
   assert.match(
     ASSIGNMENTS_API_SOURCE,
-    /submitAttempt = createServerFn\(\{ method: 'POST' \}\)[\s\S]*assertAssignmentAcceptsSubmissions[\s\S]*resolveAssignmentRuntimeSource\(row\)[\s\S]*assertSubmittedAnswersMatchRuntimeItems[\s\S]*evaluateRuntimeAnswers[\s\S]*buildScoredAttemptInsert/,
-    'Submission should pass lifecycle, runtime, answer validation, scoring, and persistence helper boundaries.'
+    /submitAttempt = createServerFn\(\{ method: 'POST' \}\)[\s\S]*resolveAssignmentRuntimeSource\(row\)[\s\S]*recoverAttemptSubmissionResponse[\s\S]*assertAssignmentAcceptsSubmissions[\s\S]*assertSubmittedAnswersMatchRuntimeItems[\s\S]*evaluateRuntimeAnswers[\s\S]*persistAttemptWithinIdentityLimit[\s\S]*buildScoredAttemptInsert[\s\S]*isSlotConflict: isAttemptIdentitySlotConflict[\s\S]*catch\(rethrowAssignmentSubmissionWriteError\)/,
+    'Submission should preserve replay priority, then pass lifecycle, answer validation, scoring, slot persistence, conflict classification, and write-time lifecycle mapping boundaries.'
   );
   assert.match(
     SNAPSHOT_SOURCE,

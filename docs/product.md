@@ -440,6 +440,16 @@ receive the normal attempt-limit error. Unlimited assignments keep identity and
 attempt-number slots nullable so they do not create artificial write contention.
 Identity keys and attempt numbers are private persistence metadata and do not
 change public feedback, teacher result labels, or exports.
+New attempt writes should also keep a submission lifecycle write guard. The API
+checks lifecycle before validation and scoring, while D1 checks assignment
+status and expiry again in a `BEFORE INSERT` boundary so a teacher closing a
+link or the close time arriving during submission cannot persist a new attempt.
+Same-key replay recovery remains first: a retry for an already persisted
+attempt returns that result, while a genuinely new key is rejected at write
+time. Only confirmed identity-slot unique conflicts may enter the bounded
+recount loop; lifecycle and unrelated database errors must not be mistaken for
+slot contention. Internal trigger markers, identity slots, answers, and student
+identity remain outside public responses and teacher exports.
 Student progress counts, browser submission payloads, and incomplete-submit
 decisions should be derived from shared assignment-domain helpers, not
 per-template route math, so every runner counts answered items, submits frozen

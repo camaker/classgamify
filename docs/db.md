@@ -97,6 +97,18 @@ collision until the configured limit is full. Both columns remain nullable for
 historical rows and unlimited assignments, avoiding backfills and unnecessary
 write contention. Slot metadata stays outside public payloads and exports.
 
+## Attempt submission lifecycle guard
+
+Migration `0011_attempt_submission_lifecycle_guard.sql` adds two D1/SQLite
+`BEFORE INSERT` triggers on `attempt`. One aborts writes when the referenced
+assignment is no longer published; the other compares a published assignment's
+`expires_at` against the database clock and aborts an expired write. This closes
+the interval between the API's initial lifecycle check and scored-attempt
+persistence without depending on an application transaction lock. Stable
+internal abort markers are mapped back to existing localized closed/expired
+messages and are never returned directly. Trigger failures are not eligible for
+identity-slot retry; only the named identity-slot unique conflict is.
+
 ## Notes
 
 - D1 is SQLite; use Drizzle’s SQLite dialect (`sqliteTable`, `text`, `integer`, etc.).

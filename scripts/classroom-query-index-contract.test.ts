@@ -63,7 +63,7 @@ test('classroom query index contract covers 30 stable read paths', () => {
 });
 
 test('classroom query indexes match schema and generated migration', () => {
-  const migrationSource = readLatestMigrationSource();
+  const migrationSource = readClassroomQueryIndexMigrationSource();
 
   for (const [indexName, columns] of Object.entries(NEW_INDEXES)) {
     assert.match(
@@ -79,7 +79,7 @@ test('classroom query indexes match schema and generated migration', () => {
       .join(',')})`;
     assert.ok(
       migrationStatement?.includes(expectedColumnList),
-      `Latest migration should create ${indexName} with ${columns.join(', ')}.`
+      `Generated index migration should create ${indexName} with ${columns.join(', ')}.`
     );
   }
 });
@@ -112,7 +112,10 @@ test('generated classroom query indexes apply with the expected SQLite order', (
       );
     `);
     db.exec(
-      readLatestMigrationSource().replaceAll('--> statement-breakpoint', '')
+      readClassroomQueryIndexMigrationSource().replaceAll(
+        '--> statement-breakpoint',
+        ''
+      )
     );
 
     for (const [indexName, columns] of Object.entries(NEW_INDEXES)) {
@@ -178,11 +181,22 @@ test('classroom query index contract is documented without private data', () => 
   }
 });
 
-function readLatestMigrationSource() {
-  const migrationFile = readdirSync('src/db/migrations')
+function readClassroomQueryIndexMigrationSource() {
+  const migrationSources = readdirSync('src/db/migrations')
     .filter((file) => /^\d{4}_.+\.sql$/.test(file))
     .sort()
-    .at(-1);
-  assert.ok(migrationFile, 'Expected at least one generated D1 migration.');
-  return readFileSync(`src/db/migrations/${migrationFile}`, 'utf8');
+    .map((file) => ({
+      file,
+      source: readFileSync(`src/db/migrations/${file}`, 'utf8'),
+    }));
+  const migration = migrationSources.find(({ source }) =>
+    Object.keys(NEW_INDEXES).every((indexName) =>
+      source.includes(`CREATE INDEX \`${indexName}\``)
+    )
+  );
+  assert.ok(
+    migration,
+    'Expected the generated classroom query index migration.'
+  );
+  return migration.source;
 }

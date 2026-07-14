@@ -61,6 +61,7 @@ export async function persistAttemptWithinIdentityLimit<TReplay>({
   countPreviousAttempts,
   identity,
   insertAttempt,
+  isSlotConflict,
   isSlotOccupied,
   maxAttempts,
   recoverReplay,
@@ -68,6 +69,7 @@ export async function persistAttemptWithinIdentityLimit<TReplay>({
   countPreviousAttempts: () => Promise<number>;
   identity: StudentIdentitySource;
   insertAttempt: (slot: AttemptIdentitySlot) => Promise<void>;
+  isSlotConflict: (error: unknown) => boolean;
   isSlotOccupied: (slot: AttemptIdentitySlot) => Promise<boolean>;
   maxAttempts?: number | null;
   recoverReplay: () => Promise<TReplay | null>;
@@ -107,6 +109,7 @@ export async function persistAttemptWithinIdentityLimit<TReplay>({
     } catch (error) {
       const replay = await recoverReplay();
       if (replay !== null) return { replay, type: 'replay' };
+      if (!isSlotConflict(error)) throw error;
       if (!(await isSlotOccupied(slot))) throw error;
     }
   }

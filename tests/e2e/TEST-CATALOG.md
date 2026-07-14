@@ -224,6 +224,12 @@ run it when changing normalized identity counting, limited-attempt slot
 allocation, concurrent submission retries, attempt inserts, identity-slot
 uniqueness, generated migrations, unlimited-attempt behavior, limit errors,
 teacher result continuity, or private slot metadata.
+Assignment submission lifecycle writes have a fast script-level gate via
+`pnpm exec tsx --test scripts/assignment-submission-lifecycle-write-guard-contract.test.ts`;
+run it when changing assignment close/reopen behavior, close-time enforcement,
+attempt inserts, D1 triggers, write-error mapping, submission replay priority,
+identity-slot conflict classification, bounded recounts, lifecycle messages,
+teacher result continuity, or private database markers.
 Assignment attempt duration has a fast script-level gate via
 `pnpm exec tsx --test scripts/assignment-attempt-duration-handoff-semantic-views.test.ts`;
 run it when changing timer start plans, submission duration normalization,

@@ -111,6 +111,7 @@ import { CLASSROOM_QUERY_INDEX_CONTRACT } from '@/db/classroom-query-index-contr
 import { CLASSROOM_QUERY_EXECUTION_CONTRACT } from '@/db/classroom-query-execution-contract';
 import { ATTEMPT_SUBMISSION_IDEMPOTENCY_STAGES } from '@/assignments/submission-idempotency';
 import { ATTEMPT_LIMIT_CONCURRENCY_STAGES } from '@/assignments/attempt-limit-concurrency';
+import { ASSIGNMENT_SUBMISSION_WRITE_GUARD_STAGES } from '@/assignments/submission-lifecycle-write';
 import {
   AUTH_ERROR_RECOVERY_STEP_IDS,
   buildAuthErrorDisplayView,
@@ -5492,6 +5493,18 @@ assert.equal(CLASSROOM_QUERY_INDEX_CONTRACT.length, 30);
 assert.equal(CLASSROOM_QUERY_EXECUTION_CONTRACT.length, 30);
 assert.equal(ATTEMPT_SUBMISSION_IDEMPOTENCY_STAGES.length, 30);
 assert.equal(ATTEMPT_LIMIT_CONCURRENCY_STAGES.length, 30);
+assert.equal(ASSIGNMENT_SUBMISSION_WRITE_GUARD_STAGES.length, 30);
+assert.equal(
+  new Set(ASSIGNMENT_SUBMISSION_WRITE_GUARD_STAGES.map((stage) => stage.id))
+    .size,
+  30
+);
+assert.equal(
+  ASSIGNMENT_SUBMISSION_WRITE_GUARD_STAGES.filter(
+    (stage) => stage.layer === 'database'
+  ).length,
+  8
+);
 assert.equal(
   new Set(ATTEMPT_LIMIT_CONCURRENCY_STAGES.map((stage) => stage.id)).size,
   30

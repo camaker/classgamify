@@ -38,6 +38,10 @@ import {
 } from '@/assignments/attempt-stats';
 import { buildScoredAttemptInsert } from '@/assignments/attempt-persistence';
 import { persistAttemptWithinIdentityLimit } from '@/assignments/attempt-limit-concurrency';
+import {
+  isAttemptIdentitySlotConflict,
+  rethrowAssignmentSubmissionWriteError,
+} from '@/assignments/submission-lifecycle-write';
 import { doesAttemptSubmissionIdentityMatch } from '@/assignments/submission-idempotency';
 import {
   buildAttemptStartedAt,
@@ -628,6 +632,7 @@ export const submitAttempt = createServerFn({ method: 'POST' })
           })
         );
       },
+      isSlotConflict: isAttemptIdentitySlotConflict,
       isSlotOccupied: (identitySlot) =>
         isAttemptIdentitySlotOccupied({
           assignmentId: row.assignment.id,
@@ -644,7 +649,7 @@ export const submitAttempt = createServerFn({ method: 'POST' })
           settings,
           submissionKey: data.submissionKey,
         }),
-    });
+    }).catch(rethrowAssignmentSubmissionWriteError);
     if (persistence.type === 'replay') return persistence.replay;
     if (persistence.type === 'limit-reached') {
       throw new Error(m.assignment_api_error_attempt_limit_reached());

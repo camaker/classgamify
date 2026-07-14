@@ -181,6 +181,8 @@ function reserve(
       if (harness.slots.has(attemptNumber)) throw new Error('slot-conflict');
       harness.slots.add(attemptNumber);
     },
+    isSlotConflict: (error) =>
+      error instanceof Error && error.message === 'slot-conflict',
     isSlotOccupied: async (slot) =>
       harness.slots.has(requireAttemptNumber(slot)),
     maxAttempts,
