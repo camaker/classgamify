@@ -171,8 +171,10 @@ Assignment lifecycle governance chain has a fast script-level gate via
 run it when changing open/closed/expired/draft status resolution,
 close/reopen transition rules, expired reopen blocking, assignment list status
 filters, share-link availability, public unavailable payloads, submit API
-lifecycle gates, result retention, snapshot retention, or lifecycle privacy
-guards.
+lifecycle gates, result retention, snapshot retention, the 30-slice public
+unavailable-access boundary for lifecycle reasons, hidden runtime and answers,
+blocked submissions, retained results, reopen guidance, indexing, and privacy,
+or other lifecycle privacy guards.
 Classroom data lifecycle chain has a fast script-level gate via
 `pnpm exec tsx --test scripts/classroom-data-lifecycle-chain-handoff.test.ts`;
 run it when changing the 30-slice attempt persistence handoff boundary, D1 app

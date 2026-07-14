@@ -1,3 +1,5 @@
+import { PUBLIC_ASSIGNMENT_UNAVAILABLE_ACCESS_HANDOFF_ITEM_IDS } from '@/assignments/unavailable-access';
+
 export const ASSIGNMENT_LIFECYCLE_GOVERNANCE_CHAIN_HANDOFF_ITEM_IDS = [
   'product-lifecycle-policy',
   'managed-status-boundary',
@@ -28,7 +30,7 @@ export const ASSIGNMENT_LIFECYCLE_GOVERNANCE_CHAIN_HANDOFF_ITEM_IDS = [
   'public-access-handoff-alignment',
   'unavailable-access-handoff-alignment',
   'lifecycle-privacy-guard',
-  'assignment-lifecycle-governance-gate',
+  'public-unavailable-access-handoff-boundary',
 ] as const;
 
 export const ASSIGNMENT_LIFECYCLE_GOVERNANCE_CHAIN_SOURCE_FILES = [
@@ -94,6 +96,7 @@ export type AssignmentLifecycleGovernanceChainPrivacyContract = {
   requiresOwnerScopedTeacherQueries: true;
   sourceFiles: string[];
   statusFiltersUseLifecycleStatus: true;
+  usesUnavailableAccessHandoff: true;
 };
 
 export type AssignmentLifecycleGovernanceChainHandoffView = {
@@ -132,6 +135,7 @@ export function buildAssignmentLifecycleGovernanceChainHandoffView(): Assignment
       requiresOwnerScopedTeacherQueries: true,
       sourceFiles: [...ASSIGNMENT_LIFECYCLE_GOVERNANCE_CHAIN_SOURCE_FILES],
       statusFiltersUseLifecycleStatus: true,
+      usesUnavailableAccessHandoff: true,
     },
     title: 'Assignment lifecycle governance chain',
   };
@@ -355,12 +359,12 @@ function getAssignmentLifecycleGovernanceChainHandoffItem(
         'Private data hidden',
         'Lifecycle handoffs omit activity content, answer keys, ids, slugs, tokens, student answers, and names.'
       );
-    case 'assignment-lifecycle-governance-gate':
+    case 'public-unavailable-access-handoff-boundary':
       return item(
         id,
-        'Assignment lifecycle governance gate',
-        '30 source files',
-        'A focused gate keeps lifecycle status, list filters, public access, submissions, results, and privacy connected.'
+        'Public unavailable access handoff boundary',
+        `${PUBLIC_ASSIGNMENT_UNAVAILABLE_ACCESS_HANDOFF_ITEM_IDS.length} unavailable access slices`,
+        'Closed, expired, draft, and missing links must use the shared unavailable-access contract for lifecycle reasons, hidden runtime and answers, blocked submissions, retained results, reopen guidance, indexing, and privacy.'
       );
   }
 }

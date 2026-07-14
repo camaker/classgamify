@@ -156,6 +156,7 @@ test('assignment lifecycle governance chain exposes 30 safe slices', () => {
     requiresOwnerScopedTeacherQueries: true,
     sourceFiles: [...ASSIGNMENT_LIFECYCLE_GOVERNANCE_CHAIN_SOURCE_FILES],
     statusFiltersUseLifecycleStatus: true,
+    usesUnavailableAccessHandoff: true,
   });
   assertNoPrivateLifecycleGovernanceText(JSON.stringify(handoffView));
 });
@@ -195,12 +196,19 @@ test('assignment lifecycle governance chain summarizes each state boundary', () 
       ['public-access-handoff-alignment', 'Public access handoff'],
       ['unavailable-access-handoff-alignment', 'Unavailable handoff'],
       ['lifecycle-privacy-guard', 'Private data hidden'],
-      ['assignment-lifecycle-governance-gate', '30 source files'],
+      [
+        'public-unavailable-access-handoff-boundary',
+        '30 unavailable access slices',
+      ],
     ]
   );
   assert.equal(
     getHandoffValue(handoffView, 'expired-reopen-block'),
     'Expired blocked'
+  );
+  assert.equal(
+    getHandoffValue(handoffView, 'public-unavailable-access-handoff-boundary'),
+    `${PUBLIC_ASSIGNMENT_UNAVAILABLE_ACCESS_HANDOFF_ITEM_IDS.length} unavailable access slices`
   );
 });
 
@@ -241,6 +249,11 @@ test('product docs and lifecycle helpers preserve status governance', () => {
     PRODUCT_SOURCE,
     /status and expiry checks should flow through shared lifecycle helpers[\s\S]*student access, teacher lists, and result pages agree on open, closed, and\s+expired states/,
     'docs/product.md should require lifecycle agreement across surfaces.'
+  );
+  assert.match(
+    PRODUCT_SOURCE,
+    /assignment\s+lifecycle\s+governance\s+chain[\s\S]*30-slice\s+public\s+unavailable-access\s+handoff[\s\S]*closed,\s+expired,\s+draft,\s+and\s+missing[\s\S]*runtime\s+content[\s\S]*submissions[\s\S]*results[\s\S]*privacy/,
+    'docs/product.md should route unavailable lifecycle states through the shared public unavailable-access contract.'
   );
   assert.match(
     PRODUCT_SOURCE,
@@ -509,7 +522,7 @@ test('assignment lifecycle governance focused gate is documented', () => {
 
   assert.match(
     TEST_CATALOG_SOURCE,
-    /Assignment lifecycle governance chain has a fast script-level gate via[\s\S]*scripts\/assignment-lifecycle-governance-chain-handoff\.test\.ts/,
+    /Assignment lifecycle governance chain has a fast script-level gate via[\s\S]*scripts\/assignment-lifecycle-governance-chain-handoff\.test\.ts[\s\S]*30-slice\s+public\s+unavailable-access\s+boundary/,
     'TEST-CATALOG should document the assignment lifecycle governance chain gate.'
   );
   assert.match(

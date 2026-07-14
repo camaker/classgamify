@@ -5440,12 +5440,13 @@ assert.deepEqual(assignmentLifecycleGovernanceChainView.privacy, {
   requiresOwnerScopedTeacherQueries: true,
   sourceFiles: [...ASSIGNMENT_LIFECYCLE_GOVERNANCE_CHAIN_SOURCE_FILES],
   statusFiltersUseLifecycleStatus: true,
+  usesUnavailableAccessHandoff: true,
 });
 assert.deepEqual(Object.fromEntries(assignmentLifecycleGovernanceChainValues), {
   'api-list-owner-scope': 'Owner scoped',
   'api-status-filter': 'Lifecycle SQL filter',
   'assignment-card-lifecycle-handoff': 'Hidden card handoff',
-  'assignment-lifecycle-governance-gate': '30 source files',
+  'public-unavailable-access-handoff-boundary': '30 unavailable access slices',
   'attempt-review-retention': 'Scored attempts',
   'close-transition-rule': 'Published -> closed',
   'expired-reopen-block': 'Expired blocked',

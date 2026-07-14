@@ -326,6 +326,13 @@ teacher UI: only published links can be closed, only closed links can be
 reopened, draft assignments cannot bypass the publish-and-snapshot flow, and
 expired assignments cannot be reopened without a future product action that
 changes the close window.
+The assignment lifecycle governance chain should explicitly carry the 30-slice
+public unavailable-access handoff so closed, expired, draft, and missing links
+share lifecycle reasons, student-safe messages, hidden runtime content and
+answers, blocked submissions, retained teacher results, reopen guidance,
+noindex policy, and privacy guards. Its independent 30-file gate should continue
+to verify status, list, public lookup, submission, snapshot, result, and export
+surfaces without substituting for that unavailable-state product contract.
 
 Public student links must return a sanitized assignment payload only while the
 assignment is open. Closed or expired links do not expose runtime content, and
