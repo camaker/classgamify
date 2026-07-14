@@ -10,6 +10,10 @@ import {
 } from '@/assignments/submission-idempotency';
 
 const API_SOURCE = readFileSync('src/api/assignments.ts', 'utf8');
+const ATTEMPT_LIMIT_CONCURRENCY_SOURCE = readFileSync(
+  'src/assignments/attempt-limit-concurrency.ts',
+  'utf8'
+);
 const ATTEMPT_QUERY_SOURCE = readFileSync(
   'src/assignments/attempt-query.ts',
   'utf8'
@@ -146,19 +150,22 @@ test('server recovers existing and concurrent retries before new-submit gates', 
   const lifecycleIndex = handlerSource.indexOf(
     'assertAssignmentAcceptsSubmissions'
   );
-  const attemptLimitIndex = handlerSource.indexOf(
-    'canUseAnotherAssignmentAttempt'
+  const persistenceIndex = handlerSource.indexOf(
+    'const persistence = await persistAttemptWithinIdentityLimit'
   );
-  const insertIndex = handlerSource.indexOf('await db.insert(attempt)');
-  const conflictRecoveryIndex = handlerSource.indexOf(
-    'const concurrentReplayResponse = await recoverAttemptSubmissionResponse'
-  );
+  const insertIndex = handlerSource.indexOf('insertAttempt: async');
+  const conflictRecoveryIndex = handlerSource.indexOf('recoverReplay: () =>');
 
   assert.ok(replayIndex >= 0);
   assert.ok(lifecycleIndex > replayIndex);
-  assert.ok(attemptLimitIndex > lifecycleIndex);
-  assert.ok(insertIndex > attemptLimitIndex);
+  assert.ok(persistenceIndex > lifecycleIndex);
+  assert.ok(insertIndex > persistenceIndex);
   assert.ok(conflictRecoveryIndex > insertIndex);
+  assert.match(
+    ATTEMPT_LIMIT_CONCURRENCY_SOURCE,
+    /catch \(error\)[\s\S]*recoverReplay\(\)[\s\S]*replay !== null[\s\S]*isSlotOccupied\(slot\)[\s\S]*throw error/,
+    'Concurrent persistence should recover same-key replay before retrying an occupied identity slot.'
+  );
   assert.match(
     ATTEMPT_QUERY_SOURCE,
     /buildAttemptSubmissionReplaySelect[\s\S]*answersJson: attempt\.answersJson[\s\S]*resultJson: attempt\.resultJson[\s\S]*buildAttemptSubmissionKeyWhere[\s\S]*eq\(attempt\.assignmentId, assignmentId\)[\s\S]*eq\(attempt\.submissionKey, submissionKey\)/

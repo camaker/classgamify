@@ -110,6 +110,7 @@ import {
 import { CLASSROOM_QUERY_INDEX_CONTRACT } from '@/db/classroom-query-index-contract';
 import { CLASSROOM_QUERY_EXECUTION_CONTRACT } from '@/db/classroom-query-execution-contract';
 import { ATTEMPT_SUBMISSION_IDEMPOTENCY_STAGES } from '@/assignments/submission-idempotency';
+import { ATTEMPT_LIMIT_CONCURRENCY_STAGES } from '@/assignments/attempt-limit-concurrency';
 import {
   AUTH_ERROR_RECOVERY_STEP_IDS,
   buildAuthErrorDisplayView,
@@ -5490,6 +5491,17 @@ const classroomDataLifecycleChainView =
 assert.equal(CLASSROOM_QUERY_INDEX_CONTRACT.length, 30);
 assert.equal(CLASSROOM_QUERY_EXECUTION_CONTRACT.length, 30);
 assert.equal(ATTEMPT_SUBMISSION_IDEMPOTENCY_STAGES.length, 30);
+assert.equal(ATTEMPT_LIMIT_CONCURRENCY_STAGES.length, 30);
+assert.equal(
+  new Set(ATTEMPT_LIMIT_CONCURRENCY_STAGES.map((stage) => stage.id)).size,
+  30
+);
+assert.equal(
+  ATTEMPT_LIMIT_CONCURRENCY_STAGES.filter(
+    (stage) => stage.layer === 'server'
+  ).length,
+  12
+);
 assert.equal(
   new Set(ATTEMPT_SUBMISSION_IDEMPOTENCY_STAGES.map((stage) => stage.id)).size,
   30
@@ -20925,11 +20937,11 @@ const assignmentAttemptLimitHandoffView =
           studentRunnerStateSource
         ),
       serverEnforcesLimit:
-        /canUseAnotherAssignmentAttempt\(\{[\s\S]*maxAttempts: settings\.maxAttempts/.test(
+        /persistAttemptWithinIdentityLimit\(\{[\s\S]*maxAttempts: settings\.maxAttempts[\s\S]*persistence\.type === 'limit-reached'/.test(
           assignmentAttemptLimitApiSource
         ),
       scoredAttemptWriteGatedByLimit:
-        /canUseAnotherAssignmentAttempt[\s\S]*throw new Error\(m\.assignment_api_error_attempt_limit_reached\(\)\)[\s\S]*await db\.insert\(attempt\)/.test(
+        /persistAttemptWithinIdentityLimit\(\{[\s\S]*insertAttempt:[\s\S]*await db\.insert\(attempt\)[\s\S]*identitySlot,[\s\S]*persistence\.type === 'limit-reached'[\s\S]*throw new Error\(m\.assignment_api_error_attempt_limit_reached\(\)\)/.test(
           assignmentAttemptLimitApiSource
         ),
       submittedAttemptCount: assignmentAttemptLimitUsage.usedAttempts,
@@ -21046,8 +21058,8 @@ assert.doesNotMatch(
 );
 assert.match(
   assignmentAttemptLimitApiSource,
-  /export const submitAttempt[\s\S]*canUseAnotherAssignmentAttempt\(\{[\s\S]*maxAttempts: settings\.maxAttempts,[\s\S]*usedAttempts: previousAttemptCount/,
-  'Submit attempt API should enforce attempt limits through the shared helper.'
+  /export const submitAttempt[\s\S]*persistAttemptWithinIdentityLimit\(\{[\s\S]*countPreviousAttempts:[\s\S]*countPreviousIdentityAttempts\(\{[\s\S]*insertAttempt:[\s\S]*identitySlot,[\s\S]*isAttemptIdentitySlotOccupied\(\{[\s\S]*recoverAttemptSubmissionResponse\(\{[\s\S]*persistence\.type === 'limit-reached'[\s\S]*assignment_api_error_attempt_limit_reached/,
+  'Submit attempt API should enforce attempt limits through the shared concurrency helper.'
 );
 assert.match(
   studentRunnerSubmissionSource,
@@ -31345,6 +31357,10 @@ const scoredAttemptInsert = buildScoredAttemptInsert({
     anonymousToken: null,
     studentName: 'Ada Lovelace',
   },
+  identitySlot: {
+    attemptNumber: 1,
+    identityKey: 'name:ada lovelace',
+  },
   startedAt: new Date('2026-01-15T12:28:45.000Z'),
   submissionKey: 'scored-submission-key',
   templateType: 'quiz',
@@ -31369,8 +31385,10 @@ assert.deepEqual(
       templateType: 'quiz',
     },
     assignmentId: 'assignment-published-1',
+    attemptNumber: 1,
     completedAt: assignmentSnapshotCreatedAt,
     id: 'attempt-scored-1',
+    identityKey: 'name:ada lovelace',
     maxScore: 2,
     resultJson: {
       accuracy: 50,
@@ -31418,7 +31436,7 @@ const scoredAttemptPersistenceSourceChecks = {
       assignmentAttemptLimitApiSource
     ),
   attemptLimitGate:
-    /countPreviousIdentityAttempts\(\{[\s\S]*canUseAnotherAssignmentAttempt\(\{[\s\S]*usedAttempts: previousAttemptCount/.test(
+    /persistAttemptWithinIdentityLimit\(\{[\s\S]*countPreviousAttempts:[\s\S]*countPreviousIdentityAttempts\(\{[\s\S]*insertAttempt:[\s\S]*identitySlot,[\s\S]*maxAttempts: settings\.maxAttempts[\s\S]*persistence\.type === 'limit-reached'/.test(
       assignmentAttemptLimitApiSource
     ),
   attemptStatsUsesResultJson:
@@ -31674,7 +31692,7 @@ assert.match(
 );
 assert.match(
   assignmentAttemptLimitApiSource,
-  /(?=[\s\S]*assertAssignmentAcceptsSubmissions\(\{)(?=[\s\S]*resolveAttemptSubmissionIdentity\(\{)(?=[\s\S]*recoverAttemptSubmissionResponse\(\{)(?=[\s\S]*countPreviousIdentityAttempts\(\{)(?=[\s\S]*canUseAnotherAssignmentAttempt\(\{)(?=[\s\S]*normalizeSubmittedAttemptAnswers\(data\.answers\))(?=[\s\S]*assertSubmittedAnswersMatchRuntimeItems\(\{)(?=[\s\S]*evaluateRuntimeAnswers\(\{)(?=[\s\S]*buildScoredAttemptInsert\(\{)(?=[\s\S]*function buildAttemptSubmissionResponse)(?=[\s\S]*buildPublicAttemptResult\(result\))(?=[\s\S]*buildPublicAttemptReviewSummaryView\(\{)/,
+  /(?=[\s\S]*assertAssignmentAcceptsSubmissions\(\{)(?=[\s\S]*resolveAttemptSubmissionIdentity\(\{)(?=[\s\S]*recoverAttemptSubmissionResponse\(\{)(?=[\s\S]*persistAttemptWithinIdentityLimit\(\{)(?=[\s\S]*countPreviousAttempts:[\s\S]*countPreviousIdentityAttempts\(\{)(?=[\s\S]*insertAttempt:[\s\S]*buildScoredAttemptInsert\(\{[\s\S]*identitySlot,)(?=[\s\S]*isAttemptIdentitySlotOccupied\(\{)(?=[\s\S]*persistence\.type === 'limit-reached')(?=[\s\S]*normalizeSubmittedAttemptAnswers\(data\.answers\))(?=[\s\S]*assertSubmittedAnswersMatchRuntimeItems\(\{)(?=[\s\S]*evaluateRuntimeAnswers\(\{)(?=[\s\S]*function buildAttemptSubmissionResponse)(?=[\s\S]*buildPublicAttemptResult\(result\))(?=[\s\S]*buildPublicAttemptReviewSummaryView\(\{)/,
   'Submit-attempt API should keep lifecycle, identity, validation, scoring, persistence, public result, and review summary connected.'
 );
 assert.match(
@@ -40950,8 +40968,8 @@ assert.match(
 );
 assert.match(
   assignmentsApiSource,
-  /export const submitAttempt[\s\S]*canUseAnotherAssignmentAttempt\(\{[\s\S]*maxAttempts: settings\.maxAttempts,[\s\S]*usedAttempts: previousAttemptCount/,
-  'Submit attempt API should enforce attempt limits through the shared assignment-domain helper.'
+  /export const submitAttempt[\s\S]*persistAttemptWithinIdentityLimit\(\{[\s\S]*countPreviousAttempts:[\s\S]*countPreviousIdentityAttempts\(\{[\s\S]*insertAttempt:[\s\S]*identitySlot,[\s\S]*maxAttempts: settings\.maxAttempts[\s\S]*persistence\.type === 'limit-reached'/,
+  'Submit attempt API should enforce attempt limits through the shared assignment concurrency helper.'
 );
 assert.match(
   assignmentsApiSource,
@@ -42427,7 +42445,7 @@ assert.match(
 assert.equal(typeof countPreviousIdentityAttempts, 'function');
 assert.match(
   assignmentsApiSource,
-  /previousAttemptCount = await countPreviousIdentityAttempts\(\{[\s\S]*assignmentId: row\.assignment\.id,[\s\S]*db,[\s\S]*studentName: submissionIdentity\.studentName/,
+  /persistAttemptWithinIdentityLimit\(\{[\s\S]*countPreviousAttempts: \(\) =>[\s\S]*countPreviousIdentityAttempts\(\{[\s\S]*anonymousToken: submissionIdentity\.anonymousToken[\s\S]*assignmentId: row\.assignment\.id,[\s\S]*db,[\s\S]*studentName: submissionIdentity\.studentName/,
   'Assignment submission API should delegate previous identity attempt counting to the assignment identity query domain.'
 );
 assert.doesNotMatch(

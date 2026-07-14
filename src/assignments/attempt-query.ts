@@ -78,6 +78,23 @@ export function buildAttemptSubmissionKeyWhere({
   );
 }
 
+export function buildAttemptIdentitySlotWhere({
+  assignmentId,
+  attemptNumber,
+  identityKey,
+}: {
+  assignmentId: string;
+  attemptNumber: number;
+  identityKey: string;
+}) {
+  return and(
+    eq(attempt.assignmentId, assignmentId),
+    eq(attempt.identityKey, identityKey),
+    eq(attempt.attemptNumber, attemptNumber),
+    isNotNull(attempt.resultJson)
+  );
+}
+
 export function buildScoredAssignmentAttemptWhere({
   assignmentId,
 }: {

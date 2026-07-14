@@ -71,6 +71,13 @@
       "when": 1784002272670,
       "tag": "0009_minor_winter_soldier",
       "breakpoints": true
+    },
+    {
+      "idx": 10,
+      "version": "6",
+      "when": 1784005476753,
+      "tag": "0010_breezy_toro",
+      "breakpoints": true
     }
   ]
 }

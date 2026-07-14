@@ -9,8 +9,10 @@ export type ScoredAttemptInsert = {
   anonymousToken: string | null;
   answersJson: AttemptAnswers;
   assignmentId: string;
+  attemptNumber: number | null;
   completedAt: Date;
   id: string;
+  identityKey: string | null;
   maxScore: number;
   resultJson: AttemptResult;
   score: number;
@@ -35,6 +37,7 @@ export function buildScoredAttemptInsert({
   evaluation,
   id,
   identity,
+  identitySlot,
   startedAt,
   submissionKey,
   templateType,
@@ -44,6 +47,10 @@ export function buildScoredAttemptInsert({
   evaluation: ScoredAttemptEvaluation;
   id: string;
   identity: ScoredAttemptIdentity;
+  identitySlot: {
+    attemptNumber: number | null;
+    identityKey: string | null;
+  };
   startedAt: Date;
   submissionKey: string;
   templateType: ActivityTemplateType;
@@ -55,8 +62,10 @@ export function buildScoredAttemptInsert({
       templateType,
     },
     assignmentId,
+    attemptNumber: identitySlot.attemptNumber,
     completedAt,
     id,
+    identityKey: identitySlot.identityKey,
     maxScore: evaluation.result.totalPoints,
     resultJson: cloneAttemptResult(evaluation.result),
     score: evaluation.result.earnedPoints,

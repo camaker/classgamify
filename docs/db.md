@@ -87,6 +87,16 @@ network retry resolve to the same scored attempt instead of creating another
 row. A key is scoped to one assignment and one normalized submission identity;
 it is not returned in public feedback, teacher results, or exports.
 
+## Attempt limit concurrency
+
+Finite-attempt rows also carry nullable `identity_key` and `attempt_number`
+columns. New limited submissions reserve the next normalized identity slot, and
+the unique `(assignment_id, identity_key, attempt_number)` index prevents two
+requests from consuming the same slot. The API recounts after a confirmed slot
+collision until the configured limit is full. Both columns remain nullable for
+historical rows and unlimited assignments, avoiding backfills and unnecessary
+write contention. Slot metadata stays outside public payloads and exports.
+
 ## Notes
 
 - D1 is SQLite; use Drizzle’s SQLite dialect (`sqliteTable`, `text`, `integer`, etc.).

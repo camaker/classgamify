@@ -430,6 +430,16 @@ and attempt-limit gates, while a genuinely new attempt still receives a new key
 and follows the normal lifecycle, limit, validation, scoring, and persistence
 flow. Submission keys remain private persistence metadata and never appear in
 public result payloads or teacher exports.
+Finite assignments should additionally keep a finite attempt concurrency
+contract. Each new scored attempt reserves the next normalized identity attempt
+slot, and D1 uniquely scopes that slot by assignment, identity, and attempt
+number. If different submission keys race for the same slot, the losing request
+rechecks idempotent replay first, confirms the occupied slot, and recounts before
+trying the next slot. Once the configured limit is full, all remaining requests
+receive the normal attempt-limit error. Unlimited assignments keep identity and
+attempt-number slots nullable so they do not create artificial write contention.
+Identity keys and attempt numbers are private persistence metadata and do not
+change public feedback, teacher result labels, or exports.
 Student progress counts, browser submission payloads, and incomplete-submit
 decisions should be derived from shared assignment-domain helpers, not
 per-template route math, so every runner counts answered items, submits frozen

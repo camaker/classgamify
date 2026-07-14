@@ -218,6 +218,12 @@ run it when changing browser submission-key generation or reset behavior,
 network retry recovery, normalized identity matching, attempt inserts,
 assignment-scoped uniqueness, generated migrations, public retry responses,
 attempt limits, lifecycle gates, teacher results, or submission-key privacy.
+Assignment attempt-limit concurrency has a fast script-level gate via
+`pnpm exec tsx --test scripts/assignment-attempt-limit-concurrency-contract.test.ts`;
+run it when changing normalized identity counting, limited-attempt slot
+allocation, concurrent submission retries, attempt inserts, identity-slot
+uniqueness, generated migrations, unlimited-attempt behavior, limit errors,
+teacher result continuity, or private slot metadata.
 Assignment attempt duration has a fast script-level gate via
 `pnpm exec tsx --test scripts/assignment-attempt-duration-handoff-semantic-views.test.ts`;
 run it when changing timer start plans, submission duration normalization,

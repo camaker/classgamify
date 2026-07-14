@@ -27,6 +27,7 @@ import {
   buildAttemptSubmissionReplaySelect,
   buildAttemptAssignmentJoin,
   buildAttemptCompletedAtOrderBy,
+  buildAttemptIdentitySlotWhere,
   buildScoredAssignmentAttemptWhere,
   buildScoredAttemptWhere,
 } from '@/assignments/attempt-query';
@@ -36,15 +37,13 @@ import {
   withAssignmentAttemptStatsSettings,
 } from '@/assignments/attempt-stats';
 import { buildScoredAttemptInsert } from '@/assignments/attempt-persistence';
+import { persistAttemptWithinIdentityLimit } from '@/assignments/attempt-limit-concurrency';
 import { doesAttemptSubmissionIdentityMatch } from '@/assignments/submission-idempotency';
 import {
   buildAttemptStartedAt,
   normalizeAttemptDurationSeconds,
 } from '@/assignments/attempt-duration';
-import {
-  buildAssignmentAttemptUsage,
-  canUseAnotherAssignmentAttempt,
-} from '@/assignments/attempt-limits';
+import { buildAssignmentAttemptUsage } from '@/assignments/attempt-limits';
 import {
   ASSIGNMENT_LIST_INPUT_LIMITS,
   ASSIGNMENT_LIST_PAGE_SIZE,
@@ -587,24 +586,6 @@ export const submitAttempt = createServerFn({ method: 'POST' })
       status: row.assignment.status,
     });
 
-    let previousAttemptCount = 0;
-    if (settings.maxAttempts) {
-      previousAttemptCount = await countPreviousIdentityAttempts({
-        anonymousToken: submissionIdentity.anonymousToken ?? '',
-        assignmentId: row.assignment.id,
-        db,
-        studentName: submissionIdentity.studentName ?? '',
-      });
-      if (
-        !canUseAnotherAssignmentAttempt({
-          maxAttempts: settings.maxAttempts,
-          usedAttempts: previousAttemptCount,
-        })
-      ) {
-        throw new Error(m.assignment_api_error_attempt_limit_reached());
-      }
-    }
-
     const submittedAnswers = normalizeSubmittedAttemptAnswers(data.answers);
     assertSubmittedAnswersMatchRuntimeItems({
       answers: submittedAnswers,
@@ -623,42 +604,95 @@ export const submitAttempt = createServerFn({ method: 'POST' })
     });
     const id = nanoid(APP_ENTITY_ID_LENGTH.generated);
 
-    try {
-      await db.insert(attempt).values(
-        buildScoredAttemptInsert({
+    const persistence = await persistAttemptWithinIdentityLimit({
+      countPreviousAttempts: () =>
+        countPreviousIdentityAttempts({
+          anonymousToken: submissionIdentity.anonymousToken ?? '',
           assignmentId: row.assignment.id,
-          completedAt: now,
-          evaluation,
-          id,
+          db,
+          studentName: submissionIdentity.studentName ?? '',
+        }),
+      identity: submissionIdentity,
+      insertAttempt: async (identitySlot) => {
+        await db.insert(attempt).values(
+          buildScoredAttemptInsert({
+            assignmentId: row.assignment.id,
+            completedAt: now,
+            evaluation,
+            id,
+            identity: submissionIdentity,
+            identitySlot,
+            startedAt,
+            submissionKey: data.submissionKey,
+            templateType,
+          })
+        );
+      },
+      isSlotOccupied: (identitySlot) =>
+        isAttemptIdentitySlotOccupied({
+          assignmentId: row.assignment.id,
+          db,
+          identitySlot,
+        }),
+      maxAttempts: settings.maxAttempts,
+      recoverReplay: () =>
+        recoverAttemptSubmissionResponse({
+          assignmentId: row.assignment.id,
+          db,
           identity: submissionIdentity,
-          startedAt,
+          orderedRuntimeItems,
+          settings,
           submissionKey: data.submissionKey,
-          templateType,
-        })
-      );
-    } catch (error) {
-      const concurrentReplayResponse = await recoverAttemptSubmissionResponse({
-        assignmentId: row.assignment.id,
-        db,
-        identity: submissionIdentity,
-        orderedRuntimeItems,
-        settings,
-        submissionKey: data.submissionKey,
-      });
-      if (concurrentReplayResponse) return concurrentReplayResponse;
-
-      throw error;
+        }),
+    });
+    if (persistence.type === 'replay') return persistence.replay;
+    if (persistence.type === 'limit-reached') {
+      throw new Error(m.assignment_api_error_attempt_limit_reached());
     }
 
     return buildAttemptSubmissionResponse({
       answers: evaluation.answers,
       attemptId: id,
       orderedRuntimeItems,
-      previousAttemptCount,
+      previousAttemptCount: persistence.previousAttemptCount,
       result: evaluation.result,
       settings,
     });
   });
+
+async function isAttemptIdentitySlotOccupied({
+  assignmentId,
+  db,
+  identitySlot,
+}: {
+  assignmentId: string;
+  db: ReturnType<typeof getDb>;
+  identitySlot: {
+    attemptNumber: number | null;
+    identityKey: string | null;
+  };
+}) {
+  if (
+    identitySlot.attemptNumber === null ||
+    identitySlot.identityKey === null
+  ) {
+    return false;
+  }
+
+  const [occupiedAttempt] = await db
+    .select({ id: attempt.id })
+    .from(attempt)
+    .where(
+      buildAttemptIdentitySlotWhere({
+        assignmentId,
+        attemptNumber: identitySlot.attemptNumber,
+        identityKey: identitySlot.identityKey,
+      })
+    )
+    .limit(1);
+
+  return Boolean(occupiedAttempt);
+}
 
 async function recoverAttemptSubmissionResponse({
   assignmentId,

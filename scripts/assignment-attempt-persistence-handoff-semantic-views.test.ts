@@ -231,6 +231,10 @@ function buildPersistenceFixture() {
       anonymousToken: SECRET_ANONYMOUS_TOKEN,
       studentName: null,
     },
+    identitySlot: {
+      attemptNumber: 1,
+      identityKey: `anonymous:${SECRET_ANONYMOUS_TOKEN}`,
+    },
     startedAt: new Date('2026-07-05T10:00:15.000Z'),
     submissionKey: 'persistence-submission-key',
     templateType: 'quiz',
@@ -327,7 +331,7 @@ function buildPersistenceSourceChecks(): AssignmentAttemptPersistenceHandoffSour
         API_SOURCE
       ),
     attemptLimitGate:
-      /countPreviousIdentityAttempts\(\{[\s\S]*canUseAnotherAssignmentAttempt\(\{[\s\S]*usedAttempts: previousAttemptCount/.test(
+      /persistAttemptWithinIdentityLimit\(\{[\s\S]*countPreviousAttempts:[\s\S]*countPreviousIdentityAttempts\(\{[\s\S]*insertAttempt:[\s\S]*identitySlot,[\s\S]*maxAttempts: settings\.maxAttempts[\s\S]*persistence\.type === 'limit-reached'/.test(
         API_SOURCE
       ),
     attemptStatsUsesResultJson:

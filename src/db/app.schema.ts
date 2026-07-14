@@ -271,6 +271,8 @@ export const attempt = sqliteTable(
     studentName: text('student_name'),
     anonymousToken: text('anonymous_token'),
     submissionKey: text('submission_key'),
+    identityKey: text('identity_key'),
+    attemptNumber: integer('attempt_number'),
     score: integer('score'),
     maxScore: integer('max_score'),
     answersJson: text('answers_json', { mode: 'json' })
@@ -297,6 +299,11 @@ export const attempt = sqliteTable(
     uniqueIndex('attempt_assignment_submission_key_unique').on(
       table.assignmentId,
       table.submissionKey
+    ),
+    uniqueIndex('attempt_assignment_identity_number_unique').on(
+      table.assignmentId,
+      table.identityKey,
+      table.attemptNumber
     ),
     index('attempt_anonymous_token_idx').on(table.anonymousToken),
     index('attempt_completed_at_idx').on(table.completedAt),

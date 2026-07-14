@@ -338,8 +338,8 @@ test('assignment attempt limit handoff is wired to shared source boundaries', ()
   );
   assert.match(
     API_ASSIGNMENTS_SOURCE,
-    /export const submitAttempt[\s\S]*canUseAnotherAssignmentAttempt\(\{[\s\S]*maxAttempts: settings\.maxAttempts,[\s\S]*usedAttempts: previousAttemptCount/,
-    'Submit attempt API should enforce attempt limits through the shared helper.'
+    /export const submitAttempt[\s\S]*persistAttemptWithinIdentityLimit\(\{[\s\S]*countPreviousAttempts:[\s\S]*countPreviousIdentityAttempts\(\{[\s\S]*insertAttempt:[\s\S]*identitySlot,[\s\S]*maxAttempts: settings\.maxAttempts[\s\S]*persistence\.type === 'limit-reached'[\s\S]*assignment_api_error_attempt_limit_reached/,
+    'Submit attempt API should enforce attempt limits through the shared concurrency helper.'
   );
   const apiIdentityBeforeAttemptLimitGate = new RegExp(
     [
@@ -350,13 +350,16 @@ test('assignment attempt limit handoff is wired to shared source boundaries', ()
         '!submissionIdentity\\.studentName\\)',
       'if \\(!settings\\.collectStudentName && ' +
         '!submissionIdentity\\.anonymousToken\\)',
-      'if \\(settings\\.maxAttempts\\) \\{',
-      'previousAttemptCount = await countPreviousIdentityAttempts\\(\\{',
+      'persistAttemptWithinIdentityLimit\\(\\{',
+      'countPreviousAttempts:',
+      'countPreviousIdentityAttempts\\(\\{',
       "anonymousToken: submissionIdentity\\.anonymousToken \\?\\? '',",
       "studentName: submissionIdentity\\.studentName \\?\\? '',",
-      'canUseAnotherAssignmentAttempt\\(\\{',
-      'usedAttempts: previousAttemptCount,',
+      'insertAttempt: async \\(identitySlot\\)',
       'await db\\.insert\\(attempt\\)',
+      'identitySlot,',
+      'maxAttempts: settings\\.maxAttempts,',
+      "persistence\\.type === 'limit-reached'",
     ].join('[\\s\\S]*')
   );
   assert.match(
@@ -468,11 +471,11 @@ function buildAttemptLimitEvidence() {
         RUNNER_STATE_SOURCE
       ),
     serverEnforcesLimit:
-      /canUseAnotherAssignmentAttempt\(\{[\s\S]*maxAttempts: settings\.maxAttempts/.test(
+      /persistAttemptWithinIdentityLimit\(\{[\s\S]*maxAttempts: settings\.maxAttempts[\s\S]*persistence\.type === 'limit-reached'/.test(
         API_ASSIGNMENTS_SOURCE
       ),
     scoredAttemptWriteGatedByLimit:
-      /canUseAnotherAssignmentAttempt[\s\S]*throw new Error\(m\.assignment_api_error_attempt_limit_reached\(\)\)[\s\S]*await db\.insert\(attempt\)/.test(
+      /persistAttemptWithinIdentityLimit\(\{[\s\S]*insertAttempt:[\s\S]*await db\.insert\(attempt\)[\s\S]*identitySlot,[\s\S]*persistence\.type === 'limit-reached'[\s\S]*throw new Error\(m\.assignment_api_error_attempt_limit_reached\(\)\)/.test(
         API_ASSIGNMENTS_SOURCE
       ),
     studentNameIdentityUsesNameStrategy:

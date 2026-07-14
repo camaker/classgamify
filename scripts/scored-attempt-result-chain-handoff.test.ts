@@ -187,7 +187,7 @@ test('scored attempt result sources preserve submit, score, and persistence boun
   );
   assert.match(
     API_SOURCE,
-    /(?=[\s\S]*resolveAttemptSubmissionIdentity\(\{)(?=[\s\S]*recoverAttemptSubmissionResponse\(\{)(?=[\s\S]*assertAssignmentAcceptsSubmissions\(\{)(?=[\s\S]*countPreviousIdentityAttempts\(\{)(?=[\s\S]*canUseAnotherAssignmentAttempt\(\{)(?=[\s\S]*normalizeSubmittedAttemptAnswers\(data\.answers\))(?=[\s\S]*assertSubmittedAnswersMatchRuntimeItems\(\{)(?=[\s\S]*evaluateRuntimeAnswers\(\{)(?=[\s\S]*buildScoredAttemptInsert\(\{)(?=[\s\S]*function buildAttemptSubmissionResponse)(?=[\s\S]*buildPublicAttemptResult\(result\))(?=[\s\S]*buildPublicAttemptReviewSummaryView\(\{)/,
+    /(?=[\s\S]*resolveAttemptSubmissionIdentity\(\{)(?=[\s\S]*recoverAttemptSubmissionResponse\(\{)(?=[\s\S]*assertAssignmentAcceptsSubmissions\(\{)(?=[\s\S]*persistAttemptWithinIdentityLimit\(\{)(?=[\s\S]*countPreviousAttempts:[\s\S]*countPreviousIdentityAttempts\(\{)(?=[\s\S]*insertAttempt:[\s\S]*buildScoredAttemptInsert\(\{[\s\S]*identitySlot,)(?=[\s\S]*isAttemptIdentitySlotOccupied\(\{)(?=[\s\S]*persistence\.type === 'limit-reached')(?=[\s\S]*normalizeSubmittedAttemptAnswers\(data\.answers\))(?=[\s\S]*assertSubmittedAnswersMatchRuntimeItems\(\{)(?=[\s\S]*evaluateRuntimeAnswers\(\{)(?=[\s\S]*function buildAttemptSubmissionResponse)(?=[\s\S]*buildPublicAttemptResult\(result\))(?=[\s\S]*buildPublicAttemptReviewSummaryView\(\{)/,
     'Submit-attempt API should gate lifecycle, identity, limits, runtime answers, scoring, persistence, public result, and review summary in order.'
   );
   assert.match(
