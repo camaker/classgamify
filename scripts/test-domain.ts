@@ -43471,6 +43471,7 @@ assert.deepEqual(printableWorksheetReviewLifecycleChainView.privacy, {
   requiresAssignmentSnapshot: true,
   requiresOwnerScopedAssignment: true,
   sourceFiles: [...PRINTABLE_WORKSHEET_REVIEW_LIFECYCLE_CHAIN_SOURCE_FILES],
+  usesPrintableWorksheetHandoff: true,
   usesSharedDeliveryPolicy: true,
   usesSharedRuntimeItems: true,
 });
@@ -43505,7 +43506,8 @@ assert.deepEqual(
     'print-route-auth-boundary': 'Authenticated teacher',
     'print-route-noindex': 'noindex nofollow',
     'printable-item-mapping': 'Student handout items',
-    'printable-review-lifecycle-gate': '30 source files',
+    'printable-worksheet-handoff-boundary':
+      '30 printable worksheet slices',
     'response-policy-map': 'Template response policy',
     'result-export-alignment': 'CSV stays full export',
     'result-page-print-action': 'Teacher result action',
@@ -43522,7 +43524,7 @@ assert.deepEqual(
 );
 assert.match(
   e2eTestCatalogText,
-  /Printable worksheet review lifecycle chain has a fast script-level gate via[\s\S]*scripts\/printable-worksheet-review-lifecycle-chain-handoff\.test\.ts/,
+  /Printable worksheet review lifecycle chain has a fast script-level gate via[\s\S]*scripts\/printable-worksheet-review-lifecycle-chain-handoff\.test\.ts[\s\S]*30-slice\s+printable\s+worksheet\s+handoff\s+boundary/,
   'TEST-CATALOG should document the printable worksheet review lifecycle chain gate.'
 );
 const classroomControlSemanticsSource = readFileSync(

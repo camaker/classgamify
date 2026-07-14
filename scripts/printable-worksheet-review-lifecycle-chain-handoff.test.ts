@@ -124,6 +124,7 @@ test('printable worksheet review lifecycle chain exposes 30 safe slices', () => 
     requiresAssignmentSnapshot: true,
     requiresOwnerScopedAssignment: true,
     sourceFiles: [...PRINTABLE_WORKSHEET_REVIEW_LIFECYCLE_CHAIN_SOURCE_FILES],
+    usesPrintableWorksheetHandoff: true,
     usesSharedDeliveryPolicy: true,
     usesSharedRuntimeItems: true,
   });
@@ -165,12 +166,16 @@ test('printable worksheet review lifecycle summarizes each review boundary', () 
       ['results-return-action', 'Back to results'],
       ['result-export-alignment', 'CSV stays full export'],
       ['worksheet-delivery-chain-alignment', 'Worksheet chain aligned'],
-      ['printable-review-lifecycle-gate', '30 source files'],
+      ['printable-worksheet-handoff-boundary', '30 printable worksheet slices'],
     ]
   );
   assert.equal(
     getHandoffValue(handoffView, 'print-route-auth-boundary'),
     'Authenticated teacher'
+  );
+  assert.equal(
+    getHandoffValue(handoffView, 'printable-worksheet-handoff-boundary'),
+    `${PRINTABLE_WORKSHEET_HANDOFF_ITEM_IDS.length} printable worksheet slices`
   );
 });
 
@@ -378,8 +383,13 @@ test('printable worksheet sources preserve snapshot, delivery, and review alignm
 
 test('printable worksheet review lifecycle focused gate is documented', () => {
   assert.match(
+    PRODUCT_SOURCE,
+    /printable\s+worksheet\s+review\s+lifecycle\s+chain[\s\S]*30-slice\s+printable\s+worksheet\s+handoff[\s\S]*handout\s+overview[\s\S]*answer-key\s+access[\s\S]*print\s+controls[\s\S]*privacy[\s\S]*independent\s+30-file\s+gate/,
+    'docs/product.md should carry printable review through the shared worksheet handoff while retaining the source-file gate.'
+  );
+  assert.match(
     TEST_CATALOG_SOURCE,
-    /Printable worksheet review lifecycle chain has a fast script-level gate via[\s\S]*scripts\/printable-worksheet-review-lifecycle-chain-handoff\.test\.ts/,
+    /Printable worksheet review lifecycle chain has a fast script-level gate via[\s\S]*scripts\/printable-worksheet-review-lifecycle-chain-handoff\.test\.ts[\s\S]*30-slice\s+printable\s+worksheet\s+handoff\s+boundary/,
     'TEST-CATALOG should document the printable worksheet review lifecycle gate.'
   );
   assert.match(

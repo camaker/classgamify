@@ -1,3 +1,5 @@
+import { PRINTABLE_WORKSHEET_HANDOFF_ITEM_IDS } from '@/assignments/printable-worksheet-view';
+
 export const PRINTABLE_WORKSHEET_REVIEW_LIFECYCLE_CHAIN_HANDOFF_ITEM_IDS = [
   'result-page-print-action',
   'prepared-print-link',
@@ -28,7 +30,7 @@ export const PRINTABLE_WORKSHEET_REVIEW_LIFECYCLE_CHAIN_HANDOFF_ITEM_IDS = [
   'results-return-action',
   'result-export-alignment',
   'worksheet-delivery-chain-alignment',
-  'printable-review-lifecycle-gate',
+  'printable-worksheet-handoff-boundary',
 ] as const;
 
 export const PRINTABLE_WORKSHEET_REVIEW_LIFECYCLE_CHAIN_SOURCE_FILES = [
@@ -91,6 +93,7 @@ export type PrintableWorksheetReviewLifecycleChainPrivacyContract = {
   requiresAssignmentSnapshot: true;
   requiresOwnerScopedAssignment: true;
   sourceFiles: string[];
+  usesPrintableWorksheetHandoff: true;
   usesSharedDeliveryPolicy: true;
   usesSharedRuntimeItems: true;
 };
@@ -129,6 +132,7 @@ export function buildPrintableWorksheetReviewLifecycleChainHandoffView(): Printa
       requiresAssignmentSnapshot: true,
       requiresOwnerScopedAssignment: true,
       sourceFiles: [...PRINTABLE_WORKSHEET_REVIEW_LIFECYCLE_CHAIN_SOURCE_FILES],
+      usesPrintableWorksheetHandoff: true,
       usesSharedDeliveryPolicy: true,
       usesSharedRuntimeItems: true,
     },
@@ -357,12 +361,12 @@ function getPrintableWorksheetReviewLifecycleChainHandoffItem(
         'Worksheet chain aligned',
         'The printable review lifecycle stays aligned with worksheet delivery, student runtime, snapshot, and export gates.'
       );
-    case 'printable-review-lifecycle-gate':
+    case 'printable-worksheet-handoff-boundary':
       return item(
         id,
-        'Printable review lifecycle gate',
-        '30 source files',
-        'The focused gate keeps result actions, print routes, worksheet builders, answer-key states, return navigation, and export boundaries connected.'
+        'Printable worksheet handoff boundary',
+        `${PRINTABLE_WORKSHEET_HANDOFF_ITEM_IDS.length} printable worksheet slices`,
+        'The review lifecycle must continue through the shared handout overview, response planning, assignment and delivery context, answer-key access, print controls, route boundaries, and privacy contract.'
       );
   }
 }

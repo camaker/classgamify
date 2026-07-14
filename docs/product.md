@@ -510,6 +510,13 @@ assignment and delivery context, answer-key access and details, results return,
 print action, route/public-runner boundaries, and privacy. Its aggregate summary
 must not expose prompt, choice, answer-key, student-response, student-identity,
 or source-material storage-key text.
+The printable worksheet review lifecycle chain should explicitly carry the
+30-slice printable worksheet handoff so handout overview, response planning,
+assignment and delivery context, answer-key access, results return, print
+controls, route boundaries, and privacy remain connected to teacher result
+review. Its independent 30-file gate should continue to verify result actions,
+teacher-only print routes, frozen snapshot rendering, answer-key states,
+navigation, and export alignment without replacing that paper handoff contract.
 The teacher result page should show the student summary, the top reteach
 priorities, and the full item performance table so a teacher can scan the
 class before opening individual student answers. The full item performance
