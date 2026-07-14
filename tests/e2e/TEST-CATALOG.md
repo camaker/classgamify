@@ -697,8 +697,8 @@ Activity AI enhancement publish boundary has a fast script-level gate via
 `pnpm exec tsx --test scripts/activity-ai-enhancement-publish-boundary.test.ts`;
 run it when changing saved activity records, teacher publish actions,
 assignment publish preflight, share-link creation boundaries, snapshot
-freezing, public-payload guards, result continuity, source-material privacy, or
-privacy guards.
+freezing, public-payload guards, result continuity, source-material privacy, the
+30-slice manual-save handoff, or privacy guards.
 Activity AI enhancement lifecycle chain has a fast script-level gate via
 `pnpm exec tsx --test scripts/activity-ai-enhancement-lifecycle-chain.test.ts`;
 run it when changing policy-to-publish ordering, draft output handoffs, editor

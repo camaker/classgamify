@@ -1,4 +1,5 @@
 import {
+  ACTIVITY_AI_ENHANCEMENT_SAVE_BOUNDARY_ITEM_IDS,
   buildActivityAiEnhancementSaveBoundaryPlan,
   type ActivityAiEnhancementSaveBoundaryPlan,
   type ActivityAiEnhancementSaveBoundarySource,
@@ -42,7 +43,7 @@ export const ACTIVITY_AI_ENHANCEMENT_PUBLISH_BOUNDARY_ITEM_IDS = [
   'publish-flow-boundary',
   'result-export-continuity',
   'blocked-reason',
-  'publish-chain-gate',
+  'manual-save-handoff-boundary',
 ] as const;
 
 export type ActivityAiEnhancementPublishBoundaryItemId =
@@ -135,6 +136,7 @@ export type ActivityAiEnhancementPublishBoundaryPrivacyContract = {
   scope: 'activity-ai-enhancement-publish-boundary';
   usesAssignmentPublishPreflight: true;
   usesAssignmentSnapshotFreeze: true;
+  usesSaveBoundaryHandoff: true;
   usesSaveBoundaryPlan: true;
 };
 
@@ -155,10 +157,10 @@ type ActivityAiEnhancementPublishBoundarySummary = {
   blockedReason: string;
   closeTimeStatus: string;
   deliveryRuleCount: string;
+  manualSaveHandoffBoundary: string;
   protectedExistingSnapshots: string;
   publicPayloadGuard: string;
   publishAccess: string;
-  publishChainGate: string;
   publishDialogSource: string;
   publishExecutionPlan: string;
   publishFlowBoundary: string;
@@ -383,10 +385,12 @@ function buildActivityAiEnhancementPublishBoundarySummary(
     deliveryRuleCount: plan.publishDialog
       ? `${plan.publishDialog.deliveryRuleCount} rules`
       : 'No delivery rules',
+    manualSaveHandoffBoundary:
+      `${ACTIVITY_AI_ENHANCEMENT_SAVE_BOUNDARY_ITEM_IDS.length} ` +
+      'save boundary slices',
     protectedExistingSnapshots: `${plan.protectedExistingAssignmentCount} existing links protected`,
     publicPayloadGuard: 'Sanitized runtime only',
     publishAccess: plan.publishDialog?.publishAccessValue ?? 'Unavailable',
-    publishChainGate: '30 publish slices',
     publishDialogSource: plan.publishDialog
       ? 'Assignment publish preflight'
       : 'Publish preflight unavailable',
@@ -651,12 +655,12 @@ function buildActivityAiEnhancementPublishBoundaryItem({
         summary.blockedReason,
         'Blocked publish states keep one structured reason for diagnostics.'
       );
-    case 'publish-chain-gate':
+    case 'manual-save-handoff-boundary':
       return item(
         id,
-        'Publish chain gate',
-        summary.publishChainGate,
-        'A focused gate keeps save, publish, share-link, snapshot, public-payload, and result-export boundaries aligned.'
+        'Manual save handoff boundary',
+        summary.manualSaveHandoffBoundary,
+        'Assignment publishing remains backed by the complete manual activity-save contract.'
       );
   }
 }
@@ -707,6 +711,7 @@ function buildActivityAiEnhancementPublishBoundaryPrivacyContract(
     scope: 'activity-ai-enhancement-publish-boundary',
     usesAssignmentPublishPreflight: true,
     usesAssignmentSnapshotFreeze: true,
+    usesSaveBoundaryHandoff: true,
     usesSaveBoundaryPlan: true,
   };
 }

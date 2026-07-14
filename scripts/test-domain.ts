@@ -8316,6 +8316,7 @@ assert.deepEqual(activityAiEnhancementPublishBoundaryView.privacy, {
   scope: 'activity-ai-enhancement-publish-boundary',
   usesAssignmentPublishPreflight: true,
   usesAssignmentSnapshotFreeze: true,
+  usesSaveBoundaryHandoff: true,
   usesSaveBoundaryPlan: true,
 });
 assert.equal(
@@ -8370,18 +8371,23 @@ assert.equal(
 );
 assert.match(
   readFileSync('src/activities/ai-enhancement-publish-boundary.ts', 'utf8'),
-  /export const ACTIVITY_AI_ENHANCEMENT_PUBLISH_BOUNDARY_ITEM_IDS = \[[\s\S]*'publish-scope'[\s\S]*'teacher-publish-action'[\s\S]*'publish-execution-plan'[\s\S]*'assignment-link-boundary'[\s\S]*'snapshot-freeze'[\s\S]*'publish-chain-gate'/,
+  /export const ACTIVITY_AI_ENHANCEMENT_PUBLISH_BOUNDARY_ITEM_IDS = \[[\s\S]*'publish-scope'[\s\S]*'teacher-publish-action'[\s\S]*'publish-execution-plan'[\s\S]*'assignment-link-boundary'[\s\S]*'snapshot-freeze'[\s\S]*'manual-save-handoff-boundary'/,
   'Activity AI enhancement publish boundary source should preserve the publish slices.'
 );
 assert.match(
   readFileSync('docs/product.md', 'utf8'),
-  /src\/activities\/ai-enhancement-publish-boundary\.ts` owns the assignment publish boundary[\s\S]*saved activity records[\s\S]*teacher publish actions[\s\S]*assignment publish preflight[\s\S]*share-link creation\s+boundaries[\s\S]*snapshot freezing[\s\S]*private\s+draft\/source-material privacy/,
+  /src\/activities\/ai-enhancement-publish-boundary\.ts` owns the assignment publish boundary[\s\S]*saved activity records[\s\S]*teacher publish actions[\s\S]*assignment publish preflight[\s\S]*share-link creation\s+boundaries[\s\S]*snapshot freezing[\s\S]*private\s+draft\/source-material privacy[\s\S]*30-slice manual-save handoff/,
   'docs/product.md should document the activity AI enhancement publish boundary owner.'
 );
 assert.match(
   readFileSync('tests/e2e/TEST-CATALOG.md', 'utf8'),
   /Activity AI enhancement publish boundary has a fast script-level gate via[\s\S]*scripts\/activity-ai-enhancement-publish-boundary\.test\.ts[\s\S]*saved activity records[\s\S]*teacher publish actions[\s\S]*assignment publish preflight[\s\S]*share-link creation boundaries[\s\S]*snapshot\s+freezing[\s\S]*privacy guards/,
   'TEST-CATALOG should document the activity AI enhancement publish boundary gate.'
+);
+assert.match(
+  readFileSync('tests/e2e/TEST-CATALOG.md', 'utf8'),
+  /30-slice\s+manual-save\s+handoff/,
+  'TEST-CATALOG should document the activity AI enhancement manual-save handoff.'
 );
 const activityAiEnhancementLifecycleChainView =
   buildActivityAiEnhancementLifecycleChainView({

@@ -104,6 +104,7 @@ test('activity AI enhancement publish boundary exposes 30 stable publish slices'
     scope: 'activity-ai-enhancement-publish-boundary',
     usesAssignmentPublishPreflight: true,
     usesAssignmentSnapshotFreeze: true,
+    usesSaveBoundaryHandoff: true,
     usesSaveBoundaryPlan: true,
   });
   assertNoPrivatePublishBoundaryText(JSON.stringify(view));
@@ -126,6 +127,10 @@ test('activity AI enhancement publish boundary waits for the teacher publish act
   assert.equal(values.get('teacher-publish-action'), 'Awaiting publish click');
   assert.equal(values.get('assignment-link-boundary'), 'No share link');
   assert.equal(values.get('blocked-reason'), 'teacher-publish-action-required');
+  assert.equal(
+    values.get('manual-save-handoff-boundary'),
+    '30 save boundary slices'
+  );
   assertNoPrivatePublishBoundaryText(JSON.stringify(view));
 });
 
@@ -201,18 +206,23 @@ test('activity AI enhancement publish boundary gate is wired into docs and cover
   assert.equal(ACTIVITY_AI_ENHANCEMENT_SAVE_BOUNDARY_ITEM_IDS.length, 30);
   assert.match(
     PUBLISH_BOUNDARY_SOURCE,
-    /export const ACTIVITY_AI_ENHANCEMENT_PUBLISH_BOUNDARY_ITEM_IDS = \[[\s\S]*'publish-scope'[\s\S]*'teacher-publish-action'[\s\S]*'publish-execution-plan'[\s\S]*'assignment-link-boundary'[\s\S]*'snapshot-freeze'[\s\S]*'publish-chain-gate'/,
+    /export const ACTIVITY_AI_ENHANCEMENT_PUBLISH_BOUNDARY_ITEM_IDS = \[[\s\S]*'publish-scope'[\s\S]*'teacher-publish-action'[\s\S]*'publish-execution-plan'[\s\S]*'assignment-link-boundary'[\s\S]*'snapshot-freeze'[\s\S]*'manual-save-handoff-boundary'/,
     'Publish boundary source should preserve the 30-slice publish boundary.'
   );
   assert.match(
     PRODUCT_SOURCE,
-    /src\/activities\/ai-enhancement-publish-boundary\.ts` owns the assignment publish boundary/,
+    /src\/activities\/ai-enhancement-publish-boundary\.ts` owns the assignment publish boundary[\s\S]*30-slice manual-save handoff/,
     'docs/product.md should document the AI enhancement publish boundary owner.'
   );
   assert.match(
     TEST_CATALOG_SOURCE,
     /Activity AI enhancement publish boundary has a fast script-level gate via[\s\S]*scripts\/activity-ai-enhancement-publish-boundary\.test\.ts[\s\S]*saved activity records[\s\S]*teacher publish actions[\s\S]*assignment publish preflight[\s\S]*share-link creation\s+boundaries[\s\S]*snapshot\s+freezing[\s\S]*privacy guards/,
     'TEST-CATALOG should document the AI enhancement publish boundary gate.'
+  );
+  assert.match(
+    TEST_CATALOG_SOURCE,
+    /30-slice\s+manual-save\s+handoff/,
+    'TEST-CATALOG should document the manual-save handoff.'
   );
 });
 

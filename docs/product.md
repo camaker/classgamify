@@ -614,7 +614,11 @@ Implementation boundaries:
   after a reviewed AI enhancement draft is saved: saved activity records,
   teacher publish actions, assignment publish preflight, share-link creation
   boundaries, snapshot freezing, public-payload guards, result continuity, and
-  private draft/source-material privacy.
+  private draft/source-material privacy. Its final boundary explicitly carries
+  the 30-slice manual-save handoff so review completion alone cannot publish:
+  a persisted activity record, saved activity id, valid assignment preflight,
+  and explicit teacher publish action remain required before creating a link or
+  freezing a new snapshot.
 - `src/activities/ai-enhancement-lifecycle-chain.ts` owns the full AI enhancement lifecycle handoff
   from request policy through execution, parsed draft output, editor
   application, teacher review, manual save, saved activity records, assignment
