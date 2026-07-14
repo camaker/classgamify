@@ -121,6 +121,7 @@ test('student runner exposes a safe submission contract view', () => {
     },
     confirmIncompleteSubmit: true,
     createAnonymousToken: () => SECRET_TOKEN,
+    createSubmissionKey: () => 'semantic-submission-key',
     now: 32_000,
     pageView,
     studentName: SECRET_STUDENT_NAME,

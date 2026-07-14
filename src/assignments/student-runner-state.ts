@@ -541,12 +541,13 @@ export type StudentRunnerAttemptResetState = {
   attemptClock?: StudentRunnerAttemptClock;
   confirmIncompleteSubmit: boolean;
   studentName: string;
+  submissionKey?: string;
   submittedAttemptCount: number;
 };
 
 export type StudentRunnerAttemptRestartPlan = Pick<
   StudentRunnerAttemptResetState,
-  'answers' | 'attemptClock' | 'confirmIncompleteSubmit'
+  'answers' | 'attemptClock' | 'confirmIncompleteSubmit' | 'submissionKey'
 > & {
   result: undefined;
   startedAt: number;
@@ -2018,6 +2019,7 @@ export function buildStudentRunnerAttemptResetState(): StudentRunnerAttemptReset
     attemptClock: undefined,
     confirmIncompleteSubmit: false,
     studentName: '',
+    submissionKey: undefined,
     submittedAttemptCount: 0,
   };
 }
@@ -2061,6 +2063,7 @@ export function buildStudentRunnerAttemptRestartPlan({
     confirmIncompleteSubmit: resetState.confirmIncompleteSubmit,
     result: undefined,
     startedAt: now,
+    submissionKey: resetState.submissionKey,
   };
 }
 
@@ -2152,17 +2155,21 @@ export function buildStudentRunnerSubmissionPlan({
   answers,
   confirmIncompleteSubmit,
   createAnonymousToken,
+  createSubmissionKey,
   now,
   pageView,
   studentName,
+  submissionKey,
 }: {
   anonymousToken?: string;
   answers: StudentAnswerMap;
   confirmIncompleteSubmit: boolean;
   createAnonymousToken: () => string;
+  createSubmissionKey: () => string;
   now: number;
   pageView: StudentRunnerPageViewModel;
   studentName: string;
+  submissionKey?: string;
 }): StudentRunnerSubmissionPlan {
   return buildStudentAttemptSubmissionPlan({
     anonymousToken,
@@ -2177,6 +2184,8 @@ export function buildStudentRunnerSubmissionPlan({
     completionSummary: pageView.attemptState.completionSummary,
     confirmIncompleteSubmit,
     createAnonymousToken,
+    createSubmissionKey,
+    currentSubmissionKey: submissionKey,
     now,
     runtimeItems: pageView.runtimeListView.items,
     shareSlug: pageView.activeShareId,
@@ -2191,26 +2200,32 @@ export function buildStudentRunnerSubmissionExecutionPlan({
   answers,
   confirmIncompleteSubmit,
   createAnonymousToken,
+  createSubmissionKey,
   now,
   pageView,
   studentName,
+  submissionKey,
 }: {
   anonymousToken?: string;
   answers: StudentAnswerMap;
   confirmIncompleteSubmit: boolean;
   createAnonymousToken: () => string;
+  createSubmissionKey: () => string;
   now: number;
   pageView: StudentRunnerPageViewModel;
   studentName: string;
+  submissionKey?: string;
 }): StudentRunnerSubmissionExecutionPlan {
   const submissionPlan = buildStudentRunnerSubmissionPlan({
     anonymousToken,
     answers,
     confirmIncompleteSubmit,
     createAnonymousToken,
+    createSubmissionKey,
     now,
     pageView,
     studentName,
+    submissionKey,
   });
 
   if (submissionPlan.type !== 'submit') {

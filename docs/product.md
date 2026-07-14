@@ -420,6 +420,16 @@ The submission contract remains template-neutral: every renderer stores
 submission still allows partial attempts, but the server rejects answers for
 unknown item ids, duplicate item ids, or answer lists longer than the frozen
 runtime item count.
+Each real browser submission should also carry a submission idempotency contract:
+the runner creates one opaque key only after submission gates pass, reuses it for
+a network retry, and clears it when the assignment changes or the student starts
+a new attempt. The server returns the same persisted attempt for a matching key
+and normalized identity, including after a concurrent duplicate reaches the
+database unique boundary. Retry recovery must happen before new-attempt lifecycle
+and attempt-limit gates, while a genuinely new attempt still receives a new key
+and follows the normal lifecycle, limit, validation, scoring, and persistence
+flow. Submission keys remain private persistence metadata and never appear in
+public result payloads or teacher exports.
 Student progress counts, browser submission payloads, and incomplete-submit
 decisions should be derived from shared assignment-domain helpers, not
 per-template route math, so every runner counts answered items, submits frozen

@@ -109,6 +109,7 @@ import {
 } from '@/db/classroom-data-lifecycle-chain';
 import { CLASSROOM_QUERY_INDEX_CONTRACT } from '@/db/classroom-query-index-contract';
 import { CLASSROOM_QUERY_EXECUTION_CONTRACT } from '@/db/classroom-query-execution-contract';
+import { ATTEMPT_SUBMISSION_IDEMPOTENCY_STAGES } from '@/assignments/submission-idempotency';
 import {
   AUTH_ERROR_RECOVERY_STEP_IDS,
   buildAuthErrorDisplayView,
@@ -5488,6 +5489,17 @@ const classroomDataLifecycleChainView =
   buildClassroomDataLifecycleChainHandoffView();
 assert.equal(CLASSROOM_QUERY_INDEX_CONTRACT.length, 30);
 assert.equal(CLASSROOM_QUERY_EXECUTION_CONTRACT.length, 30);
+assert.equal(ATTEMPT_SUBMISSION_IDEMPOTENCY_STAGES.length, 30);
+assert.equal(
+  new Set(ATTEMPT_SUBMISSION_IDEMPOTENCY_STAGES.map((stage) => stage.id)).size,
+  30
+);
+assert.equal(
+  ATTEMPT_SUBMISSION_IDEMPOTENCY_STAGES.filter(
+    (stage) => stage.layer === 'server'
+  ).length,
+  14
+);
 assert.equal(
   new Set(CLASSROOM_QUERY_EXECUTION_CONTRACT.map((item) => item.id)).size,
   30
@@ -26375,6 +26387,7 @@ assert.deepEqual(
     shareSlug: ' share-one ',
     anonymousToken: ' anonymous-token-should-not-send ',
     studentName: ' Ava   Chen ',
+    submissionKey: ' submission-key-named ',
   }),
   {
     answers: [
@@ -26383,6 +26396,7 @@ assert.deepEqual(
     durationSeconds: 89,
     shareSlug: 'share-one',
     studentName: 'Ava Chen',
+    submissionKey: 'submission-key-named',
   }
 );
 assert.deepEqual(
@@ -26393,6 +26407,7 @@ assert.deepEqual(
     runtimeItems: submissionRuntimeItems,
     shareSlug: 'share-one',
     studentName: 'Ava Chen',
+    submissionKey: 'submission-key-named',
   }),
   {
     answers: [
@@ -26400,6 +26415,7 @@ assert.deepEqual(
     ],
     shareSlug: 'share-one',
     studentName: 'Ava Chen',
+    submissionKey: 'submission-key-named',
   }
 );
 assert.deepEqual(
@@ -26410,6 +26426,7 @@ assert.deepEqual(
     runtimeItems: submissionRuntimeItems,
     shareSlug: 'share-one',
     studentName: 'Ava Chen',
+    submissionKey: 'submission-key-named',
   }),
   {
     answers: [
@@ -26418,6 +26435,7 @@ assert.deepEqual(
     durationSeconds: 5,
     shareSlug: 'share-one',
     studentName: 'Ava Chen',
+    submissionKey: 'submission-key-named',
   }
 );
 assert.deepEqual(
@@ -26428,6 +26446,7 @@ assert.deepEqual(
     shareSlug: 'share-two',
     anonymousToken: ' anonymous-token-1 ',
     studentName: 'Stale Name',
+    submissionKey: ' submission-key-anonymous ',
   }),
   {
     anonymousToken: 'anonymous-token-1',
@@ -26435,6 +26454,7 @@ assert.deepEqual(
       { answer: 'apple', itemId: 'item-1' },
     ],
     shareSlug: 'share-two',
+    submissionKey: 'submission-key-anonymous',
   }
 );
 assert.deepEqual(
@@ -26446,6 +26466,9 @@ assert.deepEqual(
     confirmIncompleteSubmit: false,
     createAnonymousToken: () => {
       throw new Error('Anonymous token should not be created before confirm.');
+    },
+    createSubmissionKey: () => {
+      throw new Error('Submission key should not be created before confirm.');
     },
     now: 6_500,
     runtimeItems: submissionRuntimeItems,
@@ -26473,6 +26496,7 @@ assert.deepEqual(
       submissionPlanAnonymousTokenCreateCount += 1;
       return ' created-plan-token ';
     },
+    createSubmissionKey: () => 'submission-key-partial',
     now: 6_500,
     runtimeItems: submissionRuntimeItems,
     shareSlug: ' share-two ',
@@ -26489,6 +26513,7 @@ assert.deepEqual(
       ],
       durationSeconds: 6,
       shareSlug: 'share-two',
+      submissionKey: 'submission-key-partial',
     },
     reason: 'confirmed-incomplete',
     type: 'submit',
@@ -26510,6 +26535,7 @@ assert.deepEqual(
     createAnonymousToken: () => {
       throw new Error('Named submissions should not create anonymous tokens.');
     },
+    createSubmissionKey: () => 'submission-key-complete',
     now: 12_000,
     runtimeItems: submissionRuntimeItems,
     shareSlug: ' share-three ',
@@ -26526,6 +26552,7 @@ assert.deepEqual(
       durationSeconds: 10,
       shareSlug: 'share-three',
       studentName: 'Ava Chen',
+      submissionKey: 'submission-key-complete',
     },
     reason: 'complete',
     type: 'submit',
@@ -31319,6 +31346,7 @@ const scoredAttemptInsert = buildScoredAttemptInsert({
     studentName: 'Ada Lovelace',
   },
   startedAt: new Date('2026-01-15T12:28:45.000Z'),
+  submissionKey: 'scored-submission-key',
   templateType: 'quiz',
 });
 assert.deepEqual(
@@ -31355,6 +31383,7 @@ assert.deepEqual(
     score: 1,
     startedAt: new Date('2026-01-15T12:28:45.000Z'),
     studentName: 'Ada Lovelace',
+    submissionKey: 'scored-submission-key',
   }
 );
 assert.notEqual(scoredAttemptInsert.answersJson.answers, scoredAttemptEvaluation.answers);
@@ -31404,7 +31433,7 @@ const scoredAttemptPersistenceSourceChecks = {
       assignmentResultsExportSource
     ),
   publicResultUsesSanitizedResult:
-    /buildPublicAttemptResult\(evaluation\.result\)/.test(
+    /function buildAttemptSubmissionResponse[\s\S]*buildPublicAttemptResult\(result\)/.test(
       assignmentAttemptLimitApiSource
     ),
   resultAnalysisUsesStoredAnswers:
@@ -31412,7 +31441,7 @@ const scoredAttemptPersistenceSourceChecks = {
       assignmentResultsSource
     ) && /attempt\.resultJson/.test(assignmentResultsSource),
   reviewSummaryUsesEvaluation:
-    /buildPublicAttemptReviewSummaryView\(\{[\s\S]*answers: evaluation\.answers,[\s\S]*runtimeItems: orderedRuntimeItems/.test(
+    /function buildAttemptSubmissionResponse[\s\S]*buildPublicAttemptReviewSummaryView\(\{[\s\S]*answers,[\s\S]*runtimeItems: orderedRuntimeItems/.test(
       assignmentAttemptLimitApiSource
     ),
   runtimeValidationGate:
@@ -31645,7 +31674,7 @@ assert.match(
 );
 assert.match(
   assignmentAttemptLimitApiSource,
-  /(?=[\s\S]*assertAssignmentAcceptsSubmissions\(\{)(?=[\s\S]*resolveAttemptSubmissionIdentity\(\{)(?=[\s\S]*countPreviousIdentityAttempts\(\{)(?=[\s\S]*canUseAnotherAssignmentAttempt\(\{)(?=[\s\S]*normalizeSubmittedAttemptAnswers\(data\.answers\))(?=[\s\S]*assertSubmittedAnswersMatchRuntimeItems\(\{)(?=[\s\S]*evaluateRuntimeAnswers\(\{)(?=[\s\S]*buildScoredAttemptInsert\(\{)(?=[\s\S]*buildPublicAttemptResult\(evaluation\.result\))(?=[\s\S]*buildPublicAttemptReviewSummaryView\(\{)/,
+  /(?=[\s\S]*assertAssignmentAcceptsSubmissions\(\{)(?=[\s\S]*resolveAttemptSubmissionIdentity\(\{)(?=[\s\S]*recoverAttemptSubmissionResponse\(\{)(?=[\s\S]*countPreviousIdentityAttempts\(\{)(?=[\s\S]*canUseAnotherAssignmentAttempt\(\{)(?=[\s\S]*normalizeSubmittedAttemptAnswers\(data\.answers\))(?=[\s\S]*assertSubmittedAnswersMatchRuntimeItems\(\{)(?=[\s\S]*evaluateRuntimeAnswers\(\{)(?=[\s\S]*buildScoredAttemptInsert\(\{)(?=[\s\S]*function buildAttemptSubmissionResponse)(?=[\s\S]*buildPublicAttemptResult\(result\))(?=[\s\S]*buildPublicAttemptReviewSummaryView\(\{)/,
   'Submit-attempt API should keep lifecycle, identity, validation, scoring, persistence, public result, and review summary connected.'
 );
 assert.match(
@@ -35258,6 +35287,7 @@ assert.deepEqual(
     createAnonymousToken: () => {
       throw new Error('Existing anonymous token should be reused.');
     },
+    createSubmissionKey: () => 'runner-submission-key',
     now: 31_400,
     pageView: submittableStudentRunnerPageView,
     studentName: '',
@@ -35274,6 +35304,7 @@ assert.deepEqual(
       ],
       durationSeconds: 30,
       shareSlug: 'share-public',
+      submissionKey: 'runner-submission-key',
     },
     reason: 'complete',
     type: 'submit',
@@ -35289,6 +35320,7 @@ assert.deepEqual(
     createAnonymousToken: () => {
       throw new Error('Existing anonymous token should be reused.');
     },
+    createSubmissionKey: () => 'runner-submission-key',
     now: 31_400,
     pageView: submittableStudentRunnerPageView,
     studentName: '',
@@ -35305,6 +35337,7 @@ assert.deepEqual(
       ],
       durationSeconds: 30,
       shareSlug: 'share-public',
+      submissionKey: 'runner-submission-key',
     },
     payloadSummary: {
       answerCount: 1,
@@ -35332,6 +35365,9 @@ assert.deepEqual(
     confirmIncompleteSubmit: false,
     createAnonymousToken: () => {
       throw new Error('Submit should be blocked while a result is shown.');
+    },
+    createSubmissionKey: () => {
+      throw new Error('Blocked submission should not create a submission key.');
     },
     now: 31_400,
     pageView: studentRunnerPageView,
@@ -35391,6 +35427,9 @@ assert.deepEqual(
     createAnonymousToken: () => {
       throw new Error('Submit should be blocked while pending.');
     },
+    createSubmissionKey: () => {
+      throw new Error('Pending submission should not create a submission key.');
+    },
     now: 31_400,
     pageView: pendingSubmitStudentRunnerPageView,
     studentName: '',
@@ -35411,6 +35450,9 @@ assert.deepEqual(
     },
     confirmIncompleteSubmit: false,
     createAnonymousToken: () => 'browser-token-2',
+    createSubmissionKey: () => {
+      throw new Error('Incomplete submit should not create a submission key.');
+    },
     now: 31_400,
     pageView: {
       ...submittableStudentRunnerPageView,
@@ -35547,6 +35589,9 @@ assert.deepEqual(
     answers: {},
     confirmIncompleteSubmit: true,
     createAnonymousToken: () => 'unused-token',
+    createSubmissionKey: () => {
+      throw new Error('Missing identity should not create a submission key.');
+    },
     now: 31_400,
     pageView: namedSubmittableStudentRunnerPageView,
     studentName: '   ',
@@ -35592,6 +35637,7 @@ assert.deepEqual(
     },
     confirmIncompleteSubmit: true,
     createAnonymousToken: () => 'unused-token',
+    createSubmissionKey: () => 'named-runner-submission-key',
     now: 31_400,
     pageView: namedAnsweredStudentRunnerPageView,
     studentName: ' Ada   Lovelace ',
@@ -35607,6 +35653,7 @@ assert.deepEqual(
       durationSeconds: 30,
       shareSlug: 'share-public',
       studentName: 'Ada Lovelace',
+      submissionKey: 'named-runner-submission-key',
     },
     payloadSummary: {
       answerCount: 1,
@@ -36270,6 +36317,7 @@ assert.deepEqual(buildStudentRunnerAttemptResetState(), {
   attemptClock: undefined,
   confirmIncompleteSubmit: false,
   studentName: '',
+  submissionKey: undefined,
   submittedAttemptCount: 0,
 });
 assert.deepEqual(
@@ -36285,6 +36333,7 @@ assert.deepEqual(
     nextAttemptSessionKey: 'session-new',
     result: undefined,
     studentName: '',
+    submissionKey: undefined,
     submittedAttemptCount: 0,
     type: 'reset',
   }
@@ -36342,6 +36391,7 @@ assert.deepEqual(buildStudentRunnerAttemptRestartPlan({ now: 98_765 }), {
   confirmIncompleteSubmit: false,
   result: undefined,
   startedAt: 98_765,
+  submissionKey: undefined,
 });
 const studentRunnerSubmissionResponse = {
   attemptUsage: {
@@ -40805,7 +40855,7 @@ assert.match(
 );
 assert.match(
   assignmentsApiSource,
-  /const reviewSummaryView = buildPublicAttemptReviewSummaryView\(\{[\s\S]*answers: evaluation\.answers,[\s\S]*runtimeItems: orderedRuntimeItems,[\s\S]*showCorrectAnswers: settings\.showCorrectAnswers,[\s\S]*\}\)[\s\S]*reviewItems: reviewSummaryView\.items,[\s\S]*reviewSummary: reviewSummaryView\.summary/,
+  /function buildAttemptSubmissionResponse[\s\S]*const reviewSummaryView = buildPublicAttemptReviewSummaryView\(\{[\s\S]*answers,[\s\S]*runtimeItems: orderedRuntimeItems,[\s\S]*showCorrectAnswers: settings\.showCorrectAnswers,[\s\S]*\}\)[\s\S]*reviewItems: reviewSummaryView\.items,[\s\S]*reviewSummary: reviewSummaryView\.summary/,
   'Assignment submission API should return student review items and review summary from one public review summary view.'
 );
 assert.match(
@@ -41731,11 +41781,15 @@ assert.match(
 );
 assert.match(
   assignmentsApiSource,
-  /result: buildPublicAttemptResult\(evaluation\.result\)/,
+  /function buildAttemptSubmissionResponse[\s\S]*result: buildPublicAttemptResult\(result\)/,
   'Submit attempt API should sanitize scorer results before returning them to the student runner.'
 );
 assert.doesNotMatch(
-  assignmentsApiSource,
+  getSourceSlice(
+    assignmentsApiSource,
+    'function buildAttemptSubmissionResponse',
+    ''
+  ),
   /result: evaluation\.result/,
   'Submit attempt API should not return raw scorer results directly.'
 );

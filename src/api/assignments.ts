@@ -4,7 +4,12 @@ import {
   buildActivityDetailOwnerWhere,
 } from '@/activities/detail-query';
 import { assertActivityCanDeriveWork } from '@/activities/lifecycle';
-import type { AssignmentStatus } from '@/activities/types';
+import type {
+  AssignmentSettings,
+  AttemptAnswer,
+  AttemptResult,
+} from '@/activities/types';
+import type { RuntimeItem } from '@/activities/runtime';
 import {
   assertSubmittedAnswersMatchRuntimeItems,
   normalizeSubmittedAttemptAnswers,
@@ -18,6 +23,8 @@ import {
   buildAssignmentAttemptStatsSelect,
   buildAssignmentAttemptsInWhere,
   buildAssignmentResultsAttemptSelect,
+  buildAttemptSubmissionKeyWhere,
+  buildAttemptSubmissionReplaySelect,
   buildAttemptAssignmentJoin,
   buildAttemptCompletedAtOrderBy,
   buildScoredAssignmentAttemptWhere,
@@ -29,6 +36,7 @@ import {
   withAssignmentAttemptStatsSettings,
 } from '@/assignments/attempt-stats';
 import { buildScoredAttemptInsert } from '@/assignments/attempt-persistence';
+import { doesAttemptSubmissionIdentityMatch } from '@/assignments/submission-idempotency';
 import {
   buildAttemptStartedAt,
   normalizeAttemptDurationSeconds,
@@ -82,6 +90,7 @@ import {
   ASSIGNMENT_SUBMISSION_ANSWER_LIMITS,
   ASSIGNMENT_SUBMISSION_DURATION_RANGE,
   ASSIGNMENT_SUBMISSION_IDENTITY_LIMITS,
+  ASSIGNMENT_SUBMISSION_KEY_LIMITS,
 } from '@/assignments/submission-limits';
 import {
   publishAssignmentInputSchema,
@@ -516,6 +525,11 @@ const submitAttemptInputSchema = z.object({
     .min(1)
     .max(ASSIGNMENT_SUBMISSION_IDENTITY_LIMITS.studentNameMaxLength)
     .optional(),
+  submissionKey: z
+    .string()
+    .trim()
+    .min(ASSIGNMENT_SUBMISSION_KEY_LIMITS.minLength)
+    .max(ASSIGNMENT_SUBMISSION_KEY_LIMITS.maxLength),
 });
 
 export const submitAttempt = createServerFn({ method: 'POST' })
@@ -533,11 +547,6 @@ export const submitAttempt = createServerFn({ method: 'POST' })
     if (!row) {
       throw new Error(m.assignment_api_error_assignment_not_found());
     }
-    assertAssignmentAcceptsSubmissions({
-      expiresAt: row.assignment.expiresAt,
-      status: row.assignment.status,
-    });
-
     const settings = resolveAssignmentSettings(row.assignment.settingsJson);
     const durationSeconds = normalizeAttemptDurationSeconds({
       durationSeconds: data.durationSeconds,
@@ -554,6 +563,29 @@ export const submitAttempt = createServerFn({ method: 'POST' })
     if (!settings.collectStudentName && !submissionIdentity.anonymousToken) {
       throw new Error(m.assignment_api_error_anonymous_token_required());
     }
+
+    const resolvedSource = resolveAssignmentRuntimeSource(row);
+    const content = resolvedSource.contentJson;
+    const templateType = resolvedSource.templateType;
+    const orderedRuntimeItems = orderAssignmentRuntimeItems({
+      items: resolvedSource.runtimeItems,
+      shareSlug: row.assignment.shareSlug,
+      shuffleItems: settings.shuffleItems,
+    });
+    const replayResponse = await recoverAttemptSubmissionResponse({
+      assignmentId: row.assignment.id,
+      db,
+      identity: submissionIdentity,
+      orderedRuntimeItems,
+      settings,
+      submissionKey: data.submissionKey,
+    });
+    if (replayResponse) return replayResponse;
+
+    assertAssignmentAcceptsSubmissions({
+      expiresAt: row.assignment.expiresAt,
+      status: row.assignment.status,
+    });
 
     let previousAttemptCount = 0;
     if (settings.maxAttempts) {
@@ -573,14 +605,6 @@ export const submitAttempt = createServerFn({ method: 'POST' })
       }
     }
 
-    const resolvedSource = resolveAssignmentRuntimeSource(row);
-    const content = resolvedSource.contentJson;
-    const templateType = resolvedSource.templateType;
-    const orderedRuntimeItems = orderAssignmentRuntimeItems({
-      items: resolvedSource.runtimeItems,
-      shareSlug: row.assignment.shareSlug,
-      shuffleItems: settings.shuffleItems,
-    });
     const submittedAnswers = normalizeSubmittedAttemptAnswers(data.answers);
     assertSubmittedAnswersMatchRuntimeItems({
       answers: submittedAnswers,
@@ -599,31 +623,125 @@ export const submitAttempt = createServerFn({ method: 'POST' })
     });
     const id = nanoid(APP_ENTITY_ID_LENGTH.generated);
 
-    await db.insert(attempt).values(
-      buildScoredAttemptInsert({
+    try {
+      await db.insert(attempt).values(
+        buildScoredAttemptInsert({
+          assignmentId: row.assignment.id,
+          completedAt: now,
+          evaluation,
+          id,
+          identity: submissionIdentity,
+          startedAt,
+          submissionKey: data.submissionKey,
+          templateType,
+        })
+      );
+    } catch (error) {
+      const concurrentReplayResponse = await recoverAttemptSubmissionResponse({
         assignmentId: row.assignment.id,
-        completedAt: now,
-        evaluation,
-        id,
+        db,
         identity: submissionIdentity,
-        startedAt,
-        templateType,
-      })
-    );
-    const reviewSummaryView = buildPublicAttemptReviewSummaryView({
-      answers: evaluation.answers,
-      runtimeItems: orderedRuntimeItems,
-      showCorrectAnswers: settings.showCorrectAnswers,
-    });
+        orderedRuntimeItems,
+        settings,
+        submissionKey: data.submissionKey,
+      });
+      if (concurrentReplayResponse) return concurrentReplayResponse;
 
-    return {
-      attemptUsage: buildAssignmentAttemptUsage({
-        maxAttempts: settings.maxAttempts,
-        previousAttemptCount,
-      }),
-      id,
-      reviewItems: reviewSummaryView.items,
-      reviewSummary: reviewSummaryView.summary,
-      result: buildPublicAttemptResult(evaluation.result),
-    };
+      throw error;
+    }
+
+    return buildAttemptSubmissionResponse({
+      answers: evaluation.answers,
+      attemptId: id,
+      orderedRuntimeItems,
+      previousAttemptCount,
+      result: evaluation.result,
+      settings,
+    });
   });
+
+async function recoverAttemptSubmissionResponse({
+  assignmentId,
+  db,
+  identity,
+  orderedRuntimeItems,
+  settings,
+  submissionKey,
+}: {
+  assignmentId: string;
+  db: ReturnType<typeof getDb>;
+  identity: {
+    anonymousToken: string | null;
+    studentName: string | null;
+  };
+  orderedRuntimeItems: RuntimeItem[];
+  settings: AssignmentSettings;
+  submissionKey: string;
+}) {
+  const [existingAttempt] = await db
+    .select(buildAttemptSubmissionReplaySelect())
+    .from(attempt)
+    .where(buildAttemptSubmissionKeyWhere({ assignmentId, submissionKey }))
+    .limit(1);
+
+  if (!existingAttempt?.resultJson) return null;
+  if (
+    !doesAttemptSubmissionIdentityMatch({
+      existing: existingAttempt,
+      requested: identity,
+    })
+  ) {
+    throw new Error(m.assignment_api_error_submission_retry_conflict());
+  }
+
+  const attemptCount = settings.maxAttempts
+    ? await countPreviousIdentityAttempts({
+        anonymousToken: identity.anonymousToken ?? '',
+        assignmentId,
+        db,
+        studentName: identity.studentName ?? '',
+      })
+    : 1;
+
+  return buildAttemptSubmissionResponse({
+    answers: existingAttempt.answersJson.answers,
+    attemptId: existingAttempt.id,
+    orderedRuntimeItems,
+    previousAttemptCount: Math.max(0, attemptCount - 1),
+    result: existingAttempt.resultJson,
+    settings,
+  });
+}
+
+function buildAttemptSubmissionResponse({
+  answers,
+  attemptId,
+  orderedRuntimeItems,
+  previousAttemptCount,
+  result,
+  settings,
+}: {
+  answers: AttemptAnswer[];
+  attemptId: string;
+  orderedRuntimeItems: RuntimeItem[];
+  previousAttemptCount: number;
+  result: AttemptResult;
+  settings: AssignmentSettings;
+}) {
+  const reviewSummaryView = buildPublicAttemptReviewSummaryView({
+    answers,
+    runtimeItems: orderedRuntimeItems,
+    showCorrectAnswers: settings.showCorrectAnswers,
+  });
+
+  return {
+    attemptUsage: buildAssignmentAttemptUsage({
+      maxAttempts: settings.maxAttempts,
+      previousAttemptCount,
+    }),
+    id: attemptId,
+    reviewItems: reviewSummaryView.items,
+    reviewSummary: reviewSummaryView.summary,
+    result: buildPublicAttemptResult(result),
+  };
+}

@@ -10,6 +10,11 @@ export const ASSIGNMENT_SUBMISSION_IDENTITY_LIMITS = {
   studentNameMaxLength: 80,
 } as const;
 
+export const ASSIGNMENT_SUBMISSION_KEY_LIMITS = {
+  maxLength: 80,
+  minLength: 16,
+} as const;
+
 export const ASSIGNMENT_SUBMISSION_DURATION_RANGE = {
   max: 24 * 60 * 60,
   min: 0,

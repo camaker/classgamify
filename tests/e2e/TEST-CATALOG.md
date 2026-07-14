@@ -212,6 +212,12 @@ runtime id normalization, unknown/duplicate/too-many rejection, API answer
 limits, safe failure mapping, teacher-result/public-payload boundaries,
 submission-validation privacy-scope boundaries, or no-public-audit DOM
 boundaries.
+Assignment submission idempotency has a fast script-level gate via
+`pnpm exec tsx --test scripts/assignment-submission-idempotency-contract.test.ts`;
+run it when changing browser submission-key generation or reset behavior,
+network retry recovery, normalized identity matching, attempt inserts,
+assignment-scoped uniqueness, generated migrations, public retry responses,
+attempt limits, lifecycle gates, teacher results, or submission-key privacy.
 Assignment attempt duration has a fast script-level gate via
 `pnpm exec tsx --test scripts/assignment-attempt-duration-handoff-semantic-views.test.ts`;
 run it when changing timer start plans, submission duration normalization,

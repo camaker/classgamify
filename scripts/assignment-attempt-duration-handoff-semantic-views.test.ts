@@ -281,6 +281,7 @@ function buildAttemptDurationEvidence(): AssignmentAttemptDurationHandoffEvidenc
     },
     confirmIncompleteSubmit: false,
     createAnonymousToken: () => SECRET_ANONYMOUS_TOKEN,
+    createSubmissionKey: () => 'duration-submission-key',
     now: 120_000,
     runtimeItems: [
       {

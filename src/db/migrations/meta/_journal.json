@@ -64,6 +64,13 @@
       "when": 1783998890660,
       "tag": "0008_unique_hydra",
       "breakpoints": true
+    },
+    {
+      "idx": 9,
+      "version": "6",
+      "when": 1784002272670,
+      "tag": "0009_minor_winter_soldier",
+      "breakpoints": true
     }
   ]
 }

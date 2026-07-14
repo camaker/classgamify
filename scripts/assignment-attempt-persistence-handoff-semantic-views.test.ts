@@ -232,6 +232,7 @@ function buildPersistenceFixture() {
       studentName: null,
     },
     startedAt: new Date('2026-07-05T10:00:15.000Z'),
+    submissionKey: 'persistence-submission-key',
     templateType: 'quiz',
   });
   const sourceChecks = buildPersistenceSourceChecks();
@@ -339,13 +340,15 @@ function buildPersistenceSourceChecks(): AssignmentAttemptPersistenceHandoffSour
         RESULTS_EXPORT_SOURCE
       ),
     publicResultUsesSanitizedResult:
-      /buildPublicAttemptResult\(evaluation\.result\)/.test(API_SOURCE),
+      /function buildAttemptSubmissionResponse[\s\S]*buildPublicAttemptResult\(result\)/.test(
+        API_SOURCE
+      ),
     resultAnalysisUsesStoredAnswers:
       /buildAttemptAnswerMapByItemId\(\s*attempt\.answersJson\.answers\s*\)/.test(
         RESULTS_SOURCE
       ) && /attempt\.resultJson/.test(RESULTS_SOURCE),
     reviewSummaryUsesEvaluation:
-      /buildPublicAttemptReviewSummaryView\(\{[\s\S]*answers: evaluation\.answers,[\s\S]*runtimeItems: orderedRuntimeItems/.test(
+      /function buildAttemptSubmissionResponse[\s\S]*buildPublicAttemptReviewSummaryView\(\{[\s\S]*answers,[\s\S]*runtimeItems: orderedRuntimeItems/.test(
         API_SOURCE
       ),
     runtimeValidationGate:

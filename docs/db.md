@@ -78,6 +78,15 @@ attempt statistics remain a dependent read because they require the selected
 page assignment ids. Keep writes, student answer payloads, raw anonymous tokens,
 and storage keys outside these read groups.
 
+## Attempt submission idempotency
+
+New attempt rows carry a nullable `submission_key`. The nullable column keeps
+existing rows migration-safe, while new student submissions always provide an
+opaque key. The unique `(assignment_id, submission_key)` index makes a browser
+network retry resolve to the same scored attempt instead of creating another
+row. A key is scoped to one assignment and one normalized submission identity;
+it is not returned in public feedback, teacher results, or exports.
+
 ## Notes
 
 - D1 is SQLite; use Drizzle’s SQLite dialect (`sqliteTable`, `text`, `integer`, etc.).

@@ -2087,6 +2087,7 @@
   "assignment_api_error_close_time_future": "请选择未来的作业关闭时间。",
   "assignment_api_error_create_load_failed": "作业已保存，但无法重新加载。",
   "assignment_api_error_status_load_failed": "作业状态已保存，但无法重新加载。",
+  "assignment_api_error_submission_retry_conflict": "无法安全重试这次提交，请开始一次新的作答。",
   "assignment_api_error_student_name_required": "这份作业需要填写学生姓名。",
   "assignment_answer_feedback_handoff_accepted_count_value": "{count} 个可接受答案",
   "assignment_answer_feedback_handoff_accepted_parser_count_description": "可接受答案解析会把教师输入的替代答案保持为学生、结果和导出的同一套评分契约。",

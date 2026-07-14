@@ -16,6 +16,7 @@ export type ScoredAttemptInsert = {
   score: number;
   startedAt: Date;
   studentName: string | null;
+  submissionKey: string;
 };
 
 export type ScoredAttemptEvaluation = {
@@ -35,6 +36,7 @@ export function buildScoredAttemptInsert({
   id,
   identity,
   startedAt,
+  submissionKey,
   templateType,
 }: {
   assignmentId: string;
@@ -43,6 +45,7 @@ export function buildScoredAttemptInsert({
   id: string;
   identity: ScoredAttemptIdentity;
   startedAt: Date;
+  submissionKey: string;
   templateType: ActivityTemplateType;
 }): ScoredAttemptInsert {
   return {
@@ -59,6 +62,7 @@ export function buildScoredAttemptInsert({
     score: evaluation.result.earnedPoints,
     startedAt,
     studentName: identity.studentName,
+    submissionKey,
   };
 }
 

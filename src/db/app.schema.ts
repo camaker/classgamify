@@ -4,7 +4,13 @@
  */
 
 import { relations } from 'drizzle-orm';
-import { index, integer, sqliteTable, text } from 'drizzle-orm/sqlite-core';
+import {
+  index,
+  integer,
+  sqliteTable,
+  text,
+  uniqueIndex,
+} from 'drizzle-orm/sqlite-core';
 import { user } from './auth.schema';
 import type {
   ActivityContent,
@@ -264,6 +270,7 @@ export const attempt = sqliteTable(
       .references(() => assignment.id, { onDelete: 'cascade' }),
     studentName: text('student_name'),
     anonymousToken: text('anonymous_token'),
+    submissionKey: text('submission_key'),
     score: integer('score'),
     maxScore: integer('max_score'),
     answersJson: text('answers_json', { mode: 'json' })
@@ -286,6 +293,10 @@ export const attempt = sqliteTable(
     index('attempt_assignment_student_name_idx').on(
       table.assignmentId,
       table.studentName
+    ),
+    uniqueIndex('attempt_assignment_submission_key_unique').on(
+      table.assignmentId,
+      table.submissionKey
     ),
     index('attempt_anonymous_token_idx').on(table.anonymousToken),
     index('attempt_completed_at_idx').on(table.completedAt),

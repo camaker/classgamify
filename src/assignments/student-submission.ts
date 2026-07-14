@@ -39,6 +39,10 @@ import {
   normalizeRuntimeDisplayText,
 } from '@/assignments/runtime-display';
 import { normalizeAssignmentShareSlug } from '@/assignments/share-slug';
+import {
+  normalizeAttemptSubmissionKey,
+  resolveAttemptSubmissionKey,
+} from '@/assignments/submission-idempotency';
 import { m } from '@/locale/paraglide/messages';
 
 export type StudentAnswerMap = Record<string, string>;
@@ -64,6 +68,7 @@ export type StudentAttemptSubmissionInput = {
   durationSeconds?: number;
   shareSlug: string;
   studentName?: string;
+  submissionKey: string;
 };
 
 export type AttemptCompletionSummary = {
@@ -1733,6 +1738,7 @@ export function buildStudentAttemptSubmissionInput({
   runtimeItems,
   shareSlug,
   studentName,
+  submissionKey,
 }: {
   anonymousToken?: string;
   answers: StudentAnswerMap;
@@ -1741,6 +1747,7 @@ export function buildStudentAttemptSubmissionInput({
   runtimeItems: StudentSubmissionRuntimeItem[];
   shareSlug: string;
   studentName: string;
+  submissionKey: string;
 }): StudentAttemptSubmissionInput {
   const input: StudentAttemptSubmissionInput = {
     answers: buildAttemptSubmissionAnswers({
@@ -1748,6 +1755,7 @@ export function buildStudentAttemptSubmissionInput({
       runtimeItems,
     }),
     shareSlug: normalizeAssignmentShareSlug(shareSlug),
+    submissionKey: normalizeAttemptSubmissionKey(submissionKey),
   };
   const normalizedDurationSeconds = normalizeAttemptDurationSeconds({
     durationSeconds,
@@ -1781,6 +1789,8 @@ export function buildStudentAttemptSubmissionPlan({
   completionSummary,
   confirmIncompleteSubmit,
   createAnonymousToken,
+  createSubmissionKey,
+  currentSubmissionKey,
   now,
   runtimeItems,
   shareSlug,
@@ -1795,6 +1805,8 @@ export function buildStudentAttemptSubmissionPlan({
   completionSummary: AttemptCompletionSummary;
   confirmIncompleteSubmit: boolean;
   createAnonymousToken: () => string;
+  createSubmissionKey: () => string;
+  currentSubmissionKey?: string;
   now: number;
   runtimeItems: StudentSubmissionRuntimeItem[];
   shareSlug: string;
@@ -1817,6 +1829,10 @@ export function buildStudentAttemptSubmissionPlan({
     createAnonymousToken,
     currentAnonymousToken: anonymousToken,
   });
+  const submissionKey = resolveAttemptSubmissionKey({
+    createSubmissionKey,
+    currentSubmissionKey,
+  });
 
   return {
     anonymousToken: nextAnonymousToken,
@@ -1832,6 +1848,7 @@ export function buildStudentAttemptSubmissionPlan({
       shareSlug,
       anonymousToken: nextAnonymousToken,
       studentName,
+      submissionKey,
     }),
     reason: submitGate.reason,
     type: 'submit',

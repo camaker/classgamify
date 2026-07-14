@@ -66,6 +66,7 @@ function PlayPage() {
   const [now, setNow] = useState(() => Date.now());
   const [anonymousToken, setAnonymousToken] = useState<string>();
   const [attemptSessionKey, setAttemptSessionKey] = useState<string>();
+  const [submissionKey, setSubmissionKey] = useState<string>();
   const starterPreview = useMemo(
     () => buildStudentRunnerStarterPreview(normalizedShareId),
     [normalizedShareId]
@@ -157,6 +158,7 @@ function PlayPage() {
     setAttemptClock(resetPlan.attemptClock);
     setSubmittedAttemptCount(resetPlan.submittedAttemptCount);
     setAnonymousToken(resetPlan.anonymousToken);
+    setSubmissionKey(resetPlan.submissionKey);
     setAttemptSessionKey(resetPlan.nextAttemptSessionKey);
   }, [attemptSessionKey, currentAttemptSessionKey]);
 
@@ -203,9 +205,11 @@ function PlayPage() {
           shareId: activeShareId,
           storage: window.localStorage,
         }),
+      createSubmissionKey: () => window.crypto.randomUUID(),
       now: Date.now(),
       pageView: runnerPageView,
       studentName,
+      submissionKey,
     });
 
     if (executionPlan.type === 'message') {
@@ -215,6 +219,7 @@ function PlayPage() {
     }
 
     try {
+      setSubmissionKey(executionPlan.input.submissionKey);
       const response = await submitAttemptMutation.mutateAsync(
         executionPlan.input
       );
@@ -243,6 +248,7 @@ function PlayPage() {
     setConfirmIncompleteSubmit(restartPlan.confirmIncompleteSubmit);
     setAnswers(restartPlan.answers);
     setAttemptClock(restartPlan.attemptClock);
+    setSubmissionKey(restartPlan.submissionKey);
     setNow(restartPlan.startedAt);
   }
 

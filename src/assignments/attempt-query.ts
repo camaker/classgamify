@@ -30,6 +30,16 @@ export function buildAssignmentResultsAttemptSelect() {
   };
 }
 
+export function buildAttemptSubmissionReplaySelect() {
+  return {
+    anonymousToken: attempt.anonymousToken,
+    answersJson: attempt.answersJson,
+    id: attempt.id,
+    resultJson: attempt.resultJson,
+    studentName: attempt.studentName,
+  };
+}
+
 export function buildAttemptAssignmentJoin() {
   return eq(attempt.assignmentId, assignment.id);
 }
@@ -52,6 +62,20 @@ export function buildAssignmentAttemptsInWhere({
   assignmentIds: string[];
 }) {
   return inArray(attempt.assignmentId, assignmentIds);
+}
+
+export function buildAttemptSubmissionKeyWhere({
+  assignmentId,
+  submissionKey,
+}: {
+  assignmentId: string;
+  submissionKey: string;
+}) {
+  return and(
+    eq(attempt.assignmentId, assignmentId),
+    eq(attempt.submissionKey, submissionKey),
+    isNotNull(attempt.resultJson)
+  );
 }
 
 export function buildScoredAssignmentAttemptWhere({

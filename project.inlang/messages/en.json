@@ -2087,6 +2087,7 @@
   "assignment_api_error_close_time_future": "Choose a future close time for this assignment.",
   "assignment_api_error_create_load_failed": "Assignment was saved but could not be loaded.",
   "assignment_api_error_status_load_failed": "Assignment status was saved but could not be loaded.",
+  "assignment_api_error_submission_retry_conflict": "This submission could not be safely retried. Start a new attempt.",
   "assignment_api_error_student_name_required": "Student name is required for this assignment.",
   "assignment_answer_feedback_handoff_accepted_count_value": "{count} accepted",
   "assignment_answer_feedback_handoff_accepted_parser_count_description": "Accepted-answer parsing keeps teacher-entered alternatives as one scoring contract for students, results, and exports.",
