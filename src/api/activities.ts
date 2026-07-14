@@ -14,6 +14,7 @@ import {
   buildActivityDetailOwnerWhere,
   buildActivityDetailSelect,
   buildActivityLifecycleGateSelect,
+  buildActivityMutationWhere,
 } from '@/activities/detail-query';
 import { getTemplateByType } from '@/activities/catalog';
 import {
@@ -37,6 +38,11 @@ import {
   assertActivityCanArchive,
   assertActivityCanRestore,
 } from '@/activities/lifecycle';
+import {
+  type ActivityMutationAction,
+  getActivityMutationConflictMessage,
+  resolveActivityMutationUpdatedAt,
+} from '@/activities/mutation-concurrency';
 import {
   assertTemplateRemixOptionReady,
   getTemplateRemixOption,
@@ -325,20 +331,31 @@ export const updateActivity = createServerFn({ method: 'POST' })
     }
     assertActivityCanEdit(existingActivity.visibility);
 
-    const now = new Date();
-
-    await db
+    const updatedAt = resolveActivityMutationUpdatedAt({
+      currentUpdatedAt: existingActivity.updatedAt,
+    });
+    const [updatedActivity] = await db
       .update(activity)
-      .set(buildActivityUpdateSet({ input: data, now }))
-      .where(buildActivityDetailOwnerWhere({ activityId: data.id, userId }));
+      .set(buildActivityUpdateSet({ input: data, now: updatedAt }))
+      .where(
+        buildActivityMutationWhere({
+          activityId: data.id,
+          currentUpdatedAt: existingActivity.updatedAt,
+          currentVisibility: existingActivity.visibility,
+          userId,
+        })
+      )
+      .returning(buildActivityDetailSelect());
 
-    const [row] = await db
-      .select(buildActivityDetailSelect())
-      .from(activity)
-      .where(buildActivityDetailOwnerWhere({ activityId: data.id, userId }))
-      .limit(1);
+    if (!updatedActivity) {
+      await throwActivityMutationConflict({
+        action: 'edit',
+        activityId: data.id,
+        ownerId: userId,
+      });
+    }
 
-    return row;
+    return updatedActivity;
   });
 
 const updateActivityVisibilityInputSchema = z.object({
@@ -398,21 +415,52 @@ async function updateActivityVisibility({
     assertActivityCanRestore(row.visibility);
   }
 
-  const updatedAt = new Date();
-  await db
+  const updatedAt = resolveActivityMutationUpdatedAt({
+    currentUpdatedAt: row.updatedAt,
+  });
+  const [updatedRow] = await db
     .update(activity)
     .set(buildActivityVisibilityUpdateSet({ nextVisibility, updatedAt }))
-    .where(buildActivityDetailOwnerWhere({ activityId, userId: ownerId }));
+    .where(
+      buildActivityMutationWhere({
+        activityId,
+        currentUpdatedAt: row.updatedAt,
+        currentVisibility: row.visibility,
+        userId: ownerId,
+      })
+    )
+    .returning(buildActivityDetailSelect());
 
-  const [updatedRow] = await db
-    .select(buildActivityDetailSelect())
+  if (!updatedRow) {
+    await throwActivityMutationConflict({ action, activityId, ownerId });
+  }
+
+  return updatedRow;
+}
+
+async function throwActivityMutationConflict({
+  action,
+  activityId,
+  ownerId,
+}: {
+  action: ActivityMutationAction;
+  activityId: string;
+  ownerId: string;
+}): Promise<never> {
+  const db = getDb();
+  const [currentActivity] = await db
+    .select(buildActivityLifecycleGateSelect())
     .from(activity)
     .where(buildActivityDetailOwnerWhere({ activityId, userId: ownerId }))
     .limit(1);
 
-  if (!updatedRow) {
+  if (!currentActivity) {
     throw new Error(m.activity_api_error_activity_not_found());
   }
-
-  return updatedRow;
+  throw new Error(
+    getActivityMutationConflictMessage({
+      action,
+      currentVisibility: currentActivity.visibility,
+    })
+  );
 }

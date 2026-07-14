@@ -114,6 +114,7 @@ import { ATTEMPT_LIMIT_CONCURRENCY_STAGES } from '@/assignments/attempt-limit-co
 import { ASSIGNMENT_SUBMISSION_WRITE_GUARD_STAGES } from '@/assignments/submission-lifecycle-write';
 import { ASSIGNMENT_STATUS_TRANSITION_CONCURRENCY_STAGES } from '@/assignments/status-transition-concurrency';
 import { ASSIGNMENT_PUBLISH_SOURCE_WRITE_GUARD_STAGES } from '@/assignments/publish-source-write';
+import { ACTIVITY_MUTATION_CONCURRENCY_STAGES } from '@/activities/mutation-concurrency';
 import {
   AUTH_ERROR_RECOVERY_STEP_IDS,
   buildAuthErrorDisplayView,
@@ -195,6 +196,7 @@ import {
   buildActivityDetailOwnerWhere,
   buildActivityDetailSelect,
   buildActivityLifecycleGateSelect,
+  buildActivityMutationWhere,
 } from '@/activities/detail-query';
 import {
   buildCreatedActivityListItemSelect,
@@ -5499,6 +5501,17 @@ assert.equal(ATTEMPT_LIMIT_CONCURRENCY_STAGES.length, 30);
 assert.equal(ASSIGNMENT_SUBMISSION_WRITE_GUARD_STAGES.length, 30);
 assert.equal(ASSIGNMENT_STATUS_TRANSITION_CONCURRENCY_STAGES.length, 30);
 assert.equal(ASSIGNMENT_PUBLISH_SOURCE_WRITE_GUARD_STAGES.length, 30);
+assert.equal(ACTIVITY_MUTATION_CONCURRENCY_STAGES.length, 30);
+assert.equal(
+  new Set(ACTIVITY_MUTATION_CONCURRENCY_STAGES.map((stage) => stage.id)).size,
+  30
+);
+assert.equal(
+  ACTIVITY_MUTATION_CONCURRENCY_STAGES.filter(
+    (stage) => stage.layer === 'database'
+  ).length,
+  8
+);
 assert.equal(
   new Set(
     ASSIGNMENT_PUBLISH_SOURCE_WRITE_GUARD_STAGES.map((stage) => stage.id)
@@ -39237,10 +39250,11 @@ assert.equal(typeof buildActivityDetailSelect, 'function');
 assert.equal(typeof buildActivityAssignmentSourceSelect, 'function');
 assert.equal(typeof buildActivityLifecycleGateSelect, 'function');
 assert.equal(typeof buildActivityDetailOwnerWhere, 'function');
+assert.equal(typeof buildActivityMutationWhere, 'function');
 assert.match(
   activityDetailQuerySource,
-  /buildActivityDetailSelect[\s\S]*contentJson: activity\.contentJson[\s\S]*ownerId: activity\.ownerId[\s\S]*updatedAt: activity\.updatedAt[\s\S]*visibility: activity\.visibility[\s\S]*buildActivityAssignmentSourceSelect[\s\S]*contentJson: activity\.contentJson[\s\S]*id: activity\.id[\s\S]*templateType: activity\.templateType[\s\S]*visibility: activity\.visibility[\s\S]*buildActivityLifecycleGateSelect[\s\S]*id: activity\.id[\s\S]*visibility: activity\.visibility[\s\S]*buildActivityDetailOwnerWhere[\s\S]*eq\(activity\.id, activityId\)[\s\S]*eq\(activity\.ownerId, userId\)/,
-  'Activity detail owner filters and source/detail select shapes should live in the activity detail query domain.'
+  /buildActivityDetailSelect[\s\S]*contentJson: activity\.contentJson[\s\S]*ownerId: activity\.ownerId[\s\S]*updatedAt: activity\.updatedAt[\s\S]*visibility: activity\.visibility[\s\S]*buildActivityAssignmentSourceSelect[\s\S]*contentJson: activity\.contentJson[\s\S]*id: activity\.id[\s\S]*templateType: activity\.templateType[\s\S]*visibility: activity\.visibility[\s\S]*buildActivityLifecycleGateSelect[\s\S]*id: activity\.id[\s\S]*updatedAt: activity\.updatedAt[\s\S]*visibility: activity\.visibility[\s\S]*buildActivityDetailOwnerWhere[\s\S]*eq\(activity\.id, activityId\)[\s\S]*eq\(activity\.ownerId, userId\)[\s\S]*buildActivityMutationWhere[\s\S]*eq\(activity\.visibility, currentVisibility\)[\s\S]*eq\(activity\.updatedAt, currentUpdatedAt\)/,
+  'Activity detail selects, lifecycle revision gate, owner scope, and mutation compare-and-set shape should live in the activity detail query domain.'
 );
 assert.match(
   activitiesApiSource,
@@ -39453,8 +39467,8 @@ assert.doesNotMatch(
 );
 assert.match(
   activitiesApiSource,
-  /updateActivity[\s\S]*\.select\(buildActivityLifecycleGateSelect\(\)\)[\s\S]*assertActivityCanEdit\(existingActivity\.visibility\)[\s\S]*\.select\(buildActivityDetailSelect\(\)\)[\s\S]*buildActivityDetailOwnerWhere\(\{ activityId: data\.id, userId \}\)/,
-  'Update activity API should use lifecycle gate and detail query helpers for owner-scoped edit flows.'
+  /updateActivity[\s\S]*\.select\(buildActivityLifecycleGateSelect\(\)\)[\s\S]*assertActivityCanEdit\(existingActivity\.visibility\)[\s\S]*resolveActivityMutationUpdatedAt[\s\S]*buildActivityMutationWhere[\s\S]*returning\(buildActivityDetailSelect\(\)\)[\s\S]*throwActivityMutationConflict/,
+  'Update activity API should use lifecycle revision, atomic mutation, returned detail, and conflict recovery helpers.'
 );
 assert.match(
   activitiesApiSource,
@@ -39535,13 +39549,13 @@ assert.match(
 );
 assert.match(
   activitiesApiSource,
-  /export const updateActivity[\s\S]*buildActivityUpdateSet\(\{ input: data, now \}\)/,
-  'Update activity API should build update payloads through the activity persistence helper.'
+  /export const updateActivity[\s\S]*buildActivityUpdateSet\(\{ input: data, now: updatedAt \}\)[\s\S]*buildActivityMutationWhere[\s\S]*returning\(buildActivityDetailSelect\(\)\)/,
+  'Update activity API should build update payloads through the persistence helper and write them atomically.'
 );
 assert.match(
   updateActivityVisibilityApiSource,
-  /buildActivityVisibilityUpdateSet\(\{ nextVisibility, updatedAt \}\)/,
-  'Archive and restore APIs should build visibility update payloads through the activity persistence helper.'
+  /resolveActivityMutationUpdatedAt[\s\S]*buildActivityVisibilityUpdateSet\(\{ nextVisibility, updatedAt \}\)[\s\S]*buildActivityMutationWhere[\s\S]*returning\(buildActivityDetailSelect\(\)\)/,
+  'Archive and restore APIs should build visibility update payloads and write them through the atomic revision boundary.'
 );
 assert.match(
   activityPersistenceSource,

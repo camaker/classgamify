@@ -172,6 +172,12 @@ run it when changing owner-scoped activity lookup, archive/restore publish
 gates, assignment and snapshot transactions, assignment insert triggers,
 source-owner invariants, trigger error mapping, active visibility acceptance,
 existing snapshot continuity, or publish-source privacy.
+Activity mutation concurrency has a fast script-level gate via
+`pnpm exec tsx --test scripts/activity-mutation-concurrency-contract.test.ts`;
+run it when changing activity edit, archive, or restore writes, lifecycle gate
+revisions, monotonic timestamps, compare-and-set predicates, zero-row conflict
+recovery, direct returned activity rows, snapshot retention, or activity mutation
+privacy.
 Assignment lifecycle governance chain has a fast script-level gate via
 `pnpm exec tsx --test scripts/assignment-lifecycle-governance-chain-handoff.test.ts`;
 run it when changing open/closed/expired/draft status resolution,

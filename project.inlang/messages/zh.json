@@ -355,6 +355,7 @@
   "activity_api_error_remix_load_failed": "活动改编草稿已保存，但无法重新加载。",
   "activity_api_error_remix_same_template": "请选择另一个模板进行改编。",
   "activity_api_error_template_not_found": "未找到模板。",
+  "activity_api_error_write_conflict": "这份活动已被另一个请求修改。请重新加载后再试。",
   "activity_created_panel_duplicate_body": "这是一份独立复制草稿。你可以安全编辑它，准备好后再发布新的作业链接；原活动和已有快照不会被改动。",
   "activity_created_panel_found_body": "检查结构化内容，继续建设活动库，或准备分享给学生时从活动卡片发布为作业。",
   "activity_created_panel_loading_body": "正在加载刚保存的活动和下一步课堂操作。",

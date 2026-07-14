@@ -226,6 +226,15 @@ Activity lifecycle governance should flow through shared domain helpers across
 library cards, edit access, publish dialogs, duplicate/remix draft creation, and
 server functions, so UI affordances and backend enforcement keep the same
 restore-before-derive contract.
+Activity edit, archive, and restore writes should also use an atomic lifecycle
+revision boundary. Each write matches the current owner, activity id, expected
+visibility, and expected `updatedAt` revision in the same database statement,
+then returns the updated row directly. A stale edit must not modify content after
+another request archives the activity, and stale archive/restore actions must not
+overwrite a newer content or lifecycle change. Zero-row updates reload the current
+owner-scoped lifecycle state so specific restore/archive guidance remains intact;
+otherwise teachers receive a localized reload-before-retry conflict. These writes
+do not mutate existing assignment snapshots, attempts, or public student links.
 The activity lifecycle governance chain should explicitly carry the 30-slice
 assignment publish handoff so restored activities return to the shared publish
 access, field validation, delivery settings, review checklist, snapshot freeze,

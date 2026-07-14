@@ -78,6 +78,17 @@ attempt statistics remain a dependent read because they require the selected
 page assignment ids. Keep writes, student answer payloads, raw anonymous tokens,
 and storage keys outside these read groups.
 
+## Activity mutation concurrency
+
+Activity edit, archive, and restore writes use one compare-and-set `UPDATE`.
+Owner id, activity id, expected visibility, and expected `updated_at` revision
+must still match the initial lifecycle read. `UPDATE ... RETURNING` supplies the
+updated activity directly and zero returned rows trigger an owner-scoped current
+state reload. Specific archived/already-transitioned lifecycle guidance wins over
+the generic reload-before-retry conflict. Revision timestamps advance
+monotonically by at least one millisecond, and these mutations do not alter
+assignment snapshots, attempts, or public student links.
+
 ## Attempt submission idempotency
 
 New attempt rows carry a nullable `submission_key`. The nullable column keeps
