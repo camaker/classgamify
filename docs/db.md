@@ -58,6 +58,16 @@ src/db/
 - **Auth** (`src/auth/auth.ts`): `drizzleAdapter(getDb(), { provider: 'sqlite' })`; Better Auth reads/writes user, session, account, verification, apikey.
 - Other server logic: `import { getDb } from '@/db'` and call `getDb()`, then run queries. Import tables from `@/db` or `@/db/auth.schema` / `@/db/app.schema` as needed.
 
+## Query index contract
+
+`src/db/classroom-query-index-contract.ts` maps 30 core classroom read paths to
+their D1 primary key, unique constraint, or named index. Teacher-owned activity,
+assignment, file, and payment indexes lead with the owner column, then preserve
+the lifecycle/filter columns and stable ordering used by the corresponding
+query helpers. Attempt indexes keep assignment scope before completed time or
+normalized identity fields. Update this contract, `app.schema.ts`, and the
+generated migration together whenever an owner filter or ordering changes.
+
 ## Notes
 
 - D1 is SQLite; use Drizzle’s SQLite dialect (`sqliteTable`, `text`, `integer`, etc.).

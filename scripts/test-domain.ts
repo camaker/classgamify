@@ -107,6 +107,7 @@ import {
   CLASSROOM_DATA_LIFECYCLE_CHAIN_SOURCE_FILES,
   buildClassroomDataLifecycleChainHandoffView,
 } from '@/db/classroom-data-lifecycle-chain';
+import { CLASSROOM_QUERY_INDEX_CONTRACT } from '@/db/classroom-query-index-contract';
 import {
   AUTH_ERROR_RECOVERY_STEP_IDS,
   buildAuthErrorDisplayView,
@@ -5484,6 +5485,32 @@ assert.match(
 );
 const classroomDataLifecycleChainView =
   buildClassroomDataLifecycleChainHandoffView();
+assert.equal(CLASSROOM_QUERY_INDEX_CONTRACT.length, 30);
+assert.equal(
+  new Set(CLASSROOM_QUERY_INDEX_CONTRACT.map((item) => item.id)).size,
+  30
+);
+assert.deepEqual(
+  CLASSROOM_QUERY_INDEX_CONTRACT.filter((item) => item.kind === 'index')
+    .map((item) => item.indexName)
+    .filter((indexName) =>
+      [
+        'activity_owner_template_updated_idx',
+        'activity_owner_visibility_updated_idx',
+        'assignment_owner_status_expires_updated_idx',
+        'payment_user_paid_created_idx',
+        'user_files_user_created_idx',
+      ].includes(indexName)
+    )
+    .sort(),
+  [
+    'activity_owner_template_updated_idx',
+    'activity_owner_visibility_updated_idx',
+    'assignment_owner_status_expires_updated_idx',
+    'payment_user_paid_created_idx',
+    'user_files_user_created_idx',
+  ]
+);
 const classroomDataLifecycleChainValues = new Map(
   classroomDataLifecycleChainView.itemViews.map((item) => [
     item.id,

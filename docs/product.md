@@ -56,6 +56,13 @@ The authenticated teacher dashboard should use owner-scoped activity and
 assignment summaries for top metrics; starter/demo activities may appear as
 preview content, but they must not be counted as the teacher's real library,
 open links, or results.
+The D1 schema should keep a 30-path classroom query index contract aligned with
+the activity library, assignment lifecycle filters, attempt identity and result
+queries, source-material library, and payment lookup surfaces. Owner columns
+must lead teacher-scoped indexes, lifecycle and identity filters must follow
+their actual query order, and stable time/id ordering must remain explicit so
+larger classroom libraries do not fall back to avoidable table scans or
+temporary sorting.
 Teacher workspace operations should keep dashboard owner summaries, activity
 library filters, assignment distribution, account governance, payment callback,
 settings files/billing/notification, and active-surface copy boundaries aligned

@@ -58,6 +58,11 @@ export const payment = sqliteTable(
     index('payment_invoice_id_idx').on(table.invoiceId),
     index('payment_paid_idx').on(table.paid),
     index('payment_user_paid_idx').on(table.userId, table.paid),
+    index('payment_user_paid_created_idx').on(
+      table.userId,
+      table.paid,
+      table.createdAt
+    ),
   ]
 );
 
@@ -90,6 +95,7 @@ export const userFiles = sqliteTable(
   },
   (table) => [
     index('user_files_user_id_idx').on(table.userId),
+    index('user_files_user_created_idx').on(table.userId, table.createdAt),
     index('user_files_r2_key_idx').on(table.r2Key),
   ]
 );
@@ -131,6 +137,16 @@ export const activity = sqliteTable(
     index('activity_template_type_idx').on(table.templateType),
     index('activity_visibility_idx').on(table.visibility),
     index('activity_owner_updated_idx').on(table.ownerId, table.updatedAt),
+    index('activity_owner_visibility_updated_idx').on(
+      table.ownerId,
+      table.visibility,
+      table.updatedAt
+    ),
+    index('activity_owner_template_updated_idx').on(
+      table.ownerId,
+      table.templateType,
+      table.updatedAt
+    ),
   ]
 );
 
@@ -173,6 +189,12 @@ export const assignment = sqliteTable(
     index('assignment_owner_status_updated_idx').on(
       table.ownerId,
       table.status,
+      table.updatedAt
+    ),
+    index('assignment_owner_status_expires_updated_idx').on(
+      table.ownerId,
+      table.status,
+      table.expiresAt,
       table.updatedAt
     ),
     index('assignment_share_slug_idx').on(table.shareSlug),
