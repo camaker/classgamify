@@ -166,6 +166,12 @@ boundary, frozen snapshots, share links, assignment list distribution, public
 student rules, lifecycle access,
 validated submissions, attempt persistence, timer duration policy, answer
 feedback, result stats, or results export handoffs.
+Assignment publish source writes have a fast script-level gate via
+`pnpm exec tsx --test scripts/assignment-publish-source-write-guard-contract.test.ts`;
+run it when changing owner-scoped activity lookup, archive/restore publish
+gates, assignment and snapshot transactions, assignment insert triggers,
+source-owner invariants, trigger error mapping, active visibility acceptance,
+existing snapshot continuity, or publish-source privacy.
 Assignment lifecycle governance chain has a fast script-level gate via
 `pnpm exec tsx --test scripts/assignment-lifecycle-governance-chain-handoff.test.ts`;
 run it when changing open/closed/expired/draft status resolution,

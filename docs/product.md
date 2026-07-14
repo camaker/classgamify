@@ -213,6 +213,15 @@ library and prevents casual republishing, but it does not delete structured
 content or alter existing assignment snapshots. Archived activities cannot be
 published, duplicated, or remixed into another template until they are restored;
 this rule is enforced by server functions, not only by dashboard buttons.
+Assignment publishing should additionally keep a source-activity write guard.
+The API performs an owner-scoped source read and restore-before-publish check,
+while D1 checks source owner equality and archived visibility again immediately
+before the assignment insert. If the activity is archived during publish, the
+assignment/snapshot transaction rolls back and returns the existing localized
+restore guidance. Owner mismatches use the same safe activity-not-found response
+as the initial lookup. Active draft, private, public, and unlisted activities
+remain publishable, existing assignment snapshots remain unchanged, and trigger
+markers, source content, teacher identity, and material metadata stay private.
 Activity lifecycle governance should flow through shared domain helpers across
 library cards, edit access, publish dialogs, duplicate/remix draft creation, and
 server functions, so UI affordances and backend enforcement keep the same

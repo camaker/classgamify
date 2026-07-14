@@ -85,6 +85,13 @@
       "when": 1784008123763,
       "tag": "0011_attempt_submission_lifecycle_guard",
       "breakpoints": true
+    },
+    {
+      "idx": 12,
+      "version": "6",
+      "when": 1784010624643,
+      "tag": "0012_assignment_publish_source_guard",
+      "breakpoints": true
     }
   ]
 }

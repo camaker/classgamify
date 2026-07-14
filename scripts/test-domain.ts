@@ -113,6 +113,7 @@ import { ATTEMPT_SUBMISSION_IDEMPOTENCY_STAGES } from '@/assignments/submission-
 import { ATTEMPT_LIMIT_CONCURRENCY_STAGES } from '@/assignments/attempt-limit-concurrency';
 import { ASSIGNMENT_SUBMISSION_WRITE_GUARD_STAGES } from '@/assignments/submission-lifecycle-write';
 import { ASSIGNMENT_STATUS_TRANSITION_CONCURRENCY_STAGES } from '@/assignments/status-transition-concurrency';
+import { ASSIGNMENT_PUBLISH_SOURCE_WRITE_GUARD_STAGES } from '@/assignments/publish-source-write';
 import {
   AUTH_ERROR_RECOVERY_STEP_IDS,
   buildAuthErrorDisplayView,
@@ -5497,6 +5498,19 @@ assert.equal(ATTEMPT_SUBMISSION_IDEMPOTENCY_STAGES.length, 30);
 assert.equal(ATTEMPT_LIMIT_CONCURRENCY_STAGES.length, 30);
 assert.equal(ASSIGNMENT_SUBMISSION_WRITE_GUARD_STAGES.length, 30);
 assert.equal(ASSIGNMENT_STATUS_TRANSITION_CONCURRENCY_STAGES.length, 30);
+assert.equal(ASSIGNMENT_PUBLISH_SOURCE_WRITE_GUARD_STAGES.length, 30);
+assert.equal(
+  new Set(
+    ASSIGNMENT_PUBLISH_SOURCE_WRITE_GUARD_STAGES.map((stage) => stage.id)
+  ).size,
+  30
+);
+assert.equal(
+  ASSIGNMENT_PUBLISH_SOURCE_WRITE_GUARD_STAGES.filter(
+    (stage) => stage.layer === 'database'
+  ).length,
+  8
+);
 assert.equal(
   new Set(
     ASSIGNMENT_STATUS_TRANSITION_CONCURRENCY_STAGES.map((stage) => stage.id)
@@ -40851,8 +40865,8 @@ assert.doesNotMatch(
 );
 assert.match(
   assignmentsApiSource,
-  /export const publishAssignment[\s\S]*await db\.transaction\(async \(tx\) => \{[\s\S]*await tx\.insert\(assignment\)[\s\S]*await tx\.insert\(assignmentSnapshot\)/,
-  'Publish assignment API should write the assignment and frozen snapshot atomically.'
+  /export const publishAssignment[\s\S]*await db[\s\S]*\.transaction\(async \(tx\) => \{[\s\S]*await tx\.insert\(assignment\)[\s\S]*await tx\.insert\(assignmentSnapshot\)[\s\S]*\.catch\(rethrowAssignmentPublishSourceWriteError\)/,
+  'Publish assignment API should write the assignment and frozen snapshot atomically with source write error mapping.'
 );
 assert.match(
   assignmentsApiSource,

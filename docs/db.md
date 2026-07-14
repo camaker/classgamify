@@ -121,6 +121,18 @@ specific transition errors, otherwise it returns the shared status-action
 failure. A monotonic `updated_at` allocator advances the revision by at least
 one millisecond and the transition does not mutate snapshots or attempts.
 
+## Assignment publish source guard
+
+Migration `0012_assignment_publish_source_guard.sql` adds two `BEFORE INSERT`
+triggers on `assignment`. The owner guard rejects a source activity whose
+`owner_id` differs from the new assignment owner. The archive guard runs only
+for the matching owner and rejects `visibility = 'archived'`. Because assignment
+insertion is the first statement in the assignment/snapshot transaction, either
+abort prevents both records from persisting. Internal markers map to the safe
+activity-not-found or existing restore-before-derive message and do not expose
+source ownership, activity content, materials, or trigger details. Existing
+assignments and their frozen snapshots are unaffected by later source archival.
+
 ## Notes
 
 - D1 is SQLite; use Drizzle’s SQLite dialect (`sqliteTable`, `text`, `integer`, etc.).

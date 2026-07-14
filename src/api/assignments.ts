@@ -79,6 +79,7 @@ import {
   buildPublicAttemptReviewSummaryView,
 } from '@/assignments/public';
 import { buildPrintableAssignmentWorksheet } from '@/assignments/printable-worksheet';
+import { rethrowAssignmentPublishSourceWriteError } from '@/assignments/publish-source-write';
 import {
   buildAssignmentActivityJoin,
   buildAssignmentDetailSelect,
@@ -296,28 +297,30 @@ export const publishAssignment = createServerFn({ method: 'POST' })
     const expiresAt = closeAfter.expiresAt;
     const settings = resolveAssignmentSettings(data.settings);
 
-    await db.transaction(async (tx) => {
-      await tx.insert(assignment).values(
-        buildPublishedAssignmentInsert({
-          expiresAt,
-          id,
-          now,
-          settings,
-          shareSlug,
-          sourceActivity,
-          title: data.title,
-          userId,
-        })
-      );
+    await db
+      .transaction(async (tx) => {
+        await tx.insert(assignment).values(
+          buildPublishedAssignmentInsert({
+            expiresAt,
+            id,
+            now,
+            settings,
+            shareSlug,
+            sourceActivity,
+            title: data.title,
+            userId,
+          })
+        );
 
-      await tx.insert(assignmentSnapshot).values(
-        buildPublishedAssignmentSnapshotInsert({
-          assignmentId: id,
-          createdAt: now,
-          sourceActivity,
-        })
-      );
-    });
+        await tx.insert(assignmentSnapshot).values(
+          buildPublishedAssignmentSnapshotInsert({
+            assignmentId: id,
+            createdAt: now,
+            sourceActivity,
+          })
+        );
+      })
+      .catch(rethrowAssignmentPublishSourceWriteError);
 
     const [row] = await db
       .select(buildAssignmentDetailSelect())
