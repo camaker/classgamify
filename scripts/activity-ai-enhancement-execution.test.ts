@@ -66,6 +66,7 @@ test('activity AI enhancement execution exposes 30 stable plan slices', () => {
     readsSourceMaterialBytes: false,
     requiresEditorReview: true,
     scope: 'activity-ai-enhancement-execution',
+    usesPolicyHandoff: true,
     usesPolicyDecision: true,
   });
   assertNoPrivateExecutionText(JSON.stringify(view));
@@ -189,6 +190,7 @@ test('activity AI enhancement execution summarizes safe source readiness only', 
     '1 audio / 1 worksheet / 0 spreadsheet'
   );
   assert.equal(values.get('provider-call-boundary'), 'Provider call allowed');
+  assert.equal(values.get('policy-handoff-boundary'), '30 policy slices');
   assertNoPrivateExecutionText(JSON.stringify(view));
 });
 
@@ -197,18 +199,23 @@ test('activity AI enhancement execution gate is wired into docs and domain cover
   assert.equal(ACTIVITY_AI_ENHANCEMENT_POLICY_ITEM_IDS.length, 30);
   assert.match(
     EXECUTION_SOURCE,
-    /export const ACTIVITY_AI_ENHANCEMENT_EXECUTION_ITEM_IDS = \[[\s\S]*'execution-scope'[\s\S]*'policy-source'[\s\S]*'provider-mode'[\s\S]*'local-fallback-mode'[\s\S]*'deterministic-draft-mode'[\s\S]*'auth-gate'[\s\S]*'source-byte-guard'[\s\S]*'result-export-continuity'/,
+    /export const ACTIVITY_AI_ENHANCEMENT_EXECUTION_ITEM_IDS = \[[\s\S]*'execution-scope'[\s\S]*'policy-source'[\s\S]*'provider-mode'[\s\S]*'local-fallback-mode'[\s\S]*'deterministic-draft-mode'[\s\S]*'auth-gate'[\s\S]*'source-byte-guard'[\s\S]*'result-export-continuity'[\s\S]*'policy-handoff-boundary'/,
     'Execution source should preserve the 30-slice AI enhancement execution boundary.'
   );
   assert.match(
     PRODUCT_SOURCE,
-    /src\/activities\/ai-enhancement-execution\.ts` owns the structured execution\s+plan/,
+    /src\/activities\/ai-enhancement-execution\.ts` owns the structured execution\s+plan[\s\S]*30-slice request-policy handoff/,
     'docs/product.md should document the AI enhancement execution owner.'
   );
   assert.match(
     TEST_CATALOG_SOURCE,
     /Activity AI enhancement execution has a fast script-level gate via[\s\S]*scripts\/activity-ai-enhancement-execution\.test\.ts[\s\S]*provider-ready[\s\S]*local-fallback[\s\S]*deterministic-draft[\s\S]*blocked-reason[\s\S]*editor-only draft targets[\s\S]*privacy guards/,
     'TEST-CATALOG should document the AI enhancement execution gate.'
+  );
+  assert.match(
+    TEST_CATALOG_SOURCE,
+    /30-slice\s+policy\s+handoff/,
+    'TEST-CATALOG should document the policy handoff.'
   );
 });
 

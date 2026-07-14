@@ -1,4 +1,5 @@
 import {
+  ACTIVITY_AI_ENHANCEMENT_POLICY_ITEM_IDS,
   buildActivityAiEnhancementPolicyDecision,
   type ActivityAiEnhancementKind,
   type ActivityAiEnhancementPolicyDecision,
@@ -36,7 +37,7 @@ export const ACTIVITY_AI_ENHANCEMENT_EXECUTION_ITEM_IDS = [
   'storage-key-guard',
   'private-text-guard',
   'result-export-continuity',
-  'execution-chain-gate',
+  'policy-handoff-boundary',
 ] as const;
 
 export type ActivityAiEnhancementExecutionItemId =
@@ -109,6 +110,7 @@ export type ActivityAiEnhancementExecutionPrivacyContract = {
   readsSourceMaterialBytes: false;
   requiresEditorReview: true;
   scope: 'activity-ai-enhancement-execution';
+  usesPolicyHandoff: true;
   usesPolicyDecision: true;
 };
 
@@ -126,12 +128,12 @@ type ActivityAiEnhancementExecutionSummary = {
   deterministicDraftMode: string;
   editorDraftTarget: string;
   enhancementKind: string;
-  executionChainGate: string;
   executionScope: string;
   fallbackStability: string;
   fieldTargets: string;
   localFallbackMode: string;
   planStatus: string;
+  policyHandoffBoundary: string;
   policySource: string;
   privateTextGuard: string;
   providerCallBoundary: string;
@@ -283,12 +285,12 @@ function buildActivityAiEnhancementExecutionSummary(
     deterministicDraftMode: plan.usesDeterministicDraft ? 'Selected' : 'Off',
     editorDraftTarget: plan.draftTarget,
     enhancementKind: plan.enhancementKind,
-    executionChainGate: '30 execution slices',
     executionScope: 'Editor draft request',
     fallbackStability: plan.usesLocalFallback ? 'Local fallback' : 'Available',
     fieldTargets: formatActivityAiEnhancementExecutionFields(plan.fieldTargets),
     localFallbackMode: plan.usesLocalFallback ? 'Selected' : 'Available',
     planStatus: plan.status,
+    policyHandoffBoundary: `${ACTIVITY_AI_ENHANCEMENT_POLICY_ITEM_IDS.length} policy slices`,
     policySource: plan.policy.requestSource,
     privateTextGuard: 'Private text hidden',
     providerCallBoundary: plan.usesExternalProvider
@@ -528,12 +530,12 @@ function buildActivityAiEnhancementExecutionItem({
         summary.resultExportContinuity,
         'AI-enhanced activities continue through the shared results model.'
       );
-    case 'execution-chain-gate':
+    case 'policy-handoff-boundary':
       return item(
         id,
-        'Execution chain gate',
-        summary.executionChainGate,
-        'A focused gate keeps execution plans aligned with policy and privacy.'
+        'Policy handoff boundary',
+        summary.policyHandoffBoundary,
+        'Execution remains backed by the complete AI enhancement request-policy contract.'
       );
   }
 }
@@ -575,6 +577,7 @@ function buildActivityAiEnhancementExecutionPrivacyContract(
     readsSourceMaterialBytes: false,
     requiresEditorReview: true,
     scope: 'activity-ai-enhancement-execution',
+    usesPolicyHandoff: true,
     usesPolicyDecision: true,
   };
 }

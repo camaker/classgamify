@@ -579,6 +579,10 @@ Implementation boundaries:
   local-fallback, deterministic-draft, or blocked states while preserving
   editor-only draft targets, structured blocked reasons, provider-call
   boundaries, privacy guards, save/publish boundaries, and snapshot protection.
+  Its final boundary explicitly carries the 30-slice request-policy handoff so
+  teacher authentication, source readiness, deterministic prechecks, structured
+  targets, provider posture, editor review, save/publish isolation, snapshot
+  protection, and public-payload privacy cannot be skipped during execution.
 - `src/activities/ai-enhancement-draft-output.ts` owns parsed AI enhancement draft output
   before editor application: provider/fallback/deterministic output source
   tracking, CreateActivityInput parsing, normalized output counts, template

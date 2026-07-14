@@ -7622,6 +7622,7 @@ assert.deepEqual(activityAiEnhancementExecutionView.privacy, {
   readsSourceMaterialBytes: false,
   requiresEditorReview: true,
   scope: 'activity-ai-enhancement-execution',
+  usesPolicyHandoff: true,
   usesPolicyDecision: true,
 });
 assert.equal(
@@ -7673,18 +7674,23 @@ assert.deepEqual(
 );
 assert.match(
   readFileSync('src/activities/ai-enhancement-execution.ts', 'utf8'),
-  /export const ACTIVITY_AI_ENHANCEMENT_EXECUTION_ITEM_IDS = \[[\s\S]*'execution-scope'[\s\S]*'policy-source'[\s\S]*'provider-mode'[\s\S]*'local-fallback-mode'[\s\S]*'deterministic-draft-mode'[\s\S]*'auth-gate'[\s\S]*'source-byte-guard'[\s\S]*'result-export-continuity'/,
+  /export const ACTIVITY_AI_ENHANCEMENT_EXECUTION_ITEM_IDS = \[[\s\S]*'execution-scope'[\s\S]*'policy-source'[\s\S]*'provider-mode'[\s\S]*'local-fallback-mode'[\s\S]*'deterministic-draft-mode'[\s\S]*'auth-gate'[\s\S]*'source-byte-guard'[\s\S]*'result-export-continuity'[\s\S]*'policy-handoff-boundary'/,
   'Activity AI enhancement execution source should preserve the execution plan slices.'
 );
 assert.match(
   readFileSync('docs/product.md', 'utf8'),
-  /src\/activities\/ai-enhancement-execution\.ts` owns the structured execution\s+plan[\s\S]*provider-ready[\s\S]*local-fallback[\s\S]*deterministic-draft[\s\S]*blocked states[\s\S]*editor-only draft targets[\s\S]*provider-call\s+boundaries[\s\S]*snapshot protection/,
+  /src\/activities\/ai-enhancement-execution\.ts` owns the structured execution\s+plan[\s\S]*provider-ready[\s\S]*local-fallback[\s\S]*deterministic-draft[\s\S]*blocked states[\s\S]*editor-only draft targets[\s\S]*provider-call\s+boundaries[\s\S]*snapshot protection[\s\S]*30-slice request-policy handoff/,
   'docs/product.md should document the activity AI enhancement execution owner.'
 );
 assert.match(
   readFileSync('tests/e2e/TEST-CATALOG.md', 'utf8'),
   /Activity AI enhancement execution has a fast script-level gate via[\s\S]*scripts\/activity-ai-enhancement-execution\.test\.ts[\s\S]*provider-ready[\s\S]*local-fallback[\s\S]*deterministic-draft[\s\S]*blocked-reason[\s\S]*editor-only draft targets[\s\S]*privacy\s+guards/,
   'TEST-CATALOG should document the activity AI enhancement execution gate.'
+);
+assert.match(
+  readFileSync('tests/e2e/TEST-CATALOG.md', 'utf8'),
+  /30-slice\s+policy\s+handoff/,
+  'TEST-CATALOG should document the activity AI enhancement policy handoff.'
 );
 const activityAiEnhancementDraftOutputDraft = {
   description: 'Reviewable water cycle draft.',

@@ -666,8 +666,8 @@ Activity AI enhancement execution has a fast script-level gate via
 `pnpm exec tsx --test scripts/activity-ai-enhancement-execution.test.ts`;
 run it when changing provider-ready, local-fallback, deterministic-draft, or
 blocked-reason execution states, editor-only draft targets, source-material
-readiness, provider-call boundaries, fallback stability, auth gates, or privacy
-guards.
+readiness, provider-call boundaries, fallback stability, auth gates, the
+30-slice policy handoff, or privacy guards.
 Activity AI enhancement draft output has a fast script-level gate via
 `pnpm exec tsx --test scripts/activity-ai-enhancement-draft-output.test.ts`;
 run it when changing provider/fallback/deterministic output, parsed draft
