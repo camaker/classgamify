@@ -588,7 +588,11 @@ Implementation boundaries:
   contract after execution planning: CreateActivityInput validation,
   field-target coverage, refreshed draft metadata, template readiness,
   source-provenance counts, teacher-review/save/publish boundaries, privacy
-  guards, snapshot protection, and result-export continuity.
+  guards, snapshot protection, and result-export continuity. Its final boundary
+  explicitly carries the 30-slice parsed draft-output handoff so provider,
+  fallback, and deterministic outputs cannot skip parsing, schema validation,
+  normalized coverage, readiness previews, editor-only targeting, or private
+  output and source-material guards before application.
 - `src/activities/ai-enhancement-editor-review.ts` owns the teacher review gate
   after draft application and before manual save: review checklist coverage,
   reviewed/missing check counts, manual-save readiness, editor-only boundaries,

@@ -7,6 +7,7 @@ import {
   buildActivityAiEnhancementDraftApplicationView,
   type ActivityAiEnhancementDraftApplicationSource,
 } from '@/activities/ai-enhancement-draft-application';
+import { ACTIVITY_AI_ENHANCEMENT_DRAFT_OUTPUT_ITEM_IDS } from '@/activities/ai-enhancement-draft-output';
 import type {
   ActivityContent,
   ActivityMaterialReference,
@@ -71,6 +72,7 @@ test('activity AI enhancement draft application exposes 30 stable slices', () =>
     requiresEditorReview: true,
     scope: 'activity-ai-enhancement-draft-application',
     usesDraftMeta: true,
+    usesDraftOutputHandoff: true,
     usesExecutionPlan: true,
     usesTemplateReadinessDomain: true,
   });
@@ -105,6 +107,11 @@ test('activity AI enhancement draft application refreshes coverage and readiness
     '2 references / 2 kinds'
   );
   assert.equal(values.get('raw-provider-output-guard'), 'Parsed draft only');
+  assert.equal(
+    values.get('draft-output-handoff-boundary'),
+    '30 draft output slices'
+  );
+  assert.equal(ACTIVITY_AI_ENHANCEMENT_DRAFT_OUTPUT_ITEM_IDS.length, 30);
 });
 
 test('activity AI enhancement draft application handles fallback and deterministic modes', () => {
@@ -205,18 +212,23 @@ test('activity AI enhancement draft application gate is wired into docs and cove
   );
   assert.match(
     APPLICATION_SOURCE,
-    /export const ACTIVITY_AI_ENHANCEMENT_DRAFT_APPLICATION_ITEM_IDS = \[[\s\S]*'application-scope'[\s\S]*'execution-plan-source'[\s\S]*'draft-contract-validation'[\s\S]*'field-target-coverage'[\s\S]*'teacher-review-gate'[\s\S]*'result-export-continuity'/,
+    /export const ACTIVITY_AI_ENHANCEMENT_DRAFT_APPLICATION_ITEM_IDS = \[[\s\S]*'application-scope'[\s\S]*'execution-plan-source'[\s\S]*'draft-contract-validation'[\s\S]*'field-target-coverage'[\s\S]*'teacher-review-gate'[\s\S]*'result-export-continuity'[\s\S]*'draft-output-handoff-boundary'/,
     'Draft application source should preserve the 30-slice application boundary.'
   );
   assert.match(
     PRODUCT_SOURCE,
-    /src\/activities\/ai-enhancement-draft-application\.ts` owns the editor-only draft application\s+contract/,
+    /src\/activities\/ai-enhancement-draft-application\.ts` owns the editor-only draft application\s+contract[\s\S]*30-slice parsed draft-output handoff/,
     'docs/product.md should document the AI enhancement draft application owner.'
   );
   assert.match(
     TEST_CATALOG_SOURCE,
     /Activity AI enhancement draft application has a fast script-level gate via[\s\S]*scripts\/activity-ai-enhancement-draft-application\.test\.ts[\s\S]*execution plans[\s\S]*CreateActivityInput validation[\s\S]*editor-only application[\s\S]*coverage\/readiness refresh[\s\S]*privacy guards/,
     'TEST-CATALOG should document the AI enhancement draft application gate.'
+  );
+  assert.match(
+    TEST_CATALOG_SOURCE,
+    /30-slice draft-output\s+handoff/,
+    'TEST-CATALOG should document the parsed draft-output handoff.'
   );
 });
 

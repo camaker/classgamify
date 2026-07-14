@@ -1,3 +1,4 @@
+import { ACTIVITY_AI_ENHANCEMENT_DRAFT_OUTPUT_ITEM_IDS } from '@/activities/ai-enhancement-draft-output';
 import {
   buildActivityAiEnhancementExecutionPlan,
   type ActivityAiEnhancementExecutionPlan,
@@ -46,7 +47,7 @@ export const ACTIVITY_AI_ENHANCEMENT_DRAFT_APPLICATION_ITEM_IDS = [
   'result-export-continuity',
   'fallback-application',
   'provider-application',
-  'application-chain-gate',
+  'draft-output-handoff-boundary',
 ] as const;
 
 export type ActivityAiEnhancementDraftApplicationItemId =
@@ -126,6 +127,7 @@ export type ActivityAiEnhancementDraftApplicationPrivacyContract = {
   requiresEditorReview: true;
   scope: 'activity-ai-enhancement-draft-application';
   usesDraftMeta: true;
+  usesDraftOutputHandoff: true;
   usesExecutionPlan: true;
   usesTemplateReadinessDomain: true;
 };
@@ -147,13 +149,13 @@ type ValidatedDraftApplication = {
 type ActivityAiEnhancementDraftApplicationSummary = {
   activityContentNormalization: string;
   answerKeyPublicGuard: string;
-  applicationChainGate: string;
   applicationScope: string;
   blockedReason: string;
   createInputContract: string;
   draftContractValidation: string;
   draftCoverageSummary: string;
   draftOutputPresence: string;
+  draftOutputHandoffBoundary: string;
   draftTextPrivacy: string;
   editorOnlyTarget: string;
   executionPlanSource: string;
@@ -396,7 +398,6 @@ function buildActivityAiEnhancementDraftApplicationSummary(
         ? 'ActivityContent normalized'
         : 'Not normalized',
     answerKeyPublicGuard: 'No public answer keys',
-    applicationChainGate: '30 application slices',
     applicationScope: 'Editor draft application',
     blockedReason: plan.execution.blockedReason ?? 'None',
     createInputContract:
@@ -414,6 +415,9 @@ function buildActivityAiEnhancementDraftApplicationSummary(
       plan.validationStatus === 'missing'
         ? 'Awaiting draft output'
         : 'Draft output supplied',
+    draftOutputHandoffBoundary:
+      `${ACTIVITY_AI_ENHANCEMENT_DRAFT_OUTPUT_ITEM_IDS.length} ` +
+      'draft output slices',
     draftTextPrivacy: 'Draft text hidden',
     editorOnlyTarget: plan.draftTarget,
     executionPlanSource: plan.execution.status,
@@ -659,12 +663,12 @@ function buildActivityAiEnhancementDraftApplicationItem({
         summary.providerApplication,
         'Provider drafts are accepted only as parsed editor drafts.'
       );
-    case 'application-chain-gate':
+    case 'draft-output-handoff-boundary':
       return item(
         id,
-        'Application chain gate',
-        summary.applicationChainGate,
-        'A focused gate keeps draft application aligned with execution, metadata, and privacy boundaries.'
+        'Draft output handoff boundary',
+        summary.draftOutputHandoffBoundary,
+        'The editor-only application remains backed by the complete parsed draft output contract.'
       );
   }
 }
@@ -710,6 +714,7 @@ function buildActivityAiEnhancementDraftApplicationPrivacyContract(
     requiresEditorReview: true,
     scope: 'activity-ai-enhancement-draft-application',
     usesDraftMeta: true,
+    usesDraftOutputHandoff: true,
     usesExecutionPlan: true,
     usesTemplateReadinessDomain: true,
   };

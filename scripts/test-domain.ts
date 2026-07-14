@@ -7900,6 +7900,7 @@ assert.deepEqual(activityAiEnhancementDraftApplicationView.privacy, {
   requiresEditorReview: true,
   scope: 'activity-ai-enhancement-draft-application',
   usesDraftMeta: true,
+  usesDraftOutputHandoff: true,
   usesExecutionPlan: true,
   usesTemplateReadinessDomain: true,
 });
@@ -7928,18 +7929,23 @@ assert.match(
     'src/activities/ai-enhancement-draft-application.ts',
     'utf8'
   ),
-  /export const ACTIVITY_AI_ENHANCEMENT_DRAFT_APPLICATION_ITEM_IDS = \[[\s\S]*'application-scope'[\s\S]*'execution-plan-source'[\s\S]*'draft-contract-validation'[\s\S]*'field-target-coverage'[\s\S]*'teacher-review-gate'[\s\S]*'result-export-continuity'/,
+  /export const ACTIVITY_AI_ENHANCEMENT_DRAFT_APPLICATION_ITEM_IDS = \[[\s\S]*'application-scope'[\s\S]*'execution-plan-source'[\s\S]*'draft-contract-validation'[\s\S]*'field-target-coverage'[\s\S]*'teacher-review-gate'[\s\S]*'result-export-continuity'[\s\S]*'draft-output-handoff-boundary'/,
   'Activity AI enhancement draft application source should preserve the application slices.'
 );
 assert.match(
   readFileSync('docs/product.md', 'utf8'),
-  /src\/activities\/ai-enhancement-draft-application\.ts` owns the editor-only draft application\s+contract[\s\S]*CreateActivityInput validation[\s\S]*field-target coverage[\s\S]*refreshed draft metadata[\s\S]*template readiness[\s\S]*teacher-review\/save\/publish boundaries[\s\S]*result-export continuity/,
+  /src\/activities\/ai-enhancement-draft-application\.ts` owns the editor-only draft application\s+contract[\s\S]*CreateActivityInput validation[\s\S]*field-target coverage[\s\S]*refreshed draft metadata[\s\S]*template readiness[\s\S]*teacher-review\/save\/publish boundaries[\s\S]*result-export continuity[\s\S]*30-slice parsed draft-output handoff/,
   'docs/product.md should document the activity AI enhancement draft application owner.'
 );
 assert.match(
   readFileSync('tests/e2e/TEST-CATALOG.md', 'utf8'),
   /Activity AI enhancement draft application has a fast script-level gate via[\s\S]*scripts\/activity-ai-enhancement-draft-application\.test\.ts[\s\S]*execution plans[\s\S]*CreateActivityInput validation[\s\S]*editor-only application[\s\S]*coverage\/readiness refresh[\s\S]*privacy guards/,
   'TEST-CATALOG should document the activity AI enhancement draft application gate.'
+);
+assert.match(
+  readFileSync('tests/e2e/TEST-CATALOG.md', 'utf8'),
+  /30-slice draft-output\s+handoff/,
+  'TEST-CATALOG should document the activity AI enhancement draft-output handoff.'
 );
 const activityAiEnhancementEditorReviewView =
   buildActivityAiEnhancementEditorReviewView({

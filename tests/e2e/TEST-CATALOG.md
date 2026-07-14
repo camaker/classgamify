@@ -679,7 +679,8 @@ Activity AI enhancement draft application has a fast script-level gate via
 run it when changing execution plans, CreateActivityInput validation,
 editor-only application, field-target coverage, coverage/readiness refresh,
 teacher-review/save/publish boundaries, snapshot protection, public-payload
-continuity, fallback/provider application modes, or privacy guards.
+continuity, fallback/provider application modes, the 30-slice draft-output
+handoff, or privacy guards.
 Activity AI enhancement editor review has a fast script-level gate via
 `pnpm exec tsx --test scripts/activity-ai-enhancement-editor-review.test.ts`;
 run it when changing teacher review checklists, reviewed/missing check counts,
