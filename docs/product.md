@@ -257,6 +257,12 @@ Individual activity cards should also summarize attached source materials by
 count and material kind, so teachers can see which reusable activities have
 audio, worksheet images, documents, or spreadsheet provenance before reopening
 the editor.
+The activity-card source-material summary chain should explicitly carry 30
+slices for the card summary surface, attached count, material-kind counts,
+extraction-readiness actions, edit-return path, ActivityContent reference, and
+privacy guards. Its aggregate summary may expose safe counts and material kinds,
+but must not expose filenames, file ids, content types, per-file sizes, file
+bytes, storage keys, permission metadata, or student payload file references.
 Activity library filter parsing and search normalization should also live in
 activity-domain helpers so URL state, dashboard controls, and list API queries
 share the same activity status and template-family rules.

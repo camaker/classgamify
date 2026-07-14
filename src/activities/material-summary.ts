@@ -149,6 +149,71 @@ export type ActivitySourceMaterialSummaryView = {
   title: string;
 };
 
+export const ACTIVITY_SOURCE_MATERIAL_CARD_HANDOFF_ITEM_IDS = [
+  'summary-surface',
+  'activity-card-scope',
+  'attached-count',
+  'kind-summary',
+  'kind-badge-count',
+  'audio-count',
+  'worksheet-document-count',
+  'worksheet-image-count',
+  'spreadsheet-count',
+  'reference-only-count',
+  'extractable-count',
+  'readiness-status',
+  'readiness-description',
+  'primary-next-step',
+  'extraction-action-count',
+  'audio-extraction-action',
+  'worksheet-extraction-action',
+  'spreadsheet-import-action',
+  'edit-action-slot',
+  'editor-return-path',
+  'library-status-summary',
+  'activity-content-reference',
+  'material-kind-metadata',
+  'content-type-boundary',
+  'size-summary-boundary',
+  'file-byte-guard',
+  'filename-guard',
+  'file-id-guard',
+  'storage-key-guard',
+  'student-payload-guard',
+] as const;
+
+export type ActivitySourceMaterialCardHandoffItemId =
+  (typeof ACTIVITY_SOURCE_MATERIAL_CARD_HANDOFF_ITEM_IDS)[number];
+
+export type ActivitySourceMaterialCardHandoffItemView = {
+  ariaLabel: string;
+  description: string;
+  id: ActivitySourceMaterialCardHandoffItemId;
+  label: string;
+  value: string;
+};
+
+export type ActivitySourceMaterialCardHandoffPrivacyContract = {
+  exposesContentTypes: false;
+  exposesFileBytes: false;
+  exposesOriginalFilenames: false;
+  exposesPermissionMetadata: false;
+  exposesSourceMaterialFileIds: false;
+  exposesSourceMaterialStorageKeys: false;
+  exposesStudentPayloadFileReferences: false;
+  itemIds: ActivitySourceMaterialCardHandoffItemId[];
+  scope: 'activity-card-source-material-summary';
+  summarizesByMaterialKind: true;
+  usesActivityContentSourceMaterials: true;
+};
+
+export type ActivitySourceMaterialCardHandoffView = {
+  description: string;
+  itemViews: ActivitySourceMaterialCardHandoffItemView[];
+  privacy: ActivitySourceMaterialCardHandoffPrivacyContract;
+  title: string;
+};
+
 type ActivitySourceMaterialPickerAvailableFile = {
   contentType?: string | null;
   filename?: string | null;
@@ -334,6 +399,325 @@ export function buildActivitySourceMaterialSummaryView(
     readinessStatus,
     title: m.activity_source_material_summary_title(),
   };
+}
+
+export function buildActivitySourceMaterialCardHandoffView({
+  hasEditAction = false,
+  summary,
+}: {
+  hasEditAction?: boolean;
+  summary: ActivitySourceMaterialSummaryView;
+}): ActivitySourceMaterialCardHandoffView {
+  const itemViews = ACTIVITY_SOURCE_MATERIAL_CARD_HANDOFF_ITEM_IDS.map((id) =>
+    buildActivitySourceMaterialCardHandoffItemView({
+      hasEditAction,
+      id,
+      summary,
+    })
+  );
+
+  return {
+    description: m.activity_source_material_card_handoff_description(),
+    itemViews,
+    privacy: {
+      exposesContentTypes: false,
+      exposesFileBytes: false,
+      exposesOriginalFilenames: false,
+      exposesPermissionMetadata: false,
+      exposesSourceMaterialFileIds: false,
+      exposesSourceMaterialStorageKeys: false,
+      exposesStudentPayloadFileReferences: false,
+      itemIds: itemViews.map((item) => item.id),
+      scope: 'activity-card-source-material-summary',
+      summarizesByMaterialKind: true,
+      usesActivityContentSourceMaterials: true,
+    },
+    title: m.activity_source_material_card_handoff_title(),
+  };
+}
+
+function buildActivitySourceMaterialCardHandoffItemView({
+  hasEditAction,
+  id,
+  summary,
+}: {
+  hasEditAction: boolean;
+  id: ActivitySourceMaterialCardHandoffItemId;
+  summary: ActivitySourceMaterialSummaryView;
+}): ActivitySourceMaterialCardHandoffItemView {
+  const label = getActivitySourceMaterialCardHandoffItemLabel(id);
+  const description = getActivitySourceMaterialCardHandoffItemDescription(id);
+  const value = getActivitySourceMaterialCardHandoffItemValue({
+    hasEditAction,
+    id,
+    summary,
+  });
+
+  return {
+    ariaLabel: m.activity_source_material_card_handoff_item_aria({
+      description,
+      label,
+      value,
+    }),
+    description,
+    id,
+    label,
+    value,
+  };
+}
+
+function getActivitySourceMaterialCardHandoffItemValue({
+  hasEditAction,
+  id,
+  summary,
+}: {
+  hasEditAction: boolean;
+  id: ActivitySourceMaterialCardHandoffItemId;
+  summary: ActivitySourceMaterialSummaryView;
+}) {
+  const totalCount = getActivitySourceMaterialSummaryTotalCount(summary);
+  const extractableCount = normalizeActivitySourceMaterialCount(
+    summary.readiness.extractableCount
+  );
+  const actionLabel = (actionId: ActivitySourceMaterialExtractionActionId) =>
+    summary.extractionActions.find((action) => action.id === actionId)?.label ??
+    m.activity_source_material_card_handoff_unavailable_value();
+
+  switch (id) {
+    case 'summary-surface':
+      return summary.title;
+    case 'activity-card-scope':
+      return m.activity_source_material_card_handoff_activity_card_scope_value();
+    case 'attached-count':
+      return summary.countLabel;
+    case 'kind-summary':
+      return summary.compactSummaryText;
+    case 'kind-badge-count':
+      return String(summary.kindBadges.length);
+    case 'audio-count':
+      return String(
+        getActivitySourceMaterialSummaryKindCount(summary, 'audio')
+      );
+    case 'worksheet-document-count':
+      return String(
+        getActivitySourceMaterialSummaryKindCount(summary, 'worksheet-document')
+      );
+    case 'worksheet-image-count':
+      return String(
+        getActivitySourceMaterialSummaryKindCount(summary, 'worksheet-image')
+      );
+    case 'spreadsheet-count':
+      return String(
+        getActivitySourceMaterialSummaryKindCount(summary, 'spreadsheet')
+      );
+    case 'reference-only-count':
+      return String(Math.max(0, totalCount - extractableCount));
+    case 'extractable-count':
+      return String(extractableCount);
+    case 'readiness-status':
+      return summary.readinessStatus.value;
+    case 'readiness-description':
+      return summary.readinessStatus.description;
+    case 'primary-next-step':
+      return (
+        summary.primaryNextStep?.label ??
+        m.activity_source_material_card_handoff_unavailable_value()
+      );
+    case 'extraction-action-count':
+      return String(summary.extractionActions.length);
+    case 'audio-extraction-action':
+      return actionLabel('extract-audio');
+    case 'worksheet-extraction-action':
+      return actionLabel('extract-worksheet');
+    case 'spreadsheet-import-action':
+      return actionLabel('import-spreadsheet');
+    case 'edit-action-slot':
+      return hasEditAction
+        ? m.activity_source_material_card_handoff_available_value()
+        : m.activity_source_material_card_handoff_unavailable_value();
+    case 'editor-return-path':
+      return m.activity_source_material_card_handoff_editor_return_path_value();
+    case 'library-status-summary':
+      return m.activity_source_material_card_handoff_library_status_summary_value();
+    case 'activity-content-reference':
+      return 'ActivityContent.sourceMaterials';
+    case 'material-kind-metadata':
+      return summary.compactSummaryText;
+    case 'content-type-boundary':
+      return m.activity_source_material_card_handoff_content_type_boundary_value();
+    case 'size-summary-boundary':
+      return m.activity_source_material_card_handoff_size_summary_boundary_value();
+    case 'file-byte-guard':
+      return m.activity_source_extraction_assist_file_byte_guard_value();
+    case 'filename-guard':
+      return m.activity_source_extraction_assist_filename_guard_value();
+    case 'file-id-guard':
+      return m.activity_source_extraction_assist_file_id_guard_value();
+    case 'storage-key-guard':
+      return m.activity_source_extraction_assist_storage_key_guard_value();
+    case 'student-payload-guard':
+      return m.activity_source_material_picker_handoff_student_payload_guard_value();
+  }
+
+  const exhaustiveId: never = id;
+  return exhaustiveId;
+}
+
+function getActivitySourceMaterialCardHandoffItemLabel(
+  id: ActivitySourceMaterialCardHandoffItemId
+) {
+  switch (id) {
+    case 'summary-surface':
+      return m.activity_source_material_card_handoff_summary_surface_label();
+    case 'activity-card-scope':
+      return m.activity_source_material_card_handoff_activity_card_scope_label();
+    case 'attached-count':
+      return m.activity_source_material_card_handoff_attached_count_label();
+    case 'kind-summary':
+      return m.activity_source_material_card_handoff_kind_summary_label();
+    case 'kind-badge-count':
+      return m.activity_source_material_card_handoff_kind_badge_count_label();
+    case 'audio-count':
+      return m.activity_source_extraction_assist_audio_source_count_label();
+    case 'worksheet-document-count':
+      return m.activity_source_material_card_handoff_worksheet_document_count_label();
+    case 'worksheet-image-count':
+      return m.activity_source_material_card_handoff_worksheet_image_count_label();
+    case 'spreadsheet-count':
+      return m.activity_source_extraction_assist_spreadsheet_source_count_label();
+    case 'reference-only-count':
+      return m.activity_source_extraction_assist_reference_only_count_label();
+    case 'extractable-count':
+      return m.activity_source_extraction_assist_extractable_material_count_label();
+    case 'readiness-status':
+      return m.activity_source_material_readiness_label();
+    case 'readiness-description':
+      return m.activity_source_material_card_handoff_readiness_description_label();
+    case 'primary-next-step':
+      return m.activity_source_material_card_handoff_primary_next_step_label();
+    case 'extraction-action-count':
+      return m.activity_source_material_card_handoff_extraction_action_count_label();
+    case 'audio-extraction-action':
+      return m.activity_source_material_extraction_audio();
+    case 'worksheet-extraction-action':
+      return m.activity_source_material_extraction_worksheet();
+    case 'spreadsheet-import-action':
+      return m.activity_source_material_extraction_spreadsheet();
+    case 'edit-action-slot':
+      return m.activity_source_material_card_handoff_edit_action_slot_label();
+    case 'editor-return-path':
+      return m.activity_source_material_card_handoff_editor_return_path_label();
+    case 'library-status-summary':
+      return m.activity_source_material_card_handoff_library_status_summary_label();
+    case 'activity-content-reference':
+      return m.activity_source_material_picker_handoff_source_material_reference_label();
+    case 'material-kind-metadata':
+      return m.activity_source_material_card_handoff_material_kind_metadata_label();
+    case 'content-type-boundary':
+      return m.activity_source_material_card_handoff_content_type_boundary_label();
+    case 'size-summary-boundary':
+      return m.activity_source_material_card_handoff_size_summary_boundary_label();
+    case 'file-byte-guard':
+      return m.activity_source_extraction_assist_file_byte_guard_label();
+    case 'filename-guard':
+      return m.activity_source_extraction_assist_filename_guard_label();
+    case 'file-id-guard':
+      return m.activity_source_extraction_assist_file_id_guard_label();
+    case 'storage-key-guard':
+      return m.activity_source_extraction_assist_storage_key_guard_label();
+    case 'student-payload-guard':
+      return m.activity_source_material_picker_handoff_student_payload_guard_label();
+  }
+
+  const exhaustiveId: never = id;
+  return exhaustiveId;
+}
+
+function getActivitySourceMaterialCardHandoffItemDescription(
+  id: ActivitySourceMaterialCardHandoffItemId
+) {
+  switch (id) {
+    case 'summary-surface':
+      return m.activity_source_material_card_handoff_summary_surface_description();
+    case 'activity-card-scope':
+      return m.activity_source_material_card_handoff_activity_card_scope_description();
+    case 'attached-count':
+      return m.activity_source_material_card_handoff_attached_count_description();
+    case 'kind-summary':
+      return m.activity_source_material_card_handoff_kind_summary_description();
+    case 'kind-badge-count':
+      return m.activity_source_material_card_handoff_kind_badge_count_description();
+    case 'audio-count':
+      return m.activity_source_extraction_assist_audio_source_count_description();
+    case 'worksheet-document-count':
+      return m.activity_source_material_card_handoff_worksheet_document_count_description();
+    case 'worksheet-image-count':
+      return m.activity_source_material_card_handoff_worksheet_image_count_description();
+    case 'spreadsheet-count':
+      return m.activity_source_extraction_assist_spreadsheet_source_count_description();
+    case 'reference-only-count':
+      return m.activity_source_extraction_assist_reference_only_count_description();
+    case 'extractable-count':
+      return m.activity_source_extraction_assist_extractable_material_count_description();
+    case 'readiness-status':
+      return m.activity_source_material_card_handoff_readiness_status_description();
+    case 'readiness-description':
+      return m.activity_source_material_card_handoff_readiness_description_description();
+    case 'primary-next-step':
+      return m.activity_source_material_card_handoff_primary_next_step_description();
+    case 'extraction-action-count':
+      return m.activity_source_material_card_handoff_extraction_action_count_description();
+    case 'audio-extraction-action':
+      return m.activity_source_material_next_step_audio_description();
+    case 'worksheet-extraction-action':
+      return m.activity_source_material_next_step_worksheet_description();
+    case 'spreadsheet-import-action':
+      return m.activity_source_material_next_step_spreadsheet_description();
+    case 'edit-action-slot':
+      return m.activity_source_material_card_handoff_edit_action_slot_description();
+    case 'editor-return-path':
+      return m.activity_source_material_card_handoff_editor_return_path_description();
+    case 'library-status-summary':
+      return m.activity_source_material_card_handoff_library_status_summary_description();
+    case 'activity-content-reference':
+      return m.activity_source_material_picker_handoff_source_material_reference_description();
+    case 'material-kind-metadata':
+      return m.activity_source_material_card_handoff_material_kind_metadata_description();
+    case 'content-type-boundary':
+      return m.activity_source_material_card_handoff_content_type_boundary_description();
+    case 'size-summary-boundary':
+      return m.activity_source_material_card_handoff_size_summary_boundary_description();
+    case 'file-byte-guard':
+      return m.activity_source_extraction_assist_file_byte_guard_description();
+    case 'filename-guard':
+      return m.activity_source_extraction_assist_filename_guard_description();
+    case 'file-id-guard':
+      return m.activity_source_extraction_assist_file_id_guard_description();
+    case 'storage-key-guard':
+      return m.activity_source_extraction_assist_storage_key_guard_description();
+    case 'student-payload-guard':
+      return m.activity_source_material_picker_handoff_student_payload_guard_description();
+  }
+
+  const exhaustiveId: never = id;
+  return exhaustiveId;
+}
+
+function getActivitySourceMaterialSummaryTotalCount(
+  summary: ActivitySourceMaterialSummaryView
+) {
+  return normalizeActivitySourceMaterialCount(
+    summary.kindBadges.reduce((total, badge) => total + badge.count, 0)
+  );
+}
+
+function getActivitySourceMaterialSummaryKindCount(
+  summary: ActivitySourceMaterialSummaryView,
+  kind: UserFileMaterialKind
+) {
+  return normalizeActivitySourceMaterialCount(
+    summary.kindBadges.find((badge) => badge.kind === kind)?.count ?? 0
+  );
 }
 
 function buildActivitySourceMaterialReadinessStatusView({

@@ -599,6 +599,12 @@ run it when changing activity library overview metrics, current-view scope,
 source-material filters, starter-preview boundaries, visible-card counts,
 activity library privacy-scope boundaries, or the hidden activity-library
 handoff.
+Activity source-material card summary has a fast script-level gate via
+`pnpm exec tsx --test scripts/activity-source-material-card-handoff-semantic-views.test.ts`;
+run it when changing activity card source-material count summaries,
+material-kind badges, extraction-readiness status, primary next-step copy,
+edit-return actions, activity-card source-material privacy-scope boundaries, or
+the hidden activity-source-material-card-summary handoff.
 Activity edit route hydration has a fast script-level gate via
 `pnpm exec tsx --test scripts/activity-edit-route-handoff-semantic-views.test.ts`;
 run it when changing saved-activity loading, owner-scoped edit access,
