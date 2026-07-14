@@ -89,6 +89,18 @@ the generic reload-before-retry conflict. Revision timestamps advance
 monotonically by at least one millisecond, and these mutations do not alter
 assignment snapshots, attempts, or public student links.
 
+## Activity derivative source guard
+
+Migration `0013_activity_derivative_source_guard.sql` adds nullable
+`derivation_source_activity_id` and `derivation_source_updated_at` columns plus
+four `BEFORE INSERT` triggers on `activity`. Ordinary creates keep both columns
+null. Duplicate and remix drafts provide both values; D1 rejects incomplete
+provenance, missing or different-owner sources, archived sources, and active
+sources whose `updated_at` no longer matches the initial read. Trigger conditions
+are mutually exclusive so owner mismatches do not reveal source lifecycle state.
+The source row remains read-only, and later source edits or archival do not change
+an existing independent derivative draft.
+
 ## Attempt submission idempotency
 
 New attempt rows carry a nullable `submission_key`. The nullable column keeps

@@ -17,6 +17,8 @@ import {
 type ActivityInsertPayload = {
   contentJson: ActivityContent;
   createdAt: Date;
+  derivationSourceActivityId: string | null;
+  derivationSourceUpdatedAt: Date | null;
   description: string | null;
   id: string;
   ownerId: string;
@@ -43,8 +45,10 @@ type ActivityVisibilityUpdatePayload = {
 type PersistedActivityDerivativeSource = {
   contentJson: ActivityContent;
   description: string | null;
+  id: string;
   templateType: ActivityTemplateType;
   title: string;
+  updatedAt: Date;
 };
 
 export function buildActivityCreateInsert({
@@ -61,6 +65,8 @@ export function buildActivityCreateInsert({
   return {
     contentJson: buildActivityContent(input),
     createdAt: now,
+    derivationSourceActivityId: null,
+    derivationSourceUpdatedAt: null,
     description: normalizeActivityDescription(input.description),
     id,
     ownerId: userId,
@@ -115,6 +121,8 @@ export function buildDuplicatedActivityInsert({
   return {
     contentJson: cloneActivityContentForDerivative(sourceActivity.contentJson),
     createdAt: now,
+    derivationSourceActivityId: sourceActivity.id,
+    derivationSourceUpdatedAt: sourceActivity.updatedAt,
     description: sourceActivity.description,
     id,
     ownerId: userId,
@@ -141,6 +149,8 @@ export function buildRemixedActivityInsert({
   return {
     contentJson: cloneActivityContentForDerivative(sourceActivity.contentJson),
     createdAt: now,
+    derivationSourceActivityId: sourceActivity.id,
+    derivationSourceUpdatedAt: sourceActivity.updatedAt,
     description: sourceActivity.description,
     id,
     ownerId: userId,

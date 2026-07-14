@@ -178,6 +178,12 @@ run it when changing activity edit, archive, or restore writes, lifecycle gate
 revisions, monotonic timestamps, compare-and-set predicates, zero-row conflict
 recovery, direct returned activity rows, snapshot retention, or activity mutation
 privacy.
+Activity derivative source writes have a fast script-level gate via
+`pnpm exec tsx --test scripts/activity-derivative-source-write-guard-contract.test.ts`;
+run it when changing duplicate/remix source reads, derivative provenance,
+activity insert triggers, owner/archive/revision guards, derivative error
+mapping, active-source acceptance, independent-draft continuity, or derivative
+source privacy.
 Assignment lifecycle governance chain has a fast script-level gate via
 `pnpm exec tsx --test scripts/assignment-lifecycle-governance-chain-handoff.test.ts`;
 run it when changing open/closed/expired/draft status resolution,

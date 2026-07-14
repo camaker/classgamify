@@ -235,6 +235,16 @@ overwrite a newer content or lifecycle change. Zero-row updates reload the curre
 owner-scoped lifecycle state so specific restore/archive guidance remains intact;
 otherwise teachers receive a localized reload-before-retry conflict. These writes
 do not mutate existing assignment snapshots, attempts, or public student links.
+Activity duplicate and template-remix inserts should keep the same write-time
+source discipline. A derivative draft stores only an internal source activity id
+and expected source revision; D1 checks the provenance pair, owner equality,
+archived state, and exact source revision immediately before inserting the draft.
+If the source is archived or edited after the initial read, the stale request is
+blocked with existing restore guidance or localized reload guidance instead of
+copying stale content. Normal activity creation has no source provenance, active
+draft/private/public/unlisted sources remain derivable, and later source changes
+do not mutate an already-created independent draft. Provenance ids, revisions,
+source content, teacher identity, and material metadata remain private.
 The activity lifecycle governance chain should explicitly carry the 30-slice
 assignment publish handoff so restored activities return to the shared publish
 access, field validation, delivery settings, review checklist, snapshot freeze,

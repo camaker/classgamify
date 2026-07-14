@@ -131,6 +131,10 @@ export const activity = sqliteTable(
     contentJson: text('content_json', { mode: 'json' })
       .notNull()
       .$type<ActivityContent>(),
+    derivationSourceActivityId: text('derivation_source_activity_id'),
+    derivationSourceUpdatedAt: integer('derivation_source_updated_at', {
+      mode: 'timestamp_ms',
+    }),
     visibility: text('visibility')
       .notNull()
       .$type<ActivityVisibility>()

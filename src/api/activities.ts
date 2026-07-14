@@ -17,6 +17,7 @@ import {
   buildActivityMutationWhere,
 } from '@/activities/detail-query';
 import { getTemplateByType } from '@/activities/catalog';
+import { rethrowActivityDerivativeSourceWriteError } from '@/activities/derivative-source-write';
 import {
   ACTIVITY_LIBRARY_INPUT_LIMITS,
   ACTIVITY_LIBRARY_PAGE_SIZE,
@@ -222,14 +223,17 @@ export const duplicateActivity = createServerFn({ method: 'POST' })
 
     const now = new Date();
     const id = nanoid(APP_ENTITY_ID_LENGTH.generated);
-    await db.insert(activity).values(
-      buildDuplicatedActivityInsert({
-        id,
-        now,
-        sourceActivity,
-        userId,
-      })
-    );
+    await db
+      .insert(activity)
+      .values(
+        buildDuplicatedActivityInsert({
+          id,
+          now,
+          sourceActivity,
+          userId,
+        })
+      )
+      .catch(rethrowActivityDerivativeSourceWriteError);
 
     const [row] = await db
       .select(buildActivityDetailSelect())
@@ -287,15 +291,18 @@ export const remixActivityTemplate = createServerFn({ method: 'POST' })
 
     const now = new Date();
     const id = nanoid(APP_ENTITY_ID_LENGTH.generated);
-    await db.insert(activity).values(
-      buildRemixedActivityInsert({
-        id,
-        now,
-        sourceActivity,
-        targetTemplate,
-        userId,
-      })
-    );
+    await db
+      .insert(activity)
+      .values(
+        buildRemixedActivityInsert({
+          id,
+          now,
+          sourceActivity,
+          targetTemplate,
+          userId,
+        })
+      )
+      .catch(rethrowActivityDerivativeSourceWriteError);
 
     const [row] = await db
       .select(buildActivityDetailSelect())

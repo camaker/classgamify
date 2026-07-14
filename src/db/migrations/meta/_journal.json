@@ -92,6 +92,13 @@
       "when": 1784010624643,
       "tag": "0012_assignment_publish_source_guard",
       "breakpoints": true
+    },
+    {
+      "idx": 13,
+      "version": "6",
+      "when": 1784013516609,
+      "tag": "0013_activity_derivative_source_guard",
+      "breakpoints": true
     }
   ]
 }

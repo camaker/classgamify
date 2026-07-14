@@ -115,6 +115,7 @@ import { ASSIGNMENT_SUBMISSION_WRITE_GUARD_STAGES } from '@/assignments/submissi
 import { ASSIGNMENT_STATUS_TRANSITION_CONCURRENCY_STAGES } from '@/assignments/status-transition-concurrency';
 import { ASSIGNMENT_PUBLISH_SOURCE_WRITE_GUARD_STAGES } from '@/assignments/publish-source-write';
 import { ACTIVITY_MUTATION_CONCURRENCY_STAGES } from '@/activities/mutation-concurrency';
+import { ACTIVITY_DERIVATIVE_SOURCE_WRITE_GUARD_STAGES } from '@/activities/derivative-source-write';
 import {
   AUTH_ERROR_RECOVERY_STEP_IDS,
   buildAuthErrorDisplayView,
@@ -5502,6 +5503,19 @@ assert.equal(ASSIGNMENT_SUBMISSION_WRITE_GUARD_STAGES.length, 30);
 assert.equal(ASSIGNMENT_STATUS_TRANSITION_CONCURRENCY_STAGES.length, 30);
 assert.equal(ASSIGNMENT_PUBLISH_SOURCE_WRITE_GUARD_STAGES.length, 30);
 assert.equal(ACTIVITY_MUTATION_CONCURRENCY_STAGES.length, 30);
+assert.equal(ACTIVITY_DERIVATIVE_SOURCE_WRITE_GUARD_STAGES.length, 30);
+assert.equal(
+  new Set(
+    ACTIVITY_DERIVATIVE_SOURCE_WRITE_GUARD_STAGES.map((stage) => stage.id)
+  ).size,
+  30
+);
+assert.equal(
+  ACTIVITY_DERIVATIVE_SOURCE_WRITE_GUARD_STAGES.filter(
+    (stage) => stage.layer === 'database'
+  ).length,
+  8
+);
 assert.equal(
   new Set(ACTIVITY_MUTATION_CONCURRENCY_STAGES.map((stage) => stage.id)).size,
   30
@@ -39539,13 +39553,13 @@ assert.match(
 );
 assert.match(
   activitiesApiSource,
-  /export const duplicateActivity[\s\S]*buildDuplicatedActivityInsert\(\{[\s\S]*sourceActivity,[\s\S]*userId/,
-  'Duplicate activity API should build derivative insert payloads through the activity domain helper.'
+  /export const duplicateActivity[\s\S]*buildDuplicatedActivityInsert\(\{[\s\S]*sourceActivity,[\s\S]*userId[\s\S]*catch\(rethrowActivityDerivativeSourceWriteError\)/,
+  'Duplicate activity API should build derivative provenance and map write-time source failures.'
 );
 assert.match(
   activitiesApiSource,
-  /export const remixActivityTemplate[\s\S]*buildRemixedActivityInsert\(\{[\s\S]*sourceActivity,[\s\S]*targetTemplate,[\s\S]*userId/,
-  'Template remix API should build derivative insert payloads through the activity domain helper.'
+  /export const remixActivityTemplate[\s\S]*buildRemixedActivityInsert\(\{[\s\S]*sourceActivity,[\s\S]*targetTemplate,[\s\S]*userId[\s\S]*catch\(rethrowActivityDerivativeSourceWriteError\)/,
+  'Template remix API should build derivative provenance and map write-time source failures.'
 );
 assert.match(
   activitiesApiSource,
@@ -39559,8 +39573,8 @@ assert.match(
 );
 assert.match(
   activityPersistenceSource,
-  /buildActivityCreateInsert[\s\S]*contentJson: buildActivityContent\(input\)[\s\S]*description: normalizeActivityDescription\(input\.description\)[\s\S]*buildActivityUpdateSet[\s\S]*contentJson: buildActivityContent\(input\)[\s\S]*buildActivityVisibilityUpdateSet[\s\S]*visibility: nextVisibility[\s\S]*buildDuplicatedActivityInsert[\s\S]*cloneActivityContentForDerivative\(sourceActivity\.contentJson\)[\s\S]*buildRemixedActivityInsert[\s\S]*targetTemplate\.type/,
-  'Activity persistence helpers should own create, edit, visibility, duplicate, and remix payload shapes.'
+  /buildActivityCreateInsert[\s\S]*contentJson: buildActivityContent\(input\)[\s\S]*derivationSourceActivityId: null[\s\S]*derivationSourceUpdatedAt: null[\s\S]*buildActivityUpdateSet[\s\S]*contentJson: buildActivityContent\(input\)[\s\S]*buildActivityVisibilityUpdateSet[\s\S]*visibility: nextVisibility[\s\S]*buildDuplicatedActivityInsert[\s\S]*derivationSourceActivityId: sourceActivity\.id[\s\S]*derivationSourceUpdatedAt: sourceActivity\.updatedAt[\s\S]*buildRemixedActivityInsert[\s\S]*derivationSourceActivityId: sourceActivity\.id[\s\S]*derivationSourceUpdatedAt: sourceActivity\.updatedAt[\s\S]*targetTemplate\.type/,
+  'Activity persistence helpers should own source-free create, atomic edit, visibility, and guarded derivative payload shapes.'
 );
 assert.doesNotMatch(
   createActivityApiSource,
@@ -56439,6 +56453,8 @@ assert.equal(activityCreateInsert.title, 'Food review');
 assert.equal(activityCreateInsert.visibility, 'private');
 assert.equal(activityCreateInsert.createdAt, activityInsertNow);
 assert.equal(activityCreateInsert.updatedAt, activityInsertNow);
+assert.equal(activityCreateInsert.derivationSourceActivityId, null);
+assert.equal(activityCreateInsert.derivationSourceUpdatedAt, null);
 assert.equal(activityCreateInsert.contentJson.subject, 'English');
 assert.equal(activityCreateInsert.contentJson.groups[0]?.label, 'Foods');
 assert.equal(
@@ -56496,8 +56512,10 @@ const duplicatedActivityInsert = buildDuplicatedActivityInsert({
   sourceActivity: {
     contentJson: derivativeSourceContent,
     description: 'Source description',
+    id: 'activity-derivative-source',
     templateType: 'group-sort',
     title: '  Food words quick check  ',
+    updatedAt: activityInsertNow,
   },
   userId: 'teacher-1',
 });
@@ -56509,6 +56527,14 @@ assert.equal(duplicatedActivityInsert.title, 'Copy of Food words quick check');
 assert.equal(duplicatedActivityInsert.visibility, 'draft');
 assert.equal(duplicatedActivityInsert.createdAt, activityInsertNow);
 assert.equal(duplicatedActivityInsert.updatedAt, activityInsertNow);
+assert.equal(
+  duplicatedActivityInsert.derivationSourceActivityId,
+  'activity-derivative-source'
+);
+assert.equal(
+  duplicatedActivityInsert.derivationSourceUpdatedAt,
+  activityInsertNow
+);
 assert.deepEqual(duplicatedActivityInsert.contentJson, derivativeClonedContent);
 assert.notEqual(duplicatedActivityInsert.contentJson, derivativeSourceContent);
 const remixedActivityInsert = buildRemixedActivityInsert({
@@ -56517,8 +56543,10 @@ const remixedActivityInsert = buildRemixedActivityInsert({
   sourceActivity: {
     contentJson: derivativeSourceContent,
     description: null,
+    id: 'activity-remix-source',
     templateType: 'group-sort',
     title: 'Food words quick check',
+    updatedAt: activityInsertNow,
   },
   targetTemplate: {
     shortName: 'Match',
@@ -56532,6 +56560,14 @@ assert.equal(remixedActivityInsert.description, null);
 assert.equal(remixedActivityInsert.templateType, 'match-up');
 assert.equal(remixedActivityInsert.title, 'Food words quick check (Match)');
 assert.equal(remixedActivityInsert.visibility, 'draft');
+assert.equal(
+  remixedActivityInsert.derivationSourceActivityId,
+  'activity-remix-source'
+);
+assert.equal(
+  remixedActivityInsert.derivationSourceUpdatedAt,
+  activityInsertNow
+);
 assert.deepEqual(remixedActivityInsert.contentJson, derivativeClonedContent);
 assert.notEqual(remixedActivityInsert.contentJson, derivativeSourceContent);
 assert.deepEqual(derivativeClonedContent, {
