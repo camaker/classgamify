@@ -354,6 +354,16 @@ teacher UI: only published links can be closed, only closed links can be
 reopened, draft assignments cannot bypass the publish-and-snapshot flow, and
 expired assignments cannot be reopened without a future product action that
 changes the close window.
+Teacher close and reopen writes should also use an atomic lifecycle transition
+contract. The server validates the initially loaded state, then updates only
+when owner, assignment id, expected status, and expected `updatedAt` revision
+still match. Reopen updates include the future close-window condition in that
+same database statement. A stale or expired transition updates zero rows,
+reloads the current lifecycle state for a specific error when possible, and
+never overwrites a newer teacher action. Successful transitions advance the
+revision monotonically even when requests share the same millisecond, while
+snapshots, attempts, results, share links, and assignment settings remain
+unchanged.
 The assignment lifecycle governance chain should explicitly carry the 30-slice
 public unavailable-access handoff so closed, expired, draft, and missing links
 share lifecycle reasons, student-safe messages, hidden runtime content and

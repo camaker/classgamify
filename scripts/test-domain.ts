@@ -112,6 +112,7 @@ import { CLASSROOM_QUERY_EXECUTION_CONTRACT } from '@/db/classroom-query-executi
 import { ATTEMPT_SUBMISSION_IDEMPOTENCY_STAGES } from '@/assignments/submission-idempotency';
 import { ATTEMPT_LIMIT_CONCURRENCY_STAGES } from '@/assignments/attempt-limit-concurrency';
 import { ASSIGNMENT_SUBMISSION_WRITE_GUARD_STAGES } from '@/assignments/submission-lifecycle-write';
+import { ASSIGNMENT_STATUS_TRANSITION_CONCURRENCY_STAGES } from '@/assignments/status-transition-concurrency';
 import {
   AUTH_ERROR_RECOVERY_STEP_IDS,
   buildAuthErrorDisplayView,
@@ -840,6 +841,7 @@ import {
   buildAssignmentDetailShareWhere,
   buildAssignmentLifecycleGateSelect,
   buildAssignmentSnapshotJoin,
+  buildAssignmentStatusTransitionWhere,
 } from '@/assignments/detail-query';
 import {
   buildOpenPublicAssignmentPayload,
@@ -5494,6 +5496,19 @@ assert.equal(CLASSROOM_QUERY_EXECUTION_CONTRACT.length, 30);
 assert.equal(ATTEMPT_SUBMISSION_IDEMPOTENCY_STAGES.length, 30);
 assert.equal(ATTEMPT_LIMIT_CONCURRENCY_STAGES.length, 30);
 assert.equal(ASSIGNMENT_SUBMISSION_WRITE_GUARD_STAGES.length, 30);
+assert.equal(ASSIGNMENT_STATUS_TRANSITION_CONCURRENCY_STAGES.length, 30);
+assert.equal(
+  new Set(
+    ASSIGNMENT_STATUS_TRANSITION_CONCURRENCY_STAGES.map((stage) => stage.id)
+  ).size,
+  30
+);
+assert.equal(
+  ASSIGNMENT_STATUS_TRANSITION_CONCURRENCY_STAGES.filter(
+    (stage) => stage.layer === 'database'
+  ).length,
+  8
+);
 assert.equal(
   new Set(ASSIGNMENT_SUBMISSION_WRITE_GUARD_STAGES.map((stage) => stage.id))
     .size,
@@ -40861,17 +40876,17 @@ assert.doesNotMatch(
 );
 assert.match(
   assignmentsApiSource,
-  /export const updateAssignmentStatus[\s\S]*assertAssignmentStatusTransition\(\{[\s\S]*currentStatus: existingAssignment\.status[\s\S]*nextStatus: data\.status[\s\S]*\.update\(assignment\)[\s\S]*buildAssignmentStatusUpdateSet\(\{[\s\S]*nextStatus: data\.status[\s\S]*updatedAt: new Date\(\)/,
-  'Update assignment status API should validate lifecycle transitions before using assignment persistence status payloads.'
+  /export const updateAssignmentStatus[\s\S]*const now = new Date\(\)[\s\S]*assertAssignmentStatusTransition\(\{[\s\S]*currentStatus: existingAssignment\.status[\s\S]*nextStatus: data\.status[\s\S]*resolveAssignmentStatusTransitionUpdatedAt\(\{[\s\S]*currentUpdatedAt: existingAssignment\.updatedAt[\s\S]*\.update\(assignment\)[\s\S]*buildAssignmentStatusUpdateSet\(\{[\s\S]*nextStatus: data\.status[\s\S]*updatedAt,[\s\S]*buildAssignmentStatusTransitionWhere[\s\S]*returning\(buildAssignmentLifecycleGateSelect\(\)\)/,
+  'Update assignment status API should validate lifecycle transitions before using monotonic compare-and-set persistence and returning the transitioned lifecycle row.'
 );
 assert.doesNotMatch(
   assignmentsApiSource,
-  /updateAssignmentStatus[\s\S]*select\(\{[\s\S]*expiresAt: assignment\.expiresAt[\s\S]*id: assignment\.id[\s\S]*status: assignment\.status[\s\S]*\}\)/,
+  /updateAssignmentStatus[\s\S]*select\(\{[\s\S]*expiresAt: assignment\.expiresAt[\s\S]*id: assignment\.id[\s\S]*status: assignment\.status[\s\S]*updatedAt: assignment\.updatedAt/,
   'Update assignment status API should not hand-write lifecycle gate select fields.'
 );
 assert.doesNotMatch(
   assignmentsApiSource,
-  /updateAssignmentStatus[\s\S]*\.set\(\{[\s\S]*status: data\.status[\s\S]*updatedAt: new Date\(\)/,
+  /updateAssignmentStatus[\s\S]*\.set\(\{[\s\S]*status: data\.status[\s\S]*updatedAt/,
   'Update assignment status API should not hand-write assignment status update payloads.'
 );
 assert.match(
@@ -41844,12 +41859,13 @@ assert.equal(typeof buildAssignmentDetailOwnerShareWhere, 'function');
 assert.equal(typeof buildAssignmentDetailShareWhere, 'function');
 assert.equal(typeof buildAssignmentDetailSelect, 'function');
 assert.equal(typeof buildAssignmentLifecycleGateSelect, 'function');
+assert.equal(typeof buildAssignmentStatusTransitionWhere, 'function');
 assert.equal(typeof buildAssignmentActivityJoin, 'function');
 assert.equal(typeof buildAssignmentSnapshotJoin, 'function');
 assert.match(
   assignmentDetailQuerySource,
-  /buildAssignmentDetailSelect[\s\S]*activity,[\s\S]*assignment,[\s\S]*snapshot: assignmentSnapshot[\s\S]*buildAssignmentLifecycleGateSelect[\s\S]*expiresAt: assignment\.expiresAt[\s\S]*id: assignment\.id[\s\S]*status: assignment\.status[\s\S]*buildAssignmentActivityJoin[\s\S]*eq\(assignment\.activityId, activity\.id\)[\s\S]*buildAssignmentSnapshotJoin[\s\S]*eq\(assignmentSnapshot\.assignmentId, assignment\.id\)/,
-  'Assignment detail select, lifecycle gate select, and join shape should live in the assignment detail query domain.'
+  /(?=[\s\S]*buildAssignmentDetailSelect[\s\S]*activity,[\s\S]*assignment,[\s\S]*snapshot: assignmentSnapshot)(?=[\s\S]*buildAssignmentLifecycleGateSelect[\s\S]*expiresAt: assignment\.expiresAt[\s\S]*id: assignment\.id[\s\S]*status: assignment\.status[\s\S]*updatedAt: assignment\.updatedAt)(?=[\s\S]*buildAssignmentStatusTransitionWhere[\s\S]*buildAssignmentDetailOwnerWhere[\s\S]*eq\(assignment\.status, currentStatus\)[\s\S]*eq\(assignment\.updatedAt, currentUpdatedAt\)[\s\S]*nextStatus === 'published'[\s\S]*gt\(assignment\.expiresAt, normalizedNow\))(?=[\s\S]*buildAssignmentActivityJoin[\s\S]*eq\(assignment\.activityId, activity\.id\))(?=[\s\S]*buildAssignmentSnapshotJoin[\s\S]*eq\(assignmentSnapshot\.assignmentId, assignment\.id\))/,
+  'Assignment detail selects, lifecycle revision gate, atomic transition where, and join shape should live in the assignment detail query domain.'
 );
 assert.match(
   assignmentsApiSource,
@@ -41863,8 +41879,8 @@ assert.match(
 );
 assert.match(
   assignmentsApiSource,
-  /export const updateAssignmentStatus[\s\S]*\.select\(buildAssignmentLifecycleGateSelect\(\)\)[\s\S]*assertAssignmentStatusTransition[\s\S]*\.select\(buildAssignmentDetailSelect\(\)\)[\s\S]*\.innerJoin\(activity, buildAssignmentActivityJoin\(\)\)[\s\S]*\.leftJoin\(assignmentSnapshot, buildAssignmentSnapshotJoin\(\)\)[\s\S]*\.where\(where\)/,
-  'Assignment status updates should use lifecycle gate and detail query helpers.'
+  /export const updateAssignmentStatus[\s\S]*\.select\(buildAssignmentLifecycleGateSelect\(\)\)[\s\S]*assertAssignmentStatusTransition[\s\S]*buildAssignmentStatusTransitionWhere[\s\S]*returning\(buildAssignmentLifecycleGateSelect\(\)\)[\s\S]*if \(!transitionedAssignment\)[\s\S]*getAssignmentStatusTransitionConflictMessage[\s\S]*\.select\(buildAssignmentDetailSelect\(\)\)[\s\S]*\.innerJoin\(activity, buildAssignmentActivityJoin\(\)\)[\s\S]*\.leftJoin\(assignmentSnapshot, buildAssignmentSnapshotJoin\(\)\)[\s\S]*\.where\(ownerWhere\)/,
+  'Assignment status updates should use lifecycle gate, atomic transition, conflict recovery, and detail query helpers.'
 );
 assert.match(
   assignmentsApiSource,
@@ -41926,7 +41942,7 @@ assert.doesNotMatch(
 );
 assert.match(
   assignmentsApiSource,
-  /updateAssignmentStatus[\s\S]*const where = buildAssignmentDetailOwnerWhere\(\{[\s\S]*assignmentId: data\.assignmentId,[\s\S]*userId,[\s\S]*\}\)/,
+  /updateAssignmentStatus[\s\S]*const ownerWhere = buildAssignmentDetailOwnerWhere\(\{[\s\S]*assignmentId: data\.assignmentId,[\s\S]*userId,[\s\S]*\}\)/,
   'Assignment status updates should load owner-scoped assignment details through the assignment detail query helper.'
 );
 assert.match(

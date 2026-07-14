@@ -175,6 +175,12 @@ lifecycle gates, result retention, snapshot retention, the 30-slice public
 unavailable-access boundary for lifecycle reasons, hidden runtime and answers,
 blocked submissions, retained results, reopen guidance, indexing, and privacy,
 or other lifecycle privacy guards.
+Assignment lifecycle transition concurrency has a fast script-level gate via
+`pnpm exec tsx --test scripts/assignment-status-transition-concurrency-contract.test.ts`;
+run it when changing close/reopen server functions, owner-scoped status writes,
+expected lifecycle revisions, same-millisecond transitions, reopen close-window
+checks, compare-and-set updates, zero-row conflict recovery, returned lifecycle
+rows, snapshot/result retention, or lifecycle transition privacy.
 Classroom data lifecycle chain has a fast script-level gate via
 `pnpm exec tsx --test scripts/classroom-data-lifecycle-chain-handoff.test.ts`;
 run it when changing the 30-slice attempt persistence handoff boundary, D1 app

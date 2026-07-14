@@ -87,6 +87,7 @@ import {
   buildAssignmentDetailShareWhere,
   buildAssignmentLifecycleGateSelect,
   buildAssignmentSnapshotJoin,
+  buildAssignmentStatusTransitionWhere,
 } from '@/assignments/detail-query';
 import { analyzeAssignmentResults } from '@/assignments/results';
 import {
@@ -107,6 +108,10 @@ import {
   normalizeAssignmentShareSlug,
 } from '@/assignments/share-slug';
 import { resolveAssignmentRuntimeSource } from '@/assignments/snapshot';
+import {
+  getAssignmentStatusTransitionConflictMessage,
+  resolveAssignmentStatusTransitionUpdatedAt,
+} from '@/assignments/status-transition-concurrency';
 import { getDb } from '@/db';
 import {
   activity,
@@ -335,41 +340,75 @@ export const updateAssignmentStatus = createServerFn({ method: 'POST' })
   .handler(async ({ data, context }) => {
     const { userId } = context;
     const db = getDb();
-    const where = buildAssignmentDetailOwnerWhere({
+    const ownerWhere = buildAssignmentDetailOwnerWhere({
       assignmentId: data.assignmentId,
       userId,
     });
     const [existingAssignment] = await db
       .select(buildAssignmentLifecycleGateSelect())
       .from(assignment)
-      .where(where)
+      .where(ownerWhere)
       .limit(1);
 
     if (!existingAssignment) {
       throw new Error(m.assignment_api_error_assignment_not_found());
     }
+    const now = new Date();
     assertAssignmentStatusTransition({
       currentStatus: existingAssignment.status,
       expiresAt: existingAssignment.expiresAt,
       nextStatus: data.status,
+      now,
     });
 
-    await db
+    const updatedAt = resolveAssignmentStatusTransitionUpdatedAt({
+      currentUpdatedAt: existingAssignment.updatedAt,
+      now,
+    });
+    const [transitionedAssignment] = await db
       .update(assignment)
       .set(
         buildAssignmentStatusUpdateSet({
           nextStatus: data.status,
-          updatedAt: new Date(),
+          updatedAt,
         })
       )
-      .where(where);
+      .where(
+        buildAssignmentStatusTransitionWhere({
+          assignmentId: data.assignmentId,
+          currentStatus: existingAssignment.status,
+          currentUpdatedAt: existingAssignment.updatedAt,
+          nextStatus: data.status,
+          now,
+          userId,
+        })
+      )
+      .returning(buildAssignmentLifecycleGateSelect());
+
+    if (!transitionedAssignment) {
+      const [currentAssignment] = await db
+        .select(buildAssignmentLifecycleGateSelect())
+        .from(assignment)
+        .where(ownerWhere)
+        .limit(1);
+      if (!currentAssignment) {
+        throw new Error(m.assignment_api_error_assignment_not_found());
+      }
+      throw new Error(
+        getAssignmentStatusTransitionConflictMessage({
+          currentStatus: currentAssignment.status,
+          expiresAt: currentAssignment.expiresAt,
+          nextStatus: data.status,
+        })
+      );
+    }
 
     const [row] = await db
       .select(buildAssignmentDetailSelect())
       .from(assignment)
       .innerJoin(activity, buildAssignmentActivityJoin())
       .leftJoin(assignmentSnapshot, buildAssignmentSnapshotJoin())
-      .where(where)
+      .where(ownerWhere)
       .limit(1);
 
     if (!row) {

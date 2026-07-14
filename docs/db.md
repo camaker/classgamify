@@ -109,6 +109,18 @@ internal abort markers are mapped back to existing localized closed/expired
 messages and are never returned directly. Trigger failures are not eligible for
 identity-slot retry; only the named identity-slot unique conflict is.
 
+## Assignment lifecycle transition concurrency
+
+Teacher close/reopen writes use one compare-and-set `UPDATE`: owner id,
+assignment id, expected status, and expected `updated_at` revision must still
+match. Reopen also requires `expires_at IS NULL OR expires_at > now` in the same
+statement. `UPDATE ... RETURNING` provides the success signal; zero returned
+rows mean the state, revision, owner scope, or close window changed after the
+initial read. The API reloads current lifecycle state to preserve existing
+specific transition errors, otherwise it returns the shared status-action
+failure. A monotonic `updated_at` allocator advances the revision by at least
+one millisecond and the transition does not mutate snapshots or attempts.
+
 ## Notes
 
 - D1 is SQLite; use Drizzle’s SQLite dialect (`sqliteTable`, `text`, `integer`, etc.).
