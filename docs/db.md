@@ -78,6 +78,17 @@ attempt statistics remain a dependent read because they require the selected
 page assignment ids. Keep writes, student answer payloads, raw anonymous tokens,
 and storage keys outside these read groups.
 
+## Activity source-material write validation
+
+Activity create and edit writes normalize at most 12 source-material references,
+then load all requested ids with one `user_files` query constrained by the
+current owner. The select includes only id, stored/original filename,
+content-type, and size; it omits `r2_key`, public/permission metadata, and file
+bytes. Every requested id must match, and persisted compact references are
+rebuilt from those authoritative rows in request order. Missing and other-owner
+ids share one safe unavailable result, while empty reference lists avoid the
+database query entirely.
+
 ## Activity mutation concurrency
 
 Activity edit, archive, and restore writes use one compare-and-set `UPDATE`.

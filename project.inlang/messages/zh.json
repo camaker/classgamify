@@ -354,6 +354,7 @@
   "activity_api_error_duplicate_load_failed": "活动已复制，但无法重新加载。",
   "activity_api_error_remix_load_failed": "活动改编草稿已保存，但无法重新加载。",
   "activity_api_error_remix_same_template": "请选择另一个模板进行改编。",
+  "activity_api_error_source_material_not_found": "一个或多个来源素材已不可用。请刷新文件列表后再试。",
   "activity_api_error_template_not_found": "未找到模板。",
   "activity_api_error_write_conflict": "这份活动已被另一个请求修改。请重新加载后再试。",
   "activity_created_panel_duplicate_body": "这是一份独立复制草稿。你可以安全编辑它，准备好后再发布新的作业链接；原活动和已有快照不会被改动。",

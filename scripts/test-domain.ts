@@ -116,6 +116,7 @@ import { ASSIGNMENT_STATUS_TRANSITION_CONCURRENCY_STAGES } from '@/assignments/s
 import { ASSIGNMENT_PUBLISH_SOURCE_WRITE_GUARD_STAGES } from '@/assignments/publish-source-write';
 import { ACTIVITY_MUTATION_CONCURRENCY_STAGES } from '@/activities/mutation-concurrency';
 import { ACTIVITY_DERIVATIVE_SOURCE_WRITE_GUARD_STAGES } from '@/activities/derivative-source-write';
+import { ACTIVITY_SOURCE_MATERIAL_WRITE_STAGES } from '@/activities/source-material-write';
 import {
   AUTH_ERROR_RECOVERY_STEP_IDS,
   buildAuthErrorDisplayView,
@@ -155,6 +156,8 @@ import {
 } from '@/admin/users-view';
 import {
   buildUserFileDetailOwnerWhere,
+  buildUserFileMaterialReferenceSelect,
+  buildUserFileMaterialsOwnerWhere,
   getUserFileListOffset,
   USER_FILE_LIST_INPUT_LIMITS,
   USER_FILE_MATERIAL_PICKER_PAGE_SIZE,
@@ -5504,6 +5507,17 @@ assert.equal(ASSIGNMENT_STATUS_TRANSITION_CONCURRENCY_STAGES.length, 30);
 assert.equal(ASSIGNMENT_PUBLISH_SOURCE_WRITE_GUARD_STAGES.length, 30);
 assert.equal(ACTIVITY_MUTATION_CONCURRENCY_STAGES.length, 30);
 assert.equal(ACTIVITY_DERIVATIVE_SOURCE_WRITE_GUARD_STAGES.length, 30);
+assert.equal(ACTIVITY_SOURCE_MATERIAL_WRITE_STAGES.length, 30);
+assert.equal(
+  new Set(ACTIVITY_SOURCE_MATERIAL_WRITE_STAGES.map((stage) => stage.id)).size,
+  30
+);
+assert.equal(
+  ACTIVITY_SOURCE_MATERIAL_WRITE_STAGES.filter(
+    (stage) => stage.layer === 'database'
+  ).length,
+  8
+);
 assert.equal(
   new Set(
     ACTIVITY_DERIVATIVE_SOURCE_WRITE_GUARD_STAGES.map((stage) => stage.id)
@@ -14919,6 +14933,13 @@ assert.match(
   userFileQuerySource,
   /buildUserFileDetailOwnerWhere[\s\S]*eq\(userFiles\.id, fileId\)[\s\S]*eq\(userFiles\.userId, userId\)/,
   'User file detail owner scoping should live in the storage query domain.'
+);
+assert.equal(typeof buildUserFileMaterialReferenceSelect, 'function');
+assert.equal(typeof buildUserFileMaterialsOwnerWhere, 'function');
+assert.match(
+  userFileQuerySource,
+  /buildUserFileMaterialReferenceSelect[\s\S]*contentType: userFiles\.contentType[\s\S]*filename: userFiles\.filename[\s\S]*id: userFiles\.id[\s\S]*originalName: userFiles\.originalName[\s\S]*size: userFiles\.size[\s\S]*buildUserFileMaterialsOwnerWhere[\s\S]*buildUserFileOwnerWhere\(\{ userId \}\)[\s\S]*inArray\(userFiles\.id, fileIds\)/,
+  'Activity material writes should use one owner-scoped minimal user-file metadata query.'
 );
 assert.match(
   userFilesApiSource,
@@ -39548,8 +39569,8 @@ assert.match(
 );
 assert.match(
   activitiesApiSource,
-  /export const createActivity[\s\S]*buildActivityCreateInsert\(\{ id, input: data, now, userId \}\)/,
-  'Create activity API should build insert payloads through the activity domain helper.'
+  /export const createActivity[\s\S]*validateActivitySourceMaterialWrite[\s\S]*buildActivityCreateInsert\(\{ id, input, now, userId \}\)/,
+  'Create activity API should validate source-material ownership before building the activity insert.'
 );
 assert.match(
   activitiesApiSource,
@@ -39563,8 +39584,8 @@ assert.match(
 );
 assert.match(
   activitiesApiSource,
-  /export const updateActivity[\s\S]*buildActivityUpdateSet\(\{ input: data, now: updatedAt \}\)[\s\S]*buildActivityMutationWhere[\s\S]*returning\(buildActivityDetailSelect\(\)\)/,
-  'Update activity API should build update payloads through the persistence helper and write them atomically.'
+  /export const updateActivity[\s\S]*assertActivityCanEdit\(existingActivity\.visibility\)[\s\S]*validateActivitySourceMaterialWrite[\s\S]*buildActivityUpdateSet\(\{ input, now: updatedAt \}\)[\s\S]*buildActivityMutationWhere[\s\S]*returning\(buildActivityDetailSelect\(\)\)/,
+  'Update activity API should validate lifecycle and source-material ownership before its atomic write.'
 );
 assert.match(
   updateActivityVisibilityApiSource,

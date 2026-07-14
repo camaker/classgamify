@@ -158,6 +158,14 @@ the owner-scoped `userFiles` rows. Those references preserve draft provenance
 for editing, AI extraction, and future worksheet/audio tooling, but public
 student payloads still expose only sanitized runtime prompts and choices, not
 the teacher's file list or storage keys.
+Activity create and edit writes must resolve every normalized source-material
+file id through one owner-scoped `userFiles` query before persistence. All
+requested references must still exist for the current teacher; missing and
+different-owner ids share the same localized unavailable response. Persisted
+references are rebuilt from authoritative database filename, content-type, and
+size metadata in the teacher's requested order rather than trusting client
+metadata. Empty reference lists skip the query, duplicate ids stay collapsed,
+and validation never selects R2 keys, permission metadata, URLs, or file bytes.
 The source-material privacy chain should explicitly carry the compact material
 reference handoff's 30 slices for reference shape, safe file ids and filename
 basenames, content-type, material kind and size normalization, duplicate

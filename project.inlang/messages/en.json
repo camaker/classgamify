@@ -354,6 +354,7 @@
   "activity_api_error_duplicate_load_failed": "Duplicated activity was saved but could not be loaded.",
   "activity_api_error_remix_load_failed": "Remixed activity was saved but could not be loaded.",
   "activity_api_error_remix_same_template": "Choose a different template to remix into.",
+  "activity_api_error_source_material_not_found": "One or more source materials are no longer available. Refresh your files and try again.",
   "activity_api_error_template_not_found": "Template not found.",
   "activity_api_error_write_conflict": "This activity changed in another request. Reload it before trying again.",
   "activity_created_panel_duplicate_body": "This draft is an independent copy. Edit it safely, then publish a new assignment link when you are ready; the original activity and existing snapshots stay unchanged.",

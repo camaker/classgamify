@@ -19,6 +19,10 @@ import {
 import { getTemplateByType } from '@/activities/catalog';
 import { rethrowActivityDerivativeSourceWriteError } from '@/activities/derivative-source-write';
 import {
+  getActivitySourceMaterialWriteFileIds,
+  resolveActivitySourceMaterialWrite,
+} from '@/activities/source-material-write';
+import {
   ACTIVITY_LIBRARY_INPUT_LIMITS,
   ACTIVITY_LIBRARY_PAGE_SIZE,
   ACTIVITY_LIBRARY_STATUSES,
@@ -49,10 +53,14 @@ import {
   getTemplateRemixOption,
 } from '@/activities/template-remix';
 import { getDb } from '@/db';
-import { activity } from '@/db/app.schema';
+import { activity, userFiles } from '@/db/app.schema';
 import { APP_ENTITY_ID_LENGTH } from '@/lib/entity-id';
 import { m } from '@/locale/paraglide/messages';
 import { authApiMiddleware } from '@/middlewares/auth-middleware';
+import {
+  buildUserFileMaterialReferenceSelect,
+  buildUserFileMaterialsOwnerWhere,
+} from '@/storage/file-query';
 import { createServerFn } from '@tanstack/react-start';
 import { nanoid } from 'nanoid';
 import { z } from 'zod';
@@ -175,12 +183,17 @@ export const createActivity = createServerFn({ method: 'POST' })
   .handler(async ({ data, context }) => {
     const { userId } = context;
     const db = getDb();
+    const input = await validateActivitySourceMaterialWrite({
+      db,
+      input: data,
+      userId,
+    });
     const now = new Date();
     const id = nanoid(APP_ENTITY_ID_LENGTH.generated);
 
     await db
       .insert(activity)
-      .values(buildActivityCreateInsert({ id, input: data, now, userId }));
+      .values(buildActivityCreateInsert({ id, input, now, userId }));
 
     const [row] = await db
       .select(buildActivityDetailSelect())
@@ -337,13 +350,18 @@ export const updateActivity = createServerFn({ method: 'POST' })
       throw new Error(m.activity_api_error_activity_not_found());
     }
     assertActivityCanEdit(existingActivity.visibility);
+    const input = await validateActivitySourceMaterialWrite({
+      db,
+      input: data,
+      userId,
+    });
 
     const updatedAt = resolveActivityMutationUpdatedAt({
       currentUpdatedAt: existingActivity.updatedAt,
     });
     const [updatedActivity] = await db
       .update(activity)
-      .set(buildActivityUpdateSet({ input: data, now: updatedAt }))
+      .set(buildActivityUpdateSet({ input, now: updatedAt }))
       .where(
         buildActivityMutationWhere({
           activityId: data.id,
@@ -470,4 +488,33 @@ async function throwActivityMutationConflict({
       currentVisibility: currentActivity.visibility,
     })
   );
+}
+
+async function validateActivitySourceMaterialWrite({
+  db,
+  input,
+  userId,
+}: {
+  db: ReturnType<typeof getDb>;
+  input: z.infer<typeof createActivityInputSchema>;
+  userId: string;
+}) {
+  const fileIds = getActivitySourceMaterialWriteFileIds(input.sourceMaterials);
+  if (fileIds.length === 0) {
+    return { ...input, sourceMaterials: [] };
+  }
+
+  const ownedFiles = await db
+    .select(buildUserFileMaterialReferenceSelect())
+    .from(userFiles)
+    .where(buildUserFileMaterialsOwnerWhere({ fileIds, userId }));
+  const resolution = resolveActivitySourceMaterialWrite({
+    ownedFiles,
+    value: input.sourceMaterials,
+  });
+  if (resolution.type === 'blocked') {
+    throw new Error(m.activity_api_error_source_material_not_found());
+  }
+
+  return { ...input, sourceMaterials: resolution.references };
 }

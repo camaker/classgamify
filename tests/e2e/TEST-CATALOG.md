@@ -184,6 +184,11 @@ run it when changing duplicate/remix source reads, derivative provenance,
 activity insert triggers, owner/archive/revision guards, derivative error
 mapping, active-source acceptance, independent-draft continuity, or derivative
 source privacy.
+Activity source-material writes have a fast script-level gate via
+`pnpm exec tsx --test scripts/activity-source-material-write-contract.test.ts`;
+run it when changing create/edit material persistence, owner-scoped user-file
+queries, authoritative metadata rebuilding, missing-reference handling, empty
+reference bypass, source-material order/count rules, or storage/file privacy.
 Assignment lifecycle governance chain has a fast script-level gate via
 `pnpm exec tsx --test scripts/assignment-lifecycle-governance-chain-handoff.test.ts`;
 run it when changing open/closed/expired/draft status resolution,
