@@ -68,6 +68,16 @@ query helpers. Attempt indexes keep assignment scope before completed time or
 normalized identity fields. Update this contract, `app.schema.ts`, and the
 generated migration together whenever an owner filter or ordering changes.
 
+## Query execution contract
+
+`src/db/classroom-query-execution-contract.ts` maps 30 list-query stages across
+the activity library, assignment library, file library, and source-material
+picker. Independent owner-scoped reads share a `Promise.all` barrier per
+surface. Post-processing starts only after that barrier, while assignment-page
+attempt statistics remain a dependent read because they require the selected
+page assignment ids. Keep writes, student answer payloads, raw anonymous tokens,
+and storage keys outside these read groups.
+
 ## Notes
 
 - D1 is SQLite; use Drizzle’s SQLite dialect (`sqliteTable`, `text`, `integer`, etc.).

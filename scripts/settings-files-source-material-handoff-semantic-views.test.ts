@@ -190,7 +190,7 @@ test('settings files hooks and APIs keep owner scope and sanitized material list
   );
   assert.match(
     USER_FILES_API_SOURCE,
-    /const summaryItems = await db[\s\S]*select\(\{[\s\S]*contentType: userFiles\.contentType,[\s\S]*filename: userFiles\.filename,[\s\S]*isPublic: userFiles\.isPublic,[\s\S]*originalName: userFiles\.originalName,[\s\S]*size: userFiles\.size,[\s\S]*\}\)[\s\S]*where\(where\)[\s\S]*summary: buildUserFileMaterialSummary\(summaryItems\)/,
+    /const \[totalRows, items, summaryItems\] = await Promise\.all\(\[[\s\S]*select\(\{[\s\S]*contentType: userFiles\.contentType,[\s\S]*filename: userFiles\.filename,[\s\S]*isPublic: userFiles\.isPublic,[\s\S]*originalName: userFiles\.originalName,[\s\S]*size: userFiles\.size,[\s\S]*\}\)[\s\S]*where\(where\),[\s\S]*\]\);[\s\S]*summary: buildUserFileMaterialSummary\(summaryItems\)/,
     'File list API should summarize all owner rows, not only visible items.'
   );
   assert.match(

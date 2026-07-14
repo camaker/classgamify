@@ -108,6 +108,7 @@ import {
   buildClassroomDataLifecycleChainHandoffView,
 } from '@/db/classroom-data-lifecycle-chain';
 import { CLASSROOM_QUERY_INDEX_CONTRACT } from '@/db/classroom-query-index-contract';
+import { CLASSROOM_QUERY_EXECUTION_CONTRACT } from '@/db/classroom-query-execution-contract';
 import {
   AUTH_ERROR_RECOVERY_STEP_IDS,
   buildAuthErrorDisplayView,
@@ -5486,6 +5487,23 @@ assert.match(
 const classroomDataLifecycleChainView =
   buildClassroomDataLifecycleChainHandoffView();
 assert.equal(CLASSROOM_QUERY_INDEX_CONTRACT.length, 30);
+assert.equal(CLASSROOM_QUERY_EXECUTION_CONTRACT.length, 30);
+assert.equal(
+  new Set(CLASSROOM_QUERY_EXECUTION_CONTRACT.map((item) => item.id)).size,
+  30
+);
+assert.equal(
+  CLASSROOM_QUERY_EXECUTION_CONTRACT.filter(
+    (item) => item.mode === 'parallel-read'
+  ).length,
+  11
+);
+assert.equal(
+  CLASSROOM_QUERY_EXECUTION_CONTRACT.filter(
+    (item) => item.mode === 'dependent-read'
+  ).length,
+  1
+);
 assert.equal(
   new Set(CLASSROOM_QUERY_INDEX_CONTRACT.map((item) => item.id)).size,
   30
@@ -14836,7 +14854,7 @@ assert.match(
 );
 assert.match(
   userFilesApiSource,
-  /const summaryItems = await db[\s\S]*select\(\{[\s\S]*contentType: userFiles\.contentType,[\s\S]*filename: userFiles\.filename,[\s\S]*isPublic: userFiles\.isPublic,[\s\S]*originalName: userFiles\.originalName,[\s\S]*size: userFiles\.size,[\s\S]*\}\)[\s\S]*where\(where\)[\s\S]*summary: buildUserFileMaterialSummary\(summaryItems\)/,
+  /const \[totalRows, items, summaryItems\] = await Promise\.all\(\[[\s\S]*select\(\{[\s\S]*contentType: userFiles\.contentType,[\s\S]*filename: userFiles\.filename,[\s\S]*isPublic: userFiles\.isPublic,[\s\S]*originalName: userFiles\.originalName,[\s\S]*size: userFiles\.size,[\s\S]*\}\)[\s\S]*where\(where\),[\s\S]*\]\);[\s\S]*summary: buildUserFileMaterialSummary\(summaryItems\)/,
   'User file list API should summarize all owner rows, not only the visible page.'
 );
 assert.match(
@@ -39087,7 +39105,7 @@ assert.match(
 );
 assert.match(
   activitiesApiSource,
-  /matchingRows = await db[\s\S]*\.select\(buildActivityLibraryItemSelect\(\)\)[\s\S]*\.from\(activity\)[\s\S]*\.where\(where\)/,
+  /const \[matchingRows, summaryRows, createdActivityRows\] = await Promise\.all\(\[[\s\S]*\.select\(buildActivityLibraryItemSelect\(\)\)[\s\S]*\.from\(activity\)[\s\S]*\.where\(where\)/,
   'Activity list API should reuse the activity-library item select helper.'
 );
 assert.match(
@@ -39121,19 +39139,19 @@ assert.match(
 );
 assert.match(
   activitiesApiSource,
-  /const where = buildActivityLibraryWhere\(\{[\s\S]*status: data\.status,[\s\S]*\}\);[\s\S]*const matchingRows = await db[\s\S]*\.where\(where\)[\s\S]*const matchingActivities = filterActivityLibrarySourceItems[\s\S]*summary: summarizeActivityLibrary\(matchingActivities\)/,
+  /const where = buildActivityLibraryWhere\(\{[\s\S]*status: data\.status,[\s\S]*\}\);[\s\S]*const \[matchingRows, summaryRows, createdActivityRows\] = await Promise\.all\(\[[\s\S]*\.where\(where\)[\s\S]*const matchingActivities = filterActivityLibrarySourceItems[\s\S]*summary: summarizeActivityLibrary\(matchingActivities\)/,
   'Activity list summary should be derived from the current owner-scoped status, search, template, and source filtered rows.'
 );
 assert.match(
   activitiesApiSource,
-  /const summaryWhere = buildActivityLibraryWhere\(\{[\s\S]*search: data\.search,[\s\S]*template: data\.template,[\s\S]*userId,[\s\S]*\}\);[\s\S]*const summaryRows = await db[\s\S]*\.where\(summaryWhere\)[\s\S]*const summaryActivities = filterActivityLibrarySourceItems\(\{[\s\S]*items: summaryRows,[\s\S]*source: data\.source,[\s\S]*statusSummary: summarizeActivityLibrary\(summaryActivities\)/,
+  /const summaryWhere = buildActivityLibraryWhere\(\{[\s\S]*search: data\.search,[\s\S]*template: data\.template,[\s\S]*userId,[\s\S]*\}\);[\s\S]*const \[matchingRows, summaryRows, createdActivityRows\] = await Promise\.all\(\[[\s\S]*\.where\(summaryWhere\)[\s\S]*const summaryActivities = filterActivityLibrarySourceItems\(\{[\s\S]*items: summaryRows,[\s\S]*source: data\.source,[\s\S]*statusSummary: summarizeActivityLibrary\(summaryActivities\)/,
   'Activity status metrics should use owner-scoped search, template, and source filters without applying the active/archived status filter.'
 );
 assert.doesNotMatch(
   getSourceSlice(
     activitiesApiSource,
     'const summaryWhere = buildActivityLibraryWhere',
-    'const matchingRows = await db'
+    'const [matchingRows, summaryRows, createdActivityRows] = await Promise.all'
   ),
   /status: data\.status/,
   'Activity status-summary query should omit the current status filter so the status switch can show both active and archived matching counts.'
@@ -40683,7 +40701,7 @@ assert.doesNotMatch(
 );
 assert.match(
   assignmentsApiSource,
-  /const summaryAttempts = await db[\s\S]*\.select\(buildAssignmentAttemptStatsSelect\(\)\)[\s\S]*\.innerJoin\(assignment, buildAttemptAssignmentJoin\(\)\)[\s\S]*\.where\(buildScoredAttemptWhere\(where\)\)/,
+  /const \[[\s\S]*summaryAttempts,[\s\S]*\] = await Promise\.all\(\[[\s\S]*\.select\(buildAssignmentAttemptStatsSelect\(\)\)[\s\S]*\.innerJoin\(assignment, buildAttemptAssignmentJoin\(\)\)[\s\S]*\.where\(buildScoredAttemptWhere\(where\)\)/,
   'Assignment list summaries should only read completed attempts with scored results.'
 );
 assert.match(
@@ -41750,7 +41768,7 @@ assert.match(
 );
 assert.match(
   assignmentsApiSource,
-  /const items = await db[\s\S]*\.select\(buildAssignmentDetailSelect\(\)\)[\s\S]*\.innerJoin\(activity, buildAssignmentActivityJoin\(\)\)[\s\S]*\.leftJoin\(assignmentSnapshot, buildAssignmentSnapshotJoin\(\)\)/,
+  /const \[[\s\S]*items,[\s\S]*\] = await Promise\.all\(\[[\s\S]*\.select\(buildAssignmentDetailSelect\(\)\)[\s\S]*\.innerJoin\(activity, buildAssignmentActivityJoin\(\)\)[\s\S]*\.leftJoin\(assignmentSnapshot, buildAssignmentSnapshotJoin\(\)\)/,
   'Assignment list item queries should reuse the shared assignment detail select and join shape.'
 );
 assert.match(
@@ -41798,17 +41816,17 @@ assert.match(
 );
 assert.match(
   assignmentsApiSource,
-  /totalRow[\s\S]*\.select\(buildAssignmentListCountSelect\(\)\)/,
+  /const \[[\s\S]*totalRows,[\s\S]*\] = await Promise\.all\(\[[\s\S]*\.select\(buildAssignmentListCountSelect\(\)\)/,
   'Assignment list API should reuse the count select helper.'
 );
 assert.match(
   assignmentsApiSource,
-  /matchingAssignments = await db[\s\S]*\.select\(buildAssignmentListSummarySelect\(\)\)/,
+  /const \[[\s\S]*matchingAssignments,[\s\S]*\] = await Promise\.all\(\[[\s\S]*\.select\(buildAssignmentListSummarySelect\(\)\)/,
   'Assignment list API should reuse the summary select helper.'
 );
 assert.match(
   assignmentsApiSource,
-  /const where = buildAssignmentListWhere\(\{[\s\S]*userId,[\s\S]*\}\);[\s\S]*const \[totalRow\] = await db[\s\S]*\.where\(where\)[\s\S]*const matchingAssignments = await db[\s\S]*\.where\(where\)[\s\S]*const summaryAttempts = await db[\s\S]*\.where\(buildScoredAttemptWhere\(where\)\)[\s\S]*const summary = buildAssignmentListSummary\(\{[\s\S]*attempts: summaryAttempts\.map\(withAssignmentAttemptStatsSettings\),[\s\S]*assignments: matchingAssignments,[\s\S]*totalAssignments: totalRow\?\.count \?\? 0/,
+  /const where = buildAssignmentListWhere\(\{[\s\S]*userId,[\s\S]*\}\);[\s\S]*const \[[\s\S]*totalRows,[\s\S]*matchingAssignments,[\s\S]*summaryAttempts,[\s\S]*\] = await Promise\.all\(\[[\s\S]*\.where\(where\)[\s\S]*\.where\(where\)[\s\S]*\.where\(buildScoredAttemptWhere\(where\)\)[\s\S]*const \[totalRow\] = totalRows;[\s\S]*const summary = buildAssignmentListSummary\(\{[\s\S]*attempts: summaryAttempts\.map\(withAssignmentAttemptStatsSettings\),[\s\S]*assignments: matchingAssignments,[\s\S]*totalAssignments: totalRow\?\.count \?\? 0/,
   'Assignment list summary should be derived from owner-scoped assignments and scored attempts, not starter preview content.'
 );
 assert.match(

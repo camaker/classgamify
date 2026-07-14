@@ -36,35 +36,33 @@ export const listUserFiles = createServerFn({ method: 'GET' })
     const db = getDb();
     const where = buildUserFileOwnerWhere({ userId });
 
-    const [totalRow] = await db
-      .select({ count: count() })
-      .from(userFiles)
-      .where(where);
-    const total = totalRow?.count ?? 0;
-
-    const items = await db
-      .select()
-      .from(userFiles)
-      .where(where)
-      .orderBy(...buildUserFileListOrderBy())
-      .limit(data.pageSize)
-      .offset(
-        getUserFileListOffset({
-          pageIndex: data.pageIndex,
-          pageSize: data.pageSize,
+    const [totalRows, items, summaryItems] = await Promise.all([
+      db.select({ count: count() }).from(userFiles).where(where),
+      db
+        .select()
+        .from(userFiles)
+        .where(where)
+        .orderBy(...buildUserFileListOrderBy())
+        .limit(data.pageSize)
+        .offset(
+          getUserFileListOffset({
+            pageIndex: data.pageIndex,
+            pageSize: data.pageSize,
+          })
+        ),
+      db
+        .select({
+          contentType: userFiles.contentType,
+          filename: userFiles.filename,
+          isPublic: userFiles.isPublic,
+          originalName: userFiles.originalName,
+          size: userFiles.size,
         })
-      );
-
-    const summaryItems = await db
-      .select({
-        contentType: userFiles.contentType,
-        filename: userFiles.filename,
-        isPublic: userFiles.isPublic,
-        originalName: userFiles.originalName,
-        size: userFiles.size,
-      })
-      .from(userFiles)
-      .where(where);
+        .from(userFiles)
+        .where(where),
+    ]);
+    const [totalRow] = totalRows;
+    const total = totalRow?.count ?? 0;
 
     return {
       items,
@@ -81,28 +79,28 @@ export const listUserFileMaterials = createServerFn({ method: 'GET' })
     const db = getDb();
     const where = buildUserFileOwnerWhere({ userId });
 
-    const [totalRow] = await db
-      .select({ count: count() })
-      .from(userFiles)
-      .where(where);
-    const items = await db
-      .select({
-        contentType: userFiles.contentType,
-        filename: userFiles.filename,
-        id: userFiles.id,
-        originalName: userFiles.originalName,
-        size: userFiles.size,
-      })
-      .from(userFiles)
-      .where(where)
-      .orderBy(...buildUserFileListOrderBy())
-      .limit(data.pageSize)
-      .offset(
-        getUserFileListOffset({
-          pageIndex: data.pageIndex,
-          pageSize: data.pageSize,
+    const [totalRows, items] = await Promise.all([
+      db.select({ count: count() }).from(userFiles).where(where),
+      db
+        .select({
+          contentType: userFiles.contentType,
+          filename: userFiles.filename,
+          id: userFiles.id,
+          originalName: userFiles.originalName,
+          size: userFiles.size,
         })
-      );
+        .from(userFiles)
+        .where(where)
+        .orderBy(...buildUserFileListOrderBy())
+        .limit(data.pageSize)
+        .offset(
+          getUserFileListOffset({
+            pageIndex: data.pageIndex,
+            pageSize: data.pageSize,
+          })
+        ),
+    ]);
+    const [totalRow] = totalRows;
 
     return {
       items,

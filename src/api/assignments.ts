@@ -152,51 +152,61 @@ export const listAssignments = createServerFn({ method: 'GET' })
       userId,
     });
 
-    const [totalRow] = await db
-      .select(buildAssignmentListCountSelect())
-      .from(assignment)
-      .innerJoin(activity, buildAssignmentActivityJoin())
-      .leftJoin(assignmentSnapshot, buildAssignmentSnapshotJoin())
-      .where(where);
-    const matchingAssignments = await db
-      .select(buildAssignmentListSummarySelect())
-      .from(assignment)
-      .innerJoin(activity, buildAssignmentActivityJoin())
-      .leftJoin(assignmentSnapshot, buildAssignmentSnapshotJoin())
-      .where(where);
-    const summaryAttempts = await db
-      .select(buildAssignmentAttemptStatsSelect())
-      .from(attempt)
-      .innerJoin(assignment, buildAttemptAssignmentJoin())
-      .innerJoin(activity, buildAssignmentActivityJoin())
-      .leftJoin(assignmentSnapshot, buildAssignmentSnapshotJoin())
-      .where(buildScoredAttemptWhere(where));
-    const [publishedAssignment] = data.publishedShareSlug
-      ? await db
-          .select(buildPublishedAssignmentListItemSelect())
-          .from(assignment)
-          .where(
-            buildAssignmentDetailOwnerShareWhere({
-              shareSlug: data.publishedShareSlug,
-              userId,
-            })
-          )
-          .limit(1)
-      : [];
-    const items = await db
-      .select(buildAssignmentDetailSelect())
-      .from(assignment)
-      .innerJoin(activity, buildAssignmentActivityJoin())
-      .leftJoin(assignmentSnapshot, buildAssignmentSnapshotJoin())
-      .where(where)
-      .orderBy(...buildAssignmentListOrderBy())
-      .limit(data.pageSize)
-      .offset(
-        getAssignmentListOffset({
-          pageIndex: data.pageIndex,
-          pageSize: data.pageSize,
-        })
-      );
+    const [
+      totalRows,
+      matchingAssignments,
+      summaryAttempts,
+      publishedAssignmentRows,
+      items,
+    ] = await Promise.all([
+      db
+        .select(buildAssignmentListCountSelect())
+        .from(assignment)
+        .innerJoin(activity, buildAssignmentActivityJoin())
+        .leftJoin(assignmentSnapshot, buildAssignmentSnapshotJoin())
+        .where(where),
+      db
+        .select(buildAssignmentListSummarySelect())
+        .from(assignment)
+        .innerJoin(activity, buildAssignmentActivityJoin())
+        .leftJoin(assignmentSnapshot, buildAssignmentSnapshotJoin())
+        .where(where),
+      db
+        .select(buildAssignmentAttemptStatsSelect())
+        .from(attempt)
+        .innerJoin(assignment, buildAttemptAssignmentJoin())
+        .innerJoin(activity, buildAssignmentActivityJoin())
+        .leftJoin(assignmentSnapshot, buildAssignmentSnapshotJoin())
+        .where(buildScoredAttemptWhere(where)),
+      data.publishedShareSlug
+        ? db
+            .select(buildPublishedAssignmentListItemSelect())
+            .from(assignment)
+            .where(
+              buildAssignmentDetailOwnerShareWhere({
+                shareSlug: data.publishedShareSlug,
+                userId,
+              })
+            )
+            .limit(1)
+        : Promise.resolve([]),
+      db
+        .select(buildAssignmentDetailSelect())
+        .from(assignment)
+        .innerJoin(activity, buildAssignmentActivityJoin())
+        .leftJoin(assignmentSnapshot, buildAssignmentSnapshotJoin())
+        .where(where)
+        .orderBy(...buildAssignmentListOrderBy())
+        .limit(data.pageSize)
+        .offset(
+          getAssignmentListOffset({
+            pageIndex: data.pageIndex,
+            pageSize: data.pageSize,
+          })
+        ),
+    ]);
+    const [totalRow] = totalRows;
+    const [publishedAssignment] = publishedAssignmentRows;
     const itemAssignmentIds = items.map((item) => item.assignment.id);
     const itemAttempts =
       itemAssignmentIds.length > 0

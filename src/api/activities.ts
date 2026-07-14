@@ -95,14 +95,25 @@ export const listActivities = createServerFn({ method: 'GET' })
       userId,
     });
 
-    const matchingRows = await db
-      .select(buildActivityLibraryItemSelect())
-      .from(activity)
-      .where(where);
-    const summaryRows = await db
-      .select(buildActivityLibraryItemSelect())
-      .from(activity)
-      .where(summaryWhere);
+    const [matchingRows, summaryRows, createdActivityRows] = await Promise.all([
+      db.select(buildActivityLibraryItemSelect()).from(activity).where(where),
+      db
+        .select(buildActivityLibraryItemSelect())
+        .from(activity)
+        .where(summaryWhere),
+      data.createdActivityId
+        ? db
+            .select(buildCreatedActivityListItemSelect())
+            .from(activity)
+            .where(
+              buildActivityDetailOwnerWhere({
+                activityId: data.createdActivityId,
+                userId,
+              })
+            )
+            .limit(1)
+        : Promise.resolve([]),
+    ]);
     const matchingActivities = filterActivityLibrarySourceItems({
       items: matchingRows,
       source: data.source,
@@ -112,18 +123,7 @@ export const listActivities = createServerFn({ method: 'GET' })
       source: data.source,
     });
     const total = matchingActivities.length;
-    const [createdActivity] = data.createdActivityId
-      ? await db
-          .select(buildCreatedActivityListItemSelect())
-          .from(activity)
-          .where(
-            buildActivityDetailOwnerWhere({
-              activityId: data.createdActivityId,
-              userId,
-            })
-          )
-          .limit(1)
-      : [];
+    const [createdActivity] = createdActivityRows;
     const items = getActivityLibraryPageItems({
       items: matchingActivities,
       pageIndex: data.pageIndex,

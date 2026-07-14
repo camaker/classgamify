@@ -63,6 +63,13 @@ must lead teacher-scoped indexes, lifecycle and identity filters must follow
 their actual query order, and stable time/id ordering must remain explicit so
 larger classroom libraries do not fall back to avoidable table scans or
 temporary sorting.
+The list APIs should also keep a 30-stage classroom query execution contract:
+independent D1 reads for activity lists, assignment summaries, published-link
+context, file pages, and file summaries run behind one explicit barrier per
+surface, while the dependent page-attempt query waits for the selected page's
+assignment ids. Owner scope is prepared before each read group, domain filtering
+and summaries run after the barrier, and these list paths remain read-only and
+free of student answers, anonymous tokens, or source-material storage keys.
 Teacher workspace operations should keep dashboard owner summaries, activity
 library filters, assignment distribution, account governance, payment callback,
 settings files/billing/notification, and active-surface copy boundaries aligned

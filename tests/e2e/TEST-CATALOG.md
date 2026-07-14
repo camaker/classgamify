@@ -187,6 +187,12 @@ Classroom query index contract has a fast script-level gate via
 when changing D1 activity, assignment, attempt, source-material, or payment
 owner filters, lifecycle filters, identity lookups, stable ordering, named
 indexes, or generated migrations for the 30-path classroom read contract.
+Classroom query execution contract has a fast script-level gate via
+`pnpm exec tsx --test scripts/classroom-query-execution-contract.test.ts`; run
+it when changing activity, assignment, file, or material-picker list reads,
+their `Promise.all` barriers, conditional published/created context reads,
+dependent page-attempt statistics, owner scope, pagination, summaries, or the
+30-stage read-only execution contract.
 Workspace governance and utility gates include
 `pnpm exec tsx --test scripts/admin-users-handoff-semantic-views.test.ts`,
 `pnpm exec tsx --test scripts/billing-semantic-views.test.ts`, and
