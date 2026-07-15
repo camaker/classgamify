@@ -430,6 +430,12 @@ run it when changing completions, average accuracy, average points, average
 duration, timer caps, result metric cards, assignment list summaries,
 assignment cards, classroom briefs, copy artifacts, CSV exports, or the
 assignment-attempt-stats handoff.
+Assignment attempt stats continuity has a focused source-chain gate via
+`pnpm exec tsx --test scripts/assignment-attempt-stats-continuity-chain-handoff.test.ts`;
+run it when changing the 30-slice source-level contract for completed scored
+attempts, timer or score normalization, assignment list/card summaries,
+teacher result metrics, classroom briefs, copy artifacts, CSV export, hidden
+semantic output, or aggregate-only privacy guards.
 Legacy public route retirement has a fast script-level gate via
 `pnpm exec tsx --test scripts/legacy-public-route-handoff-semantic-views.test.ts`;
 run it when changing retired copied-learning routes, route-tree cleanup,

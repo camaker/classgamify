@@ -678,6 +678,15 @@ Assignment attempt metrics such as completions, average accuracy, average
 points, and average duration should be computed through shared assignment-domain
 stats helpers before they reach assignment lists, result pages, classroom
 briefs, or CSV exports.
+The attempt statistics continuity chain should carry the existing attempt-stats
+handoff as a 30-slice source-level contract across completed scored attempts,
+timer-aware duration normalization, score and earned-points fallbacks, numeric
+guards, assignment lists, result pages, classroom briefs, copy artifacts, CSV
+exports, and privacy. Its aggregate summary must not expose student labels,
+anonymous tokens, prompts, runtime item ids, answer text, accepted answers,
+teacher answer keys, share slugs, copy artifact text, or CSV data URLs.
+`src/assignments/attempt-stats-continuity-chain.ts` owns this source contract
+without replacing the localized hidden semantic attempt-stats handoff.
 Result metric cards, current review-status summaries, review-scope summaries,
 classroom-brief coverage, and copy-scope previews should expose the same
 prepared result-domain labels, values, descriptions, and accessible labels as
