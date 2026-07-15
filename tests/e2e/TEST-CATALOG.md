@@ -104,6 +104,14 @@ printable worksheet review lifecycle, copy/export/print handoffs,
 teacher workspace operations and its dashboard overview boundary, public
 discovery and indexing alignment with its public metadata handoff boundary, or
 privacy guards.
+Local persisted browser journey chain has a fast script-level gate via
+`pnpm exec tsx --test scripts/local-persisted-browser-journey-chain-handoff.test.ts`;
+run it when changing the local saved activity -> published assignment ->
+student attempt -> result filters -> classroom brief -> CSV -> printable
+worksheet -> answer key -> return-to-results journey, the persisted browser
+spec that exercises it, or the result-material, result-review, copy-artifact,
+CSV export, printable worksheet, browser-health, and private-data boundaries
+that keep this real classroom loop connected.
 Active surface product boundary has a fast script-level gate via
 `pnpm exec tsx --test scripts/active-surface-product-boundary.test.ts`; run it
 when changing active account governance, contact, billing/payment callback,

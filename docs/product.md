@@ -689,6 +689,11 @@ return to results. It should verify the result-material, result-review,
 copy-artifact, and printable-worksheet 30-slice handoffs in the rendered DOM so
 the source contracts remain connected to the real Activity -> Assignment ->
 Attempt -> Results workflow.
+`src/config/local-persisted-browser-journey-chain.ts` keeps that real browser
+loop as a 30-slice source-level contract across local e2e account isolation,
+teacher auth, activity save, assignment publish, student runner submission,
+result filters, copy/CSV actions, printable worksheet answer-key state,
+return-to-results navigation, browser health, and privacy guards.
 The teacher result page should show the student summary, the top reteach
 priorities, and the full item performance table so a teacher can scan the
 class before opening individual student answers. The full item performance
