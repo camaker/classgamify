@@ -329,6 +329,12 @@ run it when changing progress counts, payload summaries, submit-readiness,
 partial-submit confirmation, identity or timer state, post-submit review,
 feedback scope, next steps, public runner submission privacy-scope boundaries,
 or the hidden student-runner-submission handoff.
+Student runner submission chain has a fast script-level gate via
+`pnpm exec tsx --test scripts/student-runner-submission-chain-handoff.test.ts`;
+run it when changing progress, payload summary, submit-readiness, identity
+privacy, timer, attempt duration, result panel, review summary, feedback scope,
+next steps, privacy guards, or the source-level student-runner-submission
+chain.
 Student runner submit controls have a fast script-level gate via
 `pnpm exec tsx --test scripts/student-runner-submit-controls-handoff-semantic-views.test.ts`;
 run it when changing the 30-slice submit-control readiness details, safe

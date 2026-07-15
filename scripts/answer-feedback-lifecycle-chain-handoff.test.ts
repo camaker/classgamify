@@ -358,7 +358,15 @@ test('runtime scoring and server review summary use shared feedback evidence', (
   );
   assert.match(
     ASSIGNMENTS_API_SOURCE,
-    /evaluateRuntimeAnswers\(\{[\s\S]*answers: submittedAnswers[\s\S]*buildPublicAttemptReviewSummaryView\(\{[\s\S]*answers: evaluation\.answers[\s\S]*runtimeItems: orderedRuntimeItems[\s\S]*showCorrectAnswers: settings\.showCorrectAnswers/
+    /const evaluation = evaluateRuntimeAnswers\(\{[\s\S]*answers: submittedAnswers/
+  );
+  assert.match(
+    ASSIGNMENTS_API_SOURCE,
+    /return buildAttemptSubmissionResponse\(\{[\s\S]*answers: evaluation\.answers/
+  );
+  assert.match(
+    ASSIGNMENTS_API_SOURCE,
+    /function buildAttemptSubmissionResponse[\s\S]*buildPublicAttemptReviewSummaryView\(\{[\s\S]*answers,[\s\S]*runtimeItems: orderedRuntimeItems,[\s\S]*showCorrectAnswers: settings\.showCorrectAnswers/
   );
   assertNoPrivateFeedbackText(JSON.stringify(reviewSummary));
 });

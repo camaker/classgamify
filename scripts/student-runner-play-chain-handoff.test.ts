@@ -222,8 +222,28 @@ test('student runner sources preserve public payload and submit boundaries', () 
   );
   assert.match(
     ASSIGNMENTS_API_SOURCE,
-    /assertAssignmentAcceptsSubmissions\(\{[\s\S]*normalizeAttemptDurationSeconds\(\{[\s\S]*normalizeSubmittedAttemptAnswers\(data\.answers\)[\s\S]*assertSubmittedAnswersMatchRuntimeItems\(\{[\s\S]*buildScoredAttemptInsert\(\{/,
-    'Submit-attempt API should share lifecycle, duration, answer validation, and persistence helpers.'
+    /assertAssignmentAcceptsSubmissions\(\{/,
+    'Submit-attempt API should share lifecycle submission checks.'
+  );
+  assert.match(
+    ASSIGNMENTS_API_SOURCE,
+    /normalizeAttemptDurationSeconds\(\{/,
+    'Submit-attempt API should normalize submitted attempt durations.'
+  );
+  assert.match(
+    ASSIGNMENTS_API_SOURCE,
+    /normalizeSubmittedAttemptAnswers\(data\.answers\)[\s\S]*assertSubmittedAnswersMatchRuntimeItems\(\{/,
+    'Submit-attempt API should validate submitted answers against runtime items.'
+  );
+  assert.match(
+    ASSIGNMENTS_API_SOURCE,
+    /evaluateRuntimeAnswers\(\{[\s\S]*answers: submittedAnswers/,
+    'Submit-attempt API should score normalized submitted answers.'
+  );
+  assert.match(
+    ASSIGNMENTS_API_SOURCE,
+    /buildScoredAttemptInsert\(\{/,
+    'Submit-attempt API should persist through the scored-attempt insert helper.'
   );
 });
 

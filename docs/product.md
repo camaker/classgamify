@@ -605,6 +605,10 @@ and post-submit next-step views as stable semantic label/value/description
 outputs, so students and assistive technology receive the same submission
 state without exposing student names, answer text, anonymous tokens, or
 teacher-only answers in the pre-submit payload summary.
+`src/assignments/student-runner-submission-chain.ts` owns the
+student-runner-submission chain as a 30-slice source-level contract for
+progress, payload, submit-readiness, identity, timer, result, review-summary,
+feedback-scope, next-step, and privacy alignment.
 Pure assignment-domain helpers should have fast script-level coverage so core
 submission semantics can be verified without depending on the local Workers
 E2E runtime.
