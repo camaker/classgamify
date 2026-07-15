@@ -263,6 +263,10 @@ extraction-readiness actions, edit-return path, ActivityContent reference, and
 privacy guards. Its aggregate summary may expose safe counts and material kinds,
 but must not expose filenames, file ids, content types, per-file sizes, file
 bytes, storage keys, permission metadata, or student payload file references.
+`src/activities/activity-source-material-summary-chain.ts` owns this
+source-level contract so activity-library cards, source-material filters,
+source-extraction readiness, AI provenance, editor return paths, and student
+payload privacy stay aligned without adding a new visible card surface.
 Activity library filter parsing and search normalization should also live in
 activity-domain helpers so URL state, dashboard controls, and list API queries
 share the same activity status and template-family rules.
