@@ -166,6 +166,15 @@ references are rebuilt from authoritative database filename, content-type, and
 size metadata in the teacher's requested order rather than trusting client
 metadata. Empty reference lists skip the query, duplicate ids stay collapsed,
 and validation never selects R2 keys, permission metadata, URLs, or file bytes.
+The activity source-material write continuity chain should carry this create and
+edit boundary as 30 source-level slices across normalized references, duplicate
+collapse, reference limits and ordering, owner-scoped batch reads, minimal file
+metadata selects, authoritative reference rebuilding, empty-query bypass,
+all-or-nothing persistence, activity mutation, derivative and publish paths,
+snapshot protection, and privacy. Its aggregate summary must not expose other
+owner rows, R2 keys, permission metadata, or file bytes.
+`src/activities/source-material-write-continuity-chain.ts` owns this source
+contract without rendering storage internals in teacher or student interfaces.
 Source-material deletion must preserve the same reference lifecycle. Before
 deleting an owner-scoped `userFiles` object, the server checks both saved activity
 content and frozen assignment snapshots for the file id. Active and archived

@@ -221,6 +221,12 @@ Activity source-material writes have a fast script-level gate via
 run it when changing create/edit material persistence, owner-scoped user-file
 queries, authoritative metadata rebuilding, missing-reference handling, empty
 reference bypass, source-material order/count rules, or storage/file privacy.
+Activity source-material write continuity has a focused source-chain gate via
+`pnpm exec tsx --test scripts/activity-source-material-write-continuity-chain-handoff.test.ts`;
+run it when changing the 30-slice source-level contract for normalized material
+references, owner-scoped batch reads, compact metadata selects, authoritative
+rebuilds, all-or-nothing create/edit writes, downstream derivative/publish paths,
+snapshot protection, or storage privacy.
 Source-material deletion has a fast script-level gate via
 `pnpm exec tsx --test scripts/activity-source-material-delete-contract.test.ts`;
 run it when changing file deletion, activity/snapshot JSON reference queries,
