@@ -436,6 +436,17 @@ card layout alone.
 Assignment list filter parsing and search normalization should live in
 assignment-domain helpers so route URLs, list API filters, and dashboard filter
 controls stay aligned.
+The assignment-list filter-state chain should expose a hidden, localized
+30-slice contract covering URL validation, default route elision,
+published-share context normalization and preservation, search normalization,
+assignment-title/share-id/source-activity search fields, status parsing and
+published-to-open aliasing, page parsing, page-size boundaries, filter-change
+page reset, page-change filter preservation, clear controls, dashboard controls,
+list API owner scope, search/status SQL boundaries, full-result summaries, and
+privacy guards. Its fast gate should verify that these outputs come from
+assignment-domain helpers and never expose assignment ids, owner ids, public
+runtime content, raw tokens, result export rows, source storage keys, student
+answers, or teacher-only answers.
 The assignment source activity context chain should explicitly carry the
 30-slice result-material handoff so frozen source title, description, template,
 and snapshot provenance remain connected to teacher copy artifacts, CSV

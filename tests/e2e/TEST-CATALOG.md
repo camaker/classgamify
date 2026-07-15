@@ -679,6 +679,13 @@ via `pnpm exec tsx --test scripts/assignment-list-semantic-views.test.ts`; run
 it when changing assignment list overview metrics, status/search filters,
 published share context, visible-card counts, assignment list privacy-scope
 boundaries, or the hidden assignment-list handoff.
+Assignment list filter-state handoff has a focused fast gate via
+`pnpm exec tsx --test scripts/assignment-list-filter-state-handoff-semantic-views.test.ts`;
+run it when changing assignment list URL validation, published context
+normalization or preservation, search normalization, page reset, dashboard
+controls, list API owner scope, search where clauses, status filters, full
+filtered-result summaries, privacy guards, or the hidden assignment list
+filter-state handoff.
 Assignment distribution lifecycle chain has a fast script-level gate via
 `pnpm exec tsx --test scripts/assignment-distribution-lifecycle-chain-handoff.test.ts`;
 run it when changing post-publish route context, owner-scoped published lookup,

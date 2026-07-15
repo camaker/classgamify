@@ -966,6 +966,7 @@ import {
   normalizeAssignmentListSummaryCount,
 } from '@/assignments/list-summary';
 import {
+  ASSIGNMENT_LIST_FILTER_HANDOFF_ITEM_IDS,
   ASSIGNMENT_LIST_PAGE_HANDOFF_ITEM_IDS,
   assignmentListActionCopy,
   assignmentListPageCopy,
@@ -41340,6 +41341,16 @@ assert.match(
   'Assignment list filters component should render filter summary and status options from the assignment-domain search panel view.'
 );
 assert.match(
+  assignmentListViewSource,
+  /export const ASSIGNMENT_LIST_FILTER_HANDOFF_ITEM_IDS = \[[\s\S]*'route-validate-search'[\s\S]*'published-context-preservation'[\s\S]*'search-normalized-query'[\s\S]*'status-published-alias'[\s\S]*'list-api-owner-scope'[\s\S]*'full-summary-filter-result'[\s\S]*'privacy-guard'[\s\S]*\] as const;[\s\S]*export type AssignmentListFilterHandoffPrivacyView = \{[\s\S]*preservesPublishedContext: true;[\s\S]*resetsPageOnFilterChange: true;[\s\S]*routesThroughValidatedSearch: true;[\s\S]*scope: 'owner-assignment-list-filter-state';[\s\S]*usesFullFilteredSummaryForOverview: true;/,
+  'Assignment list filter-state handoff should expose a stable 30-slice owner-scoped filter contract with privacy flags.'
+);
+assert.match(
+  assignmentListFiltersComponentSource,
+  /data-handoff="assignment-list-filter-state"[\s\S]*data-handoff-scope=\{handoffView\.privacy\.scope\}[\s\S]*handoffView\.itemViews\.map\(\(item\) =>[\s\S]*AssignmentListFilterHandoffItem[\s\S]*const labelId = `assignment-list-filter-state-\$\{item\.id\}-label`[\s\S]*const valueId = `assignment-list-filter-state-\$\{item\.id\}-value`[\s\S]*const descriptionId = `assignment-list-filter-state-\$\{item\.id\}-description`[\s\S]*data-handoff-item=\{item\.id\}/,
+  'Assignment list filters component should expose the hidden filter-state marker and stable item label/value/description ids.'
+);
+assert.match(
   dashboardAssignmentsRouteSource,
   /<AssignmentListFilters[\s\S]*summary=\{data\?\.summary\}/,
   'Assignment dashboard route should pass filtered assignment summary data into the filters panel.'
@@ -48894,6 +48905,8 @@ assert.deepEqual(ASSIGNMENT_LIST_INPUT_LIMITS, {
   searchMaxLength: 120,
 });
 assert.equal(ASSIGNMENT_LIST_PAGE_SIZE, 12);
+assert.equal(ASSIGNMENT_LIST_FILTER_HANDOFF_ITEM_IDS.length, 30);
+assert.equal(new Set(ASSIGNMENT_LIST_FILTER_HANDOFF_ITEM_IDS).size, 30);
 assert.equal(getAssignmentListOffset({ pageIndex: 2, pageSize: 25 }), 50);
 assert.equal(getAssignmentListOffset({ pageIndex: -1, pageSize: 25 }), 0);
 assert.equal(getAssignmentListOffset({ pageIndex: 2, pageSize: 0 }), 24);
@@ -49122,22 +49135,26 @@ assert.deepEqual(
   }),
   { hasFilters: true, text: '0 matches' }
 );
+const {
+  filterHandoffView: assignmentListFilterHandoffView,
+  ...assignmentListSearchPanelView
+} = buildAssignmentListSearchPanelView({
+  isLoading: false,
+  search: ' week ',
+  status: 'open',
+  summary: {
+    averageScore: 80,
+    closedAssignments: 1,
+    completions: 4,
+    draftAssignments: 1,
+    expiredAssignments: 2,
+    openAssignments: 2,
+    totalAssignments: 6,
+  },
+  total: 2,
+});
 assert.deepEqual(
-  buildAssignmentListSearchPanelView({
-    isLoading: false,
-    search: ' week ',
-    status: 'open',
-    summary: {
-      averageScore: 80,
-      closedAssignments: 1,
-      completions: 4,
-      draftAssignments: 1,
-      expiredAssignments: 2,
-      openAssignments: 2,
-      totalAssignments: 6,
-    },
-    total: 2,
-  }),
+  assignmentListSearchPanelView,
   {
     filterSummary: { hasFilters: true, text: '2 matches' },
     hasSearchValue: true,
@@ -49180,12 +49197,28 @@ assert.deepEqual(
   }
 );
 assert.deepEqual(
-  buildAssignmentListSearchPanelView({
-    isLoading: true,
-    search: '',
-    status: 'all',
-    total: 0,
-  }),
+  assignmentListFilterHandoffView.itemViews.map((item) => item.id),
+  [...ASSIGNMENT_LIST_FILTER_HANDOFF_ITEM_IDS]
+);
+assert.equal(
+  assignmentListFilterHandoffView.privacy.scope,
+  'owner-assignment-list-filter-state'
+);
+assert.equal(
+  assignmentListFilterHandoffView.privacy.usesFullFilteredSummaryForOverview,
+  true
+);
+const {
+  filterHandoffView: defaultAssignmentListFilterHandoffView,
+  ...defaultAssignmentListSearchPanelView
+} = buildAssignmentListSearchPanelView({
+  isLoading: true,
+  search: '',
+  status: 'all',
+  total: 0,
+});
+assert.deepEqual(
+  defaultAssignmentListSearchPanelView,
   {
     filterSummary: {
       hasFilters: false,
@@ -49229,6 +49262,14 @@ assert.deepEqual(
     ],
     statusOptions: assignmentStatusFilterOptions,
   }
+);
+assert.deepEqual(
+  defaultAssignmentListFilterHandoffView.itemViews.map((item) => item.id),
+  [...ASSIGNMENT_LIST_FILTER_HANDOFF_ITEM_IDS]
+);
+assert.equal(
+  defaultAssignmentListFilterHandoffView.privacy.routesThroughValidatedSearch,
+  true
 );
 assert.equal(
   buildAssignmentListSearchPanelView({

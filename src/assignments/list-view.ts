@@ -20,6 +20,7 @@ import {
   buildAssignmentSettingsSummaryView,
 } from '@/assignments/delivery-summary';
 import {
+  ASSIGNMENT_LIFECYCLE_STATUS_FILTERS,
   ASSIGNMENT_LIST_PAGE_SIZE,
   type AssignmentLifecycleStatusFilter,
   type AssignmentStatusFilter,
@@ -116,12 +117,88 @@ export type AssignmentListFilterScopeBoundary = {
 
 export type AssignmentListSearchPanelView = {
   filterSummary: AssignmentListFilterSummary;
+  filterHandoffView: AssignmentListFilterHandoffView;
   hasSearchValue: boolean;
   searchDescription: string;
   statusDescription: string;
   statusLabel: string;
   statusMetrics: AssignmentListStatusMetric[];
   statusOptions: AssignmentListControlOption[];
+};
+
+export const ASSIGNMENT_LIST_FILTER_HANDOFF_ITEM_IDS = [
+  'route-validate-search',
+  'route-default-elision',
+  'published-context-normalization',
+  'published-context-preservation',
+  'search-normalized-query',
+  'search-width-normalization',
+  'search-whitespace-collapse',
+  'search-empty-default',
+  'search-assignment-title',
+  'search-share-id',
+  'search-source-activity',
+  'status-parser',
+  'status-all-default',
+  'status-published-alias',
+  'status-open-filter',
+  'status-closed-filter',
+  'status-expired-filter',
+  'status-draft-filter',
+  'page-parser',
+  'page-size-boundary',
+  'filter-change-page-reset',
+  'page-change-filter-preservation',
+  'clear-search-control',
+  'clear-filter-control',
+  'dashboard-control-options',
+  'list-api-owner-scope',
+  'list-api-search-where',
+  'list-api-status-filter',
+  'full-summary-filter-result',
+  'privacy-guard',
+] as const;
+
+export type AssignmentListFilterHandoffItemId =
+  (typeof ASSIGNMENT_LIST_FILTER_HANDOFF_ITEM_IDS)[number];
+
+export type AssignmentListFilterHandoffItemView = {
+  ariaLabel: string;
+  description: string;
+  id: AssignmentListFilterHandoffItemId;
+  label: string;
+  value: string;
+};
+
+export type AssignmentListFilterHandoffPrivacyView = {
+  exposesInternalAssignmentIds: false;
+  exposesInternalOwnerId: false;
+  exposesPublicRuntimeContent: false;
+  exposesRawAnonymousToken: false;
+  exposesResultExportRows: false;
+  exposesSourceMaterialStorageKeys: false;
+  exposesStudentAnswerText: false;
+  exposesTeacherOnlyAnswers: false;
+  itemIds: AssignmentListFilterHandoffItemId[];
+  preservesPublishedContext: true;
+  resetsPageOnFilterChange: true;
+  routesThroughValidatedSearch: true;
+  scope: 'owner-assignment-list-filter-state';
+  searchMatchesAssignmentTitle: true;
+  searchMatchesShareSlug: true;
+  searchMatchesSourceActivityText: true;
+  sharesRulesWithDashboardControls: true;
+  sharesRulesWithListApi: true;
+  statusFilters: AssignmentLifecycleStatusFilter[];
+  usesDomainSearchNormalization: true;
+  usesFullFilteredSummaryForOverview: true;
+};
+
+export type AssignmentListFilterHandoffView = {
+  description: string;
+  itemViews: AssignmentListFilterHandoffItemView[];
+  privacy: AssignmentListFilterHandoffPrivacyView;
+  title: string;
 };
 
 export const ASSIGNMENT_LIST_PAGE_HANDOFF_ITEM_IDS = [
@@ -612,13 +689,19 @@ export function buildAssignmentListSearchPanelView({
 }): AssignmentListSearchPanelView {
   const normalizedSearch = normalizeAssignmentListSearch(search);
   const statusView = getAssignmentListStatusFilterView(status);
+  const filterSummary = buildAssignmentListFilterSummary({
+    isLoading,
+    search: normalizedSearch,
+    status,
+    total,
+  });
 
   return {
-    filterSummary: buildAssignmentListFilterSummary({
-      isLoading,
-      search: normalizedSearch,
-      status,
-      total,
+    filterSummary,
+    filterHandoffView: buildAssignmentListFilterHandoffView({
+      filterSummary,
+      normalizedSearch,
+      statusView,
     }),
     hasSearchValue: Boolean(normalizedSearch),
     searchDescription: assignmentListSearchCopy.searchDescription,
@@ -629,6 +712,335 @@ export function buildAssignmentListSearchPanelView({
     statusLabel: statusView.label,
     statusMetrics: buildAssignmentListStatusMetrics(summary),
     statusOptions: assignmentStatusFilterOptions,
+  };
+}
+
+export function buildAssignmentListFilterHandoffView({
+  filterSummary,
+  normalizedSearch,
+  statusView,
+}: {
+  filterSummary: AssignmentListFilterSummary;
+  normalizedSearch?: string;
+  statusView: AssignmentListControlOption;
+}): AssignmentListFilterHandoffView {
+  const itemViews = ASSIGNMENT_LIST_FILTER_HANDOFF_ITEM_IDS.map((id) =>
+    buildAssignmentListFilterHandoffItem({
+      filterSummary,
+      id,
+      normalizedSearch,
+      statusView,
+    })
+  );
+
+  return {
+    description: m.assignment_list_filter_handoff_description(),
+    itemViews,
+    privacy: {
+      exposesInternalAssignmentIds: false,
+      exposesInternalOwnerId: false,
+      exposesPublicRuntimeContent: false,
+      exposesRawAnonymousToken: false,
+      exposesResultExportRows: false,
+      exposesSourceMaterialStorageKeys: false,
+      exposesStudentAnswerText: false,
+      exposesTeacherOnlyAnswers: false,
+      itemIds: [...ASSIGNMENT_LIST_FILTER_HANDOFF_ITEM_IDS],
+      preservesPublishedContext: true,
+      resetsPageOnFilterChange: true,
+      routesThroughValidatedSearch: true,
+      scope: 'owner-assignment-list-filter-state',
+      searchMatchesAssignmentTitle: true,
+      searchMatchesShareSlug: true,
+      searchMatchesSourceActivityText: true,
+      sharesRulesWithDashboardControls: true,
+      sharesRulesWithListApi: true,
+      statusFilters: [...ASSIGNMENT_LIFECYCLE_STATUS_FILTERS],
+      usesDomainSearchNormalization: true,
+      usesFullFilteredSummaryForOverview: true,
+    },
+    title: m.assignment_list_filter_handoff_title(),
+  };
+}
+
+function buildAssignmentListFilterHandoffItem({
+  filterSummary,
+  id,
+  normalizedSearch,
+  statusView,
+}: {
+  filterSummary: AssignmentListFilterSummary;
+  id: AssignmentListFilterHandoffItemId;
+  normalizedSearch?: string;
+  statusView: AssignmentListControlOption;
+}): AssignmentListFilterHandoffItemView {
+  const item = getAssignmentListFilterHandoffItem({
+    filterSummary,
+    id,
+    normalizedSearch,
+    statusView,
+  });
+
+  return {
+    ...item,
+    ariaLabel: m.assignment_list_filter_handoff_item_aria({
+      description: item.description,
+      label: item.label,
+      value: item.value,
+    }),
+  };
+}
+
+function getAssignmentListFilterHandoffItem({
+  filterSummary,
+  id,
+  normalizedSearch,
+  statusView,
+}: {
+  filterSummary: AssignmentListFilterSummary;
+  id: AssignmentListFilterHandoffItemId;
+  normalizedSearch?: string;
+  statusView: AssignmentListControlOption;
+}): Omit<AssignmentListFilterHandoffItemView, 'ariaLabel' | 'id'> & {
+  id: AssignmentListFilterHandoffItemId;
+} {
+  switch (id) {
+    case 'route-validate-search':
+      return assignmentFilterItem(
+        id,
+        m.assignment_list_filter_handoff_route_validate_search_label(),
+        m.assignment_list_filter_handoff_route_validate_search_value(),
+        m.assignment_list_filter_handoff_route_validate_search_description()
+      );
+    case 'route-default-elision':
+      return assignmentFilterItem(
+        id,
+        m.assignment_list_filter_handoff_route_default_elision_label(),
+        m.assignment_list_filter_handoff_route_default_elision_value(),
+        m.assignment_list_filter_handoff_route_default_elision_description()
+      );
+    case 'published-context-normalization':
+      return assignmentFilterItem(
+        id,
+        m.assignment_list_filter_handoff_published_context_normalization_label(),
+        m.assignment_list_filter_handoff_published_context_normalization_value(),
+        m.assignment_list_filter_handoff_published_context_normalization_description()
+      );
+    case 'published-context-preservation':
+      return assignmentFilterItem(
+        id,
+        m.assignment_list_filter_handoff_published_context_preservation_label(),
+        m.assignment_list_filter_handoff_published_context_preservation_value(),
+        m.assignment_list_filter_handoff_published_context_preservation_description()
+      );
+    case 'search-normalized-query':
+      return assignmentFilterItem(
+        id,
+        m.assignment_list_filter_handoff_search_normalized_query_label(),
+        normalizedSearch ?? m.assignment_list_scope_search_all_value(),
+        m.assignment_list_filter_handoff_search_normalized_query_description()
+      );
+    case 'search-width-normalization':
+      return assignmentFilterItem(
+        id,
+        m.assignment_list_filter_handoff_search_width_normalization_label(),
+        m.assignment_list_filter_handoff_search_width_normalization_value(),
+        m.assignment_list_filter_handoff_search_width_normalization_description()
+      );
+    case 'search-whitespace-collapse':
+      return assignmentFilterItem(
+        id,
+        m.assignment_list_filter_handoff_search_whitespace_collapse_label(),
+        m.assignment_list_filter_handoff_search_whitespace_collapse_value(),
+        m.assignment_list_filter_handoff_search_whitespace_collapse_description()
+      );
+    case 'search-empty-default':
+      return assignmentFilterItem(
+        id,
+        m.assignment_list_filter_handoff_search_empty_default_label(),
+        normalizedSearch
+          ? m.assignment_list_filter_handoff_search_filtered_value()
+          : m.assignment_list_scope_search_all_value(),
+        m.assignment_list_filter_handoff_search_empty_default_description()
+      );
+    case 'search-assignment-title':
+      return assignmentFilterItem(
+        id,
+        m.assignment_list_filter_handoff_search_assignment_title_label(),
+        m.assignment_list_filter_handoff_search_assignment_title_value(),
+        m.assignment_list_filter_handoff_search_assignment_title_description()
+      );
+    case 'search-share-id':
+      return assignmentFilterItem(
+        id,
+        m.assignment_list_filter_handoff_search_share_id_label(),
+        m.assignment_list_filter_handoff_search_share_id_value(),
+        m.assignment_list_filter_handoff_search_share_id_description()
+      );
+    case 'search-source-activity':
+      return assignmentFilterItem(
+        id,
+        m.assignment_list_filter_handoff_search_source_activity_label(),
+        m.assignment_list_filter_handoff_search_source_activity_value(),
+        m.assignment_list_filter_handoff_search_source_activity_description()
+      );
+    case 'status-parser':
+      return assignmentFilterItem(
+        id,
+        m.assignment_list_filter_handoff_status_parser_label(),
+        m.assignment_list_filter_handoff_status_parser_value(),
+        m.assignment_list_filter_handoff_status_parser_description()
+      );
+    case 'status-all-default':
+      return assignmentFilterItem(
+        id,
+        m.assignment_list_filter_handoff_status_all_default_label(),
+        assignmentStatusFilterOptions[0].label,
+        m.assignment_list_filter_handoff_status_all_default_description()
+      );
+    case 'status-published-alias':
+      return assignmentFilterItem(
+        id,
+        m.assignment_list_filter_handoff_status_published_alias_label(),
+        m.assignment_list_filter_handoff_status_published_alias_value(),
+        m.assignment_list_filter_handoff_status_published_alias_description()
+      );
+    case 'status-open-filter':
+      return assignmentFilterItem(
+        id,
+        m.assignment_list_filter_handoff_status_open_filter_label(),
+        statusView.value === 'open'
+          ? statusView.label
+          : m.assignment_list_status_filter_published(),
+        m.assignment_list_filter_handoff_status_open_filter_description()
+      );
+    case 'status-closed-filter':
+      return assignmentFilterItem(
+        id,
+        m.assignment_list_filter_handoff_status_closed_filter_label(),
+        statusView.value === 'closed'
+          ? statusView.label
+          : m.assignment_list_status_filter_closed(),
+        m.assignment_list_filter_handoff_status_closed_filter_description()
+      );
+    case 'status-expired-filter':
+      return assignmentFilterItem(
+        id,
+        m.assignment_list_filter_handoff_status_expired_filter_label(),
+        statusView.value === 'expired'
+          ? statusView.label
+          : m.assignment_list_status_filter_expired(),
+        m.assignment_list_filter_handoff_status_expired_filter_description()
+      );
+    case 'status-draft-filter':
+      return assignmentFilterItem(
+        id,
+        m.assignment_list_filter_handoff_status_draft_filter_label(),
+        statusView.value === 'draft'
+          ? statusView.label
+          : m.assignment_list_status_filter_draft(),
+        m.assignment_list_filter_handoff_status_draft_filter_description()
+      );
+    case 'page-parser':
+      return assignmentFilterItem(
+        id,
+        m.assignment_list_filter_handoff_page_parser_label(),
+        m.assignment_list_filter_handoff_page_parser_value(),
+        m.assignment_list_filter_handoff_page_parser_description()
+      );
+    case 'page-size-boundary':
+      return assignmentFilterItem(
+        id,
+        m.assignment_list_filter_handoff_page_size_boundary_label(),
+        m.assignment_list_filter_handoff_page_size_boundary_value({
+          count: String(ASSIGNMENT_LIST_PAGE_SIZE),
+        }),
+        m.assignment_list_filter_handoff_page_size_boundary_description()
+      );
+    case 'filter-change-page-reset':
+      return assignmentFilterItem(
+        id,
+        m.assignment_list_filter_handoff_filter_change_page_reset_label(),
+        m.assignment_list_filter_handoff_filter_change_page_reset_value(),
+        m.assignment_list_filter_handoff_filter_change_page_reset_description()
+      );
+    case 'page-change-filter-preservation':
+      return assignmentFilterItem(
+        id,
+        m.assignment_list_filter_handoff_page_change_filter_preservation_label(),
+        m.assignment_list_filter_handoff_page_change_filter_preservation_value(),
+        m.assignment_list_filter_handoff_page_change_filter_preservation_description()
+      );
+    case 'clear-search-control':
+      return assignmentFilterItem(
+        id,
+        m.assignment_list_filter_handoff_clear_search_control_label(),
+        m.assignment_list_filter_handoff_clear_search_control_value(),
+        m.assignment_list_filter_handoff_clear_search_control_description()
+      );
+    case 'clear-filter-control':
+      return assignmentFilterItem(
+        id,
+        m.assignment_list_filter_handoff_clear_filter_control_label(),
+        m.assignment_list_filter_handoff_clear_filter_control_value(),
+        m.assignment_list_filter_handoff_clear_filter_control_description()
+      );
+    case 'dashboard-control-options':
+      return assignmentFilterItem(
+        id,
+        m.assignment_list_filter_handoff_dashboard_control_options_label(),
+        m.assignment_list_filter_handoff_dashboard_control_options_value(),
+        m.assignment_list_filter_handoff_dashboard_control_options_description()
+      );
+    case 'list-api-owner-scope':
+      return assignmentFilterItem(
+        id,
+        m.assignment_list_filter_handoff_list_api_owner_scope_label(),
+        m.assignment_list_filter_handoff_list_api_owner_scope_value(),
+        m.assignment_list_filter_handoff_list_api_owner_scope_description()
+      );
+    case 'list-api-search-where':
+      return assignmentFilterItem(
+        id,
+        m.assignment_list_filter_handoff_list_api_search_where_label(),
+        m.assignment_list_filter_handoff_list_api_search_where_value(),
+        m.assignment_list_filter_handoff_list_api_search_where_description()
+      );
+    case 'list-api-status-filter':
+      return assignmentFilterItem(
+        id,
+        m.assignment_list_filter_handoff_list_api_status_filter_label(),
+        m.assignment_list_filter_handoff_list_api_status_filter_value(),
+        m.assignment_list_filter_handoff_list_api_status_filter_description()
+      );
+    case 'full-summary-filter-result':
+      return assignmentFilterItem(
+        id,
+        m.assignment_list_filter_handoff_full_summary_filter_result_label(),
+        filterSummary.text,
+        m.assignment_list_filter_handoff_full_summary_filter_result_description()
+      );
+    case 'privacy-guard':
+      return assignmentFilterItem(
+        id,
+        m.assignment_list_filter_handoff_privacy_guard_label(),
+        m.assignment_list_filter_handoff_privacy_guard_value(),
+        m.assignment_list_filter_handoff_privacy_guard_description()
+      );
+  }
+}
+
+function assignmentFilterItem(
+  id: AssignmentListFilterHandoffItemId,
+  label: string,
+  value: string,
+  description: string
+): Omit<AssignmentListFilterHandoffItemView, 'ariaLabel'> {
+  return {
+    description,
+    id,
+    label,
+    value,
   };
 }
 

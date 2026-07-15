@@ -3,6 +3,8 @@ import type { AssignmentListSummary } from '@/assignments/list-summary';
 import {
   assignmentListActionCopy,
   assignmentListSearchCopy,
+  type AssignmentListFilterHandoffItemView,
+  type AssignmentListFilterHandoffView,
   buildAssignmentListSearchPanelView,
 } from '@/assignments/list-view';
 import { Button } from '@/components/ui/button';
@@ -46,6 +48,9 @@ export function AssignmentListFilters({
 
   return (
     <section className="grid gap-4 rounded-lg border bg-card p-4 lg:grid-cols-[minmax(0,1fr)_13rem_auto] lg:items-end">
+      <AssignmentListFilterHandoff
+        handoffView={searchPanelView.filterHandoffView}
+      />
       <div className="grid gap-2">
         <label htmlFor="assignment-list-search" className="font-medium text-sm">
           {assignmentListSearchCopy.label}
@@ -131,5 +136,54 @@ export function AssignmentListFilters({
         ) : null}
       </div>
     </section>
+  );
+}
+
+function AssignmentListFilterHandoff({
+  handoffView,
+}: {
+  handoffView: AssignmentListFilterHandoffView;
+}) {
+  return (
+    <div
+      className="sr-only"
+      data-handoff="assignment-list-filter-state"
+      data-handoff-scope={handoffView.privacy.scope}
+    >
+      <h2>{handoffView.title}</h2>
+      <p>{handoffView.description}</p>
+      <dl>
+        {handoffView.itemViews.map((item) => (
+          <AssignmentListFilterHandoffItem item={item} key={item.id} />
+        ))}
+      </dl>
+    </div>
+  );
+}
+
+function AssignmentListFilterHandoffItem({
+  item,
+}: {
+  item: AssignmentListFilterHandoffItemView;
+}) {
+  const labelId = `assignment-list-filter-state-${item.id}-label`;
+  const valueId = `assignment-list-filter-state-${item.id}-value`;
+  const descriptionId = `assignment-list-filter-state-${item.id}-description`;
+
+  return (
+    <div data-handoff-item={item.id}>
+      <dt id={labelId}>{item.label}</dt>
+      <dd>
+        <output
+          aria-describedby={descriptionId}
+          aria-label={item.ariaLabel}
+          aria-labelledby={`${labelId} ${valueId}`}
+          id={valueId}
+        >
+          {item.value}
+        </output>
+        <span id={descriptionId}>{item.description}</span>
+      </dd>
+    </div>
   );
 }
