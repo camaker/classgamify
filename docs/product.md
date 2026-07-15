@@ -627,6 +627,16 @@ duration at the assignment timer so teacher averages and CSV exports are not
 distorted by abnormal client clocks. Student timer badges, submitted attempt
 times, result-page averages, and per-attempt rows should format durations
 through assignment-domain helpers so time displays stay consistent.
+The attempt duration continuity chain should carry the existing duration
+handoff as a 30-slice source-level contract across playable runner readiness,
+clock start and tick plans, browser elapsed time, server normalization, timer
+caps, scored-attempt persistence, student result feedback, teacher result rows,
+aggregate statistics, and CSV export. Its aggregate summary must not expose
+clock-origin timestamps, student labels, anonymous tokens, prompts, runtime item
+ids, answer text, teacher answer keys, or CSV data URLs.
+`src/assignments/attempt-duration-continuity-chain.ts` owns this source
+contract without replacing the localized duration handoff or the shared
+`src/attempts/duration.ts` core.
 Answer scoring is centralized and tolerant of case, spacing, and common
 punctuation differences. Teachers can use `/` or `;` inside an answer field to
 define acceptable alternatives without changing the student submission

@@ -298,6 +298,12 @@ Assignment attempt duration has a fast script-level gate via
 run it when changing timer start plans, submission duration normalization,
 student timer badges, result duration labels, result average duration, or CSV
 duration fields.
+Assignment attempt duration continuity has a focused source-chain gate via
+`pnpm exec tsx --test scripts/assignment-attempt-duration-continuity-chain-handoff.test.ts`;
+run it when changing the 30-slice source-level contract for playable runner
+readiness, clock start or tick plans, browser elapsed time, server normalization,
+timer caps, scored persistence, student/teacher duration displays, aggregate
+statistics, CSV duration fields, or duration-only privacy guards.
 Assignment item ordering has a fast script-level gate via
 `pnpm exec tsx --test scripts/assignment-item-order-handoff-semantic-views.test.ts`;
 run it when changing shuffle helper logic, share-slug normalization, public
