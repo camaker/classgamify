@@ -301,6 +301,16 @@ restore guidance. Owner mismatches use the same safe activity-not-found response
 as the initial lookup. Active draft, private, public, and unlisted activities
 remain publishable, existing assignment snapshots remain unchanged, and trigger
 markers, source content, teacher identity, and material metadata stay private.
+The assignment publish source continuity chain should carry this write guard as
+30 source-level slices across authenticated teacher scope, owner-scoped source
+reads, restore-before-publish checks, publish validation and delivery settings,
+the assignment/snapshot transaction, D1 `BEFORE INSERT` owner and archive
+guards, rollback, localized error mapping, published delivery, existing snapshot
+retention, results, and privacy. Its aggregate summary must not expose activity
+content, assignment ids, teacher owner ids, source-material metadata, or internal
+trigger markers.
+`src/assignments/publish-source-continuity-chain.ts` owns this source contract
+without rendering source race metadata in teacher or student interfaces.
 Activity lifecycle governance should flow through shared domain helpers across
 library cards, edit access, publish dialogs, duplicate/remix draft creation, and
 server functions, so UI affordances and backend enforcement keep the same

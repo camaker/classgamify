@@ -186,6 +186,12 @@ run it when changing owner-scoped activity lookup, archive/restore publish
 gates, assignment and snapshot transactions, assignment insert triggers,
 source-owner invariants, trigger error mapping, active visibility acceptance,
 existing snapshot continuity, or publish-source privacy.
+Assignment publish source continuity has a focused source-chain gate via
+`pnpm exec tsx --test scripts/assignment-publish-source-continuity-chain-handoff.test.ts`;
+run it when changing the 30-slice source-level contract for owner-scoped source
+reads, restore-before-publish checks, assignment/snapshot transactions, D1 owner
+and archive triggers, rollback, localized source errors, published delivery,
+existing snapshots and results, or publish-source privacy.
 Activity mutation concurrency has a fast script-level gate via
 `pnpm exec tsx --test scripts/activity-mutation-concurrency-contract.test.ts`;
 run it when changing activity edit, archive, or restore writes, lifecycle gate
