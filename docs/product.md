@@ -344,6 +344,16 @@ copying stale content. Normal activity creation has no source provenance, active
 draft/private/public/unlisted sources remain derivable, and later source changes
 do not mutate an already-created independent draft. Provenance ids, revisions,
 source content, teacher identity, and material metadata remain private.
+The activity derivative source continuity chain should carry this duplicate and
+template-remix write guard as 30 source-level slices across owner-scoped source
+reads, lifecycle and readiness checks, source id/revision provenance, D1
+`BEFORE INSERT` pair, owner, archive, and exact revision guards, safe error
+mapping, independent draft persistence, later source changes, future publishing,
+and privacy. Its aggregate summary must not expose provenance ids or revisions,
+activity content, teacher owner ids, source-material metadata, or internal
+trigger markers.
+`src/activities/derivative-source-continuity-chain.ts` owns this source contract
+without rendering provenance metadata in teacher or student interfaces.
 The activity lifecycle governance chain should explicitly carry the 30-slice
 assignment publish handoff so restored activities return to the shared publish
 access, field validation, delivery settings, review checklist, snapshot freeze,

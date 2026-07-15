@@ -210,6 +210,12 @@ run it when changing duplicate/remix source reads, derivative provenance,
 activity insert triggers, owner/archive/revision guards, derivative error
 mapping, active-source acceptance, independent-draft continuity, or derivative
 source privacy.
+Activity derivative source continuity has a focused source-chain gate via
+`pnpm exec tsx --test scripts/activity-derivative-source-continuity-chain-handoff.test.ts`;
+run it when changing the 30-slice source-level contract for duplicate/remix
+source reads, provenance pairs, D1 owner/archive/revision triggers, safe error
+mapping, independent derivative drafts, later source changes, future publishing,
+or provenance privacy.
 Activity source-material writes have a fast script-level gate via
 `pnpm exec tsx --test scripts/activity-source-material-write-contract.test.ts`;
 run it when changing create/edit material persistence, owner-scoped user-file
