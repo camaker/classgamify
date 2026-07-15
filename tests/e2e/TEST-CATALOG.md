@@ -928,6 +928,12 @@ run it when changing submit-attempt persistence, scored-attempt inserts,
 answer/result JSON cloning, identity fields, score/maxScore mapping,
 duration persistence, result-analysis consumers, stats consumers, or CSV export
 consumers.
+Attempt persistence continuity has a focused source-chain gate via
+`pnpm exec tsx --test scripts/assignment-attempt-persistence-continuity-chain-handoff.test.ts`;
+run it when changing the 30-slice source-level contract for submission gates,
+scored-attempt row construction, identity/time fields, immutable answer/result
+JSON, sanitized feedback, teacher analysis, statistics, CSV export, or private
+persistence guards.
 Scored attempt result lifecycle chain has a fast script-level gate via
 `pnpm exec tsx --test scripts/scored-attempt-result-chain-handoff.test.ts`;
 run it when changing the post-submit scored-result boundary, sanitized public

@@ -614,6 +614,16 @@ student display, submitted time, score and answer summaries, snapshot-ordered
 answers, statuses, accepted alternatives, explanations, filters, copy/export
 scope, and privacy guards connected without exposing answer text or teacher-only
 answers in the scored-result chain summary.
+The attempt persistence continuity chain should carry the existing persistence
+handoff as a 30-slice source-level contract across submission gates, normalized
+identity, frozen runtime validation, scoring, assignment/attempt/time fields,
+immutable answer and result JSON, sanitized public feedback, teacher analysis,
+statistics, CSV export, and privacy. Its aggregate summary must not expose
+attempt ids, student names, anonymous tokens, runtime ids, answer text, teacher
+answers, raw submission payloads, source-material metadata, or CSV data URLs.
+`src/assignments/attempt-persistence-continuity-chain.ts` owns this source
+contract while `buildScoredAttemptInsert` remains the sole attempt-row shape
+builder.
 `src/assignments/attempt-review-card-chain.ts` owns the
 attempt-review-card chain as a 30-slice source-level contract from
 scored-attempt persistence and answer review summaries through prepared card
