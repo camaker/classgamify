@@ -282,6 +282,10 @@ API owner scope, source-material post-filtering, and privacy guards. Its summary
 may expose route state, option labels, safe aggregate match counts, and helper
 contract status, but must not expose activity ids, answer text, private activity
 content, source-material filenames, file ids, storage keys, or student data.
+`src/activities/activity-library-filter-state-chain.ts` owns this source-level
+contract so route validation, dashboard controls, list API owner scope,
+source-material readiness filters, created-activity return context, and hidden
+filter handoffs stay aligned.
 Teachers can soft-archive activities from the active library and restore them
 later from an archived view. Archiving hides an activity from the default
 library and prevents casual republishing, but it does not delete structured

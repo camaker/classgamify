@@ -613,6 +613,13 @@ run it when changing the activity library filter-state handoff, URL validation,
 default route elision, search normalization, page reset, page preservation,
 dashboard controls, list API owner scope, source-material post-filter behavior,
 or privacy guards.
+Activity library filter-state chain has a fast script-level gate via
+`pnpm exec tsx --test scripts/activity-library-filter-state-chain-handoff.test.ts`;
+run it when changing URL validateSearch, NFKC search normalization,
+status/template/source filters, page reset, created-activity context,
+dashboard controls, list API owner scope, source-material post-filtering,
+activity source-material summary-chain alignment, or activity-library filter
+privacy guards.
 Activity source-material card summary has a fast script-level gate via
 `pnpm exec tsx --test scripts/activity-source-material-card-handoff-semantic-views.test.ts`;
 run it when changing activity card source-material count summaries,
