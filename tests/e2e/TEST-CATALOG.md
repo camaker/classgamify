@@ -582,6 +582,11 @@ needs-review, or unanswered counts, answer text/status/summary helpers,
 accepted alternatives, explanations, copy-scope boundaries, CSV export
 boundaries, anonymous-token guards, or the assignment-attempt-review-card
 handoff.
+Assignment attempt review card chain has a fast script-level gate via
+`pnpm exec tsx --test scripts/assignment-attempt-review-card-chain-handoff.test.ts`;
+run it when changing scored result persistence, answer review summaries, answer
+text/status helpers, review filters, copy scope, CSV export, printable review
+alignment, privacy guards, or the source-level attempt review card chain.
 Assignment student follow-up priority has a fast script-level gate via
 `pnpm exec tsx --test scripts/assignment-student-follow-up-priority-handoff-semantic-views.test.ts`;
 run it when changing needs-review follow-up sorting, latest-accuracy or

@@ -594,6 +594,11 @@ student display, submitted time, score and answer summaries, snapshot-ordered
 answers, statuses, accepted alternatives, explanations, filters, copy/export
 scope, and privacy guards connected without exposing answer text or teacher-only
 answers in the scored-result chain summary.
+`src/assignments/attempt-review-card-chain.ts` owns the
+attempt-review-card chain as a 30-slice source-level contract from
+scored-attempt persistence and answer review summaries through prepared card
+rows, review filters, copy scope, CSV export boundaries, printable review
+alignment, and privacy guards.
 Student runner submission surfaces should expose those prepared progress,
 payload, submit-readiness, identity, result, review-summary, feedback-scope,
 and post-submit next-step views as stable semantic label/value/description
