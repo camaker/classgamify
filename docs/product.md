@@ -620,6 +620,16 @@ time. Only confirmed identity-slot unique conflicts may enter the bounded
 recount loop; lifecycle and unrelated database errors must not be mistaken for
 slot contention. Internal trigger markers, identity slots, answers, and student
 identity remain outside public responses and teacher exports.
+The submission lifecycle continuity chain should carry this write guard as 30
+source-level slices across replay-first recovery, initial lifecycle validation,
+runtime answer checks, deterministic scoring, attempt-slot reservation, D1
+`BEFORE INSERT` status and expiry guards, database-clock evaluation, error cause
+classification, localized closed/expired responses, bounded slot recounts,
+teacher results, and privacy. Its aggregate summary must not expose internal
+trigger markers, identity keys, attempt numbers, submission keys, student names,
+anonymous tokens, or answer text.
+`src/assignments/submission-lifecycle-continuity-chain.ts` owns this source
+contract without rendering database race metadata in public runner responses.
 Student progress counts, browser submission payloads, and incomplete-submit
 decisions should be derived from shared assignment-domain helpers, not
 per-template route math, so every runner counts answered items, submits frozen

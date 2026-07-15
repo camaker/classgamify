@@ -317,6 +317,12 @@ run it when changing assignment close/reopen behavior, close-time enforcement,
 attempt inserts, D1 triggers, write-error mapping, submission replay priority,
 identity-slot conflict classification, bounded recounts, lifecycle messages,
 teacher result continuity, or private database markers.
+Assignment submission lifecycle continuity has a focused source-chain gate via
+`pnpm exec tsx --test scripts/assignment-submission-lifecycle-continuity-chain-handoff.test.ts`;
+run it when changing the 30-slice source-level contract for replay-first
+handling, API lifecycle/validation/scoring order, D1 status and expiry triggers,
+database-clock checks, localized write errors, slot conflict isolation, teacher
+results, or internal write-boundary privacy.
 Assignment attempt duration has a fast script-level gate via
 `pnpm exec tsx --test scripts/assignment-attempt-duration-handoff-semantic-views.test.ts`;
 run it when changing timer start plans, submission duration normalization,
