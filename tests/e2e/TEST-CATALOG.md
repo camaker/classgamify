@@ -244,6 +244,12 @@ run it when changing close/reopen server functions, owner-scoped status writes,
 expected lifecycle revisions, same-millisecond transitions, reopen close-window
 checks, compare-and-set updates, zero-row conflict recovery, returned lifecycle
 rows, snapshot/result retention, or lifecycle transition privacy.
+Assignment status transition continuity has a focused source-chain gate via
+`pnpm exec tsx --test scripts/assignment-status-transition-continuity-chain-handoff.test.ts`;
+run it when changing the 30-slice source-level contract for owner-scoped reads,
+monotonic revisions, close/reopen compare-and-set predicates, single-statement
+returning updates, conflict reloads, public access, snapshot and attempt
+retention, teacher results, or transition privacy.
 Classroom data lifecycle chain has a fast script-level gate via
 `pnpm exec tsx --test scripts/classroom-data-lifecycle-chain-handoff.test.ts`;
 run it when changing the 30-slice attempt persistence handoff boundary, D1 app

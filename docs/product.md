@@ -486,6 +486,16 @@ never overwrites a newer teacher action. Successful transitions advance the
 revision monotonically even when requests share the same millisecond, while
 snapshots, attempts, results, share links, and assignment settings remain
 unchanged.
+The assignment status transition continuity chain should carry this atomic
+close/reopen contract as 30 source-level slices across owner-scoped reads,
+lifecycle validation, monotonic `updatedAt` allocation, assignment/owner/status/
+revision compare-and-set predicates, reopen expiry conditions, single-statement
+`UPDATE ... RETURNING`, zero-row conflict reloads, public access, retained
+snapshots and attempts, teacher results, and privacy. Its aggregate summary must
+not expose assignment ids, teacher owner ids, share slugs, activity content,
+student identity, or answer text.
+`src/assignments/status-transition-continuity-chain.ts` owns this source contract
+without rendering concurrency revisions in teacher or student interfaces.
 The assignment lifecycle governance chain should explicitly carry the 30-slice
 public unavailable-access handoff so closed, expired, draft, and missing links
 share lifecycle reasons, student-safe messages, hidden runtime content and
