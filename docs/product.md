@@ -324,6 +324,16 @@ overwrite a newer content or lifecycle change. Zero-row updates reload the curre
 owner-scoped lifecycle state so specific restore/archive guidance remains intact;
 otherwise teachers receive a localized reload-before-retry conflict. These writes
 do not mutate existing assignment snapshots, attempts, or public student links.
+The activity mutation continuity chain should carry this edit/archive/restore
+contract as 30 source-level slices across owner-scoped reads, lifecycle checks,
+monotonic `updatedAt` allocation, activity/owner/visibility/revision
+compare-and-set predicates, guarded content and visibility updates,
+single-statement `UPDATE ... RETURNING`, zero-row conflict reloads, derivative
+and publish gates, assignment snapshot retention, and privacy. Its aggregate
+summary must not expose activity ids, teacher owner ids, activity content,
+source-material metadata, or assignment records.
+`src/activities/activity-mutation-continuity-chain.ts` owns this source contract
+without rendering internal revisions in teacher or student interfaces.
 Activity duplicate and template-remix inserts should keep the same write-time
 source discipline. A derivative draft stores only an internal source activity id
 and expected source revision; D1 checks the provenance pair, owner equality,

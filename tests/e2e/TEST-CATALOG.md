@@ -198,6 +198,12 @@ run it when changing activity edit, archive, or restore writes, lifecycle gate
 revisions, monotonic timestamps, compare-and-set predicates, zero-row conflict
 recovery, direct returned activity rows, snapshot retention, or activity mutation
 privacy.
+Activity mutation continuity has a focused source-chain gate via
+`pnpm exec tsx --test scripts/activity-mutation-continuity-chain-handoff.test.ts`;
+run it when changing the 30-slice source-level contract for edit/archive/restore
+owner scope, monotonic revisions, visibility compare-and-set predicates,
+returning updates, conflict reloads, derivative and publish gates, assignment
+snapshot retention, or activity mutation privacy.
 Activity derivative source writes have a fast script-level gate via
 `pnpm exec tsx --test scripts/activity-derivative-source-write-guard-contract.test.ts`;
 run it when changing duplicate/remix source reads, derivative provenance,
