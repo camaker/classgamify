@@ -515,6 +515,15 @@ limits or aggregating results. Whitespace and case differences in a typed
 student name should not create a new attempt identity, while anonymous browser
 tokens should remain separate students in teacher summaries without exposing the
 raw token.
+The attempt identity continuity chain should carry the existing identity
+handoff as a 30-slice source-level contract across name normalization,
+assignment-scoped anonymous browser tokens, storage reuse, safe browser labels,
+submission strategies, previous-attempt counting, concurrent identity slots,
+scored persistence, teacher result grouping and ordering, and privacy. Its
+aggregate summary must not expose student names, raw anonymous tokens, browser
+storage keys, grouping keys, or result student keys.
+`src/assignments/attempt-identity-continuity-chain.ts` owns this source contract
+without reading browser storage or mutating attempts while building its summary.
 The student identity lifecycle should also carry the runtime identity handoff's
 30 slices for template/runtime scope, item-kind counts, normalized and unique
 runtime ids, collision and blank-id guards, submission validation, browser

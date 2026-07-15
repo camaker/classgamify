@@ -160,6 +160,12 @@ run the matching gate when changing shared assignment view models, delivery
 policy propagation, identity normalization, answer feedback, result empty
 states, result materials, public assignment access, or unavailable-link
 boundaries.
+Assignment attempt identity continuity has a focused source-chain gate via
+`pnpm exec tsx --test scripts/assignment-attempt-identity-continuity-chain-handoff.test.ts`;
+run it when changing the 30-slice source-level contract for name normalization,
+anonymous browser tokens, assignment-scoped storage, submission identity,
+attempt-limit counting, persistence, teacher result grouping and ordering, or
+raw identity privacy guards.
 Answer feedback lifecycle chain has a fast script-level gate via
 `pnpm exec tsx --test scripts/answer-feedback-lifecycle-chain-handoff.test.ts`;
 run it when changing the 30-slice answer feedback handoff boundary,
