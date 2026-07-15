@@ -184,6 +184,15 @@ minimal ids, never return activity or snapshot content, and do not inspect stude
 attempts. Teachers can remove ordinary saved-activity references before deleting
 the underlying file, while published snapshot provenance remains retained and
 continues to block deletion.
+The source-material deletion continuity chain should carry this guard as 30
+source-level slices across authenticated file lookup, parallel activity and
+snapshot reference checks, active and archived activity coverage, assignment
+owner joins, compact `json_each` evidence, a single safe in-use response,
+metadata claim and R2 ordering, retained activity content and snapshot
+provenance, and privacy. Its aggregate summary must not expose activity or
+assignment content, student data, or storage keys.
+`src/activities/source-material-delete-continuity-chain.ts` owns this source
+contract without rendering referencing record details in teacher interfaces.
 Source-material reference integrity must also hold when activity saves, assignment
 publishes, and file deletion race. Database write guards recheck owner-scoped file
 existence on activity and frozen-snapshot inserts or content updates, while file

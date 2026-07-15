@@ -232,6 +232,12 @@ Source-material deletion has a fast script-level gate via
 run it when changing file deletion, activity/snapshot JSON reference queries,
 active or archived material retention, R2 delete ordering, in-use errors,
 owner-scoped reference checks, or delete-path privacy.
+Source-material deletion continuity has a focused source-chain gate via
+`pnpm exec tsx --test scripts/source-material-delete-continuity-chain-handoff.test.ts`;
+run it when changing the 30-slice source-level contract for owner-scoped file
+lookup, active/archived activity references, frozen snapshot references,
+parallel checks, metadata claim and R2 ordering, retained provenance, minimal
+evidence, or deletion privacy.
 Source-material write/delete races have a fast script-level gate via
 `pnpm exec tsx --test scripts/source-material-integrity-guard-contract.test.ts`;
 run it when changing activity or snapshot source-material writes, file metadata
