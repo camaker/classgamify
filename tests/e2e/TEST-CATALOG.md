@@ -299,6 +299,12 @@ run it when changing browser submission-key generation or reset behavior,
 network retry recovery, normalized identity matching, attempt inserts,
 assignment-scoped uniqueness, generated migrations, public retry responses,
 attempt limits, lifecycle gates, teacher results, or submission-key privacy.
+Assignment submission idempotency continuity has a focused source-chain gate via
+`pnpm exec tsx --test scripts/assignment-submission-idempotency-continuity-chain-handoff.test.ts`;
+run it when changing the 30-slice source-level contract for browser key
+creation, retry reuse, replay-first recovery, new-attempt lifecycle and limit
+gates, concurrent D1 uniqueness recovery, sanitized feedback, teacher result
+continuity, or submission-key privacy.
 Assignment attempt-limit concurrency has a fast script-level gate via
 `pnpm exec tsx --test scripts/assignment-attempt-limit-concurrency-contract.test.ts`;
 run it when changing normalized identity counting, limited-attempt slot

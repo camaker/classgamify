@@ -581,6 +581,15 @@ and attempt-limit gates, while a genuinely new attempt still receives a new key
 and follows the normal lifecycle, limit, validation, scoring, and persistence
 flow. Submission keys remain private persistence metadata and never appear in
 public result payloads or teacher exports.
+The submission idempotency continuity chain should carry this contract as 30
+source-level slices across browser key creation, retry reuse, assignment and
+new-attempt resets, normalized identity matching, replay-first server recovery,
+new-submit lifecycle and attempt-limit gates, deterministic scoring, D1
+uniqueness, concurrent conflict recovery, sanitized feedback, teacher results,
+and privacy. Its aggregate summary must not expose submission keys, attempt ids,
+student names, anonymous tokens, payload rows, answer text, or teacher answers.
+`src/assignments/submission-idempotency-continuity-chain.ts` owns this source
+contract without rendering retry keys or internal replay state in the runner.
 Finite assignments should additionally keep a finite attempt concurrency
 contract. Each new scored attempt reserves the next normalized identity attempt
 slot, and D1 uniquely scopes that slot by assignment, identity, and attempt
