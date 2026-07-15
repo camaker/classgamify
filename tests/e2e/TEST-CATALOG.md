@@ -281,6 +281,12 @@ runtime id normalization, unknown/duplicate/too-many rejection, API answer
 limits, safe failure mapping, teacher-result/public-payload boundaries,
 submission-validation privacy-scope boundaries, or no-public-audit DOM
 boundaries.
+Assignment submission validation continuity has a focused source-chain gate via
+`pnpm exec tsx --test scripts/assignment-submission-validation-continuity-chain-handoff.test.ts`;
+run it when changing the 30-slice source-level contract for frozen runtime ids,
+partial payloads, shared answer limits, Unicode normalization, invalid-id
+rejection, validate-before-scoring order, scored persistence, safe public
+failures, teacher results, or private-content guards.
 Assignment submission idempotency has a fast script-level gate via
 `pnpm exec tsx --test scripts/assignment-submission-idempotency-contract.test.ts`;
 run it when changing browser submission-key generation or reset behavior,

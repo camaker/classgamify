@@ -552,6 +552,16 @@ The submission contract remains template-neutral: every renderer stores
 submission still allows partial attempts, but the server rejects answers for
 unknown item ids, duplicate item ids, or answer lists longer than the frozen
 runtime item count.
+The submission validation continuity chain should carry the existing validation
+handoff as a 30-slice source-level contract across frozen runtime ids, partial
+browser payloads, empty-answer omission, shared API limits, Unicode id
+normalization, blank/unknown/duplicate/too-many rejection,
+validate-before-scoring order, scored persistence, safe public failures,
+teacher results, and privacy. Its aggregate summary must not expose runtime ids,
+raw payload rows, student names, anonymous tokens, answer text, teacher answers,
+ActivityContent JSON, settings JSON, or source-material metadata.
+`src/assignments/submission-validation-continuity-chain.ts` owns this source
+contract without rendering validation audit markers in the public runner.
 Each real browser submission should also carry a submission idempotency contract:
 the runner creates one opaque key only after submission gates pass, reuses it for
 a network retry, and clears it when the assignment changes or the student starts
