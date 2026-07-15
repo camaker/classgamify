@@ -572,6 +572,16 @@ receive the normal attempt-limit error. Unlimited assignments keep identity and
 attempt-number slots nullable so they do not create artificial write contention.
 Identity keys and attempt numbers are private persistence metadata and do not
 change public feedback, teacher result labels, or exports.
+The attempt limit continuity chain should carry the existing attempt-limit
+handoff as a 30-slice source-level contract across normalized student identity,
+previous scored-attempt counts, idempotent replay priority, concurrent identity
+slots, D1 uniqueness, server enforcement, student retry state, public delivery
+rules, teacher result policy, exports, and privacy. Its aggregate summary must
+not expose identity keys, attempt numbers, submission keys, student names, raw
+anonymous tokens, submission payloads, answer text, teacher answers, or CSV data
+URLs. `src/assignments/attempt-limit-continuity-chain.ts` owns this source
+contract without replacing the localized handoff or the independent SQLite
+concurrency gate.
 New attempt writes should also keep a submission lifecycle write guard. The API
 checks lifecycle before validation and scoring, while D1 checks assignment
 status and expiry again in a `BEFORE INSERT` boundary so a teacher closing a

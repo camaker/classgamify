@@ -268,6 +268,12 @@ run it when changing max-attempt parsing, per-student attempt counters,
 retry availability, public rule summaries, result usage labels, delivery
 summaries, CSV/export delivery-policy fields, attempt-limit privacy-scope
 boundaries, or no-public-audit DOM boundaries.
+Assignment attempt limit continuity has a focused source-chain gate via
+`pnpm exec tsx --test scripts/assignment-attempt-limit-continuity-chain-handoff.test.ts`;
+run it when changing the 30-slice source-level contract for normalized identity,
+previous attempt counting, idempotent replay, concurrent identity slots, D1
+uniqueness, server limit enforcement, student retry state, public rules,
+teacher result policy, exports, or private slot-metadata guards.
 Assignment submission validation has a fast script-level gate via
 `pnpm exec tsx --test scripts/assignment-submission-validation-handoff-semantic-views.test.ts`;
 run it when changing frozen runtime validation, partial-submission payloads,
