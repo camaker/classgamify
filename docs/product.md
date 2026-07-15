@@ -455,6 +455,10 @@ privacy guards. Its fast gate should verify that these outputs come from
 assignment-domain helpers and never expose assignment ids, owner ids, public
 runtime content, raw tokens, result export rows, source storage keys, student
 answers, or teacher-only answers.
+`src/assignments/assignment-list-filter-state-chain.ts` owns the source-level
+contract for this chain, keeping URL validation, published share context,
+search/status filters, dashboard controls, list API owner scope, full filtered
+summaries, and privacy aligned with the visible handoff.
 The assignment source activity context chain should explicitly carry the
 30-slice result-material handoff so frozen source title, description, template,
 and snapshot provenance remain connected to teacher copy artifacts, CSV

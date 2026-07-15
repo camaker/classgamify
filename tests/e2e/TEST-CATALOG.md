@@ -708,6 +708,12 @@ normalization or preservation, search normalization, page reset, dashboard
 controls, list API owner scope, search where clauses, status filters, full
 filtered-result summaries, privacy guards, or the hidden assignment list
 filter-state handoff.
+Assignment list filter-state chain has a fast script-level gate via
+`pnpm exec tsx --test scripts/assignment-list-filter-state-chain-handoff.test.ts`;
+run it when changing assignment list URL validateSearch, published context,
+search normalization, lifecycle status filters, page reset, dashboard controls,
+list API owner scope, full filtered summary, privacy guards, or the
+source-level filter-state chain contract.
 Assignment distribution lifecycle chain has a fast script-level gate via
 `pnpm exec tsx --test scripts/assignment-distribution-lifecycle-chain-handoff.test.ts`;
 run it when changing post-publish route context, owner-scoped published lookup,
