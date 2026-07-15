@@ -469,7 +469,7 @@ access, assignment workflow access, AI draft access, result export access,
 source-material access, hosted checkout, customer portal, payment callback, or
 the settings-billing-workspace handoff.
 Settings payment callback handoff has a fast script-level gate via
-`pnpm exec tsx --test scripts/settings-billing-workspace-handoff-semantic-views.test.ts`;
+`pnpm exec tsx --test scripts/settings-payment-callback-handoff-semantic-views.test.ts`;
 run it when changing hosted checkout confirmation, session-id privacy, polling
 interval or timeout, server completion checks, current-plan cache refresh, safe
 callback normalization, billing return, pricing retry, timeout recovery,

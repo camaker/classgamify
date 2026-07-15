@@ -14118,6 +14118,11 @@ assert.match(
   'Payment status handoff should render stable label/value/description relationships for the settings payment callback.'
 );
 assert.match(
+  readFileSync('tests/e2e/TEST-CATALOG.md', 'utf8'),
+  /Settings payment callback handoff has a fast script-level gate via[\s\S]*scripts\/settings-payment-callback-handoff-semantic-views\.test\.ts[\s\S]*hosted checkout confirmation[\s\S]*settings-payment-callback handoff/,
+  'TEST-CATALOG should document the dedicated settings payment callback focused gate.'
+);
+assert.match(
   paymentCardSource,
   /getInitialPaymentConfirmationStatus/,
   'PaymentCard should derive its initial status through the payment status helper.'

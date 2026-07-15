@@ -6,20 +6,10 @@ import {
   buildSettingsBillingPageViewModel,
   buildSettingsBillingWorkspaceHandoffView,
   buildSettingsBillingWorkspaceSummaryView,
-  buildSettingsPaymentPageViewModel,
-  normalizeSettingsPaymentCallback,
   type SettingsBillingWorkspaceHandoffItemId,
   type SettingsBillingWorkspaceHandoffView,
 } from '@/settings/billing-view';
 import { buildSettingsBillingCardViewModel } from '@/payment/billing-view';
-import {
-  PAYMENT_STATUS_HANDOFF_ITEM_IDS,
-  buildPaymentStatusHandoffView,
-  buildPaymentStatusView,
-  getInitialPaymentConfirmationStatus,
-  type PaymentStatusHandoffItemId,
-  type PaymentStatusHandoffView,
-} from '@/payment/payment-status-view';
 import type { PricePlan, Subscription } from '@/payment/types';
 import { overwriteGetLocale } from '@/locale/paraglide/runtime';
 
@@ -36,20 +26,12 @@ const BILLING_ROUTE_SOURCE = readFileSync(
   'src/routes/settings/billing.tsx',
   'utf8'
 );
-const PAYMENT_ROUTE_SOURCE = readFileSync(
-  'src/routes/settings/payment.tsx',
-  'utf8'
-);
 const BILLING_WORKSPACE_SUMMARY_SOURCE = readFileSync(
   'src/components/settings/billing/billing-workspace-summary.tsx',
   'utf8'
 );
 const BILLING_CARD_SOURCE = readFileSync(
   'src/components/settings/billing/billing-card.tsx',
-  'utf8'
-);
-const PAYMENT_CARD_SOURCE = readFileSync(
-  'src/components/payment/payment-card.tsx',
   'utf8'
 );
 const TEST_CATALOG_SOURCE = readFileSync('tests/e2e/TEST-CATALOG.md', 'utf8');
@@ -155,42 +137,6 @@ test('settings billing handoff exposes 30 hosted classroom billing slices', () =
   assertNoPrivateBillingText(JSON.stringify(handoffView));
 });
 
-test('settings payment callback stays inside the teacher workspace', () => {
-  assert.equal(
-    normalizeSettingsPaymentCallback('/dashboard/assignments?published=abc'),
-    '/dashboard/assignments?published=abc'
-  );
-  assert.equal(
-    normalizeSettingsPaymentCallback('dashboard/assignments#results'),
-    '/dashboard/assignments#results'
-  );
-  for (const unsafeCallback of [
-    undefined,
-    '',
-    'https://evil.example/dashboard',
-    '//evil.example/dashboard',
-    'javascript:alert(1)',
-  ]) {
-    assert.equal(
-      normalizeSettingsPaymentCallback(unsafeCallback),
-      '/settings/billing'
-    );
-  }
-
-  assert.equal(
-    buildSettingsPaymentPageViewModel({
-      callback: 'https://evil.example/payments',
-    }).callback,
-    '/settings/billing'
-  );
-  assert.equal(
-    buildSettingsPaymentPageViewModel({
-      callback: '/dashboard/assignments',
-    }).callback,
-    '/dashboard/assignments'
-  );
-});
-
 test('billing card view model separates classroom plan states and hosted actions', () => {
   const formatDate = (date: Date) => `date:${date.toISOString().slice(0, 10)}`;
   const loadingView = buildSettingsBillingCardViewModel({
@@ -280,171 +226,11 @@ test('billing card view model separates classroom plan states and hosted actions
   );
 });
 
-test('payment status view keeps hosted checkout states classroom-scoped', () => {
-  assert.equal(getInitialPaymentConfirmationStatus(undefined), 'failed');
-  assert.equal(getInitialPaymentConfirmationStatus('cs_test'), 'processing');
-
-  const processing = buildPaymentStatusView('processing', {
-    hasSessionId: true,
-  });
-  const success = buildPaymentStatusView('success', { hasSessionId: true });
-  const failed = buildPaymentStatusView('failed', { hasSessionId: false });
-  const timeout = buildPaymentStatusView('timeout', { hasSessionId: true });
-
-  assert.deepEqual(
-    [processing.tone, success.tone, failed.tone, timeout.tone],
-    ['working', 'success', 'danger', 'warning']
-  );
-  assert.deepEqual(
-    [processing.icon, success.icon, failed.icon, timeout.icon],
-    ['loader', 'check', 'x', 'alert']
-  );
-  assert.match(processing.description, /teacher workspace/);
-  assert.match(success.description, /activity, assignment, and AI access/);
-  assert.match(failed.description, /pricing page/);
-  assert.match(timeout.description, /assignment workflow limits/);
-  assert.match(processing.nextStep.description, /result workflows/);
-  assert.match(timeout.nextStep.description, /source of truth/);
-});
-
-test('payment callback handoff exposes 30 hosted checkout slices', () => {
-  const processing = buildPaymentStatusView('processing', {
-    hasSessionId: true,
-  });
-  const success = buildPaymentStatusView('success', { hasSessionId: true });
-  const failed = buildPaymentStatusView('failed', { hasSessionId: false });
-  const timeout = buildPaymentStatusView('timeout', { hasSessionId: true });
-  const directHandoff = buildPaymentStatusHandoffView({
-    hasSessionId: true,
-    icon: processing.icon,
-    status: 'processing',
-    title: processing.title,
-    tone: processing.tone,
-  });
-  const itemIds = processing.handoffView.itemViews.map((item) => item.id);
-
-  assert.deepEqual(itemIds, [...PAYMENT_STATUS_HANDOFF_ITEM_IDS]);
-  assert.deepEqual(
-    directHandoff.itemViews.map((item) => item.id),
-    [...PAYMENT_STATUS_HANDOFF_ITEM_IDS]
-  );
-  assert.equal(new Set(itemIds).size, 30);
-  assert.equal(
-    processing.handoffView.itemViews.every(
-      (item) =>
-        Boolean(item.ariaLabel) &&
-        Boolean(item.description) &&
-        Boolean(item.label) &&
-        Boolean(item.value)
-    ),
-    true
-  );
-  assert.deepEqual(processing.handoffView.privacy, {
-    changesActivityContent: false,
-    changesAssignmentLinks: false,
-    exposesActivityContent: false,
-    exposesPaymentProviderSecrets: false,
-    exposesRawCheckoutSession: false,
-    exposesSourceMaterialStorageKeys: false,
-    exposesStudentAnswers: false,
-    exposesStudentIdentifiers: false,
-    exposesTeacherEmail: false,
-    hostedCheckoutStatusOnly: true,
-    itemIds,
-    modifiesAssignmentSnapshots: false,
-    refreshesPlanCacheOnlyAfterSuccess: true,
-    scope: 'teacher-payment-callback',
-  });
-
-  assert.equal(
-    getPaymentHandoffValue(processing.handoffView, 'workspace-scope'),
-    'Teacher payment callback'
-  );
-  assert.equal(
-    getPaymentHandoffValue(processing.handoffView, 'route-gate'),
-    'Protected payment route'
-  );
-  assert.equal(
-    getPaymentHandoffValue(processing.handoffView, 'session-id-presence'),
-    'Session present'
-  );
-  assert.equal(
-    getPaymentHandoffValue(failed.handoffView, 'session-id-presence'),
-    'Session missing'
-  );
-  assert.equal(
-    getPaymentHandoffValue(processing.handoffView, 'session-id-privacy'),
-    'Raw session id omitted'
-  );
-  assert.equal(
-    getPaymentHandoffValue(processing.handoffView, 'payment-polling'),
-    'Polling active'
-  );
-  assert.equal(
-    getPaymentHandoffValue(success.handoffView, 'payment-polling'),
-    'Polling stopped'
-  );
-  assert.equal(
-    getPaymentHandoffValue(processing.handoffView, 'poll-interval'),
-    'Every 2 seconds'
-  );
-  assert.equal(
-    getPaymentHandoffValue(processing.handoffView, 'poll-timeout'),
-    'Up to 60 seconds'
-  );
-  assert.equal(
-    getPaymentHandoffValue(success.handoffView, 'current-plan-cache'),
-    'Plan cache refresh queued'
-  );
-  assert.equal(
-    getPaymentHandoffValue(processing.handoffView, 'current-plan-cache'),
-    'Waiting for confirmation'
-  );
-  assert.equal(
-    getPaymentHandoffValue(success.handoffView, 'redirect-callback'),
-    'Redirect ready'
-  );
-  assert.equal(
-    getPaymentHandoffValue(failed.handoffView, 'pricing-retry'),
-    'Restart checkout'
-  );
-  assert.equal(
-    getPaymentHandoffValue(timeout.handoffView, 'timeout-recovery'),
-    'Check Billing later'
-  );
-  assert.equal(
-    getPaymentHandoffValue(processing.handoffView, 'assignment-link-boundary'),
-    'Links unchanged'
-  );
-  assert.equal(
-    getPaymentHandoffValue(processing.handoffView, 'student-data-boundary'),
-    'Student data unchanged'
-  );
-  assert.equal(
-    getPaymentHandoffValue(processing.handoffView, 'provider-secret-boundary'),
-    'Provider secrets hidden'
-  );
-  assert.equal(
-    getPaymentHandoffValue(processing.handoffView, 'raw-session-boundary'),
-    'Raw session omitted'
-  );
-  assert.equal(
-    getPaymentHandoffValue(processing.handoffView, 'privacy-guard'),
-    'Private payment data omitted'
-  );
-  assertNoPrivateBillingText(JSON.stringify(processing.handoffView));
-});
-
-test('billing and payment routes consume prepared view models', () => {
+test('billing route consumes prepared workspace view models', () => {
   assert.match(
     BILLING_ROUTE_SOURCE,
     /buildSettingsBillingPageViewModel\(\)[\s\S]*BillingWorkspaceSummary[\s\S]*view=\{pageView\.workspaceSummaryView\}[\s\S]*BillingCard/,
     'Billing route should render prepared workspace summary before plan card.'
-  );
-  assert.match(
-    PAYMENT_ROUTE_SOURCE,
-    /buildSettingsPaymentPageViewModel\(\{[\s\S]*callback: search\.callback[\s\S]*PaymentCard sessionId=\{search\.session_id\} callback=\{pageView\.callback\}/,
-    'Payment route should pass the normalized callback from the page view model.'
   );
   assert.match(
     BILLING_WORKSPACE_SUMMARY_SOURCE,
@@ -457,24 +243,9 @@ test('billing and payment routes consume prepared view models', () => {
     'E2E catalog should document the settings billing handoff focused gate.'
   );
   assert.match(
-    TEST_CATALOG_SOURCE,
-    /Settings payment callback handoff has a fast script-level gate via[\s\S]*scripts\/settings-billing-workspace-handoff-semantic-views\.test\.ts[\s\S]*hosted checkout confirmation[\s\S]*settings-payment-callback handoff/,
-    'E2E catalog should document the settings payment callback handoff focused gate.'
-  );
-  assert.match(
     BILLING_CARD_SOURCE,
     /buildSettingsBillingCardViewModel\(\{[\s\S]*canManageBilling:[\s\S]*currentPlan,[\s\S]*hasLoadError:[\s\S]*plans,[\s\S]*subscription,[\s\S]*\}\)/,
     'Billing card should delegate plan state to the payment billing view model.'
-  );
-  assert.match(
-    PAYMENT_CARD_SOURCE,
-    /buildPaymentStatusView\(status,[\s\S]*hasSessionId:[\s\S]*Boolean\(sessionId\)[\s\S]*PaymentStatusNextStep[\s\S]*PaymentStatusHandoff[\s\S]*view=\{statusView\.handoffView\}/,
-    'Payment card should render prepared payment status, next-step, and handoff views.'
-  );
-  assert.match(
-    PAYMENT_CARD_SOURCE,
-    /function PaymentStatusHandoff[\s\S]*const titleId = 'settings-payment-callback-handoff-title'[\s\S]*const descriptionId = 'settings-payment-callback-handoff-description'[\s\S]*data-handoff="settings-payment-callback"[\s\S]*data-handoff-scope=\{view\.privacy\.scope\}[\s\S]*id=\{titleId\}[\s\S]*id=\{descriptionId\}[\s\S]*view\.itemViews\.map[\s\S]*PaymentStatusHandoffItem[\s\S]*function PaymentStatusHandoffItem[\s\S]*const labelId = `settings-payment-callback-handoff-\$\{itemView\.id\}-label`[\s\S]*const valueId = `settings-payment-callback-handoff-\$\{itemView\.id\}-value`[\s\S]*const descriptionId = `settings-payment-callback-handoff-\$\{itemView\.id\}-description`[\s\S]*data-handoff-item=\{itemView\.id\}[\s\S]*id=\{labelId\}[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*aria-label=\{itemView\.ariaLabel\}[\s\S]*aria-labelledby=\{`\$\{labelId\} \$\{valueId\}`\}[\s\S]*id=\{valueId\}[\s\S]*id=\{descriptionId\}/,
-    'Payment status handoff should render marker, privacy scope, item ids, and stable label/value/description relationships.'
   );
 });
 
@@ -509,15 +280,6 @@ function getHandoffValue(
 ) {
   const itemView = view.itemViews.find((item) => item.id === id);
   assert.ok(itemView, `Missing billing handoff item ${id}`);
-  return itemView.value;
-}
-
-function getPaymentHandoffValue(
-  view: PaymentStatusHandoffView,
-  id: PaymentStatusHandoffItemId
-) {
-  const itemView = view.itemViews.find((item) => item.id === id);
-  assert.ok(itemView, `Missing payment handoff item ${id}`);
   return itemView.value;
 }
 
