@@ -613,6 +613,10 @@ run it when changing source-material library, activity attachments, AI draft
 provenance, student payload privacy, full-library summaries, owner-scoped user
 files, storage-key guard, settings-files source-material privacy-scope
 boundaries, or the settings-files-source-material handoff.
+Referenced file delete feedback has a focused regression gate via
+`pnpm exec tsx --test scripts/settings-files-delete-feedback.regression-1.test.ts`;
+run it when changing Files delete mutations, referenced-material deletion
+guards, or localized delete success and failure feedback.
 Settings files material classification has a fast script-level gate via
 `pnpm exec tsx --test scripts/settings-files-material-classification-handoff-semantic-views.test.ts`;
 run it when changing content-type normalization, extension fallback,
