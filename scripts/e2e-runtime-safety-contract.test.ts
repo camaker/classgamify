@@ -90,7 +90,11 @@ test('local E2E runtime does not open the external Google One Tap prompt', () =>
 test('cancelled auth provider requests do not log navigation errors', () => {
   assert.match(
     AUTH_PROVIDER_STATUS_SOURCE,
-    /catch \(error\) \{\s*if \(!cancelled\) \{\s*console\.error\('auth provider status error', error\);\s*setProviderStatus\(DISABLED_PROVIDER_STATUS\);/
+    /catch \{\s*if \(!cancelled\) \{\s*setProviderStatus\(DISABLED_PROVIDER_STATUS\);/
+  );
+  assert.doesNotMatch(
+    AUTH_PROVIDER_STATUS_SOURCE,
+    /console\.error\('auth provider status error'/
   );
 });
 
