@@ -10,7 +10,7 @@
   /* ─── 品牌色系 - 教育蓝（主色） ─── */
   --primary: oklch(0.65 0.15 240);
   --primary-foreground: oklch(0.98 0 0);
-  --primary-hover: oklch(0.60 0.15 240);
+  --primary-hover: oklch(0.6 0.15 240);
 
   /* ─── 品牌色系 - 游戏紫（辅色） ─── */
   --secondary: oklch(0.62 0.18 290);
@@ -27,7 +27,7 @@
 
   /* ─── 文字系统 - 炭灰 ─── */
   --foreground: oklch(0.25 0 0);
-  --muted-foreground: oklch(0.50 0 0);
+  --muted-foreground: oklch(0.5 0 0);
   --subtle-foreground: oklch(0.65 0 0);
 
   /* ─── 中性色系统 ─── */
@@ -38,19 +38,19 @@
   /* ─── 功能色 - 游戏化状态系统 ─── */
   --success: oklch(0.65 0.15 145);
   --success-foreground: oklch(0.98 0 0);
-  --error: oklch(0.60 0.18 25);
+  --error: oklch(0.6 0.18 25);
   --error-foreground: oklch(0.98 0 0);
   --warning: oklch(0.75 0.15 80);
   --warning-foreground: oklch(0.15 0 0);
-  --info: oklch(0.70 0.12 210);
+  --info: oklch(0.7 0.12 210);
   --info-foreground: oklch(0.98 0 0);
   --draft: oklch(0.68 0.08 260);
   --draft-foreground: oklch(0.25 0 0);
-  --destructive: oklch(0.60 0.18 25);
+  --destructive: oklch(0.6 0.18 25);
   --destructive-foreground: oklch(0.98 0 0);
 
   /* ─── 边框与交互 ─── */
-  --border: oklch(0.90 0.002 240);
+  --border: oklch(0.9 0.002 240);
   --input: oklch(0.92 0.002 240);
   --ring: oklch(0.65 0.15 240);
 
@@ -59,7 +59,7 @@
   --chart-2: oklch(0.62 0.18 290);
   --chart-3: oklch(0.65 0.15 145);
   --chart-4: oklch(0.75 0.15 80);
-  --chart-5: oklch(0.60 0.18 25);
+  --chart-5: oklch(0.6 0.18 25);
 
   /* ─── 圆角系统 ─── */
   --radius-sm: 0.375rem;
@@ -75,7 +75,7 @@
   --sidebar-primary-foreground: oklch(0.98 0 0);
   --sidebar-accent: oklch(0.93 0.004 240);
   --sidebar-accent-foreground: oklch(0.25 0 0);
-  --sidebar-border: oklch(0.90 0.002 240);
+  --sidebar-border: oklch(0.9 0.002 240);
   --sidebar-ring: oklch(0.65 0.15 240);
 }
 
@@ -91,7 +91,7 @@
 
   /* ─── 背景系统 - 深色 ─── */
   --background: oklch(0.15 0 0);
-  --surface: oklch(0.20 0 0);
+  --surface: oklch(0.2 0 0);
   --card: oklch(0.205 0 0);
   --card-foreground: oklch(0.95 0 0);
   --popover: oklch(0.205 0 0);
@@ -100,11 +100,11 @@
   /* ─── 文字系统 - 浅色 ─── */
   --foreground: oklch(0.95 0 0);
   --muted-foreground: oklch(0.65 0 0);
-  --subtle-foreground: oklch(0.50 0 0);
+  --subtle-foreground: oklch(0.5 0 0);
 
   /* ─── 中性色系统 ─── */
   --muted: oklch(0.25 0 0);
-  --accent: oklch(0.30 0 0);
+  --accent: oklch(0.3 0 0);
   --accent-foreground: oklch(0.95 0 0);
 
   /* ─── 功能色 - 暗色模式调整 ─── */

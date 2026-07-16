@@ -164,12 +164,18 @@ test.describe('storage source materials', () => {
     });
     await expect(summary).toBeVisible();
     await expect(
-      summary.getByText('5 extraction-ready files', { exact: true })
+      summary
+        .locator('[data-slot="badge"]')
+        .filter({ hasText: /^4 extraction-ready files$/ })
     ).toBeVisible();
-    await expect(summary.getByText(/Audio · 1/)).toBeVisible();
-    await expect(summary.getByText(/Spreadsheet · 1/)).toBeVisible();
-    await expect(summary.getByText(/Worksheet document · 1/)).toBeVisible();
-    await expect(summary.getByText(/Worksheet image · 1/)).toBeVisible();
+    await expect(
+      summary
+        .getByText(
+          'Audio · 1, File · 1, Spreadsheet · 1, Worksheet document · 1, Worksheet image · 1',
+          { exact: true }
+        )
+        .first()
+    ).toBeVisible();
     await expectNoBrowserErrors(monitor, 'uploaded material activity save');
   });
 });

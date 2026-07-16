@@ -272,7 +272,9 @@ function BillingPeriodRow({ row }: { row: SettingsBillingCardPeriodRow }) {
     <fieldset
       className={cn(
         'm-0 border-0 p-0',
-        row.tone === 'warning' ? 'text-warning-foreground' : 'text-muted-foreground'
+        row.tone === 'warning'
+          ? 'text-warning-foreground'
+          : 'text-muted-foreground'
       )}
     >
       <legend className="sr-only">{row.ariaLabel}</legend>
