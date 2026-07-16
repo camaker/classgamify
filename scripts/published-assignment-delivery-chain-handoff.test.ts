@@ -211,7 +211,7 @@ test('published assignment delivery sources preserve sanitized public and submis
   );
   assert.match(
     ASSIGNMENTS_API_SOURCE,
-    /tx\.insert\(assignment\)\.values\([\s\S]*buildPublishedAssignmentInsert\(\{[\s\S]*sourceActivity,[\s\S]*userId,[\s\S]*\}\)[\s\S]*tx\.insert\(assignmentSnapshot\)\.values\([\s\S]*buildPublishedAssignmentSnapshotInsert/
+    /\.batch\(\[[\s\S]*db\.insert\(assignment\)\.values\([\s\S]*buildPublishedAssignmentInsert\(\{[\s\S]*sourceActivity,[\s\S]*userId,[\s\S]*\}\)[\s\S]*db\.insert\(assignmentSnapshot\)\.values\([\s\S]*buildPublishedAssignmentSnapshotInsert/
   );
   assert.match(
     ASSIGNMENTS_API_SOURCE,

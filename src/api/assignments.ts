@@ -298,8 +298,8 @@ export const publishAssignment = createServerFn({ method: 'POST' })
     const settings = resolveAssignmentSettings(data.settings);
 
     await db
-      .transaction(async (tx) => {
-        await tx.insert(assignment).values(
+      .batch([
+        db.insert(assignment).values(
           buildPublishedAssignmentInsert({
             expiresAt,
             id,
@@ -310,16 +310,15 @@ export const publishAssignment = createServerFn({ method: 'POST' })
             title: data.title,
             userId,
           })
-        );
-
-        await tx.insert(assignmentSnapshot).values(
+        ),
+        db.insert(assignmentSnapshot).values(
           buildPublishedAssignmentSnapshotInsert({
             assignmentId: id,
             createdAt: now,
             sourceActivity,
           })
-        );
-      })
+        ),
+      ])
       .catch(rethrowAssignmentPublishSourceWriteError);
 
     const [row] = await db

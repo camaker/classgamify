@@ -31,13 +31,28 @@ import { useActivities } from '@/hooks/use-activities';
 import { Routes } from '@/lib/routes';
 import { cn } from '@/lib/utils';
 import { IconPlus, IconSparkles, IconX } from '@tabler/icons-react';
-import { Link, createFileRoute, useNavigate } from '@tanstack/react-router';
+import {
+  Link,
+  Outlet,
+  createFileRoute,
+  useMatchRoute,
+  useNavigate,
+} from '@tanstack/react-router';
 import { useEffect, useId, useMemo } from 'react';
 
 export const Route = createFileRoute('/dashboard/activities')({
   validateSearch: buildActivityLibraryValidatedSearch,
-  component: DashboardActivitiesPage,
+  component: DashboardActivitiesRoute,
 });
+
+function DashboardActivitiesRoute() {
+  const matchRoute = useMatchRoute();
+  const activityDetailMatch = matchRoute({
+    to: '/dashboard/activities/$activityId',
+  });
+
+  return activityDetailMatch ? <Outlet /> : <DashboardActivitiesPage />;
+}
 
 function DashboardActivitiesPage() {
   const navigate = useNavigate({ from: '/dashboard/activities' });

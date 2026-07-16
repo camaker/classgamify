@@ -219,7 +219,7 @@ test('local persisted browser journey spec covers save through return', () => {
   );
   assert.match(
     ACTIVITY_AUTHORING_SPEC_SOURCE,
-    /saveActivityFromCreatePage[\s\S]*Publish assignment[\s\S]*Assignment published[\s\S]*Open published link/i,
+    /saveActivityFromCreatePage[\s\S]*Publish assignment[\s\S]*Assignment published[\s\S]*Open link/i,
     'The journey should save an activity, publish it, and open the generated student link.'
   );
   assert.match(

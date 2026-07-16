@@ -1110,6 +1110,11 @@ matching-pairs-board handoff.
 - Fixtures: `tests/e2e/fixtures/`
 - Test-only API: `src/routes/api/e2e/users.ts`
 
+Fast infrastructure gates: `scripts/e2e-user-cleanup-contract.test.ts` keeps
+dependent classroom records ahead of file and user cleanup, while
+`scripts/e2e-runtime-safety-contract.test.ts` keeps server-function CSRF
+protection and the local-only E2E mail bypass explicit.
+
 The test-only API is disabled unless Vite is running locally with
 `import.meta.env.DEV === true`, `MODE=e2e`, and the request includes the
 configured `x-e2e-secret` header. Test accounts must use the

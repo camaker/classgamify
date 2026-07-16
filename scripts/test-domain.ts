@@ -9451,7 +9451,7 @@ assert.match(
 );
 assert.match(
   activityEditorFormSource,
-  /buildActivityEditorDraftGenerationExecutionPlan\(\{[\s\S]*current,[\s\S]*draftFocus,[\s\S]*hasUser: Boolean\(session\?\.user\),[\s\S]*itemCount: draftItemCount,[\s\S]*sourceText: draftSourceText,[\s\S]*\}\)/,
+  /buildActivityEditorDraftGenerationExecutionPlan\(\{[\s\S]*current,[\s\S]*draftFocus,[\s\S]*hasUser,[\s\S]*itemCount: draftItemCount,[\s\S]*sourceText: draftSourceText,[\s\S]*\}\)/,
   'Activity editor form should build AI draft generation execution plans from auth, source text, focus, item count, and current values.'
 );
 assert.match(
@@ -9557,7 +9557,7 @@ assert.match(
 );
 assert.match(
   activityEditorFormSource,
-  /buildActivityEditorSaveExecutionPlan\(\{[\s\S]*activityId,[\s\S]*hasUser: Boolean\(session\?\.user\),[\s\S]*mode,[\s\S]*values,[\s\S]*\}\)/,
+  /buildActivityEditorSaveExecutionPlan\(\{[\s\S]*activityId,[\s\S]*hasUser,[\s\S]*mode,[\s\S]*values,[\s\S]*\}\)/,
   'Activity editor form should build save execution plans from auth, mode, activity id, and form values.'
 );
 assert.match(
@@ -9772,7 +9772,7 @@ assert.match(
 );
 assert.match(
   activityEditorFormSource,
-  /ActivityEditorSourceMaterialsFormField[\s\S]*canLoadFiles=\{Boolean\(session\?\.user\)\}[\s\S]*control=\{form\.control\}/,
+  /ActivityEditorSourceMaterialsFormField[\s\S]*canLoadFiles=\{hasUser\}[\s\S]*control=\{form\.control\}/,
   'Activity editor form should delegate source-material form binding.'
 );
 assert.match(
@@ -9787,7 +9787,7 @@ assert.match(
 );
 assert.match(
   activityEditorFormSource,
-  /ActivityEditorFooter[\s\S]*isPending=\{isPending\}[\s\S]*loginAction=\{loginAction\}[\s\S]*modeView=\{modeView\}[\s\S]*showSaveAction=\{Boolean\(session\?\.user\)\}/,
+  /ActivityEditorFooter[\s\S]*isPending=\{isPending\}[\s\S]*loginAction=\{loginAction\}[\s\S]*modeView=\{modeView\}[\s\S]*showSaveAction=\{hasUser\}/,
   'Activity editor form should delegate editor footer actions.'
 );
 assert.match(
@@ -40998,7 +40998,7 @@ assert.doesNotMatch(
 );
 assert.match(
   assignmentsApiSource,
-  /export const publishAssignment[\s\S]*await db[\s\S]*\.transaction\(async \(tx\) => \{[\s\S]*await tx\.insert\(assignment\)[\s\S]*await tx\.insert\(assignmentSnapshot\)[\s\S]*\.catch\(rethrowAssignmentPublishSourceWriteError\)/,
+  /export const publishAssignment[\s\S]*await db[\s\S]*\.batch\(\[[\s\S]*db\.insert\(assignment\)[\s\S]*db\.insert\(assignmentSnapshot\)[\s\S]*\]\)[\s\S]*\.catch\(rethrowAssignmentPublishSourceWriteError\)/,
   'Publish assignment API should write the assignment and frozen snapshot atomically with source write error mapping.'
 );
 assert.match(
@@ -41018,7 +41018,7 @@ assert.doesNotMatch(
 );
 assert.doesNotMatch(
   assignmentsApiSource,
-  /tx\.insert\(assignment\)\.values\(\{[\s\S]*activityId: sourceActivity\.id[\s\S]*status: 'published'|tx\.insert\(assignmentSnapshot\)\.values\([\s\S]*buildAssignmentSnapshotInsert/,
+  /db\.insert\(assignment\)\.values\(\{[\s\S]*activityId: sourceActivity\.id[\s\S]*status: 'published'|db\.insert\(assignmentSnapshot\)\.values\([\s\S]*buildAssignmentSnapshotInsert/,
   'Publish assignment API should not hand-write published assignment or snapshot insert payloads.'
 );
 assert.match(

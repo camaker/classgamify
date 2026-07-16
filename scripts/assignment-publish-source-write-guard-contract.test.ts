@@ -235,12 +235,12 @@ test('publish API orders initial checks, guarded writes, and reload', () => {
   const lifecycleCheckIndex = handlerSource.indexOf(
     'assertActivityCanDeriveWork(sourceActivity.visibility)'
   );
-  const transactionIndex = handlerSource.indexOf('.transaction(async (tx)');
+  const batchIndex = handlerSource.indexOf('.batch([');
   const assignmentInsertIndex = handlerSource.indexOf(
-    'tx.insert(assignment).values'
+    'db.insert(assignment).values'
   );
   const snapshotInsertIndex = handlerSource.indexOf(
-    'tx.insert(assignmentSnapshot).values'
+    'db.insert(assignmentSnapshot).values'
   );
   const errorMappingIndex = handlerSource.indexOf(
     '.catch(rethrowAssignmentPublishSourceWriteError)'
@@ -251,8 +251,8 @@ test('publish API orders initial checks, guarded writes, and reload', () => {
 
   assert.ok(sourceReadIndex >= 0);
   assert.ok(lifecycleCheckIndex > sourceReadIndex);
-  assert.ok(transactionIndex > lifecycleCheckIndex);
-  assert.ok(assignmentInsertIndex > transactionIndex);
+  assert.ok(batchIndex > lifecycleCheckIndex);
+  assert.ok(assignmentInsertIndex > batchIndex);
   assert.ok(snapshotInsertIndex > assignmentInsertIndex);
   assert.ok(errorMappingIndex > snapshotInsertIndex);
   assert.ok(detailReloadIndex > errorMappingIndex);
@@ -261,7 +261,7 @@ test('publish API orders initial checks, guarded writes, and reload', () => {
 test('source guard contract is documented without marker disclosure', () => {
   assert.match(
     PRODUCT_SOURCE,
-    /source-activity write guard[\s\S]*assignment insert[\s\S]*archived[\s\S]*transaction rolls back[\s\S]*activity-not-found/i
+    /source-activity write guard[\s\S]*assignment insert[\s\S]*archived[\s\S]*D1 atomic batch rolls back[\s\S]*activity-not-found/i
   );
   assert.match(
     DB_DOC_SOURCE,

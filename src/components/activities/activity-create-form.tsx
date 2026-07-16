@@ -93,6 +93,7 @@ export function ActivityCreateForm({
     ACTIVITY_AI_DRAFT_DEFAULT_FOCUS
   );
   const [draftResult, setDraftResult] = useState<ActivityDraftResult>();
+  const [isMounted, setIsMounted] = useState(false);
   const form = useForm<CreateActivityInput>({
     defaultValues,
     resolver: zodResolver(createActivityInputSchema),
@@ -100,13 +101,14 @@ export function ActivityCreateForm({
   const selectedTemplate = form.watch('templateType');
   const watchedValues = form.watch();
   const isGeneratingDraft = draftMutation.isPending;
+  const hasUser = isMounted && Boolean(session?.user);
   const draftSourceState = buildActivityEditorDraftSourceState({
     draftSourceText,
     sourceMaterials: watchedValues.sourceMaterials,
   });
   const aiDraftPanelView = buildActivityEditorAiDraftPanelView({
     draftSourceText,
-    hasUser: Boolean(session?.user),
+    hasUser,
     isGeneratingDraft,
     sourceState: draftSourceState,
   });
@@ -133,6 +135,10 @@ export function ActivityCreateForm({
   };
 
   useEffect(() => {
+    setIsMounted(true);
+  }, []);
+
+  useEffect(() => {
     if (!initialValues) return;
     form.reset(initialValues);
     setDraftSourceText(buildActivityEditorDraftSourceText(initialValues));
@@ -144,7 +150,7 @@ export function ActivityCreateForm({
     const executionPlan = buildActivityEditorDraftGenerationExecutionPlan({
       current,
       draftFocus,
-      hasUser: Boolean(session?.user),
+      hasUser,
       itemCount: draftItemCount,
       sourceText: draftSourceText,
     });
@@ -200,7 +206,7 @@ export function ActivityCreateForm({
   async function onSubmit(values: CreateActivityInput) {
     const executionPlan = buildActivityEditorSaveExecutionPlan({
       activityId,
-      hasUser: Boolean(session?.user),
+      hasUser,
       mode,
       values,
     });
@@ -303,7 +309,7 @@ export function ActivityCreateForm({
                     onClick={syncAttachedMaterialsForDraft}
                   />
                 }
-                canLoadFiles={Boolean(session?.user)}
+                canLoadFiles={hasUser}
                 control={form.control}
               />
             </ActivityEditorSection>
@@ -316,7 +322,7 @@ export function ActivityCreateForm({
               />
             </ActivityEditorSection>
 
-            {!session?.user && !sessionPending ? (
+            {isMounted && !session?.user && !sessionPending ? (
               <div className="border-t px-4 py-4 sm:px-6">
                 <FormError
                   message={m.activity_form_sign_in_required_message()}
@@ -328,7 +334,7 @@ export function ActivityCreateForm({
             isPending={isPending}
             loginAction={loginAction}
             modeView={modeView}
-            showSaveAction={Boolean(session?.user)}
+            showSaveAction={hasUser}
           />
         </form>
       </Form>

@@ -341,7 +341,7 @@ Assignment publishing should additionally keep a source-activity write guard.
 The API performs an owner-scoped source read and restore-before-publish check,
 while D1 checks source owner equality and archived visibility again immediately
 before the assignment insert. If the activity is archived during publish, the
-assignment/snapshot transaction rolls back and returns the existing localized
+assignment/snapshot D1 atomic batch rolls back and returns the existing localized
 restore guidance. Owner mismatches use the same safe activity-not-found response
 as the initial lookup. Active draft, private, public, and unlisted activities
 remain publishable, existing assignment snapshots remain unchanged, and trigger

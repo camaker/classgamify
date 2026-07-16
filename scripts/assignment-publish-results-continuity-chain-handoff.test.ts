@@ -47,8 +47,9 @@ test('assignment publish results continuity keeps a real 30-file boundary', () =
 
 test('publish freezes settings and snapshot before distribution', () => {
   const api = read('src/api/assignments.ts');
-  assert.match(api, /tx\.insert\(assignment\)/);
-  assert.match(api, /tx\.insert\(assignmentSnapshot\)/);
+  assert.match(api, /\.batch\(\[/);
+  assert.match(api, /db\.insert\(assignment\)/);
+  assert.match(api, /db\.insert\(assignmentSnapshot\)/);
   assert.match(api, /buildAssignmentSnapshot/);
   assert.match(api, /shareSlug/);
 });

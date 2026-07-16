@@ -22,7 +22,7 @@ import { DEFAULT_LOGIN_REDIRECT, Routes } from '@/lib/routes';
 import { getPathWithLocale, getSafeCallbackPath } from '@/lib/urls';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { IconEye, IconEyeOff, IconLoader2 } from '@tabler/icons-react';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import * as z from 'zod';
 import { SocialLoginButton } from './social-login-button';
@@ -50,6 +50,7 @@ export function LoginForm({
   const [error, setError] = useState<string | undefined>(undefined);
   const [success, setSuccess] = useState<string | undefined>(undefined);
   const [isPending, setIsPending] = useState(false);
+  const [isMounted, setIsMounted] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const credentialLoginEnabled =
     websiteConfig.auth?.enableCredentialLogin ?? false;
@@ -65,6 +66,11 @@ export function LoginForm({
     typeof window !== 'undefined'
       ? new URLSearchParams(window.location.search).get('error')
       : null;
+
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
+
   const onSubmit = async (values: z.infer<typeof LoginSchema>) => {
     await authClient.signIn.email(
       {
@@ -195,7 +201,7 @@ export function LoginForm({
             <FormError message={error || urlError || undefined} />
             <FormSuccess message={success} />
             <Button
-              disabled={isPending}
+              disabled={isPending || !isMounted}
               size="lg"
               type="submit"
               className="w-full flex items-center justify-center gap-2"

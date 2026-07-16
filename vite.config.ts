@@ -14,6 +14,7 @@ import { paraglideVitePlugin } from '@inlang/paraglide-js';
  */
 const config = defineConfig(({ mode }) => {
   const isProduction = mode === 'production';
+  const isE2e = mode === 'e2e';
 
   return {
     server: {
@@ -36,6 +37,7 @@ const config = defineConfig(({ mode }) => {
     },
     plugins: [
       !isProduction &&
+        !isE2e &&
         devtools({
           eventBusConfig: {
             port: 0,
@@ -43,20 +45,21 @@ const config = defineConfig(({ mode }) => {
         }),
       tailwindcss(),
       contentCollections(),
-      paraglideVitePlugin({
-        project: './project.inlang',
-        outdir: './src/locale/paraglide',
-        strategy: ['url', 'cookie', 'baseLocale'],
-        routeStrategies: [
-          { match: '/api/:path(.*)?', exclude: true },
-          { match: '/robots.txt', exclude: true },
-          { match: '/sitemap.xml', exclude: true },
-          { match: '/manifest.json', exclude: true },
-        ],
-        emitTsDeclarations: true,
-        isServer: 'import.meta.env?.SSR === true',
-        outputStructure: 'locale-modules',
-      }),
+      !isE2e &&
+        paraglideVitePlugin({
+          project: './project.inlang',
+          outdir: './src/locale/paraglide',
+          strategy: ['url', 'cookie', 'baseLocale'],
+          routeStrategies: [
+            { match: '/api/:path(.*)?', exclude: true },
+            { match: '/robots.txt', exclude: true },
+            { match: '/sitemap.xml', exclude: true },
+            { match: '/manifest.json', exclude: true },
+          ],
+          emitTsDeclarations: true,
+          isServer: 'import.meta.env?.SSR === true',
+          outputStructure: 'locale-modules',
+        }),
       // https://developers.cloudflare.com/workers/vite-plugin/
       cloudflare({
         viteEnvironment: {

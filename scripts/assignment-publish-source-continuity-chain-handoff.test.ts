@@ -39,7 +39,7 @@ test('publish source continuity keeps a real 30-file boundary', () => {
   assert.equal(view.privacy.chainSourceFileCount, 30);
 });
 
-test('publish API orders guarded source read transaction and reload', () => {
+test('publish API orders guarded source read D1 batch and reload', () => {
   const api = read('src/api/assignments.ts');
   const handler = api.slice(
     api.indexOf('export const publishAssignment'),
@@ -47,10 +47,10 @@ test('publish API orders guarded source read transaction and reload', () => {
   );
   const sourceRead = handler.indexOf('buildActivityAssignmentSourceSelect()');
   const lifecycle = handler.indexOf('assertActivityCanDeriveWork');
-  const transaction = handler.indexOf('.transaction(async (tx)');
-  const assignmentInsert = handler.indexOf('tx.insert(assignment).values');
+  const batch = handler.indexOf('.batch([');
+  const assignmentInsert = handler.indexOf('db.insert(assignment).values');
   const snapshotInsert = handler.indexOf(
-    'tx.insert(assignmentSnapshot).values'
+    'db.insert(assignmentSnapshot).values'
   );
   const mapping = handler.indexOf(
     '.catch(rethrowAssignmentPublishSourceWriteError)'
@@ -58,8 +58,8 @@ test('publish API orders guarded source read transaction and reload', () => {
   const reload = handler.indexOf('buildAssignmentDetailSelect()');
   assert.ok(sourceRead >= 0);
   assert.ok(lifecycle > sourceRead);
-  assert.ok(transaction > lifecycle);
-  assert.ok(assignmentInsert > transaction);
+  assert.ok(batch > lifecycle);
+  assert.ok(assignmentInsert > batch);
   assert.ok(snapshotInsert > assignmentInsert);
   assert.ok(mapping > snapshotInsert);
   assert.ok(reload > mapping);

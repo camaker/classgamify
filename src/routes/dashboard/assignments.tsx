@@ -28,13 +28,28 @@ import { useAssignments } from '@/hooks/use-assignments';
 import { Routes } from '@/lib/routes';
 import { cn } from '@/lib/utils';
 import { IconListCheck, IconX } from '@tabler/icons-react';
-import { Link, createFileRoute, useNavigate } from '@tanstack/react-router';
+import {
+  Link,
+  Outlet,
+  createFileRoute,
+  useMatchRoute,
+  useNavigate,
+} from '@tanstack/react-router';
 import { useEffect, useId, useMemo } from 'react';
 
 export const Route = createFileRoute('/dashboard/assignments')({
   validateSearch: buildAssignmentListValidatedSearch,
-  component: DashboardAssignmentsPage,
+  component: DashboardAssignmentsRoute,
 });
+
+function DashboardAssignmentsRoute() {
+  const matchRoute = useMatchRoute();
+  const assignmentDetailMatch = matchRoute({
+    to: '/dashboard/assignments/$assignmentId',
+  });
+
+  return assignmentDetailMatch ? <Outlet /> : <DashboardAssignmentsPage />;
+}
 
 function DashboardAssignmentsPage() {
   const navigate = useNavigate({ from: '/dashboard/assignments' });

@@ -2,7 +2,7 @@ import { createFileRoute } from '@tanstack/react-router';
 import { eq, inArray, like } from 'drizzle-orm';
 import { getDb } from '@/db';
 import { account, session, user } from '@/db/auth.schema';
-import { payment, userFiles } from '@/db/app.schema';
+import { activity, payment, userFiles } from '@/db/app.schema';
 
 const TEST_EMAIL_PATTERN = 'e2e-%@example.test';
 const TEST_API_SECRET = 'classgamify-e2e-secret';
@@ -172,6 +172,7 @@ export const Route = createFileRoute('/api/e2e/users')({
         await db.delete(session).where(inArray(session.userId, userIds));
         await db.delete(account).where(inArray(account.userId, userIds));
         await db.delete(payment).where(inArray(payment.userId, userIds));
+        await db.delete(activity).where(inArray(activity.ownerId, userIds));
         await db.delete(userFiles).where(inArray(userFiles.userId, userIds));
         await db.delete(user).where(inArray(user.id, userIds));
 

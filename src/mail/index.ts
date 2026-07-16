@@ -44,6 +44,9 @@ export function getMailProvider(): MailProvider {
 export async function sendEmail(
   params: SendTemplateParams | SendRawEmailParams
 ): Promise<SendEmailResult> {
+  if (import.meta.env.DEV === true && import.meta.env.MODE === 'e2e') {
+    return { success: true, messageId: 'e2e-mail-skipped' };
+  }
   if (!websiteConfig.mail?.enable) {
     return { success: false, error: 'Mail feature is disabled' };
   }

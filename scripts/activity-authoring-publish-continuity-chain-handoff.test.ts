@@ -67,7 +67,8 @@ test('duplicate remix and publish use guarded source writes', () => {
   assert.match(activities, /rethrowActivityDerivativeSourceWriteError/);
   assert.match(activities, /assertActivityCanDeriveWork/);
   assert.match(assignments, /rethrowAssignmentPublishSourceWriteError/);
-  assert.match(assignments, /tx\.insert\(assignmentSnapshot\)/);
+  assert.match(assignments, /\.batch\(\[/);
+  assert.match(assignments, /db\.insert\(assignmentSnapshot\)/);
 });
 
 test('published snapshots remain isolated from later activity writes', () => {

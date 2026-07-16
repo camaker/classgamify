@@ -360,8 +360,8 @@ test('assignment publish, snapshot, and public payload sources stay frozen', () 
   );
   assert.match(
     ASSIGNMENTS_API_SOURCE,
-    /publishAssignment = createServerFn\(\{ method: 'POST' \}\)[\s\S]*\.middleware\(\[authApiMiddleware\]\)[\s\S]*buildActivityDetailOwnerWhere\([\s\S]*assertActivityCanDeriveWork\(sourceActivity\.visibility\)[\s\S]*await db[\s\S]*\.transaction\(async \(tx\) => \{[\s\S]*tx\.insert\(assignment\)[\s\S]*buildPublishedAssignmentInsert[\s\S]*tx\.insert\(assignmentSnapshot\)[\s\S]*buildPublishedAssignmentSnapshotInsert[\s\S]*\.catch\(rethrowAssignmentPublishSourceWriteError\)/,
-    'Publishing should require owner scope, lifecycle derivation, assignment/snapshot transaction, and write-time source error mapping.'
+    /publishAssignment = createServerFn\(\{ method: 'POST' \}\)[\s\S]*\.middleware\(\[authApiMiddleware\]\)[\s\S]*buildActivityDetailOwnerWhere\([\s\S]*assertActivityCanDeriveWork\(sourceActivity\.visibility\)[\s\S]*await db[\s\S]*\.batch\(\[[\s\S]*db\.insert\(assignment\)[\s\S]*buildPublishedAssignmentInsert[\s\S]*db\.insert\(assignmentSnapshot\)[\s\S]*buildPublishedAssignmentSnapshotInsert[\s\S]*\.catch\(rethrowAssignmentPublishSourceWriteError\)/,
+    'Publishing should require owner scope, lifecycle derivation, an atomic D1 assignment/snapshot batch, and write-time source error mapping.'
   );
   assert.match(
     ASSIGNMENTS_API_SOURCE,

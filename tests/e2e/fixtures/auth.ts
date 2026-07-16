@@ -61,15 +61,18 @@ export async function updateE2EUser(
 
 export async function loginByForm(page: Page, user: E2EUser) {
   await page.goto('/auth/login');
-  await page.waitForLoadState('networkidle');
-  await page.locator('input[name="email"]').fill(user.email);
-  await page.locator('input[name="password"]').fill(user.password);
+  const emailInput = page.locator('input[name="email"]');
+  const passwordInput = page.locator('input[name="password"]');
   const signInButton = page.getByRole('button', {
     name: /^sign in$|^登录$/i,
   });
-  await expect(signInButton).toBeEnabled();
+  await expect(emailInput).toBeVisible();
+  await expect(passwordInput).toBeVisible();
+  await expect(signInButton).toBeEnabled({ timeout: 30_000 });
+  await emailInput.fill(user.email);
+  await passwordInput.fill(user.password);
   await signInButton.click();
-  await expect(page).toHaveURL(/\/dashboard\/?$/);
+  await expect(page).toHaveURL(/\/dashboard\/?$/, { timeout: 20_000 });
 }
 
 export async function seedE2EUserFile(
