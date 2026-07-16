@@ -8,6 +8,7 @@ import type {
 } from './types';
 import { ResendProvider } from './provider/resend';
 import { CloudflareProvider } from './provider/cloudflare';
+import { captureE2EEmail } from './e2e-outbox';
 
 let mailProvider: MailProvider | null = null;
 
@@ -45,7 +46,8 @@ export async function sendEmail(
   params: SendTemplateParams | SendRawEmailParams
 ): Promise<SendEmailResult> {
   if (import.meta.env.DEV === true && import.meta.env.MODE === 'e2e') {
-    return { success: true, messageId: 'e2e-mail-skipped' };
+    const record = await captureE2EEmail(params);
+    return { success: true, messageId: record.id };
   }
   if (!websiteConfig.mail?.enable) {
     return { success: false, error: 'Mail feature is disabled' };

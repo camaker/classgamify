@@ -1266,6 +1266,18 @@ and persists a scored attempt through the production submission path.
 |---|---|---|
 | 1 | All eight templates accept scored partial attempts | Create deterministic local published assignments for quiz, match-up, line-match, group-sort, fill-blank, listening, matching-pairs, and open-box from shared structured starter content. Open each public link without teacher authentication, verify its expected choice-list or specialized runtime surface, enter a student identity, answer one item through the real template control, verify incomplete-submit confirmation, submit the partial attempt through the production API, and verify the scored result appears without browser console or page errors. Fixture creation remains restricted to local E2E mode and the E2E secret; public lookup, interaction, validation, scoring, attempt persistence, and result rendering use production paths. |
 
+## 9. Transactional Authentication Mail
+
+**File:** `specs/transactional-auth-mail.spec.ts` | **Priority:** P0
+
+Verifies real authentication mail rendering and action links without contacting
+an external mail provider.
+
+| # | Test name | Flow |
+|---|---|---|
+| 1 | Registration renders verification mail and verifies the teacher | Register through the real browser form, capture the rendered `verifyEmail` message through the secret-gated local E2E outbox, verify the localized subject plus ClassGamify HTML/plain-text workspace copy, open the real Better Auth verification URL, and verify automatic sign-in reaches the teacher dashboard. |
+| 2 | Password recovery renders reset mail | Create a verified local teacher, submit the real forgot-password browser form, capture the rendered `forgotPassword` message, and verify its localized subject, ClassGamify HTML/plain-text workspace copy, and Better Auth reset URL. The in-memory outbox supports only secret-gated read and clear operations in local E2E mode; production and normal development return 404 and continue using the configured provider. |
+
 ## Deferred Coverage
 
 These flows should be added after their dependencies are made deterministic:
@@ -1273,5 +1285,4 @@ These flows should be added after their dependencies are made deterministic:
 | Area | Reason |
 |---|---|
 | Payment checkout and portal | Requires Stripe or Creem test fixtures, webhook simulation, and provider-specific env. |
-| Transactional email | Requires a fake mail provider or captured verification links. |
 | AI provider quality checks | Requires provider mocks or stable fake responses to avoid cost and flake. |

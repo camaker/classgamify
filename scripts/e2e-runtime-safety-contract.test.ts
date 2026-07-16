@@ -15,6 +15,10 @@ const TEMPLATE_RUNNER_SPEC_SOURCE = readFileSync(
   'tests/e2e/specs/interactive-template-runners.spec.ts',
   'utf8'
 );
+const MAIL_OUTBOX_ROUTE_SOURCE = readFileSync(
+  'src/routes/api/e2e/mail.ts',
+  'utf8'
+);
 
 test('server functions use the TanStack CSRF request middleware', () => {
   assert.match(
@@ -23,19 +27,30 @@ test('server functions use the TanStack CSRF request middleware', () => {
   );
 });
 
-test('local E2E mail bypass cannot activate in production or normal dev', () => {
+test('local E2E mail capture cannot activate in production or normal dev', () => {
   assert.match(
     SEND_EMAIL_SOURCE,
     /import\.meta\.env\.DEV === true && import\.meta\.env\.MODE === 'e2e'/
   );
   assert.match(
     SEND_EMAIL_SOURCE,
-    /return \{ success: true, messageId: 'e2e-mail-skipped' \}/
+    /captureE2EEmail\(params\)[\s\S]*return \{ success: true, messageId: record\.id \}/
   );
   assert.ok(
     SEND_EMAIL_SOURCE.indexOf("import.meta.env.MODE === 'e2e'") <
       SEND_EMAIL_SOURCE.indexOf('getMailProvider()')
   );
+});
+
+test('local E2E mail outbox stays secret-gated and read-only', () => {
+  assert.match(
+    MAIL_OUTBOX_ROUTE_SOURCE,
+    /import\.meta\.env\.DEV === true && import\.meta\.env\.MODE === 'e2e'/
+  );
+  assert.match(MAIL_OUTBOX_ROUTE_SOURCE, /x-e2e-secret[\s\S]*TEST_API_SECRET/);
+  assert.match(MAIL_OUTBOX_ROUTE_SOURCE, /GET:[\s\S]*listE2EOutbox/);
+  assert.match(MAIL_OUTBOX_ROUTE_SOURCE, /DELETE:[\s\S]*clearE2EOutbox/);
+  assert.doesNotMatch(MAIL_OUTBOX_ROUTE_SOURCE, /POST:/);
 });
 
 test('interactive assignment fixtures stay local, secret-gated, and scoped', () => {
