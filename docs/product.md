@@ -238,6 +238,15 @@ route validates the id, resolves the key in D1, and then applies the existing
 owner/public access decision before fetching R2. Public shared-folder uploads
 still return their public URL, while neither response exposes owner ids, private
 descriptions, permission metadata, provider metadata, or storage keys.
+The private upload transaction continuity chain should carry this end-to-end
+boundary as 30 source-level stages across upload validation, one R2 `put`, exact
+same-key evidence recovery, owner-scoped D1 metadata insertion, ambiguous-commit
+probing, bounded object compensation, safe teacher responses, server-side key
+resolution, downstream source references, and privacy. Its aggregate summary
+must not expose file bytes, R2 object keys, upload markers, teacher owner ids, or
+student data. `src/storage/private-upload-transaction-continuity-chain.ts` owns
+this source contract without replacing the provider, persistence, or response
+boundary implementations.
 The source-material privacy chain should explicitly carry the compact material
 reference handoff's 30 slices for reference shape, safe file ids and filename
 basenames, content-type, material kind and size normalization, duplicate

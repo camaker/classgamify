@@ -265,6 +265,12 @@ Teacher file responses have a fast script-level gate via
 run it when changing full file lists, private upload responses, public avatar
 responses, safe file item fields, ID-based file links, server-side R2 key
 resolution, settings table types, owner access decisions, or response privacy.
+Private upload transaction continuity has a focused source-chain gate via
+`pnpm exec tsx --test scripts/private-upload-transaction-continuity-chain-handoff.test.ts`;
+run it when changing the 30-stage source-level contract for single R2 writes,
+same-key evidence recovery, D1 metadata commit probes, bounded compensation,
+safe private file items, server-side object-key resolution, source-reference
+continuity, or upload transaction privacy.
 Assignment lifecycle governance chain has a fast script-level gate via
 `pnpm exec tsx --test scripts/assignment-lifecycle-governance-chain-handoff.test.ts`;
 run it when changing open/closed/expired/draft status resolution,
