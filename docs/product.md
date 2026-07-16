@@ -261,6 +261,15 @@ owner-scoped library, lifecycle controls, publish access, and assignment
 snapshot protection. Its independent 30-file gate should continue to verify
 the product, activity, AI, storage, settings, assignment, and catalog surfaces
 without becoming a substitute for that downstream product contract.
+The source-material lifecycle continuity chain should connect these boundaries
+as 30 source-level stages from private upload and compact references through
+guarded activity writes, assignment snapshot freezing, protected deletion, R2
+recovery, and privacy. It must retain active, archived, and frozen-snapshot
+references while keeping file bytes, file ids, storage keys, activity content,
+snapshot content, and student data out of its aggregate summary.
+`src/activities/source-material-lifecycle-continuity-chain.ts` owns this
+cross-boundary source contract without replacing its upload, write, publish,
+integrity, deletion, or privacy authorities.
 
 Teachers must be able to reopen and edit saved activities from the activity
 library. Editing uses the same `CreateActivityInput` contract as creation, with

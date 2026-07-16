@@ -271,6 +271,11 @@ run it when changing the 30-stage source-level contract for single R2 writes,
 same-key evidence recovery, D1 metadata commit probes, bounded compensation,
 safe private file items, server-side object-key resolution, source-reference
 continuity, or upload transaction privacy.
+Source-material lifecycle continuity has a focused source-chain gate via
+`pnpm exec tsx --test scripts/source-material-lifecycle-continuity-chain-handoff.test.ts`;
+run it when changing the 30-stage source-level contract from private upload and
+compact references through guarded activity writes, assignment snapshot
+freezing, protected deletion, R2 recovery, or lifecycle privacy.
 Assignment lifecycle governance chain has a fast script-level gate via
 `pnpm exec tsx --test scripts/assignment-lifecycle-governance-chain-handoff.test.ts`;
 run it when changing open/closed/expired/draft status resolution,
