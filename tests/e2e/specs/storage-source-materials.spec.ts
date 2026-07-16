@@ -39,7 +39,9 @@ async function uploadFixture(page: Page, fixture: UploadFixture) {
     .getByRole('textbox', { name: 'Description', exact: true })
     .fill(fixture.description);
   await dialog.getByRole('button', { name: 'Upload', exact: true }).click();
-  await expect(page.getByText('File uploaded successfully')).toBeVisible();
+  await expect(
+    page.getByText('File uploaded successfully').last()
+  ).toBeVisible();
   await expect(dialog).not.toBeVisible();
 
   const row = page.getByRole('row').filter({ hasText: fixture.name });

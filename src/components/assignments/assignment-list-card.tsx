@@ -234,9 +234,9 @@ function AssignmentListDistribution({
           variant={view.status === 'ready-to-share' ? 'secondary' : 'outline'}
           className={cn(
             'rounded-md',
-            view.status === 'blocked' && 'border-amber-300 text-amber-800',
+            view.status === 'blocked' && 'border-warning/40 bg-warning/15 text-warning-foreground',
             view.status === 'collecting-results' &&
-              'border-blue-200 bg-blue-50 text-blue-700'
+              'border-info/40 bg-info/15 text-info-foreground'
           )}
         >
           {view.statusLabel}

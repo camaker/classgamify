@@ -251,10 +251,10 @@ function getStudentRunnerSubmitReadinessItemClasses(
   }
 
   if (status === 'needs-action') {
-    return `${base} border-amber-400/40 bg-amber-50 text-amber-950 dark:border-amber-500/30 dark:bg-amber-950/20 dark:text-amber-200`;
+    return `${base} border-warning/40 bg-warning/15 text-warning-foreground`;
   }
 
-  return `${base} border-emerald-400/30 bg-emerald-50 text-emerald-950 dark:border-emerald-500/30 dark:bg-emerald-950/20 dark:text-emerald-200`;
+  return `${base} border-success/40 bg-success/15 text-success-foreground`;
 }
 
 function getStudentRunnerSubmitReadinessStatusClasses(
@@ -269,10 +269,10 @@ function getStudentRunnerSubmitReadinessStatusClasses(
   }
 
   if (status === 'needs-action') {
-    return `${base} border-amber-400/40 bg-amber-50 text-amber-950 dark:border-amber-500/30 dark:bg-amber-950/20 dark:text-amber-200`;
+    return `${base} border-warning/40 bg-warning/15 text-warning-foreground`;
   }
 
-  return `${base} border-emerald-400/30 bg-emerald-50 text-emerald-950 dark:border-emerald-500/30 dark:bg-emerald-950/20 dark:text-emerald-200`;
+  return `${base} border-success/40 bg-success/15 text-success-foreground`;
 }
 
 function StudentRunnerSubmitHint({
