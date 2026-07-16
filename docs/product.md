@@ -931,6 +931,17 @@ anonymous tokens.
 
 AI-assisted creation drafts teacher-reviewable `CreateActivityInput` payloads.
 The AI layer must not bypass the activity editor or persist content directly.
+The AI review-to-publish continuity chain should connect this boundary as 30
+source-level stages from sanitized teacher source and authenticated draft
+generation through deterministic fallback, editor-only application, required
+teacher review, manual activity save, explicit assignment publish, snapshot
+protection, result-export continuity, and privacy. Its aggregate summary must
+not expose raw source or provider output, prompts, answers, file bytes, storage
+keys, share slugs, or student data, and it must never persist or publish without
+separate teacher actions.
+`src/activities/activity-ai-review-publish-continuity-chain.ts` owns this
+cross-boundary contract without replacing its authoring, fallback, lifecycle,
+editor-review, save, or publish authorities.
 The AI authoring chain should explicitly carry the 30-slice deterministic
 fallback draft chain across missing credentials, invalid provider JSON, source
 sanitization, material-note omission, safe provenance, term planning, complete
