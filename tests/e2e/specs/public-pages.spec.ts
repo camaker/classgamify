@@ -162,6 +162,8 @@ function escapeRegExp(value: string) {
 }
 
 test.describe('public page smoke coverage', () => {
+  test.describe.configure({ timeout: 120_000 });
+
   for (const { locale, theme } of smokeMatrix) {
     test(`renders all public pages in ${locale}/${theme}`, async ({ page }) => {
       await setTheme(page, theme);
@@ -185,7 +187,6 @@ test.describe('public page smoke coverage', () => {
     const monitor = installPageHealthMonitor(page);
 
     await expectHealthyPage(page, monitor, '/', { theme: 'dark' });
-    await page.waitForLoadState('networkidle');
     await page.getByRole('button', { name: /^log in$/i }).click();
 
     const dialog = page.getByRole('dialog');

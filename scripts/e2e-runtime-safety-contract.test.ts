@@ -31,6 +31,14 @@ const AUTH_PROVIDER_STATUS_SOURCE = readFileSync(
   'src/hooks/use-auth-provider-status.ts',
   'utf8'
 );
+const PAGE_HEALTH_SOURCE = readFileSync(
+  'tests/e2e/fixtures/page-health.ts',
+  'utf8'
+);
+const PUBLIC_PAGES_SPEC_SOURCE = readFileSync(
+  'tests/e2e/specs/public-pages.spec.ts',
+  'utf8'
+);
 
 test('server functions use the TanStack CSRF request middleware', () => {
   assert.match(
@@ -95,6 +103,26 @@ test('cancelled auth provider requests do not log navigation errors', () => {
   assert.doesNotMatch(
     AUTH_PROVIDER_STATUS_SOURCE,
     /console\.error\('auth provider status error'/
+  );
+});
+
+test('production page health waits for first-party DOM readiness', () => {
+  assert.match(
+    PAGE_HEALTH_SOURCE,
+    /page\.goto\(path, \{ waitUntil: 'domcontentloaded' \}\)/
+  );
+  assert.doesNotMatch(PAGE_HEALTH_SOURCE, /page\.goto\(path\);/);
+  assert.match(
+    PUBLIC_PAGES_SPEC_SOURCE,
+    /test\.describe\.configure\(\{ timeout: 120_000 \}\);/
+  );
+  assert.doesNotMatch(
+    PUBLIC_PAGES_SPEC_SOURCE,
+    /waitForLoadState\('networkidle'\)/
+  );
+  assert.match(
+    PAGE_HEALTH_SOURCE,
+    /url === 'https:\/\/accounts\.google\.com\/gsi\/client'/
   );
 });
 

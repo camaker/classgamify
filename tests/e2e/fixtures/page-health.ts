@@ -13,7 +13,16 @@ export function installPageHealthMonitor(page: Page): PageHealthMonitor {
 
   page.on('console', (message) => {
     if (message.type() === 'error') {
-      errors.push(`[console.error] ${message.text()}`);
+      const { url } = message.location();
+      if (
+        message.text() ===
+          'Failed to load resource: net::ERR_CONNECTION_TIMED_OUT' &&
+        url === 'https://accounts.google.com/gsi/client'
+      ) {
+        return;
+      }
+      const source = url ? ` (${url})` : '';
+      errors.push(`[console.error] ${message.text()}${source}`);
     }
   });
 
@@ -53,9 +62,8 @@ export async function expectHealthyPage(
 ) {
   monitor.reset();
 
-  const response = await page.goto(path);
+  const response = await page.goto(path, { waitUntil: 'domcontentloaded' });
   expect(response?.ok(), `${path} should return 2xx`).toBeTruthy();
-  await page.waitForLoadState('domcontentloaded');
   await expect(page.locator('body')).toBeVisible();
 
   if (options.expectedPath) {
