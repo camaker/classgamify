@@ -243,6 +243,12 @@ Source-material write/delete races have a fast script-level gate via
 run it when changing activity or snapshot source-material writes, file metadata
 deletion order, D1 integrity triggers, R2 delete recovery, nested trigger-error
 mapping, or concurrent reference safety.
+Source-material integrity continuity has a focused source-chain gate via
+`pnpm exec tsx --test scripts/source-material-integrity-continuity-chain-handoff.test.ts`;
+run it when changing the 30-slice source-level contract for activity/snapshot
+write triggers, file metadata delete triggers, guarded metadata claims, R2
+presence probes, metadata restoration, localized conflicts, single-writer
+ordering, safe recovery failures, or integrity privacy.
 Private file upload persistence has a fast script-level gate via
 `pnpm exec tsx --test scripts/user-file-upload-persistence-contract.test.ts`;
 run it when changing private R2 uploads, `user_files` metadata insertion,

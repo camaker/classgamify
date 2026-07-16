@@ -202,6 +202,15 @@ activity write cannot attach a disappearing object. If R2 reports a delete error
 the server probes object presence: an absent object completes deletion, a present
 object attempts metadata restoration for retry, and an unknown or failed recovery
 stays unavailable rather than allowing a broken classroom reference.
+The source-material integrity continuity chain should carry this write/delete
+race guard as 30 source-level slices across initial reference validation,
+activity and snapshot insert/update triggers, file metadata delete triggers,
+owner/file matching, guarded metadata claims, R2 deletion and presence probes,
+bounded metadata restoration, localized conflict mapping, single-writer
+ordering, safe recovery failures, and privacy. Its aggregate summary must not
+expose activity or snapshot content, storage keys, or student data.
+`src/activities/source-material-integrity-continuity-chain.ts` owns this source
+contract without rendering trigger or recovery internals in teacher interfaces.
 Private source-material uploads must also compensate across the R2 and D1
 boundary. A successful private R2 write is not returned until its owner-scoped
 `userFiles` metadata is persisted. If that insert reports failure, the server
