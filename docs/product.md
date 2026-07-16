@@ -887,6 +887,16 @@ loop as a 30-slice source-level contract across local e2e account isolation,
 teacher auth, activity save, assignment publish, student runner submission,
 result filters, copy/CSV actions, printable worksheet answer-key state,
 return-to-results navigation, browser health, and privacy guards.
+The assignment publish-to-results continuity chain should also connect this
+runtime path as 30 source-level stages from delivery settings and snapshot
+freezing through share-link distribution, sanitized student play, submission
+validation, guarded attempt persistence, teacher result analysis, copy/export/
+print actions, and privacy. Its aggregate summary must not expose attempt ids,
+student identity, runtime item ids, answer text, teacher answer keys,
+source-material metadata, or storage keys.
+`src/assignments/assignment-publish-results-continuity-chain.ts` owns this
+cross-boundary contract without replacing its delivery, distribution, runner,
+submission, persistence, or teacher-result authorities.
 The teacher result page should show the student summary, the top reteach
 priorities, and the full item performance table so a teacher can scan the
 class before opening individual student answers. The full item performance

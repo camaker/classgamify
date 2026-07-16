@@ -112,6 +112,11 @@ worksheet -> answer key -> return-to-results journey, the persisted browser
 spec that exercises it, or the result-material, result-review, copy-artifact,
 CSV export, printable worksheet, browser-health, and private-data boundaries
 that keep this real classroom loop connected.
+Assignment publish-to-results continuity has a focused source-chain gate via
+`pnpm exec tsx --test scripts/assignment-publish-results-continuity-chain-handoff.test.ts`;
+run it when changing the 30-stage source-level contract for delivery settings,
+snapshot freezing, share-link distribution, sanitized runner play, submission
+guards, attempt persistence, teacher result analysis, exports, or privacy.
 Active surface product boundary has a fast script-level gate via
 `pnpm exec tsx --test scripts/active-surface-product-boundary.test.ts`; run it
 when changing active account governance, contact, billing/payment callback,
