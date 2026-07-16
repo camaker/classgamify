@@ -19,6 +19,14 @@ const MAIL_OUTBOX_ROUTE_SOURCE = readFileSync(
   'src/routes/api/e2e/mail.ts',
   'utf8'
 );
+const CRISP_CHAT_SOURCE = readFileSync(
+  'src/components/chatbox/crisp-chat.tsx',
+  'utf8'
+);
+const GOOGLE_ONE_TAP_SOURCE = readFileSync(
+  'src/components/auth/google-one-tap-prompt.tsx',
+  'utf8'
+);
 
 test('server functions use the TanStack CSRF request middleware', () => {
   assert.match(
@@ -51,6 +59,28 @@ test('local E2E mail outbox stays secret-gated and read-only', () => {
   assert.match(MAIL_OUTBOX_ROUTE_SOURCE, /GET:[\s\S]*listE2EOutbox/);
   assert.match(MAIL_OUTBOX_ROUTE_SOURCE, /DELETE:[\s\S]*clearE2EOutbox/);
   assert.doesNotMatch(MAIL_OUTBOX_ROUTE_SOURCE, /POST:/);
+});
+
+test('local E2E runtime does not contact the external Crisp service', () => {
+  assert.match(
+    CRISP_CHAT_SOURCE,
+    /import\.meta\.env\.MODE === 'e2e'[\s\S]*return;[\s\S]*VITE_CRISP_WEBSITE_ID/
+  );
+  assert.ok(
+    CRISP_CHAT_SOURCE.indexOf("import.meta.env.MODE === 'e2e'") <
+      CRISP_CHAT_SOURCE.indexOf("import('crisp-sdk-web')")
+  );
+});
+
+test('local E2E runtime does not open the external Google One Tap prompt', () => {
+  assert.match(
+    GOOGLE_ONE_TAP_SOURCE,
+    /useEffect\(\(\) => \{[\s\S]*import\.meta\.env\.MODE === 'e2e'[\s\S]*return;[\s\S]*oneTapAuthClient/
+  );
+  assert.ok(
+    GOOGLE_ONE_TAP_SOURCE.indexOf("import.meta.env.MODE === 'e2e'") <
+      GOOGLE_ONE_TAP_SOURCE.indexOf('oneTapAuthClient\n      .oneTap')
+  );
 });
 
 test('interactive assignment fixtures stay local, secret-gated, and scoped', () => {

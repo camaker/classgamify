@@ -65,14 +65,14 @@ function HomePage() {
               {pageView.hero.badgeLabel}
             </Badge>
             <div className="space-y-4">
-              <h1 className="max-w-4xl text-4xl font-bold tracking-tight text-balance md:text-6xl">
+              <h1 className="max-w-4xl text-4xl font-bold tracking-tight text-balance sm:text-5xl md:text-6xl">
                 {pageView.hero.title}
               </h1>
               <p className="max-w-3xl text-lg leading-8 text-muted-foreground">
                 {pageView.hero.description}
               </p>
             </div>
-            <div className="flex flex-col gap-3 sm:flex-row">
+            <div className="space-y-4">
               <Link
                 to={pageView.hero.primaryAction.to}
                 aria-label={pageView.hero.primaryAction.ariaLabel}
@@ -81,28 +81,22 @@ function HomePage() {
                 <IconPlus className="size-4" />
                 {pageView.hero.primaryAction.label}
               </Link>
-              <Link
-                to={pageView.hero.browseTemplatesAction.to}
-                aria-label={pageView.hero.browseTemplatesAction.ariaLabel}
-                className={cn(
-                  buttonVariants({ variant: 'outline', size: 'lg' }),
-                  'rounded-lg bg-background'
-                )}
-              >
-                <IconLayoutGrid className="size-4" />
-                {pageView.hero.browseTemplatesAction.label}
-              </Link>
-              <Link
-                to={pageView.hero.worksheetAction.to}
-                aria-label={pageView.hero.worksheetAction.ariaLabel}
-                className={cn(
-                  buttonVariants({ variant: 'outline', size: 'lg' }),
-                  'rounded-lg bg-background'
-                )}
-              >
-                <IconSparkles className="size-4" />
-                {pageView.hero.worksheetAction.label}
-              </Link>
+              <div className="flex flex-wrap gap-4 text-sm">
+                <Link
+                  to={pageView.hero.browseTemplatesAction.to}
+                  aria-label={pageView.hero.browseTemplatesAction.ariaLabel}
+                  className="text-primary hover:underline"
+                >
+                  {pageView.hero.browseTemplatesAction.label} →
+                </Link>
+                <Link
+                  to={pageView.hero.worksheetAction.to}
+                  aria-label={pageView.hero.worksheetAction.ariaLabel}
+                  className="text-primary hover:underline"
+                >
+                  {pageView.hero.worksheetAction.label} →
+                </Link>
+              </div>
             </div>
           </div>
 
@@ -192,7 +186,9 @@ function Signal({
       <Icon className="size-5 text-primary" />
       <dt className="mt-4 text-sm text-muted-foreground">{signal.label}</dt>
       <dd>
-        <output className="text-2xl font-semibold">{signal.value}</output>
+        <output className="text-2xl font-semibold text-foreground">
+          {signal.value}
+        </output>
         <p className="mt-1 text-xs leading-5 text-muted-foreground">
           {signal.description}
         </p>

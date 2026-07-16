@@ -15,6 +15,10 @@ export function CrispChat() {
   const configured = useRef(false);
 
   useEffect(() => {
+    if (import.meta.env.MODE === 'e2e') {
+      return;
+    }
+
     const websiteId = clientEnv.VITE_CRISP_WEBSITE_ID;
     if (!websiteId || configured.current) {
       return;

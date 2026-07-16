@@ -51,6 +51,10 @@ export function GoogleOneTapPrompt() {
   }, [providerStatus?.googleOneTapClientId]);
 
   useEffect(() => {
+    if (import.meta.env.MODE === 'e2e') {
+      return;
+    }
+
     const clientId = providerStatus?.googleOneTapClientId?.trim();
     if (
       isPending ||
