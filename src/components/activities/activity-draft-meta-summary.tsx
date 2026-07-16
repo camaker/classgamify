@@ -211,9 +211,9 @@ function ActivityDraftReviewGate({
       className={cn(
         'mt-4 rounded-lg border bg-background p-3',
         reviewGateView.status === 'action-needed' &&
-          'border-amber-200 bg-amber-50/50',
+          'border-warning/30 bg-warning/10',
         reviewGateView.status === 'ready-to-save' &&
-          'border-emerald-200 bg-emerald-50/50'
+          'border-success/30 bg-success/10'
       )}
     >
       <div className="flex flex-wrap items-start justify-between gap-2">
@@ -230,9 +230,9 @@ function ActivityDraftReviewGate({
           className={cn(
             'w-fit rounded-md',
             reviewGateView.status === 'action-needed' &&
-              'border-amber-300 text-amber-800',
+              'border-warning/40 bg-warning/15 text-warning-foreground',
             reviewGateView.status === 'ready-to-save' &&
-              'border-emerald-200 bg-emerald-50 text-emerald-700'
+              'border-success/40 bg-success/15 text-success-foreground'
           )}
         >
           {reviewGateView.badgeLabel}
@@ -551,11 +551,11 @@ function ActivityDraftQuestionChoiceReadinessItem({
           className={cn(
             'w-fit shrink-0 rounded-md',
             itemView.status === 'explicit-ready' &&
-              'border-emerald-200 bg-emerald-50 text-emerald-700',
+              'border-success/40 bg-success/15 text-success-foreground',
             itemView.status === 'completed-locally' &&
-              'border-blue-200 bg-blue-50 text-blue-700',
+              'border-info/40 bg-info/15 text-info-foreground',
             itemView.status === 'needs-candidates' &&
-              'border-amber-200 bg-amber-50 text-amber-800'
+              'border-warning/40 bg-warning/15 text-warning-foreground'
           )}
         >
           {itemView.statusLabel}

@@ -1245,6 +1245,16 @@ stable starter link before release.
 |---|---|---|
 | 1 | Starter play link stays interactive while read-only | Open `/play/demo-food`, verify the starter assignment heading and progress badge render, answer two visible quiz choices, verify progress advances, verify the submit button stays disabled because starter preview assignments are read-only, verify the read-only hint is visible and associated with the submit control, and assert no browser errors. |
 
+## 7. Storage Source Materials
+
+**File:** `specs/storage-source-materials.spec.ts` | **Priority:** P1
+
+Verifies the real local browser-to-R2 path and its activity-authoring handoff.
+
+| # | Test name | Flow |
+|---|---|---|
+| 1 | Teacher uploads and attaches private classroom files | Sign in, open `/settings/files`, upload small audio, worksheet image, worksheet document, spreadsheet, and unknown-file fixtures through the real file dialog, and verify each upload closes successfully, creates owner-scoped D1 metadata, remains private, and renders the expected material classification. Open one uploaded file through its id-based private proxy and verify authenticated access returns the original bytes, MIME type, attachment filename, and `nosniff` header without exposing an R2 key. Open `/create`, verify all five uploaded files are available, attach them, save the activity, and verify the activity source-material summary reports five extraction-ready files with audio, spreadsheet, worksheet-document, and worksheet-image coverage while browser health monitoring stays clean. |
+
 ## Deferred Coverage
 
 These flows should be added after their dependencies are made deterministic:
@@ -1252,7 +1262,6 @@ These flows should be added after their dependencies are made deterministic:
 | Area | Reason |
 |---|---|
 | Payment checkout and portal | Requires Stripe or Creem test fixtures, webhook simulation, and provider-specific env. |
-| R2 file uploads | Real browser-to-R2 upload E2E still requires deterministic local storage assertions and small fixture files. The script-level storage upload readiness gate already covers the 20-slice upload contract: validation, filename/folder sanitization, content-type/extension normalization and safety, owner/public folder planning, R2 key planning, same-origin proxy URLs, privacy guards, and provider helper reuse. The storage file access boundary gate covers same-origin proxy key validation, owner checks, missing-object behavior, cache headers, attachment filenames, and `nosniff`. The activity source-material reference boundary gate covers compact `ActivityContent.sourceMaterials` references, safe file ids, safe filename basenames, duplicate collapse, storage-key omission, and student-payload privacy; future E2E should add audio, worksheet image, document, spreadsheet, and unknown-material fixtures so browser upload/download behavior, activity attachment, and material labels are verified together. |
 | Transactional email | Requires a fake mail provider or captured verification links. |
 | Interactive template runners | Requires deterministic runner fixtures and attempt submission assertions. |
 | AI provider quality checks | Requires provider mocks or stable fake responses to avoid cost and flake. |
