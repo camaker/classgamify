@@ -215,7 +215,7 @@ function StudentRuntimeInteractionRegion({
   listView: StudentRuntimeItemListView;
 }) {
   return (
-    <>
+    <div data-runtime-surface={listView.surface}>
       <StudentRuntimeSemanticBundleHandoff
         view={listView.semanticBundleHandoffView}
       />
@@ -229,7 +229,7 @@ function StudentRuntimeInteractionRegion({
         view={listView.runtimeIdentityHandoffView}
       />
       {children}
-    </>
+    </div>
   );
 }
 

@@ -1255,6 +1255,17 @@ Verifies the real local browser-to-R2 path and its activity-authoring handoff.
 |---|---|---|
 | 1 | Teacher uploads and attaches private classroom files | Sign in, open `/settings/files`, upload small audio, worksheet image, worksheet document, spreadsheet, and unknown-file fixtures through the real file dialog, and verify each upload closes successfully, creates owner-scoped D1 metadata, remains private, and renders the expected material classification. Open one uploaded file through its id-based private proxy and verify authenticated access returns the original bytes, MIME type, attachment filename, and `nosniff` header without exposing an R2 key. Open `/create`, verify all five uploaded files are available, attach them, save the activity, and verify the activity source-material summary keeps all five references while reporting four extraction-ready files across audio, spreadsheet, worksheet-document, and worksheet-image coverage and leaving the unknown file reference-only, with clean browser health monitoring. |
 
+## 8. Interactive Template Runners
+
+**File:** `specs/interactive-template-runners.spec.ts` | **Priority:** P0
+
+Verifies every published template reaches its real public interaction surface
+and persists a scored attempt through the production submission path.
+
+| # | Test name | Flow |
+|---|---|---|
+| 1 | All eight templates accept scored partial attempts | Create deterministic local published assignments for quiz, match-up, line-match, group-sort, fill-blank, listening, matching-pairs, and open-box from shared structured starter content. Open each public link without teacher authentication, verify its expected choice-list or specialized runtime surface, enter a student identity, answer one item through the real template control, verify incomplete-submit confirmation, submit the partial attempt through the production API, and verify the scored result appears without browser console or page errors. Fixture creation remains restricted to local E2E mode and the E2E secret; public lookup, interaction, validation, scoring, attempt persistence, and result rendering use production paths. |
+
 ## Deferred Coverage
 
 These flows should be added after their dependencies are made deterministic:
@@ -1263,5 +1274,4 @@ These flows should be added after their dependencies are made deterministic:
 |---|---|
 | Payment checkout and portal | Requires Stripe or Creem test fixtures, webhook simulation, and provider-specific env. |
 | Transactional email | Requires a fake mail provider or captured verification links. |
-| Interactive template runners | Requires deterministic runner fixtures and attempt submission assertions. |
 | AI provider quality checks | Requires provider mocks or stable fake responses to avoid cost and flake. |

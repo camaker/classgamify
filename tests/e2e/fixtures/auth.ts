@@ -1,5 +1,6 @@
 import { expect, type APIRequestContext, type Page } from '@playwright/test';
 import { E2E_TEST_SECRET, type E2EUser, createE2EUser } from './test-data';
+import type { ActivityTemplateType } from '@/activities/types';
 
 const e2eHeaders = {
   'x-e2e-secret': E2E_TEST_SECRET,
@@ -100,5 +101,21 @@ export async function seedE2EUserFile(
       originalName: string;
       size: number;
     };
+  };
+}
+
+export async function seedE2EAssignment(
+  request: APIRequestContext,
+  data: { email: string; templateType: ActivityTemplateType }
+) {
+  const response = await request.post('/api/e2e/assignments', {
+    headers: e2eHeaders,
+    data,
+  });
+  expect(response.ok(), await response.text()).toBeTruthy();
+  return (await response.json()) as {
+    shareSlug: string;
+    templateType: ActivityTemplateType;
+    title: string;
   };
 }

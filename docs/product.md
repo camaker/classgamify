@@ -430,6 +430,13 @@ many playable modes" model instead of only satisfying the selected template's
 minimum fields. The editor should also preview template readiness from the
 current structured text fields before save, using the same parser and
 deterministic remix model as persisted activities.
+Local release verification should exercise all eight published template types
+through their real public runner surfaces. Deterministic E2E fixtures may seed
+the teacher-owned activity, assignment, and frozen snapshot only when Vite is
+running in local E2E mode with the test secret; public lookup, student identity,
+partial-submit confirmation, scoring, attempt persistence, feedback, and result
+rendering must continue through production paths. The fixture route must never
+insert attempts or activate in production.
 The authoring/library chain should explicitly carry the editor workflow's 30
 prepared slices for workflow order, create and edit surfaces, templates,
 scaffolds, AI draft source, structured content, source materials, review

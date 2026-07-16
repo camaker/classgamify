@@ -55,6 +55,7 @@ import { Route as ApiWebhooksStripeRouteImport } from './routes/api/webhooks/str
 import { Route as ApiWebhooksCreemRouteImport } from './routes/api/webhooks/creem'
 import { Route as ApiStorageFileRouteImport } from './routes/api/storage/file'
 import { Route as ApiE2eUsersRouteImport } from './routes/api/e2e/users'
+import { Route as ApiE2eAssignmentsRouteImport } from './routes/api/e2e/assignments'
 import { Route as ApiAuthProviderStatusRouteImport } from './routes/api/auth/provider-status'
 import { Route as ApiAuthSplatRouteImport } from './routes/api/auth/$'
 
@@ -291,6 +292,11 @@ const ApiE2eUsersRoute = ApiE2eUsersRouteImport.update({
   path: '/api/e2e/users',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiE2eAssignmentsRoute = ApiE2eAssignmentsRouteImport.update({
+  id: '/api/e2e/assignments',
+  path: '/api/e2e/assignments',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiAuthProviderStatusRoute = ApiAuthProviderStatusRouteImport.update({
   id: '/api/auth/provider-status',
   path: '/api/auth/provider-status',
@@ -344,6 +350,7 @@ export interface FileRoutesByFullPath {
   '/settings/': typeof SettingsIndexRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/api/auth/provider-status': typeof ApiAuthProviderStatusRoute
+  '/api/e2e/assignments': typeof ApiE2eAssignmentsRoute
   '/api/e2e/users': typeof ApiE2eUsersRoute
   '/api/storage/file': typeof ApiStorageFileRoute
   '/api/webhooks/creem': typeof ApiWebhooksCreemRoute
@@ -391,6 +398,7 @@ export interface FileRoutesByTo {
   '/settings': typeof SettingsIndexRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/api/auth/provider-status': typeof ApiAuthProviderStatusRoute
+  '/api/e2e/assignments': typeof ApiE2eAssignmentsRoute
   '/api/e2e/users': typeof ApiE2eUsersRoute
   '/api/storage/file': typeof ApiStorageFileRoute
   '/api/webhooks/creem': typeof ApiWebhooksCreemRoute
@@ -442,6 +450,7 @@ export interface FileRoutesById {
   '/settings/': typeof SettingsIndexRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/api/auth/provider-status': typeof ApiAuthProviderStatusRoute
+  '/api/e2e/assignments': typeof ApiE2eAssignmentsRoute
   '/api/e2e/users': typeof ApiE2eUsersRoute
   '/api/storage/file': typeof ApiStorageFileRoute
   '/api/webhooks/creem': typeof ApiWebhooksCreemRoute
@@ -494,6 +503,7 @@ export interface FileRouteTypes {
     | '/settings/'
     | '/api/auth/$'
     | '/api/auth/provider-status'
+    | '/api/e2e/assignments'
     | '/api/e2e/users'
     | '/api/storage/file'
     | '/api/webhooks/creem'
@@ -541,6 +551,7 @@ export interface FileRouteTypes {
     | '/settings'
     | '/api/auth/$'
     | '/api/auth/provider-status'
+    | '/api/e2e/assignments'
     | '/api/e2e/users'
     | '/api/storage/file'
     | '/api/webhooks/creem'
@@ -591,6 +602,7 @@ export interface FileRouteTypes {
     | '/settings/'
     | '/api/auth/$'
     | '/api/auth/provider-status'
+    | '/api/e2e/assignments'
     | '/api/e2e/users'
     | '/api/storage/file'
     | '/api/webhooks/creem'
@@ -625,6 +637,7 @@ export interface RootRouteChildren {
   BlogIndexRoute: typeof BlogIndexRoute
   ApiAuthSplatRoute: typeof ApiAuthSplatRoute
   ApiAuthProviderStatusRoute: typeof ApiAuthProviderStatusRoute
+  ApiE2eAssignmentsRoute: typeof ApiE2eAssignmentsRoute
   ApiE2eUsersRoute: typeof ApiE2eUsersRoute
   ApiStorageFileRoute: typeof ApiStorageFileRoute
   ApiWebhooksCreemRoute: typeof ApiWebhooksCreemRoute
@@ -956,6 +969,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiE2eUsersRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/e2e/assignments': {
+      id: '/api/e2e/assignments'
+      path: '/api/e2e/assignments'
+      fullPath: '/api/e2e/assignments'
+      preLoaderRoute: typeof ApiE2eAssignmentsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/auth/provider-status': {
       id: '/api/auth/provider-status'
       path: '/api/auth/provider-status'
@@ -1090,6 +1110,7 @@ const rootRouteChildren: RootRouteChildren = {
   BlogIndexRoute: BlogIndexRoute,
   ApiAuthSplatRoute: ApiAuthSplatRoute,
   ApiAuthProviderStatusRoute: ApiAuthProviderStatusRoute,
+  ApiE2eAssignmentsRoute: ApiE2eAssignmentsRoute,
   ApiE2eUsersRoute: ApiE2eUsersRoute,
   ApiStorageFileRoute: ApiStorageFileRoute,
   ApiWebhooksCreemRoute: ApiWebhooksCreemRoute,
