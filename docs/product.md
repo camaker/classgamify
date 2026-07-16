@@ -406,6 +406,16 @@ public-payload, result-policy, and privacy contracts. Its independent 30-file
 gate should continue to verify archive, restore, edit, duplicate, remix,
 retention, and snapshot surfaces without replacing that downstream product
 boundary.
+The activity authoring-to-publish continuity chain should connect this teacher
+workflow as 30 source-level stages from public template entry and editor save
+through owner-scoped library search, filters and pagination, atomic edit,
+archive and restore, guarded duplicate/remix drafts, assignment publishing,
+snapshot isolation, and privacy. Its aggregate summary must not expose activity
+content, source provenance, source-material metadata, teacher owner ids,
+assignment snapshot content, or student data.
+`src/activities/activity-authoring-publish-continuity-chain.ts` owns this
+cross-boundary contract without replacing its authoring, library, lifecycle,
+mutation, derivative, or publish authorities.
 
 The activity editor should make the selected template legible. When teachers
 choose quiz, match-up, line-match, group sort, fill-blank, listening, matching

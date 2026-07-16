@@ -146,6 +146,12 @@ and
 `pnpm exec tsx --test scripts/activity-ai-fallback-handoff-semantic-views.test.ts`;
 run the matching gate when changing owner-scoped library summaries, reusable
 template scaffold quality, or deterministic local AI fallback draft semantics.
+Activity authoring-to-publish continuity has a focused source-chain gate via
+`pnpm exec tsx --test scripts/activity-authoring-publish-continuity-chain-handoff.test.ts`;
+run it when changing the 30-stage source-level contract for template entry,
+editor persistence, owner-scoped library filters, atomic lifecycle mutations,
+guarded duplicate/remix drafts, assignment publishing, snapshot isolation, or
+workflow privacy.
 Assignment shared-boundary gates include
 `pnpm exec tsx --test scripts/assignment-semantic-views.test.ts`,
 `pnpm exec tsx --test scripts/assignment-delivery-policy-handoff-semantic-views.test.ts`,
