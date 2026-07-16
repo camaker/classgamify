@@ -39,8 +39,8 @@ export function useAuthProviderStatus(enabled = true) {
           setProviderStatus(status);
         }
       } catch (error) {
-        console.error('auth provider status error', error);
         if (!cancelled) {
+          console.error('auth provider status error', error);
           setProviderStatus(DISABLED_PROVIDER_STATUS);
         }
       } finally {

@@ -27,6 +27,10 @@ const GOOGLE_ONE_TAP_SOURCE = readFileSync(
   'src/components/auth/google-one-tap-prompt.tsx',
   'utf8'
 );
+const AUTH_PROVIDER_STATUS_SOURCE = readFileSync(
+  'src/hooks/use-auth-provider-status.ts',
+  'utf8'
+);
 
 test('server functions use the TanStack CSRF request middleware', () => {
   assert.match(
@@ -80,6 +84,13 @@ test('local E2E runtime does not open the external Google One Tap prompt', () =>
   assert.ok(
     GOOGLE_ONE_TAP_SOURCE.indexOf("import.meta.env.MODE === 'e2e'") <
       GOOGLE_ONE_TAP_SOURCE.indexOf('oneTapAuthClient\n      .oneTap')
+  );
+});
+
+test('cancelled auth provider requests do not log navigation errors', () => {
+  assert.match(
+    AUTH_PROVIDER_STATUS_SOURCE,
+    /catch \(error\) \{\s*if \(!cancelled\) \{\s*console\.error\('auth provider status error', error\);\s*setProviderStatus\(DISABLED_PROVIDER_STATUS\);/
   );
 });
 
