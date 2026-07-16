@@ -1278,6 +1278,17 @@ an external mail provider.
 | 1 | Registration renders verification mail and verifies the teacher | Register through the real browser form, capture the rendered `verifyEmail` message through the secret-gated local E2E outbox, verify the localized subject plus ClassGamify HTML/plain-text workspace copy, open the real Better Auth verification URL, and verify automatic sign-in reaches the teacher dashboard. |
 | 2 | Password recovery renders reset mail | Create a verified local teacher, submit the real forgot-password browser form, capture the rendered `forgotPassword` message, and verify its localized subject, ClassGamify HTML/plain-text workspace copy, and Better Auth reset URL. The in-memory outbox supports only secret-gated read and clear operations in local E2E mode; production and normal development return 404 and continue using the configured provider. |
 
+## 10. Deterministic AI Draft Fallback
+
+**File:** `specs/ai-draft-fallback.spec.ts` | **Priority:** P0
+
+Verifies that AI-assisted authoring remains usable and teacher-controlled when
+Workers AI credentials are unavailable, without claiming provider quality.
+
+| # | Test name | Flow |
+|---|---|---|
+| 1 | Teacher generates, reviews, and explicitly saves a local fallback draft | Register and sign in as a verified teacher, replace the starter source notes with classroom content, choose the draft item count and question focus, invoke the production AI-draft server function, verify the deterministic fallback fills reviewable title and structured-question fields, exposes fallback provenance and the missing-credentials notice, and remains on the create page without persisting. Click the real save action, verify redirect to the activity library, and verify the generated title is persisted without browser console or page errors. |
+
 ## Deferred Coverage
 
 These flows should be added after their dependencies are made deterministic:
