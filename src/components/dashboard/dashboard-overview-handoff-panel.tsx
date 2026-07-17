@@ -19,7 +19,7 @@ export function DashboardOverviewHandoffPanel({
     <Card
       aria-describedby={descriptionId}
       aria-labelledby={titleId}
-      className="rounded-lg"
+      className="sr-only"
       data-handoff="dashboard-overview"
       data-handoff-scope={view.privacy.scope}
     >

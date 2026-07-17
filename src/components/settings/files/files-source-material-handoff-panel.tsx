@@ -15,7 +15,7 @@ export function FilesSourceMaterialHandoffPanel({
     <section
       aria-describedby={descriptionId}
       aria-labelledby={titleId}
-      className="grid gap-3 rounded-lg border bg-muted/20 p-4"
+      className="sr-only"
       data-handoff="settings-files-source-material"
       data-handoff-scope={view.privacy.scope}
     >

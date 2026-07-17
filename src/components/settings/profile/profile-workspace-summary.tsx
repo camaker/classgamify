@@ -63,7 +63,7 @@ function AccountWorkspaceHandoff({
     <section
       aria-describedby={descriptionId}
       aria-labelledby={titleId}
-      className="grid gap-3 border-t pt-3"
+      className="sr-only"
       data-handoff="settings-account-workspace"
       data-handoff-scope={handoffView.privacy.scope}
     >

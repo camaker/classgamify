@@ -117,7 +117,7 @@ function ActivityLibraryTemplateRemixHandoff({
     <section
       aria-describedby={descriptionId}
       aria-labelledby={titleId}
-      className="mt-3 border-t pt-3"
+      className="sr-only"
       data-handoff="activity-template-remix"
       data-handoff-scope={handoff.privacy.scope}
     >

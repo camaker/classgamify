@@ -280,6 +280,11 @@ test('activity template remix handoff localizes Chinese draft-copy boundaries', 
 test('activity template remix handoff renders stable DOM relationships', () => {
   assert.match(
     ACTIVITY_LIBRARY_COMPATIBILITY_PANEL_SOURCE,
+    /function ActivityLibraryTemplateRemixHandoff[\s\S]*className="sr-only"/,
+    'Template-remix audit semantics should stay hidden while remix actions remain visible.'
+  );
+  assert.match(
+    ACTIVITY_LIBRARY_COMPATIBILITY_PANEL_SOURCE,
     /ActivityTemplateRemixHandoffItemView[\s\S]*ActivityTemplateRemixHandoffView[\s\S]*function ActivityLibraryTemplateRemixHandoff[\s\S]*const titleId = useId\(\)[\s\S]*const descriptionId = useId\(\)[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*aria-labelledby=\{titleId\}[\s\S]*data-handoff="activity-template-remix"[\s\S]*data-handoff-scope=\{handoff\.privacy\.scope\}[\s\S]*id=\{titleId\}[\s\S]*id=\{descriptionId\}[\s\S]*handoff\.itemViews\.map[\s\S]*ActivityLibraryTemplateRemixHandoffItem[\s\S]*function ActivityLibraryTemplateRemixHandoffItem[\s\S]*const labelId = `activity-template-remix-handoff-\$\{item\.id\}-label`[\s\S]*const valueId = `activity-template-remix-handoff-\$\{item\.id\}-value`[\s\S]*const descriptionId = `activity-template-remix-handoff-\$\{item\.id\}-description`[\s\S]*data-handoff-item=\{item\.id\}[\s\S]*id=\{labelId\}[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*aria-label=\{item\.ariaLabel\}[\s\S]*aria-labelledby=\{`\$\{labelId\} \$\{valueId\}`\}[\s\S]*id=\{valueId\}[\s\S]*id=\{descriptionId\}/,
     'Template remix handoff should render each draft-copy slice with stable label, value, and description relationships.'
   );

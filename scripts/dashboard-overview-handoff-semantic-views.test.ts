@@ -29,6 +29,11 @@ const TEST_CATALOG_SOURCE = readFileSync('tests/e2e/TEST-CATALOG.md', 'utf8');
 test('dashboard overview handoff panel renders stable semantic outputs', () => {
   assert.match(
     DASHBOARD_OVERVIEW_HANDOFF_PANEL_SOURCE,
+    /className="sr-only"/,
+    'Dashboard overview audit semantics should stay available to automation without occupying the teacher workspace.'
+  );
+  assert.match(
+    DASHBOARD_OVERVIEW_HANDOFF_PANEL_SOURCE,
     /DashboardOverviewHandoffView[\s\S]*data-handoff="dashboard-overview"[\s\S]*data-handoff-scope=\{view\.privacy\.scope\}[\s\S]*view\.itemViews\.map\(\(itemView\) =>[\s\S]*DashboardOverviewHandoffItem[\s\S]*function DashboardOverviewHandoffItem[\s\S]*const labelId = `dashboard-overview-handoff-\$\{itemView\.id\}-label`[\s\S]*const valueId = `dashboard-overview-handoff-\$\{itemView\.id\}-value`[\s\S]*const descriptionId = `dashboard-overview-handoff-\$\{itemView\.id\}-description`[\s\S]*data-handoff-item=\{itemView\.id\}[\s\S]*id=\{labelId\}[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*aria-label=\{itemView\.ariaLabel\}[\s\S]*aria-labelledby=\{`\$\{labelId\} \$\{valueId\}`\}[\s\S]*id=\{valueId\}[\s\S]*id=\{descriptionId\}/,
     'Dashboard overview handoff panel should render marker, item ids, and stable label/value/description relationships.'
   );

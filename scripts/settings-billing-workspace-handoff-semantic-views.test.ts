@@ -228,6 +228,11 @@ test('billing card view model separates classroom plan states and hosted actions
 
 test('billing route consumes prepared workspace view models', () => {
   assert.match(
+    BILLING_WORKSPACE_SUMMARY_SOURCE,
+    /function BillingWorkspaceHandoff[\s\S]*className="sr-only"/,
+    'Billing audit semantics should remain hidden while current-plan and upgrade controls stay visible.'
+  );
+  assert.match(
     BILLING_ROUTE_SOURCE,
     /buildSettingsBillingPageViewModel\(\)[\s\S]*BillingWorkspaceSummary[\s\S]*view=\{pageView\.workspaceSummaryView\}[\s\S]*BillingCard/,
     'Billing route should render prepared workspace summary before plan card.'

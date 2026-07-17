@@ -370,6 +370,11 @@ test('AI draft meta handoff localizes Chinese save-review boundaries', () => {
 test('AI draft meta handoff renders stable DOM relationships', () => {
   assert.match(
     ACTIVITY_DRAFT_META_SUMMARY_SOURCE,
+    /function ActivityDraftMetaHandoff[\s\S]*className="sr-only"/,
+    'AI draft audit metadata should remain hidden while teacher-facing provenance stays concise.'
+  );
+  assert.match(
+    ACTIVITY_DRAFT_META_SUMMARY_SOURCE,
     /ActivityDraftMetaHandoffItemView[\s\S]*ActivityDraftMetaHandoffView[\s\S]*function ActivityDraftMetaHandoff[\s\S]*const titleId = 'activity-draft-meta-handoff-title'[\s\S]*const descriptionId = 'activity-draft-meta-handoff-description'[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*aria-labelledby=\{titleId\}[\s\S]*data-handoff="activity-draft-meta"[\s\S]*data-handoff-scope=\{handoffView\.privacy\.scope\}[\s\S]*id=\{titleId\}[\s\S]*id=\{descriptionId\}[\s\S]*handoffView\.itemViews\.map[\s\S]*ActivityDraftMetaHandoffItem[\s\S]*function ActivityDraftMetaHandoffItem[\s\S]*const labelId = `activity-draft-meta-handoff-\$\{item\.id\}-label`[\s\S]*const valueId = `activity-draft-meta-handoff-\$\{item\.id\}-value`[\s\S]*const descriptionId = `activity-draft-meta-handoff-\$\{item\.id\}-description`[\s\S]*data-handoff-item=\{item\.id\}[\s\S]*id=\{labelId\}[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*aria-label=\{item\.ariaLabel\}[\s\S]*aria-labelledby=\{`\$\{labelId\} \$\{valueId\}`\}[\s\S]*id=\{valueId\}[\s\S]*id=\{descriptionId\}/,
     'AI draft meta save handoff should render each review-before-save slice with stable label, value, and description relationships.'
   );

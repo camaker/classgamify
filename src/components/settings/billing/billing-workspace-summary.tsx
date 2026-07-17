@@ -64,7 +64,7 @@ function BillingWorkspaceHandoff({
     <section
       aria-describedby={descriptionId}
       aria-labelledby={titleId}
-      className="grid gap-3 rounded-md border bg-background/80 p-3"
+      className="sr-only"
       data-handoff="settings-billing-workspace"
       data-handoff-scope={handoffView.privacy.scope}
     >

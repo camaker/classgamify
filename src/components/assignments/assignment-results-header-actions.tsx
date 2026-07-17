@@ -471,7 +471,7 @@ function AssignmentResultsExportPreparation({
     <section
       aria-describedby={descriptionId}
       aria-labelledby={titleId}
-      className="grid basis-full gap-3 rounded-lg border bg-muted/20 p-3"
+      className="sr-only"
       data-handoff="assignment-results-export-preparation"
       data-handoff-scope={exportPreparationView.privacy.scope}
     >

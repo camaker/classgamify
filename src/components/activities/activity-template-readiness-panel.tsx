@@ -149,7 +149,7 @@ function ActivityTemplateQuizChoiceGenerationHandoff({
     <section
       aria-describedby={descriptionId}
       aria-labelledby={titleId}
-      className="mt-4 rounded-lg border bg-background/70 p-3"
+      className="sr-only"
       data-handoff="question-choice-generation"
       data-handoff-scope={handoffView.privacy.scope}
     >

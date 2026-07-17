@@ -160,6 +160,11 @@ test('notification settings page wires update boundary before newsletter control
   );
   assert.match(
     NOTIFICATION_SUMMARY_SOURCE,
+    /function NotificationUpdateHandoff[\s\S]*className="sr-only"/,
+    'Notification audit semantics should remain hidden while teacher preference controls stay visible.'
+  );
+  assert.match(
+    NOTIFICATION_SUMMARY_SOURCE,
     /view\.itemViews\.map\(\(itemView\) =>[\s\S]*key=\{itemView\.id\}[\s\S]*aria-label=\{itemView\.ariaLabel\}[\s\S]*itemView\.label[\s\S]*itemView\.description/,
     'Notification workspace summary should render prepared summary items by stable ids.'
   );

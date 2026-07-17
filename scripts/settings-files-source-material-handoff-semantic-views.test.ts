@@ -129,6 +129,11 @@ test('settings files table wires full-library summaries and safe handoff panels'
   );
   assert.match(
     FILES_SOURCE_HANDOFF_PANEL_SOURCE,
+    /className="sr-only"/,
+    'Files audit semantics should remain hidden while the source-material library and upload controls stay visible.'
+  );
+  assert.match(
+    FILES_SOURCE_HANDOFF_PANEL_SOURCE,
     /SettingsFilesSourceMaterialHandoffView[\s\S]*data-handoff="settings-files-source-material"[\s\S]*data-handoff-scope=\{view\.privacy\.scope\}[\s\S]*view\.itemViews\.map\(\(itemView\) =>[\s\S]*FilesSourceMaterialHandoffItem[\s\S]*function FilesSourceMaterialHandoffItem[\s\S]*const labelId = `settings-files-source-material-handoff-\$\{itemView\.id\}-label`[\s\S]*const valueId = `settings-files-source-material-handoff-\$\{itemView\.id\}-value`[\s\S]*const descriptionId = `settings-files-source-material-handoff-\$\{itemView\.id\}-description`[\s\S]*data-handoff-item=\{itemView\.id\}[\s\S]*id=\{labelId\}[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*aria-label=\{itemView\.ariaLabel\}[\s\S]*aria-labelledby=\{`\$\{labelId\} \$\{valueId\}`\}[\s\S]*id=\{valueId\}[\s\S]*id=\{descriptionId\}/,
     'Source-material handoff panel should render stable label, value, and description relationships.'
   );

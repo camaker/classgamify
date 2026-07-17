@@ -97,6 +97,11 @@ page-view or domain helpers, but should not render internal `data-handoff`
 audit output into public DOM. Authenticated teacher workspace, student runner,
 results, print, and authoring tool surfaces may still use hidden semantic
 outputs where they support workflow QA and accessibility.
+Those audit-only outputs must remain visually hidden and must not consume
+layout space, displace primary actions, or present implementation terminology
+as teacher-facing product content. Visible surfaces keep concise workflow
+guidance and real controls, while automation may continue to read the hidden
+label/value/description contracts.
 Developer-facing examples and active account/contact copy should follow the
 same product boundary: visible surfaces may refer to legacy URLs only when they
 are explicit migration entry points, while current forms, billing pages, and

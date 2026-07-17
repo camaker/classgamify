@@ -424,6 +424,11 @@ test('assignment results export preparation renders stable handoff markers', () 
   );
   assert.match(
     headerActionsSource,
+    /function AssignmentResultsExportPreparation[\s\S]*className="sr-only"/,
+    'Export-preparation audit semantics should stay hidden while download and copy actions remain visible.'
+  );
+  assert.match(
+    headerActionsSource,
     /data-handoff-scope=\{exportPreparationView\.privacy\.scope\}/
   );
   assert.match(headerActionsSource, /data-handoff-item=\{itemView\.id\}/);

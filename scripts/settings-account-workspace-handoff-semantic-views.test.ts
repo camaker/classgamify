@@ -144,6 +144,11 @@ test('profile and security account handoffs render stable semantic outputs', () 
   ] as const) {
     assert.match(
       source,
+      /function AccountWorkspaceHandoff[\s\S]*className="sr-only"/,
+      `${sourceName} account audit semantics should remain hidden while account controls stay visible.`
+    );
+    assert.match(
+      source,
       /<AccountWorkspaceHandoff handoffView=\{view\.handoffView\} \/>[\s\S]*data-handoff="settings-account-workspace"[\s\S]*data-handoff-scope=\{handoffView\.privacy\.scope\}[\s\S]*handoffView\.itemViews\.map[\s\S]*AccountWorkspaceHandoffItem[\s\S]*const labelId = `settings-account-workspace-handoff-\$\{itemView\.id\}-label`[\s\S]*const valueId = `settings-account-workspace-handoff-\$\{itemView\.id\}-value`[\s\S]*const descriptionId = `settings-account-workspace-handoff-\$\{itemView\.id\}-description`[\s\S]*data-handoff-item=\{itemView\.id\}[\s\S]*id=\{labelId\}[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*aria-label=\{itemView\.ariaLabel\}[\s\S]*aria-labelledby=\{`\$\{labelId\} \$\{valueId\}`\}[\s\S]*id=\{valueId\}[\s\S]*id=\{descriptionId\}/,
       `${sourceName} account handoff should render marker, privacy scope, item ids, and stable label/value/description relationships.`
     );
