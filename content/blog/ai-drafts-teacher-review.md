@@ -64,3 +64,32 @@ autonomous classroom operator.
 The most helpful AI feature is often not a dramatic chat interface. It is a
 button that turns messy source notes into a clean draft, highlights what is
 missing, and lets the teacher get back to teaching.
+
+## A six-point review before publishing
+
+Use the same short review every time so quality does not depend on how busy the
+teacher is that day:
+
+1. State one observable learning goal and remove questions that do not support it.
+2. Verify every answer, accepted variation, explanation, pair, and category.
+3. Check reading level, prior knowledge, timing, and accommodations for the class.
+4. Preview images, audio, keyboard access, feedback, and the complete mobile flow.
+5. Remove student data and unrelated file or permission metadata from the draft.
+6. Confirm attempt limits, answer reveal, due dates, and result collection before publishing.
+
+Teachers can choose an interaction in the [template library](/templates), refine
+the activity in the [creator](/create), or use a [printable worksheet](/worksheets)
+when paper practice better fits the learning goal. The format should follow the
+lesson, not the other way around.
+
+## Review from the student's side
+
+A technically valid activity can still be confusing. Complete one preview as a
+student and look for unclear instructions, accidental clues, unreachable
+controls, abrupt feedback, and questions that take much longer than expected.
+For assessed work, also check whether students need an account, how many attempts
+they receive, when answers appear, and what the teacher will see in the results.
+
+This final preview is the boundary between generated material and accountable
+classroom use. It keeps AI useful precisely because the teacher remains the
+person making the instructional decision.
