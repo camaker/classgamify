@@ -12,6 +12,35 @@
     "ar"
   ],
   "draftLocales": ["fr", "de", "ja", "ko", "it", "es", "pt-BR", "ar"],
+  "draftNamespaces": {
+    "common-core": [
+      "common_breadcrumb",
+      "common_cancel",
+      "common_close",
+      "common_command_palette_description",
+      "common_command_palette_title",
+      "common_escape",
+      "common_go_back",
+      "common_home",
+      "common_loading",
+      "common_logo_alt",
+      "common_main_navigation",
+      "common_mobile_navigation",
+      "common_mode_dark",
+      "common_mode_light",
+      "common_mode_system",
+      "common_mode_theme",
+      "common_more",
+      "common_open_user_menu",
+      "common_settings",
+      "common_sidebar_description",
+      "common_sidebar_title",
+      "common_switch_language",
+      "common_toggle_menu",
+      "common_toggle_sidebar",
+      "common_toggle_theme"
+    ]
+  },
   "englishOnlyKeyPatterns": [
     "^legal_",
     "legal",

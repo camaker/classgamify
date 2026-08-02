@@ -5,6 +5,7 @@ import path from 'node:path';
 type Policy = {
   targetLocales: string[];
   draftLocales: string[];
+  draftNamespaces: Record<string, string[]>;
   englishOnlyKeyPatterns: string[];
   legalMarkdown: string[];
 };
@@ -74,9 +75,10 @@ try {
         const draft = JSON.parse(
           await readFile(path.join(draftsRoot, locale, file), 'utf8')
         ) as Record<string, string>;
-        const expectedKeys = Object.keys(english)
-          .filter((key) => key.startsWith(`${namespace}_`))
-          .sort();
+        const expectedKeys = (
+          policy.draftNamespaces[namespace] ??
+          Object.keys(english).filter((key) => key.startsWith(`${namespace}_`))
+        ).sort();
         assert.ok(expectedKeys.length, `Unknown draft namespace: ${namespace}`);
         assert.deepEqual(Object.keys(draft).sort(), expectedKeys);
         const localizableKeys = expectedKeys.filter(
