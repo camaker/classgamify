@@ -1,0 +1,10 @@
+{
+  "activity_form_ai_draft_badge": "Bozza IA",
+  "activity_form_ai_draft_review_note": "Da verificare dall’insegnante prima del salvataggio",
+  "activity_form_ai_focus_label": "Obiettivo della bozza",
+  "activity_form_ai_generation_pending_hint": "La generazione della bozza è già in corso.",
+  "activity_form_ai_item_count_description": "Scegli quanti elementi generare nella bozza e verificali prima di salvare l’attività.",
+  "activity_form_ai_item_count_label": "Numero di elementi",
+  "activity_form_generate_draft": "Genera bozza",
+  "activity_form_step_ai_title": "Crea una bozza dai contenuti"
+}

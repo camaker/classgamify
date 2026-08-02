@@ -1,0 +1,10 @@
+{
+  "activity_form_ai_draft_badge": "AI下書き",
+  "activity_form_ai_draft_review_note": "保存前に教師が内容を確認してください",
+  "activity_form_ai_focus_label": "下書きの重点",
+  "activity_form_ai_generation_pending_hint": "下書きを生成しています。",
+  "activity_form_ai_item_count_description": "下書きに生成する項目数を選び、アクティビティを保存する前に教師が内容を確認します。",
+  "activity_form_ai_item_count_label": "項目数",
+  "activity_form_generate_draft": "下書きを生成",
+  "activity_form_step_ai_title": "教材から下書きを作成"
+}

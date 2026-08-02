@@ -526,6 +526,16 @@
       "activity_form_pairs_description",
       "activity_form_teacher_notes_description",
       "activity_form_vocabulary_description"
+    ],
+    "activity-form-ai-core": [
+      "activity_form_ai_draft_badge",
+      "activity_form_ai_draft_review_note",
+      "activity_form_ai_focus_label",
+      "activity_form_ai_generation_pending_hint",
+      "activity_form_ai_item_count_description",
+      "activity_form_ai_item_count_label",
+      "activity_form_generate_draft",
+      "activity_form_step_ai_title"
     ]
   },
   "englishOnlyKeys": [

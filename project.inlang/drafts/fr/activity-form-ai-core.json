@@ -1,0 +1,10 @@
+{
+  "activity_form_ai_draft_badge": "Brouillon IA",
+  "activity_form_ai_draft_review_note": "À vérifier par l’enseignant avant l’enregistrement",
+  "activity_form_ai_focus_label": "Objectif du brouillon",
+  "activity_form_ai_generation_pending_hint": "La génération du brouillon est déjà en cours.",
+  "activity_form_ai_item_count_description": "Choisissez le nombre d’éléments à générer dans le brouillon, puis vérifiez-les avant d’enregistrer l’activité.",
+  "activity_form_ai_item_count_label": "Nombre d’éléments",
+  "activity_form_generate_draft": "Générer un brouillon",
+  "activity_form_step_ai_title": "Créer un brouillon à partir du contenu"
+}

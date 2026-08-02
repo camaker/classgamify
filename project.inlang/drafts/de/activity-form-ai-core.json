@@ -1,0 +1,10 @@
+{
+  "activity_form_ai_draft_badge": "KI-Entwurf",
+  "activity_form_ai_draft_review_note": "Vor dem Speichern durch die Lehrkraft prüfen",
+  "activity_form_ai_focus_label": "Schwerpunkt des Entwurfs",
+  "activity_form_ai_generation_pending_hint": "Die Entwurfserstellung läuft bereits.",
+  "activity_form_ai_item_count_description": "Lege fest, wie viele Elemente der Entwurf erzeugen soll, und prüfe sie vor dem Speichern der Aktivität.",
+  "activity_form_ai_item_count_label": "Anzahl der Elemente",
+  "activity_form_generate_draft": "Entwurf erstellen",
+  "activity_form_step_ai_title": "Entwurf aus Inhalten erstellen"
+}

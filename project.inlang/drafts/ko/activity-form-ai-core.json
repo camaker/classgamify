@@ -1,0 +1,10 @@
+{
+  "activity_form_ai_draft_badge": "AI 초안",
+  "activity_form_ai_draft_review_note": "저장하기 전에 교사가 검토해야 합니다",
+  "activity_form_ai_focus_label": "초안 중점",
+  "activity_form_ai_generation_pending_hint": "초안을 생성하고 있습니다.",
+  "activity_form_ai_item_count_description": "초안에서 생성할 항목 수를 선택하고, 활동을 저장하기 전에 교사가 내용을 검토합니다.",
+  "activity_form_ai_item_count_label": "항목 수",
+  "activity_form_generate_draft": "초안 생성",
+  "activity_form_step_ai_title": "자료에서 초안 만들기"
+}

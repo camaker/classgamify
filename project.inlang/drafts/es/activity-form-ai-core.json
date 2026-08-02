@@ -1,0 +1,10 @@
+{
+  "activity_form_ai_draft_badge": "Borrador con IA",
+  "activity_form_ai_draft_review_note": "El docente debe revisarlo antes de guardarlo",
+  "activity_form_ai_focus_label": "Objetivo del borrador",
+  "activity_form_ai_generation_pending_hint": "La generación del borrador ya está en curso.",
+  "activity_form_ai_item_count_description": "Elige cuántos elementos debe generar el borrador y revísalos antes de guardar la actividad.",
+  "activity_form_ai_item_count_label": "Número de elementos",
+  "activity_form_generate_draft": "Generar borrador",
+  "activity_form_step_ai_title": "Crear un borrador a partir del contenido"
+}

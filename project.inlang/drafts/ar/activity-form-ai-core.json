@@ -1,0 +1,10 @@
+{
+  "activity_form_ai_draft_badge": "مسودة بالذكاء الاصطناعي",
+  "activity_form_ai_draft_review_note": "يراجعها المعلم قبل الحفظ",
+  "activity_form_ai_focus_label": "هدف المسودة",
+  "activity_form_ai_generation_pending_hint": "يجري إنشاء المسودة بالفعل.",
+  "activity_form_ai_item_count_description": "اختر عدد العناصر التي ستنشئها المسودة، ثم راجعها بصفتك معلما قبل حفظ النشاط.",
+  "activity_form_ai_item_count_label": "عدد العناصر",
+  "activity_form_generate_draft": "إنشاء مسودة",
+  "activity_form_step_ai_title": "إنشاء مسودة من المحتوى"
+}

@@ -1,0 +1,10 @@
+{
+  "activity_form_ai_draft_badge": "Rascunho com IA",
+  "activity_form_ai_draft_review_note": "O professor deve revisar antes de salvar",
+  "activity_form_ai_focus_label": "Objetivo do rascunho",
+  "activity_form_ai_generation_pending_hint": "A geração do rascunho já está em andamento.",
+  "activity_form_ai_item_count_description": "Escolha quantos itens o rascunho deve gerar e revise-os antes de salvar a atividade.",
+  "activity_form_ai_item_count_label": "Número de itens",
+  "activity_form_generate_draft": "Gerar rascunho",
+  "activity_form_step_ai_title": "Criar rascunho a partir do conteúdo"
+}
