@@ -4,6 +4,7 @@
     "nav_",
     "footer_",
     "teachers_page_",
+    "changelog_",
     "auth_forgot_password_",
     "auth_login_",
     "auth_register_",
@@ -93,6 +94,11 @@
   ],
   "draftLocales": ["fr", "de", "ja", "ko", "it", "es", "pt-BR", "ar"],
   "draftNamespaces": {
+    "changelog": [
+      "changelog_description",
+      "changelog_subtitle",
+      "changelog_title"
+    ],
     "site": ["site_description", "site_name", "site_title"],
     "nav": [
       "nav_blog",
