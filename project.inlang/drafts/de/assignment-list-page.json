@@ -1,0 +1,11 @@
+{
+  "assignment_list_empty_filtered_description": "Versuchen Sie einen anderen Aufgabentitel, eine Freigabe-ID, einen Aktivitätsnamen oder Status.",
+  "assignment_list_empty_filtered_title": "Keine passenden Aufgaben.",
+  "assignment_list_empty_library_description": "Öffnen Sie die Aktivitätsbibliothek und veröffentlichen Sie eine gespeicherte Aktivität, um einen Schülerlink zu erstellen.",
+  "assignment_list_empty_library_title": "Noch keine veröffentlichten Aufgaben.",
+  "assignment_list_empty_status_filtered_description": "Noch keine Aufgaben entsprechen dem Status {status}. Löschen Sie die Filter oder wechseln Sie den Status, um andere Klassenlinks zu prüfen.",
+  "assignment_list_page_breadcrumb_current": "Aufgaben",
+  "assignment_list_page_breadcrumb_dashboard": "Dashboard",
+  "assignment_list_page_description": "Veröffentlichte Aktivitäten mit Freigabelinks, Klasseneinstellungen und Ergebniskennzahlen.",
+  "assignment_list_page_title": "Aufgaben"
+}

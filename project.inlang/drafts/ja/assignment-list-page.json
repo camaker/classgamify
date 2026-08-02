@@ -1,0 +1,11 @@
+{
+  "assignment_list_empty_filtered_description": "別の課題名、共有ID、アクティビティ名、またはステータスを試してください。",
+  "assignment_list_empty_filtered_title": "条件に一致する課題はありません。",
+  "assignment_list_empty_library_description": "アクティビティライブラリを開き、保存済みのアクティビティを公開して生徒用リンクを作成してください。",
+  "assignment_list_empty_library_title": "公開済みの課題はまだありません。",
+  "assignment_list_empty_status_filtered_description": "ステータスが{status}の課題はまだありません。絞り込みを解除するか、別のステータスに切り替えてください。",
+  "assignment_list_page_breadcrumb_current": "課題",
+  "assignment_list_page_breadcrumb_dashboard": "ダッシュボード",
+  "assignment_list_page_description": "共有リンク、クラス設定、結果指標を備えた公開済みアクティビティです。",
+  "assignment_list_page_title": "課題"
+}

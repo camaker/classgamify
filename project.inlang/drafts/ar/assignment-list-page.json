@@ -1,0 +1,11 @@
+{
+  "assignment_list_empty_filtered_description": "جرّب عنوان تكليف أو معرّف مشاركة أو اسم نشاط أو حالة أخرى.",
+  "assignment_list_empty_filtered_title": "لا توجد تكليفات مطابقة.",
+  "assignment_list_empty_library_description": "افتح مكتبة الأنشطة وانشر نشاطًا محفوظًا لإنشاء رابط للطلاب.",
+  "assignment_list_empty_library_title": "لا توجد تكليفات منشورة بعد.",
+  "assignment_list_empty_status_filtered_description": "لا توجد تكليفات بالحالة {status} حتى الآن. امسح عوامل التصفية أو اختر حالة أخرى لمراجعة روابط الصف.",
+  "assignment_list_page_breadcrumb_current": "التكليفات",
+  "assignment_list_page_breadcrumb_dashboard": "لوحة التحكم",
+  "assignment_list_page_description": "أنشطة منشورة تتضمن روابط مشاركة وإعدادات الصف ومؤشرات النتائج.",
+  "assignment_list_page_title": "التكليفات"
+}

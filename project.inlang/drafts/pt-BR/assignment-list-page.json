@@ -1,0 +1,11 @@
+{
+  "assignment_list_empty_filtered_description": "Tente outro título, ID de compartilhamento, nome da atividade ou status.",
+  "assignment_list_empty_filtered_title": "Nenhuma atividade correspondente.",
+  "assignment_list_empty_library_description": "Abra a biblioteca de atividades e publique uma atividade salva para criar um link para os alunos.",
+  "assignment_list_empty_library_title": "Ainda não há atividades publicadas.",
+  "assignment_list_empty_status_filtered_description": "Nenhuma atividade corresponde ao status {status}. Limpe os filtros ou altere o status para revisar outros links da turma.",
+  "assignment_list_page_breadcrumb_current": "Atividades atribuídas",
+  "assignment_list_page_breadcrumb_dashboard": "Painel",
+  "assignment_list_page_description": "Atividades publicadas com links de compartilhamento, configurações da turma e métricas de resultados.",
+  "assignment_list_page_title": "Atividades atribuídas"
+}

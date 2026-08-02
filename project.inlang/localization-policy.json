@@ -10,6 +10,8 @@
     "assignment_list_search_",
     "assignment_list_status_filter_",
     "assignment_list_action_clear_filters",
+    "assignment_list_empty_",
+    "assignment_list_page_",
     "activity_library_",
     "activity_form_",
     "activity_editor_",
@@ -41,6 +43,17 @@
   ],
   "draftLocales": ["fr", "de", "ja", "ko", "it", "es", "pt-BR", "ar"],
   "draftNamespaces": {
+    "assignment-list-page": [
+      "assignment_list_empty_filtered_description",
+      "assignment_list_empty_filtered_title",
+      "assignment_list_empty_library_description",
+      "assignment_list_empty_library_title",
+      "assignment_list_empty_status_filtered_description",
+      "assignment_list_page_breadcrumb_current",
+      "assignment_list_page_breadcrumb_dashboard",
+      "assignment_list_page_description",
+      "assignment_list_page_title"
+    ],
     "assignment-list-search": [
       "assignment_list_action_clear_filters",
       "assignment_list_search_clear",
@@ -717,6 +730,7 @@
     ]
   },
   "englishOnlyKeys": [
+    "assignment_list_page_load_error",
     "activity_created_panel_duplicate_body",
     "activity_created_panel_found_body",
     "activity_created_panel_loading_body",

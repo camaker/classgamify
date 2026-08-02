@@ -1,0 +1,11 @@
+{
+  "assignment_list_empty_filtered_description": "다른 과제 제목, 공유 ID, 활동 이름 또는 상태로 검색해 보세요.",
+  "assignment_list_empty_filtered_title": "조건에 맞는 과제가 없습니다.",
+  "assignment_list_empty_library_description": "활동 라이브러리에서 저장된 활동을 게시하여 학생용 링크를 만드세요.",
+  "assignment_list_empty_library_title": "아직 게시된 과제가 없습니다.",
+  "assignment_list_empty_status_filtered_description": "{status} 상태에 맞는 과제가 아직 없습니다. 필터를 지우거나 다른 상태로 전환하세요.",
+  "assignment_list_page_breadcrumb_current": "과제",
+  "assignment_list_page_breadcrumb_dashboard": "대시보드",
+  "assignment_list_page_description": "공유 링크, 수업 설정 및 결과 지표가 포함된 게시 활동입니다.",
+  "assignment_list_page_title": "과제"
+}

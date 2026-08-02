@@ -1,0 +1,11 @@
+{
+  "assignment_list_empty_filtered_description": "Prova un altro titolo, ID di condivisione, nome dell’attività o stato.",
+  "assignment_list_empty_filtered_title": "Nessuna attività corrispondente.",
+  "assignment_list_empty_library_description": "Apri la raccolta attività e pubblica un’attività salvata per creare un link per gli studenti.",
+  "assignment_list_empty_library_title": "Nessuna attività pubblicata.",
+  "assignment_list_empty_status_filtered_description": "Nessuna attività corrisponde ancora allo stato {status}. Cancella i filtri o cambia stato per consultare altri link della classe.",
+  "assignment_list_page_breadcrumb_current": "Attività assegnate",
+  "assignment_list_page_breadcrumb_dashboard": "Dashboard",
+  "assignment_list_page_description": "Attività pubblicate con link di condivisione, impostazioni della classe e metriche dei risultati.",
+  "assignment_list_page_title": "Attività assegnate"
+}

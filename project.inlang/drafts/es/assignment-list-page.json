@@ -1,0 +1,11 @@
+{
+  "assignment_list_empty_filtered_description": "Prueba con otro título de tarea, identificador compartido, nombre de actividad o estado.",
+  "assignment_list_empty_filtered_title": "No hay tareas coincidentes.",
+  "assignment_list_empty_library_description": "Abre la biblioteca de actividades y publica una actividad guardada para crear un enlace para estudiantes.",
+  "assignment_list_empty_library_title": "Aún no hay tareas publicadas.",
+  "assignment_list_empty_status_filtered_description": "Todavía no hay tareas con el estado {status}. Borra los filtros o cambia de estado para revisar otros enlaces de clase.",
+  "assignment_list_page_breadcrumb_current": "Tareas",
+  "assignment_list_page_breadcrumb_dashboard": "Panel",
+  "assignment_list_page_description": "Actividades publicadas con enlaces compartidos, ajustes de clase y métricas de resultados.",
+  "assignment_list_page_title": "Tareas"
+}
