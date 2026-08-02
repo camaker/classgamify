@@ -56,8 +56,7 @@ const config = defineConfig(({ mode }) => {
             { match: '/sitemap.xml', exclude: true },
             { match: '/manifest.json', exclude: true },
           ],
-          emitTsDeclarations: true,
-          isServer: 'import.meta.env?.SSR === true',
+          emitTsDeclarations: false,
           outputStructure: 'locale-modules',
         }),
       // https://developers.cloudflare.com/workers/vite-plugin/
