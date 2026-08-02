@@ -10,6 +10,7 @@
     "activity_form_pairs_",
     "activity_form_questions_",
     "activity_form_teacher_notes_",
+    "activity_form_toast_",
     "activity_form_vocabulary_",
     "templates_page_",
     "worksheets_page_"
@@ -536,9 +537,22 @@
       "activity_form_ai_item_count_label",
       "activity_form_generate_draft",
       "activity_form_step_ai_title"
+    ],
+    "activity-form-success-toasts": [
+      "activity_form_toast_activity_saved",
+      "activity_form_toast_activity_updated",
+      "activity_form_toast_ai_draft_generated",
+      "activity_form_toast_local_draft_generated"
     ]
   },
   "englishOnlyKeys": [
+    "activity_form_toast_draft_generation_failed",
+    "activity_form_toast_edit_missing_activity",
+    "activity_form_toast_missing_draft_source",
+    "activity_form_toast_save_failed",
+    "activity_form_toast_sign_in_generate_draft",
+    "activity_form_toast_sign_in_save",
+    "activity_form_toast_source_materials_synced",
     "activity_form_groups_placeholder",
     "activity_form_pairs_placeholder",
     "activity_form_questions_description",
