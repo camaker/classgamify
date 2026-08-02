@@ -7,6 +7,7 @@
     "dashboard_",
     "activity_library_empty_",
     "activity_library_card_",
+    "activity_library_action_",
     "activity_library_stat_",
     "activity_library_status_",
     "templates_page_",
@@ -440,9 +441,25 @@
       "activity_library_card_content_label",
       "activity_library_card_details_label",
       "activity_library_card_untitled"
+    ],
+    "activity-library-card-actions": [
+      "activity_library_action_archive",
+      "activity_library_action_dismiss",
+      "activity_library_action_duplicate",
+      "activity_library_action_edit",
+      "activity_library_action_remix",
+      "activity_library_action_restore"
     ]
   },
   "englishOnlyKeys": [
+    "activity_library_action_aria_label",
+    "activity_library_action_publish",
+    "activity_library_action_status_aria_label",
+    "activity_library_action_status_blocked_description",
+    "activity_library_action_status_blocked_value",
+    "activity_library_action_status_label",
+    "activity_library_action_status_ready_description",
+    "activity_library_action_status_ready_value",
     "activity_library_card_remix_restore_required",
     "activity_library_card_restore_required",
     "activity_library_card_restore_required_label",
