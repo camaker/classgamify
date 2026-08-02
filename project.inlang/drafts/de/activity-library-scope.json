@@ -1,0 +1,22 @@
+{
+  "activity_library_scope_label": "Aktuelle Ansicht",
+  "activity_library_scope_page_description": "Die derzeit angezeigte Seite dieser gefilterten Aktivitätsbibliothek.",
+  "activity_library_scope_page_label": "Seite",
+  "activity_library_scope_page_out_of_range_description": "Diese Seite liegt hinter den verfügbaren Aktivitäten. Die Bibliothek kehrt zu Seite {totalPages} zurück.",
+  "activity_library_scope_page_value": "Seite {currentPage} von {totalPages}",
+  "activity_library_scope_range_description": "Aktivitäten, die derzeit auf dieser Seite sichtbar sind.",
+  "activity_library_scope_range_empty_value": "Keine sichtbaren Aktivitäten",
+  "activity_library_scope_range_label": "Sichtbare Aktivitäten",
+  "activity_library_scope_range_value": "{firstItem}–{lastItem} von {total}",
+  "activity_library_scope_search_all_description": "Kein Suchtext schränkt die Aktivitätsbibliothek ein.",
+  "activity_library_scope_search_all_value": "Alle gespeicherten Aktivitäten",
+  "activity_library_scope_search_filtered_description": "Nur Aktivitäten, die diesem Suchtext entsprechen, werden einbezogen.",
+  "activity_library_scope_search_label": "Suchbereich",
+  "activity_library_scope_status_label": "Statusbereich",
+  "activity_library_scope_summary": "{firstItem}–{lastItem} von {total} Aktivitäten auf Seite {currentPage} von {totalPages}.",
+  "activity_library_scope_summary_empty": "In der aktuellen Bibliotheksansicht sind keine Aktivitäten sichtbar.",
+  "activity_library_scope_summary_out_of_range": "Seite {currentPage} liegt hinter den verfügbaren {totalPages} Seiten.",
+  "activity_library_scope_template_all_description": "Alle Aktivitätsvorlagenfamilien sind enthalten.",
+  "activity_library_scope_template_filtered_description": "Nur Aktivitäten aus genau dieser Vorlagenfamilie sind enthalten.",
+  "activity_library_scope_template_label": "Vorlagenbereich"
+}

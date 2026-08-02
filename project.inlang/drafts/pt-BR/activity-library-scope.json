@@ -1,0 +1,22 @@
+{
+  "activity_library_scope_label": "Visualização atual",
+  "activity_library_scope_page_description": "A página exibida no momento nesta biblioteca filtrada.",
+  "activity_library_scope_page_label": "Página",
+  "activity_library_scope_page_out_of_range_description": "Esta página está além das atividades disponíveis. A biblioteca voltará para a página {totalPages}.",
+  "activity_library_scope_page_value": "Página {currentPage} de {totalPages}",
+  "activity_library_scope_range_description": "Atividades visíveis no momento nesta página.",
+  "activity_library_scope_range_empty_value": "Nenhuma atividade visível",
+  "activity_library_scope_range_label": "Atividades visíveis",
+  "activity_library_scope_range_value": "{firstItem}–{lastItem} de {total}",
+  "activity_library_scope_search_all_description": "Nenhum texto de busca está restringindo a biblioteca.",
+  "activity_library_scope_search_all_value": "Todas as atividades salvas",
+  "activity_library_scope_search_filtered_description": "Somente as atividades correspondentes a esta busca são incluídas.",
+  "activity_library_scope_search_label": "Escopo da busca",
+  "activity_library_scope_status_label": "Escopo do status",
+  "activity_library_scope_summary": "Atividades {firstItem}–{lastItem} de {total}, página {currentPage} de {totalPages}.",
+  "activity_library_scope_summary_empty": "Nenhuma atividade está visível na visualização atual.",
+  "activity_library_scope_summary_out_of_range": "A página {currentPage} está além das {totalPages} páginas disponíveis.",
+  "activity_library_scope_template_all_description": "Todas as famílias de modelos são incluídas.",
+  "activity_library_scope_template_filtered_description": "Somente atividades que usam exatamente esta família de modelos são incluídas.",
+  "activity_library_scope_template_label": "Escopo dos modelos"
+}

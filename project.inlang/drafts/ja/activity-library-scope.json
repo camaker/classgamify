@@ -1,0 +1,22 @@
+{
+  "activity_library_scope_label": "現在の表示範囲",
+  "activity_library_scope_page_description": "絞り込んだアクティビティライブラリで現在表示しているページです。",
+  "activity_library_scope_page_label": "ページ",
+  "activity_library_scope_page_out_of_range_description": "指定したページにはアクティビティがありません。ページ{totalPages}に戻ります。",
+  "activity_library_scope_page_value": "{currentPage}/{totalPages}ページ",
+  "activity_library_scope_range_description": "このページに現在表示されているアクティビティです。",
+  "activity_library_scope_range_empty_value": "表示できるアクティビティはありません",
+  "activity_library_scope_range_label": "表示中のアクティビティ",
+  "activity_library_scope_range_value": "全{total}件中{firstItem}～{lastItem}件",
+  "activity_library_scope_search_all_description": "検索語による絞り込みはありません。",
+  "activity_library_scope_search_all_value": "保存済みのすべてのアクティビティ",
+  "activity_library_scope_search_filtered_description": "この検索語に一致するアクティビティだけを表示します。",
+  "activity_library_scope_search_label": "検索範囲",
+  "activity_library_scope_status_label": "状態の範囲",
+  "activity_library_scope_summary": "全{total}件中{firstItem}～{lastItem}件を表示（{currentPage}/{totalPages}ページ）。",
+  "activity_library_scope_summary_empty": "現在のライブラリ表示にアクティビティはありません。",
+  "activity_library_scope_summary_out_of_range": "{currentPage}ページは、利用可能な全{totalPages}ページの範囲外です。",
+  "activity_library_scope_template_all_description": "すべてのアクティビティテンプレート形式を含みます。",
+  "activity_library_scope_template_filtered_description": "このテンプレート形式を使うアクティビティだけを含みます。",
+  "activity_library_scope_template_label": "テンプレートの範囲"
+}

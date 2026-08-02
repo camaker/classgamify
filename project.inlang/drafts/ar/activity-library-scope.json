@@ -1,0 +1,22 @@
+{
+  "activity_library_scope_label": "العرض الحالي",
+  "activity_library_scope_page_description": "الصفحة المعروضة حاليا من مكتبة الأنشطة بعد التصفية.",
+  "activity_library_scope_page_label": "الصفحة",
+  "activity_library_scope_page_out_of_range_description": "تتجاوز هذه الصفحة الأنشطة المتاحة. ستعود المكتبة إلى الصفحة {totalPages}.",
+  "activity_library_scope_page_value": "الصفحة {currentPage} من {totalPages}",
+  "activity_library_scope_range_description": "الأنشطة الظاهرة حاليا في هذه الصفحة.",
+  "activity_library_scope_range_empty_value": "لا توجد أنشطة ظاهرة",
+  "activity_library_scope_range_label": "الأنشطة الظاهرة",
+  "activity_library_scope_range_value": "{firstItem}–{lastItem} من أصل {total}",
+  "activity_library_scope_search_all_description": "لا يوجد نص بحث يضيق نطاق مكتبة الأنشطة.",
+  "activity_library_scope_search_all_value": "جميع الأنشطة المحفوظة",
+  "activity_library_scope_search_filtered_description": "لا تظهر إلا الأنشطة المطابقة لنص البحث هذا.",
+  "activity_library_scope_search_label": "نطاق البحث",
+  "activity_library_scope_status_label": "نطاق الحالة",
+  "activity_library_scope_summary": "عرض {firstItem}–{lastItem} من أصل {total} نشاطا، في الصفحة {currentPage} من {totalPages}.",
+  "activity_library_scope_summary_empty": "لا توجد أنشطة ظاهرة في عرض المكتبة الحالي.",
+  "activity_library_scope_summary_out_of_range": "تتجاوز الصفحة {currentPage} عدد الصفحات المتاحة وهو {totalPages}.",
+  "activity_library_scope_template_all_description": "يشمل العرض جميع فئات قوالب الأنشطة.",
+  "activity_library_scope_template_filtered_description": "لا يشمل العرض إلا الأنشطة التي تستخدم فئة القوالب المحددة.",
+  "activity_library_scope_template_label": "نطاق القالب"
+}

@@ -1,0 +1,22 @@
+{
+  "activity_library_scope_label": "Vue actuelle",
+  "activity_library_scope_page_description": "Page actuellement affichée dans cette bibliothèque filtrée.",
+  "activity_library_scope_page_label": "Page",
+  "activity_library_scope_page_out_of_range_description": "Cette page dépasse les activités disponibles. La bibliothèque reviendra à la page {totalPages}.",
+  "activity_library_scope_page_value": "Page {currentPage} sur {totalPages}",
+  "activity_library_scope_range_description": "Activités actuellement visibles sur cette page.",
+  "activity_library_scope_range_empty_value": "Aucune activité visible",
+  "activity_library_scope_range_label": "Activités visibles",
+  "activity_library_scope_range_value": "{firstItem}–{lastItem} sur {total}",
+  "activity_library_scope_search_all_description": "Aucun texte de recherche ne limite la bibliothèque.",
+  "activity_library_scope_search_all_value": "Toutes les activités enregistrées",
+  "activity_library_scope_search_filtered_description": "Seules les activités correspondant à cette recherche sont incluses.",
+  "activity_library_scope_search_label": "Périmètre de recherche",
+  "activity_library_scope_status_label": "Périmètre de l’état",
+  "activity_library_scope_summary": "Activités {firstItem}–{lastItem} sur {total}, page {currentPage} sur {totalPages}.",
+  "activity_library_scope_summary_empty": "Aucune activité n’est visible dans la vue actuelle.",
+  "activity_library_scope_summary_out_of_range": "La page {currentPage} dépasse les {totalPages} pages disponibles.",
+  "activity_library_scope_template_all_description": "Toutes les familles de modèles sont incluses.",
+  "activity_library_scope_template_filtered_description": "Seules les activités utilisant exactement cette famille de modèles sont incluses.",
+  "activity_library_scope_template_label": "Périmètre des modèles"
+}

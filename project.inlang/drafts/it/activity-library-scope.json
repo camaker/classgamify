@@ -1,0 +1,22 @@
+{
+  "activity_library_scope_label": "Vista attuale",
+  "activity_library_scope_page_description": "La pagina attualmente visualizzata in questa raccolta filtrata.",
+  "activity_library_scope_page_label": "Pagina",
+  "activity_library_scope_page_out_of_range_description": "Questa pagina supera le attività disponibili. La raccolta tornerà alla pagina {totalPages}.",
+  "activity_library_scope_page_value": "Pagina {currentPage} di {totalPages}",
+  "activity_library_scope_range_description": "Attività attualmente visibili in questa pagina.",
+  "activity_library_scope_range_empty_value": "Nessuna attività visibile",
+  "activity_library_scope_range_label": "Attività visibili",
+  "activity_library_scope_range_value": "{firstItem}–{lastItem} di {total}",
+  "activity_library_scope_search_all_description": "Nessun testo di ricerca limita la raccolta.",
+  "activity_library_scope_search_all_value": "Tutte le attività salvate",
+  "activity_library_scope_search_filtered_description": "Sono incluse solo le attività che corrispondono a questa ricerca.",
+  "activity_library_scope_search_label": "Ambito della ricerca",
+  "activity_library_scope_status_label": "Ambito dello stato",
+  "activity_library_scope_summary": "Attività {firstItem}–{lastItem} di {total}, pagina {currentPage} di {totalPages}.",
+  "activity_library_scope_summary_empty": "Nessuna attività è visibile nella vista attuale.",
+  "activity_library_scope_summary_out_of_range": "La pagina {currentPage} supera le {totalPages} pagine disponibili.",
+  "activity_library_scope_template_all_description": "Sono incluse tutte le famiglie di modelli.",
+  "activity_library_scope_template_filtered_description": "Sono incluse solo le attività che usano esattamente questa famiglia di modelli.",
+  "activity_library_scope_template_label": "Ambito dei modelli"
+}
