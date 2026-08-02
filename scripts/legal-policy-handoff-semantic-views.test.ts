@@ -134,7 +134,7 @@ test('legal policy handoff resolves page-specific policy values', () => {
   assert.equal(getHandoffValue(cookieView, 'current-policy'), 'Cookie Policy');
 });
 
-test('legal policy handoff localizes Chinese classroom boundaries', () => {
+test('legal policy handoff keeps legal policy titles English while localizing Chinese classroom boundaries', () => {
   overwriteGetLocale(() => 'zh');
   try {
     const handoffView = buildLegalPolicyPageViewModel({
@@ -145,7 +145,10 @@ test('legal policy handoff localizes Chinese classroom boundaries', () => {
     assert.equal(handoffView.title, '法律政策产品边界交接');
     assert.match(handoffView.description, /30 切片公开法律政策契约/);
     assert.equal(getHandoffValue(handoffView, 'policy-set'), '3 个政策');
-    assert.equal(getHandoffValue(handoffView, 'current-policy'), '隐私政策');
+    assert.equal(
+      getHandoffValue(handoffView, 'current-policy'),
+      'Privacy Policy'
+    );
     assert.equal(getHandoffValue(handoffView, 'content-source'), '内容集合');
     assert.equal(getHandoffValue(handoffView, 'seo-description'), '已配置');
     assert.equal(

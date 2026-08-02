@@ -6,6 +6,7 @@ type Policy = {
   targetLocales: string[];
   draftLocales: string[];
   draftNamespaces: Record<string, string[]>;
+  englishOnlyKeys: string[];
   englishOnlyKeyPatterns: string[];
   legalMarkdown: string[];
 };
@@ -60,6 +61,22 @@ function placeholders(value: string) {
 const englishOnlyPatterns = policy.englishOnlyKeyPatterns.map(
   (pattern) => new RegExp(pattern, 'i')
 );
+const englishOnlyKeys = new Set(policy.englishOnlyKeys);
+assert.equal(
+  englishOnlyKeys.size,
+  policy.englishOnlyKeys.length,
+  'English-only message keys must be unique.'
+);
+for (const key of englishOnlyKeys) {
+  assert.ok(key in english, `Unknown English-only message key: ${key}`);
+}
+
+function isEnglishOnly(key: string) {
+  return (
+    englishOnlyKeys.has(key) ||
+    englishOnlyPatterns.some((pattern) => pattern.test(key))
+  );
+}
 const draftsRoot = 'project.inlang/drafts';
 
 try {
@@ -82,9 +99,7 @@ try {
         assert.ok(expectedKeys.length, `Unknown draft namespace: ${namespace}`);
         assert.deepEqual(Object.keys(draft).sort(), expectedKeys);
         const localizableKeys = expectedKeys.filter(
-          (key) =>
-            !englishOnlyPatterns.some((pattern) => pattern.test(key)) &&
-            english[key] !== 'ClassGamify'
+          (key) => !isEnglishOnly(key) && english[key] !== 'ClassGamify'
         );
         for (const key of expectedKeys) {
           assert.ok(draft[key].trim(), `${locale}/${file}:${key} is empty`);
@@ -93,7 +108,7 @@ try {
             placeholders(english[key]),
             `${locale}/${file}:${key} placeholders differ`
           );
-          if (englishOnlyPatterns.some((pattern) => pattern.test(key))) {
+          if (isEnglishOnly(key)) {
             assert.equal(
               draft[key],
               english[key],
@@ -122,5 +137,5 @@ try {
 }
 
 console.log(
-  `Localization expansion contract OK (${policy.targetLocales.length} target locales, ${policy.draftLocales.length} draft locales, English-only legal Markdown, and ${policy.englishOnlyKeyPatterns.length} sensitive key patterns)`
+  `Localization expansion contract OK (${policy.targetLocales.length} target locales, ${policy.draftLocales.length} draft locales, English-only legal Markdown, ${policy.englishOnlyKeys.length} explicit English-only keys, and ${policy.englishOnlyKeyPatterns.length} sensitive key patterns)`
 );
