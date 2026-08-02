@@ -975,6 +975,14 @@
     ]
   },
   "englishOnlyKeys": [
+    "site_name",
+    "site_title",
+    "common_empty_value",
+    "auth_login_placeholder_email",
+    "auth_login_placeholder_password",
+    "auth_register_placeholder_email",
+    "auth_register_placeholder_password",
+    "assignment_list_status_metric_aria_label",
     "assignment_list_card_aria_label",
     "assignment_list_share_link_closed",
     "assignment_list_share_link_draft",
