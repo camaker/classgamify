@@ -265,6 +265,21 @@
       "worksheets_page_templates_cta_description",
       "worksheets_page_templates_cta_title",
       "worksheets_page_title"
+    ],
+    "worksheets-modes": [
+      "worksheets_page_mode_action_aria_label",
+      "worksheets_page_mode_card_aria_label",
+      "worksheets_page_mode_fallback_action",
+      "worksheets_page_mode_fallback_action_aria_label",
+      "worksheets_page_mode_fill_blank_action",
+      "worksheets_page_mode_fill_blank_description",
+      "worksheets_page_mode_fill_blank_title",
+      "worksheets_page_mode_group_sort_action",
+      "worksheets_page_mode_group_sort_description",
+      "worksheets_page_mode_group_sort_title",
+      "worksheets_page_mode_line_match_action",
+      "worksheets_page_mode_line_match_description",
+      "worksheets_page_mode_line_match_title"
     ]
   },
   "englishOnlyKeyPatterns": [

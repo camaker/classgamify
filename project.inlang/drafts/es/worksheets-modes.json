@@ -1,0 +1,15 @@
+{
+  "worksheets_page_mode_action_aria_label": "{action}. Abre {mode} en el editor de actividades compartido con el ejemplo de ficha seleccionado.",
+  "worksheets_page_mode_card_aria_label": "{mode}: {description}",
+  "worksheets_page_mode_fallback_action": "Crear {template}",
+  "worksheets_page_mode_fallback_action_aria_label": "{action}. Abre el editor de actividades con {template} seleccionada.",
+  "worksheets_page_mode_fill_blank_action": "Crear texto con huecos",
+  "worksheets_page_mode_fill_blank_description": "Coloca respuestas cortas en los huecos de una frase para trabajar gramática, ortografía, vocabulario o comprensión lectora.",
+  "worksheets_page_mode_fill_blank_title": "Texto con huecos",
+  "worksheets_page_mode_group_sort_action": "Crear clasificación",
+  "worksheets_page_mode_group_sort_description": "Pide al alumnado que clasifique palabras, ejemplos o conceptos en grupos definidos por el docente antes de ver la solución.",
+  "worksheets_page_mode_group_sort_title": "Clasificación por arrastre",
+  "worksheets_page_mode_line_match_action": "Crear unión con líneas",
+  "worksheets_page_mode_line_match_description": "Convierte términos y definiciones en un tablero de dos columnas para unir, familiar para quienes usan fichas de ejercicios.",
+  "worksheets_page_mode_line_match_title": "Unión con líneas"
+}

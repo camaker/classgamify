@@ -1,0 +1,15 @@
+{
+  "worksheets_page_mode_action_aria_label": "{action}. Apre {mode} nell’editor di attività condiviso con l’esempio per schede già selezionato.",
+  "worksheets_page_mode_card_aria_label": "{mode}: {description}",
+  "worksheets_page_mode_fallback_action": "Crea {template}",
+  "worksheets_page_mode_fallback_action_aria_label": "{action}. Apre l’editor di attività con {template} selezionato.",
+  "worksheets_page_mode_fill_blank_action": "Crea completamento",
+  "worksheets_page_mode_fill_blank_description": "Inserisci risposte brevi direttamente negli spazi di una frase per verificare grammatica, ortografia, vocabolario o comprensione del testo.",
+  "worksheets_page_mode_fill_blank_title": "Completamento",
+  "worksheets_page_mode_group_sort_action": "Crea classificazione",
+  "worksheets_page_mode_group_sort_description": "Chiedi agli studenti di classificare parole, esempi o concetti nei gruppi definiti dal docente prima di vedere la soluzione.",
+  "worksheets_page_mode_group_sort_title": "Classificazione con trascinamento",
+  "worksheets_page_mode_line_match_action": "Crea collegamenti",
+  "worksheets_page_mode_line_match_description": "Trasforma termini e definizioni in una tabella a due colonne da collegare, familiare a chi usa le schede didattiche.",
+  "worksheets_page_mode_line_match_title": "Collegamenti"
+}

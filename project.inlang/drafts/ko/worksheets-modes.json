@@ -1,0 +1,15 @@
+{
+  "worksheets_page_mode_action_aria_label": "{action}. 학습지 시작 예시를 선택한 상태로 {mode} 모드를 공용 활동 편집기에서 엽니다.",
+  "worksheets_page_mode_card_aria_label": "{mode}: {description}",
+  "worksheets_page_mode_fallback_action": "{template} 만들기",
+  "worksheets_page_mode_fallback_action_aria_label": "{action}. {template} 템플릿을 선택한 상태로 활동 편집기를 엽니다.",
+  "worksheets_page_mode_fill_blank_action": "빈칸 문제 만들기",
+  "worksheets_page_mode_fill_blank_description": "문장 속 빈칸에 짧은 답을 넣어 문법, 철자, 어휘, 읽기 이해를 확인하세요.",
+  "worksheets_page_mode_fill_blank_title": "빈칸 채우기",
+  "worksheets_page_mode_group_sort_action": "분류 문제 만들기",
+  "worksheets_page_mode_group_sort_description": "학생이 단어, 예시, 개념을 교사가 정한 그룹으로 분류한 뒤 올바른 분류를 확인하게 하세요.",
+  "worksheets_page_mode_group_sort_title": "드래그해서 분류",
+  "worksheets_page_mode_line_match_action": "선 연결 만들기",
+  "worksheets_page_mode_line_match_description": "용어와 정의를 두 열에 배치해 학습지에서 익숙한 선 연결 문제로 만드세요.",
+  "worksheets_page_mode_line_match_title": "선 연결"
+}

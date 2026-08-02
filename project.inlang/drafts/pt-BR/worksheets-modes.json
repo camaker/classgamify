@@ -1,0 +1,15 @@
+{
+  "worksheets_page_mode_action_aria_label": "{action}. Abre {mode} no editor de atividades compartilhado com o exemplo de folha selecionado.",
+  "worksheets_page_mode_card_aria_label": "{mode}: {description}",
+  "worksheets_page_mode_fallback_action": "Criar {template}",
+  "worksheets_page_mode_fallback_action_aria_label": "{action}. Abre o editor de atividades com {template} selecionado.",
+  "worksheets_page_mode_fill_blank_action": "Criar preenchimento",
+  "worksheets_page_mode_fill_blank_description": "Coloque respostas curtas nas lacunas das frases para trabalhar gramática, ortografia, vocabulário ou compreensão de leitura.",
+  "worksheets_page_mode_fill_blank_title": "Preencher lacunas",
+  "worksheets_page_mode_group_sort_action": "Criar classificação",
+  "worksheets_page_mode_group_sort_description": "Peça aos alunos que classifiquem palavras, exemplos ou conceitos nos grupos definidos pelo professor antes de ver a solução.",
+  "worksheets_page_mode_group_sort_title": "Classificação por arrastar",
+  "worksheets_page_mode_line_match_action": "Criar ligação por linhas",
+  "worksheets_page_mode_line_match_description": "Transforme termos e definições em um quadro de duas colunas para ligar, familiar para quem usa folhas de atividades.",
+  "worksheets_page_mode_line_match_title": "Ligação por linhas"
+}

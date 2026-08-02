@@ -1,0 +1,15 @@
+{
+  "worksheets_page_mode_action_aria_label": "{action}. Ouvre le mode {mode} dans l’éditeur d’activité commun avec l’exemple de fiche sélectionné.",
+  "worksheets_page_mode_card_aria_label": "{mode} : {description}",
+  "worksheets_page_mode_fallback_action": "Créer avec {template}",
+  "worksheets_page_mode_fallback_action_aria_label": "{action}. Ouvre l’éditeur d’activité avec le modèle {template} sélectionné.",
+  "worksheets_page_mode_fill_blank_action": "Créer un texte à trous",
+  "worksheets_page_mode_fill_blank_description": "Placez des réponses courtes directement dans les blancs d’une phrase pour travailler la grammaire, l’orthographe, le vocabulaire ou la lecture.",
+  "worksheets_page_mode_fill_blank_title": "Texte à trous",
+  "worksheets_page_mode_group_sort_action": "Créer un tri",
+  "worksheets_page_mode_group_sort_description": "Demandez aux élèves de classer des mots, exemples ou notions dans des groupes définis par l’enseignant avant de voir la bonne répartition.",
+  "worksheets_page_mode_group_sort_title": "Tri par glisser-déposer",
+  "worksheets_page_mode_line_match_action": "Créer des lignes à relier",
+  "worksheets_page_mode_line_match_description": "Transformez termes et définitions en un tableau à deux colonnes à relier, familier aux utilisateurs de fiches d’exercices.",
+  "worksheets_page_mode_line_match_title": "Lignes à relier"
+}

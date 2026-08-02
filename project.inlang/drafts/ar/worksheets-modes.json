@@ -1,0 +1,15 @@
+{
+  "worksheets_page_mode_action_aria_label": "{action}. يفتح وضع {mode} في محرر الأنشطة المشترك مع تحديد مثال ورقة العمل.",
+  "worksheets_page_mode_card_aria_label": "{mode}: {description}",
+  "worksheets_page_mode_fallback_action": "إنشاء {template}",
+  "worksheets_page_mode_fallback_action_aria_label": "{action}. يفتح محرر الأنشطة مع تحديد {template}.",
+  "worksheets_page_mode_fill_blank_action": "إنشاء ملء فراغات",
+  "worksheets_page_mode_fill_blank_description": "ضع إجابات قصيرة داخل فراغات الجمل للتدرب على القواعد أو الإملاء أو المفردات أو فهم القراءة.",
+  "worksheets_page_mode_fill_blank_title": "ملء الفراغات",
+  "worksheets_page_mode_group_sort_action": "إنشاء تصنيف",
+  "worksheets_page_mode_group_sort_description": "اطلب من الطلاب تصنيف الكلمات أو الأمثلة أو المفاهيم ضمن مجموعات يحددها المعلم قبل رؤية التصنيف الصحيح.",
+  "worksheets_page_mode_group_sort_title": "التصنيف بالسحب",
+  "worksheets_page_mode_line_match_action": "إنشاء توصيل بالخطوط",
+  "worksheets_page_mode_line_match_description": "حوّل المصطلحات والتعريفات إلى لوح من عمودين للتوصيل بينهما بأسلوب مألوف لمستخدمي أوراق العمل.",
+  "worksheets_page_mode_line_match_title": "التوصيل بالخطوط"
+}

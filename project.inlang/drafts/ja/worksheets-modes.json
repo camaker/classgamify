@@ -1,0 +1,15 @@
+{
+  "worksheets_page_mode_action_aria_label": "{action}。ワークシートの開始用サンプルを選択した状態で、{mode}を共通アクティビティエディターに開きます。",
+  "worksheets_page_mode_card_aria_label": "{mode}：{description}",
+  "worksheets_page_mode_fallback_action": "{template}を作成",
+  "worksheets_page_mode_fallback_action_aria_label": "{action}。{template}を選択した状態でアクティビティエディターを開きます。",
+  "worksheets_page_mode_fill_blank_action": "穴埋め問題を作成",
+  "worksheets_page_mode_fill_blank_description": "文中の空欄に短い答えを設定し、文法、つづり、語彙、読解の確認に使えます。",
+  "worksheets_page_mode_fill_blank_title": "穴埋め",
+  "worksheets_page_mode_group_sort_action": "分類問題を作成",
+  "worksheets_page_mode_group_sort_description": "単語、例、概念を教師が設定したグループに分類してから、正しい分類を確認します。",
+  "worksheets_page_mode_group_sort_title": "ドラッグで分類",
+  "worksheets_page_mode_line_match_action": "線つなぎを作成",
+  "worksheets_page_mode_line_match_description": "用語と定義を2列に並べ、ワークシートで馴染みのある線つなぎ問題にします。",
+  "worksheets_page_mode_line_match_title": "線つなぎ"
+}

@@ -1,0 +1,15 @@
+{
+  "worksheets_page_mode_action_aria_label": "{action}. Öffnet {mode} im gemeinsamen Aktivitätseditor mit dem passenden Arbeitsblattbeispiel.",
+  "worksheets_page_mode_card_aria_label": "{mode}: {description}",
+  "worksheets_page_mode_fallback_action": "{template} erstellen",
+  "worksheets_page_mode_fallback_action_aria_label": "{action}. Öffnet den Aktivitätseditor mit der ausgewählten Vorlage {template}.",
+  "worksheets_page_mode_fill_blank_action": "Lückentext erstellen",
+  "worksheets_page_mode_fill_blank_description": "Setze kurze Antworten direkt in Satzlücken ein, um Grammatik, Rechtschreibung, Wortschatz oder Leseverständnis zu überprüfen.",
+  "worksheets_page_mode_fill_blank_title": "Lückentext",
+  "worksheets_page_mode_group_sort_action": "Sortierung erstellen",
+  "worksheets_page_mode_group_sort_description": "Lass Lernende Wörter, Beispiele oder Begriffe in von der Lehrkraft festgelegte Gruppen einordnen, bevor die richtige Zuordnung erscheint.",
+  "worksheets_page_mode_group_sort_title": "Sortieren per Drag-and-drop",
+  "worksheets_page_mode_line_match_action": "Linienzuordnung erstellen",
+  "worksheets_page_mode_line_match_description": "Verbinde Begriffe und Definitionen auf einer zweispaltigen Fläche, wie sie aus klassischen Arbeitsblättern bekannt ist.",
+  "worksheets_page_mode_line_match_title": "Linienzuordnung"
+}
