@@ -383,6 +383,21 @@
       "activity_library_page_create",
       "activity_library_page_description",
       "activity_library_page_title"
+    ],
+    "activity-library-filters": [
+      "activity_library_filter_active",
+      "activity_library_filter_archived",
+      "activity_library_filter_clear_filters",
+      "activity_library_filter_clear_search",
+      "activity_library_filter_label",
+      "activity_library_filter_placeholder",
+      "activity_library_filter_search_description",
+      "activity_library_filter_status_description",
+      "activity_library_filter_status_label",
+      "activity_library_filter_status_selected_description",
+      "activity_library_filter_template_description",
+      "activity_library_filter_template_label",
+      "activity_library_filter_template_placeholder"
     ]
   },
   "englishOnlyKeys": [

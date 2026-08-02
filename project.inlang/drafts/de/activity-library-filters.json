@@ -1,0 +1,15 @@
+{
+  "activity_library_filter_active": "Aktiv",
+  "activity_library_filter_archived": "Archiviert",
+  "activity_library_filter_clear_filters": "Filter zurücksetzen",
+  "activity_library_filter_clear_search": "Aktivitätssuche löschen",
+  "activity_library_filter_label": "Aktivitäten suchen",
+  "activity_library_filter_placeholder": "Nach Titel, Beschreibung oder Vorlage suchen",
+  "activity_library_filter_search_description": "Durchsuche nur deine Aktivitätsbibliothek nach Titel, Beschreibung oder Vorlagenname. Die Filter bleiben auf deinen Bereich beschränkt.",
+  "activity_library_filter_status_description": "Wechsle zwischen aktiven und archivierten Aktivitäten, ohne deine eigene Bibliothek zu verlassen.",
+  "activity_library_filter_status_label": "Aktivitätsstatus",
+  "activity_library_filter_status_selected_description": "{status}: {description}",
+  "activity_library_filter_template_description": "Beschränke die Aktivitätsbibliothek auf eine bestimmte Vorlagenfamilie oder zeige alle Vorlagen an.",
+  "activity_library_filter_template_label": "Vorlage",
+  "activity_library_filter_template_placeholder": "Alle Vorlagen"
+}

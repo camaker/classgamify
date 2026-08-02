@@ -1,0 +1,15 @@
+{
+  "activity_library_filter_active": "نشطة",
+  "activity_library_filter_archived": "مؤرشفة",
+  "activity_library_filter_clear_filters": "مسح عوامل التصفية",
+  "activity_library_filter_clear_search": "مسح البحث عن الأنشطة",
+  "activity_library_filter_label": "البحث في الأنشطة",
+  "activity_library_filter_placeholder": "ابحث بالعنوان أو الوصف أو القالب",
+  "activity_library_filter_search_description": "ابحث داخل مكتبة أنشطتك فقط باستخدام العنوان أو الوصف أو اسم القالب. وتظل عوامل التصفية محصورة في مساحة عملك.",
+  "activity_library_filter_status_description": "بدل بين الأنشطة النشطة والمؤرشفة داخل مكتبتك الخاصة.",
+  "activity_library_filter_status_label": "حالة النشاط",
+  "activity_library_filter_status_selected_description": "{status}: {description}",
+  "activity_library_filter_template_description": "احصر مكتبة الأنشطة في فئة قالب محددة، أو اعرض جميع القوالب.",
+  "activity_library_filter_template_label": "القالب",
+  "activity_library_filter_template_placeholder": "جميع القوالب"
+}

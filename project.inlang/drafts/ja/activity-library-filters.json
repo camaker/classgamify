@@ -1,0 +1,15 @@
+{
+  "activity_library_filter_active": "使用中",
+  "activity_library_filter_archived": "アーカイブ済み",
+  "activity_library_filter_clear_filters": "フィルターを解除",
+  "activity_library_filter_clear_search": "アクティビティ検索を消去",
+  "activity_library_filter_label": "アクティビティを検索",
+  "activity_library_filter_placeholder": "タイトル、説明、テンプレートで検索",
+  "activity_library_filter_search_description": "自分のアクティビティライブラリだけを、タイトル、説明、テンプレート名で検索します。検索範囲がほかの教師のデータに広がることはありません。",
+  "activity_library_filter_status_description": "自分のライブラリ内で、使用中とアーカイブ済みのアクティビティを切り替えます。",
+  "activity_library_filter_status_label": "アクティビティの状態",
+  "activity_library_filter_status_selected_description": "{status}：{description}",
+  "activity_library_filter_template_description": "特定のテンプレート形式に絞り込むか、すべてのテンプレートを表示します。",
+  "activity_library_filter_template_label": "テンプレート",
+  "activity_library_filter_template_placeholder": "すべてのテンプレート"
+}

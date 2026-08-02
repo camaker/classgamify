@@ -1,0 +1,15 @@
+{
+  "activity_library_filter_active": "사용 중",
+  "activity_library_filter_archived": "보관됨",
+  "activity_library_filter_clear_filters": "필터 지우기",
+  "activity_library_filter_clear_search": "활동 검색어 지우기",
+  "activity_library_filter_label": "활동 검색",
+  "activity_library_filter_placeholder": "제목, 설명 또는 템플릿으로 검색",
+  "activity_library_filter_search_description": "내 활동 라이브러리에서만 제목, 설명 또는 템플릿 이름을 검색합니다. 필터 범위는 내 작업 공간으로 한정됩니다.",
+  "activity_library_filter_status_description": "내 라이브러리 안에서 사용 중인 활동과 보관된 활동을 전환합니다.",
+  "activity_library_filter_status_label": "활동 상태",
+  "activity_library_filter_status_selected_description": "{status}: {description}",
+  "activity_library_filter_template_description": "특정 템플릿 유형으로 활동 라이브러리를 좁히거나 모든 템플릿을 표시합니다.",
+  "activity_library_filter_template_label": "템플릿",
+  "activity_library_filter_template_placeholder": "모든 템플릿"
+}

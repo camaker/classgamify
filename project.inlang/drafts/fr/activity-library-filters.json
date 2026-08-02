@@ -1,0 +1,15 @@
+{
+  "activity_library_filter_active": "Actives",
+  "activity_library_filter_archived": "Archivées",
+  "activity_library_filter_clear_filters": "Effacer les filtres",
+  "activity_library_filter_clear_search": "Effacer la recherche d’activités",
+  "activity_library_filter_label": "Rechercher des activités",
+  "activity_library_filter_placeholder": "Rechercher par titre, description ou modèle",
+  "activity_library_filter_search_description": "Recherchez uniquement dans votre bibliothèque d’activités par titre, description ou nom de modèle. Les filtres restent limités à votre espace.",
+  "activity_library_filter_status_description": "Passez des activités actives aux activités archivées sans quitter votre propre bibliothèque.",
+  "activity_library_filter_status_label": "État de l’activité",
+  "activity_library_filter_status_selected_description": "{status} : {description}",
+  "activity_library_filter_template_description": "Limitez la bibliothèque à une famille de modèles précise ou affichez tous les modèles.",
+  "activity_library_filter_template_label": "Modèle",
+  "activity_library_filter_template_placeholder": "Tous les modèles"
+}

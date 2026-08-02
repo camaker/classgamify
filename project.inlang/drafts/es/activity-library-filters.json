@@ -1,0 +1,15 @@
+{
+  "activity_library_filter_active": "Activas",
+  "activity_library_filter_archived": "Archivadas",
+  "activity_library_filter_clear_filters": "Borrar filtros",
+  "activity_library_filter_clear_search": "Borrar búsqueda de actividades",
+  "activity_library_filter_label": "Buscar actividades",
+  "activity_library_filter_placeholder": "Buscar por título, descripción o plantilla",
+  "activity_library_filter_search_description": "Busca únicamente en tu biblioteca de actividades por título, descripción o nombre de plantilla. Los filtros se limitan a tu espacio.",
+  "activity_library_filter_status_description": "Alterna entre las actividades activas y archivadas sin salir de tu propia biblioteca.",
+  "activity_library_filter_status_label": "Estado de la actividad",
+  "activity_library_filter_status_selected_description": "{status}: {description}",
+  "activity_library_filter_template_description": "Limita la biblioteca a una familia de plantillas concreta o muestra todas las plantillas.",
+  "activity_library_filter_template_label": "Plantilla",
+  "activity_library_filter_template_placeholder": "Todas las plantillas"
+}
