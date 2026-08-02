@@ -1,0 +1,16 @@
+{
+  "assignment_list_summary_assignments": "Activités",
+  "assignment_list_summary_assignments_description": "Nombre total de liens d’activités dans le périmètre actuel.",
+  "assignment_list_summary_average": "Moyenne",
+  "assignment_list_summary_average_empty": "Aucune tentative notée pour le moment.",
+  "assignment_list_summary_average_with_attempts": "Calculée à partir des tentatives notées des élèves.",
+  "assignment_list_summary_completions": "Réalisations",
+  "assignment_list_summary_completions_many": "{count} tentatives envoyées dans cette vue.",
+  "assignment_list_summary_completions_one": "{count} tentative envoyée dans cette vue.",
+  "assignment_list_summary_matching": "Correspondance",
+  "assignment_list_summary_matching_description": "Liens correspondant aux filtres de recherche et de statut actifs.",
+  "assignment_list_summary_metric_aria_label": "{label} : {value}. {description}",
+  "assignment_list_summary_open_links": "Liens ouverts",
+  "assignment_list_summary_open_links_many": "{count} liens sont actuellement disponibles pour les élèves.",
+  "assignment_list_summary_open_links_one": "{count} lien est actuellement disponible pour les élèves."
+}

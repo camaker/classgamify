@@ -1,0 +1,16 @@
+{
+  "assignment_list_summary_assignments": "Aufgaben",
+  "assignment_list_summary_assignments_description": "Gesamtzahl der Aktivitätslinks im aktuellen Listenbereich.",
+  "assignment_list_summary_average": "Durchschnitt",
+  "assignment_list_summary_average_empty": "Noch keine bewerteten Versuche.",
+  "assignment_list_summary_average_with_attempts": "Aus den bewerteten Schülerversuchen berechnet.",
+  "assignment_list_summary_completions": "Abschlüsse",
+  "assignment_list_summary_completions_many": "{count} eingereichte Versuche in dieser Ansicht.",
+  "assignment_list_summary_completions_one": "{count} eingereichter Versuch in dieser Ansicht.",
+  "assignment_list_summary_matching": "Treffer",
+  "assignment_list_summary_matching_description": "Aktivitätslinks passend zu den aktiven Such- und Statusfiltern.",
+  "assignment_list_summary_metric_aria_label": "{label}: {value}. {description}",
+  "assignment_list_summary_open_links": "Offene Links",
+  "assignment_list_summary_open_links_many": "{count} Links sind derzeit für Lernende verfügbar.",
+  "assignment_list_summary_open_links_one": "{count} Link ist derzeit für Lernende verfügbar."
+}

@@ -6,6 +6,7 @@
     "auth_reset_password_",
     "dashboard_",
     "assignment_status_",
+    "assignment_list_summary_",
     "activity_library_",
     "activity_form_",
     "activity_editor_",
@@ -37,6 +38,22 @@
   ],
   "draftLocales": ["fr", "de", "ja", "ko", "it", "es", "pt-BR", "ar"],
   "draftNamespaces": {
+    "assignment-list-summary": [
+      "assignment_list_summary_assignments",
+      "assignment_list_summary_assignments_description",
+      "assignment_list_summary_average",
+      "assignment_list_summary_average_empty",
+      "assignment_list_summary_average_with_attempts",
+      "assignment_list_summary_completions",
+      "assignment_list_summary_completions_many",
+      "assignment_list_summary_completions_one",
+      "assignment_list_summary_matching",
+      "assignment_list_summary_matching_description",
+      "assignment_list_summary_metric_aria_label",
+      "assignment_list_summary_open_links",
+      "assignment_list_summary_open_links_many",
+      "assignment_list_summary_open_links_one"
+    ],
     "assignment-status": [
       "assignment_status_action_aria_label",
       "assignment_status_action_close_description",

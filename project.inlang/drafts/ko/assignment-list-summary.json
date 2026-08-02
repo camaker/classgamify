@@ -1,0 +1,16 @@
+{
+  "assignment_list_summary_assignments": "과제",
+  "assignment_list_summary_assignments_description": "현재 목록 범위의 전체 과제 링크 수입니다.",
+  "assignment_list_summary_average": "평균",
+  "assignment_list_summary_average_empty": "아직 채점된 응답이 없습니다.",
+  "assignment_list_summary_average_with_attempts": "채점된 학생 응답을 기준으로 계산했습니다.",
+  "assignment_list_summary_completions": "제출",
+  "assignment_list_summary_completions_many": "이 보기에서 {count}건이 제출되었습니다.",
+  "assignment_list_summary_completions_one": "이 보기에서 {count}건이 제출되었습니다.",
+  "assignment_list_summary_matching": "검색 결과",
+  "assignment_list_summary_matching_description": "현재 검색 및 상태 필터와 일치하는 과제 링크입니다.",
+  "assignment_list_summary_metric_aria_label": "{label}: {value}. {description}",
+  "assignment_list_summary_open_links": "열린 링크",
+  "assignment_list_summary_open_links_many": "현재 학생이 이용할 수 있는 링크가 {count}개 있습니다.",
+  "assignment_list_summary_open_links_one": "현재 학생이 이용할 수 있는 링크가 {count}개 있습니다."
+}

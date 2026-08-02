@@ -1,0 +1,16 @@
+{
+  "assignment_list_summary_assignments": "Tareas",
+  "assignment_list_summary_assignments_description": "Total de enlaces de tareas en el ámbito actual de la lista.",
+  "assignment_list_summary_average": "Promedio",
+  "assignment_list_summary_average_empty": "Aún no hay intentos calificados.",
+  "assignment_list_summary_average_with_attempts": "Calculado a partir de los intentos calificados de los estudiantes.",
+  "assignment_list_summary_completions": "Entregas",
+  "assignment_list_summary_completions_many": "{count} intentos enviados en esta vista.",
+  "assignment_list_summary_completions_one": "{count} intento enviado en esta vista.",
+  "assignment_list_summary_matching": "Coincidencias",
+  "assignment_list_summary_matching_description": "Enlaces que coinciden con los filtros activos de búsqueda y estado.",
+  "assignment_list_summary_metric_aria_label": "{label}: {value}. {description}",
+  "assignment_list_summary_open_links": "Enlaces abiertos",
+  "assignment_list_summary_open_links_many": "{count} enlaces están disponibles actualmente para los estudiantes.",
+  "assignment_list_summary_open_links_one": "{count} enlace está disponible actualmente para los estudiantes."
+}

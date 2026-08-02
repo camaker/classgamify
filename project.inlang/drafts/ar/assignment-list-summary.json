@@ -1,0 +1,16 @@
+{
+  "assignment_list_summary_assignments": "التكليفات",
+  "assignment_list_summary_assignments_description": "إجمالي روابط التكليفات ضمن نطاق القائمة الحالي.",
+  "assignment_list_summary_average": "المتوسط",
+  "assignment_list_summary_average_empty": "لا توجد محاولات مقيمة بعد.",
+  "assignment_list_summary_average_with_attempts": "محسوب من محاولات الطلاب المقيمة.",
+  "assignment_list_summary_completions": "التسليمات",
+  "assignment_list_summary_completions_many": "تم إرسال {count} محاولات في هذا العرض.",
+  "assignment_list_summary_completions_one": "تم إرسال {count} محاولة في هذا العرض.",
+  "assignment_list_summary_matching": "النتائج المطابقة",
+  "assignment_list_summary_matching_description": "روابط التكليفات المطابقة لعوامل البحث والحالة النشطة.",
+  "assignment_list_summary_metric_aria_label": "{label}: {value}. {description}",
+  "assignment_list_summary_open_links": "الروابط المفتوحة",
+  "assignment_list_summary_open_links_many": "يتوفر حاليًا {count} روابط للطلاب.",
+  "assignment_list_summary_open_links_one": "يتوفر حاليًا {count} رابط للطلاب."
+}

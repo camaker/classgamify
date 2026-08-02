@@ -1,0 +1,16 @@
+{
+  "assignment_list_summary_assignments": "課題",
+  "assignment_list_summary_assignments_description": "現在の一覧範囲にある課題リンクの合計です。",
+  "assignment_list_summary_average": "平均",
+  "assignment_list_summary_average_empty": "採点済みの解答はまだありません。",
+  "assignment_list_summary_average_with_attempts": "採点済みの生徒の解答から算出しています。",
+  "assignment_list_summary_completions": "提出数",
+  "assignment_list_summary_completions_many": "この表示には{count}件の提出があります。",
+  "assignment_list_summary_completions_one": "この表示には{count}件の提出があります。",
+  "assignment_list_summary_matching": "検索結果",
+  "assignment_list_summary_matching_description": "現在の検索条件とステータスに一致する課題リンクです。",
+  "assignment_list_summary_metric_aria_label": "{label}: {value}。{description}",
+  "assignment_list_summary_open_links": "公開中のリンク",
+  "assignment_list_summary_open_links_many": "現在、{count}件のリンクを生徒が利用できます。",
+  "assignment_list_summary_open_links_one": "現在、{count}件のリンクを生徒が利用できます。"
+}
