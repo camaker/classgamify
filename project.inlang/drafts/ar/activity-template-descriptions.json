@@ -1,0 +1,18 @@
+{
+  "activity_template_fill_blank_best_for": "أنماط الجمل والتدريب النحوي والمتابعة بعد أنشطة الاستماع",
+  "activity_template_fill_blank_description": "جمل تحتوي على كلمات ناقصة، مناسبة للتدريب على القواعد والإملاء.",
+  "activity_template_group_sort_best_for": "الفئات النحوية والمجموعات العلمية والتصنيف حسب الموضوع",
+  "activity_template_group_sort_description": "يسحب الطلاب العناصر إلى المجموعات التي يحددها المعلم ثم يقارنون بين الفئات.",
+  "activity_template_line_match_best_for": "ترجمة المفردات والمصطلحات وتعريفاتها والسبب والنتيجة",
+  "activity_template_line_match_description": "يوصل الطلاب كل سؤال بالإجابة المطابقة في عرض يشبه ورقة العمل.",
+  "activity_template_listening_best_for": "الإملاء والتحقق من الاستماع والمتابعة بتدريب النطق",
+  "activity_template_listening_description": "يستمع الطلاب إلى كلمة أو جملة ثم يجيبون اعتمادا على ما تذكروه.",
+  "activity_template_match_up_best_for": "الكلمات ومعانيها والأمثلة والفئات والسبب والنتيجة",
+  "activity_template_match_up_description": "يطابق الطلاب المصطلحات مع التعريفات أو الترجمات أو الصور أو الأمثلة.",
+  "activity_template_matching_pairs_best_for": "التذكر والأنشطة التمهيدية وألعاب المراجعة في مجموعات صغيرة",
+  "activity_template_matching_pairs_description": "نشاط للذاكرة يكشف فيه الطلاب البطاقات ويعثرون على الأزواج المرتبطة.",
+  "activity_template_open_box_best_for": "أسئلة التحدث وجولات المراجعة والمشاركة الصفية",
+  "activity_template_open_box_description": "يكشف الطلاب سؤالا واحدا في كل مرة للعب مع الصف بأكمله أو ضمن مجموعات.",
+  "activity_template_quiz_best_for": "مراجعة المفردات وفهم المقروء ومراجعة المفاهيم",
+  "activity_template_quiz_description": "أسئلة اختيار من متعدد مع إظهار النتيجة مباشرة للتحقق السريع."
+}

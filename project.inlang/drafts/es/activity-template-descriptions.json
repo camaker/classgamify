@@ -1,0 +1,18 @@
+{
+  "activity_template_fill_blank_best_for": "Estructuras de oraciones, práctica gramatical y seguimiento de actividades de escucha",
+  "activity_template_fill_blank_description": "Oraciones con palabras que faltan, útiles para practicar gramática y ortografía.",
+  "activity_template_group_sort_best_for": "Familias gramaticales, grupos científicos y clasificación por temas",
+  "activity_template_group_sort_description": "El alumnado arrastra los elementos a los grupos definidos por el docente y compara las categorías.",
+  "activity_template_line_match_best_for": "Traducciones, términos y definiciones, causa y efecto",
+  "activity_template_line_match_description": "El alumnado conecta cada enunciado con su respuesta en un formato similar a una ficha.",
+  "activity_template_listening_best_for": "Dictado, comprobación auditiva y práctica posterior de pronunciación",
+  "activity_template_listening_description": "El alumnado escucha una palabra o una oración y después responde de memoria.",
+  "activity_template_match_up_best_for": "Palabras y significados, ejemplos y categorías, causa y efecto",
+  "activity_template_match_up_description": "El alumnado relaciona términos con definiciones, traducciones, imágenes o ejemplos.",
+  "activity_template_matching_pairs_best_for": "Memorización, actividades iniciales y juegos de repaso en grupos pequeños",
+  "activity_template_matching_pairs_description": "Una actividad de memoria en la que el alumnado descubre cartas y encuentra las parejas relacionadas.",
+  "activity_template_open_box_best_for": "Preguntas para hablar, rondas de repaso y participación en clase",
+  "activity_template_open_box_description": "El alumnado descubre una pregunta cada vez para jugar con toda la clase o en grupos.",
+  "activity_template_quiz_best_for": "Vocabulario, comprensión lectora y repaso de conceptos",
+  "activity_template_quiz_description": "Preguntas de opción múltiple con puntuación inmediata para comprobaciones rápidas."
+}

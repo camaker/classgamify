@@ -1,0 +1,18 @@
+{
+  "activity_template_fill_blank_best_for": "文型、文法練習、リスニング後の振り返り",
+  "activity_template_fill_blank_description": "文中の空欄に語句を入れる、文法やつづりの練習に適した形式です。",
+  "activity_template_group_sort_best_for": "文法カテゴリー、理科の分類、テーマ別の整理",
+  "activity_template_group_sort_description": "教師が設定したグループへ項目をドラッグして分類し、カテゴリーごとの特徴を比べます。",
+  "activity_template_line_match_best_for": "語彙の訳、用語と定義、原因と結果",
+  "activity_template_line_match_description": "ワークシートのような画面で、問題と対応する答えを線で結びます。",
+  "activity_template_listening_best_for": "ディクテーション、聞き取り確認、発音練習への展開",
+  "activity_template_listening_description": "語句や文を聞き、覚えた内容をもとに答えます。",
+  "activity_template_match_up_best_for": "単語と意味、例とカテゴリー、原因と結果",
+  "activity_template_match_up_description": "用語を定義、訳、画像、例などと組み合わせます。",
+  "activity_template_matching_pairs_best_for": "記憶の定着、導入活動、小グループでの復習",
+  "activity_template_matching_pairs_description": "カードをめくり、関係するカードのペアを見つける記憶ゲーム形式です。",
+  "activity_template_open_box_best_for": "発話のきっかけ、復習ラウンド、授業への参加",
+  "activity_template_open_box_description": "問題を1つずつ開き、クラス全体またはグループで取り組みます。",
+  "activity_template_quiz_best_for": "語彙確認、読解、概念の復習",
+  "activity_template_quiz_description": "選択式の問題に答え、その場で得点を確認できる短時間のチェック形式です。"
+}

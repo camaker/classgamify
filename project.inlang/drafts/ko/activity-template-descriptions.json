@@ -1,0 +1,18 @@
+{
+  "activity_template_fill_blank_best_for": "문장 패턴, 문법 연습, 듣기 활동 후 복습",
+  "activity_template_fill_blank_description": "문장의 빈칸에 단어를 채우며 문법과 철자를 연습하는 형식입니다.",
+  "activity_template_group_sort_best_for": "문법 범주, 과학 분류, 주제별 정리",
+  "activity_template_group_sort_description": "교사가 정한 그룹으로 항목을 드래그해 분류하고 범주별 특징을 비교합니다.",
+  "activity_template_line_match_best_for": "어휘 번역, 용어와 정의, 원인과 결과",
+  "activity_template_line_match_description": "학습지와 비슷한 화면에서 문제와 알맞은 답을 선으로 연결합니다.",
+  "activity_template_listening_best_for": "받아쓰기, 듣기 확인, 발음 후속 연습",
+  "activity_template_listening_description": "단어나 문장을 듣고 기억한 내용을 바탕으로 답합니다.",
+  "activity_template_match_up_best_for": "단어와 뜻, 예시와 범주, 원인과 결과",
+  "activity_template_match_up_description": "용어를 정의, 번역, 이미지 또는 예시와 연결합니다.",
+  "activity_template_matching_pairs_best_for": "기억 연습, 도입 활동, 소그룹 복습 게임",
+  "activity_template_matching_pairs_description": "카드를 뒤집어 서로 관련된 카드의 짝을 찾는 기억 게임 형식입니다.",
+  "activity_template_open_box_best_for": "말하기 질문, 복습 라운드, 수업 참여",
+  "activity_template_open_box_description": "문제를 하나씩 열어 학급 전체 또는 그룹 단위로 활동합니다.",
+  "activity_template_quiz_best_for": "어휘 확인, 독해, 개념 복습",
+  "activity_template_quiz_description": "객관식 문제에 답하고 즉시 점수를 확인하는 간단한 점검 형식입니다."
+}

@@ -586,6 +586,24 @@
       "activity_template_quiz_name",
       "activity_template_quiz_short_name",
       "activity_template_start_action"
+    ],
+    "activity-template-descriptions": [
+      "activity_template_fill_blank_best_for",
+      "activity_template_fill_blank_description",
+      "activity_template_group_sort_best_for",
+      "activity_template_group_sort_description",
+      "activity_template_line_match_best_for",
+      "activity_template_line_match_description",
+      "activity_template_listening_best_for",
+      "activity_template_listening_description",
+      "activity_template_match_up_best_for",
+      "activity_template_match_up_description",
+      "activity_template_matching_pairs_best_for",
+      "activity_template_matching_pairs_description",
+      "activity_template_open_box_best_for",
+      "activity_template_open_box_description",
+      "activity_template_quiz_best_for",
+      "activity_template_quiz_description"
     ]
   },
   "englishOnlyKeys": [

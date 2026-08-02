@@ -1,0 +1,18 @@
+{
+  "activity_template_fill_blank_best_for": "Strutture della frase, grammatica e attività successive all’ascolto",
+  "activity_template_fill_blank_description": "Frasi con parole mancanti, adatte a esercizi di grammatica e ortografia.",
+  "activity_template_group_sort_best_for": "Categorie grammaticali, gruppi scientifici e classificazione per argomento",
+  "activity_template_group_sort_description": "Gli studenti trascinano gli elementi nei gruppi definiti dall’insegnante e confrontano le categorie.",
+  "activity_template_line_match_best_for": "Traduzioni, termini e definizioni, causa ed effetto",
+  "activity_template_line_match_description": "Gli studenti collegano le richieste alle risposte corrispondenti in una schermata simile a una scheda.",
+  "activity_template_listening_best_for": "Dettato, verifica dell’ascolto e attività successive sulla pronuncia",
+  "activity_template_listening_description": "Gli studenti ascoltano una parola o una frase e poi rispondono a memoria.",
+  "activity_template_match_up_best_for": "Parole e significati, esempi e categorie, causa ed effetto",
+  "activity_template_match_up_description": "Gli studenti associano termini a definizioni, traduzioni, immagini o esempi.",
+  "activity_template_matching_pairs_best_for": "Memorizzazione, attività iniziali e giochi di ripasso in piccoli gruppi",
+  "activity_template_matching_pairs_description": "Un’attività di memoria in cui gli studenti scoprono le carte e trovano le coppie correlate.",
+  "activity_template_open_box_best_for": "Spunti per parlare, turni di ripasso e partecipazione in classe",
+  "activity_template_open_box_description": "Gli studenti scoprono una richiesta alla volta per giocare con tutta la classe o in gruppo.",
+  "activity_template_quiz_best_for": "Verifica del lessico, comprensione del testo e ripasso dei concetti",
+  "activity_template_quiz_description": "Domande a scelta multipla con punteggio immediato per verifiche rapide."
+}

@@ -1,0 +1,18 @@
+{
+  "activity_template_fill_blank_best_for": "Structures de phrases, grammaire et prolongement d’une activité d’écoute",
+  "activity_template_fill_blank_description": "Des phrases à compléter, adaptées aux exercices de grammaire et d’orthographe.",
+  "activity_template_group_sort_best_for": "Familles grammaticales, groupes scientifiques et classement par thème",
+  "activity_template_group_sort_description": "Les élèves font glisser les éléments dans les groupes définis par l’enseignant, puis comparent les catégories.",
+  "activity_template_line_match_best_for": "Traductions, termes et définitions, causes et conséquences",
+  "activity_template_line_match_description": "Les élèves relient chaque consigne à la réponse correspondante dans une présentation proche d’une fiche d’exercice.",
+  "activity_template_listening_best_for": "Dictée, vérification de la compréhension orale et travail de prononciation",
+  "activity_template_listening_description": "Les élèves écoutent un mot ou une phrase, puis répondent de mémoire.",
+  "activity_template_match_up_best_for": "Mots et sens, exemples et catégories, causes et conséquences",
+  "activity_template_match_up_description": "Les élèves associent des termes à des définitions, des traductions, des images ou des exemples.",
+  "activity_template_matching_pairs_best_for": "Mémorisation, échauffements et révisions en petits groupes",
+  "activity_template_matching_pairs_description": "Une activité de mémoire où les élèves retournent des cartes pour retrouver les paires associées.",
+  "activity_template_open_box_best_for": "Prise de parole, tours de révision et participation en classe",
+  "activity_template_open_box_description": "Les élèves découvrent les consignes une par une pour jouer en classe entière ou en groupe.",
+  "activity_template_quiz_best_for": "Vocabulaire, compréhension écrite et révision des notions",
+  "activity_template_quiz_description": "Des questions à choix multiple avec un score immédiat pour une vérification rapide."
+}
