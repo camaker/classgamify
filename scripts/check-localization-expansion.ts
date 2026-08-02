@@ -43,6 +43,104 @@ const visibleLocaleNeutralKeys = new Set([
   'activity_library_filter_source_selected_description',
   'activity_library_filter_status_selected_description',
 ]);
+const structuralLocaleNeutralKeys = new Set([
+  'activity_editor_scaffold_review_item_aria_label',
+  'activity_library_card_aria_label',
+  'activity_library_filter_status_selected_description',
+  'activity_library_stat_aria_label',
+  'activity_library_status_metric_aria_label',
+  'activity_library_summary_aria_label',
+  'activity_library_template_list_separator',
+  'activity_remix_title_format',
+  'assignment_list_card_stat_aria_label',
+  'assignment_list_distribution_aria_label',
+  'assignment_list_distribution_step_aria_label',
+  'assignment_list_search_status_description',
+  'assignment_list_summary_metric_aria_label',
+  'dashboard_overview_action_card_aria_label',
+  'dashboard_overview_next_action_aria_label',
+  'dashboard_overview_next_action_status_aria_label',
+  'home_feature_aria_label',
+  'home_feature_section_aria_label',
+  'home_signal_aria_label',
+  'home_signal_panel_aria_label',
+  'teachers_page_card_aria_label',
+  'teachers_page_template_panel_aria_label',
+  'teachers_page_use_case_section_aria_label',
+  'teachers_page_workflow_section_aria_label',
+  'templates_page_card_aria_label',
+  'templates_page_entry_step_aria_label',
+  'worksheets_page_mode_card_aria_label',
+  'worksheets_page_mode_signal_aria_label',
+]);
+const naturalSameValueKeys: Record<string, Set<string>> = {
+  fr: new Set([
+    'common_pagination',
+    'common_table_page',
+    'nav_blog',
+    'footer_contact_short',
+    'footer_link_articles',
+    'footer_metric_result_value',
+    'assignment_list_scope_page_label',
+    'activity_library_scope_page_label',
+    'activity_library_stat_questions',
+    'activity_form_field_description',
+    'activity_form_field_questions',
+    'activity_preview_questions_title',
+    'activity_template_quiz_name',
+    'activity_template_quiz_short_name',
+    'activity_template_requirement_questions',
+  ]),
+  de: new Set([
+    'common_mode_system',
+    'nav_blog',
+    'footer_link_support',
+    'footer_metric_assignment_value',
+    'footer_section_support',
+    'auth_register_name',
+    'assignment_list_search_status_label',
+    'assignment_list_page_breadcrumb_dashboard',
+    'assignment_list_distribution_step_status_optional',
+    'activity_template_open_box_short_name',
+    'activity_template_quiz_name',
+    'activity_template_quiz_short_name',
+    'worksheets_page_mode_signal_editor_label',
+  ]),
+  ja: new Set(),
+  ko: new Set(),
+  it: new Set([
+    'common_home',
+    'nav_blog',
+    'footer_metric_assignment_value',
+    'auth_login_password',
+    'auth_register_password',
+    'dashboard_avatar_dashboard',
+    'dashboard_overview_breadcrumb',
+    'dashboard_sidebar_dashboard',
+    'dashboard_title',
+    'assignment_list_page_breadcrumb_dashboard',
+    'activity_library_breadcrumb_dashboard',
+    'activity_template_quiz_name',
+    'activity_template_quiz_short_name',
+    'worksheets_page_mode_signal_editor_label',
+  ]),
+  es: new Set([
+    'nav_blog',
+    'activity_template_classroom_mode_individual',
+    'activity_template_quiz_short_name',
+    'worksheets_page_mode_signal_editor_label',
+  ]),
+  'pt-BR': new Set([
+    'nav_blog',
+    'footer_metric_assignment_value',
+    'assignment_list_search_status_label',
+    'activity_template_classroom_mode_individual',
+    'activity_template_quiz_name',
+    'activity_template_quiz_short_name',
+    'worksheets_page_mode_signal_editor_label',
+  ]),
+  ar: new Set(),
+};
 const requiredVisibleLocalizedKeys = [
   'activity_created_panel_loading_title',
   'activity_created_panel_loading_body',
@@ -155,6 +253,32 @@ function isEnglishOnly(key: string) {
     englishOnlyKeys.has(key) ||
     englishOnlyPatterns.some((pattern) => pattern.test(key))
   );
+}
+
+const completeKeys = new Set(
+  policy.completeKeyPrefixes.flatMap((prefix) =>
+    Object.keys(english).filter((key) => key.startsWith(prefix))
+  )
+);
+for (const locale of policy.draftLocales) {
+  const messages = JSON.parse(
+    await readFile(`project.inlang/messages/${locale}.json`, 'utf8')
+  ) as Record<string, string>;
+  for (const key of completeKeys) {
+    if (
+      isEnglishOnly(key) ||
+      structuralLocaleNeutralKeys.has(key) ||
+      naturalSameValueKeys[locale]?.has(key) ||
+      english[key] === 'ClassGamify'
+    ) {
+      continue;
+    }
+    assert.notEqual(
+      messages[key],
+      english[key],
+      `${locale}.${key} must not fall back to English ordinary copy`
+    );
+  }
 }
 
 const draftKeyCounts = new Map<string, number>();

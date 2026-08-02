@@ -16,7 +16,7 @@ const locales = [
 ] as const;
 const hreflangs = [
   'en',
-  'zh-Hans',
+  'zh-CN',
   'fr',
   'de',
   'ja',
@@ -40,14 +40,14 @@ function messages(locale: (typeof locales)[number]) {
 
 test.describe('ten-language runtime expansion', () => {
   for (const locale of locales) {
-    test(`${locale} student demo renders its native public route`, async ({
+    test(`${locale} templates page renders its native public route`, async ({
       page,
     }) => {
-      const response = await page.goto(route(locale, '/play/demo-food'));
+      const response = await page.goto(route(locale, '/templates'));
       expect(response?.ok()).toBe(true);
       await expect(page.locator('html')).toHaveAttribute(
         'lang',
-        locale === 'zh' ? 'zh-Hans' : locale
+        locale === 'zh' ? 'zh-CN' : locale
       );
       await expect(page.locator('html')).toHaveAttribute(
         'dir',
@@ -55,7 +55,7 @@ test.describe('ten-language runtime expansion', () => {
       );
       await expect(
         page
-          .getByText(messages(locale).student_runner_public_route_badge, {
+          .getByText(messages(locale).templates_page_title, {
             exact: true,
           })
           .first()
