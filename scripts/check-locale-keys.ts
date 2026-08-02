@@ -10,28 +10,70 @@ const JSON_MESSAGE_KEYS = [
   'pricing_plans_pro_limits',
 ] as const;
 
-async function readMessages(locale: 'en' | 'zh') {
+type InlangSettings = {
+  baseLocale: string;
+  locales: string[];
+};
+
+async function readMessages(locale: string) {
   const raw = await readFile(`project.inlang/messages/${locale}.json`, 'utf8');
   return JSON.parse(raw) as Record<string, string>;
 }
 
-const en = await readMessages('en');
-const zh = await readMessages('zh');
-const enKeys = Object.keys(en).sort();
-const zhKeys = Object.keys(zh).sort();
+function placeholders(value: string) {
+  return [...value.matchAll(/\{([A-Za-z][A-Za-z0-9_]*)\}/g)]
+    .map((match) => match[1])
+    .sort();
+}
 
-const missingInZh = enKeys.filter((key) => !zhKeys.includes(key));
-const missingInEn = zhKeys.filter((key) => !enKeys.includes(key));
-const emptyValues = [...enKeys, ...zhKeys].filter((key, index, keys) => {
-  if (keys.indexOf(key) !== index) return false;
-  return en[key] === '' || zh[key] === '';
-});
+const settings = JSON.parse(
+  await readFile('project.inlang/settings.json', 'utf8')
+) as InlangSettings;
+const messagesByLocale = Object.fromEntries(
+  await Promise.all(
+    settings.locales.map(async (locale) => [locale, await readMessages(locale)])
+  )
+) as Record<string, Record<string, string>>;
+const baseMessages = messagesByLocale[settings.baseLocale];
+
+if (!baseMessages) {
+  throw new Error(`Missing base locale messages: ${settings.baseLocale}`);
+}
+
+const baseKeys = Object.keys(baseMessages).sort();
+const issues: Record<string, Record<string, unknown>> = {};
+
+for (const locale of settings.locales) {
+  const messages = messagesByLocale[locale];
+  const keys = Object.keys(messages).sort();
+  const missingKeys = baseKeys.filter((key) => !(key in messages));
+  const extraKeys = keys.filter((key) => !(key in baseMessages));
+  const emptyValues = keys.filter((key) => messages[key] === '');
+  const placeholderMismatches = baseKeys.filter((key) => {
+    if (!(key in messages)) return false;
+    return (
+      JSON.stringify(placeholders(messages[key])) !==
+      JSON.stringify(placeholders(baseMessages[key]))
+    );
+  });
+
+  if (
+    missingKeys.length ||
+    extraKeys.length ||
+    emptyValues.length ||
+    placeholderMismatches.length
+  ) {
+    issues[locale] = {
+      missingKeys,
+      extraKeys,
+      emptyValues,
+      placeholderMismatches,
+    };
+  }
+}
 
 for (const key of JSON_MESSAGE_KEYS) {
-  for (const [locale, messages] of [
-    ['en', en],
-    ['zh', zh],
-  ] as const) {
+  for (const [locale, messages] of Object.entries(messagesByLocale)) {
     try {
       JSON.parse(messages[key] ?? '');
     } catch {
@@ -40,11 +82,13 @@ for (const key of JSON_MESSAGE_KEYS) {
   }
 }
 
-if (missingInZh.length || missingInEn.length || emptyValues.length) {
-  console.error(
-    JSON.stringify({ missingInZh, missingInEn, emptyValues }, null, 2)
-  );
+if (Object.keys(issues).length) {
+  console.error(JSON.stringify(issues, null, 2));
   process.exit(1);
 }
 
-console.log(`Locale keys OK (${enKeys.length} keys)`);
+console.log(
+  `Locale keys OK (${baseKeys.length} keys across ${settings.locales.length} locales)`
+);
+
+await import('./check-localization-expansion');

@@ -4,5 +4,9 @@
 *
 !.gitignore
 !settings.json
+!localization-policy.json
 !messages/
 !messages/*.json
+!drafts/
+!drafts/*/
+!drafts/*/*.json

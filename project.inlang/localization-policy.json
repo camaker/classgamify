@@ -1,0 +1,34 @@
+{
+  "targetLocales": [
+    "en",
+    "zh",
+    "fr",
+    "de",
+    "ja",
+    "ko",
+    "it",
+    "es",
+    "pt-BR",
+    "ar"
+  ],
+  "draftLocales": ["fr", "de", "ja", "ko", "it", "es", "pt-BR", "ar"],
+  "englishOnlyKeyPatterns": [
+    "^legal_",
+    "privacy",
+    "terms",
+    "cookie",
+    "consent",
+    "billing",
+    "checkout",
+    "payment",
+    "subscription",
+    "refund",
+    "child_identity",
+    "student_identity",
+    "recording",
+    "upload",
+    "notification",
+    "cross_device"
+  ],
+  "legalMarkdown": ["cookie.md", "privacy.md", "terms.md"]
+}

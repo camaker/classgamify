@@ -2,7 +2,9 @@ import { defineCollection, defineConfig } from '@content-collections/core';
 import { z } from 'zod';
 
 function getLocaleSlug(path: string) {
-  const localeMatch = path.match(/^(?<slug>.+)\.(?<locale>en|zh)$/);
+  const localeMatch = path.match(
+    /^(?<slug>.+)\.(?<locale>en|zh|fr|de|ja|ko|it|es|pt-BR|ar)$/
+  );
   if (localeMatch?.groups) {
     return {
       locale: localeMatch.groups.locale,

@@ -6,6 +6,8 @@ This project uses Paraglide JS for runtime locale support.
 
 - Base locale: `en`
 - Additional locale: `zh`
+- Expansion target: `fr`, `de`, `ja`, `ko`, `it`, `es`, `pt-BR`, `ar`
+- Traditional Chinese is intentionally excluded
 - Default English URLs are unprefixed: `/templates`
 - Chinese URLs use a prefix: `/zh/templates`
 
@@ -28,7 +30,6 @@ content/blog/assignment-links-without-lms.zh.md
 content/changelog/v1.0.0.md
 content/changelog/v1.0.0.zh.md
 content/pages/privacy.md
-content/pages/privacy.zh.md
 ```
 
 `content-collections.ts` strips the `.zh` suffix from the route slug, so
@@ -36,13 +37,16 @@ content/pages/privacy.zh.md
 `wordwall-style-activity-loop.zh.md` both map to
 `/blog/wordwall-style-activity-loop` under their respective URL locale.
 
+Legal content is English-only. Privacy, terms, and cookie routes in every
+locale load the base English Markdown; do not add localized legal Markdown.
+
 `src/locale/paraglide/` is generated code and is ignored by git.
 
 ## Commands
 
 ```bash
 pnpm locale:sort      # sort message keys by prefix/name in all locale JSON files
-pnpm locale:check     # verify en/zh key parity and JSON leaf values
+pnpm locale:check     # verify enabled catalogs, drafts, placeholders, and legal boundaries
 pnpm locale:compile   # compile Paraglide runtime manually
 ```
 
