@@ -1,0 +1,15 @@
+{
+  "activity_editor_load_scaffold": "Carregar exemplo",
+  "activity_editor_preview_title": "Prévia do exemplo {template}",
+  "activity_editor_review_scaffold_fields": "Revisar os campos do exemplo",
+  "activity_editor_scaffold_loaded": "Exemplo {template} carregado.",
+  "activity_editor_scaffold_review_fields_action": "Ir para os campos",
+  "activity_editor_scaffold_review_fields_description": "Revise perguntas, pares, grupos, vocabulário, objetivo de aprendizagem e anotações antes de salvar.",
+  "activity_editor_scaffold_review_fields_label": "Revisar campos",
+  "activity_editor_scaffold_review_item_aria_label": "{label}. {description}",
+  "activity_editor_scaffold_review_label": "Antes de salvar este exemplo",
+  "activity_editor_scaffold_review_save_action": "Continuar editando",
+  "activity_editor_scaffold_review_save_description": "Use o exemplo como ponto de partida, adapte-o à sua turma e salve-o como uma atividade reutilizável.",
+  "activity_editor_scaffold_review_save_label": "Editar antes de salvar",
+  "activity_editor_setup_title": "Configuração de {template}"
+}

@@ -1,0 +1,15 @@
+{
+  "activity_editor_load_scaffold": "Carica esempio",
+  "activity_editor_preview_title": "Anteprima dell’esempio {template}",
+  "activity_editor_review_scaffold_fields": "Verifica i campi dell’esempio",
+  "activity_editor_scaffold_loaded": "Esempio {template} caricato.",
+  "activity_editor_scaffold_review_fields_action": "Vai ai campi",
+  "activity_editor_scaffold_review_fields_description": "Verifica domande, coppie, gruppi, lessico, obiettivo didattico e note prima di salvare.",
+  "activity_editor_scaffold_review_fields_label": "Verifica i campi",
+  "activity_editor_scaffold_review_item_aria_label": "{label}. {description}",
+  "activity_editor_scaffold_review_label": "Prima di salvare questo esempio",
+  "activity_editor_scaffold_review_save_action": "Continua a modificare",
+  "activity_editor_scaffold_review_save_description": "Usa l’esempio come punto di partenza, adattalo alla tua classe e salvalo come attività riutilizzabile.",
+  "activity_editor_scaffold_review_save_label": "Modifica prima di salvare",
+  "activity_editor_setup_title": "Configurazione di {template}"
+}

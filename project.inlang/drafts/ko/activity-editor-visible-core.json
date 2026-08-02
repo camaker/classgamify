@@ -1,0 +1,15 @@
+{
+  "activity_editor_load_scaffold": "예시 불러오기",
+  "activity_editor_preview_title": "{template} 예시 미리보기",
+  "activity_editor_review_scaffold_fields": "예시 항목 검토",
+  "activity_editor_scaffold_loaded": "{template} 예시를 불러왔습니다.",
+  "activity_editor_scaffold_review_fields_action": "항목으로 이동",
+  "activity_editor_scaffold_review_fields_description": "저장하기 전에 문제, 짝, 그룹, 어휘, 학습 목표, 교사용 메모를 확인합니다.",
+  "activity_editor_scaffold_review_fields_label": "항목 검토",
+  "activity_editor_scaffold_review_item_aria_label": "{label}. {description}",
+  "activity_editor_scaffold_review_label": "이 예시를 저장하기 전에",
+  "activity_editor_scaffold_review_save_action": "계속 편집",
+  "activity_editor_scaffold_review_save_description": "예시를 시작점으로 삼아 수업에 맞게 편집한 다음, 재사용 가능한 활동으로 저장합니다.",
+  "activity_editor_scaffold_review_save_label": "저장 전 편집",
+  "activity_editor_setup_title": "{template} 설정"
+}

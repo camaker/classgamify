@@ -1,0 +1,15 @@
+{
+  "activity_editor_load_scaffold": "تحميل المثال",
+  "activity_editor_preview_title": "معاينة مثال {template}",
+  "activity_editor_review_scaffold_fields": "مراجعة حقول المثال",
+  "activity_editor_scaffold_loaded": "تم تحميل مثال {template}.",
+  "activity_editor_scaffold_review_fields_action": "الانتقال إلى الحقول",
+  "activity_editor_scaffold_review_fields_description": "راجع الأسئلة والأزواج والمجموعات والمفردات وهدف التعلم وملاحظات المعلم قبل الحفظ.",
+  "activity_editor_scaffold_review_fields_label": "مراجعة الحقول",
+  "activity_editor_scaffold_review_item_aria_label": "{label}. {description}",
+  "activity_editor_scaffold_review_label": "قبل حفظ هذا المثال",
+  "activity_editor_scaffold_review_save_action": "متابعة التعديل",
+  "activity_editor_scaffold_review_save_description": "استخدم المثال كنقطة بداية، وعدله ليناسب صفك، ثم احفظه كنشاط قابل لإعادة الاستخدام.",
+  "activity_editor_scaffold_review_save_label": "التعديل قبل الحفظ",
+  "activity_editor_setup_title": "إعداد {template}"
+}

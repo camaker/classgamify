@@ -1,0 +1,15 @@
+{
+  "activity_editor_load_scaffold": "サンプルを読み込む",
+  "activity_editor_preview_title": "{template}サンプルのプレビュー",
+  "activity_editor_review_scaffold_fields": "サンプルの項目を確認",
+  "activity_editor_scaffold_loaded": "{template}サンプルを読み込みました。",
+  "activity_editor_scaffold_review_fields_action": "項目を開く",
+  "activity_editor_scaffold_review_fields_description": "保存前に、問題、ペア、グループ、語彙、学習目標、教師用メモを確認します。",
+  "activity_editor_scaffold_review_fields_label": "項目を確認",
+  "activity_editor_scaffold_review_item_aria_label": "{label}。{description}",
+  "activity_editor_scaffold_review_label": "このサンプルを保存する前に",
+  "activity_editor_scaffold_review_save_action": "編集を続ける",
+  "activity_editor_scaffold_review_save_description": "サンプルを出発点として授業に合わせて編集し、再利用できるアクティビティとして保存します。",
+  "activity_editor_scaffold_review_save_label": "保存前に編集",
+  "activity_editor_setup_title": "{template}の設定"
+}

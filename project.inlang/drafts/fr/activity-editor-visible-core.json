@@ -1,0 +1,15 @@
+{
+  "activity_editor_load_scaffold": "Charger l’exemple",
+  "activity_editor_preview_title": "Aperçu de l’exemple {template}",
+  "activity_editor_review_scaffold_fields": "Vérifier les champs de l’exemple",
+  "activity_editor_scaffold_loaded": "Exemple {template} chargé.",
+  "activity_editor_scaffold_review_fields_action": "Accéder aux champs",
+  "activity_editor_scaffold_review_fields_description": "Vérifiez les questions, les paires, les groupes, le vocabulaire, l’objectif pédagogique et les notes avant d’enregistrer.",
+  "activity_editor_scaffold_review_fields_label": "Vérifier les champs",
+  "activity_editor_scaffold_review_item_aria_label": "{label}. {description}",
+  "activity_editor_scaffold_review_label": "Avant d’enregistrer cet exemple",
+  "activity_editor_scaffold_review_save_action": "Continuer la modification",
+  "activity_editor_scaffold_review_save_description": "Utilisez cet exemple comme point de départ : adaptez-le à votre classe, puis enregistrez-le comme activité réutilisable.",
+  "activity_editor_scaffold_review_save_label": "Modifier avant d’enregistrer",
+  "activity_editor_setup_title": "Configuration du modèle {template}"
+}
