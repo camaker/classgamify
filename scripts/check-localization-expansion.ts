@@ -58,6 +58,9 @@ const requiredVisibleLocalizedKeys = [
   'student_runner_feedback_status_correct',
   'student_runner_feedback_status_needs_review',
   'student_runner_feedback_status_unanswered',
+  'student_runner_submit_readiness_status_blocked',
+  'student_runner_submit_readiness_status_needs_action',
+  'student_runner_submit_readiness_status_ready',
 ] as const;
 
 assert.deepEqual(policy.targetLocales, [
