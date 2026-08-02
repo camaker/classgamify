@@ -1,0 +1,10 @@
+{
+  "activity_ai_focus_balanced_description": "Hält Fragen, Paare, Gruppen, Wortschatz und Hinweise für die Wiederverwendung ausgewogen.",
+  "activity_ai_focus_balanced_label": "Ausgewogene Aktivität",
+  "activity_ai_focus_listening_script_description": "Erstellt gesprochene Aufgaben und Lösungen zur Nachbesprechung von Hörübungen.",
+  "activity_ai_focus_listening_script_label": "Hörskript",
+  "activity_ai_focus_remix_ready_description": "Bevorzugt eine ausreichende Inhaltsstruktur, damit dieselbe Aktivität in andere Spielmodi übertragen werden kann.",
+  "activity_ai_focus_remix_ready_label": "Für andere Vorlagen vorbereitet",
+  "activity_ai_focus_worksheet_practice_description": "Konzentriert sich auf Lückentexte, Linienzuordnungen und Klassifikationen für arbeitsblattähnliche Übungen.",
+  "activity_ai_focus_worksheet_practice_label": "Arbeitsblattübung"
+}

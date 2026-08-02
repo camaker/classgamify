@@ -13,6 +13,8 @@
     "activity_duplicate_",
     "activity_remix_",
     "activity_draft_meta_",
+    "activity_ai_focus_",
+    "activity_ai_notice_",
     "templates_page_",
     "worksheets_page_"
   ],
@@ -630,9 +632,26 @@
       "activity_draft_meta_next_step_label",
       "activity_draft_meta_notice_label",
       "activity_draft_meta_title"
+    ],
+    "activity-ai-focus-options": [
+      "activity_ai_focus_balanced_description",
+      "activity_ai_focus_balanced_label",
+      "activity_ai_focus_listening_script_description",
+      "activity_ai_focus_listening_script_label",
+      "activity_ai_focus_remix_ready_description",
+      "activity_ai_focus_remix_ready_label",
+      "activity_ai_focus_worksheet_practice_description",
+      "activity_ai_focus_worksheet_practice_label"
     ]
   },
   "englishOnlyKeys": [
+    "activity_ai_focus_balanced_prompt",
+    "activity_ai_focus_listening_script_prompt",
+    "activity_ai_focus_remix_ready_prompt",
+    "activity_ai_focus_worksheet_practice_prompt",
+    "activity_ai_notice_completed_draft",
+    "activity_ai_notice_invalid_draft",
+    "activity_ai_notice_missing_credentials",
     "activity_draft_meta_applied_description",
     "activity_draft_meta_applied_label",
     "activity_draft_meta_checklist_add_explanations",

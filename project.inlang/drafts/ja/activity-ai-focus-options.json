@@ -1,0 +1,10 @@
+{
+  "activity_ai_focus_balanced_description": "問題、ペア、グループ、語彙、メモをバランスよく含め、再利用しやすくします。",
+  "activity_ai_focus_balanced_label": "バランス重視",
+  "activity_ai_focus_listening_script_description": "リスニング練習向けの音声用問題と復習用の答えを作成します。",
+  "activity_ai_focus_listening_script_label": "リスニング台本",
+  "activity_ai_focus_remix_ready_description": "同じアクティビティをほかのゲーム形式にも適用できるよう、十分な内容構造を優先します。",
+  "activity_ai_focus_remix_ready_label": "別形式への適用を重視",
+  "activity_ai_focus_worksheet_practice_description": "ワークシート形式の宿題向けに、穴埋め、線結び、分類の構造を重視します。",
+  "activity_ai_focus_worksheet_practice_label": "ワークシート練習"
+}
