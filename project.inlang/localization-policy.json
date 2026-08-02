@@ -6,6 +6,11 @@
     "auth_reset_password_",
     "dashboard_",
     "activity_library_",
+    "activity_form_groups_",
+    "activity_form_pairs_",
+    "activity_form_questions_",
+    "activity_form_teacher_notes_",
+    "activity_form_vocabulary_",
     "templates_page_",
     "worksheets_page_"
   ],
@@ -515,9 +520,20 @@
       "activity_form_step_label",
       "activity_form_title_create",
       "activity_form_title_edit"
+    ],
+    "activity-form-content-help": [
+      "activity_form_groups_description",
+      "activity_form_pairs_description",
+      "activity_form_teacher_notes_description",
+      "activity_form_vocabulary_description"
     ]
   },
   "englishOnlyKeys": [
+    "activity_form_groups_placeholder",
+    "activity_form_pairs_placeholder",
+    "activity_form_questions_description",
+    "activity_form_questions_placeholder",
+    "activity_form_vocabulary_placeholder",
     "activity_library_filter_handoff_clear_filter_control_description",
     "activity_library_filter_handoff_clear_filter_control_label",
     "activity_library_filter_handoff_clear_filter_control_value",

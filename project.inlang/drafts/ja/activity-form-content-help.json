@@ -1,0 +1,6 @@
+{
+  "activity_form_groups_description": "ドラッグによる分類や、カテゴリー分けに使用します。",
+  "activity_form_pairs_description": "ペア合わせ、線で結ぶ問題、ペアカード形式で使用します。",
+  "activity_form_teacher_notes_description": "1行に1件ずつメモを入力します。",
+  "activity_form_vocabulary_description": "語句はカンマ、セミコロン、または改行で区切ります。"
+}
