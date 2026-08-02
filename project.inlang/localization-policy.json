@@ -654,6 +654,13 @@
     ]
   },
   "englishOnlyKeys": [
+    "activity_created_panel_duplicate_body",
+    "activity_created_panel_found_body",
+    "activity_created_panel_loading_body",
+    "activity_created_panel_loading_title",
+    "activity_created_panel_missing_body",
+    "activity_created_panel_missing_title",
+    "activity_created_panel_remix_body",
     "activity_edit_access_archived_action",
     "activity_edit_access_archived_description",
     "activity_edit_access_archived_title",
@@ -1944,6 +1951,8 @@
     "^activity_ai_remix_assist_",
     "^activity_ai_prompt_",
     "^activity_ai_source_",
+    "^activity_api_error_",
+    "^activity_draft_default_",
     "^activity_ai_error_",
     "^activity_draft_source_",
     "^activity_runner_",
