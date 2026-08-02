@@ -3,6 +3,7 @@
     "site_",
     "nav_",
     "footer_",
+    "teachers_page_",
     "auth_forgot_password_",
     "auth_login_",
     "auth_register_",
@@ -2279,7 +2280,9 @@
     "^listening_speech_",
     "^assignment_list_filter_handoff_",
     "^assignment_list_handoff_",
-    "^create_page_template_entry_source_"
+    "^create_page_template_entry_source_",
+    "^teachers_page_handoff_",
+    "^teachers_page_school_"
   ],
   "legalMarkdown": ["cookie.md", "privacy.md", "terms.md"]
 }
