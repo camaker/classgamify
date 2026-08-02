@@ -1,0 +1,20 @@
+{
+  "teachers_page_use_case_0_description": "Asigna juegos breves después de clase y comprueba qué estudiantes han completado la actividad.",
+  "teachers_page_use_case_0_title": "Tareas para casa",
+  "teachers_page_use_case_1_description": "Usa cajas sorpresa, audios, unión con líneas, clasificación y parejas para empezar la clase, repasar o trabajar en grupos pequeños.",
+  "teachers_page_use_case_1_title": "Juego en el aula",
+  "teachers_page_use_case_2_description": "Utiliza las actividades completadas y las puntuaciones para decidir qué preguntas necesitan refuerzo u otra actividad.",
+  "teachers_page_use_case_2_title": "Seguimiento de resultados",
+  "teachers_page_use_case_section_aria_label": "{title}: {description}",
+  "teachers_page_use_case_section_description": "Formas de usar ClassGamify en las tareas, el juego en el aula y el seguimiento de resultados.",
+  "teachers_page_use_case_section_title": "Usos en el aula",
+  "teachers_page_workflow_0_description": "Reúne vocabulario, preguntas, ejemplos o consignas de fichas en un único modelo de actividad estructurado.",
+  "teachers_page_workflow_0_title": "Empieza con el contenido de clase",
+  "teachers_page_workflow_1_description": "Presenta el mismo contenido como cuestionario, parejas, unión con líneas, clasificación en grupos, texto con huecos, audio, emparejamiento o cajas sorpresa.",
+  "teachers_page_workflow_1_title": "Elige una plantilla de juego",
+  "teachers_page_workflow_2_description": "Comparte un enlace público para el alumnado y conserva la actividad reutilizable en tu biblioteca docente.",
+  "teachers_page_workflow_2_title": "Publica una tarea",
+  "teachers_page_workflow_section_aria_label": "{title}: {description}",
+  "teachers_page_workflow_section_description": "El recorrido docente desde el material de clase hasta la actividad reutilizable, la plantilla jugable y el enlace de la tarea.",
+  "teachers_page_workflow_section_title": "Flujo de trabajo docente"
+}

@@ -1,0 +1,20 @@
+{
+  "teachers_page_use_case_0_description": "Passe jogos rápidos depois da aula e veja quais alunos concluíram a atividade.",
+  "teachers_page_use_case_0_title": "Tarefa de casa",
+  "teachers_page_use_case_1_description": "Use caixas-surpresa, compreensão oral, ligação por linhas, classificação e associação para aquecer a turma, revisar ou trabalhar em pequenos grupos.",
+  "teachers_page_use_case_1_title": "Jogo ao vivo na sala",
+  "teachers_page_use_case_2_description": "Use as conclusões e pontuações para decidir quais questões precisam de retomada ou de outra atividade.",
+  "teachers_page_use_case_2_title": "Acompanhamento dos resultados",
+  "teachers_page_use_case_section_aria_label": "{title}: {description}",
+  "teachers_page_use_case_section_description": "Formas de usar o ClassGamify nas tarefas, nas atividades ao vivo e no acompanhamento dos resultados.",
+  "teachers_page_use_case_section_title": "Usos em sala de aula",
+  "teachers_page_workflow_0_description": "Reúna vocabulário, perguntas, exemplos ou enunciados de folhas de atividades em um único modelo estruturado.",
+  "teachers_page_workflow_0_title": "Comece pelo conteúdo da aula",
+  "teachers_page_workflow_1_description": "Apresente o mesmo conteúdo como quiz, associação, ligação por linhas, classificação em grupos, preenchimento, compreensão oral, pares ou caixas-surpresa.",
+  "teachers_page_workflow_1_title": "Escolha um modelo de jogo",
+  "teachers_page_workflow_2_description": "Compartilhe um link público para os alunos e mantenha a atividade reutilizável na sua biblioteca de professor.",
+  "teachers_page_workflow_2_title": "Publique uma tarefa",
+  "teachers_page_workflow_section_aria_label": "{title}: {description}",
+  "teachers_page_workflow_section_description": "O caminho do professor entre o material da aula, a atividade reutilizável, o modelo jogável e o link da tarefa.",
+  "teachers_page_workflow_section_title": "Fluxo do professor"
+}

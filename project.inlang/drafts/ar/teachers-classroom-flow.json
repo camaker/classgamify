@@ -1,0 +1,20 @@
+{
+  "teachers_page_use_case_0_description": "عيّن ألعابًا قصيرة بعد الحصة وتحقق من الطلاب الذين أكملوا النشاط.",
+  "teachers_page_use_case_0_title": "واجبات صفية",
+  "teachers_page_use_case_1_description": "استخدم صناديق الكشف والاستماع والتوصيل بالخطوط والتصنيف والمطابقة للتمهيد أو المراجعة أو العمل في مجموعات صغيرة.",
+  "teachers_page_use_case_1_title": "اللعب داخل الصف",
+  "teachers_page_use_case_2_description": "استخدم حالات الإكمال والدرجات لتحديد الأسئلة التي تحتاج إلى إعادة شرح أو نشاط إضافي.",
+  "teachers_page_use_case_2_title": "متابعة النتائج",
+  "teachers_page_use_case_section_aria_label": "{title}: {description}",
+  "teachers_page_use_case_section_description": "طرق استخدام ClassGamify في الواجبات واللعب داخل الصف ومتابعة النتائج.",
+  "teachers_page_use_case_section_title": "استخدامات داخل الصف",
+  "teachers_page_workflow_0_description": "أدخل المفردات والأسئلة والأمثلة أو تعليمات أوراق العمل في نموذج نشاط منظم واحد.",
+  "teachers_page_workflow_0_title": "ابدأ من محتوى الدرس",
+  "teachers_page_workflow_1_description": "اعرض المحتوى نفسه كاختبار أو مطابقة أو توصيل بالخطوط أو تصنيف مجموعات أو ملء فراغات أو استماع أو مطابقة أزواج أو صناديق كشف.",
+  "teachers_page_workflow_1_title": "اختر قالب لعبة",
+  "teachers_page_workflow_2_description": "شارك رابطًا عامًا للطلاب مع الاحتفاظ بالنشاط القابل لإعادة الاستخدام في مكتبة المعلم.",
+  "teachers_page_workflow_2_title": "انشر واجبًا",
+  "teachers_page_workflow_section_aria_label": "{title}: {description}",
+  "teachers_page_workflow_section_description": "مسار المعلم من مواد الدرس إلى نشاط قابل لإعادة الاستخدام وقالب تفاعلي ورابط واجب.",
+  "teachers_page_workflow_section_title": "سير عمل المعلم"
+}

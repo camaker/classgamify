@@ -1,0 +1,20 @@
+{
+  "teachers_page_use_case_0_description": "Donnez de courts jeux après le cours et repérez les élèves qui ont terminé l’activité.",
+  "teachers_page_use_case_0_title": "Devoirs de classe",
+  "teachers_page_use_case_1_description": "Utilisez des cases à révéler, des écoutes, des lignes à relier, des tris et des associations pour l’échauffement, la révision ou le travail en petits groupes.",
+  "teachers_page_use_case_1_title": "Jeu en classe",
+  "teachers_page_use_case_2_description": "Appuyez-vous sur les activités terminées et les scores pour repérer les notions à reprendre ou à retravailler dans une nouvelle activité.",
+  "teachers_page_use_case_2_title": "Suivi des résultats",
+  "teachers_page_use_case_section_aria_label": "{title} : {description}",
+  "teachers_page_use_case_section_description": "Des usages concrets de ClassGamify pour les devoirs, le jeu en classe et le suivi des résultats.",
+  "teachers_page_use_case_section_title": "Usages en classe",
+  "teachers_page_workflow_0_description": "Regroupez vocabulaire, questions, exemples ou consignes de fiche dans un même modèle d’activité structuré.",
+  "teachers_page_workflow_0_title": "Partez de votre cours",
+  "teachers_page_workflow_1_description": "Déclinez le même contenu en quiz, associations, lignes à relier, tris par groupes, textes à trous, écoutes, paires ou cases à révéler.",
+  "teachers_page_workflow_1_title": "Choisissez un modèle de jeu",
+  "teachers_page_workflow_2_description": "Partagez un lien public pour les élèves tout en conservant l’activité réutilisable dans votre bibliothèque enseignant.",
+  "teachers_page_workflow_2_title": "Publiez un devoir",
+  "teachers_page_workflow_section_aria_label": "{title} : {description}",
+  "teachers_page_workflow_section_description": "Le parcours enseignant, du support de cours à l’activité réutilisable, au modèle jouable puis au lien de devoir.",
+  "teachers_page_workflow_section_title": "Parcours enseignant"
+}

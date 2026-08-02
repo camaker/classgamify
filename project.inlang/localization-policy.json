@@ -194,6 +194,26 @@
       "teachers_page_seo_description",
       "teachers_page_seo_title",
       "teachers_page_title"
+    ],
+    "teachers-classroom-flow": [
+      "teachers_page_use_case_0_description",
+      "teachers_page_use_case_0_title",
+      "teachers_page_use_case_1_description",
+      "teachers_page_use_case_1_title",
+      "teachers_page_use_case_2_description",
+      "teachers_page_use_case_2_title",
+      "teachers_page_use_case_section_aria_label",
+      "teachers_page_use_case_section_description",
+      "teachers_page_use_case_section_title",
+      "teachers_page_workflow_0_description",
+      "teachers_page_workflow_0_title",
+      "teachers_page_workflow_1_description",
+      "teachers_page_workflow_1_title",
+      "teachers_page_workflow_2_description",
+      "teachers_page_workflow_2_title",
+      "teachers_page_workflow_section_aria_label",
+      "teachers_page_workflow_section_description",
+      "teachers_page_workflow_section_title"
     ]
   },
   "englishOnlyKeyPatterns": [

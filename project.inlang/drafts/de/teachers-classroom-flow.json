@@ -1,0 +1,20 @@
+{
+  "teachers_page_use_case_0_description": "Gib nach dem Unterricht kurze Spiele auf und sieh, welche Lernenden die Aktivität abgeschlossen haben.",
+  "teachers_page_use_case_0_title": "Hausaufgaben",
+  "teachers_page_use_case_1_description": "Nutze Aufdeckfelder, Hörübungen, Linienzuordnung, Sortierung und Zuordnung für Einstiege, Wiederholungsrunden oder Kleingruppen.",
+  "teachers_page_use_case_1_title": "Gemeinsam im Unterricht spielen",
+  "teachers_page_use_case_2_description": "Nutze Abschlüsse und Punktzahlen, um zu entscheiden, welche Aufgaben erneut erklärt oder in einer weiteren Aktivität geübt werden sollten.",
+  "teachers_page_use_case_2_title": "Ergebnisse nachbereiten",
+  "teachers_page_use_case_section_aria_label": "{title}: {description}",
+  "teachers_page_use_case_section_description": "So lässt sich ClassGamify für Hausaufgaben, gemeinsames Spielen und die Nachbereitung von Ergebnissen einsetzen.",
+  "teachers_page_use_case_section_title": "Einsatz im Unterricht",
+  "teachers_page_workflow_0_description": "Übernimm Wortschatz, Fragen, Beispiele oder Arbeitsblattaufgaben in ein gemeinsames strukturiertes Aktivitätsmodell.",
+  "teachers_page_workflow_0_title": "Mit Unterrichtsinhalten beginnen",
+  "teachers_page_workflow_1_description": "Zeige dieselben Inhalte als Quiz, Zuordnungsspiel, Linienzuordnung, Gruppensortierung, Lückentext, Hörübung, Paarsuche oder Aufdeckspiel.",
+  "teachers_page_workflow_1_title": "Spielvorlage auswählen",
+  "teachers_page_workflow_2_description": "Teile einen öffentlichen Link für Lernende und behalte die wiederverwendbare Aktivität in deiner Lehrkräftebibliothek.",
+  "teachers_page_workflow_2_title": "Aufgabe veröffentlichen",
+  "teachers_page_workflow_section_aria_label": "{title}: {description}",
+  "teachers_page_workflow_section_description": "Der Weg für Lehrkräfte vom Unterrichtsmaterial über die wiederverwendbare Aktivität und Spielvorlage bis zum Aufgabenlink.",
+  "teachers_page_workflow_section_title": "Arbeitsablauf für Lehrkräfte"
+}

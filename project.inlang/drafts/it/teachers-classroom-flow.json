@@ -1,0 +1,20 @@
+{
+  "teachers_page_use_case_0_description": "Assegna brevi giochi dopo la lezione e verifica quali studenti hanno completato l’attività.",
+  "teachers_page_use_case_0_title": "Compiti per casa",
+  "teachers_page_use_case_1_description": "Usa caselle da scoprire, ascolti, collegamenti, classificazioni e abbinamenti per avviare la lezione, ripassare o lavorare in piccoli gruppi.",
+  "teachers_page_use_case_1_title": "Gioco in classe",
+  "teachers_page_use_case_2_description": "Usa completamenti e punteggi per capire quali domande richiedono una nuova spiegazione o un’altra attività.",
+  "teachers_page_use_case_2_title": "Attività dopo i risultati",
+  "teachers_page_use_case_section_aria_label": "{title}: {description}",
+  "teachers_page_use_case_section_description": "Come usare ClassGamify per i compiti, il gioco in classe e le attività successive ai risultati.",
+  "teachers_page_use_case_section_title": "Casi d’uso in classe",
+  "teachers_page_workflow_0_description": "Inserisci vocaboli, domande, esempi o consegne di una scheda in un unico modello di attività strutturato.",
+  "teachers_page_workflow_0_title": "Parti dai contenuti della lezione",
+  "teachers_page_workflow_1_description": "Proponi gli stessi contenuti come quiz, abbinamenti, collegamenti, classificazioni, completamenti, ascolti, coppie o caselle da scoprire.",
+  "teachers_page_workflow_1_title": "Scegli un modello di gioco",
+  "teachers_page_workflow_2_description": "Condividi un link pubblico per gli studenti mantenendo l’attività riutilizzabile nella tua raccolta docente.",
+  "teachers_page_workflow_2_title": "Pubblica un compito",
+  "teachers_page_workflow_section_aria_label": "{title}: {description}",
+  "teachers_page_workflow_section_description": "Il percorso docente dal materiale della lezione all’attività riutilizzabile, al modello giocabile e al link del compito.",
+  "teachers_page_workflow_section_title": "Flusso del docente"
+}
