@@ -1,0 +1,8 @@
+{
+  "assignment_list_distribution_aria_label": "{title}: {status}",
+  "assignment_list_distribution_status_blocked": "共有できません",
+  "assignment_list_distribution_status_collecting_results": "結果を収集中",
+  "assignment_list_distribution_status_preview": "プレビューのみ",
+  "assignment_list_distribution_status_ready_to_share": "共有できます",
+  "assignment_list_distribution_title": "配布ステータス"
+}

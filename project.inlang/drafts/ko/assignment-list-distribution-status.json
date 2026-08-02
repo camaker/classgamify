@@ -1,0 +1,8 @@
+{
+  "assignment_list_distribution_aria_label": "{title}: {status}",
+  "assignment_list_distribution_status_blocked": "공유할 수 없음",
+  "assignment_list_distribution_status_collecting_results": "결과 수집 중",
+  "assignment_list_distribution_status_preview": "미리보기 전용",
+  "assignment_list_distribution_status_ready_to_share": "공유 준비 완료",
+  "assignment_list_distribution_title": "배포 상태"
+}

@@ -1,0 +1,8 @@
+{
+  "assignment_list_distribution_aria_label": "{title}: {status}",
+  "assignment_list_distribution_status_blocked": "غير قابل للمشاركة",
+  "assignment_list_distribution_status_collecting_results": "جارٍ جمع النتائج",
+  "assignment_list_distribution_status_preview": "معاينة فقط",
+  "assignment_list_distribution_status_ready_to_share": "جاهز للمشاركة",
+  "assignment_list_distribution_title": "حالة التوزيع"
+}

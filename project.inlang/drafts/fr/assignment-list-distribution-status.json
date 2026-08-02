@@ -1,0 +1,8 @@
+{
+  "assignment_list_distribution_aria_label": "{title} : {status}",
+  "assignment_list_distribution_status_blocked": "Non partageable",
+  "assignment_list_distribution_status_collecting_results": "Collecte des résultats",
+  "assignment_list_distribution_status_preview": "Aperçu uniquement",
+  "assignment_list_distribution_status_ready_to_share": "Prêt à partager",
+  "assignment_list_distribution_title": "État de diffusion"
+}
