@@ -30,6 +30,10 @@ const requiredVisibleLocalizedPrefixes = [
   'activity_library_filter_source_',
   'activity_library_filter_status_',
   'activity_library_filter_template_',
+  'assignment_result_empty_student_summary_',
+  'assignment_result_empty_search_students_',
+  'assignment_result_empty_attempt_rows_',
+  'assignment_result_empty_search_attempts_',
 ] as const;
 const visibleLocaleNeutralKeys = new Set([
   'activity_library_filter_source_audio',
