@@ -1,0 +1,12 @@
+{
+  "create_page_template_entry_default_description": "ابدأ بنموذج النشاط القابل لإعادة الاستخدام، ثم اختر مثال قالب أو حمّله عندما تريد نمطًا صفيًا أكثر تحديدًا.",
+  "create_page_template_entry_default_title": "مسودة نشاط قابلة لإعادة الاستخدام",
+  "create_page_template_entry_description": "تم تحميل محتوى المثال {template} في المحرر والمعاينة، لذا يمكنك مراجعة الحقول بدل البدء من نموذج فارغ.",
+  "create_page_template_entry_next_step_default": "اختر قالبًا أدناه أو احفظ المسودة عندما يكتمل الهيكل.",
+  "create_page_template_entry_next_step_template": "راجع حقول {template} ثم احفظ النشاط في مكتبتك.",
+  "create_page_template_entry_ready_modes_label": "أوضاع قابلة لإعادة الاستخدام",
+  "create_page_template_entry_ready_modes_value": "{count} جاهزة",
+  "create_page_template_entry_runtime_items_label": "عناصر قابلة للتشغيل",
+  "create_page_template_entry_runtime_items_value": "{count} عناصر",
+  "create_page_template_entry_title": "تم تحميل مثال {template}"
+}

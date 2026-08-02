@@ -1,0 +1,12 @@
+{
+  "create_page_template_entry_default_description": "Parti dal modello di attività riutilizzabile, poi scegli o carica un esempio quando vuoi una modalità di classe più specifica.",
+  "create_page_template_entry_default_title": "Bozza di attività riutilizzabile",
+  "create_page_template_entry_description": "Il contenuto di esempio {template} è già caricato nell’editor e nell’anteprima, così puoi controllare i campi senza partire da un modulo vuoto.",
+  "create_page_template_entry_next_step_default": "Scegli un modello qui sotto oppure salva la bozza quando la struttura è pronta.",
+  "create_page_template_entry_next_step_template": "Controlla i campi {template}, poi salva l’attività nella raccolta.",
+  "create_page_template_entry_ready_modes_label": "Modalità riutilizzabili",
+  "create_page_template_entry_ready_modes_value": "{count} pronte",
+  "create_page_template_entry_runtime_items_label": "Elementi giocabili",
+  "create_page_template_entry_runtime_items_value": "{count} elementi",
+  "create_page_template_entry_title": "Esempio {template} caricato"
+}

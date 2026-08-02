@@ -1,0 +1,12 @@
+{
+  "create_page_template_entry_default_description": "再利用できるアクティビティモデルから始め、より具体的な授業モードが必要なときにテンプレート例を選ぶか読み込みます。",
+  "create_page_template_entry_default_title": "再利用可能なアクティビティの下書き",
+  "create_page_template_entry_description": "{template}のサンプル内容はエディターとプレビューに読み込まれているため、空のフォームから始めずに項目を確認できます。",
+  "create_page_template_entry_next_step_default": "下からテンプレートを選ぶか、構成が整ったら下書きを保存してください。",
+  "create_page_template_entry_next_step_template": "{template}の項目を確認してから、アクティビティをライブラリに保存してください。",
+  "create_page_template_entry_ready_modes_label": "再利用できるモード",
+  "create_page_template_entry_ready_modes_value": "{count}件準備完了",
+  "create_page_template_entry_runtime_items_label": "プレイ可能な項目",
+  "create_page_template_entry_runtime_items_value": "{count}件",
+  "create_page_template_entry_title": "{template}のサンプルを読み込みました"
+}

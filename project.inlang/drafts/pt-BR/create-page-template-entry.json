@@ -1,0 +1,12 @@
+{
+  "create_page_template_entry_default_description": "Comece pelo modelo de atividade reutilizável e escolha ou carregue um exemplo quando quiser um modo de aula mais específico.",
+  "create_page_template_entry_default_title": "Rascunho de atividade reutilizável",
+  "create_page_template_entry_description": "O conteúdo de exemplo {template} já foi carregado no editor e na visualização, para você revisar os campos sem começar de um formulário vazio.",
+  "create_page_template_entry_next_step_default": "Escolha um modelo abaixo ou salve o rascunho quando a estrutura estiver pronta.",
+  "create_page_template_entry_next_step_template": "Revise os campos de {template} e salve a atividade na biblioteca.",
+  "create_page_template_entry_ready_modes_label": "Modos reutilizáveis",
+  "create_page_template_entry_ready_modes_value": "{count} prontos",
+  "create_page_template_entry_runtime_items_label": "Itens interativos",
+  "create_page_template_entry_runtime_items_value": "{count} itens",
+  "create_page_template_entry_title": "Exemplo de {template} carregado"
+}

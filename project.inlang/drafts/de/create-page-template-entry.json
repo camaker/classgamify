@@ -1,0 +1,12 @@
+{
+  "create_page_template_entry_default_description": "Beginnen Sie mit dem wiederverwendbaren Aktivitätsmodell und wählen oder laden Sie anschließend ein Beispiel für einen bestimmten Unterrichtsmodus.",
+  "create_page_template_entry_default_title": "Wiederverwendbarer Aktivitätsentwurf",
+  "create_page_template_entry_description": "Der Beispielinhalt {template} ist bereits im Editor und in der Vorschau geladen. Sie können Felder prüfen, statt mit einem leeren Formular zu beginnen.",
+  "create_page_template_entry_next_step_default": "Wählen Sie unten eine Vorlage oder speichern Sie den Entwurf, sobald die Struktur bereit ist.",
+  "create_page_template_entry_next_step_template": "Prüfen Sie die {template}-Felder und speichern Sie die Aktivität anschließend in Ihrer Bibliothek.",
+  "create_page_template_entry_ready_modes_label": "Wiederverwendbare Modi",
+  "create_page_template_entry_ready_modes_value": "{count} bereit",
+  "create_page_template_entry_runtime_items_label": "Spielbare Elemente",
+  "create_page_template_entry_runtime_items_value": "{count} Elemente",
+  "create_page_template_entry_title": "Beispiel {template} geladen"
+}

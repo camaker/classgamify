@@ -1,0 +1,12 @@
+{
+  "create_page_template_entry_default_description": "Empieza con el modelo de actividad reutilizable y elige o carga un ejemplo cuando necesites un modo de aula más específico.",
+  "create_page_template_entry_default_title": "Borrador de actividad reutilizable",
+  "create_page_template_entry_description": "El contenido de ejemplo {template} ya está cargado en el editor y la vista previa para que revises los campos sin empezar con un formulario vacío.",
+  "create_page_template_entry_next_step_default": "Elige una plantilla o guarda el borrador cuando la estructura esté lista.",
+  "create_page_template_entry_next_step_template": "Revisa los campos de {template} y guarda la actividad en tu biblioteca.",
+  "create_page_template_entry_ready_modes_label": "Modos reutilizables",
+  "create_page_template_entry_ready_modes_value": "{count} listos",
+  "create_page_template_entry_runtime_items_label": "Elementos interactivos",
+  "create_page_template_entry_runtime_items_value": "{count} elementos",
+  "create_page_template_entry_title": "Ejemplo de {template} cargado"
+}

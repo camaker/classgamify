@@ -1,0 +1,12 @@
+{
+  "create_page_template_entry_default_description": "Commencez avec le modèle d’activité réutilisable, puis choisissez ou chargez un exemple lorsque vous souhaitez un mode de classe plus précis.",
+  "create_page_template_entry_default_title": "Brouillon d’activité réutilisable",
+  "create_page_template_entry_description": "Le contenu d’exemple {template} est déjà chargé dans l’éditeur et l’aperçu : vérifiez les champs sans partir d’un formulaire vide.",
+  "create_page_template_entry_next_step_default": "Choisissez un modèle ci-dessous ou enregistrez le brouillon lorsque la structure est prête.",
+  "create_page_template_entry_next_step_template": "Vérifiez les champs {template}, puis enregistrez cette activité dans votre bibliothèque.",
+  "create_page_template_entry_ready_modes_label": "Modes réutilisables",
+  "create_page_template_entry_ready_modes_value": "{count} prêts",
+  "create_page_template_entry_runtime_items_label": "Éléments jouables",
+  "create_page_template_entry_runtime_items_value": "{count} éléments",
+  "create_page_template_entry_title": "Exemple {template} chargé"
+}

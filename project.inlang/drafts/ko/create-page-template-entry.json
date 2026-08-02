@@ -1,0 +1,12 @@
+{
+  "create_page_template_entry_default_description": "재사용 가능한 활동 모델에서 시작하고, 더 구체적인 수업 모드가 필요할 때 템플릿 예시를 선택하거나 불러오세요.",
+  "create_page_template_entry_default_title": "재사용 가능한 활동 초안",
+  "create_page_template_entry_description": "{template} 예시 콘텐츠가 편집기와 미리보기에 이미 불러와져 있어 빈 양식부터 시작하지 않고 필드를 검토할 수 있습니다.",
+  "create_page_template_entry_next_step_default": "아래에서 템플릿을 선택하거나 구조가 준비되면 초안을 저장하세요.",
+  "create_page_template_entry_next_step_template": "{template} 필드를 검토한 뒤 활동을 라이브러리에 저장하세요.",
+  "create_page_template_entry_ready_modes_label": "재사용 가능한 모드",
+  "create_page_template_entry_ready_modes_value": "{count}개 준비됨",
+  "create_page_template_entry_runtime_items_label": "플레이 가능한 항목",
+  "create_page_template_entry_runtime_items_value": "{count}개 항목",
+  "create_page_template_entry_title": "{template} 예시를 불러왔습니다"
+}
