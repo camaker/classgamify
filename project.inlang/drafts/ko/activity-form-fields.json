@@ -1,0 +1,19 @@
+{
+  "activity_form_difficulty_challenge": "심화",
+  "activity_form_difficulty_core": "기본",
+  "activity_form_difficulty_starter": "입문",
+  "activity_form_field_description": "설명",
+  "activity_form_field_difficulty": "난이도",
+  "activity_form_field_grade_band": "학년",
+  "activity_form_field_groups": "그룹",
+  "activity_form_field_learning_goal": "학습 목표",
+  "activity_form_field_pairs": "연결할 짝",
+  "activity_form_field_primary_template": "기본 템플릿",
+  "activity_form_field_questions": "문제",
+  "activity_form_field_subject": "과목",
+  "activity_form_field_teacher_notes": "교사용 메모",
+  "activity_form_field_title": "제목",
+  "activity_form_field_vocabulary": "어휘",
+  "activity_form_save_activity": "활동 저장",
+  "activity_form_save_changes": "변경 사항 저장"
+}

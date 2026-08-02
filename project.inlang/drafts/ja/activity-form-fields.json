@@ -1,0 +1,19 @@
+{
+  "activity_form_difficulty_challenge": "応用",
+  "activity_form_difficulty_core": "標準",
+  "activity_form_difficulty_starter": "入門",
+  "activity_form_field_description": "説明",
+  "activity_form_field_difficulty": "難易度",
+  "activity_form_field_grade_band": "学年",
+  "activity_form_field_groups": "グループ",
+  "activity_form_field_learning_goal": "学習目標",
+  "activity_form_field_pairs": "組み合わせるペア",
+  "activity_form_field_primary_template": "基本テンプレート",
+  "activity_form_field_questions": "問題",
+  "activity_form_field_subject": "教科",
+  "activity_form_field_teacher_notes": "教師用メモ",
+  "activity_form_field_title": "タイトル",
+  "activity_form_field_vocabulary": "語彙",
+  "activity_form_save_activity": "アクティビティを保存",
+  "activity_form_save_changes": "変更を保存"
+}

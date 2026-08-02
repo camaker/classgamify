@@ -1,0 +1,19 @@
+{
+  "activity_form_difficulty_challenge": "Anspruchsvoll",
+  "activity_form_difficulty_core": "Standard",
+  "activity_form_difficulty_starter": "Einstieg",
+  "activity_form_field_description": "Beschreibung",
+  "activity_form_field_difficulty": "Schwierigkeitsgrad",
+  "activity_form_field_grade_band": "Klassenstufe",
+  "activity_form_field_groups": "Gruppen",
+  "activity_form_field_learning_goal": "Lernziel",
+  "activity_form_field_pairs": "Zuordnungspaare",
+  "activity_form_field_primary_template": "Hauptvorlage",
+  "activity_form_field_questions": "Fragen",
+  "activity_form_field_subject": "Fach",
+  "activity_form_field_teacher_notes": "Hinweise für Lehrkräfte",
+  "activity_form_field_title": "Titel",
+  "activity_form_field_vocabulary": "Wortschatz",
+  "activity_form_save_activity": "Aktivität speichern",
+  "activity_form_save_changes": "Änderungen speichern"
+}

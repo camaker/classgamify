@@ -1,0 +1,19 @@
+{
+  "activity_form_difficulty_challenge": "Avanzado",
+  "activity_form_difficulty_core": "Estándar",
+  "activity_form_difficulty_starter": "Inicial",
+  "activity_form_field_description": "Descripción",
+  "activity_form_field_difficulty": "Dificultad",
+  "activity_form_field_grade_band": "Nivel educativo",
+  "activity_form_field_groups": "Grupos",
+  "activity_form_field_learning_goal": "Objetivo de aprendizaje",
+  "activity_form_field_pairs": "Parejas para relacionar",
+  "activity_form_field_primary_template": "Plantilla principal",
+  "activity_form_field_questions": "Preguntas",
+  "activity_form_field_subject": "Asignatura",
+  "activity_form_field_teacher_notes": "Notas docentes",
+  "activity_form_field_title": "Título",
+  "activity_form_field_vocabulary": "Vocabulario",
+  "activity_form_save_activity": "Guardar actividad",
+  "activity_form_save_changes": "Guardar cambios"
+}

@@ -1,0 +1,19 @@
+{
+  "activity_form_difficulty_challenge": "Avanzato",
+  "activity_form_difficulty_core": "Standard",
+  "activity_form_difficulty_starter": "Introduttivo",
+  "activity_form_field_description": "Descrizione",
+  "activity_form_field_difficulty": "Difficoltà",
+  "activity_form_field_grade_band": "Fascia scolastica",
+  "activity_form_field_groups": "Gruppi",
+  "activity_form_field_learning_goal": "Obiettivo didattico",
+  "activity_form_field_pairs": "Coppie da abbinare",
+  "activity_form_field_primary_template": "Modello principale",
+  "activity_form_field_questions": "Domande",
+  "activity_form_field_subject": "Materia",
+  "activity_form_field_teacher_notes": "Note per l’insegnante",
+  "activity_form_field_title": "Titolo",
+  "activity_form_field_vocabulary": "Lessico",
+  "activity_form_save_activity": "Salva attività",
+  "activity_form_save_changes": "Salva modifiche"
+}

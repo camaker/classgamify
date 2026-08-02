@@ -1,0 +1,19 @@
+{
+  "activity_form_difficulty_challenge": "Approfondissement",
+  "activity_form_difficulty_core": "Standard",
+  "activity_form_difficulty_starter": "Découverte",
+  "activity_form_field_description": "Description",
+  "activity_form_field_difficulty": "Niveau de difficulté",
+  "activity_form_field_grade_band": "Niveau scolaire",
+  "activity_form_field_groups": "Groupes",
+  "activity_form_field_learning_goal": "Objectif pédagogique",
+  "activity_form_field_pairs": "Paires à associer",
+  "activity_form_field_primary_template": "Modèle principal",
+  "activity_form_field_questions": "Questions",
+  "activity_form_field_subject": "Matière",
+  "activity_form_field_teacher_notes": "Notes pédagogiques",
+  "activity_form_field_title": "Titre",
+  "activity_form_field_vocabulary": "Vocabulaire",
+  "activity_form_save_activity": "Enregistrer l’activité",
+  "activity_form_save_changes": "Enregistrer les modifications"
+}

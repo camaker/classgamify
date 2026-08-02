@@ -1,0 +1,19 @@
+{
+  "activity_form_difficulty_challenge": "متقدم",
+  "activity_form_difficulty_core": "أساسي",
+  "activity_form_difficulty_starter": "تمهيدي",
+  "activity_form_field_description": "الوصف",
+  "activity_form_field_difficulty": "مستوى الصعوبة",
+  "activity_form_field_grade_band": "المرحلة الدراسية",
+  "activity_form_field_groups": "المجموعات",
+  "activity_form_field_learning_goal": "هدف التعلم",
+  "activity_form_field_pairs": "الأزواج المطلوب مطابقتها",
+  "activity_form_field_primary_template": "القالب الأساسي",
+  "activity_form_field_questions": "الأسئلة",
+  "activity_form_field_subject": "المادة الدراسية",
+  "activity_form_field_teacher_notes": "ملاحظات المعلم",
+  "activity_form_field_title": "العنوان",
+  "activity_form_field_vocabulary": "المفردات",
+  "activity_form_save_activity": "حفظ النشاط",
+  "activity_form_save_changes": "حفظ التغييرات"
+}

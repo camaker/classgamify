@@ -486,6 +486,25 @@
       "activity_library_remix_action_fallback",
       "activity_library_remix_hint",
       "activity_library_template_list_separator"
+    ],
+    "activity-form-fields": [
+      "activity_form_difficulty_challenge",
+      "activity_form_difficulty_core",
+      "activity_form_difficulty_starter",
+      "activity_form_field_description",
+      "activity_form_field_difficulty",
+      "activity_form_field_grade_band",
+      "activity_form_field_groups",
+      "activity_form_field_learning_goal",
+      "activity_form_field_pairs",
+      "activity_form_field_primary_template",
+      "activity_form_field_questions",
+      "activity_form_field_subject",
+      "activity_form_field_teacher_notes",
+      "activity_form_field_title",
+      "activity_form_field_vocabulary",
+      "activity_form_save_activity",
+      "activity_form_save_changes"
     ]
   },
   "englishOnlyKeys": [
