@@ -1,0 +1,19 @@
+{
+  "assignment_list_action_clear_filters": "Cancella filtri",
+  "assignment_list_search_clear": "Cancella ricerca attività",
+  "assignment_list_search_description": "Cerca solo tra i tuoi link per titolo, ID di condivisione o testo dell’attività di origine.",
+  "assignment_list_search_label": "Cerca attività",
+  "assignment_list_search_placeholder": "Cerca per attività o ID di condivisione",
+  "assignment_list_search_status_description": "{status}: {description}",
+  "assignment_list_search_status_label": "Stato",
+  "assignment_list_status_filter_all": "Tutti gli stati",
+  "assignment_list_status_filter_all_description": "Mostra tutti i link, incluse bozze, attività aperte, chiuse e compiti scaduti.",
+  "assignment_list_status_filter_closed": "Chiusi",
+  "assignment_list_status_filter_closed_description": "Mostra i link chiusi dall’insegnante mantenendo disponibili i risultati.",
+  "assignment_list_status_filter_draft": "Bozze",
+  "assignment_list_status_filter_draft_description": "Mostra le attività non ancora pubblicate e fissate in uno snapshot.",
+  "assignment_list_status_filter_expired": "Scaduti",
+  "assignment_list_status_filter_expired_description": "Mostra i link oltre la scadenza che non accettano più consegne.",
+  "assignment_list_status_filter_published": "Aperti",
+  "assignment_list_status_filter_published_description": "Mostra i link pubblicati che gli studenti possono ancora aprire e inviare."
+}

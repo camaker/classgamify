@@ -1,0 +1,19 @@
+{
+  "assignment_list_action_clear_filters": "Borrar filtros",
+  "assignment_list_search_clear": "Borrar búsqueda de tareas",
+  "assignment_list_search_description": "Busca solo tus enlaces por título de tarea, identificador compartido o texto de la actividad de origen.",
+  "assignment_list_search_label": "Buscar tareas",
+  "assignment_list_search_placeholder": "Buscar por tarea, actividad o identificador",
+  "assignment_list_search_status_description": "{status}: {description}",
+  "assignment_list_search_status_label": "Estado",
+  "assignment_list_status_filter_all": "Todos los estados",
+  "assignment_list_status_filter_all_description": "Muestra todos los enlaces, incluidos borradores, abiertos, cerrados y tareas vencidas.",
+  "assignment_list_status_filter_closed": "Cerrados",
+  "assignment_list_status_filter_closed_description": "Muestra los enlaces que cerró el docente y conserva disponibles los resultados.",
+  "assignment_list_status_filter_draft": "Borradores",
+  "assignment_list_status_filter_draft_description": "Muestra tareas que todavía no se han publicado ni fijado como instantánea.",
+  "assignment_list_status_filter_expired": "Vencidos",
+  "assignment_list_status_filter_expired_description": "Muestra enlaces cuyo plazo terminó y que ya no aceptan trabajo de estudiantes.",
+  "assignment_list_status_filter_published": "Abiertos",
+  "assignment_list_status_filter_published_description": "Muestra enlaces publicados que los estudiantes todavía pueden abrir y enviar."
+}

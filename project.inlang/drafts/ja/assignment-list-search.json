@@ -1,0 +1,19 @@
+{
+  "assignment_list_action_clear_filters": "絞り込みを解除",
+  "assignment_list_search_clear": "課題の検索をクリア",
+  "assignment_list_search_description": "課題名、共有ID、または元のアクティビティの文面から自分の課題リンクを検索します。",
+  "assignment_list_search_label": "課題を検索",
+  "assignment_list_search_placeholder": "課題、アクティビティ、共有IDで検索",
+  "assignment_list_search_status_description": "{status}: {description}",
+  "assignment_list_search_status_label": "ステータス",
+  "assignment_list_status_filter_all": "すべてのステータス",
+  "assignment_list_status_filter_all_description": "下書き、公開中、終了、期限切れを含むすべての課題リンクを表示します。",
+  "assignment_list_status_filter_closed": "終了",
+  "assignment_list_status_filter_closed_description": "教師が終了したリンクを、結果を保持したまま表示します。",
+  "assignment_list_status_filter_draft": "下書き",
+  "assignment_list_status_filter_draft_description": "まだ公開およびスナップショット作成を行っていない課題を表示します。",
+  "assignment_list_status_filter_expired": "期限切れ",
+  "assignment_list_status_filter_expired_description": "提出期限を過ぎ、生徒の回答を受け付けていないリンクを表示します。",
+  "assignment_list_status_filter_published": "公開中",
+  "assignment_list_status_filter_published_description": "生徒が現在も開いて提出できる公開済みリンクを表示します。"
+}
