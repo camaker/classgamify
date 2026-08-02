@@ -1,6 +1,7 @@
 {
   "completeKeyPrefixes": [
     "site_",
+    "common_",
     "nav_",
     "footer_",
     "teachers_page_",
@@ -97,6 +98,12 @@
   ],
   "draftLocales": ["fr", "de", "ja", "ko", "it", "es", "pt-BR", "ar"],
   "draftNamespaces": {
+    "common-table-extras": [
+      "common_table_no_results",
+      "common_table_no_results_found",
+      "common_table_select_join_operator",
+      "common_table_where"
+    ],
     "changelog": [
       "changelog_description",
       "changelog_subtitle",
