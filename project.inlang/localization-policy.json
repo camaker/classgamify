@@ -9,6 +9,7 @@
     "activity_form_",
     "activity_editor_",
     "activity_preview_",
+    "activity_template_requirement_",
     "templates_page_",
     "worksheets_page_"
   ],
@@ -604,9 +605,19 @@
       "activity_template_open_box_description",
       "activity_template_quiz_best_for",
       "activity_template_quiz_description"
+    ],
+    "activity-template-requirements": [
+      "activity_template_requirement_grade_band",
+      "activity_template_requirement_groups",
+      "activity_template_requirement_learning_goal",
+      "activity_template_requirement_pairs",
+      "activity_template_requirement_questions",
+      "activity_template_requirement_teacher_notes",
+      "activity_template_requirement_vocabulary"
     ]
   },
   "englishOnlyKeys": [
+    "activity_template_requirement_source_summary",
     "activity_preview_assignment_result_value",
     "activity_preview_default_panel_description",
     "activity_preview_default_panel_title",
