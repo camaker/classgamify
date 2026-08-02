@@ -79,6 +79,9 @@ try {
           .sort();
         assert.ok(expectedKeys.length, `Unknown draft namespace: ${namespace}`);
         assert.deepEqual(Object.keys(draft).sort(), expectedKeys);
+        const localizableKeys = expectedKeys.filter(
+          (key) => !englishOnlyPatterns.some((pattern) => pattern.test(key))
+        );
         for (const key of expectedKeys) {
           assert.ok(draft[key].trim(), `${locale}/${file}:${key} is empty`);
           assert.deepEqual(
@@ -94,6 +97,19 @@ try {
             );
           }
         }
+        const localizedCount = localizableKeys.filter(
+          (key) => draft[key] !== english[key]
+        ).length;
+        assert.ok(
+          localizedCount >= Math.ceil(localizableKeys.length / 2),
+          `${locale}/${file} must localize most non-sensitive messages`
+        );
+        const localizedText = localizableKeys
+          .map((key) => draft[key])
+          .join('\n');
+        if (locale === 'ja') assert.match(localizedText, /[\u3040-\u30ff]/);
+        if (locale === 'ko') assert.match(localizedText, /[\uac00-\ud7af]/);
+        if (locale === 'ar') assert.match(localizedText, /[\u0600-\u06ff]/);
       }
     }
   }
