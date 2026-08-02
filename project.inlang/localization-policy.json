@@ -1934,7 +1934,21 @@
     "recording",
     "upload",
     "notification",
-    "cross_device"
+    "cross_device",
+    "^activity_source_extraction_",
+    "^activity_source_material_",
+    "^activity_lifecycle_",
+    "^activity_validation_",
+    "^activity_runtime_",
+    "^activity_edit_route_",
+    "^activity_ai_remix_assist_",
+    "^activity_ai_prompt_",
+    "^activity_ai_source_",
+    "^activity_ai_error_",
+    "^activity_draft_source_",
+    "^activity_runner_",
+    "^activity_scaffold_",
+    "^activity_starter_"
   ],
   "legalMarkdown": ["cookie.md", "privacy.md", "terms.md"]
 }
