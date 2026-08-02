@@ -1,0 +1,18 @@
+{
+  "templates_page_best_for_label": "Idéal pour",
+  "templates_page_card_aria_label": "{template} : {description}",
+  "templates_page_classroom_mode_label": "Mode de classe",
+  "templates_page_entry_label": "Parcours de création",
+  "templates_page_entry_step_aria_label": "{label} : {value}. {description}",
+  "templates_page_entry_step_scaffold_description": "La page de création charge un exemple adapté au modèle, que l’enseignant vérifie et modifie avant de l’enregistrer.",
+  "templates_page_entry_step_scaffold_label": "Exemple de départ",
+  "templates_page_entry_step_scaffold_value": "Exemple prêt",
+  "templates_page_entry_step_shared_description": "Les questions, associations, groupes, éléments de vocabulaire et notes utilisent toujours les champs communs de l’activité.",
+  "templates_page_entry_step_shared_label": "Champs",
+  "templates_page_entry_step_shared_value": "Éditeur commun",
+  "templates_page_entry_step_template_description": "La page de création s’ouvre avec ce modèle principal déjà sélectionné.",
+  "templates_page_entry_step_template_label": "Modèle",
+  "templates_page_entry_step_template_value": "{template} sélectionné",
+  "templates_page_requirements_aria_label": "Contenu requis pour {template}",
+  "templates_page_requirements_label": "Contenu requis"
+}

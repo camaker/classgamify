@@ -1,0 +1,18 @@
+{
+  "templates_page_best_for_label": "Ideale per",
+  "templates_page_card_aria_label": "{template}: {description}",
+  "templates_page_classroom_mode_label": "Modalità per la classe",
+  "templates_page_entry_label": "Percorso di creazione",
+  "templates_page_entry_step_aria_label": "{label}: {value}. {description}",
+  "templates_page_entry_step_scaffold_description": "La pagina di creazione carica un esempio specifico per il modello, che il docente controlla e modifica prima di salvarlo.",
+  "templates_page_entry_step_scaffold_label": "Esempio iniziale",
+  "templates_page_entry_step_scaffold_value": "Esempio pronto",
+  "templates_page_entry_step_shared_description": "Domande, coppie, gruppi, vocaboli e note continuano a usare i campi condivisi dell’attività.",
+  "templates_page_entry_step_shared_label": "Campi",
+  "templates_page_entry_step_shared_value": "Editor condiviso",
+  "templates_page_entry_step_template_description": "La pagina di creazione si apre con questo modello principale già selezionato.",
+  "templates_page_entry_step_template_label": "Modello",
+  "templates_page_entry_step_template_value": "{template} selezionato",
+  "templates_page_requirements_aria_label": "Contenuti richiesti per {template}",
+  "templates_page_requirements_label": "Contenuti richiesti"
+}

@@ -1,0 +1,18 @@
+{
+  "templates_page_best_for_label": "추천 활용법",
+  "templates_page_card_aria_label": "{template}: {description}",
+  "templates_page_classroom_mode_label": "수업 모드",
+  "templates_page_entry_label": "만들기 과정",
+  "templates_page_entry_step_aria_label": "{label}: {value}. {description}",
+  "templates_page_entry_step_scaffold_description": "만들기 페이지에 템플릿별 예시가 불러와지며, 교사가 저장하기 전에 검토하고 편집합니다.",
+  "templates_page_entry_step_scaffold_label": "시작 예시",
+  "templates_page_entry_step_scaffold_value": "예시 준비됨",
+  "templates_page_entry_step_shared_description": "문항, 짝, 그룹, 어휘, 메모는 계속 공통 활동 입력 항목을 사용합니다.",
+  "templates_page_entry_step_shared_label": "입력 항목",
+  "templates_page_entry_step_shared_value": "공용 편집기",
+  "templates_page_entry_step_template_description": "만들기 페이지는 이 기본 템플릿이 선택된 상태로 열립니다.",
+  "templates_page_entry_step_template_label": "템플릿",
+  "templates_page_entry_step_template_value": "{template} 선택됨",
+  "templates_page_requirements_aria_label": "{template}에 필요한 콘텐츠",
+  "templates_page_requirements_label": "필요한 콘텐츠"
+}

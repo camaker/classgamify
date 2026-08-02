@@ -1,0 +1,18 @@
+{
+  "templates_page_best_for_label": "الأنسب لـ",
+  "templates_page_card_aria_label": "{template}: {description}",
+  "templates_page_classroom_mode_label": "وضع الصف",
+  "templates_page_entry_label": "مسار الإنشاء",
+  "templates_page_entry_step_aria_label": "{label}: {value}. {description}",
+  "templates_page_entry_step_scaffold_description": "تحمّل صفحة الإنشاء مثالًا مناسبًا للقالب ليراجعه المعلم ويعدّله قبل الحفظ.",
+  "templates_page_entry_step_scaffold_label": "مثال للبدء",
+  "templates_page_entry_step_scaffold_value": "المثال جاهز",
+  "templates_page_entry_step_shared_description": "تستمر الأسئلة والأزواج والمجموعات والمفردات والملاحظات في استخدام حقول النشاط المشتركة.",
+  "templates_page_entry_step_shared_label": "الحقول",
+  "templates_page_entry_step_shared_value": "المحرر المشترك",
+  "templates_page_entry_step_template_description": "تفتح صفحة الإنشاء مع تحديد هذا القالب الرئيسي مسبقًا.",
+  "templates_page_entry_step_template_label": "القالب",
+  "templates_page_entry_step_template_value": "تم تحديد {template}",
+  "templates_page_requirements_aria_label": "المحتوى المطلوب لقالب {template}",
+  "templates_page_requirements_label": "المحتوى المطلوب"
+}

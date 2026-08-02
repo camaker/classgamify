@@ -1,0 +1,18 @@
+{
+  "templates_page_best_for_label": "おすすめの用途",
+  "templates_page_card_aria_label": "{template}：{description}",
+  "templates_page_classroom_mode_label": "授業モード",
+  "templates_page_entry_label": "作成の流れ",
+  "templates_page_entry_step_aria_label": "{label}：{value}。{description}",
+  "templates_page_entry_step_scaffold_description": "作成ページにテンプレート別のサンプルが読み込まれます。教師が確認、編集してから保存します。",
+  "templates_page_entry_step_scaffold_label": "開始用サンプル",
+  "templates_page_entry_step_scaffold_value": "サンプルを用意済み",
+  "templates_page_entry_step_shared_description": "問題、ペア、グループ、語彙、メモは引き続き共通のアクティビティ入力項目を使用します。",
+  "templates_page_entry_step_shared_label": "入力項目",
+  "templates_page_entry_step_shared_value": "共通エディター",
+  "templates_page_entry_step_template_description": "作成ページは、このメインテンプレートが選択された状態で開きます。",
+  "templates_page_entry_step_template_label": "テンプレート",
+  "templates_page_entry_step_template_value": "{template}を選択中",
+  "templates_page_requirements_aria_label": "{template}に必要な内容",
+  "templates_page_requirements_label": "必要な内容"
+}

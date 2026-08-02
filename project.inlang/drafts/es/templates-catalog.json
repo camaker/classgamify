@@ -1,0 +1,18 @@
+{
+  "templates_page_best_for_label": "Ideal para",
+  "templates_page_card_aria_label": "{template}: {description}",
+  "templates_page_classroom_mode_label": "Modo de clase",
+  "templates_page_entry_label": "Proceso de creación",
+  "templates_page_entry_step_aria_label": "{label}: {value}. {description}",
+  "templates_page_entry_step_scaffold_description": "La página de creación carga un ejemplo adaptado a la plantilla para que el docente lo revise y edite antes de guardarlo.",
+  "templates_page_entry_step_scaffold_label": "Ejemplo inicial",
+  "templates_page_entry_step_scaffold_value": "Ejemplo preparado",
+  "templates_page_entry_step_shared_description": "Las preguntas, parejas, grupos, palabras y notas siguen utilizando los campos compartidos de la actividad.",
+  "templates_page_entry_step_shared_label": "Campos",
+  "templates_page_entry_step_shared_value": "Editor compartido",
+  "templates_page_entry_step_template_description": "La página de creación se abre con esta plantilla principal seleccionada.",
+  "templates_page_entry_step_template_label": "Plantilla",
+  "templates_page_entry_step_template_value": "{template} seleccionada",
+  "templates_page_requirements_aria_label": "Contenido necesario para {template}",
+  "templates_page_requirements_label": "Contenido necesario"
+}

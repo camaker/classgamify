@@ -1,0 +1,18 @@
+{
+  "templates_page_best_for_label": "Geeignet für",
+  "templates_page_card_aria_label": "{template}: {description}",
+  "templates_page_classroom_mode_label": "Unterrichtsmodus",
+  "templates_page_entry_label": "Erstellungsweg",
+  "templates_page_entry_step_aria_label": "{label}: {value}. {description}",
+  "templates_page_entry_step_scaffold_description": "Die Erstellungsseite lädt ein passendes Vorlagenbeispiel, das Lehrkräfte vor dem Speichern prüfen und bearbeiten.",
+  "templates_page_entry_step_scaffold_label": "Startbeispiel",
+  "templates_page_entry_step_scaffold_value": "Beispiel bereit",
+  "templates_page_entry_step_shared_description": "Fragen, Zuordnungen, Gruppen, Wortschatz und Hinweise verwenden weiterhin die gemeinsamen Aktivitätsfelder.",
+  "templates_page_entry_step_shared_label": "Felder",
+  "templates_page_entry_step_shared_value": "Gemeinsamer Editor",
+  "templates_page_entry_step_template_description": "Die Erstellungsseite öffnet sich mit dieser Hauptvorlage als Vorauswahl.",
+  "templates_page_entry_step_template_label": "Vorlage",
+  "templates_page_entry_step_template_value": "{template} ausgewählt",
+  "templates_page_requirements_aria_label": "Inhaltliche Anforderungen für {template}",
+  "templates_page_requirements_label": "Benötigte Inhalte"
+}

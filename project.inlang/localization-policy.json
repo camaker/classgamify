@@ -237,6 +237,24 @@
       "templates_page_seo_title",
       "templates_page_student_preview_action_aria_label",
       "templates_page_title"
+    ],
+    "templates-catalog": [
+      "templates_page_best_for_label",
+      "templates_page_card_aria_label",
+      "templates_page_classroom_mode_label",
+      "templates_page_entry_label",
+      "templates_page_entry_step_aria_label",
+      "templates_page_entry_step_scaffold_description",
+      "templates_page_entry_step_scaffold_label",
+      "templates_page_entry_step_scaffold_value",
+      "templates_page_entry_step_shared_description",
+      "templates_page_entry_step_shared_label",
+      "templates_page_entry_step_shared_value",
+      "templates_page_entry_step_template_description",
+      "templates_page_entry_step_template_label",
+      "templates_page_entry_step_template_value",
+      "templates_page_requirements_aria_label",
+      "templates_page_requirements_label"
     ]
   },
   "englishOnlyKeyPatterns": [
