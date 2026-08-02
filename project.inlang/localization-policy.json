@@ -5,6 +5,7 @@
     "auth_register_",
     "auth_reset_password_",
     "dashboard_",
+    "activity_library_empty_",
     "templates_page_",
     "worksheets_page_"
   ],
@@ -408,9 +409,18 @@
       "activity_library_filter_summary_status_saved",
       "activity_library_filter_summary_total_many",
       "activity_library_filter_summary_total_one"
+    ],
+    "activity-library-empty": [
+      "activity_library_empty_archived_description",
+      "activity_library_empty_archived_title",
+      "activity_library_empty_filtered_description",
+      "activity_library_empty_filtered_title",
+      "activity_library_empty_saved_title"
     ]
   },
   "englishOnlyKeys": [
+    "activity_library_empty_saved_description",
+    "activity_library_empty_source_filtered_description",
     "dashboard_avatar_settings",
     "dashboard_sidebar_files",
     "dashboard_sidebar_profile",
