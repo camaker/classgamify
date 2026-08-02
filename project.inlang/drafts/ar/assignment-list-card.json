@@ -1,0 +1,14 @@
+{
+  "assignment_list_action_dismiss": "إغلاق",
+  "assignment_list_action_open_activity_library": "فتح مكتبة الأنشطة",
+  "assignment_list_action_open_published_link": "فتح الرابط",
+  "assignment_list_action_open_share_link": "فتح رابط المشاركة",
+  "assignment_list_action_print_worksheet": "طباعة ورقة العمل",
+  "assignment_list_action_share_link_unavailable": "رابط المشاركة غير متاح",
+  "assignment_list_action_view_results": "عرض النتائج",
+  "assignment_list_card_stat_aria_label": "{label}: {value}. {description}",
+  "assignment_list_card_stat_average": "المتوسط",
+  "assignment_list_card_stat_average_description": "متوسط درجات المحاولات المقيمة لهذا التكليف.",
+  "assignment_list_card_stat_completions": "التسليمات",
+  "assignment_list_card_stat_completions_description": "المحاولات المرسلة لهذا التكليف."
+}

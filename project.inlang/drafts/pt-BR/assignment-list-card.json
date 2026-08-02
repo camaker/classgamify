@@ -1,0 +1,14 @@
+{
+  "assignment_list_action_dismiss": "Fechar",
+  "assignment_list_action_open_activity_library": "Abrir biblioteca de atividades",
+  "assignment_list_action_open_published_link": "Abrir link",
+  "assignment_list_action_open_share_link": "Abrir link de compartilhamento",
+  "assignment_list_action_print_worksheet": "Imprimir atividade",
+  "assignment_list_action_share_link_unavailable": "Link de compartilhamento indisponível",
+  "assignment_list_action_view_results": "Ver resultados",
+  "assignment_list_card_stat_aria_label": "{label}: {value}. {description}",
+  "assignment_list_card_stat_average": "Média",
+  "assignment_list_card_stat_average_description": "Pontuação média das tentativas avaliadas desta atividade.",
+  "assignment_list_card_stat_completions": "Conclusões",
+  "assignment_list_card_stat_completions_description": "Tentativas enviadas para esta atividade."
+}

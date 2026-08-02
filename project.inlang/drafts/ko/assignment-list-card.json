@@ -1,0 +1,14 @@
+{
+  "assignment_list_action_dismiss": "닫기",
+  "assignment_list_action_open_activity_library": "활동 라이브러리 열기",
+  "assignment_list_action_open_published_link": "링크 열기",
+  "assignment_list_action_open_share_link": "공유 링크 열기",
+  "assignment_list_action_print_worksheet": "학습지 인쇄",
+  "assignment_list_action_share_link_unavailable": "공유 링크를 사용할 수 없음",
+  "assignment_list_action_view_results": "결과 보기",
+  "assignment_list_card_stat_aria_label": "{label}: {value}. {description}",
+  "assignment_list_card_stat_average": "평균",
+  "assignment_list_card_stat_average_description": "이 과제에서 채점된 응답의 평균 점수입니다.",
+  "assignment_list_card_stat_completions": "제출 수",
+  "assignment_list_card_stat_completions_description": "이 과제에 제출된 응답 수입니다."
+}

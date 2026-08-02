@@ -1,0 +1,14 @@
+{
+  "assignment_list_action_dismiss": "Chiudi",
+  "assignment_list_action_open_activity_library": "Apri la raccolta attività",
+  "assignment_list_action_open_published_link": "Apri link",
+  "assignment_list_action_open_share_link": "Apri link di condivisione",
+  "assignment_list_action_print_worksheet": "Stampa scheda",
+  "assignment_list_action_share_link_unavailable": "Link di condivisione non disponibile",
+  "assignment_list_action_view_results": "Visualizza risultati",
+  "assignment_list_card_stat_aria_label": "{label}: {value}. {description}",
+  "assignment_list_card_stat_average": "Media",
+  "assignment_list_card_stat_average_description": "Punteggio medio dei tentativi valutati per questa attività.",
+  "assignment_list_card_stat_completions": "Consegne",
+  "assignment_list_card_stat_completions_description": "Tentativi inviati per questa attività."
+}

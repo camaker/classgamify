@@ -1,0 +1,14 @@
+{
+  "assignment_list_action_dismiss": "閉じる",
+  "assignment_list_action_open_activity_library": "アクティビティライブラリを開く",
+  "assignment_list_action_open_published_link": "リンクを開く",
+  "assignment_list_action_open_share_link": "共有リンクを開く",
+  "assignment_list_action_print_worksheet": "ワークシートを印刷",
+  "assignment_list_action_share_link_unavailable": "共有リンクは利用できません",
+  "assignment_list_action_view_results": "結果を見る",
+  "assignment_list_card_stat_aria_label": "{label}: {value}。{description}",
+  "assignment_list_card_stat_average": "平均",
+  "assignment_list_card_stat_average_description": "この課題の採点済み解答の平均点です。",
+  "assignment_list_card_stat_completions": "提出数",
+  "assignment_list_card_stat_completions_description": "この課題に提出された解答数です。"
+}

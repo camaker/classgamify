@@ -1,0 +1,14 @@
+{
+  "assignment_list_action_dismiss": "Cerrar",
+  "assignment_list_action_open_activity_library": "Abrir biblioteca de actividades",
+  "assignment_list_action_open_published_link": "Abrir enlace",
+  "assignment_list_action_open_share_link": "Abrir enlace compartido",
+  "assignment_list_action_print_worksheet": "Imprimir hoja de trabajo",
+  "assignment_list_action_share_link_unavailable": "Enlace compartido no disponible",
+  "assignment_list_action_view_results": "Ver resultados",
+  "assignment_list_card_stat_aria_label": "{label}: {value}. {description}",
+  "assignment_list_card_stat_average": "Promedio",
+  "assignment_list_card_stat_average_description": "Puntuación promedio de los intentos calificados de esta tarea.",
+  "assignment_list_card_stat_completions": "Entregas",
+  "assignment_list_card_stat_completions_description": "Intentos enviados para esta tarea."
+}

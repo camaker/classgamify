@@ -1,0 +1,14 @@
+{
+  "assignment_list_action_dismiss": "Schließen",
+  "assignment_list_action_open_activity_library": "Aktivitätsbibliothek öffnen",
+  "assignment_list_action_open_published_link": "Link öffnen",
+  "assignment_list_action_open_share_link": "Freigabelink öffnen",
+  "assignment_list_action_print_worksheet": "Arbeitsblatt drucken",
+  "assignment_list_action_share_link_unavailable": "Freigabelink nicht verfügbar",
+  "assignment_list_action_view_results": "Ergebnisse anzeigen",
+  "assignment_list_card_stat_aria_label": "{label}: {value}. {description}",
+  "assignment_list_card_stat_average": "Durchschnitt",
+  "assignment_list_card_stat_average_description": "Durchschnittswert der bewerteten Versuche für diese Aufgabe.",
+  "assignment_list_card_stat_completions": "Abschlüsse",
+  "assignment_list_card_stat_completions_description": "Eingereichte Versuche für diese Aufgabe."
+}
