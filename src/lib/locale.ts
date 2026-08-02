@@ -38,6 +38,46 @@ export const localeConfig = {
     name: '中文',
     hreflang: 'zh-CN',
   },
+  fr: {
+    flag: '🇫🇷',
+    name: 'Français',
+    hreflang: 'fr',
+  },
+  de: {
+    flag: '🇩🇪',
+    name: 'Deutsch',
+    hreflang: 'de',
+  },
+  ja: {
+    flag: '🇯🇵',
+    name: '日本語',
+    hreflang: 'ja',
+  },
+  ko: {
+    flag: '🇰🇷',
+    name: '한국어',
+    hreflang: 'ko',
+  },
+  it: {
+    flag: '🇮🇹',
+    name: 'Italiano',
+    hreflang: 'it',
+  },
+  es: {
+    flag: '🇪🇸',
+    name: 'Español',
+    hreflang: 'es',
+  },
+  'pt-BR': {
+    flag: '🇧🇷',
+    name: 'Português (Brasil)',
+    hreflang: 'pt-BR',
+  },
+  ar: {
+    flag: '🇸🇦',
+    name: 'العربية',
+    hreflang: 'ar',
+  },
 } satisfies Record<Locale, LocaleConfig>;
 
 export function parseMessageJson<T>(value: string, fallback: T): T {
