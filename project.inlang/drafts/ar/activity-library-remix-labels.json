@@ -1,0 +1,6 @@
+{
+  "activity_library_remix_action": "تكييف باستخدام قالب {template}",
+  "activity_library_remix_action_fallback": "قالب",
+  "activity_library_remix_hint": "يمكن تكييف النشاط باستخدام القوالب التالية: {templates}.",
+  "activity_library_template_list_separator": "، "
+}

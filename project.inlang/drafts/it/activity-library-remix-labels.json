@@ -1,0 +1,6 @@
+{
+  "activity_library_remix_action": "Adatta con il modello {template}",
+  "activity_library_remix_action_fallback": "modello",
+  "activity_library_remix_hint": "Può essere adattata ai seguenti modelli: {templates}.",
+  "activity_library_template_list_separator": ", "
+}

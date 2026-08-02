@@ -1,0 +1,6 @@
+{
+  "activity_library_remix_action": "Als {template} gestalten",
+  "activity_library_remix_action_fallback": "Vorlage",
+  "activity_library_remix_hint": "Kann mit folgenden Vorlagen neu gestaltet werden: {templates}.",
+  "activity_library_template_list_separator": ", "
+}

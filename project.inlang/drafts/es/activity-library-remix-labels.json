@@ -1,0 +1,6 @@
+{
+  "activity_library_remix_action": "Adaptar con la plantilla {template}",
+  "activity_library_remix_action_fallback": "plantilla",
+  "activity_library_remix_hint": "Se puede adaptar a las siguientes plantillas: {templates}.",
+  "activity_library_template_list_separator": ", "
+}

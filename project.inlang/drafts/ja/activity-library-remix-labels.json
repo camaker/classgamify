@@ -1,0 +1,6 @@
+{
+  "activity_library_remix_action": "{template}形式で作成",
+  "activity_library_remix_action_fallback": "テンプレート",
+  "activity_library_remix_hint": "次の形式にアレンジできます：{templates}。",
+  "activity_library_template_list_separator": "、"
+}
