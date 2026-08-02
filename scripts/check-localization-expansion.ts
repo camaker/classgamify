@@ -43,6 +43,12 @@ const visibleLocaleNeutralKeys = new Set([
   'activity_library_filter_source_selected_description',
   'activity_library_filter_status_selected_description',
 ]);
+const requiredVisibleLocalizedKeys = [
+  'activity_created_panel_loading_title',
+  'activity_created_panel_loading_body',
+  'activity_created_panel_missing_title',
+  'activity_created_panel_missing_body',
+] as const;
 
 assert.deepEqual(policy.targetLocales, [
   'en',
@@ -80,6 +86,13 @@ for (const locale of policy.draftLocales) {
         `${locale}.${key} must be localized as visible activity-library copy`
       );
     }
+  }
+  for (const key of requiredVisibleLocalizedKeys) {
+    assert.notEqual(
+      messages[key],
+      english[key],
+      `${locale}.${key} must be localized as visible product copy`
+    );
   }
 }
 
