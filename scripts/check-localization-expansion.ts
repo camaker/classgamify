@@ -55,6 +55,9 @@ const requiredVisibleLocalizedKeys = [
   'activity_api_error_remix_same_template',
   'activity_api_error_template_not_found',
   'activity_api_error_write_conflict',
+  'student_runner_feedback_status_correct',
+  'student_runner_feedback_status_needs_review',
+  'student_runner_feedback_status_unanswered',
 ] as const;
 
 assert.deepEqual(policy.targetLocales, [
