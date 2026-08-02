@@ -222,6 +222,21 @@
       "teachers_page_template_panel_item_aria_label",
       "teachers_page_template_panel_mode_label",
       "teachers_page_template_panel_title"
+    ],
+    "templates-core": [
+      "templates_page_bottom_description",
+      "templates_page_bottom_title",
+      "templates_page_create_activity",
+      "templates_page_create_from_template",
+      "templates_page_description",
+      "templates_page_eyebrow",
+      "templates_page_footer_create_action_aria_label",
+      "templates_page_hero_create_action_aria_label",
+      "templates_page_open_student_preview",
+      "templates_page_seo_description",
+      "templates_page_seo_title",
+      "templates_page_student_preview_action_aria_label",
+      "templates_page_title"
     ]
   },
   "englishOnlyKeyPatterns": [
