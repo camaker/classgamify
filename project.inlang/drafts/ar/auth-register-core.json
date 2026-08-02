@@ -1,0 +1,15 @@
+{
+  "auth_register_create_account": "إنشاء مساحة عمل للمعلم",
+  "auth_register_description": "أنشئ مساحة عمل للمعلم في ClassGamify للمتابعة",
+  "auth_register_email": "البريد الإلكتروني",
+  "auth_register_hide_password": "إخفاء كلمة المرور",
+  "auth_register_name": "الاسم",
+  "auth_register_password": "كلمة المرور",
+  "auth_register_placeholder_email": "name@example.com",
+  "auth_register_placeholder_name": "أدخل اسمك",
+  "auth_register_placeholder_password": "******",
+  "auth_register_show_password": "إظهار كلمة المرور",
+  "auth_register_sign_in_hint": "لديك حساب بالفعل؟ سجّل الدخول",
+  "auth_register_sign_up": "إنشاء حساب",
+  "auth_register_title": "أنشئ مساحة عمل للمعلم"
+}

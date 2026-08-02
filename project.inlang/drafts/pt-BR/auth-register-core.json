@@ -1,0 +1,15 @@
+{
+  "auth_register_create_account": "Criar espaço do professor",
+  "auth_register_description": "Crie seu espaço de professor no ClassGamify para continuar",
+  "auth_register_email": "E-mail",
+  "auth_register_hide_password": "Ocultar senha",
+  "auth_register_name": "Nome",
+  "auth_register_password": "Senha",
+  "auth_register_placeholder_email": "name@example.com",
+  "auth_register_placeholder_name": "Seu nome",
+  "auth_register_placeholder_password": "******",
+  "auth_register_show_password": "Mostrar senha",
+  "auth_register_sign_in_hint": "Já tem uma conta? Entre",
+  "auth_register_sign_up": "Cadastre-se",
+  "auth_register_title": "Crie seu espaço de professor"
+}

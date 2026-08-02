@@ -1,0 +1,15 @@
+{
+  "auth_register_create_account": "Créer un espace enseignant",
+  "auth_register_description": "Créez votre espace enseignant ClassGamify pour continuer",
+  "auth_register_email": "Adresse e-mail",
+  "auth_register_hide_password": "Masquer le mot de passe",
+  "auth_register_name": "Nom",
+  "auth_register_password": "Mot de passe",
+  "auth_register_placeholder_email": "name@example.com",
+  "auth_register_placeholder_name": "Votre nom",
+  "auth_register_placeholder_password": "******",
+  "auth_register_show_password": "Afficher le mot de passe",
+  "auth_register_sign_in_hint": "Vous avez déjà un compte ? Se connecter",
+  "auth_register_sign_up": "S’inscrire",
+  "auth_register_title": "Créer votre espace enseignant"
+}

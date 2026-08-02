@@ -1,0 +1,15 @@
+{
+  "auth_register_create_account": "教師ワークスペースを作成",
+  "auth_register_description": "ClassGamifyの教師ワークスペースを作成して続けましょう",
+  "auth_register_email": "メールアドレス",
+  "auth_register_hide_password": "パスワードを隠す",
+  "auth_register_name": "お名前",
+  "auth_register_password": "パスワード",
+  "auth_register_placeholder_email": "name@example.com",
+  "auth_register_placeholder_name": "お名前を入力",
+  "auth_register_placeholder_password": "******",
+  "auth_register_show_password": "パスワードを表示",
+  "auth_register_sign_in_hint": "アカウントをお持ちの方はログイン",
+  "auth_register_sign_up": "新規登録",
+  "auth_register_title": "教師ワークスペースを作成"
+}

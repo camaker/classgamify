@@ -1,0 +1,15 @@
+{
+  "auth_register_create_account": "교사 작업 공간 만들기",
+  "auth_register_description": "ClassGamify 교사 작업 공간을 만들고 계속하세요",
+  "auth_register_email": "이메일 주소",
+  "auth_register_hide_password": "비밀번호 숨기기",
+  "auth_register_name": "이름",
+  "auth_register_password": "비밀번호",
+  "auth_register_placeholder_email": "name@example.com",
+  "auth_register_placeholder_name": "이름 입력",
+  "auth_register_placeholder_password": "******",
+  "auth_register_show_password": "비밀번호 표시",
+  "auth_register_sign_in_hint": "이미 계정이 있으신가요? 로그인",
+  "auth_register_sign_up": "회원가입",
+  "auth_register_title": "교사 작업 공간 만들기"
+}

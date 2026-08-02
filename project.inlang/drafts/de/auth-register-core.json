@@ -1,0 +1,15 @@
+{
+  "auth_register_create_account": "Lehrkräftebereich erstellen",
+  "auth_register_description": "Erstelle einen ClassGamify-Lehrkräftebereich, um fortzufahren",
+  "auth_register_email": "E-Mail-Adresse",
+  "auth_register_hide_password": "Passwort ausblenden",
+  "auth_register_name": "Name",
+  "auth_register_password": "Passwort",
+  "auth_register_placeholder_email": "name@example.com",
+  "auth_register_placeholder_name": "Dein Name",
+  "auth_register_placeholder_password": "******",
+  "auth_register_show_password": "Passwort anzeigen",
+  "auth_register_sign_in_hint": "Du hast bereits ein Konto? Anmelden",
+  "auth_register_sign_up": "Registrieren",
+  "auth_register_title": "Lehrkräftebereich erstellen"
+}
