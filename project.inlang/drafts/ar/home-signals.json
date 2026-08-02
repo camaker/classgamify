@@ -1,0 +1,15 @@
+{
+  "home_signal_aria_label": "{label}: {value}. {description}",
+  "home_signal_delivery_description": "انشر روابط واجبات تجمع بين النسخة الثابتة من النشاط وقواعد التسليم.",
+  "home_signal_delivery_label": "التسليم",
+  "home_signal_delivery_value": "رابط للمشاركة",
+  "home_signal_panel_aria_label": "{title}: {description}",
+  "home_signal_panel_description": "تعرض الصفحة الرئيسية مسار القوالب والتسليم عبر الرابط ومراجعة النتائج.",
+  "home_signal_panel_title": "دورة العمل الصفية في لمحة",
+  "home_signal_results_description": "راجع محاولات الطلاب ودرجاتهم والإجابات المقبولة ومؤشرات إعادة الشرح بعد التسليم.",
+  "home_signal_results_label": "النتائج",
+  "home_signal_results_value": "سجل المحاولات",
+  "home_signal_templates_description": "ابدأ بالاختبارات والمطابقة وتصنيف الفئات وملء الفراغات والاستماع ومطابقة الأزواج والتوصيل بالخطوط وصناديق الكشف.",
+  "home_signal_templates_label": "القوالب",
+  "home_signal_templates_value": "8 قوالب للبدء"
+}

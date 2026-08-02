@@ -1,0 +1,15 @@
+{
+  "home_signal_aria_label": "{label}: {value}. {description}",
+  "home_signal_delivery_description": "Veröffentliche Aufgabenlinks, bei denen die feste Aktivitätskopie und die Ausgaberegeln zusammenbleiben.",
+  "home_signal_delivery_label": "Ausgabe",
+  "home_signal_delivery_value": "Freigabelink",
+  "home_signal_panel_aria_label": "{title}: {description}",
+  "home_signal_panel_description": "Die Startseite zeigt Vorlagen, Ausgabe per Link und Ergebnisauswertung auf einen Blick.",
+  "home_signal_panel_title": "Der Unterrichtskreislauf im Überblick",
+  "home_signal_results_description": "Prüfe nach der Abgabe Lernversuche, Punktzahlen, akzeptierte Antworten und Hinweise für die Wiederholung.",
+  "home_signal_results_label": "Ergebnisse",
+  "home_signal_results_value": "Versuchsprotokoll",
+  "home_signal_templates_description": "Starte mit Quizzen, Zuordnungen, Kategoriesortierung, Lückentexten, Hörimpulsen, Paarsuche, Linienzuordnung und Aufdeckfeldern.",
+  "home_signal_templates_label": "Vorlagen",
+  "home_signal_templates_value": "8 zum Einstieg"
+}

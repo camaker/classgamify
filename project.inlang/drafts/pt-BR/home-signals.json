@@ -1,0 +1,15 @@
+{
+  "home_signal_aria_label": "{label}: {value}. {description}",
+  "home_signal_delivery_description": "Publique links de tarefas que mantêm juntos a cópia fixa da atividade e as regras de entrega.",
+  "home_signal_delivery_label": "Entrega",
+  "home_signal_delivery_value": "Link para compartilhar",
+  "home_signal_panel_aria_label": "{title}: {description}",
+  "home_signal_panel_description": "Os pontos principais da página inicial: modelos, entrega por link e análise dos resultados.",
+  "home_signal_panel_title": "O ciclo da aula em resumo",
+  "home_signal_results_description": "Depois do envio, analise tentativas, pontuações, respostas aceitas e sinais para retomada do conteúdo.",
+  "home_signal_results_label": "Resultados",
+  "home_signal_results_value": "Registro de tentativas",
+  "home_signal_templates_description": "Comece com quiz, associação, classificação por categorias, preenchimento, compreensão oral, pares, ligação por linhas e caixas-surpresa.",
+  "home_signal_templates_label": "Modelos",
+  "home_signal_templates_value": "8 para começar"
+}

@@ -1,0 +1,15 @@
+{
+  "home_signal_aria_label": "{label}: {value}. {description}",
+  "home_signal_delivery_description": "활동의 고정 사본과 배포 규칙을 함께 유지하는 과제 링크를 게시합니다.",
+  "home_signal_delivery_label": "배포",
+  "home_signal_delivery_value": "공유 링크",
+  "home_signal_panel_aria_label": "{title}: {description}",
+  "home_signal_panel_description": "템플릿 선택, 링크 배포, 결과 검토로 이어지는 수업 흐름을 보여 줍니다.",
+  "home_signal_panel_title": "수업 활동 흐름 한눈에 보기",
+  "home_signal_results_description": "제출 후 학생의 시도, 점수, 인정 답안, 재지도 신호를 확인합니다.",
+  "home_signal_results_label": "결과",
+  "home_signal_results_value": "시도 기록",
+  "home_signal_templates_description": "퀴즈, 짝 맞추기, 범주 분류, 빈칸 채우기, 듣기, 페어 매칭, 선 연결, 상자 열기부터 시작하세요.",
+  "home_signal_templates_label": "템플릿",
+  "home_signal_templates_value": "먼저 8가지"
+}

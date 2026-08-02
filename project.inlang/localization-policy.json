@@ -167,6 +167,21 @@
       "home_features_items_item_4_title",
       "home_features_subtitle",
       "home_features_title"
+    ],
+    "home-signals": [
+      "home_signal_aria_label",
+      "home_signal_delivery_description",
+      "home_signal_delivery_label",
+      "home_signal_delivery_value",
+      "home_signal_panel_aria_label",
+      "home_signal_panel_description",
+      "home_signal_panel_title",
+      "home_signal_results_description",
+      "home_signal_results_label",
+      "home_signal_results_value",
+      "home_signal_templates_description",
+      "home_signal_templates_label",
+      "home_signal_templates_value"
     ]
   },
   "englishOnlyKeyPatterns": [

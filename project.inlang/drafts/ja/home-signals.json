@@ -1,0 +1,15 @@
+{
+  "home_signal_aria_label": "{label}：{value}。{description}",
+  "home_signal_delivery_description": "アクティビティの固定コピーと配布ルールをひとまとめにした課題リンクを公開します。",
+  "home_signal_delivery_label": "配布",
+  "home_signal_delivery_value": "共有リンク",
+  "home_signal_panel_aria_label": "{title}：{description}",
+  "home_signal_panel_description": "テンプレート、共有リンクによる配布、結果の振り返りという授業の流れを示します。",
+  "home_signal_panel_title": "授業サイクルの概要",
+  "home_signal_results_description": "提出後に生徒の取り組み、得点、正解として認める回答、復習の手がかりを確認します。",
+  "home_signal_results_label": "結果",
+  "home_signal_results_value": "取り組み履歴",
+  "home_signal_templates_description": "クイズ、マッチング、カテゴリー分け、穴埋め、リスニング、ペア探し、線つなぎ、ボックス開示から始められます。",
+  "home_signal_templates_label": "テンプレート",
+  "home_signal_templates_value": "まずは8種類"
+}

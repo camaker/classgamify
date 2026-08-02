@@ -1,0 +1,15 @@
+{
+  "home_signal_aria_label": "{label} : {value}. {description}",
+  "home_signal_delivery_description": "Publiez des liens de devoir qui conservent ensemble la copie figée de l’activité et ses règles de diffusion.",
+  "home_signal_delivery_label": "Diffusion",
+  "home_signal_delivery_value": "Lien à partager",
+  "home_signal_panel_aria_label": "{title} : {description}",
+  "home_signal_panel_description": "Les repères essentiels de l’accueil : modèles, diffusion par lien et analyse des résultats.",
+  "home_signal_panel_title": "Le parcours de classe en un coup d’œil",
+  "home_signal_results_description": "Après la remise, analysez les tentatives, les scores, les réponses acceptées et les points à reprendre.",
+  "home_signal_results_label": "Résultats",
+  "home_signal_results_value": "Journal des tentatives",
+  "home_signal_templates_description": "Commencez avec des quiz, associations, tris par catégories, textes à trous, écoutes, paires, lignes à relier et cases à révéler.",
+  "home_signal_templates_label": "Modèles",
+  "home_signal_templates_value": "8 pour commencer"
+}

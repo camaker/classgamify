@@ -1,0 +1,15 @@
+{
+  "home_signal_aria_label": "{label}: {value}. {description}",
+  "home_signal_delivery_description": "Publica enlaces de tareas que mantienen unidas la copia fija de la actividad y las reglas de entrega.",
+  "home_signal_delivery_label": "Entrega",
+  "home_signal_delivery_value": "Enlace para compartir",
+  "home_signal_panel_aria_label": "{title}: {description}",
+  "home_signal_panel_description": "Las claves de la página de inicio: plantillas, entrega mediante enlace y revisión de resultados.",
+  "home_signal_panel_title": "El ciclo de clase de un vistazo",
+  "home_signal_results_description": "Tras la entrega, revisa los intentos, las puntuaciones, las respuestas aceptadas y las señales de refuerzo.",
+  "home_signal_results_label": "Resultados",
+  "home_signal_results_value": "Registro de intentos",
+  "home_signal_templates_description": "Empieza con cuestionarios, parejas, clasificación por categorías, textos con huecos, audios, emparejamientos, unión con líneas y cajas sorpresa.",
+  "home_signal_templates_label": "Plantillas",
+  "home_signal_templates_value": "8 para empezar"
+}

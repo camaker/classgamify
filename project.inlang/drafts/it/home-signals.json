@@ -1,0 +1,15 @@
+{
+  "home_signal_aria_label": "{label}: {value}. {description}",
+  "home_signal_delivery_description": "Pubblica link dei compiti che mantengono insieme la copia stabile dell’attività e le regole di consegna.",
+  "home_signal_delivery_label": "Consegna",
+  "home_signal_delivery_value": "Link da condividere",
+  "home_signal_panel_aria_label": "{title}: {description}",
+  "home_signal_panel_description": "I passaggi chiave in home: modelli, consegna tramite link e revisione dei risultati.",
+  "home_signal_panel_title": "Il ciclo della lezione in sintesi",
+  "home_signal_results_description": "Dopo la consegna, esamina tentativi, punteggi, risposte accettate e indicazioni per il ripasso.",
+  "home_signal_results_label": "Risultati",
+  "home_signal_results_value": "Registro dei tentativi",
+  "home_signal_templates_description": "Inizia con quiz, abbinamenti, classificazioni, completamenti, ascolti, coppie, collegamenti e caselle da scoprire.",
+  "home_signal_templates_label": "Modelli",
+  "home_signal_templates_value": "8 per iniziare"
+}
