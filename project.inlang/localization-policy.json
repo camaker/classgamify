@@ -2314,7 +2314,8 @@
     "^create_page_template_entry_source_",
     "^teachers_page_handoff_",
     "^teachers_page_school_",
-    "^home_faqs_"
+    "^home_faqs_",
+    "^contact_"
   ],
   "legalMarkdown": ["cookie.md", "privacy.md", "terms.md"]
 }
