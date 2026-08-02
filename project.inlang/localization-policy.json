@@ -68,6 +68,8 @@
     "home_feature_section_aria_label",
     "home_page_seo_",
     "home_call_to_action_",
+    "home_logo_cloud_title",
+    "home_stats_items_",
     "activity_library_",
     "activity_form_",
     "activity_editor_",
@@ -99,6 +101,12 @@
   ],
   "draftLocales": ["fr", "de", "ja", "ko", "it", "es", "pt-BR", "ar"],
   "draftNamespaces": {
+    "home-stats-brand": [
+      "home_logo_cloud_title",
+      "home_stats_items_item_1_title",
+      "home_stats_items_item_2_title",
+      "home_stats_items_item_3_title"
+    ],
     "home-call-to-action": [
       "home_call_to_action_description",
       "home_call_to_action_primary_button",
