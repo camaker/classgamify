@@ -25,6 +25,12 @@
     "assignment_list_distribution_aria_label",
     "assignment_list_distribution_status_",
     "assignment_list_distribution_title",
+    "assignment_list_distribution_step_aria_label",
+    "assignment_list_distribution_step_copy_label",
+    "assignment_list_distribution_step_preview_label",
+    "assignment_list_distribution_step_print_label",
+    "assignment_list_distribution_step_results_label",
+    "assignment_list_distribution_step_status_",
     "activity_library_",
     "activity_form_",
     "activity_editor_",
@@ -56,6 +62,17 @@
   ],
   "draftLocales": ["fr", "de", "ja", "ko", "it", "es", "pt-BR", "ar"],
   "draftNamespaces": {
+    "assignment-list-distribution-steps": [
+      "assignment_list_distribution_step_aria_label",
+      "assignment_list_distribution_step_copy_label",
+      "assignment_list_distribution_step_preview_label",
+      "assignment_list_distribution_step_print_label",
+      "assignment_list_distribution_step_results_label",
+      "assignment_list_distribution_step_status_blocked",
+      "assignment_list_distribution_step_status_optional",
+      "assignment_list_distribution_step_status_ready",
+      "assignment_list_distribution_step_status_waiting"
+    ],
     "assignment-list-distribution-status": [
       "assignment_list_distribution_aria_label",
       "assignment_list_distribution_status_blocked",
@@ -790,6 +807,15 @@
     ]
   },
   "englishOnlyKeys": [
+    "assignment_list_distribution_step_copy_blocked_description",
+    "assignment_list_distribution_step_copy_ready_description",
+    "assignment_list_distribution_step_preview_blocked_description",
+    "assignment_list_distribution_step_preview_ready_description",
+    "assignment_list_distribution_step_print_blocked_description",
+    "assignment_list_distribution_step_print_optional_description",
+    "assignment_list_distribution_step_results_blocked_description",
+    "assignment_list_distribution_step_results_ready_description",
+    "assignment_list_distribution_step_results_waiting_description",
     "assignment_list_distribution_description_blocked",
     "assignment_list_distribution_description_collecting_results",
     "assignment_list_distribution_description_preview",

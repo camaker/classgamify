@@ -1,0 +1,11 @@
+{
+  "assignment_list_distribution_step_aria_label": "{label} : {status}. {description}",
+  "assignment_list_distribution_step_copy_label": "Copier le lien",
+  "assignment_list_distribution_step_preview_label": "Aperçu élève",
+  "assignment_list_distribution_step_print_label": "Imprimer la fiche",
+  "assignment_list_distribution_step_results_label": "Consulter les résultats",
+  "assignment_list_distribution_step_status_blocked": "Bloqué",
+  "assignment_list_distribution_step_status_optional": "Facultatif",
+  "assignment_list_distribution_step_status_ready": "Prêt",
+  "assignment_list_distribution_step_status_waiting": "En attente"
+}

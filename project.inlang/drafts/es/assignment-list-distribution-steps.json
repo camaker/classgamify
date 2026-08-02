@@ -1,0 +1,11 @@
+{
+  "assignment_list_distribution_step_aria_label": "{label}: {status}. {description}",
+  "assignment_list_distribution_step_copy_label": "Copiar enlace",
+  "assignment_list_distribution_step_preview_label": "Vista del estudiante",
+  "assignment_list_distribution_step_print_label": "Imprimir hoja de trabajo",
+  "assignment_list_distribution_step_results_label": "Revisar resultados",
+  "assignment_list_distribution_step_status_blocked": "Bloqueado",
+  "assignment_list_distribution_step_status_optional": "Opcional",
+  "assignment_list_distribution_step_status_ready": "Listo",
+  "assignment_list_distribution_step_status_waiting": "En espera"
+}
