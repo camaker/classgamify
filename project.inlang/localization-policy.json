@@ -4,7 +4,7 @@
     "auth_login_",
     "auth_register_",
     "auth_reset_password_",
-    "dashboard_overview_",
+    "dashboard_",
     "templates_page_",
     "worksheets_page_"
   ],
@@ -337,6 +337,7 @@
       "auth_register_title"
     ],
     "dashboard-core": [
+      "dashboard_avatar_dashboard",
       "dashboard_overview_action_activities_cta",
       "dashboard_overview_action_activities_description",
       "dashboard_overview_action_activities_title",
@@ -375,6 +376,11 @@
     ]
   },
   "englishOnlyKeys": [
+    "dashboard_avatar_settings",
+    "dashboard_sidebar_files",
+    "dashboard_sidebar_profile",
+    "dashboard_sidebar_security",
+    "dashboard_sidebar_settings",
     "dashboard_overview_action_assignments_description",
     "dashboard_overview_action_student_preview_cta",
     "dashboard_overview_action_student_preview_description",
