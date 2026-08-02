@@ -67,6 +67,7 @@
     "home_feature_aria_label",
     "home_feature_section_aria_label",
     "home_page_seo_",
+    "home_call_to_action_",
     "activity_library_",
     "activity_form_",
     "activity_editor_",
@@ -98,6 +99,12 @@
   ],
   "draftLocales": ["fr", "de", "ja", "ko", "it", "es", "pt-BR", "ar"],
   "draftNamespaces": {
+    "home-call-to-action": [
+      "home_call_to_action_description",
+      "home_call_to_action_primary_button",
+      "home_call_to_action_secondary_button",
+      "home_call_to_action_title"
+    ],
     "common-table-extras": [
       "common_table_no_results",
       "common_table_no_results_found",
