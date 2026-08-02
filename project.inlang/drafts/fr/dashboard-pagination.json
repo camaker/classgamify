@@ -1,0 +1,10 @@
+{
+  "dashboard_pagination_activities_aria_label": "Pages d’activités",
+  "dashboard_pagination_activities_item_label": "activités",
+  "dashboard_pagination_assignments_aria_label": "Pages de devoirs",
+  "dashboard_pagination_assignments_item_label": "devoirs",
+  "dashboard_pagination_next": "Suivant",
+  "dashboard_pagination_page_summary": "Page {currentPage} sur {totalPages}",
+  "dashboard_pagination_previous": "Précédent",
+  "dashboard_pagination_summary": "Éléments {firstItem} à {lastItem} sur {total} {itemLabel}"
+}

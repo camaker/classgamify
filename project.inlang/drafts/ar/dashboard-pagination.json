@@ -1,0 +1,10 @@
+{
+  "dashboard_pagination_activities_aria_label": "صفحات الأنشطة",
+  "dashboard_pagination_activities_item_label": "نشاطًا",
+  "dashboard_pagination_assignments_aria_label": "صفحات الواجبات",
+  "dashboard_pagination_assignments_item_label": "واجبًا",
+  "dashboard_pagination_next": "التالي",
+  "dashboard_pagination_page_summary": "الصفحة {currentPage} من {totalPages}",
+  "dashboard_pagination_previous": "السابق",
+  "dashboard_pagination_summary": "عرض {firstItem}-{lastItem} من أصل {total} {itemLabel}"
+}

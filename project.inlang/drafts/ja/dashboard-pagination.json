@@ -1,0 +1,10 @@
+{
+  "dashboard_pagination_activities_aria_label": "アクティビティのページ",
+  "dashboard_pagination_activities_item_label": "件のアクティビティ",
+  "dashboard_pagination_assignments_aria_label": "課題のページ",
+  "dashboard_pagination_assignments_item_label": "件の課題",
+  "dashboard_pagination_next": "次へ",
+  "dashboard_pagination_page_summary": "全{totalPages}ページ中{currentPage}ページ目",
+  "dashboard_pagination_previous": "前へ",
+  "dashboard_pagination_summary": "全{total}{itemLabel}のうち{firstItem}～{lastItem}件を表示"
+}

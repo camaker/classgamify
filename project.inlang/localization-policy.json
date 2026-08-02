@@ -351,6 +351,16 @@
       "dashboard_sidebar_assignments",
       "dashboard_sidebar_dashboard",
       "dashboard_title"
+    ],
+    "dashboard-pagination": [
+      "dashboard_pagination_activities_aria_label",
+      "dashboard_pagination_activities_item_label",
+      "dashboard_pagination_assignments_aria_label",
+      "dashboard_pagination_assignments_item_label",
+      "dashboard_pagination_next",
+      "dashboard_pagination_page_summary",
+      "dashboard_pagination_previous",
+      "dashboard_pagination_summary"
     ]
   },
   "englishOnlyKeys": [

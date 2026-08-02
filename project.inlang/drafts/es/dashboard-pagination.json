@@ -1,0 +1,10 @@
+{
+  "dashboard_pagination_activities_aria_label": "Páginas de actividades",
+  "dashboard_pagination_activities_item_label": "actividades",
+  "dashboard_pagination_assignments_aria_label": "Páginas de tareas",
+  "dashboard_pagination_assignments_item_label": "tareas",
+  "dashboard_pagination_next": "Siguiente",
+  "dashboard_pagination_page_summary": "Página {currentPage} de {totalPages}",
+  "dashboard_pagination_previous": "Anterior",
+  "dashboard_pagination_summary": "Elementos {firstItem}-{lastItem} de {total} {itemLabel}"
+}

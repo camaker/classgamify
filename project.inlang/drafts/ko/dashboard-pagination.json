@@ -1,0 +1,10 @@
+{
+  "dashboard_pagination_activities_aria_label": "활동 페이지",
+  "dashboard_pagination_activities_item_label": "개의 활동",
+  "dashboard_pagination_assignments_aria_label": "과제 페이지",
+  "dashboard_pagination_assignments_item_label": "개의 과제",
+  "dashboard_pagination_next": "다음",
+  "dashboard_pagination_page_summary": "전체 {totalPages}페이지 중 {currentPage}페이지",
+  "dashboard_pagination_previous": "이전",
+  "dashboard_pagination_summary": "총 {total}{itemLabel} 중 {firstItem}~{lastItem}번째 표시"
+}

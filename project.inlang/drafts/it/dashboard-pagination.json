@@ -1,0 +1,10 @@
+{
+  "dashboard_pagination_activities_aria_label": "Pagine delle attività",
+  "dashboard_pagination_activities_item_label": "attività",
+  "dashboard_pagination_assignments_aria_label": "Pagine dei compiti",
+  "dashboard_pagination_assignments_item_label": "compiti",
+  "dashboard_pagination_next": "Avanti",
+  "dashboard_pagination_page_summary": "Pagina {currentPage} di {totalPages}",
+  "dashboard_pagination_previous": "Indietro",
+  "dashboard_pagination_summary": "Elementi {firstItem}-{lastItem} di {total} {itemLabel}"
+}
