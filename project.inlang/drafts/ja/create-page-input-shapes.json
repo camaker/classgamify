@@ -1,0 +1,6 @@
+{
+  "create_page_input_shape_groups": "3. グループ: ラベル | 項目1, 項目2。",
+  "create_page_input_shape_notes": "4. メモと語彙はシンプルなリスト形式。",
+  "create_page_input_shape_pairs": "2. ペア: 左 | 右。",
+  "create_page_input_shape_questions": "1. 質問: 問題文 | 解答 | 選択肢。"
+}

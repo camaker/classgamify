@@ -1,0 +1,6 @@
+{
+  "create_page_input_shape_groups": "3. Groupes : libellé | élément un, élément deux.",
+  "create_page_input_shape_notes": "4. Notes et vocabulaire sous forme de listes simples.",
+  "create_page_input_shape_pairs": "2. Paires : gauche | droite.",
+  "create_page_input_shape_questions": "1. Questions : consigne | réponse | options."
+}

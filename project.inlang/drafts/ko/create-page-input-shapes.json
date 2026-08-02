@@ -1,0 +1,6 @@
+{
+  "create_page_input_shape_groups": "3. 그룹: 레이블 | 항목 1, 항목 2.",
+  "create_page_input_shape_notes": "4. 교사 메모와 어휘는 간단한 목록 형식.",
+  "create_page_input_shape_pairs": "2. 짝 맞추기: 왼쪽 | 오른쪽.",
+  "create_page_input_shape_questions": "1. 질문: 문제 | 정답 | 선택지."
+}

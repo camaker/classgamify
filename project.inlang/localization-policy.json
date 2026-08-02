@@ -54,6 +54,7 @@
     "create_page_template_entry_runtime_items_label",
     "create_page_template_entry_runtime_items_value",
     "create_page_template_entry_title",
+    "create_page_input_shape_",
     "activity_library_",
     "activity_form_",
     "activity_editor_",
@@ -85,6 +86,12 @@
   ],
   "draftLocales": ["fr", "de", "ja", "ko", "it", "es", "pt-BR", "ar"],
   "draftNamespaces": {
+    "create-page-input-shapes": [
+      "create_page_input_shape_groups",
+      "create_page_input_shape_notes",
+      "create_page_input_shape_pairs",
+      "create_page_input_shape_questions"
+    ],
     "create-page-template-entry": [
       "create_page_template_entry_default_description",
       "create_page_template_entry_default_title",
