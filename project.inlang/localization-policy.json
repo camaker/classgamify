@@ -255,6 +255,16 @@
       "templates_page_entry_step_template_value",
       "templates_page_requirements_aria_label",
       "templates_page_requirements_label"
+    ],
+    "worksheets-core": [
+      "worksheets_page_browse_templates",
+      "worksheets_page_eyebrow",
+      "worksheets_page_seo_description",
+      "worksheets_page_seo_title",
+      "worksheets_page_templates_cta_action_aria_label",
+      "worksheets_page_templates_cta_description",
+      "worksheets_page_templates_cta_title",
+      "worksheets_page_title"
     ]
   },
   "englishOnlyKeyPatterns": [
