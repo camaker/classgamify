@@ -17,6 +17,8 @@
     "activity_ai_notice_",
     "activity_ai_fallback_",
     "activity_ai_draft_",
+    "activity_edit_page_",
+    "activity_edit_access_",
     "templates_page_",
     "worksheets_page_"
   ],
@@ -644,9 +646,19 @@
       "activity_ai_focus_remix_ready_label",
       "activity_ai_focus_worksheet_practice_description",
       "activity_ai_focus_worksheet_practice_label"
+    ],
+    "activity-edit-entry": [
+      "activity_edit_access_ready_action",
+      "activity_edit_access_ready_title",
+      "activity_edit_page_back_to_library"
     ]
   },
   "englishOnlyKeys": [
+    "activity_edit_access_archived_action",
+    "activity_edit_access_archived_description",
+    "activity_edit_access_archived_title",
+    "activity_edit_access_ready_description",
+    "activity_edit_page_load_error",
     "activity_ai_draft_boundary_handoff_auth_boundary_description",
     "activity_ai_draft_boundary_handoff_auth_boundary_label",
     "activity_ai_draft_boundary_handoff_auth_boundary_value",
