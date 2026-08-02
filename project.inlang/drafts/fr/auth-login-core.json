@@ -1,0 +1,15 @@
+{
+  "auth_login_description": "Connectez-vous pour retrouver votre espace enseignant ClassGamify",
+  "auth_login_email": "Adresse e-mail",
+  "auth_login_eyebrow": "Compte enseignant",
+  "auth_login_forgot_password": "Mot de passe oublié ?",
+  "auth_login_hide_password": "Masquer le mot de passe",
+  "auth_login_password": "Mot de passe",
+  "auth_login_placeholder_email": "name@example.com",
+  "auth_login_placeholder_password": "******",
+  "auth_login_show_password": "Afficher le mot de passe",
+  "auth_login_sign_in": "Se connecter",
+  "auth_login_sign_up_hint": "Pas encore de compte ? S’inscrire",
+  "auth_login_title": "Connexion enseignant",
+  "auth_login_welcome_back": "Heureux de vous revoir"
+}

@@ -297,6 +297,21 @@
       "worksheets_page_workflow_step_aria_label",
       "worksheets_page_workflow_step_review_label",
       "worksheets_page_workflow_step_student_submit_label"
+    ],
+    "auth-login-core": [
+      "auth_login_description",
+      "auth_login_email",
+      "auth_login_eyebrow",
+      "auth_login_forgot_password",
+      "auth_login_hide_password",
+      "auth_login_password",
+      "auth_login_placeholder_email",
+      "auth_login_placeholder_password",
+      "auth_login_show_password",
+      "auth_login_sign_in",
+      "auth_login_sign_up_hint",
+      "auth_login_title",
+      "auth_login_welcome_back"
     ]
   },
   "englishOnlyKeys": [

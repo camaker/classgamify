@@ -1,0 +1,15 @@
+{
+  "auth_login_description": "Melde dich an, um deinen ClassGamify-Lehrkräftebereich weiter zu nutzen",
+  "auth_login_email": "E-Mail-Adresse",
+  "auth_login_eyebrow": "Lehrkräftekonto",
+  "auth_login_forgot_password": "Passwort vergessen?",
+  "auth_login_hide_password": "Passwort ausblenden",
+  "auth_login_password": "Passwort",
+  "auth_login_placeholder_email": "name@example.com",
+  "auth_login_placeholder_password": "******",
+  "auth_login_show_password": "Passwort anzeigen",
+  "auth_login_sign_in": "Anmelden",
+  "auth_login_sign_up_hint": "Noch kein Konto? Jetzt registrieren",
+  "auth_login_title": "Anmeldung für Lehrkräfte",
+  "auth_login_welcome_back": "Willkommen zurück"
+}

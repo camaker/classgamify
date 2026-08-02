@@ -1,0 +1,15 @@
+{
+  "auth_login_description": "로그인하고 ClassGamify 교사 작업 공간을 계속 이용하세요",
+  "auth_login_email": "이메일 주소",
+  "auth_login_eyebrow": "교사 계정",
+  "auth_login_forgot_password": "비밀번호를 잊으셨나요?",
+  "auth_login_hide_password": "비밀번호 숨기기",
+  "auth_login_password": "비밀번호",
+  "auth_login_placeholder_email": "name@example.com",
+  "auth_login_placeholder_password": "******",
+  "auth_login_show_password": "비밀번호 표시",
+  "auth_login_sign_in": "로그인",
+  "auth_login_sign_up_hint": "계정이 없으신가요? 회원가입",
+  "auth_login_title": "교사 로그인",
+  "auth_login_welcome_back": "다시 오신 것을 환영합니다"
+}

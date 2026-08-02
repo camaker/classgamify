@@ -1,0 +1,15 @@
+{
+  "auth_login_description": "سجّل الدخول لمتابعة استخدام مساحة عمل المعلم في ClassGamify",
+  "auth_login_email": "البريد الإلكتروني",
+  "auth_login_eyebrow": "حساب المعلم",
+  "auth_login_forgot_password": "هل نسيت كلمة المرور؟",
+  "auth_login_hide_password": "إخفاء كلمة المرور",
+  "auth_login_password": "كلمة المرور",
+  "auth_login_placeholder_email": "name@example.com",
+  "auth_login_placeholder_password": "******",
+  "auth_login_show_password": "إظهار كلمة المرور",
+  "auth_login_sign_in": "تسجيل الدخول",
+  "auth_login_sign_up_hint": "ليس لديك حساب؟ أنشئ حسابًا",
+  "auth_login_title": "دخول المعلمين",
+  "auth_login_welcome_back": "مرحبًا بعودتك"
+}

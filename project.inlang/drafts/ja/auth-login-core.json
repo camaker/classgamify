@@ -1,0 +1,15 @@
+{
+  "auth_login_description": "ログインしてClassGamifyの教師ワークスペースを利用しましょう",
+  "auth_login_email": "メールアドレス",
+  "auth_login_eyebrow": "教師アカウント",
+  "auth_login_forgot_password": "パスワードをお忘れですか？",
+  "auth_login_hide_password": "パスワードを隠す",
+  "auth_login_password": "パスワード",
+  "auth_login_placeholder_email": "name@example.com",
+  "auth_login_placeholder_password": "******",
+  "auth_login_show_password": "パスワードを表示",
+  "auth_login_sign_in": "ログイン",
+  "auth_login_sign_up_hint": "アカウントをお持ちでない方は新規登録",
+  "auth_login_title": "教師向けログイン",
+  "auth_login_welcome_back": "おかえりなさい"
+}
