@@ -80,7 +80,9 @@ try {
         assert.ok(expectedKeys.length, `Unknown draft namespace: ${namespace}`);
         assert.deepEqual(Object.keys(draft).sort(), expectedKeys);
         const localizableKeys = expectedKeys.filter(
-          (key) => !englishOnlyPatterns.some((pattern) => pattern.test(key))
+          (key) =>
+            !englishOnlyPatterns.some((pattern) => pattern.test(key)) &&
+            english[key] !== 'ClassGamify'
         );
         for (const key of expectedKeys) {
           assert.ok(draft[key].trim(), `${locale}/${file}:${key} is empty`);

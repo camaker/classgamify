@@ -1,0 +1,11 @@
+{
+  "template_entry_action_aria_label": "{label}. Abre o editor de atividades com o modelo {template} selecionado e a estrutura pronta para a revisão do professor.",
+  "template_remix_diagnosis_locked": "Adicione {requirements} para liberar {template}.",
+  "template_remix_diagnosis_ready": "Pronto para adaptar ao modelo {template}.",
+  "template_remix_diagnosis_selected_ready": "O modelo {template} está selecionado e pronto.",
+  "template_remix_needs_more_content": "É necessário adicionar conteúdo",
+  "template_remix_ready": "Pronto",
+  "template_remix_requirement_list_many": "{head} e {last}",
+  "template_remix_requirement_list_pair": "{first} e {second}",
+  "template_remix_requirement_list_separator": ", "
+}

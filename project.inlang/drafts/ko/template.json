@@ -1,0 +1,11 @@
+{
+  "template_entry_action_aria_label": "{label}. 활동 편집기를 열고 {template} 템플릿과 교사가 검토할 수 있는 기본 구성을 불러옵니다.",
+  "template_remix_diagnosis_locked": "{requirements}을(를) 추가하면 {template}을(를) 사용할 수 있습니다.",
+  "template_remix_diagnosis_ready": "{template} 형식으로 재구성할 준비가 되었습니다.",
+  "template_remix_diagnosis_selected_ready": "{template}이(가) 선택되어 사용할 수 있습니다.",
+  "template_remix_needs_more_content": "콘텐츠가 더 필요합니다",
+  "template_remix_ready": "준비됨",
+  "template_remix_requirement_list_many": "{head} 및 {last}",
+  "template_remix_requirement_list_pair": "{first} 및 {second}",
+  "template_remix_requirement_list_separator": ", "
+}

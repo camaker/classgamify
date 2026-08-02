@@ -1,0 +1,11 @@
+{
+  "template_entry_action_aria_label": "{label}. Öffnet den Aktivitätseditor mit der ausgewählten Vorlage {template} und einem Gerüst zur Prüfung durch die Lehrkraft.",
+  "template_remix_diagnosis_locked": "Fügen Sie {requirements} hinzu, um {template} freizuschalten.",
+  "template_remix_diagnosis_ready": "Bereit zur Übertragung in {template}.",
+  "template_remix_diagnosis_selected_ready": "{template} ist ausgewählt und bereit.",
+  "template_remix_needs_more_content": "Mehr Inhalt erforderlich",
+  "template_remix_ready": "Bereit",
+  "template_remix_requirement_list_many": "{head} und {last}",
+  "template_remix_requirement_list_pair": "{first} und {second}",
+  "template_remix_requirement_list_separator": ", "
+}

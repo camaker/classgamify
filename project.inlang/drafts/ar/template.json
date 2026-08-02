@@ -1,0 +1,11 @@
+{
+  "template_entry_action_aria_label": "{label}. يفتح محرر النشاط مع تحديد قالب {template} وتجهيز بنيته لمراجعة المعلم.",
+  "template_remix_diagnosis_locked": "أضف {requirements} لإتاحة قالب {template}.",
+  "template_remix_diagnosis_ready": "جاهز لإعادة الصياغة باستخدام قالب {template}.",
+  "template_remix_diagnosis_selected_ready": "تم تحديد قالب {template} وهو جاهز.",
+  "template_remix_needs_more_content": "يحتاج إلى محتوى إضافي",
+  "template_remix_ready": "جاهز",
+  "template_remix_requirement_list_many": "{head} و{last}",
+  "template_remix_requirement_list_pair": "{first} و{second}",
+  "template_remix_requirement_list_separator": "، "
+}

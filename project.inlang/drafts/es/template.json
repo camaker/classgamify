@@ -1,0 +1,11 @@
+{
+  "template_entry_action_aria_label": "{label}. Abre el editor de actividades con la plantilla {template} seleccionada y su estructura lista para que el docente la revise.",
+  "template_remix_diagnosis_locked": "Añade {requirements} para desbloquear {template}.",
+  "template_remix_diagnosis_ready": "Listo para adaptarse a la plantilla {template}.",
+  "template_remix_diagnosis_selected_ready": "La plantilla {template} está seleccionada y lista.",
+  "template_remix_needs_more_content": "Se necesita más contenido",
+  "template_remix_ready": "Listo",
+  "template_remix_requirement_list_many": "{head} y {last}",
+  "template_remix_requirement_list_pair": "{first} y {second}",
+  "template_remix_requirement_list_separator": ", "
+}

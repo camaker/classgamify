@@ -1,0 +1,11 @@
+{
+  "template_entry_action_aria_label": "{label}。アクティビティ編集画面を開き、{template}を選択した状態で先生が確認できるひな形を読み込みます。",
+  "template_remix_diagnosis_locked": "{requirements}を追加すると{template}を利用できます。",
+  "template_remix_diagnosis_ready": "{template}に作り替える準備ができています。",
+  "template_remix_diagnosis_selected_ready": "{template}が選択され、使用できる状態です。",
+  "template_remix_needs_more_content": "コンテンツを追加してください",
+  "template_remix_ready": "準備完了",
+  "template_remix_requirement_list_many": "{head}、{last}",
+  "template_remix_requirement_list_pair": "{first}と{second}",
+  "template_remix_requirement_list_separator": "、"
+}

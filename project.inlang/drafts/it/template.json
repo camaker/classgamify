@@ -1,0 +1,11 @@
+{
+  "template_entry_action_aria_label": "{label}. Apre l’editor dell’attività con il modello {template} selezionato e la struttura pronta per la revisione dell’insegnante.",
+  "template_remix_diagnosis_locked": "Aggiungi {requirements} per sbloccare {template}.",
+  "template_remix_diagnosis_ready": "Pronto per essere adattato al modello {template}.",
+  "template_remix_diagnosis_selected_ready": "Il modello {template} è selezionato e pronto.",
+  "template_remix_needs_more_content": "Servono altri contenuti",
+  "template_remix_ready": "Pronto",
+  "template_remix_requirement_list_many": "{head} e {last}",
+  "template_remix_requirement_list_pair": "{first} e {second}",
+  "template_remix_requirement_list_separator": ", "
+}
