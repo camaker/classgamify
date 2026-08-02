@@ -3,6 +3,7 @@ import { readdir, readFile, stat } from 'node:fs/promises';
 import path from 'node:path';
 
 type Policy = {
+  completeKeyPrefixes: string[];
   targetLocales: string[];
   draftLocales: string[];
   draftNamespaces: Record<string, string[]>;
@@ -77,6 +78,27 @@ function isEnglishOnly(key: string) {
     englishOnlyPatterns.some((pattern) => pattern.test(key))
   );
 }
+
+const draftKeyCounts = new Map<string, number>();
+for (const keys of Object.values(policy.draftNamespaces)) {
+  for (const key of keys) {
+    draftKeyCounts.set(key, (draftKeyCounts.get(key) ?? 0) + 1);
+  }
+}
+for (const prefix of policy.completeKeyPrefixes) {
+  const sourceKeys = Object.keys(english).filter((key) =>
+    key.startsWith(prefix)
+  );
+  assert.ok(sourceKeys.length, `Unknown complete key prefix: ${prefix}`);
+  for (const key of sourceKeys) {
+    const draftCount = draftKeyCounts.get(key) ?? 0;
+    assert.ok(draftCount <= 1, `${key} appears in multiple draft namespaces`);
+    assert.ok(
+      draftCount === 1 || isEnglishOnly(key),
+      `${key} is neither localized nor explicitly English-only`
+    );
+  }
+}
 const draftsRoot = 'project.inlang/drafts';
 
 try {
@@ -137,5 +159,5 @@ try {
 }
 
 console.log(
-  `Localization expansion contract OK (${policy.targetLocales.length} target locales, ${policy.draftLocales.length} draft locales, English-only legal Markdown, ${policy.englishOnlyKeys.length} explicit English-only keys, and ${policy.englishOnlyKeyPatterns.length} sensitive key patterns)`
+  `Localization expansion contract OK (${policy.targetLocales.length} target locales, ${policy.draftLocales.length} draft locales, ${policy.completeKeyPrefixes.length} complete page prefixes, English-only legal Markdown, ${policy.englishOnlyKeys.length} explicit English-only keys, and ${policy.englishOnlyKeyPatterns.length} sensitive key patterns)`
 );

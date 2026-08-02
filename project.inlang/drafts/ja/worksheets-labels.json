@@ -1,0 +1,6 @@
+{
+  "worksheets_page_mode_signal_aria_label": "{label}：{value}。{description}",
+  "worksheets_page_workflow_step_aria_label": "ステップ{position}：{label}。{description}",
+  "worksheets_page_workflow_step_review_label": "結果を振り返る",
+  "worksheets_page_workflow_step_student_submit_label": "リンクを公開"
+}

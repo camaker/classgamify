@@ -1,4 +1,5 @@
 {
+  "completeKeyPrefixes": ["templates_page_", "worksheets_page_"],
   "targetLocales": [
     "en",
     "zh",
@@ -290,6 +291,12 @@
       "worksheets_page_workflow_step_2",
       "worksheets_page_workflow_step_assign_label",
       "worksheets_page_workflow_step_create_label"
+    ],
+    "worksheets-labels": [
+      "worksheets_page_mode_signal_aria_label",
+      "worksheets_page_workflow_step_aria_label",
+      "worksheets_page_workflow_step_review_label",
+      "worksheets_page_workflow_step_student_submit_label"
     ]
   },
   "englishOnlyKeys": [

@@ -1,0 +1,6 @@
+{
+  "worksheets_page_mode_signal_aria_label": "{label}: {value}. {description}",
+  "worksheets_page_workflow_step_aria_label": "Passaggio {position}: {label}. {description}",
+  "worksheets_page_workflow_step_review_label": "Esamina risultati",
+  "worksheets_page_workflow_step_student_submit_label": "Pubblica link"
+}
