@@ -1,0 +1,8 @@
+{
+  "teachers_page_card_aria_label": "{title}：{description}",
+  "teachers_page_template_panel_aria_label": "{title}：{description}",
+  "teachers_page_template_panel_description": "教師が共通のアクティビティ内容に適用できる、最初の再利用可能なテンプレート一覧です。",
+  "teachers_page_template_panel_item_aria_label": "{template}：授業モードは{mode}です。",
+  "teachers_page_template_panel_mode_label": "授業モード",
+  "teachers_page_template_panel_title": "最初のテンプレート"
+}

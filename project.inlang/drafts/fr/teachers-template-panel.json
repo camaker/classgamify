@@ -1,0 +1,8 @@
+{
+  "teachers_page_card_aria_label": "{title} : {description}",
+  "teachers_page_template_panel_aria_label": "{title} : {description}",
+  "teachers_page_template_panel_description": "Voici les premières familles de modèles réutilisables que les enseignants peuvent appliquer à un même contenu d’activité.",
+  "teachers_page_template_panel_item_aria_label": "{template} : mode de classe {mode}.",
+  "teachers_page_template_panel_mode_label": "Mode de classe",
+  "teachers_page_template_panel_title": "Premières familles de modèles"
+}

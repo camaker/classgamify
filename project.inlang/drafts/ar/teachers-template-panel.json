@@ -1,0 +1,8 @@
+{
+  "teachers_page_card_aria_label": "{title}: {description}",
+  "teachers_page_template_panel_aria_label": "{title}: {description}",
+  "teachers_page_template_panel_description": "هذه أول مجموعات القوالب القابلة لإعادة الاستخدام التي يمكن للمعلمين تطبيقها على محتوى النشاط نفسه.",
+  "teachers_page_template_panel_item_aria_label": "{template}: وضع الصف {mode}.",
+  "teachers_page_template_panel_mode_label": "وضع الصف",
+  "teachers_page_template_panel_title": "مجموعات القوالب الأولى"
+}

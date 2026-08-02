@@ -1,0 +1,8 @@
+{
+  "teachers_page_card_aria_label": "{title}: {description}",
+  "teachers_page_template_panel_aria_label": "{title}: {description}",
+  "teachers_page_template_panel_description": "Diese ersten wiederverwendbaren Vorlagenfamilien können Lehrkräfte auf gemeinsame Aktivitätsinhalte anwenden.",
+  "teachers_page_template_panel_item_aria_label": "{template}: Unterrichtsmodus {mode}.",
+  "teachers_page_template_panel_mode_label": "Unterrichtsmodus",
+  "teachers_page_template_panel_title": "Erste Vorlagenfamilien"
+}

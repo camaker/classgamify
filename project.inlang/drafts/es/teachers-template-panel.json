@@ -1,0 +1,8 @@
+{
+  "teachers_page_card_aria_label": "{title}: {description}",
+  "teachers_page_template_panel_aria_label": "{title}: {description}",
+  "teachers_page_template_panel_description": "Estas son las primeras familias de plantillas reutilizables que el profesorado puede aplicar al mismo contenido de una actividad.",
+  "teachers_page_template_panel_item_aria_label": "{template}: modo de clase {mode}.",
+  "teachers_page_template_panel_mode_label": "Modo de clase",
+  "teachers_page_template_panel_title": "Primeras familias de plantillas"
+}

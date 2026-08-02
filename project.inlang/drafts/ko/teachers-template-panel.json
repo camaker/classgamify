@@ -1,0 +1,8 @@
+{
+  "teachers_page_card_aria_label": "{title}: {description}",
+  "teachers_page_template_panel_aria_label": "{title}: {description}",
+  "teachers_page_template_panel_description": "교사가 같은 활동 콘텐츠에 적용할 수 있는 첫 번째 재사용형 템플릿 모음입니다.",
+  "teachers_page_template_panel_item_aria_label": "{template}: {mode} 수업 모드.",
+  "teachers_page_template_panel_mode_label": "수업 모드",
+  "teachers_page_template_panel_title": "첫 번째 템플릿 모음"
+}

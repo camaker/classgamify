@@ -214,6 +214,14 @@
       "teachers_page_workflow_section_aria_label",
       "teachers_page_workflow_section_description",
       "teachers_page_workflow_section_title"
+    ],
+    "teachers-template-panel": [
+      "teachers_page_card_aria_label",
+      "teachers_page_template_panel_aria_label",
+      "teachers_page_template_panel_description",
+      "teachers_page_template_panel_item_aria_label",
+      "teachers_page_template_panel_mode_label",
+      "teachers_page_template_panel_title"
     ]
   },
   "englishOnlyKeyPatterns": [
