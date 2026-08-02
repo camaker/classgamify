@@ -1,0 +1,6 @@
+{
+  "activity_duplicate_title_format": "Kopie von {title}",
+  "activity_duplicate_untitled_title": "Aktivität ohne Titel",
+  "activity_remix_title_format": "{title} ({template})",
+  "activity_remix_title_template_fallback": "Vorlage"
+}

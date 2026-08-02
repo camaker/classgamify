@@ -1,0 +1,6 @@
+{
+  "activity_duplicate_title_format": "نسخة من {title}",
+  "activity_duplicate_untitled_title": "نشاط بلا عنوان",
+  "activity_remix_title_format": "{title} ({template})",
+  "activity_remix_title_template_fallback": "قالب"
+}

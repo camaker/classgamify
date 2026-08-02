@@ -1,0 +1,6 @@
+{
+  "activity_duplicate_title_format": "{title} 사본",
+  "activity_duplicate_untitled_title": "제목 없는 활동",
+  "activity_remix_title_format": "{title} ({template})",
+  "activity_remix_title_template_fallback": "템플릿"
+}
