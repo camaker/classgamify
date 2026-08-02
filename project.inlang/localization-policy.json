@@ -101,6 +101,17 @@
   ],
   "draftLocales": ["fr", "de", "ja", "ko", "it", "es", "pt-BR", "ar"],
   "draftNamespaces": {
+    "pricing-core": [
+      "pricing_eyebrow",
+      "pricing_monthly",
+      "pricing_plans_free_name",
+      "pricing_plans_lifetime_name",
+      "pricing_plans_pro_name",
+      "pricing_school_title",
+      "pricing_subtitle",
+      "pricing_title",
+      "pricing_yearly"
+    ],
     "home-stats-brand": [
       "home_logo_cloud_title",
       "home_stats_items_item_1_title",
