@@ -48,6 +48,13 @@ const requiredVisibleLocalizedKeys = [
   'activity_created_panel_loading_body',
   'activity_created_panel_missing_title',
   'activity_created_panel_missing_body',
+  'activity_api_error_activity_not_found',
+  'activity_api_error_create_load_failed',
+  'activity_api_error_duplicate_load_failed',
+  'activity_api_error_remix_load_failed',
+  'activity_api_error_remix_same_template',
+  'activity_api_error_template_not_found',
+  'activity_api_error_write_conflict',
 ] as const;
 
 assert.deepEqual(policy.targetLocales, [
