@@ -69,6 +69,15 @@ const requiredVisibleLocalizedKeys = [
   'student_runner_time_expired_notice_label',
   'student_runner_timer_active_description',
   'student_runner_sequential_default_item_label',
+  'assignment_result_page_breadcrumb_assignments',
+  'assignment_result_page_breadcrumb_dashboard',
+  'assignment_result_page_default_title',
+  'student_runner_browse_templates',
+  'student_runner_create_activity',
+  'student_runner_public_route_badge',
+  'student_runner_seo_description',
+  'student_runner_seo_title_prefix',
+  'student_runner_attempt_region_label',
 ] as const;
 
 assert.deepEqual(policy.targetLocales, [
