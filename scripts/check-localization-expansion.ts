@@ -26,6 +26,16 @@ const settings = JSON.parse(
 const english = JSON.parse(
   await readFile('project.inlang/messages/en.json', 'utf8')
 ) as Record<string, string>;
+const requiredVisibleLocalizedPrefixes = [
+  'activity_library_filter_source_',
+  'activity_library_filter_status_',
+  'activity_library_filter_template_',
+] as const;
+const visibleLocaleNeutralKeys = new Set([
+  'activity_library_filter_source_audio',
+  'activity_library_filter_source_selected_description',
+  'activity_library_filter_status_selected_description',
+]);
 
 assert.deepEqual(policy.targetLocales, [
   'en',
@@ -47,6 +57,24 @@ assert.ok(
 );
 assert.ok(!policy.targetLocales.includes('zh-TW'));
 assert.ok(!policy.targetLocales.includes('zh-Hant'));
+
+for (const locale of policy.draftLocales) {
+  const messages = JSON.parse(
+    await readFile(`project.inlang/messages/${locale}.json`, 'utf8')
+  ) as Record<string, string>;
+  for (const prefix of requiredVisibleLocalizedPrefixes) {
+    const keys = Object.keys(english).filter((key) => key.startsWith(prefix));
+    assert.ok(keys.length, `Unknown visible localized prefix: ${prefix}`);
+    for (const key of keys) {
+      if (visibleLocaleNeutralKeys.has(key)) continue;
+      assert.notEqual(
+        messages[key],
+        english[key],
+        `${locale}.${key} must be localized as visible activity-library copy`
+      );
+    }
+  }
+}
 
 const legalFiles = (await readdir('content/pages'))
   .filter((file) => /^(cookie|privacy|terms)(\..+)?\.md$/.test(file))
