@@ -1,0 +1,10 @@
+{
+  "activity_library_filter_summary_filtering": "جار تصفية الأنشطة…",
+  "activity_library_filter_summary_loading": "جار تحميل الأنشطة…",
+  "activity_library_filter_summary_matches_many": "عدد النتائج المطابقة: {count}",
+  "activity_library_filter_summary_matches_one": "عدد النتائج المطابقة: {count}",
+  "activity_library_filter_summary_status_archived": "المؤرشفة",
+  "activity_library_filter_summary_status_saved": "المحفوظة",
+  "activity_library_filter_summary_total_many": "عدد الأنشطة {status}: {count}",
+  "activity_library_filter_summary_total_one": "عدد الأنشطة {status}: {count}"
+}

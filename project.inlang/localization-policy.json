@@ -398,6 +398,16 @@
       "activity_library_filter_template_description",
       "activity_library_filter_template_label",
       "activity_library_filter_template_placeholder"
+    ],
+    "activity-library-filter-summary": [
+      "activity_library_filter_summary_filtering",
+      "activity_library_filter_summary_loading",
+      "activity_library_filter_summary_matches_many",
+      "activity_library_filter_summary_matches_one",
+      "activity_library_filter_summary_status_archived",
+      "activity_library_filter_summary_status_saved",
+      "activity_library_filter_summary_total_many",
+      "activity_library_filter_summary_total_one"
     ]
   },
   "englishOnlyKeys": [

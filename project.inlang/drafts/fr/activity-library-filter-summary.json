@@ -1,0 +1,10 @@
+{
+  "activity_library_filter_summary_filtering": "Filtrage des activités…",
+  "activity_library_filter_summary_loading": "Chargement des activités…",
+  "activity_library_filter_summary_matches_many": "{count} résultats",
+  "activity_library_filter_summary_matches_one": "{count} résultat",
+  "activity_library_filter_summary_status_archived": "archivées",
+  "activity_library_filter_summary_status_saved": "enregistrées",
+  "activity_library_filter_summary_total_many": "{count} activités {status}",
+  "activity_library_filter_summary_total_one": "{count} activité {status}"
+}
