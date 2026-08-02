@@ -1,0 +1,22 @@
+{
+  "activity_template_classroom_mode_individual": "فردي",
+  "activity_template_classroom_mode_small_group": "مجموعة صغيرة",
+  "activity_template_classroom_mode_whole_class": "الصف بأكمله",
+  "activity_template_fill_blank_name": "إكمال الجملة",
+  "activity_template_fill_blank_short_name": "إكمال",
+  "activity_template_group_sort_name": "التصنيف في مجموعات",
+  "activity_template_group_sort_short_name": "تصنيف",
+  "activity_template_line_match_name": "التوصيل بالخطوط",
+  "activity_template_line_match_short_name": "توصيل",
+  "activity_template_listening_name": "الاستماع",
+  "activity_template_listening_short_name": "استماع",
+  "activity_template_match_up_name": "المطابقة",
+  "activity_template_match_up_short_name": "مطابقة",
+  "activity_template_matching_pairs_name": "العثور على الأزواج",
+  "activity_template_matching_pairs_short_name": "أزواج",
+  "activity_template_open_box_name": "فتح الصندوق",
+  "activity_template_open_box_short_name": "صندوق",
+  "activity_template_quiz_name": "اختبار قصير",
+  "activity_template_quiz_short_name": "اختبار",
+  "activity_template_start_action": "بدء {template}"
+}

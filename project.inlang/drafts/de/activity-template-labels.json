@@ -1,0 +1,22 @@
+{
+  "activity_template_classroom_mode_individual": "Einzeln",
+  "activity_template_classroom_mode_small_group": "Kleingruppe",
+  "activity_template_classroom_mode_whole_class": "Ganze Klasse",
+  "activity_template_fill_blank_name": "Satz vervollständigen",
+  "activity_template_fill_blank_short_name": "Lückentext",
+  "activity_template_group_sort_name": "Gruppen sortieren",
+  "activity_template_group_sort_short_name": "Sortieren",
+  "activity_template_line_match_name": "Mit Linien zuordnen",
+  "activity_template_line_match_short_name": "Linien",
+  "activity_template_listening_name": "Hörübung",
+  "activity_template_listening_short_name": "Hören",
+  "activity_template_match_up_name": "Zuordnen",
+  "activity_template_match_up_short_name": "Zuordnen",
+  "activity_template_matching_pairs_name": "Paare finden",
+  "activity_template_matching_pairs_short_name": "Paare",
+  "activity_template_open_box_name": "Box öffnen",
+  "activity_template_open_box_short_name": "Box",
+  "activity_template_quiz_name": "Quiz",
+  "activity_template_quiz_short_name": "Quiz",
+  "activity_template_start_action": "{template} starten"
+}

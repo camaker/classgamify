@@ -564,6 +564,28 @@
       "activity_preview_groups_title",
       "activity_preview_pairs_title",
       "activity_preview_questions_title"
+    ],
+    "activity-template-labels": [
+      "activity_template_classroom_mode_individual",
+      "activity_template_classroom_mode_small_group",
+      "activity_template_classroom_mode_whole_class",
+      "activity_template_fill_blank_name",
+      "activity_template_fill_blank_short_name",
+      "activity_template_group_sort_name",
+      "activity_template_group_sort_short_name",
+      "activity_template_line_match_name",
+      "activity_template_line_match_short_name",
+      "activity_template_listening_name",
+      "activity_template_listening_short_name",
+      "activity_template_match_up_name",
+      "activity_template_match_up_short_name",
+      "activity_template_matching_pairs_name",
+      "activity_template_matching_pairs_short_name",
+      "activity_template_open_box_name",
+      "activity_template_open_box_short_name",
+      "activity_template_quiz_name",
+      "activity_template_quiz_short_name",
+      "activity_template_start_action"
     ]
   },
   "englishOnlyKeys": [

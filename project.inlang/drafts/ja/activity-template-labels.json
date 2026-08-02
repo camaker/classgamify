@@ -1,0 +1,22 @@
+{
+  "activity_template_classroom_mode_individual": "個人",
+  "activity_template_classroom_mode_small_group": "小グループ",
+  "activity_template_classroom_mode_whole_class": "クラス全体",
+  "activity_template_fill_blank_name": "文を完成させる",
+  "activity_template_fill_blank_short_name": "穴埋め",
+  "activity_template_group_sort_name": "グループ分け",
+  "activity_template_group_sort_short_name": "分類",
+  "activity_template_line_match_name": "線で結ぶ",
+  "activity_template_line_match_short_name": "線結び",
+  "activity_template_listening_name": "リスニング",
+  "activity_template_listening_short_name": "聞く",
+  "activity_template_match_up_name": "組み合わせ",
+  "activity_template_match_up_short_name": "合わせる",
+  "activity_template_matching_pairs_name": "ペアカード",
+  "activity_template_matching_pairs_short_name": "ペア",
+  "activity_template_open_box_name": "箱を開ける",
+  "activity_template_open_box_short_name": "ボックス",
+  "activity_template_quiz_name": "クイズ",
+  "activity_template_quiz_short_name": "クイズ",
+  "activity_template_start_action": "{template}を開始"
+}

@@ -1,0 +1,22 @@
+{
+  "activity_template_classroom_mode_individual": "개별",
+  "activity_template_classroom_mode_small_group": "소그룹",
+  "activity_template_classroom_mode_whole_class": "학급 전체",
+  "activity_template_fill_blank_name": "문장 완성",
+  "activity_template_fill_blank_short_name": "빈칸 채우기",
+  "activity_template_group_sort_name": "그룹 분류",
+  "activity_template_group_sort_short_name": "분류",
+  "activity_template_line_match_name": "선으로 연결",
+  "activity_template_line_match_short_name": "선 연결",
+  "activity_template_listening_name": "듣기",
+  "activity_template_listening_short_name": "듣기",
+  "activity_template_match_up_name": "짝 맞추기",
+  "activity_template_match_up_short_name": "맞추기",
+  "activity_template_matching_pairs_name": "카드 짝 찾기",
+  "activity_template_matching_pairs_short_name": "짝",
+  "activity_template_open_box_name": "상자 열기",
+  "activity_template_open_box_short_name": "상자",
+  "activity_template_quiz_name": "퀴즈",
+  "activity_template_quiz_short_name": "퀴즈",
+  "activity_template_start_action": "{template} 시작"
+}

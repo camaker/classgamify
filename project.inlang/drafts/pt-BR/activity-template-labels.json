@@ -1,0 +1,22 @@
+{
+  "activity_template_classroom_mode_individual": "Individual",
+  "activity_template_classroom_mode_small_group": "Grupo pequeno",
+  "activity_template_classroom_mode_whole_class": "Turma inteira",
+  "activity_template_fill_blank_name": "Complete a frase",
+  "activity_template_fill_blank_short_name": "Completar",
+  "activity_template_group_sort_name": "Classificar em grupos",
+  "activity_template_group_sort_short_name": "Classificar",
+  "activity_template_line_match_name": "Relacionar com linhas",
+  "activity_template_line_match_short_name": "Relacionar",
+  "activity_template_listening_name": "Compreensão oral",
+  "activity_template_listening_short_name": "Ouvir",
+  "activity_template_match_up_name": "Relacionar",
+  "activity_template_match_up_short_name": "Relacionar",
+  "activity_template_matching_pairs_name": "Encontrar pares",
+  "activity_template_matching_pairs_short_name": "Pares",
+  "activity_template_open_box_name": "Abrir a caixa",
+  "activity_template_open_box_short_name": "Caixa",
+  "activity_template_quiz_name": "Quiz",
+  "activity_template_quiz_short_name": "Quiz",
+  "activity_template_start_action": "Iniciar {template}"
+}
