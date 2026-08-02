@@ -31,6 +31,7 @@
     "assignment_list_distribution_step_print_label",
     "assignment_list_distribution_step_results_label",
     "assignment_list_distribution_step_status_",
+    "assignment_list_published_panel_label",
     "activity_library_",
     "activity_form_",
     "activity_editor_",
@@ -62,6 +63,9 @@
   ],
   "draftLocales": ["fr", "de", "ja", "ko", "it", "es", "pt-BR", "ar"],
   "draftNamespaces": {
+    "assignment-list-published-panel": [
+      "assignment_list_published_panel_label"
+    ],
     "assignment-list-distribution-steps": [
       "assignment_list_distribution_step_aria_label",
       "assignment_list_distribution_step_copy_label",
@@ -807,6 +811,7 @@
     ]
   },
   "englishOnlyKeys": [
+    "assignment_list_published_panel_missing_hint",
     "assignment_list_distribution_step_copy_blocked_description",
     "assignment_list_distribution_step_copy_ready_description",
     "assignment_list_distribution_step_preview_blocked_description",
