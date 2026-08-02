@@ -37,6 +37,13 @@
     "assignment_list_card_summary_label",
     "assignment_list_status_metric_aria_label",
     "assignment_list_status_preview",
+    "create_page_description",
+    "create_page_eyebrow",
+    "create_page_preview_label",
+    "create_page_seo_description",
+    "create_page_seo_title",
+    "create_page_title",
+    "create_page_input_shapes_title",
     "activity_library_",
     "activity_form_",
     "activity_editor_",
@@ -68,6 +75,15 @@
   ],
   "draftLocales": ["fr", "de", "ja", "ko", "it", "es", "pt-BR", "ar"],
   "draftNamespaces": {
+    "create-page-core": [
+      "create_page_description",
+      "create_page_eyebrow",
+      "create_page_preview_label",
+      "create_page_seo_description",
+      "create_page_seo_title",
+      "create_page_title",
+      "create_page_input_shapes_title"
+    ],
     "assignment-list-card-labels": [
       "assignment_list_card_actions_label",
       "assignment_list_card_stats_label",
