@@ -115,6 +115,32 @@
       "common_table_op_less_than",
       "common_table_op_less_than_or_equal",
       "common_table_op_not_contains"
+    ],
+    "common-table-controls": [
+      "common_empty_value",
+      "common_more_pages",
+      "common_next_slide",
+      "common_pagination",
+      "common_previous_slide",
+      "common_select_all",
+      "common_select_row",
+      "common_select_value",
+      "common_social_links",
+      "common_table_clear_selection",
+      "common_table_enter_value",
+      "common_table_from",
+      "common_table_maximum_value",
+      "common_table_minimum_value",
+      "common_table_pick_date",
+      "common_table_pick_date_ellipsis",
+      "common_table_select_date",
+      "common_table_select_date_for",
+      "common_table_select_date_range",
+      "common_table_select_date_range_for",
+      "common_table_selected",
+      "common_table_slider",
+      "common_table_to",
+      "common_user_menu"
     ]
   },
   "englishOnlyKeyPatterns": [
