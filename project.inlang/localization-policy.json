@@ -1,5 +1,10 @@
 {
-  "completeKeyPrefixes": ["templates_page_", "worksheets_page_"],
+  "completeKeyPrefixes": [
+    "auth_login_",
+    "auth_register_",
+    "templates_page_",
+    "worksheets_page_"
+  ],
   "targetLocales": [
     "en",
     "zh",
@@ -330,6 +335,21 @@
     ]
   },
   "englishOnlyKeys": [
+    "auth_login_benefit_progress",
+    "auth_login_benefit_review",
+    "auth_login_benefit_worksheets",
+    "auth_login_context_description",
+    "auth_login_email_required",
+    "auth_login_password_required",
+    "auth_login_return_hint",
+    "auth_login_trust_note",
+    "auth_register_benefit_progress",
+    "auth_register_benefit_review",
+    "auth_register_benefit_worksheets",
+    "auth_register_check_email",
+    "auth_register_email_required",
+    "auth_register_name_required",
+    "auth_register_password_required",
     "home_faqs_items_item_2_answer",
     "home_faqs_items_item_2_question",
     "home_faqs_items_item_4_answer",
