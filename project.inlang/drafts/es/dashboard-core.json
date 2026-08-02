@@ -1,0 +1,17 @@
+{
+  "dashboard_overview_action_activities_cta": "Abrir actividades",
+  "dashboard_overview_action_activities_description": "Consulta tu biblioteca de actividades y el contenido estructurado que utiliza cada plantilla.",
+  "dashboard_overview_action_activities_title": "Actividades",
+  "dashboard_overview_action_assignments_cta": "Abrir tareas",
+  "dashboard_overview_action_assignments_title": "Tareas",
+  "dashboard_overview_breadcrumb": "Panel",
+  "dashboard_overview_hero_badge": "Espacio docente",
+  "dashboard_overview_hero_primary_action": "Crear actividad",
+  "dashboard_overview_hero_secondary_action": "Abrir biblioteca de actividades",
+  "dashboard_overview_hero_title": "El contenido de las actividades es el centro de ClassGamify.",
+  "dashboard_overview_title": "Panel docente",
+  "dashboard_sidebar_activities": "Actividades",
+  "dashboard_sidebar_assignments": "Tareas",
+  "dashboard_sidebar_dashboard": "Panel",
+  "dashboard_title": "Panel"
+}

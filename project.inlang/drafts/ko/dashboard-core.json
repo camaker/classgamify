@@ -1,0 +1,17 @@
+{
+  "dashboard_overview_action_activities_cta": "활동 열기",
+  "dashboard_overview_action_activities_description": "활동 라이브러리와 각 템플릿에서 사용하는 구조화된 콘텐츠를 확인하세요.",
+  "dashboard_overview_action_activities_title": "활동",
+  "dashboard_overview_action_assignments_cta": "과제 열기",
+  "dashboard_overview_action_assignments_title": "과제",
+  "dashboard_overview_breadcrumb": "대시보드",
+  "dashboard_overview_hero_badge": "교사 작업 공간",
+  "dashboard_overview_hero_primary_action": "활동 만들기",
+  "dashboard_overview_hero_secondary_action": "활동 라이브러리 열기",
+  "dashboard_overview_hero_title": "활동 콘텐츠가 ClassGamify의 중심입니다.",
+  "dashboard_overview_title": "교사 대시보드",
+  "dashboard_sidebar_activities": "활동",
+  "dashboard_sidebar_assignments": "과제",
+  "dashboard_sidebar_dashboard": "대시보드",
+  "dashboard_title": "대시보드"
+}

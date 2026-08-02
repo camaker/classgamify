@@ -1,0 +1,17 @@
+{
+  "dashboard_overview_action_activities_cta": "アクティビティを開く",
+  "dashboard_overview_action_activities_description": "アクティビティライブラリと、各テンプレートで使う構造化コンテンツを確認できます。",
+  "dashboard_overview_action_activities_title": "アクティビティ",
+  "dashboard_overview_action_assignments_cta": "課題を開く",
+  "dashboard_overview_action_assignments_title": "課題",
+  "dashboard_overview_breadcrumb": "ダッシュボード",
+  "dashboard_overview_hero_badge": "教師ワークスペース",
+  "dashboard_overview_hero_primary_action": "アクティビティを作成",
+  "dashboard_overview_hero_secondary_action": "アクティビティライブラリを開く",
+  "dashboard_overview_hero_title": "アクティビティ内容がClassGamifyの中心です。",
+  "dashboard_overview_title": "教師ダッシュボード",
+  "dashboard_sidebar_activities": "アクティビティ",
+  "dashboard_sidebar_assignments": "課題",
+  "dashboard_sidebar_dashboard": "ダッシュボード",
+  "dashboard_title": "ダッシュボード"
+}

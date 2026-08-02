@@ -334,6 +334,23 @@
       "auth_register_sign_in_hint",
       "auth_register_sign_up",
       "auth_register_title"
+    ],
+    "dashboard-core": [
+      "dashboard_overview_action_activities_cta",
+      "dashboard_overview_action_activities_description",
+      "dashboard_overview_action_activities_title",
+      "dashboard_overview_action_assignments_cta",
+      "dashboard_overview_action_assignments_title",
+      "dashboard_overview_breadcrumb",
+      "dashboard_overview_hero_badge",
+      "dashboard_overview_hero_primary_action",
+      "dashboard_overview_hero_secondary_action",
+      "dashboard_overview_hero_title",
+      "dashboard_overview_title",
+      "dashboard_sidebar_activities",
+      "dashboard_sidebar_assignments",
+      "dashboard_sidebar_dashboard",
+      "dashboard_title"
     ]
   },
   "englishOnlyKeys": [

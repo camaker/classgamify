@@ -1,0 +1,17 @@
+{
+  "dashboard_overview_action_activities_cta": "Ouvrir les activités",
+  "dashboard_overview_action_activities_description": "Retrouvez votre bibliothèque d’activités et le contenu structuré utilisé par chaque modèle.",
+  "dashboard_overview_action_activities_title": "Activités",
+  "dashboard_overview_action_assignments_cta": "Ouvrir les devoirs",
+  "dashboard_overview_action_assignments_title": "Devoirs",
+  "dashboard_overview_breadcrumb": "Tableau de bord",
+  "dashboard_overview_hero_badge": "Espace enseignant",
+  "dashboard_overview_hero_primary_action": "Créer une activité",
+  "dashboard_overview_hero_secondary_action": "Ouvrir la bibliothèque d’activités",
+  "dashboard_overview_hero_title": "Les activités sont au cœur de ClassGamify.",
+  "dashboard_overview_title": "Tableau de bord enseignant",
+  "dashboard_sidebar_activities": "Activités",
+  "dashboard_sidebar_assignments": "Devoirs",
+  "dashboard_sidebar_dashboard": "Tableau de bord",
+  "dashboard_title": "Tableau de bord"
+}
