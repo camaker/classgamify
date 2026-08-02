@@ -2167,7 +2167,9 @@
     "^fill_blank_",
     "^group_sort_",
     "^open_box_",
-    "^listening_speech_"
+    "^listening_speech_",
+    "^assignment_list_filter_handoff_",
+    "^assignment_list_handoff_"
   ],
   "legalMarkdown": ["cookie.md", "privacy.md", "terms.md"]
 }
