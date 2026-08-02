@@ -1,0 +1,13 @@
+{
+  "activity_library_summary_activities": "الأنشطة",
+  "activity_library_summary_activities_description": "الأنشطة المحفوظة ضمن نطاق المكتبة الحالي.",
+  "activity_library_summary_aria_label": "{label}: {value}. {description}",
+  "activity_library_summary_matching_activities": "الأنشطة المطابقة",
+  "activity_library_summary_matching_activities_description": "الأنشطة المطابقة لعوامل تصفية البحث والقالب والمصدر والحالة.",
+  "activity_library_summary_ready_modes": "الأنماط المتاحة",
+  "activity_library_summary_ready_to_remix": "جاهزة للتكييف",
+  "activity_library_summary_ready_to_remix_description": "أنشطة متوافقة مع فئة قوالب إضافية واحدة على الأقل.",
+  "activity_library_summary_template_coverage": "تغطية القوالب",
+  "activity_library_summary_template_coverage_description": "فئات القوالب المستخدمة ضمن نطاق المكتبة الحالي.",
+  "activity_library_created_panel_label": "تم حفظ النشاط"
+}

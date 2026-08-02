@@ -11,6 +11,8 @@
     "activity_library_stat_",
     "activity_library_status_",
     "activity_library_scope_",
+    "activity_library_summary_",
+    "activity_library_created_",
     "templates_page_",
     "worksheets_page_"
   ],
@@ -472,9 +474,27 @@
       "activity_library_scope_template_all_description",
       "activity_library_scope_template_filtered_description",
       "activity_library_scope_template_label"
+    ],
+    "activity-library-summary": [
+      "activity_library_summary_activities",
+      "activity_library_summary_activities_description",
+      "activity_library_summary_aria_label",
+      "activity_library_summary_matching_activities",
+      "activity_library_summary_matching_activities_description",
+      "activity_library_summary_ready_modes",
+      "activity_library_summary_ready_to_remix",
+      "activity_library_summary_ready_to_remix_description",
+      "activity_library_summary_template_coverage",
+      "activity_library_summary_template_coverage_description",
+      "activity_library_created_panel_label"
     ]
   },
   "englishOnlyKeys": [
+    "activity_library_created_panel_missing_hint",
+    "activity_library_summary_source_extraction",
+    "activity_library_summary_source_extraction_empty",
+    "activity_library_summary_source_extraction_many",
+    "activity_library_summary_source_extraction_one",
     "activity_library_scope_source_label",
     "activity_library_action_aria_label",
     "activity_library_action_publish",

@@ -1,0 +1,13 @@
+{
+  "activity_library_summary_activities": "Attività",
+  "activity_library_summary_activities_description": "Attività salvate nell’ambito attuale della raccolta.",
+  "activity_library_summary_aria_label": "{label}: {value}. {description}",
+  "activity_library_summary_matching_activities": "Attività corrispondenti",
+  "activity_library_summary_matching_activities_description": "Attività che corrispondono ai filtri attivi di ricerca, modello, fonte e stato.",
+  "activity_library_summary_ready_modes": "Modalità disponibili",
+  "activity_library_summary_ready_to_remix": "Pronte per altri modelli",
+  "activity_library_summary_ready_to_remix_description": "Attività compatibili con almeno un’altra famiglia di modelli.",
+  "activity_library_summary_template_coverage": "Copertura dei modelli",
+  "activity_library_summary_template_coverage_description": "Famiglie di modelli rappresentate nell’ambito attuale della raccolta.",
+  "activity_library_created_panel_label": "Attività salvata"
+}

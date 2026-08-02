@@ -1,0 +1,13 @@
+{
+  "activity_library_summary_activities": "Atividades",
+  "activity_library_summary_activities_description": "Atividades salvas no escopo atual da biblioteca.",
+  "activity_library_summary_aria_label": "{label}: {value}. {description}",
+  "activity_library_summary_matching_activities": "Atividades correspondentes",
+  "activity_library_summary_matching_activities_description": "Atividades que correspondem aos filtros ativos de busca, modelo, fonte e status.",
+  "activity_library_summary_ready_modes": "Modos disponíveis",
+  "activity_library_summary_ready_to_remix": "Prontas para adaptar",
+  "activity_library_summary_ready_to_remix_description": "Atividades compatíveis com pelo menos mais uma família de modelos.",
+  "activity_library_summary_template_coverage": "Cobertura de modelos",
+  "activity_library_summary_template_coverage_description": "Famílias de modelos representadas no escopo atual da biblioteca.",
+  "activity_library_created_panel_label": "Atividade salva"
+}

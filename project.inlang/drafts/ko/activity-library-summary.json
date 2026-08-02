@@ -1,0 +1,13 @@
+{
+  "activity_library_summary_activities": "활동",
+  "activity_library_summary_activities_description": "현재 라이브러리 범위에 저장된 활동입니다.",
+  "activity_library_summary_aria_label": "{label}: {value}. {description}",
+  "activity_library_summary_matching_activities": "조건에 맞는 활동",
+  "activity_library_summary_matching_activities_description": "현재 검색, 템플릿, 소스 및 상태 필터와 일치하는 활동입니다.",
+  "activity_library_summary_ready_modes": "사용 가능한 형식",
+  "activity_library_summary_ready_to_remix": "다른 형식으로 만들기 가능",
+  "activity_library_summary_ready_to_remix_description": "추가로 사용할 수 있는 템플릿 유형이 하나 이상 있는 활동입니다.",
+  "activity_library_summary_template_coverage": "템플릿 사용 현황",
+  "activity_library_summary_template_coverage_description": "현재 라이브러리 범위에서 사용 중인 템플릿 유형입니다.",
+  "activity_library_created_panel_label": "활동이 저장되었습니다"
+}

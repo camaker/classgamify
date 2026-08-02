@@ -1,0 +1,13 @@
+{
+  "activity_library_summary_activities": "アクティビティ",
+  "activity_library_summary_activities_description": "現在のライブラリ範囲にある保存済みアクティビティです。",
+  "activity_library_summary_aria_label": "{label}：{value}。{description}",
+  "activity_library_summary_matching_activities": "条件に一致するアクティビティ",
+  "activity_library_summary_matching_activities_description": "現在の検索、テンプレート、ソース、状態フィルターに一致するアクティビティです。",
+  "activity_library_summary_ready_modes": "利用できる形式",
+  "activity_library_summary_ready_to_remix": "別形式にアレンジ可能",
+  "activity_library_summary_ready_to_remix_description": "ほかに少なくとも1つ、利用できるテンプレート形式があるアクティビティです。",
+  "activity_library_summary_template_coverage": "テンプレートの利用状況",
+  "activity_library_summary_template_coverage_description": "現在のライブラリ範囲で使われているテンプレート形式です。",
+  "activity_library_created_panel_label": "アクティビティを保存しました"
+}

@@ -1,0 +1,13 @@
+{
+  "activity_library_summary_activities": "Aktivitäten",
+  "activity_library_summary_activities_description": "Gespeicherte Aktivitäten im aktuellen Bibliotheksbereich.",
+  "activity_library_summary_aria_label": "{label}: {value}. {description}",
+  "activity_library_summary_matching_activities": "Passende Aktivitäten",
+  "activity_library_summary_matching_activities_description": "Aktivitäten, die den aktiven Such-, Vorlagen-, Quellen- und Statusfiltern entsprechen.",
+  "activity_library_summary_ready_modes": "Verfügbare Modi",
+  "activity_library_summary_ready_to_remix": "Bereit für andere Vorlagen",
+  "activity_library_summary_ready_to_remix_description": "Aktivitäten, die mit mindestens einer weiteren Vorlagenfamilie kompatibel sind.",
+  "activity_library_summary_template_coverage": "Vorlagenabdeckung",
+  "activity_library_summary_template_coverage_description": "Vorlagenfamilien, die im aktuellen Bibliotheksbereich vertreten sind.",
+  "activity_library_created_panel_label": "Aktivität gespeichert"
+}

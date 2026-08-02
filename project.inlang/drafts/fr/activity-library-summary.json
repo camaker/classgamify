@@ -1,0 +1,13 @@
+{
+  "activity_library_summary_activities": "Activités",
+  "activity_library_summary_activities_description": "Activités enregistrées dans le périmètre actuel de la bibliothèque.",
+  "activity_library_summary_aria_label": "{label} : {value}. {description}",
+  "activity_library_summary_matching_activities": "Activités correspondantes",
+  "activity_library_summary_matching_activities_description": "Activités correspondant aux filtres de recherche, de modèle, de source et d’état.",
+  "activity_library_summary_ready_modes": "Modes disponibles",
+  "activity_library_summary_ready_to_remix": "Prêtes à adapter",
+  "activity_library_summary_ready_to_remix_description": "Activités compatibles avec au moins une autre famille de modèles.",
+  "activity_library_summary_template_coverage": "Couverture des modèles",
+  "activity_library_summary_template_coverage_description": "Familles de modèles représentées dans le périmètre actuel de la bibliothèque.",
+  "activity_library_created_panel_label": "Activité enregistrée"
+}

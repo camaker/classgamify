@@ -1,0 +1,13 @@
+{
+  "activity_library_summary_activities": "Actividades",
+  "activity_library_summary_activities_description": "Actividades guardadas en el ámbito actual de la biblioteca.",
+  "activity_library_summary_aria_label": "{label}: {value}. {description}",
+  "activity_library_summary_matching_activities": "Actividades coincidentes",
+  "activity_library_summary_matching_activities_description": "Actividades que coinciden con los filtros activos de búsqueda, plantilla, fuente y estado.",
+  "activity_library_summary_ready_modes": "Modos disponibles",
+  "activity_library_summary_ready_to_remix": "Listas para adaptar",
+  "activity_library_summary_ready_to_remix_description": "Actividades compatibles con al menos otra familia de plantillas.",
+  "activity_library_summary_template_coverage": "Cobertura de plantillas",
+  "activity_library_summary_template_coverage_description": "Familias de plantillas representadas en el ámbito actual de la biblioteca.",
+  "activity_library_created_panel_label": "Actividad guardada"
+}
