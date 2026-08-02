@@ -8,6 +8,7 @@
     "activity_library_",
     "activity_form_",
     "activity_editor_",
+    "activity_preview_",
     "templates_page_",
     "worksheets_page_"
   ],
@@ -555,9 +556,28 @@
       "activity_editor_scaffold_review_save_description",
       "activity_editor_scaffold_review_save_label",
       "activity_editor_setup_title"
+    ],
+    "activity-preview-labels": [
+      "activity_preview_classroom_mode_label",
+      "activity_preview_content_title",
+      "activity_preview_create_activity",
+      "activity_preview_groups_title",
+      "activity_preview_pairs_title",
+      "activity_preview_questions_title"
     ]
   },
   "englishOnlyKeys": [
+    "activity_preview_assignment_result_value",
+    "activity_preview_default_panel_description",
+    "activity_preview_default_panel_title",
+    "activity_preview_default_result_value",
+    "activity_preview_estimated_time_label",
+    "activity_preview_estimated_time_value",
+    "activity_preview_group_item_separator",
+    "activity_preview_group_line",
+    "activity_preview_open_student_preview",
+    "activity_preview_pair_line",
+    "activity_preview_result_target_label",
     "activity_editor_default_description",
     "activity_editor_default_grade_band",
     "activity_editor_default_groups_text",
