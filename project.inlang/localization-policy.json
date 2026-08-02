@@ -182,6 +182,18 @@
       "home_signal_templates_description",
       "home_signal_templates_label",
       "home_signal_templates_value"
+    ],
+    "teachers-core": [
+      "teachers_page_audience_type",
+      "teachers_page_description",
+      "teachers_page_eyebrow",
+      "teachers_page_primary_cta",
+      "teachers_page_primary_cta_aria_label",
+      "teachers_page_secondary_cta",
+      "teachers_page_secondary_cta_aria_label",
+      "teachers_page_seo_description",
+      "teachers_page_seo_title",
+      "teachers_page_title"
     ]
   },
   "englishOnlyKeyPatterns": [
