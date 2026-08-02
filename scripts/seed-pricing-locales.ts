@@ -1,17 +1,111 @@
 import { mkdir, writeFile } from 'node:fs/promises';
 
 const translations: Record<string, Record<string, string>> = {
-  fr: { pricing_title: 'Offres ClassGamify', pricing_subtitle: 'Commencez avec le cycle d’activités en classe, puis passez à une offre supérieure pour créer davantage, publier des devoirs et suivre les résultats.', pricing_eyebrow: 'Offres ClassGamify', pricing_monthly: 'Mensuel', pricing_yearly: 'Annuel', pricing_plans_free_name: 'Départ', pricing_plans_pro_name: 'Teacher Pro', pricing_plans_lifetime_name: 'Membre fondateur', pricing_school_title: 'Besoin d’un espace pour plusieurs enseignants ?' },
-  de: { pricing_title: 'ClassGamify-Tarife', pricing_subtitle: 'Starten Sie mit dem Unterrichtsablauf und wechseln Sie später für mehr Aktivitäten, Aufgaben, KI und Ergebnisauswertung.', pricing_eyebrow: 'ClassGamify-Tarife', pricing_monthly: 'Monatlich', pricing_yearly: 'Jährlich', pricing_plans_free_name: 'Start', pricing_plans_pro_name: 'Teacher Pro', pricing_plans_lifetime_name: 'Frühe Unterstützer', pricing_school_title: 'Brauchen Sie einen Arbeitsbereich für mehrere Lehrkräfte?' },
-  ja: { pricing_title: 'ClassGamifyのプラン', pricing_subtitle: '授業アクティビティの基本ループから始め、作成数、課題、AI、結果確認が必要になったらアップグレードできます。', pricing_eyebrow: 'ClassGamifyのプラン', pricing_monthly: '月払い', pricing_yearly: '年払い', pricing_plans_free_name: 'スターター', pricing_plans_pro_name: 'Teacher Pro', pricing_plans_lifetime_name: '早期サポーター', pricing_school_title: '複数の先生で使うワークスペースが必要ですか？' },
-  ko: { pricing_title: 'ClassGamify 요금제', pricing_subtitle: '수업 활동의 기본 흐름으로 시작하고, 더 많은 제작·과제·AI·결과 검토가 필요할 때 업그레이드하세요.', pricing_eyebrow: 'ClassGamify 요금제', pricing_monthly: '월간', pricing_yearly: '연간', pricing_plans_free_name: '스타터', pricing_plans_pro_name: 'Teacher Pro', pricing_plans_lifetime_name: '얼리 서포터', pricing_school_title: '여러 교사를 위한 워크스페이스가 필요하신가요?' },
-  it: { pricing_title: 'Piani ClassGamify', pricing_subtitle: 'Inizia con il ciclo delle attività in classe e passa a un piano superiore per creare di più, pubblicare consegne e rivedere i risultati.', pricing_eyebrow: 'Piani ClassGamify', pricing_monthly: 'Mensile', pricing_yearly: 'Annuale', pricing_plans_free_name: 'Starter', pricing_plans_pro_name: 'Teacher Pro', pricing_plans_lifetime_name: 'Sostenitore iniziale', pricing_school_title: 'Ti serve uno spazio per più insegnanti?' },
-  es: { pricing_title: 'Planes de ClassGamify', pricing_subtitle: 'Empieza con el ciclo de actividades de clase y mejora tu plan para crear más, publicar tareas y revisar resultados.', pricing_eyebrow: 'Planes de ClassGamify', pricing_monthly: 'Mensual', pricing_yearly: 'Anual', pricing_plans_free_name: 'Inicial', pricing_plans_pro_name: 'Teacher Pro', pricing_plans_lifetime_name: 'Colaborador inicial', pricing_school_title: '¿Necesitas un espacio para varios docentes?' },
-  'pt-BR': { pricing_title: 'Planos do ClassGamify', pricing_subtitle: 'Comece com o ciclo de atividades da aula e faça upgrade para criar mais, publicar tarefas e acompanhar resultados.', pricing_eyebrow: 'Planos do ClassGamify', pricing_monthly: 'Mensal', pricing_yearly: 'Anual', pricing_plans_free_name: 'Inicial', pricing_plans_pro_name: 'Teacher Pro', pricing_plans_lifetime_name: 'Apoiador inicial', pricing_school_title: 'Precisa de um espaço para vários professores?' },
-  ar: { pricing_title: 'خطط ClassGamify', pricing_subtitle: 'ابدأ بدورة أنشطة الصف، ثم انتقل إلى خطة أعلى لإنشاء المزيد ونشر الواجبات ومراجعة النتائج.', pricing_eyebrow: 'خطط ClassGamify', pricing_monthly: 'شهري', pricing_yearly: 'سنوي', pricing_plans_free_name: 'البداية', pricing_plans_pro_name: 'Teacher Pro', pricing_plans_lifetime_name: 'داعم مبكر', pricing_school_title: 'هل تحتاج إلى مساحة عمل لعدة معلمين؟' },
+  fr: {
+    pricing_title: 'Offres ClassGamify',
+    pricing_subtitle:
+      'Commencez avec le cycle d’activités en classe, puis passez à une offre supérieure pour créer davantage, publier des devoirs et suivre les résultats.',
+    pricing_eyebrow: 'Offres ClassGamify',
+    pricing_monthly: 'Mensuel',
+    pricing_yearly: 'Annuel',
+    pricing_plans_free_name: 'Départ',
+    pricing_plans_pro_name: 'Teacher Pro',
+    pricing_plans_lifetime_name: 'Membre fondateur',
+    pricing_school_title: 'Besoin d’un espace pour plusieurs enseignants ?',
+  },
+  de: {
+    pricing_title: 'ClassGamify-Tarife',
+    pricing_subtitle:
+      'Starten Sie mit dem Unterrichtsablauf und wechseln Sie später für mehr Aktivitäten, Aufgaben, KI und Ergebnisauswertung.',
+    pricing_eyebrow: 'ClassGamify-Tarife',
+    pricing_monthly: 'Monatlich',
+    pricing_yearly: 'Jährlich',
+    pricing_plans_free_name: 'Start',
+    pricing_plans_pro_name: 'Teacher Pro',
+    pricing_plans_lifetime_name: 'Frühe Unterstützer',
+    pricing_school_title:
+      'Brauchen Sie einen Arbeitsbereich für mehrere Lehrkräfte?',
+  },
+  ja: {
+    pricing_title: 'ClassGamifyのプラン',
+    pricing_subtitle:
+      '授業アクティビティの基本ループから始め、作成数、課題、AI、結果確認が必要になったらアップグレードできます。',
+    pricing_eyebrow: 'ClassGamifyのプラン',
+    pricing_monthly: '月払い',
+    pricing_yearly: '年払い',
+    pricing_plans_free_name: 'スターター',
+    pricing_plans_pro_name: 'Teacher Pro',
+    pricing_plans_lifetime_name: '早期サポーター',
+    pricing_school_title: '複数の先生で使うワークスペースが必要ですか？',
+  },
+  ko: {
+    pricing_title: 'ClassGamify 요금제',
+    pricing_subtitle:
+      '수업 활동의 기본 흐름으로 시작하고, 더 많은 제작·과제·AI·결과 검토가 필요할 때 업그레이드하세요.',
+    pricing_eyebrow: 'ClassGamify 요금제',
+    pricing_monthly: '월간',
+    pricing_yearly: '연간',
+    pricing_plans_free_name: '스타터',
+    pricing_plans_pro_name: 'Teacher Pro',
+    pricing_plans_lifetime_name: '얼리 서포터',
+    pricing_school_title: '여러 교사를 위한 워크스페이스가 필요하신가요?',
+  },
+  it: {
+    pricing_title: 'Piani ClassGamify',
+    pricing_subtitle:
+      'Inizia con il ciclo delle attività in classe e passa a un piano superiore per creare di più, pubblicare consegne e rivedere i risultati.',
+    pricing_eyebrow: 'Piani ClassGamify',
+    pricing_monthly: 'Mensile',
+    pricing_yearly: 'Annuale',
+    pricing_plans_free_name: 'Starter',
+    pricing_plans_pro_name: 'Teacher Pro',
+    pricing_plans_lifetime_name: 'Sostenitore iniziale',
+    pricing_school_title: 'Ti serve uno spazio per più insegnanti?',
+  },
+  es: {
+    pricing_title: 'Planes de ClassGamify',
+    pricing_subtitle:
+      'Empieza con el ciclo de actividades de clase y mejora tu plan para crear más, publicar tareas y revisar resultados.',
+    pricing_eyebrow: 'Planes de ClassGamify',
+    pricing_monthly: 'Mensual',
+    pricing_yearly: 'Anual',
+    pricing_plans_free_name: 'Inicial',
+    pricing_plans_pro_name: 'Teacher Pro',
+    pricing_plans_lifetime_name: 'Colaborador inicial',
+    pricing_school_title: '¿Necesitas un espacio para varios docentes?',
+  },
+  'pt-BR': {
+    pricing_title: 'Planos do ClassGamify',
+    pricing_subtitle:
+      'Comece com o ciclo de atividades da aula e faça upgrade para criar mais, publicar tarefas e acompanhar resultados.',
+    pricing_eyebrow: 'Planos do ClassGamify',
+    pricing_monthly: 'Mensal',
+    pricing_yearly: 'Anual',
+    pricing_plans_free_name: 'Inicial',
+    pricing_plans_pro_name: 'Teacher Pro',
+    pricing_plans_lifetime_name: 'Apoiador inicial',
+    pricing_school_title: 'Precisa de um espaço para vários professores?',
+  },
+  ar: {
+    pricing_title: 'خطط ClassGamify',
+    pricing_subtitle:
+      'ابدأ بدورة أنشطة الصف، ثم انتقل إلى خطة أعلى لإنشاء المزيد ونشر الواجبات ومراجعة النتائج.',
+    pricing_eyebrow: 'خطط ClassGamify',
+    pricing_monthly: 'شهري',
+    pricing_yearly: 'سنوي',
+    pricing_plans_free_name: 'البداية',
+    pricing_plans_pro_name: 'Teacher Pro',
+    pricing_plans_lifetime_name: 'داعم مبكر',
+    pricing_school_title: 'هل تحتاج إلى مساحة عمل لعدة معلمين؟',
+  },
 };
 for (const [locale, messages] of Object.entries(translations)) {
   await mkdir(`project.inlang/drafts/${locale}`, { recursive: true });
-  await writeFile(`project.inlang/drafts/${locale}/pricing-core.json`, `${JSON.stringify(messages, null, 2)}\n`);
+  await writeFile(
+    `project.inlang/drafts/${locale}/pricing-core.json`,
+    `${JSON.stringify(messages, null, 2)}\n`
+  );
 }
-console.log(`Seeded pricing core for ${Object.keys(translations).length} locales`);
+console.log(
+  `Seeded pricing core for ${Object.keys(translations).length} locales`
+);
