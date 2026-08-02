@@ -1,0 +1,23 @@
+{
+  "assignment_status_action_aria_label": "{label}. Status atual: {currentStatus}. Após esta ação: {nextStatus}.",
+  "assignment_status_action_close_description": "Feche este link do aluno mantendo o snapshot congelado e os resultados existentes para o professor.",
+  "assignment_status_action_close_label": "Fechar link",
+  "assignment_status_action_close_pending_label": "Fechando link…",
+  "assignment_status_action_close_success": "Link da atividade fechado.",
+  "assignment_status_action_current_status_label": "Status atual",
+  "assignment_status_action_failure": "Não foi possível atualizar o status da atividade.",
+  "assignment_status_action_next_status_label": "Próximo status",
+  "assignment_status_action_reopen_description": "Reabra este link para que os alunos usem o mesmo snapshot congelado.",
+  "assignment_status_action_reopen_label": "Reabrir link",
+  "assignment_status_action_reopen_pending_label": "Reabrindo link…",
+  "assignment_status_action_reopen_success": "Link da atividade reaberto.",
+  "assignment_status_error_already_closed": "O link da atividade já está fechado.",
+  "assignment_status_error_already_open": "O link da atividade já está aberto.",
+  "assignment_status_error_close_only_published": "Somente links de atividades publicadas podem ser fechados.",
+  "assignment_status_error_reopen_expired": "Atividades expiradas não podem ser reabertas.",
+  "assignment_status_error_reopen_only_closed": "Somente links fechados podem ser reabertos.",
+  "assignment_status_label_closed": "Fechado",
+  "assignment_status_label_draft": "Rascunho",
+  "assignment_status_label_expired": "Expirado",
+  "assignment_status_label_open": "Aberto"
+}

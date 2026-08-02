@@ -1,0 +1,23 @@
+{
+  "assignment_status_action_aria_label": "{label}. الحالة الحالية: {currentStatus}. بعد هذا الإجراء: {nextStatus}.",
+  "assignment_status_action_close_description": "أغلق رابط الطالب مع الاحتفاظ باللقطة المثبتة والنتائج الحالية للمعلم.",
+  "assignment_status_action_close_label": "إغلاق الرابط",
+  "assignment_status_action_close_pending_label": "جارٍ إغلاق الرابط…",
+  "assignment_status_action_close_success": "أُغلق رابط النشاط.",
+  "assignment_status_action_current_status_label": "الحالة الحالية",
+  "assignment_status_action_failure": "تعذر تحديث حالة النشاط.",
+  "assignment_status_action_next_status_label": "الحالة التالية",
+  "assignment_status_action_reopen_description": "أعد فتح الرابط ليستخدم الطلاب اللقطة المثبتة نفسها مرة أخرى.",
+  "assignment_status_action_reopen_label": "إعادة فتح الرابط",
+  "assignment_status_action_reopen_pending_label": "جارٍ إعادة فتح الرابط…",
+  "assignment_status_action_reopen_success": "أُعيد فتح رابط النشاط.",
+  "assignment_status_error_already_closed": "رابط النشاط مغلق بالفعل.",
+  "assignment_status_error_already_open": "رابط النشاط مفتوح بالفعل.",
+  "assignment_status_error_close_only_published": "لا يمكن إغلاق سوى روابط الأنشطة المنشورة.",
+  "assignment_status_error_reopen_expired": "لا يمكن إعادة فتح الأنشطة المنتهية.",
+  "assignment_status_error_reopen_only_closed": "لا يمكن إعادة فتح سوى الروابط المغلقة.",
+  "assignment_status_label_closed": "مغلق",
+  "assignment_status_label_draft": "مسودة",
+  "assignment_status_label_expired": "منتهٍ",
+  "assignment_status_label_open": "مفتوح"
+}

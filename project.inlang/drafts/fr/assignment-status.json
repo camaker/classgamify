@@ -1,0 +1,23 @@
+{
+  "assignment_status_action_aria_label": "{label}. Statut actuel : {currentStatus}. Après cette action : {nextStatus}.",
+  "assignment_status_action_close_description": "Fermer ce lien élève tout en conservant l’instantané figé et les résultats existants pour l’enseignant.",
+  "assignment_status_action_close_label": "Fermer le lien",
+  "assignment_status_action_close_pending_label": "Fermeture du lien…",
+  "assignment_status_action_close_success": "Lien d’activité fermé.",
+  "assignment_status_action_current_status_label": "Statut actuel",
+  "assignment_status_action_failure": "Le statut de l’activité n’a pas pu être mis à jour.",
+  "assignment_status_action_next_status_label": "Statut suivant",
+  "assignment_status_action_reopen_description": "Rouvrir ce lien élève pour réutiliser le même instantané figé.",
+  "assignment_status_action_reopen_label": "Rouvrir le lien",
+  "assignment_status_action_reopen_pending_label": "Réouverture du lien…",
+  "assignment_status_action_reopen_success": "Lien d’activité rouvert.",
+  "assignment_status_error_already_closed": "Le lien d’activité est déjà fermé.",
+  "assignment_status_error_already_open": "Le lien d’activité est déjà ouvert.",
+  "assignment_status_error_close_only_published": "Seuls les liens d’activité publiés peuvent être fermés.",
+  "assignment_status_error_reopen_expired": "Les activités expirées ne peuvent pas être rouvertes.",
+  "assignment_status_error_reopen_only_closed": "Seuls les liens fermés peuvent être rouverts.",
+  "assignment_status_label_closed": "Fermé",
+  "assignment_status_label_draft": "Brouillon",
+  "assignment_status_label_expired": "Expiré",
+  "assignment_status_label_open": "Ouvert"
+}

@@ -1,0 +1,23 @@
+{
+  "assignment_status_action_aria_label": "{label}. Stato attuale: {currentStatus}. Dopo questa azione: {nextStatus}.",
+  "assignment_status_action_close_description": "Chiudi questo link per gli studenti mantenendo lo snapshot bloccato e i risultati esistenti per l’insegnante.",
+  "assignment_status_action_close_label": "Chiudi link",
+  "assignment_status_action_close_pending_label": "Chiusura del link…",
+  "assignment_status_action_close_success": "Link dell’attività chiuso.",
+  "assignment_status_action_current_status_label": "Stato attuale",
+  "assignment_status_action_failure": "Impossibile aggiornare lo stato dell’attività.",
+  "assignment_status_action_next_status_label": "Stato successivo",
+  "assignment_status_action_reopen_description": "Riapri questo link perché gli studenti possano usare lo stesso snapshot bloccato.",
+  "assignment_status_action_reopen_label": "Riapri link",
+  "assignment_status_action_reopen_pending_label": "Riapertura del link…",
+  "assignment_status_action_reopen_success": "Link dell’attività riaperto.",
+  "assignment_status_error_already_closed": "Il link dell’attività è già chiuso.",
+  "assignment_status_error_already_open": "Il link dell’attività è già aperto.",
+  "assignment_status_error_close_only_published": "Si possono chiudere solo i link di attività pubblicati.",
+  "assignment_status_error_reopen_expired": "Le attività scadute non possono essere riaperte.",
+  "assignment_status_error_reopen_only_closed": "Si possono riaprire solo i link chiusi.",
+  "assignment_status_label_closed": "Chiuso",
+  "assignment_status_label_draft": "Bozza",
+  "assignment_status_label_expired": "Scaduto",
+  "assignment_status_label_open": "Aperto"
+}

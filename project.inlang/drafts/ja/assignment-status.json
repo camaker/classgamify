@@ -1,0 +1,23 @@
+{
+  "assignment_status_action_aria_label": "{label}。現在のステータス: {currentStatus}。この操作後: {nextStatus}。",
+  "assignment_status_action_close_description": "固定済みスナップショットと既存の結果を教師向けに保持したまま、生徒用リンクを閉じます。",
+  "assignment_status_action_close_label": "リンクを閉じる",
+  "assignment_status_action_close_pending_label": "リンクを閉じています…",
+  "assignment_status_action_close_success": "アクティビティリンクを閉じました。",
+  "assignment_status_action_current_status_label": "現在のステータス",
+  "assignment_status_action_failure": "アクティビティのステータスを更新できませんでした。",
+  "assignment_status_action_next_status_label": "次のステータス",
+  "assignment_status_action_reopen_description": "同じ固定済みスナップショットを生徒が再び使えるよう、このリンクを再開します。",
+  "assignment_status_action_reopen_label": "リンクを再開",
+  "assignment_status_action_reopen_pending_label": "リンクを再開しています…",
+  "assignment_status_action_reopen_success": "アクティビティリンクを再開しました。",
+  "assignment_status_error_already_closed": "アクティビティリンクはすでに閉じています。",
+  "assignment_status_error_already_open": "アクティビティリンクはすでに開いています。",
+  "assignment_status_error_close_only_published": "公開済みのアクティビティリンクのみ閉じられます。",
+  "assignment_status_error_reopen_expired": "期限切れのアクティビティは再開できません。",
+  "assignment_status_error_reopen_only_closed": "閉じたリンクのみ再開できます。",
+  "assignment_status_label_closed": "終了",
+  "assignment_status_label_draft": "下書き",
+  "assignment_status_label_expired": "期限切れ",
+  "assignment_status_label_open": "公開中"
+}

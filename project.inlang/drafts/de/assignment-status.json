@@ -1,0 +1,23 @@
+{
+  "assignment_status_action_aria_label": "{label}. Aktueller Status: {currentStatus}. Nach dieser Aktion: {nextStatus}.",
+  "assignment_status_action_close_description": "Diesen Schülerlink schließen und dabei den eingefrorenen Snapshot sowie vorhandene Ergebnisse für die Lehrkraft behalten.",
+  "assignment_status_action_close_label": "Link schließen",
+  "assignment_status_action_close_pending_label": "Link wird geschlossen…",
+  "assignment_status_action_close_success": "Aktivitätslink geschlossen.",
+  "assignment_status_action_current_status_label": "Aktueller Status",
+  "assignment_status_action_failure": "Der Aktivitätsstatus konnte nicht aktualisiert werden.",
+  "assignment_status_action_next_status_label": "Nächster Status",
+  "assignment_status_action_reopen_description": "Diesen Schülerlink wieder öffnen, damit der gleiche eingefrorene Snapshot erneut verwendet werden kann.",
+  "assignment_status_action_reopen_label": "Link wieder öffnen",
+  "assignment_status_action_reopen_pending_label": "Link wird wieder geöffnet…",
+  "assignment_status_action_reopen_success": "Aktivitätslink wieder geöffnet.",
+  "assignment_status_error_already_closed": "Der Aktivitätslink ist bereits geschlossen.",
+  "assignment_status_error_already_open": "Der Aktivitätslink ist bereits geöffnet.",
+  "assignment_status_error_close_only_published": "Nur veröffentlichte Aktivitätslinks können geschlossen werden.",
+  "assignment_status_error_reopen_expired": "Abgelaufene Aktivitäten können nicht wieder geöffnet werden.",
+  "assignment_status_error_reopen_only_closed": "Nur geschlossene Links können wieder geöffnet werden.",
+  "assignment_status_label_closed": "Geschlossen",
+  "assignment_status_label_draft": "Entwurf",
+  "assignment_status_label_expired": "Abgelaufen",
+  "assignment_status_label_open": "Geöffnet"
+}

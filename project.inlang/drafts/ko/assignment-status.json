@@ -1,0 +1,23 @@
+{
+  "assignment_status_action_aria_label": "{label}. 현재 상태: {currentStatus}. 이 작업 후: {nextStatus}.",
+  "assignment_status_action_close_description": "고정된 스냅샷과 기존 결과를 교사에게 유지한 채 학생 링크를 닫습니다.",
+  "assignment_status_action_close_label": "링크 닫기",
+  "assignment_status_action_close_pending_label": "링크 닫는 중…",
+  "assignment_status_action_close_success": "활동 링크를 닫았습니다.",
+  "assignment_status_action_current_status_label": "현재 상태",
+  "assignment_status_action_failure": "활동 상태를 업데이트하지 못했습니다.",
+  "assignment_status_action_next_status_label": "다음 상태",
+  "assignment_status_action_reopen_description": "학생이 같은 고정 스냅샷을 다시 사용할 수 있도록 링크를 엽니다.",
+  "assignment_status_action_reopen_label": "링크 다시 열기",
+  "assignment_status_action_reopen_pending_label": "링크 다시 여는 중…",
+  "assignment_status_action_reopen_success": "활동 링크를 다시 열었습니다.",
+  "assignment_status_error_already_closed": "활동 링크가 이미 닫혀 있습니다.",
+  "assignment_status_error_already_open": "활동 링크가 이미 열려 있습니다.",
+  "assignment_status_error_close_only_published": "게시된 활동 링크만 닫을 수 있습니다.",
+  "assignment_status_error_reopen_expired": "만료된 활동은 다시 열 수 없습니다.",
+  "assignment_status_error_reopen_only_closed": "닫힌 링크만 다시 열 수 있습니다.",
+  "assignment_status_label_closed": "닫힘",
+  "assignment_status_label_draft": "초안",
+  "assignment_status_label_expired": "만료됨",
+  "assignment_status_label_open": "열림"
+}

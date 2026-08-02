@@ -1,0 +1,23 @@
+{
+  "assignment_status_action_aria_label": "{label}. Estado actual: {currentStatus}. Después de esta acción: {nextStatus}.",
+  "assignment_status_action_close_description": "Cierra este enlace del estudiante y conserva la instantánea fijada y los resultados existentes para el docente.",
+  "assignment_status_action_close_label": "Cerrar enlace",
+  "assignment_status_action_close_pending_label": "Cerrando enlace…",
+  "assignment_status_action_close_success": "Enlace de actividad cerrado.",
+  "assignment_status_action_current_status_label": "Estado actual",
+  "assignment_status_action_failure": "No se pudo actualizar el estado de la actividad.",
+  "assignment_status_action_next_status_label": "Estado siguiente",
+  "assignment_status_action_reopen_description": "Vuelve a abrir este enlace para que los estudiantes usen la misma instantánea fijada.",
+  "assignment_status_action_reopen_label": "Volver a abrir enlace",
+  "assignment_status_action_reopen_pending_label": "Volviendo a abrir enlace…",
+  "assignment_status_action_reopen_success": "Enlace de actividad reabierto.",
+  "assignment_status_error_already_closed": "El enlace de actividad ya está cerrado.",
+  "assignment_status_error_already_open": "El enlace de actividad ya está abierto.",
+  "assignment_status_error_close_only_published": "Solo se pueden cerrar enlaces de actividades publicadas.",
+  "assignment_status_error_reopen_expired": "Las actividades vencidas no se pueden reabrir.",
+  "assignment_status_error_reopen_only_closed": "Solo se pueden reabrir enlaces cerrados.",
+  "assignment_status_label_closed": "Cerrado",
+  "assignment_status_label_draft": "Borrador",
+  "assignment_status_label_expired": "Vencido",
+  "assignment_status_label_open": "Abierto"
+}
