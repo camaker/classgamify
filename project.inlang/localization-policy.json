@@ -505,6 +505,16 @@
       "activity_form_field_vocabulary",
       "activity_form_save_activity",
       "activity_form_save_changes"
+    ],
+    "activity-form-editor-core": [
+      "activity_form_editor_badge",
+      "activity_form_step_content_description",
+      "activity_form_step_content_title",
+      "activity_form_step_frame_description",
+      "activity_form_step_frame_title",
+      "activity_form_step_label",
+      "activity_form_title_create",
+      "activity_form_title_edit"
     ]
   },
   "englishOnlyKeys": [

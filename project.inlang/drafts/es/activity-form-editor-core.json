@@ -1,0 +1,10 @@
+{
+  "activity_form_editor_badge": "Editor estructurado",
+  "activity_form_step_content_description": "Organiza las preguntas, parejas, grupos, vocabulario y notas reutilizables por todas las plantillas.",
+  "activity_form_step_content_title": "Editar el contenido reutilizable",
+  "activity_form_step_frame_description": "Pon nombre a la actividad, elige el modo para el aula y carga un punto de partida coherente cuando resulte útil.",
+  "activity_form_step_frame_title": "Configurar la actividad",
+  "activity_form_step_label": "Paso {number}",
+  "activity_form_title_create": "Crear una actividad reutilizable",
+  "activity_form_title_edit": "Editar la actividad reutilizable"
+}

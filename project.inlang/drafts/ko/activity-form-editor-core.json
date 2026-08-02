@@ -1,0 +1,10 @@
+{
+  "activity_form_editor_badge": "구조화 편집기",
+  "activity_form_step_content_description": "어떤 템플릿에서도 사용할 수 있는 문제, 짝, 그룹, 어휘, 메모를 구성합니다.",
+  "activity_form_step_content_title": "재사용 콘텐츠 편집",
+  "activity_form_step_frame_description": "활동 이름과 수업 형식을 정하고, 필요하면 알맞은 시작 콘텐츠를 불러옵니다.",
+  "activity_form_step_frame_title": "활동 기본 설정",
+  "activity_form_step_label": "{number}단계",
+  "activity_form_title_create": "재사용 가능한 활동 만들기",
+  "activity_form_title_edit": "재사용 가능한 활동 편집"
+}

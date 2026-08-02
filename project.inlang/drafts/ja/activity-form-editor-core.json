@@ -1,0 +1,10 @@
+{
+  "activity_form_editor_badge": "構造化エディター",
+  "activity_form_step_content_description": "どのテンプレートでも使える問題、ペア、グループ、語彙、メモを編集します。",
+  "activity_form_step_content_title": "再利用できる内容を編集",
+  "activity_form_step_frame_description": "アクティビティ名と授業形式を決め、必要に応じて適切な初期内容を読み込みます。",
+  "activity_form_step_frame_title": "アクティビティの基本設定",
+  "activity_form_step_label": "ステップ{number}",
+  "activity_form_title_create": "再利用できるアクティビティを作成",
+  "activity_form_title_edit": "再利用できるアクティビティを編集"
+}

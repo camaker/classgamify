@@ -1,0 +1,10 @@
+{
+  "activity_form_editor_badge": "محرر منظم",
+  "activity_form_step_content_description": "نظم الأسئلة والأزواج والمجموعات والمفردات والملاحظات القابلة لإعادة الاستخدام في جميع القوالب.",
+  "activity_form_step_content_title": "تعديل المحتوى القابل لإعادة الاستخدام",
+  "activity_form_step_frame_description": "سم النشاط واختر نمط الصف وحمل نقطة بداية مترابطة عند الحاجة.",
+  "activity_form_step_frame_title": "إعداد النشاط",
+  "activity_form_step_label": "الخطوة {number}",
+  "activity_form_title_create": "إنشاء نشاط قابل لإعادة الاستخدام",
+  "activity_form_title_edit": "تعديل النشاط القابل لإعادة الاستخدام"
+}
