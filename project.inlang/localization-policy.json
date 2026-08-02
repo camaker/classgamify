@@ -39,6 +39,29 @@
       "common_toggle_menu",
       "common_toggle_sidebar",
       "common_toggle_theme"
+    ],
+    "common-table-navigation": [
+      "common_table_add_sort",
+      "common_table_add_sorting_hint",
+      "common_table_ascending",
+      "common_table_descending",
+      "common_table_first_page",
+      "common_table_hide_column",
+      "common_table_last_page",
+      "common_table_modify_sorting_hint",
+      "common_table_next_page",
+      "common_table_no_columns",
+      "common_table_no_sorting_applied",
+      "common_table_page",
+      "common_table_previous_page",
+      "common_table_reset_sorting",
+      "common_table_rows_per_page",
+      "common_table_search_columns",
+      "common_table_sort",
+      "common_table_sort_asc",
+      "common_table_sort_by",
+      "common_table_sort_desc",
+      "common_table_view_options"
     ]
   },
   "englishOnlyKeyPatterns": [

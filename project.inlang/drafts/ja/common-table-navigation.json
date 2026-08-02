@@ -1,0 +1,23 @@
+{
+  "common_table_add_sort": "並べ替えを追加",
+  "common_table_add_sorting_hint": "行を整理するための並べ替えを追加します。",
+  "common_table_ascending": "昇順",
+  "common_table_descending": "降順",
+  "common_table_first_page": "最初のページ",
+  "common_table_hide_column": "列を非表示",
+  "common_table_last_page": "最後のページ",
+  "common_table_modify_sorting_hint": "行を整理するための並べ替えを変更します。",
+  "common_table_next_page": "次のページ",
+  "common_table_no_columns": "列がありません。",
+  "common_table_no_sorting_applied": "並べ替えは設定されていません",
+  "common_table_page": "ページ",
+  "common_table_previous_page": "前のページ",
+  "common_table_reset_sorting": "並べ替えをリセット",
+  "common_table_rows_per_page": "1ページの行数",
+  "common_table_search_columns": "列を検索…",
+  "common_table_sort": "並べ替え",
+  "common_table_sort_asc": "昇順",
+  "common_table_sort_by": "並べ替え基準",
+  "common_table_sort_desc": "降順",
+  "common_table_view_options": "表示オプション"
+}

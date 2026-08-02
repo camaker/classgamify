@@ -1,0 +1,23 @@
+{
+  "common_table_add_sort": "Sortierung hinzufügen",
+  "common_table_add_sorting_hint": "Fügen Sie eine Sortierung hinzu, um die Zeilen zu ordnen.",
+  "common_table_ascending": "Aufsteigend",
+  "common_table_descending": "Absteigend",
+  "common_table_first_page": "Erste Seite",
+  "common_table_hide_column": "Spalte ausblenden",
+  "common_table_last_page": "Letzte Seite",
+  "common_table_modify_sorting_hint": "Ändern Sie die Sortierung, um die Zeilen zu ordnen.",
+  "common_table_next_page": "Nächste Seite",
+  "common_table_no_columns": "Keine Spalten.",
+  "common_table_no_sorting_applied": "Keine Sortierung angewendet",
+  "common_table_page": "Seite",
+  "common_table_previous_page": "Vorherige Seite",
+  "common_table_reset_sorting": "Sortierung zurücksetzen",
+  "common_table_rows_per_page": "Zeilen pro Seite",
+  "common_table_search_columns": "Spalten suchen…",
+  "common_table_sort": "Sortieren",
+  "common_table_sort_asc": "Aufsteigend",
+  "common_table_sort_by": "Sortieren nach",
+  "common_table_sort_desc": "Absteigend",
+  "common_table_view_options": "Ansichtsoptionen"
+}

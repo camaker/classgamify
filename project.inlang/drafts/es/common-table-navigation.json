@@ -1,0 +1,23 @@
+{
+  "common_table_add_sort": "Añadir orden",
+  "common_table_add_sorting_hint": "Añade un criterio para ordenar las filas.",
+  "common_table_ascending": "Ascendente",
+  "common_table_descending": "Descendente",
+  "common_table_first_page": "Primera página",
+  "common_table_hide_column": "Ocultar columna",
+  "common_table_last_page": "Última página",
+  "common_table_modify_sorting_hint": "Modifica el orden para organizar las filas.",
+  "common_table_next_page": "Página siguiente",
+  "common_table_no_columns": "No hay columnas.",
+  "common_table_no_sorting_applied": "No se ha aplicado ningún orden",
+  "common_table_page": "Página",
+  "common_table_previous_page": "Página anterior",
+  "common_table_reset_sorting": "Restablecer orden",
+  "common_table_rows_per_page": "Filas por página",
+  "common_table_search_columns": "Buscar columnas…",
+  "common_table_sort": "Ordenar",
+  "common_table_sort_asc": "Ascendente",
+  "common_table_sort_by": "Ordenar por",
+  "common_table_sort_desc": "Descendente",
+  "common_table_view_options": "Opciones de vista"
+}

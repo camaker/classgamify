@@ -1,0 +1,23 @@
+{
+  "common_table_add_sort": "إضافة ترتيب",
+  "common_table_add_sorting_hint": "أضف ترتيباً لتنظيم الصفوف.",
+  "common_table_ascending": "تصاعدي",
+  "common_table_descending": "تنازلي",
+  "common_table_first_page": "الصفحة الأولى",
+  "common_table_hide_column": "إخفاء العمود",
+  "common_table_last_page": "الصفحة الأخيرة",
+  "common_table_modify_sorting_hint": "عدّل الترتيب لتنظيم الصفوف.",
+  "common_table_next_page": "الصفحة التالية",
+  "common_table_no_columns": "لا توجد أعمدة.",
+  "common_table_no_sorting_applied": "لم يطبّق أي ترتيب",
+  "common_table_page": "صفحة",
+  "common_table_previous_page": "الصفحة السابقة",
+  "common_table_reset_sorting": "إعادة ضبط الترتيب",
+  "common_table_rows_per_page": "عدد الصفوف في الصفحة",
+  "common_table_search_columns": "البحث في الأعمدة…",
+  "common_table_sort": "ترتيب",
+  "common_table_sort_asc": "تصاعدي",
+  "common_table_sort_by": "الترتيب حسب",
+  "common_table_sort_desc": "تنازلي",
+  "common_table_view_options": "خيارات العرض"
+}

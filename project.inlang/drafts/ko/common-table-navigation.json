@@ -1,0 +1,23 @@
+{
+  "common_table_add_sort": "정렬 추가",
+  "common_table_add_sorting_hint": "행을 정리하려면 정렬을 추가하세요.",
+  "common_table_ascending": "오름차순",
+  "common_table_descending": "내림차순",
+  "common_table_first_page": "첫 페이지",
+  "common_table_hide_column": "열 숨기기",
+  "common_table_last_page": "마지막 페이지",
+  "common_table_modify_sorting_hint": "행을 정리하려면 정렬을 수정하세요.",
+  "common_table_next_page": "다음 페이지",
+  "common_table_no_columns": "열이 없습니다.",
+  "common_table_no_sorting_applied": "적용된 정렬 없음",
+  "common_table_page": "페이지",
+  "common_table_previous_page": "이전 페이지",
+  "common_table_reset_sorting": "정렬 초기화",
+  "common_table_rows_per_page": "페이지당 행 수",
+  "common_table_search_columns": "열 검색…",
+  "common_table_sort": "정렬",
+  "common_table_sort_asc": "오름차순",
+  "common_table_sort_by": "정렬 기준",
+  "common_table_sort_desc": "내림차순",
+  "common_table_view_options": "보기 옵션"
+}

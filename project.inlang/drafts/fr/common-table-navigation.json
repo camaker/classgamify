@@ -1,0 +1,23 @@
+{
+  "common_table_add_sort": "Ajouter un tri",
+  "common_table_add_sorting_hint": "Ajoutez un tri pour organiser les lignes.",
+  "common_table_ascending": "Croissant",
+  "common_table_descending": "Décroissant",
+  "common_table_first_page": "Première page",
+  "common_table_hide_column": "Masquer la colonne",
+  "common_table_last_page": "Dernière page",
+  "common_table_modify_sorting_hint": "Modifiez le tri pour organiser les lignes.",
+  "common_table_next_page": "Page suivante",
+  "common_table_no_columns": "Aucune colonne.",
+  "common_table_no_sorting_applied": "Aucun tri appliqué",
+  "common_table_page": "Page",
+  "common_table_previous_page": "Page précédente",
+  "common_table_reset_sorting": "Réinitialiser le tri",
+  "common_table_rows_per_page": "Lignes par page",
+  "common_table_search_columns": "Rechercher des colonnes…",
+  "common_table_sort": "Trier",
+  "common_table_sort_asc": "Croissant",
+  "common_table_sort_by": "Trier par",
+  "common_table_sort_desc": "Décroissant",
+  "common_table_view_options": "Options d’affichage"
+}
