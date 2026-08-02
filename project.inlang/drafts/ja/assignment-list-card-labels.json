@@ -1,0 +1,7 @@
+{
+  "assignment_list_card_actions_label": "{title}の操作",
+  "assignment_list_card_stats_label": "{title}の結果統計",
+  "assignment_list_card_summary_label": "{title}の設定と結果",
+  "assignment_list_status_metric_aria_label": "{value} {label}",
+  "assignment_list_status_preview": "プレビュー"
+}

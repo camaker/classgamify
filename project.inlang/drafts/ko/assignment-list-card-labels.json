@@ -1,0 +1,7 @@
+{
+  "assignment_list_card_actions_label": "{title} 작업",
+  "assignment_list_card_stats_label": "{title} 결과 통계",
+  "assignment_list_card_summary_label": "{title} 설정 및 결과",
+  "assignment_list_status_metric_aria_label": "{value} {label}",
+  "assignment_list_status_preview": "미리보기"
+}

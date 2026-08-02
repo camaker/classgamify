@@ -1,0 +1,7 @@
+{
+  "assignment_list_card_actions_label": "Actions pour {title}",
+  "assignment_list_card_stats_label": "Statistiques de résultats pour {title}",
+  "assignment_list_card_summary_label": "Paramètres et résultats de {title}",
+  "assignment_list_status_metric_aria_label": "{value} {label}",
+  "assignment_list_status_preview": "Aperçu"
+}

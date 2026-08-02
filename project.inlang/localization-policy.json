@@ -32,6 +32,11 @@
     "assignment_list_distribution_step_results_label",
     "assignment_list_distribution_step_status_",
     "assignment_list_published_panel_label",
+    "assignment_list_card_actions_label",
+    "assignment_list_card_stats_label",
+    "assignment_list_card_summary_label",
+    "assignment_list_status_metric_aria_label",
+    "assignment_list_status_preview",
     "activity_library_",
     "activity_form_",
     "activity_editor_",
@@ -63,6 +68,13 @@
   ],
   "draftLocales": ["fr", "de", "ja", "ko", "it", "es", "pt-BR", "ar"],
   "draftNamespaces": {
+    "assignment-list-card-labels": [
+      "assignment_list_card_actions_label",
+      "assignment_list_card_stats_label",
+      "assignment_list_card_summary_label",
+      "assignment_list_status_metric_aria_label",
+      "assignment_list_status_preview"
+    ],
     "assignment-list-published-panel": [
       "assignment_list_published_panel_label"
     ],
@@ -811,6 +823,10 @@
     ]
   },
   "englishOnlyKeys": [
+    "assignment_list_card_aria_label",
+    "assignment_list_share_link_closed",
+    "assignment_list_share_link_draft",
+    "assignment_list_share_link_expired",
     "assignment_list_published_panel_missing_hint",
     "assignment_list_distribution_step_copy_blocked_description",
     "assignment_list_distribution_step_copy_ready_description",
