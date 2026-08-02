@@ -141,6 +141,32 @@
       "common_table_slider",
       "common_table_to",
       "common_user_menu"
+    ],
+    "home-core": [
+      "home_page_seo_description",
+      "home_page_seo_title",
+      "home_hero_browse_templates",
+      "home_hero_browse_templates_aria_label",
+      "home_hero_description",
+      "home_hero_introduction",
+      "home_hero_primary",
+      "home_hero_primary_aria_label",
+      "home_hero_secondary",
+      "home_hero_secondary_aria_label",
+      "home_hero_title",
+      "home_feature_aria_label",
+      "home_feature_section_aria_label",
+      "home_features_description",
+      "home_features_items_item_1_description",
+      "home_features_items_item_1_title",
+      "home_features_items_item_2_description",
+      "home_features_items_item_2_title",
+      "home_features_items_item_3_description",
+      "home_features_items_item_3_title",
+      "home_features_items_item_4_description",
+      "home_features_items_item_4_title",
+      "home_features_subtitle",
+      "home_features_title"
     ]
   },
   "englishOnlyKeyPatterns": [
