@@ -1,0 +1,10 @@
+{
+  "dashboard_overview_action_card_aria_label": "{title}: {description}",
+  "dashboard_overview_next_action_aria_label": "{label}: {status}",
+  "dashboard_overview_next_action_create_activity_cta": "Criar",
+  "dashboard_overview_next_action_create_activity_description": "Estruture o conteúdo da aula para apresentá-lo em modelos de jogo ou folhas de atividades.",
+  "dashboard_overview_next_action_create_activity_label": "Criar atividade",
+  "dashboard_overview_next_action_publish_assignment_cta": "Abrir biblioteca",
+  "dashboard_overview_next_action_publish_assignment_label": "Publicar tarefa",
+  "dashboard_overview_next_action_status_aria_label": "{label}: {status}. {description}"
+}

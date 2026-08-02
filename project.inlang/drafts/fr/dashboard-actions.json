@@ -1,0 +1,10 @@
+{
+  "dashboard_overview_action_card_aria_label": "{title} : {description}",
+  "dashboard_overview_next_action_aria_label": "{label} : {status}",
+  "dashboard_overview_next_action_create_activity_cta": "Créer",
+  "dashboard_overview_next_action_create_activity_description": "Structurez votre contenu de cours pour pouvoir l’afficher avec des modèles de jeu ou de fiche d’exercices.",
+  "dashboard_overview_next_action_create_activity_label": "Créer une activité",
+  "dashboard_overview_next_action_publish_assignment_cta": "Ouvrir la bibliothèque",
+  "dashboard_overview_next_action_publish_assignment_label": "Publier un devoir",
+  "dashboard_overview_next_action_status_aria_label": "{label} : {status}. {description}"
+}

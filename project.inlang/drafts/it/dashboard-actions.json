@@ -1,0 +1,10 @@
+{
+  "dashboard_overview_action_card_aria_label": "{title}: {description}",
+  "dashboard_overview_next_action_aria_label": "{label}: {status}",
+  "dashboard_overview_next_action_create_activity_cta": "Crea",
+  "dashboard_overview_next_action_create_activity_description": "Struttura i contenuti della lezione per presentarli con modelli di gioco o schede didattiche.",
+  "dashboard_overview_next_action_create_activity_label": "Crea attività",
+  "dashboard_overview_next_action_publish_assignment_cta": "Apri raccolta",
+  "dashboard_overview_next_action_publish_assignment_label": "Pubblica compito",
+  "dashboard_overview_next_action_status_aria_label": "{label}: {status}. {description}"
+}
