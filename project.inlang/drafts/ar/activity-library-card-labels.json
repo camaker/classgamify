@@ -1,0 +1,9 @@
+{
+  "activity_library_card_actions_label": "إجراءات {title}",
+  "activity_library_card_aria_label": "{title}، {status}، {template}",
+  "activity_library_card_compatibility_label": "القوالب المتوافقة مع {title}",
+  "activity_library_card_compatible_templates": "فئات القوالب المتوافقة",
+  "activity_library_card_content_label": "أعداد محتوى {title}",
+  "activity_library_card_details_label": "تفاصيل النشاط {title}",
+  "activity_library_card_untitled": "نشاط بلا عنوان"
+}

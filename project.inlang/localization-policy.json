@@ -6,6 +6,7 @@
     "auth_reset_password_",
     "dashboard_",
     "activity_library_empty_",
+    "activity_library_card_",
     "activity_library_stat_",
     "activity_library_status_",
     "templates_page_",
@@ -430,9 +431,29 @@
       "activity_library_status_archived",
       "activity_library_status_metric_aria_label",
       "activity_library_status_preview"
+    ],
+    "activity-library-card-labels": [
+      "activity_library_card_actions_label",
+      "activity_library_card_aria_label",
+      "activity_library_card_compatibility_label",
+      "activity_library_card_compatible_templates",
+      "activity_library_card_content_label",
+      "activity_library_card_details_label",
+      "activity_library_card_untitled"
     ]
   },
   "englishOnlyKeys": [
+    "activity_library_card_remix_restore_required",
+    "activity_library_card_restore_required",
+    "activity_library_card_restore_required_label",
+    "activity_library_card_source_material_edit_action",
+    "activity_library_card_source_materials_label",
+    "activity_library_card_status_summary_item_aria",
+    "activity_library_card_status_summary_label",
+    "activity_library_card_status_summary_status_archived_description",
+    "activity_library_card_status_summary_status_label",
+    "activity_library_card_status_summary_status_preview_description",
+    "activity_library_card_status_summary_status_saved_description",
     "activity_library_empty_saved_description",
     "activity_library_empty_source_filtered_description",
     "dashboard_avatar_settings",

@@ -1,0 +1,9 @@
+{
+  "activity_library_card_actions_label": "Actions pour {title}",
+  "activity_library_card_aria_label": "{title}, {status}, {template}",
+  "activity_library_card_compatibility_label": "Compatibilité des modèles pour {title}",
+  "activity_library_card_compatible_templates": "Familles de modèles compatibles",
+  "activity_library_card_content_label": "Quantité de contenus pour {title}",
+  "activity_library_card_details_label": "Détails de l’activité {title}",
+  "activity_library_card_untitled": "Activité sans titre"
+}

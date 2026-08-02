@@ -1,0 +1,9 @@
+{
+  "activity_library_card_actions_label": "{title}の操作",
+  "activity_library_card_aria_label": "{title}、{status}、{template}",
+  "activity_library_card_compatibility_label": "{title}で使えるテンプレート",
+  "activity_library_card_compatible_templates": "対応しているテンプレート形式",
+  "activity_library_card_content_label": "{title}のコンテンツ数",
+  "activity_library_card_details_label": "{title}の詳細",
+  "activity_library_card_untitled": "タイトル未設定のアクティビティ"
+}

@@ -1,0 +1,9 @@
+{
+  "activity_library_card_actions_label": "{title} 작업",
+  "activity_library_card_aria_label": "{title}, {status}, {template}",
+  "activity_library_card_compatibility_label": "{title}에서 사용할 수 있는 템플릿",
+  "activity_library_card_compatible_templates": "호환되는 템플릿 유형",
+  "activity_library_card_content_label": "{title} 콘텐츠 수",
+  "activity_library_card_details_label": "{title} 활동 세부 정보",
+  "activity_library_card_untitled": "제목 없는 활동"
+}
