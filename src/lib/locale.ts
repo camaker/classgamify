@@ -80,6 +80,10 @@ export const localeConfig = {
   },
 } satisfies Record<Locale, LocaleConfig>;
 
+export function isRtlLocale(locale: Locale): boolean {
+  return locale === 'ar';
+}
+
 export function parseMessageJson<T>(value: string, fallback: T): T {
   try {
     return JSON.parse(value) as T;

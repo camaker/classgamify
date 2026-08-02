@@ -23,6 +23,7 @@ import { getCanonicalUrl, getOgImage, twitterHandleFromUrl } from '@/lib/urls';
 import {
   getCanonicalPathname,
   getLocale,
+  isRtlLocale,
   localeConfig,
   locales,
 } from '@/lib/locale';
@@ -170,8 +171,13 @@ function RootComponent() {
  * Root document
  */
 function RootDocument({ children }: { children: React.ReactNode }) {
+  const currentLocale = getLocale();
   return (
-    <html lang={localeConfig[getLocale()].hreflang} suppressHydrationWarning>
+    <html
+      lang={localeConfig[currentLocale].hreflang}
+      dir={isRtlLocale(currentLocale) ? 'rtl' : 'ltr'}
+      suppressHydrationWarning
+    >
       <head>
         <HeadContent />
       </head>
