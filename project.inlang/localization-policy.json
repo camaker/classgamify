@@ -6,6 +6,8 @@
     "auth_reset_password_",
     "dashboard_",
     "activity_library_empty_",
+    "activity_library_stat_",
+    "activity_library_status_",
     "templates_page_",
     "worksheets_page_"
   ],
@@ -416,6 +418,18 @@
       "activity_library_empty_filtered_description",
       "activity_library_empty_filtered_title",
       "activity_library_empty_saved_title"
+    ],
+    "activity-library-card-stats": [
+      "activity_library_stat_aria_label",
+      "activity_library_stat_groups",
+      "activity_library_stat_groups_description",
+      "activity_library_stat_pairs",
+      "activity_library_stat_pairs_description",
+      "activity_library_stat_questions",
+      "activity_library_stat_questions_description",
+      "activity_library_status_archived",
+      "activity_library_status_metric_aria_label",
+      "activity_library_status_preview"
     ]
   },
   "englishOnlyKeys": [

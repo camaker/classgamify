@@ -1,0 +1,12 @@
+{
+  "activity_library_stat_aria_label": "{label}: {value}. {description}",
+  "activity_library_stat_groups": "Gruppen",
+  "activity_library_stat_groups_description": "In dieser Aktivität gespeicherte Sortierkategorien.",
+  "activity_library_stat_pairs": "Paare",
+  "activity_library_stat_pairs_description": "In dieser Aktivität gespeicherte, wiederverwendbare Zuordnungspaare.",
+  "activity_library_stat_questions": "Fragen",
+  "activity_library_stat_questions_description": "In dieser Aktivität gespeicherte Fragestellungen.",
+  "activity_library_status_archived": "Archiviert",
+  "activity_library_status_metric_aria_label": "{value} {label}",
+  "activity_library_status_preview": "Vorschau"
+}

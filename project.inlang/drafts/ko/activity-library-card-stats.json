@@ -1,0 +1,12 @@
+{
+  "activity_library_stat_aria_label": "{label}: {value}. {description}",
+  "activity_library_stat_groups": "그룹",
+  "activity_library_stat_groups_description": "이 활동에 저장된 분류 범주입니다.",
+  "activity_library_stat_pairs": "짝",
+  "activity_library_stat_pairs_description": "이 활동에 저장되어 반복해서 사용할 수 있는 짝입니다.",
+  "activity_library_stat_questions": "문제",
+  "activity_library_stat_questions_description": "이 활동에 저장된 문제 문구입니다.",
+  "activity_library_status_archived": "보관됨",
+  "activity_library_status_metric_aria_label": "{label} {value}",
+  "activity_library_status_preview": "미리보기"
+}

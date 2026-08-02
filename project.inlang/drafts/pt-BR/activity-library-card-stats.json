@@ -1,0 +1,12 @@
+{
+  "activity_library_stat_aria_label": "{label}: {value}. {description}",
+  "activity_library_stat_groups": "Grupos",
+  "activity_library_stat_groups_description": "Categorias de classificação salvas nesta atividade.",
+  "activity_library_stat_pairs": "Pares",
+  "activity_library_stat_pairs_description": "Pares reutilizáveis salvos nesta atividade.",
+  "activity_library_stat_questions": "Perguntas",
+  "activity_library_stat_questions_description": "Enunciados de perguntas salvos nesta atividade.",
+  "activity_library_status_archived": "Arquivada",
+  "activity_library_status_metric_aria_label": "{value} {label}",
+  "activity_library_status_preview": "Prévia"
+}

@@ -1,0 +1,12 @@
+{
+  "activity_library_stat_aria_label": "{label}：{value}。{description}",
+  "activity_library_stat_groups": "グループ",
+  "activity_library_stat_groups_description": "このアクティビティに保存されている分類カテゴリーです。",
+  "activity_library_stat_pairs": "ペア",
+  "activity_library_stat_pairs_description": "このアクティビティに保存されている、繰り返し使える組み合わせです。",
+  "activity_library_stat_questions": "問題",
+  "activity_library_stat_questions_description": "このアクティビティに保存されている問題文です。",
+  "activity_library_status_archived": "アーカイブ済み",
+  "activity_library_status_metric_aria_label": "{label}：{value}",
+  "activity_library_status_preview": "プレビュー"
+}

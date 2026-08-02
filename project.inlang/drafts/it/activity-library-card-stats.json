@@ -1,0 +1,12 @@
+{
+  "activity_library_stat_aria_label": "{label}: {value}. {description}",
+  "activity_library_stat_groups": "Gruppi",
+  "activity_library_stat_groups_description": "Categorie di ordinamento salvate in questa attività.",
+  "activity_library_stat_pairs": "Coppie",
+  "activity_library_stat_pairs_description": "Coppie riutilizzabili salvate in questa attività.",
+  "activity_library_stat_questions": "Domande",
+  "activity_library_stat_questions_description": "Testi delle domande salvati in questa attività.",
+  "activity_library_status_archived": "Archiviata",
+  "activity_library_status_metric_aria_label": "{value} {label}",
+  "activity_library_status_preview": "Anteprima"
+}

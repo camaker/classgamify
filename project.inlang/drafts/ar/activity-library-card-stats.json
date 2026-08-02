@@ -1,0 +1,12 @@
+{
+  "activity_library_stat_aria_label": "{label}: {value}. {description}",
+  "activity_library_stat_groups": "المجموعات",
+  "activity_library_stat_groups_description": "فئات التصنيف المحفوظة في هذا النشاط.",
+  "activity_library_stat_pairs": "الأزواج",
+  "activity_library_stat_pairs_description": "أزواج المطابقة القابلة لإعادة الاستخدام والمحفوظة في هذا النشاط.",
+  "activity_library_stat_questions": "الأسئلة",
+  "activity_library_stat_questions_description": "نصوص الأسئلة المحفوظة في هذا النشاط.",
+  "activity_library_status_archived": "مؤرشف",
+  "activity_library_status_metric_aria_label": "{label}: {value}",
+  "activity_library_status_preview": "معاينة"
+}
