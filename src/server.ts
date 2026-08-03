@@ -2,6 +2,7 @@
 // This file is a good smoke test to make sure the custom server entry is working
 import handler from '@tanstack/react-start/server-entry';
 import { localeMiddleware } from '@/locale/middleware';
+import { redirectLegacyPublicRoute } from '@/seo/legacy-public-redirects';
 
 /**
  * TanStack Start server entry
@@ -25,21 +26,6 @@ export default {
     return withSeoHeaders(request, response);
   },
 };
-
-const LEGACY_PUBLIC_REDIRECTS = new Map([
-  ['/(pages)/roadmap', '/roadmap'],
-  ['/(legals)/terms', '/terms'],
-  ['/(legals)/terms/terms', '/terms'],
-]);
-
-function redirectLegacyPublicRoute(request: Request) {
-  const url = new URL(request.url);
-  const destination = LEGACY_PUBLIC_REDIRECTS.get(url.pathname);
-  if (!destination) return null;
-
-  url.pathname = destination;
-  return Response.redirect(url, 308);
-}
 
 function withSeoHeaders(request: Request, response: Response) {
   const headers = new Headers(response.headers);
