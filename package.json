@@ -17,7 +17,7 @@
     "format": "biome format --write .",
     "locale:sort": "tsx scripts/sort-locale-keys.ts",
     "locale:check": "tsx scripts/check-locale-keys.ts",
-    "locale:compile": "paraglide-js compile --project ./project.inlang --outdir ./src/locale/paraglide --strategy url cookie baseLocale --no-emit-ts-declarations --no-emit-readme --output-structure locale-modules",
+    "locale:compile": "paraglide-js compile --project ./project.inlang --outdir ./src/locale/paraglide --strategy url cookie baseLocale --no-emit-ts-declarations --no-emit-readme --output-structure message-modules",
     "predeploy": "pnpm locale:check && pnpm check && pnpm build",
     "deploy": "pnpm run build && wrangler deploy --config dist/server/wrangler.json --keep-vars --var CREEM_DEBUG:false",
     "postinstall": "pnpm run cf-typegen",

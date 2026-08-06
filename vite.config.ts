@@ -57,7 +57,7 @@ const config = defineConfig(({ mode }) => {
             { match: '/manifest.json', exclude: true },
           ],
           emitTsDeclarations: false,
-          outputStructure: 'locale-modules',
+          outputStructure: 'message-modules',
         }),
       // https://developers.cloudflare.com/workers/vite-plugin/
       cloudflare({

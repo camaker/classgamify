@@ -4,13 +4,12 @@ import { cn } from '@/lib/utils';
 
 export function Logo({ className }: { className?: string }) {
   const name = websiteConfig.metadata?.name ?? 'App';
-  const logoLight = websiteConfig.metadata?.images?.logoLight ?? '/logo.png';
-  const logoDark = websiteConfig.metadata?.images?.logoDark ?? logoLight;
+  const navigationLogo = '/favicon-32x32.png';
 
   return (
     <>
       <img
-        src={logoLight}
+        src={navigationLogo}
         alt={m.common_logo_alt({ name })}
         className={cn('size-8 rounded-md dark:hidden', className)}
         width={32}
@@ -18,7 +17,7 @@ export function Logo({ className }: { className?: string }) {
         decoding="async"
       />
       <img
-        src={logoDark}
+        src={navigationLogo}
         alt={m.common_logo_alt({ name })}
         className={cn('size-8 rounded-md hidden dark:block', className)}
         width={32}

@@ -30,7 +30,7 @@
   "sitemap": {
     "status": "pass",
     "http_status": 200,
-    "url_count": 160,
+    "url_count": 170,
     "is_index": false,
     "checked_url": "https://classgamify.com/sitemap.xml",
     "urls": [
@@ -84,6 +84,16 @@
       "https://classgamify.com/es/pricing",
       "https://classgamify.com/pt-BR/pricing",
       "https://classgamify.com/ar/pricing",
+      "https://classgamify.com/about",
+      "https://classgamify.com/zh/about",
+      "https://classgamify.com/fr/about",
+      "https://classgamify.com/de/about",
+      "https://classgamify.com/ja/about",
+      "https://classgamify.com/ko/about",
+      "https://classgamify.com/it/about",
+      "https://classgamify.com/es/about",
+      "https://classgamify.com/pt-BR/about",
+      "https://classgamify.com/ar/about",
       "https://classgamify.com/teachers",
       "https://classgamify.com/zh/teachers",
       "https://classgamify.com/fr/teachers",
@@ -196,15 +206,15 @@
       "https://classgamify.com/ar/blog/wordwall-style-activity-loop"
     ],
     "child_sitemaps": [],
-    "detail": "Sitemap at https://classgamify.com/sitemap.xml with 160 URL(s)."
+    "detail": "Sitemap at https://classgamify.com/sitemap.xml with 170 URL(s)."
   },
   "sitemap_inventory": {
     "status": "info",
-    "total_urls": 160,
+    "total_urls": 170,
     "directories": [
       {
         "path": "/zh/",
-        "url_count": 16,
+        "url_count": 17,
         "sample_urls": [
           "https://classgamify.com/zh/",
           "https://classgamify.com/zh/templates",
@@ -217,7 +227,7 @@
       },
       {
         "path": "/fr/",
-        "url_count": 16,
+        "url_count": 17,
         "sample_urls": [
           "https://classgamify.com/fr/",
           "https://classgamify.com/fr/templates",
@@ -230,7 +240,7 @@
       },
       {
         "path": "/de/",
-        "url_count": 16,
+        "url_count": 17,
         "sample_urls": [
           "https://classgamify.com/de/",
           "https://classgamify.com/de/templates",
@@ -243,7 +253,7 @@
       },
       {
         "path": "/ja/",
-        "url_count": 16,
+        "url_count": 17,
         "sample_urls": [
           "https://classgamify.com/ja/",
           "https://classgamify.com/ja/templates",
@@ -256,7 +266,7 @@
       },
       {
         "path": "/ko/",
-        "url_count": 16,
+        "url_count": 17,
         "sample_urls": [
           "https://classgamify.com/ko/",
           "https://classgamify.com/ko/templates",
@@ -269,7 +279,7 @@
       },
       {
         "path": "/it/",
-        "url_count": 16,
+        "url_count": 17,
         "sample_urls": [
           "https://classgamify.com/it/",
           "https://classgamify.com/it/templates",
@@ -282,7 +292,7 @@
       },
       {
         "path": "/es/",
-        "url_count": 16,
+        "url_count": 17,
         "sample_urls": [
           "https://classgamify.com/es/",
           "https://classgamify.com/es/templates",
@@ -295,7 +305,7 @@
       },
       {
         "path": "/pt-BR/",
-        "url_count": 16,
+        "url_count": 17,
         "sample_urls": [
           "https://classgamify.com/pt-BR/",
           "https://classgamify.com/pt-BR/templates",
@@ -308,7 +318,7 @@
       },
       {
         "path": "/ar/",
-        "url_count": 16,
+        "url_count": 17,
         "sample_urls": [
           "https://classgamify.com/ar/",
           "https://classgamify.com/ar/templates",
@@ -355,6 +365,6 @@
         "example_url": "https://classgamify.com/templates"
       }
     ],
-    "detail": "Sitemap contains 160 URL(s) across 21 first-level directories. Use this as a site-level map, then run full audit on representative sample URLs."
+    "detail": "Sitemap contains 170 URL(s) across 22 first-level directories. Use this as a site-level map, then run full audit on representative sample URLs."
   }
 }

@@ -9,7 +9,7 @@
     "is_homepage": true,
     "keyword_match": "unverified",
     "llm_review_required": false,
-    "detail": "Homepage detected — URL slug check not applicable."
+    "detail": "Homepage detected �� URL slug check not applicable."
   },
   "title": {
     "status": "warn",
@@ -18,7 +18,7 @@
     "keyword_match": "partial",
     "keyword_position": "middle",
     "llm_review_required": true,
-    "detail": "Partial match for \"classroom gamification\" in title: \"ClassGamify | AI-ready classroom activity platform\". Script cannot determine semantic intent alignment. LLM review required: does this title cover the keyword's search intent? Is it grammatically natural? | Length 50 chars — within recommended range (50-60)."
+    "detail": "Partial match for \"classroom gamification\" in title: \"ClassGamify | AI-ready classroom activity platform\". Script cannot determine semantic intent alignment. LLM review required: does this title cover the keyword's search intent? Is it grammatically natural? | Length 50 chars �� within recommended range (50-60)."
   },
   "meta_description": {
     "status": "warn",
@@ -26,7 +26,7 @@
     "length": 124,
     "keyword_match": "partial",
     "llm_review_required": true,
-    "detail": "Partial match for \"classroom gamification\" in meta description. LLM review required: check if a synonym covers the intent naturally. | Length 124 chars — within recommended range (120-160). | LLM review required: (1) complete sentence? (2) mentions concrete result not vague fluff? (3) keyword used naturally, not stuffed? (4) more specific than a typical competitor?"
+    "detail": "Partial match for \"classroom gamification\" in meta description. LLM review required: check if a synonym covers the intent naturally. | Length 124 chars �� within recommended range (120-160). | LLM review required: (1) complete sentence? (2) mentions concrete result not vague fluff? (3) keyword used naturally, not stuffed? (4) more specific than a typical competitor?"
   },
   "h1": {
     "status": "warn",

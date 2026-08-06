@@ -1,0 +1,389 @@
+{
+  "fetchTime": "2026-08-06T08:46:53.936Z",
+  "finalUrl": "https://classgamify.com/",
+  "performance": 57.0,
+  "server-response-time": {
+    "title": "Initial server response time was short",
+    "score": 1,
+    "displayValue": "Root document took 0 ms",
+    "description": "Keep the server response time for the main document short because all other requests depend on it. [Learn more about the Time to First Byte metric](https://developer.chrome.com/docs/lighthouse/performance/time-to-first-byte/).",
+    "items": [
+      {
+        "url": "https://classgamify.com/",
+        "responseTime": 3
+      }
+    ]
+  },
+  "lcp-discovery-insight": {
+    "title": "LCP request discovery",
+    "score": null,
+    "displayValue": null,
+    "description": "[Optimize LCP](https://developer.chrome.com/docs/performance/insights/lcp-discovery) by making the LCP image discoverable from the HTML immediately, and avoiding lazy-loading",
+    "items": []
+  },
+  "lcp-breakdown-insight": {
+    "title": "LCP breakdown",
+    "score": 1,
+    "displayValue": null,
+    "description": "Each [subpart has specific improvement strategies](https://developer.chrome.com/docs/performance/insights/lcp-breakdown). Ideally, most of the LCP time should be spent on loading the resources, not within delays.",
+    "items": [
+      {
+        "headings": [
+          {
+            "label": "Subpart",
+            "valueType": "text",
+            "key": "label"
+          },
+          {
+            "valueType": "ms",
+            "label": "Duration",
+            "key": "duration"
+          }
+        ],
+        "items": [
+          {
+            "duration": 3.204,
+            "label": "Time to first byte",
+            "subpart": "timeToFirstByte"
+          },
+          {
+            "subpart": "elementRenderDelay",
+            "label": "Element render delay",
+            "duration": 2151.083
+          }
+        ],
+        "type": "table"
+      },
+      {
+        "snippet": "<h1 class=\"max-w-4xl text-4xl font-bold tracking-tight text-balance sm:text-5xl md:te…\">",
+        "boundingRect": {
+          "bottom": 276,
+          "left": 16,
+          "width": 380,
+          "top": 156,
+          "height": 120,
+          "right": 396
+        },
+        "selector": "section.grid > div.min-w-0 > div.space-y-4 > h1.max-w-4xl",
+        "lhId": "page-0-H1",
+        "nodeLabel": "Make classroom practice feel like a game",
+        "path": "1,HTML,1,BODY,0,DIV,1,MAIN,1,DIV,0,DIV,0,SECTION,0,DIV,1,DIV,0,H1",
+        "type": "node"
+      }
+    ]
+  },
+  "image-delivery-insight": {
+    "title": "Improve image delivery",
+    "score": 0.5,
+    "displayValue": "Est savings of 207 KiB",
+    "description": "Reducing the download time of images can improve the perceived load time of the page and LCP. [Learn more about optimizing image size](https://developer.chrome.com/docs/performance/insights/image-delivery)",
+    "items": [
+      {
+        "url": "https://classgamify.com/logo-dark.png",
+        "subItems": {
+          "type": "subitems",
+          "items": [
+            {
+              "wastedBytes": 169279,
+              "reason": "Using a modern image format (WebP, AVIF) or increasing the image compression could improve this image's download size."
+            },
+            {
+              "wastedBytes": 210422,
+              "reason": "This image file is larger than it needs to be (512x512) for its displayed dimensions (56x56). Use responsive images to reduce the image download size."
+            }
+          ]
+        },
+        "wastedBytes": 212447,
+        "totalBytes": 212970,
+        "node": {
+          "snippet": "<img alt=\"ClassGamify logo\" class=\"size-8 rounded-md hidden dark:block\" width=\"32\" height=\"32\" decoding=\"async\" src=\"/logo-dark.png\">",
+          "boundingRect": {
+            "left": 16,
+            "right": 48,
+            "height": 32,
+            "bottom": 48,
+            "top": 16,
+            "width": 32
+          },
+          "nodeLabel": "ClassGamify logo",
+          "path": "1,HTML,1,BODY,0,DIV,0,HEADER,0,DIV,0,DIV,1,DIV,0,A,1,IMG",
+          "type": "node",
+          "selector": "div.container > div.flex > a.flex > img.size-8",
+          "lhId": "page-2-IMG"
+        }
+      }
+    ]
+  },
+  "network-dependency-tree-insight": {
+    "title": "Network dependency tree",
+    "score": 0,
+    "displayValue": null,
+    "description": "[Avoid chaining critical requests](https://developer.chrome.com/docs/performance/insights/network-dependency-tree) by reducing the length of chains, reducing the download size of resources, or deferring the download of unnecessary resources to improve page load.",
+    "items": [
+      {
+        "value": {
+          "type": "network-tree",
+          "chains": {
+            "647E369F57D2A5F5C7310F7F5E1F7382": {
+              "url": "https://classgamify.com/",
+              "children": {
+                "55.4": {
+                  "url": "https://classgamify.com/assets/styles-L6-EV5V4.css",
+                  "navStartToEndTime": 1926,
+                  "transferSize": 31524,
+                  "children": {
+                    "55.88": {
+                      "children": {},
+                      "transferSize": 23081,
+                      "url": "https://classgamify.com/fonts/bricolage-400.woff2",
+                      "navStartToEndTime": 2130
+                    },
+                    "55.90": {
+                      "navStartToEndTime": 2130,
+                      "url": "https://classgamify.com/fonts/bricolage-700.woff2",
+                      "transferSize": 23105,
+                      "children": {}
+                    },
+                    "55.89": {
+                      "children": {},
+                      "transferSize": 23173,
+                      "navStartToEndTime": 2131,
+                      "url": "https://classgamify.com/fonts/bricolage-600.woff2"
+                    }
+                  }
+                },
+                "55.47": {
+                  "children": {
+                    "55.100": {
+                      "children": {},
+                      "isLongest": true,
+                      "transferSize": 758,
+                      "navStartToEndTime": 3780,
+                      "url": "https://classgamify.com/cdn-cgi/rum?"
+                    }
+                  },
+                  "isLongest": true,
+                  "url": "https://static.cloudflareinsights.com/beacon.min.js/v4513226cdae34746b4dedf0b4dfa099e1781791509496",
+                  "transferSize": 11714,
+                  "navStartToEndTime": 1852
+                }
+              },
+              "transferSize": 10112,
+              "navStartToEndTime": 1789,
+              "isLongest": true
+            }
+          },
+          "longestChain": {
+            "duration": 3780
+          }
+        },
+        "type": "list-section"
+      },
+      {
+        "type": "list-section",
+        "description": "[preconnect](https://developer.chrome.com/docs/lighthouse/performance/uses-rel-preconnect/) hints help the browser establish a connection earlier in the page load, saving time when the first request for that origin is made. The following are the origins that the page preconnected to.",
+        "title": "Preconnected origins",
+        "value": {
+          "value": "no origins were preconnected",
+          "type": "text"
+        }
+      },
+      {
+        "type": "list-section",
+        "value": {
+          "value": "No additional origins are good candidates for preconnecting",
+          "type": "text"
+        },
+        "title": "Preconnect candidates",
+        "description": "Add [preconnect](https://developer.chrome.com/docs/lighthouse/performance/uses-rel-preconnect/) hints to your most important origins, but try to use no more than 4."
+      }
+    ]
+  },
+  "unused-javascript": {
+    "title": "Reduce unused JavaScript",
+    "score": 0,
+    "displayValue": "Est savings of 1,229 KiB",
+    "description": "Reduce unused JavaScript and defer loading scripts until they are required to decrease bytes consumed by network activity. [Learn how to reduce unused JavaScript](https://developer.chrome.com/docs/lighthouse/performance/unused-javascript/).",
+    "items": [
+      {
+        "wastedBytes": 933528,
+        "wastedPercent": 88.84935702848709,
+        "totalBytes": 1050687,
+        "url": "https://classgamify.com/assets/utils-CHF9h8Pl.js"
+      },
+      {
+        "wastedBytes": 172785,
+        "totalBytes": 294149,
+        "wastedPercent": 58.7404492254469,
+        "url": "https://classgamify.com/assets/index-CxpqhRkA.js"
+      },
+      {
+        "wastedPercent": 47.12472815811745,
+        "wastedBytes": 78287,
+        "totalBytes": 166128,
+        "url": "https://www.googletagmanager.com/gtag/js?id=G-QH46LZCPE3"
+      },
+      {
+        "url": "https://accounts.google.com/gsi/client",
+        "wastedPercent": 75.35933365407746,
+        "totalBytes": 98101,
+        "wastedBytes": 73928
+      }
+    ]
+  },
+  "unused-css-rules": {
+    "title": "Reduce unused CSS",
+    "score": 1,
+    "displayValue": null,
+    "description": "Reduce unused rules from stylesheets and defer CSS not used for above-the-fold content to decrease bytes consumed by network activity. [Learn how to reduce unused CSS](https://developer.chrome.com/docs/lighthouse/performance/unused-css-rules/).",
+    "items": []
+  },
+  "total-byte-weight": {
+    "title": "Avoids enormous network payloads",
+    "score": 1,
+    "displayValue": "Total size was 2,290 KiB",
+    "description": "Large network payloads cost users real money and are highly correlated with long load times. [Learn how to reduce payload sizes](https://developer.chrome.com/docs/lighthouse/performance/total-byte-weight/).",
+    "items": [
+      {
+        "url": "https://classgamify.com/assets/utils-CHF9h8Pl.js",
+        "totalBytes": 1095851
+      },
+      {
+        "totalBytes": 298522,
+        "url": "https://classgamify.com/assets/index-CxpqhRkA.js"
+      },
+      {
+        "url": "https://classgamify.com/logo-dark.png",
+        "totalBytes": 213693
+      },
+      {
+        "url": "https://classgamify.com/logo.png",
+        "totalBytes": 213685
+      },
+      {
+        "totalBytes": 166815,
+        "url": "https://www.googletagmanager.com/gtag/js?id=G-QH46LZCPE3"
+      },
+      {
+        "totalBytes": 99292,
+        "url": "https://accounts.google.com/gsi/client"
+      },
+      {
+        "totalBytes": 31524,
+        "url": "https://classgamify.com/assets/styles-L6-EV5V4.css"
+      },
+      {
+        "url": "https://scripts.clarity.ms/0.8.69/clarity.js",
+        "totalBytes": 25895
+      },
+      {
+        "url": "https://classgamify.com/fonts/bricolage-600.woff2",
+        "totalBytes": 23173
+      },
+      {
+        "totalBytes": 23105,
+        "url": "https://classgamify.com/fonts/bricolage-700.woff2"
+      }
+    ]
+  },
+  "mainthread-work-breakdown": {
+    "title": "Minimize main-thread work",
+    "score": 0.5,
+    "displayValue": "3.3 s",
+    "description": "Consider reducing the time spent parsing, compiling and executing JS. You may find delivering smaller JS payloads helps with this. [Learn how to minimize main-thread work](https://developer.chrome.com/docs/lighthouse/performance/mainthread-work-breakdown/)",
+    "items": [
+      {
+        "group": "scriptParseCompile",
+        "duration": 1414.5492000000006,
+        "groupLabel": "Script Parsing & Compilation"
+      },
+      {
+        "duration": 771.8915999999989,
+        "groupLabel": "Script Evaluation",
+        "group": "scriptEvaluation"
+      },
+      {
+        "group": "other",
+        "duration": 598.3331999999982,
+        "groupLabel": "Other"
+      },
+      {
+        "duration": 247.53,
+        "group": "styleLayout",
+        "groupLabel": "Style & Layout"
+      },
+      {
+        "groupLabel": "Garbage Collection",
+        "group": "garbageCollection",
+        "duration": 217.10519999999994
+      },
+      {
+        "group": "parseHTML",
+        "groupLabel": "Parse HTML & CSS",
+        "duration": 21.887999999999998
+      },
+      {
+        "group": "paintCompositeRender",
+        "groupLabel": "Rendering",
+        "duration": 19.684799999999996
+      }
+    ]
+  },
+  "bootup-time": {
+    "title": "Reduce JavaScript execution time",
+    "score": 0.5,
+    "displayValue": "2.1 s",
+    "description": "Consider reducing the time spent parsing, compiling, and executing JS. You may find delivering smaller JS payloads helps with this. [Learn how to reduce Javascript execution time](https://developer.chrome.com/docs/lighthouse/performance/bootup-time/).",
+    "items": [
+      {
+        "url": "https://classgamify.com/assets/utils-CHF9h8Pl.js",
+        "scriptParseCompile": 1161.7235999999998,
+        "scripting": 0,
+        "total": 1239.0156
+      },
+      {
+        "total": 540.9371999999993,
+        "url": "https://classgamify.com/assets/index-CxpqhRkA.js",
+        "scriptParseCompile": 95.21759999999998,
+        "scripting": 427.6655999999993
+      },
+      {
+        "scriptParseCompile": 0,
+        "scripting": 4.414799999999999,
+        "total": 459.7103999999987,
+        "url": "Unattributable"
+      },
+      {
+        "scriptParseCompile": 1.744799999999999,
+        "total": 299.6556,
+        "url": "https://classgamify.com/",
+        "scripting": 15.309599999999996
+      },
+      {
+        "scriptParseCompile": 79.4124,
+        "total": 195.6768000000001,
+        "url": "https://www.googletagmanager.com/gtag/js?id=G-QH46LZCPE3",
+        "scripting": 114.8424000000001
+      },
+      {
+        "scriptParseCompile": 10.6824,
+        "scripting": 92.50199999999995,
+        "url": "https://scripts.clarity.ms/0.8.69/clarity.js",
+        "total": 111.45119999999994
+      },
+      {
+        "scriptParseCompile": 29.255999999999997,
+        "url": "https://accounts.google.com/gsi/client",
+        "scripting": 39.35520000000003,
+        "total": 68.85840000000003
+      }
+    ]
+  },
+  "font-display-insight": {
+    "title": "Font display",
+    "score": 1,
+    "displayValue": null,
+    "description": "Consider setting [`font-display`](https://developer.chrome.com/docs/performance/insights/font-display) to `swap` or `optional` to ensure text is consistently visible. `swap` can be further optimized to mitigate layout shifts with [font metric overrides](https://developer.chrome.com/blog/font-fallbacks).",
+    "items": []
+  }
+}
