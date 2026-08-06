@@ -2,6 +2,7 @@ import { Routes } from '@/lib/routes';
 
 export type PublicIndexableRouteId =
   | 'blog'
+  | 'about'
   | 'contact'
   | 'cookie'
   | 'create'
@@ -70,6 +71,12 @@ export const PUBLIC_INDEXABLE_STATIC_ROUTES = [
     priority: '0.7',
   },
   {
+    id: 'about',
+    path: Routes.About,
+    changefreq: 'monthly',
+    priority: '0.6',
+  },
+  {
     id: 'teachers',
     path: Routes.Teachers,
     changefreq: 'monthly',
@@ -114,7 +121,6 @@ export const PUBLIC_ROBOTS_DISALLOW_RULES = [
 ] as const satisfies readonly PublicRobotsDisallowRule[];
 
 export const RETIRED_LEGACY_PUBLIC_PATHS = [
-  '/about',
   '/ai',
   '/changelog',
   '/hanzi',

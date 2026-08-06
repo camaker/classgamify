@@ -100,12 +100,7 @@ const LEGACY_PUBLIC_ROUTE_PATH_ITEMS = {
   'learn-path': '/learn',
   'settings-credits-path': '/settings/credits',
   'waitlist-path': '/waitlist',
-} as const satisfies Partial<
-  Record<
-    LegacyPublicRouteHandoffItemId,
-    (typeof RETIRED_LEGACY_PUBLIC_PATHS)[number]
-  >
->;
+} as const satisfies Partial<Record<LegacyPublicRouteHandoffItemId, string>>;
 
 const PROTECTED_ROBOTS_BOUNDARY_PATHS = [
   Routes.Dashboard,

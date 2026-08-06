@@ -1,0 +1,47 @@
+{
+  "url": "https://classgamify.com",
+  "final_url": "https://classgamify.com/",
+  "http_status": 200,
+  "redirect_chain": [],
+  "url_slug": {
+    "status": "pass",
+    "slug": "/",
+    "is_homepage": true,
+    "keyword_match": "unverified",
+    "llm_review_required": false,
+    "detail": "Homepage detected — URL slug check not applicable."
+  },
+  "title": {
+    "status": "warn",
+    "value": "ClassGamify | AI-ready classroom activity platform",
+    "length": 50,
+    "keyword_match": "partial",
+    "keyword_position": "middle",
+    "llm_review_required": true,
+    "detail": "Partial match for \"classroom gamification\" in title: \"ClassGamify | AI-ready classroom activity platform\". Script cannot determine semantic intent alignment. LLM review required: does this title cover the keyword's search intent? Is it grammatically natural? | Length 50 chars — within recommended range (50-60)."
+  },
+  "meta_description": {
+    "status": "warn",
+    "value": "Create game-based classroom activities, publish student play links, and track assignment results from one teacher workspace.",
+    "length": 124,
+    "keyword_match": "partial",
+    "llm_review_required": true,
+    "detail": "Partial match for \"classroom gamification\" in meta description. LLM review required: check if a synonym covers the intent naturally. | Length 124 chars — within recommended range (120-160). | LLM review required: (1) complete sentence? (2) mentions concrete result not vague fluff? (3) keyword used naturally, not stuffed? (4) more specific than a typical competitor?"
+  },
+  "h1": {
+    "status": "warn",
+    "count": 1,
+    "values": [
+      "Make classroom practice feel like a game"
+    ],
+    "keyword_match": "partial",
+    "llm_review_required": true,
+    "detail": "Partial string match for \"classroom gamification\" in H1: \"Make classroom practice feel like a game\". Script cannot determine semantic intent alignment. LLM review required: does this H1 cover the search intent of the keyword?"
+  },
+  "canonical": {
+    "status": "pass",
+    "value": "https://classgamify.com/",
+    "matches_final_url": true,
+    "detail": "Self-referencing canonical present."
+  }
+}

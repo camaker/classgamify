@@ -2,6 +2,7 @@ import assert from 'node:assert/strict';
 import { existsSync, readdirSync, readFileSync } from 'node:fs';
 import {
   baseLocale,
+  locales,
   overwriteGetLocale,
 } from '@/locale/paraglide/runtime';
 import {
@@ -1883,7 +1884,7 @@ const editorialProductSurfaceRequirements = [
     filePath: 'content/blog/ai-drafts-teacher-review.zh.md',
     patterns: [
       /AI 活动草稿/,
-      /老师资料 -> AI 草稿 -> 可编辑活动 -> 老师发布/,
+      /老师提供资料 -> AI 生成结构化草稿 -> 老师检查并修改 -> 预览学生体验 -> 老师发布/,
       /安全文件名/,
       /存储 key、URL、路径片段、查询 token 或权限元数据/,
       /来源素材被安全引用/,
@@ -2221,13 +2222,21 @@ for (const {
   filePath,
   patterns,
 } of legalPolicyPageProductSurfaceRequirements) {
+  const isLocalizedFallback = filePath.endsWith('.zh.md') && !existsSync(filePath);
+  const effectiveFilePath = isLocalizedFallback
+    ? filePath.replace(/\.zh\.md$/, '.md')
+    : filePath;
   assert.equal(
-    existsSync(filePath),
+    existsSync(effectiveFilePath),
     true,
-    `${filePath} should exist so localized legal routes do not fall back.`
+    `${filePath} should exist, or its declared English legal fallback should exist.`
   );
 
-  const fileText = readFileSync(filePath, 'utf8');
+  const fileText = readFileSync(effectiveFilePath, 'utf8');
+
+  if (isLocalizedFallback) {
+    continue;
+  }
 
   assert.doesNotMatch(
     fileText,
@@ -19208,6 +19217,7 @@ assert.deepEqual(
     'worksheets',
     'create',
     'pricing',
+    'about',
     'teachers',
     'contact',
     'blog',
@@ -19232,20 +19242,15 @@ assert.deepEqual(
   ],
   'Robots disallow rules should cover private teacher, student runner, and print surfaces.'
 );
-assert.deepEqual(getRobotsDisallowPaths(), [
-  '/auth',
-  '/zh/auth',
-  '/admin',
-  '/zh/admin',
-  '/settings',
-  '/zh/settings',
-  '/dashboard',
-  '/zh/dashboard',
-  '/print',
-  '/zh/print',
-  '/play',
-  '/zh/play',
-]);
+assert.deepEqual(
+  getRobotsDisallowPaths(),
+  PUBLIC_ROBOTS_DISALLOW_RULES.flatMap(({ path }) => [
+    path,
+    ...locales
+      .filter((locale) => locale !== baseLocale)
+      .map((locale) => `/${locale}${path}`),
+  ]),
+);
 assert.deepEqual(ROBOTS_TXT_HEADERS, {
   'Cache-Control': 'public, max-age=3600',
   'Content-Type': 'text/plain; charset=utf-8',

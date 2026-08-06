@@ -26,6 +26,7 @@ export const Routes = {
   Features: '/#features',
   Faqs: '/#faqs',
   Pricing: '/pricing',
+  About: '/about',
   Teachers: '/teachers',
   Blog: '/blog',
   Roadmap: '/roadmap',

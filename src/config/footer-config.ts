@@ -81,6 +81,13 @@ export function getFooterLinks(): MenuItemConfig[] {
       external: false,
     },
     {
+      id: 'about',
+      title: m.nav_about_title(),
+      href: Routes.About,
+      description: m.teachers_page_description(),
+      external: false,
+    },
+    {
       id: 'teachers',
       title: m.footer_link_teachers(),
       href: Routes.Teachers,

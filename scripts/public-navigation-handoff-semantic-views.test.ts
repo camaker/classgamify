@@ -131,7 +131,7 @@ test('public navigation handoff comes from shared navbar and footer configs', ()
         ['templates', 'worksheets', 'create', 'student-preview', 'pricing'],
       ],
       ['platform', ['activities', 'assignments']],
-      ['support', ['roadmap', 'articles', 'support', 'teachers']],
+      ['support', ['roadmap', 'articles', 'support', 'about', 'teachers']],
       ['legal', ['privacy', 'cookies', 'terms']],
     ]
   );

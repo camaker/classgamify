@@ -1,0 +1,80 @@
+{
+  "url": "reports\\audit-data\\page.html",
+  "status": "warn",
+  "schemas": [
+    {
+      "types": [
+        "Organization"
+      ],
+      "status": "warn",
+      "fields_present": [
+        "name",
+        "url",
+        "logo"
+      ],
+      "fields_missing": [],
+      "recommended_missing": [
+        "sameAs"
+      ],
+      "nested_issues": [],
+      "detail": "Organization: missing recommended: sameAs."
+    },
+    {
+      "types": [
+        "WebSite"
+      ],
+      "status": "warn",
+      "fields_present": [
+        "name",
+        "url"
+      ],
+      "fields_missing": [],
+      "recommended_missing": [
+        "potentialAction"
+      ],
+      "nested_issues": [],
+      "detail": "WebSite: missing recommended: potentialAction."
+    }
+  ],
+  "parse_errors": [],
+  "found_types": [
+    "Organization",
+    "WebSite"
+  ],
+  "inferred_page_type": "unknown",
+  "expected_types": [],
+  "has_expected_type": false,
+  "has_type_conflicts": false,
+  "page_language": "en",
+  "canonical_url": "https://classgamify.com/",
+  "hreflang_urls": {
+    "en": "https://classgamify.com/",
+    "zh-CN": "https://classgamify.com/zh/",
+    "fr": "https://classgamify.com/fr/",
+    "de": "https://classgamify.com/de/",
+    "ja": "https://classgamify.com/ja/",
+    "ko": "https://classgamify.com/ko/",
+    "it": "https://classgamify.com/it/",
+    "es": "https://classgamify.com/es/",
+    "pt-BR": "https://classgamify.com/pt-BR/",
+    "ar": "https://classgamify.com/ar/",
+    "x-default": "https://classgamify.com/"
+  },
+  "localized_schema": {
+    "status": "pass",
+    "page_language": "en",
+    "schema_languages": [
+      "en"
+    ],
+    "schema_urls": [
+      "https://classgamify.com",
+      "https://classgamify.com/"
+    ],
+    "multilingual": true,
+    "issues": [],
+    "fixes": [],
+    "detail": "Localized schema matches page language."
+  },
+  "detail": "Found 2 JSON-LD block(s): Organization, WebSite. Organization: missing recommended: sameAs. WebSite: missing recommended: potentialAction.",
+  "llm_review_required": true
+}

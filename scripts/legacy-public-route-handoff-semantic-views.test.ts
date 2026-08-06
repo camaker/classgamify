@@ -8,6 +8,7 @@ import { Routes } from '@/lib/routes';
 import { localizeHref, locales } from '@/lib/locale';
 import { overwriteGetLocale } from '@/locale/paraglide/runtime';
 import { buildHomePageViewModel } from '@/pages/public-page-view';
+import { redirectLegacyPublicRoute } from '@/seo/legacy-public-redirects';
 import {
   buildSitemapUrlEntries,
   getRobotsDisallowPaths,
@@ -36,11 +37,13 @@ type RetiredLegacyPath = (typeof RETIRED_LEGACY_PUBLIC_PATHS)[number];
 
 const ROUTE_TREE_SOURCE = readFileSync('src/routeTree.gen.ts', 'utf8');
 const PUBLIC_ROUTES_SOURCE = readFileSync('src/seo/public-routes.ts', 'utf8');
-const SERVER_SOURCE = readFileSync('src/server.ts', 'utf8');
+const REDIRECT_SOURCE = readFileSync(
+  'src/seo/legacy-public-redirects.ts',
+  'utf8'
+);
 const TEST_CATALOG_SOURCE = readFileSync('tests/e2e/TEST-CATALOG.md', 'utf8');
 
 const RETIRED_ROUTE_MODULE_CANDIDATES = {
-  '/about': ['src/routes/(pages)/about.tsx', 'src/routes/about.tsx'],
   '/ai': ['src/routes/(pages)/ai.tsx', 'src/routes/ai.tsx'],
   '/changelog': [
     'src/routes/(pages)/changelog.tsx',
@@ -56,10 +59,15 @@ const RETIRED_ROUTE_MODULE_CANDIDATES = {
 const EVIDENCE = buildLegacyPublicRouteEvidence();
 
 test('leaked route-group URLs redirect only to their canonical public pages', () => {
-  assert.match(SERVER_SOURCE, /\['\/\(pages\)\/roadmap', '\/roadmap'\]/);
-  assert.match(SERVER_SOURCE, /\['\/\(legals\)\/terms', '\/terms'\]/);
-  assert.match(SERVER_SOURCE, /\['\/\(legals\)\/terms\/terms', '\/terms'\]/);
-  assert.match(SERVER_SOURCE, /Response\.redirect\(url, 308\)/);
+  assert.match(REDIRECT_SOURCE, /\['\/\(pages\)\/roadmap', '\/roadmap'\]/);
+  assert.match(REDIRECT_SOURCE, /\['\/\(legals\)\/terms', '\/terms'\]/);
+  assert.match(REDIRECT_SOURCE, /\['\/\(legals\)\/terms\/terms', '\/terms'\]/);
+  assert.match(REDIRECT_SOURCE, /Response\.redirect\(url, 308\)/);
+  assert.ok(
+    redirectLegacyPublicRoute(
+      new Request('https://example.test/(pages)/roadmap')
+    )
+  );
 });
 
 test('legacy public route handoff exposes 30 safe retirement slices', () => {
@@ -103,10 +111,10 @@ test('legacy public route handoff summarizes current retired-route state', () =>
   assert.deepEqual(
     handoffView.itemViews.map((item) => [item.id, item.value]),
     [
-      ['retired-inventory-count', '8 paths'],
+      ['retired-inventory-count', '7 paths'],
       [
         'retired-path-list',
-        '/about, /ai, /changelog, /hanzi, /hsk, /learn, /settings/credits, /waitlist',
+        '/ai, /changelog, /hanzi, /hsk, /learn, /settings/credits, /waitlist',
       ],
       ['mounted-route-count', '0 mounted'],
       ['route-tree-boundary', 'No generated routes'],
@@ -150,7 +158,7 @@ test('legacy public route handoff localizes Chinese retirement boundaries', () =
     assert.match(handoffView.description, /30 切片旧公开路径退役契约/);
     assert.equal(
       getHandoffValue(handoffView, 'retired-inventory-count'),
-      '8 个路径'
+      '7 个路径'
     );
     assert.equal(
       getHandoffValue(handoffView, 'mounted-route-count'),
@@ -188,7 +196,6 @@ test('retired legacy route evidence comes from generated routes and public helpe
   assert.deepEqual(
     [...RETIRED_LEGACY_PUBLIC_PATHS],
     [
-      '/about',
       '/ai',
       '/changelog',
       '/hanzi',

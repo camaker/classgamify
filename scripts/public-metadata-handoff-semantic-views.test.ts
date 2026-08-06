@@ -89,7 +89,7 @@ test('public metadata handoff exposes 30 indexing and install slices', () => {
       ['indexable-entrypoints', '9'],
       ['route-helper-source', 'Routes constants'],
       ['localized-path-registry', String(PUBLIC_LOCALIZED_PATHS.length)],
-      ['localized-alternate-links', '2 locales'],
+      ['localized-alternate-links', '10 locales'],
       ['x-default-alternate', 'Included'],
       ['sitemap-url-count', String(sitemapEntries.length)],
       ['sitemap-static-count', String(PUBLIC_INDEXABLE_STATIC_ROUTES.length)],
@@ -99,7 +99,7 @@ test('public metadata handoff exposes 30 indexing and install slices', () => {
       ['sitemap-base-url', NORMALIZED_BASE_URL],
       ['robots-rule-registry', String(PUBLIC_ROBOTS_DISALLOW_RULES.length)],
       ['robots-disallow-paths', String(getRobotsDisallowPaths().length)],
-      ['robots-localized-variants', '2 per rule'],
+      ['robots-localized-variants', '10 per rule'],
       ['robots-dashboard-boundary', 'Blocked'],
       ['robots-settings-boundary', 'Blocked'],
       ['robots-student-runner-boundary', 'Blocked'],
@@ -133,7 +133,7 @@ test('public metadata handoff localizes Chinese boundaries', () => {
     );
     assert.equal(
       getHandoffValue(handoffView, 'localized-alternate-links'),
-      '2 种语言'
+      '10 种语言'
     );
     assert.equal(
       getHandoffValue(handoffView, 'robots-student-runner-boundary'),

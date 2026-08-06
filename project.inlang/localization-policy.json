@@ -137,6 +137,7 @@
     ],
     "site": ["site_description", "site_name", "site_title"],
     "nav": [
+      "nav_about_title",
       "nav_blog",
       "nav_changelog_description",
       "nav_changelog_title",

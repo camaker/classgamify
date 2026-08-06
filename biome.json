@@ -22,6 +22,7 @@
       "!node_modules",
       "!dist",
       "!build",
+      "!reports",
       "!playwright-report",
       "!test-results",
       "!.wrangler",

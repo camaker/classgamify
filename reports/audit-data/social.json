@@ -1,0 +1,70 @@
+{
+  "url": "reports\\audit-data\\page.html",
+  "status": "pass",
+  "og": {
+    "status": "pass",
+    "fields": {
+      "title": {
+        "present": true,
+        "value": "ClassGamify | AI-ready classroom activity platform",
+        "length": 50,
+        "status": "pass"
+      },
+      "description": {
+        "present": true,
+        "value": "Create game-based classroom activities, publish student play links, and track assignment results from one teacher workspace.",
+        "length": 124,
+        "status": "pass"
+      },
+      "image": {
+        "present": true,
+        "value": "https://classgamify.com/og.png",
+        "status": "pass"
+      },
+      "type": {
+        "present": true,
+        "value": "website",
+        "status": "pass"
+      },
+      "url": {
+        "present": true,
+        "value": "https://classgamify.com/",
+        "status": "pass"
+      }
+    },
+    "issues": [],
+    "warnings": [],
+    "detail": "All OG tags present and valid."
+  },
+  "twitter_card": {
+    "status": "pass",
+    "fields": {
+      "card": {
+        "present": true,
+        "value": "summary_large_image",
+        "status": "pass"
+      },
+      "title": {
+        "present": true,
+        "value": "ClassGamify | AI-ready classroom activity platform",
+        "length": 50,
+        "status": "pass"
+      },
+      "description": {
+        "present": true,
+        "value": "Create game-based classroom activities, publish student play links, and track assignment results from one teacher workspace.",
+        "length": 124,
+        "status": "pass"
+      },
+      "image": {
+        "present": true,
+        "value": "https://classgamify.com/og.png",
+        "status": "pass"
+      }
+    },
+    "issues": [],
+    "warnings": [],
+    "detail": "Twitter Card valid with all fields present or fallback available."
+  },
+  "detail": "OG: pass. Twitter Card: pass."
+}

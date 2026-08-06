@@ -16,6 +16,7 @@ const publicPages = [
   { path: '/worksheets', name: 'worksheets' },
   { path: '/play/demo-food', name: 'student play demo' },
   { path: '/pricing', name: 'pricing' },
+  { path: '/about', name: 'about' },
   { path: '/teachers', name: 'teachers' },
   { path: '/contact', name: 'contact' },
   { path: '/contact?subject=classroom', name: 'classroom contact' },

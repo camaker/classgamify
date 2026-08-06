@@ -45,6 +45,7 @@ import { Route as pagesTeachersRouteImport } from './routes/(pages)/teachers'
 import { Route as pagesRoadmapRouteImport } from './routes/(pages)/roadmap'
 import { Route as pagesPricingRouteImport } from './routes/(pages)/pricing'
 import { Route as pagesContactRouteImport } from './routes/(pages)/contact'
+import { Route as pagesAboutRouteImport } from './routes/(pages)/about'
 import { Route as legalsTermsRouteImport } from './routes/(legals)/terms'
 import { Route as legalsPrivacyRouteImport } from './routes/(legals)/privacy'
 import { Route as legalsCookieRouteImport } from './routes/(legals)/cookie'
@@ -240,6 +241,11 @@ const pagesContactRoute = pagesContactRouteImport.update({
   path: '/contact',
   getParentRoute: () => rootRouteImport,
 } as any)
+const pagesAboutRoute = pagesAboutRouteImport.update({
+  id: '/(pages)/about',
+  path: '/about',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const legalsTermsRoute = legalsTermsRouteImport.update({
   id: '/(legals)/terms',
   path: '/terms',
@@ -329,6 +335,7 @@ export interface FileRoutesByFullPath {
   '/cookie': typeof legalsCookieRoute
   '/privacy': typeof legalsPrivacyRoute
   '/terms': typeof legalsTermsRoute
+  '/about': typeof pagesAboutRoute
   '/contact': typeof pagesContactRoute
   '/pricing': typeof pagesPricingRoute
   '/roadmap': typeof pagesRoadmapRoute
@@ -378,6 +385,7 @@ export interface FileRoutesByTo {
   '/cookie': typeof legalsCookieRoute
   '/privacy': typeof legalsPrivacyRoute
   '/terms': typeof legalsTermsRoute
+  '/about': typeof pagesAboutRoute
   '/contact': typeof pagesContactRoute
   '/pricing': typeof pagesPricingRoute
   '/roadmap': typeof pagesRoadmapRoute
@@ -431,6 +439,7 @@ export interface FileRoutesById {
   '/(legals)/cookie': typeof legalsCookieRoute
   '/(legals)/privacy': typeof legalsPrivacyRoute
   '/(legals)/terms': typeof legalsTermsRoute
+  '/(pages)/about': typeof pagesAboutRoute
   '/(pages)/contact': typeof pagesContactRoute
   '/(pages)/pricing': typeof pagesPricingRoute
   '/(pages)/roadmap': typeof pagesRoadmapRoute
@@ -485,6 +494,7 @@ export interface FileRouteTypes {
     | '/cookie'
     | '/privacy'
     | '/terms'
+    | '/about'
     | '/contact'
     | '/pricing'
     | '/roadmap'
@@ -534,6 +544,7 @@ export interface FileRouteTypes {
     | '/cookie'
     | '/privacy'
     | '/terms'
+    | '/about'
     | '/contact'
     | '/pricing'
     | '/roadmap'
@@ -586,6 +597,7 @@ export interface FileRouteTypes {
     | '/(legals)/cookie'
     | '/(legals)/privacy'
     | '/(legals)/terms'
+    | '/(pages)/about'
     | '/(pages)/contact'
     | '/(pages)/pricing'
     | '/(pages)/roadmap'
@@ -639,6 +651,7 @@ export interface RootRouteChildren {
   legalsCookieRoute: typeof legalsCookieRoute
   legalsPrivacyRoute: typeof legalsPrivacyRoute
   legalsTermsRoute: typeof legalsTermsRoute
+  pagesAboutRoute: typeof pagesAboutRoute
   pagesContactRoute: typeof pagesContactRoute
   pagesPricingRoute: typeof pagesPricingRoute
   pagesRoadmapRoute: typeof pagesRoadmapRoute
@@ -912,6 +925,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof pagesContactRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/(pages)/about': {
+      id: '/(pages)/about'
+      path: '/about'
+      fullPath: '/about'
+      preLoaderRoute: typeof pagesAboutRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/(legals)/terms': {
       id: '/(legals)/terms'
       path: '/terms'
@@ -1120,6 +1140,7 @@ const rootRouteChildren: RootRouteChildren = {
   legalsCookieRoute: legalsCookieRoute,
   legalsPrivacyRoute: legalsPrivacyRoute,
   legalsTermsRoute: legalsTermsRoute,
+  pagesAboutRoute: pagesAboutRoute,
   pagesContactRoute: pagesContactRoute,
   pagesPricingRoute: pagesPricingRoute,
   pagesRoadmapRoute: pagesRoadmapRoute,

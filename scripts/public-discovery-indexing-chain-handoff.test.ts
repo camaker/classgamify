@@ -238,6 +238,7 @@ test('public route registry and indexing helpers keep crawlable routes aligned',
       ['worksheets', Routes.Worksheets],
       ['create', Routes.Create],
       ['pricing', Routes.Pricing],
+      ['about', Routes.About],
       ['teachers', Routes.Teachers],
       ['contact', Routes.Contact],
       ['blog', Routes.Blog],
@@ -261,7 +262,6 @@ test('public route registry and indexing helpers keep crawlable routes aligned',
   assert.deepEqual(
     [...RETIRED_LEGACY_PUBLIC_PATHS],
     [
-      '/about',
       '/ai',
       '/changelog',
       '/hanzi',
@@ -300,7 +300,7 @@ test('public indexing route handlers delegate to shared helpers', () => {
   );
   assert.match(
     PUBLIC_ROUTES_SOURCE,
-    /RETIRED_LEGACY_PUBLIC_PATHS[\s\S]*'\/about'[\s\S]*'\/learn'[\s\S]*'\/waitlist'/
+    /RETIRED_LEGACY_PUBLIC_PATHS[\s\S]*'\/ai'[\s\S]*'\/learn'[\s\S]*'\/waitlist'/
   );
   assert.match(
     PUBLIC_INDEXING_SOURCE,
