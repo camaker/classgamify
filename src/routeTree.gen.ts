@@ -17,6 +17,8 @@ import { Route as RobotsDottxtRouteImport } from './routes/robots[.]txt'
 import { Route as ManifestDotjsonRouteImport } from './routes/manifest[.]json'
 import { Route as DashboardRouteImport } from './routes/dashboard'
 import { Route as CreateRouteImport } from './routes/create'
+import { Route as ClassroomQuizGameRouteImport } from './routes/classroom-quiz-game'
+import { Route as ClassroomMatchingGameRouteImport } from './routes/classroom-matching-game'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AdminRouteImport } from './routes/admin'
 import { Route as IndexRouteImport } from './routes/index'
@@ -99,6 +101,16 @@ const DashboardRoute = DashboardRouteImport.update({
 const CreateRoute = CreateRouteImport.update({
   id: '/create',
   path: '/create',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ClassroomQuizGameRoute = ClassroomQuizGameRouteImport.update({
+  id: '/classroom-quiz-game',
+  path: '/classroom-quiz-game',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ClassroomMatchingGameRoute = ClassroomMatchingGameRouteImport.update({
+  id: '/classroom-matching-game',
+  path: '/classroom-matching-game',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthRoute = AuthRouteImport.update({
@@ -324,6 +336,8 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/admin': typeof AdminRouteWithChildren
   '/auth': typeof AuthRouteWithChildren
+  '/classroom-matching-game': typeof ClassroomMatchingGameRoute
+  '/classroom-quiz-game': typeof ClassroomQuizGameRoute
   '/create': typeof CreateRoute
   '/dashboard': typeof DashboardRouteWithChildren
   '/manifest.json': typeof ManifestDotjsonRoute
@@ -376,6 +390,8 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRouteWithChildren
+  '/classroom-matching-game': typeof ClassroomMatchingGameRoute
+  '/classroom-quiz-game': typeof ClassroomQuizGameRoute
   '/create': typeof CreateRoute
   '/manifest.json': typeof ManifestDotjsonRoute
   '/robots.txt': typeof RobotsDottxtRoute
@@ -428,6 +444,8 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/admin': typeof AdminRouteWithChildren
   '/auth': typeof AuthRouteWithChildren
+  '/classroom-matching-game': typeof ClassroomMatchingGameRoute
+  '/classroom-quiz-game': typeof ClassroomQuizGameRoute
   '/create': typeof CreateRoute
   '/dashboard': typeof DashboardRouteWithChildren
   '/manifest.json': typeof ManifestDotjsonRoute
@@ -483,6 +501,8 @@ export interface FileRouteTypes {
     | '/'
     | '/admin'
     | '/auth'
+    | '/classroom-matching-game'
+    | '/classroom-quiz-game'
     | '/create'
     | '/dashboard'
     | '/manifest.json'
@@ -535,6 +555,8 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/auth'
+    | '/classroom-matching-game'
+    | '/classroom-quiz-game'
     | '/create'
     | '/manifest.json'
     | '/robots.txt'
@@ -586,6 +608,8 @@ export interface FileRouteTypes {
     | '/'
     | '/admin'
     | '/auth'
+    | '/classroom-matching-game'
+    | '/classroom-quiz-game'
     | '/create'
     | '/dashboard'
     | '/manifest.json'
@@ -640,6 +664,8 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AdminRoute: typeof AdminRouteWithChildren
   AuthRoute: typeof AuthRouteWithChildren
+  ClassroomMatchingGameRoute: typeof ClassroomMatchingGameRoute
+  ClassroomQuizGameRoute: typeof ClassroomQuizGameRoute
   CreateRoute: typeof CreateRoute
   DashboardRoute: typeof DashboardRouteWithChildren
   ManifestDotjsonRoute: typeof ManifestDotjsonRoute
@@ -727,6 +753,20 @@ declare module '@tanstack/react-router' {
       path: '/create'
       fullPath: '/create'
       preLoaderRoute: typeof CreateRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/classroom-quiz-game': {
+      id: '/classroom-quiz-game'
+      path: '/classroom-quiz-game'
+      fullPath: '/classroom-quiz-game'
+      preLoaderRoute: typeof ClassroomQuizGameRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/classroom-matching-game': {
+      id: '/classroom-matching-game'
+      path: '/classroom-matching-game'
+      fullPath: '/classroom-matching-game'
+      preLoaderRoute: typeof ClassroomMatchingGameRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/auth': {
@@ -1129,6 +1169,8 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AdminRoute: AdminRouteWithChildren,
   AuthRoute: AuthRouteWithChildren,
+  ClassroomMatchingGameRoute: ClassroomMatchingGameRoute,
+  ClassroomQuizGameRoute: ClassroomQuizGameRoute,
   CreateRoute: CreateRoute,
   DashboardRoute: DashboardRouteWithChildren,
   ManifestDotjsonRoute: ManifestDotjsonRoute,

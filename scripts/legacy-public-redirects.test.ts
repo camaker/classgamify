@@ -3,9 +3,13 @@ import { describe, it } from 'node:test';
 import { redirectLegacyPublicRoute } from '../src/seo/legacy-public-redirects';
 
 const cases = [
+  ['/blog/$slug', '/blog'],
+  ['/blog/%24slug', '/blog'],
   ['/create/create', '/create'],
+  ['/(pages)/about', '/about'],
   ['/(pages)/teachers', '/teachers'],
   ['/(pages)/contact', '/contact'],
+  ['/(pages)/contact/contact', '/contact'],
   ['/(pages)/roadmap', '/roadmap'],
   ['/(legals)/terms', '/terms'],
   ['/(legals)/cookie', '/cookie'],

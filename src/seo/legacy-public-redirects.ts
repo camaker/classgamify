@@ -1,7 +1,11 @@
 const LEGACY_PUBLIC_REDIRECTS = new Map([
+  ['/blog/$slug', '/blog'],
+  ['/blog/%24slug', '/blog'],
   ['/create/create', '/create'],
+  ['/(pages)/about', '/about'],
   ['/(pages)/teachers', '/teachers'],
   ['/(pages)/contact', '/contact'],
+  ['/(pages)/contact/contact', '/contact'],
   ['/(pages)/roadmap', '/roadmap'],
   ['/(legals)/terms', '/terms'],
   ['/(legals)/cookie', '/cookie'],

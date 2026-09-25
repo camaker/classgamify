@@ -197,6 +197,75 @@ test.describe('public page smoke coverage', () => {
     monitor.expectNoErrors('home login modal');
   });
 
+  test('shows the starter preview before scrolling on desktop and mobile', async ({
+    page,
+  }) => {
+    await setTheme(page, 'light');
+    const monitor = installPageHealthMonitor(page);
+
+    for (const viewport of [
+      { width: 1280, height: 720 },
+      { width: 390, height: 844 },
+    ]) {
+      await page.setViewportSize(viewport);
+      await expectHealthyPage(page, monitor, '/', { theme: 'light' });
+      await page.evaluate(() => document.fonts.ready);
+
+      const preview = page.getByRole('region', {
+        name: getLocaleMessage('en', 'home_hero_preview_label'),
+      });
+      await expect(preview).toBeVisible();
+      const previewBox = await preview.boundingBox();
+      const signalBox = await page
+        .getByRole('heading', {
+          name: getLocaleMessage('en', 'home_signal_panel_title'),
+        })
+        .boundingBox();
+      expect(previewBox).not.toBeNull();
+      expect(signalBox).not.toBeNull();
+      if (!previewBox || !signalBox) continue;
+      expect(previewBox.y).toBeLessThan(viewport.height);
+      expect(signalBox.y).toBeGreaterThan(previewBox.y);
+    }
+
+    const sampleLink = page.getByRole('link', {
+      name: getLocaleMessage('en', 'home_hero_play_sample'),
+    });
+    await expect(sampleLink).toHaveAttribute('href', '/play/demo-food');
+    await sampleLink.click();
+    await expect(page).toHaveURL(/\/play\/demo-food$/);
+    monitor.expectNoErrors('home starter preview');
+  });
+
+  for (const locale of ['en', 'zh'] as const) {
+    test(`warns guests before editing an activity in ${locale}`, async ({
+      page,
+    }) => {
+      await setTheme(page, 'light');
+      const monitor = installPageHealthMonitor(page);
+      await expectHealthyPage(page, monitor, localizedPath('/create', locale), {
+        theme: 'light',
+      });
+
+      await expect(
+        page.getByText(
+          getLocaleMessage(locale, 'create_guest_save_notice_title')
+        )
+      ).toBeVisible();
+      await expect(
+        page.getByText(
+          getLocaleMessage(locale, 'create_guest_save_notice_description')
+        )
+      ).toBeVisible();
+      await expect(
+        page.getByRole('link', {
+          name: getLocaleMessage(locale, 'create_guest_register_action'),
+        })
+      ).toHaveAttribute('href', /\/auth\/register\?/);
+      monitor.expectNoErrors(`guest create notice ${locale}`);
+    });
+  }
+
   for (const { fieldKeys, locale } of classroomContactCases) {
     test(`shows classroom inquiry fields in ${locale}`, async ({ page }) => {
       await setTheme(page, 'light');
@@ -293,6 +362,37 @@ test.describe('public page smoke coverage', () => {
           name: getLocaleMessage(locale, 'templates_page_title'),
         })
       ).toBeVisible();
+
+      await expect(page.locator('[data-template-example]')).toHaveCount(
+        templateEntryCases.length
+      );
+      await expect(
+        page.locator('[data-template-example="quiz"]')
+      ).toContainText(getLocaleMessage(locale, 'activity_scaffold_quiz_title'));
+      await expect(
+        page.locator('[data-template-example="matching-pairs"]')
+      ).toContainText(
+        getLocaleMessage(locale, 'activity_scaffold_matching_pairs_title')
+      );
+      if (locale === 'en') {
+        await expect(
+          page.getByRole('link', {
+            name: getLocaleMessage(locale, 'templates_page_guide_quiz'),
+          })
+        ).toHaveAttribute('href', '/classroom-quiz-game');
+        await expect(
+          page.getByRole('link', {
+            name: getLocaleMessage(locale, 'templates_page_guide_matching'),
+          })
+        ).toHaveAttribute('href', '/classroom-matching-game');
+      } else {
+        await expect(
+          page.locator('a[href="/classroom-quiz-game"]')
+        ).toHaveCount(0);
+        await expect(
+          page.locator('a[href="/classroom-matching-game"]')
+        ).toHaveCount(0);
+      }
 
       for (const action of templateEntryCases) {
         const link = page

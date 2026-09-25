@@ -82,7 +82,7 @@ test('homepage product-loop handoff exposes 30 public entry slices', () => {
       ['feature-assignment-links', 'Assignment links'],
       ['feature-teacher-results', 'Teacher results'],
       ['signal-panel', '3 items'],
-      ['signal-templates', '8 first'],
+      ['signal-templates', '8 game formats'],
       ['signal-delivery', 'Share link'],
       ['signal-results', 'Attempt log'],
       ['activity-content-model', 'ActivityContent'],

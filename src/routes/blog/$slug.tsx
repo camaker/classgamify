@@ -7,10 +7,15 @@ import { buttonVariants } from '@/components/ui/button';
 import { websiteConfig } from '@/config/website';
 import { m } from '@/locale/paraglide/messages';
 import { formatDate } from '@/lib/formatter';
-import { getPostBySlug } from '@/lib/blog';
+import {
+  getBlogIndexingPolicy,
+  getPostBySlug,
+  getPostLocales,
+} from '@/lib/blog';
 import { getLocale, localeConfig } from '@/lib/locale';
 import { Routes } from '@/lib/routes';
 import { seo } from '@/lib/seo';
+import { getCanonicalUrlForLocale } from '@/lib/urls';
 import {
   articleJsonLd,
   graphJsonLd,
@@ -20,9 +25,30 @@ import {
 import { cn } from '@/lib/utils';
 import { buildBlogPostCtaViewModel } from '@/pages/blog-page-view';
 import { IconArrowLeft } from '@tabler/icons-react';
-import { Link, createFileRoute, notFound } from '@tanstack/react-router';
+import {
+  Link,
+  createFileRoute,
+  notFound,
+  redirect,
+} from '@tanstack/react-router';
 
 export const Route = createFileRoute('/blog/$slug')({
+  beforeLoad: ({ params }) => {
+    const publishedLocales = getPostLocales(params.slug);
+    if (publishedLocales.length === 0) return;
+
+    const policy = getBlogIndexingPolicy(publishedLocales, getLocale());
+    if (!policy.indexable) {
+      throw redirect({
+        href: getCanonicalUrlForLocale(
+          `${Routes.Blog}/${params.slug}`,
+          policy.canonicalLocale
+        ),
+        reloadDocument: true,
+        statusCode: 308,
+      });
+    }
+  },
   loader: ({ params }) => {
     const post = getPostBySlug(params.slug);
     if (!post) throw notFound();
@@ -32,14 +58,22 @@ export const Route = createFileRoute('/blog/$slug')({
   head: ({ loaderData }) => {
     const post = loaderData?.post;
     if (!post) return {};
-    const currentLocale = getLocale() === 'zh' ? 'zh' : 'en';
+    const policy = getBlogIndexingPolicy(
+      getPostLocales(post.slug),
+      getLocale()
+    );
     const path = `${Routes.Blog}/${post.slug}`;
     const metadata = seo(path, {
       title: `${post.title} | ${websiteConfig.metadata?.name}`,
       description: post.description,
       image: post.image,
       type: 'article',
+      alternateLocales: policy.alternateLocales,
+      canonicalLocale: policy.canonicalLocale,
+      robots: policy.indexable ? undefined : 'noindex,follow',
     });
+
+    if (!policy.indexable) return metadata;
 
     return {
       ...metadata,
@@ -52,7 +86,7 @@ export const Route = createFileRoute('/blog/$slug')({
               description: post.description,
               headline: post.title,
               image: post.image,
-              inLanguage: localeConfig[currentLocale].hreflang,
+              inLanguage: localeConfig[post.locale].hreflang,
               path,
             }),
           ])
