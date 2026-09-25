@@ -1,7 +1,9 @@
 import { ActivityPreview } from '@/components/activities/activity-preview';
 import { ActivityCreateForm } from '@/components/activities/activity-create-form';
+import { authClient } from '@/auth/client';
 import Container from '@/components/layout/container';
 import { Badge } from '@/components/ui/badge';
+import { buttonVariants } from '@/components/ui/button';
 import {
   type ActivityCreatePageEditorViewModel,
   type ActivityEditorWorkflowHandoffView,
@@ -13,8 +15,11 @@ import {
   parseCreateActivityTemplateSourceSearch,
 } from '@/activities/template-entry';
 import { websiteConfig } from '@/config/website';
+import { Routes } from '@/lib/routes';
+import { getPathWithLocale } from '@/lib/urls';
 import { m } from '@/locale/paraglide/messages';
 import { seo } from '@/lib/seo';
+import { cn } from '@/lib/utils';
 import {
   IconChevronDown,
   IconClipboardList,
@@ -24,8 +29,8 @@ import {
   IconPencil,
   IconSparkles,
 } from '@tabler/icons-react';
-import { createFileRoute } from '@tanstack/react-router';
-import { useMemo } from 'react';
+import { createFileRoute, Link } from '@tanstack/react-router';
+import { useEffect, useMemo, useState } from 'react';
 
 export const Route = createFileRoute('/create')({
   validateSearch: (search: Record<string, unknown>) => ({
@@ -42,6 +47,9 @@ export const Route = createFileRoute('/create')({
 
 function CreatePage() {
   const { source, template } = Route.useSearch();
+  const { data: session, isPending: sessionPending } = authClient.useSession();
+  const [sessionReady, setSessionReady] = useState(false);
+  useEffect(() => setSessionReady(true), []);
   const pageView = useMemo(
     () =>
       buildActivityCreatePageEditorViewModel({
@@ -69,6 +77,35 @@ function CreatePage() {
                   {pageView.hero.description}
                 </p>
               </div>
+              {sessionReady && !sessionPending && !session?.user ? (
+                <div className="max-w-2xl rounded-lg border border-primary/30 bg-primary/5 p-4">
+                  <p className="text-sm font-semibold">
+                    {m.create_guest_save_notice_title()}
+                  </p>
+                  <p className="mt-1 text-sm leading-6 text-muted-foreground">
+                    {m.create_guest_save_notice_description()}
+                  </p>
+                  <div className="mt-3 flex flex-wrap items-center gap-3">
+                    <Link
+                      to={Routes.Register}
+                      search={{ callbackUrl: getPathWithLocale(Routes.Create) }}
+                      className={cn(
+                        buttonVariants({ size: 'sm' }),
+                        'rounded-md'
+                      )}
+                    >
+                      {m.create_guest_register_action()}
+                    </Link>
+                    <Link
+                      to={Routes.Login}
+                      search={{ callbackUrl: getPathWithLocale(Routes.Create) }}
+                      className="text-sm font-medium text-primary underline-offset-4 hover:underline"
+                    >
+                      {m.create_guest_login_action()}
+                    </Link>
+                  </div>
+                </div>
+              ) : null}
             </div>
             <TemplateEntryPanel templateEntry={pageView.templateEntry} />
           </div>

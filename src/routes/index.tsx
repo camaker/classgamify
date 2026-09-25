@@ -4,6 +4,7 @@ import { Badge } from '@/components/ui/badge';
 import { buttonVariants } from '@/components/ui/button';
 import { websiteConfig } from '@/config/website';
 import { getLocale, localeConfig } from '@/lib/locale';
+import { Routes } from '@/lib/routes';
 import { seo } from '@/lib/seo';
 import {
   buildHomePageViewModel,
@@ -21,7 +22,7 @@ import { cn } from '@/lib/utils';
 import {
   IconChartBar,
   IconDeviceGamepad2,
-  IconLayoutGrid,
+  IconPlayerPlay,
   IconPlus,
   IconSparkles,
   IconUsers,
@@ -56,43 +57,55 @@ function HomePage() {
   const pageView = buildHomePageViewModel();
 
   return (
-    <Container className="px-4 py-12 md:py-16">
-      <div className="mx-auto max-w-6xl space-y-12 pb-16">
-        <section className="grid gap-8 lg:grid-cols-[minmax(0,0.9fr)_minmax(360px,1.1fr)] lg:items-center">
-          <div className="min-w-0 space-y-6">
+    <Container className="px-4 pt-7 pb-16 md:pt-10">
+      <div className="mx-auto max-w-7xl space-y-16">
+        <section className="grid gap-8 lg:grid-cols-[minmax(0,0.85fr)_minmax(0,1.15fr)] lg:items-start lg:gap-12">
+          <div className="min-w-0 space-y-5 lg:pt-10">
             <Badge variant="outline" className="rounded-md border-primary/30">
               <IconSparkles className="size-3.5" />
               {pageView.hero.badgeLabel}
             </Badge>
-            <div className="space-y-4">
-              <h1 className="max-w-4xl text-4xl font-bold tracking-tight text-balance sm:text-5xl md:text-6xl">
+            <div className="space-y-3">
+              <h1 className="max-w-2xl text-4xl leading-[1.08] font-bold tracking-tight text-balance sm:text-5xl lg:text-[3.5rem]">
                 {pageView.hero.title}
               </h1>
-              <p className="max-w-3xl text-lg leading-8 text-muted-foreground">
+              <p className="max-w-xl text-base leading-7 text-muted-foreground sm:text-lg sm:leading-8">
                 {pageView.hero.description}
               </p>
             </div>
-            <div className="space-y-4">
-              <Link
-                to={pageView.hero.primaryAction.to}
-                aria-label={pageView.hero.primaryAction.ariaLabel}
-                className={cn(buttonVariants({ size: 'lg' }), 'rounded-lg')}
-              >
-                <IconPlus className="size-4" />
-                {pageView.hero.primaryAction.label}
-              </Link>
-              <div className="flex flex-wrap gap-4 text-sm">
+            <div className="space-y-3">
+              <div className="flex flex-wrap gap-3">
+                <Link
+                  to={pageView.hero.primaryAction.to}
+                  aria-label={pageView.hero.primaryAction.ariaLabel}
+                  className={cn(buttonVariants({ size: 'lg' }), 'rounded-lg')}
+                >
+                  <IconPlus className="size-4" />
+                  {pageView.hero.primaryAction.label}
+                </Link>
+                <Link
+                  to={Routes.StudentPreview}
+                  className={cn(
+                    buttonVariants({ size: 'lg', variant: 'outline' }),
+                    'rounded-lg bg-background'
+                  )}
+                >
+                  <IconPlayerPlay className="size-4" />
+                  {m.home_hero_play_sample()}
+                </Link>
+              </div>
+              <div className="flex flex-wrap gap-x-5 gap-y-2 text-sm">
                 <Link
                   to={pageView.hero.browseTemplatesAction.to}
                   aria-label={pageView.hero.browseTemplatesAction.ariaLabel}
-                  className="text-primary hover:underline"
+                  className="text-primary underline-offset-4 hover:underline"
                 >
                   {pageView.hero.browseTemplatesAction.label} →
                 </Link>
                 <Link
                   to={pageView.hero.worksheetAction.to}
                   aria-label={pageView.hero.worksheetAction.ariaLabel}
-                  className="text-primary hover:underline"
+                  className="text-primary underline-offset-4 hover:underline"
                 >
                   {pageView.hero.worksheetAction.label} →
                 </Link>
@@ -100,34 +113,40 @@ function HomePage() {
             </div>
           </div>
 
-          <section
-            aria-label={pageView.signalPanel.ariaLabel}
-            className="rounded-lg border bg-card p-4"
-          >
-            <div className="mb-4">
-              <h2 className="font-semibold text-sm">
-                {pageView.signalPanel.title}
-              </h2>
-              <p className="mt-1 text-muted-foreground text-sm">
-                {pageView.signalPanel.description}
-              </p>
-            </div>
-            <div className="grid gap-3 sm:grid-cols-3">
-              {pageView.signals.map((signal) => (
-                <Signal
-                  key={signal.id}
-                  icon={homeSignalIcons[signal.id]}
-                  signal={signal}
-                />
-              ))}
-            </div>
+          <section aria-label={m.home_hero_preview_label()} className="min-w-0">
+            <p className="mb-3 text-sm font-semibold text-primary">
+              {m.home_hero_preview_label()}
+            </p>
+            <ActivityPreview
+              activity={pageView.preview.activity}
+              compact
+              layout="stacked"
+            />
           </section>
         </section>
 
-        <ActivityPreview
-          activity={pageView.preview.activity}
-          assignment={pageView.preview.assignment}
-        />
+        <section
+          aria-label={pageView.signalPanel.ariaLabel}
+          className="grid gap-6 border-y py-8 lg:grid-cols-[minmax(0,0.7fr)_minmax(0,1.3fr)] lg:items-center"
+        >
+          <div>
+            <h2 className="text-xl font-semibold tracking-tight">
+              {pageView.signalPanel.title}
+            </h2>
+            <p className="mt-2 max-w-md text-sm leading-6 text-muted-foreground">
+              {pageView.signalPanel.description}
+            </p>
+          </div>
+          <div className="grid gap-5 sm:grid-cols-3">
+            {pageView.signals.map((signal) => (
+              <Signal
+                key={signal.id}
+                icon={homeSignalIcons[signal.id]}
+                signal={signal}
+              />
+            ))}
+          </div>
+        </section>
 
         <section
           aria-label={pageView.featureSection.ariaLabel}
@@ -181,10 +200,10 @@ function Signal({
   return (
     <dl
       aria-label={signal.ariaLabel}
-      className="rounded-lg border bg-background p-4"
+      className="border-l-2 border-primary/30 pl-4"
     >
-      <Icon className="size-5 text-primary" />
-      <dt className="mt-4 text-sm text-muted-foreground">{signal.label}</dt>
+      <Icon className="size-5 text-primary" aria-hidden="true" />
+      <dt className="mt-2 text-sm text-muted-foreground">{signal.label}</dt>
       <dd>
         <output className="text-2xl font-semibold text-foreground">
           {signal.value}

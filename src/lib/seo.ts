@@ -11,7 +11,9 @@ import {
   isLocalizedPath,
   localeConfig,
   locales,
+  type Locale,
 } from '@/lib/locale';
+import { getIndexableLocalesForStaticPath } from '@/seo/public-routes';
 
 /**
  * Build metadata + canonical link for a page
@@ -28,28 +30,57 @@ export function seo(
     image?: string;
     robots?: string;
     type?: 'website' | 'article';
+    alternateLocales?: Locale[];
+    canonicalLocale?: Locale;
   }
 ) {
-  const url = getCanonicalUrl(path);
+  const currentLocale = getLocale();
+  const staticLocales = getIndexableLocalesForStaticPath(path);
+  const excludedStaticLocale =
+    staticLocales !== undefined && !staticLocales.includes(currentLocale);
+  const canonicalLocale = excludedStaticLocale
+    ? baseLocale
+    : options.canonicalLocale;
+  const url = canonicalLocale
+    ? getCanonicalUrlForLocale(path, canonicalLocale)
+    : getCanonicalUrl(path);
   const image = options.image ?? getOgImage();
   const localized = isLocalizedPath(path);
-  const alternateLinks = localized
-    ? [
-        ...locales.map((locale) => ({
-          rel: 'alternate',
-          hrefLang: localeConfig[locale].hreflang,
-          href: getCanonicalUrlForLocale(path, locale),
-        })),
-        {
-          rel: 'alternate',
-          hrefLang: 'x-default',
-          href: getCanonicalUrlForLocale(path, baseLocale),
-        },
-      ]
-    : [];
+  const availableLocales = excludedStaticLocale
+    ? []
+    : staticLocales
+      ? (options.alternateLocales?.filter((locale) =>
+          staticLocales.includes(locale)
+        ) ?? staticLocales)
+      : (options.alternateLocales ?? locales);
+  const defaultAlternateLocale = availableLocales.includes(baseLocale)
+    ? baseLocale
+    : availableLocales[0];
+  const alternateLinks =
+    localized && defaultAlternateLocale
+      ? [
+          ...availableLocales.map((locale) => ({
+            rel: 'alternate',
+            hrefLang: localeConfig[locale].hreflang,
+            href: getCanonicalUrlForLocale(path, locale),
+          })),
+          {
+            rel: 'alternate',
+            hrefLang: 'x-default',
+            href: getCanonicalUrlForLocale(path, defaultAlternateLocale),
+          },
+        ]
+      : [];
 
   return {
-    meta: metadata({ ...options, url, image, type: options.type ?? 'website' }),
+    meta: metadata({
+      ...options,
+      alternateLocales: availableLocales,
+      robots: excludedStaticLocale ? 'noindex,follow' : options.robots,
+      url,
+      image,
+      type: options.type ?? 'website',
+    }),
     links: [{ rel: 'canonical', href: url }, ...alternateLinks],
   };
 }
@@ -60,6 +91,7 @@ export const metadata = ({
   keywords,
   image,
   robots,
+  alternateLocales,
   url,
   type = 'website',
 }: {
@@ -69,6 +101,7 @@ export const metadata = ({
   url?: string;
   keywords?: string;
   robots?: string;
+  alternateLocales?: readonly Locale[];
   type?: 'website' | 'article';
 }) => {
   const twitterSite = websiteConfig.social?.twitter
@@ -78,7 +111,7 @@ export const metadata = ({
   // for <html lang> / hreflang which uses hyphens.
   const currentLocale = getLocale();
   const ogLocale = localeConfig[currentLocale].hreflang.replace('-', '_');
-  const alternateLocales = locales
+  const ogAlternateLocales = (alternateLocales ?? locales)
     .filter((l) => l !== currentLocale)
     .map((l) => localeConfig[l].hreflang.replace('-', '_'));
   const metadata: Array<{
@@ -95,7 +128,7 @@ export const metadata = ({
     { property: 'og:type', content: type },
     { property: 'og:site_name', content: websiteConfig.metadata?.name ?? '' },
     { property: 'og:locale', content: ogLocale },
-    ...alternateLocales.map((loc) => ({
+    ...ogAlternateLocales.map((loc) => ({
       property: 'og:locale:alternate',
       content: loc,
     })),

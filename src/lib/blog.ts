@@ -1,7 +1,7 @@
 import { allBlogs } from 'content-collections';
 import type { Blog } from 'content-collections';
 import { websiteConfig } from '@/config/website';
-import { baseLocale, getLocale, type Locale } from '@/lib/locale';
+import { baseLocale, getLocale, locales, type Locale } from '@/lib/locale';
 
 export type BlogPost = Blog & { locale: Locale; slug: string };
 
@@ -15,6 +15,37 @@ export function getSortedPosts(locale: Locale = getLocale()): BlogPost[] {
   return [...(allBlogs as BlogPost[])]
     .filter((p) => p.locale === locale)
     .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+}
+
+export function getBlogLocalesWithPosts(): Locale[] {
+  const publishedLocales = new Set(
+    (allBlogs as BlogPost[]).map((post) => post.locale)
+  );
+  return locales.filter((locale) => publishedLocales.has(locale));
+}
+
+export function getPostLocales(slug: string): Locale[] {
+  const publishedLocales = new Set(
+    (allBlogs as BlogPost[])
+      .filter((post) => post.slug === slug)
+      .map((post) => post.locale)
+  );
+  return locales.filter((locale) => publishedLocales.has(locale));
+}
+
+export function getBlogIndexingPolicy(
+  publishedLocales: Locale[],
+  requestedLocale: Locale
+) {
+  const indexable = publishedLocales.includes(requestedLocale);
+  const fallbackLocale = publishedLocales.includes(baseLocale)
+    ? baseLocale
+    : (publishedLocales[0] ?? baseLocale);
+  return {
+    alternateLocales: indexable ? publishedLocales : [],
+    canonicalLocale: indexable ? requestedLocale : fallbackLocale,
+    indexable,
+  };
 }
 
 export function getPostBySlug(

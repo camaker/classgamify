@@ -1,6 +1,6 @@
 import { allBlogs, allChangelogs } from 'content-collections';
 import type { Blog, Changelog } from 'content-collections';
-import { baseLocale, locales, type Locale } from '@/lib/locale';
+import { baseLocale, type Locale } from '@/lib/locale';
 import { Routes } from '@/lib/routes';
 import { m } from '@/locale/paraglide/messages';
 import { getSitemapUrls } from '@/seo/public-indexing';
@@ -527,6 +527,7 @@ function buildPublicEditorialHandoffPrivacyContract(
 
 function countLocalizedPairs(docs: { locale: Locale; slug: string }[]) {
   const localesBySlug = new Map<string, Set<Locale>>();
+  const translatedLocales: Locale[] = [baseLocale, 'zh'];
 
   for (const doc of docs) {
     const slugLocales = localesBySlug.get(doc.slug) ?? new Set<Locale>();
@@ -535,7 +536,7 @@ function countLocalizedPairs(docs: { locale: Locale; slug: string }[]) {
   }
 
   return [...localesBySlug.values()].filter((slugLocales) =>
-    locales.every((locale) => slugLocales.has(locale))
+    translatedLocales.every((locale) => slugLocales.has(locale))
   ).length;
 }
 

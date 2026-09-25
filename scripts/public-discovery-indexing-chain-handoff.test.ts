@@ -235,6 +235,8 @@ test('public route registry and indexing helpers keep crawlable routes aligned',
     [
       ['home', Routes.Root],
       ['templates', Routes.Templates],
+      ['classroom-quiz-game', '/classroom-quiz-game'],
+      ['classroom-matching-game', '/classroom-matching-game'],
       ['worksheets', Routes.Worksheets],
       ['create', Routes.Create],
       ['pricing', Routes.Pricing],
@@ -304,7 +306,7 @@ test('public indexing route handlers delegate to shared helpers', () => {
   );
   assert.match(
     PUBLIC_INDEXING_SOURCE,
-    /buildSitemapUrlEntries[\s\S]*isLocalizedPath\(url\.path\)[\s\S]*locales\.map[\s\S]*buildSitemapAlternateLinks/
+    /buildSitemapUrlEntries[\s\S]*getSitemapLocalesForPath\(url\.path\)[\s\S]*buildSitemapUrlEntry[\s\S]*buildSitemapAlternateLinks/
   );
   assert.match(
     PUBLIC_INDEXING_SOURCE,

@@ -3,13 +3,32 @@ import { BlogPagination } from '@/components/blog/blog-pagination';
 import { BlogCtaActionLink } from '@/components/blog/blog-cta-action-link';
 import Container from '@/components/layout/container';
 import { websiteConfig } from '@/config/website';
-import { getPaginatedPosts } from '@/lib/blog';
+import {
+  getBlogIndexingPolicy,
+  getBlogLocalesWithPosts,
+  getPaginatedPosts,
+} from '@/lib/blog';
+import { getLocale } from '@/lib/locale';
 import { Routes } from '@/lib/routes';
 import { seo } from '@/lib/seo';
+import { getCanonicalUrlForLocale } from '@/lib/urls';
 import { buildBlogListPageViewModel } from '@/pages/blog-page-view';
-import { createFileRoute } from '@tanstack/react-router';
+import { createFileRoute, redirect } from '@tanstack/react-router';
 
 export const Route = createFileRoute('/blog/')({
+  beforeLoad: () => {
+    const policy = getBlogIndexingPolicy(
+      getBlogLocalesWithPosts(),
+      getLocale()
+    );
+    if (!policy.indexable) {
+      throw redirect({
+        href: getCanonicalUrlForLocale(Routes.Blog, policy.canonicalLocale),
+        reloadDocument: true,
+        statusCode: 308,
+      });
+    }
+  },
   validateSearch: (search: Record<string, unknown>) => ({
     page: parseBlogPageSearch(search.page),
   }),
@@ -17,10 +36,17 @@ export const Route = createFileRoute('/blog/')({
   loader: ({ deps }) => getPaginatedPosts(deps.page),
   head: () => {
     const pageView = buildBlogListPageViewModel();
+    const policy = getBlogIndexingPolicy(
+      getBlogLocalesWithPosts(),
+      getLocale()
+    );
 
     return seo(Routes.Blog, {
       title: `${pageView.seoTitle} | ${websiteConfig.metadata?.name}`,
       description: pageView.seoDescription,
+      alternateLocales: policy.alternateLocales,
+      canonicalLocale: policy.canonicalLocale,
+      robots: policy.indexable ? undefined : 'noindex,follow',
     });
   },
   component: BlogListPage,

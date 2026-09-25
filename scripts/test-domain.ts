@@ -11088,8 +11088,13 @@ assert.match(
 );
 assert.match(
   homeRouteSource,
-  /<ActivityPreview[\s\S]*activity=\{pageView\.preview\.activity\}[\s\S]*assignment=\{pageView\.preview\.assignment\}/,
+  /<ActivityPreview\s+activity=\{pageView\.preview\.activity\}/,
   'Home route should render the starter activity preview from the prepared page view-model.'
+);
+assert.doesNotMatch(
+  homeRouteSource,
+  /assignment=\{pageView\.preview\.assignment\}/,
+  'Home hero should not present sample assignment results as real classroom activity.'
 );
 assert.doesNotMatch(
   homeRouteSource,
@@ -11393,8 +11398,8 @@ assert.match(
 );
 assert.match(
   templateDirectoryCardSource,
-  /TemplatesPageCardEntryStepView[\s\S]*const entryLabelId = `template-entry-\$\{template\.template\}-label`[\s\S]*aria-labelledby=\{entryLabelId\}[\s\S]*id=\{entryLabelId\}[\s\S]*template\.entryLabel[\s\S]*template\.entrySteps\.map[\s\S]*TemplateEntryStep[\s\S]*key=\{step\.id\}/,
-  'Template directory cards should render prepared create-entry steps from the card view.'
+  /TemplatesPageCardEntryStepView[\s\S]*const entryLabelId = `template-entry-\$\{template\.template\}-label`[\s\S]*<details[\s\S]*<summary id=\{entryLabelId\}[\s\S]*template\.entryLabel[\s\S]*template\.entrySteps\.map[\s\S]*TemplateEntryStep[\s\S]*key=\{step\.id\}/,
+  'Template directory cards should keep prepared create-entry steps in a disclosure.'
 );
 assert.match(
   templateDirectoryCardSource,
@@ -19214,6 +19219,8 @@ assert.deepEqual(
   [
     'home',
     'templates',
+    'classroom-quiz-game',
+    'classroom-matching-game',
     'worksheets',
     'create',
     'pricing',
@@ -44115,45 +44122,45 @@ assert.deepEqual(homePageVisibleView, {
     title: 'Activity tools',
   },
   hero: {
-    badgeLabel: 'Wordwall-style classroom activities',
+    badgeLabel: 'Classroom games for teachers',
     browseTemplatesAction: {
       ariaLabel: 'Browse ClassGamify templates before creating an activity.',
-      label: 'Browse templates',
+      label: 'Browse 8 game formats',
       to: Routes.Templates,
     },
     description:
-      'Create game-based classroom activities, publish assignment links, and review student attempts from the same structured content.',
+      'Start with a quiz or matching game, share a link students can open, and review their responses after they play.',
     primaryAction: {
       ariaLabel:
         'Create a reusable ClassGamify activity in the shared editor.',
-      label: 'Create activity',
+      label: 'Create an activity',
       to: Routes.Create,
     },
     worksheetAction: {
       ariaLabel:
-        'Create a Liveworksheets-style activity from worksheet modes.',
-      label: 'Create worksheet',
+        "Explore ClassGamify's interactive worksheet modes.",
+      label: 'Explore interactive worksheets',
       to: Routes.Worksheets,
     },
-    title: 'Make classroom practice feel like a game',
+    title: 'Turn lesson content into a classroom game',
   },
   preview: homePageStarterPreview,
   signalPanel: {
     ariaLabel:
-      'Classroom loop signals: Homepage signals for templates, share-link delivery, and result review.',
+      'One activity through the whole lesson: Make an activity, give students a link, then see what they understood.',
     description:
-      'Homepage signals for templates, share-link delivery, and result review.',
-    title: 'Classroom loop signals',
+      'Make an activity, give students a link, then see what they understood.',
+    title: 'One activity through the whole lesson',
   },
   signals: [
     {
       ariaLabel:
-        'Templates: 8 first. Start from quizzes, matching activities, category sorting, fill-in practice, listening prompts, pair matching, line matching, and reveal boxes.',
+        'Templates: 8 game formats. Start from quizzes, matching activities, category sorting, fill-in practice, listening prompts, pair matching, line matching, and reveal boxes.',
       description:
         'Start from quizzes, matching activities, category sorting, fill-in practice, listening prompts, pair matching, line matching, and reveal boxes.',
       id: 'templates',
       label: 'Templates',
-      value: '8 first',
+      value: '8 game formats',
     },
     {
       ariaLabel:
@@ -44806,13 +44813,13 @@ assert.deepEqual(buildTemplatesPageViewModel(), {
       to: Routes.Create,
     },
     description:
-      'ClassGamify templates render shared questions, pairs, groups, and vocabulary as quick checks, matching games, worksheet practice, listening prompts, or whole-class reveal rounds.',
+      'See a real starter example for each format. Open one in the editor, add your lesson content, then share it with students.',
     studentPreviewAction: {
       ariaLabel: 'Open the demo student assignment preview.',
       label: 'Open student preview',
       to: Routes.StudentPreview,
     },
-    title: 'Pick a game format for the same lesson content.',
+    title: 'Choose a classroom game to make',
   },
 });
 assert.deepEqual(

@@ -1,4 +1,8 @@
-import { getSortedPosts } from '@/lib/blog';
+import {
+  getBlogLocalesWithPosts,
+  getPostLocales,
+  getSortedPosts,
+} from '@/lib/blog';
 import {
   baseLocale,
   isLocalizedPath,
@@ -10,6 +14,7 @@ import {
 import { Routes } from '@/lib/routes';
 import { getBaseUrl } from '@/lib/urls';
 import {
+  getIndexableLocalesForStaticPath,
   PUBLIC_INDEXABLE_STATIC_ROUTES,
   PUBLIC_ROBOTS_DISALLOW_RULES,
   type SitemapChangeFrequency,
@@ -77,11 +82,12 @@ ${entries}
 
 export function buildSitemapUrlEntries({ baseUrl = getBaseUrl() } = {}) {
   const urls = getSitemapUrls();
-  return urls.flatMap((url) =>
-    isLocalizedPath(url.path)
-      ? locales.map((locale) => buildSitemapUrlEntry({ baseUrl, locale, url }))
-      : [buildSitemapUrlEntry({ baseUrl, locale: baseLocale, url })]
-  );
+  return urls.flatMap((url) => {
+    const availableLocales = getSitemapLocalesForPath(url.path);
+    return availableLocales.map((locale) =>
+      buildSitemapUrlEntry({ availableLocales, baseUrl, locale, url })
+    );
+  });
 }
 
 export function getSitemapUrls(): SitemapUrl[] {
@@ -96,6 +102,17 @@ export function getSitemapUrls(): SitemapUrl[] {
   ];
 }
 
+function getSitemapLocalesForPath(path: string): Locale[] {
+  if (path === Routes.Blog) return getBlogLocalesWithPosts();
+  if (path.startsWith(`${Routes.Blog}/`)) {
+    return getPostLocales(path.slice(Routes.Blog.length + 1));
+  }
+  const staticLocales = getIndexableLocalesForStaticPath(path);
+  if (staticLocales) return [...staticLocales];
+  if (!isLocalizedPath(path)) return [baseLocale];
+  return [...locales];
+}
+
 function getLocalizedPublicPathVariants(path: string) {
   return [
     path,
@@ -106,10 +123,12 @@ function getLocalizedPublicPathVariants(path: string) {
 }
 
 function buildSitemapUrlEntry({
+  availableLocales,
   baseUrl,
   locale,
   url,
 }: {
+  availableLocales: Locale[];
   baseUrl: string;
   locale: Locale;
   url: SitemapUrl;
@@ -122,6 +141,7 @@ function buildSitemapUrlEntry({
   return {
     ...url,
     alternates: buildSitemapAlternateLinks({
+      availableLocales,
       baseUrl: base,
       path: url.path,
     }),
@@ -131,21 +151,28 @@ function buildSitemapUrlEntry({
 }
 
 function buildSitemapAlternateLinks({
+  availableLocales,
   baseUrl,
   path,
 }: {
+  availableLocales: Locale[];
   baseUrl: string;
   path: string;
 }): SitemapAlternateLink[] {
   if (!isLocalizedPath(path)) return [];
 
+  const defaultLocale = availableLocales.includes(baseLocale)
+    ? baseLocale
+    : availableLocales[0];
+  if (!defaultLocale) return [];
+
   return [
-    ...locales.map((locale) => ({
+    ...availableLocales.map((locale) => ({
       href: `${baseUrl}${localizeHref(path, { locale })}`,
       hreflang: localeConfig[locale].hreflang,
     })),
     {
-      href: `${baseUrl}${localizeHref(path, { locale: baseLocale })}`,
+      href: `${baseUrl}${localizeHref(path, { locale: defaultLocale })}`,
       hreflang: 'x-default',
     },
   ];
