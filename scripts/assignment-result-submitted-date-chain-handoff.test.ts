@@ -196,8 +196,8 @@ test('submitted-date sources preserve shared result formatting', () => {
   );
   assert.match(
     RESULT_FORMAT_SOURCE,
-    /export function formatAssignmentResultDate[\s\S]*new Intl\.DateTimeFormat\(options\?\.locale,[\s\S]*timeZone: options\?\.timeZone/,
-    'Result UI dates should use the shared locale/time-zone aware formatter.'
+    /export function getAssignmentDateLocale[\s\S]*return getLocale\(\)[\s\S]*export function formatAssignmentResultDate[\s\S]*new Intl\.DateTimeFormat\(\s*options\?\.locale \?\? getAssignmentDateLocale\(\),[\s\S]*timeZone: options\?\.timeZone/,
+    'Result UI dates should use the shared locale/time-zone aware formatter, defaulting to the app language rather than the host locale.'
   );
   assert.match(
     RESULT_FORMAT_SOURCE,

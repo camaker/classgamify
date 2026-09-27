@@ -1500,6 +1500,10 @@ import type {
   AttemptResult,
 } from '@/activities/types';
 
+// Expected dates below are written for UTC+8. Pin the zone so results do not
+// depend on the machine running the suite.
+process.env.TZ = 'Asia/Shanghai';
+
 function getSourceSlice(
   source: string,
   startMarker: string,
@@ -2028,15 +2032,17 @@ assert.match(
   /buildActivityCreatePageEditorViewModel\(\{[\s\S]*templateSource: source,[\s\S]*templateType: template,[\s\S]*\}\)/,
   'The create route should pass template-entry source context into the create-page view-model.'
 );
-assert.match(
+// The row editor replaced the pipe-syntax helper (docs/design.md: say it once).
+assert.doesNotMatch(
   createRouteSource,
-  /<InputShapePanel inputShape=\{pageView\.inputShape\} \/>[\s\S]*function InputShapePanel[\s\S]*inputShape\.itemViews\.map\(\(itemView, index\) =>[\s\S]*key=\{itemView\.id\}[\s\S]*itemView\.label/,
-  'The create route should render structured input-shape items with stable ids.'
+  /<InputShapePanel\b/,
+  'The create route no longer repeats a pipe-syntax helper panel; the row editor labels every field.'
 );
-assert.match(
+// The hero summary box repeated the template setup below it.
+assert.doesNotMatch(
   createRouteSource,
-  /<TemplateEntryPanel templateEntry=\{pageView\.templateEntry\} \/>[\s\S]*function TemplateEntryPanel[\s\S]*templateEntry\.sourceLabel[\s\S]*templateEntry\.shortName[\s\S]*templateEntry\.title[\s\S]*templateEntry\.description[\s\S]*templateEntry\.sourceDescription[\s\S]*templateEntry\.metrics\.map[\s\S]*key=\{metric\.id\}[\s\S]*metric\.label[\s\S]*metric\.value[\s\S]*templateEntry\.nextStep/,
-  'The create route should render prepared template-entry source, summary, metrics, and next-step guidance.'
+  /<TemplateEntryPanel\b/,
+  'The create route no longer shows a template summary box in the hero; the form header names the template.'
 );
 assert.doesNotMatch(
   createRouteSource,
@@ -9415,8 +9421,14 @@ assert.match(
 );
 assert.match(
   createRouteSource,
-  /<WorkflowNav workflow=\{pageView\.workflow\} \/>[\s\S]*<ActivityEditorWorkflowHandoff[\s\S]*handoffView=\{pageView\.workflow\.handoffView\}[\s\S]*data-handoff="activity-editor-workflow"[\s\S]*data-handoff-scope=\{handoffView\.privacy\.scope\}[\s\S]*handoffView\.itemViews\.map[\s\S]*ActivityEditorWorkflowHandoffItem[\s\S]*const labelId = `activity-editor-workflow-handoff-\$\{item\.id\}-label`[\s\S]*const valueId = `activity-editor-workflow-handoff-\$\{item\.id\}-value`[\s\S]*const descriptionId =[\s\S]*`activity-editor-workflow-handoff-\$\{item\.id\}-description`[\s\S]*data-handoff-item=\{item\.id\}[\s\S]*id=\{labelId\}[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*aria-label=\{item\.ariaLabel\}[\s\S]*aria-labelledby=\{`\$\{labelId\} \$\{valueId\}`\}[\s\S]*id=\{valueId\}[\s\S]*id=\{descriptionId\}/,
-  'Create route should render workflow navigation and hidden 30-slice workflow handoff from the prepared page view.'
+  /<ActivityEditorWorkflowHandoff[\s\S]*handoffView=\{pageView\.workflow\.handoffView\}[\s\S]*data-handoff="activity-editor-workflow"[\s\S]*data-handoff-scope=\{handoffView\.privacy\.scope\}[\s\S]*handoffView\.itemViews\.map[\s\S]*ActivityEditorWorkflowHandoffItem/,
+  'Create route should render the hidden workflow handoff from the prepared page view.'
+);
+// The form sections carry the step titles; a separate step bar repeated them.
+assert.doesNotMatch(
+  createRouteSource,
+  /<WorkflowNav\b/,
+  'The create route no longer renders a step bar that repeats the form section titles.'
 );
 assert.doesNotMatch(
   createRouteSource,
@@ -9821,8 +9833,8 @@ assert.match(
 );
 assert.match(
   activityEditorFieldsSource,
-  /ActivityEditorStructuredContentFields[\s\S]*name="vocabularyText"[\s\S]*name="questionsText"[\s\S]*name="pairsText"[\s\S]*name="groupsText"[\s\S]*name="sourceSummary"[\s\S]*name="teacherNotesText"/,
-  'Activity editor structured content fields should own reusable classroom content bindings.'
+  /ActivityEditorStructuredContentFields[\s\S]*name="questionsText"[\s\S]*name="pairsText"[\s\S]*name="groupsText"[\s\S]*name="vocabularyText"[\s\S]*name="sourceSummary"[\s\S]*name="teacherNotesText"/,
+  'Activity editor structured content fields should own reusable classroom content bindings, with the row-edited questions, pairs, and groups first.'
 );
 assert.match(
   activityEditorFieldsSource,
@@ -9866,8 +9878,14 @@ assert.match(
 );
 assert.match(
   activityTemplateScaffoldPanelSource,
-  /function ActivityTemplateScaffoldPanel[\s\S]*setupView\.shortName[\s\S]*setupView\.title[\s\S]*setupView\.description[\s\S]*setupView\.requirementBadges\.map[\s\S]*key=\{requirement\.id\}[\s\S]*ActivityTemplateScaffoldSummary[\s\S]*summary=\{setupView\.scaffoldSummary\}[\s\S]*ActivityTemplateScaffoldReviewChecklist[\s\S]*setupView=\{setupView\}/,
-  'Activity editor scaffold panel should render prepared setup view labels and delegate scaffold summary and checklist details.'
+  /function ActivityTemplateScaffoldPanel[\s\S]*setupView\.shortName[\s\S]*setupView\.title[\s\S]*setupView\.description[\s\S]*setupView\.requirementBadges\.map[\s\S]*key=\{requirement\.id\}[\s\S]*setupView\.actionLabel/,
+  'Activity editor scaffold panel should render prepared setup view labels, requirement badges, and the load-example action.'
+);
+// Coverage and checklist blocks duplicated the review step of the same form.
+assert.doesNotMatch(
+  activityTemplateScaffoldPanelSource,
+  /ActivityTemplateScaffoldSummary|ActivityTemplateScaffoldReviewChecklist/,
+  'Template setup no longer repeats coverage badges and a before-saving checklist; the readiness step covers them.'
 );
 assert.match(
   activityTemplateScaffoldPanelSource,
@@ -9886,28 +9904,28 @@ assert.doesNotMatch(
 );
 assert.match(
   activityTemplateScaffoldPanelSource,
-  /ActivityEditorTemplateRequirementBadgeView[\s\S]*ActivityEditorTemplateScaffoldCoverageMetricView[\s\S]*ActivityEditorTemplateScaffoldReadyOptionView[\s\S]*ActivityEditorTemplateScaffoldReviewItemView[\s\S]*ActivityEditorTemplateScaffoldSummaryView[\s\S]*ActivityEditorTemplateSetupView/,
-  'Activity editor scaffold panel should import explicit template scaffold view contracts.'
+  /ActivityEditorTemplateRequirementBadgeView[\s\S]*ActivityEditorTemplateSetupView/,
+  'Activity editor scaffold panel should import explicit template setup view contracts.'
 );
 assert.doesNotMatch(
   activityTemplateScaffoldPanelSource,
   /ReturnType<typeof buildActivityEditorTemplateView>|ActivityEditorTemplateView\[/,
   'Activity editor scaffold panel should not infer scaffold props from the full editor template view.'
 );
-assert.match(
+assert.doesNotMatch(
   activityTemplateScaffoldPanelSource,
-  /function ActivityTemplateScaffoldSummary[\s\S]*summary\.runtimeItemLabel[\s\S]*summary\.readyTemplateLabel[\s\S]*summary\.coverageMetrics\.map[\s\S]*ActivityTemplateScaffoldMetricBadge[\s\S]*summary\.readyTemplateOptions\.map[\s\S]*ActivityTemplateScaffoldReadyBadge/,
-  'Activity editor scaffold summary should render prepared runtime, coverage, and ready-template details.'
+  /function ActivityTemplateScaffoldSummary\b/,
+  'ActivityTemplateScaffoldSummary was removed with the duplicated template-setup blocks.'
 );
-assert.match(
+assert.doesNotMatch(
   activityTemplateScaffoldPanelSource,
-  /function ActivityTemplateScaffoldReviewChecklist[\s\S]*aria-labelledby=\{labelId\}[\s\S]*setupView\.reviewChecklistLabel[\s\S]*setupView\.reviewChecklistItems\.map[\s\S]*ActivityTemplateScaffoldReviewItem[\s\S]*key=\{item\.id\}/,
-  'Activity editor scaffold review checklist should render prepared checklist rows with stable item ids.'
+  /function ActivityTemplateScaffoldReviewChecklist\b/,
+  'ActivityTemplateScaffoldReviewChecklist was removed with the duplicated template-setup blocks.'
 );
-assert.match(
+assert.doesNotMatch(
   activityTemplateScaffoldPanelSource,
-  /function ActivityTemplateScaffoldReviewItem[\s\S]*ActivityEditorTemplateScaffoldReviewItemView[\s\S]*item\.ariaLabel[\s\S]*item\.label[\s\S]*href=\{item\.actionHref\}[\s\S]*item\.actionLabel[\s\S]*item\.description/,
-  'Activity editor scaffold review item should render prepared labels, descriptions, aria labels, and action targets.'
+  /function ActivityTemplateScaffoldReviewItem\b/,
+  'ActivityTemplateScaffoldReviewItem was removed with the duplicated template-setup blocks.'
 );
 assert.doesNotMatch(
   activityTemplateScaffoldPanelSource,
@@ -9919,15 +9937,15 @@ assert.match(
   /function ActivityTemplateRequirementBadge[\s\S]*requirement/,
   'Activity editor scaffold requirement badge should render prepared requirement labels.'
 );
-assert.match(
+assert.doesNotMatch(
   activityTemplateScaffoldPanelSource,
-  /function ActivityTemplateScaffoldMetricBadge[\s\S]*metric\.label/,
-  'Activity editor scaffold metric badge should render prepared coverage metric labels.'
+  /function ActivityTemplateScaffoldMetricBadge\b/,
+  'ActivityTemplateScaffoldMetricBadge was removed with the duplicated template-setup blocks.'
 );
-assert.match(
+assert.doesNotMatch(
   activityTemplateScaffoldPanelSource,
-  /function ActivityTemplateScaffoldReadyBadge[\s\S]*option\.shortName/,
-  'Activity editor scaffold ready badge should render prepared ready-template labels.'
+  /function ActivityTemplateScaffoldReadyBadge\b/,
+  'ActivityTemplateScaffoldReadyBadge was removed with the duplicated template-setup blocks.'
 );
 assert.doesNotMatch(
   activityEditorFormSource,
@@ -11088,8 +11106,8 @@ assert.match(
 );
 assert.match(
   homeRouteSource,
-  /<ActivityPreview\s+activity=\{pageView\.preview\.activity\}/,
-  'Home route should render the starter activity preview from the prepared page view-model.'
+  /<HomeHeroGame \/>/,
+  'Home route should show the playable starter quiz runner in the hero.'
 );
 assert.doesNotMatch(
   homeRouteSource,
@@ -11967,7 +11985,7 @@ assert.doesNotMatch(
 );
 assert.match(
   assignmentResultRouteSource,
-  /const sectionViews = pageView\.sectionViews[\s\S]*sectionViews=\{sectionViews\}[\s\S]*sectionViews\.reteachPriorities\.isVisible[\s\S]*sectionViews\.studentAttempts\.emptyState[\s\S]*sectionViews\.answerReview\.submissionSummary/,
+  /const sectionViews = pageView\.sectionViews[\s\S]*sectionViews\.reteachPriorities\.isVisible[\s\S]*sectionViews\.studentFollowUp[\s\S]*sectionViews\.studentAttempts\.emptyState[\s\S]*sectionViews\.answerReview\.submissionSummary/,
   'Assignment result route should render section visibility, headings, empty states, and answer-review summaries from pageView.sectionViews.'
 );
 assert.match(
@@ -12076,18 +12094,26 @@ assert.doesNotMatch(
 );
 assert.match(
   assignmentResultRouteSource,
-  /<AssignmentResultsClassroomBriefCard[\s\S]*brief=\{pageView\.classroomBrief\}[\s\S]*copyArtifactHandoffView=\{pageView\.copyArtifactHandoffView\}[\s\S]*copyArtifactPreviews=\{pageView\.copyArtifactPreviews\}[\s\S]*copyScopeView=\{pageView\.copyScopeView\}[\s\S]*onResultAction=\{\(actionButton\) =>[\s\S]*void onResultAction\(actionButton\)[\s\S]*sectionViews=\{sectionViews\}/,
-  'Assignment result route should pass prepared copy artifact handoff, previews, copy scope, section views, and the result action handler into the classroom brief card.'
+  /<AssignmentResultsFollowUpPanel[\s\S]*pageView\.classroomBrief\.followUpStudentViews[\s\S]*sectionView=\{sectionViews\.studentFollowUp\}/,
+  'Assignment result route should render the prepared student follow-up list beside the reteach priorities.'
 );
-assert.match(
+// The brief card repeated the metrics, reteach items, and four copy previews.
+assert.doesNotMatch(
   assignmentResultRouteSource,
-  /AssignmentResultsReviewScopePanel[\s\S]*view=\{pageView\.reviewScopeView\}/,
-  'Assignment result route should render the prepared current review-scope panel from the page view-model.'
+  /<AssignmentResultsClassroomBriefCard\b/,
+  'Copy artifacts are reached through the Copy & export menu; the page no longer repeats every copy preview inline.'
 );
-assert.match(
+// The scope panel restated the filters shown right above the tables.
+assert.doesNotMatch(
   assignmentResultRouteSource,
-  /AssignmentResultsReviewStatusPanel[\s\S]*view=\{pageView\.reviewStatusView\}/,
-  'Assignment result route should render the prepared review-status panel from the page view-model.'
+  /<AssignmentResultsReviewScopePanel\b/,
+  'The result page no longer renders a "Current review scope" recap of its own filters.'
+);
+// The status panel delayed the reteach answer the page exists to give.
+assert.doesNotMatch(
+  assignmentResultRouteSource,
+  /<AssignmentResultsReviewStatusPanel\b/,
+  'The result page no longer renders a "Ready to review" status panel; the first screen shows reteach priorities.'
 );
 assert.match(
   assignmentResultViewSource,
@@ -12201,8 +12227,13 @@ assert.match(
 );
 assert.match(
   assignmentResultsHeaderCardSource,
-  /AssignmentSettingsSummary[\s\S]*AssignmentResultsHeaderActions/,
-  'Assignment result header component should own delivery summary and delegate share/result actions to a focused component.'
+  /AssignmentSettingsSummary[\s\S]*view=\{headerView\.settingsSummaryView\}/,
+  'Assignment result settings section should own the delivery summary.'
+);
+assert.match(
+  assignmentResultRouteSource,
+  /<AssignmentResultsHeaderActions[\s\S]*resultActions=\{pageView\.actionButtons\}[\s\S]*shareAction=\{headerView\.shareAction\}/,
+  'Assignment result page toolbar should delegate share and result actions to the focused header actions component.'
 );
 assert.match(
   assignmentResultViewSource,
@@ -12245,9 +12276,9 @@ assert.match(
   'Assignment result header card should import the explicit assignment-domain header-view contract.'
 );
 assert.match(
-  assignmentResultsHeaderCardSource,
+  assignmentResultRouteSource,
   /exportPreparationView=\{headerView\.exportPreparationView\}/,
-  'Assignment result header card should pass prepared CSV export coverage into focused header actions.'
+  'Assignment result page should pass prepared CSV export coverage into the focused header actions.'
 );
 assert.match(
   assignmentResultsHeaderActionsSource,
@@ -12276,7 +12307,7 @@ assert.match(
 );
 assert.match(
   assignmentResultsMetricCardSource,
-  /const labelId = `assignment-result-metric-\$\{metric\.key\}-label`[\s\S]*const valueId = `assignment-result-metric-\$\{metric\.key\}-value`[\s\S]*const descriptionId = `assignment-result-metric-\$\{metric\.key\}-description`[\s\S]*<Card[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*aria-label=\{metric\.ariaLabel\}[\s\S]*aria-labelledby=\{`\$\{labelId\} \$\{valueId\}`\}[\s\S]*role="article"[\s\S]*<output[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*aria-label=\{metric\.ariaLabel\}[\s\S]*aria-labelledby=\{`\$\{labelId\} \$\{valueId\}`\}[\s\S]*id=\{valueId\}[\s\S]*id=\{labelId\}[\s\S]*id=\{descriptionId\}[\s\S]*metric\.description/,
+  /const labelId = `assignment-result-metric-\$\{metric\.key\}-label`[\s\S]*const valueId = `assignment-result-metric-\$\{metric\.key\}-value`[\s\S]*const descriptionId = `assignment-result-metric-\$\{metric\.key\}-description`[\s\S]*<article[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*aria-label=\{metric\.ariaLabel\}[\s\S]*aria-labelledby=\{`\$\{labelId\} \$\{valueId\}`\}[\s\S]*id=\{labelId\}[\s\S]*<output[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*aria-label=\{metric\.ariaLabel\}[\s\S]*aria-labelledby=\{`\$\{labelId\} \$\{valueId\}`\}[\s\S]*id=\{valueId\}[\s\S]*id=\{descriptionId\}[\s\S]*metric\.description/,
   'Assignment result metric cards should render prepared accessible metric labels, values, and descriptions.'
 );
 assert.match(
@@ -12356,8 +12387,8 @@ assert.match(
 );
 assert.match(
   assignmentResultsHeaderActionsSource,
-  /const shareDisabledReasonId =\s*getAssignmentResultHeaderShareDisabledReasonId\(shareAction\)[\s\S]*const sharePathDescriptionId =\s*getAssignmentResultHeaderSharePathDescriptionId\(shareAction\)[\s\S]*AssignmentResultsHeaderSharePreviewLink[\s\S]*disabledReasonId=\{shareDisabledReasonId\}[\s\S]*sharePathDescriptionId=\{sharePathDescriptionId\}[\s\S]*AssignmentResultsHeaderSharePath[\s\S]*descriptionId=\{sharePathDescriptionId\}[\s\S]*AssignmentResultsHeaderCopyShareAction[\s\S]*disabledReasonId=\{shareDisabledReasonId\}[\s\S]*sharePathDescriptionId=\{sharePathDescriptionId\}[\s\S]*AssignmentResultsHeaderShareDisabledReason[\s\S]*disabledReasonId=\{shareDisabledReasonId\}/,
-  'Assignment result share controls should pass the same prepared disabled reason id and current student-link description id through preview, path, copy, and disabled reason text.'
+  /const shareDisabledReasonId =\s*getAssignmentResultHeaderShareDisabledReasonId\(shareAction\)[\s\S]*const sharePathDescriptionId =\s*getAssignmentResultHeaderSharePathDescriptionId\(shareAction\)[\s\S]*AssignmentResultsHeaderCopyShareAction[\s\S]*disabledReasonId=\{shareDisabledReasonId\}[\s\S]*sharePathDescriptionId=\{sharePathDescriptionId\}[\s\S]*AssignmentResultsHeaderSharePreviewLink[\s\S]*disabledReasonId=\{shareDisabledReasonId\}[\s\S]*sharePathDescriptionId=\{sharePathDescriptionId\}[\s\S]*AssignmentResultsHeaderSharePath[\s\S]*descriptionId=\{sharePathDescriptionId\}[\s\S]*AssignmentResultsHeaderShareDisabledReason[\s\S]*disabledReasonId=\{shareDisabledReasonId\}/,
+  'Assignment result share controls should pass the same prepared disabled reason id and current student-link description id through copy, preview, path, and disabled reason text.'
 );
 assert.match(
   assignmentResultsHeaderActionsSource,
@@ -12381,23 +12412,24 @@ assert.match(
 );
 assert.match(
   assignmentResultsHeaderActionsSource,
-  /function AssignmentResultsHeaderResultActions[\s\S]*resultActions\.map[\s\S]*AssignmentResultsHeaderResultActionButton[\s\S]*function AssignmentResultsHeaderResultActionButton[\s\S]*resultActionIconByAction\[actionButton\.action\][\s\S]*actionButton\.disabled[\s\S]*aria-label=\{actionButton\.ariaLabel\}[\s\S]*actionButton\.label[\s\S]*actionButton\.description[\s\S]*actionButton\.scopeView[\s\S]*actionButton\.statusView/,
-  'Assignment result action buttons should render prepared result action state, aria labels, data scope, status, and descriptions through focused button components.'
+  /function AssignmentResultsHeaderResultActions[\s\S]*<DropdownMenu>[\s\S]*resultActions\.map[\s\S]*AssignmentResultsHeaderResultActionButton[\s\S]*function AssignmentResultsHeaderResultActionButton[\s\S]*resultActionIconByAction\[actionButton\.action\][\s\S]*<DropdownMenuItem[\s\S]*disabled=\{actionButton\.disabled\}[\s\S]*aria-label=\{actionButton\.ariaLabel\}[\s\S]*actionButton\.label[\s\S]*actionButton\.description/,
+  'Assignment result actions should render prepared state, aria labels, labels, and descriptions as items of the Copy & export menu.'
 );
 assert.match(
   assignmentResultsHeaderActionsSource,
-  /const actionDescriptionId = getResultActionDescriptionId\(actionButton\.id\)[\s\S]*const scopeDescriptionId = getResultActionSummaryDescriptionId\([\s\S]*`\$\{actionButton\.id\}-scope`[\s\S]*const statusDescriptionId = getResultActionSummaryDescriptionId\([\s\S]*`\$\{actionButton\.id\}-status`[\s\S]*const describedBy = \[[\s\S]*actionDescriptionId,[\s\S]*scopeDescriptionId,[\s\S]*statusDescriptionId,[\s\S]*disabledReasonId,[\s\S]*aria-describedby=\{describedBy\}[\s\S]*id=\{actionDescriptionId\}/,
-  'Assignment result action buttons should associate action, scope, status, and disabled-reason descriptions with the button control.'
+  /const actionDescriptionId = getResultActionDescriptionId\(actionButton\.id\)[\s\S]*const describedBy = \[actionDescriptionId, disabledReasonId\][\s\S]*aria-describedby=\{describedBy\}[\s\S]*id=\{actionDescriptionId\}/,
+  'Assignment result menu items should associate their description and any disabled reason with the control.'
 );
-assert.match(
+// Five action cards with two badges each were replaced by one menu.
+assert.doesNotMatch(
   assignmentResultsHeaderActionsSource,
-  /function AssignmentResultActionSummaryItem[\s\S]*ariaLabel[\s\S]*description[\s\S]*label[\s\S]*tone[\s\S]*value[\s\S]*<Badge[\s\S]*data-tone=\{tone\}[\s\S]*<output[\s\S]*aria-label=\{ariaLabel\}[\s\S]*\{value\}[\s\S]*\{description\}/,
-  'Assignment result action summary items should render prepared scope/status labels, values, tones, descriptions, and accessible labels.'
+  /function AssignmentResultActionSummaryItem\b/,
+  'Result actions no longer show per-action scope and status badges; each menu item keeps its label and description.'
 );
-assert.match(
+assert.doesNotMatch(
   assignmentResultsHeaderActionsSource,
-  /function AssignmentResultActionSummaryItem[\s\S]*const descriptionId = getResultActionSummaryDescriptionId\(id\)[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*id=\{descriptionId\}/,
-  'Assignment result action summary descriptions should use the same stable ids referenced by result action buttons.'
+  /getResultActionSummaryDescriptionId/,
+  'Result action summary description ids were removed together with the scope and status badges.'
 );
 assert.match(
   assignmentResultsHeaderActionsSource,
@@ -12421,8 +12453,8 @@ assert.match(
 );
 assert.match(
   assignmentResultsHeaderActionsSource,
-  /function AssignmentResultsHeaderResultActionButton[\s\S]*const describedBy = \[[\s\S]*disabledReasonId,[\s\S]*aria-describedby=\{describedBy\}[\s\S]*function AssignmentResultsHeaderResultActionDisabledReasons[\s\S]*id=\{getResultActionDisabledReasonId[\s\S]*id: disabledReason\.id/,
-  'Assignment result action disabled buttons should be associated with their prepared disabled reason text.'
+  /function AssignmentResultsHeaderResultActionButton[\s\S]*const describedBy = \[actionDescriptionId, disabledReasonId\][\s\S]*aria-describedby=\{describedBy\}[\s\S]*function AssignmentResultsHeaderResultActionDisabledReasons[\s\S]*id=\{getResultActionDisabledReasonId[\s\S]*id: disabledReason\.id/,
+  'Assignment result disabled menu items should be associated with their prepared disabled reason text.'
 );
 assert.match(
   assignmentResultsHeaderActionsSource,
@@ -12826,13 +12858,13 @@ assert.match(
 );
 assert.match(
   assignmentResultsItemAnalysisCardSource,
-  /AssignmentResultsItemAnalysisAnswerNotes[\s\S]*itemView=\{itemView\}/,
-  'Assignment result item analysis card component should delegate prepared answer notes to a focused item component.'
+  /itemView\.correctRateProgressValue[\s\S]*itemView\.prompt[\s\S]*itemView\.correctRateLabel/,
+  'Assignment result reteach rows should render the prompt with its correct rate and a rate bar.'
 );
 assert.match(
   assignmentResultsItemAnalysisCardSource,
-  /function AssignmentResultsItemAnalysisAnswerNotes[\s\S]*itemView\.expectedAnswerSummaryText[\s\S]*itemView\.acceptedAnswersLineText[\s\S]*itemView\.explanationText/,
-  'Assignment result item analysis answer notes should render prepared expected answer, accepted answer, and explanation text.'
+  /itemView\.expectedAnswerSummaryText[\s\S]*itemView\.acceptedAnswersLineText[\s\S]*itemView\.explanationText/,
+  'Assignment result reteach rows should render prepared expected answer, accepted answer, and explanation text.'
 );
 assert.match(
   assignmentResultsAttemptReviewCardSource,
@@ -13269,20 +13301,26 @@ assert.match(
   /buildGroupSortBoardHandoffView[\s\S]*runnerView: GroupSortRunnerView[\s\S]*buildGroupSortBoardHandoffContext[\s\S]*runnerView\.groupViews\.reduce[\s\S]*runnerView\.completionSummary\.answeredItemCount[\s\S]*runnerView\.unplacedItemViews\.length/,
   'Group-sort board handoff should derive category, placement, progress, and unplaced counts from the prepared runner view.'
 );
-assert.match(
+// docs/design.md (Tokens And Hard Rules): screen-reader-only text
+// describes the visible UI and must not add audit detail.
+assert.doesNotMatch(
   groupSortBoardSource,
-  /buildGroupSortBoardHandoffView[\s\S]*disabled,[\s\S]*revealAnswer,[\s\S]*runnerView,/,
-  'Group-sort runner should build its category-board handoff from the prepared runner view.'
+  /buildGroupSortBoardHandoffView/,
+  'Group-sort runner should not render hidden audit handoff output.'
 );
-assert.match(
+// docs/design.md (Tokens And Hard Rules): screen-reader-only text
+// describes the visible UI and must not add audit detail.
+assert.doesNotMatch(
   groupSortBoardSource,
-  /GroupSortBoardHandoff[\s\S]*view=\{handoffView\}/,
-  'Group-sort runner should render the prepared category-board handoff.'
+  /<GroupSortBoardHandoff\b/,
+  'Group-sort runner should not render hidden audit handoff output.'
 );
-assert.match(
+// docs/design.md (Tokens And Hard Rules): screen-reader-only text
+// describes the visible UI and must not add audit detail.
+assert.doesNotMatch(
   groupSortBoardSource,
-  /GroupSortBoardHandoffItemView[\s\S]*GroupSortBoardHandoffView[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*aria-labelledby=\{titleId\}[\s\S]*data-handoff="group-sort-board"[\s\S]*data-handoff-scope=\{view\.privacy\.scope\}[\s\S]*view\.itemViews\.map\(\(item\) =>[\s\S]*GroupSortBoardHandoffItem[\s\S]*function GroupSortBoardHandoffItem[\s\S]*const labelId = `group-sort-board-handoff-\$\{item\.id\}-label`[\s\S]*const valueId = `group-sort-board-handoff-\$\{item\.id\}-value`[\s\S]*const descriptionId = `group-sort-board-handoff-\$\{item\.id\}-description`[\s\S]*data-handoff-item=\{item\.id\}[\s\S]*id=\{labelId\}[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*aria-label=\{item\.ariaLabel\}[\s\S]*aria-labelledby=\{`\$\{labelId\} \$\{valueId\}`\}[\s\S]*id=\{valueId\}[\s\S]*id=\{descriptionId\}/,
-  'Group-sort runner should expose stable hidden group-sort board privacy scope plus label, value, and description relationships.'
+  /data-handoff=/,
+  'Group-sort runner should not render hidden audit handoff output.'
 );
 assert.match(
   matchingPairsBoardHandoffSource,
@@ -13294,20 +13332,26 @@ assert.match(
   /buildMatchingPairsBoardHandoffView[\s\S]*runnerView: ChoicePairingRunnerView[\s\S]*buildMatchingPairsBoardHandoffContext[\s\S]*runnerView\.promptItemViews\.length[\s\S]*runnerView\.choiceViews\.length[\s\S]*runnerView\.completionSummary\.answeredItemCount/,
   'Matching-pairs board handoff should derive card, choice, selection, and progress state from the prepared runner view.'
 );
-assert.match(
+// docs/design.md (Tokens And Hard Rules): screen-reader-only text
+// describes the visible UI and must not add audit detail.
+assert.doesNotMatch(
   matchingPairsBoardSource,
-  /buildMatchingPairsBoardHandoffView[\s\S]*disabled,[\s\S]*revealAnswer,[\s\S]*runnerView,/,
-  'Matching-pairs runner should build its card-board handoff from the prepared runner view.'
+  /buildMatchingPairsBoardHandoffView/,
+  'Matching-pairs runner should not render hidden audit handoff output.'
 );
-assert.match(
+// docs/design.md (Tokens And Hard Rules): screen-reader-only text
+// describes the visible UI and must not add audit detail.
+assert.doesNotMatch(
   matchingPairsBoardSource,
-  /MatchingPairsBoardHandoff[\s\S]*view=\{handoffView\}/,
-  'Matching-pairs runner should render the prepared card-board handoff.'
+  /<MatchingPairsBoardHandoff\b/,
+  'Matching-pairs runner should not render hidden audit handoff output.'
 );
-assert.match(
+// docs/design.md (Tokens And Hard Rules): screen-reader-only text
+// describes the visible UI and must not add audit detail.
+assert.doesNotMatch(
   matchingPairsBoardSource,
-  /MatchingPairsBoardHandoffItemView[\s\S]*MatchingPairsBoardHandoffView[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*aria-labelledby=\{titleId\}[\s\S]*data-handoff="matching-pairs-board"[\s\S]*data-handoff-scope=\{view\.privacy\.scope\}[\s\S]*view\.itemViews\.map\(\(item\) =>[\s\S]*MatchingPairsBoardHandoffItem[\s\S]*function MatchingPairsBoardHandoffItem[\s\S]*const labelId = `matching-pairs-board-handoff-\$\{item\.id\}-label`[\s\S]*const valueId = `matching-pairs-board-handoff-\$\{item\.id\}-value`[\s\S]*const descriptionId = `matching-pairs-board-handoff-\$\{item\.id\}-description`[\s\S]*data-handoff-item=\{item\.id\}[\s\S]*id=\{labelId\}[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*aria-label=\{item\.ariaLabel\}[\s\S]*aria-labelledby=\{`\$\{labelId\} \$\{valueId\}`\}[\s\S]*id=\{valueId\}[\s\S]*id=\{descriptionId\}/,
-  'Matching-pairs runner should expose stable hidden matching-pairs board privacy scope plus label, value, and description relationships.'
+  /data-handoff=/,
+  'Matching-pairs runner should not render hidden audit handoff output.'
 );
 assert.match(
   groupSortBoardSource,
@@ -13390,15 +13434,19 @@ assert.match(
   /buildListeningPromptView/,
   'Listening runner should delegate speech language and transcript visibility to the listening prompt view helper.'
 );
-assert.match(
+// docs/design.md (Tokens And Hard Rules): screen-reader-only text
+// describes the visible UI and must not add audit detail.
+assert.doesNotMatch(
   listeningRunnerSource,
-  /buildListeningSpeechHandoffView[\s\S]*promptView: activePromptView[\s\S]*runnerView[\s\S]*speechSupported/,
-  'Listening runner should expose the prepared listening speech handoff from the shared runner and prompt views.'
+  /buildListeningSpeechHandoffView/,
+  'Listening runner should not render hidden audit handoff output.'
 );
-assert.match(
+// docs/design.md (Tokens And Hard Rules): screen-reader-only text
+// describes the visible UI and must not add audit detail.
+assert.doesNotMatch(
   listeningRunnerSource,
-  /ListeningSpeechHandoffView[\s\S]*ListeningSpeechHandoffItemView[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*aria-labelledby=\{titleId\}[\s\S]*data-handoff="listening-speech"[\s\S]*data-handoff-scope=\{view\.privacy\.scope\}[\s\S]*view\.itemViews\.map\(\(item\) =>[\s\S]*ListeningSpeechHandoffItem[\s\S]*function ListeningSpeechHandoffItem[\s\S]*item: ListeningSpeechHandoffItemView[\s\S]*const labelId = `listening-speech-handoff-\$\{item\.id\}-label`[\s\S]*const valueId = `listening-speech-handoff-\$\{item\.id\}-value`[\s\S]*const descriptionId = `listening-speech-handoff-\$\{item\.id\}-description`[\s\S]*data-handoff-item=\{item\.id\}[\s\S]*id=\{labelId\}[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*aria-label=\{item\.ariaLabel\}[\s\S]*aria-labelledby=\{`\$\{labelId\} \$\{valueId\}`\}[\s\S]*id=\{valueId\}[\s\S]*id=\{descriptionId\}/,
-  'Listening runner should render stable listening speech privacy scope plus handoff markers and item outputs.'
+  /data-handoff=/,
+  'Listening runner should not render hidden audit handoff output.'
 );
 assert.match(
   listeningRunnerSource,
@@ -13444,10 +13492,12 @@ assert.doesNotMatch(
   /activeIndex \+ offset|getSequentialRunnerItemIdByOffset|getStudentRunnerReviewStatusClassName|answers\[activeItem\.id\]/,
   'Open-box runner should not hand-roll sequence wrapping, review styles, or active answer state.'
 );
-assert.match(
+// docs/design.md (Tokens And Hard Rules): screen-reader-only text
+// describes the visible UI and must not add audit detail.
+assert.doesNotMatch(
   openBoxRunnerSource,
-  /OpenBoxRevealHandoffView[\s\S]*OpenBoxRevealHandoffItemView[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*aria-labelledby=\{titleId\}[\s\S]*data-handoff="open-box-reveal-card"[\s\S]*data-handoff-scope=\{view\.privacy\.scope\}[\s\S]*view\.itemViews\.map\(\(item\) =>[\s\S]*OpenBoxRevealHandoffItem[\s\S]*function OpenBoxRevealHandoffItem[\s\S]*item: OpenBoxRevealHandoffItemView[\s\S]*const labelId = `open-box-reveal-handoff-\$\{item\.id\}-label`[\s\S]*const valueId = `open-box-reveal-handoff-\$\{item\.id\}-value`[\s\S]*const descriptionId = `open-box-reveal-handoff-\$\{item\.id\}-description`[\s\S]*data-handoff-item=\{item\.id\}[\s\S]*id=\{labelId\}[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*aria-label=\{item\.ariaLabel\}[\s\S]*aria-labelledby=\{`\$\{labelId\} \$\{valueId\}`\}[\s\S]*id=\{valueId\}[\s\S]*id=\{descriptionId\}/,
-  'Open-box runner should render reveal-card privacy scope plus stable label, value, and description outputs.'
+  /data-handoff=/,
+  'Open-box runner should not render hidden audit handoff output.'
 );
 for (const filePath of [
   'src/components/activities/line-match-board.tsx',
@@ -18983,8 +19033,8 @@ assert.match(
 );
 assert.match(
   publicPagesSpecSource,
-  /localizedPath\(`\/create\?template=\$\{mode\.template\}`, locale\)[\s\S]*localizedPath\(`\/create\?template=\$\{action\.template\}`, locale\)[\s\S]*expectedLocalizedUrlPattern\('\/create\?template=line-match', locale\)/,
-  'Public entry E2E tests should verify locale-aware template creation URLs.'
+  /localizedPath\(\s*`\/create\?source=worksheets&template=\$\{mode\.template\}`,\s*locale\s*\)[\s\S]*localizedPath\(\s*`\/create\?source=templates&template=\$\{action\.template\}`,\s*locale\s*\)[\s\S]*expectedLocalizedUrlPattern\(\s*'\/create\?source=templates&template=line-match',\s*locale\s*\)/,
+  'Public entry E2E tests should verify locale-aware template creation URLs that carry the entry source.'
 );
 assert.doesNotMatch(
   publicPagesSpecSource,
@@ -20272,30 +20322,38 @@ assert.match(
   /function buildStudentRuntimeSemanticBundleHandoffView\(\{[\s\S]*interactionHandoffView,[\s\S]*runtimeChoiceAssignmentHandoffView,[\s\S]*runtimeIdentityHandoffView,[\s\S]*STUDENT_RUNTIME_SEMANTIC_BUNDLE_HANDOFF_ITEM_IDS\.map[\s\S]*getStudentRuntimeSemanticBundleSource\([\s\S]*getStudentRuntimeSemanticBundleSourceItem\([\s\S]*sourceItem\.description[\s\S]*sourceItem\.label[\s\S]*sourceItem\.value[\s\S]*data/,
   'Student runtime semantic bundle should derive its 30 slices from existing safe child handoff items instead of recalculating prompt, choice, answer, or runtime-id data.'
 );
-assert.match(
+// docs/design.md (Tokens And Hard Rules): screen-reader-only text
+// describes the visible UI and must not add audit detail.
+assert.doesNotMatch(
   studentRuntimeItemListSource,
-  /StudentRuntimeSemanticBundleHandoffItemView[\s\S]*StudentRuntimeSemanticBundleHandoffView[\s\S]*data-handoff="student-runtime-semantic-bundle"[\s\S]*data-handoff-scope=\{view\.privacy\.scope\}[\s\S]*view\.itemViews\.map[\s\S]*StudentRuntimeSemanticBundleHandoffItem[\s\S]*function StudentRuntimeSemanticBundleHandoffItem[\s\S]*const labelId = `student-runtime-semantic-bundle-handoff-\$\{itemView\.id\}-label`[\s\S]*const valueId = `student-runtime-semantic-bundle-handoff-\$\{itemView\.id\}-value`[\s\S]*const descriptionId = `student-runtime-semantic-bundle-handoff-\$\{itemView\.id\}-description`[\s\S]*data-handoff-item=\{itemView\.id\}[\s\S]*data-source-handoff=\{itemView\.sourceScope\}[\s\S]*data-source-handoff-item=\{itemView\.sourceItemId\}[\s\S]*id=\{labelId\}[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*aria-label=\{itemView\.ariaLabel\}[\s\S]*aria-labelledby=\{`\$\{labelId\} \$\{valueId\}`\}[\s\S]*id=\{valueId\}[\s\S]*id=\{descriptionId\}/,
-  'Student runtime item-list component should render hidden stable semantic-bundle handoff outputs with privacy scope, source markers, label, value, and description relationships.'
+  /data-handoff="student-runtime-semantic-bundle"/,
+  'Student runtime item list should not render hidden audit handoff output.'
+);
+// docs/design.md (Tokens And Hard Rules): screen-reader-only text
+// describes the visible UI and must not add audit detail.
+assert.doesNotMatch(
+  studentRuntimeItemListSource,
+  /data-handoff="student-runtime-interaction"/,
+  'Student runtime item list should not render hidden audit handoff output.'
+);
+// docs/design.md (Tokens And Hard Rules): screen-reader-only text
+// describes the visible UI and must not add audit detail.
+assert.doesNotMatch(
+  studentRuntimeItemListSource,
+  /data-handoff="student-runtime-choice-assignment"/,
+  'Student runtime item list should not render hidden audit handoff output.'
+);
+// docs/design.md (Tokens And Hard Rules): screen-reader-only text
+// describes the visible UI and must not add audit detail.
+assert.doesNotMatch(
+  studentRuntimeItemListSource,
+  /data-handoff="student-runtime-identity"/,
+  'Student runtime item list should not render hidden audit handoff output.'
 );
 assert.match(
-  studentRuntimeItemListSource,
-  /StudentRuntimeInteractionHandoffItemView[\s\S]*StudentRuntimeInteractionHandoffView[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*aria-labelledby=\{titleId\}[\s\S]*data-handoff="student-runtime-interaction"[\s\S]*data-handoff-scope=\{view\.privacy\.scope\}[\s\S]*view\.itemViews\.map[\s\S]*StudentRuntimeInteractionHandoffItem[\s\S]*function StudentRuntimeInteractionHandoffItem[\s\S]*const labelId = `student-runtime-interaction-handoff-\$\{itemView\.id\}-label`[\s\S]*const valueId = `student-runtime-interaction-handoff-\$\{itemView\.id\}-value`[\s\S]*const descriptionId = `student-runtime-interaction-handoff-\$\{itemView\.id\}-description`[\s\S]*data-handoff-item=\{itemView\.id\}[\s\S]*id=\{labelId\}[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*aria-label=\{itemView\.ariaLabel\}[\s\S]*aria-labelledby=\{`\$\{labelId\} \$\{valueId\}`\}[\s\S]*id=\{valueId\}[\s\S]*id=\{descriptionId\}/,
-  'Student runtime item-list component should render hidden stable runtime-interaction handoff outputs with privacy scope plus label, value, and description relationships.'
-);
-assert.match(
-  studentRuntimeItemListSource,
-  /StudentRuntimeChoiceAssignmentHandoffItemView[\s\S]*StudentRuntimeChoiceAssignmentHandoffView[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*aria-labelledby=\{titleId\}[\s\S]*data-handoff="student-runtime-choice-assignment"[\s\S]*data-handoff-scope=\{view\.privacy\.scope\}[\s\S]*view\.itemViews\.map[\s\S]*StudentRuntimeChoiceAssignmentHandoffItem[\s\S]*function StudentRuntimeChoiceAssignmentHandoffItem[\s\S]*const labelId = `student-runtime-choice-assignment-handoff-\$\{itemView\.id\}-label`[\s\S]*const valueId = `student-runtime-choice-assignment-handoff-\$\{itemView\.id\}-value`[\s\S]*const descriptionId = `student-runtime-choice-assignment-handoff-\$\{itemView\.id\}-description`[\s\S]*data-handoff-item=\{itemView\.id\}[\s\S]*id=\{labelId\}[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*aria-label=\{itemView\.ariaLabel\}[\s\S]*aria-labelledby=\{`\$\{labelId\} \$\{valueId\}`\}[\s\S]*id=\{valueId\}[\s\S]*id=\{descriptionId\}/,
-  'Student runtime item-list component should render hidden stable choice-assignment handoff outputs with privacy scope plus label, value, and description relationships.'
-);
-assert.match(
-  studentRuntimeItemListSource,
-  /StudentRuntimeIdentityHandoffItemView[\s\S]*StudentRuntimeIdentityHandoffView[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*aria-labelledby=\{titleId\}[\s\S]*data-handoff="student-runtime-identity"[\s\S]*data-handoff-scope=\{view\.privacy\.scope\}[\s\S]*view\.itemViews\.map[\s\S]*StudentRuntimeIdentityHandoffItem[\s\S]*function StudentRuntimeIdentityHandoffItem[\s\S]*const labelId = `student-runtime-identity-handoff-\$\{itemView\.id\}-label`[\s\S]*const valueId = `student-runtime-identity-handoff-\$\{itemView\.id\}-value`[\s\S]*const descriptionId = `student-runtime-identity-handoff-\$\{itemView\.id\}-description`[\s\S]*data-handoff-item=\{itemView\.id\}[\s\S]*id=\{labelId\}[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*aria-label=\{itemView\.ariaLabel\}[\s\S]*aria-labelledby=\{`\$\{labelId\} \$\{valueId\}`\}[\s\S]*id=\{valueId\}[\s\S]*id=\{descriptionId\}/,
-  'Student runtime item-list component should render hidden stable runtime-identity handoff outputs with privacy scope plus label, value, and description relationships.'
-);
-assert.match(
-  studentRuntimeItemListSource,
-  /type RuntimeChoiceButtonView[\s\S]*choiceViews: RuntimeChoiceButtonView\[\];[\s\S]*choices: RuntimeChoiceButtonView\[\];|import type \{ RuntimeChoiceButtonView \}[\s\S]*choiceViews: RuntimeChoiceButtonView\[\];[\s\S]*choices: RuntimeChoiceButtonView\[\];/,
-  'Student runtime item list component should consume explicit choice-button view contracts.'
+  readFileSync('src/components/activities/choice-question-stepper.tsx', 'utf8'),
+  /import type \{ DefaultRuntimeItemCardView \} from \'@\/assignments\/student-runner-view\'[\s\S]*cardViews: DefaultRuntimeItemCardView\[\];[\s\S]*cardView\.choiceViews\.map/,
+  'The choice question stepper should consume explicit runtime item card and choice-button view contracts.'
 );
 assert.match(
   fillBlankWorksheetSource,
@@ -20551,7 +20609,7 @@ assert.match(
 );
 assert.match(
   playRouteSource,
-  /StudentRunnerHeaderCard[\s\S]*badgeLabel=\{runnerPageView\.routeBadgeLabel\}[\s\S]*view=\{runnerRouteState\.headerView\}/,
+  /StudentRunnerHeaderCard[\s\S]*templateLabel=\{controlView\.runnerTitle\}[\s\S]*view=\{runnerRouteState\.headerView\}/,
   'Student play route should delegate student assignment header rendering from the page view-model.'
 );
 assert.match(
@@ -20559,20 +20617,23 @@ assert.match(
   /StudentRunnerStartHandoffItemView[\s\S]*StudentRunnerStartHandoffView[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*aria-labelledby=\{titleId\}[\s\S]*data-handoff="student-runner-start"[\s\S]*data-handoff-scope=\{view\.privacy\.scope\}[\s\S]*view\.itemViews\.map[\s\S]*StudentRunnerStartHandoffItem[\s\S]*function StudentRunnerStartHandoffItem[\s\S]*const labelId = `student-runner-start-handoff-\$\{itemView\.id\}-label`[\s\S]*const valueId = `student-runner-start-handoff-\$\{itemView\.id\}-value`[\s\S]*const descriptionId = `student-runner-start-handoff-\$\{itemView\.id\}-description`[\s\S]*data-handoff-item=\{itemView\.id\}[\s\S]*id=\{labelId\}[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*aria-label=\{itemView\.ariaLabel\}[\s\S]*aria-labelledby=\{`\$\{labelId\} \$\{valueId\}`\}[\s\S]*id=\{valueId\}[\s\S]*id=\{descriptionId\}/,
   'Student runner start handoff component should render hidden safe outputs with privacy scope plus prepared label, value, and description relationships.'
 );
-assert.match(
+// docs/design.md (Tokens And Hard Rules): screen-reader-only text
+// describes the visible UI and must not add audit detail.
+assert.doesNotMatch(
   playRouteSource,
-  /StudentRunnerStartHandoff[\s\S]*from '@\/components\/assignments\/student-runner-start-handoff'[\s\S]*runnerPageView\.startHandoffView[\s\S]*<StudentRunnerStartHandoff[\s\S]*view=\{runnerPageView\.startHandoffView\}/,
-  'Student play route should render the prepared hidden start handoff view.'
+  /<StudentRunnerStartHandoff\b/,
+  'Student play route should not render the hidden start audit handoff.'
 );
 assert.match(
   playRouteSource,
   /StudentRunnerAttemptShell[\s\S]*controlView=\{controlView\}[\s\S]*identityView=\{runnerRouteState\.identityView\}[\s\S]*resultPanelView=\{resultPanelView\}/,
   'Student play route should delegate attempt shell, identity, timer, and result presentation.'
 );
-assert.match(
+// docs/design.md (Student Runner): play links use a focused layout with no teacher links.
+assert.doesNotMatch(
   playRouteSource,
-  /const \{ previewView \} = runnerRouteState[\s\S]*<ActivityPreview[\s\S]*activity=\{previewView\.activity\}[\s\S]*assignment=\{previewView\.assignment\}[\s\S]*hideAnswers=\{previewView\.hideAnswers\}/,
-  'Student play route should render activity preview from the prepared runner preview view.'
+  /<ActivityPreview\b/,
+  'Student play links no longer show the teacher activity preview card or its Create activity call to action.'
 );
 assert.match(
   studentRunnerStateSource,
@@ -20710,13 +20771,14 @@ assert.doesNotMatch(
 );
 assert.match(
   studentRunnerSubmitControlsSource,
-  /const submitControlsLabelId = 'student-runner-submit-controls-label'[\s\S]*aria-labelledby=\{submitControlsLabelId\}[\s\S]*controlView\.submitControlsLabel[\s\S]*data-confirm-incomplete=[\s\S]*controlView\.requiresIncompleteSubmitConfirmation[\s\S]*controlView\.submitDisabled[\s\S]*aria-label=\{controlView\.submitButtonAriaLabel\}[\s\S]*aria-describedby=\{buttonDescriptionIds\.join\(' '\)\}[\s\S]*controlView\.submitButtonLabel[\s\S]*controlView\.submitHintViews\.map\(\(hintView\)[\s\S]*key=\{hintView\.id\}[\s\S]*ariaLabel=\{hintView\.ariaLabel\}[\s\S]*text=\{hintView\.text\}[\s\S]*tone=\{hintView\.tone\}/,
-  'Student runner submit controls should render prepared submit disabled state, labels, structured incomplete-confirmation state, and domain-prepared hint views.'
+  /const submitControlsLabelId = 'student-runner-submit-controls-label'[\s\S]*aria-labelledby=\{submitControlsLabelId\}[\s\S]*controlView\.submitControlsLabel[\s\S]*controlView\.submitHintViews\.map\(\(hintView\)[\s\S]*hintView=\{hintView\}[\s\S]*key=\{hintView\.id\}[\s\S]*data-confirm-incomplete=[\s\S]*controlView\.requiresIncompleteSubmitConfirmation[\s\S]*controlView\.submitDisabled[\s\S]*aria-label=\{controlView\.submitButtonAriaLabel\}[\s\S]*aria-describedby=\{buttonDescriptionIds\.join\(' '\)\}[\s\S]*controlView\.submitButtonLabel[\s\S]*function StudentRunnerSubmitHint[\s\S]*aria-label=\{hintView\.ariaLabel\}[\s\S]*data-tone=\{hintView\.tone\}[\s\S]*hintView\.text/,
+  'Student runner submit bar should render prepared submit disabled state, labels, structured incomplete-confirmation state, and domain-prepared hint views.'
 );
-assert.match(
+// The payload summary (share slug, loaded item counts) is system detail, not student UI.
+assert.doesNotMatch(
   studentRunnerSubmitControlsSource,
-  /<fieldset[\s\S]*controlView\.payloadSummaryView\.ariaLabel[\s\S]*<legend[\s\S]*controlView\.payloadSummaryView\.title[\s\S]*controlView\.payloadSummaryView\.description[\s\S]*<dl[\s\S]*controlView\.payloadSummaryView\.metrics\.map\(\(metric\)[\s\S]*buildStudentRunnerPayloadMetricLabelId\(metric\.key\)[\s\S]*<output[\s\S]*aria-describedby=\{buildStudentRunnerPayloadMetricDescriptionId\([\s\S]*metric\.key[\s\S]*aria-label=\{metric\.ariaLabel\}[\s\S]*aria-labelledby=\{`\$\{buildStudentRunnerPayloadMetricLabelId\([\s\S]*metric\.key[\s\S]*\} \$\{buildStudentRunnerPayloadMetricValueId\(metric\.key\)\}`\}[\s\S]*id=\{buildStudentRunnerPayloadMetricValueId\(metric\.key\)\}[\s\S]*\{metric\.value\}[\s\S]*id=\{buildStudentRunnerPayloadMetricDescriptionId\(metric\.key\)\}[\s\S]*\{metric\.description\}/,
-  'Student runner submit controls should render the prepared browser payload summary as semantic labelled outputs.'
+  /controlView\.payloadSummaryView/,
+  'The submit bar shows progress; it no longer lists the raw browser payload summary to students.'
 );
 assert.match(
   studentRunnerSubmitControlsHandoffSource,
@@ -20764,15 +20826,19 @@ assert.match(
   /export function buildStudentRunnerSubmitControlsHandoffView\([\s\S]*controlView: StudentRunnerControlView[\s\S]*answeredValue = getPayloadMetricValue\(controlView, 'answers'\)[\s\S]*itemValue = getPayloadMetricValue\(controlView, 'items'\)[\s\S]*unansweredValue = getPayloadMetricValue\(controlView, 'unanswered'\)[\s\S]*const hasReadOnlyHint = hasSubmitHint\(controlView, 'read-only'\)[\s\S]*hasConfirmIncompleteHint: hasSubmitHint\(controlView, 'confirm-incomplete'\)[\s\S]*hasReadOnlyHint,[\s\S]*hasUnansweredHint: hasSubmitHint\(controlView, 'unanswered'\)[\s\S]*submitDisabledPolicy: formatSubmitDisabledPolicy[\s\S]*submitHintOrder: formatSubmitHintOrder\(controlView\)[\s\S]*privacy: buildStudentRunnerSubmitControlsHandoffPrivacyContract/,
   'Student runner submit controls handoff should derive safe counts, readiness details, hint order, disabled policy, and privacy from the prepared control view.'
 );
-assert.match(
+// docs/design.md (Tokens And Hard Rules): screen-reader-only text
+// describes the visible UI and must not add audit detail.
+assert.doesNotMatch(
   studentRunnerSubmitControlsSource,
-  /buildStudentRunnerSubmitControlsHandoffView[\s\S]*const submitControlsHandoffView =[\s\S]*buildStudentRunnerSubmitControlsHandoffView\(controlView\)[\s\S]*<StudentRunnerSubmitControlsHandoff view=\{submitControlsHandoffView\} \/>/,
-  'Student runner submit controls should render the prepared hidden submit-controls handoff.'
+  /<StudentRunnerSubmitControlsHandoff\b/,
+  'Student runner submit bar should not render the hidden submit-controls audit handoff.'
 );
-assert.match(
+// docs/design.md (Tokens And Hard Rules): screen-reader-only text
+// describes the visible UI and must not add audit detail.
+assert.doesNotMatch(
   studentRunnerSubmitControlsSource,
-  /function StudentRunnerSubmitControlsHandoff[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*aria-labelledby=\{titleId\}[\s\S]*data-handoff="student-runner-submit-controls"[\s\S]*data-handoff-scope=\{view\.privacy\.scope\}[\s\S]*view\.itemViews\.map\(\(itemView\)[\s\S]*StudentRunnerSubmitControlsHandoffItem[\s\S]*function StudentRunnerSubmitControlsHandoffItem[\s\S]*const labelId = `student-runner-submit-controls-handoff-\$\{itemView\.id\}-label`[\s\S]*const valueId = `student-runner-submit-controls-handoff-\$\{itemView\.id\}-value`[\s\S]*const descriptionId = `student-runner-submit-controls-handoff-\$\{itemView\.id\}-description`[\s\S]*data-handoff-item=\{itemView\.id\}[\s\S]*id=\{labelId\}[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*aria-label=\{itemView\.ariaLabel\}[\s\S]*aria-labelledby=\{`\$\{labelId\} \$\{valueId\}`\}[\s\S]*id=\{valueId\}[\s\S]*id=\{descriptionId\}/,
-  'Student runner submit controls handoff should render hidden safe outputs with privacy scope plus prepared label, value, and description relationships.'
+  /data-handoff=/,
+  'Student runner submit bar should not render hidden audit handoff output.'
 );
 assert.match(
   studentRunnerStateSource,
@@ -20840,10 +20906,12 @@ assert.match(
   /StudentRunnerSubmissionHandoffItemView[\s\S]*StudentRunnerSubmissionHandoffView[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*aria-labelledby=\{titleId\}[\s\S]*data-handoff="student-runner-submission"[\s\S]*data-handoff-scope=\{view\.privacy\.scope\}[\s\S]*view\.itemViews\.map[\s\S]*StudentRunnerSubmissionHandoffItem[\s\S]*function StudentRunnerSubmissionHandoffItem[\s\S]*const labelId = `student-runner-submission-handoff-\$\{itemView\.id\}-label`[\s\S]*const valueId = `student-runner-submission-handoff-\$\{itemView\.id\}-value`[\s\S]*const descriptionId = `student-runner-submission-handoff-\$\{itemView\.id\}-description`[\s\S]*data-handoff-item=\{itemView\.id\}[\s\S]*id=\{labelId\}[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*aria-label=\{itemView\.ariaLabel\}[\s\S]*aria-labelledby=\{`\$\{labelId\} \$\{valueId\}`\}[\s\S]*id=\{valueId\}[\s\S]*id=\{descriptionId\}/,
   'Student runner submission handoff component should render hidden safe outputs with privacy scope plus prepared label, value, and description relationships.'
 );
-assert.match(
+// docs/design.md (Tokens And Hard Rules): screen-reader-only text
+// describes the visible UI and must not add audit detail.
+assert.doesNotMatch(
   playRouteSource,
-  /StudentRunnerSubmissionHandoff[\s\S]*from '@\/components\/assignments\/student-runner-submission-handoff'[\s\S]*<StudentRunnerSubmissionHandoff[\s\S]*view=\{runnerPageView\.submissionHandoffView\}/,
-  'Student runner route should render the prepared hidden submission handoff view.'
+  /<StudentRunnerSubmissionHandoff\b/,
+  'Student play route should not render the hidden submission audit handoff.'
 );
 const studentSubmissionPrivateAnswer = 'DOMAIN_PRIVATE_STUDENT_ANSWER';
 const studentSubmissionPrivateToken = 'domain-private-anonymous-token';
@@ -21494,10 +21562,11 @@ for (const privateValue of [
     `Submission validation handoff leaked private text: ${privateValue}`
   );
 }
-assert.match(
+// The readiness checklist exposed system checks ("frozen runtime items") to students.
+assert.doesNotMatch(
   studentRunnerSubmitControlsSource,
-  /<StudentRunnerSubmitReadiness[\s\S]*view=\{controlView\.submitReadinessView\}[\s\S]*const titleId = 'student-runner-submit-readiness-title'[\s\S]*aria-describedby=\{`\$\{descriptionId\} \$\{statusValueId\}`\}[\s\S]*aria-label=\{view\.ariaLabel\}[\s\S]*aria-labelledby=\{titleId\}[\s\S]*data-status=\{view\.status\}[\s\S]*<output[\s\S]*aria-label=\{view\.ariaLabel\}[\s\S]*id=\{statusValueId\}[\s\S]*view\.statusLabel[\s\S]*view\.items\.map\(\(item\)[\s\S]*const labelId = `student-runner-submit-readiness-\$\{item\.id\}-label`[\s\S]*const valueId = `student-runner-submit-readiness-\$\{item\.id\}-value`[\s\S]*const descriptionId = `student-runner-submit-readiness-\$\{item\.id\}-description`[\s\S]*aria-label=\{item\.ariaLabel\}[\s\S]*data-status=\{item\.status\}[\s\S]*<output[\s\S]*aria-label=\{item\.ariaLabel\}[\s\S]*id=\{valueId\}[\s\S]*item\.statusLabel[\s\S]*item\.description/,
-  'Student runner submit controls should render the domain-prepared submit-readiness checks.'
+  /StudentRunnerSubmitReadiness\b|controlView\.submitReadinessView/,
+  'The submit bar no longer shows a five-row readiness checklist; progress and the incomplete confirmation cover it.'
 );
 assert.doesNotMatch(
   studentRunnerSubmitControlsSource,
@@ -21514,15 +21583,16 @@ assert.match(
   /buildStudentRunnerUnavailableSafetyItems[\s\S]*contentPolicy\.runtimeItemsHidden[\s\S]*buildStudentRunnerUnavailableSafetyItemView[\s\S]*student_runner_unavailable_safety_activity_content_label[\s\S]*contentPolicy\.answerKeysHidden[\s\S]*contentPolicy\.explanationsHidden[\s\S]*student_runner_unavailable_safety_answer_feedback_label[\s\S]*identityPolicy\.browserLabelHidden[\s\S]*identityPolicy\.rawAnonymousTokenHidden[\s\S]*student_runner_unavailable_safety_browser_identity_label[\s\S]*contentPolicy\.teacherMaterialsHidden[\s\S]*student_runner_unavailable_safety_source_materials_label[\s\S]*submissionPolicy\.submissionsBlocked[\s\S]*student_runner_unavailable_safety_submissions_label[\s\S]*function buildStudentRunnerUnavailableSafetyItemView[\s\S]*public_assignment_unavailable_access_handoff_item_aria/,
   'Student runner unavailable safety items should be derived from explicit public payload privacy and submission policies.'
 );
-assert.match(
+// Closed links show one plain message: no status cards and no teacher or marketing links.
+assert.doesNotMatch(
   studentRunnerMissingPanelSource,
-  /view\.unavailableSafetyView[\s\S]*aria-labelledby=\{safetyTitleId\}[\s\S]*view\.unavailableSafetyView\.title[\s\S]*view\.unavailableSafetyView\.description[\s\S]*<dl[\s\S]*aria-describedby=\{safetyDescriptionId\}[\s\S]*view\.unavailableSafetyView\.items\.map\(\(item\)[\s\S]*StudentRunnerUnavailableSafetyIcon[\s\S]*<dt id=\{labelId\}[\s\S]*item\.label[\s\S]*aria-label=\{item\.ariaLabel\}[\s\S]*item\.value[\s\S]*item\.description/,
-  'Student runner missing panel should render the prepared unavailable-link safety view without rebuilding copy.'
+  /view\.unavailableSafetyView/,
+  'Student runner missing panel should not render the unavailable-link safety cards.'
 );
 assert.match(
   studentRunnerSubmitControlsSource,
-  /const submitHintIds = controlView\.submitHintViews\.map[\s\S]*const buttonDescriptionIds = \[[\s\S]*readinessDescriptionId,[\s\S]*payloadSummaryDescriptionId,[\s\S]*\.\.\.submitHintIds,[\s\S]*aria-describedby=\{buttonDescriptionIds\.join\(' '\)\}[\s\S]*id=\{buildStudentRunnerSubmitHintId\(hintView\.id\)\}[\s\S]*function buildStudentRunnerSubmitHintId[\s\S]*student-runner-submit-\$\{id\}-hint/,
-  'Student runner submit button should be associated with readiness, payload, and every prepared submit hint.'
+  /const submitHintIds = controlView\.submitHintViews\.map[\s\S]*const buttonDescriptionIds = \[progressDescriptionId, \.\.\.submitHintIds\][\s\S]*id=\{buildStudentRunnerSubmitHintId\(hintView\.id\)\}[\s\S]*aria-describedby=\{buttonDescriptionIds\.join\(' '\)\}[\s\S]*function buildStudentRunnerSubmitHintId[\s\S]*student-runner-submit-\$\{id\}-hint/,
+  'Student runner submit button should be associated with the progress description and every prepared submit hint.'
 );
 assert.match(
   studentRunnerStateSource,
@@ -21554,13 +21624,13 @@ assert.doesNotMatch(
   'Student runner submit controls should not choose optional hint copy locally.'
 );
 assert.match(
-  studentRunnerAttemptShellSource,
-  /const progressDescriptionId = 'student-runner-progress-description'[\s\S]*const progressValueId = 'student-runner-progress-value'[\s\S]*const timerDescriptionId = 'student-runner-timer-description'[\s\S]*const timerValueId = 'student-runner-timer-value'[\s\S]*aria-describedby=\{[\s\S]*progressDescriptionId[\s\S]*<output[\s\S]*aria-describedby=\{progressDescriptionId\}[\s\S]*aria-label=\{controlView\.progressView\.ariaLabel\}[\s\S]*id=\{progressValueId\}[\s\S]*controlView\.progressView\.label[\s\S]*controlView\.progressView\.description[\s\S]*controlView\.timerBadge\.show[\s\S]*aria-label=\{controlView\.timerBadge\.ariaLabel\}[\s\S]*id=\{timerValueId\}[\s\S]*controlView\.timerBadge\.label[\s\S]*controlView\.timerBadge\.description/,
-  'Student runner attempt status bar should render progress as a semantic output with prepared accessible labels.'
+  studentRunnerSubmitControlsSource,
+  /const progressDescriptionId = 'student-runner-progress-description'[\s\S]*<output[\s\S]*aria-describedby=\{progressDescriptionId\}[\s\S]*aria-label=\{progressView\.ariaLabel\}[\s\S]*progressView\.label[\s\S]*progressView\.description[\s\S]*timerBadge\.show[\s\S]*aria-label=\{timerBadge\.ariaLabel\}[\s\S]*timerBadge\.label/,
+  'Student runner submit bar should render progress and the timer as semantic outputs with prepared accessible labels.'
 );
 assert.match(
   studentRunnerAttemptShellSource,
-  /function StudentRunnerMetricOutput[\s\S]*const labelId = `\$\{prefix\}-\$\{metric\.key\}-label`[\s\S]*const valueId = `\$\{prefix\}-\$\{metric\.key\}-value`[\s\S]*const descriptionId = `\$\{prefix\}-\$\{metric\.key\}-description`[\s\S]*<dt id=\{labelId\}[\s\S]*metric\.label[\s\S]*<output[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*aria-label=\{metric\.ariaLabel\}[\s\S]*aria-labelledby=\{`\$\{labelId\} \$\{valueId\}`\}[\s\S]*id=\{valueId\}[\s\S]*metric\.value[\s\S]*id=\{descriptionId\}[\s\S]*metric\.description/,
+  /function StudentRunnerReviewSummary[\s\S]*view\.metrics\.map[\s\S]*const labelId = `student-runner-review-summary-\$\{metric\.key\}-label`[\s\S]*const valueId = `student-runner-review-summary-\$\{metric\.key\}-value`[\s\S]*<dt id=\{labelId\}[\s\S]*metric\.label[\s\S]*<output[\s\S]*aria-label=\{metric\.ariaLabel\}[\s\S]*aria-labelledby=\{`\$\{labelId\} \$\{valueId\}`\}[\s\S]*id=\{valueId\}[\s\S]*metric\.value/,
   'Student runner post-submit review summary should render metric values as semantic labelled outputs.'
 );
 assert.match(
@@ -21600,8 +21670,8 @@ assert.doesNotMatch(
 );
 assert.match(
   studentRunnerHeaderCardSource,
-  /StudentRunnerHeaderView[\s\S]*StudentRunnerTeacherAction[\s\S]*StudentRunnerPrepareView[\s\S]*StudentRunnerInstructionView/,
-  'Student runner header card should consume explicit assignment-domain header sub-view contracts.'
+  /PublicAssignmentRuleSummaryItem[\s\S]*PublicAssignmentRuleSummaryStats[\s\S]*StudentRunnerHeaderView[\s\S]*StudentRunnerTeacherAction/,
+  'Student runner header card should consume explicit rule-summary, header, and teacher-action view contracts.'
 );
 assert.doesNotMatch(
   studentRunnerHeaderCardSource,
@@ -21668,20 +21738,21 @@ assert.match(
   /view\.message/,
   'Student runner loading panel should consume the loading view message.'
 );
-assert.match(
+// Closed links show one plain message: no status cards and no teacher or marketing links.
+assert.doesNotMatch(
   studentRunnerMissingPanelSource,
-  /view\.badgeLabel[\s\S]*view\.browseTemplatesLabel/,
-  'Student runner missing panel should consume the missing view call to action.'
+  /view\.browseTemplatesLabel|view\.badgeLabel/,
+  'Student runner missing panel should not show a browse-templates call to action or route badge to students.'
 );
-assert.match(
+assert.doesNotMatch(
   studentRunnerMissingPanelSource,
-  /<dl[\s\S]*aria-labelledby=\{titleId\}[\s\S]*view\.scopeItems\.map[\s\S]*key=\{item\.id\}[\s\S]*StudentRunnerMissingScopeIcon[\s\S]*<dt id=\{labelId\}[\s\S]*item\.label[\s\S]*aria-label=\{item\.ariaLabel\}[\s\S]*item\.value[\s\S]*item\.description/,
-  'Student runner missing panel should render prepared missing-link scope labels, values, and descriptions.'
+  /view\.scopeItems/,
+  'Student runner missing panel should not render missing-link scope cards.'
 );
-assert.match(
+assert.doesNotMatch(
   studentRunnerMissingPanelSource,
-  /studentRunnerMissingScopeIcons[\s\S]*'activity-content': IconEyeOff[\s\S]*'link-status': IconCircleOff[\s\S]*'next-step': IconRoute[\s\S]*submissions: IconSendOff[\s\S]*satisfies Record/,
-  'Student runner missing panel should map every missing-link scope item to a typed icon.'
+  /studentRunnerMissingScopeIcons/,
+  'Student runner missing panel no longer maps scope-card icons.'
 );
 assert.doesNotMatch(
   studentRunnerMissingPanelSource,
@@ -21695,18 +21766,19 @@ assert.match(
 );
 assert.match(
   studentRunnerHeaderCardSource,
-  /function StudentRunnerTeacherActionLink[\s\S]*action\.type === 'view-results'[\s\S]*to=\{action\.to\}[\s\S]*params=\{\{ assignmentId: action\.assignmentId \}\}[\s\S]*<Link to=\{action\.to\}/,
-  'Student runner header card should consume prepared teacher action route targets.'
+  /function StudentRunnerTeacherActionLink[\s\S]*action\.type !== 'create-activity'[\s\S]*return null[\s\S]*<Link[\s\S]*to=\{action\.to\}/,
+  'Student runner header card should link only the starter-preview create action; public assignment links show students no teacher results link.'
 );
 assert.doesNotMatch(
   studentRunnerHeaderCardSource,
   /Routes\.DashboardAssignmentResults|Routes\.Create/,
   'Student runner header card should not hardcode teacher action route targets.'
 );
-assert.match(
+// The before-start list restated the rule list that followed it.
+assert.doesNotMatch(
   studentRunnerHeaderCardSource,
-  /StudentRunnerPrepareCard[\s\S]*prepareView=\{view\.prepareView\}[\s\S]*prepareView\.stepViews\.map[\s\S]*key=\{step\.id\}[\s\S]*step\.ariaLabel[\s\S]*step\.label[\s\S]*step\.description/,
-  'Student runner header card should render prepared before-start guidance labels, descriptions, and aria text from the header view.'
+  /StudentRunnerPrepareCard|view\.prepareView/,
+  'Student runner header card no longer repeats a before-start list; key rule chips and the rules disclosure cover it.'
 );
 assert.doesNotMatch(
   studentRunnerHeaderCardSource,
@@ -21720,18 +21792,18 @@ assert.doesNotMatch(
 );
 assert.match(
   studentRunnerAttemptShellSource,
-  /StudentRunnerControlView[\s\S]*StudentRunnerIdentityView[\s\S]*StudentRunnerResultPanelView[\s\S]*StudentAttemptReviewSummaryView[\s\S]*StudentAttemptResultNextStepsView/,
-  'Student runner attempt shell should consume explicit runner control, identity, result, review-summary, and next-step view contracts.'
+  /StudentRunnerControlView[\s\S]*StudentRunnerIdentityView[\s\S]*StudentRunnerResultPanelView[\s\S]*StudentAttemptReviewSummaryView/,
+  'Student runner attempt shell should consume explicit runner control, identity, result, and review-summary view contracts.'
 );
 assert.match(
   studentRunnerAttemptShellSource,
-  /StudentRunnerAttemptStatusBar[\s\S]*controlView=\{controlView\}[\s\S]*StudentRunnerIdentityPanel[\s\S]*identityView=\{identityView\}[\s\S]*StudentRunnerResultPanel[\s\S]*StudentRunnerTimeExpiredNotice/,
-  'Student runner attempt shell should delegate status, identity, result-panel, and time-expired presentation.'
+  /<StudentRunnerResultPanel[\s\S]*<StudentRunnerIdentityPanel[\s\S]*identityView=\{identityView\}[\s\S]*<StudentRunnerTimeExpiredNotice[\s\S]*controlView=\{controlView\}/,
+  'Student runner attempt shell should delegate result-panel, identity, and time-expired presentation; progress lives in the sticky submit bar.'
 );
 assert.match(
-  studentRunnerAttemptShellSource,
-  /function StudentRunnerAttemptStatusBar[\s\S]*controlView\.runnerTitle[\s\S]*controlView\.progressView\.label[\s\S]*controlView\.timerBadge/,
-  'Student runner attempt status bar should render prepared runner, progress, and timer labels.'
+  studentRunnerSubmitControlsSource,
+  /controlView\.submitControlsLabel[\s\S]*progressView\.label[\s\S]*timerBadge\.label/,
+  'Student runner submit bar should render prepared progress and timer labels.'
 );
 assert.match(
   studentRunnerAttemptShellSource,
@@ -21739,19 +21811,20 @@ assert.match(
   'Student runner attempt shell should label the whole attempt workspace from the runner control view.'
 );
 assert.match(
-  studentRunnerAttemptShellSource,
-  /aria-label=\{controlView\.statusBarLabel\}[\s\S]*aria-label=\{controlView\.timerBadge\.ariaLabel\}/,
-  'Student runner attempt status bar should expose domain-prepared status and timer labels.'
+  studentRunnerSubmitControlsSource,
+  /aria-label=\{progressView\.ariaLabel\}[\s\S]*aria-label=\{timerBadge\.ariaLabel\}/,
+  'Student runner submit bar should expose domain-prepared progress and timer labels.'
 );
 assert.match(
   studentRunnerAttemptShellSource,
-  /function StudentRunnerIdentityPanel[\s\S]*identityView\.mode === 'student-name'[\s\S]*aria-describedby=\{studentNameDescriptionId\}[\s\S]*aria-label=\{identityView\.ariaLabel\}[\s\S]*id="student-name"[\s\S]*disabled=\{identityView\.disabled\}[\s\S]*identityView\.description[\s\S]*const browserLabelCaptionId =[\s\S]*'student-runner-anonymous-browser-label-caption'[\s\S]*const browserLabelValueId = 'student-runner-anonymous-browser-label-value'[\s\S]*aria-label=\{identityView\.ariaLabel\}[\s\S]*identityView\.copy\.description[\s\S]*aria-label=\{identityView\.copy\.browserLabelAriaLabel\}[\s\S]*identityView\.copy\.browserLabelCaption[\s\S]*aria-labelledby=\{`\$\{browserLabelCaptionId\} \$\{browserLabelValueId\}`\}[\s\S]*id=\{browserLabelValueId\}[\s\S]*identityView\.copy\.browserLabel[\s\S]*identityView\.copy\.summaryItems\.map[\s\S]*StudentRunnerAnonymousSummaryItem[\s\S]*key=\{summaryItem\.id\}[\s\S]*summaryItem=\{summaryItem\}[\s\S]*identityView\.copy\.retryDescription/,
-  'Student runner identity panel should render prepared named-student lock state and anonymous browser identity views with stable output ids.'
+  /function StudentRunnerIdentityPanel[\s\S]*identityView\.mode === 'student-name'[\s\S]*aria-describedby=\{studentNameDescriptionId\}[\s\S]*aria-label=\{identityView\.ariaLabel\}[\s\S]*id=\"student-name\"[\s\S]*disabled=\{identityView\.disabled\}[\s\S]*identityView\.description[\s\S]*const browserLabelCaptionId =[\s\S]*'student-runner-anonymous-browser-label-caption'[\s\S]*const browserLabelValueId = 'student-runner-anonymous-browser-label-value'[\s\S]*aria-label=\{identityView\.ariaLabel\}[\s\S]*identityView\.copy\.description[\s\S]*identityView\.copy\.browserLabelCaption[\s\S]*aria-label=\{identityView\.copy\.browserLabelAriaLabel\}[\s\S]*aria-labelledby=\{`\$\{browserLabelCaptionId\} \$\{browserLabelValueId\}`\}[\s\S]*id=\{browserLabelValueId\}[\s\S]*identityView\.copy\.browserLabel[\s\S]*identityView\.copy\.retryDescription/,
+  'Student runner identity panel should render prepared named-student lock state and the anonymous browser label with stable output ids.'
 );
-assert.match(
+// Three privacy cards before the first question buried the activity.
+assert.doesNotMatch(
   studentRunnerAttemptShellSource,
-  /function StudentRunnerAnonymousSummaryItem[\s\S]*const labelId = `student-runner-anonymous-summary-\$\{summaryItem\.id\}-label`[\s\S]*const valueId = `student-runner-anonymous-summary-\$\{summaryItem\.id\}-value`[\s\S]*const descriptionId = `student-runner-anonymous-summary-\$\{summaryItem\.id\}-description`[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*aria-label=\{summaryItem\.ariaLabel\}[\s\S]*aria-labelledby=\{`\$\{labelId\} \$\{valueId\}`\}[\s\S]*summaryItem\.label[\s\S]*<output[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*aria-label=\{summaryItem\.ariaLabel\}[\s\S]*id=\{valueId\}[\s\S]*summaryItem\.value[\s\S]*summaryItem\.description/,
-  'Student runner anonymous identity summary items should render prepared label, value, and privacy descriptions as stable semantic outputs.'
+  /StudentRunnerAnonymousSummaryItem\b|identityView\.copy\.summaryItems/,
+  'The anonymous identity note is one sentence plus the browser label; it no longer renders three privacy summary cards.'
 );
 assert.match(
   studentRunnerIdentityHandoffSource,
@@ -21799,15 +21872,19 @@ assert.match(
   /export function buildStudentRunnerIdentityHandoffView\([\s\S]*identityView: StudentRunnerIdentityView[\s\S]*identityView\.mode === 'anonymous'[\s\S]*identityView\.copy\.summaryItems\.map\(\(summaryItem\) => summaryItem\.id\)[\s\S]*privacy: buildStudentRunnerIdentityHandoffPrivacyContract/,
   'Student runner identity handoff should derive anonymous summary ids and privacy from the prepared identity view.'
 );
-assert.match(
+// docs/design.md (Tokens And Hard Rules): screen-reader-only text
+// describes the visible UI and must not add audit detail.
+assert.doesNotMatch(
   studentRunnerAttemptShellSource,
-  /buildStudentRunnerIdentityHandoffView[\s\S]*const identityHandoffView =[\s\S]*buildStudentRunnerIdentityHandoffView\(identityView\)[\s\S]*<StudentRunnerIdentityHandoff view=\{identityHandoffView\} \/>/,
-  'Student runner identity panel should render the prepared hidden identity handoff.'
+  /<StudentRunnerIdentityHandoff\b/,
+  'Student runner identity panel should not render the hidden identity audit handoff.'
 );
-assert.match(
+// docs/design.md (Tokens And Hard Rules): screen-reader-only text
+// describes the visible UI and must not add audit detail.
+assert.doesNotMatch(
   studentRunnerAttemptShellSource,
-  /function StudentRunnerIdentityHandoff[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*aria-labelledby=\{titleId\}[\s\S]*data-handoff="student-runner-identity"[\s\S]*data-handoff-scope=\{view\.privacy\.scope\}[\s\S]*view\.itemViews\.map\(\(itemView\)[\s\S]*StudentRunnerIdentityHandoffItem[\s\S]*function StudentRunnerIdentityHandoffItem[\s\S]*const labelId = `student-runner-identity-handoff-\$\{itemView\.id\}-label`[\s\S]*const valueId = `student-runner-identity-handoff-\$\{itemView\.id\}-value`[\s\S]*const descriptionId = `student-runner-identity-handoff-\$\{itemView\.id\}-description`[\s\S]*data-handoff-item=\{itemView\.id\}[\s\S]*id=\{labelId\}[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*aria-label=\{itemView\.ariaLabel\}[\s\S]*aria-labelledby=\{`\$\{labelId\} \$\{valueId\}`\}[\s\S]*id=\{valueId\}[\s\S]*id=\{descriptionId\}/,
-  'Student runner identity handoff should render hidden safe outputs with privacy scope plus prepared label, value, and description relationships.'
+  /data-handoff=/,
+  'Student runner attempt shell should not render hidden audit handoff output.'
 );
 assert.doesNotMatch(
   getSourceSlice(
@@ -21838,10 +21915,11 @@ assert.match(
   /startAnotherAttemptDescriptionId[\s\S]*aria-describedby=\{startAnotherAttemptDescriptionId\}[\s\S]*aria-label=\{view\.startAnotherAttemptAriaLabel\}[\s\S]*view\.startAnotherAttemptLabel[\s\S]*id=\{startAnotherAttemptDescriptionId\}[\s\S]*view\.startAnotherAttemptDescription/,
   'Student runner start-another-attempt button should associate its prepared accessible label and reset consequence description.'
 );
-assert.match(
+// docs/design.md (Student Runner): after submission the score is the first thing on screen.
+assert.doesNotMatch(
   studentRunnerAttemptShellSource,
-  /StudentRunnerResultNextSteps[\s\S]*view=\{view\.nextStepsView\}[\s\S]*const titleId = 'student-runner-result-next-steps-title'[\s\S]*aria-label=\{view\.ariaLabel\}[\s\S]*aria-labelledby=\{titleId\}[\s\S]*id=\{titleId\}[\s\S]*view\.title[\s\S]*view\.stepViews\.map[\s\S]*id=\{`student-runner-result-next-step-\$\{step\.id\}`\}[\s\S]*key=\{step\.id\}[\s\S]*step\.label/,
-  'Student runner result panel should render prepared post-submit next steps from the result panel view with stable step ids.'
+  /StudentRunnerResultNextSteps\b|view\.nextStepsView/,
+  'The score card leads with the score and review metrics; it no longer lists generic next steps.'
 );
 assert.doesNotMatch(
   studentRunnerAttemptShellSource,
@@ -21850,18 +21928,18 @@ assert.doesNotMatch(
 );
 assert.match(
   studentRunnerAttemptShellSource,
-  /StudentRunnerReviewSummary[\s\S]*view=\{view\.reviewSummaryView\}[\s\S]*function StudentRunnerReviewSummary[\s\S]*const titleId = 'student-runner-review-summary-title'[\s\S]*const descriptionId = 'student-runner-review-summary-description'[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*aria-label=\{view\.ariaLabel\}[\s\S]*aria-labelledby=\{titleId\}[\s\S]*view\.title[\s\S]*view\.description[\s\S]*aria-label=\{view\.metricsLabel\}[\s\S]*view\.metrics\.map[\s\S]*StudentRunnerMetricOutput[\s\S]*prefix="student-runner-review-summary"/,
+  /<StudentRunnerReviewSummary view=\{view\.reviewSummaryView\} \/>[\s\S]*function StudentRunnerReviewSummary[\s\S]*aria-label=\{view\.metricsLabel\}[\s\S]*view\.metrics\.map/,
   'Student runner result panel should render prepared post-submit review summary metrics from the result panel view as stable outputs.'
 );
 assert.match(
   studentRunnerAttemptShellSource,
-  /StudentRunnerFeedbackScope[\s\S]*view=\{view\.feedbackScopeView\}[\s\S]*function StudentRunnerFeedbackScope[\s\S]*const titleId = 'student-runner-feedback-scope-title'[\s\S]*const descriptionId = 'student-runner-feedback-scope-description'[\s\S]*const statusLabelId = 'student-runner-feedback-scope-status-label'[\s\S]*const statusValueId = 'student-runner-feedback-scope-status-value'[\s\S]*aria-describedby=\{`\$\{descriptionId\} \$\{statusValueId\}`\}[\s\S]*aria-label=\{view\.ariaLabel\}[\s\S]*aria-labelledby=\{titleId\}[\s\S]*data-status=\{view\.status\}[\s\S]*aria-label=\{view\.statusAriaLabel\}[\s\S]*id=\{statusValueId\}[\s\S]*view\.statusLabel[\s\S]*aria-label=\{view\.metricsLabel\}[\s\S]*view\.metrics\.map[\s\S]*StudentRunnerMetricOutput[\s\S]*prefix="student-runner-feedback-scope"/,
-  'Student runner result panel should render prepared feedback coverage status and metrics from the result panel view as stable outputs.'
+  /view\.feedbackScopeView\.hiddenBySettings[\s\S]*view\.feedbackScopeView\.description/,
+  'Student runner result panel should explain the feedback scope only when the teacher hid answers.'
 );
 assert.match(
   studentRunnerAttemptShellSource,
-  /function StudentRunnerFeedbackScope[\s\S]*aria-label=\{view\.ariaLabel\}[\s\S]*function StudentRunnerReviewSummary[\s\S]*aria-label=\{view\.ariaLabel\}[\s\S]*function StudentRunnerMetricOutput[\s\S]*function StudentRunnerResultNextSteps[\s\S]*aria-label=\{view\.ariaLabel\}/,
-  'Student runner review summary, feedback coverage, and next-step panels should use domain-prepared accessible labels.'
+  /aria-label=\{view\.ariaLabel\}[\s\S]*aria-labelledby=\{resultStatusId\}[\s\S]*aria-label=\{view\.metricsLabel\}/,
+  'Student runner result panel and review summary should use domain-prepared accessible labels.'
 );
 assert.doesNotMatch(
   studentRunnerAttemptShellSource,
@@ -21870,13 +21948,13 @@ assert.doesNotMatch(
 );
 assert.match(
   studentRunnerHeaderCardSource,
-  /StudentRunnerInstructionsCard[\s\S]*instructions=\{view\.instructions\}/,
-  'Student runner header card should delegate prepared instructions to a focused card.'
+  /view\.instructions \?[\s\S]*aria-label=\{view\.instructions\.label\}/,
+  'Student runner header card should render prepared teacher instructions in their own labelled section.'
 );
 assert.match(
   studentRunnerHeaderCardSource,
-  /function StudentRunnerInstructionsCard[\s\S]*instructions\.label[\s\S]*instructions\.value/,
-  'Student runner instructions card should render prepared instruction labels and values.'
+  /view\.instructions\.label[\s\S]*view\.instructions\.value/,
+  'Student runner header card should render prepared instruction labels and values.'
 );
 assert.doesNotMatch(
   playRouteSource,
@@ -21890,8 +21968,8 @@ assert.match(
 );
 assert.match(
   publicAssignmentRulesComponentSource,
-  /summaryView\.title[\s\S]*summaryView\.description[\s\S]*PublicAssignmentRuleStatus[\s\S]*statusView=\{summaryView\.status\}/,
-  'Public assignment rules component should render the prepared public rule summary heading, description, and status.'
+  /<dl aria-label=\{summaryView\.title\}[\s\S]*summaryView\.items\.map/,
+  'Public assignment rules should render as a list labelled by the prepared summary title inside the rules disclosure.'
 );
 assert.match(
   publicAssignmentRulesComponentSource,
@@ -21910,13 +21988,13 @@ assert.doesNotMatch(
 );
 assert.match(
   publicAssignmentRulesComponentSource,
-  /function PublicAssignmentRuleItem[\s\S]*aria-label=\{rule\.ariaLabel\}[\s\S]*rule\.description/,
-  'Public assignment rule item should render prepared rule accessibility labels and student-facing descriptions.'
+  /function PublicAssignmentRuleItem[\s\S]*<dt[\s\S]*rule\.label[\s\S]*rule\.value[\s\S]*<dd[\s\S]*rule\.description/,
+  'Public assignment rule items should render the prepared label, value, and student-facing description as a term/description pair.'
 );
-assert.match(
+assert.doesNotMatch(
   publicAssignmentRulesComponentSource,
-  /function PublicAssignmentRuleStatus[\s\S]*statusView\.ariaLabel[\s\S]*statusView\.tone === 'attention'[\s\S]*statusView\.label/,
-  'Public assignment rules component should render prepared status copy, accessibility text, and tone.'
+  /function PublicAssignmentRuleStatus\b/,
+  'The rules list no longer carries a status badge; the header shows timer, close time, and attempt limits as chips.'
 );
 assert.match(
   publicAssignmentRulesComponentSource,
@@ -21935,23 +22013,29 @@ assert.doesNotMatch(
 );
 assert.match(
   publicAssignmentRulesComponentSource,
-  /PublicAssignmentRuleIcon[\s\S]*publicAssignmentRuleIcons\[id\]/,
+  /publicAssignmentRuleIcons\[rule\.id\][\s\S]*const publicAssignmentRuleIcons = \{[\s\S]*satisfies Record<PublicAssignmentRuleSummaryId, Icon>/,
   'Public assignment rules component should own rule icon mapping for student-facing delivery policy.'
 );
-assert.match(
+// docs/design.md (Tokens And Hard Rules): screen-reader-only text
+// describes the visible UI and must not add audit detail.
+assert.doesNotMatch(
   publicAssignmentRulesComponentSource,
-  /<PublicAssignmentRulesHandoff view=\{summaryView\.handoffView\} \/>/,
-  'Public assignment rules component should render the prepared hidden rule handoff from the same summary view.'
+  /<PublicAssignmentRulesHandoff\b/,
+  'Public assignment rules should not render hidden audit handoff output.'
 );
-assert.match(
+// docs/design.md (Tokens And Hard Rules): screen-reader-only text
+// describes the visible UI and must not add audit detail.
+assert.doesNotMatch(
   publicAssignmentRulesComponentSource,
-  /function PublicAssignmentRulesHandoff[\s\S]*className="sr-only"[\s\S]*data-handoff="public-assignment-rules"[\s\S]*data-handoff-scope=\{view\.privacy\.scope\}[\s\S]*<dl>[\s\S]*view\.itemViews\.map\(\(itemView\) =>[\s\S]*PublicAssignmentRulesHandoffItem/,
-  'Public assignment rules handoff should render a hidden scoped dl from prepared item views.'
+  /data-handoff=/,
+  'Public assignment rules should not render hidden audit handoff output.'
 );
-assert.match(
+// docs/design.md (Tokens And Hard Rules): screen-reader-only text
+// describes the visible UI and must not add audit detail.
+assert.doesNotMatch(
   publicAssignmentRulesComponentSource,
-  /function PublicAssignmentRulesHandoffItem[\s\S]*const labelId = `public-assignment-rules-handoff-\$\{itemView\.id\}-label`[\s\S]*const valueId = `public-assignment-rules-handoff-\$\{itemView\.id\}-value`[\s\S]*const descriptionId = `public-assignment-rules-handoff-\$\{itemView\.id\}-description`[\s\S]*data-handoff-item=\{itemView\.id\}[\s\S]*id=\{labelId\}[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*aria-label=\{itemView\.ariaLabel\}[\s\S]*aria-labelledby=\{`\$\{labelId\} \$\{valueId\}`\}[\s\S]*id=\{valueId\}[\s\S]*id=\{descriptionId\}/,
-  'Public assignment rules handoff items should keep stable label, value, and description relationships.'
+  /function PublicAssignmentRulesHandoffItem\b/,
+  'Public assignment rules should not render hidden audit handoff output.'
 );
 assert.match(
   e2eTestCatalogText,
@@ -22342,7 +22426,7 @@ assert.match(
 );
 assert.match(
   studentRuntimeItemListSource,
-  /if \(listView\.surface === 'choice-list'\)[\s\S]*listView\.defaultItemCardViews\.map[\s\S]*assertUnhandledStudentRuntimeItemListSurface\(listView\.surface\)/,
+  /if \(listView\.surface === \'choice-list\'\)[\s\S]*cardViews=\{listView\.defaultItemCardViews\}[\s\S]*assertUnhandledStudentRuntimeItemListSurface\(listView\.surface\)/,
   'Student runtime item list should render default item cards only through an explicit choice-list surface branch.'
 );
 assert.match(
@@ -22351,9 +22435,9 @@ assert.match(
   'Student runtime item list should use a never-typed surface guard so new runner kinds cannot silently fall back to choice-list cards.'
 );
 assert.match(
-  studentRuntimeItemListSource,
-  /choices\.map\(\(choiceView\)[\s\S]*key=\{choiceView\.id\}/,
-  'Student runtime item list should render choice buttons with stable domain choice-view ids.'
+  readFileSync('src/components/activities/choice-question-stepper.tsx', 'utf8'),
+  /cardView\.choiceViews\.map\(\(choiceView, choiceIndex\)[\s\S]*key=\{choiceView\.id\}/,
+  'The choice question stepper should render answer tiles with stable domain choice-view ids.'
 );
 assert.doesNotMatch(
   studentRuntimeItemListSource,
@@ -22365,10 +22449,12 @@ assert.match(
   /resolveChoicePairingRunnerAction\(\{[\s\S]*action,[\s\S]*answers,[\s\S]*disabled,[\s\S]*items,[\s\S]*selectedItemId,[\s\S]*onAnswerChanges\(result\.answerChanges\)/,
   'Line-match should resolve prompt and choice interactions through the assignment-domain pairing action helper with current runtime items.'
 );
-assert.match(
+// docs/design.md (Tokens And Hard Rules): screen-reader-only text
+// describes the visible UI and must not add audit detail.
+assert.doesNotMatch(
   lineMatchBoardSource,
-  /buildLineMatchBoardHandoffView\(\{[\s\S]*disabled,[\s\S]*revealAnswer,[\s\S]*runnerView,[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*aria-labelledby=\{titleId\}[\s\S]*data-handoff="line-match-board"[\s\S]*data-handoff-scope=\{view\.privacy\.scope\}/,
-  'Line-match should expose the hidden connection-board handoff from the assignment-domain view model with a stable privacy scope.'
+  /data-handoff=/,
+  'Line-match should not render hidden audit handoff output.'
 );
 assert.match(
   lineMatchBoardSource,
@@ -23604,6 +23690,7 @@ assert.deepEqual(getActivityRunnerKindCopy('group-sort'), {
   clearSelectionLabel: 'Clear',
   correctAnswerLabel: 'Correct group',
   emptyItemsLabel: 'All items sorted',
+  helpText: 'Tap an item, then tap the group it belongs to.',
   inputPlaceholder: 'Choose a group',
   itemListLabel: 'Items',
   progressVerb: 'sorted',
@@ -23623,6 +23710,14 @@ assert.deepEqual(getActivityRunnerKindCopy('listening'), {
   usedChoiceLabel: 'Selected',
 });
 assert.equal(getActivityRunnerKindCopy('open-box').sequenceItemLabel, 'Box');
+assert.equal(
+  getActivityRunnerKindCopy('open-box').helpText,
+  'Tap a box to open it, then type your answer.'
+);
+assert.equal(
+  getActivityRunnerKindCopy('matching-pairs').helpText,
+  'Tap a card on the left, then tap the card on the right that goes with it.'
+);
 assert.equal(getActivityTemplateRunnerCopy('quiz').title, 'Quiz');
 assert.equal(
   getActivityTemplateRunnerCopy('match-up').correctAnswerLabel,
@@ -40089,10 +40184,11 @@ assert.match(
   /ActivityLibrarySearch/,
   'Activity dashboard route should delegate filter controls to the activity library search component.'
 );
-assert.match(
+// The "Current view" recap restated the filters shown right above it.
+assert.doesNotMatch(
   dashboardActivitiesRouteSource,
-  /ActivityLibraryScopePanel[\s\S]*view=\{activePageView\.scopeView\}/,
-  'Activity dashboard route should render the prepared activity-library scope panel from the page view-model.'
+  /<ActivityLibraryScopePanel\b/,
+  'The activity library no longer renders a "Current view" recap panel.'
 );
 assert.match(
   dashboardActivitiesRouteSource,
@@ -40109,10 +40205,11 @@ assert.match(
   /ActivityLibraryCard/,
   'Activity dashboard route should delegate activity card rendering to the activity library card component.'
 );
-assert.match(
+// Those metrics described internal readiness, not anything a teacher acts on.
+assert.doesNotMatch(
   dashboardActivitiesRouteSource,
-  /ActivityLibrarySummaryCard/,
-  'Activity dashboard route should delegate summary metric rendering to the activity library summary card component.'
+  /<ActivityLibrarySummaryCard\b/,
+  'The activity library no longer shows "Template coverage / Ready to remix / Source extraction" metric cards.'
 );
 assert.match(
   dashboardActivitiesRouteSource,
@@ -40369,20 +40466,21 @@ assert.match(
   /<CardDescription>[\s\S]*\{cardDisplayView\.displayDescription\}[\s\S]*<\/CardDescription>/,
   'Activity library card component should render the prepared display description instead of raw activity descriptions.'
 );
-assert.match(
+// Four status blocks per card repeated the header badges and actions.
+assert.doesNotMatch(
   activityLibraryCardComponentSource,
-  /const cardElementId = formatActivityLibraryElementId\([\s\S]*`activity-library-card-\$\{activity\.id\}`[\s\S]*ActivityLibraryCardStatusSummary[\s\S]*idPrefix=\{cardElementId\}[\s\S]*summary=\{cardDisplayView\.statusSummary\}[\s\S]*function ActivityLibraryCardStatusSummary\([\s\S]*idPrefix: string[\s\S]*summary: ActivityLibraryCardStatusSummaryView[\s\S]*const labelId = `\$\{idPrefix\}-status-summary-label`[\s\S]*aria-label=\{summary\.ariaLabel\}[\s\S]*aria-labelledby=\{labelId\}[\s\S]*summary\.label[\s\S]*summary\.items\.map[\s\S]*ActivityLibraryCardStatusSummaryEntry[\s\S]*idPrefix=\{idPrefix\}[\s\S]*item=\{item\}/,
-  'Activity library card component should render the prepared classroom-readiness status summary with stable per-card ids.'
+  /ActivityLibraryCardStatusSummary\b/,
+  'Activity cards no longer render four status blocks; status and template badges sit in the card header.'
 );
 assert.match(
   activityLibraryCardComponentSource,
   /ActivityLifecycleHandoffItemView[\s\S]*ActivityLifecycleHandoffView[\s\S]*ActivityLibraryLifecycleHandoff[\s\S]*handoff=\{cardDisplayView\.lifecycleHandoffView\}[\s\S]*function ActivityLibraryLifecycleHandoff\([\s\S]*data-handoff="activity-lifecycle"[\s\S]*data-handoff-scope=\{handoff\.privacy\.scope\}[\s\S]*handoff\.title[\s\S]*handoff\.description[\s\S]*handoff\.itemViews\.map[\s\S]*ActivityLibraryLifecycleHandoffItem[\s\S]*function ActivityLibraryLifecycleHandoffItem[\s\S]*const labelId = `activity-lifecycle-handoff-\$\{item\.id\}-label`[\s\S]*const valueId = `activity-lifecycle-handoff-\$\{item\.id\}-value`[\s\S]*const descriptionId = `activity-lifecycle-handoff-\$\{item\.id\}-description`[\s\S]*data-handoff-item=\{item\.id\}[\s\S]*id=\{labelId\}[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*aria-label=\{item\.ariaLabel\}[\s\S]*aria-labelledby=\{`\$\{labelId\} \$\{valueId\}`\}[\s\S]*id=\{valueId\}[\s\S]*id=\{descriptionId\}/,
   'Activity library card component should render the prepared activity lifecycle handoff as stable hidden label, value, and description relationships.'
 );
-assert.match(
+assert.doesNotMatch(
   activityLibraryCardComponentSource,
-  /function ActivityLibraryCardStatusSummaryEntry[\s\S]*idPrefix: string[\s\S]*item: ActivityLibraryCardStatusSummaryItemView[\s\S]*item\.tone === 'blocked'[\s\S]*item\.tone === 'ready'[\s\S]*const itemId = `\$\{idPrefix\}-status-\$\{item\.id\}`[\s\S]*const labelId = `\$\{itemId\}-label`[\s\S]*const valueId = `\$\{itemId\}-value`[\s\S]*const descriptionId = `\$\{itemId\}-description`[\s\S]*<section[\s\S]*aria-label=\{item\.ariaLabel\}[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*data-tone=\{item\.tone\}[\s\S]*id=\{labelId\}[\s\S]*item\.label[\s\S]*id=\{valueId\}[\s\S]*aria-labelledby=\{`\$\{labelId\} \$\{valueId\}`\}[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*item\.value[\s\S]*id=\{descriptionId\}[\s\S]*item\.description/,
-  'Activity library card status summary items should render prepared labels, values, descriptions, aria labels, and tones as stable semantic outputs.'
+  /ActivityLibraryCardStatusSummaryEntry\b/,
+  'Activity cards no longer render status summary entries.'
 );
 assert.match(
   activityLibraryCardComponentSource,
@@ -40416,8 +40514,8 @@ assert.doesNotMatch(
 );
 assert.match(
   activityLibraryCardComponentSource,
-  /ActivitySourceMaterialsSummary[\s\S]*actionSlot=\{[\s\S]*cardDisplayView\.actionState\.showEditAction[\s\S]*cardDisplayView\.sourceMaterials\.hasMaterials[\s\S]*ActivityLibrarySourceMaterialEditAction[\s\S]*action=\{cardDisplayView\.sourceMaterialEditAction\}[\s\S]*summary=\{cardDisplayView\.sourceMaterials\}/,
-  'Activity library card component should render source-material summary with an edit action only when the activity can be edited.'
+  /cardDisplayView\.sourceMaterials\.hasMaterials[\s\S]*ActivitySourceMaterialsSummary[\s\S]*actionSlot=\{[\s\S]*cardDisplayView\.actionState\.showEditAction[\s\S]*ActivityLibrarySourceMaterialEditAction[\s\S]*action=\{cardDisplayView\.sourceMaterialEditAction\}[\s\S]*summary=\{cardDisplayView\.sourceMaterials\}/,
+  'Activity library cards should render the source-material summary only when materials exist, with an edit action only when the activity can be edited.'
 );
 assert.match(
   activityLibraryCardComponentSource,
@@ -41322,10 +41420,11 @@ assert.match(
   /AssignmentListFilters/,
   'Assignment dashboard route should delegate filter controls to the assignment list filters component.'
 );
-assert.match(
+// The "Current view" recap restated the filters shown right above it.
+assert.doesNotMatch(
   dashboardAssignmentsRouteSource,
-  /AssignmentListScopePanel[\s\S]*view=\{activePageView\.scopeView\}/,
-  'Assignment dashboard route should render the prepared assignment-list scope panel from the page view-model.'
+  /<AssignmentListScopePanel\b/,
+  'The assignments list no longer renders a "Current view" recap panel.'
 );
 assert.match(
   dashboardAssignmentsRouteSource,
@@ -41429,8 +41528,8 @@ assert.doesNotMatch(
 );
 assert.match(
   assignmentListSummaryCardComponentSource,
-  /const labelId = `assignment-list-summary-\$\{metric\.id\}-label`[\s\S]*const valueId = `assignment-list-summary-\$\{metric\.id\}-value`[\s\S]*const descriptionId = `assignment-list-summary-\$\{metric\.id\}-description`[\s\S]*role="article"[\s\S]*aria-label=\{metric\.ariaLabel\}[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*<output id=\{valueId\}[\s\S]*aria-labelledby=\{`\$\{labelId\} \$\{valueId\}`\}[\s\S]*metric\.value[\s\S]*id=\{labelId\}[\s\S]*metric\.label[\s\S]*id=\{descriptionId\}[\s\S]*metric\.description/,
-  'Assignment list summary cards should render prepared metric values, descriptions, and aria labels as stable accessible outputs.'
+  /const labelId = `assignment-list-summary-\$\{metric\.id\}-label`[\s\S]*const valueId = `assignment-list-summary-\$\{metric\.id\}-value`[\s\S]*const descriptionId = `assignment-list-summary-\$\{metric\.id\}-description`[\s\S]*<article[\s\S]*aria-label=\{metric\.ariaLabel\}[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*id=\{labelId\}[\s\S]*metric\.label[\s\S]*<output id=\{valueId\}[\s\S]*aria-labelledby=\{`\$\{labelId\} \$\{valueId\}`\}[\s\S]*metric\.value[\s\S]*id=\{descriptionId\}[\s\S]*metric\.description/,
+  'Assignment list summary metrics should render prepared values, descriptions, and aria labels as stable accessible outputs.'
 );
 assert.match(
   assignmentListCardComponentSource,
@@ -47237,8 +47336,8 @@ assert.match(
 );
 assert.match(
   dashboardOverviewRouteSource,
-  /useAssignments\(\{[\s\S]*pageIndex: 0,[\s\S]*pageSize: 1/,
-  'Dashboard overview metrics should read the owner-scoped assignment summary from the assignments API.'
+  /useAssignments\(\{[\s\S]*pageIndex: 0,[\s\S]*pageSize: RECENT_ASSIGNMENT_COUNT/,
+  'Dashboard overview should read the owner-scoped assignment summary and the latest assignments from one assignments API request.'
 );
 assert.match(
   dashboardOverviewRouteSource,
@@ -47270,15 +47369,17 @@ assert.match(
   /DashboardOverviewLoopStatusPanel[\s\S]*view=\{pageView\.loopStatus\}/,
   'Dashboard overview route should delegate loop-status rendering to the dashboard overview loop-status component.'
 );
-assert.match(
+// The readiness card repeated the loop status panel below it.
+assert.doesNotMatch(
   dashboardOverviewRouteSource,
   /DashboardOverviewReadinessRow/,
-  'Dashboard overview route should delegate readiness row rendering to the dashboard overview readiness component.'
+  'The dashboard no longer renders a readiness card; the create → publish → share → review panel shows the same progress.'
 );
-assert.match(
+// The action cards linked to the same pages as the sidebar.
+assert.doesNotMatch(
   dashboardOverviewRouteSource,
   /DashboardOverviewActionCard/,
-  'Dashboard overview route should delegate action card rendering to the dashboard overview action component.'
+  'The dashboard no longer renders nav cards that repeat the sidebar.'
 );
 assert.doesNotMatch(
   dashboardOverviewRouteSource,
@@ -47320,10 +47421,11 @@ assert.doesNotMatch(
   /dashboardActionHrefs|Routes\./,
   'Dashboard overview action routes should be prepared by the dashboard domain view-model.'
 );
-assert.match(
+// A demo card showed "18 completions · 84% avg" next to real 0% results.
+assert.doesNotMatch(
   dashboardOverviewRouteSource,
-  /<ActivityPreview[\s\S]*activity=\{pageView\.preview\.activity\}[\s\S]*assignment=\{pageView\.preview\.assignment\}[\s\S]*\/>/,
-  'Dashboard starter activity and assignment should render only through the dashboard preview view-model.'
+  /<ActivityPreview\b/,
+  "The dashboard no longer shows a demo activity card whose sample results sat next to the teacher's real numbers."
 );
 const dashboardOverviewDomainSource = readFileSync(
   'src/dashboard/overview.ts',
@@ -66074,7 +66176,7 @@ assert.deepEqual(
           attempts: '0',
           deliveryAnswerReveal: 'Hidden',
           deliveryAttemptLimit: '2',
-          deliveryCloseTime: '2026年7月1日 08:00',
+          deliveryCloseTime: 'Jul 1, 2026, 8:00 AM',
           deliveryIdentity: 'Anonymous',
           deliveryInstructions: 'Present',
           deliveryItemOrder: 'Fixed order',
@@ -66155,7 +66257,7 @@ assert.deepEqual(
           attempts: '0',
           deliveryAnswerReveal: 'After submit',
           deliveryAttemptLimit: '2',
-          deliveryCloseTime: '2026年5月1日 08:00',
+          deliveryCloseTime: 'May 1, 2026, 8:00 AM',
           deliveryIdentity: 'Names',
           deliveryInstructions: 'None',
           deliveryItemOrder: 'Shuffled',
@@ -69420,7 +69522,7 @@ assert.deepEqual(
       attempts: '3',
       deliveryAnswerReveal: 'After submit',
       deliveryAttemptLimit: '2',
-      deliveryCloseTime: '2026年1月10日 18:00',
+      deliveryCloseTime: 'Jan 10, 2026, 6:00 PM',
       deliveryIdentity: 'Names',
       deliveryInstructions: 'Present',
       deliveryItemOrder: 'Fixed order',
@@ -69475,13 +69577,13 @@ assert.deepEqual(
   }),
   {
     answerReveal: 'After submit',
-    closeTime: '2026年1月10日 18:00',
+    closeTime: 'Jan 10, 2026, 6:00 PM',
     identityMode: 'Names',
     instructions: 'Use "complete sentences", then submit.',
     itemOrder: 'Fixed order',
     maxAttempts: 2,
     policyText:
-      'Student instructions: Use "complete sentences", then submit.; Attempts: 2 max; Timer: 1 min; Closes: 2026年1月10日 18:00; Student identity: Names; Answer reveal: After submit; Item order: Fixed order',
+      'Student instructions: Use "complete sentences", then submit.; Attempts: 2 max; Timer: 1 min; Closes: Jan 10, 2026, 6:00 PM; Student identity: Names; Answer reveal: After submit; Item order: Fixed order',
     rawCollectStudentName: true,
     rawMaxAttempts: 2,
     rawShowCorrectAnswers: true,
@@ -69522,7 +69624,7 @@ assert.match(csv, /Answer reveal: After submit; Item order: Fixed order/);
 assert.match(csv, /"Use ""complete sentences"", then submit\."/);
 assert.match(
   csv,
-  /"2026年1月10日 18:00","Student instructions: Use ""complete sentences"", then submit\.; Attempts: 2 max; Timer: 1 min; Closes: 2026年1月10日 18:00; Student identity: Names; Answer reveal: After submit; Item order: Fixed order","Use ""complete sentences"", then submit\.","Names","After submit","Fixed order","2","60","true","true","false","2","60"/
+  /"Jan 10, 2026, 6:00 PM","Student instructions: Use ""complete sentences"", then submit\.; Attempts: 2 max; Timer: 1 min; Closes: Jan 10, 2026, 6:00 PM; Student identity: Names; Answer reveal: After submit; Item order: Fixed order","Use ""complete sentences"", then submit\.","Names","After submit","Fixed order","2","60","true","true","false","2","60"/
 );
 const stringSettingsCsv = buildAssignmentResultsCsv({
   ...csvExportData,
