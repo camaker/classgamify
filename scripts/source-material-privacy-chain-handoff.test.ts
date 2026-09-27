@@ -16,7 +16,6 @@ import {
   ACTIVITY_SOURCE_MATERIAL_REFERENCE_PRIVACY_CONTRACT,
 } from '@/activities/material-references';
 import { PUBLIC_ASSIGNMENT_ACCESS_HANDOFF_ITEM_IDS } from '@/assignments/public';
-import { STUDENT_RUNTIME_SEMANTIC_BUNDLE_HANDOFF_ITEM_IDS } from '@/assignments/student-runtime-item-list';
 import { PUBLIC_ASSIGNMENT_UNAVAILABLE_ACCESS_HANDOFF_ITEM_IDS } from '@/assignments/unavailable-access';
 import { SETTINGS_FILES_SOURCE_MATERIAL_HANDOFF_ITEM_IDS } from '@/settings/files-view';
 import {
@@ -205,10 +204,9 @@ test('source-material privacy chain ties together existing focused contracts', (
       ACTIVITY_AI_DRAFT_BOUNDARY_HANDOFF_ITEM_IDS.length,
       ACTIVITY_SOURCE_EXTRACTION_ASSIST_HANDOFF_ITEM_IDS.length,
       PUBLIC_ASSIGNMENT_ACCESS_HANDOFF_ITEM_IDS.length,
-      STUDENT_RUNTIME_SEMANTIC_BUNDLE_HANDOFF_ITEM_IDS.length,
       PUBLIC_ASSIGNMENT_UNAVAILABLE_ACCESS_HANDOFF_ITEM_IDS.length,
     ],
-    [30, 30, 30, 30, 30, 30, 30]
+    [30, 30, 30, 30, 30, 30]
   );
 });
 
@@ -228,7 +226,11 @@ test('public, student-runtime, AI, and storage sources keep private material dat
     PUBLIC_ASSIGNMENT_SOURCE,
     /exposesTeacherSourceMaterials: false/
   );
-  assert.match(STUDENT_RUNTIME_SOURCE, /exposesSourceMaterialMetadata: false/);
+  assert.doesNotMatch(
+    STUDENT_RUNTIME_SOURCE,
+    /\b(sourceMaterials|storageKey|fileId|originalName|permission|bytes|fileList)\b/,
+    'Student runtime item lists should only read public runtime items.'
+  );
   assert.match(
     DRAFT_SOURCE,
     /sanitizeActivityDraftSourceTextForAi[\s\S]*removeActivitySourceMaterialDraftNotes[\s\S]*buildActivitySourceMaterialDraftNoteViewsFromSourceText/

@@ -47,12 +47,6 @@ export const ANSWER_FEEDBACK_LIFECYCLE_CHAIN_SOURCE_FILES = [
   'src/components/activities/matching-pairs-board.tsx',
   'src/components/activities/listening-runner.tsx',
   'src/components/activities/open-box-runner.tsx',
-  'src/assignments/fill-blank-worksheet-handoff.ts',
-  'src/assignments/line-match-board-handoff.ts',
-  'src/assignments/group-sort-board-handoff.ts',
-  'src/assignments/matching-pairs-board-handoff.ts',
-  'src/assignments/listening-speech-handoff.ts',
-  'src/assignments/open-box-reveal-handoff.ts',
   'src/assignments/answer-feedback-handoff.ts',
   'src/assignments/result-answer-view.ts',
   'src/assignments/result-format.ts',
@@ -62,6 +56,12 @@ export const ANSWER_FEEDBACK_LIFECYCLE_CHAIN_SOURCE_FILES = [
   'src/api/assignments.ts',
   'src/assignments/teacher-results-review-chain.ts',
   'tests/e2e/TEST-CATALOG.md',
+  'src/components/activities/choice-question-stepper.tsx',
+  'tests/e2e/specs/interactive-template-runners.spec.ts',
+  'src/assignments/attempt-answers.ts',
+  'src/assignments/scored-attempt-result-chain.ts',
+  'src/assignments/student-runtime-item-list.ts',
+  'scripts/answer-feedback-lifecycle-chain-handoff.test.ts',
 ] as const;
 
 export type AnswerFeedbackLifecycleChainHandoffItemId =

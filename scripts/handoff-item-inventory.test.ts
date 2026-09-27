@@ -30,10 +30,8 @@ test('handoff inventory discovers product-loop contracts', () => {
   for (const requiredName of [
     'ACTIVITY_LIBRARY_PAGE_HANDOFF_ITEM_IDS',
     'ASSIGNMENT_LIST_PAGE_HANDOFF_ITEM_IDS',
-    'STUDENT_RUNNER_SUBMISSION_HANDOFF_ITEM_IDS',
     'ASSIGNMENT_RESULT_REVIEW_HANDOFF_ITEM_IDS',
     'PUBLIC_TEMPLATE_ENTRY_HANDOFF_ITEM_IDS',
-    'CLASSROOM_CONTROL_SEMANTICS_HANDOFF_ITEM_IDS',
   ]) {
     assert.ok(
       discoveredNames.has(requiredName),

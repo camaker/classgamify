@@ -350,7 +350,11 @@ test('DOM handoff and public payloads do not expose source material secrets', ()
     PUBLIC_ASSIGNMENT_SOURCE,
     /exposesTeacherSourceMaterials: false/
   );
-  assert.match(STUDENT_RUNTIME_SOURCE, /exposesSourceMaterialMetadata: false/);
+  assert.doesNotMatch(
+    STUDENT_RUNTIME_SOURCE,
+    /\b(sourceMaterials|storageKey|fileId|originalName|permission|bytes|fileList)\b/,
+    'Student runtime item lists should only read public runtime items.'
+  );
 });
 
 test('source extraction lifecycle focused gate is documented', () => {

@@ -53,7 +53,7 @@ export const LOCAL_PERSISTED_BROWSER_JOURNEY_CHAIN_SOURCE_FILES = [
   'src/components/assignments/student-runner-header-card.tsx',
   'src/components/assignments/student-runner-attempt-shell.tsx',
   'src/components/assignments/student-runner-submit-controls.tsx',
-  'src/components/assignments/student-runner-submission-handoff.tsx',
+  'src/components/assignments/student-runner-frame.tsx',
   'src/routes/dashboard/assignments/$assignmentId.tsx',
   'src/components/assignments/assignment-results-header-actions.tsx',
   'src/components/assignments/assignment-results-review-handoff-panel.tsx',
@@ -115,7 +115,7 @@ export type LocalPersistedBrowserJourneyChainPrivacyContract = {
   usesCsvExportPreparationHandoff: true;
   usesPageHealthMonitor: true;
   usesPrintableWorksheetHandoff: true;
-  usesStudentRunnerSubmissionHandoff: true;
+  usesStudentRunnerSubmitControls: true;
 };
 
 export type LocalPersistedBrowserJourneyChainHandoffView = {
@@ -173,7 +173,7 @@ export function buildLocalPersistedBrowserJourneyChainHandoffView(): LocalPersis
       usesCsvExportPreparationHandoff: true,
       usesPageHealthMonitor: true,
       usesPrintableWorksheetHandoff: true,
-      usesStudentRunnerSubmissionHandoff: true,
+      usesStudentRunnerSubmitControls: true,
     },
     title: 'Local persisted browser journey chain',
   };

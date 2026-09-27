@@ -1,5 +1,3 @@
-import { STUDENT_RUNNER_START_HANDOFF_ITEM_IDS } from '@/assignments/student-runner-state';
-
 export const ASSIGNMENT_DISTRIBUTION_LIFECYCLE_CHAIN_HANDOFF_ITEM_IDS = [
   'product-distribution-policy',
   'publish-redirect-context',
@@ -56,7 +54,6 @@ export const ASSIGNMENT_DISTRIBUTION_LIFECYCLE_CHAIN_SOURCE_FILES = [
   'src/components/assignments/copy-assignment-share-link-button.tsx',
   'src/components/assignments/assignment-share-link-handoff.tsx',
   'src/components/assignments/assignment-list-filters.tsx',
-  'src/components/assignments/assignment-list-scope-panel.tsx',
   'src/components/assignments/assignment-list-summary-card.tsx',
   'src/components/assignments/assignment-settings-summary.tsx',
   'scripts/assignment-list-semantic-views.test.ts',
@@ -64,6 +61,7 @@ export const ASSIGNMENT_DISTRIBUTION_LIFECYCLE_CHAIN_SOURCE_FILES = [
   'scripts/assignment-publish-handoff-semantic-views.test.ts',
   'scripts/published-assignment-delivery-chain-handoff.test.ts',
   'tests/e2e/TEST-CATALOG.md',
+  'src/components/assignments/student-runner-header-card.tsx',
 ] as const;
 
 export type AssignmentDistributionLifecycleChainHandoffItemId =
@@ -370,9 +368,9 @@ function getAssignmentDistributionLifecycleChainHandoffItem(
     case 'student-runner-start-handoff-boundary':
       return item(
         id,
-        'Student runner start handoff boundary',
-        `${STUDENT_RUNNER_START_HANDOFF_ITEM_IDS.length} runner start slices`,
-        'Copied and previewed student links must enter the shared runner-start contract for sanitized source, runtime availability, delivery rules, attempts, timer, identity, submission preparation, and privacy.'
+        'Student runner start screen',
+        'Visible start screen',
+        'Copied and previewed student links open the focused runner start screen: title, key rule chips, name field, and the first question.'
       );
   }
 }

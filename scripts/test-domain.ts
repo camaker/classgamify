@@ -6,7 +6,6 @@ import {
   overwriteGetLocale,
 } from '@/locale/paraglide/runtime';
 import {
-  getCanonicalPathname,
   isLocalizedPath,
   LOCALIZED_PATHS,
 } from '@/lib/locale';
@@ -64,12 +63,6 @@ import {
   buildPublicNavigationHandoffView,
   PUBLIC_NAVIGATION_HANDOFF_ITEM_IDS,
 } from '@/navigation/public-navigation-handoff';
-import {
-  buildClassroomControlSemanticsHandoffView,
-  CLASSROOM_CONTROL_SEMANTICS_HANDOFF_ITEM_IDS,
-  CLASSROOM_CONTROL_SEMANTICS_HANDOFF_ROUTE_SCOPES,
-  shouldRenderClassroomControlSemanticsHandoff,
-} from '@/classroom/control-semantics';
 import {
   buildWebAppManifest,
   buildWebAppManifestInstallBoundary,
@@ -814,27 +807,11 @@ import {
   resolveSequentialStudentRunnerNavigationAction,
 } from '@/assignments/student-runner-view';
 import {
-  buildFillBlankWorksheetHandoffView,
-  FILL_BLANK_WORKSHEET_HANDOFF_ITEM_IDS,
-} from '@/assignments/fill-blank-worksheet-handoff';
-import {
-  buildGroupSortBoardHandoffView,
-  GROUP_SORT_BOARD_HANDOFF_ITEM_IDS,
-} from '@/assignments/group-sort-board-handoff';
-import { LINE_MATCH_BOARD_HANDOFF_ITEM_IDS } from '@/assignments/line-match-board-handoff';
-import { LISTENING_SPEECH_HANDOFF_ITEM_IDS } from '@/assignments/listening-speech-handoff';
-import {
-  buildMatchingPairsBoardHandoffView,
-  MATCHING_PAIRS_BOARD_HANDOFF_ITEM_IDS,
-} from '@/assignments/matching-pairs-board-handoff';
-import { OPEN_BOX_REVEAL_HANDOFF_ITEM_IDS } from '@/assignments/open-box-reveal-handoff';
-import {
   formatAssignmentDisplayText,
   formatAssignmentDisplayTitle,
 } from '@/assignments/assignment-display';
 import {
   ASSIGNMENT_DELIVERY_POLICY_HANDOFF_ITEM_IDS,
-  PUBLIC_ASSIGNMENT_RULES_HANDOFF_ITEM_IDS,
   buildAssignmentDeliverySummary,
   buildAssignmentDeliveryPolicyHandoffView,
   buildAssignmentSettingsSummaryView,
@@ -842,7 +819,6 @@ import {
   buildPublicAssignmentRuleSummaryFromSettings,
   buildPublicAssignmentRuleSummaryView,
   buildPublicAssignmentRuleSummaryViewFromSettings,
-  buildPublicAssignmentRulesHandoffView,
   formatAssignmentDeliveryInstructions,
   formatAssignmentDeliveryPolicyText,
   formatAssignmentExpiry,
@@ -875,7 +851,6 @@ import {
   stripRuntimeAnswer,
   stripRuntimeAnswers,
   summarizePublicAttemptReviewItemsForTotal,
-  type PublicRuntimeItem,
 } from '@/assignments/public';
 import {
   PUBLIC_ASSIGNMENT_UNAVAILABLE_ACCESS_HANDOFF_ITEM_IDS,
@@ -1385,7 +1360,6 @@ import {
   buildStudentRunnerReadyState,
   buildStudentRunnerRouteState,
   buildStudentRunnerSeoView,
-  buildStudentRunnerStartHandoffView,
   buildStudentRunnerStarterPreview,
   buildStudentRunnerSubmissionExecutionPlan,
   buildStudentRunnerSubmissionPlan,
@@ -1395,8 +1369,6 @@ import {
   buildStudentRunnerTimerTickPlan,
   buildStudentRunnerUnavailableSafetyView,
   getStudentRunnerAttemptStartedAt,
-  STUDENT_RUNNER_START_HANDOFF_ITEM_IDS,
-  STUDENT_RUNNER_SUBMISSION_HANDOFF_ITEM_IDS,
   shouldResetStudentRunnerAttemptSession,
   shouldStartStudentRunnerAttemptClock,
 } from '@/assignments/student-runner-state';
@@ -1410,15 +1382,6 @@ import {
   STUDENT_IDENTITY_LIFECYCLE_CHAIN_SOURCE_FILES,
   buildStudentIdentityLifecycleChainHandoffView,
 } from '@/assignments/student-identity-lifecycle-chain';
-import { STUDENT_RUNNER_LOADING_HANDOFF_ITEM_IDS } from '@/assignments/student-runner-loading-handoff';
-import {
-  buildStudentRunnerSubmitControlsHandoffView,
-  STUDENT_RUNNER_SUBMIT_CONTROLS_HANDOFF_ITEM_IDS,
-} from '@/assignments/student-runner-submit-controls-handoff';
-import {
-  buildStudentRunnerIdentityHandoffView,
-  STUDENT_RUNNER_IDENTITY_HANDOFF_ITEM_IDS,
-} from '@/assignments/student-runner-identity-handoff';
 import {
   buildAttemptCompletionCopy,
   applyStudentAnswerChanges,
@@ -1455,14 +1418,7 @@ import {
 import {
   buildStudentRuntimeItemListView,
   buildStudentRuntimeSingleAnswerChanges,
-  STUDENT_RUNTIME_INTERACTION_HANDOFF_ITEM_IDS,
-  STUDENT_RUNTIME_SEMANTIC_BUNDLE_HANDOFF_ITEM_IDS,
 } from '@/assignments/student-runtime-item-list';
-import {
-  buildStudentRuntimeIdentityHandoffView,
-  STUDENT_RUNTIME_IDENTITY_HANDOFF_ITEM_IDS,
-} from '@/assignments/runtime-identity-handoff';
-import { STUDENT_RUNTIME_CHOICE_ASSIGNMENT_HANDOFF_ITEM_IDS } from '@/assignments/runtime-choice-assignment-handoff';
 import {
   ASSIGNMENT_MAX_ATTEMPTS_RANGE,
   ASSIGNMENT_PUBLISH_FIELD_LIMITS,
@@ -5063,7 +5019,6 @@ assert.deepEqual(
   [
     ASSIGNMENT_PUBLISH_HANDOFF_ITEM_IDS.length,
     ASSIGNMENT_DELIVERY_POLICY_HANDOFF_ITEM_IDS.length,
-    PUBLIC_ASSIGNMENT_RULES_HANDOFF_ITEM_IDS.length,
     ASSIGNMENT_SHARE_LINK_HANDOFF_ITEM_IDS.length,
     ASSIGNMENT_LIST_PAGE_HANDOFF_ITEM_IDS.length,
     ASSIGNMENT_LIFECYCLE_HANDOFF_ITEM_IDS.length,
@@ -5074,13 +5029,12 @@ assert.deepEqual(
     ASSIGNMENT_SUBMISSION_VALIDATION_HANDOFF_ITEM_IDS.length,
     ASSIGNMENT_ATTEMPT_PERSISTENCE_HANDOFF_ITEM_IDS.length,
     ASSIGNMENT_ATTEMPT_DURATION_HANDOFF_ITEM_IDS.length,
-    STUDENT_RUNNER_SUBMISSION_HANDOFF_ITEM_IDS.length,
     ASSIGNMENT_ANSWER_FEEDBACK_HANDOFF_ITEM_IDS.length,
     ASSIGNMENT_ATTEMPT_STATS_HANDOFF_ITEM_IDS.length,
     ASSIGNMENT_RESULTS_EXPORT_PREPARATION_ITEM_IDS.length,
     ASSIGNMENT_PUBLISH_CONTROL_BOUNDARY_ITEM_IDS.length,
   ],
-  Array.from({ length: 18 }, () => 30),
+  Array.from({ length: 16 }, () => 30),
   'Published assignment delivery chain should stay backed by focused assignment gates.'
 );
 assert.deepEqual(Object.fromEntries(publishedAssignmentDeliveryChainValues), {
@@ -5182,11 +5136,10 @@ assert.deepEqual(
     ASSIGNMENT_DELIVERY_POLICY_HANDOFF_ITEM_IDS.length,
     PUBLISHED_ASSIGNMENT_DELIVERY_CHAIN_HANDOFF_ITEM_IDS.length,
     ASSIGNMENT_SOURCE_ACTIVITY_CONTEXT_CHAIN_HANDOFF_ITEM_IDS.length,
-    STUDENT_RUNNER_START_HANDOFF_ITEM_IDS.length,
     PRINTABLE_WORKSHEET_HANDOFF_ITEM_IDS.length,
     TEACHER_RESULTS_REVIEW_CHAIN_HANDOFF_ITEM_IDS.length,
   ],
-  Array.from({ length: 9 }, () => 30),
+  Array.from({ length: 8 }, () => 30),
   'Assignment distribution lifecycle chain should stay backed by assignment list, share-link, publish, delivery, source context, runner, print, and results gates.'
 );
 assert.deepEqual(Object.fromEntries(assignmentDistributionLifecycleChainValues), {
@@ -5194,7 +5147,7 @@ assert.deepEqual(Object.fromEntries(assignmentDistributionLifecycleChainValues),
   'copy-execution-plan': 'Shared copy plan',
   'copy-feedback': 'Toast mapped',
   'copy-step-readiness': 'Copy step',
-  'student-runner-start-handoff-boundary': '30 runner start slices',
+  'student-runner-start-handoff-boundary': 'Visible start screen',
   'distribution-status': 'Ready or collecting',
   'filter-scope-alignment': 'Owner scope',
   'hidden-share-handoff': '30 share slices',
@@ -9019,10 +8972,9 @@ assert.deepEqual(
     ACTIVITY_AI_DRAFT_BOUNDARY_HANDOFF_ITEM_IDS.length,
     ACTIVITY_SOURCE_EXTRACTION_ASSIST_HANDOFF_ITEM_IDS.length,
     PUBLIC_ASSIGNMENT_ACCESS_HANDOFF_ITEM_IDS.length,
-    STUDENT_RUNTIME_SEMANTIC_BUNDLE_HANDOFF_ITEM_IDS.length,
     PUBLIC_ASSIGNMENT_UNAVAILABLE_ACCESS_HANDOFF_ITEM_IDS.length,
   ],
-  [20, 30, 30, 30, 30, 30, 30, 30, 30, 30],
+  [20, 30, 30, 30, 30, 30, 30, 30, 30],
   'Source-material privacy chain should stay backed by the focused gates it links together.'
 );
 assert.deepEqual(STORAGE_FILE_ACCESS_PRIVACY_CONTRACT, {
@@ -9100,9 +9052,10 @@ const storageFileAccessPrivacySource = readFileSync(
   'utf8'
 );
 assert.match(publicAssignmentSource, /exposesTeacherSourceMaterials: false/);
-assert.match(
+assert.doesNotMatch(
   studentRuntimePrivacySource,
-  /exposesSourceMaterialMetadata: false/
+  /\b(sourceMaterials|storageKey|fileId|originalName|permission|bytes|fileList)\b/,
+  'Student runtime item lists should only read public runtime items.'
 );
 assert.match(
   activityDraftSourceBoundarySource,
@@ -11726,14 +11679,6 @@ const assignmentResultsClassroomBriefCardSource = readFileSync(
   'src/components/assignments/assignment-results-classroom-brief-card.tsx',
   'utf8'
 );
-const assignmentResultsReviewScopePanelSource = readFileSync(
-  'src/components/assignments/assignment-results-review-scope-panel.tsx',
-  'utf8'
-);
-const assignmentResultsReviewStatusPanelSource = readFileSync(
-  'src/components/assignments/assignment-results-review-status-panel.tsx',
-  'utf8'
-);
 const assignmentResultsStudentSearchSource = readFileSync(
   'src/components/assignments/assignment-results-student-search.tsx',
   'utf8'
@@ -12169,51 +12114,6 @@ assert.match(
   assignmentResultViewSource,
   /const reviewScopeView = buildAssignmentResultReviewScopeView\(\{[\s\S]*controlViews,[\s\S]*summary: resultView\.reviewScope\.summary,[\s\S]*\}\)[\s\S]*reviewScopeView,/,
   'Assignment result page view-model should prepare current review-scope text from the same shared review scope summary used by copy artifacts.'
-);
-assert.match(
-  assignmentResultsReviewScopePanelSource,
-  /AssignmentResultReviewScopeItemView[\s\S]*AssignmentResultReviewScopeSummaryItemView[\s\S]*AssignmentResultReviewScopeView[\s\S]*const titleId = 'assignment-result-review-scope-title'[\s\S]*const descriptionId = 'assignment-result-review-scope-description'[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*aria-labelledby=\{titleId\}[\s\S]*id=\{titleId\}[\s\S]*id=\{descriptionId\}[\s\S]*view\.itemViews\.map[\s\S]*key=\{itemView\.id\}[\s\S]*view\.summaryItems\.map[\s\S]*key=\{summaryItem\.id\}/,
-  'Assignment result review-scope panel should render prepared scope and summary items in a labelled and described section keyed by stable ids.'
-);
-assert.match(
-  assignmentResultsReviewScopePanelSource,
-  /const labelId = `assignment-result-review-scope-\$\{itemView\.id\}-label`[\s\S]*const valueId = `assignment-result-review-scope-\$\{itemView\.id\}-value`[\s\S]*const descriptionId = `assignment-result-review-scope-\$\{itemView\.id\}-description`[\s\S]*const statusDescriptionId = `assignment-result-review-scope-\$\{itemView\.id\}-status-description`[\s\S]*const statusValueId = `assignment-result-review-scope-\$\{itemView\.id\}-status`[\s\S]*<article[\s\S]*aria-describedby=\{`\$\{descriptionId\} \$\{statusDescriptionId\}`\}[\s\S]*aria-labelledby=\{`\$\{labelId\} \$\{valueId\}`\}[\s\S]*AssignmentResultControlStatusBadge[\s\S]*descriptionId=\{statusDescriptionId\}[\s\S]*labelId=\{labelId\}[\s\S]*valueId=\{statusValueId\}[\s\S]*view=\{itemView\.statusView\}[\s\S]*<output[\s\S]*aria-describedby=\{`\$\{descriptionId\} \$\{statusDescriptionId\}`\}[\s\S]*aria-label=\{itemView\.ariaLabel\}[\s\S]*aria-labelledby=\{`\$\{labelId\} \$\{valueId\}`\}[\s\S]*id=\{valueId\}[\s\S]*id=\{descriptionId\}/,
-  'Assignment result review-scope items should associate each prepared scope value with its explanation, control status, and aria label.'
-);
-assert.match(
-  assignmentResultsReviewScopePanelSource,
-  /const summaryLabelId = 'assignment-result-review-scope-summary-label'[\s\S]*<section[\s\S]*aria-labelledby=\{summaryLabelId\}[\s\S]*id=\{summaryLabelId\}[\s\S]*<dl[\s\S]*const labelId = `assignment-result-review-scope-summary-\$\{summaryItem\.id\}-label`[\s\S]*const valueId = `assignment-result-review-scope-summary-\$\{summaryItem\.id\}-value`[\s\S]*<dt[\s\S]*id=\{labelId\}[\s\S]*<output[\s\S]*aria-labelledby=\{`\$\{labelId\} \$\{valueId\}`\}[\s\S]*id=\{valueId\}/,
-  'Assignment result review-scope summary counts should expose stable labels and values for assistive technology.'
-);
-assert.match(
-  assignmentResultsReviewStatusPanelSource,
-  /AssignmentResultReviewStatusView[\s\S]*AssignmentResultReviewStatus[\s\S]*const titleId = 'assignment-result-review-status-title'[\s\S]*const descriptionId = 'assignment-result-review-status-description'[\s\S]*aria-label=\{view\.ariaLabel\}[\s\S]*id=\{titleId\}[\s\S]*view\.title[\s\S]*id=\{descriptionId\}[\s\S]*view\.description/,
-  'Assignment result review-status panel should render the prepared status title, description, and accessible label from the page view-model.'
-);
-assert.match(
-  assignmentResultsReviewStatusPanelSource,
-  /const statusValueId = 'assignment-result-review-status-value'[\s\S]*const stepLabelId = 'assignment-result-review-status-step-label'[\s\S]*data-status=\{view\.status\}[\s\S]*getAssignmentResultReviewStatusBadgeVariant\(view\.status\)[\s\S]*<output[\s\S]*aria-labelledby=\{`\$\{titleId\} \$\{statusValueId\}`\}[\s\S]*id=\{statusValueId\}[\s\S]*view\.statusLabel[\s\S]*<fieldset[\s\S]*aria-describedby=\{stepDescriptionId\}[\s\S]*<legend[\s\S]*id=\{stepLabelId\}[\s\S]*view\.step\.label[\s\S]*view\.step\.description/,
-  'Assignment result review-status panel should render prepared status and next-step copy with status-driven badge presentation.'
-);
-assert.match(
-  assignmentResultsReviewStatusPanelSource,
-  /summaryLabelId = 'assignment-result-review-status-summary-label'[\s\S]*view\.summaryLabel[\s\S]*view\.summaryItems\.map[\s\S]*key=\{summaryItem\.id\}[\s\S]*AssignmentResultsReviewStatusSummaryItem/,
-  'Assignment result review-status panel should render prepared matched-record summary items keyed by stable ids.'
-);
-assert.match(
-  assignmentResultsReviewStatusPanelSource,
-  /const labelId = `assignment-result-review-status-summary-\$\{summaryItem\.id\}-label`[\s\S]*const valueId = `assignment-result-review-status-summary-\$\{summaryItem\.id\}-value`[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*<output[\s\S]*aria-label=\{summaryItem\.ariaLabel\}[\s\S]*aria-labelledby=\{`\$\{labelId\} \$\{valueId\}`\}[\s\S]*id=\{valueId\}[\s\S]*summaryItem\.description/,
-  'Assignment result review-status summary items should render prepared accessible labels and hidden descriptions.'
-);
-assert.match(
-  assignmentResultsReviewScopePanelSource,
-  /const descriptionId = `assignment-result-review-scope-summary-\$\{summaryItem\.id\}-description`[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*<output[\s\S]*aria-label=\{summaryItem\.ariaLabel\}[\s\S]*aria-labelledby=\{`\$\{labelId\} \$\{valueId\}`\}[\s\S]*summaryItem\.description/,
-  'Assignment result review-scope summary counts should render prepared accessible labels and hidden descriptions.'
-);
-assert.doesNotMatch(
-  `${assignmentResultsReviewScopePanelSource}\n${assignmentResultsReviewStatusPanelSource}\n${assignmentResultRouteSource}`,
-  /Current review scope|Matched records|Current matched records|Ready to review|Waiting for student attempts|Student search|学生搜索|当前复盘范围|匹配记录|当前匹配记录|等待学生提交|可以复盘全班/,
-  'Assignment result route, review-scope panel, and review-status panel should not hard-code review-scope or review-status copy.'
 );
 assert.doesNotMatch(
   assignmentResultRouteSource,
@@ -13249,14 +13149,6 @@ const matchingPairsBoardSource = readFileSync(
   'src/components/activities/matching-pairs-board.tsx',
   'utf8'
 );
-const groupSortBoardHandoffSource = readFileSync(
-  'src/assignments/group-sort-board-handoff.ts',
-  'utf8'
-);
-const matchingPairsBoardHandoffSource = readFileSync(
-  'src/assignments/matching-pairs-board-handoff.ts',
-  'utf8'
-);
 const fillBlankWorksheetSource = readFileSync(
   'src/components/activities/fill-blank-worksheet.tsx',
   'utf8'
@@ -13291,16 +13183,6 @@ assert.match(
   /<GroupSortItemButton[\s\S]*correctLabel=\{copy\.correctAnswerLabel\}/,
   'Group-sort runner should pass the template-specific correct-answer label into item feedback.'
 );
-assert.match(
-  groupSortBoardHandoffSource,
-  /export const GROUP_SORT_BOARD_HANDOFF_ITEM_IDS = \[(?=[\s\S]*'template-type')(?=[\s\S]*'category-count')(?=[\s\S]*'selected-item-state')(?=[\s\S]*'group-placement-action')(?=[\s\S]*'public-payload-boundary')(?=[\s\S]*'privacy-guard')[\s\S]*\] as const;[\s\S]*export type GroupSortBoardHandoffPrivacyContract = \{[\s\S]*exposesAnswerText: false;[\s\S]*exposesCategoryText: false;[\s\S]*exposesRuntimeItemIds: false;[\s\S]*exposesRuntimePromptText: false;[\s\S]*scope: 'group-sort-category-board';/,
-  'Group-sort board handoff should expose a typed 30-slice category-board privacy contract.'
-);
-assert.match(
-  groupSortBoardHandoffSource,
-  /buildGroupSortBoardHandoffView[\s\S]*runnerView: GroupSortRunnerView[\s\S]*buildGroupSortBoardHandoffContext[\s\S]*runnerView\.groupViews\.reduce[\s\S]*runnerView\.completionSummary\.answeredItemCount[\s\S]*runnerView\.unplacedItemViews\.length/,
-  'Group-sort board handoff should derive category, placement, progress, and unplaced counts from the prepared runner view.'
-);
 // docs/design.md (Tokens And Hard Rules): screen-reader-only text
 // describes the visible UI and must not add audit detail.
 assert.doesNotMatch(
@@ -13321,16 +13203,6 @@ assert.doesNotMatch(
   groupSortBoardSource,
   /data-handoff=/,
   'Group-sort runner should not render hidden audit handoff output.'
-);
-assert.match(
-  matchingPairsBoardHandoffSource,
-  /export const MATCHING_PAIRS_BOARD_HANDOFF_ITEM_IDS = \[(?=[\s\S]*'template-type')(?=[\s\S]*'prompt-card-count')(?=[\s\S]*'choice-card-count')(?=[\s\S]*'reassignment-policy')(?=[\s\S]*'public-payload-boundary')(?=[\s\S]*'privacy-guard')[\s\S]*\] as const;[\s\S]*export type MatchingPairsBoardHandoffPrivacyContract = \{[\s\S]*exposesAnswerText: false;[\s\S]*exposesChoiceText: false;[\s\S]*exposesRuntimeItemIds: false;[\s\S]*exposesRuntimePromptText: false;[\s\S]*scope: 'matching-pairs-card-board';/,
-  'Matching-pairs board handoff should expose a typed 30-slice card-board privacy contract.'
-);
-assert.match(
-  matchingPairsBoardHandoffSource,
-  /buildMatchingPairsBoardHandoffView[\s\S]*runnerView: ChoicePairingRunnerView[\s\S]*buildMatchingPairsBoardHandoffContext[\s\S]*runnerView\.promptItemViews\.length[\s\S]*runnerView\.choiceViews\.length[\s\S]*runnerView\.completionSummary\.answeredItemCount/,
-  'Matching-pairs board handoff should derive card, choice, selection, and progress state from the prepared runner view.'
 );
 // docs/design.md (Tokens And Hard Rules): screen-reader-only text
 // describes the visible UI and must not add audit detail.
@@ -17310,12 +17182,10 @@ assert.deepEqual(
     ASSIGNMENT_DISTRIBUTION_LIFECYCLE_CHAIN_SOURCE_FILES.length,
     PUBLISHED_ASSIGNMENT_DELIVERY_CHAIN_HANDOFF_ITEM_IDS.length,
     PUBLISHED_ASSIGNMENT_DELIVERY_CHAIN_SOURCE_FILES.length,
-    PUBLIC_ASSIGNMENT_RULES_HANDOFF_ITEM_IDS.length,
     STUDENT_RUNNER_PLAY_CHAIN_HANDOFF_ITEM_IDS.length,
     STUDENT_RUNNER_PLAY_CHAIN_SOURCE_FILES.length,
     STUDENT_IDENTITY_LIFECYCLE_CHAIN_HANDOFF_ITEM_IDS.length,
     STUDENT_IDENTITY_LIFECYCLE_CHAIN_SOURCE_FILES.length,
-    STUDENT_RUNTIME_IDENTITY_HANDOFF_ITEM_IDS.length,
     ASSIGNMENT_SUBMISSION_VALIDATION_HANDOFF_ITEM_IDS.length,
     ASSIGNMENT_ATTEMPT_PERSISTENCE_HANDOFF_ITEM_IDS.length,
     ASSIGNMENT_ATTEMPT_DURATION_HANDOFF_ITEM_IDS.length,
@@ -17343,7 +17213,7 @@ assert.deepEqual(
     PUBLIC_DISCOVERY_INDEXING_CHAIN_SOURCE_FILES.length,
     CLASSROOM_TRUST_COMMUNICATION_CHAIN_HANDOFF_ITEM_IDS.length,
   ],
-  Array.from({ length: 60 }, () => 30),
+  Array.from({ length: 58 }, () => 30),
   'Classroom product loop chain should stay backed by adjacent public entry, public discovery/indexing, workspace, data, authoring, source extraction, lifecycle governance, template roadmap, AI enhancement lifecycle, delivery, runner, result continuity, export, print, and trust gates.'
 );
 assert.deepEqual(Object.fromEntries(classroomProductLoopChainValues), {
@@ -17365,13 +17235,13 @@ assert.deepEqual(Object.fromEntries(classroomProductLoopChainValues), {
   'assignment-attempt-stats-boundary': '30 stats slices',
   'assignment-attempt-persistence-boundary': '30 persistence slices',
   'public-discovery-indexing-boundary': '30 discovery slices',
-  'public-assignment-rules-boundary': '30 rule slices',
+  'public-assignment-rules-boundary': 'Visible rule chips',
   'student-runner-play-boundary': '30 runner slices',
   'result-accepted-answer-boundary': '30 answer slices',
   'result-explanation-boundary': '30 explanation slices',
   'worksheet-mode-delivery-boundary': '30 worksheet slices',
   'assignment-attempt-duration-boundary': '30 duration slices',
-  'student-runtime-identity-boundary': '30 runtime identity slices',
+  'student-runtime-identity-boundary': 'Runtime item ids',
   'teacher-result-copy-lifecycle-boundary': '30 copy slices',
   'source-extraction-lifecycle-boundary': '30 extraction slices',
   'student-identity-lifecycle-boundary': '30 identity slices',
@@ -19475,22 +19345,6 @@ const studentRunnerSubmitControlsSource = readFileSync(
   'src/components/assignments/student-runner-submit-controls.tsx',
   'utf8'
 );
-const studentRunnerIdentityHandoffSource = readFileSync(
-  'src/assignments/student-runner-identity-handoff.ts',
-  'utf8'
-);
-const studentRunnerSubmitControlsHandoffSource = readFileSync(
-  'src/assignments/student-runner-submit-controls-handoff.ts',
-  'utf8'
-);
-const studentRunnerStartHandoffSource = readFileSync(
-  'src/components/assignments/student-runner-start-handoff.tsx',
-  'utf8'
-);
-const studentRunnerSubmissionHandoffSource = readFileSync(
-  'src/components/assignments/student-runner-submission-handoff.tsx',
-  'utf8'
-);
 const studentRunnerLoadingPanelSource = readFileSync(
   'src/components/assignments/student-runner-loading-panel.tsx',
   'utf8'
@@ -19555,16 +19409,8 @@ const studentRuntimeItemListDomainSource = readFileSync(
   'src/assignments/student-runtime-item-list.ts',
   'utf8'
 );
-const studentRuntimeIdentityHandoffSource = readFileSync(
-  'src/assignments/runtime-identity-handoff.ts',
-  'utf8'
-);
 const studentRunnerViewSource = readFileSync(
   'src/assignments/student-runner-view.ts',
-  'utf8'
-);
-const fillBlankWorksheetHandoffSource = readFileSync(
-  'src/assignments/fill-blank-worksheet-handoff.ts',
   'utf8'
 );
 const studentRuntimeItemListSource = readFileSync(
@@ -19602,7 +19448,7 @@ assert.match(
 );
 assert.match(
   studentRunnerSubmissionSource,
-  /export type StudentAttemptFeedbackScopeStatus = 'hidden' \| 'visible';[\s\S]*export type StudentAttemptFeedbackScopeMetricKey =[\s\S]*'accepted-alternatives'[\s\S]*'explanations'[\s\S]*'item-feedback'[\s\S]*'needs-review'[\s\S]*'unanswered'[\s\S]*'visibility'[\s\S]*export type StudentAttemptFeedbackScopeView = \{[\s\S]*hiddenBySettings: boolean;[\s\S]*metricsLabel: string;[\s\S]*metrics: StudentAttemptFeedbackScopeMetricView\[\];[\s\S]*status: StudentAttemptFeedbackScopeStatus;[\s\S]*statusAriaLabel: string;[\s\S]*statusLabel: string;/,
+  /export type StudentAttemptFeedbackScopeStatus = 'hidden' \| 'visible';[\s\S]*type StudentAttemptFeedbackScopeMetricKey =[\s\S]*'accepted-alternatives'[\s\S]*'explanations'[\s\S]*'item-feedback'[\s\S]*'needs-review'[\s\S]*'unanswered'[\s\S]*'visibility'[\s\S]*export type StudentAttemptFeedbackScopeView = \{[\s\S]*hiddenBySettings: boolean;[\s\S]*metricsLabel: string;[\s\S]*metrics: StudentAttemptFeedbackScopeMetricView\[\];[\s\S]*status: StudentAttemptFeedbackScopeStatus;[\s\S]*statusAriaLabel: string;[\s\S]*statusLabel: string;/,
   'Student submission domain should expose an explicit feedback coverage view contract.'
 );
 assert.match(
@@ -19767,17 +19613,17 @@ assert.match(
 );
 assert.match(
   studentRunnerViewSource,
-  /export type RuntimeChoiceButtonView = \{[\s\S]*choice: string;[\s\S]*id: string;[\s\S]*selected: boolean;[\s\S]*export type StudentRunnerItemView = StudentAttemptAnswerState & \{[\s\S]*item: PublicRuntimeItem;[\s\S]*reviewItem: PublicAttemptReviewItem \| undefined;[\s\S]*status: StudentRunnerReviewStatus;[\s\S]*export type StudentRunnerView = \{[\s\S]*completionSummary: AttemptCompletionSummary;[\s\S]*itemViews: StudentRunnerItemView\[\];[\s\S]*itemViewsById: Map<string, StudentRunnerItemView>;[\s\S]*export type DefaultRuntimeItemCardView = StudentRunnerItemView & \{/,
+  /export type RuntimeChoiceButtonView = \{[\s\S]*choice: string;[\s\S]*id: string;[\s\S]*selected: boolean;[\s\S]*export type StudentRunnerItemView = StudentAttemptAnswerState & \{[\s\S]*item: PublicRuntimeItem;[\s\S]*reviewItem: PublicAttemptReviewItem \| undefined;[\s\S]*status: StudentRunnerReviewStatus;[\s\S]*type StudentRunnerView = \{[\s\S]*completionSummary: AttemptCompletionSummary;[\s\S]*itemViews: StudentRunnerItemView\[\];[\s\S]*itemViewsById: Map<string, StudentRunnerItemView>;[\s\S]*export type DefaultRuntimeItemCardView = StudentRunnerItemView & \{/,
   'Student runner domain should expose explicit base item, list, choice, and default-card view contracts.'
 );
 assert.match(
   studentRunnerViewSource,
-  /export type RuntimeChoiceView = \{[\s\S]*action: ChoicePairingRunnerAction;[\s\S]*choice: string;[\s\S]*id: string;[\s\S]*usedByItemId: string \| undefined;[\s\S]*export type ChoicePairingRunnerView = StudentRunnerView & \{[\s\S]*choiceViews: RuntimeChoiceView\[\];[\s\S]*promptItemViews: ChoicePairingPromptItemView\[\];[\s\S]*export type ChoicePairingPromptItemView = StudentRunnerItemView & \{[\s\S]*action: ChoicePairingRunnerAction;[\s\S]*reviewStatusClassName: string \| undefined;[\s\S]*selected: boolean;/,
+  /type RuntimeChoiceView = \{[\s\S]*action: ChoicePairingRunnerAction;[\s\S]*choice: string;[\s\S]*id: string;[\s\S]*usedByItemId: string \| undefined;[\s\S]*type ChoicePairingRunnerView = StudentRunnerView & \{[\s\S]*choiceViews: RuntimeChoiceView\[\];[\s\S]*promptItemViews: ChoicePairingPromptItemView\[\];[\s\S]*type ChoicePairingPromptItemView = StudentRunnerItemView & \{[\s\S]*action: ChoicePairingRunnerAction;[\s\S]*reviewStatusClassName: string \| undefined;[\s\S]*selected: boolean;/,
   'Student runner domain should expose explicit choice-pairing view contracts for line-match and matching-pairs templates.'
 );
 assert.match(
   studentRunnerViewSource,
-  /export type GroupSortRunnerView = StudentRunnerView & \{[\s\S]*groupViews: GroupSortGroupView\[\];[\s\S]*selectedClearAction: GroupSortRunnerAction \| undefined;[\s\S]*selectedItem\?: PublicRuntimeItem;[\s\S]*unplacedItemViews: GroupSortItemView\[\];[\s\S]*export type GroupSortGroupView = \{[\s\S]*group: string;[\s\S]*id: string;[\s\S]*placedItemViews: GroupSortItemView\[\];[\s\S]*export type GroupSortItemView = StudentRunnerItemView & \{[\s\S]*action: GroupSortRunnerAction;[\s\S]*reviewStatusClassName: string \| undefined;[\s\S]*selected: boolean;/,
+  /type GroupSortRunnerView = StudentRunnerView & \{[\s\S]*groupViews: GroupSortGroupView\[\];[\s\S]*selectedClearAction: GroupSortRunnerAction \| undefined;[\s\S]*selectedItem\?: PublicRuntimeItem;[\s\S]*unplacedItemViews: GroupSortItemView\[\];[\s\S]*type GroupSortGroupView = \{[\s\S]*group: string;[\s\S]*id: string;[\s\S]*placedItemViews: GroupSortItemView\[\];[\s\S]*type GroupSortItemView = StudentRunnerItemView & \{[\s\S]*action: GroupSortRunnerAction;[\s\S]*reviewStatusClassName: string \| undefined;[\s\S]*selected: boolean;/,
   'Student runner domain should expose explicit group-sort board view contracts.'
 );
 assert.match(
@@ -19787,140 +19633,9 @@ assert.match(
 );
 assert.match(
   studentRunnerViewSource,
-  /export type InlineBlankPromptView =[\s\S]*mode: 'inline';[\s\S]*mode: 'standalone';[\s\S]*prompt: string;[\s\S]*export type FillBlankWorksheetItemView = StudentRunnerItemView & \{[\s\S]*promptView: InlineBlankPromptView;[\s\S]*export type FillBlankWorksheetView = StudentRunnerView & \{[\s\S]*fillBlankItemViews: FillBlankWorksheetItemView\[\];/,
+  /export type InlineBlankPromptView =[\s\S]*mode: 'inline';[\s\S]*mode: 'standalone';[\s\S]*prompt: string;[\s\S]*type FillBlankWorksheetItemView = StudentRunnerItemView & \{[\s\S]*promptView: InlineBlankPromptView;[\s\S]*type FillBlankWorksheetView = StudentRunnerView & \{[\s\S]*fillBlankItemViews: FillBlankWorksheetItemView\[\];/,
   'Student runner domain should expose explicit fill-blank worksheet prompt and item view contracts.'
 );
-assert.deepEqual(
-  [...FILL_BLANK_WORKSHEET_HANDOFF_ITEM_IDS],
-  [
-    'template-type',
-    'runner-surface',
-    'worksheet-state',
-    'runtime-item-count',
-    'inline-blank-count',
-    'inline-input-coverage',
-    'standalone-prompt-count',
-    'standalone-fallback-coverage',
-    'word-bank-row-count',
-    'word-bank-coverage',
-    'answered-item-count',
-    'answer-row-scope',
-    'unanswered-item-count',
-    'partial-submit-boundary',
-    'completion-progress',
-    'input-placement-policy',
-    'answer-input-state',
-    'disabled-action-policy',
-    'review-feedback-state',
-    'review-visibility-policy',
-    'review-item-count',
-    'accepted-answer-boundary',
-    'accepted-answer-visibility',
-    'explanation-boundary',
-    'explanation-visibility',
-    'public-payload-boundary',
-    'submission-contract',
-    'runtime-id-boundary',
-    'prompt-word-bank-boundary',
-    'privacy-guard',
-  ],
-  'Fill-blank worksheet handoff should expose exactly 30 stable slice ids.'
-);
-assert.match(
-  fillBlankWorksheetHandoffSource,
-  /export const FILL_BLANK_WORKSHEET_HANDOFF_ITEM_IDS = \[(?=[\s\S]*'inline-input-coverage')(?=[\s\S]*'standalone-fallback-coverage')(?=[\s\S]*'word-bank-coverage')(?=[\s\S]*'answer-row-scope')(?=[\s\S]*'partial-submit-boundary')(?=[\s\S]*'review-visibility-policy')(?=[\s\S]*'accepted-answer-visibility')(?=[\s\S]*'explanation-visibility')(?=[\s\S]*'runtime-id-boundary')(?=[\s\S]*'prompt-word-bank-boundary')[\s\S]*export type FillBlankWorksheetHandoffPrivacyContract = \{[\s\S]*exposesAnswerKeys: false;[\s\S]*exposesAnswerText: false;[\s\S]*exposesRuntimeItemIds: false;[\s\S]*exposesRuntimePromptText: false;[\s\S]*exposesSourceMaterialMetadata: false;[\s\S]*exposesStudentIdentity: false;[\s\S]*exposesWordBankText: false;[\s\S]*usesSharedSubmissionContract: true;/,
-  'Fill-blank worksheet handoff should expose a typed 30-slice privacy contract.'
-);
-const domainFillBlankPrivateAnswer = 'DOMAIN_FILL_BLANK_PRIVATE_ANSWER';
-const domainFillBlankPrivatePrompt = 'DOMAIN_FILL_BLANK_PRIVATE_PROMPT ___';
-const domainFillBlankPrivateChoice = 'DOMAIN_FILL_BLANK_PRIVATE_CHOICE';
-const domainFillBlankPrivateItemId = 'domain-fill-blank-private-item';
-const domainFillBlankView = buildFillBlankWorksheetView({
-  answers: {
-    [domainFillBlankPrivateItemId]: domainFillBlankPrivateAnswer,
-  },
-  items: [
-    {
-      choices: [domainFillBlankPrivateChoice],
-      id: domainFillBlankPrivateItemId,
-      kind: 'question',
-      prompt: domainFillBlankPrivatePrompt,
-    },
-    {
-      id: 'domain-fill-blank-safe-standalone',
-      kind: 'question',
-      prompt: 'SAFE_DOMAIN_FILL_BLANK_STANDALONE',
-    },
-  ],
-  progressVerb: 'completed',
-  revealAnswer: false,
-  wordBankLabel: 'Word bank',
-});
-const domainFillBlankHandoffView = buildFillBlankWorksheetHandoffView({
-  runnerView: domainFillBlankView,
-});
-const domainFillBlankHandoffValues = new Map(
-  domainFillBlankHandoffView.itemViews.map((item) => [item.id, item.value])
-);
-assert.deepEqual(
-  domainFillBlankHandoffView.itemViews.map((item) => item.id),
-  [...FILL_BLANK_WORKSHEET_HANDOFF_ITEM_IDS],
-  'Fill-blank worksheet handoff should build item views from the stable 30-slice id list.'
-);
-assert.deepEqual(domainFillBlankHandoffView.privacy, {
-  exposesAnswerKeys: false,
-  exposesAnswerText: false,
-  exposesRuntimeItemIds: false,
-  exposesRuntimePromptText: false,
-  exposesSourceMaterialMetadata: false,
-  exposesStudentIdentity: false,
-  exposesWordBankText: false,
-  itemIds: [...FILL_BLANK_WORKSHEET_HANDOFF_ITEM_IDS],
-  runnerSurface: 'fill-blank',
-  scope: 'fill-blank-worksheet',
-  templateType: 'fill-blank',
-  usesSharedSubmissionContract: true,
-});
-assert.equal(
-  domainFillBlankHandoffValues.get('inline-input-coverage'),
-  '1 of 2 inline'
-);
-assert.equal(
-  domainFillBlankHandoffValues.get('standalone-fallback-coverage'),
-  '1 of 2 standalone'
-);
-assert.equal(
-  domainFillBlankHandoffValues.get('word-bank-coverage'),
-  '1 of 2 with word bank'
-);
-assert.equal(
-  domainFillBlankHandoffValues.get('answer-row-scope'),
-  'Answers summarized'
-);
-assert.equal(
-  domainFillBlankHandoffValues.get('partial-submit-boundary'),
-  'Partial attempt available'
-);
-assert.equal(
-  domainFillBlankHandoffValues.get('runtime-id-boundary'),
-  'Runtime ids hidden'
-);
-assert.equal(
-  domainFillBlankHandoffValues.get('prompt-word-bank-boundary'),
-  'Prompts and word banks hidden'
-);
-for (const privateValue of [
-  domainFillBlankPrivateAnswer,
-  domainFillBlankPrivatePrompt,
-  domainFillBlankPrivateChoice,
-  domainFillBlankPrivateItemId,
-]) {
-  assert.equal(
-    JSON.stringify(domainFillBlankHandoffView).includes(privateValue),
-    false,
-    `Fill-blank worksheet handoff leaked private text: ${privateValue}`
-  );
-}
 assert.match(
   studentRunnerViewSource,
   /export function buildChoicePairingRunnerView\([\s\S]*\): ChoicePairingRunnerView[\s\S]*export function buildGroupSortRunnerView\([\s\S]*\): GroupSortRunnerView/,
@@ -19928,7 +19643,7 @@ assert.match(
 );
 assert.match(
   studentRunnerViewSource,
-  /export type SequentialStudentRunnerItemView = StudentRunnerItemView & \{[\s\S]*sequenceLabel: string;[\s\S]*export type SequentialStudentRunnerNavigationItemView =[\s\S]*selectAction: SequentialStudentRunnerNavigationAction;[\s\S]*export type SequentialStudentRunnerNavigationView = \{[\s\S]*itemViews: SequentialStudentRunnerNavigationItemView\[\];[\s\S]*export type SequentialStudentRunnerSequenceView = \{[\s\S]*activeItemView: SequentialStudentRunnerItemView \| undefined;[\s\S]*export type SequentialStudentRunnerView = StudentRunnerView & \{[\s\S]*activeChoiceViews: RuntimeChoiceButtonView\[\];[\s\S]*navigationView: SequentialStudentRunnerNavigationView;[\s\S]*sequenceView: SequentialStudentRunnerSequenceView;/,
+  /type SequentialStudentRunnerItemView = StudentRunnerItemView & \{[\s\S]*sequenceLabel: string;[\s\S]*export type SequentialStudentRunnerNavigationItemView =[\s\S]*selectAction: SequentialStudentRunnerNavigationAction;[\s\S]*type SequentialStudentRunnerNavigationView = \{[\s\S]*itemViews: SequentialStudentRunnerNavigationItemView\[\];[\s\S]*type SequentialStudentRunnerSequenceView = \{[\s\S]*activeItemView: SequentialStudentRunnerItemView \| undefined;[\s\S]*type SequentialStudentRunnerView = StudentRunnerView & \{[\s\S]*activeChoiceViews: RuntimeChoiceButtonView\[\];[\s\S]*navigationView: SequentialStudentRunnerNavigationView;[\s\S]*sequenceView: SequentialStudentRunnerSequenceView;/,
   'Student runner domain should expose explicit sequential runner view contracts for listening and open-box templates.'
 );
 assert.match(
@@ -19940,114 +19655,6 @@ assert.match(
   studentRuntimeItemListDomainSource,
   /defaultItemCardViews: DefaultRuntimeItemCardView\[\];[\s\S]*runnerCopy: ActivityRunnerCopy;/,
   'Student runtime item list domain should compose explicit runner copy and default-card contracts.'
-);
-assert.deepEqual(
-  [...STUDENT_RUNTIME_INTERACTION_HANDOFF_ITEM_IDS],
-  [
-    'template-type',
-    'runner-surface',
-    'renderer-surface-count',
-    'renderer-dispatch-boundary',
-    'runner-title',
-    'runtime-items',
-    'runtime-kind-summary',
-    'choice-count',
-    'choice-list-renderer',
-    'line-match-renderer',
-    'fill-blank-renderer',
-    'open-box-renderer',
-    'listening-renderer',
-    'listening-language',
-    'group-sort-renderer',
-    'matching-pairs-renderer',
-    'answer-contract',
-    'answer-change-contract',
-    'submission-payload-boundary',
-    'selection-scope',
-    'review-feedback',
-    'review-item-count',
-    'feedback-data-boundary',
-    'disabled-state',
-    'public-payload-boundary',
-    'runtime-id-boundary',
-    'prompt-text-boundary',
-    'choice-text-boundary',
-    'answer-text-boundary',
-    'privacy-guard',
-  ],
-  'Student runtime interaction handoff should expose exactly 30 stable slice ids.'
-);
-assert.deepEqual(
-  [...STUDENT_RUNTIME_IDENTITY_HANDOFF_ITEM_IDS],
-  [
-    'template-type',
-    'runner-surface',
-    'runtime-item-count',
-    'normalized-runtime-id-count',
-    'unique-runtime-id-status',
-    'duplicate-runtime-id-count',
-    'blank-runtime-id-count',
-    'question-count',
-    'pair-count',
-    'group-item-count',
-    'choice-count',
-    'runtime-id-normalization-source',
-    'multilingual-id-collision-guard',
-    'submission-contract',
-    'submission-validation-boundary',
-    'unknown-answer-id-policy',
-    'duplicate-answer-id-policy',
-    'answer-list-length-policy',
-    'browser-answer-boundary',
-    'scoring-lookup-boundary',
-    'teacher-results-boundary',
-    'public-payload-boundary',
-    'assignment-snapshot-boundary',
-    'activity-content-boundary',
-    'prompt-choice-boundary',
-    'answer-text-boundary',
-    'student-name-boundary',
-    'anonymous-token-boundary',
-    'source-material-boundary',
-    'privacy-guard',
-  ],
-  'Student runtime identity handoff should expose exactly 30 stable slice ids.'
-);
-assert.deepEqual(
-  [...STUDENT_RUNTIME_SEMANTIC_BUNDLE_HANDOFF_ITEM_IDS],
-  [
-    'interaction-template-type',
-    'interaction-runner-surface',
-    'interaction-renderer-dispatch',
-    'interaction-runtime-items',
-    'interaction-kind-summary',
-    'interaction-answer-contract',
-    'interaction-selection-scope',
-    'interaction-review-feedback',
-    'interaction-disabled-state',
-    'interaction-privacy-guard',
-    'choice-runner-surface',
-    'choice-exclusive-state',
-    'choice-group-placement',
-    'choice-choice-list',
-    'choice-normalized-count',
-    'choice-selected-state',
-    'choice-answer-change-contract',
-    'choice-normalized-answer-scope',
-    'choice-public-payload',
-    'choice-privacy-guard',
-    'identity-template-type',
-    'identity-runner-surface',
-    'identity-runtime-count',
-    'identity-normalized-id-count',
-    'identity-unique-id-status',
-    'identity-collision-guard',
-    'identity-submission-validation',
-    'identity-public-payload',
-    'identity-snapshot-boundary',
-    'identity-privacy-guard',
-  ],
-  'Student runtime semantic bundle handoff should expose exactly 30 stable sourced slice ids.'
 );
 const studentRunnerPlayChainView = buildStudentRunnerPlayChainHandoffView();
 const studentRunnerPlayChainValues = new Map(
@@ -20096,30 +19703,14 @@ assert.deepEqual(studentRunnerPlayChainView.privacy, {
 assert.deepEqual(
   [
     PUBLIC_ASSIGNMENT_ACCESS_HANDOFF_ITEM_IDS.length,
-    PUBLIC_ASSIGNMENT_RULES_HANDOFF_ITEM_IDS.length,
     PUBLIC_ASSIGNMENT_UNAVAILABLE_ACCESS_HANDOFF_ITEM_IDS.length,
-    STUDENT_RUNNER_LOADING_HANDOFF_ITEM_IDS.length,
-    STUDENT_RUNNER_START_HANDOFF_ITEM_IDS.length,
-    STUDENT_RUNNER_IDENTITY_HANDOFF_ITEM_IDS.length,
-    STUDENT_RUNNER_SUBMIT_CONTROLS_HANDOFF_ITEM_IDS.length,
-    STUDENT_RUNNER_SUBMISSION_HANDOFF_ITEM_IDS.length,
-    STUDENT_RUNTIME_INTERACTION_HANDOFF_ITEM_IDS.length,
-    STUDENT_RUNTIME_CHOICE_ASSIGNMENT_HANDOFF_ITEM_IDS.length,
-    STUDENT_RUNTIME_IDENTITY_HANDOFF_ITEM_IDS.length,
-    STUDENT_RUNTIME_SEMANTIC_BUNDLE_HANDOFF_ITEM_IDS.length,
-    FILL_BLANK_WORKSHEET_HANDOFF_ITEM_IDS.length,
-    LINE_MATCH_BOARD_HANDOFF_ITEM_IDS.length,
-    GROUP_SORT_BOARD_HANDOFF_ITEM_IDS.length,
-    MATCHING_PAIRS_BOARD_HANDOFF_ITEM_IDS.length,
-    LISTENING_SPEECH_HANDOFF_ITEM_IDS.length,
-    OPEN_BOX_REVEAL_HANDOFF_ITEM_IDS.length,
     ASSIGNMENT_ATTEMPT_LIMIT_HANDOFF_ITEM_IDS.length,
     ASSIGNMENT_ATTEMPT_DURATION_HANDOFF_ITEM_IDS.length,
     ASSIGNMENT_ANSWER_FEEDBACK_HANDOFF_ITEM_IDS.length,
     ASSIGNMENT_SUBMISSION_VALIDATION_HANDOFF_ITEM_IDS.length,
     ASSIGNMENT_ATTEMPT_PERSISTENCE_HANDOFF_ITEM_IDS.length,
   ],
-  Array.from({ length: 23 }, () => 30),
+  Array.from({ length: 7 }, () => 30),
   'Student runner play chain should stay backed by focused public-runner gates.'
 );
 assert.deepEqual(Object.fromEntries(studentRunnerPlayChainValues), {
@@ -20148,7 +19739,7 @@ assert.deepEqual(Object.fromEntries(studentRunnerPlayChainValues), {
   'runtime-item-order': 'Stable order',
   'runtime-identity-contract': 'Identity hidden',
   'semantic-bundle-guard': 'Safe handoff bundle',
-  'submit-controls-handoff-boundary': '30 submit control slices',
+  'submit-controls-handoff-boundary': 'Visible submit controls',
   'submit-controls-readiness': 'Prepared controls',
   'submission-validation': 'Shared answer guard',
   'timer-start-boundary': 'After readiness',
@@ -20156,7 +19747,7 @@ assert.deepEqual(Object.fromEntries(studentRunnerPlayChainValues), {
 });
 assert.match(
   readFileSync('tests/e2e/TEST-CATALOG.md', 'utf8'),
-  /Student runner play chain has a fast script-level gate via[\s\S]*scripts\/student-runner-play-chain-handoff\.test\.ts[\s\S]*submit controls handoff boundary/,
+  /Student runner play chain has a fast script-level gate via[\s\S]*scripts\/student-runner-play-chain-handoff\.test\.ts[\s\S]*visible submit controls/,
   'TEST-CATALOG should document the student runner play chain gate.'
 );
 const studentIdentityLifecycleChainView =
@@ -20213,11 +19804,6 @@ assert.deepEqual(studentIdentityLifecycleChainView.privacy, {
 });
 assert.deepEqual(
   [
-    STUDENT_RUNNER_IDENTITY_HANDOFF_ITEM_IDS.length,
-    STUDENT_RUNNER_START_HANDOFF_ITEM_IDS.length,
-    STUDENT_RUNNER_SUBMISSION_HANDOFF_ITEM_IDS.length,
-    STUDENT_RUNNER_SUBMIT_CONTROLS_HANDOFF_ITEM_IDS.length,
-    STUDENT_RUNTIME_IDENTITY_HANDOFF_ITEM_IDS.length,
     ASSIGNMENT_ATTEMPT_LIMIT_HANDOFF_ITEM_IDS.length,
     ASSIGNMENT_ATTEMPT_PERSISTENCE_HANDOFF_ITEM_IDS.length,
     ASSIGNMENT_RESULT_STUDENT_SEARCH_HANDOFF_ITEM_IDS.length,
@@ -20227,7 +19813,7 @@ assert.deepEqual(
     STUDENT_RUNNER_PLAY_CHAIN_HANDOFF_ITEM_IDS.length,
     TEACHER_RESULTS_REVIEW_CHAIN_HANDOFF_ITEM_IDS.length,
   ],
-  Array.from({ length: 13 }, () => 30),
+  Array.from({ length: 8 }, () => 30),
   'Student identity lifecycle chain should stay backed by adjacent identity, runner, attempt, result, and export gates.'
 );
 assert.deepEqual(Object.fromEntries(studentIdentityLifecycleChainValues), {
@@ -20248,12 +19834,12 @@ assert.deepEqual(Object.fromEntries(studentIdentityLifecycleChainValues), {
   'result-export-token-guard': 'Raw token hidden',
   'result-search-anonymous-label': 'Normalized labels',
   'runner-anonymous-guidance': 'Browser guidance',
-  'runner-identity-handoff': '30 identity slices',
+  'runner-identity-handoff': 'Named or anonymous',
   'runner-identity-view': 'Prepared identity view',
   'runner-start-privacy': 'Start handoff hidden',
   'runner-submission-privacy': 'Submission handoff hidden',
   'scored-attempt-query-identity': 'Identity selects',
-  'runtime-identity-handoff-boundary': '30 runtime identity slices',
+  'runtime-identity-handoff-boundary': 'Runtime item ids',
   'student-name-identity-key': 'name:*',
   'student-name-normalization': 'NFKC + collapsed spaces',
   'student-summary-sort-identity': 'Student label sort',
@@ -20266,61 +19852,6 @@ assert.match(
   readFileSync('tests/e2e/TEST-CATALOG.md', 'utf8'),
   /Student identity lifecycle chain has a fast script-level gate via[\s\S]*scripts\/student-identity-lifecycle-chain-handoff\.test\.ts/,
   'TEST-CATALOG should document the student identity lifecycle chain gate.'
-);
-assert.match(
-  studentRuntimeItemListDomainSource,
-  /export type StudentRuntimeInteractionHandoffView = \{[\s\S]*description: string;[\s\S]*itemViews: StudentRuntimeInteractionHandoffItemView\[\];[\s\S]*privacy: StudentRuntimeInteractionHandoffPrivacyContract;[\s\S]*title: string;/,
-  'Student runtime item list domain should expose an explicit runtime interaction handoff view contract.'
-);
-assert.match(
-  studentRuntimeItemListDomainSource,
-  /export type StudentRuntimeSemanticBundleHandoffItemView = \{[\s\S]*ariaLabel: string;[\s\S]*description: string;[\s\S]*id: StudentRuntimeSemanticBundleHandoffItemId;[\s\S]*label: string;[\s\S]*sourceItemId:[\s\S]*sourceScope: StudentRuntimeSemanticBundleSourceScope;[\s\S]*value: string;[\s\S]*export type StudentRuntimeSemanticBundleHandoffPrivacyContract = \{[\s\S]*exposesAnswerText: false;[\s\S]*exposesAnonymousToken: false;[\s\S]*exposesRuntimeChoiceText: false;[\s\S]*exposesRuntimeItemIds: false;[\s\S]*exposesRuntimePromptText: false;[\s\S]*exposesSourceMaterialMetadata: false;[\s\S]*exposesStudentNames: false;[\s\S]*exposesTeacherOnlyAnswers: false;[\s\S]*sourceScopes: StudentRuntimeSemanticBundleSourceScope\[\];[\s\S]*scope: 'public-student-runtime-semantic-bundle';/,
-  'Student runtime item list domain should expose an explicit semantic bundle handoff item, source, and privacy contract.'
-);
-assert.match(
-  studentRuntimeIdentityHandoffSource,
-  /export type StudentRuntimeIdentityHandoffPrivacyContract = \{[\s\S]*exposesActivityContentJson: false;[\s\S]*exposesAnswerText: false;[\s\S]*exposesAnonymousToken: false;[\s\S]*exposesRuntimeChoiceText: false;[\s\S]*exposesRuntimeItemIds: false;[\s\S]*exposesRuntimePromptText: false;[\s\S]*exposesSourceMaterialMetadata: false;[\s\S]*exposesStudentName: false;[\s\S]*rejectsDuplicateAnswerIds: true;[\s\S]*rejectsOverlongAnswerRows: true;[\s\S]*rejectsUnknownRuntimeIds: true;[\s\S]*scope: 'public-student-runtime-identity';[\s\S]*usesFrozenSnapshotIdentity: true;/,
-  'Student runtime identity handoff privacy should lock activity content, student name, anonymous token, submission validation, frozen snapshot, and stable public runtime identity scope boundaries.'
-);
-assert.match(
-  studentRuntimeIdentityHandoffSource,
-  /getAttemptAnswerRuntimeItemEntries\(\{[\s\S]*includeEmpty: true,[\s\S]*runtimeItems: items,[\s\S]*\}\)/,
-  'Student runtime identity handoff should summarize ids through the shared attempt-answer normalizer.'
-);
-assert.match(
-  studentRuntimeItemListDomainSource,
-  /interactionHandoffView: StudentRuntimeInteractionHandoffView;/,
-  'Student runtime item list view should include the prepared runtime interaction handoff view.'
-);
-assert.match(
-  studentRuntimeItemListDomainSource,
-  /semanticBundleHandoffView: StudentRuntimeSemanticBundleHandoffView;[\s\S]*const interactionHandoffView = buildStudentRuntimeInteractionHandoffView\(\{[\s\S]*const runtimeChoiceAssignmentHandoffView =[\s\S]*buildStudentRuntimeChoiceAssignmentHandoffView\(\{[\s\S]*const runtimeIdentityHandoffView = buildStudentRuntimeIdentityHandoffView\(\{[\s\S]*semanticBundleHandoffView: buildStudentRuntimeSemanticBundleHandoffView\(\{[\s\S]*interactionHandoffView,[\s\S]*runtimeChoiceAssignmentHandoffView,[\s\S]*runtimeIdentityHandoffView,[\s\S]*templateType,/,
-  'Student runtime item list view should build the semantic bundle from the same prepared interaction, choice-assignment, and identity handoffs.'
-);
-assert.match(
-  studentRuntimeItemListDomainSource,
-  /runtimeIdentityHandoffView: StudentRuntimeIdentityHandoffView;[\s\S]*const runtimeIdentityHandoffView = buildStudentRuntimeIdentityHandoffView\(\{[\s\S]*items,[\s\S]*templateType,[\s\S]*\}\);[\s\S]*runtimeIdentityHandoffView,/,
-  'Student runtime item list view should include the prepared runtime identity handoff view from the current runtime items and template.'
-);
-assert.match(
-  studentRuntimeItemListDomainSource,
-  /buildStudentRuntimeInteractionHandoffView\(\{[\s\S]*disabled,[\s\S]*items,[\s\S]*language,[\s\S]*revealAnswer,[\s\S]*reviewItems,[\s\S]*runnerCopy,[\s\S]*surface,[\s\S]*templateType,/,
-  'Student runtime item-list domain should compose interaction handoff state from renderer dispatch, language, disabled, review items, and review inputs.'
-);
-assert.match(
-  studentRuntimeItemListDomainSource,
-  /exposesAnswerText: false[;,][\s\S]*exposesRuntimeChoiceText: false[;,][\s\S]*exposesRuntimeItemIds: false[;,][\s\S]*exposesRuntimePromptText: false[;,][\s\S]*exposesStudentNames: false[;,][\s\S]*exposesTeacherOnlyAnswers: false[;,][\s\S]*scope: 'public-student-runtime-interaction'[;,]/,
-  'Student runtime interaction handoff privacy should forbid answer, prompt, choice, runtime id, student name, and teacher-only answer exposure while exposing a stable scope.'
-);
-assert.match(
-  studentRuntimeItemListDomainSource,
-  /getTemplateByType\(templateType\)\.name[\s\S]*STUDENT_RUNTIME_RENDERER_SURFACES[\s\S]*normalizeListeningSpeechLanguage\(language\)[\s\S]*formatStudentRuntimeAnswerChangeContract\(surface\)[\s\S]*formatStudentRuntimeSelectionScope\(surface\)[\s\S]*formatStudentRuntimeReviewItemCount\(reviewItems\)/,
-  'Student runtime interaction handoff should derive template, renderer-count, listening language, answer-update, selection-scope, and review-count semantics from shared helpers.'
-);
-assert.match(
-  studentRuntimeItemListDomainSource,
-  /function buildStudentRuntimeSemanticBundleHandoffView\(\{[\s\S]*interactionHandoffView,[\s\S]*runtimeChoiceAssignmentHandoffView,[\s\S]*runtimeIdentityHandoffView,[\s\S]*STUDENT_RUNTIME_SEMANTIC_BUNDLE_HANDOFF_ITEM_IDS\.map[\s\S]*getStudentRuntimeSemanticBundleSource\([\s\S]*getStudentRuntimeSemanticBundleSourceItem\([\s\S]*sourceItem\.description[\s\S]*sourceItem\.label[\s\S]*sourceItem\.value[\s\S]*data/,
-  'Student runtime semantic bundle should derive its 30 slices from existing safe child handoff items instead of recalculating prompt, choice, answer, or runtime-id data.'
 );
 // docs/design.md (Tokens And Hard Rules): screen-reader-only text
 // describes the visible UI and must not add audit detail.
@@ -20447,7 +19978,7 @@ assert.match(
 );
 assert.match(
   studentRunnerViewSource,
-  /export type StudentRunnerPrepareView = \{[\s\S]*stepViews: StudentRunnerPrepareStepView\[\];[\s\S]*title: string;[\s\S]*export type StudentRunnerPrepareStepId =[\s\S]*'anonymous'[\s\S]*'no-timer'[\s\S]*'review-rules'[\s\S]*'student-name'[\s\S]*'submit'[\s\S]*'timer'[\s\S]*export type StudentRunnerPrepareStepView = \{[\s\S]*ariaLabel: string;[\s\S]*description: string;[\s\S]*id: StudentRunnerPrepareStepId;[\s\S]*label: string;/,
+  /export type StudentRunnerPrepareView = \{[\s\S]*stepViews: StudentRunnerPrepareStepView\[\];[\s\S]*title: string;[\s\S]*type StudentRunnerPrepareStepId =[\s\S]*'anonymous'[\s\S]*'no-timer'[\s\S]*'review-rules'[\s\S]*'student-name'[\s\S]*'submit'[\s\S]*'timer'[\s\S]*export type StudentRunnerPrepareStepView = \{[\s\S]*ariaLabel: string;[\s\S]*description: string;[\s\S]*id: StudentRunnerPrepareStepId;[\s\S]*label: string;/,
   'Student runner prepare guidance should expose stable step ids and structured accessibility, label, and description fields.'
 );
 assert.match(
@@ -20612,11 +20143,6 @@ assert.match(
   /StudentRunnerHeaderCard[\s\S]*templateLabel=\{controlView\.runnerTitle\}[\s\S]*view=\{runnerRouteState\.headerView\}/,
   'Student play route should delegate student assignment header rendering from the page view-model.'
 );
-assert.match(
-  studentRunnerStartHandoffSource,
-  /StudentRunnerStartHandoffItemView[\s\S]*StudentRunnerStartHandoffView[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*aria-labelledby=\{titleId\}[\s\S]*data-handoff="student-runner-start"[\s\S]*data-handoff-scope=\{view\.privacy\.scope\}[\s\S]*view\.itemViews\.map[\s\S]*StudentRunnerStartHandoffItem[\s\S]*function StudentRunnerStartHandoffItem[\s\S]*const labelId = `student-runner-start-handoff-\$\{itemView\.id\}-label`[\s\S]*const valueId = `student-runner-start-handoff-\$\{itemView\.id\}-value`[\s\S]*const descriptionId = `student-runner-start-handoff-\$\{itemView\.id\}-description`[\s\S]*data-handoff-item=\{itemView\.id\}[\s\S]*id=\{labelId\}[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*aria-label=\{itemView\.ariaLabel\}[\s\S]*aria-labelledby=\{`\$\{labelId\} \$\{valueId\}`\}[\s\S]*id=\{valueId\}[\s\S]*id=\{descriptionId\}/,
-  'Student runner start handoff component should render hidden safe outputs with privacy scope plus prepared label, value, and description relationships.'
-);
 // docs/design.md (Tokens And Hard Rules): screen-reader-only text
 // describes the visible UI and must not add audit detail.
 assert.doesNotMatch(
@@ -20696,7 +20222,7 @@ assert.match(
 );
 assert.match(
   studentRunnerSubmissionSource,
-  /type StudentRunnerCopy = \{[\s\S]*studentNameDescription: string;[\s\S]*studentNameLockedDescription: string;[\s\S]*export type AnonymousAttemptCopy = \{[\s\S]*browserLabelAriaLabel: string;[\s\S]*browserLabel: string;[\s\S]*browserLabelCaption: string;[\s\S]*retryDescription: string;[\s\S]*summary: \{[\s\S]*hidesRawToken: boolean;[\s\S]*itemCount: number;[\s\S]*showsBrowserLabel: boolean;[\s\S]*summaryItems: AnonymousAttemptSummaryItem\[\];[\s\S]*export type AnonymousAttemptSummaryItemId =[\s\S]*'browser-label'[\s\S]*'retry-browser'[\s\S]*'token-privacy'[\s\S]*export type StudentAttemptResultDisplay = \{/,
+  /type StudentRunnerCopy = \{[\s\S]*studentNameDescription: string;[\s\S]*studentNameLockedDescription: string;[\s\S]*export type AnonymousAttemptCopy = \{[\s\S]*browserLabelAriaLabel: string;[\s\S]*browserLabel: string;[\s\S]*browserLabelCaption: string;[\s\S]*retryDescription: string;[\s\S]*summary: \{[\s\S]*hidesRawToken: boolean;[\s\S]*itemCount: number;[\s\S]*showsBrowserLabel: boolean;[\s\S]*summaryItems: AnonymousAttemptSummaryItem\[\];[\s\S]*type AnonymousAttemptSummaryItemId =[\s\S]*'browser-label'[\s\S]*'retry-browser'[\s\S]*'token-privacy'[\s\S]*export type StudentAttemptResultDisplay = \{/,
   'Student submission domain should expose explicit identity copy, control, result, and timer badge contracts.'
 );
 assert.match(
@@ -20739,21 +20265,6 @@ assert.match(
   /export type StudentRunnerRouteState =[\s\S]*headerView: StudentRunnerHeaderView;[\s\S]*identityView: StudentRunnerIdentityView;[\s\S]*previewView: StudentRunnerActivityPreviewView;/,
   'Student runner route state should expose ready-state views through explicit focused contracts.'
 );
-assert.match(
-  studentRunnerStateSource,
-  /export const STUDENT_RUNNER_START_HANDOFF_ITEM_IDS = \[(?=[\s\S]*'share-link')(?=[\s\S]*'assignment-title')(?=[\s\S]*'runner-source')(?=[\s\S]*'source-boundary')(?=[\s\S]*'runtime-availability')(?=[\s\S]*'submit-gate')(?=[\s\S]*'read-only-state')(?=[\s\S]*'rule-status')(?=[\s\S]*'rule-count')(?=[\s\S]*'item-count')(?=[\s\S]*'attempt-limit')(?=[\s\S]*'timer-policy')(?=[\s\S]*'timer-start-boundary')(?=[\s\S]*'close-time')(?=[\s\S]*'identity-mode')(?=[\s\S]*'identity-privacy')(?=[\s\S]*'review-behavior')(?=[\s\S]*'item-order')(?=[\s\S]*'instructions')(?=[\s\S]*'prepare-review-rules')(?=[\s\S]*'prepare-identity')(?=[\s\S]*'prepare-timer')(?=[\s\S]*'prepare-submit')(?=[\s\S]*'prepare-step-count')(?=[\s\S]*'browser-label')(?=[\s\S]*'teacher-action')(?=[\s\S]*'runtime-content-guard')(?=[\s\S]*'answer-key-guard')(?=[\s\S]*'student-data-guard')(?=[\s\S]*'privacy-guard')[\s\S]*export type StudentRunnerStartHandoffPrivacyContract = \{[\s\S]*exposesAnonymousToken: false;[\s\S]*exposesAnswerText: false;[\s\S]*exposesRuntimeChoiceText: false;[\s\S]*exposesRuntimeItemIds: false;[\s\S]*exposesRuntimePromptText: false;[\s\S]*exposesStudentName: false;[\s\S]*exposesTeacherOnlyAnswers: false;[\s\S]*exposesTeacherSourceMaterials: false;[\s\S]*scope: 'public-student-runner-start';/,
-  'Student runner start handoff should expose a typed 30-slice contract with explicit privacy flags and scope.'
-);
-assert.match(
-  studentRunnerStateSource,
-  /startHandoffView\?: StudentRunnerStartHandoffView;[\s\S]*const startHandoffView = headerView[\s\S]*buildStudentRunnerStartHandoffView\(\{[\s\S]*activeShareId,[\s\S]*canSubmit: attemptState\.canSubmit,[\s\S]*headerView,[\s\S]*identityView,[\s\S]*source: pageState\.status === 'ready' \? pageState\.source : undefined,[\s\S]*startHandoffView,/,
-  'Student runner page view-model should compose the start handoff from prepared header, identity, source, share-link, and submit availability state.'
-);
-assert.match(
-  studentRunnerStateSource,
-  /export function buildStudentRunnerStartHandoffView(?=[\s\S]*STUDENT_RUNNER_START_HANDOFF_ITEM_IDS\.map)(?=[\s\S]*buildStudentRunnerStartHandoffItem)(?=[\s\S]*headerView\.ruleSummaryView)(?=[\s\S]*headerView\.prepareView)(?=[\s\S]*identityView)(?=[\s\S]*privacy: buildStudentRunnerStartHandoffPrivacyContract)[\s\S]*id === 'source-boundary'[\s\S]*id === 'submit-gate'[\s\S]*id === 'read-only-state'[\s\S]*id === 'rule-count'[\s\S]*id === 'item-count'[\s\S]*id === 'attempt-limit'[\s\S]*id === 'timer-policy'[\s\S]*id === 'timer-start-boundary'[\s\S]*id === 'identity-mode'[\s\S]*id === 'identity-privacy'[\s\S]*id === 'browser-label'[\s\S]*id === 'runtime-content-guard'[\s\S]*id === 'answer-key-guard'[\s\S]*id === 'student-data-guard'[\s\S]*student_runner_start_handoff_privacy_description/,
-  'Student runner start handoff should collect compact rules, prepare steps, identity setup, runtime availability, submit boundaries, and privacy slices from domain views.'
-);
 assert.doesNotMatch(
   studentRunnerStateSource,
   /StudentRunnerStartHandoffView\['itemViews'\]|ReturnType<\s*typeof buildStudentRunnerStartHandoffView>/,
@@ -20780,52 +20291,6 @@ assert.doesNotMatch(
   /controlView\.payloadSummaryView/,
   'The submit bar shows progress; it no longer lists the raw browser payload summary to students.'
 );
-assert.match(
-  studentRunnerSubmitControlsHandoffSource,
-  /export const STUDENT_RUNNER_SUBMIT_CONTROLS_HANDOFF_ITEM_IDS = \[(?=[\s\S]*'controls-region')(?=[\s\S]*'readiness-status')(?=[\s\S]*'readiness-items')(?=[\s\S]*'readiness-share-link')(?=[\s\S]*'readiness-runtime-items')(?=[\s\S]*'readiness-completion')(?=[\s\S]*'readiness-confirmation')(?=[\s\S]*'readiness-submission-state')(?=[\s\S]*'payload-summary')(?=[\s\S]*'payload-metrics')(?=[\s\S]*'payload-share-link')(?=[\s\S]*'payload-item-count')(?=[\s\S]*'payload-answer-count')(?=[\s\S]*'completion-counts')(?=[\s\S]*'unanswered-count')(?=[\s\S]*'button-label')(?=[\s\S]*'button-aria')(?=[\s\S]*'button-disabled')(?=[\s\S]*'disabled-policy')(?=[\s\S]*'button-describedby')(?=[\s\S]*'confirm-incomplete-state')(?=[\s\S]*'hint-count')(?=[\s\S]*'hint-order')(?=[\s\S]*'unanswered-hint')(?=[\s\S]*'confirm-incomplete-hint')(?=[\s\S]*'read-only-hint')(?=[\s\S]*'submit-action-boundary')(?=[\s\S]*'identity-privacy')(?=[\s\S]*'payload-privacy')(?=[\s\S]*'privacy-guard')[\s\S]*export type StudentRunnerSubmitControlsHandoffPrivacyContract = \{[\s\S]*exposesAnonymousToken: false;[\s\S]*exposesAnswerText: false;[\s\S]*exposesRawSubmissionPayload: false;[\s\S]*exposesRuntimeItemIds: false;[\s\S]*exposesStudentName: false;[\s\S]*exposesTeacherOnlyAnswers: false;[\s\S]*exposesTeacherSourceMaterials: false;[\s\S]*scope: 'public-student-runner-submit-controls';/,
-  'Student runner submit controls handoff should expose a typed 30-slice contract with explicit privacy flags and scope.'
-);
-assert.deepEqual(
-  [...STUDENT_RUNNER_SUBMIT_CONTROLS_HANDOFF_ITEM_IDS],
-  [
-    'controls-region',
-    'readiness-status',
-    'readiness-items',
-    'readiness-share-link',
-    'readiness-runtime-items',
-    'readiness-completion',
-    'readiness-confirmation',
-    'readiness-submission-state',
-    'payload-summary',
-    'payload-metrics',
-    'payload-share-link',
-    'payload-item-count',
-    'payload-answer-count',
-    'completion-counts',
-    'unanswered-count',
-    'button-label',
-    'button-aria',
-    'button-disabled',
-    'disabled-policy',
-    'button-describedby',
-    'confirm-incomplete-state',
-    'hint-count',
-    'hint-order',
-    'unanswered-hint',
-    'confirm-incomplete-hint',
-    'read-only-hint',
-    'submit-action-boundary',
-    'identity-privacy',
-    'payload-privacy',
-    'privacy-guard',
-  ],
-  'Student runner submit controls handoff should expose exactly 30 stable slice ids.'
-);
-assert.match(
-  studentRunnerSubmitControlsHandoffSource,
-  /export function buildStudentRunnerSubmitControlsHandoffView\([\s\S]*controlView: StudentRunnerControlView[\s\S]*answeredValue = getPayloadMetricValue\(controlView, 'answers'\)[\s\S]*itemValue = getPayloadMetricValue\(controlView, 'items'\)[\s\S]*unansweredValue = getPayloadMetricValue\(controlView, 'unanswered'\)[\s\S]*const hasReadOnlyHint = hasSubmitHint\(controlView, 'read-only'\)[\s\S]*hasConfirmIncompleteHint: hasSubmitHint\(controlView, 'confirm-incomplete'\)[\s\S]*hasReadOnlyHint,[\s\S]*hasUnansweredHint: hasSubmitHint\(controlView, 'unanswered'\)[\s\S]*submitDisabledPolicy: formatSubmitDisabledPolicy[\s\S]*submitHintOrder: formatSubmitHintOrder\(controlView\)[\s\S]*privacy: buildStudentRunnerSubmitControlsHandoffPrivacyContract/,
-  'Student runner submit controls handoff should derive safe counts, readiness details, hint order, disabled policy, and privacy from the prepared control view.'
-);
 // docs/design.md (Tokens And Hard Rules): screen-reader-only text
 // describes the visible UI and must not add audit detail.
 assert.doesNotMatch(
@@ -20842,69 +20307,8 @@ assert.doesNotMatch(
 );
 assert.match(
   studentRunnerStateSource,
-  /export type StudentRunnerSubmitReadinessStatus =[\s\S]*'blocked'[\s\S]*'needs-action'[\s\S]*'ready'[\s\S]*export type StudentRunnerSubmitReadinessItemId =[\s\S]*'completion'[\s\S]*'incomplete-confirmation'[\s\S]*'runtime-items'[\s\S]*'share-link'[\s\S]*'submission-state'[\s\S]*export type StudentRunnerSubmitReadinessView = \{[\s\S]*items: StudentRunnerSubmitReadinessItemView\[\];[\s\S]*status: StudentRunnerSubmitReadinessStatus;[\s\S]*statusLabel: string;/,
+  /export type StudentRunnerSubmitReadinessStatus =[\s\S]*'blocked'[\s\S]*'needs-action'[\s\S]*'ready'[\s\S]*type StudentRunnerSubmitReadinessItemId =[\s\S]*'completion'[\s\S]*'incomplete-confirmation'[\s\S]*'runtime-items'[\s\S]*'share-link'[\s\S]*'submission-state'[\s\S]*export type StudentRunnerSubmitReadinessView = \{[\s\S]*items: StudentRunnerSubmitReadinessItemView\[\];[\s\S]*status: StudentRunnerSubmitReadinessStatus;[\s\S]*statusLabel: string;/,
   'Student runner state should expose an explicit submit-readiness view contract.'
-);
-assert.match(
-  studentRunnerStateSource,
-  /export const STUDENT_RUNNER_SUBMISSION_HANDOFF_ITEM_IDS = \[[\s\S]*'share-link'[\s\S]*'runtime-items'[\s\S]*'payload-summary'[\s\S]*'submit-readiness'[\s\S]*'identity-privacy'[\s\S]*'timer-limit'[\s\S]*'attempt-clock'[\s\S]*'review-summary'[\s\S]*'feedback-scope'[\s\S]*'next-steps'[\s\S]*'privacy-guard'[\s\S]*\] as const;[\s\S]*export type StudentRunnerSubmissionHandoffItemId =[\s\S]*typeof STUDENT_RUNNER_SUBMISSION_HANDOFF_ITEM_IDS/,
-  'Student runner submission handoff should derive its typed contract from a stable 30-slice id list.'
-);
-assert.deepEqual(
-  [...STUDENT_RUNNER_SUBMISSION_HANDOFF_ITEM_IDS],
-  [
-    'share-link',
-    'runtime-items',
-    'answered-items',
-    'unanswered-items',
-    'progress',
-    'payload-summary',
-    'submit-readiness',
-    'partial-confirmation',
-    'submission-state',
-    'identity-mode',
-    'identity-privacy',
-    'timer-status',
-    'timer-limit',
-    'attempt-duration',
-    'attempt-clock',
-    'result-status',
-    'score-summary',
-    'result-accuracy',
-    'attempt-usage',
-    'retry-availability',
-    'review-summary',
-    'review-submitted',
-    'review-needs-review',
-    'review-unanswered',
-    'feedback-scope',
-    'feedback-visibility',
-    'feedback-items',
-    'feedback-detail-evidence',
-    'next-steps',
-    'privacy-guard',
-  ],
-  'Student runner submission handoff should expose exactly 30 stable slice ids.'
-);
-assert.match(
-  studentRunnerStateSource,
-  /export type StudentRunnerSubmissionHandoffPrivacyContract = \{[\s\S]*exposesAnonymousToken: false;[\s\S]*exposesAnswerText: false;[\s\S]*exposesRawSubmissionPayload: false;[\s\S]*exposesRuntimeItemIds: false;[\s\S]*exposesStudentName: false;[\s\S]*exposesTeacherOnlyAnswers: false;[\s\S]*exposesTeacherSourceMaterials: false;[\s\S]*payloadMetricKeys: StudentRunnerSubmissionPayloadSummaryMetricKey\[\];[\s\S]*readinessItemIds: StudentRunnerSubmitReadinessItemId\[\];[\s\S]*reviewMetricKeys: StudentAttemptReviewSummaryMetricKey\[\];[\s\S]*scope: 'public-student-runner-submission';/,
-  'Student runner submission handoff should expose explicit privacy, metric-key, and scope contracts.'
-);
-assert.match(
-  studentRunnerStateSource,
-  /submissionHandoffView: StudentRunnerSubmissionHandoffView;[\s\S]*const submissionHandoffView = buildStudentRunnerSubmissionHandoffView\(\{[\s\S]*activeShareId,[\s\S]*attemptResultDisplay,[\s\S]*attemptState,[\s\S]*attemptTimer,[\s\S]*identityView,[\s\S]*payloadSummaryView: currentPayloadSummaryView,[\s\S]*progressView,[\s\S]*resultPanelView,[\s\S]*submitReadinessView,[\s\S]*timerBadge: attemptTimerBadge,[\s\S]*submissionHandoffView,/,
-  'Student runner page view-model should compose the submission handoff from prepared progress, payload, readiness, identity, timer, and result views.'
-);
-assert.match(
-  studentRunnerStateSource,
-  /function buildStudentRunnerSubmissionHandoffView(?=[\s\S]*payloadSummaryView)(?=[\s\S]*progressView)(?=[\s\S]*submitReadinessView)(?=[\s\S]*identityView)(?=[\s\S]*resultPanelView)[\s\S]*id: 'payload-summary'[\s\S]*id: 'submit-readiness'[\s\S]*buildStudentRunnerIdentityHandoffPrivacyItem\(identityView\)[\s\S]*id: 'attempt-duration'[\s\S]*id: 'review-summary'[\s\S]*id: 'feedback-scope'[\s\S]*id: 'next-steps'[\s\S]*privacy: buildStudentRunnerSubmissionHandoffPrivacyContract/,
-  'Student runner submission handoff should collect progress, payload, readiness, identity, timer, result, review, feedback, and next-step slices.'
-);
-assert.match(
-  studentRunnerSubmissionHandoffSource,
-  /StudentRunnerSubmissionHandoffItemView[\s\S]*StudentRunnerSubmissionHandoffView[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*aria-labelledby=\{titleId\}[\s\S]*data-handoff="student-runner-submission"[\s\S]*data-handoff-scope=\{view\.privacy\.scope\}[\s\S]*view\.itemViews\.map[\s\S]*StudentRunnerSubmissionHandoffItem[\s\S]*function StudentRunnerSubmissionHandoffItem[\s\S]*const labelId = `student-runner-submission-handoff-\$\{itemView\.id\}-label`[\s\S]*const valueId = `student-runner-submission-handoff-\$\{itemView\.id\}-value`[\s\S]*const descriptionId = `student-runner-submission-handoff-\$\{itemView\.id\}-description`[\s\S]*data-handoff-item=\{itemView\.id\}[\s\S]*id=\{labelId\}[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*aria-label=\{itemView\.ariaLabel\}[\s\S]*aria-labelledby=\{`\$\{labelId\} \$\{valueId\}`\}[\s\S]*id=\{valueId\}[\s\S]*id=\{descriptionId\}/,
-  'Student runner submission handoff component should render hidden safe outputs with privacy scope plus prepared label, value, and description relationships.'
 );
 // docs/design.md (Tokens And Hard Rules): screen-reader-only text
 // describes the visible UI and must not add audit detail.
@@ -20921,223 +20325,6 @@ const studentSubmissionStarterPreview = buildStudentRunnerStarterPreview(
 const studentSubmissionRuntimeItem =
   studentSubmissionStarterPreview.runtimeItems[0];
 assert.ok(studentSubmissionRuntimeItem);
-const studentSubmissionPageView = buildStudentRunnerPageViewModel({
-  anonymousToken: studentSubmissionPrivateToken,
-  answers: {
-    [studentSubmissionRuntimeItem.id]: studentSubmissionPrivateAnswer,
-  },
-  confirmIncompleteSubmit: false,
-  fallbackStartedAt: 10_000,
-  isSubmitting: false,
-  pageState: buildStudentRunnerReadyState({
-    activity: studentSubmissionStarterPreview.activity,
-    assignment: {
-      ...studentSubmissionStarterPreview.assignment,
-      settings: {
-        ...studentSubmissionStarterPreview.assignment.settings,
-        collectStudentName: false,
-        showCorrectAnswers: false,
-        timeLimitSeconds: 120,
-      },
-    },
-    runtimeItems: studentSubmissionStarterPreview.runtimeItems,
-    source: 'public-assignment',
-  }),
-  shareId: STARTER_FOOD_ASSIGNMENT_SHARE_ID,
-  submittedAttemptCount: 0,
-});
-const studentSubmissionHandoffValues = new Map(
-  studentSubmissionPageView.submissionHandoffView.itemViews.map((item) => [
-    item.id,
-    item.value,
-  ])
-);
-assert.deepEqual(
-  studentSubmissionPageView.submissionHandoffView.itemViews.map(
-    (item) => item.id
-  ),
-  [...STUDENT_RUNNER_SUBMISSION_HANDOFF_ITEM_IDS],
-  'Student runner submission handoff should expose the stable 30-slice order from the page view-model.'
-);
-assert.deepEqual(studentSubmissionPageView.submissionHandoffView.privacy, {
-  exposesAnonymousToken: false,
-  exposesAnswerText: false,
-  exposesRawSubmissionPayload: false,
-  exposesRuntimeItemIds: false,
-  exposesStudentName: false,
-  exposesTeacherOnlyAnswers: false,
-  exposesTeacherSourceMaterials: false,
-  feedbackMetricKeys: [],
-  itemIds: [...STUDENT_RUNNER_SUBMISSION_HANDOFF_ITEM_IDS],
-  payloadMetricKeys: ['share-link', 'items', 'answers', 'unanswered'],
-  readinessItemIds: [
-    'share-link',
-    'runtime-items',
-    'completion',
-    'incomplete-confirmation',
-    'submission-state',
-  ],
-  reviewMetricKeys: [],
-  scope: 'public-student-runner-submission',
-});
-assert.equal(
-  studentSubmissionHandoffValues.get('share-link'),
-  STARTER_FOOD_ASSIGNMENT_SHARE_ID
-);
-assert.equal(studentSubmissionHandoffValues.get('answered-items'), '1');
-assert.equal(studentSubmissionHandoffValues.get('identity-mode'), 'anonymous');
-assert.equal(
-  studentSubmissionHandoffValues.get('identity-privacy'),
-  'Token hidden'
-);
-assert.equal(studentSubmissionHandoffValues.get('timer-limit'), '2:00');
-assert.equal(
-  studentSubmissionHandoffValues.get('result-accuracy'),
-  'Not submitted'
-);
-assert.equal(
-  studentSubmissionHandoffValues.get('feedback-detail-evidence'),
-  'Alternatives: Not submitted · Explanations: Not submitted'
-);
-assert.equal(
-  studentSubmissionHandoffValues.get('privacy-guard'),
-  'Private data omitted'
-);
-for (const privateValue of [
-  studentSubmissionPrivateAnswer,
-  studentSubmissionPrivateToken,
-  studentSubmissionRuntimeItem.id,
-]) {
-  assert.equal(
-    JSON.stringify(studentSubmissionPageView.submissionHandoffView).includes(
-      privateValue
-    ),
-    false,
-    `Student submission handoff leaked private text: ${privateValue}`
-  );
-}
-const studentSubmitControlsPrivateAnswer =
-  'DOMAIN_PRIVATE_SUBMIT_CONTROL_ANSWER';
-const studentSubmitControlsPageView = buildStudentRunnerPageViewModel({
-  anonymousToken: studentSubmissionPrivateToken,
-  answers: {
-    [studentSubmissionRuntimeItem.id]: studentSubmitControlsPrivateAnswer,
-  },
-  confirmIncompleteSubmit: true,
-  fallbackStartedAt: 10_000,
-  isSubmitting: false,
-  pageState: buildStudentRunnerReadyState({
-    activity: studentSubmissionStarterPreview.activity,
-    assignment: studentSubmissionStarterPreview.assignment,
-    runtimeItems: studentSubmissionStarterPreview.runtimeItems,
-    source: 'public-assignment',
-  }),
-  shareId: STARTER_FOOD_ASSIGNMENT_SHARE_ID,
-  submittedAttemptCount: 0,
-});
-const studentSubmitControlsHandoffView =
-  buildStudentRunnerSubmitControlsHandoffView(
-    studentSubmitControlsPageView.controlView
-  );
-const studentSubmitControlsHandoffValues = new Map(
-  studentSubmitControlsHandoffView.itemViews.map((item) => [
-    item.id,
-    item.value,
-  ])
-);
-assert.deepEqual(
-  studentSubmitControlsHandoffView.itemViews.map((item) => item.id),
-  [...STUDENT_RUNNER_SUBMIT_CONTROLS_HANDOFF_ITEM_IDS],
-  'Student runner submit controls handoff should expose the stable 30-slice order from the prepared control view.'
-);
-assert.deepEqual(studentSubmitControlsHandoffView.privacy, {
-  exposesAnonymousToken: false,
-  exposesAnswerText: false,
-  exposesRawSubmissionPayload: false,
-  exposesRuntimeItemIds: false,
-  exposesStudentName: false,
-  exposesTeacherOnlyAnswers: false,
-  exposesTeacherSourceMaterials: false,
-  hintIds: ['unanswered', 'confirm-incomplete'],
-  itemIds: [...STUDENT_RUNNER_SUBMIT_CONTROLS_HANDOFF_ITEM_IDS],
-  payloadMetricKeys: ['share-link', 'items', 'answers', 'unanswered'],
-  readinessItemIds: [
-    'share-link',
-    'runtime-items',
-    'completion',
-    'incomplete-confirmation',
-    'submission-state',
-  ],
-  scope: 'public-student-runner-submit-controls',
-});
-assert.equal(
-  studentSubmitControlsHandoffValues.get('readiness-status'),
-  'Needs review'
-);
-assert.equal(
-  studentSubmitControlsHandoffValues.get('readiness-share-link'),
-  'Ready'
-);
-assert.equal(
-  studentSubmitControlsHandoffValues.get('readiness-completion'),
-  'Needs review'
-);
-assert.equal(
-  studentSubmitControlsHandoffValues.get('readiness-confirmation'),
-  'Ready'
-);
-assert.equal(
-  studentSubmitControlsHandoffValues.get('payload-share-link'),
-  'Present'
-);
-assert.equal(
-  studentSubmitControlsHandoffValues.get('payload-item-count'),
-  String(studentSubmissionStarterPreview.runtimeItems.length)
-);
-assert.equal(
-  studentSubmitControlsHandoffValues.get('payload-answer-count'),
-  '1'
-);
-assert.equal(
-  studentSubmitControlsHandoffValues.get('completion-counts'),
-  `1/${studentSubmissionStarterPreview.runtimeItems.length}`
-);
-assert.equal(
-  studentSubmitControlsHandoffValues.get('confirm-incomplete-state'),
-  'Yes'
-);
-assert.equal(
-  studentSubmitControlsHandoffValues.get('confirm-incomplete-hint'),
-  'Yes'
-);
-assert.equal(
-  studentSubmitControlsHandoffValues.get('disabled-policy'),
-  'Enabled'
-);
-assert.equal(
-  studentSubmitControlsHandoffValues.get('hint-order'),
-  'unanswered · confirm-incomplete'
-);
-assert.equal(
-  studentSubmitControlsHandoffValues.get('submit-action-boundary'),
-  'No mutation'
-);
-assert.equal(
-  studentSubmitControlsHandoffValues.get('privacy-guard'),
-  'Private data omitted'
-);
-for (const privateValue of [
-  studentSubmitControlsPrivateAnswer,
-  studentSubmissionPrivateToken,
-  studentSubmissionRuntimeItem.id,
-  STARTER_FOOD_ASSIGNMENT_SHARE_ID,
-]) {
-  assert.equal(
-    JSON.stringify(studentSubmitControlsHandoffView).includes(privateValue),
-    false,
-    `Student submit controls handoff leaked private text: ${privateValue}`
-  );
-}
 const assignmentAttemptLimitUsage = buildAssignmentAttemptUsage({
   maxAttempts: 3.8,
   previousAttemptCount: 1.9,
@@ -21295,8 +20482,8 @@ assert.equal(normalizeAssignmentMaxAttempts(0), undefined);
 assert.equal(normalizeAssignmentMaxAttempts(Number.NaN), undefined);
 assert.match(
   studentRunnerStateSource,
-  /attemptLimitHandoffView: AssignmentAttemptLimitHandoffView;[\s\S]*buildAssignmentAttemptLimitHandoffView\([\s\S]*buildAssignmentAttemptLimitHandoffEvidence\(\{[\s\S]*attemptUsage: result\?\.attemptUsage,[\s\S]*maxAttempts:[\s\S]*assignment\?\.settings\.maxAttempts,[\s\S]*retryAvailable: showStartAnotherAttempt/,
-  'Student runner page view-model should compose the attempt-limit handoff from server usage and assignment settings.'
+  /const showStartAnotherAttempt = canStartAnotherStudentAttempt\(\{[\s\S]*maxAttempts:[\s\S]*result\?\.attemptUsage\.maxAttempts \?\? assignment\?\.settings\.maxAttempts/,
+  'Student runner retry availability should come from server usage and assignment settings.'
 );
 assert.doesNotMatch(
   studentRunnerSubmitControlsSource,
@@ -21526,8 +20713,8 @@ assert.match(
 );
 assert.match(
   studentRunnerStateSource,
-  /submissionValidationHandoffView: AssignmentSubmissionValidationHandoffView;[\s\S]*buildAssignmentSubmissionValidationHandoffView\([\s\S]*buildAssignmentSubmissionValidationHandoffEvidence\(\{[\s\S]*runtimeItems: attemptState\.runtimeItems,[\s\S]*submittedAnswerCount: currentPayloadSummary\.answerCount/,
-  'Student runner page view-model should compose the submission validation handoff from runtime and payload counts.'
+  /const currentPayloadSummary = buildStudentRunnerCurrentPayloadSummary\(\{[\s\S]*activeShareId,[\s\S]*attemptState,/,
+  'Student runner page view-model should derive payload counts from the active attempt state.'
 );
 assert.doesNotMatch(
   studentRunnerSubmitControlsSource,
@@ -21680,8 +20867,8 @@ assert.doesNotMatch(
 );
 assert.match(
   e2eTestCatalogText,
-  /Teacher can publish and copy a configured student share link[\s\S]*hidden localized `data-handoff="student-runner-start"`[\s\S]*public-assignment-access 30-slice domain contract[\s\S]*`data-handoff="public-assignment-access"`[\s\S]*visible public rule summary/,
-  'E2E catalog should document the hidden safe start handoff and source-level public access contract.'
+  /Teacher can publish and copy a configured student share link[\s\S]*renders no hidden `data-handoff` sections[\s\S]*public-assignment-access 30-slice domain contract[\s\S]*`data-handoff="public-assignment-access"`[\s\S]*visible public rule summary/,
+  'E2E catalog should document the handoff-free runner and source-level public access contract.'
 );
 assert.match(
   e2eTestCatalogText,
@@ -21695,18 +20882,8 @@ assert.match(
 );
 assert.match(
   e2eTestCatalogText,
-  /scripts\/student-runner-start-handoff-semantic-views\.test\.ts[\s\S]*public runner start privacy-scope\s+boundaries/,
-  'E2E catalog should document the student runner safe-start privacy-scope fast gate.'
-);
-assert.match(
-  e2eTestCatalogText,
-  /Student submission exposes a hidden 30-slice safe handoff[\s\S]*hidden localized `data-handoff="student-runner-submission"`/,
-  'E2E catalog should document the hidden safe student-submission handoff.'
-);
-assert.match(
-  e2eTestCatalogText,
-  /scripts\/student-runner-submission-handoff-semantic-views\.test\.ts[\s\S]*public runner submission privacy-scope boundaries/,
-  'E2E catalog should document the student runner safe-submission privacy-scope fast gate.'
+  /Student submission keeps visible progress and results private[\s\S]*renders no hidden `data-handoff` sections/,
+  'E2E catalog should document the handoff-free student submission journey.'
 );
 assert.match(
   e2eTestCatalogText,
@@ -21825,52 +21002,6 @@ assert.doesNotMatch(
   studentRunnerAttemptShellSource,
   /StudentRunnerAnonymousSummaryItem\b|identityView\.copy\.summaryItems/,
   'The anonymous identity note is one sentence plus the browser label; it no longer renders three privacy summary cards.'
-);
-assert.match(
-  studentRunnerIdentityHandoffSource,
-  /export const STUDENT_RUNNER_IDENTITY_HANDOFF_ITEM_IDS = \[(?=[\s\S]*'identity-region')(?=[\s\S]*'identity-mode')(?=[\s\S]*'collection-policy')(?=[\s\S]*'student-name-field')(?=[\s\S]*'student-name-disabled')(?=[\s\S]*'anonymous-panel')(?=[\s\S]*'browser-label')(?=[\s\S]*'anonymous-summary-count')(?=[\s\S]*'token-privacy-summary')(?=[\s\S]*'submission-identity-source')(?=[\s\S]*'attempt-limit-identity-boundary')(?=[\s\S]*'result-review-identity-boundary')(?=[\s\S]*'anonymous-token-boundary')(?=[\s\S]*'privacy-guard')[\s\S]*export type StudentRunnerIdentityHandoffPrivacyContract = \{[\s\S]*exposesAnonymousBrowserLabel: boolean;[\s\S]*exposesAnonymousToken: false;[\s\S]*exposesAnswerText: false;[\s\S]*exposesRawSubmissionPayload: false;[\s\S]*exposesSourceMaterialMetadata: false;[\s\S]*exposesStudentName: false;[\s\S]*exposesStudentNameInputValue: false;[\s\S]*exposesTeacherOnlyAnswers: false;[\s\S]*scope: 'public-student-runner-identity';/,
-  'Student runner identity handoff should expose a typed 30-slice contract with explicit identity privacy flags and scope.'
-);
-assert.deepEqual(
-  [...STUDENT_RUNNER_IDENTITY_HANDOFF_ITEM_IDS],
-  [
-    'identity-region',
-    'identity-mode',
-    'collection-policy',
-    'student-name-field',
-    'student-name-label',
-    'student-name-placeholder',
-    'student-name-description',
-    'student-name-disabled',
-    'student-name-lock-policy',
-    'student-name-value-guard',
-    'anonymous-panel',
-    'browser-label',
-    'browser-label-caption',
-    'browser-label-aria',
-    'anonymous-summary-count',
-    'anonymous-summary-ids',
-    'browser-summary',
-    'retry-summary',
-    'token-privacy-summary',
-    'retry-description',
-    'submission-identity-source',
-    'attempt-limit-identity-boundary',
-    'result-review-identity-boundary',
-    'browser-token-storage-boundary',
-    'normalized-name-boundary',
-    'anonymous-token-boundary',
-    'answer-text-boundary',
-    'teacher-answer-boundary',
-    'source-material-boundary',
-    'privacy-guard',
-  ],
-  'Student runner identity handoff should expose exactly 30 stable slice ids.'
-);
-assert.match(
-  studentRunnerIdentityHandoffSource,
-  /export function buildStudentRunnerIdentityHandoffView\([\s\S]*identityView: StudentRunnerIdentityView[\s\S]*identityView\.mode === 'anonymous'[\s\S]*identityView\.copy\.summaryItems\.map\(\(summaryItem\) => summaryItem\.id\)[\s\S]*privacy: buildStudentRunnerIdentityHandoffPrivacyContract/,
-  'Student runner identity handoff should derive anonymous summary ids and privacy from the prepared identity view.'
 );
 // docs/design.md (Tokens And Hard Rules): screen-reader-only text
 // describes the visible UI and must not add audit detail.
@@ -22037,11 +21168,6 @@ assert.doesNotMatch(
   /function PublicAssignmentRulesHandoffItem\b/,
   'Public assignment rules should not render hidden audit handoff output.'
 );
-assert.match(
-  e2eTestCatalogText,
-  /scripts\/public-assignment-rules-handoff-semantic-views\.test\.ts[\s\S]*public rule panel[\s\S]*timer and identity boundaries[\s\S]*answer-key guard/,
-  'E2E catalog should document the public assignment rules handoff fast gate.'
-);
 const assignmentDeliverySummarySource = readFileSync(
   'src/assignments/delivery-summary.ts',
   'utf8'
@@ -22060,26 +21186,6 @@ assert.match(
   assignmentDeliverySummarySource,
   /export type PublicAssignmentRuleSummaryStats = \{[\s\S]*collectsStudentName: boolean;[\s\S]*hasAttemptLimit: boolean;[\s\S]*hasCloseTime: boolean;[\s\S]*hasTimer: boolean;[\s\S]*itemCount: number;[\s\S]*ruleCount: number;[\s\S]*ruleIds: PublicAssignmentRuleSummaryId\[\];[\s\S]*shufflesItems: boolean;[\s\S]*showsCorrectAnswers: boolean;/,
   'Public assignment rule summary stats should expose item-order delivery metadata.'
-);
-assert.match(
-  assignmentDeliverySummarySource,
-  /export const PUBLIC_ASSIGNMENT_RULES_HANDOFF_ITEM_IDS = \[(?=[\s\S]*'summary-source')(?=[\s\S]*'visible-rule-panel')(?=[\s\S]*'status-badge')(?=[\s\S]*'rule-count')(?=[\s\S]*'delivery-rule-order')(?=[\s\S]*'item-count')(?=[\s\S]*'items-rule-state')(?=[\s\S]*'attempt-limit')(?=[\s\S]*'attempts-rule-state')(?=[\s\S]*'timer-policy')(?=[\s\S]*'timer-rule-state')(?=[\s\S]*'close-time-policy')(?=[\s\S]*'close-time-rule-state')(?=[\s\S]*'identity-mode')(?=[\s\S]*'identity-rule-state')(?=[\s\S]*'review-behavior')(?=[\s\S]*'review-rule-state')(?=[\s\S]*'item-order')(?=[\s\S]*'item-order-rule-state')(?=[\s\S]*'timer-start-boundary')(?=[\s\S]*'anonymous-browser-boundary')(?=[\s\S]*'normalized-identity-boundary')(?=[\s\S]*'post-submit-review-boundary')(?=[\s\S]*'settings-resolution-boundary')(?=[\s\S]*'status-derivation-boundary')(?=[\s\S]*'public-payload-boundary')(?=[\s\S]*'runtime-content-guard')(?=[\s\S]*'teacher-settings-guard')(?=[\s\S]*'answer-key-guard')(?=[\s\S]*'privacy-guard')/,
-  'Public assignment rules handoff should expose the full 30-slice item id contract.'
-);
-assert.match(
-  assignmentDeliverySummarySource,
-  /export type PublicAssignmentRulesHandoffPrivacyContract = \{[\s\S]*exposesAcceptedAlternatives: false;[\s\S]*exposesAnswerKeys: false;[\s\S]*exposesRawSettingsJson: false;[\s\S]*exposesRuntimeChoiceText: false;[\s\S]*exposesRuntimeItemIds: false;[\s\S]*exposesRuntimePromptText: false;[\s\S]*exposesShareSlug: false;[\s\S]*exposesStudentAnswerText: false;[\s\S]*exposesStudentNames: false;[\s\S]*exposesTeacherSourceMaterials: false;[\s\S]*mutatesAssignment: false;[\s\S]*scope: 'public-assignment-rules';[\s\S]*usesResolvedSettings: true;/,
-  'Public assignment rules handoff should expose a student-runner privacy and settings-resolution contract.'
-);
-assert.match(
-  assignmentDeliverySummarySource,
-  /export function buildPublicAssignmentRuleSummaryView[\s\S]*const summary = buildPublicAssignmentRuleSummaryStats[\s\S]*const status = buildPublicAssignmentRuleSummaryStatusView\(summary\)[\s\S]*const summaryView = \{[\s\S]*description: m\.assignment_delivery_public_rules_description\(\),[\s\S]*items,[\s\S]*status,[\s\S]*summary,[\s\S]*title: m\.assignment_delivery_public_rules_title\(\)[\s\S]*handoffView: buildPublicAssignmentRulesHandoffView\(summaryView\)/,
-  'Public assignment rule summary views should centralize rule items, heading copy, status, summary metadata, and the hidden rule handoff.'
-);
-assert.match(
-  assignmentDeliverySummarySource,
-  /export function buildPublicAssignmentRulesHandoffView[\s\S]*PUBLIC_ASSIGNMENT_RULES_HANDOFF_ITEM_IDS\.map[\s\S]*buildPublicAssignmentRulesHandoffItemView[\s\S]*privacy: buildPublicAssignmentRulesHandoffPrivacyContract\(itemViews\)/,
-  'Public assignment rules handoff should build item views from the stable 30-slice id list.'
 );
 assert.match(
   assignmentDeliverySummarySource,
@@ -22396,7 +21502,7 @@ assert.doesNotMatch(
 );
 assert.match(
   studentRuntimeItemListSource,
-  /buildStudentRuntimeItemListView\(\{[\s\S]*answers,[\s\S]*disabled,[\s\S]*items,[\s\S]*language,[\s\S]*revealAnswer,[\s\S]*reviewItems,[\s\S]*templateType/,
+  /buildStudentRuntimeItemListView\(\{[\s\S]*answers,[\s\S]*items,[\s\S]*reviewItems,[\s\S]*templateType/,
   'Student runtime item list should consume the assignment-domain template dispatch view.'
 );
 assert.match(
@@ -23758,376 +22864,10 @@ assert.deepEqual(
     },
   ]
 );
-const quizRuntimeInteractionHandoffView =
-  quizRuntimeListView.interactionHandoffView;
-const quizRuntimeInteractionHandoffValues = new Map(
-  quizRuntimeInteractionHandoffView.itemViews.map((item) => [
-    item.id,
-    item.value,
-  ])
-);
-assert.deepEqual(
-  quizRuntimeInteractionHandoffView.itemViews.map((item) => item.id),
-  [...STUDENT_RUNTIME_INTERACTION_HANDOFF_ITEM_IDS],
-  'Student runtime interaction handoff should expose the stable 30 slice order.'
-);
-assert.deepEqual(quizRuntimeInteractionHandoffView.privacy, {
-  exposesAnswerText: false,
-  exposesRuntimeChoiceText: false,
-  exposesRuntimeItemIds: false,
-  exposesRuntimePromptText: false,
-  exposesStudentNames: false,
-  exposesTeacherOnlyAnswers: false,
-  itemIds: [...STUDENT_RUNTIME_INTERACTION_HANDOFF_ITEM_IDS],
-  runnerSurface: 'choice-list',
-  scope: 'public-student-runtime-interaction',
-  templateType: 'quiz',
-});
-assert.equal(quizRuntimeInteractionHandoffValues.get('template-type'), 'Quiz');
-assert.equal(
-  quizRuntimeInteractionHandoffValues.get('runner-surface'),
-  'choice-list'
-);
-assert.equal(
-  quizRuntimeInteractionHandoffValues.get('renderer-surface-count'),
-  '7 surfaces'
-);
-assert.equal(
-  quizRuntimeInteractionHandoffValues.get('renderer-dispatch-boundary'),
-  'Template-driven'
-);
-assert.equal(
-  quizRuntimeInteractionHandoffValues.get('choice-count'),
-  '2 choices'
-);
-assert.equal(
-  quizRuntimeInteractionHandoffValues.get('answer-contract'),
-  '{ itemId, answer }'
-);
-assert.equal(
-  quizRuntimeInteractionHandoffValues.get('submission-payload-boundary'),
-  'Shared answer rows'
-);
-assert.equal(
-  quizRuntimeInteractionHandoffValues.get('choice-list-renderer'),
-  'Active'
-);
-assert.equal(
-  quizRuntimeInteractionHandoffValues.get('line-match-renderer'),
-  'Inactive'
-);
-assert.equal(
-  quizRuntimeInteractionHandoffValues.get('review-feedback'),
-  'Hidden'
-);
-assert.equal(
-  quizRuntimeInteractionHandoffValues.get('review-item-count'),
-  '0 review items'
-);
-assert.equal(
-  quizRuntimeInteractionHandoffValues.get('feedback-data-boundary'),
-  'Review summary only'
-);
-assert.equal(
-  quizRuntimeInteractionHandoffValues.get('public-payload-boundary'),
-  'Sanitized runtime'
-);
-assert.equal(
-  quizRuntimeInteractionHandoffValues.get('runtime-id-boundary'),
-  'Ids hidden'
-);
-assert.equal(
-  quizRuntimeInteractionHandoffValues.get('prompt-text-boundary'),
-  'Prompts omitted'
-);
-assert.equal(
-  quizRuntimeInteractionHandoffValues.get('choice-text-boundary'),
-  'Choice text omitted'
-);
-assert.equal(
-  quizRuntimeInteractionHandoffValues.get('answer-text-boundary'),
-  'Answers omitted'
-);
-assert.equal(
-  quizRuntimeInteractionHandoffValues.get('privacy-guard'),
-  'Private data omitted'
-);
-assert.equal(
-  JSON.stringify(quizRuntimeInteractionHandoffView).includes(
-    'Capital of France?'
-  ),
-  false,
-  'Student runtime interaction handoff should not expose prompt text.'
-);
-assert.equal(
-  JSON.stringify(quizRuntimeInteractionHandoffView).includes('Paris'),
-  false,
-  'Student runtime interaction handoff should not expose answer or choice text.'
-);
-assert.equal(
-  JSON.stringify(quizRuntimeInteractionHandoffView).includes('q-1'),
-  false,
-  'Student runtime interaction handoff should not expose runtime item ids.'
-);
-const quizRuntimeIdentityHandoffView =
-  quizRuntimeListView.runtimeIdentityHandoffView;
-const quizRuntimeIdentityHandoffValues = new Map(
-  quizRuntimeIdentityHandoffView.itemViews.map((item) => [
-    item.id,
-    item.value,
-  ])
-);
-assert.deepEqual(
-  quizRuntimeIdentityHandoffView.itemViews.map((item) => item.id),
-  [...STUDENT_RUNTIME_IDENTITY_HANDOFF_ITEM_IDS],
-  'Student runtime identity handoff should expose the stable 30 slice order.'
-);
-assert.deepEqual(quizRuntimeIdentityHandoffView.privacy, {
-  exposesActivityContentJson: false,
-  exposesAnswerText: false,
-  exposesAnonymousToken: false,
-  exposesRuntimeChoiceText: false,
-  exposesRuntimeItemIds: false,
-  exposesRuntimePromptText: false,
-  exposesSourceMaterialMetadata: false,
-  exposesStudentName: false,
-  itemIds: [...STUDENT_RUNTIME_IDENTITY_HANDOFF_ITEM_IDS],
-  normalizedRuntimeIdCount: 1,
-  rejectsDuplicateAnswerIds: true,
-  rejectsOverlongAnswerRows: true,
-  rejectsUnknownRuntimeIds: true,
-  runtimeItemCount: 1,
-  runtimeIdsUnique: true,
-  runnerSurface: 'choice-list',
-  scope: 'public-student-runtime-identity',
-  templateType: 'quiz',
-  usesFrozenSnapshotIdentity: true,
-});
-assert.equal(quizRuntimeIdentityHandoffValues.get('template-type'), 'Quiz');
-assert.equal(
-  quizRuntimeIdentityHandoffValues.get('runtime-id-normalization-source'),
-  'Shared helper'
-);
-assert.equal(
-  quizRuntimeIdentityHandoffValues.get('multilingual-id-collision-guard'),
-  'Collision safe'
-);
-assert.equal(
-  quizRuntimeIdentityHandoffValues.get('submission-validation-boundary'),
-  'Server validation'
-);
-assert.equal(
-  quizRuntimeIdentityHandoffValues.get('unknown-answer-id-policy'),
-  'Rejected'
-);
-assert.equal(
-  quizRuntimeIdentityHandoffValues.get('duplicate-answer-id-policy'),
-  'Rejected'
-);
-assert.equal(
-  quizRuntimeIdentityHandoffValues.get('answer-list-length-policy'),
-  'Rejected'
-);
-assert.equal(
-  quizRuntimeIdentityHandoffValues.get('assignment-snapshot-boundary'),
-  'Frozen snapshot'
-);
-assert.equal(
-  quizRuntimeIdentityHandoffValues.get('activity-content-boundary'),
-  'ActivityContent hidden'
-);
-assert.equal(
-  quizRuntimeIdentityHandoffValues.get('student-name-boundary'),
-  'Student name hidden'
-);
-assert.equal(
-  quizRuntimeIdentityHandoffValues.get('anonymous-token-boundary'),
-  'Token hidden'
-);
-assert.equal(
-  JSON.stringify(quizRuntimeIdentityHandoffView).includes(
-    'Capital of France?'
-  ),
-  false,
-  'Student runtime identity handoff should not expose prompt text.'
-);
-assert.equal(
-  JSON.stringify(quizRuntimeIdentityHandoffView).includes('Paris'),
-  false,
-  'Student runtime identity handoff should not expose answer or choice text.'
-);
-assert.equal(
-  JSON.stringify(quizRuntimeIdentityHandoffView).includes('q-1'),
-  false,
-  'Student runtime identity handoff should not expose runtime item ids.'
-);
-const blockedRuntimeIdentityHandoffView =
-  buildStudentRuntimeIdentityHandoffView({
-    items: [
-      {
-        choices: ['Secret choice'],
-        id: 'item-1',
-        kind: 'question',
-        prompt: 'Secret prompt',
-      },
-      {
-        choices: ['Secret choice'],
-        id: ' ｉｔｅｍ－１ ',
-        kind: 'pair',
-        prompt: 'Secret prompt',
-      },
-      {
-        choices: ['Secret group'],
-        id: '   ',
-        kind: 'group-item',
-        prompt: 'Secret prompt',
-      },
-    ] satisfies PublicRuntimeItem[],
-    templateType: 'matching-pairs',
-  });
-const blockedRuntimeIdentityHandoffValues = new Map(
-  blockedRuntimeIdentityHandoffView.itemViews.map((item) => [
-    item.id,
-    item.value,
-  ])
-);
-assert.equal(blockedRuntimeIdentityHandoffView.privacy.runtimeIdsUnique, false);
-assert.equal(
-  blockedRuntimeIdentityHandoffView.privacy.normalizedRuntimeIdCount,
-  1
-);
-assert.equal(
-  blockedRuntimeIdentityHandoffValues.get('multilingual-id-collision-guard'),
-  'Collision blocked'
-);
-assert.equal(
-  blockedRuntimeIdentityHandoffValues.get('duplicate-runtime-id-count'),
-  '1 duplicates'
-);
-assert.equal(
-  blockedRuntimeIdentityHandoffValues.get('blank-runtime-id-count'),
-  '1 blank ids'
-);
-assert.equal(
-  JSON.stringify(blockedRuntimeIdentityHandoffView).includes('Secret prompt'),
-  false,
-  'Student runtime identity collision handoff should not expose prompt text.'
-);
-assert.equal(
-  JSON.stringify(blockedRuntimeIdentityHandoffView).includes('Secret choice'),
-  false,
-  'Student runtime identity collision handoff should not expose choice text.'
-);
-assert.equal(
-  JSON.stringify(blockedRuntimeIdentityHandoffView).includes('item-1'),
-  false,
-  'Student runtime identity collision handoff should not expose runtime item ids.'
-);
 assert.match(
   e2eTestCatalogText,
-  /Student runtime interaction exposes a 30-slice handoff[\s\S]*student-runtime-interaction[\s\S]*renderer dispatch boundary[\s\S]*prompt\/choice\/answer text boundaries/,
-  'E2E catalog should cover the hidden 30-slice student runtime interaction handoff contract.'
-);
-assert.match(
-  e2eTestCatalogText,
-  /scripts\/student-runtime-interaction-handoff-semantic-views\.test\.ts[\s\S]*public runtime interaction\s+privacy-scope boundaries/,
-  'E2E catalog should document the student runtime interaction privacy-scope fast gate.'
-);
-assert.match(
-  e2eTestCatalogText,
-  /Student runner adapts to template content[\s\S]*line-match-board handoff[\s\S]*available\/used\/unused choice counts[\s\S]*group-sort-board handoff[\s\S]*category target readiness[\s\S]*runtime-id\/prompt\/answer\/student\/source-material guards[\s\S]*matching-pairs-board handoff[\s\S]*left prompt card and right choice card counts[\s\S]*runtime-id\/prompt\/choice\/answer\/student\/source-material guards/,
-  'E2E catalog should cover the hidden 30-slice line-match, group-sort, and matching-pairs board handoff contracts.'
-);
-assert.match(
-  e2eTestCatalogText,
-  /scripts\/line-match-board-handoff-semantic-views\.test\.ts[\s\S]*line-match board\s+privacy-scope\s+boundaries/,
-  'E2E catalog should document the line-match board privacy-scope fast gate.'
-);
-assert.match(
-  e2eTestCatalogText,
-  /scripts\/group-sort-board-handoff-semantic-views\.test\.ts[\s\S]*group-sort board\s+privacy-scope\s+boundaries/,
-  'E2E catalog should document the group-sort board privacy-scope fast gate.'
-);
-assert.match(
-  e2eTestCatalogText,
-  /scripts\/matching-pairs-board-handoff-semantic-views\.test\.ts[\s\S]*matching-pairs board\s+privacy-scope\s+boundaries/,
-  'E2E catalog should document the matching-pairs board privacy-scope fast gate.'
-);
-assert.match(
-  e2eTestCatalogText,
-  /scripts\/listening-speech-handoff-semantic-views\.test\.ts[\s\S]*listening speech\s+privacy-scope\s+boundaries/,
-  'E2E catalog should document the listening speech privacy-scope fast gate.'
-);
-assert.match(
-  e2eTestCatalogText,
-  /scripts\/open-box-reveal-handoff-semantic-views\.test\.ts[\s\S]*open-box reveal-card\s+privacy-scope\s+boundaries/,
-  'E2E catalog should document the open-box reveal-card privacy-scope fast gate.'
-);
-assert.match(
-  e2eTestCatalogText,
-  /Student runtime identity exposes a 30-slice handoff[\s\S]*runtime id normalization source[\s\S]*submission validation boundary[\s\S]*anonymous-token boundary/,
-  'E2E catalog should cover the hidden 30-slice student runtime identity handoff contract.'
-);
-assert.match(
-  e2eTestCatalogText,
-  /scripts\/student-runtime-identity-handoff-semantic-views\.test\.ts[\s\S]*runtime identity\s+privacy-scope boundaries/,
-  'E2E catalog should document the student runtime identity privacy-scope fast gate.'
-);
-assert.match(
-  e2eTestCatalogText,
-  /scripts\/student-runtime-choice-assignment-handoff-semantic-views\.test\.ts[\s\S]*runtime choice\s+assignment privacy-scope boundaries/,
-  'E2E catalog should document the student runtime choice-assignment privacy-scope fast gate.'
-);
-assert.match(
-  e2eTestCatalogText,
-  /Student runtime semantic bundle mirrors 30 safe child handoff slices[\s\S]*student-runtime-semantic-bundle[\s\S]*source-scope and source-item markers[\s\S]*does not expose raw prompts, choice text, runtime item ids, student names, anonymous tokens/,
-  'E2E catalog should cover the hidden 30-slice student runtime semantic bundle handoff contract.'
-);
-assert.match(
-  e2eTestCatalogText,
-  /scripts\/student-runtime-semantic-bundle-handoff-semantic-views\.test\.ts[\s\S]*semantic bundle\s+privacy-scope boundaries/,
-  'E2E catalog should document the student runtime semantic bundle privacy-scope fast gate.'
-);
-const listeningRuntimeInteractionHandoffView =
-  buildStudentRuntimeItemListView({
-    answers: {},
-    disabled: true,
-    items: [
-      {
-        id: 'listen-1',
-        kind: 'question',
-        prompt: '听到的短句',
-      },
-    ],
-    language: '中文',
-    revealAnswer: true,
-    templateType: 'listening',
-  }).interactionHandoffView;
-const listeningRuntimeInteractionHandoffValues = new Map(
-  listeningRuntimeInteractionHandoffView.itemViews.map((item) => [
-    item.id,
-    item.value,
-  ])
-);
-assert.equal(
-  listeningRuntimeInteractionHandoffView.privacy.runnerSurface,
-  'listening'
-);
-assert.equal(
-  listeningRuntimeInteractionHandoffValues.get('listening-renderer'),
-  'Active'
-);
-assert.equal(
-  listeningRuntimeInteractionHandoffValues.get('listening-language'),
-  'zh-CN'
-);
-assert.equal(
-  listeningRuntimeInteractionHandoffValues.get('review-feedback'),
-  'Visible'
-);
-assert.equal(
-  listeningRuntimeInteractionHandoffValues.get('disabled-state'),
-  'Disabled'
+  /Student runner adapts to template content[\s\S]*line-match renders a two-column connection board[\s\S]*group-sort renders a category board[\s\S]*matching-pairs renders a left\/right card board/,
+  'E2E catalog should cover the visible line-match, group-sort, and matching-pairs boards.'
 );
 assert.equal(
   buildStudentRuntimeItemListView({
@@ -30287,87 +29027,6 @@ assert.deepEqual(
     title: 'Assignment rules',
   }
 );
-assert.deepEqual(
-  scheduledPublicRuleSummaryView.handoffView.itemViews.map((item) => item.id),
-  [...PUBLIC_ASSIGNMENT_RULES_HANDOFF_ITEM_IDS]
-);
-assert.equal(
-  scheduledPublicRuleSummaryView.handoffView.itemViews.length,
-  30
-);
-assert.deepEqual(scheduledPublicRuleSummaryView.handoffView.privacy, {
-  exposesAcceptedAlternatives: false,
-  exposesAnswerKeys: false,
-  exposesRawSettingsJson: false,
-  exposesRuntimeChoiceText: false,
-  exposesRuntimeItemIds: false,
-  exposesRuntimePromptText: false,
-  exposesShareSlug: false,
-  exposesStudentAnswerText: false,
-  exposesStudentNames: false,
-  exposesTeacherSourceMaterials: false,
-  itemIds: [...PUBLIC_ASSIGNMENT_RULES_HANDOFF_ITEM_IDS],
-  mutatesAssignment: false,
-  scope: 'public-assignment-rules',
-  usesResolvedSettings: true,
-});
-assert.deepEqual(
-  scheduledPublicRuleSummaryView.handoffView.itemViews.map((item) => [
-    item.id,
-    item.value,
-  ]),
-  [
-    ['summary-source', 'PublicAssignmentRuleSummaryView'],
-    ['visible-rule-panel', 'Assignment rules'],
-    ['status-badge', 'Close scheduled'],
-    ['rule-count', '7 rules'],
-    [
-      'delivery-rule-order',
-      'items · attempts · timer · closes · identity · answerReveal · itemOrder',
-    ],
-    ['item-count', '2 items'],
-    ['items-rule-state', '2 items'],
-    ['attempt-limit', '2 max'],
-    ['attempts-rule-state', '2 max'],
-    ['timer-policy', 'No timer'],
-    ['timer-rule-state', 'No timer'],
-    [
-      'close-time-policy',
-      formatAssignmentExpiry('2026-02-01T00:00:00.000Z'),
-    ],
-    [
-      'close-time-rule-state',
-      formatAssignmentExpiry('2026-02-01T00:00:00.000Z'),
-    ],
-    ['identity-mode', 'Names'],
-    ['identity-rule-state', 'Names'],
-    ['review-behavior', 'After submit'],
-    ['review-rule-state', 'After submit'],
-    ['item-order', 'Shuffled'],
-    ['item-order-rule-state', 'Shuffled'],
-    ['timer-start-boundary', 'No timer'],
-    ['anonymous-browser-boundary', 'Name entry visible'],
-    ['normalized-identity-boundary', 'Normalized before attempts'],
-    ['post-submit-review-boundary', 'After scoring'],
-    ['settings-resolution-boundary', 'Resolved settings'],
-    ['status-derivation-boundary', 'scheduled'],
-    ['public-payload-boundary', 'Sanitized rules'],
-    ['runtime-content-guard', 'Prompts and choices hidden'],
-    ['teacher-settings-guard', 'Raw settings hidden'],
-    ['answer-key-guard', 'Answer keys hidden'],
-    ['privacy-guard', 'Private data hidden'],
-  ]
-);
-assert.deepEqual(
-  buildPublicAssignmentRulesHandoffView({
-    description: scheduledPublicRuleSummaryView.description,
-    items: scheduledPublicRuleSummaryView.items,
-    status: scheduledPublicRuleSummaryView.status,
-    summary: scheduledPublicRuleSummaryView.summary,
-    title: scheduledPublicRuleSummaryView.title,
-  }),
-  scheduledPublicRuleSummaryView.handoffView
-);
 assert.equal(formatAssignmentExpiry('not-a-date'), 'No close time');
 assert.deepEqual(
   buildAssignmentDeliverySummary({
@@ -31919,7 +30578,6 @@ assert.deepEqual(
   [
     ASSIGNMENT_ATTEMPT_PERSISTENCE_HANDOFF_ITEM_IDS.length,
     ASSIGNMENT_ATTEMPT_DURATION_HANDOFF_ITEM_IDS.length,
-    STUDENT_RUNNER_SUBMISSION_HANDOFF_ITEM_IDS.length,
     STUDENT_RUNNER_PLAY_CHAIN_HANDOFF_ITEM_IDS.length,
     ASSIGNMENT_ANSWER_FEEDBACK_HANDOFF_ITEM_IDS.length,
     ANSWER_FEEDBACK_LIFECYCLE_CHAIN_HANDOFF_ITEM_IDS.length,
@@ -31929,7 +30587,7 @@ assert.deepEqual(
     ASSIGNMENT_RESULTS_EXPORT_PREPARATION_ITEM_IDS.length,
     ASSIGNMENT_ATTEMPT_REVIEW_CARD_HANDOFF_ITEM_IDS.length,
   ],
-  Array.from({ length: 11 }, () => 30),
+  Array.from({ length: 10 }, () => 30),
   'Scored attempt result chain should stay backed by persistence, duration, runner, feedback, stats, results, copy, and export gates.'
 );
 assert.deepEqual(Object.fromEntries(scoredAttemptResultChainValues), {
@@ -34746,66 +33404,6 @@ assert.equal(
   JSON.stringify(studentRunnerAnonymousAttemptCopy).includes('browser-1'),
   false
 );
-const studentRunnerIdentityHandoffView =
-  buildStudentRunnerIdentityHandoffView(
-    readyStudentRunnerRouteState.identityView
-  );
-const studentRunnerIdentityHandoffValues = new Map(
-  studentRunnerIdentityHandoffView.itemViews.map((item) => [
-    item.id,
-    item.value,
-  ])
-);
-assert.deepEqual(
-  studentRunnerIdentityHandoffView.itemViews.map((item) => item.id),
-  [...STUDENT_RUNNER_IDENTITY_HANDOFF_ITEM_IDS],
-  'Student runner identity handoff should expose the stable 30-slice order from the prepared identity view.'
-);
-assert.deepEqual(studentRunnerIdentityHandoffView.privacy, {
-  exposesAnonymousBrowserLabel: true,
-  exposesAnonymousToken: false,
-  exposesAnswerText: false,
-  exposesRawSubmissionPayload: false,
-  exposesSourceMaterialMetadata: false,
-  exposesStudentName: false,
-  exposesStudentNameInputValue: false,
-  exposesTeacherOnlyAnswers: false,
-  itemIds: [...STUDENT_RUNNER_IDENTITY_HANDOFF_ITEM_IDS],
-  mode: 'anonymous',
-  scope: 'public-student-runner-identity',
-  summaryItemIds: ['browser-label', 'retry-browser', 'token-privacy'],
-});
-assert.equal(
-  studentRunnerIdentityHandoffValues.get('identity-mode'),
-  'Anonymous'
-);
-assert.equal(
-  studentRunnerIdentityHandoffValues.get('browser-label'),
-  studentRunnerAnonymousBrowserLabel
-);
-assert.equal(
-  studentRunnerIdentityHandoffValues.get('anonymous-summary-ids'),
-  'browser-label · retry-browser · token-privacy'
-);
-assert.equal(
-  studentRunnerIdentityHandoffValues.get('token-privacy-summary'),
-  'Token hidden'
-);
-assert.equal(
-  studentRunnerIdentityHandoffValues.get('anonymous-token-boundary'),
-  'Raw token omitted'
-);
-assert.equal(
-  studentRunnerIdentityHandoffValues.get('privacy-guard'),
-  'Private data omitted'
-);
-for (const privateValue of ['browser-1', 'DOMAIN_PRIVATE_IDENTITY_ANSWER']) {
-  assert.equal(
-    JSON.stringify(studentRunnerIdentityHandoffView).includes(privateValue),
-    false,
-    `Student runner identity handoff leaked private text: ${privateValue}`
-  );
-}
 assert.deepEqual(
   {
     activeShareId: studentRunnerPageView.activeShareId,
@@ -34820,13 +33418,7 @@ assert.deepEqual(
     headerView: studentRunnerPageView.headerView,
     identityView: studentRunnerPageView.identityView,
     itemCount: studentRunnerPageView.itemCount,
-    loadingView: {
-      message: studentRunnerPageView.loadingView.message,
-      handoffScope: studentRunnerPageView.loadingView.handoffView.privacy.scope,
-      handoffItemIds: studentRunnerPageView.loadingView.handoffView.itemViews.map(
-        (item) => item.id
-      ),
-    },
+    loadingView: studentRunnerPageView.loadingView,
     missingView: studentRunnerPageView.missingView,
     previewView: studentRunnerPageView.previewView,
     resultPanelView: studentRunnerPageView.resultPanelView,
@@ -34937,8 +33529,6 @@ assert.deepEqual(
     },
     itemCount: publicRunnerState.runtimeItems.length,
     loadingView: {
-      handoffItemIds: [...STUDENT_RUNNER_LOADING_HANDOFF_ITEM_IDS],
-      handoffScope: 'public-student-runner-loading',
       message: 'Loading student activity...',
     },
     missingView: undefined,
@@ -35156,106 +33746,6 @@ const submittableStudentRunnerPageView = buildStudentRunnerPageViewModel({
   shareId: ' share-public ',
   submittedAttemptCount: 0,
 });
-const studentRunnerStartHandoffView =
-  submittableStudentRunnerPageView.startHandoffView;
-assert.ok(studentRunnerStartHandoffView);
-assert.deepEqual(
-  studentRunnerStartHandoffView.itemViews.map((item) => item.id),
-  [...STUDENT_RUNNER_START_HANDOFF_ITEM_IDS]
-);
-assert.deepEqual(studentRunnerStartHandoffView.privacy, {
-  exposesAnonymousToken: false,
-  exposesAnswerText: false,
-  exposesRuntimeChoiceText: false,
-  exposesRuntimeItemIds: false,
-  exposesRuntimePromptText: false,
-  exposesStudentName: false,
-  exposesTeacherOnlyAnswers: false,
-  exposesTeacherSourceMaterials: false,
-  itemIds: [...STUDENT_RUNNER_START_HANDOFF_ITEM_IDS],
-  prepareStepIds: ['review-rules', 'anonymous', 'no-timer', 'submit'],
-  ruleIds: [
-    'items',
-    'attempts',
-    'timer',
-    'closes',
-    'identity',
-    'answerReveal',
-    'itemOrder',
-  ],
-  scope: 'public-student-runner-start',
-});
-assert.deepEqual(
-  [
-    getStudentRunnerStartHandoffValue('share-link'),
-    getStudentRunnerStartHandoffValue('runner-source'),
-    getStudentRunnerStartHandoffValue('source-boundary'),
-    getStudentRunnerStartHandoffValue('runtime-availability'),
-    getStudentRunnerStartHandoffValue('submit-gate'),
-    getStudentRunnerStartHandoffValue('read-only-state'),
-    getStudentRunnerStartHandoffValue('rule-status'),
-    getStudentRunnerStartHandoffValue('rule-count'),
-    getStudentRunnerStartHandoffValue('attempt-limit'),
-    getStudentRunnerStartHandoffValue('timer-policy'),
-    getStudentRunnerStartHandoffValue('timer-start-boundary'),
-    getStudentRunnerStartHandoffValue('identity-mode'),
-    getStudentRunnerStartHandoffValue('identity-privacy'),
-    getStudentRunnerStartHandoffValue('review-behavior'),
-    getStudentRunnerStartHandoffValue('prepare-step-count'),
-    getStudentRunnerStartHandoffValue('runtime-content-guard'),
-    getStudentRunnerStartHandoffValue('answer-key-guard'),
-    getStudentRunnerStartHandoffValue('student-data-guard'),
-    getStudentRunnerStartHandoffValue('privacy-guard'),
-  ],
-  [
-    'share-public',
-    'Public assignment',
-    'Public assignment',
-    'Ready to submit',
-    'Ready to submit',
-    'Submittable',
-    'Attempt limit',
-    '7 rules',
-    '2 max',
-    'No timer',
-    'No timer',
-    'Anonymous',
-    'Token hidden',
-    'After submit',
-    '4 steps',
-    'Prompts and choices omitted',
-    'Answer keys hidden',
-    'Student data omitted',
-    'Private data omitted',
-  ]
-);
-assert.match(
-  getStudentRunnerStartHandoffValue('browser-label'),
-  /^Anonymous browser [A-Z0-9]{6}$/
-);
-assert.deepEqual(
-  buildStudentRunnerStartHandoffView({
-    activeShareId: submittableStudentRunnerPageView.activeShareId,
-    canSubmit: submittableStudentRunnerPageView.attemptState.canSubmit,
-    headerView: submittableStudentRunnerPageView.headerView!,
-    identityView: submittableStudentRunnerPageView.identityView,
-    source: 'public-assignment',
-  }).privacy,
-  studentRunnerStartHandoffView.privacy
-);
-assert.equal(
-  JSON.stringify(studentRunnerStartHandoffView).includes('browser-token-1'),
-  false
-);
-function getStudentRunnerStartHandoffValue(
-  id: (typeof STUDENT_RUNNER_START_HANDOFF_ITEM_IDS)[number]
-) {
-  const item = studentRunnerStartHandoffView.itemViews.find(
-    (view) => view.id === id
-  );
-  assert.ok(item, `Missing student runner start handoff item ${id}`);
-  return item.value;
-}
 function buildExpectedStudentRunnerPayloadSummaryView({
   answerCount,
   itemCount,
@@ -35993,63 +34483,13 @@ const loadingStudentRunnerRouteState = buildStudentRunnerRouteState(
 );
 assert.deepEqual(
   {
-    loadingHandoffItemIds:
-      loadingStudentRunnerRouteState.pageView.loadingView.handoffView.itemViews.map(
-        (item) => item.id
-      ),
-    loadingHandoffPrivacy:
-      loadingStudentRunnerRouteState.pageView.loadingView.handoffView.privacy,
     loadingMessage: loadingStudentRunnerRouteState.pageView.loadingView.message,
     status: loadingStudentRunnerRouteState.status,
   },
   {
-    loadingHandoffItemIds: [...STUDENT_RUNNER_LOADING_HANDOFF_ITEM_IDS],
-    loadingHandoffPrivacy: {
-      allowsSubmission: false,
-      exposesActivityContent: false,
-      exposesActualShareSlug: false,
-      exposesAnonymousToken: false,
-      exposesAnswerKeys: false,
-      exposesAssignmentTitle: false,
-      exposesBrowserLabel: false,
-      exposesExplanations: false,
-      exposesRawSettingsJson: false,
-      exposesRuntimeChoiceText: false,
-      exposesRuntimeItemIds: false,
-      exposesRuntimePromptText: false,
-      exposesSourceMaterialMetadata: false,
-      exposesStudentAnswerText: false,
-      exposesStudentName: false,
-      itemIds: [...STUDENT_RUNNER_LOADING_HANDOFF_ITEM_IDS],
-      scope: 'public-student-runner-loading',
-      startsAttemptClock: false,
-    },
     loadingMessage: 'Loading student activity...',
     status: 'loading',
   }
-);
-const studentRunnerLoadingHandoffValues = new Map(
-  loadingStudentRunnerRouteState.pageView.loadingView.handoffView.itemViews.map(
-    (item) => [item.id, item.value]
-  )
-);
-assert.equal(
-  studentRunnerLoadingHandoffValues.get('share-link'),
-  'Share id hidden'
-);
-assert.equal(studentRunnerLoadingHandoffValues.get('lookup-state'), 'Pending');
-assert.equal(
-  studentRunnerLoadingHandoffValues.get('timer-start-boundary'),
-  'After runtime load'
-);
-assert.equal(
-  studentRunnerLoadingHandoffValues.get('attempt-clock-status'),
-  'Not started'
-);
-assert.equal(studentRunnerLoadingHandoffValues.get('submit-gate'), 'Blocked');
-assert.equal(
-  studentRunnerLoadingHandoffValues.get('privacy-guard'),
-  'Private data omitted'
 );
 assert.deepEqual(
   buildStudentRunnerPageViewModel({
@@ -36087,16 +34527,10 @@ const missingStudentRunnerPageView = buildStudentRunnerPageViewModel({
 });
 assert.deepEqual(
   {
-    itemIds: missingStudentRunnerPageView.loadingView.handoffView.itemViews.map(
-      (item) => item.id
-    ),
     message: missingStudentRunnerPageView.loadingView.message,
-    scope: missingStudentRunnerPageView.loadingView.handoffView.privacy.scope,
   },
   {
-    itemIds: [...STUDENT_RUNNER_LOADING_HANDOFF_ITEM_IDS],
     message: 'Loading student activity...',
-    scope: 'public-student-runner-loading',
   }
 );
 assert.equal(missingStudentRunnerPageView.missingReason, 'closed');
@@ -36230,42 +34664,6 @@ assert.deepEqual(namedStudentRunnerPageView.identityView, {
   mode: 'student-name',
   placeholder: 'Type your name',
 });
-const namedStudentRunnerIdentityHandoffView =
-  buildStudentRunnerIdentityHandoffView(
-    namedStudentRunnerPageView.identityView!
-  );
-assert.deepEqual(namedStudentRunnerIdentityHandoffView.privacy, {
-  exposesAnonymousBrowserLabel: false,
-  exposesAnonymousToken: false,
-  exposesAnswerText: false,
-  exposesRawSubmissionPayload: false,
-  exposesSourceMaterialMetadata: false,
-  exposesStudentName: false,
-  exposesStudentNameInputValue: false,
-  exposesTeacherOnlyAnswers: false,
-  itemIds: [...STUDENT_RUNNER_IDENTITY_HANDOFF_ITEM_IDS],
-  mode: 'student-name',
-  scope: 'public-student-runner-identity',
-  summaryItemIds: [],
-});
-assert.equal(
-  namedStudentRunnerIdentityHandoffView.itemViews.find(
-    (item) => item.id === 'student-name-lock-policy'
-  )?.value,
-  'Editable'
-);
-assert.equal(
-  namedStudentRunnerIdentityHandoffView.itemViews.find(
-    (item) => item.id === 'student-name-value-guard'
-  )?.value,
-  'Input value omitted'
-);
-assert.equal(
-  JSON.stringify(namedStudentRunnerIdentityHandoffView).includes(
-    'Private Student'
-  ),
-  false
-);
 const submittedNamedStudentRunnerPageView = buildStudentRunnerPageViewModel({
   answers: {},
   attemptClock: undefined,
@@ -36310,22 +34708,6 @@ assert.deepEqual(
     mode: 'student-name',
     placeholder: 'Type your name',
   }
-);
-const lockedNamedStudentRunnerIdentityHandoffView =
-  buildStudentRunnerIdentityHandoffView(
-    submittedNamedStudentRunnerPageView.identityView!
-  );
-assert.equal(
-  lockedNamedStudentRunnerIdentityHandoffView.itemViews.find(
-    (item) => item.id === 'student-name-disabled'
-  )?.value,
-  'Yes'
-);
-assert.equal(
-  lockedNamedStudentRunnerIdentityHandoffView.itemViews.find(
-    (item) => item.id === 'student-name-lock-policy'
-  )?.value,
-  'Locked'
 );
 const invalidAttemptUsageStudentRunnerPageView =
   buildStudentRunnerPageViewModel({
@@ -37766,162 +36148,6 @@ assert.deepEqual(
     ],
   ]
 );
-const groupSortBoardHandoffView = buildGroupSortBoardHandoffView({
-  runnerView: groupSortBoardView,
-});
-const groupSortBoardHandoffValues = new Map(
-  groupSortBoardHandoffView.itemViews.map((item) => [item.id, item.value])
-);
-assert.deepEqual(
-  groupSortBoardHandoffView.itemViews.map((item) => item.id),
-  [...GROUP_SORT_BOARD_HANDOFF_ITEM_IDS]
-);
-assert.equal(groupSortBoardHandoffView.itemViews.length, 30);
-assert.deepEqual(groupSortBoardHandoffView.privacy, {
-  exposesAnswerKeys: false,
-  exposesAnswerText: false,
-  exposesCategoryText: false,
-  exposesRuntimeItemIds: false,
-  exposesRuntimePromptText: false,
-  exposesSourceMaterialMetadata: false,
-  exposesStudentIdentity: false,
-  itemIds: [...GROUP_SORT_BOARD_HANDOFF_ITEM_IDS],
-  runnerSurface: 'group-sort',
-  scope: 'group-sort-category-board',
-  templateType: 'group-sort',
-  usesSharedSubmissionContract: true,
-});
-assert.equal(groupSortBoardHandoffValues.get('category-count'), '2 categories');
-assert.equal(groupSortBoardHandoffValues.get('item-count'), '3 items');
-assert.equal(groupSortBoardHandoffValues.get('unplaced-item-count'), '1');
-assert.equal(groupSortBoardHandoffValues.get('placed-item-count'), '2');
-assert.equal(
-  groupSortBoardHandoffValues.get('selected-item-state'),
-  'Selected'
-);
-assert.equal(
-  groupSortBoardHandoffValues.get('available-category-count'),
-  '2 available categories'
-);
-assert.equal(
-  groupSortBoardHandoffValues.get('completion-progress'),
-  '2 of 3 sorted'
-);
-assert.equal(
-  groupSortBoardHandoffValues.get('public-payload-boundary'),
-  'Privacy-safe assignment content'
-);
-for (const privateGroupSortBoardValue of [
-  'Apple',
-  'Water',
-  'Pear',
-  'Fruit',
-  'Drink',
-  'group-fruit-apple',
-  'group-drink-water',
-  'group-fruit-pear',
-]) {
-  assert.equal(
-    JSON.stringify(groupSortBoardHandoffView).includes(
-      privateGroupSortBoardValue
-    ),
-    false,
-    `Group-sort board handoff leaked private text: ${privateGroupSortBoardValue}`
-  );
-}
-const matchingPairsBoardView = buildChoicePairingRunnerView({
-  answers: {
-    'pair-one': 'Right answer',
-  },
-  items: [
-    {
-      choices: ['Right answer', 'Second choice'],
-      id: 'pair-one',
-      kind: 'pair',
-      prompt: 'Secret left prompt',
-    },
-    {
-      choices: ['Right answer', 'Second choice'],
-      id: 'pair-two',
-      kind: 'pair',
-      prompt: 'Second secret prompt',
-    },
-  ],
-  selectedItemId: 'pair-two',
-});
-const matchingPairsBoardHandoffView = buildMatchingPairsBoardHandoffView({
-  runnerView: matchingPairsBoardView,
-});
-const matchingPairsBoardHandoffValues = new Map(
-  matchingPairsBoardHandoffView.itemViews.map((item) => [item.id, item.value])
-);
-assert.deepEqual(
-  matchingPairsBoardHandoffView.itemViews.map((item) => item.id),
-  [...MATCHING_PAIRS_BOARD_HANDOFF_ITEM_IDS]
-);
-assert.equal(matchingPairsBoardHandoffView.itemViews.length, 30);
-assert.deepEqual(matchingPairsBoardHandoffView.privacy, {
-  exposesAnswerKeys: false,
-  exposesAnswerText: false,
-  exposesChoiceText: false,
-  exposesRuntimeItemIds: false,
-  exposesRuntimePromptText: false,
-  exposesSourceMaterialMetadata: false,
-  exposesStudentIdentity: false,
-  itemIds: [...MATCHING_PAIRS_BOARD_HANDOFF_ITEM_IDS],
-  runnerSurface: 'matching-pairs',
-  scope: 'matching-pairs-card-board',
-  templateType: 'matching-pairs',
-  usesSharedSubmissionContract: true,
-});
-assert.equal(
-  matchingPairsBoardHandoffValues.get('prompt-card-count'),
-  '2 prompts'
-);
-assert.equal(
-  matchingPairsBoardHandoffValues.get('choice-card-count'),
-  '2 choices'
-);
-assert.equal(
-  matchingPairsBoardHandoffValues.get('selected-prompt-state'),
-  'Selected'
-);
-assert.equal(
-  matchingPairsBoardHandoffValues.get('available-choice-count'),
-  '2 available choices'
-);
-assert.equal(
-  matchingPairsBoardHandoffValues.get('used-choice-count'),
-  '1 used choice'
-);
-assert.equal(
-  matchingPairsBoardHandoffValues.get('unused-choice-count'),
-  '1 unused choice'
-);
-assert.equal(
-  matchingPairsBoardHandoffValues.get('completion-progress'),
-  '1 of 2 paired'
-);
-assert.equal(
-  matchingPairsBoardHandoffValues.get('public-payload-boundary'),
-  'Privacy-safe assignment content'
-);
-for (const privateMatchingPairsBoardValue of [
-  'Secret left prompt',
-  'Second secret prompt',
-  'Right answer',
-  'Second choice',
-  'pair-one',
-  'pair-two',
-]) {
-  assert.equal(
-    JSON.stringify(matchingPairsBoardHandoffView).includes(
-      privateMatchingPairsBoardValue
-    ),
-    false,
-    `Matching-pairs board handoff leaked private text: ${privateMatchingPairsBoardValue}`
-  );
-}
 assert.deepEqual(
   resolveGroupSortRunnerAction({
     action: {
@@ -39997,10 +38223,6 @@ const activityLibrarySearchComponentSource = readFileSync(
   'src/components/activities/activity-library-search.tsx',
   'utf8'
 );
-const activityLibraryScopePanelComponentSource = readFileSync(
-  'src/components/activities/activity-library-scope-panel.tsx',
-  'utf8'
-);
 const activityLibraryCompatibilityPanelSource = readFileSync(
   'src/components/activities/activity-library-compatibility-panel.tsx',
   'utf8'
@@ -40015,10 +38237,6 @@ const activityLibraryCardComponentSource = readFileSync(
 );
 const activityLibraryActionStatusBadgeSource = readFileSync(
   'src/components/activities/activity-library-action-status-badge.tsx',
-  'utf8'
-);
-const activityLibrarySummaryCardComponentSource = readFileSync(
-  'src/components/activities/activity-library-summary-card.tsx',
   'utf8'
 );
 const activitySourceMaterialsSummaryComponentSource = readFileSync(
@@ -40261,40 +38479,10 @@ assert.match(
   /const scopeView = buildActivityLibraryPageScopeView\(\{[\s\S]*currentPage: resolvedSearch\.currentPage,[\s\S]*pageSize: ACTIVITY_LIBRARY_PAGE_SIZE,[\s\S]*search: resolvedSearch\.searchQuery,[\s\S]*source: resolvedSearch\.sourceFilter,[\s\S]*status: resolvedSearch\.libraryStatus,[\s\S]*template: resolvedSearch\.templateFilter,[\s\S]*total: totalActivities,[\s\S]*totalPages,[\s\S]*visibleCount: activities\.length/,
   'Activity library page view-model should prepare a current-view scope from resolved search, source, template, total pages, and visible item count.'
 );
-assert.match(
-  activityLibraryScopePanelComponentSource,
-  /ActivityLibraryPageScopeItem[\s\S]*ActivityLibraryPageScopeView[\s\S]*const titleId = 'activity-library-scope-panel-title'[\s\S]*const summaryId = 'activity-library-scope-panel-summary'[\s\S]*aria-labelledby=\{titleId\}[\s\S]*aria-describedby=\{summaryId\}[\s\S]*id=\{titleId\}[\s\S]*view\.label[\s\S]*id=\{summaryId\}[\s\S]*view\.summary[\s\S]*view\.items\.map[\s\S]*key=\{item\.id\}/,
-  'Activity library scope panel should render prepared scope text and key items in a labelled semantic region.'
-);
-assert.match(
-  activityLibraryScopePanelComponentSource,
-  /<dl[\s\S]*aria-labelledby=\{titleId\}[\s\S]*aria-describedby=\{summaryId\}[\s\S]*view\.items\.map[\s\S]*function ActivityLibraryScopeItem[\s\S]*const labelId = `activity-library-scope-\$\{item\.id\}-label`[\s\S]*const valueId = `activity-library-scope-\$\{item\.id\}-value`[\s\S]*const descriptionId = `activity-library-scope-\$\{item\.id\}-description`[\s\S]*<dt id=\{labelId\}[\s\S]*item\.label[\s\S]*<output[\s\S]*id=\{valueId\}[\s\S]*aria-labelledby=\{`\$\{labelId\} \$\{valueId\}`\}[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*item\.value[\s\S]*<dd[\s\S]*id=\{descriptionId\}[\s\S]*item\.description/,
-  'Activity library scope panel should render current-view scope as stable semantic label/value/description outputs.'
-);
-assert.match(
-  activityLibraryScopePanelComponentSource,
-  /function ActivityLibraryScopeItem[\s\S]*item\.label[\s\S]*item\.value[\s\S]*item\.description/,
-  'Activity library scope panel items should render prepared labels, values, and descriptions.'
-);
 assert.doesNotMatch(
   activityLibrarySearchComponentSource,
   /audio-ready|worksheet-ready|spreadsheet-ready|future AI extraction|activity status|练习纸提取|活动状态/,
   'Activity library search component should not hardcode filter explanatory copy.'
-);
-assert.doesNotMatch(
-  `${activityLibraryScopePanelComponentSource}\n${dashboardActivitiesRouteSource}`,
-  /Current view|Visible activities|Search scope|Status scope|Template scope|Source scope|当前视图|可见活动|搜索范围|状态范围|模板范围|来源范围/,
-  'Activity library route and scope panel component should not hard-code current-view scope copy.'
-);
-assert.match(
-  activityLibrarySummaryCardComponentSource,
-  /\{metric\.description\}/,
-  'Activity library summary cards should render optional domain-provided metric descriptions.'
-);
-assert.match(
-  activityLibrarySummaryCardComponentSource,
-  /const labelId = `activity-library-summary-\$\{metric\.id\}-label`[\s\S]*const valueId = `activity-library-summary-\$\{metric\.id\}-value`[\s\S]*const descriptionId = `activity-library-summary-\$\{metric\.id\}-description`[\s\S]*<Card[\s\S]*role="article"[\s\S]*aria-label=\{metric\.ariaLabel\}[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*<output id=\{valueId\}[\s\S]*aria-labelledby=\{`\$\{labelId\} \$\{valueId\}`\}[\s\S]*metric\.value[\s\S]*id=\{labelId\}[\s\S]*metric\.label[\s\S]*id=\{descriptionId\}[\s\S]*metric\.description/,
-  'Activity library summary cards should expose each prepared metric as a stable accessible article output.'
 );
 assert.match(
   activityLibraryCardComponentSource,
@@ -40728,11 +38916,6 @@ assert.match(
   'Activity source-material summary should accept a card-specific section label while preserving the source-summary fallback label.'
 );
 assert.match(
-  activityLibrarySummaryCardComponentSource,
-  /ActivityLibrarySummaryMetricId/,
-  'Activity library summary card component should map icons by the activity-domain metric id.'
-);
-assert.match(
   createdActivityPanelComponentSource,
   /buildCreatedActivityPanelContext/,
   'Created activity panel component should render saved-activity state from the activity-domain panel context.'
@@ -40863,10 +39046,6 @@ const dashboardAssignmentsRouteSource = readFileSync(
 );
 const assignmentListFiltersComponentSource = readFileSync(
   'src/components/assignments/assignment-list-filters.tsx',
-  'utf8'
-);
-const assignmentListScopePanelComponentSource = readFileSync(
-  'src/components/assignments/assignment-list-scope-panel.tsx',
   'utf8'
 );
 const assignmentListCardComponentSource = readFileSync(
@@ -41501,30 +39680,10 @@ assert.match(
   /const scopeView = buildAssignmentListPageScopeView\(\{[\s\S]*currentPage: resolvedSearch\.currentPage,[\s\S]*pageSize: ASSIGNMENT_LIST_PAGE_SIZE,[\s\S]*search: resolvedSearch\.searchQuery,[\s\S]*status: resolvedSearch\.statusFilter,[\s\S]*total: totalAssignments,[\s\S]*totalPages,[\s\S]*visibleCount: assignments\.length[\s\S]*\}\)[\s\S]*scopeView,/,
   'Assignment list page view-model should prepare a current-view scope from resolved search, total pages, and visible item count.'
 );
-assert.match(
-  assignmentListScopePanelComponentSource,
-  /AssignmentListPageScopeItem[\s\S]*AssignmentListPageScopeView[\s\S]*const titleId = 'assignment-list-scope-panel-title'[\s\S]*const summaryId = 'assignment-list-scope-panel-summary'[\s\S]*aria-labelledby=\{titleId\}[\s\S]*aria-describedby=\{summaryId\}[\s\S]*id=\{titleId\}[\s\S]*view\.label[\s\S]*id=\{summaryId\}[\s\S]*view\.summary[\s\S]*view\.items\.map[\s\S]*key=\{item\.id\}/,
-  'Assignment list scope panel should render prepared scope text and key items in a labelled semantic region.'
-);
-assert.match(
-  assignmentListScopePanelComponentSource,
-  /<dl[\s\S]*aria-labelledby=\{titleId\}[\s\S]*aria-describedby=\{summaryId\}[\s\S]*view\.items\.map[\s\S]*function AssignmentListScopeItem[\s\S]*const labelId = `assignment-list-scope-\$\{item\.id\}-label`[\s\S]*const valueId = `assignment-list-scope-\$\{item\.id\}-value`[\s\S]*const descriptionId = `assignment-list-scope-\$\{item\.id\}-description`[\s\S]*<dt id=\{labelId\}[\s\S]*item\.label[\s\S]*<output[\s\S]*id=\{valueId\}[\s\S]*aria-labelledby=\{`\$\{labelId\} \$\{valueId\}`\}[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*item\.value[\s\S]*<dd[\s\S]*id=\{descriptionId\}[\s\S]*item\.description/,
-  'Assignment list scope panel should expose current-view scope items as stable semantic label/value/description outputs.'
-);
-assert.match(
-  assignmentListScopePanelComponentSource,
-  /function AssignmentListScopeItem[\s\S]*item\.label[\s\S]*item\.value[\s\S]*item\.description/,
-  'Assignment list scope panel items should render prepared labels, values, and descriptions.'
-);
 assert.doesNotMatch(
   assignmentListFiltersComponentSource,
   /student work|homework windows|已过期作业|开放链接/,
   'Assignment list filters component should not hardcode status-filter explanatory copy.'
-);
-assert.doesNotMatch(
-  `${assignmentListScopePanelComponentSource}\n${dashboardAssignmentsRouteSource}`,
-  /Current view|Visible assignments|Search scope|Status scope|当前视图|可见作业|搜索范围|状态范围/,
-  'Assignment list route and scope panel component should not hard-code current-view scope copy.'
 );
 assert.match(
   assignmentListSummaryCardComponentSource,
@@ -43941,121 +42100,12 @@ assert.match(
   /Printable worksheet review lifecycle chain has a fast script-level gate via[\s\S]*scripts\/printable-worksheet-review-lifecycle-chain-handoff\.test\.ts[\s\S]*30-slice\s+printable\s+worksheet\s+handoff\s+boundary/,
   'TEST-CATALOG should document the printable worksheet review lifecycle chain gate.'
 );
-const classroomControlSemanticsSource = readFileSync(
-  'src/classroom/control-semantics.ts',
-  'utf8'
-);
-const classroomControlSemanticsHandoffSource = readFileSync(
-  'src/components/classroom/classroom-control-semantics-handoff.tsx',
-  'utf8'
-);
-const classroomControlSemanticsHandoffView =
-  buildClassroomControlSemanticsHandoffView();
-assert.deepEqual(
-  [...CLASSROOM_CONTROL_SEMANTICS_HANDOFF_ITEM_IDS],
-  [
-    'ai-source-textarea',
-    'ai-safe-source-note',
-    'ai-source-readiness',
-    'ai-material-safety',
-    'ai-source-capabilities',
-    'ai-synced-provenance',
-    'ai-focus-control',
-    'ai-generate-action',
-    'ai-draft-summary',
-    'activity-source-filter',
-    'assignment-status-filter',
-    'publish-title-field',
-    'publish-instructions-field',
-    'publish-attempt-limit-field',
-    'publish-timer-field',
-    'publish-close-time-field',
-    'publish-delivery-toggles',
-    'publish-preview-region',
-    'result-student-search',
-    'result-student-sort',
-    'result-item-sort',
-    'result-answer-review-filter',
-    'result-review-scope',
-    'result-copy-scope',
-    'result-csv-coverage',
-    'printable-answer-key-toggle',
-    'printable-print-action',
-    'student-identity-input',
-    'student-submit-button',
-    'privacy-guard',
-  ],
-  'Classroom control semantics should expose exactly 30 stable control slice ids.'
-);
-assert.deepEqual([...CLASSROOM_CONTROL_SEMANTICS_HANDOFF_ROUTE_SCOPES], [
-  '/create',
-  '/dashboard',
-  '/play',
-  '/print',
-]);
-assert.equal(classroomControlSemanticsHandoffView.itemViews.length, 30);
-assert.deepEqual(
-  classroomControlSemanticsHandoffView.itemViews.map((itemView) => itemView.id),
-  [...CLASSROOM_CONTROL_SEMANTICS_HANDOFF_ITEM_IDS]
-);
-assert.deepEqual(classroomControlSemanticsHandoffView.privacy, {
-  exposesActivityContentText: false,
-  exposesAnswerKeys: false,
-  exposesAssignmentTitleText: false,
-  exposesCsvDataUrl: false,
-  exposesPromptText: false,
-  exposesRawAnonymousTokens: false,
-  exposesStudentAnswers: false,
-  exposesStudentName: false,
-  itemIds: [...CLASSROOM_CONTROL_SEMANTICS_HANDOFF_ITEM_IDS],
-  mutatesActivity: false,
-  mutatesAssignment: false,
-  scope: 'classroom-control-semantics',
-  submitsAttempt: false,
-  usesPreparedViewModels: true,
-});
-assert.deepEqual(
-  [
-    shouldRenderClassroomControlSemanticsHandoff('/create'),
-    shouldRenderClassroomControlSemanticsHandoff('/dashboard/assignments'),
-    shouldRenderClassroomControlSemanticsHandoff('/play/demo-food'),
-    shouldRenderClassroomControlSemanticsHandoff(
-      '/print/assignments/assignment-id'
-    ),
-    shouldRenderClassroomControlSemanticsHandoff('/templates'),
-    shouldRenderClassroomControlSemanticsHandoff('/worksheets'),
-    shouldRenderClassroomControlSemanticsHandoff('/pricing'),
-    shouldRenderClassroomControlSemanticsHandoff('/auth/login'),
-  ],
-  [true, true, true, true, false, false, false, false],
-  'Classroom control semantics should render only on create, dashboard, student-runner, and print routes.'
-);
-assert.equal(
-  shouldRenderClassroomControlSemanticsHandoff(
-    getCanonicalPathname('/zh/play/demo-food')
-  ),
-  true,
-  'Classroom control semantics mount should support localized student runner paths after canonicalization.'
-);
-assert.match(
-  classroomControlSemanticsSource,
-  /export const CLASSROOM_CONTROL_SEMANTICS_HANDOFF_ROUTE_SCOPES = \[[\s\S]*'\/create'[\s\S]*'\/dashboard'[\s\S]*'\/play'[\s\S]*'\/print'[\s\S]*\] as const;/,
-  'Classroom control semantics domain should keep an explicit route-scope allowlist.'
-);
-assert.match(
-  classroomControlSemanticsHandoffSource,
-  /useRouterState[\s\S]*getCanonicalPathname\(pathname\)[\s\S]*shouldRenderClassroomControlSemanticsHandoff\(canonicalPathname\)/,
-  'Classroom control semantics mount should canonicalize localized paths before applying the route allowlist.'
-);
-assert.match(
-  classroomControlSemanticsHandoffSource,
-  /data-handoff="classroom-control-semantics"[\s\S]*data-handoff-scope=\{handoffView\.privacy\.scope\}[\s\S]*handoffView\.itemViews\.map\(\(itemView\) =>[\s\S]*ClassroomControlSemanticsHandoffItem[\s\S]*const labelId = `classroom-control-semantics-handoff-\$\{itemView\.id\}-label`[\s\S]*const valueId = `classroom-control-semantics-handoff-\$\{itemView\.id\}-value`[\s\S]*const descriptionId = `classroom-control-semantics-handoff-\$\{itemView\.id\}-description`[\s\S]*data-handoff-item=\{itemView\.id\}[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*aria-label=\{itemView\.ariaLabel\}[\s\S]*aria-labelledby=\{`\$\{labelId\} \$\{valueId\}`\}[\s\S]*id=\{valueId\}[\s\S]*id=\{descriptionId\}/,
-  'Classroom control semantics handoff component should render stable hidden label, value, description, and scope outputs.'
-);
-assert.match(
+// The root document renders on every public page, so it must not mount
+// hidden audit markup (docs/design.md, Tokens And Hard Rules).
+assert.doesNotMatch(
   rootRouteSource,
-  /import \{ ClassroomControlSemanticsHandoffMount \} from '@\/components\/classroom\/classroom-control-semantics-handoff';[\s\S]*<TooltipProvider>[\s\S]*\{children\}[\s\S]*<ClassroomControlSemanticsHandoffMount \/>[\s\S]*<GoogleOneTapPrompt \/>/,
-  'Root document should mount classroom control semantics globally while the component enforces the route allowlist.'
+  /Handoff\b|data-handoff/,
+  'Root document should not mount hidden handoff markup.'
 );
 assert.doesNotMatch(
   `${readFileSync('src/routes/index.tsx', 'utf8')}\n${readFileSync(
@@ -45938,23 +43988,15 @@ assert.deepEqual(
     ACTIVITY_TEMPLATE_SCAFFOLD_QUALITY_HANDOFF_ITEM_IDS.length,
     ACTIVITY_SOURCE_EXTRACTION_ASSIST_HANDOFF_ITEM_IDS.length,
     ASSIGNMENT_DELIVERY_POLICY_HANDOFF_ITEM_IDS.length,
-    PUBLIC_ASSIGNMENT_RULES_HANDOFF_ITEM_IDS.length,
     PUBLIC_ASSIGNMENT_ACCESS_HANDOFF_ITEM_IDS.length,
     ASSIGNMENT_ITEM_ORDER_HANDOFF_ITEM_IDS.length,
-    STUDENT_RUNTIME_INTERACTION_HANDOFF_ITEM_IDS.length,
-    STUDENT_RUNTIME_SEMANTIC_BUNDLE_HANDOFF_ITEM_IDS.length,
-    FILL_BLANK_WORKSHEET_HANDOFF_ITEM_IDS.length,
-    LINE_MATCH_BOARD_HANDOFF_ITEM_IDS.length,
-    LISTENING_SPEECH_HANDOFF_ITEM_IDS.length,
-    GROUP_SORT_BOARD_HANDOFF_ITEM_IDS.length,
-    STUDENT_RUNNER_SUBMISSION_HANDOFF_ITEM_IDS.length,
     ASSIGNMENT_SUBMISSION_VALIDATION_HANDOFF_ITEM_IDS.length,
     ASSIGNMENT_ATTEMPT_DURATION_HANDOFF_ITEM_IDS.length,
     ASSIGNMENT_ANSWER_FEEDBACK_HANDOFF_ITEM_IDS.length,
     PRINTABLE_WORKSHEET_HANDOFF_ITEM_IDS.length,
     ASSIGNMENT_RESULTS_EXPORT_PREPARATION_ITEM_IDS.length,
   ],
-  Array.from({ length: 19 }, () => 30),
+  Array.from({ length: 11 }, () => 30),
   'Worksheet-mode delivery chain should stay backed by focused worksheet, runtime, print, and export gates.'
 );
 assert.deepEqual(Object.fromEntries(worksheetModeDeliveryChainValues), {
@@ -46059,16 +44101,10 @@ assert.deepEqual(
     ACTIVITY_SOURCE_EXTRACTION_ASSIST_HANDOFF_ITEM_IDS.length,
     WORKSHEET_MODE_DELIVERY_CHAIN_HANDOFF_ITEM_IDS.length,
     STUDENT_RUNNER_PLAY_CHAIN_HANDOFF_ITEM_IDS.length,
-    FILL_BLANK_WORKSHEET_HANDOFF_ITEM_IDS.length,
-    LINE_MATCH_BOARD_HANDOFF_ITEM_IDS.length,
-    GROUP_SORT_BOARD_HANDOFF_ITEM_IDS.length,
-    MATCHING_PAIRS_BOARD_HANDOFF_ITEM_IDS.length,
-    LISTENING_SPEECH_HANDOFF_ITEM_IDS.length,
-    OPEN_BOX_REVEAL_HANDOFF_ITEM_IDS.length,
     PRINTABLE_WORKSHEET_HANDOFF_ITEM_IDS.length,
     ASSIGNMENT_RESULTS_EXPORT_PREPARATION_ITEM_IDS.length,
   ],
-  Array.from({ length: 22 }, () => 30),
+  Array.from({ length: 16 }, () => 30),
   'Template roadmap capability chain should stay backed by focused roadmap, template, AI, worksheet, runtime, print, and export gates.'
 );
 assert.deepEqual(Object.fromEntries(templateRoadmapCapabilityChainValues), {
@@ -47309,20 +45345,12 @@ const dashboardOverviewRouteSource = readFileSync(
   'src/routes/dashboard/index.tsx',
   'utf8'
 );
-const dashboardOverviewActionCardSource = readFileSync(
-  'src/components/dashboard/dashboard-overview-action-card.tsx',
-  'utf8'
-);
 const dashboardOverviewMetricCardSource = readFileSync(
   'src/components/dashboard/dashboard-overview-metric-card.tsx',
   'utf8'
 );
 const dashboardOverviewLoopStatusPanelSource = readFileSync(
   'src/components/dashboard/dashboard-overview-loop-status-panel.tsx',
-  'utf8'
-);
-const dashboardOverviewReadinessRowSource = readFileSync(
-  'src/components/dashboard/dashboard-overview-readiness-row.tsx',
   'utf8'
 );
 const dashboardOverviewHandoffPanelSource = readFileSync(
@@ -47392,11 +45420,6 @@ assert.match(
   'Dashboard overview metric component should own metric icon mapping.'
 );
 assert.match(
-  dashboardOverviewReadinessRowSource,
-  /row\.description[\s\S]*Progress/,
-  'Dashboard overview readiness component should render prepared row descriptions and own progress rendering.'
-);
-assert.match(
   dashboardOverviewLoopStatusPanelSource,
   /view\.nextActions\.map[\s\S]*action\.status === 'ready'[\s\S]*action\.cta[\s\S]*dashboardNextActionIcons[\s\S]*dashboardNextActionStatusIcons/,
   'Dashboard overview loop-status component should render prepared next-action copy and own icon/status presentation.'
@@ -47407,19 +45430,9 @@ assert.doesNotMatch(
   'Dashboard overview loop-status component should not hardcode visible next-action or loop-status copy.'
 );
 assert.match(
-  dashboardOverviewActionCardSource,
-  /dashboardActionIcons/,
-  'Dashboard overview action component should own action icon presentation.'
-);
-assert.match(
   dashboardOverviewHandoffPanelSource,
   /DashboardOverviewHandoffView[\s\S]*data-handoff="dashboard-overview"[\s\S]*data-handoff-scope=\{view\.privacy\.scope\}[\s\S]*view\.itemViews\.map\(\(itemView\) =>[\s\S]*DashboardOverviewHandoffItem[\s\S]*function DashboardOverviewHandoffItem[\s\S]*const labelId = `dashboard-overview-handoff-\$\{itemView\.id\}-label`[\s\S]*const valueId = `dashboard-overview-handoff-\$\{itemView\.id\}-value`[\s\S]*const descriptionId = `dashboard-overview-handoff-\$\{itemView\.id\}-description`[\s\S]*data-handoff-item=\{itemView\.id\}[\s\S]*id=\{labelId\}[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*aria-label=\{itemView\.ariaLabel\}[\s\S]*aria-labelledby=\{`\$\{labelId\} \$\{valueId\}`\}[\s\S]*id=\{valueId\}[\s\S]*id=\{descriptionId\}/,
   'Dashboard overview handoff panel should render marker, item ids, and stable label/value/description relationships.'
-);
-assert.doesNotMatch(
-  dashboardOverviewActionCardSource,
-  /dashboardActionHrefs|Routes\./,
-  'Dashboard overview action routes should be prepared by the dashboard domain view-model.'
 );
 // A demo card showed "18 completions · 84% avg" next to real 0% results.
 assert.doesNotMatch(

@@ -42,10 +42,9 @@ export const STUDENT_IDENTITY_LIFECYCLE_CHAIN_SOURCE_FILES = [
   'src/assignments/attempt-query.ts',
   'src/assignments/student-submission.ts',
   'src/assignments/student-runner-state.ts',
-  'src/assignments/student-runner-identity-handoff.ts',
-  'src/assignments/student-runner-submit-controls-handoff.ts',
+  'src/components/assignments/student-runner-submit-controls.tsx',
   'src/assignments/student-runner-view.ts',
-  'src/assignments/runtime-identity-handoff.ts',
+  'src/assignments/student-runtime-item-list.ts',
   'src/assignments/public.ts',
   'src/assignments/results.ts',
   'src/assignments/result-display.ts',
@@ -62,6 +61,7 @@ export const STUDENT_IDENTITY_LIFECYCLE_CHAIN_SOURCE_FILES = [
   'src/components/assignments/assignment-results-student-search.tsx',
   'src/components/assignments/assignment-results-attempt-review-card.tsx',
   'tests/e2e/TEST-CATALOG.md',
+  'tests/e2e/specs/student-runner.spec.ts',
 ] as const;
 
 export type StudentIdentityLifecycleChainHandoffItemId =
@@ -271,9 +271,9 @@ function getStudentIdentityLifecycleChainHandoffItem(
     case 'runner-identity-handoff':
       return item(
         id,
-        'Runner identity handoff',
-        '30 identity slices',
-        'The dedicated runner identity handoff covers named, anonymous, browser, retry, and privacy boundaries.'
+        'Runner identity view',
+        'Named or anonymous',
+        'The runner identity view covers named, anonymous, browser, retry, and privacy boundaries without rendering tokens.'
       );
     case 'runner-start-privacy':
       return item(
@@ -362,8 +362,8 @@ function getStudentIdentityLifecycleChainHandoffItem(
     case 'runtime-identity-handoff-boundary':
       return item(
         id,
-        'Runtime identity handoff boundary',
-        '30 runtime identity slices',
+        'Runtime item identity',
+        'Runtime item ids',
         'Runtime kind counts, normalized and unique ids, collision and blank-id guards, submission validation, browser answers, scoring lookups, teacher results, public payload, assignment snapshot, and privacy stay aligned.'
       );
   }

@@ -16,12 +16,6 @@ import {
   type AnswerFeedbackLifecycleChainHandoffItemId,
   type AnswerFeedbackLifecycleChainHandoffView,
 } from '@/assignments/answer-feedback-lifecycle-chain';
-import { FILL_BLANK_WORKSHEET_HANDOFF_ITEM_IDS } from '@/assignments/fill-blank-worksheet-handoff';
-import { GROUP_SORT_BOARD_HANDOFF_ITEM_IDS } from '@/assignments/group-sort-board-handoff';
-import { LINE_MATCH_BOARD_HANDOFF_ITEM_IDS } from '@/assignments/line-match-board-handoff';
-import { LISTENING_SPEECH_HANDOFF_ITEM_IDS } from '@/assignments/listening-speech-handoff';
-import { MATCHING_PAIRS_BOARD_HANDOFF_ITEM_IDS } from '@/assignments/matching-pairs-board-handoff';
-import { OPEN_BOX_REVEAL_HANDOFF_ITEM_IDS } from '@/assignments/open-box-reveal-handoff';
 import {
   buildPublicAttemptReviewSummaryView,
   type PublicAttemptReviewItem,
@@ -215,17 +209,11 @@ test('answer feedback lifecycle chain is backed by adjacent gates', () => {
   assert.deepEqual(
     [
       ASSIGNMENT_ANSWER_FEEDBACK_HANDOFF_ITEM_IDS.length,
-      FILL_BLANK_WORKSHEET_HANDOFF_ITEM_IDS.length,
-      LINE_MATCH_BOARD_HANDOFF_ITEM_IDS.length,
-      GROUP_SORT_BOARD_HANDOFF_ITEM_IDS.length,
-      MATCHING_PAIRS_BOARD_HANDOFF_ITEM_IDS.length,
-      LISTENING_SPEECH_HANDOFF_ITEM_IDS.length,
-      OPEN_BOX_REVEAL_HANDOFF_ITEM_IDS.length,
       STUDENT_RUNNER_PLAY_CHAIN_HANDOFF_ITEM_IDS.length,
       TEACHER_RESULTS_REVIEW_CHAIN_HANDOFF_ITEM_IDS.length,
       ASSIGNMENT_RESULTS_EXPORT_PREPARATION_ITEM_IDS.length,
     ],
-    Array.from({ length: 10 }, () => 30)
+    Array.from({ length: 4 }, () => 30)
   );
 });
 

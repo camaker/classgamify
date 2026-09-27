@@ -10,7 +10,6 @@ import {
   type PublicDomHandoffBoundaryItemId,
   type PublicDomHandoffBoundaryView,
 } from '@/seo/public-dom-handoff-boundary';
-import { shouldRenderClassroomControlSemanticsHandoff } from '@/classroom/control-semantics';
 import { Routes } from '@/lib/routes';
 
 const TEST_CATALOG_SOURCE = readFileSync('tests/e2e/TEST-CATALOG.md', 'utf8');
@@ -143,66 +142,20 @@ test('public route sources keep internal handoff audit markup out of DOM', () =>
   );
 });
 
-test('classroom control handoff stays gated away from public entry routes', () => {
-  for (const routePath of [
-    Routes.Root,
-    Routes.Templates,
-    Routes.Worksheets,
-    Routes.Pricing,
-    Routes.Teachers,
-    Routes.Roadmap,
-    Routes.Contact,
-    Routes.Blog,
-    `${Routes.Blog}/classroom-results`,
-    Routes.CookiePolicy,
-    Routes.PrivacyPolicy,
-    Routes.TermsOfService,
-    Routes.Auth,
-    Routes.Login,
-    Routes.Register,
-    Routes.ForgotPassword,
-    Routes.ResetPassword,
-    Routes.AuthError,
-  ]) {
-    assert.equal(
-      shouldRenderClassroomControlSemanticsHandoff(routePath),
-      false,
-      `${routePath} should not render classroom-control handoff markup.`
-    );
-  }
-
+test('handoff audit markup stays scoped to teacher and runner routes', () => {
   assert.deepEqual(PUBLIC_DOM_HANDOFF_ALLOWED_ROUTE_SCOPES, [
     Routes.Create,
     Routes.Dashboard,
     Routes.Play,
     '/print',
   ]);
-
-  for (const routePath of [
-    Routes.Create,
-    Routes.DashboardActivities,
-    Routes.DashboardAssignments,
-    '/play/demo-food',
-    '/print/assignments/example',
-  ]) {
-    assert.equal(
-      shouldRenderClassroomControlSemanticsHandoff(routePath),
-      true,
-      `${routePath} should remain eligible for hidden classroom-control handoff markup.`
-    );
-  }
 });
 
-test('root document keeps classroom control handoff route-gated', () => {
-  assert.match(
-    ROOT_ROUTE_SOURCE,
-    /<ClassroomControlSemanticsHandoffMount \/>/,
-    'Root document should mount the route-gated classroom-control semantics boundary.'
-  );
+test('root document mounts no global handoff markup', () => {
   assert.doesNotMatch(
     ROOT_ROUTE_SOURCE,
-    /data-handoff|data-handoff-item/,
-    'Root route source should not hardcode handoff audit attributes into every public document.'
+    /Handoff\b|data-handoff|data-handoff-item/,
+    'The root document renders on every public page, so it must not mount handoff audit markup.'
   );
 });
 

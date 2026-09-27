@@ -55,7 +55,6 @@ export const ASSIGNMENT_LIST_FILTER_STATE_CHAIN_SOURCE_FILES = [
   'src/components/assignments/assignment-list-filters.tsx',
   'src/components/assignments/assignment-list-card.tsx',
   'src/components/assignments/assignment-list-summary-card.tsx',
-  'src/components/assignments/assignment-list-scope-panel.tsx',
   'src/components/assignments/assignment-list-stats.tsx',
   'src/components/assignments/published-assignment-panel.tsx',
   'src/components/assignments/copy-assignment-share-link-button.tsx',
@@ -67,6 +66,7 @@ export const ASSIGNMENT_LIST_FILTER_STATE_CHAIN_SOURCE_FILES = [
   'scripts/assignment-distribution-lifecycle-chain-handoff.test.ts',
   'scripts/published-assignment-delivery-chain-handoff.test.ts',
   'tests/e2e/TEST-CATALOG.md',
+  'tests/e2e/specs/protected-pages.spec.ts',
 ] as const;
 
 export type AssignmentListFilterStateChainHandoffItemId =

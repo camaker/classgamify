@@ -57,7 +57,6 @@ import {
   PUBLISHED_ASSIGNMENT_DELIVERY_CHAIN_HANDOFF_ITEM_IDS,
   PUBLISHED_ASSIGNMENT_DELIVERY_CHAIN_SOURCE_FILES,
 } from '@/assignments/published-assignment-delivery-chain';
-import { PUBLIC_ASSIGNMENT_RULES_HANDOFF_ITEM_IDS } from '@/assignments/delivery-summary';
 import { ASSIGNMENT_PUBLISH_HANDOFF_ITEM_IDS } from '@/assignments/publish-input';
 import {
   ASSIGNMENT_RESULT_ACCEPTED_ANSWER_CHAIN_HANDOFF_ITEM_IDS,
@@ -75,7 +74,6 @@ import {
   SCORED_ATTEMPT_RESULT_CHAIN_HANDOFF_ITEM_IDS,
   SCORED_ATTEMPT_RESULT_CHAIN_SOURCE_FILES,
 } from '@/assignments/scored-attempt-result-chain';
-import { STUDENT_RUNTIME_IDENTITY_HANDOFF_ITEM_IDS } from '@/assignments/runtime-identity-handoff';
 import {
   STUDENT_IDENTITY_LIFECYCLE_CHAIN_HANDOFF_ITEM_IDS,
   STUDENT_IDENTITY_LIFECYCLE_CHAIN_SOURCE_FILES,
@@ -451,9 +449,9 @@ test('classroom product loop chain summarizes activity to results flow', () => {
       ['published-assignment-delivery-boundary', '30 delivery slices'],
       ['assignment-publish-preflight-boundary', '30 publish slices'],
       ['student-runner-play-boundary', '30 runner slices'],
-      ['public-assignment-rules-boundary', '30 rule slices'],
+      ['public-assignment-rules-boundary', 'Visible rule chips'],
       ['student-identity-lifecycle-boundary', '30 identity slices'],
-      ['student-runtime-identity-boundary', '30 runtime identity slices'],
+      ['student-runtime-identity-boundary', 'Runtime item ids'],
       ['assignment-attempt-persistence-boundary', '30 persistence slices'],
       ['assignment-submission-validation-boundary', '30 validation slices'],
       ['scored-attempt-result-boundary', '30 result slices'],
@@ -473,7 +471,7 @@ test('classroom product loop chain summarizes activity to results flow', () => {
   );
   assert.equal(
     getHandoffValue(handoffView, 'student-runtime-identity-boundary'),
-    '30 runtime identity slices'
+    'Runtime item ids'
   );
 });
 
@@ -516,12 +514,10 @@ test('classroom product loop chain is backed by adjacent focused gates', () => {
       ASSIGNMENT_DISTRIBUTION_LIFECYCLE_CHAIN_SOURCE_FILES.length,
       PUBLISHED_ASSIGNMENT_DELIVERY_CHAIN_HANDOFF_ITEM_IDS.length,
       PUBLISHED_ASSIGNMENT_DELIVERY_CHAIN_SOURCE_FILES.length,
-      PUBLIC_ASSIGNMENT_RULES_HANDOFF_ITEM_IDS.length,
       STUDENT_RUNNER_PLAY_CHAIN_HANDOFF_ITEM_IDS.length,
       STUDENT_RUNNER_PLAY_CHAIN_SOURCE_FILES.length,
       STUDENT_IDENTITY_LIFECYCLE_CHAIN_HANDOFF_ITEM_IDS.length,
       STUDENT_IDENTITY_LIFECYCLE_CHAIN_SOURCE_FILES.length,
-      STUDENT_RUNTIME_IDENTITY_HANDOFF_ITEM_IDS.length,
       ASSIGNMENT_SUBMISSION_VALIDATION_HANDOFF_ITEM_IDS.length,
       ASSIGNMENT_ATTEMPT_PERSISTENCE_HANDOFF_ITEM_IDS.length,
       ASSIGNMENT_ATTEMPT_DURATION_HANDOFF_ITEM_IDS.length,
@@ -549,7 +545,7 @@ test('classroom product loop chain is backed by adjacent focused gates', () => {
       PUBLIC_DISCOVERY_INDEXING_CHAIN_SOURCE_FILES.length,
       CLASSROOM_TRUST_COMMUNICATION_CHAIN_HANDOFF_ITEM_IDS.length,
     ],
-    Array.from({ length: 60 }, () => 30)
+    Array.from({ length: 58 }, () => 30)
   );
 });
 

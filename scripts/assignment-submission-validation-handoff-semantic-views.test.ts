@@ -164,7 +164,7 @@ test('submission validation handoff localizes Chinese safe values', () => {
   }
 });
 
-test('student runner page state renders submission validation handoff', () => {
+test('student runner progress counts only answered runtime items', () => {
   const starterPreview = buildStudentRunnerStarterPreview(
     STARTER_FOOD_ASSIGNMENT_SHARE_ID
   );
@@ -189,35 +189,15 @@ test('student runner page state renders submission validation handoff', () => {
     submittedAttemptCount: 0,
   });
 
-  assert.deepEqual(
-    pageView.submissionValidationHandoffView.itemViews.map((item) => item.id),
-    [...ASSIGNMENT_SUBMISSION_VALIDATION_HANDOFF_ITEM_IDS]
-  );
+  const payloadSummaryView = pageView.controlView.payloadSummaryView;
+  assert.equal(pageView.controlView.progressView.answeredItemCount, 1);
   assert.equal(
-    getHandoffValue(
-      pageView.submissionValidationHandoffView,
-      'runtime-item-count'
-    ),
-    `${starterPreview.runtimeItems.length} runtime items`
+    pageView.controlView.progressView.itemCount,
+    starterPreview.runtimeItems.length
   );
+  assertNoPrivateSubmissionValidationText(JSON.stringify(payloadSummaryView));
   assert.equal(
-    getHandoffValue(
-      pageView.submissionValidationHandoffView,
-      'submitted-answer-count'
-    ),
-    '1 answers'
-  );
-  assert.equal(
-    getHandoffValue(pageView.submissionValidationHandoffView, 'privacy-guard'),
-    'Private data hidden'
-  );
-  assertNoPrivateSubmissionValidationText(
-    JSON.stringify(pageView.submissionValidationHandoffView)
-  );
-  assert.equal(
-    JSON.stringify(pageView.submissionValidationHandoffView).includes(
-      runtimeItem.id
-    ),
+    JSON.stringify(payloadSummaryView).includes(runtimeItem.id),
     false
   );
 });
@@ -250,8 +230,8 @@ test('submission validation handoff is wired to source boundaries', () => {
   );
   assert.match(
     RUNNER_STATE_SOURCE,
-    /submissionValidationHandoffView: AssignmentSubmissionValidationHandoffView;[\s\S]*buildAssignmentSubmissionValidationHandoffView\([\s\S]*buildAssignmentSubmissionValidationHandoffEvidence\(\{[\s\S]*runtimeItems: attemptState\.runtimeItems,[\s\S]*submittedAnswerCount: currentPayloadSummary\.answerCount/,
-    'Student runner page view-model should compose the submission validation handoff from runtime and payload counts.'
+    /const currentPayloadSummary = buildStudentRunnerCurrentPayloadSummary\(\{[\s\S]*activeShareId,[\s\S]*attemptState,/,
+    'Student runner page view-model should derive payload counts from the active attempt state.'
   );
   assert.doesNotMatch(
     SUBMIT_CONTROLS_SOURCE,

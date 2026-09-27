@@ -261,7 +261,7 @@ test('assignment attempt limit helpers preserve finite and unlimited retries', (
   assertNoPrivateAttemptLimitText(JSON.stringify(handoffView));
 });
 
-test('student runner renders the attempt-limit handoff from page state', () => {
+test('student runner hides retry once the attempt limit is used', () => {
   const starterPreview = buildStudentRunnerStarterPreview(
     STARTER_FOOD_ASSIGNMENT_SHARE_ID
   );
@@ -294,38 +294,13 @@ test('student runner renders the attempt-limit handoff from page state', () => {
     submittedAttemptCount: 2,
   });
 
-  assert.deepEqual(
-    pageView.attemptLimitHandoffView.itemViews.map((item) => item.id),
-    [...ASSIGNMENT_ATTEMPT_LIMIT_HANDOFF_ITEM_IDS]
-  );
+  assert.equal(pageView.showStartAnotherAttempt, false);
+  assert.equal(pageView.resultPanelView.show, true);
+  assert.ok(pageView.resultPanelView.show);
+  assert.equal(pageView.resultPanelView.showStartAnotherAttempt, false);
+  assertNoPrivateAttemptLimitText(JSON.stringify(pageView.resultPanelView));
   assert.equal(
-    getHandoffValue(
-      pageView.attemptLimitHandoffView,
-      'max-attempt-normalization'
-    ),
-    '2 max'
-  );
-  assert.equal(
-    getHandoffValue(pageView.attemptLimitHandoffView, 'remaining-attempts'),
-    'No attempts left'
-  );
-  assert.equal(
-    getHandoffValue(pageView.attemptLimitHandoffView, 'retry-availability'),
-    'Unavailable'
-  );
-  assert.equal(
-    getHandoffValue(pageView.attemptLimitHandoffView, 'retry-button-boundary'),
-    'Unavailable'
-  );
-  assert.equal(
-    getHandoffValue(pageView.attemptLimitHandoffView, 'privacy-guard'),
-    'Private data hidden'
-  );
-  assertNoPrivateAttemptLimitText(
-    JSON.stringify(pageView.attemptLimitHandoffView)
-  );
-  assert.equal(
-    JSON.stringify(pageView.attemptLimitHandoffView).includes(runtimeItem.id),
+    JSON.stringify(pageView.resultPanelView).includes(runtimeItem.id),
     false
   );
 });
@@ -374,8 +349,8 @@ test('assignment attempt limit handoff is wired to shared source boundaries', ()
   );
   assert.match(
     RUNNER_STATE_SOURCE,
-    /attemptLimitHandoffView: AssignmentAttemptLimitHandoffView;[\s\S]*buildAssignmentAttemptLimitHandoffView\([\s\S]*buildAssignmentAttemptLimitHandoffEvidence\(\{[\s\S]*attemptUsage: result\?\.attemptUsage,[\s\S]*maxAttempts:[\s\S]*assignment\?\.settings\.maxAttempts,[\s\S]*retryAvailable: showStartAnotherAttempt/,
-    'Student runner page view-model should compose the attempt-limit handoff from server usage and assignment settings.'
+    /const showStartAnotherAttempt = canStartAnotherStudentAttempt\(\{[\s\S]*maxAttempts:[\s\S]*result\?\.attemptUsage\.maxAttempts \?\? assignment\?\.settings\.maxAttempts/,
+    'Student runner retry availability should come from server usage and assignment settings.'
   );
   assert.doesNotMatch(
     SUBMIT_CONTROLS_SOURCE,

@@ -22,31 +22,20 @@ import {
   type StudentRunnerSubmissionChainHandoffItemId,
   type StudentRunnerSubmissionChainHandoffView,
 } from '@/assignments/student-runner-submission-chain';
-import { STUDENT_RUNNER_IDENTITY_HANDOFF_ITEM_IDS } from '@/assignments/student-runner-identity-handoff';
 import {
   buildStudentRunnerPageViewModel,
   buildStudentRunnerReadyState,
   buildStudentRunnerStarterPreview,
-  STUDENT_RUNNER_SUBMISSION_HANDOFF_ITEM_IDS,
   type StudentRunnerAttemptResult,
 } from '@/assignments/student-runner-state';
-import { STUDENT_RUNNER_SUBMIT_CONTROLS_HANDOFF_ITEM_IDS } from '@/assignments/student-runner-submit-controls-handoff';
 import { overwriteGetLocale } from '@/locale/paraglide/runtime';
 
 overwriteGetLocale(() => 'en');
 
 const PRODUCT_SOURCE = readFileSync('docs/product.md', 'utf8');
 const TEST_CATALOG_SOURCE = readFileSync('tests/e2e/TEST-CATALOG.md', 'utf8');
-const STUDENT_RUNNER_STATE_SOURCE = readFileSync(
-  'src/assignments/student-runner-state.ts',
-  'utf8'
-);
 const STUDENT_SUBMISSION_SOURCE = readFileSync(
   'src/assignments/student-submission.ts',
-  'utf8'
-);
-const SUBMIT_CONTROLS_SOURCE = readFileSync(
-  'src/assignments/student-runner-submit-controls-handoff.ts',
   'utf8'
 );
 const SUBMISSION_VALIDATION_SOURCE = readFileSync(
@@ -54,10 +43,6 @@ const SUBMISSION_VALIDATION_SOURCE = readFileSync(
   'utf8'
 );
 const ROUTE_SOURCE = readFileSync('src/routes/play/$shareId.tsx', 'utf8');
-const COMPONENT_SOURCE = readFileSync(
-  'src/components/assignments/student-runner-submission-handoff.tsx',
-  'utf8'
-);
 
 const SECRET_ANSWER_TEXT = 'SECRET_STUDENT_RUNNER_SUBMISSION_CHAIN_ANSWER';
 const SECRET_RAW_PAYLOAD = 'SECRET_STUDENT_RUNNER_SUBMISSION_CHAIN_RAW_PAYLOAD';
@@ -78,7 +63,6 @@ test('student runner submission chain exposes 30 safe slices', () => {
   assert.deepEqual(itemIds, [
     ...STUDENT_RUNNER_SUBMISSION_CHAIN_HANDOFF_ITEM_IDS,
   ]);
-  assert.deepEqual(itemIds, [...STUDENT_RUNNER_SUBMISSION_HANDOFF_ITEM_IDS]);
   assert.equal(handoffView.title, 'Student runner submission chain');
   assert.match(
     handoffView.description,
@@ -104,7 +88,7 @@ test('student runner submission chain exposes 30 safe slices', () => {
     connectsAttemptPersistenceHandoff: true,
     connectsScoredAttemptResultChain: true,
     connectsStudentRunnerPlayChain: true,
-    connectsSubmitControlsHandoff: true,
+    connectsSubmitControls: true,
     connectsSubmissionValidationHandoff: true,
     exposesAnonymousToken: false,
     exposesAnswerText: false,
@@ -123,7 +107,7 @@ test('student runner submission chain exposes 30 safe slices', () => {
     usesPreparedPageViewModel: true,
     usesResultPanelView: true,
     usesReviewSummaryView: true,
-    usesStudentRunnerSubmissionHandoff: true,
+    usesStudentRunnerSubmitControls: true,
     usesSubmitReadinessView: true,
     validatesSubmissionBeforePersistence: true,
   });
@@ -185,23 +169,20 @@ test('student runner submission chain is backed by adjacent gates', () => {
 
   assert.deepEqual(
     [
-      STUDENT_RUNNER_SUBMISSION_HANDOFF_ITEM_IDS.length,
-      STUDENT_RUNNER_SUBMIT_CONTROLS_HANDOFF_ITEM_IDS.length,
       ASSIGNMENT_SUBMISSION_VALIDATION_HANDOFF_ITEM_IDS.length,
       ASSIGNMENT_ATTEMPT_PERSISTENCE_HANDOFF_ITEM_IDS.length,
       ASSIGNMENT_ATTEMPT_DURATION_HANDOFF_ITEM_IDS.length,
       ASSIGNMENT_ATTEMPT_LIMIT_HANDOFF_ITEM_IDS.length,
-      STUDENT_RUNNER_IDENTITY_HANDOFF_ITEM_IDS.length,
       ASSIGNMENT_ANSWER_FEEDBACK_HANDOFF_ITEM_IDS.length,
       ANSWER_FEEDBACK_LIFECYCLE_CHAIN_HANDOFF_ITEM_IDS.length,
       SCORED_ATTEMPT_RESULT_CHAIN_HANDOFF_ITEM_IDS.length,
       STUDENT_RUNNER_PLAY_CHAIN_HANDOFF_ITEM_IDS.length,
     ],
-    Array.from({ length: 11 }, () => 30)
+    Array.from({ length: 8 }, () => 30)
   );
 });
 
-test('student runner submission chain matches pre-submit visible handoff privacy', () => {
+test('student runner submission chain keeps pre-submit visible state private', () => {
   const starterPreview = buildStudentRunnerStarterPreview(
     STARTER_FOOD_ASSIGNMENT_SHARE_ID
   );
@@ -230,53 +211,26 @@ test('student runner submission chain matches pre-submit visible handoff privacy
     submittedAttemptCount: 0,
   });
 
-  assert.deepEqual(
-    pageView.submissionHandoffView.itemViews.map((item) => item.id),
-    [...STUDENT_RUNNER_SUBMISSION_CHAIN_HANDOFF_ITEM_IDS]
-  );
-  assert.deepEqual(pageView.submissionHandoffView.privacy, {
-    exposesAnonymousToken: false,
-    exposesAnswerText: false,
-    exposesRawSubmissionPayload: false,
-    exposesRuntimeItemIds: false,
-    exposesStudentName: false,
-    exposesTeacherOnlyAnswers: false,
-    exposesTeacherSourceMaterials: false,
-    feedbackMetricKeys: [],
-    itemIds: [...STUDENT_RUNNER_SUBMISSION_CHAIN_HANDOFF_ITEM_IDS],
-    payloadMetricKeys: ['share-link', 'items', 'answers', 'unanswered'],
-    readinessItemIds: [
-      'share-link',
-      'runtime-items',
-      'completion',
-      'incomplete-confirmation',
-      'submission-state',
-    ],
-    reviewMetricKeys: [],
-    scope: 'public-student-runner-submission',
-  });
+  const visibleView = {
+    attemptTimerBadge: pageView.attemptTimerBadge,
+    controlView: pageView.controlView,
+    identityView: pageView.identityView,
+    resultPanelView: pageView.resultPanelView,
+  };
+
+  assert.equal(pageView.controlView.progressView.answeredItemCount, 1);
   assert.equal(
-    getVisibleHandoffValue(pageView.submissionHandoffView, 'answered-items'),
-    '1'
+    pageView.controlView.progressView.itemCount,
+    starterPreview.runtimeItems.length
   );
-  assert.equal(
-    getVisibleHandoffValue(pageView.submissionHandoffView, 'identity-privacy'),
-    'Token hidden'
-  );
-  assert.equal(
-    getVisibleHandoffValue(pageView.submissionHandoffView, 'timer-limit'),
-    '2:00'
-  );
-  assert.equal(
-    getVisibleHandoffValue(pageView.submissionHandoffView, 'result-accuracy'),
-    'Not submitted'
-  );
-  assertNoPrivateStudentSubmissionChainText(
-    JSON.stringify(pageView.submissionHandoffView)
-  );
+  assert.equal(pageView.identityView?.mode, 'anonymous');
+  assert.equal(pageView.attemptTimerBadge.show, true);
+  assert.match(pageView.attemptTimerBadge.label, /2:00/);
+  assert.equal(pageView.resultPanelView.show, false);
+  assertNoPrivateStudentSubmissionChainText(JSON.stringify(visibleView));
 });
 
-test('student runner submission chain matches post-submit review handoff state', () => {
+test('student runner submission chain shows the post-submit result panel', () => {
   const starterPreview = buildStudentRunnerStarterPreview(
     STARTER_FOOD_ASSIGNMENT_SHARE_ID
   );
@@ -310,60 +264,25 @@ test('student runner submission chain matches post-submit review handoff state',
     submittedAttemptCount: 1,
   });
 
-  assert.deepEqual(pageView.submissionHandoffView.privacy.reviewMetricKeys, [
-    'submitted',
-    'correct',
-    'needs-review',
-    'unanswered',
-  ]);
-  assert.deepEqual(pageView.submissionHandoffView.privacy.feedbackMetricKeys, [
-    'visibility',
-    'item-feedback',
-    'accepted-alternatives',
-    'explanations',
-    'needs-review',
-    'unanswered',
-  ]);
+  const resultPanelView = pageView.resultPanelView;
+  assert.equal(resultPanelView.show, true);
+  assert.ok(resultPanelView.show);
+  assert.equal(pageView.identityView?.mode, 'student-name');
   assert.equal(
-    getVisibleHandoffValue(pageView.submissionHandoffView, 'identity-mode'),
-    'student-name'
-  );
-  assert.equal(
-    getVisibleHandoffValue(pageView.submissionHandoffView, 'score-summary'),
+    resultPanelView.scoreLabel,
     `0/${starterPreview.runtimeItems.length}`
   );
-  assert.equal(
-    getVisibleHandoffValue(pageView.submissionHandoffView, 'feedback-scope'),
-    'Visible'
-  );
-  assert.equal(
-    getVisibleHandoffValue(
-      pageView.submissionHandoffView,
-      'feedback-detail-evidence'
-    ),
-    'Alternatives: 0 · Explanations: 1'
-  );
+  assert.equal(resultPanelView.showStartAnotherAttempt, true);
   assertNoPrivateStudentSubmissionChainText(
-    JSON.stringify(pageView.submissionHandoffView)
+    JSON.stringify({
+      controlView: pageView.controlView,
+      identityView: pageView.identityView,
+      resultPanelView,
+    })
   );
 });
 
 test('student runner submission source boundaries preserve domain ownership', () => {
-  assert.match(
-    STUDENT_RUNNER_STATE_SOURCE,
-    /submissionHandoffView: StudentRunnerSubmissionHandoffView[\s\S]*const submissionHandoffView = buildStudentRunnerSubmissionHandoffView\(\{[\s\S]*activeShareId,[\s\S]*attemptResultDisplay,[\s\S]*attemptState,[\s\S]*attemptTimer,[\s\S]*identityView,[\s\S]*payloadSummaryView: currentPayloadSummaryView,[\s\S]*progressView,[\s\S]*resultPanelView,[\s\S]*submitReadinessView,[\s\S]*timerBadge: attemptTimerBadge,[\s\S]*timeLimitSeconds/,
-    'Student runner page view-model should compose the submission handoff from prepared views.'
-  );
-  assert.match(
-    STUDENT_RUNNER_STATE_SOURCE,
-    /function buildStudentRunnerSubmissionHandoffView[\s\S]*getStudentRunnerSubmissionPayloadMetric[\s\S]*getStudentRunnerSubmitReadinessItem[\s\S]*getStudentRunnerReviewSummaryMetric[\s\S]*getStudentRunnerFeedbackScopeMetric[\s\S]*buildStudentRunnerSubmissionHandoffPrivacyContract/,
-    'Submission handoff builder should gather payload, readiness, review, feedback, and privacy state in the assignment domain.'
-  );
-  assert.match(
-    SUBMIT_CONTROLS_SOURCE,
-    /STUDENT_RUNNER_SUBMIT_CONTROLS_HANDOFF_ITEM_IDS[\s\S]*readiness-status[\s\S]*payload-summary[\s\S]*payload-answer-count[\s\S]*payload-privacy/,
-    'Submit controls handoff should keep readiness and payload privacy slices adjacent to submission state.'
-  );
   assert.match(
     SUBMISSION_VALIDATION_SOURCE,
     /ASSIGNMENT_SUBMISSION_VALIDATION_HANDOFF_ITEM_IDS[\s\S]*api-validates-before-scoring[\s\S]*persistence-normalized-answers[\s\S]*client-payload-builder[\s\S]*raw-payload-guard/,
@@ -391,13 +310,8 @@ test('student runner submission source boundaries preserve domain ownership', ()
   );
   assert.doesNotMatch(
     ROUTE_SOURCE,
-    /<StudentRunnerSubmissionHandoff\b/,
-    'The focused public play route should not render the hidden submission audit handoff.'
-  );
-  assert.match(
-    COMPONENT_SOURCE,
-    /data-handoff="student-runner-submission"[\s\S]*data-handoff-scope=\{view\.privacy\.scope\}[\s\S]*view\.itemViews\.map[\s\S]*data-handoff-item=\{itemView\.id\}/,
-    'Student runner submission handoff component should render hidden safe labelled outputs.'
+    /Handoff\b|data-handoff/,
+    'The focused public play route should not render hidden submission audit markup.'
   );
 });
 
@@ -491,20 +405,6 @@ function getHandoffValue(
 ) {
   const item = view.itemViews.find((candidate) => candidate.id === id);
   assert.ok(item, `Missing student runner submission chain item ${id}`);
-  return item.value;
-}
-
-function getVisibleHandoffValue(
-  view: {
-    itemViews: Array<{
-      id: StudentRunnerSubmissionChainHandoffItemId;
-      value: string;
-    }>;
-  },
-  id: StudentRunnerSubmissionChainHandoffItemId
-) {
-  const item = view.itemViews.find((handoffItem) => handoffItem.id === id);
-  assert.ok(item, `Missing visible submission handoff item ${id}`);
   return item.value;
 }
 

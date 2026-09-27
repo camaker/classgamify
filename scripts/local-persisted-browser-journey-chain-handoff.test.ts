@@ -11,10 +11,6 @@ import { ASSIGNMENT_RESULTS_EXPORT_PREPARATION_ITEM_IDS } from '@/assignments/re
 import { ASSIGNMENT_SHARE_LINK_HANDOFF_ITEM_IDS } from '@/assignments/share-link';
 import { PRINTABLE_WORKSHEET_HANDOFF_ITEM_IDS } from '@/assignments/printable-worksheet-view';
 import {
-  STUDENT_RUNNER_START_HANDOFF_ITEM_IDS,
-  STUDENT_RUNNER_SUBMISSION_HANDOFF_ITEM_IDS,
-} from '@/assignments/student-runner-state';
-import {
   LOCAL_PERSISTED_BROWSER_JOURNEY_CHAIN_HANDOFF_ITEM_IDS,
   LOCAL_PERSISTED_BROWSER_JOURNEY_CHAIN_SOURCE_FILES,
   buildLocalPersistedBrowserJourneyChainHandoffView,
@@ -108,7 +104,7 @@ test('local persisted browser journey chain exposes 30 safe slices', () => {
     usesCsvExportPreparationHandoff: true,
     usesPageHealthMonitor: true,
     usesPrintableWorksheetHandoff: true,
-    usesStudentRunnerSubmissionHandoff: true,
+    usesStudentRunnerSubmitControls: true,
   });
   assertNoPrivateLocalJourneyText(JSON.stringify(handoffView));
 });
@@ -176,15 +172,13 @@ test('local persisted browser journey is backed by adjacent gates', () => {
       ACTIVITY_LIBRARY_PAGE_HANDOFF_ITEM_IDS.length,
       ASSIGNMENT_PUBLISH_HANDOFF_ITEM_IDS.length,
       ASSIGNMENT_SHARE_LINK_HANDOFF_ITEM_IDS.length,
-      STUDENT_RUNNER_START_HANDOFF_ITEM_IDS.length,
-      STUDENT_RUNNER_SUBMISSION_HANDOFF_ITEM_IDS.length,
       ASSIGNMENT_RESULT_MATERIAL_HANDOFF_ITEM_IDS.length,
       ASSIGNMENT_RESULT_REVIEW_HANDOFF_ITEM_IDS.length,
       ASSIGNMENT_COPY_ARTIFACT_HANDOFF_ITEM_IDS.length,
       ASSIGNMENT_RESULTS_EXPORT_PREPARATION_ITEM_IDS.length,
       PRINTABLE_WORKSHEET_HANDOFF_ITEM_IDS.length,
     ],
-    Array.from({ length: 11 }, () => 30)
+    Array.from({ length: 9 }, () => 30)
   );
 });
 

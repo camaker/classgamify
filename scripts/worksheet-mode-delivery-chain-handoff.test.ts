@@ -7,23 +7,11 @@ import { PUBLIC_TEMPLATE_ENTRY_HANDOFF_ITEM_IDS } from '@/activities/entry-page-
 import { WORKSHEET_MODE_TEMPLATES } from '@/activities/worksheet-modes';
 import { ASSIGNMENT_ANSWER_FEEDBACK_HANDOFF_ITEM_IDS } from '@/assignments/answer-feedback-handoff';
 import { ASSIGNMENT_ATTEMPT_DURATION_HANDOFF_ITEM_IDS } from '@/assignments/attempt-duration-handoff';
-import {
-  ASSIGNMENT_DELIVERY_POLICY_HANDOFF_ITEM_IDS,
-  PUBLIC_ASSIGNMENT_RULES_HANDOFF_ITEM_IDS,
-} from '@/assignments/delivery-summary';
-import { FILL_BLANK_WORKSHEET_HANDOFF_ITEM_IDS } from '@/assignments/fill-blank-worksheet-handoff';
-import { GROUP_SORT_BOARD_HANDOFF_ITEM_IDS } from '@/assignments/group-sort-board-handoff';
+import { ASSIGNMENT_DELIVERY_POLICY_HANDOFF_ITEM_IDS } from '@/assignments/delivery-summary';
 import { ASSIGNMENT_ITEM_ORDER_HANDOFF_ITEM_IDS } from '@/assignments/item-order-handoff';
-import { LINE_MATCH_BOARD_HANDOFF_ITEM_IDS } from '@/assignments/line-match-board-handoff';
-import { LISTENING_SPEECH_HANDOFF_ITEM_IDS } from '@/assignments/listening-speech-handoff';
 import { PRINTABLE_WORKSHEET_HANDOFF_ITEM_IDS } from '@/assignments/printable-worksheet-view';
 import { PUBLIC_ASSIGNMENT_ACCESS_HANDOFF_ITEM_IDS } from '@/assignments/public';
 import { ASSIGNMENT_RESULTS_EXPORT_PREPARATION_ITEM_IDS } from '@/assignments/results-export';
-import { STUDENT_RUNNER_SUBMISSION_HANDOFF_ITEM_IDS } from '@/assignments/student-runner-state';
-import {
-  STUDENT_RUNTIME_INTERACTION_HANDOFF_ITEM_IDS,
-  STUDENT_RUNTIME_SEMANTIC_BUNDLE_HANDOFF_ITEM_IDS,
-} from '@/assignments/student-runtime-item-list';
 import { ASSIGNMENT_SUBMISSION_VALIDATION_HANDOFF_ITEM_IDS } from '@/assignments/submission-validation-handoff';
 import {
   WORKSHEET_MODE_DELIVERY_CHAIN_HANDOFF_ITEM_IDS,
@@ -179,23 +167,15 @@ test('worksheet-mode delivery chain stays backed by focused contracts', () => {
       ACTIVITY_TEMPLATE_SCAFFOLD_QUALITY_HANDOFF_ITEM_IDS.length,
       ACTIVITY_SOURCE_EXTRACTION_ASSIST_HANDOFF_ITEM_IDS.length,
       ASSIGNMENT_DELIVERY_POLICY_HANDOFF_ITEM_IDS.length,
-      PUBLIC_ASSIGNMENT_RULES_HANDOFF_ITEM_IDS.length,
       PUBLIC_ASSIGNMENT_ACCESS_HANDOFF_ITEM_IDS.length,
       ASSIGNMENT_ITEM_ORDER_HANDOFF_ITEM_IDS.length,
-      STUDENT_RUNTIME_INTERACTION_HANDOFF_ITEM_IDS.length,
-      STUDENT_RUNTIME_SEMANTIC_BUNDLE_HANDOFF_ITEM_IDS.length,
-      FILL_BLANK_WORKSHEET_HANDOFF_ITEM_IDS.length,
-      LINE_MATCH_BOARD_HANDOFF_ITEM_IDS.length,
-      LISTENING_SPEECH_HANDOFF_ITEM_IDS.length,
-      GROUP_SORT_BOARD_HANDOFF_ITEM_IDS.length,
-      STUDENT_RUNNER_SUBMISSION_HANDOFF_ITEM_IDS.length,
       ASSIGNMENT_SUBMISSION_VALIDATION_HANDOFF_ITEM_IDS.length,
       ASSIGNMENT_ATTEMPT_DURATION_HANDOFF_ITEM_IDS.length,
       ASSIGNMENT_ANSWER_FEEDBACK_HANDOFF_ITEM_IDS.length,
       PRINTABLE_WORKSHEET_HANDOFF_ITEM_IDS.length,
       ASSIGNMENT_RESULTS_EXPORT_PREPARATION_ITEM_IDS.length,
     ],
-    Array.from({ length: 19 }, () => 30)
+    Array.from({ length: 11 }, () => 30)
   );
 });
 

@@ -524,13 +524,11 @@ not ad hoc route code, because pagination and filters may change how much of the
 list is visible. Absolute share-link URL construction and `/play/:id` path
 encoding should also live in assignment-domain helpers so copied links are
 consistent across publish success panels, list cards, and result pages. The
-assignment distribution lifecycle chain should explicitly carry the 30-slice
-student-runner-start handoff so copied and previewed links enter the shared
-sanitized source, runtime availability, delivery rules, attempt limit, timer,
-identity, item order, instructions, submission preparation, and privacy
-contracts. Its independent 30-file gate should continue to verify post-publish
-context, owner lookup, share actions, print, and result surfaces without
-substituting for that student-facing start boundary. The
+assignment distribution lifecycle chain should make sure copied and previewed
+links open the focused student-runner start screen: title, key rule chips,
+name field, and the first question, all built from the sanitized public
+payload. Its independent 30-file gate should continue to verify post-publish
+context, owner lookup, share actions, print, and result surfaces. The
 assignment list should remain searchable as teachers reuse
 the product across classes: teachers can filter their own assignments by title,
 share id, source activity text, or assignment status without broadening outside
@@ -637,11 +635,11 @@ aggregate summary must not expose student names, raw anonymous tokens, browser
 storage keys, grouping keys, or result student keys.
 `src/assignments/attempt-identity-continuity-chain.ts` owns this source contract
 without reading browser storage or mutating attempts while building its summary.
-The student identity lifecycle should also carry the runtime identity handoff's
-30 slices for template/runtime scope, item-kind counts, normalized and unique
-runtime ids, collision and blank-id guards, submission validation, browser
-answers, scoring lookups, teacher results, public payload, and frozen snapshot
-boundaries. Its aggregate identity summary must not expose runtime item ids,
+The student identity lifecycle should also keep runtime item identity
+consistent across template/runtime scope: normalized and unique runtime ids,
+collision and blank-id guards, submission validation, browser answers, scoring
+lookups, teacher results, public payload, and frozen snapshot boundaries. Its
+aggregate identity summary must not expose runtime item ids,
 prompts, choices, answer text, student names, raw browser tokens, teacher-only
 answers, or source-material metadata.
 

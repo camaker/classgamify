@@ -9,10 +9,7 @@ import {
   type AssignmentLifecycleGovernanceChainHandoffItemId,
   type AssignmentLifecycleGovernanceChainHandoffView,
 } from '@/assignments/assignment-lifecycle-governance-chain';
-import {
-  ASSIGNMENT_DELIVERY_POLICY_HANDOFF_ITEM_IDS,
-  PUBLIC_ASSIGNMENT_RULES_HANDOFF_ITEM_IDS,
-} from '@/assignments/delivery-summary';
+import { ASSIGNMENT_DELIVERY_POLICY_HANDOFF_ITEM_IDS } from '@/assignments/delivery-summary';
 import { ASSIGNMENT_LIFECYCLE_HANDOFF_ITEM_IDS } from '@/assignments/lifecycle';
 import { ASSIGNMENT_LIST_PAGE_HANDOFF_ITEM_IDS } from '@/assignments/list-view';
 import {
@@ -231,11 +228,10 @@ test('assignment lifecycle governance chain is backed by adjacent gates', () => 
       PUBLISHED_ASSIGNMENT_DELIVERY_CHAIN_HANDOFF_ITEM_IDS.length,
       PUBLISHED_ASSIGNMENT_DELIVERY_CHAIN_SOURCE_FILES.length,
       ASSIGNMENT_DELIVERY_POLICY_HANDOFF_ITEM_IDS.length,
-      PUBLIC_ASSIGNMENT_RULES_HANDOFF_ITEM_IDS.length,
       ASSIGNMENT_ATTEMPT_STATS_HANDOFF_ITEM_IDS.length,
       ASSIGNMENT_RESULTS_EXPORT_PREPARATION_ITEM_IDS.length,
     ],
-    Array.from({ length: 11 }, () => 30)
+    Array.from({ length: 10 }, () => 30)
   );
 });
 

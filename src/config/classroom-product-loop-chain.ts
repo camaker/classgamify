@@ -51,7 +51,7 @@ export const CLASSROOM_PRODUCT_LOOP_CHAIN_SOURCE_FILES = [
   'src/assignments/student-runner-play-chain.ts',
   'src/assignments/result-explanation-chain.ts',
   'src/assignments/student-identity-lifecycle-chain.ts',
-  'src/assignments/runtime-identity-handoff.ts',
+  'src/assignments/student-runtime-item-list.ts',
   'src/assignments/submission-validation-handoff.ts',
   'src/assignments/attempt-persistence.ts',
   'src/assignments/scored-attempt-result-chain.ts',
@@ -748,7 +748,7 @@ function getClassroomProductLoopChainHandoffItem(
       return item(
         id,
         'Public assignment rules boundary',
-        '30 rule slices',
+        'Visible rule chips',
         'Visible rule panels, status badges, item counts, attempts, timers, close times, identity, review behavior, item order, timer start, public payload, runtime-content, teacher-settings, answer-key, and privacy guards stay aligned.'
       );
     case 'student-identity-lifecycle-boundary':
@@ -762,7 +762,7 @@ function getClassroomProductLoopChainHandoffItem(
       return item(
         id,
         'Student runtime identity boundary',
-        '30 runtime identity slices',
+        'Runtime item ids',
         'Template runner surfaces, runtime item counts, normalized runtime id counts, duplicate/blank/collision guards, shared submission contract, server validation, browser/scoring/teacher/public payload boundaries, frozen snapshots, and runtime privacy guards stay aligned.'
       );
     case 'assignment-attempt-persistence-boundary':

@@ -36,9 +36,8 @@ export const STUDENT_RUNNER_SUBMISSION_CHAIN_SOURCE_FILES = [
   'src/assignments/student-runner-state.ts',
   'src/assignments/student-runner-view.ts',
   'src/assignments/student-submission.ts',
-  'src/assignments/student-runner-submit-controls-handoff.ts',
   'src/components/assignments/student-runner-submit-controls.tsx',
-  'src/components/assignments/student-runner-submission-handoff.tsx',
+  'src/components/assignments/student-runner-frame.tsx',
   'src/components/assignments/student-runner-attempt-shell.tsx',
   'src/routes/play/$shareId.tsx',
   'src/assignments/submission-validation-handoff.ts',
@@ -51,17 +50,18 @@ export const STUDENT_RUNNER_SUBMISSION_CHAIN_SOURCE_FILES = [
   'src/assignments/attempt-limits.ts',
   'src/assignments/attempt-limit-handoff.ts',
   'src/assignments/identity.ts',
-  'src/assignments/student-runner-identity-handoff.ts',
   'src/assignments/public.ts',
   'src/assignments/answer-feedback-handoff.ts',
   'src/assignments/answer-feedback-lifecycle-chain.ts',
   'src/assignments/scored-attempt-result-chain.ts',
   'src/assignments/student-runner-play-chain.ts',
-  'scripts/student-runner-submission-handoff-semantic-views.test.ts',
-  'scripts/student-runner-submit-controls-handoff-semantic-views.test.ts',
+  'scripts/control-accessibility-contracts.test.ts',
+  'tests/e2e/specs/student-runner.spec.ts',
   'scripts/assignment-submission-validation-handoff-semantic-views.test.ts',
   'scripts/scored-attempt-result-chain-handoff.test.ts',
   'tests/e2e/TEST-CATALOG.md',
+  'src/components/assignments/student-runner-header-card.tsx',
+  'src/components/activities/public-answer-feedback.tsx',
 ] as const;
 
 export type StudentRunnerSubmissionChainHandoffItemId =
@@ -83,7 +83,7 @@ export type StudentRunnerSubmissionChainPrivacyContract = {
   connectsAttemptPersistenceHandoff: true;
   connectsScoredAttemptResultChain: true;
   connectsStudentRunnerPlayChain: true;
-  connectsSubmitControlsHandoff: true;
+  connectsSubmitControls: true;
   connectsSubmissionValidationHandoff: true;
   exposesAnonymousToken: false;
   exposesAnswerText: false;
@@ -102,7 +102,7 @@ export type StudentRunnerSubmissionChainPrivacyContract = {
   usesPreparedPageViewModel: true;
   usesResultPanelView: true;
   usesReviewSummaryView: true;
-  usesStudentRunnerSubmissionHandoff: true;
+  usesStudentRunnerSubmitControls: true;
   usesSubmitReadinessView: true;
   validatesSubmissionBeforePersistence: true;
 };
@@ -131,7 +131,7 @@ export function buildStudentRunnerSubmissionChainHandoffView(): StudentRunnerSub
       connectsAttemptPersistenceHandoff: true,
       connectsScoredAttemptResultChain: true,
       connectsStudentRunnerPlayChain: true,
-      connectsSubmitControlsHandoff: true,
+      connectsSubmitControls: true,
       connectsSubmissionValidationHandoff: true,
       exposesAnonymousToken: false,
       exposesAnswerText: false,
@@ -150,7 +150,7 @@ export function buildStudentRunnerSubmissionChainHandoffView(): StudentRunnerSub
       usesPreparedPageViewModel: true,
       usesResultPanelView: true,
       usesReviewSummaryView: true,
-      usesStudentRunnerSubmissionHandoff: true,
+      usesStudentRunnerSubmitControls: true,
       usesSubmitReadinessView: true,
       validatesSubmissionBeforePersistence: true,
     },
