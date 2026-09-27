@@ -311,15 +311,19 @@ test('student runner submit controls handoff renders hidden DOM relationships', 
   );
   const catalogSource = readFileSync('tests/e2e/TEST-CATALOG.md', 'utf8');
 
-  assert.match(
+  // docs/design.md: screen-reader-only text describes the visible UI and
+  // must not add audit detail, so the student play page renders none.
+  assert.doesNotMatch(
     componentSource,
-    /buildStudentRunnerSubmitControlsHandoffView[\s\S]*const submitControlsHandoffView =[\s\S]*<StudentRunnerSubmitControlsHandoff view=\{submitControlsHandoffView\} \/>/,
-    'Student runner submit controls should build and render the prepared hidden handoff beside the visible controls.'
+    /data-handoff=/,
+    'Student runner submit bar should not render hidden submit-controls audit output.'
   );
-  assert.match(
+  // docs/design.md: screen-reader-only text describes the visible UI and
+  // must not add audit detail, so the student play page renders none.
+  assert.doesNotMatch(
     componentSource,
-    /function StudentRunnerSubmitControlsHandoff[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*aria-labelledby=\{titleId\}[\s\S]*data-handoff="student-runner-submit-controls"[\s\S]*data-handoff-scope=\{view\.privacy\.scope\}[\s\S]*view\.itemViews\.map\(\(itemView\)[\s\S]*StudentRunnerSubmitControlsHandoffItem[\s\S]*function StudentRunnerSubmitControlsHandoffItem[\s\S]*const labelId = `student-runner-submit-controls-handoff-\$\{itemView\.id\}-label`[\s\S]*const valueId = `student-runner-submit-controls-handoff-\$\{itemView\.id\}-value`[\s\S]*const descriptionId = `student-runner-submit-controls-handoff-\$\{itemView\.id\}-description`[\s\S]*data-handoff-item=\{itemView\.id\}[\s\S]*id=\{labelId\}[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*aria-label=\{itemView\.ariaLabel\}[\s\S]*aria-labelledby=\{`\$\{labelId\} \$\{valueId\}`\}[\s\S]*id=\{valueId\}[\s\S]*id=\{descriptionId\}/,
-    'Student runner submit controls handoff should render privacy scope plus stable label, value, and description relationships.'
+    /function StudentRunnerSubmitControlsHandoff\\b/,
+    'Student runner submit bar should not define hidden submit-controls audit output.'
   );
   assert.match(
     catalogSource,

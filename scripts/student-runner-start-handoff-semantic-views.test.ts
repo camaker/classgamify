@@ -278,10 +278,12 @@ test('student runner start handoff renders hidden DOM relationships', () => {
     /StudentRunnerStartHandoffItemView[\s\S]*StudentRunnerStartHandoffView[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*aria-labelledby=\{titleId\}[\s\S]*data-handoff="student-runner-start"[\s\S]*data-handoff-scope=\{view\.privacy\.scope\}[\s\S]*view\.itemViews\.map[\s\S]*StudentRunnerStartHandoffItem[\s\S]*function StudentRunnerStartHandoffItem[\s\S]*const labelId = `student-runner-start-handoff-\$\{itemView\.id\}-label`[\s\S]*const valueId = `student-runner-start-handoff-\$\{itemView\.id\}-value`[\s\S]*const descriptionId = `student-runner-start-handoff-\$\{itemView\.id\}-description`[\s\S]*data-handoff-item=\{itemView\.id\}[\s\S]*id=\{labelId\}[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*aria-label=\{itemView\.ariaLabel\}[\s\S]*aria-labelledby=\{`\$\{labelId\} \$\{valueId\}`\}[\s\S]*id=\{valueId\}[\s\S]*id=\{descriptionId\}/,
     'Student runner start handoff should render each safe start slice with privacy scope plus stable label, value, and description relationships.'
   );
-  assert.match(
+  // docs/design.md: screen-reader-only text describes the visible UI and must
+  // not add audit detail, so the focused play page no longer mounts it.
+  assert.doesNotMatch(
     routeSource,
-    /StudentRunnerStartHandoff[\s\S]*from '@\/components\/assignments\/student-runner-start-handoff'[\s\S]*runnerPageView\.startHandoffView[\s\S]*<StudentRunnerStartHandoff[\s\S]*view=\{runnerPageView\.startHandoffView\}/,
-    'Student runner route should render the prepared hidden start handoff view.'
+    /<StudentRunnerStartHandoff\b/,
+    'Student play route should not render the hidden start audit handoff.'
   );
 });
 

@@ -389,10 +389,10 @@ test('student runner submission source boundaries preserve domain ownership', ()
     /attempt-limit-reached/,
     'Student submission helpers should connect duration normalization and attempt-limit failure mapping.'
   );
-  assert.match(
+  assert.doesNotMatch(
     ROUTE_SOURCE,
-    /StudentRunnerSubmissionHandoff[\s\S]*from '@\/components\/assignments\/student-runner-submission-handoff'[\s\S]*<StudentRunnerSubmissionHandoff[\s\S]*view=\{runnerPageView\.submissionHandoffView\}/,
-    'The public play route should render the prepared hidden submission handoff view.'
+    /<StudentRunnerSubmissionHandoff\b/,
+    'The focused public play route should not render the hidden submission audit handoff.'
   );
   assert.match(
     COMPONENT_SOURCE,

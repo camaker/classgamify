@@ -414,10 +414,12 @@ test('identity handoffs remain hidden semantic structures', () => {
     /STUDENT_RUNTIME_IDENTITY_HANDOFF_ITEM_IDS[\s\S]*'student-name-boundary'[\s\S]*'anonymous-token-boundary'[\s\S]*exposesAnonymousToken: false[\s\S]*exposesStudentName: false/,
     'Runtime identity handoff should hide names and anonymous tokens.'
   );
-  assert.match(
+  // docs/design.md: screen-reader-only text describes the visible UI and
+  // must not add audit detail, so the student play page renders none.
+  assert.doesNotMatch(
     STUDENT_RUNNER_SHELL_SOURCE,
-    /buildStudentRunnerIdentityHandoffView\(identityView\)[\s\S]*className="sr-only"[\s\S]*data-handoff="student-runner-identity"[\s\S]*data-handoff-item=\{itemView\.id\}/,
-    'Runner identity handoff should stay a hidden semantic dl structure.'
+    /data-handoff="student-runner-identity"/,
+    'Student runner attempt shell should not render hidden identity audit output.'
   );
   assert.match(
     RESULT_SEARCH_COMPONENT_SOURCE,

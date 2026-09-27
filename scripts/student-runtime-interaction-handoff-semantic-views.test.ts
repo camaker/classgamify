@@ -252,10 +252,12 @@ test('student runtime interaction handoff renders hidden DOM relationships', () 
     'utf8'
   );
 
-  assert.match(
+  // docs/design.md: screen-reader-only text describes the visible UI and
+  // must not add audit detail, so the student play page renders none.
+  assert.doesNotMatch(
     componentSource,
-    /StudentRuntimeInteractionHandoffItemView[\s\S]*StudentRuntimeInteractionHandoffView[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*aria-labelledby=\{titleId\}[\s\S]*data-handoff="student-runtime-interaction"[\s\S]*data-handoff-scope=\{view\.privacy\.scope\}[\s\S]*view\.itemViews\.map[\s\S]*StudentRuntimeInteractionHandoffItem[\s\S]*function StudentRuntimeInteractionHandoffItem[\s\S]*const labelId = `student-runtime-interaction-handoff-\$\{itemView\.id\}-label`[\s\S]*const valueId = `student-runtime-interaction-handoff-\$\{itemView\.id\}-value`[\s\S]*const descriptionId = `student-runtime-interaction-handoff-\$\{itemView\.id\}-description`[\s\S]*data-handoff-item=\{itemView\.id\}[\s\S]*id=\{labelId\}[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*aria-label=\{itemView\.ariaLabel\}[\s\S]*aria-labelledby=\{`\$\{labelId\} \$\{valueId\}`\}[\s\S]*id=\{valueId\}[\s\S]*id=\{descriptionId\}/,
-    'Student runtime interaction handoff should render each safe interaction slice with privacy scope plus stable label, value, and description relationships.'
+    /data-handoff=/,
+    'Student runtime item list should not render hidden interaction audit output.'
   );
 });
 

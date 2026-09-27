@@ -250,21 +250,25 @@ test('public assignment rules handoff localizes Chinese boundary values', () => 
   }
 });
 
-test('public assignment rules handoff renders stable hidden DOM relationships', () => {
+test('public assignment rules render visible rules without hidden handoff DOM', () => {
   assert.match(
     COMPONENT_SOURCE,
-    /summaryView\.items\.map\(\(rule\) =>[\s\S]*<PublicAssignmentRuleItem key=\{rule\.id\} rule=\{rule\} \/>[\s\S]*<PublicAssignmentRulesHandoff view=\{summaryView\.handoffView\} \/>/,
-    'Public rules should render visible rule cards and the prepared hidden handoff view from the same summary view.'
+    /summaryView\.items\.map\(\(rule\) =>[\s\S]*<PublicAssignmentRuleItem key=\{rule\.id\} rule=\{rule\} \/>/,
+    'Public rules should render each rule from the prepared summary view.'
   );
-  assert.match(
+  // docs/design.md: screen-reader-only text describes the visible UI and
+  // must not add audit detail, so the student play page renders none.
+  assert.doesNotMatch(
     COMPONENT_SOURCE,
-    /function PublicAssignmentRulesHandoff[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*aria-labelledby=\{titleId\}[\s\S]*className="sr-only"[\s\S]*data-handoff="public-assignment-rules"[\s\S]*data-handoff-scope=\{view\.privacy\.scope\}[\s\S]*<dl>[\s\S]*view\.itemViews\.map\(\(itemView\) =>[\s\S]*PublicAssignmentRulesHandoffItem/,
-    'Public rules handoff should expose a hidden scoped dl container.'
+    /data-handoff=/,
+    'Public rules should not render a hidden rules audit handoff.'
   );
-  assert.match(
+  // docs/design.md: screen-reader-only text describes the visible UI and
+  // must not add audit detail, so the student play page renders none.
+  assert.doesNotMatch(
     COMPONENT_SOURCE,
-    /function PublicAssignmentRulesHandoffItem[\s\S]*PublicAssignmentRulesHandoffItemView[\s\S]*const labelId = `public-assignment-rules-handoff-\$\{itemView\.id\}-label`[\s\S]*const valueId = `public-assignment-rules-handoff-\$\{itemView\.id\}-value`[\s\S]*const descriptionId = `public-assignment-rules-handoff-\$\{itemView\.id\}-description`[\s\S]*data-handoff-item=\{itemView\.id\}[\s\S]*<dt id=\{labelId\}>[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*aria-label=\{itemView\.ariaLabel\}[\s\S]*aria-labelledby=\{`\$\{labelId\} \$\{valueId\}`\}[\s\S]*id=\{valueId\}[\s\S]*id=\{descriptionId\}/,
-    'Each public rule handoff item should keep stable label, value, and description relationships.'
+    /function PublicAssignmentRulesHandoffItem\\b/,
+    'Public rules should not define hidden rules audit items.'
   );
 });
 

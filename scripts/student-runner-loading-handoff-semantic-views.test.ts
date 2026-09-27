@@ -209,10 +209,12 @@ test('student runner loading panel renders stable hidden handoff markers', () =>
   );
   const routeSource = readFileSync('src/routes/play/$shareId.tsx', 'utf8');
 
-  assert.match(
+  // docs/design.md: screen-reader-only text describes the visible UI and
+  // must not add audit detail, so the student play page renders none.
+  assert.doesNotMatch(
     componentSource,
-    /StudentRunnerLoadingHandoffItemView[\s\S]*StudentRunnerLoadingHandoffView[\s\S]*<StudentRunnerLoadingHandoff view=\{view\.handoffView\} \/>[\s\S]*function StudentRunnerLoadingHandoff[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*aria-labelledby=\{titleId\}[\s\S]*data-handoff="student-runner-loading"[\s\S]*data-handoff-scope=\{view\.privacy\.scope\}[\s\S]*view\.itemViews\.map[\s\S]*StudentRunnerLoadingHandoffItem[\s\S]*function StudentRunnerLoadingHandoffItem[\s\S]*const labelId = `student-runner-loading-handoff-\$\{itemView\.id\}-label`[\s\S]*const valueId = `student-runner-loading-handoff-\$\{itemView\.id\}-value`[\s\S]*const descriptionId = `student-runner-loading-handoff-\$\{itemView\.id\}-description`[\s\S]*data-handoff-item=\{itemView\.id\}[\s\S]*id=\{labelId\}[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*aria-label=\{itemView\.ariaLabel\}[\s\S]*aria-labelledby=\{`\$\{labelId\} \$\{valueId\}`\}[\s\S]*id=\{valueId\}[\s\S]*id=\{descriptionId\}/,
-    'Student runner loading handoff should render privacy scope plus stable label, value, and description relationships.'
+    /data-handoff=/,
+    'Student runner loading panel should not render hidden loading audit output.'
   );
   assert.match(
     routeSource,

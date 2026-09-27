@@ -244,20 +244,26 @@ test('student runtime semantic bundle renders hidden DOM relationships', () => {
     'utf8'
   );
 
-  assert.match(
+  // docs/design.md: screen-reader-only text describes the visible UI and
+  // must not add audit detail, so the student play page renders none.
+  assert.doesNotMatch(
     componentSource,
-    /StudentRuntimeInteractionRegion[\s\S]*listView: StudentRuntimeItemListView[\s\S]*StudentRuntimeSemanticBundleHandoff[\s\S]*view=\{listView\.semanticBundleHandoffView\}[\s\S]*StudentRuntimeInteractionHandoff[\s\S]*view=\{listView\.interactionHandoffView\}[\s\S]*StudentRuntimeChoiceAssignmentHandoff[\s\S]*view=\{listView\.runtimeChoiceAssignmentHandoffView\}[\s\S]*StudentRuntimeIdentityHandoff[\s\S]*view=\{listView\.runtimeIdentityHandoffView\}/,
-    'Runtime interaction region should mount semantic bundle, interaction, choice-assignment, and identity handoffs from the same list view.'
+    /data-handoff=/,
+    'Runtime interaction region should not mount hidden audit handoffs.'
   );
-  assert.match(
+  // docs/design.md: screen-reader-only text describes the visible UI and
+  // must not add audit detail, so the student play page renders none.
+  assert.doesNotMatch(
     componentSource,
-    /function StudentRuntimeSemanticBundleHandoff[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*aria-labelledby=\{titleId\}[\s\S]*data-handoff="student-runtime-semantic-bundle"[\s\S]*data-handoff-scope=\{view\.privacy\.scope\}[\s\S]*view\.itemViews\.map[\s\S]*StudentRuntimeSemanticBundleHandoffItem/,
-    'Runtime semantic bundle handoff should render a hidden scoped dl container.'
+    /function StudentRuntimeSemanticBundleHandoff\\b/,
+    'Runtime item list should not define the hidden semantic bundle handoff.'
   );
-  assert.match(
+  // docs/design.md: screen-reader-only text describes the visible UI and
+  // must not add audit detail, so the student play page renders none.
+  assert.doesNotMatch(
     componentSource,
-    /function StudentRuntimeSemanticBundleHandoffItem[\s\S]*const labelId = `student-runtime-semantic-bundle-handoff-\$\{itemView\.id\}-label`[\s\S]*const valueId = `student-runtime-semantic-bundle-handoff-\$\{itemView\.id\}-value`[\s\S]*const descriptionId = `student-runtime-semantic-bundle-handoff-\$\{itemView\.id\}-description`[\s\S]*data-handoff-item=\{itemView\.id\}[\s\S]*data-source-handoff=\{itemView\.sourceScope\}[\s\S]*data-source-handoff-item=\{itemView\.sourceItemId\}[\s\S]*id=\{labelId\}[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*aria-label=\{itemView\.ariaLabel\}[\s\S]*aria-labelledby=\{`\$\{labelId\} \$\{valueId\}`\}[\s\S]*id=\{valueId\}[\s\S]*id=\{descriptionId\}/,
-    'Each runtime semantic bundle item should expose stable item, source-scope, source-item, label, value, and description relationships.'
+    /function StudentRuntimeSemanticBundleHandoffItem\\b/,
+    'Runtime item list should not define hidden semantic bundle items.'
   );
 });
 

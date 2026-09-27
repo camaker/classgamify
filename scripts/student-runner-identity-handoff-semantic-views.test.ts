@@ -275,15 +275,19 @@ test('student runner identity handoff renders hidden DOM relationships', () => {
   );
   const catalogSource = readFileSync('tests/e2e/TEST-CATALOG.md', 'utf8');
 
-  assert.match(
+  // docs/design.md: screen-reader-only text describes the visible UI and
+  // must not add audit detail, so the student play page renders none.
+  assert.doesNotMatch(
     componentSource,
-    /buildStudentRunnerIdentityHandoffView[\s\S]*const identityHandoffView =[\s\S]*buildStudentRunnerIdentityHandoffView\(identityView\)[\s\S]*<StudentRunnerIdentityHandoff view=\{identityHandoffView\} \/>/,
-    'Student runner identity panel should build and render the prepared hidden identity handoff.'
+    /data-handoff=/,
+    'Student runner identity panel should not render the hidden identity audit handoff.'
   );
-  assert.match(
+  // docs/design.md: screen-reader-only text describes the visible UI and
+  // must not add audit detail, so the student play page renders none.
+  assert.doesNotMatch(
     componentSource,
-    /function StudentRunnerIdentityHandoff[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*aria-labelledby=\{titleId\}[\s\S]*data-handoff="student-runner-identity"[\s\S]*data-handoff-scope=\{view\.privacy\.scope\}[\s\S]*view\.itemViews\.map\(\(itemView\)[\s\S]*StudentRunnerIdentityHandoffItem[\s\S]*function StudentRunnerIdentityHandoffItem[\s\S]*const labelId = `student-runner-identity-handoff-\$\{itemView\.id\}-label`[\s\S]*const valueId = `student-runner-identity-handoff-\$\{itemView\.id\}-value`[\s\S]*const descriptionId = `student-runner-identity-handoff-\$\{itemView\.id\}-description`[\s\S]*data-handoff-item=\{itemView\.id\}[\s\S]*id=\{labelId\}[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*aria-label=\{itemView\.ariaLabel\}[\s\S]*aria-labelledby=\{`\$\{labelId\} \$\{valueId\}`\}[\s\S]*id=\{valueId\}[\s\S]*id=\{descriptionId\}/,
-    'Student runner identity handoff should render privacy scope plus stable label, value, and description relationships.'
+    /function StudentRunnerIdentityHandoff\\b/,
+    'Student runner attempt shell should not define hidden identity audit output.'
   );
   assert.match(
     catalogSource,
