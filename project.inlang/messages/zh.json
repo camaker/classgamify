@@ -8654,5 +8654,8 @@
   "student_play_previous": "上一题",
   "student_play_next": "下一题",
   "student_play_go_to_question": "跳到第 {number} 题",
-  "student_play_rules_toggle": "查看全部作业规则"
+  "student_play_rules_toggle": "查看全部作业规则",
+  "activity_runner_group_sort_help": "先点一个词条，再点它所属的分组。",
+  "activity_runner_matching_pairs_help": "先点左边的卡片，再点右边与它配对的卡片。",
+  "activity_runner_open_box_help": "点一个盒子打开它，然后输入你的答案。"
 }

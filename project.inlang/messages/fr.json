@@ -8654,5 +8654,8 @@
   "student_play_previous": "Précédente",
   "student_play_next": "Suivante",
   "student_play_go_to_question": "Aller à la question {number}",
-  "student_play_rules_toggle": "Toutes les règles du devoir"
+  "student_play_rules_toggle": "Toutes les règles du devoir",
+  "activity_runner_group_sort_help": "Touche un élément, puis touche le groupe auquel il appartient.",
+  "activity_runner_matching_pairs_help": "Touche une carte à gauche, puis la carte de droite qui va avec.",
+  "activity_runner_open_box_help": "Touche une boîte pour l’ouvrir, puis écris ta réponse."
 }

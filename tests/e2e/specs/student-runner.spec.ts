@@ -50,11 +50,12 @@ test.describe('student runner', () => {
       theme: 'light',
     });
 
+    // The runner loads client-side; a cold dev server can take a while.
     await expect(
       page.getByRole('heading', {
         name: getLocaleMessage('en', 'activity_starter_assignment_food_title'),
       })
-    ).toBeVisible();
+    ).toBeVisible({ timeout: 20_000 });
     await expect(
       page.getByText(
         formatLocaleMessage(
@@ -160,8 +161,9 @@ test.describe('student runner', () => {
     await expect(page.getByRole('link', { name: /^sign up$/i })).toHaveCount(0);
     await expect(page.locator('footer')).toHaveCount(0);
 
-    // One question at a time.
+    // One question at a time. The runner loads client-side, so wait for it.
     const surface = page.locator('[data-runtime-surface="choice-list"]');
+    await expect(surface).toBeVisible({ timeout: 20_000 });
     await expect(surface.getByRole('article')).toHaveCount(1);
     await expect(
       page.getByText(

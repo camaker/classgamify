@@ -8654,5 +8654,8 @@
   "student_play_previous": "Anterior",
   "student_play_next": "Siguiente",
   "student_play_go_to_question": "Ir a la pregunta {number}",
-  "student_play_rules_toggle": "Todas las reglas de la tarea"
+  "student_play_rules_toggle": "Todas las reglas de la tarea",
+  "activity_runner_group_sort_help": "Toca un elemento y luego toca el grupo al que pertenece.",
+  "activity_runner_matching_pairs_help": "Toca una tarjeta a la izquierda y luego la tarjeta de la derecha que le corresponde.",
+  "activity_runner_open_box_help": "Toca una caja para abrirla y luego escribe tu respuesta."
 }

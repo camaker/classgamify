@@ -2,11 +2,6 @@ import type {
   PublicAttemptReviewItem,
   PublicRuntimeItem,
 } from '@/assignments/public';
-import {
-  buildGroupSortBoardHandoffView,
-  type GroupSortBoardHandoffItemView,
-  type GroupSortBoardHandoffView,
-} from '@/assignments/group-sort-board-handoff';
 import { getActivityRunnerKindCopy } from '@/activities/runner-copy';
 import {
   buildGroupSortRunnerView,
@@ -15,14 +10,16 @@ import {
   type GroupSortRunnerAction,
 } from '@/assignments/student-runner-view';
 import { PublicAnswerFeedback } from '@/components/activities/public-answer-feedback';
-import { Badge } from '@/components/ui/badge';
-import { cn } from '@/lib/utils';
 import {
-  IconCategory2,
-  IconCheck,
-  IconCircle,
-  IconLayoutColumns,
-} from '@tabler/icons-react';
+  RUNNER_BOARD_FRAME,
+  RUNNER_BOARD_HELP,
+  RUNNER_BOARD_LABEL,
+  RUNNER_TARGET_READY,
+  RUNNER_TILE,
+  RUNNER_TILE_SELECTED,
+} from '@/components/activities/runner-board-styles';
+import { cn } from '@/lib/utils';
+import { IconCheck, IconCircle, IconLayoutColumns } from '@tabler/icons-react';
 import { useEffect, useMemo, useState } from 'react';
 
 type GroupSortBoardProps = {
@@ -85,55 +82,91 @@ export function GroupSortBoard({
     }
   }
 
-  const handoffView = useMemo(
-    () =>
-      buildGroupSortBoardHandoffView({
-        disabled,
-        revealAnswer,
-        runnerView,
-      }),
-    [disabled, revealAnswer, runnerView]
-  );
-
   return (
-    <>
-      <div className="rounded-lg border bg-card p-3">
-        <div className="flex flex-wrap items-center justify-between gap-2">
-          <div className="flex items-center gap-2 text-sm font-medium">
-            <IconCategory2 className="size-4 text-primary" />
-            {copy.title}
+    <div className={RUNNER_BOARD_FRAME}>
+      {copy.helpText ? (
+        <p className={RUNNER_BOARD_HELP}>{copy.helpText}</p>
+      ) : null}
+
+      <div className="grid gap-5 lg:grid-cols-[minmax(14rem,18rem)_minmax(0,1fr)]">
+        <div className="grid content-start gap-3">
+          <div className="flex min-h-9 items-center justify-between gap-2">
+            <div className={cn(RUNNER_BOARD_LABEL, 'flex items-center gap-2')}>
+              <IconLayoutColumns
+                aria-hidden="true"
+                className="size-5 text-muted-foreground"
+              />
+              {copy.itemListLabel}
+            </div>
+            {runnerView.selectedItem ? (
+              <button
+                type="button"
+                disabled={disabled}
+                className="rounded-md px-2 py-1 font-medium text-muted-foreground text-sm transition-colors hover:bg-muted hover:text-foreground disabled:cursor-default disabled:opacity-60"
+                onClick={() =>
+                  runnerView.selectedClearAction
+                    ? handleRunnerAction(runnerView.selectedClearAction)
+                    : undefined
+                }
+              >
+                {copy.clearSelectionLabel}
+              </button>
+            ) : null}
           </div>
-          <Badge variant="outline" className="rounded-md">
-            {runnerView.progressLabel}
-          </Badge>
+
+          {runnerView.unplacedItemViews.length ? (
+            runnerView.unplacedItemViews.map(
+              ({
+                action,
+                item,
+                reviewItem,
+                reviewStatusClassName,
+                selected,
+              }) => (
+                <GroupSortItemButton
+                  action={action}
+                  correctLabel={copy.correctAnswerLabel}
+                  key={item.id}
+                  item={item}
+                  reviewItem={reviewItem}
+                  revealAnswer={revealAnswer}
+                  reviewStatusClassName={reviewStatusClassName}
+                  selected={selected}
+                  onSelect={handleRunnerAction}
+                  disabled={disabled}
+                />
+              )
+            )
+          ) : (
+            <div className="rounded-xl border-2 border-dashed p-4 text-base text-muted-foreground">
+              {copy.emptyItemsLabel}
+            </div>
+          )}
         </div>
 
-        <div className="mt-3 grid gap-3 lg:grid-cols-[minmax(14rem,18rem)_minmax(0,1fr)]">
-          <div className="rounded-lg border bg-muted/20 p-3">
-            <div className="flex items-center justify-between gap-2">
-              <div className="flex items-center gap-2 text-sm font-medium">
-                <IconLayoutColumns className="size-4 text-muted-foreground" />
-                {copy.itemListLabel}
-              </div>
-              {runnerView.selectedItem ? (
+        <div className="grid content-start gap-4 md:grid-cols-2 xl:grid-cols-3">
+          {runnerView.groupViews.map(
+            ({ action, group, id, placedItemViews }) => (
+              <div key={id} className="grid content-start gap-2">
                 <button
                   type="button"
-                  disabled={disabled}
-                  className="rounded-md border bg-background px-2 py-1 text-xs font-medium text-muted-foreground transition-colors hover:border-primary/50 hover:text-primary disabled:cursor-default disabled:opacity-60"
-                  onClick={() =>
-                    runnerView.selectedClearAction
-                      ? handleRunnerAction(runnerView.selectedClearAction)
-                      : undefined
-                  }
+                  disabled={!selectedItemId || disabled}
+                  className={cn(
+                    RUNNER_TILE,
+                    'bg-muted/50',
+                    selectedItemId && !disabled && RUNNER_TARGET_READY
+                  )}
+                  onClick={() => handleRunnerAction(action)}
                 >
-                  {copy.clearSelectionLabel}
+                  <div className="flex items-center justify-between gap-2">
+                    <span className="font-semibold">{group}</span>
+                    <span className="rounded-full bg-background px-2 font-semibold text-muted-foreground text-sm tabular-nums">
+                      {placedItemViews.length}
+                    </span>
+                  </div>
                 </button>
-              ) : null}
-            </div>
 
-            <div className="mt-3 grid gap-2">
-              {runnerView.unplacedItemViews.length ? (
-                runnerView.unplacedItemViews.map(
+                {placedItemViews.map(
                   ({
                     action,
                     item,
@@ -142,9 +175,9 @@ export function GroupSortBoard({
                     selected,
                   }) => (
                     <GroupSortItemButton
-                      action={action}
-                      correctLabel={copy.correctAnswerLabel}
                       key={item.id}
+                      correctLabel={copy.correctAnswerLabel}
+                      action={action}
                       item={item}
                       reviewItem={reviewItem}
                       revealAnswer={revealAnswer}
@@ -152,128 +185,21 @@ export function GroupSortBoard({
                       selected={selected}
                       onSelect={handleRunnerAction}
                       disabled={disabled}
+                      compact
                     />
                   )
-                )
-              ) : (
-                <div className="min-h-14 rounded-lg border border-dashed bg-background/60 p-3 text-sm text-muted-foreground">
-                  {copy.emptyItemsLabel}
-                </div>
-              )}
-            </div>
-          </div>
-
-          <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-3">
-            {runnerView.groupViews.map(
-              ({ action, group, id, placedItemViews }) => {
-                return (
-                  <div key={id} className="rounded-lg border bg-background p-3">
-                    <button
-                      type="button"
-                      disabled={!selectedItemId || disabled}
-                      className={cn(
-                        'min-h-14 w-full rounded-lg border bg-muted/20 p-3 text-left transition-colors',
-                        'disabled:cursor-default disabled:opacity-100',
-                        selectedItemId &&
-                          !disabled &&
-                          'border-primary/40 hover:border-primary/60 hover:bg-primary/5'
-                      )}
-                      onClick={() => handleRunnerAction(action)}
-                    >
-                      <div className="flex items-center justify-between gap-2">
-                        <p className="text-sm font-semibold">{group}</p>
-                        <Badge variant="secondary" className="rounded-md">
-                          {placedItemViews.length}
-                        </Badge>
-                      </div>
-                    </button>
-
-                    <div className="mt-3 grid gap-2">
-                      {placedItemViews.map(
-                        ({
-                          action,
-                          item,
-                          reviewItem,
-                          reviewStatusClassName,
-                          selected,
-                        }) => (
-                          <GroupSortItemButton
-                            key={item.id}
-                            correctLabel={copy.correctAnswerLabel}
-                            action={action}
-                            item={item}
-                            reviewItem={reviewItem}
-                            revealAnswer={revealAnswer}
-                            reviewStatusClassName={reviewStatusClassName}
-                            selected={selected}
-                            onSelect={handleRunnerAction}
-                            disabled={disabled}
-                            compact
-                          />
-                        )
-                      )}
-                      {!placedItemViews.length ? (
-                        <div className="min-h-12 rounded-lg border border-dashed bg-muted/10 p-3" />
-                      ) : null}
-                    </div>
-                  </div>
-                );
-              }
-            )}
-          </div>
+                )}
+                {!placedItemViews.length ? (
+                  <div
+                    aria-hidden="true"
+                    className="min-h-14 rounded-xl border-2 border-dashed"
+                  />
+                ) : null}
+              </div>
+            )
+          )}
         </div>
       </div>
-      <GroupSortBoardHandoff view={handoffView} />
-    </>
-  );
-}
-
-function GroupSortBoardHandoff({ view }: { view: GroupSortBoardHandoffView }) {
-  const titleId = 'group-sort-board-handoff-title';
-  const descriptionId = 'group-sort-board-handoff-description';
-
-  return (
-    <section
-      aria-describedby={descriptionId}
-      aria-labelledby={titleId}
-      className="sr-only"
-      data-handoff="group-sort-board"
-      data-handoff-scope={view.privacy.scope}
-    >
-      <h2 id={titleId}>{view.title}</h2>
-      <p id={descriptionId}>{view.description}</p>
-      <dl>
-        {view.itemViews.map((item) => (
-          <GroupSortBoardHandoffItem item={item} key={item.id} />
-        ))}
-      </dl>
-    </section>
-  );
-}
-
-function GroupSortBoardHandoffItem({
-  item,
-}: {
-  item: GroupSortBoardHandoffItemView;
-}) {
-  const labelId = `group-sort-board-handoff-${item.id}-label`;
-  const valueId = `group-sort-board-handoff-${item.id}-value`;
-  const descriptionId = `group-sort-board-handoff-${item.id}-description`;
-
-  return (
-    <div data-handoff-item={item.id}>
-      <dt id={labelId}>{item.label}</dt>
-      <dd>
-        <output
-          aria-describedby={descriptionId}
-          aria-label={item.ariaLabel}
-          aria-labelledby={`${labelId} ${valueId}`}
-          id={valueId}
-        >
-          {item.value}
-        </output>
-        <span id={descriptionId}>{item.description}</span>
-      </dd>
     </div>
   );
 }
@@ -306,20 +232,25 @@ function GroupSortItemButton({
       type="button"
       disabled={disabled}
       className={cn(
-        'w-full rounded-lg border bg-background p-3 text-left transition-colors',
-        'hover:border-primary/50 hover:bg-primary/5 disabled:cursor-default disabled:opacity-100',
-        selected && 'border-primary bg-primary/10',
-        reviewStatusClassName,
-        compact && 'p-2'
+        RUNNER_TILE,
+        compact && 'min-h-12 py-2',
+        selected && RUNNER_TILE_SELECTED,
+        reviewStatusClassName
       )}
       onClick={() => onSelect(action)}
     >
-      <div className="flex items-start justify-between gap-2">
-        <p className="text-sm font-medium">{item.prompt}</p>
+      <div className="flex items-start justify-between gap-3">
+        <span>{item.prompt}</span>
         {selected ? (
-          <IconCheck className="mt-0.5 size-4 text-primary" />
+          <IconCheck
+            aria-hidden="true"
+            className="mt-1 size-5 shrink-0 text-primary"
+          />
         ) : (
-          <IconCircle className="mt-0.5 size-4 text-muted-foreground" />
+          <IconCircle
+            aria-hidden="true"
+            className="mt-1 size-5 shrink-0 text-muted-foreground"
+          />
         )}
       </div>
       {revealAnswer && reviewItem ? (

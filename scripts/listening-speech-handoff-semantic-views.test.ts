@@ -276,7 +276,7 @@ test('listening speech handoff localizes Chinese speech boundaries', () => {
   }
 });
 
-test('listening runner attaches the speech handoff to the component', () => {
+test('listening runner renders inside the shared board frame without hidden handoff DOM', () => {
   const source = readFileSync(
     'src/components/activities/listening-runner.tsx',
     'utf8'
@@ -284,12 +284,15 @@ test('listening runner attaches the speech handoff to the component', () => {
 
   assert.match(
     source,
-    /buildListeningSpeechHandoffView[\s\S]*disabled,[\s\S]*language,[\s\S]*promptView: activePromptView,[\s\S]*revealAnswer,[\s\S]*runnerView,[\s\S]*speechSupported,/
+    /RUNNER_BOARD_FRAME/,
+    'listening runner should use the shared student runner board frame.'
   );
-  assert.match(source, /data-handoff="listening-speech"/);
-  assert.match(
+  // docs/design.md: screen-reader-only text describes the visible UI and must
+  // not add audit detail, so student boards render no hidden handoff output.
+  assert.doesNotMatch(
     source,
-    /ListeningSpeechHandoffView[\s\S]*ListeningSpeechHandoffItemView[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*aria-labelledby=\{titleId\}[\s\S]*data-handoff="listening-speech"[\s\S]*data-handoff-scope=\{view\.privacy\.scope\}[\s\S]*view\.itemViews\.map\(\(item\) =>[\s\S]*ListeningSpeechHandoffItem[\s\S]*function ListeningSpeechHandoffItem[\s\S]*item: ListeningSpeechHandoffItemView[\s\S]*const labelId = `listening-speech-handoff-\$\{item\.id\}-label`[\s\S]*const valueId = `listening-speech-handoff-\$\{item\.id\}-value`[\s\S]*const descriptionId = `listening-speech-handoff-\$\{item\.id\}-description`[\s\S]*data-handoff-item=\{item\.id\}[\s\S]*id=\{labelId\}[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*aria-label=\{item\.ariaLabel\}[\s\S]*aria-labelledby=\{`\$\{labelId\} \$\{valueId\}`\}[\s\S]*id=\{valueId\}[\s\S]*id=\{descriptionId\}/
+    /data-handoff=/,
+    'listening runner should not render hidden audit handoff output.'
   );
 });
 

@@ -4,11 +4,6 @@ import type {
 } from '@/assignments/public';
 import { getActivityRunnerKindCopy } from '@/activities/runner-copy';
 import {
-  buildOpenBoxRevealHandoffView,
-  type OpenBoxRevealHandoffItemView,
-  type OpenBoxRevealHandoffView,
-} from '@/assignments/open-box-reveal-handoff';
-import {
   buildSequentialStudentRunnerView,
   getInitialSequentialStudentRunnerActiveItemId,
   resolveSequentialStudentRunnerActiveItemId,
@@ -16,9 +11,13 @@ import {
   type SequentialStudentRunnerNavigationAction,
 } from '@/assignments/student-runner-view';
 import { PublicAnswerFeedback } from '@/components/activities/public-answer-feedback';
-import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import {
+  RUNNER_BOARD_FRAME,
+  RUNNER_BOARD_HELP,
+} from '@/components/activities/runner-board-styles';
+import { m } from '@/locale/paraglide/messages';
 import { cn } from '@/lib/utils';
 import {
   IconArrowLeft,
@@ -80,15 +79,6 @@ export function OpenBoxRunner({
     ]
   );
   const { activeItem, navigationView, sequenceView } = runnerView;
-  const revealHandoffView = useMemo(
-    () =>
-      buildOpenBoxRevealHandoffView({
-        disabled,
-        revealAnswer,
-        runnerView,
-      }),
-    [disabled, revealAnswer, runnerView]
-  );
 
   function handleNavigationAction(
     action: SequentialStudentRunnerNavigationAction
@@ -103,170 +93,123 @@ export function OpenBoxRunner({
   }
 
   if (!activeItem) {
-    return <OpenBoxRevealHandoff view={revealHandoffView} />;
+    return null;
   }
 
   return (
-    <>
-      <OpenBoxRevealHandoff view={revealHandoffView} />
-      <div className="rounded-lg border bg-card p-3">
-        <div className="flex flex-wrap items-center justify-between gap-2">
-          <div className="flex items-center gap-2 text-sm font-medium">
-            <IconBox className="size-4 text-primary" />
-            {copy.title}
-          </div>
-          <Badge variant="outline" className="rounded-md">
-            {runnerView.progressLabel}
-          </Badge>
+    <div className={RUNNER_BOARD_FRAME}>
+      {copy.helpText ? (
+        <p className={RUNNER_BOARD_HELP}>{copy.helpText}</p>
+      ) : null}
+
+      <div className="grid gap-5 lg:grid-cols-[minmax(12rem,16rem)_minmax(0,1fr)]">
+        <div className="grid grid-cols-3 content-start gap-3 sm:grid-cols-4 lg:grid-cols-2">
+          {navigationView.itemViews.map((itemView, boxIndex) => {
+            const {
+              answered,
+              item,
+              reviewStatusClassName,
+              selected,
+              sequenceLabel,
+            } = itemView;
+
+            return (
+              <button
+                key={item.id}
+                type="button"
+                aria-current={selected ? 'step' : undefined}
+                className={cn(
+                  'flex aspect-square min-h-16 flex-col items-center justify-center gap-1 rounded-xl p-2 font-semibold text-base text-play-foreground',
+                  'shadow-[0_4px_0_rgb(0_0_0/0.18)] transition-[transform,box-shadow,opacity] active:translate-y-0.5 active:shadow-none',
+                  'focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-ring/60',
+                  OPEN_BOX_COLORS[boxIndex % OPEN_BOX_COLORS.length],
+                  answered && !selected && 'opacity-60',
+                  selected &&
+                    'ring-4 ring-foreground/75 ring-offset-2 ring-offset-background',
+                  reviewStatusClassName && 'ring-2',
+                  reviewStatusClassName
+                )}
+                onClick={() => handleNavigationAction(itemView.selectAction)}
+              >
+                {answered ? (
+                  <IconCheck aria-hidden="true" className="size-6" />
+                ) : (
+                  <IconBox aria-hidden="true" className="size-6" />
+                )}
+                <span className="text-sm">{sequenceLabel}</span>
+              </button>
+            );
+          })}
         </div>
 
-        <div className="mt-3 grid gap-3 lg:grid-cols-[minmax(12rem,18rem)_minmax(0,1fr)]">
-          <div className="grid content-start gap-2">
-            {navigationView.itemViews.map((itemView) => {
-              const {
-                answered,
-                item,
-                reviewStatusClassName,
-                selected,
-                sequenceLabel,
-              } = itemView;
-
-              return (
-                <button
-                  key={item.id}
-                  type="button"
-                  className={cn(
-                    'min-h-14 rounded-lg border bg-background p-3 text-left transition-colors',
-                    'hover:border-primary/50 hover:bg-primary/5',
-                    selected && 'border-primary bg-primary/10',
-                    reviewStatusClassName
-                  )}
-                  onClick={() => handleNavigationAction(itemView.selectAction)}
-                >
-                  <div className="flex items-center justify-between gap-2">
-                    <span className="text-sm font-medium">{sequenceLabel}</span>
-                    {answered ? (
-                      <IconCheck className="size-4 text-primary" />
-                    ) : (
-                      <IconBox className="size-4 text-muted-foreground" />
-                    )}
-                  </div>
-                </button>
-              );
-            })}
+        <div
+          className={cn(
+            'grid content-start gap-5 rounded-xl border-2 p-5',
+            navigationView.activePanelStatusClassName
+          )}
+        >
+          <div className="flex flex-wrap items-center justify-between gap-2">
+            <p className="font-semibold text-muted-foreground text-sm">
+              {sequenceView.activeLabel}
+            </p>
+            <div className="flex items-center gap-2">
+              <Button
+                type="button"
+                variant="outline"
+                size="icon"
+                aria-label={m.student_play_previous()}
+                disabled={!navigationView.canMove}
+                onClick={() =>
+                  handleNavigationAction(navigationView.previousAction)
+                }
+              >
+                <IconArrowLeft className="size-4" />
+              </Button>
+              <Button
+                type="button"
+                variant="outline"
+                size="icon"
+                aria-label={m.student_play_next()}
+                disabled={!navigationView.canMove}
+                onClick={() =>
+                  handleNavigationAction(navigationView.nextAction)
+                }
+              >
+                <IconArrowRight className="size-4" />
+              </Button>
+            </div>
           </div>
 
-          <div
-            className={cn(
-              'rounded-lg border bg-background p-4',
-              navigationView.activePanelStatusClassName
-            )}
-          >
-            <div className="flex flex-wrap items-center justify-between gap-2">
-              <Badge variant="secondary" className="rounded-md">
-                {sequenceView.activeLabel}
-              </Badge>
-              <div className="flex items-center gap-2">
-                <Button
-                  type="button"
-                  variant="outline"
-                  size="icon"
-                  disabled={!navigationView.canMove}
-                  onClick={() =>
-                    handleNavigationAction(navigationView.previousAction)
-                  }
-                >
-                  <IconArrowLeft className="size-4" />
-                </Button>
-                <Button
-                  type="button"
-                  variant="outline"
-                  size="icon"
-                  disabled={!navigationView.canMove}
-                  onClick={() =>
-                    handleNavigationAction(navigationView.nextAction)
-                  }
-                >
-                  <IconArrowRight className="size-4" />
-                </Button>
-              </div>
-            </div>
+          <h2 className="text-balance font-bold text-2xl leading-snug">
+            {activeItem.prompt}
+          </h2>
 
-            <div className="mt-6 rounded-lg border bg-muted/20 p-4">
-              <p className="text-base font-semibold leading-7">
-                {activeItem.prompt}
-              </p>
-            </div>
+          <Input
+            value={runnerView.activeAnswer}
+            disabled={disabled}
+            aria-label={activeItem.prompt}
+            onChange={(event) =>
+              onAnswerChange(activeItem.id, event.target.value)
+            }
+            placeholder={copy.inputPlaceholder}
+            className="h-14 text-lg md:text-lg"
+          />
 
-            <Input
-              value={runnerView.activeAnswer}
-              disabled={disabled}
-              onChange={(event) =>
-                onAnswerChange(activeItem.id, event.target.value)
-              }
-              placeholder={copy.inputPlaceholder}
-              className="mt-4"
+          {revealAnswer && runnerView.activeReviewItem ? (
+            <PublicAnswerFeedback
+              correctLabel={copy.correctAnswerLabel}
+              reviewItem={runnerView.activeReviewItem}
             />
-
-            {revealAnswer && runnerView.activeReviewItem ? (
-              <PublicAnswerFeedback
-                correctLabel={copy.correctAnswerLabel}
-                reviewItem={runnerView.activeReviewItem}
-              />
-            ) : null}
-          </div>
+          ) : null}
         </div>
       </div>
-    </>
-  );
-}
-
-function OpenBoxRevealHandoff({ view }: { view: OpenBoxRevealHandoffView }) {
-  const titleId = 'open-box-reveal-handoff-title';
-  const descriptionId = 'open-box-reveal-handoff-description';
-
-  return (
-    <section
-      aria-describedby={descriptionId}
-      aria-labelledby={titleId}
-      className="sr-only"
-      data-handoff="open-box-reveal-card"
-      data-handoff-scope={view.privacy.scope}
-    >
-      <h2 id={titleId}>{view.title}</h2>
-      <p id={descriptionId}>{view.description}</p>
-      <dl>
-        {view.itemViews.map((item) => (
-          <OpenBoxRevealHandoffItem item={item} key={item.id} />
-        ))}
-      </dl>
-    </section>
-  );
-}
-
-function OpenBoxRevealHandoffItem({
-  item,
-}: {
-  item: OpenBoxRevealHandoffItemView;
-}) {
-  const labelId = `open-box-reveal-handoff-${item.id}-label`;
-  const valueId = `open-box-reveal-handoff-${item.id}-value`;
-  const descriptionId = `open-box-reveal-handoff-${item.id}-description`;
-
-  return (
-    <div data-handoff-item={item.id}>
-      <dt id={labelId}>{item.label}</dt>
-      <dd>
-        <output
-          aria-describedby={descriptionId}
-          aria-label={item.ariaLabel}
-          aria-labelledby={`${labelId} ${valueId}`}
-          id={valueId}
-        >
-          {item.value}
-        </output>
-        <span id={descriptionId}>{item.description}</span>
-      </dd>
     </div>
   );
 }
+
+const OPEN_BOX_COLORS = [
+  'bg-play-1',
+  'bg-play-2',
+  'bg-play-3',
+  'bg-play-4',
+] as const;

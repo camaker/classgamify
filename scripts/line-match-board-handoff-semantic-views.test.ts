@@ -250,7 +250,7 @@ test('line-match board handoff localizes Chinese connection boundaries', () => {
   }
 });
 
-test('line-match board attaches the connection-board handoff to the component', () => {
+test('line-match board renders inside the shared board frame without hidden handoff DOM', () => {
   const source = readFileSync(
     'src/components/activities/line-match-board.tsx',
     'utf8'
@@ -258,12 +258,15 @@ test('line-match board attaches the connection-board handoff to the component', 
 
   assert.match(
     source,
-    /buildLineMatchBoardHandoffView[\s\S]*disabled,[\s\S]*revealAnswer,[\s\S]*runnerView,/
+    /RUNNER_BOARD_FRAME/,
+    'line-match board should use the shared student runner board frame.'
   );
-  assert.match(source, /data-handoff="line-match-board"/);
-  assert.match(
+  // docs/design.md: screen-reader-only text describes the visible UI and must
+  // not add audit detail, so student boards render no hidden handoff output.
+  assert.doesNotMatch(
     source,
-    /LineMatchBoardHandoffItemView[\s\S]*LineMatchBoardHandoffView[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*aria-labelledby=\{titleId\}[\s\S]*data-handoff="line-match-board"[\s\S]*data-handoff-scope=\{view\.privacy\.scope\}[\s\S]*view\.itemViews\.map\(\(item\) =>[\s\S]*LineMatchBoardHandoffItem[\s\S]*function LineMatchBoardHandoffItem[\s\S]*const labelId = `line-match-board-handoff-\$\{item\.id\}-label`[\s\S]*const valueId = `line-match-board-handoff-\$\{item\.id\}-value`[\s\S]*const descriptionId = `line-match-board-handoff-\$\{item\.id\}-description`[\s\S]*data-handoff-item=\{item\.id\}[\s\S]*id=\{labelId\}[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*aria-label=\{item\.ariaLabel\}[\s\S]*aria-labelledby=\{`\$\{labelId\} \$\{valueId\}`\}[\s\S]*id=\{valueId\}[\s\S]*id=\{descriptionId\}/
+    /data-handoff=/,
+    'line-match board should not render hidden audit handoff output.'
   );
 });
 

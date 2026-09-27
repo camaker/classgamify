@@ -8654,5 +8654,8 @@
   "student_play_previous": "السابق",
   "student_play_next": "التالي",
   "student_play_go_to_question": "انتقل إلى السؤال {number}",
-  "student_play_rules_toggle": "كل قواعد الواجب"
+  "student_play_rules_toggle": "كل قواعد الواجب",
+  "activity_runner_group_sort_help": "اضغط على عنصر، ثم اضغط على المجموعة التي ينتمي إليها.",
+  "activity_runner_matching_pairs_help": "اضغط على بطاقة في اليسار، ثم اضغط على البطاقة المطابقة لها في اليمين.",
+  "activity_runner_open_box_help": "اضغط على صندوق لفتحه، ثم اكتب إجابتك."
 }

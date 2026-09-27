@@ -10,16 +10,17 @@ import {
   resolveSequentialStudentRunnerNavigationAction,
   type SequentialStudentRunnerNavigationAction,
 } from '@/assignments/student-runner-view';
-import {
-  buildListeningSpeechHandoffView,
-  type ListeningSpeechHandoffItemView,
-  type ListeningSpeechHandoffView,
-} from '@/assignments/listening-speech-handoff';
 import { buildListeningPromptView } from '@/activities/listening-speech';
 import { PublicAnswerFeedback } from '@/components/activities/public-answer-feedback';
-import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import {
+  RUNNER_BOARD_FRAME,
+  RUNNER_BOARD_HELP,
+  RUNNER_TILE,
+  RUNNER_TILE_ANSWERED,
+  RUNNER_TILE_SELECTED,
+} from '@/components/activities/runner-board-styles';
 import { cn } from '@/lib/utils';
 import {
   IconCheck,
@@ -109,25 +110,6 @@ export function ListeningRunner({
         : undefined,
     [activeItem, language, revealAnswer, speechSupported]
   );
-  const speechHandoffView = useMemo(
-    () =>
-      buildListeningSpeechHandoffView({
-        disabled,
-        language,
-        promptView: activePromptView,
-        revealAnswer,
-        runnerView,
-        speechSupported,
-      }),
-    [
-      activePromptView,
-      disabled,
-      language,
-      revealAnswer,
-      runnerView,
-      speechSupported,
-    ]
-  );
 
   useEffect(() => {
     setSpeechSupported(
@@ -167,235 +149,162 @@ export function ListeningRunner({
   const describedBy = `${helpId} ${statusId}`;
 
   return (
-    <>
-      <div className="rounded-lg border bg-card p-3">
-        <div className="flex flex-wrap items-center justify-between gap-2">
-          <div className="flex items-center gap-2 text-sm font-medium">
-            <IconVolume className="size-4 text-primary" />
-            {copy.title}
-          </div>
-          <Badge variant="outline" className="rounded-md">
-            {runnerView.progressLabel}
-          </Badge>
+    <div className={RUNNER_BOARD_FRAME}>
+      <div className="grid gap-5 lg:grid-cols-[minmax(12rem,16rem)_minmax(0,1fr)]">
+        <div className="grid content-start gap-3">
+          {navigationView.itemViews.map((itemView) => {
+            const {
+              answered,
+              item,
+              reviewStatusClassName,
+              selected,
+              sequenceLabel,
+            } = itemView;
+
+            return (
+              <button
+                key={item.id}
+                type="button"
+                aria-current={selected ? 'step' : undefined}
+                className={cn(
+                  RUNNER_TILE,
+                  answered && RUNNER_TILE_ANSWERED,
+                  selected && RUNNER_TILE_SELECTED,
+                  reviewStatusClassName
+                )}
+                onClick={() => handleNavigationAction(itemView.selectAction)}
+              >
+                <div className="flex items-center justify-between gap-2">
+                  <span>{sequenceLabel}</span>
+                  {answered ? (
+                    <IconCheck
+                      aria-hidden="true"
+                      className="size-5 shrink-0 text-primary"
+                    />
+                  ) : (
+                    <IconVolume
+                      aria-hidden="true"
+                      className="size-5 shrink-0 text-muted-foreground"
+                    />
+                  )}
+                </div>
+              </button>
+            );
+          })}
         </div>
 
-        <div className="mt-3 grid gap-3 lg:grid-cols-[minmax(12rem,18rem)_minmax(0,1fr)]">
-          <div className="grid content-start gap-2">
-            {navigationView.itemViews.map((itemView) => {
-              const {
-                answered,
-                item,
-                reviewStatusClassName,
-                selected,
-                sequenceLabel,
-              } = itemView;
+        <div
+          className={cn(
+            'grid content-start gap-5 rounded-xl border-2 p-5',
+            navigationView.activePanelStatusClassName
+          )}
+        >
+          <p className="font-semibold text-muted-foreground text-sm">
+            {sequenceView.activeLabel}
+          </p>
 
-              return (
-                <button
-                  key={item.id}
-                  type="button"
-                  className={cn(
-                    'min-h-14 rounded-lg border bg-background p-3 text-left transition-colors',
-                    'hover:border-primary/50 hover:bg-primary/5',
-                    selected && 'border-primary bg-primary/10',
-                    reviewStatusClassName
-                  )}
-                  onClick={() => handleNavigationAction(itemView.selectAction)}
-                >
-                  <div className="flex items-center justify-between gap-2">
-                    <span className="text-sm font-medium">{sequenceLabel}</span>
-                    {answered ? (
-                      <IconCheck className="size-4 text-primary" />
-                    ) : (
-                      <IconVolume className="size-4 text-muted-foreground" />
-                    )}
-                  </div>
-                </button>
-              );
-            })}
-          </div>
-
-          <div
-            className={cn(
-              'rounded-lg border bg-background p-4',
-              navigationView.activePanelStatusClassName
-            )}
+          <Button
+            type="button"
+            size="lg"
+            className="h-16 w-full text-lg sm:w-fit sm:px-8"
+            aria-describedby={`${playDescriptionId} ${describedBy}`}
+            disabled={!speechSupported}
+            onClick={playPrompt}
           >
-            <div className="flex flex-wrap items-center justify-between gap-2">
-              <Badge variant="secondary" className="rounded-md">
-                {sequenceView.activeLabel}
-              </Badge>
-              <Button
-                type="button"
-                variant="outline"
-                aria-describedby={`${playDescriptionId} ${describedBy}`}
-                disabled={!speechSupported}
-                onClick={playPrompt}
-              >
-                {speechSupported ? (
-                  <IconPlayerPlay className="size-4" />
-                ) : (
-                  <IconVolumeOff className="size-4" />
-                )}
-                {copy.playAudioLabel}
-              </Button>
-            </div>
-
-            <p id={playDescriptionId} className="sr-only">
-              {
-                activePromptView?.statusItemViews.find(
-                  (itemView) => itemView.id === 'speech'
-                )?.description
-              }
-            </p>
-
-            <div className="mt-6 rounded-lg border bg-muted/20 p-4">
-              <p className="text-xs font-medium uppercase text-muted-foreground">
-                {copy.listeningPromptLabel}
-              </p>
-              <p
-                id={helpId}
-                className="mt-2 text-sm leading-6 text-muted-foreground"
-              >
-                {copy.helpText}
-              </p>
-              {activePromptView ? (
-                <dl
-                  id={statusId}
-                  aria-label={copy.listeningReadinessLabel}
-                  className="mt-4 grid gap-2 sm:grid-cols-3"
-                >
-                  {activePromptView.statusItemViews.map((itemView) => (
-                    <div
-                      key={itemView.id}
-                      className="rounded-md border bg-background px-3 py-2"
-                    >
-                      <dt className="text-xs font-medium text-muted-foreground">
-                        {itemView.label}
-                      </dt>
-                      <dd className="mt-1 text-sm font-semibold">
-                        {itemView.value}
-                      </dd>
-                      <dd className="sr-only">{itemView.description}</dd>
-                    </div>
-                  ))}
-                </dl>
-              ) : null}
-              {activePromptView?.transcriptText ? (
-                <p className="mt-4 text-base font-semibold leading-7">
-                  {activePromptView.transcriptText}
-                </p>
-              ) : null}
-            </div>
-
-            {runnerView.activeChoiceViews.length ? (
-              <div className="mt-4 grid gap-2 sm:grid-cols-2">
-                {runnerView.activeChoiceViews.map((choiceView) => {
-                  return (
-                    <button
-                      key={choiceView.id}
-                      type="button"
-                      disabled={disabled}
-                      className={cn(
-                        'min-h-10 rounded-lg border bg-background px-3 py-2 text-left text-sm transition-colors',
-                        'hover:border-primary/50 hover:bg-primary/5 disabled:cursor-default disabled:opacity-100',
-                        choiceView.selected &&
-                          'border-primary bg-primary/10 text-primary'
-                      )}
-                      onClick={() =>
-                        onAnswerChange(activeItem.id, choiceView.choice)
-                      }
-                    >
-                      {choiceView.choice}
-                    </button>
-                  );
-                })}
-              </div>
+            {speechSupported ? (
+              <IconPlayerPlay className="size-6" />
             ) : (
-              <Input
-                value={runnerView.activeAnswer}
-                disabled={disabled}
-                aria-describedby={`${inputDescriptionId} ${describedBy}`}
-                onChange={(event) =>
-                  onAnswerChange(activeItem.id, event.target.value)
-                }
-                placeholder={copy.inputPlaceholder}
-                className="mt-4"
-              />
+              <IconVolumeOff className="size-6" />
             )}
+            {copy.playAudioLabel}
+          </Button>
 
-            <p id={inputDescriptionId} className="sr-only">
-              {
-                activePromptView?.statusItemViews.find(
-                  (itemView) => itemView.id === 'transcript'
-                )?.description
-              }
+          <p id={playDescriptionId} className="sr-only">
+            {
+              activePromptView?.statusItemViews.find(
+                (itemView) => itemView.id === 'speech'
+              )?.description
+            }
+          </p>
+
+          <p id={helpId} className={RUNNER_BOARD_HELP}>
+            {copy.helpText}
+          </p>
+
+          {activePromptView ? (
+            <dl
+              id={statusId}
+              aria-label={copy.listeningReadinessLabel}
+              className="flex flex-wrap gap-x-4 gap-y-1 text-muted-foreground text-sm"
+            >
+              {activePromptView.statusItemViews.map((itemView) => (
+                <div key={itemView.id} className="flex gap-1">
+                  <dt>{itemView.label}:</dt>
+                  <dd className="font-medium text-foreground">
+                    {itemView.value}
+                  </dd>
+                  <dd className="sr-only">{itemView.description}</dd>
+                </div>
+              ))}
+            </dl>
+          ) : null}
+
+          {activePromptView?.transcriptText ? (
+            <p className="rounded-lg bg-muted/50 p-4 font-semibold text-lg leading-8">
+              {activePromptView.transcriptText}
             </p>
+          ) : null}
 
-            {revealAnswer && runnerView.activeReviewItem ? (
-              <PublicAnswerFeedback
-                correctLabel={copy.correctAnswerLabel}
-                reviewItem={runnerView.activeReviewItem}
-              />
-            ) : null}
-          </div>
+          {runnerView.activeChoiceViews.length ? (
+            <div className="grid gap-3 sm:grid-cols-2">
+              {runnerView.activeChoiceViews.map((choiceView) => {
+                return (
+                  <button
+                    key={choiceView.id}
+                    type="button"
+                    disabled={disabled}
+                    className={cn(
+                      RUNNER_TILE,
+                      choiceView.selected && RUNNER_TILE_SELECTED
+                    )}
+                    onClick={() =>
+                      onAnswerChange(activeItem.id, choiceView.choice)
+                    }
+                  >
+                    {choiceView.choice}
+                  </button>
+                );
+              })}
+            </div>
+          ) : (
+            <Input
+              value={runnerView.activeAnswer}
+              disabled={disabled}
+              aria-describedby={`${inputDescriptionId} ${describedBy}`}
+              onChange={(event) =>
+                onAnswerChange(activeItem.id, event.target.value)
+              }
+              placeholder={copy.inputPlaceholder}
+              className="h-14 text-lg md:text-lg"
+            />
+          )}
+
+          <p id={inputDescriptionId} className="sr-only">
+            {
+              activePromptView?.statusItemViews.find(
+                (itemView) => itemView.id === 'transcript'
+              )?.description
+            }
+          </p>
+
+          {revealAnswer && runnerView.activeReviewItem ? (
+            <PublicAnswerFeedback
+              correctLabel={copy.correctAnswerLabel}
+              reviewItem={runnerView.activeReviewItem}
+            />
+          ) : null}
         </div>
       </div>
-      <ListeningSpeechHandoff view={speechHandoffView} />
-    </>
-  );
-}
-
-function ListeningSpeechHandoff({
-  view,
-}: {
-  view: ListeningSpeechHandoffView;
-}) {
-  const titleId = 'listening-speech-handoff-title';
-  const descriptionId = 'listening-speech-handoff-description';
-
-  return (
-    <section
-      aria-describedby={descriptionId}
-      aria-labelledby={titleId}
-      className="sr-only"
-      data-handoff="listening-speech"
-      data-handoff-scope={view.privacy.scope}
-    >
-      <h2 id={titleId}>{view.title}</h2>
-      <p id={descriptionId}>{view.description}</p>
-      <dl>
-        {view.itemViews.map((item) => (
-          <ListeningSpeechHandoffItem item={item} key={item.id} />
-        ))}
-      </dl>
-    </section>
-  );
-}
-
-function ListeningSpeechHandoffItem({
-  item,
-}: {
-  item: ListeningSpeechHandoffItemView;
-}) {
-  const labelId = `listening-speech-handoff-${item.id}-label`;
-  const valueId = `listening-speech-handoff-${item.id}-value`;
-  const descriptionId = `listening-speech-handoff-${item.id}-description`;
-
-  return (
-    <div data-handoff-item={item.id}>
-      <dt id={labelId}>{item.label}</dt>
-      <dd>
-        <output
-          aria-describedby={descriptionId}
-          aria-label={item.ariaLabel}
-          aria-labelledby={`${labelId} ${valueId}`}
-          id={valueId}
-        >
-          {item.value}
-        </output>
-        <span id={descriptionId}>{item.description}</span>
-      </dd>
     </div>
   );
 }
