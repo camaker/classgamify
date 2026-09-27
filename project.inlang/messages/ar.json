@@ -8657,5 +8657,7 @@
   "student_play_rules_toggle": "كل قواعد الواجب",
   "activity_runner_group_sort_help": "اضغط على عنصر، ثم اضغط على المجموعة التي ينتمي إليها.",
   "activity_runner_matching_pairs_help": "اضغط على بطاقة في اليسار، ثم اضغط على البطاقة المطابقة لها في اليمين.",
-  "activity_runner_open_box_help": "اضغط على صندوق لفتحه، ثم اكتب إجابتك."
+  "activity_runner_open_box_help": "اضغط على صندوق لفتحه، ثم اكتب إجابتك.",
+  "assignment_results_settings_toggle": "إعدادات الواجب",
+  "assignment_results_export_menu": "النسخ والتصدير"
 }

@@ -8657,5 +8657,7 @@
   "student_play_rules_toggle": "查看全部作业规则",
   "activity_runner_group_sort_help": "先点一个词条，再点它所属的分组。",
   "activity_runner_matching_pairs_help": "先点左边的卡片，再点右边与它配对的卡片。",
-  "activity_runner_open_box_help": "点一个盒子打开它，然后输入你的答案。"
+  "activity_runner_open_box_help": "点一个盒子打开它，然后输入你的答案。",
+  "assignment_results_settings_toggle": "作业设置",
+  "assignment_results_export_menu": "复制与导出"
 }

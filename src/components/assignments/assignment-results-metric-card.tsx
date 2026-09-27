@@ -2,7 +2,6 @@ import type {
   AssignmentResultMetricItem,
   AssignmentResultMetricKey,
 } from '@/assignments/result-view';
-import { Card, CardContent } from '@/components/ui/card';
 import {
   IconCalendarTime,
   IconChartBar,
@@ -14,6 +13,7 @@ type AssignmentResultsMetricCardProps = {
   metric: AssignmentResultMetricItem;
 };
 
+/** One figure in the results summary row: label, big value. */
 export function AssignmentResultsMetricCard({
   metric,
 }: AssignmentResultsMetricCardProps) {
@@ -23,35 +23,34 @@ export function AssignmentResultsMetricCard({
   const descriptionId = `assignment-result-metric-${metric.key}-description`;
 
   return (
-    <Card
+    <article
       aria-describedby={descriptionId}
       aria-label={metric.ariaLabel}
       aria-labelledby={`${labelId} ${valueId}`}
-      className="rounded-lg"
-      role="article"
+      className="grid min-w-32 gap-1"
     >
-      <CardContent className="p-4">
-        <Icon aria-hidden="true" className="size-5 text-primary" />
-        <output
-          aria-describedby={descriptionId}
-          aria-label={metric.ariaLabel}
-          aria-labelledby={`${labelId} ${valueId}`}
-          className="mt-4 block"
-          id={valueId}
-        >
-          <span className="text-2xl font-semibold">{metric.value}</span>
-        </output>
-        <p id={labelId} className="text-sm text-muted-foreground">
-          {metric.label}
-        </p>
-        <p
-          id={descriptionId}
-          className="mt-2 text-xs leading-relaxed text-muted-foreground"
-        >
-          {metric.description}
-        </p>
-      </CardContent>
-    </Card>
+      <p
+        id={labelId}
+        className="flex items-center gap-1.5 text-muted-foreground text-sm"
+      >
+        <Icon aria-hidden="true" className="size-4" />
+        {metric.label}
+      </p>
+      <output
+        aria-describedby={descriptionId}
+        aria-label={metric.ariaLabel}
+        aria-labelledby={`${labelId} ${valueId}`}
+        className="block"
+        id={valueId}
+      >
+        <span className="font-bold text-3xl tabular-nums tracking-tight">
+          {metric.value}
+        </span>
+      </output>
+      <p id={descriptionId} className="sr-only">
+        {metric.description}
+      </p>
+    </article>
   );
 }
 

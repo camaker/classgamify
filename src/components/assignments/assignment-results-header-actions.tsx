@@ -12,12 +12,19 @@ import type {
   AssignmentResultHeaderShareAction,
 } from '@/assignments/result-view';
 import { buildAssignmentShareLinkHandoffView } from '@/assignments/share-link';
-import { Badge } from '@/components/ui/badge';
 import { AssignmentShareLinkHandoff } from '@/components/assignments/assignment-share-link-handoff';
 import { CopyAssignmentShareLinkButton } from '@/components/assignments/copy-assignment-share-link-button';
 import { Button, buttonVariants } from '@/components/ui/button';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
+import { m } from '@/locale/paraglide/messages';
 import { cn } from '@/lib/utils';
 import {
+  IconChevronDown,
   IconClipboardText,
   IconCopy,
   IconDownload,
@@ -35,6 +42,8 @@ type AssignmentResultsHeaderActionsProps = {
   resultActionsLabel: string;
   resultActions: AssignmentResultActionButton[];
   shareAction: AssignmentResultHeaderShareAction;
+  /** Copy and export actions only make sense once students have submitted. */
+  showResultActions?: boolean;
 };
 
 export function AssignmentResultsHeaderActions({
@@ -45,6 +54,7 @@ export function AssignmentResultsHeaderActions({
   resultActionsLabel,
   resultActions,
   shareAction,
+  showResultActions = true,
 }: AssignmentResultsHeaderActionsProps) {
   const shareDisabledReasonId =
     getAssignmentResultHeaderShareDisabledReasonId(shareAction);
@@ -58,31 +68,33 @@ export function AssignmentResultsHeaderActions({
   );
 
   return (
-    <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap">
+    <div className="flex flex-wrap items-center gap-2">
       <AssignmentShareLinkHandoff handoff={shareLinkHandoffView} />
-      <AssignmentResultsHeaderSharePreviewLink
-        disabledReasonId={shareDisabledReasonId}
-        sharePathDescriptionId={sharePathDescriptionId}
-        shareAction={shareAction}
-      />
-      <AssignmentResultsHeaderSharePath
-        descriptionId={sharePathDescriptionId}
-        shareAction={shareAction}
-      />
       <AssignmentResultsHeaderCopyShareAction
         disabledReasonId={shareDisabledReasonId}
         sharePathDescriptionId={sharePathDescriptionId}
         shareAction={shareAction}
       />
+      <AssignmentResultsHeaderSharePreviewLink
+        disabledReasonId={shareDisabledReasonId}
+        sharePathDescriptionId={sharePathDescriptionId}
+        shareAction={shareAction}
+      />
       <AssignmentResultsHeaderPrintActionLink printAction={printAction} />
+      {showResultActions ? (
+        <AssignmentResultsHeaderResultActions
+          onResultAction={onResultAction}
+          resultActionsLabel={resultActionsLabel}
+          resultActions={resultActions}
+        />
+      ) : null}
+      <AssignmentResultsHeaderSharePath
+        descriptionId={sharePathDescriptionId}
+        shareAction={shareAction}
+      />
       <AssignmentResultsHeaderShareDisabledReason
         disabledReasonId={shareDisabledReasonId}
         shareAction={shareAction}
-      />
-      <AssignmentResultsHeaderResultActions
-        onResultAction={onResultAction}
-        resultActionsLabel={resultActionsLabel}
-        resultActions={resultActions}
       />
       <AssignmentResultsMaterialHandoff
         materialHandoffView={materialHandoffView}
@@ -165,7 +177,7 @@ function AssignmentResultsHeaderSharePath({
     <section
       aria-labelledby={shareUrlLabelId}
       aria-describedby={descriptionId}
-      className="flex min-h-8 max-w-full flex-wrap items-center gap-2 rounded-lg border bg-muted/30 px-3 py-2 text-sm text-muted-foreground"
+      className="sr-only"
     >
       <IconShare3 aria-hidden="true" className="size-4" />
       <span id={shareUrlLabelId} className="font-medium">
@@ -300,18 +312,29 @@ function AssignmentResultsHeaderResultActions({
   resultActions: AssignmentResultActionButton[];
 }) {
   return (
-    <section
-      aria-label={resultActionsLabel}
-      className="grid basis-full gap-2 md:grid-cols-2 xl:grid-cols-5"
-    >
-      {resultActions.map((actionButton) => (
-        <AssignmentResultsHeaderResultActionButton
-          actionButton={actionButton}
-          key={actionButton.id}
-          disabledReasonId={getResultActionDisabledReasonId(actionButton)}
-          onClick={() => onResultAction(actionButton)}
-        />
-      ))}
+    <section aria-label={resultActionsLabel}>
+      <DropdownMenu>
+        <DropdownMenuTrigger
+          className={cn(
+            buttonVariants({ variant: 'outline' }),
+            'bg-background'
+          )}
+        >
+          <IconDownload aria-hidden="true" className="size-4" />
+          {m.assignment_results_export_menu()}
+          <IconChevronDown aria-hidden="true" className="size-4" />
+        </DropdownMenuTrigger>
+        <DropdownMenuContent align="end" className="w-80 p-1.5">
+          {resultActions.map((actionButton) => (
+            <AssignmentResultsHeaderResultActionButton
+              actionButton={actionButton}
+              key={actionButton.id}
+              disabledReasonId={getResultActionDisabledReasonId(actionButton)}
+              onClick={() => onResultAction(actionButton)}
+            />
+          ))}
+        </DropdownMenuContent>
+      </DropdownMenu>
       <AssignmentResultsHeaderResultActionDisabledReasons
         resultActions={resultActions}
       />
@@ -330,97 +353,29 @@ function AssignmentResultsHeaderResultActionButton({
 }) {
   const Icon = resultActionIconByAction[actionButton.action];
   const actionDescriptionId = getResultActionDescriptionId(actionButton.id);
-  const scopeDescriptionId = getResultActionSummaryDescriptionId(
-    `${actionButton.id}-scope`
-  );
-  const statusDescriptionId = getResultActionSummaryDescriptionId(
-    `${actionButton.id}-status`
-  );
-  const describedBy = [
-    actionDescriptionId,
-    scopeDescriptionId,
-    statusDescriptionId,
-    disabledReasonId,
-  ]
+  const describedBy = [actionDescriptionId, disabledReasonId]
     .filter(Boolean)
     .join(' ');
 
   return (
-    <div className="grid min-w-0 gap-1">
-      <Button
-        type="button"
-        variant="outline"
-        className="w-full justify-start bg-background"
-        disabled={actionButton.disabled}
-        onClick={onClick}
-        aria-label={actionButton.ariaLabel}
-        aria-describedby={describedBy}
-      >
-        <Icon aria-hidden="true" className="size-4" />
-        {actionButton.label}
-      </Button>
-      <p
-        id={actionDescriptionId}
-        className="text-muted-foreground text-xs leading-snug"
-      >
-        {actionButton.description}
-      </p>
-      <dl className="grid gap-1 text-xs">
-        <AssignmentResultActionSummaryItem
-          ariaLabel={actionButton.scopeView.ariaLabel}
-          description={actionButton.scopeView.description}
-          id={`${actionButton.id}-scope`}
-          label={actionButton.scopeView.label}
-          value={actionButton.scopeView.value}
-        />
-        <AssignmentResultActionSummaryItem
-          ariaLabel={actionButton.statusView.ariaLabel}
-          description={actionButton.statusView.description}
-          id={`${actionButton.id}-status`}
-          label={actionButton.statusView.label}
-          tone={actionButton.statusView.tone}
-          value={actionButton.statusView.value}
-        />
-      </dl>
-    </div>
-  );
-}
-
-function AssignmentResultActionSummaryItem({
-  ariaLabel,
-  description,
-  id,
-  label,
-  tone,
-  value,
-}: {
-  ariaLabel: string;
-  description: string;
-  id: string;
-  label: string;
-  tone?: AssignmentResultActionButton['statusView']['tone'];
-  value: string;
-}) {
-  const descriptionId = getResultActionSummaryDescriptionId(id);
-
-  return (
-    <div className="grid gap-1">
-      <dt className="sr-only">{label}</dt>
-      <dd aria-describedby={descriptionId} className="min-w-0">
-        <Badge
-          data-tone={tone}
-          variant={tone === 'blocked' ? 'destructive' : 'secondary'}
-          className="max-w-full rounded-md"
+    <DropdownMenuItem
+      className="items-start gap-3 px-2.5 py-2"
+      disabled={actionButton.disabled}
+      onClick={onClick}
+      aria-label={actionButton.ariaLabel}
+      aria-describedby={describedBy}
+    >
+      <Icon aria-hidden="true" className="mt-0.5 size-4" />
+      <span className="grid gap-0.5">
+        <span className="font-medium text-sm">{actionButton.label}</span>
+        <span
+          id={actionDescriptionId}
+          className="text-muted-foreground text-xs leading-snug"
         >
-          <output aria-label={ariaLabel} className="truncate">
-            {value}
-          </output>
-        </Badge>
-      </dd>
-      <dd id={descriptionId} className="sr-only">
-        {description}
-      </dd>
-    </div>
+          {actionButton.description}
+        </span>
+      </span>
+    </DropdownMenuItem>
   );
 }
 
@@ -443,7 +398,7 @@ function AssignmentResultsHeaderResultActionDisabledReasons({
   if (disabledReasons.length === 0) return null;
 
   return (
-    <div className="grid gap-1 text-sm text-muted-foreground md:col-span-2 xl:col-span-5">
+    <div className="sr-only">
       {disabledReasons.map((disabledReason) => (
         <p
           id={getResultActionDisabledReasonId({
@@ -598,10 +553,6 @@ function getResultActionDisabledReasonId({
 
 function getResultActionDescriptionId(id: AssignmentResultActionButton['id']) {
   return `assignment-result-action-${id}-description`;
-}
-
-function getResultActionSummaryDescriptionId(id: string) {
-  return `assignment-result-action-summary-${id}-description`;
 }
 
 const resultActionIconByAction: Record<

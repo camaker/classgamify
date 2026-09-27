@@ -8657,5 +8657,7 @@
   "student_play_rules_toggle": "Alle Regeln der Aufgabe",
   "activity_runner_group_sort_help": "Tippe auf einen Begriff und dann auf die Gruppe, zu der er gehört.",
   "activity_runner_matching_pairs_help": "Tippe links auf eine Karte und dann rechts auf die passende Karte.",
-  "activity_runner_open_box_help": "Tippe auf eine Box, um sie zu öffnen, und schreibe dann deine Antwort."
+  "activity_runner_open_box_help": "Tippe auf eine Box, um sie zu öffnen, und schreibe dann deine Antwort.",
+  "assignment_results_settings_toggle": "Einstellungen der Aufgabe",
+  "assignment_results_export_menu": "Kopieren und exportieren"
 }

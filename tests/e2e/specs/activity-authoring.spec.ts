@@ -192,48 +192,35 @@ test.describe('activity authoring', () => {
     await expect(
       page.getByRole('heading', { name: assignmentTitle, exact: true }).first()
     ).toBeVisible();
-    const resultActions = page.getByLabel('Result actions', { exact: true });
-    await expect(
-      resultActions.getByText(
-        'Copy a compact class snapshot with metrics, reteach focus, and students who need follow-up.'
-      )
-    ).toBeVisible();
-    await expect(
-      resultActions.getByText(
-        'Copy a lesson-ready script for the weakest items and priority students.'
-      )
-    ).toBeVisible();
-    await expect(
-      resultActions.getByText(
-        'Copy prompt-level performance with expected answers, alternatives, and notes.'
-      )
-    ).toBeVisible();
-    await expect(
-      resultActions.getByText(
-        'Copy a student-by-student support list sorted by review need.'
-      )
-    ).toBeVisible();
-    await expect(
-      resultActions.getByText(
-        'Download gradebook-ready results with delivery policy and item-level answers.'
-      )
-    ).toBeVisible();
+    // Copy and export actions live in one menu next to the share actions.
+    const exportMenu = page.getByRole('button', {
+      name: 'Copy & export',
+      exact: true,
+    });
+    await exportMenu.click();
+    for (const description of [
+      'Copy a compact class snapshot with metrics, reteach focus, and students who need follow-up.',
+      'Copy a lesson-ready script for the weakest items and priority students.',
+      'Copy prompt-level performance with expected answers, alternatives, and notes.',
+      'Copy a student-by-student support list sorted by review need.',
+      'Download gradebook-ready results with delivery policy and item-level answers.',
+    ]) {
+      await expect(
+        page.getByRole('menuitem').filter({ hasText: description })
+      ).toBeVisible();
+    }
+    await page.keyboard.press('Escape');
 
     await expectThirtySliceHandoff(page, 'assignment-result-material');
     await expectThirtySliceHandoff(page, 'assignment-result-review');
-    await expectThirtySliceHandoff(page, 'assignment-copy-artifact');
 
+    // The first screen answers "what should I explain again?" and "who
+    // needs help?" before the detailed tables.
     await expect(
-      page.getByRole('heading', {
-        name: 'Ready to review the full class.',
-        exact: true,
-      })
+      page.getByRole('heading', { name: 'Reteach priorities', exact: true })
     ).toBeVisible();
     await expect(
-      page.getByRole('heading', { name: 'Current review scope', exact: true })
-    ).toBeVisible();
-    await expect(
-      page.getByRole('heading', { name: 'Classroom brief', exact: true })
+      page.getByRole('heading', { name: 'Student follow-up', exact: true })
     ).toBeVisible();
     await expect(
       page.getByRole('heading', { name: 'Item performance', exact: true })
@@ -291,7 +278,8 @@ test.describe('activity authoring', () => {
     await page
       .context()
       .grantPermissions(['clipboard-read', 'clipboard-write']);
-    await resultActions.getByRole('button', { name: /^Copy brief\./ }).click();
+    await exportMenu.click();
+    await page.getByRole('menuitem', { name: /^Copy brief\./ }).click();
     await expect(page.getByText('Classroom brief copied.')).toBeVisible();
     const copiedBrief = await page.evaluate(() =>
       navigator.clipboard.readText()
@@ -301,9 +289,8 @@ test.describe('activity authoring', () => {
     await expectNoBrowserErrors(monitor, 'teacher result clipboard action');
 
     const csvDownloadPromise = page.waitForEvent('download');
-    await resultActions
-      .getByRole('button', { name: /^Download CSV\./ })
-      .click();
+    await exportMenu.click();
+    await page.getByRole('menuitem', { name: /^Download CSV\./ }).click();
     const csvDownload = await csvDownloadPromise;
     expect(csvDownload.suggestedFilename()).toMatch(
       /classgamify-.*-results\.csv/

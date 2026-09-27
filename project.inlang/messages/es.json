@@ -8657,5 +8657,7 @@
   "student_play_rules_toggle": "Todas las reglas de la tarea",
   "activity_runner_group_sort_help": "Toca un elemento y luego toca el grupo al que pertenece.",
   "activity_runner_matching_pairs_help": "Toca una tarjeta a la izquierda y luego la tarjeta de la derecha que le corresponde.",
-  "activity_runner_open_box_help": "Toca una caja para abrirla y luego escribe tu respuesta."
+  "activity_runner_open_box_help": "Toca una caja para abrirla y luego escribe tu respuesta.",
+  "assignment_results_settings_toggle": "Ajustes de la tarea",
+  "assignment_results_export_menu": "Copiar y exportar"
 }

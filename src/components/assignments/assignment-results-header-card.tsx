@@ -1,62 +1,48 @@
-import type {
-  AssignmentResultActionButton,
-  AssignmentResultHeaderView,
-  AssignmentResultMaterialHandoffView,
-} from '@/assignments/result-view';
-import { AssignmentResultsHeaderActions } from '@/components/assignments/assignment-results-header-actions';
+import type { AssignmentResultHeaderView } from '@/assignments/result-view';
 import { AssignmentSettingsSummary } from '@/components/assignments/assignment-settings-summary';
 import { Badge } from '@/components/ui/badge';
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card';
+import { m } from '@/locale/paraglide/messages';
+import { IconChevronDown } from '@tabler/icons-react';
 
 type AssignmentResultsHeaderCardProps = {
   headerView: AssignmentResultHeaderView;
-  materialHandoffView: AssignmentResultMaterialHandoffView;
-  onResultAction: (actionButton: AssignmentResultActionButton) => void;
-  resultActions: AssignmentResultActionButton[];
 };
 
+/**
+ * Delivery settings for this assignment, collapsed by default: teachers
+ * set them when publishing and rarely need them while reviewing results.
+ */
 export function AssignmentResultsHeaderCard({
   headerView,
-  materialHandoffView,
-  onResultAction,
-  resultActions,
 }: AssignmentResultsHeaderCardProps) {
   return (
-    <Card className="rounded-lg">
-      <CardHeader>
-        <div className="flex flex-wrap items-center gap-2">
-          <Badge variant="secondary" className="rounded-md">
-            {headerView.statusLabel}
-          </Badge>
-          <Badge variant="outline" className="rounded-md">
-            {headerView.templateLabel}
-          </Badge>
-        </div>
-        <CardTitle>
-          <h2 className="text-lg font-semibold">{headerView.activityTitle}</h2>
-        </CardTitle>
-        <CardDescription>
-          <p>{headerView.activityDescription}</p>
-        </CardDescription>
-      </CardHeader>
-      <CardContent className="grid gap-4">
-        <AssignmentSettingsSummary view={headerView.settingsSummaryView} />
-        <AssignmentResultsHeaderActions
-          exportPreparationView={headerView.exportPreparationView}
-          materialHandoffView={materialHandoffView}
-          onResultAction={onResultAction}
-          printAction={headerView.printAction}
-          resultActionsLabel={headerView.resultActionsLabel}
-          resultActions={resultActions}
-          shareAction={headerView.shareAction}
+    <details className="group rounded-lg border bg-card">
+      <summary className="flex cursor-pointer list-none flex-wrap items-center gap-2 px-4 py-3 [&::-webkit-details-marker]:hidden">
+        <span className="font-medium text-sm">
+          {m.assignment_results_settings_toggle()}
+        </span>
+        <Badge variant="secondary" className="rounded-md">
+          {headerView.statusLabel}
+        </Badge>
+        <Badge variant="outline" className="rounded-md">
+          {headerView.templateLabel}
+        </Badge>
+        <IconChevronDown
+          aria-hidden="true"
+          className="ml-auto size-4 text-muted-foreground transition-transform group-open:rotate-180"
         />
-      </CardContent>
-    </Card>
+      </summary>
+      <div className="grid gap-3 border-t px-4 py-4">
+        <div>
+          <h2 className="font-semibold text-base">
+            {headerView.activityTitle}
+          </h2>
+          <p className="text-muted-foreground text-sm">
+            {headerView.activityDescription}
+          </p>
+        </div>
+        <AssignmentSettingsSummary view={headerView.settingsSummaryView} />
+      </div>
+    </details>
   );
 }

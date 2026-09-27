@@ -8657,5 +8657,7 @@
   "student_play_rules_toggle": "課題のルールをすべて見る",
   "activity_runner_group_sort_help": "項目をタップしてから、その項目が入るグループをタップします。",
   "activity_runner_matching_pairs_help": "左のカードをタップしてから、それと組になる右のカードをタップします。",
-  "activity_runner_open_box_help": "箱をタップして開け、答えを入力します。"
+  "activity_runner_open_box_help": "箱をタップして開け、答えを入力します。",
+  "assignment_results_settings_toggle": "課題の設定",
+  "assignment_results_export_menu": "コピーとエクスポート"
 }

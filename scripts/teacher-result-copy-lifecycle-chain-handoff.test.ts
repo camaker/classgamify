@@ -296,9 +296,15 @@ test('result page assembles scoped copy data without leaking copy text', () => {
     RESULT_VIEW_SOURCE,
     /buildTeacherResultsReviewChainHandoffView\(\)/
   );
+  // Copy artifacts are reached through the Copy & export menu; the page no
+  // longer repeats every copy preview inline.
   assert.match(
     RESULT_ROUTE_SOURCE,
-    /copyArtifactPreviews=\{pageView\.copyArtifactPreviews\}/
+    /<AssignmentResultsHeaderActions[\s\S]*resultActions=\{pageView\.actionButtons\}/
+  );
+  assert.doesNotMatch(
+    RESULT_ROUTE_SOURCE,
+    /<AssignmentResultsClassroomBriefCard\b/
   );
   assert.match(
     CLASSROOM_BRIEF_CARD_SOURCE,
