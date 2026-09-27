@@ -213,13 +213,13 @@ test('local persisted browser journey spec covers save through return', () => {
   );
   assert.match(
     ACTIVITY_AUTHORING_SPEC_SOURCE,
-    /Copy & export[\s\S]*assignment-result-material[\s\S]*assignment-result-review[\s\S]*Copy brief/,
-    'The journey should verify the result material and review handoff DOM, then copy through the Copy & export menu.'
+    /Copy & export[\s\S]*locator\('\[data-handoff\]'\)\)\.toHaveCount\(0\)[\s\S]*Scope status: Adjusted[\s\S]*Copy brief/,
+    'The journey should verify the results page renders no hidden audit sections, shows visible scope badges, then copies through the Copy & export menu.'
   );
   assert.match(
     ACTIVITY_AUTHORING_SPEC_SOURCE,
-    /Find student[\s\S]*Sort students[\s\S]*Sort items[\s\S]*Review view[\s\S]*student-search-status[\s\S]*answer-review-status/,
-    'The journey should verify result filter URL state and adjusted handoff status.'
+    /Find student[\s\S]*Sort students[\s\S]*Sort items[\s\S]*Review view[\s\S]*Scope status: Adjusted[\s\S]*toHaveCount\(4\)/,
+    'The journey should verify result filter URL state and the visible Adjusted scope badges.'
   );
   assert.match(
     ACTIVITY_AUTHORING_SPEC_SOURCE,
@@ -233,7 +233,7 @@ test('local persisted browser journey spec covers save through return', () => {
   );
   assert.match(
     ACTIVITY_AUTHORING_SPEC_SOURCE,
-    /Print worksheet[\s\S]*Hidden by default[\s\S]*printable-worksheet[\s\S]*Include answer key[\s\S]*answerKey=true[\s\S]*Teacher-only key included[\s\S]*Back to results/,
+    /Print worksheet[\s\S]*Hidden by default[\s\S]*toHaveCount\(0\)[\s\S]*Include answer key[\s\S]*answerKey=true[\s\S]*Teacher-only key included[\s\S]*Back to results/,
     'The journey should verify printable worksheet, explicit answer-key state, and return-to-results navigation.'
   );
   assert.match(
