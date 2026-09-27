@@ -285,7 +285,7 @@ function parseRows(raw: string | undefined, rowKind: ActivityContentRowKind) {
     });
 }
 
-function splitActivityContentRow(line: string) {
+export function splitActivityContentRow(line: string) {
   const separator = PRIMARY_ROW_SEPARATOR_PATTERN.test(line)
     ? PRIMARY_ROW_SEPARATOR_PATTERN
     : FALLBACK_ROW_SEPARATOR_PATTERN;

@@ -239,7 +239,7 @@ export function ActivityCreateForm({
   }
 
   return (
-    <Card className="overflow-hidden rounded-lg border-primary/10">
+    <Card className="rounded-lg">
       <ActivityEditorHeader
         modeView={modeView}
         template={templateView.template}

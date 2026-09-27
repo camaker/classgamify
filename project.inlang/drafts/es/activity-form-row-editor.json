@@ -1,0 +1,20 @@
+{
+  "activity_form_rows_add_group": "Añadir grupo",
+  "activity_form_rows_add_pair": "Añadir pareja",
+  "activity_form_rows_add_question": "Añadir pregunta",
+  "activity_form_rows_answer": "Respuesta correcta",
+  "activity_form_rows_edit_as_text": "Editar como texto",
+  "activity_form_rows_explanation": "Explicación (opcional)",
+  "activity_form_rows_group_items": "Elementos",
+  "activity_form_rows_group_label": "Grupo {number}",
+  "activity_form_rows_group_name": "Nombre del grupo",
+  "activity_form_rows_items_placeholder": "Separa los elementos con comas",
+  "activity_form_rows_left": "Término",
+  "activity_form_rows_options": "Opciones de respuesta",
+  "activity_form_rows_options_placeholder": "Separa las opciones con comas",
+  "activity_form_rows_pair_label": "Pareja {number}",
+  "activity_form_rows_prompt": "Pregunta",
+  "activity_form_rows_question_label": "Pregunta {number}",
+  "activity_form_rows_remove": "Quitar {label}",
+  "activity_form_rows_right": "Pareja"
+}

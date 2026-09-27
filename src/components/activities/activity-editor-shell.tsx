@@ -61,7 +61,7 @@ export function ActivityEditorFooter({
   showSaveAction,
 }: ActivityEditorFooterProps) {
   return (
-    <CardFooter className="mt-6 flex flex-col gap-3 border-t bg-muted/40 px-6 py-4 sm:flex-row sm:items-center sm:justify-between">
+    <CardFooter className="sticky bottom-0 z-10 mt-6 flex flex-col gap-3 rounded-b-lg border-t bg-background/95 px-6 py-4 backdrop-blur sm:flex-row sm:items-center sm:justify-between">
       <p className="text-sm text-muted-foreground">{modeView.footerHint}</p>
       {showSaveAction ? (
         <Button type="submit" disabled={isPending}>

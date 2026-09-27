@@ -1,0 +1,20 @@
+{
+  "activity_form_rows_add_group": "グループを追加",
+  "activity_form_rows_add_pair": "ペアを追加",
+  "activity_form_rows_add_question": "問題を追加",
+  "activity_form_rows_answer": "正解",
+  "activity_form_rows_edit_as_text": "テキストで編集",
+  "activity_form_rows_explanation": "解説（任意）",
+  "activity_form_rows_group_items": "項目",
+  "activity_form_rows_group_label": "グループ {number}",
+  "activity_form_rows_group_name": "グループ名",
+  "activity_form_rows_items_placeholder": "項目はカンマで区切ります",
+  "activity_form_rows_left": "語句",
+  "activity_form_rows_options": "選択肢",
+  "activity_form_rows_options_placeholder": "選択肢はカンマで区切ります",
+  "activity_form_rows_pair_label": "ペア {number}",
+  "activity_form_rows_prompt": "問題文",
+  "activity_form_rows_question_label": "問題 {number}",
+  "activity_form_rows_remove": "{label}を削除",
+  "activity_form_rows_right": "対応する語"
+}

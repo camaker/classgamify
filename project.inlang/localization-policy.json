@@ -884,6 +884,26 @@
       "activity_form_toast_local_draft_generated"
     ],
     "activity-form-review-step": ["activity_form_step_review_title"],
+    "activity-form-row-editor": [
+      "activity_form_rows_add_group",
+      "activity_form_rows_add_pair",
+      "activity_form_rows_add_question",
+      "activity_form_rows_answer",
+      "activity_form_rows_edit_as_text",
+      "activity_form_rows_explanation",
+      "activity_form_rows_group_items",
+      "activity_form_rows_group_label",
+      "activity_form_rows_group_name",
+      "activity_form_rows_items_placeholder",
+      "activity_form_rows_left",
+      "activity_form_rows_options",
+      "activity_form_rows_options_placeholder",
+      "activity_form_rows_pair_label",
+      "activity_form_rows_prompt",
+      "activity_form_rows_question_label",
+      "activity_form_rows_remove",
+      "activity_form_rows_right"
+    ],
     "activity-editor-visible-core": [
       "activity_editor_load_scaffold",
       "activity_editor_preview_title",
