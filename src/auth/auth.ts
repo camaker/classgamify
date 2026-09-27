@@ -13,8 +13,9 @@ import {
   getAuthBannedUserMessage,
   getAuthDefaultBanReason,
 } from '@/auth/plugin-copy';
+import { apiKey } from '@better-auth/api-key';
 import { emailHarmony } from 'better-auth-harmony';
-import { admin, apiKey, oneTap } from 'better-auth/plugins';
+import { admin, oneTap } from 'better-auth/plugins';
 
 /**
  * Better Auth Configuration

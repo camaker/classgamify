@@ -9,4 +9,14 @@ overrides:
   # rewrites requests for an older workerd, so this override goes inert once
   # wrangler / @cloudflare/vite-plugin pin a fixed runtime themselves; delete
   # it then. See docs/env.md "Local dev runtime".
+  # package.json pins @cloudflare/vite-plugin 1.49.0 and wrangler 4.116.0
+  # exactly: they are the last releases on a stable Miniflare (4.20260730.0);
+  # every later release depends on a Miniflare 5 alpha.
   'workerd@<1.20260925.1': 1.20260927.1
+
+peerDependencyRules:
+  allowedVersions:
+    # workers-types 5 declares a global `Buffer: any` that breaks the
+    # @types/node Buffer used by scripts/ in our single tsconfig; wrangler's
+    # peer on it is optional, so stay on 4.x.
+    wrangler>@cloudflare/workers-types: '4'

@@ -46,7 +46,7 @@ src/auth/
 - **plugins**:
   - `tanstackStartCookies()` — cookies/session with TanStack Start on Cloudflare.
   - `admin()` — user management, ban/unban, roles; `bannedUserMessage` and `defaultBanReason` are supplied by locale-backed auth plugin copy helpers so blocked teacher-workspace messaging stays in the translation files.
-  - `apiKey()` — API key management for users.
+  - `apiKey()` from `@better-auth/api-key` (no longer exported from `better-auth/plugins`) — API key management; keys belong to a `reference_id` (the user id) since better-auth 1.7.
   - `emailHarmony()` — email normalization/validation; `allowNormalizedSignin: false`.
 - **onAPIError**: `errorURL: '/auth/error'`; optional `onError` logging.
 
@@ -54,7 +54,7 @@ src/auth/
 
 ## Client (client.ts)
 
-- `createAuthClient({ baseURL: getBaseUrl(), plugins: [adminClient(), apiKeyClient(), inferAdditionalFields<typeof auth>()] })` exported as **`authClient`**.
+- `createAuthClient({ baseURL: getBaseUrl(), plugins: [adminClient(), apiKeyClient() /* @better-auth/api-key/client */, inferAdditionalFields<typeof auth>()] })` exported as **`authClient`**.
 - Typical usage:
   - `authClient.useSession()` — current session (includes user with role when admin plugin is used).
   - `authClient.signIn.email()`, `authClient.signUp.email()`, `authClient.signOut()`.

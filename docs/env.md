@@ -123,8 +123,10 @@ every request then fails with `Internal server error: fetch failed`
 (`~/Library/Logs/DiagnosticReports/workerd-*.ips` shows
 `MaglevCodeGenerator::EmitCode`). 1.20260925.1 and newer are fixed.
 
-The stable wrangler 4.105 / Miniflare 4.x line we use still pins an affected
-build, so `pnpm-workspace.yaml` overrides it:
+`package.json` pins `@cloudflare/vite-plugin` 1.49.0 and wrangler 4.116.0
+exactly: they are the last releases on a stable Miniflare (4.20260730.0); every
+later release depends on a Miniflare 5 alpha. That Miniflare still pins an
+affected build, so `pnpm-workspace.yaml` overrides it:
 
 ```yaml
 overrides:
