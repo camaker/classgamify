@@ -5,6 +5,8 @@ overrides:
   vitefu: ^1.1.3
   # workerd 1.20260730.1 and older crash on Apple Silicon under `vite dev`
   # (V8 Maglev CHECK in Assembler::bind -> SIGTRAP), so Miniflare drops the
-  # socket with "fetch failed". The stable Miniflare 4.x line still pins an
-  # affected build, so pin the fixed runtime until a stable Miniflare ships it.
-  workerd: 1.20260927.1
+  # socket with "fetch failed". 1.20260925.1+ is fixed. The selector only
+  # rewrites requests for an older workerd, so this override goes inert once
+  # wrangler / @cloudflare/vite-plugin pin a fixed runtime themselves; delete
+  # it then. See docs/env.md "Local dev runtime".
+  'workerd@<1.20260925.1': 1.20260927.1
