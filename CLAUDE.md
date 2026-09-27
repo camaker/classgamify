@@ -126,6 +126,9 @@ Enforced by Biome (`biome.json`):
 - **Styling**: Tailwind CSS v4 with `cn()` from `src/lib/utils.ts`, class-based dark mode
 - **Icons**: `@tabler/icons-react`
 
+### Local Dev Runtime
+`pnpm-workspace.yaml` overrides `workerd` so that `pnpm dev` doesn't crash on Apple Silicon (a V8 Maglev JIT crash in workerd ≤ 1.20260730.1 surfaces as Miniflare `fetch failed`). Keep the override until wrangler / `@cloudflare/vite-plugin` pin workerd ≥ 1.20260925.1 themselves. Back up `.wrangler/state` before switching workerd versions. Details: `docs/env.md` § Local dev runtime.
+
 ### Cloudflare Workers Constraint
 Avoid Node.js-specific APIs — this runs on Cloudflare Workers runtime, not Node.js.
 

@@ -15,14 +15,23 @@ import {
 } from '../fixtures/page-health';
 
 /**
+ * The /settings layout sets `ssr: false`, so settings pages paint only after
+ * hydration and the session check, which takes several seconds on a dev
+ * server. Give their text assertions the same budget as other client-loaded
+ * checks.
+ */
+const CLIENT_RENDER_TIMEOUT = 20_000;
+
+/**
  * Text the teacher can see. Settings pages also mount screen-reader-only
  * audit sections (class `sr-only`) that repeat the same labels, and
  * Playwright treats those 1px boxes as visible, so exclude anything inside
- * an sr-only container.
+ * an sr-only container. Match exactly: short labels such as "Assignment
+ * workflow" also appear inside longer page and card descriptions.
  */
 function onScreenText(page: Page, text: string) {
   return page
-    .getByText(text)
+    .getByText(text, { exact: true })
     .and(
       page.locator(
         'xpath=//*[not(ancestor-or-self::*[contains(concat(" ", normalize-space(@class), " "), " sr-only ")])]'
@@ -80,6 +89,9 @@ function getLocaleMessage(locale: LocaleMode, key: string) {
 }
 
 test.describe('protected page smoke coverage', () => {
+  // Each test signs in and walks every protected page, several client-only.
+  test.describe.configure({ timeout: 120_000 });
+
   test.beforeAll(async ({ request }) => {
     await cleanupE2EUsers(request);
   });
@@ -116,7 +128,7 @@ test.describe('protected page smoke coverage', () => {
                   'settings_security_workspace_summary_title'
                 )
               )
-            ).toBeVisible();
+            ).toBeVisible({ timeout: CLIENT_RENDER_TIMEOUT });
             await expect(
               onScreenText(
                 page,
@@ -125,7 +137,7 @@ test.describe('protected page smoke coverage', () => {
                   'settings_security_workspace_capabilities_title'
                 )
               )
-            ).toBeVisible();
+            ).toBeVisible({ timeout: CLIENT_RENDER_TIMEOUT });
             await expect(
               onScreenText(
                 page,
@@ -134,7 +146,7 @@ test.describe('protected page smoke coverage', () => {
                   'settings_security_workspace_summary_results_label'
                 )
               )
-            ).toBeVisible();
+            ).toBeVisible({ timeout: CLIENT_RENDER_TIMEOUT });
           }
           if (protectedPage.path === '/settings/files') {
             await expect(
@@ -145,7 +157,7 @@ test.describe('protected page smoke coverage', () => {
                   'settings_files_workspace_summary_title'
                 )
               )
-            ).toBeVisible();
+            ).toBeVisible({ timeout: CLIENT_RENDER_TIMEOUT });
             await expect(
               onScreenText(
                 page,
@@ -154,7 +166,7 @@ test.describe('protected page smoke coverage', () => {
                   'settings_files_workspace_summary_library_label'
                 )
               )
-            ).toBeVisible();
+            ).toBeVisible({ timeout: CLIENT_RENDER_TIMEOUT });
             await expect(
               onScreenText(
                 page,
@@ -163,7 +175,7 @@ test.describe('protected page smoke coverage', () => {
                   'settings_files_workspace_summary_privacy_label'
                 )
               )
-            ).toBeVisible();
+            ).toBeVisible({ timeout: CLIENT_RENDER_TIMEOUT });
           }
           if (protectedPage.path === '/settings/billing') {
             await expect(
@@ -174,7 +186,7 @@ test.describe('protected page smoke coverage', () => {
                   'settings_billing_workspace_summary_title'
                 )
               )
-            ).toBeVisible();
+            ).toBeVisible({ timeout: CLIENT_RENDER_TIMEOUT });
             await expect(
               onScreenText(
                 page,
@@ -183,13 +195,18 @@ test.describe('protected page smoke coverage', () => {
                   'settings_billing_workspace_summary_assignments_label'
                 )
               )
-            ).toBeVisible();
+            ).toBeVisible({ timeout: CLIENT_RENDER_TIMEOUT });
+            // The handoff section is screen-reader-only by design (6790a20e),
+            // so check it is in the accessibility tree, not on screen.
             await expect(
-              onScreenText(
-                page,
-                getLocaleMessage(locale, 'settings_billing_handoff_title')
-              )
-            ).toBeVisible();
+              page.getByRole('heading', {
+                name: getLocaleMessage(
+                  locale,
+                  'settings_billing_handoff_title'
+                ),
+                exact: true,
+              })
+            ).toBeAttached({ timeout: CLIENT_RENDER_TIMEOUT });
           }
           if (protectedPage.path === '/settings/payment') {
             await expect(
@@ -197,7 +214,7 @@ test.describe('protected page smoke coverage', () => {
                 page,
                 getLocaleMessage(locale, 'settings_payment_failed_title')
               )
-            ).toBeVisible();
+            ).toBeVisible({ timeout: CLIENT_RENDER_TIMEOUT });
             const paymentHandoff = page.locator(
               '[data-handoff="settings-payment-callback"]'
             );

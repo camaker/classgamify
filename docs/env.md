@@ -110,3 +110,46 @@ Read at **Worker request time**. Used for secrets, API keys, and server-only con
 | `wrangler secret put <NAME>` | Worker runtime | Secrets → `process.env` |
 
 Copy **`.env.example`** to **`.env.local`** and fill in values. See module docs ([Auth](./auth.md), [Mail](./mail.md), [Payment](./payment.md), etc.) for which vars each feature needs.
+
+---
+
+## 5. Local dev runtime (workerd)
+
+`pnpm dev` runs the Worker in a local **workerd** process managed by Miniflare
+(via `@cloudflare/vite-plugin`). workerd **1.20260730.1 and older** crash on
+Apple Silicon: V8's Maglev JIT hits a `CHECK` in `Assembler::bind` while
+compiling this app's large server chunks, workerd exits with `SIGTRAP`, and
+every request then fails with `Internal server error: fetch failed`
+(`~/Library/Logs/DiagnosticReports/workerd-*.ips` shows
+`MaglevCodeGenerator::EmitCode`). 1.20260925.1 and newer are fixed.
+
+The stable wrangler 4.105 / Miniflare 4.x line we use still pins an affected
+build, so `pnpm-workspace.yaml` overrides it:
+
+```yaml
+overrides:
+  'workerd@<1.20260925.1': 1.20260927.1
+```
+
+The selector only rewrites requests for an affected workerd, so the override
+stops doing anything once wrangler / `@cloudflare/vite-plugin` pin a fixed
+runtime themselves. Remove it at that point. `pnpm build` and deploys don't use
+this binary, so production is unaffected.
+
+Notes:
+
+- **No V8-flag option.** Miniflare, wrangler, and the Vite plugin don't expose
+  workerd's `v8Flags` config, and the workerd CLI has no V8-flags switch, so
+  `--no-maglev` can't be set without patching Miniflare. The runtime upgrade
+  is the supported fix.
+- **Trying another workerd without reinstalling:** Miniflare honors
+  `MINIFLARE_WORKERD_PATH=/path/to/workerd pnpm dev`.
+- **Don't mix workerd versions on one local state.** Newer workerd upgrades
+  the SQLite files in `.wrangler/state` (e.g. adds `actor_name` to
+  `_cf_ALARM`), and older workerd then refuses to load them. Back up
+  `.wrangler/state` before switching versions. If a downgrade already broke
+  it, delete the folder and re-run `pnpm db:migrate:local`.
+- **Symptom checklist:** a `fetch failed` stack through
+  `Miniflare.dispatchFetch`, no workerd process left running, and a new
+  `workerd-*.ips` crash report. Confirm the installed runtime with
+  `ls node_modules/.pnpm | grep workerd-darwin`.
