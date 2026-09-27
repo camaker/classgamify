@@ -22,7 +22,6 @@ import {
 } from '@/assignments/public';
 import { buildAssignmentResultAttemptAnswerTextView } from '@/assignments/result-answer-view';
 import { analyzeAssignmentResults } from '@/assignments/results';
-import { ASSIGNMENT_RESULTS_EXPORT_PREPARATION_ITEM_IDS } from '@/assignments/results-export';
 import { STUDENT_RUNNER_PLAY_CHAIN_HANDOFF_ITEM_IDS } from '@/assignments/student-runner-play-chain';
 import { buildPublicAnswerFeedbackView } from '@/assignments/student-runner-view';
 import { TEACHER_RESULTS_REVIEW_CHAIN_HANDOFF_ITEM_IDS } from '@/assignments/teacher-results-review-chain';
@@ -211,9 +210,8 @@ test('answer feedback lifecycle chain is backed by adjacent gates', () => {
       ASSIGNMENT_ANSWER_FEEDBACK_HANDOFF_ITEM_IDS.length,
       STUDENT_RUNNER_PLAY_CHAIN_HANDOFF_ITEM_IDS.length,
       TEACHER_RESULTS_REVIEW_CHAIN_HANDOFF_ITEM_IDS.length,
-      ASSIGNMENT_RESULTS_EXPORT_PREPARATION_ITEM_IDS.length,
     ],
-    Array.from({ length: 4 }, () => 30)
+    Array.from({ length: 3 }, () => 30)
   );
 });
 

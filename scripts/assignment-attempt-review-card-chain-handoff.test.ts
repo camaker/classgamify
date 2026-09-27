@@ -9,12 +9,6 @@ import {
   type AssignmentAttemptReviewCardChainHandoffView,
 } from '@/assignments/attempt-review-card-chain';
 import {
-  ASSIGNMENT_ATTEMPT_REVIEW_CARD_HANDOFF_ITEM_IDS,
-  buildAssignmentAttemptReviewCardHandoffEvidence,
-  buildAssignmentAttemptReviewCardHandoffView,
-} from '@/assignments/attempt-review-card-handoff';
-import { ASSIGNMENT_COPY_ARTIFACT_HANDOFF_ITEM_IDS } from '@/assignments/copy-artifact-handoff';
-import {
   ASSIGNMENT_RESULT_ACCEPTED_ANSWER_CHAIN_HANDOFF_ITEM_IDS,
   ASSIGNMENT_RESULT_ACCEPTED_ANSWER_CHAIN_SOURCE_FILES,
 } from '@/assignments/result-accepted-answer-chain';
@@ -30,11 +24,7 @@ import {
   ASSIGNMENT_RESULT_SUBMITTED_DATE_CHAIN_HANDOFF_ITEM_IDS,
   ASSIGNMENT_RESULT_SUBMITTED_DATE_CHAIN_SOURCE_FILES,
 } from '@/assignments/result-submitted-date-chain';
-import {
-  ASSIGNMENT_RESULT_REVIEW_HANDOFF_ITEM_IDS,
-  buildAssignmentAttemptAnswerReviewViews,
-  buildAssignmentAttemptReviewCardView,
-} from '@/assignments/result-view';
+import { buildAssignmentAttemptReviewCardView } from '@/assignments/result-view';
 import { buildAssignmentAttemptReviewSummary } from '@/assignments/result-review-summary';
 import type { AssignmentAttemptReviewAnswer } from '@/assignments/results';
 import { PRINTABLE_WORKSHEET_REVIEW_LIFECYCLE_CHAIN_HANDOFF_ITEM_IDS } from '@/assignments/printable-worksheet-review-lifecycle-chain';
@@ -47,10 +37,6 @@ overwriteGetLocale(() => 'en');
 
 const PRODUCT_SOURCE = readFileSync('docs/product.md', 'utf8');
 const TEST_CATALOG_SOURCE = readFileSync('tests/e2e/TEST-CATALOG.md', 'utf8');
-const HANDOFF_SOURCE = readFileSync(
-  'src/assignments/attempt-review-card-handoff.ts',
-  'utf8'
-);
 const RESULT_REVIEW_SUMMARY_SOURCE = readFileSync(
   'src/assignments/result-review-summary.ts',
   'utf8'
@@ -97,9 +83,6 @@ test('assignment attempt review card chain exposes 30 safe slices', () => {
 
   assert.deepEqual(itemIds, [
     ...ASSIGNMENT_ATTEMPT_REVIEW_CARD_CHAIN_HANDOFF_ITEM_IDS,
-  ]);
-  assert.deepEqual(itemIds, [
-    ...ASSIGNMENT_ATTEMPT_REVIEW_CARD_HANDOFF_ITEM_IDS,
   ]);
   assert.equal(handoffView.title, 'Assignment attempt review card chain');
   assert.match(
@@ -207,34 +190,31 @@ test('assignment attempt review card chain is backed by adjacent gates', () => {
 
   assert.deepEqual(
     [
-      ASSIGNMENT_ATTEMPT_REVIEW_CARD_HANDOFF_ITEM_IDS.length,
-      ASSIGNMENT_COPY_ARTIFACT_HANDOFF_ITEM_IDS.length,
       ASSIGNMENT_RESULT_ACCEPTED_ANSWER_CHAIN_HANDOFF_ITEM_IDS.length,
       ASSIGNMENT_RESULT_EXPLANATION_CHAIN_HANDOFF_ITEM_IDS.length,
       ASSIGNMENT_RESULT_SUBMITTED_DATE_CHAIN_HANDOFF_ITEM_IDS.length,
-      ASSIGNMENT_RESULT_REVIEW_HANDOFF_ITEM_IDS.length,
       PRINTABLE_WORKSHEET_REVIEW_LIFECYCLE_CHAIN_HANDOFF_ITEM_IDS.length,
       SCORED_ATTEMPT_RESULT_CHAIN_HANDOFF_ITEM_IDS.length,
       TEACHER_RESULT_COPY_LIFECYCLE_CHAIN_HANDOFF_ITEM_IDS.length,
       TEACHER_RESULTS_REVIEW_CHAIN_HANDOFF_ITEM_IDS.length,
     ],
-    Array.from({ length: 10 }, () => 30)
+    Array.from({ length: 7 }, () => 30)
   );
   assert.equal(
     ASSIGNMENT_RESULT_ACCEPTED_ANSWER_CHAIN_SOURCE_FILES.includes(
-      'src/assignments/attempt-review-card-handoff.ts'
+      'src/components/assignments/assignment-results-attempt-review-card.tsx'
     ),
     true
   );
   assert.equal(
     ASSIGNMENT_RESULT_EXPLANATION_CHAIN_SOURCE_FILES.includes(
-      'src/assignments/attempt-review-card-handoff.ts'
+      'src/components/assignments/assignment-results-attempt-review-card.tsx'
     ),
     true
   );
   assert.equal(
     ASSIGNMENT_RESULT_SUBMITTED_DATE_CHAIN_SOURCE_FILES.includes(
-      'src/assignments/attempt-review-card-handoff.ts'
+      'src/components/assignments/assignment-results-attempt-review-card.tsx'
     ),
     true
   );
@@ -287,56 +267,7 @@ test('attempt review summary and answer helpers keep card counts shared', () => 
   assert.equal(unansweredAnswerView.statusTone, 'idle');
 });
 
-test('attempt review card handoff evidence aggregates prepared rows only', () => {
-  const answers = buildAttemptReviewAnswers();
-  const answerViews = buildAssignmentAttemptAnswerReviewViews(answers);
-  const evidence = buildAssignmentAttemptReviewCardHandoffEvidence({
-    answers,
-    answerViews,
-    badgeLabel: '33% - 1 points',
-    submittedAtLabel: 'Apr 5, 2026, 10:00 AM',
-    summaryMetricCount: 4,
-  });
-
-  assert.deepEqual(evidence, {
-    acceptedAlternativesLineCount: 3,
-    answerCardCount: 3,
-    correctAnswerCount: 1,
-    correctStatusCount: 1,
-    expectedAnswerLineCount: 3,
-    explanationLineCount: 2,
-    hasScoreBadge: true,
-    hasSubmittedAtLabel: true,
-    needsReviewAnswerCount: 2,
-    needsReviewStatusCount: 1,
-    statusLabelCount: 3,
-    studentAnswerLineCount: 3,
-    submittedAnswerCount: 2,
-    summaryMetricCount: 4,
-    totalAnswerCount: 3,
-    unansweredAnswerCount: 1,
-    unansweredStatusCount: 1,
-  });
-
-  const handoffView = buildAssignmentAttemptReviewCardHandoffView(evidence);
-
-  assert.deepEqual(
-    handoffView.itemViews.map((item) => item.id),
-    [...ASSIGNMENT_ATTEMPT_REVIEW_CARD_HANDOFF_ITEM_IDS]
-  );
-  assert.equal(getVisibleHandoffValue(handoffView, 'submitted-count'), '2/3');
-  assert.equal(getVisibleHandoffValue(handoffView, 'correct-count'), '1');
-  assert.equal(getVisibleHandoffValue(handoffView, 'needs-review-count'), '2');
-  assert.equal(getVisibleHandoffValue(handoffView, 'unanswered-count'), '1');
-  assertNoPrivateAttemptReviewCardChainText(JSON.stringify(handoffView));
-});
-
 test('attempt review card source boundaries preserve domain ownership', () => {
-  assert.match(
-    HANDOFF_SOURCE,
-    /ASSIGNMENT_ATTEMPT_REVIEW_CARD_HANDOFF_ITEM_IDS[\s\S]*buildAssignmentAttemptReviewCardHandoffEvidence[\s\S]*buildAssignmentAttemptReviewSummary[\s\S]*buildAssignmentAttemptReviewCardHandoffView/,
-    'Attempt review card handoff should keep the 30-item evidence builder in the assignment domain.'
-  );
   assert.match(
     RESULT_REVIEW_SUMMARY_SOURCE,
     /buildAssignmentAttemptReviewSummary[\s\S]*submittedItemCount[\s\S]*correctItemCount[\s\S]*needsReviewItemCount[\s\S]*unansweredItemCount/,
@@ -349,7 +280,7 @@ test('attempt review card source boundaries preserve domain ownership', () => {
   );
   assert.match(
     RESULT_VIEW_SOURCE,
-    /buildAssignmentAttemptReviewCardView[\s\S]*buildAssignmentAttemptAnswerReviewViews\(attempt\.answers\)[\s\S]*buildAssignmentAttemptReviewSummaryMetricViews\(attempt\)[\s\S]*handoffView: buildAssignmentAttemptReviewCardHandoffView[\s\S]*buildAssignmentAttemptReviewCardHandoffEvidence/,
+    /buildAssignmentAttemptReviewCardView[\s\S]*buildAssignmentAttemptAnswerReviewViews\(attempt\.answers\)[\s\S]*buildAssignmentAttemptReviewSummaryMetricViews\(attempt\)/,
     'Result view models should prepare card evidence before React renders the card.'
   );
   assert.match(
@@ -367,10 +298,10 @@ test('attempt review card source boundaries preserve domain ownership', () => {
     /validateSearch: buildAssignmentResultRouteSearch[\s\S]*pageView\.attemptReviewCardViews\.map\(\(attemptView\) =>[\s\S]*<AssignmentResultsAttemptReviewCard/,
     'The teacher result route should validate review filters and render prepared attempt review card views.'
   );
-  assert.match(
+  assert.doesNotMatch(
     CARD_COMPONENT_SOURCE,
-    /data-handoff="assignment-attempt-review-card"[\s\S]*data-handoff-scope=\{view\.privacy\.scope\}[\s\S]*<dl>[\s\S]*view\.itemViews\.map[\s\S]*data-handoff-item=\{itemView\.id\}/,
-    'Attempt review card components should render the hidden semantic handoff from prepared view data.'
+    /data-handoff|Handoff\b/,
+    'Attempt review cards should render only visible answer rows and metrics.'
   );
 });
 
@@ -387,22 +318,8 @@ test('attempt review card chain preserves visible card privacy', () => {
   assert.equal(cardView.id, PRIVATE_ATTEMPT_ID);
   assert.equal(cardView.studentLabel, PRIVATE_STUDENT_LABEL);
   assert.equal(cardView.answerViews.length, 3);
-  assert.deepEqual(
-    cardView.handoffView.itemViews.map((item) => item.id),
-    [...ASSIGNMENT_ATTEMPT_REVIEW_CARD_CHAIN_HANDOFF_ITEM_IDS]
-  );
-  assert.equal(cardView.handoffView.privacy.exposesAcceptedAnswerText, false);
-  assert.equal(cardView.handoffView.privacy.exposesAttemptId, false);
-  assert.equal(cardView.handoffView.privacy.exposesPromptText, false);
-  assert.equal(cardView.handoffView.privacy.exposesRawAnonymousToken, false);
-  assert.equal(cardView.handoffView.privacy.exposesStudentAnswerText, false);
-  assert.equal(cardView.handoffView.privacy.exposesStudentDisplayLabel, false);
-  assert.equal(cardView.handoffView.privacy.exposesTeacherAnswerText, false);
-  assert.equal(cardView.handoffView.privacy.mutatesResultData, false);
-  assert.equal(cardView.handoffView.privacy.usesAssignmentDomainHelpers, true);
-  assertNoPrivateAttemptReviewCardChainText(
-    JSON.stringify(cardView.handoffView)
-  );
+  const serializedCard = JSON.stringify(cardView);
+  assert.equal(serializedCard.includes('anonymousToken'), false);
 });
 
 test('assignment attempt review card chain is documented', () => {
@@ -471,15 +388,6 @@ function getHandoffValue(
 ) {
   const item = view.itemViews.find((candidate) => candidate.id === id);
   assert.ok(item, `Missing attempt review card chain item ${id}`);
-  return item.value;
-}
-
-function getVisibleHandoffValue(
-  view: ReturnType<typeof buildAssignmentAttemptReviewCardHandoffView>,
-  id: AssignmentAttemptReviewCardChainHandoffItemId
-) {
-  const item = view.itemViews.find((candidate) => candidate.id === id);
-  assert.ok(item, `Missing attempt review card handoff item ${id}`);
   return item.value;
 }
 

@@ -46,7 +46,7 @@ export const ASSIGNMENT_RESULT_EXPLANATION_CHAIN_SOURCE_FILES = [
   'src/components/assignments/assignment-results-item-analysis-card.tsx',
   'src/components/assignments/assignment-results-item-performance-table.tsx',
   'src/components/assignments/assignment-results-attempt-review-card.tsx',
-  'src/assignments/attempt-review-card-handoff.ts',
+  'src/assignments/result-answer-view.ts',
   'src/assignments/item-review-summary.ts',
   'src/assignments/result-actions.ts',
   'src/assignments/results-export.ts',
@@ -59,8 +59,8 @@ export const ASSIGNMENT_RESULT_EXPLANATION_CHAIN_SOURCE_FILES = [
   'src/components/assignments/printable-worksheet-answer-key.tsx',
   'src/assignments/printable-worksheet-review-lifecycle-chain.ts',
   'scripts/answer-feedback-lifecycle-chain-handoff.test.ts',
-  'scripts/assignment-results-export-preparation-handoff-semantic-views.test.ts',
-  'scripts/assignment-attempt-review-card-handoff-semantic-views.test.ts',
+  'scripts/assignment-results-csv-export.test.ts',
+  'scripts/assignment-result-review-helpers.test.ts',
   'tests/e2e/TEST-CATALOG.md',
 ] as const;
 

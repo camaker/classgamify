@@ -3,10 +3,7 @@ import { existsSync, readFileSync } from 'node:fs';
 import test from 'node:test';
 import type { RuntimeItem } from '@/activities/runtime';
 import { ASSIGNMENT_DELIVERY_POLICY_HANDOFF_ITEM_IDS } from '@/assignments/delivery-summary';
-import {
-  PRINTABLE_WORKSHEET_HANDOFF_ITEM_IDS,
-  buildPrintableWorksheetPageViewModel,
-} from '@/assignments/printable-worksheet-view';
+import { buildPrintableWorksheetPageViewModel } from '@/assignments/printable-worksheet-view';
 import {
   buildPrintableAssignmentSearch,
   buildPrintableAssignmentWorksheet,
@@ -20,8 +17,6 @@ import {
   type PrintableWorksheetReviewLifecycleChainHandoffItemId,
   type PrintableWorksheetReviewLifecycleChainHandoffView,
 } from '@/assignments/printable-worksheet-review-lifecycle-chain';
-import { ASSIGNMENT_RESULT_MATERIAL_HANDOFF_ITEM_IDS } from '@/assignments/result-actions';
-import { ASSIGNMENT_RESULTS_EXPORT_PREPARATION_ITEM_IDS } from '@/assignments/results-export';
 import { WORKSHEET_MODE_DELIVERY_CHAIN_HANDOFF_ITEM_IDS } from '@/assignments/worksheet-mode-delivery-chain';
 import { overwriteGetLocale } from '@/locale/paraglide/runtime';
 
@@ -70,10 +65,6 @@ const PRINTABLE_PREPARATION_SOURCE = readFileSync(
 );
 const PRINTABLE_ANSWER_KEY_SOURCE = readFileSync(
   'src/components/assignments/printable-worksheet-answer-key.tsx',
-  'utf8'
-);
-const PRINTABLE_HANDOFF_SOURCE = readFileSync(
-  'src/components/assignments/printable-worksheet-handoff.tsx',
   'utf8'
 );
 const TEST_CATALOG_SOURCE = readFileSync('tests/e2e/TEST-CATALOG.md', 'utf8');
@@ -166,7 +157,7 @@ test('printable worksheet review lifecycle summarizes each review boundary', () 
       ['results-return-action', 'Back to results'],
       ['result-export-alignment', 'CSV stays full export'],
       ['worksheet-delivery-chain-alignment', 'Worksheet chain aligned'],
-      ['printable-worksheet-handoff-boundary', '30 printable worksheet slices'],
+      ['printable-worksheet-handoff-boundary', 'Visible print page'],
     ]
   );
   assert.equal(
@@ -175,7 +166,7 @@ test('printable worksheet review lifecycle summarizes each review boundary', () 
   );
   assert.equal(
     getHandoffValue(handoffView, 'printable-worksheet-handoff-boundary'),
-    `${PRINTABLE_WORKSHEET_HANDOFF_ITEM_IDS.length} printable worksheet slices`
+    'Visible print page'
   );
 });
 
@@ -193,13 +184,10 @@ test('printable worksheet review lifecycle is backed by adjacent gates', () => {
 
   assert.deepEqual(
     [
-      PRINTABLE_WORKSHEET_HANDOFF_ITEM_IDS.length,
       WORKSHEET_MODE_DELIVERY_CHAIN_HANDOFF_ITEM_IDS.length,
-      ASSIGNMENT_RESULTS_EXPORT_PREPARATION_ITEM_IDS.length,
       ASSIGNMENT_DELIVERY_POLICY_HANDOFF_ITEM_IDS.length,
-      ASSIGNMENT_RESULT_MATERIAL_HANDOFF_ITEM_IDS.length,
     ],
-    Array.from({ length: 5 }, () => 30)
+    Array.from({ length: 2 }, () => 30)
   );
 });
 
@@ -263,25 +251,9 @@ test('printable worksheet view keeps answer-key lifecycle states explicit', () =
   );
   assert.equal(unavailablePageView.showAnswerKey, false);
   assert.equal(
-    getPrintableHandoffValue(hiddenPageView, 'answer-key'),
-    'Hidden by default'
-  );
-  assert.equal(
-    getPrintableHandoffValue(includedPageView, 'answer-key'),
-    'Teacher-only key included'
-  );
-  assert.equal(
-    getPrintableHandoffValue(unavailablePageView, 'answer-key'),
-    'No answer key available'
-  );
-  assertNoPrivatePrintableLifecycleText(
-    JSON.stringify(hiddenPageView.handoffView)
-  );
-  assertNoPrivatePrintableLifecycleText(
-    JSON.stringify(includedPageView.handoffView)
-  );
-  assertNoPrivatePrintableLifecycleText(
-    JSON.stringify(unavailablePageView.handoffView)
+    JSON.stringify(hiddenPageView.answerKeyView).includes(SECRET_ANSWER_TEXT),
+    false,
+    'The student copy must not carry answer-key text when the key is hidden.'
   );
 });
 
@@ -303,8 +275,8 @@ test('printable worksheet sources preserve route, API, and DOM boundaries', () =
   );
   assert.match(
     PRINTABLE_ROUTE_SOURCE,
-    /validateSearch: parsePrintableAssignmentSearch[\s\S]*robots: 'noindex, nofollow'[\s\S]*middleware: \[authRouteMiddleware\][\s\S]*includeAnswerKey: answerKey[\s\S]*document\.body\.dataset\.printMode = PRINTABLE_WORKSHEET_BODY_PRINT_MODE[\s\S]*search: buildPrintableAssignmentSearch\(\{ answerKey: nextAnswerKey \}\)[\s\S]*onPrint=\{\(\) => window\.print\(\)\}[\s\S]*PrintableWorksheetHandoff view=\{pageView\.handoffView\}/,
-    'Printable route should stay search-validated, teacher-only, noindex, print-mode scoped, URL-toggle backed, and handoff-rendered.'
+    /validateSearch: parsePrintableAssignmentSearch[\s\S]*robots: 'noindex, nofollow'[\s\S]*middleware: \[authRouteMiddleware\][\s\S]*includeAnswerKey: answerKey[\s\S]*document\.body\.dataset\.printMode = PRINTABLE_WORKSHEET_BODY_PRINT_MODE[\s\S]*search: buildPrintableAssignmentSearch\(\{ answerKey: nextAnswerKey \}\)[\s\S]*onPrint=\{\(\) => window\.print\(\)\}[\s\S]*PrintableWorksheetAnswerKey view=\{pageView\.answerKeyView\}/,
+    'Printable route should stay search-validated, teacher-only, noindex, print-mode scoped, and URL-toggle backed, with the answer key rendered only through its own view.'
   );
   assert.match(
     ROOT_ROUTE_SOURCE,
@@ -374,18 +346,18 @@ test('printable worksheet sources preserve snapshot, delivery, and review alignm
     /data-print-answer-key-state=\{view\.accessView\.state\}[\s\S]*view\.itemViews\.map[\s\S]*PrintableWorksheetAnswerKeyItem[\s\S]*detailView\.id/,
     'Printable answer-key component should expose access state and stable detail ids.'
   );
-  assert.match(
-    PRINTABLE_HANDOFF_SOURCE,
-    /data-handoff="printable-worksheet"[\s\S]*data-handoff-scope=\{view\.privacy\.scope\}[\s\S]*data-handoff-item=\{itemView\.id\}/,
-    'Printable handoff should keep hidden semantic item coverage.'
+  assert.doesNotMatch(
+    PRINTABLE_ROUTE_SOURCE,
+    /data-handoff|Handoff\b/,
+    'The print page should render no hidden audit sections.'
   );
 });
 
 test('printable worksheet review lifecycle focused gate is documented', () => {
   assert.match(
     PRODUCT_SOURCE,
-    /printable\s+worksheet\s+review\s+lifecycle\s+chain[\s\S]*30-slice\s+printable\s+worksheet\s+handoff[\s\S]*handout\s+overview[\s\S]*answer-key\s+access[\s\S]*print\s+controls[\s\S]*privacy[\s\S]*independent\s+30-file\s+gate/,
-    'docs/product.md should carry printable review through the shared worksheet handoff while retaining the source-file gate.'
+    /printable\s+worksheet\s+review\s+lifecycle\s+chain[\s\S]*visible\s+print\s+page[\s\S]*answer-key\s+access[\s\S]*print\s+controls[\s\S]*independent\s+30-file\s+gate/,
+    'docs/product.md should carry printable review through the visible print page while retaining the source-file gate.'
   );
   assert.match(
     TEST_CATALOG_SOURCE,
@@ -453,17 +425,6 @@ function getHandoffValue(
 ) {
   const item = view.itemViews.find((itemView) => itemView.id === id);
   assert.ok(item, `Missing printable worksheet review lifecycle item ${id}`);
-  return item.value;
-}
-
-function getPrintableHandoffValue(
-  pageView: ReturnType<typeof buildPrintableWorksheetPageViewModel>,
-  id: (typeof PRINTABLE_WORKSHEET_HANDOFF_ITEM_IDS)[number]
-) {
-  const item = pageView.handoffView.itemViews.find(
-    (itemView) => itemView.id === id
-  );
-  assert.ok(item, `Missing printable worksheet handoff item ${id}`);
   return item.value;
 }
 

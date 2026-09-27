@@ -9,9 +9,7 @@ import { ASSIGNMENT_ANSWER_FEEDBACK_HANDOFF_ITEM_IDS } from '@/assignments/answe
 import { ASSIGNMENT_ATTEMPT_DURATION_HANDOFF_ITEM_IDS } from '@/assignments/attempt-duration-handoff';
 import { ASSIGNMENT_DELIVERY_POLICY_HANDOFF_ITEM_IDS } from '@/assignments/delivery-summary';
 import { ASSIGNMENT_ITEM_ORDER_HANDOFF_ITEM_IDS } from '@/assignments/item-order-handoff';
-import { PRINTABLE_WORKSHEET_HANDOFF_ITEM_IDS } from '@/assignments/printable-worksheet-view';
 import { PUBLIC_ASSIGNMENT_ACCESS_HANDOFF_ITEM_IDS } from '@/assignments/public';
-import { ASSIGNMENT_RESULTS_EXPORT_PREPARATION_ITEM_IDS } from '@/assignments/results-export';
 import { ASSIGNMENT_SUBMISSION_VALIDATION_HANDOFF_ITEM_IDS } from '@/assignments/submission-validation-handoff';
 import {
   WORKSHEET_MODE_DELIVERY_CHAIN_HANDOFF_ITEM_IDS,
@@ -133,7 +131,7 @@ test('worksheet-mode delivery chain summarizes each worksheet handoff step', () 
       ['result-export-policy', 'Delivery rules included'],
       ['source-material-guard', 'Storage keys hidden'],
       ['raw-identity-guard', 'Identity hidden'],
-      ['printable-worksheet-handoff-boundary', '30 printable worksheet slices'],
+      ['printable-worksheet-handoff-boundary', 'Visible print page'],
     ]
   );
   assert.equal(
@@ -172,10 +170,8 @@ test('worksheet-mode delivery chain stays backed by focused contracts', () => {
       ASSIGNMENT_SUBMISSION_VALIDATION_HANDOFF_ITEM_IDS.length,
       ASSIGNMENT_ATTEMPT_DURATION_HANDOFF_ITEM_IDS.length,
       ASSIGNMENT_ANSWER_FEEDBACK_HANDOFF_ITEM_IDS.length,
-      PRINTABLE_WORKSHEET_HANDOFF_ITEM_IDS.length,
-      ASSIGNMENT_RESULTS_EXPORT_PREPARATION_ITEM_IDS.length,
     ],
-    Array.from({ length: 11 }, () => 30)
+    Array.from({ length: 9 }, () => 30)
   );
 });
 
@@ -245,12 +241,12 @@ test('worksheet-mode delivery sources preserve runtime, print, and export bounda
   );
   assert.match(
     PRINTABLE_ROUTE_SOURCE,
-    /validateSearch: parsePrintableAssignmentSearch[\s\S]*robots: 'noindex, nofollow'[\s\S]*middleware: \[authRouteMiddleware\][\s\S]*includeAnswerKey: answerKey[\s\S]*<PrintableWorksheetHandoff view=\{pageView\.handoffView\} \/>/,
+    /validateSearch: parsePrintableAssignmentSearch[\s\S]*robots: 'noindex, nofollow'[\s\S]*middleware: \[authRouteMiddleware\][\s\S]*includeAnswerKey: answerKey[\s\S]*<PrintableWorksheetAnswerKey view=\{pageView\.answerKeyView\} \/>/,
     'Printable worksheet route should stay teacher-authenticated, noindex, answer-key-toggle backed, and semantically reviewable.'
   );
   assert.match(
     TEST_CATALOG_SOURCE,
-    /Printable worksheet handoff has a fast script-level gate via[\s\S]*scripts\/printable-worksheet-handoff-semantic-views\.test\.ts/,
+    /Printable worksheet view has a fast script-level gate via[\s\S]*scripts\/printable-worksheet-view\.test\.ts/,
     'TEST-CATALOG should keep the printable worksheet focused gate discoverable.'
   );
 });
@@ -260,8 +256,8 @@ test('worksheet-mode delivery chain focused gate is documented', () => {
 
   assert.match(
     PRODUCT_SOURCE,
-    /worksheet-mode delivery chain[\s\S]*printable[\s\S]*30 slices[\s\S]*choice-bank and writing-area coverage[\s\S]*answer-key access[\s\S]*must not expose prompt[\s\S]*student-response[\s\S]*source-material storage-key text/,
-    'docs/product.md should describe the printable worksheet handoff and student-response privacy boundary.'
+    /worksheet-mode delivery chain[\s\S]*visible print page[\s\S]*choice banks[\s\S]*answer-key access[\s\S]*without exposing prompt[\s\S]*student-response[\s\S]*source-material\s+storage-key text/,
+    'docs/product.md should describe the visible print page and student-response privacy boundary.'
   );
   assert.match(
     TEST_CATALOG_SOURCE,

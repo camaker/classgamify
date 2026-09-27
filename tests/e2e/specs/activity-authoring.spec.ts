@@ -20,24 +20,6 @@ async function expectNoBrowserErrors(
   });
 }
 
-async function expectThirtySliceHandoff(page: Page, handoffName: string) {
-  const handoff = page.locator(`[data-handoff="${handoffName}"]`);
-  const itemViews = handoff.locator(':scope > dl > [data-handoff-item]');
-
-  await expect(handoff).toHaveCount(1);
-  await expect(handoff).toHaveClass(/sr-only/);
-  await expect(handoff).toHaveAttribute('data-handoff-scope', /.+/);
-  await expect(itemViews).toHaveCount(30);
-  await expect(itemViews.locator(':scope > dt')).toHaveCount(30);
-  await expect(itemViews.locator(':scope > dd > output')).toHaveCount(30);
-
-  const itemIds = await itemViews.evaluateAll((items) =>
-    items.map((item) => item.getAttribute('data-handoff-item'))
-  );
-  expect(itemIds.every(Boolean)).toBe(true);
-  expect(new Set(itemIds).size).toBe(30);
-}
-
 async function saveActivityFromCreatePage(page: Page, title: string) {
   await page.goto('/create');
   await page.waitForLoadState('networkidle');
@@ -211,8 +193,9 @@ test.describe('activity authoring', () => {
     }
     await page.keyboard.press('Escape');
 
-    await expectThirtySliceHandoff(page, 'assignment-result-material');
-    await expectThirtySliceHandoff(page, 'assignment-result-review');
+    // Screen-reader text only describes the visible page (docs/design.md),
+    // so the results page renders no hidden audit sections.
+    await expect(page.locator('[data-handoff]')).toHaveCount(0);
 
     // The first screen answers "what should I explain again?" and "who
     // needs help?" before the detailed tables.
@@ -253,21 +236,12 @@ test.describe('activity authoring', () => {
     });
     await reviewViewControl.selectOption('needs-review');
     await expect(page).toHaveURL(/review=needs-review/);
+    // Search, both sorts, and the review filter each show a visible
+    // Adjusted badge once they leave their defaults.
     await expect(
-      page
-        .locator('[data-handoff="assignment-result-review"]')
-        .locator(
-          ':scope > dl > [data-handoff-item="student-search-status"] output'
-        )
-    ).toHaveText('Adjusted');
+      page.getByRole('status', { name: /^Scope status: Adjusted\./ })
+    ).toHaveCount(4);
     await expectNoBrowserErrors(monitor, 'teacher result filters');
-    await expect(
-      page
-        .locator('[data-handoff="assignment-result-review"]')
-        .locator(
-          ':scope > dl > [data-handoff-item="answer-review-status"] output'
-        )
-    ).toHaveText('Adjusted');
 
     await page.getByRole('button', { name: 'Clear student search' }).click();
     await expect(page).not.toHaveURL(/student=/);
@@ -310,7 +284,7 @@ test.describe('activity authoring', () => {
     ).toBeVisible();
     await expect(page.getByText('Before printing')).toBeVisible();
     await expect(page.getByText('Hidden by default').first()).toBeVisible();
-    await expectThirtySliceHandoff(page, 'printable-worksheet');
+    await expect(page.locator('[data-handoff]')).toHaveCount(0);
 
     await page.getByRole('switch', { name: 'Include answer key' }).click();
     await expect(page).toHaveURL(/answerKey=true/);

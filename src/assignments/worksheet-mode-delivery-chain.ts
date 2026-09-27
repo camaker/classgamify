@@ -351,9 +351,9 @@ function getWorksheetModeDeliveryChainHandoffItem(
     case 'printable-worksheet-handoff-boundary':
       return item(
         id,
-        'Printable worksheet handoff boundary',
-        '30 printable worksheet slices',
-        'Handout overview, student fields, response modes, choice banks, writing areas, answer lines, delivery policy, answer-key access and details, results return, print controls, and privacy stay aligned.'
+        'Printable worksheet page',
+        'Visible print page',
+        'Student fields, response modes, choice banks, writing areas, answer lines, delivery policy, answer-key access, and print controls stay aligned on the visible print page.'
       );
   }
 }

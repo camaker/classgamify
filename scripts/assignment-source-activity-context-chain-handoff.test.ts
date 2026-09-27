@@ -10,8 +10,6 @@ import {
   ASSIGNMENT_LIST_PAGE_HANDOFF_ITEM_IDS,
   buildAssignmentListCardViewModel,
 } from '@/assignments/list-view';
-import { ASSIGNMENT_RESULT_MATERIAL_HANDOFF_ITEM_IDS } from '@/assignments/result-actions';
-import { ASSIGNMENT_RESULTS_EXPORT_PREPARATION_ITEM_IDS } from '@/assignments/results-export';
 import {
   ASSIGNMENT_SOURCE_ACTIVITY_CONTEXT_CHAIN_HANDOFF_ITEM_IDS,
   ASSIGNMENT_SOURCE_ACTIVITY_CONTEXT_CHAIN_SOURCE_FILES,
@@ -19,10 +17,7 @@ import {
   type AssignmentSourceActivityContextChainHandoffItemId,
   type AssignmentSourceActivityContextChainHandoffView,
 } from '@/assignments/source-activity-context-chain';
-import {
-  PRINTABLE_WORKSHEET_HANDOFF_ITEM_IDS,
-  buildPrintableWorksheetPageViewModel,
-} from '@/assignments/printable-worksheet-view';
+import { buildPrintableWorksheetPageViewModel } from '@/assignments/printable-worksheet-view';
 import { PRINTABLE_WORKSHEET_REVIEW_LIFECYCLE_CHAIN_HANDOFF_ITEM_IDS } from '@/assignments/printable-worksheet-review-lifecycle-chain';
 import { SCORED_ATTEMPT_RESULT_CHAIN_HANDOFF_ITEM_IDS } from '@/assignments/scored-attempt-result-chain';
 import { TEACHER_RESULTS_REVIEW_CHAIN_HANDOFF_ITEM_IDS } from '@/assignments/teacher-results-review-chain';
@@ -156,7 +151,7 @@ test('assignment source activity context summarizes each lifecycle boundary', ()
       ['scored-result-chain-alignment', 'Scoring aligned'],
       ['source-material-storage-guard', 'Storage keys omitted'],
       ['student-data-privacy-guard', 'Student data omitted'],
-      ['result-material-handoff-boundary', '30 result material slices'],
+      ['result-material-handoff-boundary', 'Copy, CSV, and print'],
     ]
   );
   assert.equal(
@@ -165,7 +160,7 @@ test('assignment source activity context summarizes each lifecycle boundary', ()
   );
   assert.equal(
     getHandoffValue(handoffView, 'result-material-handoff-boundary'),
-    `${ASSIGNMENT_RESULT_MATERIAL_HANDOFF_ITEM_IDS.length} result material slices`
+    'Copy, CSV, and print'
   );
 });
 
@@ -185,9 +180,6 @@ test('assignment source activity context is backed by adjacent gates', () => {
   assert.deepEqual(
     [
       ASSIGNMENT_LIST_PAGE_HANDOFF_ITEM_IDS.length,
-      ASSIGNMENT_RESULT_MATERIAL_HANDOFF_ITEM_IDS.length,
-      ASSIGNMENT_RESULTS_EXPORT_PREPARATION_ITEM_IDS.length,
-      PRINTABLE_WORKSHEET_HANDOFF_ITEM_IDS.length,
       PRINTABLE_WORKSHEET_REVIEW_LIFECYCLE_CHAIN_HANDOFF_ITEM_IDS.length,
       ASSIGNMENT_DISTRIBUTION_LIFECYCLE_CHAIN_HANDOFF_ITEM_IDS.length,
       WORKSHEET_MODE_DELIVERY_CHAIN_HANDOFF_ITEM_IDS.length,
@@ -195,7 +187,7 @@ test('assignment source activity context is backed by adjacent gates', () => {
       TEACHER_RESULTS_REVIEW_CHAIN_HANDOFF_ITEM_IDS.length,
       SCORED_ATTEMPT_RESULT_CHAIN_HANDOFF_ITEM_IDS.length,
     ],
-    Array.from({ length: 10 }, () => 30)
+    Array.from({ length: 7 }, () => 30)
   );
 });
 
@@ -273,10 +265,6 @@ test('assignment source activity context uses frozen snapshots across surfaces',
       label: 'Activity description',
       value: 'Frozen source context description.',
     }
-  );
-  assert.equal(
-    getPrintableHandoffValue(printablePageView, 'assignment-field-count'),
-    '9 fields'
   );
 });
 
@@ -363,8 +351,8 @@ test('assignment source activity context focused gate is documented', () => {
 
   assert.match(
     PRODUCT_SOURCE,
-    /assignment\s+source\s+activity\s+context\s+chain[\s\S]*30-slice\s+result-material\s+handoff[\s\S]*frozen\s+source\s+title[\s\S]*teacher\s+copy\s+artifacts[\s\S]*CSV\s+preparation[\s\S]*printable\s+worksheets[\s\S]*snapshot-source\s+evidence[\s\S]*privacy/,
-    'docs/product.md should carry frozen source context into the shared teacher result-material contract.'
+    /assignment\s+source\s+activity\s+context\s+chain[\s\S]*frozen\s+source\s+title[\s\S]*teacher\s+copy\s+text[\s\S]*CSV\s+export[\s\S]*printable\s+worksheet/,
+    'docs/product.md should carry frozen source context into teacher copy, CSV, and print.'
   );
   assert.match(
     TEST_CATALOG_SOURCE,
@@ -384,17 +372,6 @@ function getHandoffValue(
 ) {
   const item = view.itemViews.find((itemView) => itemView.id === id);
   assert.ok(item, `Missing assignment source activity context item ${id}`);
-  return item.value;
-}
-
-function getPrintableHandoffValue(
-  pageView: ReturnType<typeof buildPrintableWorksheetPageViewModel>,
-  id: (typeof PRINTABLE_WORKSHEET_HANDOFF_ITEM_IDS)[number]
-) {
-  const item = pageView.handoffView.itemViews.find(
-    (itemView) => itemView.id === id
-  );
-  assert.ok(item, `Missing printable worksheet handoff item ${id}`);
   return item.value;
 }
 

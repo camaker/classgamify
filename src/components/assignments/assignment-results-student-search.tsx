@@ -2,7 +2,6 @@ import type {
   AssignmentResultStudentSearchControlView,
   StudentSummarySort,
 } from '@/assignments/result-view';
-import type { AssignmentResultStudentSearchHandoffView } from '@/assignments/result-student-search-handoff';
 import { AssignmentResultControlStatusBadge } from '@/components/assignments/assignment-result-control-status-badge';
 import { Input } from '@/components/ui/input';
 import {
@@ -15,7 +14,6 @@ type AssignmentResultsStudentSearchProps = {
   onClear: () => void;
   onSearch: (value: string) => void;
   onSortChange: (sort: StudentSummarySort) => void;
-  searchHandoffView: AssignmentResultStudentSearchHandoffView;
   view: AssignmentResultStudentSearchControlView;
 };
 
@@ -23,7 +21,6 @@ export function AssignmentResultsStudentSearch({
   onClear,
   onSearch,
   onSortChange,
-  searchHandoffView,
   view,
 }: AssignmentResultsStudentSearchProps) {
   const searchDescriptionIds = [
@@ -126,67 +123,6 @@ export function AssignmentResultsStudentSearch({
           {view.summary}
         </p>
       </section>
-      <AssignmentResultStudentSearchHandoff view={searchHandoffView} />
     </>
-  );
-}
-
-function AssignmentResultStudentSearchHandoff({
-  view,
-}: {
-  view: AssignmentResultStudentSearchHandoffView;
-}) {
-  const titleId = 'assignment-result-student-search-handoff-title';
-  const descriptionId = 'assignment-result-student-search-handoff-description';
-
-  return (
-    <section
-      aria-describedby={descriptionId}
-      aria-labelledby={titleId}
-      className="sr-only"
-      data-handoff="assignment-result-student-search"
-      data-handoff-scope={view.privacy.scope}
-    >
-      <h3 id={titleId}>{view.title}</h3>
-      <p id={descriptionId}>{view.description}</p>
-      <dl>
-        {view.itemViews.map((itemView) => (
-          <AssignmentResultStudentSearchHandoffItem
-            itemView={itemView}
-            key={itemView.id}
-          />
-        ))}
-      </dl>
-    </section>
-  );
-}
-
-function AssignmentResultStudentSearchHandoffItem({
-  itemView,
-}: {
-  itemView: AssignmentResultStudentSearchHandoffView['itemViews'][number];
-}) {
-  const labelId = `assignment-result-student-search-handoff-${itemView.id}-label`;
-  const valueId = `assignment-result-student-search-handoff-${itemView.id}-value`;
-  const descriptionId = `assignment-result-student-search-handoff-${itemView.id}-description`;
-
-  return (
-    <div data-handoff-item={itemView.id}>
-      <dt id={labelId}>{itemView.label}</dt>
-      <dd>
-        <output
-          aria-describedby={descriptionId}
-          aria-label={itemView.ariaLabel}
-          aria-labelledby={`${labelId} ${valueId}`}
-          id={valueId}
-        >
-          {itemView.value}
-        </output>
-        {itemView.statusLabel ? (
-          <span aria-hidden="true">{itemView.statusLabel}</span>
-        ) : null}
-        <p id={descriptionId}>{itemView.description}</p>
-      </dd>
-    </div>
   );
 }

@@ -560,13 +560,11 @@ answers, or teacher-only answers.
 contract for this chain, keeping URL validation, published share context,
 search/status filters, dashboard controls, list API owner scope, full filtered
 summaries, and privacy aligned with the visible handoff.
-The assignment source activity context chain should explicitly carry the
-30-slice result-material handoff so frozen source title, description, template,
-and snapshot provenance remain connected to teacher copy artifacts, CSV
-preparation, printable worksheets, current-review and full-assignment scopes,
-snapshot-source evidence, and privacy guards. Its independent 30-file gate
+The assignment source activity context chain should keep frozen source title,
+description, template, and snapshot provenance connected to teacher copy text,
+the CSV export, and the printable worksheet. Its independent 30-file gate
 should continue to verify list search, public summaries, result headers, export,
-and print surfaces without replacing that teacher-material output contract.
+and print surfaces.
 Teachers can close and reopen published assignment links without changing the
 frozen snapshot, so public student access and submissions respect the assignment
 lifecycle while existing attempts remain available for review. Assignment
@@ -747,12 +745,11 @@ per-template route math, so every runner counts answered items, submits frozen
 runtime item ids, and prompts for partial attempts consistently.
 The post-submit result boundary should also stay shared from scored-attempt
 persistence through public feedback, assignment stats, teacher result analysis,
-a 30-slice attempt review card handoff, copy artifacts, CSV export, and printable
-review return links. The attempt review card handoff keeps prepared slices for
-student display, submitted time, score and answer summaries, snapshot-ordered
-answers, statuses, accepted alternatives, explanations, filters, copy/export
-scope, and privacy guards connected without exposing answer text or teacher-only
-answers in the scored-result chain summary.
+answer review cards, copy artifacts, CSV export, and printable review return
+links. Answer review cards show student display, submitted time, score and
+answer summaries, snapshot-ordered answers, statuses, accepted alternatives, and
+explanations without exposing answer text or teacher-only answers in the
+scored-result chain summary.
 The attempt persistence continuity chain should carry the existing persistence
 handoff as a 30-slice source-level contract across submission gates, normalized
 identity, frozen runtime validation, scoring, assignment/attempt/time fields,
@@ -874,22 +871,18 @@ before copying reteach artifacts or exporting results.
 Printable worksheet pages should do the same for handout overview chips,
 student/date/score and delivery fields, answer-key access state, item response
 help, choice banks, writing areas, teacher-only answer-key details,
-return-to-results links, and print controls, so paper handoffs remain
+return-to-results links, and print controls, so printed worksheets remain
 reviewable without depending on visual badges alone.
-The worksheet-mode delivery chain should explicitly carry this printable
-worksheet handoff as 30 slices spanning handout overview, student fields,
-response planning, choice-bank and writing-area coverage, answer lines,
-assignment and delivery context, answer-key access and details, results return,
-print action, route/public-runner boundaries, and privacy. Its aggregate summary
-must not expose prompt, choice, answer-key, student-response, student-identity,
-or source-material storage-key text.
-The printable worksheet review lifecycle chain should explicitly carry the
-30-slice printable worksheet handoff so handout overview, response planning,
-assignment and delivery context, answer-key access, results return, print
-controls, route boundaries, and privacy remain connected to teacher result
-review. Its independent 30-file gate should continue to verify result actions,
-teacher-only print routes, frozen snapshot rendering, answer-key states,
-navigation, and export alignment without replacing that paper handoff contract.
+The worksheet-mode delivery chain should end at that visible print page: student
+fields, response planning, choice banks, writing areas, answer lines, delivery
+context, answer-key access, and the print action, without exposing prompt,
+choice, answer-key, student-response, student-identity, or source-material
+storage-key text in its aggregate summary.
+The printable worksheet review lifecycle chain should keep the visible print
+page connected to teacher result review: response planning, delivery context,
+answer-key access, results return, and print controls. Its independent 30-file
+gate should continue to verify result actions, teacher-only print routes, frozen
+snapshot rendering, answer-key states, navigation, and export alignment.
 The local persisted browser journey should complete this same teacher loop in
 one data set: save an activity, publish an assignment, submit a student attempt,
 review and filter the result, copy a classroom brief, download the full CSV,

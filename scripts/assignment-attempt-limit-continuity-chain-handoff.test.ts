@@ -95,7 +95,7 @@ test('student retry, public rules, teacher result, and export stay aligned', () 
   assert.match(read('src/assignments/result-view.ts'), /settingsSummaryView/);
   assert.match(
     read('src/assignments/results-export.ts'),
-    /delivery-attempt-limit/
+    /deliveryView\.maxAttempts/
   );
 });
 

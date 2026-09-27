@@ -549,7 +549,7 @@ function buildSourceEvidence() {
         publishSource
       ),
     resultExportExposesPolicy:
-      /'delivery-item-order'[\s\S]*shuffleItems: exportSettings\.shuffleItems/.test(
+      /deliveryView\.itemOrder,[\s\S]*shuffleItems: exportSettings\.shuffleItems/.test(
         resultsExportSource
       ),
     studentReviewUsesOrderedRuntimeItems:

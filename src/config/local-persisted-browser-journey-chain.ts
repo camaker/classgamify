@@ -56,14 +56,14 @@ export const LOCAL_PERSISTED_BROWSER_JOURNEY_CHAIN_SOURCE_FILES = [
   'src/components/assignments/student-runner-frame.tsx',
   'src/routes/dashboard/assignments/$assignmentId.tsx',
   'src/components/assignments/assignment-results-header-actions.tsx',
-  'src/components/assignments/assignment-results-review-handoff-panel.tsx',
-  'src/components/assignments/assignment-results-classroom-brief-card.tsx',
+  'src/components/assignments/assignment-results-attempt-review-filter-control.tsx',
+  'src/components/assignments/assignment-results-follow-up-panel.tsx',
   'src/components/assignments/assignment-results-item-performance-table.tsx',
   'src/components/assignments/assignment-results-student-search.tsx',
   'src/assignments/results-export.ts',
   'src/routes/print/assignments/$assignmentId.tsx',
   'src/components/assignments/printable-worksheet-toolbar.tsx',
-  'src/components/assignments/printable-worksheet-handoff.tsx',
+  'src/components/assignments/printable-worksheet-preparation-summary.tsx',
 ] as const;
 
 export type LocalPersistedBrowserJourneyChainHandoffItemId =

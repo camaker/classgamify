@@ -17,7 +17,6 @@ import {
   PUBLISHED_ASSIGNMENT_DELIVERY_CHAIN_SOURCE_FILES,
 } from '@/assignments/published-assignment-delivery-chain';
 import { PUBLIC_ASSIGNMENT_ACCESS_HANDOFF_ITEM_IDS } from '@/assignments/public';
-import { ASSIGNMENT_RESULTS_EXPORT_PREPARATION_ITEM_IDS } from '@/assignments/results-export';
 import { ASSIGNMENT_SHARE_LINK_HANDOFF_ITEM_IDS } from '@/assignments/share-link';
 import { PUBLIC_ASSIGNMENT_UNAVAILABLE_ACCESS_HANDOFF_ITEM_IDS } from '@/assignments/unavailable-access';
 
@@ -229,9 +228,8 @@ test('assignment lifecycle governance chain is backed by adjacent gates', () => 
       PUBLISHED_ASSIGNMENT_DELIVERY_CHAIN_SOURCE_FILES.length,
       ASSIGNMENT_DELIVERY_POLICY_HANDOFF_ITEM_IDS.length,
       ASSIGNMENT_ATTEMPT_STATS_HANDOFF_ITEM_IDS.length,
-      ASSIGNMENT_RESULTS_EXPORT_PREPARATION_ITEM_IDS.length,
     ],
-    Array.from({ length: 10 }, () => 30)
+    Array.from({ length: 9 }, () => 30)
   );
 });
 
@@ -457,16 +455,17 @@ test('server functions preserve owner scope, lifecycle gates, and retained resul
   );
   assert.match(
     RESULTS_EXPORT_SOURCE,
-    /ASSIGNMENT_RESULTS_EXPORT_PREPARATION_ITEM_IDS[\s\S]*'delivery-close-time'/,
-    'Results export preparation should include delivery lifecycle while hiding private data.'
+    /deliveryView\.closeTime,[\s\S]*deliveryView\.policyText,[\s\S]*deliveryView\.identityMode,[\s\S]*deliveryView\.answerReveal,[\s\S]*deliveryView\.itemOrder,[\s\S]*deliveryView\.maxAttempts,[\s\S]*deliveryView\.timeLimitSeconds/,
+    'Results CSV export should include delivery lifecycle columns.'
   );
   assert.match(
     RESULTS_EXPORT_SOURCE,
     /formatAssignmentExportStatusLabel[\s\S]*getAssignmentStatusLabel/
   );
-  assert.match(
+  assert.doesNotMatch(
     RESULTS_EXPORT_SOURCE,
-    /exposesRawAnonymousToken: false[\s\S]*exposesStudentAnswerText: false/
+    /anonymousToken|storageKey/,
+    'Results CSV export should never read raw anonymous tokens or storage keys.'
   );
   assert.match(
     APP_SCHEMA_SOURCE,
@@ -483,18 +482,13 @@ test('server functions preserve owner scope, lifecycle gates, and retained resul
 test('result surfaces keep lifecycle sharing and retained review contracts', () => {
   assert.match(
     RESULT_VIEW_SOURCE,
-    /resolveAssignmentSnapshotSource[\s\S]*buildAssignmentResultsExportPreparationView[\s\S]*getAssignmentStatusLabel/,
-    'Result page view should combine lifecycle status, snapshot source, share availability, and export preparation.'
+    /resolveAssignmentSnapshotSource[\s\S]*getAssignmentStatusLabel/,
+    'Result page view should combine lifecycle status, snapshot source, and share availability.'
   );
   assert.match(
     RESULT_VIEW_SOURCE,
     /buildAssignmentResultHeaderShareAction[\s\S]*buildAssignmentShareLinkAvailability/,
     'Result page share actions should reuse assignment share-link availability.'
-  );
-  assert.match(
-    RESULT_VIEW_SOURCE,
-    /buildAssignmentResultReviewHandoffView[\s\S]*action-export-csv[\s\S]*full-export-boundary/,
-    'Result review handoff should preserve export/review boundaries after lifecycle changes.'
   );
   assert.match(
     ASSIGNMENT_RESULTS_HEADER_CARD_SOURCE,
@@ -508,13 +502,13 @@ test('result surfaces keep lifecycle sharing and retained review contracts', () 
   );
   assert.match(
     ASSIGNMENT_RESULTS_HEADER_ACTIONS_SOURCE,
-    /buildAssignmentShareLinkHandoffView\([\s\S]*surface: 'result-page'[\s\S]*CopyAssignmentShareLinkButton[\s\S]*disabled=\{!shareAction\.isAvailable\}/,
-    'Results header actions should keep result-page share link handoff and availability gates.'
+    /CopyAssignmentShareLinkButton[\s\S]*disabled=\{!shareAction\.isAvailable\}/,
+    'Results header actions should keep share-link availability gates.'
   );
-  assert.match(
+  assert.doesNotMatch(
     ASSIGNMENT_RESULTS_HEADER_ACTIONS_SOURCE,
-    /data-handoff="assignment-results-export-preparation"[\s\S]*data-handoff-item=\{itemView\.id\}/,
-    'Results header actions should keep hidden export-preparation handoff coverage.'
+    /data-handoff|Handoff\b/,
+    'Results header actions should render no hidden audit sections.'
   );
 });
 

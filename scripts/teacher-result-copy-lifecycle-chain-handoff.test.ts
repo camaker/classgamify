@@ -1,14 +1,6 @@
 import assert from 'node:assert/strict';
 import { existsSync, readFileSync } from 'node:fs';
 import test from 'node:test';
-import { ASSIGNMENT_ATTEMPT_REVIEW_CARD_HANDOFF_ITEM_IDS } from '@/assignments/attempt-review-card-handoff';
-import { ASSIGNMENT_COPY_ARTIFACT_HANDOFF_ITEM_IDS } from '@/assignments/copy-artifact-handoff';
-import { ASSIGNMENT_ITEM_PERFORMANCE_SORT_HANDOFF_ITEM_IDS } from '@/assignments/item-performance-sort-handoff';
-import { ASSIGNMENT_RESULT_STUDENT_SEARCH_HANDOFF_ITEM_IDS } from '@/assignments/result-student-search-handoff';
-import { ASSIGNMENT_RESULT_MATERIAL_HANDOFF_ITEM_IDS } from '@/assignments/result-actions';
-import { ASSIGNMENT_RESULTS_EXPORT_PREPARATION_ITEM_IDS } from '@/assignments/results-export';
-import { ASSIGNMENT_STUDENT_FOLLOW_UP_PRIORITY_HANDOFF_ITEM_IDS } from '@/assignments/student-follow-up-priority';
-import { ASSIGNMENT_STUDENT_SUMMARY_SORT_HANDOFF_ITEM_IDS } from '@/assignments/student-summary-sort-handoff';
 import {
   TEACHER_RESULT_COPY_LIFECYCLE_CHAIN_HANDOFF_ITEM_IDS,
   TEACHER_RESULT_COPY_LIFECYCLE_CHAIN_SOURCE_FILES,
@@ -25,10 +17,6 @@ const RESULT_ACTIONS_SOURCE = readFileSync(
 );
 const RESULT_VIEW_SOURCE = readFileSync(
   'src/assignments/result-view.ts',
-  'utf8'
-);
-const COPY_ARTIFACT_HANDOFF_SOURCE = readFileSync(
-  'src/assignments/copy-artifact-handoff.ts',
   'utf8'
 );
 const CLASSROOM_BRIEF_SOURCE = readFileSync(
@@ -52,7 +40,7 @@ const RESULT_COPY_FORMAT_SOURCE = readFileSync(
   'utf8'
 );
 const CLASSROOM_BRIEF_CARD_SOURCE = readFileSync(
-  'src/components/assignments/assignment-results-classroom-brief-card.tsx',
+  'src/components/assignments/assignment-results-follow-up-panel.tsx',
   'utf8'
 );
 const RESULT_ROUTE_SOURCE = readFileSync(
@@ -172,18 +160,8 @@ test('teacher result copy lifecycle chain is backed by adjacent gates', () => {
   }
 
   assert.deepEqual(
-    [
-      ASSIGNMENT_COPY_ARTIFACT_HANDOFF_ITEM_IDS.length,
-      ASSIGNMENT_STUDENT_FOLLOW_UP_PRIORITY_HANDOFF_ITEM_IDS.length,
-      ASSIGNMENT_ITEM_PERFORMANCE_SORT_HANDOFF_ITEM_IDS.length,
-      ASSIGNMENT_STUDENT_SUMMARY_SORT_HANDOFF_ITEM_IDS.length,
-      ASSIGNMENT_RESULT_STUDENT_SEARCH_HANDOFF_ITEM_IDS.length,
-      ASSIGNMENT_ATTEMPT_REVIEW_CARD_HANDOFF_ITEM_IDS.length,
-      ASSIGNMENT_RESULT_MATERIAL_HANDOFF_ITEM_IDS.length,
-      ASSIGNMENT_RESULTS_EXPORT_PREPARATION_ITEM_IDS.length,
-      TEACHER_RESULTS_REVIEW_CHAIN_HANDOFF_ITEM_IDS.length,
-    ],
-    Array.from({ length: 9 }, () => 30)
+    [TEACHER_RESULTS_REVIEW_CHAIN_HANDOFF_ITEM_IDS.length],
+    Array.from({ length: 1 }, () => 30)
   );
 });
 
@@ -225,10 +203,7 @@ test('product docs and copy builders preserve teacher copy artifact policy', () 
 test('copy artifacts reuse shared priority, formatting, and latest-attempt helpers', () => {
   assert.match(CLASSROOM_BRIEF_SOURCE, /buildAssignmentAttemptStatsView/);
   assert.match(CLASSROOM_BRIEF_SOURCE, /getAssignmentReviewPriorityItems/);
-  assert.match(
-    CLASSROOM_BRIEF_SOURCE,
-    /buildAssignmentStudentFollowUpPriorityHandoffView/
-  );
+  assert.match(CLASSROOM_BRIEF_SOURCE, /getClassroomBriefFollowUpStudents/);
   assert.match(
     CLASSROOM_BRIEF_SOURCE,
     /buildLatestAttemptReviewByStudentKey[\s\S]*formatStudentFollowUpLatestAttemptSummary/
@@ -288,13 +263,10 @@ test('result page assembles scoped copy data without leaking copy text', () => {
     RESULT_VIEW_SOURCE,
     /buildAssignmentResultCopyArtifactPreviews\(\{[\s\S]*artifacts: copyArtifacts,[\s\S]*copyScopeView/
   );
-  assert.match(
+  assert.doesNotMatch(
     RESULT_VIEW_SOURCE,
-    /buildAssignmentCopyArtifactHandoffView\(\{[\s\S]*artifacts: copyArtifacts,[\s\S]*previews: copyArtifactPreviews/
-  );
-  assert.match(
-    RESULT_VIEW_SOURCE,
-    /buildTeacherResultsReviewChainHandoffView\(\)/
+    /HandoffView/,
+    'The result page view model should not build hidden audit views.'
   );
   // Copy artifacts are reached through the Copy & export menu; the page no
   // longer repeats every copy preview inline.
@@ -306,11 +278,11 @@ test('result page assembles scoped copy data without leaking copy text', () => {
     RESULT_ROUTE_SOURCE,
     /<AssignmentResultsClassroomBriefCard\b/
   );
-  assert.match(
+  assert.doesNotMatch(
     CLASSROOM_BRIEF_CARD_SOURCE,
-    /AssignmentCopyArtifactHandoff[\s\S]*className="sr-only"[\s\S]*data-handoff="assignment-copy-artifact"[\s\S]*<dl>[\s\S]*data-handoff-item=\{itemView\.id\}/
+    /data-handoff/,
+    'The follow-up panel should render no hidden copy-artifact audit output.'
   );
-  assert.match(COPY_ARTIFACT_HANDOFF_SOURCE, /exposesArtifactText: false/);
   assertNoPrivateCopyLifecycleText(
     JSON.stringify(buildTeacherResultCopyLifecycleChainHandoffView())
   );

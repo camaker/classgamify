@@ -1,18 +1,11 @@
 import type {
   AssignmentResultAction,
   AssignmentResultActionButton,
-  AssignmentResultMaterialHandoffView,
 } from '@/assignments/result-actions';
-import type {
-  AssignmentResultsExportPreparationItemView,
-  AssignmentResultsExportPreparationView,
-} from '@/assignments/results-export';
 import type {
   AssignmentResultHeaderPrintAction,
   AssignmentResultHeaderShareAction,
 } from '@/assignments/result-view';
-import { buildAssignmentShareLinkHandoffView } from '@/assignments/share-link';
-import { AssignmentShareLinkHandoff } from '@/components/assignments/assignment-share-link-handoff';
 import { CopyAssignmentShareLinkButton } from '@/components/assignments/copy-assignment-share-link-button';
 import { Button, buttonVariants } from '@/components/ui/button';
 import {
@@ -35,8 +28,6 @@ import {
 import { Link } from '@tanstack/react-router';
 
 type AssignmentResultsHeaderActionsProps = {
-  exportPreparationView: AssignmentResultsExportPreparationView;
-  materialHandoffView: AssignmentResultMaterialHandoffView;
   onResultAction: (actionButton: AssignmentResultActionButton) => void;
   printAction: AssignmentResultHeaderPrintAction;
   resultActionsLabel: string;
@@ -47,8 +38,6 @@ type AssignmentResultsHeaderActionsProps = {
 };
 
 export function AssignmentResultsHeaderActions({
-  exportPreparationView,
-  materialHandoffView,
   onResultAction,
   printAction,
   resultActionsLabel,
@@ -60,16 +49,9 @@ export function AssignmentResultsHeaderActions({
     getAssignmentResultHeaderShareDisabledReasonId(shareAction);
   const sharePathDescriptionId =
     getAssignmentResultHeaderSharePathDescriptionId(shareAction);
-  const shareLinkHandoffView = buildAssignmentShareLinkHandoffView(
-    shareAction,
-    {
-      surface: 'result-page',
-    }
-  );
 
   return (
     <div className="flex flex-wrap items-center gap-2">
-      <AssignmentShareLinkHandoff handoff={shareLinkHandoffView} />
       <AssignmentResultsHeaderCopyShareAction
         disabledReasonId={shareDisabledReasonId}
         sharePathDescriptionId={sharePathDescriptionId}
@@ -95,12 +77,6 @@ export function AssignmentResultsHeaderActions({
       <AssignmentResultsHeaderShareDisabledReason
         disabledReasonId={shareDisabledReasonId}
         shareAction={shareAction}
-      />
-      <AssignmentResultsMaterialHandoff
-        materialHandoffView={materialHandoffView}
-      />
-      <AssignmentResultsExportPreparation
-        exportPreparationView={exportPreparationView}
       />
     </div>
   );
@@ -410,134 +386,6 @@ function AssignmentResultsHeaderResultActionDisabledReasons({
           {disabledReason.message}
         </p>
       ))}
-    </div>
-  );
-}
-
-function AssignmentResultsExportPreparation({
-  exportPreparationView,
-}: {
-  exportPreparationView: AssignmentResultsExportPreparationView;
-}) {
-  const titleId = 'assignment-results-export-preparation-title';
-  const descriptionId = 'assignment-results-export-preparation-description';
-
-  return (
-    <section
-      aria-describedby={descriptionId}
-      aria-labelledby={titleId}
-      className="sr-only"
-      data-handoff="assignment-results-export-preparation"
-      data-handoff-scope={exportPreparationView.privacy.scope}
-    >
-      <div className="grid gap-1">
-        <h3 id={titleId} className="font-medium text-sm">
-          {exportPreparationView.title}
-        </h3>
-        <p id={descriptionId} className="text-muted-foreground text-xs">
-          {exportPreparationView.description}
-        </p>
-      </div>
-      <div className="grid gap-2 sm:grid-cols-2 xl:grid-cols-5">
-        {exportPreparationView.itemViews.map((itemView) => (
-          <AssignmentResultsExportPreparationItem
-            itemView={itemView}
-            key={itemView.id}
-          />
-        ))}
-      </div>
-    </section>
-  );
-}
-
-function AssignmentResultsExportPreparationItem({
-  itemView,
-}: {
-  itemView: AssignmentResultsExportPreparationItemView;
-}) {
-  const labelId = `assignment-results-export-preparation-${itemView.id}-label`;
-  const valueId = `assignment-results-export-preparation-${itemView.id}-value`;
-  const descriptionId = `assignment-results-export-preparation-${itemView.id}-description`;
-
-  return (
-    <article
-      aria-describedby={descriptionId}
-      aria-label={itemView.ariaLabel}
-      aria-labelledby={`${labelId} ${valueId}`}
-      className="grid gap-1 rounded-md border bg-background p-3"
-      data-handoff-item={itemView.id}
-    >
-      <p className="text-muted-foreground text-xs" id={labelId}>
-        {itemView.label}
-      </p>
-      <output
-        aria-describedby={descriptionId}
-        aria-label={itemView.ariaLabel}
-        aria-labelledby={`${labelId} ${valueId}`}
-        id={valueId}
-      >
-        <span className="font-semibold text-lg">{itemView.value}</span>
-      </output>
-      <p className="text-muted-foreground text-xs" id={descriptionId}>
-        {itemView.description}
-      </p>
-    </article>
-  );
-}
-
-function AssignmentResultsMaterialHandoff({
-  materialHandoffView,
-}: {
-  materialHandoffView: AssignmentResultMaterialHandoffView;
-}) {
-  const titleId = 'assignment-results-material-handoff-title';
-  const descriptionId = 'assignment-results-material-handoff-description';
-
-  return (
-    <section
-      aria-describedby={descriptionId}
-      aria-labelledby={titleId}
-      className="sr-only"
-      data-handoff="assignment-result-material"
-      data-handoff-scope={materialHandoffView.privacy.scope}
-    >
-      <h3 id={titleId}>{materialHandoffView.title}</h3>
-      <p id={descriptionId}>{materialHandoffView.description}</p>
-      <dl>
-        {materialHandoffView.itemViews.map((itemView) => (
-          <AssignmentResultsMaterialHandoffItem
-            itemView={itemView}
-            key={itemView.id}
-          />
-        ))}
-      </dl>
-    </section>
-  );
-}
-
-function AssignmentResultsMaterialHandoffItem({
-  itemView,
-}: {
-  itemView: AssignmentResultMaterialHandoffView['itemViews'][number];
-}) {
-  const labelId = `assignment-result-material-handoff-${itemView.id}-label`;
-  const valueId = `assignment-result-material-handoff-${itemView.id}-value`;
-  const descriptionId = `assignment-result-material-handoff-${itemView.id}-description`;
-
-  return (
-    <div data-handoff-item={itemView.id} data-scope={itemView.dataScope}>
-      <dt id={labelId}>{itemView.label}</dt>
-      <dd>
-        <output
-          aria-describedby={descriptionId}
-          aria-label={itemView.ariaLabel}
-          aria-labelledby={`${labelId} ${valueId}`}
-          id={valueId}
-        >
-          {itemView.value}
-        </output>
-        <p id={descriptionId}>{itemView.description}</p>
-      </dd>
     </div>
   );
 }

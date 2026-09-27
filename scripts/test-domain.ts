@@ -1,5 +1,9 @@
 import assert from 'node:assert/strict';
-import { existsSync, readdirSync, readFileSync } from 'node:fs';
+import {
+  existsSync,
+  readdirSync,
+  readFileSync,
+} from 'node:fs';
 import {
   baseLocale,
   locales,
@@ -9,7 +13,10 @@ import {
   isLocalizedPath,
   LOCALIZED_PATHS,
 } from '@/lib/locale';
-import { isLinkActive, isLinkSectionActive } from '@/lib/urls';
+import {
+  isLinkActive,
+  isLinkSectionActive,
+} from '@/lib/urls';
 import { Routes } from '@/lib/routes';
 import {
   PUBLIC_INDEXABLE_STATIC_ROUTES,
@@ -363,9 +370,7 @@ import {
   buildActivityAiDraftFocusOptions,
   buildActivityAiDraftFocusPromptLine,
 } from '@/activities/ai-draft-focus';
-import {
-  ACTIVITY_AI_DRAFT_BOUNDARY_HANDOFF_ITEM_IDS,
-} from '@/activities/ai-draft-boundary';
+import { ACTIVITY_AI_DRAFT_BOUNDARY_HANDOFF_ITEM_IDS } from '@/activities/ai-draft-boundary';
 import { ACTIVITY_AI_FALLBACK_HANDOFF_ITEM_IDS } from '@/activities/ai-draft-fallback-handoff';
 import {
   ACTIVITY_AI_REMIX_ASSIST_HANDOFF_ITEM_IDS,
@@ -635,7 +640,10 @@ import {
   WORKSHEET_MODE_TEMPLATES,
 } from '@/activities/worksheet-modes';
 import { STARTER_FOOD_ASSIGNMENT_SHARE_ID } from '@/activities/starter-ids';
-import { getAcceptedAnswers, matchAnswer } from '@/activities/answer-matching';
+import {
+  getAcceptedAnswers,
+  matchAnswer,
+} from '@/activities/answer-matching';
 import {
   buildDashboardCoreLoopReadiness,
   buildDashboardOverviewLoopStatus,
@@ -702,7 +710,9 @@ import {
   buildSettingsFilesWorkspaceSummaryView,
   SETTINGS_FILES_SOURCE_MATERIAL_HANDOFF_ITEM_IDS,
 } from '@/settings/files-view';
-import { SETTINGS_FILES_MATERIAL_CLASSIFICATION_HANDOFF_ITEM_IDS } from '@/settings/files-material-classification-view';
+import {
+  SETTINGS_FILES_MATERIAL_CLASSIFICATION_HANDOFF_ITEM_IDS,
+} from '@/settings/files-material-classification-view';
 import {
   buildSettingsNotificationNewsletterCardView,
   buildSettingsNotificationPageViewModel,
@@ -711,7 +721,10 @@ import {
   SETTINGS_NOTIFICATION_UPDATE_HANDOFF_ITEM_IDS,
 } from '@/settings/notifications-view';
 import { SETTINGS_SECURITY_WORKSPACE_HANDOFF_ITEM_IDS } from '@/settings/security-handoff';
-import type { PricePlan, Subscription } from '@/payment/types';
+import type {
+  PricePlan,
+  Subscription,
+} from '@/payment/types';
 import {
   AssignmentAttemptAnswerValidationError,
   assertSubmittedAnswersMatchRuntimeItems,
@@ -891,7 +904,6 @@ import {
 } from '@/assignments/printable-worksheet';
 import {
   PRINTABLE_WORKSHEET_BODY_PRINT_MODE,
-  PRINTABLE_WORKSHEET_HANDOFF_ITEM_IDS,
   buildPrintableWorksheetAnswerKeyAccessView,
   buildPrintableWorksheetAnswerKeyItemView,
   buildPrintableWorksheetErrorView,
@@ -992,29 +1004,11 @@ import {
 } from '@/assignments/item-order';
 import { ASSIGNMENT_ITEM_ORDER_HANDOFF_ITEM_IDS } from '@/assignments/item-order-handoff';
 import {
-  ASSIGNMENT_ITEM_PERFORMANCE_SORT_HANDOFF_ITEM_IDS,
-  buildAssignmentItemPerformanceSortHandoffEvidence,
-} from '@/assignments/item-performance-sort-handoff';
-import {
-  ASSIGNMENT_STUDENT_SUMMARY_SORT_HANDOFF_ITEM_IDS,
-  buildAssignmentStudentSummarySortHandoffEvidence,
-  buildAssignmentStudentSummarySortHandoffView,
-} from '@/assignments/student-summary-sort-handoff';
-import {
-  ASSIGNMENT_ATTEMPT_REVIEW_CARD_HANDOFF_ITEM_IDS,
-  buildAssignmentAttemptReviewCardHandoffEvidence,
-  buildAssignmentAttemptReviewCardHandoffView,
-} from '@/assignments/attempt-review-card-handoff';
-import { ASSIGNMENT_COPY_ARTIFACT_HANDOFF_ITEM_IDS } from '@/assignments/copy-artifact-handoff';
-import { ASSIGNMENT_RESULT_STUDENT_SEARCH_HANDOFF_ITEM_IDS } from '@/assignments/result-student-search-handoff';
-import {
   assignmentResultPageCopy,
   assignmentResultReviewCopy,
   assignmentResultSearchCopy,
   assignmentResultSectionCopy,
   assignmentResultTableHeaders,
-  ASSIGNMENT_RESULT_REVIEW_CONTROLS_HANDOFF_ITEM_IDS,
-  ASSIGNMENT_RESULT_REVIEW_HANDOFF_ITEM_IDS,
   assignmentResultActionDescriptors,
   assignmentResultActionOrder,
   buildAttemptReviewSubmissionSummary,
@@ -1030,7 +1024,6 @@ import {
   buildAssignmentItemAnalysisCardView,
   buildAssignmentItemAnalysisCardViews,
   buildAssignmentItemPerformanceRowView,
-  buildAssignmentItemPerformanceTableView,
   buildAssignmentItemPerformanceRowViews,
   buildAssignmentResultActionButtons,
   buildAssignmentResultActionDataSet,
@@ -1053,8 +1046,6 @@ import {
   buildAssignmentResultControlViews,
   buildAssignmentResultControlStatusView,
   buildAssignmentResultCopyScopeView,
-  buildAssignmentResultReviewControlsHandoffView,
-  buildAssignmentResultReviewHandoffView,
   buildAssignmentResultReviewScopeView,
   buildAssignmentResultReviewStatusView,
   buildAssignmentResultReviewScopeSummary,
@@ -1062,7 +1053,6 @@ import {
   buildAssignmentResultsPageViewModel,
   buildAssignmentResultsRouteState,
   buildAssignmentStudentSummaryRowView,
-  buildAssignmentStudentSummaryTableView,
   buildAssignmentStudentSummaryRowViews,
   buildAssignmentResultEmptyState,
   attemptReviewFilterOptions,
@@ -1116,10 +1106,6 @@ import {
   ASSIGNMENT_RESULT_EXPLANATION_CHAIN_SOURCE_FILES,
   buildAssignmentResultExplanationChainHandoffView,
 } from '@/assignments/result-explanation-chain';
-import {
-  ASSIGNMENT_RESULT_EMPTY_STATE_HANDOFF_ITEM_IDS,
-  buildAssignmentResultEmptyStateHandoffView,
-} from '@/assignments/result-empty-state-handoff';
 import {
   ATTEMPT_REVIEW_FILTER_VALUES,
   DEFAULT_ATTEMPT_REVIEW_FILTER,
@@ -1175,7 +1161,6 @@ import {
   ANSWER_FEEDBACK_LIFECYCLE_CHAIN_SOURCE_FILES,
   buildAnswerFeedbackLifecycleChainHandoffView,
 } from '@/assignments/answer-feedback-lifecycle-chain';
-import { ASSIGNMENT_RESULT_MATERIAL_HANDOFF_ITEM_IDS } from '@/assignments/result-actions';
 import { buildAssignmentAttemptReviewSummary } from '@/assignments/result-review-summary';
 import {
   formatAssignmentSummaryAccuracy,
@@ -1195,8 +1180,6 @@ import {
   sortAssignmentItemsByReviewPriority,
 } from '@/assignments/review-priority';
 import {
-  ASSIGNMENT_STUDENT_FOLLOW_UP_PRIORITY_HANDOFF_ITEM_IDS,
-  buildAssignmentStudentFollowUpPriorityHandoffView,
   compareAssignmentStudentsByDisplayLabel,
   getAssignmentStudentFollowUpPriorityStudents,
   sortAssignmentStudentsByFollowUpPriority,
@@ -1207,9 +1190,7 @@ import {
   isAssignmentAttemptAnswerNeedsReview,
 } from '@/assignments/results';
 import {
-  ASSIGNMENT_RESULTS_EXPORT_PREPARATION_ITEM_IDS,
   ASSIGNMENT_RESULTS_EXPORT_FILENAME_LIMITS,
-  buildAssignmentResultsExportPreparationView,
   buildAssignmentResultsExportDeliveryView,
   buildAssignmentResultsCsv,
   buildAssignmentResultsCsvDataUrl,
@@ -1448,7 +1429,10 @@ import {
   STORAGE_UPLOAD_READINESS_ITEM_IDS,
   buildStorageUploadReadinessPlan,
 } from '@/storage/upload-readiness';
-import { STORAGE_ERROR_CODES, UploadError } from '@/storage/types';
+import {
+  STORAGE_ERROR_CODES,
+  UploadError,
+} from '@/storage/types';
 import type { RuntimeItem } from '@/activities/runtime';
 import type {
   AssignmentSettings,
@@ -1488,8 +1472,6 @@ function summarizeAssignmentResultEmptyState(
 
   return {
     description: state.description,
-    handoffScope: state.handoffView.privacy.scope,
-    handoffSliceCount: state.handoffView.itemViews.length,
     title: state.title,
   };
 }
@@ -3472,12 +3454,12 @@ assert.match(
 );
 assert.match(
   assignmentResultActionsSource,
-  /export type AssignmentResultCopyArtifactPreviewScope = \{[\s\S]*description: string;[\s\S]*itemViews: AssignmentResultCopyArtifactPreviewScopeItem\[\];[\s\S]*summaryItems: AssignmentResultCopyArtifactPreviewScopeSummaryItem\[\];[\s\S]*title: string;[\s\S]*\}/,
+  /type AssignmentResultCopyArtifactPreviewScope = \{[\s\S]*description: string;[\s\S]*itemViews: AssignmentResultCopyArtifactPreviewScopeItem\[\];[\s\S]*summaryItems: AssignmentResultCopyArtifactPreviewScopeSummaryItem\[\];[\s\S]*title: string;[\s\S]*\}/,
   'Assignment result copy artifact previews should expose a structured copy-scope snapshot contract.'
 );
 assert.match(
   assignmentResultActionsSource,
-  /export type AssignmentResultCopyArtifactPreviewScopeSummaryItem = \{[\s\S]*ariaLabel: string;[\s\S]*description: string;[\s\S]*id: AssignmentResultCopyArtifactPreviewScopeSummaryItemId;[\s\S]*label: string;[\s\S]*value: string;/,
+  /type AssignmentResultCopyArtifactPreviewScopeSummaryItem = \{[\s\S]*ariaLabel: string;[\s\S]*description: string;[\s\S]*id: AssignmentResultCopyArtifactPreviewScopeSummaryItemId;[\s\S]*label: string;[\s\S]*value: string;/,
   'Assignment result copy artifact preview scope summary items should carry prepared accessible labels and descriptions.'
 );
 assert.match(
@@ -3607,11 +3589,6 @@ assert.match(
 );
 assert.match(
   assignmentResultViewActionBoundarySource,
-  /from '@\/assignments\/copy-artifact-handoff'/,
-  'Assignment result page view-model should consume the copy artifact handoff from the dedicated domain module.'
-);
-assert.match(
-  assignmentResultViewActionBoundarySource,
   /const copyActionData = data[\s\S]*buildAssignmentResultCopyActionData\(\{[\s\S]*attempts: resultView\.filteredAttemptReviews,[\s\S]*copyScopeView,[\s\S]*items: resultView\.sortedPerformanceItems,[\s\S]*students: resultView\.filteredStudents,[\s\S]*\}\)[\s\S]*const copyArtifacts = copyActionData[\s\S]*buildAssignmentResultCopyArtifacts\(copyActionData\)/,
   'Assignment result page view-model should derive classroom brief previews from current sorted item, filtered student review data, filtered attempt reviews, and prepared copy scope.'
 );
@@ -3619,11 +3596,6 @@ assert.match(
   assignmentResultViewActionBoundarySource,
   /const copyArtifactPreviews = copyArtifacts[\s\S]*buildAssignmentResultCopyArtifactPreviews\(\{[\s\S]*artifacts: copyArtifacts,[\s\S]*copyScopeView,[\s\S]*\}\)[\s\S]*button\.id === preview\.actionButtonId[\s\S]*copyArtifactPreviews,/,
   'Assignment result page view-model should bind scoped copy previews to action buttons by stable action-button id.'
-);
-assert.match(
-  assignmentResultViewActionBoundarySource,
-  /copyArtifactHandoffView: AssignmentCopyArtifactHandoffView \| null[\s\S]*const copyArtifactHandoffView = copyArtifacts[\s\S]*buildAssignmentCopyArtifactHandoffView\(\{[\s\S]*artifacts: copyArtifacts,[\s\S]*previews: copyArtifactPreviews,[\s\S]*\}\)[\s\S]*copyArtifactHandoffView,/,
-  'Assignment result page view-model should expose the 30-slice copy artifact handoff from the same prepared artifacts and previews rendered on the page.'
 );
 assert.doesNotMatch(
   assignmentResultViewActionBoundarySource,
@@ -3637,28 +3609,8 @@ assert.match(
 );
 assert.match(
   assignmentResultViewActionBoundarySource,
-  /export const ASSIGNMENT_RESULT_REVIEW_HANDOFF_ITEM_IDS = \[[\s\S]*'review-status'[\s\S]*'review-next-step'[\s\S]*'student-search-status'[\s\S]*'answer-review-status'[\s\S]*'matched-answer-reviews'[\s\S]*'copy-scope-review'[\s\S]*'action-export-csv'[\s\S]*'preview-copy-follow-up'[\s\S]*'route-state'[\s\S]*'current-review-boundary'[\s\S]*'full-export-boundary'[\s\S]*'privacy-guard'[\s\S]*\] as const/,
-  'Assignment result review handoff should expose fixed ids for review status, next step, controls, matched counts, copy scope, actions, previews, route state, boundaries, and privacy.'
-);
-assert.match(
-  assignmentResultViewActionBoundarySource,
-  /export type AssignmentResultReviewHandoffPrivacyContract = \{[\s\S]*exposesCopyArtifactText: false;[\s\S]*exposesCsvDataUrl: false;[\s\S]*exposesRawAnonymousToken: false;[\s\S]*exposesStudentAnswerText: false;[\s\S]*exposesTeacherAnswerKey: false;[\s\S]*scope: 'teacher-result-review';/,
-  'Assignment result review handoff should document that the handoff contract excludes copy text, CSV data URLs, raw anonymous tokens, submitted answers, and teacher answer keys inside the teacher result review scope.'
-);
-assert.match(
-  assignmentResultViewActionBoundarySource,
   /const controlViews = buildAssignmentResultControlViews\([\s\S]*const copyScopeView = buildAssignmentResultCopyScopeView\(\{[\s\S]*controlViews,[\s\S]*summary: resultView\.reviewScope\.summary,[\s\S]*\}\)[\s\S]*copyScopeView,/,
   'Assignment result page view-model should derive copy-scope previews from the prepared result control views and shared review scope summary.'
-);
-assert.match(
-  assignmentResultViewActionBoundarySource,
-  /const reviewHandoffView = buildAssignmentResultReviewHandoffView\(\{[\s\S]*actionButtons,[\s\S]*controlViews,[\s\S]*copyArtifactPreviews,[\s\S]*copyScopeView,[\s\S]*reviewScopeView,[\s\S]*reviewStatusView,[\s\S]*\}\)[\s\S]*reviewHandoffView,/,
-  'Assignment result page view-model should expose a review handoff view derived from prepared controls, scopes, actions, and scoped copy previews.'
-);
-assert.match(
-  assignmentResultViewActionBoundarySource,
-  /buildAssignmentResultReviewHandoffView[\s\S]*ASSIGNMENT_RESULT_REVIEW_HANDOFF_ITEM_IDS\.map[\s\S]*buildAssignmentResultReviewHandoffScopeItem[\s\S]*buildAssignmentResultReviewHandoffControlStatusItem[\s\S]*buildAssignmentResultReviewHandoffMatchedItem[\s\S]*buildAssignmentResultReviewHandoffCopyScopeItem[\s\S]*buildAssignmentResultReviewHandoffActionItem[\s\S]*buildAssignmentResultReviewHandoffPreviewItem[\s\S]*buildAssignmentResultReviewHandoffRouteStateItem[\s\S]*buildAssignmentResultReviewHandoffDataScopeItem/,
-  'Assignment result review handoff should collect review controls, control state, matched counts, copy scope, action states, copy preview summaries, route state, and data-scope boundaries.'
 );
 assert.match(
   assignmentResultViewActionBoundarySource,
@@ -3677,7 +3629,7 @@ assert.match(
 );
 assert.match(
   assignmentResultViewActionBoundarySource,
-  /export type AssignmentResultCopyScopeSummaryItemView = \{[\s\S]*ariaLabel: string;[\s\S]*description: string;[\s\S]*id: AssignmentResultCopyScopeSummaryItemId;[\s\S]*label: string;[\s\S]*value: string;/,
+  /type AssignmentResultCopyScopeSummaryItemView = \{[\s\S]*ariaLabel: string;[\s\S]*description: string;[\s\S]*id: AssignmentResultCopyScopeSummaryItemId;[\s\S]*label: string;[\s\S]*value: string;/,
   'Assignment result copy-scope summary items should carry domain-prepared accessible labels and descriptions.'
 );
 assert.match(
@@ -3997,20 +3949,8 @@ const assignmentResultFiltersSource = readFileSync(
   'src/assignments/result-filters.ts',
   'utf8'
 );
-const assignmentItemPerformanceSortHandoffSource = readFileSync(
-  'src/assignments/item-performance-sort-handoff.ts',
-  'utf8'
-);
-const assignmentStudentSummarySortHandoffSource = readFileSync(
-  'src/assignments/student-summary-sort-handoff.ts',
-  'utf8'
-);
 const assignmentResultsItemPerformanceTableSource = readFileSync(
   'src/components/assignments/assignment-results-item-performance-table.tsx',
-  'utf8'
-);
-const assignmentResultsStudentSummarySortTableSource = readFileSync(
-  'src/components/assignments/assignment-results-student-summary-table.tsx',
   'utf8'
 );
 const assignmentReviewPrioritySource = readFileSync(
@@ -4029,16 +3969,8 @@ const assignmentAttemptStatsHandoffSource = readFileSync(
   'src/assignments/attempt-stats-handoff.ts',
   'utf8'
 );
-const assignmentResultsAttemptStatsHandoffSource = readFileSync(
-  'src/components/assignments/assignment-results-attempt-stats-handoff.tsx',
-  'utf8'
-);
 const assignmentResultsExportStatsHandoffSource = readFileSync(
   'src/assignments/results-export.ts',
-  'utf8'
-);
-const assignmentResultRouteStatsHandoffSource = readFileSync(
-  'src/routes/dashboard/assignments/$assignmentId.tsx',
   'utf8'
 );
 const assignmentListSummarySource = readFileSync(
@@ -4126,21 +4058,6 @@ assert.match(
 );
 assert.match(
   assignmentResultViewSource,
-  /attemptStatsHandoffView: AssignmentAttemptStatsHandoffView[\s\S]*buildAssignmentAttemptStatsHandoffView\(\s*buildAssignmentAttemptStatsHandoffEvidence\(\{[\s\S]*attempts: data\?\.attempts \?\? \[\],[\s\S]*stats: data\?\.stats \?\? null,[\s\S]*timeLimitSeconds:/,
-  'Assignment result pages should carry the shared attempt stats handoff view.'
-);
-assert.match(
-  assignmentResultsAttemptStatsHandoffSource,
-  /function AssignmentResultsAttemptStatsHandoff[\s\S]*const titleId = 'assignment-attempt-stats-handoff-title'[\s\S]*const descriptionId = 'assignment-attempt-stats-handoff-description'[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*aria-labelledby=\{titleId\}[\s\S]*data-handoff="assignment-attempt-stats"[\s\S]*data-handoff-scope=\{view\.privacy\.scope\}[\s\S]*id=\{titleId\}[\s\S]*id=\{descriptionId\}[\s\S]*<dl>[\s\S]*view\.itemViews\.map[\s\S]*AssignmentAttemptStatsHandoffItem[\s\S]*function AssignmentAttemptStatsHandoffItem[\s\S]*const labelId = `assignment-attempt-stats-handoff-\$\{itemView\.id\}-label`[\s\S]*const valueId = `assignment-attempt-stats-handoff-\$\{itemView\.id\}-value`[\s\S]*const descriptionId = `assignment-attempt-stats-handoff-\$\{itemView\.id\}-description`[\s\S]*data-handoff-item=\{itemView\.id\}[\s\S]*id=\{labelId\}[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*aria-label=\{itemView\.ariaLabel\}[\s\S]*aria-labelledby=\{`\$\{labelId\} \$\{valueId\}`\}[\s\S]*id=\{valueId\}[\s\S]*id=\{descriptionId\}/,
-  'Assignment attempt stats handoff should render marker, privacy scope, item ids, and stable label/value/description relationships.'
-);
-assert.match(
-  assignmentResultRouteStatsHandoffSource,
-  /AssignmentResultsAttemptStatsHandoff[\s\S]*view=\{pageView\.attemptStatsHandoffView\}/,
-  'Assignment result route should render the attempt stats handoff beside metric cards.'
-);
-assert.match(
-  assignmentResultViewSource,
   /buildAssignmentResultControlOptions\([\s\S]*values\.map\(\(value\)/,
   'Assignment result control options should map directly from the domain enum values.'
 );
@@ -4221,7 +4138,7 @@ assert.match(
 );
 assert.match(
   assignmentResultFiltersSource,
-  /export function sortItemPerformance/,
+  /function sortItemPerformance/,
   'Assignment result item performance sort rules should live in the assignment result filter domain helper.'
 );
 assert.match(
@@ -4236,7 +4153,7 @@ assert.match(
 );
 assert.match(
   assignmentResultFiltersSource,
-  /export type AssignmentResultReviewScopeSummary[\s\S]*attemptReviews[\s\S]*attemptRows[\s\S]*itemPerformance[\s\S]*students/,
+  /type AssignmentResultReviewScopeSummary[\s\S]*attemptReviews[\s\S]*attemptRows[\s\S]*itemPerformance[\s\S]*students/,
   'Assignment result review scope should expose a structured scope summary.'
 );
 assert.match(
@@ -4255,60 +4172,14 @@ assert.match(
   'Assignment result view model should build search summaries from the shared review scope summary.'
 );
 assert.match(
-  assignmentResultViewSource,
-  /ASSIGNMENT_RESULT_REVIEW_CONTROLS_HANDOFF_ITEM_IDS = \[[\s\S]*'route-parser'[\s\S]*'student-search-status'[\s\S]*'copy-scope-students'[\s\S]*'anonymous-label-search'[\s\S]*'privacy-guard'/,
-  'Assignment result review controls handoff should name the route, control, copy-scope, anonymous-label, and privacy slices.'
-);
-assert.match(
-  assignmentResultViewSource,
-  /buildAssignmentResultReviewControlsHandoffView\(\{[\s\S]*controlViews,[\s\S]*copyScopeView,[\s\S]*reviewScope: resultView\.reviewScope,[\s\S]*viewState/,
-  'Assignment result page view should attach the review controls handoff from the same scope used by visible tables and copy artifacts.'
-);
-assert.match(
-  assignmentResultViewSource,
-  /buildAssignmentResultReviewControlsHandoffPrivacyContract[\s\S]*exposesRawRouteQuery: false[\s\S]*exposesStudentDisplayLabels: false[\s\S]*usesAssignmentDomainHelpers: true/,
-  'Assignment result review controls handoff should keep raw route queries and display labels out of semantic output while naming the domain-helper boundary.'
-);
-assert.match(
-  readFileSync(
-    'src/components/assignments/assignment-results-review-handoff-panel.tsx',
-    'utf8'
-  ),
-  /export function AssignmentResultsReviewHandoffPanel[\s\S]*const titleId = 'assignment-result-review-handoff-title'[\s\S]*const descriptionId = 'assignment-result-review-handoff-description'[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*aria-labelledby=\{titleId\}[\s\S]*className="sr-only"[\s\S]*data-handoff="assignment-result-review"[\s\S]*data-handoff-scope=\{view\.privacy\.scope\}[\s\S]*id=\{titleId\}[\s\S]*id=\{descriptionId\}[\s\S]*<dl>[\s\S]*view\.itemViews\.map[\s\S]*AssignmentResultReviewHandoffItem[\s\S]*function AssignmentResultReviewHandoffItem[\s\S]*const labelId = `assignment-result-review-\$\{itemView\.id\}-label`[\s\S]*const valueId = `assignment-result-review-\$\{itemView\.id\}-value`[\s\S]*const descriptionId = `assignment-result-review-\$\{itemView\.id\}-description`[\s\S]*data-handoff-item=\{itemView\.id\}[\s\S]*data-scope=\{itemView\.dataScope\}[\s\S]*id=\{labelId\}[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*aria-label=\{itemView\.ariaLabel\}[\s\S]*aria-labelledby=\{`\$\{labelId\} \$\{valueId\}`\}[\s\S]*id=\{valueId\}[\s\S]*aria-hidden="true"[\s\S]*id=\{descriptionId\}/,
-  'Assignment results review handoff panel should render the hidden main result review semantic handoff with marker, privacy scope, item ids, data scopes, and stable label/value/description relationships.'
-);
-assert.match(
-  readFileSync(
-    'src/components/assignments/assignment-results-review-handoff-panel.tsx',
-    'utf8'
-  ),
-  /function AssignmentResultReviewControlsHandoff[\s\S]*const titleId = 'assignment-result-review-controls-handoff-title'[\s\S]*const descriptionId = 'assignment-result-review-controls-handoff-description'[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*aria-labelledby=\{titleId\}[\s\S]*data-handoff="assignment-result-review-controls"[\s\S]*data-handoff-scope=\{view\.privacy\.scope\}[\s\S]*id=\{titleId\}[\s\S]*id=\{descriptionId\}[\s\S]*<dl>[\s\S]*view\.itemViews\.map[\s\S]*AssignmentResultReviewControlsHandoffItem[\s\S]*function AssignmentResultReviewControlsHandoffItem[\s\S]*const labelId = `assignment-result-review-controls-handoff-\$\{itemView\.id\}-label`[\s\S]*const valueId = `assignment-result-review-controls-handoff-\$\{itemView\.id\}-value`[\s\S]*const descriptionId = `assignment-result-review-controls-handoff-\$\{itemView\.id\}-description`[\s\S]*data-handoff-item=\{itemView\.id\}[\s\S]*id=\{labelId\}[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*aria-label=\{itemView\.ariaLabel\}[\s\S]*aria-labelledby=\{`\$\{labelId\} \$\{valueId\}`\}[\s\S]*id=\{valueId\}[\s\S]*id=\{descriptionId\}/,
-  'Assignment results review handoff panel should render the hidden result review controls marker, privacy scope, item ids, and stable label/value/description relationships.'
-);
-assert.match(
   readFileSync('tests/e2e/TEST-CATALOG.md', 'utf8'),
-  /\|\s*6b\s*\|\s*Result review scope exposes a 30-slice handoff\s*\|[\s\S]*`assignment-result-review`[\s\S]*hidden `dl\/dt\/dd`[\s\S]*label\/value\/description[\s\S]*`data-handoff-item`/,
-  'E2E catalog should include the result-review handoff marker, hidden semantic structure, and stable item marker acceptance journey.'
-);
-assert.match(
-  readFileSync('tests/e2e/TEST-CATALOG.md', 'utf8'),
-  /Assignment result review handoff has a fast script-level gate via[\s\S]*scripts\/assignment-result-review-handoff-semantic-views\.test\.ts[\s\S]*copy-scope alignment[\s\S]*assignment-result-review\s+handoff/,
+  /Assignment result review helpers have a fast script-level gate via[\s\S]*scripts\/assignment-result-review-helpers\.test\.ts[\s\S]*route state[\s\S]*result sorting/,
   'E2E catalog should document the result review focused gate.'
 );
 assert.match(
   readFileSync('tests/e2e/TEST-CATALOG.md', 'utf8'),
-  /Assignment result review controls has a fast script-level gate via[\s\S]*scripts\/assignment-result-review-controls-handoff-semantic-views\.test\.ts[\s\S]*student search[\s\S]*assignment-result-review-controls handoff/,
+  /Assignment result review controls has a fast script-level gate via[\s\S]*scripts\/assignment-result-review-controls\.test\.ts[\s\S]*default elision[\s\S]*invalid-route guards/,
   'E2E catalog should document the result review controls focused gate.'
-);
-assert.match(
-  readFileSync('src/routes/dashboard/assignments/$assignmentId.tsx', 'utf8'),
-  /controlsView=\{pageView\.reviewControlsHandoffView\}/,
-  'Assignment results route should pass the prepared result review controls handoff into the review panel.'
-);
-assert.match(
-  assignmentItemPerformanceSortHandoffSource,
-  /ASSIGNMENT_ITEM_PERFORMANCE_SORT_HANDOFF_ITEM_IDS = \[[\s\S]*'sort-scope'[\s\S]*'submitted-count-order'[\s\S]*'copy-artifact-consumer'[\s\S]*'privacy-guard'/,
-  'Assignment item performance sort handoff should name the route, table, copy-scope, export, and privacy slices.'
 );
 assert.match(
   assignmentResultFiltersSource,
@@ -4316,64 +4187,9 @@ assert.match(
   'Assignment item performance sorting should preserve snapshot, lowest-accuracy, submitted-count, and item-type review passes.'
 );
 assert.match(
-  assignmentResultViewSource,
-  /buildAssignmentItemPerformanceTableView\(\{[\s\S]*controlView: controlViews\.itemPerformanceSort,[\s\S]*items: resultView\.sortedPerformanceItems,[\s\S]*reviewScopeSummary: resultView\.reviewScope\.summary,[\s\S]*sort: viewState\.itemPerformanceSort/,
-  'Assignment result page view should attach item-performance sort handoff evidence from the same sorted table rows and review scope.'
-);
-assert.match(
-  assignmentItemPerformanceSortHandoffSource,
-  /buildAssignmentItemPerformanceSortHandoffPrivacyContract[\s\S]*exposesPromptText: false[\s\S]*exposesShareSlug: false[\s\S]*usesSortedTableRows: true/,
-  'Assignment item performance sort handoff should keep prompts and share slugs out while proving sorted-row reuse.'
-);
-assert.match(
-  assignmentResultsItemPerformanceTableSource,
-  /function AssignmentItemPerformanceSortHandoff[\s\S]*const titleId = 'assignment-item-performance-sort-handoff-title'[\s\S]*const descriptionId = 'assignment-item-performance-sort-handoff-description'[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*aria-labelledby=\{titleId\}[\s\S]*data-handoff="assignment-item-performance-sort"[\s\S]*data-handoff-scope=\{view\.privacy\.scope\}[\s\S]*id=\{titleId\}[\s\S]*id=\{descriptionId\}[\s\S]*<dl>[\s\S]*view\.itemViews\.map[\s\S]*AssignmentItemPerformanceSortHandoffItem[\s\S]*function AssignmentItemPerformanceSortHandoffItem[\s\S]*const labelId = `assignment-item-performance-sort-handoff-\$\{itemView\.id\}-label`[\s\S]*const valueId = `assignment-item-performance-sort-handoff-\$\{itemView\.id\}-value`[\s\S]*const descriptionId = `assignment-item-performance-sort-handoff-\$\{itemView\.id\}-description`[\s\S]*data-handoff-item=\{itemView\.id\}[\s\S]*id=\{labelId\}[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*aria-label=\{itemView\.ariaLabel\}[\s\S]*aria-labelledby=\{`\$\{labelId\} \$\{valueId\}`\}[\s\S]*id=\{valueId\}[\s\S]*id=\{descriptionId\}/,
-  'Assignment item performance table should render the hidden item sort marker, privacy scope, item ids, and stable label/value/description relationships.'
-);
-assert.match(
-  readFileSync('tests/e2e/TEST-CATALOG.md', 'utf8'),
-  /6e \| Result item performance sort exposes a 30-slice handoff[\s\S]*snapshot order, lowest accuracy, most answered, and item type[\s\S]*prompt text, expected or accepted answers/,
-  'E2E catalog should include the item performance sort handoff journey and privacy guard.'
-);
-assert.match(
-  readFileSync('tests/e2e/TEST-CATALOG.md', 'utf8'),
-  /Assignment item performance sort has a fast script-level gate via[\s\S]*scripts\/assignment-item-performance-sort-handoff-semantic-views\.test\.ts[\s\S]*snapshot order[\s\S]*assignment-item-performance-sort[\s\S]*handoff/,
-  'E2E catalog should document the item performance sort focused gate.'
-);
-assert.match(
-  assignmentStudentSummarySortHandoffSource,
-  /ASSIGNMENT_STUDENT_SUMMARY_SORT_HANDOFF_ITEM_IDS = \[[\s\S]*'sort-scope'[\s\S]*'attempt-count-order'[\s\S]*'copy-artifact-consumer'[\s\S]*'privacy-guard'/,
-  'Assignment student summary sort handoff should name the route, table, copy-scope, tie-breaker, and privacy slices.'
-);
-assert.match(
   assignmentResultFiltersSource,
-  /export function sortStudentSummaries[\s\S]*if \(sort === 'best'\)[\s\S]*if \(sort === 'name'\)[\s\S]*if \(sort === 'attempts'\)[\s\S]*if \(sort === 'last-submitted'\)[\s\S]*compareAssignmentStudentsByFollowUpPriority/,
+  /function sortStudentSummaries[\s\S]*if \(sort === 'best'\)[\s\S]*if \(sort === 'name'\)[\s\S]*if \(sort === 'attempts'\)[\s\S]*if \(sort === 'last-submitted'\)[\s\S]*compareAssignmentStudentsByFollowUpPriority/,
   'Assignment student summary sorting should preserve needs-review, best-score, name, attempts, and last-submitted review passes.'
-);
-assert.match(
-  assignmentResultViewSource,
-  /buildAssignmentStudentSummaryTableView\(\{[\s\S]*controlView: controlViews\.studentSearch,[\s\S]*reviewScopeSummary: resultView\.reviewScope\.summary,[\s\S]*sort: viewState\.studentSort,[\s\S]*students: resultView\.filteredStudents/,
-  'Assignment result page view should attach student-summary sort handoff evidence from the same sorted table rows and review scope.'
-);
-assert.match(
-  assignmentStudentSummarySortHandoffSource,
-  /buildAssignmentStudentSummarySortHandoffPrivacyContract[\s\S]*exposesRawRouteQuery: false[\s\S]*exposesStudentDisplayLabels: false[\s\S]*exposesStudentKeys: false[\s\S]*usesSortedTableRows: true/,
-  'Assignment student summary sort handoff should keep route queries, display labels, and student keys out while proving sorted-row reuse.'
-);
-assert.match(
-  assignmentResultsStudentSummarySortTableSource,
-  /function AssignmentStudentSummarySortHandoff[\s\S]*const titleId = 'assignment-student-summary-sort-handoff-title'[\s\S]*const descriptionId = 'assignment-student-summary-sort-handoff-description'[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*aria-labelledby=\{titleId\}[\s\S]*data-handoff="assignment-student-summary-sort"[\s\S]*data-handoff-scope=\{view\.privacy\.scope\}[\s\S]*id=\{titleId\}[\s\S]*id=\{descriptionId\}[\s\S]*<dl>[\s\S]*view\.itemViews\.map[\s\S]*AssignmentStudentSummarySortHandoffItem[\s\S]*function AssignmentStudentSummarySortHandoffItem[\s\S]*const labelId = `assignment-student-summary-sort-handoff-\$\{itemView\.id\}-label`[\s\S]*const valueId = `assignment-student-summary-sort-handoff-\$\{itemView\.id\}-value`[\s\S]*const descriptionId = `assignment-student-summary-sort-handoff-\$\{itemView\.id\}-description`[\s\S]*data-handoff-item=\{itemView\.id\}[\s\S]*id=\{labelId\}[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*aria-label=\{itemView\.ariaLabel\}[\s\S]*aria-labelledby=\{`\$\{labelId\} \$\{valueId\}`\}[\s\S]*id=\{valueId\}[\s\S]*id=\{descriptionId\}/,
-  'Assignment student summary table should render the hidden student sort marker, privacy scope, item ids, and stable label/value/description relationships.'
-);
-assert.match(
-  readFileSync('tests/e2e/TEST-CATALOG.md', 'utf8'),
-  /6g \| Result student summary sort exposes a 30-slice handoff[\s\S]*needs review, best score, student name, attempts, and last submitted[\s\S]*student display labels, student keys, raw anonymous tokens/,
-  'E2E catalog should include the student summary sort handoff journey and privacy guard.'
-);
-assert.match(
-  readFileSync('tests/e2e/TEST-CATALOG.md', 'utf8'),
-  /Assignment student summary sort has a fast script-level gate via[\s\S]*scripts\/assignment-student-summary-sort-handoff-semantic-views\.test\.ts[\s\S]*needs review[\s\S]*assignment-student-summary-sort[\s\S]*handoff/,
-  'E2E catalog should document the student summary sort focused gate.'
 );
 assert.doesNotMatch(
   assignmentResultViewSource,
@@ -4427,43 +4243,6 @@ const studentFollowUpPriorityFixture = [
     studentLabel: 'Student C',
   },
 ];
-const studentFollowUpPriorityHandoff =
-  buildAssignmentStudentFollowUpPriorityHandoffView({
-    limit: 1,
-    selectedStudents: getAssignmentStudentFollowUpPriorityStudents(
-      studentFollowUpPriorityFixture,
-      {
-        limit: 1,
-      }
-    ),
-    students: studentFollowUpPriorityFixture,
-    surface: 'classroom-brief',
-  });
-assert.deepEqual(
-  studentFollowUpPriorityHandoff.itemViews.map((itemView) => itemView.id),
-  [...ASSIGNMENT_STUDENT_FOLLOW_UP_PRIORITY_HANDOFF_ITEM_IDS],
-  'Assignment student follow-up priority handoff should expose stable 30-slice ids.'
-);
-assert.equal(
-  studentFollowUpPriorityHandoff.itemViews.length,
-  30,
-  'Assignment student follow-up priority handoff should expose exactly 30 slices.'
-);
-assert.deepEqual(
-  studentFollowUpPriorityHandoff.privacy,
-  {
-    exposesRawAnonymousToken: false,
-    exposesStudentAnswerText: false,
-    exposesStudentDisplayLabels: false,
-    exposesStudentKeys: false,
-    exposesTeacherAnswerKey: false,
-    itemIds: [...ASSIGNMENT_STUDENT_FOLLOW_UP_PRIORITY_HANDOFF_ITEM_IDS],
-    mutatesResultData: false,
-    scope: 'teacher-student-follow-up-priority',
-    usesSharedPriorityHelper: true,
-  },
-  'Assignment student follow-up priority handoff should keep private result data out of semantic output.'
-);
 assert.deepEqual(
   sortAssignmentStudentsByFollowUpPriority(
     studentFollowUpPriorityFixture
@@ -4478,32 +4257,9 @@ assert.deepEqual(
   ['student-a', 'student-b'],
   'Assignment student follow-up priority lists should exclude students with no review needs.'
 );
-assert.doesNotMatch(
-  JSON.stringify(studentFollowUpPriorityHandoff),
-  /Student A|student-a|SECRET_RAW_ANONYMOUS_TOKEN|SECRET_STUDENT_ANSWER/,
-  'Assignment student follow-up priority handoff should expose counts and policy, not student labels, keys, tokens, or answers.'
-);
-assert.match(
-  assignmentStudentFollowUpPrioritySource,
-  /ASSIGNMENT_STUDENT_FOLLOW_UP_PRIORITY_HANDOFF_ITEM_IDS = \[[\s\S]*'needs-review-sort'[\s\S]*'accuracy-tie-breaker'[\s\S]*'display-label-tie-breaker'[\s\S]*'anonymous-token-guard'[\s\S]*'privacy-guard'/,
-  'Assignment student follow-up priority should name the sorting, tie-breaker, and privacy slices.'
-);
-assert.match(
-  assignmentClassroomBriefSource,
-  /followUpPriorityHandoffView[\s\S]*buildAssignmentStudentFollowUpPriorityHandoffView\(\{[\s\S]*limit: ASSIGNMENT_CLASSROOM_BRIEF_LIMITS\.followUpStudents[\s\S]*selectedStudents: followUpStudents[\s\S]*surface: 'classroom-brief'/,
-  'Classroom brief should attach the prepared student follow-up priority handoff from the shared priority helper.'
-);
-assert.match(
-  readFileSync(
-    'src/components/assignments/assignment-results-classroom-brief-card.tsx',
-    'utf8'
-  ),
-  /function AssignmentStudentFollowUpPriorityHandoff[\s\S]*const titleId = 'assignment-student-follow-up-priority-handoff-title'[\s\S]*const descriptionId =[\s\S]*'assignment-student-follow-up-priority-handoff-description'[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*aria-labelledby=\{titleId\}[\s\S]*data-handoff="assignment-student-follow-up-priority"[\s\S]*data-handoff-scope=\{handoffView\.privacy\.scope\}[\s\S]*id=\{titleId\}[\s\S]*id=\{descriptionId\}[\s\S]*<dl>[\s\S]*handoffView\.itemViews\.map[\s\S]*AssignmentStudentFollowUpPriorityHandoffItem[\s\S]*function AssignmentStudentFollowUpPriorityHandoffItem[\s\S]*const labelId = `assignment-student-follow-up-priority-handoff-\$\{itemView\.id\}-label`[\s\S]*const valueId = `assignment-student-follow-up-priority-handoff-\$\{itemView\.id\}-value`[\s\S]*const descriptionId = `assignment-student-follow-up-priority-handoff-\$\{itemView\.id\}-description`[\s\S]*data-handoff-item=\{itemView\.id\}[\s\S]*id=\{labelId\}[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*aria-label=\{itemView\.ariaLabel\}[\s\S]*aria-labelledby=\{`\$\{labelId\} \$\{valueId\}`\}[\s\S]*id=\{valueId\}[\s\S]*id=\{descriptionId\}/,
-  'Assignment results classroom brief card should render the hidden student follow-up priority marker, privacy scope, item ids, and stable label/value/description relationships.'
-);
 assert.match(
   readFileSync('tests/e2e/TEST-CATALOG.md', 'utf8'),
-  /Assignment student follow-up priority has a fast script-level gate via[\s\S]*scripts\/assignment-student-follow-up-priority-handoff-semantic-views\.test\.ts[\s\S]*needs-review[\s\S]*assignment-student-follow-up-priority[\s\S]*handoff/,
+  /Assignment student follow-up priority has a fast script-level gate via[\s\S]*scripts\/assignment-student-follow-up-priority\.test\.ts[\s\S]*needs-review[\s\S]*anonymous-token guards/,
   'E2E catalog should document the student follow-up priority focused gate.'
 );
 assert.match(
@@ -4667,57 +4423,6 @@ assert.match(
   assignmentResultsExportSource,
   /export type AssignmentResultsExportDeliveryView = \{[\s\S]*answerReveal: string;[\s\S]*maxAttempts: number \| string;[\s\S]*policyText: string;[\s\S]*rawCollectStudentName: boolean;[\s\S]*rawMaxAttempts: number \| null \| undefined;[\s\S]*rawShowCorrectAnswers: boolean;[\s\S]*rawShuffleItems: boolean;[\s\S]*rawTimeLimitSeconds: number \| undefined;[\s\S]*settings: AssignmentSettings;[\s\S]*timeLimitSeconds: number \| undefined;/,
   'Assignment CSV export domain should expose an explicit delivery view contract.'
-);
-assert.match(
-  assignmentResultsExportSource,
-  /export const ASSIGNMENT_RESULTS_EXPORT_PREPARATION_ITEM_IDS = \[(?=[\s\S]*'export-scope')(?=[\s\S]*'assignment-context')(?=[\s\S]*'activity-snapshot')(?=[\s\S]*'delivery-identity')(?=[\s\S]*'delivery-answer-reveal')(?=[\s\S]*'delivery-item-order')(?=[\s\S]*'delivery-attempt-limit')(?=[\s\S]*'delivery-timer')(?=[\s\S]*'delivery-close-time')(?=[\s\S]*'delivery-instructions')(?=[\s\S]*'result-metrics')(?=[\s\S]*'item-performance')(?=[\s\S]*'expected-answer')(?=[\s\S]*'accepted-alternatives')(?=[\s\S]*'export-filename')(?=[\s\S]*'csv-data-url-boundary')(?=[\s\S]*'formula-injection-guard')(?=[\s\S]*'submitted-date-format')(?=[\s\S]*'duration-normalization')(?=[\s\S]*'empty-answer-row')(?=[\s\S]*'prompt-column')(?=[\s\S]*'student-answer-column')(?=[\s\S]*'correctness-column')(?=[\s\S]*'explanation-column')[\s\S]*export type AssignmentResultsExportPreparationPrivacyContract = \{[\s\S]*exposesAssignmentTitle: false;[\s\S]*exposesCopyArtifactText: false;[\s\S]*exposesCsvDataUrl: false;[\s\S]*exposesCsvFilename: false;[\s\S]*exposesPromptText: false;[\s\S]*exposesRawAnonymousToken: false;[\s\S]*exposesStudentAnswerText: false;[\s\S]*exposesStudentInstructions: false;[\s\S]*exposesTeacherAnswerText: false;[\s\S]*scope: 'full-assignment-results';[\s\S]*export type AssignmentResultsExportPreparationView = \{[\s\S]*description: string;[\s\S]*itemViews: AssignmentResultsExportPreparationItemView\[\];[\s\S]*privacy: AssignmentResultsExportPreparationPrivacyContract;[\s\S]*title: string;/,
-  'Assignment CSV export domain should expose a stable 30-slice prepared export coverage view contract with privacy flags.'
-);
-assert.deepEqual(
-  [...ASSIGNMENT_RESULTS_EXPORT_PREPARATION_ITEM_IDS],
-  [
-    'export-scope',
-    'assignment-context',
-    'activity-snapshot',
-    'attempts',
-    'students',
-    'student-privacy',
-    'delivery-identity',
-    'delivery-answer-reveal',
-    'delivery-item-order',
-    'delivery-attempt-limit',
-    'delivery-timer',
-    'delivery-close-time',
-    'delivery-instructions',
-    'raw-settings',
-    'result-metrics',
-    'item-performance',
-    'answer-rows',
-    'expected-answer',
-    'accepted-alternatives',
-    'export-filename',
-    'csv-data-url-boundary',
-    'formula-injection-guard',
-    'submitted-date-format',
-    'duration-normalization',
-    'empty-answer-row',
-    'prompt-column',
-    'student-answer-column',
-    'correctness-column',
-    'explanation-column',
-    'columns',
-  ],
-  'Assignment CSV export preparation should expose exactly 30 stable slice ids.'
-);
-assert.match(
-  assignmentResultsExportSource,
-  /export function buildAssignmentResultsExportPreparationView[\s\S]*ASSIGNMENT_RESULTS_EXPORT_PREPARATION_ITEM_IDS\.map[\s\S]*buildAssignmentResultsExportPreparationItem[\s\S]*assignment_results_export_preparation_export_scope_label[\s\S]*assignment_results_export_preparation_activity_snapshot_label[\s\S]*assignment_results_export_preparation_delivery_identity_label[\s\S]*assignment_results_export_preparation_result_metrics_label[\s\S]*assignment_results_export_preparation_accepted_alternatives_label[\s\S]*assignment_results_export_preparation_export_filename_label[\s\S]*assignment_results_export_preparation_data_url_boundary_label[\s\S]*assignment_results_export_preparation_formula_guard_label[\s\S]*assignment_results_export_preparation_student_answer_column_label/,
-  'Assignment CSV export preparation views should use localized labels for each export coverage item.'
-);
-assert.match(
-  assignmentResultsExportSource,
-  /function buildAssignmentResultsExportPreparationSummary[\s\S]*const resolvedSource = resolveAssignmentSnapshotSource\(data\)[\s\S]*answerRowCount: countAssignmentResultsExportAnswerRows[\s\S]*attemptCount: data\.analysis\.attempts\.length[\s\S]*columnCount: getAssignmentResultsExportColumns\(\)\.length[\s\S]*itemPerformanceCount: data\.analysis\.perItem\.length[\s\S]*rawSettingFieldCount:[\s\S]*countAssignmentResultsExportRawSettingFields[\s\S]*resultMetricCount: countAssignmentResultsExportResultMetricColumns[\s\S]*snapshotTemplateLabel: formatAssignmentExportTemplateLabel/,
-  'Assignment CSV export preparation summaries should count attempts, students, item performance, answer rows, result metrics, raw settings, columns, and snapshot template from the export domain.'
 );
 assert.match(
   assignmentResultsExportSource,
@@ -5031,10 +4736,9 @@ assert.deepEqual(
     ASSIGNMENT_ATTEMPT_DURATION_HANDOFF_ITEM_IDS.length,
     ASSIGNMENT_ANSWER_FEEDBACK_HANDOFF_ITEM_IDS.length,
     ASSIGNMENT_ATTEMPT_STATS_HANDOFF_ITEM_IDS.length,
-    ASSIGNMENT_RESULTS_EXPORT_PREPARATION_ITEM_IDS.length,
     ASSIGNMENT_PUBLISH_CONTROL_BOUNDARY_ITEM_IDS.length,
   ],
-  Array.from({ length: 16 }, () => 30),
+  Array.from({ length: 15 }, () => 30),
   'Published assignment delivery chain should stay backed by focused assignment gates.'
 );
 assert.deepEqual(Object.fromEntries(publishedAssignmentDeliveryChainValues), {
@@ -5136,10 +4840,9 @@ assert.deepEqual(
     ASSIGNMENT_DELIVERY_POLICY_HANDOFF_ITEM_IDS.length,
     PUBLISHED_ASSIGNMENT_DELIVERY_CHAIN_HANDOFF_ITEM_IDS.length,
     ASSIGNMENT_SOURCE_ACTIVITY_CONTEXT_CHAIN_HANDOFF_ITEM_IDS.length,
-    PRINTABLE_WORKSHEET_HANDOFF_ITEM_IDS.length,
     TEACHER_RESULTS_REVIEW_CHAIN_HANDOFF_ITEM_IDS.length,
   ],
-  Array.from({ length: 8 }, () => 30),
+  Array.from({ length: 7 }, () => 30),
   'Assignment distribution lifecycle chain should stay backed by assignment list, share-link, publish, delivery, source context, runner, print, and results gates.'
 );
 assert.deepEqual(Object.fromEntries(assignmentDistributionLifecycleChainValues), {
@@ -5241,9 +4944,6 @@ assert.deepEqual(assignmentSourceActivityContextChainView.privacy, {
 assert.deepEqual(
   [
     ASSIGNMENT_LIST_PAGE_HANDOFF_ITEM_IDS.length,
-    ASSIGNMENT_RESULT_MATERIAL_HANDOFF_ITEM_IDS.length,
-    ASSIGNMENT_RESULTS_EXPORT_PREPARATION_ITEM_IDS.length,
-    PRINTABLE_WORKSHEET_HANDOFF_ITEM_IDS.length,
     PRINTABLE_WORKSHEET_REVIEW_LIFECYCLE_CHAIN_HANDOFF_ITEM_IDS.length,
     ASSIGNMENT_DISTRIBUTION_LIFECYCLE_CHAIN_HANDOFF_ITEM_IDS.length,
     WORKSHEET_MODE_DELIVERY_CHAIN_HANDOFF_ITEM_IDS.length,
@@ -5251,7 +4951,7 @@ assert.deepEqual(
     TEACHER_RESULTS_REVIEW_CHAIN_HANDOFF_ITEM_IDS.length,
     SCORED_ATTEMPT_RESULT_CHAIN_HANDOFF_ITEM_IDS.length,
   ],
-  Array.from({ length: 10 }, () => 30),
+  Array.from({ length: 7 }, () => 30),
   'Assignment source activity context chain should stay backed by list, export, printable, distribution, worksheet, data, results, and scored-result gates.'
 );
 assert.deepEqual(
@@ -5286,7 +4986,7 @@ assert.deepEqual(
     'scored-result-chain-alignment': 'Scoring aligned',
     'source-material-storage-guard': 'Storage keys omitted',
     'student-data-privacy-guard': 'Student data omitted',
-    'result-material-handoff-boundary': '30 result material slices',
+    'result-material-handoff-boundary': 'Copy, CSV, and print',
   }
 );
 assert.match(
@@ -5737,11 +5437,9 @@ assert.deepEqual(
     TEACHER_RESULTS_REVIEW_CHAIN_HANDOFF_ITEM_IDS.length,
     TEACHER_RESULTS_REVIEW_CHAIN_SOURCE_FILES.length,
     ASSIGNMENT_ATTEMPT_PERSISTENCE_HANDOFF_ITEM_IDS.length,
-    ASSIGNMENT_RESULTS_EXPORT_PREPARATION_ITEM_IDS.length,
     PUBLIC_ASSIGNMENT_ACCESS_HANDOFF_ITEM_IDS.length,
-    PRINTABLE_WORKSHEET_HANDOFF_ITEM_IDS.length,
   ],
-  Array.from({ length: 12 }, () => 30),
+  Array.from({ length: 10 }, () => 30),
   'Classroom data lifecycle chain should stay backed by adjacent activity, delivery, student-runner, result, export, public, and print gates.'
 );
 assert.deepEqual(Object.fromEntries(classroomDataLifecycleChainValues), {
@@ -5840,21 +5538,10 @@ assert.deepEqual(teacherResultsReviewChainView.privacy, {
 assert.deepEqual(
   [
     ASSIGNMENT_ATTEMPT_STATS_HANDOFF_ITEM_IDS.length,
-    ASSIGNMENT_RESULT_REVIEW_HANDOFF_ITEM_IDS.length,
-    ASSIGNMENT_RESULT_REVIEW_CONTROLS_HANDOFF_ITEM_IDS.length,
-    ASSIGNMENT_RESULT_STUDENT_SEARCH_HANDOFF_ITEM_IDS.length,
-    ASSIGNMENT_ITEM_PERFORMANCE_SORT_HANDOFF_ITEM_IDS.length,
-    ASSIGNMENT_STUDENT_SUMMARY_SORT_HANDOFF_ITEM_IDS.length,
-    ASSIGNMENT_ATTEMPT_REVIEW_CARD_HANDOFF_ITEM_IDS.length,
-    ASSIGNMENT_STUDENT_FOLLOW_UP_PRIORITY_HANDOFF_ITEM_IDS.length,
-    ASSIGNMENT_COPY_ARTIFACT_HANDOFF_ITEM_IDS.length,
-    ASSIGNMENT_RESULTS_EXPORT_PREPARATION_ITEM_IDS.length,
-    ASSIGNMENT_RESULT_MATERIAL_HANDOFF_ITEM_IDS.length,
-    ASSIGNMENT_RESULT_EMPTY_STATE_HANDOFF_ITEM_IDS.length,
     ASSIGNMENT_ATTEMPT_DURATION_HANDOFF_ITEM_IDS.length,
     ASSIGNMENT_ANSWER_FEEDBACK_HANDOFF_ITEM_IDS.length,
   ],
-  Array.from({ length: 14 }, () => 30),
+  Array.from({ length: 3 }, () => 30),
   'Teacher results review chain should stay backed by focused result-review gates.'
 );
 assert.deepEqual(Object.fromEntries(teacherResultsReviewChainValues), {
@@ -5982,7 +5669,7 @@ assert.deepEqual(Object.fromEntries(teacherResultCopyLifecycleChainValues), {
 });
 assert.match(
   readFileSync('tests/e2e/TEST-CATALOG.md', 'utf8'),
-  /Teacher result copy lifecycle chain has a fast script-level gate via[\s\S]*scripts\/teacher-result-copy-lifecycle-chain-handoff\.test\.ts[\s\S]*copy artifact handoff boundary/,
+  /Teacher result copy lifecycle chain has a fast script-level gate via[\s\S]*scripts\/teacher-result-copy-lifecycle-chain-handoff\.test\.ts[\s\S]*classroom brief builders[\s\S]*copy-artifact privacy guards/,
   'TEST-CATALOG should document the teacher result copy lifecycle chain gate.'
 );
 assert.doesNotMatch(
@@ -7480,9 +7167,8 @@ assert.deepEqual(
     ACTIVITY_AI_ENHANCEMENT_LIFECYCLE_CHAIN_ITEM_IDS.length,
     TEMPLATE_ROADMAP_CAPABILITY_CHAIN_HANDOFF_ITEM_IDS.length,
     WORKSHEET_MODE_DELIVERY_CHAIN_HANDOFF_ITEM_IDS.length,
-    ASSIGNMENT_RESULTS_EXPORT_PREPARATION_ITEM_IDS.length,
   ],
-  Array.from({ length: 19 }, () => 30),
+  Array.from({ length: 18 }, () => 30),
   'Activity AI enhancement roadmap chain should stay backed by authoring, remix, extraction, policy, execution, draft output, draft application, editor review, save boundary, publish boundary, lifecycle, roadmap, worksheet, and result-export gates.'
 );
 assert.deepEqual(
@@ -11676,7 +11362,7 @@ const assignmentResultsHeaderCardSource = readFileSync(
   'utf8'
 );
 const assignmentResultsClassroomBriefCardSource = readFileSync(
-  'src/components/assignments/assignment-results-classroom-brief-card.tsx',
+  'src/components/assignments/assignment-results-follow-up-panel.tsx',
   'utf8'
 );
 const assignmentResultsStudentSearchSource = readFileSync(
@@ -11719,14 +11405,6 @@ const assignmentResultsEmptyStateSource = readFileSync(
   'src/components/assignments/assignment-results-empty-state.tsx',
   'utf8'
 );
-const assignmentResultEmptyStateHandoffSource = readFileSync(
-  'src/assignments/result-empty-state-handoff.ts',
-  'utf8'
-);
-const assignmentResultEmptyStateHandoffSemanticTestSource = readFileSync(
-  'scripts/assignment-result-empty-state-handoff-semantic-views.test.ts',
-  'utf8'
-);
 const assignmentResultDisplaySource = readFileSync(
   'src/assignments/result-display.ts',
   'utf8'
@@ -11737,10 +11415,6 @@ const assignmentResultFormatSource = readFileSync(
 );
 const assignmentResultAnswerViewSource = readFileSync(
   'src/assignments/result-answer-view.ts',
-  'utf8'
-);
-const assignmentAttemptReviewCardHandoffSource = readFileSync(
-  'src/assignments/attempt-review-card-handoff.ts',
   'utf8'
 );
 assert.doesNotMatch(
@@ -11905,8 +11579,8 @@ assert.match(
 );
 assert.match(
   assignmentResultViewSource,
-  /export type AssignmentResultSectionView = \{[\s\S]*export type AssignmentResultSectionViews = \{[\s\S]*export type AssignmentResultClassroomBriefSectionViews = Pick<[\s\S]*'classroomBrief' \| 'classReviewFocus' \| 'studentFollowUp'/,
-  'Assignment result view domain should expose explicit section-view and focused classroom-brief section-view contracts.'
+  /export type AssignmentResultSectionView = \{[\s\S]*export type AssignmentResultSectionViews = \{/,
+  'Assignment result view domain should expose explicit section-view contracts.'
 );
 assert.match(
   assignmentResultViewSource,
@@ -11989,8 +11663,8 @@ assert.match(
 );
 assert.match(
   assignmentResultViewSource,
-  /studentSummaryTableView:\s*AssignmentResultStudentSummaryTableView[\s\S]*buildAssignmentStudentSummaryTableView[\s\S]*headers: assignmentResultTableHeaders\.studentSummary[\s\S]*rows,[\s\S]*sortHandoffView: buildAssignmentStudentSummarySortHandoffView/,
-  'Assignment result page view-model should own formatted student summary table views and student sort handoff evidence.'
+  /studentSummaryTableView:\s*AssignmentResultStudentSummaryTableView[\s\S]*buildAssignmentStudentSummaryTableView[\s\S]*headers: assignmentResultTableHeaders\.studentSummary[\s\S]*rows,/,
+  'Assignment result page view-model should own formatted student summary table views.'
 );
 assert.match(
   assignmentResultViewSource,
@@ -12004,8 +11678,8 @@ assert.match(
 );
 assert.match(
   assignmentResultViewSource,
-  /itemPerformanceTableView:\s*AssignmentResultItemPerformanceTableView[\s\S]*buildAssignmentItemPerformanceTableView[\s\S]*headers: assignmentResultTableHeaders\.itemPerformance[\s\S]*rows,[\s\S]*sortHandoffView: buildAssignmentItemPerformanceSortHandoffView/,
-  'Assignment result page view-model should own formatted item performance table views and item sort handoff evidence.'
+  /itemPerformanceTableView:\s*AssignmentResultItemPerformanceTableView[\s\S]*buildAssignmentItemPerformanceTableView[\s\S]*headers: assignmentResultTableHeaders\.itemPerformance[\s\S]*rows,/,
+  'Assignment result page view-model should own formatted item performance table views.'
 );
 assert.match(
   assignmentResultRouteSource,
@@ -12137,13 +11811,8 @@ assert.match(
 );
 assert.match(
   assignmentResultViewSource,
-  /export type AssignmentResultHeaderShareAction[\s\S]*export type AssignmentResultHeaderPrintAction[\s\S]*search: PrintableAssignmentSearch;[\s\S]*export type AssignmentResultHeaderView[\s\S]*exportPreparationView: AssignmentResultsExportPreparationView;/,
-  'Assignment result header share, print, CSV export preparation, and header-view contracts should be explicit assignment-domain exports.'
-);
-assert.match(
-  assignmentResultViewSource,
-  /exportPreparationView: buildAssignmentResultsExportPreparationView\(\{[\s\S]*activity,[\s\S]*analysis: analysis \?\? EMPTY_ASSIGNMENT_RESULTS_ANALYSIS,[\s\S]*assignment,[\s\S]*snapshot,[\s\S]*stats,/,
-  'Assignment result header view should prepare CSV export coverage from the full assignment result scope.'
+  /export type AssignmentResultHeaderShareAction[\s\S]*export type AssignmentResultHeaderPrintAction[\s\S]*search: PrintableAssignmentSearch;[\s\S]*export type AssignmentResultHeaderView/,
+  'Assignment result header share, print, and header-view contracts should be explicit assignment-domain exports.'
 );
 assert.match(
   assignmentResultViewSource,
@@ -12176,14 +11845,9 @@ assert.match(
   'Assignment result header card should import the explicit assignment-domain header-view contract.'
 );
 assert.match(
-  assignmentResultRouteSource,
-  /exportPreparationView=\{headerView\.exportPreparationView\}/,
-  'Assignment result page should pass prepared CSV export coverage into the focused header actions.'
-);
-assert.match(
   assignmentResultsHeaderActionsSource,
-  /AssignmentResultHeaderPrintAction[\s\S]*AssignmentResultHeaderShareAction[\s\S]*AssignmentResultsExportPreparationView/,
-  'Assignment result header actions should import explicit assignment-domain print/share action contracts and export preparation view.'
+  /AssignmentResultHeaderPrintAction[\s\S]*AssignmentResultHeaderShareAction/,
+  'Assignment result header actions should import explicit assignment-domain print/share action contracts.'
 );
 assert.doesNotMatch(
   assignmentResultsHeaderActionsSource,
@@ -12267,8 +11931,8 @@ assert.match(
 );
 assert.match(
   assignmentResultsHeaderActionsSource,
-  /AssignmentResultsHeaderSharePreviewLink[\s\S]*AssignmentResultsHeaderSharePath[\s\S]*AssignmentResultsHeaderCopyShareAction[\s\S]*AssignmentResultsHeaderPrintActionLink[\s\S]*AssignmentResultsHeaderShareDisabledReason[\s\S]*AssignmentResultsHeaderResultActions[\s\S]*AssignmentResultsExportPreparation/,
-  'Assignment result header actions should delegate preview, share path, copy, print, disabled reason, result actions, and export preparation coverage to focused components.'
+  /AssignmentResultsHeaderSharePreviewLink[\s\S]*AssignmentResultsHeaderSharePath[\s\S]*AssignmentResultsHeaderCopyShareAction[\s\S]*AssignmentResultsHeaderPrintActionLink[\s\S]*AssignmentResultsHeaderShareDisabledReason[\s\S]*AssignmentResultsHeaderResultActions/,
+  'Assignment result header actions should delegate preview, share path, copy, print, disabled reason, and result actions to focused components.'
 );
 assert.match(
   assignmentResultsHeaderActionsSource,
@@ -12289,11 +11953,6 @@ assert.match(
   assignmentResultsHeaderActionsSource,
   /const shareDisabledReasonId =\s*getAssignmentResultHeaderShareDisabledReasonId\(shareAction\)[\s\S]*const sharePathDescriptionId =\s*getAssignmentResultHeaderSharePathDescriptionId\(shareAction\)[\s\S]*AssignmentResultsHeaderCopyShareAction[\s\S]*disabledReasonId=\{shareDisabledReasonId\}[\s\S]*sharePathDescriptionId=\{sharePathDescriptionId\}[\s\S]*AssignmentResultsHeaderSharePreviewLink[\s\S]*disabledReasonId=\{shareDisabledReasonId\}[\s\S]*sharePathDescriptionId=\{sharePathDescriptionId\}[\s\S]*AssignmentResultsHeaderSharePath[\s\S]*descriptionId=\{sharePathDescriptionId\}[\s\S]*AssignmentResultsHeaderShareDisabledReason[\s\S]*disabledReasonId=\{shareDisabledReasonId\}/,
   'Assignment result share controls should pass the same prepared disabled reason id and current student-link description id through copy, preview, path, and disabled reason text.'
-);
-assert.match(
-  assignmentResultsHeaderActionsSource,
-  /const shareLinkHandoffView = buildAssignmentShareLinkHandoffView\([\s\S]*shareAction,[\s\S]*surface: 'result-page'[\s\S]*<AssignmentShareLinkHandoff handoff=\{shareLinkHandoffView\} \/>/,
-  'Assignment result header should expose the prepared assignment share-link handoff for the result-page surface.'
 );
 assert.match(
   assignmentResultsHeaderActionsSource,
@@ -12356,41 +12015,6 @@ assert.match(
   /function AssignmentResultsHeaderResultActionButton[\s\S]*const describedBy = \[actionDescriptionId, disabledReasonId\][\s\S]*aria-describedby=\{describedBy\}[\s\S]*function AssignmentResultsHeaderResultActionDisabledReasons[\s\S]*id=\{getResultActionDisabledReasonId[\s\S]*id: disabledReason\.id/,
   'Assignment result disabled menu items should be associated with their prepared disabled reason text.'
 );
-assert.match(
-  assignmentResultsHeaderActionsSource,
-  /function AssignmentResultsExportPreparation[\s\S]*exportPreparationView\.title[\s\S]*exportPreparationView\.description[\s\S]*exportPreparationView\.itemViews\.map[\s\S]*key=\{itemView\.id\}[\s\S]*itemView\.label[\s\S]*itemView\.value[\s\S]*itemView\.description/,
-  'Assignment result header actions should render prepared CSV export coverage title, description, labels, values, and descriptions.'
-);
-assert.match(
-  assignmentResultsHeaderActionsSource,
-  /function AssignmentResultsExportPreparation[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*aria-labelledby=\{titleId\}[\s\S]*data-handoff="assignment-results-export-preparation"[\s\S]*data-handoff-scope=\{exportPreparationView\.privacy\.scope\}[\s\S]*exportPreparationView\.itemViews\.map[\s\S]*AssignmentResultsExportPreparationItem[\s\S]*function AssignmentResultsExportPreparationItem[\s\S]*const labelId = `assignment-results-export-preparation-\$\{itemView\.id\}-label`[\s\S]*const valueId = `assignment-results-export-preparation-\$\{itemView\.id\}-value`[\s\S]*const descriptionId = `assignment-results-export-preparation-\$\{itemView\.id\}-description`[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*aria-label=\{itemView\.ariaLabel\}[\s\S]*aria-labelledby=\{`\$\{labelId\} \$\{valueId\}`\}[\s\S]*data-handoff-item=\{itemView\.id\}[\s\S]*id=\{labelId\}[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*aria-label=\{itemView\.ariaLabel\}[\s\S]*aria-labelledby=\{`\$\{labelId\} \$\{valueId\}`\}[\s\S]*id=\{valueId\}[\s\S]*id=\{descriptionId\}/,
-  'Assignment result CSV export coverage should render prepared accessible labels, values, and descriptions for each full-export coverage item.'
-);
-assert.match(
-  assignmentResultsHeaderActionsSource,
-  /function AssignmentResultsMaterialHandoff[\s\S]*const titleId = 'assignment-results-material-handoff-title'[\s\S]*const descriptionId = 'assignment-results-material-handoff-description'[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*aria-labelledby=\{titleId\}[\s\S]*className="sr-only"[\s\S]*data-handoff="assignment-result-material"[\s\S]*data-handoff-scope=\{materialHandoffView\.privacy\.scope\}[\s\S]*id=\{titleId\}[\s\S]*id=\{descriptionId\}[\s\S]*<dl>[\s\S]*materialHandoffView\.itemViews\.map[\s\S]*AssignmentResultsMaterialHandoffItem[\s\S]*function AssignmentResultsMaterialHandoffItem[\s\S]*itemView: AssignmentResultMaterialHandoffView\['itemViews'\]\[number\][\s\S]*const labelId = `assignment-result-material-handoff-\$\{itemView\.id\}-label`[\s\S]*const valueId = `assignment-result-material-handoff-\$\{itemView\.id\}-value`[\s\S]*const descriptionId =[\s\S]*`assignment-result-material-handoff-\$\{itemView\.id\}-description`[\s\S]*data-handoff-item=\{itemView\.id\}[\s\S]*data-scope=\{itemView\.dataScope\}[\s\S]*id=\{labelId\}[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*aria-label=\{itemView\.ariaLabel\}[\s\S]*aria-labelledby=\{`\$\{labelId\} \$\{valueId\}`\}[\s\S]*id=\{valueId\}[\s\S]*id=\{descriptionId\}/,
-  'Assignment result material handoff should render a stable page marker, privacy scope, item markers, data scopes, and accessible label/value/description relationships for teacher result materials.'
-);
-assert.match(
-  authE2eCatalogSource,
-  /\|\s*6a\s*\|\s*Result materials expose a 30-slice handoff\s*\|[\s\S]*`assignment-result-material`[\s\S]*`dl\/dt\/dd`[\s\S]*label\/value\/description[\s\S]*`data-handoff-item`/,
-  'E2E catalog should include the result-material handoff marker, hidden semantic structure, and stable item marker acceptance journey.'
-);
-assert.match(
-  authE2eCatalogSource,
-  /\|\s*6c\s*\|\s*Result copy artifacts expose a 30-slice handoff\s*\|[\s\S]*`assignment-copy-artifact`[\s\S]*hidden `dl\/dt\/dd`[\s\S]*label\/value\/description[\s\S]*`data-handoff-item`/,
-  'E2E catalog should include the result copy-artifact marker, hidden semantic structure, and stable item marker acceptance journey.'
-);
-assert.match(
-  authE2eCatalogSource,
-  /Assignment copy artifacts have a fast script-level gate via[\s\S]*scripts\/assignment-copy-artifact-handoff-semantic-views\.test\.ts[\s\S]*classroom brief[\s\S]*assignment-copy-artifact\s+handoff/,
-  'E2E catalog should document the result copy-artifact focused gate.'
-);
-assert.match(
-  authE2eCatalogSource,
-  /\|\s*6i\s*\|\s*Result CSV export preparation exposes a 30-slice handoff\s*\|/,
-  'E2E catalog should include the result CSV export-preparation handoff acceptance journey.'
-);
 assert.doesNotMatch(
   assignmentResultsHeaderActionsSource,
   /gate\.message|assignment_results_export_preparation_|assignment_result_action_scope_|assignment_result_action_status_|CSV export coverage|Delivery fields|Answer rows|Current review|Full assignment results|Ready|Needs data|CSV 导出覆盖范围|投放字段|答案行|当前复盘范围|完整作业结果|可执行|需要数据/,
@@ -12416,16 +12040,6 @@ assert.doesNotMatch(
   /assignmentResultPageCopy/,
   'Assignment result header component should render page labels from prepared header and action views.'
 );
-assert.match(
-  assignmentResultsClassroomBriefCardSource,
-  /AssignmentResultsClassroomBriefScope[\s\S]*brief=\{brief\}[\s\S]*AssignmentResultsClassroomBriefStats[\s\S]*brief=\{brief\}[\s\S]*AssignmentResultsClassFocusPanel[\s\S]*focusItemViews=\{brief\.focusItemViews\}[\s\S]*sectionView=\{sectionViews\.classReviewFocus\}[\s\S]*AssignmentResultsFollowUpPanel[\s\S]*followUpStudentViews=\{brief\.followUpStudentViews\}[\s\S]*sectionView=\{sectionViews\.studentFollowUp\}[\s\S]*AssignmentResultsClassroomBriefCopyPreview[\s\S]*copyArtifactHandoffView=\{copyArtifactHandoffView\}[\s\S]*copyArtifactPreviews=\{copyArtifactPreviews\}[\s\S]*copyScopeView=\{copyScopeView\}[\s\S]*onResultAction=\{onResultAction\}/,
-  'Assignment classroom brief card should delegate prepared scope, stats, focus item, follow-up student, copy artifact handoff, copy-scope, and copy-preview views to focused panels.'
-);
-assert.match(
-  assignmentResultsClassroomBriefCardSource,
-  /sectionViews\.classroomBrief\.title[\s\S]*sectionViews\.classroomBrief\.description/,
-  'Assignment classroom brief card should render its heading from prepared classroom-brief section views.'
-);
 assert.doesNotMatch(
   assignmentResultsClassroomBriefCardSource,
   /assignmentResultSectionCopy/,
@@ -12433,48 +12047,13 @@ assert.doesNotMatch(
 );
 assert.match(
   assignmentClassroomBriefSource,
-  /export type AssignmentClassroomBrief = \{[\s\S]*scopeLabel: string;[\s\S]*scopeSummary: AssignmentClassroomBriefScopeSummary;[\s\S]*scopeViews: AssignmentClassroomBriefScopeView\[\];[\s\S]*export type AssignmentClassroomBriefStatView = \{[\s\S]*ariaLabel: string;[\s\S]*description: string;[\s\S]*export type AssignmentClassroomBriefCopyPreview = \{[\s\S]*export type AssignmentClassroomBriefScopeId =[\s\S]*'attempts'[\s\S]*'focus-items'[\s\S]*'students'[\s\S]*'total-items'[\s\S]*export type AssignmentClassroomBriefScopeSummary = \{[\s\S]*attemptCount: number;[\s\S]*focusItemCount: number;[\s\S]*followUpStudentCount: number;[\s\S]*totalItemCount: number;[\s\S]*export type AssignmentClassroomBriefScopeView = \{[\s\S]*ariaLabel: string;[\s\S]*description: string;[\s\S]*id: AssignmentClassroomBriefScopeId;[\s\S]*label: string;[\s\S]*value: string;[\s\S]*export type AssignmentClassroomBriefFocusItemView = \{[\s\S]*export type AssignmentClassroomBriefFollowUpStudentView = \{/,
+  /export type AssignmentClassroomBrief = \{[\s\S]*scopeLabel: string;[\s\S]*scopeSummary: AssignmentClassroomBriefScopeSummary;[\s\S]*scopeViews: AssignmentClassroomBriefScopeView\[\];[\s\S]*export type AssignmentClassroomBriefStatView = \{[\s\S]*ariaLabel: string;[\s\S]*description: string;[\s\S]*export type AssignmentClassroomBriefCopyPreview = \{[\s\S]*type AssignmentClassroomBriefScopeId =[\s\S]*'attempts'[\s\S]*'focus-items'[\s\S]*'students'[\s\S]*'total-items'[\s\S]*export type AssignmentClassroomBriefScopeSummary = \{[\s\S]*attemptCount: number;[\s\S]*focusItemCount: number;[\s\S]*followUpStudentCount: number;[\s\S]*totalItemCount: number;[\s\S]*export type AssignmentClassroomBriefScopeView = \{[\s\S]*ariaLabel: string;[\s\S]*description: string;[\s\S]*id: AssignmentClassroomBriefScopeId;[\s\S]*label: string;[\s\S]*value: string;[\s\S]*export type AssignmentClassroomBriefFocusItemView = \{[\s\S]*export type AssignmentClassroomBriefFollowUpStudentView = \{/,
   'Assignment classroom brief should expose explicit aggregate, scope, stat, copy-preview, focus-item, and follow-up student view contracts.'
-);
-assert.match(
-  assignmentResultsClassroomBriefCardSource,
-  /AssignmentClassroomBrief,[\s\S]*AssignmentClassroomBriefCopyPreview,[\s\S]*AssignmentClassroomBriefFocusItemView,[\s\S]*AssignmentClassroomBriefFollowUpStudentView,[\s\S]*AssignmentClassroomBriefScopeView,[\s\S]*AssignmentClassroomBriefStatView/,
-  'Assignment classroom brief card should import explicit classroom brief aggregate, scope, and child view contracts.'
-);
-assert.match(
-  assignmentResultsClassroomBriefCardSource,
-  /AssignmentResultClassroomBriefSectionViews[\s\S]*AssignmentResultSectionView/,
-  'Assignment classroom brief card should consume focused classroom-brief and child section-view contracts.'
 );
 assert.doesNotMatch(
   assignmentResultsClassroomBriefCardSource,
   /ReturnType<typeof buildAssignmentResultsPageViewModel>/,
   'Assignment classroom brief card should not infer its brief contract from the full result page view-model ReturnType.'
-);
-assert.match(
-  assignmentResultsClassroomBriefCardSource,
-  /function AssignmentResultsClassroomBriefScope[\s\S]*brief\.scopeLabel[\s\S]*brief\.scopeViews\.map[\s\S]*key=\{scopeView\.id\}[\s\S]*AssignmentResultsClassroomBriefScopeItem/,
-  'Assignment classroom brief scope panel should render prepared scope labels and key scope items by stable ids.'
-);
-assert.match(
-  assignmentResultsClassroomBriefCardSource,
-  /function AssignmentResultsClassroomBriefScopeItem[\s\S]*const labelId = `assignment-results-classroom-brief-scope-\$\{scopeView\.id\}-label`[\s\S]*const valueId = `assignment-results-classroom-brief-scope-\$\{scopeView\.id\}-value`[\s\S]*const descriptionId = `assignment-results-classroom-brief-scope-\$\{scopeView\.id\}-description`[\s\S]*id=\{labelId\}[\s\S]*scopeView\.label[\s\S]*<output[\s\S]*aria-label=\{scopeView\.ariaLabel\}[\s\S]*aria-labelledby=\{`\$\{labelId\} \$\{valueId\}`\}[\s\S]*id=\{valueId\}[\s\S]*scopeView\.value[\s\S]*id=\{descriptionId\}[\s\S]*scopeView\.description/,
-  'Assignment classroom brief scope items should render prepared labels, values, descriptions, and accessible labels.'
-);
-assert.match(
-  assignmentResultsClassroomBriefCardSource,
-  /function AssignmentResultsClassroomBriefStats[\s\S]*brief\.statSummaryLabel[\s\S]*brief\.statViews\.map[\s\S]*AssignmentResultsClassroomBriefStat/,
-  'Assignment classroom brief stats panel should render prepared stat summary and stat views.'
-);
-assert.match(
-  assignmentResultsClassroomBriefCardSource,
-  /function AssignmentResultsClassroomBriefStat[\s\S]*const labelId = `assignment-results-classroom-brief-stat-\$\{statView\.key\}-label`[\s\S]*const valueId = `assignment-results-classroom-brief-stat-\$\{statView\.key\}-value`[\s\S]*const descriptionId = `assignment-results-classroom-brief-stat-\$\{statView\.key\}-description`[\s\S]*id=\{labelId\}[\s\S]*statView\.label[\s\S]*<output[\s\S]*aria-label=\{statView\.ariaLabel\}[\s\S]*aria-labelledby=\{`\$\{labelId\} \$\{valueId\}`\}[\s\S]*id=\{valueId\}[\s\S]*statView\.value[\s\S]*id=\{descriptionId\}[\s\S]*statView\.description/,
-  'Assignment classroom brief stat cards should render prepared stat labels, values, descriptions, and accessible labels.'
-);
-assert.match(
-  assignmentResultsClassroomBriefCardSource,
-  /function AssignmentResultsClassFocusPanel[\s\S]*sectionView\.title[\s\S]*focusItemViews\.map[\s\S]*AssignmentResultsClassFocusItem[\s\S]*itemView=\{itemView\}[\s\S]*sectionView\.emptyMessage/,
-  'Assignment classroom focus panel should delegate prepared focus item views and render prepared section labels.'
 );
 assert.match(
   assignmentResultsClassroomBriefCardSource,
@@ -12488,33 +12067,13 @@ assert.match(
 );
 assert.match(
   assignmentResultsClassroomBriefCardSource,
-  /function AssignmentResultsClassFocusItem[\s\S]*itemView\.promptLabel[\s\S]*itemView\.correctRateLabel[\s\S]*itemView\.kindLabel[\s\S]*itemView\.performanceLabel[\s\S]*itemView\.correctSummaryLabel/,
-  'Assignment classroom focus item should render prepared focus labels, item type, and performance summary.'
-);
-assert.match(
-  assignmentResultsClassroomBriefCardSource,
   /function AssignmentResultsFollowUpStudent[\s\S]*studentView\.studentLabel[\s\S]*studentView\.accuracyLabel[\s\S]*studentView\.submittedContextLabel[\s\S]*studentView\.followUpRecommendation[\s\S]*studentView\.needsReviewLabel/,
   'Assignment follow-up student item should render prepared follow-up labels, submitted context, and next-step copy.'
-);
-assert.match(
-  assignmentResultsClassroomBriefCardSource,
-  /itemView\.promptLabel/,
-  'Assignment classroom brief component should render prepared focus item prompt labels.'
 );
 assert.doesNotMatch(
   assignmentResultsClassroomBriefCardSource,
   /itemView\.itemNumberLabel[\s\S]*itemView\.prompt/,
   'Assignment classroom brief component should not hand-compose focus item number and prompt text.'
-);
-assert.match(
-  assignmentResultsClassroomBriefCardSource,
-  /function AssignmentResultsClassroomBriefCopyPreview[\s\S]*copyPreview\.label[\s\S]*AssignmentCopyArtifactHandoff[\s\S]*handoffView=\{copyArtifactHandoffView\}[\s\S]*AssignmentResultsCopyScopeView[\s\S]*copyScopeView=\{copyScopeView\}[\s\S]*copyArtifactPreviews\.map[\s\S]*AssignmentResultsCopyArtifactPreview[\s\S]*key=\{preview\.id\}[\s\S]*onResultAction=\{onResultAction\}/,
-  'Assignment classroom brief copy preview should render prepared copy artifact handoff, copy scope, and copy artifact previews with the prepared result action handler.'
-);
-assert.match(
-  assignmentResultsClassroomBriefCardSource,
-  /function AssignmentCopyArtifactHandoff[\s\S]*const titleId = 'assignment-copy-artifact-handoff-title'[\s\S]*const descriptionId = 'assignment-copy-artifact-handoff-description'[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*aria-labelledby=\{titleId\}[\s\S]*className="sr-only"[\s\S]*data-handoff="assignment-copy-artifact"[\s\S]*data-handoff-scope=\{handoffView\.privacy\.scope\}[\s\S]*id=\{titleId\}[\s\S]*id=\{descriptionId\}[\s\S]*<dl>[\s\S]*handoffView\.itemViews\.map[\s\S]*AssignmentCopyArtifactHandoffItem[\s\S]*function AssignmentCopyArtifactHandoffItem[\s\S]*itemView: AssignmentCopyArtifactHandoffItemView[\s\S]*const labelId = `assignment-copy-artifact-handoff-\$\{itemView\.id\}-label`[\s\S]*const valueId = `assignment-copy-artifact-handoff-\$\{itemView\.id\}-value`[\s\S]*const descriptionId = `assignment-copy-artifact-handoff-\$\{itemView\.id\}-description`[\s\S]*data-handoff-item=\{itemView\.id\}[\s\S]*id=\{labelId\}[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*aria-label=\{itemView\.ariaLabel\}[\s\S]*aria-labelledby=\{`\$\{labelId\} \$\{valueId\}`\}[\s\S]*id=\{valueId\}[\s\S]*id=\{descriptionId\}/,
-  'Assignment classroom brief copy artifact handoff should render stable result-page handoff, item markers, and accessible label/value/description relationships.'
 );
 assert.doesNotMatch(
   assignmentResultsClassroomBriefCardSource,
@@ -12525,56 +12084,6 @@ assert.doesNotMatch(
   assignmentResultsClassroomBriefCardSource,
   /AssignmentClassroomBrief\['(?:scopeViews|statViews|focusItemViews|followUpStudentViews)'\]|AssignmentResultsClassroomBriefCardProps\['sectionViews'\]/,
   'Assignment classroom brief card child components should not infer props from aggregate classroom brief or card prop indexes.'
-);
-assert.match(
-  assignmentResultsClassroomBriefCardSource,
-  /function AssignmentResultsCopyScopeView[\s\S]*copyScopeView\.title[\s\S]*copyScopeView\.description[\s\S]*copyScopeView\.itemViews\.map[\s\S]*AssignmentResultsCopyScopeItem[\s\S]*function AssignmentResultsCopyScopeItem[\s\S]*AssignmentResultCopyScopeItemView[\s\S]*const labelId = `assignment-results-copy-scope-\$\{itemView\.id\}-label`[\s\S]*const valueId = `assignment-results-copy-scope-\$\{itemView\.id\}-value`[\s\S]*const descriptionId = `assignment-results-copy-scope-\$\{itemView\.id\}-description`[\s\S]*itemView\.label[\s\S]*<output[\s\S]*aria-labelledby=\{`\$\{labelId\} \$\{valueId\}`\}[\s\S]*id=\{valueId\}[\s\S]*itemView\.value[\s\S]*id=\{descriptionId\}[\s\S]*itemView\.description/,
-  'Assignment classroom brief copy-scope view should render prepared scope title, description, labels, values, and descriptions.'
-);
-assert.match(
-  assignmentResultsClassroomBriefCardSource,
-  /function AssignmentResultsCopyScopeSummaryItem[\s\S]*AssignmentResultCopyScopeSummaryItemView[\s\S]*const labelId = `assignment-results-copy-scope-summary-\$\{summaryItem\.id\}-label`[\s\S]*const valueId = `assignment-results-copy-scope-summary-\$\{summaryItem\.id\}-value`[\s\S]*<output[\s\S]*aria-label=\{summaryItem\.ariaLabel\}[\s\S]*aria-labelledby=\{`\$\{labelId\} \$\{valueId\}`\}[\s\S]*id=\{valueId\}[\s\S]*summaryItem\.description/,
-  'Assignment classroom brief copy-scope summary should render prepared accessible labels and descriptions.'
-);
-assert.match(
-  assignmentResultsClassroomBriefCardSource,
-  /function AssignmentResultsCopyArtifactPreview[\s\S]*preview\.label[\s\S]*preview\.description[\s\S]*preview\.actionButton\.disabled[\s\S]*onResultAction\(preview\.actionButton\)[\s\S]*aria-label=\{preview\.actionButton\.ariaLabel\}[\s\S]*preview\.actionButton\.label[\s\S]*preview\.summaryLabel[\s\S]*preview\.metaItems\.map[\s\S]*metaItem\.label[\s\S]*metaItem\.value[\s\S]*preview\.text/,
-  'Assignment classroom brief copy artifact preview cards should render prepared label, description, action aria label, summary, metadata, copied text, and action button state.'
-);
-assert.match(
-  assignmentResultsClassroomBriefCardSource,
-  /const titleId = getCopyArtifactPreviewTitleId\(preview\.id\)[\s\S]*const descriptionId = getCopyArtifactPreviewDescriptionId\(preview\.id\)[\s\S]*const scopeDescriptionId = getCopyArtifactPreviewScopeDescriptionId\([\s\S]*preview\.id[\s\S]*const describedBy = \[[\s\S]*descriptionId,[\s\S]*scopeDescriptionId,[\s\S]*disabledReasonId[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*aria-labelledby=\{titleId\}[\s\S]*id=\{titleId\}[\s\S]*id=\{descriptionId\}[\s\S]*aria-describedby=\{describedBy\}/,
-  'Assignment classroom brief copy artifact preview cards should associate preview labels, descriptions, copy-scope descriptions, and disabled reasons with their controls.'
-);
-assert.match(
-  assignmentResultsClassroomBriefCardSource,
-  /const scopeTitleId = getCopyArtifactPreviewScopeTitleId\(preview\.id\)[\s\S]*AssignmentResultsCopyArtifactPreviewScope[\s\S]*copyScopeView=\{preview\.copyScopeView\}[\s\S]*descriptionId=\{scopeDescriptionId\}[\s\S]*previewId=\{preview\.id\}[\s\S]*titleId=\{scopeTitleId\}[\s\S]*function AssignmentResultsCopyArtifactPreviewScope[\s\S]*previewId: AssignmentResultCopyArtifactPreview\['id'\][\s\S]*titleId: string;[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*aria-labelledby=\{titleId\}[\s\S]*id=\{titleId\}[\s\S]*copyScopeView\.title[\s\S]*id=\{descriptionId\}[\s\S]*copyScopeView\.description[\s\S]*copyScopeView\.itemViews\.map[\s\S]*AssignmentResultsCopyArtifactPreviewScopeItem[\s\S]*copyScopeView\.summaryItems\.map[\s\S]*AssignmentResultsCopyArtifactPreviewScopeSummaryItem/,
-  'Assignment classroom brief copy artifact preview cards should render each preview-specific copy scope and summary count item.'
-);
-assert.match(
-  assignmentResultsClassroomBriefCardSource,
-  /function AssignmentResultsCopyArtifactPreviewScopeItem[\s\S]*AssignmentResultCopyScopeItemView[\s\S]*const labelId = `assignment-result-copy-preview-\$\{previewId\}-scope-\$\{itemView\.id\}-label`[\s\S]*const valueId = `assignment-result-copy-preview-\$\{previewId\}-scope-\$\{itemView\.id\}-value`[\s\S]*const descriptionId = `assignment-result-copy-preview-\$\{previewId\}-scope-\$\{itemView\.id\}-description`[\s\S]*aria-labelledby=\{`\$\{labelId\} \$\{valueId\}`\}[\s\S]*itemView\.label[\s\S]*<output[\s\S]*aria-labelledby=\{`\$\{labelId\} \$\{valueId\}`\}[\s\S]*id=\{valueId\}[\s\S]*itemView\.value[\s\S]*itemView\.description[\s\S]*function AssignmentResultsCopyArtifactPreviewScopeSummaryItem[\s\S]*AssignmentResultCopyScopeSummaryItemView[\s\S]*const labelId = `assignment-result-copy-preview-\$\{previewId\}-scope-summary-\$\{summaryItem\.id\}-label`[\s\S]*const valueId = `assignment-result-copy-preview-\$\{previewId\}-scope-summary-\$\{summaryItem\.id\}-value`[\s\S]*aria-label=\{summaryItem\.ariaLabel\}[\s\S]*<output[\s\S]*aria-label=\{summaryItem\.ariaLabel\}[\s\S]*aria-labelledby=\{`\$\{labelId\} \$\{valueId\}`\}[\s\S]*id=\{valueId\}[\s\S]*summaryItem\.description/,
-  'Assignment classroom brief copy artifact preview summaries should render prepared accessible labels and descriptions.'
-);
-assert.match(
-  assignmentResultsClassroomBriefCardSource,
-  /const disabledReasonId = getCopyArtifactPreviewDisabledReasonId\([\s\S]*preview\.actionButton[\s\S]*const describedBy = \[[\s\S]*disabledReasonId[\s\S]*aria-describedby=\{describedBy\}[\s\S]*AssignmentResultsCopyArtifactDisabledReason[\s\S]*actionButton=\{preview\.actionButton\}[\s\S]*disabledReasonId=\{disabledReasonId\}/,
-  'Assignment classroom brief copy artifact preview buttons should associate disabled actions with their prepared disabled reason text.'
-);
-assert.match(
-  assignmentResultsClassroomBriefCardSource,
-  /function getCopyArtifactPreviewTitleId\([\s\S]*AssignmentResultCopyArtifactPreview\['id'\][\s\S]*function getCopyArtifactPreviewDescriptionId\([\s\S]*AssignmentResultCopyArtifactPreview\['id'\][\s\S]*function getCopyArtifactPreviewScopeTitleId\([\s\S]*AssignmentResultCopyArtifactPreview\['id'\][\s\S]*function getCopyArtifactPreviewScopeDescriptionId\([\s\S]*AssignmentResultCopyArtifactPreview\['id'\]/,
-  'Assignment classroom brief copy artifact preview ids should be stable from the prepared preview id contract.'
-);
-assert.match(
-  assignmentResultsClassroomBriefCardSource,
-  /function AssignmentResultsCopyArtifactDisabledReason[\s\S]*if \(!actionButton\.disabledReason\) return null;[\s\S]*id=\{disabledReasonId\}[\s\S]*actionButton\.disabledReason/,
-  'Assignment classroom brief copy artifact preview cards should render prepared disabled reasons for blocked copy actions.'
-);
-assert.match(
-  assignmentResultsClassroomBriefCardSource,
-  /function getCopyArtifactPreviewDisabledReasonId[\s\S]*`assignment-result-copy-preview-\$\{id\}-disabled-reason`/,
-  'Assignment classroom brief copy artifact disabled reason ids should be stable per prepared action-button id.'
 );
 assert.doesNotMatch(
   assignmentResultsClassroomBriefCardSource,
@@ -12610,16 +12119,6 @@ assert.match(
   assignmentResultsStudentSearchSource,
   /IconSearch[\s\S]*aria-hidden="true"/,
   'Assignment result student search decorative search icon should be hidden from assistive technology.'
-);
-assert.match(
-  assignmentResultsStudentSearchSource,
-  /function AssignmentResultStudentSearchHandoff[\s\S]*const titleId = 'assignment-result-student-search-handoff-title'[\s\S]*const descriptionId = 'assignment-result-student-search-handoff-description'[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*aria-labelledby=\{titleId\}[\s\S]*data-handoff="assignment-result-student-search"[\s\S]*data-handoff-scope=\{view\.privacy\.scope\}[\s\S]*id=\{titleId\}[\s\S]*id=\{descriptionId\}[\s\S]*<dl>[\s\S]*view\.itemViews\.map[\s\S]*AssignmentResultStudentSearchHandoffItem[\s\S]*function AssignmentResultStudentSearchHandoffItem[\s\S]*const labelId = `assignment-result-student-search-handoff-\$\{itemView\.id\}-label`[\s\S]*const valueId = `assignment-result-student-search-handoff-\$\{itemView\.id\}-value`[\s\S]*const descriptionId = `assignment-result-student-search-handoff-\$\{itemView\.id\}-description`[\s\S]*data-handoff-item=\{itemView\.id\}[\s\S]*id=\{labelId\}[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*aria-label=\{itemView\.ariaLabel\}[\s\S]*aria-labelledby=\{`\$\{labelId\} \$\{valueId\}`\}[\s\S]*id=\{valueId\}[\s\S]*id=\{descriptionId\}/,
-  'Assignment result student search handoff should render the hidden search marker, privacy scope, item ids, and stable label/value/description relationships.'
-);
-assert.match(
-  authE2eCatalogSource,
-  /Assignment result student search has a fast script-level gate via[\s\S]*scripts\/assignment-result-student-search-handoff-semantic-views\.test\.ts[\s\S]*query[\s\S]*normalization[\s\S]*assignment-result-student-search[\s\S]*handoff/,
-  'E2E catalog should document the result student search focused gate.'
 );
 assert.doesNotMatch(
   `${assignmentResultsStudentSearchSource}\n${assignmentResultsAttemptReviewFilterSource}\n${assignmentResultsItemPerformanceSortSource}`,
@@ -12782,150 +12281,11 @@ assert.match(
   'Assignment result attempt answer review item should render prepared metric labels, answer-review accessible labels, and text lines.'
 );
 assert.match(
-  assignmentAttemptReviewCardHandoffSource,
-  /export const ASSIGNMENT_ATTEMPT_REVIEW_CARD_HANDOFF_ITEM_IDS = \[(?=[\s\S]*'review-card-scope')(?=[\s\S]*'student-display-boundary')(?=[\s\S]*'submitted-time-display')(?=[\s\S]*'score-badge')(?=[\s\S]*'summary-metric-count')(?=[\s\S]*'submitted-count')(?=[\s\S]*'correct-count')(?=[\s\S]*'needs-review-count')(?=[\s\S]*'unanswered-count')(?=[\s\S]*'answer-card-count')(?=[\s\S]*'answer-sequence')(?=[\s\S]*'prompt-labels')(?=[\s\S]*'status-labels')(?=[\s\S]*'correct-status-count')(?=[\s\S]*'needs-review-status-count')(?=[\s\S]*'unanswered-status-count')(?=[\s\S]*'student-answer-lines')(?=[\s\S]*'expected-answer-lines')(?=[\s\S]*'accepted-alternatives-lines')(?=[\s\S]*'explanation-lines')(?=[\s\S]*'unsubmitted-answer-guard')(?=[\s\S]*'answer-text-view-helper')(?=[\s\S]*'answer-status-helper')(?=[\s\S]*'attempt-summary-helper')(?=[\s\S]*'review-card-consumer')(?=[\s\S]*'review-filter-consumer')(?=[\s\S]*'copy-scope-boundary')(?=[\s\S]*'csv-export-boundary')(?=[\s\S]*'anonymous-token-guard')(?=[\s\S]*'privacy-guard')/,
-  'Attempt review card handoff should preserve the 30-slice item id contract.'
-);
-assert.match(
-  assignmentAttemptReviewCardHandoffSource,
-  /export type AssignmentAttemptReviewCardHandoffPrivacyContract = \{[\s\S]*exposesAcceptedAnswerText: false;[\s\S]*exposesAttemptId: false;[\s\S]*exposesPromptText: false;[\s\S]*exposesRawAnonymousToken: false;[\s\S]*exposesStudentAnswerText: false;[\s\S]*exposesStudentDisplayLabel: false;[\s\S]*exposesTeacherAnswerText: false;[\s\S]*mutatesResultData: false;[\s\S]*scope: 'teacher-result-attempt-review-card';[\s\S]*usesAssignmentDomainHelpers: true;/,
-  'Attempt review card handoff should keep raw card text and identity out of hidden semantic output.'
-);
-assert.match(
-  assignmentResultViewSource,
-  /buildAssignmentAttemptReviewCardHandoffEvidence\(\{[\s\S]*answers: attempt\.answers,[\s\S]*answerViews,[\s\S]*badgeLabel,[\s\S]*submittedAtLabel,[\s\S]*summaryMetricCount: summaryMetricViews\.length/,
-  'Attempt review card handoff evidence should be built from the prepared card view and attempt answers.'
-);
-assert.match(
-  assignmentResultsAttemptReviewCardSource,
-  /function AssignmentResultsAttemptReviewCardHandoff[\s\S]*const baseId = useId\(\)[\s\S]*const titleId = `\$\{baseId\}-assignment-attempt-review-card-handoff-title`[\s\S]*const descriptionId = `\$\{baseId\}-assignment-attempt-review-card-handoff-description`[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*aria-labelledby=\{titleId\}[\s\S]*data-handoff="assignment-attempt-review-card"[\s\S]*data-handoff-scope=\{view\.privacy\.scope\}[\s\S]*id=\{titleId\}[\s\S]*id=\{descriptionId\}[\s\S]*<dl>[\s\S]*view\.itemViews\.map[\s\S]*AssignmentResultsAttemptReviewCardHandoffItem[\s\S]*baseId=\{baseId\}[\s\S]*function AssignmentResultsAttemptReviewCardHandoffItem[\s\S]*const itemId = `\$\{baseId\}-assignment-attempt-review-card-\$\{itemView\.id\}`[\s\S]*const labelId = `\$\{itemId\}-label`[\s\S]*const valueId = `\$\{itemId\}-value`[\s\S]*const descriptionId = `\$\{itemId\}-description`[\s\S]*data-handoff-item=\{itemView\.id\}[\s\S]*id=\{labelId\}[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*aria-label=\{itemView\.ariaLabel\}[\s\S]*aria-labelledby=\{`\$\{labelId\} \$\{valueId\}`\}[\s\S]*id=\{valueId\}[\s\S]*id=\{descriptionId\}/,
-  'Attempt review card component should render the hidden handoff marker, privacy scope, item ids, and stable label/value/description relationships beside the visible review card.'
-);
-assert.match(
-  assignmentResultsAttemptReviewCardSource,
-  /const baseId = useId\(\)[\s\S]*baseId=\{baseId\}[\s\S]*const itemId = `\$\{baseId\}-assignment-attempt-review-card-\$\{itemView\.id\}`/,
-  'Attempt review card handoff should use generated DOM id prefixes instead of leaking attempt ids or repeating static ids.'
-);
-assert.match(
-  authE2eCatalogSource,
-  /\|\s*6h\s*\|\s*Result attempt review cards expose a 30-slice handoff\s*\|/,
-  'E2E catalog should include the attempt review card handoff acceptance journey.'
-);
-assert.match(
-  authE2eCatalogSource,
-  /Assignment attempt review cards has a fast script-level gate via[\s\S]*scripts\/assignment-attempt-review-card-handoff-semantic-views\.test\.ts[\s\S]*answer review cards[\s\S]*assignment-attempt-review-card[\s\S]*handoff/,
-  'E2E catalog should document the attempt review card focused gate.'
-);
-assert.match(
   assignmentResultsEmptyStateSource,
   /AssignmentResultEmptyState/,
   'Assignment result empty-state component should consume the assignment-domain empty-state view.'
 );
 overwriteGetLocale(() => 'en');
-assert.equal(ASSIGNMENT_RESULT_EMPTY_STATE_HANDOFF_ITEM_IDS.length, 30);
-assert.equal(
-  new Set(ASSIGNMENT_RESULT_EMPTY_STATE_HANDOFF_ITEM_IDS).size,
-  30
-);
-const assignmentResultEmptyStateHandoffProbe =
-  buildAssignmentResultEmptyStateHandoffView({
-    description:
-      'Clear the search or try another student name from this assignment.',
-    reason: 'attempt-search-no-matches',
-    search: ' Private Student ',
-    surface: 'attempt-rows',
-    title: 'No matching attempts.',
-    totalAttempts: 3,
-  });
-const assignmentResultEmptyStateHandoffItemIds =
-  assignmentResultEmptyStateHandoffProbe.itemViews.map(
-    (itemView) => itemView.id
-  );
-assert.deepEqual(assignmentResultEmptyStateHandoffItemIds, [
-  ...ASSIGNMENT_RESULT_EMPTY_STATE_HANDOFF_ITEM_IDS,
-]);
-assert.deepEqual(assignmentResultEmptyStateHandoffProbe.privacy, {
-  exposesPublicRunnerContent: false,
-  exposesRawAnonymousToken: false,
-  exposesRawSearchText: false,
-  exposesStudentAnswerText: false,
-  exposesStudentDisplayLabels: false,
-  exposesTeacherAnswerKey: false,
-  itemIds: assignmentResultEmptyStateHandoffItemIds,
-  mutatesResultData: false,
-  scope: 'teacher-result-empty-state',
-  usesResultDomainHelpers: true,
-});
-const assignmentResultEmptyStateHandoffValues = new Map(
-  assignmentResultEmptyStateHandoffProbe.itemViews.map((itemView) => [
-    itemView.id,
-    itemView.value,
-  ])
-);
-assert.equal(
-  assignmentResultEmptyStateHandoffValues.get('empty-reason'),
-  'Attempt search no match'
-);
-assert.equal(
-  assignmentResultEmptyStateHandoffValues.get('search-state'),
-  'Adjusted'
-);
-assert.equal(
-  assignmentResultEmptyStateHandoffValues.get('search-normalization'),
-  'normalizeResultSearch'
-);
-assert.equal(
-  assignmentResultEmptyStateHandoffValues.get('no-match-next-step'),
-  'Clear search'
-);
-assert.equal(
-  assignmentResultEmptyStateHandoffValues.get('copy-brief-gate'),
-  'Current review scope'
-);
-assert.equal(
-  assignmentResultEmptyStateHandoffValues.get('export-csv-gate'),
-  'Full assignment scope'
-);
-assert.equal(
-  assignmentResultEmptyStateHandoffValues.get('anonymous-token-guard'),
-  'Hidden'
-);
-assert.equal(
-  JSON.stringify(assignmentResultEmptyStateHandoffProbe).includes(
-    'Private Student'
-  ),
-  false
-);
-assert.match(
-  assignmentResultEmptyStateHandoffSource,
-  /ASSIGNMENT_RESULT_EMPTY_STATE_HANDOFF_ITEM_IDS = \[(?=[\s\S]*'empty-surface')(?=[\s\S]*'visible-description')(?=[\s\S]*'student-summary-section')(?=[\s\S]*'attempt-table-section')(?=[\s\S]*'answer-review-section')(?=[\s\S]*'search-normalization')(?=[\s\S]*'copy-brief-gate')(?=[\s\S]*'export-csv-gate')(?=[\s\S]*'public-runner-boundary')(?=[\s\S]*'anonymous-token-guard')(?=[\s\S]*'student-answer-guard')(?=[\s\S]*'teacher-answer-guard')[\s\S]*\] as const/,
-  'Assignment result empty-state handoff should preserve the 30-slice item id contract.'
-);
-assert.match(
-  assignmentResultEmptyStateHandoffSource,
-  /export type AssignmentResultEmptyStateHandoffPrivacyContract = \{[\s\S]*exposesPublicRunnerContent: false;[\s\S]*exposesRawAnonymousToken: false;[\s\S]*exposesRawSearchText: false;[\s\S]*exposesStudentAnswerText: false;[\s\S]*exposesStudentDisplayLabels: false;[\s\S]*exposesTeacherAnswerKey: false;[\s\S]*mutatesResultData: false;[\s\S]*scope: 'teacher-result-empty-state';[\s\S]*usesResultDomainHelpers: true;/,
-  'Assignment result empty-state handoff should document the teacher-result privacy boundary.'
-);
-assert.match(
-  assignmentResultViewSource,
-  /from '@\/assignments\/result-empty-state-handoff'[\s\S]*handoffView: AssignmentResultEmptyStateHandoffView[\s\S]*function buildAssignmentResultEmptyStateView\([\s\S]*buildAssignmentResultEmptyStateHandoffView\(input\)/,
-  'Assignment result empty states should attach the prepared empty-state handoff from the dedicated domain module.'
-);
-assert.match(
-  assignmentResultsEmptyStateSource,
-  /useId[\s\S]*const baseId = useId\(\)[\s\S]*data-handoff="assignment-result-empty-state"[\s\S]*data-handoff-scope=\{state\.handoffView\.privacy\.scope\}[\s\S]*state\.handoffView\.itemViews\.map[\s\S]*AssignmentResultEmptyStateHandoffItem[\s\S]*baseId=\{baseId\}[\s\S]*function AssignmentResultEmptyStateHandoffItem[\s\S]*const itemId = `\$\{baseId\}-assignment-result-empty-state-\$\{itemView\.id\}`[\s\S]*const labelId = `\$\{itemId\}-label`[\s\S]*const valueId = `\$\{itemId\}-value`[\s\S]*const descriptionId = `\$\{itemId\}-description`[\s\S]*data-handoff-item=\{itemView\.id\}[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*aria-label=\{itemView\.ariaLabel\}[\s\S]*aria-labelledby=\{`\$\{labelId\} \$\{valueId\}`\}[\s\S]*id=\{valueId\}[\s\S]*id=\{descriptionId\}/,
-  'Assignment result empty-state component should render marker, privacy scope, item ids, and stable label/value/description relationships without repeated static ids.'
-);
-assert.match(
-  authE2eCatalogSource,
-  /\|\s*6j\s*\|\s*Result empty states expose a 30-slice handoff\s*\|[\s\S]*`assignment-result-empty-state`[\s\S]*`data-handoff-item`/,
-  'E2E catalog should include the result empty-state handoff marker and stable item marker acceptance journey.'
-);
-assert.match(
-  assignmentResultEmptyStateHandoffSemanticTestSource,
-  /SECRET_PRIVATE_STUDENT[\s\S]*exposesRawSearchText: false[\s\S]*needs-review-no-matches[\s\S]*data-handoff="assignment-result-empty-state"/,
-  'Focused semantic test should exercise raw-search privacy, needs-review no matches, and component marker wiring.'
-);
 assert.match(
   assignmentResultViewSource,
   /getAssignmentResultCompletedAttemptCount\(\s*data\?\.stats\.completions\s*\)/,
@@ -17204,7 +16564,6 @@ assert.deepEqual(
     TEACHER_RESULTS_REVIEW_CHAIN_SOURCE_FILES.length,
     TEACHER_RESULT_COPY_LIFECYCLE_CHAIN_HANDOFF_ITEM_IDS.length,
     TEACHER_RESULT_COPY_LIFECYCLE_CHAIN_SOURCE_FILES.length,
-    ASSIGNMENT_RESULTS_EXPORT_PREPARATION_ITEM_IDS.length,
     PRINTABLE_WORKSHEET_REVIEW_LIFECYCLE_CHAIN_HANDOFF_ITEM_IDS.length,
     PRINTABLE_WORKSHEET_REVIEW_LIFECYCLE_CHAIN_SOURCE_FILES.length,
     WORKSHEET_MODE_DELIVERY_CHAIN_HANDOFF_ITEM_IDS.length,
@@ -17213,7 +16572,7 @@ assert.deepEqual(
     PUBLIC_DISCOVERY_INDEXING_CHAIN_SOURCE_FILES.length,
     CLASSROOM_TRUST_COMMUNICATION_CHAIN_HANDOFF_ITEM_IDS.length,
   ],
-  Array.from({ length: 58 }, () => 30),
+  Array.from({ length: 57 }, () => 30),
   'Classroom product loop chain should stay backed by adjacent public entry, public discovery/indexing, workspace, data, authoring, source extraction, lifecycle governance, template roadmap, AI enhancement lifecycle, delivery, runner, result continuity, export, print, and trust gates.'
 );
 assert.deepEqual(Object.fromEntries(classroomProductLoopChainValues), {
@@ -19806,14 +19165,10 @@ assert.deepEqual(
   [
     ASSIGNMENT_ATTEMPT_LIMIT_HANDOFF_ITEM_IDS.length,
     ASSIGNMENT_ATTEMPT_PERSISTENCE_HANDOFF_ITEM_IDS.length,
-    ASSIGNMENT_RESULT_STUDENT_SEARCH_HANDOFF_ITEM_IDS.length,
-    ASSIGNMENT_STUDENT_SUMMARY_SORT_HANDOFF_ITEM_IDS.length,
-    ASSIGNMENT_ATTEMPT_REVIEW_CARD_HANDOFF_ITEM_IDS.length,
-    ASSIGNMENT_RESULTS_EXPORT_PREPARATION_ITEM_IDS.length,
     STUDENT_RUNNER_PLAY_CHAIN_HANDOFF_ITEM_IDS.length,
     TEACHER_RESULTS_REVIEW_CHAIN_HANDOFF_ITEM_IDS.length,
   ],
-  Array.from({ length: 8 }, () => 30),
+  Array.from({ length: 4 }, () => 30),
   'Student identity lifecycle chain should stay backed by adjacent identity, runner, attempt, result, and export gates.'
 );
 assert.deepEqual(Object.fromEntries(studentIdentityLifecycleChainValues), {
@@ -20522,7 +19877,7 @@ assert.match(
 );
 assert.match(
   assignmentAttemptLimitResultExportSource,
-  /delivery-attempt-limit/,
+  /deliveryView\.maxAttempts/,
   'Result exports should preserve the assignment delivery attempt-limit field.'
 );
 for (const privateValue of [
@@ -30584,10 +29939,8 @@ assert.deepEqual(
     ASSIGNMENT_ATTEMPT_STATS_HANDOFF_ITEM_IDS.length,
     TEACHER_RESULTS_REVIEW_CHAIN_HANDOFF_ITEM_IDS.length,
     TEACHER_RESULT_COPY_LIFECYCLE_CHAIN_HANDOFF_ITEM_IDS.length,
-    ASSIGNMENT_RESULTS_EXPORT_PREPARATION_ITEM_IDS.length,
-    ASSIGNMENT_ATTEMPT_REVIEW_CARD_HANDOFF_ITEM_IDS.length,
   ],
-  Array.from({ length: 10 }, () => 30),
+  Array.from({ length: 8 }, () => 30),
   'Scored attempt result chain should stay backed by persistence, duration, runner, feedback, stats, results, copy, and export gates.'
 );
 assert.deepEqual(Object.fromEntries(scoredAttemptResultChainValues), {
@@ -30624,7 +29977,7 @@ assert.deepEqual(Object.fromEntries(scoredAttemptResultChainValues), {
 });
 assert.match(
   readFileSync('docs/product.md', 'utf8'),
-  /post-submit result boundary[\s\S]*scored-attempt\s+persistence[\s\S]*public feedback[\s\S]*assignment stats[\s\S]*teacher result analysis[\s\S]*30-slice attempt review card handoff[\s\S]*copy artifacts[\s\S]*CSV export[\s\S]*printable\s+review\s+return/,
+  /post-submit result boundary[\s\S]*scored-attempt\s+persistence[\s\S]*public feedback[\s\S]*assignment stats[\s\S]*teacher result analysis[\s\S]*answer review cards[\s\S]*copy artifacts[\s\S]*CSV export[\s\S]*printable\s+review\s+return/,
   'docs/product.md should document the shared post-submit scored-result boundary.'
 );
 assert.match(
@@ -32299,154 +31652,6 @@ assert.deepEqual(
     showAnswerKey: true,
   }
 );
-const printableWorksheetHandoffValues = new Map(
-  printableWorksheetPageView.handoffView.itemViews.map((item) => [
-    item.id,
-    item.value,
-  ])
-);
-assert.deepEqual(
-  printableWorksheetPageView.handoffView.itemViews.map((item) => item.id),
-  [...PRINTABLE_WORKSHEET_HANDOFF_ITEM_IDS],
-  'Printable worksheet page view-model should expose the stable 30-slice handoff order.'
-);
-assert.deepEqual(printableWorksheetPageView.handoffView.privacy, {
-  exposesAnswerKeyText: false,
-  exposesChoiceText: false,
-  exposesPromptText: false,
-  exposesStudentResponseText: false,
-  itemIds: [...PRINTABLE_WORKSHEET_HANDOFF_ITEM_IDS],
-  scope: 'teacher-printable-worksheet',
-});
-assert.equal(
-  printableWorksheetHandoffValues.get('handout-overview'),
-  'Ready to print'
-);
-assert.equal(
-  printableWorksheetHandoffValues.get('preparation-metric-count'),
-  '3 checks'
-);
-assert.equal(
-  printableWorksheetHandoffValues.get('student-fields'),
-  'Name, date, score'
-);
-assert.equal(
-  printableWorksheetHandoffValues.get('response-plan'),
-  '1 item · Multiple choice practice'
-);
-assert.equal(
-  printableWorksheetHandoffValues.get('answer-key'),
-  'Teacher-only key included'
-);
-assert.equal(
-  printableWorksheetHandoffValues.get('answer-key-access'),
-  'Teacher-only key included'
-);
-assert.equal(
-  printableWorksheetHandoffValues.get('answer-key-toggle-boundary'),
-  'Teacher toggle'
-);
-assert.equal(
-  printableWorksheetHandoffValues.get('printable-items'),
-  '1 item'
-);
-assert.equal(
-  printableWorksheetHandoffValues.get('response-modes'),
-  'Multiple choice practice'
-);
-assert.equal(
-  printableWorksheetHandoffValues.get('choice-bank-coverage'),
-  '1 item'
-);
-assert.equal(
-  printableWorksheetHandoffValues.get('choice-bank-choice-count'),
-  '3 choices'
-);
-assert.equal(
-  printableWorksheetHandoffValues.get('writing-area-coverage'),
-  '1 answer line'
-);
-assert.equal(
-  printableWorksheetHandoffValues.get('answer-line-count'),
-  '1 answer line'
-);
-assert.equal(
-  printableWorksheetHandoffValues.get('item-response-help'),
-  'Choose one'
-);
-assert.equal(
-  printableWorksheetHandoffValues.get('assignment-field-count'),
-  '9 fields'
-);
-assert.equal(
-  printableWorksheetHandoffValues.get('student-name-field'),
-  'Blank line'
-);
-assert.equal(
-  printableWorksheetHandoffValues.get('date-field'),
-  'Blank line'
-);
-assert.equal(
-  printableWorksheetHandoffValues.get('score-field'),
-  'Blank line'
-);
-assert.equal(
-  printableWorksheetHandoffValues.get('share-path'),
-  '/play/printable-1'
-);
-assert.equal(printableWorksheetHandoffValues.get('template'), 'Quiz');
-assert.equal(
-  printableWorksheetHandoffValues.get('snapshot-source'),
-  'Frozen from Frozen activity title for /play/printable-1'
-);
-assert.equal(
-  printableWorksheetHandoffValues.get('instructions'),
-  'Finish on paper.'
-);
-assert.equal(
-  printableWorksheetHandoffValues.get('answer-key-items'),
-  '1 item'
-);
-assert.equal(
-  printableWorksheetHandoffValues.get('answer-key-details'),
-  '3 items'
-);
-assert.equal(
-  printableWorksheetHandoffValues.get('results-return'),
-  'assignment-printable-1'
-);
-assert.equal(
-  printableWorksheetHandoffValues.get('print-action'),
-  'Printable practice'
-);
-assert.equal(
-  printableWorksheetHandoffValues.get('print-route-boundary'),
-  'Teacher print route'
-);
-assert.equal(
-  printableWorksheetHandoffValues.get('public-runner-boundary'),
-  'Runner unchanged'
-);
-assert.equal(
-  printableWorksheetHandoffValues.get('privacy-guard'),
-  'Private data omitted'
-);
-for (const privatePrintableHandoffValue of [
-  'q-frozen-prompt',
-  'Frozen prompt?',
-  'Frozen answer',
-  'Frozen accepted',
-  'Frozen explanation',
-  'Other',
-]) {
-  assert.equal(
-    JSON.stringify(printableWorksheetPageView.handoffView).includes(
-      privatePrintableHandoffValue
-    ),
-    false,
-    `Printable worksheet handoff leaked private text: ${privatePrintableHandoffValue}`
-  );
-}
 assert.deepEqual(
   simplifyPrintableAssignmentFieldViews([
     buildPrintableWorksheetSnapshotSourceFieldView(
@@ -41328,57 +40533,6 @@ assert.match(
 );
 assert.match(
   printableWorksheetViewSource,
-  /export const PRINTABLE_WORKSHEET_HANDOFF_ITEM_IDS = \[[\s\S]*'handout-overview'[\s\S]*'preparation-metric-count'[\s\S]*'student-fields'[\s\S]*'response-plan'[\s\S]*'answer-key'[\s\S]*'answer-key-access'[\s\S]*'answer-key-toggle-boundary'[\s\S]*'printable-items'[\s\S]*'response-modes'[\s\S]*'choice-bank-coverage'[\s\S]*'choice-bank-choice-count'[\s\S]*'writing-area-coverage'[\s\S]*'answer-line-count'[\s\S]*'item-response-help'[\s\S]*'assignment-field-count'[\s\S]*'student-name-field'[\s\S]*'date-field'[\s\S]*'score-field'[\s\S]*'share-path'[\s\S]*'template'[\s\S]*'snapshot-source'[\s\S]*'instructions'[\s\S]*'delivery-policy'[\s\S]*'answer-key-items'[\s\S]*'answer-key-details'[\s\S]*'results-return'[\s\S]*'print-action'[\s\S]*'print-route-boundary'[\s\S]*'public-runner-boundary'[\s\S]*'privacy-guard'[\s\S]*\] as const;[\s\S]*export type PrintableWorksheetHandoffItemId =\s*\n\s*\(typeof PRINTABLE_WORKSHEET_HANDOFF_ITEM_IDS\)\[number\];[\s\S]*export type PrintableWorksheetHandoffPrivacyContract = \{[\s\S]*exposesAnswerKeyText: false;[\s\S]*exposesChoiceText: false;[\s\S]*exposesPromptText: false;[\s\S]*exposesStudentResponseText: false;[\s\S]*itemIds: PrintableWorksheetHandoffItemId\[\];[\s\S]*scope: 'teacher-printable-worksheet';/,
-  'Printable worksheet handoff should expose a typed 30-slice paper handoff contract derived from stable exported ids with explicit privacy flags and scope.'
-);
-assert.deepEqual(
-  [...PRINTABLE_WORKSHEET_HANDOFF_ITEM_IDS],
-  [
-    'handout-overview',
-    'preparation-metric-count',
-    'student-fields',
-    'response-plan',
-    'answer-key',
-    'answer-key-access',
-    'answer-key-toggle-boundary',
-    'printable-items',
-    'response-modes',
-    'choice-bank-coverage',
-    'choice-bank-choice-count',
-    'writing-area-coverage',
-    'answer-line-count',
-    'item-response-help',
-    'assignment-field-count',
-    'student-name-field',
-    'date-field',
-    'score-field',
-    'share-path',
-    'template',
-    'snapshot-source',
-    'instructions',
-    'delivery-policy',
-    'answer-key-items',
-    'answer-key-details',
-    'results-return',
-    'print-action',
-    'print-route-boundary',
-    'public-runner-boundary',
-    'privacy-guard',
-  ],
-  'Printable worksheet handoff should expose exactly 30 stable slice ids.'
-);
-assert.match(
-  printableWorksheetViewSource,
-  /const itemViews = worksheet\.items\.map\(buildPrintableWorksheetItemView\)[\s\S]*handoffView: buildPrintableWorksheetHandoffView\(\{[\s\S]*answerKeyView,[\s\S]*assignmentFieldViews,[\s\S]*controlView,[\s\S]*headerView,[\s\S]*itemViews,[\s\S]*preparationView,/,
-  'Printable worksheet page view-model should compose handoff state from prepared answer-key, assignment-field, control, header, item, and preparation views.'
-);
-assert.match(
-  printableWorksheetViewSource,
-  /function buildPrintableWorksheetHandoffView(?=[\s\S]*answerKeyView: PrintableWorksheetAnswerKeyView)(?=[\s\S]*itemViews: PrintableWorksheetItemView\[\])[\s\S]*const candidateItemViews = \[[\s\S]*id: 'handout-overview'[\s\S]*id: 'preparation-metric-count'[\s\S]*id: 'answer-key-access'[\s\S]*id: 'answer-key-toggle-boundary'[\s\S]*id: 'choice-bank-coverage'[\s\S]*id: 'choice-bank-choice-count'[\s\S]*id: 'writing-area-coverage'[\s\S]*id: 'answer-line-count'[\s\S]*id: 'item-response-help'[\s\S]*id: 'assignment-field-count'[\s\S]*id: 'answer-key-items'[\s\S]*id: 'answer-key-details'[\s\S]*id: 'print-route-boundary'[\s\S]*id: 'public-runner-boundary'[\s\S]*id: 'privacy-guard'[\s\S]*\]\.filter\(isPrintableWorksheetHandoffItemView\);[\s\S]*const itemViewById = new Map\([\s\S]*candidateItemViews\.map\(\(itemView\) => \[itemView\.id, itemView\] as const\)[\s\S]*const orderedItemViews = PRINTABLE_WORKSHEET_HANDOFF_ITEM_IDS\.map\(\(id\) => \{[\s\S]*Missing printable worksheet handoff item:[\s\S]*itemViews: orderedItemViews,[\s\S]*privacy: buildPrintableWorksheetHandoffPrivacyContract\(orderedItemViews\)/,
-  'Printable worksheet handoff should collect prepared paper slices, order them through the stable id contract, and fail loudly when a slice is missing.'
-);
-assert.match(
-  printableWorksheetViewSource,
   /const answerKeyItemViews = answerKey[\s\S]*worksheet\.answerKey\?\.map\(buildPrintableWorksheetAnswerKeyItemView\)[\s\S]*: \[\]/,
   'Printable worksheet page view-model should only prepare teacher-only answer-key item views when answer key display is requested.'
 );
@@ -41404,7 +40558,7 @@ assert.match(
 );
 assert.match(
   printableWorksheetViewSource,
-  /get activityDescriptionLabel\(\)[\s\S]*assignment_printable_activity_description_label[\s\S]*get snapshotSourceLabel\(\)[\s\S]*assignment_printable_snapshot_source_label[\s\S]*buildPrintableWorksheetAssignmentFieldViews[\s\S]*buildPrintableWorksheetSnapshotSourceFieldView\(headerView\)[\s\S]*buildPrintableWorksheetActivityDescriptionFieldView\(headerView\)[\s\S]*export function buildPrintableWorksheetActivityDescriptionFieldView[\s\S]*activityDescriptionLabel[\s\S]*activityDescriptionFallback[\s\S]*export function buildPrintableWorksheetSnapshotSourceFieldView[\s\S]*snapshotSourceLabel[\s\S]*assignment_printable_snapshot_source_value/,
+  /get activityDescriptionLabel\(\)[\s\S]*assignment_printable_activity_description_label[\s\S]*get snapshotSourceLabel\(\)[\s\S]*assignment_printable_snapshot_source_label[\s\S]*buildPrintableWorksheetAssignmentFieldViews[\s\S]*buildPrintableWorksheetSnapshotSourceFieldView\(headerView\)[\s\S]*buildPrintableWorksheetActivityDescriptionFieldView\(headerView\)[\s\S]*function buildPrintableWorksheetActivityDescriptionFieldView[\s\S]*activityDescriptionLabel[\s\S]*activityDescriptionFallback[\s\S]*export function buildPrintableWorksheetSnapshotSourceFieldView[\s\S]*snapshotSourceLabel[\s\S]*assignment_printable_snapshot_source_value/,
   'Printable worksheet assignment fields should expose localized frozen-snapshot source and source activity description rows from the domain view model.'
 );
 assert.match(
@@ -41494,10 +40648,6 @@ const printableWorksheetPreparationSummarySource = readFileSync(
   'src/components/assignments/printable-worksheet-preparation-summary.tsx',
   'utf8'
 );
-const printableWorksheetHandoffSource = readFileSync(
-  'src/components/assignments/printable-worksheet-handoff.tsx',
-  'utf8'
-);
 assert.match(
   printableWorksheetAnswerKeySource,
   /itemView\.headingLabel/,
@@ -41527,16 +40677,6 @@ assert.match(
   printableWorksheetViewSource,
   /function buildPrintableWorksheetHeaderView\([\s\S]*\): PrintableWorksheetHeaderView[\s\S]*export function buildPrintableWorksheetItemView\([\s\S]*\): PrintableWorksheetItemView[\s\S]*export function buildPrintableWorksheetAnswerKeyItemView\([\s\S]*\): PrintableWorksheetAnswerKeyItemView[\s\S]*function getPrintableWorksheetAnswerLines\([\s\S]*\): PrintableWorksheetAnswerLineView\[\]/,
   'Printable worksheet builders should return explicit printable view contracts.'
-);
-assert.doesNotMatch(
-  `${printableWorksheetToolbarSource}\n${printableWorksheetStatePanelSource}\n${printableWorksheetHeaderSource}\n${printableWorksheetAssignmentFieldsSource}\n${printableWorksheetItemListSource}\n${printableWorksheetAnswerKeySource}\n${printableWorksheetPreparationSummarySource}\n${printableWorksheetHandoffSource}`,
-  /buildPrintableWorksheetPageViewModel|PrintableWorksheetPageViewModel\[|ReturnType<\s*typeof buildPrintableWorksheet(?:LoadingView|ErrorView|PageViewModel)/,
-  'Printable worksheet components should import focused view contracts instead of deriving them from printable page builders.'
-);
-assert.match(
-  printableWorksheetHandoffSource,
-  /PrintableWorksheetHandoffItemView[\s\S]*PrintableWorksheetHandoffView[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*aria-labelledby=\{titleId\}[\s\S]*data-handoff="printable-worksheet"[\s\S]*data-handoff-scope=\{view\.privacy\.scope\}[\s\S]*view\.itemViews\.map[\s\S]*PrintableWorksheetHandoffItem[\s\S]*function PrintableWorksheetHandoffItem[\s\S]*const labelId = `printable-worksheet-handoff-\$\{itemView\.id\}-label`[\s\S]*const valueId = `printable-worksheet-handoff-\$\{itemView\.id\}-value`[\s\S]*const descriptionId = `printable-worksheet-handoff-\$\{itemView\.id\}-description`[\s\S]*data-handoff-item=\{itemView\.id\}[\s\S]*id=\{labelId\}[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*aria-label=\{itemView\.ariaLabel\}[\s\S]*aria-labelledby=\{`\$\{labelId\} \$\{valueId\}`\}[\s\S]*id=\{valueId\}[\s\S]*id=\{descriptionId\}/,
-  'Printable worksheet handoff component should render hidden stable handoff outputs with privacy scope plus prepared label, value, and description relationships.'
 );
 assert.match(
   printableWorksheetToolbarSource,
@@ -41953,11 +41093,6 @@ assert.match(
   /to=\{printAction\.to\}[\s\S]*assignmentId: printAction\.assignmentId/,
   'Assignment results header actions should expose the prepared printable worksheet teacher action.'
 );
-assert.match(
-  printableAssignmentRouteSource,
-  /PrintableWorksheetHandoff[\s\S]*view=\{pageView\.handoffView\}/,
-  'Printable worksheet route should expose the prepared handoff view as hidden semantic DOM output.'
-);
 const rootRouteSource = readFileSync('src/routes/__root.tsx', 'utf8');
 assert.match(
   rootRouteSource,
@@ -41976,12 +41111,7 @@ assert.match(
 );
 assert.match(
   e2eTestCatalogText,
-  /hidden localized 30-slice printable worksheet handoff[\s\S]*handout overview[\s\S]*public-runner boundary[\s\S]*privacy guard/,
-  'E2E catalog should cover the printable worksheet hidden 30-slice handoff contract.'
-);
-assert.match(
-  e2eTestCatalogText,
-  /scripts\/printable-worksheet-handoff-semantic-views\.test\.ts[\s\S]*privacy-scope boundaries/,
+  /scripts\/printable-worksheet-view\.test\.ts[\s\S]*privacy-scope boundaries/,
   'E2E catalog should document the printable worksheet privacy-scope fast gate.'
 );
 assert.match(
@@ -42050,13 +41180,10 @@ assert.deepEqual(printableWorksheetReviewLifecycleChainView.privacy, {
 });
 assert.deepEqual(
   [
-    PRINTABLE_WORKSHEET_HANDOFF_ITEM_IDS.length,
     WORKSHEET_MODE_DELIVERY_CHAIN_HANDOFF_ITEM_IDS.length,
-    ASSIGNMENT_RESULTS_EXPORT_PREPARATION_ITEM_IDS.length,
     ASSIGNMENT_DELIVERY_POLICY_HANDOFF_ITEM_IDS.length,
-    ASSIGNMENT_RESULT_MATERIAL_HANDOFF_ITEM_IDS.length,
   ],
-  Array.from({ length: 5 }, () => 30),
+  Array.from({ length: 2 }, () => 30),
   'Printable worksheet review lifecycle chain should stay backed by printable, worksheet delivery, delivery policy, result material, and export gates.'
 );
 assert.deepEqual(
@@ -42080,7 +41207,7 @@ assert.deepEqual(
     'print-route-noindex': 'noindex nofollow',
     'printable-item-mapping': 'Student handout items',
     'printable-worksheet-handoff-boundary':
-      '30 printable worksheet slices',
+      'Visible print page',
     'response-policy-map': 'Template response policy',
     'result-export-alignment': 'CSV stays full export',
     'result-page-print-action': 'Teacher result action',
@@ -43993,10 +43120,8 @@ assert.deepEqual(
     ASSIGNMENT_SUBMISSION_VALIDATION_HANDOFF_ITEM_IDS.length,
     ASSIGNMENT_ATTEMPT_DURATION_HANDOFF_ITEM_IDS.length,
     ASSIGNMENT_ANSWER_FEEDBACK_HANDOFF_ITEM_IDS.length,
-    PRINTABLE_WORKSHEET_HANDOFF_ITEM_IDS.length,
-    ASSIGNMENT_RESULTS_EXPORT_PREPARATION_ITEM_IDS.length,
   ],
-  Array.from({ length: 11 }, () => 30),
+  Array.from({ length: 9 }, () => 30),
   'Worksheet-mode delivery chain should stay backed by focused worksheet, runtime, print, and export gates.'
 );
 assert.deepEqual(Object.fromEntries(worksheetModeDeliveryChainValues), {
@@ -44024,7 +43149,7 @@ assert.deepEqual(Object.fromEntries(worksheetModeDeliveryChainValues), {
   'student-rules-summary': 'Student-visible rules',
   'submission-contract': '{ itemId, answer }',
   'template-search-param': 'template',
-  'printable-worksheet-handoff-boundary': '30 printable worksheet slices',
+  'printable-worksheet-handoff-boundary': 'Visible print page',
   'worksheet-create-actions': 'Create editor links',
   'worksheet-extraction-boundary': 'No parallel model',
   'worksheet-mode-catalog': '4 worksheet modes',
@@ -44101,10 +43226,8 @@ assert.deepEqual(
     ACTIVITY_SOURCE_EXTRACTION_ASSIST_HANDOFF_ITEM_IDS.length,
     WORKSHEET_MODE_DELIVERY_CHAIN_HANDOFF_ITEM_IDS.length,
     STUDENT_RUNNER_PLAY_CHAIN_HANDOFF_ITEM_IDS.length,
-    PRINTABLE_WORKSHEET_HANDOFF_ITEM_IDS.length,
-    ASSIGNMENT_RESULTS_EXPORT_PREPARATION_ITEM_IDS.length,
   ],
-  Array.from({ length: 16 }, () => 30),
+  Array.from({ length: 14 }, () => 30),
   'Template roadmap capability chain should stay backed by focused roadmap, template, AI, worksheet, runtime, print, and export gates.'
 );
 assert.deepEqual(Object.fromEntries(templateRoadmapCapabilityChainValues), {
@@ -58857,7 +57980,6 @@ assert.deepEqual(submittedDateChainView.privacy, {
   uiDatesUseLocalizedFormatter: true,
   usesCopyArtifactHandoff: true,
 });
-assert.equal(ASSIGNMENT_COPY_ARTIFACT_HANDOFF_ITEM_IDS.length, 30);
 assert.equal(
   submittedDateChainView.itemViews.find(
     (itemView) => itemView.id === 'copy-artifact-handoff-boundary'
@@ -58904,7 +58026,6 @@ assert.deepEqual(acceptedAnswerChainView.privacy, {
   splitsPrimaryFromAlternatives: true,
   usesResultReviewHandoff: true,
 });
-assert.equal(ASSIGNMENT_RESULT_REVIEW_HANDOFF_ITEM_IDS.length, 30);
 assert.equal(
   acceptedAnswerChainView.itemViews.find(
     (itemView) => itemView.id === 'result-review-handoff-boundary'
@@ -58944,7 +58065,6 @@ assert.deepEqual(explanationChainView.privacy, {
   sourceFiles: [...ASSIGNMENT_RESULT_EXPLANATION_CHAIN_SOURCE_FILES],
   usesResultMaterialHandoff: true,
 });
-assert.equal(ASSIGNMENT_RESULT_MATERIAL_HANDOFF_ITEM_IDS.length, 30);
 assert.equal(
   explanationChainView.itemViews.find(
     (itemView) => itemView.id === 'result-material-handoff-boundary'
@@ -60325,50 +59445,6 @@ const noMatchResultsPageView = buildAssignmentResultsPageViewModel({
   data: scoredResultsPageData,
   search: { student: 'Nobody' },
 });
-const scoredResultsAttemptStatsHandoffValues = new Map(
-  scoredResultsPageView.attemptStatsHandoffView.itemViews.map((itemView) => [
-    itemView.id,
-    itemView.value,
-  ])
-);
-assert.equal(
-  scoredResultsAttemptStatsHandoffValues.get('source-attempt-count'),
-  '2'
-);
-assert.equal(
-  scoredResultsAttemptStatsHandoffValues.get('completed-attempt-count'),
-  '1'
-);
-assert.equal(
-  scoredResultsAttemptStatsHandoffValues.get('average-accuracy'),
-  scoredResultsPageView.metricItems.find(
-    (metric) => metric.key === 'average-accuracy'
-  )?.value
-);
-assert.equal(
-  scoredResultsAttemptStatsHandoffValues.get('average-points'),
-  scoredResultsPageView.metricItems.find(
-    (metric) => metric.key === 'average-points'
-  )?.value
-);
-assert.equal(
-  scoredResultsAttemptStatsHandoffValues.get('average-duration'),
-  scoredResultsPageView.metricItems.find(
-    (metric) => metric.key === 'average-time'
-  )?.value
-);
-assert.equal(
-  JSON.stringify(scoredResultsPageView.attemptStatsHandoffView).includes(
-    'Alice'
-  ),
-  false
-);
-assert.equal(
-  JSON.stringify(scoredResultsPageView.attemptStatsHandoffView).includes(
-    'result-share'
-  ),
-  false
-);
 assert.deepEqual(
   [
     defaultResultsPageView.reviewStatusView,
@@ -60676,142 +59752,6 @@ assert.equal(
   }).itemViews[0]?.value,
   'All students'
 );
-const scoredResultReviewControlsHandoffView =
-  scoredResultsPageView.reviewControlsHandoffView;
-const scoredResultReviewControlsHandoffValues = new Map(
-  scoredResultReviewControlsHandoffView.itemViews.map((itemView) => [
-    itemView.id,
-    itemView.value,
-  ])
-);
-assert.deepEqual(
-  scoredResultReviewControlsHandoffView.itemViews.map((itemView) => itemView.id),
-  [...ASSIGNMENT_RESULT_REVIEW_CONTROLS_HANDOFF_ITEM_IDS]
-);
-assert.equal(scoredResultReviewControlsHandoffView.itemViews.length, 30);
-assert.deepEqual(scoredResultReviewControlsHandoffView.privacy, {
-  exposesCopyArtifactText: false,
-  exposesRawAnonymousToken: false,
-  exposesRawRouteQuery: false,
-  exposesStudentAnswerText: false,
-  exposesStudentDisplayLabels: false,
-  exposesTeacherAnswerKey: false,
-  itemIds: [...ASSIGNMENT_RESULT_REVIEW_CONTROLS_HANDOFF_ITEM_IDS],
-  mutatesResultData: false,
-  scope: 'teacher-result-review-controls',
-  usesAssignmentDomainHelpers: true,
-});
-assert.deepEqual(
-  scoredResultReviewControlsHandoffView,
-  buildAssignmentResultReviewControlsHandoffView({
-    controlViews: scoredResultsPageView.controlViews,
-    copyScopeView: scoredResultsPageView.copyScopeView,
-    reviewScope: scoredResultsPageView.resultView.reviewScope,
-    viewState: scoredResultsPageView.viewState,
-  })
-);
-assert.deepEqual([...scoredResultReviewControlsHandoffValues.entries()], [
-  ['route-parser', 'buildAssignmentResultRouteSearch'],
-  ['route-update-helper', 'buildAssignmentResultControlSearchState'],
-  ['route-default-elision', 'Defaults omitted'],
-  ['invalid-route-guard', 'Invalid values cleared'],
-  ['search-normalization', 'NFKC + trim'],
-  ['resolved-student-search', 'Search applied'],
-  ['student-search-status', 'Adjusted'],
-  ['student-search-match-count', '1/1'],
-  ['student-sort-option', 'Student name'],
-  ['student-sort-status', 'Adjusted'],
-  ['student-sort-default', 'Non-default persisted'],
-  ['item-sort-option', 'Lowest accuracy'],
-  ['item-sort-status', 'Adjusted'],
-  ['item-sort-default', 'Non-default persisted'],
-  ['answer-review-filter', 'Needs review only'],
-  ['answer-review-status', 'Adjusted'],
-  ['answer-review-default', 'Non-default persisted'],
-  ['filtered-students', '1/1'],
-  ['filtered-attempt-rows', '1/1'],
-  ['filtered-answer-reviews', '1/1'],
-  ['sorted-performance-items', '2/2'],
-  [
-    'review-scope-summary',
-    'Students 1/1; attempts 1/1; items 2/2; reviews 1/1',
-  ],
-  ['copy-scope-students', '1 student · 1 attempt'],
-  ['copy-scope-items', 'Lowest accuracy'],
-  ['copy-scope-review', 'Needs review only'],
-  ['table-consumer', 'Result tables'],
-  ['review-card-consumer', 'Answer review cards'],
-  ['copy-artifact-consumer', 'Current copy scope'],
-  ['anonymous-label-search', 'Normalized labels only'],
-  ['privacy-guard', 'Hidden'],
-]);
-assert.equal(
-  defaultResultsPageView.reviewControlsHandoffView.itemViews.find(
-    (itemView) => itemView.id === 'resolved-student-search'
-  )?.value,
-  'All students'
-);
-assert.equal(
-  defaultResultsPageView.reviewControlsHandoffView.itemViews.find(
-    (itemView) => itemView.id === 'student-sort-default'
-  )?.value,
-  'Default kept'
-);
-const scoredItemPerformanceSortHandoffView =
-  scoredResultsPageView.itemPerformanceTableView.sortHandoffView;
-const scoredItemPerformanceSortHandoffValues = new Map(
-  scoredItemPerformanceSortHandoffView.itemViews.map((itemView) => [
-    itemView.id,
-    itemView.value,
-  ])
-);
-assert.deepEqual(
-  scoredItemPerformanceSortHandoffView.itemViews.map((itemView) => itemView.id),
-  [...ASSIGNMENT_ITEM_PERFORMANCE_SORT_HANDOFF_ITEM_IDS]
-);
-assert.equal(scoredItemPerformanceSortHandoffView.itemViews.length, 30);
-assert.deepEqual(scoredItemPerformanceSortHandoffView.privacy, {
-  exposesAcceptedAnswers: false,
-  exposesCopyArtifactText: false,
-  exposesCsvDataUrl: false,
-  exposesPromptText: false,
-  exposesRawAnonymousToken: false,
-  exposesShareSlug: false,
-  exposesStudentAnswerText: false,
-  exposesStudentDisplayLabels: false,
-  exposesTeacherAnswerKey: false,
-  itemIds: [...ASSIGNMENT_ITEM_PERFORMANCE_SORT_HANDOFF_ITEM_IDS],
-  mutatesResultData: false,
-  scope: 'teacher-result-item-performance-sort',
-  usesAssignmentDomainHelpers: true,
-  usesSortedTableRows: true,
-});
-assert.deepEqual(
-  [
-    scoredItemPerformanceSortHandoffValues.get('selected-sort'),
-    scoredItemPerformanceSortHandoffValues.get('default-sort'),
-    scoredItemPerformanceSortHandoffValues.get('lowest-accuracy-order'),
-    scoredItemPerformanceSortHandoffValues.get('table-row-count'),
-    scoredItemPerformanceSortHandoffValues.get('matched-item-count'),
-    scoredItemPerformanceSortHandoffValues.get('copy-scope-row-count'),
-    scoredItemPerformanceSortHandoffValues.get('table-consumer'),
-    scoredItemPerformanceSortHandoffValues.get('copy-artifact-consumer'),
-    scoredItemPerformanceSortHandoffValues.get('csv-export-boundary'),
-    scoredItemPerformanceSortHandoffValues.get('privacy-guard'),
-  ],
-  [
-    'Lowest accuracy',
-    'Non-default persisted',
-    'Active',
-    '2',
-    '2/2',
-    '2',
-    'Item performance table',
-    'Current copy scope',
-    'Full export',
-    'Hidden',
-  ]
-);
 assert.deepEqual(
   scoredResultsPageView.itemPerformanceTableView.rows.map(
     (rowView) => rowView.id
@@ -60821,95 +59761,6 @@ assert.deepEqual(
   )
 );
 assert.deepEqual(
-  buildAssignmentItemPerformanceSortHandoffEvidence({
-    items: scoredResultsPageData.analysis.perItem,
-    reviewScopeSummary: {
-      attemptReviews: { matched: 1, total: 1 },
-      attemptRows: { matched: 1, total: 1 },
-      itemPerformance: { matched: 2.2, total: Number.NaN },
-      students: { matched: 1, total: 1 },
-    },
-    sort: 'submitted',
-    tableRowCount: Number.NEGATIVE_INFINITY,
-  }),
-  {
-    copyScopeRowCount: 2,
-    itemSort: 'submitted',
-    matchedItemCount: 2,
-    sortOptionCount: 4,
-    tableRowCount: 0,
-    totalItemCount: 0,
-  }
-);
-for (const privateSortHandoffValue of [
-  'Alice',
-  'answer-1',
-  'q-1',
-  'result-share',
-  'data:text/csv',
-]) {
-  assert.equal(
-    JSON.stringify(scoredItemPerformanceSortHandoffView).includes(
-      privateSortHandoffValue
-    ),
-    false,
-    `Item performance sort handoff leaked private text: ${privateSortHandoffValue}`
-  );
-}
-const scoredStudentSummarySortHandoffView =
-  scoredResultsPageView.studentSummaryTableView.sortHandoffView;
-const scoredStudentSummarySortHandoffValues = new Map(
-  scoredStudentSummarySortHandoffView.itemViews.map((itemView) => [
-    itemView.id,
-    itemView.value,
-  ])
-);
-assert.deepEqual(
-  scoredStudentSummarySortHandoffView.itemViews.map((itemView) => itemView.id),
-  [...ASSIGNMENT_STUDENT_SUMMARY_SORT_HANDOFF_ITEM_IDS]
-);
-assert.equal(scoredStudentSummarySortHandoffView.itemViews.length, 30);
-assert.deepEqual(scoredStudentSummarySortHandoffView.privacy, {
-  exposesCopyArtifactText: false,
-  exposesRawAnonymousToken: false,
-  exposesRawRouteQuery: false,
-  exposesStudentAnswerText: false,
-  exposesStudentDisplayLabels: false,
-  exposesStudentKeys: false,
-  exposesTeacherAnswerKey: false,
-  itemIds: [...ASSIGNMENT_STUDENT_SUMMARY_SORT_HANDOFF_ITEM_IDS],
-  mutatesResultData: false,
-  scope: 'teacher-result-student-summary-sort',
-  usesAssignmentDomainHelpers: true,
-  usesSortedTableRows: true,
-});
-assert.deepEqual(
-  [
-    scoredStudentSummarySortHandoffValues.get('selected-sort'),
-    scoredStudentSummarySortHandoffValues.get('default-sort'),
-    scoredStudentSummarySortHandoffValues.get('student-name-order'),
-    scoredStudentSummarySortHandoffValues.get('table-row-count'),
-    scoredStudentSummarySortHandoffValues.get('matched-student-count'),
-    scoredStudentSummarySortHandoffValues.get('copy-scope-row-count'),
-    scoredStudentSummarySortHandoffValues.get('table-consumer'),
-    scoredStudentSummarySortHandoffValues.get('copy-artifact-consumer'),
-    scoredStudentSummarySortHandoffValues.get('anonymous-label-guard'),
-    scoredStudentSummarySortHandoffValues.get('privacy-guard'),
-  ],
-  [
-    'Student name',
-    'Non-default persisted',
-    'Active',
-    '1',
-    '1/1',
-    '1',
-    'Student summary table',
-    'Current copy scope',
-    'Hidden',
-    'Hidden',
-  ]
-);
-assert.deepEqual(
   scoredResultsPageView.studentSummaryTableView.rows.map(
     (rowView) => rowView.id
   ),
@@ -60917,58 +59768,6 @@ assert.deepEqual(
     (student) => student.studentKey
   )
 );
-assert.deepEqual(
-  buildAssignmentStudentSummarySortHandoffEvidence({
-    reviewScopeSummary: {
-      attemptReviews: { matched: 1, total: 1 },
-      attemptRows: { matched: 1, total: 1 },
-      itemPerformance: { matched: 2, total: 2 },
-      students: { matched: 3.8, total: Number.NaN },
-    },
-    sort: 'attempts',
-    students: scoredResultsPageData.analysis.students,
-    tableRowCount: Number.NEGATIVE_INFINITY,
-  }),
-  {
-    copyScopeRowCount: 3,
-    matchedStudentCount: 1,
-    sortOptionCount: 5,
-    studentSort: 'attempts',
-    tableRowCount: 0,
-    totalStudentCount: 0,
-  }
-);
-for (const privateStudentSortHandoffValue of [
-  'Alice',
-  'answer-1',
-  'q-1',
-  'name:alice',
-  'result-share',
-  'data:text/csv',
-]) {
-  assert.equal(
-    JSON.stringify(scoredStudentSummarySortHandoffView).includes(
-      privateStudentSortHandoffValue
-    ),
-    false,
-    `Student summary sort handoff leaked private text: ${privateStudentSortHandoffValue}`
-  );
-}
-for (const privateControlsHandoffValue of [
-  'Alice',
-  'answer-1',
-  'q-1',
-  'share-123',
-  'data:text/csv',
-]) {
-  assert.equal(
-    JSON.stringify(scoredResultReviewControlsHandoffView).includes(
-      privateControlsHandoffValue
-    ),
-    false,
-    `Result review controls handoff leaked private text: ${privateControlsHandoffValue}`
-  );
-}
 assert.deepEqual(
   {
     actionDisabled: scoredResultsPageView.actionButtons.map((button) => [
@@ -61150,22 +59949,6 @@ assert.deepEqual(
       scoredResultsPageView.resultView.filteredAttemptRows.map(
         ({ attempt }) => attempt.id
       ),
-    headerExportPreparation: scoredResultsPageView.headerView
-      ? {
-          description:
-            scoredResultsPageView.headerView.exportPreparationView.description,
-          itemViews:
-            scoredResultsPageView.headerView.exportPreparationView.itemViews.map(
-              (itemView) => [
-                itemView.id,
-                itemView.label,
-                itemView.value,
-                itemView.description,
-              ]
-            ),
-          title: scoredResultsPageView.headerView.exportPreparationView.title,
-        }
-      : null,
     headerDeliveryItems:
       scoredResultsPageView.headerView?.settingsSummaryView.items.map(
         (item) => [item.id, item.value]
@@ -61564,25 +60347,6 @@ assert.deepEqual(
       },
     },
     filteredAttemptIds: ['completed-attempt'],
-    headerExportPreparation: {
-      description:
-        'CSV export uses the full assignment result set, independent of the current search or review filter.',
-      itemViews: expectedAssignmentResultsExportPreparationRowsEn({
-        activitySnapshot: 'Quiz',
-        answerRows: '2',
-        attempts: '1',
-        deliveryAnswerReveal: 'After submit',
-        deliveryAttemptLimit: '2',
-        deliveryCloseTime: 'No close time',
-        deliveryIdentity: 'Names',
-        deliveryInstructions: 'None',
-        deliveryItemOrder: 'Shuffled',
-        deliveryTimer: '60',
-        itemPerformance: '2',
-        students: '1',
-      }),
-      title: 'CSV export coverage',
-    },
     headerDeliveryItems: [
       ['attempts', '2 max'],
       ['timer', '1 min'],
@@ -62081,65 +60845,6 @@ assert.deepEqual(
     ['pair-1', '2.', '2. Match "Hot" with its pair.', '50%'],
   ]
 );
-const resultItemPerformanceTableView = buildAssignmentItemPerformanceTableView({
-  controlView: buildAssignmentResultControlViews({
-    resultSearchSummary: 'All students',
-    viewState: {
-      attemptReviewFilter: 'all',
-      itemPerformanceSort: 'original',
-      studentSearch: '',
-      studentSort: 'needs-review',
-    },
-  }).itemPerformanceSort,
-  items: resultAnalysis.perItem,
-  reviewScopeSummary: {
-    attemptReviews: {
-      matched: resultAnalysis.attempts.length,
-      total: resultAnalysis.attempts.length,
-    },
-    attemptRows: {
-      matched: resultAnalysis.attempts.length,
-      total: resultAnalysis.attempts.length,
-    },
-    itemPerformance: {
-      matched: resultAnalysis.perItem.length,
-      total: resultAnalysis.perItem.length,
-    },
-    students: {
-      matched: resultAnalysis.students.length,
-      total: resultAnalysis.students.length,
-    },
-  },
-  sort: 'original',
-});
-assert.deepEqual(
-  {
-    ariaLabel: resultItemPerformanceTableView.ariaLabel,
-    caption: resultItemPerformanceTableView.caption,
-    headers: summarizeAssignmentResultTableHeaders(
-      resultItemPerformanceTableView.headers
-    ),
-    handoffIds: resultItemPerformanceTableView.sortHandoffView.itemViews.map(
-      (itemView) => itemView.id
-    ),
-    rows: resultItemPerformanceTableView.rows.map(
-      (row) => [row.id, row.itemNumberLabel, row.promptLabel, row.correctRateLabel]
-    ),
-  },
-  {
-    ariaLabel: 'Item performance',
-    caption:
-      'Review every prompt from the frozen assignment snapshot, including submitted counts, correct rates, and answer notes.',
-    headers: summarizeAssignmentResultTableHeaders(
-      assignmentResultTableHeaders.itemPerformance
-    ),
-    handoffIds: [...ASSIGNMENT_ITEM_PERFORMANCE_SORT_HANDOFF_ITEM_IDS],
-    rows: [
-      ['q-1', '1.', '1. Capital of France?', '67%'],
-      ['pair-1', '2.', '2. Match "Hot" with its pair.', '50%'],
-    ],
-  }
-);
 assert.equal(
   resultAnalysis.attempts[0]?.answers[0]?.explanation,
   'Paris is the capital of France.'
@@ -62427,67 +61132,6 @@ assert.deepEqual(
     ['name:alice', 'Alice', '2'],
     ['anonymous:empty', 'Anonymous student 2', '0'],
   ]
-);
-const studentSummaryTableView = buildAssignmentStudentSummaryTableView({
-  controlView: defaultResultsPageView.controlViews.studentSearch,
-  reviewScopeSummary: {
-    attemptReviews: { matched: 2, total: 2 },
-    attemptRows: { matched: 2, total: 2 },
-    itemPerformance: { matched: 2, total: 2 },
-    students: { matched: 2, total: 2 },
-  },
-  sort: 'needs-review',
-  students: [
-    resultAnalysis.students[1]!,
-    {
-      attempts: 0,
-      averageAccuracy: 0,
-      bestAccuracy: 0,
-      lastCompletedAt: null,
-      latestAccuracy: 0,
-      needsReviewCount: 0,
-      studentKey: 'anonymous:empty',
-      studentLabel: 'Anonymous student 2',
-    },
-  ],
-});
-assert.deepEqual(
-  {
-    ariaLabel: studentSummaryTableView.ariaLabel,
-    caption: studentSummaryTableView.caption,
-    headers: summarizeAssignmentResultTableHeaders(
-      studentSummaryTableView.headers
-    ),
-    rows: studentSummaryTableView.rows.map((row) => [
-      row.id,
-      row.studentLabel,
-      row.attemptsLabel,
-    ]),
-    sortHandoffValues: [
-      studentSummaryTableView.sortHandoffView.itemViews.find(
-        (itemView) => itemView.id === 'selected-sort'
-      )?.value,
-      studentSummaryTableView.sortHandoffView.itemViews.find(
-        (itemView) => itemView.id === 'table-row-count'
-      )?.value,
-      studentSummaryTableView.sortHandoffView.itemViews.find(
-        (itemView) => itemView.id === 'privacy-guard'
-      )?.value,
-    ],
-  },
-  {
-    ariaLabel: 'Student summary',
-    caption:
-      'Sort students by review priority, best score, name, attempt volume, or last submitted time before reading every submitted answer.',
-    headers: summarizeAssignmentResultTableHeaders(
-      assignmentResultTableHeaders.studentSummary
-    ),
-    rows: [
-      ['name:alice', 'Alice', '2'],
-      ['anonymous:empty', 'Anonymous student 2', '0'],
-    ],
-    sortHandoffValues: ['Needs review', '2', 'Hidden'],
-  }
 );
 const runtimeOrderedResultAnalysis = analyzeAssignmentResults({
   attempts: [
@@ -63321,519 +61965,6 @@ function expectTimerAttemptDurationView(
   };
 }
 
-function expectAssignmentResultsExportPreparationItemViews(
-  itemViews: Array<
-    Omit<
-      ReturnType<typeof buildAssignmentResultsExportPreparationView>['itemViews'][number],
-      'ariaLabel'
-    >
-  >
-) {
-  return itemViews.map((itemView) => ({
-    ...itemView,
-    ariaLabel: `${itemView.label}: ${itemView.value}. ${itemView.description}`,
-  }));
-}
-
-type ExpectedAssignmentResultsExportPreparationItem = Omit<
-  ReturnType<typeof buildAssignmentResultsExportPreparationView>['itemViews'][number],
-  'ariaLabel'
->;
-
-type ExpectedAssignmentResultsExportPreparationValues = {
-  activitySnapshot: string;
-  answerRows: string;
-  attempts: string;
-  columns?: string;
-  deliveryAnswerReveal: string;
-  deliveryAttemptLimit: string;
-  deliveryCloseTime: string;
-  deliveryIdentity: string;
-  deliveryInstructions: string;
-  deliveryItemOrder: string;
-  deliveryTimer: string;
-  itemPerformance: string;
-  rawSettings?: string;
-  resultMetrics?: string;
-  students: string;
-};
-
-function expectedAssignmentResultsExportPreparationPrivacy() {
-  return {
-    exposesAssignmentTitle: false,
-    exposesCopyArtifactText: false,
-    exposesCsvDataUrl: false,
-    exposesCsvFilename: false,
-    exposesPromptText: false,
-    exposesRawAnonymousToken: false,
-    exposesStudentAnswerText: false,
-    exposesStudentInstructions: false,
-    exposesTeacherAnswerText: false,
-    itemIds: [...ASSIGNMENT_RESULTS_EXPORT_PREPARATION_ITEM_IDS],
-    scope: 'full-assignment-results',
-  };
-}
-
-function expectedAssignmentResultsExportPreparationItemsEn({
-  activitySnapshot,
-  answerRows,
-  attempts,
-  columns = '55',
-  deliveryAnswerReveal,
-  deliveryAttemptLimit,
-  deliveryCloseTime,
-  deliveryIdentity,
-  deliveryInstructions,
-  deliveryItemOrder,
-  deliveryTimer,
-  itemPerformance,
-  rawSettings = '5',
-  resultMetrics = '4',
-  students,
-}: ExpectedAssignmentResultsExportPreparationValues): ExpectedAssignmentResultsExportPreparationItem[] {
-  return [
-    {
-      description:
-        'Export action uses full assignment results rather than the current review filters.',
-      id: 'export-scope',
-      label: 'Export scope',
-      value: 'Full assignment results',
-    },
-    {
-      description:
-        'Assignment id, title, share slug, status, and close time are included for offline records.',
-      id: 'assignment-context',
-      label: 'Assignment context',
-      value: 'Prepared',
-    },
-    {
-      description:
-        'Activity title, description, and template come from the frozen assignment snapshot when available.',
-      id: 'activity-snapshot',
-      label: 'Activity snapshot',
-      value: activitySnapshot,
-    },
-    {
-      description:
-        'Completed attempt reviews included in the full export scope.',
-      id: 'attempts',
-      label: 'Attempts',
-      value: attempts,
-    },
-    {
-      description:
-        'Student summary records included with latest, average, best, follow-up count, and last submitted fields.',
-      id: 'students',
-      label: 'Students',
-      value: students,
-    },
-    {
-      description:
-        'Student rows use normalized display labels; raw anonymous browser tokens are not exported.',
-      id: 'student-privacy',
-      label: 'Student privacy',
-      value: 'Protected',
-    },
-    {
-      description:
-        'Identity mode is exported as a display policy without raw anonymous browser tokens.',
-      id: 'delivery-identity',
-      label: 'Identity mode',
-      value: deliveryIdentity,
-    },
-    {
-      description:
-        'Answer reveal policy is exported so offline records explain whether students could review correct answers.',
-      id: 'delivery-answer-reveal',
-      label: 'Answer reveal',
-      value: deliveryAnswerReveal,
-    },
-    {
-      description:
-        'Shuffle or fixed-order policy is preserved next to item result rows.',
-      id: 'delivery-item-order',
-      label: 'Item order',
-      value: deliveryItemOrder,
-    },
-    {
-      description:
-        'Attempt limits are exported with the same assignment delivery formatting.',
-      id: 'delivery-attempt-limit',
-      label: 'Attempt limit',
-      value: deliveryAttemptLimit,
-    },
-    {
-      description:
-        'Timer seconds are exported beside normalized attempt durations.',
-      id: 'delivery-timer',
-      label: 'Timer',
-      value: deliveryTimer,
-    },
-    {
-      description:
-        'The scheduled close time is formatted with shared result date helpers.',
-      id: 'delivery-close-time',
-      label: 'Close time',
-      value: deliveryCloseTime,
-    },
-    {
-      description:
-        'Student instructions are included only as the teacher-published assignment instructions.',
-      id: 'delivery-instructions',
-      label: 'Instructions',
-      value: deliveryInstructions,
-    },
-    {
-      description:
-        'Raw publish-setting columns preserve booleans and numeric limits for spreadsheet filtering or SIS import.',
-      id: 'raw-settings',
-      label: 'Raw settings',
-      value: rawSettings,
-    },
-    {
-      description:
-        'Assignment metrics include completions, average accuracy, average points, and average duration.',
-      id: 'result-metrics',
-      label: 'Result metrics',
-      value: resultMetrics,
-    },
-    {
-      description:
-        'Item performance columns include correct rate, correct count, submitted count, and unanswered count.',
-      id: 'item-performance',
-      label: 'Item performance',
-      value: itemPerformance,
-    },
-    {
-      description:
-        'Rows prepared from every submitted answer, with empty-answer attempts kept aligned to the header.',
-      id: 'answer-rows',
-      label: 'Answer rows',
-      value: answerRows,
-    },
-    {
-      description:
-        'Primary expected answers are exported separately from alternatives for gradebook review.',
-      id: 'expected-answer',
-      label: 'Expected answer',
-      value: 'Primary answer column',
-    },
-    {
-      description:
-        'Accepted alternatives use the same answer parser as scoring and student review.',
-      id: 'accepted-alternatives',
-      label: 'Accepted alternatives',
-      value: 'Alternatives column',
-    },
-    {
-      description:
-        'The export filename is derived from a normalized assignment title and share slug without exposing it in the preparation view.',
-      id: 'export-filename',
-      label: 'Export filename',
-      value: 'Prepared',
-    },
-    {
-      description:
-        'The preparation view confirms CSV download readiness without exposing the generated data URL.',
-      id: 'csv-data-url-boundary',
-      label: 'Data URL boundary',
-      value: 'Not exposed',
-    },
-    {
-      description:
-        'Spreadsheet formula-looking text is prefixed before CSV serialization.',
-      id: 'formula-injection-guard',
-      label: 'Formula guard',
-      value: 'Enabled',
-    },
-    {
-      description:
-        'The same result date formatter prepares submitted dates for CSV cells.',
-      id: 'submitted-date-format',
-      label: 'Submitted date format',
-      value: 'Prepared',
-    },
-    {
-      description:
-        'Attempt and average duration seconds are normalized through the shared timer-aware duration helper.',
-      id: 'duration-normalization',
-      label: 'Duration normalization',
-      value: 'Timer-aware',
-    },
-    {
-      description:
-        'Attempts without answer rows still receive a header-aligned empty answer segment.',
-      id: 'empty-answer-row',
-      label: 'Empty-answer rows',
-      value: 'Prepared',
-    },
-    {
-      description:
-        'Item prompts are exported as CSV cells but omitted from this preparation summary.',
-      id: 'prompt-column',
-      label: 'Prompt column',
-      value: 'Prompt column',
-    },
-    {
-      description:
-        'Student answer text is exported only in the CSV file, never in the preparation summary or handoff.',
-      id: 'student-answer-column',
-      label: 'Student answer column',
-      value: 'Student answer column',
-    },
-    {
-      description:
-        'Correctness status is exported separately from student answer text and expected answer text.',
-      id: 'correctness-column',
-      label: 'Correctness column',
-      value: 'Correctness column',
-    },
-    {
-      description:
-        'Answer explanations are exported through the same answer-view path as teacher review.',
-      id: 'explanation-column',
-      label: 'Explanation column',
-      value: 'Explanation column',
-    },
-    {
-      description:
-        'CSV columns covering assignment, delivery, student summary, attempts, items, and answer details.',
-      id: 'columns',
-      label: 'Columns',
-      value: columns,
-    },
-  ];
-}
-
-function expectedAssignmentResultsExportPreparationRowsEn(
-  values: ExpectedAssignmentResultsExportPreparationValues
-) {
-  return expectedAssignmentResultsExportPreparationItemsEn(values).map(
-    ({ description, id, label, value }) => [id, label, value, description]
-  );
-}
-
-function expectedAssignmentResultsExportPreparationItemsZh({
-  activitySnapshot,
-  answerRows,
-  attempts,
-  columns = '55',
-  deliveryAnswerReveal,
-  deliveryAttemptLimit,
-  deliveryCloseTime,
-  deliveryIdentity,
-  deliveryInstructions,
-  deliveryItemOrder,
-  deliveryTimer,
-  itemPerformance,
-  rawSettings = '5',
-  resultMetrics = '4',
-  students,
-}: ExpectedAssignmentResultsExportPreparationValues): ExpectedAssignmentResultsExportPreparationItem[] {
-  return [
-    {
-      description: '导出操作使用完整作业结果，而不是当前复盘筛选。',
-      id: 'export-scope',
-      label: '导出范围',
-      value: '完整作业结果',
-    },
-    {
-      description:
-        '离线记录会包含作业 ID、标题、分享 slug、状态和关闭时间。',
-      id: 'assignment-context',
-      label: '作业上下文',
-      value: '已准备',
-    },
-    {
-      description:
-        '有冻结作业快照时，活动标题、说明和模板会来自快照。',
-      id: 'activity-snapshot',
-      label: '活动快照',
-      value: activitySnapshot,
-    },
-    {
-      description: '完整导出范围内包含的已完成作答复盘。',
-      id: 'attempts',
-      label: '作答',
-      value: attempts,
-    },
-    {
-      description:
-        '包含最近、平均、最佳、跟进数量和最近提交时间字段的学生汇总记录。',
-      id: 'students',
-      label: '学生',
-      value: students,
-    },
-    {
-      description: '学生行使用规范化显示标签，不导出原始匿名浏览器令牌。',
-      id: 'student-privacy',
-      label: '学生隐私',
-      value: '已保护',
-    },
-    {
-      description: '身份模式以显示策略导出，不包含原始匿名浏览器令牌。',
-      id: 'delivery-identity',
-      label: '身份模式',
-      value: deliveryIdentity,
-    },
-    {
-      description:
-        '导出答案显示策略，离线记录也能说明学生是否可查看正确答案。',
-      id: 'delivery-answer-reveal',
-      label: '答案显示',
-      value: deliveryAnswerReveal,
-    },
-    {
-      description: '题目乱序或固定顺序策略会和题目结果行一起保留。',
-      id: 'delivery-item-order',
-      label: '题目顺序',
-      value: deliveryItemOrder,
-    },
-    {
-      description: '作答次数限制会用同一套作业投放格式导出。',
-      id: 'delivery-attempt-limit',
-      label: '作答次数',
-      value: deliveryAttemptLimit,
-    },
-    {
-      description: '计时秒数会和规范化后的作答用时一起导出。',
-      id: 'delivery-timer',
-      label: '计时器',
-      value: deliveryTimer,
-    },
-    {
-      description: '计划关闭时间通过共享结果日期格式输出。',
-      id: 'delivery-close-time',
-      label: '关闭时间',
-      value: deliveryCloseTime,
-    },
-    {
-      description: '只导出老师发布到作业里的学生说明。',
-      id: 'delivery-instructions',
-      label: '学生说明',
-      value: deliveryInstructions,
-    },
-    {
-      description:
-        '原始发布设置列会保留布尔值和数字限制，便于表格筛选或导入校务系统。',
-      id: 'raw-settings',
-      label: '原始设置',
-      value: rawSettings,
-    },
-    {
-      description:
-        '作业指标包含完成数、平均正确率、平均得分和平均用时。',
-      id: 'result-metrics',
-      label: '结果指标',
-      value: resultMetrics,
-    },
-    {
-      description:
-        '题目表现列包含正确率、正确数、提交数和未作答数。',
-      id: 'item-performance',
-      label: '题目表现',
-      value: itemPerformance,
-    },
-    {
-      description:
-        '按每个已提交答案生成的行；无答案作答也会保留与表头对齐的空答案行。',
-      id: 'answer-rows',
-      label: '答案行',
-      value: answerRows,
-    },
-    {
-      description:
-        '主要预期答案会和替代答案分列导出，方便成绩册复核。',
-      id: 'expected-answer',
-      label: '预期答案',
-      value: '主答案列',
-    },
-    {
-      description:
-        '可接受替代答案使用与评分和学生回顾相同的答案解析器。',
-      id: 'accepted-alternatives',
-      label: '可接受替代',
-      value: '替代答案列',
-    },
-    {
-      description:
-        '导出文件名来自规范化后的作业标题和分享 slug，但准备视图不会暴露文件名。',
-      id: 'export-filename',
-      label: '导出文件名',
-      value: '已准备',
-    },
-    {
-      description: '准备视图只确认 CSV 下载已就绪，不暴露生成后的 data URL。',
-      id: 'csv-data-url-boundary',
-      label: 'Data URL 边界',
-      value: '未暴露',
-    },
-    {
-      description: '看起来像电子表格公式的文本会在 CSV 序列化前加前缀。',
-      id: 'formula-injection-guard',
-      label: '公式防护',
-      value: '已启用',
-    },
-    {
-      description: '同一个结果日期格式器会为 CSV 单元格准备提交日期。',
-      id: 'submitted-date-format',
-      label: '提交日期格式',
-      value: '已准备',
-    },
-    {
-      description:
-        '作答用时和平均用时会通过共享的计时器感知 duration helper 规范化。',
-      id: 'duration-normalization',
-      label: '用时规范化',
-      value: '计时器感知',
-    },
-    {
-      description: '没有答案行的作答仍会获得与表头对齐的空答案片段。',
-      id: 'empty-answer-row',
-      label: '空答案行',
-      value: '已准备',
-    },
-    {
-      description: '题目提示会作为 CSV 单元格导出，但不会出现在准备摘要中。',
-      id: 'prompt-column',
-      label: '题目提示列',
-      value: '题目提示列',
-    },
-    {
-      description: '学生答案文本只会进入 CSV 文件，不会出现在准备摘要或交接视图中。',
-      id: 'student-answer-column',
-      label: '学生答案列',
-      value: '学生答案列',
-    },
-    {
-      description: '正确状态会独立于学生答案文本和预期答案文本导出。',
-      id: 'correctness-column',
-      label: '正确状态列',
-      value: '正确状态列',
-    },
-    {
-      description: '答案解析会通过与教师复盘相同的答案视图路径导出。',
-      id: 'explanation-column',
-      label: '解析列',
-      value: '解析列',
-    },
-    {
-      description: '覆盖作业、投放规则、学生汇总、作答、题目和答案详情的 CSV 列。',
-      id: 'columns',
-      label: '列',
-      value: columns,
-    },
-  ];
-}
-
-function expectedAssignmentResultsExportPreparationRowsZh(
-  values: ExpectedAssignmentResultsExportPreparationValues
-) {
-  return expectedAssignmentResultsExportPreparationItemsZh(values).map(
-    ({ description, id, label, value }) => [id, label, value, description]
-  );
-}
-
 function expectAssignmentClassroomBriefStatViews(
   statViews: Array<
     Omit<
@@ -64179,28 +62310,6 @@ assert.deepEqual(
     assignmentSharePath: '/play/share%20123',
     assignmentShareUrl: buildAssignmentShareUrl('share 123'),
     assignmentTitle: 'Week 1 results',
-    exportPreparationView: {
-      description:
-        'CSV export uses the full assignment result set, independent of the current search or review filter.',
-      itemViews: expectAssignmentResultsExportPreparationItemViews(
-        expectedAssignmentResultsExportPreparationItemsEn({
-          activitySnapshot: 'Line match',
-          answerRows: '0',
-          attempts: '0',
-          deliveryAnswerReveal: 'Hidden',
-          deliveryAttemptLimit: '2',
-          deliveryCloseTime: 'Jul 1, 2026, 8:00 AM',
-          deliveryIdentity: 'Anonymous',
-          deliveryInstructions: 'Present',
-          deliveryItemOrder: 'Fixed order',
-          deliveryTimer: '120',
-          itemPerformance: '0',
-          students: '0',
-        })
-      ),
-      privacy: expectedAssignmentResultsExportPreparationPrivacy(),
-      title: 'CSV export coverage',
-    },
     printAction: {
       assignmentId: 'assignment-week-1',
       label: 'Print worksheet',
@@ -64260,28 +62369,6 @@ assert.deepEqual(
     assignmentSharePath: '/play/closed-share',
     assignmentShareUrl: buildAssignmentShareUrl('closed-share'),
     assignmentTitle: 'Expired results',
-    exportPreparationView: {
-      description:
-        'CSV export uses the full assignment result set, independent of the current search or review filter.',
-      itemViews: expectAssignmentResultsExportPreparationItemViews(
-        expectedAssignmentResultsExportPreparationItemsEn({
-          activitySnapshot: 'Quiz',
-          answerRows: '0',
-          attempts: '0',
-          deliveryAnswerReveal: 'After submit',
-          deliveryAttemptLimit: '2',
-          deliveryCloseTime: 'May 1, 2026, 8:00 AM',
-          deliveryIdentity: 'Names',
-          deliveryInstructions: 'None',
-          deliveryItemOrder: 'Shuffled',
-          deliveryTimer: 'No timer',
-          itemPerformance: '0',
-          students: '0',
-        })
-      ),
-      privacy: expectedAssignmentResultsExportPreparationPrivacy(),
-      title: 'CSV export coverage',
-    },
     printAction: {
       assignmentId: 'assignment-expired',
       label: 'Print worksheet',
@@ -64870,10 +62957,7 @@ const detailedAttemptReviewCardView = buildAssignmentAttemptReviewCardView({
   score: 2,
   studentLabel: 'Alice',
 });
-const {
-  handoffView: detailedAttemptReviewCardHandoffView,
-  ...detailedAttemptReviewCardDisplayView
-} = detailedAttemptReviewCardView;
+const detailedAttemptReviewCardDisplayView = detailedAttemptReviewCardView;
 assert.deepEqual(detailedAttemptReviewCardDisplayView, {
   answerViews: [
     {
@@ -64928,51 +63012,6 @@ assert.deepEqual(detailedAttemptReviewCardDisplayView, {
   studentLabel: 'Alice',
   submittedAtLabel: formatAssignmentResultDate(attemptRowCompletedAt),
 });
-assert.deepEqual(
-  detailedAttemptReviewCardHandoffView.itemViews.map((itemView) => [
-    itemView.id,
-    itemView.value,
-  ]),
-  [
-    ['review-card-scope', 'Teacher answer review card'],
-    ['student-display-boundary', 'Display label prepared'],
-    ['submitted-time-display', 'Prepared'],
-    ['score-badge', 'Prepared'],
-    ['summary-metric-count', '4'],
-    ['submitted-count', '1/1'],
-    ['correct-count', '1'],
-    ['needs-review-count', '0'],
-    ['unanswered-count', '0'],
-    ['answer-card-count', '1'],
-    ['answer-sequence', 'Snapshot order'],
-    ['prompt-labels', 'Numbered'],
-    ['status-labels', '1'],
-    ['correct-status-count', '1'],
-    ['needs-review-status-count', '0'],
-    ['unanswered-status-count', '0'],
-    ['student-answer-lines', '1'],
-    ['expected-answer-lines', '1'],
-    ['accepted-alternatives-lines', '0'],
-    ['explanation-lines', '0'],
-    ['unsubmitted-answer-guard', 'Unanswered label'],
-    [
-      'answer-text-view-helper',
-      'buildAssignmentResultAttemptAnswerTextView',
-    ],
-    ['answer-status-helper', 'buildAssignmentResultAnswerStatusView'],
-    ['attempt-summary-helper', 'buildAssignmentAttemptReviewSummary'],
-    ['review-card-consumer', 'Answer review card'],
-    ['review-filter-consumer', 'Attempt review filter'],
-    ['copy-scope-boundary', 'Current copy scope'],
-    ['csv-export-boundary', 'Full CSV export'],
-    ['anonymous-token-guard', 'Hidden'],
-    ['privacy-guard', 'Hidden'],
-  ]
-);
-assert.deepEqual(
-  detailedAttemptReviewCardHandoffView.privacy.itemIds,
-  [...ASSIGNMENT_ATTEMPT_REVIEW_CARD_HANDOFF_ITEM_IDS]
-);
 const emptyAttemptReviewCardView = buildAssignmentAttemptReviewCardView({
   accuracy: 0,
   answers: [],
@@ -64981,10 +63020,7 @@ const emptyAttemptReviewCardView = buildAssignmentAttemptReviewCardView({
   score: 0,
   studentLabel: '   ',
 });
-const {
-  handoffView: emptyAttemptReviewCardHandoffView,
-  ...emptyAttemptReviewCardDisplayView
-} = emptyAttemptReviewCardView;
+const emptyAttemptReviewCardDisplayView = emptyAttemptReviewCardView;
 assert.deepEqual(emptyAttemptReviewCardDisplayView, {
   answerViews: [],
   ariaLabel: 'Anonymous student. Submitted -. 0 pts · 0%.',
@@ -65019,61 +63055,6 @@ assert.deepEqual(emptyAttemptReviewCardDisplayView, {
   studentLabel: 'Anonymous student',
   submittedAtLabel: '-',
 });
-assert.equal(
-  emptyAttemptReviewCardHandoffView.itemViews.find(
-    (itemView) => itemView.id === 'answer-card-count'
-  )?.value,
-  '0'
-);
-const normalizedAttemptReviewCardHandoffView =
-  buildAssignmentAttemptReviewCardHandoffView(
-    buildAssignmentAttemptReviewCardHandoffEvidence({
-      answers: [
-        {
-          acceptedAnswers: ['Paris'],
-          answer: '',
-          correct: false,
-          expectedAnswer: 'Paris',
-          itemId: 'q-empty',
-          prompt: 'Hidden prompt',
-          submitted: false,
-        },
-      ],
-      answerViews: [
-        {
-          acceptedAnswersLineText: null,
-          expectedAnswerLineText: 'Expected: Paris',
-          explanationText: null,
-          statusLabel: 'Unanswered',
-          statusTone: 'idle',
-          studentAnswerLineText: 'Student: Unanswered',
-        },
-      ],
-      badgeLabel: '',
-      submittedAtLabel: '',
-      summaryMetricCount: Number.NaN,
-    })
-  );
-assert.deepEqual(
-  normalizedAttemptReviewCardHandoffView.itemViews
-    .filter((itemView) =>
-      [
-        'summary-metric-count',
-        'submitted-count',
-        'needs-review-count',
-        'unanswered-status-count',
-        'score-badge',
-      ].includes(itemView.id)
-    )
-    .map((itemView) => [itemView.id, itemView.value]),
-  [
-    ['score-badge', 'Missing'],
-    ['summary-metric-count', '0'],
-    ['submitted-count', '0/1'],
-    ['needs-review-count', '1'],
-    ['unanswered-status-count', '1'],
-  ]
-);
 assert.deepEqual(
   buildAssignmentAttemptReviewCardViews(resultAnalysis.attempts).map(
     (cardView) => [
@@ -65855,8 +63836,6 @@ assert.deepEqual(
       emptyState: {
         description:
           'Clear the search or try another student name from this assignment.',
-        handoffScope: 'teacher-result-empty-state',
-        handoffSliceCount: 30,
         title: 'No matching attempts.',
       },
       isVisible: true,
@@ -65871,8 +63850,6 @@ assert.deepEqual(
       emptyState: {
         description:
           'Clear the search or try another student name from this assignment.',
-        handoffScope: 'teacher-result-empty-state',
-        handoffSliceCount: 30,
         title: 'No matching students.',
       },
       isVisible: true,
@@ -66176,8 +64153,6 @@ assert.deepEqual(
   {
     description:
       'Share the student link, then completed submissions will appear here.',
-    handoffScope: 'teacher-result-empty-state',
-    handoffSliceCount: 30,
     title: 'No student attempts yet.',
   }
 );
@@ -66192,8 +64167,6 @@ assert.deepEqual(
   {
     description:
       'Clear the search or try another student name from this assignment.',
-    handoffScope: 'teacher-result-empty-state',
-    handoffSliceCount: 30,
     title: 'No matching students.',
   }
 );
@@ -66209,8 +64182,6 @@ assert.deepEqual(
   {
     description:
       'Every shown submission is currently correct for this assignment snapshot.',
-    handoffScope: 'teacher-result-empty-state',
-    handoffSliceCount: 30,
     title: 'No answers need review.',
   }
 );
@@ -66226,8 +64197,6 @@ assert.deepEqual(
   {
     description:
       'Clear the search or try another student name from this assignment.',
-    handoffScope: 'teacher-result-empty-state',
-    handoffSliceCount: 30,
     title: 'No matching answer reviews.',
   }
 );
@@ -66768,22 +64737,16 @@ assert.deepEqual(
     attemptReview: {
       description:
         'Clear the search or try another student name from this assignment.',
-      handoffScope: 'teacher-result-empty-state',
-      handoffSliceCount: 30,
       title: 'No matching answer reviews.',
     },
     attemptRows: {
       description:
         'Clear the search or try another student name from this assignment.',
-      handoffScope: 'teacher-result-empty-state',
-      handoffSliceCount: 30,
       title: 'No matching attempts.',
     },
     studentSummary: {
       description:
         'Clear the search or try another student name from this assignment.',
-      handoffScope: 'teacher-result-empty-state',
-      handoffSliceCount: 30,
       title: 'No matching students.',
     },
   }
@@ -67513,76 +65476,6 @@ const csvExportData = {
 
 const csv = buildAssignmentResultsCsv(csvExportData);
 const csvRows = parseCsvRows(csv);
-const csvExportPreparationView =
-  buildAssignmentResultsExportPreparationView(csvExportData);
-assert.deepEqual(
-  {
-    description: csvExportPreparationView.description,
-    itemViews: csvExportPreparationView.itemViews.map((itemView) => [
-      itemView.id,
-      itemView.label,
-      itemView.value,
-      itemView.description,
-    ]),
-    title: csvExportPreparationView.title,
-  },
-  {
-    description:
-      'CSV export uses the full assignment result set, independent of the current search or review filter.',
-    itemViews: expectedAssignmentResultsExportPreparationRowsEn({
-      activitySnapshot: 'Quiz',
-      answerRows: '6',
-      attempts: '3',
-      deliveryAnswerReveal: 'After submit',
-      deliveryAttemptLimit: '2',
-      deliveryCloseTime: 'Jan 10, 2026, 6:00 PM',
-      deliveryIdentity: 'Names',
-      deliveryInstructions: 'Present',
-      deliveryItemOrder: 'Fixed order',
-      deliveryTimer: '60',
-      itemPerformance: '2',
-      students: '2',
-    }),
-    title: 'CSV export coverage',
-  }
-);
-overwriteGetLocale(() => 'zh');
-try {
-  const zhCsvExportPreparationView =
-    buildAssignmentResultsExportPreparationView(csvExportData);
-  assert.deepEqual(
-    {
-      description: zhCsvExportPreparationView.description,
-      itemViews: zhCsvExportPreparationView.itemViews.map((itemView) => [
-        itemView.id,
-        itemView.label,
-        itemView.value,
-        itemView.description,
-      ]),
-      title: zhCsvExportPreparationView.title,
-    },
-    {
-      description: 'CSV 导出使用完整作业结果，不受当前搜索或复盘筛选影响。',
-      itemViews: expectedAssignmentResultsExportPreparationRowsZh({
-        activitySnapshot: '测验',
-        answerRows: '6',
-        attempts: '3',
-        deliveryAnswerReveal: '提交后显示',
-        deliveryAttemptLimit: '2',
-        deliveryCloseTime: '2026年1月10日 18:00',
-        deliveryIdentity: '姓名',
-        deliveryInstructions: '有',
-        deliveryItemOrder: '固定顺序',
-        deliveryTimer: '60',
-        itemPerformance: '2',
-        students: '2',
-      }),
-      title: 'CSV 导出覆盖范围',
-    }
-  );
-} finally {
-  overwriteGetLocale(() => 'en');
-}
 assert.deepEqual(
   buildAssignmentResultsExportDeliveryView({
     expiresAt: csvExportData.assignment.expiresAt,

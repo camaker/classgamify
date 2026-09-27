@@ -45,7 +45,6 @@ export const ASSIGNMENT_RESULT_ACCEPTED_ANSWER_CHAIN_SOURCE_FILES = [
   'src/assignments/answer-feedback-lifecycle-chain.ts',
   'src/assignments/scored-attempt-result-chain.ts',
   'src/assignments/teacher-results-review-chain.ts',
-  'src/assignments/attempt-review-card-handoff.ts',
   'src/assignments/item-review-summary.ts',
   'src/assignments/classroom-brief.ts',
   'src/assignments/reteach-plan.ts',
@@ -57,11 +56,12 @@ export const ASSIGNMENT_RESULT_ACCEPTED_ANSWER_CHAIN_SOURCE_FILES = [
   'src/components/assignments/assignment-results-attempt-review-card.tsx',
   'src/components/assignments/assignment-results-header-actions.tsx',
   'src/components/assignments/printable-worksheet-answer-key.tsx',
-  'scripts/assignment-results-export-preparation-handoff-semantic-views.test.ts',
-  'scripts/assignment-attempt-review-card-handoff-semantic-views.test.ts',
+  'scripts/assignment-results-csv-export.test.ts',
+  'scripts/assignment-result-review-helpers.test.ts',
   'scripts/scored-attempt-result-chain-handoff.test.ts',
   'scripts/answer-feedback-lifecycle-chain-handoff.test.ts',
   'tests/e2e/TEST-CATALOG.md',
+  'src/components/assignments/assignment-results-metric-card.tsx',
 ] as const;
 
 export type AssignmentResultAcceptedAnswerChainHandoffItemId =

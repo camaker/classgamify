@@ -3,18 +3,13 @@ import { existsSync, readFileSync } from 'node:fs';
 import test from 'node:test';
 import { ANSWER_FEEDBACK_LIFECYCLE_CHAIN_HANDOFF_ITEM_IDS } from '@/assignments/answer-feedback-lifecycle-chain';
 import { ASSIGNMENT_ANSWER_FEEDBACK_HANDOFF_ITEM_IDS } from '@/assignments/answer-feedback-handoff';
-import { ASSIGNMENT_ATTEMPT_REVIEW_CARD_HANDOFF_ITEM_IDS } from '@/assignments/attempt-review-card-handoff';
 import {
   buildAssignmentItemAnalysisCardView,
   buildAssignmentAttemptAnswerReviewView,
   buildAssignmentItemPerformanceRowView,
 } from '@/assignments/result-view';
 import { buildAssignmentItemReviewSummaryItemView } from '@/assignments/item-review-summary';
-import { ASSIGNMENT_RESULT_MATERIAL_HANDOFF_ITEM_IDS } from '@/assignments/result-actions';
-import {
-  ASSIGNMENT_RESULTS_EXPORT_PREPARATION_ITEM_IDS,
-  buildAssignmentResultsCsv,
-} from '@/assignments/results-export';
+import { buildAssignmentResultsCsv } from '@/assignments/results-export';
 import {
   ASSIGNMENT_RESULT_EXPLANATION_CHAIN_HANDOFF_ITEM_IDS,
   ASSIGNMENT_RESULT_EXPLANATION_CHAIN_SOURCE_FILES,
@@ -58,10 +53,6 @@ const STUDENT_SUBMISSION_SOURCE = readFileSync(
 );
 const PUBLIC_FEEDBACK_SOURCE = readFileSync(
   'src/components/activities/public-answer-feedback.tsx',
-  'utf8'
-);
-const ATTEMPT_REVIEW_CARD_HANDOFF_SOURCE = readFileSync(
-  'src/assignments/attempt-review-card-handoff.ts',
   'utf8'
 );
 const ITEM_REVIEW_SUMMARY_SOURCE = readFileSync(
@@ -189,15 +180,12 @@ test('assignment result explanation chain is backed by adjacent gates', () => {
     [
       ASSIGNMENT_ANSWER_FEEDBACK_HANDOFF_ITEM_IDS.length,
       ANSWER_FEEDBACK_LIFECYCLE_CHAIN_HANDOFF_ITEM_IDS.length,
-      ASSIGNMENT_ATTEMPT_REVIEW_CARD_HANDOFF_ITEM_IDS.length,
-      ASSIGNMENT_RESULTS_EXPORT_PREPARATION_ITEM_IDS.length,
-      ASSIGNMENT_RESULT_MATERIAL_HANDOFF_ITEM_IDS.length,
       TEACHER_RESULTS_REVIEW_CHAIN_HANDOFF_ITEM_IDS.length,
       TEACHER_RESULT_COPY_LIFECYCLE_CHAIN_HANDOFF_ITEM_IDS.length,
       SCORED_ATTEMPT_RESULT_CHAIN_HANDOFF_ITEM_IDS.length,
       PRINTABLE_WORKSHEET_REVIEW_LIFECYCLE_CHAIN_HANDOFF_ITEM_IDS.length,
     ],
-    Array.from({ length: 9 }, () => 30)
+    Array.from({ length: 6 }, () => 30)
   );
 });
 
@@ -508,11 +496,6 @@ test('teacher copy, CSV, printable, and catalog sources document explanation con
     RESULT_VIEW_SOURCE,
     /(?=[\s\S]*buildAssignmentItemAnalysisCardView[\s\S]*explanationText: formatAssignmentResultOptionalText\(item\.explanation\))(?=[\s\S]*buildAssignmentItemPerformanceRowView[\s\S]*explanationText: formatAssignmentResultValue\(item\.explanation\))(?=[\s\S]*buildAssignmentAttemptAnswerReviewView[\s\S]*const explanationText = formatAssignmentResultOptionalText\(\s*answer\.explanation)/,
     'Teacher result views should format explanations for item cards, performance rows, and answer review cards.'
-  );
-  assert.match(
-    ATTEMPT_REVIEW_CARD_HANDOFF_SOURCE,
-    /'explanation-lines'[\s\S]*explanationLineCount[\s\S]*Boolean\(answerView\.explanationText\)/,
-    'Attempt review card handoff should count explanation lines without exposing explanation text.'
   );
   assert.match(
     ITEM_REVIEW_SUMMARY_SOURCE,
