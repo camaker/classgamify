@@ -9,6 +9,7 @@ import {
   type AssignmentSettingsInput,
   resolveAssignmentSettings,
 } from '@/assignments/validation';
+import { getAssignmentDateLocale } from '@/assignments/result-format';
 import { normalizeOptionalRuntimeDisplayText } from '@/assignments/runtime-display';
 import { m } from '@/locale/paraglide/messages';
 
@@ -1337,7 +1338,7 @@ export function formatAssignmentExpiry(expiresAt: AssignmentDate) {
     return m.assignment_delivery_expiry_none();
   }
 
-  return new Intl.DateTimeFormat(undefined, {
+  return new Intl.DateTimeFormat(getAssignmentDateLocale(), {
     dateStyle: 'medium',
     timeStyle: 'short',
   }).format(new Date(timestamp));

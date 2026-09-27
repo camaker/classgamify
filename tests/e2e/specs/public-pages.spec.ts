@@ -247,11 +247,13 @@ test.describe('public page smoke coverage', () => {
         theme: 'light',
       });
 
+      // The notice waits for hydration and the client session check, which
+      // takes several seconds on a dev server.
       await expect(
         page.getByText(
           getLocaleMessage(locale, 'create_guest_save_notice_title')
         )
-      ).toBeVisible();
+      ).toBeVisible({ timeout: 20_000 });
       await expect(
         page.getByText(
           getLocaleMessage(locale, 'create_guest_save_notice_description')
@@ -279,8 +281,10 @@ test.describe('public page smoke coverage', () => {
       );
 
       for (const fieldKey of fieldKeys) {
+        // Exact match: each field also has a guidance card whose aria-label
+        // starts with the same field name.
         await expect(
-          page.getByLabel(getLocaleMessage(locale, fieldKey))
+          page.getByLabel(getLocaleMessage(locale, fieldKey), { exact: true })
         ).toBeVisible();
       }
 
@@ -324,7 +328,10 @@ test.describe('public page smoke coverage', () => {
 
       for (const mode of worksheetEntryCases) {
         await expect(
-          page.getByText(getLocaleMessage(locale, mode.titleKey))
+          page.getByRole('heading', {
+            name: getLocaleMessage(locale, mode.titleKey),
+            exact: true,
+          })
         ).toBeVisible();
 
         const link = page
@@ -335,7 +342,10 @@ test.describe('public page smoke coverage', () => {
 
         await expect(link).toHaveAttribute(
           'href',
-          localizedPath(`/create?template=${mode.template}`, locale)
+          localizedPath(
+            `/create?source=worksheets&template=${mode.template}`,
+            locale
+          )
         );
       }
 
@@ -403,7 +413,10 @@ test.describe('public page smoke coverage', () => {
 
         await expect(link).toHaveAttribute(
           'href',
-          localizedPath(`/create?template=${action.template}`, locale)
+          localizedPath(
+            `/create?source=templates&template=${action.template}`,
+            locale
+          )
         );
       }
 
@@ -422,17 +435,26 @@ test.describe('public page smoke coverage', () => {
         .first()
         .click();
       await expect(page).toHaveURL(
-        expectedLocalizedUrlPattern('/create?template=line-match', locale)
+        expectedLocalizedUrlPattern(
+          '/create?source=templates&template=line-match',
+          locale
+        )
       );
+      // The line-match starter is loaded into the editor: its title fills the
+      // Title field. (Playwright has no getByDisplayValue; assert the value.)
+      await expect(page.locator('input[name="title"]')).toHaveValue(
+        getLocaleMessage(locale, 'activity_scaffold_line_match_title')
+      );
+      // The hidden template handoff also has an output named after this field;
+      // target the select itself.
       await expect(
-        page.getByDisplayValue(
-          getLocaleMessage(locale, 'activity_scaffold_line_match_title')
-        )
-      ).toBeVisible();
-      await expect(
-        page.getByLabel(
-          getLocaleMessage(locale, 'activity_form_field_primary_template')
-        )
+        page.getByRole('combobox', {
+          name: getLocaleMessage(
+            locale,
+            'activity_form_field_primary_template'
+          ),
+          exact: true,
+        })
       ).toHaveValue('line-match');
 
       const bodyText = (await page.locator('body').innerText()).trim();
