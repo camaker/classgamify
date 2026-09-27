@@ -9,113 +9,63 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as WorksheetsRouteImport } from './routes/worksheets'
-import { Route as TemplatesRouteImport } from './routes/templates'
-import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
-import { Route as SettingsRouteImport } from './routes/settings'
-import { Route as RobotsDottxtRouteImport } from './routes/robots[.]txt'
-import { Route as ManifestDotjsonRouteImport } from './routes/manifest[.]json'
-import { Route as DashboardRouteImport } from './routes/dashboard'
-import { Route as CreateRouteImport } from './routes/create'
-import { Route as ClassroomQuizGameRouteImport } from './routes/classroom-quiz-game'
-import { Route as ClassroomMatchingGameRouteImport } from './routes/classroom-matching-game'
-import { Route as AuthRouteImport } from './routes/auth'
-import { Route as AdminRouteImport } from './routes/admin'
 import { Route as IndexRouteImport } from './routes/index'
-import { Route as SettingsIndexRouteImport } from './routes/settings/index'
-import { Route as DashboardIndexRouteImport } from './routes/dashboard/index'
-import { Route as BlogIndexRouteImport } from './routes/blog/index'
-import { Route as AdminIndexRouteImport } from './routes/admin/index'
-import { Route as SettingsSecurityRouteImport } from './routes/settings/security'
-import { Route as SettingsProfileRouteImport } from './routes/settings/profile'
-import { Route as SettingsPaymentRouteImport } from './routes/settings/payment'
-import { Route as SettingsNotificationsRouteImport } from './routes/settings/notifications'
-import { Route as SettingsFilesRouteImport } from './routes/settings/files'
-import { Route as SettingsBillingRouteImport } from './routes/settings/billing'
-import { Route as PlayShareIdRouteImport } from './routes/play/$shareId'
-import { Route as DashboardAssignmentsRouteImport } from './routes/dashboard/assignments'
-import { Route as DashboardActivitiesRouteImport } from './routes/dashboard/activities'
-import { Route as BlogSlugRouteImport } from './routes/blog/$slug'
-import { Route as AuthResetPasswordRouteImport } from './routes/auth/reset-password'
-import { Route as AuthRegisterRouteImport } from './routes/auth/register'
-import { Route as AuthLoginRouteImport } from './routes/auth/login'
-import { Route as AuthForgotPasswordRouteImport } from './routes/auth/forgot-password'
-import { Route as AuthErrorRouteImport } from './routes/auth/error'
-import { Route as ApiPingRouteImport } from './routes/api/ping'
-import { Route as AdminUsersRouteImport } from './routes/admin/users'
-import { Route as pagesTeachersRouteImport } from './routes/(pages)/teachers'
-import { Route as pagesRoadmapRouteImport } from './routes/(pages)/roadmap'
-import { Route as pagesPricingRouteImport } from './routes/(pages)/pricing'
-import { Route as pagesContactRouteImport } from './routes/(pages)/contact'
-import { Route as pagesAboutRouteImport } from './routes/(pages)/about'
-import { Route as legalsTermsRouteImport } from './routes/(legals)/terms'
-import { Route as legalsPrivacyRouteImport } from './routes/(legals)/privacy'
+import { Route as AdminRouteImport } from './routes/admin'
+import { Route as AuthRouteImport } from './routes/auth'
+import { Route as ClassroomMatchingGameRouteImport } from './routes/classroom-matching-game'
+import { Route as ClassroomQuizGameRouteImport } from './routes/classroom-quiz-game'
+import { Route as CreateRouteImport } from './routes/create'
+import { Route as DashboardRouteImport } from './routes/dashboard'
+import { Route as ManifestDotjsonRouteImport } from './routes/manifest[.]json'
+import { Route as RobotsDottxtRouteImport } from './routes/robots[.]txt'
+import { Route as SettingsRouteImport } from './routes/settings'
+import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
+import { Route as TemplatesRouteImport } from './routes/templates'
+import { Route as WorksheetsRouteImport } from './routes/worksheets'
 import { Route as legalsCookieRouteImport } from './routes/(legals)/cookie'
-import { Route as PrintAssignmentsAssignmentIdRouteImport } from './routes/print/assignments/$assignmentId'
-import { Route as DashboardAssignmentsAssignmentIdRouteImport } from './routes/dashboard/assignments/$assignmentId'
-import { Route as DashboardActivitiesActivityIdRouteImport } from './routes/dashboard/activities/$activityId'
-import { Route as ApiWebhooksStripeRouteImport } from './routes/api/webhooks/stripe'
-import { Route as ApiWebhooksCreemRouteImport } from './routes/api/webhooks/creem'
-import { Route as ApiStorageFileRouteImport } from './routes/api/storage/file'
-import { Route as ApiE2eUsersRouteImport } from './routes/api/e2e/users'
-import { Route as ApiE2eMailRouteImport } from './routes/api/e2e/mail'
-import { Route as ApiE2eAssignmentsRouteImport } from './routes/api/e2e/assignments'
-import { Route as ApiAuthProviderStatusRouteImport } from './routes/api/auth/provider-status'
+import { Route as legalsPrivacyRouteImport } from './routes/(legals)/privacy'
+import { Route as legalsTermsRouteImport } from './routes/(legals)/terms'
+import { Route as pagesAboutRouteImport } from './routes/(pages)/about'
+import { Route as pagesContactRouteImport } from './routes/(pages)/contact'
+import { Route as pagesPricingRouteImport } from './routes/(pages)/pricing'
+import { Route as pagesRoadmapRouteImport } from './routes/(pages)/roadmap'
+import { Route as pagesTeachersRouteImport } from './routes/(pages)/teachers'
+import { Route as AdminIndexRouteImport } from './routes/admin/index'
+import { Route as AdminUsersRouteImport } from './routes/admin/users'
+import { Route as ApiPingRouteImport } from './routes/api/ping'
+import { Route as AuthErrorRouteImport } from './routes/auth/error'
+import { Route as AuthForgotPasswordRouteImport } from './routes/auth/forgot-password'
+import { Route as AuthLoginRouteImport } from './routes/auth/login'
+import { Route as AuthRegisterRouteImport } from './routes/auth/register'
+import { Route as AuthResetPasswordRouteImport } from './routes/auth/reset-password'
+import { Route as BlogIndexRouteImport } from './routes/blog/index'
+import { Route as BlogSlugRouteImport } from './routes/blog/$slug'
+import { Route as DashboardIndexRouteImport } from './routes/dashboard/index'
+import { Route as DashboardActivitiesRouteImport } from './routes/dashboard/activities'
+import { Route as DashboardAssignmentsRouteImport } from './routes/dashboard/assignments'
+import { Route as PlayShareIdRouteImport } from './routes/play/$shareId'
+import { Route as SettingsIndexRouteImport } from './routes/settings/index'
+import { Route as SettingsBillingRouteImport } from './routes/settings/billing'
+import { Route as SettingsFilesRouteImport } from './routes/settings/files'
+import { Route as SettingsNotificationsRouteImport } from './routes/settings/notifications'
+import { Route as SettingsPaymentRouteImport } from './routes/settings/payment'
+import { Route as SettingsProfileRouteImport } from './routes/settings/profile'
+import { Route as SettingsSecurityRouteImport } from './routes/settings/security'
 import { Route as ApiAuthSplatRouteImport } from './routes/api/auth/$'
+import { Route as ApiAuthProviderStatusRouteImport } from './routes/api/auth/provider-status'
+import { Route as ApiE2eAssignmentsRouteImport } from './routes/api/e2e/assignments'
+import { Route as ApiE2eMailRouteImport } from './routes/api/e2e/mail'
+import { Route as ApiE2eUsersRouteImport } from './routes/api/e2e/users'
+import { Route as ApiStorageFileRouteImport } from './routes/api/storage/file'
+import { Route as ApiWebhooksCreemRouteImport } from './routes/api/webhooks/creem'
+import { Route as ApiWebhooksStripeRouteImport } from './routes/api/webhooks/stripe'
+import { Route as DashboardActivitiesActivityIdRouteImport } from './routes/dashboard/activities/$activityId'
+import { Route as DashboardAssignmentsAssignmentIdRouteImport } from './routes/dashboard/assignments/$assignmentId'
+import { Route as PrintAssignmentsAssignmentIdRouteImport } from './routes/print/assignments/$assignmentId'
 
-const WorksheetsRoute = WorksheetsRouteImport.update({
-  id: '/worksheets',
-  path: '/worksheets',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const TemplatesRoute = TemplatesRouteImport.update({
-  id: '/templates',
-  path: '/templates',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
-  id: '/sitemap.xml',
-  path: '/sitemap.xml',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const SettingsRoute = SettingsRouteImport.update({
-  id: '/settings',
-  path: '/settings',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const RobotsDottxtRoute = RobotsDottxtRouteImport.update({
-  id: '/robots.txt',
-  path: '/robots.txt',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ManifestDotjsonRoute = ManifestDotjsonRouteImport.update({
-  id: '/manifest.json',
-  path: '/manifest.json',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const DashboardRoute = DashboardRouteImport.update({
-  id: '/dashboard',
-  path: '/dashboard',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const CreateRoute = CreateRouteImport.update({
-  id: '/create',
-  path: '/create',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ClassroomQuizGameRoute = ClassroomQuizGameRouteImport.update({
-  id: '/classroom-quiz-game',
-  path: '/classroom-quiz-game',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ClassroomMatchingGameRoute = ClassroomMatchingGameRouteImport.update({
-  id: '/classroom-matching-game',
-  path: '/classroom-matching-game',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const AuthRoute = AuthRouteImport.update({
-  id: '/auth',
-  path: '/auth',
+const IndexRoute = IndexRouteImport.update({
+  id: '/',
+  path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AdminRoute = AdminRouteImport.update({
@@ -123,149 +73,59 @@ const AdminRoute = AdminRouteImport.update({
   path: '/admin',
   getParentRoute: () => rootRouteImport,
 } as any)
-const IndexRoute = IndexRouteImport.update({
-  id: '/',
-  path: '/',
+const AuthRoute = AuthRouteImport.update({
+  id: '/auth',
+  path: '/auth',
   getParentRoute: () => rootRouteImport,
 } as any)
-const SettingsIndexRoute = SettingsIndexRouteImport.update({
-  id: '/',
-  path: '/',
-  getParentRoute: () => SettingsRoute,
-} as any)
-const DashboardIndexRoute = DashboardIndexRouteImport.update({
-  id: '/',
-  path: '/',
-  getParentRoute: () => DashboardRoute,
-} as any)
-const BlogIndexRoute = BlogIndexRouteImport.update({
-  id: '/blog/',
-  path: '/blog/',
+const ClassroomMatchingGameRoute = ClassroomMatchingGameRouteImport.update({
+  id: '/classroom-matching-game',
+  path: '/classroom-matching-game',
   getParentRoute: () => rootRouteImport,
 } as any)
-const AdminIndexRoute = AdminIndexRouteImport.update({
-  id: '/',
-  path: '/',
-  getParentRoute: () => AdminRoute,
-} as any)
-const SettingsSecurityRoute = SettingsSecurityRouteImport.update({
-  id: '/security',
-  path: '/security',
-  getParentRoute: () => SettingsRoute,
-} as any)
-const SettingsProfileRoute = SettingsProfileRouteImport.update({
-  id: '/profile',
-  path: '/profile',
-  getParentRoute: () => SettingsRoute,
-} as any)
-const SettingsPaymentRoute = SettingsPaymentRouteImport.update({
-  id: '/payment',
-  path: '/payment',
-  getParentRoute: () => SettingsRoute,
-} as any)
-const SettingsNotificationsRoute = SettingsNotificationsRouteImport.update({
-  id: '/notifications',
-  path: '/notifications',
-  getParentRoute: () => SettingsRoute,
-} as any)
-const SettingsFilesRoute = SettingsFilesRouteImport.update({
-  id: '/files',
-  path: '/files',
-  getParentRoute: () => SettingsRoute,
-} as any)
-const SettingsBillingRoute = SettingsBillingRouteImport.update({
-  id: '/billing',
-  path: '/billing',
-  getParentRoute: () => SettingsRoute,
-} as any)
-const PlayShareIdRoute = PlayShareIdRouteImport.update({
-  id: '/play/$shareId',
-  path: '/play/$shareId',
+const ClassroomQuizGameRoute = ClassroomQuizGameRouteImport.update({
+  id: '/classroom-quiz-game',
+  path: '/classroom-quiz-game',
   getParentRoute: () => rootRouteImport,
 } as any)
-const DashboardAssignmentsRoute = DashboardAssignmentsRouteImport.update({
-  id: '/assignments',
-  path: '/assignments',
-  getParentRoute: () => DashboardRoute,
-} as any)
-const DashboardActivitiesRoute = DashboardActivitiesRouteImport.update({
-  id: '/activities',
-  path: '/activities',
-  getParentRoute: () => DashboardRoute,
-} as any)
-const BlogSlugRoute = BlogSlugRouteImport.update({
-  id: '/blog/$slug',
-  path: '/blog/$slug',
+const CreateRoute = CreateRouteImport.update({
+  id: '/create',
+  path: '/create',
   getParentRoute: () => rootRouteImport,
 } as any)
-const AuthResetPasswordRoute = AuthResetPasswordRouteImport.update({
-  id: '/reset-password',
-  path: '/reset-password',
-  getParentRoute: () => AuthRoute,
-} as any)
-const AuthRegisterRoute = AuthRegisterRouteImport.update({
-  id: '/register',
-  path: '/register',
-  getParentRoute: () => AuthRoute,
-} as any)
-const AuthLoginRoute = AuthLoginRouteImport.update({
-  id: '/login',
-  path: '/login',
-  getParentRoute: () => AuthRoute,
-} as any)
-const AuthForgotPasswordRoute = AuthForgotPasswordRouteImport.update({
-  id: '/forgot-password',
-  path: '/forgot-password',
-  getParentRoute: () => AuthRoute,
-} as any)
-const AuthErrorRoute = AuthErrorRouteImport.update({
-  id: '/error',
-  path: '/error',
-  getParentRoute: () => AuthRoute,
-} as any)
-const ApiPingRoute = ApiPingRouteImport.update({
-  id: '/api/ping',
-  path: '/api/ping',
+const DashboardRoute = DashboardRouteImport.update({
+  id: '/dashboard',
+  path: '/dashboard',
   getParentRoute: () => rootRouteImport,
 } as any)
-const AdminUsersRoute = AdminUsersRouteImport.update({
-  id: '/users',
-  path: '/users',
-  getParentRoute: () => AdminRoute,
-} as any)
-const pagesTeachersRoute = pagesTeachersRouteImport.update({
-  id: '/(pages)/teachers',
-  path: '/teachers',
+const ManifestDotjsonRoute = ManifestDotjsonRouteImport.update({
+  id: '/manifest.json',
+  path: '/manifest.json',
   getParentRoute: () => rootRouteImport,
 } as any)
-const pagesRoadmapRoute = pagesRoadmapRouteImport.update({
-  id: '/(pages)/roadmap',
-  path: '/roadmap',
+const RobotsDottxtRoute = RobotsDottxtRouteImport.update({
+  id: '/robots.txt',
+  path: '/robots.txt',
   getParentRoute: () => rootRouteImport,
 } as any)
-const pagesPricingRoute = pagesPricingRouteImport.update({
-  id: '/(pages)/pricing',
-  path: '/pricing',
+const SettingsRoute = SettingsRouteImport.update({
+  id: '/settings',
+  path: '/settings',
   getParentRoute: () => rootRouteImport,
 } as any)
-const pagesContactRoute = pagesContactRouteImport.update({
-  id: '/(pages)/contact',
-  path: '/contact',
+const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
+  id: '/sitemap.xml',
+  path: '/sitemap.xml',
   getParentRoute: () => rootRouteImport,
 } as any)
-const pagesAboutRoute = pagesAboutRouteImport.update({
-  id: '/(pages)/about',
-  path: '/about',
+const TemplatesRoute = TemplatesRouteImport.update({
+  id: '/templates',
+  path: '/templates',
   getParentRoute: () => rootRouteImport,
 } as any)
-const legalsTermsRoute = legalsTermsRouteImport.update({
-  id: '/(legals)/terms',
-  path: '/terms',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const legalsPrivacyRoute = legalsPrivacyRouteImport.update({
-  id: '/(legals)/privacy',
-  path: '/privacy',
+const WorksheetsRoute = WorksheetsRouteImport.update({
+  id: '/worksheets',
+  path: '/worksheets',
   getParentRoute: () => rootRouteImport,
 } as any)
 const legalsCookieRoute = legalsCookieRouteImport.update({
@@ -273,52 +133,149 @@ const legalsCookieRoute = legalsCookieRouteImport.update({
   path: '/cookie',
   getParentRoute: () => rootRouteImport,
 } as any)
-const PrintAssignmentsAssignmentIdRoute =
-  PrintAssignmentsAssignmentIdRouteImport.update({
-    id: '/print/assignments/$assignmentId',
-    path: '/print/assignments/$assignmentId',
-    getParentRoute: () => rootRouteImport,
-  } as any)
-const DashboardAssignmentsAssignmentIdRoute =
-  DashboardAssignmentsAssignmentIdRouteImport.update({
-    id: '/$assignmentId',
-    path: '/$assignmentId',
-    getParentRoute: () => DashboardAssignmentsRoute,
-  } as any)
-const DashboardActivitiesActivityIdRoute =
-  DashboardActivitiesActivityIdRouteImport.update({
-    id: '/$activityId',
-    path: '/$activityId',
-    getParentRoute: () => DashboardActivitiesRoute,
-  } as any)
-const ApiWebhooksStripeRoute = ApiWebhooksStripeRouteImport.update({
-  id: '/api/webhooks/stripe',
-  path: '/api/webhooks/stripe',
+const legalsPrivacyRoute = legalsPrivacyRouteImport.update({
+  id: '/(legals)/privacy',
+  path: '/privacy',
   getParentRoute: () => rootRouteImport,
 } as any)
-const ApiWebhooksCreemRoute = ApiWebhooksCreemRouteImport.update({
-  id: '/api/webhooks/creem',
-  path: '/api/webhooks/creem',
+const legalsTermsRoute = legalsTermsRouteImport.update({
+  id: '/(legals)/terms',
+  path: '/terms',
   getParentRoute: () => rootRouteImport,
 } as any)
-const ApiStorageFileRoute = ApiStorageFileRouteImport.update({
-  id: '/api/storage/file',
-  path: '/api/storage/file',
+const pagesAboutRoute = pagesAboutRouteImport.update({
+  id: '/(pages)/about',
+  path: '/about',
   getParentRoute: () => rootRouteImport,
 } as any)
-const ApiE2eUsersRoute = ApiE2eUsersRouteImport.update({
-  id: '/api/e2e/users',
-  path: '/api/e2e/users',
+const pagesContactRoute = pagesContactRouteImport.update({
+  id: '/(pages)/contact',
+  path: '/contact',
   getParentRoute: () => rootRouteImport,
 } as any)
-const ApiE2eMailRoute = ApiE2eMailRouteImport.update({
-  id: '/api/e2e/mail',
-  path: '/api/e2e/mail',
+const pagesPricingRoute = pagesPricingRouteImport.update({
+  id: '/(pages)/pricing',
+  path: '/pricing',
   getParentRoute: () => rootRouteImport,
 } as any)
-const ApiE2eAssignmentsRoute = ApiE2eAssignmentsRouteImport.update({
-  id: '/api/e2e/assignments',
-  path: '/api/e2e/assignments',
+const pagesRoadmapRoute = pagesRoadmapRouteImport.update({
+  id: '/(pages)/roadmap',
+  path: '/roadmap',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const pagesTeachersRoute = pagesTeachersRouteImport.update({
+  id: '/(pages)/teachers',
+  path: '/teachers',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdminIndexRoute = AdminIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminUsersRoute = AdminUsersRouteImport.update({
+  id: '/users',
+  path: '/users',
+  getParentRoute: () => AdminRoute,
+} as any)
+const ApiPingRoute = ApiPingRouteImport.update({
+  id: '/api/ping',
+  path: '/api/ping',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthErrorRoute = AuthErrorRouteImport.update({
+  id: '/error',
+  path: '/error',
+  getParentRoute: () => AuthRoute,
+} as any)
+const AuthForgotPasswordRoute = AuthForgotPasswordRouteImport.update({
+  id: '/forgot-password',
+  path: '/forgot-password',
+  getParentRoute: () => AuthRoute,
+} as any)
+const AuthLoginRoute = AuthLoginRouteImport.update({
+  id: '/login',
+  path: '/login',
+  getParentRoute: () => AuthRoute,
+} as any)
+const AuthRegisterRoute = AuthRegisterRouteImport.update({
+  id: '/register',
+  path: '/register',
+  getParentRoute: () => AuthRoute,
+} as any)
+const AuthResetPasswordRoute = AuthResetPasswordRouteImport.update({
+  id: '/reset-password',
+  path: '/reset-password',
+  getParentRoute: () => AuthRoute,
+} as any)
+const BlogIndexRoute = BlogIndexRouteImport.update({
+  id: '/blog/',
+  path: '/blog/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const BlogSlugRoute = BlogSlugRouteImport.update({
+  id: '/blog/$slug',
+  path: '/blog/$slug',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DashboardIndexRoute = DashboardIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => DashboardRoute,
+} as any)
+const DashboardActivitiesRoute = DashboardActivitiesRouteImport.update({
+  id: '/activities',
+  path: '/activities',
+  getParentRoute: () => DashboardRoute,
+} as any)
+const DashboardAssignmentsRoute = DashboardAssignmentsRouteImport.update({
+  id: '/assignments',
+  path: '/assignments',
+  getParentRoute: () => DashboardRoute,
+} as any)
+const PlayShareIdRoute = PlayShareIdRouteImport.update({
+  id: '/play/$shareId',
+  path: '/play/$shareId',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SettingsIndexRoute = SettingsIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => SettingsRoute,
+} as any)
+const SettingsBillingRoute = SettingsBillingRouteImport.update({
+  id: '/billing',
+  path: '/billing',
+  getParentRoute: () => SettingsRoute,
+} as any)
+const SettingsFilesRoute = SettingsFilesRouteImport.update({
+  id: '/files',
+  path: '/files',
+  getParentRoute: () => SettingsRoute,
+} as any)
+const SettingsNotificationsRoute = SettingsNotificationsRouteImport.update({
+  id: '/notifications',
+  path: '/notifications',
+  getParentRoute: () => SettingsRoute,
+} as any)
+const SettingsPaymentRoute = SettingsPaymentRouteImport.update({
+  id: '/payment',
+  path: '/payment',
+  getParentRoute: () => SettingsRoute,
+} as any)
+const SettingsProfileRoute = SettingsProfileRouteImport.update({
+  id: '/profile',
+  path: '/profile',
+  getParentRoute: () => SettingsRoute,
+} as any)
+const SettingsSecurityRoute = SettingsSecurityRouteImport.update({
+  id: '/security',
+  path: '/security',
+  getParentRoute: () => SettingsRoute,
+} as any)
+const ApiAuthSplatRoute = ApiAuthSplatRouteImport.update({
+  id: '/api/auth/$',
+  path: '/api/auth/$',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ApiAuthProviderStatusRoute = ApiAuthProviderStatusRouteImport.update({
@@ -326,11 +283,54 @@ const ApiAuthProviderStatusRoute = ApiAuthProviderStatusRouteImport.update({
   path: '/api/auth/provider-status',
   getParentRoute: () => rootRouteImport,
 } as any)
-const ApiAuthSplatRoute = ApiAuthSplatRouteImport.update({
-  id: '/api/auth/$',
-  path: '/api/auth/$',
+const ApiE2eAssignmentsRoute = ApiE2eAssignmentsRouteImport.update({
+  id: '/api/e2e/assignments',
+  path: '/api/e2e/assignments',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiE2eMailRoute = ApiE2eMailRouteImport.update({
+  id: '/api/e2e/mail',
+  path: '/api/e2e/mail',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiE2eUsersRoute = ApiE2eUsersRouteImport.update({
+  id: '/api/e2e/users',
+  path: '/api/e2e/users',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiStorageFileRoute = ApiStorageFileRouteImport.update({
+  id: '/api/storage/file',
+  path: '/api/storage/file',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiWebhooksCreemRoute = ApiWebhooksCreemRouteImport.update({
+  id: '/api/webhooks/creem',
+  path: '/api/webhooks/creem',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiWebhooksStripeRoute = ApiWebhooksStripeRouteImport.update({
+  id: '/api/webhooks/stripe',
+  path: '/api/webhooks/stripe',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DashboardActivitiesActivityIdRoute =
+  DashboardActivitiesActivityIdRouteImport.update({
+    id: '/$activityId',
+    path: '/$activityId',
+    getParentRoute: () => DashboardActivitiesRoute,
+  } as any)
+const DashboardAssignmentsAssignmentIdRoute =
+  DashboardAssignmentsAssignmentIdRouteImport.update({
+    id: '/$assignmentId',
+    path: '/$assignmentId',
+    getParentRoute: () => DashboardAssignmentsRoute,
+  } as any)
+const PrintAssignmentsAssignmentIdRoute =
+  PrintAssignmentsAssignmentIdRouteImport.update({
+    id: '/print/assignments/$assignmentId',
+    path: '/print/assignments/$assignmentId',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -699,81 +699,11 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/worksheets': {
-      id: '/worksheets'
-      path: '/worksheets'
-      fullPath: '/worksheets'
-      preLoaderRoute: typeof WorksheetsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/templates': {
-      id: '/templates'
-      path: '/templates'
-      fullPath: '/templates'
-      preLoaderRoute: typeof TemplatesRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/sitemap.xml': {
-      id: '/sitemap.xml'
-      path: '/sitemap.xml'
-      fullPath: '/sitemap.xml'
-      preLoaderRoute: typeof SitemapDotxmlRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/settings': {
-      id: '/settings'
-      path: '/settings'
-      fullPath: '/settings'
-      preLoaderRoute: typeof SettingsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/robots.txt': {
-      id: '/robots.txt'
-      path: '/robots.txt'
-      fullPath: '/robots.txt'
-      preLoaderRoute: typeof RobotsDottxtRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/manifest.json': {
-      id: '/manifest.json'
-      path: '/manifest.json'
-      fullPath: '/manifest.json'
-      preLoaderRoute: typeof ManifestDotjsonRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/dashboard': {
-      id: '/dashboard'
-      path: '/dashboard'
-      fullPath: '/dashboard'
-      preLoaderRoute: typeof DashboardRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/create': {
-      id: '/create'
-      path: '/create'
-      fullPath: '/create'
-      preLoaderRoute: typeof CreateRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/classroom-quiz-game': {
-      id: '/classroom-quiz-game'
-      path: '/classroom-quiz-game'
-      fullPath: '/classroom-quiz-game'
-      preLoaderRoute: typeof ClassroomQuizGameRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/classroom-matching-game': {
-      id: '/classroom-matching-game'
-      path: '/classroom-matching-game'
-      fullPath: '/classroom-matching-game'
-      preLoaderRoute: typeof ClassroomMatchingGameRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/auth': {
-      id: '/auth'
-      path: '/auth'
-      fullPath: '/auth'
-      preLoaderRoute: typeof AuthRouteImport
+    '/': {
+      id: '/'
+      path: '/'
+      fullPath: '/'
+      preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/admin': {
@@ -783,207 +713,81 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/': {
-      id: '/'
-      path: '/'
-      fullPath: '/'
-      preLoaderRoute: typeof IndexRouteImport
+    '/auth': {
+      id: '/auth'
+      path: '/auth'
+      fullPath: '/auth'
+      preLoaderRoute: typeof AuthRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/settings/': {
-      id: '/settings/'
-      path: '/'
-      fullPath: '/settings/'
-      preLoaderRoute: typeof SettingsIndexRouteImport
-      parentRoute: typeof SettingsRoute
-    }
-    '/dashboard/': {
-      id: '/dashboard/'
-      path: '/'
-      fullPath: '/dashboard/'
-      preLoaderRoute: typeof DashboardIndexRouteImport
-      parentRoute: typeof DashboardRoute
-    }
-    '/blog/': {
-      id: '/blog/'
-      path: '/blog'
-      fullPath: '/blog/'
-      preLoaderRoute: typeof BlogIndexRouteImport
+    '/classroom-matching-game': {
+      id: '/classroom-matching-game'
+      path: '/classroom-matching-game'
+      fullPath: '/classroom-matching-game'
+      preLoaderRoute: typeof ClassroomMatchingGameRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/admin/': {
-      id: '/admin/'
-      path: '/'
-      fullPath: '/admin/'
-      preLoaderRoute: typeof AdminIndexRouteImport
-      parentRoute: typeof AdminRoute
-    }
-    '/settings/security': {
-      id: '/settings/security'
-      path: '/security'
-      fullPath: '/settings/security'
-      preLoaderRoute: typeof SettingsSecurityRouteImport
-      parentRoute: typeof SettingsRoute
-    }
-    '/settings/profile': {
-      id: '/settings/profile'
-      path: '/profile'
-      fullPath: '/settings/profile'
-      preLoaderRoute: typeof SettingsProfileRouteImport
-      parentRoute: typeof SettingsRoute
-    }
-    '/settings/payment': {
-      id: '/settings/payment'
-      path: '/payment'
-      fullPath: '/settings/payment'
-      preLoaderRoute: typeof SettingsPaymentRouteImport
-      parentRoute: typeof SettingsRoute
-    }
-    '/settings/notifications': {
-      id: '/settings/notifications'
-      path: '/notifications'
-      fullPath: '/settings/notifications'
-      preLoaderRoute: typeof SettingsNotificationsRouteImport
-      parentRoute: typeof SettingsRoute
-    }
-    '/settings/files': {
-      id: '/settings/files'
-      path: '/files'
-      fullPath: '/settings/files'
-      preLoaderRoute: typeof SettingsFilesRouteImport
-      parentRoute: typeof SettingsRoute
-    }
-    '/settings/billing': {
-      id: '/settings/billing'
-      path: '/billing'
-      fullPath: '/settings/billing'
-      preLoaderRoute: typeof SettingsBillingRouteImport
-      parentRoute: typeof SettingsRoute
-    }
-    '/play/$shareId': {
-      id: '/play/$shareId'
-      path: '/play/$shareId'
-      fullPath: '/play/$shareId'
-      preLoaderRoute: typeof PlayShareIdRouteImport
+    '/classroom-quiz-game': {
+      id: '/classroom-quiz-game'
+      path: '/classroom-quiz-game'
+      fullPath: '/classroom-quiz-game'
+      preLoaderRoute: typeof ClassroomQuizGameRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/dashboard/assignments': {
-      id: '/dashboard/assignments'
-      path: '/assignments'
-      fullPath: '/dashboard/assignments'
-      preLoaderRoute: typeof DashboardAssignmentsRouteImport
-      parentRoute: typeof DashboardRoute
-    }
-    '/dashboard/activities': {
-      id: '/dashboard/activities'
-      path: '/activities'
-      fullPath: '/dashboard/activities'
-      preLoaderRoute: typeof DashboardActivitiesRouteImport
-      parentRoute: typeof DashboardRoute
-    }
-    '/blog/$slug': {
-      id: '/blog/$slug'
-      path: '/blog/$slug'
-      fullPath: '/blog/$slug'
-      preLoaderRoute: typeof BlogSlugRouteImport
+    '/create': {
+      id: '/create'
+      path: '/create'
+      fullPath: '/create'
+      preLoaderRoute: typeof CreateRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/auth/reset-password': {
-      id: '/auth/reset-password'
-      path: '/reset-password'
-      fullPath: '/auth/reset-password'
-      preLoaderRoute: typeof AuthResetPasswordRouteImport
-      parentRoute: typeof AuthRoute
-    }
-    '/auth/register': {
-      id: '/auth/register'
-      path: '/register'
-      fullPath: '/auth/register'
-      preLoaderRoute: typeof AuthRegisterRouteImport
-      parentRoute: typeof AuthRoute
-    }
-    '/auth/login': {
-      id: '/auth/login'
-      path: '/login'
-      fullPath: '/auth/login'
-      preLoaderRoute: typeof AuthLoginRouteImport
-      parentRoute: typeof AuthRoute
-    }
-    '/auth/forgot-password': {
-      id: '/auth/forgot-password'
-      path: '/forgot-password'
-      fullPath: '/auth/forgot-password'
-      preLoaderRoute: typeof AuthForgotPasswordRouteImport
-      parentRoute: typeof AuthRoute
-    }
-    '/auth/error': {
-      id: '/auth/error'
-      path: '/error'
-      fullPath: '/auth/error'
-      preLoaderRoute: typeof AuthErrorRouteImport
-      parentRoute: typeof AuthRoute
-    }
-    '/api/ping': {
-      id: '/api/ping'
-      path: '/api/ping'
-      fullPath: '/api/ping'
-      preLoaderRoute: typeof ApiPingRouteImport
+    '/dashboard': {
+      id: '/dashboard'
+      path: '/dashboard'
+      fullPath: '/dashboard'
+      preLoaderRoute: typeof DashboardRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/admin/users': {
-      id: '/admin/users'
-      path: '/users'
-      fullPath: '/admin/users'
-      preLoaderRoute: typeof AdminUsersRouteImport
-      parentRoute: typeof AdminRoute
-    }
-    '/(pages)/teachers': {
-      id: '/(pages)/teachers'
-      path: '/teachers'
-      fullPath: '/teachers'
-      preLoaderRoute: typeof pagesTeachersRouteImport
+    '/manifest.json': {
+      id: '/manifest.json'
+      path: '/manifest.json'
+      fullPath: '/manifest.json'
+      preLoaderRoute: typeof ManifestDotjsonRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/(pages)/roadmap': {
-      id: '/(pages)/roadmap'
-      path: '/roadmap'
-      fullPath: '/roadmap'
-      preLoaderRoute: typeof pagesRoadmapRouteImport
+    '/robots.txt': {
+      id: '/robots.txt'
+      path: '/robots.txt'
+      fullPath: '/robots.txt'
+      preLoaderRoute: typeof RobotsDottxtRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/(pages)/pricing': {
-      id: '/(pages)/pricing'
-      path: '/pricing'
-      fullPath: '/pricing'
-      preLoaderRoute: typeof pagesPricingRouteImport
+    '/settings': {
+      id: '/settings'
+      path: '/settings'
+      fullPath: '/settings'
+      preLoaderRoute: typeof SettingsRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/(pages)/contact': {
-      id: '/(pages)/contact'
-      path: '/contact'
-      fullPath: '/contact'
-      preLoaderRoute: typeof pagesContactRouteImport
+    '/sitemap.xml': {
+      id: '/sitemap.xml'
+      path: '/sitemap.xml'
+      fullPath: '/sitemap.xml'
+      preLoaderRoute: typeof SitemapDotxmlRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/(pages)/about': {
-      id: '/(pages)/about'
-      path: '/about'
-      fullPath: '/about'
-      preLoaderRoute: typeof pagesAboutRouteImport
+    '/templates': {
+      id: '/templates'
+      path: '/templates'
+      fullPath: '/templates'
+      preLoaderRoute: typeof TemplatesRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/(legals)/terms': {
-      id: '/(legals)/terms'
-      path: '/terms'
-      fullPath: '/terms'
-      preLoaderRoute: typeof legalsTermsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/(legals)/privacy': {
-      id: '/(legals)/privacy'
-      path: '/privacy'
-      fullPath: '/privacy'
-      preLoaderRoute: typeof legalsPrivacyRouteImport
+    '/worksheets': {
+      id: '/worksheets'
+      path: '/worksheets'
+      fullPath: '/worksheets'
+      preLoaderRoute: typeof WorksheetsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/(legals)/cookie': {
@@ -993,67 +797,207 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof legalsCookieRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/print/assignments/$assignmentId': {
-      id: '/print/assignments/$assignmentId'
-      path: '/print/assignments/$assignmentId'
-      fullPath: '/print/assignments/$assignmentId'
-      preLoaderRoute: typeof PrintAssignmentsAssignmentIdRouteImport
+    '/(legals)/privacy': {
+      id: '/(legals)/privacy'
+      path: '/privacy'
+      fullPath: '/privacy'
+      preLoaderRoute: typeof legalsPrivacyRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/dashboard/assignments/$assignmentId': {
-      id: '/dashboard/assignments/$assignmentId'
-      path: '/$assignmentId'
-      fullPath: '/dashboard/assignments/$assignmentId'
-      preLoaderRoute: typeof DashboardAssignmentsAssignmentIdRouteImport
-      parentRoute: typeof DashboardAssignmentsRoute
-    }
-    '/dashboard/activities/$activityId': {
-      id: '/dashboard/activities/$activityId'
-      path: '/$activityId'
-      fullPath: '/dashboard/activities/$activityId'
-      preLoaderRoute: typeof DashboardActivitiesActivityIdRouteImport
-      parentRoute: typeof DashboardActivitiesRoute
-    }
-    '/api/webhooks/stripe': {
-      id: '/api/webhooks/stripe'
-      path: '/api/webhooks/stripe'
-      fullPath: '/api/webhooks/stripe'
-      preLoaderRoute: typeof ApiWebhooksStripeRouteImport
+    '/(legals)/terms': {
+      id: '/(legals)/terms'
+      path: '/terms'
+      fullPath: '/terms'
+      preLoaderRoute: typeof legalsTermsRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/api/webhooks/creem': {
-      id: '/api/webhooks/creem'
-      path: '/api/webhooks/creem'
-      fullPath: '/api/webhooks/creem'
-      preLoaderRoute: typeof ApiWebhooksCreemRouteImport
+    '/(pages)/about': {
+      id: '/(pages)/about'
+      path: '/about'
+      fullPath: '/about'
+      preLoaderRoute: typeof pagesAboutRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/api/storage/file': {
-      id: '/api/storage/file'
-      path: '/api/storage/file'
-      fullPath: '/api/storage/file'
-      preLoaderRoute: typeof ApiStorageFileRouteImport
+    '/(pages)/contact': {
+      id: '/(pages)/contact'
+      path: '/contact'
+      fullPath: '/contact'
+      preLoaderRoute: typeof pagesContactRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/api/e2e/users': {
-      id: '/api/e2e/users'
-      path: '/api/e2e/users'
-      fullPath: '/api/e2e/users'
-      preLoaderRoute: typeof ApiE2eUsersRouteImport
+    '/(pages)/pricing': {
+      id: '/(pages)/pricing'
+      path: '/pricing'
+      fullPath: '/pricing'
+      preLoaderRoute: typeof pagesPricingRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/api/e2e/mail': {
-      id: '/api/e2e/mail'
-      path: '/api/e2e/mail'
-      fullPath: '/api/e2e/mail'
-      preLoaderRoute: typeof ApiE2eMailRouteImport
+    '/(pages)/roadmap': {
+      id: '/(pages)/roadmap'
+      path: '/roadmap'
+      fullPath: '/roadmap'
+      preLoaderRoute: typeof pagesRoadmapRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/api/e2e/assignments': {
-      id: '/api/e2e/assignments'
-      path: '/api/e2e/assignments'
-      fullPath: '/api/e2e/assignments'
-      preLoaderRoute: typeof ApiE2eAssignmentsRouteImport
+    '/(pages)/teachers': {
+      id: '/(pages)/teachers'
+      path: '/teachers'
+      fullPath: '/teachers'
+      preLoaderRoute: typeof pagesTeachersRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/admin/': {
+      id: '/admin/'
+      path: '/'
+      fullPath: '/admin/'
+      preLoaderRoute: typeof AdminIndexRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/users': {
+      id: '/admin/users'
+      path: '/users'
+      fullPath: '/admin/users'
+      preLoaderRoute: typeof AdminUsersRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/api/ping': {
+      id: '/api/ping'
+      path: '/api/ping'
+      fullPath: '/api/ping'
+      preLoaderRoute: typeof ApiPingRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/auth/error': {
+      id: '/auth/error'
+      path: '/error'
+      fullPath: '/auth/error'
+      preLoaderRoute: typeof AuthErrorRouteImport
+      parentRoute: typeof AuthRoute
+    }
+    '/auth/forgot-password': {
+      id: '/auth/forgot-password'
+      path: '/forgot-password'
+      fullPath: '/auth/forgot-password'
+      preLoaderRoute: typeof AuthForgotPasswordRouteImport
+      parentRoute: typeof AuthRoute
+    }
+    '/auth/login': {
+      id: '/auth/login'
+      path: '/login'
+      fullPath: '/auth/login'
+      preLoaderRoute: typeof AuthLoginRouteImport
+      parentRoute: typeof AuthRoute
+    }
+    '/auth/register': {
+      id: '/auth/register'
+      path: '/register'
+      fullPath: '/auth/register'
+      preLoaderRoute: typeof AuthRegisterRouteImport
+      parentRoute: typeof AuthRoute
+    }
+    '/auth/reset-password': {
+      id: '/auth/reset-password'
+      path: '/reset-password'
+      fullPath: '/auth/reset-password'
+      preLoaderRoute: typeof AuthResetPasswordRouteImport
+      parentRoute: typeof AuthRoute
+    }
+    '/blog/': {
+      id: '/blog/'
+      path: '/blog'
+      fullPath: '/blog/'
+      preLoaderRoute: typeof BlogIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/blog/$slug': {
+      id: '/blog/$slug'
+      path: '/blog/$slug'
+      fullPath: '/blog/$slug'
+      preLoaderRoute: typeof BlogSlugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/dashboard/': {
+      id: '/dashboard/'
+      path: '/'
+      fullPath: '/dashboard/'
+      preLoaderRoute: typeof DashboardIndexRouteImport
+      parentRoute: typeof DashboardRoute
+    }
+    '/dashboard/activities': {
+      id: '/dashboard/activities'
+      path: '/activities'
+      fullPath: '/dashboard/activities'
+      preLoaderRoute: typeof DashboardActivitiesRouteImport
+      parentRoute: typeof DashboardRoute
+    }
+    '/dashboard/assignments': {
+      id: '/dashboard/assignments'
+      path: '/assignments'
+      fullPath: '/dashboard/assignments'
+      preLoaderRoute: typeof DashboardAssignmentsRouteImport
+      parentRoute: typeof DashboardRoute
+    }
+    '/play/$shareId': {
+      id: '/play/$shareId'
+      path: '/play/$shareId'
+      fullPath: '/play/$shareId'
+      preLoaderRoute: typeof PlayShareIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/settings/': {
+      id: '/settings/'
+      path: '/'
+      fullPath: '/settings/'
+      preLoaderRoute: typeof SettingsIndexRouteImport
+      parentRoute: typeof SettingsRoute
+    }
+    '/settings/billing': {
+      id: '/settings/billing'
+      path: '/billing'
+      fullPath: '/settings/billing'
+      preLoaderRoute: typeof SettingsBillingRouteImport
+      parentRoute: typeof SettingsRoute
+    }
+    '/settings/files': {
+      id: '/settings/files'
+      path: '/files'
+      fullPath: '/settings/files'
+      preLoaderRoute: typeof SettingsFilesRouteImport
+      parentRoute: typeof SettingsRoute
+    }
+    '/settings/notifications': {
+      id: '/settings/notifications'
+      path: '/notifications'
+      fullPath: '/settings/notifications'
+      preLoaderRoute: typeof SettingsNotificationsRouteImport
+      parentRoute: typeof SettingsRoute
+    }
+    '/settings/payment': {
+      id: '/settings/payment'
+      path: '/payment'
+      fullPath: '/settings/payment'
+      preLoaderRoute: typeof SettingsPaymentRouteImport
+      parentRoute: typeof SettingsRoute
+    }
+    '/settings/profile': {
+      id: '/settings/profile'
+      path: '/profile'
+      fullPath: '/settings/profile'
+      preLoaderRoute: typeof SettingsProfileRouteImport
+      parentRoute: typeof SettingsRoute
+    }
+    '/settings/security': {
+      id: '/settings/security'
+      path: '/security'
+      fullPath: '/settings/security'
+      preLoaderRoute: typeof SettingsSecurityRouteImport
+      parentRoute: typeof SettingsRoute
+    }
+    '/api/auth/$': {
+      id: '/api/auth/$'
+      path: '/api/auth/$'
+      fullPath: '/api/auth/$'
+      preLoaderRoute: typeof ApiAuthSplatRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/api/auth/provider-status': {
@@ -1063,11 +1007,67 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiAuthProviderStatusRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/api/auth/$': {
-      id: '/api/auth/$'
-      path: '/api/auth/$'
-      fullPath: '/api/auth/$'
-      preLoaderRoute: typeof ApiAuthSplatRouteImport
+    '/api/e2e/assignments': {
+      id: '/api/e2e/assignments'
+      path: '/api/e2e/assignments'
+      fullPath: '/api/e2e/assignments'
+      preLoaderRoute: typeof ApiE2eAssignmentsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/e2e/mail': {
+      id: '/api/e2e/mail'
+      path: '/api/e2e/mail'
+      fullPath: '/api/e2e/mail'
+      preLoaderRoute: typeof ApiE2eMailRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/e2e/users': {
+      id: '/api/e2e/users'
+      path: '/api/e2e/users'
+      fullPath: '/api/e2e/users'
+      preLoaderRoute: typeof ApiE2eUsersRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/storage/file': {
+      id: '/api/storage/file'
+      path: '/api/storage/file'
+      fullPath: '/api/storage/file'
+      preLoaderRoute: typeof ApiStorageFileRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/webhooks/creem': {
+      id: '/api/webhooks/creem'
+      path: '/api/webhooks/creem'
+      fullPath: '/api/webhooks/creem'
+      preLoaderRoute: typeof ApiWebhooksCreemRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/webhooks/stripe': {
+      id: '/api/webhooks/stripe'
+      path: '/api/webhooks/stripe'
+      fullPath: '/api/webhooks/stripe'
+      preLoaderRoute: typeof ApiWebhooksStripeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/dashboard/activities/$activityId': {
+      id: '/dashboard/activities/$activityId'
+      path: '/$activityId'
+      fullPath: '/dashboard/activities/$activityId'
+      preLoaderRoute: typeof DashboardActivitiesActivityIdRouteImport
+      parentRoute: typeof DashboardActivitiesRoute
+    }
+    '/dashboard/assignments/$assignmentId': {
+      id: '/dashboard/assignments/$assignmentId'
+      path: '/$assignmentId'
+      fullPath: '/dashboard/assignments/$assignmentId'
+      preLoaderRoute: typeof DashboardAssignmentsAssignmentIdRouteImport
+      parentRoute: typeof DashboardAssignmentsRoute
+    }
+    '/print/assignments/$assignmentId': {
+      id: '/print/assignments/$assignmentId'
+      path: '/print/assignments/$assignmentId'
+      fullPath: '/print/assignments/$assignmentId'
+      preLoaderRoute: typeof PrintAssignmentsAssignmentIdRouteImport
       parentRoute: typeof rootRouteImport
     }
   }
