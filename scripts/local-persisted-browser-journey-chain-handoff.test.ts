@@ -229,8 +229,8 @@ test('local persisted browser journey spec covers save through return', () => {
   );
   assert.match(
     ACTIVITY_AUTHORING_SPEC_SOURCE,
-    /assignment-result-material[\s\S]*assignment-result-review[\s\S]*assignment-copy-artifact/,
-    'The journey should verify the result material, review, and copy handoff DOM.'
+    /Copy & export[\s\S]*assignment-result-material[\s\S]*assignment-result-review[\s\S]*Copy brief/,
+    'The journey should verify the result material and review handoff DOM, then copy through the Copy & export menu.'
   );
   assert.match(
     ACTIVITY_AUTHORING_SPEC_SOURCE,

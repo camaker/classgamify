@@ -8657,5 +8657,7 @@
   "student_play_rules_toggle": "All assignment rules",
   "activity_runner_group_sort_help": "Tap an item, then tap the group it belongs to.",
   "activity_runner_matching_pairs_help": "Tap a card on the left, then tap the card on the right that goes with it.",
-  "activity_runner_open_box_help": "Tap a box to open it, then type your answer."
+  "activity_runner_open_box_help": "Tap a box to open it, then type your answer.",
+  "assignment_results_settings_toggle": "Assignment settings",
+  "assignment_results_export_menu": "Copy & export"
 }

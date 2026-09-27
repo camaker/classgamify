@@ -325,7 +325,7 @@ function AssignmentResultsClassFocusPanel({
   );
 }
 
-function AssignmentResultsFollowUpPanel({
+export function AssignmentResultsFollowUpPanel({
   followUpStudentViews,
   sectionView,
 }: {
@@ -335,27 +335,23 @@ function AssignmentResultsFollowUpPanel({
   const titleId = 'assignment-results-follow-up-title';
 
   return (
-    <section
-      aria-labelledby={titleId}
-      className="rounded-lg border bg-muted/20 p-4"
-    >
-      <h3 id={titleId} className="font-medium text-sm">
+    <section aria-labelledby={titleId} className="grid content-start gap-3">
+      <h2 id={titleId} className="font-semibold text-lg">
         {sectionView.title}
-      </h3>
-      <div className="mt-3 grid gap-3">
-        {followUpStudentViews.length > 0 ? (
-          followUpStudentViews.map((studentView) => (
-            <AssignmentResultsFollowUpStudent
-              key={studentView.studentKey}
-              studentView={studentView}
-            />
-          ))
-        ) : (
-          <p className="text-muted-foreground text-sm">
-            {sectionView.emptyMessage}
-          </p>
-        )}
-      </div>
+      </h2>
+      {followUpStudentViews.length > 0 ? (
+        <ul className="grid divide-y rounded-lg border bg-card">
+          {followUpStudentViews.map((studentView) => (
+            <li key={studentView.studentKey} className="px-4 py-3">
+              <AssignmentResultsFollowUpStudent studentView={studentView} />
+            </li>
+          ))}
+        </ul>
+      ) : (
+        <p className="rounded-lg border border-dashed p-4 text-muted-foreground text-sm">
+          {sectionView.emptyMessage}
+        </p>
+      )}
     </section>
   );
 }
@@ -394,22 +390,21 @@ function AssignmentResultsFollowUpStudent({
   studentView: AssignmentClassroomBriefFollowUpStudentView;
 }) {
   return (
-    <div className="flex items-center justify-between gap-3 text-sm">
-      <div className="min-w-0">
-        <p className="truncate font-medium">{studentView.studentLabel}</p>
-        <p className="text-muted-foreground text-xs">
+    <div className="flex items-start justify-between gap-3">
+      <div className="grid min-w-0 gap-0.5">
+        <p className="truncate font-semibold">{studentView.studentLabel}</p>
+        <p className="text-muted-foreground text-sm">
           {studentView.accuracyLabel}
+          {studentView.submittedContextLabel
+            ? ` · ${studentView.submittedContextLabel}`
+            : ''}
         </p>
-        {studentView.submittedContextLabel ? (
-          <p className="text-muted-foreground text-xs">
-            {studentView.submittedContextLabel}
-          </p>
-        ) : null}
-        <p className="text-muted-foreground text-xs">
-          {studentView.followUpRecommendation}
-        </p>
+        <p className="text-sm">{studentView.followUpRecommendation}</p>
       </div>
-      <Badge variant="secondary" className="rounded-md">
+      <Badge
+        variant="outline"
+        className="shrink-0 rounded-md border-warning/50 bg-warning/10 text-warning-text"
+      >
         {studentView.needsReviewLabel}
       </Badge>
     </div>

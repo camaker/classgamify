@@ -502,8 +502,13 @@ test('result surfaces keep lifecycle sharing and retained review contracts', () 
   );
   assert.match(
     ASSIGNMENT_RESULTS_HEADER_CARD_SOURCE,
-    /headerView\.statusLabel[\s\S]*AssignmentResultsHeaderActions[\s\S]*shareAction=\{headerView\.shareAction\}/,
-    'Results header card should surface lifecycle status and share action together.'
+    /headerView\.statusLabel/,
+    'Results settings section should surface the lifecycle status.'
+  );
+  assert.match(
+    readFileSync('src/routes/dashboard/assignments/$assignmentId.tsx', 'utf8'),
+    /<AssignmentResultsHeaderActions[\s\S]*shareAction=\{headerView\.shareAction\}/,
+    'Results page toolbar should surface the lifecycle-aware share action.'
   );
   assert.match(
     ASSIGNMENT_RESULTS_HEADER_ACTIONS_SOURCE,

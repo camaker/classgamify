@@ -1,57 +1,63 @@
 import type { AssignmentResultItemAnalysisCardView } from '@/assignments/result-view';
 import { Badge } from '@/components/ui/badge';
-import { Progress } from '@/components/ui/progress';
+import { cn } from '@/lib/utils';
 
 type AssignmentResultsItemAnalysisCardProps = {
   itemView: AssignmentResultItemAnalysisCardView;
 };
 
+/**
+ * One reteach priority: how many students got the item right, the prompt,
+ * and the expected answer, so the teacher can explain it again.
+ */
 export function AssignmentResultsItemAnalysisCard({
   itemView,
 }: AssignmentResultsItemAnalysisCardProps) {
+  const rate = itemView.correctRateProgressValue;
+  const tone =
+    rate < 50
+      ? { bar: 'bg-error', text: 'text-error-text' }
+      : rate < 80
+        ? { bar: 'bg-warning', text: 'text-warning-text' }
+        : { bar: 'bg-success', text: 'text-success-text' };
+
   return (
-    <div className="rounded-lg border bg-background p-4">
-      <div className="flex items-center justify-between gap-3">
-        <Badge variant="outline" className="rounded-md">
-          {itemView.kindLabel}
-        </Badge>
-        <span className="text-sm font-semibold">
+    <div className="grid gap-2 px-4 py-4">
+      <div className="flex items-start justify-between gap-4">
+        <p className="font-semibold">{itemView.prompt}</p>
+        <span
+          className={cn(
+            'shrink-0 font-bold text-2xl tabular-nums leading-none',
+            tone.text
+          )}
+        >
           {itemView.correctRateLabel}
         </span>
       </div>
-      <p className="mt-3 line-clamp-2 text-sm font-medium">{itemView.prompt}</p>
-      <Progress
-        value={itemView.correctRateProgressValue}
-        className="mt-3 h-2"
-      />
-      <AssignmentResultsItemAnalysisAnswerNotes itemView={itemView} />
-    </div>
-  );
-}
-
-function AssignmentResultsItemAnalysisAnswerNotes({
-  itemView,
-}: {
-  itemView: AssignmentResultItemAnalysisCardView;
-}) {
-  return (
-    <>
-      <p className="mt-2 text-xs text-muted-foreground">
-        {itemView.expectedAnswerSummaryText}
-      </p>
-      <p className="mt-1 text-xs leading-5 text-muted-foreground">
-        {itemView.unansweredLabel}
-      </p>
+      <div
+        aria-hidden="true"
+        className="h-2 overflow-hidden rounded-full bg-muted"
+      >
+        <div
+          className={cn('h-full rounded-full', tone.bar)}
+          style={{ width: `${Math.max(rate, 2)}%` }}
+        />
+      </div>
+      <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-muted-foreground text-sm">
+        <Badge variant="outline" className="rounded-md">
+          {itemView.kindLabel}
+        </Badge>
+        <span>{itemView.expectedAnswerSummaryText}</span>
+        <span>{itemView.unansweredLabel}</span>
+      </div>
       {itemView.acceptedAnswersLineText ? (
-        <p className="mt-1 text-xs leading-5 text-muted-foreground">
+        <p className="text-muted-foreground text-sm">
           {itemView.acceptedAnswersLineText}
         </p>
       ) : null}
       {itemView.explanationText ? (
-        <p className="mt-2 text-xs leading-5 text-muted-foreground">
-          {itemView.explanationText}
-        </p>
+        <p className="text-sm leading-6">{itemView.explanationText}</p>
       ) : null}
-    </>
+    </div>
   );
 }
