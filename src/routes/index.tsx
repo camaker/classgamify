@@ -1,5 +1,5 @@
-import { ActivityPreview } from '@/components/activities/activity-preview';
 import Container from '@/components/layout/container';
+import { HomeHeroGame } from '@/components/page/home-hero-game';
 import { Badge } from '@/components/ui/badge';
 import { buttonVariants } from '@/components/ui/button';
 import { websiteConfig } from '@/config/website';
@@ -117,11 +117,7 @@ function HomePage() {
             <p className="mb-3 text-sm font-semibold text-primary">
               {m.home_hero_preview_label()}
             </p>
-            <ActivityPreview
-              activity={pageView.preview.activity}
-              compact
-              layout="stacked"
-            />
+            <HomeHeroGame />
           </section>
         </section>
 
