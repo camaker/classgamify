@@ -135,6 +135,8 @@ function RootComponent() {
   const canonicalPathname = getCanonicalPathname(pathname);
   const matches = useRouterState({ select: (s) => s.matches }) ?? [];
   const isAuthPages = canonicalPathname.startsWith(Routes.Auth);
+  // Student play links stay focused: no marketing navbar or footer.
+  const isStudentPlayPages = canonicalPathname.startsWith('/play/');
   const isProtectedPages =
     canonicalPathname.startsWith(Routes.Admin) ||
     canonicalPathname.startsWith(Routes.Dashboard) ||
@@ -146,7 +148,7 @@ function RootComponent() {
     canonicalPathname !== '' &&
     matches.length <= 1;
 
-  if (isAuthPages || isProtectedPages || isNotFound) {
+  if (isAuthPages || isStudentPlayPages || isProtectedPages || isNotFound) {
     return (
       <div className="flex min-h-screen flex-col">
         <main id="main-content" className="flex-1">

@@ -1263,7 +1263,8 @@ stable starter link before release.
 
 | # | Test name | Flow |
 |---|---|---|
-| 1 | Starter play link stays interactive while read-only | Open `/play/demo-food`, verify the starter assignment heading and progress badge render, answer two visible quiz choices, verify progress advances, verify the submit button stays disabled because starter preview assignments are read-only, verify the read-only hint is visible and associated with the submit control, and assert no browser errors. |
+| 1 | Starter play link stays interactive while read-only | Open `/play/demo-food`, verify the starter assignment heading and progress render, answer the first quiz question, verify the runner moves on to the next question by itself, answer it, verify progress advances, verify the submit button stays disabled because starter preview assignments are read-only, verify the read-only hint is visible and associated with the submit control, and assert no browser errors. |
+| 2 | Play links use the focused student layout | Open `/play/demo-food` and verify there is no marketing navbar or footer (no Pricing or Sign up links), only one quiz question is on screen with a "Question 1 of 3" position label, the Previous button is disabled on the first question, question dots jump between questions, and the full assignment rules sit behind the "All assignment rules" disclosure. |
 
 ## 7. Storage Source Materials
 

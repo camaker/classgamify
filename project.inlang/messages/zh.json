@@ -8648,5 +8648,11 @@
   "settings_files_material_classification_worksheet_document_description": "练习纸文档会计入可打印或可提取的课堂材料。",
   "settings_files_material_classification_worksheet_image_description": "练习纸图片会作为可视练习纸来源计数，但不暴露图片字节。",
   "settings_files_material_secondary_content_type": "Content type",
-  "settings_files_material_secondary_extension": "扩展名"
+  "settings_files_material_secondary_extension": "扩展名",
+  "student_play_intro": "逐题作答，完成后提交，老师就能看到你的答案。",
+  "student_play_question_position": "第 {current} 题，共 {total} 题",
+  "student_play_previous": "上一题",
+  "student_play_next": "下一题",
+  "student_play_go_to_question": "跳到第 {number} 题",
+  "student_play_rules_toggle": "查看全部作业规则"
 }

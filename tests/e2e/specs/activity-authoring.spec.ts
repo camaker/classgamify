@@ -146,9 +146,10 @@ test.describe('activity authoring', () => {
       page.getByRole('button', { name: /^submit anyway\./i })
     ).toBeVisible();
 
+    // The runner has moved on to question 2, the only question on screen.
     await page
       .getByRole('button', { name: /^apple$/i })
-      .nth(1)
+      .first()
       .click();
     await expect(
       page.getByRole('status', {

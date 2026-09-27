@@ -97,6 +97,15 @@ test.describe('student runner', () => {
       )
     ).toBeVisible();
 
+    // Answering a question moves the runner on to the next one.
+    await expect(
+      page.getByText(
+        formatLocaleMessage(
+          getLocaleMessage('en', 'student_play_question_position'),
+          { current: '2', total: '3' }
+        )
+      )
+    ).toBeVisible();
     await page
       .getByRole('button', {
         name: getLocaleMessage('en', 'activity_starter_food_vocabulary_milk'),
@@ -136,5 +145,64 @@ test.describe('student runner', () => {
     ).toBeVisible();
 
     monitor.expectNoErrors('starter student runner interaction');
+  });
+
+  test('play links use the focused student layout', async ({ page }) => {
+    await setTheme(page, 'light');
+    const monitor = installPageHealthMonitor(page);
+
+    await expectHealthyPage(page, monitor, '/play/demo-food', {
+      theme: 'light',
+    });
+
+    // No marketing chrome around the student runner.
+    await expect(page.getByRole('link', { name: /^pricing$/i })).toHaveCount(0);
+    await expect(page.getByRole('link', { name: /^sign up$/i })).toHaveCount(0);
+    await expect(page.locator('footer')).toHaveCount(0);
+
+    // One question at a time.
+    const surface = page.locator('[data-runtime-surface="choice-list"]');
+    await expect(surface.getByRole('article')).toHaveCount(1);
+    await expect(
+      page.getByText(
+        formatLocaleMessage(
+          getLocaleMessage('en', 'student_play_question_position'),
+          { current: '1', total: '3' }
+        )
+      )
+    ).toBeVisible();
+    await expect(
+      page.getByRole('button', {
+        name: getLocaleMessage('en', 'student_play_previous'),
+      })
+    ).toBeDisabled();
+
+    await page
+      .getByRole('button', {
+        name: formatLocaleMessage(
+          getLocaleMessage('en', 'student_play_go_to_question'),
+          { number: '3' }
+        ),
+      })
+      .click();
+    await expect(
+      page.getByText(
+        formatLocaleMessage(
+          getLocaleMessage('en', 'student_play_question_position'),
+          { current: '3', total: '3' }
+        )
+      )
+    ).toBeVisible();
+
+    // Full rules stay behind the disclosure until the student opens it.
+    const rulesToggle = page.getByText(
+      getLocaleMessage('en', 'student_play_rules_toggle')
+    );
+    const rulesList = page.locator('details dl');
+    await expect(rulesList).toBeHidden();
+    await rulesToggle.click();
+    await expect(rulesList).toBeVisible();
+
+    monitor.expectNoErrors('focused student layout');
   });
 });

@@ -8648,5 +8648,11 @@
   "settings_files_material_classification_worksheet_document_description": "Worksheet documents are counted as printable or extraction-ready classroom materials.",
   "settings_files_material_classification_worksheet_image_description": "Worksheet images are counted as visual worksheet sources without exposing image bytes.",
   "settings_files_material_secondary_content_type": "Content type",
-  "settings_files_material_secondary_extension": "Extension"
+  "settings_files_material_secondary_extension": "Extension",
+  "student_play_intro": "모든 문제에 답한 뒤 제출하면 선생님께 전달됩니다.",
+  "student_play_question_position": "{total}문제 중 {current}번",
+  "student_play_previous": "이전",
+  "student_play_next": "다음",
+  "student_play_go_to_question": "{number}번 문제로 이동",
+  "student_play_rules_toggle": "과제 규칙 모두 보기"
 }
