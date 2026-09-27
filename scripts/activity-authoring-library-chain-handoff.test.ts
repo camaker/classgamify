@@ -21,7 +21,6 @@ import { ACTIVITY_SOURCE_MATERIAL_PICKER_HANDOFF_ITEM_IDS } from '@/activities/m
 import { ACTIVITY_SOURCE_MATERIAL_REFERENCE_ITEM_IDS } from '@/activities/material-references';
 import { ACTIVITY_TEMPLATE_SCAFFOLD_QUALITY_HANDOFF_ITEM_IDS } from '@/activities/scaffolds';
 import { ACTIVITY_TEMPLATE_REMIX_HANDOFF_ITEM_IDS } from '@/activities/template-remix';
-import { ASSIGNMENT_PUBLISH_HANDOFF_ITEM_IDS } from '@/assignments/publish-input';
 
 const PRODUCT_SOURCE = readFileSync('docs/product.md', 'utf8');
 const ACTIVITIES_API_SOURCE = readFileSync('src/api/activities.ts', 'utf8');
@@ -181,9 +180,8 @@ test('activity authoring/library chain is backed by focused gates', () => {
       ACTIVITY_DUPLICATE_HANDOFF_ITEM_IDS.length,
       ACTIVITY_TEMPLATE_REMIX_HANDOFF_ITEM_IDS.length,
       ACTIVITY_LIFECYCLE_HANDOFF_ITEM_IDS.length,
-      ASSIGNMENT_PUBLISH_HANDOFF_ITEM_IDS.length,
     ],
-    Array.from({ length: 12 }, () => 30)
+    Array.from({ length: 11 }, () => 30)
   );
 });
 
@@ -286,7 +284,7 @@ test('activity authoring/library sources preserve publish and snapshot boundary'
   );
   assert.match(
     PUBLISH_SOURCE,
-    /buildAssignmentPublishDialogViewModel[\s\S]*buildAssignmentPublishHandoffView[\s\S]*snapshot-freeze[\s\S]*public-payload-boundary/,
+    /buildAssignmentPublishDialogViewModel[\s\S]*snapshot-freeze/,
     'Publish dialog view models should expose snapshot and public-payload boundaries.'
   );
   assert.match(

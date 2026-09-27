@@ -1,8 +1,4 @@
 import type {
-  AssignmentLifecycleHandoffItemView,
-  AssignmentLifecycleHandoffView,
-} from '@/assignments/lifecycle';
-import type {
   AssignmentListCardActionView,
   AssignmentListCardViewModel,
   AssignmentListDistributionStepId,
@@ -14,10 +10,8 @@ import type {
   AssignmentListStatusAction,
 } from '@/assignments/list-view';
 import { buildAssignmentStatusActionExecutionPlan } from '@/assignments/lifecycle';
-import { buildAssignmentShareLinkHandoffView } from '@/assignments/share-link';
 import { AssignmentListStats } from '@/components/assignments/assignment-list-stats';
 import { AssignmentSettingsSummary } from '@/components/assignments/assignment-settings-summary';
-import { AssignmentShareLinkHandoff } from '@/components/assignments/assignment-share-link-handoff';
 import { CopyAssignmentShareLinkButton } from '@/components/assignments/copy-assignment-share-link-button';
 import { Badge } from '@/components/ui/badge';
 import { Button, buttonVariants } from '@/components/ui/button';
@@ -42,7 +36,6 @@ import {
   IconPrinter,
 } from '@tabler/icons-react';
 import { Link } from '@tanstack/react-router';
-import { useId } from 'react';
 import { toast } from 'sonner';
 
 type AssignmentListCardProps = {
@@ -79,9 +72,6 @@ export function AssignmentListCard({ assignment }: AssignmentListCardProps) {
     >
       <AssignmentListCardHeader assignment={assignment} />
       <CardContent className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-end">
-        <AssignmentListLifecycleHandoff
-          handoff={assignment.lifecycleHandoffView}
-        />
         <AssignmentListCardSummary
           assignment={assignment}
           idPrefix={cardElementId}
@@ -95,60 +85,6 @@ export function AssignmentListCard({ assignment }: AssignmentListCardProps) {
         />
       </CardContent>
     </Card>
-  );
-}
-
-function AssignmentListLifecycleHandoff({
-  handoff,
-}: {
-  handoff: AssignmentLifecycleHandoffView;
-}) {
-  const titleId = useId();
-  const descriptionId = useId();
-
-  return (
-    <section
-      aria-describedby={descriptionId}
-      aria-labelledby={titleId}
-      className="sr-only"
-      data-handoff="assignment-lifecycle"
-      data-handoff-scope={handoff.privacy.scope}
-    >
-      <h3 id={titleId}>{handoff.title}</h3>
-      <p id={descriptionId}>{handoff.description}</p>
-      <dl>
-        {handoff.itemViews.map((item) => (
-          <AssignmentListLifecycleHandoffItem item={item} key={item.id} />
-        ))}
-      </dl>
-    </section>
-  );
-}
-
-function AssignmentListLifecycleHandoffItem({
-  item,
-}: {
-  item: AssignmentLifecycleHandoffItemView;
-}) {
-  const labelId = `assignment-lifecycle-handoff-${item.id}-label`;
-  const valueId = `assignment-lifecycle-handoff-${item.id}-value`;
-  const descriptionId = `assignment-lifecycle-handoff-${item.id}-description`;
-
-  return (
-    <div data-handoff-item={item.id}>
-      <dt id={labelId}>{item.label}</dt>
-      <dd>
-        <output
-          aria-describedby={descriptionId}
-          aria-label={item.ariaLabel}
-          aria-labelledby={`${labelId} ${valueId}`}
-          id={valueId}
-        >
-          {item.value}
-        </output>
-        <span id={descriptionId}>{item.description}</span>
-      </dd>
-    </div>
   );
 }
 
@@ -504,13 +440,9 @@ function AssignmentListShareActions({
   const disabledReasonId = getAssignmentListShareDisabledReasonId(action);
   const sharePathDescriptionId =
     getAssignmentListSharePathDescriptionId(action);
-  const handoffView = buildAssignmentShareLinkHandoffView(action, {
-    surface: 'assignment-list',
-  });
 
   return (
     <div className="grid gap-2">
-      <AssignmentShareLinkHandoff handoff={handoffView} />
       <AssignmentListSharePath
         action={action}
         descriptionId={sharePathDescriptionId}

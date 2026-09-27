@@ -954,8 +954,6 @@ import {
   normalizeAssignmentListSummaryCount,
 } from '@/assignments/list-summary';
 import {
-  ASSIGNMENT_LIST_FILTER_HANDOFF_ITEM_IDS,
-  ASSIGNMENT_LIST_PAGE_HANDOFF_ITEM_IDS,
   assignmentListActionCopy,
   assignmentListPageCopy,
   assignmentListPublishedPanelCopy,
@@ -977,11 +975,9 @@ import {
   getAssignmentListEmptyState,
 } from '@/assignments/list-view';
 import {
-  ASSIGNMENT_LIFECYCLE_HANDOFF_ITEM_IDS,
   ASSIGNMENT_MANAGED_STATUSES,
   assertAssignmentAcceptsSubmissions,
   assertAssignmentStatusTransition,
-  buildAssignmentLifecycleHandoffView,
   buildAssignmentStatusAction,
   buildAssignmentStatusActionExecutionPlan,
   getAssignmentLifecycleStatus,
@@ -1223,14 +1219,12 @@ import {
   buildAssignmentLifecycleGovernanceChainHandoffView,
 } from '@/assignments/assignment-lifecycle-governance-chain';
 import {
-  ASSIGNMENT_SHARE_LINK_HANDOFF_ITEM_IDS,
   ASSIGNMENT_SHARE_ROUTE_TARGET,
   assignmentShareLinkActionCopy,
   buildAssignmentShareLinkAvailability,
   buildAssignmentShareLinkActionView,
   buildAssignmentShareLinkAvailabilityState,
   buildAssignmentShareLinkCopyExecutionPlan,
-  buildAssignmentShareLinkHandoffView,
   buildAssignmentSharePath,
   buildAssignmentShareUrl,
   normalizeShareBaseUrl,
@@ -1245,7 +1239,6 @@ import {
   assignmentPublishDialogCopy,
   assignmentPublishToggleOptions,
   ASSIGNMENT_PUBLISH_CONTROL_BOUNDARY_ITEM_IDS,
-  ASSIGNMENT_PUBLISH_HANDOFF_ITEM_IDS,
   buildAssignmentPublishDraft,
   buildAssignmentPublishDraftDefaults,
   buildAssignmentPublishDialogAccessView,
@@ -3270,16 +3263,6 @@ assert.match(
   /export type AssignmentShareLinkActionView = \{[\s\S]*sharePath: string;[\s\S]*sharePathLabel: string;[\s\S]*shareSlug: string;[\s\S]*shareUrl: string;[\s\S]*shareUrlLabel: string;/,
   'Share-link action views should expose both route paths and absolute student-link URLs for teacher distribution surfaces.'
 );
-assert.match(
-  assignmentShareLinkSource,
-  /export const ASSIGNMENT_SHARE_LINK_HANDOFF_ITEM_IDS = \[(?=[\s\S]*'route-target')(?=[\s\S]*'normalized-share-slug')(?=[\s\S]*'normalized-slug-component')(?=[\s\S]*'encoded-share-path')(?=[\s\S]*'encoded-route-param')(?=[\s\S]*'absolute-share-url')(?=[\s\S]*'preview-route-params')(?=[\s\S]*'public-delivery-contract')(?=[\s\S]*'copy-disabled-gate')(?=[\s\S]*'copy-action')(?=[\s\S]*'clipboard-payload')(?=[\s\S]*'copy-execution-plan')(?=[\s\S]*'preview-disabled-gate')(?=[\s\S]*'preview-action')(?=[\s\S]*'path-encoding-guard')(?=[\s\S]*'publish-success-surface')(?=[\s\S]*'assignment-list-surface')(?=[\s\S]*'result-page-surface')(?=[\s\S]*'surface-consistency')(?=[\s\S]*'privacy-guard')[\s\S]*export type AssignmentShareLinkHandoffPrivacyContract = \{[\s\S]*exposesActivityContent: false;[\s\S]*exposesAnswerKeys: false;[\s\S]*exposesClipboardPrivateData: false;[\s\S]*exposesInternalAssignmentIds: false;[\s\S]*exposesInternalBaseUrlConfig: false;[\s\S]*exposesRawAnonymousToken: false;[\s\S]*exposesSourceMaterialStorageKeys: false;[\s\S]*exposesStudentAnswerText: false;[\s\S]*scope: 'assignment-share-link-distribution';[\s\S]*shareUrlIsPublicDeliveryLink: true;/,
-  'Share-link handoff should expose a typed 30-slice distribution contract with explicit privacy flags.'
-);
-assert.match(
-  assignmentShareLinkSource,
-  /export function buildAssignmentShareLinkHandoffView\([\s\S]*actionView: AssignmentShareLinkActionView[\s\S]*surface = 'shared'[\s\S]*buildAssignmentShareLinkCopyExecutionPlan[\s\S]*getAssignmentShareLinkEncodedRouteParam[\s\S]*id: 'route-target'[\s\S]*id: 'normalized-share-slug'[\s\S]*id: 'normalized-slug-component'[\s\S]*id: 'encoded-share-path'[\s\S]*id: 'encoded-route-param'[\s\S]*id: 'absolute-share-url'[\s\S]*id: 'preview-route-params'[\s\S]*id: 'public-delivery-contract'[\s\S]*id: 'copy-disabled-gate'[\s\S]*id: 'clipboard-payload'[\s\S]*id: 'copy-execution-plan'[\s\S]*id: 'preview-disabled-gate'[\s\S]*id: 'path-encoding-guard'[\s\S]*id: 'surface-consistency'[\s\S]*privacy: buildAssignmentShareLinkHandoffPrivacyContract/,
-  'Share-link handoff should collect path, URL, lifecycle, copy-plan, preview-route, encoding, and distribution-surface slices from the prepared action view.'
-);
 assert.doesNotMatch(
   assignmentShareLinkSource,
   /AssignmentShareLinkActionView\['handoffView'\]|ReturnType<\s*typeof buildAssignmentShareLinkHandoffView>/,
@@ -4634,16 +4617,6 @@ assert.doesNotMatch(
 );
 assert.match(
   assignmentPublishSource,
-  /export const ASSIGNMENT_PUBLISH_HANDOFF_ITEM_IDS = \[(?=[\s\S]*'publish-access')(?=[\s\S]*'activity-lifecycle-gate')(?=[\s\S]*'validation-message')(?=[\s\S]*'draft-field-count')(?=[\s\S]*'field-limit-boundary')(?=[\s\S]*'delivery-rule-count')(?=[\s\S]*'settings-summary-status')(?=[\s\S]*'student-instructions')(?=[\s\S]*'review-checklist-count')(?=[\s\S]*'delivery-defaults')(?=[\s\S]*'attempts-policy')(?=[\s\S]*'attempt-limit-parser')(?=[\s\S]*'timer-parser')(?=[\s\S]*'settings-json')(?=[\s\S]*'close-time-parser')(?=[\s\S]*'snapshot-freeze')(?=[\s\S]*'public-payload-boundary')(?=[\s\S]*'results-policy')(?=[\s\S]*'privacy-guard')[\s\S]*export type AssignmentPublishHandoffPrivacyContract = \{[\s\S]*exposesActivityContent: false;[\s\S]*exposesAnswerKeys: false;[\s\S]*exposesAssignmentTitle: false;[\s\S]*exposesInternalActivityIds: false;[\s\S]*exposesPublicRuntimeContent: false;[\s\S]*exposesRawSettingsJson: false;[\s\S]*exposesShareSlug: false;[\s\S]*exposesSourceMaterialStorageKeys: false;[\s\S]*exposesStudentAnswerText: false;[\s\S]*exposesStudentInstructions: false;[\s\S]*exposesStudentNames: false;[\s\S]*exposesTeacherNotes: false;[\s\S]*scope: 'assignment-publish-preflight-boundary';/,
-  'Assignment publish handoff should expose a typed 30-slice contract with explicit privacy flags and scope.'
-);
-assert.match(
-  assignmentPublishSource,
-  /handoffView: AssignmentPublishHandoffView;[\s\S]*handoffView: buildAssignmentPublishHandoffView\(\{[\s\S]*accessView,[\s\S]*dialogState,[\s\S]*draft,[\s\S]*preview,[\s\S]*toggleViews,[\s\S]*validation,[\s\S]*\}\)/,
-  'Assignment publish dialog view-model should compose handoff state from access, validation, preview, toggles, and dialog state.'
-);
-assert.match(
-  assignmentPublishSource,
   /ASSIGNMENT_PUBLISH_CONTROL_BOUNDARY_ITEM_IDS = \[(?=[\s\S]*'title-input')(?=[\s\S]*'instructions-input')(?=[\s\S]*'attempt-limit-input')(?=[\s\S]*'timer-input')(?=[\s\S]*'close-time-input')(?=[\s\S]*'delivery-toggle-group')(?=[\s\S]*'preview-region')(?=[\s\S]*'frozen-link-status')(?=[\s\S]*'review-checklist')(?=[\s\S]*'validation-alert')(?=[\s\S]*'privacy-guard')[\s\S]*export type AssignmentPublishControlBoundaryView = \{[\s\S]*scope: 'assignment-publish-control-semantics';[\s\S]*usesOpaqueControlScope: true;[\s\S]*usesPreparedControlIds: true;/,
   'Assignment publish control boundary should expose a typed 30-slice control semantics contract.'
 );
@@ -4656,11 +4629,6 @@ assert.match(
   assignmentPublishSource,
   /function buildAssignmentPublishControlBoundary[\s\S]*buildAssignmentPublishControlIds\(controlIdBase\)[\s\S]*itemIds: \[\.\.\.ASSIGNMENT_PUBLISH_CONTROL_BOUNDARY_ITEM_IDS\][\s\S]*previewRegionDescribedByIds:[\s\S]*controlIds\.previewContextDescription[\s\S]*controlIds\.previewContextStatusMessage[\s\S]*reviewChecklistLabelledByIds: \[controlIds\.previewReviewLabel\]/,
   'Assignment publish control boundary should derive field, toggle, preview, stat, and review ids from prepared control ids.'
-);
-assert.match(
-  assignmentPublishSource,
-  /function buildAssignmentPublishHandoffView(?=[\s\S]*accessView: AssignmentPublishDialogAccessView)(?=[\s\S]*dialogState: AssignmentPublishDialogState)(?=[\s\S]*preview: AssignmentPublishPreview)[\s\S]*id: 'publish-access'[\s\S]*id: 'activity-lifecycle-gate'[\s\S]*id: 'validation-message'[\s\S]*id: 'draft-field-count'[\s\S]*id: 'field-limit-boundary'[\s\S]*id: 'delivery-rule-count'[\s\S]*id: 'settings-summary-status'[\s\S]*id: 'student-instructions'[\s\S]*id: 'review-checklist-count'[\s\S]*id: 'delivery-defaults'[\s\S]*id: 'attempts-policy'[\s\S]*id: 'attempt-limit-parser'[\s\S]*id: 'timer-parser'[\s\S]*id: 'settings-json'[\s\S]*id: 'close-time-parser'[\s\S]*id: 'snapshot-freeze'[\s\S]*id: 'public-payload-boundary'[\s\S]*id: 'results-policy'[\s\S]*id: 'privacy-guard'[\s\S]*privacy: buildAssignmentPublishHandoffPrivacyContract/,
-  'Assignment publish handoff should collect publish access, validation, delivery rules, defaults, parsers, payload, privacy, and review checklist slices.'
 );
 assert.doesNotMatch(
   assignmentPublishSource,
@@ -4722,11 +4690,7 @@ assert.deepEqual(publishedAssignmentDeliveryChainView.privacy, {
 });
 assert.deepEqual(
   [
-    ASSIGNMENT_PUBLISH_HANDOFF_ITEM_IDS.length,
     ASSIGNMENT_DELIVERY_POLICY_HANDOFF_ITEM_IDS.length,
-    ASSIGNMENT_SHARE_LINK_HANDOFF_ITEM_IDS.length,
-    ASSIGNMENT_LIST_PAGE_HANDOFF_ITEM_IDS.length,
-    ASSIGNMENT_LIFECYCLE_HANDOFF_ITEM_IDS.length,
     PUBLIC_ASSIGNMENT_ACCESS_HANDOFF_ITEM_IDS.length,
     PUBLIC_ASSIGNMENT_UNAVAILABLE_ACCESS_HANDOFF_ITEM_IDS.length,
     ASSIGNMENT_ITEM_ORDER_HANDOFF_ITEM_IDS.length,
@@ -4738,7 +4702,7 @@ assert.deepEqual(
     ASSIGNMENT_ATTEMPT_STATS_HANDOFF_ITEM_IDS.length,
     ASSIGNMENT_PUBLISH_CONTROL_BOUNDARY_ITEM_IDS.length,
   ],
-  Array.from({ length: 15 }, () => 30),
+  Array.from({ length: 11 }, () => 30),
   'Published assignment delivery chain should stay backed by focused assignment gates.'
 );
 assert.deepEqual(Object.fromEntries(publishedAssignmentDeliveryChainValues), {
@@ -4834,15 +4798,12 @@ assert.deepEqual(assignmentDistributionLifecycleChainView.privacy, {
 });
 assert.deepEqual(
   [
-    ASSIGNMENT_LIST_PAGE_HANDOFF_ITEM_IDS.length,
-    ASSIGNMENT_SHARE_LINK_HANDOFF_ITEM_IDS.length,
-    ASSIGNMENT_PUBLISH_HANDOFF_ITEM_IDS.length,
     ASSIGNMENT_DELIVERY_POLICY_HANDOFF_ITEM_IDS.length,
     PUBLISHED_ASSIGNMENT_DELIVERY_CHAIN_HANDOFF_ITEM_IDS.length,
     ASSIGNMENT_SOURCE_ACTIVITY_CONTEXT_CHAIN_HANDOFF_ITEM_IDS.length,
     TEACHER_RESULTS_REVIEW_CHAIN_HANDOFF_ITEM_IDS.length,
   ],
-  Array.from({ length: 7 }, () => 30),
+  Array.from({ length: 4 }, () => 30),
   'Assignment distribution lifecycle chain should stay backed by assignment list, share-link, publish, delivery, source context, runner, print, and results gates.'
 );
 assert.deepEqual(Object.fromEntries(assignmentDistributionLifecycleChainValues), {
@@ -4853,7 +4814,7 @@ assert.deepEqual(Object.fromEntries(assignmentDistributionLifecycleChainValues),
   'student-runner-start-handoff-boundary': 'Visible start screen',
   'distribution-status': 'Ready or collecting',
   'filter-scope-alignment': 'Owner scope',
-  'hidden-share-handoff': '30 share slices',
+  'hidden-share-handoff': 'Visible share actions',
   'list-card-action-parity': 'Card actions',
   'owner-scoped-published-lookup': 'Owner list query',
   'preview-route-action': 'Student runner link',
@@ -4943,7 +4904,6 @@ assert.deepEqual(assignmentSourceActivityContextChainView.privacy, {
 });
 assert.deepEqual(
   [
-    ASSIGNMENT_LIST_PAGE_HANDOFF_ITEM_IDS.length,
     PRINTABLE_WORKSHEET_REVIEW_LIFECYCLE_CHAIN_HANDOFF_ITEM_IDS.length,
     ASSIGNMENT_DISTRIBUTION_LIFECYCLE_CHAIN_HANDOFF_ITEM_IDS.length,
     WORKSHEET_MODE_DELIVERY_CHAIN_HANDOFF_ITEM_IDS.length,
@@ -4951,7 +4911,7 @@ assert.deepEqual(
     TEACHER_RESULTS_REVIEW_CHAIN_HANDOFF_ITEM_IDS.length,
     SCORED_ATTEMPT_RESULT_CHAIN_HANDOFF_ITEM_IDS.length,
   ],
-  Array.from({ length: 7 }, () => 30),
+  Array.from({ length: 6 }, () => 30),
   'Assignment source activity context chain should stay backed by list, export, printable, distribution, worksheet, data, results, and scored-result gates.'
 );
 assert.deepEqual(
@@ -8435,7 +8395,7 @@ assert.match(
 );
 assert.match(
   readFileSync('docs/product.md', 'utf8'),
-  /src\/activities\/ai-enhancement-lifecycle-chain\.ts` owns the full AI enhancement lifecycle handoff[\s\S]*request policy[\s\S]*parsed draft output[\s\S]*teacher review[\s\S]*manual save[\s\S]*assignment\s+publish actions[\s\S]*result-export continuity[\s\S]*30-slice core\s+assignment-publish handoff/,
+  /src\/activities\/ai-enhancement-lifecycle-chain\.ts` owns the full AI enhancement lifecycle handoff[\s\S]*request policy[\s\S]*parsed draft output[\s\S]*teacher review[\s\S]*manual save[\s\S]*assignment\s+publish actions[\s\S]*result-export continuity[\s\S]*shared\s+publish dialog/,
   'docs/product.md should document the activity AI enhancement lifecycle owner.'
 );
 assert.match(
@@ -8443,10 +8403,9 @@ assert.match(
   /Activity AI enhancement lifecycle chain has a fast script-level gate via[\s\S]*scripts\/activity-ai-enhancement-lifecycle-chain\.test\.ts[\s\S]*policy-to-publish ordering[\s\S]*draft output handoffs[\s\S]*teacher review[\s\S]*manual save[\s\S]*assignment\s+publish actions[\s\S]*share-link\/snapshot boundaries[\s\S]*result-export continuity/,
   'TEST-CATALOG should document the activity AI enhancement lifecycle chain gate.'
 );
-assert.equal(ASSIGNMENT_PUBLISH_HANDOFF_ITEM_IDS.length, 30);
 assert.match(
   readFileSync('tests/e2e/TEST-CATALOG.md', 'utf8'),
-  /30-slice\s+assignment-publish\s+handoff/,
+  /assignment\s+publish\s+actions[\s\S]*result-export\s+continuity/,
   'TEST-CATALOG should document the activity AI enhancement assignment-publish handoff.'
 );
 const activityAuthoringLibraryChainView =
@@ -8513,9 +8472,8 @@ assert.deepEqual(
     ACTIVITY_DUPLICATE_HANDOFF_ITEM_IDS.length,
     ACTIVITY_TEMPLATE_REMIX_HANDOFF_ITEM_IDS.length,
     ACTIVITY_LIFECYCLE_HANDOFF_ITEM_IDS.length,
-    ASSIGNMENT_PUBLISH_HANDOFF_ITEM_IDS.length,
   ],
-  Array.from({ length: 12 }, () => 30),
+  Array.from({ length: 11 }, () => 30),
   'Activity authoring/library chain should stay backed by focused public-entry, editor, library, derivative, lifecycle, and publish gates.'
 );
 assert.deepEqual(Object.fromEntries(activityAuthoringLibraryChainValues), {
@@ -10500,8 +10458,8 @@ assert.match(
 );
 assert.match(
   activityPublishSettingsFormSource,
-  /AssignmentPublishControlBoundaryView[\s\S]*AssignmentPublishDialogViewModel[\s\S]*AssignmentPublishDraft[\s\S]*AssignmentPublishDraftValues[\s\S]*AssignmentPublishHandoffView[\s\S]*AssignmentPublishToggleView/,
-  'Assignment publish settings form should import the explicit assignment-domain control, handoff, and toggle view contracts.'
+  /AssignmentPublishControlBoundaryView[\s\S]*AssignmentPublishDialogViewModel[\s\S]*AssignmentPublishDraft[\s\S]*AssignmentPublishDraftValues[\s\S]*AssignmentPublishToggleView/,
+  'Assignment publish settings form should import the explicit assignment-domain control and toggle view contracts.'
 );
 assert.match(
   activityPublishSettingsFormSource,
@@ -10517,11 +10475,6 @@ assert.match(
   activityPublishSettingsFormSource,
   /ActivityPublishPreviewContext[\s\S]*context=\{view\.preview\.context\}/,
   'Assignment publish settings form should render the prepared frozen-link preview context.'
-);
-assert.match(
-  activityPublishSettingsFormSource,
-  /AssignmentPublishHandoff[\s\S]*view=\{view\.handoffView\}[\s\S]*data-handoff="assignment-publish"[\s\S]*data-handoff-scope=\{view\.privacy\.scope\}[\s\S]*view\.itemViews\.map\(\(item\) =>[\s\S]*AssignmentPublishHandoffItem[\s\S]*function AssignmentPublishHandoffItem[\s\S]*const labelId = `assignment-publish-handoff-\$\{item\.id\}-label`[\s\S]*const valueId = `assignment-publish-handoff-\$\{item\.id\}-value`[\s\S]*const descriptionId = `assignment-publish-handoff-\$\{item\.id\}-description`[\s\S]*data-handoff-item=\{item\.id\}[\s\S]*id=\{labelId\}[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*aria-label=\{item\.ariaLabel\}[\s\S]*aria-labelledby=\{`\$\{labelId\} \$\{valueId\}`\}[\s\S]*id=\{valueId\}[\s\S]*id=\{descriptionId\}/,
-  'Assignment publish settings form should render the prepared publish handoff, privacy scope, and hidden semantic output.'
 );
 assert.match(
   activityPublishSettingsFormSource,
@@ -16534,7 +16487,6 @@ assert.deepEqual(
     SOURCE_EXTRACTION_LIFECYCLE_CHAIN_HANDOFF_ITEM_IDS.length,
     SOURCE_EXTRACTION_LIFECYCLE_CHAIN_SOURCE_FILES.length,
     SOURCE_MATERIAL_PRIVACY_CHAIN_HANDOFF_ITEM_IDS.length,
-    ASSIGNMENT_PUBLISH_HANDOFF_ITEM_IDS.length,
     ASSIGNMENT_SOURCE_ACTIVITY_CONTEXT_CHAIN_HANDOFF_ITEM_IDS.length,
     ASSIGNMENT_LIFECYCLE_GOVERNANCE_CHAIN_HANDOFF_ITEM_IDS.length,
     ASSIGNMENT_LIFECYCLE_GOVERNANCE_CHAIN_SOURCE_FILES.length,
@@ -16572,7 +16524,7 @@ assert.deepEqual(
     PUBLIC_DISCOVERY_INDEXING_CHAIN_SOURCE_FILES.length,
     CLASSROOM_TRUST_COMMUNICATION_CHAIN_HANDOFF_ITEM_IDS.length,
   ],
-  Array.from({ length: 57 }, () => 30),
+  Array.from({ length: 56 }, () => 30),
   'Classroom product loop chain should stay backed by adjacent public entry, public discovery/indexing, workspace, data, authoring, source extraction, lifecycle governance, template roadmap, AI enhancement lifecycle, delivery, runner, result continuity, export, print, and trust gates.'
 );
 assert.deepEqual(Object.fromEntries(classroomProductLoopChainValues), {
@@ -16936,7 +16888,6 @@ assert.deepEqual(
   [
     DASHBOARD_OVERVIEW_HANDOFF_ITEM_IDS.length,
     ACTIVITY_LIBRARY_PAGE_HANDOFF_ITEM_IDS.length,
-    ASSIGNMENT_LIST_PAGE_HANDOFF_ITEM_IDS.length,
     ACCOUNT_GOVERNANCE_LIFECYCLE_CHAIN_HANDOFF_ITEM_IDS.length,
     ACTIVE_SURFACE_PRODUCT_BOUNDARY_ITEM_IDS.length,
     PAYMENT_STATUS_HANDOFF_ITEM_IDS.length,
@@ -16947,7 +16898,7 @@ assert.deepEqual(
     SETTINGS_BILLING_WORKSPACE_HANDOFF_ITEM_IDS.length,
     SETTINGS_NOTIFICATION_UPDATE_HANDOFF_ITEM_IDS.length,
   ],
-  Array.from({ length: 12 }, () => 30),
+  Array.from({ length: 11 }, () => 30),
   'Teacher workspace operations chain should stay backed by focused dashboard, list, account governance, active surface, payment callback, and settings gates.'
 );
 assert.deepEqual(Object.fromEntries(teacherWorkspaceOperationsChainValues), {
@@ -20227,13 +20178,13 @@ assert.match(
 );
 assert.match(
   e2eTestCatalogText,
-  /scripts\/assignment-share-link-handoff-semantic-views\.test\.ts[\s\S]*assignment share-link\s+privacy-scope\s+boundaries/,
-  'E2E catalog should document the assignment share-link privacy-scope fast gate.'
+  /scripts\/assignment-share-link\.test\.ts[\s\S]*share-link privacy guards/,
+  'E2E catalog should document the assignment share-link fast gate.'
 );
 assert.match(
   e2eTestCatalogText,
-  /scripts\/assignment-lifecycle-handoff-semantic-views\.test\.ts[\s\S]*assignment lifecycle\s+privacy-scope\s+boundaries/,
-  'E2E catalog should document the assignment lifecycle privacy-scope fast gate.'
+  /scripts\/assignment-lifecycle-status-actions\.test\.ts[\s\S]*close\/reopen[\s\S]*close-window policy/,
+  'E2E catalog should document the assignment lifecycle fast gate.'
 );
 assert.match(
   e2eTestCatalogText,
@@ -25170,21 +25121,6 @@ assert.match(
   /export type AssignmentStatusTransitionErrorCode =[\s\S]*'already-closed'[\s\S]*'already-open'[\s\S]*'close-only-published'[\s\S]*'reopen-expired'[\s\S]*'reopen-only-closed'[\s\S]*'unsupported-transition'/,
   'Assignment lifecycle should expose stable status-transition error codes separately from localized messages.'
 );
-assert.match(
-  assignmentLifecycleSource,
-  /export const ASSIGNMENT_LIFECYCLE_HANDOFF_ITEM_IDS = \[(?=[\s\S]*'current-status')(?=[\s\S]*'source-status')(?=[\s\S]*'persisted-source')(?=[\s\S]*'student-access')(?=[\s\S]*'public-payload')(?=[\s\S]*'public-route-contract')(?=[\s\S]*'submission-gate')(?=[\s\S]*'teacher-list-state')(?=[\s\S]*'status-filter-alignment')(?=[\s\S]*'result-page-state')(?=[\s\S]*'close-action')(?=[\s\S]*'reopen-action')(?=[\s\S]*'copy-link-action')(?=[\s\S]*'preview-link-action')(?=[\s\S]*'close-transition')(?=[\s\S]*'reopen-transition')(?=[\s\S]*'close-window-policy')(?=[\s\S]*'draft-snapshot-gate')(?=[\s\S]*'snapshot-retention')(?=[\s\S]*'privacy-guard')[\s\S]*export type AssignmentLifecycleHandoffPrivacyContract = \{[\s\S]*exposesActivityContent: false;[\s\S]*exposesAnswerKeys: false;[\s\S]*exposesInternalAssignmentIds: false;[\s\S]*exposesPublicRouteUrl: false;[\s\S]*exposesPublicShareSlug: false;[\s\S]*exposesRawAnonymousToken: false;[\s\S]*exposesStudentAnswerText: false;[\s\S]*exposesStudentNames: false;[\s\S]*exposesTeacherNotes: false;[\s\S]*scope: 'assignment-lifecycle-state';/,
-  'Assignment lifecycle handoff should expose a typed 30-slice lifecycle contract with explicit privacy flags.'
-);
-assert.match(
-  assignmentLifecycleSource,
-  /export function buildAssignmentLifecycleHandoffView\(\{[\s\S]*currentStatus,[\s\S]*expiresAt,[\s\S]*isPersisted = true,[\s\S]*surface = 'shared'[\s\S]*const lifecycleStatus = getAssignmentLifecycleStatus\([\s\S]*const submissionErrorMessage = getAssignmentSubmissionErrorMessage\(\{[\s\S]*const statusAction = buildAssignmentStatusAction\(\{[\s\S]*const executionPlan = buildAssignmentStatusActionExecutionPlan\(\{[\s\S]*const closeTransitionError = getAssignmentStatusTransitionErrorView\(\{[\s\S]*const reopenTransitionError = getAssignmentStatusTransitionErrorView\(\{[\s\S]*privacy: buildAssignmentLifecycleHandoffPrivacyContract/,
-  'Assignment lifecycle handoff should compose status, submission gates, status actions, execution plans, and transition errors from shared lifecycle helpers.'
-);
-assert.match(
-  assignmentLifecycleSource,
-  /id: 'student-access'[\s\S]*id: 'public-payload'[\s\S]*id: 'public-route-contract'[\s\S]*id: 'submission-gate'[\s\S]*id: 'teacher-list-state'[\s\S]*id: 'status-filter-alignment'[\s\S]*id: 'result-page-state'[\s\S]*id: 'close-action'[\s\S]*id: 'reopen-action'[\s\S]*id: 'copy-link-action'[\s\S]*id: 'preview-link-action'[\s\S]*id: 'close-transition'[\s\S]*id: 'reopen-transition'[\s\S]*id: 'draft-snapshot-gate'[\s\S]*id: 'snapshot-retention'[\s\S]*id: 'closed-snapshot-retention'[\s\S]*id: 'attempt-review-retention'[\s\S]*id: 'server-transition-guard'/,
-  'Assignment lifecycle handoff should collect student access, teacher list, result page, transition, public-link, snapshot, and review-retention slices.'
-);
 assert.doesNotMatch(
   assignmentLifecycleSource,
   /AssignmentLifecycleHandoffView\['itemViews'\]|ReturnType<\s*typeof buildAssignmentLifecycleHandoffView>/,
@@ -25366,222 +25302,6 @@ assert.throws(
       status: 'draft',
     }),
   /This assignment has not been published for students yet\./
-);
-const openLifecycleHandoffView = buildAssignmentLifecycleHandoffView({
-  currentStatus: 'published',
-  expiresAt: new Date('2026-01-01T10:00:01.000Z'),
-  now: assignmentLifecycleNow,
-  surface: 'student-access',
-});
-const openLifecycleHandoffItemIds = openLifecycleHandoffView.itemViews.map(
-  (item) => item.id
-);
-assert.deepEqual(openLifecycleHandoffItemIds, [
-  ...ASSIGNMENT_LIFECYCLE_HANDOFF_ITEM_IDS,
-]);
-assert.equal(openLifecycleHandoffView.itemViews.length, 30);
-assert.deepEqual(openLifecycleHandoffView.privacy, {
-  exposesActivityContent: false,
-  exposesAnswerKeys: false,
-  exposesInternalAssignmentIds: false,
-  exposesPublicRouteUrl: false,
-  exposesPublicShareSlug: false,
-  exposesRawAnonymousToken: false,
-  exposesStudentAnswerText: false,
-  exposesStudentNames: false,
-  exposesTeacherNotes: false,
-  itemIds: openLifecycleHandoffItemIds,
-  scope: 'assignment-lifecycle-state',
-});
-assert.deepEqual(
-  openLifecycleHandoffView.itemViews.map((item) => [item.id, item.value]),
-  [
-    ['current-status', 'open'],
-    ['source-status', 'published'],
-    ['status-label', 'Open'],
-    ['persisted-source', 'Persisted'],
-    ['student-access', 'Available'],
-    ['public-payload', 'Available'],
-    ['public-route-contract', 'Available'],
-    ['submission-gate', 'Accepting submissions'],
-    ['teacher-list-state', 'Open'],
-    ['status-filter-alignment', 'open'],
-    ['result-page-state', 'Open'],
-    ['close-action', 'Ready'],
-    ['reopen-action', 'Not available'],
-    ['copy-link-action', 'Ready'],
-    ['preview-link-action', 'Ready'],
-    ['next-status', 'Closed'],
-    ['close-transition', 'Ready'],
-    ['reopen-transition', 'Assignment link is already open.'],
-    ['transition-error', 'None'],
-    ['execution-plan', 'update-status'],
-    ['expiry-check', 'Future close time'],
-    ['close-time', 'Scheduled'],
-    ['close-window-policy', 'Close window scheduled'],
-    ['draft-snapshot-gate', 'Snapshot frozen'],
-    ['snapshot-retention', 'Snapshot frozen'],
-    ['closed-snapshot-retention', 'Snapshot frozen'],
-    ['attempt-review-retention', 'Attempt review retained'],
-    ['server-transition-guard', 'Validated'],
-    ['owner-scope', 'Owner scoped'],
-    ['privacy-guard', 'Private data omitted'],
-  ]
-);
-assert.equal(
-  JSON.stringify(openLifecycleHandoffView).includes('SECRET_ASSIGNMENT_ID'),
-  false
-);
-const closedLifecycleHandoffView = buildAssignmentLifecycleHandoffView({
-  currentStatus: 'closed',
-  expiresAt: null,
-  now: assignmentLifecycleNow,
-  surface: 'teacher-list',
-});
-assert.equal(
-  closedLifecycleHandoffView.itemViews.find(
-    (item) => item.id === 'submission-gate'
-  )?.value,
-  'This assignment is closed.'
-);
-assert.equal(
-  closedLifecycleHandoffView.itemViews.find(
-    (item) => item.id === 'reopen-action'
-  )?.value,
-  'Ready'
-);
-assert.equal(
-  closedLifecycleHandoffView.itemViews.find(
-    (item) => item.id === 'public-route-contract'
-  )?.value,
-  'Blocked'
-);
-assert.equal(
-  closedLifecycleHandoffView.itemViews.find(
-    (item) => item.id === 'close-transition'
-  )?.value,
-  'Assignment link is already closed.'
-);
-assert.equal(
-  closedLifecycleHandoffView.itemViews.find(
-    (item) => item.id === 'reopen-transition'
-  )?.value,
-  'Ready'
-);
-assert.equal(
-  closedLifecycleHandoffView.itemViews.find(
-    (item) => item.id === 'closed-snapshot-retention'
-  )?.value,
-  'Results retained'
-);
-const expiredClosedLifecycleHandoffView = buildAssignmentLifecycleHandoffView({
-  currentStatus: 'closed',
-  expiresAt: new Date('2026-01-01T09:00:00.000Z'),
-  now: assignmentLifecycleNow,
-  surface: 'server-function',
-});
-assert.equal(
-  expiredClosedLifecycleHandoffView.itemViews.find(
-    (item) => item.id === 'reopen-action'
-  )?.value,
-  'Not available'
-);
-assert.equal(
-  expiredClosedLifecycleHandoffView.itemViews.find(
-    (item) => item.id === 'transition-error'
-  )?.value,
-  'Expired assignments cannot be reopened.'
-);
-assert.equal(
-  expiredClosedLifecycleHandoffView.itemViews.find(
-    (item) => item.id === 'reopen-transition'
-  )?.value,
-  'Expired assignments cannot be reopened.'
-);
-assert.equal(
-  expiredClosedLifecycleHandoffView.itemViews.find(
-    (item) => item.id === 'expiry-check'
-  )?.value,
-  'Expired close time'
-);
-assert.equal(
-  expiredClosedLifecycleHandoffView.itemViews.find(
-    (item) => item.id === 'close-window-policy'
-  )?.value,
-  'Close window expired'
-);
-const draftLifecycleHandoffView = buildAssignmentLifecycleHandoffView({
-  currentStatus: 'draft',
-  expiresAt: null,
-  now: assignmentLifecycleNow,
-  surface: 'result-page',
-});
-assert.equal(
-  draftLifecycleHandoffView.itemViews.find(
-    (item) => item.id === 'public-payload'
-  )?.value,
-  'Blocked'
-);
-assert.equal(
-  draftLifecycleHandoffView.itemViews.find(
-    (item) => item.id === 'public-route-contract'
-  )?.value,
-  'Blocked'
-);
-assert.equal(
-  draftLifecycleHandoffView.itemViews.find(
-    (item) => item.id === 'close-transition'
-  )?.value,
-  'Only published assignment links can be closed.'
-);
-assert.equal(
-  draftLifecycleHandoffView.itemViews.find(
-    (item) => item.id === 'reopen-transition'
-  )?.value,
-  'Only closed assignment links can be reopened.'
-);
-assert.equal(
-  draftLifecycleHandoffView.itemViews.find(
-    (item) => item.id === 'draft-snapshot-gate'
-  )?.value,
-  'Publish required'
-);
-assert.equal(
-  draftLifecycleHandoffView.itemViews.find(
-    (item) => item.id === 'snapshot-retention'
-  )?.value,
-  'Publish required'
-);
-const previewLifecycleHandoffView = buildAssignmentLifecycleHandoffView({
-  currentStatus: 'published',
-  expiresAt: new Date('2026-01-01T10:00:01.000Z'),
-  isPersisted: false,
-  now: assignmentLifecycleNow,
-  surface: 'teacher-list',
-});
-assert.equal(
-  previewLifecycleHandoffView.itemViews.find(
-    (item) => item.id === 'persisted-source'
-  )?.value,
-  'Preview'
-);
-assert.equal(
-  previewLifecycleHandoffView.itemViews.find(
-    (item) => item.id === 'public-route-contract'
-  )?.value,
-  'Blocked'
-);
-assert.equal(
-  previewLifecycleHandoffView.itemViews.find(
-    (item) => item.id === 'copy-link-action'
-  )?.value,
-  'Not available'
-);
-assert.equal(
-  previewLifecycleHandoffView.itemViews.find(
-    (item) => item.id === 'execution-plan'
-  )?.value,
-  'blocked'
 );
 assert.deepEqual(
   buildAssignmentStatusAction({
@@ -26435,121 +26155,6 @@ assert.deepEqual(
     to: Routes.Play,
   }
 );
-const assignmentShareLinkHandoffView = buildAssignmentShareLinkHandoffView(
-  buildAssignmentShareLinkActionView({
-    baseUrl: ' classgamify.test/dashboard ',
-    label: 'SECRET_SHARE_ACTION_LABEL',
-    shareSlug: '　class/１２３　',
-  }),
-  {
-    surface: 'publish-success',
-  }
-);
-const assignmentShareLinkHandoffItemIds =
-  assignmentShareLinkHandoffView.itemViews.map((item) => item.id);
-assert.deepEqual(assignmentShareLinkHandoffItemIds, [
-  ...ASSIGNMENT_SHARE_LINK_HANDOFF_ITEM_IDS,
-]);
-assert.equal(assignmentShareLinkHandoffView.itemViews.length, 30);
-assert.deepEqual(assignmentShareLinkHandoffView.privacy, {
-  exposesActivityContent: false,
-  exposesAnswerKeys: false,
-  exposesClipboardPrivateData: false,
-  exposesInternalAssignmentIds: false,
-  exposesInternalBaseUrlConfig: false,
-  exposesRawAnonymousToken: false,
-  exposesSourceMaterialStorageKeys: false,
-  exposesStudentAnswerText: false,
-  exposesStudentNames: false,
-  exposesTeacherNotes: false,
-  itemIds: assignmentShareLinkHandoffItemIds,
-  scope: 'assignment-share-link-distribution',
-  shareUrlIsPublicDeliveryLink: true,
-});
-assert.deepEqual(
-  assignmentShareLinkHandoffView.itemViews.map((item) => [
-    item.id,
-    item.value,
-  ]),
-  [
-    ['route-target', '/play/$shareId'],
-    ['normalized-share-slug', 'Resolved'],
-    ['normalized-slug-component', 'class/123'],
-    ['encoded-share-path', '/play/class%2F123'],
-    ['encoded-route-param', 'class%2F123'],
-    ['absolute-share-url', 'https://classgamify.test/play/class%2F123'],
-    ['base-url-origin', 'https://classgamify.test'],
-    ['route-param', 'shareId'],
-    ['preview-route-params', 'shareId=class%2F123'],
-    ['path-label', 'Student link'],
-    ['url-label', 'Full student link'],
-    ['public-delivery-contract', 'Public delivery link'],
-    ['availability', 'Available'],
-    ['lifecycle-guard', 'Open'],
-    ['disabled-reason', 'None'],
-    ['copy-disabled-gate', 'Enabled'],
-    ['copy-action', 'Enabled'],
-    ['clipboard-payload', 'https://classgamify.test/play/class%2F123'],
-    ['copy-execution-plan', 'copy-link'],
-    ['copy-feedback', 'Student link copied.'],
-    ['preview-disabled-gate', 'Enabled'],
-    ['preview-action', 'Enabled'],
-    ['student-runner-target', '/play/$shareId'],
-    ['path-encoding-guard', 'Passed'],
-    ['publish-success-surface', 'Active'],
-    ['assignment-list-surface', 'Compatible'],
-    ['result-page-surface', 'Compatible'],
-    ['surface-consistency', 'Consistent'],
-    ['missing-slug-guard', 'Passed'],
-    ['privacy-guard', 'Private data omitted'],
-  ]
-);
-assert.equal(
-  JSON.stringify(assignmentShareLinkHandoffView).includes(
-    'SECRET_SHARE_ACTION_LABEL'
-  ),
-  false
-);
-const missingShareLinkHandoffView = buildAssignmentShareLinkHandoffView(
-  buildAssignmentShareLinkActionView({
-    disabledReasonCode: 'missing-share-slug',
-    label: 'Student link unavailable',
-    shareSlug: '   ',
-  }),
-  {
-    surface: 'assignment-list',
-  }
-);
-assert.equal(
-  missingShareLinkHandoffView.itemViews.find(
-    (item) => item.id === 'normalized-share-slug'
-  )?.value,
-  'Missing'
-);
-assert.equal(
-  missingShareLinkHandoffView.itemViews.find(
-    (item) => item.id === 'missing-slug-guard'
-  )?.value,
-  'Blocked'
-);
-assert.equal(
-  missingShareLinkHandoffView.itemViews.find(
-    (item) => item.id === 'copy-execution-plan'
-  )?.value,
-  'blocked'
-);
-assert.equal(
-  missingShareLinkHandoffView.itemViews.find(
-    (item) => item.id === 'clipboard-payload'
-  )?.value,
-  'Blocked'
-);
-assert.equal(
-  missingShareLinkHandoffView.itemViews.find(
-    (item) => item.id === 'preview-route-params'
-  )?.value,
-  'shareId=Missing'
-);
 assert.deepEqual(
   buildAssignmentShareLinkCopyExecutionPlan({
     baseUrl: 'https://classgamify.test',
@@ -27210,78 +26815,6 @@ assert.deepEqual(
     ],
     validation: { ok: true },
   }
-);
-const assignmentPublishHandoffItemIds =
-  assignmentPublishDialogViewModel.handoffView.itemViews.map((item) => item.id);
-assert.deepEqual(assignmentPublishHandoffItemIds, [
-  ...ASSIGNMENT_PUBLISH_HANDOFF_ITEM_IDS,
-]);
-assert.equal(assignmentPublishDialogViewModel.handoffView.itemViews.length, 30);
-assert.deepEqual(assignmentPublishDialogViewModel.handoffView.privacy, {
-  exposesActivityContent: false,
-  exposesAnswerKeys: false,
-  exposesAssignmentTitle: false,
-  exposesInternalActivityIds: false,
-  exposesPublicRuntimeContent: false,
-  exposesRawSettingsJson: false,
-  exposesShareSlug: false,
-  exposesSourceMaterialStorageKeys: false,
-  exposesStudentAnswerText: false,
-  exposesStudentInstructions: false,
-  exposesStudentNames: false,
-  exposesTeacherNotes: false,
-  itemIds: assignmentPublishHandoffItemIds,
-  scope: 'assignment-publish-preflight-boundary',
-});
-assert.deepEqual(
-  assignmentPublishDialogViewModel.handoffView.itemViews.map((item) => [
-    item.id,
-    item.value,
-  ]),
-  [
-    ['publish-access', 'Available'],
-    ['activity-lifecycle-gate', 'Available'],
-    ['publish-action', 'Enabled'],
-    ['publish-disabled', 'Enabled'],
-    ['validation-status', 'Ready to publish'],
-    ['validation-message', 'No validation blocker'],
-    ['title-field', 'Provided'],
-    ['draft-field-count', '8 draft fields'],
-    ['field-limit-boundary', 'Limits enforced'],
-    ['frozen-link-status', 'Ready to publish'],
-    ['delivery-rule-count', '6 rules'],
-    ['settings-summary-status', 'Timer and close time'],
-    ['student-instructions', 'Added'],
-    ['timer-status', 'Enabled'],
-    ['close-time-status', 'Scheduled'],
-    ['review-checklist-count', '3 checks'],
-    ['delivery-defaults', 'Resolved settings'],
-    ['attempts-policy', '3 max'],
-    ['attempt-limit-parser', 'Limited'],
-    ['identity-policy', 'Anonymous'],
-    ['answer-reveal-policy', 'Hidden'],
-    ['item-order-policy', 'Fixed order'],
-    ['timer-parser', '15 min'],
-    ['settings-json', '6 setting fields'],
-    ['close-time-parser', 'Scheduled'],
-    ['snapshot-freeze', 'Ready to publish'],
-    ['student-link-rules', 'Ready to publish'],
-    ['public-payload-boundary', 'Student payload safe'],
-    ['results-policy', 'Ready to publish'],
-    ['privacy-guard', 'Private data omitted'],
-  ]
-);
-assert.equal(
-  JSON.stringify(assignmentPublishDialogViewModel.handoffView).includes(
-    'Week 1 review'
-  ),
-  false
-);
-assert.equal(
-  JSON.stringify(assignmentPublishDialogViewModel.handoffView).includes(
-    'Finish before class.'
-  ),
-  false
 );
 assert.deepEqual(
   {
@@ -37304,9 +36837,8 @@ assert.deepEqual(
     ACTIVITY_TEMPLATE_REMIX_HANDOFF_ITEM_IDS.length,
     ACTIVITY_AUTHORING_LIBRARY_CHAIN_HANDOFF_ITEM_IDS.length,
     ACTIVITY_AUTHORING_LIBRARY_CHAIN_SOURCE_FILES.length,
-    ASSIGNMENT_PUBLISH_HANDOFF_ITEM_IDS.length,
   ],
-  Array.from({ length: 7 }, () => 30),
+  Array.from({ length: 6 }, () => 30),
   'Activity lifecycle governance chain should stay backed by lifecycle, library, duplicate, remix, authoring, and publish gates.'
 );
 assert.deepEqual(Object.fromEntries(activityLifecycleGovernanceChainValues), {
@@ -37325,7 +36857,7 @@ assert.deepEqual(Object.fromEntries(activityLifecycleGovernanceChainValues), {
   'library-status-parser': 'active/archived',
   'library-status-summary': 'Full filtered result',
   'lifecycle-domain-source': 'activities/lifecycle',
-  'assignment-publish-handoff-boundary': '30 assignment publish slices',
+  'assignment-publish-handoff-boundary': 'Visible publish dialog',
   'product-archive-policy': 'Restore before derive',
   'public-assignment-continuity': 'Existing links unchanged',
   'publish-access-gate': 'Archived blocked',
@@ -38257,10 +37789,6 @@ const assignmentListCardComponentSource = readFileSync(
   'src/components/assignments/assignment-list-card.tsx',
   'utf8'
 );
-const assignmentShareLinkHandoffComponentSource = readFileSync(
-  'src/components/assignments/assignment-share-link-handoff.tsx',
-  'utf8'
-);
 const assignmentListStatsComponentSource = readFileSync(
   'src/components/assignments/assignment-list-stats.tsx',
   'utf8'
@@ -38728,7 +38256,7 @@ assert.doesNotMatch(
   getSourceSlice(
     assignmentListViewSource,
     'const summaryMetrics = buildAssignmentListSummaryMetrics',
-    'const searchPanelView = buildAssignmentListSearchPanelView'
+    'const filterScopeBoundary = buildAssignmentListFilterScopeBoundary'
   ),
   /starterPreview|getStarterAssignments|getStarterAssignment|getStarterActivity/,
   'Assignment list summary metrics should not count starter-preview assignments.'
@@ -38737,57 +38265,6 @@ assert.match(
   assignmentListViewSource,
   /export type AssignmentListFilterScopeBoundary = \{[\s\S]*fullFilteredAssignmentCount: number;[\s\S]*keepsDistributionStepsPrepared: true;[\s\S]*keepsVisiblePageCountsSeparate: true;[\s\S]*overviewAssignmentCount: number;[\s\S]*publishedShareContextStatus:[\s\S]*scope: 'owner-assignment-list-filter-scope';[\s\S]*searchMatchesAssignmentTitle: true;[\s\S]*searchMatchesShareSlug: true;[\s\S]*searchMatchesSourceActivityText: true;[\s\S]*usesFullFilteredSummaryForOverview: true;[\s\S]*visiblePageAssignmentCount: number;[\s\S]*export type AssignmentListSearchPanelView/,
   'Assignment list page view-model should expose a typed owner-scoped filter boundary for overview, visible-page, search, and distribution scope.'
-);
-assert.match(
-  assignmentListViewSource,
-  /export const ASSIGNMENT_LIST_PAGE_HANDOFF_ITEM_IDS = \[[\s\S]*'owner-scope'[\s\S]*'summary-total'[\s\S]*'scope-range'[\s\S]*'status-open'[\s\S]*'published-share-context'[\s\S]*'distribution-copy-link'[\s\S]*'distribution-review-results'[\s\S]*\] as const;[\s\S]*export type AssignmentListPageHandoffItemId =[\s\S]*typeof ASSIGNMENT_LIST_PAGE_HANDOFF_ITEM_IDS[\s\S]*export type AssignmentListPageHandoffPrivacyView = \{[\s\S]*broadensBeyondOwner: false;[\s\S]*countsStarterPreviewAsOwned: false;[\s\S]*exposesRawAnonymousToken: false;[\s\S]*exposesStudentAnswerText: false;[\s\S]*itemIds: AssignmentListPageHandoffItemId\[\];[\s\S]*keepsVisiblePageCountsSeparate: true;[\s\S]*searchMatchesAssignmentTitle: true;[\s\S]*searchMatchesShareSlug: true;[\s\S]*searchMatchesSourceActivityText: true;[\s\S]*scope: 'owner-assignment-list-filter-scope';[\s\S]*usesOwnerScopedStatusFilters: true;[\s\S]*export type AssignmentListPageHandoffView = \{/,
-  'Assignment list page handoff should derive its typed owner-scoped distribution contract from a stable 30-slice id list with explicit privacy flags.'
-);
-assert.deepEqual(
-  [...ASSIGNMENT_LIST_PAGE_HANDOFF_ITEM_IDS],
-  [
-    'owner-scope',
-    'summary-total',
-    'summary-open',
-    'summary-completions',
-    'summary-average',
-    'scope-range',
-    'scope-page',
-    'scope-status',
-    'scope-search',
-    'status-open',
-    'status-closed',
-    'status-expired',
-    'status-draft',
-    'filter-summary',
-    'visible-page-items',
-    'visible-open-links',
-    'visible-closed-links',
-    'visible-expired-links',
-    'visible-draft-assignments',
-    'visible-copy-ready',
-    'visible-copy-blocked',
-    'visible-preview-ready',
-    'visible-print-ready',
-    'visible-results-ready',
-    'visible-result-evidence',
-    'pagination',
-    'published-share-context',
-    'distribution-copy-link',
-    'distribution-preview-link',
-    'distribution-review-results',
-  ],
-  'Assignment list handoff should expose exactly 30 stable slice ids.'
-);
-assert.match(
-  assignmentListViewSource,
-  /const candidateItemViews: AssignmentListPageHandoffItemView\[\] = \[[\s\S]*const itemViewById = new Map[\s\S]*ASSIGNMENT_LIST_PAGE_HANDOFF_ITEM_IDS\.map\(\(id\) =>[\s\S]*Missing assignment list handoff item/,
-  'Assignment list handoff should order runtime item views through the stable id list and fail on missing slices.'
-);
-assert.match(
-  assignmentListViewSource,
-  /handoffView: buildAssignmentListPageHandoffView\(\{[\s\S]*assignments,[\s\S]*publishedPanelContext,[\s\S]*scopeView,[\s\S]*searchPanelView,[\s\S]*summaryMetrics,[\s\S]*visibleCount: assignments\.length/,
-  'Assignment list page view-model should compose the handoff view from prepared assignment-domain page, filter, summary, and distribution views.'
 );
 assert.match(
   dashboardAssignmentsRouteSource,
@@ -38812,16 +38289,6 @@ assert.doesNotMatch(
 );
 assert.match(
   dashboardAssignmentsRouteSource,
-  /<AssignmentListPageHandoff[\s\S]*handoffView=\{activePageView\.handoffView\}[\s\S]*\/>/,
-  'Assignment dashboard route should render the prepared assignment-list page handoff from the page view-model.'
-);
-assert.match(
-  dashboardAssignmentsRouteSource,
-  /function AssignmentListPageHandoff[\s\S]*data-handoff="assignment-list"[\s\S]*data-handoff-scope=\{handoffView\.privacy\.scope\}[\s\S]*handoffView\.itemViews\.map\(\(item\) =>[\s\S]*AssignmentListPageHandoffItem[\s\S]*function AssignmentListPageHandoffItem[\s\S]*const labelId = `assignment-list-handoff-\$\{item\.id\}-label`[\s\S]*const valueId = `assignment-list-handoff-\$\{item\.id\}-value`[\s\S]*const descriptionId = `assignment-list-handoff-\$\{item\.id\}-description`[\s\S]*data-handoff-item=\{item\.id\}[\s\S]*id=\{labelId\}[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*aria-label=\{item\.ariaLabel\}[\s\S]*aria-labelledby=\{`\$\{labelId\} \$\{valueId\}`\}[\s\S]*id=\{valueId\}[\s\S]*id=\{descriptionId\}/,
-  'Assignment dashboard route should expose the page handoff marker and stable assignment-list item outputs.'
-);
-assert.match(
-  dashboardAssignmentsRouteSource,
   /AssignmentListCard/,
   'Assignment dashboard route should delegate assignment card rendering to the assignment list card component.'
 );
@@ -38839,16 +38306,6 @@ assert.match(
   assignmentListFiltersComponentSource,
   /buildAssignmentListSearchPanelView/,
   'Assignment list filters component should render filter summary and status options from the assignment-domain search panel view.'
-);
-assert.match(
-  assignmentListViewSource,
-  /export const ASSIGNMENT_LIST_FILTER_HANDOFF_ITEM_IDS = \[[\s\S]*'route-validate-search'[\s\S]*'published-context-preservation'[\s\S]*'search-normalized-query'[\s\S]*'status-published-alias'[\s\S]*'list-api-owner-scope'[\s\S]*'full-summary-filter-result'[\s\S]*'privacy-guard'[\s\S]*\] as const;[\s\S]*export type AssignmentListFilterHandoffPrivacyView = \{[\s\S]*preservesPublishedContext: true;[\s\S]*resetsPageOnFilterChange: true;[\s\S]*routesThroughValidatedSearch: true;[\s\S]*scope: 'owner-assignment-list-filter-state';[\s\S]*usesFullFilteredSummaryForOverview: true;/,
-  'Assignment list filter-state handoff should expose a stable 30-slice owner-scoped filter contract with privacy flags.'
-);
-assert.match(
-  assignmentListFiltersComponentSource,
-  /data-handoff="assignment-list-filter-state"[\s\S]*data-handoff-scope=\{handoffView\.privacy\.scope\}[\s\S]*handoffView\.itemViews\.map\(\(item\) =>[\s\S]*AssignmentListFilterHandoffItem[\s\S]*const labelId = `assignment-list-filter-state-\$\{item\.id\}-label`[\s\S]*const valueId = `assignment-list-filter-state-\$\{item\.id\}-value`[\s\S]*const descriptionId = `assignment-list-filter-state-\$\{item\.id\}-description`[\s\S]*data-handoff-item=\{item\.id\}/,
-  'Assignment list filters component should expose the hidden filter-state marker and stable item label/value/description ids.'
 );
 assert.match(
   dashboardAssignmentsRouteSource,
@@ -38922,11 +38379,6 @@ assert.match(
 );
 assert.match(
   assignmentListViewSource,
-  /AssignmentLifecycleHandoffView[\s\S]*export type AssignmentListCardViewModel = \{[\s\S]*lifecycleHandoffView: AssignmentLifecycleHandoffView;[\s\S]*lifecycleHandoffView: buildAssignmentLifecycleHandoffView\(\{[\s\S]*currentStatus: assignment\.status,[\s\S]*expiresAt: assignment\.expiresAt,[\s\S]*isPersisted: persisted,[\s\S]*surface: 'teacher-list'/,
-  'Assignment list card view-model should expose a prepared assignment lifecycle handoff from the domain layer.'
-);
-assert.match(
-  assignmentListViewSource,
   /export type AssignmentListCardStats = \{[\s\S]*averageScore: number;[\s\S]*completions: number;[\s\S]*export type AssignmentListCardActivitySource = \{[\s\S]*export type AssignmentListCardAssignmentSource = \{[\s\S]*export type AssignmentListCardSnapshotSource = \{[\s\S]*export type AssignmentListCardSource = \{/,
   'Assignment list card inputs should expose explicit stats, activity, assignment, snapshot, and source contracts.'
 );
@@ -38984,16 +38436,6 @@ assert.match(
   assignmentListCardComponentSource,
   /function AssignmentListCardSummary[\s\S]*idPrefix: string[\s\S]*<section[\s\S]*aria-label=\{assignment\.summaryLabel\}[\s\S]*AssignmentListDistribution[\s\S]*idPrefix=\{idPrefix\}[\s\S]*view=\{assignment\.distributionView\}[\s\S]*AssignmentSettingsSummary[\s\S]*AssignmentListStats[\s\S]*idPrefix=\{idPrefix\}/,
   'Assignment list card summary should expose the prepared summary-region label and render distribution, settings, and stats views with stable per-card ids.'
-);
-assert.match(
-  assignmentListCardComponentSource,
-  /AssignmentListLifecycleHandoff[\s\S]*handoff=\{assignment\.lifecycleHandoffView\}[\s\S]*function AssignmentListLifecycleHandoff\([\s\S]*handoff: AssignmentLifecycleHandoffView[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*aria-labelledby=\{titleId\}[\s\S]*data-handoff="assignment-lifecycle"[\s\S]*data-handoff-scope=\{handoff\.privacy\.scope\}[\s\S]*handoff\.title[\s\S]*handoff\.description[\s\S]*handoff\.itemViews\.map[\s\S]*AssignmentListLifecycleHandoffItem[\s\S]*function AssignmentListLifecycleHandoffItem[\s\S]*item: AssignmentLifecycleHandoffItemView[\s\S]*const labelId = `assignment-lifecycle-handoff-\$\{item\.id\}-label`[\s\S]*const valueId = `assignment-lifecycle-handoff-\$\{item\.id\}-value`[\s\S]*const descriptionId = `assignment-lifecycle-handoff-\$\{item\.id\}-description`[\s\S]*data-handoff-item=\{item\.id\}[\s\S]*id=\{labelId\}[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*aria-label=\{item\.ariaLabel\}[\s\S]*aria-labelledby=\{`\$\{labelId\} \$\{valueId\}`\}[\s\S]*id=\{valueId\}[\s\S]*id=\{descriptionId\}/,
-  'Assignment list card component should render the prepared assignment lifecycle privacy scope as stable hidden semantic output.'
-);
-assert.match(
-  assignmentShareLinkHandoffComponentSource,
-  /AssignmentShareLinkHandoffView[\s\S]*useId[\s\S]*export function AssignmentShareLinkHandoff[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*aria-labelledby=\{titleId\}[\s\S]*data-handoff="assignment-share-link"[\s\S]*data-handoff-scope=\{handoff\.privacy\.scope\}[\s\S]*handoff\.title[\s\S]*handoff\.description[\s\S]*handoff\.itemViews\.map\(\(item\) => \([\s\S]*AssignmentShareLinkHandoffItem[\s\S]*item=\{item\}[\s\S]*key=\{item\.id\}[\s\S]*function AssignmentShareLinkHandoffItem[\s\S]*item: AssignmentShareLinkHandoffItemView[\s\S]*const labelId = `assignment-share-link-handoff-\$\{item\.id\}-label`[\s\S]*const valueId = `assignment-share-link-handoff-\$\{item\.id\}-value`[\s\S]*const descriptionId = `assignment-share-link-handoff-\$\{item\.id\}-description`[\s\S]*data-handoff-item=\{item\.id\}[\s\S]*id=\{labelId\}[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*aria-label=\{item\.ariaLabel\}[\s\S]*aria-labelledby=\{`\$\{labelId\} \$\{valueId\}`\}[\s\S]*id=\{valueId\}[\s\S]*id=\{descriptionId\}/,
-  'Assignment share-link handoff component should render prepared share-link privacy scope and item views as stable hidden semantic output.'
 );
 assert.match(
   assignmentListCardComponentSource,
@@ -39119,11 +38561,6 @@ assert.match(
   assignmentListCardComponentSource,
   /function AssignmentListShareActions[\s\S]*AssignmentListSharePreviewAction[\s\S]*CopyAssignmentShareLinkButton[\s\S]*disabled=\{!action\.isAvailable\}[\s\S]*disabledReasonCode=\{action\.disabledReasonCode\}[\s\S]*disabledMessage=\{action\.disabledReason\}[\s\S]*AssignmentListShareDisabledReason/,
   'Assignment list share actions should render prepared student-link availability, copy-disabled state, disabled reason code, and disabled reason text.'
-);
-assert.match(
-  assignmentListCardComponentSource,
-  /function AssignmentListShareActions[\s\S]*const handoffView = buildAssignmentShareLinkHandoffView\(action, \{[\s\S]*surface: 'assignment-list'[\s\S]*<AssignmentShareLinkHandoff handoff=\{handoffView\} \/>/,
-  'Assignment list share actions should expose the prepared assignment share-link handoff for the assignment-list surface.'
 );
 assert.match(
   assignmentListCardComponentSource,
@@ -39351,11 +38788,6 @@ assert.match(
   publishedAssignmentPanelComponentSource,
   /function PublishedAssignmentShareActions[\s\S]*PublishedAssignmentSharePreviewAction[\s\S]*CopyAssignmentShareLinkButton[\s\S]*disabled=\{!action\.isAvailable\}[\s\S]*disabledReasonCode=\{action\.disabledReasonCode\}[\s\S]*disabledMessage=\{action\.disabledReason\}[\s\S]*label=\{action\.copyLabel\}[\s\S]*shareSlug=\{action\.shareSlug\}[\s\S]*PublishedAssignmentShareDisabledReason[\s\S]*function PublishedAssignmentDismissActionButton[\s\S]*action\.label/,
   'Published assignment share and dismiss actions should render prepared share data, disabled state, copy labels, and copy-link behavior.'
-);
-assert.match(
-  publishedAssignmentPanelComponentSource,
-  /function PublishedAssignmentShareActions[\s\S]*const handoffView = buildAssignmentShareLinkHandoffView\(action, \{[\s\S]*surface: 'publish-success'[\s\S]*<AssignmentShareLinkHandoff handoff=\{handoffView\} \/>/,
-  'Published assignment share actions should expose the prepared assignment share-link handoff for the publish-success surface.'
 );
 assert.doesNotMatch(
   publishedAssignmentPanelComponentSource,
@@ -46160,8 +45592,6 @@ assert.deepEqual(ASSIGNMENT_LIST_INPUT_LIMITS, {
   searchMaxLength: 120,
 });
 assert.equal(ASSIGNMENT_LIST_PAGE_SIZE, 12);
-assert.equal(ASSIGNMENT_LIST_FILTER_HANDOFF_ITEM_IDS.length, 30);
-assert.equal(new Set(ASSIGNMENT_LIST_FILTER_HANDOFF_ITEM_IDS).size, 30);
 assert.equal(getAssignmentListOffset({ pageIndex: 2, pageSize: 25 }), 50);
 assert.equal(getAssignmentListOffset({ pageIndex: -1, pageSize: 25 }), 0);
 assert.equal(getAssignmentListOffset({ pageIndex: 2, pageSize: 0 }), 24);
@@ -46390,10 +45820,7 @@ assert.deepEqual(
   }),
   { hasFilters: true, text: '0 matches' }
 );
-const {
-  filterHandoffView: assignmentListFilterHandoffView,
-  ...assignmentListSearchPanelView
-} = buildAssignmentListSearchPanelView({
+const assignmentListSearchPanelView = buildAssignmentListSearchPanelView({
   isLoading: false,
   search: ' week ',
   status: 'open',
@@ -46451,22 +45878,7 @@ assert.deepEqual(
     statusOptions: assignmentStatusFilterOptions,
   }
 );
-assert.deepEqual(
-  assignmentListFilterHandoffView.itemViews.map((item) => item.id),
-  [...ASSIGNMENT_LIST_FILTER_HANDOFF_ITEM_IDS]
-);
-assert.equal(
-  assignmentListFilterHandoffView.privacy.scope,
-  'owner-assignment-list-filter-state'
-);
-assert.equal(
-  assignmentListFilterHandoffView.privacy.usesFullFilteredSummaryForOverview,
-  true
-);
-const {
-  filterHandoffView: defaultAssignmentListFilterHandoffView,
-  ...defaultAssignmentListSearchPanelView
-} = buildAssignmentListSearchPanelView({
+const defaultAssignmentListSearchPanelView = buildAssignmentListSearchPanelView({
   isLoading: true,
   search: '',
   status: 'all',
@@ -46517,14 +45929,6 @@ assert.deepEqual(
     ],
     statusOptions: assignmentStatusFilterOptions,
   }
-);
-assert.deepEqual(
-  defaultAssignmentListFilterHandoffView.itemViews.map((item) => item.id),
-  [...ASSIGNMENT_LIST_FILTER_HANDOFF_ITEM_IDS]
-);
-assert.equal(
-  defaultAssignmentListFilterHandoffView.privacy.routesThroughValidatedSearch,
-  true
 );
 assert.equal(
   buildAssignmentListSearchPanelView({
@@ -47621,38 +47025,6 @@ assert.deepEqual(
     totalPages: 3,
   }
 );
-const filteredAssignmentListHandoffValues = new Map(
-  filteredAssignmentListPageView.handoffView.itemViews.map((item) => [
-    item.id,
-    item.value,
-  ])
-);
-assert.deepEqual(
-  filteredAssignmentListPageView.handoffView.itemViews.map((item) => item.id),
-  [...ASSIGNMENT_LIST_PAGE_HANDOFF_ITEM_IDS],
-  'Assignment list page view-model should expose the stable 30-slice handoff order.'
-);
-assert.deepEqual(filteredAssignmentListPageView.handoffView.privacy, {
-  broadensBeyondOwner: false,
-  countsStarterPreviewAsOwned: false,
-  exposesInternalAssignmentIds: false,
-  exposesInternalOwnerId: false,
-  exposesPublicRuntimeContent: false,
-  exposesRawAnonymousToken: false,
-  exposesResultExportRows: false,
-  exposesSourceMaterialStorageKeys: false,
-  exposesStudentAnswerText: false,
-  exposesTeacherOnlyAnswers: false,
-  itemIds: [...ASSIGNMENT_LIST_PAGE_HANDOFF_ITEM_IDS],
-  keepsDistributionStepsPrepared: true,
-  keepsVisiblePageCountsSeparate: true,
-  searchMatchesAssignmentTitle: true,
-  searchMatchesShareSlug: true,
-  searchMatchesSourceActivityText: true,
-  scope: 'owner-assignment-list-filter-scope',
-  usesFullFilteredSummaryForOverview: true,
-  usesOwnerScopedStatusFilters: true,
-});
 assert.deepEqual(
   buildAssignmentListFilterScopeBoundary({
     statusFilter: 'closed',
@@ -47676,103 +47048,6 @@ assert.deepEqual(
     visiblePageAssignmentCount: 0,
   }
 );
-assert.equal(filteredAssignmentListHandoffValues.get('summary-total'), '1');
-assert.equal(filteredAssignmentListHandoffValues.get('summary-open'), '1');
-assert.equal(
-  filteredAssignmentListHandoffValues.get('summary-completions'),
-  '9'
-);
-assert.equal(
-  filteredAssignmentListHandoffValues.get('summary-average'),
-  '76%'
-);
-assert.equal(
-  filteredAssignmentListHandoffValues.get('scope-range'),
-  '25-25 of 31'
-);
-assert.equal(
-  filteredAssignmentListHandoffValues.get('scope-page'),
-  'Page 3 of 3'
-);
-assert.equal(filteredAssignmentListHandoffValues.get('scope-status'), 'Open');
-assert.equal(
-  filteredAssignmentListHandoffValues.get('scope-search'),
-  'Week 1'
-);
-assert.equal(filteredAssignmentListHandoffValues.get('status-open'), '1');
-assert.equal(filteredAssignmentListHandoffValues.get('status-closed'), '0');
-assert.equal(filteredAssignmentListHandoffValues.get('status-expired'), '0');
-assert.equal(filteredAssignmentListHandoffValues.get('status-draft'), '0');
-assert.equal(
-  filteredAssignmentListHandoffValues.get('filter-summary'),
-  '31 matches'
-);
-assert.equal(
-  filteredAssignmentListHandoffValues.get('visible-page-items'),
-  '1 visible assignments'
-);
-assert.equal(
-  filteredAssignmentListHandoffValues.get('visible-open-links'),
-  '1 visible assignments'
-);
-assert.equal(
-  filteredAssignmentListHandoffValues.get('visible-copy-ready'),
-  '1 visible assignments'
-);
-assert.equal(
-  filteredAssignmentListHandoffValues.get('visible-copy-blocked'),
-  '0 visible assignments'
-);
-assert.equal(
-  filteredAssignmentListHandoffValues.get('visible-preview-ready'),
-  '1 visible assignments'
-);
-assert.equal(
-  filteredAssignmentListHandoffValues.get('visible-print-ready'),
-  '1 visible assignments'
-);
-assert.equal(
-  filteredAssignmentListHandoffValues.get('visible-results-ready'),
-  '1 visible assignments'
-);
-assert.equal(
-  filteredAssignmentListHandoffValues.get('visible-result-evidence'),
-  '1 visible assignments'
-);
-assert.equal(
-  filteredAssignmentListHandoffValues.get('pagination'),
-  'Page 3 of 3; 31 teacher assignments'
-);
-assert.equal(
-  filteredAssignmentListHandoffValues.get('published-share-context'),
-  'Ready: /play/share-1'
-);
-assert.equal(
-  filteredAssignmentListHandoffValues.get('distribution-copy-link'),
-  'Ready now'
-);
-assert.equal(
-  filteredAssignmentListHandoffValues.get('distribution-preview-link'),
-  'Ready now'
-);
-assert.equal(
-  filteredAssignmentListHandoffValues.get('distribution-review-results'),
-  'After submissions'
-);
-for (const privateAssignmentListValue of [
-  'persisted-assignment-1',
-  'raw-anonymous-token',
-  'private/source/storage-key',
-  'SECRET_STUDENT_ANSWER',
-]) {
-  assert.equal(
-    JSON.stringify(filteredAssignmentListPageView.handoffView).includes(
-      privateAssignmentListValue
-    ),
-    false,
-    `Assignment list handoff leaked private text: ${privateAssignmentListValue}`
-  );
-}
 assert.deepEqual(
   buildAssignmentListCardStats({
     averageScore: 83,
@@ -48039,13 +47314,6 @@ assert.deepEqual(
       title: 'Distribution status',
     },
     id: 'persisted-assignment-1',
-    lifecycleHandoffView: buildAssignmentLifecycleHandoffView({
-      currentStatus: 'published',
-      expiresAt: new Date('2026-02-01T00:00:00.000Z'),
-      isPersisted: true,
-      now: new Date('2026-01-15T00:00:00.000Z').getTime(),
-      surface: 'teacher-list',
-    }),
     persisted: true,
     settingsSummaryView: buildAssignmentSettingsSummaryView({
       expiresAt: new Date('2026-02-01T00:00:00.000Z'),
@@ -48208,12 +47476,6 @@ assert.deepEqual(
       title: 'Distribution status',
     },
     id: 'assignment-food-demo',
-    lifecycleHandoffView: buildAssignmentLifecycleHandoffView({
-      currentStatus: 'published',
-      expiresAt: null,
-      isPersisted: false,
-      surface: 'teacher-list',
-    }),
     persisted: false,
     settingsSummaryView: buildAssignmentSettingsSummaryView({
       expiresAt: null,

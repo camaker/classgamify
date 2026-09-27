@@ -9,8 +9,6 @@ import {
 } from '@/assignments/list-filters';
 import {
   assignmentListActionCopy,
-  type AssignmentListPageHandoffItemView,
-  type AssignmentListPageHandoffView,
   buildAssignmentListCardViewModel,
   buildAssignmentListRouteState,
   buildStarterAssignmentListCardViewModel,
@@ -34,7 +32,7 @@ import {
   useMatchRoute,
   useNavigate,
 } from '@tanstack/react-router';
-import { useEffect, useId, useMemo } from 'react';
+import { useEffect, useMemo } from 'react';
 
 export const Route = createFileRoute('/dashboard/assignments')({
   validateSearch: buildAssignmentListValidatedSearch,
@@ -153,8 +151,6 @@ function DashboardAssignmentsPage() {
       description={activePageView.description}
     >
       <div className="grid gap-6">
-        <AssignmentListPageHandoff handoffView={activePageView.handoffView} />
-
         <section className="grid grid-cols-2 gap-x-8 gap-y-5 sm:flex sm:flex-wrap sm:gap-x-12">
           {activePageView.summaryMetrics.map((metric) => (
             <AssignmentListSummaryCard key={metric.id} metric={metric} />
@@ -283,59 +279,5 @@ function DashboardAssignmentsPage() {
         ) : null}
       </div>
     </DashboardLayout>
-  );
-}
-
-function AssignmentListPageHandoff({
-  handoffView,
-}: {
-  handoffView: AssignmentListPageHandoffView;
-}) {
-  const titleId = useId();
-  const descriptionId = useId();
-
-  return (
-    <section
-      aria-describedby={descriptionId}
-      aria-labelledby={titleId}
-      className="sr-only"
-      data-handoff="assignment-list"
-      data-handoff-scope={handoffView.privacy.scope}
-    >
-      <h2 id={titleId}>{handoffView.title}</h2>
-      <p id={descriptionId}>{handoffView.description}</p>
-      <dl>
-        {handoffView.itemViews.map((item) => (
-          <AssignmentListPageHandoffItem item={item} key={item.id} />
-        ))}
-      </dl>
-    </section>
-  );
-}
-
-function AssignmentListPageHandoffItem({
-  item,
-}: {
-  item: AssignmentListPageHandoffItemView;
-}) {
-  const labelId = `assignment-list-handoff-${item.id}-label`;
-  const valueId = `assignment-list-handoff-${item.id}-value`;
-  const descriptionId = `assignment-list-handoff-${item.id}-description`;
-
-  return (
-    <div data-handoff-item={item.id}>
-      <dt id={labelId}>{item.label}</dt>
-      <dd>
-        <output
-          aria-describedby={descriptionId}
-          aria-label={item.ariaLabel}
-          aria-labelledby={`${labelId} ${valueId}`}
-          id={valueId}
-        >
-          {item.value}
-        </output>
-        <span id={descriptionId}>{item.description}</span>
-      </dd>
-    </div>
   );
 }

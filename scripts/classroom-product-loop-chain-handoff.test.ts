@@ -56,7 +56,6 @@ import {
   PUBLISHED_ASSIGNMENT_DELIVERY_CHAIN_HANDOFF_ITEM_IDS,
   PUBLISHED_ASSIGNMENT_DELIVERY_CHAIN_SOURCE_FILES,
 } from '@/assignments/published-assignment-delivery-chain';
-import { ASSIGNMENT_PUBLISH_HANDOFF_ITEM_IDS } from '@/assignments/publish-input';
 import {
   ASSIGNMENT_RESULT_ACCEPTED_ANSWER_CHAIN_HANDOFF_ITEM_IDS,
   ASSIGNMENT_RESULT_ACCEPTED_ANSWER_CHAIN_SOURCE_FILES,
@@ -505,7 +504,6 @@ test('classroom product loop chain is backed by adjacent focused gates', () => {
       SOURCE_EXTRACTION_LIFECYCLE_CHAIN_HANDOFF_ITEM_IDS.length,
       SOURCE_EXTRACTION_LIFECYCLE_CHAIN_SOURCE_FILES.length,
       SOURCE_MATERIAL_PRIVACY_CHAIN_HANDOFF_ITEM_IDS.length,
-      ASSIGNMENT_PUBLISH_HANDOFF_ITEM_IDS.length,
       ASSIGNMENT_SOURCE_ACTIVITY_CONTEXT_CHAIN_HANDOFF_ITEM_IDS.length,
       ASSIGNMENT_LIFECYCLE_GOVERNANCE_CHAIN_HANDOFF_ITEM_IDS.length,
       ASSIGNMENT_LIFECYCLE_GOVERNANCE_CHAIN_SOURCE_FILES.length,
@@ -543,7 +541,7 @@ test('classroom product loop chain is backed by adjacent focused gates', () => {
       PUBLIC_DISCOVERY_INDEXING_CHAIN_SOURCE_FILES.length,
       CLASSROOM_TRUST_COMMUNICATION_CHAIN_HANDOFF_ITEM_IDS.length,
     ],
-    Array.from({ length: 57 }, () => 30)
+    Array.from({ length: 56 }, () => 30)
   );
 });
 

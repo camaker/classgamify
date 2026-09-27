@@ -22,7 +22,6 @@ import type {
   ActivityMaterialReference,
 } from '@/activities/types';
 import type { CreateActivityInput } from '@/activities/validation';
-import { ASSIGNMENT_PUBLISH_HANDOFF_ITEM_IDS } from '@/assignments/publish-input';
 import { overwriteGetLocale } from '@/locale/paraglide/runtime';
 
 overwriteGetLocale(() => 'en');
@@ -166,7 +165,7 @@ test('activity AI enhancement lifecycle chain summarizes ordered gates', () => {
       ['result-export-stage', 'Shared result model'],
       ['chain-state-stage', 'ready-for-assignment-publish'],
       ['documentation-stage', '30 source files'],
-      ['assignment-publish-handoff-boundary', '30 assignment publish slices'],
+      ['assignment-publish-handoff-boundary', 'Visible publish dialog'],
     ]
   );
 });
@@ -264,9 +263,8 @@ test('activity AI enhancement lifecycle chain is backed by focused gates', () =>
       ACTIVITY_AI_ENHANCEMENT_EDITOR_REVIEW_CHECK_IDS.length,
       ACTIVITY_AI_ENHANCEMENT_SAVE_BOUNDARY_ITEM_IDS.length,
       ACTIVITY_AI_ENHANCEMENT_PUBLISH_BOUNDARY_ITEM_IDS.length,
-      ASSIGNMENT_PUBLISH_HANDOFF_ITEM_IDS.length,
     ],
-    [30, 30, 30, 30, 12, 30, 30, 30]
+    [30, 30, 30, 30, 12, 30, 30]
   );
 });
 
@@ -278,7 +276,7 @@ test('activity AI enhancement lifecycle chain gate is wired into docs and catalo
   );
   assert.match(
     PRODUCT_SOURCE,
-    /src\/activities\/ai-enhancement-lifecycle-chain\.ts` owns the full AI enhancement lifecycle handoff[\s\S]*30-slice core\s+assignment-publish handoff/,
+    /src\/activities\/ai-enhancement-lifecycle-chain\.ts` owns the full AI enhancement lifecycle handoff[\s\S]*shared\s+publish dialog/,
     'docs/product.md should document the AI enhancement lifecycle owner.'
   );
   assert.match(
@@ -288,8 +286,8 @@ test('activity AI enhancement lifecycle chain gate is wired into docs and catalo
   );
   assert.match(
     TEST_CATALOG_SOURCE,
-    /30-slice\s+assignment-publish\s+handoff/,
-    'TEST-CATALOG should document the core assignment-publish handoff.'
+    /assignment\s+publish\s+actions[\s\S]*result-export\s+continuity/,
+    'TEST-CATALOG should document the assignment publish and result-export stages.'
   );
 });
 

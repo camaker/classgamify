@@ -6,10 +6,7 @@ import {
   ASSIGNMENT_DISTRIBUTION_LIFECYCLE_CHAIN_HANDOFF_ITEM_IDS,
   ASSIGNMENT_DISTRIBUTION_LIFECYCLE_CHAIN_SOURCE_FILES,
 } from '@/assignments/assignment-distribution-lifecycle-chain';
-import {
-  ASSIGNMENT_LIST_PAGE_HANDOFF_ITEM_IDS,
-  buildAssignmentListCardViewModel,
-} from '@/assignments/list-view';
+import { buildAssignmentListCardViewModel } from '@/assignments/list-view';
 import {
   ASSIGNMENT_SOURCE_ACTIVITY_CONTEXT_CHAIN_HANDOFF_ITEM_IDS,
   ASSIGNMENT_SOURCE_ACTIVITY_CONTEXT_CHAIN_SOURCE_FILES,
@@ -179,7 +176,6 @@ test('assignment source activity context is backed by adjacent gates', () => {
   assert.equal(ASSIGNMENT_DISTRIBUTION_LIFECYCLE_CHAIN_SOURCE_FILES.length, 30);
   assert.deepEqual(
     [
-      ASSIGNMENT_LIST_PAGE_HANDOFF_ITEM_IDS.length,
       PRINTABLE_WORKSHEET_REVIEW_LIFECYCLE_CHAIN_HANDOFF_ITEM_IDS.length,
       ASSIGNMENT_DISTRIBUTION_LIFECYCLE_CHAIN_HANDOFF_ITEM_IDS.length,
       WORKSHEET_MODE_DELIVERY_CHAIN_HANDOFF_ITEM_IDS.length,
@@ -187,7 +183,7 @@ test('assignment source activity context is backed by adjacent gates', () => {
       TEACHER_RESULTS_REVIEW_CHAIN_HANDOFF_ITEM_IDS.length,
       SCORED_ATTEMPT_RESULT_CHAIN_HANDOFF_ITEM_IDS.length,
     ],
-    Array.from({ length: 7 }, () => 30)
+    Array.from({ length: 6 }, () => 30)
   );
 });
 

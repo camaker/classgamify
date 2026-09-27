@@ -25,7 +25,6 @@ import {
 } from '@/activities/lifecycle';
 import { ACTIVITY_LIBRARY_PAGE_HANDOFF_ITEM_IDS } from '@/activities/library-view';
 import { ACTIVITY_TEMPLATE_REMIX_HANDOFF_ITEM_IDS } from '@/activities/template-remix';
-import { ASSIGNMENT_PUBLISH_HANDOFF_ITEM_IDS } from '@/assignments/publish-input';
 
 const PRODUCT_SOURCE = readFileSync('docs/product.md', 'utf8');
 const ACTIVITIES_API_SOURCE = readFileSync('src/api/activities.ts', 'utf8');
@@ -163,7 +162,7 @@ test('activity lifecycle governance chain summarizes archive and restore boundar
       ['snapshot-protection', 'Snapshots unchanged'],
       ['public-assignment-continuity', 'Existing links unchanged'],
       ['created-panel-publish-gate', 'Same access view'],
-      ['assignment-publish-handoff-boundary', '30 assignment publish slices'],
+      ['assignment-publish-handoff-boundary', 'Visible publish dialog'],
     ]
   );
   assert.equal(
@@ -176,7 +175,7 @@ test('activity lifecycle governance chain summarizes archive and restore boundar
   );
   assert.equal(
     getHandoffValue(handoffView, 'assignment-publish-handoff-boundary'),
-    `${ASSIGNMENT_PUBLISH_HANDOFF_ITEM_IDS.length} assignment publish slices`
+    'Visible publish dialog'
   );
 });
 
@@ -197,9 +196,8 @@ test('activity lifecycle governance chain is backed by focused lifecycle gates',
       ACTIVITY_TEMPLATE_REMIX_HANDOFF_ITEM_IDS.length,
       ACTIVITY_AUTHORING_LIBRARY_CHAIN_HANDOFF_ITEM_IDS.length,
       ACTIVITY_AUTHORING_LIBRARY_CHAIN_SOURCE_FILES.length,
-      ASSIGNMENT_PUBLISH_HANDOFF_ITEM_IDS.length,
     ],
-    Array.from({ length: 7 }, () => 30)
+    Array.from({ length: 6 }, () => 30)
   );
 });
 
@@ -261,7 +259,7 @@ test('activity lifecycle sources keep library scopes and UI gates aligned', () =
   );
   assert.match(
     PRODUCT_SOURCE,
-    /activity\s+lifecycle\s+governance\s+chain[\s\S]*30-slice\s+assignment\s+publish\s+handoff[\s\S]*publish\s+access[\s\S]*snapshot\s+freeze[\s\S]*public-payload[\s\S]*privacy/,
+    /activity\s+lifecycle\s+governance\s+chain[\s\S]*shared\s+publish\s+dialog[\s\S]*publish\s+access[\s\S]*snapshot\s+freeze[\s\S]*public-payload/,
     'docs/product.md should return restored activity lifecycle work to the shared assignment publish contract.'
   );
   assert.match(

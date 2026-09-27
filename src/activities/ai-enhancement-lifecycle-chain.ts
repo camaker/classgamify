@@ -32,7 +32,6 @@ import {
   type ActivityAiEnhancementSaveBoundaryStatus,
 } from '@/activities/ai-enhancement-save-boundary';
 import type { CreateActivityInput } from '@/activities/validation';
-import { ASSIGNMENT_PUBLISH_HANDOFF_ITEM_IDS } from '@/assignments/publish-input';
 
 export const ACTIVITY_AI_ENHANCEMENT_LIFECYCLE_CHAIN_ITEM_IDS = [
   'policy-stage',
@@ -432,7 +431,7 @@ function buildActivityAiEnhancementLifecycleChainSummary(
       ? 'Saved activity record'
       : 'Activity save pending',
     answerKeyStage: 'No public answer keys',
-    assignmentPublishHandoffBoundary: `${ASSIGNMENT_PUBLISH_HANDOFF_ITEM_IDS.length} assignment publish slices`,
+    assignmentPublishHandoffBoundary: 'Visible publish dialog',
     assignmentPublishStage: plan.publishStatus,
     blockedReasonStage: plan.blockedReason,
     chainStateStage: plan.chainStatus,
@@ -694,7 +693,7 @@ function buildActivityAiEnhancementLifecycleChainItem({
     case 'assignment-publish-handoff-boundary':
       return item(
         id,
-        'Assignment publish handoff boundary',
+        'Assignment publish dialog',
         summary.assignmentPublishHandoffBoundary,
         'The AI lifecycle returns to the complete core assignment publish contract.'
       );

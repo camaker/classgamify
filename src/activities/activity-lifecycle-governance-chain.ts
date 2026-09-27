@@ -1,5 +1,3 @@
-import { ASSIGNMENT_PUBLISH_HANDOFF_ITEM_IDS } from '@/assignments/publish-input';
-
 export const ACTIVITY_LIFECYCLE_GOVERNANCE_CHAIN_HANDOFF_ITEM_IDS = [
   'product-archive-policy',
   'lifecycle-domain-source',
@@ -354,8 +352,8 @@ function getActivityLifecycleGovernanceChainHandoffItem(
     case 'assignment-publish-handoff-boundary':
       return item(
         id,
-        'Assignment publish handoff boundary',
-        `${ASSIGNMENT_PUBLISH_HANDOFF_ITEM_IDS.length} assignment publish slices`,
+        'Assignment publish dialog',
+        'Visible publish dialog',
         'Restored activities must enter the shared assignment publish access, validation, delivery settings, review checklist, snapshot freeze, public payload, result policy, and privacy contracts.'
       );
   }

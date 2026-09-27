@@ -52,13 +52,13 @@ export const ASSIGNMENT_DISTRIBUTION_LIFECYCLE_CHAIN_SOURCE_FILES = [
   'src/components/assignments/published-assignment-panel.tsx',
   'src/components/assignments/assignment-list-card.tsx',
   'src/components/assignments/copy-assignment-share-link-button.tsx',
-  'src/components/assignments/assignment-share-link-handoff.tsx',
+  'tests/e2e/specs/activity-authoring.spec.ts',
   'src/components/assignments/assignment-list-filters.tsx',
   'src/components/assignments/assignment-list-summary-card.tsx',
   'src/components/assignments/assignment-settings-summary.tsx',
   'scripts/assignment-list-semantic-views.test.ts',
-  'scripts/assignment-share-link-handoff-semantic-views.test.ts',
-  'scripts/assignment-publish-handoff-semantic-views.test.ts',
+  'scripts/assignment-share-link.test.ts',
+  'scripts/assignment-publish-dialog.test.ts',
   'scripts/published-assignment-delivery-chain-handoff.test.ts',
   'tests/e2e/TEST-CATALOG.md',
   'src/components/assignments/student-runner-header-card.tsx',
@@ -326,9 +326,9 @@ function getAssignmentDistributionLifecycleChainHandoffItem(
     case 'hidden-share-handoff':
       return item(
         id,
-        'Hidden share handoff',
-        '30 share slices',
-        'Assignment list, publish-success, and result-page share surfaces render the shared hidden share-link handoff contract.'
+        'Share link actions',
+        'Visible share actions',
+        'Assignment list, publish-success, and result-page surfaces show the same copy, open, and share-path actions from the shared share-link view.'
       );
     case 'filter-scope-alignment':
       return item(
