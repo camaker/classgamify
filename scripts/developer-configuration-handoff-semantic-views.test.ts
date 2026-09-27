@@ -335,7 +335,7 @@ function buildDeveloperConfigurationEvidence(): DeveloperConfigurationHandoffEvi
         SOURCES.productionEnvExample
       ),
     workerTypegenCommandDocumented:
-      /"cf-typegen":\s*"wrangler types --include-runtime=false --env-interface Env"/.test(
+      /"cf-typegen":\s*"wrangler types --include-runtime=false --env-interface Env --env-file \.env\.example"/.test(
         SOURCES.packageJson
       ) &&
       /"postinstall":\s*"pnpm run cf-typegen"/.test(SOURCES.packageJson) &&

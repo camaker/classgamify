@@ -24,19 +24,20 @@ export const getRouter = () => {
     },
     defaultPreload: 'intent',
     scrollRestoration: true,
-    // Wrap: provides NuqsAdapter and TanstackQuery.Provider for SSR
-    // These providers wrap the entire route tree content (not RootDocument)
     // RootDocument (shellComponent)
-    // └─ Wrap (NuqsAdapter + TanstackQuery.Provider)
-    //     └─ Route tree content (RootComponent / errorComponent / notFoundComponent)
+    // └─ Wrap (TanstackQuery.Provider, outside the router context)
+    //     └─ InnerWrap (NuqsAdapter, needs the router: nuqs 2.10+ subscribes
+    //        to router.history for back/forward)
+    //         └─ Route tree content (RootComponent / errorComponent / notFoundComponent)
     Wrap: (props: { children: React.ReactNode }) => {
       return (
-        <NuqsAdapter>
-          <TanstackQuery.Provider {...queryContext}>
-            {props.children}
-          </TanstackQuery.Provider>
-        </NuqsAdapter>
+        <TanstackQuery.Provider {...queryContext}>
+          {props.children}
+        </TanstackQuery.Provider>
       );
+    },
+    InnerWrap: (props: { children: React.ReactNode }) => {
+      return <NuqsAdapter>{props.children}</NuqsAdapter>;
     },
   });
 

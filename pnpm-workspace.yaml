@@ -13,6 +13,40 @@ overrides:
   # exactly: they are the last releases on a stable Miniflare (4.20260730.0);
   # every later release depends on a Miniflare 5 alpha.
   'workerd@<1.20260925.1': 1.20260927.1
+  # Security patches (pnpm audit): lift vulnerable transitive versions to
+  # the first patched release of the same major. Almost all of these reach
+  # only dev/build tooling; defu (via better-auth) is bundled into the Worker.
+  '@babel/core@>=7.0.0 <7.29.6': '^7.29.6'
+  '@hono/node-server@>=1.0.0 <1.19.15': '^1.19.15'
+  'ajv@>=8.0.0 <8.18.0': '^8.18.0'
+  'baseline-browser-mapping@>=2.0.0 <2.11.0': '^2.11.0'
+  'body-parser@>=2.0.0 <2.3.0': '^2.3.0'
+  'brace-expansion@>=5.0.0 <5.0.9': '^5.0.9'
+  'browserslist@>=4.0.0 <4.28.7': '^4.28.7'
+  'defu@>=6.0.0 <6.1.5': '^6.1.5'
+  'engine.io@>=6.0.0 <6.6.7': '^6.6.7'
+  'express-rate-limit@>=8.0.0 <8.2.2': '^8.2.2'
+  'fast-uri@>=3.0.0 <3.1.6': '^3.1.6'
+  'hono@>=4.0.0 <4.13.5': '^4.13.5'
+  'ip-address@>=10.0.0 <10.3.1': '^10.3.1'
+  'js-yaml@>=3.0.0 <3.15.2': '^3.15.2'
+  'js-yaml@>=4.0.0 <4.3.2': '^4.3.2'
+  'minimatch@>=10.0.0 <10.2.3': '^10.2.3'
+  'next@>=16.0.0 <16.3.3': '^16.3.3'
+  'path-to-regexp@>=8.0.0 <8.4.0': '^8.4.0'
+  'picomatch@>=2.0.0 <2.3.2': '^2.3.2'
+  'picomatch@>=4.0.0 <4.0.4': '^4.0.4'
+  'postcss@>=8.0.0 <8.5.23': '^8.5.23'
+  'qs@>=6.0.0 <6.16.0': '^6.16.0'
+  'smol-toml@>=1.0.0 <1.7.1': '^1.7.1'
+  'socket.io-parser@>=4.0.0 <4.2.7': '^4.2.7'
+  'undici@>=7.0.0 <7.29.0': '^7.29.0'
+  'ws@>=8.0.0 <8.21.0': '^8.21.0'
+  'yaml@>=2.0.0 <2.8.3': '^2.8.3'
+  'sharp@>=0.35.0 <0.35.4': '~0.35.4'
+  # Majors: build-time only, API-compatible for these callers.
+  '@content-collections/core>serialize-javascript': '^7.0.5'
+  '@esbuild-kit/core-utils>esbuild': '^0.25.4'
 
 peerDependencyRules:
   allowedVersions:

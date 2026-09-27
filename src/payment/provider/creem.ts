@@ -126,11 +126,11 @@ export class CreemProvider implements PaymentProvider {
 
     this.webhookSecret = webhookSecret;
 
-    // serverIdx: 0 = production (api.creem.io), 1 = test (test-api.creem.io)
+    // server: 'prod' = api.creem.io, 'test' = test-api.creem.io
     const isDebug = process.env.CREEM_DEBUG === 'true';
     this.client = new Creem({
       apiKey,
-      serverIdx: isDebug ? 1 : 0,
+      server: isDebug ? 'test' : 'prod',
     });
   }
 

@@ -28,6 +28,7 @@
       "!.wrangler",
       "!.content-collections",
       "!project.inlang/.meta.json",
+      "!project.inlang/cache",
       "!scripts/test-domain.ts",
       "!src/locale/paraglide",
       "!worker-configuration.d.ts",

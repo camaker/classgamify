@@ -86,7 +86,9 @@ provider settings.
 
 Regenerate Worker binding types with `pnpm cf-typegen` after binding shape
 changes. The `postinstall` hook also runs this command so local installs keep
-the generated `Env` interface aligned with `wrangler.jsonc`.
+the generated `Env` interface aligned with `wrangler.jsonc`. It reads variable
+names from `.env.example`, so a local `.dev.vars` does not rewrite
+`worker-configuration.d.ts`.
 
 ## Auth And Workspace Access
 
