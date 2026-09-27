@@ -6,7 +6,6 @@ import { ASSIGNMENT_ATTEMPT_PERSISTENCE_HANDOFF_ITEM_IDS } from '@/assignments/a
 import { ASSIGNMENT_ATTEMPT_REVIEW_CARD_HANDOFF_ITEM_IDS } from '@/assignments/attempt-review-card-handoff';
 import { ASSIGNMENT_RESULT_STUDENT_SEARCH_HANDOFF_ITEM_IDS } from '@/assignments/result-student-search-handoff';
 import { ASSIGNMENT_RESULTS_EXPORT_PREPARATION_ITEM_IDS } from '@/assignments/results-export';
-import { STUDENT_RUNTIME_IDENTITY_HANDOFF_ITEM_IDS } from '@/assignments/runtime-identity-handoff';
 import {
   STUDENT_IDENTITY_LIFECYCLE_CHAIN_HANDOFF_ITEM_IDS,
   STUDENT_IDENTITY_LIFECYCLE_CHAIN_SOURCE_FILES,
@@ -14,16 +13,10 @@ import {
   type StudentIdentityLifecycleChainHandoffItemId,
   type StudentIdentityLifecycleChainHandoffView,
 } from '@/assignments/student-identity-lifecycle-chain';
-import { STUDENT_RUNNER_IDENTITY_HANDOFF_ITEM_IDS } from '@/assignments/student-runner-identity-handoff';
 import {
   STUDENT_RUNNER_PLAY_CHAIN_HANDOFF_ITEM_IDS,
   STUDENT_RUNNER_PLAY_CHAIN_SOURCE_FILES,
 } from '@/assignments/student-runner-play-chain';
-import {
-  STUDENT_RUNNER_START_HANDOFF_ITEM_IDS,
-  STUDENT_RUNNER_SUBMISSION_HANDOFF_ITEM_IDS,
-} from '@/assignments/student-runner-state';
-import { STUDENT_RUNNER_SUBMIT_CONTROLS_HANDOFF_ITEM_IDS } from '@/assignments/student-runner-submit-controls-handoff';
 import { ASSIGNMENT_STUDENT_SUMMARY_SORT_HANDOFF_ITEM_IDS } from '@/assignments/student-summary-sort-handoff';
 import { TEACHER_RESULTS_REVIEW_CHAIN_HANDOFF_ITEM_IDS } from '@/assignments/teacher-results-review-chain';
 
@@ -47,14 +40,6 @@ const STUDENT_SUBMISSION_SOURCE = readFileSync(
 );
 const STUDENT_RUNNER_STATE_SOURCE = readFileSync(
   'src/assignments/student-runner-state.ts',
-  'utf8'
-);
-const STUDENT_RUNNER_IDENTITY_SOURCE = readFileSync(
-  'src/assignments/student-runner-identity-handoff.ts',
-  'utf8'
-);
-const RUNTIME_IDENTITY_SOURCE = readFileSync(
-  'src/assignments/runtime-identity-handoff.ts',
   'utf8'
 );
 const ASSIGNMENTS_API_SOURCE = readFileSync('src/api/assignments.ts', 'utf8');
@@ -172,7 +157,7 @@ test('student identity lifecycle chain summarizes each identity step', () => {
       ['attempt-limit-count-query', 'Scored attempts'],
       ['runner-identity-view', 'Prepared identity view'],
       ['runner-anonymous-guidance', 'Browser guidance'],
-      ['runner-identity-handoff', '30 identity slices'],
+      ['runner-identity-handoff', 'Named or anonymous'],
       ['runner-start-privacy', 'Start handoff hidden'],
       ['runner-submission-privacy', 'Submission handoff hidden'],
       ['submission-input-builder', 'Sanitized input'],
@@ -185,7 +170,7 @@ test('student identity lifecycle chain summarizes each identity step', () => {
       ['student-summary-sort-identity', 'Student label sort'],
       ['attempt-review-identity', 'Review label only'],
       ['result-export-token-guard', 'Raw token hidden'],
-      ['runtime-identity-handoff-boundary', '30 runtime identity slices'],
+      ['runtime-identity-handoff-boundary', 'Runtime item ids'],
     ]
   );
   assert.equal(
@@ -205,11 +190,6 @@ test('student identity lifecycle chain is backed by adjacent gates', () => {
 
   assert.deepEqual(
     [
-      STUDENT_RUNNER_IDENTITY_HANDOFF_ITEM_IDS.length,
-      STUDENT_RUNNER_START_HANDOFF_ITEM_IDS.length,
-      STUDENT_RUNNER_SUBMISSION_HANDOFF_ITEM_IDS.length,
-      STUDENT_RUNNER_SUBMIT_CONTROLS_HANDOFF_ITEM_IDS.length,
-      STUDENT_RUNTIME_IDENTITY_HANDOFF_ITEM_IDS.length,
       ASSIGNMENT_ATTEMPT_LIMIT_HANDOFF_ITEM_IDS.length,
       ASSIGNMENT_ATTEMPT_PERSISTENCE_HANDOFF_ITEM_IDS.length,
       ASSIGNMENT_RESULT_STUDENT_SEARCH_HANDOFF_ITEM_IDS.length,
@@ -220,7 +200,7 @@ test('student identity lifecycle chain is backed by adjacent gates', () => {
       STUDENT_RUNNER_PLAY_CHAIN_SOURCE_FILES.length,
       TEACHER_RESULTS_REVIEW_CHAIN_HANDOFF_ITEM_IDS.length,
     ],
-    Array.from({ length: 14 }, () => 30)
+    Array.from({ length: 9 }, () => 30)
   );
 });
 
@@ -310,16 +290,6 @@ test('submission, runner, api, and attempt sources preserve identity privacy', (
   );
   assert.match(
     STUDENT_RUNNER_STATE_SOURCE,
-    /StudentRunnerStartHandoffPrivacyContract[\s\S]*exposesAnonymousToken: false[\s\S]*exposesStudentName: false[\s\S]*exposesTeacherOnlyAnswers: false/,
-    'Start handoff privacy should hide identity and answer details.'
-  );
-  assert.match(
-    STUDENT_RUNNER_STATE_SOURCE,
-    /StudentRunnerSubmissionHandoffPrivacyContract[\s\S]*exposesAnonymousToken: false[\s\S]*exposesRawSubmissionPayload: false[\s\S]*exposesStudentName: false/,
-    'Submission handoff privacy should hide raw payload and identity details.'
-  );
-  assert.match(
-    STUDENT_RUNNER_STATE_SOURCE,
     /buildStudentRunnerAnonymousTokenPlan[\s\S]*settings\.collectStudentName[\s\S]*return \{ type: 'skip' \}[\s\S]*type: 'resolve'/,
     'Runner anonymous-token plan should resolve tokens only for anonymous mode.'
   );
@@ -404,16 +374,6 @@ test('attempt limits and teacher result consumers preserve identity guards', () 
 });
 
 test('identity handoffs remain hidden semantic structures', () => {
-  assert.match(
-    STUDENT_RUNNER_IDENTITY_SOURCE,
-    /STUDENT_RUNNER_IDENTITY_HANDOFF_ITEM_IDS[\s\S]*'browser-label'[\s\S]*'token-privacy-summary'[\s\S]*'anonymous-token-boundary'[\s\S]*'privacy-guard'[\s\S]*exposesAnonymousToken: false[\s\S]*exposesStudentNameInputValue: false/,
-    'Runner identity handoff should keep browser label and token privacy slices.'
-  );
-  assert.match(
-    RUNTIME_IDENTITY_SOURCE,
-    /STUDENT_RUNTIME_IDENTITY_HANDOFF_ITEM_IDS[\s\S]*'student-name-boundary'[\s\S]*'anonymous-token-boundary'[\s\S]*exposesAnonymousToken: false[\s\S]*exposesStudentName: false/,
-    'Runtime identity handoff should hide names and anonymous tokens.'
-  );
   // docs/design.md: screen-reader-only text describes the visible UI and
   // must not add audit detail, so the student play page renders none.
   assert.doesNotMatch(
@@ -438,8 +398,8 @@ test('student identity lifecycle chain focused gate is documented', () => {
 
   assert.match(
     PRODUCT_SOURCE,
-    /student identity lifecycle[\s\S]*runtime identity handoff's[\s\S]*30 slices[\s\S]*normalized and unique[\s\S]*collision and blank-id guards[\s\S]*must not expose runtime item ids[\s\S]*raw browser tokens[\s\S]*source-material metadata/,
-    'docs/product.md should describe the runtime identity handoff and its private-id boundary.'
+    /student identity lifecycle[\s\S]*runtime item identity[\s\S]*normalized and unique[\s\S]*collision and blank-id guards[\s\S]*must not expose runtime item ids[\s\S]*raw browser tokens[\s\S]*source-material metadata/,
+    'docs/product.md should describe runtime item identity and its private-id boundary.'
   );
   assert.match(
     TEST_CATALOG_SOURCE,
@@ -448,7 +408,7 @@ test('student identity lifecycle chain focused gate is documented', () => {
   );
   assert.match(
     normalizedCatalog,
-    /student-name normalization[\s\S]*anonymous browser tokens[\s\S]*identity grouping[\s\S]*30-slice runtime identity handoff boundary[\s\S]*attempt-limit identity counting[\s\S]*student runner identity views[\s\S]*submission input identity[\s\S]*attempt persistence identity fields[\s\S]*teacher result identity labels\/search\/sort\/review[\s\S]*result export privacy[\s\S]*raw-token guards/,
+    /student-name normalization[\s\S]*anonymous browser tokens[\s\S]*identity grouping[\s\S]*runtime item id normalization[\s\S]*attempt-limit identity counting[\s\S]*student runner identity views[\s\S]*submission input identity[\s\S]*attempt persistence identity fields[\s\S]*teacher result identity labels\/search\/sort\/review[\s\S]*result export privacy[\s\S]*raw-token guards/,
     'TEST-CATALOG should describe the student identity chain gate scope.'
   );
 });

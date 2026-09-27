@@ -11,7 +11,6 @@ export const ASSIGNMENT_ATTEMPT_IDENTITY_CONTINUITY_CHAIN_SOURCE_FILES = [
   'src/api/assignments.ts',
   'src/assignments/student-submission.ts',
   'src/assignments/student-runner-state.ts',
-  'src/assignments/student-runner-identity-handoff.ts',
   'src/assignments/student-runner-submission-chain.ts',
   'src/assignments/student-runner-play-chain.ts',
   'src/assignments/student-identity-lifecycle-chain.ts',
@@ -34,6 +33,7 @@ export const ASSIGNMENT_ATTEMPT_IDENTITY_CONTINUITY_CHAIN_SOURCE_FILES = [
   'scripts/assignment-identity-handoff-semantic-views.test.ts',
   'tests/e2e/specs/student-runner.spec.ts',
   'tests/e2e/TEST-CATALOG.md',
+  'scripts/assignment-attempt-identity-continuity-chain-handoff.test.ts',
 ] as const;
 
 export type AssignmentAttemptIdentityContinuityChainHandoffItemId =

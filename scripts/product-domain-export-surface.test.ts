@@ -246,16 +246,6 @@ const INTERNAL_PRODUCT_DOMAIN_HELPERS = [
     name: 'buildStudentRunnerSubmissionContractView',
   },
   {
-    declaration: 'function',
-    filePath: 'src/assignments/student-runner-state.ts',
-    name: 'buildStudentRunnerSubmissionHandoffView',
-  },
-  {
-    declaration: 'function',
-    filePath: 'src/assignments/student-runtime-item-list.ts',
-    name: 'buildStudentRuntimeInteractionHandoffView',
-  },
-  {
     declaration: 'type',
     filePath: 'src/activities/template-remix.ts',
     name: 'TemplateRemixReadinessErrorCode',
@@ -294,11 +284,6 @@ const INTERNAL_PRODUCT_DOMAIN_HELPERS = [
     declaration: 'type',
     filePath: 'src/activities/template-remix.ts',
     name: 'ActivityTemplateRemixHandoffSource',
-  },
-  {
-    declaration: 'function',
-    filePath: 'src/assignments/student-runtime-item-list.ts',
-    name: 'buildStudentRuntimeSemanticBundleHandoffView',
   },
   {
     declaration: 'type',
@@ -399,12 +384,6 @@ const INTERNAL_PRODUCT_DOMAIN_HELPERS = [
     declaration: 'const',
     filePath: 'src/storage/upload-readiness.ts',
     name: 'STORAGE_UPLOAD_MIME_EXTENSIONS',
-  },
-  {
-    declaration: 'function',
-    filePath:
-      'src/components/classroom/classroom-control-semantics-handoff.tsx',
-    name: 'ClassroomControlSemanticsHandoff',
   },
 ] satisfies InternalHelperDeclaration[];
 
@@ -516,8 +495,8 @@ const RESULT_VIEW_REEXPORT_BOUNDARIES = [
   },
 ] satisfies ReExportBoundary[];
 
-test('product-domain export surface keeps 78 helpers and types internal', () => {
-  assert.equal(INTERNAL_PRODUCT_DOMAIN_HELPERS.length, 78);
+test('product-domain export surface keeps 74 helpers and types internal', () => {
+  assert.equal(INTERNAL_PRODUCT_DOMAIN_HELPERS.length, 74);
 
   for (const helper of INTERNAL_PRODUCT_DOMAIN_HELPERS) {
     const source = readFileSync(helper.filePath, 'utf8');

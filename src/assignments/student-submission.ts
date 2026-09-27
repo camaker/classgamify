@@ -251,7 +251,7 @@ export type AnonymousAttemptCopy = {
   title: string;
 };
 
-export type AnonymousAttemptSummaryItemId =
+type AnonymousAttemptSummaryItemId =
   | 'browser-label'
   | 'retry-browser'
   | 'token-privacy';
@@ -296,7 +296,7 @@ export type StudentAttemptResultNextStepsView = {
   title: string;
 };
 
-export type StudentAttemptReviewSummaryMetricKey =
+type StudentAttemptReviewSummaryMetricKey =
   | 'correct'
   | 'items'
   | 'needs-review'
@@ -323,7 +323,7 @@ export type StudentAttemptReviewSummaryView = {
 
 export type StudentAttemptFeedbackScopeStatus = 'hidden' | 'visible';
 
-export type StudentAttemptFeedbackScopeMetricKey =
+type StudentAttemptFeedbackScopeMetricKey =
   | 'accepted-alternatives'
   | 'explanations'
   | 'item-feedback'

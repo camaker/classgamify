@@ -336,7 +336,11 @@ test('activity source-material summary keeps private file data out', () => {
     /\b(sourceMaterials|storageKey|fileId|originalName|permission|bytes|fileList)\b/,
     'PublicAssignmentPayload should not expose teacher source-material details.'
   );
-  assert.match(STUDENT_RUNTIME_SOURCE, /exposesSourceMaterialMetadata: false/);
+  assert.doesNotMatch(
+    STUDENT_RUNTIME_SOURCE,
+    /\b(sourceMaterials|storageKey|fileId|originalName|permission|bytes|fileList)\b/,
+    'Student runtime item lists should only read public runtime items.'
+  );
 });
 
 test('activity source-material summary chain focused gate is documented', () => {

@@ -52,8 +52,6 @@ export const ACTIVITY_LIBRARY_FILTER_STATE_CHAIN_SOURCE_FILES = [
   'src/api/activities.ts',
   'src/components/activities/activity-library-search.tsx',
   'src/components/activities/activity-library-card.tsx',
-  'src/components/activities/activity-library-summary-card.tsx',
-  'src/components/activities/activity-library-scope-panel.tsx',
   'src/components/activities/activity-library-stats.tsx',
   'src/components/activities/activity-library-compatibility-panel.tsx',
   'src/components/activities/created-activity-panel.tsx',
@@ -69,6 +67,8 @@ export const ACTIVITY_LIBRARY_FILTER_STATE_CHAIN_SOURCE_FILES = [
   'scripts/activity-source-material-summary-chain-handoff.test.ts',
   'scripts/activity-library-semantic-views.test.ts',
   'tests/e2e/TEST-CATALOG.md',
+  'tests/e2e/specs/protected-pages.spec.ts',
+  'scripts/activity-library-filter-state-chain-handoff.test.ts',
 ] as const;
 
 export type ActivityLibraryFilterStateChainHandoffItemId =

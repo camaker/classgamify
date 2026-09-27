@@ -367,14 +367,15 @@ function buildAttemptDurationEvidence(): AssignmentAttemptDurationHandoffEvidenc
     runnerClockStartPlanType: clockStartPlan.type,
     runnerTickIntervalMs: tickPlan.type === 'tick' ? tickPlan.intervalMs : 0,
     runnerTickPlanType: tickPlan.type,
-    startHandoffHasTimerBoundary: /'timer-start-boundary'/.test(
+    startHandoffHasTimerBoundary: /buildStudentAttemptTimerBadge\(/.test(
       RUNNER_STATE_SOURCE
     ),
     startedAtDeltaSeconds: (completedAt.getTime() - startedAt.getTime()) / 1000,
     submissionDurationSeconds,
-    submissionHandoffHasAttemptDuration: /id: 'attempt-duration'/.test(
-      RUNNER_STATE_SOURCE
-    ),
+    submissionHandoffHasAttemptDuration:
+      /durationLabel: attemptResultDisplay\.durationLabel/.test(
+        RUNNER_STATE_SOURCE
+      ),
     submissionInputDurationSeconds: submissionPlan.input.durationSeconds,
     timeExpiredControlsDisabled: expiredControlState.submitDisabled,
     timeExpiredNoticeShown: expiredControlState.showTimeExpiredMessage,

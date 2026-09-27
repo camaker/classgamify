@@ -21,12 +21,6 @@ import {
   QUESTION_CHOICE_GENERATION_HANDOFF_ITEM_IDS,
 } from '@/activities/distractors';
 import { PUBLIC_TEMPLATE_ENTRY_HANDOFF_ITEM_IDS } from '@/activities/entry-page-view';
-import { FILL_BLANK_WORKSHEET_HANDOFF_ITEM_IDS } from '@/assignments/fill-blank-worksheet-handoff';
-import { GROUP_SORT_BOARD_HANDOFF_ITEM_IDS } from '@/assignments/group-sort-board-handoff';
-import { LINE_MATCH_BOARD_HANDOFF_ITEM_IDS } from '@/assignments/line-match-board-handoff';
-import { LISTENING_SPEECH_HANDOFF_ITEM_IDS } from '@/assignments/listening-speech-handoff';
-import { MATCHING_PAIRS_BOARD_HANDOFF_ITEM_IDS } from '@/assignments/matching-pairs-board-handoff';
-import { OPEN_BOX_REVEAL_HANDOFF_ITEM_IDS } from '@/assignments/open-box-reveal-handoff';
 import { PRINTABLE_WORKSHEET_HANDOFF_ITEM_IDS } from '@/assignments/printable-worksheet-view';
 import { ASSIGNMENT_RESULTS_EXPORT_PREPARATION_ITEM_IDS } from '@/assignments/results-export';
 import { STUDENT_RUNNER_PLAY_CHAIN_HANDOFF_ITEM_IDS } from '@/assignments/student-runner-play-chain';
@@ -206,16 +200,10 @@ test('template roadmap capability chain is backed by focused gates', () => {
       ACTIVITY_SOURCE_EXTRACTION_ASSIST_HANDOFF_ITEM_IDS.length,
       WORKSHEET_MODE_DELIVERY_CHAIN_HANDOFF_ITEM_IDS.length,
       STUDENT_RUNNER_PLAY_CHAIN_HANDOFF_ITEM_IDS.length,
-      FILL_BLANK_WORKSHEET_HANDOFF_ITEM_IDS.length,
-      LINE_MATCH_BOARD_HANDOFF_ITEM_IDS.length,
-      GROUP_SORT_BOARD_HANDOFF_ITEM_IDS.length,
-      MATCHING_PAIRS_BOARD_HANDOFF_ITEM_IDS.length,
-      LISTENING_SPEECH_HANDOFF_ITEM_IDS.length,
-      OPEN_BOX_REVEAL_HANDOFF_ITEM_IDS.length,
       PRINTABLE_WORKSHEET_HANDOFF_ITEM_IDS.length,
       ASSIGNMENT_RESULTS_EXPORT_PREPARATION_ITEM_IDS.length,
     ],
-    Array.from({ length: 19 }, () => 30)
+    Array.from({ length: 13 }, () => 30)
   );
 });
 

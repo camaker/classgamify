@@ -16,7 +16,6 @@ import {
   type ScoredAttemptResultChainHandoffView,
 } from '@/assignments/scored-attempt-result-chain';
 import { STUDENT_RUNNER_PLAY_CHAIN_HANDOFF_ITEM_IDS } from '@/assignments/student-runner-play-chain';
-import { STUDENT_RUNNER_SUBMISSION_HANDOFF_ITEM_IDS } from '@/assignments/student-runner-state';
 import { TEACHER_RESULT_COPY_LIFECYCLE_CHAIN_HANDOFF_ITEM_IDS } from '@/assignments/teacher-result-copy-lifecycle-chain';
 import { TEACHER_RESULTS_REVIEW_CHAIN_HANDOFF_ITEM_IDS } from '@/assignments/teacher-results-review-chain';
 
@@ -165,7 +164,6 @@ test('scored attempt result chain is backed by adjacent result gates', () => {
     [
       ASSIGNMENT_ATTEMPT_PERSISTENCE_HANDOFF_ITEM_IDS.length,
       ASSIGNMENT_ATTEMPT_DURATION_HANDOFF_ITEM_IDS.length,
-      STUDENT_RUNNER_SUBMISSION_HANDOFF_ITEM_IDS.length,
       STUDENT_RUNNER_PLAY_CHAIN_HANDOFF_ITEM_IDS.length,
       ASSIGNMENT_ANSWER_FEEDBACK_HANDOFF_ITEM_IDS.length,
       ANSWER_FEEDBACK_LIFECYCLE_CHAIN_HANDOFF_ITEM_IDS.length,
@@ -175,7 +173,7 @@ test('scored attempt result chain is backed by adjacent result gates', () => {
       ASSIGNMENT_RESULTS_EXPORT_PREPARATION_ITEM_IDS.length,
       ASSIGNMENT_ATTEMPT_REVIEW_CARD_HANDOFF_ITEM_IDS.length,
     ],
-    Array.from({ length: 11 }, () => 30)
+    Array.from({ length: 10 }, () => 30)
   );
 });
 

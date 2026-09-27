@@ -43,7 +43,6 @@ export const ACTIVITY_SOURCE_MATERIAL_SUMMARY_CHAIN_SOURCE_FILES = [
   'src/components/activities/activity-source-materials-summary.tsx',
   'src/components/activities/activity-library-card.tsx',
   'src/components/activities/activity-library-search.tsx',
-  'src/components/activities/activity-library-summary-card.tsx',
   'src/components/activities/activity-source-materials-field.tsx',
   'src/activities/source-extraction-assist.ts',
   'src/activities/source-extraction-lifecycle-chain.ts',
@@ -62,6 +61,7 @@ export const ACTIVITY_SOURCE_MATERIAL_SUMMARY_CHAIN_SOURCE_FILES = [
   'scripts/source-extraction-lifecycle-chain-handoff.test.ts',
   'scripts/source-material-privacy-chain-handoff.test.ts',
   'tests/e2e/TEST-CATALOG.md',
+  'tests/e2e/specs/storage-source-materials.spec.ts',
 ] as const;
 
 export type ActivitySourceMaterialSummaryChainHandoffItemId =

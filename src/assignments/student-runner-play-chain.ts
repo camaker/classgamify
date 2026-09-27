@@ -49,18 +49,18 @@ export const STUDENT_RUNNER_PLAY_CHAIN_SOURCE_FILES = [
   'src/assignments/student-submission.ts',
   'src/assignments/student-runner-state.ts',
   'src/assignments/student-runner-view.ts',
-  'src/assignments/student-runner-loading-handoff.ts',
-  'src/assignments/student-runner-identity-handoff.ts',
-  'src/assignments/student-runner-submit-controls-handoff.ts',
+  'src/components/assignments/student-runner-loading-panel.tsx',
+  'src/components/assignments/student-runner-attempt-shell.tsx',
+  'src/components/assignments/student-runner-submit-controls.tsx',
   'src/assignments/student-runtime-item-list.ts',
-  'src/assignments/runtime-choice-assignment-handoff.ts',
-  'src/assignments/runtime-identity-handoff.ts',
-  'src/assignments/fill-blank-worksheet-handoff.ts',
-  'src/assignments/line-match-board-handoff.ts',
-  'src/assignments/group-sort-board-handoff.ts',
-  'src/assignments/matching-pairs-board-handoff.ts',
-  'src/assignments/listening-speech-handoff.ts',
-  'src/assignments/open-box-reveal-handoff.ts',
+  'src/components/activities/choice-question-stepper.tsx',
+  'src/components/activities/student-runtime-item-list.tsx',
+  'src/components/activities/fill-blank-worksheet.tsx',
+  'src/components/activities/line-match-board.tsx',
+  'src/components/activities/group-sort-board.tsx',
+  'src/components/activities/matching-pairs-board.tsx',
+  'src/components/activities/listening-runner.tsx',
+  'src/components/activities/open-box-runner.tsx',
   'src/assignments/answer-feedback-handoff.ts',
 ] as const;
 
@@ -359,8 +359,8 @@ function getStudentRunnerPlayChainHandoffItem(
     case 'submit-controls-handoff-boundary':
       return item(
         id,
-        'Submit controls handoff boundary',
-        '30 submit control slices',
+        'Submit controls boundary',
+        'Visible submit controls',
         'Readiness and payload summaries, completion counts, button and disabled policy, incomplete confirmation, ordered hints, submit action scope, identity privacy, and payload guards stay aligned.'
       );
   }

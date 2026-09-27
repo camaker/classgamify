@@ -58,7 +58,7 @@ export type RuntimeChoiceButtonView = {
   selected: boolean;
 };
 
-export type RuntimeChoiceView = {
+type RuntimeChoiceView = {
   action: ChoicePairingRunnerAction;
   choice: string;
   id: string;
@@ -75,7 +75,7 @@ export type StudentRunnerItemView = StudentAttemptAnswerState & {
   status: StudentRunnerReviewStatus;
 };
 
-export type StudentRunnerView = {
+type StudentRunnerView = {
   choices: string[];
   completionSummary: AttemptCompletionSummary;
   itemViews: StudentRunnerItemView[];
@@ -91,33 +91,33 @@ export type DefaultRuntimeItemCardView = StudentRunnerItemView & {
   showChoices: boolean;
 };
 
-export type ChoicePairingRunnerView = StudentRunnerView & {
+type ChoicePairingRunnerView = StudentRunnerView & {
   choiceViews: RuntimeChoiceView[];
   promptItemViews: ChoicePairingPromptItemView[];
 };
 
-export type ChoicePairingPromptItemView = StudentRunnerItemView & {
+type ChoicePairingPromptItemView = StudentRunnerItemView & {
   action: ChoicePairingRunnerAction;
   promptLabel: string;
   reviewStatusClassName: string | undefined;
   selected: boolean;
 };
 
-export type GroupSortRunnerView = StudentRunnerView & {
+type GroupSortRunnerView = StudentRunnerView & {
   groupViews: GroupSortGroupView[];
   selectedClearAction: GroupSortRunnerAction | undefined;
   selectedItem?: PublicRuntimeItem;
   unplacedItemViews: GroupSortItemView[];
 };
 
-export type GroupSortGroupView = {
+type GroupSortGroupView = {
   action: GroupSortRunnerAction;
   group: string;
   id: string;
   placedItemViews: GroupSortItemView[];
 };
 
-export type GroupSortItemView = StudentRunnerItemView & {
+type GroupSortItemView = StudentRunnerItemView & {
   action: GroupSortRunnerAction;
   reviewStatusClassName: string | undefined;
   selected: boolean;
@@ -180,7 +180,7 @@ export type InlineBlankPromptView =
       prompt: string;
     };
 
-export type FillBlankWorksheetItemView = StudentRunnerItemView & {
+type FillBlankWorksheetItemView = StudentRunnerItemView & {
   promptView: InlineBlankPromptView;
   reviewStatusClassName: string | undefined;
   sequenceLabel: string;
@@ -188,11 +188,11 @@ export type FillBlankWorksheetItemView = StudentRunnerItemView & {
   wordBankText: string | null;
 };
 
-export type FillBlankWorksheetView = StudentRunnerView & {
+type FillBlankWorksheetView = StudentRunnerView & {
   fillBlankItemViews: FillBlankWorksheetItemView[];
 };
 
-export type SequentialStudentRunnerItemView = StudentRunnerItemView & {
+type SequentialStudentRunnerItemView = StudentRunnerItemView & {
   sequenceLabel: string;
 };
 
@@ -203,7 +203,7 @@ export type SequentialStudentRunnerNavigationItemView =
     selectAction: SequentialStudentRunnerNavigationAction;
   };
 
-export type SequentialStudentRunnerNavigationView = {
+type SequentialStudentRunnerNavigationView = {
   activePanelStatusClassName: string | undefined;
   canMove: boolean;
   itemViews: SequentialStudentRunnerNavigationItemView[];
@@ -225,7 +225,7 @@ export type SequentialStudentRunnerNavigationAction =
       type: 'select';
     };
 
-export type SequentialStudentRunnerSequenceView = {
+type SequentialStudentRunnerSequenceView = {
   activeIndex: number;
   activeItem: PublicRuntimeItem | undefined;
   activeItemView: SequentialStudentRunnerItemView | undefined;
@@ -233,7 +233,7 @@ export type SequentialStudentRunnerSequenceView = {
   itemViews: SequentialStudentRunnerItemView[];
 };
 
-export type SequentialStudentRunnerView = StudentRunnerView & {
+type SequentialStudentRunnerView = StudentRunnerView & {
   activeAnswer: string;
   activeChoiceViews: RuntimeChoiceButtonView[];
   activeItem: PublicRuntimeItem | undefined;
@@ -315,7 +315,7 @@ export type StudentRunnerPrepareView = {
   title: string;
 };
 
-export type StudentRunnerPrepareStepId =
+type StudentRunnerPrepareStepId =
   | 'anonymous'
   | 'no-timer'
   | 'review-rules'

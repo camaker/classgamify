@@ -12,10 +12,7 @@ import {
   ASSIGNMENT_PUBLISH_CONTROL_BOUNDARY_ITEM_IDS,
   ASSIGNMENT_PUBLISH_HANDOFF_ITEM_IDS,
 } from '@/assignments/publish-input';
-import {
-  ASSIGNMENT_DELIVERY_POLICY_HANDOFF_ITEM_IDS,
-  PUBLIC_ASSIGNMENT_RULES_HANDOFF_ITEM_IDS,
-} from '@/assignments/delivery-summary';
+import { ASSIGNMENT_DELIVERY_POLICY_HANDOFF_ITEM_IDS } from '@/assignments/delivery-summary';
 import { ASSIGNMENT_SHARE_LINK_HANDOFF_ITEM_IDS } from '@/assignments/share-link';
 import { ASSIGNMENT_LIST_PAGE_HANDOFF_ITEM_IDS } from '@/assignments/list-view';
 import { ASSIGNMENT_LIFECYCLE_HANDOFF_ITEM_IDS } from '@/assignments/lifecycle';
@@ -26,7 +23,6 @@ import { ASSIGNMENT_ATTEMPT_LIMIT_HANDOFF_ITEM_IDS } from '@/assignments/attempt
 import { ASSIGNMENT_SUBMISSION_VALIDATION_HANDOFF_ITEM_IDS } from '@/assignments/submission-validation-handoff';
 import { ASSIGNMENT_ATTEMPT_PERSISTENCE_HANDOFF_ITEM_IDS } from '@/assignments/attempt-persistence-handoff';
 import { ASSIGNMENT_ATTEMPT_DURATION_HANDOFF_ITEM_IDS } from '@/assignments/attempt-duration-handoff';
-import { STUDENT_RUNNER_SUBMISSION_HANDOFF_ITEM_IDS } from '@/assignments/student-runner-state';
 import { ASSIGNMENT_ANSWER_FEEDBACK_HANDOFF_ITEM_IDS } from '@/assignments/answer-feedback-handoff';
 import { ASSIGNMENT_ATTEMPT_STATS_HANDOFF_ITEM_IDS } from '@/assignments/attempt-stats-handoff';
 import { ASSIGNMENT_RESULTS_EXPORT_PREPARATION_ITEM_IDS } from '@/assignments/results-export';
@@ -168,7 +164,6 @@ test('published assignment delivery chain stays backed by focused contracts', ()
     [
       ASSIGNMENT_PUBLISH_HANDOFF_ITEM_IDS.length,
       ASSIGNMENT_DELIVERY_POLICY_HANDOFF_ITEM_IDS.length,
-      PUBLIC_ASSIGNMENT_RULES_HANDOFF_ITEM_IDS.length,
       ASSIGNMENT_SHARE_LINK_HANDOFF_ITEM_IDS.length,
       ASSIGNMENT_LIST_PAGE_HANDOFF_ITEM_IDS.length,
       ASSIGNMENT_LIFECYCLE_HANDOFF_ITEM_IDS.length,
@@ -179,13 +174,12 @@ test('published assignment delivery chain stays backed by focused contracts', ()
       ASSIGNMENT_SUBMISSION_VALIDATION_HANDOFF_ITEM_IDS.length,
       ASSIGNMENT_ATTEMPT_PERSISTENCE_HANDOFF_ITEM_IDS.length,
       ASSIGNMENT_ATTEMPT_DURATION_HANDOFF_ITEM_IDS.length,
-      STUDENT_RUNNER_SUBMISSION_HANDOFF_ITEM_IDS.length,
       ASSIGNMENT_ANSWER_FEEDBACK_HANDOFF_ITEM_IDS.length,
       ASSIGNMENT_ATTEMPT_STATS_HANDOFF_ITEM_IDS.length,
       ASSIGNMENT_RESULTS_EXPORT_PREPARATION_ITEM_IDS.length,
       ASSIGNMENT_PUBLISH_CONTROL_BOUNDARY_ITEM_IDS.length,
     ],
-    Array.from({ length: 18 }, () => 30)
+    Array.from({ length: 16 }, () => 30)
   );
 });
 
@@ -223,7 +217,7 @@ test('published assignment delivery sources preserve sanitized public and submis
   );
   assert.match(
     STUDENT_RUNNER_SOURCE,
-    /STUDENT_RUNNER_SUBMISSION_HANDOFF_ITEM_IDS[\s\S]*exposesRawSubmissionPayload: false[\s\S]*exposesRuntimeItemIds: false[\s\S]*exposesTeacherOnlyAnswers: false/
+    /buildStudentRunnerSubmissionExecutionPlan[\s\S]*confirmIncompleteSubmit/
   );
 });
 
@@ -231,10 +225,6 @@ test('published assignment delivery privacy contracts stay explicit across surfa
   assert.match(
     PUBLISH_INPUT_SOURCE,
     /AssignmentPublishHandoffPrivacyContract[\s\S]*exposesPublicRuntimeContent: false[\s\S]*exposesRawSettingsJson: false[\s\S]*exposesShareSlug: false[\s\S]*scope: 'assignment-publish-preflight-boundary'/
-  );
-  assert.match(
-    DELIVERY_SUMMARY_SOURCE,
-    /PublicAssignmentRulesHandoffPrivacyContract[\s\S]*exposesAnswerKeys: false[\s\S]*exposesRawSettingsJson: false[\s\S]*exposesTeacherSourceMaterials: false[\s\S]*scope: 'public-assignment-rules'/
   );
   assert.match(
     DELIVERY_SUMMARY_SOURCE,

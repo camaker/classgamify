@@ -5,16 +5,7 @@ import { ASSIGNMENT_ANSWER_FEEDBACK_HANDOFF_ITEM_IDS } from '@/assignments/answe
 import { ASSIGNMENT_ATTEMPT_DURATION_HANDOFF_ITEM_IDS } from '@/assignments/attempt-duration-handoff';
 import { ASSIGNMENT_ATTEMPT_LIMIT_HANDOFF_ITEM_IDS } from '@/assignments/attempt-limit-handoff';
 import { ASSIGNMENT_ATTEMPT_PERSISTENCE_HANDOFF_ITEM_IDS } from '@/assignments/attempt-persistence-handoff';
-import { PUBLIC_ASSIGNMENT_RULES_HANDOFF_ITEM_IDS } from '@/assignments/delivery-summary';
-import { FILL_BLANK_WORKSHEET_HANDOFF_ITEM_IDS } from '@/assignments/fill-blank-worksheet-handoff';
-import { GROUP_SORT_BOARD_HANDOFF_ITEM_IDS } from '@/assignments/group-sort-board-handoff';
-import { LINE_MATCH_BOARD_HANDOFF_ITEM_IDS } from '@/assignments/line-match-board-handoff';
-import { LISTENING_SPEECH_HANDOFF_ITEM_IDS } from '@/assignments/listening-speech-handoff';
-import { MATCHING_PAIRS_BOARD_HANDOFF_ITEM_IDS } from '@/assignments/matching-pairs-board-handoff';
-import { OPEN_BOX_REVEAL_HANDOFF_ITEM_IDS } from '@/assignments/open-box-reveal-handoff';
 import { PUBLIC_ASSIGNMENT_ACCESS_HANDOFF_ITEM_IDS } from '@/assignments/public';
-import { STUDENT_RUNTIME_CHOICE_ASSIGNMENT_HANDOFF_ITEM_IDS } from '@/assignments/runtime-choice-assignment-handoff';
-import { STUDENT_RUNTIME_IDENTITY_HANDOFF_ITEM_IDS } from '@/assignments/runtime-identity-handoff';
 import {
   STUDENT_RUNNER_PLAY_CHAIN_HANDOFF_ITEM_IDS,
   STUDENT_RUNNER_PLAY_CHAIN_SOURCE_FILES,
@@ -22,17 +13,6 @@ import {
   type StudentRunnerPlayChainHandoffItemId,
   type StudentRunnerPlayChainHandoffView,
 } from '@/assignments/student-runner-play-chain';
-import { STUDENT_RUNNER_IDENTITY_HANDOFF_ITEM_IDS } from '@/assignments/student-runner-identity-handoff';
-import { STUDENT_RUNNER_LOADING_HANDOFF_ITEM_IDS } from '@/assignments/student-runner-loading-handoff';
-import {
-  STUDENT_RUNNER_START_HANDOFF_ITEM_IDS,
-  STUDENT_RUNNER_SUBMISSION_HANDOFF_ITEM_IDS,
-} from '@/assignments/student-runner-state';
-import { STUDENT_RUNNER_SUBMIT_CONTROLS_HANDOFF_ITEM_IDS } from '@/assignments/student-runner-submit-controls-handoff';
-import {
-  STUDENT_RUNTIME_INTERACTION_HANDOFF_ITEM_IDS,
-  STUDENT_RUNTIME_SEMANTIC_BUNDLE_HANDOFF_ITEM_IDS,
-} from '@/assignments/student-runtime-item-list';
 import { ASSIGNMENT_SUBMISSION_VALIDATION_HANDOFF_ITEM_IDS } from '@/assignments/submission-validation-handoff';
 import { PUBLIC_ASSIGNMENT_UNAVAILABLE_ACCESS_HANDOFF_ITEM_IDS } from '@/assignments/unavailable-access';
 
@@ -141,7 +121,7 @@ test('student runner play chain summarizes each runner step', () => {
       ['attempt-persistence', 'Scored attempt'],
       ['answer-feedback-policy', 'Reveal if allowed'],
       ['post-submit-next-steps', 'Review or retry'],
-      ['submit-controls-handoff-boundary', '30 submit control slices'],
+      ['submit-controls-handoff-boundary', 'Visible submit controls'],
     ]
   );
   assert.equal(
@@ -162,30 +142,14 @@ test('student runner play chain stays backed by focused contracts', () => {
   assert.deepEqual(
     [
       PUBLIC_ASSIGNMENT_ACCESS_HANDOFF_ITEM_IDS.length,
-      PUBLIC_ASSIGNMENT_RULES_HANDOFF_ITEM_IDS.length,
       PUBLIC_ASSIGNMENT_UNAVAILABLE_ACCESS_HANDOFF_ITEM_IDS.length,
-      STUDENT_RUNNER_LOADING_HANDOFF_ITEM_IDS.length,
-      STUDENT_RUNNER_START_HANDOFF_ITEM_IDS.length,
-      STUDENT_RUNNER_IDENTITY_HANDOFF_ITEM_IDS.length,
-      STUDENT_RUNNER_SUBMIT_CONTROLS_HANDOFF_ITEM_IDS.length,
-      STUDENT_RUNNER_SUBMISSION_HANDOFF_ITEM_IDS.length,
-      STUDENT_RUNTIME_INTERACTION_HANDOFF_ITEM_IDS.length,
-      STUDENT_RUNTIME_CHOICE_ASSIGNMENT_HANDOFF_ITEM_IDS.length,
-      STUDENT_RUNTIME_IDENTITY_HANDOFF_ITEM_IDS.length,
-      STUDENT_RUNTIME_SEMANTIC_BUNDLE_HANDOFF_ITEM_IDS.length,
-      FILL_BLANK_WORKSHEET_HANDOFF_ITEM_IDS.length,
-      LINE_MATCH_BOARD_HANDOFF_ITEM_IDS.length,
-      GROUP_SORT_BOARD_HANDOFF_ITEM_IDS.length,
-      MATCHING_PAIRS_BOARD_HANDOFF_ITEM_IDS.length,
-      LISTENING_SPEECH_HANDOFF_ITEM_IDS.length,
-      OPEN_BOX_REVEAL_HANDOFF_ITEM_IDS.length,
       ASSIGNMENT_ATTEMPT_LIMIT_HANDOFF_ITEM_IDS.length,
       ASSIGNMENT_ATTEMPT_DURATION_HANDOFF_ITEM_IDS.length,
       ASSIGNMENT_ANSWER_FEEDBACK_HANDOFF_ITEM_IDS.length,
       ASSIGNMENT_SUBMISSION_VALIDATION_HANDOFF_ITEM_IDS.length,
       ASSIGNMENT_ATTEMPT_PERSISTENCE_HANDOFF_ITEM_IDS.length,
     ],
-    Array.from({ length: 23 }, () => 30)
+    Array.from({ length: 7 }, () => 30)
   );
 });
 
@@ -247,17 +211,7 @@ test('student runner sources preserve public payload and submit boundaries', () 
   );
 });
 
-test('student runner privacy contracts stay explicit across surfaces', () => {
-  assert.match(
-    STUDENT_RUNNER_STATE_SOURCE,
-    /StudentRunnerStartHandoffPrivacyContract[\s\S]*exposesAnonymousToken: false[\s\S]*exposesRuntimeItemIds: false[\s\S]*exposesRuntimePromptText: false[\s\S]*scope: 'public-student-runner-start'/,
-    'Student runner start handoff should hide tokens, runtime ids, prompts, answers, and teacher-only content.'
-  );
-  assert.match(
-    STUDENT_RUNNER_STATE_SOURCE,
-    /StudentRunnerSubmissionHandoffPrivacyContract[\s\S]*exposesAnonymousToken: false[\s\S]*exposesRawSubmissionPayload: false[\s\S]*exposesRuntimeItemIds: false[\s\S]*exposesStudentName: false/,
-    'Student runner submission handoff should hide raw payload, runtime ids, student names, and anonymous tokens.'
-  );
+test('student runner clocks, submit confirmation, and runtime surfaces stay explicit', () => {
   assert.match(
     STUDENT_RUNNER_STATE_SOURCE,
     /buildStudentRunnerAttemptClockStartPlan[\s\S]*canSubmit[\s\S]*buildStudentRunnerSubmissionExecutionPlan[\s\S]*confirmIncompleteSubmit/,
@@ -270,13 +224,13 @@ test('student runner privacy contracts stay explicit across surfaces', () => {
   );
   assert.match(
     STUDENT_RUNTIME_SOURCE,
-    /STUDENT_RUNTIME_RENDERER_SURFACES[\s\S]*buildStudentRuntimeInteractionHandoffView[\s\S]*buildStudentRuntimeSemanticBundleHandoffView[\s\S]*privacy: buildStudentRuntimeSemanticBundleHandoffPrivacyContract/,
-    'Student runtime helpers should compose renderer, choice-assignment, and identity semantic bundles.'
+    /buildStudentRuntimeItemListView[\s\S]*getActivityTemplateRunnerKind\(templateType\)[\s\S]*buildDefaultRuntimeItemCardViews\(\{/,
+    'Student runtime helpers should pick the template runner surface and build the visible item cards.'
   );
-  assert.match(
+  assert.doesNotMatch(
     STUDENT_RUNTIME_SOURCE,
-    /StudentRuntimeSemanticBundleHandoffPrivacyContract[\s\S]*exposesAnswerText: false[\s\S]*exposesRuntimeItemIds: false[\s\S]*exposesRuntimePromptText: false[\s\S]*scope: 'public-student-runtime-semantic-bundle'/,
-    'Student runtime semantic bundle should keep runtime details private while using the shared answer contract.'
+    /Handoff/,
+    'Student runtime helpers should not rebuild hidden handoff markup.'
   );
 });
 
@@ -293,8 +247,8 @@ test('student runner play chain focused gate is documented', () => {
   );
   assert.match(
     TEST_CATALOG_SOURCE.replace(/\s+/g, ' '),
-    /submit controls handoff boundary/,
-    'TEST-CATALOG should document the concrete submit controls handoff boundary.'
+    /visible submit controls/,
+    'TEST-CATALOG should document the visible submit controls boundary.'
   );
 });
 

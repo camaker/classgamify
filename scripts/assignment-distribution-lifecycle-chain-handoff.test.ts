@@ -42,7 +42,6 @@ import {
 } from '@/assignments/share-link';
 import { normalizeAssignmentShareSlug } from '@/assignments/share-slug';
 import { ASSIGNMENT_SOURCE_ACTIVITY_CONTEXT_CHAIN_HANDOFF_ITEM_IDS } from '@/assignments/source-activity-context-chain';
-import { STUDENT_RUNNER_START_HANDOFF_ITEM_IDS } from '@/assignments/student-runner-state';
 import { TEACHER_RESULTS_REVIEW_CHAIN_HANDOFF_ITEM_IDS } from '@/assignments/teacher-results-review-chain';
 import { overwriteGetLocale } from '@/locale/paraglide/runtime';
 
@@ -175,7 +174,7 @@ test('assignment distribution lifecycle summarizes each handoff boundary', () =>
       ['student-runner-boundary', 'Public /play'],
       ['printable-handout-boundary', 'Teacher print'],
       ['result-review-boundary', 'Teacher results'],
-      ['student-runner-start-handoff-boundary', '30 runner start slices'],
+      ['student-runner-start-handoff-boundary', 'Visible start screen'],
     ]
   );
   assert.equal(
@@ -184,7 +183,7 @@ test('assignment distribution lifecycle summarizes each handoff boundary', () =>
   );
   assert.equal(
     getHandoffValue(handoffView, 'student-runner-start-handoff-boundary'),
-    `${STUDENT_RUNNER_START_HANDOFF_ITEM_IDS.length} runner start slices`
+    'Visible start screen'
   );
 });
 
@@ -206,11 +205,10 @@ test('assignment distribution lifecycle is backed by adjacent gates', () => {
       ASSIGNMENT_DELIVERY_POLICY_HANDOFF_ITEM_IDS.length,
       PUBLISHED_ASSIGNMENT_DELIVERY_CHAIN_HANDOFF_ITEM_IDS.length,
       ASSIGNMENT_SOURCE_ACTIVITY_CONTEXT_CHAIN_HANDOFF_ITEM_IDS.length,
-      STUDENT_RUNNER_START_HANDOFF_ITEM_IDS.length,
       PRINTABLE_WORKSHEET_HANDOFF_ITEM_IDS.length,
       TEACHER_RESULTS_REVIEW_CHAIN_HANDOFF_ITEM_IDS.length,
     ],
-    Array.from({ length: 9 }, () => 30)
+    Array.from({ length: 8 }, () => 30)
   );
 });
 
@@ -501,7 +499,7 @@ test('assignment distribution lifecycle sources preserve route, DOM, and API bou
   );
   assert.match(
     PRODUCT_SOURCE,
-    /assignment\s+distribution\s+lifecycle\s+chain[\s\S]*30-slice\s+student-runner-start\s+handoff[\s\S]*sanitized\s+source[\s\S]*delivery\s+rules[\s\S]*identity[\s\S]*submission\s+preparation[\s\S]*privacy/,
+    /assignment\s+distribution\s+lifecycle\s+chain[\s\S]*student-runner\s+start\s+screen[\s\S]*rule\s+chips[\s\S]*name\s+field[\s\S]*sanitized\s+public/,
     'docs/product.md should connect distributed student links to the shared runner-start contract.'
   );
   assert.match(
@@ -564,7 +562,7 @@ test('assignment distribution lifecycle sources preserve route, DOM, and API bou
 test('assignment distribution lifecycle focused gate is documented', () => {
   assert.match(
     TEST_CATALOG_SOURCE,
-    /Assignment distribution lifecycle chain has a fast script-level gate via[\s\S]*scripts\/assignment-distribution-lifecycle-chain-handoff\.test\.ts[\s\S]*30-slice\s+student-runner-start\s+boundary/,
+    /Assignment distribution lifecycle chain has a fast script-level gate via[\s\S]*scripts\/assignment-distribution-lifecycle-chain-handoff\.test\.ts[\s\S]*visible\s+student-runner\s+start\s+screen/,
     'TEST-CATALOG should document the assignment distribution lifecycle gate.'
   );
   assert.match(
