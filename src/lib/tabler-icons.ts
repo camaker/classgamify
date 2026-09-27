@@ -91,7 +91,6 @@ export { default as IconMenu2 } from '@tabler/icons-react/dist/esm/icons/IconMen
 export { default as IconMessageCircle } from '@tabler/icons-react/dist/esm/icons/IconMessageCircle.mjs';
 export { default as IconMoon } from '@tabler/icons-react/dist/esm/icons/IconMoon.mjs';
 export { default as IconPaperclip } from '@tabler/icons-react/dist/esm/icons/IconPaperclip.mjs';
-export { default as IconPencil } from '@tabler/icons-react/dist/esm/icons/IconPencil.mjs';
 export { default as IconPencilPlus } from '@tabler/icons-react/dist/esm/icons/IconPencilPlus.mjs';
 export { default as IconPhoto } from '@tabler/icons-react/dist/esm/icons/IconPhoto.mjs';
 export { default as IconPlayerPlay } from '@tabler/icons-react/dist/esm/icons/IconPlayerPlay.mjs';

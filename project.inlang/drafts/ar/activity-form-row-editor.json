@@ -1,0 +1,20 @@
+{
+  "activity_form_rows_add_group": "إضافة مجموعة",
+  "activity_form_rows_add_pair": "إضافة زوج",
+  "activity_form_rows_add_question": "إضافة سؤال",
+  "activity_form_rows_answer": "الإجابة الصحيحة",
+  "activity_form_rows_edit_as_text": "التحرير كنص",
+  "activity_form_rows_explanation": "الشرح (اختياري)",
+  "activity_form_rows_group_items": "العناصر",
+  "activity_form_rows_group_label": "المجموعة {number}",
+  "activity_form_rows_group_name": "اسم المجموعة",
+  "activity_form_rows_items_placeholder": "افصل العناصر بفواصل",
+  "activity_form_rows_left": "المصطلح",
+  "activity_form_rows_options": "خيارات الإجابة",
+  "activity_form_rows_options_placeholder": "افصل الخيارات بفواصل",
+  "activity_form_rows_pair_label": "الزوج {number}",
+  "activity_form_rows_prompt": "السؤال",
+  "activity_form_rows_question_label": "السؤال {number}",
+  "activity_form_rows_remove": "إزالة {label}",
+  "activity_form_rows_right": "المطابق"
+}

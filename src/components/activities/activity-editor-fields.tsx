@@ -3,6 +3,7 @@ import type {
   ActivityEditorTemplateView,
 } from '@/activities/editor';
 import type { CreateActivityInput } from '@/activities/validation';
+import { ActivityRowListEditor } from '@/components/activities/activity-row-list-editor';
 import { ActivitySourceMaterialsField } from '@/components/activities/activity-source-materials-field';
 import { Button } from '@/components/ui/button';
 import {
@@ -184,95 +185,142 @@ export function ActivityEditorStructuredContentFields({
 }: ActivityEditorFieldsProps) {
   return (
     <>
-      <div className="grid gap-4 lg:grid-cols-2">
-        <FormField
-          control={control}
-          name="vocabularyText"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>{m.activity_form_field_vocabulary()}</FormLabel>
-              <FormControl>
-                <Textarea
-                  {...field}
-                  className="max-h-52"
-                  rows={4}
-                  placeholder={m.activity_form_vocabulary_placeholder()}
-                />
-              </FormControl>
-              <FormDescription>
-                {m.activity_form_vocabulary_description()}
-              </FormDescription>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        <FormField
-          control={control}
-          name="questionsText"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>{m.activity_form_field_questions()}</FormLabel>
-              <FormControl>
-                <Textarea
-                  {...field}
-                  className="max-h-60"
-                  rows={4}
-                  placeholder={m.activity_form_questions_placeholder()}
-                />
-              </FormControl>
-              <FormDescription>
-                {m.activity_form_questions_description()}
-              </FormDescription>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-      </div>
+      <FormField
+        control={control}
+        name="questionsText"
+        render={({ field }) => (
+          <FormItem>
+            <p className="font-semibold text-base">
+              {m.activity_form_field_questions()}
+            </p>
+            <ActivityRowListEditor
+              addLabel={m.activity_form_rows_add_question()}
+              columns={[
+                {
+                  key: 'prompt',
+                  label: m.activity_form_rows_prompt(),
+                  wide: true,
+                },
+                { key: 'answer', label: m.activity_form_rows_answer() },
+                {
+                  key: 'options',
+                  label: m.activity_form_rows_options(),
+                  placeholder: m.activity_form_rows_options_placeholder(),
+                },
+                {
+                  key: 'explanation',
+                  label: m.activity_form_rows_explanation(),
+                  wide: true,
+                },
+              ]}
+              rowLabel={(number) =>
+                m.activity_form_rows_question_label({ number })
+              }
+              textareaProps={{
+                name: field.name,
+                onBlur: field.onBlur,
+                placeholder: m.activity_form_questions_placeholder(),
+                ref: field.ref,
+              }}
+              value={field.value ?? ''}
+              onChange={field.onChange}
+            />
+            <FormMessage />
+          </FormItem>
+        )}
+      />
 
-      <div className="grid gap-4 lg:grid-cols-2">
-        <FormField
-          control={control}
-          name="pairsText"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>{m.activity_form_field_pairs()}</FormLabel>
-              <FormControl>
-                <Textarea
-                  {...field}
-                  className="max-h-52"
-                  rows={4}
-                  placeholder={m.activity_form_pairs_placeholder()}
-                />
-              </FormControl>
-              <FormDescription>
-                {m.activity_form_pairs_description()}
-              </FormDescription>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        <FormField
-          control={control}
-          name="groupsText"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>{m.activity_form_field_groups()}</FormLabel>
-              <FormControl>
-                <Textarea
-                  {...field}
-                  className="max-h-52"
-                  rows={4}
-                  placeholder={m.activity_form_groups_placeholder()}
-                />
-              </FormControl>
-              <FormDescription>
-                {m.activity_form_groups_description()}
-              </FormDescription>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-      </div>
+      <FormField
+        control={control}
+        name="pairsText"
+        render={({ field }) => (
+          <FormItem>
+            <p className="font-semibold text-base">
+              {m.activity_form_field_pairs()}
+            </p>
+            <p className="text-muted-foreground text-sm">
+              {m.activity_form_pairs_description()}
+            </p>
+            <ActivityRowListEditor
+              addLabel={m.activity_form_rows_add_pair()}
+              columns={[
+                { key: 'left', label: m.activity_form_rows_left() },
+                { key: 'right', label: m.activity_form_rows_right() },
+              ]}
+              rowLabel={(number) => m.activity_form_rows_pair_label({ number })}
+              textareaProps={{
+                name: field.name,
+                onBlur: field.onBlur,
+                placeholder: m.activity_form_pairs_placeholder(),
+                ref: field.ref,
+              }}
+              value={field.value ?? ''}
+              onChange={field.onChange}
+            />
+            <FormMessage />
+          </FormItem>
+        )}
+      />
+
+      <FormField
+        control={control}
+        name="groupsText"
+        render={({ field }) => (
+          <FormItem>
+            <p className="font-semibold text-base">
+              {m.activity_form_field_groups()}
+            </p>
+            <p className="text-muted-foreground text-sm">
+              {m.activity_form_groups_description()}
+            </p>
+            <ActivityRowListEditor
+              addLabel={m.activity_form_rows_add_group()}
+              columns={[
+                { key: 'label', label: m.activity_form_rows_group_name() },
+                {
+                  key: 'items',
+                  label: m.activity_form_rows_group_items(),
+                  placeholder: m.activity_form_rows_items_placeholder(),
+                },
+              ]}
+              rowLabel={(number) =>
+                m.activity_form_rows_group_label({ number })
+              }
+              textareaProps={{
+                name: field.name,
+                onBlur: field.onBlur,
+                placeholder: m.activity_form_groups_placeholder(),
+                ref: field.ref,
+              }}
+              value={field.value ?? ''}
+              onChange={field.onChange}
+            />
+            <FormMessage />
+          </FormItem>
+        )}
+      />
+
+      <FormField
+        control={control}
+        name="vocabularyText"
+        render={({ field }) => (
+          <FormItem>
+            <FormLabel>{m.activity_form_field_vocabulary()}</FormLabel>
+            <FormControl>
+              <Textarea
+                {...field}
+                className="max-h-52"
+                rows={3}
+                placeholder={m.activity_form_vocabulary_placeholder()}
+              />
+            </FormControl>
+            <FormDescription>
+              {m.activity_form_vocabulary_description()}
+            </FormDescription>
+            <FormMessage />
+          </FormItem>
+        )}
+      />
 
       <div className="grid gap-4 lg:grid-cols-2">
         <FormField

@@ -1,0 +1,20 @@
+{
+  "activity_form_rows_add_group": "Ajouter un groupe",
+  "activity_form_rows_add_pair": "Ajouter une paire",
+  "activity_form_rows_add_question": "Ajouter une question",
+  "activity_form_rows_answer": "Bonne réponse",
+  "activity_form_rows_edit_as_text": "Modifier en texte",
+  "activity_form_rows_explanation": "Explication (facultatif)",
+  "activity_form_rows_group_items": "Éléments",
+  "activity_form_rows_group_label": "Groupe {number}",
+  "activity_form_rows_group_name": "Nom du groupe",
+  "activity_form_rows_items_placeholder": "Sépare les éléments par des virgules",
+  "activity_form_rows_left": "Terme",
+  "activity_form_rows_options": "Choix de réponses",
+  "activity_form_rows_options_placeholder": "Sépare les choix par des virgules",
+  "activity_form_rows_pair_label": "Paire {number}",
+  "activity_form_rows_prompt": "Énoncé",
+  "activity_form_rows_question_label": "Question n° {number}",
+  "activity_form_rows_remove": "Supprimer {label}",
+  "activity_form_rows_right": "Correspondance"
+}
