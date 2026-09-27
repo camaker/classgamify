@@ -22,16 +22,13 @@ import {
   type StudentRunnerAttemptClock,
 } from '@/assignments/student-runner-state';
 import { normalizeAssignmentShareSlug } from '@/assignments/share-slug';
-import { ActivityPreview } from '@/components/activities/activity-preview';
 import { StudentRuntimeItemList } from '@/components/activities/student-runtime-item-list';
 import { StudentRunnerAttemptShell } from '@/components/assignments/student-runner-attempt-shell';
+import { StudentRunnerFrame } from '@/components/assignments/student-runner-frame';
 import { StudentRunnerHeaderCard } from '@/components/assignments/student-runner-header-card';
 import { StudentRunnerLoadingPanel } from '@/components/assignments/student-runner-loading-panel';
 import { StudentRunnerMissingPanel } from '@/components/assignments/student-runner-missing-panel';
-import { StudentRunnerStartHandoff } from '@/components/assignments/student-runner-start-handoff';
-import { StudentRunnerSubmissionHandoff } from '@/components/assignments/student-runner-submission-handoff';
 import { StudentRunnerSubmitControls } from '@/components/assignments/student-runner-submit-controls';
-import Container from '@/components/layout/container';
 import { websiteConfig } from '@/config/website';
 import { usePublicAssignment, useSubmitAttempt } from '@/hooks/use-assignments';
 import { seo } from '@/lib/seo';
@@ -214,7 +211,10 @@ function PlayPage() {
 
     if (executionPlan.type === 'message') {
       setConfirmIncompleteSubmit(executionPlan.nextConfirmIncompleteSubmit);
-      toast[executionPlan.messageTone](executionPlan.message);
+      // The submit bar already shows the unanswered-item confirmation inline.
+      if (!executionPlan.nextConfirmIncompleteSubmit) {
+        toast[executionPlan.messageTone](executionPlan.message);
+      }
       return;
     }
 
@@ -276,65 +276,55 @@ function PlayPage() {
   }
 
   if (runnerRouteState.status === 'loading') {
-    return <StudentRunnerLoadingPanel view={runnerPageView.loadingView} />;
+    return (
+      <StudentRunnerFrame>
+        <StudentRunnerLoadingPanel view={runnerPageView.loadingView} />
+      </StudentRunnerFrame>
+    );
   }
 
   if (runnerRouteState.status === 'missing') {
-    return <StudentRunnerMissingPanel view={runnerRouteState.missingView} />;
+    return (
+      <StudentRunnerFrame>
+        <StudentRunnerMissingPanel view={runnerRouteState.missingView} />
+      </StudentRunnerFrame>
+    );
   }
 
   if (runnerRouteState.status !== 'ready') return null;
 
-  const { previewView } = runnerRouteState;
-
   return (
-    <Container className="px-4 py-10 md:py-14">
-      <div className="mx-auto max-w-6xl space-y-8 pb-16">
-        <StudentRunnerHeaderCard
-          badgeLabel={runnerPageView.routeBadgeLabel}
-          view={runnerRouteState.headerView}
+    <StudentRunnerFrame>
+      <StudentRunnerHeaderCard
+        templateLabel={controlView.runnerTitle}
+        view={runnerRouteState.headerView}
+      />
+
+      <StudentRunnerAttemptShell
+        controlView={controlView}
+        identityView={runnerRouteState.identityView}
+        onStartAnotherAttempt={startAnotherAttempt}
+        onStudentNameChange={setStudentName}
+        resultPanelView={resultPanelView}
+        studentName={studentName}
+      >
+        <StudentRuntimeItemList
+          answers={answers}
+          disabled={runtimeListView.disabled}
+          items={runtimeListView.items}
+          revealAnswer={runtimeListView.revealAnswer}
+          reviewItems={runtimeListView.reviewItems}
+          language={runtimeListView.language}
+          templateType={runtimeListView.templateType}
+          onAnswerChanges={updateAnswers}
         />
 
-        {runnerPageView.startHandoffView ? (
-          <StudentRunnerStartHandoff view={runnerPageView.startHandoffView} />
-        ) : null}
-
-        <StudentRunnerAttemptShell
+        <StudentRunnerSubmitControls
           controlView={controlView}
-          identityView={runnerRouteState.identityView}
-          onStartAnotherAttempt={startAnotherAttempt}
-          onStudentNameChange={setStudentName}
-          resultPanelView={resultPanelView}
-          studentName={studentName}
-        >
-          <StudentRuntimeItemList
-            answers={answers}
-            disabled={runtimeListView.disabled}
-            items={runtimeListView.items}
-            revealAnswer={runtimeListView.revealAnswer}
-            reviewItems={runtimeListView.reviewItems}
-            language={runtimeListView.language}
-            templateType={runtimeListView.templateType}
-            onAnswerChanges={updateAnswers}
-          />
-
-          <StudentRunnerSubmitControls
-            controlView={controlView}
-            onSubmit={submitAnswers}
-          />
-        </StudentRunnerAttemptShell>
-
-        <StudentRunnerSubmissionHandoff
-          view={runnerPageView.submissionHandoffView}
+          hidden={resultPanelView.show}
+          onSubmit={submitAnswers}
         />
-
-        <ActivityPreview
-          activity={previewView.activity}
-          assignment={previewView.assignment}
-          compact
-          hideAnswers={previewView.hideAnswers}
-        />
-      </div>
-    </Container>
+      </StudentRunnerAttemptShell>
+    </StudentRunnerFrame>
   );
 }

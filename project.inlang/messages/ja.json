@@ -8648,5 +8648,11 @@
   "settings_files_material_classification_worksheet_document_description": "Worksheet documents are counted as printable or extraction-ready classroom materials.",
   "settings_files_material_classification_worksheet_image_description": "Worksheet images are counted as visual worksheet sources without exposing image bytes.",
   "settings_files_material_secondary_content_type": "Content type",
-  "settings_files_material_secondary_extension": "Extension"
+  "settings_files_material_secondary_extension": "Extension",
+  "student_play_intro": "すべての問題に答えてから提出すると、先生に届きます。",
+  "student_play_question_position": "{total} 問中 {current} 問目",
+  "student_play_previous": "前へ",
+  "student_play_next": "次へ",
+  "student_play_go_to_question": "{number} 問目へ移動",
+  "student_play_rules_toggle": "課題のルールをすべて見る"
 }

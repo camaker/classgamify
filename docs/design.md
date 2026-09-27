@@ -101,6 +101,46 @@ scale font size with viewport width.
 publish, preview, shuffle, timer, close, export, sort, filter, archive, restore,
 and review. Prefer icon-plus-label buttons where the command matters.
 
+### Tokens And Hard Rules
+
+These rules are checkable in review. When a screen breaks one, fix the screen
+instead of adding an exception.
+
+**Theme:** Light is the default (`websiteConfig.ui.mode.defaultMode`). Dark
+mode stays available through the switcher and must remain legible.
+
+**Color tokens** (defined in `src/styles.css`, usable as Tailwind classes):
+
+| Role | Classes | Use for |
+|------|---------|---------|
+| Brand | `primary`, `secondary` | Main action per screen, links, focus ring |
+| Status fill | `success`, `warning`, `error`, `info`, `draft` | Icons, dots, tinted backgrounds (`bg-success/10`) |
+| Status text | `success-text`, `warning-text`, `error-text` | Status words on light or tinted surfaces |
+| Student play | `play-1` … `play-4`, `play-foreground` | Answer tiles and other large tactile targets in runners only |
+
+- Status meaning comes from the status tokens, never from `primary`,
+  `secondary`, or hard-coded Tailwind palette colors (`amber-*`,
+  `emerald-*`, …). One badge color must not mean two different things.
+- Never put `*-foreground` text on a `/10`–`/20` tint of the same token; use
+  the matching `*-text` token.
+
+**Structure:**
+
+- One primary button per screen region. Secondary actions are outline or ghost
+  buttons, and rarely used ones go into a menu.
+- No card inside a card. A section is separated by spacing or a heading, not by
+  another border.
+- Say something once. The same rule, empty state, or status must not appear in
+  several panels on one page.
+- Supporting text is at least `text-sm` (14px). `text-xs` is for metadata
+  labels only, never for sentences a user must read to act.
+- Screen-reader-only (`sr-only`) text describes the visible UI. It must not add
+  audit or implementation detail that sighted users never see.
+
+**Copy:** Write what the user does and sees, not how the system is built.
+Words such as snapshot, runtime, payload, handoff, frozen, contract, surface,
+and scope do not belong in teacher or student UI.
+
 ### Page Standards
 
 **Home**
@@ -154,6 +194,15 @@ and review. Prefer icon-plus-label buttons where the command matters.
   left/right cards for matching pairs.
 - Progress and unanswered-item confirmation should reduce accidental empty
   submissions.
+- Public play links use a focused layout: no marketing navbar, footer, pricing,
+  sign-up, or teacher-only links. The only way out is closing the tab.
+- The first screen shows the title, the rules that change how a student works
+  (timer, close time, limited attempts), the name field, and the first
+  question. All other delivery rules sit behind a disclosure.
+- Choice templates show one question at a time with large `play-*` answer
+  tiles, and move to the next question after an answer. Progress and submit
+  live in one sticky bottom bar.
+- After submission the score is the first thing on screen.
 - Anonymous assignments should explain that work is tied to the current browser
   and show a short browser label, without exposing raw tokens.
 

@@ -5,6 +5,7 @@ export type {
   TablerIcon,
 } from '@tabler/icons-react';
 
+export { default as IconAlarm } from '@tabler/icons-react/dist/esm/icons/IconAlarm.mjs';
 export { default as IconAlertCircle } from '@tabler/icons-react/dist/esm/icons/IconAlertCircle.mjs';
 export { default as IconAlertOctagon } from '@tabler/icons-react/dist/esm/icons/IconAlertOctagon.mjs';
 export { default as IconAlertTriangle } from '@tabler/icons-react/dist/esm/icons/IconAlertTriangle.mjs';
@@ -21,6 +22,7 @@ export { default as IconBox } from '@tabler/icons-react/dist/esm/icons/IconBox.m
 export { default as IconBrandGoogleFilled } from '@tabler/icons-react/dist/esm/icons/IconBrandGoogleFilled.mjs';
 export { default as IconBug } from '@tabler/icons-react/dist/esm/icons/IconBug.mjs';
 export { default as IconCalendar } from '@tabler/icons-react/dist/esm/icons/IconCalendar.mjs';
+export { default as IconCalendarDue } from '@tabler/icons-react/dist/esm/icons/IconCalendarDue.mjs';
 export { default as IconCalendarTime } from '@tabler/icons-react/dist/esm/icons/IconCalendarTime.mjs';
 export { default as IconCards } from '@tabler/icons-react/dist/esm/icons/IconCards.mjs';
 export { default as IconCategory2 } from '@tabler/icons-react/dist/esm/icons/IconCategory2.mjs';
@@ -34,12 +36,14 @@ export { default as IconChevronsLeft } from '@tabler/icons-react/dist/esm/icons/
 export { default as IconChevronsRight } from '@tabler/icons-react/dist/esm/icons/IconChevronsRight.mjs';
 export { default as IconCircle } from '@tabler/icons-react/dist/esm/icons/IconCircle.mjs';
 export { default as IconCircleCheck } from '@tabler/icons-react/dist/esm/icons/IconCircleCheck.mjs';
+export { default as IconCircleCheckFilled } from '@tabler/icons-react/dist/esm/icons/IconCircleCheckFilled.mjs';
 export { default as IconCircleOff } from '@tabler/icons-react/dist/esm/icons/IconCircleOff.mjs';
 export { default as IconCirclePlus } from '@tabler/icons-react/dist/esm/icons/IconCirclePlus.mjs';
 export { default as IconCircleX } from '@tabler/icons-react/dist/esm/icons/IconCircleX.mjs';
 export { default as IconClipboardList } from '@tabler/icons-react/dist/esm/icons/IconClipboardList.mjs';
 export { default as IconClipboardText } from '@tabler/icons-react/dist/esm/icons/IconClipboardText.mjs';
 export { default as IconClock } from '@tabler/icons-react/dist/esm/icons/IconClock.mjs';
+export { default as IconConfetti } from '@tabler/icons-react/dist/esm/icons/IconConfetti.mjs';
 export { default as IconCopy } from '@tabler/icons-react/dist/esm/icons/IconCopy.mjs';
 export { default as IconCreditCard } from '@tabler/icons-react/dist/esm/icons/IconCreditCard.mjs';
 export { default as IconDeviceDesktop } from '@tabler/icons-react/dist/esm/icons/IconDeviceDesktop.mjs';
@@ -71,6 +75,7 @@ export { default as IconLayoutSidebar } from '@tabler/icons-react/dist/esm/icons
 export { default as IconLetterCase } from '@tabler/icons-react/dist/esm/icons/IconLetterCase.mjs';
 export { default as IconLineDashed } from '@tabler/icons-react/dist/esm/icons/IconLineDashed.mjs';
 export { default as IconLink } from '@tabler/icons-react/dist/esm/icons/IconLink.mjs';
+export { default as IconLinkOff } from '@tabler/icons-react/dist/esm/icons/IconLinkOff.mjs';
 export { default as IconListCheck } from '@tabler/icons-react/dist/esm/icons/IconListCheck.mjs';
 export { default as IconListDetails } from '@tabler/icons-react/dist/esm/icons/IconListDetails.mjs';
 export { default as IconLoader } from '@tabler/icons-react/dist/esm/icons/IconLoader.mjs';

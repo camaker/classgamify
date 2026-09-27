@@ -33,17 +33,17 @@ export function PublicAnswerFeedback({
       aria-describedby={descriptionId}
       aria-label={feedback.ariaLabel}
       className={cn(
-        'mt-3 flex flex-wrap items-center gap-2 rounded-lg border px-3 py-2 text-xs',
+        'mt-3 flex flex-wrap items-center gap-2 rounded-lg border px-3 py-2.5 text-sm',
         feedback.status === 'correct'
-          ? 'border-primary/25 bg-primary/5 text-primary'
-          : 'bg-muted/30 text-muted-foreground',
+          ? 'border-success/40 bg-success/10 font-semibold text-success-text'
+          : 'border-error/30 bg-error/5 font-semibold text-error-text',
         className
       )}
     >
       {feedback.status === 'correct' ? (
-        <IconCheck aria-hidden="true" className="size-3.5" />
+        <IconCheck aria-hidden="true" className="size-4" />
       ) : (
-        <IconX aria-hidden="true" className="size-3.5" />
+        <IconX aria-hidden="true" className="size-4" />
       )}
       <span className="sr-only" id={statusLabelId}>
         {feedback.statusAriaLabel}
@@ -59,7 +59,7 @@ export function PublicAnswerFeedback({
       <p className="sr-only" id={descriptionId}>
         {feedback.description}
       </p>
-      <dl className="basis-full space-y-1 text-muted-foreground">
+      <dl className="basis-full space-y-1 font-normal text-foreground/80">
         {feedback.detailLines.map((line) => (
           <PublicAnswerFeedbackDetailLineItem
             descriptionId={descriptionId}

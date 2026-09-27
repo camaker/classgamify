@@ -49,6 +49,18 @@
   --destructive: oklch(0.6 0.18 25);
   --destructive-foreground: oklch(0.98 0 0);
 
+  /* 语义色的文字版：用在浅色底上的状态文字，保证对比度 */
+  --success-text: oklch(0.45 0.13 145);
+  --error-text: oklch(0.5 0.19 25);
+  --warning-text: oklch(0.48 0.12 70);
+
+  /* ─── 学生端游戏色块：选项按钮等大面积实色，配白字 ─── */
+  --play-1: oklch(0.55 0.17 255);
+  --play-2: oklch(0.58 0.16 40);
+  --play-3: oklch(0.53 0.13 165);
+  --play-4: oklch(0.55 0.19 345);
+  --play-foreground: oklch(0.99 0 0);
+
   /* ─── 边框与交互 ─── */
   --border: oklch(0.9 0.002 240);
   --input: oklch(0.92 0.002 240);
@@ -121,6 +133,16 @@
   --destructive: oklch(0.65 0.18 25);
   --destructive-foreground: oklch(0.15 0 0);
 
+  --success-text: oklch(0.8 0.14 145);
+  --error-text: oklch(0.78 0.14 25);
+  --warning-text: oklch(0.85 0.13 80);
+
+  --play-1: oklch(0.6 0.16 255);
+  --play-2: oklch(0.63 0.15 40);
+  --play-3: oklch(0.58 0.12 165);
+  --play-4: oklch(0.6 0.17 345);
+  --play-foreground: oklch(0.99 0 0);
+
   /* ─── 边框与交互 ─── */
   --border: oklch(1 0 0 / 10%);
   --input: oklch(1 0 0 / 15%);
@@ -149,6 +171,24 @@
   --font-sans: var(--font-brand);
   --font-custom: var(--font-brand);
   --border-width: 1px;
+  --color-success: var(--success);
+  --color-success-foreground: var(--success-foreground);
+  --color-success-text: var(--success-text);
+  --color-error: var(--error);
+  --color-error-foreground: var(--error-foreground);
+  --color-error-text: var(--error-text);
+  --color-warning: var(--warning);
+  --color-warning-foreground: var(--warning-foreground);
+  --color-warning-text: var(--warning-text);
+  --color-info: var(--info);
+  --color-info-foreground: var(--info-foreground);
+  --color-draft: var(--draft);
+  --color-draft-foreground: var(--draft-foreground);
+  --color-play-1: var(--play-1);
+  --color-play-2: var(--play-2);
+  --color-play-3: var(--play-3);
+  --color-play-4: var(--play-4);
+  --color-play-foreground: var(--play-foreground);
   --color-sidebar-ring: var(--sidebar-ring);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);

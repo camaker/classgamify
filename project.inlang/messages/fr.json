@@ -8648,5 +8648,11 @@
   "settings_files_material_classification_worksheet_document_description": "Worksheet documents are counted as printable or extraction-ready classroom materials.",
   "settings_files_material_classification_worksheet_image_description": "Worksheet images are counted as visual worksheet sources without exposing image bytes.",
   "settings_files_material_secondary_content_type": "Content type",
-  "settings_files_material_secondary_extension": "Extension"
+  "settings_files_material_secondary_extension": "Extension",
+  "student_play_intro": "Réponds à chaque question, puis envoie ton travail à ton enseignant.",
+  "student_play_question_position": "Question {current} sur {total}",
+  "student_play_previous": "Précédente",
+  "student_play_next": "Suivante",
+  "student_play_go_to_question": "Aller à la question {number}",
+  "student_play_rules_toggle": "Toutes les règles du devoir"
 }
