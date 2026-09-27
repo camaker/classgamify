@@ -6,15 +6,39 @@ import { fileURLToPath, URL } from 'url';
 import tailwindcss from '@tailwindcss/vite';
 import { cloudflare } from '@cloudflare/vite-plugin';
 import contentCollections from '@content-collections/vite';
-import { paraglideVitePlugin } from '@inlang/paraglide-js';
+import { compile, paraglideVitePlugin } from '@inlang/paraglide-js';
+
+const PARAGLIDE_OPTIONS = {
+  project: './project.inlang',
+  outdir: './src/locale/paraglide',
+  strategy: ['url', 'cookie', 'baseLocale'],
+  routeStrategies: [
+    { match: '/api/:path(.*)?', exclude: true },
+    { match: '/robots.txt', exclude: true },
+    { match: '/sitemap.xml', exclude: true },
+    { match: '/manifest.json', exclude: true },
+  ],
+  emitTsDeclarations: false,
+} satisfies Parameters<typeof paraglideVitePlugin>[0];
 
 /**
  * Vite configuration
  * https://vite.dev/config/
  */
-const config = defineConfig(({ mode }) => {
+const config = defineConfig(async ({ command, mode }) => {
   const isProduction = mode === 'production';
   const isE2e = mode === 'e2e';
+
+  // Message modules emit one file per message (~7,800). Under `vite dev` the
+  // file watcher holds one descriptor per file, and once the process passes
+  // 10,240 descriptors Node on macOS fails to spawn workerd with EBADF (the
+  // Cloudflare plugin starts it after the watcher is up). Paraglide
+  // recommends locale modules for dev (opral/inlang-paraglide-js#486);
+  // builds keep message modules. e2e mode runs without the Paraglide plugin,
+  // so compile once up front.
+  if (isE2e && command === 'serve') {
+    await compile({ ...PARAGLIDE_OPTIONS, outputStructure: 'locale-modules' });
+  }
 
   return {
     server: {
@@ -47,17 +71,9 @@ const config = defineConfig(({ mode }) => {
       contentCollections(),
       !isE2e &&
         paraglideVitePlugin({
-          project: './project.inlang',
-          outdir: './src/locale/paraglide',
-          strategy: ['url', 'cookie', 'baseLocale'],
-          routeStrategies: [
-            { match: '/api/:path(.*)?', exclude: true },
-            { match: '/robots.txt', exclude: true },
-            { match: '/sitemap.xml', exclude: true },
-            { match: '/manifest.json', exclude: true },
-          ],
-          emitTsDeclarations: false,
-          outputStructure: 'message-modules',
+          ...PARAGLIDE_OPTIONS,
+          outputStructure:
+            command === 'build' ? 'message-modules' : 'locale-modules',
         }),
       // https://developers.cloudflare.com/workers/vite-plugin/
       cloudflare({
