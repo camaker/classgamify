@@ -12,7 +12,7 @@ export function ActivityLibraryStats({
   stats,
 }: ActivityLibraryStatsProps) {
   return (
-    <dl aria-label={label} className="grid gap-3 sm:grid-cols-3">
+    <dl aria-label={label} className="flex flex-wrap gap-x-5 gap-y-1 text-sm">
       {stats.map((stat) => (
         <ActivityLibraryStat idPrefix={idPrefix} key={stat.key} stat={stat} />
       ))}
@@ -32,11 +32,11 @@ function ActivityLibraryStat({
   const descriptionId = `${idPrefix}-stat-${stat.key}-description`;
 
   return (
-    <div className="rounded-lg border bg-background p-3">
-      <dt id={labelId} className="text-xs text-muted-foreground">
+    <div className="flex items-baseline gap-1.5">
+      <dt id={labelId} className="text-muted-foreground">
         {stat.label}
       </dt>
-      <dd className="text-xl font-semibold">
+      <dd className="font-semibold tabular-nums">
         <output
           id={valueId}
           aria-label={stat.ariaLabel}

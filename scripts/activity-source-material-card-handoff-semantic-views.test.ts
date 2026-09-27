@@ -187,7 +187,7 @@ test('activity source-material card summary renders a hidden semantic dl', () =>
   );
   assert.match(
     ACTIVITY_LIBRARY_CARD_SOURCE,
-    /ActivitySourceMaterialsSummary[\s\S]*actionSlot=\{[\s\S]*cardDisplayView\.actionState\.showEditAction[\s\S]*cardDisplayView\.sourceMaterials\.hasMaterials[\s\S]*summary=\{cardDisplayView\.sourceMaterials\}/
+    /cardDisplayView\.sourceMaterials\.hasMaterials[\s\S]*ActivitySourceMaterialsSummary[\s\S]*actionSlot=\{[\s\S]*cardDisplayView\.actionState\.showEditAction[\s\S]*summary=\{cardDisplayView\.sourceMaterials\}/
   );
 });
 

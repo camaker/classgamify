@@ -17,7 +17,6 @@ import {
 } from '@/assignments/list-view';
 import { AssignmentListCard } from '@/components/assignments/assignment-list-card';
 import { AssignmentListFilters } from '@/components/assignments/assignment-list-filters';
-import { AssignmentListScopePanel } from '@/components/assignments/assignment-list-scope-panel';
 import { AssignmentListSummaryCard } from '@/components/assignments/assignment-list-summary-card';
 import { PublishedAssignmentPanel } from '@/components/assignments/published-assignment-panel';
 import { DashboardPagination } from '@/components/dashboard/dashboard-pagination';
@@ -156,7 +155,7 @@ function DashboardAssignmentsPage() {
       <div className="grid gap-6">
         <AssignmentListPageHandoff handoffView={activePageView.handoffView} />
 
-        <section className="grid gap-4 md:grid-cols-4">
+        <section className="grid grid-cols-2 gap-x-8 gap-y-5 sm:flex sm:flex-wrap sm:gap-x-12">
           {activePageView.summaryMetrics.map((metric) => (
             <AssignmentListSummaryCard key={metric.id} metric={metric} />
           ))}
@@ -191,10 +190,6 @@ function DashboardAssignmentsPage() {
           summary={data?.summary}
           total={activePageView.totalAssignments}
         />
-
-        {routeState.status !== 'loading' ? (
-          <AssignmentListScopePanel view={activePageView.scopeView} />
-        ) : null}
 
         {routeState.showLoadError ? (
           <div className="rounded-lg border border-destructive/30 bg-destructive/5 p-4 text-sm text-destructive">
