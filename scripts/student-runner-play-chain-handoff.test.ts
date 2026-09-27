@@ -217,8 +217,8 @@ test('student runner sources preserve public payload and submit boundaries', () 
   );
   assert.match(
     PLAY_ROUTE_SOURCE,
-    /usePublicAssignment\(normalizedShareId\)[\s\S]*buildStudentRunnerPageViewModel\(\{[\s\S]*buildStudentRunnerSubmissionExecutionPlan\(\{[\s\S]*submitAttemptMutation\.mutateAsync\([\s\S]*StudentRuntimeItemList[\s\S]*StudentRunnerSubmitControls[\s\S]*StudentRunnerSubmissionHandoff/s,
-    'The play route should compose public payload, runner state, runtime list, submit controls, and submission handoff.'
+    /usePublicAssignment\(normalizedShareId\)[\s\S]*buildStudentRunnerPageViewModel\(\{[\s\S]*buildStudentRunnerSubmissionExecutionPlan\(\{[\s\S]*submitAttemptMutation\.mutateAsync\([\s\S]*StudentRuntimeItemList[\s\S]*StudentRunnerSubmitControls/s,
+    'The play route should compose public payload, runner state, runtime list, and submit controls.'
   );
   assert.match(
     ASSIGNMENTS_API_SOURCE,

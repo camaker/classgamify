@@ -366,10 +366,12 @@ test('student runtime choice assignment handoff renders hidden DOM relationships
     'utf8'
   );
 
-  assert.match(
+  // docs/design.md: screen-reader-only text describes the visible UI and
+  // must not add audit detail, so the student play page renders none.
+  assert.doesNotMatch(
     componentSource,
-    /StudentRuntimeChoiceAssignmentHandoffItemView[\s\S]*StudentRuntimeChoiceAssignmentHandoffView[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*aria-labelledby=\{titleId\}[\s\S]*data-handoff="student-runtime-choice-assignment"[\s\S]*data-handoff-scope=\{view\.privacy\.scope\}[\s\S]*view\.itemViews\.map[\s\S]*StudentRuntimeChoiceAssignmentHandoffItem[\s\S]*function StudentRuntimeChoiceAssignmentHandoffItem[\s\S]*const labelId = `student-runtime-choice-assignment-handoff-\$\{itemView\.id\}-label`[\s\S]*const valueId = `student-runtime-choice-assignment-handoff-\$\{itemView\.id\}-value`[\s\S]*const descriptionId = `student-runtime-choice-assignment-handoff-\$\{itemView\.id\}-description`[\s\S]*data-handoff-item=\{itemView\.id\}[\s\S]*id=\{labelId\}[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*aria-label=\{itemView\.ariaLabel\}[\s\S]*aria-labelledby=\{`\$\{labelId\} \$\{valueId\}`\}[\s\S]*id=\{valueId\}[\s\S]*id=\{descriptionId\}/,
-    'Student runtime choice assignment handoff should render each safe choice-assignment slice with privacy scope plus stable label, value, and description relationships.'
+    /data-handoff=/,
+    'Student runtime item list should not render hidden choice-assignment audit output.'
   );
 });
 

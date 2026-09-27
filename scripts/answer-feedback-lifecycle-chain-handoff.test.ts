@@ -55,8 +55,8 @@ const PUBLIC_ANSWER_FEEDBACK_COMPONENT_SOURCE = readFileSync(
   'src/components/activities/public-answer-feedback.tsx',
   'utf8'
 );
-const STUDENT_RUNTIME_ITEM_LIST_COMPONENT_SOURCE = readFileSync(
-  'src/components/activities/student-runtime-item-list.tsx',
+const CHOICE_QUESTION_STEPPER_COMPONENT_SOURCE = readFileSync(
+  'src/components/activities/choice-question-stepper.tsx',
   'utf8'
 );
 const FILL_BLANK_COMPONENT_SOURCE = readFileSync(
@@ -395,7 +395,7 @@ test('public feedback view and all template surfaces share feedback rendering', 
     'Public feedback DOM should not derive ids from raw runtime item ids.'
   );
   for (const [label, source] of [
-    ['choice-list', STUDENT_RUNTIME_ITEM_LIST_COMPONENT_SOURCE],
+    ['choice-list', CHOICE_QUESTION_STEPPER_COMPONENT_SOURCE],
     ['fill-blank', FILL_BLANK_COMPONENT_SOURCE],
     ['line-match', LINE_MATCH_COMPONENT_SOURCE],
     ['group-sort', GROUP_SORT_COMPONENT_SOURCE],

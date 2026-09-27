@@ -28,6 +28,7 @@ export function StudentRunnerSubmitControls({
   );
   const submitControlsLabelId = 'student-runner-submit-controls-label';
   const progressDescriptionId = 'student-runner-progress-description';
+  const buttonDescriptionIds = [progressDescriptionId, ...submitHintIds];
   const { progressView, timerBadge } = controlView;
   const progressPercent =
     progressView.itemCount > 0
@@ -100,9 +101,7 @@ export function StudentRunnerSubmitControls({
             }
             disabled={controlView.submitDisabled}
             aria-label={controlView.submitButtonAriaLabel}
-            aria-describedby={[progressDescriptionId, ...submitHintIds].join(
-              ' '
-            )}
+            aria-describedby={buttonDescriptionIds.join(' ')}
             onClick={onSubmit}
           >
             <IconCheck className="size-5" />

@@ -37,7 +37,6 @@ export { default as IconChevronsRight } from '@tabler/icons-react/dist/esm/icons
 export { default as IconCircle } from '@tabler/icons-react/dist/esm/icons/IconCircle.mjs';
 export { default as IconCircleCheck } from '@tabler/icons-react/dist/esm/icons/IconCircleCheck.mjs';
 export { default as IconCircleCheckFilled } from '@tabler/icons-react/dist/esm/icons/IconCircleCheckFilled.mjs';
-export { default as IconCircleOff } from '@tabler/icons-react/dist/esm/icons/IconCircleOff.mjs';
 export { default as IconCirclePlus } from '@tabler/icons-react/dist/esm/icons/IconCirclePlus.mjs';
 export { default as IconCircleX } from '@tabler/icons-react/dist/esm/icons/IconCircleX.mjs';
 export { default as IconClipboardList } from '@tabler/icons-react/dist/esm/icons/IconClipboardList.mjs';
@@ -105,7 +104,6 @@ export { default as IconRoute } from '@tabler/icons-react/dist/esm/icons/IconRou
 export { default as IconSchool } from '@tabler/icons-react/dist/esm/icons/IconSchool.mjs';
 export { default as IconSearch } from '@tabler/icons-react/dist/esm/icons/IconSearch.mjs';
 export { default as IconSelector } from '@tabler/icons-react/dist/esm/icons/IconSelector.mjs';
-export { default as IconSendOff } from '@tabler/icons-react/dist/esm/icons/IconSendOff.mjs';
 export { default as IconSettings2 } from '@tabler/icons-react/dist/esm/icons/IconSettings2.mjs';
 export { default as IconShare3 } from '@tabler/icons-react/dist/esm/icons/IconShare3.mjs';
 export { default as IconShieldCheck } from '@tabler/icons-react/dist/esm/icons/IconShieldCheck.mjs';
