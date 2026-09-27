@@ -29,9 +29,11 @@ import {
   CardTitle,
 } from '@/components/ui/card';
 import { useUpdateAssignmentStatus } from '@/hooks/use-assignments';
+import { m } from '@/locale/paraglide/messages';
 import { cn } from '@/lib/utils';
 import {
   IconChartBar,
+  IconChevronDown,
   IconClipboardText,
   IconListCheck,
   IconLock,
@@ -189,7 +191,18 @@ function AssignmentListCardSummary({
         idPrefix={idPrefix}
         view={assignment.distributionView}
       />
-      <AssignmentSettingsSummary view={assignment.settingsSummaryView} />
+      <details className="group rounded-lg border">
+        <summary className="flex cursor-pointer list-none items-center justify-between gap-2 px-3 py-2 font-medium text-sm [&::-webkit-details-marker]:hidden">
+          {m.assignment_results_settings_toggle()}
+          <IconChevronDown
+            aria-hidden="true"
+            className="size-4 text-muted-foreground transition-transform group-open:rotate-180"
+          />
+        </summary>
+        <div className="border-t p-3">
+          <AssignmentSettingsSummary view={assignment.settingsSummaryView} />
+        </div>
+      </details>
       <AssignmentListStats
         idPrefix={idPrefix}
         label={assignment.statsLabel}

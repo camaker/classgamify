@@ -453,9 +453,6 @@ test.describe('activity authoring', () => {
     await expect(
       page.getByRole('heading', { name: activityTitle, exact: true }).first()
     ).toBeVisible();
-    await expect(
-      page.getByRole('paragraph').filter({ hasText: /^Source extraction$/ })
-    ).toBeVisible();
     await sourceMaterialFilter.selectOption('spreadsheet');
     await expect(page).toHaveURL(/source=spreadsheet/);
     await expect(

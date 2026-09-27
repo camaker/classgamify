@@ -101,13 +101,10 @@ export function AssignmentListFilters({
             </NativeSelectOption>
           ))}
         </NativeSelect>
-        <p
-          id={statusFilterDescriptionId}
-          className="text-xs leading-5 text-muted-foreground"
-        >
+        <p id={statusFilterDescriptionId} className="sr-only">
           {searchPanelView.statusDescription}
         </p>
-        <div className="flex flex-wrap gap-1.5">
+        <div className="sr-only">
           {searchPanelView.statusMetrics.map((metric) => (
             <output
               key={metric.status}

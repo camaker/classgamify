@@ -12,8 +12,6 @@ import {
   type ActivityLibraryCardActionView,
   type ActivityLibraryCardDerivativeActionView,
   type ActivityLibraryCardActionState,
-  type ActivityLibraryCardStatusSummaryItem as ActivityLibraryCardStatusSummaryItemView,
-  type ActivityLibraryCardStatusSummaryView,
   type ActivityLibraryCardRestoreActionView,
   type ActivityLibraryCardTemplateType,
   type ActivityLibraryCardViewModel,
@@ -48,13 +46,11 @@ import {
 import { Routes } from '@/lib/routes';
 import { cn } from '@/lib/utils';
 import {
-  IconAlertCircle,
-  IconCircleCheck,
+  IconChevronDown,
   IconCopy,
   IconDeviceGamepad2,
   IconEdit,
   IconFolderOff,
-  IconInfoCircle,
   IconPlus,
   IconRotateClockwise,
 } from '@tabler/icons-react';
@@ -209,10 +205,6 @@ export function ActivityLibraryCard({
         <CardDescription>
           <p>{cardDisplayView.displayDescription}</p>
         </CardDescription>
-        <ActivityLibraryCardStatusSummary
-          idPrefix={cardElementId}
-          summary={cardDisplayView.statusSummary}
-        />
       </CardHeader>
       <CardContent className="space-y-4">
         <ActivityLibraryLifecycleHandoff
@@ -220,34 +212,47 @@ export function ActivityLibraryCard({
         />
         <section
           aria-label={cardDisplayView.detailsLabel}
-          className="space-y-4"
+          className="space-y-3"
         >
           <ActivityLibraryStats
             idPrefix={cardElementId}
             label={cardDisplayView.contentLabel}
             stats={cardDisplayView.stats}
           />
-          <ActivitySourceMaterialsSummary
-            actionSlot={
-              cardDisplayView.actionState.showEditAction &&
-              cardDisplayView.sourceMaterials.hasMaterials ? (
-                <ActivityLibrarySourceMaterialEditAction
-                  action={cardDisplayView.sourceMaterialEditAction}
-                />
-              ) : undefined
-            }
-            className="bg-muted/30"
-            label={cardDisplayView.sourceMaterialsLabel}
-            summary={cardDisplayView.sourceMaterials}
-          />
+          {cardDisplayView.sourceMaterials.hasMaterials ? (
+            <ActivitySourceMaterialsSummary
+              actionSlot={
+                cardDisplayView.actionState.showEditAction ? (
+                  <ActivityLibrarySourceMaterialEditAction
+                    action={cardDisplayView.sourceMaterialEditAction}
+                  />
+                ) : undefined
+              }
+              className="bg-muted/30"
+              label={cardDisplayView.sourceMaterialsLabel}
+              summary={cardDisplayView.sourceMaterials}
+            />
+          ) : null}
         </section>
-        <ActivityLibraryCompatibilityPanel
-          actionState={cardDisplayView.actionState}
-          compatibility={cardDisplayView.compatibility}
-          isRemixing={remixMutation.isPending}
-          label={cardDisplayView.compatibilityLabel}
-          onRemix={remixActivity}
-        />
+        {/* Other game formats are an occasional task; keep them one click away. */}
+        <details className="group rounded-lg border">
+          <summary className="flex cursor-pointer list-none items-center justify-between gap-2 px-3 py-2 font-medium text-sm [&::-webkit-details-marker]:hidden">
+            {cardDisplayView.compatibilityLabel}
+            <IconChevronDown
+              aria-hidden="true"
+              className="size-4 text-muted-foreground transition-transform group-open:rotate-180"
+            />
+          </summary>
+          <div className="border-t p-3">
+            <ActivityLibraryCompatibilityPanel
+              actionState={cardDisplayView.actionState}
+              compatibility={cardDisplayView.compatibility}
+              isRemixing={remixMutation.isPending}
+              label={cardDisplayView.compatibilityLabel}
+              onRemix={remixActivity}
+            />
+          </div>
+        </details>
         <ActivityLibraryCardActions
           actionState={cardDisplayView.actionState}
           actionView={cardDisplayView.actionView}
@@ -281,94 +286,6 @@ export function ActivityLibraryCard({
         }
       />
     </Card>
-  );
-}
-
-function ActivityLibraryCardStatusSummary({
-  idPrefix,
-  summary,
-}: {
-  idPrefix: string;
-  summary: ActivityLibraryCardStatusSummaryView;
-}) {
-  const labelId = `${idPrefix}-status-summary-label`;
-
-  return (
-    <section
-      aria-label={summary.ariaLabel}
-      aria-labelledby={labelId}
-      className="mt-3 grid gap-2 sm:grid-cols-2"
-    >
-      <h3 id={labelId} className="sr-only">
-        {summary.label}
-      </h3>
-      {summary.items.map((item) => (
-        <ActivityLibraryCardStatusSummaryEntry
-          idPrefix={idPrefix}
-          item={item}
-          key={item.id}
-        />
-      ))}
-    </section>
-  );
-}
-
-function ActivityLibraryCardStatusSummaryEntry({
-  idPrefix,
-  item,
-}: {
-  idPrefix: string;
-  item: ActivityLibraryCardStatusSummaryItemView;
-}) {
-  const Icon =
-    item.tone === 'blocked'
-      ? IconAlertCircle
-      : item.tone === 'ready'
-        ? IconCircleCheck
-        : IconInfoCircle;
-  const itemId = `${idPrefix}-status-${item.id}`;
-  const labelId = `${itemId}-label`;
-  const valueId = `${itemId}-value`;
-  const descriptionId = `${itemId}-description`;
-
-  return (
-    <section
-      aria-label={item.ariaLabel}
-      aria-describedby={descriptionId}
-      className="rounded-md border bg-muted/30 p-2.5"
-      data-tone={item.tone}
-    >
-      <div className="flex min-w-0 items-center justify-between gap-2">
-        <p
-          id={labelId}
-          className="flex min-w-0 items-center gap-1.5 font-medium text-xs"
-        >
-          <Icon aria-hidden="true" className="size-3.5 shrink-0" />
-          <span className="truncate">{item.label}</span>
-        </p>
-        <Badge
-          id={valueId}
-          aria-labelledby={`${labelId} ${valueId}`}
-          aria-describedby={descriptionId}
-          variant={
-            item.tone === 'blocked'
-              ? 'destructive'
-              : item.tone === 'ready'
-                ? 'secondary'
-                : 'outline'
-          }
-          className="rounded-md"
-        >
-          {item.value}
-        </Badge>
-      </div>
-      <p
-        id={descriptionId}
-        className="mt-1 line-clamp-2 text-muted-foreground text-xs leading-5"
-      >
-        {item.description}
-      </p>
-    </section>
   );
 }
 
@@ -475,7 +392,7 @@ function ActivityLibraryCardActions({
   if (!actionState.showPersistedActions) return null;
 
   return (
-    <section aria-label={label} className="flex flex-col gap-2 sm:flex-row">
+    <section aria-label={label} className="flex flex-wrap gap-2">
       {actionView.duplicate.duplicateHandoffView ? (
         <ActivityLibraryDuplicateHandoff
           handoff={actionView.duplicate.duplicateHandoffView}

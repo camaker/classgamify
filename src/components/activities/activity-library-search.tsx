@@ -159,13 +159,10 @@ export function ActivityLibrarySearch({
             </NativeSelectOption>
           ))}
         </NativeSelect>
-        <p
-          id={sourceFilterDescriptionId}
-          className="text-xs leading-5 text-muted-foreground"
-        >
+        <p id={sourceFilterDescriptionId} className="sr-only">
           {searchPanelView.sourceFilterDescription}
         </p>
-        <div className="flex flex-wrap gap-1.5">
+        <div className="sr-only">
           {searchPanelView.sourceCapabilityMetrics.map((metric) => (
             <output
               key={metric.capability}
@@ -204,13 +201,10 @@ export function ActivityLibrarySearch({
             );
           })}
         </fieldset>
-        <p
-          id={statusFilterDescriptionId}
-          className="text-xs leading-5 text-muted-foreground"
-        >
+        <p id={statusFilterDescriptionId} className="sr-only">
           {searchPanelView.statusDescription}
         </p>
-        <div className="flex flex-wrap gap-1.5">
+        <div className="sr-only">
           {searchPanelView.statusMetrics.map((metric) => (
             <output
               key={metric.status}

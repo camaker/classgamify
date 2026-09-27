@@ -19,18 +19,15 @@ import {
 } from '@/activities/library-view';
 import { ActivityLibraryCard } from '@/components/activities/activity-library-card';
 import { ActivityLibrarySearch } from '@/components/activities/activity-library-search';
-import { ActivityLibraryScopePanel } from '@/components/activities/activity-library-scope-panel';
-import { ActivityLibrarySummaryCard } from '@/components/activities/activity-library-summary-card';
 import { CreatedActivityPanel } from '@/components/activities/created-activity-panel';
 import { DashboardPagination } from '@/components/dashboard/dashboard-pagination';
 import { DashboardLayout } from '@/components/layout/dashboard-layout';
-import { Badge } from '@/components/ui/badge';
 import { Button, buttonVariants } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { useActivities } from '@/hooks/use-activities';
 import { Routes } from '@/lib/routes';
 import { cn } from '@/lib/utils';
-import { IconPlus, IconSparkles, IconX } from '@tabler/icons-react';
+import { IconPlus, IconX } from '@tabler/icons-react';
 import {
   Link,
   Outlet,
@@ -175,33 +172,12 @@ function DashboardActivitiesPage() {
       <div className="grid gap-6">
         <ActivityLibraryPageHandoff handoffView={activePageView.handoffView} />
 
-        <section className="grid gap-4 rounded-lg border bg-card p-4 lg:grid-cols-[minmax(0,1fr)_18rem]">
-          <div className="min-w-0">
-            <Badge variant="outline" className="rounded-md border-primary/30">
-              <IconSparkles className="size-3.5" />
-              {activePageView.hero.badgeLabel}
-            </Badge>
-            <h2 className="mt-4 text-2xl font-semibold tracking-tight">
-              {activePageView.hero.title}
-            </h2>
-            <p className="mt-2 max-w-3xl text-sm leading-6 text-muted-foreground">
-              {activePageView.hero.description}
-            </p>
-          </div>
-          <Link
-            to={Routes.Create}
-            className={cn(buttonVariants(), 'h-fit w-full lg:w-auto')}
-          >
+        <div className="flex flex-wrap items-center gap-2">
+          <Link to={Routes.Create} className={buttonVariants()}>
             <IconPlus className="size-4" />
             {activityLibraryPageCopy.createActivityLabel}
           </Link>
-        </section>
-
-        <section className="grid gap-4 md:grid-cols-4">
-          {activePageView.summaryMetrics.map((metric) => (
-            <ActivityLibrarySummaryCard key={metric.id} metric={metric} />
-          ))}
-        </section>
+        </div>
 
         {created ? (
           <CreatedActivityPanel
@@ -241,10 +217,6 @@ function DashboardActivitiesPage() {
           total={activePageView.totalActivities}
           value={searchQuery}
         />
-
-        {routeState.status !== 'loading' ? (
-          <ActivityLibraryScopePanel view={activePageView.scopeView} />
-        ) : null}
 
         {routeState.showLoadError ? (
           <div className="rounded-lg border border-destructive/30 bg-destructive/5 p-4 text-sm text-destructive">

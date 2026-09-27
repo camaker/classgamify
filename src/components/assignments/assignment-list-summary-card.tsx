@@ -2,7 +2,6 @@ import type {
   AssignmentListSummaryMetric,
   AssignmentListSummaryMetricId,
 } from '@/assignments/list-summary';
-import { Card, CardContent } from '@/components/ui/card';
 import {
   IconChartBar,
   IconListCheck,
@@ -23,30 +22,27 @@ export function AssignmentListSummaryCard({
   const descriptionId = `assignment-list-summary-${metric.id}-description`;
 
   return (
-    <Card
-      role="article"
+    <article
       aria-label={metric.ariaLabel}
       aria-describedby={descriptionId}
-      className="rounded-lg"
+      className="grid min-w-28 gap-1"
     >
-      <CardContent className="p-4">
-        <Icon aria-hidden="true" className="size-5 text-primary" />
-        <p className="mt-4 text-2xl font-semibold">
-          <output id={valueId} aria-labelledby={`${labelId} ${valueId}`}>
-            {metric.value}
-          </output>
-        </p>
-        <p id={labelId} className="text-sm text-muted-foreground">
-          {metric.label}
-        </p>
-        <p
-          id={descriptionId}
-          className="mt-1 text-xs leading-5 text-muted-foreground"
-        >
-          {metric.description}
-        </p>
-      </CardContent>
-    </Card>
+      <p
+        id={labelId}
+        className="flex items-center gap-1.5 text-muted-foreground text-sm"
+      >
+        <Icon aria-hidden="true" className="size-4" />
+        {metric.label}
+      </p>
+      <p className="font-bold text-3xl tabular-nums tracking-tight">
+        <output id={valueId} aria-labelledby={`${labelId} ${valueId}`}>
+          {metric.value}
+        </output>
+      </p>
+      <p id={descriptionId} className="sr-only">
+        {metric.description}
+      </p>
+    </article>
   );
 }
 
