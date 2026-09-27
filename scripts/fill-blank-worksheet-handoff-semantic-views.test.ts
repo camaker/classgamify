@@ -296,7 +296,7 @@ test('fill-blank worksheet handoff localizes Chinese worksheet boundaries', () =
   }
 });
 
-test('fill-blank worksheet attaches the hidden handoff to the component', () => {
+test('fill-blank worksheet renders inside the shared board frame without hidden handoff DOM', () => {
   const source = readFileSync(
     'src/components/activities/fill-blank-worksheet.tsx',
     'utf8'
@@ -304,12 +304,15 @@ test('fill-blank worksheet attaches the hidden handoff to the component', () => 
 
   assert.match(
     source,
-    /buildFillBlankWorksheetHandoffView[\s\S]*disabled,[\s\S]*revealAnswer,[\s\S]*runnerView,/
+    /RUNNER_BOARD_FRAME/,
+    'fill-blank worksheet should use the shared student runner board frame.'
   );
-  assert.match(source, /data-handoff="fill-blank-worksheet"/);
-  assert.match(
+  // docs/design.md: screen-reader-only text describes the visible UI and must
+  // not add audit detail, so student boards render no hidden handoff output.
+  assert.doesNotMatch(
     source,
-    /FillBlankWorksheetHandoffItemView[\s\S]*FillBlankWorksheetHandoffView[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*aria-labelledby=\{titleId\}[\s\S]*data-handoff="fill-blank-worksheet"[\s\S]*data-handoff-scope=\{view\.privacy\.scope\}[\s\S]*view\.itemViews\.map\(\(item\) =>[\s\S]*FillBlankWorksheetHandoffItem[\s\S]*function FillBlankWorksheetHandoffItem[\s\S]*item: FillBlankWorksheetHandoffItemView[\s\S]*const labelId = `fill-blank-worksheet-handoff-\$\{item\.id\}-label`[\s\S]*const valueId = `fill-blank-worksheet-handoff-\$\{item\.id\}-value`[\s\S]*const descriptionId = `fill-blank-worksheet-handoff-\$\{item\.id\}-description`[\s\S]*data-handoff-item=\{item\.id\}[\s\S]*id=\{labelId\}[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*aria-label=\{item\.ariaLabel\}[\s\S]*aria-labelledby=\{`\$\{labelId\} \$\{valueId\}`\}[\s\S]*id=\{valueId\}[\s\S]*id=\{descriptionId\}/
+    /data-handoff=/,
+    'fill-blank worksheet should not render hidden audit handoff output.'
   );
 });
 

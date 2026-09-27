@@ -1368,9 +1368,9 @@ function formatPublicAnswerFeedbackOptionalValue(
 export function getStudentRunnerReviewStatusClassName(
   status: StudentRunnerReviewStatus
 ) {
-  if (status === 'correct') return 'border-primary/35 bg-primary/5';
+  if (status === 'correct') return 'border-success/60 bg-success/10';
   if (status === 'needs-review' || status === 'unanswered') {
-    return 'border-destructive/30 bg-destructive/5';
+    return 'border-error/50 bg-error/5';
   }
 
   return undefined;

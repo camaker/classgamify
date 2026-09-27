@@ -24665,17 +24665,17 @@ const revealedSequentialNavigationView =
   });
 assert.equal(
   revealedSequentialNavigationView.activePanelStatusClassName,
-  'border-destructive/30 bg-destructive/5'
+  'border-error/50 bg-error/5'
 );
 assert.equal(revealedSequentialNavigationView.itemViews[0]?.selected, false);
 assert.equal(revealedSequentialNavigationView.itemViews[1]?.selected, true);
 assert.equal(
   revealedSequentialNavigationView.itemViews[0]?.reviewStatusClassName,
-  'border-primary/35 bg-primary/5'
+  'border-success/60 bg-success/10'
 );
 assert.equal(
   revealedSequentialNavigationView.itemViews[1]?.reviewStatusClassName,
-  'border-destructive/30 bg-destructive/5'
+  'border-error/50 bg-error/5'
 );
 assert.equal(revealedSequentialNavigationView.previousItemId, 'q-1');
 assert.equal(revealedSequentialNavigationView.nextItemId, 'q-1');
@@ -24882,7 +24882,7 @@ assert.deepEqual(
     itemView.item.id,
     itemView.reviewStatusClassName,
   ]),
-  [['blank-1', 'border-destructive/30 bg-destructive/5']]
+  [['blank-1', 'border-error/50 bg-error/5']]
 );
 overwriteGetLocale(() => 'zh');
 try {
@@ -25119,15 +25119,15 @@ assert.deepEqual(
 );
 assert.equal(
   getStudentRunnerReviewStatusClassName('correct'),
-  'border-primary/35 bg-primary/5'
+  'border-success/60 bg-success/10'
 );
 assert.equal(
   getStudentRunnerReviewStatusClassName('needs-review'),
-  'border-destructive/30 bg-destructive/5'
+  'border-error/50 bg-error/5'
 );
 assert.equal(
   getStudentRunnerReviewStatusClassName('unanswered'),
-  'border-destructive/30 bg-destructive/5'
+  'border-error/50 bg-error/5'
 );
 assert.equal(getStudentRunnerReviewStatusClassName('idle'), undefined);
 assert.deepEqual(
@@ -37442,7 +37442,7 @@ assert.deepEqual(
         type: 'select-prompt',
       },
       '1. Capital of France?',
-      'border-primary/35 bg-primary/5',
+      'border-success/60 bg-success/10',
       false,
     ],
     [
@@ -37452,7 +37452,7 @@ assert.deepEqual(
         type: 'select-prompt',
       },
       '2. Match "Hot" with its pair.',
-      'border-destructive/30 bg-destructive/5',
+      'border-error/50 bg-error/5',
       false,
     ],
     [
@@ -37966,10 +37966,10 @@ assert.deepEqual(
     ]),
   ]),
   [
-    ['Fruit', [['group-fruit-apple', 'border-primary/35 bg-primary/5']]],
+    ['Fruit', [['group-fruit-apple', 'border-success/60 bg-success/10']]],
     [
       'Drink',
-      [['group-drink-water', 'border-destructive/30 bg-destructive/5']],
+      [['group-drink-water', 'border-error/50 bg-error/5']],
     ],
   ]
 );

@@ -8654,5 +8654,8 @@
   "student_play_previous": "前へ",
   "student_play_next": "次へ",
   "student_play_go_to_question": "{number} 問目へ移動",
-  "student_play_rules_toggle": "課題のルールをすべて見る"
+  "student_play_rules_toggle": "課題のルールをすべて見る",
+  "activity_runner_group_sort_help": "項目をタップしてから、その項目が入るグループをタップします。",
+  "activity_runner_matching_pairs_help": "左のカードをタップしてから、それと組になる右のカードをタップします。",
+  "activity_runner_open_box_help": "箱をタップして開け、答えを入力します。"
 }

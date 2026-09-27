@@ -8654,5 +8654,8 @@
   "student_play_previous": "이전",
   "student_play_next": "다음",
   "student_play_go_to_question": "{number}번 문제로 이동",
-  "student_play_rules_toggle": "과제 규칙 모두 보기"
+  "student_play_rules_toggle": "과제 규칙 모두 보기",
+  "activity_runner_group_sort_help": "항목을 누른 다음 그 항목이 속한 그룹을 누르세요.",
+  "activity_runner_matching_pairs_help": "왼쪽 카드를 누른 다음 짝이 되는 오른쪽 카드를 누르세요.",
+  "activity_runner_open_box_help": "상자를 눌러 연 다음 답을 입력하세요."
 }

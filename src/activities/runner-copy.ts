@@ -53,6 +53,7 @@ export function getActivityRunnerKindCopy(
       clearSelectionLabel: m.activity_runner_clear_selection(),
       correctAnswerLabel: m.activity_runner_correct_group(),
       emptyItemsLabel: m.activity_runner_all_items_sorted(),
+      helpText: m.activity_runner_group_sort_help(),
       inputPlaceholder: m.activity_runner_choose_group_placeholder(),
       itemListLabel: m.activity_runner_group_sort_items_label(),
       progressVerb: m.activity_runner_progress_sorted(),
@@ -90,6 +91,7 @@ export function getActivityRunnerKindCopy(
   if (runnerKind === 'matching-pairs') {
     return {
       correctAnswerLabel: m.activity_runner_correct_pair(),
+      helpText: m.activity_runner_matching_pairs_help(),
       inputPlaceholder: m.activity_runner_choose_pair_placeholder(),
       progressVerb: m.activity_runner_progress_matched(),
       title: m.activity_runner_matching_pairs_title(),
@@ -99,6 +101,7 @@ export function getActivityRunnerKindCopy(
 
   return {
     correctAnswerLabel: m.activity_runner_model_answer(),
+    helpText: m.activity_runner_open_box_help(),
     inputPlaceholder: m.activity_runner_type_answer_placeholder(),
     progressVerb: m.activity_runner_progress_answered(),
     sequenceItemLabel: m.activity_runner_open_box_item_label(),
