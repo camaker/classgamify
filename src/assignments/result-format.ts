@@ -4,8 +4,18 @@ import {
   normalizeRuntimeDisplayText,
 } from '@/assignments/runtime-display';
 import { m } from '@/locale/paraglide/messages';
+import { getLocale } from '@/locale/paraglide/runtime';
 
 type ResultDateValue = Date | string | null | undefined;
+
+/**
+ * Dates follow the app language the teacher picked, not the host default:
+ * a Worker, a browser, and a test machine would otherwise format the same
+ * timestamp differently, and a Chinese CSV would carry an English date.
+ */
+export function getAssignmentDateLocale(): Intl.LocalesArgument {
+  return getLocale();
+}
 
 export function formatAssignmentResultDate(
   value: ResultDateValue,
@@ -21,7 +31,7 @@ export function formatAssignmentResultDate(
   const date = value instanceof Date ? value : new Date(value);
   if (Number.isNaN(date.getTime())) return emptyValue;
 
-  return new Intl.DateTimeFormat(options?.locale, {
+  return new Intl.DateTimeFormat(options?.locale ?? getAssignmentDateLocale(), {
     dateStyle: 'medium',
     timeStyle: 'short',
     timeZone: options?.timeZone,

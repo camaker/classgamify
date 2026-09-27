@@ -1,5 +1,5 @@
 import { readFileSync } from 'node:fs';
-import { expect, test } from '@playwright/test';
+import { expect, type Page, test } from '@playwright/test';
 import {
   cleanupE2EUsers,
   loginByForm,
@@ -13,6 +13,22 @@ import {
   type LocaleMode,
   type ThemeMode,
 } from '../fixtures/page-health';
+
+/**
+ * Text the teacher can see. Settings pages also mount screen-reader-only
+ * audit sections (class `sr-only`) that repeat the same labels, and
+ * Playwright treats those 1px boxes as visible, so exclude anything inside
+ * an sr-only container.
+ */
+function onScreenText(page: Page, text: string) {
+  return page
+    .getByText(text)
+    .and(
+      page.locator(
+        'xpath=//*[not(ancestor-or-self::*[contains(concat(" ", normalize-space(@class), " "), " sr-only ")])]'
+      )
+    );
+}
 
 type LocaleMessages = Record<string, string>;
 
@@ -93,7 +109,8 @@ test.describe('protected page smoke coverage', () => {
           );
           if (protectedPage.path === '/settings/security') {
             await expect(
-              page.getByText(
+              onScreenText(
+                page,
                 getLocaleMessage(
                   locale,
                   'settings_security_workspace_summary_title'
@@ -101,7 +118,8 @@ test.describe('protected page smoke coverage', () => {
               )
             ).toBeVisible();
             await expect(
-              page.getByText(
+              onScreenText(
+                page,
                 getLocaleMessage(
                   locale,
                   'settings_security_workspace_capabilities_title'
@@ -109,7 +127,8 @@ test.describe('protected page smoke coverage', () => {
               )
             ).toBeVisible();
             await expect(
-              page.getByText(
+              onScreenText(
+                page,
                 getLocaleMessage(
                   locale,
                   'settings_security_workspace_summary_results_label'
@@ -119,7 +138,8 @@ test.describe('protected page smoke coverage', () => {
           }
           if (protectedPage.path === '/settings/files') {
             await expect(
-              page.getByText(
+              onScreenText(
+                page,
                 getLocaleMessage(
                   locale,
                   'settings_files_workspace_summary_title'
@@ -127,7 +147,8 @@ test.describe('protected page smoke coverage', () => {
               )
             ).toBeVisible();
             await expect(
-              page.getByText(
+              onScreenText(
+                page,
                 getLocaleMessage(
                   locale,
                   'settings_files_workspace_summary_library_label'
@@ -135,7 +156,8 @@ test.describe('protected page smoke coverage', () => {
               )
             ).toBeVisible();
             await expect(
-              page.getByText(
+              onScreenText(
+                page,
                 getLocaleMessage(
                   locale,
                   'settings_files_workspace_summary_privacy_label'
@@ -145,7 +167,8 @@ test.describe('protected page smoke coverage', () => {
           }
           if (protectedPage.path === '/settings/billing') {
             await expect(
-              page.getByText(
+              onScreenText(
+                page,
                 getLocaleMessage(
                   locale,
                   'settings_billing_workspace_summary_title'
@@ -153,7 +176,8 @@ test.describe('protected page smoke coverage', () => {
               )
             ).toBeVisible();
             await expect(
-              page.getByText(
+              onScreenText(
+                page,
                 getLocaleMessage(
                   locale,
                   'settings_billing_workspace_summary_assignments_label'
@@ -161,14 +185,16 @@ test.describe('protected page smoke coverage', () => {
               )
             ).toBeVisible();
             await expect(
-              page.getByText(
+              onScreenText(
+                page,
                 getLocaleMessage(locale, 'settings_billing_handoff_title')
               )
             ).toBeVisible();
           }
           if (protectedPage.path === '/settings/payment') {
             await expect(
-              page.getByText(
+              onScreenText(
+                page,
                 getLocaleMessage(locale, 'settings_payment_failed_title')
               )
             ).toBeVisible();
