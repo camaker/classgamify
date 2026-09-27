@@ -11,8 +11,6 @@ import {
   PUBLISHED_ASSIGNMENT_DELIVERY_CHAIN_SOURCE_FILES,
 } from '@/assignments/published-assignment-delivery-chain';
 import { PUBLIC_ASSIGNMENT_ACCESS_HANDOFF_ITEM_IDS } from '@/assignments/public';
-import { PRINTABLE_WORKSHEET_HANDOFF_ITEM_IDS } from '@/assignments/printable-worksheet-view';
-import { ASSIGNMENT_RESULTS_EXPORT_PREPARATION_ITEM_IDS } from '@/assignments/results-export';
 import {
   STUDENT_RUNNER_PLAY_CHAIN_HANDOFF_ITEM_IDS,
   STUDENT_RUNNER_PLAY_CHAIN_SOURCE_FILES,
@@ -228,11 +226,9 @@ test('classroom data lifecycle chain is backed by adjacent 30-item gates', () =>
       TEACHER_RESULTS_REVIEW_CHAIN_HANDOFF_ITEM_IDS.length,
       TEACHER_RESULTS_REVIEW_CHAIN_SOURCE_FILES.length,
       ASSIGNMENT_ATTEMPT_PERSISTENCE_HANDOFF_ITEM_IDS.length,
-      ASSIGNMENT_RESULTS_EXPORT_PREPARATION_ITEM_IDS.length,
       PUBLIC_ASSIGNMENT_ACCESS_HANDOFF_ITEM_IDS.length,
-      PRINTABLE_WORKSHEET_HANDOFF_ITEM_IDS.length,
     ],
-    Array.from({ length: 12 }, () => 30)
+    Array.from({ length: 10 }, () => 30)
   );
 });
 
@@ -451,10 +447,10 @@ test('attempt persistence, result consumers, and export privacy stay aligned', (
     /AssignmentResultsExportData[\s\S]*activity:[\s\S]*analysis:[\s\S]*assignment:[\s\S]*attempts:[\s\S]*snapshot:[\s\S]*stats:[\s\S]*buildAssignmentResultsCsv[\s\S]*formatAssignmentDeliveryPolicyText[\s\S]*CSV_FORMULA_PREFIX_PATTERN/,
     'Result export should consume assignment context, delivery policy, analysis, attempts, snapshots, stats, and formula guards.'
   );
-  assert.match(
+  assert.doesNotMatch(
     RESULTS_EXPORT_SOURCE,
-    /exposesCsvDataUrl: false[\s\S]*exposesPromptText: false[\s\S]*exposesRawAnonymousToken: false[\s\S]*exposesStudentAnswerText: false[\s\S]*exposesTeacherAnswerText: false/,
-    'Result export preparation handoff should keep private CSV, prompt, token, and answer text out of audit summaries.'
+    /anonymousToken|storageKey/,
+    'Results CSV export should never read raw anonymous tokens or storage keys.'
   );
   assert.match(
     PRINTABLE_WORKSHEET_SOURCE,

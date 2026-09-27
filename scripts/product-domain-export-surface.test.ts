@@ -148,11 +148,6 @@ const INTERNAL_PRODUCT_DOMAIN_HELPERS = [
   {
     declaration: 'function',
     filePath: 'src/assignments/printable-worksheet-view.ts',
-    name: 'buildPrintableWorksheetHandoffView',
-  },
-  {
-    declaration: 'function',
-    filePath: 'src/assignments/printable-worksheet-view.ts',
     name: 'buildPrintableWorksheetControlView',
   },
   {
@@ -199,11 +194,6 @@ const INTERNAL_PRODUCT_DOMAIN_HELPERS = [
     declaration: 'function',
     filePath: 'src/assignments/result-summary-format.ts',
     name: 'normalizeAssignmentSummaryPercent',
-  },
-  {
-    declaration: 'function',
-    filePath: 'src/assignments/student-follow-up-priority.ts',
-    name: 'buildAssignmentStudentFollowUpPriorityHandoffEvidence',
   },
   {
     declaration: 'function',
@@ -488,15 +478,10 @@ const RESULT_VIEW_REEXPORT_BOUNDARIES = [
     name: 'parseStudentSummarySort',
     sourceFilePath: 'src/assignments/result-filters.ts',
   },
-  {
-    aggregatorFilePath: 'src/assignments/result-view.ts',
-    name: 'buildAssignmentResultMaterialHandoffView',
-    sourceFilePath: 'src/assignments/result-actions.ts',
-  },
 ] satisfies ReExportBoundary[];
 
-test('product-domain export surface keeps 74 helpers and types internal', () => {
-  assert.equal(INTERNAL_PRODUCT_DOMAIN_HELPERS.length, 74);
+test('product-domain export surface keeps 72 helpers and types internal', () => {
+  assert.equal(INTERNAL_PRODUCT_DOMAIN_HELPERS.length, 72);
 
   for (const helper of INTERNAL_PRODUCT_DOMAIN_HELPERS) {
     const source = readFileSync(helper.filePath, 'utf8');
@@ -529,8 +514,8 @@ test('product-domain export surface keeps 74 helpers and types internal', () => 
   }
 });
 
-test('result-view export surface keeps 21 domain helpers on their source modules', () => {
-  assert.equal(RESULT_VIEW_REEXPORT_BOUNDARIES.length, 21);
+test('result-view export surface keeps 20 domain helpers on their source modules', () => {
+  assert.equal(RESULT_VIEW_REEXPORT_BOUNDARIES.length, 20);
 
   for (const boundary of RESULT_VIEW_REEXPORT_BOUNDARIES) {
     const aggregatorSource = readFileSync(boundary.aggregatorFilePath, 'utf8');

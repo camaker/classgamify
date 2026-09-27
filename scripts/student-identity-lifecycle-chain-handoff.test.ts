@@ -3,9 +3,6 @@ import { existsSync, readFileSync } from 'node:fs';
 import test from 'node:test';
 import { ASSIGNMENT_ATTEMPT_LIMIT_HANDOFF_ITEM_IDS } from '@/assignments/attempt-limit-handoff';
 import { ASSIGNMENT_ATTEMPT_PERSISTENCE_HANDOFF_ITEM_IDS } from '@/assignments/attempt-persistence-handoff';
-import { ASSIGNMENT_ATTEMPT_REVIEW_CARD_HANDOFF_ITEM_IDS } from '@/assignments/attempt-review-card-handoff';
-import { ASSIGNMENT_RESULT_STUDENT_SEARCH_HANDOFF_ITEM_IDS } from '@/assignments/result-student-search-handoff';
-import { ASSIGNMENT_RESULTS_EXPORT_PREPARATION_ITEM_IDS } from '@/assignments/results-export';
 import {
   STUDENT_IDENTITY_LIFECYCLE_CHAIN_HANDOFF_ITEM_IDS,
   STUDENT_IDENTITY_LIFECYCLE_CHAIN_SOURCE_FILES,
@@ -17,7 +14,6 @@ import {
   STUDENT_RUNNER_PLAY_CHAIN_HANDOFF_ITEM_IDS,
   STUDENT_RUNNER_PLAY_CHAIN_SOURCE_FILES,
 } from '@/assignments/student-runner-play-chain';
-import { ASSIGNMENT_STUDENT_SUMMARY_SORT_HANDOFF_ITEM_IDS } from '@/assignments/student-summary-sort-handoff';
 import { TEACHER_RESULTS_REVIEW_CHAIN_HANDOFF_ITEM_IDS } from '@/assignments/teacher-results-review-chain';
 
 const PRODUCT_SOURCE = readFileSync('docs/product.md', 'utf8');
@@ -49,18 +45,6 @@ const PUBLIC_ASSIGNMENT_SOURCE = readFileSync(
   'utf8'
 );
 const RESULTS_SOURCE = readFileSync('src/assignments/results.ts', 'utf8');
-const RESULT_SEARCH_SOURCE = readFileSync(
-  'src/assignments/result-student-search-handoff.ts',
-  'utf8'
-);
-const STUDENT_SUMMARY_SORT_SOURCE = readFileSync(
-  'src/assignments/student-summary-sort-handoff.ts',
-  'utf8'
-);
-const ATTEMPT_REVIEW_CARD_SOURCE = readFileSync(
-  'src/assignments/attempt-review-card-handoff.ts',
-  'utf8'
-);
 const RESULTS_EXPORT_SOURCE = readFileSync(
   'src/assignments/results-export.ts',
   'utf8'
@@ -192,15 +176,11 @@ test('student identity lifecycle chain is backed by adjacent gates', () => {
     [
       ASSIGNMENT_ATTEMPT_LIMIT_HANDOFF_ITEM_IDS.length,
       ASSIGNMENT_ATTEMPT_PERSISTENCE_HANDOFF_ITEM_IDS.length,
-      ASSIGNMENT_RESULT_STUDENT_SEARCH_HANDOFF_ITEM_IDS.length,
-      ASSIGNMENT_STUDENT_SUMMARY_SORT_HANDOFF_ITEM_IDS.length,
-      ASSIGNMENT_ATTEMPT_REVIEW_CARD_HANDOFF_ITEM_IDS.length,
-      ASSIGNMENT_RESULTS_EXPORT_PREPARATION_ITEM_IDS.length,
       STUDENT_RUNNER_PLAY_CHAIN_HANDOFF_ITEM_IDS.length,
       STUDENT_RUNNER_PLAY_CHAIN_SOURCE_FILES.length,
       TEACHER_RESULTS_REVIEW_CHAIN_HANDOFF_ITEM_IDS.length,
     ],
-    Array.from({ length: 9 }, () => 30)
+    Array.from({ length: 5 }, () => 30)
   );
 });
 
@@ -351,29 +331,14 @@ test('attempt limits and teacher result consumers preserve identity guards', () 
     /createStudentIdentityResolver\(completedAttempts\)[\s\S]*identityResolver\.resolve/,
     'Result analysis should resolve normalized display identities once.'
   );
-  assert.match(
-    RESULT_SEARCH_SOURCE,
-    /exposesRawAnonymousToken: false[\s\S]*exposesStudentDisplayLabels: false[\s\S]*usesAssignmentDomainHelpers: true/,
-    'Student search handoff should hide raw tokens and display labels.'
-  );
-  assert.match(
-    STUDENT_SUMMARY_SORT_SOURCE,
-    /exposesRawAnonymousToken: false[\s\S]*exposesStudentDisplayLabels: false[\s\S]*usesSortedTableRows: true/,
-    'Student summary sort handoff should hide raw identity values.'
-  );
-  assert.match(
-    ATTEMPT_REVIEW_CARD_SOURCE,
-    /exposesRawAnonymousToken: false[\s\S]*exposesStudentDisplayLabel: false[\s\S]*scope: 'teacher-result-attempt-review-card'/,
-    'Attempt review card handoff should hide raw identity values.'
-  );
-  assert.match(
+  assert.doesNotMatch(
     RESULTS_EXPORT_SOURCE,
-    /student-privacy[\s\S]*delivery-identity[\s\S]*exposesRawAnonymousToken: false[\s\S]*scope: 'full-assignment-results'/,
-    'Result export preparation should preserve identity policy and token guard.'
+    /anonymousToken/,
+    'Result CSV export should never read raw anonymous tokens.'
   );
 });
 
-test('identity handoffs remain hidden semantic structures', () => {
+test('identity surfaces render no hidden audit output', () => {
   // docs/design.md: screen-reader-only text describes the visible UI and
   // must not add audit detail, so the student play page renders none.
   assert.doesNotMatch(
@@ -381,15 +346,15 @@ test('identity handoffs remain hidden semantic structures', () => {
     /data-handoff="student-runner-identity"/,
     'Student runner attempt shell should not render hidden identity audit output.'
   );
-  assert.match(
+  assert.doesNotMatch(
     RESULT_SEARCH_COMPONENT_SOURCE,
-    /className="sr-only"[\s\S]*data-handoff="assignment-result-student-search"[\s\S]*data-handoff-item=\{itemView\.id\}/,
-    'Result search handoff should remain hidden semantic output.'
+    /data-handoff/,
+    'Result student search should render no hidden audit output.'
   );
-  assert.match(
+  assert.doesNotMatch(
     ATTEMPT_REVIEW_COMPONENT_SOURCE,
-    /className="sr-only"[\s\S]*data-handoff="assignment-attempt-review-card"[\s\S]*data-handoff-item=\{itemView\.id\}/,
-    'Attempt review card handoff should remain hidden semantic output.'
+    /data-handoff/,
+    'Attempt review cards should render no hidden audit output.'
   );
 });
 

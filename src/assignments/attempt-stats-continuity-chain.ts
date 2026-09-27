@@ -21,19 +21,19 @@ export const ASSIGNMENT_ATTEMPT_STATS_CONTINUITY_CHAIN_SOURCE_FILES = [
   'src/assignments/result-format.ts',
   'src/assignments/results.ts',
   'src/assignments/classroom-brief.ts',
-  'src/assignments/copy-artifact-handoff.ts',
+  'src/assignments/result-actions.ts',
   'src/assignments/results-export.ts',
   'src/assignments/scored-attempt-result-chain.ts',
   'src/assignments/teacher-results-review-chain.ts',
   'src/assignments/teacher-result-copy-lifecycle-chain.ts',
   'src/assignments/assignment-list-filter-state-chain.ts',
-  'src/components/assignments/assignment-results-attempt-stats-handoff.tsx',
   'src/components/assignments/assignment-results-metric-card.tsx',
-  'src/components/assignments/assignment-results-classroom-brief-card.tsx',
+  'src/components/assignments/assignment-results-follow-up-panel.tsx',
   'src/components/assignments/assignment-list-card.tsx',
   'src/components/assignments/assignment-list-summary-card.tsx',
   'scripts/assignment-attempt-stats-handoff-semantic-views.test.ts',
   'tests/e2e/TEST-CATALOG.md',
+  'scripts/assignment-result-review-helpers.test.ts',
 ] as const;
 
 export type AssignmentAttemptStatsContinuityChainHandoffItemId =

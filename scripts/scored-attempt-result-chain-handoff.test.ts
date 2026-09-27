@@ -2,12 +2,10 @@ import assert from 'node:assert/strict';
 import { existsSync, readFileSync } from 'node:fs';
 import test from 'node:test';
 import { ASSIGNMENT_ANSWER_FEEDBACK_HANDOFF_ITEM_IDS } from '@/assignments/answer-feedback-handoff';
-import { ASSIGNMENT_ATTEMPT_REVIEW_CARD_HANDOFF_ITEM_IDS } from '@/assignments/attempt-review-card-handoff';
 import { ANSWER_FEEDBACK_LIFECYCLE_CHAIN_HANDOFF_ITEM_IDS } from '@/assignments/answer-feedback-lifecycle-chain';
 import { ASSIGNMENT_ATTEMPT_DURATION_HANDOFF_ITEM_IDS } from '@/assignments/attempt-duration-handoff';
 import { ASSIGNMENT_ATTEMPT_PERSISTENCE_HANDOFF_ITEM_IDS } from '@/assignments/attempt-persistence-handoff';
 import { ASSIGNMENT_ATTEMPT_STATS_HANDOFF_ITEM_IDS } from '@/assignments/attempt-stats-handoff';
-import { ASSIGNMENT_RESULTS_EXPORT_PREPARATION_ITEM_IDS } from '@/assignments/results-export';
 import {
   SCORED_ATTEMPT_RESULT_CHAIN_HANDOFF_ITEM_IDS,
   SCORED_ATTEMPT_RESULT_CHAIN_SOURCE_FILES,
@@ -170,17 +168,15 @@ test('scored attempt result chain is backed by adjacent result gates', () => {
       ASSIGNMENT_ATTEMPT_STATS_HANDOFF_ITEM_IDS.length,
       TEACHER_RESULTS_REVIEW_CHAIN_HANDOFF_ITEM_IDS.length,
       TEACHER_RESULT_COPY_LIFECYCLE_CHAIN_HANDOFF_ITEM_IDS.length,
-      ASSIGNMENT_RESULTS_EXPORT_PREPARATION_ITEM_IDS.length,
-      ASSIGNMENT_ATTEMPT_REVIEW_CARD_HANDOFF_ITEM_IDS.length,
     ],
-    Array.from({ length: 10 }, () => 30)
+    Array.from({ length: 8 }, () => 30)
   );
 });
 
 test('scored attempt result sources preserve submit, score, and persistence boundaries', () => {
   assert.match(
     PRODUCT_SOURCE,
-    /submission contract remains template-neutral[\s\S]*server rejects answers[\s\S]*shared assignment-domain helpers[\s\S]*post-submit result boundary[\s\S]*public feedback[\s\S]*assignment stats[\s\S]*teacher result analysis[\s\S]*30-slice attempt review card handoff[\s\S]*copy artifacts[\s\S]*CSV export/,
+    /submission contract remains template-neutral[\s\S]*server rejects answers[\s\S]*shared assignment-domain helpers[\s\S]*post-submit result boundary[\s\S]*public feedback[\s\S]*assignment stats[\s\S]*teacher result analysis[\s\S]*answer review cards[\s\S]*copy artifacts[\s\S]*CSV export/,
     'docs/product.md should describe the shared post-submit scored-result boundary.'
   );
   assert.match(

@@ -52,16 +52,16 @@ export const TEACHER_RESULTS_REVIEW_CHAIN_SOURCE_FILES = [
   'src/assignments/item-review-summary.ts',
   'src/assignments/classroom-brief.ts',
   'src/assignments/reteach-plan.ts',
-  'src/assignments/copy-artifact-handoff.ts',
   'src/assignments/results-export.ts',
-  'src/assignments/result-student-search-handoff.ts',
-  'src/assignments/result-empty-state-handoff.ts',
-  'src/assignments/attempt-review-card-handoff.ts',
-  'src/assignments/item-performance-sort-handoff.ts',
-  'src/assignments/student-summary-sort-handoff.ts',
+  'src/components/assignments/assignment-results-student-search.tsx',
+  'src/components/assignments/assignment-results-empty-state.tsx',
+  'src/components/assignments/assignment-results-attempt-review-card.tsx',
+  'src/components/assignments/assignment-results-item-performance-sort-control.tsx',
+  'src/components/assignments/assignment-results-student-summary-table.tsx',
   'src/assignments/attempt-duration.ts',
   'src/assignments/answer-feedback-handoff.ts',
-  'src/components/assignments/assignment-results-classroom-brief-card.tsx',
+  'src/components/assignments/assignment-results-follow-up-panel.tsx',
+  'scripts/assignment-result-review-helpers.test.ts',
 ] as const;
 
 export type TeacherResultsReviewChainHandoffItemId =

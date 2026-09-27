@@ -32,7 +32,6 @@ import {
   resolvePublishedAssignmentPanelAssignment,
 } from '@/assignments/published-assignment';
 import { ASSIGNMENT_PUBLISH_HANDOFF_ITEM_IDS } from '@/assignments/publish-input';
-import { PRINTABLE_WORKSHEET_HANDOFF_ITEM_IDS } from '@/assignments/printable-worksheet-view';
 import {
   ASSIGNMENT_SHARE_LINK_HANDOFF_ITEM_IDS,
   buildAssignmentShareLinkActionView,
@@ -205,10 +204,9 @@ test('assignment distribution lifecycle is backed by adjacent gates', () => {
       ASSIGNMENT_DELIVERY_POLICY_HANDOFF_ITEM_IDS.length,
       PUBLISHED_ASSIGNMENT_DELIVERY_CHAIN_HANDOFF_ITEM_IDS.length,
       ASSIGNMENT_SOURCE_ACTIVITY_CONTEXT_CHAIN_HANDOFF_ITEM_IDS.length,
-      PRINTABLE_WORKSHEET_HANDOFF_ITEM_IDS.length,
       TEACHER_RESULTS_REVIEW_CHAIN_HANDOFF_ITEM_IDS.length,
     ],
-    Array.from({ length: 8 }, () => 30)
+    Array.from({ length: 7 }, () => 30)
   );
 });
 

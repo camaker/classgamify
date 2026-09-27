@@ -33,7 +33,6 @@ export const ASSIGNMENT_ATTEMPT_REVIEW_CARD_CHAIN_HANDOFF_ITEM_IDS = [
 
 export const ASSIGNMENT_ATTEMPT_REVIEW_CARD_CHAIN_SOURCE_FILES = [
   'docs/product.md',
-  'src/assignments/attempt-review-card-handoff.ts',
   'src/assignments/result-view.ts',
   'src/assignments/result-review-summary.ts',
   'src/assignments/result-answer-view.ts',
@@ -48,20 +47,21 @@ export const ASSIGNMENT_ATTEMPT_REVIEW_CARD_CHAIN_SOURCE_FILES = [
   'src/assignments/result-submitted-date-chain.ts',
   'src/assignments/result-accepted-answer-chain.ts',
   'src/assignments/result-explanation-chain.ts',
-  'src/assignments/copy-artifact-handoff.ts',
+  'src/assignments/result-actions.ts',
   'src/assignments/printable-worksheet-view.ts',
   'src/assignments/printable-worksheet-review-lifecycle-chain.ts',
   'src/routes/dashboard/assignments/$assignmentId.tsx',
   'src/components/assignments/assignment-results-attempt-review-card.tsx',
   'src/components/assignments/assignment-results-attempt-review-filter-control.tsx',
   'src/components/assignments/assignment-results-attempts-table.tsx',
-  'src/components/assignments/assignment-results-classroom-brief-card.tsx',
+  'src/components/assignments/assignment-results-follow-up-panel.tsx',
   'src/components/assignments/assignment-results-header-actions.tsx',
-  'src/components/assignments/assignment-results-review-handoff-panel.tsx',
-  'scripts/assignment-attempt-review-card-handoff-semantic-views.test.ts',
+  'src/components/assignments/assignment-results-student-search.tsx',
+  'scripts/assignment-result-review-helpers.test.ts',
   'scripts/scored-attempt-result-chain-handoff.test.ts',
   'scripts/teacher-results-review-chain-handoff.test.ts',
   'tests/e2e/TEST-CATALOG.md',
+  'src/assignments/classroom-brief.ts',
 ] as const;
 
 export type AssignmentAttemptReviewCardChainHandoffItemId =

@@ -8,13 +8,8 @@ import {
   getPrintableWorksheetResponsePolicy,
   parsePrintableAssignmentSearch,
   summarizePrintableAssignmentWorksheet,
-  type PrintableAssignmentWorksheet,
 } from '@/assignments/printable-worksheet';
-import {
-  PRINTABLE_WORKSHEET_HANDOFF_ITEM_IDS,
-  buildPrintableWorksheetPageViewModel,
-  type PrintableWorksheetHandoffItemId,
-} from '@/assignments/printable-worksheet-view';
+import { buildPrintableWorksheetPageViewModel } from '@/assignments/printable-worksheet-view';
 import { overwriteGetLocale } from '@/locale/paraglide/runtime';
 
 overwriteGetLocale(() => 'en');
@@ -42,135 +37,6 @@ const TOOLBAR_SOURCE = readFileSync(
   'src/components/assignments/printable-worksheet-toolbar.tsx',
   'utf8'
 );
-
-test('printable worksheet handoff exposes 30 paper handoff slices safely', () => {
-  const pageView = buildPrintableWorksheetPageViewModel({
-    answerKey: false,
-    assignmentId: 'assignment-1',
-    worksheet: buildWorksheet(),
-  });
-
-  assert.deepEqual(
-    pageView.handoffView.itemViews.map((item) => item.id),
-    [...PRINTABLE_WORKSHEET_HANDOFF_ITEM_IDS]
-  );
-  assert.equal(pageView.handoffView.itemViews.length, 30);
-  assert.deepEqual(pageView.handoffView.privacy, {
-    exposesAnswerKeyText: false,
-    exposesChoiceText: false,
-    exposesPromptText: false,
-    exposesStudentResponseText: false,
-    itemIds: [...PRINTABLE_WORKSHEET_HANDOFF_ITEM_IDS],
-    scope: 'teacher-printable-worksheet',
-  });
-  assert.equal(
-    getHandoffItemValue(pageView, 'answer-key'),
-    'Hidden by default'
-  );
-  assert.equal(
-    getHandoffItemValue(pageView, 'answer-key-access'),
-    'Hidden by default'
-  );
-  assert.equal(
-    getHandoffItemValue(pageView, 'answer-key-items'),
-    'Hidden by default'
-  );
-  assert.equal(
-    getHandoffItemValue(pageView, 'handout-overview'),
-    'Ready to print'
-  );
-  assert.equal(
-    getHandoffItemValue(pageView, 'preparation-metric-count'),
-    '3 checks'
-  );
-  assert.equal(
-    getHandoffItemValue(pageView, 'assignment-field-count'),
-    '9 fields'
-  );
-  assert.equal(getHandoffItemValue(pageView, 'printable-items'), '1 item');
-  assert.equal(getHandoffItemValue(pageView, 'choice-bank-coverage'), '1 item');
-  assert.equal(
-    getHandoffItemValue(pageView, 'choice-bank-choice-count'),
-    '2 choices'
-  );
-  assert.equal(
-    getHandoffItemValue(pageView, 'writing-area-coverage'),
-    '1 answer line'
-  );
-  assert.equal(
-    getHandoffItemValue(pageView, 'answer-line-count'),
-    '1 answer line'
-  );
-  assert.equal(
-    getHandoffItemValue(pageView, 'answer-key-toggle-boundary'),
-    'Teacher toggle'
-  );
-  assert.equal(
-    getHandoffItemValue(pageView, 'print-route-boundary'),
-    'Teacher print route'
-  );
-  assert.equal(
-    getHandoffItemValue(pageView, 'public-runner-boundary'),
-    'Runner unchanged'
-  );
-  assert.equal(
-    getHandoffItemValue(pageView, 'privacy-guard'),
-    'Private data omitted'
-  );
-  assert.equal(
-    pageView.handoffView.itemViews.every((item) => Boolean(item.ariaLabel)),
-    true
-  );
-  assertNoPrivatePrintableText(JSON.stringify(pageView.handoffView));
-});
-
-test('printable worksheet handoff summarizes included answer keys without key text', () => {
-  const pageView = buildPrintableWorksheetPageViewModel({
-    answerKey: true,
-    assignmentId: 'assignment-1',
-    worksheet: buildWorksheet(),
-  });
-
-  assert.equal(pageView.showAnswerKey, true);
-  assert.equal(pageView.answerKeyView.accessView.state, 'included');
-  assert.equal(
-    getHandoffItemValue(pageView, 'answer-key'),
-    'Teacher-only key included'
-  );
-  assert.equal(
-    getHandoffItemValue(pageView, 'answer-key-access'),
-    'Teacher-only key included'
-  );
-  assert.equal(getHandoffItemValue(pageView, 'answer-key-items'), '1 item');
-  assert.equal(getHandoffItemValue(pageView, 'answer-key-details'), '3 items');
-  assertNoPrivatePrintableText(JSON.stringify(pageView.handoffView));
-});
-
-test('printable worksheet handoff keeps unavailable answer keys explicit', () => {
-  const pageView = buildPrintableWorksheetPageViewModel({
-    answerKey: true,
-    assignmentId: 'assignment-1',
-    worksheet: {
-      ...buildWorksheet(),
-      answerKey: [],
-    },
-  });
-
-  assert.equal(pageView.showAnswerKey, false);
-  assert.equal(pageView.answerKeyView.accessView.state, 'unavailable');
-  assert.equal(
-    getHandoffItemValue(pageView, 'answer-key-items'),
-    'No answer key available'
-  );
-  assert.equal(
-    getHandoffItemValue(pageView, 'answer-key-access'),
-    'No answer key available'
-  );
-  assert.equal(
-    getHandoffItemValue(pageView, 'answer-key-details'),
-    'No answer key available'
-  );
-});
 
 test('printable worksheet builder preserves snapshot, delivery, and answer-key contracts', () => {
   const hiddenWorksheet = buildSourceWorksheet({ includeAnswerKey: false });
@@ -256,15 +122,10 @@ test('printable worksheet builder preserves snapshot, delivery, and answer-key c
   assert.equal(answerKeyPageView.answerKeyItemViews.length, 2);
   assert.equal(answerKeyPageView.answerKeyView.accessView.state, 'included');
   assert.equal(
-    getHandoffItemValue(answerKeyPageView, 'answer-key-items'),
-    '2 items'
+    JSON.stringify(hiddenPageView.answerKeyView).includes(SECRET_ANSWER_TEXT),
+    false,
+    'The student copy must not carry answer-key text when the key is hidden.'
   );
-  assert.equal(
-    getHandoffItemValue(answerKeyPageView, 'answer-key-details'),
-    '4 items'
-  );
-  assertNoPrivatePrintableText(JSON.stringify(hiddenPageView.handoffView));
-  assertNoPrivatePrintableText(JSON.stringify(answerKeyPageView.handoffView));
 });
 
 test('printable worksheet source contract keeps print route teacher-scoped and snapshot-backed', () => {
@@ -352,8 +213,8 @@ test('printable worksheet source contract keeps print route teacher-scoped and s
   );
   assert.match(
     ROUTE_SOURCE,
-    /validateSearch: parsePrintableAssignmentSearch[\s\S]*robots: 'noindex, nofollow'[\s\S]*middleware: \[authRouteMiddleware\][\s\S]*usePrintableAssignmentWorksheet\(\{[\s\S]*assignmentId,[\s\S]*includeAnswerKey: answerKey,[\s\S]*\}\)[\s\S]*buildPrintableWorksheetRouteState[\s\S]*document\.body\.dataset\.printMode = PRINTABLE_WORKSHEET_BODY_PRINT_MODE[\s\S]*search: buildPrintableAssignmentSearch\(\{ answerKey: nextAnswerKey \}\)[\s\S]*<PrintableWorksheetHandoff view=\{pageView\.handoffView\} \/>/,
-    'Printable route should stay teacher-only, noindex, print-mode scoped, URL-toggle backed, and handoff-rendered.'
+    /validateSearch: parsePrintableAssignmentSearch[\s\S]*robots: 'noindex, nofollow'[\s\S]*middleware: \[authRouteMiddleware\][\s\S]*usePrintableAssignmentWorksheet\(\{[\s\S]*assignmentId,[\s\S]*includeAnswerKey: answerKey,[\s\S]*\}\)[\s\S]*buildPrintableWorksheetRouteState[\s\S]*document\.body\.dataset\.printMode = PRINTABLE_WORKSHEET_BODY_PRINT_MODE[\s\S]*search: buildPrintableAssignmentSearch\(\{ answerKey: nextAnswerKey \}\)[\s\S]*<PrintableWorksheetAnswerKey view=\{pageView\.answerKeyView\} \/>/,
+    'Printable route should stay teacher-only, noindex, print-mode scoped, and URL-toggle backed, with the answer key rendered only through its own view.'
   );
   assert.match(
     TOOLBAR_SOURCE,
@@ -362,62 +223,10 @@ test('printable worksheet source contract keeps print route teacher-scoped and s
   );
   assert.match(
     TEST_CATALOG_SOURCE,
-    /scripts\/printable-worksheet-handoff-semantic-views\.test\.ts/,
+    /scripts\/printable-worksheet-view\.test\.ts/,
     'The E2E catalog should list the printable worksheet fast gate.'
   );
 });
-
-test('printable worksheet handoff renders stable DOM item relationships', () => {
-  const source = readFileSync(
-    'src/components/assignments/printable-worksheet-handoff.tsx',
-    'utf8'
-  );
-
-  assert.match(
-    source,
-    /PrintableWorksheetHandoffItemView[\s\S]*PrintableWorksheetHandoffView[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*aria-labelledby=\{titleId\}[\s\S]*data-handoff="printable-worksheet"[\s\S]*data-handoff-scope=\{view\.privacy\.scope\}[\s\S]*view\.itemViews\.map[\s\S]*PrintableWorksheetHandoffItem[\s\S]*function PrintableWorksheetHandoffItem[\s\S]*const labelId = `printable-worksheet-handoff-\$\{itemView\.id\}-label`[\s\S]*const valueId = `printable-worksheet-handoff-\$\{itemView\.id\}-value`[\s\S]*const descriptionId = `printable-worksheet-handoff-\$\{itemView\.id\}-description`[\s\S]*data-handoff-item=\{itemView\.id\}[\s\S]*id=\{labelId\}[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*aria-label=\{itemView\.ariaLabel\}[\s\S]*aria-labelledby=\{`\$\{labelId\} \$\{valueId\}`\}[\s\S]*id=\{valueId\}[\s\S]*id=\{descriptionId\}/,
-    'Printable worksheet handoff should render each paper handoff item with privacy scope plus stable label, value, and description relationships.'
-  );
-});
-
-function buildWorksheet(): PrintableAssignmentWorksheet {
-  return {
-    activityDescription: 'Practice capital cities.',
-    activityTitle: 'Capital city check',
-    answerKey: [
-      {
-        acceptedAnswers: [SECRET_ANSWER_TEXT, 'City of Light'],
-        answer: SECRET_ANSWER_TEXT,
-        explanation: 'Teacher-only explanation text.',
-        id: 'question-1',
-        kind: 'question',
-        prompt: SECRET_PROMPT_TEXT,
-        sequenceNumber: 1,
-      },
-    ],
-    assignmentTitle: 'Capital city exit ticket',
-    deliveryPolicyText: 'Two attempts, no shuffle.',
-    deliverySummary: [],
-    includeAnswerKey: false,
-    instructions: 'Write the best answer.',
-    items: [
-      {
-        answerSpaceLines: 1,
-        choicePresentation: 'choice-list',
-        choices: [SECRET_CHOICE_TEXT, 'Lyon'],
-        id: 'question-1',
-        kind: 'question',
-        layout: 'multiple-choice',
-        prompt: SECRET_PROMPT_TEXT,
-        responseMode: 'choice',
-        sequenceNumber: 1,
-      },
-    ],
-    sharePath: '/play/capital-review',
-    shareSlug: 'capital-review',
-    templateType: 'quiz',
-  };
-}
 
 function buildSourceWorksheet({
   includeAnswerKey,
@@ -470,20 +279,3 @@ const SOURCE_RUNTIME_ITEMS: RuntimeItem[] = [
     prompt: 'Second prompt',
   },
 ];
-
-function getHandoffItemValue(
-  pageView: ReturnType<typeof buildPrintableWorksheetPageViewModel>,
-  id: PrintableWorksheetHandoffItemId
-) {
-  const item = pageView.handoffView.itemViews.find(
-    (handoffItem) => handoffItem.id === id
-  );
-  assert.ok(item, `Missing handoff item ${id}`);
-  return item.value;
-}
-
-function assertNoPrivatePrintableText(serializedView: string) {
-  assert.equal(serializedView.includes(SECRET_ANSWER_TEXT), false);
-  assert.equal(serializedView.includes(SECRET_CHOICE_TEXT), false);
-  assert.equal(serializedView.includes(SECRET_PROMPT_TEXT), false);
-}

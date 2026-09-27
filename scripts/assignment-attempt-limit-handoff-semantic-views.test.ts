@@ -379,7 +379,7 @@ test('assignment attempt limit handoff is wired to shared source boundaries', ()
   );
   assert.match(
     RESULT_EXPORT_SOURCE,
-    /delivery-attempt-limit/,
+    /deliveryView\.maxAttempts/,
     'Result exports should retain the assignment delivery attempt-limit field.'
   );
 });
@@ -429,7 +429,7 @@ function buildAttemptLimitEvidence() {
       /case 'attempt-limit':[\s\S]*assignment_delivery_label_attempts/.test(
         PUBLIC_ASSIGNMENT_SOURCE
       ),
-    resultExportUsesAttemptLimit: /delivery-attempt-limit/.test(
+    resultExportUsesAttemptLimit: /deliveryView\.maxAttempts/.test(
       RESULT_EXPORT_SOURCE
     ),
     resultPageUsesAttemptLimit:

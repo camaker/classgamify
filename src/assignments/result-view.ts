@@ -8,11 +8,6 @@ import type {
 } from '@/assignments/results';
 import { formatAssignmentDisplayTitle } from '@/assignments/assignment-display';
 import { buildAssignmentAttemptStatsView } from '@/assignments/attempt-stats';
-import {
-  buildAssignmentAttemptStatsHandoffEvidence,
-  buildAssignmentAttemptStatsHandoffView,
-  type AssignmentAttemptStatsHandoffView,
-} from '@/assignments/attempt-stats-handoff';
 import { getAssignmentStatusLabel } from '@/assignments/lifecycle';
 import {
   buildAttemptDurationDisplayView,
@@ -60,10 +55,7 @@ import {
   ITEM_PERFORMANCE_SORT_VALUES,
   STUDENT_SUMMARY_SORT_VALUES,
   buildAssignmentResultReviewScope,
-  buildFilteredAttemptRows,
-  filterAndSortStudentSummaries,
   filterAssignmentResultCompletedAttemptRows,
-  filterAttemptReviews,
   normalizeResultSearch,
   resolveAssignmentResultViewState,
   sortItemPerformance,
@@ -78,25 +70,6 @@ import {
   type StudentSummarySort,
 } from '@/assignments/result-filters';
 import {
-  buildAssignmentItemPerformanceSortHandoffEvidence,
-  buildAssignmentItemPerformanceSortHandoffView,
-  type AssignmentItemPerformanceSortHandoffView,
-} from '@/assignments/item-performance-sort-handoff';
-import {
-  buildAssignmentStudentSummarySortHandoffEvidence,
-  buildAssignmentStudentSummarySortHandoffView,
-  type AssignmentStudentSummarySortHandoffView,
-} from '@/assignments/student-summary-sort-handoff';
-import {
-  buildAssignmentResultStudentSearchHandoffView,
-  type AssignmentResultStudentSearchHandoffView,
-} from '@/assignments/result-student-search-handoff';
-import {
-  buildAssignmentAttemptReviewCardHandoffEvidence,
-  buildAssignmentAttemptReviewCardHandoffView,
-  type AssignmentAttemptReviewCardHandoffView,
-} from '@/assignments/attempt-review-card-handoff';
-import {
   type AssignmentShareLinkActionView,
   buildAssignmentShareLinkAvailability,
   buildAssignmentShareLinkActionView,
@@ -107,47 +80,19 @@ import type { AssignmentSettingsInput } from '@/assignments/validation';
 import {
   buildAssignmentResultActionButtons,
   buildAssignmentResultActionDataSet,
-  buildAssignmentResultActionScopeView,
-  buildAssignmentResultActionStatusView,
   buildAssignmentResultCopyActionData,
   buildAssignmentResultCopyArtifacts,
   buildAssignmentResultCopyArtifactPreviews,
-  buildAssignmentResultMaterialHandoffView,
   buildAssignmentResultActionState,
-  getAssignmentResultActionCopy,
-  getAssignmentResultActionDataScope,
-  type AssignmentResultAction,
   type AssignmentResultActionButton,
-  type AssignmentResultActionDataScope,
   type AssignmentResultActionDataSet,
-  type AssignmentResultCopyAction,
   type AssignmentResultCopyActionData,
   type AssignmentResultCopyArtifactPreview,
-  type AssignmentResultCopyArtifacts,
-  type AssignmentResultMaterialHandoffView,
   type AssignmentResultActionState,
 } from '@/assignments/result-actions';
-import {
-  buildAssignmentResultEmptyStateHandoffView,
-  type AssignmentResultEmptyStateHandoffInput,
-  type AssignmentResultEmptyStateHandoffView,
-} from '@/assignments/result-empty-state-handoff';
-import {
-  buildAssignmentResultsExportPreparationView,
-  type AssignmentResultsExportPreparationView,
-} from '@/assignments/results-export';
 import type { AssignmentClassroomBrief } from '@/assignments/classroom-brief';
-import {
-  buildAssignmentCopyArtifactHandoffView,
-  type AssignmentCopyArtifactHandoffView,
-} from '@/assignments/copy-artifact-handoff';
-import {
-  buildTeacherResultsReviewChainHandoffView,
-  type TeacherResultsReviewChainHandoffView,
-} from '@/assignments/teacher-results-review-chain';
 import type {
   ActivityTemplateType,
-  AssignmentSettings,
   AssignmentStatus,
 } from '@/activities/types';
 import { getTemplateByType } from '@/activities/catalog';
@@ -160,12 +105,9 @@ export {
   buildAssignmentResultRouteSearch,
   normalizeAssignmentResultScopeCount,
   resolveAssignmentResultViewState,
-  sortItemPerformance,
-  sortStudentSummaries,
   type AssignmentAttemptReviewRow,
   type AssignmentAttemptRowInput,
   type AssignmentResultReviewScope,
-  type AssignmentResultReviewScopeSummary,
   type AssignmentResultControlSearchUpdate,
   type AssignmentResultResolvedViewState,
   type AssignmentResultSearchState,
@@ -198,20 +140,16 @@ export {
   getAssignmentResultActionGateFromState,
   type AssignmentResultActionButton,
   type AssignmentResultActionButtonId,
-  type AssignmentResultActionDataScope,
   type AssignmentResultActionDataSet,
   type AssignmentResultActionScopeView,
   type AssignmentResultActionStatusView,
   type AssignmentResultCopyActionData,
   type AssignmentResultCopyArtifactPreview,
-  type AssignmentResultCopyArtifactPreviewScope,
   type AssignmentResultCopyArtifactPreviewId,
-  type AssignmentResultMaterialHandoffView,
 } from '@/assignments/result-actions';
 
 export type AssignmentResultEmptyState = {
   description: string;
-  handoffView: AssignmentResultEmptyStateHandoffView;
   title: string;
 };
 
@@ -256,11 +194,6 @@ export type AssignmentResultSectionViews = {
   studentFollowUp: AssignmentResultSectionView;
   studentSummary: AssignmentResultSectionView;
 };
-
-export type AssignmentResultClassroomBriefSectionViews = Pick<
-  AssignmentResultSectionViews,
-  'classroomBrief' | 'classReviewFocus' | 'studentFollowUp'
->;
 
 type AssignmentResultContentState = {
   hasAttemptReviewCards: boolean;
@@ -365,7 +298,6 @@ export type AssignmentResultAttemptReviewCardView = {
   answerViews: AssignmentResultAttemptAnswerReviewView[];
   ariaLabel: string;
   badgeLabel: string;
-  handoffView: AssignmentAttemptReviewCardHandoffView;
   id: string;
   summaryMetricViews: AssignmentResultAttemptReviewSummaryMetricView[];
   studentLabel: string;
@@ -389,9 +321,7 @@ export type AssignmentResultStudentSummaryRowView =
   };
 
 export type AssignmentResultStudentSummaryTableView =
-  AssignmentResultTableView<AssignmentResultStudentSummaryRowView> & {
-    sortHandoffView: AssignmentStudentSummarySortHandoffView;
-  };
+  AssignmentResultTableView<AssignmentResultStudentSummaryRowView> & {};
 
 export type AssignmentResultItemAnalysisCardDisplayView = {
   acceptedAnswersLabel: string;
@@ -434,9 +364,7 @@ export type AssignmentResultItemPerformanceRowView =
   };
 
 export type AssignmentResultItemPerformanceTableView =
-  AssignmentResultTableView<AssignmentResultItemPerformanceRowView> & {
-    sortHandoffView: AssignmentItemPerformanceSortHandoffView;
-  };
+  AssignmentResultTableView<AssignmentResultItemPerformanceRowView> & {};
 
 type AssignmentResultPageBreadcrumb = {
   href?: string;
@@ -525,7 +453,7 @@ export type AssignmentResultControlViews = {
 
 type AssignmentResultCopyScopeItemId = 'items' | 'review' | 'students';
 
-export type AssignmentResultCopyScopeItemView = {
+type AssignmentResultCopyScopeItemView = {
   description: string;
   id: AssignmentResultCopyScopeItemId;
   label: string;
@@ -538,7 +466,7 @@ type AssignmentResultCopyScopeSummaryItemId =
   | 'items'
   | 'students';
 
-export type AssignmentResultCopyScopeSummaryItemView = {
+type AssignmentResultCopyScopeSummaryItemView = {
   ariaLabel: string;
   description: string;
   id: AssignmentResultCopyScopeSummaryItemId;
@@ -615,134 +543,6 @@ export type AssignmentResultReviewStatusView = {
   title: string;
 };
 
-export const ASSIGNMENT_RESULT_REVIEW_CONTROLS_HANDOFF_ITEM_IDS = [
-  'route-parser',
-  'route-update-helper',
-  'route-default-elision',
-  'invalid-route-guard',
-  'search-normalization',
-  'resolved-student-search',
-  'student-search-status',
-  'student-search-match-count',
-  'student-sort-option',
-  'student-sort-status',
-  'student-sort-default',
-  'item-sort-option',
-  'item-sort-status',
-  'item-sort-default',
-  'answer-review-filter',
-  'answer-review-status',
-  'answer-review-default',
-  'filtered-students',
-  'filtered-attempt-rows',
-  'filtered-answer-reviews',
-  'sorted-performance-items',
-  'review-scope-summary',
-  'copy-scope-students',
-  'copy-scope-items',
-  'copy-scope-review',
-  'table-consumer',
-  'review-card-consumer',
-  'copy-artifact-consumer',
-  'anonymous-label-search',
-  'privacy-guard',
-] as const;
-
-export type AssignmentResultReviewControlsHandoffItemId =
-  (typeof ASSIGNMENT_RESULT_REVIEW_CONTROLS_HANDOFF_ITEM_IDS)[number];
-
-export type AssignmentResultReviewControlsHandoffPrivacyContract = {
-  exposesCopyArtifactText: false;
-  exposesRawAnonymousToken: false;
-  exposesRawRouteQuery: false;
-  exposesStudentAnswerText: false;
-  exposesStudentDisplayLabels: false;
-  exposesTeacherAnswerKey: false;
-  itemIds: AssignmentResultReviewControlsHandoffItemId[];
-  mutatesResultData: false;
-  scope: 'teacher-result-review-controls';
-  usesAssignmentDomainHelpers: true;
-};
-
-export type AssignmentResultReviewControlsHandoffItemView = {
-  ariaLabel: string;
-  description: string;
-  id: AssignmentResultReviewControlsHandoffItemId;
-  label: string;
-  statusLabel?: string;
-  value: string;
-};
-
-export type AssignmentResultReviewControlsHandoffView = {
-  description: string;
-  itemViews: AssignmentResultReviewControlsHandoffItemView[];
-  privacy: AssignmentResultReviewControlsHandoffPrivacyContract;
-  title: string;
-};
-
-export const ASSIGNMENT_RESULT_REVIEW_HANDOFF_ITEM_IDS = [
-  'review-status',
-  'review-next-step',
-  'student-search',
-  'student-search-status',
-  'student-sort',
-  'student-sort-status',
-  'item-sort',
-  'item-sort-status',
-  'answer-review',
-  'answer-review-status',
-  'matched-students',
-  'matched-attempts',
-  'matched-items',
-  'matched-answer-reviews',
-  'copy-scope-students',
-  'copy-scope-items',
-  'copy-scope-review',
-  'action-copy-brief',
-  'action-copy-reteach-plan',
-  'action-copy-item-review',
-  'action-copy-follow-up',
-  'action-export-csv',
-  'preview-copy-brief',
-  'preview-copy-reteach-plan',
-  'preview-copy-item-review',
-  'preview-copy-follow-up',
-  'route-state',
-  'current-review-boundary',
-  'full-export-boundary',
-  'privacy-guard',
-] as const;
-
-export type AssignmentResultReviewHandoffItemId =
-  (typeof ASSIGNMENT_RESULT_REVIEW_HANDOFF_ITEM_IDS)[number];
-
-export type AssignmentResultReviewHandoffPrivacyContract = {
-  exposesCopyArtifactText: false;
-  exposesCsvDataUrl: false;
-  exposesRawAnonymousToken: false;
-  exposesStudentAnswerText: false;
-  exposesTeacherAnswerKey: false;
-  itemIds: AssignmentResultReviewHandoffItemId[];
-  scope: 'teacher-result-review';
-};
-
-export type AssignmentResultReviewHandoffItemView = {
-  ariaLabel: string;
-  dataScope?: AssignmentResultActionDataScope;
-  description: string;
-  id: AssignmentResultReviewHandoffItemId;
-  label: string;
-  statusLabel?: string;
-  value: string;
-};
-
-export type AssignmentResultReviewHandoffView = {
-  description: string;
-  itemViews: AssignmentResultReviewHandoffItemView[];
-  privacy: AssignmentResultReviewHandoffPrivacyContract;
-  title: string;
-};
-
 export type AssignmentAttemptRowDisplayInput = AssignmentAttemptRowInput & {
   completedAt: Date | string | null;
   maxScore: number | null;
@@ -791,7 +591,6 @@ export type AssignmentResultHeaderView = {
   assignmentSharePath: string;
   assignmentShareUrl: string;
   assignmentTitle: string;
-  exportPreparationView: AssignmentResultsExportPreparationView;
   printAction: AssignmentResultHeaderPrintAction;
   resultActionsLabel: string;
   settingsSummaryView: AssignmentSettingsSummaryView;
@@ -824,7 +623,6 @@ export type AssignmentResultsPageViewModel<
   actionState: AssignmentResultActionState;
   attemptReviewCardViews: AssignmentResultAttemptReviewCardView[];
   attemptRowViews: AssignmentResultAttemptRowView[];
-  attemptStatsHandoffView: AssignmentAttemptStatsHandoffView;
   attemptTableView: AssignmentResultAttemptTableView;
   breadcrumbs: AssignmentResultPageBreadcrumb[];
   classroomBrief: AssignmentClassroomBrief | null;
@@ -839,7 +637,6 @@ export type AssignmentResultsPageViewModel<
       actionButton: AssignmentResultActionButton;
     }
   >;
-  copyArtifactHandoffView: AssignmentCopyArtifactHandoffView | null;
   copyScopeView: AssignmentResultCopyScopeView;
   description: string;
   headerView: AssignmentResultHeaderView | null;
@@ -847,19 +644,14 @@ export type AssignmentResultsPageViewModel<
   loadErrorMessage: string;
   itemPerformanceRowViews: AssignmentResultItemPerformanceRowView[];
   itemPerformanceTableView: AssignmentResultItemPerformanceTableView;
-  materialHandoffView: AssignmentResultMaterialHandoffView;
   metricItems: AssignmentResultMetricItem[];
   resultView: AssignmentResultViewModel<TAttempt>;
-  reviewControlsHandoffView: AssignmentResultReviewControlsHandoffView;
-  reviewHandoffView: AssignmentResultReviewHandoffView;
   reviewStatusView: AssignmentResultReviewStatusView;
   reviewScopeView: AssignmentResultReviewScopeView;
   sectionState: AssignmentResultSectionState;
   sectionViews: AssignmentResultSectionViews;
-  studentSearchHandoffView: AssignmentResultStudentSearchHandoffView;
   studentSummaryRowViews: AssignmentResultStudentSummaryRowView[];
   studentSummaryTableView: AssignmentResultStudentSummaryTableView;
-  teacherResultsReviewChainHandoffView: TeacherResultsReviewChainHandoffView;
   title: string;
   viewState: AssignmentResultResolvedViewState;
 };
@@ -1469,15 +1261,11 @@ export function buildAssignmentResultMetricItems({
 
 export function buildAssignmentResultHeaderView({
   activity,
-  analysis,
   assignment,
   now,
   snapshot,
-  stats,
 }: AssignmentResultHeaderSource & {
-  analysis?: AssignmentResultsAnalysis;
   now?: number;
-  stats?: AssignmentResultsPageData<AssignmentAttemptRowDisplayInput>['stats'];
 }): AssignmentResultHeaderView {
   const resolvedSource = resolveAssignmentSnapshotSource({
     activity,
@@ -1497,13 +1285,6 @@ export function buildAssignmentResultHeaderView({
     assignmentSharePath: shareAction.sharePath,
     assignmentShareUrl: shareAction.shareUrl,
     assignmentTitle: formatAssignmentDisplayTitle(assignment.title),
-    exportPreparationView: buildAssignmentResultsExportPreparationView({
-      activity,
-      analysis: analysis ?? EMPTY_ASSIGNMENT_RESULTS_ANALYSIS,
-      assignment,
-      snapshot,
-      stats,
-    }),
     printAction: {
       assignmentId: assignment.id,
       label: assignmentResultPageCopy.printWorksheetLabel,
@@ -1526,13 +1307,6 @@ export function buildAssignmentResultHeaderView({
     templateType,
   };
 }
-
-const EMPTY_ASSIGNMENT_RESULTS_ANALYSIS = {
-  attempts: [],
-  needsReview: [],
-  perItem: [],
-  students: [],
-} satisfies AssignmentResultsAnalysis;
 
 export function buildAssignmentResultHeaderShareAction({
   expiresAt,
@@ -1896,15 +1670,6 @@ export function buildAssignmentAttemptReviewCardView(
       submitted: submittedAtLabel,
     }),
     badgeLabel,
-    handoffView: buildAssignmentAttemptReviewCardHandoffView(
-      buildAssignmentAttemptReviewCardHandoffEvidence({
-        answers: attempt.answers,
-        answerViews,
-        badgeLabel,
-        submittedAtLabel,
-        summaryMetricCount: summaryMetricViews.length,
-      })
-    ),
     id: attempt.id,
     summaryMetricViews,
     studentLabel,
@@ -2027,15 +1792,9 @@ export function buildAssignmentStudentSummaryRowViews(
   }));
 }
 
-export function buildAssignmentStudentSummaryTableView({
-  controlView,
-  reviewScopeSummary,
-  sort,
+function buildAssignmentStudentSummaryTableView({
   students,
 }: {
-  controlView: AssignmentResultStudentSearchControlView;
-  reviewScopeSummary: AssignmentResultReviewScopeSummary;
-  sort: StudentSummarySort;
   students: AssignmentStudentSummary[];
 }): AssignmentResultStudentSummaryTableView {
   const rows = buildAssignmentStudentSummaryRowViews(students);
@@ -2045,18 +1804,6 @@ export function buildAssignmentStudentSummaryTableView({
     caption: assignmentResultSectionCopy.studentSummary.description,
     headers: assignmentResultTableHeaders.studentSummary,
     rows,
-    sortHandoffView: buildAssignmentStudentSummarySortHandoffView({
-      evidence: buildAssignmentStudentSummarySortHandoffEvidence({
-        reviewScopeSummary,
-        sort,
-        students,
-        tableRowCount: rows.length,
-      }),
-      selectedSortDescription: controlView.selectedSortOption.description,
-      selectedSortLabel: controlView.selectedSortOption.label,
-      statusDescription: controlView.sortStatusView.description,
-      statusLabel: controlView.sortStatusView.value,
-    }),
   };
 }
 
@@ -2190,16 +1937,10 @@ export function buildAssignmentItemPerformanceRowViews(
   }));
 }
 
-export function buildAssignmentItemPerformanceTableView({
-  controlView,
+function buildAssignmentItemPerformanceTableView({
   items,
-  reviewScopeSummary,
-  sort,
 }: {
-  controlView: AssignmentResultItemPerformanceSortControlView;
   items: AssignmentItemAnalysis[];
-  reviewScopeSummary: AssignmentResultReviewScopeSummary;
-  sort: ItemPerformanceSort;
 }): AssignmentResultItemPerformanceTableView {
   const rows = buildAssignmentItemPerformanceRowViews(items);
 
@@ -2208,18 +1949,6 @@ export function buildAssignmentItemPerformanceTableView({
     caption: assignmentResultSectionCopy.itemPerformance.description,
     headers: assignmentResultTableHeaders.itemPerformance,
     rows,
-    sortHandoffView: buildAssignmentItemPerformanceSortHandoffView({
-      evidence: buildAssignmentItemPerformanceSortHandoffEvidence({
-        items,
-        reviewScopeSummary,
-        sort,
-        tableRowCount: rows.length,
-      }),
-      selectedSortDescription: controlView.selectedSortOption.description,
-      selectedSortLabel: controlView.selectedSortOption.label,
-      statusDescription: controlView.statusView.description,
-      statusLabel: controlView.statusView.value,
-    }),
   };
 }
 
@@ -2433,22 +2162,14 @@ export function buildAssignmentResultEmptyState(
     if (input.totalStudents === 0) {
       return buildAssignmentResultEmptyStateView({
         description: m.assignment_result_empty_student_summary_description(),
-        reason: 'no-student-summaries',
-        search: input.search,
-        surface: input.surface,
         title: m.assignment_result_empty_student_summary_title(),
-        totalStudents: input.totalStudents,
       });
     }
 
     if (hasSearch) {
       return buildAssignmentResultEmptyStateView({
         description: m.assignment_result_empty_search_students_description(),
-        reason: 'student-search-no-matches',
-        search: input.search,
-        surface: input.surface,
         title: m.assignment_result_empty_search_students_title(),
-        totalStudents: input.totalStudents,
       });
     }
 
@@ -2459,22 +2180,14 @@ export function buildAssignmentResultEmptyState(
     if (input.totalAttempts === 0) {
       return buildAssignmentResultEmptyStateView({
         description: m.assignment_result_empty_attempt_rows_description(),
-        reason: 'no-attempts',
-        search: input.search,
-        surface: input.surface,
         title: m.assignment_result_empty_attempt_rows_title(),
-        totalAttempts: input.totalAttempts,
       });
     }
 
     if (hasSearch) {
       return buildAssignmentResultEmptyStateView({
         description: m.assignment_result_empty_search_attempts_description(),
-        reason: 'attempt-search-no-matches',
-        search: input.search,
-        surface: input.surface,
         title: m.assignment_result_empty_search_attempts_title(),
-        totalAttempts: input.totalAttempts,
       });
     }
 
@@ -2484,12 +2197,7 @@ export function buildAssignmentResultEmptyState(
   if (input.totalAttemptReviews === 0) {
     return buildAssignmentResultEmptyStateView({
       description: m.assignment_result_empty_attempt_review_description(),
-      filter: input.filter,
-      reason: 'no-answer-reviews',
-      search: input.search,
-      surface: input.surface,
       title: m.assignment_result_empty_attempt_review_title(),
-      totalAttemptReviews: input.totalAttemptReviews,
     });
   }
 
@@ -2497,38 +2205,18 @@ export function buildAssignmentResultEmptyState(
     return buildAssignmentResultEmptyStateView({
       description:
         m.assignment_result_empty_search_answer_reviews_description(),
-      filter: input.filter,
-      reason: 'answer-review-search-no-matches',
-      search: input.search,
-      surface: input.surface,
       title: m.assignment_result_empty_search_answer_reviews_title(),
-      totalAttemptReviews: input.totalAttemptReviews,
     });
   }
 
   if (input.filter === 'needs-review') {
     return buildAssignmentResultEmptyStateView({
       description: m.assignment_result_empty_needs_review_description(),
-      filter: input.filter,
-      reason: 'needs-review-no-matches',
-      search: input.search,
-      surface: input.surface,
       title: m.assignment_result_empty_needs_review_title(),
-      totalAttemptReviews: input.totalAttemptReviews,
     });
   }
 
   return undefined;
-}
-
-function buildAssignmentResultEmptyStateView(
-  input: AssignmentResultEmptyStateHandoffInput
-): AssignmentResultEmptyState {
-  return {
-    description: input.description,
-    handoffView: buildAssignmentResultEmptyStateHandoffView(input),
-    title: input.title,
-  };
 }
 
 export function buildResultSearchSummary({
@@ -2601,27 +2289,11 @@ export function buildAssignmentResultsPageViewModel<
     controlViews,
     summary: resultView.reviewScope.summary,
   });
-  const reviewControlsHandoffView =
-    buildAssignmentResultReviewControlsHandoffView({
-      controlViews,
-      copyScopeView,
-      reviewScope: resultView.reviewScope,
-      viewState,
-    });
   const reviewStatusView = buildAssignmentResultReviewStatusView({
     controlViews,
     summary: resultView.reviewScope.summary,
     viewState,
   });
-  const studentSearchHandoffView =
-    buildAssignmentResultStudentSearchHandoffView({
-      search: viewState.studentSearch,
-      searchDescription: controlViews.studentSearch.searchDescription,
-      searchStatusDescription:
-        controlViews.studentSearch.searchStatusView.description,
-      searchStatusLabel: controlViews.studentSearch.searchStatusView.value,
-      summary: resultView.reviewScope.summary,
-    });
   const attemptTableView = data
     ? buildAssignmentAttemptTableView({
         rows: resultView.filteredAttemptRows,
@@ -2634,16 +2306,10 @@ export function buildAssignmentResultsPageViewModel<
           headerView?.settingsSummaryView.settings.timeLimitSeconds,
       });
   const studentSummaryTableView = buildAssignmentStudentSummaryTableView({
-    controlView: controlViews.studentSearch,
-    reviewScopeSummary: resultView.reviewScope.summary,
-    sort: viewState.studentSort,
     students: resultView.filteredStudents,
   });
   const itemPerformanceTableView = buildAssignmentItemPerformanceTableView({
-    controlView: controlViews.itemPerformanceSort,
     items: resultView.sortedPerformanceItems,
-    reviewScopeSummary: resultView.reviewScope.summary,
-    sort: viewState.itemPerformanceSort,
   });
   const attemptRowViews = attemptTableView.rows;
   const studentSummaryRowViews = studentSummaryTableView.rows;
@@ -2720,39 +2386,6 @@ export function buildAssignmentResultsPageViewModel<
           : [];
       })
     : [];
-  const copyArtifactHandoffView = copyArtifacts
-    ? buildAssignmentCopyArtifactHandoffView({
-        artifacts: copyArtifacts,
-        previews: copyArtifactPreviews,
-      })
-    : null;
-  const reviewHandoffView = buildAssignmentResultReviewHandoffView({
-    actionButtons,
-    controlViews,
-    copyArtifactPreviews,
-    copyScopeView,
-    reviewScopeView,
-    reviewStatusView,
-  });
-  const materialHandoffView = buildAssignmentResultMaterialHandoffView({
-    actionButtons,
-    copyArtifactPreviews,
-    copyScopeView,
-    exportPreparationView: headerView?.exportPreparationView ?? null,
-    printAction: headerView?.printAction ?? null,
-    reviewStatusView,
-  });
-  const attemptStatsHandoffView = buildAssignmentAttemptStatsHandoffView(
-    buildAssignmentAttemptStatsHandoffEvidence({
-      attempts: data?.attempts ?? [],
-      stats: data?.stats ?? null,
-      timeLimitSeconds:
-        headerView?.settingsSummaryView.settings.timeLimitSeconds,
-    })
-  );
-  const teacherResultsReviewChainHandoffView =
-    buildTeacherResultsReviewChainHandoffView();
-
   return {
     actionButtons,
     actionData: data ?? null,
@@ -2760,7 +2393,6 @@ export function buildAssignmentResultsPageViewModel<
     actionState,
     attemptReviewCardViews,
     attemptRowViews,
-    attemptStatsHandoffView,
     attemptTableView,
     breadcrumbs: [
       {
@@ -2783,7 +2415,6 @@ export function buildAssignmentResultsPageViewModel<
     controlViews,
     copyActionData,
     copyArtifactPreviews,
-    copyArtifactHandoffView,
     copyScopeView,
     description: assignmentResultPageCopy.description,
     headerView,
@@ -2791,7 +2422,6 @@ export function buildAssignmentResultsPageViewModel<
     itemPerformanceRowViews,
     itemPerformanceTableView,
     loadErrorMessage: assignmentResultPageCopy.loadErrorMessage,
-    materialHandoffView,
     metricItems: data
       ? buildAssignmentResultMetricItems({
           averageDurationSeconds: data.stats.averageDurationSeconds,
@@ -2804,16 +2434,12 @@ export function buildAssignmentResultsPageViewModel<
         })
       : [],
     resultView,
-    reviewControlsHandoffView,
-    reviewHandoffView,
     reviewStatusView,
     reviewScopeView,
     sectionState,
     sectionViews,
-    studentSearchHandoffView,
     studentSummaryRowViews,
     studentSummaryTableView,
-    teacherResultsReviewChainHandoffView,
     title,
     viewState,
   };
@@ -3159,905 +2785,6 @@ export function buildAssignmentResultReviewScopeView({
   };
 }
 
-export function buildAssignmentResultReviewControlsHandoffView<
-  TAttempt extends AssignmentAttemptRowInput,
->({
-  controlViews,
-  copyScopeView,
-  reviewScope,
-  viewState,
-}: {
-  controlViews: AssignmentResultControlViews;
-  copyScopeView: AssignmentResultCopyScopeView;
-  reviewScope: AssignmentResultReviewScope<TAttempt>;
-  viewState: AssignmentResultResolvedViewState;
-}): AssignmentResultReviewControlsHandoffView {
-  const itemViews = ASSIGNMENT_RESULT_REVIEW_CONTROLS_HANDOFF_ITEM_IDS.map(
-    (id) =>
-      buildAssignmentResultReviewControlsHandoffItem({
-        controlViews,
-        copyScopeView,
-        id,
-        reviewScope,
-        viewState,
-      })
-  );
-
-  return {
-    description: m.assignment_result_review_controls_handoff_description(),
-    itemViews,
-    privacy:
-      buildAssignmentResultReviewControlsHandoffPrivacyContract(itemViews),
-    title: m.assignment_result_review_controls_handoff_title(),
-  };
-}
-
-type AssignmentResultReviewControlsHandoffBuildContext<
-  TAttempt extends AssignmentAttemptRowInput,
-> = {
-  controlViews: AssignmentResultControlViews;
-  copyScopeView: AssignmentResultCopyScopeView;
-  id: AssignmentResultReviewControlsHandoffItemId;
-  reviewScope: AssignmentResultReviewScope<TAttempt>;
-  viewState: AssignmentResultResolvedViewState;
-};
-
-function buildAssignmentResultReviewControlsHandoffItem<
-  TAttempt extends AssignmentAttemptRowInput,
->(
-  context: AssignmentResultReviewControlsHandoffBuildContext<TAttempt>
-): AssignmentResultReviewControlsHandoffItemView {
-  const { controlViews, copyScopeView, id, reviewScope, viewState } = context;
-  const summary = reviewScope.summary;
-
-  switch (id) {
-    case 'route-parser':
-      return buildAssignmentResultReviewControlsHandoffItemView({
-        description:
-          m.assignment_result_review_controls_handoff_route_parser_description(),
-        id,
-        label: m.assignment_result_review_controls_handoff_route_parser_label(),
-        value: 'buildAssignmentResultRouteSearch',
-      });
-    case 'route-update-helper':
-      return buildAssignmentResultReviewControlsHandoffItemView({
-        description:
-          m.assignment_result_review_controls_handoff_route_update_description(),
-        id,
-        label: m.assignment_result_review_controls_handoff_route_update_label(),
-        value: 'buildAssignmentResultControlSearchState',
-      });
-    case 'route-default-elision':
-      return buildAssignmentResultReviewControlsHandoffItemView({
-        description:
-          m.assignment_result_review_controls_handoff_default_elision_description(),
-        id,
-        label:
-          m.assignment_result_review_controls_handoff_default_elision_label(),
-        value:
-          m.assignment_result_review_controls_handoff_default_elision_value(),
-      });
-    case 'invalid-route-guard':
-      return buildAssignmentResultReviewControlsHandoffItemView({
-        description:
-          m.assignment_result_review_controls_handoff_invalid_route_description(),
-        id,
-        label:
-          m.assignment_result_review_controls_handoff_invalid_route_label(),
-        value:
-          m.assignment_result_review_controls_handoff_invalid_route_value(),
-      });
-    case 'search-normalization':
-      return buildAssignmentResultReviewControlsHandoffItemView({
-        description:
-          m.assignment_result_review_controls_handoff_search_normalization_description(),
-        id,
-        label:
-          m.assignment_result_review_controls_handoff_search_normalization_label(),
-        value: 'NFKC + trim',
-      });
-    case 'resolved-student-search':
-      return buildAssignmentResultReviewControlsHandoffItemView({
-        description: assignmentResultReviewScopeCopy.searchDescription,
-        id,
-        label: assignmentResultReviewScopeCopy.searchLabel,
-        statusLabel: controlViews.studentSearch.searchStatusView.value,
-        value: viewState.studentSearch
-          ? m.assignment_result_review_controls_handoff_search_applied_value()
-          : assignmentResultReviewScopeCopy.searchAllValue,
-      });
-    case 'student-search-status':
-      return buildAssignmentResultReviewControlsHandoffItemView({
-        description:
-          m.assignment_result_review_controls_handoff_student_search_status_description(),
-        id,
-        label: m.assignment_result_review_handoff_student_search_status_label(),
-        statusLabel: controlViews.studentSearch.searchStatusView.value,
-        value: controlViews.studentSearch.searchStatusView.value,
-      });
-    case 'student-search-match-count':
-      return buildAssignmentResultReviewControlsHandoffItemView({
-        description:
-          m.assignment_result_review_controls_handoff_student_search_match_description(),
-        id,
-        label:
-          m.assignment_result_review_controls_handoff_student_search_match_label(),
-        value: formatAssignmentResultCopyScopeSummaryCount(summary.students),
-      });
-    case 'student-sort-option':
-      return buildAssignmentResultReviewControlsHandoffItemView({
-        description: controlViews.studentSearch.selectedSortOption.description,
-        id,
-        label: assignmentResultReviewScopeCopy.studentSortLabel,
-        statusLabel: controlViews.studentSearch.sortStatusView.value,
-        value: controlViews.studentSearch.selectedSortOption.label,
-      });
-    case 'student-sort-status':
-      return buildAssignmentResultReviewControlsHandoffItemView({
-        description: controlViews.studentSearch.sortStatusView.description,
-        id,
-        label: m.assignment_result_review_handoff_student_sort_status_label(),
-        statusLabel: controlViews.studentSearch.sortStatusView.value,
-        value: controlViews.studentSearch.sortStatusView.value,
-      });
-    case 'student-sort-default':
-      return buildAssignmentResultReviewControlsHandoffItemView({
-        description:
-          m.assignment_result_review_controls_handoff_student_sort_default_description(),
-        id,
-        label:
-          m.assignment_result_review_controls_handoff_student_sort_default_label(),
-        value: formatAssignmentResultReviewControlDefaultValue(
-          viewState.studentSort === DEFAULT_STUDENT_SUMMARY_SORT
-        ),
-      });
-    case 'item-sort-option':
-      return buildAssignmentResultReviewControlsHandoffItemView({
-        description:
-          controlViews.itemPerformanceSort.selectedSortOption.description,
-        id,
-        label: assignmentResultReviewScopeCopy.itemSortLabel,
-        statusLabel: controlViews.itemPerformanceSort.statusView.value,
-        value: controlViews.itemPerformanceSort.selectedSortOption.label,
-      });
-    case 'item-sort-status':
-      return buildAssignmentResultReviewControlsHandoffItemView({
-        description: controlViews.itemPerformanceSort.statusView.description,
-        id,
-        label: m.assignment_result_review_handoff_item_sort_status_label(),
-        statusLabel: controlViews.itemPerformanceSort.statusView.value,
-        value: controlViews.itemPerformanceSort.statusView.value,
-      });
-    case 'item-sort-default':
-      return buildAssignmentResultReviewControlsHandoffItemView({
-        description:
-          m.assignment_result_review_controls_handoff_item_sort_default_description(),
-        id,
-        label:
-          m.assignment_result_review_controls_handoff_item_sort_default_label(),
-        value: formatAssignmentResultReviewControlDefaultValue(
-          viewState.itemPerformanceSort === DEFAULT_ITEM_PERFORMANCE_SORT
-        ),
-      });
-    case 'answer-review-filter':
-      return buildAssignmentResultReviewControlsHandoffItemView({
-        description:
-          controlViews.attemptReviewFilter.selectedFilterOption.description,
-        id,
-        label: assignmentResultReviewScopeCopy.answerReviewsLabel,
-        statusLabel: controlViews.attemptReviewFilter.statusView.value,
-        value: controlViews.attemptReviewFilter.selectedFilterOption.label,
-      });
-    case 'answer-review-status':
-      return buildAssignmentResultReviewControlsHandoffItemView({
-        description: controlViews.attemptReviewFilter.statusView.description,
-        id,
-        label: m.assignment_result_review_handoff_answer_review_status_label(),
-        statusLabel: controlViews.attemptReviewFilter.statusView.value,
-        value: controlViews.attemptReviewFilter.statusView.value,
-      });
-    case 'answer-review-default':
-      return buildAssignmentResultReviewControlsHandoffItemView({
-        description:
-          m.assignment_result_review_controls_handoff_answer_review_default_description(),
-        id,
-        label:
-          m.assignment_result_review_controls_handoff_answer_review_default_label(),
-        value: formatAssignmentResultReviewControlDefaultValue(
-          viewState.attemptReviewFilter === DEFAULT_ATTEMPT_REVIEW_FILTER
-        ),
-      });
-    case 'filtered-students':
-      return buildAssignmentResultReviewControlsHandoffItemView({
-        description:
-          m.assignment_result_review_scope_summary_students_description(),
-        id,
-        label: assignmentResultReviewScopeCopy.studentsLabel,
-        value: formatAssignmentResultCopyScopeSummaryCount(summary.students),
-      });
-    case 'filtered-attempt-rows':
-      return buildAssignmentResultReviewControlsHandoffItemView({
-        description:
-          m.assignment_result_review_scope_summary_attempts_description(),
-        id,
-        label: assignmentResultReviewScopeCopy.attemptsLabel,
-        value: formatAssignmentResultCopyScopeSummaryCount(summary.attemptRows),
-      });
-    case 'filtered-answer-reviews':
-      return buildAssignmentResultReviewControlsHandoffItemView({
-        description:
-          m.assignment_result_review_scope_summary_answer_reviews_description(),
-        id,
-        label: assignmentResultReviewScopeCopy.answerReviewsLabel,
-        value: formatAssignmentResultCopyScopeSummaryCount(
-          summary.attemptReviews
-        ),
-      });
-    case 'sorted-performance-items':
-      return buildAssignmentResultReviewControlsHandoffItemView({
-        description:
-          m.assignment_result_review_scope_summary_items_description(),
-        id,
-        label: assignmentResultReviewScopeCopy.itemsLabel,
-        value: formatAssignmentResultCopyScopeSummaryCount(
-          summary.itemPerformance
-        ),
-      });
-    case 'review-scope-summary':
-      return buildAssignmentResultReviewControlsHandoffItemView({
-        description: assignmentResultReviewScopeCopy.description,
-        id,
-        label: assignmentResultReviewScopeCopy.matchedRecordsLabel,
-        value: m.assignment_result_review_controls_handoff_scope_summary_value({
-          attempts: formatAssignmentResultCopyScopeSummaryCount(
-            summary.attemptRows
-          ),
-          items: formatAssignmentResultCopyScopeSummaryCount(
-            summary.itemPerformance
-          ),
-          reviews: formatAssignmentResultCopyScopeSummaryCount(
-            summary.attemptReviews
-          ),
-          students: formatAssignmentResultCopyScopeSummaryCount(
-            summary.students
-          ),
-        }),
-      });
-    case 'copy-scope-students':
-      return buildAssignmentResultReviewControlsCopyScopeItem({
-        copyScopeItemId: 'students',
-        copyScopeView,
-        id,
-      });
-    case 'copy-scope-items':
-      return buildAssignmentResultReviewControlsCopyScopeItem({
-        copyScopeItemId: 'items',
-        copyScopeView,
-        id,
-      });
-    case 'copy-scope-review':
-      return buildAssignmentResultReviewControlsCopyScopeItem({
-        copyScopeItemId: 'review',
-        copyScopeView,
-        id,
-      });
-    case 'table-consumer':
-      return buildAssignmentResultReviewControlsHandoffItemView({
-        description:
-          m.assignment_result_review_controls_handoff_table_consumer_description(),
-        id,
-        label:
-          m.assignment_result_review_controls_handoff_table_consumer_label(),
-        value:
-          m.assignment_result_review_controls_handoff_table_consumer_value(),
-      });
-    case 'review-card-consumer':
-      return buildAssignmentResultReviewControlsHandoffItemView({
-        description:
-          m.assignment_result_review_controls_handoff_review_card_consumer_description(),
-        id,
-        label:
-          m.assignment_result_review_controls_handoff_review_card_consumer_label(),
-        value:
-          m.assignment_result_review_controls_handoff_review_card_consumer_value(),
-      });
-    case 'copy-artifact-consumer':
-      return buildAssignmentResultReviewControlsHandoffItemView({
-        description:
-          m.assignment_result_review_controls_handoff_copy_artifact_consumer_description(),
-        id,
-        label:
-          m.assignment_result_review_controls_handoff_copy_artifact_consumer_label(),
-        value:
-          m.assignment_result_review_controls_handoff_copy_artifact_consumer_value(),
-      });
-    case 'anonymous-label-search':
-      return buildAssignmentResultReviewControlsHandoffItemView({
-        description:
-          m.assignment_result_review_controls_handoff_anonymous_label_description(),
-        id,
-        label:
-          m.assignment_result_review_controls_handoff_anonymous_label_label(),
-        value:
-          m.assignment_result_review_controls_handoff_anonymous_label_value(),
-      });
-    case 'privacy-guard':
-      return buildAssignmentResultReviewControlsHandoffItemView({
-        description:
-          m.assignment_result_review_controls_handoff_privacy_description(),
-        id,
-        label: m.assignment_result_review_handoff_privacy_label(),
-        value: m.assignment_result_review_handoff_hidden_value(),
-      });
-  }
-}
-
-function buildAssignmentResultReviewControlsCopyScopeItem({
-  copyScopeItemId,
-  copyScopeView,
-  id,
-}: {
-  copyScopeItemId: AssignmentResultCopyScopeItemId;
-  copyScopeView: AssignmentResultCopyScopeView;
-  id: AssignmentResultReviewControlsHandoffItemId;
-}) {
-  const itemView = copyScopeView.itemViews.find(
-    (item) => item.id === copyScopeItemId
-  );
-
-  return buildAssignmentResultReviewControlsHandoffItemView({
-    description:
-      itemView?.description ??
-      m.assignment_result_review_handoff_missing_description(),
-    id,
-    label:
-      itemView?.label ?? m.assignment_result_review_handoff_missing_label(),
-    value:
-      itemView?.value ?? m.assignment_result_review_handoff_missing_value(),
-  });
-}
-
-function buildAssignmentResultReviewControlsHandoffItemView({
-  description,
-  id,
-  label,
-  statusLabel,
-  value,
-}: Omit<AssignmentResultReviewControlsHandoffItemView, 'ariaLabel'>) {
-  return {
-    ariaLabel: statusLabel
-      ? m.assignment_result_review_scope_item_aria_label({
-          description,
-          label,
-          status: statusLabel,
-          value,
-        })
-      : m.assignment_result_copy_scope_summary_item_aria_label({
-          description,
-          label,
-          value,
-        }),
-    description,
-    id,
-    label,
-    ...(statusLabel ? { statusLabel } : {}),
-    value,
-  };
-}
-
-function buildAssignmentResultReviewControlsHandoffPrivacyContract(
-  itemViews: AssignmentResultReviewControlsHandoffItemView[]
-): AssignmentResultReviewControlsHandoffPrivacyContract {
-  return {
-    exposesCopyArtifactText: false,
-    exposesRawAnonymousToken: false,
-    exposesRawRouteQuery: false,
-    exposesStudentAnswerText: false,
-    exposesStudentDisplayLabels: false,
-    exposesTeacherAnswerKey: false,
-    itemIds: itemViews.map((itemView) => itemView.id),
-    mutatesResultData: false,
-    scope: 'teacher-result-review-controls',
-    usesAssignmentDomainHelpers: true,
-  };
-}
-
-function formatAssignmentResultReviewControlDefaultValue(isDefault: boolean) {
-  return isDefault
-    ? m.assignment_result_review_controls_handoff_default_kept_value()
-    : m.assignment_result_review_controls_handoff_default_omitted_value();
-}
-
-export function buildAssignmentResultReviewHandoffView({
-  actionButtons,
-  controlViews,
-  copyArtifactPreviews,
-  copyScopeView,
-  reviewScopeView,
-  reviewStatusView,
-}: {
-  actionButtons: AssignmentResultActionButton[];
-  controlViews: AssignmentResultControlViews;
-  copyArtifactPreviews: Array<
-    AssignmentResultCopyArtifactPreview & {
-      actionButton: AssignmentResultActionButton;
-    }
-  >;
-  copyScopeView: AssignmentResultCopyScopeView;
-  reviewScopeView: AssignmentResultReviewScopeView;
-  reviewStatusView: AssignmentResultReviewStatusView;
-}): AssignmentResultReviewHandoffView {
-  const itemViews = ASSIGNMENT_RESULT_REVIEW_HANDOFF_ITEM_IDS.map((id) =>
-    buildAssignmentResultReviewHandoffItem({
-      actionButtons,
-      controlViews,
-      copyArtifactPreviews,
-      copyScopeView,
-      id,
-      reviewScopeView,
-      reviewStatusView,
-    })
-  );
-
-  return {
-    description: m.assignment_result_review_handoff_description(),
-    itemViews,
-    privacy: buildAssignmentResultReviewHandoffPrivacyContract(itemViews),
-    title: m.assignment_result_review_handoff_title(),
-  };
-}
-
-type AssignmentResultReviewHandoffBuildContext = {
-  actionButtons: AssignmentResultActionButton[];
-  controlViews: AssignmentResultControlViews;
-  copyArtifactPreviews: Array<
-    AssignmentResultCopyArtifactPreview & {
-      actionButton: AssignmentResultActionButton;
-    }
-  >;
-  copyScopeView: AssignmentResultCopyScopeView;
-  id: AssignmentResultReviewHandoffItemId;
-  reviewScopeView: AssignmentResultReviewScopeView;
-  reviewStatusView: AssignmentResultReviewStatusView;
-};
-
-function buildAssignmentResultReviewHandoffItem(
-  context: AssignmentResultReviewHandoffBuildContext
-): AssignmentResultReviewHandoffItemView {
-  switch (context.id) {
-    case 'review-status':
-      return buildAssignmentResultReviewHandoffItemView({
-        description: context.reviewStatusView.description,
-        id: context.id,
-        label: context.reviewStatusView.title,
-        statusLabel: context.reviewStatusView.step.label,
-        value: context.reviewStatusView.statusLabel,
-      });
-    case 'review-next-step':
-      return buildAssignmentResultReviewHandoffItemView({
-        description: context.reviewStatusView.step.description,
-        id: context.id,
-        label: m.assignment_result_review_handoff_next_step_label(),
-        statusLabel: context.reviewStatusView.statusLabel,
-        value: context.reviewStatusView.step.label,
-      });
-    case 'student-search':
-      return buildAssignmentResultReviewHandoffScopeItem({
-        id: context.id,
-        reviewScopeView: context.reviewScopeView,
-        scopeItemId: 'student-search',
-      });
-    case 'student-search-status':
-      return buildAssignmentResultReviewHandoffControlStatusItem({
-        id: context.id,
-        label: m.assignment_result_review_handoff_student_search_status_label(),
-        statusView: context.controlViews.studentSearch.searchStatusView,
-      });
-    case 'student-sort':
-      return buildAssignmentResultReviewHandoffScopeItem({
-        id: context.id,
-        reviewScopeView: context.reviewScopeView,
-        scopeItemId: 'student-sort',
-      });
-    case 'student-sort-status':
-      return buildAssignmentResultReviewHandoffControlStatusItem({
-        id: context.id,
-        label: m.assignment_result_review_handoff_student_sort_status_label(),
-        statusView: context.controlViews.studentSearch.sortStatusView,
-      });
-    case 'item-sort':
-      return buildAssignmentResultReviewHandoffScopeItem({
-        id: context.id,
-        reviewScopeView: context.reviewScopeView,
-        scopeItemId: 'item-sort',
-      });
-    case 'item-sort-status':
-      return buildAssignmentResultReviewHandoffControlStatusItem({
-        id: context.id,
-        label: m.assignment_result_review_handoff_item_sort_status_label(),
-        statusView: context.controlViews.itemPerformanceSort.statusView,
-      });
-    case 'answer-review':
-      return buildAssignmentResultReviewHandoffScopeItem({
-        id: context.id,
-        reviewScopeView: context.reviewScopeView,
-        scopeItemId: 'answer-review',
-      });
-    case 'answer-review-status':
-      return buildAssignmentResultReviewHandoffControlStatusItem({
-        id: context.id,
-        label: m.assignment_result_review_handoff_answer_review_status_label(),
-        statusView: context.controlViews.attemptReviewFilter.statusView,
-      });
-    case 'matched-students':
-      return buildAssignmentResultReviewHandoffMatchedItem({
-        id: context.id,
-        reviewScopeView: context.reviewScopeView,
-        summaryItemId: 'students',
-      });
-    case 'matched-attempts':
-      return buildAssignmentResultReviewHandoffMatchedItem({
-        id: context.id,
-        reviewScopeView: context.reviewScopeView,
-        summaryItemId: 'attempts',
-      });
-    case 'matched-items':
-      return buildAssignmentResultReviewHandoffMatchedItem({
-        id: context.id,
-        reviewScopeView: context.reviewScopeView,
-        summaryItemId: 'items',
-      });
-    case 'matched-answer-reviews':
-      return buildAssignmentResultReviewHandoffMatchedItem({
-        id: context.id,
-        reviewScopeView: context.reviewScopeView,
-        summaryItemId: 'answer-reviews',
-      });
-    case 'copy-scope-students':
-      return buildAssignmentResultReviewHandoffCopyScopeItem({
-        copyScopeItemId: 'students',
-        copyScopeView: context.copyScopeView,
-        id: context.id,
-      });
-    case 'copy-scope-items':
-      return buildAssignmentResultReviewHandoffCopyScopeItem({
-        copyScopeItemId: 'items',
-        copyScopeView: context.copyScopeView,
-        id: context.id,
-      });
-    case 'copy-scope-review':
-      return buildAssignmentResultReviewHandoffCopyScopeItem({
-        copyScopeItemId: 'review',
-        copyScopeView: context.copyScopeView,
-        id: context.id,
-      });
-    case 'action-copy-brief':
-      return buildAssignmentResultReviewHandoffActionItem({
-        action: 'copy-brief',
-        actionButtons: context.actionButtons,
-        id: context.id,
-      });
-    case 'action-copy-reteach-plan':
-      return buildAssignmentResultReviewHandoffActionItem({
-        action: 'copy-reteach-plan',
-        actionButtons: context.actionButtons,
-        id: context.id,
-      });
-    case 'action-copy-item-review':
-      return buildAssignmentResultReviewHandoffActionItem({
-        action: 'copy-item-review',
-        actionButtons: context.actionButtons,
-        id: context.id,
-      });
-    case 'action-copy-follow-up':
-      return buildAssignmentResultReviewHandoffActionItem({
-        action: 'copy-follow-up',
-        actionButtons: context.actionButtons,
-        id: context.id,
-      });
-    case 'action-export-csv':
-      return buildAssignmentResultReviewHandoffActionItem({
-        action: 'export-csv',
-        actionButtons: context.actionButtons,
-        id: context.id,
-      });
-    case 'preview-copy-brief':
-      return buildAssignmentResultReviewHandoffPreviewItem({
-        action: 'copy-brief',
-        copyArtifactPreviews: context.copyArtifactPreviews,
-        id: context.id,
-      });
-    case 'preview-copy-reteach-plan':
-      return buildAssignmentResultReviewHandoffPreviewItem({
-        action: 'copy-reteach-plan',
-        copyArtifactPreviews: context.copyArtifactPreviews,
-        id: context.id,
-      });
-    case 'preview-copy-item-review':
-      return buildAssignmentResultReviewHandoffPreviewItem({
-        action: 'copy-item-review',
-        copyArtifactPreviews: context.copyArtifactPreviews,
-        id: context.id,
-      });
-    case 'preview-copy-follow-up':
-      return buildAssignmentResultReviewHandoffPreviewItem({
-        action: 'copy-follow-up',
-        copyArtifactPreviews: context.copyArtifactPreviews,
-        id: context.id,
-      });
-    case 'route-state':
-      return buildAssignmentResultReviewHandoffRouteStateItem({
-        controlViews: context.controlViews,
-        id: context.id,
-      });
-    case 'current-review-boundary':
-      return buildAssignmentResultReviewHandoffDataScopeItem({
-        dataScope: 'current-review',
-        id: context.id,
-      });
-    case 'full-export-boundary':
-      return buildAssignmentResultReviewHandoffDataScopeItem({
-        dataScope: 'full-assignment-results',
-        id: context.id,
-      });
-    case 'privacy-guard':
-      return buildAssignmentResultReviewHandoffItemView({
-        description: m.assignment_result_review_handoff_privacy_description(),
-        id: context.id,
-        label: m.assignment_result_review_handoff_privacy_label(),
-        value: m.assignment_result_review_handoff_hidden_value(),
-      });
-  }
-}
-
-function buildAssignmentResultReviewHandoffScopeItem({
-  id,
-  reviewScopeView,
-  scopeItemId,
-}: {
-  id: AssignmentResultReviewHandoffItemId;
-  reviewScopeView: AssignmentResultReviewScopeView;
-  scopeItemId: AssignmentResultReviewScopeItemId;
-}) {
-  const itemView = reviewScopeView.itemViews.find(
-    (item) => item.id === scopeItemId
-  );
-
-  return buildAssignmentResultReviewHandoffItemView({
-    description:
-      itemView?.description ??
-      m.assignment_result_review_handoff_missing_description(),
-    id,
-    label:
-      itemView?.label ?? m.assignment_result_review_handoff_missing_label(),
-    statusLabel: itemView?.statusView.value,
-    value:
-      itemView?.value ?? m.assignment_result_review_handoff_missing_value(),
-  });
-}
-
-function buildAssignmentResultReviewHandoffControlStatusItem({
-  id,
-  label,
-  statusView,
-}: {
-  id: AssignmentResultReviewHandoffItemId;
-  label: string;
-  statusView: AssignmentResultControlStatusView;
-}) {
-  return buildAssignmentResultReviewHandoffItemView({
-    description: statusView.description,
-    id,
-    label,
-    statusLabel: statusView.value,
-    value: statusView.value,
-  });
-}
-
-function buildAssignmentResultReviewHandoffMatchedItem({
-  id,
-  reviewScopeView,
-  summaryItemId,
-}: {
-  id: AssignmentResultReviewHandoffItemId;
-  reviewScopeView: AssignmentResultReviewScopeView;
-  summaryItemId: AssignmentResultReviewScopeSummaryItemId;
-}) {
-  const itemView = reviewScopeView.summaryItems.find(
-    (item) => item.id === summaryItemId
-  );
-
-  return buildAssignmentResultReviewHandoffItemView({
-    description:
-      itemView?.description ??
-      m.assignment_result_review_handoff_missing_description(),
-    id,
-    label:
-      itemView?.label ?? m.assignment_result_review_handoff_missing_label(),
-    value:
-      itemView?.value ?? m.assignment_result_review_handoff_missing_value(),
-  });
-}
-
-function buildAssignmentResultReviewHandoffCopyScopeItem({
-  copyScopeItemId,
-  copyScopeView,
-  id,
-}: {
-  copyScopeItemId: AssignmentResultCopyScopeItemId;
-  copyScopeView: AssignmentResultCopyScopeView;
-  id: AssignmentResultReviewHandoffItemId;
-}) {
-  const itemView = copyScopeView.itemViews.find(
-    (item) => item.id === copyScopeItemId
-  );
-
-  return buildAssignmentResultReviewHandoffItemView({
-    description:
-      itemView?.description ??
-      m.assignment_result_review_handoff_missing_description(),
-    id,
-    label:
-      itemView?.label ?? m.assignment_result_review_handoff_missing_label(),
-    value:
-      itemView?.value ?? m.assignment_result_review_handoff_missing_value(),
-  });
-}
-
-function buildAssignmentResultReviewHandoffActionItem({
-  action,
-  actionButtons,
-  id,
-}: {
-  action: AssignmentResultAction;
-  actionButtons: AssignmentResultActionButton[];
-  id: AssignmentResultReviewHandoffItemId;
-}) {
-  const actionButton = actionButtons.find((button) => button.action === action);
-  const actionCopy = getAssignmentResultActionCopy(action);
-  const scopeView =
-    actionButton?.scopeView ??
-    buildAssignmentResultActionScopeView(
-      getAssignmentResultActionDataScope(action)
-    );
-  const statusView =
-    actionButton?.statusView ??
-    buildAssignmentResultActionStatusView({ type: 'ready' });
-
-  return buildAssignmentResultReviewHandoffItemView({
-    dataScope: scopeView.dataScope,
-    description: actionButton?.description ?? actionCopy.description,
-    id,
-    label: actionButton?.label ?? actionCopy.label,
-    statusLabel: statusView.value,
-    value: `${scopeView.value} | ${statusView.value}`,
-  });
-}
-
-function buildAssignmentResultReviewHandoffPreviewItem({
-  action,
-  copyArtifactPreviews,
-  id,
-}: {
-  action: AssignmentResultCopyAction;
-  copyArtifactPreviews: Array<
-    AssignmentResultCopyArtifactPreview & {
-      actionButton: AssignmentResultActionButton;
-    }
-  >;
-  id: AssignmentResultReviewHandoffItemId;
-}) {
-  const preview = copyArtifactPreviews.find(
-    (copyPreview) => copyPreview.action === action
-  );
-  const actionCopy = getAssignmentResultActionCopy(action);
-
-  return buildAssignmentResultReviewHandoffItemView({
-    dataScope: 'current-review',
-    description: preview?.description ?? actionCopy.description,
-    id,
-    label: preview?.label ?? actionCopy.label,
-    statusLabel:
-      preview?.actionButton.statusView.value ??
-      m.assignment_result_review_handoff_not_ready_value(),
-    value:
-      preview?.summaryLabel ??
-      m.assignment_result_review_handoff_not_ready_value(),
-  });
-}
-
-function buildAssignmentResultReviewHandoffRouteStateItem({
-  controlViews,
-  id,
-}: {
-  controlViews: AssignmentResultControlViews;
-  id: AssignmentResultReviewHandoffItemId;
-}) {
-  const isAdjusted = [
-    controlViews.attemptReviewFilter.statusView,
-    controlViews.itemPerformanceSort.statusView,
-    controlViews.studentSearch.searchStatusView,
-    controlViews.studentSearch.sortStatusView,
-  ].some((statusView) => statusView.tone === 'custom');
-  const value = isAdjusted
-    ? m.assignment_result_review_handoff_route_adjusted_value()
-    : m.assignment_result_review_handoff_route_default_value();
-
-  return buildAssignmentResultReviewHandoffItemView({
-    description: m.assignment_result_review_handoff_route_description(),
-    id,
-    label: m.assignment_result_review_handoff_route_label(),
-    statusLabel: value,
-    value,
-  });
-}
-
-function buildAssignmentResultReviewHandoffDataScopeItem({
-  dataScope,
-  id,
-}: {
-  dataScope: AssignmentResultActionDataScope;
-  id: AssignmentResultReviewHandoffItemId;
-}) {
-  const scopeView = buildAssignmentResultActionScopeView(dataScope);
-  const description =
-    dataScope === 'current-review'
-      ? m.assignment_result_review_handoff_current_review_description()
-      : m.assignment_result_review_handoff_full_export_description();
-
-  return buildAssignmentResultReviewHandoffItemView({
-    dataScope,
-    description,
-    id,
-    label: scopeView.label,
-    value: scopeView.value,
-  });
-}
-
-function buildAssignmentResultReviewHandoffItemView({
-  dataScope,
-  description,
-  id,
-  label,
-  statusLabel,
-  value,
-}: Omit<AssignmentResultReviewHandoffItemView, 'ariaLabel'>) {
-  return {
-    ariaLabel: statusLabel
-      ? m.assignment_result_review_scope_item_aria_label({
-          description,
-          label,
-          status: statusLabel,
-          value,
-        })
-      : m.assignment_result_copy_scope_summary_item_aria_label({
-          description,
-          label,
-          value,
-        }),
-    ...(dataScope ? { dataScope } : {}),
-    description,
-    id,
-    label,
-    ...(statusLabel ? { statusLabel } : {}),
-    value,
-  };
-}
-
-function buildAssignmentResultReviewHandoffPrivacyContract(
-  itemViews: AssignmentResultReviewHandoffItemView[]
-): AssignmentResultReviewHandoffPrivacyContract {
-  return {
-    exposesCopyArtifactText: false,
-    exposesCsvDataUrl: false,
-    exposesRawAnonymousToken: false,
-    exposesStudentAnswerText: false,
-    exposesTeacherAnswerKey: false,
-    itemIds: itemViews.map((itemView) => itemView.id),
-    scope: 'teacher-result-review',
-  };
-}
-
 function resolveAssignmentResultReviewStatus({
   controlViews,
   summary,
@@ -4320,4 +3047,11 @@ function formatResultAttemptCount(count: number) {
   }
 
   return m.assignment_result_search_summary_attempts_many({ count });
+}
+
+function buildAssignmentResultEmptyStateView({
+  description,
+  title,
+}: AssignmentResultEmptyState): AssignmentResultEmptyState {
+  return { description, title };
 }

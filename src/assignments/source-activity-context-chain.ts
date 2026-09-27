@@ -1,5 +1,3 @@
-import { ASSIGNMENT_RESULT_MATERIAL_HANDOFF_ITEM_IDS } from '@/assignments/result-actions';
-
 export const ASSIGNMENT_SOURCE_ACTIVITY_CONTEXT_CHAIN_HANDOFF_ITEM_IDS = [
   'product-source-policy',
   'snapshot-schema-fields',
@@ -52,7 +50,7 @@ export const ASSIGNMENT_SOURCE_ACTIVITY_CONTEXT_CHAIN_SOURCE_FILES = [
   'src/assignments/printable-worksheet-view.ts',
   'src/components/assignments/printable-worksheet-header.tsx',
   'src/components/assignments/printable-worksheet-assignment-fields.tsx',
-  'src/components/assignments/printable-worksheet-handoff.tsx',
+  'src/routes/print/assignments/$assignmentId.tsx',
   'src/assignments/assignment-distribution-lifecycle-chain.ts',
   'src/assignments/published-assignment-delivery-chain.ts',
   'src/assignments/worksheet-mode-delivery-chain.ts',
@@ -364,9 +362,9 @@ function getAssignmentSourceActivityContextChainHandoffItem(
     case 'result-material-handoff-boundary':
       return item(
         id,
-        'Result material handoff boundary',
-        `${ASSIGNMENT_RESULT_MATERIAL_HANDOFF_ITEM_IDS.length} result material slices`,
-        'Frozen source context must continue through shared teacher copy, CSV preparation, printable worksheet, current/full data scope, snapshot source, and privacy contracts.'
+        'Result materials',
+        'Copy, CSV, and print',
+        'Frozen source context continues through teacher copy text, the CSV export, and the printable worksheet, all built from the assignment snapshot.'
       );
   }
 }

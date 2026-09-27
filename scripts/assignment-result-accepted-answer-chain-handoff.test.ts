@@ -3,11 +3,7 @@ import { existsSync, readFileSync } from 'node:fs';
 import test from 'node:test';
 import { ANSWER_FEEDBACK_LIFECYCLE_CHAIN_HANDOFF_ITEM_IDS } from '@/assignments/answer-feedback-lifecycle-chain';
 import { ASSIGNMENT_ANSWER_FEEDBACK_HANDOFF_ITEM_IDS } from '@/assignments/answer-feedback-handoff';
-import { ASSIGNMENT_ATTEMPT_REVIEW_CARD_HANDOFF_ITEM_IDS } from '@/assignments/attempt-review-card-handoff';
-import {
-  ASSIGNMENT_RESULTS_EXPORT_PREPARATION_ITEM_IDS,
-  buildAssignmentResultsCsv,
-} from '@/assignments/results-export';
+import { buildAssignmentResultsCsv } from '@/assignments/results-export';
 import {
   ASSIGNMENT_RESULT_ACCEPTED_ANSWER_CHAIN_HANDOFF_ITEM_IDS,
   ASSIGNMENT_RESULT_ACCEPTED_ANSWER_CHAIN_SOURCE_FILES,
@@ -24,7 +20,6 @@ import {
   buildAssignmentResultAcceptedAnswerView,
   buildAssignmentResultAttemptAnswerTextView,
 } from '@/assignments/result-answer-view';
-import { ASSIGNMENT_RESULT_REVIEW_HANDOFF_ITEM_IDS } from '@/assignments/result-view';
 import { SCORED_ATTEMPT_RESULT_CHAIN_HANDOFF_ITEM_IDS } from '@/assignments/scored-attempt-result-chain';
 import { TEACHER_RESULTS_REVIEW_CHAIN_HANDOFF_ITEM_IDS } from '@/assignments/teacher-results-review-chain';
 import { overwriteGetLocale } from '@/locale/paraglide/runtime';
@@ -172,13 +167,10 @@ test('assignment result accepted-answer chain is backed by adjacent gates', () =
     [
       ASSIGNMENT_ANSWER_FEEDBACK_HANDOFF_ITEM_IDS.length,
       ANSWER_FEEDBACK_LIFECYCLE_CHAIN_HANDOFF_ITEM_IDS.length,
-      ASSIGNMENT_ATTEMPT_REVIEW_CARD_HANDOFF_ITEM_IDS.length,
-      ASSIGNMENT_RESULTS_EXPORT_PREPARATION_ITEM_IDS.length,
-      ASSIGNMENT_RESULT_REVIEW_HANDOFF_ITEM_IDS.length,
       SCORED_ATTEMPT_RESULT_CHAIN_HANDOFF_ITEM_IDS.length,
       TEACHER_RESULTS_REVIEW_CHAIN_HANDOFF_ITEM_IDS.length,
     ],
-    Array.from({ length: 7 }, () => 30)
+    Array.from({ length: 4 }, () => 30)
   );
 });
 

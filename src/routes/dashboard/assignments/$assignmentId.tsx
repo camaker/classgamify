@@ -12,8 +12,7 @@ import {
 import { AssignmentResultsAttemptReviewCard } from '@/components/assignments/assignment-results-attempt-review-card';
 import { AssignmentResultsAttemptReviewFilterControl } from '@/components/assignments/assignment-results-attempt-review-filter-control';
 import { AssignmentResultsAttemptsTable } from '@/components/assignments/assignment-results-attempts-table';
-import { AssignmentResultsAttemptStatsHandoff } from '@/components/assignments/assignment-results-attempt-stats-handoff';
-import { AssignmentResultsFollowUpPanel } from '@/components/assignments/assignment-results-classroom-brief-card';
+import { AssignmentResultsFollowUpPanel } from '@/components/assignments/assignment-results-follow-up-panel';
 import { AssignmentResultsEmptyState } from '@/components/assignments/assignment-results-empty-state';
 import { AssignmentResultsHeaderActions } from '@/components/assignments/assignment-results-header-actions';
 import { AssignmentResultsHeaderCard } from '@/components/assignments/assignment-results-header-card';
@@ -21,7 +20,6 @@ import { AssignmentResultsItemAnalysisCard } from '@/components/assignments/assi
 import { AssignmentResultsItemPerformanceSortControl } from '@/components/assignments/assignment-results-item-performance-sort-control';
 import { AssignmentResultsItemPerformanceTable } from '@/components/assignments/assignment-results-item-performance-table';
 import { AssignmentResultsMetricCard } from '@/components/assignments/assignment-results-metric-card';
-import { AssignmentResultsReviewHandoffPanel } from '@/components/assignments/assignment-results-review-handoff-panel';
 import { AssignmentResultsStudentSearch } from '@/components/assignments/assignment-results-student-search';
 import { AssignmentResultsStudentSummaryTable } from '@/components/assignments/assignment-results-student-summary-table';
 import { DashboardLayout } from '@/components/layout/dashboard-layout';
@@ -139,8 +137,6 @@ function LoadedAssignmentResultsPage({
     <div className="grid gap-10">
       <section className="grid gap-6">
         <AssignmentResultsHeaderActions
-          exportPreparationView={headerView.exportPreparationView}
-          materialHandoffView={pageView.materialHandoffView}
           onResultAction={(actionButton) => void onResultAction(actionButton)}
           printAction={headerView.printAction}
           resultActionsLabel={headerView.resultActionsLabel}
@@ -155,9 +151,6 @@ function LoadedAssignmentResultsPage({
             ))}
           </div>
         ) : null}
-        <AssignmentResultsAttemptStatsHandoff
-          view={pageView.attemptStatsHandoffView}
-        />
         <AssignmentResultsHeaderCard headerView={headerView} />
       </section>
 
@@ -194,14 +187,6 @@ function LoadedAssignmentResultsPage({
               />
             ) : null}
           </div>
-
-          <AssignmentResultsReviewHandoffPanel
-            controlsView={pageView.reviewControlsHandoffView}
-            teacherResultsReviewChainView={
-              pageView.teacherResultsReviewChainHandoffView
-            }
-            view={pageView.reviewHandoffView}
-          />
 
           {sectionViews.itemPerformance.isVisible ? (
             <ResultSection
@@ -240,7 +225,6 @@ function LoadedAssignmentResultsPage({
                 onSortChange={(value) =>
                   onControlChange({ control: 'student-sort', value })
                 }
-                searchHandoffView={pageView.studentSearchHandoffView}
                 view={pageView.controlViews.studentSearch}
               />
               {pageView.contentState.hasStudentSummaryRows ? (

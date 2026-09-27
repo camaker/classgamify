@@ -25,7 +25,6 @@ import { ASSIGNMENT_ATTEMPT_PERSISTENCE_HANDOFF_ITEM_IDS } from '@/assignments/a
 import { ASSIGNMENT_ATTEMPT_DURATION_HANDOFF_ITEM_IDS } from '@/assignments/attempt-duration-handoff';
 import { ASSIGNMENT_ANSWER_FEEDBACK_HANDOFF_ITEM_IDS } from '@/assignments/answer-feedback-handoff';
 import { ASSIGNMENT_ATTEMPT_STATS_HANDOFF_ITEM_IDS } from '@/assignments/attempt-stats-handoff';
-import { ASSIGNMENT_RESULTS_EXPORT_PREPARATION_ITEM_IDS } from '@/assignments/results-export';
 
 const ASSIGNMENTS_API_SOURCE = readFileSync('src/api/assignments.ts', 'utf8');
 const PUBLISH_INPUT_SOURCE = readFileSync(
@@ -176,10 +175,9 @@ test('published assignment delivery chain stays backed by focused contracts', ()
       ASSIGNMENT_ATTEMPT_DURATION_HANDOFF_ITEM_IDS.length,
       ASSIGNMENT_ANSWER_FEEDBACK_HANDOFF_ITEM_IDS.length,
       ASSIGNMENT_ATTEMPT_STATS_HANDOFF_ITEM_IDS.length,
-      ASSIGNMENT_RESULTS_EXPORT_PREPARATION_ITEM_IDS.length,
       ASSIGNMENT_PUBLISH_CONTROL_BOUNDARY_ITEM_IDS.length,
     ],
-    Array.from({ length: 16 }, () => 30)
+    Array.from({ length: 15 }, () => 30)
   );
 });
 
@@ -236,11 +234,12 @@ test('published assignment delivery privacy contracts stay explicit across surfa
   );
   assert.match(
     RESULTS_EXPORT_SOURCE,
-    /ASSIGNMENT_RESULTS_EXPORT_PREPARATION_ITEM_IDS[\s\S]*'delivery-identity'[\s\S]*'delivery-answer-reveal'[\s\S]*'delivery-item-order'[\s\S]*'delivery-attempt-limit'[\s\S]*'delivery-timer'[\s\S]*'delivery-close-time'/
+    /deliveryView\.closeTime,[\s\S]*deliveryView\.policyText,[\s\S]*deliveryView\.identityMode,[\s\S]*deliveryView\.answerReveal,[\s\S]*deliveryView\.itemOrder,[\s\S]*deliveryView\.maxAttempts,[\s\S]*deliveryView\.timeLimitSeconds/
   );
-  assert.match(
+  assert.doesNotMatch(
     RESULTS_EXPORT_SOURCE,
-    /exposesCsvDataUrl: false[\s\S]*exposesRawAnonymousToken: false[\s\S]*exposesStudentAnswerText: false[\s\S]*exposesTeacherAnswerText: false[\s\S]*scope: 'full-assignment-results'/
+    /anonymousToken|storageKey/,
+    'Results CSV export should never read raw anonymous tokens or storage keys.'
   );
 });
 

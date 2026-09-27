@@ -89,12 +89,11 @@ test('attempt stats continuity reaches every aggregate product consumer', () => 
 
 test('attempt stats continuity keeps hidden semantic and privacy boundaries', () => {
   const view = buildAssignmentAttemptStatsContinuityChainHandoffView();
-  const component = read(
-    'src/components/assignments/assignment-results-attempt-stats-handoff.tsx'
+  assert.doesNotMatch(
+    read('src/routes/dashboard/assignments/$assignmentId.tsx'),
+    /attemptStatsHandoffView|data-handoff/,
+    'The results page should render attempt stats as visible metric cards only.'
   );
-  assert.match(component, /className="sr-only"/);
-  assert.match(component, /data-handoff="assignment-attempt-stats"/);
-  assert.match(component, /<dl>/);
   assert.equal(view.privacy.mutatesAttempts, false);
   assert.equal(view.privacy.usesCompletedScoredAttempts, true);
   assert.equal(view.privacy.usesSharedAssignmentDomainStats, true);

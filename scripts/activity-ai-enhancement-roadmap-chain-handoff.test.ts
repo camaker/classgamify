@@ -24,7 +24,6 @@ import {
   TEMPLATE_ROADMAP_CAPABILITY_CHAIN_SOURCE_FILES,
 } from '@/activities/template-roadmap-capability-chain';
 import { QUESTION_CHOICE_GENERATION_HANDOFF_ITEM_IDS } from '@/activities/distractors';
-import { ASSIGNMENT_RESULTS_EXPORT_PREPARATION_ITEM_IDS } from '@/assignments/results-export';
 import { WORKSHEET_MODE_DELIVERY_CHAIN_HANDOFF_ITEM_IDS } from '@/assignments/worksheet-mode-delivery-chain';
 
 const PRODUCT_SOURCE = readFileSync('docs/product.md', 'utf8');
@@ -197,9 +196,8 @@ test('activity AI enhancement roadmap chain is backed by focused product gates',
       SOURCE_MATERIAL_PRIVACY_CHAIN_HANDOFF_ITEM_IDS.length,
       TEMPLATE_ROADMAP_CAPABILITY_CHAIN_HANDOFF_ITEM_IDS.length,
       WORKSHEET_MODE_DELIVERY_CHAIN_HANDOFF_ITEM_IDS.length,
-      ASSIGNMENT_RESULTS_EXPORT_PREPARATION_ITEM_IDS.length,
     ],
-    Array.from({ length: 12 }, () => 30)
+    Array.from({ length: 11 }, () => 30)
   );
 });
 
@@ -279,8 +277,8 @@ test('activity AI enhancement roadmap sources preserve output targets and privac
   );
   assert.match(
     RESULTS_EXPORT_SOURCE,
-    /ASSIGNMENT_RESULTS_EXPORT_PREPARATION_ITEM_IDS[\s\S]*'delivery-identity'[\s\S]*'delivery-answer-reveal'[\s\S]*'delivery-item-order'[\s\S]*'raw-settings'[\s\S]*buildAssignmentResultsExportPreparationPrivacyContract[\s\S]*exposesPromptText: false[\s\S]*exposesStudentAnswerText: false[\s\S]*exposesTeacherAnswerText: false/,
-    'Result exports should keep delivery policy, raw-settings coverage, and privacy guards.'
+    /deliveryView\.closeTime,[\s\S]*deliveryView\.policyText,[\s\S]*deliveryView\.identityMode,[\s\S]*deliveryView\.answerReveal,[\s\S]*deliveryView\.itemOrder,[\s\S]*deliveryView\.maxAttempts,[\s\S]*deliveryView\.timeLimitSeconds/,
+    'Result CSV exports should keep delivery policy columns.'
   );
 });
 

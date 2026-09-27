@@ -219,7 +219,7 @@ export type StudentRunnerSubmissionContractItemView = {
   value: string;
 };
 
-export type StudentRunnerSubmissionPrivacyContract = {
+type StudentRunnerSubmissionPrivacyContract = {
   exposesAnonymousToken: false;
   exposesAnswerText: false;
   exposesStudentName: false;
@@ -494,7 +494,7 @@ type StudentRunnerSubmissionPayloadSummaryMetricKey =
   | 'share-link'
   | 'unanswered';
 
-export type StudentRunnerSubmissionPayloadSummaryMetricView = {
+type StudentRunnerSubmissionPayloadSummaryMetricView = {
   ariaLabel: string;
   description: string;
   key: StudentRunnerSubmissionPayloadSummaryMetricKey;
