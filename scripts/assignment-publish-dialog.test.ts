@@ -3,10 +3,8 @@ import { readFileSync } from 'node:fs';
 import test from 'node:test';
 import {
   ASSIGNMENT_PUBLISH_CONTROL_BOUNDARY_ITEM_IDS,
-  ASSIGNMENT_PUBLISH_HANDOFF_ITEM_IDS,
   buildAssignmentPublishDialogViewModel,
   buildAssignmentPublishDraftDefaults,
-  type AssignmentPublishHandoffItemId,
 } from '@/assignments/publish-input';
 import { overwriteGetLocale } from '@/locale/paraglide/runtime';
 
@@ -24,7 +22,7 @@ const ACTIVITY_PUBLISH_SETTINGS_FORM_SOURCE = readFileSync(
 );
 const TEST_CATALOG_SOURCE = readFileSync('tests/e2e/TEST-CATALOG.md', 'utf8');
 
-test('publish dialog exposes a safe 30-slice preview handoff', () => {
+test('publish dialog wires control ids and help text for every field', () => {
   const defaults = buildAssignmentPublishDraftDefaults({
     activityId: SECRET_ACTIVITY_ID,
     title: SECRET_TITLE,
@@ -44,73 +42,6 @@ test('publish dialog exposes a safe 30-slice preview handoff', () => {
     },
     visibility: 'draft',
   });
-  const handoffView = publishView.handoffView;
-  const itemIds = handoffView.itemViews.map((item) => item.id);
-
-  assert.deepEqual(itemIds, [...ASSIGNMENT_PUBLISH_HANDOFF_ITEM_IDS]);
-  assert.equal(new Set(itemIds).size, 30);
-  assert.equal(
-    handoffView.itemViews.every(
-      (item) =>
-        Boolean(item.ariaLabel) &&
-        Boolean(item.description) &&
-        Boolean(item.label) &&
-        Boolean(item.value)
-    ),
-    true
-  );
-  assert.deepEqual(handoffView.privacy, {
-    exposesActivityContent: false,
-    exposesAnswerKeys: false,
-    exposesAssignmentTitle: false,
-    exposesInternalActivityIds: false,
-    exposesPublicRuntimeContent: false,
-    exposesRawSettingsJson: false,
-    exposesShareSlug: false,
-    exposesSourceMaterialStorageKeys: false,
-    exposesStudentAnswerText: false,
-    exposesStudentInstructions: false,
-    exposesStudentNames: false,
-    exposesTeacherNotes: false,
-    itemIds,
-    scope: 'assignment-publish-preflight-boundary',
-  });
-  assert.deepEqual(
-    handoffView.itemViews.map((item) => [item.id, item.value]),
-    [
-      ['publish-access', 'Available'],
-      ['activity-lifecycle-gate', 'Available'],
-      ['publish-action', 'Enabled'],
-      ['publish-disabled', 'Enabled'],
-      ['validation-status', 'Ready to publish'],
-      ['validation-message', 'No validation blocker'],
-      ['title-field', 'Provided'],
-      ['draft-field-count', '8 draft fields'],
-      ['field-limit-boundary', 'Limits enforced'],
-      ['frozen-link-status', 'Ready to publish'],
-      ['delivery-rule-count', '6 rules'],
-      ['settings-summary-status', 'Timer and close time'],
-      ['student-instructions', 'Added'],
-      ['timer-status', 'Enabled'],
-      ['close-time-status', 'Scheduled'],
-      ['review-checklist-count', '3 checks'],
-      ['delivery-defaults', 'Resolved settings'],
-      ['attempts-policy', '3 max'],
-      ['attempt-limit-parser', 'Limited'],
-      ['identity-policy', 'Anonymous'],
-      ['answer-reveal-policy', 'Hidden'],
-      ['item-order-policy', 'Fixed order'],
-      ['timer-parser', '15 min'],
-      ['settings-json', '6 setting fields'],
-      ['close-time-parser', 'Scheduled'],
-      ['snapshot-freeze', 'Ready to publish'],
-      ['student-link-rules', 'Ready to publish'],
-      ['public-payload-boundary', 'Student payload safe'],
-      ['results-policy', 'Ready to publish'],
-      ['privacy-guard', 'Private data omitted'],
-    ]
-  );
-  assertNoPrivatePublishText(JSON.stringify(handoffView));
   assert.deepEqual(publishView.controlBoundary, {
     closeAfterStatus: 'ready',
     controlIdBase: 'publish-test',
@@ -253,7 +184,7 @@ test('publish dialog exposes a safe 30-slice preview handoff', () => {
   assertNoPrivatePublishText(JSON.stringify(publishView.controlBoundary));
 });
 
-test('publish handoff keeps blocked access and invalid drafts explicit', () => {
+test('publish dialog keeps blocked access and invalid drafts explicit', () => {
   const defaults = buildAssignmentPublishDraftDefaults({
     activityId: SECRET_BLOCKED_ACTIVITY_ID,
     title: SECRET_TITLE,
@@ -268,44 +199,6 @@ test('publish handoff keeps blocked access and invalid drafts explicit', () => {
     },
     visibility: 'archived',
   });
-  const handoffView = publishView.handoffView;
-
-  assert.deepEqual(
-    handoffView.itemViews.map((item) => item.id),
-    [...ASSIGNMENT_PUBLISH_HANDOFF_ITEM_IDS]
-  );
-  assert.equal(
-    getHandoffItemValue(handoffView.itemViews, 'publish-access'),
-    'Restore required'
-  );
-  assert.equal(
-    getHandoffItemValue(handoffView.itemViews, 'activity-lifecycle-gate'),
-    'Restore required'
-  );
-  assert.equal(
-    getHandoffItemValue(handoffView.itemViews, 'publish-action'),
-    'Disabled'
-  );
-  assert.equal(
-    getHandoffItemValue(handoffView.itemViews, 'validation-message'),
-    'Add an assignment title before publishing.'
-  );
-  assert.equal(
-    getHandoffItemValue(handoffView.itemViews, 'title-field'),
-    'Missing'
-  );
-  assert.equal(
-    getHandoffItemValue(handoffView.itemViews, 'student-instructions'),
-    'Added'
-  );
-  assert.equal(
-    getHandoffItemValue(handoffView.itemViews, 'public-payload-boundary'),
-    'Student payload safe'
-  );
-  assert.equal(
-    getHandoffItemValue(handoffView.itemViews, 'privacy-guard'),
-    'Private data omitted'
-  );
   assert.deepEqual(
     {
       closeAfterStatus: publishView.controlBoundary.closeAfterStatus,
@@ -334,27 +227,23 @@ test('publish handoff keeps blocked access and invalid drafts explicit', () => {
       validationAlert: 'publish-blocked-validation-alert',
     }
   );
-  assertNoPrivatePublishText(JSON.stringify(handoffView));
   assertNoPrivatePublishText(JSON.stringify(publishView.controlBoundary));
 });
 
-test('publish handoff renders stable semantic outputs in the dialog', () => {
-  assert.match(
+test('publish dialog renders no hidden audit sections', () => {
+  assert.doesNotMatch(
     ACTIVITY_PUBLISH_SETTINGS_FORM_SOURCE,
-    /<AssignmentPublishHandoff view=\{view\.handoffView\} \/>/
-  );
-  assert.match(
-    ACTIVITY_PUBLISH_SETTINGS_FORM_SOURCE,
-    /function AssignmentPublishHandoff[\s\S]*const titleId = 'assignment-publish-handoff-title'[\s\S]*const descriptionId = 'assignment-publish-handoff-description'[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*aria-labelledby=\{titleId\}[\s\S]*className="sr-only"[\s\S]*data-handoff="assignment-publish"[\s\S]*data-handoff-scope=\{view\.privacy\.scope\}[\s\S]*id=\{titleId\}[\s\S]*id=\{descriptionId\}[\s\S]*view\.itemViews\.map\(\(item\) =>[\s\S]*AssignmentPublishHandoffItem[\s\S]*function AssignmentPublishHandoffItem[\s\S]*item: AssignmentPublishHandoffView\['itemViews'\]\[number\][\s\S]*const labelId = `assignment-publish-handoff-\$\{item\.id\}-label`[\s\S]*const valueId = `assignment-publish-handoff-\$\{item\.id\}-value`[\s\S]*const descriptionId = `assignment-publish-handoff-\$\{item\.id\}-description`[\s\S]*data-handoff-item=\{item\.id\}[\s\S]*id=\{labelId\}[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*aria-label=\{item\.ariaLabel\}[\s\S]*aria-labelledby=\{`\$\{labelId\} \$\{valueId\}`\}[\s\S]*id=\{valueId\}[\s\S]*id=\{descriptionId\}/
+    /data-handoff|Handoff\b/,
+    'The publish dialog should only render visible fields, preview, and review checklist.'
   );
 });
 
-test('publish handoff focused gate is documented', () => {
+test('publish dialog focused gate is documented', () => {
   const normalizedCatalog = TEST_CATALOG_SOURCE.replace(/\s+/g, ' ');
 
   assert.match(
     TEST_CATALOG_SOURCE,
-    /pnpm exec tsx --test scripts\/assignment-publish-handoff-semantic-views\.test\.ts/
+    /pnpm exec tsx --test scripts\/assignment-publish-dialog\.test\.ts/
   );
   for (const boundary of [
     'publish-setting input IDs',
@@ -370,15 +259,6 @@ test('publish handoff focused gate is documented', () => {
     assert.match(normalizedCatalog, new RegExp(boundary));
   }
 });
-
-function getHandoffItemValue(
-  itemViews: Array<{ id: AssignmentPublishHandoffItemId; value: string }>,
-  id: AssignmentPublishHandoffItemId
-) {
-  const item = itemViews.find((view) => view.id === id);
-  assert.ok(item, `Expected publish handoff item ${id}`);
-  return item.value;
-}
 
 function assertNoPrivatePublishText(value: string) {
   for (const privateValue of [

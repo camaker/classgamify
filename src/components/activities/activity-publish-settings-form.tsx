@@ -4,7 +4,6 @@ import {
   type AssignmentPublishDialogViewModel,
   type AssignmentPublishDraft,
   type AssignmentPublishDraftValues,
-  type AssignmentPublishHandoffView,
   type AssignmentPublishPreviewContextTone,
   type AssignmentPublishPreviewContextStatView,
   type AssignmentPublishPreviewContextView,
@@ -264,7 +263,6 @@ function ActivityPublishPreview({
         controlBoundary={controlBoundary}
       />
       <AssignmentSettingsSummary view={view.preview.settingsSummaryView} />
-      <AssignmentPublishHandoff view={view.handoffView} />
       {view.dialogState.errorMessage ? (
         <p
           id={controlIds.validationAlert}
@@ -275,60 +273,6 @@ function ActivityPublishPreview({
         </p>
       ) : null}
     </section>
-  );
-}
-
-function AssignmentPublishHandoff({
-  view,
-}: {
-  view: AssignmentPublishHandoffView;
-}) {
-  const titleId = 'assignment-publish-handoff-title';
-  const descriptionId = 'assignment-publish-handoff-description';
-
-  return (
-    <section
-      aria-describedby={descriptionId}
-      aria-labelledby={titleId}
-      className="sr-only"
-      data-handoff="assignment-publish"
-      data-handoff-scope={view.privacy.scope}
-    >
-      <h3 id={titleId}>{view.title}</h3>
-      <p id={descriptionId}>{view.description}</p>
-      <dl>
-        {view.itemViews.map((item) => (
-          <AssignmentPublishHandoffItem item={item} key={item.id} />
-        ))}
-      </dl>
-    </section>
-  );
-}
-
-function AssignmentPublishHandoffItem({
-  item,
-}: {
-  item: AssignmentPublishHandoffView['itemViews'][number];
-}) {
-  const labelId = `assignment-publish-handoff-${item.id}-label`;
-  const valueId = `assignment-publish-handoff-${item.id}-value`;
-  const descriptionId = `assignment-publish-handoff-${item.id}-description`;
-
-  return (
-    <div data-handoff-item={item.id}>
-      <dt id={labelId}>{item.label}</dt>
-      <dd>
-        <output
-          aria-describedby={descriptionId}
-          aria-label={item.ariaLabel}
-          aria-labelledby={`${labelId} ${valueId}`}
-          id={valueId}
-        >
-          {item.value}
-        </output>
-        <span id={descriptionId}>{item.description}</span>
-      </dd>
-    </div>
   );
 }
 

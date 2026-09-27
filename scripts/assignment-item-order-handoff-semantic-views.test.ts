@@ -541,13 +541,7 @@ function buildSourceEvidence() {
       /buildPublicAssignmentPayload[\s\S]*const orderedRuntimeItems = orderAssignmentRuntimeItems\(\{[\s\S]*items: runtimeItems,[\s\S]*shareSlug,[\s\S]*shuffleItems: settings\.shuffleItems/.test(
         publicSource
       ),
-    publishPreviewExposesPolicy:
-      /id: 'item-order-policy'[\s\S]*label: itemOrderPolicy\.label,[\s\S]*value: itemOrderPolicy\.value/.test(
-        publishSource
-      ) &&
-      /getAssignmentPublishToggleDescription\([\s\S]*toggleViews,[\s\S]*'shuffleItems'/.test(
-        publishSource
-      ),
+    publishPreviewExposesPolicy: /key: 'shuffleItems',/.test(publishSource),
     resultExportExposesPolicy:
       /deliveryView\.itemOrder,[\s\S]*shuffleItems: exportSettings\.shuffleItems/.test(
         resultsExportSource

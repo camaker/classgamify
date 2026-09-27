@@ -197,11 +197,6 @@ const INTERNAL_PRODUCT_DOMAIN_HELPERS = [
   },
   {
     declaration: 'function',
-    filePath: 'src/assignments/publish-input.ts',
-    name: 'buildAssignmentPublishHandoffView',
-  },
-  {
-    declaration: 'function',
     filePath: 'src/assignments/student-follow-up-summary.ts',
     name: 'buildAssignmentStudentFollowUpSummaryStudentViews',
   },
@@ -480,8 +475,8 @@ const RESULT_VIEW_REEXPORT_BOUNDARIES = [
   },
 ] satisfies ReExportBoundary[];
 
-test('product-domain export surface keeps 72 helpers and types internal', () => {
-  assert.equal(INTERNAL_PRODUCT_DOMAIN_HELPERS.length, 72);
+test('product-domain export surface keeps 71 helpers and types internal', () => {
+  assert.equal(INTERNAL_PRODUCT_DOMAIN_HELPERS.length, 71);
 
   for (const helper of INTERNAL_PRODUCT_DOMAIN_HELPERS) {
     const source = readFileSync(helper.filePath, 'utf8');

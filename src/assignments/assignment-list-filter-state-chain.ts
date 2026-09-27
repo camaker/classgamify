@@ -61,7 +61,7 @@ export const ASSIGNMENT_LIST_FILTER_STATE_CHAIN_SOURCE_FILES = [
   'src/components/dashboard/dashboard-pagination.tsx',
   'src/lib/sql-like.ts',
   'src/lib/routes.ts',
-  'scripts/assignment-list-filter-state-handoff-semantic-views.test.ts',
+  'scripts/assignment-list-filter-state.test.ts',
   'scripts/assignment-list-semantic-views.test.ts',
   'scripts/assignment-distribution-lifecycle-chain-handoff.test.ts',
   'scripts/published-assignment-delivery-chain-handoff.test.ts',

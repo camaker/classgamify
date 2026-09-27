@@ -8,14 +8,8 @@ import {
   type PublishedAssignmentDeliveryChainHandoffItemId,
   type PublishedAssignmentDeliveryChainHandoffView,
 } from '@/assignments/published-assignment-delivery-chain';
-import {
-  ASSIGNMENT_PUBLISH_CONTROL_BOUNDARY_ITEM_IDS,
-  ASSIGNMENT_PUBLISH_HANDOFF_ITEM_IDS,
-} from '@/assignments/publish-input';
+import { ASSIGNMENT_PUBLISH_CONTROL_BOUNDARY_ITEM_IDS } from '@/assignments/publish-input';
 import { ASSIGNMENT_DELIVERY_POLICY_HANDOFF_ITEM_IDS } from '@/assignments/delivery-summary';
-import { ASSIGNMENT_SHARE_LINK_HANDOFF_ITEM_IDS } from '@/assignments/share-link';
-import { ASSIGNMENT_LIST_PAGE_HANDOFF_ITEM_IDS } from '@/assignments/list-view';
-import { ASSIGNMENT_LIFECYCLE_HANDOFF_ITEM_IDS } from '@/assignments/lifecycle';
 import { PUBLIC_ASSIGNMENT_ACCESS_HANDOFF_ITEM_IDS } from '@/assignments/public';
 import { PUBLIC_ASSIGNMENT_UNAVAILABLE_ACCESS_HANDOFF_ITEM_IDS } from '@/assignments/unavailable-access';
 import { ASSIGNMENT_ITEM_ORDER_HANDOFF_ITEM_IDS } from '@/assignments/item-order-handoff';
@@ -27,10 +21,6 @@ import { ASSIGNMENT_ANSWER_FEEDBACK_HANDOFF_ITEM_IDS } from '@/assignments/answe
 import { ASSIGNMENT_ATTEMPT_STATS_HANDOFF_ITEM_IDS } from '@/assignments/attempt-stats-handoff';
 
 const ASSIGNMENTS_API_SOURCE = readFileSync('src/api/assignments.ts', 'utf8');
-const PUBLISH_INPUT_SOURCE = readFileSync(
-  'src/assignments/publish-input.ts',
-  'utf8'
-);
 const DELIVERY_SUMMARY_SOURCE = readFileSync(
   'src/assignments/delivery-summary.ts',
   'utf8'
@@ -161,11 +151,7 @@ test('published assignment delivery chain stays backed by focused contracts', ()
 
   assert.deepEqual(
     [
-      ASSIGNMENT_PUBLISH_HANDOFF_ITEM_IDS.length,
       ASSIGNMENT_DELIVERY_POLICY_HANDOFF_ITEM_IDS.length,
-      ASSIGNMENT_SHARE_LINK_HANDOFF_ITEM_IDS.length,
-      ASSIGNMENT_LIST_PAGE_HANDOFF_ITEM_IDS.length,
-      ASSIGNMENT_LIFECYCLE_HANDOFF_ITEM_IDS.length,
       PUBLIC_ASSIGNMENT_ACCESS_HANDOFF_ITEM_IDS.length,
       PUBLIC_ASSIGNMENT_UNAVAILABLE_ACCESS_HANDOFF_ITEM_IDS.length,
       ASSIGNMENT_ITEM_ORDER_HANDOFF_ITEM_IDS.length,
@@ -177,7 +163,7 @@ test('published assignment delivery chain stays backed by focused contracts', ()
       ASSIGNMENT_ATTEMPT_STATS_HANDOFF_ITEM_IDS.length,
       ASSIGNMENT_PUBLISH_CONTROL_BOUNDARY_ITEM_IDS.length,
     ],
-    Array.from({ length: 15 }, () => 30)
+    Array.from({ length: 11 }, () => 30)
   );
 });
 
@@ -221,16 +207,13 @@ test('published assignment delivery sources preserve sanitized public and submis
 
 test('published assignment delivery privacy contracts stay explicit across surfaces', () => {
   assert.match(
-    PUBLISH_INPUT_SOURCE,
-    /AssignmentPublishHandoffPrivacyContract[\s\S]*exposesPublicRuntimeContent: false[\s\S]*exposesRawSettingsJson: false[\s\S]*exposesShareSlug: false[\s\S]*scope: 'assignment-publish-preflight-boundary'/
-  );
-  assert.match(
     DELIVERY_SUMMARY_SOURCE,
     /AssignmentDeliveryPolicyHandoffPrivacyContract[\s\S]*deliveryRuleCount: number;[\s\S]*exposesAnswerKeys: false[\s\S]*exposesRawSettingsJson: false[\s\S]*scope: 'assignment-delivery-policy-summary'/
   );
-  assert.match(
+  assert.doesNotMatch(
     SHARE_LINK_SOURCE,
-    /shareUrlIsPublicDeliveryLink: true[\s\S]*exposesRawAnonymousToken: false[\s\S]*exposesSourceMaterialStorageKeys: false[\s\S]*scope: 'assignment-share-link-distribution'/
+    /anonymousToken|storageKey/,
+    'Share links should never read raw anonymous tokens or storage keys.'
   );
   assert.match(
     RESULTS_EXPORT_SOURCE,

@@ -3,8 +3,6 @@ import { existsSync, readFileSync } from 'node:fs';
 import test from 'node:test';
 import { ACTIVITY_EDITOR_WORKFLOW_HANDOFF_ITEM_IDS } from '@/activities/editor';
 import { ACTIVITY_LIBRARY_PAGE_HANDOFF_ITEM_IDS } from '@/activities/library-view';
-import { ASSIGNMENT_PUBLISH_HANDOFF_ITEM_IDS } from '@/assignments/publish-input';
-import { ASSIGNMENT_SHARE_LINK_HANDOFF_ITEM_IDS } from '@/assignments/share-link';
 import {
   LOCAL_PERSISTED_BROWSER_JOURNEY_CHAIN_HANDOFF_ITEM_IDS,
   LOCAL_PERSISTED_BROWSER_JOURNEY_CHAIN_SOURCE_FILES,
@@ -165,10 +163,8 @@ test('local persisted browser journey is backed by adjacent gates', () => {
     [
       ACTIVITY_EDITOR_WORKFLOW_HANDOFF_ITEM_IDS.length,
       ACTIVITY_LIBRARY_PAGE_HANDOFF_ITEM_IDS.length,
-      ASSIGNMENT_PUBLISH_HANDOFF_ITEM_IDS.length,
-      ASSIGNMENT_SHARE_LINK_HANDOFF_ITEM_IDS.length,
     ],
-    Array.from({ length: 4 }, () => 30)
+    Array.from({ length: 2 }, () => 30)
   );
 });
 

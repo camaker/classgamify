@@ -10,14 +10,11 @@ import {
   type AssignmentLifecycleGovernanceChainHandoffView,
 } from '@/assignments/assignment-lifecycle-governance-chain';
 import { ASSIGNMENT_DELIVERY_POLICY_HANDOFF_ITEM_IDS } from '@/assignments/delivery-summary';
-import { ASSIGNMENT_LIFECYCLE_HANDOFF_ITEM_IDS } from '@/assignments/lifecycle';
-import { ASSIGNMENT_LIST_PAGE_HANDOFF_ITEM_IDS } from '@/assignments/list-view';
 import {
   PUBLISHED_ASSIGNMENT_DELIVERY_CHAIN_HANDOFF_ITEM_IDS,
   PUBLISHED_ASSIGNMENT_DELIVERY_CHAIN_SOURCE_FILES,
 } from '@/assignments/published-assignment-delivery-chain';
 import { PUBLIC_ASSIGNMENT_ACCESS_HANDOFF_ITEM_IDS } from '@/assignments/public';
-import { ASSIGNMENT_SHARE_LINK_HANDOFF_ITEM_IDS } from '@/assignments/share-link';
 import { PUBLIC_ASSIGNMENT_UNAVAILABLE_ACCESS_HANDOFF_ITEM_IDS } from '@/assignments/unavailable-access';
 
 const PRODUCT_SOURCE = readFileSync('docs/product.md', 'utf8');
@@ -219,9 +216,6 @@ test('assignment lifecycle governance chain is backed by adjacent gates', () => 
 
   assert.deepEqual(
     [
-      ASSIGNMENT_LIFECYCLE_HANDOFF_ITEM_IDS.length,
-      ASSIGNMENT_LIST_PAGE_HANDOFF_ITEM_IDS.length,
-      ASSIGNMENT_SHARE_LINK_HANDOFF_ITEM_IDS.length,
       PUBLIC_ASSIGNMENT_ACCESS_HANDOFF_ITEM_IDS.length,
       PUBLIC_ASSIGNMENT_UNAVAILABLE_ACCESS_HANDOFF_ITEM_IDS.length,
       PUBLISHED_ASSIGNMENT_DELIVERY_CHAIN_HANDOFF_ITEM_IDS.length,
@@ -229,7 +223,7 @@ test('assignment lifecycle governance chain is backed by adjacent gates', () => 
       ASSIGNMENT_DELIVERY_POLICY_HANDOFF_ITEM_IDS.length,
       ASSIGNMENT_ATTEMPT_STATS_HANDOFF_ITEM_IDS.length,
     ],
-    Array.from({ length: 9 }, () => 30)
+    Array.from({ length: 6 }, () => 30)
   );
 });
 
@@ -289,11 +283,6 @@ test('product docs and lifecycle helpers preserve status governance', () => {
     /buildAssignmentStatusActionExecutionPlan[\s\S]*type: 'blocked'[\s\S]*type: 'update-status'/,
     'Status actions should prepare blocked or update-status execution plans.'
   );
-  assert.match(
-    LIFECYCLE_SOURCE,
-    /AssignmentLifecycleHandoffPrivacyContract[\s\S]*exposesActivityContent: false[\s\S]*exposesAnswerKeys: false[\s\S]*exposesInternalAssignmentIds: false[\s\S]*exposesPublicShareSlug: false[\s\S]*exposesRawAnonymousToken: false[\s\S]*exposesStudentAnswerText: false[\s\S]*exposesStudentNames: false/,
-    'Lifecycle handoff should keep private classroom and student data hidden.'
-  );
 });
 
 test('list queries, route filters, and list cards use lifecycle status', () => {
@@ -329,13 +318,18 @@ test('list queries, route filters, and list cards use lifecycle status', () => {
   );
   assert.match(
     LIST_VIEW_SOURCE,
-    /buildAssignmentLifecycleHandoffView[\s\S]*surface: 'teacher-list'[\s\S]*buildAssignmentShareLinkAvailability[\s\S]*buildAssignmentStatusAction/,
-    'List view models should prepare lifecycle handoff, share availability, and status actions together.'
+    /buildAssignmentShareLinkAvailability[\s\S]*buildAssignmentStatusAction/,
+    'List view models should prepare share availability and status actions together.'
   );
   assert.match(
     ASSIGNMENT_LIST_CARD_SOURCE,
-    /buildAssignmentStatusActionExecutionPlan[\s\S]*handoff=\{assignment\.lifecycleHandoffView\}[\s\S]*data-handoff="assignment-lifecycle"[\s\S]*data-handoff-item=\{item\.id\}/,
-    'Assignment cards should keep hidden lifecycle handoff and status execution planning together.'
+    /buildAssignmentStatusActionExecutionPlan/,
+    'List cards should run status changes through the shared execution plan.'
+  );
+  assert.doesNotMatch(
+    ASSIGNMENT_LIST_CARD_SOURCE,
+    /data-handoff/,
+    'List cards should render no hidden lifecycle audit output.'
   );
   assert.match(
     ASSIGNMENT_LIST_FILTERS_COMPONENT_SOURCE,
@@ -365,10 +359,10 @@ test('share links, public lookups, and unavailable states preserve lifecycle gat
     /getAssignmentShareLinkDisabledReason[\s\S]*if \(!shareSlug\)[\s\S]*if \(lifecycleStatus === 'open'\) return \{\}[\s\S]*return \{ disabledReasonCode: lifecycleStatus \}/,
     'Share-link disabled reasons should follow lifecycle status.'
   );
-  assert.match(
+  assert.doesNotMatch(
     SHARE_LINK_SOURCE,
-    /exposesRawAnonymousToken: false[\s\S]*exposesSourceMaterialStorageKeys: false[\s\S]*scope: 'assignment-share-link-distribution'/,
-    'Share-link handoffs should not expose raw tokens or source material keys.'
+    /anonymousToken|storageKey/,
+    'Share links should never read raw anonymous tokens or storage keys.'
   );
   assert.match(
     PUBLIC_ASSIGNMENT_SOURCE,

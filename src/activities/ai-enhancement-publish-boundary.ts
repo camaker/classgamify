@@ -1,3 +1,4 @@
+import { m } from '@/locale/paraglide/messages';
 import {
   ACTIVITY_AI_ENHANCEMENT_SAVE_BOUNDARY_ITEM_IDS,
   buildActivityAiEnhancementSaveBoundaryPlan,
@@ -272,21 +273,15 @@ function buildActivityAiEnhancementPublishDialogSummary({
   return {
     closeAfterStatus: publishView.controlBoundary.closeAfterStatus,
     deliveryRuleCount: publishView.controlBoundary.deliveryRuleCount,
-    publishAccessValue: getPublishHandoffValue(
-      publishView.handoffView.itemViews,
-      'publish-access'
-    ),
+    publishAccessValue: publishView.accessView.value,
     publishDisabled: publishView.dialogState.publishDisabled,
     reviewChecklistCount: publishView.preview.context.reviewItems.length,
-    settingsSummaryStatusValue: getPublishHandoffValue(
-      publishView.handoffView.itemViews,
-      'settings-summary-status'
-    ),
+    settingsSummaryStatusValue:
+      publishView.preview.settingsSummaryView.status.value,
     status: publishView.controlBoundary.status,
-    validationStatusValue: getPublishHandoffValue(
-      publishView.handoffView.itemViews,
-      'validation-status'
-    ),
+    validationStatusValue: publishView.validation.ok
+      ? m.assignment_publish_preview_status_ready_label()
+      : m.assignment_publish_preview_status_blocked_label(),
   };
 }
 
@@ -714,13 +709,6 @@ function buildActivityAiEnhancementPublishBoundaryPrivacyContract(
     usesSaveBoundaryHandoff: true,
     usesSaveBoundaryPlan: true,
   };
-}
-
-function getPublishHandoffValue(
-  itemViews: Array<{ id: string; value: string }>,
-  id: string
-) {
-  return itemViews.find((itemView) => itemView.id === id)?.value ?? '';
 }
 
 function item(

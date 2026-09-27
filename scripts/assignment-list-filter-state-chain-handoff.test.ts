@@ -20,12 +20,7 @@ import {
   normalizeAssignmentListSearch,
   parseAssignmentStatusFilter,
 } from '@/assignments/list-filters';
-import {
-  ASSIGNMENT_LIST_FILTER_HANDOFF_ITEM_IDS,
-  buildAssignmentListSearchPanelView,
-} from '@/assignments/list-view';
 import { PUBLISHED_ASSIGNMENT_DELIVERY_CHAIN_HANDOFF_ITEM_IDS } from '@/assignments/published-assignment-delivery-chain';
-import { overwriteGetLocale } from '@/locale/paraglide/runtime';
 
 const PRODUCT_SOURCE = readFileSync('docs/product.md', 'utf8');
 const TEST_CATALOG_SOURCE = readFileSync('tests/e2e/TEST-CATALOG.md', 'utf8');
@@ -58,7 +53,6 @@ test('assignment list filter-state chain exposes 30 safe slices', () => {
   assert.deepEqual(itemIds, [
     ...ASSIGNMENT_LIST_FILTER_STATE_CHAIN_HANDOFF_ITEM_IDS,
   ]);
-  assert.deepEqual(itemIds, [...ASSIGNMENT_LIST_FILTER_HANDOFF_ITEM_IDS]);
   assert.equal(handoffView.title, 'Assignment list filter-state chain');
   assert.match(
     handoffView.description,
@@ -165,11 +159,10 @@ test('assignment list filter-state chain is backed by adjacent gates', () => {
 
   assert.deepEqual(
     [
-      ASSIGNMENT_LIST_FILTER_HANDOFF_ITEM_IDS.length,
       ASSIGNMENT_DISTRIBUTION_LIFECYCLE_CHAIN_HANDOFF_ITEM_IDS.length,
       PUBLISHED_ASSIGNMENT_DELIVERY_CHAIN_HANDOFF_ITEM_IDS.length,
     ],
-    [30, 30, 30]
+    [30, 30]
   );
 });
 
@@ -278,10 +271,10 @@ test('assignment list route component and API share filter state', () => {
     /validateSearch: buildAssignmentListValidatedSearch[\s\S]*buildAssignmentListFilterRouteSearch[\s\S]*buildAssignmentListPageRouteSearch[\s\S]*buildAssignmentListRouteSearch[\s\S]*buildAssignmentListDismissPublishedRouteSearch/,
     'The dashboard route should validate and build assignment-list filter route state through shared helpers.'
   );
-  assert.match(
+  assert.doesNotMatch(
     COMPONENT_SOURCE,
-    /data-handoff="assignment-list-filter-state"[\s\S]*data-handoff-scope=\{handoffView\.privacy\.scope\}[\s\S]*handoffView\.itemViews\.map/,
-    'The assignment list filter component should render the hidden filter-state handoff.'
+    /data-handoff/,
+    'The assignment list filters should render no hidden audit output.'
   );
   assert.match(
     FILTER_SOURCE,
@@ -302,48 +295,6 @@ test('assignment list route component and API share filter state', () => {
     SUMMARY_SOURCE,
     /buildAssignmentListFilterSummary[\s\S]*total[\s\S]*buildAssignmentListSummaryMetrics/,
     'Assignment list summaries should keep full-filter overview helpers in the assignment domain.'
-  );
-});
-
-test('assignment list filter-state chain matches the visible handoff privacy', () => {
-  overwriteGetLocale(() => 'en');
-
-  const filterHandoffView = buildAssignmentListSearchPanelView({
-    isLoading: false,
-    search: '  Ｗｅｅｋ   １  ',
-    status: 'closed',
-    total: 9,
-  }).filterHandoffView;
-
-  assert.deepEqual(
-    filterHandoffView.itemViews.map((item) => item.id),
-    [...ASSIGNMENT_LIST_FILTER_STATE_CHAIN_HANDOFF_ITEM_IDS]
-  );
-  assert.equal(filterHandoffView.privacy.exposesInternalAssignmentIds, false);
-  assert.equal(filterHandoffView.privacy.exposesInternalOwnerId, false);
-  assert.equal(filterHandoffView.privacy.exposesPublicRuntimeContent, false);
-  assert.equal(filterHandoffView.privacy.exposesRawAnonymousToken, false);
-  assert.equal(filterHandoffView.privacy.exposesResultExportRows, false);
-  assert.equal(
-    filterHandoffView.privacy.exposesSourceMaterialStorageKeys,
-    false
-  );
-  assert.equal(filterHandoffView.privacy.exposesStudentAnswerText, false);
-  assert.equal(filterHandoffView.privacy.exposesTeacherOnlyAnswers, false);
-  assert.equal(filterHandoffView.privacy.preservesPublishedContext, true);
-  assert.equal(filterHandoffView.privacy.resetsPageOnFilterChange, true);
-  assert.equal(filterHandoffView.privacy.routesThroughValidatedSearch, true);
-  assert.equal(
-    filterHandoffView.privacy.sharesRulesWithDashboardControls,
-    true
-  );
-  assert.equal(filterHandoffView.privacy.sharesRulesWithListApi, true);
-  assert.equal(
-    filterHandoffView.privacy.usesFullFilteredSummaryForOverview,
-    true
-  );
-  assertNoPrivateAssignmentListFilterStateText(
-    JSON.stringify(filterHandoffView)
   );
 });
 

@@ -10,7 +10,6 @@ import {
   type AssignmentDistributionLifecycleChainHandoffView,
 } from '@/assignments/assignment-distribution-lifecycle-chain';
 import {
-  ASSIGNMENT_LIST_PAGE_HANDOFF_ITEM_IDS,
   buildAssignmentListCardViewModel,
   buildAssignmentListPageViewModel,
   type AssignmentListCardSource,
@@ -31,12 +30,9 @@ import {
   findPublishedAssignmentInList,
   resolvePublishedAssignmentPanelAssignment,
 } from '@/assignments/published-assignment';
-import { ASSIGNMENT_PUBLISH_HANDOFF_ITEM_IDS } from '@/assignments/publish-input';
 import {
-  ASSIGNMENT_SHARE_LINK_HANDOFF_ITEM_IDS,
   buildAssignmentShareLinkActionView,
   buildAssignmentShareLinkCopyExecutionPlan,
-  buildAssignmentShareLinkHandoffView,
   buildAssignmentSharePath,
 } from '@/assignments/share-link';
 import { normalizeAssignmentShareSlug } from '@/assignments/share-slug';
@@ -75,10 +71,6 @@ const COPY_BUTTON_SOURCE = readFileSync(
   'src/components/assignments/copy-assignment-share-link-button.tsx',
   'utf8'
 );
-const SHARE_HANDOFF_SOURCE = readFileSync(
-  'src/components/assignments/assignment-share-link-handoff.tsx',
-  'utf8'
-);
 const TEST_CATALOG_SOURCE = readFileSync('tests/e2e/TEST-CATALOG.md', 'utf8');
 
 const SECRET_INTERNAL_ASSIGNMENT_ID = 'SECRET_INTERNAL_ASSIGNMENT_ID';
@@ -99,7 +91,6 @@ test('assignment distribution lifecycle chain exposes 30 safe slices', () => {
   ]);
   assert.equal(handoffView.title, 'Assignment distribution lifecycle chain');
   assert.match(handoffView.description, /Thirty-slice assignment distribution/);
-  assert.equal(handoffView.itemViews.length, 30);
   assert.equal(new Set(itemIds).size, 30);
   assert.equal(
     handoffView.itemViews.every(
@@ -167,7 +158,7 @@ test('assignment distribution lifecycle summarizes each handoff boundary', () =>
       ['results-step-readiness', 'Results step'],
       ['list-card-action-parity', 'Card actions'],
       ['published-panel-action-parity', 'Panel actions'],
-      ['hidden-share-handoff', '30 share slices'],
+      ['hidden-share-handoff', 'Visible share actions'],
       ['filter-scope-alignment', 'Owner scope'],
       ['source-activity-context', 'Frozen source shown'],
       ['student-runner-boundary', 'Public /play'],
@@ -198,15 +189,12 @@ test('assignment distribution lifecycle is backed by adjacent gates', () => {
   assert.equal(PUBLISHED_ASSIGNMENT_DELIVERY_CHAIN_SOURCE_FILES.length, 30);
   assert.deepEqual(
     [
-      ASSIGNMENT_LIST_PAGE_HANDOFF_ITEM_IDS.length,
-      ASSIGNMENT_SHARE_LINK_HANDOFF_ITEM_IDS.length,
-      ASSIGNMENT_PUBLISH_HANDOFF_ITEM_IDS.length,
       ASSIGNMENT_DELIVERY_POLICY_HANDOFF_ITEM_IDS.length,
       PUBLISHED_ASSIGNMENT_DELIVERY_CHAIN_HANDOFF_ITEM_IDS.length,
       ASSIGNMENT_SOURCE_ACTIVITY_CONTEXT_CHAIN_HANDOFF_ITEM_IDS.length,
       TEACHER_RESULTS_REVIEW_CHAIN_HANDOFF_ITEM_IDS.length,
     ],
-    Array.from({ length: 7 }, () => 30)
+    Array.from({ length: 4 }, () => 30)
   );
 });
 
@@ -317,43 +305,12 @@ test('published assignment context keeps distribution states and actions aligned
     pageView.filterScopeBoundary.publishedShareContextStatus,
     'found'
   );
-  assert.equal(
-    getAssignmentListHandoffValue(
-      pageView.handoffView,
-      'published-share-context'
-    ),
-    'Ready: /play/classroom-link'
-  );
-  assert.equal(
-    getAssignmentListHandoffValue(
-      pageView.handoffView,
-      'distribution-copy-link'
-    ),
-    'Ready now'
-  );
-  assert.equal(
-    getAssignmentListHandoffValue(
-      pageView.handoffView,
-      'distribution-preview-link'
-    ),
-    'Ready now'
-  );
-  assert.equal(
-    getAssignmentListHandoffValue(
-      pageView.handoffView,
-      'distribution-review-results'
-    ),
-    'After submissions'
-  );
 });
 
 test('share-link helpers normalize route state and copy plans', () => {
   const action = buildAssignmentShareLinkActionView({
     label: 'Open student preview',
     shareSlug: ' classroom-link ',
-  });
-  const handoffView = buildAssignmentShareLinkHandoffView(action, {
-    surface: 'publish-success',
   });
   const blockedPlan = buildAssignmentShareLinkCopyExecutionPlan({
     disabled: true,
@@ -379,16 +336,6 @@ test('share-link helpers normalize route state and copy plans', () => {
   assert.equal(action.shareSlug, 'classroom-link');
   assert.equal(action.sharePath, '/play/classroom-link');
   assert.equal(action.isAvailable, true);
-  assert.equal(handoffView.surface, 'publish-success');
-  assert.equal(handoffView.itemViews.length, 30);
-  assert.equal(
-    getShareHandoffValue(handoffView, 'publish-success-surface'),
-    'Active'
-  );
-  assert.equal(
-    getShareHandoffValue(handoffView, 'assignment-list-surface'),
-    'Compatible'
-  );
   assert.equal(copyPlan.type, 'copy-link');
   assert.match(
     copyPlan.type === 'copy-link' ? copyPlan.url : '',
@@ -537,30 +484,25 @@ test('assignment distribution lifecycle sources preserve route, DOM, and API bou
   );
   assert.match(
     PUBLISHED_PANEL_SOURCE,
-    /(?=[\s\S]*buildAssignmentShareLinkHandoffView\(action, \{[\s\S]*surface: 'publish-success')(?=[\s\S]*<AssignmentShareLinkHandoff handoff=\{handoffView\} \/>)(?=[\s\S]*<PublishedAssignmentSharePreviewAction)(?=[\s\S]*<CopyAssignmentShareLinkButton)(?=[\s\S]*<PublishedAssignmentPrintActionLink)(?=[\s\S]*<PublishedAssignmentResultsActionLink)/,
-    'Published assignment panel should render the hidden share handoff and prepared preview, copy, print, and result actions.'
+    /(?=[\s\S]*<PublishedAssignmentSharePreviewAction)(?=[\s\S]*<CopyAssignmentShareLinkButton)(?=[\s\S]*<PublishedAssignmentPrintActionLink)(?=[\s\S]*<PublishedAssignmentResultsActionLink)/,
+    'Published assignment panel should render prepared preview, copy, print, and result actions.'
   );
   assert.match(
     ASSIGNMENT_CARD_SOURCE,
-    /(?=[\s\S]*buildAssignmentShareLinkHandoffView\(action, \{[\s\S]*surface: 'assignment-list')(?=[\s\S]*<AssignmentShareLinkHandoff handoff=\{handoffView\} \/>)(?=[\s\S]*<AssignmentListSharePreviewAction)(?=[\s\S]*<CopyAssignmentShareLinkButton)(?=[\s\S]*<AssignmentListPrintActionLink)(?=[\s\S]*<AssignmentListResultActionLink)/,
-    'Assignment list cards should render the hidden share handoff and prepared preview, copy, print, and result actions.'
+    /(?=[\s\S]*<AssignmentListSharePreviewAction)(?=[\s\S]*<CopyAssignmentShareLinkButton)(?=[\s\S]*<AssignmentListPrintActionLink)(?=[\s\S]*<AssignmentListResultActionLink)/,
+    'Assignment list cards should render prepared preview, copy, print, and result actions.'
   );
   assert.match(
     COPY_BUTTON_SOURCE,
     /buildAssignmentShareLinkCopyExecutionPlan\(\{[\s\S]*copyTextToClipboard\(executionPlan\.url\)[\s\S]*toast\.success\(executionPlan\.successMessage\)[\s\S]*toast\.error\(executionPlan\.failureMessage\)/,
     'Copy button should execute the shared copy plan and map feedback through localized messages.'
   );
-  assert.match(
-    SHARE_HANDOFF_SOURCE,
-    /data-handoff="assignment-share-link"[\s\S]*data-handoff-scope=\{handoff\.privacy\.scope\}[\s\S]*data-handoff-item=\{item\.id\}/,
-    'Share-link handoff should keep hidden semantic coverage for all distribution surfaces.'
-  );
 });
 
 test('assignment distribution lifecycle focused gate is documented', () => {
   assert.match(
     TEST_CATALOG_SOURCE,
-    /Assignment distribution lifecycle chain has a fast script-level gate via[\s\S]*scripts\/assignment-distribution-lifecycle-chain-handoff\.test\.ts[\s\S]*visible\s+student-runner\s+start\s+screen/,
+    /Assignment distribution lifecycle chain has a fast script-level gate via[\s\S]*scripts\/assignment-distribution-lifecycle-chain-handoff\.test\.ts[\s\S]*student-runner\s+start\s+screen/,
     'TEST-CATALOG should document the assignment distribution lifecycle gate.'
   );
   assert.match(
@@ -608,24 +550,6 @@ function getHandoffValue(
 ) {
   const item = view.itemViews.find((itemView) => itemView.id === id);
   assert.ok(item, `Missing assignment distribution lifecycle item ${id}`);
-  return item.value;
-}
-
-function getAssignmentListHandoffValue(
-  view: ReturnType<typeof buildAssignmentListPageViewModel>['handoffView'],
-  id: (typeof ASSIGNMENT_LIST_PAGE_HANDOFF_ITEM_IDS)[number]
-) {
-  const item = view.itemViews.find((itemView) => itemView.id === id);
-  assert.ok(item, `Missing assignment list handoff item ${id}`);
-  return item.value;
-}
-
-function getShareHandoffValue(
-  view: ReturnType<typeof buildAssignmentShareLinkHandoffView>,
-  id: (typeof ASSIGNMENT_SHARE_LINK_HANDOFF_ITEM_IDS)[number]
-) {
-  const item = view.itemViews.find((itemView) => itemView.id === id);
-  assert.ok(item, `Missing assignment share-link handoff item ${id}`);
   return item.value;
 }
 

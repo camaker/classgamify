@@ -410,13 +410,11 @@ activity content, teacher owner ids, source-material metadata, or internal
 trigger markers.
 `src/activities/derivative-source-continuity-chain.ts` owns this source contract
 without rendering provenance metadata in teacher or student interfaces.
-The activity lifecycle governance chain should explicitly carry the 30-slice
-assignment publish handoff so restored activities return to the shared publish
-access, field validation, delivery settings, review checklist, snapshot freeze,
-public-payload, result-policy, and privacy contracts. Its independent 30-file
-gate should continue to verify archive, restore, edit, duplicate, remix,
-retention, and snapshot surfaces without replacing that downstream product
-boundary.
+The activity lifecycle governance chain should send restored activities back
+through the shared publish dialog: publish access, field validation, delivery
+settings, review checklist, snapshot freeze, public-payload, and result-policy
+contracts. Its independent 30-file gate should continue to verify archive,
+restore, edit, duplicate, remix, retention, and snapshot surfaces.
 The activity authoring-to-publish continuity chain should connect this teacher
 workflow as 30 source-level stages from public template entry and editor save
 through owner-scoped library search, filters and pagination, atomic edit,
@@ -1074,10 +1072,9 @@ Implementation boundaries:
   distractors, variants, explanations, listening scripts, and extraction paths
   cannot bypass blocked reasons, editor-only draft targets, teacher review,
   manual save, explicit publish, frozen snapshots, sanitized public payloads,
-  or result exports. Its final boundary explicitly carries the 30-slice core
-  assignment-publish handoff so AI-enhanced activities return to the shared
-  publish access, validation, delivery settings, review checklist, snapshot
-  freeze, public-payload, result-policy, and privacy contracts instead of
+  or result exports. Its final boundary sends AI-enhanced activities through the
+  shared publish dialog (publish access, validation, delivery settings, review
+  checklist, snapshot freeze, public payload, and result policy) instead of
   creating an AI-specific assignment path.
 - `src/activities/ai-fallback-draft-chain.ts` owns the deterministic AI
   fallback draft chain for missing Workers AI credentials, invalid provider
