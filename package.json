@@ -111,10 +111,5 @@
     "typescript": "^5.7.2",
     "vite": "^8.1.0",
     "wrangler": "^4.105.0"
-  },
-  "pnpm": {
-    "overrides": {
-      "vitefu": "^1.1.3"
-    }
   }
 }
