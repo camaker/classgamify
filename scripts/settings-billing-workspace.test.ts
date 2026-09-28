@@ -1,10 +1,6 @@
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import test from 'node:test';
-import {
-  buildSettingsBillingPageViewModel,
-  buildSettingsBillingWorkspaceSummaryView,
-} from '@/settings/billing-view';
 import { buildSettingsBillingCardViewModel } from '@/payment/billing-view';
 import type { PricePlan, Subscription } from '@/payment/types';
 import { overwriteGetLocale } from '@/locale/paraglide/runtime';
@@ -19,25 +15,6 @@ const BILLING_CARD_SOURCE = readFileSync(
   'src/components/settings/billing/billing-card.tsx',
   'utf8'
 );
-
-test('settings billing workspace summary lists hosted classroom billing areas', () => {
-  const pageView = buildSettingsBillingPageViewModel();
-  const summaryView = buildSettingsBillingWorkspaceSummaryView();
-
-  assert.equal(pageView.workspaceSummaryView.title, summaryView.title);
-  assert.deepEqual(
-    summaryView.itemViews.map((item) => item.id),
-    ['plan-access', 'activity-library', 'assignment-workflow', 'results-ai']
-  );
-  assert.equal(
-    summaryView.itemViews.every(
-      (item) =>
-        item.ariaLabel.includes(item.label) &&
-        item.ariaLabel.includes(item.description)
-    ),
-    true
-  );
-});
 
 test('billing card view model separates classroom plan states and hosted actions', () => {
   const formatDate = (date: Date) => `date:${date.toISOString().slice(0, 10)}`;
@@ -131,8 +108,8 @@ test('billing card view model separates classroom plan states and hosted actions
 test('billing route consumes prepared workspace view models', () => {
   assert.match(
     BILLING_ROUTE_SOURCE,
-    /buildSettingsBillingPageViewModel\(\)[\s\S]*BillingWorkspaceSummary[\s\S]*view=\{pageView\.workspaceSummaryView\}[\s\S]*BillingCard/,
-    'Billing route should render prepared workspace summary before plan card.'
+    /buildSettingsBillingPageViewModel\(\)[\s\S]*BillingCard/,
+    'Billing route should render the plan card directly.'
   );
   assert.match(
     BILLING_CARD_SOURCE,

@@ -35,6 +35,22 @@ test.describe('authentication and protected routes', () => {
     await cleanupE2EUsers(request);
   });
 
+  for (const viewport of [
+    { name: 'desktop', width: 1280, height: 720 },
+    { name: 'mobile', width: 375, height: 667 },
+  ]) {
+    test(`shows the auth forms in the first ${viewport.name} viewport`, async ({
+      page,
+    }) => {
+      await page.setViewportSize(viewport);
+      for (const path of ['/auth/login', '/auth/register']) {
+        await page.goto(path);
+        // Nothing may push the form below the fold: no explanation panels.
+        await expect(page.locator('input[name="email"]')).toBeInViewport();
+      }
+    });
+  }
+
   test('redirects guests from dashboard to login', async ({ page }) => {
     await page.goto('/dashboard');
 

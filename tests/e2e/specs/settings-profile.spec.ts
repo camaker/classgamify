@@ -49,32 +49,8 @@ test.describe('settings profile', () => {
     await loginByForm(page, user);
     await page.goto('/settings/profile');
 
-    await expect(
-      page.getByText(
-        getLocaleMessage('en', 'settings_profile_workspace_summary_title')
-      )
-    ).toBeVisible();
-    await expect(
-      page.getByText(
-        getLocaleMessage(
-          'en',
-          'settings_profile_workspace_summary_assignments_label'
-        ),
-        { exact: true }
-      )
-    ).toBeVisible();
-    await expect(
-      page.getByText(
-        getLocaleMessage(
-          'en',
-          'settings_profile_workspace_summary_results_label'
-        ),
-        { exact: true }
-      )
-    ).toBeVisible();
-
     const nameInput = page.locator('input[name="name"]');
-    await expect(nameInput).toBeVisible();
+    await expect(nameInput).toBeInViewport();
     await nameInput.fill(newName);
     await page.getByRole('button', { name: /save|保存/i }).click();
 
@@ -87,7 +63,7 @@ test.describe('settings profile', () => {
     await expect(page.locator('input[name="name"]')).toHaveValue(newName);
   });
 
-  test('shows the localized teacher identity scope', async ({
+  test('opens the localized profile page on the name form', async ({
     page,
     request,
   }) => {
@@ -97,23 +73,11 @@ test.describe('settings profile', () => {
     await page.goto('/zh/settings/profile');
 
     await expect(
-      page.getByText(
-        getLocaleMessage('zh', 'settings_profile_workspace_summary_title')
-      )
+      page.getByRole('heading', {
+        name: getLocaleMessage('zh', 'settings_profile_title'),
+        exact: true,
+      })
     ).toBeVisible();
-    await expect(
-      page.getByText(
-        getLocaleMessage(
-          'zh',
-          'settings_profile_workspace_summary_student_label'
-        ),
-        { exact: true }
-      )
-    ).toBeVisible();
-    await expect(
-      page.getByText(
-        getLocaleMessage('zh', 'settings_profile_workspace_summary_description')
-      )
-    ).toBeVisible();
+    await expect(page.locator('input[name="name"]')).toBeInViewport();
   });
 });

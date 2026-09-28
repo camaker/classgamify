@@ -1,5 +1,4 @@
 import { DashboardLayout } from '@/components/layout/dashboard-layout';
-import { NotificationWorkspaceSummary } from '@/components/settings/notification/notification-workspace-summary';
 import { NewsletterFormCard } from '@/components/settings/notification/newsletter-form-card';
 import {
   buildSettingsNotificationPageViewModel,
@@ -29,7 +28,6 @@ function NotificationsPage() {
         aria-label={pageView.contentAriaLabel}
         className="flex flex-col gap-8"
       >
-        <NotificationWorkspaceSummary view={pageView.workspaceSummaryView} />
         <section
           aria-label={pageView.newsletterSectionAriaLabel}
           className="grid grid-cols-1 gap-8 md:grid-cols-2"

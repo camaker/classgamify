@@ -9,10 +9,6 @@ const NOTIFICATION_ROUTE_SOURCE = readFileSync(
   'src/routes/settings/notifications.tsx',
   'utf8'
 );
-const NOTIFICATION_SUMMARY_SOURCE = readFileSync(
-  'src/components/settings/notification/notification-workspace-summary.tsx',
-  'utf8'
-);
 const NEWSLETTER_CARD_SOURCE = readFileSync(
   'src/components/settings/notification/newsletter-form-card.tsx',
   'utf8'
@@ -46,16 +42,10 @@ test('notification settings page wires update boundary before newsletter control
   );
   assert.match(
     NOTIFICATION_ROUTE_SOURCE,
-    /<NotificationWorkspaceSummary view=\{pageView\.workspaceSummaryView\} \/>[\s\S]*<NewsletterFormCard view=\{pageView\.newsletterCardView\} \/>/,
-    'Notification workspace boundary should render before the newsletter control card.'
-  );
-  assert.match(
-    NOTIFICATION_SUMMARY_SOURCE,
-    /view\.itemViews\.map\(\(itemView\) =>[\s\S]*key=\{itemView\.id\}[\s\S]*aria-label=\{itemView\.ariaLabel\}[\s\S]*itemView\.label[\s\S]*itemView\.description/,
-    'Notification workspace summary should render prepared summary items by stable ids.'
+    /<NewsletterFormCard view=\{pageView\.newsletterCardView\} \/>/,
+    'Notification settings should render the newsletter control card.'
   );
   assertNoLegacyNotificationCopy(NOTIFICATION_ROUTE_SOURCE);
-  assertNoLegacyNotificationCopy(NOTIFICATION_SUMMARY_SOURCE);
 });
 
 test('newsletter settings control mutates only teacher product email state', () => {

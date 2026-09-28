@@ -44,7 +44,6 @@ import {
   normalizeContactInquiryIntent,
 } from '@/contact/inquiry';
 import { buildContactClassroomInquiryScopeView, CONTACT_CLASSROOM_INQUIRY_SCOPE_ITEM_IDS } from '@/contact/inquiry-view';
-import { AUTH_WORKSPACE_BOUNDARY_ITEM_IDS, buildAuthWorkspaceBoundaryView } from '@/auth/workspace-boundary';
 import { CLASSROOM_QUERY_INDEX_CONTRACT } from '@/db/classroom-query-index-contract';
 import { CLASSROOM_QUERY_EXECUTION_CONTRACT } from '@/db/classroom-query-execution-contract';
 import { ATTEMPT_SUBMISSION_IDEMPOTENCY_STAGES } from '@/assignments/submission-idempotency';
@@ -83,10 +82,6 @@ import {
   getAdminUserListOffset,
   normalizeAdminUserSortId,
 } from '@/admin/users-query';
-import {
-  ADMIN_USERS_HANDOFF_ITEM_IDS,
-  buildAdminUsersHandoffView,
-} from '@/admin/users-view';
 import {
   buildUserFileDetailOwnerWhere,
   buildUserFileMaterialReferenceSelect,
@@ -506,21 +501,9 @@ import {
   getInitialPaymentConfirmationStatus,
 } from '@/payment/payment-status-view';
 import { buildSettingsBillingCardViewModel } from '@/payment/billing-view';
-import {
-  buildSettingsBillingPageViewModel,
-  buildSettingsBillingWorkspaceSummaryView,
-  buildSettingsPaymentPageViewModel,
-  normalizeSettingsPaymentCallback,
-} from '@/settings/billing-view';
-import {
-  buildSettingsFilesPageViewModel,
-  buildSettingsFilesWorkspaceSummaryView,
-} from '@/settings/files-view';
-import {
-  buildSettingsNotificationNewsletterCardView,
-  buildSettingsNotificationPageViewModel,
-  buildSettingsNotificationWorkspaceSummaryView,
-} from '@/settings/notifications-view';
+import { buildSettingsBillingPageViewModel, buildSettingsPaymentPageViewModel, normalizeSettingsPaymentCallback } from '@/settings/billing-view';
+import { buildSettingsFilesPageViewModel } from '@/settings/files-view';
+import { buildSettingsNotificationNewsletterCardView, buildSettingsNotificationPageViewModel } from '@/settings/notifications-view';
 import type {
   PricePlan,
   Subscription,
@@ -1926,49 +1909,20 @@ const settingsProfileViewSource = readFileSync(
   'src/settings/profile-view.ts',
   'utf8'
 );
-const profileWorkspaceSummarySource = readFileSync(
-  'src/components/settings/profile/profile-workspace-summary.tsx',
-  'utf8'
-);
 assert.match(
   settingsProfileViewSource,
-  /type SettingsProfileWorkspaceSummaryItemId =[\s\S]*'activities'[\s\S]*'assignments'[\s\S]*'results'[\s\S]*'student-recognition'/,
-  'Profile settings view model should expose stable teacher identity scope item ids.'
-);
-assert.match(
-  settingsProfileViewSource,
-  /export function buildSettingsProfilePageViewModel\(\)[\s\S]*breadcrumbs:[\s\S]*id: 'settings'[\s\S]*id: 'profile'[\s\S]*workspaceSummaryView: buildSettingsProfileWorkspaceSummaryView\(\)/,
+  /export function buildSettingsProfilePageViewModel\(\)[\s\S]*breadcrumbs:[\s\S]*id: 'settings'[\s\S]*id: 'profile'/,
   'Profile settings view model should own page breadcrumbs and the workspace identity summary.'
-);
-assert.match(
-  settingsProfileViewSource,
-  /settings_profile_workspace_summary_title[\s\S]*settings_profile_workspace_summary_description[\s\S]*settings_profile_workspace_summary_activities_description[\s\S]*settings_profile_workspace_summary_assignments_description[\s\S]*settings_profile_workspace_summary_student_description[\s\S]*settings_profile_workspace_summary_results_description/,
-  'Profile settings view model should prepare localized teacher identity scope copy.'
 );
 assert.match(
   settingsProfileRouteProductSource,
   /const pageView = buildSettingsProfilePageViewModel\(\);[\s\S]*breadcrumbs=\{pageView\.breadcrumbs\}[\s\S]*title=\{pageView\.title\}[\s\S]*description=\{pageView\.description\}/,
   'Profile settings route should consume the settings profile page view model.'
 );
-assert.match(
-  settingsProfileRouteProductSource,
-  /ProfileWorkspaceSummary[\s\S]*view=\{pageView\.workspaceSummaryView\}/,
-  'Profile settings route should render the prepared teacher identity scope summary.'
-);
 assert.doesNotMatch(
   settingsProfileRouteProductSource,
   /m\.settings_profile_title|m\.settings_profile_description|m\.common_settings/,
   'Profile settings route should not rebuild localized page copy directly.'
-);
-assert.match(
-  profileWorkspaceSummarySource,
-  /view\.itemViews\.map\(\(itemView\) =>[\s\S]*key=\{itemView\.id\}[\s\S]*itemView\.label[\s\S]*itemView\.description/,
-  'Profile workspace summary component should render prepared summary items keyed by stable ids.'
-);
-assert.doesNotMatch(
-  profileWorkspaceSummarySource,
-  /Teacher identity scope|Account workspace handoff|Activities|Assignment links|Student recognition|Results|教师身份|账号工作区交接|活动|作业链接|学生识别|结果/,
-  'Profile workspace summary component should not hard-code visible profile scope copy.'
 );
 const updatePasswordCardSource = readFileSync(
   'src/components/settings/security/update-password-card.tsx',
@@ -1982,20 +1936,12 @@ const settingsSecurityViewSource = readFileSync(
   'src/settings/security-view.ts',
   'utf8'
 );
-const securityWorkspaceSummarySource = readFileSync(
-  'src/components/settings/security/security-workspace-summary.tsx',
-  'utf8'
-);
 const settingsFilesRouteProductSource = readFileSync(
   'src/routes/settings/files.tsx',
   'utf8'
 );
 const settingsFilesViewSource = readFileSync(
   'src/settings/files-view.ts',
-  'utf8'
-);
-const filesWorkspaceSummarySource = readFileSync(
-  'src/components/settings/files/files-workspace-summary.tsx',
   'utf8'
 );
 assert.doesNotMatch(
@@ -2010,38 +1956,13 @@ assert.match(
 );
 assert.match(
   settingsSecurityViewSource,
-  /export type SettingsSecurityWorkspaceSummaryItemId =[\s\S]*'account-access'[\s\S]*'activities'[\s\S]*'assignments'[\s\S]*'student-results'/,
-  'Security settings view model should expose stable workspace boundary item ids.'
-);
-assert.match(
-  settingsSecurityViewSource,
-  /export type SettingsSecurityCapabilityId =[\s\S]*'account-deletion'[\s\S]*'email-password'/,
-  'Security settings view model should expose stable security capability ids.'
-);
-assert.match(
-  settingsSecurityViewSource,
-  /export function buildSettingsSecurityPageViewModel\(\)[\s\S]*websiteConfig\.auth\?\.enableCredentialLogin[\s\S]*websiteConfig\.auth\?\.enableDeleteAccount[\s\S]*breadcrumbs:[\s\S]*id: 'settings'[\s\S]*id: 'security'[\s\S]*workspaceSummaryView: buildSettingsSecurityWorkspaceSummaryView/,
+  /export function buildSettingsSecurityPageViewModel\(\)[\s\S]*websiteConfig\.auth\?\.enableCredentialLogin[\s\S]*websiteConfig\.auth\?\.enableDeleteAccount[\s\S]*breadcrumbs:[\s\S]*id: 'settings'[\s\S]*id: 'security'/,
   'Security settings view model should own config-aware page state, breadcrumbs, and workspace summary.'
-);
-assert.match(
-  settingsSecurityViewSource,
-  /settings_security_workspace_summary_title[\s\S]*settings_security_workspace_summary_description[\s\S]*settings_security_workspace_capabilities_description[\s\S]*settings_security_workspace_capability_password_enabled_description[\s\S]*settings_security_workspace_capability_delete_enabled_description/,
-  'Security settings view model should prepare localized workspace capability copy.'
-);
-assert.match(
-  settingsSecurityViewSource,
-  /settings_security_workspace_summary_access_description[\s\S]*settings_security_workspace_summary_activities_description[\s\S]*settings_security_workspace_summary_assignments_description[\s\S]*settings_security_workspace_summary_results_description/,
-  'Security settings view model should prepare localized workspace boundary copy.'
 );
 assert.match(
   settingsSecurityRouteProductSource,
   /const pageView = buildSettingsSecurityPageViewModel\(\);[\s\S]*breadcrumbs=\{pageView\.breadcrumbs\}[\s\S]*title=\{pageView\.title\}[\s\S]*description=\{pageView\.description\}/,
   'Security settings route should consume the settings security page view model.'
-);
-assert.match(
-  settingsSecurityRouteProductSource,
-  /SecurityWorkspaceSummary[\s\S]*view=\{pageView\.workspaceSummaryView\}/,
-  'Security settings route should render the prepared workspace security boundary summary.'
 );
 assert.match(
   settingsSecurityRouteProductSource,
@@ -2054,69 +1975,24 @@ assert.doesNotMatch(
   'Security settings route should not rebuild localized page copy or config-derived state directly.'
 );
 assert.match(
-  securityWorkspaceSummarySource,
-  /view\.itemViews\.map\(\(itemView\) =>[\s\S]*key=\{itemView\.id\}[\s\S]*function SecurityWorkspaceSummaryItem[\s\S]*itemView\.label[\s\S]*itemView\.description/,
-  'Security workspace summary component should render prepared boundary views keyed by stable ids.'
-);
-assert.match(
-  securityWorkspaceSummarySource,
-  /view\.capabilityViews\.map\(\(capabilityView\) =>[\s\S]*key=\{capabilityView\.id\}[\s\S]*function SecurityCapabilityItem[\s\S]*capabilityView\.state[\s\S]*capabilityView\.value[\s\S]*capabilityView\.description/,
-  'Security workspace summary component should render prepared capability views keyed by stable ids.'
-);
-assert.doesNotMatch(
-  securityWorkspaceSummarySource,
-  /Workspace security boundary|Account workspace handoff|Available security controls|Account access|Assignment links|Student results|Email password|Account deletion|工作区安全边界|账号工作区交接|可用安全控制|账号访问|作业链接|学生结果|邮箱密码|账号删除/,
-  'Security workspace summary component should not hard-code visible security boundary copy.'
-);
-assert.match(
-  settingsFilesViewSource,
-  /export type SettingsFilesWorkspaceSummaryItemId =[\s\S]*'activity-attachments'[\s\S]*'ai-provenance'[\s\S]*'source-library'[\s\S]*'student-privacy'/,
-  'Files settings view model should expose stable classroom material boundary item ids.'
-);
-assert.match(
-  settingsFilesViewSource,
-  /export type SettingsFilesWorkspaceSummaryItemView = \{[\s\S]*ariaLabel: string;[\s\S]*description: string;[\s\S]*id: SettingsFilesWorkspaceSummaryItemId;[\s\S]*label: string;/,
-  'Files settings workspace summary items should expose prepared aria labels.'
-);
-assert.match(
   settingsFilesViewSource,
   /export function isSettingsFilesEnabled\(\)[\s\S]*websiteConfig\.storage\?\.enable === true/,
   'Files settings feature visibility should be centralized in the settings files view helper.'
 );
 assert.match(
   settingsFilesViewSource,
-  /export function buildSettingsFilesPageViewModel\(\)[\s\S]*breadcrumbs:[\s\S]*id: 'settings'[\s\S]*id: 'files'[\s\S]*workspaceSummaryView: buildSettingsFilesWorkspaceSummaryView/,
+  /export function buildSettingsFilesPageViewModel\(\)[\s\S]*breadcrumbs:[\s\S]*id: 'settings'[\s\S]*id: 'files'/,
   'Files settings view model should own localized page state, breadcrumbs, and workspace summary.'
 );
 assert.match(
-  settingsFilesViewSource,
-  /settings_files_workspace_summary_title[\s\S]*settings_files_workspace_summary_description[\s\S]*settings_files_workspace_summary_library_description[\s\S]*settings_files_workspace_summary_attachments_description[\s\S]*settings_files_workspace_summary_ai_description[\s\S]*settings_files_workspace_summary_privacy_description/,
-  'Files settings view model should prepare localized classroom material boundary copy.'
-);
-assert.match(
-  settingsFilesViewSource,
-  /function buildSettingsFilesWorkspaceSummaryItemView[\s\S]*settings_files_workspace_summary_aria_label\(\{[\s\S]*description,[\s\S]*title: label/,
-  'Files settings view model should build item-level accessible labels from localized copy.'
-);
-assert.match(
   settingsFilesRouteProductSource,
-  /const pageView = buildSettingsFilesPageViewModel\(\);[\s\S]*breadcrumbs=\{pageView\.breadcrumbs\}[\s\S]*title=\{pageView\.title\}[\s\S]*FilesWorkspaceSummary[\s\S]*view=\{pageView\.workspaceSummaryView\}[\s\S]*FilesPageContent/,
+  /const pageView = buildSettingsFilesPageViewModel\(\);[\s\S]*breadcrumbs=\{pageView\.breadcrumbs\}[\s\S]*title=\{pageView\.title\}[\s\S]*FilesPageContent/,
   'Files settings route should consume the settings files page view model and render the prepared material boundary summary.'
 );
 assert.doesNotMatch(
   settingsFilesRouteProductSource,
   /m\.settings_files_|m\.common_settings|websiteConfig\.storage/,
   'Files settings route should not rebuild localized files page copy or feature visibility directly.'
-);
-assert.match(
-  filesWorkspaceSummarySource,
-  /view\.itemViews\.map\(\(itemView\) =>[\s\S]*key=\{itemView\.id\}[\s\S]*function FilesWorkspaceSummaryItem[\s\S]*aria-label=\{itemView\.ariaLabel\}[\s\S]*itemView\.label[\s\S]*itemView\.description/,
-  'Files workspace summary component should render prepared boundary views keyed by stable ids.'
-);
-assert.doesNotMatch(
-  filesWorkspaceSummarySource,
-  /Classroom material boundary|Source material library|Activity attachments|AI draft provenance|Student payload privacy|课堂素材边界|来源素材库|活动附件|AI 草稿来源|学生载荷隐私/,
-  'Files workspace summary component should not hard-code visible material boundary copy.'
 );
 const deleteAccountCardSource = readFileSync(
   'src/components/settings/security/delete-account-card.tsx',
@@ -2147,10 +2023,6 @@ const adminUsersRouteSource = readFileSync(
 const adminUsersViewSource = readFileSync('src/admin/users-view.ts', 'utf8');
 const adminUsersContentSource = readFileSync(
   'src/components/admin/users/admin-users-content.tsx',
-  'utf8'
-);
-const adminUsersHandoffPanelSource = readFileSync(
-  'src/components/admin/users/admin-users-handoff-panel.tsx',
   'utf8'
 );
 const useAuthSource = readFileSync('src/hooks/use-auth.ts', 'utf8');
@@ -2204,48 +2076,6 @@ assert.match(
   /const message = m\.admin_users_unban_error\(\);/,
   'Admin user unban failures should use the localized unban failure message.'
 );
-assert.deepEqual(ADMIN_USERS_HANDOFF_ITEM_IDS, [
-  'admin-scope',
-  'route-gate',
-  'admin-role-boundary',
-  'user-list-query',
-  'search-state',
-  'role-filter',
-  'status-filter',
-  'sort-state',
-  'pagination-state',
-  'visible-rows',
-  'total-users',
-  'loading-state',
-  'table-columns',
-  'name-column',
-  'email-column',
-  'email-copy-action',
-  'email-verification-status',
-  'role-column',
-  'status-column',
-  'ban-reason-column',
-  'ban-expiry-column',
-  'detail-drawer',
-  'ban-action',
-  'unban-action',
-  'ban-reason-required',
-  'ban-expiry-optional',
-  'mutation-feedback',
-  'activity-content-boundary',
-  'assignment-link-boundary',
-  'student-result-boundary',
-]);
-assert.match(
-  adminUsersViewSource,
-  /export const ADMIN_USERS_HANDOFF_ITEM_IDS = \[(?=[\s\S]*'admin-scope')(?=[\s\S]*'route-gate')(?=[\s\S]*'admin-role-boundary')(?=[\s\S]*'user-list-query')(?=[\s\S]*'search-state')(?=[\s\S]*'role-filter')(?=[\s\S]*'status-filter')(?=[\s\S]*'sort-state')(?=[\s\S]*'pagination-state')(?=[\s\S]*'visible-rows')(?=[\s\S]*'total-users')(?=[\s\S]*'loading-state')(?=[\s\S]*'table-columns')(?=[\s\S]*'name-column')(?=[\s\S]*'email-column')(?=[\s\S]*'email-copy-action')(?=[\s\S]*'email-verification-status')(?=[\s\S]*'role-column')(?=[\s\S]*'status-column')(?=[\s\S]*'ban-reason-column')(?=[\s\S]*'ban-expiry-column')(?=[\s\S]*'detail-drawer')(?=[\s\S]*'ban-action')(?=[\s\S]*'unban-action')(?=[\s\S]*'ban-reason-required')(?=[\s\S]*'ban-expiry-optional')(?=[\s\S]*'mutation-feedback')(?=[\s\S]*'activity-content-boundary')(?=[\s\S]*'assignment-link-boundary')(?=[\s\S]*'student-result-boundary')/,
-  'Admin users handoff should expose stable 30-slice teacher-account governance item ids.'
-);
-assert.match(
-  adminUsersViewSource,
-  /export type AdminUsersHandoffPrivacyContract = \{[\s\S]*changesActivityContent: false;[\s\S]*changesAssignmentLinks: false;[\s\S]*exposesActivityContent: false;[\s\S]*exposesAssignmentSnapshots: false;[\s\S]*exposesRawStudentIdentifiers: false;[\s\S]*exposesSearchText: false;[\s\S]*exposesSourceMaterialStorageKeys: false;[\s\S]*exposesStudentAnswers: false;[\s\S]*exposesUserEmails: false;[\s\S]*scope: 'admin-user-governance';/,
-  'Admin users handoff should publish explicit privacy and classroom data-boundary flags.'
-);
 assert.match(
   adminUsersViewSource,
   /buildAdminUsersPageViewModel[\s\S]*id: 'admin'[\s\S]*id: 'users'[\s\S]*contentAriaLabel: m\.admin_users_content_aria_label/,
@@ -2255,82 +2085,6 @@ assert.match(
   adminUsersRouteSource,
   /buildAdminUsersPageViewModel\(\)[\s\S]*DashboardHeader breadcrumbs=\{pageView\.breadcrumbs\}[\s\S]*aria-label=\{pageView\.contentAriaLabel\}/,
   'Admin users route should render the prepared page view model instead of hand-writing route copy.'
-);
-assert.match(
-  adminUsersContentSource,
-  /buildAdminUsersHandoffView\(\{[\s\S]*filters: clientFilters[\s\S]*loading: isLoading[\s\S]*pageIndex: page[\s\S]*pageSize: size[\s\S]*search,[\s\S]*sorting: effectiveSort[\s\S]*total: data\?\.total \?\? 0[\s\S]*visibleCount: data\?\.items\.length \?\? 0[\s\S]*<AdminUsersHandoffPanel handoffView=\{handoffView\} \/>[\s\S]*<UsersTable/,
-  'Admin users content should prepare the handoff view from current filters, query state, and result counts before rendering the table.'
-);
-assert.match(
-  adminUsersHandoffPanelSource,
-  /aria-label=\{handoffView\.title\}[\s\S]*handoffView\.itemViews\.map\(\(itemView\) =>[\s\S]*key=\{itemView\.id\}[\s\S]*<output aria-label=\{itemView\.ariaLabel\}/,
-  'Admin users handoff panel should render semantic item outputs from prepared item views.'
-);
-assert.doesNotMatch(
-  `${adminUsersViewSource}\n${adminUsersHandoffPanelSource}`,
-  /Teacher account governance|Protected admin route|Clipboard guarded|Private results|教师账号治理|管理员路由门禁|剪贴板受控|私密结果/,
-  'Admin users handoff source and panel should read visible governance copy from locale messages.'
-);
-const adminUsersHandoffView = buildAdminUsersHandoffView({
-  filters: [
-    { id: 'role', value: 'user' },
-    { id: 'status', value: 'inactive' },
-  ],
-  loading: false,
-  pageIndex: 1,
-  pageSize: 25,
-  search: 'private teacher email search',
-  sorting: [{ id: 'email', desc: false }],
-  total: 42,
-  visibleCount: 25,
-});
-const adminUsersHandoffItemIds = adminUsersHandoffView.itemViews.map(
-  (item) => item.id
-);
-assert.deepEqual(adminUsersHandoffItemIds, [
-  ...ADMIN_USERS_HANDOFF_ITEM_IDS,
-]);
-assert.deepEqual(adminUsersHandoffView.privacy, {
-  changesActivityContent: false,
-  changesAssignmentLinks: false,
-  exposesActivityContent: false,
-  exposesAssignmentSnapshots: false,
-  exposesRawStudentIdentifiers: false,
-  exposesSearchText: false,
-  exposesSourceMaterialStorageKeys: false,
-  exposesStudentAnswers: false,
-  exposesUserEmails: false,
-  itemIds: adminUsersHandoffItemIds,
-  scope: 'admin-user-governance',
-});
-assert.deepEqual(
-  adminUsersHandoffView.itemViews
-    .filter((item) =>
-      [
-        'search-state',
-        'role-filter',
-        'status-filter',
-        'sort-state',
-        'pagination-state',
-        'assignment-link-boundary',
-        'student-result-boundary',
-      ].includes(item.id)
-    )
-    .map((item) => [item.id, item.value]),
-  [
-    ['search-state', 'Search active'],
-    ['role-filter', 'Teacher'],
-    ['status-filter', 'Inactive'],
-    ['sort-state', 'Email ascending'],
-    ['pagination-state', 'Page 2 · 25 per page'],
-    ['assignment-link-boundary', 'No link changes'],
-    ['student-result-boundary', 'Private results'],
-  ]
-);
-assert.doesNotMatch(
-  JSON.stringify(adminUsersHandoffView),
-  /private teacher email search|teacher-private@example\.test|anonymous-browser-token|source-materials\/private\/key\.pdf|student wrote the private answer/,
-  'Admin users handoff should not serialize search text, email values, storage keys, raw student tokens, or student answers.'
 );
 assert.doesNotMatch(
   useAuthSource,
@@ -7348,10 +7102,6 @@ const authCardSource = readFileSync(
   'src/components/auth/auth-card.tsx',
   'utf8'
 );
-const authWorkspaceBoundarySource = readFileSync(
-  'src/auth/workspace-boundary.ts',
-  'utf8'
-);
 const authErrorRecoverySource = readFileSync(
   'src/auth/error-recovery.ts',
   'utf8'
@@ -8103,31 +7853,6 @@ assert.doesNotMatch(
   /PublicTemplateEntryHandoffPanel|public-template-entry-handoff-panel|data-handoff="public-template-entry"|data-handoff-item|pageView\.handoffView/,
   'Worksheets route should keep internal template-entry handoff markup out of the public page.'
 );
-assert.match(
-  authCardSource,
-  /type AuthCardBenefitItem = \{[\s\S]*id: string;[\s\S]*text: string;[\s\S]*benefits\?: AuthCardBenefitItem\[\];[\s\S]*key=\{benefit\.id\}[\s\S]*benefit\.text/,
-  'Auth cards should render benefit rows from structured benefit ids and text.'
-);
-assert.match(
-  authCardSource,
-  /type AuthWorkflowStep = \{[\s\S]*id: string;[\s\S]*workflowSteps\?: AuthWorkflowStep\[\];[\s\S]*key=\{step\.id\}/,
-  'Auth cards should render workflow steps from stable step ids.'
-);
-assert.match(
-  authWorkspaceBoundarySource,
-  /AUTH_WORKSPACE_BOUNDARY_ITEM_IDS[\s\S]*'account-access'[\s\S]*'activity-library'[\s\S]*'assignment-links'[\s\S]*'student-results'[\s\S]*'source-materials'/,
-  'Auth workspace-boundary domain should own stable account boundary item ids.'
-);
-assert.doesNotMatch(
-  authWorkspaceBoundarySource,
-  /Teacher workspace boundary|Account access|Activity library|Assignment links|Student results|Source materials/,
-  'Auth workspace-boundary domain should read visible copy from locale messages.'
-);
-assert.match(
-  authCardSource,
-  /AuthWorkspaceBoundaryView[\s\S]*workspaceBoundary\?: AuthWorkspaceBoundaryView[\s\S]*AuthWorkspaceBoundaryPanel[\s\S]*view\.items\.map\(\(item\) =>[\s\S]*key=\{item\.id\}[\s\S]*item\.label[\s\S]*item\.description/,
-  'Auth cards should render the prepared workspace-boundary view from stable item ids.'
-);
 assert.doesNotMatch(
   authCardSource,
   /auth-workspace-handoff|data-handoff="auth-workspace-boundary"|data-handoff-item|view\.itemViews\.map/,
@@ -8145,7 +7870,7 @@ assert.doesNotMatch(
 );
 assert.match(
   authErrorCardSource,
-  /buildAuthErrorRecoveryView[\s\S]*getKnownAuthErrorMessage\(errorCode\)[\s\S]*workspaceBoundary=\{buildAuthWorkspaceBoundaryView\(\)\}[\s\S]*recoveryView\.steps\.map\(\(step\) =>[\s\S]*key=\{step\.id\}/,
+  /buildAuthErrorRecoveryView[\s\S]*getKnownAuthErrorMessage\(errorCode\)[\s\S]*recoveryView\.steps\.map\(\(step\) =>[\s\S]*key=\{step\.id\}/,
   'Auth error card should render prepared recovery and workspace-boundary views.'
 );
 assert.doesNotMatch(
@@ -8200,36 +7925,6 @@ assert.doesNotMatch(
   authCardSource,
   /key=\{benefit\}|key=\{`\$\{step\.label\}-\$\{step\.title\}`\}/,
   'Auth cards should not key benefit or workflow rows by localized copy.'
-);
-assert.match(
-  loginFormSource,
-  /benefits=\{\[[\s\S]*id: 'progress'[\s\S]*auth_login_benefit_progress[\s\S]*id: 'worksheets'[\s\S]*auth_login_benefit_worksheets[\s\S]*id: 'review'[\s\S]*auth_login_benefit_review/,
-  'Login form should pass structured auth benefit rows.'
-);
-assert.match(
-  registerFormSource,
-  /benefits=\{\[[\s\S]*id: 'progress'[\s\S]*auth_register_benefit_progress[\s\S]*id: 'worksheets'[\s\S]*auth_register_benefit_worksheets[\s\S]*id: 'review'[\s\S]*auth_register_benefit_review/,
-  'Register form should pass structured auth benefit rows.'
-);
-assert.match(
-  loginFormSource,
-  /buildAuthWorkspaceBoundaryView[\s\S]*workspaceBoundary=\{buildAuthWorkspaceBoundaryView\(\)\}/,
-  'Login form should render the teacher workspace boundary before sign-in.'
-);
-assert.match(
-  registerFormSource,
-  /buildAuthWorkspaceBoundaryView[\s\S]*workspaceBoundary=\{buildAuthWorkspaceBoundaryView\(\)\}/,
-  'Register form should render the teacher workspace boundary before account creation.'
-);
-assert.match(
-  forgotPasswordFormSource,
-  /buildAuthWorkspaceBoundaryView[\s\S]*workspaceBoundary=\{buildAuthWorkspaceBoundaryView\(\)\}/,
-  'Forgot-password form should render the teacher workspace boundary before reset requests.'
-);
-assert.match(
-  resetPasswordFormSource,
-  /buildAuthWorkspaceBoundaryView[\s\S]*workspaceBoundary=\{buildAuthWorkspaceBoundaryView\(\)\}[\s\S]*workspaceBoundary=\{buildAuthWorkspaceBoundaryView\(\)\}/,
-  'Reset-password form should render the teacher workspace boundary for invalid and active reset states.'
 );
 assert.match(
   worksheetsRouteSource,
@@ -9991,10 +9686,6 @@ const settingsNotificationViewSource = readFileSync(
   'src/settings/notifications-view.ts',
   'utf8'
 );
-const notificationWorkspaceSummarySource = readFileSync(
-  'src/components/settings/notification/notification-workspace-summary.tsx',
-  'utf8'
-);
 const newsletterHookSource = readFileSync('src/hooks/use-newsletter.ts', 'utf8');
 assert.doesNotMatch(
   newsletterFormCardSource,
@@ -10048,11 +9739,6 @@ assert.doesNotMatch(
 );
 assert.match(
   settingsNotificationViewSource,
-  /export type SettingsNotificationWorkspaceSummaryItemId =[\s\S]*'assignment-review'[\s\S]*'teacher-control'[\s\S]*'template-updates'[\s\S]*'worksheet-workflows'/,
-  'Notification settings view model should expose stable classroom update boundary item ids.'
-);
-assert.match(
-  settingsNotificationViewSource,
   /export type SettingsNotificationNewsletterCardView = \{[\s\S]*ariaLabel: string;[\s\S]*emailRequiredMessage: string;[\s\S]*formAriaLabel: string;[\s\S]*hintAriaLabel: string;[\s\S]*scopeAriaLabel: string;[\s\S]*scopeDescription: string;[\s\S]*scopeLabel: string;[\s\S]*subscribeSuccessMessage: string;[\s\S]*switchAriaLabel: string;[\s\S]*switchDescription: string;[\s\S]*switchGroupAriaLabel: string;[\s\S]*unsubscribeSuccessMessage: string;/,
   'Notification settings view model should expose prepared newsletter card copy, switch descriptions, update scope, and semantic labels.'
 );
@@ -10063,13 +9749,8 @@ assert.match(
 );
 assert.match(
   settingsNotificationViewSource,
-  /export function buildSettingsNotificationPageViewModel\(\)[\s\S]*breadcrumbs:[\s\S]*id: 'settings'[\s\S]*id: 'notifications'[\s\S]*contentAriaLabel: m\.settings_notification_content_aria_label[\s\S]*newsletterCardView: buildSettingsNotificationNewsletterCardView\(\)[\s\S]*newsletterSectionAriaLabel:[\s\S]*settings_notification_newsletter_section_aria_label[\s\S]*workspaceSummaryView: buildSettingsNotificationWorkspaceSummaryView/,
+  /export function buildSettingsNotificationPageViewModel\(\)[\s\S]*breadcrumbs:[\s\S]*id: 'settings'[\s\S]*id: 'notifications'[\s\S]*contentAriaLabel: m\.settings_notification_content_aria_label[\s\S]*newsletterCardView: buildSettingsNotificationNewsletterCardView\(\)[\s\S]*newsletterSectionAriaLabel:[\s\S]*settings_notification_newsletter_section_aria_label/,
   'Notification settings view model should own localized page state, breadcrumbs, section semantics, workspace summary, and newsletter card view.'
-);
-assert.match(
-  settingsNotificationViewSource,
-  /settings_notification_workspace_summary_title[\s\S]*settings_notification_workspace_summary_description[\s\S]*buildSettingsNotificationWorkspaceSummaryItemView[\s\S]*settings_notification_workspace_summary_templates_description[\s\S]*settings_notification_workspace_summary_worksheets_description[\s\S]*settings_notification_workspace_summary_review_description[\s\S]*settings_notification_workspace_summary_control_description[\s\S]*settings_notification_workspace_summary_item_aria_label/,
-  'Notification settings view model should prepare localized classroom update boundary copy and item semantics.'
 );
 assert.match(
   settingsNotificationViewSource,
@@ -10078,23 +9759,13 @@ assert.match(
 );
 assert.match(
   settingsNotificationRouteProductSource,
-  /const pageView = buildSettingsNotificationPageViewModel\(\);[\s\S]*breadcrumbs=\{pageView\.breadcrumbs\}[\s\S]*title=\{pageView\.title\}[\s\S]*aria-label=\{pageView\.contentAriaLabel\}[\s\S]*NotificationWorkspaceSummary[\s\S]*view=\{pageView\.workspaceSummaryView\}[\s\S]*aria-label=\{pageView\.newsletterSectionAriaLabel\}[\s\S]*NewsletterFormCard[\s\S]*view=\{pageView\.newsletterCardView\}/,
+  /const pageView = buildSettingsNotificationPageViewModel\(\);[\s\S]*breadcrumbs=\{pageView\.breadcrumbs\}[\s\S]*title=\{pageView\.title\}[\s\S]*aria-label=\{pageView\.contentAriaLabel\}[\s\S]*aria-label=\{pageView\.newsletterSectionAriaLabel\}[\s\S]*NewsletterFormCard[\s\S]*view=\{pageView\.newsletterCardView\}/,
   'Notification settings route should consume the notification page view model and render prepared classroom update, newsletter views, and section semantics.'
 );
 assert.doesNotMatch(
   settingsNotificationRouteProductSource,
   /m\.settings_notification_|m\.common_settings|websiteConfig\.newsletter/,
   'Notification settings route should not rebuild localized update page copy or feature visibility directly.'
-);
-assert.match(
-  notificationWorkspaceSummarySource,
-  /view\.itemViews\.map\(\(itemView\) =>[\s\S]*key=\{itemView\.id\}[\s\S]*function NotificationWorkspaceSummaryItem[\s\S]*aria-label=\{itemView\.ariaLabel\}[\s\S]*itemView\.label[\s\S]*itemView\.description/,
-  'Notification workspace summary component should render prepared boundary views and item semantics keyed by stable ids.'
-);
-assert.doesNotMatch(
-  notificationWorkspaceSummarySource,
-  /Classroom update boundary|Classroom update handoff|Template updates|Worksheet workflows|Assignment review|Teacher control|No student reminders|No link changes|No learner notifications|Private data omitted|课堂更新边界|课堂更新交接|模板更新|练习纸工作流|作业复盘|教师控制|不发送学生提醒|不改链接|不通知学习者|已省略私有数据/,
-  'Notification workspace summary component should not hard-code visible update boundary copy.'
 );
 const billingCardSource = readFileSync(
   'src/components/settings/billing/billing-card.tsx',
@@ -10103,10 +9774,6 @@ const billingCardSource = readFileSync(
 const billingViewSource = readFileSync('src/payment/billing-view.ts', 'utf8');
 const settingsBillingViewSource = readFileSync(
   'src/settings/billing-view.ts',
-  'utf8'
-);
-const billingWorkspaceSummarySource = readFileSync(
-  'src/components/settings/billing/billing-workspace-summary.tsx',
   'utf8'
 );
 const paymentCardSource = readFileSync(
@@ -10164,17 +9831,12 @@ assert.match(
 );
 assert.match(
   settingsBillingViewSource,
-  /export type SettingsBillingWorkspaceSummaryItemId =[\s\S]*'activity-library'[\s\S]*'assignment-workflow'[\s\S]*'plan-access'[\s\S]*'results-ai'/,
-  'Settings billing view model should expose stable workspace billing boundary item ids.'
-);
-assert.match(
-  settingsBillingViewSource,
   /export function isSettingsBillingEnabled\(\)[\s\S]*websiteConfig\.payment\?\.enable === true/,
   'Settings billing feature visibility should be centralized in the settings billing view helper.'
 );
 assert.match(
   settingsBillingViewSource,
-  /export function buildSettingsBillingPageViewModel\(\)[\s\S]*breadcrumbs:[\s\S]*id: 'settings'[\s\S]*id: 'billing'[\s\S]*contentAriaLabel: m\.settings_billing_content_aria_label[\s\S]*planSectionAriaLabel: m\.settings_billing_plan_section_aria_label[\s\S]*workspaceSummaryView: buildSettingsBillingWorkspaceSummaryView/,
+  /export function buildSettingsBillingPageViewModel\(\)[\s\S]*breadcrumbs:[\s\S]*id: 'settings'[\s\S]*id: 'billing'[\s\S]*contentAriaLabel: m\.settings_billing_content_aria_label[\s\S]*planSectionAriaLabel: m\.settings_billing_plan_section_aria_label/,
   'Settings billing page view model should own localized page state, breadcrumbs, section semantics, and workspace summary.'
 );
 assert.match(
@@ -10186,21 +9848,6 @@ assert.match(
   settingsBillingViewSource,
   /export function normalizeSettingsPaymentCallback\(callback\?: string\)[\s\S]*getSafeCallbackPath\(callback, SETTINGS_PAYMENT_DEFAULT_CALLBACK\)/,
   'Settings payment callback normalization should reuse the shared safe-callback path helper.'
-);
-assert.match(
-  settingsBillingViewSource,
-  /settings_billing_workspace_summary_title[\s\S]*settings_billing_workspace_summary_description[\s\S]*buildSettingsBillingWorkspaceSummaryItemView[\s\S]*settings_billing_workspace_summary_plan_description[\s\S]*settings_billing_workspace_summary_activities_description[\s\S]*settings_billing_workspace_summary_assignments_description[\s\S]*settings_billing_workspace_summary_results_description[\s\S]*settings_billing_workspace_summary_item_aria_label/,
-  'Settings billing view model should prepare localized workspace billing boundary copy and item semantics.'
-);
-assert.match(
-  billingWorkspaceSummarySource,
-  /view\.itemViews\.map\(\(itemView\) =>[\s\S]*key=\{itemView\.id\}[\s\S]*function BillingWorkspaceSummaryItem[\s\S]*aria-label=\{itemView\.ariaLabel\}[\s\S]*itemView\.label[\s\S]*itemView\.description/,
-  'Billing workspace summary component should render prepared boundary views and item semantics keyed by stable ids.'
-);
-assert.doesNotMatch(
-  billingWorkspaceSummarySource,
-  /Workspace billing boundary|Billing workspace handoff|Plan access|Activity library|Assignment workflow|Results and AI|Teacher billing workspace|Hosted checkout|Provider secrets hidden|Student data unchanged|工作区账单边界|账单工作区交接|方案权限|活动库|作业工作流|结果和 AI|教师账单工作区|托管结账|已隐藏服务商密钥|学生数据不变/,
-  'Billing workspace summary component should not hard-code visible billing boundary copy.'
 );
 assert.match(
   paymentCardSource,
@@ -10236,25 +9883,12 @@ overwriteGetLocale(() => 'en');
 const filesPageView = buildSettingsFilesPageViewModel();
 assert.equal(filesPageView.breadcrumbs.at(-1)?.id, 'files');
 assert.equal(filesPageView.title, 'Files');
-const filesWorkspaceSummaryItemIds = filesPageView.workspaceSummaryView.itemViews
-  .map((item) => item.id)
-  .join(',');
-assert.equal(
-  filesWorkspaceSummaryItemIds,
-  'source-library,activity-attachments,ai-provenance,student-privacy'
-);
-assert.match(
-  filesPageView.workspaceSummaryView.description,
-  /teacher-owned classroom source materials/
-);
-const filesWorkspaceSummaryView = buildSettingsFilesWorkspaceSummaryView();
-assert.equal(filesWorkspaceSummaryView.itemViews.length, 4);
 const notificationPageView = buildSettingsNotificationPageViewModel();
 assert.equal(notificationPageView.breadcrumbs.at(-1)?.id, 'notifications');
 assert.equal(notificationPageView.title, 'Updates');
 assert.equal(
   notificationPageView.contentAriaLabel,
-  'Updates: Choose whether this teacher workspace receives ClassGamify product updates.'
+  'Updates: Choose whether you receive ClassGamify product update emails.'
 );
 assert.equal(
   notificationPageView.newsletterSectionAriaLabel,
@@ -10293,45 +9927,6 @@ assert.deepEqual(
       'Receive ClassGamify updates: Turns update emails on or off for template changes, worksheet workflows, and result-review improvements only.',
   }
 );
-const notificationWorkspaceSummaryItemIds =
-  notificationPageView.workspaceSummaryView.itemViews
-    .map((item) => item.id)
-    .join(',');
-assert.equal(
-  notificationWorkspaceSummaryItemIds,
-  'template-updates,worksheet-workflows,assignment-review,teacher-control'
-);
-assert.match(
-  notificationPageView.workspaceSummaryView.description,
-  /teacher workspace/
-);
-assert.deepEqual(
-  notificationPageView.workspaceSummaryView.itemViews.map((item) => [
-    item.id,
-    item.ariaLabel,
-  ]),
-  [
-    [
-      'template-updates',
-      'Template updates: Template updates cover quiz games, matching activities, category sorting, reveal boxes, pair matching, and remix readiness improvements.',
-    ],
-    [
-      'worksheet-workflows',
-      'Worksheet workflows: Worksheet updates cover fill-in-the-blank practice, line matching, listening activities, source-material workflows, and future extraction tools.',
-    ],
-    [
-      'assignment-review',
-      'Assignment review: Result-review updates focus on classroom briefs, reteach plans, exports, and follow-up workflows teachers use after student attempts.',
-    ],
-    [
-      'teacher-control',
-      'Teacher control: Teachers can pause or resume these classroom update emails at any time without changing account access, activities, assignments, or results.',
-    ],
-  ]
-);
-const notificationWorkspaceSummaryView =
-  buildSettingsNotificationWorkspaceSummaryView();
-assert.equal(notificationWorkspaceSummaryView.itemViews.length, 4);
 const notificationNewsletterCardView =
   buildSettingsNotificationNewsletterCardView();
 assert.match(
@@ -10367,50 +9962,12 @@ assert.equal(billingPageView.breadcrumbs.at(-1)?.id, 'billing');
 assert.equal(billingPageView.title, 'Billing');
 assert.equal(
   billingPageView.contentAriaLabel,
-  'Billing: Review your ClassGamify workspace access, hosted checkout status, assignment workflow limits, and plan management options'
+  'Billing: Your current plan and billing.'
 );
 assert.equal(
   billingPageView.planSectionAriaLabel,
   'Current ClassGamify plan and hosted billing controls'
 );
-const billingWorkspaceSummaryItemIds =
-  billingPageView.workspaceSummaryView.itemViews
-    .map((item) => item.id)
-    .join(',');
-assert.equal(
-  billingWorkspaceSummaryItemIds,
-  'plan-access,activity-library,assignment-workflow,results-ai'
-);
-assert.match(
-  billingPageView.workspaceSummaryView.description,
-  /Billing connects hosted checkout status/
-);
-assert.deepEqual(
-  billingPageView.workspaceSummaryView.itemViews.map((item) => [
-    item.id,
-    item.ariaLabel,
-  ]),
-  [
-    [
-      'plan-access',
-      'Plan access: The current plan is the source of truth for which teacher workspace capabilities are included, upgradeable, or managed in the hosted billing portal.',
-    ],
-    [
-      'activity-library',
-      'Activity library: Plan access can shape how many saved activity sets, source-material workflows, and reusable template remixes fit into the teacher workspace.',
-    ],
-    [
-      'assignment-workflow',
-      'Assignment workflow: Assignment limits and upgrade paths should be checked before sending links with timers, attempt rules, shuffle policy, or close times to a class.',
-    ],
-    [
-      'results-ai',
-      'Results and AI: Result exports, classroom briefs, AI-assisted drafting, and future school workspace needs stay tied to the same plan boundary.',
-    ],
-  ]
-);
-const billingWorkspaceSummaryView = buildSettingsBillingWorkspaceSummaryView();
-assert.equal(billingWorkspaceSummaryView.itemViews.length, 4);
 const paymentPageView = buildSettingsPaymentPageViewModel({
   callback: '/dashboard/assignments',
 });
@@ -10524,7 +10081,7 @@ const loadingBillingView = buildSettingsBillingCardViewModel({
 assert.equal(loadingBillingView.state, 'loading');
 assert.equal(
   loadingBillingView.ariaLabel,
-  'Current plan: Your ClassGamify plan, activity access, assignment workflow limits, and hosted billing status'
+  'Current plan: Your plan and what it includes.'
 );
 assert.equal(loadingBillingView.action, undefined);
 const errorBillingView = buildSettingsBillingCardViewModel({
@@ -10583,7 +10140,7 @@ assert.equal(
   freeBillingView.action?.ariaLabel,
   'View ClassGamify plans. Billing action for the current ClassGamify teacher workspace.'
 );
-assert.match(freeBillingView.plan?.message ?? '', /classroom activity workflow/);
+assert.match(freeBillingView.plan?.message ?? '', /starter activities and student previews/);
 assert.deepEqual(
   freeBillingView.plan?.featureSections.map((section) => [
     section.id,
@@ -10593,12 +10150,12 @@ assert.deepEqual(
   [
     [
       'features',
-      'Included classroom access: Configured plan capabilities for reusable classroom activities, assignment links, AI drafts, and result workflows.',
+      'Included classroom access: What your plan includes.',
       ['Create classroom activities', 'Open student preview links'],
     ],
     [
       'limits',
-      'Upgrade path: Capabilities that may need an upgrade, school plan, or future workspace expansion.',
+      'Upgrade path: Available on a paid plan.',
       ['AI drafts', 'Result exports'],
     ],
   ]
@@ -10609,7 +10166,7 @@ assert.match(
 );
 assert.match(
   freeBillingView.plan?.nextStep.description ?? '',
-  /assignment handoffs/
+  /publish assignments every week/
 );
 assert.doesNotMatch(
   freeBillingView.plan?.message ?? '',
@@ -12654,14 +12211,6 @@ assert.match(
   /public classroom contact intake[\s\S]*auth workspace entry[\s\S]*transactional mail lifecycle[\s\S]*teacher notification settings[\s\S]*hosted billing[\s\S]*legal\/provider copy[\s\S]*developer configuration secrets[\s\S]*public DOM handoff boundaries/,
   'TEST-CATALOG should describe the full classroom trust communication chain scope.'
 );
-assert.deepEqual(
-  [
-    ADMIN_USERS_HANDOFF_ITEM_IDS.length,
-    STORAGE_FILE_ACCESS_ITEM_IDS.length,
-  ],
-  Array.from({ length: 2 }, () => 30),
-  'Account governance lifecycle chain should stay backed by focused auth, settings, admin, files, billing, payment callback, notification, and storage gates.'
-);
 assert.match(
   readFileSync('tests/e2e/TEST-CATALOG.md', 'utf8'),
   /Account governance lifecycle chain has a fast script-level gate via[\s\S]*scripts\/account-governance-lifecycle-chain\.test\.ts/,
@@ -12858,7 +12407,7 @@ for (const [source, breadcrumbId] of [
 }
 assert.match(
   settingsBillingRouteSource,
-  /const pageView = buildSettingsBillingPageViewModel\(\);[\s\S]*breadcrumbs=\{pageView\.breadcrumbs\}[\s\S]*aria-label=\{pageView\.contentAriaLabel\}[\s\S]*BillingWorkspaceSummary[\s\S]*view=\{pageView\.workspaceSummaryView\}[\s\S]*aria-label=\{pageView\.planSectionAriaLabel\}[\s\S]*BillingCard/,
+  /const pageView = buildSettingsBillingPageViewModel\(\);[\s\S]*breadcrumbs=\{pageView\.breadcrumbs\}[\s\S]*aria-label=\{pageView\.contentAriaLabel\}[\s\S]*aria-label=\{pageView\.planSectionAriaLabel\}[\s\S]*BillingCard/,
   'Settings billing route should consume the billing page view model and render the prepared workspace billing summary and plan section semantics.'
 );
 assert.doesNotMatch(
@@ -12929,22 +12478,12 @@ const contactMessageBoundaryRequirements = [
     enLocaleMessages,
     'en',
     [
-      ['mail_contact_message_subject', /ClassGamify classroom and product inquiry/],
-      ['mail_contact_message_intro', /teacher, tutor, parent, or school team/],
-      ['mail_contact_message_type_classroom', /Classroom workflow/],
-      ['mail_contact_message_classroom_heading', /Classroom workflow details/],
-      ['mail_contact_message_classroom_need', /Template, worksheet, or result need/],
     ],
   ],
   [
     zhLocaleMessages,
     'zh',
     [
-      ['mail_contact_message_subject', /ClassGamify 课堂与产品咨询/],
-      ['mail_contact_message_intro', /老师、辅导者、家长或学校团队/],
-      ['mail_contact_message_type_classroom', /课堂工作流/],
-      ['mail_contact_message_classroom_heading', /课堂工作流信息/],
-      ['mail_contact_message_classroom_need', /模板、练习纸或结果需求/],
     ],
   ],
 ] as const;
@@ -12966,20 +12505,12 @@ const editorialNavigationMessageRequirements = [
     enLocaleMessages,
     'en',
     [
-      ['blog_description', /templates, assignment links, AI drafting/],
-      ['changelog_description', /student runners, AI drafts, and teacher results/],
-      ['changelog_subtitle', /activity -> assignment -> attempt -> results loop/],
-      ['nav_changelog_description', /activities, assignments, AI drafts, and results/],
     ],
   ],
   [
     zhLocaleMessages,
     'zh',
     [
-      ['blog_description', /模板、作业链接、AI 草稿/],
-      ['changelog_description', /学生作答页、AI 草稿和老师结果/],
-      ['changelog_subtitle', /活动 -> 作业 -> 作答 -> 结果闭环/],
-      ['nav_changelog_description', /活动、作业、AI 草稿和结果复盘/],
     ],
   ],
 ] as const;
@@ -13001,50 +12532,12 @@ const contactClassroomScopeRequirements = [
     enLocaleMessages,
     'en',
     [
-      ['contact_classroom_scope_title', /scope the workflow/],
-      ['contact_classroom_scope_description', /activity, delivery, and review loop/],
-      ['contact_classroom_scope_activity_material_description', /source material type, or worksheet/],
-      ['contact_classroom_scope_assignment_routine_description', /links are handed to students/],
-      ['contact_classroom_scope_template_worksheet_description', /matching, fill blank, line match, listening, group sort/],
-      ['contact_classroom_scope_result_review_description', /CSV export, reteach notes, or student follow-up/],
-      ['contact_classroom_scope_privacy_description', /storage keys, private file URLs, raw student identifiers/],
-      ['contact_classroom_intake_handoff_description', /30-slice classroom inquiry intake contract/],
-      ['contact_classroom_intake_handoff_contact_route_description', /\/contact\?subject=classroom/],
-      ['contact_classroom_intake_handoff_scope_panel_description', /safe scope items/],
-      ['contact_classroom_intake_handoff_scope_field_mapping_description', /structured field ids/],
-      ['contact_classroom_intake_handoff_client_submit_boundary_description', /classroomInquiry object/],
-      ['contact_classroom_intake_handoff_server_rebuild_boundary_description', /rebuilds and normalizes classroomInquiry/],
-      ['contact_classroom_intake_handoff_email_template_boundary_description', /separate classroom inquiry block/],
-      ['contact_classroom_intake_handoff_no_activity_mutation_description', /does not create, edit, archive, duplicate, publish, close, or reopen/],
-      ['contact_classroom_intake_handoff_no_student_notification_description', /never sends student or learner notifications/],
-      ['contact_classroom_intake_handoff_field_normalization_description', /NFKC, collapsed whitespace, trimming/],
-      ['contact_classroom_intake_handoff_structured_payload_description', /learner, grade, material, routine, and need fields/],
-      ['contact_classroom_intake_handoff_private_data_guard_description', /raw student identifiers, source-material storage keys/],
     ],
   ],
   [
     zhLocaleMessages,
     'zh',
     [
-      ['contact_classroom_scope_title', /判断流程/],
-      ['contact_classroom_scope_description', /活动、交付和结果复盘闭环/],
-      ['contact_classroom_scope_activity_material_description', /来源素材类型/],
-      ['contact_classroom_scope_assignment_routine_description', /学生如何收到链接/],
-      ['contact_classroom_scope_template_worksheet_description', /配对、填空、连线、听力、分类/],
-      ['contact_classroom_scope_result_review_description', /CSV 导出、重讲提示或学生跟进/],
-      ['contact_classroom_scope_privacy_description', /存储 key、私有文件 URL、原始学生标识/],
-      ['contact_classroom_intake_handoff_description', /30 切片课堂咨询收集契约/],
-      ['contact_classroom_intake_handoff_contact_route_description', /\/contact\?subject=classroom/],
-      ['contact_classroom_intake_handoff_scope_panel_description', /安全范围项目/],
-      ['contact_classroom_intake_handoff_scope_field_mapping_description', /结构化字段 id/],
-      ['contact_classroom_intake_handoff_client_submit_boundary_description', /classroomInquiry 对象/],
-      ['contact_classroom_intake_handoff_server_rebuild_boundary_description', /重建并规范化 classroomInquiry/],
-      ['contact_classroom_intake_handoff_email_template_boundary_description', /独立的课堂咨询区块/],
-      ['contact_classroom_intake_handoff_no_activity_mutation_description', /不会创建、编辑、归档、复制、发布、关闭或重开/],
-      ['contact_classroom_intake_handoff_no_student_notification_description', /不会发送学生或学习者通知/],
-      ['contact_classroom_intake_handoff_field_normalization_description', /NFKC 规范化、空白折叠/],
-      ['contact_classroom_intake_handoff_structured_payload_description', /学习者、年级、材料、节奏和需求字段/],
-      ['contact_classroom_intake_handoff_private_data_guard_description', /原始学生标识、来源素材存储 key/],
     ],
   ],
 ] as const;
@@ -13066,70 +12559,12 @@ const transactionalEmailBoundaryRequirements = [
     enLocaleMessages,
     'en',
     [
-      ['mail_verify_email_subject', /ClassGamify teacher workspace email/],
-      ['mail_verify_email_body', /verify the email for your ClassGamify teacher workspace/],
-      ['mail_verify_email_workspace_note', /saved activities, assignment links, source materials/],
-      ['mail_forgot_password_subject', /ClassGamify teacher workspace password/],
-      ['mail_forgot_password_body', /reset access to your ClassGamify teacher workspace/],
-      ['mail_forgot_password_security_note', /student attempts, and result records/],
-      ['mail_subscribe_newsletter_subject', /ClassGamify classroom updates enabled/],
-      ['mail_subscribe_newsletter_body', /assignment links, teacher-reviewed AI drafts/],
-      ['mail_subscribe_newsletter_workspace_note', /activity to assignment to attempt to results loop/],
-      ['mail_layout_copyright', /teacher activity platform/],
-      ['mail_workspace_boundary_title', /Workspace boundary/],
-      ['mail_workspace_boundary_description', /ClassGamify teacher workspace/],
-      ['mail_workspace_boundary_item_activities_description', /Saved activities, reusable structured content/],
-      ['mail_workspace_boundary_item_assignments_description', /Published links, frozen snapshots/],
-      ['mail_workspace_boundary_item_results_description', /Submitted attempts, review summaries, CSV exports/],
-      ['mail_workspace_boundary_item_ai_sources_description', /Teacher-reviewed AI drafts and safe source-material provenance/],
-      ['mail_workspace_boundary_item_line', /\{label\}: \{description\}/],
-      ['mail_transactional_handoff_title', /Transactional email workspace handoff/],
-      ['mail_transactional_handoff_description', /30-slice preflight contract/],
-      ['mail_transactional_handoff_template_set_description', /verification, password reset, classroom update, and contact-message templates/],
-      ['mail_transactional_handoff_locale_fallback_description', /Unsupported mail locales/],
-      ['mail_transactional_handoff_render_before_send_description', /before a mail provider sends/],
-      ['mail_transactional_handoff_provider_registry_boundary_description', /shared mail provider registry/],
-      ['mail_transactional_handoff_source_material_safety_description', /file URLs, paths, permission metadata, or storage keys/],
-      ['mail_transactional_handoff_no_file_byte_read_description', /does not read uploaded file bytes/],
-      ['mail_transactional_handoff_no_assignment_mutation_description', /does not create, close, reopen, or publish assignment links/],
-      ['mail_transactional_handoff_no_learner_notification_description', /not learner reminders/],
-      ['mail_transactional_handoff_provider_secret_guard_description', /Provider API tokens stay in server configuration/],
-      ['mail_transactional_handoff_private_data_guard_description', /recipient names, email addresses, action URLs/],
     ],
   ],
   [
     zhLocaleMessages,
     'zh',
     [
-      ['mail_verify_email_subject', /ClassGamify 教师工作区邮箱/],
-      ['mail_verify_email_body', /验证你的 ClassGamify 教师工作区邮箱/],
-      ['mail_verify_email_workspace_note', /已保存活动、作业链接、来源素材/],
-      ['mail_forgot_password_subject', /ClassGamify 教师工作区密码/],
-      ['mail_forgot_password_body', /重置你的 ClassGamify 教师工作区访问密码/],
-      ['mail_forgot_password_security_note', /学生尝试和结果记录/],
-      ['mail_subscribe_newsletter_subject', /ClassGamify 课堂更新/],
-      ['mail_subscribe_newsletter_body', /作业链接、老师审核的 AI 草稿/],
-      ['mail_subscribe_newsletter_workspace_note', /活动、作业、作答和结果闭环/],
-      ['mail_layout_copyright', /教师课堂活动平台/],
-      ['mail_workspace_boundary_title', /工作区边界/],
-      ['mail_workspace_boundary_description', /ClassGamify 教师工作区/],
-      ['mail_workspace_boundary_item_activities_description', /已保存活动、可复用结构化内容/],
-      ['mail_workspace_boundary_item_assignments_description', /已发布链接、冻结快照/],
-      ['mail_workspace_boundary_item_results_description', /已提交作答、复盘摘要、CSV 导出/],
-      ['mail_workspace_boundary_item_ai_sources_description', /老师审核的 AI 草稿和安全来源素材信息/],
-      ['mail_workspace_boundary_item_line', /\{label\}：\{description\}/],
-      ['mail_transactional_handoff_title', /事务邮件工作区交接/],
-      ['mail_transactional_handoff_description', /30 切片预检契约/],
-      ['mail_transactional_handoff_template_set_description', /邮箱验证、密码重置、课堂更新和联系消息模板/],
-      ['mail_transactional_handoff_locale_fallback_description', /不支持的邮件语言/],
-      ['mail_transactional_handoff_render_before_send_description', /然后再由邮件 provider 发送/],
-      ['mail_transactional_handoff_provider_registry_boundary_description', /共享邮件 provider 注册表/],
-      ['mail_transactional_handoff_source_material_safety_description', /文件 URL、路径、权限元数据或存储密钥/],
-      ['mail_transactional_handoff_no_file_byte_read_description', /不读取已上传文件字节/],
-      ['mail_transactional_handoff_no_assignment_mutation_description', /不会创建、关闭、重新打开或发布作业链接/],
-      ['mail_transactional_handoff_no_learner_notification_description', /不会通知学生公开链接/],
-      ['mail_transactional_handoff_provider_secret_guard_description', /Provider API token 保留在服务端配置/],
-      ['mail_transactional_handoff_private_data_guard_description', /收件人姓名、邮箱、操作 URL/],
     ],
   ],
 ] as const;
@@ -13216,29 +12651,6 @@ assert.match(
   /Transactional mail lifecycle chain has a fast script-level gate via[\s\S]*scripts\/transactional-mail-lifecycle-chain\.test\.ts[\s\S]*template set[\s\S]*locale fallback[\s\S]*HTML\/plain-text rendering[\s\S]*shared workspace boundary[\s\S]*auth reset\/verification[\s\S]*provider registry[\s\S]*privacy guards/,
   'E2E catalog should document the transactional mail lifecycle chain gate.'
 );
-assert.deepEqual(AUTH_WORKSPACE_BOUNDARY_ITEM_IDS, [
-  'account-access',
-  'activity-library',
-  'assignment-links',
-  'student-results',
-  'source-materials',
-]);
-const authWorkspaceBoundaryView = buildAuthWorkspaceBoundaryView();
-assert.equal(authWorkspaceBoundaryView.title, 'Teacher workspace boundary');
-assert.match(
-  authWorkspaceBoundaryView.description,
-  /creating, publishing, and reviewing classroom work/
-);
-assert.deepEqual(
-  authWorkspaceBoundaryView.items.map((item) => [item.id, item.label]),
-  [
-    ['account-access', 'Account access'],
-    ['activity-library', 'Activity library'],
-    ['assignment-links', 'Assignment links'],
-    ['student-results', 'Student results'],
-    ['source-materials', 'Source materials'],
-  ]
-);
 assert.deepEqual(AUTH_ERROR_RECOVERY_STEP_IDS, [
   'retry-sign-in',
   'check-email',
@@ -13266,214 +12678,20 @@ const authWorkspaceBoundaryRequirements = [
     enLocaleMessages,
     'en',
     [
-      ['auth_banned_user_message', /ClassGamify teacher workspace/],
-      ['auth_login_title', /Teacher sign-in/],
-      ['auth_login_benefit_progress', /source materials/],
-      ['auth_login_benefit_review', /student attempts, and result exports/],
-      ['auth_login_trust_note', /activity drafts, assignment links, source materials/],
-      ['auth_register_create_account', /Create teacher workspace/],
-      ['auth_register_benefit_progress', /source materials, assignments/],
-      ['auth_register_benefit_review', /student attempts/],
-      ['auth_forgot_password_description', /activities, assignment links, and results/],
-      ['auth_reset_password_description', /source materials, and result records/],
-      ['auth_error_workspace_title', /Workspace sign-in issue/],
-      ['auth_error_workspace_description', /creating, publishing, or reviewing classroom work/],
-      ['auth_error_workspace_unknown_message', /classroom activities, assignment links, source materials, and results/],
-      ['auth_error_recovery_retry_sign_in_description', /activity, assignment, result, or settings page/],
-      ['auth_error_recovery_check_email_description', /verification or password link/],
-      ['auth_error_recovery_protect_workspace_description', /saved activities, source materials, assignment links/],
-      ['auth_workspace_boundary_title', /Teacher workspace boundary/],
-      ['auth_workspace_boundary_description', /creating, publishing, and reviewing classroom work/],
-      ['auth_workspace_boundary_item_account_access_description', /protected teacher workspace/],
-      ['auth_workspace_boundary_item_activity_library_description', /template scaffolds, edits, duplicates/],
-      ['auth_workspace_boundary_item_assignment_links_description', /frozen snapshots, instructions, timers/],
-      ['auth_workspace_boundary_item_student_results_description', /anonymous browser identities, summaries, exports/],
-      ['auth_workspace_boundary_item_source_materials_description', /audio, worksheet images, documents, and spreadsheets/],
-      ['settings_account_handoff_description', /30-slice account settings contract/],
-      ['settings_account_handoff_account_scope_description', /teacher account that owns activities/],
-      ['settings_account_handoff_assignment_link_boundary_description', /do not open, close, rewrite/],
-      ['settings_account_handoff_delete_confirmation_boundary_description', /saved activities, source materials, assignment links/],
-      ['settings_account_handoff_privacy_guard_description', /teacher emails, auth secrets, raw student identifiers/],
-      ['admin_users_title', /Teacher accounts/],
-      ['admin_users_handoff_description', /ClassGamify teacher accounts/],
-      ['admin_users_handoff_admin_scope_description', /generic SaaS users/],
-      ['admin_users_handoff_activity_content_boundary_description', /saved activity content/],
-      ['admin_users_handoff_assignment_link_boundary_description', /does not open, close, rewrite/],
-      ['admin_users_handoff_student_result_boundary_description', /student answers, anonymous tokens/],
-      ['admin_users_handoff_email_copy_action_description', /does not include copied email values/],
-      ['settings_profile_workspace_summary_description', /display name and avatar/],
-      ['settings_profile_workspace_summary_activities_description', /reusable classroom content/],
-      ['settings_profile_workspace_summary_assignments_description', /Published assignment links/],
-      ['settings_profile_workspace_summary_student_description', /ClassGamify teacher workspace/],
-      ['settings_profile_workspace_summary_results_description', /student attempt records/],
-      ['settings_files_workspace_summary_description', /classroom source materials/],
-      ['settings_files_workspace_summary_library_description', /future worksheet extraction flows/],
-      ['settings_files_workspace_summary_attachments_description', /published assignment snapshots/],
-      ['settings_files_workspace_summary_ai_description', /storage keys, URLs, and permissions/],
-      ['settings_files_workspace_summary_privacy_description', /sanitized runtime prompts and choices/],
-      ['settings_notification_workspace_summary_description', /teacher workspace/],
-      ['settings_notification_workspace_summary_templates_description', /remix readiness/],
-      ['settings_notification_workspace_summary_worksheets_description', /source-material workflows/],
-      ['settings_notification_workspace_summary_review_description', /classroom briefs, reteach plans/],
-      ['settings_notification_workspace_summary_control_description', /account access, activities, assignments, or results/],
-      ['settings_notification_newsletter_switch_aria_label', /teacher workspace/],
-      ['settings_notification_newsletter_switch_description', /template changes, worksheet workflows, and result-review improvements/],
-      ['settings_notification_newsletter_scope_label', /Update scope/],
-      ['settings_notification_newsletter_scope_description', /do not send student assignment reminders/],
-      ['settings_notification_handoff_description', /30-slice classroom update contract/],
-      ['settings_notification_handoff_email_channel_description', /teacher account email only/],
-      ['settings_notification_handoff_activity_library_boundary_description', /never creates, archives, restores/],
-      ['settings_notification_handoff_assignment_snapshot_boundary_description', /snapshots stay frozen/],
-      ['settings_notification_handoff_attempt_record_boundary_description', /do not create, score, hide, or delete/],
-      ['settings_notification_handoff_result_export_boundary_description', /CSV exports are unaffected/],
-      ['settings_notification_handoff_source_material_read_boundary_description', /does not read worksheet files/],
-      ['settings_notification_handoff_mutation_payload_guard_description', /without serializing newsletter mutation payloads/],
-      ['settings_notification_handoff_student_reminder_boundary_description', /not assignment due-date reminders/],
-      ['settings_notification_handoff_public_link_boundary_description', /never opens, closes, rewrites/],
-      ['settings_notification_handoff_learner_notification_boundary_description', /do not notify learners/],
-      ['settings_notification_handoff_private_data_guard_description', /teacher email addresses, raw student identifiers/],
-      ['settings_security_workspace_summary_description', /reusable activities, source materials, assignment links/],
-      ['settings_security_workspace_summary_access_description', /teacher workspace/],
-      ['settings_security_workspace_summary_activities_description', /source-material references/],
-      ['settings_security_workspace_summary_assignments_description', /Published assignment links/],
-      ['settings_security_workspace_summary_results_description', /Student attempt records/],
-      ['settings_security_workspace_capability_password_enabled_description', /activities, source materials, links, and results/],
-      ['settings_security_workspace_capability_delete_enabled_description', /classroom result records/],
-      ['settings_security_description', /connected providers/],
       [
         'settings_security_delete_account_confirm_description',
         /source-material references, assignment links, student attempts/,
       ],
-      ['settings_security_delete_account_warning', /classroom result records/],
-      ['settings_payment_processing_description', /saved activities, assignments, and results/],
-      ['settings_payment_processing_next_step_description', /AI drafts, and result workflows/],
-      ['settings_payment_description', /activity, assignment, AI, and result access/],
-      ['settings_payment_success_description', /activity, assignment, and AI access/],
-      ['settings_payment_success_next_step_description', /classroom access/],
-      ['settings_billing_card_current_plan_description', /assignment workflow limits/],
-      ['settings_billing_card_features_description', /assignment links, AI drafts, and result workflows/],
-      ['settings_billing_card_limits_description', /school plan/],
-      ['settings_billing_card_free_plan_message', /AI drafts, and result exports/],
-      ['settings_billing_card_lifetime_message', /source-material workflows/],
-      ['settings_billing_card_next_step_pro_description', /student attempts, AI drafts, and result exports/],
-      ['settings_billing_workspace_summary_description', /activities, assignment links, AI drafting, and private results/],
-      ['settings_billing_workspace_summary_plan_description', /hosted billing portal/],
-      ['settings_billing_workspace_summary_activities_description', /source-material workflows/],
-      ['settings_billing_workspace_summary_assignments_description', /timers, attempt rules, shuffle policy/],
-      ['settings_billing_workspace_summary_results_description', /Result exports, classroom briefs, AI-assisted drafting/],
-      ['settings_billing_handoff_description', /hosted plan management, classroom capability boundaries/],
-      ['settings_billing_handoff_workspace_scope_description', /teacher-owned activities, assignments, AI drafts/],
-      ['settings_billing_handoff_assignment_workflow_access_description', /published links, timers, attempt rules/],
-      ['settings_billing_handoff_provider_boundary_description', /Payment provider secrets, webhook payloads/],
-      ['settings_billing_handoff_student_data_boundary_description', /student names, anonymous tokens, answers/],
-      ['settings_billing_handoff_privacy_guard_description', /teacher emails, raw checkout sessions, processor secrets/],
     ],
   ],
   [
     zhLocaleMessages,
     'zh',
     [
-      ['auth_banned_user_message', /ClassGamify 教师工作区/],
-      ['auth_login_title', /教师登录/],
-      ['auth_login_benefit_progress', /来源素材/],
-      ['auth_login_benefit_review', /学生尝试和结果导出/],
-      ['auth_login_trust_note', /活动草稿、作业链接、来源素材/],
-      ['auth_register_create_account', /创建教师工作区/],
-      ['auth_register_benefit_progress', /来源素材、作业/],
-      ['auth_register_benefit_review', /学生尝试/],
-      ['auth_forgot_password_description', /活动、作业链接和结果记录/],
-      ['auth_reset_password_description', /来源素材和结果记录/],
-      ['auth_error_workspace_title', /工作区登录异常/],
-      ['auth_error_workspace_description', /创建、发布或复盘课堂工作/],
-      ['auth_error_workspace_unknown_message', /课堂活动、作业链接、来源素材和结果记录/],
-      ['auth_error_recovery_retry_sign_in_description', /活动、作业、结果或设置页面/],
-      ['auth_error_recovery_check_email_description', /验证或密码链接/],
-      ['auth_error_recovery_protect_workspace_description', /已保存活动、来源素材、作业链接/],
-      ['auth_workspace_boundary_title', /教师工作区边界/],
-      ['auth_workspace_boundary_description', /创建、发布和复盘课堂工作/],
-      ['auth_workspace_boundary_item_account_access_description', /受保护的教师工作区/],
-      ['auth_workspace_boundary_item_activity_library_description', /模板示例、编辑、复制/],
-      ['auth_workspace_boundary_item_assignment_links_description', /冻结快照、说明、计时器/],
-      ['auth_workspace_boundary_item_student_results_description', /匿名浏览器身份、摘要、导出/],
-      ['auth_workspace_boundary_item_source_materials_description', /音频、练习纸图片、文档和表格/],
-      ['settings_account_handoff_description', /30 切片账号设置契约/],
-      ['settings_account_handoff_account_scope_description', /拥有活动、来源素材、作业链接和结果/],
-      ['settings_account_handoff_assignment_link_boundary_description', /不会打开、关闭、改写/],
-      ['settings_account_handoff_delete_confirmation_boundary_description', /已保存活动、来源素材、作业链接/],
-      ['settings_account_handoff_privacy_guard_description', /教师邮箱、认证密钥、原始学生标识/],
-      ['admin_users_title', /教师账号治理/],
-      ['admin_users_handoff_description', /ClassGamify 教师账号/],
-      ['admin_users_handoff_admin_scope_description', /通用 SaaS 用户/],
-      ['admin_users_handoff_activity_content_boundary_description', /已保存活动内容/],
-      ['admin_users_handoff_assignment_link_boundary_description', /不会打开、关闭、改写/],
-      ['admin_users_handoff_student_result_boundary_description', /学生答案、匿名令牌/],
-      ['admin_users_handoff_email_copy_action_description', /不会包含被复制的邮箱值/],
-      ['settings_profile_workspace_summary_description', /显示名称和头像/],
-      ['settings_profile_workspace_summary_activities_description', /可复用课堂内容/],
-      ['settings_profile_workspace_summary_assignments_description', /已发布作业链接/],
-      ['settings_profile_workspace_summary_student_description', /ClassGamify 教师工作区/],
-      ['settings_profile_workspace_summary_results_description', /学生尝试记录/],
-      ['settings_files_workspace_summary_description', /课堂来源素材/],
-      ['settings_files_workspace_summary_library_description', /未来练习纸提取流程/],
-      ['settings_files_workspace_summary_attachments_description', /已发布作业快照/],
-      ['settings_files_workspace_summary_ai_description', /存储 key、URL 和权限信息/],
-      ['settings_files_workspace_summary_privacy_description', /运行时题目和选项/],
-      ['settings_notification_workspace_summary_description', /教师工作区/],
-      ['settings_notification_workspace_summary_templates_description', /改编就绪能力/],
-      ['settings_notification_workspace_summary_worksheets_description', /来源素材工作流/],
-      ['settings_notification_workspace_summary_review_description', /课堂简报、再讲计划/],
-      ['settings_notification_workspace_summary_control_description', /账号访问、活动、作业或结果记录/],
-      ['settings_notification_newsletter_switch_aria_label', /教师工作区/],
-      ['settings_notification_newsletter_switch_description', /练习纸工作流和结果复盘/],
-      ['settings_notification_newsletter_scope_label', /更新范围/],
-      ['settings_notification_newsletter_scope_description', /不会发送学生作业提醒/],
-      ['settings_notification_handoff_description', /30 切片课堂更新契约/],
-      ['settings_notification_handoff_email_channel_description', /只使用已登录教师账号邮箱/],
-      ['settings_notification_handoff_activity_library_boundary_description', /不会创建、归档、恢复/],
-      ['settings_notification_handoff_assignment_snapshot_boundary_description', /已发布作业快照仍保持冻结/],
-      ['settings_notification_handoff_attempt_record_boundary_description', /不会创建、评分、隐藏或删除/],
-      ['settings_notification_handoff_result_export_boundary_description', /CSV 导出不受更新订阅变更影响/],
-      ['settings_notification_handoff_source_material_read_boundary_description', /不会读取练习纸文件/],
-      ['settings_notification_handoff_mutation_payload_guard_description', /不序列化 newsletter mutation payload/],
-      ['settings_notification_handoff_student_reminder_boundary_description', /不是作业截止提醒/],
-      ['settings_notification_handoff_public_link_boundary_description', /不会打开、关闭、改写/],
-      ['settings_notification_handoff_learner_notification_boundary_description', /不会通知学习者/],
-      ['settings_notification_handoff_private_data_guard_description', /不暴露教师邮箱、原始学生标识/],
-      ['settings_security_workspace_summary_description', /可复用活动、来源素材、作业链接/],
-      ['settings_security_workspace_summary_access_description', /教师工作区/],
-      ['settings_security_workspace_summary_activities_description', /来源素材引用/],
-      ['settings_security_workspace_summary_assignments_description', /已发布作业链接/],
-      ['settings_security_workspace_summary_results_description', /学生尝试记录/],
-      ['settings_security_workspace_capability_password_enabled_description', /活动、来源素材、作业链接和结果记录/],
-      ['settings_security_workspace_capability_delete_enabled_description', /课堂结果记录/],
-      ['settings_security_description', /已连接登录方式/],
       [
         'settings_security_delete_account_confirm_description',
         /来源素材引用、作业链接、学生尝试/,
       ],
-      ['settings_security_delete_account_warning', /课堂结果记录/],
-      ['settings_payment_processing_description', /已保存活动、作业和结果/],
-      ['settings_payment_processing_next_step_description', /AI 草稿和结果工作流/],
-      ['settings_payment_description', /活动、作业、AI 和结果权限/],
-      ['settings_payment_success_description', /活动、作业和 AI 权限/],
-      ['settings_payment_success_next_step_description', /课堂权限/],
-      ['settings_billing_card_current_plan_description', /作业工作流限制/],
-      ['settings_billing_card_features_description', /作业链接、AI 草稿和结果工作流/],
-      ['settings_billing_card_limits_description', /学校方案/],
-      ['settings_billing_card_free_plan_message', /AI 草稿和结果导出/],
-      ['settings_billing_card_lifetime_message', /来源素材工作流/],
-      ['settings_billing_card_next_step_pro_description', /学生尝试、AI 草稿和结果导出/],
-      ['settings_billing_workspace_summary_description', /活动、作业链接、AI 草稿和私密结果/],
-      ['settings_billing_workspace_summary_plan_description', /托管账单入口/],
-      ['settings_billing_workspace_summary_activities_description', /来源素材工作流/],
-      ['settings_billing_workspace_summary_assignments_description', /计时器、尝试规则、打乱策略/],
-      ['settings_billing_workspace_summary_results_description', /结果导出、课堂简报、AI 辅助草稿/],
-      ['settings_billing_handoff_description', /托管方案管理、课堂能力边界/],
-      ['settings_billing_handoff_workspace_scope_description', /教师拥有的活动、作业、AI 草稿/],
-      ['settings_billing_handoff_assignment_workflow_access_description', /已发布链接、计时器、尝试规则/],
-      ['settings_billing_handoff_provider_boundary_description', /支付服务商密钥、webhook 载荷/],
-      ['settings_billing_handoff_student_data_boundary_description', /学生姓名、匿名令牌、答案/],
-      ['settings_billing_handoff_privacy_guard_description', /教师邮箱、原始结账会话、支付服务商密钥/],
     ],
   ],
 ] as const;
@@ -38094,7 +37312,7 @@ assert.deepEqual(activityLibraryPageCopy, {
   breadcrumbDashboard: 'Dashboard',
   createActivityLabel: 'Create activity',
   description:
-    'Reusable teacher-owned activities. Each activity stores template-neutral content so it can render as different classroom games.',
+    'Your saved activities. Publish one to get a student link, or copy it into another game.',
   loadErrorMessage:
     'Activities could not be loaded. Refresh the page or sign in again.',
   title: 'Activity library',
@@ -38146,7 +37364,7 @@ assert.deepEqual(
     filterSummary: { hasFilters: true, text: '3 matches' },
     hasSearchValue: true,
     searchDescription:
-      'Search only your activity library by title, description, or template label; filters stay owner-scoped.',
+      'Search by title, description, or template.',
     sourceCapabilityMetrics: [
       {
         ariaLabel: '0 audio-ready',
@@ -38245,7 +37463,7 @@ assert.deepEqual(
     filterSummary: { hasFilters: true, text: '2 matches' },
     hasSearchValue: false,
     searchDescription:
-      'Search only your activity library by title, description, or template label; filters stay owner-scoped.',
+      'Search by title, description, or template.',
     sourceCapabilityMetrics: [
       {
         ariaLabel: '1 audio-ready',
@@ -39823,7 +39041,7 @@ assert.deepEqual(assignmentListPageCopy, {
   breadcrumbCurrent: 'Assignments',
   breadcrumbDashboard: 'Dashboard',
   description:
-    'Published activity instances with share links, classroom settings, and result metrics.',
+    'Student links you have published, with completions and scores.',
   loadErrorMessage:
     'Assignments could not be loaded. Refresh the page or sign in again.',
   title: 'Assignments',

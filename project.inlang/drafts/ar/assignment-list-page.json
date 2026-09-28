@@ -6,6 +6,6 @@
   "assignment_list_empty_status_filtered_description": "لا توجد تكليفات بالحالة {status} حتى الآن. امسح عوامل التصفية أو اختر حالة أخرى لمراجعة روابط الصف.",
   "assignment_list_page_breadcrumb_current": "التكليفات",
   "assignment_list_page_breadcrumb_dashboard": "لوحة التحكم",
-  "assignment_list_page_description": "أنشطة منشورة تتضمن روابط مشاركة وإعدادات الصف ومؤشرات النتائج.",
+  "assignment_list_page_description": "روابط الطلاب التي نشرتها، مع عدد الإنجازات والدرجات.",
   "assignment_list_page_title": "التكليفات"
 }

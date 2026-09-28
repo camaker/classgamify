@@ -119,109 +119,19 @@ test.describe('protected page smoke coverage', () => {
             localizedPath(protectedPage.path, locale),
             { theme }
           );
-          if (protectedPage.path === '/settings/security') {
+          const firstContentKey = {
+            '/settings/security': 'settings_security_update_password_title',
+            '/settings/files': 'settings_files_upload_button',
+            '/settings/billing': 'settings_billing_card_current_plan',
+            '/settings/payment': 'settings_payment_failed_title',
+          }[protectedPage.path];
+          if (firstContentKey) {
+            // Settings pages open with the control itself, not an
+            // explanation panel.
             await expect(
-              onScreenText(
-                page,
-                getLocaleMessage(
-                  locale,
-                  'settings_security_workspace_summary_title'
-                )
-              )
+              onScreenText(page, getLocaleMessage(locale, firstContentKey))
             ).toBeVisible({ timeout: CLIENT_RENDER_TIMEOUT });
-            await expect(
-              onScreenText(
-                page,
-                getLocaleMessage(
-                  locale,
-                  'settings_security_workspace_capabilities_title'
-                )
-              )
-            ).toBeVisible({ timeout: CLIENT_RENDER_TIMEOUT });
-            await expect(
-              onScreenText(
-                page,
-                getLocaleMessage(
-                  locale,
-                  'settings_security_workspace_summary_results_label'
-                )
-              )
-            ).toBeVisible({ timeout: CLIENT_RENDER_TIMEOUT });
-          }
-          if (protectedPage.path === '/settings/files') {
-            await expect(
-              onScreenText(
-                page,
-                getLocaleMessage(
-                  locale,
-                  'settings_files_workspace_summary_title'
-                )
-              )
-            ).toBeVisible({ timeout: CLIENT_RENDER_TIMEOUT });
-            await expect(
-              onScreenText(
-                page,
-                getLocaleMessage(
-                  locale,
-                  'settings_files_workspace_summary_library_label'
-                )
-              )
-            ).toBeVisible({ timeout: CLIENT_RENDER_TIMEOUT });
-            await expect(
-              onScreenText(
-                page,
-                getLocaleMessage(
-                  locale,
-                  'settings_files_workspace_summary_privacy_label'
-                )
-              )
-            ).toBeVisible({ timeout: CLIENT_RENDER_TIMEOUT });
-          }
-          if (protectedPage.path === '/settings/billing') {
-            await expect(
-              onScreenText(
-                page,
-                getLocaleMessage(
-                  locale,
-                  'settings_billing_workspace_summary_title'
-                )
-              )
-            ).toBeVisible({ timeout: CLIENT_RENDER_TIMEOUT });
-            await expect(
-              onScreenText(
-                page,
-                getLocaleMessage(
-                  locale,
-                  'settings_billing_workspace_summary_assignments_label'
-                )
-              )
-            ).toBeVisible({ timeout: CLIENT_RENDER_TIMEOUT });
-            // The handoff section is screen-reader-only by design (6790a20e),
-            // so check it is in the accessibility tree, not on screen.
-            await expect(
-              page.getByRole('heading', {
-                name: getLocaleMessage(
-                  locale,
-                  'settings_billing_handoff_title'
-                ),
-                exact: true,
-              })
-            ).toBeAttached({ timeout: CLIENT_RENDER_TIMEOUT });
-          }
-          if (protectedPage.path === '/settings/payment') {
-            await expect(
-              onScreenText(
-                page,
-                getLocaleMessage(locale, 'settings_payment_failed_title')
-              )
-            ).toBeVisible({ timeout: CLIENT_RENDER_TIMEOUT });
-            const paymentHandoff = page.locator(
-              '[data-handoff="settings-payment-callback"]'
-            );
-            await expect(paymentHandoff).toHaveCount(1);
-            await expect(paymentHandoff).toContainText(
-              getLocaleMessage(locale, 'settings_payment_handoff_title')
-            );
+            await expect(page.locator('[data-handoff]')).toHaveCount(0);
           }
         });
       }

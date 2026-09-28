@@ -2,31 +2,10 @@ import type { DashboardBreadcrumbItem } from '@/components/layout/dashboard-head
 import { websiteConfig } from '@/config/website';
 import { m } from '@/locale/paraglide/messages';
 
-export type SettingsFilesWorkspaceSummaryItemId =
-  | 'activity-attachments'
-  | 'ai-provenance'
-  | 'source-library'
-  | 'student-privacy';
-
-export type SettingsFilesWorkspaceSummaryItemView = {
-  ariaLabel: string;
-  description: string;
-  id: SettingsFilesWorkspaceSummaryItemId;
-  label: string;
-};
-
-export type SettingsFilesWorkspaceSummaryView = {
-  ariaLabel: string;
-  description: string;
-  itemViews: SettingsFilesWorkspaceSummaryItemView[];
-  title: string;
-};
-
 type SettingsFilesPageViewModel = {
   breadcrumbs: DashboardBreadcrumbItem[];
   description: string;
   title: string;
-  workspaceSummaryView: SettingsFilesWorkspaceSummaryView;
 };
 
 export function isSettingsFilesEnabled() {
@@ -44,63 +23,5 @@ export function buildSettingsFilesPageViewModel(): SettingsFilesPageViewModel {
     ],
     description,
     title,
-    workspaceSummaryView: buildSettingsFilesWorkspaceSummaryView(),
-  };
-}
-
-export function buildSettingsFilesWorkspaceSummaryView(): SettingsFilesWorkspaceSummaryView {
-  const title = m.settings_files_workspace_summary_title();
-  const description = m.settings_files_workspace_summary_description();
-
-  return {
-    ariaLabel: m.settings_files_workspace_summary_aria_label({
-      description,
-      title,
-    }),
-    description,
-    itemViews: [
-      buildSettingsFilesWorkspaceSummaryItemView({
-        description: m.settings_files_workspace_summary_library_description(),
-        id: 'source-library',
-        label: m.settings_files_workspace_summary_library_label(),
-      }),
-      buildSettingsFilesWorkspaceSummaryItemView({
-        description:
-          m.settings_files_workspace_summary_attachments_description(),
-        id: 'activity-attachments',
-        label: m.settings_files_workspace_summary_attachments_label(),
-      }),
-      buildSettingsFilesWorkspaceSummaryItemView({
-        description: m.settings_files_workspace_summary_ai_description(),
-        id: 'ai-provenance',
-        label: m.settings_files_workspace_summary_ai_label(),
-      }),
-      buildSettingsFilesWorkspaceSummaryItemView({
-        description: m.settings_files_workspace_summary_privacy_description(),
-        id: 'student-privacy',
-        label: m.settings_files_workspace_summary_privacy_label(),
-      }),
-    ],
-    title,
-  };
-}
-
-function buildSettingsFilesWorkspaceSummaryItemView({
-  description,
-  id,
-  label,
-}: {
-  description: string;
-  id: SettingsFilesWorkspaceSummaryItemId;
-  label: string;
-}): SettingsFilesWorkspaceSummaryItemView {
-  return {
-    ariaLabel: m.settings_files_workspace_summary_aria_label({
-      description,
-      title: label,
-    }),
-    description,
-    id,
-    label,
   };
 }

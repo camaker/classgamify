@@ -99,7 +99,6 @@ export { default as IconPrinter } from '@tabler/icons-react/dist/esm/icons/IconP
 export { default as IconRefresh } from '@tabler/icons-react/dist/esm/icons/IconRefresh.mjs';
 export { default as IconRepeat } from '@tabler/icons-react/dist/esm/icons/IconRepeat.mjs';
 export { default as IconRotateClockwise } from '@tabler/icons-react/dist/esm/icons/IconRotateClockwise.mjs';
-export { default as IconRoute } from '@tabler/icons-react/dist/esm/icons/IconRoute.mjs';
 export { default as IconSchool } from '@tabler/icons-react/dist/esm/icons/IconSchool.mjs';
 export { default as IconSearch } from '@tabler/icons-react/dist/esm/icons/IconSearch.mjs';
 export { default as IconSelector } from '@tabler/icons-react/dist/esm/icons/IconSelector.mjs';

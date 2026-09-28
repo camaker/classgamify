@@ -16,7 +16,6 @@ import {
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { authClient } from '@/auth/client';
-import { buildAuthWorkspaceBoundaryView } from '@/auth/workspace-boundary';
 import { Routes } from '@/lib/routes';
 import { getSafeCallbackPath } from '@/lib/urls';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -60,7 +59,6 @@ export function ResetPasswordForm() {
         bottomButtonLabel={m.auth_reset_password_back_to_login()}
         bottomButtonHref={Routes.Login}
         bottomButtonSearch={authSwitchSearch}
-        workspaceBoundary={buildAuthWorkspaceBoundaryView()}
       >
         <p className="text-sm text-destructive py-4">
           {m.auth_reset_password_invalid_token()}
@@ -102,7 +100,6 @@ export function ResetPasswordForm() {
       bottomButtonLabel={m.auth_reset_password_back_to_login()}
       bottomButtonHref={Routes.Login}
       bottomButtonSearch={authSwitchSearch}
-      workspaceBoundary={buildAuthWorkspaceBoundaryView()}
     >
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">

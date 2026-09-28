@@ -16,7 +16,6 @@ import {
 import { Input } from '@/components/ui/input';
 import { websiteConfig } from '@/config/website';
 import { authClient } from '@/auth/client';
-import { buildAuthWorkspaceBoundaryView } from '@/auth/workspace-boundary';
 import { cn } from '@/lib/utils';
 import { DEFAULT_LOGIN_REDIRECT, Routes } from '@/lib/routes';
 import { getPathWithLocale, getSafeCallbackPath } from '@/lib/urls';
@@ -102,23 +101,6 @@ export function LoginForm({
       eyebrow={m.auth_login_eyebrow()}
       headerLabel={m.auth_login_welcome_back()}
       description={m.auth_login_context_description()}
-      returnHint={m.auth_login_return_hint()}
-      benefits={[
-        {
-          id: 'progress',
-          text: m.auth_login_benefit_progress(),
-        },
-        {
-          id: 'worksheets',
-          text: m.auth_login_benefit_worksheets(),
-        },
-        {
-          id: 'review',
-          text: m.auth_login_benefit_review(),
-        },
-      ]}
-      workspaceBoundary={buildAuthWorkspaceBoundaryView()}
-      trustNote={m.auth_login_trust_note()}
       bottomButtonLabel={m.auth_login_sign_up_hint()}
       bottomButtonHref={Routes.Register}
       bottomButtonSearch={authSwitchSearch}
