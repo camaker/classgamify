@@ -45,7 +45,7 @@ export const STUDENT_RUNNER_PLAY_CHAIN_SOURCE_FILES = [
   'src/assignments/attempt-duration.ts',
   'src/assignments/attempt-answers.ts',
   'src/assignments/attempt-persistence.ts',
-  'src/assignments/submission-validation-handoff.ts',
+  'src/assignments/validation.ts',
   'src/assignments/student-submission.ts',
   'src/assignments/student-runner-state.ts',
   'src/assignments/student-runner-view.ts',
@@ -61,7 +61,7 @@ export const STUDENT_RUNNER_PLAY_CHAIN_SOURCE_FILES = [
   'src/components/activities/matching-pairs-board.tsx',
   'src/components/activities/listening-runner.tsx',
   'src/components/activities/open-box-runner.tsx',
-  'src/assignments/answer-feedback-handoff.ts',
+  'src/assignments/result-answer-view.ts',
 ] as const;
 
 export type StudentRunnerPlayChainHandoffItemId =

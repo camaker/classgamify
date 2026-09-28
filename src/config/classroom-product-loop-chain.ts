@@ -52,7 +52,7 @@ export const CLASSROOM_PRODUCT_LOOP_CHAIN_SOURCE_FILES = [
   'src/assignments/result-explanation-chain.ts',
   'src/assignments/student-identity-lifecycle-chain.ts',
   'src/assignments/student-runtime-item-list.ts',
-  'src/assignments/submission-validation-handoff.ts',
+  'src/assignments/validation.ts',
   'src/assignments/attempt-persistence.ts',
   'src/assignments/scored-attempt-result-chain.ts',
   'src/assignments/answer-feedback-lifecycle-chain.ts',

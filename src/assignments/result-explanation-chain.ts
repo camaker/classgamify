@@ -50,7 +50,7 @@ export const ASSIGNMENT_RESULT_EXPLANATION_CHAIN_SOURCE_FILES = [
   'src/assignments/item-review-summary.ts',
   'src/assignments/result-actions.ts',
   'src/assignments/results-export.ts',
-  'src/assignments/answer-feedback-handoff.ts',
+  'src/activities/answer-matching.ts',
   'src/assignments/answer-feedback-lifecycle-chain.ts',
   'src/assignments/teacher-results-review-chain.ts',
   'src/assignments/teacher-result-copy-lifecycle-chain.ts',

@@ -1,9 +1,6 @@
 import assert from 'node:assert/strict';
 import { existsSync, readFileSync } from 'node:fs';
 import test from 'node:test';
-import { ASSIGNMENT_ANSWER_FEEDBACK_HANDOFF_ITEM_IDS } from '@/assignments/answer-feedback-handoff';
-import { ASSIGNMENT_ATTEMPT_DURATION_HANDOFF_ITEM_IDS } from '@/assignments/attempt-duration-handoff';
-import { ASSIGNMENT_ATTEMPT_STATS_HANDOFF_ITEM_IDS } from '@/assignments/attempt-stats-handoff';
 import {
   TEACHER_RESULTS_REVIEW_CHAIN_HANDOFF_ITEM_IDS,
   TEACHER_RESULTS_REVIEW_CHAIN_SOURCE_FILES,
@@ -130,15 +127,6 @@ test('teacher results review chain stays backed by focused contracts', () => {
       `Missing teacher results review chain file ${filePath}`
     );
   }
-
-  assert.deepEqual(
-    [
-      ASSIGNMENT_ATTEMPT_STATS_HANDOFF_ITEM_IDS.length,
-      ASSIGNMENT_ATTEMPT_DURATION_HANDOFF_ITEM_IDS.length,
-      ASSIGNMENT_ANSWER_FEEDBACK_HANDOFF_ITEM_IDS.length,
-    ],
-    Array.from({ length: 3 }, () => 30)
-  );
 });
 
 test('teacher results review sources preserve private review boundaries', () => {
@@ -173,8 +161,6 @@ test('teacher results review sources preserve private review boundaries', () => 
     'The results page should render no hidden audit sections.'
   );
 });
-
-test('teacher results review chain renders as hidden semantic output', () => {});
 
 test('teacher results review chain focused gate is documented', () => {
   assert.match(

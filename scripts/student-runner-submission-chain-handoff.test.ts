@@ -3,18 +3,10 @@ import { existsSync, readFileSync } from 'node:fs';
 import test from 'node:test';
 import { STARTER_FOOD_ASSIGNMENT_SHARE_ID } from '@/activities/starter-ids';
 import type { AssignmentSeed } from '@/activities/types';
-import { ANSWER_FEEDBACK_LIFECYCLE_CHAIN_HANDOFF_ITEM_IDS } from '@/assignments/answer-feedback-lifecycle-chain';
-import { ASSIGNMENT_ANSWER_FEEDBACK_HANDOFF_ITEM_IDS } from '@/assignments/answer-feedback-handoff';
-import { ASSIGNMENT_ATTEMPT_DURATION_HANDOFF_ITEM_IDS } from '@/assignments/attempt-duration-handoff';
-import { ASSIGNMENT_ATTEMPT_LIMIT_HANDOFF_ITEM_IDS } from '@/assignments/attempt-limit-handoff';
-import { ASSIGNMENT_ATTEMPT_PERSISTENCE_HANDOFF_ITEM_IDS } from '@/assignments/attempt-persistence-handoff';
 import type {
   PublicAttemptReviewItem,
   PublicAttemptReviewSummary,
 } from '@/assignments/public';
-import { SCORED_ATTEMPT_RESULT_CHAIN_HANDOFF_ITEM_IDS } from '@/assignments/scored-attempt-result-chain';
-import { STUDENT_RUNNER_PLAY_CHAIN_HANDOFF_ITEM_IDS } from '@/assignments/student-runner-play-chain';
-import { ASSIGNMENT_SUBMISSION_VALIDATION_HANDOFF_ITEM_IDS } from '@/assignments/submission-validation-handoff';
 import {
   STUDENT_RUNNER_SUBMISSION_CHAIN_HANDOFF_ITEM_IDS,
   STUDENT_RUNNER_SUBMISSION_CHAIN_SOURCE_FILES,
@@ -36,10 +28,6 @@ const PRODUCT_SOURCE = readFileSync('docs/product.md', 'utf8');
 const TEST_CATALOG_SOURCE = readFileSync('tests/e2e/TEST-CATALOG.md', 'utf8');
 const STUDENT_SUBMISSION_SOURCE = readFileSync(
   'src/assignments/student-submission.ts',
-  'utf8'
-);
-const SUBMISSION_VALIDATION_SOURCE = readFileSync(
-  'src/assignments/submission-validation-handoff.ts',
   'utf8'
 );
 const ROUTE_SOURCE = readFileSync('src/routes/play/$shareId.tsx', 'utf8');
@@ -166,20 +154,6 @@ test('student runner submission chain is backed by adjacent gates', () => {
       `Missing student runner submission chain file ${filePath}`
     );
   }
-
-  assert.deepEqual(
-    [
-      ASSIGNMENT_SUBMISSION_VALIDATION_HANDOFF_ITEM_IDS.length,
-      ASSIGNMENT_ATTEMPT_PERSISTENCE_HANDOFF_ITEM_IDS.length,
-      ASSIGNMENT_ATTEMPT_DURATION_HANDOFF_ITEM_IDS.length,
-      ASSIGNMENT_ATTEMPT_LIMIT_HANDOFF_ITEM_IDS.length,
-      ASSIGNMENT_ANSWER_FEEDBACK_HANDOFF_ITEM_IDS.length,
-      ANSWER_FEEDBACK_LIFECYCLE_CHAIN_HANDOFF_ITEM_IDS.length,
-      SCORED_ATTEMPT_RESULT_CHAIN_HANDOFF_ITEM_IDS.length,
-      STUDENT_RUNNER_PLAY_CHAIN_HANDOFF_ITEM_IDS.length,
-    ],
-    Array.from({ length: 8 }, () => 30)
-  );
 });
 
 test('student runner submission chain keeps pre-submit visible state private', () => {
@@ -283,11 +257,6 @@ test('student runner submission chain shows the post-submit result panel', () =>
 });
 
 test('student runner submission source boundaries preserve domain ownership', () => {
-  assert.match(
-    SUBMISSION_VALIDATION_SOURCE,
-    /ASSIGNMENT_SUBMISSION_VALIDATION_HANDOFF_ITEM_IDS[\s\S]*api-validates-before-scoring[\s\S]*persistence-normalized-answers[\s\S]*client-payload-builder[\s\S]*raw-payload-guard/,
-    'Submission validation handoff should protect validate-before-scoring and raw-payload boundaries.'
-  );
   assert.match(
     STUDENT_SUBMISSION_SOURCE,
     /normalizeAttemptDurationSeconds[\s\S]*durationSeconds/,

@@ -21,13 +21,6 @@ import {
   buildStudentRunnerAttemptClockStartPlan,
   buildStudentRunnerTimerTickPlan,
 } from '@/assignments/student-runner-state';
-import {
-  ASSIGNMENT_ATTEMPT_DURATION_HANDOFF_ITEM_IDS,
-  buildAssignmentAttemptDurationHandoffView,
-  type AssignmentAttemptDurationHandoffEvidence,
-  type AssignmentAttemptDurationHandoffItemId,
-  type AssignmentAttemptDurationHandoffView,
-} from '@/assignments/attempt-duration-handoff';
 import { overwriteGetLocale } from '@/locale/paraglide/runtime';
 
 overwriteGetLocale(() => 'en');
@@ -60,103 +53,6 @@ const RUNNER_STATE_SOURCE = readFileSync(
 const TEST_CATALOG_SOURCE = readFileSync('tests/e2e/TEST-CATALOG.md', 'utf8');
 
 const EVIDENCE = buildAttemptDurationEvidence();
-
-test('assignment attempt duration handoff exposes 30 safe timer slices', () => {
-  const handoffView = buildAssignmentAttemptDurationHandoffView(EVIDENCE);
-  const itemIds = handoffView.itemViews.map((item) => item.id);
-
-  assert.deepEqual(itemIds, [...ASSIGNMENT_ATTEMPT_DURATION_HANDOFF_ITEM_IDS]);
-  assert.equal(new Set(itemIds).size, 30);
-  assert.equal(
-    handoffView.itemViews.every(
-      (item) =>
-        Boolean(item.ariaLabel) &&
-        Boolean(item.description) &&
-        Boolean(item.label) &&
-        Boolean(item.value)
-    ),
-    true
-  );
-  assert.deepEqual(handoffView.privacy, {
-    exposesAnonymousToken: false,
-    exposesAnswerText: false,
-    exposesRawStartedAt: false,
-    exposesRawSubmissionPayload: false,
-    exposesRuntimeItemIds: false,
-    exposesStudentName: false,
-    exposesTeacherOnlyAnswers: false,
-    itemIds,
-    mutatesAttempts: false,
-    readsBrowserStorage: false,
-    scope: 'assignment-attempt-duration-boundary',
-    usesSharedDurationHelpers: true,
-  });
-  assertNoPrivateAttemptDurationText(JSON.stringify(handoffView));
-});
-
-test('assignment attempt duration handoff summarizes normalized timer state', () => {
-  const handoffView = buildAssignmentAttemptDurationHandoffView(EVIDENCE);
-
-  assert.deepEqual(
-    handoffView.itemViews.map((item) => [item.id, item.value]),
-    [
-      ['duration-unit-contract', '1000 ms / 60 s'],
-      ['time-limit-normalization', '90s'],
-      ['duration-rounding', '46s'],
-      ['duration-cap', '90s'],
-      ['negative-duration-guard', '0s'],
-      ['nonfinite-duration-guard', 'Ignored'],
-      ['zero-duration-display', '-'],
-      ['readable-format', '1m 30s'],
-      ['timer-format', '1:30'],
-      ['display-view', '46s'],
-      ['capped-display-view', '1:30'],
-      ['timer-state-elapsed', '45s'],
-      ['timer-state-remaining', '45s'],
-      ['timer-state-expiry', 'Expired at 90s'],
-      ['started-at-derivation', '90s before completion'],
-      ['submission-duration-resolution', '90s'],
-      ['submission-input-duration', '90s submitted'],
-      ['runner-clock-start-plan', 'After load'],
-      ['route-clock-effect', 'Ready'],
-      ['runner-tick-plan', '1000ms tick'],
-      ['timer-badge', '45s remaining'],
-      ['time-expired-control', 'Disabled'],
-      ['start-handoff-boundary', 'Ready'],
-      ['submission-handoff-boundary', 'Ready'],
-      ['result-display-boundary', 'Time: 1:30'],
-      ['result-analysis-boundary', 'Ready'],
-      ['result-view-boundary', 'Ready'],
-      ['export-average-duration', 'Ready'],
-      ['export-attempt-duration', 'Ready'],
-      ['privacy-guard', 'Private data hidden'],
-    ]
-  );
-  assertNoPrivateAttemptDurationText(JSON.stringify(handoffView));
-});
-
-test('assignment attempt duration handoff localizes Chinese timer boundaries', () => {
-  overwriteGetLocale(() => 'zh');
-  try {
-    const handoffView = buildAssignmentAttemptDurationHandoffView(
-      buildAttemptDurationEvidence()
-    );
-
-    assert.equal(handoffView.title, '作答计时与用时交接');
-    assert.match(handoffView.description, /30 切片/);
-    assert.equal(getHandoffValue(handoffView, 'duration-rounding'), '46 秒');
-    assert.equal(getHandoffValue(handoffView, 'timer-format'), '1:30');
-    assert.equal(
-      getHandoffValue(handoffView, 'runner-clock-start-plan'),
-      '加载后'
-    );
-    assert.equal(getHandoffValue(handoffView, 'timer-badge'), '45 秒剩余');
-    assert.equal(getHandoffValue(handoffView, 'privacy-guard'), '私密数据隐藏');
-    assertNoPrivateAttemptDurationText(JSON.stringify(handoffView));
-  } finally {
-    overwriteGetLocale(() => 'en');
-  }
-});
 
 test('assignment attempt duration evidence comes from shared runner and result helpers', () => {
   assert.deepEqual(EVIDENCE.durationUnits, {
@@ -214,7 +110,7 @@ test('assignment attempt duration submit path normalizes before scoring and pers
 test('assignment attempt duration focused gate is documented', () => {
   assert.match(
     TEST_CATALOG_SOURCE,
-    /pnpm exec tsx --test scripts\/assignment-attempt-duration-handoff-semantic-views\.test\.ts/,
+    /pnpm exec tsx --test scripts\/assignment-attempt-duration\.test\.ts/,
     'E2E catalog should point duration work at the focused script gate.'
   );
   assert.match(
@@ -224,7 +120,7 @@ test('assignment attempt duration focused gate is documented', () => {
   );
 });
 
-function buildAttemptDurationEvidence(): AssignmentAttemptDurationHandoffEvidence {
+function buildAttemptDurationEvidence() {
   const normalizedTimeLimitSeconds = normalizeAttemptTimeLimitSeconds(90.8);
   const durationRoundedSeconds = normalizeAttemptDurationSeconds({
     durationSeconds: 45.6,
@@ -388,15 +284,6 @@ function buildAttemptDurationEvidence(): AssignmentAttemptDurationHandoffEvidenc
     timerStateRemainingSeconds: timerState.remainingSeconds,
     zeroDurationLabel: formatAttemptDuration(0),
   };
-}
-
-function getHandoffValue(
-  view: AssignmentAttemptDurationHandoffView,
-  id: AssignmentAttemptDurationHandoffItemId
-) {
-  const item = view.itemViews.find((candidate) => candidate.id === id);
-  assert.ok(item, `Missing handoff item: ${id}`);
-  return item.value;
 }
 
 function assertNoPrivateAttemptDurationText(serialized: string) {

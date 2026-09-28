@@ -41,7 +41,7 @@ export const ASSIGNMENT_RESULT_ACCEPTED_ANSWER_CHAIN_SOURCE_FILES = [
   'src/assignments/results.ts',
   'src/assignments/result-view.ts',
   'src/assignments/results-export.ts',
-  'src/assignments/answer-feedback-handoff.ts',
+  'scripts/assignment-answer-feedback.test.ts',
   'src/assignments/answer-feedback-lifecycle-chain.ts',
   'src/assignments/scored-attempt-result-chain.ts',
   'src/assignments/teacher-results-review-chain.ts',

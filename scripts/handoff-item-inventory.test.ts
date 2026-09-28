@@ -37,7 +37,7 @@ test('handoff inventory discovers product-loop contracts', () => {
   assert.ok(
     // The rendered handoff sections are being retired surface by surface, so
     // this floor tracks the remaining source-level contracts.
-    inventoryEntries.length >= 64,
+    inventoryEntries.length >= 56,
     'Handoff inventory should cover the remaining source-level contracts.'
   );
 });

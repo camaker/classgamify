@@ -7,13 +7,6 @@ import {
   resolveAttemptSubmissionIdentity,
 } from '@/assignments/attempt-identity-query';
 import {
-  ASSIGNMENT_IDENTITY_HANDOFF_ITEM_IDS,
-  buildAssignmentIdentityHandoffView,
-  type AssignmentIdentityHandoffEvidence,
-  type AssignmentIdentityHandoffItemId,
-  type AssignmentIdentityHandoffView,
-} from '@/assignments/identity-handoff';
-import {
   buildAnonymousAttemptTokenStorageKey,
   buildAnonymousIdentityKey,
   buildStudentIdentityGroupingKey,
@@ -52,113 +45,6 @@ const STUDENT_SUBMISSION_SOURCE = readFileSync(
 
 const EVIDENCE = buildIdentityHandoffEvidence();
 
-test('assignment identity handoff exposes 30 safe identity slices', () => {
-  const handoffView = buildAssignmentIdentityHandoffView(EVIDENCE);
-  const itemIds = handoffView.itemViews.map((item) => item.id);
-
-  assert.deepEqual(itemIds, [...ASSIGNMENT_IDENTITY_HANDOFF_ITEM_IDS]);
-  assert.equal(new Set(itemIds).size, 30);
-  assert.equal(
-    handoffView.itemViews.every(
-      (item) =>
-        Boolean(item.ariaLabel) &&
-        Boolean(item.description) &&
-        Boolean(item.label) &&
-        Boolean(item.value)
-    ),
-    true
-  );
-  assert.deepEqual(handoffView.privacy, {
-    exposesAnonymousToken: false,
-    exposesBrowserStorageKey: false,
-    exposesRawGroupingKey: false,
-    exposesRawStudentName: false,
-    exposesResultStudentKey: false,
-    itemIds,
-    mutatesAttempts: false,
-    readsBrowserStorage: false,
-    scope: 'assignment-attempt-identity-boundary',
-    usesSharedIdentityHelpers: true,
-  });
-  assertNoPrivateIdentityHandoffText(JSON.stringify(handoffView));
-});
-
-test('assignment identity handoff summarizes normalization and privacy state', () => {
-  const handoffView = buildAssignmentIdentityHandoffView(EVIDENCE);
-
-  assert.deepEqual(
-    handoffView.itemViews.map((item) => [item.id, item.value]),
-    [
-      ['identity-scope', 'Attempt identity'],
-      ['name-whitespace-normalization', 'Whitespace collapsed'],
-      ['name-unicode-normalization', 'NFKC applied'],
-      ['name-case-grouping', 'Case-insensitive key'],
-      ['name-priority', 'Student name wins'],
-      ['anonymous-token-normalization', 'Whitespace removed'],
-      ['anonymous-storage-key', 'Share-scoped key'],
-      ['anonymous-existing-token', 'Existing token reused'],
-      ['anonymous-sanitized-write', 'Sanitized token stored'],
-      ['anonymous-created-token', 'Created when missing'],
-      ['browser-label', 'Browser code only'],
-      ['grouping-name-key', 'Stable name key'],
-      ['grouping-anonymous-key', 'Stable token key'],
-      ['unknown-identity', 'Anonymous fallback'],
-      ['same-name-comparison', 'Matched'],
-      ['same-token-comparison', 'Matched'],
-      ['distinct-token-comparison', 'Separated'],
-      ['name-attempt-count', '2 attempts'],
-      ['token-attempt-count', '2 attempts'],
-      ['submission-name-strategy', 'Student name'],
-      ['submission-token-strategy', 'Anonymous token'],
-      ['submission-missing-strategy', 'Missing'],
-      ['previous-name-strategy', 'Normalized name'],
-      ['previous-token-strategy', 'Anonymous token'],
-      ['resolver-name-label', 'Name label prepared'],
-      ['resolver-anonymous-label', 'Anonymous label prepared'],
-      ['resolver-ordering', 'Chronological labels'],
-      ['result-display-key', 'Display key only'],
-      ['raw-token-guard', 'Raw token hidden'],
-      ['privacy-guard', 'Private identity hidden'],
-    ]
-  );
-  assertNoPrivateIdentityHandoffText(JSON.stringify(handoffView));
-});
-
-test('assignment identity handoff localizes Chinese identity boundaries', () => {
-  overwriteGetLocale(() => 'zh');
-  try {
-    const handoffView = buildAssignmentIdentityHandoffView(
-      buildIdentityHandoffEvidence()
-    );
-
-    assert.equal(handoffView.title, '作答身份交接');
-    assert.match(handoffView.description, /30 切片/);
-    assert.equal(
-      getIdentityHandoffValue(handoffView, 'name-whitespace-normalization'),
-      '空白已折叠'
-    );
-    assert.equal(
-      getIdentityHandoffValue(handoffView, 'name-attempt-count'),
-      '2 次作答'
-    );
-    assert.equal(
-      getIdentityHandoffValue(handoffView, 'browser-label'),
-      '仅浏览器代码'
-    );
-    assert.equal(
-      getIdentityHandoffValue(handoffView, 'raw-token-guard'),
-      'Raw token 隐藏'
-    );
-    assert.equal(
-      getIdentityHandoffValue(handoffView, 'privacy-guard'),
-      '私有身份隐藏'
-    );
-    assertNoPrivateIdentityHandoffText(JSON.stringify(handoffView));
-  } finally {
-    overwriteGetLocale(() => 'en');
-  }
-});
-
 test('assignment identity evidence comes from shared identity helpers', () => {
   assert.equal(EVIDENCE.nameWhitespaceCollapsed, true);
   assert.equal(EVIDENCE.nameUnicodeNormalized, true);
@@ -191,7 +77,7 @@ test('assignment identity evidence comes from shared identity helpers', () => {
   assertNoPrivateIdentityHandoffText(JSON.stringify(EVIDENCE));
 });
 
-function buildIdentityHandoffEvidence(): AssignmentIdentityHandoffEvidence {
+function buildIdentityHandoffEvidence() {
   const normalizedStudentName = normalizeStudentName(SECRET_STUDENT_NAME);
   const normalizedAnonymousToken = normalizeAnonymousToken(
     SECRET_ANONYMOUS_TOKEN
@@ -384,15 +270,6 @@ function createMemoryStorage(
     },
     writes,
   };
-}
-
-function getIdentityHandoffValue(
-  view: AssignmentIdentityHandoffView,
-  id: AssignmentIdentityHandoffItemId
-) {
-  const itemView = view.itemViews.find((item) => item.id === id);
-  assert.ok(itemView, `Missing assignment identity handoff item ${id}`);
-  return itemView.value;
 }
 
 function assertNoPrivateIdentityHandoffText(serializedView: string) {

@@ -24,7 +24,7 @@ checks such as `pnpm check` and `pnpm build` unless a separate E2E environment i
 explicitly provisioned.
 Pure assignment-domain helpers also have a fast local gate via
 `pnpm test:domain`; run it when changing scoring, submission payload, identity,
-attempt identity handoff contracts, attempt metrics, duration formatting,
+attempt identity contracts, attempt metrics, duration formatting,
 assignment delivery summaries, activity lifecycle derivation rules,
 publish-setting input parsing, share-link helpers, student submit decisions,
 result-summary helpers, result formatting, result copy artifacts,
@@ -89,7 +89,7 @@ Classroom product loop chain has a fast script-level gate via
 `pnpm exec tsx --test scripts/classroom-product-loop-chain-handoff.test.ts`;
 run it when changing the Activity -> Assignment -> Attempt -> Results contract,
 assignment source activity context boundary, classroom data lifecycle and its
-attempt persistence handoff boundary,
+attempt persistence boundary,
 activity library page boundary,
 activity authoring/library workflow, source
 extraction lifecycle, activity lifecycle governance, template roadmap
@@ -101,7 +101,7 @@ runner play and its submit controls handoff boundary,
 student identity lifecycle, student runtime identity boundary, assignment
 submission validation boundary, assignment attempt persistence boundary, scored
 attempt results, assignment attempt stats boundary, answer feedback lifecycle
-and its answer feedback handoff boundary,
+and its answer feedback boundary,
 assignment attempt duration
 boundary, submitted-date continuity, accepted-answer continuity, explanation
 continuity, teacher result review,
@@ -172,8 +172,8 @@ review, manual save, explicit publish, snapshot protection, or AI privacy.
 Assignment shared-boundary gates include
 `pnpm exec tsx --test scripts/assignment-semantic-views.test.ts`,
 `pnpm exec tsx --test scripts/assignment-delivery-policy-handoff-semantic-views.test.ts`,
-`pnpm exec tsx --test scripts/assignment-identity-handoff-semantic-views.test.ts`,
-`pnpm exec tsx --test scripts/assignment-answer-feedback-handoff-semantic-views.test.ts`,
+`pnpm exec tsx --test scripts/assignment-identity.test.ts`,
+`pnpm exec tsx --test scripts/assignment-answer-feedback.test.ts`,
 `pnpm exec tsx --test scripts/public-assignment-access-semantic-views.test.ts`,
 and
 `pnpm exec tsx --test scripts/public-assignment-unavailable-access-handoff-semantic-views.test.ts`;
@@ -181,14 +181,14 @@ run the matching gate when changing shared assignment view models, delivery
 policy propagation, identity normalization, answer feedback, public assignment
 access, or unavailable-link boundaries.
 Assignment attempt identity continuity has a focused source-chain gate via
-`pnpm exec tsx --test scripts/assignment-attempt-identity-continuity-chain-handoff.test.ts`;
-run it when changing the 30-slice source-level contract for name normalization,
+`pnpm exec tsx --test scripts/assignment-attempt-identity-continuity.test.ts`;
+run it when changing the source guards for name normalization,
 anonymous browser tokens, assignment-scoped storage, submission identity,
 attempt-limit counting, persistence, teacher result grouping and ordering, or
 raw identity privacy guards.
 Answer feedback lifecycle chain has a fast script-level gate via
 `pnpm exec tsx --test scripts/answer-feedback-lifecycle-chain-handoff.test.ts`;
-run it when changing the 30-slice answer feedback handoff boundary,
+run it when changing the answer feedback boundary,
 accepted-answer parsing, answer normalization, runtime scoring, public
 post-submit feedback, template feedback surfaces, teacher result analysis,
 result answer text views, CSV answer columns, server review summaries, or
@@ -319,7 +319,7 @@ returning updates, conflict reloads, public access, snapshot and attempt
 retention, teacher results, or transition privacy.
 Classroom data lifecycle chain has a fast script-level gate via
 `pnpm exec tsx --test scripts/classroom-data-lifecycle-chain-handoff.test.ts`;
-run it when changing the 30-slice attempt persistence handoff boundary, D1 app
+run it when changing the attempt persistence boundary, D1 app
 schema, activity/assignment persistence helpers, owner-scoped activity or
 assignment queries, assignment snapshot freezing, public assignment payload
 sanitization, attempt persistence, scored-attempt queries, result
@@ -342,27 +342,27 @@ Workspace governance and utility gates include
 gate when changing admin user governance, billing workspace behavior, or the
 icon proxy used by classroom controls.
 Assignment attempt limits have a fast script-level gate via
-`pnpm exec tsx --test scripts/assignment-attempt-limit-handoff-semantic-views.test.ts`;
+`pnpm exec tsx --test scripts/assignment-attempt-limit.test.ts`;
 run it when changing max-attempt parsing, per-student attempt counters,
 retry availability, public rule summaries, result usage labels, delivery
 summaries, CSV/export delivery-policy fields, attempt-limit privacy-scope
 boundaries, or no-public-audit DOM boundaries.
 Assignment attempt limit continuity has a focused source-chain gate via
-`pnpm exec tsx --test scripts/assignment-attempt-limit-continuity-chain-handoff.test.ts`;
-run it when changing the 30-slice source-level contract for normalized identity,
+`pnpm exec tsx --test scripts/assignment-attempt-limit-continuity.test.ts`;
+run it when changing the source guards for normalized identity,
 previous attempt counting, idempotent replay, concurrent identity slots, D1
 uniqueness, server limit enforcement, student retry state, public rules,
 teacher result policy, exports, or private slot-metadata guards.
 Assignment submission validation has a fast script-level gate via
-`pnpm exec tsx --test scripts/assignment-submission-validation-handoff-semantic-views.test.ts`;
+`pnpm exec tsx --test scripts/assignment-submission-validation.test.ts`;
 run it when changing frozen runtime validation, partial-submission payloads,
 runtime id normalization, unknown/duplicate/too-many rejection, API answer
 limits, safe failure mapping, teacher-result/public-payload boundaries,
 submission-validation privacy-scope boundaries, or no-public-audit DOM
 boundaries.
 Assignment submission validation continuity has a focused source-chain gate via
-`pnpm exec tsx --test scripts/assignment-submission-validation-continuity-chain-handoff.test.ts`;
-run it when changing the 30-slice source-level contract for frozen runtime ids,
+`pnpm exec tsx --test scripts/assignment-submission-validation-continuity.test.ts`;
+run it when changing the source guards for frozen runtime ids,
 partial payloads, shared answer limits, Unicode normalization, invalid-id
 rejection, validate-before-scoring order, scored persistence, safe public
 failures, teacher results, or private-content guards.
@@ -397,18 +397,18 @@ handling, API lifecycle/validation/scoring order, D1 status and expiry triggers,
 database-clock checks, localized write errors, slot conflict isolation, teacher
 results, or internal write-boundary privacy.
 Assignment attempt duration has a fast script-level gate via
-`pnpm exec tsx --test scripts/assignment-attempt-duration-handoff-semantic-views.test.ts`;
+`pnpm exec tsx --test scripts/assignment-attempt-duration.test.ts`;
 run it when changing timer start plans, submission duration normalization,
 student timer badges, result duration labels, result average duration, or CSV
 duration fields.
 Assignment attempt duration continuity has a focused source-chain gate via
-`pnpm exec tsx --test scripts/assignment-attempt-duration-continuity-chain-handoff.test.ts`;
-run it when changing the 30-slice source-level contract for playable runner
+`pnpm exec tsx --test scripts/assignment-attempt-duration-continuity.test.ts`;
+run it when changing the source guards for playable runner
 readiness, clock start or tick plans, browser elapsed time, server normalization,
 timer caps, scored persistence, student/teacher duration displays, aggregate
 statistics, CSV duration fields, or duration-only privacy guards.
 Assignment item ordering has a fast script-level gate via
-`pnpm exec tsx --test scripts/assignment-item-order-handoff-semantic-views.test.ts`;
+`pnpm exec tsx --test scripts/assignment-item-order.test.ts`;
 run it when changing shuffle helper logic, share-slug normalization, public
 payload ordering, student submit/review ordering, printable worksheet ordering,
 delivery summaries, publish previews, public rule summaries, or CSV/export
@@ -467,17 +467,16 @@ worksheet fields, source-context chain alignment, the 30-slice result-material
 boundary for teacher copy, CSV preparation, print, current/full data scope,
 snapshot source, and privacy, or other source-context privacy guards.
 Assignment attempt stats has a fast script-level gate via
-`pnpm exec tsx --test scripts/assignment-attempt-stats-handoff-semantic-views.test.ts`;
+`pnpm exec tsx --test scripts/assignment-attempt-stats.test.ts`;
 run it when changing completions, average accuracy, average points, average
 duration, timer caps, result metric cards, assignment list summaries,
-assignment cards, classroom briefs, copy artifacts, CSV exports, or the
-assignment-attempt-stats handoff.
+assignment cards, classroom briefs, copy artifacts, or CSV exports.
 Assignment attempt stats continuity has a focused source-chain gate via
-`pnpm exec tsx --test scripts/assignment-attempt-stats-continuity-chain-handoff.test.ts`;
-run it when changing the 30-slice source-level contract for completed scored
+`pnpm exec tsx --test scripts/assignment-attempt-stats-continuity.test.ts`;
+run it when changing the source guards for completed scored
 attempts, timer or score normalization, assignment list/card summaries,
-teacher result metrics, classroom briefs, copy artifacts, CSV export, hidden
-semantic output, or aggregate-only privacy guards.
+teacher result metrics, classroom briefs, copy artifacts, CSV export, or
+aggregate-only privacy guards.
 Legacy public route retirement has a fast script-level gate via
 `pnpm exec tsx --test scripts/legacy-public-route-handoff-semantic-views.test.ts`;
 run it when changing retired copied-learning routes, route-tree cleanup,
@@ -806,14 +805,14 @@ AI fallback source-term planning has a fast script-level gate via
 run it when changing deterministic fallback source extraction, material-note
 omission, source-term padding, or the fallback draft term consumers.
 Attempt persistence boundaries have a fast script-level gate via
-`pnpm exec tsx --test scripts/assignment-attempt-persistence-handoff-semantic-views.test.ts`;
+`pnpm exec tsx --test scripts/assignment-attempt-persistence.test.ts`;
 run it when changing submit-attempt persistence, scored-attempt inserts,
 answer/result JSON cloning, identity fields, score/maxScore mapping,
 duration persistence, result-analysis consumers, stats consumers, or CSV export
 consumers.
 Attempt persistence continuity has a focused source-chain gate via
-`pnpm exec tsx --test scripts/assignment-attempt-persistence-continuity-chain-handoff.test.ts`;
-run it when changing the 30-slice source-level contract for submission gates,
+`pnpm exec tsx --test scripts/assignment-attempt-persistence-continuity.test.ts`;
+run it when changing the source guards for submission gates,
 scored-attempt row construction, identity/time fields, immutable answer/result
 JSON, sanitized feedback, teacher analysis, statistics, CSV export, or private
 persistence guards.

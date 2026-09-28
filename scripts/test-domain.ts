@@ -692,17 +692,7 @@ import {
   summarizeAssignmentAttemptsByAssignmentId,
   withAssignmentAttemptStatsSettings,
 } from '@/assignments/attempt-stats';
-import {
-  ASSIGNMENT_ATTEMPT_STATS_HANDOFF_ITEM_IDS,
-  buildAssignmentAttemptStatsHandoffEvidence,
-  buildAssignmentAttemptStatsHandoffView,
-} from '@/assignments/attempt-stats-handoff';
 import { buildScoredAttemptInsert } from '@/assignments/attempt-persistence';
-import {
-  ASSIGNMENT_ATTEMPT_PERSISTENCE_HANDOFF_ITEM_IDS,
-  buildAssignmentAttemptPersistenceHandoffEvidence,
-  buildAssignmentAttemptPersistenceHandoffView,
-} from '@/assignments/attempt-persistence-handoff';
 import {
   SCORED_ATTEMPT_RESULT_CHAIN_HANDOFF_ITEM_IDS,
   SCORED_ATTEMPT_RESULT_CHAIN_SOURCE_FILES,
@@ -718,7 +708,6 @@ import {
   normalizeAttemptTimeLimitSeconds,
   resolveAttemptSubmissionDurationSeconds,
 } from '@/assignments/attempt-duration';
-import { ASSIGNMENT_ATTEMPT_DURATION_HANDOFF_ITEM_IDS } from '@/assignments/attempt-duration-handoff';
 import {
   buildAssignmentAttemptUsage,
   canUseAnotherAssignmentAttempt,
@@ -726,16 +715,6 @@ import {
   normalizeAssignmentMaxAttempts,
   normalizeAssignmentRemainingAttempts,
 } from '@/assignments/attempt-limits';
-import {
-  ASSIGNMENT_ATTEMPT_LIMIT_HANDOFF_ITEM_IDS,
-  buildAssignmentAttemptLimitHandoffEvidence,
-  buildAssignmentAttemptLimitHandoffView,
-} from '@/assignments/attempt-limit-handoff';
-import {
-  ASSIGNMENT_SUBMISSION_VALIDATION_HANDOFF_ITEM_IDS,
-  buildAssignmentSubmissionValidationHandoffEvidence,
-  buildAssignmentSubmissionValidationHandoffView,
-} from '@/assignments/submission-validation-handoff';
 import {
   buildChoicePairingRunnerView,
   buildDefaultRuntimeItemCardViews,
@@ -949,85 +928,7 @@ import {
   orderAssignmentRuntimeItems,
   stableShuffle,
 } from '@/assignments/item-order';
-import { ASSIGNMENT_ITEM_ORDER_HANDOFF_ITEM_IDS } from '@/assignments/item-order-handoff';
-import {
-  assignmentResultPageCopy,
-  assignmentResultReviewCopy,
-  assignmentResultSearchCopy,
-  assignmentResultSectionCopy,
-  assignmentResultTableHeaders,
-  assignmentResultActionDescriptors,
-  assignmentResultActionOrder,
-  buildAttemptReviewSubmissionSummary,
-  buildAssignmentAttemptAnswerReviewView,
-  buildAssignmentAttemptAnswerReviewViews,
-  buildAssignmentAttemptReviewCardView,
-  buildAssignmentAttemptReviewCardViews,
-  buildAssignmentAttemptReviewSummaryMetricViews,
-  buildAssignmentAttemptRowDisplay,
-  buildAssignmentAttemptRowMetricLabels,
-  buildAssignmentAttemptTableView,
-  buildAssignmentAttemptRowViews,
-  buildAssignmentItemAnalysisCardView,
-  buildAssignmentItemAnalysisCardViews,
-  buildAssignmentItemPerformanceRowView,
-  buildAssignmentItemPerformanceRowViews,
-  buildAssignmentResultActionButtons,
-  buildAssignmentResultActionDataSet,
-  buildAssignmentResultActionExecutionPlan,
-  buildAssignmentResultActionPayload,
-  buildAssignmentResultActionState,
-  buildAssignmentResultActionScopeView,
-  buildAssignmentResultActionStatusView,
-  buildAssignmentResultCopyActionData,
-  buildAssignmentResultCopyArtifacts,
-  buildAssignmentResultCopyArtifactPreviews,
-  buildAssignmentResultCopyText,
-  buildAssignmentResultContentState,
-  buildAssignmentResultHeaderView,
-  buildAssignmentResultHeaderShareAction,
-  buildAssignmentResultMetricItems,
-  buildAssignmentResultSectionState,
-  buildAssignmentResultSectionViews,
-  buildAssignmentResultControlAriaLabel,
-  buildAssignmentResultControlViews,
-  buildAssignmentResultControlStatusView,
-  buildAssignmentResultCopyScopeView,
-  buildAssignmentResultReviewScopeView,
-  buildAssignmentResultReviewStatusView,
-  buildAssignmentResultReviewScopeSummary,
-  buildAssignmentResultViewModel,
-  buildAssignmentResultsPageViewModel,
-  buildAssignmentResultsRouteState,
-  buildAssignmentStudentSummaryRowView,
-  buildAssignmentStudentSummaryRowViews,
-  buildAssignmentResultEmptyState,
-  attemptReviewFilterOptions,
-  buildResultSearchSummary,
-  formatAssignmentAttemptReviewBadge,
-  formatAssignmentItemCorrectSummary,
-  formatAssignmentResultFraction,
-  formatAssignmentResultNumber,
-  formatAssignmentResultPercent,
-  formatAssignmentReviewCount,
-  getAssignmentAnswerReviewStatus,
-  getAssignmentResultCompletedAttemptCount,
-  itemPerformanceSortOptions,
-  normalizeAssignmentResultScopeCount,
-  normalizeAssignmentResultProgressValue,
-  getAssignmentResultActionExecutionData,
-  getAssignmentResultActionExecutionDataScope,
-  getAssignmentResultActionButtonId,
-  getAssignmentResultCopyArtifactText,
-  getAssignmentResultCopyArtifactPreviewId,
-  getAssignmentResultActionDisabledReason,
-  getAssignmentResultActionCopy,
-  getAssignmentResultActionGate,
-  getAssignmentResultActionGateFromState,
-  studentSummarySortOptions,
-  type AssignmentResultEmptyState,
-  type AssignmentResultTableHeaderView,
-} from '@/assignments/result-view';
+import { assignmentResultPageCopy, assignmentResultReviewCopy, assignmentResultSearchCopy, assignmentResultSectionCopy, assignmentResultTableHeaders, assignmentResultActionDescriptors, assignmentResultActionOrder, buildAttemptReviewSubmissionSummary, buildAssignmentAttemptAnswerReviewView, buildAssignmentAttemptAnswerReviewViews, buildAssignmentAttemptReviewCardView, buildAssignmentAttemptReviewCardViews, buildAssignmentAttemptReviewSummaryMetricViews, buildAssignmentAttemptRowDisplay, buildAssignmentAttemptRowMetricLabels, buildAssignmentAttemptTableView, buildAssignmentAttemptRowViews, buildAssignmentItemAnalysisCardView, buildAssignmentItemAnalysisCardViews, buildAssignmentItemPerformanceRowView, buildAssignmentItemPerformanceRowViews, buildAssignmentResultActionButtons, buildAssignmentResultActionDataSet, buildAssignmentResultActionExecutionPlan, buildAssignmentResultActionPayload, buildAssignmentResultActionState, buildAssignmentResultActionScopeView, buildAssignmentResultActionStatusView, buildAssignmentResultCopyActionData, buildAssignmentResultCopyArtifacts, buildAssignmentResultCopyArtifactPreviews, buildAssignmentResultCopyText, buildAssignmentResultContentState, buildAssignmentResultHeaderView, buildAssignmentResultHeaderShareAction, buildAssignmentResultMetricItems, buildAssignmentResultSectionState, buildAssignmentResultSectionViews, buildAssignmentResultControlAriaLabel, buildAssignmentResultControlViews, buildAssignmentResultControlStatusView, buildAssignmentResultCopyScopeView, buildAssignmentResultReviewScopeView, buildAssignmentResultReviewScopeSummary, buildAssignmentResultViewModel, buildAssignmentResultsPageViewModel, buildAssignmentResultsRouteState, buildAssignmentStudentSummaryRowView, buildAssignmentStudentSummaryRowViews, buildAssignmentResultEmptyState, attemptReviewFilterOptions, buildResultSearchSummary, formatAssignmentAttemptReviewBadge, formatAssignmentItemCorrectSummary, formatAssignmentResultFraction, formatAssignmentResultNumber, formatAssignmentResultPercent, formatAssignmentReviewCount, getAssignmentAnswerReviewStatus, getAssignmentResultCompletedAttemptCount, itemPerformanceSortOptions, normalizeAssignmentResultScopeCount, normalizeAssignmentResultProgressValue, getAssignmentResultActionExecutionData, getAssignmentResultActionExecutionDataScope, getAssignmentResultActionButtonId, getAssignmentResultCopyArtifactText, getAssignmentResultCopyArtifactPreviewId, getAssignmentResultActionDisabledReason, getAssignmentResultActionCopy, getAssignmentResultActionGate, getAssignmentResultActionGateFromState, studentSummarySortOptions, type AssignmentResultEmptyState, type AssignmentResultTableHeaderView } from '@/assignments/result-view';
 import {
   TEACHER_RESULTS_REVIEW_CHAIN_HANDOFF_ITEM_IDS,
   TEACHER_RESULTS_REVIEW_CHAIN_SOURCE_FILES,
@@ -1102,7 +1003,6 @@ import {
   buildAssignmentResultAnswerStatusView,
   buildAssignmentResultAttemptAnswerTextView,
 } from '@/assignments/result-answer-view';
-import { ASSIGNMENT_ANSWER_FEEDBACK_HANDOFF_ITEM_IDS } from '@/assignments/answer-feedback-handoff';
 import {
   ANSWER_FEEDBACK_LIFECYCLE_CHAIN_HANDOFF_ITEM_IDS,
   ANSWER_FEEDBACK_LIFECYCLE_CHAIN_SOURCE_FILES,
@@ -3706,10 +3606,6 @@ const assignmentAttemptStatsSource = readFileSync(
   'src/assignments/attempt-stats.ts',
   'utf8'
 );
-const assignmentAttemptStatsHandoffSource = readFileSync(
-  'src/assignments/attempt-stats-handoff.ts',
-  'utf8'
-);
 const assignmentResultsExportStatsHandoffSource = readFileSync(
   'src/assignments/results-export.ts',
   'utf8'
@@ -3741,21 +3637,6 @@ assert.match(
   assignmentAttemptStatsSource,
   /function getAttemptAccuracy[\s\S]*normalizeAttemptStatsPercent\(item\.resultJson\?\.accuracy\)[\s\S]*function getAttemptPoints[\s\S]*normalizeAttemptStatsNumber\(item\.score,[\s\S]*max: totalPoints[\s\S]*normalizeAttemptStatsNumber\(item\.resultJson\?\.earnedPoints/,
   'Assignment attempt stats should normalize accuracy and point values before averaging.'
-);
-assert.match(
-  assignmentAttemptStatsHandoffSource,
-  /ASSIGNMENT_ATTEMPT_STATS_HANDOFF_ITEM_IDS = \[[\s\S]*'stats-scope'[\s\S]*'completed-attempt-count'[\s\S]*'average-duration'[\s\S]*'csv-export-consumer'[\s\S]*'privacy-guard'/,
-  'Assignment attempt stats handoff should expose the 30 shared metric and privacy slices.'
-);
-assert.match(
-  assignmentAttemptStatsHandoffSource,
-  /buildAssignmentAttemptStatsHandoffEvidence[\s\S]*summarizeAssignmentAttempts[\s\S]*normalizeAssignmentAttemptStats[\s\S]*buildAssignmentAttemptStatsView/,
-  'Assignment attempt stats handoff evidence should derive from shared assignment stats helpers.'
-);
-assert.match(
-  assignmentAttemptStatsHandoffSource,
-  /exposesAcceptedAnswers: false[\s\S]*exposesCsvDataUrl: false[\s\S]*exposesPromptText: false[\s\S]*exposesRawAnonymousToken: false[\s\S]*exposesShareSlug: false[\s\S]*exposesStudentAnswerText: false[\s\S]*exposesStudentDisplayLabels: false[\s\S]*exposesTeacherAnswerKey: false/,
-  'Assignment attempt stats handoff privacy contract should keep private result data out of semantic output.'
 );
 assert.doesNotMatch(
   assignmentAttemptStatsSource,
@@ -4446,23 +4327,6 @@ assert.deepEqual(publishedAssignmentDeliveryChainView.privacy, {
   usesOpaquePublishControlScope: true,
   usesPublishControlHandoff: true,
 });
-assert.deepEqual(
-  [
-    ASSIGNMENT_DELIVERY_POLICY_HANDOFF_ITEM_IDS.length,
-    PUBLIC_ASSIGNMENT_ACCESS_HANDOFF_ITEM_IDS.length,
-    PUBLIC_ASSIGNMENT_UNAVAILABLE_ACCESS_HANDOFF_ITEM_IDS.length,
-    ASSIGNMENT_ITEM_ORDER_HANDOFF_ITEM_IDS.length,
-    ASSIGNMENT_ATTEMPT_LIMIT_HANDOFF_ITEM_IDS.length,
-    ASSIGNMENT_SUBMISSION_VALIDATION_HANDOFF_ITEM_IDS.length,
-    ASSIGNMENT_ATTEMPT_PERSISTENCE_HANDOFF_ITEM_IDS.length,
-    ASSIGNMENT_ATTEMPT_DURATION_HANDOFF_ITEM_IDS.length,
-    ASSIGNMENT_ANSWER_FEEDBACK_HANDOFF_ITEM_IDS.length,
-    ASSIGNMENT_ATTEMPT_STATS_HANDOFF_ITEM_IDS.length,
-    ASSIGNMENT_PUBLISH_CONTROL_BOUNDARY_ITEM_IDS.length,
-  ],
-  Array.from({ length: 11 }, () => 30),
-  'Published assignment delivery chain should stay backed by focused assignment gates.'
-);
 assert.deepEqual(Object.fromEntries(publishedAssignmentDeliveryChainValues), {
   'answer-feedback-gate': 'Reveal policy respected',
   'assignment-persistence': 'Published row',
@@ -4798,7 +4662,7 @@ assert.deepEqual(Object.fromEntries(answerFeedbackLifecycleChainValues), {
 });
 assert.match(
   readFileSync('tests/e2e/TEST-CATALOG.md', 'utf8'),
-  /Answer feedback lifecycle chain has a fast script-level gate via[\s\S]*scripts\/answer-feedback-lifecycle-chain-handoff\.test\.ts[\s\S]*answer feedback handoff boundary/,
+  /Answer feedback lifecycle chain has a fast script-level gate via[\s\S]*scripts\/answer-feedback-lifecycle-chain-handoff\.test\.ts[\s\S]*answer feedback boundary/,
   'TEST-CATALOG should document the answer feedback lifecycle chain gate.'
 );
 const assignmentLifecycleGovernanceChainView =
@@ -5144,22 +5008,6 @@ assert.deepEqual(classroomDataLifecycleChainView.privacy, {
   usesSnapshotForPublicRuntime: true,
   usesScoredAttemptInsertHelper: true,
 });
-assert.deepEqual(
-  [
-    ACTIVITY_AUTHORING_LIBRARY_CHAIN_HANDOFF_ITEM_IDS.length,
-    ACTIVITY_AUTHORING_LIBRARY_CHAIN_SOURCE_FILES.length,
-    PUBLISHED_ASSIGNMENT_DELIVERY_CHAIN_HANDOFF_ITEM_IDS.length,
-    PUBLISHED_ASSIGNMENT_DELIVERY_CHAIN_SOURCE_FILES.length,
-    STUDENT_RUNNER_PLAY_CHAIN_HANDOFF_ITEM_IDS.length,
-    STUDENT_RUNNER_PLAY_CHAIN_SOURCE_FILES.length,
-    TEACHER_RESULTS_REVIEW_CHAIN_HANDOFF_ITEM_IDS.length,
-    TEACHER_RESULTS_REVIEW_CHAIN_SOURCE_FILES.length,
-    ASSIGNMENT_ATTEMPT_PERSISTENCE_HANDOFF_ITEM_IDS.length,
-    PUBLIC_ASSIGNMENT_ACCESS_HANDOFF_ITEM_IDS.length,
-  ],
-  Array.from({ length: 10 }, () => 30),
-  'Classroom data lifecycle chain should stay backed by adjacent activity, delivery, student-runner, result, export, public, and print gates.'
-);
 assert.deepEqual(Object.fromEntries(classroomDataLifecycleChainValues), {
   'activity-content-json': 'ActivityContent',
   'activity-create-persistence': 'buildActivityCreateInsert',
@@ -5194,7 +5042,7 @@ assert.deepEqual(Object.fromEntries(classroomDataLifecycleChainValues), {
 });
 assert.match(
   readFileSync('tests/e2e/TEST-CATALOG.md', 'utf8'),
-  /Classroom data lifecycle chain has a fast script-level gate via[\s\S]*scripts\/classroom-data-lifecycle-chain-handoff\.test\.ts[\s\S]*attempt persistence handoff boundary/,
+  /Classroom data lifecycle chain has a fast script-level gate via[\s\S]*scripts\/classroom-data-lifecycle-chain-handoff\.test\.ts[\s\S]*attempt persistence boundary/,
   'TEST-CATALOG should document the classroom data lifecycle chain gate.'
 );
 assert.match(
@@ -5253,15 +5101,6 @@ assert.deepEqual(teacherResultsReviewChainView.privacy, {
   usesResultReviewControlsHandoff: true,
   usesTeacherOnlyResultScope: true,
 });
-assert.deepEqual(
-  [
-    ASSIGNMENT_ATTEMPT_STATS_HANDOFF_ITEM_IDS.length,
-    ASSIGNMENT_ATTEMPT_DURATION_HANDOFF_ITEM_IDS.length,
-    ASSIGNMENT_ANSWER_FEEDBACK_HANDOFF_ITEM_IDS.length,
-  ],
-  Array.from({ length: 3 }, () => 30),
-  'Teacher results review chain should stay backed by focused result-review gates.'
-);
 assert.deepEqual(Object.fromEntries(teacherResultsReviewChainValues), {
   'accepted-alternatives-format': 'Shared formatter',
   'anonymous-token-guard': 'Raw token hidden',
@@ -15536,10 +15375,6 @@ assert.deepEqual(
     STUDENT_RUNNER_PLAY_CHAIN_SOURCE_FILES.length,
     STUDENT_IDENTITY_LIFECYCLE_CHAIN_HANDOFF_ITEM_IDS.length,
     STUDENT_IDENTITY_LIFECYCLE_CHAIN_SOURCE_FILES.length,
-    ASSIGNMENT_SUBMISSION_VALIDATION_HANDOFF_ITEM_IDS.length,
-    ASSIGNMENT_ATTEMPT_PERSISTENCE_HANDOFF_ITEM_IDS.length,
-    ASSIGNMENT_ATTEMPT_DURATION_HANDOFF_ITEM_IDS.length,
-    ASSIGNMENT_ATTEMPT_STATS_HANDOFF_ITEM_IDS.length,
     ANSWER_FEEDBACK_LIFECYCLE_CHAIN_HANDOFF_ITEM_IDS.length,
     ANSWER_FEEDBACK_LIFECYCLE_CHAIN_SOURCE_FILES.length,
     SCORED_ATTEMPT_RESULT_CHAIN_HANDOFF_ITEM_IDS.length,
@@ -15562,7 +15397,7 @@ assert.deepEqual(
     PUBLIC_DISCOVERY_INDEXING_CHAIN_SOURCE_FILES.length,
     CLASSROOM_TRUST_COMMUNICATION_CHAIN_HANDOFF_ITEM_IDS.length,
   ],
-  Array.from({ length: 54 }, () => 30),
+  Array.from({ length: 50 }, () => 30),
   'Classroom product loop chain should stay backed by adjacent public entry, public discovery/indexing, workspace, data, authoring, source extraction, lifecycle governance, template roadmap, AI enhancement lifecycle, delivery, runner, result continuity, export, print, and trust gates.'
 );
 assert.deepEqual(Object.fromEntries(classroomProductLoopChainValues), {
@@ -17678,18 +17513,6 @@ const studentRunnerSubmissionSource = readFileSync(
   'src/assignments/student-submission.ts',
   'utf8'
 );
-const attemptLimitHandoffSource = readFileSync(
-  'src/assignments/attempt-limit-handoff.ts',
-  'utf8'
-);
-const submissionValidationHandoffSource = readFileSync(
-  'src/assignments/submission-validation-handoff.ts',
-  'utf8'
-);
-const attemptLimitsSource = readFileSync(
-  'src/assignments/attempt-limits.ts',
-  'utf8'
-);
 const assignmentAttemptLimitApiSource = readFileSync(
   'src/api/assignments.ts',
   'utf8'
@@ -18017,19 +17840,6 @@ assert.deepEqual(studentRunnerPlayChainView.privacy, {
   submissionPayloadUsesRuntimeItemIds: true,
   usesSubmitControlsHandoff: true,
 });
-assert.deepEqual(
-  [
-    PUBLIC_ASSIGNMENT_ACCESS_HANDOFF_ITEM_IDS.length,
-    PUBLIC_ASSIGNMENT_UNAVAILABLE_ACCESS_HANDOFF_ITEM_IDS.length,
-    ASSIGNMENT_ATTEMPT_LIMIT_HANDOFF_ITEM_IDS.length,
-    ASSIGNMENT_ATTEMPT_DURATION_HANDOFF_ITEM_IDS.length,
-    ASSIGNMENT_ANSWER_FEEDBACK_HANDOFF_ITEM_IDS.length,
-    ASSIGNMENT_SUBMISSION_VALIDATION_HANDOFF_ITEM_IDS.length,
-    ASSIGNMENT_ATTEMPT_PERSISTENCE_HANDOFF_ITEM_IDS.length,
-  ],
-  Array.from({ length: 7 }, () => 30),
-  'Student runner play chain should stay backed by focused public-runner gates.'
-);
 assert.deepEqual(Object.fromEntries(studentRunnerPlayChainValues), {
   'anonymous-token-guard': 'Raw token hidden',
   'answer-feedback-policy': 'Reveal if allowed',
@@ -18119,16 +17929,6 @@ assert.deepEqual(studentIdentityLifecycleChainView.privacy, {
   usesScoredAttemptsForAttemptLimits: true,
   usesStudentRuntimeIdentityHandoff: true,
 });
-assert.deepEqual(
-  [
-    ASSIGNMENT_ATTEMPT_LIMIT_HANDOFF_ITEM_IDS.length,
-    ASSIGNMENT_ATTEMPT_PERSISTENCE_HANDOFF_ITEM_IDS.length,
-    STUDENT_RUNNER_PLAY_CHAIN_HANDOFF_ITEM_IDS.length,
-    TEACHER_RESULTS_REVIEW_CHAIN_HANDOFF_ITEM_IDS.length,
-  ],
-  Array.from({ length: 4 }, () => 30),
-  'Student identity lifecycle chain should stay backed by adjacent identity, runner, attempt, result, and export gates.'
-);
 assert.deepEqual(Object.fromEntries(studentIdentityLifecycleChainValues), {
   'anonymous-browser-label': '6-char browser code',
   'anonymous-identity-key': 'anonymous:*',
@@ -18630,166 +18430,12 @@ assert.doesNotMatch(
   /<StudentRunnerSubmissionHandoff\b/,
   'Student play route should not render the hidden submission audit handoff.'
 );
-const studentSubmissionPrivateAnswer = 'DOMAIN_PRIVATE_STUDENT_ANSWER';
-const studentSubmissionPrivateToken = 'domain-private-anonymous-token';
 const studentSubmissionStarterPreview = buildStudentRunnerStarterPreview(
   STARTER_FOOD_ASSIGNMENT_SHARE_ID
 );
 const studentSubmissionRuntimeItem =
   studentSubmissionStarterPreview.runtimeItems[0];
 assert.ok(studentSubmissionRuntimeItem);
-const assignmentAttemptLimitUsage = buildAssignmentAttemptUsage({
-  maxAttempts: 3.8,
-  previousAttemptCount: 1.9,
-});
-const assignmentAttemptLimitHandoffView =
-  buildAssignmentAttemptLimitHandoffView(
-    buildAssignmentAttemptLimitHandoffEvidence({
-      apiPreviousCountUsesIdentityQuery: /countPreviousIdentityAttempts/.test(
-        assignmentAttemptLimitApiSource
-      ),
-      attemptUsage: assignmentAttemptLimitUsage,
-      attemptUsageLabel: formatStudentAttemptUsageLabel(
-        assignmentAttemptLimitUsage
-      ),
-      attemptCounterUsesPreviousCount: /previousAttemptCount/.test(
-        assignmentAttemptLimitApiSource
-      ),
-      deliverySummaryUsesAttemptLimit:
-        /hasAttemptLimit[\s\S]*maxAttempts/.test(
-          assignmentAttemptLimitDeliverySummarySource
-        ),
-      identityMode: 'student-name',
-      maxAttemptParserUsesSharedHelper: /normalizeAssignmentMaxAttempts/.test(
-        attemptLimitsSource
-      ),
-      publicRulesUseAttemptLimit:
-        /case 'attempt-limit':[\s\S]*assignment_delivery_label_attempts/.test(
-          assignmentAttemptLimitPublicSource
-        ),
-      resultExportUsesAttemptLimit: /delivery-attempt-limit/.test(
-        assignmentAttemptLimitResultExportSource
-      ),
-      resultPageUsesAttemptLimit:
-        /settingsSummaryView: buildAssignmentSettingsSummaryView\(\{[\s\S]*settings: assignment\.settingsJson/.test(
-          assignmentAttemptLimitResultViewSource
-        ),
-      retryAvailable: canStartAnotherStudentAttempt({
-        canSubmit: true,
-        hasResult: true,
-        maxAttempts: assignmentAttemptLimitUsage.maxAttempts,
-        submittedAttemptCount: assignmentAttemptLimitUsage.usedAttempts,
-      }),
-      retryButtonUsesLimitDecision:
-        /showStartAnotherAttempt = canStartAnotherStudentAttempt/.test(
-          studentRunnerStateSource
-        ),
-      runnerResultUsesAttemptUsage:
-        /formatStudentAttemptUsageLabel\(result\.attemptUsage\)/.test(
-          studentRunnerStateSource
-        ),
-      serverEnforcesLimit:
-        /persistAttemptWithinIdentityLimit\(\{[\s\S]*maxAttempts: settings\.maxAttempts[\s\S]*persistence\.type === 'limit-reached'/.test(
-          assignmentAttemptLimitApiSource
-        ),
-      scoredAttemptWriteGatedByLimit:
-        /persistAttemptWithinIdentityLimit\(\{[\s\S]*insertAttempt:[\s\S]*await db\.insert\(attempt\)[\s\S]*identitySlot,[\s\S]*persistence\.type === 'limit-reached'[\s\S]*throw new Error\(m\.assignment_api_error_attempt_limit_reached\(\)\)/.test(
-          assignmentAttemptLimitApiSource
-        ),
-      submittedAttemptCount: assignmentAttemptLimitUsage.usedAttempts,
-      submissionGateUsesLimitHelper:
-        /canStartAnotherStudentAttempt[\s\S]*canUseAnotherAssignmentAttempt/.test(
-          studentRunnerSubmissionSource
-        ),
-    })
-  );
-const assignmentAttemptLimitHandoffValues = new Map(
-  assignmentAttemptLimitHandoffView.itemViews.map((item) => [
-    item.id,
-    item.value,
-  ])
-);
-assert.match(
-  attemptLimitHandoffSource,
-  /export const ASSIGNMENT_ATTEMPT_LIMIT_HANDOFF_ITEM_IDS = \[(?=[\s\S]*'attempt-scope')(?=[\s\S]*'max-attempt-normalization')(?=[\s\S]*'previous-count-normalization')(?=[\s\S]*'used-attempts')(?=[\s\S]*'remaining-attempts')(?=[\s\S]*'unlimited-attempts')(?=[\s\S]*'limit-reached')(?=[\s\S]*'retry-availability')(?=[\s\S]*'result-usage-label')(?=[\s\S]*'student-name-identity')(?=[\s\S]*'anonymous-token-identity')(?=[\s\S]*'identity-mode')(?=[\s\S]*'attempt-counter-source')(?=[\s\S]*'max-attempt-parser')(?=[\s\S]*'api-previous-count-query')(?=[\s\S]*'server-enforcement')(?=[\s\S]*'scored-attempt-write-gate')(?=[\s\S]*'runner-result-boundary')(?=[\s\S]*'retry-button-boundary')(?=[\s\S]*'submission-gate-boundary')(?=[\s\S]*'delivery-summary-boundary')(?=[\s\S]*'public-rule-boundary')(?=[\s\S]*'result-page-boundary')(?=[\s\S]*'result-export-boundary')(?=[\s\S]*'negative-count-guard')(?=[\s\S]*'fractional-count-guard')(?=[\s\S]*'nonfinite-max-guard')(?=[\s\S]*'zero-max-guard')(?=[\s\S]*'raw-token-guard')(?=[\s\S]*'privacy-guard')[\s\S]*\] as const;/,
-  'Assignment attempt-limit handoff should declare exactly the 30 product and architecture slice ids.'
-);
-assert.deepEqual(
-  assignmentAttemptLimitHandoffView.itemViews.map((item) => item.id),
-  [...ASSIGNMENT_ATTEMPT_LIMIT_HANDOFF_ITEM_IDS],
-  'Assignment attempt-limit handoff should expose the stable 30-slice order.'
-);
-assert.equal(assignmentAttemptLimitHandoffView.itemViews.length, 30);
-assert.deepEqual(assignmentAttemptLimitHandoffView.privacy, {
-  exposesAnonymousToken: false,
-  exposesAnswerText: false,
-  exposesRawIdentityKey: false,
-  exposesRawSubmissionPayload: false,
-  exposesStudentName: false,
-  exposesTeacherOnlyAnswers: false,
-  itemIds: [...ASSIGNMENT_ATTEMPT_LIMIT_HANDOFF_ITEM_IDS],
-  mutatesAttempts: false,
-  readsBrowserStorage: false,
-  scope: 'assignment-attempt-limit-boundary',
-  usesSharedAttemptLimitHelpers: true,
-});
-assert.equal(
-  assignmentAttemptLimitHandoffValues.get('max-attempt-normalization'),
-  '3 max'
-);
-assert.equal(
-  assignmentAttemptLimitHandoffValues.get('previous-count-normalization'),
-  '1 previous'
-);
-assert.equal(assignmentAttemptLimitHandoffValues.get('used-attempts'), '2 used');
-assert.equal(
-  assignmentAttemptLimitHandoffValues.get('remaining-attempts'),
-  '1 attempt left'
-);
-assert.equal(
-  assignmentAttemptLimitHandoffValues.get('limit-reached'),
-  'Blocked'
-);
-assert.equal(
-  assignmentAttemptLimitHandoffValues.get('retry-availability'),
-  'Available'
-);
-assert.equal(
-  assignmentAttemptLimitHandoffValues.get('student-name-identity'),
-  'Normalized name'
-);
-assert.equal(
-  assignmentAttemptLimitHandoffValues.get('anonymous-token-identity'),
-  'Normalized token'
-);
-assert.equal(
-  assignmentAttemptLimitHandoffValues.get('identity-mode'),
-  'Student name'
-);
-assert.equal(
-  assignmentAttemptLimitHandoffValues.get('attempt-counter-source'),
-  'Previous count'
-);
-assert.equal(
-  assignmentAttemptLimitHandoffValues.get('retry-button-boundary'),
-  'Available'
-);
-assert.equal(
-  assignmentAttemptLimitHandoffValues.get('nonfinite-max-guard'),
-  'Unlimited'
-);
-assert.equal(
-  assignmentAttemptLimitHandoffValues.get('zero-max-guard'),
-  'Unlimited'
-);
-assert.equal(
-  assignmentAttemptLimitHandoffValues.get('raw-token-guard'),
-  'Raw token hidden'
-);
-assert.equal(
-  assignmentAttemptLimitHandoffValues.get('privacy-guard'),
-  'Private data hidden'
-);
 assert.equal(normalizeAssignmentMaxAttempts(3.8), 3);
 assert.equal(normalizeAssignmentMaxAttempts(0), undefined);
 assert.equal(normalizeAssignmentMaxAttempts(Number.NaN), undefined);
@@ -18838,172 +18484,6 @@ assert.match(
   /deliveryView\.maxAttempts/,
   'Result exports should preserve the assignment delivery attempt-limit field.'
 );
-for (const privateValue of [
-  studentSubmissionPrivateAnswer,
-  studentSubmissionPrivateToken,
-  studentSubmissionRuntimeItem.id,
-]) {
-  assert.equal(
-    JSON.stringify(assignmentAttemptLimitHandoffView).includes(privateValue),
-    false,
-    `Assignment attempt-limit handoff leaked private text: ${privateValue}`
-  );
-}
-const assignmentSubmissionValidationHandoffView =
-  buildAssignmentSubmissionValidationHandoffView(
-    buildAssignmentSubmissionValidationHandoffEvidence({
-      apiNormalizesAnswersBeforeValidation:
-        /const submittedAnswers = normalizeSubmittedAttemptAnswers/.test(
-          assignmentAttemptLimitApiSource
-        ),
-      apiValidatesBeforeScoring:
-        /assertSubmittedAnswersMatchRuntimeItems[\s\S]*evaluateRuntimeAnswers/.test(
-          assignmentAttemptLimitApiSource
-        ),
-      clientPayloadUsesRuntimeItems:
-        /buildAttemptSubmissionAnswers[\s\S]*getUniqueSubmissionRuntimeItemEntries/.test(
-          studentRunnerSubmissionSource
-        ),
-      clientProgressUsesRuntimeItems:
-        /getAttemptCompletionSummary[\s\S]*getUniqueSubmissionRuntimeItemEntries/.test(
-          studentRunnerSubmissionSource
-        ),
-      persistenceUsesNormalizedAnswers:
-        /const evaluation = evaluateRuntimeAnswers\(\{[\s\S]*answers: submittedAnswers[\s\S]*buildScoredAttemptInsert\(\{[\s\S]*evaluation,/.test(
-          assignmentAttemptLimitApiSource
-        ),
-      publicPayloadExcludesTeacherAnswers: /stripRuntimeAnswers/.test(
-        assignmentAttemptLimitPublicSource
-      ),
-      runtimeItems: [
-        { id: 'item-1' },
-        { id: 'item-2' },
-        { id: 'item-3' },
-      ],
-      safeFailureMapping:
-        /isSafeStudentAttemptAnswerValidationErrorCode[\s\S]*unknown-item/.test(
-          studentRunnerSubmissionSource
-        ),
-      scoringUsesNormalizedAnswers:
-        /evaluateRuntimeAnswers\(\{[\s\S]*answers: submittedAnswers/.test(
-          assignmentAttemptLimitApiSource
-        ),
-      submittedAnswerCount: 2,
-      teacherResultsUseStoredScoredAnswers:
-        /buildAssignmentResultsPageViewModel[\s\S]*reviews: data\?\.analysis\.attempts/.test(
-          assignmentAttemptLimitResultViewSource
-        ),
-    })
-  );
-const assignmentSubmissionValidationHandoffValues = new Map(
-  assignmentSubmissionValidationHandoffView.itemViews.map((item) => [
-    item.id,
-    item.value,
-  ])
-);
-assert.match(
-  submissionValidationHandoffSource,
-  /export const ASSIGNMENT_SUBMISSION_VALIDATION_HANDOFF_ITEM_IDS = \[(?=[\s\S]*'validation-scope')(?=[\s\S]*'runtime-source')(?=[\s\S]*'runtime-item-count')(?=[\s\S]*'submitted-answer-count')(?=[\s\S]*'partial-submission')(?=[\s\S]*'empty-answer-omission')(?=[\s\S]*'runtime-id-normalization')(?=[\s\S]*'submitted-id-normalization')(?=[\s\S]*'runtime-id-uniqueness')(?=[\s\S]*'blank-id-rejection')(?=[\s\S]*'unknown-item-rejection')(?=[\s\S]*'duplicate-item-rejection')(?=[\s\S]*'too-many-rejection')(?=[\s\S]*'duplicate-runtime-rejection')(?=[\s\S]*'fullwidth-id-normalization')(?=[\s\S]*'api-answer-limit')(?=[\s\S]*'api-item-id-limit')(?=[\s\S]*'api-answer-text-limit')(?=[\s\S]*'api-max-answers-limit')(?=[\s\S]*'api-normalizes-answers')(?=[\s\S]*'api-validates-before-scoring')(?=[\s\S]*'scoring-normalized-answers')(?=[\s\S]*'persistence-normalized-answers')(?=[\s\S]*'client-payload-builder')(?=[\s\S]*'client-progress-source')(?=[\s\S]*'safe-failure-mapping')(?=[\s\S]*'teacher-result-boundary')(?=[\s\S]*'public-payload-boundary')(?=[\s\S]*'raw-payload-guard')(?=[\s\S]*'privacy-guard')[\s\S]*\] as const;/,
-  'Assignment submission-validation handoff should declare exactly the 30 submission contract slice ids.'
-);
-assert.deepEqual(
-  assignmentSubmissionValidationHandoffView.itemViews.map((item) => item.id),
-  [...ASSIGNMENT_SUBMISSION_VALIDATION_HANDOFF_ITEM_IDS],
-  'Assignment submission-validation handoff should expose the stable 30-slice order.'
-);
-assert.equal(assignmentSubmissionValidationHandoffView.itemViews.length, 30);
-assert.deepEqual(assignmentSubmissionValidationHandoffView.privacy, {
-  exposesAnswerText: false,
-  exposesRawAnonymousToken: false,
-  exposesRawPayloadRows: false,
-  exposesRuntimeItemIds: false,
-  exposesStudentName: false,
-  exposesTeacherOnlyAnswers: false,
-  itemIds: [...ASSIGNMENT_SUBMISSION_VALIDATION_HANDOFF_ITEM_IDS],
-  mutatesAttempts: false,
-  scope: 'assignment-submission-validation-boundary',
-  usesSharedAttemptAnswerHelpers: true,
-});
-assert.equal(
-  assignmentSubmissionValidationHandoffValues.get('validation-scope'),
-  'Frozen runtime validation'
-);
-assert.equal(
-  assignmentSubmissionValidationHandoffValues.get('runtime-source'),
-  'Frozen runtime'
-);
-assert.equal(
-  assignmentSubmissionValidationHandoffValues.get('runtime-item-count'),
-  '3 runtime items'
-);
-assert.equal(
-  assignmentSubmissionValidationHandoffValues.get('submitted-answer-count'),
-  '2 answers'
-);
-assert.equal(
-  assignmentSubmissionValidationHandoffValues.get('partial-submission'),
-  'Partial attempts allowed'
-);
-assert.equal(
-  assignmentSubmissionValidationHandoffValues.get('empty-answer-omission'),
-  'Empty answers omitted'
-);
-assert.equal(
-  assignmentSubmissionValidationHandoffValues.get('runtime-id-uniqueness'),
-  'Unique ids'
-);
-assert.equal(
-  assignmentSubmissionValidationHandoffValues.get('blank-id-rejection'),
-  'Rejected'
-);
-assert.equal(
-  assignmentSubmissionValidationHandoffValues.get('unknown-item-rejection'),
-  'Rejected'
-);
-assert.equal(
-  assignmentSubmissionValidationHandoffValues.get('duplicate-item-rejection'),
-  'Rejected'
-);
-assert.equal(
-  assignmentSubmissionValidationHandoffValues.get('too-many-rejection'),
-  'Rejected'
-);
-assert.equal(
-  assignmentSubmissionValidationHandoffValues.get(
-    'duplicate-runtime-rejection'
-  ),
-  'Rejected'
-);
-assert.equal(
-  assignmentSubmissionValidationHandoffValues.get(
-    'fullwidth-id-normalization'
-  ),
-  'Normalized'
-);
-assert.equal(
-  assignmentSubmissionValidationHandoffValues.get('api-answer-limit'),
-  '200 max'
-);
-assert.equal(
-  assignmentSubmissionValidationHandoffValues.get('api-item-id-limit'),
-  '120 max'
-);
-assert.equal(
-  assignmentSubmissionValidationHandoffValues.get('api-answer-text-limit'),
-  '500 chars'
-);
-assert.equal(
-  assignmentSubmissionValidationHandoffValues.get('safe-failure-mapping'),
-  'Safe failure messages'
-);
-assert.equal(
-  assignmentSubmissionValidationHandoffValues.get('raw-payload-guard'),
-  'Raw payload hidden'
-);
-assert.equal(
-  assignmentSubmissionValidationHandoffValues.get('privacy-guard'),
-  'Private data hidden'
-);
 assert.match(
   assignmentSubmissionValidationAttemptAnswersSource,
   /assertSubmittedAnswersMatchRuntimeItems[\s\S]*answers\.length > runtimeItems\.length[\s\S]*unknown-item[\s\S]*duplicate-item[\s\S]*duplicate-runtime-item/,
@@ -19049,19 +18529,6 @@ assert.match(
   /buildAssignmentResultsPageViewModel[\s\S]*reviews: data\?\.analysis\.attempts/,
   'Teacher result pages should rely on stored attempt analysis rather than public payload internals.'
 );
-for (const privateValue of [
-  studentSubmissionPrivateAnswer,
-  studentSubmissionPrivateToken,
-  studentSubmissionRuntimeItem.id,
-]) {
-  assert.equal(
-    JSON.stringify(assignmentSubmissionValidationHandoffView).includes(
-      privateValue
-    ),
-    false,
-    `Submission validation handoff leaked private text: ${privateValue}`
-  );
-}
 // The readiness checklist exposed system checks ("frozen runtime items") to students.
 assert.doesNotMatch(
   studentRunnerSubmitControlsSource,
@@ -28079,10 +27546,6 @@ const assignmentAttemptPersistenceSource = readFileSync(
   'src/assignments/attempt-persistence.ts',
   'utf8'
 );
-const assignmentAttemptPersistenceHandoffSource = readFileSync(
-  'src/assignments/attempt-persistence-handoff.ts',
-  'utf8'
-);
 assert.match(
   assignmentSnapshotSource,
   /resolveAssignmentSnapshotSource[\s\S]*normalizeOptionalRuntimeDisplayText\([\s\S]*activityDescription[\s\S]*normalizeRuntimeDisplayText\(activityTitle\)/,
@@ -28297,113 +27760,9 @@ assert.deepEqual(scoredAttemptPersistenceSourceChecks, {
   reviewSummaryUsesEvaluation: true,
   runtimeValidationGate: true,
 });
-const scoredAttemptPersistenceHandoffView =
-  buildAssignmentAttemptPersistenceHandoffView(
-    buildAssignmentAttemptPersistenceHandoffEvidence({
-      answersJsonCloned:
-        scoredAttemptInsert.answersJson.answers !==
-          scoredAttemptEvaluation.answers &&
-        scoredAttemptInsert.answersJson.answers.every(
-          (answer, index) => answer !== scoredAttemptEvaluation.answers[index]
-        ),
-      insert: scoredAttemptInsert,
-      resultJsonCloned:
-        scoredAttemptInsert.resultJson !== scoredAttemptEvaluation.result,
-      sourceChecks: scoredAttemptPersistenceSourceChecks,
-    })
-  );
-const scoredAttemptPersistenceHandoffValues = new Map(
-  scoredAttemptPersistenceHandoffView.itemViews.map((item) => [
-    item.id,
-    item.value,
-  ])
-);
-assert.match(
-  assignmentAttemptPersistenceHandoffSource,
-  /export const ASSIGNMENT_ATTEMPT_PERSISTENCE_HANDOFF_ITEM_IDS = \[(?=[\s\S]*'persistence-scope')(?=[\s\S]*'api-lifecycle-gate')(?=[\s\S]*'api-identity-gate')(?=[\s\S]*'scoring-source')(?=[\s\S]*'insert-builder')(?=[\s\S]*'answers-json')(?=[\s\S]*'result-json')(?=[\s\S]*'score-source')(?=[\s\S]*'immutable-answer-copy')(?=[\s\S]*'immutable-result-copy')(?=[\s\S]*'csv-export-boundary')(?=[\s\S]*'source-material-guard')(?=[\s\S]*'raw-payload-guard')(?=[\s\S]*'privacy-guard')[\s\S]*\] as const;/,
-  'Attempt persistence handoff should declare stable scored-attempt persistence slice ids.'
-);
-assert.deepEqual(
-  scoredAttemptPersistenceHandoffView.itemViews.map((item) => item.id),
-  [...ASSIGNMENT_ATTEMPT_PERSISTENCE_HANDOFF_ITEM_IDS],
-  'Attempt persistence handoff should expose the stable 30-slice order.'
-);
-assert.equal(scoredAttemptPersistenceHandoffView.itemViews.length, 30);
-assert.deepEqual(scoredAttemptPersistenceHandoffView.privacy, {
-  exposesAnswerText: false,
-  exposesRawAnonymousToken: false,
-  exposesRawSubmissionPayload: false,
-  exposesRuntimeItemIds: false,
-  exposesSourceMaterialMetadata: false,
-  exposesStudentName: false,
-  exposesTeacherOnlyAnswers: false,
-  itemIds: [...ASSIGNMENT_ATTEMPT_PERSISTENCE_HANDOFF_ITEM_IDS],
-  mutatesEvaluationAfterInsert: false,
-  scope: 'assignment-attempt-persistence-boundary',
-  storesScoredAttemptRows: true,
-  usesScoredAttemptInsertHelper: true,
-});
-assert.equal(
-  scoredAttemptPersistenceHandoffValues.get('persistence-scope'),
-  'Scored attempt insert'
-);
-assert.equal(
-  scoredAttemptPersistenceHandoffValues.get('insert-builder'),
-  'buildScoredAttemptInsert'
-);
-assert.equal(
-  scoredAttemptPersistenceHandoffValues.get('answers-json'),
-  '2 answer rows'
-);
-assert.equal(
-  scoredAttemptPersistenceHandoffValues.get('score-source'),
-  '1 earned'
-);
-assert.equal(
-  scoredAttemptPersistenceHandoffValues.get('max-score-source'),
-  '2 max'
-);
-assert.equal(
-  scoredAttemptPersistenceHandoffValues.get('duration-source'),
-  '75s'
-);
-assert.equal(
-  scoredAttemptPersistenceHandoffValues.get('immutable-answer-copy'),
-  'Cloned'
-);
-assert.equal(
-  scoredAttemptPersistenceHandoffValues.get('immutable-result-copy'),
-  'Cloned'
-);
-assert.equal(
-  scoredAttemptPersistenceHandoffValues.get('csv-export-boundary'),
-  'Full assignment results'
-);
-assert.equal(
-  scoredAttemptPersistenceHandoffValues.get('privacy-guard'),
-  'Private data hidden'
-);
-for (const privateValue of [
-  'Ada Lovelace',
-  'Frozen answer',
-  'Other answer',
-  'raw-private-anonymous-token',
-  'source-materials/private/key.pdf',
-]) {
-  assert.equal(
-    JSON.stringify(scoredAttemptPersistenceHandoffView).includes(privateValue),
-    false,
-    `Attempt persistence handoff leaked private text: ${privateValue}`
-  );
-}
-assert.doesNotMatch(
-  assignmentAttemptPersistenceHandoffSource,
-  /exposesAnswerText: true|exposesRawAnonymousToken: true|exposesRawSubmissionPayload: true|exposesRuntimeItemIds: true|exposesSourceMaterialMetadata: true|exposesStudentName: true|exposesTeacherOnlyAnswers: true/,
-  'Attempt persistence handoff privacy flags should stay closed for private classroom attempt data.'
-);
 assert.match(
   e2eTestCatalogText,
-  /assignment-attempt-persistence-handoff-semantic-views\.test\.ts[\s\S]*Assignment attempt persistence keeps a 30-slice source-level contract/,
+  /assignment-attempt-persistence\.test\.ts[\s\S]*Assignment attempt persistence keeps a 30-slice source-level contract/,
   'E2E catalog should document the attempt persistence source-level handoff gate.'
 );
 const scoredAttemptResultChainView =
@@ -28454,20 +27813,6 @@ assert.deepEqual(scoredAttemptResultChainView.privacy, {
   usesSharedDurationFormatting: true,
   usesAttemptReviewCardHandoff: true,
 });
-assert.deepEqual(
-  [
-    ASSIGNMENT_ATTEMPT_PERSISTENCE_HANDOFF_ITEM_IDS.length,
-    ASSIGNMENT_ATTEMPT_DURATION_HANDOFF_ITEM_IDS.length,
-    STUDENT_RUNNER_PLAY_CHAIN_HANDOFF_ITEM_IDS.length,
-    ASSIGNMENT_ANSWER_FEEDBACK_HANDOFF_ITEM_IDS.length,
-    ANSWER_FEEDBACK_LIFECYCLE_CHAIN_HANDOFF_ITEM_IDS.length,
-    ASSIGNMENT_ATTEMPT_STATS_HANDOFF_ITEM_IDS.length,
-    TEACHER_RESULTS_REVIEW_CHAIN_HANDOFF_ITEM_IDS.length,
-    TEACHER_RESULT_COPY_LIFECYCLE_CHAIN_HANDOFF_ITEM_IDS.length,
-  ],
-  Array.from({ length: 8 }, () => 30),
-  'Scored attempt result chain should stay backed by persistence, duration, runner, feedback, stats, results, copy, and export gates.'
-);
 assert.deepEqual(Object.fromEntries(scoredAttemptResultChainValues), {
   'accepted-alternatives-consistency': 'Shared formatting',
   'anonymous-token-guard': 'Raw token hidden',
@@ -37025,7 +36370,7 @@ assert.match(
 );
 assert.match(
   attemptAnswersSource,
-  /export type SubmittedAttemptAnswer[\s\S]*export type AttemptAnswerRuntimeItem[\s\S]*export type AttemptAnswerRuntimeItemEntry/,
+  /type SubmittedAttemptAnswer[\s\S]*export type AttemptAnswerRuntimeItem[\s\S]*export type AttemptAnswerRuntimeItemEntry/,
   'Attempt answer helpers should expose explicit submitted-answer and runtime-item contracts.'
 );
 assert.match(
@@ -41426,20 +40771,6 @@ assert.deepEqual(worksheetModeDeliveryChainView.privacy, {
   sourceFiles: [...WORKSHEET_MODE_DELIVERY_CHAIN_SOURCE_FILES],
   usesPrintableWorksheetHandoff: true,
 });
-assert.deepEqual(
-  [
-    PUBLIC_TEMPLATE_ENTRY_HANDOFF_ITEM_IDS.length,
-    ACTIVITY_TEMPLATE_SCAFFOLD_QUALITY_HANDOFF_ITEM_IDS.length,
-    ASSIGNMENT_DELIVERY_POLICY_HANDOFF_ITEM_IDS.length,
-    PUBLIC_ASSIGNMENT_ACCESS_HANDOFF_ITEM_IDS.length,
-    ASSIGNMENT_ITEM_ORDER_HANDOFF_ITEM_IDS.length,
-    ASSIGNMENT_SUBMISSION_VALIDATION_HANDOFF_ITEM_IDS.length,
-    ASSIGNMENT_ATTEMPT_DURATION_HANDOFF_ITEM_IDS.length,
-    ASSIGNMENT_ANSWER_FEEDBACK_HANDOFF_ITEM_IDS.length,
-  ],
-  Array.from({ length: 8 }, () => 30),
-  'Worksheet-mode delivery chain should stay backed by focused worksheet, runtime, print, and export gates.'
-);
 assert.deepEqual(Object.fromEntries(worksheetModeDeliveryChainValues), {
   'answer-feedback-policy': 'Reveal if allowed',
   'assignment-publish-boundary': 'Explicit freeze step',
@@ -55560,140 +54891,6 @@ assert.deepEqual(
     completions: 2,
   }
 );
-const assignmentAttemptStatsHandoffView =
-  buildAssignmentAttemptStatsHandoffView(
-    buildAssignmentAttemptStatsHandoffEvidence({
-      attempts: [
-        {
-          resultJson: {
-            accuracy: 80,
-            completedItemCount: 4,
-            correctItemCount: 4,
-            durationSeconds: 40,
-            earnedPoints: 7,
-            totalPoints: 10,
-          },
-          score: 8,
-        },
-        {
-          resultJson: {
-            accuracy: 50,
-            completedItemCount: 3,
-            correctItemCount: 2,
-            durationSeconds: 200,
-            earnedPoints: 5,
-            totalPoints: 10,
-          },
-          score: null,
-        },
-        {
-          resultJson: {
-            accuracy: 110,
-            completedItemCount: 5,
-            correctItemCount: 5,
-            durationSeconds: -5,
-            earnedPoints: 12,
-            totalPoints: 10,
-          },
-          score: 999,
-        },
-        {
-          resultJson: null,
-          score: null,
-        },
-      ],
-      timeLimitSeconds: 120,
-    })
-  );
-const assignmentAttemptStatsHandoffItemIds =
-  assignmentAttemptStatsHandoffView.itemViews.map((itemView) => itemView.id);
-const assignmentAttemptStatsHandoffValues = new Map(
-  assignmentAttemptStatsHandoffView.itemViews.map((itemView) => [
-    itemView.id,
-    itemView.value,
-  ])
-);
-assert.deepEqual(assignmentAttemptStatsHandoffItemIds, [
-  ...ASSIGNMENT_ATTEMPT_STATS_HANDOFF_ITEM_IDS,
-]);
-assert.equal(new Set(assignmentAttemptStatsHandoffItemIds).size, 30);
-assert.deepEqual(assignmentAttemptStatsHandoffView.privacy, {
-  exposesAcceptedAnswers: false,
-  exposesCsvDataUrl: false,
-  exposesPromptText: false,
-  exposesRawAnonymousToken: false,
-  exposesRuntimeItemIds: false,
-  exposesShareSlug: false,
-  exposesStudentAnswerText: false,
-  exposesStudentDisplayLabels: false,
-  exposesTeacherAnswerKey: false,
-  itemIds: assignmentAttemptStatsHandoffItemIds,
-  mutatesResultData: false,
-  scope: 'teacher-result-attempt-stats',
-  usesAssignmentDomainHelpers: true,
-});
-assert.equal(
-  assignmentAttemptStatsHandoffValues.get('stats-scope'),
-  'Assignment attempt metrics'
-);
-assert.equal(
-  assignmentAttemptStatsHandoffValues.get('source-attempt-count'),
-  '4'
-);
-assert.equal(
-  assignmentAttemptStatsHandoffValues.get('completed-attempt-count'),
-  '3'
-);
-assert.equal(
-  assignmentAttemptStatsHandoffValues.get('average-accuracy'),
-  '77%'
-);
-assert.equal(
-  assignmentAttemptStatsHandoffValues.get('average-points'),
-  '8'
-);
-assert.equal(
-  assignmentAttemptStatsHandoffValues.get('average-duration'),
-  '53s'
-);
-assert.equal(
-  assignmentAttemptStatsHandoffValues.get('duration-time-limit'),
-  '120s cap'
-);
-assert.equal(
-  assignmentAttemptStatsHandoffValues.get('nonfinite-number-guard'),
-  'Hidden'
-);
-assert.equal(
-  assignmentAttemptStatsHandoffValues.get('negative-number-guard'),
-  '0'
-);
-assert.equal(
-  assignmentAttemptStatsHandoffValues.get('fractional-count-guard'),
-  '2'
-);
-assert.equal(
-  assignmentAttemptStatsHandoffValues.get('result-metric-consumer'),
-  'Result metric cards'
-);
-assert.equal(
-  assignmentAttemptStatsHandoffValues.get('assignment-list-summary-consumer'),
-  'Assignment list summary'
-);
-assert.equal(
-  assignmentAttemptStatsHandoffValues.get('csv-export-consumer'),
-  'CSV export'
-);
-assert.equal(
-  assignmentAttemptStatsHandoffValues.get('privacy-guard'),
-  'Hidden'
-);
-assert.equal(
-  JSON.stringify(assignmentAttemptStatsHandoffView).includes(
-    'SECRET_RAW_ANONYMOUS_TOKEN'
-  ),
-  false
-);
 
 const resultRuntimeItems = [
   {
@@ -63999,6 +63196,10 @@ assert.deepEqual(
   ]
 );
 overwriteGetLocale(() => 'zh');
+const attemptLimitsSource = readFileSync(
+  'src/assignments/attempt-limits.ts',
+  'utf8'
+);
 try {
   assert.deepEqual(
     buildAssignmentStudentFollowUpSummaryCoverageViews({
@@ -64950,6 +64151,90 @@ function parseCsvRows(csvText: string) {
   rows.push(row);
 
   return rows;
+}
+
+// Assignment attempt domain source boundaries stay wired to shared helpers.
+{
+  assert.match(
+    assignmentAttemptLimitApiSource,
+    /countPreviousIdentityAttempts/,
+    'apiPreviousCountUsesIdentityQuery'
+  );
+  assert.match(
+    assignmentAttemptLimitApiSource,
+    /previousAttemptCount/,
+    'attemptCounterUsesPreviousCount'
+  );
+  assert.match(
+    attemptLimitsSource,
+    /normalizeAssignmentMaxAttempts/,
+    'maxAttemptParserUsesSharedHelper'
+  );
+  assert.match(
+    assignmentAttemptLimitResultExportSource,
+    /deliveryView\.maxAttempts/,
+    'resultExportUsesAttemptLimit'
+  );
+  assert.match(
+    studentRunnerStateSource,
+    /showStartAnotherAttempt = canStartAnotherStudentAttempt/,
+    'retryButtonUsesLimitDecision'
+  );
+  assert.match(
+    studentRunnerStateSource,
+    /formatStudentAttemptUsageLabel\(result\.attemptUsage\)/,
+    'runnerResultUsesAttemptUsage'
+  );
+  assert.match(
+    assignmentAttemptLimitApiSource,
+    /persistAttemptWithinIdentityLimit\(\{[\s\S]*maxAttempts: settings\.maxAttempts[\s\S]*persistence\.type === 'limit-reached'/,
+    'serverEnforcesLimit'
+  );
+  assert.match(
+    assignmentAttemptLimitApiSource,
+    /persistAttemptWithinIdentityLimit\(\{[\s\S]*insertAttempt:[\s\S]*await db\.insert\(attempt\)[\s\S]*identitySlot,[\s\S]*persistence\.type === 'limit-reached'[\s\S]*throw new Error\(m\.assignment_api_error_attempt_limit_reached\(\)\)/,
+    'scoredAttemptWriteGatedByLimit'
+  );
+  assert.match(
+    studentRunnerSubmissionSource,
+    /canStartAnotherStudentAttempt[\s\S]*canUseAnotherAssignmentAttempt/,
+    'submissionGateUsesLimitHelper'
+  );
+  assert.match(
+    assignmentAttemptLimitApiSource,
+    /const submittedAnswers = normalizeSubmittedAttemptAnswers/,
+    'apiNormalizesAnswersBeforeValidation'
+  );
+  assert.match(
+    assignmentAttemptLimitApiSource,
+    /assertSubmittedAnswersMatchRuntimeItems[\s\S]*evaluateRuntimeAnswers/,
+    'apiValidatesBeforeScoring'
+  );
+  assert.match(
+    studentRunnerSubmissionSource,
+    /buildAttemptSubmissionAnswers[\s\S]*getUniqueSubmissionRuntimeItemEntries/,
+    'clientPayloadUsesRuntimeItems'
+  );
+  assert.match(
+    studentRunnerSubmissionSource,
+    /getAttemptCompletionSummary[\s\S]*getUniqueSubmissionRuntimeItemEntries/,
+    'clientProgressUsesRuntimeItems'
+  );
+  assert.match(
+    assignmentAttemptLimitPublicSource,
+    /stripRuntimeAnswers/,
+    'publicPayloadExcludesTeacherAnswers'
+  );
+  assert.match(
+    studentRunnerSubmissionSource,
+    /isSafeStudentAttemptAnswerValidationErrorCode[\s\S]*unknown-item/,
+    'safeFailureMapping'
+  );
+  assert.match(
+    assignmentAttemptLimitApiSource,
+    /evaluateRuntimeAnswers\(\{[\s\S]*answers: submittedAnswers/,
+    'scoringUsesNormalizedAnswers'
+  );
 }
 
 console.log('Domain tests passed.');

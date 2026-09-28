@@ -2,14 +2,7 @@ import assert from 'node:assert/strict';
 import { existsSync, readFileSync } from 'node:fs';
 import test from 'node:test';
 import { ACTIVITY_TEMPLATE_SCAFFOLD_QUALITY_HANDOFF_ITEM_IDS } from '@/activities/scaffolds';
-import { PUBLIC_TEMPLATE_ENTRY_HANDOFF_ITEM_IDS } from '@/activities/entry-page-view';
 import { WORKSHEET_MODE_TEMPLATES } from '@/activities/worksheet-modes';
-import { ASSIGNMENT_ANSWER_FEEDBACK_HANDOFF_ITEM_IDS } from '@/assignments/answer-feedback-handoff';
-import { ASSIGNMENT_ATTEMPT_DURATION_HANDOFF_ITEM_IDS } from '@/assignments/attempt-duration-handoff';
-import { ASSIGNMENT_DELIVERY_POLICY_HANDOFF_ITEM_IDS } from '@/assignments/delivery-summary';
-import { ASSIGNMENT_ITEM_ORDER_HANDOFF_ITEM_IDS } from '@/assignments/item-order-handoff';
-import { PUBLIC_ASSIGNMENT_ACCESS_HANDOFF_ITEM_IDS } from '@/assignments/public';
-import { ASSIGNMENT_SUBMISSION_VALIDATION_HANDOFF_ITEM_IDS } from '@/assignments/submission-validation-handoff';
 import {
   WORKSHEET_MODE_DELIVERY_CHAIN_HANDOFF_ITEM_IDS,
   WORKSHEET_MODE_DELIVERY_CHAIN_SOURCE_FILES,
@@ -157,19 +150,6 @@ test('worksheet-mode delivery chain stays backed by focused contracts', () => {
       'worksheet-entry'
     ),
     true
-  );
-  assert.deepEqual(
-    [
-      PUBLIC_TEMPLATE_ENTRY_HANDOFF_ITEM_IDS.length,
-      ACTIVITY_TEMPLATE_SCAFFOLD_QUALITY_HANDOFF_ITEM_IDS.length,
-      ASSIGNMENT_DELIVERY_POLICY_HANDOFF_ITEM_IDS.length,
-      PUBLIC_ASSIGNMENT_ACCESS_HANDOFF_ITEM_IDS.length,
-      ASSIGNMENT_ITEM_ORDER_HANDOFF_ITEM_IDS.length,
-      ASSIGNMENT_SUBMISSION_VALIDATION_HANDOFF_ITEM_IDS.length,
-      ASSIGNMENT_ATTEMPT_DURATION_HANDOFF_ITEM_IDS.length,
-      ASSIGNMENT_ANSWER_FEEDBACK_HANDOFF_ITEM_IDS.length,
-    ],
-    Array.from({ length: 8 }, () => 30)
   );
 });
 

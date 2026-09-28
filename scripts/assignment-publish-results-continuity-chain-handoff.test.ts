@@ -23,7 +23,6 @@ test('assignment publish results continuity carries 30 unique stages', () => {
   assert.deepEqual(view.sourceContracts, {
     delivery: 30,
     distribution: 30,
-    persistence: 30,
     play: 30,
     results: 30,
     submission: 30,

@@ -1,7 +1,6 @@
 import assert from 'node:assert/strict';
 import { existsSync, readFileSync } from 'node:fs';
 import test from 'node:test';
-import { ASSIGNMENT_ATTEMPT_STATS_HANDOFF_ITEM_IDS } from '@/assignments/attempt-stats-handoff';
 import {
   ASSIGNMENT_LIFECYCLE_GOVERNANCE_CHAIN_HANDOFF_ITEM_IDS,
   ASSIGNMENT_LIFECYCLE_GOVERNANCE_CHAIN_SOURCE_FILES,
@@ -9,12 +8,6 @@ import {
   type AssignmentLifecycleGovernanceChainHandoffItemId,
   type AssignmentLifecycleGovernanceChainHandoffView,
 } from '@/assignments/assignment-lifecycle-governance-chain';
-import { ASSIGNMENT_DELIVERY_POLICY_HANDOFF_ITEM_IDS } from '@/assignments/delivery-summary';
-import {
-  PUBLISHED_ASSIGNMENT_DELIVERY_CHAIN_HANDOFF_ITEM_IDS,
-  PUBLISHED_ASSIGNMENT_DELIVERY_CHAIN_SOURCE_FILES,
-} from '@/assignments/published-assignment-delivery-chain';
-import { PUBLIC_ASSIGNMENT_ACCESS_HANDOFF_ITEM_IDS } from '@/assignments/public';
 import { PUBLIC_ASSIGNMENT_UNAVAILABLE_ACCESS_HANDOFF_ITEM_IDS } from '@/assignments/unavailable-access';
 
 const PRODUCT_SOURCE = readFileSync('docs/product.md', 'utf8');
@@ -213,18 +206,6 @@ test('assignment lifecycle governance chain is backed by adjacent gates', () => 
       `Missing assignment lifecycle governance file ${filePath}`
     );
   }
-
-  assert.deepEqual(
-    [
-      PUBLIC_ASSIGNMENT_ACCESS_HANDOFF_ITEM_IDS.length,
-      PUBLIC_ASSIGNMENT_UNAVAILABLE_ACCESS_HANDOFF_ITEM_IDS.length,
-      PUBLISHED_ASSIGNMENT_DELIVERY_CHAIN_HANDOFF_ITEM_IDS.length,
-      PUBLISHED_ASSIGNMENT_DELIVERY_CHAIN_SOURCE_FILES.length,
-      ASSIGNMENT_DELIVERY_POLICY_HANDOFF_ITEM_IDS.length,
-      ASSIGNMENT_ATTEMPT_STATS_HANDOFF_ITEM_IDS.length,
-    ],
-    Array.from({ length: 6 }, () => 30)
-  );
 });
 
 test('product docs and lifecycle helpers preserve status governance', () => {

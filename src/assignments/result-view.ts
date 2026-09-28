@@ -2705,7 +2705,7 @@ export function buildAssignmentResultCopyScopeView({
   };
 }
 
-export function buildAssignmentResultReviewStatusView({
+function buildAssignmentResultReviewStatusView({
   controlViews,
   summary,
   viewState,

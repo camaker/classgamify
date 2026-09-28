@@ -2,7 +2,7 @@ import type { AttemptAnswer } from '@/activities/types';
 import { normalizeRuntimeDisplayText } from '@/assignments/runtime-display';
 import { m } from '@/locale/paraglide/messages';
 
-export type SubmittedAttemptAnswer = {
+type SubmittedAttemptAnswer = {
   answer?: string;
   itemId: string;
 };

@@ -5,7 +5,7 @@ import type {
   AttemptResult,
 } from '@/activities/types';
 
-export type ScoredAttemptInsert = {
+type ScoredAttemptInsert = {
   anonymousToken: string | null;
   answersJson: AttemptAnswers;
   assignmentId: string;
