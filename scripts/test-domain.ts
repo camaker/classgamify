@@ -676,7 +676,6 @@ import {
   buildAssignmentListCardActionView,
   buildAssignmentListCardStats,
   buildAssignmentListCardViewModel,
-  buildAssignmentListDistributionView,
   buildAssignmentListEmptyStateView,
   buildAssignmentListFilterScopeBoundary,
   buildAssignmentListPageScopeView,
@@ -3666,7 +3665,7 @@ assert.match(
 );
 assert.match(
   readFileSync('tests/e2e/TEST-CATALOG.md', 'utf8'),
-  /post-publish route context[\s\S]*owner-scoped published lookup[\s\S]*absolute student URLs[\s\S]*frozen source activity context[\s\S]*copy\/preview\/print\/results actions[\s\S]*assignment-list distribution steps/,
+  /post-publish route context[\s\S]*owner-scoped published lookup[\s\S]*absolute student URLs[\s\S]*frozen source activity context[\s\S]*copy\/preview\/print\/results actions[\s\S]*assignment-list share-link row/,
   'TEST-CATALOG should describe source-aware distribution lifecycle scope.'
 );
 assert.match(
@@ -30690,7 +30689,7 @@ assert.doesNotMatch(
 );
 assert.match(
   activityLibraryCardComponentSource,
-  /ActivityLibraryCardActionButtonView[\s\S]*ActivityLibraryCardActionView[\s\S]*ActivityLibraryCardDerivativeActionView[\s\S]*ActivityLibraryCardActionState[\s\S]*ActivityLibraryCardRestoreActionView[\s\S]*ActivityLibraryCardViewModel[\s\S]*ActivityLibraryEditorActionView/,
+  /ActivityLibraryCardActionView[\s\S]*ActivityLibraryCardDerivativeActionView[\s\S]*ActivityLibraryCardActionState[\s\S]*ActivityLibraryCardRestoreActionView[\s\S]*ActivityLibraryCardViewModel[\s\S]*ActivityLibraryEditorActionView/,
   'Activity library card component should import explicit card display and action view contracts.'
 );
 assert.doesNotMatch(
@@ -30866,12 +30865,12 @@ assert.match(
 );
 assert.match(
   activityLibraryCardComponentSource,
-  /function ActivityLibraryCardActions[\s\S]*actionState\.showPersistedActions[\s\S]*ActivityLibraryEditActionLink[\s\S]*ActivityLibraryDuplicateActionButton[\s\S]*ActivityLibraryArchiveActionButton[\s\S]*ActivityLibraryPublishActionButton[\s\S]*ActivityLibraryRestoreAction/,
-  'Activity library card actions should split edit, duplicate, archive, publish, and restore rendering.'
+  /function ActivityLibraryCardActions[\s\S]*actionState\.showPersistedActions[\s\S]*ActivityLibraryPublishActionButton[\s\S]*ActivityLibraryEditActionLink[\s\S]*DropdownMenuItem[\s\S]*actionView\.duplicate[\s\S]*actionView\.archive[\s\S]*ActivityLibraryRestoreAction/,
+  'Activity library card actions should lead with publish and edit, keep duplicate and archive in the More menu, and render restore separately.'
 );
 assert.match(
   activityLibraryCardComponentSource,
-  /actionState\.showArchiveAction \? \([\s\S]*ActivityLibraryArchiveActionButton[\s\S]*actionState\.showPublishAction \? \([\s\S]*ActivityLibraryPublishActionButton[\s\S]*actionState\.showRestoreAction \|\|[\s\S]*actionState\.showRestoreRequiredMessage \? \([\s\S]*ActivityLibraryRestoreAction/,
+  /actionState\.showDerivativeActions \? \([\s\S]*actionState\.showArchiveAction \? \([\s\S]*actionState\.showRestoreAction \|\|[\s\S]*actionState\.showRestoreRequiredMessage \? \([\s\S]*ActivityLibraryRestoreAction/,
   'Activity library card actions should render restore controls only through explicit restore action-state gates.'
 );
 assert.doesNotMatch(
@@ -30881,7 +30880,7 @@ assert.doesNotMatch(
 );
 assert.match(
   activityLibraryCardComponentSource,
-  /function ActivityLibraryEditActionLink[\s\S]*to=\{action\.to\}[\s\S]*params=\{\{ activityId: action\.activityId \}\}[\s\S]*\{action\.label\}[\s\S]*function ActivityLibraryDuplicateActionButton[\s\S]*action: ActivityLibraryCardDerivativeActionView[\s\S]*aria-label=\{action\.ariaLabel\}[\s\S]*\{action\.label\}[\s\S]*function ActivityLibraryArchiveActionButton[\s\S]*action: ActivityLibraryCardActionButtonView[\s\S]*aria-label=\{action\.ariaLabel\}[\s\S]*\{action\.label\}[\s\S]*function ActivityLibraryPublishActionButton[\s\S]*action: ActivityLibraryCardDerivativeActionView[\s\S]*aria-label=\{action\.ariaLabel\}[\s\S]*\{action\.label\}/,
+  /function ActivityLibraryCardActions[\s\S]*aria-label=\{actionView\.duplicate\.ariaLabel\}[\s\S]*\{actionView\.duplicate\.label\}[\s\S]*aria-label=\{actionView\.archive\.ariaLabel\}[\s\S]*\{actionView\.archive\.label\}[\s\S]*function ActivityLibraryEditActionLink[\s\S]*to=\{action\.to\}[\s\S]*params=\{\{ activityId: action\.activityId \}\}[\s\S]*\{action\.label\}[\s\S]*function ActivityLibraryPublishActionButton[\s\S]*action: ActivityLibraryCardDerivativeActionView[\s\S]*aria-label=\{action\.ariaLabel\}[\s\S]*\{action\.label\}/,
   'Activity library action subcomponents should render prepared action labels and aria labels from the activity-domain action view.'
 );
 assert.doesNotMatch(
@@ -31625,8 +31624,8 @@ assert.doesNotMatch(
 );
 assert.match(
   assignmentListViewSource,
-  /type AssignmentListFilterScopeBoundary = \{[\s\S]*fullFilteredAssignmentCount: number;[\s\S]*keepsDistributionStepsPrepared: true;[\s\S]*keepsVisiblePageCountsSeparate: true;[\s\S]*overviewAssignmentCount: number;[\s\S]*publishedShareContextStatus:[\s\S]*scope: 'owner-assignment-list-filter-scope';[\s\S]*searchMatchesAssignmentTitle: true;[\s\S]*searchMatchesShareSlug: true;[\s\S]*searchMatchesSourceActivityText: true;[\s\S]*usesFullFilteredSummaryForOverview: true;[\s\S]*visiblePageAssignmentCount: number;[\s\S]*type AssignmentListSearchPanelView/,
-  'Assignment list page view-model should expose a typed owner-scoped filter boundary for overview, visible-page, search, and distribution scope.'
+  /type AssignmentListFilterScopeBoundary = \{[\s\S]*fullFilteredAssignmentCount: number;[\s\S]*keepsVisiblePageCountsSeparate: true;[\s\S]*overviewAssignmentCount: number;[\s\S]*publishedShareContextStatus:[\s\S]*scope: 'owner-assignment-list-filter-scope';[\s\S]*searchMatchesAssignmentTitle: true;[\s\S]*searchMatchesShareSlug: true;[\s\S]*searchMatchesSourceActivityText: true;[\s\S]*usesFullFilteredSummaryForOverview: true;[\s\S]*visiblePageAssignmentCount: number;[\s\S]*type AssignmentListSearchPanelView/,
+  'Assignment list page view-model should expose a typed owner-scoped filter boundary for overview, visible-page, and search scope.'
 );
 assert.match(
   dashboardAssignmentsRouteSource,
@@ -31731,13 +31730,8 @@ assert.match(
 );
 assert.match(
   assignmentListViewSource,
-  /export type AssignmentListDistributionStatus =[\s\S]*'blocked'[\s\S]*'collecting-results'[\s\S]*'preview'[\s\S]*'ready-to-share'[\s\S]*export type AssignmentListDistributionStepId =[\s\S]*'copy-link'[\s\S]*'preview-link'[\s\S]*'print-worksheet'[\s\S]*'review-results'[\s\S]*export type AssignmentListDistributionView = \{[\s\S]*description: string;[\s\S]*status: AssignmentListDistributionStatus;[\s\S]*stepViews: AssignmentListDistributionStepView\[\];/,
-  'Assignment list distribution status should be an explicit domain contract with stable step ids.'
-);
-assert.match(
-  assignmentListViewSource,
-  /export type AssignmentListCardViewModel = \{[\s\S]*actionsLabel: string;[\s\S]*ariaLabel: string;[\s\S]*distributionView: AssignmentListDistributionView;[\s\S]*statsLabel: string;[\s\S]*summaryLabel: string;/,
-  'Assignment list card view-model should expose prepared card, distribution, summary, stats, and action labels.'
+  /export type AssignmentListCardViewModel = \{[\s\S]*actionsLabel: string;[\s\S]*ariaLabel: string;[\s\S]*statsLabel: string;[\s\S]*summaryLabel: string;/,
+  'Assignment list card view-model should expose prepared card, summary, stats, and action labels.'
 );
 assert.match(
   assignmentListViewSource,
@@ -31796,23 +31790,8 @@ assert.match(
 );
 assert.match(
   assignmentListCardComponentSource,
-  /function AssignmentListCardSummary[\s\S]*idPrefix: string[\s\S]*<section[\s\S]*aria-label=\{assignment\.summaryLabel\}[\s\S]*AssignmentListDistribution[\s\S]*idPrefix=\{idPrefix\}[\s\S]*view=\{assignment\.distributionView\}[\s\S]*AssignmentSettingsSummary[\s\S]*AssignmentListStats[\s\S]*idPrefix=\{idPrefix\}/,
-  'Assignment list card summary should expose the prepared summary-region label and render distribution, settings, and stats views with stable per-card ids.'
-);
-assert.match(
-  assignmentListCardComponentSource,
-  /AssignmentListDistributionStepId[\s\S]*AssignmentListDistributionStepView[\s\S]*AssignmentListDistributionView/,
-  'Assignment list card component should import focused distribution child contracts.'
-);
-assert.match(
-  assignmentListCardComponentSource,
-  /function AssignmentListDistribution[\s\S]*idPrefix: string[\s\S]*const titleId = `\$\{idPrefix\}-distribution-title`[\s\S]*const descriptionId = `\$\{idPrefix\}-distribution-description`[\s\S]*const statusId = `\$\{idPrefix\}-distribution-status`[\s\S]*aria-label=\{view\.ariaLabel\}[\s\S]*aria-describedby=\{`\$\{descriptionId\} \$\{statusId\}`\}[\s\S]*id=\{titleId\}[\s\S]*view\.title[\s\S]*id=\{descriptionId\}[\s\S]*view\.description[\s\S]*id=\{statusId\}[\s\S]*view\.statusLabel[\s\S]*view\.stepViews\.map[\s\S]*AssignmentListDistributionStep[\s\S]*idPrefix=\{idPrefix\}/,
-  'Assignment list distribution component should render prepared title, description, status, and step views with stable per-card ids.'
-);
-assert.match(
-  assignmentListCardComponentSource,
-  /function AssignmentListDistributionStep[\s\S]*idPrefix: string[\s\S]*const labelId = `\$\{idPrefix\}-distribution-\$\{stepView\.id\}-label`[\s\S]*const statusId = `\$\{idPrefix\}-distribution-\$\{stepView\.id\}-status`[\s\S]*const descriptionId = `\$\{idPrefix\}-distribution-\$\{stepView\.id\}-description`[\s\S]*<dt[\s\S]*id=\{labelId\}[\s\S]*stepView\.label[\s\S]*id=\{statusId\}[\s\S]*aria-labelledby=\{`\$\{labelId\} \$\{statusId\}`\}[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*stepView\.statusLabel[\s\S]*<output[\s\S]*id=\{descriptionId\}[\s\S]*aria-label=\{stepView\.ariaLabel\}[\s\S]*aria-labelledby=\{`\$\{labelId\} \$\{descriptionId\}`\}[\s\S]*stepView\.description/,
-  'Assignment list distribution steps should render prepared labels, status labels, aria labels, and descriptions as stable semantic outputs.'
+  /function AssignmentListCardHeader[\s\S]*idPrefix: string[\s\S]*AssignmentListStats[\s\S]*idPrefix=\{idPrefix\}[\s\S]*label=\{assignment\.statsLabel\}[\s\S]*statItems=\{assignment\.statItems\}/,
+  'Assignment list card header should render the prepared stats label and stats with stable per-card ids.'
 );
 assert.doesNotMatch(
   assignmentListCardComponentSource,
@@ -31846,7 +31825,7 @@ assert.match(
 );
 assert.match(
   assignmentListStatsComponentSource,
-  /function AssignmentListStat[\s\S]*const Icon = assignmentListCardStatIcons\[stat\.key\][\s\S]*const labelId = `\$\{idPrefix\}-stat-\$\{stat\.key\}-label`[\s\S]*const valueId = `\$\{idPrefix\}-stat-\$\{stat\.key\}-value`[\s\S]*const descriptionId = `\$\{idPrefix\}-stat-\$\{stat\.key\}-description`[\s\S]*<dt id=\{labelId\}[\s\S]*stat\.label[\s\S]*<output[\s\S]*id=\{valueId\}[\s\S]*aria-label=\{stat\.ariaLabel\}[\s\S]*aria-labelledby=\{`\$\{labelId\} \$\{valueId\}`\}[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*stat\.value[\s\S]*<dd id=\{descriptionId\} className="sr-only"[\s\S]*stat\.description/,
+  /function AssignmentListStat[\s\S]*const Icon = assignmentListCardStatIcons\[stat\.key\][\s\S]*const labelId = `\$\{idPrefix\}-stat-\$\{stat\.key\}-label`[\s\S]*const valueId = `\$\{idPrefix\}-stat-\$\{stat\.key\}-value`[\s\S]*const descriptionId = `\$\{idPrefix\}-stat-\$\{stat\.key\}-description`[\s\S]*<dt[\s\S]*id=\{labelId\}[\s\S]*stat\.label[\s\S]*<output[\s\S]*id=\{valueId\}[\s\S]*aria-label=\{stat\.ariaLabel\}[\s\S]*aria-labelledby=\{`\$\{labelId\} \$\{valueId\}`\}[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*stat\.value[\s\S]*<dd id=\{descriptionId\} className="sr-only"[\s\S]*stat\.description/,
   'Assignment list stat items should expose label, value, and description through stable semantic terms and outputs.'
 );
 assert.doesNotMatch(
@@ -31881,8 +31860,8 @@ assert.match(
 );
 assert.match(
   assignmentListCardComponentSource,
-  /AssignmentListCardHeader[\s\S]*assignment=\{assignment\}[\s\S]*AssignmentListCardSummary[\s\S]*assignment=\{assignment\}[\s\S]*AssignmentListCardActions/,
-  'Assignment list card component should delegate header, summary, and action sections.'
+  /AssignmentListCardHeader[\s\S]*assignment=\{assignment\}[\s\S]*AssignmentListShareActions[\s\S]*AssignmentListCardActions/,
+  'Assignment list card component should delegate header, share, and action sections.'
 );
 assert.match(
   assignmentListCardComponentSource,
@@ -31891,13 +31870,13 @@ assert.match(
 );
 assert.match(
   assignmentListCardComponentSource,
-  /function AssignmentListCardSummary[\s\S]*aria-label=\{assignment\.summaryLabel\}[\s\S]*AssignmentListDistribution[\s\S]*idPrefix=\{idPrefix\}[\s\S]*view=\{assignment\.distributionView\}[\s\S]*AssignmentSettingsSummary[\s\S]*view=\{assignment\.settingsSummaryView\}[\s\S]*AssignmentListStats[\s\S]*idPrefix=\{idPrefix\}[\s\S]*label=\{assignment\.statsLabel\}[\s\S]*statItems=\{assignment\.statItems\}/,
-  'Assignment list card summary should render prepared distribution status, settings summary, stats label, and stats with stable per-card ids.'
+  /<details[\s\S]*aria-label=\{assignment\.summaryLabel\}[\s\S]*AssignmentSettingsSummary[\s\S]*view=\{assignment\.settingsSummaryView\}/,
+  'Assignment list card should keep the prepared settings summary behind a labelled disclosure.'
 );
 assert.match(
   assignmentListCardComponentSource,
-  /function AssignmentListCardActions[\s\S]*actionView\.resultAction[\s\S]*AssignmentListResultActionLink[\s\S]*actionView\.printAction[\s\S]*AssignmentListPrintActionLink[\s\S]*actionView\.statusAction[\s\S]*AssignmentListStatusActionButton[\s\S]*actionView\.shareAction[\s\S]*AssignmentListShareActions/,
-  'Assignment list card actions should split result, print, status, and share actions into focused components.'
+  /function AssignmentListCardActions[\s\S]*actionView\.resultAction[\s\S]*AssignmentListResultActionLink[\s\S]*actionView\.printAction[\s\S]*AssignmentListPrintActionLink[\s\S]*actionView\.statusAction[\s\S]*AssignmentListStatusActionButton/,
+  'Assignment list card actions should split result, print, and status actions into focused components.'
 );
 assert.match(
   assignmentListCardComponentSource,
@@ -31921,13 +31900,13 @@ assert.match(
 );
 assert.match(
   assignmentListCardComponentSource,
-  /function AssignmentListShareActions[\s\S]*AssignmentListSharePreviewAction[\s\S]*CopyAssignmentShareLinkButton[\s\S]*disabled=\{!action\.isAvailable\}[\s\S]*disabledReasonCode=\{action\.disabledReasonCode\}[\s\S]*disabledMessage=\{action\.disabledReason\}[\s\S]*AssignmentListShareDisabledReason/,
+  /function AssignmentListShareActions[\s\S]*CopyAssignmentShareLinkButton[\s\S]*disabled=\{!action\.isAvailable\}[\s\S]*disabledReasonCode=\{action\.disabledReasonCode\}[\s\S]*disabledMessage=\{action\.disabledReason\}[\s\S]*AssignmentListSharePreviewAction[\s\S]*AssignmentListShareDisabledReason/,
   'Assignment list share actions should render prepared student-link availability, copy-disabled state, disabled reason code, and disabled reason text.'
 );
 assert.match(
   assignmentListCardComponentSource,
-  /function AssignmentListShareActions[\s\S]*AssignmentListSharePath[\s\S]*AssignmentListSharePreviewAction[\s\S]*CopyAssignmentShareLinkButton[\s\S]*label=\{action\.copyLabel\}/,
-  'Assignment list share actions should render the prepared student-link path before preview and copy actions.'
+  /function AssignmentListShareActions[\s\S]*AssignmentListSharePath[\s\S]*CopyAssignmentShareLinkButton[\s\S]*label=\{action\.copyLabel\}[\s\S]*AssignmentListSharePreviewAction/,
+  'Assignment list share actions should render the prepared student link, then copy and preview actions.'
 );
 assert.match(
   assignmentListCardComponentSource,
@@ -31946,7 +31925,7 @@ assert.match(
 );
 assert.match(
   assignmentListCardComponentSource,
-  /function AssignmentListShareActions[\s\S]*const disabledReasonId = getAssignmentListShareDisabledReasonId\(action\)[\s\S]*const sharePathDescriptionId =\s*getAssignmentListSharePathDescriptionId\(action\)[\s\S]*AssignmentListSharePath[\s\S]*descriptionId=\{sharePathDescriptionId\}[\s\S]*AssignmentListSharePreviewAction[\s\S]*sharePathDescriptionId=\{sharePathDescriptionId\}[\s\S]*CopyAssignmentShareLinkButton[\s\S]*disabledReasonId=\{disabledReasonId\}[\s\S]*descriptionId=\{sharePathDescriptionId\}[\s\S]*AssignmentListShareDisabledReason[\s\S]*disabledReasonId=\{disabledReasonId\}/,
+  /function AssignmentListShareActions[\s\S]*const disabledReasonId = getAssignmentListShareDisabledReasonId\(action\)[\s\S]*const sharePathDescriptionId =\s*getAssignmentListSharePathDescriptionId\(action\)[\s\S]*AssignmentListSharePath[\s\S]*descriptionId=\{sharePathDescriptionId\}[\s\S]*CopyAssignmentShareLinkButton[\s\S]*disabledReasonId=\{disabledReasonId\}[\s\S]*descriptionId=\{sharePathDescriptionId\}[\s\S]*AssignmentListSharePreviewAction[\s\S]*sharePathDescriptionId=\{sharePathDescriptionId\}[\s\S]*AssignmentListShareDisabledReason[\s\S]*disabledReasonId=\{disabledReasonId\}/,
   'Assignment list share copy button should reference the same prepared disabled reason text and current student-link description as the preview action.'
 );
 assert.match(
@@ -31963,26 +31942,6 @@ assert.match(
   assignmentListViewSource,
   /buildAssignmentShareLinkAvailability\(\{[\s\S]*expiresAt,[\s\S]*shareSlug,[\s\S]*status,[\s\S]*\}\)/,
   'Assignment list card action state should resolve share-link state and path through the shared assignment share helper.'
-);
-assert.match(
-  assignmentListViewSource,
-  /distributionView: buildAssignmentListDistributionView\(\{[\s\S]*actionState,[\s\S]*stats,[\s\S]*\}\)/,
-  'Assignment list card view-models should build a prepared distribution status view from action state and assignment stats.'
-);
-assert.match(
-  assignmentListViewSource,
-  /export function buildAssignmentListDistributionView[\s\S]*resolveAssignmentListDistributionStatus[\s\S]*formatAssignmentListDistributionStatus[\s\S]*buildAssignmentListDistributionStepViews/,
-  'Assignment list distribution view should centralize card distribution status labels and step views in the assignment domain.'
-);
-assert.match(
-  assignmentListViewSource,
-  /function resolveAssignmentListDistributionStatus[\s\S]*!actionState\.isPersisted[\s\S]*!actionState\.shareAvailability\.isAvailable[\s\S]*normalizeAssignmentListCardStatCount\(stats\.completions\) > 0[\s\S]*'collecting-results'[\s\S]*'ready-to-share'/,
-  'Assignment list distribution status should distinguish preview, blocked, collecting-results, and ready-to-share states from domain inputs.'
-);
-assert.match(
-  assignmentListViewSource,
-  /function buildAssignmentListDistributionStepViews[\s\S]*isShareAvailable[\s\S]*hasPublishedSnapshot[\s\S]*hasCompletions[\s\S]*'copy-link'[\s\S]*'preview-link'[\s\S]*'print-worksheet'[\s\S]*'review-results'/,
-  'Assignment list distribution step views should cover copy, preview, printable worksheet, and result-review steps.'
 );
 assert.match(
   assignmentListViewSource,
@@ -35594,24 +35553,24 @@ assert.deepEqual(
       value: '-',
     },
     {
-      ariaLabel: 'Templates: -. Loading template coverage...',
-      description: 'Loading template coverage...',
+      ariaLabel: 'Game types: -. Loading game types...',
+      description: 'Loading game types...',
       id: 'templates',
-      label: 'Templates',
+      label: 'Game types',
       value: '-',
     },
     {
-      ariaLabel: 'Assignments: -. Loading classroom share links...',
+      ariaLabel: 'Open links: -. Loading classroom share links...',
       description: 'Loading classroom share links...',
       id: 'assignments',
-      label: 'Assignments',
+      label: 'Open links',
       value: '-',
     },
     {
-      ariaLabel: 'Results: -. Loading submitted attempts...',
+      ariaLabel: 'Average score: -. Loading submitted attempts...',
       description: 'Loading submitted attempts...',
       id: 'results',
-      label: 'Results',
+      label: 'Average score',
       value: '-',
     },
   ]
@@ -35629,9 +35588,9 @@ assert.deepEqual(
   }).map((metric) => [metric.id, metric.value, metric.description]),
   [
     ['activities', '-', 'Loading your library...'],
-    ['templates', '-', 'Loading template coverage...'],
+    ['templates', '-', 'Loading game types...'],
     ['assignments', '3', '3 open links across 6 assignments'],
-    ['results', '83%', '14 submitted attempts logged'],
+    ['results', '83%', 'Across 14 submissions'],
   ]
 );
 assert.deepEqual(
@@ -35658,24 +35617,24 @@ assert.deepEqual(
       value: '9',
     },
     {
-      ariaLabel: `Templates: 5/${ACTIVITY_TEMPLATE_TYPES.length}. 5 of ${ACTIVITY_TEMPLATE_TYPES.length} template families represented by active activities`,
-      description: `5 of ${ACTIVITY_TEMPLATE_TYPES.length} template families represented by active activities`,
+      ariaLabel: `Game types: 5/${ACTIVITY_TEMPLATE_TYPES.length}. 5 of ${ACTIVITY_TEMPLATE_TYPES.length} game types used`,
+      description: `5 of ${ACTIVITY_TEMPLATE_TYPES.length} game types used`,
       id: 'templates',
-      label: 'Templates',
+      label: 'Game types',
       value: `5/${ACTIVITY_TEMPLATE_TYPES.length}`,
     },
     {
-      ariaLabel: 'Assignments: 3. 3 open links across 6 assignments',
+      ariaLabel: 'Open links: 3. 3 open links across 6 assignments',
       description: '3 open links across 6 assignments',
       id: 'assignments',
-      label: 'Assignments',
+      label: 'Open links',
       value: '3',
     },
     {
-      ariaLabel: 'Results: 83%. 14 submitted attempts logged',
-      description: '14 submitted attempts logged',
+      ariaLabel: 'Average score: 83%. Across 14 submissions',
+      description: 'Across 14 submissions',
       id: 'results',
-      label: 'Results',
+      label: 'Average score',
       value: '83%',
     },
   ]
@@ -35839,8 +35798,8 @@ assert.deepEqual(
           'Next',
           Routes.DashboardActivityNew,
           'Create activity: Next',
-          'This is the next useful action for the current teacher workspace state.',
-          'Create activity: Next. This is the next useful action for the current teacher workspace state.',
+          'Do this next.',
+          'Create activity: Next. Do this next.',
         ],
         [
           'publish-assignment',
@@ -35849,8 +35808,8 @@ assert.deepEqual(
           'Locked',
           Routes.DashboardActivities,
           'Publish assignment: Locked',
-          'Complete the earlier classroom-loop step before using this action.',
-          'Publish assignment: Locked. Complete the earlier classroom-loop step before using this action.',
+          'Finish the earlier step first.',
+          'Publish assignment: Locked. Finish the earlier step first.',
         ],
         [
           'share-assignment',
@@ -35859,8 +35818,8 @@ assert.deepEqual(
           'Locked',
           Routes.DashboardAssignments,
           'Share student link: Locked',
-          'Complete the earlier classroom-loop step before using this action.',
-          'Share student link: Locked. Complete the earlier classroom-loop step before using this action.',
+          'Finish the earlier step first.',
+          'Share student link: Locked. Finish the earlier step first.',
         ],
         [
           'review-results',
@@ -35869,8 +35828,8 @@ assert.deepEqual(
           'Locked',
           Routes.DashboardAssignments,
           'Review results: Locked',
-          'Complete the earlier classroom-loop step before using this action.',
-          'Review results: Locked. Complete the earlier classroom-loop step before using this action.',
+          'Finish the earlier step first.',
+          'Review results: Locked. Finish the earlier step first.',
         ],
       ],
       status: 'empty',
@@ -35882,10 +35841,10 @@ assert.deepEqual(
       [
         'templates',
         `0/${ACTIVITY_TEMPLATE_TYPES.length}`,
-        `0 of ${ACTIVITY_TEMPLATE_TYPES.length} template families represented by active activities`,
+        `0 of ${ACTIVITY_TEMPLATE_TYPES.length} game types used`,
       ],
       ['assignments', '0', '0 open links across 0 assignments'],
-      ['results', '0%', '0 submitted attempts logged'],
+      ['results', '-', 'Across 0 submissions'],
     ],
     previewAssignmentId: 'assignment-food-demo',
     readinessValues: [
@@ -35902,7 +35861,7 @@ assert.deepEqual(
       [
         'student-runner',
         0,
-        'Open assignment links will let students play the frozen snapshot.',
+        'Students can play once a link is open.',
       ],
       [
         'teacher-results',
@@ -35952,17 +35911,17 @@ assert.deepEqual(
   {
     loadingDescription: 'Loading your library...',
     partialAssignmentMetric: {
-      ariaLabel: 'Assignments: 1. 1 open link across 1 assignment',
+      ariaLabel: 'Open links: 1. 1 open link across 1 assignment',
       description: '1 open link across 1 assignment',
       id: 'assignments',
-      label: 'Assignments',
+      label: 'Open links',
       value: '1',
     },
     partialResultMetric: {
-      ariaLabel: 'Results: 90%. 2 submitted attempts logged',
-      description: '2 submitted attempts logged',
+      ariaLabel: 'Average score: 90%. Across 2 submissions',
+      description: 'Across 2 submissions',
       id: 'results',
-      label: 'Results',
+      label: 'Average score',
       value: '90%',
     },
     metricIds: ['activities', 'templates', 'assignments', 'results'],
@@ -35974,7 +35933,7 @@ assert.deepEqual(
         ['review-results', 'ready', 'Next'],
       ],
       status: 'reviewing',
-      title: 'Review submitted attempts.',
+      title: 'Review student results.',
     },
     readinessValues: [
       [
@@ -35990,7 +35949,7 @@ assert.deepEqual(
       [
         'student-runner',
         100,
-        '14 submitted attempts prove the student loop is active.',
+        '14 submissions so far.',
       ],
       [
         'teacher-results',
@@ -36100,7 +36059,7 @@ assert.deepEqual(
       [
         'student-runner',
         100,
-        '14 submitted attempts prove the student loop is active.',
+        '14 submissions so far.',
       ],
       [
         'teacher-results',
@@ -36303,8 +36262,8 @@ assert.deepEqual(
       '0%',
       'blocked',
       'Needs setup',
-      'Open assignment links will let students play the frozen snapshot.',
-      'Student runner: 0%. Needs setup. Open assignment links will let students play the frozen snapshot.',
+      'Students can play once a link is open.',
+      'Student runner: 0%. Needs setup. Students can play once a link is open.',
     ],
     [
       'teacher-results',
@@ -36362,7 +36321,7 @@ assert.deepEqual(
       '0%',
       'blocked',
       'Needs setup',
-      'Open assignment links will let students play the frozen snapshot.',
+      'Students can play once a link is open.',
     ],
     [
       'teacher-results',
@@ -36474,7 +36433,7 @@ assert.deepEqual(
       '100%',
       'ready',
       'Ready',
-      '8 submitted attempts prove the student loop is active.',
+      '8 submissions so far.',
     ],
     [
       'teacher-results',
@@ -36558,9 +36517,9 @@ assert.deepEqual(
   }),
   {
     ariaLabel:
-      'Core loop readiness: In progress. Some classroom-loop pieces are ready; finish the next unlocked step before sending the workflow live.',
+      'Getting started: In progress. Some steps are done. Finish the next one to get student results.',
     description:
-      'Some classroom-loop pieces are ready; finish the next unlocked step before sending the workflow live.',
+      'Some steps are done. Finish the next one to get student results.',
     rows: buildDashboardCoreLoopReadiness({
       activitySummary: {
         draftActivities: 0,
@@ -36576,7 +36535,7 @@ assert.deepEqual(
     }),
     status: 'partial',
     statusLabel: 'In progress',
-    title: 'Core loop readiness',
+    title: 'Getting started',
   }
 );
 assert.deepEqual(dashboardOverviewPageCopy, {
@@ -36585,12 +36544,12 @@ assert.deepEqual(dashboardOverviewPageCopy, {
     'Manage reusable activities, publish classroom assignments, and track student attempts from one workspace.',
   heroBadge: 'Teacher workspace',
   heroDescription:
-    'ClassGamify separates reusable teacher activities from published assignments and student attempts. Create, publish, play, and review now share one activity data contract that AI drafting and template remixing can build on.',
+    'Create activities, publish student links, and review results in one place.',
   heroPrimaryAction: 'Create activity',
   heroSecondaryAction: 'Open activity library',
   heroTitle: 'Activity content is now the center of the product.',
-  loopBadge: 'Wordwall-core loop',
-  readinessTitle: 'Core loop readiness',
+  loopBadge: 'Create, share, review',
+  readinessTitle: 'Getting started',
   title: 'Teacher dashboard',
 });
 const dashboardOverviewRouteSource = readFileSync(
@@ -36669,8 +36628,8 @@ assert.match(
 );
 assert.match(
   dashboardOverviewLoopStatusPanelSource,
-  /view\.nextActions\.map[\s\S]*action\.status === 'ready'[\s\S]*action\.cta[\s\S]*dashboardNextActionIcons[\s\S]*dashboardNextActionStatusIcons/,
-  'Dashboard overview loop-status component should render prepared next-action copy and own icon/status presentation.'
+  /view\.nextActions\.find[\s\S]*action\.status === 'ready'[\s\S]*nextAction\.cta[\s\S]*view\.nextActions\.map[\s\S]*dashboardNextActionStatusIcons/,
+  'Dashboard overview loop-status component should render the prepared next action and a compact step list with status icons.'
 );
 assert.doesNotMatch(
   dashboardOverviewLoopStatusPanelSource,
@@ -37227,7 +37186,7 @@ assert.deepEqual(activityLibraryPageCopy, {
 assert.deepEqual(activityLibraryHeroCopy, {
   badgeLabel: 'Structured activity content',
   description:
-    'The activity model separates questions, pairs, groups, vocabulary, and teacher notes. Template switching and AI creation can both build on this shared contract.',
+    'Your saved activities. Publish one to get a student link, or copy it into another game.',
   title: 'One lesson, several renderings.',
 });
 assert.equal(
@@ -38489,14 +38448,14 @@ assert.deepEqual(
         description:
           'Show published links that students can still open and submit.',
         id: 'status',
-        label: 'Status scope',
+        label: 'Status',
         value: 'Open',
       },
       {
         description:
           'Only assignment links matching this search text are included.',
         id: 'search',
-        label: 'Search scope',
+        label: 'Search',
         value: 'Week 1',
       },
     ],
@@ -38532,13 +38491,13 @@ assert.deepEqual(
       {
         description: 'All assignment lifecycle states are included.',
         id: 'status',
-        label: 'Status scope',
+        label: 'Status',
         value: 'All statuses',
       },
       {
         description: 'No search text is narrowing the assignment list.',
         id: 'search',
-        label: 'Search scope',
+        label: 'Search',
         value: 'All assignment links',
       },
     ],
@@ -38574,13 +38533,13 @@ assert.deepEqual(
       {
         description: 'All assignment lifecycle states are included.',
         id: 'status',
-        label: 'Status scope',
+        label: 'Status',
         value: 'All statuses',
       },
       {
         description: 'No search text is narrowing the assignment list.',
         id: 'search',
-        label: 'Search scope',
+        label: 'Search',
         value: 'All assignment links',
       },
     ],
@@ -38718,8 +38677,8 @@ assert.deepEqual(
   [
     {
       ariaLabel:
-        'Assignments: 0. Total assignment links in the current list scope.',
-      description: 'Total assignment links in the current list scope.',
+        'Assignments: 0. Student links that match your filters.',
+      description: 'Student links that match your filters.',
       id: 'total',
       label: 'Assignments',
       value: '0',
@@ -38941,7 +38900,7 @@ assert.deepEqual(
     'Show published links that students can still open and submit.',
     'Show links whose close-after window has passed and no longer accepts student work.',
     'Show links the teacher intentionally closed while keeping results available.',
-    'Show assignments that have not gone through the publish-and-snapshot flow yet.',
+    'Show assignments that haven\'t been published yet.',
   ]
 );
 assert.deepEqual(assignmentListPageCopy, {
@@ -39084,13 +39043,13 @@ assert.deepEqual(
         {
           description: 'All assignment lifecycle states are included.',
           id: 'status',
-          label: 'Status scope',
+          label: 'Status',
           value: 'All statuses',
         },
         {
           description: 'No search text is narrowing the assignment list.',
           id: 'search',
-          label: 'Search scope',
+          label: 'Search',
           value: 'All assignment links',
         },
       ],
@@ -39104,8 +39063,8 @@ assert.deepEqual(
     summaryMetrics: [
       {
         ariaLabel:
-          'Assignments: 0. Total assignment links in the current list scope.',
-        description: 'Total assignment links in the current list scope.',
+          'Assignments: 0. Student links that match your filters.',
+        description: 'Student links that match your filters.',
         id: 'total',
         label: 'Assignments',
         value: '0',
@@ -39381,7 +39340,6 @@ assert.deepEqual(
       broadensBeyondOwner: false,
       countsStarterPreviewAsOwned: false,
       fullFilteredAssignmentCount: 31,
-      keepsDistributionStepsPrepared: true,
       keepsVisiblePageCountsSeparate: true,
       normalizedSearchQuery: 'Week 1',
       overviewAssignmentCount: 1,
@@ -39468,14 +39426,14 @@ assert.deepEqual(
           description:
             'Show published links that students can still open and submit.',
           id: 'status',
-          label: 'Status scope',
+          label: 'Status',
           value: 'Open',
         },
         {
           description:
             'Only assignment links matching this search text are included.',
           id: 'search',
-          label: 'Search scope',
+          label: 'Search',
           value: 'Week 1',
         },
       ],
@@ -39530,7 +39488,6 @@ assert.deepEqual(
     broadensBeyondOwner: false,
     countsStarterPreviewAsOwned: false,
     fullFilteredAssignmentCount: 0,
-    keepsDistributionStepsPrepared: true,
     keepsVisiblePageCountsSeparate: true,
     overviewAssignmentCount: 0,
     publishedShareContextStatus: 'none',
@@ -39758,56 +39715,6 @@ assert.deepEqual(
     activityDescription: 'Frozen activity description',
     ariaLabel:
       'Persisted assignment, Open, Line match, share id share-1',
-    distributionView: {
-      ariaLabel: 'Distribution status: Collecting results',
-      description:
-        'The student link is open and submitted attempts are ready for teacher review.',
-      status: 'collecting-results',
-      statusLabel: 'Collecting results',
-      stepViews: [
-        {
-          ariaLabel:
-            'Copy link: Ready. Copy the full /play link for class chat, LMS, or email.',
-          description:
-            'Copy the full /play link for class chat, LMS, or email.',
-          id: 'copy-link',
-          label: 'Copy link',
-          status: 'ready',
-          statusLabel: 'Ready',
-        },
-        {
-          ariaLabel:
-            'Preview as student: Ready. Open the public runner to verify the student experience.',
-          description:
-            'Open the public runner to verify the student experience.',
-          id: 'preview-link',
-          label: 'Preview as student',
-          status: 'ready',
-          statusLabel: 'Ready',
-        },
-        {
-          ariaLabel:
-            'Print worksheet: Optional. Prepare a printable worksheet from the frozen assignment snapshot.',
-          description:
-            'Prepare a printable worksheet from the frozen assignment snapshot.',
-          id: 'print-worksheet',
-          label: 'Print worksheet',
-          status: 'optional',
-          statusLabel: 'Optional',
-        },
-        {
-          ariaLabel:
-            'Review results: Ready. Open results to review submitted attempts and follow-up needs.',
-          description:
-            'Open results to review submitted attempts and follow-up needs.',
-          id: 'review-results',
-          label: 'Review results',
-          status: 'ready',
-          statusLabel: 'Ready',
-        },
-      ],
-      title: 'Distribution status',
-    },
     id: 'persisted-assignment-1',
     persisted: true,
     settingsSummaryView: buildAssignmentSettingsSummaryView({
@@ -39920,56 +39827,6 @@ assert.deepEqual(
     actionsLabel: 'Actions for Food words homework',
     activityDescription: 'Starter activity description',
     ariaLabel: 'Food words homework, Preview, Group sort, share id demo-food',
-    distributionView: {
-      ariaLabel: 'Distribution status: Preview only',
-      description:
-        'This starter assignment is preview content; create your own assignment before using a real class link.',
-      status: 'preview',
-      statusLabel: 'Preview only',
-      stepViews: [
-        {
-          ariaLabel:
-            'Copy link: Ready. Copy the full /play link for class chat, LMS, or email.',
-          description:
-            'Copy the full /play link for class chat, LMS, or email.',
-          id: 'copy-link',
-          label: 'Copy link',
-          status: 'ready',
-          statusLabel: 'Ready',
-        },
-        {
-          ariaLabel:
-            'Preview as student: Ready. Open the public runner to verify the student experience.',
-          description:
-            'Open the public runner to verify the student experience.',
-          id: 'preview-link',
-          label: 'Preview as student',
-          status: 'ready',
-          statusLabel: 'Ready',
-        },
-        {
-          ariaLabel:
-            'Print worksheet: Blocked. Printable worksheets become available after the assignment is published.',
-          description:
-            'Printable worksheets become available after the assignment is published.',
-          id: 'print-worksheet',
-          label: 'Print worksheet',
-          status: 'blocked',
-          statusLabel: 'Blocked',
-        },
-        {
-          ariaLabel:
-            'Review results: Blocked. Results become available after the assignment has a frozen published snapshot.',
-          description:
-            'Results become available after the assignment has a frozen published snapshot.',
-          id: 'review-results',
-          label: 'Review results',
-          status: 'blocked',
-          statusLabel: 'Blocked',
-        },
-      ],
-      title: 'Distribution status',
-    },
     id: 'assignment-food-demo',
     persisted: false,
     settingsSummaryView: buildAssignmentSettingsSummaryView({
@@ -40176,65 +40033,6 @@ assert.deepEqual(
     showShareActions: true,
     statusAction: undefined,
   }
-);
-const readyAssignmentDistributionView = buildAssignmentListDistributionView({
-  actionState: getAssignmentListCardActionState({
-    expiresAt: null,
-    persisted: true,
-    shareSlug: 'ready-share',
-    status: 'published',
-  }),
-  stats: {
-    averageScore: 0,
-    completions: 0,
-  },
-});
-assert.equal(readyAssignmentDistributionView.status, 'ready-to-share');
-assert.equal(readyAssignmentDistributionView.statusLabel, 'Ready to share');
-assert.deepEqual(
-  readyAssignmentDistributionView.stepViews.map((stepView) => [
-    stepView.id,
-    stepView.status,
-    stepView.statusLabel,
-  ]),
-  [
-    ['copy-link', 'ready', 'Ready'],
-    ['preview-link', 'ready', 'Ready'],
-    ['print-worksheet', 'optional', 'Optional'],
-    ['review-results', 'waiting', 'Waiting'],
-  ]
-);
-assert.match(
-  readyAssignmentDistributionView.stepViews.find(
-    (stepView) => stepView.id === 'review-results'
-  )?.description ?? '',
-  /after students submit attempts/
-);
-const blockedDraftDistributionView = buildAssignmentListDistributionView({
-  actionState: getAssignmentListCardActionState({
-    expiresAt: null,
-    persisted: true,
-    shareSlug: 'draft-share',
-    status: 'draft',
-  }),
-  stats: {
-    averageScore: 0,
-    completions: 0,
-  },
-});
-assert.equal(blockedDraftDistributionView.status, 'blocked');
-assert.equal(blockedDraftDistributionView.statusLabel, 'Not shareable');
-assert.deepEqual(
-  blockedDraftDistributionView.stepViews.map((stepView) => [
-    stepView.id,
-    stepView.status,
-  ]),
-  [
-    ['copy-link', 'blocked'],
-    ['preview-link', 'blocked'],
-    ['print-worksheet', 'blocked'],
-    ['review-results', 'blocked'],
-  ]
 );
 assert.deepEqual(
   buildAssignmentListCardActionView({
@@ -43120,16 +42918,16 @@ assert.deepEqual(
   [
     {
       ariaLabel:
-        'Activities: 0. Saved activities in the current library scope.',
-      description: 'Saved activities in the current library scope.',
+        'Activities: 0. Saved activities that match your filters.',
+      description: 'Saved activities that match your filters.',
       id: 'total',
       label: 'Activities',
       value: '0',
     },
     {
-      ariaLabel: `Template coverage: 0/${ACTIVITY_TEMPLATE_TYPES.length}. Template families represented by the current library scope.`,
+      ariaLabel: `Template coverage: 0/${ACTIVITY_TEMPLATE_TYPES.length}. Game types used by the activities that match your filters.`,
       description:
-        'Template families represented by the current library scope.',
+        'Game types used by the activities that match your filters.',
       id: 'coverage',
       label: 'Template coverage',
       value: `0/${ACTIVITY_TEMPLATE_TYPES.length}`,
@@ -43170,9 +42968,9 @@ assert.deepEqual(
       value: '2',
     },
     {
-      ariaLabel: `Template coverage: 2/${ACTIVITY_TEMPLATE_TYPES.length}. Template families represented by the current library scope.`,
+      ariaLabel: `Template coverage: 2/${ACTIVITY_TEMPLATE_TYPES.length}. Game types used by the activities that match your filters.`,
       description:
-        'Template families represented by the current library scope.',
+        'Game types used by the activities that match your filters.',
       id: 'coverage',
       label: 'Template coverage',
       value: `2/${ACTIVITY_TEMPLATE_TYPES.length}`,
@@ -43229,9 +43027,9 @@ assert.deepEqual(
     },
     {
       ariaLabel:
-        'Template coverage: -. Template families represented by the current library scope.',
+        'Template coverage: -. Game types used by the activities that match your filters.',
       description:
-        'Template families represented by the current library scope.',
+        'Game types used by the activities that match your filters.',
       id: 'coverage',
       label: 'Template coverage',
       value: '-',
@@ -43287,9 +43085,9 @@ assert.deepEqual(
       value: '3',
     },
     {
-      ariaLabel: `Template coverage: 2/${ACTIVITY_TEMPLATE_TYPES.length}. Template families represented by the current library scope.`,
+      ariaLabel: `Template coverage: 2/${ACTIVITY_TEMPLATE_TYPES.length}. Game types used by the activities that match your filters.`,
       description:
-        'Template families represented by the current library scope.',
+        'Game types used by the activities that match your filters.',
       id: 'coverage',
       label: 'Template coverage',
       value: `2/${ACTIVITY_TEMPLATE_TYPES.length}`,
@@ -43476,27 +43274,27 @@ assert.deepEqual(
         description:
           'Switch between active and archived activity views without widening beyond your own saved activities.',
         id: 'status',
-        label: 'Status scope',
+        label: 'Status',
         value: 'Archived',
       },
       {
         description:
           'Only activities using this exact template family are included.',
         id: 'template',
-        label: 'Template scope',
+        label: 'Game',
         value: 'Quiz',
       },
       {
         description:
           'Show activities with worksheet images or documents ready for worksheet extraction.',
         id: 'source',
-        label: 'Source scope',
+        label: 'Source material',
         value: 'Worksheet',
       },
       {
         description: 'Only activities matching this search text are included.',
         id: 'search',
-        label: 'Search scope',
+        label: 'Search',
         value: 'Food words',
       },
     ],
@@ -43535,26 +43333,26 @@ assert.deepEqual(
         description:
           'Switch between active and archived activity views without widening beyond your own saved activities.',
         id: 'status',
-        label: 'Status scope',
+        label: 'Status',
         value: 'Active',
       },
       {
         description: 'Every activity template family is included.',
         id: 'template',
-        label: 'Template scope',
+        label: 'Game',
         value: 'All templates',
       },
       {
         description:
           'Show every saved activity, whether or not it has classroom files attached.',
         id: 'source',
-        label: 'Source scope',
+        label: 'Source material',
         value: 'All source materials',
       },
       {
         description: 'No search text is narrowing the activity library.',
         id: 'search',
-        label: 'Search scope',
+        label: 'Search',
         value: 'All saved activities',
       },
     ],
@@ -43593,26 +43391,26 @@ assert.deepEqual(
         description:
           'Switch between active and archived activity views without widening beyond your own saved activities.',
         id: 'status',
-        label: 'Status scope',
+        label: 'Status',
         value: 'Active',
       },
       {
         description: 'Every activity template family is included.',
         id: 'template',
-        label: 'Template scope',
+        label: 'Game',
         value: 'All templates',
       },
       {
         description:
           'Show every saved activity, whether or not it has classroom files attached.',
         id: 'source',
-        label: 'Source scope',
+        label: 'Source material',
         value: 'All source materials',
       },
       {
         description: 'No search text is narrowing the activity library.',
         id: 'search',
-        label: 'Search scope',
+        label: 'Search',
         value: 'All saved activities',
       },
     ],
@@ -43701,26 +43499,26 @@ assert.deepEqual(
           description:
             'Switch between active and archived activity views without widening beyond your own saved activities.',
           id: 'status',
-          label: 'Status scope',
+          label: 'Status',
           value: 'Active',
         },
         {
           description: 'Every activity template family is included.',
           id: 'template',
-          label: 'Template scope',
+          label: 'Game',
           value: 'All templates',
         },
         {
           description:
             'Show every saved activity, whether or not it has classroom files attached.',
           id: 'source',
-          label: 'Source scope',
+          label: 'Source material',
           value: 'All source materials',
         },
         {
           description: 'No search text is narrowing the activity library.',
           id: 'search',
-          label: 'Search scope',
+          label: 'Search',
           value: 'All saved activities',
         },
       ],
@@ -43734,16 +43532,16 @@ assert.deepEqual(
     summaryMetrics: [
       {
         ariaLabel:
-          'Activities: 0. Saved activities in the current library scope.',
-        description: 'Saved activities in the current library scope.',
+          'Activities: 0. Saved activities that match your filters.',
+        description: 'Saved activities that match your filters.',
         id: 'total',
         label: 'Activities',
         value: '0',
       },
       {
-        ariaLabel: `Template coverage: 0/${ACTIVITY_TEMPLATE_TYPES.length}. Template families represented by the current library scope.`,
+        ariaLabel: `Template coverage: 0/${ACTIVITY_TEMPLATE_TYPES.length}. Game types used by the activities that match your filters.`,
         description:
-          'Template families represented by the current library scope.',
+          'Game types used by the activities that match your filters.',
         id: 'coverage',
         label: 'Template coverage',
         value: `0/${ACTIVITY_TEMPLATE_TYPES.length}`,
@@ -44125,27 +43923,27 @@ assert.deepEqual(
           description:
             'Switch between active and archived activity views without widening beyond your own saved activities.',
           id: 'status',
-          label: 'Status scope',
+          label: 'Status',
           value: 'Archived',
         },
         {
           description:
             'Only activities using this exact template family are included.',
           id: 'template',
-          label: 'Template scope',
+          label: 'Game',
           value: 'Quiz',
         },
         {
           description:
             'Show activities with worksheet images or documents ready for worksheet extraction.',
           id: 'source',
-          label: 'Source scope',
+          label: 'Source material',
           value: 'Worksheet',
         },
         {
           description: 'Only activities matching this search text are included.',
           id: 'search',
-          label: 'Search scope',
+          label: 'Search',
           value: 'Food words',
         },
       ],
@@ -44178,9 +43976,9 @@ assert.deepEqual(
         value: '2',
       },
       {
-        ariaLabel: `Template coverage: 2/${ACTIVITY_TEMPLATE_TYPES.length}. Template families represented by the current library scope.`,
+        ariaLabel: `Template coverage: 2/${ACTIVITY_TEMPLATE_TYPES.length}. Game types used by the activities that match your filters.`,
         description:
-          'Template families represented by the current library scope.',
+          'Game types used by the activities that match your filters.',
         id: 'coverage',
         label: 'Template coverage',
         value: `2/${ACTIVITY_TEMPLATE_TYPES.length}`,

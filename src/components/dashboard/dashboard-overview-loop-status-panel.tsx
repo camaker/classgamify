@@ -1,6 +1,5 @@
 import type {
   DashboardOverviewLoopStatusView,
-  DashboardOverviewNextActionId,
   DashboardOverviewNextActionStatus,
 } from '@/dashboard/overview';
 import { Badge } from '@/components/ui/badge';
@@ -9,12 +8,8 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { cn } from '@/lib/utils';
 import {
   IconArrowRight,
-  IconChartBar,
   IconCircleCheck,
-  IconClipboardList,
   IconLock,
-  IconPlus,
-  IconShare3,
   type TablerIcon,
 } from '@tabler/icons-react';
 import { Link } from '@tanstack/react-router';
@@ -26,85 +21,75 @@ type DashboardOverviewLoopStatusPanelProps = {
 export function DashboardOverviewLoopStatusPanel({
   view,
 }: DashboardOverviewLoopStatusPanelProps) {
+  const nextAction = view.nextActions.find(
+    (action) => action.status === 'ready'
+  );
+
   return (
-    <Card aria-label={view.ariaLabel} className="rounded-lg">
-      <CardHeader className="gap-3">
-        <div className="flex flex-wrap items-center justify-between gap-2">
-          <Badge variant="outline" className="rounded-md border-primary/30">
+    <Card aria-label={view.ariaLabel} className="gap-4 rounded-lg py-4">
+      <CardHeader className="flex flex-wrap items-center justify-between gap-x-6 gap-y-3 px-4">
+        <div className="grid min-w-0 flex-1 basis-72 gap-1">
+          <Badge
+            variant="outline"
+            className="w-fit rounded-md border-primary/30"
+          >
             {view.statusLabel}
           </Badge>
+          <CardTitle>
+            <h2 className="text-base font-semibold">{view.title}</h2>
+          </CardTitle>
+          <p className="text-sm leading-6 text-muted-foreground">
+            {view.description}
+          </p>
         </div>
-        <CardTitle>
-          <h2 className="text-base font-semibold">{view.title}</h2>
-        </CardTitle>
-        <p className="text-sm leading-6 text-muted-foreground">
-          {view.description}
-        </p>
+        {nextAction ? (
+          <Link
+            to={nextAction.to}
+            aria-label={nextAction.ariaLabel}
+            className={buttonVariants()}
+          >
+            {nextAction.cta}
+            <IconArrowRight aria-hidden="true" className="size-4" />
+          </Link>
+        ) : null}
       </CardHeader>
-      <CardContent className="grid gap-3 md:grid-cols-2 xl:grid-cols-4">
-        {view.nextActions.map((action) => {
-          const Icon = dashboardNextActionIcons[action.id];
-          const StatusIcon = dashboardNextActionStatusIcons[action.status];
+      <CardContent className="px-4">
+        <ol className="flex flex-wrap gap-x-5 gap-y-2">
+          {view.nextActions.map((action) => {
+            const StatusIcon = dashboardNextActionStatusIcons[action.status];
 
-          return (
-            <fieldset
-              key={action.id}
-              aria-label={action.ariaLabel}
-              className={cn(
-                'grid min-h-40 min-w-0 gap-3 rounded-lg border bg-background p-3',
-                action.status === 'ready' && 'border-primary/40 bg-primary/5'
-              )}
-            >
-              <div className="flex items-start justify-between gap-3">
-                <span className="flex size-9 items-center justify-center rounded-lg border bg-card text-primary">
-                  <Icon aria-hidden="true" className="size-4" />
-                </span>
-                <Badge
+            return (
+              <li
+                key={action.id}
+                aria-label={action.ariaLabel}
+                data-status={action.status}
+                className={cn(
+                  'flex items-center gap-1.5 text-sm',
+                  action.status === 'done' && 'text-muted-foreground',
+                  action.status === 'ready' && 'font-medium text-primary',
+                  action.status === 'blocked' && 'text-muted-foreground/70'
+                )}
+              >
+                <StatusIcon
                   aria-label={action.statusAriaLabel}
-                  variant={getDashboardNextActionBadgeVariant(action.status)}
-                  className="rounded-md"
-                >
-                  <StatusIcon aria-hidden="true" className="size-3" />
-                  {action.statusLabel}
-                </Badge>
-              </div>
-              <div className="min-w-0 space-y-1">
-                <h3 className="text-sm font-semibold">{action.label}</h3>
-                <p className="text-xs leading-5 text-muted-foreground">
-                  {action.description}
-                </p>
-                <p className="sr-only">{action.statusDescription}</p>
-              </div>
-              {action.status === 'ready' ? (
-                <Link
-                  to={action.to}
-                  aria-label={action.ariaLabel}
                   className={cn(
-                    buttonVariants({ size: 'sm' }),
-                    'w-full justify-between'
+                    'size-4',
+                    action.status === 'done' && 'text-success-text'
                   )}
-                >
-                  {action.cta}
-                  <IconArrowRight aria-hidden="true" className="size-4" />
-                </Link>
-              ) : null}
-            </fieldset>
-          );
-        })}
+                />
+                {action.label}
+                <span className="sr-only">
+                  {action.statusLabel}. {action.description}{' '}
+                  {action.statusDescription}
+                </span>
+              </li>
+            );
+          })}
+        </ol>
       </CardContent>
     </Card>
   );
 }
-
-const dashboardNextActionIcons: Record<
-  DashboardOverviewNextActionId,
-  TablerIcon
-> = {
-  'create-activity': IconPlus,
-  'publish-assignment': IconClipboardList,
-  'review-results': IconChartBar,
-  'share-assignment': IconShare3,
-};
 
 const dashboardNextActionStatusIcons: Record<
   DashboardOverviewNextActionStatus,
@@ -114,12 +99,3 @@ const dashboardNextActionStatusIcons: Record<
   done: IconCircleCheck,
   ready: IconArrowRight,
 };
-
-function getDashboardNextActionBadgeVariant(
-  status: DashboardOverviewNextActionStatus
-) {
-  if (status === 'ready') return 'default';
-  if (status === 'done') return 'secondary';
-
-  return 'outline';
-}

@@ -5,6 +5,7 @@ import {
 import { Button } from '@/components/ui/button';
 import { copyTextToClipboard } from '@/lib/clipboard';
 import { IconCopy } from '@tabler/icons-react';
+import type { ComponentProps } from 'react';
 import { toast } from 'sonner';
 
 export function CopyAssignmentShareLinkButton({
@@ -17,6 +18,8 @@ export function CopyAssignmentShareLinkButton({
   label,
   shareSlug,
   shareUrl,
+  size,
+  variant = 'outline',
 }: {
   className?: string;
   descriptionId?: string;
@@ -27,6 +30,8 @@ export function CopyAssignmentShareLinkButton({
   label: string;
   shareSlug: string;
   shareUrl?: string;
+  size?: ComponentProps<typeof Button>['size'];
+  variant?: ComponentProps<typeof Button>['variant'];
 }) {
   async function copyShareLink() {
     const executionPlan = buildAssignmentShareLinkCopyExecutionPlan({
@@ -52,7 +57,8 @@ export function CopyAssignmentShareLinkButton({
   return (
     <Button
       type="button"
-      variant="outline"
+      variant={variant}
+      size={size}
       className={className}
       disabled={disabled}
       aria-describedby={buildShareLinkButtonDescriptionIds(

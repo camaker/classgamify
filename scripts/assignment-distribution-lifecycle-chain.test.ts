@@ -100,16 +100,6 @@ test('published assignment context keeps distribution states and actions aligned
 
   assert.equal(cardView.shareSlug, 'classroom-link');
   assert.equal(cardView.activityDescription, 'Frozen distribution snapshot.');
-  assert.equal(cardView.distributionView.status, 'ready-to-share');
-  assert.deepEqual(
-    cardView.distributionView.stepViews.map((step) => [step.id, step.status]),
-    [
-      ['copy-link', 'ready'],
-      ['preview-link', 'ready'],
-      ['print-worksheet', 'optional'],
-      ['review-results', 'waiting'],
-    ]
-  );
   assert.equal(
     cardView.actionView.shareAction?.sharePath,
     '/play/classroom-link'
@@ -303,7 +293,7 @@ test('assignment distribution lifecycle sources preserve route, DOM, and API bou
   );
   assert.match(
     PRODUCT_SOURCE,
-    /filter their own assignments by title,[\s\S]*source activity text[\s\S]*Assignment list overview cards[\s\S]*distribution steps/,
+    /filter their own assignments by title,[\s\S]*source activity text[\s\S]*Assignment list overview cards[\s\S]*share-link row/,
     'docs/product.md should keep source activity context connected to assignment list distribution.'
   );
   assert.match(
@@ -343,8 +333,8 @@ test('assignment distribution lifecycle sources preserve route, DOM, and API bou
   );
   assert.match(
     LIST_VIEW_SOURCE,
-    /(?=[\s\S]*resolveAssignmentSnapshotSource\(\{[\s\S]*activity,[\s\S]*snapshot[\s\S]*activityDescription: resolvedSource\.activityDescription \?\? '')(?=[\s\S]*publishedPanelContext[\s\S]*buildAssignmentListFilterScopeBoundary[\s\S]*publishedShareContextStatus)(?=[\s\S]*buildAssignmentListDistributionView[\s\S]*copy-link[\s\S]*preview-link[\s\S]*print-worksheet[\s\S]*review-results[\s\S]*buildAssignmentListCardActionView)/,
-    'Assignment list view model should keep frozen source context, published context, distribution steps, and action preparation together.'
+    /(?=[\s\S]*resolveAssignmentSnapshotSource\(\{[\s\S]*activity,[\s\S]*snapshot[\s\S]*activityDescription: resolvedSource\.activityDescription \?\? '')(?=[\s\S]*publishedPanelContext[\s\S]*buildAssignmentListFilterScopeBoundary[\s\S]*publishedShareContextStatus)/,
+    'Assignment list view model should keep frozen source context, published context, and action preparation together.'
   );
   assert.match(
     PUBLISHED_PANEL_SOURCE,
@@ -371,7 +361,7 @@ test('assignment distribution lifecycle focused gate is documented', () => {
   );
   assert.match(
     TEST_CATALOG_SOURCE,
-    /post-publish route context[\s\S]*owner-scoped published lookup[\s\S]*absolute student URLs[\s\S]*frozen source activity context[\s\S]*copy[\s\S]*preview[\s\S]*print[\s\S]*results actions[\s\S]*assignment-list[\s\S]*distribution steps/,
+    /post-publish route context[\s\S]*owner-scoped published lookup[\s\S]*absolute student URLs[\s\S]*frozen source activity context[\s\S]*copy[\s\S]*preview[\s\S]*print[\s\S]*results actions[\s\S]*assignment-list[\s\S]*share-link row/,
     'TEST-CATALOG should describe the distribution lifecycle scope.'
   );
 });

@@ -1,6 +1,6 @@
 {
   "assignment_list_summary_assignments": "التكليفات",
-  "assignment_list_summary_assignments_description": "إجمالي روابط التكليفات ضمن نطاق القائمة الحالي.",
+  "assignment_list_summary_assignments_description": "روابط الطلاب المطابقة لعوامل التصفية.",
   "assignment_list_summary_average": "المتوسط",
   "assignment_list_summary_average_empty": "لا توجد محاولات مقيمة بعد.",
   "assignment_list_summary_average_with_attempts": "محسوب من محاولات الطلاب المقيمة.",

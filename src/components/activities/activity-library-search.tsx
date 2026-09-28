@@ -71,8 +71,8 @@ export function ActivityLibrarySearch({
   });
 
   return (
-    <section className="grid gap-4 rounded-lg border bg-card p-4 xl:grid-cols-[minmax(0,1fr)_13rem_13rem_13rem_auto] xl:items-end">
-      <div className="grid gap-2">
+    <section className="grid grid-cols-2 items-end gap-3 rounded-lg border bg-card p-4 xl:grid-cols-[minmax(0,1fr)_13rem_13rem_13rem_auto] xl:gap-4">
+      <div className="col-span-2 grid gap-2 xl:col-span-1">
         <label
           htmlFor="activity-library-search"
           className="font-medium text-sm"
@@ -211,8 +211,8 @@ export function ActivityLibrarySearch({
           ))}
         </div>
       </div>
-      <div className="flex flex-col gap-3 lg:items-end">
-        <p className="text-sm text-muted-foreground lg:text-right">
+      <div className="flex flex-col items-end gap-3">
+        <p className="text-right text-sm text-muted-foreground">
           {searchPanelView.filterSummary.text}
         </p>
         {searchPanelView.filterSummary.hasFilters ? (
@@ -220,7 +220,7 @@ export function ActivityLibrarySearch({
             type="button"
             variant="outline"
             size="sm"
-            className="w-full bg-background lg:w-auto"
+            className="bg-background"
             onClick={onClearFilters}
           >
             <IconX aria-hidden="true" className="size-4" />

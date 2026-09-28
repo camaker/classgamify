@@ -1,6 +1,6 @@
 {
   "assignment_list_summary_assignments": "Atividades",
-  "assignment_list_summary_assignments_description": "Total de links de atividades no escopo atual da lista.",
+  "assignment_list_summary_assignments_description": "Links para alunos que correspondem aos filtros.",
   "assignment_list_summary_average": "Média",
   "assignment_list_summary_average_empty": "Ainda não há tentativas avaliadas.",
   "assignment_list_summary_average_with_attempts": "Calculada com base nas tentativas avaliadas dos alunos.",

@@ -91,7 +91,6 @@ type AssignmentListFilterScopeBoundary = {
   broadensBeyondOwner: false;
   countsStarterPreviewAsOwned: false;
   fullFilteredAssignmentCount: number;
-  keepsDistributionStepsPrepared: true;
   keepsVisiblePageCountsSeparate: true;
   normalizedSearchQuery?: string;
   overviewAssignmentCount: number;
@@ -169,48 +168,11 @@ export type AssignmentListCardStats = {
   completions: number;
 };
 
-export type AssignmentListDistributionStatus =
-  | 'blocked'
-  | 'collecting-results'
-  | 'preview'
-  | 'ready-to-share';
-
-export type AssignmentListDistributionStepId =
-  | 'copy-link'
-  | 'preview-link'
-  | 'print-worksheet'
-  | 'review-results';
-
-export type AssignmentListDistributionStepStatus =
-  | 'blocked'
-  | 'optional'
-  | 'ready'
-  | 'waiting';
-
-export type AssignmentListDistributionStepView = {
-  ariaLabel: string;
-  description: string;
-  id: AssignmentListDistributionStepId;
-  label: string;
-  status: AssignmentListDistributionStepStatus;
-  statusLabel: string;
-};
-
-export type AssignmentListDistributionView = {
-  ariaLabel: string;
-  description: string;
-  status: AssignmentListDistributionStatus;
-  statusLabel: string;
-  stepViews: AssignmentListDistributionStepView[];
-  title: string;
-};
-
 export type AssignmentListCardViewModel = {
   actionView: AssignmentListCardActionView;
   actionsLabel: string;
   activityDescription: string;
   ariaLabel: string;
-  distributionView: AssignmentListDistributionView;
   id: string;
   persisted: boolean;
   settingsSummaryView: AssignmentSettingsSummaryView;
@@ -883,7 +845,6 @@ export function buildAssignmentListFilterScopeBoundary({
     broadensBeyondOwner: false,
     countsStarterPreviewAsOwned: false,
     fullFilteredAssignmentCount,
-    keepsDistributionStepsPrepared: true,
     keepsVisiblePageCountsSeparate: true,
     ...(normalizedSearchQuery ? { normalizedSearchQuery } : {}),
     overviewAssignmentCount: normalizeAssignmentListSummaryCount(
@@ -1052,10 +1013,6 @@ export function buildAssignmentListCardViewModel({
       template: templateLabel,
       title,
     }),
-    distributionView: buildAssignmentListDistributionView({
-      actionState,
-      stats,
-    }),
     id: assignment.id,
     persisted,
     settingsSummaryView: buildAssignmentSettingsSummaryView({
@@ -1111,10 +1068,6 @@ export function buildStarterAssignmentListCardViewModel({
       status: statusLabel,
       template: templateLabel,
       title,
-    }),
-    distributionView: buildAssignmentListDistributionView({
-      actionState,
-      stats,
     }),
     id: assignment.id,
     persisted,
@@ -1226,176 +1179,6 @@ function formatAssignmentListCardStatAriaLabel({
     label,
     value,
   });
-}
-
-export function buildAssignmentListDistributionView({
-  actionState,
-  stats,
-}: {
-  actionState: AssignmentListCardActionState;
-  stats: AssignmentListCardStats;
-}): AssignmentListDistributionView {
-  const status = resolveAssignmentListDistributionStatus({
-    actionState,
-    stats,
-  });
-  const statusLabel = formatAssignmentListDistributionStatus(status);
-
-  return {
-    ariaLabel: m.assignment_list_distribution_aria_label({
-      status: statusLabel,
-      title: m.assignment_list_distribution_title(),
-    }),
-    description: formatAssignmentListDistributionDescription(status),
-    status,
-    statusLabel,
-    stepViews: buildAssignmentListDistributionStepViews({
-      actionState,
-      stats,
-    }),
-    title: m.assignment_list_distribution_title(),
-  };
-}
-
-function resolveAssignmentListDistributionStatus({
-  actionState,
-  stats,
-}: {
-  actionState: AssignmentListCardActionState;
-  stats: AssignmentListCardStats;
-}): AssignmentListDistributionStatus {
-  if (!actionState.isPersisted) return 'preview';
-  if (!actionState.shareAvailability.isAvailable) return 'blocked';
-
-  return normalizeAssignmentListCardStatCount(stats.completions) > 0
-    ? 'collecting-results'
-    : 'ready-to-share';
-}
-
-function buildAssignmentListDistributionStepViews({
-  actionState,
-  stats,
-}: {
-  actionState: AssignmentListCardActionState;
-  stats: AssignmentListCardStats;
-}): AssignmentListDistributionStepView[] {
-  const isShareAvailable = actionState.shareAvailability.isAvailable;
-  const hasPublishedSnapshot = actionState.showResultsAction;
-  const hasCompletions =
-    normalizeAssignmentListCardStatCount(stats.completions) > 0;
-
-  return [
-    buildAssignmentListDistributionStepView({
-      description: isShareAvailable
-        ? m.assignment_list_distribution_step_copy_ready_description()
-        : m.assignment_list_distribution_step_copy_blocked_description(),
-      id: 'copy-link',
-      label: m.assignment_list_distribution_step_copy_label(),
-      status: isShareAvailable ? 'ready' : 'blocked',
-    }),
-    buildAssignmentListDistributionStepView({
-      description: isShareAvailable
-        ? m.assignment_list_distribution_step_preview_ready_description()
-        : m.assignment_list_distribution_step_preview_blocked_description(),
-      id: 'preview-link',
-      label: m.assignment_list_distribution_step_preview_label(),
-      status: isShareAvailable ? 'ready' : 'blocked',
-    }),
-    buildAssignmentListDistributionStepView({
-      description: hasPublishedSnapshot
-        ? m.assignment_list_distribution_step_print_optional_description()
-        : m.assignment_list_distribution_step_print_blocked_description(),
-      id: 'print-worksheet',
-      label: m.assignment_list_distribution_step_print_label(),
-      status: hasPublishedSnapshot ? 'optional' : 'blocked',
-    }),
-    buildAssignmentListDistributionStepView({
-      description: !hasPublishedSnapshot
-        ? m.assignment_list_distribution_step_results_blocked_description()
-        : hasCompletions
-          ? m.assignment_list_distribution_step_results_ready_description()
-          : m.assignment_list_distribution_step_results_waiting_description(),
-      id: 'review-results',
-      label: m.assignment_list_distribution_step_results_label(),
-      status: !hasPublishedSnapshot
-        ? 'blocked'
-        : hasCompletions
-          ? 'ready'
-          : 'waiting',
-    }),
-  ];
-}
-
-function buildAssignmentListDistributionStepView({
-  description,
-  id,
-  label,
-  status,
-}: {
-  description: string;
-  id: AssignmentListDistributionStepId;
-  label: string;
-  status: AssignmentListDistributionStepStatus;
-}): AssignmentListDistributionStepView {
-  const statusLabel = formatAssignmentListDistributionStepStatus(status);
-
-  return {
-    ariaLabel: m.assignment_list_distribution_step_aria_label({
-      description,
-      label,
-      status: statusLabel,
-    }),
-    description,
-    id,
-    label,
-    status,
-    statusLabel,
-  };
-}
-
-function formatAssignmentListDistributionStatus(
-  status: AssignmentListDistributionStatus
-) {
-  switch (status) {
-    case 'blocked':
-      return m.assignment_list_distribution_status_blocked();
-    case 'collecting-results':
-      return m.assignment_list_distribution_status_collecting_results();
-    case 'preview':
-      return m.assignment_list_distribution_status_preview();
-    case 'ready-to-share':
-      return m.assignment_list_distribution_status_ready_to_share();
-  }
-}
-
-function formatAssignmentListDistributionDescription(
-  status: AssignmentListDistributionStatus
-) {
-  switch (status) {
-    case 'blocked':
-      return m.assignment_list_distribution_description_blocked();
-    case 'collecting-results':
-      return m.assignment_list_distribution_description_collecting_results();
-    case 'preview':
-      return m.assignment_list_distribution_description_preview();
-    case 'ready-to-share':
-      return m.assignment_list_distribution_description_ready_to_share();
-  }
-}
-
-function formatAssignmentListDistributionStepStatus(
-  status: AssignmentListDistributionStepStatus
-) {
-  switch (status) {
-    case 'blocked':
-      return m.assignment_list_distribution_step_status_blocked();
-    case 'optional':
-      return m.assignment_list_distribution_step_status_optional();
-    case 'ready':
-      return m.assignment_list_distribution_step_status_ready();
-    case 'waiting':
-      return m.assignment_list_distribution_step_status_waiting();
-  }
 }
 
 export function buildAssignmentListCardActionView({

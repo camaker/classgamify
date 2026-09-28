@@ -11,7 +11,7 @@
   "assignment_list_status_filter_closed": "Geschlossen",
   "assignment_list_status_filter_closed_description": "Von der Lehrkraft geschlossene Links anzeigen, deren Ergebnisse weiterhin verfügbar sind.",
   "assignment_list_status_filter_draft": "Entwürfe",
-  "assignment_list_status_filter_draft_description": "Aufgaben anzeigen, die noch nicht veröffentlicht und als Snapshot fixiert wurden.",
+  "assignment_list_status_filter_draft_description": "Zeigt Aufgaben, die noch nicht veröffentlicht wurden.",
   "assignment_list_status_filter_expired": "Abgelaufen",
   "assignment_list_status_filter_expired_description": "Links anzeigen, deren Abgabefrist verstrichen ist und die keine Schülerarbeiten mehr annehmen.",
   "assignment_list_status_filter_published": "Offen",

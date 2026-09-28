@@ -5,5 +5,6 @@
   "activity_library_card_compatible_templates": "対応しているテンプレート形式",
   "activity_library_card_content_label": "{title}のコンテンツ数",
   "activity_library_card_details_label": "{title}の詳細",
+  "activity_library_card_other_games_summary": "別のゲームで遊ぶ",
   "activity_library_card_untitled": "タイトル未設定のアクティビティ"
 }

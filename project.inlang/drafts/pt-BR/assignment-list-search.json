@@ -11,7 +11,7 @@
   "assignment_list_status_filter_closed": "Fechados",
   "assignment_list_status_filter_closed_description": "Mostre os links fechados pelo professor mantendo os resultados disponíveis.",
   "assignment_list_status_filter_draft": "Rascunhos",
-  "assignment_list_status_filter_draft_description": "Mostre atividades que ainda não passaram pela publicação e criação do snapshot.",
+  "assignment_list_status_filter_draft_description": "Mostrar tarefas que ainda não foram publicadas.",
   "assignment_list_status_filter_expired": "Expirados",
   "assignment_list_status_filter_expired_description": "Mostre links cujo prazo terminou e que não aceitam mais envios dos alunos.",
   "assignment_list_status_filter_published": "Abertos",

@@ -11,7 +11,7 @@
   "assignment_list_status_filter_closed": "Cerrados",
   "assignment_list_status_filter_closed_description": "Muestra los enlaces que cerró el docente y conserva disponibles los resultados.",
   "assignment_list_status_filter_draft": "Borradores",
-  "assignment_list_status_filter_draft_description": "Muestra tareas que todavía no se han publicado ni fijado como instantánea.",
+  "assignment_list_status_filter_draft_description": "Mostrar tareas que aún no se han publicado.",
   "assignment_list_status_filter_expired": "Vencidos",
   "assignment_list_status_filter_expired_description": "Muestra enlaces cuyo plazo terminó y que ya no aceptan trabajo de estudiantes.",
   "assignment_list_status_filter_published": "Abiertos",

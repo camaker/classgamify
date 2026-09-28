@@ -1,6 +1,6 @@
 {
   "assignment_list_summary_assignments": "Attività",
-  "assignment_list_summary_assignments_description": "Numero totale di link alle attività nell’ambito corrente dell’elenco.",
+  "assignment_list_summary_assignments_description": "Link per gli studenti che corrispondono ai filtri.",
   "assignment_list_summary_average": "Media",
   "assignment_list_summary_average_empty": "Nessun tentativo valutato.",
   "assignment_list_summary_average_with_attempts": "Calcolata sui tentativi valutati degli studenti.",

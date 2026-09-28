@@ -11,7 +11,7 @@
   "assignment_list_status_filter_closed": "مغلقة",
   "assignment_list_status_filter_closed_description": "اعرض الروابط التي أغلقها المعلم مع إبقاء النتائج متاحة.",
   "assignment_list_status_filter_draft": "مسودات",
-  "assignment_list_status_filter_draft_description": "اعرض التكليفات التي لم تُنشر ولم تُنشأ لها لقطة بعد.",
+  "assignment_list_status_filter_draft_description": "عرض الواجبات التي لم تُنشر بعد.",
   "assignment_list_status_filter_expired": "منتهية",
   "assignment_list_status_filter_expired_description": "اعرض الروابط التي انتهت مهلة تسليمها ولم تعد تقبل أعمال الطلاب.",
   "assignment_list_status_filter_published": "مفتوحة",

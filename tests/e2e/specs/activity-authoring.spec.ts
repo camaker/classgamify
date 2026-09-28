@@ -100,6 +100,22 @@ test.describe('activity authoring', () => {
       .filter({ hasText: 'Activity saved' })
       .first();
     await expect(savedPanel).toContainText(activityTitle);
+
+    const activityCard = page
+      .getByRole('article')
+      .filter({
+        has: page.getByRole('heading', { name: activityTitle, exact: true }),
+      })
+      .first();
+    await activityCard.getByRole('button', { name: /^more$/i }).click();
+    await expect(
+      page.getByRole('menuitem', { name: /duplicate/i })
+    ).toBeVisible();
+    await expect(
+      page.getByRole('menuitem', { name: /archive/i })
+    ).toBeVisible();
+    await page.keyboard.press('Escape');
+
     await savedPanel
       .getByRole('button', { name: /^publish assignment$/i })
       .click();
@@ -131,6 +147,7 @@ test.describe('activity authoring', () => {
     await expect(
       page.getByRole('button', { name: /^copy student link$/i }).first()
     ).toBeVisible();
+    await expect(page.getByText('Distribution status')).toHaveCount(0);
 
     await page.getByRole('link', { name: /^open link$/i }).click();
     await expect(page).toHaveURL(/\/play\/[^/]+$/);

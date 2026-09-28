@@ -11,12 +11,12 @@
   "activity_library_scope_search_all_description": "검색어로 활동 라이브러리를 좁히지 않은 상태입니다.",
   "activity_library_scope_search_all_value": "저장된 모든 활동",
   "activity_library_scope_search_filtered_description": "이 검색어와 일치하는 활동만 포함합니다.",
-  "activity_library_scope_search_label": "검색 범위",
-  "activity_library_scope_status_label": "상태 범위",
+  "activity_library_scope_search_label": "검색",
+  "activity_library_scope_status_label": "상태",
   "activity_library_scope_summary": "전체 {total}개 중 {firstItem}–{lastItem}개 표시, {currentPage}/{totalPages}페이지.",
   "activity_library_scope_summary_empty": "현재 라이브러리 보기에 표시할 활동이 없습니다.",
   "activity_library_scope_summary_out_of_range": "{currentPage}페이지는 사용 가능한 전체 {totalPages}페이지 범위를 벗어납니다.",
   "activity_library_scope_template_all_description": "모든 활동 템플릿 유형을 포함합니다.",
   "activity_library_scope_template_filtered_description": "이 템플릿 유형을 사용하는 활동만 포함합니다.",
-  "activity_library_scope_template_label": "템플릿 범위"
+  "activity_library_scope_template_label": "게임"
 }

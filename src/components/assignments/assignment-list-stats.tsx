@@ -16,7 +16,7 @@ export function AssignmentListStats({
   statItems,
 }: AssignmentListStatsProps) {
   return (
-    <dl aria-label={label} className="grid gap-3 sm:grid-cols-2">
+    <dl aria-label={label} className="flex gap-6">
       {statItems.map((stat) => (
         <AssignmentListStat idPrefix={idPrefix} key={stat.key} stat={stat} />
       ))}
@@ -45,12 +45,15 @@ function AssignmentListStat({
   const descriptionId = `${idPrefix}-stat-${stat.key}-description`;
 
   return (
-    <div className="rounded-lg border bg-background p-3">
-      <Icon aria-hidden="true" className="size-4 text-primary" />
-      <dt id={labelId} className="mt-2 text-xs text-muted-foreground">
+    <div className="grid gap-0.5">
+      <dt
+        id={labelId}
+        className="flex items-center gap-1.5 text-muted-foreground text-xs"
+      >
+        <Icon aria-hidden="true" className="size-3.5" />
         {stat.label}
       </dt>
-      <dd className="text-sm font-medium">
+      <dd className="font-semibold text-lg tabular-nums">
         <output
           id={valueId}
           aria-label={stat.ariaLabel}

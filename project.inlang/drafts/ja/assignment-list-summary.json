@@ -1,6 +1,6 @@
 {
   "assignment_list_summary_assignments": "課題",
-  "assignment_list_summary_assignments_description": "現在の一覧範囲にある課題リンクの合計です。",
+  "assignment_list_summary_assignments_description": "フィルターに一致する生徒用リンク。",
   "assignment_list_summary_average": "平均",
   "assignment_list_summary_average_empty": "採点済みの解答はまだありません。",
   "assignment_list_summary_average_with_attempts": "採点済みの生徒の解答から算出しています。",

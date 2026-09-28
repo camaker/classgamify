@@ -16,9 +16,9 @@
   "assignment_list_scope_search_all_description": "検索条件で課題一覧を絞り込んでいません。",
   "assignment_list_scope_search_all_value": "すべての課題リンク",
   "assignment_list_scope_search_filtered_description": "検索条件に一致する課題リンクのみを表示しています。",
-  "assignment_list_scope_search_label": "検索範囲",
+  "assignment_list_scope_search_label": "検索",
   "assignment_list_scope_status_all_description": "すべての課題ステータスを表示しています。",
-  "assignment_list_scope_status_label": "ステータス範囲",
+  "assignment_list_scope_status_label": "ステータス",
   "assignment_list_scope_summary": "全{total}件中{firstItem}-{lastItem}件、{totalPages}ページ中{currentPage}ページを表示しています。",
   "assignment_list_scope_summary_empty": "現在の一覧に表示できる課題はありません。",
   "assignment_list_scope_summary_out_of_range": "ページ{currentPage}は利用可能な{totalPages}ページを超えています。"

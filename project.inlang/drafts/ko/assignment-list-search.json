@@ -11,7 +11,7 @@
   "assignment_list_status_filter_closed": "종료됨",
   "assignment_list_status_filter_closed_description": "교사가 닫은 링크를 결과는 유지한 채 표시합니다.",
   "assignment_list_status_filter_draft": "초안",
-  "assignment_list_status_filter_draft_description": "아직 게시 및 스냅샷 생성 과정을 거치지 않은 과제를 표시합니다.",
+  "assignment_list_status_filter_draft_description": "아직 게시하지 않은 과제를 표시합니다.",
   "assignment_list_status_filter_expired": "만료됨",
   "assignment_list_status_filter_expired_description": "제출 기한이 지나 학생 응답을 받지 않는 링크를 표시합니다.",
   "assignment_list_status_filter_published": "공개 중",
