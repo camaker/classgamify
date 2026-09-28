@@ -227,11 +227,6 @@ test('assignment item order source boundaries stay wired to shared helpers', () 
   );
   assert.match(
     publicSource,
-    /case 'shuffle-policy':[\s\S]*buildPublicAssignmentAccessRuleHandoffItem\([\s\S]*'itemOrder'[\s\S]*id/,
-    'publicAccessExposesPolicy'
-  );
-  assert.match(
-    publicSource,
     /buildPublicAssignmentPayload[\s\S]*const orderedRuntimeItems = orderAssignmentRuntimeItems\(\{[\s\S]*items: runtimeItems,[\s\S]*shareSlug,[\s\S]*shuffleItems: settings\.shuffleItems/,
     'publicPayloadUsesOrdering'
   );

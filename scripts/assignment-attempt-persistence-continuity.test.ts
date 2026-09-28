@@ -54,6 +54,6 @@ test('product and catalog register persistence continuity', () => {
   );
   assert.match(
     read('tests/e2e/TEST-CATALOG.md'),
-    /assignment-attempt-persistence-continuity\.test\.ts[\s\S]*30-slice source-level contract/i
+    /assignment-attempt-persistence-continuity\.test\.ts[\s\S]*source guards/i
   );
 });

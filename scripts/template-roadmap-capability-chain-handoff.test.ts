@@ -1,9 +1,6 @@
 import assert from 'node:assert/strict';
 import { existsSync, readFileSync } from 'node:fs';
 import test from 'node:test';
-import { ACTIVITY_AI_AUTHORING_CHAIN_HANDOFF_ITEM_IDS } from '@/activities/ai-authoring-chain';
-import { ACTIVITY_AUTHORING_LIBRARY_CHAIN_HANDOFF_ITEM_IDS } from '@/activities/authoring-library-chain';
-import { ACTIVITY_TEMPLATE_SCAFFOLD_QUALITY_HANDOFF_ITEM_IDS } from '@/activities/scaffolds';
 import {
   TEMPLATE_ROADMAP_CAPABILITY_CHAIN_HANDOFF_ITEM_IDS,
   TEMPLATE_ROADMAP_CAPABILITY_CHAIN_SOURCE_FILES,
@@ -14,11 +11,7 @@ import {
 import { ACTIVITY_TEMPLATE_TYPES } from '@/activities/types';
 import { WORKSHEET_MODE_TEMPLATES } from '@/activities/worksheet-modes';
 import { DEFAULT_QUESTION_CHOICE_COUNT } from '@/activities/distractors';
-import { PUBLIC_TEMPLATE_ENTRY_HANDOFF_ITEM_IDS } from '@/activities/entry-page-view';
-import { STUDENT_RUNNER_PLAY_CHAIN_HANDOFF_ITEM_IDS } from '@/assignments/student-runner-play-chain';
-import { WORKSHEET_MODE_DELIVERY_CHAIN_HANDOFF_ITEM_IDS } from '@/assignments/worksheet-mode-delivery-chain';
 import { Routes } from '@/lib/routes';
-import { ROADMAP_PUBLIC_HANDOFF_ITEM_IDS } from '@/pages/public-page-view';
 
 const PRODUCT_SOURCE = readFileSync('docs/product.md', 'utf8');
 const PUBLIC_PAGE_VIEW_SOURCE = readFileSync(
@@ -175,18 +168,6 @@ test('template roadmap capability chain is backed by focused gates', () => {
     ['fill-blank', 'line-match', 'listening', 'group-sort']
   );
   assert.equal(DEFAULT_QUESTION_CHOICE_COUNT, 4);
-  assert.deepEqual(
-    [
-      ROADMAP_PUBLIC_HANDOFF_ITEM_IDS.length,
-      PUBLIC_TEMPLATE_ENTRY_HANDOFF_ITEM_IDS.length,
-      ACTIVITY_AUTHORING_LIBRARY_CHAIN_HANDOFF_ITEM_IDS.length,
-      ACTIVITY_TEMPLATE_SCAFFOLD_QUALITY_HANDOFF_ITEM_IDS.length,
-      ACTIVITY_AI_AUTHORING_CHAIN_HANDOFF_ITEM_IDS.length,
-      WORKSHEET_MODE_DELIVERY_CHAIN_HANDOFF_ITEM_IDS.length,
-      STUDENT_RUNNER_PLAY_CHAIN_HANDOFF_ITEM_IDS.length,
-    ],
-    Array.from({ length: 7 }, () => 30)
-  );
 });
 
 test('template roadmap capability chain preserves product roadmap boundaries', () => {
@@ -245,8 +226,8 @@ test('template roadmap capability sources align entries, status, and review gate
   );
   assert.match(
     ENTRY_PAGE_SOURCE,
-    /buildWorksheetsPageViewModel[\s\S]*surface: 'worksheets'[\s\S]*modeCards: worksheetModeDefinitions\.map/,
-    'Worksheet page view model should use shared template-entry handoff and mode cards.'
+    /buildWorksheetsPageViewModel[\s\S]*modeCards: worksheetModeDefinitions\.map/,
+    'Worksheet page view model should use shared mode cards.'
   );
 });
 

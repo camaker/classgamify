@@ -37,7 +37,7 @@ export const STUDENT_RUNNER_PLAY_CHAIN_SOURCE_FILES = [
   'src/api/assignments.ts',
   'src/assignments/public.ts',
   'src/assignments/delivery-summary.ts',
-  'src/assignments/unavailable-access.ts',
+  'src/assignments/share-slug.ts',
   'src/assignments/lifecycle.ts',
   'src/assignments/item-order.ts',
   'src/assignments/identity.ts',

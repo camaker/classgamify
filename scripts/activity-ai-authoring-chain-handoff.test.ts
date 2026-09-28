@@ -8,15 +8,8 @@ import {
   type ActivityAiAuthoringChainHandoffItemId,
   type ActivityAiAuthoringChainHandoffView,
 } from '@/activities/ai-authoring-chain';
-import {
-  ACTIVITY_AI_FALLBACK_SOURCE_TERM_PLAN_ITEM_IDS,
-  ACTIVITY_DRAFT_REVIEW_STATE,
-} from '@/activities/ai-draft';
-import { ACTIVITY_AI_FALLBACK_HANDOFF_ITEM_IDS } from '@/activities/ai-draft-fallback-handoff';
-import { ACTIVITY_AI_FALLBACK_DRAFT_CHAIN_HANDOFF_ITEM_IDS } from '@/activities/ai-fallback-draft-chain';
+import { ACTIVITY_DRAFT_REVIEW_STATE } from '@/activities/ai-draft';
 import { ACTIVITY_SOURCE_MATERIAL_READINESS_CAPABILITIES } from '@/activities/material-summary';
-import { ACTIVITY_TEMPLATE_SCAFFOLD_QUALITY_HANDOFF_ITEM_IDS } from '@/activities/scaffolds';
-import { SOURCE_MATERIAL_PRIVACY_CHAIN_HANDOFF_ITEM_IDS } from '@/activities/source-material-privacy-chain';
 
 const PRODUCT_SOURCE = readFileSync('docs/product.md', 'utf8');
 const ACTIVITY_AI_API_SOURCE = readFileSync('src/api/activity-ai.ts', 'utf8');
@@ -128,17 +121,6 @@ test('activity AI authoring chain stays backed by focused gates', () => {
       `Missing activity AI authoring chain file ${filePath}`
     );
   }
-
-  assert.deepEqual(
-    [
-      ACTIVITY_AI_FALLBACK_HANDOFF_ITEM_IDS.length,
-      ACTIVITY_AI_FALLBACK_DRAFT_CHAIN_HANDOFF_ITEM_IDS.length,
-      ACTIVITY_AI_FALLBACK_SOURCE_TERM_PLAN_ITEM_IDS.length,
-      SOURCE_MATERIAL_PRIVACY_CHAIN_HANDOFF_ITEM_IDS.length,
-      ACTIVITY_TEMPLATE_SCAFFOLD_QUALITY_HANDOFF_ITEM_IDS.length,
-    ],
-    Array.from({ length: 5 }, () => 30)
-  );
   assert.deepEqual(ACTIVITY_DRAFT_REVIEW_STATE, {
     applicationMode: 'editor-review',
     persistenceMode: 'not-persisted',

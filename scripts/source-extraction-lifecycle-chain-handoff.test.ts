@@ -239,10 +239,6 @@ test('DOM handoff and public payloads do not expose source material secrets', ()
     /\b(sourceMaterials|r2Key|storageKey|fileId|originalName|permission|bytes|fileList)\b/,
     'PublicAssignmentPayload should not expose teacher source-material metadata.'
   );
-  assert.match(
-    PUBLIC_ASSIGNMENT_SOURCE,
-    /exposesTeacherSourceMaterials: false/
-  );
   assert.doesNotMatch(
     STUDENT_RUNTIME_SOURCE,
     /\b(sourceMaterials|storageKey|fileId|originalName|permission|bytes|fileList)\b/,

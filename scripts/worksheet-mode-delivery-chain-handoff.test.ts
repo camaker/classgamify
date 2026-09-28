@@ -1,7 +1,6 @@
 import assert from 'node:assert/strict';
 import { existsSync, readFileSync } from 'node:fs';
 import test from 'node:test';
-import { ACTIVITY_TEMPLATE_SCAFFOLD_QUALITY_HANDOFF_ITEM_IDS } from '@/activities/scaffolds';
 import { WORKSHEET_MODE_TEMPLATES } from '@/activities/worksheet-modes';
 import {
   WORKSHEET_MODE_DELIVERY_CHAIN_HANDOFF_ITEM_IDS,
@@ -145,12 +144,6 @@ test('worksheet-mode delivery chain stays backed by focused contracts', () => {
     [...WORKSHEET_MODE_TEMPLATES],
     ['fill-blank', 'line-match', 'listening', 'group-sort']
   );
-  assert.equal(
-    ACTIVITY_TEMPLATE_SCAFFOLD_QUALITY_HANDOFF_ITEM_IDS.includes(
-      'worksheet-entry'
-    ),
-    true
-  );
 });
 
 test('worksheet-mode sources keep worksheets on the shared product loop', () => {
@@ -186,8 +179,8 @@ test('worksheet-mode sources keep worksheets on the shared product loop', () => 
   );
   assert.match(
     ENTRY_PAGE_SOURCE,
-    /buildWorksheetsPageViewModel[\s\S]*handoffView: buildPublicTemplateEntryHandoffView\(\{[\s\S]*surface: 'worksheets'[\s\S]*worksheetModeDefinitions[\s\S]*\}[\s\S]*modeCards: worksheetModeDefinitions\.map/,
-    'The worksheets page view model should use the shared public template entry handoff without rendering a separate worksheet model.'
+    /buildWorksheetsPageViewModel[\s\S]*modeCards: worksheetModeDefinitions\.map/,
+    'The worksheets page view model should build mode cards from the shared worksheet mode definitions.'
   );
   assert.match(
     CREATE_ROUTE_SOURCE,

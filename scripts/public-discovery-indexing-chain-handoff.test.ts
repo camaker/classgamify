@@ -1,20 +1,7 @@
 import assert from 'node:assert/strict';
 import { existsSync, readFileSync } from 'node:fs';
 import test from 'node:test';
-import { PUBLIC_TEMPLATE_ENTRY_HANDOFF_ITEM_IDS } from '@/activities/entry-page-view';
-import { AUTH_WORKSPACE_HANDOFF_ITEM_IDS } from '@/auth/workspace-boundary';
-import { CONTACT_CLASSROOM_INTAKE_HANDOFF_ITEM_IDS } from '@/contact/inquiry-view';
-import { ACTIVE_SURFACE_PRODUCT_BOUNDARY_ITEM_IDS } from '@/config/active-surface-product-boundary';
 import { Routes } from '@/lib/routes';
-import { PUBLIC_NAVIGATION_HANDOFF_ITEM_IDS } from '@/navigation/public-navigation-handoff';
-import { LEGAL_POLICY_HANDOFF_ITEM_IDS } from '@/pages/legal-policy-view';
-import {
-  HOME_PAGE_PRODUCT_LOOP_HANDOFF_ITEM_IDS,
-  PRICING_PAGE_HANDOFF_ITEM_IDS,
-  ROADMAP_PUBLIC_HANDOFF_ITEM_IDS,
-  TEACHERS_PAGE_HANDOFF_ITEM_IDS,
-} from '@/pages/public-page-view';
-import { PUBLIC_EDITORIAL_HANDOFF_ITEM_IDS } from '@/pages/public-editorial-content-view';
 import {
   PUBLIC_DISCOVERY_INDEXING_CHAIN_HANDOFF_ITEM_IDS,
   PUBLIC_DISCOVERY_INDEXING_CHAIN_SOURCE_FILES,
@@ -23,19 +10,12 @@ import {
   type PublicDiscoveryIndexingChainHandoffView,
 } from '@/seo/public-discovery-indexing-chain';
 import {
-  PUBLIC_DOM_HANDOFF_BLOCKED_COMPONENT_FILES,
-  PUBLIC_DOM_HANDOFF_BLOCKED_ROUTE_FILES,
-  PUBLIC_DOM_HANDOFF_BOUNDARY_ITEM_IDS,
-} from '@/seo/public-dom-handoff-boundary';
-import {
   buildRobotsTxt,
   buildSitemap,
   buildSitemapUrlEntries,
   getRobotsDisallowPaths,
   getSitemapUrls,
 } from '@/seo/public-indexing';
-import { LEGACY_PUBLIC_ROUTE_HANDOFF_ITEM_IDS } from '@/seo/legacy-public-route-handoff';
-import { PUBLIC_METADATA_HANDOFF_ITEM_IDS } from '@/seo/public-metadata-handoff';
 import {
   PUBLIC_INDEXABLE_STATIC_ROUTES,
   PUBLIC_ROBOTS_DISALLOW_RULES,
@@ -62,9 +42,6 @@ const MANIFEST_ROUTE_SOURCE = readFileSync(
   'utf8'
 );
 const TEST_CATALOG_SOURCE = readFileSync('tests/e2e/TEST-CATALOG.md', 'utf8');
-
-const PUBLIC_ROUTE_INTERNAL_HANDOFF_PATTERN =
-  /data-handoff|data-handoff-item|HandoffPanel|handoffView\.itemViews|<[^>]*Handoff\b/;
 
 const PRIVATE_ANSWER_KEY = 'SECRET_PUBLIC_DISCOVERY_ANSWER_KEY';
 const PRIVATE_ATTEMPT_RECORD = 'SECRET_PUBLIC_DISCOVERY_ATTEMPT_RECORD';
@@ -184,26 +161,6 @@ test('public discovery/indexing chain is backed by focused public gates', () => 
       `Missing public discovery/indexing chain file ${filePath}`
     );
   }
-
-  assert.deepEqual(
-    [
-      HOME_PAGE_PRODUCT_LOOP_HANDOFF_ITEM_IDS.length,
-      PUBLIC_NAVIGATION_HANDOFF_ITEM_IDS.length,
-      PUBLIC_TEMPLATE_ENTRY_HANDOFF_ITEM_IDS.length,
-      TEACHERS_PAGE_HANDOFF_ITEM_IDS.length,
-      ROADMAP_PUBLIC_HANDOFF_ITEM_IDS.length,
-      PRICING_PAGE_HANDOFF_ITEM_IDS.length,
-      PUBLIC_EDITORIAL_HANDOFF_ITEM_IDS.length,
-      LEGAL_POLICY_HANDOFF_ITEM_IDS.length,
-      CONTACT_CLASSROOM_INTAKE_HANDOFF_ITEM_IDS.length,
-      AUTH_WORKSPACE_HANDOFF_ITEM_IDS.length,
-      ACTIVE_SURFACE_PRODUCT_BOUNDARY_ITEM_IDS.length,
-      PUBLIC_METADATA_HANDOFF_ITEM_IDS.length,
-      PUBLIC_DOM_HANDOFF_BOUNDARY_ITEM_IDS.length,
-      LEGACY_PUBLIC_ROUTE_HANDOFF_ITEM_IDS.length,
-    ],
-    Array.from({ length: 14 }, () => 30)
-  );
 });
 
 test('public discovery/indexing sources preserve docs product boundaries', () => {
@@ -335,33 +292,6 @@ test('public indexing route handlers delegate to shared helpers', () => {
   );
 });
 
-test('public DOM route and component sources keep audit handoff markup out', () => {
-  const routeLeaks = PUBLIC_DOM_HANDOFF_BLOCKED_ROUTE_FILES.filter(
-    (filePath) => {
-      assert.ok(existsSync(filePath), `Missing public route file ${filePath}`);
-      return PUBLIC_ROUTE_INTERNAL_HANDOFF_PATTERN.test(
-        readFileSync(filePath, 'utf8')
-      );
-    }
-  );
-  const componentLeaks = PUBLIC_DOM_HANDOFF_BLOCKED_COMPONENT_FILES.filter(
-    (filePath) => {
-      assert.ok(
-        existsSync(filePath),
-        `Missing public component file ${filePath}`
-      );
-      return PUBLIC_ROUTE_INTERNAL_HANDOFF_PATTERN.test(
-        readFileSync(filePath, 'utf8')
-      );
-    }
-  );
-
-  assert.deepEqual(routeLeaks, []);
-  assert.deepEqual(componentLeaks, []);
-  assert.equal(PUBLIC_DOM_HANDOFF_BLOCKED_ROUTE_FILES.length, 18);
-  assert.equal(PUBLIC_DOM_HANDOFF_BLOCKED_COMPONENT_FILES.length, 12);
-});
-
 test('manifest and robots keep protected and legacy paths out of discovery', () => {
   const manifest = buildWebAppManifest();
   const installBoundary = buildWebAppManifestInstallBoundary(manifest);
@@ -414,13 +344,13 @@ test('public discovery/indexing chain focused gate is documented', () => {
   );
   assert.match(
     TEST_CATALOG_SOURCE.replace(/\s+/g, ' '),
-    /public entry routes[\s\S]*navigation[\s\S]*template\/worksheet entries[\s\S]*sitemap\/robots\/manifest[\s\S]*legacy route retirement[\s\S]*public DOM handoff boundaries[\s\S]*privacy\/indexing guards/,
+    /public entry routes[\s\S]*navigation[\s\S]*template\/worksheet entries[\s\S]*sitemap\/robots\/manifest[\s\S]*legacy route retirement[\s\S]*public DOM boundaries[\s\S]*privacy\/indexing guards/,
     'TEST-CATALOG should describe the full public discovery/indexing chain scope.'
   );
   assert.match(
     TEST_CATALOG_SOURCE.replace(/\s+/g, ' '),
-    /public metadata handoff boundary/,
-    'TEST-CATALOG should document the concrete public metadata handoff boundary.'
+    /public metadata boundary/,
+    'TEST-CATALOG should document the public metadata boundary.'
   );
 });
 

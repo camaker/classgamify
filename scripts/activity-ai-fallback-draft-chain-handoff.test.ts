@@ -2,25 +2,13 @@ import assert from 'node:assert/strict';
 import { existsSync, readFileSync } from 'node:fs';
 import test from 'node:test';
 import {
-  ACTIVITY_AI_AUTHORING_CHAIN_HANDOFF_ITEM_IDS,
-  ACTIVITY_AI_AUTHORING_CHAIN_SOURCE_FILES,
-} from '@/activities/ai-authoring-chain';
-import { ACTIVITY_AI_FALLBACK_HANDOFF_ITEM_IDS } from '@/activities/ai-draft-fallback-handoff';
-import {
   ACTIVITY_AI_FALLBACK_DRAFT_CHAIN_HANDOFF_ITEM_IDS,
   ACTIVITY_AI_FALLBACK_DRAFT_CHAIN_SOURCE_FILES,
   buildActivityAiFallbackDraftChainHandoffView,
   type ActivityAiFallbackDraftChainHandoffItemId,
   type ActivityAiFallbackDraftChainHandoffView,
 } from '@/activities/ai-fallback-draft-chain';
-import {
-  ACTIVITY_AI_FALLBACK_SOURCE_TERM_PLAN_ITEM_IDS,
-  ACTIVITY_DRAFT_REVIEW_STATE,
-} from '@/activities/ai-draft';
-import { ACTIVITY_AI_ENHANCEMENT_EXECUTION_ITEM_IDS } from '@/activities/ai-enhancement-execution';
-import { ACTIVITY_AUTHORING_LIBRARY_CHAIN_HANDOFF_ITEM_IDS } from '@/activities/authoring-library-chain';
-import { SOURCE_EXTRACTION_LIFECYCLE_CHAIN_HANDOFF_ITEM_IDS } from '@/activities/source-extraction-lifecycle-chain';
-import { SOURCE_MATERIAL_PRIVACY_CHAIN_HANDOFF_ITEM_IDS } from '@/activities/source-material-privacy-chain';
+import { ACTIVITY_DRAFT_REVIEW_STATE } from '@/activities/ai-draft';
 
 const PRODUCT_SOURCE = readFileSync('docs/product.md', 'utf8');
 const ACTIVITY_AI_API_SOURCE = readFileSync('src/api/activity-ai.ts', 'utf8');
@@ -148,20 +136,6 @@ test('activity AI fallback draft chain is backed by adjacent focused gates', () 
       `Missing activity AI fallback draft chain file ${filePath}`
     );
   }
-
-  assert.deepEqual(
-    [
-      ACTIVITY_AI_FALLBACK_HANDOFF_ITEM_IDS.length,
-      ACTIVITY_AI_FALLBACK_SOURCE_TERM_PLAN_ITEM_IDS.length,
-      SOURCE_EXTRACTION_LIFECYCLE_CHAIN_HANDOFF_ITEM_IDS.length,
-      SOURCE_MATERIAL_PRIVACY_CHAIN_HANDOFF_ITEM_IDS.length,
-      ACTIVITY_AI_AUTHORING_CHAIN_HANDOFF_ITEM_IDS.length,
-      ACTIVITY_AI_AUTHORING_CHAIN_SOURCE_FILES.length,
-      ACTIVITY_AI_ENHANCEMENT_EXECUTION_ITEM_IDS.length,
-      ACTIVITY_AUTHORING_LIBRARY_CHAIN_HANDOFF_ITEM_IDS.length,
-    ],
-    Array.from({ length: 8 }, () => 30)
-  );
   assert.deepEqual(ACTIVITY_DRAFT_REVIEW_STATE, {
     applicationMode: 'editor-review',
     persistenceMode: 'not-persisted',

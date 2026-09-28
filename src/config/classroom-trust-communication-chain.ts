@@ -58,11 +58,11 @@ export const CLASSROOM_TRUST_COMMUNICATION_CHAIN_SOURCE_FILES = [
   'src/payment/provider/creem.ts',
   'src/pages/legal-policy-view.ts',
   'src/routes/(legals)/privacy.tsx',
-  'src/config/developer-configuration-handoff.ts',
+  'src/env/server.ts',
   'src/config/website.ts',
   'wrangler.jsonc',
   '.env.example',
-  'src/seo/public-dom-handoff-boundary.ts',
+  'src/seo/public-indexing.ts',
   'tests/e2e/TEST-CATALOG.md',
 ] as const;
 

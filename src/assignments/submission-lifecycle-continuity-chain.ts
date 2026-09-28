@@ -25,7 +25,7 @@ export const ASSIGNMENT_SUBMISSION_LIFECYCLE_CONTINUITY_CHAIN_SOURCE_FILES = [
   'src/assignments/student-runner-state.ts',
   'src/routes/play/$shareId.tsx',
   'src/assignments/public.ts',
-  'src/assignments/unavailable-access.ts',
+  'src/assignments/share-slug.ts',
   'src/assignments/results.ts',
   'src/assignments/results-export.ts',
   'src/assignments/result-view.ts',

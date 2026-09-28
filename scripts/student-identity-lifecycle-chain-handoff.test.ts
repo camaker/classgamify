@@ -305,7 +305,7 @@ test('attempt limits and teacher result consumers preserve identity guards', () 
   );
   assert.match(
     PUBLIC_ASSIGNMENT_SOURCE,
-    /collectStudentName[\s\S]*rawAnonymousTokenHidden: true[\s\S]*exposesRawAnonymousToken: false/,
+    /collectStudentName[\s\S]*rawAnonymousTokenHidden: true/,
     'Public payloads should expose identity mode without raw anonymous tokens.'
   );
   assert.match(

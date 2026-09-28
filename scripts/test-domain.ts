@@ -25,30 +25,12 @@ import {
   PUBLIC_ROBOTS_DISALLOW_RULES,
   RETIRED_LEGACY_PUBLIC_PATHS,
 } from '@/seo/public-routes';
-import {
-  buildRobotsTxt,
-  buildSitemap,
-  buildSitemapUrlEntries,
-  getRobotsDisallowPaths,
-  getSitemapUrls,
-  ROBOTS_TXT_HEADERS,
-  SITEMAP_XML_HEADERS,
-} from '@/seo/public-indexing';
-import {
-  buildPublicMetadataHandoffView,
-  PUBLIC_METADATA_HANDOFF_ITEM_IDS,
-} from '@/seo/public-metadata-handoff';
+import { buildRobotsTxt, buildSitemap, buildSitemapUrlEntries, getRobotsDisallowPaths, ROBOTS_TXT_HEADERS, SITEMAP_XML_HEADERS } from '@/seo/public-indexing';
 import {
   PUBLIC_DISCOVERY_INDEXING_CHAIN_HANDOFF_ITEM_IDS,
   PUBLIC_DISCOVERY_INDEXING_CHAIN_SOURCE_FILES,
   buildPublicDiscoveryIndexingChainHandoffView,
 } from '@/seo/public-discovery-indexing-chain';
-import {
-  PUBLIC_DOM_HANDOFF_BLOCKED_COMPONENT_FILES,
-  PUBLIC_DOM_HANDOFF_BLOCKED_ROUTE_FILES,
-  PUBLIC_DOM_HANDOFF_BOUNDARY_ITEM_IDS,
-  buildPublicDomHandoffBoundaryView,
-} from '@/seo/public-dom-handoff-boundary';
 import {
   ACTIVE_SURFACE_ALLOWED_LEGACY_MIGRATION_FILES,
   ACTIVE_SURFACE_PRODUCT_BOUNDARY_ITEM_IDS,
@@ -65,11 +47,6 @@ import {
   CLASSROOM_TRUST_COMMUNICATION_CHAIN_SOURCE_FILES,
   buildClassroomTrustCommunicationChainHandoffView,
 } from '@/config/classroom-trust-communication-chain';
-import { DEVELOPER_CONFIGURATION_HANDOFF_ITEM_IDS } from '@/config/developer-configuration-handoff';
-import {
-  buildPublicNavigationHandoffView,
-  PUBLIC_NAVIGATION_HANDOFF_ITEM_IDS,
-} from '@/navigation/public-navigation-handoff';
 import {
   buildWebAppManifest,
   buildWebAppManifestInstallBoundary,
@@ -87,17 +64,8 @@ import {
   normalizeContactClassroomInquiryFields,
   normalizeContactInquiryIntent,
 } from '@/contact/inquiry';
-import {
-  buildContactClassroomIntakeHandoffView,
-  buildContactClassroomInquiryScopeView,
-  CONTACT_CLASSROOM_INTAKE_HANDOFF_ITEM_IDS,
-  CONTACT_CLASSROOM_INQUIRY_SCOPE_ITEM_IDS,
-} from '@/contact/inquiry-view';
-import {
-  AUTH_WORKSPACE_BOUNDARY_ITEM_IDS,
-  AUTH_WORKSPACE_HANDOFF_ITEM_IDS,
-  buildAuthWorkspaceBoundaryView,
-} from '@/auth/workspace-boundary';
+import { buildContactClassroomInquiryScopeView, CONTACT_CLASSROOM_INQUIRY_SCOPE_ITEM_IDS } from '@/contact/inquiry-view';
+import { AUTH_WORKSPACE_BOUNDARY_ITEM_IDS, buildAuthWorkspaceBoundaryView } from '@/auth/workspace-boundary';
 import {
   ACCOUNT_GOVERNANCE_LIFECYCLE_CHAIN_HANDOFF_ITEM_IDS,
   ACCOUNT_GOVERNANCE_LIFECYCLE_CHAIN_SOURCE_FILES,
@@ -132,12 +100,7 @@ import {
   getAuthBannedUserMessage,
   getAuthDefaultBanReason,
 } from '@/auth/plugin-copy';
-import {
-  buildMailTransactionalWorkspaceHandoffView,
-  buildMailWorkspaceBoundaryView,
-  MAIL_TRANSACTIONAL_TEMPLATE_IDS,
-  MAIL_TRANSACTIONAL_WORKSPACE_HANDOFF_ITEM_IDS,
-} from '@/mail/workspace-boundary';
+import { buildMailWorkspaceBoundaryView } from '@/mail/workspace-boundary';
 import {
   TRANSACTIONAL_MAIL_LIFECYCLE_CHAIN_HANDOFF_ITEM_IDS,
   TRANSACTIONAL_MAIL_LIFECYCLE_CHAIN_SOURCE_FILES,
@@ -368,7 +331,6 @@ import {
   buildActivityAiDraftFocusOptions,
   buildActivityAiDraftFocusPromptLine,
 } from '@/activities/ai-draft-focus';
-import { ACTIVITY_AI_FALLBACK_HANDOFF_ITEM_IDS } from '@/activities/ai-draft-fallback-handoff';
 import {
   formatEditorGroupRow,
   formatEditorGroupRows,
@@ -529,12 +491,7 @@ import {
   parseCreateActivityTemplateSearch,
   parseCreateActivityTemplateSourceSearch,
 } from '@/activities/template-entry';
-import {
-  buildPublicTemplateEntryHandoffView,
-  buildTemplatesPageViewModel,
-  buildWorksheetsPageViewModel,
-  PUBLIC_TEMPLATE_ENTRY_HANDOFF_ITEM_IDS,
-} from '@/activities/entry-page-view';
+import { buildTemplatesPageViewModel, buildWorksheetsPageViewModel } from '@/activities/entry-page-view';
 import {
   ACTIVITY_CREATABLE_VISIBILITIES,
   ACTIVITY_DIFFICULTIES,
@@ -595,13 +552,7 @@ import {
   DEFAULT_QUESTION_CHOICE_COUNT,
 } from '@/activities/distractors';
 import { buildQuestionOptionTexts } from '@/activities/question-options';
-import {
-  ACTIVITY_TEMPLATE_SCAFFOLD_QUALITY_HANDOFF_ITEM_IDS,
-  ACTIVITY_TEMPLATE_SCAFFOLD_QUALITY_TARGETS,
-  buildActivityTemplateScaffoldInput,
-  buildActivityTemplateScaffoldReadinessSummary,
-  getActivityTemplateScaffold,
-} from '@/activities/scaffolds';
+import { ACTIVITY_TEMPLATE_SCAFFOLD_QUALITY_TARGETS, buildActivityTemplateScaffoldInput, buildActivityTemplateScaffoldReadinessSummary, getActivityTemplateScaffold } from '@/activities/scaffolds';
 import {
   getWorksheetModeDefinitions,
   WORKSHEET_MODE_TEMPLATES,
@@ -631,27 +582,12 @@ import {
   buildTeacherWorkspaceOperationsChainHandoffView,
 } from '@/dashboard/teacher-workspace-operations-chain';
 import { buildDashboardPaginationView } from '@/dashboard/pagination';
-import {
-  buildContactPageViewModel,
-  buildHomePageStarterPreview,
-  buildHomePageViewModel,
-  buildPricingFaqItems,
-  buildPricingPageViewModel,
-  buildRoadmapPageViewModel,
-  buildTeachersPageViewModel,
-  HOME_PAGE_PRODUCT_LOOP_HANDOFF_ITEM_IDS,
-  PRICING_PAGE_HANDOFF_ITEM_IDS,
-  ROADMAP_PUBLIC_HANDOFF_ITEM_IDS,
-  TEACHERS_PAGE_HANDOFF_ITEM_IDS,
-} from '@/pages/public-page-view';
+import { buildContactPageViewModel, buildHomePageStarterPreview, buildHomePageViewModel, buildPricingFaqItems, buildPricingPageViewModel, buildRoadmapPageViewModel, buildTeachersPageViewModel } from '@/pages/public-page-view';
 import {
   buildBlogListPageViewModel,
   buildBlogPostCtaViewModel,
   getBlogCtaActions,
 } from '@/pages/blog-page-view';
-import { PUBLIC_EDITORIAL_HANDOFF_ITEM_IDS } from '@/pages/public-editorial-content-view';
-import { LEGAL_POLICY_HANDOFF_ITEM_IDS } from '@/pages/legal-policy-view';
-import { LEGACY_PUBLIC_ROUTE_HANDOFF_ITEM_IDS } from '@/seo/legacy-public-route-handoff';
 import {
   buildPaymentStatusView,
   getInitialPaymentConfirmationStatus,
@@ -753,20 +689,7 @@ import {
   formatAssignmentDisplayText,
   formatAssignmentDisplayTitle,
 } from '@/assignments/assignment-display';
-import {
-  ASSIGNMENT_DELIVERY_POLICY_HANDOFF_ITEM_IDS,
-  buildAssignmentDeliverySummary,
-  buildAssignmentDeliveryPolicyHandoffView,
-  buildAssignmentSettingsSummaryView,
-  buildPublicAssignmentRuleSummary,
-  buildPublicAssignmentRuleSummaryFromSettings,
-  buildPublicAssignmentRuleSummaryView,
-  buildPublicAssignmentRuleSummaryViewFromSettings,
-  formatAssignmentDeliveryInstructions,
-  formatAssignmentDeliveryPolicyText,
-  formatAssignmentExpiry,
-  formatAssignmentItemCount,
-} from '@/assignments/delivery-summary';
+import { buildAssignmentDeliverySummary, buildAssignmentSettingsSummaryView, buildPublicAssignmentRuleSummary, buildPublicAssignmentRuleSummaryFromSettings, buildPublicAssignmentRuleSummaryView, buildPublicAssignmentRuleSummaryViewFromSettings, formatAssignmentDeliveryInstructions, formatAssignmentDeliveryPolicyText, formatAssignmentExpiry, formatAssignmentItemCount } from '@/assignments/delivery-summary';
 import {
   buildAssignmentActivityJoin,
   buildAssignmentDetailSelect,
@@ -777,27 +700,7 @@ import {
   buildAssignmentSnapshotJoin,
   buildAssignmentStatusTransitionWhere,
 } from '@/assignments/detail-query';
-import {
-  buildOpenPublicAssignmentPayload,
-  buildPublicAssignmentAccessHandoffView,
-  buildPublicAssignmentLookupResult,
-  buildPublicAssignmentPayload,
-  buildPublicAssignmentPreviewActivity,
-  buildPublicAssignmentPreviewAssignment,
-  buildPublicAssignmentUnavailablePayload,
-  buildPublicAttemptResult,
-  buildPublicAttemptReviewItems,
-  buildPublicAttemptReviewItemMap,
-  buildPublicAttemptReviewSummaryView,
-  PUBLIC_ASSIGNMENT_ACCESS_HANDOFF_ITEM_IDS,
-  PUBLIC_ASSIGNMENT_ESTIMATED_MINUTES,
-  stripRuntimeAnswer,
-  stripRuntimeAnswers,
-  summarizePublicAttemptReviewItemsForTotal,
-} from '@/assignments/public';
-import {
-  PUBLIC_ASSIGNMENT_UNAVAILABLE_ACCESS_HANDOFF_ITEM_IDS,
-} from '@/assignments/unavailable-access';
+import { buildOpenPublicAssignmentPayload, buildPublicAssignmentLookupResult, buildPublicAssignmentPayload, buildPublicAssignmentPreviewActivity, buildPublicAssignmentPreviewAssignment, buildPublicAssignmentUnavailablePayload, buildPublicAttemptResult, buildPublicAttemptReviewItems, buildPublicAttemptReviewItemMap, buildPublicAttemptReviewSummaryView, PUBLIC_ASSIGNMENT_ESTIMATED_MINUTES, stripRuntimeAnswer, stripRuntimeAnswers, summarizePublicAttemptReviewItemsForTotal } from '@/assignments/public';
 import {
   compareRuntimeDisplaySearchText,
   getRuntimeDisplayAcceptedAnswers,
@@ -2047,7 +1950,7 @@ for (const pattern of [
   /sanitized classroom\s+content[\s\S]*safe source-material provenance/,
   /should not publish an\s+assignment[\s\S]*without teacher review/,
   /e2e-\*@example\.test/,
-  /30-slice[\s\S]*developer configuration boundary/,
+  /scripts\/developer-configuration\.test\.ts[\s\S]*classroom\s+product loop/,
   /Student assignment payloads[\s\S]*should not expose teacher source-material\s+lists[\s\S]*R2 keys/,
 ]) {
   assert.match(
@@ -4420,12 +4323,11 @@ assert.deepEqual(assignmentDistributionLifecycleChainView.privacy, {
 });
 assert.deepEqual(
   [
-    ASSIGNMENT_DELIVERY_POLICY_HANDOFF_ITEM_IDS.length,
     PUBLISHED_ASSIGNMENT_DELIVERY_CHAIN_HANDOFF_ITEM_IDS.length,
     ASSIGNMENT_SOURCE_ACTIVITY_CONTEXT_CHAIN_HANDOFF_ITEM_IDS.length,
     TEACHER_RESULTS_REVIEW_CHAIN_HANDOFF_ITEM_IDS.length,
   ],
-  Array.from({ length: 4 }, () => 30),
+  Array.from({ length: 3 }, () => 30),
   'Assignment distribution lifecycle chain should stay backed by assignment list, share-link, publish, delivery, source context, runner, print, and results gates.'
 );
 assert.deepEqual(Object.fromEntries(assignmentDistributionLifecycleChainValues), {
@@ -4721,7 +4623,7 @@ assert.deepEqual(Object.fromEntries(assignmentLifecycleGovernanceChainValues), {
   'api-list-owner-scope': 'Owner scoped',
   'api-status-filter': 'Lifecycle SQL filter',
   'assignment-card-lifecycle-handoff': 'Hidden card handoff',
-  'public-unavailable-access-handoff-boundary': '30 unavailable access slices',
+  'public-unavailable-access-handoff-boundary': 'Closed, expired, draft, and missing',
   'attempt-review-retention': 'Scored attempts',
   'close-transition-rule': 'Published -> closed',
   'expired-reopen-block': 'Expired blocked',
@@ -5243,67 +5145,6 @@ assert.match(
   /PUBLIC_ASSIGNMENT_ESTIMATED_MINUTES[\s\S]*max: 20[\s\S]*min: 5[\s\S]*perItem: 2/,
   'Public assignment estimated minutes should expose named domain limits.'
 );
-assert.deepEqual(
-  [...PUBLIC_ASSIGNMENT_ACCESS_HANDOFF_ITEM_IDS],
-  [
-    'access-status',
-    'lifecycle-status',
-    'share-link',
-    'assignment-title',
-    'template',
-    'snapshot-source',
-    'item-count',
-    'public-rule-summary',
-    'sanitized-payload',
-    'runtime-prompts',
-    'runtime-choices',
-    'runtime-id-contract',
-    'answer-keys',
-    'explanations',
-    'accepted-alternatives',
-    'post-submit-review-gate',
-    'source-materials',
-    'activity-content-guard',
-    'instructions',
-    'attempt-limit',
-    'timer',
-    'close-time',
-    'identity-mode',
-    'browser-identity-policy',
-    'shuffle-policy',
-    'review-behavior',
-    'submission-policy',
-    'unavailable-safety',
-    'unavailable-content-guard',
-    'privacy-guard',
-  ],
-  'Public assignment access should expose exactly 30 stable handoff slice ids.'
-);
-assert.match(
-  publicAssignmentSource,
-  /export const PUBLIC_ASSIGNMENT_ACCESS_HANDOFF_ITEM_IDS = \[[\s\S]*'access-status'[\s\S]*'runtime-prompts'[\s\S]*'answer-keys'[\s\S]*'submission-policy'[\s\S]*'unavailable-content-guard'[\s\S]*'privacy-guard'[\s\S]*\] as const;[\s\S]*export type PublicAssignmentAccessHandoffItemId =[\s\S]*typeof PUBLIC_ASSIGNMENT_ACCESS_HANDOFF_ITEM_IDS/,
-  'Public assignment access should derive the typed handoff item id contract from the stable 30-slice id list.'
-);
-assert.match(
-  publicAssignmentSource,
-  /export type PublicAssignmentAccessHandoffPrivacyView = \{[\s\S]*exposesAcceptedAlternatives: false;[\s\S]*exposesActivityContentJson: false;[\s\S]*exposesAssignmentSettingsJson: false;[\s\S]*exposesBrowserIdentity: false;[\s\S]*exposesRawAnonymousToken: false;[\s\S]*exposesRuntimeChoiceText: false;[\s\S]*exposesRuntimeItemIds: false;[\s\S]*exposesRuntimePromptText: false;[\s\S]*exposesSnapshotContentJson: false;[\s\S]*exposesStudentAnswerText: false;[\s\S]*exposesTeacherOnlyAnswers: false;[\s\S]*exposesTeacherSourceMaterials: false;/,
-  'Public assignment access should expose explicit privacy flags for public payload, review data, student identity, and source-material boundaries.'
-);
-assert.match(
-  publicAssignmentSource,
-  /const itemViews = PUBLIC_ASSIGNMENT_ACCESS_HANDOFF_ITEM_IDS\.map\(\(id\) =>[\s\S]*buildPublicAssignmentAccessHandoffItemInput\(context, id\)[\s\S]*privacy: buildPublicAssignmentAccessHandoffPrivacyView\(itemViews\)/,
-  'Public assignment access handoff should build item views from the stable 30-slice id list.'
-);
-assert.match(
-  publicAssignmentSource,
-  /function buildPublicAssignmentAccessHandoffItemInput(?=[\s\S]*case 'item-count':[\s\S]*'items'[\s\S]*id)(?=[\s\S]*case 'attempt-limit':[\s\S]*'attempts'[\s\S]*id)(?=[\s\S]*case 'timer':[\s\S]*'timer'[\s\S]*id)(?=[\s\S]*case 'close-time':[\s\S]*'closes'[\s\S]*id)(?=[\s\S]*case 'identity-mode':[\s\S]*'identity'[\s\S]*id)(?=[\s\S]*case 'shuffle-policy':[\s\S]*'itemOrder'[\s\S]*id)(?=[\s\S]*case 'review-behavior':[\s\S]*'answerReveal'[\s\S]*id)/,
-  'Public assignment access handoff should compose stable rule slices from the shared public rule-summary view.'
-);
-assert.match(
-  publicAssignmentSource,
-  /function buildPublicAssignmentAccessHandoffContext[\s\S]*buildPublicAssignmentRuleSummaryViewFromSettings\(\{[\s\S]*expiresAt: payload\.assignment\.expiresAt,[\s\S]*itemCount: payload\.summary\.itemCount,[\s\S]*settings: payload\.assignment\.settingsJson,[\s\S]*\}\)\.items[\s\S]*status: 'unavailable'/,
-  'Public assignment access handoff context should derive open-link rules from sanitized payload settings and keep unavailable links content-free.'
-);
 const publicAssignmentAccessPrivatePrompt = 'PRIVATE_ACCESS_PROMPT';
 const publicAssignmentAccessPrivateAnswer = 'PRIVATE_ACCESS_ANSWER';
 const publicAssignmentAccessPrivateChoice = 'PRIVATE_ACCESS_CHOICE';
@@ -5343,232 +5184,6 @@ publicAssignmentAccessContent.sourceMaterials = [
     originalName: publicAssignmentAccessPrivateSource,
   },
 ];
-const publicAssignmentAccessSource = {
-  activity: {
-    contentJson: publicAssignmentAccessContent,
-    description: 'Access activity description',
-    id: 'public-access-activity',
-    templateType: 'quiz' as ActivityTemplateType,
-    title: 'Public access activity',
-    visibility: 'private' as const,
-  },
-  assignment: {
-    expiresAt: null,
-    id: 'public-access-assignment',
-    settingsJson: {
-      collectStudentName: false,
-      instructions: '  Read the classroom prompt and answer carefully.  ',
-      maxAttempts: 3,
-      showCorrectAnswers: false,
-      shuffleItems: true,
-      timeLimitSeconds: 120,
-    },
-    shareSlug: ' public-access-share ',
-    status: 'published' as const,
-    title: '  Public access homework  ',
-  },
-  snapshot: {
-    activityDescription: 'Frozen public access activity',
-    activityTitle: 'Frozen public access title',
-    contentJson: structuredClone(publicAssignmentAccessContent),
-    templateType: 'quiz' as ActivityTemplateType,
-  },
-};
-const publicAssignmentAccessHandoffView =
-  buildPublicAssignmentAccessHandoffView({
-    lookupResult: buildPublicAssignmentLookupResult(
-      publicAssignmentAccessSource
-    ),
-  });
-const publicAssignmentAccessHandoffValues = new Map(
-  publicAssignmentAccessHandoffView.itemViews.map((item) => [
-    item.id,
-    item.value,
-  ])
-);
-assert.match(publicAssignmentAccessHandoffView.description, /30-slice/);
-assert.deepEqual(
-  publicAssignmentAccessHandoffView.itemViews.map((item) => item.id),
-  [...PUBLIC_ASSIGNMENT_ACCESS_HANDOFF_ITEM_IDS],
-  'Public assignment access handoff should expose the stable 30-slice order for open links.'
-);
-assert.deepEqual(publicAssignmentAccessHandoffView.privacy, {
-  exposesAcceptedAlternatives: false,
-  exposesActivityContentJson: false,
-  exposesAssignmentSettingsJson: false,
-  exposesBrowserIdentity: false,
-  exposesRawAnonymousToken: false,
-  exposesRuntimeChoiceText: false,
-  exposesRuntimeItemIds: false,
-  exposesRuntimePromptText: false,
-  exposesSnapshotContentJson: false,
-  exposesStudentAnswerText: false,
-  exposesTeacherOnlyAnswers: false,
-  exposesTeacherSourceMaterials: false,
-  itemIds: [...PUBLIC_ASSIGNMENT_ACCESS_HANDOFF_ITEM_IDS],
-});
-assert.equal(
-  publicAssignmentAccessHandoffValues.get('access-status'),
-  'Available'
-);
-assert.equal(
-  publicAssignmentAccessHandoffValues.get('lifecycle-status'),
-  'Open'
-);
-assert.equal(
-  publicAssignmentAccessHandoffValues.get('share-link'),
-  'public-access-share'
-);
-assert.equal(
-  publicAssignmentAccessHandoffValues.get('assignment-title'),
-  'Public access homework'
-);
-assert.equal(publicAssignmentAccessHandoffValues.get('template'), 'Quiz');
-assert.equal(
-  publicAssignmentAccessHandoffValues.get('snapshot-source'),
-  'Frozen snapshot'
-);
-assert.equal(publicAssignmentAccessHandoffValues.get('item-count'), '1 item');
-assert.equal(
-  publicAssignmentAccessHandoffValues.get('public-rule-summary'),
-  '7 rules'
-);
-assert.equal(
-  publicAssignmentAccessHandoffValues.get('sanitized-payload'),
-  'Prepared'
-);
-assert.equal(
-  publicAssignmentAccessHandoffValues.get('runtime-prompts'),
-  '1 prompts'
-);
-assert.equal(
-  publicAssignmentAccessHandoffValues.get('runtime-choices'),
-  '3 choices'
-);
-assert.equal(
-  publicAssignmentAccessHandoffValues.get('runtime-id-contract'),
-  'Ids omitted'
-);
-assert.equal(
-  publicAssignmentAccessHandoffValues.get('source-materials'),
-  'Private'
-);
-assert.equal(
-  publicAssignmentAccessHandoffValues.get('activity-content-guard'),
-  'Content JSON hidden'
-);
-assert.equal(
-  publicAssignmentAccessHandoffValues.get('instructions'),
-  'Read the classroom prompt and answer carefully.'
-);
-assert.equal(
-  publicAssignmentAccessHandoffValues.get('attempt-limit'),
-  '3 max'
-);
-assert.equal(publicAssignmentAccessHandoffValues.get('timer'), '2 min');
-assert.equal(
-  publicAssignmentAccessHandoffValues.get('identity-mode'),
-  'Anonymous'
-);
-assert.equal(
-  publicAssignmentAccessHandoffValues.get('browser-identity-policy'),
-  'Anonymous token hidden'
-);
-assert.equal(
-  publicAssignmentAccessHandoffValues.get('submission-policy'),
-  'Submissions allowed'
-);
-assert.equal(
-  publicAssignmentAccessHandoffValues.get('unavailable-content-guard'),
-  'Open link'
-);
-assert.equal(
-  publicAssignmentAccessHandoffValues.get('privacy-guard'),
-  'Private data omitted'
-);
-for (const privateValue of [
-  publicAssignmentAccessPrivatePrompt,
-  publicAssignmentAccessPrivateAnswer,
-  publicAssignmentAccessPrivateChoice,
-  publicAssignmentAccessPrivateSource,
-  'private-access-file-id',
-]) {
-  assert.equal(
-    JSON.stringify(publicAssignmentAccessHandoffView).includes(privateValue),
-    false,
-    `Public assignment access handoff leaked private text: ${privateValue}`
-  );
-}
-const closedPublicAssignmentAccessHandoffView =
-  buildPublicAssignmentAccessHandoffView({
-    lookupResult: buildPublicAssignmentLookupResult({
-      ...publicAssignmentAccessSource,
-      assignment: {
-        ...publicAssignmentAccessSource.assignment,
-        shareSlug: 'closed-public-access-share',
-        status: 'closed',
-      },
-    }),
-    shareSlug: 'closed-public-access-share',
-  });
-const closedPublicAssignmentAccessHandoffValues = new Map(
-  closedPublicAssignmentAccessHandoffView.itemViews.map((item) => [
-    item.id,
-    item.value,
-  ])
-);
-assert.deepEqual(
-  closedPublicAssignmentAccessHandoffView.itemViews.map((item) => item.id),
-  [...PUBLIC_ASSIGNMENT_ACCESS_HANDOFF_ITEM_IDS],
-  'Public assignment access handoff should expose the stable 30-slice order for unavailable links.'
-);
-assert.equal(
-  closedPublicAssignmentAccessHandoffValues.get('access-status'),
-  'Unavailable'
-);
-assert.equal(
-  closedPublicAssignmentAccessHandoffValues.get('lifecycle-status'),
-  'Closed'
-);
-assert.equal(
-  closedPublicAssignmentAccessHandoffValues.get('assignment-title'),
-  'Hidden'
-);
-assert.equal(
-  closedPublicAssignmentAccessHandoffValues.get('runtime-prompts'),
-  'Hidden'
-);
-assert.equal(
-  closedPublicAssignmentAccessHandoffValues.get('browser-identity-policy'),
-  'Hidden'
-);
-assert.equal(
-  closedPublicAssignmentAccessHandoffValues.get('submission-policy'),
-  'Submissions blocked'
-);
-assert.equal(
-  closedPublicAssignmentAccessHandoffValues.get('unavailable-safety'),
-  'Safety policy active'
-);
-assert.equal(
-  closedPublicAssignmentAccessHandoffValues.get('unavailable-content-guard'),
-  'Runtime hidden'
-);
-for (const privateValue of [
-  publicAssignmentAccessPrivatePrompt,
-  publicAssignmentAccessPrivateAnswer,
-  publicAssignmentAccessPrivateChoice,
-  publicAssignmentAccessPrivateSource,
-  'private-access-file-id',
-]) {
-  assert.equal(
-    JSON.stringify(closedPublicAssignmentAccessHandoffView).includes(
-      privateValue
-    ),
-    false,
-    `Closed public assignment access handoff leaked private text: ${privateValue}`
-  );
-}
 assert.match(
   publicAssignmentSource,
   /export type PublicAssignmentUnavailablePayload = \{[\s\S]*contentPolicy: PublicAssignmentUnavailableContentPolicy;[\s\S]*identityPolicy: PublicAssignmentUnavailableIdentityPolicy;[\s\S]*reason: PublicAssignmentUnavailableReason;[\s\S]*submissionPolicy: PublicAssignmentUnavailableSubmissionPolicy;/,
@@ -6299,17 +5914,6 @@ assert.deepEqual(activityAiAuthoringChainView.privacy, {
   sourceFiles: [...ACTIVITY_AI_AUTHORING_CHAIN_SOURCE_FILES],
   usesFallbackDraftChain: true,
 });
-assert.deepEqual(
-  [
-    ACTIVITY_AI_FALLBACK_HANDOFF_ITEM_IDS.length,
-    ACTIVITY_AI_FALLBACK_DRAFT_CHAIN_HANDOFF_ITEM_IDS.length,
-    ACTIVITY_AI_FALLBACK_SOURCE_TERM_PLAN_ITEM_IDS.length,
-    SOURCE_MATERIAL_PRIVACY_CHAIN_HANDOFF_ITEM_IDS.length,
-    ACTIVITY_TEMPLATE_SCAFFOLD_QUALITY_HANDOFF_ITEM_IDS.length,
-  ],
-  Array.from({ length: 5 }, () => 30),
-  'Activity AI authoring chain should stay backed by focused authoring gates.'
-);
 assert.deepEqual(Object.fromEntries(activityAiAuthoringChainValues), {
   'activity-persistence-handoff': 'Create/update helpers',
   'fallback-draft-chain-boundary': '30 fallback slices',
@@ -6405,20 +6009,6 @@ assert.deepEqual(activityAiFallbackDraftChainView.privacy, {
   usesAuthoringLibraryChain: true,
   usesSanitizedSourceText: true,
 });
-assert.deepEqual(
-  [
-    ACTIVITY_AI_FALLBACK_HANDOFF_ITEM_IDS.length,
-    ACTIVITY_AI_FALLBACK_SOURCE_TERM_PLAN_ITEM_IDS.length,
-    SOURCE_EXTRACTION_LIFECYCLE_CHAIN_HANDOFF_ITEM_IDS.length,
-    SOURCE_MATERIAL_PRIVACY_CHAIN_HANDOFF_ITEM_IDS.length,
-    ACTIVITY_AI_AUTHORING_CHAIN_HANDOFF_ITEM_IDS.length,
-    ACTIVITY_AI_AUTHORING_CHAIN_SOURCE_FILES.length,
-    ACTIVITY_AI_ENHANCEMENT_EXECUTION_ITEM_IDS.length,
-    ACTIVITY_AUTHORING_LIBRARY_CHAIN_HANDOFF_ITEM_IDS.length,
-  ],
-  Array.from({ length: 8 }, () => 30),
-  'Activity AI fallback draft chain should stay backed by fallback, source-term, draft boundary, metadata, template, question-choice, editor, source-material, extraction, authoring, and execution gates.'
-);
 assert.deepEqual(Object.fromEntries(activityAiFallbackDraftChainValues), {
   'complete-group-fields': 'Groups ready',
   'complete-pair-fields': 'Pairs ready',
@@ -7859,11 +7449,9 @@ assert.deepEqual(activityAuthoringLibraryChainView.privacy, {
 });
 assert.deepEqual(
   [
-    PUBLIC_TEMPLATE_ENTRY_HANDOFF_ITEM_IDS.length,
-    ACTIVITY_TEMPLATE_SCAFFOLD_QUALITY_HANDOFF_ITEM_IDS.length,
     ACTIVITY_SOURCE_MATERIAL_REFERENCE_ITEM_IDS.length,
   ],
-  Array.from({ length: 3 }, () => 30),
+  Array.from({ length: 1 }, () => 30),
   'Activity authoring/library chain should stay backed by focused public-entry, editor, library, derivative, lifecycle, and publish gates.'
 );
 assert.deepEqual(Object.fromEntries(activityAuthoringLibraryChainValues), {
@@ -7996,17 +7584,6 @@ assert.deepEqual(sourceMaterialPrivacyUploadPlan.privacy, {
   readsFileBytesForClassification: false,
   tracksOwnerScopedUserFiles: true,
 });
-assert.deepEqual(
-  [
-    STORAGE_UPLOAD_READINESS_ITEM_IDS.length,
-    STORAGE_FILE_ACCESS_ITEM_IDS.length,
-    ACTIVITY_SOURCE_MATERIAL_REFERENCE_ITEM_IDS.length,
-    PUBLIC_ASSIGNMENT_ACCESS_HANDOFF_ITEM_IDS.length,
-    PUBLIC_ASSIGNMENT_UNAVAILABLE_ACCESS_HANDOFF_ITEM_IDS.length,
-  ],
-  [20, 30, 30, 30, 30],
-  'Source-material privacy chain should stay backed by the focused gates it links together.'
-);
 assert.deepEqual(STORAGE_FILE_ACCESS_PRIVACY_CONTRACT, {
   exposesFileBytesInDecision: false,
   exposesOriginalFilenameOnlyInAttachmentHeader: true,
@@ -8065,7 +7642,6 @@ const storageFileAccessPrivacySource = readFileSync(
   'src/storage/file-access.ts',
   'utf8'
 );
-assert.match(publicAssignmentSource, /exposesTeacherSourceMaterials: false/);
 assert.doesNotMatch(
   studentRuntimePrivacySource,
   /\b(sourceMaterials|storageKey|fileId|originalName|permission|bytes|fileList)\b/,
@@ -9406,13 +8982,8 @@ const publicPageViewSource = readFileSync(
 );
 assert.match(
   publicPageViewSource,
-  /export type PricingPageViewModel[\s\S]*handoffView: PricingPageHandoffView;[\s\S]*valueSection: PricingPageSectionView;[\s\S]*valueCards: PricingValueCardView\[\];[\s\S]*export type PricingFaqItemView = \{[\s\S]*ariaLabel: string;[\s\S]*type PricingValueCardView = \{[\s\S]*ariaLabel: string;/,
-  'Pricing page view models should expose prepared section, FAQ item, value card, and plan-boundary handoff semantics.'
-);
-assert.match(
-  publicPageViewSource,
-  /export const PRICING_PAGE_HANDOFF_ITEM_IDS = \[(?=[\s\S]*'pricing-route')(?=[\s\S]*'product-loop')(?=[\s\S]*'plan-source')(?=[\s\S]*'free-plan-boundary')(?=[\s\S]*'pro-plan-boundary')(?=[\s\S]*'lifetime-plan-boundary')(?=[\s\S]*'subscription-price-path')(?=[\s\S]*'authenticated-checkout')(?=[\s\S]*'payment-provider-boundary')(?=[\s\S]*'school-cta-path')(?=[\s\S]*'student-account-boundary')(?=[\s\S]*'source-material-access')(?=[\s\S]*'privacy-guard')[\s\S]*export type PricingPageHandoffPrivacyContract = \{[\s\S]*exposesCheckoutSessionIds: false;[\s\S]*exposesPaymentProviderSecrets: false;[\s\S]*exposesRawAnonymousToken: false;[\s\S]*exposesSourceMaterialStorageKeys: false;[\s\S]*publishesAssignmentLinks: false;[\s\S]*scope: 'public-pricing-plan-boundary';/,
-  'Pricing page handoff should expose stable public plan-boundary item ids and privacy contract fields.'
+  /export type PricingPageViewModel[\s\S]*valueSection: PricingPageSectionView;[\s\S]*valueCards: PricingValueCardView\[\];[\s\S]*export type PricingFaqItemView = \{[\s\S]*ariaLabel: string;[\s\S]*type PricingValueCardView = \{[\s\S]*ariaLabel: string;/,
+  'Pricing page view models should expose prepared section, FAQ item, and value card semantics.'
 );
 assert.match(
   publicPageViewSource,
@@ -9423,68 +8994,6 @@ assert.match(
   publicPageViewSource,
   /m\.pricing_faq_section_aria_label\(\{[\s\S]*m\.pricing_value_section_aria_label\(\{[\s\S]*m\.pricing_faq_item_aria_label\(\{[\s\S]*m\.pricing_value_card_aria_label\(\{/,
   'Pricing page view model should prepare localized value, FAQ, and card aria labels.'
-);
-const pricingPlanBoundaryPageView = buildPricingPageViewModel();
-assert.deepEqual(
-  pricingPlanBoundaryPageView.handoffView.itemViews.map((item) => item.id),
-  [...PRICING_PAGE_HANDOFF_ITEM_IDS],
-  'Pricing page view model should expose the complete 30-slice pricing handoff.'
-);
-assert.deepEqual(
-  pricingPlanBoundaryPageView.handoffView.privacy,
-  {
-    exposesAnswerKeys: false,
-    exposesCheckoutSessionIds: false,
-    exposesPaymentProviderSecrets: false,
-    exposesRawAnonymousToken: false,
-    exposesSourceMaterialStorageKeys: false,
-    exposesStudentAttemptRecords: false,
-    exposesTeacherPrivateActivityContent: false,
-    itemIds: [...PRICING_PAGE_HANDOFF_ITEM_IDS],
-    mutatesTeacherData: false,
-    publishesAssignmentLinks: false,
-    routeActionsUseSharedConstants: true,
-    scope: 'public-pricing-plan-boundary',
-  },
-  'Pricing page handoff should summarize public pricing without private checkout, student, source-material, or activity data.'
-);
-assert.equal(
-  pricingPlanBoundaryPageView.handoffView.itemViews.find(
-    (item) => item.id === 'product-loop'
-  )?.value,
-  'Activity -> Assignment -> Attempt -> Results'
-);
-assert.equal(
-  pricingPlanBoundaryPageView.handoffView.itemViews.find(
-    (item) => item.id === 'school-cta-path'
-  )?.value,
-  Routes.ContactClassroom
-);
-assert.equal(
-  pricingPlanBoundaryPageView.handoffView.itemViews.find(
-    (item) => item.id === 'billing-return-path'
-  )?.value,
-  Routes.Payment
-);
-assert.match(
-  publicPageViewSource,
-  /export type TeachersPageViewModel = \{[\s\S]*handoffView: TeachersPageHandoffView;[\s\S]*templatePanel: TeachersTemplatePanelView;[\s\S]*workflow: TeachersPageItemView<TeachersPageWorkflowId>\[\];/,
-  'Teachers page view model should expose the prepared product-loop handoff alongside visible page sections.'
-);
-assert.match(
-  publicPageViewSource,
-  /export const TEACHERS_PAGE_HANDOFF_ITEM_IDS = \[(?=[\s\S]*'teachers-route')(?=[\s\S]*'teacher-audience')(?=[\s\S]*'primary-create-action')(?=[\s\S]*'secondary-contact-action')(?=[\s\S]*'workflow-section')(?=[\s\S]*'use-case-section')(?=[\s\S]*'template-panel')(?=[\s\S]*'template-count')(?=[\s\S]*'template-mode-coverage')(?=[\s\S]*'template-quiz')(?=[\s\S]*'template-open-box')(?=[\s\S]*'school-contact-route')(?=[\s\S]*'activity-assignment-loop')(?=[\s\S]*'legacy-copy-guard')(?=[\s\S]*'privacy-guard')/,
-  'Teachers page handoff should expose stable 30-slice public teacher-entry item ids.'
-);
-assert.match(
-  publicPageViewSource,
-  /export type TeachersPageHandoffPrivacyContract = \{[\s\S]*createsAssignmentLinks: false;[\s\S]*exposesAnswerKeys: false;[\s\S]*exposesRawAnonymousToken: false;[\s\S]*exposesSourceMaterialStorageKeys: false;[\s\S]*exposesStudentAttemptRecords: false;[\s\S]*exposesTeacherPrivateActivityContent: false;[\s\S]*mutatesTeacherWorkspace: false;[\s\S]*routeActionsUseSharedConstants: true;[\s\S]*scope: 'public-teachers-product-loop';[\s\S]*templateModesComeFromCatalog: true;[\s\S]*usesClassGamifyCopy: true;[\s\S]*usesPreparedViewModel: true;/,
-  'Teachers page handoff should publish explicit safe public teacher-page behavior flags.'
-);
-assert.match(
-  publicPageViewSource,
-  /const templatePanel = \{[\s\S]*templates: getActivityTemplates\(\)\.map\(buildTeachersTemplatePanelItemView\)[\s\S]*handoffView: buildTeachersPageHandoffView\(\{[\s\S]*templatePanel[\s\S]*workflowSection/,
-  'Teachers page handoff should reuse the prepared template catalog and visible page view model.'
 );
 assert.doesNotMatch(
   teachersRouteSource,
@@ -9498,10 +9007,6 @@ const navbarMobileSource = readFileSync(
   'utf8'
 );
 const footerSource = readFileSync('src/components/layout/footer.tsx', 'utf8');
-const publicNavigationHandoffSource = readFileSync(
-  'src/navigation/public-navigation-handoff.ts',
-  'utf8'
-);
 const dashboardHeaderSource = readFileSync(
   'src/components/layout/dashboard-header.tsx',
   'utf8'
@@ -9919,7 +9424,7 @@ assert.match(
 );
 assert.match(
   publicPageViewSource,
-  /export function buildHomePageViewModel\(\{[\s\S]*preview = buildHomePageStarterPreview\(\)[\s\S]*preview\?: HomePagePreviewView;[\s\S]*const featureSection = \{[\s\S]*const signalPanel = \{[\s\S]*const signals = \[[\s\S]*handoffView: buildHomePageProductLoopHandoffView\(\{[\s\S]*features(?:,|: features)[\s\S]*featureSection(?:,|: featureSection)[\s\S]*hero(?:,|: hero)[\s\S]*preview(?:,|: preview)[\s\S]*signalPanel(?:,|: signalPanel)[\s\S]*signals(?:,|: signals)/,
+  /export function buildHomePageViewModel\(\{[\s\S]*preview = buildHomePageStarterPreview\(\)[\s\S]*preview\?: HomePagePreviewView;[\s\S]*const featureSection = \{[\s\S]*const signalPanel = \{[\s\S]*const signals = \[[\s\S]*features(?:,|: features)[\s\S]*featureSection(?:,|: featureSection)[\s\S]*hero(?:,|: hero)[\s\S]*preview(?:,|: preview)[\s\S]*signalPanel(?:,|: signalPanel)[\s\S]*signals(?:,|: signals)/,
   'Home page view model should own the default starter preview and semantic section composition.'
 );
 assert.match(
@@ -10081,21 +9586,6 @@ assert.doesNotMatch(
   roadmapRouteSource,
   /data-handoff="roadmap-public-boundary"|data-handoff-item/,
   'Roadmap route should keep hidden handoff attributes out of the public page.'
-);
-assert.match(
-  publicPageViewSource,
-  /ROADMAP_PUBLIC_HANDOFF_ITEM_IDS = \[(?=[\s\S]*'current-loop')(?=[\s\S]*'roadmap-surface')(?=[\s\S]*'available-count')(?=[\s\S]*'improving-count')(?=[\s\S]*'planned-count')(?=[\s\S]*'column-board')(?=[\s\S]*'status-label-boundary')(?=[\s\S]*'activity-assignment-loop')(?=[\s\S]*'template-foundation')(?=[\s\S]*'ai-draft-capability')(?=[\s\S]*'results-reteach-focus')(?=[\s\S]*'worksheet-delivery-focus')(?=[\s\S]*'worksheet-extraction-boundary')(?=[\s\S]*'school-workflow-boundary')(?=[\s\S]*'task-evidence-boundary')(?=[\s\S]*'task-next-step-boundary')(?=[\s\S]*'hero-action-boundary')(?=[\s\S]*'create-route')(?=[\s\S]*'templates-route')(?=[\s\S]*'feedback-route')(?=[\s\S]*'snapshot-panel')(?=[\s\S]*'snapshot-live-core')(?=[\s\S]*'snapshot-template-depth')(?=[\s\S]*'snapshot-ai-expansion')(?=[\s\S]*'principle-focus-boundary')(?=[\s\S]*'principle-model-boundary')(?=[\s\S]*'validation-decision-boundary')(?=[\s\S]*'public-copy-boundary')(?=[\s\S]*'legacy-copy-guard')(?=[\s\S]*'privacy-guard')/,
-  'Roadmap public handoff should expose stable 30-slice public product-boundary item ids.'
-);
-assert.match(
-  publicPageViewSource,
-  /export type RoadmapPublicHandoffPrivacyContract = \{[\s\S]*createsAssignmentLinks: false;[\s\S]*describesCurrentUsableLoop: true;[\s\S]*describesPublicRoadmapSurface: true;[\s\S]*exposesAnswerKeys: false;[\s\S]*exposesRawAnonymousToken: false;[\s\S]*exposesSourceMaterialStorageKeys: false;[\s\S]*exposesStudentAttemptRecords: false;[\s\S]*exposesTeacherPrivateActivityContent: false;[\s\S]*keepsLegacyCopyOut: true;[\s\S]*keepsPlannedBetsExploratory: true;[\s\S]*mutatesTeacherWorkspace: false;[\s\S]*readsSourceMaterialFileBytes: false;[\s\S]*rendersTaskEvidence: true;[\s\S]*rendersTaskNextSteps: true;[\s\S]*rendersValidationCriteria: true;[\s\S]*routeActionsUseSharedConstants: true;[\s\S]*scope: 'public-roadmap-product-boundary';[\s\S]*usesPreparedViewModel: true;/,
-  'Roadmap public handoff should publish explicit safe public roadmap behavior flags.'
-);
-assert.match(
-  publicPageViewSource,
-  /const principles: RoadmapPrincipleView\[\] = \[[\s\S]*buildRoadmapPublicHandoffView\(\{[\s\S]*principles[\s\S]*case 'principle-focus-boundary'[\s\S]*getRoadmapPublicHandoffPrinciple[\s\S]*case 'principle-model-boundary'/,
-  'Roadmap public handoff should include prepared roadmap principles from the page view model.'
 );
 assert.match(
   publicPageViewSource,
@@ -12105,23 +11595,8 @@ assert.match(
 );
 assert.match(
   contactInquiryViewSource,
-  /CONTACT_CLASSROOM_INTAKE_HANDOFF_ITEM_IDS = \[(?=[\s\S]*'classroom-intent')(?=[\s\S]*'contact-route')(?=[\s\S]*'inquiry-panel')(?=[\s\S]*'scope-panel')(?=[\s\S]*'scope-field-mapping')(?=[\s\S]*'subject-routing')(?=[\s\S]*'message-template')(?=[\s\S]*'form-rendering')(?=[\s\S]*'learners-field')(?=[\s\S]*'grade-field')(?=[\s\S]*'material-field')(?=[\s\S]*'routine-field')(?=[\s\S]*'need-field')(?=[\s\S]*'message-body')(?=[\s\S]*'name-field')(?=[\s\S]*'email-field')(?=[\s\S]*'field-normalization')(?=[\s\S]*'field-limits')(?=[\s\S]*'structured-payload')(?=[\s\S]*'client-submit-boundary')(?=[\s\S]*'api-intent-normalization')(?=[\s\S]*'server-rebuild-boundary')(?=[\s\S]*'mail-context')(?=[\s\S]*'email-template-boundary')(?=[\s\S]*'locale-forwarding')(?=[\s\S]*'safe-context-boundary')(?=[\s\S]*'private-data-guard')(?=[\s\S]*'no-activity-mutation')(?=[\s\S]*'no-student-notification')(?=[\s\S]*'legacy-copy-guard')/,
-  'Contact classroom intake handoff should expose stable 30-slice classroom inquiry item ids.'
-);
-assert.match(
-  contactInquiryViewSource,
-  /export type ContactClassroomIntakeHandoffPrivacyContract = \{[\s\S]*createsActivities: false;[\s\S]*createsAssignmentLinks: false;[\s\S]*createsStudentRecords: false;[\s\S]*exposesContactMessageTextInHandoff: false;[\s\S]*exposesPrivateFileUrls: false;[\s\S]*exposesRawProviderErrors: false;[\s\S]*exposesRawStudentIdentifiers: false;[\s\S]*exposesRecipientEmailInView: false;[\s\S]*exposesSourceMaterialStorageKeys: false;[\s\S]*forwardsLocaleToMail: true;[\s\S]*mutatesTeacherWorkspace: false;[\s\S]*notifiesLearners: false;[\s\S]*persistsActivityContent: false;[\s\S]*readsFileBytes: false;[\s\S]*rendersInPublicDom: false;[\s\S]*rendersStructuredFieldsInMail: true;[\s\S]*scope: 'public-classroom-inquiry-intake';[\s\S]*usesClassroomRouteIntent: true;[\s\S]*usesStructuredFields: true;/,
-  'Contact classroom intake handoff should publish explicit safety and behavior flags.'
-);
-assert.match(
-  contactInquiryViewSource,
   /privacyBoundary:[\s\S]*id: 'safe-classroom-context'/,
   'Contact inquiry view should expose a stable safe-context privacy boundary.'
-);
-assert.match(
-  contactInquiryViewSource,
-  /buildContactClassroomIntakeHandoffView[\s\S]*contact_classroom_intake_handoff_description[\s\S]*buildContactClassroomIntakeHandoffPrivacyContract[\s\S]*contact_classroom_intake_handoff_title[\s\S]*contact_classroom_intake_handoff_item_aria_label/,
-  'Contact classroom intake handoff should prepare localized title, description, item semantics, and privacy contract.'
 );
 assert.doesNotMatch(
   contactInquiryViewSource,
@@ -12157,21 +11632,6 @@ assert.match(
   mailWorkspaceBoundarySource,
   /export type MailWorkspaceBoundaryItemId =[\s\S]*'activities'[\s\S]*'assignments'[\s\S]*'results'[\s\S]*'ai-sources'[\s\S]*export type MailWorkspaceBoundaryView = \{[\s\S]*items: MailWorkspaceBoundaryItemView\[\];[\s\S]*buildMailWorkspaceBoundaryView[\s\S]*mail_workspace_boundary_item_activities_description[\s\S]*mail_workspace_boundary_description[\s\S]*mail_workspace_boundary_title[\s\S]*buildMailWorkspaceBoundaryItemView[\s\S]*mail_workspace_boundary_item_line/,
   'Mail workspace-boundary domain should expose explicit item and panel view contracts from localized copy.'
-);
-assert.match(
-  mailWorkspaceBoundarySource,
-  /export const MAIL_TRANSACTIONAL_WORKSPACE_HANDOFF_ITEM_IDS = \[(?=[\s\S]*'template-set')(?=[\s\S]*'verify-email-template')(?=[\s\S]*'forgot-password-template')(?=[\s\S]*'newsletter-template')(?=[\s\S]*'contact-template')(?=[\s\S]*'localized-subjects')(?=[\s\S]*'html-language')(?=[\s\S]*'locale-fallback')(?=[\s\S]*'plain-text-render')(?=[\s\S]*'render-before-send')(?=[\s\S]*'shared-layout')(?=[\s\S]*'provider-registry-boundary')(?=[\s\S]*'boundary-panel')(?=[\s\S]*'activities-scope')(?=[\s\S]*'assignments-scope')(?=[\s\S]*'attempt-results-scope')(?=[\s\S]*'ai-draft-scope')(?=[\s\S]*'source-material-safety')(?=[\s\S]*'no-file-byte-read')(?=[\s\S]*'worksheet-workflow-scope')(?=[\s\S]*'contact-classroom-fields')(?=[\s\S]*'action-link-placement')(?=[\s\S]*'no-activity-mutation')(?=[\s\S]*'no-assignment-mutation')(?=[\s\S]*'no-attempt-mutation')(?=[\s\S]*'no-result-export')(?=[\s\S]*'no-learner-notification')(?=[\s\S]*'provider-secret-guard')(?=[\s\S]*'legacy-copy-guard')(?=[\s\S]*'private-data-guard')/,
-  'Transactional mail handoff should expose 30 stable workspace boundary slice ids.'
-);
-assert.match(
-  mailWorkspaceBoundarySource,
-  /export type MailTransactionalWorkspaceHandoffPrivacyContract = \{[\s\S]*exportsResultRecords: false;[\s\S]*exposesActionUrls: false;[\s\S]*exposesContactMessageText: false;[\s\S]*exposesProviderApiTokens: false;[\s\S]*exposesRawErrors: false;[\s\S]*exposesRecipientEmail: false;[\s\S]*exposesRecipientName: false;[\s\S]*exposesSourceMaterialStorageKeys: false;[\s\S]*exposesStudentIdentifiers: false;[\s\S]*mutatesActivities: false;[\s\S]*mutatesAssignmentLinks: false;[\s\S]*mutatesAttemptRecords: false;[\s\S]*normalizesUnsupportedLocales: true;[\s\S]*readsSourceMaterialFileBytes: false;[\s\S]*rendersBeforeProviderSend: true;[\s\S]*rendersSharedBoundaryPanel: true;[\s\S]*scope: 'transactional-email-workspace-boundary';[\s\S]*sendsLearnerNotifications: false;[\s\S]*usesLocalizedSubjects: true;[\s\S]*usesProviderRegistryBoundary: true;/,
-  'Transactional mail handoff should publish explicit privacy flags for private email values.'
-);
-assert.match(
-  mailWorkspaceBoundarySource,
-  /buildMailTransactionalWorkspaceHandoffView[\s\S]*buildMailWorkspaceBoundaryView\(input\)[\s\S]*MAIL_TRANSACTIONAL_WORKSPACE_HANDOFF_ITEM_IDS\.map[\s\S]*buildMailTransactionalWorkspaceHandoffItemView[\s\S]*privacy: buildMailTransactionalWorkspaceHandoffPrivacyContract/,
-  'Transactional mail handoff should derive slice views from localized mail subjects and the shared workspace boundary panel.'
 );
 assert.match(
   emailWorkspaceBoundaryComponentSource,
@@ -14848,88 +14308,6 @@ assert.match(
   /metadata = websiteConfig\.metadata(?=[\s\S]*description: metadata\?\.description)(?=[\s\S]*name: metadata\?\.name)(?=[\s\S]*scope: Routes\.Root)(?=[\s\S]*start_url: Routes\.Root)(?=[\s\S]*buildWebAppManifestInstallBoundary)/,
   'Web manifest helper should derive install name and description from ClassGamify site metadata while keeping public root start and scope through shared route constants.'
 );
-const publicMetadataHandoffView = buildPublicMetadataHandoffView({
-  baseUrl: 'https://classgamify.example/',
-});
-const publicMetadataHandoffIds = publicMetadataHandoffView.itemViews.map(
-  (itemView) => itemView.id
-);
-assert.deepEqual(publicMetadataHandoffIds, [
-  ...PUBLIC_METADATA_HANDOFF_ITEM_IDS,
-]);
-assert.equal(publicMetadataHandoffView.itemViews.length, 30);
-assert.equal(
-  publicMetadataHandoffView.itemViews.every(
-    (itemView) =>
-      Boolean(itemView.ariaLabel) &&
-      Boolean(itemView.description) &&
-      Boolean(itemView.label) &&
-      Boolean(itemView.value)
-  ),
-  true
-);
-assert.deepEqual(publicMetadataHandoffView.privacy, {
-  createsAssignmentLinks: false,
-  exposesAnswerKeys: false,
-  exposesRawAnonymousToken: false,
-  exposesSourceMaterialStorageKeys: false,
-  exposesStudentAttemptRecords: false,
-  exposesTeacherPrivateActivityContent: false,
-  includesLocalizedAlternates: true,
-  itemIds: publicMetadataHandoffIds,
-  keepsDashboardOutOfIndex: true,
-  keepsManifestOnPublicRoot: true,
-  keepsManifestProtectedSurfacesOut: true,
-  keepsManifestRetiredLegacyOut: true,
-  keepsPrintViewsOutOfIndex: true,
-  keepsRetiredLegacyOutOfIndex: true,
-  keepsStudentRunnerOutOfIndex: true,
-  readsSourceMaterialFileBytes: false,
-  routeActionsUseSharedConstants: true,
-  scope: 'public-indexing-install-metadata',
-});
-assert.deepEqual(
-  publicMetadataHandoffView.itemViews.map((itemView) => itemView.id),
-  [...PUBLIC_METADATA_HANDOFF_ITEM_IDS]
-);
-assert.equal(
-  publicMetadataHandoffView.itemViews.find(
-    (itemView) => itemView.id === 'sitemap-url-count'
-  )?.value,
-  String(
-    buildSitemapUrlEntries({
-      baseUrl: 'https://classgamify.example',
-    }).length
-  )
-);
-assert.equal(
-  publicMetadataHandoffView.itemViews.find(
-    (itemView) => itemView.id === 'sitemap-blog-count'
-  )?.value,
-  String(
-    getSitemapUrls().filter((url) =>
-      url.path.startsWith(`${PUBLIC_INDEXED_BLOG_BASE_PATH}/`)
-    ).length
-  )
-);
-assert.equal(
-  publicMetadataHandoffView.itemViews.find(
-    (itemView) => itemView.id === 'robots-disallow-paths'
-  )?.value,
-  String(getRobotsDisallowPaths().length)
-);
-assert.equal(
-  publicMetadataHandoffView.itemViews.find(
-    (itemView) => itemView.id === 'manifest-display'
-  )?.value,
-  'standalone'
-);
-assert.equal(
-  publicMetadataHandoffView.itemViews.find(
-    (itemView) => itemView.id === 'privacy-guard'
-  )?.value,
-  'Private data hidden'
-);
 const publicDiscoveryIndexingChainView =
   buildPublicDiscoveryIndexingChainHandoffView();
 const publicDiscoveryIndexingChainValues = new Map(
@@ -14986,26 +14364,6 @@ assert.deepEqual(publicDiscoveryIndexingChainView.privacy, {
   usesPublicMetadataHandoff: true,
   usesSharedIndexingHelpers: true,
 });
-assert.deepEqual(
-  [
-    HOME_PAGE_PRODUCT_LOOP_HANDOFF_ITEM_IDS.length,
-    PUBLIC_NAVIGATION_HANDOFF_ITEM_IDS.length,
-    PUBLIC_TEMPLATE_ENTRY_HANDOFF_ITEM_IDS.length,
-    TEACHERS_PAGE_HANDOFF_ITEM_IDS.length,
-    ROADMAP_PUBLIC_HANDOFF_ITEM_IDS.length,
-    PRICING_PAGE_HANDOFF_ITEM_IDS.length,
-    PUBLIC_EDITORIAL_HANDOFF_ITEM_IDS.length,
-    LEGAL_POLICY_HANDOFF_ITEM_IDS.length,
-    CONTACT_CLASSROOM_INTAKE_HANDOFF_ITEM_IDS.length,
-    AUTH_WORKSPACE_HANDOFF_ITEM_IDS.length,
-    ACTIVE_SURFACE_PRODUCT_BOUNDARY_ITEM_IDS.length,
-    PUBLIC_METADATA_HANDOFF_ITEM_IDS.length,
-    PUBLIC_DOM_HANDOFF_BOUNDARY_ITEM_IDS.length,
-    LEGACY_PUBLIC_ROUTE_HANDOFF_ITEM_IDS.length,
-  ],
-  Array.from({ length: 14 }, () => 30),
-  'Public discovery/indexing chain should stay backed by focused public route, content, metadata, DOM, and legacy-route gates.'
-);
 assert.deepEqual(Object.fromEntries(publicDiscoveryIndexingChainValues), {
   'active-surface-copy-boundary': 'ClassGamify copy',
   'auth-entry-boundary': Routes.Auth,
@@ -15040,7 +14398,7 @@ assert.deepEqual(Object.fromEntries(publicDiscoveryIndexingChainValues), {
 });
 assert.match(
   readFileSync('tests/e2e/TEST-CATALOG.md', 'utf8'),
-  /Public discovery\/indexing chain has a fast script-level gate via[\s\S]*scripts\/public-discovery-indexing-chain-handoff\.test\.ts[\s\S]*public metadata handoff boundary/,
+  /Public discovery\/indexing chain has a fast script-level gate via[\s\S]*scripts\/public-discovery-indexing-chain-handoff\.test\.ts[\s\S]*public metadata/,
   'TEST-CATALOG should document the public discovery/indexing chain gate.'
 );
 const classroomProductLoopChainView =
@@ -15346,7 +14704,6 @@ assert.deepEqual(classroomProductLoopChainView.privacy, {
 });
 assert.deepEqual(
   [
-    HOME_PAGE_PRODUCT_LOOP_HANDOFF_ITEM_IDS.length,
     TEACHER_WORKSPACE_OPERATIONS_CHAIN_HANDOFF_ITEM_IDS.length,
     TEACHER_WORKSPACE_OPERATIONS_CHAIN_SOURCE_FILES.length,
     CLASSROOM_DATA_LIFECYCLE_CHAIN_HANDOFF_ITEM_IDS.length,
@@ -15397,7 +14754,7 @@ assert.deepEqual(
     PUBLIC_DISCOVERY_INDEXING_CHAIN_SOURCE_FILES.length,
     CLASSROOM_TRUST_COMMUNICATION_CHAIN_HANDOFF_ITEM_IDS.length,
   ],
-  Array.from({ length: 50 }, () => 30),
+  Array.from({ length: 49 }, () => 30),
   'Classroom product loop chain should stay backed by adjacent public entry, public discovery/indexing, workspace, data, authoring, source extraction, lifecycle governance, template roadmap, AI enhancement lifecycle, delivery, runner, result continuity, export, print, and trust gates.'
 );
 assert.deepEqual(Object.fromEntries(classroomProductLoopChainValues), {
@@ -15514,19 +14871,6 @@ assert.deepEqual(classroomTrustCommunicationChainView.privacy, {
   usesTransactionalMailLifecycleChain: true,
   usesClassGamifyProductModel: true,
 });
-assert.deepEqual(
-  [
-    CONTACT_CLASSROOM_INTAKE_HANDOFF_ITEM_IDS.length,
-    AUTH_WORKSPACE_HANDOFF_ITEM_IDS.length,
-    TRANSACTIONAL_MAIL_LIFECYCLE_CHAIN_HANDOFF_ITEM_IDS.length,
-    MAIL_TRANSACTIONAL_WORKSPACE_HANDOFF_ITEM_IDS.length,
-    LEGAL_POLICY_HANDOFF_ITEM_IDS.length,
-    DEVELOPER_CONFIGURATION_HANDOFF_ITEM_IDS.length,
-    PUBLIC_DOM_HANDOFF_BOUNDARY_ITEM_IDS.length,
-  ],
-  Array.from({ length: 7 }, () => 30),
-  'Classroom trust communication chain should stay backed by focused contact, auth, transactional mail lifecycle, mail workspace, notification, billing, legal, config, and public DOM gates.'
-);
 assert.equal(
   TRANSACTIONAL_MAIL_LIFECYCLE_CHAIN_SOURCE_FILES.length,
   30,
@@ -15633,11 +14977,10 @@ assert.deepEqual(accountGovernanceLifecycleChainView.privacy, {
 });
 assert.deepEqual(
   [
-    AUTH_WORKSPACE_HANDOFF_ITEM_IDS.length,
     ADMIN_USERS_HANDOFF_ITEM_IDS.length,
     STORAGE_FILE_ACCESS_ITEM_IDS.length,
   ],
-  Array.from({ length: 3 }, () => 30),
+  Array.from({ length: 2 }, () => 30),
   'Account governance lifecycle chain should stay backed by focused auth, settings, admin, files, billing, payment callback, notification, and storage gates.'
 );
 assert.deepEqual(Object.fromEntries(accountGovernanceLifecycleChainValues), {
@@ -15793,148 +15136,6 @@ assert.match(
   readFileSync('tests/e2e/TEST-CATALOG.md', 'utf8').replace(/\s+/g, ' '),
   /dashboard owner summaries[\s\S]*activity library filters\/summaries\/actions[\s\S]*assignment list filters\/distribution[\s\S]*account governance[\s\S]*teacher settings security\/files\/billing\/payment callback\/notification boundaries[\s\S]*active surface product boundary/,
   'TEST-CATALOG should describe the full teacher workspace operations chain scope.'
-);
-const publicDomHandoffBoundaryView = buildPublicDomHandoffBoundaryView();
-const publicDomProtectedSourceFileCount =
-  PUBLIC_DOM_HANDOFF_BLOCKED_ROUTE_FILES.length +
-  PUBLIC_DOM_HANDOFF_BLOCKED_COMPONENT_FILES.length;
-assert.equal(PUBLIC_DOM_HANDOFF_BLOCKED_ROUTE_FILES.length, 18);
-assert.equal(PUBLIC_DOM_HANDOFF_BLOCKED_COMPONENT_FILES.length, 12);
-assert.equal(publicDomProtectedSourceFileCount, 30);
-assert.equal(
-  publicDomHandoffBoundaryView.itemViews.find(
-    (itemView) => itemView.id === 'public-route-set'
-  )?.value,
-  '30 source files'
-);
-assert.deepEqual(publicDomHandoffBoundaryView.privacy.routeFiles, [
-  ...PUBLIC_DOM_HANDOFF_BLOCKED_ROUTE_FILES,
-]);
-assert.deepEqual(publicDomHandoffBoundaryView.privacy.sharedComponentFiles, [
-  ...PUBLIC_DOM_HANDOFF_BLOCKED_COMPONENT_FILES,
-]);
-assert.equal(
-  publicDomHandoffBoundaryView.privacy.protectedSourceFileCount,
-  publicDomProtectedSourceFileCount
-);
-const publicNavigationHandoffView = buildPublicNavigationHandoffView();
-const publicNavigationHandoffIds = publicNavigationHandoffView.itemViews.map(
-  (itemView) => itemView.id
-);
-assert.deepEqual(PUBLIC_NAVIGATION_HANDOFF_ITEM_IDS, [
-  'product-loop',
-  'navbar-surface',
-  'navbar-count',
-  'navbar-templates-route',
-  'navbar-worksheets-route',
-  'navbar-create-route',
-  'navbar-student-preview-route',
-  'navbar-pricing-route',
-  'navbar-blog-route',
-  'mobile-navbar-source',
-  'footer-surface',
-  'footer-section-count',
-  'footer-product-section',
-  'footer-product-templates-route',
-  'footer-product-worksheets-route',
-  'footer-product-create-route',
-  'footer-product-preview-route',
-  'footer-product-pricing-route',
-  'footer-platform-activities-route',
-  'footer-platform-assignments-route',
-  'footer-support-roadmap-route',
-  'footer-support-articles-route',
-  'footer-support-contact-route',
-  'footer-support-teachers-route',
-  'footer-legal-routes',
-  'footer-cta-actions',
-  'footer-loop-metrics',
-  'route-constant-boundary',
-  'legacy-copy-guard',
-  'privacy-guard',
-]);
-assert.deepEqual(publicNavigationHandoffIds, [
-  ...PUBLIC_NAVIGATION_HANDOFF_ITEM_IDS,
-]);
-assert.equal(publicNavigationHandoffView.itemViews.length, 30);
-assert.equal(
-  publicNavigationHandoffView.itemViews.every(
-    (itemView) =>
-      Boolean(itemView.ariaLabel) &&
-      Boolean(itemView.description) &&
-      Boolean(itemView.label) &&
-      Boolean(itemView.value)
-  ),
-  true
-);
-assert.deepEqual(publicNavigationHandoffView.privacy, {
-  createsAssignmentLinks: false,
-  exposesAnswerKeys: false,
-  exposesRawAnonymousToken: false,
-  exposesSourceMaterialStorageKeys: false,
-  exposesStudentAttemptRecords: false,
-  exposesTeacherPrivateActivityContent: false,
-  footerUsesSharedConfig: true,
-  itemIds: publicNavigationHandoffIds,
-  keepsLegacyCopyOut: true,
-  mobileNavUsesSharedConfig: true,
-  mutatesTeacherWorkspace: false,
-  navbarUsesSharedConfig: true,
-  routeActionsUseSharedConstants: true,
-  scope: 'public-navigation-entrypoints',
-});
-assert.match(
-  publicNavigationHandoffSource,
-  /export const PUBLIC_NAVIGATION_HANDOFF_ITEM_IDS = \[(?=[\s\S]*'product-loop')(?=[\s\S]*'navbar-surface')(?=[\s\S]*'navbar-count')(?=[\s\S]*'navbar-templates-route')(?=[\s\S]*'navbar-worksheets-route')(?=[\s\S]*'navbar-create-route')(?=[\s\S]*'navbar-student-preview-route')(?=[\s\S]*'navbar-pricing-route')(?=[\s\S]*'navbar-blog-route')(?=[\s\S]*'mobile-navbar-source')(?=[\s\S]*'footer-surface')(?=[\s\S]*'footer-section-count')(?=[\s\S]*'footer-product-section')(?=[\s\S]*'footer-product-templates-route')(?=[\s\S]*'footer-product-worksheets-route')(?=[\s\S]*'footer-product-create-route')(?=[\s\S]*'footer-product-preview-route')(?=[\s\S]*'footer-product-pricing-route')(?=[\s\S]*'footer-platform-activities-route')(?=[\s\S]*'footer-platform-assignments-route')(?=[\s\S]*'footer-support-roadmap-route')(?=[\s\S]*'footer-support-articles-route')(?=[\s\S]*'footer-support-contact-route')(?=[\s\S]*'footer-support-teachers-route')(?=[\s\S]*'footer-legal-routes')(?=[\s\S]*'footer-cta-actions')(?=[\s\S]*'footer-loop-metrics')(?=[\s\S]*'route-constant-boundary')(?=[\s\S]*'legacy-copy-guard')(?=[\s\S]*'privacy-guard')/,
-  'Public navigation handoff should expose stable 30-slice public navigation item ids.'
-);
-assert.match(
-  publicNavigationHandoffSource,
-  /export type PublicNavigationHandoffPrivacyContract = \{[\s\S]*createsAssignmentLinks: false;[\s\S]*exposesAnswerKeys: false;[\s\S]*exposesRawAnonymousToken: false;[\s\S]*exposesSourceMaterialStorageKeys: false;[\s\S]*exposesStudentAttemptRecords: false;[\s\S]*exposesTeacherPrivateActivityContent: false;[\s\S]*footerUsesSharedConfig: true;[\s\S]*mobileNavUsesSharedConfig: true;[\s\S]*mutatesTeacherWorkspace: false;[\s\S]*navbarUsesSharedConfig: true;[\s\S]*routeActionsUseSharedConstants: true;[\s\S]*scope: 'public-navigation-entrypoints';/,
-  'Public navigation handoff should publish explicit safe public navigation behavior flags.'
-);
-assert.match(
-  publicNavigationHandoffSource,
-  /getFooterLinks\(\)[\s\S]*getNavbarLinks\(\)[\s\S]*PUBLIC_NAVIGATION_HANDOFF_ITEM_IDS\.map\(\(id\) =>[\s\S]*buildPublicNavigationHandoffItemView\(\{ footerLinks, id, navbarLinks \}\)/,
-  'Public navigation handoff should derive slices from shared navbar and footer configs.'
-);
-assert.deepEqual(
-  publicNavigationHandoffView.itemViews.map((itemView) => [
-    itemView.id,
-    itemView.value,
-  ]),
-  [
-    ['product-loop', 'Activity -> Assignment -> Attempt -> Results'],
-    ['navbar-surface', 'Desktop and mobile navbar'],
-    ['navbar-count', '6 items'],
-    ['navbar-templates-route', Routes.Templates],
-    ['navbar-worksheets-route', Routes.Worksheets],
-    ['navbar-create-route', Routes.Create],
-    ['navbar-student-preview-route', Routes.StudentPreview],
-    ['navbar-pricing-route', Routes.Pricing],
-    ['navbar-blog-route', Routes.Blog],
-    ['mobile-navbar-source', 'Shared navigation choices'],
-    ['footer-surface', 'Footer directory'],
-    ['footer-section-count', '4 items'],
-    ['footer-product-section', '5 items'],
-    ['footer-product-templates-route', Routes.Templates],
-    ['footer-product-worksheets-route', Routes.Worksheets],
-    ['footer-product-create-route', Routes.Create],
-    ['footer-product-preview-route', Routes.StudentPreview],
-    ['footer-product-pricing-route', Routes.Pricing],
-    ['footer-platform-activities-route', Routes.DashboardActivities],
-    ['footer-platform-assignments-route', Routes.DashboardAssignments],
-    ['footer-support-roadmap-route', Routes.Roadmap],
-    ['footer-support-articles-route', Routes.Blog],
-    ['footer-support-contact-route', Routes.Contact],
-    ['footer-support-teachers-route', Routes.Teachers],
-    ['footer-legal-routes', '3 items'],
-    ['footer-cta-actions', `${Routes.Create} + ${Routes.Templates}`],
-    ['footer-loop-metrics', '8 templates · Link assignments · Score results'],
-    ['route-constant-boundary', 'Consistent product links'],
-    ['legacy-copy-guard', 'ClassGamify navigation'],
-    ['privacy-guard', 'Private data hidden'],
-  ]
 );
 assert.match(
   navbarSource,
@@ -16435,156 +15636,6 @@ assert.deepEqual(buildMailWorkspaceBoundaryView(), {
   ],
   title: 'Workspace boundary',
 });
-const mailTransactionalHandoffView =
-  buildMailTransactionalWorkspaceHandoffView();
-const mailTransactionalHandoffItemIds =
-  mailTransactionalHandoffView.itemViews.map((item) => item.id);
-const getMailTransactionalHandoffValue = (
-  id: (typeof MAIL_TRANSACTIONAL_WORKSPACE_HANDOFF_ITEM_IDS)[number]
-) => {
-  const item = mailTransactionalHandoffView.itemViews.find(
-    (handoffItem) => handoffItem.id === id
-  );
-  assert.ok(item, `Missing mail transactional handoff item ${id}`);
-  return item.value;
-};
-assert.deepEqual(mailTransactionalHandoffItemIds, [
-  ...MAIL_TRANSACTIONAL_WORKSPACE_HANDOFF_ITEM_IDS,
-]);
-assert.equal(new Set(mailTransactionalHandoffItemIds).size, 30);
-assert.deepEqual(mailTransactionalHandoffView.privacy, {
-  exportsResultRecords: false,
-  exposesActionUrls: false,
-  exposesContactMessageText: false,
-  exposesProviderApiTokens: false,
-  exposesRawErrors: false,
-  exposesRecipientEmail: false,
-  exposesRecipientName: false,
-  exposesSourceMaterialStorageKeys: false,
-  exposesStudentIdentifiers: false,
-  itemIds: mailTransactionalHandoffItemIds,
-  mutatesActivities: false,
-  mutatesAssignmentLinks: false,
-  mutatesAttemptRecords: false,
-  normalizesUnsupportedLocales: true,
-  readsSourceMaterialFileBytes: false,
-  rendersBeforeProviderSend: true,
-  rendersSharedBoundaryPanel: true,
-  scope: 'transactional-email-workspace-boundary',
-  sendsLearnerNotifications: false,
-  templateIds: [...MAIL_TRANSACTIONAL_TEMPLATE_IDS],
-  usesLocalizedSubjects: true,
-  usesProviderRegistryBoundary: true,
-});
-assert.deepEqual(
-  [
-    getMailTransactionalHandoffValue('template-set'),
-    getMailTransactionalHandoffValue('verify-email-template'),
-    getMailTransactionalHandoffValue('forgot-password-template'),
-    getMailTransactionalHandoffValue('newsletter-template'),
-    getMailTransactionalHandoffValue('contact-template'),
-    getMailTransactionalHandoffValue('localized-subjects'),
-    getMailTransactionalHandoffValue('html-language'),
-    getMailTransactionalHandoffValue('locale-fallback'),
-    getMailTransactionalHandoffValue('plain-text-render'),
-    getMailTransactionalHandoffValue('render-before-send'),
-    getMailTransactionalHandoffValue('shared-layout'),
-    getMailTransactionalHandoffValue('provider-registry-boundary'),
-    getMailTransactionalHandoffValue('boundary-panel'),
-    getMailTransactionalHandoffValue('activities-scope'),
-    getMailTransactionalHandoffValue('assignments-scope'),
-    getMailTransactionalHandoffValue('attempt-results-scope'),
-    getMailTransactionalHandoffValue('ai-draft-scope'),
-    getMailTransactionalHandoffValue('source-material-safety'),
-    getMailTransactionalHandoffValue('no-file-byte-read'),
-    getMailTransactionalHandoffValue('worksheet-workflow-scope'),
-    getMailTransactionalHandoffValue('contact-classroom-fields'),
-    getMailTransactionalHandoffValue('action-link-placement'),
-    getMailTransactionalHandoffValue('no-activity-mutation'),
-    getMailTransactionalHandoffValue('no-assignment-mutation'),
-    getMailTransactionalHandoffValue('no-attempt-mutation'),
-    getMailTransactionalHandoffValue('no-result-export'),
-    getMailTransactionalHandoffValue('no-learner-notification'),
-    getMailTransactionalHandoffValue('provider-secret-guard'),
-    getMailTransactionalHandoffValue('legacy-copy-guard'),
-    getMailTransactionalHandoffValue('private-data-guard'),
-  ],
-  [
-    '4 templates',
-    'Verify your ClassGamify teacher workspace email',
-    'Reset your ClassGamify teacher workspace password',
-    'ClassGamify classroom updates enabled',
-    'ClassGamify classroom and product inquiry',
-    'Message keys',
-    'en',
-    'Base locale fallback',
-    'HTML and text',
-    'Prepared render',
-    'EmailLayout',
-    'Shared provider',
-    'Workspace boundary',
-    'Activities and templates',
-    'Assignment links',
-    'Student attempts and results',
-    'AI drafts and source materials',
-    'No storage keys',
-    'No file bytes',
-    'Worksheet workflows',
-    'Structured fields',
-    'After boundary',
-    'No activity changes',
-    'No link changes',
-    'No attempt changes',
-    'No export',
-    'Teacher email only',
-    'Secrets hidden',
-    'ClassGamify only',
-    'Private data omitted',
-  ]
-);
-assert.deepEqual(
-  buildMailTransactionalWorkspaceHandoffView({
-    locale: 'zh',
-  }).itemViews.map((item) => [item.id, item.value]),
-  [
-    ['template-set', '4 个模板'],
-    ['verify-email-template', '验证你的 ClassGamify 教师工作区邮箱'],
-    ['forgot-password-template', '重置你的 ClassGamify 教师工作区密码'],
-    ['newsletter-template', '已开启 ClassGamify 课堂更新'],
-    ['contact-template', 'ClassGamify 课堂与产品咨询'],
-    ['localized-subjects', '消息键'],
-    ['html-language', 'zh'],
-    ['locale-fallback', '基础语言兜底'],
-    ['plain-text-render', 'HTML 和文本'],
-    ['render-before-send', '渲染已准备'],
-    ['shared-layout', 'EmailLayout'],
-    ['provider-registry-boundary', '共享 provider'],
-    ['boundary-panel', '工作区边界'],
-    ['activities-scope', '活动与模板'],
-    ['assignments-scope', '作业链接'],
-    ['attempt-results-scope', '学生作答与结果'],
-    ['ai-draft-scope', 'AI 草稿与来源素材'],
-    ['source-material-safety', '无存储密钥'],
-    ['no-file-byte-read', '不读文件'],
-    ['worksheet-workflow-scope', '练习纸流程'],
-    ['contact-classroom-fields', '结构化字段'],
-    ['action-link-placement', '边界之后'],
-    ['no-activity-mutation', '活动不变'],
-    ['no-assignment-mutation', '链接不变'],
-    ['no-attempt-mutation', '作答不变'],
-    ['no-result-export', '不导出'],
-    ['no-learner-notification', '仅老师邮件'],
-    ['provider-secret-guard', '密钥已隐藏'],
-    ['legacy-copy-guard', '仅 ClassGamify'],
-    ['private-data-guard', '已省略私有数据'],
-  ]
-);
-assert.equal(
-  buildMailTransactionalWorkspaceHandoffView({
-    locale: 'not-supported',
-  }).title,
-  mailTransactionalHandoffView.title
-);
 const transactionalMailLifecycleChainView =
   buildTransactionalMailLifecycleChainHandoffView();
 const transactionalMailLifecycleChainValues = new Map(
@@ -16674,14 +15725,6 @@ assert.deepEqual(Object.fromEntries(transactionalMailLifecycleChainValues), {
   'verify-email-consumer': 'Better Auth',
   'workspace-boundary-panel': 'Shared panel',
 });
-assert.deepEqual(
-  [
-    MAIL_TRANSACTIONAL_WORKSPACE_HANDOFF_ITEM_IDS.length,
-    MAIL_TRANSACTIONAL_TEMPLATE_IDS.length,
-  ],
-  [30, 4],
-  'Transactional mail lifecycle chain should stay backed by the workspace handoff and four current templates.'
-);
 assert.match(
   productSource,
   /Transactional email surfaces follow the same lifecycle boundary[\s\S]*verification[\s\S]*password reset[\s\S]*newsletter confirmation[\s\S]*contact-message templates[\s\S]*provider send[\s\S]*action URLs[\s\S]*recipient data[\s\S]*provider secrets[\s\S]*handoff contracts/,
@@ -16696,11 +15739,6 @@ assert.match(
   mailRenderSource,
   /const EmailTemplates = \{[\s\S]*forgotPassword: ForgotPassword,[\s\S]*verifyEmail: VerifyEmail,[\s\S]*subscribeNewsletter: SubscribeNewsletter,[\s\S]*contactMessage: ContactMessage,[\s\S]*\} as const[\s\S]*normalizeMailLocale\(context\.locale\)[\s\S]*renderEmailHtml\(email\)[\s\S]*toPlainText\(html\)[\s\S]*getEmailSubject\(\{/,
   'Mail renderer should preserve the template registry, locale normalization, HTML render, text render, and localized subject chain.'
-);
-assert.match(
-  mailWorkspaceBoundarySource,
-  /MAIL_TRANSACTIONAL_WORKSPACE_HANDOFF_ITEM_IDS[\s\S]*'template-set'[\s\S]*'private-data-guard'[\s\S]*buildMailTransactionalWorkspaceHandoffView[\s\S]*rendersBeforeProviderSend: true[\s\S]*usesProviderRegistryBoundary: true/,
-  'Mail workspace boundary should keep the 30-slice transactional handoff backing this lifecycle chain.'
 );
 assert.match(
   authMailLocaleSource,
@@ -18330,7 +17368,7 @@ assert.match(
 );
 assert.match(
   studentRunnerStateSource,
-  /export type StudentRunnerUnavailableSafetyItemId =[\s\S]*'activity-content'[\s\S]*'answer-feedback'[\s\S]*'browser-identity'[\s\S]*'source-materials'[\s\S]*'submissions'[\s\S]*export type StudentRunnerUnavailableSafetyItemView = \{[\s\S]*ariaLabel: string;[\s\S]*description: string;[\s\S]*id: StudentRunnerUnavailableSafetyItemId;[\s\S]*label: string;[\s\S]*value: string;[\s\S]*export type StudentRunnerUnavailableSafetyView = \{[\s\S]*description: string;[\s\S]*items: StudentRunnerUnavailableSafetyItemView\[\];[\s\S]*title: string;/,
+  /export type StudentRunnerUnavailableSafetyItemId =[\s\S]*'activity-content'[\s\S]*'answer-feedback'[\s\S]*'browser-identity'[\s\S]*'source-materials'[\s\S]*'submissions'[\s\S]*type StudentRunnerUnavailableSafetyItemView = \{[\s\S]*ariaLabel: string;[\s\S]*description: string;[\s\S]*id: StudentRunnerUnavailableSafetyItemId;[\s\S]*label: string;[\s\S]*value: string;[\s\S]*export type StudentRunnerUnavailableSafetyView = \{[\s\S]*description: string;[\s\S]*items: StudentRunnerUnavailableSafetyItemView\[\];[\s\S]*title: string;/,
   'Student runner state should expose an explicit unavailable-link safety view contract.'
 );
 assert.match(
@@ -18470,8 +17508,8 @@ assert.match(
   'Delivery summaries should derive attempt-limit status from assignment settings.'
 );
 assert.match(
-  assignmentAttemptLimitPublicSource,
-  /case 'attempt-limit':[\s\S]*assignment_delivery_label_attempts/,
+  readFileSync('src/assignments/delivery-summary.ts', 'utf8'),
+  /assignment_delivery_label_attempts/,
   'Public assignment rule summaries should expose the attempt-limit delivery policy.'
 );
 assert.match(
@@ -18647,7 +17685,7 @@ assert.doesNotMatch(
 );
 assert.match(
   e2eTestCatalogText,
-  /Teacher can publish and copy a configured student share link[\s\S]*renders no hidden `data-handoff` sections[\s\S]*public-assignment-access 30-slice domain contract[\s\S]*`data-handoff="public-assignment-access"`[\s\S]*visible public rule summary/,
+  /Teacher can publish and copy a configured student share link[\s\S]*renders no hidden `data-handoff` sections[\s\S]*`data-handoff="public-assignment-access"`[\s\S]*visible public rule summary/,
   'E2E catalog should document the handoff-free runner and source-level public access contract.'
 );
 assert.match(
@@ -18667,17 +17705,17 @@ assert.match(
 );
 assert.match(
   e2eTestCatalogText,
-  /Assignment attempt limits have a fast script-level gate[\s\S]*attempt-limit privacy-scope\s+boundaries[\s\S]*no-public-audit DOM boundaries[\s\S]*Assignment attempt limits keep a 30-slice domain contract without public audit DOM[\s\S]*source-level assignment-attempt-limit contract[\s\S]*`data-handoff="assignment-attempt-limit"`/,
+  /Assignment attempt limits have a fast script-level gate[\s\S]*attempt-limit privacy-scope\s+boundaries[\s\S]*no-public-audit DOM boundaries[\s\S]*Assignment attempt limits keep domain guards without public audit DOM[\s\S]*source-level assignment-attempt-limit guards[\s\S]*`data-handoff="assignment-attempt-limit"`/,
   'E2E catalog should document the attempt-limit focused gate, privacy scope, and no-public-audit DOM contract.'
 );
 assert.match(
   e2eTestCatalogText,
-  /Assignment submission validation has a fast script-level gate[\s\S]*submission-validation privacy-scope\s+boundaries[\s\S]*no-public-audit DOM\s+boundaries[\s\S]*Assignment submission validation keeps a 30-slice domain contract without public audit DOM[\s\S]*source-level assignment-submission-validation contract[\s\S]*`data-handoff="assignment-submission-validation"`/,
+  /Assignment submission validation has a fast script-level gate[\s\S]*submission-validation privacy-scope\s+boundaries[\s\S]*no-public-audit DOM\s+boundaries[\s\S]*Assignment submission validation keeps domain guards without public audit DOM[\s\S]*source-level assignment-submission-validation guards[\s\S]*`data-handoff="assignment-submission-validation"`/,
   'E2E catalog should document the submission-validation focused gate, privacy scope, and no-public-audit DOM contract.'
 );
 assert.match(
   e2eTestCatalogText,
-  /Assignment close-after time blocks late submissions[\s\S]*public-assignment-unavailable-access 30-slice domain contract[\s\S]*`data-handoff="public-assignment-unavailable-access"`[\s\S]*`data-handoff="public-assignment-access"`/,
+  /Assignment close-after time blocks late submissions[\s\S]*`data-handoff="public-assignment-unavailable-access"`[\s\S]*`data-handoff="public-assignment-access"`/,
   'E2E catalog should document unavailable-access domain coverage without public audit markers.'
 );
 assert.doesNotMatch(
@@ -19055,21 +18093,6 @@ assert.doesNotMatch(
   assignmentDeliverySummarySource,
   /Assignment rules|Open link|Timer on|Close scheduled|Attempt limit|playable items|submitted attempts|activity is ready|stops accepting|work is identified|answers appear|作业规则|链接开放|已开启计时|可作答项目|次数限制|计时才会开始/,
   'Assignment delivery summary should not hard-code public rule descriptions or status copy.'
-);
-assert.match(
-  assignmentDeliverySummarySource,
-  /export const ASSIGNMENT_DELIVERY_POLICY_HANDOFF_ITEM_IDS = \[(?=[\s\S]*'domain-helper-source')(?=[\s\S]*'settings-resolution')(?=[\s\S]*'settings-summary-surface')(?=[\s\S]*'public-rules-surface')(?=[\s\S]*'publish-dialog-surface')(?=[\s\S]*'assignment-card-surface')(?=[\s\S]*'result-header-surface')(?=[\s\S]*'student-runner-surface')(?=[\s\S]*'item-count-rule')(?=[\s\S]*'attempts-rule')(?=[\s\S]*'timer-rule')(?=[\s\S]*'close-time-rule')(?=[\s\S]*'identity-rule')(?=[\s\S]*'answer-reveal-rule')(?=[\s\S]*'item-order-rule')(?=[\s\S]*'instructions-rule')(?=[\s\S]*'delivery-rule-order')(?=[\s\S]*'public-rule-count')(?=[\s\S]*'settings-rule-count')(?=[\s\S]*'status-derivation')(?=[\s\S]*'default-attempts')(?=[\s\S]*'unlimited-attempts')(?=[\s\S]*'timer-normalization')(?=[\s\S]*'close-time-normalization')(?=[\s\S]*'policy-text-export')(?=[\s\S]*'snapshot-boundary')(?=[\s\S]*'public-payload-boundary')(?=[\s\S]*'result-export-boundary')(?=[\s\S]*'legacy-copy-guard')(?=[\s\S]*'privacy-guard')/,
-  'Assignment delivery policy handoff should expose the full 30-slice item id contract.'
-);
-assert.match(
-  assignmentDeliverySummarySource,
-  /export type AssignmentDeliveryPolicyHandoffPrivacyContract = \{[\s\S]*createsAssignmentLinks: false;[\s\S]*exposesAnswerKeys: false;[\s\S]*exposesRawSettingsJson: false;[\s\S]*exposesShareSlug: false;[\s\S]*exposesSourceMaterialStorageKeys: false;[\s\S]*exposesStudentAnswerText: false;[\s\S]*exposesStudentNames: false;[\s\S]*mutatesAssignment: false;[\s\S]*publicRulesAreSanitized: true;[\s\S]*settingsResolveThroughDomain: true;[\s\S]*surfacesShareSummaryView: true;/,
-  'Assignment delivery policy handoff should expose an explicit privacy and domain-resolution contract.'
-);
-assert.match(
-  assignmentDeliverySummarySource,
-  /export function buildAssignmentDeliveryPolicyHandoffView[\s\S]*buildAssignmentSettingsSummaryView\(\{[\s\S]*buildPublicAssignmentRuleSummaryViewFromSettings\(\{[\s\S]*formatAssignmentDeliveryPolicyText\(\{[\s\S]*ASSIGNMENT_DELIVERY_POLICY_HANDOFF_ITEM_IDS\.map/,
-  'Assignment delivery policy handoff should compose existing settings, public-rule, and policy-text helpers.'
 );
 assert.doesNotMatch(
   playRouteSource,
@@ -26666,158 +25689,8 @@ try {
 } finally {
   overwriteGetLocale(() => 'en');
 }
-const assignmentDeliveryPolicyHandoffView =
-  buildAssignmentDeliveryPolicyHandoffView({
-    itemCount: 4,
-    settings: {
-      collectStudentName: false,
-      instructions: 'Read rules before starting.',
-      maxAttempts: null,
-      showCorrectAnswers: false,
-      shuffleItems: false,
-      timeLimitSeconds: 15 * 60,
-    },
-  });
-const assignmentDeliveryPolicyHandoffIds =
-  assignmentDeliveryPolicyHandoffView.itemViews.map((itemView) => itemView.id);
-assert.deepEqual(ASSIGNMENT_DELIVERY_POLICY_HANDOFF_ITEM_IDS, [
-  'domain-helper-source',
-  'settings-resolution',
-  'settings-summary-surface',
-  'public-rules-surface',
-  'publish-dialog-surface',
-  'assignment-card-surface',
-  'result-header-surface',
-  'student-runner-surface',
-  'item-count-rule',
-  'attempts-rule',
-  'timer-rule',
-  'close-time-rule',
-  'identity-rule',
-  'answer-reveal-rule',
-  'item-order-rule',
-  'instructions-rule',
-  'delivery-rule-order',
-  'public-rule-count',
-  'settings-rule-count',
-  'status-derivation',
-  'default-attempts',
-  'unlimited-attempts',
-  'timer-normalization',
-  'close-time-normalization',
-  'policy-text-export',
-  'snapshot-boundary',
-  'public-payload-boundary',
-  'result-export-boundary',
-  'legacy-copy-guard',
-  'privacy-guard',
-]);
-assert.deepEqual(
-  assignmentDeliveryPolicyHandoffIds,
-  ASSIGNMENT_DELIVERY_POLICY_HANDOFF_ITEM_IDS
-);
-assert.equal(assignmentDeliveryPolicyHandoffView.itemViews.length, 30);
-assert.deepEqual(assignmentDeliveryPolicyHandoffView.privacy, {
-  createsAssignmentLinks: false,
-  exposesAnswerKeys: false,
-  exposesRawSettingsJson: false,
-  exposesShareSlug: false,
-  exposesSourceMaterialStorageKeys: false,
-  exposesStudentAnswerText: false,
-  exposesStudentNames: false,
-  itemIds: assignmentDeliveryPolicyHandoffIds,
-  mutatesAssignment: false,
-  publicRulesAreSanitized: true,
-  scope: 'assignment-delivery-policy-summary',
-  settingsResolveThroughDomain: true,
-  surfacesShareSummaryView: true,
-});
-assert.deepEqual(
-  assignmentDeliveryPolicyHandoffView.itemViews.map((item) => [
-    item.id,
-    item.value,
-  ]),
-  [
-    ['domain-helper-source', 'delivery-summary.ts'],
-    ['settings-resolution', 'Resolved settings'],
-    [
-      'settings-summary-surface',
-      'Publish dialog + assignment card + result header',
-    ],
-    ['public-rules-surface', 'Student runner'],
-    ['publish-dialog-surface', 'Publish dialog'],
-    ['assignment-card-surface', 'AssignmentSettingsSummaryView'],
-    ['result-header-surface', 'AssignmentSettingsSummaryView'],
-    ['student-runner-surface', 'PublicAssignmentRuleSummaryView'],
-    ['item-count-rule', '4 items'],
-    ['attempts-rule', 'Open'],
-    ['timer-rule', '15 min'],
-    ['close-time-rule', 'No close time'],
-    ['identity-rule', 'Anonymous'],
-    ['answer-reveal-rule', 'Hidden'],
-    ['item-order-rule', 'Fixed order'],
-    ['instructions-rule', 'Read rules before starting.'],
-    [
-      'delivery-rule-order',
-      'attempts -> timer -> closes -> identity -> answerReveal -> itemOrder',
-    ],
-    ['public-rule-count', '7 rules'],
-    ['settings-rule-count', '6 rules'],
-    ['status-derivation', 'Timer on'],
-    ['default-attempts', '2 max'],
-    ['unlimited-attempts', 'Open'],
-    ['timer-normalization', '15 min'],
-    ['close-time-normalization', 'No close time'],
-    [
-      'policy-text-export',
-      'Student instructions: Read rules before starting.; Attempts: Open; Timer: 15 min; Closes: No close time; Student identity: Anonymous; Answer reveal: Hidden; Item order: Fixed order',
-    ],
-    ['snapshot-boundary', 'AssignmentSnapshot'],
-    ['public-payload-boundary', 'Sanitized rules'],
-    ['result-export-boundary', 'Policy text'],
-    ['legacy-copy-guard', 'ClassGamify delivery policy'],
-    ['privacy-guard', 'Private data hidden'],
-  ]
-);
 overwriteGetLocale(() => 'zh');
 try {
-  const zhAssignmentDeliveryPolicyHandoffView =
-    buildAssignmentDeliveryPolicyHandoffView({
-      itemCount: 4,
-      settings: {
-        collectStudentName: false,
-        instructions: '请先阅读规则。',
-        maxAttempts: null,
-        showCorrectAnswers: false,
-        shuffleItems: false,
-        timeLimitSeconds: 15 * 60,
-      },
-    });
-  const zhAssignmentDeliveryPolicyHandoffValue = (id: string) =>
-    zhAssignmentDeliveryPolicyHandoffView.itemViews.find(
-      (item) => item.id === id
-    )?.value;
-
-  assert.equal(
-    zhAssignmentDeliveryPolicyHandoffView.title,
-    '作业分发策略交接'
-  );
-  assert.equal(
-    zhAssignmentDeliveryPolicyHandoffValue('settings-summary-surface'),
-    '发布弹窗 + 作业卡片 + 结果页头'
-  );
-  assert.equal(
-    zhAssignmentDeliveryPolicyHandoffValue('public-rules-surface'),
-    '学生作答器'
-  );
-  assert.equal(
-    zhAssignmentDeliveryPolicyHandoffValue('policy-text-export'),
-    '学生说明：请先阅读规则。；作答次数：不限次数；计时：15 分钟；关闭时间：不设关闭时间；学生身份：匿名；答案显示：隐藏；题目顺序：固定顺序'
-  );
-  assert.equal(
-    zhAssignmentDeliveryPolicyHandoffValue('privacy-guard'),
-    '私密数据隐藏'
-  );
 } finally {
   overwriteGetLocale(() => 'en');
 }
@@ -27762,7 +26635,7 @@ assert.deepEqual(scoredAttemptPersistenceSourceChecks, {
 });
 assert.match(
   e2eTestCatalogText,
-  /assignment-attempt-persistence\.test\.ts[\s\S]*Assignment attempt persistence keeps a 30-slice source-level contract/,
+  /assignment-attempt-persistence\.test\.ts[\s\S]*Assignment attempt persistence keeps source-level guards/,
   'E2E catalog should document the attempt persistence source-level handoff gate.'
 );
 const scoredAttemptResultChainView =
@@ -38848,9 +37721,8 @@ assert.deepEqual(printableWorksheetReviewLifecycleChainView.privacy, {
 assert.deepEqual(
   [
     WORKSHEET_MODE_DELIVERY_CHAIN_HANDOFF_ITEM_IDS.length,
-    ASSIGNMENT_DELIVERY_POLICY_HANDOFF_ITEM_IDS.length,
   ],
-  Array.from({ length: 2 }, () => 30),
+  Array.from({ length: 1 }, () => 30),
   'Printable worksheet review lifecycle chain should stay backed by printable, worksheet delivery, delivery policy, result material, and export gates.'
 );
 assert.deepEqual(
@@ -39012,10 +37884,7 @@ assert.deepEqual(
 const homePageView = buildHomePageViewModel({
   preview: homePageStarterPreview,
 });
-const {
-  handoffView: homePageHandoffView,
-  ...homePageVisibleView
-} = homePageView;
+const homePageVisibleView = homePageView;
 assert.deepEqual(homePageVisibleView, {
   features: [
     {
@@ -39119,35 +37988,6 @@ assert.deepEqual(homePageVisibleView, {
       value: 'Attempt log',
     },
   ],
-});
-assert.deepEqual(
-  homePageHandoffView.itemViews.map((itemView) => itemView.id),
-  [...HOME_PAGE_PRODUCT_LOOP_HANDOFF_ITEM_IDS]
-);
-assert.equal(homePageHandoffView.itemViews.length, 30);
-assert.equal(
-  homePageHandoffView.itemViews.every(
-    (itemView) =>
-      Boolean(itemView.ariaLabel) &&
-      Boolean(itemView.description) &&
-      Boolean(itemView.label) &&
-      Boolean(itemView.value)
-  ),
-  true
-);
-assert.deepEqual(homePageHandoffView.privacy, {
-  createsAssignmentLinks: false,
-  exposesAnswerKeys: false,
-  exposesRawAnonymousToken: false,
-  exposesSourceMaterialStorageKeys: false,
-  exposesStudentAttemptRecords: false,
-  exposesTeacherPrivateActivityContent: false,
-  itemIds: [...HOME_PAGE_PRODUCT_LOOP_HANDOFF_ITEM_IDS],
-  keepsLegacyEntrypointsOut: true,
-  mutatesTeacherData: false,
-  previewIsStarterOnly: true,
-  routeActionsUseSharedConstants: true,
-  scope: 'public-home-product-loop',
 });
 assert.equal(buildHomePageViewModel().preview.source, 'starter-preview');
 const contactPageView = buildContactPageViewModel();
@@ -39372,143 +38212,8 @@ assert.match(
   buildContactClassroomInquiryScopeView().privacyBoundary.description,
   /storage keys, private file URLs, raw student identifiers/
 );
-assert.deepEqual(CONTACT_CLASSROOM_INTAKE_HANDOFF_ITEM_IDS, [
-  'classroom-intent',
-  'contact-route',
-  'inquiry-panel',
-  'scope-panel',
-  'scope-field-mapping',
-  'subject-routing',
-  'message-template',
-  'form-rendering',
-  'learners-field',
-  'grade-field',
-  'material-field',
-  'routine-field',
-  'need-field',
-  'message-body',
-  'name-field',
-  'email-field',
-  'field-normalization',
-  'field-limits',
-  'structured-payload',
-  'client-submit-boundary',
-  'api-intent-normalization',
-  'server-rebuild-boundary',
-  'mail-context',
-  'email-template-boundary',
-  'locale-forwarding',
-  'safe-context-boundary',
-  'private-data-guard',
-  'no-activity-mutation',
-  'no-student-notification',
-  'legacy-copy-guard',
-]);
-const contactClassroomIntakeHandoffView =
-  buildContactClassroomIntakeHandoffView();
-const contactClassroomIntakeHandoffItemIds =
-  contactClassroomIntakeHandoffView.itemViews.map((item) => item.id);
-assert.deepEqual(contactClassroomIntakeHandoffItemIds, [
-  ...CONTACT_CLASSROOM_INTAKE_HANDOFF_ITEM_IDS,
-]);
-assert.deepEqual(contactClassroomIntakeHandoffView.privacy, {
-  createsActivities: false,
-  createsAssignmentLinks: false,
-  createsStudentRecords: false,
-  exposesContactMessageTextInHandoff: false,
-  exposesPrivateFileUrls: false,
-  exposesRawProviderErrors: false,
-  exposesRawStudentIdentifiers: false,
-  exposesRecipientEmailInView: false,
-  exposesSourceMaterialStorageKeys: false,
-  forwardsLocaleToMail: true,
-  itemIds: contactClassroomIntakeHandoffItemIds,
-  mutatesTeacherWorkspace: false,
-  notifiesLearners: false,
-  persistsActivityContent: false,
-  readsFileBytes: false,
-  rendersInPublicDom: false,
-  rendersStructuredFieldsInMail: true,
-  scope: 'public-classroom-inquiry-intake',
-  usesClassroomRouteIntent: true,
-  usesStructuredFields: true,
-});
-assert.deepEqual(
-  contactClassroomIntakeHandoffView.itemViews.map((item) => [
-    item.id,
-    item.value,
-  ]),
-  [
-    ['classroom-intent', 'Classroom workflow'],
-    ['contact-route', '/contact?subject=classroom'],
-    ['inquiry-panel', 'Classroom inquiry panel'],
-    ['scope-panel', '5 scope items'],
-    ['scope-field-mapping', 'Structured field ids'],
-    ['subject-routing', 'ClassGamify classroom workflow'],
-    ['message-template', 'Prompted context'],
-    ['form-rendering', 'Separate classroom fields'],
-    ['learners-field', 'Learners'],
-    ['grade-field', 'Class or grade'],
-    ['material-field', 'Activity material'],
-    ['routine-field', 'Weekly routine'],
-    ['need-field', 'Main need'],
-    ['message-body', 'Message'],
-    ['name-field', 'Name'],
-    ['email-field', 'Email'],
-    ['field-normalization', 'Trimmed NFKC text'],
-    ['field-limits', 'Bounded fields'],
-    ['structured-payload', 'classroomInquiry'],
-    ['client-submit-boundary', 'Client structured payload'],
-    ['api-intent-normalization', 'Server normalized'],
-    ['server-rebuild-boundary', 'Server rebuilt payload'],
-    ['mail-context', 'Contact email'],
-    ['email-template-boundary', 'Structured email fields'],
-    ['locale-forwarding', 'Request locale'],
-    ['safe-context-boundary', 'Safe classroom context'],
-    ['private-data-guard', 'Private data omitted'],
-    ['no-activity-mutation', 'No activity mutation'],
-    ['no-student-notification', 'No learner notification'],
-    ['legacy-copy-guard', 'ClassGamify only'],
-  ]
-);
-assert.doesNotMatch(
-  JSON.stringify(contactClassroomIntakeHandoffView),
-  /raw-student-token|source-material\/private\/storage-key|private\/worksheet\.pdf|raw-provider-stack-trace|raw-private-file-bytes/,
-  'Contact classroom intake handoff should not serialize private student, source-material, provider, file URL, or file-byte text.'
-);
 overwriteGetLocale(() => 'zh');
 try {
-  const zhContactClassroomIntakeHandoffView =
-    buildContactClassroomIntakeHandoffView();
-  assert.equal(zhContactClassroomIntakeHandoffView.title, '课堂咨询收集');
-  assert.match(
-    zhContactClassroomIntakeHandoffView.description,
-    /30 切片课堂咨询收集契约/
-  );
-  assert.deepEqual(
-    zhContactClassroomIntakeHandoffView.itemViews
-      .filter((item) =>
-        [
-          'classroom-intent',
-          'contact-route',
-          'scope-panel',
-          'field-normalization',
-          'safe-context-boundary',
-          'private-data-guard',
-          'no-student-notification',
-        ].includes(item.id)
-      )
-      .map((item) => [item.id, item.value]),
-    [
-      ['classroom-intent', '课堂工作流'],
-      ['contact-route', '/contact?subject=classroom'],
-      ['scope-panel', '5 个范围项目'],
-      ['field-normalization', '已裁剪 NFKC 文本'],
-      ['safe-context-boundary', '安全课堂上下文'],
-      ['private-data-guard', '已省略私有数据'],
-      ['no-student-notification', '不通知学习者'],
-    ]
-  );
 } finally {
   overwriteGetLocale(() => 'en');
 }
@@ -39740,7 +38445,6 @@ assert.deepEqual(buildTemplatesPageViewModel(), {
       'Open the editor, load an example for the selected game format, then publish it as a shareable student assignment link.',
     title: 'Ready to draft one?',
   },
-  handoffView: buildPublicTemplateEntryHandoffView({ surface: 'templates' }),
   hero: {
     badgeLabel: 'Template library',
     createAction: {
@@ -39770,42 +38474,7 @@ assert.deepEqual(
     to: Routes.Create,
   }
 );
-const {
-  handoffView: roadmapPublicHandoffView,
-  ...roadmapPageViewModel
-} = buildRoadmapPageViewModel();
-assert.deepEqual(ROADMAP_PUBLIC_HANDOFF_ITEM_IDS, [
-  'current-loop',
-  'roadmap-surface',
-  'available-count',
-  'improving-count',
-  'planned-count',
-  'column-board',
-  'status-label-boundary',
-  'activity-assignment-loop',
-  'template-foundation',
-  'ai-draft-capability',
-  'results-reteach-focus',
-  'worksheet-delivery-focus',
-  'worksheet-extraction-boundary',
-  'school-workflow-boundary',
-  'task-evidence-boundary',
-  'task-next-step-boundary',
-  'hero-action-boundary',
-  'create-route',
-  'templates-route',
-  'feedback-route',
-  'snapshot-panel',
-  'snapshot-live-core',
-  'snapshot-template-depth',
-  'snapshot-ai-expansion',
-  'principle-focus-boundary',
-  'principle-model-boundary',
-  'validation-decision-boundary',
-  'public-copy-boundary',
-  'legacy-copy-guard',
-  'privacy-guard',
-]);
+const roadmapPageViewModel = buildRoadmapPageViewModel();
 assert.deepEqual(roadmapPageViewModel, {
   columns: [
     {
@@ -40011,170 +38680,7 @@ assert.deepEqual(roadmapPageViewModel, {
     title: 'We choose work that saves teachers time',
   },
 });
-assert.deepEqual(
-  roadmapPublicHandoffView.itemViews.map((itemView) => itemView.id),
-  [...ROADMAP_PUBLIC_HANDOFF_ITEM_IDS]
-);
-assert.equal(roadmapPublicHandoffView.itemViews.length, 30);
-assert.deepEqual(roadmapPublicHandoffView.privacy, {
-  createsAssignmentLinks: false,
-  describesCurrentUsableLoop: true,
-  describesPublicRoadmapSurface: true,
-  exposesAnswerKeys: false,
-  exposesRawAnonymousToken: false,
-  exposesSourceMaterialStorageKeys: false,
-  exposesStudentAttemptRecords: false,
-  exposesTeacherPrivateActivityContent: false,
-  itemIds: roadmapPublicHandoffView.itemViews.map((itemView) => itemView.id),
-  keepsLegacyCopyOut: true,
-  keepsPlannedBetsExploratory: true,
-  mutatesTeacherWorkspace: false,
-  readsSourceMaterialFileBytes: false,
-  rendersTaskEvidence: true,
-  rendersTaskNextSteps: true,
-  rendersValidationCriteria: true,
-  routeActionsUseSharedConstants: true,
-  scope: 'public-roadmap-product-boundary',
-  usesPreparedViewModel: true,
-});
-assert.deepEqual(
-  roadmapPublicHandoffView.itemViews.map((itemView) => [
-    itemView.id,
-    itemView.value,
-  ]),
-  [
-    ['current-loop', 'Activity -> Assignment -> Attempt -> Results'],
-    ['roadmap-surface', '/roadmap'],
-    ['available-count', '3'],
-    ['improving-count', '2'],
-    ['planned-count', '2'],
-    ['column-board', '3 columns'],
-    ['status-label-boundary', 'Clear status labels'],
-    ['activity-assignment-loop', 'Live'],
-    ['template-foundation', 'Live'],
-    ['ai-draft-capability', 'Live'],
-    ['results-reteach-focus', 'Improving'],
-    ['worksheet-delivery-focus', 'Improving'],
-    ['worksheet-extraction-boundary', 'Exploring'],
-    ['school-workflow-boundary', 'Exploring'],
-    ['task-evidence-boundary', 'Public classroom summary'],
-    ['task-next-step-boundary', 'Classroom direction'],
-    ['hero-action-boundary', 'Ready teacher actions'],
-    ['create-route', Routes.Create],
-    ['templates-route', Routes.Templates],
-    ['feedback-route', Routes.ContactClassroom],
-    ['snapshot-panel', '3 snapshots'],
-    ['snapshot-live-core', 'Usable classroom core'],
-    ['snapshot-template-depth', 'Template depth now'],
-    ['snapshot-ai-expansion', 'AI drafts now, extraction next'],
-    ['principle-focus-boundary', 'Core loop before breadth'],
-    ['principle-model-boundary', 'One content model'],
-    [
-      'validation-decision-boundary',
-      'We choose work that saves teachers time',
-    ],
-    ['public-copy-boundary', 'Prepared classroom copy'],
-    ['legacy-copy-guard', 'ClassGamify only'],
-    ['privacy-guard', 'Private data hidden'],
-  ]
-);
-const {
-  handoffView: teachersPageHandoffView,
-  ...teachersPageVisibleView
-} = buildTeachersPageViewModel();
-assert.deepEqual(TEACHERS_PAGE_HANDOFF_ITEM_IDS, [
-  'teachers-route',
-  'teacher-audience',
-  'hero-positioning',
-  'primary-create-action',
-  'secondary-contact-action',
-  'workflow-section',
-  'workflow-draft',
-  'workflow-publish',
-  'workflow-share',
-  'use-case-section',
-  'use-case-classrooms',
-  'use-case-games',
-  'use-case-results',
-  'template-panel',
-  'template-count',
-  'template-classroom-mode-label',
-  'template-mode-coverage',
-  'template-quiz',
-  'template-match-up',
-  'template-group-sort',
-  'template-fill-blank',
-  'template-listening',
-  'template-matching-pairs',
-  'template-line-match',
-  'template-open-box',
-  'school-cta',
-  'school-contact-route',
-  'activity-assignment-loop',
-  'legacy-copy-guard',
-  'privacy-guard',
-]);
-assert.deepEqual(
-  teachersPageHandoffView.itemViews.map((itemView) => itemView.id),
-  [...TEACHERS_PAGE_HANDOFF_ITEM_IDS]
-);
-assert.equal(teachersPageHandoffView.itemViews.length, 30);
-assert.deepEqual(teachersPageHandoffView.privacy, {
-  createsAssignmentLinks: false,
-  exposesAnswerKeys: false,
-  exposesRawAnonymousToken: false,
-  exposesSourceMaterialStorageKeys: false,
-  exposesStudentAttemptRecords: false,
-  exposesTeacherPrivateActivityContent: false,
-  itemIds: teachersPageHandoffView.itemViews.map((itemView) => itemView.id),
-  mutatesTeacherWorkspace: false,
-  routeActionsUseSharedConstants: true,
-  scope: 'public-teachers-product-loop',
-  templateModesComeFromCatalog: true,
-  usesClassGamifyCopy: true,
-  usesPreparedViewModel: true,
-});
-assert.deepEqual(
-  teachersPageHandoffView.itemViews.map((itemView) => [
-    itemView.id,
-    itemView.value,
-  ]),
-  [
-    ['teachers-route', Routes.Teachers],
-    ['teacher-audience', 'Teachers, tutors, schools, and learning centers'],
-    [
-      'hero-positioning',
-      'Build repeatable game-based assignments from the lessons you already teach.',
-    ],
-    ['primary-create-action', Routes.Create],
-    ['secondary-contact-action', Routes.ContactClassroom],
-    ['workflow-section', '3 items'],
-    ['workflow-draft', 'Start from lesson content'],
-    ['workflow-publish', 'Choose a game template'],
-    ['workflow-share', 'Publish an assignment'],
-    ['use-case-section', '3 items'],
-    ['use-case-classrooms', 'Classroom homework'],
-    ['use-case-games', 'Live classroom play'],
-    ['use-case-results', 'Result follow-up'],
-    ['template-panel', 'First template families'],
-    ['template-count', '8 items'],
-    ['template-classroom-mode-label', 'Classroom mode'],
-    ['template-mode-coverage', '8 catalog modes'],
-    ['template-quiz', 'Quiz'],
-    ['template-match-up', 'Match up'],
-    ['template-group-sort', 'Group sort'],
-    ['template-fill-blank', 'Complete the sentence'],
-    ['template-listening', 'Listening'],
-    ['template-matching-pairs', 'Matching pairs'],
-    ['template-line-match', 'Line match'],
-    ['template-open-box', 'Open the box'],
-    ['school-cta', 'Need a school or learning-center workflow?'],
-    ['school-contact-route', Routes.ContactClassroom],
-    ['activity-assignment-loop', 'Activity -> Assignment -> Attempt -> Results'],
-    ['legacy-copy-guard', 'ClassGamify only'],
-    ['privacy-guard', 'Private data hidden'],
-  ]
-);
+const teachersPageVisibleView = buildTeachersPageViewModel();
 assert.deepEqual(teachersPageVisibleView, {
   hero: {
     badgeLabel: 'Teachers and learning teams',
@@ -40492,7 +38998,6 @@ assert.deepEqual(worksheetsPageView, {
       'Every worksheet mode stays in the same flow: create reusable activity content, publish a student link, collect attempts, then review results.',
     title: 'Worksheet delivery loop',
   },
-  handoffView: buildPublicTemplateEntryHandoffView({ surface: 'worksheets' }),
   hero: {
     badgeLabel: 'Liveworksheets-style modes',
     description:
@@ -40859,10 +39364,7 @@ assert.deepEqual(templateRoadmapCapabilityChainView.privacy, {
 });
 assert.deepEqual(
   [
-    ROADMAP_PUBLIC_HANDOFF_ITEM_IDS.length,
-    PUBLIC_TEMPLATE_ENTRY_HANDOFF_ITEM_IDS.length,
     ACTIVITY_AUTHORING_LIBRARY_CHAIN_HANDOFF_ITEM_IDS.length,
-    ACTIVITY_TEMPLATE_SCAFFOLD_QUALITY_HANDOFF_ITEM_IDS.length,
     ACTIVITY_AI_AUTHORING_CHAIN_HANDOFF_ITEM_IDS.length,
     ACTIVITY_AI_ENHANCEMENT_ROADMAP_CHAIN_HANDOFF_ITEM_IDS.length,
     ACTIVITY_AI_ENHANCEMENT_POLICY_ITEM_IDS.length,
@@ -40870,7 +39372,7 @@ assert.deepEqual(
     WORKSHEET_MODE_DELIVERY_CHAIN_HANDOFF_ITEM_IDS.length,
     STUDENT_RUNNER_PLAY_CHAIN_HANDOFF_ITEM_IDS.length,
   ],
-  Array.from({ length: 10 }, () => 30),
+  Array.from({ length: 7 }, () => 30),
   'Template roadmap capability chain should stay backed by focused roadmap, template, AI, worksheet, runtime, print, and export gates.'
 );
 assert.deepEqual(Object.fromEntries(templateRoadmapCapabilityChainValues), {

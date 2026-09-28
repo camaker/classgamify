@@ -39,7 +39,7 @@ export const ACTIVITY_AI_FALLBACK_DRAFT_CHAIN_SOURCE_FILES = [
   'src/activities/ai-draft.ts',
   'src/activities/ai-draft-focus.ts',
   'src/api/activities.ts',
-  'src/activities/ai-draft-fallback-handoff.ts',
+  'src/activities/ai-enhancement-draft-output.ts',
   'src/activities/draft-source.ts',
   'src/activities/draft-meta.ts',
   'src/activities/material-references.ts',

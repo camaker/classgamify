@@ -55,7 +55,7 @@ export const SOURCE_MATERIAL_PRIVACY_CHAIN_SOURCE_FILES = [
   'src/activities/template-remix.ts',
   'src/assignments/public.ts',
   'src/assignments/student-runtime-item-list.ts',
-  'src/assignments/unavailable-access.ts',
+  'src/routes/play/$shareId.tsx',
   'src/settings/files-view.ts',
   'src/components/settings/files/files-table.tsx',
   'tests/e2e/specs/protected-pages.spec.ts',

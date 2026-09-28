@@ -47,7 +47,7 @@ export const PUBLISHED_ASSIGNMENT_DELIVERY_CHAIN_SOURCE_FILES = [
   'src/assignments/list-view.ts',
   'src/assignments/lifecycle.ts',
   'src/assignments/public.ts',
-  'src/assignments/unavailable-access.ts',
+  'src/routes/play/$shareId.tsx',
   'src/assignments/item-order.ts',
   'scripts/assignment-item-order.test.ts',
   'src/assignments/attempt-limits.ts',

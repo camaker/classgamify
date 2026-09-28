@@ -149,7 +149,7 @@ export type StudentRunnerUnavailableSafetyItemId =
   | 'source-materials'
   | 'submissions';
 
-export type StudentRunnerUnavailableSafetyItemView = {
+type StudentRunnerUnavailableSafetyItemView = {
   ariaLabel: string;
   description: string;
   id: StudentRunnerUnavailableSafetyItemId;

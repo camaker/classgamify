@@ -1,7 +1,6 @@
 import assert from 'node:assert/strict';
 import { existsSync, readFileSync } from 'node:fs';
 import test from 'node:test';
-import { ASSIGNMENT_DELIVERY_POLICY_HANDOFF_ITEM_IDS } from '@/assignments/delivery-summary';
 import {
   ASSIGNMENT_DISTRIBUTION_LIFECYCLE_CHAIN_HANDOFF_ITEM_IDS,
   ASSIGNMENT_DISTRIBUTION_LIFECYCLE_CHAIN_SOURCE_FILES,
@@ -20,10 +19,7 @@ import {
   buildAssignmentListRouteSearch,
   buildAssignmentListValidatedSearch,
 } from '@/assignments/list-filters';
-import {
-  PUBLISHED_ASSIGNMENT_DELIVERY_CHAIN_HANDOFF_ITEM_IDS,
-  PUBLISHED_ASSIGNMENT_DELIVERY_CHAIN_SOURCE_FILES,
-} from '@/assignments/published-assignment-delivery-chain';
+import { PUBLISHED_ASSIGNMENT_DELIVERY_CHAIN_SOURCE_FILES } from '@/assignments/published-assignment-delivery-chain';
 import {
   buildPublishedAssignmentPanelContext,
   buildPublishedAssignmentPanelNextStepViews,
@@ -36,8 +32,6 @@ import {
   buildAssignmentSharePath,
 } from '@/assignments/share-link';
 import { normalizeAssignmentShareSlug } from '@/assignments/share-slug';
-import { ASSIGNMENT_SOURCE_ACTIVITY_CONTEXT_CHAIN_HANDOFF_ITEM_IDS } from '@/assignments/source-activity-context-chain';
-import { TEACHER_RESULTS_REVIEW_CHAIN_HANDOFF_ITEM_IDS } from '@/assignments/teacher-results-review-chain';
 import { overwriteGetLocale } from '@/locale/paraglide/runtime';
 
 overwriteGetLocale(() => 'en');
@@ -187,15 +181,6 @@ test('assignment distribution lifecycle is backed by adjacent gates', () => {
   }
 
   assert.equal(PUBLISHED_ASSIGNMENT_DELIVERY_CHAIN_SOURCE_FILES.length, 30);
-  assert.deepEqual(
-    [
-      ASSIGNMENT_DELIVERY_POLICY_HANDOFF_ITEM_IDS.length,
-      PUBLISHED_ASSIGNMENT_DELIVERY_CHAIN_HANDOFF_ITEM_IDS.length,
-      ASSIGNMENT_SOURCE_ACTIVITY_CONTEXT_CHAIN_HANDOFF_ITEM_IDS.length,
-      TEACHER_RESULTS_REVIEW_CHAIN_HANDOFF_ITEM_IDS.length,
-    ],
-    Array.from({ length: 4 }, () => 30)
-  );
 });
 
 test('published assignment context keeps distribution states and actions aligned', () => {

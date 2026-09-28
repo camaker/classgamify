@@ -77,6 +77,6 @@ test('product and e2e catalogs register the duration source chain', () => {
   );
   assert.match(
     read('tests/e2e/TEST-CATALOG.md'),
-    /assignment-attempt-duration-continuity\.test\.ts[\s\S]*30-slice source-level contract/i
+    /assignment-attempt-duration-continuity\.test\.ts[\s\S]*source guards/i
   );
 });

@@ -1,11 +1,7 @@
 import assert from 'node:assert/strict';
 import { existsSync, readFileSync } from 'node:fs';
 import test from 'node:test';
-import {
-  MAIL_TRANSACTIONAL_TEMPLATE_IDS,
-  MAIL_TRANSACTIONAL_WORKSPACE_HANDOFF_ITEM_IDS,
-  buildMailTransactionalWorkspaceHandoffView,
-} from '@/mail/workspace-boundary';
+import { MAIL_TRANSACTIONAL_TEMPLATE_IDS } from '@/mail/workspace-boundary';
 import { getTemplate } from '@/mail/render';
 import {
   TRANSACTIONAL_MAIL_LIFECYCLE_CHAIN_HANDOFF_ITEM_IDS,
@@ -21,10 +17,6 @@ const MAIL_TYPES_SOURCE = readFileSync('src/mail/types.ts', 'utf8');
 const MAIL_LOCALE_SOURCE = readFileSync('src/mail/locale.ts', 'utf8');
 const MAIL_RENDER_SOURCE = readFileSync('src/mail/render.ts', 'utf8');
 const MAIL_INDEX_SOURCE = readFileSync('src/mail/index.ts', 'utf8');
-const MAIL_WORKSPACE_BOUNDARY_SOURCE = readFileSync(
-  'src/mail/workspace-boundary.ts',
-  'utf8'
-);
 const EMAIL_LAYOUT_SOURCE = readFileSync(
   'src/mail/components/email-layout.tsx',
   'utf8'
@@ -176,20 +168,7 @@ test('transactional mail lifecycle chain is backed by focused mail contracts', (
       `Missing transactional mail lifecycle chain file ${filePath}`
     );
   }
-
-  assert.equal(MAIL_TRANSACTIONAL_WORKSPACE_HANDOFF_ITEM_IDS.length, 30);
   assert.equal(MAIL_TRANSACTIONAL_TEMPLATE_IDS.length, 4);
-  assert.match(
-    MAIL_WORKSPACE_BOUNDARY_SOURCE,
-    /MAIL_TRANSACTIONAL_WORKSPACE_HANDOFF_ITEM_IDS[\s\S]*'template-set'[\s\S]*'private-data-guard'[\s\S]*buildMailTransactionalWorkspaceHandoffView[\s\S]*rendersBeforeProviderSend: true[\s\S]*usesProviderRegistryBoundary: true/,
-    'Mail workspace boundary source should keep the 30-slice transactional handoff contract.'
-  );
-  assert.deepEqual(
-    buildMailTransactionalWorkspaceHandoffView({
-      locale: 'not-supported',
-    }).itemViews,
-    buildMailTransactionalWorkspaceHandoffView({ locale: 'en' }).itemViews
-  );
 });
 
 test('transactional mail sources preserve render, locale, and template boundaries', () => {
