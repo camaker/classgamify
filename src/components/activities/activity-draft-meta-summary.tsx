@@ -227,9 +227,9 @@ function ActivityDraftReviewGate({
           className={cn(
             'w-fit rounded-md',
             reviewGateView.status === 'action-needed' &&
-              'border-warning/40 bg-warning/15 text-warning-foreground',
+              'border-warning/40 bg-warning/15 text-warning-text',
             reviewGateView.status === 'ready-to-save' &&
-              'border-success/40 bg-success/15 text-success-foreground'
+              'border-success/40 bg-success/15 text-success-text'
           )}
         >
           {reviewGateView.badgeLabel}
@@ -477,11 +477,11 @@ function ActivityDraftQuestionChoiceReadinessItem({
           className={cn(
             'w-fit shrink-0 rounded-md',
             itemView.status === 'explicit-ready' &&
-              'border-success/40 bg-success/15 text-success-foreground',
+              'border-success/40 bg-success/15 text-success-text',
             itemView.status === 'completed-locally' &&
-              'border-info/40 bg-info/15 text-info-foreground',
+              'border-info/40 bg-info/15 text-info-text',
             itemView.status === 'needs-candidates' &&
-              'border-warning/40 bg-warning/15 text-warning-foreground'
+              'border-warning/40 bg-warning/15 text-warning-text'
           )}
         >
           {itemView.statusLabel}

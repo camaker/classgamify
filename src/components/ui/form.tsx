@@ -48,10 +48,12 @@ const useFormField = () => {
     throw new Error('useFormField should be used within <FormField>')
   }
 
-  const { id } = itemContext
+  const { id, hasDescription, hasMessage } = itemContext
 
   return {
     id,
+    hasDescription,
+    hasMessage,
     name: fieldContext.name,
     formItemId: `${id}-form-item`,
     formDescriptionId: `${id}-form-item-description`,
@@ -62,6 +64,10 @@ const useFormField = () => {
 
 type FormItemContextValue = {
   id: string
+  hasDescription?: boolean
+  hasMessage?: boolean
+  setHasDescription?: (value: boolean) => void
+  setHasMessage?: (value: boolean) => void
 }
 
 const FormItemContext = React.createContext<FormItemContextValue>(
@@ -70,9 +76,21 @@ const FormItemContext = React.createContext<FormItemContextValue>(
 
 function FormItem({ className, ...props }: React.ComponentProps<'div'>) {
   const id = React.useId()
+  const [hasDescription, setHasDescription] = React.useState(false)
+  const [hasMessage, setHasMessage] = React.useState(false)
+  const value = React.useMemo(
+    () => ({
+      id,
+      hasDescription,
+      hasMessage,
+      setHasDescription,
+      setHasMessage,
+    }),
+    [id, hasDescription, hasMessage],
+  )
 
   return (
-    <FormItemContext.Provider value={{ id }}>
+    <FormItemContext.Provider value={value}>
       <div
         data-slot="form-item"
         className={cn('grid gap-2', className)}
@@ -102,14 +120,27 @@ function FormLabel({
 function FormControl({
   children,
 }: { children?: React.ReactNode }) {
-  const { error, formItemId, formDescriptionId, formMessageId } = useFormField()
+  const {
+    error,
+    formItemId,
+    formDescriptionId,
+    formMessageId,
+    hasDescription,
+    hasMessage,
+  } = useFormField()
+
+  // Only reference ids that are actually rendered in the DOM.
+  const describedBy = [
+    hasDescription && formDescriptionId,
+    hasMessage && formMessageId,
+  ]
+    .filter(Boolean)
+    .join(' ')
 
   const child = React.Children.only(children) as React.ReactElement
   return React.cloneElement(child, {
     id: formItemId,
-    'aria-describedby': !error
-      ? formDescriptionId
-      : `${formDescriptionId} ${formMessageId}`,
+    'aria-describedby': describedBy || undefined,
     'aria-invalid': !!error,
   })
 }
@@ -119,6 +150,12 @@ function FormDescription({
   ...props
 }: React.ComponentProps<'p'>) {
   const { formDescriptionId } = useFormField()
+  const { setHasDescription } = React.useContext(FormItemContext)
+
+  React.useEffect(() => {
+    setHasDescription?.(true)
+    return () => setHasDescription?.(false)
+  }, [setHasDescription])
 
   return (
     <p
@@ -136,6 +173,13 @@ function FormMessage({
 }: React.ComponentProps<'p'>) {
   const { error, formMessageId } = useFormField()
   const body = error ? String(error?.message ?? '') : props.children
+  const { setHasMessage } = React.useContext(FormItemContext)
+  const isRendered = !!body
+
+  React.useEffect(() => {
+    setHasMessage?.(isRendered)
+    return () => setHasMessage?.(false)
+  }, [isRendered, setHasMessage])
 
   if (!body) {
     return null

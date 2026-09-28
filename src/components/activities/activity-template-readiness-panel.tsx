@@ -144,11 +144,11 @@ function ActivityTemplateQuizChoiceReadinessItem({
           className={cn(
             'w-fit shrink-0 rounded-md',
             itemView.status === 'explicit-ready' &&
-              'border-success/40 bg-success/15 text-success-foreground',
+              'border-success/40 bg-success/15 text-success-text',
             itemView.status === 'completed-locally' &&
-              'border-info/40 bg-info/15 text-info-foreground',
+              'border-info/40 bg-info/15 text-info-text',
             itemView.status === 'needs-candidates' &&
-              'border-warning/40 bg-warning/15 text-warning-foreground'
+              'border-warning/40 bg-warning/15 text-warning-text'
           )}
         >
           {itemView.statusLabel}
@@ -161,7 +161,7 @@ function ActivityTemplateQuizChoiceReadinessItem({
         {itemView.sourceLabel}
       </p>
       {itemView.issueLabel ? (
-        <p className="mt-1 text-warning-foreground text-xs leading-5">
+        <p className="mt-1 text-warning-text text-xs leading-5">
           {itemView.issueLabel}
         </p>
       ) : null}

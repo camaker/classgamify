@@ -255,8 +255,8 @@ function BillingStatusBadge({ badge }: { badge: SettingsBillingCardBadge }) {
       className={cn(
         'text-xs border-transparent',
         badge.tone === 'trial'
-          ? 'bg-warning/15 text-warning-foreground dark:bg-warning/20 dark:text-warning-foreground'
-          : 'bg-success/15 text-success-foreground dark:bg-success/20 dark:text-success-foreground'
+          ? 'bg-warning/15 text-warning-text dark:bg-warning/20'
+          : 'bg-success/15 text-success-text dark:bg-success/20'
       )}
     >
       <span className="flex items-center space-x-2">
@@ -272,9 +272,7 @@ function BillingPeriodRow({ row }: { row: SettingsBillingCardPeriodRow }) {
     <fieldset
       className={cn(
         'm-0 border-0 p-0',
-        row.tone === 'warning'
-          ? 'text-warning-foreground'
-          : 'text-muted-foreground'
+        row.tone === 'warning' ? 'text-warning-text' : 'text-muted-foreground'
       )}
     >
       <legend className="sr-only">{row.ariaLabel}</legend>
