@@ -1,5 +1,4 @@
 import { defineConfig } from 'vite';
-import { devtools } from '@tanstack/devtools-vite';
 import { tanstackStart } from '@tanstack/react-start/plugin/vite';
 import viteReact from '@vitejs/plugin-react';
 import { fileURLToPath, URL } from 'url';
@@ -26,7 +25,6 @@ const PARAGLIDE_OPTIONS = {
  * https://vite.dev/config/
  */
 const config = defineConfig(async ({ command, mode }) => {
-  const isProduction = mode === 'production';
   const isE2e = mode === 'e2e';
 
   // Message modules emit one file per message (~7,800). Under `vite dev` the
@@ -60,13 +58,6 @@ const config = defineConfig(async ({ command, mode }) => {
       ],
     },
     plugins: [
-      !isProduction &&
-        !isE2e &&
-        devtools({
-          eventBusConfig: {
-            port: 0,
-          },
-        }),
       tailwindcss(),
       contentCollections(),
       !isE2e &&
