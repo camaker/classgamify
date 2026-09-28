@@ -1,6 +1,6 @@
 {
   "home_signal_aria_label": "{label}: {value}. {description}",
-  "home_signal_delivery_description": "انشر روابط واجبات تجمع بين النسخة الثابتة من النشاط وقواعد التسليم.",
+  "home_signal_delivery_description": "انشر روابط للطلاب تجمع النشاط وإعدادات صفك معًا.",
   "home_signal_delivery_label": "التسليم",
   "home_signal_delivery_value": "رابط للمشاركة",
   "home_signal_panel_aria_label": "{title}: {description}",

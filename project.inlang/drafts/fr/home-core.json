@@ -4,13 +4,13 @@
   "home_hero_browse_templates": "Parcourir les modèles",
   "home_hero_browse_templates_aria_label": "Parcourir les modèles ClassGamify avant de créer une activité.",
   "home_hero_description": "Créez des activités de classe ludiques, publiez des liens de devoir et analysez les tentatives des élèves à partir du même contenu structuré.",
-  "home_hero_introduction": "Activités de classe dans l’esprit de Wordwall",
+  "home_hero_introduction": "Des jeux de classe pour les enseignants",
   "home_hero_play_sample": "Essayer l’exemple",
   "home_hero_primary": "Créer une activité",
   "home_hero_primary_aria_label": "Créer une activité ClassGamify réutilisable dans l’éditeur commun.",
   "home_hero_preview_label": "Une véritable activité de départ à explorer",
   "home_hero_secondary": "Créer une fiche d’exercices",
-  "home_hero_secondary_aria_label": "Créer une activité dans l’esprit de Liveworksheets à partir des modes fiche d’exercices.",
+  "home_hero_secondary_aria_label": "Découvrir les modes de fiches interactives de ClassGamify.",
   "home_hero_title": "Transformez les exercices de classe en jeu",
   "home_feature_aria_label": "{title} : {description}",
   "home_feature_section_aria_label": "{title} : {description}",
@@ -23,6 +23,6 @@
   "home_features_items_item_3_title": "Liens de devoir",
   "home_features_items_item_4_description": "Analysez les scores, la réussite par question, les réponses acceptées, les priorités de reprise et les synthèses de suivi.",
   "home_features_items_item_4_title": "Résultats enseignant",
-  "home_features_subtitle": "Boucle pédagogique",
+  "home_features_subtitle": "Comment ça marche",
   "home_features_title": "Outils d’activité"
 }

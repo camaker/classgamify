@@ -1348,7 +1348,7 @@ const editorialProductSurfaceRequirements = [
   {
     filePath: 'content/blog/wordwall-style-activity-loop.md',
     patterns: [
-      /Wordwall-style activity loop/,
+      /reusable classroom activity loop/,
       /Source materials can support that activity/,
       /not teacher file lists or storage metadata/,
       /assignment snapshot and scored attempts/,
@@ -1358,7 +1358,7 @@ const editorialProductSurfaceRequirements = [
   {
     filePath: 'content/blog/wordwall-style-activity-loop.zh.md',
     patterns: [
-      /Wordwall 风格的课堂活动闭环/,
+      /可复用的课堂活动闭环/,
       /来源素材可以支持这个活动/,
       /不是老师的文件列表或存储元数据/,
       /作业快照和已批改尝试/,
@@ -7744,13 +7744,8 @@ assert.match(
 );
 assert.match(
   templateDirectoryCardSource,
-  /TemplatesPageCardEntryStepView[\s\S]*const entryLabelId = `template-entry-\$\{template\.template\}-label`[\s\S]*<details[\s\S]*<summary id=\{entryLabelId\}[\s\S]*template\.entryLabel[\s\S]*template\.entrySteps\.map[\s\S]*TemplateEntryStep[\s\S]*key=\{step\.id\}/,
-  'Template directory cards should keep prepared create-entry steps in a disclosure.'
-);
-assert.match(
-  templateDirectoryCardSource,
-  /function TemplateEntryStep[\s\S]*step: TemplatesPageCardEntryStepView[\s\S]*descriptionId = `template-entry-\$\{templateType\}-\$\{step\.id\}-description`[\s\S]*step\.label[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*aria-label=\{step\.ariaLabel\}[\s\S]*step\.value[\s\S]*step\.description/,
-  'Template entry step rows should expose prepared labels, values, aria labels, and hidden descriptions.'
+  /const TemplateIcon = templateVisuals\[template\.template\]\.icon[\s\S]*templateVisuals\[template\.template\]\.className[\s\S]*<TemplateIcon[\s\S]*const templateVisuals: Record</,
+  'Template directory cards should give each game its own icon and colour instead of a shared icon and mode badge.'
 );
 assert.doesNotMatch(
   templateDirectoryCardSource,
@@ -12493,10 +12488,10 @@ assert.deepEqual(buildMailWorkspaceBoundaryView(), {
   items: [
     {
       description:
-        'Saved activities, reusable structured content, and Wordwall-style template readiness.',
+        'Saved activities, reusable content, and which games each activity can play as.',
       id: 'activities',
       label: 'Activities and templates',
-      line: 'Activities and templates: Saved activities, reusable structured content, and Wordwall-style template readiness.',
+      line: 'Activities and templates: Saved activities, reusable content, and which games each activity can play as.',
     },
     {
       description:
@@ -34041,7 +34036,7 @@ assert.deepEqual(homePageVisibleView, {
       'Activity tools: Core tools for turning lesson material into a repeatable classroom activity workflow.',
     description:
       'Core tools for turning lesson material into a repeatable classroom activity workflow.',
-    eyebrowLabel: 'Classroom loop',
+    eyebrowLabel: 'How it works',
     title: 'Activity tools',
   },
   hero: {
@@ -34087,9 +34082,9 @@ assert.deepEqual(homePageVisibleView, {
     },
     {
       ariaLabel:
-        'Delivery: Share link. Publish assignment links that keep the activity snapshot and delivery rules together.',
+        'Delivery: Share link. Publish student links that keep the activity and your classroom settings together.',
       description:
-        'Publish assignment links that keep the activity snapshot and delivery rules together.',
+        'Publish student links that keep the activity and your classroom settings together.',
       id: 'delivery',
       label: 'Delivery',
       value: 'Share link',
@@ -34337,7 +34332,7 @@ const pricingPageView = buildPricingPageViewModel();
 assert.deepEqual(pricingPageView.hero, {
   eyebrow: 'ClassGamify plans',
   subtitle:
-    'Start with the classroom activity loop, then upgrade for more creation, assignment, AI, and result workflows.',
+    'Start free. Paid plans with more activities, AI drafting, and deeper results are coming soon.',
   title: 'ClassGamify Plans',
 });
 assert.deepEqual(pricingPageView.valueSection, {
@@ -34400,9 +34395,9 @@ assert.deepEqual(
 assert.deepEqual(buildPricingFaqItems(), [
   {
     answer:
-      'The free plan is for testing the core creation loop: browse templates, create a small number of activities, open student previews, and see whether the workflow fits your class rhythm.',
+      'The free plan lets you browse templates, create a few activities, preview them as a student, and see whether ClassGamify fits your class.',
     ariaLabel:
-      'What is the free plan for?: The free plan is for testing the core creation loop: browse templates, create a small number of activities, open student previews, and see whether the workflow fits your class rhythm.',
+      'What is the free plan for?: The free plan lets you browse templates, create a few activities, preview them as a student, and see whether ClassGamify fits your class.',
     id: 'free',
     question: 'What is the free plan for?',
   },
@@ -34496,37 +34491,6 @@ try {
 } finally {
   overwriteGetLocale(() => 'en');
 }
-function buildExpectedTemplateEntrySteps(templateShortName: string) {
-  return [
-    {
-      ariaLabel:
-        `Template: ${templateShortName} selected. The create page opens with this primary template selected.`,
-      description:
-        'The create page opens with this primary template selected.',
-      id: 'select-template',
-      label: 'Template',
-      value: `${templateShortName} selected`,
-    },
-    {
-      ariaLabel:
-        'Scaffold: Example ready. The create page loads a template-specific example that teachers review before saving.',
-      description:
-        'The create page loads a template-specific example that teachers review before saving.',
-      id: 'load-scaffold',
-      label: 'Scaffold',
-      value: 'Example ready',
-    },
-    {
-      ariaLabel:
-        'Fields: Shared editor. Questions, pairs, groups, vocabulary, and notes still use the shared activity input contract.',
-      description:
-        'Questions, pairs, groups, vocabulary, and notes still use the shared activity input contract.',
-      id: 'shared-editor',
-      label: 'Fields',
-      value: 'Shared editor',
-    },
-  ];
-}
 assert.deepEqual(buildTemplatesPageViewModel(), {
   cards: activityTemplates.map((template) => ({
     action: {
@@ -34546,8 +34510,6 @@ assert.deepEqual(buildTemplatesPageViewModel(), {
     contentRequirementsAriaLabel: `${template.name} content requirements`,
     contentRequirementsLabel: 'Content required',
     description: template.description,
-    entryLabel: 'Creation path',
-    entrySteps: buildExpectedTemplateEntrySteps(template.shortName),
     name: template.name,
     template: template.type,
   })),
@@ -34600,7 +34562,7 @@ assert.deepEqual(roadmapPageViewModel, {
       items: [
         {
           description:
-            'Teachers can create reusable structured activities, publish assignment links, and keep snapshots stable for student attempts.',
+            'Teachers can create reusable activities, publish student links, and keep each link stable while students play.',
           evidence:
             'Teachers can save an activity, share a stable assignment link, collect responses, and review results from the same place.',
           evidenceLabel: 'Teacher value',
@@ -34609,9 +34571,9 @@ assert.deepEqual(roadmapPageViewModel, {
             'Keep sharing and review dependable as the product becomes easier to navigate.',
           nextStepLabel: 'What improves next',
           status: 'available',
-          statusAriaLabel: 'Activity to assignment loop status: Live',
+          statusAriaLabel: 'Activities and student links status: Live',
           statusLabel: 'Live',
-          title: 'Activity to assignment loop',
+          title: 'Activities and student links',
         },
         {
           description:
@@ -34630,7 +34592,7 @@ assert.deepEqual(roadmapPageViewModel, {
         },
         {
           description:
-            'Teachers can generate AI-assisted activity drafts, review coverage, inspect safe source-material provenance, and edit everything before saving.',
+            'Teachers can draft activities with AI, check what was generated, see which source files were used, and edit everything before saving.',
           evidence:
             'Drafts open in the normal editor so teachers can inspect, edit, and publish only what fits the class.',
           evidenceLabel: 'Teacher value',
@@ -34669,7 +34631,7 @@ assert.deepEqual(roadmapPageViewModel, {
         },
         {
           description:
-            'Tighten printable follow-up, fill-in, line matching, and listening flows around the same assignment snapshot.',
+            'Improve printable follow-up, fill-in, line matching, and listening for each assignment.',
           evidence:
             'Teachers can move the same assignment into printable practice, worksheet-style activities, and follow-up review.',
           evidenceLabel: 'Teacher value',
@@ -34688,7 +34650,7 @@ assert.deepEqual(roadmapPageViewModel, {
     },
     {
       description:
-        'Later improvements once the core classroom loop stays dependable.',
+        'Later improvements once the core features are dependable.',
       id: 'backlog',
       items: [
         {
@@ -34746,9 +34708,9 @@ assert.deepEqual(roadmapPageViewModel, {
   principles: [
     {
       description:
-        'We build around the Activity -> Assignment -> Attempt -> Results loop before adding parallel surfaces.',
+        'We make creating, sharing, and reviewing activities work well before adding more features.',
       id: 'focus',
-      title: 'Core loop before breadth',
+      title: 'Depth before breadth',
     },
     {
       description:
@@ -34801,7 +34763,7 @@ assert.deepEqual(teachersPageVisibleView, {
   hero: {
     badgeLabel: 'Teachers and learning teams',
     description:
-      'ClassGamify supports the real Wordwall-style loop: create an activity, switch templates, publish a share link, and review student results.',
+      'Create an activity, switch games, publish a student link, and review student results.',
     primaryAction: {
       ariaLabel: 'Create a reusable activity from the teachers page.',
       label: 'Create activity',
@@ -34991,9 +34953,9 @@ const expectedWorksheetModeSignalViews = [
   },
   {
     ariaLabel:
-      'Assignment: Student link. Publishes through the same assignment snapshot and student runner instead of a separate worksheet product.',
+      'Assignment: Student link. Publishes as a normal student link, not a separate worksheet product.',
     description:
-      'Publishes through the same assignment snapshot and student runner instead of a separate worksheet product.',
+      'Publishes as a normal student link, not a separate worksheet product.',
     id: 'assignment-link',
     label: 'Assignment',
     value: 'Student link',
@@ -35011,12 +34973,12 @@ const expectedWorksheetModeSignalViews = [
 const expectedWorksheetResultSignalViews = [
   {
     ariaLabel:
-      'Attempt summaries: Snapshot-based. Student submissions stay attached to the assignment snapshot for teacher review.',
+      'Attempt summaries: Saved per link. Student submissions stay with the assignment for teacher review.',
     description:
-      'Student submissions stay attached to the assignment snapshot for teacher review.',
+      'Student submissions stay with the assignment for teacher review.',
     id: 'attempts',
     label: 'Attempt summaries',
-    value: 'Snapshot-based',
+    value: 'Saved per link',
   },
   {
     ariaLabel:
@@ -35097,7 +35059,7 @@ assert.deepEqual(
   ]),
   WORKSHEET_MODE_TEMPLATES.map((template) => [
     template,
-    'Same product loop',
+    'Same activity, same link',
     expectedWorksheetModeSignalViews.map((signalView) => [
       signalView.id,
       signalView.label,
@@ -35109,13 +35071,13 @@ assert.deepEqual(
 assert.deepEqual(worksheetsPageView, {
   deliveryLoop: {
     ariaLabel:
-      'Worksheet delivery loop: Every worksheet mode stays in the same flow: create reusable activity content, publish a student link, collect attempts, then review results.',
+      'How worksheets reach students: Every worksheet mode stays in the same flow: create reusable activity content, publish a student link, collect attempts, then review results.',
     description:
       'Every worksheet mode stays in the same flow: create reusable activity content, publish a student link, collect attempts, then review results.',
-    title: 'Worksheet delivery loop',
+    title: 'How worksheets reach students',
   },
   hero: {
-    badgeLabel: 'Liveworksheets-style modes',
+    badgeLabel: 'Worksheet modes',
     description:
       'ClassGamify treats fill-in practice, line matching, listening, and classification as playable assignment templates. Teachers create reusable content once, publish a student link, and review results without exposing answer keys before submission.',
     title: 'Worksheet modes for the same activity content.',
@@ -35172,7 +35134,7 @@ assert.deepEqual(worksheetsPageView, {
       contentRequirements: [{ id: 'questions', label: 'questions' }],
       description:
         'Place short answers directly into sentence gaps for grammar, spelling, vocabulary, or reading checks.',
-      signalLabel: 'Same product loop',
+      signalLabel: 'Same activity, same link',
       signalViews: expectedWorksheetModeSignalViews,
       template: 'fill-blank',
       title: 'Fill blanks',
@@ -35190,7 +35152,7 @@ assert.deepEqual(worksheetsPageView, {
       contentRequirements: [{ id: 'pairs', label: 'match pairs' }],
       description:
         'Turn terms and definitions into a two-column connection board that feels familiar to worksheet users.',
-      signalLabel: 'Same product loop',
+      signalLabel: 'Same activity, same link',
       signalViews: expectedWorksheetModeSignalViews,
       template: 'line-match',
       title: 'Line matching',
@@ -35208,7 +35170,7 @@ assert.deepEqual(worksheetsPageView, {
       contentRequirements: [{ id: 'questions', label: 'questions' }],
       description:
         'Use spoken tracks for dictation, comprehension, or pronunciation follow-up while hiding transcripts before review.',
-      signalLabel: 'Same product loop',
+      signalLabel: 'Same activity, same link',
       signalViews: expectedWorksheetModeSignalViews,
       template: 'listening',
       title: 'Listening prompts',
@@ -35226,7 +35188,7 @@ assert.deepEqual(worksheetsPageView, {
       contentRequirements: [{ id: 'groups', label: 'groups' }],
       description:
         'Ask learners to classify words, examples, or concepts into teacher-defined groups before seeing the answer pattern.',
-      signalLabel: 'Same product loop',
+      signalLabel: 'Same activity, same link',
       signalViews: expectedWorksheetModeSignalViews,
       template: 'group-sort',
       title: 'Drag sorting',
@@ -35234,7 +35196,7 @@ assert.deepEqual(worksheetsPageView, {
   ],
   printable: {
     description:
-      'The first product pass focuses on interactive worksheets with scoring, attempts, accepted answers, and result exports. Printable practice and teacher-uploaded worksheet extraction should extend the same activity snapshot and results model instead of creating a separate worksheet product.',
+      'Interactive worksheets come first, with scoring, attempts, accepted answers, and result exports. Printable practice and uploaded worksheets will use the same activities and results.',
     title: 'Printable follow-up can build on the same assignment record.',
   },
   resultSignals: expectedWorksheetResultSignalViews,
@@ -35372,16 +35334,6 @@ assert.match(
   entryPageViewSource,
   /export type EntryAction = TemplateEntryAction;[\s\S]*type LinkAction = TemplateEntryLinkAction;[\s\S]*type CreateLinkAction = TemplateEntryCreateLinkAction;[\s\S]*export type WorksheetsPageHeroActionView = EntryAction & \{/,
   'Entry page view domain should export focused entry and link action contracts.'
-);
-assert.match(
-  entryPageViewSource,
-  /export type TemplatesPageCardView = \{[\s\S]*entryLabel: string;[\s\S]*entrySteps: TemplatesPageCardEntryStepView\[\];[\s\S]*export type TemplatesPageCardEntryStepId =[\s\S]*'load-scaffold'[\s\S]*'select-template'[\s\S]*'shared-editor'[\s\S]*export type TemplatesPageCardEntryStepView = \{[\s\S]*ariaLabel: string;[\s\S]*description: string;[\s\S]*id: TemplatesPageCardEntryStepId;[\s\S]*label: string;[\s\S]*value: string;/,
-  'Template directory card view-model should expose structured create-entry steps with accessible labels.'
-);
-assert.match(
-  entryPageViewSource,
-  /entryLabel: m\.templates_page_entry_label\(\)[\s\S]*entrySteps: buildTemplatesPageCardEntrySteps\(template\.shortName\)[\s\S]*function buildTemplatesPageCardEntrySteps\([\s\S]*templateShortName: string[\s\S]*templates_page_entry_step_template_[\s\S]*templates_page_entry_step_scaffold_[\s\S]*templates_page_entry_step_shared_[\s\S]*templates_page_entry_step_aria_label/,
-  'Template directory card view-model should derive localized create-entry steps from the selected template short name.'
 );
 assert.match(
   templateEntrySource,
@@ -42468,7 +42420,7 @@ assert.deepEqual(
   ),
   {
     description:
-      'The same structured content can become multiple Wordwall-style activity formats after saving.',
+      'The same content can play as several game types after saving.',
     emptyText: 'Add questions, pairs, or groups to unlock playable templates.',
     lockedOptions: [
       { diagnosis: 'Add match pairs to unlock Match.', template: 'match-up' },
@@ -42547,7 +42499,7 @@ assert.equal(getActivityTemplateQuizChoiceReadinessItemPosition(-3), 1);
 assert.equal(getActivityTemplateQuizChoiceReadinessItemPosition(Number.NaN), 1);
 assert.deepEqual(buildActivityTemplateReadinessPanelSummary(null), {
   description:
-    'The same structured content can become multiple Wordwall-style activity formats after saving.',
+    'The same content can play as several game types after saving.',
   emptyText: 'Add questions, pairs, or groups to unlock playable templates.',
   lockedOptions: [],
   readyCount: 0,

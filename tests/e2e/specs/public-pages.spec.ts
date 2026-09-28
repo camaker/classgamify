@@ -463,6 +463,62 @@ test.describe('public page smoke coverage', () => {
     });
   }
 
+  for (const locale of ['en', 'zh'] as const) {
+    test(`public pages never name competitors in ${locale}`, async ({
+      page,
+    }) => {
+      for (const path of [
+        '/',
+        '/templates',
+        '/worksheets',
+        '/pricing',
+        '/contact',
+        '/roadmap',
+      ]) {
+        await page.goto(localizedPath(path, locale));
+        await expect(page.locator('h1').first()).toBeVisible({
+          timeout: 20_000,
+        });
+        const bodyText = await page.locator('body').innerText();
+        expect(bodyText, path).not.toMatch(/wordwall|liveworksheets/i);
+      }
+    });
+  }
+
+  test('paid plans offer a waitlist instead of checkout', async ({ page }) => {
+    await page.goto('/pricing');
+    await expect(
+      page.getByRole('link', {
+        name: getLocaleMessage('en', 'pricing_card_join_waitlist'),
+      })
+    ).toHaveCount(2);
+    await expect(
+      page.getByText(getLocaleMessage('en', 'pricing_card_coming_soon'), {
+        exact: true,
+      })
+    ).toHaveCount(2);
+    await expect(
+      page.getByRole('link', {
+        name: getLocaleMessage('en', 'pricing_card_get_started_for_free'),
+      })
+    ).toBeVisible();
+    await expect(
+      page.getByRole('button', {
+        name: getLocaleMessage('en', 'pricing_card_get_started'),
+      })
+    ).toHaveCount(0);
+  });
+
+  test('template cards have their own icons and no mode badge', async ({
+    page,
+  }) => {
+    await page.goto('/templates');
+    const cards = page.getByRole('article');
+    await expect(cards).toHaveCount(8, { timeout: 20_000 });
+    await expect(page.getByText('Creation path')).toHaveCount(0);
+    await expect(cards.getByText('Individual', { exact: true })).toHaveCount(0);
+  });
+
   test('health check responds with pong', async ({ request }) => {
     const response = await request.get('/api/ping');
 

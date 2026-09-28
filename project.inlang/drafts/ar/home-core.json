@@ -4,13 +4,13 @@
   "home_hero_browse_templates": "استعراض القوالب",
   "home_hero_browse_templates_aria_label": "استعرض قوالب ClassGamify قبل إنشاء نشاط.",
   "home_hero_description": "أنشئ أنشطة صفية بأسلوب الألعاب، وانشر روابط الواجبات، وراجع محاولات الطلاب انطلاقًا من المحتوى المنظم نفسه.",
-  "home_hero_introduction": "أنشطة صفية بأسلوب Wordwall",
+  "home_hero_introduction": "ألعاب صفية للمعلمين",
   "home_hero_play_sample": "جرّب المثال",
   "home_hero_primary": "إنشاء نشاط",
   "home_hero_primary_aria_label": "أنشئ نشاطًا قابلًا لإعادة الاستخدام في ClassGamify باستخدام المحرر المشترك.",
   "home_hero_preview_label": "نشاط تمهيدي حقيقي يمكنك استكشافه",
   "home_hero_secondary": "إنشاء ورقة عمل",
-  "home_hero_secondary_aria_label": "أنشئ نشاطًا بأسلوب Liveworksheets باستخدام أوضاع أوراق العمل.",
+  "home_hero_secondary_aria_label": "استكشف أوضاع أوراق العمل التفاعلية في ClassGamify.",
   "home_hero_title": "حوّل التدريب الصفي إلى تجربة تشبه اللعب",
   "home_feature_aria_label": "{title}: {description}",
   "home_feature_section_aria_label": "{title}: {description}",
@@ -23,6 +23,6 @@
   "home_features_items_item_3_title": "روابط الواجبات",
   "home_features_items_item_4_description": "راجع الدرجات وأداء كل سؤال والإجابات المقبولة وأولويات إعادة الشرح وملخصات المتابعة.",
   "home_features_items_item_4_title": "نتائج المعلم",
-  "home_features_subtitle": "دورة العمل الصفية",
+  "home_features_subtitle": "كيف يعمل",
   "home_features_title": "أدوات الأنشطة"
 }

@@ -4,13 +4,13 @@
   "home_hero_browse_templates": "テンプレートを見る",
   "home_hero_browse_templates_aria_label": "アクティビティを作成する前にClassGamifyのテンプレートを確認します。",
   "home_hero_description": "同じ構造化コンテンツからゲーム形式の授業アクティビティを作成し、課題リンクを公開して、生徒の取り組みを振り返れます。",
-  "home_hero_introduction": "Wordwall形式の授業アクティビティ",
+  "home_hero_introduction": "先生のための授業ゲーム",
   "home_hero_play_sample": "サンプルをプレイ",
   "home_hero_primary": "アクティビティを作成",
   "home_hero_primary_aria_label": "共通エディターで再利用できるClassGamifyアクティビティを作成します。",
   "home_hero_preview_label": "試せる実際のサンプル教材",
   "home_hero_secondary": "ワークシートを作成",
-  "home_hero_secondary_aria_label": "ワークシートモードからLiveworksheets形式のアクティビティを作成します。",
+  "home_hero_secondary_aria_label": "ClassGamify のインタラクティブなワークシートモードを見る。",
   "home_hero_title": "授業の練習をゲームのように楽しく",
   "home_feature_aria_label": "{title}：{description}",
   "home_feature_section_aria_label": "{title}：{description}",
@@ -23,6 +23,6 @@
   "home_features_items_item_3_title": "課題リンク",
   "home_features_items_item_4_description": "得点、設問別の結果、正解として認める回答、復習の優先項目、生徒へのフォロー概要を確認できます。",
   "home_features_items_item_4_title": "教師向け結果",
-  "home_features_subtitle": "授業のサイクル",
+  "home_features_subtitle": "使い方",
   "home_features_title": "アクティビティツール"
 }

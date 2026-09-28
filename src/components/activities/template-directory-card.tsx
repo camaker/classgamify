@@ -1,7 +1,4 @@
-import type {
-  TemplatesPageCardEntryStepView,
-  TemplatesPageCardView,
-} from '@/activities/entry-page-view';
+import type { TemplatesPageCardView } from '@/activities/entry-page-view';
 import { getActivityTemplateScaffold } from '@/activities/scaffolds';
 import { buttonVariants } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -18,9 +15,17 @@ import { getPathWithLocale } from '@/lib/urls';
 import { m } from '@/locale/paraglide/messages';
 import {
   IconArrowRight,
-  IconDeviceGamepad2,
+  IconArrowsLeftRight,
+  IconBox,
+  IconCards,
+  IconCategory,
+  IconForms,
+  IconHeadphones,
+  IconLine,
+  IconListCheck,
   IconPlus,
   IconVolume,
+  type TablerIcon,
 } from '@tabler/icons-react';
 import { Link } from '@tanstack/react-router';
 
@@ -31,8 +36,8 @@ type TemplateDirectoryCardProps = {
 export function TemplateDirectoryCard({
   template,
 }: TemplateDirectoryCardProps) {
-  const entryLabelId = `template-entry-${template.template}-label`;
   const guide = getLocale() === 'en' ? templateGuides[template.template] : null;
+  const TemplateIcon = templateVisuals[template.template].icon;
 
   return (
     <Card
@@ -41,13 +46,13 @@ export function TemplateDirectoryCard({
       className="flex h-full flex-col overflow-hidden rounded-xl"
     >
       <CardHeader className="pb-4">
-        <div className="mb-1 flex items-center justify-between gap-3">
-          <div className="flex size-9 items-center justify-center rounded-lg bg-primary/10 text-primary">
-            <IconDeviceGamepad2 className="size-4" aria-hidden="true" />
-          </div>
-          <Badge variant="secondary" className="rounded-md">
-            {template.classroomMode}
-          </Badge>
+        <div
+          className={cn(
+            'mb-1 flex size-10 items-center justify-center rounded-lg',
+            templateVisuals[template.template].className
+          )}
+        >
+          <TemplateIcon className="size-5" aria-hidden="true" />
         </div>
         <CardTitle>
           <h2 className="text-lg font-semibold">{template.name}</h2>
@@ -98,25 +103,49 @@ export function TemplateDirectoryCard({
             </a>
           ) : null}
         </div>
-
-        <details className="border-t pt-3 text-xs text-muted-foreground">
-          <summary id={entryLabelId} className="cursor-pointer font-medium">
-            {template.entryLabel}
-          </summary>
-          <dl className="mt-3 grid gap-2">
-            {template.entrySteps.map((step) => (
-              <TemplateEntryStep
-                key={step.id}
-                step={step}
-                templateType={template.template}
-              />
-            ))}
-          </dl>
-        </details>
       </CardContent>
     </Card>
   );
 }
+
+/** Each game gets its own icon and colour so the directory is scannable. */
+const templateVisuals: Record<
+  TemplatesPageCardView['template'],
+  { className: string; icon: TablerIcon }
+> = {
+  'fill-blank': {
+    className: 'bg-amber-500/15 text-amber-700 dark:text-amber-300',
+    icon: IconForms,
+  },
+  'group-sort': {
+    className: 'bg-emerald-500/15 text-emerald-700 dark:text-emerald-300',
+    icon: IconCategory,
+  },
+  'line-match': {
+    className: 'bg-sky-500/15 text-sky-700 dark:text-sky-300',
+    icon: IconLine,
+  },
+  listening: {
+    className: 'bg-violet-500/15 text-violet-700 dark:text-violet-300',
+    icon: IconHeadphones,
+  },
+  'match-up': {
+    className: 'bg-indigo-500/15 text-indigo-700 dark:text-indigo-300',
+    icon: IconArrowsLeftRight,
+  },
+  'matching-pairs': {
+    className: 'bg-pink-500/15 text-pink-700 dark:text-pink-300',
+    icon: IconCards,
+  },
+  'open-box': {
+    className: 'bg-orange-500/15 text-orange-700 dark:text-orange-300',
+    icon: IconBox,
+  },
+  quiz: {
+    className: 'bg-blue-500/15 text-blue-700 dark:text-blue-300',
+    icon: IconListCheck,
+  },
+};
 
 const templateGuides: Partial<
   Record<
@@ -285,28 +314,4 @@ function TemplateExamplePreview({
 
 function parseFirstLine(value: string) {
   return (value.split('\n')[0] ?? '').split('|').map((part) => part.trim());
-}
-
-function TemplateEntryStep({
-  step,
-  templateType,
-}: {
-  step: TemplatesPageCardEntryStepView;
-  templateType: TemplatesPageCardView['template'];
-}) {
-  const descriptionId = `template-entry-${templateType}-${step.id}-description`;
-
-  return (
-    <div className="grid grid-cols-[minmax(0,5.75rem)_minmax(0,1fr)] gap-2 text-xs">
-      <dt className="truncate text-muted-foreground">{step.label}</dt>
-      <dd aria-describedby={descriptionId} className="min-w-0 font-medium">
-        <output aria-label={step.ariaLabel} className="break-words">
-          {step.value}
-        </output>
-        <span id={descriptionId} className="sr-only">
-          {step.description}
-        </span>
-      </dd>
-    </div>
-  );
 }

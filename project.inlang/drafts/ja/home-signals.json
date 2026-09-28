@@ -1,6 +1,6 @@
 {
   "home_signal_aria_label": "{label}：{value}。{description}",
-  "home_signal_delivery_description": "アクティビティの固定コピーと配布ルールをひとまとめにした課題リンクを公開します。",
+  "home_signal_delivery_description": "アクティビティとクラス設定をまとめた生徒用リンクを公開します。",
   "home_signal_delivery_label": "配布",
   "home_signal_delivery_value": "共有リンク",
   "home_signal_panel_aria_label": "{title}：{description}",
