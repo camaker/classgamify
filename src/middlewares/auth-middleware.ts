@@ -1,7 +1,7 @@
 import { auth } from '@/auth/auth';
 import { redirect } from '@tanstack/react-router';
 import { createMiddleware } from '@tanstack/react-start';
-import { getRequestHeaders } from '@tanstack/react-start/server';
+import { getRequest, getRequestHeaders } from '@tanstack/react-start/server';
 import { Routes } from '@/lib/routes';
 import { websiteConfig } from '@/config/website';
 
@@ -58,3 +58,27 @@ export const authApiMiddleware = createMiddleware().server(async ({ next }) => {
 
   return await next({ context: { userId: session.user.id } });
 });
+
+/**
+ * Create route middleware: signed-in teachers create activities inside the
+ * workspace, so a direct load of /create moves them there with the same
+ * template and source search params. Guests keep the public page.
+ */
+export const createRouteWorkspaceMiddleware = createMiddleware().server(
+  async ({ next }) => {
+    if (websiteConfig.auth?.enable) {
+      const session = await auth.api.getSession({
+        headers: getRequestHeaders(),
+      });
+      if (session?.user?.emailVerified) {
+        const url = new URL(getRequest().url);
+        throw redirect({
+          to: Routes.DashboardActivityNew,
+          search: Object.fromEntries(url.searchParams),
+        });
+      }
+    }
+
+    return await next();
+  }
+);

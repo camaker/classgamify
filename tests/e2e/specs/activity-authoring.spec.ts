@@ -45,6 +45,42 @@ test.describe('activity authoring', () => {
     await cleanupE2EUsers(request);
   });
 
+  test('signed-in create opens the workspace editor', async ({
+    page,
+    request,
+  }) => {
+    const user = await registerE2EUser(request);
+    const monitor = installPageHealthMonitor(page);
+
+    await loginByForm(page, user);
+    await page.goto('/create?template=matching-pairs&source=templates');
+    await expect(page).toHaveURL(/\/dashboard\/activities\/new\?/);
+    const editorUrl = new URL(page.url());
+    expect(editorUrl.searchParams.get('template')).toBe('matching-pairs');
+    expect(editorUrl.searchParams.get('source')).toBe('templates');
+
+    await expect(
+      page.getByRole('heading', { level: 1, name: 'New activity' })
+    ).toBeVisible();
+    await expect(
+      page.getByRole('link', { name: /back to library/i })
+    ).toBeVisible();
+
+    const otherContent = page.locator('details').filter({
+      has: page.getByText('Content for other games (optional)'),
+    });
+    await expect(otherContent).toHaveCount(1);
+    await expect(otherContent).not.toHaveAttribute('open', '');
+    await otherContent.getByText('Content for other games (optional)').click();
+    await expect(otherContent).toHaveAttribute('open', '');
+
+    await page.goto('/dashboard');
+    await expect(
+      page.getByRole('link', { name: /^create activity$/i }).first()
+    ).toHaveAttribute('href', '/dashboard/activities/new');
+    await expectNoBrowserErrors(monitor, 'workspace create page');
+  });
+
   test('publishes a saved activity from the saved panel', async ({
     page,
     request,

@@ -1073,7 +1073,7 @@ const dashboardOverviewNextActionRoutes: Record<
   DashboardOverviewNextActionId,
   string
 > = {
-  'create-activity': Routes.Create,
+  'create-activity': Routes.DashboardActivityNew,
   'publish-assignment': Routes.DashboardActivities,
   'review-results': Routes.DashboardAssignments,
   'share-assignment': Routes.DashboardAssignments,

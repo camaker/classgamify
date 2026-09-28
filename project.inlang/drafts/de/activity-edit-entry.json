@@ -1,5 +1,8 @@
 {
   "activity_edit_access_ready_action": "Aktivität bearbeiten",
   "activity_edit_access_ready_title": "Wiederverwendbare Aktivität bearbeiten",
-  "activity_edit_page_back_to_library": "Zurück zur Bibliothek"
+  "activity_edit_page_back_to_library": "Zurück zur Bibliothek",
+  "activity_form_other_content_summary": "Inhalte für andere Spiele (optional)",
+  "activity_new_page_description": "Wähle ein Spiel, füge deine Inhalte hinzu und speichere es in deiner Bibliothek.",
+  "activity_new_page_title": "Neue Aktivität"
 }

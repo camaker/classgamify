@@ -54,7 +54,7 @@ test.describe('deterministic AI draft fallback', () => {
     await expect(
       page.getByText(/local deterministic draft was used/i).first()
     ).toBeVisible();
-    await expect(page).toHaveURL(/\/create\/?$/);
+    await expect(page).toHaveURL(/\/dashboard\/activities\/new\/?$/);
 
     const generatedTitle = await titleInput.inputValue();
     expect(generatedTitle.trim()).not.toBe('');
