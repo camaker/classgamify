@@ -2442,7 +2442,7 @@
   "pricing_school_description": "For multiple teachers, campuses, or long-running cohorts, contact us to plan teacher seats, student data handling, template needs, and rollout timing.",
   "pricing_school_eyebrow": "Schools and teams",
   "pricing_school_title": "複数の先生で使うワークスペースが必要ですか？",
-  "pricing_subtitle": "無料で始められます。より多くのアクティビティ、AI 下書き、詳しい結果を備えた有料プランは近日公開予定です。",
+  "pricing_subtitle": "無料で始めて、より多くのアクティビティ、AI 下書き、詳しい結果が必要になったらアップグレードできます。",
   "pricing_title": "ClassGamifyのプラン",
   "pricing_trust_free_preview": "Student preview available",
   "pricing_value_ai_description": "Paid plans will expand around AI creation, remixing, more templates, and result reporting.",
@@ -3144,7 +3144,5 @@
   "activity_new_page_title": "新しいアクティビティ",
   "activity_new_page_description": "ゲームを選び、内容を入力してライブラリに保存します。",
   "activity_library_card_other_games_summary": "別のゲームで遊ぶ",
-  "activity_runner_group_sort_place_prompt": "「{item}」を入れる先：",
-  "pricing_card_coming_soon": "近日公開",
-  "pricing_card_join_waitlist": "ウェイトリストに登録"
+  "activity_runner_group_sort_place_prompt": "「{item}」を入れる先："
 }

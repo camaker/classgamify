@@ -2442,7 +2442,7 @@
   "pricing_school_description": "For multiple teachers, campuses, or long-running cohorts, contact us to plan teacher seats, student data handling, template needs, and rollout timing.",
   "pricing_school_eyebrow": "Schools and teams",
   "pricing_school_title": "여러 교사를 위한 워크스페이스가 필요하신가요?",
-  "pricing_subtitle": "무료로 시작하세요. 더 많은 활동, AI 초안, 자세한 결과를 제공하는 유료 플랜이 곧 출시됩니다.",
+  "pricing_subtitle": "무료로 시작하고, 더 많은 활동, AI 초안, 자세한 결과가 필요하면 업그레이드하세요.",
   "pricing_title": "ClassGamify 요금제",
   "pricing_trust_free_preview": "Student preview available",
   "pricing_value_ai_description": "Paid plans will expand around AI creation, remixing, more templates, and result reporting.",
@@ -3144,7 +3144,5 @@
   "activity_new_page_title": "새 활동",
   "activity_new_page_description": "게임을 고르고 내용을 입력해 라이브러리에 저장하세요.",
   "activity_library_card_other_games_summary": "다른 게임으로 플레이",
-  "activity_runner_group_sort_place_prompt": "‘{item}’ 넣을 곳:",
-  "pricing_card_coming_soon": "출시 예정",
-  "pricing_card_join_waitlist": "대기자 명단에 등록"
+  "activity_runner_group_sort_place_prompt": "‘{item}’ 넣을 곳:"
 }

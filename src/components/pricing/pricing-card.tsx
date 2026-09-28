@@ -91,13 +91,8 @@ export function PricingCard({
       )}
 
       <CardHeader className="gap-2 px-3 sm:px-4">
-        <CardTitle className="flex flex-wrap items-center gap-2">
+        <CardTitle>
           <h3 className="font-medium">{plan.name ?? plan.id}</h3>
-          {plan.comingSoon && !isCurrentPlan ? (
-            <Badge variant="outline" className="rounded-md">
-              {m.pricing_card_coming_soon()}
-            </Badge>
-          ) : null}
         </CardTitle>
         <div className="my-3 flex flex-wrap items-baseline gap-x-2 gap-y-1 sm:my-4">
           <span className="block text-3xl font-semibold sm:text-4xl">
@@ -130,16 +125,6 @@ export function PricingCard({
           >
             {m.pricing_card_your_current_plan()}
           </Button>
-        ) : plan.comingSoon ? (
-          <Link
-            to={Routes.Contact}
-            className={cn(
-              buttonVariants({ variant: 'outline' }),
-              'mt-4 w-full'
-            )}
-          >
-            {m.pricing_card_join_waitlist()}
-          </Link>
         ) : isPaidPlan && price ? (
           currentUser && hasValidPriceId ? (
             <CheckoutButton

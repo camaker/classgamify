@@ -2442,7 +2442,7 @@
   "pricing_school_description": "For multiple teachers, campuses, or long-running cohorts, contact us to plan teacher seats, student data handling, template needs, and rollout timing.",
   "pricing_school_eyebrow": "Schools and teams",
   "pricing_school_title": "هل تحتاج إلى مساحة عمل لعدة معلمين؟",
-  "pricing_subtitle": "ابدأ مجانًا. الخطط المدفوعة التي تضم أنشطة أكثر ومسودات بالذكاء الاصطناعي ونتائج أعمق قادمة قريبًا.",
+  "pricing_subtitle": "ابدأ مجانًا، ثم رقِّ خطتك للحصول على أنشطة أكثر ومسودات بالذكاء الاصطناعي ونتائج أعمق.",
   "pricing_title": "خطط ClassGamify",
   "pricing_trust_free_preview": "Student preview available",
   "pricing_value_ai_description": "Paid plans will expand around AI creation, remixing, more templates, and result reporting.",
@@ -3144,7 +3144,5 @@
   "activity_new_page_title": "نشاط جديد",
   "activity_new_page_description": "اختر لعبة وأضف المحتوى واحفظه في مكتبتك.",
   "activity_library_card_other_games_summary": "العب كلعبة أخرى",
-  "activity_runner_group_sort_place_prompt": "ضع «{item}» في:",
-  "pricing_card_coming_soon": "قريبًا",
-  "pricing_card_join_waitlist": "انضم إلى قائمة الانتظار"
+  "activity_runner_group_sort_place_prompt": "ضع «{item}» في:"
 }
