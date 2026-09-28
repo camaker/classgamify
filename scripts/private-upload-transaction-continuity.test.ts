@@ -69,7 +69,7 @@ test('transaction continuity preserves downstream source references', () => {
 test('product and catalog register private upload transaction continuity', () => {
   assert.match(
     read('docs/product.md'),
-    /private upload transaction continuity chain[\s\S]*30[\s\S]*R2[\s\S]*D1[\s\S]*privacy/i
+    /private upload transaction continuity gate[\s\S]*R2[\s\S]*D1[\s\S]*privacy/i
   );
   assert.match(
     read('tests/e2e/TEST-CATALOG.md'),

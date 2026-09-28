@@ -56,7 +56,7 @@ test('recovery distinguishes absent restored and unconfirmed objects', () => {
 test('product and catalog register source material integrity continuity', () => {
   assert.match(
     read('docs/product.md'),
-    /source-material integrity continuity chain[\s\S]*30[\s\S]*trigger[\s\S]*metadata[\s\S]*R2[\s\S]*privacy/i
+    /source-material integrity continuity gate[\s\S]*trigger[\s\S]*metadata[\s\S]*R2[\s\S]*privacy/i
   );
   assert.match(
     read('tests/e2e/TEST-CATALOG.md'),

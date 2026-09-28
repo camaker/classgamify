@@ -129,7 +129,7 @@ test('activity library filter helpers normalize URL state predictably', () => {
 test('activity library filter state is documented', () => {
   assert.match(
     PRODUCT_SOURCE,
-    /activity-library filter-state chain[\s\S]*30 slices[\s\S]*URL validation[\s\S]*search normalization[\s\S]*dashboard control[\s\S]*list\s+API[\s\S]*privacy guards/,
+    /activity-library filter-state gate[\s\S]*URL validation[\s\S]*search normalization[\s\S]*dashboard control[\s\S]*list\s+API[\s\S]*privacy guards/,
     'docs/product.md should document the filter-state chain.'
   );
   assert.match(

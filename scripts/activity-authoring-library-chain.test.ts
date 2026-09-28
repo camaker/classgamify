@@ -53,7 +53,7 @@ test('activity authoring/library sources preserve product boundaries', () => {
   );
   assert.match(
     PRODUCT_SOURCE,
-    /authoring\/library chain[\s\S]*editor workflow's 30[\s\S]*AI draft source[\s\S]*review[\s\S]*save controls[\s\S]*publish boundaries[\s\S]*teacher\s+notes[\s\S]*storage keys/,
+    /authoring\/library gate[\s\S]*editor workflow order[\s\S]*AI draft source[\s\S]*review[\s\S]*save controls[\s\S]*publish boundaries[\s\S]*teacher\s+notes[\s\S]*storage keys/,
     'docs/product.md should describe the 30-slice editor workflow handoff and its privacy boundary.'
   );
   assert.match(

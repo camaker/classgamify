@@ -95,7 +95,7 @@ const sourceMaterials: Array<
 test('activity source-material summary chain preserves product docs', () => {
   assert.match(
     PRODUCT_SOURCE,
-    /activity-card source-material summary chain[\s\S]*30\s+slices[\s\S]*card summary surface[\s\S]*attached count[\s\S]*material-kind counts[\s\S]*extraction-readiness actions[\s\S]*edit-return path[\s\S]*ActivityContent reference[\s\S]*privacy guards/i,
+    /activity-card source-material summary gate[\s\S]*card summary surface[\s\S]*attached count[\s\S]*material-kind counts[\s\S]*extraction-readiness actions[\s\S]*edit-return path[\s\S]*ActivityContent reference[\s\S]*privacy guards/i,
     'docs/product.md should preserve the activity-card source-material summary chain scope.'
   );
 });

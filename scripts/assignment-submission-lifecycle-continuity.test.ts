@@ -81,7 +81,7 @@ test('public feedback and teacher results hide write-boundary metadata', () => {
 test('product and catalog register submission lifecycle continuity', () => {
   assert.match(
     read('docs/product.md'),
-    /submission lifecycle continuity chain[\s\S]*30[\s\S]*replay[\s\S]*BEFORE INSERT[\s\S]*localized[\s\S]*privacy/i
+    /submission lifecycle continuity gate[\s\S]*replay[\s\S]*BEFORE INSERT[\s\S]*localized[\s\S]*privacy/i
   );
   assert.match(
     read('tests/e2e/TEST-CATALOG.md'),

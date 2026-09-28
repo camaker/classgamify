@@ -29,7 +29,7 @@ const COMPONENT_SOURCE = readFileSync(
 test('assignment list filter-state chain preserves product docs', () => {
   assert.match(
     PRODUCT_SOURCE,
-    /assignment-list filter-state chain[\s\S]*30-slice contract[\s\S]*URL validation[\s\S]*published-share context[\s\S]*search normalization[\s\S]*status parsing[\s\S]*list\s+API[\s\S]*privacy guards/,
+    /assignment-list filter-state gate[\s\S]*URL validation[\s\S]*published-share context[\s\S]*search normalization[\s\S]*status parsing[\s\S]*list\s+API[\s\S]*privacy guards/,
     'docs/product.md should preserve the assignment-list filter-state chain scope.'
   );
 });

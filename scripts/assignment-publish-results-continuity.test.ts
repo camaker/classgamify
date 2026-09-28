@@ -47,7 +47,7 @@ test('teacher results reuse persisted snapshot and attempt evidence', () => {
 test('product and catalog register assignment publish results continuity', () => {
   assert.match(
     read('docs/product.md'),
-    /assignment publish-to-results continuity chain[\s\S]*30[\s\S]*share[\s\S]*submission[\s\S]*result[\s\S]*privacy/i
+    /assignment publish-to-results continuity gate[\s\S]*share[\s\S]*submission[\s\S]*result[\s\S]*privacy/i
   );
   assert.match(
     read('tests/e2e/TEST-CATALOG.md'),

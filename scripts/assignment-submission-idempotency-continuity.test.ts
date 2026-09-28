@@ -78,7 +78,7 @@ test('replay returns persisted sanitized feedback without private keys', () => {
 test('product and catalog register idempotency continuity', () => {
   assert.match(
     read('docs/product.md'),
-    /submission idempotency continuity chain[\s\S]*30[\s\S]*browser key[\s\S]*replay[\s\S]*D1[\s\S]*privacy/i
+    /submission idempotency continuity gate[\s\S]*browser key[\s\S]*replay[\s\S]*D1[\s\S]*privacy/i
   );
   assert.match(
     read('tests/e2e/TEST-CATALOG.md'),

@@ -1830,8 +1830,8 @@ assert.match(
 );
 assert.match(
   mailDocumentationSource,
-  /buildMailTransactionalWorkspaceHandoffView\(\)[\s\S]*30-slice preflight contract[\s\S]*template set[\s\S]*HTML\/plain-text rendering[\s\S]*provider boundaries[\s\S]*no-mutation guarantees[\s\S]*provider-secret[\s\S]*private-data[\s\S]*provider API tokens[\s\S]*result exports/,
-  'Mail docs should document the transactional email handoff privacy contract.'
+  /scripts\/mail-transactional-workspace\.test\.ts`[\s\S]*verify-email[\s\S]*contact-message templates[\s\S]*without sending real\s+mail[\s\S]*localized subject[\s\S]*HTML `lang`[\s\S]*plain-text output[\s\S]*workspace boundary panel[\s\S]*before the\s+action link[\s\S]*legacy copy[\s\S]*shared email layout/,
+  'Mail docs should document the transactional mail render gate and what it checks.'
 );
 assert.doesNotMatch(
   blogPostVisualSource,
@@ -3921,7 +3921,7 @@ assert.match(
 );
 assert.match(
   readFileSync('tests/e2e/TEST-CATALOG.md', 'utf8'),
-  /Assignment source-activity context chain has a fast script-level gate via[\s\S]*scripts\/assignment-source-activity-context-chain\.test\.ts[\s\S]*30-slice\s+result-material\s+boundary/,
+  /Assignment source-activity context chain has a fast script-level gate via[\s\S]*scripts\/assignment-source-activity-context-chain\.test\.ts[\s\S]*result-material\s+boundary/,
   'TEST-CATALOG should document the assignment source-activity context chain gate.'
 );
 assert.match(
@@ -4784,7 +4784,7 @@ const activitySourceExtractionAssistTestCatalogSource = readFileSync(
 );
 assert.match(
   readFileSync('tests/e2e/TEST-CATALOG.md', 'utf8'),
-  /Source extraction lifecycle chain has a fast script-level gate via[\s\S]*scripts\/source-extraction-lifecycle-chain\.test\.ts[\s\S]*30-slice authoring\/library boundary/,
+  /Source\s+extraction\s+lifecycle\s+chain\s+has\s+a\s+fast\s+script-level\s+gate\s+via[\s\S]*scripts\/source-extraction-lifecycle-chain\.test\.ts[\s\S]*authoring\/library\s+boundary\s+that\s+returns\s+extraction\s+output/,
   'TEST-CATALOG should document the source extraction lifecycle chain gate.'
 );
 assert.match(
@@ -4804,7 +4804,7 @@ assert.match(
 );
 assert.match(
   readFileSync('tests/e2e/TEST-CATALOG.md', 'utf8'),
-  /Activity AI enhancement roadmap chain has a fast script-level gate via[\s\S]*scripts\/activity-ai-enhancement-roadmap-chain\.test\.ts[\s\S]*template\s+transforms[\s\S]*distractor write\s+targets[\s\S]*leveled variants[\s\S]*answer\s+explanations[\s\S]*listening\s+scripts[\s\S]*worksheet\/audio\/spreadsheet\s+extraction[\s\S]*source-material privacy[\s\S]*editor-review\/save\/publish boundaries[\s\S]*snapshot\s+protection[\s\S]*result-export continuity/,
+  /Activity\s+AI\s+enhancement\s+roadmap\s+chain\s+has\s+a\s+fast\s+script-level\s+gate\s+via[\s\S]*scripts\/activity-ai-enhancement-roadmap-chain\.test\.ts[\s\S]*template\s+transforms[\s\S]*distractor\s+write\s+targets[\s\S]*leveled\s+variants[\s\S]*answer\s+explanations[\s\S]*listening\s+scripts[\s\S]*worksheet\/audio\/spreadsheet\s+extraction[\s\S]*source-material\s+privacy[\s\S]*editor-review\/save\/publish\s+boundaries[\s\S]*snapshot\s+protection[\s\S]*result-export\s+continuity/,
   'TEST-CATALOG should document the activity AI enhancement roadmap chain gate.'
 );
 const activityAiEnhancementPolicyContent = {
@@ -5149,7 +5149,7 @@ assert.match(
 );
 assert.match(
   readFileSync('docs/product.md', 'utf8'),
-  /src\/activities\/ai-enhancement-execution\.ts` owns the structured execution\s+plan[\s\S]*provider-ready[\s\S]*local-fallback[\s\S]*deterministic-draft[\s\S]*blocked states[\s\S]*editor-only draft targets[\s\S]*provider-call\s+boundaries[\s\S]*snapshot protection[\s\S]*30-slice request-policy handoff/,
+  /src\/activities\/ai-enhancement-execution\.ts` owns the structured execution\s+plan[\s\S]*provider-ready[\s\S]*local-fallback[\s\S]*deterministic-draft[\s\S]*blocked states[\s\S]*editor-only draft targets[\s\S]*provider-call\s+boundaries[\s\S]*snapshot protection[\s\S]*30-item request-policy list/,
   'docs/product.md should document the activity AI enhancement execution owner.'
 );
 assert.match(
@@ -5159,7 +5159,7 @@ assert.match(
 );
 assert.match(
   readFileSync('tests/e2e/TEST-CATALOG.md', 'utf8'),
-  /30-slice\s+policy\s+handoff/,
+  /30-item\s+policy\s+list/,
   'TEST-CATALOG should document the activity AI enhancement policy handoff.'
 );
 const activityAiEnhancementDraftOutputDraft = {
@@ -5410,7 +5410,7 @@ assert.match(
 );
 assert.match(
   readFileSync('docs/product.md', 'utf8'),
-  /src\/activities\/ai-enhancement-draft-application\.ts` owns the editor-only draft application\s+contract[\s\S]*CreateActivityInput validation[\s\S]*field-target coverage[\s\S]*refreshed draft metadata[\s\S]*template readiness[\s\S]*teacher-review\/save\/publish boundaries[\s\S]*result-export continuity[\s\S]*30-slice parsed draft-output handoff/,
+  /src\/activities\/ai-enhancement-draft-application\.ts` owns the editor-only draft application\s+contract[\s\S]*CreateActivityInput validation[\s\S]*field-target coverage[\s\S]*refreshed draft metadata[\s\S]*template readiness[\s\S]*teacher-review\/save\/publish boundaries[\s\S]*result-export continuity[\s\S]*30-item parsed draft-output list/,
   'docs/product.md should document the activity AI enhancement draft application owner.'
 );
 assert.match(
@@ -5420,7 +5420,7 @@ assert.match(
 );
 assert.match(
   readFileSync('tests/e2e/TEST-CATALOG.md', 'utf8'),
-  /30-slice draft-output\s+handoff/,
+  /30-item draft-output\s+list/,
   'TEST-CATALOG should document the activity AI enhancement draft-output handoff.'
 );
 const activityAiEnhancementEditorReviewView =
@@ -5525,7 +5525,7 @@ assert.match(
 );
 assert.match(
   readFileSync('docs/product.md', 'utf8'),
-  /src\/activities\/ai-enhancement-editor-review\.ts` owns the teacher review gate[\s\S]*review checklist coverage[\s\S]*reviewed\/missing check counts[\s\S]*manual-save readiness[\s\S]*editor-only boundaries[\s\S]*snapshot protection[\s\S]*private\s+draft\/source-material privacy[\s\S]*30-slice editor-only draft-application handoff/,
+  /src\/activities\/ai-enhancement-editor-review\.ts` owns the teacher review gate[\s\S]*review checklist coverage[\s\S]*reviewed\/missing check counts[\s\S]*manual-save readiness[\s\S]*editor-only boundaries[\s\S]*snapshot protection[\s\S]*private\s+draft\/source-material privacy[\s\S]*30-item editor-only draft-application list/,
   'docs/product.md should document the activity AI enhancement editor review owner.'
 );
 assert.match(
@@ -5535,7 +5535,7 @@ assert.match(
 );
 assert.match(
   readFileSync('tests/e2e/TEST-CATALOG.md', 'utf8'),
-  /30-slice\s+draft-application\s+handoff/,
+  /30-item\s+draft-application\s+list/,
   'TEST-CATALOG should document the activity AI enhancement draft-application handoff.'
 );
 const activityAiEnhancementSaveBoundaryView =
@@ -5668,7 +5668,7 @@ assert.match(
 );
 assert.match(
   readFileSync('docs/product.md', 'utf8'),
-  /src\/activities\/ai-enhancement-save-boundary\.ts` owns the manual save boundary[\s\S]*teacher save actions[\s\S]*create\/edit save plans[\s\S]*activity-id gates[\s\S]*manual persistence boundaries[\s\S]*snapshot protection[\s\S]*private\s+draft\/source-material privacy[\s\S]*30-slice teacher editor-review handoff/,
+  /src\/activities\/ai-enhancement-save-boundary\.ts` owns the manual save boundary[\s\S]*teacher save actions[\s\S]*create\/edit save plans[\s\S]*activity-id gates[\s\S]*manual persistence boundaries[\s\S]*snapshot protection[\s\S]*private\s+draft\/source-material privacy[\s\S]*30-item teacher editor-review list/,
   'docs/product.md should document the activity AI enhancement save boundary owner.'
 );
 assert.match(
@@ -5678,7 +5678,7 @@ assert.match(
 );
 assert.match(
   readFileSync('tests/e2e/TEST-CATALOG.md', 'utf8'),
-  /30-slice\s+editor-review\s+handoff/,
+  /30-item\s+editor-review\s+list/,
   'TEST-CATALOG should document the activity AI enhancement editor-review handoff.'
 );
 const activityAiEnhancementPublishBoundaryView =
@@ -5852,7 +5852,7 @@ assert.match(
 );
 assert.match(
   readFileSync('docs/product.md', 'utf8'),
-  /src\/activities\/ai-enhancement-publish-boundary\.ts` owns the assignment publish boundary[\s\S]*saved activity records[\s\S]*teacher publish actions[\s\S]*assignment publish preflight[\s\S]*share-link creation\s+boundaries[\s\S]*snapshot freezing[\s\S]*private\s+draft\/source-material privacy[\s\S]*30-slice manual-save handoff/,
+  /src\/activities\/ai-enhancement-publish-boundary\.ts` owns the assignment publish boundary[\s\S]*saved activity records[\s\S]*teacher publish actions[\s\S]*assignment publish preflight[\s\S]*share-link creation\s+boundaries[\s\S]*snapshot freezing[\s\S]*private\s+draft\/source-material privacy[\s\S]*30-item manual-save list/,
   'docs/product.md should document the activity AI enhancement publish boundary owner.'
 );
 assert.match(
@@ -5862,7 +5862,7 @@ assert.match(
 );
 assert.match(
   readFileSync('tests/e2e/TEST-CATALOG.md', 'utf8'),
-  /30-slice\s+manual-save\s+handoff/,
+  /30-item\s+manual-save\s+list/,
   'TEST-CATALOG should document the activity AI enhancement manual-save handoff.'
 );
 assert.match(
@@ -13188,8 +13188,8 @@ assert.match(
 );
 assert.match(
   mailDocsSource,
-  /Transactional email[\s\S]*provider registry[\s\S]*context\.locale[\s\S]*fallback to the base locale[\s\S]*shared workspace boundary panel[\s\S]*buildMailTransactionalWorkspaceHandoffView\(\)[\s\S]*30-slice preflight contract/,
-  'Mail docs should preserve the transactional template, locale, provider, and handoff lifecycle contract.'
+  /Transactional email[\s\S]*provider registry[\s\S]*context\.locale[\s\S]*fallback to the base locale[\s\S]*shared workspace boundary panel[\s\S]*scripts\/mail-transactional-workspace\.test\.ts`[\s\S]*without sending real\s+mail/,
+  'Mail docs should preserve the transactional template, locale, provider, and render-gate lifecycle contract.'
 );
 assert.match(
   mailRenderSource,
@@ -34795,7 +34795,7 @@ assert.match(
 );
 assert.match(
   e2eTestCatalogText,
-  /Printable worksheet review lifecycle chain has a fast script-level gate via[\s\S]*scripts\/printable-worksheet-review-lifecycle-chain\.test\.ts[\s\S]*30-slice\s+printable\s+worksheet\s+handoff\s+boundary/,
+  /Printable worksheet review lifecycle chain has a fast script-level gate via[\s\S]*scripts\/printable-worksheet-review-lifecycle-chain\.test\.ts[\s\S]*printable\s+worksheet\s+boundary/,
   'TEST-CATALOG should document the printable worksheet review lifecycle chain gate.'
 );
 // The root document renders on every public page, so it must not mount

@@ -72,11 +72,11 @@ sitemap/robots/manifest helpers, legacy route retirement, public DOM
 boundaries, or privacy/indexing guards.
 Classroom trust communication chain has a fast script-level gate via
 `pnpm exec tsx --test scripts/classroom-trust-communication-chain.test.ts`;
-run it when changing the 30-slice transactional mail workspace boundary, public
-classroom contact intake, auth workspace entry, transactional mail lifecycle,
-teacher notification settings, hosted billing, legal/provider copy, developer
-configuration secrets, storage source-material boundaries, or public DOM
-handoff boundaries.
+run it when changing the transactional mail workspace boundary, public classroom
+contact intake, auth workspace entry, transactional mail lifecycle, teacher
+notification settings, hosted billing, legal/provider copy, developer
+configuration secrets, storage source-material boundaries, or public DOM handoff
+boundaries.
 Account governance lifecycle chain has a fast script-level gate via
 `pnpm exec tsx --test scripts/account-governance-lifecycle-chain.test.ts`;
 run it when changing auth session and email verification, profile and security
@@ -195,11 +195,10 @@ result answer text views, CSV answer columns, server review summaries, or
 feedback privacy guards.
 Published assignment delivery chain has a fast script-level gate via
 `pnpm exec tsx --test scripts/published-assignment-delivery-chain.test.ts`;
-run it when changing publish preflight, the 30-slice publish control handoff
-boundary, frozen snapshots, share links, assignment list distribution, public
-student rules, lifecycle access,
-validated submissions, attempt persistence, timer duration policy, answer
-feedback, result stats, or results export handoffs.
+run it when changing publish preflight, the 30-item publish control boundary,
+frozen snapshots, share links, assignment list distribution, public student
+rules, lifecycle access, validated submissions, attempt persistence, timer
+duration policy, answer feedback, result stats, or results export handoffs.
 Assignment publish source writes have a fast script-level gate via
 `pnpm exec tsx --test scripts/assignment-publish-source-write-guard-contract.test.ts`;
 run it when changing owner-scoped activity lookup, archive/restore publish
@@ -301,7 +300,7 @@ Assignment lifecycle governance chain has a fast script-level gate via
 run it when changing open/closed/expired/draft status resolution,
 close/reopen transition rules, expired reopen blocking, assignment list status
 filters, share-link availability, public unavailable payloads, submit API
-lifecycle gates, result retention, snapshot retention, the 30-slice public
+lifecycle gates, result retention, snapshot retention, the public
 unavailable-access boundary for lifecycle reasons, hidden runtime and answers,
 blocked submissions, retained results, reopen guidance, indexing, and privacy,
 or other lifecycle privacy guards.
@@ -463,9 +462,9 @@ Assignment source-activity context chain has a fast script-level gate via
 `pnpm exec tsx --test scripts/assignment-source-activity-context-chain.test.ts`;
 run it when changing source-activity snapshot resolution, assignment-list
 search, public student payloads, result headers, CSV source columns, printable
-worksheet fields, source-context chain alignment, the 30-slice result-material
-boundary for teacher copy, CSV preparation, print, current/full data scope,
-snapshot source, and privacy, or other source-context privacy guards.
+worksheet fields, source-context chain alignment, the result-material boundary
+for teacher copy, CSV preparation, print, current/full data scope, snapshot
+source, and privacy, or other source-context privacy guards.
 Assignment attempt stats has a fast script-level gate via
 `pnpm exec tsx --test scripts/assignment-attempt-stats.test.ts`;
 run it when changing completions, average accuracy, average points, average
@@ -556,10 +555,9 @@ limits, compact JSON shape, storage-key omission, or student-payload privacy.
 Source-material privacy chain has a fast script-level gate via
 `pnpm exec tsx --test scripts/source-material-privacy-chain.test.ts`;
 run it when changing storage upload/access, ActivityContent.sourceMaterials
-references, the 30-slice compact material reference handoff boundary, settings
-files, source-material picker, AI draft source notes,
-extraction readiness, public assignment payloads, or student runtime
-source-material metadata guards.
+references, the 30-item compact material reference boundary, settings files,
+source-material picker, AI draft source notes, extraction readiness, public
+assignment payloads, or student runtime source-material metadata guards.
 Assignment result review helpers have a fast script-level gate via
 `pnpm exec tsx --test scripts/assignment-result-review-helpers.test.ts`;
 run it when changing result-page route state, student search normalization,
@@ -639,11 +637,11 @@ run it when changing owner-scoped archive and restore, edit, publish,
 duplicate, and remix gates, server lifecycle enforcement, content and
 source-material retention, assignment snapshot protection, public assignment
 continuity, lifecycle mutation cache refresh, created-panel publish access, the
-30-slice assignment publish boundary that returns restored activities to shared
-publish access, validation, delivery settings, review, snapshot freeze, public
-payload, result policy, and privacy contracts, or archive/restore privacy guards.
-Assignment list filter and distribution boundaries have a fast script-level gate
-via `pnpm exec tsx --test scripts/assignment-list-semantic-views.test.ts`; run
+assignment publish boundary that returns restored activities to shared publish
+access, validation, delivery settings, review, snapshot freeze, public payload,
+result policy, and privacy contracts, or archive/restore privacy guards.
+Assignment list filter and distribution boundaries have a fast script-level gate via
+`pnpm exec tsx --test scripts/assignment-list-semantic-views.test.ts`; run
 it when changing assignment list overview metrics, status/search filters,
 published share context, visible-card counts, or the owner filter scope
 boundary.
@@ -692,32 +690,31 @@ Activity AI authoring chain has a fast script-level gate via
 run it when changing AI source safety, authenticated draft generation,
 deterministic fallback, CreateActivityInput mapping, draft coverage,
 template readiness, quiz-choice readiness, AI remix assist, editor review,
-source-material privacy guards, or save/publish boundaries. The chain also
-carries the 30-slice fallback draft lifecycle for missing credentials, invalid
-provider JSON, sanitized term planning, complete classroom fields, editor
-application, teacher review, persistence boundaries, provider secrets, and
-privacy while its independent source file gate remains intact.
+source-material privacy guards, or save/publish boundaries. The gate also guards
+the fallback draft lifecycle for missing credentials, invalid provider JSON,
+sanitized term planning, complete classroom fields, editor application, teacher
+review, persistence boundaries, provider secrets, and privacy.
 Activity AI fallback draft chain has a fast script-level gate via
-`pnpm exec tsx --test scripts/activity-ai-fallback-draft-chain.test.ts`;
-run it when changing missing Workers AI credentials, invalid provider JSON,
-deterministic local draft generation, source-term planning, fallback padding,
-CreateActivityInput mapping, teacher review, editor application,
-save/publish boundaries, provider-secret guards, or fallback privacy guards.
-The chain also carries the 30-slice authoring/library lifecycle for shared
-create and edit contracts, persistence, teacher-owned library management,
-readiness, lifecycle gates, publish access, snapshot protection, and privacy
-while its independent source file gate remains intact.
+`pnpm exec tsx --test
+scripts/activity-ai-fallback-draft-chain.test.ts`; run it when changing missing
+Workers AI credentials, invalid provider JSON, deterministic local draft
+generation, source-term planning, fallback padding, CreateActivityInput mapping,
+teacher review, editor application, save/publish boundaries, provider-secret
+guards, or fallback privacy guards. The gate also guards the authoring/library
+lifecycle for shared create and edit contracts, persistence, teacher-owned
+library management, readiness, lifecycle gates, publish access, snapshot
+protection, and privacy.
 Activity AI enhancement roadmap chain has a fast script-level gate via
-`pnpm exec tsx --test scripts/activity-ai-enhancement-roadmap-chain.test.ts`;
-run it when changing template transforms, AI remix completion, distractor write
-targets, leveled variants, answer explanations, listening scripts,
-worksheet/audio/spreadsheet extraction, provider and fallback gates,
-source-material privacy, editor-review/save/publish boundaries, snapshot
-protection, public-payload guards, or result-export continuity. The roadmap
-chain also carries the full 30-slice enhancement lifecycle across policy,
-execution, parsed output, editor application, teacher review, manual save,
-publish, snapshots, public payloads, privacy, and result exports while its
-independent source file gate remains intact.
+`pnpm exec tsx --test
+scripts/activity-ai-enhancement-roadmap-chain.test.ts`; run it when changing
+template transforms, AI remix completion, distractor write targets, leveled
+variants, answer explanations, listening scripts, worksheet/audio/spreadsheet
+extraction, provider and fallback gates, source-material privacy,
+editor-review/save/publish boundaries, snapshot protection, public-payload
+guards, or result-export continuity. The roadmap gate also guards the full
+enhancement lifecycle across policy, execution, parsed output, editor
+application, teacher review, manual save, publish, snapshots, public payloads,
+privacy, and result exports.
 Activity AI enhancement policy has a fast script-level gate via
 `pnpm exec tsx --test scripts/activity-ai-enhancement-policy.test.ts`;
 run it when changing teacher-auth gates, deterministic readiness, structured
@@ -728,8 +725,8 @@ Activity AI enhancement execution has a fast script-level gate via
 `pnpm exec tsx --test scripts/activity-ai-enhancement-execution.test.ts`;
 run it when changing provider-ready, local-fallback, deterministic-draft, or
 blocked-reason execution states, editor-only draft targets, source-material
-readiness, provider-call boundaries, fallback stability, auth gates, the
-30-slice policy handoff, or privacy guards.
+readiness, provider-call boundaries, fallback stability, auth gates, the 30-item
+policy list, or privacy guards.
 Activity AI enhancement draft output has a fast script-level gate via
 `pnpm exec tsx --test scripts/activity-ai-enhancement-draft-output.test.ts`;
 run it when changing provider/fallback/deterministic output, parsed draft
@@ -741,26 +738,26 @@ Activity AI enhancement draft application has a fast script-level gate via
 run it when changing execution plans, CreateActivityInput validation,
 editor-only application, field-target coverage, coverage/readiness refresh,
 teacher-review/save/publish boundaries, snapshot protection, public-payload
-continuity, fallback/provider application modes, the 30-slice draft-output
-handoff, or privacy guards.
+continuity, fallback/provider application modes, the 30-item draft-output list,
+or privacy guards.
 Activity AI enhancement editor review has a fast script-level gate via
 `pnpm exec tsx --test scripts/activity-ai-enhancement-editor-review.test.ts`;
 run it when changing teacher review checklists, reviewed/missing check counts,
 manual-save readiness, editor-only boundaries, publish blocking, snapshot
-protection, public-payload guards, source-material privacy, the 30-slice
-draft-application handoff, or privacy guards.
+protection, public-payload guards, source-material privacy, the 30-item
+draft-application list, or privacy guards.
 Activity AI enhancement save boundary has a fast script-level gate via
 `pnpm exec tsx --test scripts/activity-ai-enhancement-save-boundary.test.ts`;
 run it when changing teacher save actions, create/edit save plans, activity-id
 gates, manual persistence boundaries, activity-record targets, publish
 blocking, snapshot protection, result continuity, source-material privacy, the
-30-slice editor-review handoff, or privacy guards.
+30-item editor-review list, or privacy guards.
 Activity AI enhancement publish boundary has a fast script-level gate via
 `pnpm exec tsx --test scripts/activity-ai-enhancement-publish-boundary.test.ts`;
 run it when changing saved activity records, teacher publish actions,
 assignment publish preflight, share-link creation boundaries, snapshot
 freezing, public-payload guards, result continuity, source-material privacy, the
-30-slice manual-save handoff, or privacy guards.
+30-item manual-save list, or privacy guards.
 Activity AI enhancement lifecycle chain has a fast script-level gate via
 `pnpm exec tsx --test scripts/activity-ai-enhancement-lifecycle-chain.test.ts`;
 run it when changing policy-to-publish ordering, draft output handoffs, editor
@@ -772,11 +769,10 @@ Template roadmap capability chain has a fast script-level gate via
 run it when changing roadmap template promises, Wordwall-style templates,
 Liveworksheets-style modes, shared editor scaffolds, AI enhancements, source
 extraction readiness, worksheet delivery, print follow-up, result export
-continuity, or template capability privacy guards. The chain also carries the
-30-slice authoring/library handoff for shared create and edit contracts,
-persistence, owner-scoped library management, readiness, derivative drafts,
-lifecycle gates, publish access, snapshot protection, and privacy while its
-independent source file gate remains intact.
+continuity, or template capability privacy guards. The gate also guards the
+authoring/library path for shared create and edit contracts, persistence,
+owner-scoped library management, readiness, derivative drafts, lifecycle gates,
+publish access, snapshot protection, and privacy.
 Activity authoring/library chain has a fast script-level gate via
 `pnpm exec tsx --test scripts/activity-authoring-library-chain.test.ts`;
 run it when changing public template and worksheet entries, shared editor save,
@@ -789,10 +785,9 @@ run it when changing compact source-material references, material-kind
 classification, extraction readiness action maps, audio/worksheet/spreadsheet
 readiness, source summaries, AI source provenance, ActivityContent write
 targets, editor-review/persistence/publish boundaries, assignment snapshot
-protection, public payload privacy, or the 30-slice authoring/library boundary
-that returns extraction output to shared create/edit, teacher save,
-owner-scoped library, lifecycle, publish access, and snapshot contracts while
-the independent 30-file source gate remains intact.
+protection, public payload privacy, or the authoring/library boundary that
+returns extraction output to shared create/edit, teacher save, owner-scoped
+library, lifecycle, publish access, and snapshot contracts.
 Assignment publish control boundaries have fast script-level gates via
 `pnpm exec tsx --test scripts/assignment-publish-dialog.test.ts`
 and `pnpm exec tsx --test scripts/control-accessibility-contracts.test.ts`;
@@ -819,9 +814,9 @@ persistence guards.
 Scored attempt result lifecycle chain has a fast script-level gate via
 `pnpm exec tsx --test scripts/scored-attempt-result-chain.test.ts`;
 run it when changing the post-submit scored-result boundary, sanitized public
-feedback, attempt stats, teacher result review, the 30-slice attempt review card
-handoff boundary, copy artifacts, CSV export, printable review return links,
-duration display, accepted-answer formatting, or scored-result privacy guards.
+feedback, attempt stats, teacher result review, the attempt review card
+boundary, copy artifacts, CSV export, printable review return links, duration
+display, accepted-answer formatting, or scored-result privacy guards.
 Quiz choice generation has a fast script-level gate via
 `pnpm exec tsx --test scripts/question-choice-generation.test.ts`;
 run it when changing deterministic distractor generation, question option
@@ -840,16 +835,15 @@ run it when changing result-page print actions, teacher-only print routes,
 frozen snapshot handouts, answer-key hidden/included/unavailable states, source
 activity description fields, toolbar toggles, print actions,
 return-to-results links, printable handoff privacy, worksheet delivery chain
-alignment, the 30-slice printable worksheet handoff boundary for handout
-overview, response planning, delivery context, answer-key access, print
-controls, route boundaries, and privacy, or CSV export alignment.
+alignment, the printable worksheet boundary for handout overview, response
+planning, delivery context, answer-key access, print controls, route boundaries,
+and privacy, or CSV export alignment.
 Worksheet-mode delivery chain has a fast script-level gate via
 `pnpm exec tsx --test scripts/worksheet-mode-delivery-chain.test.ts`;
 run it when changing `/worksheets` creation entry points, shared create editor
 scaffolds, assignment snapshots, worksheet-style student runtimes, printable
-handouts and their 30-slice printable worksheet handoff boundary, result
-exports, worksheet extraction boundaries, or source-material
-and student-identity privacy guards.
+handouts and their printable worksheet boundary, result exports, worksheet
+extraction boundaries, or source-material and student-identity privacy guards.
 Student runner play chain has a fast script-level gate via
 `pnpm exec tsx --test scripts/student-runner-play-chain.test.ts`;
 run it when changing the visible submit controls, public
@@ -942,8 +936,8 @@ Verifies the signed-in profile update flow.
 Verifies the core teacher loop from reusable activity creation through
 assignment publishing, student submission, teacher result review, and the
 printable worksheet return path. The persisted browser journey exercises the
-30-slice result-material, result-review, copy-artifact, and printable-worksheet
-handoffs rather than relying only on source-level contract tests.
+result-material, result-review, copy-artifact, and printable-worksheet surfaces
+rather than relying only on source-level tests.
 
 | # | Test name | Flow |
 |---|---|---|
@@ -970,20 +964,20 @@ handoffs rather than relying only on source-level contract tests.
 | 13 | Teacher can copy an activity into a ready template | Sign in, create an activity whose content satisfies multiple template requirements, open `/dashboard/activities`, click a ready `Copy as ...` remix action, verify a new draft activity opens with the target template selected, verify the remixed draft title includes the target template short name without exceeding the activity title limit even from a long source title, and verify the original activity and any existing assignments remain unchanged. |
 | 14 | Answer matching accepts teacher-defined alternatives | Create a fill-blank or listening activity whose answer field contains alternatives separated by `/` or `;`, publish it, submit an answer with different casing or punctuation, and verify scoring treats the accepted alternative as correct while preserving the original review answer and showing the accepted alternatives only after submission. Verify quiz, fill-blank, listening, line-match, matching-pairs, group-sort, and open-box student review feedback all use the shared correct/needs-review presentation so the student's submitted answer, accepted alternatives, and explanations appear whenever answer reveal is enabled, with the feedback exposed as a localized semantic region, status label/value/description relationship, and labelled detail output relationships rather than template-specific text fragments. Verify the teacher results page, copied item review summary, and CSV export also show the accepted alternatives from the assignment snapshot. |
 | 15 | Time-limited assignments show attempt duration | Publish an assignment with a short time limit, verify `/dashboard/assignments` and `/dashboard/assignments/:assignmentId` show the shared settings summary with timer, attempt limit, close time, identity mode, answer reveal, item order, and instructions, open `/play/:shareId`, verify the countdown starts after the playable assignment loads, verify the timer badge has a localized accessible label and description from the same timer state used by the visible countdown, submit an attempt, verify the score panel exposes elapsed time as a localized labelled output with a normalization description, verify direct submissions store duration as whole non-negative seconds capped to the timer, and verify the result page average-time metric, per-attempt duration cells, assignment-list summary stats, and CSV average/duration seconds all use the same normalized duration contract. |
-| 16 | Quiz choices are completed from lesson content | Create or edit a quiz activity with question answers but sparse or missing choices plus vocabulary terms, verify the editor template-readiness panel shows which questions already have explicit choices, which are completed locally from sibling answers or vocabulary, and which still need more candidates before publishing. Verify the same panel exposes a localized 30-slice quiz-choice generation handoff with stable semantic label/value/description output relationships for generation scope, target count, question readiness counts, explicit/local/missing choice counts, sibling/vocabulary candidate counts, candidate source count, answer coverage, missing answers, shared `ActivityQuestionOption[]` write target, deterministic-now/AI-later mode, teacher-review boundary, save-before-publish boundary, completed choice count, explicit answer coverage, local candidate question count, candidate deduplication, candidate normalization, stable choice order, runtime choice source, answer inclusion guard, empty-content guard, and privacy guard before future AI distractor generation is connected, without exposing question prompts, option text, answer text, vocabulary text, raw AI output, or stable ordering seeds. Publish it, open `/play/:shareId`, and verify the quiz renders deterministic multiple-choice options without exposing which option is correct before submission. |
+| 16 | Quiz choices are completed from lesson content | Create or edit a quiz activity with question answers but sparse or missing choices plus vocabulary terms, verify the editor template-readiness panel shows which questions already have explicit choices, which are completed locally from sibling answers or vocabulary, and which still need more candidates before publishing. Verify deterministic quiz-choice generation keeps explicit options, adds stable sibling and vocabulary candidates, keeps every correct answer, deduplicates choices, and writes the result into the shared `ActivityQuestionOption[]` target before future AI distractor generation is connected, without exposing question prompts, option text, answer text, vocabulary text, raw AI output, or stable ordering seeds. Publish it, open `/play/:shareId`, and verify the quiz renders deterministic multiple-choice options without exposing which option is correct before submission. |
 | 17 | Homepage and template routes enter ClassGamify product loops | Open `/`, verify the hero preview and primary actions point to templates or activity creation rather than legacy Hanzi, HSK, worksheet, or skeleton-only routes, verify the public homepage DOM does not render internal handoff markers, audit text, or pageView.handoffView output, without creating assignment links, mutating teacher data, exposing answer keys, student attempt records, raw anonymous tokens, source-material storage keys, or teacher-private activity content, then follow the primary CTA and verify the activity creation page loads. Open `/templates`, verify the template cards describe real classroom modes and content requirements, click a template-specific start action, and verify `/create?template=...&source=templates` loads with that primary template selected, the matching template scaffold already filling the structured fields, and the create page's localized template-entry summary showing the template-directory source, loaded example, playable item count, reusable mode count, and next save/review step. Open `/worksheets`, verify it is a Liveworksheets-style entry page for fill-blank, line-match, listening, and group-sort modes rather than a legacy reset page, click the worksheet-mode actions, and verify they route to `/create?template=fill-blank&source=worksheets`, `/create?template=line-match&source=worksheets`, `/create?template=listening&source=worksheets`, or `/create?template=group-sort&source=worksheets` with the matching scaffold selected and a localized worksheet-entry source explanation. Verify the `/templates` and `/worksheets` public DOM does not render internal handoff markers, audit text, or pageView.handoffView output. Open `/learn`, `/hsk/1`, and a `/hanzi/:character` URL, verify retired legacy learning routes are not mounted as copied lesson UI, remain excluded from active navigation and sitemap targets, and are no longer preserved as legacy product crawler rules in `robots.txt` while active ClassGamify product routes continue to load. Verify sitemap URLs, localized alternates, robots disallow rules, and manifest metadata derive from the shared public product-route registry so active ClassGamify entry points stay indexed while teacher dashboard, student runner, print, and retired legacy paths stay out of public indexing. Open `/roadmap` and `/dashboard`, verify they describe the current usable create-publish-play-results loop rather than stale skeleton-only milestones, verify the roadmap lists teacher-reviewed AI drafts as an available capability instead of a backlog item, verify every roadmap item exposes a localized status badge, teacher-value label, teacher-value text, what-improves-next label, and classroom-direction next step from prepared page-view data rather than internal classroom-evidence or task-board wording, verify the authenticated dashboard top metrics come from the teacher's real activity and assignment summaries while starter/demo content remains only a preview, verify activity and assignment metrics can resolve independently when one query is still loading, verify the dashboard loop-status panel recommends the next teacher action for empty library, publish-needed, distribution, collecting-attempts, and review-ready states with localized status labels and real route targets, and verify every dashboard readiness row includes localized next-step guidance derived from the teacher's real activity, open-link, submitted-attempt, and result-review state. |
 | 17a | Dashboard overview keeps owner metrics separate from the starter preview | Sign in and open `/dashboard`. Verify the dashboard domain exposes a `teacher-dashboard-query-boundary` with separate activity/assignment resolved states, both-ready, both-loading, activity-loading, and assignment-loading branches, and owner counts derived only from resolved owner summaries. Verify starter preview activity and assignment text are not counted as owner metrics and the page renders no hidden `data-handoff` sections. |
 | 18 | Legal pages describe ClassGamify data surfaces | Open `/terms`, `/privacy`, and `/cookie` for `en` and `zh`, verify the pages mention ClassGamify classroom activities, frozen assignment snapshots or assignment links, student attempts, anonymous browser tokens or local runner state where relevant, teacher result summaries or CSV exports where relevant, and AI drafts or source materials where relevant. Verify configured AI-provider examples stay scoped to teacher-reviewed activity drafts, template remixing, distractors, listening scripts, worksheet extraction, and source-material provenance, and do not mention copied Lang Study, getlangstudy, HSK, Hanzi, AI demo product surfaces, unused `fal.ai` image-generation providers, or generic image-generation features. |
 | 19 | Blog and release notes describe ClassGamify | Open `/blog`, each visible `/blog/:slug`, and the generated sitemap, verify public post slugs and cards reference ClassGamify templates, assignment links, AI authoring, teacher results, safe source-material provenance, public runner rule summaries, frozen assignment snapshots, CSV exports, or copied teacher review artifacts as appropriate. Verify old HSK, Hanzi, getlangstudy, copied starter, and handwriting editorial URLs or topics are absent. |
 | 20 | Attempt limits use normalized student identity | Publish an assignment with student names and a max-attempt limit, submit as `Alice`, then try again as ` alice ` or `ALICE` and verify the limit still applies. Publish another assignment with the max-attempt field cleared, submit more than the default cap from the same normalized student identity, and verify the runner, attempt usage message, teacher settings summary, and CSV export continue to show additional attempts allowed. Publish an anonymous assignment, verify the student runner explains that the current browser is the anonymous identity and shows a short anonymous browser label, submit from two browser contexts, and verify the two browser tokens are summarized as separate anonymous students in teacher results without exposing raw tokens. |
 | 21 | Teacher can duplicate an activity safely | Sign in, create a saved activity, click `Duplicate` in `/dashboard/activities`, verify a draft copy opens with the same structured content and `Copy of ...` title, edit the copy, and verify the original activity and its published assignments remain unchanged. |
-| 22 | Teacher can search, filter, and page the activity library | Sign in, create enough saved activities to exceed one library page with distinct titles, descriptions, template types, active and archived visibility, and attached classroom source materials such as audio, spreadsheet, worksheet document, worksheet image, and reference-only video/file references, open `/dashboard/activities`, verify overview cards summarize the full current status-filtered result for matching activities, template-family coverage, activities ready to remix, and source materials ready for extraction rather than only the visible page, verify each overview card exposes a localized description and accessible label for the metric value with a stable label/value/description output relationship, verify the source-extraction overview explains how many matching activities have extractable material, verify the source-material filter explains the selected material type and shows prepared audio-ready, worksheet-ready, and spreadsheet-ready capability count labels from the filtered result, verify the activity-status control explains the selected status and shows prepared active/archived matching count labels from the same owner-scoped search/template/source filters without mixing in starter activities or other teachers' rows, verify the current-view panel summarizes visible activity range, current page, selected lifecycle status, exact template-family scope, source-material scope, and active search scope from the same filtered result with stable semantic scope items, verify the activity-library view model exposes an `owner-activity-library-source-scope` boundary that separates full filtered activity count, overview activity count, and visible page activity count while preserving the normalized search, lifecycle status, template, and source-material filters, verify activity cards expose prepared card, detail, content-count, source-material, compatibility, and action-region labels while card stats, readiness summaries, and the localized 30-slice deterministic template-remix safety handoff render as stable semantic label/value/description items covering current and ready template counts, suggested Copy as actions, locked diagnostics, owner scope, source status, lifecycle gate, ready-target-only target gating, current-template exclusion, visible action limit, draft output, title strategy and limit, template switch, content-clone counts, source-material count/kind/privacy, assignment-snapshot protection, original-activity protection, and privacy guard without exposing prompts, answers, choices, teacher notes, source summaries, filenames, file ids, or storage keys, verify activity cards show localized source-material readiness states for no materials, reference-only materials, and extraction-ready material counts alongside source-material count, material type badges, extraction readiness hints, and localized next-step guidance for audio listening draft input, spreadsheet structured import input, or worksheet extraction input without exposing file ids, storage keys, paths, URLs, permissions, owner metadata, or private file identifiers, verify the result range and next/previous controls, move to page 2 and verify the URL keeps `page`, search by a title keyword and verify the list resets to page 1 with `q`, search by a description or template keyword, verify matching cards and overview cards update, filter by an exact template family such as quiz or group sort and verify the URL keeps `template`, filter by source material such as any extractable source, audio, spreadsheet, or worksheet and verify the URL keeps `source`, verify the overview extraction count, source-filter explanation, status counts, capability counts, current-view panel, cards, pagination, empty state, and clear-filters action all reflect the source-material filtered result, combine source filtering with search, template, or archived status, clear filters, and verify the full library returns. |
+| 22 | Teacher can search, filter, and page the activity library | Sign in, create enough saved activities to exceed one library page with distinct titles, descriptions, template types, active and archived visibility, and attached classroom source materials such as audio, spreadsheet, worksheet document, worksheet image, and reference-only video/file references, open `/dashboard/activities`, verify overview cards summarize the full current status-filtered result for matching activities, template-family coverage, activities ready to remix, and source materials ready for extraction rather than only the visible page, verify each overview card exposes a localized description and accessible label for the metric value with a stable label/value/description output relationship, verify the source-extraction overview explains how many matching activities have extractable material, verify the source-material filter explains the selected material type and shows prepared audio-ready, worksheet-ready, and spreadsheet-ready capability count labels from the filtered result, verify the activity-status control explains the selected status and shows prepared active/archived matching count labels from the same owner-scoped search/template/source filters without mixing in starter activities or other teachers' rows, verify the current-view panel summarizes visible activity range, current page, selected lifecycle status, exact template-family scope, source-material scope, and active search scope from the same filtered result with stable semantic scope items, verify the activity-library view model exposes an `owner-activity-library-source-scope` boundary that separates full filtered activity count, overview activity count, and visible page activity count while preserving the normalized search, lifecycle status, template, and source-material filters, verify activity cards expose prepared card, detail, content-count, source-material, compatibility, and action-region labels while card stats and readiness summaries render as stable semantic label/value/description items, and the deterministic template-remix rules keep current and ready template counts, suggested Copy as actions, locked diagnostics, owner scope, source status, lifecycle gate, ready-target-only target gating, current-template exclusion, visible action limit, draft output, title strategy and limit, template switch, content-clone counts, source-material count/kind/privacy, assignment-snapshot protection, original-activity protection, and privacy guards consistent without exposing prompts, answers, choices, teacher notes, source summaries, filenames, file ids, or storage keys, verify activity cards show localized source-material readiness states for no materials, reference-only materials, and extraction-ready material counts alongside source-material count, material type badges, extraction readiness hints, and localized next-step guidance for audio listening draft input, spreadsheet structured import input, or worksheet extraction input without exposing file ids, storage keys, paths, URLs, permissions, owner metadata, or private file identifiers, verify the result range and next/previous controls, move to page 2 and verify the URL keeps `page`, search by a title keyword and verify the list resets to page 1 with `q`, search by a description or template keyword, verify matching cards and overview cards update, filter by an exact template family such as quiz or group sort and verify the URL keeps `template`, filter by source material such as any extractable source, audio, spreadsheet, or worksheet and verify the URL keeps `source`, verify the overview extraction count, source-filter explanation, status counts, capability counts, current-view panel, cards, pagination, empty state, and clear-filters action all reflect the source-material filtered result, combine source filtering with search, template, or archived status, clear filters, and verify the full library returns. |
 | 23 | Teacher can filter and page the assignment list | Sign in, publish enough assignments to exceed one list page with distinct titles, statuses, and attempts, open `/dashboard/assignments`, verify overview cards summarize the full current filter result for matching assignments, open links, completions, and attempt accuracy rather than only the visible page, verify the open-link, completion, average, and matching-assignment cards expose localized descriptions and accessible labels for the metric value with stable label/value/description output relationships, verify the status filter explains the selected status with localized copy and shows prepared open, closed, expired, and draft count labels from the filtered result, verify the current-view panel summarizes visible assignment range, current page, selected lifecycle status, and active search scope from the same filtered result with stable semantic scope items, verify assignment cards expose prepared card, settings-summary, result-stats, distribution-step, and action-region labels while card stats and distribution steps render as stable semantic label/value/description items, verify the result range and next/previous controls, move to page 2 and verify the URL keeps `page`, search by assignment title, source activity text, or share id and verify the list resets to page 1 with `q`, filter by published, expired, closed, or draft status, verify overview counts, status-filter explanation, status counts, current-view panel, and cards update for the filtered result, clear filters, and verify the full assignment list returns. |
 | 24 | Teacher can archive and restore activities | Sign in, create a saved activity, publish an assignment from it, archive the activity from `/dashboard/activities`, verify it disappears from the active library but the existing assignment and student link still use the frozen snapshot, switch to the archived activity view, verify the status count moves from active to archived under the same search/template/source filters, verify the archived card still exposes prepared card, compatibility, action-region, and restore-required labels, verify activity card actions expose localized action-status labels, verify the compatibility panel exposes the prepared remix action status, verify it still shows its ready and locked template-mode summary while explaining that publishing, duplicating, and template remixing require restore first and does not show those derivative actions, verify any attempted publish-dialog open for the archived activity is blocked by the prepared publish-access status and cannot submit, restore the activity, and verify it returns to the active library as a draft with available publish, duplicate, archive, and ready remix action statuses. |
 | 25 | Contact classroom inquiry uses ClassGamify language | Open `/contact?subject=classroom` for `en` and `zh`, verify the classroom form fields, default message, and inquiry-scope panel ask about learners, class or grade, activity material, assignment routine, template or worksheet needs, and result-review needs. Verify the scope panel also warns teachers to send safe classroom context rather than storage keys, private file URLs, raw student identifiers, or unnecessary personal data. Verify the classroom fields remain separate structured inquiry data for the contact API and email template instead of being folded into a free-text message, verify the contact email subject and template describe ClassGamify classroom/product inquiries, and verify the page and developer-facing mail/env examples do not show copied HSK, Hanzi, Lang Study, getlangstudy, GitHub Actions deploy ownership, fal.ai, or Chinese-level/language-scope wording. |
 | 26 | Billing settings use ClassGamify plan language | Sign in, open `/settings/billing` for `en` and `zh`, verify the page-level workspace billing boundary describes plan access, activity libraries/source-material workflows, assignment rules, result exports, and AI drafting before the current-plan card. Verify the current-plan card describes ClassGamify plans, activity access, classroom routines, saved activity sets, assignment workflow limits, AI drafts, source-material workflows, result exports, hosted billing status, included classroom access, upgrade-path or plan-limit items, and the localized next step for free, paid, lifetime, or no-plan states, and verify it does not mention copied Lang Study, HSK, Hanzi, Chinese-character, or saved-character-list plan copy. Open the hosted payment status return page states where possible and verify the payment page title/description plus processing, success, failed, and timeout copy point back to teacher workspace access with a localized next-step section rather than generic SaaS checkout language. |
 | 27 | Core classroom controls expose accessible descriptions | Sign in and walk `/create`, `/dashboard/activities`, `/dashboard/assignments`, `/dashboard/assignments/:assignmentId`, `/play/:shareId`, and `/print/assignments/:assignmentId`; verify the AI source textarea is described by the safe-source note, source-readiness state, attached-material safety context, source-capability summary, and synced material-note region, verify the AI draft focus and generate controls stay associated with their prepared help text and source-readiness state, and verify activity source/status filters, assignment status filters, result student search, result student sort, item-performance sort, answer-review filter, result metric cards, copy-scope previews, publish-setting inputs and toggles, printable answer-key toggle, student identity input, and submit button are associated with their prepared help text, descriptions, scope summaries, or submit hints through semantic grouping, labelled regions, or `aria-describedby` while continuing to use localized runtime copy. No page renders hidden `data-handoff` audit sections. |
-| 28 | Transactional emails describe teacher workspace boundaries | Render or capture verify-email, forgot-password, subscribe-newsletter, and contact-message emails in a fake mail provider or email preview environment. Verify subjects and bodies describe the ClassGamify teacher workspace, saved activities, source materials, assignment links, student attempts, result records, teacher-reviewed AI drafts, worksheet workflows, and classroom update scope where relevant. Verify every transactional template renders the shared localized workspace-boundary panel for activities/templates, assignment links, student attempts/results, and AI drafts/source materials. Verify the transactional-mail handoff exposes a localized 30-slice preflight contract for template set, verify-email, forgot-password, newsletter, contact-message, localized subjects, HTML language, locale fallback, HTML/plain-text rendering, render-before-send, shared layout, provider registry boundary, boundary panel, activity scope, assignment scope, attempt/result scope, AI draft scope, source-material safety, no file-byte reads, worksheet workflow scope, structured classroom contact fields, action-link placement, no activity mutation, no assignment-link mutation, no attempt mutation, no result export, no learner notification, provider-secret guard, legacy-copy guard, and private-data guard. Verify the handoff privacy contract does not expose recipient names, recipient emails, action URLs, contact message text, raw errors, raw student identifiers, source-material storage keys, provider API tokens, file bytes, learner notifications, product mutations, or result exports. Verify the templates use localized message keys rather than hardcoded copy and do not use generic SaaS, copied starter, Lang Study, HSK, Hanzi, or Website Contact wording. |
+| 28 | Transactional emails describe teacher workspace boundaries | Render or capture verify-email, forgot-password, subscribe-newsletter, and contact-message emails in a fake mail provider or email preview environment. Verify subjects and bodies describe the ClassGamify teacher workspace, saved activities, source materials, assignment links, student attempts, result records, teacher-reviewed AI drafts, worksheet workflows, and classroom update scope where relevant. Verify every transactional template renders the shared localized workspace-boundary panel for activities/templates, assignment links, student attempts/results, and AI drafts/source materials. Verify each template renders its localized subject, the HTML `lang` attribute, HTML and plain-text output, and the shared workspace boundary panel before the action link, without legacy copy. Verify the handoff privacy contract does not expose recipient names, recipient emails, action URLs, contact message text, raw errors, raw student identifiers, source-material storage keys, provider API tokens, file bytes, learner notifications, product mutations, or result exports. Verify the templates use localized message keys rather than hardcoded copy and do not use generic SaaS, copied starter, Lang Study, HSK, Hanzi, or Website Contact wording. |
 | 29 | Notification settings use classroom update boundaries | With newsletter settings enabled, sign in and open `/settings/notifications` for `en` and `zh`; verify the page-level classroom update boundary describes template updates, worksheet workflows, assignment review, and teacher control before the newsletter card. Verify the newsletter card still uses localized ClassGamify update copy and does not imply student assignment reminders, public link behavior changes, learner notifications, source-material reads, activity or assignment mutations, attempt/result changes, raw mutation payloads, raw private data exposure, or generic SaaS announcements. |
 | 30 | Audit-only semantic handoffs stay out of the visible product layout | Sign in and walk `/dashboard`, `/create`, `/dashboard/activities`, `/dashboard/assignments/:assignmentId`, `/settings/profile`, `/settings/security`, `/settings/notifications`, `/settings/files`, and `/settings/billing`. For every `[data-handoff]` audit section, verify the element remains available to semantic automation but uses the shared `sr-only` visual boundary and a one-pixel off-screen layout footprint. Verify dashboard metrics and next actions, activity template badges and remix buttons, assignment result copy/download actions, file upload/table controls, current-plan/upgrade controls, profile/security actions, notification preferences, and AI draft review controls remain visible and operable. Reject any audit panel that consumes page height, exposes internal contract terminology, or displaces the teacher's primary classroom workflow. |
 

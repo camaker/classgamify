@@ -211,7 +211,7 @@ test('assignment source activity context focused gate is documented', () => {
   );
   assert.match(
     TEST_CATALOG_SOURCE,
-    /Assignment source-activity context chain has a fast script-level gate via[\s\S]*scripts\/assignment-source-activity-context-chain\.test\.ts[\s\S]*30-slice\s+result-material\s+boundary/,
+    /Assignment source-activity context chain has a fast script-level gate via[\s\S]*scripts\/assignment-source-activity-context-chain\.test\.ts[\s\S]*result-material\s+boundary/,
     'TEST-CATALOG should document the assignment source-activity context chain gate.'
   );
   assert.match(

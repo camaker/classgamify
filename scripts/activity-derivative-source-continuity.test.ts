@@ -71,7 +71,7 @@ test('source errors preserve safe lifecycle and conflict mappings', () => {
 test('product and catalog register derivative source continuity', () => {
   assert.match(
     read('docs/product.md'),
-    /derivative source continuity chain[\s\S]*30[\s\S]*provenance[\s\S]*revision[\s\S]*independent draft[\s\S]*privacy/i
+    /derivative source continuity gate[\s\S]*provenance[\s\S]*revision[\s\S]*independent draft[\s\S]*privacy/i
   );
   assert.match(
     read('tests/e2e/TEST-CATALOG.md'),

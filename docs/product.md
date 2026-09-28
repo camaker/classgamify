@@ -144,13 +144,14 @@ references are rebuilt from authoritative database filename, content-type, and
 size metadata in the teacher's requested order rather than trusting client
 metadata. Empty reference lists skip the query, duplicate ids stay collapsed,
 and validation never selects R2 keys, permission metadata, URLs, or file bytes.
-The activity source-material write continuity chain should carry this create and
-edit boundary as 30 source-level slices across normalized references, duplicate
+The activity source-material write continuity gate
+(`scripts/activity-source-material-write-continuity.test.ts`) keeps source-level
+guards on this create and edit boundary across normalized references, duplicate
 collapse, reference limits and ordering, owner-scoped batch reads, minimal file
 metadata selects, authoritative reference rebuilding, empty-query bypass,
 all-or-nothing persistence, activity mutation, derivative and publish paths,
-snapshot protection, and privacy. Its aggregate summary must not expose other
-owner rows, R2 keys, permission metadata, or file bytes.
+snapshot protection, and privacy. The guarded paths must not expose other owner
+rows, R2 keys, permission metadata, or file bytes.
 Source-material deletion must preserve the same reference lifecycle. Before
 deleting an owner-scoped `userFiles` object, the server checks both saved activity
 content and frozen assignment snapshots for the file id. Active and archived
@@ -160,13 +161,15 @@ minimal ids, never return activity or snapshot content, and do not inspect stude
 attempts. Teachers can remove ordinary saved-activity references before deleting
 the underlying file, while published snapshot provenance remains retained and
 continues to block deletion.
-The source-material deletion continuity chain should carry this guard as 30
-source-level slices across authenticated file lookup, parallel activity and
-snapshot reference checks, active and archived activity coverage, assignment
-owner joins, compact `json_each` evidence, a single safe in-use response,
-metadata claim and R2 ordering, retained activity content and snapshot
-provenance, and privacy. Its aggregate summary must not expose activity or
-assignment content, student data, or storage keys.
+The source-material deletion continuity gate
+(`scripts/source-material-delete-continuity.test.ts`) keeps source-level guards
+on this deletion path across authenticated file lookup, parallel activity and
+snapshot
+reference checks, active and archived activity coverage, assignment owner joins,
+compact `json_each` evidence, a single safe in-use response, metadata claim and
+R2 ordering, retained activity content and snapshot provenance, and privacy. The
+guarded paths must not expose activity or assignment content, student data, or
+storage keys.
 Source-material reference integrity must also hold when activity saves, assignment
 publishes, and file deletion race. Database write guards recheck owner-scoped file
 existence on activity and frozen-snapshot inserts or content updates, while file
@@ -176,13 +179,14 @@ activity write cannot attach a disappearing object. If R2 reports a delete error
 the server probes object presence: an absent object completes deletion, a present
 object attempts metadata restoration for retry, and an unknown or failed recovery
 stays unavailable rather than allowing a broken classroom reference.
-The source-material integrity continuity chain should carry this write/delete
-race guard as 30 source-level slices across initial reference validation,
+The source-material integrity continuity gate
+(`scripts/source-material-integrity-continuity.test.ts`) keeps source-level
+guards on this write/delete race guard across initial reference validation,
 activity and snapshot insert/update triggers, file metadata delete triggers,
 owner/file matching, guarded metadata claims, R2 deletion and presence probes,
 bounded metadata restoration, localized conflict mapping, single-writer
-ordering, safe recovery failures, and privacy. Its aggregate summary must not
-expose activity or snapshot content, storage keys, or student data.
+ordering, safe recovery failures, and privacy. The guarded paths must not expose
+activity or snapshot content, storage keys, or student data.
 Private source-material uploads must also compensate across the R2 and D1
 boundary. A successful private R2 write is not returned until its owner-scoped
 `userFiles` metadata is persisted. If that insert reports failure, the server
@@ -210,33 +214,33 @@ route validates the id, resolves the key in D1, and then applies the existing
 owner/public access decision before fetching R2. Public shared-folder uploads
 still return their public URL, while neither response exposes owner ids, private
 descriptions, permission metadata, provider metadata, or storage keys.
-The private upload transaction continuity chain should carry this end-to-end
-boundary as 30 source-level stages across upload validation, one R2 `put`, exact
+The private upload transaction continuity gate
+(`scripts/private-upload-transaction-continuity.test.ts`) keeps source-level
+guards on this end-to-end boundary across upload validation, one R2 `put`, exact
 same-key evidence recovery, owner-scoped D1 metadata insertion, ambiguous-commit
 probing, bounded object compensation, safe teacher responses, server-side key
-resolution, downstream source references, and privacy. Its aggregate summary
-must not expose file bytes, R2 object keys, upload markers, teacher owner ids, or
-student data.
-The source-material privacy chain should explicitly carry the compact material
-reference handoff's 30 slices for reference shape, safe file ids and filename
-basenames, content-type, material kind and size normalization, duplicate
-collapse, the 12-reference limit, editor and AI consumers, public-payload
-guards, and privacy. Its aggregate summary must not expose file ids, original
-filenames, file bytes, storage keys, permission metadata, private activity
-content, or student payload file references.
-The source extraction lifecycle should explicitly carry the 30-slice activity
-authoring/library chain so future audio, worksheet, and spreadsheet extraction
-output returns to the shared create and edit contracts, teacher save action,
-owner-scoped library, lifecycle controls, publish access, and assignment
-snapshot protection. Its independent 30-file gate should continue to verify
-the product, activity, AI, storage, settings, assignment, and catalog surfaces
-without becoming a substitute for that downstream product contract.
-The source-material lifecycle continuity chain should connect these boundaries
-as 30 source-level stages from private upload and compact references through
+resolution, downstream source references, and privacy. The guarded paths must
+not expose file bytes, R2 object keys, upload markers, teacher owner ids, or
+student data. The source-material privacy gate
+(`scripts/source-material-privacy-chain.test.ts`) keeps the compact material
+reference boundary's 30 items (`ACTIVITY_SOURCE_MATERIAL_REFERENCE_ITEM_IDS`)
+aligned for reference shape, safe file ids and filename basenames, content-type,
+material kind and size normalization, duplicate collapse, the 12-reference
+limit, editor and AI consumers, public-payload guards, and privacy. The guarded
+paths must not expose file ids, original filenames, file bytes, storage keys,
+permission metadata, private activity content, or student payload file
+references. The source extraction lifecycle gate
+(`scripts/source-extraction-lifecycle-chain.test.ts`) keeps future audio,
+worksheet, and spreadsheet extraction output returning to the shared create and
+edit contracts, teacher save action, owner-scoped library, lifecycle controls,
+publish access, and assignment snapshot protection. The source-material
+lifecycle continuity gate
+(`scripts/source-material-lifecycle-continuity.test.ts`) keeps source-level
+guards on these boundaries from private upload and compact references through
 guarded activity writes, assignment snapshot freezing, protected deletion, R2
 recovery, and privacy. It must retain active, archived, and frozen-snapshot
 references while keeping file bytes, file ids, storage keys, activity content,
-snapshot content, and student data out of its aggregate summary.
+snapshot content, and student data out of every guarded path.
 
 Teachers must be able to reopen and edit saved activities from the activity
 library. Editing uses the same `CreateActivityInput` contract as creation, with
@@ -269,27 +273,30 @@ Individual activity cards should also summarize attached source materials by
 count and material kind, so teachers can see which reusable activities have
 audio, worksheet images, documents, or spreadsheet provenance before reopening
 the editor.
-The activity-card source-material summary chain should explicitly carry 30
-slices for the card summary surface, attached count, material-kind counts,
+The activity-card source-material summary gate
+(`scripts/activity-source-material-summary-chain.test.ts`) keeps source-level
+guards on the card summary surface, attached count, material-kind counts,
 extraction-readiness actions, edit-return path, ActivityContent reference, and
-privacy guards. Its aggregate summary may expose safe counts and material kinds,
-but must not expose filenames, file ids, content types, per-file sizes, file
-bytes, storage keys, permission metadata, or student payload file references.
+privacy guards. The card summary may expose safe counts and material kinds, but
+must not expose filenames, file ids, content types, per-file sizes, file bytes,
+storage keys, permission metadata, or student payload file references.
 Activity library filter parsing and search normalization should also live in
 activity-domain helpers so URL state, dashboard controls, and list API queries
 share the same activity status and template-family rules.
-The activity-library filter-state chain should explicitly carry 30 slices for
-URL validation, default-route elision, NFKC search normalization, whitespace
-collapse, empty-search defaults, owner-scoped search fields, status parsing,
-active and archived lifecycle filters, template parsing, all-template defaults,
-exact template families, source-material filter parsing, all/audio/extractable/
-spreadsheet/worksheet source filters, page parsing, page-size bounds, page reset
-on filter changes, filter preservation on page changes, created-activity return
-context, clear-search and clear-filter controls, dashboard control options, list
-API owner scope, source-material post-filtering, and privacy guards. Its summary
-may expose route state, option labels, safe aggregate match counts, and helper
-contract status, but must not expose activity ids, answer text, private activity
-content, source-material filenames, file ids, storage keys, or student data.
+The activity-library filter-state gate
+(`scripts/activity-library-filter-state-chain.test.ts`) keeps source-level
+guards on URL validation, default-route elision, NFKC search normalization,
+whitespace collapse, empty-search defaults, owner-scoped search fields, status
+parsing, active and archived lifecycle filters, template parsing, all-template
+defaults, exact template families, source-material filter parsing,
+all/audio/extractable/ spreadsheet/worksheet source filters, page parsing,
+page-size bounds, page reset on filter changes, filter preservation on page
+changes, created-activity return context, clear-search and clear-filter
+controls, dashboard control options, list API owner scope, source-material
+post-filtering, and privacy guards. Its summary may expose route state, option
+labels, safe aggregate match counts, and helper contract status, but must not
+expose activity ids, answer text, private activity content, source-material
+filenames, file ids, storage keys, or student data.
 Teachers can soft-archive activities from the active library and restore them
 later from an archived view. Archiving hides an activity from the default
 library and prevents casual republishing, but it does not delete structured
@@ -305,14 +312,15 @@ restore guidance. Owner mismatches use the same safe activity-not-found response
 as the initial lookup. Active draft, private, public, and unlisted activities
 remain publishable, existing assignment snapshots remain unchanged, and trigger
 markers, source content, teacher identity, and material metadata stay private.
-The assignment publish source continuity chain should carry this write guard as
-30 source-level slices across authenticated teacher scope, owner-scoped source
-reads, restore-before-publish checks, publish validation and delivery settings,
-the assignment/snapshot transaction, D1 `BEFORE INSERT` owner and archive
-guards, rollback, localized error mapping, published delivery, existing snapshot
-retention, results, and privacy. Its aggregate summary must not expose activity
-content, assignment ids, teacher owner ids, source-material metadata, or internal
-trigger markers.
+The assignment publish source continuity gate
+(`scripts/assignment-publish-source-continuity.test.ts`) keeps source-level
+guards on this write guard across authenticated teacher scope, owner-scoped
+source reads, restore-before-publish checks, publish validation and delivery
+settings, the assignment/snapshot transaction, D1 `BEFORE INSERT` owner and
+archive guards, rollback, localized error mapping, published delivery, existing
+snapshot retention, results, and privacy. The guarded paths must not expose
+activity content, assignment ids, teacher owner ids, source-material metadata,
+or internal trigger markers.
 Activity lifecycle governance should flow through shared domain helpers across
 library cards, edit access, publish dialogs, duplicate/remix draft creation, and
 server functions, so UI affordances and backend enforcement keep the same
@@ -326,13 +334,14 @@ overwrite a newer content or lifecycle change. Zero-row updates reload the curre
 owner-scoped lifecycle state so specific restore/archive guidance remains intact;
 otherwise teachers receive a localized reload-before-retry conflict. These writes
 do not mutate existing assignment snapshots, attempts, or public student links.
-The activity mutation continuity chain should carry this edit/archive/restore
-contract as 30 source-level slices across owner-scoped reads, lifecycle checks,
+The activity mutation continuity gate
+(`scripts/activity-mutation-continuity.test.ts`) keeps source-level guards on
+this edit/archive/restore contract across owner-scoped reads, lifecycle checks,
 monotonic `updatedAt` allocation, activity/owner/visibility/revision
 compare-and-set predicates, guarded content and visibility updates,
 single-statement `UPDATE ... RETURNING`, zero-row conflict reloads, derivative
-and publish gates, assignment snapshot retention, and privacy. Its aggregate
-summary must not expose activity ids, teacher owner ids, activity content,
+and publish gates, assignment snapshot retention, and privacy. The guarded paths
+must not expose activity ids, teacher owner ids, activity content,
 source-material metadata, or assignment records.
 Activity duplicate and template-remix inserts should keep the same write-time
 source discipline. A derivative draft stores only an internal source activity id
@@ -344,24 +353,24 @@ copying stale content. Normal activity creation has no source provenance, active
 draft/private/public/unlisted sources remain derivable, and later source changes
 do not mutate an already-created independent draft. Provenance ids, revisions,
 source content, teacher identity, and material metadata remain private.
-The activity derivative source continuity chain should carry this duplicate and
-template-remix write guard as 30 source-level slices across owner-scoped source
-reads, lifecycle and readiness checks, source id/revision provenance, D1
+The activity derivative source continuity gate
+(`scripts/activity-derivative-source-continuity.test.ts`) keeps source-level
+guards on this duplicate and template-remix write guard across owner-scoped
+source reads, lifecycle and readiness checks, source id/revision provenance, D1
 `BEFORE INSERT` pair, owner, archive, and exact revision guards, safe error
 mapping, independent draft persistence, later source changes, future publishing,
-and privacy. Its aggregate summary must not expose provenance ids or revisions,
+and privacy. The guarded paths must not expose provenance ids or revisions,
 activity content, teacher owner ids, source-material metadata, or internal
 trigger markers.
 The activity lifecycle governance chain should send restored activities back
 through the shared publish dialog: publish access, field validation, delivery
 settings, review checklist, snapshot freeze, public-payload, and result-policy
-contracts. Its independent 30-file gate should continue to verify archive,
-restore, edit, duplicate, remix, retention, and snapshot surfaces.
-The activity authoring-to-publish continuity chain should connect this teacher
-workflow as 30 source-level stages from public template entry and editor save
+contracts. The activity authoring-to-publish continuity gate
+(`scripts/activity-authoring-publish-continuity.test.ts`) keeps source-level
+guards on this teacher workflow from public template entry and editor save
 through owner-scoped library search, filters and pagination, atomic edit,
 archive and restore, guarded duplicate/remix drafts, assignment publishing,
-snapshot isolation, and privacy. Its aggregate summary must not expose activity
+snapshot isolation, and privacy. The guarded paths must not expose activity
 content, source provenance, source-material metadata, teacher owner ids,
 assignment snapshot content, or student data.
 
@@ -385,12 +394,12 @@ running in local E2E mode with the test secret; public lookup, student identity,
 partial-submit confirmation, scoring, attempt persistence, feedback, and result
 rendering must continue through production paths. The fixture route must never
 insert attempts or activate in production.
-The authoring/library chain should explicitly carry the editor workflow's 30
-prepared slices for workflow order, create and edit surfaces, templates,
-scaffolds, AI draft source, structured content, source materials, review
-readiness, save controls, authentication, publish boundaries, and privacy. Its
-handoff summary must not expose raw editor input, prompts, answers, teacher
-notes, filenames, file ids, or storage keys.
+The authoring/library gate (`scripts/activity-authoring-library-chain.test.ts`)
+keeps source-level guards on the editor workflow order, create and edit
+surfaces, templates, scaffolds, AI draft source, structured content, source
+materials, review readiness, save controls, authentication, publish boundaries,
+and privacy. The editor workflow must not expose raw editor input, prompts,
+answers, teacher notes, filenames, file ids, or storage keys.
 The public template directory should act as a real creation entry point:
 teachers can start from any template card and land in `/create` with that
 primary template selected and its template-specific scaffold loaded, while the
@@ -443,8 +452,9 @@ control slices for title, instructions, attempt limit, timer, close time,
 delivery toggles, preview state, frozen-link status, rule stats, settings
 summary, review checklist, validation, field limits, and publish action state.
 Prepared field/help and preview/checklist relationships should use an opaque
-control scope, while aggregate handoffs omit generated control ids, assignment
-copy, raw settings, student data, answers, and source-material storage keys.
+control scope, while the control boundary omits generated control ids,
+assignment copy, raw settings, student data, answers, and source-material
+storage keys.
 Assignment item ordering is also delivery policy. Shuffle behavior should use a
 stable assignment-domain helper keyed by the share link so the same frozen
 assignment loads in a predictable order while preserving the original snapshot
@@ -464,10 +474,8 @@ consistent across publish success panels, list cards, and result pages. The
 assignment distribution lifecycle chain should make sure copied and previewed
 links open the focused student-runner start screen: title, key rule chips,
 name field, and the first question, all built from the sanitized public
-payload. Its independent 30-file gate should continue to verify post-publish
-context, owner lookup, share actions, print, and result surfaces. The
-assignment list should remain searchable as teachers reuse
-the product across classes: teachers can filter their own assignments by title,
+payload. The assignment list should remain searchable as teachers reuse the
+product across classes: teachers can filter their own assignments by title,
 share id, source activity text, or assignment status without broadening outside
 the current owner. It should also paginate from the same authenticated list API
 so teachers with many class links can move through bounded result pages without
@@ -482,9 +490,10 @@ card layout alone.
 Assignment list filter parsing and search normalization should live in
 assignment-domain helpers so route URLs, list API filters, and dashboard filter
 controls stay aligned.
-The assignment-list filter-state chain should expose a hidden, localized
-30-slice contract covering URL validation, default route elision,
-published-share context normalization and preservation, search normalization,
+The assignment-list filter-state gate
+(`scripts/assignment-list-filter-state-chain.test.ts`) keeps source-level guards
+covering URL validation, default route elision, published-share context
+normalization and preservation, search normalization,
 assignment-title/share-id/source-activity search fields, status parsing and
 published-to-open aliasing, page parsing, page-size boundaries, filter-change
 page reset, page-change filter preservation, clear controls, dashboard controls,
@@ -495,9 +504,7 @@ runtime content, raw tokens, result export rows, source storage keys, student
 answers, or teacher-only answers.
 The assignment source activity context chain should keep frozen source title,
 description, template, and snapshot provenance connected to teacher copy text,
-the CSV export, and the printable worksheet. Its independent 30-file gate
-should continue to verify list search, public summaries, result headers, export,
-and print surfaces.
+the CSV export, and the printable worksheet.
 Teachers can close and reopen published assignment links without changing the
 frozen snapshot, so public student access and submissions respect the assignment
 lifecycle while existing attempts remain available for review. Assignment
@@ -518,21 +525,19 @@ never overwrites a newer teacher action. Successful transitions advance the
 revision monotonically even when requests share the same millisecond, while
 snapshots, attempts, results, share links, and assignment settings remain
 unchanged.
-The assignment status transition continuity chain should carry this atomic
-close/reopen contract as 30 source-level slices across owner-scoped reads,
-lifecycle validation, monotonic `updatedAt` allocation, assignment/owner/status/
-revision compare-and-set predicates, reopen expiry conditions, single-statement
-`UPDATE ... RETURNING`, zero-row conflict reloads, public access, retained
-snapshots and attempts, teacher results, and privacy. Its aggregate summary must
-not expose assignment ids, teacher owner ids, share slugs, activity content,
-student identity, or answer text.
-The assignment lifecycle governance chain should explicitly carry the 30-slice
-public unavailable-access handoff so closed, expired, draft, and missing links
-share lifecycle reasons, student-safe messages, hidden runtime content and
-answers, blocked submissions, retained teacher results, reopen guidance,
-noindex policy, and privacy guards. Its independent 30-file gate should continue
-to verify status, list, public lookup, submission, snapshot, result, and export
-surfaces without substituting for that unavailable-state product contract.
+The assignment status transition continuity gate
+(`scripts/assignment-status-transition-continuity.test.ts`) keeps source-level
+guards on this atomic close/reopen contract across owner-scoped reads, lifecycle
+validation, monotonic `updatedAt` allocation, assignment/owner/status/ revision
+compare-and-set predicates, reopen expiry conditions, single-statement `UPDATE
+... RETURNING`, zero-row conflict reloads, public access, retained snapshots and
+attempts, teacher results, and privacy. The guarded paths must not expose
+assignment ids, teacher owner ids, share slugs, activity content, student
+identity, or answer text. The assignment lifecycle governance gate
+(`scripts/assignment-lifecycle-governance-chain.test.ts`) keeps closed, expired,
+draft, and missing links sharing lifecycle reasons, student-safe messages,
+hidden runtime content and answers, blocked submissions, retained teacher
+results, reopen guidance, noindex policy, and privacy guards.
 
 Public student links must return a sanitized assignment payload only while the
 assignment is open. Closed or expired links do not expose runtime content, and
@@ -565,10 +570,10 @@ helpers.
 The student identity lifecycle should also keep runtime item identity
 consistent across template/runtime scope: normalized and unique runtime ids,
 collision and blank-id guards, submission validation, browser answers, scoring
-lookups, teacher results, public payload, and frozen snapshot boundaries. Its
-aggregate identity summary must not expose runtime item ids,
-prompts, choices, answer text, student names, raw browser tokens, teacher-only
-answers, or source-material metadata.
+lookups, teacher results, public payload, and frozen snapshot boundaries.
+Identity guards must not expose runtime item ids, prompts, choices, answer text,
+student names, raw browser tokens, teacher-only answers, or source-material
+metadata.
 
 Student runners should use the runtime item kind and template type to choose the
 interaction. Multiple-choice questions and match-up pairs render as tap/click
@@ -579,9 +584,9 @@ Open-box uses a reveal-card flow where students choose a box, answer the prompt,
 and move between boxes.
 Line-match board state should expose the same prepared connection counts,
 selection readiness, exclusive-choice policy, review-feedback visibility, and
-privacy guards as stable hidden semantic outputs, without copying prompt text,
-choice text, answer text, runtime item ids, student identity, or source
-material metadata into the handoff summary.
+privacy guards in the shared board view model, without copying prompt text,
+choice text, answer text, runtime item ids, student identity, or source material
+metadata into the rendered board.
 Listening uses a browser-spoken track flow that hides the transcript until
 review, then records the student's selected or typed answer against the same
 question item. The spoken track should set the browser speech language from the
@@ -616,13 +621,15 @@ and attempt-limit gates, while a genuinely new attempt still receives a new key
 and follows the normal lifecycle, limit, validation, scoring, and persistence
 flow. Submission keys remain private persistence metadata and never appear in
 public result payloads or teacher exports.
-The submission idempotency continuity chain should carry this contract as 30
-source-level slices across browser key creation, retry reuse, assignment and
-new-attempt resets, normalized identity matching, replay-first server recovery,
-new-submit lifecycle and attempt-limit gates, deterministic scoring, D1
-uniqueness, concurrent conflict recovery, sanitized feedback, teacher results,
-and privacy. Its aggregate summary must not expose submission keys, attempt ids,
-student names, anonymous tokens, payload rows, answer text, or teacher answers.
+The submission idempotency continuity gate
+(`scripts/assignment-submission-idempotency-continuity.test.ts`) keeps
+source-level guards on this contract across browser key creation, retry reuse,
+assignment and new-attempt resets, normalized identity matching, replay-first
+server recovery, new-submit lifecycle and attempt-limit gates, deterministic
+scoring, D1 uniqueness, concurrent conflict recovery, sanitized feedback,
+teacher results, and privacy. The guarded paths must not expose submission keys,
+attempt ids, student names, anonymous tokens, payload rows, answer text, or
+teacher answers.
 Finite assignments should additionally keep a finite attempt concurrency
 contract. Each new scored attempt reserves the next normalized identity attempt
 slot, and D1 uniquely scopes that slot by assignment, identity, and attempt
@@ -650,14 +657,15 @@ time. Only confirmed identity-slot unique conflicts may enter the bounded
 recount loop; lifecycle and unrelated database errors must not be mistaken for
 slot contention. Internal trigger markers, identity slots, answers, and student
 identity remain outside public responses and teacher exports.
-The submission lifecycle continuity chain should carry this write guard as 30
-source-level slices across replay-first recovery, initial lifecycle validation,
-runtime answer checks, deterministic scoring, attempt-slot reservation, D1
-`BEFORE INSERT` status and expiry guards, database-clock evaluation, error cause
-classification, localized closed/expired responses, bounded slot recounts,
-teacher results, and privacy. Its aggregate summary must not expose internal
-trigger markers, identity keys, attempt numbers, submission keys, student names,
-anonymous tokens, or answer text.
+The submission lifecycle continuity gate
+(`scripts/assignment-submission-lifecycle-continuity.test.ts`) keeps
+source-level guards on this write guard across replay-first recovery, initial
+lifecycle validation, runtime answer checks, deterministic scoring, attempt-slot
+reservation, D1 `BEFORE INSERT` status and expiry guards, database-clock
+evaluation, error cause classification, localized closed/expired responses,
+bounded slot recounts, teacher results, and privacy. The guarded paths must not
+expose internal trigger markers, identity keys, attempt numbers, submission
+keys, student names, anonymous tokens, or answer text.
 Student progress counts, browser submission payloads, and incomplete-submit
 decisions should be derived from shared assignment-domain helpers, not
 per-template route math, so every runner counts answered items, submits frozen
@@ -734,24 +742,26 @@ assignment-domain formatting for submitted dates and accepted-answer
 alternatives so teacher-facing tables, review cards, and offline records stay
 consistent. This keeps the results loop useful for deciding what to explain
 again after homework.
-The submitted-date continuity chain should explicitly carry the copy artifact
-handoff as 30 slices spanning classroom and review scope, four teacher copy
-artifacts, latest-attempt details, last-submitted and duration context, priority
-ordering, artifact previews, normalized copy lines, and privacy. Its aggregate
-summary must not expose raw completed-at values, student labels or names,
-anonymous tokens, student answers, copy artifact text, or CSV data URLs.
-The accepted-answer continuity chain should explicitly carry the result review
-handoff as 30 slices spanning review status and next steps, search and sort
+The submitted-date continuity gate
+(`scripts/assignment-result-submitted-date-chain.test.ts`) keeps source-level
+guards on teacher copy artifacts spanning classroom and review scope, four
+teacher copy artifacts, latest-attempt details, last-submitted and duration
+context, priority ordering, artifact previews, normalized copy lines, and
+privacy. The guarded paths must not expose raw completed-at values, student
+labels or names, anonymous tokens, student answers, copy artifact text, or CSV
+data URLs. The accepted-answer continuity gate
+(`scripts/assignment-result-accepted-answer-chain.test.ts`) keeps source-level
+guards on result review spanning review status and next steps, search and sort
 controls, answer-review filters, matched and copy scope, copy previews, CSV
 actions, route state, current-review and full-export boundaries, and privacy.
-Its aggregate summary must not expose prompts, runtime item ids, student
-answers, student names, teacher answers, or CSV data URLs.
-The explanation continuity chain should explicitly carry the result material
-handoff as 30 slices spanning current review scope, matched result counts, copy
-actions and previews, CSV preparation and answer columns, worksheet and answer
-key printing, current-review and full-assignment data scopes, snapshot sources,
-and privacy. Its aggregate summary must not expose prompts, runtime item ids,
-student answers, student names, teacher explanation text, or CSV data URLs.
+The guarded paths must not expose prompts, runtime item ids, student answers,
+student names, teacher answers, or CSV data URLs. The explanation continuity
+gate (`scripts/assignment-result-explanation-chain.test.ts`) keeps source-level
+guards on result materials spanning current review scope, matched result counts,
+copy actions and previews, CSV preparation and answer columns, worksheet and
+answer key printing, current-review and full-assignment data scopes, snapshot
+sources, and privacy. The guarded paths must not expose prompts, runtime item
+ids, student answers, student names, teacher explanation text, or CSV data URLs.
 Assignment attempt metrics such as completions, average accuracy, average
 points, and average duration should be computed through shared assignment-domain
 stats helpers before they reach assignment lists, result pages, classroom
@@ -776,27 +786,25 @@ The worksheet-mode delivery chain should end at that visible print page: student
 fields, response planning, choice banks, writing areas, answer lines, delivery
 context, answer-key access, and the print action, without exposing prompt,
 choice, answer-key, student-response, student-identity, or source-material
-storage-key text in its aggregate summary.
+storage-key text.
 The printable worksheet review lifecycle chain should keep the visible print
 page connected to teacher result review: response planning, delivery context,
-answer-key access, results return, and print controls. Its independent 30-file
-gate should continue to verify result actions, teacher-only print routes, frozen
-snapshot rendering, answer-key states, navigation, and export alignment.
+answer-key access, results return, and print controls.
 The local persisted browser journey should complete this same teacher loop in
 one data set: save an activity, publish an assignment, submit a student attempt,
 review and filter the result, copy a classroom brief, download the full CSV,
 open the printable worksheet, explicitly include the teacher answer key, and
 return to results. It should verify the result-material, result-review,
-copy-artifact, and printable-worksheet 30-slice handoffs in the rendered DOM so
-the source contracts remain connected to the real Activity -> Assignment ->
-Attempt -> Results workflow.
-The assignment publish-to-results continuity chain should also connect this
-runtime path as 30 source-level stages from delivery settings and snapshot
-freezing through share-link distribution, sanitized student play, submission
-validation, guarded attempt persistence, teacher result analysis, copy/export/
-print actions, and privacy. Its aggregate summary must not expose attempt ids,
-student identity, runtime item ids, answer text, teacher answer keys,
-source-material metadata, or storage keys.
+copy-artifact, and printable-worksheet surfaces in the rendered DOM so the
+source-level guards remain connected to the real Activity -> Assignment ->
+Attempt -> Results workflow. The assignment publish-to-results continuity gate
+(`scripts/assignment-publish-results-continuity.test.ts`) keeps source-level
+guards on this runtime path from delivery settings and snapshot freezing through
+share-link distribution, sanitized student play, submission validation, guarded
+attempt persistence, teacher result analysis, copy/export/ print actions, and
+privacy. The guarded paths must not expose attempt ids, student identity,
+runtime item ids, answer text, teacher answer keys, source-material metadata, or
+storage keys.
 The teacher result page should show the student summary, the top reteach
 priorities, and the full item performance table so a teacher can scan the
 class before opening individual student answers. The full item performance
@@ -831,21 +839,23 @@ anonymous tokens.
 
 AI-assisted creation drafts teacher-reviewable `CreateActivityInput` payloads.
 The AI layer must not bypass the activity editor or persist content directly.
-The AI review-to-publish continuity chain should connect this boundary as 30
-source-level stages from sanitized teacher source and authenticated draft
+The AI review-to-publish continuity gate
+(`scripts/activity-ai-review-publish-continuity.test.ts`) keeps source-level
+guards on this boundary from sanitized teacher source and authenticated draft
 generation through deterministic fallback, editor-only application, required
 teacher review, manual activity save, explicit assignment publish, snapshot
-protection, result-export continuity, and privacy. Its aggregate summary must
-not expose raw source or provider output, prompts, answers, file bytes, storage
-keys, share slugs, or student data, and it must never persist or publish without
-separate teacher actions.
-The AI authoring chain should explicitly carry the 30-slice deterministic
-fallback draft chain across missing credentials, invalid provider JSON, source
-sanitization, material-note omission, safe provenance, term planning, complete
-classroom fields, CreateActivityInput mapping, metadata and readiness previews,
-editor application, teacher review, save and publish boundaries, and provider
-secret guards. Its aggregate summary must not expose raw source text, material
-notes, file ids, storage keys, provider output, answer text, or API tokens.
+protection, result-export continuity, and privacy. The guarded paths must not
+expose raw source or provider output, prompts, answers, file bytes, storage
+keys, share slugs, or student data, and they must never persist or publish
+without separate teacher actions. The AI authoring gate
+(`scripts/activity-ai-authoring-chain.test.ts`) keeps source-level guards on the
+deterministic fallback draft path across missing credentials, invalid provider
+JSON, source sanitization, material-note omission, safe provenance, term
+planning, complete classroom fields, CreateActivityInput mapping, metadata and
+readiness previews, editor application, teacher review, save and publish
+boundaries, and provider secret guards. The guarded paths must not expose raw
+source text, material notes, file ids, storage keys, provider output, answer
+text, or API tokens.
 Teachers should always see and edit the generated title, learning goal,
 vocabulary, questions, answer explanations, pairs, groups, and notes before
 saving. AI draft responses should also expose a lightweight coverage summary:
@@ -909,10 +919,11 @@ Implementation boundaries:
   local-fallback, deterministic-draft, or blocked states while preserving
   editor-only draft targets, structured blocked reasons, provider-call
   boundaries, privacy guards, save/publish boundaries, and snapshot protection.
-  Its final boundary explicitly carries the 30-slice request-policy handoff so
-  teacher authentication, source readiness, deterministic prechecks, structured
-  targets, provider posture, editor review, save/publish isolation, snapshot
-  protection, and public-payload privacy cannot be skipped during execution.
+  Its final boundary explicitly carries the 30-item request-policy list
+  (`ACTIVITY_AI_ENHANCEMENT_POLICY_ITEM_IDS`) so teacher authentication, source
+  readiness, deterministic prechecks, structured targets, provider posture,
+  editor review, save/publish isolation, snapshot protection, and public-payload
+  privacy cannot be skipped during execution.
 - `src/activities/ai-enhancement-draft-output.ts` owns parsed AI enhancement draft output
   before editor application: provider/fallback/deterministic output source
   tracking, CreateActivityInput parsing, normalized output counts, template
@@ -923,33 +934,39 @@ Implementation boundaries:
   field-target coverage, refreshed draft metadata, template readiness,
   source-provenance counts, teacher-review/save/publish boundaries, privacy
   guards, snapshot protection, and result-export continuity. Its final boundary
-  explicitly carries the 30-slice parsed draft-output handoff so provider,
-  fallback, and deterministic outputs cannot skip parsing, schema validation,
-  normalized coverage, readiness previews, editor-only targeting, or private
-  output and source-material guards before application.
+  explicitly carries the 30-item parsed draft-output list
+  (`ACTIVITY_AI_ENHANCEMENT_DRAFT_OUTPUT_ITEM_IDS`) so provider, fallback, and
+  deterministic outputs cannot skip parsing, schema validation, normalized
+  coverage, readiness previews, editor-only targeting, or private output and
+  source-material guards before application.
 - `src/activities/ai-enhancement-editor-review.ts` owns the teacher review gate
   after draft application and before manual save: review checklist coverage,
   reviewed/missing check counts, manual-save readiness, editor-only boundaries,
   publish blocking, snapshot protection, public-payload guards, and private
   draft/source-material privacy. Its final boundary explicitly carries the
-  30-slice editor-only draft-application handoff so invalid or incomplete
-  application plans cannot bypass CreateActivityInput validation, field-target
-  coverage, refreshed readiness, source privacy, or save/publish isolation when
-  entering teacher review.
+  30-item editor-only draft-application list
+  (`ACTIVITY_AI_ENHANCEMENT_DRAFT_APPLICATION_ITEM_IDS`) so invalid or
+  incomplete application plans cannot bypass CreateActivityInput validation,
+  field-target coverage, refreshed readiness, source privacy, or save/publish
+  isolation when entering teacher review.
 - `src/activities/ai-enhancement-save-boundary.ts` owns the manual save boundary
   after teacher review: teacher save actions, create/edit save plans,
   activity-id gates, manual persistence boundaries, activity-record targets,
   publish blocking, snapshot protection, result continuity, and private
   draft/source-material privacy. Its final boundary explicitly carries the
-  30-slice teacher editor-review handoff so incomplete checklists, invalid draft
-  applications, hidden source details, or missing teacher confirmation cannot
-  reach create/edit persistence, assignment publishing, or snapshot mutation.
+  30-item teacher editor-review list
+  (`ACTIVITY_AI_ENHANCEMENT_EDITOR_REVIEW_ITEM_IDS`) so incomplete checklists,
+  invalid draft applications, hidden source details, or missing teacher
+  confirmation cannot reach create/edit persistence, assignment publishing, or
+  snapshot mutation.
 - `src/activities/ai-enhancement-publish-boundary.ts` owns the assignment publish boundary
   after a reviewed AI enhancement draft is saved: saved activity records,
   teacher publish actions, assignment publish preflight, share-link creation
   boundaries, snapshot freezing, public-payload guards, result continuity, and
   private draft/source-material privacy. Its final boundary explicitly carries
-  the 30-slice manual-save handoff so review completion alone cannot publish:
+  the 30-item manual-save list
+  (`ACTIVITY_AI_ENHANCEMENT_SAVE_BOUNDARY_ITEM_IDS`) so review completion alone
+  cannot publish:
   a persisted activity record, saved activity id, valid assignment preflight,
   and explicit teacher publish action remain required before creating a link or
   freezing a new snapshot.
@@ -967,13 +984,15 @@ Production should still configure `CLOUDFLARE_ACCOUNT_ID` and
 
 ## Near-Term Template Roadmap
 
-The template roadmap capability chain should explicitly carry the 30-slice
-authoring/library chain across public template entries, the shared create and
-edit contract, persistence, owner-scoped library search and filters, readiness
-summaries, derivative drafts, archive and restore gates, publish access, and
-assignment snapshot protection. Its aggregate summary must not expose prompts,
-answers, teacher notes, raw editor input, source-material filenames, file ids,
-or storage keys, and it must not create assignment links without teacher action.
+The template roadmap capability gate
+(`scripts/template-roadmap-capability-chain.test.ts`) keeps source-level guards
+on the authoring/library path across public template entries, the shared create
+and edit contract, persistence, owner-scoped library search and filters,
+readiness summaries, derivative drafts, archive and restore gates, publish
+access, and assignment snapshot protection. The guarded paths must not expose
+prompts, answers, teacher notes, raw editor input, source-material filenames,
+file ids, or storage keys, and they must not create assignment links without
+teacher action.
 
 - Wordwall-style: quiz, match-up, group sort, matching pairs, open box.
 - Liveworksheets-style: fill blanks, worksheet layout, first listening prompts,

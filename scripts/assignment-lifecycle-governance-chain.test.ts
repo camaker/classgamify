@@ -89,7 +89,7 @@ test('product docs and lifecycle helpers preserve status governance', () => {
   );
   assert.match(
     PRODUCT_SOURCE,
-    /assignment\s+lifecycle\s+governance\s+chain[\s\S]*30-slice\s+public\s+unavailable-access\s+handoff[\s\S]*closed,\s+expired,\s+draft,\s+and\s+missing[\s\S]*runtime\s+content[\s\S]*submissions[\s\S]*results[\s\S]*privacy/,
+    /assignment\s+lifecycle\s+governance\s+gate[\s\S]*closed,\s+expired,\s+draft,\s+and\s+missing[\s\S]*runtime\s+content[\s\S]*submissions[\s\S]*results[\s\S]*privacy/,
     'docs/product.md should route unavailable lifecycle states through the shared public unavailable-access contract.'
   );
   assert.match(
@@ -350,7 +350,7 @@ test('assignment lifecycle governance focused gate is documented', () => {
 
   assert.match(
     TEST_CATALOG_SOURCE,
-    /Assignment lifecycle governance chain has a fast script-level gate via[\s\S]*scripts\/assignment-lifecycle-governance-chain\.test\.ts[\s\S]*30-slice\s+public\s+unavailable-access\s+boundary/,
+    /Assignment lifecycle governance chain has a fast script-level gate via[\s\S]*scripts\/assignment-lifecycle-governance-chain\.test\.ts[\s\S]*public\s+unavailable-access\s+boundary/,
     'TEST-CATALOG should document the assignment lifecycle governance chain gate.'
   );
   assert.match(

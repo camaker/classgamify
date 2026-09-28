@@ -130,7 +130,7 @@ test('worksheet-mode delivery chain focused gate is documented', () => {
   );
   assert.match(
     normalizedCatalog,
-    /\/worksheets[\s\S]*shared create editor[\s\S]*assignment snapshots[\s\S]*worksheet-style student runtimes[\s\S]*printable handouts[\s\S]*30-slice printable worksheet handoff boundary[\s\S]*result exports/,
+    /\/worksheets[\s\S]*shared create editor[\s\S]*assignment snapshots[\s\S]*worksheet-style student runtimes[\s\S]*printable handouts[\s\S]*printable worksheet boundary[\s\S]*result exports/,
     'TEST-CATALOG should document the worksheet-mode chain scope.'
   );
 });

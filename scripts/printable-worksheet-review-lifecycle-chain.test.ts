@@ -229,12 +229,12 @@ test('printable worksheet sources preserve snapshot, delivery, and review alignm
 test('printable worksheet review lifecycle focused gate is documented', () => {
   assert.match(
     PRODUCT_SOURCE,
-    /printable\s+worksheet\s+review\s+lifecycle\s+chain[\s\S]*visible\s+print\s+page[\s\S]*answer-key\s+access[\s\S]*print\s+controls[\s\S]*independent\s+30-file\s+gate/,
+    /printable\s+worksheet\s+review\s+lifecycle\s+chain[\s\S]*visible\s+print\s+page[\s\S]*answer-key\s+access[\s\S]*print\s+controls/,
     'docs/product.md should carry printable review through the visible print page while retaining the source-file gate.'
   );
   assert.match(
     TEST_CATALOG_SOURCE,
-    /Printable worksheet review lifecycle chain has a fast script-level gate via[\s\S]*scripts\/printable-worksheet-review-lifecycle-chain\.test\.ts[\s\S]*30-slice\s+printable\s+worksheet\s+handoff\s+boundary/,
+    /Printable worksheet review lifecycle chain has a fast script-level gate via[\s\S]*scripts\/printable-worksheet-review-lifecycle-chain\.test\.ts[\s\S]*printable\s+worksheet\s+boundary/,
     'TEST-CATALOG should document the printable worksheet review lifecycle gate.'
   );
   assert.match(

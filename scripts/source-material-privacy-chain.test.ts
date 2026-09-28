@@ -138,7 +138,7 @@ test('source-material privacy chain focused gate is documented', () => {
 
   assert.match(
     PRODUCT_SOURCE,
-    /source-material privacy chain[\s\S]*compact material[\s\S]*30 slices[\s\S]*safe file ids[\s\S]*12-reference limit[\s\S]*must not expose file ids[\s\S]*storage keys[\s\S]*student payload file references/,
+    /source-material\s+privacy\s+gate[\s\S]*compact\s+material[\s\S]*30\s+items[\s\S]*safe\s+file\s+ids[\s\S]*12-reference\s+limit[\s\S]*must\s+not\s+expose\s+file\s+ids[\s\S]*storage keys[\s\S]*student payload file references/,
     'docs/product.md should describe the compact material-reference handoff and file privacy boundary.'
   );
   assert.match(
@@ -148,7 +148,7 @@ test('source-material privacy chain focused gate is documented', () => {
   );
   assert.match(
     normalizedCatalog,
-    /storage upload\/access[\s\S]*ActivityContent\.sourceMaterials[\s\S]*30-slice compact material reference handoff boundary[\s\S]*settings files[\s\S]*source-material picker[\s\S]*AI draft source notes[\s\S]*student runtime[\s\S]*source-material metadata guards/,
+    /storage upload\/access[\s\S]*ActivityContent\.sourceMaterials[\s\S]*30-item compact material reference boundary[\s\S]*settings files[\s\S]*source-material picker[\s\S]*AI draft source notes[\s\S]*student runtime[\s\S]*source-material metadata guards/,
     'TEST-CATALOG should document the cross-module source-material privacy chain scope.'
   );
 });

@@ -204,7 +204,7 @@ test('activity AI enhancement execution gate is wired into docs and domain cover
   );
   assert.match(
     PRODUCT_SOURCE,
-    /src\/activities\/ai-enhancement-execution\.ts` owns the structured execution\s+plan[\s\S]*30-slice request-policy handoff/,
+    /src\/activities\/ai-enhancement-execution\.ts` owns the structured execution\s+plan[\s\S]*30-item request-policy list/,
     'docs/product.md should document the AI enhancement execution owner.'
   );
   assert.match(
@@ -214,7 +214,7 @@ test('activity AI enhancement execution gate is wired into docs and domain cover
   );
   assert.match(
     TEST_CATALOG_SOURCE,
-    /30-slice\s+policy\s+handoff/,
+    /30-item\s+policy\s+list/,
     'TEST-CATALOG should document the policy handoff.'
   );
 });
