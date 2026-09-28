@@ -908,8 +908,8 @@ verified users.
 | # | Test name | Flow |
 |---|---|---|
 | 1 | Guests are redirected from dashboard | Open `/dashboard` while signed out, expect redirect to `/auth/login`, and verify the email input is visible. |
-| 2 | Verified user can sign in | Create an E2E user, mark it verified, sign in through `/auth/login`, and verify dashboard content. |
-| 3 | User can register from UI | Fill `/auth/register`, verify the registration success message, mark the test account verified, sign in through `/auth/login`, and verify dashboard content. |
+| 2 | Verified user can sign in | Create an E2E user, mark it verified, sign in through `/auth/login`, and verify the Teacher dashboard heading, the Create activity and Open activity library actions, and the empty-workspace "Start by creating a reusable activity." next step. |
+| 3 | User can register from UI | Fill `/auth/register`, verify the "Check your email to verify your teacher workspace" success status, mark the test account verified, sign in through `/auth/login`, and verify dashboard content. |
 | 4 | Non-admin cannot view admin pages | Sign in as a non-admin user, open `/admin/users`, and expect redirect to `/dashboard`. |
 | 5 | Admin can view users dashboard | Sign in as an admin E2E user, open `/admin/users`, and verify the users dashboard shows the admin email. |
 
