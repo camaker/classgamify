@@ -137,11 +137,7 @@ function PricingPage() {
             </h2>
             <p className="text-muted-foreground">{pageView.faq.description}</p>
           </div>
-          <Accordion
-            type="single"
-            collapsible
-            className="rounded-lg border px-4"
-          >
+          <Accordion className="rounded-lg border px-4">
             {pageView.faq.items.map((item) => (
               <AccordionItem
                 aria-label={item.ariaLabel}

@@ -4,13 +4,13 @@
   "home_hero_browse_templates": "Explorar plantillas",
   "home_hero_browse_templates_aria_label": "Explorar las plantillas de ClassGamify antes de crear una actividad.",
   "home_hero_description": "Crea actividades de clase gamificadas, publica enlaces de tareas y revisa los intentos del alumnado a partir del mismo contenido estructurado.",
-  "home_hero_introduction": "Actividades de clase al estilo Wordwall",
+  "home_hero_introduction": "Juegos de clase para docentes",
   "home_hero_play_sample": "Probar el ejemplo",
   "home_hero_primary": "Crear actividad",
   "home_hero_primary_aria_label": "Crear una actividad reutilizable de ClassGamify en el editor compartido.",
   "home_hero_preview_label": "Una actividad de ejemplo real para explorar",
   "home_hero_secondary": "Crear ficha de ejercicios",
-  "home_hero_secondary_aria_label": "Crear una actividad al estilo Liveworksheets desde los modos de ficha de ejercicios.",
+  "home_hero_secondary_aria_label": "Explora los modos de ficha interactiva de ClassGamify.",
   "home_hero_title": "Convierte la práctica de clase en un juego",
   "home_feature_aria_label": "{title}: {description}",
   "home_feature_section_aria_label": "{title}: {description}",
@@ -23,6 +23,6 @@
   "home_features_items_item_3_title": "Enlaces de tareas",
   "home_features_items_item_4_description": "Revisa puntuaciones, rendimiento por pregunta, respuestas aceptadas, prioridades de refuerzo y resúmenes de seguimiento.",
   "home_features_items_item_4_title": "Resultados para docentes",
-  "home_features_subtitle": "Ciclo de clase",
+  "home_features_subtitle": "Cómo funciona",
   "home_features_title": "Herramientas de actividades"
 }

@@ -141,6 +141,7 @@ export const websiteConfig: WebsiteConfig = {
           isFree: false,
           isLifetime: false,
           popular: true,
+          comingSoon: true,
           get name() {
             return m.pricing_plans_pro_name();
           },
@@ -167,6 +168,7 @@ export const websiteConfig: WebsiteConfig = {
           ],
           isFree: false,
           isLifetime: true,
+          comingSoon: true,
           get name() {
             return m.pricing_plans_lifetime_name();
           },

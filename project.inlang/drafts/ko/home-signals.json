@@ -1,6 +1,6 @@
 {
   "home_signal_aria_label": "{label}: {value}. {description}",
-  "home_signal_delivery_description": "활동의 고정 사본과 배포 규칙을 함께 유지하는 과제 링크를 게시합니다.",
+  "home_signal_delivery_description": "활동과 수업 설정을 함께 담은 학생 링크를 게시하세요.",
   "home_signal_delivery_label": "배포",
   "home_signal_delivery_value": "공유 링크",
   "home_signal_panel_aria_label": "{title}: {description}",

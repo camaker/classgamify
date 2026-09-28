@@ -1,13 +1,13 @@
 ---
-title: Designing the Wordwall-style activity loop
+title: Designing a reusable classroom activity loop
 description: How ClassGamify separates reusable teacher content, game templates, assignment links, and result review.
 date: 2026-07-02
 category: Templates
 image: https://classgamify.com/og.png
 ---
 
-The important lesson from Wordwall is not just that activities feel playful. The
-real product loop is that one teacher-owned set of lesson material can become
+The important lesson from classroom game tools is not just that activities feel
+playful. The real product loop is that one teacher-owned set of lesson material can become
 several classroom experiences without being rewritten every time.
 
 ClassGamify is built around that loop:

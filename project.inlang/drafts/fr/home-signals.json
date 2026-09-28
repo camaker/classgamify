@@ -1,6 +1,6 @@
 {
   "home_signal_aria_label": "{label} : {value}. {description}",
-  "home_signal_delivery_description": "Publiez des liens de devoir qui conservent ensemble la copie figée de l’activité et ses règles de diffusion.",
+  "home_signal_delivery_description": "Publiez des liens élèves qui gardent l'activité et vos réglages de classe ensemble.",
   "home_signal_delivery_label": "Diffusion",
   "home_signal_delivery_value": "Lien à partager",
   "home_signal_panel_aria_label": "{title} : {description}",

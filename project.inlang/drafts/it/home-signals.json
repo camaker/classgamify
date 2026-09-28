@@ -1,6 +1,6 @@
 {
   "home_signal_aria_label": "{label}: {value}. {description}",
-  "home_signal_delivery_description": "Pubblica link dei compiti che mantengono insieme la copia stabile dell’attività e le regole di consegna.",
+  "home_signal_delivery_description": "Pubblica link per gli studenti che tengono insieme attività e impostazioni della classe.",
   "home_signal_delivery_label": "Consegna",
   "home_signal_delivery_value": "Link da condividere",
   "home_signal_panel_aria_label": "{title}: {description}",
