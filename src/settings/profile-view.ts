@@ -1,8 +1,4 @@
 import type { DashboardBreadcrumbItem } from '@/components/layout/dashboard-header';
-import {
-  buildSettingsAccountWorkspaceHandoffView,
-  type SettingsAccountWorkspaceHandoffView,
-} from '@/settings/account-handoff';
 import { m } from '@/locale/paraglide/messages';
 
 type SettingsProfileWorkspaceSummaryItemId =
@@ -20,7 +16,6 @@ export type SettingsProfileWorkspaceSummaryItemView = {
 export type SettingsProfileWorkspaceSummaryView = {
   ariaLabel: string;
   description: string;
-  handoffView: SettingsAccountWorkspaceHandoffView;
   itemViews: SettingsProfileWorkspaceSummaryItemView[];
   title: string;
 };
@@ -57,9 +52,6 @@ function buildSettingsProfileWorkspaceSummaryView(): SettingsProfileWorkspaceSum
       title,
     }),
     description,
-    handoffView: buildSettingsAccountWorkspaceHandoffView({
-      page: 'profile',
-    }),
     itemViews: [
       {
         description:

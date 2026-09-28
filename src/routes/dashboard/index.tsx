@@ -2,7 +2,6 @@ import {
   assignmentListActionCopy,
   buildAssignmentListCardViewModel,
 } from '@/assignments/list-view';
-import { DashboardOverviewHandoffPanel } from '@/components/dashboard/dashboard-overview-handoff-panel';
 import { DashboardOverviewLoopStatusPanel } from '@/components/dashboard/dashboard-overview-loop-status-panel';
 import { DashboardOverviewMetricCard } from '@/components/dashboard/dashboard-overview-metric-card';
 import { DashboardLayout } from '@/components/layout/dashboard-layout';
@@ -87,8 +86,6 @@ function DashboardPage() {
         </section>
 
         <DashboardOverviewLoopStatusPanel view={pageView.loopStatus} />
-
-        <DashboardOverviewHandoffPanel view={pageView.handoffView} />
 
         {recentAssignments.length > 0 ? (
           <section className="grid gap-3">

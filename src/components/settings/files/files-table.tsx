@@ -1,7 +1,5 @@
 import { m } from '@/locale/paraglide/messages';
 import { DataTablePagination } from '@/components/data-table/data-table-pagination';
-import { FilesMaterialClassificationHandoff } from '@/components/settings/files/files-material-classification-handoff';
-import { FilesSourceMaterialHandoffPanel } from '@/components/settings/files/files-source-material-handoff-panel';
 import { Button, buttonVariants } from '@/components/ui/button';
 import {
   Dialog,
@@ -38,8 +36,6 @@ import {
   buildUserFileMaterialSummaryItems,
   type UserFileMaterialSummary,
 } from '@/storage/file-summary';
-import { buildSettingsFilesMaterialClassificationHandoffView } from '@/settings/files-material-classification-view';
-import { buildSettingsFilesSourceMaterialHandoffView } from '@/settings/files-view';
 import {
   buildUserFileIdAccessPath,
   type UserFileClientItem,
@@ -150,37 +146,6 @@ export function FilesTable({
   const materialSummary = useMemo(
     () => summary ?? buildUserFileMaterialSummary(data),
     [data, summary]
-  );
-  const handoffView = useMemo(
-    () =>
-      buildSettingsFilesSourceMaterialHandoffView({
-        loading,
-        pageIndex,
-        pageSize,
-        summary: materialSummary,
-        total,
-        uploading,
-        visibleItemCount: data.length,
-      }),
-    [
-      data.length,
-      loading,
-      materialSummary,
-      pageIndex,
-      pageSize,
-      total,
-      uploading,
-    ]
-  );
-  const materialClassificationHandoffView = useMemo(
-    () =>
-      buildSettingsFilesMaterialClassificationHandoffView({
-        sampleFile: data[0],
-        summary: materialSummary,
-        total,
-        visibleItemCount: data.length,
-      }),
-    [data, materialSummary, total]
   );
   const columns: ColumnDef<UserFileClientItem>[] = useMemo(
     () => [
@@ -437,11 +402,6 @@ export function FilesTable({
       </div>
 
       <FilesSummaryStrip summary={materialSummary} />
-
-      <FilesSourceMaterialHandoffPanel view={handoffView} />
-      <FilesMaterialClassificationHandoff
-        view={materialClassificationHandoffView}
-      />
 
       <div className="relative flex flex-col gap-4 overflow-auto">
         <div className="overflow-hidden rounded-lg border">

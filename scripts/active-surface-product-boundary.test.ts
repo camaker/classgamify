@@ -14,10 +14,6 @@ import { AUTH_WORKSPACE_HANDOFF_ITEM_IDS } from '@/auth/workspace-boundary';
 import { CONTACT_CLASSROOM_INTAKE_HANDOFF_ITEM_IDS } from '@/contact/inquiry-view';
 import { DEVELOPER_CONFIGURATION_HANDOFF_ITEM_IDS } from '@/config/developer-configuration-handoff';
 import { MAIL_TRANSACTIONAL_WORKSPACE_HANDOFF_ITEM_IDS } from '@/mail/workspace-boundary';
-import { PAYMENT_STATUS_HANDOFF_ITEM_IDS } from '@/payment/payment-status-view';
-import { SETTINGS_ACCOUNT_WORKSPACE_HANDOFF_ITEM_IDS } from '@/settings/account-handoff';
-import { SETTINGS_BILLING_WORKSPACE_HANDOFF_ITEM_IDS } from '@/settings/billing-view';
-import { SETTINGS_NOTIFICATION_UPDATE_HANDOFF_ITEM_IDS } from '@/settings/notifications-view';
 
 const TEST_CATALOG_SOURCE = readFileSync('tests/e2e/TEST-CATALOG.md', 'utf8');
 const SECRET_CHECKOUT_SESSION = 'checkout-session-secret';
@@ -135,19 +131,9 @@ test('active surface source inventory stays tied to existing 30-slice focused co
     ['contact', CONTACT_CLASSROOM_INTAKE_HANDOFF_ITEM_IDS.length],
     ['developer-config', DEVELOPER_CONFIGURATION_HANDOFF_ITEM_IDS.length],
     ['mail', MAIL_TRANSACTIONAL_WORKSPACE_HANDOFF_ITEM_IDS.length],
-    ['payment-callback', PAYMENT_STATUS_HANDOFF_ITEM_IDS.length],
-    ['settings-account', SETTINGS_ACCOUNT_WORKSPACE_HANDOFF_ITEM_IDS.length],
-    ['settings-billing', SETTINGS_BILLING_WORKSPACE_HANDOFF_ITEM_IDS.length],
-    [
-      'settings-notifications',
-      SETTINGS_NOTIFICATION_UPDATE_HANDOFF_ITEM_IDS.length,
-    ],
   ]);
 
-  assert.deepEqual(
-    [...focusedContractLengths.values()],
-    [30, 30, 30, 30, 30, 30, 30, 30, 30]
-  );
+  assert.deepEqual([...focusedContractLengths.values()], [30, 30, 30, 30, 30]);
 
   for (const filePath of ACTIVE_SURFACE_PRODUCT_BOUNDARY_SOURCE_FILES) {
     assert.ok(existsSync(filePath), `Missing active surface file ${filePath}`);

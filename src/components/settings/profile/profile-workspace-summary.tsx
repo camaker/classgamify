@@ -1,8 +1,4 @@
 import type {
-  SettingsAccountWorkspaceHandoffItemView,
-  SettingsAccountWorkspaceHandoffView,
-} from '@/settings/account-handoff';
-import type {
   SettingsProfileWorkspaceSummaryItemView,
   SettingsProfileWorkspaceSummaryView,
 } from '@/settings/profile-view';
@@ -29,7 +25,6 @@ export function ProfileWorkspaceSummary({
           <ProfileWorkspaceSummaryItem itemView={itemView} key={itemView.id} />
         ))}
       </ul>
-      <AccountWorkspaceHandoff handoffView={view.handoffView} />
     </section>
   );
 }
@@ -48,76 +43,5 @@ function ProfileWorkspaceSummaryItem({
         {itemView.description}
       </p>
     </li>
-  );
-}
-
-function AccountWorkspaceHandoff({
-  handoffView,
-}: {
-  handoffView: SettingsAccountWorkspaceHandoffView;
-}) {
-  const titleId = 'settings-account-workspace-handoff-title';
-  const descriptionId = 'settings-account-workspace-handoff-description';
-
-  return (
-    <section
-      aria-describedby={descriptionId}
-      aria-labelledby={titleId}
-      className="sr-only"
-      data-handoff="settings-account-workspace"
-      data-handoff-scope={handoffView.privacy.scope}
-    >
-      <div>
-        <h3 className="font-medium text-sm" id={titleId}>
-          {handoffView.title}
-        </h3>
-        <p className="mt-1 text-muted-foreground text-sm" id={descriptionId}>
-          {handoffView.description}
-        </p>
-      </div>
-      <dl className="grid gap-2 md:grid-cols-2">
-        {handoffView.itemViews.map((itemView) => (
-          <AccountWorkspaceHandoffItem itemView={itemView} key={itemView.id} />
-        ))}
-      </dl>
-    </section>
-  );
-}
-
-function AccountWorkspaceHandoffItem({
-  itemView,
-}: {
-  itemView: SettingsAccountWorkspaceHandoffItemView;
-}) {
-  const labelId = `settings-account-workspace-handoff-${itemView.id}-label`;
-  const valueId = `settings-account-workspace-handoff-${itemView.id}-value`;
-  const descriptionId = `settings-account-workspace-handoff-${itemView.id}-description`;
-
-  return (
-    <div
-      className="rounded-md border bg-background px-3 py-2"
-      data-handoff-item={itemView.id}
-    >
-      <dt className="font-medium text-xs" id={labelId}>
-        {itemView.label}
-      </dt>
-      <dd className="mt-1">
-        <output
-          aria-describedby={descriptionId}
-          aria-label={itemView.ariaLabel}
-          aria-labelledby={`${labelId} ${valueId}`}
-          className="text-sm"
-          id={valueId}
-        >
-          {itemView.value}
-        </output>
-        <p
-          className="mt-1 text-muted-foreground text-xs leading-5"
-          id={descriptionId}
-        >
-          {itemView.description}
-        </p>
-      </dd>
-    </div>
   );
 }

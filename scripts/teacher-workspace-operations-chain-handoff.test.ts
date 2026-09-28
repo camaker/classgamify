@@ -3,10 +3,7 @@ import { existsSync, readFileSync } from 'node:fs';
 import test from 'node:test';
 import { ACCOUNT_GOVERNANCE_LIFECYCLE_CHAIN_HANDOFF_ITEM_IDS } from '@/auth/account-governance-lifecycle-chain';
 import { ACTIVE_SURFACE_PRODUCT_BOUNDARY_ITEM_IDS } from '@/config/active-surface-product-boundary';
-import {
-  DASHBOARD_OVERVIEW_HANDOFF_ITEM_IDS,
-  buildDashboardOverviewPageViewModel,
-} from '@/dashboard/overview';
+import { buildDashboardOverviewPageViewModel } from '@/dashboard/overview';
 import {
   TEACHER_WORKSPACE_OPERATIONS_CHAIN_HANDOFF_ITEM_IDS,
   TEACHER_WORKSPACE_OPERATIONS_CHAIN_SOURCE_FILES,
@@ -16,13 +13,6 @@ import {
 } from '@/dashboard/teacher-workspace-operations-chain';
 import { overwriteGetLocale } from '@/locale/paraglide/runtime';
 import { Routes } from '@/lib/routes';
-import { PAYMENT_STATUS_HANDOFF_ITEM_IDS } from '@/payment/payment-status-view';
-import { SETTINGS_ACCOUNT_WORKSPACE_HANDOFF_ITEM_IDS } from '@/settings/account-handoff';
-import { SETTINGS_BILLING_WORKSPACE_HANDOFF_ITEM_IDS } from '@/settings/billing-view';
-import { SETTINGS_FILES_MATERIAL_CLASSIFICATION_HANDOFF_ITEM_IDS } from '@/settings/files-material-classification-view';
-import { SETTINGS_FILES_SOURCE_MATERIAL_HANDOFF_ITEM_IDS } from '@/settings/files-view';
-import { SETTINGS_NOTIFICATION_UPDATE_HANDOFF_ITEM_IDS } from '@/settings/notifications-view';
-import { SETTINGS_SECURITY_WORKSPACE_HANDOFF_ITEM_IDS } from '@/settings/security-handoff';
 
 overwriteGetLocale(() => 'en');
 
@@ -49,30 +39,6 @@ const ASSIGNMENT_LIST_QUERY_SOURCE = readFileSync(
 );
 const ACCOUNT_GOVERNANCE_SOURCE = readFileSync(
   'src/auth/account-governance-lifecycle-chain.ts',
-  'utf8'
-);
-const SETTINGS_SECURITY_SOURCE = readFileSync(
-  'src/settings/security-handoff.ts',
-  'utf8'
-);
-const SETTINGS_FILES_SOURCE = readFileSync(
-  'src/settings/files-view.ts',
-  'utf8'
-);
-const SETTINGS_FILES_CLASSIFICATION_SOURCE = readFileSync(
-  'src/settings/files-material-classification-view.ts',
-  'utf8'
-);
-const SETTINGS_BILLING_SOURCE = readFileSync(
-  'src/settings/billing-view.ts',
-  'utf8'
-);
-const PAYMENT_STATUS_SOURCE = readFileSync(
-  'src/payment/payment-status-view.ts',
-  'utf8'
-);
-const SETTINGS_NOTIFICATION_SOURCE = readFileSync(
-  'src/settings/notifications-view.ts',
   'utf8'
 );
 const ACTIVE_SURFACE_SOURCE = readFileSync(
@@ -219,18 +185,10 @@ test('teacher workspace operations chain is backed by focused workspace gates', 
 
   assert.deepEqual(
     [
-      DASHBOARD_OVERVIEW_HANDOFF_ITEM_IDS.length,
       ACCOUNT_GOVERNANCE_LIFECYCLE_CHAIN_HANDOFF_ITEM_IDS.length,
       ACTIVE_SURFACE_PRODUCT_BOUNDARY_ITEM_IDS.length,
-      PAYMENT_STATUS_HANDOFF_ITEM_IDS.length,
-      SETTINGS_ACCOUNT_WORKSPACE_HANDOFF_ITEM_IDS.length,
-      SETTINGS_SECURITY_WORKSPACE_HANDOFF_ITEM_IDS.length,
-      SETTINGS_FILES_SOURCE_MATERIAL_HANDOFF_ITEM_IDS.length,
-      SETTINGS_FILES_MATERIAL_CLASSIFICATION_HANDOFF_ITEM_IDS.length,
-      SETTINGS_BILLING_WORKSPACE_HANDOFF_ITEM_IDS.length,
-      SETTINGS_NOTIFICATION_UPDATE_HANDOFF_ITEM_IDS.length,
     ],
-    Array.from({ length: 10 }, () => 30)
+    Array.from({ length: 2 }, () => 30)
   );
 });
 
@@ -272,7 +230,7 @@ test('teacher workspace operations chain preserves docs product boundaries', () 
   );
   assert.match(
     PRODUCT_SOURCE,
-    /active surface product boundary should absorb both the account governance[\s\S]*payment callback handoff contracts[\s\S]*current account, contact,[\s\S]*billing, mail, notification, and developer configuration surfaces/i,
+    /active surface product boundary should absorb the account governance[\s\S]*payment callback flow[\s\S]*current account, contact,[\s\S]*billing, mail, notification, and developer configuration surfaces/i,
     'docs/product.md should keep active surfaces aligned with account governance and payment callbacks.'
   );
 });
@@ -280,12 +238,12 @@ test('teacher workspace operations chain preserves docs product boundaries', () 
 test('teacher workspace operations sources preserve owner scope and preview boundaries', () => {
   assert.match(
     DASHBOARD_OVERVIEW_SOURCE,
-    /countsStarterPreviewAsOwnedMetrics: false[\s\S]*usesOwnerScopedSummaries: true/,
+    /countsStarterPreviewAsOwnedMetrics: false[\s\S]*ownerActivityCount: activitiesResolved/,
     'Dashboard overview privacy contract should exclude starter previews from owner metrics.'
   );
   assert.match(
     DASHBOARD_OVERVIEW_SOURCE,
-    /keepsActivityLoadingIndependent: true[\s\S]*keepsAssignmentLoadingIndependent: true/,
+    /const activitiesResolved = !activitiesLoading;[\s\S]*const assignmentsResolved = !assignmentsLoading;/,
     'Dashboard overview should keep activity and assignment loading independent.'
   );
   assert.match(
@@ -347,36 +305,6 @@ test('teacher workspace settings boundaries do not mutate classroom data', () =>
     ACCOUNT_GOVERNANCE_SOURCE,
     /ACCOUNT_GOVERNANCE_LIFECYCLE_CHAIN_HANDOFF_ITEM_IDS[\s\S]*'billing-payment-callback-boundary'[\s\S]*usesPaymentCallbackHandoff: true[\s\S]*keepsAccountSettingsFromMutatingClassroomData: true/,
     'Account governance lifecycle chain should cover account settings and payment callback boundaries without classroom data mutation.'
-  );
-  assert.match(
-    SETTINGS_SECURITY_SOURCE,
-    /changesActivityContent: false[\s\S]*changesPublicAssignmentLinks: false[\s\S]*exposesAuthSecrets: false[\s\S]*exposesPasswordValues: false[\s\S]*exposesProviderErrors: false[\s\S]*modifiesAssignmentSnapshots: false[\s\S]*modifiesStudentAttempts: false/,
-    'Security settings handoff should hide secrets and avoid classroom data mutation.'
-  );
-  assert.match(
-    SETTINGS_FILES_SOURCE,
-    /exposesFileBytes: false[\s\S]*exposesPermissionMetadata: false[\s\S]*exposesRawStudentIdentity: false[\s\S]*exposesSourceMaterialStorageKeys: false[\s\S]*exposesTeacherPrivateFilenames: false[\s\S]*publicPayloadIncludesFileList: false[\s\S]*storageKeysStayServerSide: true/,
-    'Settings files handoff should protect source-material file metadata.'
-  );
-  assert.match(
-    SETTINGS_FILES_CLASSIFICATION_SOURCE,
-    /classificationUsesSafeBasenameExtension: true[\s\S]*exposesFileBytes: false[\s\S]*exposesOriginalFilenames: false[\s\S]*exposesPermissionMetadata: false[\s\S]*exposesSourceMaterialStorageKeys: false/,
-    'Settings files classification should use safe extension labels without exposing file bytes or storage keys.'
-  );
-  assert.match(
-    SETTINGS_BILLING_SOURCE,
-    /changesActivityContent: false[\s\S]*changesAssignmentLinks: false[\s\S]*exposesPaymentProviderSecrets: false[\s\S]*hostedBillingOnly: true[\s\S]*modifiesAssignmentSnapshots: false/,
-    'Billing settings should expose hosted billing controls without classroom data mutation.'
-  );
-  assert.match(
-    PAYMENT_STATUS_SOURCE,
-    /PAYMENT_STATUS_HANDOFF_ITEM_IDS[\s\S]*'hosted-checkout'[\s\S]*'completion-check'[\s\S]*'current-plan-cache'[\s\S]*'callback-normalization'[\s\S]*'raw-session-boundary'[\s\S]*hostedCheckoutStatusOnly: true/,
-    'Payment callback handoff should keep hosted checkout callbacks inside teacher workspace operations.'
-  );
-  assert.match(
-    SETTINGS_NOTIFICATION_SOURCE,
-    /changesActivityContent: false[\s\S]*changesActivityLibrary: false[\s\S]*changesAssignmentSnapshots: false[\s\S]*changesAttemptRecords: false[\s\S]*changesPublicAssignmentLinks: false[\s\S]*notifiesLearners: false[\s\S]*sendsStudentAssignmentReminders: false/,
-    'Notification settings should remain teacher product-email preferences, not learner notifications.'
   );
   assert.match(
     ACTIVE_SURFACE_SOURCE,

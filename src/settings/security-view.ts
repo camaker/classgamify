@@ -1,13 +1,5 @@
 import type { DashboardBreadcrumbItem } from '@/components/layout/dashboard-header';
 import { websiteConfig } from '@/config/website';
-import {
-  buildSettingsAccountWorkspaceHandoffView,
-  type SettingsAccountWorkspaceHandoffView,
-} from '@/settings/account-handoff';
-import {
-  buildSettingsSecurityWorkspaceHandoffView,
-  type SettingsSecurityWorkspaceHandoffView,
-} from '@/settings/security-handoff';
 import { m } from '@/locale/paraglide/messages';
 
 export type SettingsSecurityWorkspaceSummaryItemId =
@@ -42,9 +34,7 @@ export type SettingsSecurityWorkspaceSummaryView = {
   capabilityTitle: string;
   capabilityViews: SettingsSecurityCapabilityView[];
   description: string;
-  handoffView: SettingsAccountWorkspaceHandoffView;
   itemViews: SettingsSecurityWorkspaceSummaryItemView[];
-  securityHandoffView: SettingsSecurityWorkspaceHandoffView;
   title: string;
 };
 
@@ -80,7 +70,7 @@ export function buildSettingsSecurityPageViewModel(): SettingsSecurityPageViewMo
   };
 }
 
-export function buildSettingsSecurityWorkspaceSummaryView({
+function buildSettingsSecurityWorkspaceSummaryView({
   credentialLoginEnabled,
   deleteAccountEnabled,
 }: {
@@ -117,11 +107,6 @@ export function buildSettingsSecurityWorkspaceSummaryView({
       }),
     ],
     description,
-    handoffView: buildSettingsAccountWorkspaceHandoffView({
-      credentialLoginEnabled,
-      deleteAccountEnabled,
-      page: 'security',
-    }),
     itemViews: [
       {
         description: m.settings_security_workspace_summary_access_description(),
@@ -147,10 +132,6 @@ export function buildSettingsSecurityWorkspaceSummaryView({
         label: m.settings_security_workspace_summary_results_label(),
       },
     ],
-    securityHandoffView: buildSettingsSecurityWorkspaceHandoffView({
-      credentialLoginEnabled,
-      deleteAccountEnabled,
-    }),
     title,
   };
 }

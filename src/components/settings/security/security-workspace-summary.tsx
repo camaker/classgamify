@@ -1,12 +1,4 @@
 import type {
-  SettingsAccountWorkspaceHandoffItemView,
-  SettingsAccountWorkspaceHandoffView,
-} from '@/settings/account-handoff';
-import type {
-  SettingsSecurityWorkspaceHandoffItemView,
-  SettingsSecurityWorkspaceHandoffView,
-} from '@/settings/security-handoff';
-import type {
   SettingsSecurityCapabilityView,
   SettingsSecurityWorkspaceSummaryItemView,
   SettingsSecurityWorkspaceSummaryView,
@@ -50,10 +42,6 @@ export function SecurityWorkspaceSummary({
           ))}
         </ul>
       </div>
-      <AccountWorkspaceHandoff handoffView={view.handoffView} />
-      <SettingsSecurityWorkspaceHandoff
-        handoffView={view.securityHandoffView}
-      />
     </section>
   );
 }
@@ -72,77 +60,6 @@ function SecurityWorkspaceSummaryItem({
         {itemView.description}
       </p>
     </li>
-  );
-}
-
-function AccountWorkspaceHandoff({
-  handoffView,
-}: {
-  handoffView: SettingsAccountWorkspaceHandoffView;
-}) {
-  const titleId = 'settings-account-workspace-handoff-title';
-  const descriptionId = 'settings-account-workspace-handoff-description';
-
-  return (
-    <section
-      aria-describedby={descriptionId}
-      aria-labelledby={titleId}
-      className="sr-only"
-      data-handoff="settings-account-workspace"
-      data-handoff-scope={handoffView.privacy.scope}
-    >
-      <div>
-        <h3 className="font-medium text-sm" id={titleId}>
-          {handoffView.title}
-        </h3>
-        <p className="mt-1 text-muted-foreground text-sm" id={descriptionId}>
-          {handoffView.description}
-        </p>
-      </div>
-      <dl className="grid gap-2 md:grid-cols-2">
-        {handoffView.itemViews.map((itemView) => (
-          <AccountWorkspaceHandoffItem itemView={itemView} key={itemView.id} />
-        ))}
-      </dl>
-    </section>
-  );
-}
-
-function AccountWorkspaceHandoffItem({
-  itemView,
-}: {
-  itemView: SettingsAccountWorkspaceHandoffItemView;
-}) {
-  const labelId = `settings-account-workspace-handoff-${itemView.id}-label`;
-  const valueId = `settings-account-workspace-handoff-${itemView.id}-value`;
-  const descriptionId = `settings-account-workspace-handoff-${itemView.id}-description`;
-
-  return (
-    <div
-      className="rounded-md border bg-background px-3 py-2"
-      data-handoff-item={itemView.id}
-    >
-      <dt className="font-medium text-xs" id={labelId}>
-        {itemView.label}
-      </dt>
-      <dd className="mt-1">
-        <output
-          aria-describedby={descriptionId}
-          aria-label={itemView.ariaLabel}
-          aria-labelledby={`${labelId} ${valueId}`}
-          className="text-sm"
-          id={valueId}
-        >
-          {itemView.value}
-        </output>
-        <p
-          className="mt-1 text-muted-foreground text-xs leading-5"
-          id={descriptionId}
-        >
-          {itemView.description}
-        </p>
-      </dd>
-    </div>
   );
 }
 
@@ -169,62 +86,5 @@ function SecurityCapabilityItem({
         {capabilityView.description}
       </p>
     </li>
-  );
-}
-
-function SettingsSecurityWorkspaceHandoff({
-  handoffView,
-}: {
-  handoffView: SettingsSecurityWorkspaceHandoffView;
-}) {
-  const titleId = 'settings-security-workspace-handoff-title';
-  const descriptionId = 'settings-security-workspace-handoff-description';
-
-  return (
-    <section
-      aria-describedby={descriptionId}
-      aria-labelledby={titleId}
-      className="sr-only"
-      data-handoff="settings-security-workspace"
-      data-handoff-scope={handoffView.privacy.scope}
-    >
-      <h3 id={titleId}>{handoffView.title}</h3>
-      <p id={descriptionId}>{handoffView.description}</p>
-      <dl>
-        {handoffView.itemViews.map((itemView) => (
-          <SettingsSecurityWorkspaceHandoffItem
-            itemView={itemView}
-            key={itemView.id}
-          />
-        ))}
-      </dl>
-    </section>
-  );
-}
-
-function SettingsSecurityWorkspaceHandoffItem({
-  itemView,
-}: {
-  itemView: SettingsSecurityWorkspaceHandoffItemView;
-}) {
-  const labelId = `settings-security-workspace-handoff-${itemView.id}-label`;
-  const valueId = `settings-security-workspace-handoff-${itemView.id}-value`;
-  const descriptionId = `settings-security-workspace-handoff-${itemView.id}-description`;
-
-  return (
-    <div data-handoff-item={itemView.id}>
-      <dt id={labelId}>{itemView.label}</dt>
-      <dd>
-        <output
-          aria-describedby={descriptionId}
-          aria-label={itemView.ariaLabel}
-          aria-labelledby={`${labelId} ${valueId}`}
-          id={valueId}
-        >
-          {itemView.value}
-        </output>
-      </dd>
-      <dd id={descriptionId}>{itemView.description}</dd>
-    </div>
   );
 }

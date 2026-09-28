@@ -14,7 +14,6 @@ import {
   type TransactionalMailLifecycleChainHandoffItemId,
   type TransactionalMailLifecycleChainHandoffView,
 } from '@/mail/transactional-mail-lifecycle-chain';
-import { SETTINGS_NOTIFICATION_UPDATE_HANDOFF_ITEM_IDS } from '@/settings/notifications-view';
 
 const PRODUCT_SOURCE = readFileSync('docs/product.md', 'utf8');
 const MAIL_DOC_SOURCE = readFileSync('docs/mail.md', 'utf8');
@@ -179,7 +178,6 @@ test('transactional mail lifecycle chain is backed by focused mail contracts', (
   }
 
   assert.equal(MAIL_TRANSACTIONAL_WORKSPACE_HANDOFF_ITEM_IDS.length, 30);
-  assert.equal(SETTINGS_NOTIFICATION_UPDATE_HANDOFF_ITEM_IDS.length, 30);
   assert.equal(MAIL_TRANSACTIONAL_TEMPLATE_IDS.length, 4);
   assert.match(
     MAIL_WORKSPACE_BOUNDARY_SOURCE,

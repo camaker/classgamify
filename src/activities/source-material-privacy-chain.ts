@@ -58,7 +58,7 @@ export const SOURCE_MATERIAL_PRIVACY_CHAIN_SOURCE_FILES = [
   'src/assignments/unavailable-access.ts',
   'src/settings/files-view.ts',
   'src/components/settings/files/files-table.tsx',
-  'src/components/settings/files/files-source-material-handoff-panel.tsx',
+  'tests/e2e/specs/protected-pages.spec.ts',
   'src/components/activities/activity-source-materials-field.tsx',
   'src/components/activities/activity-source-materials-summary.tsx',
   'src/components/activities/activity-ai-draft-panel.tsx',

@@ -19,8 +19,6 @@ import {
 } from '@/mail/transactional-mail-lifecycle-chain';
 import { LEGAL_POLICY_HANDOFF_ITEM_IDS } from '@/pages/legal-policy-view';
 import { PUBLIC_DOM_HANDOFF_BOUNDARY_ITEM_IDS } from '@/seo/public-dom-handoff-boundary';
-import { SETTINGS_BILLING_WORKSPACE_HANDOFF_ITEM_IDS } from '@/settings/billing-view';
-import { SETTINGS_NOTIFICATION_UPDATE_HANDOFF_ITEM_IDS } from '@/settings/notifications-view';
 
 const PRODUCT_SOURCE = readFileSync('docs/product.md', 'utf8');
 const CONFIGURATION_DOC_SOURCE = readFileSync('docs/configuration.md', 'utf8');
@@ -44,11 +42,6 @@ const TRANSACTIONAL_MAIL_LIFECYCLE_SOURCE = readFileSync(
   'src/mail/transactional-mail-lifecycle-chain.ts',
   'utf8'
 );
-const NOTIFICATION_SOURCE = readFileSync(
-  'src/settings/notifications-view.ts',
-  'utf8'
-);
-const BILLING_SOURCE = readFileSync('src/settings/billing-view.ts', 'utf8');
 const LEGAL_POLICY_SOURCE = readFileSync(
   'src/pages/legal-policy-view.ts',
   'utf8'
@@ -215,13 +208,11 @@ test('classroom trust communication chain is backed by focused trust gates', () 
       AUTH_WORKSPACE_HANDOFF_ITEM_IDS.length,
       TRANSACTIONAL_MAIL_LIFECYCLE_CHAIN_HANDOFF_ITEM_IDS.length,
       MAIL_TRANSACTIONAL_WORKSPACE_HANDOFF_ITEM_IDS.length,
-      SETTINGS_NOTIFICATION_UPDATE_HANDOFF_ITEM_IDS.length,
-      SETTINGS_BILLING_WORKSPACE_HANDOFF_ITEM_IDS.length,
       LEGAL_POLICY_HANDOFF_ITEM_IDS.length,
       DEVELOPER_CONFIGURATION_HANDOFF_ITEM_IDS.length,
       PUBLIC_DOM_HANDOFF_BOUNDARY_ITEM_IDS.length,
     ],
-    Array.from({ length: 9 }, () => 30)
+    Array.from({ length: 7 }, () => 30)
   );
   assert.equal(TRANSACTIONAL_MAIL_LIFECYCLE_CHAIN_SOURCE_FILES.length, 30);
 });
@@ -274,16 +265,6 @@ test('classroom trust communication sources preserve privacy and mutation bounda
     TRANSACTIONAL_MAIL_LIFECYCLE_SOURCE,
     /TRANSACTIONAL_MAIL_LIFECYCLE_CHAIN_HANDOFF_ITEM_IDS[\s\S]*'template-set-registry'[\s\S]*'render-before-send'[\s\S]*'provider-registry'[\s\S]*'no-workspace-mutation'[\s\S]*'learner-notification-guard'/,
     'Classroom trust chain should absorb the full transactional mail lifecycle contract.'
-  );
-  assert.match(
-    NOTIFICATION_SOURCE,
-    /changesActivityContent: false[\s\S]*changesAssignmentSnapshots: false[\s\S]*changesAttemptRecords: false[\s\S]*notifiesLearners: false[\s\S]*sendsStudentAssignmentReminders: false[\s\S]*updatesTeacherProductEmailOnly: true/,
-    'Notification settings should remain teacher product-email preferences.'
-  );
-  assert.match(
-    BILLING_SOURCE,
-    /changesActivityContent: false[\s\S]*changesAssignmentLinks: false[\s\S]*exposesPaymentProviderSecrets: false[\s\S]*exposesRawCheckoutSession: false[\s\S]*hostedBillingOnly: true/,
-    'Billing settings should stay hosted and avoid classroom data mutation.'
   );
   assert.match(
     LEGAL_POLICY_SOURCE,
