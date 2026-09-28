@@ -69,6 +69,6 @@ test('product and catalog register submission validation continuity', () => {
   );
   assert.match(
     read('tests/e2e/TEST-CATALOG.md'),
-    /assignment-submission-validation-continuity\.test\.ts[\s\S]*30-slice source-level contract/i
+    /assignment-submission-validation-continuity\.test\.ts[\s\S]*source guards/i
   );
 });

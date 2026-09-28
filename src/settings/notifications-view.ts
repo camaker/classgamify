@@ -47,7 +47,7 @@ type SettingsNotificationWorkspaceSummaryBaseView = Omit<
   'handoffView'
 >;
 
-export type SettingsNotificationPageViewModel = {
+type SettingsNotificationPageViewModel = {
   breadcrumbs: DashboardBreadcrumbItem[];
   contentAriaLabel: string;
   description: string;

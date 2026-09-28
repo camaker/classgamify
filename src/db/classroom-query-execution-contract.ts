@@ -1,4 +1,4 @@
-export type ClassroomQueryExecutionMode =
+type ClassroomQueryExecutionMode =
   | 'barrier'
   | 'conditional-read'
   | 'dependent-read'
@@ -7,7 +7,7 @@ export type ClassroomQueryExecutionMode =
   | 'post-process'
   | 'precondition';
 
-export type ClassroomQueryExecutionSurface =
+type ClassroomQueryExecutionSurface =
   | 'activity-library'
   | 'assignment-library'
   | 'file-library'

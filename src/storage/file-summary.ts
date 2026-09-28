@@ -24,13 +24,13 @@ export interface UserFileMaterialSummary {
   worksheetFiles: number;
 }
 
-export type UserFileMaterialSummaryItemId =
+type UserFileMaterialSummaryItemId =
   | 'audio-materials'
   | 'total-files'
   | 'total-storage'
   | 'worksheet-materials';
 
-export type UserFileMaterialSummaryItemView = {
+type UserFileMaterialSummaryItemView = {
   id: UserFileMaterialSummaryItemId;
   label: string;
   value: string;

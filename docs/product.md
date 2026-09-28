@@ -11,33 +11,6 @@ templates, publish assignments, and review student attempts.
 Activity -> Assignment -> Attempt -> Results
 ```
 
-`src/config/classroom-product-loop-chain.ts` owns the cross-surface
-product-loop handoff that keeps teacher-owned activities, reusable content,
-assignment source activity context boundary, classroom data lifecycle and its
-attempt persistence boundary,
-activity library page boundary,
-activity authoring/library workflow,
-source extraction lifecycle boundaries, activity lifecycle governance,
-template roadmap capability alignment,
-AI enhancement lifecycle review,
-published assignment delivery, assignment publish preflight boundary,
-assignment lifecycle governance boundary, assignment distribution lifecycle
-boundary, public assignment rules boundary, student runner play and its submit
-controls handoff boundary, student
-identity lifecycle,
-student runtime identity boundary, assignment submission validation boundary,
-assignment attempt persistence boundary, scored attempt results, assignment
-attempt stats boundary, answer feedback lifecycle and its answer feedback
-handoff boundary, assignment attempt duration
-boundary, submitted-date continuity,
-accepted-answer continuity, and explanation continuity, teacher result review,
-result review controls boundary, teacher result copy lifecycle and its copy
-artifact handoff boundary,
-worksheet-mode delivery boundary, printable worksheet review lifecycle,
-copy/export/print handoffs, teacher workspace operations and its dashboard
-overview boundary, public discovery/indexing metadata and its public metadata
-handoff boundary, and privacy guards aligned with
-this sequence.
 
 Copied-template surfaces should be retired in narrow, verified waves. Public
 navigation and homepage entry points should point at ClassGamify templates,
@@ -140,12 +113,6 @@ updates, assignment review context, provider visibility, and email-channel
 scope. It must not mutate activities, assignment snapshots,
 attempts, result exports, or public links, read source-material files, expose
 recipient or student data, or send learner assignment reminders.
-`src/config/classroom-trust-communication-chain.ts` absorbs that
-transactional mail lifecycle and its transactional mail workspace boundary
-alongside public contact intake, auth workspace
-entry, teacher notification settings, hosted billing, legal/provider copy,
-developer configuration, storage, and public-DOM boundaries, so trust copy and
-provider behavior stay aligned without adding public audit output.
 
 - `Activity` is the teacher-owned reusable content object.
 - `ActivityContent` is template-neutral lesson material: questions, pairs,
@@ -184,8 +151,6 @@ metadata selects, authoritative reference rebuilding, empty-query bypass,
 all-or-nothing persistence, activity mutation, derivative and publish paths,
 snapshot protection, and privacy. Its aggregate summary must not expose other
 owner rows, R2 keys, permission metadata, or file bytes.
-`src/activities/source-material-write-continuity-chain.ts` owns this source
-contract without rendering storage internals in teacher or student interfaces.
 Source-material deletion must preserve the same reference lifecycle. Before
 deleting an owner-scoped `userFiles` object, the server checks both saved activity
 content and frozen assignment snapshots for the file id. Active and archived
@@ -202,8 +167,6 @@ owner joins, compact `json_each` evidence, a single safe in-use response,
 metadata claim and R2 ordering, retained activity content and snapshot
 provenance, and privacy. Its aggregate summary must not expose activity or
 assignment content, student data, or storage keys.
-`src/activities/source-material-delete-continuity-chain.ts` owns this source
-contract without rendering referencing record details in teacher interfaces.
 Source-material reference integrity must also hold when activity saves, assignment
 publishes, and file deletion race. Database write guards recheck owner-scoped file
 existence on activity and frozen-snapshot inserts or content updates, while file
@@ -220,8 +183,6 @@ owner/file matching, guarded metadata claims, R2 deletion and presence probes,
 bounded metadata restoration, localized conflict mapping, single-writer
 ordering, safe recovery failures, and privacy. Its aggregate summary must not
 expose activity or snapshot content, storage keys, or student data.
-`src/activities/source-material-integrity-continuity-chain.ts` owns this source
-contract without rendering trigger or recovery internals in teacher interfaces.
 Private source-material uploads must also compensate across the R2 and D1
 boundary. A successful private R2 write is not returned until its owner-scoped
 `userFiles` metadata is persisted. If that insert reports failure, the server
@@ -255,9 +216,7 @@ same-key evidence recovery, owner-scoped D1 metadata insertion, ambiguous-commit
 probing, bounded object compensation, safe teacher responses, server-side key
 resolution, downstream source references, and privacy. Its aggregate summary
 must not expose file bytes, R2 object keys, upload markers, teacher owner ids, or
-student data. `src/storage/private-upload-transaction-continuity-chain.ts` owns
-this source contract without replacing the provider, persistence, or response
-boundary implementations.
+student data.
 The source-material privacy chain should explicitly carry the compact material
 reference handoff's 30 slices for reference shape, safe file ids and filename
 basenames, content-type, material kind and size normalization, duplicate
@@ -278,9 +237,6 @@ guarded activity writes, assignment snapshot freezing, protected deletion, R2
 recovery, and privacy. It must retain active, archived, and frozen-snapshot
 references while keeping file bytes, file ids, storage keys, activity content,
 snapshot content, and student data out of its aggregate summary.
-`src/activities/source-material-lifecycle-continuity-chain.ts` owns this
-cross-boundary source contract without replacing its upload, write, publish,
-integrity, deletion, or privacy authorities.
 
 Teachers must be able to reopen and edit saved activities from the activity
 library. Editing uses the same `CreateActivityInput` contract as creation, with
@@ -319,10 +275,6 @@ extraction-readiness actions, edit-return path, ActivityContent reference, and
 privacy guards. Its aggregate summary may expose safe counts and material kinds,
 but must not expose filenames, file ids, content types, per-file sizes, file
 bytes, storage keys, permission metadata, or student payload file references.
-`src/activities/activity-source-material-summary-chain.ts` owns this
-source-level contract so activity-library cards, source-material filters,
-source-extraction readiness, AI provenance, editor return paths, and student
-payload privacy stay aligned without adding a new visible card surface.
 Activity library filter parsing and search normalization should also live in
 activity-domain helpers so URL state, dashboard controls, and list API queries
 share the same activity status and template-family rules.
@@ -338,10 +290,6 @@ API owner scope, source-material post-filtering, and privacy guards. Its summary
 may expose route state, option labels, safe aggregate match counts, and helper
 contract status, but must not expose activity ids, answer text, private activity
 content, source-material filenames, file ids, storage keys, or student data.
-`src/activities/activity-library-filter-state-chain.ts` owns this source-level
-contract so route validation, dashboard controls, list API owner scope,
-source-material readiness filters, and created-activity return context stay
-aligned.
 Teachers can soft-archive activities from the active library and restore them
 later from an archived view. Archiving hides an activity from the default
 library and prevents casual republishing, but it does not delete structured
@@ -365,8 +313,6 @@ guards, rollback, localized error mapping, published delivery, existing snapshot
 retention, results, and privacy. Its aggregate summary must not expose activity
 content, assignment ids, teacher owner ids, source-material metadata, or internal
 trigger markers.
-`src/assignments/publish-source-continuity-chain.ts` owns this source contract
-without rendering source race metadata in teacher or student interfaces.
 Activity lifecycle governance should flow through shared domain helpers across
 library cards, edit access, publish dialogs, duplicate/remix draft creation, and
 server functions, so UI affordances and backend enforcement keep the same
@@ -388,8 +334,6 @@ single-statement `UPDATE ... RETURNING`, zero-row conflict reloads, derivative
 and publish gates, assignment snapshot retention, and privacy. Its aggregate
 summary must not expose activity ids, teacher owner ids, activity content,
 source-material metadata, or assignment records.
-`src/activities/activity-mutation-continuity-chain.ts` owns this source contract
-without rendering internal revisions in teacher or student interfaces.
 Activity duplicate and template-remix inserts should keep the same write-time
 source discipline. A derivative draft stores only an internal source activity id
 and expected source revision; D1 checks the provenance pair, owner equality,
@@ -408,8 +352,6 @@ mapping, independent draft persistence, later source changes, future publishing,
 and privacy. Its aggregate summary must not expose provenance ids or revisions,
 activity content, teacher owner ids, source-material metadata, or internal
 trigger markers.
-`src/activities/derivative-source-continuity-chain.ts` owns this source contract
-without rendering provenance metadata in teacher or student interfaces.
 The activity lifecycle governance chain should send restored activities back
 through the shared publish dialog: publish access, field validation, delivery
 settings, review checklist, snapshot freeze, public-payload, and result-policy
@@ -422,9 +364,6 @@ archive and restore, guarded duplicate/remix drafts, assignment publishing,
 snapshot isolation, and privacy. Its aggregate summary must not expose activity
 content, source provenance, source-material metadata, teacher owner ids,
 assignment snapshot content, or student data.
-`src/activities/activity-authoring-publish-continuity-chain.ts` owns this
-cross-boundary contract without replacing its authoring, library, lifecycle,
-mutation, derivative, or publish authorities.
 
 The activity editor should make the selected template legible. When teachers
 choose quiz, match-up, line-match, group sort, fill-blank, listening, matching
@@ -554,10 +493,6 @@ privacy guards. Its fast gate should verify that these outputs come from
 assignment-domain helpers and never expose assignment ids, owner ids, public
 runtime content, raw tokens, result export rows, source storage keys, student
 answers, or teacher-only answers.
-`src/assignments/assignment-list-filter-state-chain.ts` owns the source-level
-contract for this chain, keeping URL validation, published share context,
-search/status filters, dashboard controls, list API owner scope, full filtered
-summaries, and privacy aligned with the visible handoff.
 The assignment source activity context chain should keep frozen source title,
 description, template, and snapshot provenance connected to teacher copy text,
 the CSV export, and the printable worksheet. Its independent 30-file gate
@@ -591,8 +526,6 @@ revision compare-and-set predicates, reopen expiry conditions, single-statement
 snapshots and attempts, teacher results, and privacy. Its aggregate summary must
 not expose assignment ids, teacher owner ids, share slugs, activity content,
 student identity, or answer text.
-`src/assignments/status-transition-continuity-chain.ts` owns this source contract
-without rendering concurrency revisions in teacher or student interfaces.
 The assignment lifecycle governance chain should explicitly carry the 30-slice
 public unavailable-access handoff so closed, expired, draft, and missing links
 share lifecycle reasons, student-safe messages, hidden runtime content and
@@ -690,8 +623,6 @@ new-submit lifecycle and attempt-limit gates, deterministic scoring, D1
 uniqueness, concurrent conflict recovery, sanitized feedback, teacher results,
 and privacy. Its aggregate summary must not expose submission keys, attempt ids,
 student names, anonymous tokens, payload rows, answer text, or teacher answers.
-`src/assignments/submission-idempotency-continuity-chain.ts` owns this source
-contract without rendering retry keys or internal replay state in the runner.
 Finite assignments should additionally keep a finite attempt concurrency
 contract. Each new scored attempt reserves the next normalized identity attempt
 slot, and D1 uniquely scopes that slot by assignment, identity, and attempt
@@ -727,8 +658,6 @@ classification, localized closed/expired responses, bounded slot recounts,
 teacher results, and privacy. Its aggregate summary must not expose internal
 trigger markers, identity keys, attempt numbers, submission keys, student names,
 anonymous tokens, or answer text.
-`src/assignments/submission-lifecycle-continuity-chain.ts` owns this source
-contract without rendering database race metadata in public runner responses.
 Student progress counts, browser submission payloads, and incomplete-submit
 decisions should be derived from shared assignment-domain helpers, not
 per-template route math, so every runner counts answered items, submits frozen
@@ -746,21 +675,12 @@ guards across submission gates, normalized identity, frozen runtime validation,
 scoring, assignment/attempt/time fields, immutable answer and result JSON,
 sanitized public feedback, teacher analysis, statistics, CSV export, and
 privacy, so each step keeps using the shared assignment-domain helpers.
-`src/assignments/attempt-review-card-chain.ts` owns the
-attempt-review-card chain as a 30-slice source-level contract from
-scored-attempt persistence and answer review summaries through prepared card
-rows, review filters, copy scope, CSV export boundaries, printable review
-alignment, and privacy guards.
 Student runner submission surfaces should expose those prepared progress,
 payload, submit-readiness, identity, result, review-summary, feedback-scope,
 and post-submit next-step views as stable semantic label/value/description
 outputs, so students and assistive technology receive the same submission
 state without exposing student names, answer text, anonymous tokens, or
 teacher-only answers in the pre-submit payload summary.
-`src/assignments/student-runner-submission-chain.ts` owns the
-student-runner-submission chain as a 30-slice source-level contract for
-progress, payload, submit-readiness, identity, timer, result, review-summary,
-feedback-scope, next-step, and privacy alignment.
 Pure assignment-domain helpers should have fast script-level coverage so core
 submission semantics can be verified without depending on the local Workers
 E2E runtime.
@@ -870,11 +790,6 @@ return to results. It should verify the result-material, result-review,
 copy-artifact, and printable-worksheet 30-slice handoffs in the rendered DOM so
 the source contracts remain connected to the real Activity -> Assignment ->
 Attempt -> Results workflow.
-`src/config/local-persisted-browser-journey-chain.ts` keeps that real browser
-loop as a 30-slice source-level contract across local e2e account isolation,
-teacher auth, activity save, assignment publish, student runner submission,
-result filters, copy/CSV actions, printable worksheet answer-key state,
-return-to-results navigation, browser health, and privacy guards.
 The assignment publish-to-results continuity chain should also connect this
 runtime path as 30 source-level stages from delivery settings and snapshot
 freezing through share-link distribution, sanitized student play, submission
@@ -882,9 +797,6 @@ validation, guarded attempt persistence, teacher result analysis, copy/export/
 print actions, and privacy. Its aggregate summary must not expose attempt ids,
 student identity, runtime item ids, answer text, teacher answer keys,
 source-material metadata, or storage keys.
-`src/assignments/assignment-publish-results-continuity-chain.ts` owns this
-cross-boundary contract without replacing its delivery, distribution, runner,
-submission, persistence, or teacher-result authorities.
 The teacher result page should show the student summary, the top reteach
 priorities, and the full item performance table so a teacher can scan the
 class before opening individual student answers. The full item performance
@@ -927,9 +839,6 @@ protection, result-export continuity, and privacy. Its aggregate summary must
 not expose raw source or provider output, prompts, answers, file bytes, storage
 keys, share slugs, or student data, and it must never persist or publish without
 separate teacher actions.
-`src/activities/activity-ai-review-publish-continuity-chain.ts` owns this
-cross-boundary contract without replacing its authoring, fallback, lifecycle,
-editor-review, save, or publish authorities.
 The AI authoring chain should explicitly carry the 30-slice deterministic
 fallback draft chain across missing credentials, invalid provider JSON, source
 sanitization, material-note omission, safe provenance, term planning, complete
@@ -1044,28 +953,6 @@ Implementation boundaries:
   a persisted activity record, saved activity id, valid assignment preflight,
   and explicit teacher publish action remain required before creating a link or
   freezing a new snapshot.
-- `src/activities/ai-enhancement-lifecycle-chain.ts` owns the full AI enhancement lifecycle handoff
-  from request policy through execution, parsed draft output, editor
-  application, teacher review, manual save, saved activity records, assignment
-  publish actions, share-link and snapshot boundaries, public-payload guards,
-  privacy guards, and result-export continuity. The AI enhancement roadmap
-  explicitly carries these 30 lifecycle slices so future transforms,
-  distractors, variants, explanations, listening scripts, and extraction paths
-  cannot bypass blocked reasons, editor-only draft targets, teacher review,
-  manual save, explicit publish, frozen snapshots, sanitized public payloads,
-  or result exports. Its final boundary sends AI-enhanced activities through the
-  shared publish dialog (publish access, validation, delivery settings, review
-  checklist, snapshot freeze, public payload, and result policy) instead of
-  creating an AI-specific assignment path.
-- `src/activities/ai-fallback-draft-chain.ts` owns the deterministic AI
-  fallback draft chain for missing Workers AI credentials, invalid provider
-  JSON, sanitized source-term planning, local classroom draft completion,
-  teacher review, and save/publish boundaries. It explicitly carries the
-  30-slice authoring/library chain so fallback drafts remain inside shared
-  create and edit contracts, teacher-owned persistence and library management,
-  lifecycle gates, publish access, and assignment snapshot protection without
-  exposing raw editor input, answers, teacher notes, filenames, file ids, or
-  storage keys.
 - `src/api/activity-ai.ts` exposes the authenticated server function.
 - `src/components/activities/activity-create-form.tsx` only collects draft
   inputs and fills the existing form.

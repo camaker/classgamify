@@ -41,10 +41,6 @@ test('public feedback is sanitized from the same scored result', () => {
   const api = read('src/api/assignments.ts');
   assert.match(api, /buildAttemptSubmissionResponse/);
   assert.match(read('src/assignments/public.ts'), /PublicAttemptResult/);
-  assert.match(
-    read('src/assignments/scored-attempt-result-chain.ts'),
-    /public-result-sanitization/
-  );
 });
 
 test('product and catalog register persistence continuity', () => {

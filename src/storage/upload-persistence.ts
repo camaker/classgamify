@@ -36,7 +36,7 @@ export type UploadedObjectCleanupResult =
   | 'retained'
   | 'unconfirmed';
 
-export type UserFileUploadPersistenceRecovery =
+type UserFileUploadPersistenceRecovery =
   | UploadedObjectCleanupResult
   | 'persisted';
 

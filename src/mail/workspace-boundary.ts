@@ -18,7 +18,7 @@ export type MailWorkspaceBoundaryItemView = {
   line: string;
 };
 
-export type MailWorkspaceBoundaryView = {
+type MailWorkspaceBoundaryView = {
   description: string;
   items: MailWorkspaceBoundaryItemView[];
   title: string;
@@ -30,9 +30,6 @@ export const MAIL_TRANSACTIONAL_TEMPLATE_IDS = [
   'subscribeNewsletter',
   'contactMessage',
 ] as const;
-
-export type MailTransactionalTemplateId =
-  (typeof MAIL_TRANSACTIONAL_TEMPLATE_IDS)[number];
 
 export function buildMailWorkspaceBoundaryView(
   input?: MailLocaleInput

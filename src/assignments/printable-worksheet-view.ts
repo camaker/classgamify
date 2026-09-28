@@ -37,7 +37,7 @@ export type PrintableWorksheetHeaderOverviewItem = {
   value: string;
 };
 
-export type PrintableWorksheetAnswerKeyAccessState =
+type PrintableWorksheetAnswerKeyAccessState =
   | 'hidden'
   | 'included'
   | 'unavailable';
@@ -211,7 +211,7 @@ export type PrintableWorksheetLoadStateView = {
   message: string;
 };
 
-export type PrintableWorksheetPageViewModel = {
+type PrintableWorksheetPageViewModel = {
   answerKeyView: PrintableWorksheetAnswerKeyView;
   answerKeyItemViews: PrintableWorksheetAnswerKeyItemView[];
   assignmentFieldViews: PrintableWorksheetAssignmentFieldView[];
@@ -223,7 +223,7 @@ export type PrintableWorksheetPageViewModel = {
   showAnswerKey: boolean;
 };
 
-export type PrintableWorksheetRouteState =
+type PrintableWorksheetRouteState =
   | {
       statePanelView: PrintableWorksheetLoadStateView;
       status: 'loading';

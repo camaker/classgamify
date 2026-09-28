@@ -399,10 +399,9 @@ const aiGroupSchema = z.object({
     .max(ACTIVITY_AI_DRAFT_FIELD_LIMITS.groupLabel.max),
 });
 
-export type AiActivityDraftQuestion = z.output<typeof aiQuestionSchema>;
-export type AiActivityDraftPair = z.output<typeof aiPairSchema>;
-export type AiActivityDraftGroup = z.output<typeof aiGroupSchema>;
-export type AiActivityDraftGroupList = AiActivityDraftGroup[];
+type AiActivityDraftQuestion = z.output<typeof aiQuestionSchema>;
+type AiActivityDraftGroup = z.output<typeof aiGroupSchema>;
+type AiActivityDraftGroupList = AiActivityDraftGroup[];
 
 const aiDraftSchema = z.object({
   description: z
@@ -520,10 +519,8 @@ const aiDraftCompletionSchema = z.object({
     .optional(),
 });
 
-export type AiActivityDraftCompletion = z.output<
-  typeof aiDraftCompletionSchema
->;
-export type NormalizedAiActivityDraft = z.output<typeof aiDraftSchema>;
+type AiActivityDraftCompletion = z.output<typeof aiDraftCompletionSchema>;
+type NormalizedAiActivityDraft = z.output<typeof aiDraftSchema>;
 
 export async function generateActivityDraftFromAi(
   input: GenerateActivityDraftInput

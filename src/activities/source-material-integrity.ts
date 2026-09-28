@@ -41,10 +41,7 @@ export const SOURCE_MATERIAL_INTEGRITY_STAGES = [
   stage('student-data-unread', 'privacy'),
 ] as const;
 
-export type UserFileDeleteRecovery =
-  | 'already-deleted'
-  | 'restored'
-  | 'unconfirmed';
+type UserFileDeleteRecovery = 'already-deleted' | 'restored' | 'unconfirmed';
 
 export function getSourceMaterialIntegrityErrorMessage(error: unknown) {
   const errorText = getErrorTextChain(error);

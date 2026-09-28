@@ -18,7 +18,7 @@ type PublicIndexableRouteId =
   | 'terms'
   | 'worksheets';
 
-export type PublicRobotsDisallowRuleId =
+type PublicRobotsDisallowRuleId =
   | 'admin'
   | 'auth'
   | 'dashboard'
@@ -35,7 +35,7 @@ export type SitemapChangeFrequency =
   | 'weekly'
   | 'yearly';
 
-export type PublicIndexableStaticRoute = {
+type PublicIndexableStaticRoute = {
   changefreq?: SitemapChangeFrequency;
   id: PublicIndexableRouteId;
   indexableLocales?: readonly Locale[];
@@ -44,7 +44,7 @@ export type PublicIndexableStaticRoute = {
   priority?: string;
 };
 
-export type PublicRobotsDisallowRule = {
+type PublicRobotsDisallowRule = {
   id: PublicRobotsDisallowRuleId;
   path: string;
 };

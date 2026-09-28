@@ -24,12 +24,12 @@ import type {
 } from '@/auth/workspace-boundary';
 import { cn } from '@/lib/utils';
 
-export type AuthCardBenefitItem = {
+type AuthCardBenefitItem = {
   id: string;
   text: string;
 };
 
-export type AuthWorkflowStep = {
+type AuthWorkflowStep = {
   id: string;
   label: string;
   title: string;

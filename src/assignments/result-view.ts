@@ -105,12 +105,8 @@ export {
   buildAssignmentResultRouteSearch,
   normalizeAssignmentResultScopeCount,
   resolveAssignmentResultViewState,
-  type AssignmentAttemptReviewRow,
   type AssignmentAttemptRowInput,
-  type AssignmentResultReviewScope,
-  type AssignmentResultControlSearchUpdate,
   type AssignmentResultResolvedViewState,
-  type AssignmentResultSearchState,
   type AttemptReviewFilter,
   type ItemPerformanceSort,
   type StudentSummarySort,
@@ -139,13 +135,9 @@ export {
   getAssignmentResultActionGate,
   getAssignmentResultActionGateFromState,
   type AssignmentResultActionButton,
-  type AssignmentResultActionButtonId,
   type AssignmentResultActionDataSet,
-  type AssignmentResultActionScopeView,
-  type AssignmentResultActionStatusView,
   type AssignmentResultCopyActionData,
   type AssignmentResultCopyArtifactPreview,
-  type AssignmentResultCopyArtifactPreviewId,
 } from '@/assignments/result-actions';
 
 export type AssignmentResultEmptyState = {
@@ -281,7 +273,7 @@ export type AssignmentResultAttemptAnswerReviewView =
     id: string;
   };
 
-export type AssignmentResultAttemptReviewSummaryMetricKey =
+type AssignmentResultAttemptReviewSummaryMetricKey =
   | 'correct'
   | 'needs-review'
   | 'submitted'
@@ -489,7 +481,7 @@ type AssignmentResultReviewScopeItemId =
   | 'student-search'
   | 'student-sort';
 
-export type AssignmentResultReviewScopeItemView = {
+type AssignmentResultReviewScopeItemView = {
   ariaLabel: string;
   description: string;
   id: AssignmentResultReviewScopeItemId;
@@ -504,7 +496,7 @@ type AssignmentResultReviewScopeSummaryItemId =
   | 'items'
   | 'students';
 
-export type AssignmentResultReviewScopeSummaryItemView = {
+type AssignmentResultReviewScopeSummaryItemView = {
   ariaLabel: string;
   description: string;
   id: AssignmentResultReviewScopeSummaryItemId;
@@ -520,14 +512,14 @@ export type AssignmentResultReviewScopeView = {
   title: string;
 };
 
-export type AssignmentResultReviewStatus =
+type AssignmentResultReviewStatus =
   | 'class-ready'
   | 'focused'
   | 'needs-review'
   | 'no-matches'
   | 'waiting-for-attempts';
 
-export type AssignmentResultReviewStatusStepView = {
+type AssignmentResultReviewStatusStepView = {
   description: string;
   label: string;
 };
@@ -656,7 +648,7 @@ export type AssignmentResultsPageViewModel<
   viewState: AssignmentResultResolvedViewState;
 };
 
-export type AssignmentResultsRouteState<
+type AssignmentResultsRouteState<
   TAttempt extends AssignmentAttemptRowDisplayInput,
 > =
   | {

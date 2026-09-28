@@ -7,7 +7,7 @@ import rehypeSlug from 'rehype-slug';
 import rehypeAutolinkHeadings from 'rehype-autolink-headings';
 import rehypeStringify from 'rehype-stringify';
 
-export type MarkdownResult = {
+type MarkdownResult = {
   markup: string;
 };
 

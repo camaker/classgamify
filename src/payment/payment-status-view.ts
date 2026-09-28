@@ -16,7 +16,7 @@ export type PaymentStatusNextStepView = {
   label: string;
 };
 
-export type PaymentStatusView = {
+type PaymentStatusView = {
   description: string;
   icon: PaymentStatusIconKey;
   nextStep: PaymentStatusNextStepView;

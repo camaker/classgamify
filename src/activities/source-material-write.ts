@@ -38,7 +38,7 @@ export const ACTIVITY_SOURCE_MATERIAL_WRITE_STAGES = [
   stage('file-bytes-unread', 'privacy'),
 ] as const;
 
-export type ActivitySourceMaterialOwnedFile = {
+type ActivitySourceMaterialOwnedFile = {
   contentType?: string | null;
   filename?: string | null;
   id: string;
@@ -46,7 +46,7 @@ export type ActivitySourceMaterialOwnedFile = {
   size?: number | null;
 };
 
-export type ActivitySourceMaterialWriteResolution =
+type ActivitySourceMaterialWriteResolution =
   | {
       references: ActivityMaterialReference[];
       requestedCount: number;

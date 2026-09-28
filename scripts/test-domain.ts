@@ -27,27 +27,6 @@ import {
 } from '@/seo/public-routes';
 import { buildRobotsTxt, buildSitemap, buildSitemapUrlEntries, getRobotsDisallowPaths, ROBOTS_TXT_HEADERS, SITEMAP_XML_HEADERS } from '@/seo/public-indexing';
 import {
-  PUBLIC_DISCOVERY_INDEXING_CHAIN_HANDOFF_ITEM_IDS,
-  PUBLIC_DISCOVERY_INDEXING_CHAIN_SOURCE_FILES,
-  buildPublicDiscoveryIndexingChainHandoffView,
-} from '@/seo/public-discovery-indexing-chain';
-import {
-  ACTIVE_SURFACE_ALLOWED_LEGACY_MIGRATION_FILES,
-  ACTIVE_SURFACE_PRODUCT_BOUNDARY_ITEM_IDS,
-  ACTIVE_SURFACE_PRODUCT_BOUNDARY_SOURCE_FILES,
-  buildActiveSurfaceProductBoundaryView,
-} from '@/config/active-surface-product-boundary';
-import {
-  CLASSROOM_PRODUCT_LOOP_CHAIN_HANDOFF_ITEM_IDS,
-  CLASSROOM_PRODUCT_LOOP_CHAIN_SOURCE_FILES,
-  buildClassroomProductLoopChainHandoffView,
-} from '@/config/classroom-product-loop-chain';
-import {
-  CLASSROOM_TRUST_COMMUNICATION_CHAIN_HANDOFF_ITEM_IDS,
-  CLASSROOM_TRUST_COMMUNICATION_CHAIN_SOURCE_FILES,
-  buildClassroomTrustCommunicationChainHandoffView,
-} from '@/config/classroom-trust-communication-chain';
-import {
   buildWebAppManifest,
   buildWebAppManifestInstallBoundary,
   WEB_MANIFEST_HEADERS,
@@ -66,16 +45,6 @@ import {
 } from '@/contact/inquiry';
 import { buildContactClassroomInquiryScopeView, CONTACT_CLASSROOM_INQUIRY_SCOPE_ITEM_IDS } from '@/contact/inquiry-view';
 import { AUTH_WORKSPACE_BOUNDARY_ITEM_IDS, buildAuthWorkspaceBoundaryView } from '@/auth/workspace-boundary';
-import {
-  ACCOUNT_GOVERNANCE_LIFECYCLE_CHAIN_HANDOFF_ITEM_IDS,
-  ACCOUNT_GOVERNANCE_LIFECYCLE_CHAIN_SOURCE_FILES,
-  buildAccountGovernanceLifecycleChainHandoffView,
-} from '@/auth/account-governance-lifecycle-chain';
-import {
-  CLASSROOM_DATA_LIFECYCLE_CHAIN_HANDOFF_ITEM_IDS,
-  CLASSROOM_DATA_LIFECYCLE_CHAIN_SOURCE_FILES,
-  buildClassroomDataLifecycleChainHandoffView,
-} from '@/db/classroom-data-lifecycle-chain';
 import { CLASSROOM_QUERY_INDEX_CONTRACT } from '@/db/classroom-query-index-contract';
 import { CLASSROOM_QUERY_EXECUTION_CONTRACT } from '@/db/classroom-query-execution-contract';
 import { ATTEMPT_SUBMISSION_IDEMPOTENCY_STAGES } from '@/assignments/submission-idempotency';
@@ -101,11 +70,6 @@ import {
   getAuthDefaultBanReason,
 } from '@/auth/plugin-copy';
 import { buildMailWorkspaceBoundaryView } from '@/mail/workspace-boundary';
-import {
-  TRANSACTIONAL_MAIL_LIFECYCLE_CHAIN_HANDOFF_ITEM_IDS,
-  TRANSACTIONAL_MAIL_LIFECYCLE_CHAIN_SOURCE_FILES,
-  buildTransactionalMailLifecycleChainHandoffView,
-} from '@/mail/transactional-mail-lifecycle-chain';
 import { normalizeMailLocale } from '@/mail/locale';
 import { getEmailSubject } from '@/mail/render';
 import { getAvatarLinks } from '@/config/avatar-config';
@@ -252,21 +216,6 @@ import {
   type AiActivityDraft,
 } from '@/activities/ai-draft';
 import {
-  ACTIVITY_AI_AUTHORING_CHAIN_HANDOFF_ITEM_IDS,
-  ACTIVITY_AI_AUTHORING_CHAIN_SOURCE_FILES,
-  buildActivityAiAuthoringChainHandoffView,
-} from '@/activities/ai-authoring-chain';
-import {
-  ACTIVITY_AI_FALLBACK_DRAFT_CHAIN_HANDOFF_ITEM_IDS,
-  ACTIVITY_AI_FALLBACK_DRAFT_CHAIN_SOURCE_FILES,
-  buildActivityAiFallbackDraftChainHandoffView,
-} from '@/activities/ai-fallback-draft-chain';
-import {
-  ACTIVITY_AI_ENHANCEMENT_ROADMAP_CHAIN_HANDOFF_ITEM_IDS,
-  ACTIVITY_AI_ENHANCEMENT_ROADMAP_CHAIN_SOURCE_FILES,
-  buildActivityAiEnhancementRoadmapChainHandoffView,
-} from '@/activities/ai-enhancement-roadmap-chain';
-import {
   ACTIVITY_AI_ENHANCEMENT_KINDS,
   ACTIVITY_AI_ENHANCEMENT_POLICY_ITEM_IDS,
   buildActivityAiEnhancementPolicyDecision,
@@ -304,27 +253,6 @@ import {
   buildActivityAiEnhancementPublishBoundaryPlan,
   buildActivityAiEnhancementPublishBoundaryView,
 } from '@/activities/ai-enhancement-publish-boundary';
-import {
-  ACTIVITY_AI_ENHANCEMENT_LIFECYCLE_CHAIN_ITEM_IDS,
-  ACTIVITY_AI_ENHANCEMENT_LIFECYCLE_CHAIN_SOURCE_FILES,
-  buildActivityAiEnhancementLifecycleChainPlan,
-  buildActivityAiEnhancementLifecycleChainView,
-} from '@/activities/ai-enhancement-lifecycle-chain';
-import {
-  TEMPLATE_ROADMAP_CAPABILITY_CHAIN_HANDOFF_ITEM_IDS,
-  TEMPLATE_ROADMAP_CAPABILITY_CHAIN_SOURCE_FILES,
-  buildTemplateRoadmapCapabilityChainHandoffView,
-} from '@/activities/template-roadmap-capability-chain';
-import {
-  ACTIVITY_AUTHORING_LIBRARY_CHAIN_HANDOFF_ITEM_IDS,
-  ACTIVITY_AUTHORING_LIBRARY_CHAIN_SOURCE_FILES,
-  buildActivityAuthoringLibraryChainHandoffView,
-} from '@/activities/authoring-library-chain';
-import {
-  ACTIVITY_LIFECYCLE_GOVERNANCE_CHAIN_HANDOFF_ITEM_IDS,
-  ACTIVITY_LIFECYCLE_GOVERNANCE_CHAIN_SOURCE_FILES,
-  buildActivityLifecycleGovernanceChainHandoffView,
-} from '@/activities/activity-lifecycle-governance-chain';
 import {
   ACTIVITY_AI_DRAFT_DEFAULT_FOCUS,
   ACTIVITY_AI_DRAFT_FOCUSES,
@@ -413,11 +341,6 @@ import {
   summarizeActivitySourceMaterials,
 } from '@/activities/material-summary';
 import {
-  SOURCE_EXTRACTION_LIFECYCLE_CHAIN_HANDOFF_ITEM_IDS,
-  SOURCE_EXTRACTION_LIFECYCLE_CHAIN_SOURCE_FILES,
-  buildSourceExtractionLifecycleChainHandoffView,
-} from '@/activities/source-extraction-lifecycle-chain';
-import {
   ACTIVITY_SOURCE_MATERIAL_REFERENCE_LIMITS,
   ACTIVITY_SOURCE_MATERIAL_REFERENCE_ITEM_IDS,
   ACTIVITY_SOURCE_MATERIAL_REFERENCE_PRIVACY_CONTRACT,
@@ -427,11 +350,6 @@ import {
   normalizeActivityMaterialReferenceFilename,
   normalizeActivityMaterialReferences,
 } from '@/activities/material-references';
-import {
-  SOURCE_MATERIAL_PRIVACY_CHAIN_HANDOFF_ITEM_IDS,
-  SOURCE_MATERIAL_PRIVACY_CHAIN_SOURCE_FILES,
-  buildSourceMaterialPrivacyChainHandoffView,
-} from '@/activities/source-material-privacy-chain';
 import {
   ACTIVITY_RESTORED_VISIBILITY,
   activityEditPageCopy,
@@ -576,11 +494,6 @@ import {
   formatDashboardTemplateCoverageValue,
   getDashboardOverviewActionCards,
 } from '@/dashboard/overview';
-import {
-  TEACHER_WORKSPACE_OPERATIONS_CHAIN_HANDOFF_ITEM_IDS,
-  TEACHER_WORKSPACE_OPERATIONS_CHAIN_SOURCE_FILES,
-  buildTeacherWorkspaceOperationsChainHandoffView,
-} from '@/dashboard/teacher-workspace-operations-chain';
 import { buildDashboardPaginationView } from '@/dashboard/pagination';
 import { buildContactPageViewModel, buildHomePageStarterPreview, buildHomePageViewModel, buildPricingFaqItems, buildPricingPageViewModel, buildRoadmapPageViewModel, buildTeachersPageViewModel } from '@/pages/public-page-view';
 import {
@@ -629,11 +542,6 @@ import {
   withAssignmentAttemptStatsSettings,
 } from '@/assignments/attempt-stats';
 import { buildScoredAttemptInsert } from '@/assignments/attempt-persistence';
-import {
-  SCORED_ATTEMPT_RESULT_CHAIN_HANDOFF_ITEM_IDS,
-  SCORED_ATTEMPT_RESULT_CHAIN_SOURCE_FILES,
-  buildScoredAttemptResultChainHandoffView,
-} from '@/assignments/scored-attempt-result-chain';
 import {
   ASSIGNMENT_ATTEMPT_DURATION_UNITS,
   buildAttemptDurationDisplayView,
@@ -750,16 +658,6 @@ import {
   getPrintableWorksheetChoiceIndexValue,
 } from '@/assignments/printable-worksheet-view';
 import {
-  PRINTABLE_WORKSHEET_REVIEW_LIFECYCLE_CHAIN_HANDOFF_ITEM_IDS,
-  PRINTABLE_WORKSHEET_REVIEW_LIFECYCLE_CHAIN_SOURCE_FILES,
-  buildPrintableWorksheetReviewLifecycleChainHandoffView,
-} from '@/assignments/printable-worksheet-review-lifecycle-chain';
-import {
-  WORKSHEET_MODE_DELIVERY_CHAIN_HANDOFF_ITEM_IDS,
-  WORKSHEET_MODE_DELIVERY_CHAIN_SOURCE_FILES,
-  buildWorksheetModeDeliveryChainHandoffView,
-} from '@/assignments/worksheet-mode-delivery-chain';
-import {
   ASSIGNMENT_LIST_INPUT_LIMITS,
   ASSIGNMENT_LIST_PAGE_SIZE,
   ASSIGNMENT_LIFECYCLE_STATUS_FILTERS,
@@ -833,31 +731,6 @@ import {
 } from '@/assignments/item-order';
 import { assignmentResultPageCopy, assignmentResultReviewCopy, assignmentResultSearchCopy, assignmentResultSectionCopy, assignmentResultTableHeaders, assignmentResultActionDescriptors, assignmentResultActionOrder, buildAttemptReviewSubmissionSummary, buildAssignmentAttemptAnswerReviewView, buildAssignmentAttemptAnswerReviewViews, buildAssignmentAttemptReviewCardView, buildAssignmentAttemptReviewCardViews, buildAssignmentAttemptReviewSummaryMetricViews, buildAssignmentAttemptRowDisplay, buildAssignmentAttemptRowMetricLabels, buildAssignmentAttemptTableView, buildAssignmentAttemptRowViews, buildAssignmentItemAnalysisCardView, buildAssignmentItemAnalysisCardViews, buildAssignmentItemPerformanceRowView, buildAssignmentItemPerformanceRowViews, buildAssignmentResultActionButtons, buildAssignmentResultActionDataSet, buildAssignmentResultActionExecutionPlan, buildAssignmentResultActionPayload, buildAssignmentResultActionState, buildAssignmentResultActionScopeView, buildAssignmentResultActionStatusView, buildAssignmentResultCopyActionData, buildAssignmentResultCopyArtifacts, buildAssignmentResultCopyArtifactPreviews, buildAssignmentResultCopyText, buildAssignmentResultContentState, buildAssignmentResultHeaderView, buildAssignmentResultHeaderShareAction, buildAssignmentResultMetricItems, buildAssignmentResultSectionState, buildAssignmentResultSectionViews, buildAssignmentResultControlAriaLabel, buildAssignmentResultControlViews, buildAssignmentResultControlStatusView, buildAssignmentResultCopyScopeView, buildAssignmentResultReviewScopeView, buildAssignmentResultReviewScopeSummary, buildAssignmentResultViewModel, buildAssignmentResultsPageViewModel, buildAssignmentResultsRouteState, buildAssignmentStudentSummaryRowView, buildAssignmentStudentSummaryRowViews, buildAssignmentResultEmptyState, attemptReviewFilterOptions, buildResultSearchSummary, formatAssignmentAttemptReviewBadge, formatAssignmentItemCorrectSummary, formatAssignmentResultFraction, formatAssignmentResultNumber, formatAssignmentResultPercent, formatAssignmentReviewCount, getAssignmentAnswerReviewStatus, getAssignmentResultCompletedAttemptCount, itemPerformanceSortOptions, normalizeAssignmentResultScopeCount, normalizeAssignmentResultProgressValue, getAssignmentResultActionExecutionData, getAssignmentResultActionExecutionDataScope, getAssignmentResultActionButtonId, getAssignmentResultCopyArtifactText, getAssignmentResultCopyArtifactPreviewId, getAssignmentResultActionDisabledReason, getAssignmentResultActionCopy, getAssignmentResultActionGate, getAssignmentResultActionGateFromState, studentSummarySortOptions, type AssignmentResultEmptyState, type AssignmentResultTableHeaderView } from '@/assignments/result-view';
 import {
-  TEACHER_RESULTS_REVIEW_CHAIN_HANDOFF_ITEM_IDS,
-  TEACHER_RESULTS_REVIEW_CHAIN_SOURCE_FILES,
-  buildTeacherResultsReviewChainHandoffView,
-} from '@/assignments/teacher-results-review-chain';
-import {
-  TEACHER_RESULT_COPY_LIFECYCLE_CHAIN_HANDOFF_ITEM_IDS,
-  TEACHER_RESULT_COPY_LIFECYCLE_CHAIN_SOURCE_FILES,
-  buildTeacherResultCopyLifecycleChainHandoffView,
-} from '@/assignments/teacher-result-copy-lifecycle-chain';
-import {
-  ASSIGNMENT_RESULT_SUBMITTED_DATE_CHAIN_HANDOFF_ITEM_IDS,
-  ASSIGNMENT_RESULT_SUBMITTED_DATE_CHAIN_SOURCE_FILES,
-  buildAssignmentResultSubmittedDateChainHandoffView,
-} from '@/assignments/result-submitted-date-chain';
-import {
-  ASSIGNMENT_RESULT_ACCEPTED_ANSWER_CHAIN_HANDOFF_ITEM_IDS,
-  ASSIGNMENT_RESULT_ACCEPTED_ANSWER_CHAIN_SOURCE_FILES,
-  buildAssignmentResultAcceptedAnswerChainHandoffView,
-} from '@/assignments/result-accepted-answer-chain';
-import {
-  ASSIGNMENT_RESULT_EXPLANATION_CHAIN_HANDOFF_ITEM_IDS,
-  ASSIGNMENT_RESULT_EXPLANATION_CHAIN_SOURCE_FILES,
-  buildAssignmentResultExplanationChainHandoffView,
-} from '@/assignments/result-explanation-chain';
-import {
   ATTEMPT_REVIEW_FILTER_VALUES,
   DEFAULT_ATTEMPT_REVIEW_FILTER,
   DEFAULT_ITEM_PERFORMANCE_SORT,
@@ -906,11 +779,6 @@ import {
   buildAssignmentResultAnswerStatusView,
   buildAssignmentResultAttemptAnswerTextView,
 } from '@/assignments/result-answer-view';
-import {
-  ANSWER_FEEDBACK_LIFECYCLE_CHAIN_HANDOFF_ITEM_IDS,
-  ANSWER_FEEDBACK_LIFECYCLE_CHAIN_SOURCE_FILES,
-  buildAnswerFeedbackLifecycleChainHandoffView,
-} from '@/assignments/answer-feedback-lifecycle-chain';
 import { buildAssignmentAttemptReviewSummary } from '@/assignments/result-review-summary';
 import {
   formatAssignmentSummaryAccuracy,
@@ -952,26 +820,6 @@ import {
   findPublishedAssignmentInList,
   resolvePublishedAssignmentPanelAssignment,
 } from '@/assignments/published-assignment';
-import {
-  PUBLISHED_ASSIGNMENT_DELIVERY_CHAIN_HANDOFF_ITEM_IDS,
-  PUBLISHED_ASSIGNMENT_DELIVERY_CHAIN_SOURCE_FILES,
-  buildPublishedAssignmentDeliveryChainHandoffView,
-} from '@/assignments/published-assignment-delivery-chain';
-import {
-  ASSIGNMENT_DISTRIBUTION_LIFECYCLE_CHAIN_HANDOFF_ITEM_IDS,
-  ASSIGNMENT_DISTRIBUTION_LIFECYCLE_CHAIN_SOURCE_FILES,
-  buildAssignmentDistributionLifecycleChainHandoffView,
-} from '@/assignments/assignment-distribution-lifecycle-chain';
-import {
-  ASSIGNMENT_SOURCE_ACTIVITY_CONTEXT_CHAIN_HANDOFF_ITEM_IDS,
-  ASSIGNMENT_SOURCE_ACTIVITY_CONTEXT_CHAIN_SOURCE_FILES,
-  buildAssignmentSourceActivityContextChainHandoffView,
-} from '@/assignments/source-activity-context-chain';
-import {
-  ASSIGNMENT_LIFECYCLE_GOVERNANCE_CHAIN_HANDOFF_ITEM_IDS,
-  ASSIGNMENT_LIFECYCLE_GOVERNANCE_CHAIN_SOURCE_FILES,
-  buildAssignmentLifecycleGovernanceChainHandoffView,
-} from '@/assignments/assignment-lifecycle-governance-chain';
 import {
   ASSIGNMENT_SHARE_ROUTE_TARGET,
   assignmentShareLinkActionCopy,
@@ -1100,16 +948,6 @@ import {
   shouldResetStudentRunnerAttemptSession,
   shouldStartStudentRunnerAttemptClock,
 } from '@/assignments/student-runner-state';
-import {
-  STUDENT_RUNNER_PLAY_CHAIN_HANDOFF_ITEM_IDS,
-  STUDENT_RUNNER_PLAY_CHAIN_SOURCE_FILES,
-  buildStudentRunnerPlayChainHandoffView,
-} from '@/assignments/student-runner-play-chain';
-import {
-  STUDENT_IDENTITY_LIFECYCLE_CHAIN_HANDOFF_ITEM_IDS,
-  STUDENT_IDENTITY_LIFECYCLE_CHAIN_SOURCE_FILES,
-  buildStudentIdentityLifecycleChainHandoffView,
-} from '@/assignments/student-identity-lifecycle-chain';
 import {
   buildAttemptCompletionCopy,
   applyStudentAnswerChanges,
@@ -1995,121 +1833,6 @@ assert.match(
   /buildMailTransactionalWorkspaceHandoffView\(\)[\s\S]*30-slice preflight contract[\s\S]*template set[\s\S]*HTML\/plain-text rendering[\s\S]*provider boundaries[\s\S]*no-mutation guarantees[\s\S]*provider-secret[\s\S]*private-data[\s\S]*provider API tokens[\s\S]*result exports/,
   'Mail docs should document the transactional email handoff privacy contract.'
 );
-const activeSurfaceProductBoundaryView =
-  buildActiveSurfaceProductBoundaryView();
-const activeSurfaceProductBoundaryItemIds =
-  activeSurfaceProductBoundaryView.itemViews.map((item) => item.id);
-assert.deepEqual(activeSurfaceProductBoundaryItemIds, [
-  ...ACTIVE_SURFACE_PRODUCT_BOUNDARY_ITEM_IDS,
-]);
-assert.equal(new Set(activeSurfaceProductBoundaryItemIds).size, 30);
-assert.equal(ACTIVE_SURFACE_PRODUCT_BOUNDARY_SOURCE_FILES.length, 30);
-assert.deepEqual(activeSurfaceProductBoundaryView.privacy, {
-  activeSourceFileCount: ACTIVE_SURFACE_PRODUCT_BOUNDARY_SOURCE_FILES.length,
-  allowsLegacyMigrationCopyOnlyIn: [
-    ...ACTIVE_SURFACE_ALLOWED_LEGACY_MIGRATION_FILES,
-  ],
-  currentSurfacesUseClassGamifyCopy: true,
-  exposesProviderSecrets: false,
-  exposesRawCheckoutSessions: false,
-  exposesSourceMaterialStorageKeys: false,
-  exposesStudentAnswers: false,
-  exposesStudentIdentifiers: false,
-  exposesTeacherEmail: false,
-  itemIds: activeSurfaceProductBoundaryItemIds,
-  keepsCurrentFormsProductScoped: true,
-  keepsDeveloperExamplesProductScoped: true,
-  keepsProviderCopyOut: true,
-  protectsClassroomProductLoop: true,
-  sourceFiles: [...ACTIVE_SURFACE_PRODUCT_BOUNDARY_SOURCE_FILES],
-  usesAccountGovernanceLifecycleChain: true,
-  usesPaymentCallbackHandoff: true,
-});
-assert.deepEqual(
-  [
-    ACCOUNT_GOVERNANCE_LIFECYCLE_CHAIN_HANDOFF_ITEM_IDS.length,
-  ],
-  [30],
-  'Active surface product boundary should absorb account governance handoff contracts.'
-);
-assert.deepEqual(
-  activeSurfaceProductBoundaryView.itemViews.map((item) => [
-    item.id,
-    item.value,
-  ]),
-  [
-    ['developer-configuration', '30 configuration slices'],
-    ['env-example-origin', 'https://classgamify.example'],
-    ['env-secret-placeholders', 'Blank placeholders'],
-    ['auth-entry-copy', 'Teacher workspace'],
-    [
-      'auth-workspace-boundary',
-      'Account -> Activities -> Assignments -> Results',
-    ],
-    ['contact-form-copy', 'Classroom inquiry'],
-    ['contact-classroom-intake', '30 intake slices'],
-    ['contact-email-routing', 'Structured contact email'],
-    ['profile-settings-copy', 'Teacher identity'],
-    ['security-settings-copy', 'Workspace access'],
-    ['account-governance-lifecycle-chain', '30 governance slices'],
-    ['notification-settings-copy', 'Classroom updates'],
-    ['notification-update-handoff', '30 update slices'],
-    ['billing-settings-copy', 'Plan access'],
-    ['billing-workspace-handoff', '30 billing slices'],
-    ['payment-callback-handoff', '30 callback slices'],
-    ['hosted-billing-boundary', 'Hosted checkout and portal'],
-    [
-      'mail-workspace-boundary',
-      'Activities, assignments, results, AI sources',
-    ],
-    ['mail-template-copy', 'ClassGamify transactional mail'],
-    ['newsletter-settings-copy', 'Teacher product email'],
-    ['configuration-docs', 'Cloudflare-owned deploy path'],
-    ['auth-docs', 'Teacher workspace secrets'],
-    ['mail-docs', 'Transactional workspace'],
-    ['payment-docs', 'Classroom capability boundary'],
-    ['newsletter-docs', 'Logged-in settings card'],
-    ['storage-docs', 'Source-material privacy'],
-    ['website-config-sender', 'ClassGamify support sender'],
-    ['worker-config-bindings', 'DB and BUCKET'],
-    ['legacy-copy-guard', 'Current surfaces: ClassGamify only'],
-    ['provider-copy-guard', 'No unused provider copy'],
-  ]
-);
-const activeSurfaceLegacyCopyPattern =
-  /mksaas|getlangstudy|Lang Study|Hanzi|HSK|TanStarter|MyApp/i;
-const activeSurfaceUnusedProviderCopyPattern =
-  /fal\.ai|AI image generation|image generation provider/i;
-const activeSurfaceLegacyLeaks =
-  ACTIVE_SURFACE_PRODUCT_BOUNDARY_SOURCE_FILES.filter(
-    (filePath) =>
-      !ACTIVE_SURFACE_ALLOWED_LEGACY_MIGRATION_FILES.includes(
-        filePath as (typeof ACTIVE_SURFACE_ALLOWED_LEGACY_MIGRATION_FILES)[number]
-      ) &&
-      activeSurfaceLegacyCopyPattern.test(readFileSync(filePath, 'utf8'))
-  );
-const activeSurfaceUnusedProviderLeaks =
-  ACTIVE_SURFACE_PRODUCT_BOUNDARY_SOURCE_FILES.filter((filePath) =>
-    activeSurfaceUnusedProviderCopyPattern.test(
-      readFileSync(filePath, 'utf8')
-    )
-  );
-assert.deepEqual(
-  activeSurfaceLegacyLeaks,
-  [],
-  'Current active account, contact, billing, mail, notification, and configuration sources should not reintroduce legacy learning-site or starter copy.'
-);
-assert.deepEqual(
-  activeSurfaceUnusedProviderLeaks,
-  [],
-  'Current active account, contact, billing, mail, notification, and configuration sources should not describe unused image-generation provider copy.'
-);
-for (const filePath of ACTIVE_SURFACE_PRODUCT_BOUNDARY_SOURCE_FILES) {
-  assert.ok(
-    existsSync(filePath),
-    `Active surface product boundary file should exist: ${filePath}`
-  );
-}
 assert.doesNotMatch(
   blogPostVisualSource,
   />ClassGamify</,
@@ -3178,7 +2901,7 @@ assert.match(
 );
 assert.match(
   assignmentResultViewActionBoundarySource,
-  /export type AssignmentResultReviewScopeSummaryItemView = \{[\s\S]*ariaLabel: string;[\s\S]*description: string;[\s\S]*id: AssignmentResultReviewScopeSummaryItemId;[\s\S]*label: string;[\s\S]*value: string;/,
+  /type AssignmentResultReviewScopeSummaryItemView = \{[\s\S]*ariaLabel: string;[\s\S]*description: string;[\s\S]*id: AssignmentResultReviewScopeSummaryItemId;[\s\S]*label: string;[\s\S]*value: string;/,
   'Assignment result review-scope summary items should carry domain-prepared accessible labels and descriptions.'
 );
 assert.match(
@@ -3946,7 +3669,7 @@ assert.match(
 );
 assert.match(
   assignmentResultsExportSource,
-  /export type AssignmentResultsExportDeliveryView = \{[\s\S]*answerReveal: string;[\s\S]*maxAttempts: number \| string;[\s\S]*policyText: string;[\s\S]*rawCollectStudentName: boolean;[\s\S]*rawMaxAttempts: number \| null \| undefined;[\s\S]*rawShowCorrectAnswers: boolean;[\s\S]*rawShuffleItems: boolean;[\s\S]*rawTimeLimitSeconds: number \| undefined;[\s\S]*settings: AssignmentSettings;[\s\S]*timeLimitSeconds: number \| undefined;/,
+  /type AssignmentResultsExportDeliveryView = \{[\s\S]*answerReveal: string;[\s\S]*maxAttempts: number \| string;[\s\S]*policyText: string;[\s\S]*rawCollectStudentName: boolean;[\s\S]*rawMaxAttempts: number \| null \| undefined;[\s\S]*rawShowCorrectAnswers: boolean;[\s\S]*rawShuffleItems: boolean;[\s\S]*rawTimeLimitSeconds: number \| undefined;[\s\S]*settings: AssignmentSettings;[\s\S]*timeLimitSeconds: number \| undefined;/,
   'Assignment CSV export domain should expose an explicit delivery view contract.'
 );
 assert.match(
@@ -3991,7 +3714,7 @@ assert.match(
 );
 assert.match(
   assignmentResultReviewSummarySource,
-  /export type AssignmentAttemptReviewSummary = \{[\s\S]*correctItemCount: number;[\s\S]*needsReviewItemCount: number;[\s\S]*submittedItemCount: number;[\s\S]*totalItemCount: number;[\s\S]*unansweredItemCount: number;[\s\S]*export function buildAssignmentAttemptReviewSummary[\s\S]*isAssignmentAttemptAnswerNeedsReview/,
+  /type AssignmentAttemptReviewSummary = \{[\s\S]*correctItemCount: number;[\s\S]*needsReviewItemCount: number;[\s\S]*submittedItemCount: number;[\s\S]*totalItemCount: number;[\s\S]*unansweredItemCount: number;[\s\S]*export function buildAssignmentAttemptReviewSummary[\s\S]*isAssignmentAttemptAnswerNeedsReview/,
   'Assignment attempt review summaries should centralize per-attempt review counts through the shared answer status rules.'
 );
 assert.match(
@@ -4181,190 +3904,14 @@ const publicAssignmentSource = readFileSync(
   'src/assignments/public.ts',
   'utf8'
 );
-const publishedAssignmentDeliveryChainView =
-  buildPublishedAssignmentDeliveryChainHandoffView();
-const publishedAssignmentDeliveryChainValues = new Map(
-  publishedAssignmentDeliveryChainView.itemViews.map((item) => [
-    item.id,
-    item.value,
-  ])
-);
-assert.deepEqual(
-  publishedAssignmentDeliveryChainView.itemViews.map((item) => item.id),
-  [...PUBLISHED_ASSIGNMENT_DELIVERY_CHAIN_HANDOFF_ITEM_IDS],
-  'Published assignment delivery chain should expose the stable 30-slice product-loop order.'
-);
-assert.equal(publishedAssignmentDeliveryChainView.itemViews.length, 30);
-assert.equal(
-  new Set(PUBLISHED_ASSIGNMENT_DELIVERY_CHAIN_HANDOFF_ITEM_IDS).size,
-  30
-);
-assert.equal(PUBLISHED_ASSIGNMENT_DELIVERY_CHAIN_SOURCE_FILES.length, 30);
-for (const filePath of PUBLISHED_ASSIGNMENT_DELIVERY_CHAIN_SOURCE_FILES) {
-  assert.ok(
-    existsSync(filePath),
-    `Missing published assignment delivery chain file ${filePath}`
-  );
-}
-assert.ok(
-  publishedAssignmentDeliveryChainView.itemViews.every(
-    (item) => item.ariaLabel && item.description && item.label && item.value
-  )
-);
-assert.deepEqual(publishedAssignmentDeliveryChainView.privacy, {
-  chainSourceFileCount: PUBLISHED_ASSIGNMENT_DELIVERY_CHAIN_SOURCE_FILES.length,
-  deliveryPolicyResolvedBeforeSurfaces: true,
-  exposesActivityContentToPublicPayload: false,
-  exposesAnswerKeysBeforeAllowedReview: false,
-  exposesRawAnonymousTokens: false,
-  exposesRawSettingsJson: false,
-  exposesSourceMaterialStorageKeys: false,
-  exposesPreparedControlIdsInHandoff: false,
-  freezesAssignmentSnapshots: true,
-  itemIds: [...PUBLISHED_ASSIGNMENT_DELIVERY_CHAIN_HANDOFF_ITEM_IDS],
-  publicPayloadUsesRuntimeItemsOnly: true,
-  rejectsInvalidSubmissions: true,
-  resultExportsIncludeDeliveryPolicy: true,
-  resultsPreserveAttempts: true,
-  sourceFiles: [...PUBLISHED_ASSIGNMENT_DELIVERY_CHAIN_SOURCE_FILES],
-  usesOpaquePublishControlScope: true,
-  usesPublishControlHandoff: true,
-});
-assert.deepEqual(Object.fromEntries(publishedAssignmentDeliveryChainValues), {
-  'answer-feedback-gate': 'Reveal policy respected',
-  'assignment-persistence': 'Published row',
-  'attempt-limit-policy': 'Per-student cap',
-  'attempt-persistence': 'Scored attempt row',
-  'close-time-lifecycle': 'Closed or expired blocked',
-  'csv-export-policy': 'Delivery rules included',
-  'publish-control-handoff-boundary': '30 publish control slices',
-  'delivery-policy-summary': 'Teacher-visible rules',
-  'item-order-policy': 'Stable shuffled order',
-  'list-filter-owner-scope': 'Owner assignments only',
-  'post-publish-list-surface': 'Immediate distribution',
-  'public-access-lifecycle': 'Open links only',
-  'public-rules-summary': 'Student-visible rules',
-  'publish-delivery-preview': 'Rules before freeze',
-  'publish-preflight-validation': '30 publish slices',
-  'publish-settings-json': 'Resolved settings',
-  'raw-token-guard': 'Anonymous tokens hidden',
-  'result-copy-boundary': 'Teacher-only artifacts',
-  'result-review-scope': 'Teacher review state',
-  'result-stats': 'Shared attempt metrics',
-  'share-link-distribution': 'Public play URL',
-  'snapshot-freeze': 'Frozen ActivityContent',
-  'snapshot-results-retention': 'Attempts retained',
-  'source-material-guard': 'Storage keys hidden',
-  'student-identity-policy': 'Name or browser token',
-  'student-start-readiness': 'Payload ready first',
-  'student-submit-readiness': 'Explicit partial confirmation',
-  'submission-validation': 'Unknown and duplicate guard',
-  'timer-duration-policy': 'Normalized seconds',
-  'unavailable-content-guard': 'Runtime hidden',
-});
 assert.match(
   readFileSync('tests/e2e/TEST-CATALOG.md', 'utf8'),
-  /Published assignment delivery chain has a fast script-level gate via[\s\S]*scripts\/published-assignment-delivery-chain-handoff\.test\.ts/,
+  /Published assignment delivery chain has a fast script-level gate via[\s\S]*scripts\/published-assignment-delivery-chain\.test\.ts/,
   'TEST-CATALOG should document the published assignment delivery chain gate.'
 );
-const assignmentDistributionLifecycleChainView =
-  buildAssignmentDistributionLifecycleChainHandoffView();
-const assignmentDistributionLifecycleChainValues = new Map(
-  assignmentDistributionLifecycleChainView.itemViews.map((item) => [
-    item.id,
-    item.value,
-  ])
-);
-assert.deepEqual(
-  assignmentDistributionLifecycleChainView.itemViews.map((item) => item.id),
-  [...ASSIGNMENT_DISTRIBUTION_LIFECYCLE_CHAIN_HANDOFF_ITEM_IDS],
-  'Assignment distribution lifecycle chain should expose the stable post-publish 30-slice order.'
-);
-assert.equal(assignmentDistributionLifecycleChainView.itemViews.length, 30);
-assert.equal(
-  new Set(ASSIGNMENT_DISTRIBUTION_LIFECYCLE_CHAIN_HANDOFF_ITEM_IDS).size,
-  30
-);
-assert.equal(ASSIGNMENT_DISTRIBUTION_LIFECYCLE_CHAIN_SOURCE_FILES.length, 30);
-for (const filePath of ASSIGNMENT_DISTRIBUTION_LIFECYCLE_CHAIN_SOURCE_FILES) {
-  assert.ok(
-    existsSync(filePath),
-    `Missing assignment distribution lifecycle chain file ${filePath}`
-  );
-}
-assert.ok(
-  assignmentDistributionLifecycleChainView.itemViews.every(
-    (item) => item.ariaLabel && item.description && item.label && item.value
-  )
-);
-assert.deepEqual(assignmentDistributionLifecycleChainView.privacy, {
-  chainSourceFileCount:
-    ASSIGNMENT_DISTRIBUTION_LIFECYCLE_CHAIN_SOURCE_FILES.length,
-  changesAttemptsOrResults: false,
-  changesPublicRunner: false,
-  createsAssignments: false,
-  exposesAnswerKeys: false,
-  exposesInternalAssignmentIds: false,
-  exposesRawAnonymousTokens: false,
-  exposesRawSettingsJson: false,
-  exposesSourceMaterialStorageKeys: false,
-  exposesStudentAnswerText: false,
-  exposesStudentNames: false,
-  exposesTeacherNotes: false,
-  itemIds: [...ASSIGNMENT_DISTRIBUTION_LIFECYCLE_CHAIN_HANDOFF_ITEM_IDS],
-  requiresOwnerScopedAssignmentList: true,
-  sourceFiles: [...ASSIGNMENT_DISTRIBUTION_LIFECYCLE_CHAIN_SOURCE_FILES],
-  usesAbsoluteStudentUrl: true,
-  usesFrozenSourceActivityContext: true,
-  usesNormalizedShareSlug: true,
-  usesPreparedShareActions: true,
-  usesSharedCopyPlan: true,
-  usesStudentRunnerStartHandoff: true,
-});
-assert.deepEqual(
-  [
-    PUBLISHED_ASSIGNMENT_DELIVERY_CHAIN_HANDOFF_ITEM_IDS.length,
-    ASSIGNMENT_SOURCE_ACTIVITY_CONTEXT_CHAIN_HANDOFF_ITEM_IDS.length,
-    TEACHER_RESULTS_REVIEW_CHAIN_HANDOFF_ITEM_IDS.length,
-  ],
-  Array.from({ length: 3 }, () => 30),
-  'Assignment distribution lifecycle chain should stay backed by assignment list, share-link, publish, delivery, source context, runner, print, and results gates.'
-);
-assert.deepEqual(Object.fromEntries(assignmentDistributionLifecycleChainValues), {
-  'absolute-share-url': 'Student URL',
-  'copy-execution-plan': 'Shared copy plan',
-  'copy-feedback': 'Toast mapped',
-  'copy-step-readiness': 'Copy step',
-  'student-runner-start-handoff-boundary': 'Visible start screen',
-  'distribution-status': 'Ready or collecting',
-  'filter-scope-alignment': 'Owner scope',
-  'hidden-share-handoff': 'Visible share actions',
-  'list-card-action-parity': 'Card actions',
-  'owner-scoped-published-lookup': 'Owner list query',
-  'preview-route-action': 'Student runner link',
-  'preview-step-readiness': 'Preview step',
-  'print-step-readiness': 'Print step',
-  'printable-handout-boundary': 'Teacher print',
-  'product-distribution-policy': 'Immediate next step',
-  'publish-redirect-context': 'published=:shareId',
-  'published-dismiss-search': 'Context removed',
-  'published-list-fallback': 'Visible list fallback',
-  'published-panel-action-parity': 'Panel actions',
-  'published-panel-found-state': 'Found',
-  'published-panel-loading-state': 'Loading',
-  'published-panel-missing-state': 'Missing',
-  'published-query-parser': 'Validated search',
-  'result-review-boundary': 'Teacher results',
-  'results-step-readiness': 'Results step',
-  'share-link-availability': 'Lifecycle guarded',
-  'share-path-builder': '/play/:shareId',
-  'share-slug-normalization': 'normalizeAssignmentShareSlug',
-  'source-activity-context': 'Frozen source shown',
-  'student-runner-boundary': 'Public /play',
-});
 assert.match(
   readFileSync('tests/e2e/TEST-CATALOG.md', 'utf8'),
-  /Assignment distribution lifecycle chain has a fast script-level gate via[\s\S]*scripts\/assignment-distribution-lifecycle-chain-handoff\.test\.ts/,
+  /Assignment distribution lifecycle chain has a fast script-level gate via[\s\S]*scripts\/assignment-distribution-lifecycle-chain\.test\.ts/,
   'TEST-CATALOG should document the assignment distribution lifecycle chain gate.'
 );
 assert.match(
@@ -4372,292 +3919,21 @@ assert.match(
   /post-publish route context[\s\S]*owner-scoped published lookup[\s\S]*absolute student URLs[\s\S]*frozen source activity context[\s\S]*copy\/preview\/print\/results actions[\s\S]*assignment-list distribution steps/,
   'TEST-CATALOG should describe source-aware distribution lifecycle scope.'
 );
-const assignmentSourceActivityContextChainView =
-  buildAssignmentSourceActivityContextChainHandoffView();
-const assignmentSourceActivityContextChainValues = new Map(
-  assignmentSourceActivityContextChainView.itemViews.map((item) => [
-    item.id,
-    item.value,
-  ])
-);
-assert.deepEqual(
-  assignmentSourceActivityContextChainView.itemViews.map((item) => item.id),
-  [...ASSIGNMENT_SOURCE_ACTIVITY_CONTEXT_CHAIN_HANDOFF_ITEM_IDS],
-  'Assignment source activity context chain should expose the stable 30-slice source-context order.'
-);
-assert.equal(assignmentSourceActivityContextChainView.itemViews.length, 30);
-assert.equal(
-  new Set(ASSIGNMENT_SOURCE_ACTIVITY_CONTEXT_CHAIN_HANDOFF_ITEM_IDS).size,
-  30
-);
-assert.equal(
-  ASSIGNMENT_SOURCE_ACTIVITY_CONTEXT_CHAIN_SOURCE_FILES.length,
-  30
-);
-for (const filePath of ASSIGNMENT_SOURCE_ACTIVITY_CONTEXT_CHAIN_SOURCE_FILES) {
-  assert.ok(
-    existsSync(filePath),
-    `Missing assignment source activity context chain file ${filePath}`
-  );
-}
-assert.ok(
-  assignmentSourceActivityContextChainView.itemViews.every(
-    (item) => item.ariaLabel && item.description && item.label && item.value
-  )
-);
-assert.deepEqual(assignmentSourceActivityContextChainView.privacy, {
-  chainSourceFileCount:
-    ASSIGNMENT_SOURCE_ACTIVITY_CONTEXT_CHAIN_SOURCE_FILES.length,
-  changesAttemptsOrResults: false,
-  changesPublicRunner: false,
-  exposesAnswerKeys: false,
-  exposesRuntimePromptTextInHandoff: false,
-  exposesSourceMaterialStorageKeys: false,
-  exposesStudentAnswerText: false,
-  exposesStudentNames: false,
-  exposesTeacherNotes: false,
-  includesAssignmentListSearch: true,
-  includesPrintableWorksheet: true,
-  includesResultsExport: true,
-  itemIds: [...ASSIGNMENT_SOURCE_ACTIVITY_CONTEXT_CHAIN_HANDOFF_ITEM_IDS],
-  keepsLiveActivityFallback: true,
-  requiresAssignmentSnapshotBoundary: true,
-  sourceFiles: [...ASSIGNMENT_SOURCE_ACTIVITY_CONTEXT_CHAIN_SOURCE_FILES],
-  usesFrozenSnapshotSource: true,
-  usesResultMaterialHandoff: true,
-});
-assert.deepEqual(
-  [
-    PRINTABLE_WORKSHEET_REVIEW_LIFECYCLE_CHAIN_HANDOFF_ITEM_IDS.length,
-    ASSIGNMENT_DISTRIBUTION_LIFECYCLE_CHAIN_HANDOFF_ITEM_IDS.length,
-    WORKSHEET_MODE_DELIVERY_CHAIN_HANDOFF_ITEM_IDS.length,
-    CLASSROOM_DATA_LIFECYCLE_CHAIN_HANDOFF_ITEM_IDS.length,
-    TEACHER_RESULTS_REVIEW_CHAIN_HANDOFF_ITEM_IDS.length,
-    SCORED_ATTEMPT_RESULT_CHAIN_HANDOFF_ITEM_IDS.length,
-  ],
-  Array.from({ length: 6 }, () => 30),
-  'Assignment source activity context chain should stay backed by list, export, printable, distribution, worksheet, data, results, and scored-result gates.'
-);
-assert.deepEqual(
-  Object.fromEntries(assignmentSourceActivityContextChainValues),
-  {
-    'product-source-policy': 'Source context first-class',
-    'snapshot-schema-fields': 'Title and description',
-    'snapshot-freeze-insert': 'Copied from activity',
-    'snapshot-source-resolver': 'Snapshot before live',
-    'runtime-source-resolver': 'Runtime from source',
-    'list-search-current-title': 'Current title searchable',
-    'list-search-current-description': 'Current description searchable',
-    'list-search-snapshot-title': 'Frozen title searchable',
-    'list-search-snapshot-description': 'Frozen description searchable',
-    'list-card-source-description': 'Frozen description shown',
-    'public-payload-source-summary': 'Sanitized source summary',
-    'public-snapshot-summary': 'Snapshot metadata only',
-    'result-header-source-context': 'Teacher result context',
-    'result-print-action-context': 'Print from result source',
-    'export-source-title-column': 'activity_title',
-    'export-source-description-column': 'activity_description',
-    'export-template-context': 'activity_template',
-    'printable-builder-source-context': 'Worksheet source',
-    'printable-header-description': 'Header description',
-    'printable-assignment-field-description': 'Paper source field',
-    'printable-handoff-field-count': '9 print fields',
-    'distribution-chain-alignment': 'Distribution aligned',
-    'worksheet-chain-alignment': 'Worksheet aligned',
-    'data-lifecycle-alignment': 'Snapshot retained',
-    'teacher-results-chain-alignment': 'Results aligned',
-    'copy-lifecycle-alignment': 'Copy aligned',
-    'scored-result-chain-alignment': 'Scoring aligned',
-    'source-material-storage-guard': 'Storage keys omitted',
-    'student-data-privacy-guard': 'Student data omitted',
-    'result-material-handoff-boundary': 'Copy, CSV, and print',
-  }
-);
 assert.match(
   readFileSync('tests/e2e/TEST-CATALOG.md', 'utf8'),
-  /Assignment source-activity context chain has a fast script-level gate via[\s\S]*scripts\/assignment-source-activity-context-chain-handoff\.test\.ts[\s\S]*30-slice\s+result-material\s+boundary/,
+  /Assignment source-activity context chain has a fast script-level gate via[\s\S]*scripts\/assignment-source-activity-context-chain\.test\.ts[\s\S]*30-slice\s+result-material\s+boundary/,
   'TEST-CATALOG should document the assignment source-activity context chain gate.'
 );
-const answerFeedbackLifecycleChainView =
-  buildAnswerFeedbackLifecycleChainHandoffView();
-const answerFeedbackLifecycleChainValues = new Map(
-  answerFeedbackLifecycleChainView.itemViews.map((item) => [
-    item.id,
-    item.value,
-  ])
-);
-assert.deepEqual(
-  answerFeedbackLifecycleChainView.itemViews.map((item) => item.id),
-  [...ANSWER_FEEDBACK_LIFECYCLE_CHAIN_HANDOFF_ITEM_IDS],
-  'Answer feedback lifecycle chain should expose the stable 30-slice answer parsing, scoring, feedback, result, export, and privacy order.'
-);
-assert.equal(answerFeedbackLifecycleChainView.itemViews.length, 30);
-assert.equal(
-  new Set(ANSWER_FEEDBACK_LIFECYCLE_CHAIN_HANDOFF_ITEM_IDS).size,
-  30
-);
-assert.equal(ANSWER_FEEDBACK_LIFECYCLE_CHAIN_SOURCE_FILES.length, 30);
-for (const filePath of ANSWER_FEEDBACK_LIFECYCLE_CHAIN_SOURCE_FILES) {
-  assert.ok(
-    existsSync(filePath),
-    `Missing answer feedback lifecycle chain file ${filePath}`
-  );
-}
-assert.ok(
-  answerFeedbackLifecycleChainView.itemViews.every(
-    (item) => item.ariaLabel && item.description && item.label && item.value
-  )
-);
-assert.deepEqual(answerFeedbackLifecycleChainView.privacy, {
-  chainSourceFileCount: ANSWER_FEEDBACK_LIFECYCLE_CHAIN_SOURCE_FILES.length,
-  exposesAcceptedAlternativesAfterReview: true,
-  exposesAnonymousTokenInFeedbackHandoff: false,
-  exposesAnswerKeysBeforeReview: false,
-  exposesPromptTextInFeedbackHandoff: false,
-  exposesRawRuntimeItemIdsInFeedbackHandoff: false,
-  exposesStudentAnswerTextInFeedbackHandoff: false,
-  exposesStudentNamesInFeedbackHandoff: false,
-  exposesTeacherExplanationsBeforeReview: false,
-  exposesTeacherOnlyAnswerTextInFeedbackHandoff: false,
-  itemIds: [...ANSWER_FEEDBACK_LIFECYCLE_CHAIN_HANDOFF_ITEM_IDS],
-  mutatesAttempts: false,
-  preservesTeacherResultEvidence: true,
-  publicFeedbackRespectsAnswerReveal: true,
-  runtimeScoringUsesSharedMatcher: true,
-  sourceFiles: [...ANSWER_FEEDBACK_LIFECYCLE_CHAIN_SOURCE_FILES],
-  templateFeedbackUsesSharedComponent: true,
-  usesAnswerFeedbackHandoff: true,
-  usesSharedAcceptedAnswerParser: true,
-  usesSharedFeedbackViews: true,
-});
-assert.deepEqual(Object.fromEntries(answerFeedbackLifecycleChainValues), {
-  'accepted-answer-parser': 'getAcceptedAnswers',
-  'answer-feedback-handoff-boundary': '30 feedback handoff slices',
-  'answer-normalization': 'NFKC + punctuation',
-  'blank-answer-guard': 'Blank is incorrect',
-  'csv-export-feedback': 'Answer columns',
-  'feedback-dom-semantics': 'Label/value/details',
-  'feedback-privacy-guard': 'Private data hidden',
-  'fill-blank-feedback-boundary': 'Blank review',
-  'group-sort-feedback-boundary': 'Category review',
-  'line-match-feedback-boundary': 'Connection review',
-  'listening-feedback-boundary': 'Transcript review',
-  'matching-pairs-feedback-boundary': 'Pair review',
-  'open-box-feedback-boundary': 'Reveal review',
-  'product-scoring-policy': 'Shared scoring',
-  'public-feedback-view': 'Shared feedback view',
-  'public-review-policy': 'Reveal if allowed',
-  'quiz-choice-completion': 'Deterministic choices',
-  'result-answer-text-view': 'Expected/alternatives',
-  'result-formatting-shared': 'Shared accepted formatting',
-  'runtime-item-source': 'Questions/pairs/groups',
-  'runtime-scoring-evaluation': 'evaluateRuntimeAnswers',
-  'scored-result-metrics': 'Accuracy/points/completed',
-  'separator-coverage': 'Slash/semicolon/Chinese',
-  'server-review-summary': 'Scored review payload',
-  'submitted-answer-normalization': 'Display text',
-  'teacher-analysis-feedback': 'Accepted answers retained',
-  'teacher-results-chain-alignment': 'Results chain',
-  'template-feedback-surfaces': 'Shared component',
-  'template-runner-map': 'Seven runners',
-  'unique-alternative-dedup': 'Normalized unique',
-});
 assert.match(
   readFileSync('tests/e2e/TEST-CATALOG.md', 'utf8'),
-  /Answer feedback lifecycle chain has a fast script-level gate via[\s\S]*scripts\/answer-feedback-lifecycle-chain-handoff\.test\.ts[\s\S]*answer feedback boundary/,
+  /Answer feedback lifecycle chain has a fast script-level gate via[\s\S]*scripts\/answer-feedback-lifecycle-chain\.test\.ts[\s\S]*answer feedback boundary/,
   'TEST-CATALOG should document the answer feedback lifecycle chain gate.'
 );
-const assignmentLifecycleGovernanceChainView =
-  buildAssignmentLifecycleGovernanceChainHandoffView();
-const assignmentLifecycleGovernanceChainValues = new Map(
-  assignmentLifecycleGovernanceChainView.itemViews.map((item) => [
-    item.id,
-    item.value,
-  ])
-);
-assert.deepEqual(
-  assignmentLifecycleGovernanceChainView.itemViews.map((item) => item.id),
-  [...ASSIGNMENT_LIFECYCLE_GOVERNANCE_CHAIN_HANDOFF_ITEM_IDS],
-  'Assignment lifecycle governance chain should expose the stable 30-slice status, list, public, submission, result, and privacy order.'
-);
-assert.equal(assignmentLifecycleGovernanceChainView.itemViews.length, 30);
-assert.equal(
-  new Set(ASSIGNMENT_LIFECYCLE_GOVERNANCE_CHAIN_HANDOFF_ITEM_IDS).size,
-  30
-);
-assert.equal(ASSIGNMENT_LIFECYCLE_GOVERNANCE_CHAIN_SOURCE_FILES.length, 30);
-for (const filePath of ASSIGNMENT_LIFECYCLE_GOVERNANCE_CHAIN_SOURCE_FILES) {
-  assert.ok(
-    existsSync(filePath),
-    `Missing assignment lifecycle governance chain file ${filePath}`
-  );
-}
-assert.ok(
-  assignmentLifecycleGovernanceChainView.itemViews.every(
-    (item) => item.ariaLabel && item.description && item.label && item.value
-  )
-);
-assert.deepEqual(assignmentLifecycleGovernanceChainView.privacy, {
-  blocksClosedOrExpiredSubmissions: true,
-  blocksDraftPublicAccess: true,
-  chainSourceFileCount:
-    ASSIGNMENT_LIFECYCLE_GOVERNANCE_CHAIN_SOURCE_FILES.length,
-  exposesActivityContentInLifecycleHandoff: false,
-  exposesAnswerKeysInLifecycleHandoff: false,
-  exposesInternalAssignmentIdsInLifecycleHandoff: false,
-  exposesPublicShareSlugsInLifecycleHandoff: false,
-  exposesRawAnonymousTokensInLifecycleHandoff: false,
-  exposesStudentAnswerTextInLifecycleHandoff: false,
-  exposesStudentNamesInLifecycleHandoff: false,
-  itemIds: [...ASSIGNMENT_LIFECYCLE_GOVERNANCE_CHAIN_HANDOFF_ITEM_IDS],
-  keepsExpiredReopenBlocked: true,
-  preservesAttemptsAfterClose: true,
-  preservesSnapshotsAfterClose: true,
-  publicUnavailablePayloadHidesRuntime: true,
-  requiresOwnerScopedTeacherQueries: true,
-  sourceFiles: [...ASSIGNMENT_LIFECYCLE_GOVERNANCE_CHAIN_SOURCE_FILES],
-  statusFiltersUseLifecycleStatus: true,
-  usesUnavailableAccessHandoff: true,
-});
-assert.deepEqual(Object.fromEntries(assignmentLifecycleGovernanceChainValues), {
-  'api-list-owner-scope': 'Owner scoped',
-  'api-status-filter': 'Lifecycle SQL filter',
-  'assignment-card-lifecycle-handoff': 'Hidden card handoff',
-  'public-unavailable-access-handoff-boundary': 'Closed, expired, draft, and missing',
-  'attempt-review-retention': 'Scored attempts',
-  'close-transition-rule': 'Published -> closed',
-  'expired-reopen-block': 'Expired blocked',
-  'expiry-timestamp-normalization': 'Finite timestamp',
-  'lifecycle-privacy-guard': 'Private data hidden',
-  'lifecycle-status-resolution': 'getAssignmentLifecycleStatus',
-  'list-route-status-filter': 'URL status state',
-  'list-summary-status-metrics': 'Open/closed/expired/draft',
-  'managed-status-boundary': 'published + closed',
-  'open-access-policy': 'Open only',
-  'product-lifecycle-policy': 'Open, closed, expired, draft',
-  'public-access-handoff-alignment': 'Public access handoff',
-  'public-lookup-lifecycle': 'Available or unavailable',
-  'public-unavailable-policy': 'Runtime hidden',
-  'published-delivery-chain-alignment': 'Delivery chain',
-  'reopen-transition-rule': 'Closed -> published',
-  'result-page-owner-scope': 'Owner results only',
-  'result-page-retention': 'Closed attempts retained',
-  'share-link-availability': 'Open persisted links',
-  'snapshot-retention': 'Frozen snapshot',
-  'status-action-execution-plan': 'update-status or blocked',
-  'status-action-view': 'Prepared action',
-  'status-filter-open-alias': 'published -> open',
-  'submission-error-policy': 'Reasoned rejection',
-  'submit-api-lifecycle-gate': 'assertAssignmentAcceptsSubmissions',
-  'unavailable-access-handoff-alignment': 'Unavailable handoff',
-});
 assert.match(
   readFileSync('tests/e2e/TEST-CATALOG.md', 'utf8'),
-  /Assignment lifecycle governance chain has a fast script-level gate via[\s\S]*scripts\/assignment-lifecycle-governance-chain-handoff\.test\.ts/,
+  /Assignment lifecycle governance chain has a fast script-level gate via[\s\S]*scripts\/assignment-lifecycle-governance-chain\.test\.ts/,
   'TEST-CATALOG should document the assignment lifecycle governance chain gate.'
 );
-const classroomDataLifecycleChainView =
-  buildClassroomDataLifecycleChainHandoffView();
 assert.equal(CLASSROOM_QUERY_INDEX_CONTRACT.length, 30);
 assert.equal(CLASSROOM_QUERY_EXECUTION_CONTRACT.length, 30);
 assert.equal(ATTEMPT_SUBMISSION_IDEMPOTENCY_STAGES.length, 30);
@@ -4851,100 +4127,9 @@ assert.deepEqual(
     'user_files_user_created_idx',
   ]
 );
-const classroomDataLifecycleChainValues = new Map(
-  classroomDataLifecycleChainView.itemViews.map((item) => [
-    item.id,
-    item.value,
-  ])
-);
-assert.deepEqual(
-  classroomDataLifecycleChainView.itemViews.map((item) => item.id),
-  [...CLASSROOM_DATA_LIFECYCLE_CHAIN_HANDOFF_ITEM_IDS],
-  'Classroom data lifecycle chain should expose the stable 30-slice schema, persistence, snapshot, attempt, and result order.'
-);
-assert.equal(classroomDataLifecycleChainView.itemViews.length, 30);
-assert.equal(
-  new Set(CLASSROOM_DATA_LIFECYCLE_CHAIN_HANDOFF_ITEM_IDS).size,
-  30
-);
-assert.equal(CLASSROOM_DATA_LIFECYCLE_CHAIN_SOURCE_FILES.length, 30);
-for (const filePath of CLASSROOM_DATA_LIFECYCLE_CHAIN_SOURCE_FILES) {
-  assert.ok(
-    existsSync(filePath),
-    `Missing classroom data lifecycle chain file ${filePath}`
-  );
-}
-assert.ok(
-  classroomDataLifecycleChainView.itemViews.every(
-    (item) => item.ariaLabel && item.description && item.label && item.value
-  )
-);
-assert.deepEqual(classroomDataLifecycleChainView.privacy, {
-  chainSourceFileCount: CLASSROOM_DATA_LIFECYCLE_CHAIN_SOURCE_FILES.length,
-  createsParallelWorksheetTables: false,
-  exposesActivityContentJsonToPublicPayload: false,
-  exposesAnswerTextInPersistenceHandoff: false,
-  exposesRawAnonymousTokens: false,
-  exposesRawSubmissionPayloadInPersistenceHandoff: false,
-  exposesRuntimeItemIdsInPersistenceHandoff: false,
-  exposesSnapshotContentJsonToPublicPayload: false,
-  exposesSourceMaterialStorageKeys: false,
-  exposesSourceMaterialMetadataInPersistenceHandoff: false,
-  exposesStudentAnswerTextInHandoff: false,
-  exposesStudentNameInPersistenceHandoff: false,
-  exposesTeacherAnswerKeysBeforeReview: false,
-  exposesTeacherOnlyAnswersInPersistenceHandoff: false,
-  freezesSnapshotContent: true,
-  itemIds: [...CLASSROOM_DATA_LIFECYCLE_CHAIN_HANDOFF_ITEM_IDS],
-  mutatesEvaluationAfterInsert: false,
-  persistsAttemptsAfterValidation: true,
-  publicPayloadUsesRuntimeItemsOnly: true,
-  publishesAssignmentAndSnapshotTogether: true,
-  requiresOwnerScopedActivities: true,
-  requiresOwnerScopedAssignments: true,
-  resultConsumersUseScoredAttempts: true,
-  sourceFiles: [...CLASSROOM_DATA_LIFECYCLE_CHAIN_SOURCE_FILES],
-  storesScoredAttemptRows: true,
-  usesAttemptPersistenceHandoff: true,
-  usesD1AppSchema: true,
-  usesSnapshotForPublicRuntime: true,
-  usesScoredAttemptInsertHelper: true,
-});
-assert.deepEqual(Object.fromEntries(classroomDataLifecycleChainValues), {
-  'activity-content-json': 'ActivityContent',
-  'activity-create-persistence': 'buildActivityCreateInsert',
-  'activity-derivative-draft-persistence': 'draft clone',
-  'activity-owner-query-scope': 'Owner where helpers',
-  'activity-table-owner-scope': 'owner_id',
-  'activity-template-visibility-indexes': 'template + visibility',
-  'activity-update-persistence': 'buildActivityUpdateSet',
-  'assignment-lifecycle-fields': 'status + expiresAt',
-  'assignment-publish-transaction': 'assignment + snapshot',
-  'assignment-settings-json': 'AssignmentSettings',
-  'assignment-share-slug-uniqueness': 'unique share_slug',
-  'assignment-snapshot-table': 'assignment_snapshot',
-  'assignment-table-owner-scope': 'owner_id + activity_id',
-  'attempt-answer-result-json': 'answersJson + resultJson',
-  'attempt-limit-identity-count': 'Normalized identity',
-  'attempt-persistence-helper': 'buildScoredAttemptInsert',
-  'attempt-query-scored-filter': 'resultJson required',
-  'attempt-table-identity': 'name or browser token',
-  'attempt-persistence-handoff-boundary': '30 persistence handoff slices',
-  'd1-app-schema-boundary': 'app.schema.ts',
-  'printable-worksheet-consumer': 'Frozen runtime items',
-  'product-data-model': 'Activity -> Assignment -> Attempt -> Results',
-  'public-payload-sanitization': 'Runtime items only',
-  'public-unavailable-guard': 'Runtime hidden',
-  'raw-student-token-guard': 'Anonymous token hidden',
-  'result-analysis-consumer': 'runtime items + attempts',
-  'result-export-consumer': 'Private CSV',
-  'snapshot-content-clone': 'structuredClone',
-  'snapshot-runtime-source': 'resolveAssignmentRuntimeSource',
-  'source-material-storage-key-guard': 'Storage keys hidden',
-});
 assert.match(
   readFileSync('tests/e2e/TEST-CATALOG.md', 'utf8'),
-  /Classroom data lifecycle chain has a fast script-level gate via[\s\S]*scripts\/classroom-data-lifecycle-chain-handoff\.test\.ts[\s\S]*attempt persistence boundary/,
+  /Classroom data lifecycle chain has a fast script-level gate via[\s\S]*scripts\/classroom-data-lifecycle-chain\.test\.ts[\s\S]*attempt persistence boundary/,
   'TEST-CATALOG should document the classroom data lifecycle chain gate.'
 );
 assert.match(
@@ -4952,183 +4137,14 @@ assert.match(
   /D1 app schema[\s\S]*activity\/assignment persistence helpers[\s\S]*owner-scoped activity or assignment queries[\s\S]*assignment snapshot freezing[\s\S]*public assignment payload sanitization[\s\S]*attempt persistence[\s\S]*scored-attempt queries[\s\S]*result analysis\/export\/print consumers[\s\S]*source-material\/token privacy guards/,
   'TEST-CATALOG should describe the classroom data lifecycle chain scope.'
 );
-const teacherResultsReviewChainView =
-  buildTeacherResultsReviewChainHandoffView();
-const teacherResultsReviewChainValues = new Map(
-  teacherResultsReviewChainView.itemViews.map((item) => [item.id, item.value])
-);
-assert.deepEqual(
-  teacherResultsReviewChainView.itemViews.map((item) => item.id),
-  [...TEACHER_RESULTS_REVIEW_CHAIN_HANDOFF_ITEM_IDS],
-  'Teacher results review chain should expose the stable teacher-review 30-slice order.'
-);
-assert.equal(teacherResultsReviewChainView.itemViews.length, 30);
-assert.equal(
-  new Set(TEACHER_RESULTS_REVIEW_CHAIN_HANDOFF_ITEM_IDS).size,
-  30
-);
-assert.equal(TEACHER_RESULTS_REVIEW_CHAIN_SOURCE_FILES.length, 30);
-for (const filePath of TEACHER_RESULTS_REVIEW_CHAIN_SOURCE_FILES) {
-  assert.ok(
-    existsSync(filePath),
-    `Missing teacher results review chain file ${filePath}`
-  );
-}
-assert.ok(
-  teacherResultsReviewChainView.itemViews.every(
-    (item) => item.ariaLabel && item.description && item.label && item.value
-  )
-);
-assert.deepEqual(teacherResultsReviewChainView.privacy, {
-  chainSourceFileCount: TEACHER_RESULTS_REVIEW_CHAIN_SOURCE_FILES.length,
-  exposesAcceptedAlternativesToTeachersOnly: true,
-  exposesAnswerKeysToPublicRunner: false,
-  exposesCopyArtifactText: false,
-  exposesRawAnonymousToken: false,
-  exposesRawAnonymousTokens: false,
-  exposesRawRouteQuery: false,
-  exposesRawCopyArtifactsInHandoff: false,
-  exposesRawCsvDataUrlInHandoff: false,
-  exposesSourceMaterialStorageKeys: false,
-  exposesStudentAnswerTextInHandoff: false,
-  exposesStudentDisplayLabels: false,
-  exposesTeacherAnswerKey: false,
-  itemIds: [...TEACHER_RESULTS_REVIEW_CHAIN_HANDOFF_ITEM_IDS],
-  mutatesResultData: false,
-  preservesFrozenSnapshots: true,
-  resultExportsIncludeDeliveryPolicy: true,
-  sourceFiles: [...TEACHER_RESULTS_REVIEW_CHAIN_SOURCE_FILES],
-  usesSharedAttemptStats: true,
-  usesAssignmentDomainHelpers: true,
-  usesResultReviewControlsHandoff: true,
-  usesTeacherOnlyResultScope: true,
-});
-assert.deepEqual(Object.fromEntries(teacherResultsReviewChainValues), {
-  'accepted-alternatives-format': 'Shared formatter',
-  'anonymous-token-guard': 'Raw token hidden',
-  'answer-review-status': 'Correct or needs review',
-  'assignment-metric-cards': 'Prepared metrics',
-  'attempt-review-cards': 'Item-level review',
-  'attempt-review-filter': 'All or missed',
-  'attempt-stats-summary': 'Shared metrics',
-  'classroom-brief': 'Teacher-only brief',
-  'copy-artifact-boundary': 'Handoff hidden',
-  'csv-export-preparation': 'Private export',
-  'delivery-policy-export': 'Rules included',
-  'duration-formatting': 'Shared duration labels',
-  'empty-state-guidance': 'No attempts yet',
-  'frozen-snapshot-source': 'AssignmentSnapshot',
-  'item-analysis-priority': 'Reteach priorities',
-  'item-performance-sort': 'Lowest accuracy first',
-  'item-review-copy': 'Prompt summary',
-  'lowest-performing-items': 'Top reteach focus',
-  'public-runner-boundary': 'Teacher-only results',
-  'result-material-handoff': 'Teacher material scope',
-  'result-route-owner-scope': 'Teacher assignment only',
-  'reteach-plan-copy': 'Classroom script',
-  'review-scope-controls': 'URL-backed controls',
-  'review-status-summary': 'Current review state',
-  'source-material-guard': 'Storage keys hidden',
-  'student-follow-up-copy': 'Support list',
-  'student-follow-up-priority': 'Needs support first',
-  'student-search-normalization': 'Anonymous labels',
-  'student-summary-sort': 'Review order',
-  'result-review-controls-boundary': '30 control slices',
-});
 assert.match(
   readFileSync('tests/e2e/TEST-CATALOG.md', 'utf8'),
-  /Teacher results review chain has a fast script-level gate via[\s\S]*scripts\/teacher-results-review-chain-handoff\.test\.ts[\s\S]*result review controls boundary/,
+  /Teacher results review chain has a fast script-level gate via[\s\S]*scripts\/teacher-results-review-chain\.test\.ts[\s\S]*result review controls boundary/,
   'TEST-CATALOG should document the teacher results review chain gate.'
 );
-const teacherResultCopyLifecycleChainView =
-  buildTeacherResultCopyLifecycleChainHandoffView();
-const teacherResultCopyLifecycleChainValues = new Map(
-  teacherResultCopyLifecycleChainView.itemViews.map((item) => [
-    item.id,
-    item.value,
-  ])
-);
-assert.deepEqual(
-  teacherResultCopyLifecycleChainView.itemViews.map((item) => item.id),
-  [...TEACHER_RESULT_COPY_LIFECYCLE_CHAIN_HANDOFF_ITEM_IDS],
-  'Teacher result copy lifecycle chain should expose the stable 30-slice copy artifact order.'
-);
-assert.equal(teacherResultCopyLifecycleChainView.itemViews.length, 30);
-assert.equal(
-  new Set(TEACHER_RESULT_COPY_LIFECYCLE_CHAIN_HANDOFF_ITEM_IDS).size,
-  30
-);
-assert.equal(TEACHER_RESULT_COPY_LIFECYCLE_CHAIN_SOURCE_FILES.length, 30);
-for (const filePath of TEACHER_RESULT_COPY_LIFECYCLE_CHAIN_SOURCE_FILES) {
-  assert.ok(
-    existsSync(filePath),
-    `Missing teacher result copy lifecycle chain file ${filePath}`
-  );
-}
-assert.ok(
-  teacherResultCopyLifecycleChainView.itemViews.every(
-    (item) => item.ariaLabel && item.description && item.label && item.value
-  )
-);
-assert.deepEqual(teacherResultCopyLifecycleChainView.privacy, {
-  appendsCopyScopeToArtifacts: true,
-  chainSourceFileCount:
-    TEACHER_RESULT_COPY_LIFECYCLE_CHAIN_SOURCE_FILES.length,
-  exposesAcceptedAnswerTextInHandoff: false,
-  exposesArtifactTextInHandoff: false,
-  exposesCsvDataUrlInHandoff: false,
-  exposesExpectedAnswerTextInHandoff: false,
-  exposesPromptTextInHandoff: false,
-  exposesRawAnonymousTokensInHandoff: false,
-  exposesRawCopyArtifactTextInHandoff: false,
-  exposesStudentAnswerTextInHandoff: false,
-  exposesStudentLabelsInHandoff: false,
-  exposesTeacherNotesTextInHandoff: false,
-  itemIds: [...TEACHER_RESULT_COPY_LIFECYCLE_CHAIN_HANDOFF_ITEM_IDS],
-  keepsCsvExportFullAssignment: true,
-  mutatesPublicRunner: false,
-  mutatesResultArtifacts: false,
-  sourceFiles: [...TEACHER_RESULT_COPY_LIFECYCLE_CHAIN_SOURCE_FILES],
-  usesCurrentReviewScopeForCopyActions: true,
-  usesCopyArtifactHandoff: true,
-  usesSharedCopyArtifactBuilders: true,
-  usesSharedCopyArtifactHelpers: true,
-});
-assert.deepEqual(Object.fromEntries(teacherResultCopyLifecycleChainValues), {
-  'classroom-brief-builder': 'Brief artifact',
-  'classroom-brief-focus-items': 'Lowest items',
-  'classroom-brief-follow-up-students': 'Support list',
-  'classroom-brief-metrics': 'Shared stats',
-  'copy-action-buttons': 'Four copy actions',
-  'copy-action-execution-plan': 'Copy text',
-  'copy-action-gates': 'Ready or blocked',
-  'copy-action-scope': 'Current review',
-  'copy-handoff-hidden-dom': 'sr-only dl',
-  'copy-artifact-handoff-boundary': '30 artifact handoff slices',
-  'copy-line-normalization': 'Line joiner',
-  'copy-preview-builder': 'Preview cards',
-  'copy-preview-meta': 'Preview counts',
-  'copy-scope-appended': 'Scope block',
-  'copy-title-normalization': 'NFKC title',
-  'current-review-data-set': 'Filtered copy data',
-  'item-review-answer-coverage': 'Answer evidence',
-  'item-review-summary-builder': 'Prompt summary',
-  'latest-attempt-context': 'Latest attempt',
-  'privacy-guards': 'Private text hidden',
-  'product-copy-artifact-policy': 'Teacher copy loop',
-  'result-page-card-consumer': 'Brief card',
-  'result-view-assembly': 'View model',
-  'reteach-plan-builder': 'Classroom script',
-  'reteach-plan-review-items': 'Priority items',
-  'reteach-plan-student-follow-up': 'Priority students',
-  'review-scope-source': 'Search/sort/filter',
-  'student-follow-up-priority-order': 'Needs review first',
-  'student-follow-up-summary-builder': 'Student support',
-  'teacher-results-chain-alignment': 'Results chain',
-});
 assert.match(
   readFileSync('tests/e2e/TEST-CATALOG.md', 'utf8'),
-  /Teacher result copy lifecycle chain has a fast script-level gate via[\s\S]*scripts\/teacher-result-copy-lifecycle-chain-handoff\.test\.ts[\s\S]*classroom brief builders[\s\S]*copy-artifact privacy guards/,
+  /Teacher result copy lifecycle chain has a fast script-level gate via[\s\S]*scripts\/teacher-result-copy-lifecycle-chain\.test\.ts[\s\S]*classroom brief builders[\s\S]*copy-artifact privacy guards/,
   'TEST-CATALOG should document the teacher result copy lifecycle chain gate.'
 );
 assert.doesNotMatch(
@@ -5766,393 +4782,20 @@ const activitySourceExtractionAssistTestCatalogSource = readFileSync(
   'tests/e2e/TEST-CATALOG.md',
   'utf8'
 );
-const sourceExtractionLifecycleChainView =
-  buildSourceExtractionLifecycleChainHandoffView();
-const sourceExtractionLifecycleChainValues = new Map(
-  sourceExtractionLifecycleChainView.itemViews.map((item) => [
-    item.id,
-    item.value,
-  ])
-);
-assert.deepEqual(
-  sourceExtractionLifecycleChainView.itemViews.map((item) => item.id),
-  [...SOURCE_EXTRACTION_LIFECYCLE_CHAIN_HANDOFF_ITEM_IDS],
-  'Source extraction lifecycle chain should expose the stable extraction-readiness 30-slice order.'
-);
-assert.equal(sourceExtractionLifecycleChainView.itemViews.length, 30);
-assert.equal(
-  new Set(SOURCE_EXTRACTION_LIFECYCLE_CHAIN_HANDOFF_ITEM_IDS).size,
-  30
-);
-assert.equal(SOURCE_EXTRACTION_LIFECYCLE_CHAIN_SOURCE_FILES.length, 30);
-for (const filePath of SOURCE_EXTRACTION_LIFECYCLE_CHAIN_SOURCE_FILES) {
-  assert.ok(
-    existsSync(filePath),
-    `Missing source extraction lifecycle chain file ${filePath}`
-  );
-}
-assert.ok(
-  sourceExtractionLifecycleChainView.itemViews.every(
-    (item) => item.ariaLabel && item.description && item.label && item.value
-  )
-);
-assert.deepEqual(sourceExtractionLifecycleChainView.privacy, {
-  chainSourceFileCount: SOURCE_EXTRACTION_LIFECYCLE_CHAIN_SOURCE_FILES.length,
-  createsParallelWorksheetModel: false,
-  exposesAcceptedAnswerTextInHandoff: false,
-  exposesActivityContentTextInHandoff: false,
-  exposesFileBytesToAi: false,
-  exposesRawSourceMaterialFileIdsInHandoff: false,
-  exposesSourceMaterialFilenamesInHandoff: false,
-  exposesSourceMaterialStorageKeys: false,
-  exposesSourceMaterialsToPublicPayload: false,
-  itemIds: [...SOURCE_EXTRACTION_LIFECYCLE_CHAIN_HANDOFF_ITEM_IDS],
-  persistsActivityWithoutTeacherAction: false,
-  publishesAssignmentWithoutTeacherAction: false,
-  readsSourceMaterialBytes: false,
-  requiresEditorReview: true,
-  sourceFiles: [...SOURCE_EXTRACTION_LIFECYCLE_CHAIN_SOURCE_FILES],
-  targetsActivityContent: true,
-  usesAuthoringLibraryChain: true,
-  usesCompactSourceMaterialReferences: true,
-});
-assert.deepEqual(
-  [
-    ACTIVITY_SOURCE_MATERIAL_REFERENCE_ITEM_IDS.length,
-    SOURCE_MATERIAL_PRIVACY_CHAIN_HANDOFF_ITEM_IDS.length,
-    ACTIVITY_AI_AUTHORING_CHAIN_HANDOFF_ITEM_IDS.length,
-    TEMPLATE_ROADMAP_CAPABILITY_CHAIN_HANDOFF_ITEM_IDS.length,
-    ACTIVITY_AUTHORING_LIBRARY_CHAIN_HANDOFF_ITEM_IDS.length,
-  ],
-  Array.from({ length: 5 }, () => 30),
-  'Source extraction lifecycle chain should stay backed by source-material, AI, roadmap, and authoring gates.'
-);
-assert.deepEqual(Object.fromEntries(sourceExtractionLifecycleChainValues), {
-  'accepted-answer-target': 'Accepted answers',
-  'activity-content-source-materials': 'ActivityContent.sourceMaterials',
-  'activity-content-target': 'ActivityContent target',
-  'ai-authoring-chain-alignment': 'AI authoring aligned',
-  'ai-draft-boundary-sanitization': 'Sanitized AI source',
-  'ai-source-omitted-notes': 'Unsafe notes omitted',
-  'ai-source-safe-provenance': 'Kind and basename only',
-  'assignment-snapshot-boundary': 'Snapshots unchanged',
-  'audio-extraction-readiness': 'Audio draft ready',
-  'compact-reference-boundary': 'Compact references',
-  'editor-review-gate': 'Teacher review required',
-  'material-kind-classification': 'Metadata classification',
-  'persistence-boundary': 'Not auto-saved',
-  'picker-owner-scope': 'Current teacher files',
-  'picker-reference-write': 'Writes compact refs',
-  'product-extraction-policy': 'Product policy',
-  'public-payload-privacy': 'Public payload hidden',
-  'publish-boundary': 'No auto-publish',
-  'question-pair-group-targets': 'Structured field targets',
-  'readiness-action-map': 'Three readiness actions',
-  'reference-only-state': 'Reference-only explicit',
-  'settings-library-provenance': 'Settings provenance',
-  'authoring-library-chain-boundary': '30 authoring slices',
-  'source-material-privacy-chain-alignment': 'Privacy chain aligned',
-  'source-summary-hidden-handoff': 'Hidden dl handoff',
-  'source-summary-view': 'Summary view model',
-  'spreadsheet-import-readiness': 'Spreadsheet import ready',
-  'template-readiness-target': 'Template readiness',
-  'template-roadmap-chain-alignment': 'Roadmap aligned',
-  'worksheet-extraction-readiness': 'Worksheet extraction ready',
-});
 assert.match(
   readFileSync('tests/e2e/TEST-CATALOG.md', 'utf8'),
-  /Source extraction lifecycle chain has a fast script-level gate via[\s\S]*scripts\/source-extraction-lifecycle-chain-handoff\.test\.ts[\s\S]*30-slice authoring\/library boundary/,
+  /Source extraction lifecycle chain has a fast script-level gate via[\s\S]*scripts\/source-extraction-lifecycle-chain\.test\.ts[\s\S]*30-slice authoring\/library boundary/,
   'TEST-CATALOG should document the source extraction lifecycle chain gate.'
 );
-const activityAiAuthoringChainView =
-  buildActivityAiAuthoringChainHandoffView();
-const activityAiAuthoringChainValues = new Map(
-  activityAiAuthoringChainView.itemViews.map((item) => [
-    item.id,
-    item.value,
-  ])
-);
-assert.deepEqual(
-  activityAiAuthoringChainView.itemViews.map((item) => item.id),
-  [...ACTIVITY_AI_AUTHORING_CHAIN_HANDOFF_ITEM_IDS],
-  'Activity AI authoring chain should expose the stable source-to-editor 30-slice order.'
-);
-assert.equal(activityAiAuthoringChainView.itemViews.length, 30);
-assert.equal(
-  new Set(ACTIVITY_AI_AUTHORING_CHAIN_HANDOFF_ITEM_IDS).size,
-  30
-);
-assert.equal(ACTIVITY_AI_AUTHORING_CHAIN_SOURCE_FILES.length, 30);
-for (const filePath of ACTIVITY_AI_AUTHORING_CHAIN_SOURCE_FILES) {
-  assert.ok(
-    existsSync(filePath),
-    `Missing activity AI authoring chain file ${filePath}`
-  );
-}
-assert.ok(
-  activityAiAuthoringChainView.itemViews.every(
-    (item) => item.ariaLabel && item.description && item.label && item.value
-  )
-);
-assert.deepEqual(activityAiAuthoringChainView.privacy, {
-  chainSourceFileCount: ACTIVITY_AI_AUTHORING_CHAIN_SOURCE_FILES.length,
-  createsAssignmentLinks: false,
-  exposesActivityContentBeforeTeacherReview: false,
-  exposesAnswerText: false,
-  exposesFileBytesToAi: false,
-  exposesRawProviderResponse: false,
-  exposesRawSourceText: false,
-  exposesSourceMaterialFileIds: false,
-  exposesSourceMaterialStorageKeys: false,
-  itemIds: [...ACTIVITY_AI_AUTHORING_CHAIN_HANDOFF_ITEM_IDS],
-  persistsActivityWithoutTeacherAction: false,
-  publishesAssignmentWithoutTeacherAction: false,
-  requiresAuthenticatedTeacher: true,
-  requiresCreateActivityInputContract: true,
-  requiresDeterministicFallback: true,
-  requiresTeacherReview: true,
-  sourceFiles: [...ACTIVITY_AI_AUTHORING_CHAIN_SOURCE_FILES],
-  usesFallbackDraftChain: true,
-});
-assert.deepEqual(Object.fromEntries(activityAiAuthoringChainValues), {
-  'activity-persistence-handoff': 'Create/update helpers',
-  'fallback-draft-chain-boundary': '30 fallback slices',
-  'ai-remix-assist-boundary': 'Completion before save',
-  'assignment-snapshot-protection': 'Future links only',
-  'auth-server-boundary': 'Authenticated teacher',
-  'create-input-contract': 'CreateActivityInput',
-  'direct-persistence-guard': 'No direct save',
-  'distractor-write-target': 'ActivityQuestion.options',
-  'draft-coverage-summary': 'Coverage counts',
-  'editor-application': 'Apply to form',
-  'editor-review-gate': 'Review before save',
-  'fallback-draft-path': 'Deterministic local draft',
-  'fallback-source-term-plan': 'Safe terms only',
-  'generate-input-schema': 'GenerateActivityDraftInput',
-  'local-completion-contract': 'Complete classroom fields',
-  'model-selection': 'Configured model',
-  'provider-selection': 'Workers AI or fallback',
-  'publish-boundary': 'No assignment link',
-  'quiz-choice-readiness': 'Distractors checked',
-  'raw-provider-response-guard': 'Parsed JSON only',
-  'safe-material-provenance': 'Kind and basename only',
-  'save-gate-review': 'Teacher action required',
-  'source-byte-guard': 'No file bytes',
-  'source-panel-readiness': 'Teacher source gate',
-  'source-text-priority': 'Structured notes first',
-  'storage-key-guard': 'Storage hidden',
-  'template-readiness-diagnosis': 'Ready and locked modes',
-  'template-remix-foundation': 'Deterministic readiness',
-  'template-scaffold-context': 'Shared editor model',
-  'unsafe-material-omission': 'Unsafe notes omitted',
-});
 assert.match(
   readFileSync('tests/e2e/TEST-CATALOG.md', 'utf8'),
-  /Activity AI authoring chain has a fast script-level gate via[\s\S]*scripts\/activity-ai-authoring-chain-handoff\.test\.ts/,
+  /Activity AI authoring chain has a fast script-level gate via[\s\S]*scripts\/activity-ai-authoring-chain\.test\.ts/,
   'TEST-CATALOG should document the activity AI authoring chain gate.'
 );
-const activityAiFallbackDraftChainView =
-  buildActivityAiFallbackDraftChainHandoffView();
-const activityAiFallbackDraftChainValues = new Map(
-  activityAiFallbackDraftChainView.itemViews.map((item) => [
-    item.id,
-    item.value,
-  ])
-);
-assert.deepEqual(
-  activityAiFallbackDraftChainView.itemViews.map((item) => item.id),
-  [...ACTIVITY_AI_FALLBACK_DRAFT_CHAIN_HANDOFF_ITEM_IDS],
-  'Activity AI fallback draft chain should expose the stable provider-failure-to-editor-review 30-slice order.'
-);
-assert.equal(activityAiFallbackDraftChainView.itemViews.length, 30);
-assert.equal(
-  new Set(ACTIVITY_AI_FALLBACK_DRAFT_CHAIN_HANDOFF_ITEM_IDS).size,
-  30
-);
-assert.equal(ACTIVITY_AI_FALLBACK_DRAFT_CHAIN_SOURCE_FILES.length, 30);
-for (const filePath of ACTIVITY_AI_FALLBACK_DRAFT_CHAIN_SOURCE_FILES) {
-  assert.ok(
-    existsSync(filePath),
-    `Missing activity AI fallback draft chain file ${filePath}`
-  );
-}
-assert.ok(
-  activityAiFallbackDraftChainView.itemViews.every(
-    (item) => item.ariaLabel && item.description && item.label && item.value
-  )
-);
-assert.deepEqual(activityAiFallbackDraftChainView.privacy, {
-  callsWorkersAiWithoutCredentials: false,
-  chainSourceFileCount:
-    ACTIVITY_AI_FALLBACK_DRAFT_CHAIN_SOURCE_FILES.length,
-  createsAssignmentLinks: false,
-  exposesActivityContentBeforeTeacherReview: false,
-  exposesAnswerText: false,
-  exposesFileBytesToAi: false,
-  exposesProviderApiTokens: false,
-  exposesRawFallbackDraft: false,
-  exposesRawProviderResponse: false,
-  exposesRawSourceMaterialNotes: false,
-  exposesRawSourceText: false,
-  exposesSourceMaterialFileIds: false,
-  exposesSourceMaterialStorageKeys: false,
-  itemIds: [...ACTIVITY_AI_FALLBACK_DRAFT_CHAIN_HANDOFF_ITEM_IDS],
-  keepsLocalCiStable: true,
-  persistsActivityWithoutTeacherAction: false,
-  providerCredentialsServerSide: true,
-  publishesAssignmentWithoutTeacherAction: false,
-  requiresCreateActivityInputContract: true,
-  requiresDeterministicFallback: true,
-  requiresEditorApplication: true,
-  requiresTeacherReview: true,
-  sourceFiles: [...ACTIVITY_AI_FALLBACK_DRAFT_CHAIN_SOURCE_FILES],
-  usesAuthoringLibraryChain: true,
-  usesSanitizedSourceText: true,
-});
-assert.deepEqual(Object.fromEntries(activityAiFallbackDraftChainValues), {
-  'complete-group-fields': 'Groups ready',
-  'complete-pair-fields': 'Pairs ready',
-  'complete-question-fields': 'Questions with explanations',
-  'create-input-mapping': 'CreateActivityInput',
-  'credential-missing-path': 'Missing credentials -> fallback',
-  'draft-focus-preservation': 'Selected focus kept',
-  'draft-metadata-summary': 'Coverage + trust',
-  'editor-application': 'Apply to editor',
-  'explanation-coverage': 'Answer explanations',
-  'authoring-library-chain-boundary': '30 authoring slices',
-  'fallback-contract-owner': 'ai-draft.ts',
-  'fallback-padding': 'Deterministic classroom terms',
-  'input-schema-boundary': 'GenerateActivityDraftInput',
-  'invalid-json-path': 'Invalid provider JSON -> fallback',
-  'local-draft-generator': 'createFallbackActivityDraft',
-  'material-note-omission': 'Raw material notes omitted',
-  'provider-call-boundary': 'Workers AI only when configured',
-  'provider-secret-guard': 'Worker secrets only',
-  'publish-boundary': 'Save before publish',
-  'quiz-choice-readiness': 'Local choices checked',
-  'safe-provenance-boundary': 'Kind and basename only',
-  'save-boundary': 'Teacher saves first',
-  'source-sanitization': 'sanitizeActivityDraftSourceTextForAi',
-  'source-term-plan': '30 planning slices',
-  'target-item-count': 'Bounded item target',
-  'teacher-note-coverage': 'Review notes',
-  'teacher-review-gate': 'Review required',
-  'template-preservation': 'Selected template kept',
-  'template-readiness-preview': 'Ready and locked modes',
-  'vocabulary-coverage': 'Vocabulary terms',
-});
 assert.match(
   readFileSync('tests/e2e/TEST-CATALOG.md', 'utf8'),
-  /Activity AI fallback draft chain has a fast script-level gate via[\s\S]*scripts\/activity-ai-fallback-draft-chain-handoff\.test\.ts/,
+  /Activity AI fallback draft chain has a fast script-level gate via[\s\S]*scripts\/activity-ai-fallback-draft-chain\.test\.ts/,
   'TEST-CATALOG should document the activity AI fallback draft chain gate.'
-);
-const activityAiEnhancementRoadmapChainView =
-  buildActivityAiEnhancementRoadmapChainHandoffView();
-const activityAiEnhancementRoadmapChainValues = new Map(
-  activityAiEnhancementRoadmapChainView.itemViews.map((item) => [
-    item.id,
-    item.value,
-  ])
-);
-assert.deepEqual(
-  activityAiEnhancementRoadmapChainView.itemViews.map((item) => item.id),
-  [...ACTIVITY_AI_ENHANCEMENT_ROADMAP_CHAIN_HANDOFF_ITEM_IDS],
-  'Activity AI enhancement roadmap chain should expose the stable future-enhancement 30-slice order.'
-);
-assert.equal(activityAiEnhancementRoadmapChainView.itemViews.length, 30);
-assert.equal(
-  new Set(ACTIVITY_AI_ENHANCEMENT_ROADMAP_CHAIN_HANDOFF_ITEM_IDS).size,
-  30
-);
-assert.equal(ACTIVITY_AI_ENHANCEMENT_ROADMAP_CHAIN_SOURCE_FILES.length, 30);
-for (const filePath of ACTIVITY_AI_ENHANCEMENT_ROADMAP_CHAIN_SOURCE_FILES) {
-  assert.ok(
-    existsSync(filePath),
-    `Missing activity AI enhancement roadmap chain file ${filePath}`
-  );
-}
-assert.ok(
-  activityAiEnhancementRoadmapChainView.itemViews.every(
-    (item) => item.ariaLabel && item.description && item.label && item.value
-  )
-);
-assert.deepEqual(activityAiEnhancementRoadmapChainView.privacy, {
-  chainSourceFileCount:
-    ACTIVITY_AI_ENHANCEMENT_ROADMAP_CHAIN_SOURCE_FILES.length,
-  createsAssignmentLinksWithoutTeacherAction: false,
-  exposesAnswerKeysToPublicPayload: false,
-  exposesFileBytesToAi: false,
-  exposesRawAiOutput: false,
-  exposesRawSourceText: false,
-  exposesSourceMaterialFileIds: false,
-  exposesSourceMaterialStorageKeys: false,
-  itemIds: [...ACTIVITY_AI_ENHANCEMENT_ROADMAP_CHAIN_HANDOFF_ITEM_IDS],
-  keepsLeveledVariantsAsDrafts: true,
-  mutatesExistingAssignmentSnapshots: false,
-  persistsActivityWithoutTeacherAction: false,
-  publishesAssignmentWithoutTeacherAction: false,
-  readsSourceMaterialBytes: false,
-  requiresCreateActivityInputContract: true,
-  requiresEditorReview: true,
-  sourceFiles: [...ACTIVITY_AI_ENHANCEMENT_ROADMAP_CHAIN_SOURCE_FILES],
-  usesDeterministicFallback: true,
-  usesEnhancementLifecycleChain: true,
-  usesSharedActivityAssignmentModel: true,
-  writesDistractorsToQuestionOptions: true,
-});
-assert.deepEqual(
-  [
-    ACTIVITY_AI_AUTHORING_CHAIN_HANDOFF_ITEM_IDS.length,
-    SOURCE_EXTRACTION_LIFECYCLE_CHAIN_HANDOFF_ITEM_IDS.length,
-    SOURCE_MATERIAL_PRIVACY_CHAIN_HANDOFF_ITEM_IDS.length,
-    ACTIVITY_AI_ENHANCEMENT_POLICY_ITEM_IDS.length,
-    ACTIVITY_AI_ENHANCEMENT_EXECUTION_ITEM_IDS.length,
-    ACTIVITY_AI_ENHANCEMENT_DRAFT_OUTPUT_ITEM_IDS.length,
-    ACTIVITY_AI_ENHANCEMENT_DRAFT_APPLICATION_ITEM_IDS.length,
-    ACTIVITY_AI_ENHANCEMENT_EDITOR_REVIEW_ITEM_IDS.length,
-    ACTIVITY_AI_ENHANCEMENT_SAVE_BOUNDARY_ITEM_IDS.length,
-    ACTIVITY_AI_ENHANCEMENT_PUBLISH_BOUNDARY_ITEM_IDS.length,
-    ACTIVITY_AI_ENHANCEMENT_LIFECYCLE_CHAIN_ITEM_IDS.length,
-    TEMPLATE_ROADMAP_CAPABILITY_CHAIN_HANDOFF_ITEM_IDS.length,
-    WORKSHEET_MODE_DELIVERY_CHAIN_HANDOFF_ITEM_IDS.length,
-  ],
-  Array.from({ length: 13 }, () => 30),
-  'Activity AI enhancement roadmap chain should stay backed by authoring, remix, extraction, policy, execution, draft output, draft application, editor review, save boundary, publish boundary, lifecycle, roadmap, worksheet, and result-export gates.'
-);
-assert.deepEqual(
-  Object.fromEntries(activityAiEnhancementRoadmapChainValues),
-  {
-    'activity-content-target': 'Questions/pairs/groups',
-    'enhancement-lifecycle-chain-boundary': '30 lifecycle slices',
-    'ai-remix-completion': 'Missing fields only',
-    'answer-explanation-target': 'Question explanations',
-    'assignment-snapshot-protection': 'Frozen links protected',
-    'audio-extraction-readiness': 'Listening draft path',
-    'create-input-contract': 'CreateActivityInput',
-    'deterministic-fallback': 'Local stable draft',
-    'deterministic-remix-precheck': 'Readiness first',
-    'distractor-generation-target': 'ActivityQuestion.options',
-    'draft-coverage-summary': 'Coverage counts',
-    'editor-review-gate': 'Review before save',
-    'leveled-variant-boundary': 'Draft copy variant',
-    'listening-script-boundary': 'Listening prompt draft',
-    'product-ai-enhancement-boundary': 'Teacher-reviewed roadmap',
-    'provider-credential-gate': 'Configured provider only',
-    'public-payload-guard': 'Sanitized runtime only',
-    'publish-boundary': 'No assignment link',
-    'question-option-contract': 'Four-choice readiness',
-    'raw-provider-output-guard': 'Parsed fields only',
-    'result-export-continuity': 'Shared export model',
-    'save-gate': 'Teacher action required',
-    'source-byte-guard': 'No file bytes',
-    'source-material-provenance': 'Kind and basename only',
-    'source-to-activity-draft': 'CreateActivityInput draft',
-    'spreadsheet-import-readiness': 'Structured import path',
-    'storage-key-guard': 'Storage hidden',
-    'template-readiness-diagnosis': 'Ready and locked modes',
-    'template-transform-boundary': 'Structured field proposal',
-    'worksheet-extraction-boundary': 'ActivityContent target',
-  }
 );
 assert.match(
   readFileSync('docs/product.md', 'utf8'),
@@ -6161,7 +4804,7 @@ assert.match(
 );
 assert.match(
   readFileSync('tests/e2e/TEST-CATALOG.md', 'utf8'),
-  /Activity AI enhancement roadmap chain has a fast script-level gate via[\s\S]*scripts\/activity-ai-enhancement-roadmap-chain-handoff\.test\.ts[\s\S]*template\s+transforms[\s\S]*distractor write\s+targets[\s\S]*leveled variants[\s\S]*answer\s+explanations[\s\S]*listening\s+scripts[\s\S]*worksheet\/audio\/spreadsheet\s+extraction[\s\S]*source-material privacy[\s\S]*editor-review\/save\/publish boundaries[\s\S]*snapshot\s+protection[\s\S]*result-export continuity/,
+  /Activity AI enhancement roadmap chain has a fast script-level gate via[\s\S]*scripts\/activity-ai-enhancement-roadmap-chain\.test\.ts[\s\S]*template\s+transforms[\s\S]*distractor write\s+targets[\s\S]*leveled variants[\s\S]*answer\s+explanations[\s\S]*listening\s+scripts[\s\S]*worksheet\/audio\/spreadsheet\s+extraction[\s\S]*source-material privacy[\s\S]*editor-review\/save\/publish boundaries[\s\S]*snapshot\s+protection[\s\S]*result-export continuity/,
   'TEST-CATALOG should document the activity AI enhancement roadmap chain gate.'
 );
 const activityAiEnhancementPolicyContent = {
@@ -7222,170 +5865,6 @@ assert.match(
   /30-slice\s+manual-save\s+handoff/,
   'TEST-CATALOG should document the activity AI enhancement manual-save handoff.'
 );
-const activityAiEnhancementLifecycleChainView =
-  buildActivityAiEnhancementLifecycleChainView({
-    activityPersisted: true,
-    content: activityAiEnhancementPolicyContent,
-    currentTemplateType: 'quiz',
-    enhancementKind: 'answer-explanation',
-    existingAssignmentSnapshotCount: 3,
-    existingPublishedAssignmentCount: 4,
-    hasAuthenticatedTeacher: true,
-    parsedDraft: activityAiEnhancementDraftApplicationDraft,
-    proposedDraft: activityAiEnhancementDraftApplicationDraft,
-    providerConfigured: true,
-    publishSubmitted: true,
-    publishValues: {
-      instructions: 'secret lifecycle instructions',
-      maxAttempts: '3',
-      timeLimitMinutes: '15',
-    },
-    reviewedCheckIds: ACTIVITY_AI_ENHANCEMENT_EDITOR_REVIEW_CHECK_IDS,
-    savedActivityId: 'secret-lifecycle-activity-id',
-    teacherSubmittedSave: true,
-  });
-const activityAiEnhancementLifecycleValues = new Map(
-  activityAiEnhancementLifecycleChainView.itemViews.map((item) => [
-    item.id,
-    item.value,
-  ])
-);
-assert.deepEqual(
-  activityAiEnhancementLifecycleChainView.itemViews.map((item) => item.id),
-  [...ACTIVITY_AI_ENHANCEMENT_LIFECYCLE_CHAIN_ITEM_IDS],
-  'Activity AI enhancement lifecycle chain should expose the stable policy-to-publish 30-slice order.'
-);
-assert.equal(activityAiEnhancementLifecycleChainView.itemViews.length, 30);
-assert.equal(
-  new Set(ACTIVITY_AI_ENHANCEMENT_LIFECYCLE_CHAIN_ITEM_IDS).size,
-  30
-);
-assert.equal(ACTIVITY_AI_ENHANCEMENT_LIFECYCLE_CHAIN_SOURCE_FILES.length, 30);
-for (const filePath of ACTIVITY_AI_ENHANCEMENT_LIFECYCLE_CHAIN_SOURCE_FILES) {
-  assert.ok(
-    existsSync(filePath),
-    `Missing activity AI enhancement lifecycle source ${filePath}`
-  );
-}
-assert.equal(
-  activityAiEnhancementLifecycleChainView.plan.chainStatus,
-  'ready-for-assignment-publish'
-);
-assert.equal(
-  activityAiEnhancementLifecycleChainView.plan.canPassDraftOutputToApplication,
-  true
-);
-assert.equal(
-  activityAiEnhancementLifecycleChainView.plan.canCreateAssignmentLink,
-  true
-);
-assert.equal(
-  activityAiEnhancementLifecycleValues.get('chain-state-stage'),
-  'ready-for-assignment-publish'
-);
-assert.equal(
-  activityAiEnhancementLifecycleValues.get('share-link-stage'),
-  'Publish flow creates link'
-);
-assert.equal(
-  activityAiEnhancementLifecycleValues.get('snapshot-freeze-stage'),
-  'Saved activity snapshot'
-);
-assert.equal(
-  JSON.stringify(activityAiEnhancementLifecycleChainView).includes(
-    'secret-policy-file-id'
-  ),
-  false,
-  'Activity AI enhancement lifecycle view should not leak source material file ids.'
-);
-assert.equal(
-  JSON.stringify(activityAiEnhancementLifecycleChainView).includes(
-    'secret-lifecycle-activity-id'
-  ),
-  false,
-  'Activity AI enhancement lifecycle view should not leak saved activity ids.'
-);
-assert.equal(
-  JSON.stringify(activityAiEnhancementLifecycleChainView).includes(
-    'secret lifecycle instructions'
-  ),
-  false,
-  'Activity AI enhancement lifecycle view should not leak student instructions.'
-);
-assert.deepEqual(activityAiEnhancementLifecycleChainView.privacy, {
-  chainSourceFileCount:
-    ACTIVITY_AI_ENHANCEMENT_LIFECYCLE_CHAIN_SOURCE_FILES.length,
-  createsAssignmentLinksWithoutTeacherAction: false,
-  exposesActivityContentText: false,
-  exposesAnswerKeysToPublicPayload: false,
-  exposesAssignmentTitle: false,
-  exposesDraftText: false,
-  exposesFileBytesToAi: false,
-  exposesInternalActivityIds: false,
-  exposesQuestionPromptText: false,
-  exposesRawAiOutput: false,
-  exposesRawSourceText: false,
-  exposesShareSlug: false,
-  exposesSourceMaterialFileIds: false,
-  exposesSourceMaterialFilenames: false,
-  exposesSourceMaterialStorageKeys: false,
-  exposesStudentInstructions: false,
-  itemIds: [...ACTIVITY_AI_ENHANCEMENT_LIFECYCLE_CHAIN_ITEM_IDS],
-  mutatesExistingAssignmentSnapshots: false,
-  persistsActivityWithoutTeacherAction: false,
-  publishesAssignmentWithoutTeacherAction: false,
-  readsSourceMaterialBytes: false,
-  requiresCreateActivityInputContract: true,
-  requiresEditorReview: true,
-  requiresTeacherPublishAction: true,
-  requiresTeacherSaveAction: true,
-  sourceFiles: [...ACTIVITY_AI_ENHANCEMENT_LIFECYCLE_CHAIN_SOURCE_FILES],
-  usesAssignmentPublishHandoff: true,
-  usesAssignmentPublishPreflight: true,
-  usesAssignmentSnapshotFreeze: true,
-  usesDraftOutputPlan: true,
-  usesPublishBoundaryPlan: true,
-  usesSaveBoundaryPlan: true,
-});
-assert.equal(
-  buildActivityAiEnhancementLifecycleChainPlan({
-    content: activityAiEnhancementPolicyContent,
-    currentTemplateType: 'quiz',
-    enhancementKind: 'answer-explanation',
-    hasAuthenticatedTeacher: true,
-    parsedDraft: null,
-    proposedDraft: activityAiEnhancementDraftApplicationDraft,
-    providerConfigured: true,
-    reviewedCheckIds: ACTIVITY_AI_ENHANCEMENT_EDITOR_REVIEW_CHECK_IDS,
-    teacherSubmittedSave: true,
-  }).chainStatus,
-  'awaiting-draft-output'
-);
-assert.equal(
-  buildActivityAiEnhancementLifecycleChainPlan({
-    activityPersisted: true,
-    content: activityAiEnhancementPolicyContent,
-    currentTemplateType: 'quiz',
-    enhancementKind: 'answer-explanation',
-    hasAuthenticatedTeacher: true,
-    proposedDraft: activityAiEnhancementDraftApplicationDraft,
-    providerConfigured: true,
-    reviewedCheckIds: ACTIVITY_AI_ENHANCEMENT_EDITOR_REVIEW_CHECK_IDS,
-    savedActivityId: 'secret-lifecycle-activity-id',
-    teacherSubmittedSave: true,
-  }).chainStatus,
-  'awaiting-teacher-publish'
-);
-assert.match(
-  readFileSync('src/activities/ai-enhancement-lifecycle-chain.ts', 'utf8'),
-  /buildActivityAiEnhancementPolicyDecision[\s\S]*buildActivityAiEnhancementExecutionPlan[\s\S]*buildActivityAiEnhancementDraftOutputPlan[\s\S]*buildActivityAiEnhancementDraftApplicationPlan[\s\S]*buildActivityAiEnhancementEditorReviewPlan[\s\S]*buildActivityAiEnhancementSaveBoundaryPlan[\s\S]*buildActivityAiEnhancementPublishBoundaryPlan/,
-  'Activity AI enhancement lifecycle source should compose the existing policy-to-publish stages.'
-);
-assert.match(
-  readFileSync('docs/product.md', 'utf8'),
-  /src\/activities\/ai-enhancement-lifecycle-chain\.ts` owns the full AI enhancement lifecycle handoff[\s\S]*request policy[\s\S]*parsed draft output[\s\S]*teacher review[\s\S]*manual save[\s\S]*assignment\s+publish actions[\s\S]*result-export continuity[\s\S]*shared\s+publish dialog/,
-  'docs/product.md should document the activity AI enhancement lifecycle owner.'
-);
 assert.match(
   readFileSync('tests/e2e/TEST-CATALOG.md', 'utf8'),
   /Activity AI enhancement lifecycle chain has a fast script-level gate via[\s\S]*scripts\/activity-ai-enhancement-lifecycle-chain\.test\.ts[\s\S]*policy-to-publish ordering[\s\S]*draft output handoffs[\s\S]*teacher review[\s\S]*manual save[\s\S]*assignment\s+publish actions[\s\S]*share-link\/snapshot boundaries[\s\S]*result-export continuity/,
@@ -7396,57 +5875,6 @@ assert.match(
   /assignment\s+publish\s+actions[\s\S]*result-export\s+continuity/,
   'TEST-CATALOG should document the activity AI enhancement assignment-publish handoff.'
 );
-const activityAuthoringLibraryChainView =
-  buildActivityAuthoringLibraryChainHandoffView();
-const activityAuthoringLibraryChainValues = new Map(
-  activityAuthoringLibraryChainView.itemViews.map((item) => [
-    item.id,
-    item.value,
-  ])
-);
-assert.deepEqual(
-  activityAuthoringLibraryChainView.itemViews.map((item) => item.id),
-  [...ACTIVITY_AUTHORING_LIBRARY_CHAIN_HANDOFF_ITEM_IDS],
-  'Activity authoring/library chain should expose the stable public-entry to library-management 30-slice order.'
-);
-assert.equal(activityAuthoringLibraryChainView.itemViews.length, 30);
-assert.equal(
-  new Set(ACTIVITY_AUTHORING_LIBRARY_CHAIN_HANDOFF_ITEM_IDS).size,
-  30
-);
-assert.equal(ACTIVITY_AUTHORING_LIBRARY_CHAIN_SOURCE_FILES.length, 30);
-for (const filePath of ACTIVITY_AUTHORING_LIBRARY_CHAIN_SOURCE_FILES) {
-  assert.ok(
-    existsSync(filePath),
-    `Missing activity authoring/library chain file ${filePath}`
-  );
-}
-assert.ok(
-  activityAuthoringLibraryChainView.itemViews.every(
-    (item) => item.ariaLabel && item.description && item.label && item.value
-  )
-);
-assert.deepEqual(activityAuthoringLibraryChainView.privacy, {
-  chainSourceFileCount: ACTIVITY_AUTHORING_LIBRARY_CHAIN_SOURCE_FILES.length,
-  createsAssignmentLinksWithoutTeacherAction: false,
-  editsPublishedAssignmentSnapshots: false,
-  exposesAnswerText: false,
-  exposesPromptTextInHandoff: false,
-  exposesRawEditorInput: false,
-  exposesSourceMaterialFileIds: false,
-  exposesSourceMaterialFilenames: false,
-  exposesSourceMaterialStorageKeys: false,
-  exposesTeacherNotesInHandoff: false,
-  itemIds: [...ACTIVITY_AUTHORING_LIBRARY_CHAIN_HANDOFF_ITEM_IDS],
-  requiresAuthenticatedTeacherForPersistence: true,
-  requiresCreateActivityInputContract: true,
-  requiresOwnerScopedLibrary: true,
-  requiresTeacherSave: true,
-  sourceFiles: [...ACTIVITY_AUTHORING_LIBRARY_CHAIN_SOURCE_FILES],
-  usesAssignmentSnapshotsForExistingLinks: true,
-  usesActivityEditorWorkflowHandoff: true,
-  usesSharedTemplateReadiness: true,
-});
 assert.deepEqual(
   [
     ACTIVITY_SOURCE_MATERIAL_REFERENCE_ITEM_IDS.length,
@@ -7454,118 +5882,11 @@ assert.deepEqual(
   Array.from({ length: 1 }, () => 30),
   'Activity authoring/library chain should stay backed by focused public-entry, editor, library, derivative, lifecycle, and publish gates.'
 );
-assert.deepEqual(Object.fromEntries(activityAuthoringLibraryChainValues), {
-  'activity-persistence': 'Create/update helpers',
-  'editor-workflow-handoff-boundary': 'Visible 5-step workflow',
-  'archive-lifecycle-gate': 'Archive blocks derive',
-  'card-readiness-summary': 'Ready/locked modes',
-  'card-source-materials': 'Kind/count badges',
-  'create-editor-entry': '/create',
-  'duplicate-draft-boundary': 'Draft copy',
-  'edit-contract-roundtrip': 'Content to editor input',
-  'edit-route-owner-scope': 'Authenticated owner',
-  'editor-readiness-preview': 'TemplateRemixPlan',
-  'editor-scaffold-loading': 'Reviewed scaffolds',
-  'library-owner-scope': 'Owner-scoped API',
-  'library-pagination': 'Bounded pages',
-  'library-search-normalization': 'NFKC trimmed search',
-  'library-source-filter': 'Material kind filter',
-  'library-status-filter': 'Active/archived',
-  'library-summary-metrics': 'Full filtered result',
-  'library-template-filter': 'Exact template',
-  'publish-access-boundary': 'Publish dialog only',
-  'public-template-entry': '/templates',
-  'remix-readiness-boundary': 'Ready target only',
-  'restore-lifecycle-gate': 'Restore before derive',
-  'save-validation': 'Zod validation',
-  'shared-create-input': 'CreateActivityInput',
-  'snapshot-protection': 'AssignmentSnapshot',
-  'source-material-picker': 'Owner files',
-  'source-material-summary': 'Kind/count only',
-  'structured-content-fields': 'Questions/pairs/groups',
-  'template-source-search': 'template/source params',
-  'worksheet-entry': '/worksheets',
-});
 assert.match(
   readFileSync('tests/e2e/TEST-CATALOG.md', 'utf8'),
-  /Activity authoring\/library chain has a fast script-level gate via[\s\S]*scripts\/activity-authoring-library-chain-handoff\.test\.ts/,
+  /Activity authoring\/library chain has a fast script-level gate via[\s\S]*scripts\/activity-authoring-library-chain\.test\.ts/,
   'TEST-CATALOG should document the activity authoring/library chain gate.'
 );
-const sourceMaterialPrivacyChainView =
-  buildSourceMaterialPrivacyChainHandoffView();
-const sourceMaterialPrivacyChainValues = new Map(
-  sourceMaterialPrivacyChainView.itemViews.map((item) => [item.id, item.value])
-);
-assert.deepEqual(
-  sourceMaterialPrivacyChainView.itemViews.map((item) => item.id),
-  [...SOURCE_MATERIAL_PRIVACY_CHAIN_HANDOFF_ITEM_IDS],
-  'Source-material privacy chain should expose the stable cross-module 30-slice order.'
-);
-assert.equal(sourceMaterialPrivacyChainView.itemViews.length, 30);
-assert.equal(
-  new Set(SOURCE_MATERIAL_PRIVACY_CHAIN_HANDOFF_ITEM_IDS).size,
-  30
-);
-assert.equal(SOURCE_MATERIAL_PRIVACY_CHAIN_SOURCE_FILES.length, 30);
-for (const filePath of SOURCE_MATERIAL_PRIVACY_CHAIN_SOURCE_FILES) {
-  assert.ok(
-    existsSync(filePath),
-    `Missing source material chain file ${filePath}`
-  );
-}
-assert.ok(
-  sourceMaterialPrivacyChainView.itemViews.every(
-    (item) => item.ariaLabel && item.description && item.label && item.value
-  )
-);
-assert.deepEqual(sourceMaterialPrivacyChainView.privacy, {
-  allowsSafeFilenameBasenamesInTeacherAiNotes: true,
-  chainSourceFileCount: SOURCE_MATERIAL_PRIVACY_CHAIN_SOURCE_FILES.length,
-  exposesFileBytesToAi: false,
-  exposesFileIdsInHandoff: false,
-  exposesPermissionMetadataToActivityContent: false,
-  exposesRawSourceMaterialListToStudents: false,
-  exposesStorageKeysToActivityContent: false,
-  exposesStorageKeysToStudents: false,
-  itemIds: [...SOURCE_MATERIAL_PRIVACY_CHAIN_HANDOFF_ITEM_IDS],
-  keepsReferencesCompact: true,
-  publicPayloadIncludesSourceMaterials: false,
-  requiresTeacherReviewBeforeExtractionPersistence: true,
-  sourceFiles: [...SOURCE_MATERIAL_PRIVACY_CHAIN_SOURCE_FILES],
-  usesSourceMaterialReferenceHandoff: true,
-});
-assert.deepEqual(Object.fromEntries(sourceMaterialPrivacyChainValues), {
-  'activity-reference-shape': 'Compact reference',
-  'activity-validation-normalization': 'CreateActivityInput normalized',
-  'ai-draft-file-byte-guard': 'Bytes omitted',
-  'ai-draft-source-sanitization': 'Sanitized source',
-  'ai-draft-storage-key-guard': 'Storage hidden',
-  'draft-source-omitted-notes': 'Unsafe notes omitted',
-  'draft-source-safe-notes': 'Safe material provenance',
-  'extraction-editor-review': 'Teacher review required',
-  'extraction-parallel-model-guard': 'No parallel worksheet model',
-  'extraction-readiness': 'Future extraction paths',
-  'file-byte-stream-boundary': 'Stream only from storage',
-  'filename-disposition-boundary': 'Attachment header only',
-  'material-classification': 'Kind from metadata',
-  'picker-attachment-limit': 'Up to 12 files',
-  'picker-owner-scope': 'Current teacher files',
-  'picker-reference-write': 'ActivityContent.sourceMaterials',
-  'material-reference-handoff-boundary': '30 reference slices',
-  'private-owner-access': 'Owner required',
-  'public-assignment-source-guard': 'Teacher materials hidden',
-  'reference-duplicate-collapse': 'First 12 safe references',
-  'reference-file-id-safety': 'Unsafe ids rejected',
-  'reference-filename-safety': 'Safe basename',
-  'same-origin-access-proxy': '30 access slices',
-  'settings-library-summary': 'Full owner library',
-  'settings-material-handoff': '30 library slices',
-  'storage-key-planning': 'Server-side R2 key',
-  'storage-owner-metadata': 'Owner-scoped userFiles',
-  'storage-upload-validation': '20 upload slices',
-  'student-runtime-source-guard': 'Source metadata hidden',
-  'unavailable-link-content-guard': 'Runtime hidden',
-});
 const sourceMaterialPrivacyUploadPlan = buildStorageUploadReadinessPlan({
   contentType: 'application/pdf',
   file: new Blob(['safe source material fixture'], {
@@ -7677,7 +5998,7 @@ assert.match(
 );
 assert.match(
   activitySourceExtractionAssistTestCatalogSource,
-  /Source-material privacy chain has a fast script-level gate via[\s\S]*scripts\/source-material-privacy-chain-handoff\.test\.ts/
+  /Source-material privacy chain has a fast script-level gate via[\s\S]*scripts\/source-material-privacy-chain\.test\.ts/
 );
 assert.doesNotMatch(
   activitySourceMaterialsFieldSource,
@@ -7761,7 +6082,7 @@ assert.match(
 );
 assert.match(
   activityLifecycleSource,
-  /export type ActivityVisibilityBlockedReason =[\s\S]*'already-archived'[\s\S]*'not-archived'[\s\S]*reason: ActivityVisibilityBlockedReason/,
+  /type ActivityVisibilityBlockedReason =[\s\S]*'already-archived'[\s\S]*'not-archived'[\s\S]*reason: ActivityVisibilityBlockedReason/,
   'Activity visibility execution plans should expose structured blocked reasons.'
 );
 assert.match(
@@ -7796,7 +6117,7 @@ assert.match(
 );
 assert.match(
   activityEditorSource,
-  /export type ActivityEditPageEditorView = \{[\s\S]*activityId: string;[\s\S]*initialValues: CreateActivityInput;[\s\S]*mode: 'edit';[\s\S]*export type ActivityEditPageViewModel = \{[\s\S]*editAccessView: ActivityEditAccessView \| null;[\s\S]*editor\?: ActivityEditPageEditorView;[\s\S]*export type ActivityEditRouteState =/,
+  /type ActivityEditPageEditorView = \{[\s\S]*activityId: string;[\s\S]*initialValues: CreateActivityInput;[\s\S]*mode: 'edit';[\s\S]*type ActivityEditPageViewModel = \{[\s\S]*editAccessView: ActivityEditAccessView \| null;[\s\S]*editor\?: ActivityEditPageEditorView;[\s\S]*type ActivityEditRouteState =/,
   'Activity editor domain should expose explicit edit page, editor, and route-state contracts.'
 );
 assert.doesNotMatch(
@@ -7806,12 +6127,12 @@ assert.doesNotMatch(
 );
 assert.match(
   activityEditorSource,
-  /export type ActivityCreatePageInputShapeItemId =[\s\S]*'groups'[\s\S]*'notes'[\s\S]*'pairs'[\s\S]*'questions'[\s\S]*export type ActivityCreatePageInputShapeItemView = \{[\s\S]*id: ActivityCreatePageInputShapeItemId;[\s\S]*label: string;[\s\S]*export type ActivityCreatePageInputShapeView = \{[\s\S]*itemViews: ActivityCreatePageInputShapeItemView\[\];[\s\S]*export type ActivityCreatePageViewModel = \{/,
+  /type ActivityCreatePageInputShapeItemId =[\s\S]*'groups'[\s\S]*'notes'[\s\S]*'pairs'[\s\S]*'questions'[\s\S]*type ActivityCreatePageInputShapeItemView = \{[\s\S]*id: ActivityCreatePageInputShapeItemId;[\s\S]*label: string;[\s\S]*type ActivityCreatePageInputShapeView = \{[\s\S]*itemViews: ActivityCreatePageInputShapeItemView\[\];[\s\S]*type ActivityCreatePageViewModel = \{/,
   'Activity editor domain should expose structured create-page input-shape item contracts.'
 );
 assert.match(
   activityEditorSource,
-  /export type ActivityCreatePageTemplateEntryMetricId =[\s\S]*'readyModes'[\s\S]*'runtimeItems'[\s\S]*export type ActivityCreatePageTemplateEntryMetricView = \{[\s\S]*id: ActivityCreatePageTemplateEntryMetricId;[\s\S]*label: string;[\s\S]*value: string;[\s\S]*export type ActivityCreatePageTemplateSource = CreateActivityTemplateSource;[\s\S]*export type ActivityCreatePageTemplateEntryView = \{[\s\S]*isTemplateEntry: boolean;[\s\S]*metrics: ActivityCreatePageTemplateEntryMetricView\[\];[\s\S]*nextStep: string;[\s\S]*shortName: string;[\s\S]*source: ActivityCreatePageTemplateSource \| 'direct';[\s\S]*sourceDescription: string;[\s\S]*sourceLabel: string;[\s\S]*title: string;[\s\S]*templateEntry: ActivityCreatePageTemplateEntryView;/,
+  /type ActivityCreatePageTemplateEntryMetricId =[\s\S]*'readyModes'[\s\S]*'runtimeItems'[\s\S]*type ActivityCreatePageTemplateEntryMetricView = \{[\s\S]*id: ActivityCreatePageTemplateEntryMetricId;[\s\S]*label: string;[\s\S]*value: string;[\s\S]*type ActivityCreatePageTemplateSource = CreateActivityTemplateSource;[\s\S]*type ActivityCreatePageTemplateEntryView = \{[\s\S]*isTemplateEntry: boolean;[\s\S]*metrics: ActivityCreatePageTemplateEntryMetricView\[\];[\s\S]*nextStep: string;[\s\S]*shortName: string;[\s\S]*source: ActivityCreatePageTemplateSource \| 'direct';[\s\S]*sourceDescription: string;[\s\S]*sourceLabel: string;[\s\S]*title: string;[\s\S]*templateEntry: ActivityCreatePageTemplateEntryView;/,
   'Activity editor domain should expose structured create-page template-entry summary, metric, and source-context contracts.'
 );
 assert.match(
@@ -7896,7 +6217,7 @@ assert.match(
 );
 assert.match(
   activityEditorSource,
-  /export type ActivityEditorTemplateSetupView[\s\S]*requirementBadges: ActivityEditorTemplateRequirementBadgeView\[\];[\s\S]*reviewChecklistItems: ActivityEditorTemplateScaffoldReviewItemView\[\];[\s\S]*reviewChecklistLabel: string;[\s\S]*export type ActivityEditorTemplateScaffoldReviewItemId =[\s\S]*'check-ready-modes'[\s\S]*'edit-before-save'[\s\S]*'review-fields';[\s\S]*export type ActivityEditorTemplateScaffoldReviewItemView = \{[\s\S]*actionHref: ActivityEditorSectionHref;[\s\S]*actionLabel: string;[\s\S]*ariaLabel: string;[\s\S]*export type ActivityEditorTemplateRequirementBadgeView =\s*TemplateRequirementView;[\s\S]*export type ActivityEditorTemplateScaffoldSummaryView =\s*ActivityTemplateScaffoldReadinessSummary;[\s\S]*export type ActivityEditorTemplateScaffoldCoverageMetricView =\s*ActivityTemplateScaffoldCoverageMetricView;[\s\S]*export type ActivityEditorTemplateScaffoldReadyOptionView =\s*ActivityTemplateScaffoldReadyOptionView;/,
+  /export type ActivityEditorTemplateSetupView[\s\S]*requirementBadges: ActivityEditorTemplateRequirementBadgeView\[\];[\s\S]*reviewChecklistItems: ActivityEditorTemplateScaffoldReviewItemView\[\];[\s\S]*reviewChecklistLabel: string;[\s\S]*type ActivityEditorTemplateScaffoldReviewItemId =[\s\S]*'check-ready-modes'[\s\S]*'edit-before-save'[\s\S]*'review-fields';[\s\S]*export type ActivityEditorTemplateScaffoldReviewItemView = \{[\s\S]*actionHref: ActivityEditorSectionHref;[\s\S]*actionLabel: string;[\s\S]*ariaLabel: string;[\s\S]*export type ActivityEditorTemplateRequirementBadgeView =\s*TemplateRequirementView;/,
   'Activity editor domain should expose explicit template scaffold view contracts.'
 );
 assert.doesNotMatch(
@@ -7957,7 +6278,7 @@ assert.match(
 );
 assert.match(
   activityEditorSource,
-  /export type ActivityEditorDraftGenerationBlockedReason =[\s\S]*'auth-required'[\s\S]*'source-required'[\s\S]*'source-too-long'[\s\S]*reason: ActivityEditorDraftGenerationBlockedReason/,
+  /type ActivityEditorDraftGenerationBlockedReason =[\s\S]*'auth-required'[\s\S]*'source-required'[\s\S]*'source-too-long'[\s\S]*reason: ActivityEditorDraftGenerationBlockedReason/,
   'Activity editor draft generation gates and blocked plans should expose structured blocked reasons.'
 );
 assert.match(
@@ -8457,7 +6778,7 @@ const activityDraftMetaSource = readFileSync(
 );
 assert.match(
   activityDraftMetaSource,
-  /export type ActivityDraftMetaSummaryCoverageStatView[\s\S]*export type ActivityDraftMetaSummaryReadinessOption[\s\S]*export type ActivityDraftMetaSummarySourceMaterialNoteView[\s\S]*export type ActivityDraftMetaSummarySourceMaterialCapabilityView[\s\S]*export type ActivityDraftMetaSummarySourceMaterialSafetyView[\s\S]*export type ActivityDraftMetaSummaryView[\s\S]*export type ActivityDraftReviewChecklistItemView[\s\S]*export type ActivityDraftReviewChecklistStatusView[\s\S]*export type ActivityDraftMetaSummaryQuestionChoiceReadinessView[\s\S]*export type ActivityDraftMetaSummaryQuestionChoiceReadinessItemView/,
+  /export type ActivityDraftMetaSummaryCoverageStatView[\s\S]*export type ActivityDraftMetaSummaryReadinessOption[\s\S]*type ActivityDraftMetaSummarySourceMaterialNoteView[\s\S]*export type ActivityDraftMetaSummarySourceMaterialCapabilityView[\s\S]*export type ActivityDraftMetaSummarySourceMaterialSafetyView[\s\S]*type ActivityDraftMetaSummaryView[\s\S]*export type ActivityDraftReviewChecklistItemView[\s\S]*type ActivityDraftReviewChecklistStatusView[\s\S]*export type ActivityDraftMetaSummaryQuestionChoiceReadinessView[\s\S]*export type ActivityDraftMetaSummaryQuestionChoiceReadinessItemView/,
   'AI draft meta domain should expose explicit summary, checklist, source-material, readiness, and quiz-choice view contracts.'
 );
 assert.match(
@@ -8477,7 +6798,7 @@ assert.match(
 );
 assert.match(
   activityDraftMetaSource,
-  /export type ActivityDraftMetaSummarySourceMaterialNoteView =[\s\S]*ActivitySourceMaterialDraftNoteView & \{[\s\S]*ariaLabel: string;[\s\S]*displayText: string;[\s\S]*key: string;/,
+  /type ActivityDraftMetaSummarySourceMaterialNoteView =[\s\S]*ActivitySourceMaterialDraftNoteView & \{[\s\S]*ariaLabel: string;[\s\S]*displayText: string;[\s\S]*key: string;/,
   'AI draft meta source material note views should expose stable keys and aria labels separately from display text.'
 );
 assert.match(
@@ -8982,7 +7303,7 @@ const publicPageViewSource = readFileSync(
 );
 assert.match(
   publicPageViewSource,
-  /export type PricingPageViewModel[\s\S]*valueSection: PricingPageSectionView;[\s\S]*valueCards: PricingValueCardView\[\];[\s\S]*export type PricingFaqItemView = \{[\s\S]*ariaLabel: string;[\s\S]*type PricingValueCardView = \{[\s\S]*ariaLabel: string;/,
+  /type PricingPageViewModel[\s\S]*valueSection: PricingPageSectionView;[\s\S]*valueCards: PricingValueCardView\[\];[\s\S]*type PricingFaqItemView = \{[\s\S]*ariaLabel: string;[\s\S]*type PricingValueCardView = \{[\s\S]*ariaLabel: string;/,
   'Pricing page view models should expose prepared section, FAQ item, and value card semantics.'
 );
 assert.match(
@@ -9419,7 +7740,7 @@ assert.doesNotMatch(
 );
 assert.match(
   publicPageViewSource,
-  /export type HomePagePreviewView = \{[\s\S]*activity: ActivitySeed;[\s\S]*assignment: AssignmentSeed;[\s\S]*source: 'starter-preview';[\s\S]*export type HomePageSignalId/,
+  /type HomePagePreviewView = \{[\s\S]*activity: ActivitySeed;[\s\S]*assignment: AssignmentSeed;[\s\S]*source: 'starter-preview';[\s\S]*export type HomePageSignalId/,
   'Home page view model should expose a structured starter preview contract.'
 );
 assert.match(
@@ -9529,7 +7850,7 @@ assert.match(
 );
 assert.match(
   publicPageViewSource,
-  /export type ContactPageViewModel[\s\S]*supportCta: ContactSupportActionView;[\s\S]*supportEmail:[\s\S]*actionAriaLabel: string;[\s\S]*ariaLabel: string;[\s\S]*topicSection: ContactSectionView;[\s\S]*type ContactChecklistItemView = \{[\s\S]*ariaLabel: string;[\s\S]*type ContactTopicView = \{[\s\S]*actionAriaLabel: string;[\s\S]*ariaLabel: string;/,
+  /type ContactPageViewModel[\s\S]*supportCta: ContactSupportActionView;[\s\S]*supportEmail:[\s\S]*actionAriaLabel: string;[\s\S]*ariaLabel: string;[\s\S]*topicSection: ContactSectionView;[\s\S]*type ContactChecklistItemView = \{[\s\S]*ariaLabel: string;[\s\S]*type ContactTopicView = \{[\s\S]*actionAriaLabel: string;[\s\S]*ariaLabel: string;/,
   'Contact page view models should expose prepared hero, checklist, topic, support, and inquiry semantics.'
 );
 assert.match(
@@ -9589,12 +7910,12 @@ assert.doesNotMatch(
 );
 assert.match(
   publicPageViewSource,
-  /export type RoadmapTaskStatus = 'available' \| 'improving' \| 'planned'/,
+  /type RoadmapTaskStatus = 'available' \| 'improving' \| 'planned'/,
   'Roadmap task view models should expose explicit product status states.'
 );
 assert.match(
   publicPageViewSource,
-  /export type RoadmapTaskId[\s\S]*type RoadmapTaskView = \{[\s\S]*evidence: string;[\s\S]*id: RoadmapTaskId;[\s\S]*nextStep: string;[\s\S]*status: RoadmapTaskStatus;[\s\S]*statusAriaLabel: string;[\s\S]*title: string;/,
+  /type RoadmapTaskId[\s\S]*type RoadmapTaskView = \{[\s\S]*evidence: string;[\s\S]*id: RoadmapTaskId;[\s\S]*nextStep: string;[\s\S]*status: RoadmapTaskStatus;[\s\S]*statusAriaLabel: string;[\s\S]*title: string;/,
   'Roadmap task view models should expose stable ids, task status, evidence, and next-step copy separate from localized titles.'
 );
 assert.match(
@@ -9659,12 +7980,12 @@ assert.match(
 );
 assert.match(
   blogPageViewSource,
-  /export type BlogListPageViewModel = \{[\s\S]*ctaActions: BlogCtaAction\[\];[\s\S]*seoDescription: string;[\s\S]*seoTitle: string;[\s\S]*title: string;/,
+  /type BlogListPageViewModel = \{[\s\S]*ctaActions: BlogCtaAction\[\];[\s\S]*seoDescription: string;[\s\S]*seoTitle: string;[\s\S]*title: string;/,
   'Blog page view should expose prepared list-page hero, SEO, and CTA copy.'
 );
 assert.match(
   blogPageViewSource,
-  /export type BlogPostCtaViewModel = \{[\s\S]*actions: BlogCtaAction\[\];[\s\S]*description: string;[\s\S]*title: string;/,
+  /type BlogPostCtaViewModel = \{[\s\S]*actions: BlogCtaAction\[\];[\s\S]*description: string;[\s\S]*title: string;/,
   'Blog page view should expose prepared post CTA copy and actions.'
 );
 assert.match(
@@ -9784,12 +8105,12 @@ assert.doesNotMatch(
 );
 assert.match(
   authCardSource,
-  /export type AuthCardBenefitItem = \{[\s\S]*id: string;[\s\S]*text: string;[\s\S]*benefits\?: AuthCardBenefitItem\[\];[\s\S]*key=\{benefit\.id\}[\s\S]*benefit\.text/,
+  /type AuthCardBenefitItem = \{[\s\S]*id: string;[\s\S]*text: string;[\s\S]*benefits\?: AuthCardBenefitItem\[\];[\s\S]*key=\{benefit\.id\}[\s\S]*benefit\.text/,
   'Auth cards should render benefit rows from structured benefit ids and text.'
 );
 assert.match(
   authCardSource,
-  /export type AuthWorkflowStep = \{[\s\S]*id: string;[\s\S]*workflowSteps\?: AuthWorkflowStep\[\];[\s\S]*key=\{step\.id\}/,
+  /type AuthWorkflowStep = \{[\s\S]*id: string;[\s\S]*workflowSteps\?: AuthWorkflowStep\[\];[\s\S]*key=\{step\.id\}/,
   'Auth cards should render workflow steps from stable step ids.'
 );
 assert.match(
@@ -10073,7 +8394,7 @@ assert.match(
 );
 assert.match(
   assignmentResultViewSource,
-  /export type AssignmentAttemptRowDisplayInput = AssignmentAttemptRowInput &[\s\S]*export type AssignmentResultsPageViewModel<[\s\S]*export type AssignmentResultsRouteState</,
+  /export type AssignmentAttemptRowDisplayInput = AssignmentAttemptRowInput &[\s\S]*export type AssignmentResultsPageViewModel<[\s\S]*type AssignmentResultsRouteState</,
   'Assignment result view domain should export explicit route-facing result page and route-state contracts.'
 );
 assert.match(
@@ -10375,12 +8696,12 @@ assert.doesNotMatch(
 );
 assert.match(
   assignmentResultViewSource,
-  /export type AssignmentResultReviewScopeItemView = \{[\s\S]*ariaLabel: string;[\s\S]*description: string;[\s\S]*id: AssignmentResultReviewScopeItemId;[\s\S]*label: string;[\s\S]*statusView: AssignmentResultControlStatusView;[\s\S]*value: string;[\s\S]*export type AssignmentResultReviewScopeSummaryItemView = \{[\s\S]*ariaLabel: string;[\s\S]*description: string;[\s\S]*id: AssignmentResultReviewScopeSummaryItemId;[\s\S]*label: string;[\s\S]*value: string;[\s\S]*export type AssignmentResultReviewScopeView = \{[\s\S]*description: string;[\s\S]*itemViews: AssignmentResultReviewScopeItemView\[\];[\s\S]*summaryItems: AssignmentResultReviewScopeSummaryItemView\[\];[\s\S]*summaryLabel: string;[\s\S]*title: string;/,
+  /type AssignmentResultReviewScopeItemView = \{[\s\S]*ariaLabel: string;[\s\S]*description: string;[\s\S]*id: AssignmentResultReviewScopeItemId;[\s\S]*label: string;[\s\S]*statusView: AssignmentResultControlStatusView;[\s\S]*value: string;[\s\S]*type AssignmentResultReviewScopeSummaryItemView = \{[\s\S]*ariaLabel: string;[\s\S]*description: string;[\s\S]*id: AssignmentResultReviewScopeSummaryItemId;[\s\S]*label: string;[\s\S]*value: string;[\s\S]*export type AssignmentResultReviewScopeView = \{[\s\S]*description: string;[\s\S]*itemViews: AssignmentResultReviewScopeItemView\[\];[\s\S]*summaryItems: AssignmentResultReviewScopeSummaryItemView\[\];[\s\S]*summaryLabel: string;[\s\S]*title: string;/,
   'Assignment result view domain should expose explicit current review-scope panel contracts.'
 );
 assert.match(
   assignmentResultViewSource,
-  /export type AssignmentResultReviewStatus[\s\S]*'class-ready'[\s\S]*'focused'[\s\S]*'needs-review'[\s\S]*'no-matches'[\s\S]*'waiting-for-attempts'[\s\S]*export type AssignmentResultReviewStatusView = \{[\s\S]*ariaLabel: string;[\s\S]*status: AssignmentResultReviewStatus;[\s\S]*step: AssignmentResultReviewStatusStepView;[\s\S]*summaryItems: AssignmentResultReviewScopeSummaryItemView\[\];/,
+  /type AssignmentResultReviewStatus[\s\S]*'class-ready'[\s\S]*'focused'[\s\S]*'needs-review'[\s\S]*'no-matches'[\s\S]*'waiting-for-attempts'[\s\S]*export type AssignmentResultReviewStatusView = \{[\s\S]*ariaLabel: string;[\s\S]*status: AssignmentResultReviewStatus;[\s\S]*step: AssignmentResultReviewStatusStepView;[\s\S]*summaryItems: AssignmentResultReviewScopeSummaryItemView\[\];/,
   'Assignment result view domain should expose an explicit review-status panel contract with stable status ids and prepared summary items.'
 );
 assert.match(
@@ -10455,7 +8776,7 @@ assert.match(
 );
 assert.match(
   assignmentResultViewSource,
-  /export type AssignmentResultMetricKey[\s\S]*export type AssignmentResultMetricItem[\s\S]*export type AssignmentResultAttemptRowMetricLabels[\s\S]*export type AssignmentResultAttemptRowView[\s\S]*export type AssignmentResultAttemptTableView[\s\S]*export type AssignmentResultAttemptAnswerReviewDisplayView[\s\S]*export type AssignmentResultAttemptAnswerReviewView[\s\S]*export type AssignmentResultAttemptReviewSummaryMetricKey[\s\S]*export type AssignmentResultAttemptReviewSummaryMetricView[\s\S]*export type AssignmentResultAttemptReviewCardView[\s\S]*export type AssignmentResultStudentSummaryRowDisplayView[\s\S]*export type AssignmentResultStudentSummaryRowView[\s\S]*export type AssignmentResultStudentSummaryTableView[\s\S]*export type AssignmentResultItemAnalysisCardDisplayView[\s\S]*export type AssignmentResultItemAnalysisCardView[\s\S]*export type AssignmentResultItemPerformanceRowDisplayView[\s\S]*export type AssignmentResultItemPerformanceRowView[\s\S]*export type AssignmentResultItemPerformanceTableView/,
+  /export type AssignmentResultMetricKey[\s\S]*export type AssignmentResultMetricItem[\s\S]*export type AssignmentResultAttemptRowMetricLabels[\s\S]*export type AssignmentResultAttemptRowView[\s\S]*export type AssignmentResultAttemptTableView[\s\S]*export type AssignmentResultAttemptAnswerReviewDisplayView[\s\S]*export type AssignmentResultAttemptAnswerReviewView[\s\S]*type AssignmentResultAttemptReviewSummaryMetricKey[\s\S]*export type AssignmentResultAttemptReviewSummaryMetricView[\s\S]*export type AssignmentResultAttemptReviewCardView[\s\S]*export type AssignmentResultStudentSummaryRowDisplayView[\s\S]*export type AssignmentResultStudentSummaryRowView[\s\S]*export type AssignmentResultStudentSummaryTableView[\s\S]*export type AssignmentResultItemAnalysisCardDisplayView[\s\S]*export type AssignmentResultItemAnalysisCardView[\s\S]*export type AssignmentResultItemPerformanceRowDisplayView[\s\S]*export type AssignmentResultItemPerformanceRowView[\s\S]*export type AssignmentResultItemPerformanceTableView/,
   'Assignment result view domain should expose explicit result metric, row, review-card, answer-review, and table view contracts.'
 );
 assert.doesNotMatch(
@@ -11630,7 +9951,7 @@ assert.match(
 );
 assert.match(
   mailWorkspaceBoundarySource,
-  /export type MailWorkspaceBoundaryItemId =[\s\S]*'activities'[\s\S]*'assignments'[\s\S]*'results'[\s\S]*'ai-sources'[\s\S]*export type MailWorkspaceBoundaryView = \{[\s\S]*items: MailWorkspaceBoundaryItemView\[\];[\s\S]*buildMailWorkspaceBoundaryView[\s\S]*mail_workspace_boundary_item_activities_description[\s\S]*mail_workspace_boundary_description[\s\S]*mail_workspace_boundary_title[\s\S]*buildMailWorkspaceBoundaryItemView[\s\S]*mail_workspace_boundary_item_line/,
+  /export type MailWorkspaceBoundaryItemId =[\s\S]*'activities'[\s\S]*'assignments'[\s\S]*'results'[\s\S]*'ai-sources'[\s\S]*type MailWorkspaceBoundaryView = \{[\s\S]*items: MailWorkspaceBoundaryItemView\[\];[\s\S]*buildMailWorkspaceBoundaryView[\s\S]*mail_workspace_boundary_item_activities_description[\s\S]*mail_workspace_boundary_description[\s\S]*mail_workspace_boundary_title[\s\S]*buildMailWorkspaceBoundaryItemView[\s\S]*mail_workspace_boundary_item_line/,
   'Mail workspace-boundary domain should expose explicit item and panel view contracts from localized copy.'
 );
 assert.match(
@@ -12933,7 +11254,7 @@ assert.match(
 );
 assert.match(
   activityMaterialSummarySource,
-  /export type ActivitySourceMaterialReadinessStatusId[\s\S]*'extractable'[\s\S]*'none'[\s\S]*'reference-only'[\s\S]*export type ActivitySourceMaterialReadinessStatusView = \{[\s\S]*badgeVariant: 'outline' \| 'secondary';[\s\S]*id: ActivitySourceMaterialReadinessStatusId;[\s\S]*readinessStatus: ActivitySourceMaterialReadinessStatusView;/,
+  /type ActivitySourceMaterialReadinessStatusId[\s\S]*'extractable'[\s\S]*'none'[\s\S]*'reference-only'[\s\S]*export type ActivitySourceMaterialReadinessStatusView = \{[\s\S]*badgeVariant: 'outline' \| 'secondary';[\s\S]*id: ActivitySourceMaterialReadinessStatusId;[\s\S]*readinessStatus: ActivitySourceMaterialReadinessStatusView;/,
   'Activity source-material summary domain should expose explicit readiness status ids, badge variants, and summary view contracts.'
 );
 assert.doesNotMatch(
@@ -14308,491 +12629,14 @@ assert.match(
   /metadata = websiteConfig\.metadata(?=[\s\S]*description: metadata\?\.description)(?=[\s\S]*name: metadata\?\.name)(?=[\s\S]*scope: Routes\.Root)(?=[\s\S]*start_url: Routes\.Root)(?=[\s\S]*buildWebAppManifestInstallBoundary)/,
   'Web manifest helper should derive install name and description from ClassGamify site metadata while keeping public root start and scope through shared route constants.'
 );
-const publicDiscoveryIndexingChainView =
-  buildPublicDiscoveryIndexingChainHandoffView();
-const publicDiscoveryIndexingChainValues = new Map(
-  publicDiscoveryIndexingChainView.itemViews.map((item) => [
-    item.id,
-    item.value,
-  ])
-);
-assert.deepEqual(
-  publicDiscoveryIndexingChainView.itemViews.map((item) => item.id),
-  [...PUBLIC_DISCOVERY_INDEXING_CHAIN_HANDOFF_ITEM_IDS],
-  'Public discovery/indexing chain should expose the stable 30-slice public route, indexing, DOM, and legacy-retirement order.'
-);
-assert.equal(publicDiscoveryIndexingChainView.itemViews.length, 30);
-assert.equal(
-  new Set(PUBLIC_DISCOVERY_INDEXING_CHAIN_HANDOFF_ITEM_IDS).size,
-  30
-);
-assert.equal(PUBLIC_DISCOVERY_INDEXING_CHAIN_SOURCE_FILES.length, 30);
-for (const filePath of PUBLIC_DISCOVERY_INDEXING_CHAIN_SOURCE_FILES) {
-  assert.ok(
-    existsSync(filePath),
-    `Missing public discovery/indexing chain file ${filePath}`
-  );
-}
-assert.ok(
-  publicDiscoveryIndexingChainView.itemViews.every(
-    (item) => item.ariaLabel && item.description && item.label && item.value
-  )
-);
-assert.deepEqual(publicDiscoveryIndexingChainView.privacy, {
-  chainSourceFileCount: PUBLIC_DISCOVERY_INDEXING_CHAIN_SOURCE_FILES.length,
-  createsAssignmentLinks: false,
-  exposesAnswerKeys: false,
-  exposesPublicDomHandoffMarkup: false,
-  exposesRawAnonymousTokens: false,
-  exposesSourceMaterialStorageKeys: false,
-  exposesStudentAttemptRecords: false,
-  exposesTeacherPrivateActivityContent: false,
-  includesLocalizedAlternates: true,
-  itemIds: [...PUBLIC_DISCOVERY_INDEXING_CHAIN_HANDOFF_ITEM_IDS],
-  keepsAuthEntryOutOfIndex: true,
-  keepsDashboardOutOfIndex: true,
-  keepsManifestProtectedSurfacesOut: true,
-  keepsManifestRetiredLegacyOut: true,
-  keepsPrintRoutesOutOfIndex: true,
-  keepsPublicHandoffsSourceLevel: true,
-  keepsRetiredLegacyOutOfIndex: true,
-  keepsStudentRunnerOutOfIndex: true,
-  manifestTargetsPublicRoot: true,
-  readsSourceMaterialFileBytes: false,
-  routeActionsUseSharedConstants: true,
-  sourceFiles: [...PUBLIC_DISCOVERY_INDEXING_CHAIN_SOURCE_FILES],
-  usesPublicMetadataHandoff: true,
-  usesSharedIndexingHelpers: true,
-});
-assert.deepEqual(Object.fromEntries(publicDiscoveryIndexingChainValues), {
-  'active-surface-copy-boundary': 'ClassGamify copy',
-  'auth-entry-boundary': Routes.Auth,
-  'classroom-control-route-gate': 'Create/dashboard/play/print',
-  'contact-classroom-entry': Routes.ContactClassroom,
-  'editorial-content-boundary': Routes.Blog,
-  'home-product-entry': Routes.Root,
-  'legacy-copy-guard': 'ClassGamify only',
-  'legacy-navigation-exclusion': 'Navigation excluded',
-  'legacy-noindex-boundary': 'Noindex when mounted',
-  'legacy-route-inventory': 'Retired path list',
-  'legal-policy-boundary': 'Terms/privacy/cookie',
-  'localized-alternates': 'hreflang + x-default',
-  'manifest-install-boundary': Routes.Root,
-  'navigation-entrypoints': 'Navbar and footer',
-  'pricing-plan-boundary': Routes.Pricing,
-  'print-route-index-guard': '/print',
-  'private-data-guard': 'Private data hidden',
-  'public-metadata-handoff-boundary': '30 metadata slices',
-  'public-dom-component-guard': 'Shared components blocked',
-  'public-dom-route-guard': 'Route files blocked',
-  'public-route-registry': 'PUBLIC_INDEXABLE_STATIC_ROUTES',
-  'roadmap-status-boundary': Routes.Roadmap,
-  'robots-protected-boundaries': 'dashboard/settings/play/print/auth',
-  'sitemap-blog-routes': 'Published posts',
-  'sitemap-static-routes': 'Shared registry',
-  'source-level-handoff-contracts': 'Focused gates only',
-  'student-runner-index-guard': Routes.Play,
-  'teachers-page-entry': Routes.Teachers,
-  'template-directory-entry': Routes.Templates,
-  'worksheet-entry': Routes.Worksheets,
-});
 assert.match(
   readFileSync('tests/e2e/TEST-CATALOG.md', 'utf8'),
-  /Public discovery\/indexing chain has a fast script-level gate via[\s\S]*scripts\/public-discovery-indexing-chain-handoff\.test\.ts[\s\S]*public metadata/,
+  /Public discovery\/indexing chain has a fast script-level gate via[\s\S]*scripts\/public-discovery-indexing-chain\.test\.ts[\s\S]*public metadata/,
   'TEST-CATALOG should document the public discovery/indexing chain gate.'
 );
-const classroomProductLoopChainView =
-  buildClassroomProductLoopChainHandoffView();
-const classroomProductLoopChainValues = new Map(
-  classroomProductLoopChainView.itemViews.map((item) => [
-    item.id,
-    item.value,
-  ])
-);
-assert.deepEqual(
-  classroomProductLoopChainView.itemViews.map((item) => item.id),
-  [...CLASSROOM_PRODUCT_LOOP_CHAIN_HANDOFF_ITEM_IDS],
-  'Classroom product loop chain should expose the stable 30-slice activity, assignment, attempt, results, workspace, public entry, and privacy order.'
-);
-assert.equal(classroomProductLoopChainView.itemViews.length, 30);
-assert.equal(
-  new Set(CLASSROOM_PRODUCT_LOOP_CHAIN_HANDOFF_ITEM_IDS).size,
-  30
-);
-assert.equal(CLASSROOM_PRODUCT_LOOP_CHAIN_SOURCE_FILES.length, 30);
-for (const filePath of CLASSROOM_PRODUCT_LOOP_CHAIN_SOURCE_FILES) {
-  assert.ok(
-    existsSync(filePath),
-    `Missing classroom product loop chain file ${filePath}`
-  );
-}
-assert.ok(
-  classroomProductLoopChainView.itemViews.every(
-    (item) => item.ariaLabel && item.description && item.label && item.value
-  )
-);
-assert.deepEqual(classroomProductLoopChainView.privacy, {
-  appendsCopyScopeToArtifacts: true,
-  apiNormalizesAnswersBeforeValidation: true,
-  apiValidatesBeforeScoring: true,
-  answerKeyHiddenByDefault: true,
-  assignmentPublishFreezesSnapshots: true,
-  assignmentPublishRequiresActivityLifecycleGate: true,
-  assignmentPublishResolvesSettingsBeforePersist: true,
-  assignmentPublishValidatesDraftBeforePersist: true,
-  blocksClosedOrExpiredSubmissions: true,
-  blocksDraftPublicAccess: true,
-  chainSourceFileCount: CLASSROOM_PRODUCT_LOOP_CHAIN_SOURCE_FILES.length,
-  changesAttemptsOrResults: false,
-  changesPublicRunner: false,
-  submissionContractUsesRuntimeItemAnswerRows: true,
-  clientPayloadUsesRuntimeItems: true,
-  clientProgressUsesRuntimeItems: true,
-  copyArtifactsUseFormattedDates: true,
-  copyArtifactsUseFormattedExplanations: true,
-  countsStarterPreviewAsOwned: false,
-  createsAssignments: false,
-  createsParallelWorksheetModel: false,
-  exposesDerivativeDraftPayloads: false,
-  createsParallelWorksheetTables: false,
-  csvExportsUseSharedAnswerView: true,
-  csvExportsUseFormattedExplanations: true,
-  csvFormulaInjectionGuardEnabled: true,
-  createsAssignmentLinksWithoutTeacherAction: false,
-  csvDatesUseIsoFormatter: true,
-  deliveryPolicyResolvedBeforeAssignmentSurfaces: true,
-  emptyAnswersOmitted: true,
-  exposesAnswerText: false,
-  exposesAnswerKeys: false,
-  exposesAnswerKeysToPublicPayload: false,
-  exposesAssignmentRuntimeContent: false,
-  exposesAnonymousBrowserLabel: true,
-  exposesAcceptedAlternativesToTeachersOnly: true,
-  exposesAcceptedAlternativesAfterReview: true,
-  exposesAcceptedAnswerTextInHandoff: false,
-  exposesAcceptedAnswers: false,
-  exposesActivityContentJsonToPublicPayload: false,
-  exposesActivityContentJson: false,
-  exposesInternalActivityIds: false,
-  exposesInternalAssignmentIds: false,
-  exposesInternalAssignmentIdsInLifecycleHandoff: false,
-  exposesAssignmentTitle: false,
-  exposesAuthSecrets: false,
-  exposesAnonymousToken: false,
-  exposesAnswerKeyTextInHandoff: false,
-  exposesAnswerKeysBeforeReview: false,
-  exposesAnswerKeysToPublicRunner: false,
-  exposesAnswerKeysBeforeAllowedReview: false,
-  exposesChoiceTextInHandoff: false,
-  exposesCopyArtifactText: false,
-  exposesCsvDataUrl: false,
-  exposesCsvFilename: false,
-  exposesCsvDataUrlInHandoff: false,
-  exposesPrivateActivityContent: false,
-  exposesProviderSecrets: false,
-  exposesRawSettingsJson: false,
-  exposesRawStartedAt: false,
-  exposesRawAnonymousTokens: false,
-  exposesRawStudentIdentity: false,
-  exposesRawAnonymousToken: false,
-  exposesRawCopyArtifactsInHandoff: false,
-  exposesRawCsvDataUrlInHandoff: false,
-  exposesRawRuntimeItemIdsInHandoff: false,
-  exposesRawPayloadRows: false,
-  exposesRawSubmissionPayload: false,
-  exposesRawSubmissionPayloads: false,
-  exposesResultExportRows: false,
-  exposesRuntimeChoiceText: false,
-  exposesRuntimeItemIds: false,
-  exposesRuntimeItemIdsInHandoff: false,
-  exposesRuntimePromptText: false,
-  exposesSnapshotContentJsonToPublicPayload: false,
-  exposesSourceMaterialMetadataInIdentityHandoff: false,
-  exposesSourceMaterialFileIds: false,
-  exposesSourceMaterialFilenames: false,
-  exposesSourceMaterialStorageKeys: false,
-  exposesSourceMaterialMetadata: false,
-  exposesPromptText: false,
-  exposesPromptTextInFeedbackHandoff: false,
-  exposesPromptTextInHandoff: false,
-  exposesRawRuntimeItemIdsInFeedbackHandoff: false,
-  exposesExpectedAnswerTextInHandoff: false,
-  exposesStudentAnswerText: false,
-  exposesStudentAnswerTextInIdentityHandoff: false,
-  exposesStudentAnswerTextInFeedbackHandoff: false,
-  exposesStudentAnswerTextInHandoff: false,
-  exposesStudentAnswerTextInLifecycleHandoff: false,
-  exposesStudentInstructions: false,
-  exposesStudentLabelsInHandoff: false,
-  exposesStudentDisplayLabels: false,
-  exposesStudentName: false,
-  exposesStudentNameInputValues: false,
-  exposesStudentNames: false,
-  exposesStudentNamesInFeedbackHandoff: false,
-  exposesStudentNamesInHandoff: false,
-  exposesStudentNamesInLifecycleHandoff: false,
-  exposesStudentResponseTextInHandoff: false,
-  exposesTeacherOnlyAnswers: false,
-  exposesTeacherAnswerKey: false,
-  exposesTeacherAnswerText: false,
-  exposesTeacherAnswerKeysInIdentityHandoff: false,
-  exposesTeacherAnswerTextInHandoff: false,
-  exposesTeacherEmail: false,
-  exposesTeacherExplanationsBeforeReview: false,
-  exposesTeacherExplanationTextInHandoff: false,
-  exposesTeacherNotes: false,
-  exposesShareSlug: false,
-  exposesRawAnonymousTokensInHandoff: false,
-  exposesPublicShareSlugsInLifecycleHandoff: false,
-  exposesRawAnonymousTokensInLifecycleHandoff: false,
-  exposesRawCopyArtifactTextInHandoff: false,
-  exportPreparationScope: 'full-assignment-results',
-  exportIncludesSubmittedDateColumns: true,
-  freezesAssignmentSnapshots: true,
-  freezesSnapshotContent: true,
-  includesAssignmentListSearch: true,
-  includesPrintableWorksheet: true,
-  includesResultsExport: true,
-  itemIds: [...CLASSROOM_PRODUCT_LOOP_CHAIN_HANDOFF_ITEM_IDS],
-  preservesFrozenSnapshots: true,
-  preservesAttemptsAfterClose: true,
-  preservesSnapshotsAfterClose: true,
-  requiresTeacherSaveBeforeActivityPersistence: true,
-  keepsSourceMaterialExtractionEditorReviewed: true,
-  archivedActivitiesRequireRestoreBeforeDerive: true,
-  attemptPersistenceKeepsSourceMaterialsOutOfRows: true,
-  attemptPersistenceUsesAttemptLimitGate: true,
-  attemptPersistenceUsesIdentityGate: true,
-  attemptPersistenceUsesImmutableAnswerCopy: true,
-  attemptPersistenceUsesImmutableResultCopy: true,
-  attemptPersistenceUsesLifecycleGate: true,
-  attemptPersistenceUsesRuntimeValidationGate: true,
-  keepsProtectedRoutesOutOfIndex: true,
-  keepsPublicDiscoverySourceLevel: true,
-  keepsActivityLibraryOwnerScoped: true,
-  keepsLiveActivityFallback: true,
-  keepsExpiredReopenBlocked: true,
-  keepsAssignmentListOwnerScoped: true,
-  keepsDashboardOwnerScoped: true,
-  keepsCsvExportFullAssignment: true,
-  keepsTemplateRoadmapOnSharedActivityModel: true,
-  keepsSettingsFromMutatingClassroomData: true,
-  keepsVisiblePageCountsSeparate: true,
-  keepsNameAndTokenModesExclusive: true,
-  mutatesAttemptsFromValidationHandoff: false,
-  mutatesAttempts: false,
-  mutatesEvaluationAfterInsert: false,
-  mutatesResultData: false,
-  mutatesPublicRunner: false,
-  partialSubmissionAllowed: true,
-  persistenceUsesNormalizedAnswers: true,
-  printableAnswerKeysUseFormattedExplanations: true,
-  printRouteRequiresTeacherAuth: true,
-  preservesTeacherResultEvidence: true,
-  persistsAttemptsAfterValidation: true,
-  publishesAssignmentAndSnapshotTogether: true,
-  publicRulesDoNotMutateAssignment: true,
-  publicRulesHideRuntimeContent: true,
-  publicRulesHideTeacherSettings: true,
-  publicRulesUseResolvedSettings: true,
-  publicFeedbackRespectsAnswerReveal: true,
-  publicPayloadUsesRuntimeItemsOnly: true,
-  publicPayloadUsesSanitizedRuntimeItems: true,
-  publicUnavailablePayloadHidesRuntime: true,
-  publicResponseUsesSanitizedScoredResult: true,
-  publicStudentRunnerPayloadUsesSanitizedRuntimeItems: true,
-  rejectsClosedOrExpiredStudentRunnerSubmissions: true,
-  rejectsDuplicateAnswerIds: true,
-  rejectsInvalidSubmissions: true,
-  rejectsOverlongAnswerRows: true,
-  rejectsUnknownRuntimeIds: true,
-  readsBrowserStorage: false,
-  requiresRuntimeIdsUniqueBeforeSubmission: true,
-  resultPagesUseSharedAnswerView: true,
-  resultPagesUseFormattedExplanations: true,
-  resultExportsIncludeDeliveryPolicy: true,
-  resultSubmittedDateSortingUsesTimestampParsing: true,
-  resultUiDatesUseLocalizedFormatter: true,
-  runtimeIdentityUsesFrozenSnapshot: true,
-  runtimeIdentityUsesSharedNormalizer: true,
-  requiresTeacherReviewForAiEnhancements: true,
-  requiresTeacherReviewForAiDrafts: true,
-  requiresAuthenticatedTeacher: true,
-  requiresAssignmentSnapshot: true,
-  requiresAssignmentSnapshotBoundary: true,
-  requiresCreateActivityInputContract: true,
-  requiresNormalizedAnonymousTokens: true,
-  requiresNormalizedStudentNames: true,
-  requiresOwnerScopedActivities: true,
-  requiresOwnerScopedAssignments: true,
-  requiresOwnerScopedAssignment: true,
-  requiresOwnerScopedAssignmentList: true,
-  requiresOwnerScopedTeacherQueries: true,
-  resultConsumersUseNormalizedIdentity: true,
-  resultConsumersUseScoredAttempts: true,
-  runtimeScoringUsesSharedMatcher: true,
-  scoringUsesSharedAcceptedAnswerParser: true,
-  scoringUsesNormalizedAnswers: true,
-  sourceFiles: [...CLASSROOM_PRODUCT_LOOP_CHAIN_SOURCE_FILES],
-  splitsPrimaryFromAlternatives: true,
-  storesImmutableScoredAttemptAnswerJson: true,
-  storesImmutableScoredAttemptResultJson: true,
-  storesScoredAttemptRows: true,
-  statusFiltersUseLifecycleStatus: true,
-  usesAiEnhancementLifecycleChain: true,
-  usesActivityAuthoringLibraryChain: true,
-  usesActivityAssignmentAttemptResultsLoop: true,
-  usesActivityLifecycleGovernanceChain: true,
-  usesAccountGovernanceLifecycleChain: true,
-  usesActiveSurfaceProductBoundary: true,
-  usesAnswerFeedbackLifecycleChain: true,
-  usesAssignmentPublishHandoff: true,
-  usesAssignmentAttemptPersistenceHandoff: true,
-  usesAssignmentAttemptDurationHandoff: true,
-  usesAssignmentAttemptStatsHandoff: true,
-  usesAssignmentSubmissionValidationHandoff: true,
-  usesAssignmentSourceActivityContextChain: true,
-  usesAssignmentLifecycleGovernanceChain: true,
-  usesAssignmentDistributionLifecycleChain: true,
-  usesClassroomDataLifecycleChain: true,
-  usesD1AppSchema: true,
-  usesAssignmentDomainHelpers: true,
-  usesPublishedAssignmentDeliveryChain: true,
-  usesPublicAssignmentRulesHandoff: true,
-  usesPublicDiscoveryIndexingChain: true,
-  usesAssignmentResultsExportPreparation: true,
-  usesBrowserTokenForAnonymousAttempts: true,
-  usesAbsoluteStudentUrl: true,
-  usesDisplayLabelsForAnonymousResults: true,
-  usesFullFilteredSummariesForOverview: true,
-  usesFrozenSnapshotSource: true,
-  usesFrozenSourceActivityContext: true,
-  usesActivityLibraryPageHandoff: true,
-  usesOwnerScopedSourceFilters: true,
-  usesNormalizedShareSlug: true,
-  usesPreparedShareActions: true,
-  usesPaymentCallbackHandoff: true,
-  usesPrintableWorksheetReviewLifecycleChain: true,
-  usesWorksheetModeDeliveryChain: true,
-  usesResultAcceptedAnswerChain: true,
-  usesResultExplanationChain: true,
-  usesResultSubmittedDateChain: true,
-  usesScoredAttemptResultChain: true,
-  usesSharedAttemptStats: true,
-  usesSharedDurationFormatting: true,
-  usesSharedDurationHelpers: true,
-  usesSourceExtractionLifecycleChain: true,
-  usesStudentRuntimeIdentityHandoff: true,
-  usesStudentRunnerPlayChain: true,
-  usesTemplateRoadmapCapabilityChain: true,
-  usesTeacherOnlyResultScope: true,
-  usesCurrentReviewScopeForCopyActions: true,
-  usesSharedCopyArtifactBuilders: true,
-  usesSharedCopyPlan: true,
-  usesSharedDeliveryPolicy: true,
-  usesSharedRuntimeItems: true,
-  usesSharedAttemptAnswerHelpers: true,
-  usesScoredAttemptInsertHelper: true,
-  usesScoredAttemptsForAttemptLimits: true,
-  usesSnapshotForPublicRuntime: true,
-  submissionValidationUsesFrozenRuntimeItems: true,
-  usesStudentIdentityLifecycleChain: true,
-  usesTeacherWorkspaceOperationsChain: true,
-  templateFeedbackUsesSharedComponent: true,
-  usesTeacherResultCopyLifecycleChain: true,
-  usesTeacherResultsReviewChain: true,
-});
-assert.deepEqual(
-  [
-    TEACHER_WORKSPACE_OPERATIONS_CHAIN_HANDOFF_ITEM_IDS.length,
-    TEACHER_WORKSPACE_OPERATIONS_CHAIN_SOURCE_FILES.length,
-    CLASSROOM_DATA_LIFECYCLE_CHAIN_HANDOFF_ITEM_IDS.length,
-    CLASSROOM_DATA_LIFECYCLE_CHAIN_SOURCE_FILES.length,
-    ACTIVITY_AUTHORING_LIBRARY_CHAIN_HANDOFF_ITEM_IDS.length,
-    ACTIVITY_AUTHORING_LIBRARY_CHAIN_SOURCE_FILES.length,
-    ACTIVITY_LIFECYCLE_GOVERNANCE_CHAIN_HANDOFF_ITEM_IDS.length,
-    ACTIVITY_LIFECYCLE_GOVERNANCE_CHAIN_SOURCE_FILES.length,
-    TEMPLATE_ROADMAP_CAPABILITY_CHAIN_HANDOFF_ITEM_IDS.length,
-    TEMPLATE_ROADMAP_CAPABILITY_CHAIN_SOURCE_FILES.length,
-    ACTIVITY_AI_AUTHORING_CHAIN_HANDOFF_ITEM_IDS.length,
-    ACTIVITY_AI_AUTHORING_CHAIN_SOURCE_FILES.length,
-    ACTIVITY_AI_ENHANCEMENT_LIFECYCLE_CHAIN_ITEM_IDS.length,
-    ACTIVITY_AI_ENHANCEMENT_LIFECYCLE_CHAIN_SOURCE_FILES.length,
-    SOURCE_EXTRACTION_LIFECYCLE_CHAIN_HANDOFF_ITEM_IDS.length,
-    SOURCE_EXTRACTION_LIFECYCLE_CHAIN_SOURCE_FILES.length,
-    SOURCE_MATERIAL_PRIVACY_CHAIN_HANDOFF_ITEM_IDS.length,
-    ASSIGNMENT_SOURCE_ACTIVITY_CONTEXT_CHAIN_HANDOFF_ITEM_IDS.length,
-    ASSIGNMENT_LIFECYCLE_GOVERNANCE_CHAIN_HANDOFF_ITEM_IDS.length,
-    ASSIGNMENT_LIFECYCLE_GOVERNANCE_CHAIN_SOURCE_FILES.length,
-    ASSIGNMENT_DISTRIBUTION_LIFECYCLE_CHAIN_HANDOFF_ITEM_IDS.length,
-    ASSIGNMENT_DISTRIBUTION_LIFECYCLE_CHAIN_SOURCE_FILES.length,
-    PUBLISHED_ASSIGNMENT_DELIVERY_CHAIN_HANDOFF_ITEM_IDS.length,
-    PUBLISHED_ASSIGNMENT_DELIVERY_CHAIN_SOURCE_FILES.length,
-    STUDENT_RUNNER_PLAY_CHAIN_HANDOFF_ITEM_IDS.length,
-    STUDENT_RUNNER_PLAY_CHAIN_SOURCE_FILES.length,
-    STUDENT_IDENTITY_LIFECYCLE_CHAIN_HANDOFF_ITEM_IDS.length,
-    STUDENT_IDENTITY_LIFECYCLE_CHAIN_SOURCE_FILES.length,
-    ANSWER_FEEDBACK_LIFECYCLE_CHAIN_HANDOFF_ITEM_IDS.length,
-    ANSWER_FEEDBACK_LIFECYCLE_CHAIN_SOURCE_FILES.length,
-    SCORED_ATTEMPT_RESULT_CHAIN_HANDOFF_ITEM_IDS.length,
-    SCORED_ATTEMPT_RESULT_CHAIN_SOURCE_FILES.length,
-    ASSIGNMENT_RESULT_SUBMITTED_DATE_CHAIN_HANDOFF_ITEM_IDS.length,
-    ASSIGNMENT_RESULT_SUBMITTED_DATE_CHAIN_SOURCE_FILES.length,
-    ASSIGNMENT_RESULT_ACCEPTED_ANSWER_CHAIN_HANDOFF_ITEM_IDS.length,
-    ASSIGNMENT_RESULT_ACCEPTED_ANSWER_CHAIN_SOURCE_FILES.length,
-    ASSIGNMENT_RESULT_EXPLANATION_CHAIN_HANDOFF_ITEM_IDS.length,
-    ASSIGNMENT_RESULT_EXPLANATION_CHAIN_SOURCE_FILES.length,
-    TEACHER_RESULTS_REVIEW_CHAIN_HANDOFF_ITEM_IDS.length,
-    TEACHER_RESULTS_REVIEW_CHAIN_SOURCE_FILES.length,
-    TEACHER_RESULT_COPY_LIFECYCLE_CHAIN_HANDOFF_ITEM_IDS.length,
-    TEACHER_RESULT_COPY_LIFECYCLE_CHAIN_SOURCE_FILES.length,
-    PRINTABLE_WORKSHEET_REVIEW_LIFECYCLE_CHAIN_HANDOFF_ITEM_IDS.length,
-    PRINTABLE_WORKSHEET_REVIEW_LIFECYCLE_CHAIN_SOURCE_FILES.length,
-    WORKSHEET_MODE_DELIVERY_CHAIN_HANDOFF_ITEM_IDS.length,
-    WORKSHEET_MODE_DELIVERY_CHAIN_SOURCE_FILES.length,
-    PUBLIC_DISCOVERY_INDEXING_CHAIN_HANDOFF_ITEM_IDS.length,
-    PUBLIC_DISCOVERY_INDEXING_CHAIN_SOURCE_FILES.length,
-    CLASSROOM_TRUST_COMMUNICATION_CHAIN_HANDOFF_ITEM_IDS.length,
-  ],
-  Array.from({ length: 49 }, () => 30),
-  'Classroom product loop chain should stay backed by adjacent public entry, public discovery/indexing, workspace, data, authoring, source extraction, lifecycle governance, template roadmap, AI enhancement lifecycle, delivery, runner, result continuity, export, print, and trust gates.'
-);
-assert.deepEqual(Object.fromEntries(classroomProductLoopChainValues), {
-  'activity-authoring-library-boundary': '30 authoring slices',
-  'classroom-data-lifecycle-boundary': '30 data slices',
-  'activity-library-page-boundary': 'Visible library page',
-  'activity-lifecycle-governance-boundary': '30 lifecycle slices',
-  'assignment-source-activity-context-boundary': '30 source context slices',
-  'assignment-lifecycle-governance-boundary':
-    '30 assignment lifecycle slices',
-  'assignment-distribution-lifecycle-boundary': '30 distribution slices',
-  'ai-enhancement-lifecycle-boundary': 'Policy-to-publish review',
-  'answer-feedback-lifecycle-boundary': '30 feedback slices',
-  'published-assignment-delivery-boundary': '30 delivery slices',
-  'assignment-publish-preflight-boundary': '30 publish slices',
-  'scored-attempt-result-boundary': '30 result slices',
-  'csv-export-boundary': '30 export slices',
-  'teacher-workspace-operations-boundary': '30 workspace slices',
-  'assignment-attempt-stats-boundary': '30 stats slices',
-  'assignment-attempt-persistence-boundary': '30 persistence slices',
-  'public-discovery-indexing-boundary': '30 discovery slices',
-  'public-assignment-rules-boundary': 'Visible rule chips',
-  'student-runner-play-boundary': '30 runner slices',
-  'result-accepted-answer-boundary': '30 answer slices',
-  'result-explanation-boundary': '30 explanation slices',
-  'worksheet-mode-delivery-boundary': '30 worksheet slices',
-  'assignment-attempt-duration-boundary': '30 duration slices',
-  'student-runtime-identity-boundary': 'Runtime item ids',
-  'teacher-result-copy-lifecycle-boundary': '30 copy slices',
-  'source-extraction-lifecycle-boundary': '30 extraction slices',
-  'student-identity-lifecycle-boundary': '30 identity slices',
-  'assignment-submission-validation-boundary': '30 validation slices',
-  'teacher-result-review-boundary': '30 review slices',
-  'template-roadmap-capability-boundary': '30 roadmap slices',
-});
 assert.match(
   readFileSync('tests/e2e/TEST-CATALOG.md', 'utf8'),
-  /Classroom product loop chain has a fast script-level gate via[\s\S]*scripts\/classroom-product-loop-chain-handoff\.test\.ts/,
+  /Classroom product loop chain has a fast script-level gate via[\s\S]*scripts\/classroom-product-loop-chain\.test\.ts/,
   'TEST-CATALOG should document the classroom product loop chain gate.'
 );
 assert.match(
@@ -14800,117 +12644,9 @@ assert.match(
   /Activity -> Assignment -> Attempt -> Results[\s\S]*assignment source activity context boundary[\s\S]*classroom data lifecycle[\s\S]*activity library page boundary[\s\S]*activity authoring\/library workflow[\s\S]*source extraction lifecycle[\s\S]*activity lifecycle governance[\s\S]*template roadmap capability[\s\S]*AI enhancement lifecycle[\s\S]*published assignment delivery[\s\S]*assignment publish preflight boundary[\s\S]*assignment lifecycle governance boundary[\s\S]*assignment distribution lifecycle boundary[\s\S]*public assignment rules boundary[\s\S]*student runner play[\s\S]*student identity lifecycle[\s\S]*student runtime identity boundary[\s\S]*assignment submission validation boundary[\s\S]*assignment attempt persistence boundary[\s\S]*scored attempt results[\s\S]*assignment attempt stats boundary[\s\S]*answer feedback lifecycle[\s\S]*assignment attempt duration boundary[\s\S]*submitted-date continuity[\s\S]*accepted-answer continuity[\s\S]*explanation continuity[\s\S]*teacher result review[\s\S]*teacher result copy lifecycle[\s\S]*worksheet-mode delivery boundary[\s\S]*printable worksheet review lifecycle[\s\S]*copy\/export\/print handoffs[\s\S]*teacher workspace operations[\s\S]*public discovery[\s\S]*privacy guards/,
   'TEST-CATALOG should describe the full classroom product loop chain scope.'
 );
-const classroomTrustCommunicationChainView =
-  buildClassroomTrustCommunicationChainHandoffView();
-const classroomTrustCommunicationChainValues = new Map(
-  classroomTrustCommunicationChainView.itemViews.map((item) => [
-    item.id,
-    item.value,
-  ])
-);
-assert.deepEqual(
-  classroomTrustCommunicationChainView.itemViews.map((item) => item.id),
-  [...CLASSROOM_TRUST_COMMUNICATION_CHAIN_HANDOFF_ITEM_IDS],
-  'Classroom trust communication chain should expose the stable 30-slice contact, auth, mail, notification, billing, legal, config, storage, and public DOM order.'
-);
-assert.equal(classroomTrustCommunicationChainView.itemViews.length, 30);
-assert.equal(
-  new Set(CLASSROOM_TRUST_COMMUNICATION_CHAIN_HANDOFF_ITEM_IDS).size,
-  30
-);
-assert.equal(CLASSROOM_TRUST_COMMUNICATION_CHAIN_SOURCE_FILES.length, 30);
-for (const filePath of CLASSROOM_TRUST_COMMUNICATION_CHAIN_SOURCE_FILES) {
-  assert.ok(
-    existsSync(filePath),
-    `Missing classroom trust communication chain file ${filePath}`
-  );
-}
-assert.ok(
-  classroomTrustCommunicationChainView.itemViews.every(
-    (item) => item.ariaLabel && item.description && item.label && item.value
-  )
-);
-assert.deepEqual(classroomTrustCommunicationChainView.privacy, {
-  chainSourceFileCount: CLASSROOM_TRUST_COMMUNICATION_CHAIN_SOURCE_FILES.length,
-  contactCreatesActivities: false,
-  contactCreatesAssignmentLinks: false,
-  contactCreatesStudentRecords: false,
-  exportsResultRecords: false,
-  exposesActionUrls: false,
-  exposesAnswerKeys: false,
-  exposesAuthSecrets: false,
-  exposesContactMessageText: false,
-  exposesOAuthClientSecrets: false,
-  exposesPaymentProviderSecrets: false,
-  exposesProviderApiTokens: false,
-  exposesRawAnonymousTokens: false,
-  exposesRawProviderErrors: false,
-  exposesRecipientEmail: false,
-  exposesRecipientName: false,
-  exposesSourceMaterialStorageKeys: false,
-  exposesStudentAttemptRecords: false,
-  exposesStudentIdentifiers: false,
-  exposesTeacherEmail: false,
-  exposesTeacherPrivateActivityContent: false,
-  itemIds: [...CLASSROOM_TRUST_COMMUNICATION_CHAIN_HANDOFF_ITEM_IDS],
-  keepsCloudflareDeployOwnerDocumented: true,
-  keepsRuntimeSecretsServerSide: true,
-  keepsTrustHandoffsSourceLevelForPublicDom: true,
-  normalizesUnsupportedMailLocales: true,
-  mutatesActivities: false,
-  mutatesAssignmentLinks: false,
-  mutatesAttemptRecords: false,
-  readsSourceMaterialFileBytes: false,
-  rendersBeforeProviderSend: true,
-  rendersSharedMailBoundaryPanel: true,
-  sendsLearnerNotifications: false,
-  sourceFiles: [...CLASSROOM_TRUST_COMMUNICATION_CHAIN_SOURCE_FILES],
-  usesLocalizedMailSubjects: true,
-  usesMailProviderRegistryBoundary: true,
-  usesTransactionalMailWorkspaceHandoff: true,
-  usesTransactionalMailLifecycleChain: true,
-  usesClassGamifyProductModel: true,
-});
-assert.equal(
-  TRANSACTIONAL_MAIL_LIFECYCLE_CHAIN_SOURCE_FILES.length,
-  30,
-  'Classroom trust communication chain should absorb the full transactional mail lifecycle source chain.'
-);
-assert.deepEqual(Object.fromEntries(classroomTrustCommunicationChainValues), {
-  'auth-callback-safety': 'Safe callback paths',
-  'auth-entry-boundary': Routes.Login,
-  'auth-provider-gates': 'Credential/Google gates',
-  'auth-workspace-access': Routes.Dashboard,
-  'billing-hosted-boundary': Routes.SettingsBilling,
-  'billing-plan-capabilities': 'Classroom loop access',
-  'billing-provider-secret-guard': 'Provider secrets hidden',
-  'transactional-mail-workspace-boundary': '30 mail handoff slices',
-  'contact-classroom-intent': 'Classroom inquiry',
-  'contact-mail-context': 'Structured mail context',
-  'contact-no-workspace-mutation': 'No workspace mutation',
-  'contact-structured-fields': 'Learners/material/routine/need',
-  'developer-config-deploy-owner': 'Cloudflare Git',
-  'developer-config-env-split': 'Build/runtime split',
-  'developer-config-secret-boundary': 'Worker secrets',
-  'legal-policy-product-model': 'Teacher/student data model',
-  'legal-provider-scope': 'Configured providers',
-  'legal-student-data-boundary': 'Student data protected',
-  'legacy-copy-guard': 'ClassGamify only',
-  'notification-no-learner-reminders': 'No learner reminders',
-  'notification-teacher-updates': Routes.SettingsNotifications,
-  'private-data-guard': 'Private data hidden',
-  'product-boundary': 'Activity -> Assignment -> Attempt -> Results',
-  'public-contact-entry': Routes.ContactClassroom,
-  'public-dom-handoff-boundary': 'Source-level public gates',
-  'storage-source-material-boundary': 'R2 owner files',
-  'transactional-mail-boundary-panel': 'Workspace boundary panel',
-  'transactional-mail-lifecycle-chain': '30 mail slices',
-  'transactional-mail-localization': 'Localized subjects',
-  'transactional-mail-template-set': 'Verify/reset/newsletter/contact',
-});
 assert.match(
   readFileSync('tests/e2e/TEST-CATALOG.md', 'utf8'),
-  /Classroom trust communication chain has a fast script-level gate via[\s\S]*scripts\/classroom-trust-communication-chain-handoff\.test\.ts[\s\S]*transactional mail workspace boundary/,
+  /Classroom trust communication chain has a fast script-level gate via[\s\S]*scripts\/classroom-trust-communication-chain\.test\.ts[\s\S]*transactional mail workspace boundary/,
   'TEST-CATALOG should document the classroom trust communication chain gate.'
 );
 assert.match(
@@ -14918,63 +12654,6 @@ assert.match(
   /public classroom contact intake[\s\S]*auth workspace entry[\s\S]*transactional mail lifecycle[\s\S]*teacher notification settings[\s\S]*hosted billing[\s\S]*legal\/provider copy[\s\S]*developer configuration secrets[\s\S]*public DOM handoff boundaries/,
   'TEST-CATALOG should describe the full classroom trust communication chain scope.'
 );
-const accountGovernanceLifecycleChainView =
-  buildAccountGovernanceLifecycleChainHandoffView();
-const accountGovernanceLifecycleChainValues = new Map(
-  accountGovernanceLifecycleChainView.itemViews.map((item) => [
-    item.id,
-    item.value,
-  ])
-);
-assert.deepEqual(
-  accountGovernanceLifecycleChainView.itemViews.map((item) => item.id),
-  [...ACCOUNT_GOVERNANCE_LIFECYCLE_CHAIN_HANDOFF_ITEM_IDS],
-  'Account governance lifecycle chain should expose the stable 30-slice auth, settings, admin, file, and provider-boundary order.'
-);
-assert.equal(accountGovernanceLifecycleChainView.itemViews.length, 30);
-assert.equal(
-  new Set(ACCOUNT_GOVERNANCE_LIFECYCLE_CHAIN_HANDOFF_ITEM_IDS).size,
-  30
-);
-assert.equal(ACCOUNT_GOVERNANCE_LIFECYCLE_CHAIN_SOURCE_FILES.length, 30);
-for (const filePath of ACCOUNT_GOVERNANCE_LIFECYCLE_CHAIN_SOURCE_FILES) {
-  assert.ok(
-    existsSync(filePath),
-    `Missing account governance lifecycle chain file ${filePath}`
-  );
-}
-assert.ok(
-  accountGovernanceLifecycleChainView.itemViews.every(
-    (item) => item.ariaLabel && item.description && item.label && item.value
-  )
-);
-assert.deepEqual(accountGovernanceLifecycleChainView.privacy, {
-  chainSourceFileCount:
-    ACCOUNT_GOVERNANCE_LIFECYCLE_CHAIN_SOURCE_FILES.length,
-  deletesWorkspaceDataWithoutExplicitAction: false,
-  exposesAdminSearchText: false,
-  exposesAuthSecrets: false,
-  exposesOAuthClientSecrets: false,
-  exposesPasswordValues: false,
-  exposesPaymentProviderSecrets: false,
-  exposesProviderErrors: false,
-  exposesRawAnonymousTokens: false,
-  exposesRawUserEmails: false,
-  exposesSourceMaterialStorageKeys: false,
-  exposesStudentAnswers: false,
-  exposesStudentIdentifiers: false,
-  exposesTeacherPrivateActivityContent: false,
-  itemIds: [...ACCOUNT_GOVERNANCE_LIFECYCLE_CHAIN_HANDOFF_ITEM_IDS],
-  keepsAccountSettingsFromMutatingClassroomData: true,
-  keepsAdminActionsAwayFromClassroomLinks: true,
-  keepsRuntimeSecretsServerSide: true,
-  requiresAdminRoleForUserGovernance: true,
-  requiresTeacherSessionForAccountSettings: true,
-  sourceFiles: [...ACCOUNT_GOVERNANCE_LIFECYCLE_CHAIN_SOURCE_FILES],
-  usesClassGamifyAccountCopy: true,
-  usesPaymentCallbackHandoff: true,
-  usesSettingsSecurityWorkspaceHandoff: true,
-});
 assert.deepEqual(
   [
     ADMIN_USERS_HANDOFF_ITEM_IDS.length,
@@ -14983,41 +12662,9 @@ assert.deepEqual(
   Array.from({ length: 2 }, () => 30),
   'Account governance lifecycle chain should stay backed by focused auth, settings, admin, files, billing, payment callback, notification, and storage gates.'
 );
-assert.deepEqual(Object.fromEntries(accountGovernanceLifecycleChainValues), {
-  'account-delete-feature-gate': 'Feature gated',
-  'security-workspace-handoff-boundary': '30 security workspace slices',
-  'admin-api-gate': '401/403 protected',
-  'admin-route-gate': Routes.AdminUsers,
-  'admin-user-ban-actions': 'Ban/unban only',
-  'admin-user-list-query': 'Search/filter/sort/page',
-  'auth-error-recovery': Routes.Login,
-  'auth-session-runtime': 'Better Auth + D1',
-  'billing-payment-callback-boundary': 'Billing + callback',
-  'credential-login-provider': 'Feature gated',
-  'delete-confirmation-required': 'Explicit confirmation',
-  'delete-no-silent-data-loss': 'No implicit classroom deletion',
-  'email-verification-gate': 'Verified teachers only',
-  'files-owner-scope-boundary': Routes.SettingsFiles,
-  'google-oauth-provider': 'Runtime secret gated',
-  'google-one-tap-provider': 'Auth routes skipped',
-  'legacy-copy-guard': 'ClassGamify only',
-  'notification-email-preference': Routes.SettingsNotifications,
-  'password-reset-mail': 'Forgot-password email',
-  'password-update-gate': 'Credential gate',
-  'product-account-boundary': 'Teacher account lifecycle',
-  'profile-avatar-update': 'Avatar only',
-  'profile-identity-update': 'Display name only',
-  'profile-no-classroom-mutation': 'No classroom mutation',
-  'profile-route': Routes.SettingsProfile,
-  'provider-secret-guard': 'Runtime secrets hidden',
-  'safe-callback-redirect': Routes.Dashboard,
-  'security-route': Routes.SettingsSecurity,
-  'storage-private-owner-check': 'Private owner required',
-  'student-data-guard': 'Student data hidden',
-});
 assert.match(
   readFileSync('tests/e2e/TEST-CATALOG.md', 'utf8'),
-  /Account governance lifecycle chain has a fast script-level gate via[\s\S]*scripts\/account-governance-lifecycle-chain-handoff\.test\.ts/,
+  /Account governance lifecycle chain has a fast script-level gate via[\s\S]*scripts\/account-governance-lifecycle-chain\.test\.ts/,
   'TEST-CATALOG should document the account governance lifecycle chain gate.'
 );
 assert.match(
@@ -15025,111 +12672,9 @@ assert.match(
   /auth session and email verification[\s\S]*profile and security settings[\s\S]*explicit account deletion[\s\S]*admin user governance[\s\S]*billing\/payment callback\/notification\/files boundaries[\s\S]*storage owner checks[\s\S]*provider-secret and student-data guards/,
   'TEST-CATALOG should describe the full account governance lifecycle chain scope.'
 );
-const teacherWorkspaceOperationsChainView =
-  buildTeacherWorkspaceOperationsChainHandoffView();
-const teacherWorkspaceOperationsChainValues = new Map(
-  teacherWorkspaceOperationsChainView.itemViews.map((item) => [
-    item.id,
-    item.value,
-  ])
-);
-assert.deepEqual(
-  teacherWorkspaceOperationsChainView.itemViews.map((item) => item.id),
-  [...TEACHER_WORKSPACE_OPERATIONS_CHAIN_HANDOFF_ITEM_IDS],
-  'Teacher workspace operations chain should expose the stable 30-slice dashboard, library, assignment-list, and settings order.'
-);
-assert.equal(teacherWorkspaceOperationsChainView.itemViews.length, 30);
-assert.equal(
-  new Set(TEACHER_WORKSPACE_OPERATIONS_CHAIN_HANDOFF_ITEM_IDS).size,
-  30
-);
-assert.equal(TEACHER_WORKSPACE_OPERATIONS_CHAIN_SOURCE_FILES.length, 30);
-for (const filePath of TEACHER_WORKSPACE_OPERATIONS_CHAIN_SOURCE_FILES) {
-  assert.ok(
-    existsSync(filePath),
-    `Missing teacher workspace operations chain file ${filePath}`
-  );
-}
-assert.ok(
-  teacherWorkspaceOperationsChainView.itemViews.every(
-    (item) => item.ariaLabel && item.description && item.label && item.value
-  )
-);
-assert.deepEqual(teacherWorkspaceOperationsChainView.privacy, {
-  chainSourceFileCount: TEACHER_WORKSPACE_OPERATIONS_CHAIN_SOURCE_FILES.length,
-  countsStarterPreviewAsOwned: false,
-  countsStarterPreviewAsOwnedMetrics: false,
-  exposesAssignmentAttemptDetailsInDashboard: false,
-  exposesAssignmentRuntimeContent: false,
-  exposesAuthSecrets: false,
-  exposesPrivateActivityContent: false,
-  exposesProviderSecrets: false,
-  exposesRawAnonymousTokens: false,
-  exposesResultExportRows: false,
-  exposesSourceMaterialFileIds: false,
-  exposesSourceMaterialFilenames: false,
-  exposesSourceMaterialStorageKeys: false,
-  exposesStudentAnswerText: false,
-  exposesTeacherEmail: false,
-  exposesTeacherPrivateActivityContentInDashboard: false,
-  itemIds: [...TEACHER_WORKSPACE_OPERATIONS_CHAIN_HANDOFF_ITEM_IDS],
-  keepsActivityLibraryOwnerScoped: true,
-  keepsAssignmentListOwnerScoped: true,
-  keepsDashboardActivityLoadingIndependent: true,
-  keepsDashboardAssignmentLoadingIndependent: true,
-  keepsDashboardOwnerScoped: true,
-  keepsSettingsFromMutatingClassroomData: true,
-  keepsVisiblePageCountsSeparate: true,
-  sourceFiles: [...TEACHER_WORKSPACE_OPERATIONS_CHAIN_SOURCE_FILES],
-  usesAccountGovernanceLifecycleChain: true,
-  usesActiveSurfaceProductBoundary: true,
-  usesDashboardOverviewHandoff: true,
-  usesFullFilteredSummariesForOverview: true,
-  usesPaymentCallbackHandoff: true,
-});
-assert.deepEqual(
-  [
-    ACCOUNT_GOVERNANCE_LIFECYCLE_CHAIN_HANDOFF_ITEM_IDS.length,
-    ACTIVE_SURFACE_PRODUCT_BOUNDARY_ITEM_IDS.length,
-  ],
-  Array.from({ length: 2 }, () => 30),
-  'Teacher workspace operations chain should stay backed by focused dashboard, list, account governance, active surface, payment callback, and settings gates.'
-);
-assert.deepEqual(Object.fromEntries(teacherWorkspaceOperationsChainValues), {
-  'account-governance-lifecycle-chain': '30 governance slices',
-  'activity-library-actions': 'Edit/publish/duplicate/remix/archive',
-  'activity-library-owner-scope': 'Owner activities only',
-  'activity-library-route': Routes.DashboardActivities,
-  'activity-library-search-filter': 'Search/status/template/source',
-  'activity-library-starter-preview': 'Preview only',
-  'activity-library-summary': 'Full filtered summary',
-  'activity-library-visible-page': 'Visible page separate',
-  'assignment-list-distribution': 'Copy/preview/print/review',
-  'assignment-list-owner-scope': 'Owner assignments only',
-  'assignment-list-published-context': 'Post-publish handoff',
-  'assignment-list-route': Routes.DashboardAssignments,
-  'assignment-list-search-status': 'Search/status',
-  'assignment-list-summary': 'Full filtered summary',
-  'assignment-list-visible-page': 'Visible page separate',
-  'dashboard-independent-loading': 'Split loading',
-  'dashboard-loop-status': 'Core loop status',
-  'dashboard-next-actions': 'Create/publish/share/review',
-  'dashboard-owner-scope': 'Owner summaries only',
-  'dashboard-readiness': 'Activity/link/runner/results',
-  'dashboard-starter-preview-boundary': 'Preview only',
-  'dashboard-top-metrics': 'Activities/templates/assignments/results',
-  'active-surface-product-boundary': '30 active-surface slices',
-  'settings-billing-payment-boundary': 'Billing + callback',
-  'settings-files-boundary': Routes.SettingsFiles,
-  'settings-files-classification': 'Safe material labels',
-  'settings-notification-boundary': Routes.SettingsNotifications,
-  'settings-security-boundary': Routes.SettingsSecurity,
-  'dashboard-overview-boundary': '30 dashboard slices',
-  'workspace-private-data-guard': 'Private data hidden',
-});
 assert.match(
   readFileSync('tests/e2e/TEST-CATALOG.md', 'utf8'),
-  /Teacher workspace operations chain has a fast script-level gate via[\s\S]*scripts\/teacher-workspace-operations-chain-handoff\.test\.ts[\s\S]*dashboard overview/,
+  /Teacher workspace operations chain has a fast script-level gate via[\s\S]*scripts\/teacher-workspace-operations-chain\.test\.ts[\s\S]*dashboard overview/,
   'TEST-CATALOG should document the teacher workspace operations chain gate.'
 );
 assert.match(
@@ -15636,95 +13181,6 @@ assert.deepEqual(buildMailWorkspaceBoundaryView(), {
   ],
   title: 'Workspace boundary',
 });
-const transactionalMailLifecycleChainView =
-  buildTransactionalMailLifecycleChainHandoffView();
-const transactionalMailLifecycleChainValues = new Map(
-  transactionalMailLifecycleChainView.itemViews.map((item) => [
-    item.id,
-    item.value,
-  ])
-);
-assert.deepEqual(
-  transactionalMailLifecycleChainView.itemViews.map((item) => item.id),
-  [...TRANSACTIONAL_MAIL_LIFECYCLE_CHAIN_HANDOFF_ITEM_IDS],
-  'Transactional mail lifecycle chain should expose the stable 30-slice order.'
-);
-assert.equal(transactionalMailLifecycleChainView.itemViews.length, 30);
-assert.equal(
-  new Set(TRANSACTIONAL_MAIL_LIFECYCLE_CHAIN_HANDOFF_ITEM_IDS).size,
-  30
-);
-assert.equal(TRANSACTIONAL_MAIL_LIFECYCLE_CHAIN_SOURCE_FILES.length, 30);
-for (const filePath of TRANSACTIONAL_MAIL_LIFECYCLE_CHAIN_SOURCE_FILES) {
-  assert.ok(
-    existsSync(filePath),
-    `Missing transactional mail lifecycle chain file ${filePath}`
-  );
-}
-assert.ok(
-  transactionalMailLifecycleChainView.itemViews.every(
-    (item) => item.ariaLabel && item.description && item.label && item.value
-  )
-);
-assert.deepEqual(transactionalMailLifecycleChainView.privacy, {
-  chainSourceFileCount: TRANSACTIONAL_MAIL_LIFECYCLE_CHAIN_SOURCE_FILES.length,
-  contactCreatesActivities: false,
-  contactCreatesAssignmentLinks: false,
-  contactCreatesStudentRecords: false,
-  exposesActionUrls: false,
-  exposesContactMessageText: false,
-  exposesProviderApiTokens: false,
-  exposesRawProviderErrors: false,
-  exposesRecipientEmails: false,
-  exposesRecipientNames: false,
-  exposesSourceMaterialStorageKeys: false,
-  exposesStudentIdentifiers: false,
-  itemIds: [...TRANSACTIONAL_MAIL_LIFECYCLE_CHAIN_HANDOFF_ITEM_IDS],
-  mutatesActivities: false,
-  mutatesAssignmentLinks: false,
-  mutatesAttemptRecords: false,
-  normalizesUnsupportedLocales: true,
-  readsSourceMaterialFileBytes: false,
-  rendersBeforeProviderSend: true,
-  rendersSharedWorkspaceBoundary: true,
-  sendsLearnerNotifications: false,
-  sourceFiles: [...TRANSACTIONAL_MAIL_LIFECYCLE_CHAIN_SOURCE_FILES],
-  templateSetSize: 4,
-  usesProviderRegistry: true,
-  usesTeacherNotificationUpdateHandoff: true,
-});
-assert.deepEqual(Object.fromEntries(transactionalMailLifecycleChainValues), {
-  'action-url-guard': 'Not in handoff',
-  'boundary-activities-scope': 'Activities/templates',
-  'boundary-ai-source-scope': 'AI drafts/materials',
-  'boundary-assignments-scope': 'Assignment links',
-  'boundary-results-scope': 'Attempts/results',
-  'cloudflare-template-render': 'getTemplate first',
-  'contact-consumer': 'Support inbox',
-  'contact-structured-fields': 'Classroom context',
-  'forgot-password-consumer': 'Better Auth',
-  'html-render-path': 'React email',
-  'learner-notification-guard': 'Teacher email only',
-  'locale-normalization': 'Base fallback',
-  'mail-disabled-guard': 'No provider send',
-  'mail-doc-provider-registry': 'Provider registry',
-  'newsletter-consumer': 'Teacher updates',
-  'no-workspace-mutation': 'Mail sends only',
-  'plain-text-render-path': 'HTML to text',
-  'product-mail-boundary': 'Teacher workspace',
-  'provider-registry': 'Resend/Cloudflare',
-  'provider-secret-guard': 'Secrets server-side',
-  'recipient-privacy-guard': 'Recipients hidden',
-  'render-before-send': 'Prepared payload',
-  'resend-template-render': 'getTemplate first',
-  'shared-email-layout': 'Localized HTML',
-  'subject-localization': 'Message keys',
-  'template-set-registry': 'Render registry',
-  'template-type-union': '4 templates',
-  'teacher-notification-update-boundary': '30 notification slices',
-  'verify-email-consumer': 'Better Auth',
-  'workspace-boundary-panel': 'Shared panel',
-});
 assert.match(
   productSource,
   /Transactional email surfaces follow the same lifecycle boundary[\s\S]*verification[\s\S]*password reset[\s\S]*newsletter confirmation[\s\S]*contact-message templates[\s\S]*provider send[\s\S]*action URLs[\s\S]*recipient data[\s\S]*provider secrets[\s\S]*handoff contracts/,
@@ -15757,7 +13213,7 @@ assert.match(
 );
 assert.match(
   e2eTestCatalogText.replace(/\s+/g, ' '),
-  /Transactional mail lifecycle chain has a fast script-level gate via[\s\S]*scripts\/transactional-mail-lifecycle-chain-handoff\.test\.ts[\s\S]*template set[\s\S]*locale fallback[\s\S]*HTML\/plain-text rendering[\s\S]*shared workspace boundary[\s\S]*auth reset\/verification[\s\S]*provider registry[\s\S]*privacy guards/,
+  /Transactional mail lifecycle chain has a fast script-level gate via[\s\S]*scripts\/transactional-mail-lifecycle-chain\.test\.ts[\s\S]*template set[\s\S]*locale fallback[\s\S]*HTML\/plain-text rendering[\s\S]*shared workspace boundary[\s\S]*auth reset\/verification[\s\S]*provider registry[\s\S]*privacy guards/,
   'E2E catalog should document the transactional mail lifecycle chain gate.'
 );
 assert.deepEqual(AUTH_WORKSPACE_BOUNDARY_ITEM_IDS, [
@@ -16616,7 +14072,7 @@ assert.match(
 );
 assert.match(
   studentRunnerSubmissionSource,
-  /export type StudentAttemptResultNextStepId =[\s\S]*'done'[\s\S]*'feedback'[\s\S]*'review-score'[\s\S]*'start-another'[\s\S]*'teacher-review'[\s\S]*export type StudentAttemptResultNextStepView = \{[\s\S]*id: StudentAttemptResultNextStepId;[\s\S]*label: string;[\s\S]*export type StudentAttemptResultNextStepsView = \{[\s\S]*ariaLabel: string;[\s\S]*stepViews: StudentAttemptResultNextStepView\[\];[\s\S]*title: string;/,
+  /type StudentAttemptResultNextStepId =[\s\S]*'done'[\s\S]*'feedback'[\s\S]*'review-score'[\s\S]*'start-another'[\s\S]*'teacher-review'[\s\S]*export type StudentAttemptResultNextStepView = \{[\s\S]*id: StudentAttemptResultNextStepId;[\s\S]*label: string;[\s\S]*export type StudentAttemptResultNextStepsView = \{[\s\S]*ariaLabel: string;[\s\S]*stepViews: StudentAttemptResultNextStepView\[\];[\s\S]*title: string;/,
   'Student result next steps should expose stable step ids and structured labels.'
 );
 assert.match(
@@ -16821,7 +14277,7 @@ assert.match(
 );
 assert.match(
   studentRunnerViewSource,
-  /type SequentialStudentRunnerItemView = StudentRunnerItemView & \{[\s\S]*sequenceLabel: string;[\s\S]*export type SequentialStudentRunnerNavigationItemView =[\s\S]*selectAction: SequentialStudentRunnerNavigationAction;[\s\S]*type SequentialStudentRunnerNavigationView = \{[\s\S]*itemViews: SequentialStudentRunnerNavigationItemView\[\];[\s\S]*type SequentialStudentRunnerSequenceView = \{[\s\S]*activeItemView: SequentialStudentRunnerItemView \| undefined;[\s\S]*type SequentialStudentRunnerView = StudentRunnerView & \{[\s\S]*activeChoiceViews: RuntimeChoiceButtonView\[\];[\s\S]*navigationView: SequentialStudentRunnerNavigationView;[\s\S]*sequenceView: SequentialStudentRunnerSequenceView;/,
+  /type SequentialStudentRunnerItemView = StudentRunnerItemView & \{[\s\S]*sequenceLabel: string;[\s\S]*type SequentialStudentRunnerNavigationItemView =[\s\S]*selectAction: SequentialStudentRunnerNavigationAction;[\s\S]*type SequentialStudentRunnerNavigationView = \{[\s\S]*itemViews: SequentialStudentRunnerNavigationItemView\[\];[\s\S]*type SequentialStudentRunnerSequenceView = \{[\s\S]*activeItemView: SequentialStudentRunnerItemView \| undefined;[\s\S]*type SequentialStudentRunnerView = StudentRunnerView & \{[\s\S]*activeChoiceViews: RuntimeChoiceButtonView\[\];[\s\S]*navigationView: SequentialStudentRunnerNavigationView;[\s\S]*sequenceView: SequentialStudentRunnerSequenceView;/,
   'Student runner domain should expose explicit sequential runner view contracts for listening and open-box templates.'
 );
 assert.match(
@@ -16834,174 +14290,14 @@ assert.match(
   /defaultItemCardViews: DefaultRuntimeItemCardView\[\];[\s\S]*runnerCopy: ActivityRunnerCopy;/,
   'Student runtime item list domain should compose explicit runner copy and default-card contracts.'
 );
-const studentRunnerPlayChainView = buildStudentRunnerPlayChainHandoffView();
-const studentRunnerPlayChainValues = new Map(
-  studentRunnerPlayChainView.itemViews.map((item) => [item.id, item.value])
-);
-assert.deepEqual(
-  studentRunnerPlayChainView.itemViews.map((item) => item.id),
-  [...STUDENT_RUNNER_PLAY_CHAIN_HANDOFF_ITEM_IDS],
-  'Student runner play chain should expose the stable public-runner 30-slice order.'
-);
-assert.equal(studentRunnerPlayChainView.itemViews.length, 30);
-assert.equal(new Set(STUDENT_RUNNER_PLAY_CHAIN_HANDOFF_ITEM_IDS).size, 30);
-assert.equal(STUDENT_RUNNER_PLAY_CHAIN_SOURCE_FILES.length, 30);
-for (const filePath of STUDENT_RUNNER_PLAY_CHAIN_SOURCE_FILES) {
-  assert.ok(
-    existsSync(filePath),
-    `Missing student runner play chain file ${filePath}`
-  );
-}
-assert.ok(
-  studentRunnerPlayChainView.itemViews.every(
-    (item) => item.ariaLabel && item.description && item.label && item.value
-  )
-);
-assert.deepEqual(studentRunnerPlayChainView.privacy, {
-  chainSourceFileCount: STUDENT_RUNNER_PLAY_CHAIN_SOURCE_FILES.length,
-  exposesAnswerKeysBeforeReview: false,
-  exposesAnswerTextInSubmitControls: false,
-  exposesRawAnonymousTokens: false,
-  exposesRawSubmissionPayloadInSubmitControls: false,
-  exposesRuntimeItemIdsInHandoffs: false,
-  exposesSourceMaterialMetadata: false,
-  exposesStudentAnswersBeforeSubmit: false,
-  exposesStudentNameInHandoffs: false,
-  exposesTeacherOnlyAnswersInSubmitControls: false,
-  exposesTeacherSourceMaterialsInSubmitControls: false,
-  itemIds: [...STUDENT_RUNNER_PLAY_CHAIN_HANDOFF_ITEM_IDS],
-  preservesTeacherReviewBoundary: true,
-  publicPayloadUsesSanitizedRuntimeItems: true,
-  rejectsClosedOrExpiredSubmissions: true,
-  rejectsInvalidSubmittedAnswers: true,
-  sourceFiles: [...STUDENT_RUNNER_PLAY_CHAIN_SOURCE_FILES],
-  submissionPayloadUsesRuntimeItemIds: true,
-  usesSubmitControlsHandoff: true,
-});
-assert.deepEqual(Object.fromEntries(studentRunnerPlayChainValues), {
-  'anonymous-token-guard': 'Raw token hidden',
-  'answer-feedback-policy': 'Reveal if allowed',
-  'attempt-limit-enforcement': 'Per identity',
-  'attempt-persistence': 'Scored attempt',
-  'choice-assignment-contract': '{ itemId, answer }',
-  'duration-normalization': 'Whole seconds',
-  'fill-blank-renderer': 'Worksheet blanks',
-  'group-sort-renderer': 'Category board',
-  'lifecycle-access-check': 'Published and open',
-  'line-match-renderer': 'Connection flow',
-  'listening-renderer': 'Speech track',
-  'matching-pairs-renderer': 'Left/right cards',
-  'open-box-renderer': 'Reveal flow',
-  'partial-submit-confirmation': 'Explicit second action',
-  'post-submit-next-steps': 'Review or retry',
-  'progress-counts': 'Answered items',
-  'public-payload-gate': 'Open links only',
-  'public-rules-summary': 'Student-visible policy',
-  'runner-identity-policy': 'Name or browser',
-  'runner-loading-state': 'Payload pending',
-  'runner-start-readiness': 'Rules before play',
-  'runtime-interaction-routing': 'Template renderer',
-  'runtime-item-order': 'Stable order',
-  'runtime-identity-contract': 'Identity hidden',
-  'semantic-bundle-guard': 'Safe handoff bundle',
-  'submit-controls-handoff-boundary': 'Visible submit controls',
-  'submit-controls-readiness': 'Prepared controls',
-  'submission-validation': 'Shared answer guard',
-  'timer-start-boundary': 'After readiness',
-  'unavailable-link-policy': 'Runtime hidden',
-});
 assert.match(
   readFileSync('tests/e2e/TEST-CATALOG.md', 'utf8'),
-  /Student runner play chain has a fast script-level gate via[\s\S]*scripts\/student-runner-play-chain-handoff\.test\.ts[\s\S]*visible submit controls/,
+  /Student runner play chain has a fast script-level gate via[\s\S]*scripts\/student-runner-play-chain\.test\.ts[\s\S]*visible submit controls/,
   'TEST-CATALOG should document the student runner play chain gate.'
 );
-const studentIdentityLifecycleChainView =
-  buildStudentIdentityLifecycleChainHandoffView();
-const studentIdentityLifecycleChainValues = new Map(
-  studentIdentityLifecycleChainView.itemViews.map((item) => [
-    item.id,
-    item.value,
-  ])
-);
-assert.deepEqual(
-  studentIdentityLifecycleChainView.itemViews.map((item) => item.id),
-  [...STUDENT_IDENTITY_LIFECYCLE_CHAIN_HANDOFF_ITEM_IDS],
-  'Student identity lifecycle chain should expose the stable 30-slice order.'
-);
-assert.equal(studentIdentityLifecycleChainView.itemViews.length, 30);
-assert.equal(
-  new Set(STUDENT_IDENTITY_LIFECYCLE_CHAIN_HANDOFF_ITEM_IDS).size,
-  30
-);
-assert.equal(STUDENT_IDENTITY_LIFECYCLE_CHAIN_SOURCE_FILES.length, 30);
-for (const filePath of STUDENT_IDENTITY_LIFECYCLE_CHAIN_SOURCE_FILES) {
-  assert.ok(
-    existsSync(filePath),
-    `Missing student identity lifecycle chain file ${filePath}`
-  );
-}
-assert.ok(
-  studentIdentityLifecycleChainView.itemViews.every(
-    (item) => item.ariaLabel && item.description && item.label && item.value
-  )
-);
-assert.deepEqual(studentIdentityLifecycleChainView.privacy, {
-  chainSourceFileCount: STUDENT_IDENTITY_LIFECYCLE_CHAIN_SOURCE_FILES.length,
-  exposesAnonymousBrowserLabel: true,
-  exposesRawAnonymousTokens: false,
-  exposesRawSubmissionPayloads: false,
-  exposesRuntimeItemIdsInIdentityHandoff: false,
-  exposesSourceMaterialMetadataInIdentityHandoff: false,
-  exposesStudentAnswerTextInIdentityHandoff: false,
-  exposesStudentNameInputValues: false,
-  exposesStudentNamesInHandoff: false,
-  exposesTeacherAnswerKeysInIdentityHandoff: false,
-  itemIds: [...STUDENT_IDENTITY_LIFECYCLE_CHAIN_HANDOFF_ITEM_IDS],
-  keepsNameAndTokenModesExclusive: true,
-  requiresNormalizedAnonymousTokens: true,
-  requiresNormalizedStudentNames: true,
-  resultConsumersUseNormalizedIdentity: true,
-  sourceFiles: [...STUDENT_IDENTITY_LIFECYCLE_CHAIN_SOURCE_FILES],
-  usesBrowserTokenForAnonymousAttempts: true,
-  usesDisplayLabelsForAnonymousResults: true,
-  usesScoredAttemptsForAttemptLimits: true,
-  usesStudentRuntimeIdentityHandoff: true,
-});
-assert.deepEqual(Object.fromEntries(studentIdentityLifecycleChainValues), {
-  'anonymous-browser-label': '6-char browser code',
-  'anonymous-identity-key': 'anonymous:*',
-  'anonymous-token-create-reuse': 'Reuse or create',
-  'anonymous-token-normalization': 'NFKC + no whitespace',
-  'anonymous-token-storage-key': 'classgamify:attempt-token',
-  'api-submission-identity': 'Resolved identity',
-  'attempt-count-strategy': 'Normalized strategy',
-  'attempt-limit-count-query': 'Scored attempts',
-  'attempt-persistence-identity-fields': 'Name or token',
-  'attempt-review-identity': 'Review label only',
-  'identity-grouping-priority': 'Name before token',
-  'identity-resolver-display': 'Safe labels',
-  'product-identity-policy': 'Name or browser token',
-  'result-analysis-identity': 'Identity resolver',
-  'result-export-token-guard': 'Raw token hidden',
-  'result-search-anonymous-label': 'Normalized labels',
-  'runner-anonymous-guidance': 'Browser guidance',
-  'runner-identity-handoff': 'Named or anonymous',
-  'runner-identity-view': 'Prepared identity view',
-  'runner-start-privacy': 'Start handoff hidden',
-  'runner-submission-privacy': 'Submission handoff hidden',
-  'scored-attempt-query-identity': 'Identity selects',
-  'runtime-identity-handoff-boundary': 'Runtime item ids',
-  'student-name-identity-key': 'name:*',
-  'student-name-normalization': 'NFKC + collapsed spaces',
-  'student-summary-sort-identity': 'Student label sort',
-  'submission-anonymous-mode': 'Token only',
-  'submission-input-builder': 'Sanitized input',
-  'submission-name-mode': 'Name only',
-  'submission-plan-token-resolution': 'Anonymous only',
-});
 assert.match(
   readFileSync('tests/e2e/TEST-CATALOG.md', 'utf8'),
-  /Student identity lifecycle chain has a fast script-level gate via[\s\S]*scripts\/student-identity-lifecycle-chain-handoff\.test\.ts/,
+  /Student identity lifecycle chain has a fast script-level gate via[\s\S]*scripts\/student-identity-lifecycle-chain\.test\.ts/,
   'TEST-CATALOG should document the student identity lifecycle chain gate.'
 );
 // docs/design.md (Tokens And Hard Rules): screen-reader-only text
@@ -17129,7 +14425,7 @@ assert.match(
 );
 assert.match(
   studentRunnerViewSource,
-  /export type StudentRunnerPrepareView = \{[\s\S]*stepViews: StudentRunnerPrepareStepView\[\];[\s\S]*title: string;[\s\S]*type StudentRunnerPrepareStepId =[\s\S]*'anonymous'[\s\S]*'no-timer'[\s\S]*'review-rules'[\s\S]*'student-name'[\s\S]*'submit'[\s\S]*'timer'[\s\S]*export type StudentRunnerPrepareStepView = \{[\s\S]*ariaLabel: string;[\s\S]*description: string;[\s\S]*id: StudentRunnerPrepareStepId;[\s\S]*label: string;/,
+  /export type StudentRunnerPrepareView = \{[\s\S]*stepViews: StudentRunnerPrepareStepView\[\];[\s\S]*title: string;[\s\S]*type StudentRunnerPrepareStepId =[\s\S]*'anonymous'[\s\S]*'no-timer'[\s\S]*'review-rules'[\s\S]*'student-name'[\s\S]*'submit'[\s\S]*'timer'[\s\S]*type StudentRunnerPrepareStepView = \{[\s\S]*ariaLabel: string;[\s\S]*description: string;[\s\S]*id: StudentRunnerPrepareStepId;[\s\S]*label: string;/,
   'Student runner prepare guidance should expose stable step ids and structured accessibility, label, and description fields.'
 );
 assert.match(
@@ -17271,7 +14567,7 @@ assert.doesNotMatch(
 );
 assert.match(
   studentRunnerStateSource,
-  /export type StudentRunnerStarterPreview = \{[\s\S]*activity: ActivitySeed;[\s\S]*assignment: AssignmentSeed;[\s\S]*runtimeItems: PublicRuntimeItem\[\];[\s\S]*export function buildStudentRunnerPageState\(\{[\s\S]*starterPreview,/,
+  /type StudentRunnerStarterPreview = \{[\s\S]*activity: ActivitySeed;[\s\S]*assignment: AssignmentSeed;[\s\S]*runtimeItems: PublicRuntimeItem\[\];[\s\S]*export function buildStudentRunnerPageState\(\{[\s\S]*starterPreview,/,
   'Student runner state should expose a structured starter preview contract for page-state construction.'
 );
 assert.match(
@@ -17363,12 +14659,12 @@ assert.match(
 );
 assert.match(
   studentRunnerStateSource,
-  /export type StudentRunnerLoadingView = \{[\s\S]*export type StudentRunnerMissingPageView = \{[\s\S]*reason: StudentRunnerMissingReason;[\s\S]*scopeItems: StudentRunnerMissingScopeItem\[\];[\s\S]*unavailable\?: PublicAssignmentUnavailablePayload;[\s\S]*unavailableSafetyView\?: StudentRunnerUnavailableSafetyView;[\s\S]*export type StudentRunnerIdentityView =[\s\S]*ariaLabel: string;[\s\S]*description: string;[\s\S]*disabled: boolean;[\s\S]*export type StudentRunnerControlView = \{[\s\S]*attemptRegionLabel: string;[\s\S]*statusBarLabel: string;[\s\S]*export type StudentRunnerResultPanelView =[\s\S]*ariaLabel: string;[\s\S]*export type StudentRunnerActivityPreviewView = \{[\s\S]*export type StudentRunnerRuntimeListView = \{[\s\S]*export type StudentRunnerPageViewModel = \{/,
+  /export type StudentRunnerLoadingView = \{[\s\S]*export type StudentRunnerMissingPageView = \{[\s\S]*reason: StudentRunnerMissingReason;[\s\S]*scopeItems: StudentRunnerMissingScopeItem\[\];[\s\S]*unavailable\?: PublicAssignmentUnavailablePayload;[\s\S]*unavailableSafetyView\?: StudentRunnerUnavailableSafetyView;[\s\S]*export type StudentRunnerIdentityView =[\s\S]*ariaLabel: string;[\s\S]*description: string;[\s\S]*disabled: boolean;[\s\S]*export type StudentRunnerControlView = \{[\s\S]*attemptRegionLabel: string;[\s\S]*statusBarLabel: string;[\s\S]*export type StudentRunnerResultPanelView =[\s\S]*ariaLabel: string;[\s\S]*type StudentRunnerActivityPreviewView = \{[\s\S]*type StudentRunnerRuntimeListView = \{[\s\S]*type StudentRunnerPageViewModel = \{/,
   'Student runner state domain should export focused route-facing page and sub-view contracts.'
 );
 assert.match(
   studentRunnerStateSource,
-  /export type StudentRunnerUnavailableSafetyItemId =[\s\S]*'activity-content'[\s\S]*'answer-feedback'[\s\S]*'browser-identity'[\s\S]*'source-materials'[\s\S]*'submissions'[\s\S]*type StudentRunnerUnavailableSafetyItemView = \{[\s\S]*ariaLabel: string;[\s\S]*description: string;[\s\S]*id: StudentRunnerUnavailableSafetyItemId;[\s\S]*label: string;[\s\S]*value: string;[\s\S]*export type StudentRunnerUnavailableSafetyView = \{[\s\S]*description: string;[\s\S]*items: StudentRunnerUnavailableSafetyItemView\[\];[\s\S]*title: string;/,
+  /type StudentRunnerUnavailableSafetyItemId =[\s\S]*'activity-content'[\s\S]*'answer-feedback'[\s\S]*'browser-identity'[\s\S]*'source-materials'[\s\S]*'submissions'[\s\S]*type StudentRunnerUnavailableSafetyItemView = \{[\s\S]*ariaLabel: string;[\s\S]*description: string;[\s\S]*id: StudentRunnerUnavailableSafetyItemId;[\s\S]*label: string;[\s\S]*value: string;[\s\S]*export type StudentRunnerUnavailableSafetyView = \{[\s\S]*description: string;[\s\S]*items: StudentRunnerUnavailableSafetyItemView\[\];[\s\S]*title: string;/,
   'Student runner state should expose an explicit unavailable-link safety view contract.'
 );
 assert.match(
@@ -17383,7 +14679,7 @@ assert.match(
 );
 assert.match(
   studentRunnerSubmissionSource,
-  /export type StudentRunnerMissingScopeItemId =[\s\S]*'activity-content'[\s\S]*'browser-identity'[\s\S]*'link-status'[\s\S]*'next-step'[\s\S]*'submissions'[\s\S]*export type StudentRunnerMissingScopeItem = \{[\s\S]*ariaLabel: string;[\s\S]*description: string;[\s\S]*id: StudentRunnerMissingScopeItemId;[\s\S]*label: string;[\s\S]*value: string;[\s\S]*export type StudentRunnerMissingView = \{[\s\S]*reason: StudentRunnerMissingReason;[\s\S]*scopeItems: StudentRunnerMissingScopeItem\[\];[\s\S]*unavailable\?: PublicAssignmentUnavailablePayload;/,
+  /export type StudentRunnerMissingScopeItemId =[\s\S]*'activity-content'[\s\S]*'browser-identity'[\s\S]*'link-status'[\s\S]*'next-step'[\s\S]*'submissions'[\s\S]*export type StudentRunnerMissingScopeItem = \{[\s\S]*ariaLabel: string;[\s\S]*description: string;[\s\S]*id: StudentRunnerMissingScopeItemId;[\s\S]*label: string;[\s\S]*value: string;[\s\S]*type StudentRunnerMissingView = \{[\s\S]*reason: StudentRunnerMissingReason;[\s\S]*scopeItems: StudentRunnerMissingScopeItem\[\];[\s\S]*unavailable\?: PublicAssignmentUnavailablePayload;/,
   'Student submission domain should expose explicit missing-link scope item and view contracts.'
 );
 assert.match(
@@ -17413,7 +14709,7 @@ assert.match(
 );
 assert.match(
   studentRunnerStateSource,
-  /export type StudentRunnerRouteState =[\s\S]*headerView: StudentRunnerHeaderView;[\s\S]*identityView: StudentRunnerIdentityView;[\s\S]*previewView: StudentRunnerActivityPreviewView;/,
+  /type StudentRunnerRouteState =[\s\S]*headerView: StudentRunnerHeaderView;[\s\S]*identityView: StudentRunnerIdentityView;[\s\S]*previewView: StudentRunnerActivityPreviewView;/,
   'Student runner route state should expose ready-state views through explicit focused contracts.'
 );
 assert.doesNotMatch(
@@ -17458,7 +14754,7 @@ assert.doesNotMatch(
 );
 assert.match(
   studentRunnerStateSource,
-  /export type StudentRunnerSubmitReadinessStatus =[\s\S]*'blocked'[\s\S]*'needs-action'[\s\S]*'ready'[\s\S]*type StudentRunnerSubmitReadinessItemId =[\s\S]*'completion'[\s\S]*'incomplete-confirmation'[\s\S]*'runtime-items'[\s\S]*'share-link'[\s\S]*'submission-state'[\s\S]*export type StudentRunnerSubmitReadinessView = \{[\s\S]*items: StudentRunnerSubmitReadinessItemView\[\];[\s\S]*status: StudentRunnerSubmitReadinessStatus;[\s\S]*statusLabel: string;/,
+  /type StudentRunnerSubmitReadinessStatus =[\s\S]*'blocked'[\s\S]*'needs-action'[\s\S]*'ready'[\s\S]*type StudentRunnerSubmitReadinessItemId =[\s\S]*'completion'[\s\S]*'incomplete-confirmation'[\s\S]*'runtime-items'[\s\S]*'share-link'[\s\S]*'submission-state'[\s\S]*export type StudentRunnerSubmitReadinessView = \{[\s\S]*items: StudentRunnerSubmitReadinessItemView\[\];[\s\S]*status: StudentRunnerSubmitReadinessStatus;[\s\S]*statusLabel: string;/,
   'Student runner state should expose an explicit submit-readiness view contract.'
 );
 // docs/design.md (Tokens And Hard Rules): screen-reader-only text
@@ -17997,7 +15293,7 @@ assert.match(
 );
 assert.match(
   assignmentDeliverySummarySource,
-  /export type PublicAssignmentRuleSummaryStatus =[\s\S]*'attempt-limited'[\s\S]*'open'[\s\S]*'scheduled'[\s\S]*'timed'[\s\S]*'timed-scheduled'[\s\S]*export type PublicAssignmentRuleSummaryStatusView = \{[\s\S]*ariaLabel: string;[\s\S]*description: string;[\s\S]*label: string;[\s\S]*status: PublicAssignmentRuleSummaryStatus;[\s\S]*tone: PublicAssignmentRuleSummaryStatusTone;[\s\S]*export type PublicAssignmentRuleSummaryView = \{[\s\S]*description: string;[\s\S]*items: PublicAssignmentRuleSummaryItem\[\];[\s\S]*status: PublicAssignmentRuleSummaryStatusView;[\s\S]*summary: PublicAssignmentRuleSummaryStats;[\s\S]*title: string;/,
+  /type PublicAssignmentRuleSummaryStatus =[\s\S]*'attempt-limited'[\s\S]*'open'[\s\S]*'scheduled'[\s\S]*'timed'[\s\S]*'timed-scheduled'[\s\S]*export type PublicAssignmentRuleSummaryStatusView = \{[\s\S]*ariaLabel: string;[\s\S]*description: string;[\s\S]*label: string;[\s\S]*status: PublicAssignmentRuleSummaryStatus;[\s\S]*tone: PublicAssignmentRuleSummaryStatusTone;[\s\S]*export type PublicAssignmentRuleSummaryView = \{[\s\S]*description: string;[\s\S]*items: PublicAssignmentRuleSummaryItem\[\];[\s\S]*status: PublicAssignmentRuleSummaryStatusView;[\s\S]*summary: PublicAssignmentRuleSummaryStats;[\s\S]*title: string;/,
   'Assignment delivery summary should expose structured public rule summary, status, and heading contracts.'
 );
 assert.match(
@@ -18146,7 +15442,7 @@ assert.match(
 );
 assert.match(
   studentRunnerStateSource,
-  /export type StudentRunnerSubmissionPayloadSummary = \{[\s\S]*answerCount: number;[\s\S]*itemCount: number;[\s\S]*shareSlug: string;[\s\S]*unansweredItemCount: number;[\s\S]*export type StudentRunnerSubmissionPayloadSummaryView = \{[\s\S]*metrics: StudentRunnerSubmissionPayloadSummaryMetricView\[\];[\s\S]*buildStudentRunnerSubmissionPayloadSummaryExecutionViews\(\{[\s\S]*input: submissionPlan\.input,[\s\S]*pageView,[\s\S]*payloadSummaryView:[\s\S]*buildStudentRunnerSubmissionPayloadSummaryView\(payloadSummary\)[\s\S]*function buildStudentRunnerSubmissionPayloadSummary/,
+  /type StudentRunnerSubmissionPayloadSummary = \{[\s\S]*answerCount: number;[\s\S]*itemCount: number;[\s\S]*shareSlug: string;[\s\S]*unansweredItemCount: number;[\s\S]*export type StudentRunnerSubmissionPayloadSummaryView = \{[\s\S]*metrics: StudentRunnerSubmissionPayloadSummaryMetricView\[\];[\s\S]*buildStudentRunnerSubmissionPayloadSummaryExecutionViews\(\{[\s\S]*input: submissionPlan\.input,[\s\S]*pageView,[\s\S]*payloadSummaryView:[\s\S]*buildStudentRunnerSubmissionPayloadSummaryView\(payloadSummary\)[\s\S]*function buildStudentRunnerSubmissionPayloadSummary/,
   'Student runner submission execution plans should expose raw and localized route-safe summaries of the normalized browser payload.'
 );
 assert.match(
@@ -18156,7 +15452,7 @@ assert.match(
 );
 assert.match(
   studentRunnerStateSource,
-  /StudentAttemptSubmissionBlockedReason[\s\S]*StudentAttemptSubmissionConfirmIncompleteReason[\s\S]*StudentAttemptSubmissionInput[\s\S]*StudentAttemptSubmissionMessageType[\s\S]*StudentAttemptSubmissionSubmitReason[\s\S]*export type StudentRunnerSubmissionPlan = StudentAttemptSubmissionPlan;[\s\S]*type StudentRunnerSubmissionMessageReason =[\s\S]*StudentAttemptSubmissionBlockedReason[\s\S]*StudentAttemptSubmissionConfirmIncompleteReason[\s\S]*input: StudentAttemptSubmissionInput;[\s\S]*reason: StudentAttemptSubmissionSubmitReason;/,
+  /StudentAttemptSubmissionBlockedReason[\s\S]*StudentAttemptSubmissionConfirmIncompleteReason[\s\S]*StudentAttemptSubmissionInput[\s\S]*StudentAttemptSubmissionMessageType[\s\S]*StudentAttemptSubmissionSubmitReason[\s\S]*type StudentRunnerSubmissionPlan = StudentAttemptSubmissionPlan;[\s\S]*type StudentRunnerSubmissionMessageReason =[\s\S]*StudentAttemptSubmissionBlockedReason[\s\S]*StudentAttemptSubmissionConfirmIncompleteReason[\s\S]*input: StudentAttemptSubmissionInput;[\s\S]*reason: StudentAttemptSubmissionSubmitReason;/,
   'Student runner state should compose explicit assignment-domain submission plan contracts.'
 );
 assert.doesNotMatch(
@@ -18265,7 +15561,7 @@ assert.doesNotMatch(
 );
 assert.match(
   studentRunnerStateSource,
-  /export type StudentRunnerSubmissionSuccessState = \{[\s\S]*confirmIncompleteSubmit: false;[\s\S]*export function buildStudentRunnerSubmissionSuccessState[\s\S]*confirmIncompleteSubmit: false/,
+  /type StudentRunnerSubmissionSuccessState = \{[\s\S]*confirmIncompleteSubmit: false;[\s\S]*export function buildStudentRunnerSubmissionSuccessState[\s\S]*confirmIncompleteSubmit: false/,
   'Student runner success-state plans should reset incomplete-submit confirmation after a successful submission.'
 );
 assert.match(
@@ -22600,7 +19896,7 @@ const assignmentLifecycleSource = readFileSync(
 );
 assert.match(
   assignmentLifecycleSource,
-  /export type AssignmentStatusTransitionErrorCode =[\s\S]*'already-closed'[\s\S]*'already-open'[\s\S]*'close-only-published'[\s\S]*'reopen-expired'[\s\S]*'reopen-only-closed'[\s\S]*'unsupported-transition'/,
+  /type AssignmentStatusTransitionErrorCode =[\s\S]*'already-closed'[\s\S]*'already-open'[\s\S]*'close-only-published'[\s\S]*'reopen-expired'[\s\S]*'reopen-only-closed'[\s\S]*'unsupported-transition'/,
   'Assignment lifecycle should expose stable status-transition error codes separately from localized messages.'
 );
 assert.doesNotMatch(
@@ -22625,7 +19921,7 @@ assert.match(
 );
 assert.match(
   assignmentLifecycleSource,
-  /export type AssignmentStatusActionBlockedReason = 'missing-status-action'[\s\S]*reason: AssignmentStatusActionBlockedReason;[\s\S]*type: 'blocked'/,
+  /type AssignmentStatusActionBlockedReason = 'missing-status-action'[\s\S]*reason: AssignmentStatusActionBlockedReason;[\s\S]*type: 'blocked'/,
   'Assignment status action execution plans should expose a structured blocked reason.'
 );
 assert.match(
@@ -26638,86 +23934,6 @@ assert.match(
   /assignment-attempt-persistence\.test\.ts[\s\S]*Assignment attempt persistence keeps source-level guards/,
   'E2E catalog should document the attempt persistence source-level handoff gate.'
 );
-const scoredAttemptResultChainView =
-  buildScoredAttemptResultChainHandoffView();
-const scoredAttemptResultChainValues = new Map(
-  scoredAttemptResultChainView.itemViews.map((item) => [item.id, item.value])
-);
-assert.deepEqual(
-  scoredAttemptResultChainView.itemViews.map((item) => item.id),
-  [...SCORED_ATTEMPT_RESULT_CHAIN_HANDOFF_ITEM_IDS],
-  'Scored attempt result chain should expose the stable post-submit 30-slice order.'
-);
-assert.equal(scoredAttemptResultChainView.itemViews.length, 30);
-assert.equal(
-  new Set(SCORED_ATTEMPT_RESULT_CHAIN_HANDOFF_ITEM_IDS).size,
-  30
-);
-assert.equal(SCORED_ATTEMPT_RESULT_CHAIN_SOURCE_FILES.length, 30);
-for (const filePath of SCORED_ATTEMPT_RESULT_CHAIN_SOURCE_FILES) {
-  assert.ok(
-    existsSync(filePath),
-    `Missing scored attempt result chain file ${filePath}`
-  );
-}
-assert.ok(
-  scoredAttemptResultChainView.itemViews.every(
-    (item) => item.ariaLabel && item.description && item.label && item.value
-  )
-);
-assert.deepEqual(scoredAttemptResultChainView.privacy, {
-  chainSourceFileCount: SCORED_ATTEMPT_RESULT_CHAIN_SOURCE_FILES.length,
-  exposesAnswerKeysBeforeAllowedReview: false,
-  exposesCsvDataUrlInHandoff: false,
-  exposesRawAnonymousTokens: false,
-  exposesRawSubmissionPayload: false,
-  exposesRuntimeItemIdsInHandoff: false,
-  exposesSourceMaterialStorageKeys: false,
-  exposesStudentAnswerTextInHandoff: false,
-  exposesStudentNamesInHandoff: false,
-  exposesTeacherOnlyAnswersInHandoff: false,
-  itemIds: [...SCORED_ATTEMPT_RESULT_CHAIN_HANDOFF_ITEM_IDS],
-  publicResponseUsesSanitizedResult: true,
-  resultConsumersUseScoredAttempts: true,
-  sourceFiles: [...SCORED_ATTEMPT_RESULT_CHAIN_SOURCE_FILES],
-  storesImmutableAnswerJson: true,
-  storesImmutableResultJson: true,
-  usesSharedAttemptStats: true,
-  usesSharedDurationFormatting: true,
-  usesAttemptReviewCardHandoff: true,
-});
-assert.deepEqual(Object.fromEntries(scoredAttemptResultChainValues), {
-  'accepted-alternatives-consistency': 'Shared formatting',
-  'anonymous-token-guard': 'Raw token hidden',
-  'answers-json-clone': 'Immutable answer rows',
-  'assignment-list-stats-consumer': 'Card/list metrics',
-  'attempt-limit-gate': 'Per identity',
-  'attempt-query-scored-filter': 'resultJson required',
-  'attempt-review-cards': 'Answer review',
-  'attempt-stats-consumer': 'Shared metrics',
-  'classroom-brief-consumer': 'Reteach evidence',
-  'copy-artifact-consumer': 'Current review copy',
-  'csv-export-consumer': 'Full assignment export',
-  'csv-formula-guard': 'Formula prefix',
-  'duration-display-consistency': 'Shared duration view',
-  'duration-normalization': 'Timer capped seconds',
-  'product-scored-attempt-policy': 'Submit -> review',
-  'printable-result-return': 'Back to results',
-  'public-feedback-policy': 'Reveal if allowed',
-  'public-result-sanitization': 'Public score view',
-  'public-review-summary': 'Review summary',
-  'result-analysis-consumer': 'Stored answers',
-  'result-json-clone': 'Immutable result',
-  'runtime-answer-validation': 'Frozen runtime ids',
-  'runtime-scoring-evaluation': 'evaluateRuntimeAnswers',
-  'score-field-mapping': 'earned/max points',
-  'scored-insert-builder': 'buildScoredAttemptInsert',
-  'attempt-review-card-handoff-boundary': 'Visible review cards',
-  'source-material-guard': 'Storage keys hidden',
-  'submit-api-identity-gate': 'Name or browser token',
-  'submit-api-lifecycle-gate': 'Open assignment only',
-  'teacher-review-state': 'Current review',
-});
 assert.match(
   readFileSync('docs/product.md', 'utf8'),
   /post-submit result boundary[\s\S]*scored-attempt\s+persistence[\s\S]*public feedback[\s\S]*assignment stats[\s\S]*teacher result analysis[\s\S]*answer review cards[\s\S]*copy artifacts[\s\S]*CSV export[\s\S]*printable\s+review\s+return/,
@@ -26750,7 +23966,7 @@ assert.match(
 );
 assert.match(
   e2eTestCatalogText,
-  /Scored attempt result lifecycle chain has a fast script-level gate via[\s\S]*scripts\/scored-attempt-result-chain-handoff\.test\.ts[\s\S]*post-submit scored-result boundary[\s\S]*public\s+feedback[\s\S]*attempt\s+stats[\s\S]*teacher\s+result\s+review[\s\S]*copy\s+artifacts[\s\S]*CSV\s+export[\s\S]*printable\s+review\s+return/,
+  /Scored attempt result lifecycle chain has a fast script-level gate via[\s\S]*scripts\/scored-attempt-result-chain\.test\.ts[\s\S]*post-submit scored-result boundary[\s\S]*public\s+feedback[\s\S]*attempt\s+stats[\s\S]*teacher\s+result\s+review[\s\S]*copy\s+artifacts[\s\S]*CSV\s+export[\s\S]*printable\s+review\s+return/,
   'E2E catalog should document the scored attempt result lifecycle chain gate.'
 );
 assignmentSnapshotSourceActivity.description = 'Edited after publish';
@@ -33990,93 +31206,6 @@ assert.match(
   /export const updateActivity[\s\S]*assertActivityCanEdit\(existingActivity\.visibility\)/,
   'Update activity API should block edits to archived activities server-side.'
 );
-const activityLifecycleGovernanceChainView =
-  buildActivityLifecycleGovernanceChainHandoffView();
-const activityLifecycleGovernanceChainValues = new Map(
-  activityLifecycleGovernanceChainView.itemViews.map((item) => [
-    item.id,
-    item.value,
-  ])
-);
-assert.deepEqual(
-  activityLifecycleGovernanceChainView.itemViews.map((item) => item.id),
-  [...ACTIVITY_LIFECYCLE_GOVERNANCE_CHAIN_HANDOFF_ITEM_IDS],
-  'Activity lifecycle governance chain should expose the stable 30-slice order.'
-);
-assert.equal(activityLifecycleGovernanceChainView.itemViews.length, 30);
-assert.equal(
-  new Set(ACTIVITY_LIFECYCLE_GOVERNANCE_CHAIN_HANDOFF_ITEM_IDS).size,
-  30
-);
-assert.equal(ACTIVITY_LIFECYCLE_GOVERNANCE_CHAIN_SOURCE_FILES.length, 30);
-for (const filePath of ACTIVITY_LIFECYCLE_GOVERNANCE_CHAIN_SOURCE_FILES) {
-  assert.ok(
-    existsSync(filePath),
-    `Missing activity lifecycle governance chain file ${filePath}`
-  );
-}
-assert.ok(
-  activityLifecycleGovernanceChainView.itemViews.every(
-    (item) => item.ariaLabel && item.description && item.label && item.value
-  )
-);
-assert.deepEqual(activityLifecycleGovernanceChainView.privacy, {
-  archivedActivitiesBlockDerivatives: true,
-  chainSourceFileCount: ACTIVITY_LIFECYCLE_GOVERNANCE_CHAIN_SOURCE_FILES.length,
-  deletesActivityContentOnArchive: false,
-  exposesActivityContentText: false,
-  exposesAssignmentSnapshotContent: false,
-  exposesInternalActivityIds: false,
-  exposesSourceMaterialFileIds: false,
-  exposesSourceMaterialStorageKeys: false,
-  exposesTeacherNotesText: false,
-  itemIds: [...ACTIVITY_LIFECYCLE_GOVERNANCE_CHAIN_HANDOFF_ITEM_IDS],
-  mutatesPublishedAssignmentSnapshots: false,
-  requiresOwnerScope: true,
-  restoredVisibility: 'draft',
-  sourceFiles: [...ACTIVITY_LIFECYCLE_GOVERNANCE_CHAIN_SOURCE_FILES],
-  usesAssignmentPublishHandoff: true,
-});
-assert.deepEqual(
-  [
-    ACTIVITY_AUTHORING_LIBRARY_CHAIN_HANDOFF_ITEM_IDS.length,
-    ACTIVITY_AUTHORING_LIBRARY_CHAIN_SOURCE_FILES.length,
-  ],
-  Array.from({ length: 2 }, () => 30),
-  'Activity lifecycle governance chain should stay backed by lifecycle, library, duplicate, remix, authoring, and publish gates.'
-);
-assert.deepEqual(Object.fromEntries(activityLifecycleGovernanceChainValues), {
-  'archive-execution-plan': 'Validated transition',
-  'archive-server-guard': 'Already archived blocked',
-  'card-action-state': 'Restore-only archived',
-  'content-retention': 'Content retained',
-  'created-panel-publish-gate': 'Same access view',
-  'duplicate-api-gate': 'Server enforced',
-  'duplicate-ui-plan': 'Blocked or draft',
-  'edit-access-gate': 'Archived blocked',
-  'hidden-lifecycle-handoff': '30 semantic items',
-  'library-active-scope': 'Archived hidden',
-  'library-archived-scope': 'Archived only',
-  'library-owner-query': 'Owner scoped',
-  'library-status-parser': 'active/archived',
-  'library-status-summary': 'Full filtered result',
-  'lifecycle-domain-source': 'activities/lifecycle',
-  'assignment-publish-handoff-boundary': 'Visible publish dialog',
-  'product-archive-policy': 'Restore before derive',
-  'public-assignment-continuity': 'Existing links unchanged',
-  'publish-access-gate': 'Archived blocked',
-  'publish-api-derivation-gate': 'Server enforced',
-  'ready-template-remix-guard': 'Missing content blocked',
-  'remix-api-gate': 'Server enforced',
-  'remix-ui-plan': 'Ready target only',
-  'restore-execution-plan': 'Validated transition',
-  'restore-server-guard': 'Not archived blocked',
-  'restored-visibility-contract': 'draft',
-  'same-template-remix-guard': 'Blocked',
-  'snapshot-protection': 'Snapshots unchanged',
-  'source-material-retention': 'References retained',
-  'visibility-update-helper': 'Visibility only',
-});
 assert.match(
   readFileSync('docs/product.md', 'utf8'),
   /Teachers can soft-archive activities[\s\S]*restore them\s+later[\s\S]*Archived activities cannot be\s+published, duplicated, or remixed[\s\S]*server functions/,
@@ -34137,7 +31266,7 @@ assert.match(
 );
 assert.match(
   e2eTestCatalogText.replace(/\s+/g, ' '),
-  /Activity lifecycle governance chain has a fast script-level gate via[\s\S]*scripts\/activity-lifecycle-governance-chain-handoff\.test\.ts[\s\S]*owner-scoped archive and restore[\s\S]*edit, publish, duplicate, and remix gates[\s\S]*server lifecycle enforcement[\s\S]*content and source-material retention[\s\S]*assignment snapshot protection[\s\S]*public assignment continuity/,
+  /Activity lifecycle governance chain has a fast script-level gate via[\s\S]*scripts\/activity-lifecycle-governance-chain\.test\.ts[\s\S]*owner-scoped archive and restore[\s\S]*edit, publish, duplicate, and remix gates[\s\S]*server lifecycle enforcement[\s\S]*content and source-material retention[\s\S]*assignment snapshot protection[\s\S]*public assignment continuity/,
   'E2E catalog should document the activity lifecycle governance chain gate.'
 );
 const useActivitiesSource = readFileSync('src/hooks/use-activities.ts', 'utf8');
@@ -34264,7 +31393,7 @@ assert.doesNotMatch(
 );
 assert.match(
   activityLibraryViewSource,
-  /export type ActivityLibrarySourceScopeBoundary = \{[\s\S]*fullFilteredActivityCount: number;[\s\S]*keepsVisiblePageCountsSeparate: true;[\s\S]*overviewActivityCount: number;[\s\S]*scope: 'owner-activity-library-source-scope';[\s\S]*usesFullFilteredSummaryForOverview: true;[\s\S]*visiblePageActivityCount: number;/,
+  /type ActivityLibrarySourceScopeBoundary = \{[\s\S]*fullFilteredActivityCount: number;[\s\S]*keepsVisiblePageCountsSeparate: true;[\s\S]*overviewActivityCount: number;[\s\S]*scope: 'owner-activity-library-source-scope';[\s\S]*usesFullFilteredSummaryForOverview: true;[\s\S]*visiblePageActivityCount: number;/,
   'Activity library page should expose a source-scope boundary that separates full filtered overview counts from visible page counts.'
 );
 assert.match(
@@ -34346,7 +31475,7 @@ assert.doesNotMatch(
 );
 assert.match(
   activityLibraryViewSource,
-  /export type ActivityLibraryPageScopeItemId =[\s\S]*'page'[\s\S]*'range'[\s\S]*'search'[\s\S]*'source'[\s\S]*'status'[\s\S]*'template'[\s\S]*export type ActivityLibraryPageScopeItem = \{[\s\S]*description: string;[\s\S]*id: ActivityLibraryPageScopeItemId;[\s\S]*label: string;[\s\S]*value: string;[\s\S]*export type ActivityLibraryPageScopeView = \{[\s\S]*items: ActivityLibraryPageScopeItem\[\];[\s\S]*label: string;[\s\S]*summary: string;/,
+  /type ActivityLibraryPageScopeItemId =[\s\S]*'page'[\s\S]*'range'[\s\S]*'search'[\s\S]*'source'[\s\S]*'status'[\s\S]*'template'[\s\S]*type ActivityLibraryPageScopeItem = \{[\s\S]*description: string;[\s\S]*id: ActivityLibraryPageScopeItemId;[\s\S]*label: string;[\s\S]*value: string;[\s\S]*type ActivityLibraryPageScopeView = \{[\s\S]*items: ActivityLibraryPageScopeItem\[\];[\s\S]*label: string;[\s\S]*summary: string;/,
   'Activity library view domain should expose explicit current-view scope contracts with stable item ids.'
 );
 assert.match(
@@ -34371,7 +31500,7 @@ assert.match(
 );
 assert.match(
   activityLibraryViewSource,
-  /export type ActivityLibraryCardStat[\s\S]*export type ActivityLibraryReadyTemplateOptionView[\s\S]*isCurrent: boolean;[\s\S]*export type ActivityLibraryRemixActionOptionView[\s\S]*actionLabel: string;[\s\S]*export type ActivityLibraryCompatibilityView[\s\S]*readyTemplateOptions: ActivityLibraryReadyTemplateOptionView\[\];[\s\S]*remixStatusView: ActivityLibraryActionStatusView;[\s\S]*remixActionOptions: ActivityLibraryRemixActionOptionView\[\];[\s\S]*export type ActivityLibraryCardActionState[\s\S]*export type ActivityLibraryCardViewModel[\s\S]*export type ActivityLibraryCardDisplayView[\s\S]*export type ActivityLibraryCardTemplateType = ActivityTemplateType;[\s\S]*export type ActivityLibraryCardActionView[\s\S]*export type ActivityLibraryEditorActionView/,
+  /export type ActivityLibraryCardStat[\s\S]*export type ActivityLibraryReadyTemplateOptionView[\s\S]*isCurrent: boolean;[\s\S]*export type ActivityLibraryRemixActionOptionView[\s\S]*actionLabel: string;[\s\S]*export type ActivityLibraryCompatibilityView[\s\S]*readyTemplateOptions: ActivityLibraryReadyTemplateOptionView\[\];[\s\S]*remixStatusView: ActivityLibraryActionStatusView;[\s\S]*remixActionOptions: ActivityLibraryRemixActionOptionView\[\];[\s\S]*export type ActivityLibraryCardActionState[\s\S]*export type ActivityLibraryCardViewModel[\s\S]*type ActivityLibraryCardDisplayView[\s\S]*export type ActivityLibraryCardTemplateType = ActivityTemplateType;[\s\S]*export type ActivityLibraryCardActionView[\s\S]*export type ActivityLibraryEditorActionView/,
   'Activity library domain should expose explicit card, compatibility, action, and stat view contracts.'
 );
 assert.match(
@@ -34381,22 +31510,22 @@ assert.match(
 );
 assert.match(
   activityLibraryViewSource,
-  /export type ActivityLibraryCardDisplayView = \{[\s\S]*actionsLabel: string;[\s\S]*ariaLabel: string;[\s\S]*compatibilityLabel: string;[\s\S]*contentLabel: string;[\s\S]*detailsLabel: string;[\s\S]*restoreRequiredLabel: string;[\s\S]*sourceMaterialsLabel: string;/,
+  /type ActivityLibraryCardDisplayView = \{[\s\S]*actionsLabel: string;[\s\S]*ariaLabel: string;[\s\S]*compatibilityLabel: string;[\s\S]*contentLabel: string;[\s\S]*detailsLabel: string;[\s\S]*restoreRequiredLabel: string;[\s\S]*sourceMaterialsLabel: string;/,
   'Activity library card display view should expose prepared card and section labels for semantic rendering.'
 );
 assert.match(
   activityLibraryViewSource,
-  /export type ActivityLibraryCardStatusSummaryItemId =[\s\S]*'library-status'[\s\S]*'publish'[\s\S]*'remix'[\s\S]*'source-materials'[\s\S]*export type ActivityLibraryCardStatusSummaryItem = \{[\s\S]*ariaLabel: string;[\s\S]*description: string;[\s\S]*id: ActivityLibraryCardStatusSummaryItemId;[\s\S]*label: string;[\s\S]*tone: ActivityLibraryCardStatusSummaryTone;[\s\S]*value: string;[\s\S]*export type ActivityLibraryCardStatusSummaryView = \{[\s\S]*ariaLabel: string;[\s\S]*items: ActivityLibraryCardStatusSummaryItem\[\];[\s\S]*label: string;/,
+  /type ActivityLibraryCardStatusSummaryItemId =[\s\S]*'library-status'[\s\S]*'publish'[\s\S]*'remix'[\s\S]*'source-materials'[\s\S]*type ActivityLibraryCardStatusSummaryItem = \{[\s\S]*ariaLabel: string;[\s\S]*description: string;[\s\S]*id: ActivityLibraryCardStatusSummaryItemId;[\s\S]*label: string;[\s\S]*tone: ActivityLibraryCardStatusSummaryTone;[\s\S]*value: string;[\s\S]*type ActivityLibraryCardStatusSummaryView = \{[\s\S]*ariaLabel: string;[\s\S]*items: ActivityLibraryCardStatusSummaryItem\[\];[\s\S]*label: string;/,
   'Activity library card display view should expose a prepared classroom-readiness status summary contract.'
 );
 assert.match(
   activityLibraryViewSource,
-  /export type ActivityLibraryCardDisplayView = \{[\s\S]*displayTitle: string;[\s\S]*export function formatActivityLibraryDisplayTitle\(title: string\)[\s\S]*normalizeRuntimeDisplayText\(title\)[\s\S]*m\.activity_library_card_untitled\(\)/,
+  /type ActivityLibraryCardDisplayView = \{[\s\S]*displayTitle: string;[\s\S]*export function formatActivityLibraryDisplayTitle\(title: string\)[\s\S]*normalizeRuntimeDisplayText\(title\)[\s\S]*m\.activity_library_card_untitled\(\)/,
   'Activity library card display views should normalize visible titles through one localized display-title helper.'
 );
 assert.match(
   activityLibraryViewSource,
-  /export type ActivityLibraryCardDisplayView = \{[\s\S]*displayDescription: string;[\s\S]*export function formatActivityLibraryDisplayDescription\(description: string\)[\s\S]*normalizeRuntimeDisplayText\(description\)/,
+  /type ActivityLibraryCardDisplayView = \{[\s\S]*displayDescription: string;[\s\S]*export function formatActivityLibraryDisplayDescription\(description: string\)[\s\S]*normalizeRuntimeDisplayText\(description\)/,
   'Activity library card display views should normalize visible descriptions through one display-description helper.'
 );
 assert.match(
@@ -34767,7 +31896,7 @@ assert.match(
 );
 assert.match(
   activityLibraryViewSource,
-  /export type CreatedActivityListItem[\s\S]*export type CreatedActivityPanelContext[\s\S]*actionView: CreatedActivityPanelActionView;[\s\S]*export type CreatedActivityPanelActivity = CreatedActivityListItem \| undefined;[\s\S]*export type CreatedActivityPanelEditAction = ActivityLibraryEditorActionView;[\s\S]*export type CreatedActivityPanelPublishActionView =[\s\S]*export type CreatedActivityPanelCreateActionView = \{[\s\S]*to: typeof Routes\.Create;[\s\S]*export type CreatedActivityPanelDismissActionView = \{[\s\S]*export type CreatedActivityPanelActionView = \{[\s\S]*create: CreatedActivityPanelCreateActionView;[\s\S]*dismiss: CreatedActivityPanelDismissActionView;[\s\S]*edit\?: CreatedActivityPanelEditAction;[\s\S]*publish\?: CreatedActivityPanelPublishActionView;/,
+  /export type CreatedActivityListItem[\s\S]*export type CreatedActivityPanelContext[\s\S]*actionView: CreatedActivityPanelActionView;[\s\S]*export type CreatedActivityPanelEditAction = ActivityLibraryEditorActionView;[\s\S]*export type CreatedActivityPanelPublishActionView =[\s\S]*export type CreatedActivityPanelCreateActionView = \{[\s\S]*to: typeof Routes\.Create;[\s\S]*export type CreatedActivityPanelDismissActionView = \{[\s\S]*export type CreatedActivityPanelActionView = \{[\s\S]*create: CreatedActivityPanelCreateActionView;[\s\S]*dismiss: CreatedActivityPanelDismissActionView;[\s\S]*edit\?: CreatedActivityPanelEditAction;[\s\S]*publish\?: CreatedActivityPanelPublishActionView;/,
   'Activity library domain should expose explicit created-activity panel contracts.'
 );
 assert.doesNotMatch(
@@ -35198,7 +32327,7 @@ assert.match(
 );
 assert.match(
   studentRunnerSubmissionSource,
-  /export type StudentAttemptSubmissionFailureCode =[\s\S]*AssignmentAttemptAnswerValidationErrorCode[\s\S]*'anonymous-token-required'[\s\S]*'assignment-closed'[\s\S]*'assignment-expired'[\s\S]*'assignment-not-found'[\s\S]*'assignment-not-published'[\s\S]*'attempt-limit-reached'[\s\S]*'student-name-required'/,
+  /type StudentAttemptSubmissionFailureCode =[\s\S]*AssignmentAttemptAnswerValidationErrorCode[\s\S]*'anonymous-token-required'[\s\S]*'assignment-closed'[\s\S]*'assignment-expired'[\s\S]*'assignment-not-found'[\s\S]*'assignment-not-published'[\s\S]*'attempt-limit-reached'[\s\S]*'student-name-required'/,
   'Student submission failure copy should expose stable failure codes for student-actionable submission errors.'
 );
 assert.match(
@@ -35371,7 +32500,7 @@ assert.doesNotMatch(
 );
 assert.match(
   assignmentListViewSource,
-  /export type AssignmentListFilterScopeBoundary = \{[\s\S]*fullFilteredAssignmentCount: number;[\s\S]*keepsDistributionStepsPrepared: true;[\s\S]*keepsVisiblePageCountsSeparate: true;[\s\S]*overviewAssignmentCount: number;[\s\S]*publishedShareContextStatus:[\s\S]*scope: 'owner-assignment-list-filter-scope';[\s\S]*searchMatchesAssignmentTitle: true;[\s\S]*searchMatchesShareSlug: true;[\s\S]*searchMatchesSourceActivityText: true;[\s\S]*usesFullFilteredSummaryForOverview: true;[\s\S]*visiblePageAssignmentCount: number;[\s\S]*export type AssignmentListSearchPanelView/,
+  /type AssignmentListFilterScopeBoundary = \{[\s\S]*fullFilteredAssignmentCount: number;[\s\S]*keepsDistributionStepsPrepared: true;[\s\S]*keepsVisiblePageCountsSeparate: true;[\s\S]*overviewAssignmentCount: number;[\s\S]*publishedShareContextStatus:[\s\S]*scope: 'owner-assignment-list-filter-scope';[\s\S]*searchMatchesAssignmentTitle: true;[\s\S]*searchMatchesShareSlug: true;[\s\S]*searchMatchesSourceActivityText: true;[\s\S]*usesFullFilteredSummaryForOverview: true;[\s\S]*visiblePageAssignmentCount: number;[\s\S]*type AssignmentListSearchPanelView/,
   'Assignment list page view-model should expose a typed owner-scoped filter boundary for overview, visible-page, search, and distribution scope.'
 );
 assert.match(
@@ -35437,7 +32566,7 @@ assert.doesNotMatch(
 );
 assert.match(
   assignmentListViewSource,
-  /export type AssignmentListPageScopeItemId =[\s\S]*'page'[\s\S]*'range'[\s\S]*'search'[\s\S]*'status'[\s\S]*export type AssignmentListPageScopeItem = \{[\s\S]*description: string;[\s\S]*id: AssignmentListPageScopeItemId;[\s\S]*label: string;[\s\S]*value: string;[\s\S]*export type AssignmentListPageScopeView = \{[\s\S]*items: AssignmentListPageScopeItem\[\];[\s\S]*label: string;[\s\S]*summary: string;/,
+  /type AssignmentListPageScopeItemId =[\s\S]*'page'[\s\S]*'range'[\s\S]*'search'[\s\S]*'status'[\s\S]*type AssignmentListPageScopeItem = \{[\s\S]*description: string;[\s\S]*id: AssignmentListPageScopeItemId;[\s\S]*label: string;[\s\S]*value: string;[\s\S]*type AssignmentListPageScopeView = \{[\s\S]*items: AssignmentListPageScopeItem\[\];[\s\S]*label: string;[\s\S]*summary: string;/,
   'Assignment list view domain should expose explicit current-view scope contracts with stable item ids.'
 );
 assert.match(
@@ -36207,7 +33336,7 @@ const activityDraftSourceSource = readFileSync(
 );
 assert.match(
   activityDraftSourceSource,
-  /export type ActivitySourceMaterialDraftKindCounts = Partial<[\s\S]*Record<ActivityMaterialReference\['kind'\], number>[\s\S]*export type ActivitySourceMaterialDraftSafetySummary = \{[\s\S]*inputCount: number;[\s\S]*omittedCount: number;[\s\S]*safeCount: number;[\s\S]*export type ActivitySourceMaterialDraftSummary[\s\S]*kindCounts: ActivitySourceMaterialDraftKindCounts[\s\S]*noteViews[\s\S]*notesText[\s\S]*safety: ActivitySourceMaterialDraftSafetySummary[\s\S]*totalCount/,
+  /type ActivitySourceMaterialDraftKindCounts = Partial<[\s\S]*Record<ActivityMaterialReference\['kind'\], number>[\s\S]*export type ActivitySourceMaterialDraftSafetySummary = \{[\s\S]*inputCount: number;[\s\S]*omittedCount: number;[\s\S]*safeCount: number;[\s\S]*type ActivitySourceMaterialDraftSummary[\s\S]*kindCounts: ActivitySourceMaterialDraftKindCounts[\s\S]*noteViews[\s\S]*notesText[\s\S]*safety: ActivitySourceMaterialDraftSafetySummary[\s\S]*totalCount/,
   'AI draft source materials should expose a structured safe provenance summary.'
 );
 assert.match(
@@ -36464,7 +33593,7 @@ assert.match(
 );
 assert.match(
   activityAiDraftSource,
-  /export type AiActivityDraftQuestion = z\.output<typeof aiQuestionSchema>;[\s\S]*export type AiActivityDraftPair = z\.output<typeof aiPairSchema>;[\s\S]*export type AiActivityDraftGroup = z\.output<typeof aiGroupSchema>;[\s\S]*export type AiActivityDraftGroupList = AiActivityDraftGroup\[\];[\s\S]*export type AiActivityDraftCompletion = z\.output<[\s\S]*export type NormalizedAiActivityDraft = z\.output<typeof aiDraftSchema>;/,
+  /type AiActivityDraftQuestion = z\.output<typeof aiQuestionSchema>;[\s\S]*type AiActivityDraftGroup = z\.output<typeof aiGroupSchema>;[\s\S]*type AiActivityDraftGroupList = AiActivityDraftGroup\[\];[\s\S]*type AiActivityDraftCompletion = z\.output<[\s\S]*type NormalizedAiActivityDraft = z\.output<typeof aiDraftSchema>;/,
   'AI draft domain should expose explicit normalized draft child contracts.'
 );
 assert.match(
@@ -36823,7 +33952,7 @@ assert.doesNotMatch(
 );
 assert.match(
   printableWorksheetSource,
-  /type AssignmentDeliverySummaryItem[\s\S]*export type PrintableAssignmentDeliveryView = \{[\s\S]*deliverySummary: AssignmentDeliverySummaryItem\[\];[\s\S]*export type PrintableAssignmentWorksheet = \{[\s\S]*deliverySummary: AssignmentDeliverySummaryItem\[\];/,
+  /type AssignmentDeliverySummaryItem[\s\S]*type PrintableAssignmentDeliveryView = \{[\s\S]*deliverySummary: AssignmentDeliverySummaryItem\[\];[\s\S]*export type PrintableAssignmentWorksheet = \{[\s\S]*deliverySummary: AssignmentDeliverySummaryItem\[\];/,
   'Printable worksheet delivery contracts should use the explicit assignment delivery summary item type.'
 );
 assert.doesNotMatch(
@@ -37118,7 +34247,7 @@ assert.match(
 );
 assert.match(
   printableWorksheetViewSource,
-  /export type PrintableWorksheetAnswerKeyAccessState =[\s\S]*'hidden'[\s\S]*'included'[\s\S]*'unavailable'[\s\S]*export type PrintableWorksheetAnswerKeyAccessView = \{[\s\S]*ariaLabel: string;[\s\S]*description: string;[\s\S]*label: string;[\s\S]*state: PrintableWorksheetAnswerKeyAccessState;[\s\S]*value: string;/,
+  /type PrintableWorksheetAnswerKeyAccessState =[\s\S]*'hidden'[\s\S]*'included'[\s\S]*'unavailable'[\s\S]*export type PrintableWorksheetAnswerKeyAccessView = \{[\s\S]*ariaLabel: string;[\s\S]*description: string;[\s\S]*label: string;[\s\S]*state: PrintableWorksheetAnswerKeyAccessState;[\s\S]*value: string;/,
   'Printable worksheet answer-key access should expose a stable hidden, included, and unavailable state contract.'
 );
 assert.match(
@@ -37210,7 +34339,7 @@ assert.match(
 );
 assert.match(
   printableWorksheetViewSource,
-  /export type PrintableWorksheetBlankFieldView = \{[\s\S]*ariaLabel: string;[\s\S]*description: string;[\s\S]*kind: 'blank-line';[\s\S]*value: string;[\s\S]*export type PrintableWorksheetTextFieldView = \{[\s\S]*ariaLabel: string;[\s\S]*description: string;[\s\S]*kind: 'text';[\s\S]*export type PrintableWorksheetAssignmentFieldView =[\s\S]*PrintableWorksheetBlankFieldView[\s\S]*PrintableWorksheetTextFieldView;[\s\S]*export type PrintableWorksheetAnswerKeyView = \{[\s\S]*export type PrintableWorksheetBackToResultsAction = \{[\s\S]*export type PrintableWorksheetAnswerKeyToggleView = \{[\s\S]*export type PrintableWorksheetPrintAction = \{[\s\S]*export type PrintableWorksheetControlView = \{[\s\S]*answerKeyToggle: PrintableWorksheetAnswerKeyToggleView;[\s\S]*backToResultsAction: PrintableWorksheetBackToResultsAction;[\s\S]*printAction: PrintableWorksheetPrintAction;[\s\S]*export type PrintableWorksheetEmptyState = \{[\s\S]*export type PrintableWorksheetLoadStateView = \{[\s\S]*export type PrintableWorksheetPageViewModel = \{/,
+  /export type PrintableWorksheetBlankFieldView = \{[\s\S]*ariaLabel: string;[\s\S]*description: string;[\s\S]*kind: 'blank-line';[\s\S]*value: string;[\s\S]*export type PrintableWorksheetTextFieldView = \{[\s\S]*ariaLabel: string;[\s\S]*description: string;[\s\S]*kind: 'text';[\s\S]*export type PrintableWorksheetAssignmentFieldView =[\s\S]*PrintableWorksheetBlankFieldView[\s\S]*PrintableWorksheetTextFieldView;[\s\S]*export type PrintableWorksheetAnswerKeyView = \{[\s\S]*export type PrintableWorksheetBackToResultsAction = \{[\s\S]*export type PrintableWorksheetAnswerKeyToggleView = \{[\s\S]*export type PrintableWorksheetPrintAction = \{[\s\S]*export type PrintableWorksheetControlView = \{[\s\S]*answerKeyToggle: PrintableWorksheetAnswerKeyToggleView;[\s\S]*backToResultsAction: PrintableWorksheetBackToResultsAction;[\s\S]*printAction: PrintableWorksheetPrintAction;[\s\S]*export type PrintableWorksheetEmptyState = \{[\s\S]*export type PrintableWorksheetLoadStateView = \{[\s\S]*type PrintableWorksheetPageViewModel = \{/,
   'Printable worksheet view domain should export focused assignment-field, answer-key, control, empty, load, and page view contracts.'
 );
 assert.match(
@@ -37664,106 +34793,9 @@ assert.match(
   /student-name, date, and score lines/,
   'E2E catalog should cover the printable worksheet student, date, and score fields.'
 );
-const printableWorksheetReviewLifecycleChainView =
-  buildPrintableWorksheetReviewLifecycleChainHandoffView();
-const printableWorksheetReviewLifecycleChainValues = new Map(
-  printableWorksheetReviewLifecycleChainView.itemViews.map((item) => [
-    item.id,
-    item.value,
-  ])
-);
-assert.deepEqual(
-  printableWorksheetReviewLifecycleChainView.itemViews.map((item) => item.id),
-  [...PRINTABLE_WORKSHEET_REVIEW_LIFECYCLE_CHAIN_HANDOFF_ITEM_IDS],
-  'Printable worksheet review lifecycle chain should expose the stable result-to-print 30-slice order.'
-);
-assert.equal(printableWorksheetReviewLifecycleChainView.itemViews.length, 30);
-assert.equal(
-  new Set(PRINTABLE_WORKSHEET_REVIEW_LIFECYCLE_CHAIN_HANDOFF_ITEM_IDS).size,
-  30
-);
-assert.equal(
-  PRINTABLE_WORKSHEET_REVIEW_LIFECYCLE_CHAIN_SOURCE_FILES.length,
-  30
-);
-for (const filePath of PRINTABLE_WORKSHEET_REVIEW_LIFECYCLE_CHAIN_SOURCE_FILES) {
-  assert.ok(
-    existsSync(filePath),
-    `Missing printable worksheet review lifecycle chain file ${filePath}`
-  );
-}
-assert.ok(
-  printableWorksheetReviewLifecycleChainView.itemViews.every(
-    (item) => item.ariaLabel && item.description && item.label && item.value
-  )
-);
-assert.deepEqual(printableWorksheetReviewLifecycleChainView.privacy, {
-  answerKeyHiddenByDefault: true,
-  chainSourceFileCount:
-    PRINTABLE_WORKSHEET_REVIEW_LIFECYCLE_CHAIN_SOURCE_FILES.length,
-  changesAttemptsOrResults: false,
-  changesPublicRunner: false,
-  exposesAnswerKeyTextInHandoff: false,
-  exposesChoiceTextInHandoff: false,
-  exposesPromptTextInHandoff: false,
-  exposesRawAnonymousTokens: false,
-  exposesSourceMaterialStorageKeys: false,
-  exposesStudentResponseTextInHandoff: false,
-  itemIds: [...PRINTABLE_WORKSHEET_REVIEW_LIFECYCLE_CHAIN_HANDOFF_ITEM_IDS],
-  requiresAuthenticatedTeacher: true,
-  requiresAssignmentSnapshot: true,
-  requiresOwnerScopedAssignment: true,
-  sourceFiles: [...PRINTABLE_WORKSHEET_REVIEW_LIFECYCLE_CHAIN_SOURCE_FILES],
-  usesPrintableWorksheetHandoff: true,
-  usesSharedDeliveryPolicy: true,
-  usesSharedRuntimeItems: true,
-});
-assert.deepEqual(
-  [
-    WORKSHEET_MODE_DELIVERY_CHAIN_HANDOFF_ITEM_IDS.length,
-  ],
-  Array.from({ length: 1 }, () => 30),
-  'Printable worksheet review lifecycle chain should stay backed by printable, worksheet delivery, delivery policy, result material, and export gates.'
-);
-assert.deepEqual(
-  Object.fromEntries(printableWorksheetReviewLifecycleChainValues),
-  {
-    'answer-key-detail-boundary': 'Detail ids stable',
-    'answer-key-hidden-state': 'Hidden by default',
-    'answer-key-included-state': 'Teacher-only key included',
-    'answer-key-search-builder': 'answerKey=true only',
-    'answer-key-search-parser': 'answerKey parser',
-    'answer-key-unavailable-state': 'No answer key available',
-    'assignment-field-handoff': '9 print fields',
-    'choice-bank-policy': 'Choice bank from runtime',
-    'delivery-policy-printing': 'Shared delivery policy',
-    'header-overview-chips': '3 overview chips',
-    'owner-scoped-print-api': 'Owner assignment row',
-    'preparation-summary': '3 preparation checks',
-    'prepared-print-link': '/print/assignments/:assignmentId',
-    'print-action-boundary': 'window.print action',
-    'print-route-auth-boundary': 'Authenticated teacher',
-    'print-route-noindex': 'noindex nofollow',
-    'printable-item-mapping': 'Student handout items',
-    'printable-worksheet-handoff-boundary':
-      'Visible print page',
-    'response-policy-map': 'Template response policy',
-    'result-export-alignment': 'CSV stays full export',
-    'result-page-print-action': 'Teacher result action',
-    'results-return-action': 'Back to results',
-    'robots-print-disallow': 'Disallow /print',
-    'runtime-item-order': 'Shared item order',
-    'share-path-printing': '/play share path',
-    'snapshot-source-resolution': 'Frozen snapshot',
-    'toolbar-toggle-boundary': 'Answer-key switch',
-    'worksheet-delivery-chain-alignment': 'Worksheet chain aligned',
-    'worksheet-query-key': 'Keyed by answer key',
-    'writing-area-policy': 'Bounded answer lines',
-  }
-);
 assert.match(
   e2eTestCatalogText,
-  /Printable worksheet review lifecycle chain has a fast script-level gate via[\s\S]*scripts\/printable-worksheet-review-lifecycle-chain-handoff\.test\.ts[\s\S]*30-slice\s+printable\s+worksheet\s+handoff\s+boundary/,
+  /Printable worksheet review lifecycle chain has a fast script-level gate via[\s\S]*scripts\/printable-worksheet-review-lifecycle-chain\.test\.ts[\s\S]*30-slice\s+printable\s+worksheet\s+handoff\s+boundary/,
   'TEST-CATALOG should document the printable worksheet review lifecycle chain gate.'
 );
 // The root document renders on every public page, so it must not mount
@@ -39229,187 +36261,14 @@ assert.deepEqual(
     ?.contentRequirements,
   []
 );
-const worksheetModeDeliveryChainView =
-  buildWorksheetModeDeliveryChainHandoffView();
-const worksheetModeDeliveryChainValues = new Map(
-  worksheetModeDeliveryChainView.itemViews.map((item) => [
-    item.id,
-    item.value,
-  ])
-);
-assert.deepEqual(
-  worksheetModeDeliveryChainView.itemViews.map((item) => item.id),
-  [...WORKSHEET_MODE_DELIVERY_CHAIN_HANDOFF_ITEM_IDS],
-  'Worksheet-mode delivery chain should expose the stable worksheet-loop 30-slice order.'
-);
-assert.equal(worksheetModeDeliveryChainView.itemViews.length, 30);
-assert.equal(
-  new Set(WORKSHEET_MODE_DELIVERY_CHAIN_HANDOFF_ITEM_IDS).size,
-  30
-);
-assert.equal(WORKSHEET_MODE_DELIVERY_CHAIN_SOURCE_FILES.length, 30);
-for (const filePath of WORKSHEET_MODE_DELIVERY_CHAIN_SOURCE_FILES) {
-  assert.ok(
-    existsSync(filePath),
-    `Missing worksheet-mode delivery chain file ${filePath}`
-  );
-}
-assert.ok(
-  worksheetModeDeliveryChainView.itemViews.every(
-    (item) => item.ariaLabel && item.description && item.label && item.value
-  )
-);
-assert.deepEqual(worksheetModeDeliveryChainView.privacy, {
-  chainSourceFileCount: WORKSHEET_MODE_DELIVERY_CHAIN_SOURCE_FILES.length,
-  createsParallelWorksheetModel: false,
-  exposesAnswerKeysToPublicPayload: false,
-  exposesPromptTextInHandoff: false,
-  exposesRawAnonymousTokens: false,
-  exposesRawStudentIdentity: false,
-  exposesSourceMaterialStorageKeys: false,
-  exposesStudentResponseTextInHandoff: false,
-  itemIds: [...WORKSHEET_MODE_DELIVERY_CHAIN_HANDOFF_ITEM_IDS],
-  printRouteRequiresTeacherAuth: true,
-  publicPayloadUsesSanitizedRuntimeItems: true,
-  requiresAssignmentSnapshot: true,
-  requiresCreateActivityInputContract: true,
-  sourceFiles: [...WORKSHEET_MODE_DELIVERY_CHAIN_SOURCE_FILES],
-  usesPrintableWorksheetHandoff: true,
-});
-assert.deepEqual(Object.fromEntries(worksheetModeDeliveryChainValues), {
-  'answer-feedback-policy': 'Reveal if allowed',
-  'assignment-publish-boundary': 'Explicit freeze step',
-  'attempt-duration-policy': 'Normalized seconds',
-  'delivery-policy-summary': 'Shared delivery rules',
-  'editor-readiness-preview': 'Template readiness',
-  'editor-scaffold-loading': 'Reviewed example',
-  'fill-blank-runtime': 'Inline blanks',
-  'group-sort-runtime': 'Category board',
-  'line-match-runtime': 'Connection board',
-  'listening-runtime': 'Speech track',
-  'print-answer-key-toggle': 'Teacher-only key',
-  'print-response-policy': 'Paper response plan',
-  'print-route-boundary': 'Teacher print route',
-  'public-payload-sanitization': 'Runtime only',
-  'raw-identity-guard': 'Identity hidden',
-  'result-export-policy': 'Delivery rules included',
-  'runtime-item-order': 'Stable order',
-  'shared-create-input': 'CreateActivityInput',
-  'snapshot-freeze': 'AssignmentSnapshot',
-  'source-material-guard': 'Storage keys hidden',
-  'source-material-provenance': 'Compact references',
-  'student-rules-summary': 'Student-visible rules',
-  'submission-contract': '{ itemId, answer }',
-  'template-search-param': 'template',
-  'printable-worksheet-handoff-boundary': 'Visible print page',
-  'worksheet-create-actions': 'Create editor links',
-  'worksheet-extraction-boundary': 'No parallel model',
-  'worksheet-mode-catalog': '4 worksheet modes',
-  'worksheet-source-param': 'source=worksheets',
-  'worksheets-entry-route': '/worksheets',
-});
 assert.match(
   readFileSync('tests/e2e/TEST-CATALOG.md', 'utf8'),
-  /Worksheet-mode delivery chain has a fast script-level gate via[\s\S]*scripts\/worksheet-mode-delivery-chain-handoff\.test\.ts/,
+  /Worksheet-mode delivery chain has a fast script-level gate via[\s\S]*scripts\/worksheet-mode-delivery-chain\.test\.ts/,
   'TEST-CATALOG should document the worksheet-mode delivery chain gate.'
 );
-const templateRoadmapCapabilityChainView =
-  buildTemplateRoadmapCapabilityChainHandoffView();
-const templateRoadmapCapabilityChainValues = new Map(
-  templateRoadmapCapabilityChainView.itemViews.map((item) => [
-    item.id,
-    item.value,
-  ])
-);
-assert.deepEqual(
-  templateRoadmapCapabilityChainView.itemViews.map((item) => item.id),
-  [...TEMPLATE_ROADMAP_CAPABILITY_CHAIN_HANDOFF_ITEM_IDS],
-  'Template roadmap capability chain should expose the stable 30-slice roadmap, template, worksheet, AI, runtime, print, and export order.'
-);
-assert.equal(templateRoadmapCapabilityChainView.itemViews.length, 30);
-assert.equal(
-  new Set(TEMPLATE_ROADMAP_CAPABILITY_CHAIN_HANDOFF_ITEM_IDS).size,
-  30
-);
-assert.equal(TEMPLATE_ROADMAP_CAPABILITY_CHAIN_SOURCE_FILES.length, 30);
-for (const filePath of TEMPLATE_ROADMAP_CAPABILITY_CHAIN_SOURCE_FILES) {
-  assert.ok(
-    existsSync(filePath),
-    `Missing template roadmap capability chain file ${filePath}`
-  );
-}
-assert.ok(
-  templateRoadmapCapabilityChainView.itemViews.every(
-    (item) => item.ariaLabel && item.description && item.label && item.value
-  )
-);
-assert.deepEqual(templateRoadmapCapabilityChainView.privacy, {
-  chainSourceFileCount: TEMPLATE_ROADMAP_CAPABILITY_CHAIN_SOURCE_FILES.length,
-  createsAssignmentLinksWithoutTeacherAction: false,
-  createsParallelWorksheetModel: false,
-  exposesAnswerKeysToPublicPayload: false,
-  exposesPromptTextInHandoff: false,
-  exposesRawAiOutput: false,
-  exposesRawSourceText: false,
-  exposesSourceMaterialFileIds: false,
-  exposesSourceMaterialStorageKeys: false,
-  itemIds: [...TEMPLATE_ROADMAP_CAPABILITY_CHAIN_HANDOFF_ITEM_IDS],
-  mutatesExistingAssignmentSnapshots: false,
-  readsSourceMaterialFileBytes: false,
-  requiresCreateActivityInputContract: true,
-  requiresTeacherReviewBeforePersistence: true,
-  sourceFiles: [...TEMPLATE_ROADMAP_CAPABILITY_CHAIN_SOURCE_FILES],
-  usesSharedActivityAssignmentModel: true,
-  usesAuthoringLibraryChain: true,
-});
-assert.deepEqual(
-  [
-    ACTIVITY_AUTHORING_LIBRARY_CHAIN_HANDOFF_ITEM_IDS.length,
-    ACTIVITY_AI_AUTHORING_CHAIN_HANDOFF_ITEM_IDS.length,
-    ACTIVITY_AI_ENHANCEMENT_ROADMAP_CHAIN_HANDOFF_ITEM_IDS.length,
-    ACTIVITY_AI_ENHANCEMENT_POLICY_ITEM_IDS.length,
-    ACTIVITY_AI_ENHANCEMENT_EXECUTION_ITEM_IDS.length,
-    WORKSHEET_MODE_DELIVERY_CHAIN_HANDOFF_ITEM_IDS.length,
-    STUDENT_RUNNER_PLAY_CHAIN_HANDOFF_ITEM_IDS.length,
-  ],
-  Array.from({ length: 7 }, () => 30),
-  'Template roadmap capability chain should stay backed by focused roadmap, template, AI, worksheet, runtime, print, and export gates.'
-);
-assert.deepEqual(Object.fromEntries(templateRoadmapCapabilityChainValues), {
-  'ai-draft-capability': 'Teacher-reviewed draft',
-  'ai-remix-assist': 'Missing-field completion',
-  'assignment-snapshot-extension': 'AssignmentSnapshot',
-  'create-input-contract': 'CreateActivityInput',
-  'current-loop-signal': 'Create -> publish -> play -> results',
-  'deterministic-remix-foundation': 'Ready targets first',
-  'fill-blank-runtime': 'Inline blanks',
-  'group-sort-runtime': 'Category board',
-  'line-match-runtime': 'Connection board',
-  'listening-runtime': 'Speech track',
-  'liveworksheets-mode-set': '4 worksheet modes',
-  'matching-pairs-runtime': 'Left/right cards',
-  'open-box-runtime': 'Reveal flow',
-  'printable-follow-up': 'Teacher print route',
-  'privacy-model-guard': 'No parallel model',
-  'product-roadmap-boundary': Routes.Roadmap,
-  'public-template-entry': Routes.Templates,
-  'public-worksheet-entry': Routes.Worksheets,
-  'quiz-choice-generation': 'ActivityQuestion.options',
-  'result-export-continuity': 'Shared result export',
-  'shared-create-editor': Routes.Create,
-  'source-extraction-readiness': 'Future extraction paths',
-  'spreadsheet-import-path': 'Structured import readiness',
-  'student-runtime-routing': 'Runtime item kind',
-  'teacher-audio-path': 'Listening draft readiness',
-  'template-readiness-diagnosis': 'Ready and locked modes',
-  'authoring-library-chain-boundary': '30 authoring slices',
-  'template-scaffold-coverage': 'All template scaffolds',
-  'wordwall-template-set': '8 template modes',
-  'worksheet-extraction-path': 'Worksheet import readiness',
-});
 assert.match(
   readFileSync('tests/e2e/TEST-CATALOG.md', 'utf8'),
-  /Template roadmap capability chain has a fast script-level gate via[\s\S]*scripts\/template-roadmap-capability-chain-handoff\.test\.ts/,
+  /Template roadmap capability chain has a fast script-level gate via[\s\S]*scripts\/template-roadmap-capability-chain\.test\.ts/,
   'TEST-CATALOG should document the template roadmap capability chain gate.'
 );
 assert.match(
@@ -39427,7 +36286,7 @@ const entryPageViewSource = readFileSync(
 );
 assert.match(
   entryPageViewSource,
-  /export type EntryActionSearch = CreateActivityTemplateSearch;[\s\S]*export type EntryAction = TemplateEntryAction;[\s\S]*export type LinkAction = TemplateEntryLinkAction;[\s\S]*export type CreateLinkAction = TemplateEntryCreateLinkAction;[\s\S]*export type WorksheetsPageHeroActionView = EntryAction & \{/,
+  /export type EntryAction = TemplateEntryAction;[\s\S]*type LinkAction = TemplateEntryLinkAction;[\s\S]*type CreateLinkAction = TemplateEntryCreateLinkAction;[\s\S]*export type WorksheetsPageHeroActionView = EntryAction & \{/,
   'Entry page view domain should export focused entry and link action contracts.'
 );
 assert.match(
@@ -39452,7 +36311,7 @@ assert.doesNotMatch(
 );
 assert.match(
   entryPageViewSource,
-  /type CreateActivityTemplateSearch,[\s\S]*type TemplateEntryAction,[\s\S]*type TemplateEntryCreateLinkAction,[\s\S]*type TemplateEntryLinkAction,[\s\S]*export type EntryActionSearch = CreateActivityTemplateSearch;[\s\S]*export type EntryAction = TemplateEntryAction;[\s\S]*export type LinkAction = TemplateEntryLinkAction;[\s\S]*export type CreateLinkAction = TemplateEntryCreateLinkAction;/,
+  /type TemplateEntryAction,[\s\S]*type TemplateEntryCreateLinkAction,[\s\S]*type TemplateEntryLinkAction,[\s\S]*export type EntryAction = TemplateEntryAction;[\s\S]*type LinkAction = TemplateEntryLinkAction;[\s\S]*type CreateLinkAction = TemplateEntryCreateLinkAction;/,
   'Template and worksheet entry view-models should reuse the explicit template-entry action contracts.'
 );
 assert.doesNotMatch(
@@ -39462,7 +36321,7 @@ assert.doesNotMatch(
 );
 assert.doesNotMatch(
   entryPageViewSource,
-  /export type EntryAction = \{[\s\S]*to: typeof Routes\.Create|export type LinkAction = \{[\s\S]*Routes\.StudentPreview/,
+  /export type EntryAction = \{[\s\S]*to: typeof Routes\.Create|type LinkAction = \{[\s\S]*Routes\.StudentPreview/,
   'Entry page view-models should not redeclare route action shapes locally.'
 );
 assert.match(
@@ -40725,12 +37584,12 @@ const dashboardOverviewLoopStatusSource = getSourceSlice(
 );
 assert.match(
   dashboardOverviewDomainSource,
-  /export type DashboardOverviewOwnerActivitySummary[\s\S]*export type DashboardOverviewOwnerAssignmentSummary/,
+  /type DashboardOverviewOwnerActivitySummary[\s\S]*type DashboardOverviewOwnerAssignmentSummary/,
   'Dashboard overview should name owner-scoped real-data summary contracts explicitly.'
 );
 assert.match(
   dashboardOverviewDomainSource,
-  /export type DashboardOverviewQueryBoundaryState[\s\S]*export type DashboardOverviewQueryBoundary[\s\S]*scope: 'teacher-dashboard-query-boundary'/,
+  /type DashboardOverviewQueryBoundaryState[\s\S]*type DashboardOverviewQueryBoundary[\s\S]*scope: 'teacher-dashboard-query-boundary'/,
   'Dashboard overview should expose a query boundary for independently resolved owner summaries.'
 );
 assert.match(
@@ -52646,139 +49505,6 @@ assert.match(
   }),
   /Jan 1, 2026, 10:00 AM/
 );
-assert.equal(
-  ASSIGNMENT_RESULT_SUBMITTED_DATE_CHAIN_HANDOFF_ITEM_IDS.length,
-  30
-);
-assert.equal(
-  ASSIGNMENT_RESULT_SUBMITTED_DATE_CHAIN_SOURCE_FILES.length,
-  30
-);
-for (const filePath of ASSIGNMENT_RESULT_SUBMITTED_DATE_CHAIN_SOURCE_FILES) {
-  assert.ok(existsSync(filePath), `Missing submitted-date chain ${filePath}`);
-}
-const submittedDateChainView =
-  buildAssignmentResultSubmittedDateChainHandoffView();
-assert.deepEqual(
-  submittedDateChainView.itemViews.map((itemView) => itemView.id),
-  [...ASSIGNMENT_RESULT_SUBMITTED_DATE_CHAIN_HANDOFF_ITEM_IDS]
-);
-assert.deepEqual(submittedDateChainView.privacy, {
-  chainSourceFileCount:
-    ASSIGNMENT_RESULT_SUBMITTED_DATE_CHAIN_SOURCE_FILES.length,
-  copyArtifactsUseFormattedDates: true,
-  csvDatesUseIsoFormatter: true,
-  exportIncludesSubmittedDateColumns: true,
-  exposesCsvDataUrlInHandoff: false,
-  exposesRawAnonymousTokensInHandoff: false,
-  exposesRawCompletedAtValuesInHandoff: false,
-  exposesStudentAnswerTextInHandoff: false,
-  exposesStudentLabelsInHandoff: false,
-  exposesStudentNamesInHandoff: false,
-  itemIds: [...ASSIGNMENT_RESULT_SUBMITTED_DATE_CHAIN_HANDOFF_ITEM_IDS],
-  preservesTeacherOnlyResultScope: true,
-  sortingUsesTimestampParsing: true,
-  sourceFiles: [...ASSIGNMENT_RESULT_SUBMITTED_DATE_CHAIN_SOURCE_FILES],
-  uiDatesUseLocalizedFormatter: true,
-  usesCopyArtifactHandoff: true,
-});
-assert.equal(
-  submittedDateChainView.itemViews.find(
-    (itemView) => itemView.id === 'copy-artifact-handoff-boundary'
-  )?.value,
-  '30 artifact slices'
-);
-assert.equal(
-  submittedDateChainView.itemViews.find(
-    (itemView) => itemView.id === 'csv-date-iso-output'
-  )?.value,
-  'ISO string'
-);
-assert.equal(
-  ASSIGNMENT_RESULT_ACCEPTED_ANSWER_CHAIN_HANDOFF_ITEM_IDS.length,
-  30
-);
-assert.equal(
-  ASSIGNMENT_RESULT_ACCEPTED_ANSWER_CHAIN_SOURCE_FILES.length,
-  30
-);
-for (const filePath of ASSIGNMENT_RESULT_ACCEPTED_ANSWER_CHAIN_SOURCE_FILES) {
-  assert.ok(existsSync(filePath), `Missing accepted-answer chain ${filePath}`);
-}
-const acceptedAnswerChainView =
-  buildAssignmentResultAcceptedAnswerChainHandoffView();
-assert.deepEqual(
-  acceptedAnswerChainView.itemViews.map((itemView) => itemView.id),
-  [...ASSIGNMENT_RESULT_ACCEPTED_ANSWER_CHAIN_HANDOFF_ITEM_IDS]
-);
-assert.deepEqual(acceptedAnswerChainView.privacy, {
-  chainSourceFileCount:
-    ASSIGNMENT_RESULT_ACCEPTED_ANSWER_CHAIN_SOURCE_FILES.length,
-  csvExportsUseSharedAnswerView: true,
-  exposesCsvDataUrlInHandoff: false,
-  exposesPromptTextInHandoff: false,
-  exposesRawRuntimeItemIdsInHandoff: false,
-  exposesStudentAnswerTextInHandoff: false,
-  exposesStudentNamesInHandoff: false,
-  exposesTeacherAnswerTextInHandoff: false,
-  itemIds: [...ASSIGNMENT_RESULT_ACCEPTED_ANSWER_CHAIN_HANDOFF_ITEM_IDS],
-  resultPagesUseSharedAnswerView: true,
-  scoringUsesSharedAcceptedAnswerParser: true,
-  sourceFiles: [...ASSIGNMENT_RESULT_ACCEPTED_ANSWER_CHAIN_SOURCE_FILES],
-  splitsPrimaryFromAlternatives: true,
-  usesResultReviewHandoff: true,
-});
-assert.equal(
-  acceptedAnswerChainView.itemViews.find(
-    (itemView) => itemView.id === 'result-review-handoff-boundary'
-  )?.value,
-  '30 review slices'
-);
-assert.equal(
-  acceptedAnswerChainView.itemViews.find(
-    (itemView) => itemView.id === 'accepted-alternatives-text'
-  )?.value,
-  'Alternatives only'
-);
-assert.equal(ASSIGNMENT_RESULT_EXPLANATION_CHAIN_HANDOFF_ITEM_IDS.length, 30);
-assert.equal(ASSIGNMENT_RESULT_EXPLANATION_CHAIN_SOURCE_FILES.length, 30);
-for (const filePath of ASSIGNMENT_RESULT_EXPLANATION_CHAIN_SOURCE_FILES) {
-  assert.ok(existsSync(filePath), `Missing explanation chain ${filePath}`);
-}
-const explanationChainView = buildAssignmentResultExplanationChainHandoffView();
-assert.deepEqual(
-  explanationChainView.itemViews.map((itemView) => itemView.id),
-  [...ASSIGNMENT_RESULT_EXPLANATION_CHAIN_HANDOFF_ITEM_IDS]
-);
-assert.deepEqual(explanationChainView.privacy, {
-  chainSourceFileCount: ASSIGNMENT_RESULT_EXPLANATION_CHAIN_SOURCE_FILES.length,
-  copyArtifactsUseFormattedExplanations: true,
-  csvExportsUseFormattedExplanations: true,
-  exposesCsvDataUrlInHandoff: false,
-  exposesPromptTextInHandoff: false,
-  exposesRawRuntimeItemIdsInHandoff: false,
-  exposesStudentAnswerTextInHandoff: false,
-  exposesStudentNamesInHandoff: false,
-  exposesTeacherExplanationTextInHandoff: false,
-  itemIds: [...ASSIGNMENT_RESULT_EXPLANATION_CHAIN_HANDOFF_ITEM_IDS],
-  printableAnswerKeysUseFormattedExplanations: true,
-  publicFeedbackRespectsAnswerReveal: true,
-  resultPagesUseFormattedExplanations: true,
-  sourceFiles: [...ASSIGNMENT_RESULT_EXPLANATION_CHAIN_SOURCE_FILES],
-  usesResultMaterialHandoff: true,
-});
-assert.equal(
-  explanationChainView.itemViews.find(
-    (itemView) => itemView.id === 'result-material-handoff-boundary'
-  )?.value,
-  '30 material slices'
-);
-assert.equal(
-  explanationChainView.itemViews.find(
-    (itemView) => itemView.id === 'csv-answer-row-explanation'
-  )?.value,
-  'Formatted text'
-);
 assert.equal(formatAcceptedAnswerAlternatives([]), '-');
 assert.equal(formatAcceptedAnswerAlternatives(['Paris']), '-');
 assert.equal(
@@ -61315,7 +58041,7 @@ assert.match(
 );
 assert.match(
   assignmentStudentFollowUpSummarySource,
-  /export type AssignmentStudentFollowUpSummaryCoverageItemId[\s\S]*'latest-attempt-details'[\s\S]*'last-submitted-context'[\s\S]*'review-needed-students'[\s\S]*'students'[\s\S]*export type AssignmentStudentFollowUpSummaryCoverageItemView = \{[\s\S]*description: string;[\s\S]*id: AssignmentStudentFollowUpSummaryCoverageItemId;[\s\S]*label: string;[\s\S]*value: string;/,
+  /type AssignmentStudentFollowUpSummaryCoverageItemId[\s\S]*'latest-attempt-details'[\s\S]*'last-submitted-context'[\s\S]*'review-needed-students'[\s\S]*'students'[\s\S]*export type AssignmentStudentFollowUpSummaryCoverageItemView = \{[\s\S]*description: string;[\s\S]*id: AssignmentStudentFollowUpSummaryCoverageItemId;[\s\S]*label: string;[\s\S]*value: string;/,
   'Assignment student follow-up summaries should expose stable prepared coverage item views.'
 );
 assert.match(

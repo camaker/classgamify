@@ -52,7 +52,7 @@ export type AssignmentStudentFollowUpSummaryStudentView = {
   text: string;
 };
 
-export type AssignmentStudentFollowUpSummaryCoverageItemId =
+type AssignmentStudentFollowUpSummaryCoverageItemId =
   | 'latest-attempt-details'
   | 'last-submitted-context'
   | 'review-needed-students'

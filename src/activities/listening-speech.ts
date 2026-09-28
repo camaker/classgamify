@@ -1,6 +1,6 @@
 import { m } from '@/locale/paraglide/messages';
 
-export type ListeningPromptStatusItemId = 'language' | 'speech' | 'transcript';
+type ListeningPromptStatusItemId = 'language' | 'speech' | 'transcript';
 
 type ListeningPromptStatusItemView = {
   description: string;

@@ -11,26 +11,26 @@ import {
 import { m } from '@/locale/paraglide/messages';
 import { Routes } from '@/lib/routes';
 
-export type DashboardOverviewOwnerActivitySummary = {
+type DashboardOverviewOwnerActivitySummary = {
   draftActivities: number;
   templateCoverage: number;
   totalActivities: number;
 };
 
-export type DashboardOverviewOwnerAssignmentSummary = {
+type DashboardOverviewOwnerAssignmentSummary = {
   averageScore: number;
   completions: number;
   openAssignments: number;
   totalAssignments: number;
 };
 
-export type DashboardOverviewQueryBoundaryState =
+type DashboardOverviewQueryBoundaryState =
   | 'activity-loading'
   | 'assignment-loading'
   | 'both-loading'
   | 'both-ready';
 
-export type DashboardOverviewQueryBoundary = {
+type DashboardOverviewQueryBoundary = {
   activitiesResolved: boolean;
   assignmentsResolved: boolean;
   countsStarterPreviewAsOwnedMetrics: false;
@@ -109,12 +109,12 @@ type DashboardOverviewOwnerAssignmentData = {
   summary?: DashboardOverviewOwnerAssignmentSummary;
 };
 
-export type DashboardOverviewActionCardId =
+type DashboardOverviewActionCardId =
   | 'activities'
   | 'assignments'
   | 'student-preview';
 
-export type DashboardOverviewActionCard = {
+type DashboardOverviewActionCard = {
   ariaLabel: string;
   cta: string;
   description: string;
@@ -123,15 +123,15 @@ export type DashboardOverviewActionCard = {
   to: string;
 };
 
-export type DashboardCoreLoopReadinessId =
+type DashboardCoreLoopReadinessId =
   | 'activity-authoring'
   | 'assignment-links'
   | 'student-runner'
   | 'teacher-results';
 
-export type DashboardCoreLoopReadinessStatus = 'blocked' | 'partial' | 'ready';
+type DashboardCoreLoopReadinessStatus = 'blocked' | 'partial' | 'ready';
 
-export type DashboardCoreLoopReadinessRow = {
+type DashboardCoreLoopReadinessRow = {
   ariaLabel: string;
   description: string;
   id: DashboardCoreLoopReadinessId;
@@ -142,7 +142,7 @@ export type DashboardCoreLoopReadinessRow = {
   value: number;
 };
 
-export type DashboardCoreLoopReadinessView = {
+type DashboardCoreLoopReadinessView = {
   ariaLabel: string;
   description: string;
   rows: DashboardCoreLoopReadinessRow[];
@@ -151,7 +151,7 @@ export type DashboardCoreLoopReadinessView = {
   title: string;
 };
 
-export type DashboardOverviewPreview = {
+type DashboardOverviewPreview = {
   activity: ActivitySeed;
   assignment: AssignmentSeed;
   source: 'starter-preview';

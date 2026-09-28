@@ -42,7 +42,7 @@ export const ACTIVITY_AI_ENHANCEMENT_SAVE_BOUNDARY_ITEM_IDS = [
   'editor-review-handoff-boundary',
 ] as const;
 
-export type ActivityAiEnhancementSaveBoundaryItemId =
+type ActivityAiEnhancementSaveBoundaryItemId =
   (typeof ACTIVITY_AI_ENHANCEMENT_SAVE_BOUNDARY_ITEM_IDS)[number];
 
 export type ActivityAiEnhancementSaveBoundaryMode = 'create' | 'edit';
@@ -90,7 +90,7 @@ export type ActivityAiEnhancementSaveBoundaryPlan = {
   teacherSubmittedSave: boolean;
 };
 
-export type ActivityAiEnhancementSaveBoundaryItemView = {
+type ActivityAiEnhancementSaveBoundaryItemView = {
   ariaLabel: string;
   description: string;
   id: ActivityAiEnhancementSaveBoundaryItemId;
@@ -98,7 +98,7 @@ export type ActivityAiEnhancementSaveBoundaryItemView = {
   value: string;
 };
 
-export type ActivityAiEnhancementSaveBoundaryPrivacyContract = {
+type ActivityAiEnhancementSaveBoundaryPrivacyContract = {
   appliesAfterEditorReview: true;
   createsAssignmentLinksWithoutTeacherAction: false;
   exposesAnswerKeysToPublicPayload: false;
@@ -125,7 +125,7 @@ export type ActivityAiEnhancementSaveBoundaryPrivacyContract = {
   writesOnlyActivityRecord: true;
 };
 
-export type ActivityAiEnhancementSaveBoundaryView = {
+type ActivityAiEnhancementSaveBoundaryView = {
   description: string;
   itemViews: ActivityAiEnhancementSaveBoundaryItemView[];
   plan: ActivityAiEnhancementSaveBoundaryPlan;

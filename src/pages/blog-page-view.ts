@@ -14,7 +14,7 @@ export type BlogCtaAction = {
   variant?: 'default' | 'outline';
 };
 
-export type BlogListPageViewModel = {
+type BlogListPageViewModel = {
   ctaActions: BlogCtaAction[];
   description: string;
   eyebrow: string;
@@ -23,7 +23,7 @@ export type BlogListPageViewModel = {
   title: string;
 };
 
-export type BlogPostCtaViewModel = {
+type BlogPostCtaViewModel = {
   actions: BlogCtaAction[];
   description: string;
   title: string;

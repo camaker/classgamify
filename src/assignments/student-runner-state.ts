@@ -81,11 +81,9 @@ import {
 } from '@/assignments/student-runner-view';
 import { m } from '@/locale/paraglide/messages';
 
-export type StudentRunnerReadyStateSource =
-  | 'public-assignment'
-  | 'starter-preview';
+type StudentRunnerReadyStateSource = 'public-assignment' | 'starter-preview';
 
-export type StudentRunnerStarterPreview = {
+type StudentRunnerStarterPreview = {
   activity: ActivitySeed;
   assignment: AssignmentSeed;
   runtimeItems: PublicRuntimeItem[];
@@ -142,7 +140,7 @@ export type StudentRunnerMissingPageView = {
   unavailableSafetyView?: StudentRunnerUnavailableSafetyView;
 };
 
-export type StudentRunnerUnavailableSafetyItemId =
+type StudentRunnerUnavailableSafetyItemId =
   | 'activity-content'
   | 'answer-feedback'
   | 'browser-identity'
@@ -204,14 +202,14 @@ export type StudentRunnerControlView = {
   unansweredLabel?: string;
 };
 
-export type StudentRunnerSubmissionContractItemId =
+type StudentRunnerSubmissionContractItemId =
   | 'feedback'
   | 'identity'
   | 'payload-summary'
   | 'submit-readiness'
   | 'timer';
 
-export type StudentRunnerSubmissionContractItemView = {
+type StudentRunnerSubmissionContractItemView = {
   ariaLabel: string;
   description: string;
   id: StudentRunnerSubmissionContractItemId;
@@ -228,7 +226,7 @@ type StudentRunnerSubmissionPrivacyContract = {
   metricKeys: StudentRunnerSubmissionPayloadSummaryMetricKey[];
 };
 
-export type StudentRunnerSubmissionContractView = {
+type StudentRunnerSubmissionContractView = {
   description: string;
   itemViews: StudentRunnerSubmissionContractItemView[];
   privacy: StudentRunnerSubmissionPrivacyContract;
@@ -247,10 +245,7 @@ export type StudentRunnerSubmitHintView = {
   tone: 'info' | 'warning';
 };
 
-export type StudentRunnerSubmitReadinessStatus =
-  | 'blocked'
-  | 'needs-action'
-  | 'ready';
+type StudentRunnerSubmitReadinessStatus = 'blocked' | 'needs-action' | 'ready';
 
 type StudentRunnerSubmitReadinessItemId =
   | 'completion'
@@ -259,7 +254,7 @@ type StudentRunnerSubmitReadinessItemId =
   | 'share-link'
   | 'submission-state';
 
-export type StudentRunnerSubmitReadinessItemView = {
+type StudentRunnerSubmitReadinessItemView = {
   ariaLabel: string;
   description: string;
   id: StudentRunnerSubmitReadinessItemId;
@@ -300,13 +295,13 @@ export type StudentRunnerResultPanelView =
       statusLabel: string;
     };
 
-export type StudentRunnerActivityPreviewView = {
+type StudentRunnerActivityPreviewView = {
   activity: ActivitySeed;
   assignment: AssignmentSeed;
   hideAnswers: boolean;
 };
 
-export type StudentRunnerRuntimeListView = {
+type StudentRunnerRuntimeListView = {
   disabled: boolean;
   items: PublicRuntimeItem[];
   language?: string;
@@ -315,12 +310,12 @@ export type StudentRunnerRuntimeListView = {
   templateType: ActivityTemplateType;
 };
 
-export type StudentRunnerSeoView = {
+type StudentRunnerSeoView = {
   description: string;
   titlePrefix: string;
 };
 
-export type StudentRunnerPageViewModel = {
+type StudentRunnerPageViewModel = {
   activeShareId: string;
   activity: ActivitySeed | undefined;
   anonymousAttemptCopy: AnonymousAttemptCopy;
@@ -351,7 +346,7 @@ export type StudentRunnerPageViewModel = {
   timeLimitSeconds?: number;
 };
 
-export type StudentRunnerRouteState =
+type StudentRunnerRouteState =
   | {
       pageView: StudentRunnerPageViewModel;
       status: 'loading';
@@ -376,7 +371,7 @@ export type StudentRunnerRouteState =
       status: 'ready';
     };
 
-export type StudentRunnerAttemptResetState = {
+type StudentRunnerAttemptResetState = {
   answers: StudentAnswerMap;
   anonymousToken?: string;
   attemptClock?: StudentRunnerAttemptClock;
@@ -386,7 +381,7 @@ export type StudentRunnerAttemptResetState = {
   submittedAttemptCount: number;
 };
 
-export type StudentRunnerAttemptRestartPlan = Pick<
+type StudentRunnerAttemptRestartPlan = Pick<
   StudentRunnerAttemptResetState,
   'answers' | 'attemptClock' | 'confirmIncompleteSubmit' | 'submissionKey'
 > & {
@@ -399,7 +394,7 @@ export type StudentRunnerAttemptClock = {
   startedAt: number;
 };
 
-export type StudentRunnerTimerTickPlan =
+type StudentRunnerTimerTickPlan =
   | {
       intervalMs: number;
       type: 'tick';
@@ -408,7 +403,7 @@ export type StudentRunnerTimerTickPlan =
       type: 'skip';
     };
 
-export type StudentRunnerAttemptSessionResetPlan =
+type StudentRunnerAttemptSessionResetPlan =
   | {
       type: 'skip';
     }
@@ -418,7 +413,7 @@ export type StudentRunnerAttemptSessionResetPlan =
       type: 'reset';
     });
 
-export type StudentRunnerAttemptClockStartPlan =
+type StudentRunnerAttemptClockStartPlan =
   | {
       attemptClock: StudentRunnerAttemptClock;
       now: number;
@@ -428,14 +423,14 @@ export type StudentRunnerAttemptClockStartPlan =
       type: 'skip';
     };
 
-export type StudentRunnerAttemptSubmissionResponse = {
+type StudentRunnerAttemptSubmissionResponse = {
   attemptUsage: AssignmentAttemptUsage;
   result: PublicAttemptResult;
   reviewSummary?: PublicAttemptReviewSummary;
   reviewItems: PublicAttemptReviewItem[];
 };
 
-export type StudentRunnerAnswerUpdatePlan =
+type StudentRunnerAnswerUpdatePlan =
   | {
       answers: StudentAnswerMap;
       confirmIncompleteSubmit: false;
@@ -445,7 +440,7 @@ export type StudentRunnerAnswerUpdatePlan =
       type: 'ignored';
     };
 
-export type StudentRunnerAnonymousTokenPlan =
+type StudentRunnerAnonymousTokenPlan =
   | {
       type: 'skip';
     }
@@ -454,7 +449,7 @@ export type StudentRunnerAnonymousTokenPlan =
       type: 'resolve';
     };
 
-export type StudentRunnerSubmissionPlan = StudentAttemptSubmissionPlan;
+type StudentRunnerSubmissionPlan = StudentAttemptSubmissionPlan;
 
 type StudentRunnerSubmissionMessageReason =
   | StudentAttemptSubmissionBlockedReason
@@ -462,7 +457,7 @@ type StudentRunnerSubmissionMessageReason =
 
 type StudentRunnerSubmissionMessageTone = 'error' | 'warning';
 
-export type StudentRunnerSubmissionExecutionPlan =
+type StudentRunnerSubmissionExecutionPlan =
   | {
       message: string;
       messageTone: StudentRunnerSubmissionMessageTone;
@@ -481,7 +476,7 @@ export type StudentRunnerSubmissionExecutionPlan =
       type: 'submit';
     };
 
-export type StudentRunnerSubmissionPayloadSummary = {
+type StudentRunnerSubmissionPayloadSummary = {
   answerCount: number;
   itemCount: number;
   shareSlug: string;
@@ -510,7 +505,7 @@ export type StudentRunnerSubmissionPayloadSummaryView = {
   title: string;
 };
 
-export type StudentRunnerSubmissionSuccessState = {
+type StudentRunnerSubmissionSuccessState = {
   anonymousToken: string | undefined;
   confirmIncompleteSubmit: false;
   result: StudentRunnerAttemptResult;

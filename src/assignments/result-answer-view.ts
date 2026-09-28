@@ -12,19 +12,19 @@ import { m } from '@/locale/paraglide/messages';
 
 export type AssignmentResultAnswerStatusTone = 'correct' | 'idle' | 'review';
 
-export type AssignmentResultAnswerStatusView = {
+type AssignmentResultAnswerStatusView = {
   exportLabel: string;
   label: string;
   tone: AssignmentResultAnswerStatusTone;
 };
 
-export type AssignmentResultAcceptedAnswerView = {
+type AssignmentResultAcceptedAnswerView = {
   acceptedAlternativesText: string;
   expectedAnswerText: string;
   optionalAcceptedAlternativesText: string | null;
 };
 
-export type AssignmentResultAttemptAnswerTextView =
+type AssignmentResultAttemptAnswerTextView =
   AssignmentResultAcceptedAnswerView & {
     exportStatusLabel: string;
     exportStudentAnswerText: string;

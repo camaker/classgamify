@@ -33,7 +33,7 @@ export const ATTEMPT_SUBMISSION_IDEMPOTENCY_STAGES = [
   stage('private-key-boundary', 'privacy'),
 ] as const;
 
-export type AttemptSubmissionIdempotencyLayer =
+type AttemptSubmissionIdempotencyLayer =
   | 'client'
   | 'database'
   | 'privacy'

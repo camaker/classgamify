@@ -4,7 +4,7 @@ import {
   type AssignmentAttemptReviewAnswer,
 } from '@/assignments/results';
 
-export type AssignmentAttemptReviewSummary = {
+type AssignmentAttemptReviewSummary = {
   correctItemCount: number;
   needsReviewItemCount: number;
   submittedItemCount: number;

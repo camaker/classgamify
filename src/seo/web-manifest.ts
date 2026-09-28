@@ -7,14 +7,14 @@ export const WEB_MANIFEST_HEADERS = {
   'Content-Type': 'application/manifest+json; charset=utf-8',
 };
 
-export type WebAppManifestIcon = {
+type WebAppManifestIcon = {
   purpose?: string;
   sizes: string;
   src: string;
   type: string;
 };
 
-export type WebAppManifest = {
+type WebAppManifest = {
   background_color: string;
   description?: string;
   display: 'standalone';
@@ -26,7 +26,7 @@ export type WebAppManifest = {
   theme_color: string;
 };
 
-export type WebAppManifestInstallBoundary = {
+type WebAppManifestInstallBoundary = {
   hasConfiguredDescription: boolean;
   hasConfiguredName: boolean;
   hasMaskableIcons: boolean;

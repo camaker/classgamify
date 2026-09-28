@@ -60,8 +60,6 @@ import {
   buildActivityTemplateScaffoldInput,
   buildActivityTemplateScaffoldReadinessSummary,
   getActivityTemplateScaffold,
-  type ActivityTemplateScaffoldCoverageMetricView,
-  type ActivityTemplateScaffoldReadyOptionView,
   type ActivityTemplateScaffoldReadinessSummary,
 } from '@/activities/scaffolds';
 import {
@@ -130,7 +128,7 @@ export type ActivityEditorWorkflowStepView = {
   title: string;
 };
 
-export type ActivityEditorWorkflowView = {
+type ActivityEditorWorkflowView = {
   ariaLabel: string;
   steps: ActivityEditorWorkflowStepView[];
 };
@@ -167,7 +165,7 @@ export type ActivityEditorTemplateSetupView = {
   title: string;
 };
 
-export type ActivityEditorTemplateScaffoldReviewItemId =
+type ActivityEditorTemplateScaffoldReviewItemId =
   | 'check-ready-modes'
   | 'edit-before-save'
   | 'review-fields';
@@ -183,15 +181,6 @@ export type ActivityEditorTemplateScaffoldReviewItemView = {
 
 export type ActivityEditorTemplateRequirementBadgeView =
   TemplateRequirementView;
-
-export type ActivityEditorTemplateScaffoldSummaryView =
-  ActivityTemplateScaffoldReadinessSummary;
-
-export type ActivityEditorTemplateScaffoldCoverageMetricView =
-  ActivityTemplateScaffoldCoverageMetricView;
-
-export type ActivityEditorTemplateScaffoldReadyOptionView =
-  ActivityTemplateScaffoldReadyOptionView;
 
 type ActivityEditorSelectOption<TValue extends string> = {
   label: string;
@@ -273,7 +262,7 @@ export const ACTIVITY_EDITOR_AI_DRAFT_SOURCE_CONTROL_IDS = {
   syncMaterialsHelp: 'activity-ai-sync-materials-help',
 } as const;
 
-export type ActivityEditorAiDraftSourceControlIds =
+type ActivityEditorAiDraftSourceControlIds =
   typeof ACTIVITY_EDITOR_AI_DRAFT_SOURCE_CONTROL_IDS;
 
 export type ActivityEditorAiDraftSourceControlBoundaryView = {
@@ -337,7 +326,7 @@ export type ActivityEditorAiDraftPanelView = {
 export type ActivityEditorAiDraftSourceCapabilityCardView =
   ActivityEditorAiDraftSourceCapabilityView;
 
-export type ActivityEditorDraftGenerationBlockedReason =
+type ActivityEditorDraftGenerationBlockedReason =
   | 'auth-required'
   | 'source-required'
   | 'source-too-long';
@@ -354,7 +343,7 @@ type ActivityEditorDraftGenerationGate =
       sourceText: string;
     };
 
-export type ActivityEditorDraftGenerationExecutionPlan =
+type ActivityEditorDraftGenerationExecutionPlan =
   | {
       failureMessage: string;
       message: string;
@@ -398,7 +387,7 @@ type ActivityEditorSaveGate =
       mode: 'edit';
     };
 
-export type ActivityEditorSaveExecutionPlan =
+type ActivityEditorSaveExecutionPlan =
   | {
       failureMessage: string;
       message: string;
@@ -435,35 +424,33 @@ export type ActivityEditorTemplateView = {
 
 export type ActivityEditorSelectedTemplateView = ActivityTemplateDefinition;
 
-export type ActivityCreatePageInputShapeItemId =
+type ActivityCreatePageInputShapeItemId =
   | 'groups'
   | 'notes'
   | 'pairs'
   | 'questions';
 
-export type ActivityCreatePageInputShapeItemView = {
+type ActivityCreatePageInputShapeItemView = {
   id: ActivityCreatePageInputShapeItemId;
   label: string;
 };
 
-export type ActivityCreatePageInputShapeView = {
+type ActivityCreatePageInputShapeView = {
   itemViews: ActivityCreatePageInputShapeItemView[];
   title: string;
 };
 
-export type ActivityCreatePageTemplateEntryMetricId =
-  | 'readyModes'
-  | 'runtimeItems';
+type ActivityCreatePageTemplateEntryMetricId = 'readyModes' | 'runtimeItems';
 
-export type ActivityCreatePageTemplateEntryMetricView = {
+type ActivityCreatePageTemplateEntryMetricView = {
   id: ActivityCreatePageTemplateEntryMetricId;
   label: string;
   value: string;
 };
 
-export type ActivityCreatePageTemplateSource = CreateActivityTemplateSource;
+type ActivityCreatePageTemplateSource = CreateActivityTemplateSource;
 
-export type ActivityCreatePageTemplateEntryView = {
+type ActivityCreatePageTemplateEntryView = {
   description: string;
   isTemplateEntry: boolean;
   metrics: ActivityCreatePageTemplateEntryMetricView[];
@@ -475,7 +462,7 @@ export type ActivityCreatePageTemplateEntryView = {
   title: string;
 };
 
-export type ActivityCreatePageViewModel = {
+type ActivityCreatePageViewModel = {
   hero: {
     badgeLabel: string;
     description: string;
@@ -486,7 +473,7 @@ export type ActivityCreatePageViewModel = {
   templateEntry: ActivityCreatePageTemplateEntryView;
 };
 
-export type ActivityCreatePageEditorViewModel = ActivityCreatePageViewModel & {
+type ActivityCreatePageEditorViewModel = ActivityCreatePageViewModel & {
   initialValues?: CreateActivityInput;
   previewActivity: ActivitySeed;
   previewPanel: ActivityEditorPreviewPanel;
@@ -510,13 +497,13 @@ type ActivityEditorPageBreadcrumb = {
   label: string;
 };
 
-export type ActivityEditPageEditorView = {
+type ActivityEditPageEditorView = {
   activityId: string;
   initialValues: CreateActivityInput;
   mode: 'edit';
 };
 
-export type ActivityEditPageViewModel = {
+type ActivityEditPageViewModel = {
   archivedActivitiesAction: {
     href: typeof Routes.DashboardActivities;
     search: {
@@ -543,7 +530,7 @@ type ActivityEditReadyPageViewModel = ActivityEditPageViewModel & {
   editor: ActivityEditPageEditorView;
 };
 
-export type ActivityEditRouteState =
+type ActivityEditRouteState =
   | {
       pageView: ActivityEditPageViewModel;
       status: 'loading';

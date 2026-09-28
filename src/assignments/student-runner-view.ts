@@ -45,8 +45,6 @@ type StudentRunnerReviewStatus =
   | 'needs-review'
   | 'unanswered';
 
-export type { StudentRunnerReviewStatus };
-
 type RuntimeChoiceAnswerChange = {
   answer: string;
   itemId: string;
@@ -133,7 +131,7 @@ export type ChoicePairingRunnerAction =
       type: 'choose-choice';
     };
 
-export type ChoicePairingRunnerActionResult =
+type ChoicePairingRunnerActionResult =
   | {
       answerChanges: RuntimeChoiceAnswerChange[];
       selectedItemId: undefined;
@@ -157,7 +155,7 @@ export type GroupSortRunnerAction =
       type: 'clear-selected';
     };
 
-export type GroupSortRunnerActionResult =
+type GroupSortRunnerActionResult =
   | {
       answer: string;
       itemId: string;
@@ -196,7 +194,7 @@ type SequentialStudentRunnerItemView = StudentRunnerItemView & {
   sequenceLabel: string;
 };
 
-export type SequentialStudentRunnerNavigationItemView =
+type SequentialStudentRunnerNavigationItemView =
   SequentialStudentRunnerItemView & {
     reviewStatusClassName: string | undefined;
     selected: boolean;
@@ -323,7 +321,7 @@ type StudentRunnerPrepareStepId =
   | 'submit'
   | 'timer';
 
-export type StudentRunnerPrepareStepView = {
+type StudentRunnerPrepareStepView = {
   ariaLabel: string;
   description: string;
   id: StudentRunnerPrepareStepId;

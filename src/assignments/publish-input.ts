@@ -84,7 +84,7 @@ type AssignmentPublishDraftResult =
       reason: AssignmentPublishValidationCode;
     };
 
-export type AssignmentPublishExecutionPlan =
+type AssignmentPublishExecutionPlan =
   | {
       failureMessage: string;
       message: string;
@@ -133,9 +133,9 @@ export type AssignmentPublishPreviewReviewItemId =
 
 export type AssignmentPublishPreviewContextTone = 'blocked' | 'ready';
 
-export type AssignmentPublishDialogAccessStatus = 'blocked' | 'ready';
+type AssignmentPublishDialogAccessStatus = 'blocked' | 'ready';
 
-export type AssignmentPublishFieldControlKey =
+type AssignmentPublishFieldControlKey =
   | 'closeAfter'
   | 'instructions'
   | 'maxAttempts'
@@ -227,24 +227,24 @@ export const ASSIGNMENT_PUBLISH_CONTROL_BOUNDARY_ITEM_IDS = [
 export type AssignmentPublishControlBoundaryItemId =
   (typeof ASSIGNMENT_PUBLISH_CONTROL_BOUNDARY_ITEM_IDS)[number];
 
-export type AssignmentPublishFieldControlIds = {
+type AssignmentPublishFieldControlIds = {
   describedByIds: string[];
   helpId: string;
   inputId: string;
 };
 
-export type AssignmentPublishToggleControlIds = {
+type AssignmentPublishToggleControlIds = {
   describedByIds: string[];
   descriptionId: string;
   inputId: string;
 };
 
-export type AssignmentPublishPreviewStatControlIds = {
+type AssignmentPublishPreviewStatControlIds = {
   labelId: string;
   valueId: string;
 };
 
-export type AssignmentPublishPreviewReviewControlIds = {
+type AssignmentPublishPreviewReviewControlIds = {
   describedByIds: string[];
   descriptionId: string;
   labelledByIds: string[];
@@ -338,7 +338,7 @@ export type AssignmentPublishDialogViewModel = {
   validation: AssignmentPublishDraftValidation;
 };
 
-export type AssignmentPublishToggleKey =
+type AssignmentPublishToggleKey =
   | 'collectStudentName'
   | 'showCorrectAnswers'
   | 'shuffleItems';

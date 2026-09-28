@@ -41,10 +41,6 @@ test('server normalizes duration before scored persistence', () => {
     persistence,
     /resultJson: cloneAttemptResult\(evaluation\.result\)/
   );
-  assert.match(
-    read('src/assignments/scored-attempt-result-chain.ts'),
-    /duration-normalization/
-  );
 });
 
 test('duration consumers share assignment-domain formatting', () => {

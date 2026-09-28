@@ -68,7 +68,7 @@ type ActivityRemixExecutionPlan = {
   type: 'remix';
 };
 
-export type ActivityDerivativeActionExecutionPlan =
+type ActivityDerivativeActionExecutionPlan =
   | ActivityDerivativeBlockedExecutionPlan
   | ActivityDuplicateExecutionPlan
   | ActivityRemixExecutionPlan;
@@ -92,9 +92,7 @@ type ActivityVisibilityAction = Extract<
   'archive' | 'restore'
 >;
 
-export type ActivityVisibilityBlockedReason =
-  | 'already-archived'
-  | 'not-archived';
+type ActivityVisibilityBlockedReason = 'already-archived' | 'not-archived';
 
 type ActivityVisibilityBlockedExecutionPlan = {
   failureMessage: string;
@@ -118,7 +116,7 @@ type ActivityVisibilityUpdateExecutionPlan = {
   type: 'update-visibility';
 };
 
-export type ActivityVisibilityActionExecutionPlan =
+type ActivityVisibilityActionExecutionPlan =
   | ActivityVisibilityBlockedExecutionPlan
   | ActivityVisibilityUpdateExecutionPlan;
 

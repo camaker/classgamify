@@ -43,7 +43,7 @@ export type AttemptIdentitySlot = {
   identityKey: string | null;
 };
 
-export type AttemptSlotReservation<TReplay> =
+type AttemptSlotReservation<TReplay> =
   | {
       previousAttemptCount: number;
       slot: AttemptIdentitySlot;

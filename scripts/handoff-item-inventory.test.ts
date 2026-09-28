@@ -35,9 +35,9 @@ test('handoff inventory discovers product-loop contracts', () => {
   }
 
   assert.ok(
-    // The rendered handoff sections are being retired surface by surface, so
-    // this floor tracks the remaining source-level contracts.
-    inventoryEntries.length >= 37,
+    // Hidden handoff sections are retired; the visible admin users panel is
+    // the remaining handoff contract.
+    inventoryEntries.length >= 1,
     'Handoff inventory should cover the remaining source-level contracts.'
   );
 });

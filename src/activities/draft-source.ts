@@ -22,7 +22,7 @@ export type ActivitySourceMaterialDraftNoteView = {
   name: string;
 };
 
-export type ActivitySourceMaterialDraftKindCounts = Partial<
+type ActivitySourceMaterialDraftKindCounts = Partial<
   Record<ActivityMaterialReference['kind'], number>
 >;
 
@@ -42,7 +42,7 @@ type ActivitySourceMaterialDraftNoteSource = Pick<
   'kind' | 'originalName'
 >;
 
-export type ActivitySourceMaterialDraftSummary = {
+type ActivitySourceMaterialDraftSummary = {
   hasMaterials: boolean;
   kindCounts: ActivitySourceMaterialDraftKindCounts;
   noteViews: ActivitySourceMaterialDraftNoteView[];

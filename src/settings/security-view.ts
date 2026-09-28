@@ -38,7 +38,7 @@ export type SettingsSecurityWorkspaceSummaryView = {
   title: string;
 };
 
-export type SettingsSecurityPageViewModel = {
+type SettingsSecurityPageViewModel = {
   breadcrumbs: DashboardBreadcrumbItem[];
   credentialLoginEnabled: boolean;
   deleteAccountEnabled: boolean;

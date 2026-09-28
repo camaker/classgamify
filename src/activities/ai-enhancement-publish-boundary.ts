@@ -47,17 +47,17 @@ export const ACTIVITY_AI_ENHANCEMENT_PUBLISH_BOUNDARY_ITEM_IDS = [
   'manual-save-handoff-boundary',
 ] as const;
 
-export type ActivityAiEnhancementPublishBoundaryItemId =
+type ActivityAiEnhancementPublishBoundaryItemId =
   (typeof ACTIVITY_AI_ENHANCEMENT_PUBLISH_BOUNDARY_ITEM_IDS)[number];
 
-export type ActivityAiEnhancementPublishBoundaryStatus =
+type ActivityAiEnhancementPublishBoundaryStatus =
   | 'awaiting-activity-record'
   | 'awaiting-publish-action'
   | 'blocked-before-publish'
   | 'blocked-before-save'
   | 'ready-for-assignment-publish';
 
-export type ActivityAiEnhancementPublishExecutionSummary =
+type ActivityAiEnhancementPublishExecutionSummary =
   | {
       reason: AssignmentPublishBlockedReason;
       type: 'blocked';
@@ -66,7 +66,7 @@ export type ActivityAiEnhancementPublishExecutionSummary =
       type: 'publish';
     };
 
-export type ActivityAiEnhancementPublishDialogSummary = {
+type ActivityAiEnhancementPublishDialogSummary = {
   closeAfterStatus: string;
   deliveryRuleCount: number;
   publishAccessValue: string;
@@ -87,7 +87,7 @@ export type ActivityAiEnhancementPublishBoundarySource =
     savedActivityId?: string;
   };
 
-export type ActivityAiEnhancementPublishBoundaryPlan = {
+type ActivityAiEnhancementPublishBoundaryPlan = {
   activityPersisted: boolean;
   canCreateAssignmentLink: boolean;
   canPublishAssignment: boolean;
@@ -101,7 +101,7 @@ export type ActivityAiEnhancementPublishBoundaryPlan = {
   status: ActivityAiEnhancementPublishBoundaryStatus;
 };
 
-export type ActivityAiEnhancementPublishBoundaryItemView = {
+type ActivityAiEnhancementPublishBoundaryItemView = {
   ariaLabel: string;
   description: string;
   id: ActivityAiEnhancementPublishBoundaryItemId;
@@ -109,7 +109,7 @@ export type ActivityAiEnhancementPublishBoundaryItemView = {
   value: string;
 };
 
-export type ActivityAiEnhancementPublishBoundaryPrivacyContract = {
+type ActivityAiEnhancementPublishBoundaryPrivacyContract = {
   appliesAfterActivitySave: true;
   createsAssignmentLinksWithoutTeacherAction: false;
   createsAssignmentSnapshotsWithoutTeacherAction: false;
@@ -141,7 +141,7 @@ export type ActivityAiEnhancementPublishBoundaryPrivacyContract = {
   usesSaveBoundaryPlan: true;
 };
 
-export type ActivityAiEnhancementPublishBoundaryView = {
+type ActivityAiEnhancementPublishBoundaryView = {
   description: string;
   itemViews: ActivityAiEnhancementPublishBoundaryItemView[];
   plan: ActivityAiEnhancementPublishBoundaryPlan;

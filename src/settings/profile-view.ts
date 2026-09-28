@@ -20,7 +20,7 @@ export type SettingsProfileWorkspaceSummaryView = {
   title: string;
 };
 
-export type SettingsProfilePageViewModel = {
+type SettingsProfilePageViewModel = {
   breadcrumbs: DashboardBreadcrumbItem[];
   description: string;
   title: string;

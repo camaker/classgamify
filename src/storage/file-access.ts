@@ -35,16 +35,13 @@ export const STORAGE_FILE_ACCESS_ITEM_IDS = [
   'test-catalog-gate',
 ] as const;
 
-export type StorageFileAccessItemId =
-  (typeof STORAGE_FILE_ACCESS_ITEM_IDS)[number];
-
 export type StorageFileAccessRecord = {
   isPublic: boolean | null;
   originalName?: string | null;
   userId: string;
 };
 
-export type StorageFileAccessDecision =
+type StorageFileAccessDecision =
   | {
       allowed: false;
       reason:
@@ -63,11 +60,11 @@ export type StorageFileAccessDecision =
       status: 200;
     };
 
-export type StorageFileProxyKeyValidation =
+type StorageFileProxyKeyValidation =
   | { key: string; success: true }
   | { reason: 'missing-key' | 'unsafe-key'; success: false };
 
-export type StorageFileResponseHeadersInput = {
+type StorageFileResponseHeadersInput = {
   contentType?: string | null;
   fileRecord?: Pick<StorageFileAccessRecord, 'originalName'> | null;
   isPublicFile: boolean;

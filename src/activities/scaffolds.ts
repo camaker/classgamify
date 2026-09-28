@@ -15,7 +15,7 @@ import {
 } from '@/activities/validation';
 import { m } from '@/locale/paraglide/messages';
 
-export type ActivityTemplateScaffold = Pick<
+type ActivityTemplateScaffold = Pick<
   CreateActivityInput,
   | 'description'
   | 'groupsText'
@@ -36,7 +36,7 @@ type ActivityTemplateScaffoldCoverageMetricId =
   | 'teacherNotes'
   | 'vocabulary';
 
-export type ActivityTemplateScaffoldCoverageTargetMap = Record<
+type ActivityTemplateScaffoldCoverageTargetMap = Record<
   ActivityTemplateScaffoldCoverageMetricId,
   number
 >;
