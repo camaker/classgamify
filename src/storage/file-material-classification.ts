@@ -16,7 +16,7 @@ type UserFileMaterialClassificationInput = {
   originalName?: string | null;
 };
 
-export type UserFileMaterialClassificationView = {
+type UserFileMaterialClassificationView = {
   basis: UserFileMaterialClassificationBasis;
   basisLabel: string;
   contentType?: string;

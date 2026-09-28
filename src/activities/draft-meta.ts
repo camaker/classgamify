@@ -160,7 +160,7 @@ export type ActivityDraftMetaSummaryReadinessOption = {
   template: ActivityTemplateType;
 };
 
-export type ActivityDraftMetaSummarySourceMaterialNoteView =
+type ActivityDraftMetaSummarySourceMaterialNoteView =
   ActivitySourceMaterialDraftNoteView & {
     ariaLabel: string;
     displayText: string;
@@ -249,7 +249,7 @@ export type ActivityDraftMetaReviewGateView = {
   title: string;
 };
 
-export type ActivityDraftMetaSummaryView = {
+type ActivityDraftMetaSummaryView = {
   appliedDescription: string;
   appliedLabel: string;
   coverageStats: ActivityDraftMetaSummaryCoverageStatView[];
@@ -300,7 +300,7 @@ export type ActivityDraftReviewChecklistItemView =
     statusLabel: string;
   };
 
-export type ActivityDraftReviewChecklistStatusView = {
+type ActivityDraftReviewChecklistStatusView = {
   id: ActivityDraftReviewChecklistStatus;
   label: string;
 };

@@ -67,13 +67,13 @@ export type AdminUsersHandoffView = {
   title: string;
 };
 
-export type AdminUsersPageViewModel = {
+type AdminUsersPageViewModel = {
   breadcrumbs: DashboardBreadcrumbItem[];
   contentAriaLabel: string;
   title: string;
 };
 
-export type AdminUsersHandoffInput = {
+type AdminUsersHandoffInput = {
   filters?: Array<{ id: string; value: string }>;
   loading?: boolean;
   pageIndex: number;

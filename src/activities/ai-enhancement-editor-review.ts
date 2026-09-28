@@ -53,7 +53,7 @@ export const ACTIVITY_AI_ENHANCEMENT_EDITOR_REVIEW_CHECK_IDS = [
   'question-choices',
 ] as const;
 
-export type ActivityAiEnhancementEditorReviewItemId =
+type ActivityAiEnhancementEditorReviewItemId =
   (typeof ACTIVITY_AI_ENHANCEMENT_EDITOR_REVIEW_ITEM_IDS)[number];
 
 export type ActivityAiEnhancementEditorReviewCheckId =
@@ -81,7 +81,7 @@ export type ActivityAiEnhancementEditorReviewPlan = {
   teacherConfirmedReview: boolean;
 };
 
-export type ActivityAiEnhancementEditorReviewItemView = {
+type ActivityAiEnhancementEditorReviewItemView = {
   ariaLabel: string;
   description: string;
   id: ActivityAiEnhancementEditorReviewItemId;
@@ -89,7 +89,7 @@ export type ActivityAiEnhancementEditorReviewItemView = {
   value: string;
 };
 
-export type ActivityAiEnhancementEditorReviewPrivacyContract = {
+type ActivityAiEnhancementEditorReviewPrivacyContract = {
   appliesAfterDraftApplication: true;
   blocksSaveUntilTeacherReview: true;
   createsAssignmentLinksWithoutTeacherAction: false;
@@ -114,7 +114,7 @@ export type ActivityAiEnhancementEditorReviewPrivacyContract = {
   usesDraftApplicationPlan: true;
 };
 
-export type ActivityAiEnhancementEditorReviewView = {
+type ActivityAiEnhancementEditorReviewView = {
   description: string;
   itemViews: ActivityAiEnhancementEditorReviewItemView[];
   plan: ActivityAiEnhancementEditorReviewPlan;

@@ -25,7 +25,7 @@ export type SettingsBillingWorkspaceSummaryView = {
   title: string;
 };
 
-export type SettingsBillingPageViewModel = {
+type SettingsBillingPageViewModel = {
   breadcrumbs: DashboardBreadcrumbItem[];
   contentAriaLabel: string;
   description: string;
@@ -34,7 +34,7 @@ export type SettingsBillingPageViewModel = {
   workspaceSummaryView: SettingsBillingWorkspaceSummaryView;
 };
 
-export type SettingsPaymentPageViewModel = {
+type SettingsPaymentPageViewModel = {
   breadcrumbs: DashboardBreadcrumbItem[];
   callback: string;
   description: string;

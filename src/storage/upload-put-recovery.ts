@@ -33,13 +33,13 @@ export const R2_UPLOAD_PUT_RECOVERY_STAGES = [
   stage('provider-error-details-hidden', 'privacy'),
 ] as const;
 
-export type R2UploadPutRecoveryResult =
+type R2UploadPutRecoveryResult =
   | 'committed'
   | 'mismatched'
   | 'missing'
   | 'unconfirmed';
 
-export type R2UploadObjectEvidence = {
+type R2UploadObjectEvidence = {
   customMetadata?: Record<string, string>;
   httpMetadata?: { contentType?: string };
   size?: number;

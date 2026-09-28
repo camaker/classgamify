@@ -16,7 +16,7 @@ export type AssignmentShareLinkAvailability = {
   shareSlug: string;
 };
 
-export type AssignmentShareLinkAvailabilityState = Pick<
+type AssignmentShareLinkAvailabilityState = Pick<
   AssignmentShareLinkAvailability,
   'isAvailable' | 'lifecycleStatus'
 >;
@@ -60,7 +60,7 @@ export const assignmentShareLinkActionCopy = {
   },
 } as const;
 
-export type AssignmentShareLinkCopyExecutionPlan =
+type AssignmentShareLinkCopyExecutionPlan =
   | {
       failureMessage: string;
       message: string;

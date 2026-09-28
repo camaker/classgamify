@@ -10,7 +10,7 @@ export type ManagedAssignmentStatus = Extract<
   (typeof ASSIGNMENT_MANAGED_STATUSES)[number]
 >;
 export type AssignmentStatusActionKind = 'close-link' | 'reopen-link';
-export type AssignmentStatusTransitionErrorCode =
+type AssignmentStatusTransitionErrorCode =
   | 'already-closed'
   | 'already-open'
   | 'close-only-published'
@@ -18,7 +18,7 @@ export type AssignmentStatusTransitionErrorCode =
   | 'reopen-only-closed'
   | 'unsupported-transition';
 
-export type AssignmentStatusTransitionErrorView = {
+type AssignmentStatusTransitionErrorView = {
   code: AssignmentStatusTransitionErrorCode;
   message: string;
 };
@@ -38,9 +38,9 @@ export type AssignmentStatusAction = {
   successMessage: string;
 };
 
-export type AssignmentStatusActionBlockedReason = 'missing-status-action';
+type AssignmentStatusActionBlockedReason = 'missing-status-action';
 
-export type AssignmentStatusActionExecutionPlan =
+type AssignmentStatusActionExecutionPlan =
   | {
       reason: AssignmentStatusActionBlockedReason;
       type: 'blocked';

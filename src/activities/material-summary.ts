@@ -17,12 +17,12 @@ import {
 } from '@/storage/file-materials';
 import { formatUserFileMaterialKind } from '@/storage/file-material-labels';
 
-export type ActivitySourceMaterialKindSummary = {
+type ActivitySourceMaterialKindSummary = {
   count: number;
   kind: UserFileMaterialKind;
 };
 
-export type ActivitySourceMaterialExtractionActionId =
+type ActivitySourceMaterialExtractionActionId =
   | 'extract-audio'
   | 'extract-worksheet'
   | 'import-spreadsheet';
@@ -106,7 +106,7 @@ export type ActivitySourceMaterialKindBadgeView = {
   summaryText: string;
 };
 
-export type ActivitySourceMaterialReadinessStatusId =
+type ActivitySourceMaterialReadinessStatusId =
   | 'extractable'
   | 'none'
   | 'reference-only';

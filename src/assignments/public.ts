@@ -68,7 +68,7 @@ export type PublicAttemptReviewSummary = {
   unansweredItemCount: number;
 };
 
-export type PublicAttemptReviewSummaryView = {
+type PublicAttemptReviewSummaryView = {
   items: PublicAttemptReviewItem[];
   summary: PublicAttemptReviewSummary;
 };
@@ -82,7 +82,7 @@ export type PublicAttemptResult = {
   totalPoints: number;
 };
 
-export type PublicAssignmentSettings = Pick<
+type PublicAssignmentSettings = Pick<
   AssignmentSettings,
   | 'collectStudentName'
   | 'instructions'

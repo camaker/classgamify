@@ -44,9 +44,6 @@ export const ACTIVITY_SOURCE_MATERIAL_REFERENCE_ITEM_IDS = [
   'student-payload-boundary',
 ] as const;
 
-export type ActivitySourceMaterialReferenceItemId =
-  (typeof ACTIVITY_SOURCE_MATERIAL_REFERENCE_ITEM_IDS)[number];
-
 export const ACTIVITY_SOURCE_MATERIAL_REFERENCE_PRIVACY_CONTRACT = {
   exposesFileBytes: false,
   exposesPermissionMetadata: false,

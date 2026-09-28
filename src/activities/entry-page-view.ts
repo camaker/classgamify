@@ -7,7 +7,6 @@ import {
   buildTemplateEntryAction,
   buildWorksheetHeroActions,
   buildWorksheetModeEntryAction,
-  type CreateActivityTemplateSearch,
   type TemplateEntryAction,
   type TemplateEntryCreateLinkAction,
   type TemplateEntryLinkAction,
@@ -28,15 +27,11 @@ import type {
 import { Routes } from '@/lib/routes';
 import { m } from '@/locale/paraglide/messages';
 
-export type EntryActionSearch = CreateActivityTemplateSearch;
-
 export type EntryAction = TemplateEntryAction;
 
-export type LinkAction = TemplateEntryLinkAction;
+type LinkAction = TemplateEntryLinkAction;
 
-export type CreateLinkAction = TemplateEntryCreateLinkAction;
-
-export type PublicTemplateEntrySurface = 'templates' | 'worksheets';
+type CreateLinkAction = TemplateEntryCreateLinkAction;
 
 export type WorksheetsPageHeroActionView = EntryAction & {
   isPrimary: boolean;
@@ -73,11 +68,11 @@ export type TemplatesPageCardEntryStepView = {
   value: string;
 };
 
-export type TemplatesPageViewModelInput = {
+type TemplatesPageViewModelInput = {
   activityTemplates?: ActivityTemplateDefinition[];
 };
 
-export type TemplatesPageViewModel = {
+type TemplatesPageViewModel = {
   cards: TemplatesPageCardView[];
   footer: {
     createAction: CreateLinkAction;
@@ -145,7 +140,7 @@ export type WorksheetsPageWorkflowStepView = {
   positionLabel: string;
 };
 
-export type WorksheetsPageViewModel = {
+type WorksheetsPageViewModel = {
   deliveryLoop: {
     ariaLabel: string;
     description: string;

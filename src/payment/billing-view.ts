@@ -1,11 +1,7 @@
 import type { PricePlan, Subscription } from '@/payment/types';
 import { m } from '@/locale/paraglide/messages';
 
-export type SettingsBillingCardState =
-  | 'error'
-  | 'loading'
-  | 'no-plan'
-  | 'ready';
+type SettingsBillingCardState = 'error' | 'loading' | 'no-plan' | 'ready';
 
 export type SettingsBillingCardActionKind =
   | 'manage-billing'
@@ -73,7 +69,7 @@ export type SettingsBillingCardPeriodRow = {
   value: string;
 };
 
-export type SettingsBillingCardPlanView = {
+type SettingsBillingCardPlanView = {
   description?: string;
   featureSections: SettingsBillingCardPlanFeatureSection[];
   id: string;
@@ -84,7 +80,7 @@ export type SettingsBillingCardPlanView = {
   nextStep: SettingsBillingCardNextStepView;
 };
 
-export type SettingsBillingCardViewModel = {
+type SettingsBillingCardViewModel = {
   action?: SettingsBillingCardAction;
   ariaLabel: string;
   header: SettingsBillingCardHeader;

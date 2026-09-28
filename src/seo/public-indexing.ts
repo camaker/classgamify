@@ -30,20 +30,20 @@ export const SITEMAP_XML_HEADERS = {
   'Content-Type': 'application/xml; charset=utf-8',
 };
 
-export type SitemapUrl = {
+type SitemapUrl = {
   changefreq?: SitemapChangeFrequency;
   lastmod?: string;
   path: string;
   priority?: string;
 };
 
-export type SitemapUrlEntry = SitemapUrl & {
+type SitemapUrlEntry = SitemapUrl & {
   alternates: SitemapAlternateLink[];
   locale: Locale;
   loc: string;
 };
 
-export type SitemapAlternateLink = {
+type SitemapAlternateLink = {
   href: string;
   hreflang: string;
 };

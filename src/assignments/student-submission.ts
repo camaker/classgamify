@@ -139,7 +139,7 @@ export type StudentAttemptSubmissionBlockedReason =
   | 'missing-student-name'
   | 'read-only';
 
-export type StudentAttemptSubmissionFailureCode =
+type StudentAttemptSubmissionFailureCode =
   | AssignmentAttemptAnswerValidationErrorCode
   | 'anonymous-token-required'
   | 'assignment-closed'
@@ -278,7 +278,7 @@ export type StudentAttemptResultDisplay = {
   scoreLabel: string;
 };
 
-export type StudentAttemptResultNextStepId =
+type StudentAttemptResultNextStepId =
   | 'done'
   | 'feedback'
   | 'review-score'
@@ -388,7 +388,7 @@ export type StudentRunnerMissingScopeItem = {
   value: string;
 };
 
-export type StudentRunnerMissingView = {
+type StudentRunnerMissingView = {
   description: string;
   reason: StudentRunnerMissingReason;
   scopeItems: StudentRunnerMissingScopeItem[];

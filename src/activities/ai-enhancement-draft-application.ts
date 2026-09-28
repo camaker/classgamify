@@ -50,7 +50,7 @@ export const ACTIVITY_AI_ENHANCEMENT_DRAFT_APPLICATION_ITEM_IDS = [
   'draft-output-handoff-boundary',
 ] as const;
 
-export type ActivityAiEnhancementDraftApplicationItemId =
+type ActivityAiEnhancementDraftApplicationItemId =
   (typeof ACTIVITY_AI_ENHANCEMENT_DRAFT_APPLICATION_ITEM_IDS)[number];
 
 export type ActivityAiEnhancementDraftApplicationStatus =
@@ -96,7 +96,7 @@ export type ActivityAiEnhancementDraftContentCoverage = {
   vocabulary: number;
 };
 
-export type ActivityAiEnhancementDraftApplicationItemView = {
+type ActivityAiEnhancementDraftApplicationItemView = {
   ariaLabel: string;
   description: string;
   id: ActivityAiEnhancementDraftApplicationItemId;
@@ -104,7 +104,7 @@ export type ActivityAiEnhancementDraftApplicationItemView = {
   value: string;
 };
 
-export type ActivityAiEnhancementDraftApplicationPrivacyContract = {
+type ActivityAiEnhancementDraftApplicationPrivacyContract = {
   appliesAfterExecutionPlan: true;
   createsAssignmentLinksWithoutTeacherAction: false;
   exposesAnswerKeysToPublicPayload: false;
@@ -132,7 +132,7 @@ export type ActivityAiEnhancementDraftApplicationPrivacyContract = {
   usesTemplateReadinessDomain: true;
 };
 
-export type ActivityAiEnhancementDraftApplicationView = {
+type ActivityAiEnhancementDraftApplicationView = {
   description: string;
   itemViews: ActivityAiEnhancementDraftApplicationItemView[];
   plan: ActivityAiEnhancementDraftApplicationPlan;

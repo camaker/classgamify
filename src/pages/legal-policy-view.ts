@@ -4,7 +4,7 @@ const LEGAL_POLICY_PAGE_IDS = ['terms', 'privacy', 'cookie'] as const;
 
 type LegalPolicyPageId = (typeof LEGAL_POLICY_PAGE_IDS)[number];
 
-export type LegalPolicyPageViewModel = {
+type LegalPolicyPageViewModel = {
   page: PageDoc;
   policyId: LegalPolicyPageId;
 };

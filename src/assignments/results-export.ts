@@ -405,7 +405,7 @@ export function buildAssignmentResultsCsvDataUrl(csv: string) {
   return `data:text/csv;charset=utf-8,${encodeURIComponent(csv)}`;
 }
 
-export type AssignmentResultsExportDeliveryView = {
+type AssignmentResultsExportDeliveryView = {
   answerReveal: string;
   closeTime: string;
   identityMode: string;

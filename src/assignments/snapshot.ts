@@ -21,14 +21,14 @@ export type AssignmentSnapshotInsert = {
   templateType: ActivityTemplateType;
 };
 
-export type AssignmentSnapshotFallbackActivity = {
+type AssignmentSnapshotFallbackActivity = {
   contentJson?: ActivityContent;
   description: string | null;
   templateType: ActivityTemplateType;
   title: string;
 };
 
-export type AssignmentSnapshotFallbackSnapshot = {
+type AssignmentSnapshotFallbackSnapshot = {
   activityDescription: string | null;
   activityTitle: string;
   contentJson?: ActivityContent;
@@ -43,11 +43,10 @@ export type ResolvedAssignmentSnapshotSource = {
   templateType: ActivityTemplateType;
 };
 
-export type ResolvedAssignmentRuntimeSource =
-  ResolvedAssignmentSnapshotSource & {
-    contentJson: ActivityContent;
-    runtimeItems: RuntimeItem[];
-  };
+type ResolvedAssignmentRuntimeSource = ResolvedAssignmentSnapshotSource & {
+  contentJson: ActivityContent;
+  runtimeItems: RuntimeItem[];
+};
 
 export function buildAssignmentSnapshotInsert({
   assignmentId,

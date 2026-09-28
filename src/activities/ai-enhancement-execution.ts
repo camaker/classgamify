@@ -40,7 +40,7 @@ export const ACTIVITY_AI_ENHANCEMENT_EXECUTION_ITEM_IDS = [
   'policy-handoff-boundary',
 ] as const;
 
-export type ActivityAiEnhancementExecutionItemId =
+type ActivityAiEnhancementExecutionItemId =
   (typeof ACTIVITY_AI_ENHANCEMENT_EXECUTION_ITEM_IDS)[number];
 
 export type ActivityAiEnhancementExecutionStatus =
@@ -83,7 +83,7 @@ export type ActivityAiEnhancementExecutionPlan = {
   usesLocalFallback: boolean;
 };
 
-export type ActivityAiEnhancementExecutionItemView = {
+type ActivityAiEnhancementExecutionItemView = {
   ariaLabel: string;
   description: string;
   id: ActivityAiEnhancementExecutionItemId;
@@ -91,7 +91,7 @@ export type ActivityAiEnhancementExecutionItemView = {
   value: string;
 };
 
-export type ActivityAiEnhancementExecutionPrivacyContract = {
+type ActivityAiEnhancementExecutionPrivacyContract = {
   blocksWithoutAuthenticatedTeacher: true;
   createsAssignmentLinksWithoutTeacherAction: false;
   exposesActivityContentText: false;
@@ -114,7 +114,7 @@ export type ActivityAiEnhancementExecutionPrivacyContract = {
   usesPolicyDecision: true;
 };
 
-export type ActivityAiEnhancementExecutionView = {
+type ActivityAiEnhancementExecutionView = {
   description: string;
   itemViews: ActivityAiEnhancementExecutionItemView[];
   plan: ActivityAiEnhancementExecutionPlan;

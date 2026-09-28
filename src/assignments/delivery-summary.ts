@@ -73,14 +73,14 @@ export type PublicAssignmentRuleSummaryStats = {
   showsCorrectAnswers: boolean;
 };
 
-export type PublicAssignmentRuleSummaryStatus =
+type PublicAssignmentRuleSummaryStatus =
   | 'attempt-limited'
   | 'open'
   | 'scheduled'
   | 'timed'
   | 'timed-scheduled';
 
-export type PublicAssignmentRuleSummaryStatusTone = 'attention' | 'neutral';
+type PublicAssignmentRuleSummaryStatusTone = 'attention' | 'neutral';
 
 export type PublicAssignmentRuleSummaryStatusView = {
   ariaLabel: string;

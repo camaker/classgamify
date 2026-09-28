@@ -37,11 +37,11 @@ type StorageUploadPlanInput = {
   userId?: string;
 };
 
-export type StorageUploadReadinessInput = StorageUploadFileInput &
+type StorageUploadReadinessInput = StorageUploadFileInput &
   StorageUploadValidationConfig &
   Omit<StorageUploadPlanInput, 'fileId'>;
 
-export type StorageUploadReadinessItemId =
+type StorageUploadReadinessItemId =
   | 'activity-source-reference'
   | 'allowed-extension-check'
   | 'content-type-match'
@@ -63,11 +63,6 @@ export type StorageUploadReadinessItemId =
   | 'student-payload-boundary'
   | 'upload-validation';
 
-export type StorageUploadReadinessIssue = {
-  code: StorageErrorCode;
-  details?: StorageErrorDetails;
-};
-
 type StorageUploadObjectPlan = {
   isPublicFolder: boolean;
   r2Key: string;
@@ -76,7 +71,7 @@ type StorageUploadObjectPlan = {
   url: string;
 };
 
-export type StorageUploadReadinessPlan = {
+type StorageUploadReadinessPlan = {
   allowedExtensions: string[];
   classification: UserFileMaterialClassification;
   contentType?: string;

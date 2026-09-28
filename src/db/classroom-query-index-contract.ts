@@ -1,9 +1,9 @@
-export type ClassroomQueryIndexContractKind =
+type ClassroomQueryIndexContractKind =
   | 'index'
   | 'primary-key'
   | 'unique';
 
-export type ClassroomQueryIndexContractItem = {
+type ClassroomQueryIndexContractItem = {
   columns: readonly string[];
   id: string;
   indexName: string;

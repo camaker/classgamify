@@ -49,7 +49,7 @@ export const ACTIVITY_AI_ENHANCEMENT_DRAFT_OUTPUT_ITEM_IDS = [
   'snapshot-result-continuity',
 ] as const;
 
-export type ActivityAiEnhancementDraftOutputItemId =
+type ActivityAiEnhancementDraftOutputItemId =
   (typeof ACTIVITY_AI_ENHANCEMENT_DRAFT_OUTPUT_ITEM_IDS)[number];
 
 export type ActivityAiEnhancementDraftOutputSourceMode =
@@ -58,13 +58,13 @@ export type ActivityAiEnhancementDraftOutputSourceMode =
   | 'provider'
   | 'unavailable';
 
-export type ActivityAiEnhancementDraftOutputStatus =
+type ActivityAiEnhancementDraftOutputStatus =
   | 'awaiting-output'
   | 'blocked-before-output'
   | 'normalized-draft-ready'
   | 'rejected-output';
 
-export type ActivityAiEnhancementDraftOutputValidationStatus =
+type ActivityAiEnhancementDraftOutputValidationStatus =
   | 'blocked'
   | 'invalid-content'
   | 'invalid-schema'
@@ -77,7 +77,7 @@ export type ActivityAiEnhancementDraftOutputSource =
     parsedDraft?: CreateActivityInput | null;
   };
 
-export type ActivityAiEnhancementDraftOutputPlan = {
+type ActivityAiEnhancementDraftOutputPlan = {
   canPassToEditorApplication: boolean;
   contentCoverage: ActivityAiEnhancementDraftOutputContentCoverage;
   coveredFieldTargetCount: number;
@@ -98,7 +98,7 @@ export type ActivityAiEnhancementDraftOutputPlan = {
   validationStatus: ActivityAiEnhancementDraftOutputValidationStatus;
 };
 
-export type ActivityAiEnhancementDraftOutputContentCoverage = {
+type ActivityAiEnhancementDraftOutputContentCoverage = {
   groups: number;
   pairs: number;
   questions: number;
@@ -107,7 +107,7 @@ export type ActivityAiEnhancementDraftOutputContentCoverage = {
   vocabulary: number;
 };
 
-export type ActivityAiEnhancementDraftOutputItemView = {
+type ActivityAiEnhancementDraftOutputItemView = {
   ariaLabel: string;
   description: string;
   id: ActivityAiEnhancementDraftOutputItemId;
@@ -115,7 +115,7 @@ export type ActivityAiEnhancementDraftOutputItemView = {
   value: string;
 };
 
-export type ActivityAiEnhancementDraftOutputPrivacyContract = {
+type ActivityAiEnhancementDraftOutputPrivacyContract = {
   appliesAfterExecutionPlan: true;
   appliesBeforeEditorApplication: true;
   createsAssignmentLinksWithoutTeacherAction: false;
@@ -141,7 +141,7 @@ export type ActivityAiEnhancementDraftOutputPrivacyContract = {
   usesExecutionPlan: true;
 };
 
-export type ActivityAiEnhancementDraftOutputView = {
+type ActivityAiEnhancementDraftOutputView = {
   description: string;
   itemViews: ActivityAiEnhancementDraftOutputItemView[];
   plan: ActivityAiEnhancementDraftOutputPlan;

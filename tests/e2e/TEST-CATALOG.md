@@ -65,20 +65,20 @@ public layout route sources and shared public components that must keep internal
 `data-handoff` audit DOM out of public pages while preserving source-level
 handoff contracts.
 Public discovery/indexing chain has a fast script-level gate via
-`pnpm exec tsx --test scripts/public-discovery-indexing-chain-handoff.test.ts`;
+`pnpm exec tsx --test scripts/public-discovery-indexing-chain.test.ts`;
 run it when changing public metadata, public entry
 routes, navigation, template/worksheet entries, public page copy,
 sitemap/robots/manifest helpers, legacy route retirement, public DOM
 boundaries, or privacy/indexing guards.
 Classroom trust communication chain has a fast script-level gate via
-`pnpm exec tsx --test scripts/classroom-trust-communication-chain-handoff.test.ts`;
+`pnpm exec tsx --test scripts/classroom-trust-communication-chain.test.ts`;
 run it when changing the 30-slice transactional mail workspace boundary, public
 classroom contact intake, auth workspace entry, transactional mail lifecycle,
 teacher notification settings, hosted billing, legal/provider copy, developer
 configuration secrets, storage source-material boundaries, or public DOM
 handoff boundaries.
 Account governance lifecycle chain has a fast script-level gate via
-`pnpm exec tsx --test scripts/account-governance-lifecycle-chain-handoff.test.ts`;
+`pnpm exec tsx --test scripts/account-governance-lifecycle-chain.test.ts`;
 run it when changing auth session and email verification, profile and security
 settings, the security workspace summary, explicit account
 deletion, admin user governance,
@@ -86,7 +86,7 @@ billing/payment callback/notification/files boundaries, storage owner checks,
 provider-secret and student-data guards, or account lifecycle copy that should
 stay tied to the ClassGamify teacher workspace.
 Classroom product loop chain has a fast script-level gate via
-`pnpm exec tsx --test scripts/classroom-product-loop-chain-handoff.test.ts`;
+`pnpm exec tsx --test scripts/classroom-product-loop-chain.test.ts`;
 run it when changing the Activity -> Assignment -> Attempt -> Results contract,
 assignment source activity context boundary, classroom data lifecycle and its
 attempt persistence boundary,
@@ -112,7 +112,7 @@ teacher workspace operations and its dashboard overview boundary, public
 discovery and indexing alignment with its public metadata boundary, or
 privacy guards.
 Local persisted browser journey chain has a fast script-level gate via
-`pnpm exec tsx --test scripts/local-persisted-browser-journey-chain-handoff.test.ts`;
+`pnpm exec tsx --test scripts/local-persisted-browser-journey-chain.test.ts`;
 run it when changing the local saved activity -> published assignment ->
 student attempt -> result filters -> classroom brief -> CSV -> printable
 worksheet -> answer key -> return-to-results journey, the persisted browser
@@ -120,7 +120,7 @@ spec that exercises it, or the result-material, result-review, copy-artifact,
 CSV export, printable worksheet, browser-health, and private-data boundaries
 that keep this real classroom loop connected.
 Assignment publish-to-results continuity has a focused source-chain gate via
-`pnpm exec tsx --test scripts/assignment-publish-results-continuity-chain-handoff.test.ts`;
+`pnpm exec tsx --test scripts/assignment-publish-results-continuity.test.ts`;
 run it when changing the 30-stage source-level contract for delivery settings,
 snapshot freezing, share-link distribution, sanitized runner play, submission
 guards, attempt persistence, teacher result analysis, exports, or privacy.
@@ -159,13 +159,13 @@ and
 run the matching gate when changing owner-scoped library summaries, reusable
 template scaffold quality, or deterministic local AI fallback draft semantics.
 Activity authoring-to-publish continuity has a focused source-chain gate via
-`pnpm exec tsx --test scripts/activity-authoring-publish-continuity-chain-handoff.test.ts`;
+`pnpm exec tsx --test scripts/activity-authoring-publish-continuity.test.ts`;
 run it when changing the 30-stage source-level contract for template entry,
 editor persistence, owner-scoped library filters, atomic lifecycle mutations,
 guarded duplicate/remix drafts, assignment publishing, snapshot isolation, or
 workflow privacy.
 AI review-to-publish continuity has a focused source-chain gate via
-`pnpm exec tsx --test scripts/activity-ai-review-publish-continuity-chain-handoff.test.ts`;
+`pnpm exec tsx --test scripts/activity-ai-review-publish-continuity.test.ts`;
 run it when changing the 30-stage source-level contract for sanitized source,
 draft generation, deterministic fallback, editor-only application, teacher
 review, manual save, explicit publish, snapshot protection, or AI privacy.
@@ -187,14 +187,14 @@ anonymous browser tokens, assignment-scoped storage, submission identity,
 attempt-limit counting, persistence, teacher result grouping and ordering, or
 raw identity privacy guards.
 Answer feedback lifecycle chain has a fast script-level gate via
-`pnpm exec tsx --test scripts/answer-feedback-lifecycle-chain-handoff.test.ts`;
+`pnpm exec tsx --test scripts/answer-feedback-lifecycle-chain.test.ts`;
 run it when changing the answer feedback boundary,
 accepted-answer parsing, answer normalization, runtime scoring, public
 post-submit feedback, template feedback surfaces, teacher result analysis,
 result answer text views, CSV answer columns, server review summaries, or
 feedback privacy guards.
 Published assignment delivery chain has a fast script-level gate via
-`pnpm exec tsx --test scripts/published-assignment-delivery-chain-handoff.test.ts`;
+`pnpm exec tsx --test scripts/published-assignment-delivery-chain.test.ts`;
 run it when changing publish preflight, the 30-slice publish control handoff
 boundary, frozen snapshots, share links, assignment list distribution, public
 student rules, lifecycle access,
@@ -207,8 +207,8 @@ gates, assignment and snapshot transactions, assignment insert triggers,
 source-owner invariants, trigger error mapping, active visibility acceptance,
 existing snapshot continuity, or publish-source privacy.
 Assignment publish source continuity has a focused source-chain gate via
-`pnpm exec tsx --test scripts/assignment-publish-source-continuity-chain-handoff.test.ts`;
-run it when changing the 30-slice source-level contract for owner-scoped source
+`pnpm exec tsx --test scripts/assignment-publish-source-continuity.test.ts`;
+run it when changing the source guards for owner-scoped source
 reads, restore-before-publish checks, assignment/snapshot transactions, D1 owner
 and archive triggers, rollback, localized source errors, published delivery,
 existing snapshots and results, or publish-source privacy.
@@ -219,8 +219,8 @@ revisions, monotonic timestamps, compare-and-set predicates, zero-row conflict
 recovery, direct returned activity rows, snapshot retention, or activity mutation
 privacy.
 Activity mutation continuity has a focused source-chain gate via
-`pnpm exec tsx --test scripts/activity-mutation-continuity-chain-handoff.test.ts`;
-run it when changing the 30-slice source-level contract for edit/archive/restore
+`pnpm exec tsx --test scripts/activity-mutation-continuity.test.ts`;
+run it when changing the source guards for edit/archive/restore
 owner scope, monotonic revisions, visibility compare-and-set predicates,
 returning updates, conflict reloads, derivative and publish gates, assignment
 snapshot retention, or activity mutation privacy.
@@ -231,8 +231,8 @@ activity insert triggers, owner/archive/revision guards, derivative error
 mapping, active-source acceptance, independent-draft continuity, or derivative
 source privacy.
 Activity derivative source continuity has a focused source-chain gate via
-`pnpm exec tsx --test scripts/activity-derivative-source-continuity-chain-handoff.test.ts`;
-run it when changing the 30-slice source-level contract for duplicate/remix
+`pnpm exec tsx --test scripts/activity-derivative-source-continuity.test.ts`;
+run it when changing the source guards for duplicate/remix
 source reads, provenance pairs, D1 owner/archive/revision triggers, safe error
 mapping, independent derivative drafts, later source changes, future publishing,
 or provenance privacy.
@@ -242,8 +242,8 @@ run it when changing create/edit material persistence, owner-scoped user-file
 queries, authoritative metadata rebuilding, missing-reference handling, empty
 reference bypass, source-material order/count rules, or storage/file privacy.
 Activity source-material write continuity has a focused source-chain gate via
-`pnpm exec tsx --test scripts/activity-source-material-write-continuity-chain-handoff.test.ts`;
-run it when changing the 30-slice source-level contract for normalized material
+`pnpm exec tsx --test scripts/activity-source-material-write-continuity.test.ts`;
+run it when changing the source guards for normalized material
 references, owner-scoped batch reads, compact metadata selects, authoritative
 rebuilds, all-or-nothing create/edit writes, downstream derivative/publish paths,
 snapshot protection, or storage privacy.
@@ -253,8 +253,8 @@ run it when changing file deletion, activity/snapshot JSON reference queries,
 active or archived material retention, R2 delete ordering, in-use errors,
 owner-scoped reference checks, or delete-path privacy.
 Source-material deletion continuity has a focused source-chain gate via
-`pnpm exec tsx --test scripts/source-material-delete-continuity-chain-handoff.test.ts`;
-run it when changing the 30-slice source-level contract for owner-scoped file
+`pnpm exec tsx --test scripts/source-material-delete-continuity.test.ts`;
+run it when changing the source guards for owner-scoped file
 lookup, active/archived activity references, frozen snapshot references,
 parallel checks, metadata claim and R2 ordering, retained provenance, minimal
 evidence, or deletion privacy.
@@ -264,8 +264,8 @@ run it when changing activity or snapshot source-material writes, file metadata
 deletion order, D1 integrity triggers, R2 delete recovery, nested trigger-error
 mapping, or concurrent reference safety.
 Source-material integrity continuity has a focused source-chain gate via
-`pnpm exec tsx --test scripts/source-material-integrity-continuity-chain-handoff.test.ts`;
-run it when changing the 30-slice source-level contract for activity/snapshot
+`pnpm exec tsx --test scripts/source-material-integrity-continuity.test.ts`;
+run it when changing the source guards for activity/snapshot
 write triggers, file metadata delete triggers, guarded metadata claims, R2
 presence probes, metadata restoration, localized conflicts, single-writer
 ordering, safe recovery failures, or integrity privacy.
@@ -286,18 +286,18 @@ run it when changing full file lists, private upload responses, public avatar
 responses, safe file item fields, ID-based file links, server-side R2 key
 resolution, settings table types, owner access decisions, or response privacy.
 Private upload transaction continuity has a focused source-chain gate via
-`pnpm exec tsx --test scripts/private-upload-transaction-continuity-chain-handoff.test.ts`;
+`pnpm exec tsx --test scripts/private-upload-transaction-continuity.test.ts`;
 run it when changing the 30-stage source-level contract for single R2 writes,
 same-key evidence recovery, D1 metadata commit probes, bounded compensation,
 safe private file items, server-side object-key resolution, source-reference
 continuity, or upload transaction privacy.
 Source-material lifecycle continuity has a focused source-chain gate via
-`pnpm exec tsx --test scripts/source-material-lifecycle-continuity-chain-handoff.test.ts`;
+`pnpm exec tsx --test scripts/source-material-lifecycle-continuity.test.ts`;
 run it when changing the 30-stage source-level contract from private upload and
 compact references through guarded activity writes, assignment snapshot
 freezing, protected deletion, R2 recovery, or lifecycle privacy.
 Assignment lifecycle governance chain has a fast script-level gate via
-`pnpm exec tsx --test scripts/assignment-lifecycle-governance-chain-handoff.test.ts`;
+`pnpm exec tsx --test scripts/assignment-lifecycle-governance-chain.test.ts`;
 run it when changing open/closed/expired/draft status resolution,
 close/reopen transition rules, expired reopen blocking, assignment list status
 filters, share-link availability, public unavailable payloads, submit API
@@ -312,13 +312,13 @@ expected lifecycle revisions, same-millisecond transitions, reopen close-window
 checks, compare-and-set updates, zero-row conflict recovery, returned lifecycle
 rows, snapshot/result retention, or lifecycle transition privacy.
 Assignment status transition continuity has a focused source-chain gate via
-`pnpm exec tsx --test scripts/assignment-status-transition-continuity-chain-handoff.test.ts`;
-run it when changing the 30-slice source-level contract for owner-scoped reads,
+`pnpm exec tsx --test scripts/assignment-status-transition-continuity.test.ts`;
+run it when changing the source guards for owner-scoped reads,
 monotonic revisions, close/reopen compare-and-set predicates, single-statement
 returning updates, conflict reloads, public access, snapshot and attempt
 retention, teacher results, or transition privacy.
 Classroom data lifecycle chain has a fast script-level gate via
-`pnpm exec tsx --test scripts/classroom-data-lifecycle-chain-handoff.test.ts`;
+`pnpm exec tsx --test scripts/classroom-data-lifecycle-chain.test.ts`;
 run it when changing the attempt persistence boundary, D1 app
 schema, activity/assignment persistence helpers, owner-scoped activity or
 assignment queries, assignment snapshot freezing, public assignment payload
@@ -373,8 +373,8 @@ network retry recovery, normalized identity matching, attempt inserts,
 assignment-scoped uniqueness, generated migrations, public retry responses,
 attempt limits, lifecycle gates, teacher results, or submission-key privacy.
 Assignment submission idempotency continuity has a focused source-chain gate via
-`pnpm exec tsx --test scripts/assignment-submission-idempotency-continuity-chain-handoff.test.ts`;
-run it when changing the 30-slice source-level contract for browser key
+`pnpm exec tsx --test scripts/assignment-submission-idempotency-continuity.test.ts`;
+run it when changing the source guards for browser key
 creation, retry reuse, replay-first recovery, new-attempt lifecycle and limit
 gates, concurrent D1 uniqueness recovery, sanitized feedback, teacher result
 continuity, or submission-key privacy.
@@ -391,8 +391,8 @@ attempt inserts, D1 triggers, write-error mapping, submission replay priority,
 identity-slot conflict classification, bounded recounts, lifecycle messages,
 teacher result continuity, or private database markers.
 Assignment submission lifecycle continuity has a focused source-chain gate via
-`pnpm exec tsx --test scripts/assignment-submission-lifecycle-continuity-chain-handoff.test.ts`;
-run it when changing the 30-slice source-level contract for replay-first
+`pnpm exec tsx --test scripts/assignment-submission-lifecycle-continuity.test.ts`;
+run it when changing the source guards for replay-first
 handling, API lifecycle/validation/scoring order, D1 status and expiry triggers,
 database-clock checks, localized write errors, slot conflict isolation, teacher
 results, or internal write-boundary privacy.
@@ -423,13 +423,13 @@ identity, submit confirmation, template boards) is covered end to end in
 `tests/e2e/specs/student-runner.spec.ts` and
 `tests/e2e/specs/interactive-template-runners.spec.ts`.
 Student runner submission chain has a fast script-level gate via
-`pnpm exec tsx --test scripts/student-runner-submission-chain-handoff.test.ts`;
+`pnpm exec tsx --test scripts/student-runner-submission-chain.test.ts`;
 run it when changing progress, payload summary, submit-readiness, identity
 privacy, timer, attempt duration, result panel, review summary, feedback scope,
 next steps, privacy guards, or the source-level student-runner-submission
 chain.
 Student identity lifecycle chain has a fast script-level gate via
-`pnpm exec tsx --test scripts/student-identity-lifecycle-chain-handoff.test.ts`;
+`pnpm exec tsx --test scripts/student-identity-lifecycle-chain.test.ts`;
 run it when changing student-name normalization, anonymous browser tokens,
 identity grouping, runtime item id normalization, attempt-limit
 identity counting, student runner identity views, submission input identity,
@@ -443,24 +443,24 @@ accepted-answer columns, submitted-date formatting, timer-aware duration
 normalization, formula-injection guards, or CSV data URL boundaries.
 Assignment result submitted-date continuity chain has a fast script-level gate
 via
-`pnpm exec tsx --test scripts/assignment-result-submitted-date-chain-handoff.test.ts`;
+`pnpm exec tsx --test scripts/assignment-result-submitted-date-chain.test.ts`;
 run it when changing result date formatting, attempt submitted labels, student
 last-submitted labels, latest-attempt copy context, completed-at sorting, CSV
 submitted-date columns, or submitted-date privacy guards.
 Assignment result accepted-answer continuity chain has a fast script-level gate
 via
-`pnpm exec tsx --test scripts/assignment-result-accepted-answer-chain-handoff.test.ts`;
+`pnpm exec tsx --test scripts/assignment-result-accepted-answer-chain.test.ts`;
 run it when changing the accepted-answer parser, primary-vs-alternatives
 formatting, result cards, item performance columns, attempt review cards, CSV
 accepted-answer columns, printable review alignment, or accepted-answer privacy
 guards.
 Assignment result explanation continuity chain has a fast script-level gate via
-`pnpm exec tsx --test scripts/assignment-result-explanation-chain-handoff.test.ts`;
+`pnpm exec tsx --test scripts/assignment-result-explanation-chain.test.ts`;
 run it when changing result explanations, post-submit review visibility,
 student feedback explanations, item review copy notes, CSV explanation columns,
 printable answer-key explanations, or explanation privacy guards.
 Assignment source-activity context chain has a fast script-level gate via
-`pnpm exec tsx --test scripts/assignment-source-activity-context-chain-handoff.test.ts`;
+`pnpm exec tsx --test scripts/assignment-source-activity-context-chain.test.ts`;
 run it when changing source-activity snapshot resolution, assignment-list
 search, public student payloads, result headers, CSV source columns, printable
 worksheet fields, source-context chain alignment, the 30-slice result-material
@@ -501,7 +501,7 @@ run it when changing owner-scoped activity/assignment summaries,
 starter-preview boundaries, independent loading states, top metrics, loop
 status, next actions, or route targets.
 Teacher workspace operations chain has a fast script-level gate via
-`pnpm exec tsx --test scripts/teacher-workspace-operations-chain-handoff.test.ts`;
+`pnpm exec tsx --test scripts/teacher-workspace-operations-chain.test.ts`;
 run it when changing the dashboard overview, dashboard owner
 summaries, activity library filters/summaries/actions, assignment list
 filters/distribution, account governance, teacher settings
@@ -554,7 +554,7 @@ file id rules, safe filename basenames, content-type normalization,
 material-kind fallback, size normalization, duplicate collapse, reference
 limits, compact JSON shape, storage-key omission, or student-payload privacy.
 Source-material privacy chain has a fast script-level gate via
-`pnpm exec tsx --test scripts/source-material-privacy-chain-handoff.test.ts`;
+`pnpm exec tsx --test scripts/source-material-privacy-chain.test.ts`;
 run it when changing storage upload/access, ActivityContent.sourceMaterials
 references, the 30-slice compact material reference handoff boundary, settings
 files, source-material picker, AI draft source notes,
@@ -569,19 +569,19 @@ Assignment result review controls has a fast script-level gate via
 run it when changing result-page route parsing, default elision, or
 invalid-route guards for student search, sorting, and answer-review filters.
 Teacher results review chain has a fast script-level gate via
-`pnpm exec tsx --test scripts/teacher-results-review-chain-handoff.test.ts`;
+`pnpm exec tsx --test scripts/teacher-results-review-chain.test.ts`;
 run it when changing owner-scoped result routes, frozen snapshots, attempt
 stats, review controls, result review controls boundary, student search/sort
 rules, item performance sorting,
 copy artifacts, CSV exports, result-material privacy, empty-result guidance,
 anonymous-token guards, or source-material guards.
 Teacher result copy lifecycle chain has a fast script-level gate via
-`pnpm exec tsx --test scripts/teacher-result-copy-lifecycle-chain-handoff.test.ts`;
+`pnpm exec tsx --test scripts/teacher-result-copy-lifecycle-chain.test.ts`;
 run it when changing classroom brief builders, reteach plan builders, item-review summaries, student follow-up
 summaries, copy preview metadata, current-review copy data, the full-assignment
 CSV boundary, action execution, or copy-artifact privacy guards.
 Assignment attempt review card chain has a fast script-level gate via
-`pnpm exec tsx --test scripts/assignment-attempt-review-card-chain-handoff.test.ts`;
+`pnpm exec tsx --test scripts/assignment-attempt-review-card-chain.test.ts`;
 run it when changing scored result persistence, answer review summaries, answer
 text/status helpers, review filters, copy scope, CSV export, printable review
 alignment, privacy guards, or the source-level attempt review card chain.
@@ -608,14 +608,14 @@ default route elision, search normalization, page reset, page preservation,
 dashboard controls, list API owner scope, source-material post-filter behavior,
 or privacy guards.
 Activity library filter-state chain has a fast script-level gate via
-`pnpm exec tsx --test scripts/activity-library-filter-state-chain-handoff.test.ts`;
+`pnpm exec tsx --test scripts/activity-library-filter-state-chain.test.ts`;
 run it when changing URL validateSearch, NFKC search normalization,
 status/template/source filters, page reset, created-activity context,
 dashboard controls, list API owner scope, source-material post-filtering,
 activity source-material summary-chain alignment, or activity-library filter
 privacy guards.
 Activity source-material summary chain has a fast script-level gate via
-`pnpm exec tsx --test scripts/activity-source-material-summary-chain-handoff.test.ts`;
+`pnpm exec tsx --test scripts/activity-source-material-summary-chain.test.ts`;
 run it when changing the card summary surface, attached count,
 material-kind badges, extraction readiness, edit-return path, activity library
 consumers, source extraction lifecycle alignment, AI-safe provenance,
@@ -634,7 +634,7 @@ archived library visibility, edit/publish/duplicate/remix gates,
 restore-before-derive policy, assignment snapshot protection, public assignment
 continuity, or server archive/restore/derivative guards.
 Activity lifecycle governance chain has a fast script-level gate via
-`pnpm exec tsx --test scripts/activity-lifecycle-governance-chain-handoff.test.ts`;
+`pnpm exec tsx --test scripts/activity-lifecycle-governance-chain.test.ts`;
 run it when changing owner-scoped archive and restore, edit, publish,
 duplicate, and remix gates, server lifecycle enforcement, content and
 source-material retention, assignment snapshot protection, public assignment
@@ -654,13 +654,13 @@ normalization or preservation, search normalization, page reset, dashboard
 controls, list API owner scope, search where clauses, status filters, full
 filtered-result summaries, or privacy guards.
 Assignment list filter-state chain has a fast script-level gate via
-`pnpm exec tsx --test scripts/assignment-list-filter-state-chain-handoff.test.ts`;
+`pnpm exec tsx --test scripts/assignment-list-filter-state-chain.test.ts`;
 run it when changing assignment list URL validateSearch, published context,
 search normalization, lifecycle status filters, page reset, dashboard controls,
 list API owner scope, full filtered summary, privacy guards, or the
 source-level filter-state chain contract.
 Assignment distribution lifecycle chain has a fast script-level gate via
-`pnpm exec tsx --test scripts/assignment-distribution-lifecycle-chain-handoff.test.ts`;
+`pnpm exec tsx --test scripts/assignment-distribution-lifecycle-chain.test.ts`;
 run it when changing post-publish route context, owner-scoped published lookup,
 absolute student URLs, frozen source activity context,
 copy/preview/print/results actions, assignment-list distribution steps,
@@ -682,13 +682,13 @@ when changing AI source textarea descriptions, source-readiness, safe/omitted
 material provenance, attached-material capability summaries, sync-material
 controls, or generate-button gating.
 Transactional mail lifecycle chain has a fast script-level gate via
-`pnpm exec tsx --test scripts/transactional-mail-lifecycle-chain-handoff.test.ts`;
+`pnpm exec tsx --test scripts/transactional-mail-lifecycle-chain.test.ts`;
 run it when changing the transactional template set, locale fallback,
 HTML/plain-text rendering, shared workspace boundary, auth reset/verification,
 newsletter confirmation, contact classroom inquiry, provider registry, mail
 disabled/provider-secret guards, no-mutation guarantees, or mail privacy guards.
 Activity AI authoring chain has a fast script-level gate via
-`pnpm exec tsx --test scripts/activity-ai-authoring-chain-handoff.test.ts`;
+`pnpm exec tsx --test scripts/activity-ai-authoring-chain.test.ts`;
 run it when changing AI source safety, authenticated draft generation,
 deterministic fallback, CreateActivityInput mapping, draft coverage,
 template readiness, quiz-choice readiness, AI remix assist, editor review,
@@ -698,7 +698,7 @@ provider JSON, sanitized term planning, complete classroom fields, editor
 application, teacher review, persistence boundaries, provider secrets, and
 privacy while its independent source file gate remains intact.
 Activity AI fallback draft chain has a fast script-level gate via
-`pnpm exec tsx --test scripts/activity-ai-fallback-draft-chain-handoff.test.ts`;
+`pnpm exec tsx --test scripts/activity-ai-fallback-draft-chain.test.ts`;
 run it when changing missing Workers AI credentials, invalid provider JSON,
 deterministic local draft generation, source-term planning, fallback padding,
 CreateActivityInput mapping, teacher review, editor application,
@@ -708,7 +708,7 @@ create and edit contracts, persistence, teacher-owned library management,
 readiness, lifecycle gates, publish access, snapshot protection, and privacy
 while its independent source file gate remains intact.
 Activity AI enhancement roadmap chain has a fast script-level gate via
-`pnpm exec tsx --test scripts/activity-ai-enhancement-roadmap-chain-handoff.test.ts`;
+`pnpm exec tsx --test scripts/activity-ai-enhancement-roadmap-chain.test.ts`;
 run it when changing template transforms, AI remix completion, distractor write
 targets, leveled variants, answer explanations, listening scripts,
 worksheet/audio/spreadsheet extraction, provider and fallback gates,
@@ -768,7 +768,7 @@ application, teacher review, manual save, saved activity records, assignment
 publish actions, share-link/snapshot boundaries, public payload/privacy guards,
 or result-export continuity.
 Template roadmap capability chain has a fast script-level gate via
-`pnpm exec tsx --test scripts/template-roadmap-capability-chain-handoff.test.ts`;
+`pnpm exec tsx --test scripts/template-roadmap-capability-chain.test.ts`;
 run it when changing roadmap template promises, Wordwall-style templates,
 Liveworksheets-style modes, shared editor scaffolds, AI enhancements, source
 extraction readiness, worksheet delivery, print follow-up, result export
@@ -778,13 +778,13 @@ persistence, owner-scoped library management, readiness, derivative drafts,
 lifecycle gates, publish access, snapshot protection, and privacy while its
 independent source file gate remains intact.
 Activity authoring/library chain has a fast script-level gate via
-`pnpm exec tsx --test scripts/activity-authoring-library-chain-handoff.test.ts`;
+`pnpm exec tsx --test scripts/activity-authoring-library-chain.test.ts`;
 run it when changing public template and worksheet entries, shared editor save,
 the editor workflow, edit hydration, owner-scoped
 library management, derivative drafts, lifecycle gates, publish snapshot
 boundaries, or the end-to-end activity creation to library workflow contract.
 Source extraction lifecycle chain has a fast script-level gate via
-`pnpm exec tsx --test scripts/source-extraction-lifecycle-chain-handoff.test.ts`;
+`pnpm exec tsx --test scripts/source-extraction-lifecycle-chain.test.ts`;
 run it when changing compact source-material references, material-kind
 classification, extraction readiness action maps, audio/worksheet/spreadsheet
 readiness, source summaries, AI source provenance, ActivityContent write
@@ -817,7 +817,7 @@ scored-attempt row construction, identity/time fields, immutable answer/result
 JSON, sanitized feedback, teacher analysis, statistics, CSV export, or private
 persistence guards.
 Scored attempt result lifecycle chain has a fast script-level gate via
-`pnpm exec tsx --test scripts/scored-attempt-result-chain-handoff.test.ts`;
+`pnpm exec tsx --test scripts/scored-attempt-result-chain.test.ts`;
 run it when changing the post-submit scored-result boundary, sanitized public
 feedback, attempt stats, teacher result review, the 30-slice attempt review card
 handoff boundary, copy artifacts, CSV export, printable review return links,
@@ -835,7 +835,7 @@ frozen snapshot worksheet generation, source activity description fields,
 delivery-policy printing, answer-key toggle behavior, privacy-scope boundaries,
 accepted-answer/explanation rendering, or the print toolbar.
 Printable worksheet review lifecycle chain has a fast script-level gate via
-`pnpm exec tsx --test scripts/printable-worksheet-review-lifecycle-chain-handoff.test.ts`;
+`pnpm exec tsx --test scripts/printable-worksheet-review-lifecycle-chain.test.ts`;
 run it when changing result-page print actions, teacher-only print routes,
 frozen snapshot handouts, answer-key hidden/included/unavailable states, source
 activity description fields, toolbar toggles, print actions,
@@ -844,14 +844,14 @@ alignment, the 30-slice printable worksheet handoff boundary for handout
 overview, response planning, delivery context, answer-key access, print
 controls, route boundaries, and privacy, or CSV export alignment.
 Worksheet-mode delivery chain has a fast script-level gate via
-`pnpm exec tsx --test scripts/worksheet-mode-delivery-chain-handoff.test.ts`;
+`pnpm exec tsx --test scripts/worksheet-mode-delivery-chain.test.ts`;
 run it when changing `/worksheets` creation entry points, shared create editor
 scaffolds, assignment snapshots, worksheet-style student runtimes, printable
 handouts and their 30-slice printable worksheet handoff boundary, result
 exports, worksheet extraction boundaries, or source-material
 and student-identity privacy guards.
 Student runner play chain has a fast script-level gate via
-`pnpm exec tsx --test scripts/student-runner-play-chain-handoff.test.ts`;
+`pnpm exec tsx --test scripts/student-runner-play-chain.test.ts`;
 run it when changing the visible submit controls, public
 payload access, public rule summary, runner loading or start readiness, identity
 and anonymous-token policy, attempt limits, timers/duration, template renderers,

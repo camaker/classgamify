@@ -23,7 +23,7 @@ type PublicPageRouteAction = {
     | typeof Routes.Templates;
 };
 
-export type HomePageViewModel = {
+type HomePageViewModel = {
   features: HomePageFeature[];
   featureSection: HomePageFeatureSectionView;
   hero: HomePageHeroView;
@@ -61,7 +61,7 @@ type HomePageHeroView = {
   title: string;
 };
 
-export type HomePagePreviewView = {
+type HomePagePreviewView = {
   activity: ActivitySeed;
   assignment: AssignmentSeed;
   source: 'starter-preview';
@@ -83,7 +83,7 @@ type HomePageSignalPanelView = {
   title: string;
 };
 
-export type RoadmapPageViewModel = {
+type RoadmapPageViewModel = {
   columns: RoadmapColumnView[];
   hero: RoadmapHeroView;
   principles: RoadmapPrincipleView[];
@@ -125,7 +125,7 @@ type RoadmapSnapshotView = {
   title: string;
 };
 
-export type RoadmapTaskId =
+type RoadmapTaskId =
   | 'ai-assisted-activity-drafting'
   | 'activity-assignment-loop'
   | 'playable-template-foundation'
@@ -134,7 +134,7 @@ export type RoadmapTaskId =
   | 'worksheet-extraction'
   | 'worksheet-style-delivery';
 
-export type RoadmapTaskStatus = 'available' | 'improving' | 'planned';
+type RoadmapTaskStatus = 'available' | 'improving' | 'planned';
 
 type RoadmapTaskView = {
   description: string;
@@ -156,7 +156,7 @@ type RoadmapValidationView = {
   title: string;
 };
 
-export type TeachersPageViewModel = {
+type TeachersPageViewModel = {
   hero: TeachersHeroView;
   schoolCta: TeachersSchoolCtaView;
   templatePanel: TeachersTemplatePanelView;
@@ -168,7 +168,7 @@ export type TeachersPageViewModel = {
 
 export type ContactIntent = 'classroom' | 'general';
 
-export type ContactPageViewModel = {
+type ContactPageViewModel = {
   checklist: ContactChecklistView;
   directSubject: string;
   hero: ContactHeroView;
@@ -187,7 +187,7 @@ export type ContactPageViewModel = {
 
 export type ContactTopicId = 'classroom' | 'partnership' | 'product';
 
-export type ContactChecklistItemId =
+type ContactChecklistItemId =
   | 'classroom-learners'
   | 'classroom-routine'
   | 'classroom-worksheets'
@@ -246,7 +246,7 @@ type ContactTopicView = {
   title: string;
 };
 
-export type PricingPageViewModel = {
+type PricingPageViewModel = {
   faq: {
     ariaLabel: string;
     description: string;
@@ -271,14 +271,14 @@ export type PricingPageViewModel = {
 
 export type PricingValueCardId = 'ai' | 'assignments' | 'templates';
 
-export type PricingFaqItemId =
+type PricingFaqItemId =
   | 'free'
   | 'pro'
   | 'schools'
   | 'student-accounts'
   | 'templates';
 
-export type PricingFaqItemView = {
+type PricingFaqItemView = {
   answer: string;
   ariaLabel: string;
   id: PricingFaqItemId;

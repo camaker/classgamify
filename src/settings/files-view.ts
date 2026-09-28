@@ -22,7 +22,7 @@ export type SettingsFilesWorkspaceSummaryView = {
   title: string;
 };
 
-export type SettingsFilesPageViewModel = {
+type SettingsFilesPageViewModel = {
   breadcrumbs: DashboardBreadcrumbItem[];
   description: string;
   title: string;

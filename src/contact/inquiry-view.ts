@@ -12,7 +12,7 @@ export const CONTACT_CLASSROOM_INQUIRY_SCOPE_ITEM_IDS = [
 export type ContactClassroomInquiryScopeItemId =
   (typeof CONTACT_CLASSROOM_INQUIRY_SCOPE_ITEM_IDS)[number];
 
-export type ContactClassroomInquiryPrivacyBoundaryId = 'safe-classroom-context';
+type ContactClassroomInquiryPrivacyBoundaryId = 'safe-classroom-context';
 
 export type ContactClassroomInquiryScopeItemView = {
   description: string;

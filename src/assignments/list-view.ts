@@ -72,26 +72,22 @@ type AssignmentListControlOption = {
   value: AssignmentStatusFilter;
 };
 
-export type AssignmentListPageScopeItemId =
-  | 'page'
-  | 'range'
-  | 'search'
-  | 'status';
+type AssignmentListPageScopeItemId = 'page' | 'range' | 'search' | 'status';
 
-export type AssignmentListPageScopeItem = {
+type AssignmentListPageScopeItem = {
   description: string;
   id: AssignmentListPageScopeItemId;
   label: string;
   value: string;
 };
 
-export type AssignmentListPageScopeView = {
+type AssignmentListPageScopeView = {
   items: AssignmentListPageScopeItem[];
   label: string;
   summary: string;
 };
 
-export type AssignmentListFilterScopeBoundary = {
+type AssignmentListFilterScopeBoundary = {
   broadensBeyondOwner: false;
   countsStarterPreviewAsOwned: false;
   fullFilteredAssignmentCount: number;
@@ -111,7 +107,7 @@ export type AssignmentListFilterScopeBoundary = {
   visiblePageAssignmentCount: number;
 };
 
-export type AssignmentListSearchPanelView = {
+type AssignmentListSearchPanelView = {
   filterSummary: AssignmentListFilterSummary;
   hasSearchValue: boolean;
   searchDescription: string;
@@ -131,7 +127,7 @@ export type AssignmentListCardStat = {
   value: string;
 };
 
-export type AssignmentListCardActionState = {
+type AssignmentListCardActionState = {
   isPersisted: boolean;
   shareAvailability: AssignmentShareLinkAvailability;
   shareDisabledReasonCode?: AssignmentShareLinkDisabledReasonCode;
@@ -357,12 +353,12 @@ type AssignmentListRouteState<TItem extends AssignmentListPageItem> =
       status: 'ready';
     };
 
-export type AssignmentListStarterPreviewItem = {
+type AssignmentListStarterPreviewItem = {
   activity: ActivitySeed;
   assignment: AssignmentSeed;
 };
 
-export type AssignmentListStarterPreview = {
+type AssignmentListStarterPreview = {
   assignments: AssignmentListStarterPreviewItem[];
   source: 'starter-preview';
 };

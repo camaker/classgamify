@@ -6,23 +6,22 @@ export const AUTH_ERROR_RECOVERY_STEP_IDS = [
   'protect-workspace',
 ] as const;
 
-export type AuthErrorRecoveryStepId =
-  (typeof AUTH_ERROR_RECOVERY_STEP_IDS)[number];
+type AuthErrorRecoveryStepId = (typeof AUTH_ERROR_RECOVERY_STEP_IDS)[number];
 
-export type AuthErrorDisplaySource = 'fallback' | 'known-code';
+type AuthErrorDisplaySource = 'fallback' | 'known-code';
 
-export type AuthErrorDisplayView = {
+type AuthErrorDisplayView = {
   message: string;
   source: AuthErrorDisplaySource;
 };
 
-export type AuthErrorRecoveryStepView = {
+type AuthErrorRecoveryStepView = {
   description: string;
   id: AuthErrorRecoveryStepId;
   title: string;
 };
 
-export type AuthErrorRecoveryView = {
+type AuthErrorRecoveryView = {
   description: string;
   message: AuthErrorDisplayView;
   messageLabel: string;

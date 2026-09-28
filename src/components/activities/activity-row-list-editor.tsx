@@ -7,7 +7,7 @@ import { cn } from '@/lib/utils';
 import { IconChevronDown, IconPlus, IconTrash } from '@tabler/icons-react';
 import { type ComponentProps, useEffect, useId, useRef, useState } from 'react';
 
-export type ActivityRowListColumn = {
+type ActivityRowListColumn = {
   key: string;
   label: string;
   placeholder?: string;

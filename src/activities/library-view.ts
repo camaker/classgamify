@@ -141,18 +141,15 @@ export type ActivityLibraryCardActionState = {
   showRemixActions: boolean;
 };
 
-export type ActivityLibraryCardStatusSummaryItemId =
+type ActivityLibraryCardStatusSummaryItemId =
   | 'library-status'
   | 'publish'
   | 'remix'
   | 'source-materials';
 
-export type ActivityLibraryCardStatusSummaryTone =
-  | 'blocked'
-  | 'neutral'
-  | 'ready';
+type ActivityLibraryCardStatusSummaryTone = 'blocked' | 'neutral' | 'ready';
 
-export type ActivityLibraryCardStatusSummaryItem = {
+type ActivityLibraryCardStatusSummaryItem = {
   ariaLabel: string;
   description: string;
   id: ActivityLibraryCardStatusSummaryItemId;
@@ -161,7 +158,7 @@ export type ActivityLibraryCardStatusSummaryItem = {
   value: string;
 };
 
-export type ActivityLibraryCardStatusSummaryView = {
+type ActivityLibraryCardStatusSummaryView = {
   ariaLabel: string;
   items: ActivityLibraryCardStatusSummaryItem[];
   label: string;
@@ -186,7 +183,7 @@ export type ActivityLibraryCardViewModel = {
   title: string;
 };
 
-export type ActivityLibraryCardDisplayView = {
+type ActivityLibraryCardDisplayView = {
   editAction: ActivityLibraryEditorActionView;
   actionState: ActivityLibraryCardActionState;
   actionView: ActivityLibraryCardActionView;
@@ -230,8 +227,6 @@ export type CreatedActivityPanelContext = {
   status: 'found' | 'loading' | 'missing';
   title: string;
 };
-
-export type CreatedActivityPanelActivity = CreatedActivityListItem | undefined;
 
 export type CreatedActivityPanelEditAction = ActivityLibraryEditorActionView;
 
@@ -297,7 +292,7 @@ type ActivityLibrarySearchPanelView = {
   templateOptions: ActivityLibraryTemplateFilterOption[];
 };
 
-export type ActivityLibraryPageScopeItemId =
+type ActivityLibraryPageScopeItemId =
   | 'page'
   | 'range'
   | 'search'
@@ -305,20 +300,20 @@ export type ActivityLibraryPageScopeItemId =
   | 'status'
   | 'template';
 
-export type ActivityLibraryPageScopeItem = {
+type ActivityLibraryPageScopeItem = {
   description: string;
   id: ActivityLibraryPageScopeItemId;
   label: string;
   value: string;
 };
 
-export type ActivityLibraryPageScopeView = {
+type ActivityLibraryPageScopeView = {
   items: ActivityLibraryPageScopeItem[];
   label: string;
   summary: string;
 };
 
-export type ActivityLibrarySourceScopeBoundary = {
+type ActivityLibrarySourceScopeBoundary = {
   broadensBeyondOwner: false;
   countsStarterPreviewAsOwned: false;
   fullFilteredActivityCount: number;
@@ -431,7 +426,7 @@ type ActivityLibraryRouteState<TItem extends ActivityLibraryPageItem> =
       status: 'ready';
     };
 
-export type ActivityLibraryStarterPreview = {
+type ActivityLibraryStarterPreview = {
   activities: ActivitySeed[];
   source: 'starter-preview';
 };

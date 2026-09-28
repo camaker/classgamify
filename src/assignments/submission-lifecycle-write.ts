@@ -5,7 +5,7 @@ export const ASSIGNMENT_SUBMISSION_STATUS_BLOCKED_MARKER =
   'classgamify_assignment_submission_status_blocked';
 export const ASSIGNMENT_SUBMISSION_EXPIRED_MARKER =
   'classgamify_assignment_submission_expired';
-export const ATTEMPT_IDENTITY_SLOT_UNIQUE_INDEX =
+const ATTEMPT_IDENTITY_SLOT_UNIQUE_INDEX =
   'attempt_assignment_identity_number_unique';
 
 export const ASSIGNMENT_SUBMISSION_WRITE_GUARD_STAGES = [

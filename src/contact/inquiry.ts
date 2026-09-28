@@ -37,7 +37,7 @@ export const CONTACT_CLASSROOM_INQUIRY_MAX_FIELD_LENGTH = Math.max(
 
 export type ContactInquiryIntent = 'classroom' | 'general';
 
-export type ContactClassroomInquiryInput = Partial<
+type ContactClassroomInquiryInput = Partial<
   Record<ContactClassroomInquiryFieldId, string | null | undefined>
 >;
 

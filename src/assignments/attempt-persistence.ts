@@ -26,7 +26,7 @@ export type ScoredAttemptEvaluation = {
   result: AttemptResult;
 };
 
-export type ScoredAttemptIdentity = {
+type ScoredAttemptIdentity = {
   anonymousToken: string | null;
   studentName: string | null;
 };

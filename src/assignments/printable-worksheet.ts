@@ -50,7 +50,7 @@ export type PrintableWorksheetItemLayout =
   | 'multiple-choice'
   | 'short-answer';
 
-export type PrintableWorksheetResponsePolicy = {
+type PrintableWorksheetResponsePolicy = {
   answerSpaceLines: number;
   choicePresentation: PrintableWorksheetChoicePresentation;
   itemLayout: PrintableWorksheetItemLayout;
@@ -79,7 +79,7 @@ export type PrintableWorksheetAnswerKeyItem = {
   sequenceNumber: number;
 };
 
-export type PrintableAssignmentDeliveryView = {
+type PrintableAssignmentDeliveryView = {
   deliveryPolicyText: string;
   deliverySummary: AssignmentDeliverySummaryItem[];
   instructions?: string;

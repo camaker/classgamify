@@ -73,7 +73,7 @@ export type AssignmentResultResolvedViewState = {
   studentSort: StudentSummarySort;
 };
 
-export type AssignmentResultControlSearchUpdate =
+type AssignmentResultControlSearchUpdate =
   | {
       control: 'attempt-review-filter';
       value: AttemptReviewFilter;

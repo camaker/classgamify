@@ -1,7 +1,7 @@
 import { getTemplate } from '@/mail/render';
 import type { SendRawEmailParams, SendTemplateParams } from '@/mail/types';
 
-export type E2EMailOutboxRecord = {
+type E2EMailOutboxRecord = {
   context?: Record<string, unknown>;
   createdAt: string;
   html: string;

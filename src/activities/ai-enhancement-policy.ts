@@ -63,7 +63,7 @@ export const ACTIVITY_AI_ENHANCEMENT_POLICY_ITEM_IDS = [
 export type ActivityAiEnhancementKind =
   (typeof ACTIVITY_AI_ENHANCEMENT_KINDS)[number];
 
-export type ActivityAiEnhancementPolicyItemId =
+type ActivityAiEnhancementPolicyItemId =
   (typeof ACTIVITY_AI_ENHANCEMENT_POLICY_ITEM_IDS)[number];
 
 export type ActivityAiEnhancementPolicyStatus =
@@ -87,7 +87,7 @@ export type ActivityAiEnhancementPolicyTargetField =
   | 'templateType'
   | 'vocabulary';
 
-export type ActivityAiEnhancementPolicyItemView = {
+type ActivityAiEnhancementPolicyItemView = {
   ariaLabel: string;
   description: string;
   id: ActivityAiEnhancementPolicyItemId;
@@ -95,7 +95,7 @@ export type ActivityAiEnhancementPolicyItemView = {
   value: string;
 };
 
-export type ActivityAiEnhancementPolicyPrivacyContract = {
+type ActivityAiEnhancementPolicyPrivacyContract = {
   appliesBeforeActivitySave: true;
   createsAssignmentLinksWithoutTeacherAction: false;
   exposesActivityContentText: false;
@@ -156,7 +156,7 @@ export type ActivityAiEnhancementPolicyDecision = {
   worksheetSourceCount: number;
 };
 
-export type ActivityAiEnhancementPolicyView = {
+type ActivityAiEnhancementPolicyView = {
   decision: ActivityAiEnhancementPolicyDecision;
   description: string;
   itemViews: ActivityAiEnhancementPolicyItemView[];

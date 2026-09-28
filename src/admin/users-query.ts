@@ -9,8 +9,8 @@ export const ADMIN_USER_LIST_INPUT_LIMITS = {
 
 export const ADMIN_USER_STATUS_FILTERS = ['active', 'inactive'] as const;
 
-export type AdminUserStatusFilter = (typeof ADMIN_USER_STATUS_FILTERS)[number];
-export type AdminUserSortId = 'createdAt' | 'email' | 'name';
+type AdminUserStatusFilter = (typeof ADMIN_USER_STATUS_FILTERS)[number];
+type AdminUserSortId = 'createdAt' | 'email' | 'name';
 
 const ADMIN_USER_SORT_FIELD_MAP = {
   createdAt: user.createdAt,
