@@ -238,7 +238,7 @@ export function ActivityCreateForm({
   }
 
   return (
-    <Card className="rounded-lg">
+    <Card className="overflow-visible rounded-lg">
       <ActivityEditorHeader
         modeView={modeView}
         template={templateView.template}
@@ -286,7 +286,10 @@ export function ActivityCreateForm({
                 selectOptionsView={selectOptionsView}
               />
 
-              <ActivityEditorStructuredContentFields control={form.control} />
+              <ActivityEditorStructuredContentFields
+                control={form.control}
+                requirements={templateView.template.contentRequirements}
+              />
             </ActivityEditorSection>
 
             <ActivityEditorSection

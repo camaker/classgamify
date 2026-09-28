@@ -10,13 +10,14 @@ import {
   parseCreateActivityTemplateSourceSearch,
 } from '@/activities/template-entry';
 import { websiteConfig } from '@/config/website';
+import { createRouteWorkspaceMiddleware } from '@/middlewares/auth-middleware';
 import { Routes } from '@/lib/routes';
 import { getPathWithLocale } from '@/lib/urls';
 import { m } from '@/locale/paraglide/messages';
 import { seo } from '@/lib/seo';
 import { cn } from '@/lib/utils';
 import { IconDeviceGamepad2, IconSparkles } from '@tabler/icons-react';
-import { createFileRoute, Link } from '@tanstack/react-router';
+import { createFileRoute, Link, useNavigate } from '@tanstack/react-router';
 import { useEffect, useMemo, useState } from 'react';
 
 export const Route = createFileRoute('/create')({
@@ -29,6 +30,9 @@ export const Route = createFileRoute('/create')({
       title: `${m.create_page_seo_title()} | ${websiteConfig.metadata?.name}`,
       description: m.create_page_seo_description(),
     }),
+  server: {
+    middleware: [createRouteWorkspaceMiddleware],
+  },
   component: CreatePage,
 });
 
@@ -37,6 +41,18 @@ function CreatePage() {
   const { data: session, isPending: sessionPending } = authClient.useSession();
   const [sessionReady, setSessionReady] = useState(false);
   useEffect(() => setSessionReady(true), []);
+  const navigate = useNavigate();
+  // Client-side navigations skip the server middleware; send signed-in
+  // teachers to the workspace editor here too.
+  useEffect(() => {
+    if (session?.user) {
+      void navigate({
+        to: Routes.DashboardActivityNew,
+        search: { source, template },
+        replace: true,
+      });
+    }
+  }, [navigate, session?.user, source, template]);
   const pageView = useMemo(
     () =>
       buildActivityCreatePageEditorViewModel({

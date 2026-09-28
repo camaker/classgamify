@@ -60,6 +60,7 @@ import { Route as ApiStorageFileRouteImport } from './routes/api/storage/file'
 import { Route as ApiWebhooksCreemRouteImport } from './routes/api/webhooks/creem'
 import { Route as ApiWebhooksStripeRouteImport } from './routes/api/webhooks/stripe'
 import { Route as DashboardActivitiesActivityIdRouteImport } from './routes/dashboard/activities/$activityId'
+import { Route as DashboardActivitiesNewRouteImport } from './routes/dashboard/activities_.new'
 import { Route as DashboardAssignmentsAssignmentIdRouteImport } from './routes/dashboard/assignments/$assignmentId'
 import { Route as PrintAssignmentsAssignmentIdRouteImport } from './routes/print/assignments/$assignmentId'
 
@@ -319,6 +320,11 @@ const DashboardActivitiesActivityIdRoute =
     path: '/$activityId',
     getParentRoute: () => DashboardActivitiesRoute,
   } as any)
+const DashboardActivitiesNewRoute = DashboardActivitiesNewRouteImport.update({
+  id: '/activities_/new',
+  path: '/activities/new',
+  getParentRoute: () => DashboardRoute,
+} as any)
 const DashboardAssignmentsAssignmentIdRoute =
   DashboardAssignmentsAssignmentIdRouteImport.update({
     id: '/$assignmentId',
@@ -384,6 +390,7 @@ export interface FileRoutesByFullPath {
   '/api/webhooks/creem': typeof ApiWebhooksCreemRoute
   '/api/webhooks/stripe': typeof ApiWebhooksStripeRoute
   '/dashboard/activities/$activityId': typeof DashboardActivitiesActivityIdRoute
+  '/dashboard/activities/new': typeof DashboardActivitiesNewRoute
   '/dashboard/assignments/$assignmentId': typeof DashboardAssignmentsAssignmentIdRoute
   '/print/assignments/$assignmentId': typeof PrintAssignmentsAssignmentIdRoute
 }
@@ -436,6 +443,7 @@ export interface FileRoutesByTo {
   '/api/webhooks/creem': typeof ApiWebhooksCreemRoute
   '/api/webhooks/stripe': typeof ApiWebhooksStripeRoute
   '/dashboard/activities/$activityId': typeof DashboardActivitiesActivityIdRoute
+  '/dashboard/activities/new': typeof DashboardActivitiesNewRoute
   '/dashboard/assignments/$assignmentId': typeof DashboardAssignmentsAssignmentIdRoute
   '/print/assignments/$assignmentId': typeof PrintAssignmentsAssignmentIdRoute
 }
@@ -492,6 +500,7 @@ export interface FileRoutesById {
   '/api/webhooks/creem': typeof ApiWebhooksCreemRoute
   '/api/webhooks/stripe': typeof ApiWebhooksStripeRoute
   '/dashboard/activities/$activityId': typeof DashboardActivitiesActivityIdRoute
+  '/dashboard/activities_/new': typeof DashboardActivitiesNewRoute
   '/dashboard/assignments/$assignmentId': typeof DashboardAssignmentsAssignmentIdRoute
   '/print/assignments/$assignmentId': typeof PrintAssignmentsAssignmentIdRoute
 }
@@ -549,6 +558,7 @@ export interface FileRouteTypes {
     | '/api/webhooks/creem'
     | '/api/webhooks/stripe'
     | '/dashboard/activities/$activityId'
+    | '/dashboard/activities/new'
     | '/dashboard/assignments/$assignmentId'
     | '/print/assignments/$assignmentId'
   fileRoutesByTo: FileRoutesByTo
@@ -601,6 +611,7 @@ export interface FileRouteTypes {
     | '/api/webhooks/creem'
     | '/api/webhooks/stripe'
     | '/dashboard/activities/$activityId'
+    | '/dashboard/activities/new'
     | '/dashboard/assignments/$assignmentId'
     | '/print/assignments/$assignmentId'
   id:
@@ -656,6 +667,7 @@ export interface FileRouteTypes {
     | '/api/webhooks/creem'
     | '/api/webhooks/stripe'
     | '/dashboard/activities/$activityId'
+    | '/dashboard/activities_/new'
     | '/dashboard/assignments/$assignmentId'
     | '/print/assignments/$assignmentId'
   fileRoutesById: FileRoutesById
@@ -1056,6 +1068,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DashboardActivitiesActivityIdRouteImport
       parentRoute: typeof DashboardActivitiesRoute
     }
+    '/dashboard/activities_/new': {
+      id: '/dashboard/activities_/new'
+      path: '/activities/new'
+      fullPath: '/dashboard/activities/new'
+      preLoaderRoute: typeof DashboardActivitiesNewRouteImport
+      parentRoute: typeof DashboardRoute
+    }
     '/dashboard/assignments/$assignmentId': {
       id: '/dashboard/assignments/$assignmentId'
       path: '/$assignmentId'
@@ -1129,12 +1148,14 @@ interface DashboardRouteChildren {
   DashboardActivitiesRoute: typeof DashboardActivitiesRouteWithChildren
   DashboardAssignmentsRoute: typeof DashboardAssignmentsRouteWithChildren
   DashboardIndexRoute: typeof DashboardIndexRoute
+  DashboardActivitiesNewRoute: typeof DashboardActivitiesNewRoute
 }
 
 const DashboardRouteChildren: DashboardRouteChildren = {
   DashboardActivitiesRoute: DashboardActivitiesRouteWithChildren,
   DashboardAssignmentsRoute: DashboardAssignmentsRouteWithChildren,
   DashboardIndexRoute: DashboardIndexRoute,
+  DashboardActivitiesNewRoute: DashboardActivitiesNewRoute,
 }
 
 const DashboardRouteWithChildren = DashboardRoute._addFileChildren(

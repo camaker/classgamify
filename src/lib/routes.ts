@@ -19,6 +19,7 @@ export const Routes = {
   Play: ASSIGNMENT_SHARE_ROUTE_TARGET,
   Resources: '/blog',
   DashboardActivities: '/dashboard/activities',
+  DashboardActivityNew: '/dashboard/activities/new',
   DashboardActivityEdit: '/dashboard/activities/$activityId',
   DashboardAssignments: '/dashboard/assignments',
   DashboardAssignmentResults: '/dashboard/assignments/$assignmentId',

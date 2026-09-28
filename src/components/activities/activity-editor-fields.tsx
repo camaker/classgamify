@@ -2,6 +2,7 @@ import type {
   ActivityEditorSelectOptionsView,
   ActivityEditorTemplateView,
 } from '@/activities/editor';
+import type { ActivityTemplateContentRequirement } from '@/activities/types';
 import type { CreateActivityInput } from '@/activities/validation';
 import { ActivityRowListEditor } from '@/components/activities/activity-row-list-editor';
 import { ActivitySourceMaterialsField } from '@/components/activities/activity-source-materials-field';
@@ -22,7 +23,7 @@ import {
 import { Textarea } from '@/components/ui/textarea';
 import { m } from '@/locale/paraglide/messages';
 import { IconPaperclip } from '@tabler/icons-react';
-import type { ReactNode } from 'react';
+import { Fragment, type ReactNode } from 'react';
 import type { Control } from 'react-hook-form';
 
 type ActivityEditorFieldsProps = {
@@ -182,9 +183,18 @@ export function ActivityEditorDetailsFields({
 
 export function ActivityEditorStructuredContentFields({
   control,
-}: ActivityEditorFieldsProps) {
-  return (
-    <>
+  requirements,
+}: ActivityEditorFieldsProps & {
+  requirements: readonly ActivityTemplateContentRequirement[];
+}) {
+  const primaryContent = CONTENT_REQUIREMENT_ORDER.filter(
+    (kind: StructuredContentKind) => requirements.includes(kind)
+  );
+  const otherContent = CONTENT_REQUIREMENT_ORDER.filter(
+    (kind: StructuredContentKind) => !primaryContent.includes(kind)
+  );
+  const contentFields: Record<StructuredContentKind, ReactNode> = {
+    questions: (
       <FormField
         control={control}
         name="questionsText"
@@ -229,7 +239,8 @@ export function ActivityEditorStructuredContentFields({
           </FormItem>
         )}
       />
-
+    ),
+    pairs: (
       <FormField
         control={control}
         name="pairsText"
@@ -261,7 +272,8 @@ export function ActivityEditorStructuredContentFields({
           </FormItem>
         )}
       />
-
+    ),
+    groups: (
       <FormField
         control={control}
         name="groupsText"
@@ -299,6 +311,26 @@ export function ActivityEditorStructuredContentFields({
           </FormItem>
         )}
       />
+    ),
+  };
+
+  return (
+    <>
+      {primaryContent.map((kind: StructuredContentKind) => (
+        <Fragment key={kind}>{contentFields[kind]}</Fragment>
+      ))}
+      {otherContent.length > 0 ? (
+        <details className="rounded-lg border px-4 py-3">
+          <summary className="cursor-pointer font-medium text-sm">
+            {m.activity_form_other_content_summary()}
+          </summary>
+          <div className="mt-4 grid gap-6">
+            {otherContent.map((kind: StructuredContentKind) => (
+              <Fragment key={kind}>{contentFields[kind]}</Fragment>
+            ))}
+          </div>
+        </details>
+      ) : null}
 
       <FormField
         control={control}
@@ -356,6 +388,15 @@ export function ActivityEditorStructuredContentFields({
     </>
   );
 }
+
+/** The structured content lists a template can play from. */
+type StructuredContentKind = 'groups' | 'pairs' | 'questions';
+
+const CONTENT_REQUIREMENT_ORDER: readonly StructuredContentKind[] = [
+  'questions',
+  'pairs',
+  'groups',
+];
 
 export function ActivityEditorSourceMaterialsFormField({
   attachedSummaryActionSlot,

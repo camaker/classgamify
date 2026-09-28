@@ -20308,16 +20308,16 @@ assert.deepEqual(
 assert.equal(assignmentPublishDialogCopy.title, 'Publish assignment');
 assert.equal(
   assignmentPublishDialogCopy.description,
-  'Freeze this activity into a student share link with classroom delivery settings.'
+  'Create a student link with these classroom settings.'
 );
 assert.equal(assignmentPublishDialogCopy.previewLabel, 'Delivery preview');
 assert.equal(
   assignmentPublishDialogCopy.previewContextTitle,
-  'Frozen link rules'
+  'What students will see'
 );
 assert.equal(
   assignmentPublishDialogCopy.previewContextDescription,
-  'These settings are the teacher-facing preview of the rules that will be saved with the assignment snapshot and student share link.'
+  'These rules are saved with the student link.'
 );
 assert.equal(assignmentPublishDialogCopy.timeLimitPlaceholder, 'No limit');
 assert.equal(
@@ -20326,10 +20326,10 @@ assert.equal(
 );
 const assignmentPublishReadyAccessView = {
   ariaLabel:
-    'Publish access: Available. This activity can be frozen into a student share link.',
+    'Publish access: Available. This activity is ready to share with students.',
   canOpen: true,
   canPublish: true,
-  description: 'This activity can be frozen into a student share link.',
+  description: 'This activity is ready to share with students.',
   label: 'Publish access',
   status: 'ready' as const,
   value: 'Available',
@@ -20382,17 +20382,17 @@ assert.deepEqual(
   }
 );
 const assignmentPublishPreviewContextDescription =
-  'These settings are the teacher-facing preview of the rules that will be saved with the assignment snapshot and student share link.';
-const assignmentPublishPreviewContextTitle = 'Frozen link rules';
+  'These rules are saved with the student link.';
+const assignmentPublishPreviewContextTitle = 'What students will see';
 const assignmentPublishPreviewReviewLabel = 'Before creating the link';
 const assignmentPublishPreviewReviewItems = [
   {
     ariaLabel:
-      'Snapshot is frozen. Publishing freezes the activity title, template, and content while saving these delivery settings on the share link.',
+      "Later edits won't change this link. Publishing saves a copy of the activity, so editing it later won't change what students see on this link.",
     description:
-      'Publishing freezes the activity title, template, and content while saving these delivery settings on the share link.',
+      'Publishing saves a copy of the activity, so editing it later won\'t change what students see on this link.',
     id: 'snapshot-freeze',
-    label: 'Snapshot is frozen',
+    label: 'Later edits won\'t change this link',
   },
   {
     ariaLabel:
@@ -20404,9 +20404,9 @@ const assignmentPublishPreviewReviewItems = [
   },
   {
     ariaLabel:
-      'Results use the same policy. Attempts, averages, exports, and review pages read from the same frozen assignment settings.',
+      'Results use the same policy. Scores, averages, and exports use these same settings.',
     description:
-      'Attempts, averages, exports, and review pages read from the same frozen assignment settings.',
+      'Scores, averages, and exports use these same settings.',
     id: 'results-policy',
     label: 'Results use the same policy',
   },
@@ -20456,7 +20456,7 @@ const assignmentPublishReadyPreviewContext = {
   ],
   status: {
     label: 'Ready to publish',
-    message: 'Publishing will freeze this preview into the student link.',
+    message: 'Ready to publish this as a student link.',
     tone: 'ready',
   },
   summary: {
@@ -20615,7 +20615,7 @@ const assignmentPublishOpenReadyPreviewContext = {
   ],
   status: {
     label: 'Ready to publish',
-    message: 'Publishing will freeze this preview into the student link.',
+    message: 'Ready to publish this as a student link.',
     tone: 'ready',
   },
   summary: {
@@ -35837,7 +35837,7 @@ assert.deepEqual(
           'Create activity',
           'ready',
           'Next',
-          Routes.Create,
+          Routes.DashboardActivityNew,
           'Create activity: Next',
           'This is the next useful action for the current teacher workspace state.',
           'Create activity: Next. This is the next useful action for the current teacher workspace state.',
@@ -36125,7 +36125,7 @@ assert.deepEqual(
     },
   }).nextActions.map((action) => [action.id, action.status, action.to]),
   [
-    ['create-activity', 'done', Routes.Create],
+    ['create-activity', 'done', Routes.DashboardActivityNew],
     ['publish-assignment', 'ready', Routes.DashboardActivities],
     ['share-assignment', 'blocked', Routes.DashboardAssignments],
     ['review-results', 'blocked', Routes.DashboardAssignments],
@@ -36744,7 +36744,7 @@ assert.match(
 );
 assert.match(
   dashboardOverviewDomainSource,
-  /resolveDashboardOverviewLoopStatus[\s\S]*buildDashboardOverviewNextActions[\s\S]*dashboardOverviewNextActionRoutes[\s\S]*Routes\.Create[\s\S]*Routes\.DashboardAssignments/,
+  /resolveDashboardOverviewLoopStatus[\s\S]*buildDashboardOverviewNextActions[\s\S]*dashboardOverviewNextActionRoutes[\s\S]*Routes\.DashboardActivityNew[\s\S]*Routes\.DashboardAssignments/,
   'Dashboard loop status should resolve owner-scoped next actions and route targets inside the dashboard domain.'
 );
 assert.match(
@@ -42686,26 +42686,26 @@ assert.deepEqual(
     ],
     questionChoiceReadiness: {
       description:
-        'Each quiz question should have 4 playable choices. Missing distractors can be completed from sibling answers and vocabulary before AI distractor generation is connected.',
+        'Each question needs 4 answer choices. Missing choices are filled in from other answers and your vocabulary list.',
       emptyText: 'Add quiz questions to inspect choice readiness.',
       itemViews: [
         {
           detail:
-            '2/4 choices are playable; add 2 more explicit choices or lesson vocabulary.',
+            '2/4 choices ready. Add 2 more choices or vocabulary words.',
           key: 'q-capital-of-france',
           promptLabel: '1. Capital of France?',
           sourceLabel:
-            'Candidate sources: 1 sibling answers, 0 vocabulary terms.',
+            'Other answers: 1 · Vocabulary words: 0',
           status: 'needs-candidates',
           statusLabel: 'Needs candidates',
         },
         {
           detail:
-            '2/4 choices are playable; add 2 more explicit choices or lesson vocabulary.',
+            '2/4 choices ready. Add 2 more choices or vocabulary words.',
           key: 'q-2-2',
           promptLabel: '2. 2 + 2?',
           sourceLabel:
-            'Candidate sources: 1 sibling answers, 0 vocabulary terms.',
+            'Other answers: 1 · Vocabulary words: 0',
           status: 'needs-candidates',
           statusLabel: 'Needs candidates',
         },
@@ -45774,7 +45774,7 @@ assert.equal(
 );
 assert.equal(
   fallbackDraftMetaSummary.providerDescription,
-  'Generated locally from the source notes, so treat it like a scaffold before assigning.'
+  'Built from your source notes without AI, so review it carefully before assigning.'
 );
 assert.equal(fallbackDraftMetaSummary.providerLabel, 'Fallback');
 assert.deepEqual(fallbackDraftMetaSummary.trustView, {
@@ -45783,9 +45783,9 @@ assert.deepEqual(fallbackDraftMetaSummary.trustView, {
   items: [
     {
       ariaLabel:
-        'Provider: Fallback. Generated locally from the source notes, so treat it like a scaffold before assigning.',
+        'Provider: Fallback. Built from your source notes without AI, so review it carefully before assigning.',
       description:
-        'Generated locally from the source notes, so treat it like a scaffold before assigning.',
+        'Built from your source notes without AI, so review it carefully before assigning.',
       id: 'provider',
       label: 'Provider',
       value: 'Fallback',
@@ -45857,17 +45857,17 @@ assert.equal(
 );
 assert.equal(
   fallbackDraftMetaSummary.questionChoiceReadiness?.description,
-  'Review whether generated quiz questions already include 4 usable choices or still need teacher-approved distractors.'
+  'Check that each generated question has 4 answer choices.'
 );
 assert.deepEqual(
   fallbackDraftMetaSummary.questionChoiceReadiness?.itemViews[0],
   {
     answerLabel: 'Answer is present in the playable choices.',
     choiceCountLabel: '4/4 playable choices (4 explicit, 0 local).',
-    detail: 'The draft already includes 4/4 explicit choices.',
+    detail: 'The draft already has 4/4 choices.',
     key: fallbackDraftMeta.questionChoiceReadiness.items[0]?.questionId,
     promptLabel: '1. Track 1: The Science listening word is weather.',
-    sourceLabel: 'Candidate sources: 1 sibling answers, 0 vocabulary terms.',
+    sourceLabel: 'Other answers: 1 · Vocabulary words: 0',
     status: 'explicit-ready',
     statusLabel: 'Explicit choices',
   }
@@ -46190,7 +46190,7 @@ assert.equal(
 assert.equal(
   questionOnlyDraftMetaSummary.questionChoiceReadiness?.itemViews[0]
     ?.statusLabel,
-  'Needs distractors'
+  'Needs more choices'
 );
 assert.equal(
   questionOnlyDraftMetaSummary.questionChoiceReadiness?.itemViews[0]?.detail,
@@ -46204,7 +46204,7 @@ assert.equal(
 assert.equal(
   questionOnlyDraftMetaSummary.questionChoiceReadiness?.itemViews[0]
     ?.sourceLabel,
-  'Candidate sources: 0 sibling answers, 0 vocabulary terms.'
+  'Other answers: 0 · Vocabulary words: 0'
 );
 assert.equal(
   questionOnlyDraftMetaSummary.questionChoiceReadiness?.itemViews[0]
@@ -46216,7 +46216,7 @@ assert.equal(
     id: 'question-review',
     items: questionOnlyDraftMetaSummary.reviewChecklistItems,
   }).label,
-  'Add distractor choices or vocabulary for 1 quiz question before publishing.'
+  'Add answer choices or vocabulary for 1 quiz question before publishing.'
 );
 assert.deepEqual(
   findActivityDraftChecklistItem({
@@ -46225,11 +46225,11 @@ assert.deepEqual(
   }),
   {
     description:
-      'Teacher-approved choices keep quiz play fair and prevent weak generated distractors.',
+      'Choices you check keep the quiz fair.',
     id: 'question-review',
     key: 'question-review:all:2',
     label:
-      'Add distractor choices or vocabulary for 1 quiz question before publishing.',
+      'Add answer choices or vocabulary for 1 quiz question before publishing.',
     priority: 'high',
     status: 'action-needed',
     statusLabel: 'Action needed',
@@ -46278,7 +46278,7 @@ assert.equal(
     notice: 'Workers AI returned a partial draft for testing.',
     provider: 'workers-ai',
   }).providerDescription,
-  'Drafted by Workers AI, then completed locally where required classroom structures were missing.'
+  'Drafted by AI, with missing parts filled in automatically.'
 );
 assert.equal(
   buildActivityDraftMetaSummaryView({
@@ -46367,7 +46367,7 @@ assert.equal(
 );
 assert.equal(
   normalizedDraftMetaSummary.providerDescription,
-  'Drafted by Workers AI, then completed locally where required classroom structures were missing.'
+  'Drafted by AI, with missing parts filled in automatically.'
 );
 assert.equal(
   normalizedDraftMetaSummary.trustView.items.find(
@@ -46420,14 +46420,14 @@ try {
   assert.equal(zhFallbackDraftMetaSummary.modelLineText, '模型：test-model');
   assert.equal(
     zhFallbackDraftMetaSummary.providerDescription,
-    '已根据素材备注在本地生成，请把它当作脚手架检查后再发布。'
+    '未使用 AI，而是根据你的素材备注生成，布置前请仔细检查。'
   );
   assert.equal(zhFallbackDraftMetaSummary.trustView.title, '草稿信任检查');
   assert.equal(
     zhFallbackDraftMetaSummary.trustView.items.find(
       (item) => item.id === 'provider'
     )?.ariaLabel,
-    '生成来源：本地兜底。已根据素材备注在本地生成，请把它当作脚手架检查后再发布。'
+    '生成来源：本地兜底。未使用 AI，而是根据你的素材备注生成，布置前请仔细检查。'
   );
   assert.equal(
     zhFallbackDraftMetaSummary.trustView.items.find(
@@ -46555,7 +46555,7 @@ try {
       id: 'question-review',
       items: zhSparseDraftMetaSummary.reviewChecklistItems,
     }).label,
-    '发布前请为 1 道测验题补充干扰选项或词汇。'
+    '发布前请为 1 道测验题补充答案选项或词汇。'
   );
   assert.equal(
     findActivityDraftChecklistItem({
@@ -47024,7 +47024,7 @@ assert.equal(
     id: 'question-review',
     items: questionOnlyDraftMeta.reviewChecklistItems,
   }).label,
-  'Add distractor choices or vocabulary for 1 quiz question before publishing.'
+  'Add answer choices or vocabulary for 1 quiz question before publishing.'
 );
 const choiceReadyMissingExplanationDraftMeta = buildActivityDraftMeta({
   activity: {

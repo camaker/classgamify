@@ -169,7 +169,7 @@ function DashboardActivitiesPage() {
     >
       <div className="grid gap-6">
         <div className="flex flex-wrap items-center gap-2">
-          <Link to={Routes.Create} className={buttonVariants()}>
+          <Link to={Routes.DashboardActivityNew} className={buttonVariants()}>
             <IconPlus className="size-4" />
             {activityLibraryPageCopy.createActivityLabel}
           </Link>
@@ -281,7 +281,7 @@ function DashboardActivitiesPage() {
                 {activePageView.emptyState.description}
               </p>
               <Link
-                to={Routes.Create}
+                to={Routes.DashboardActivityNew}
                 className={cn(buttonVariants(), 'mt-4 w-fit')}
               >
                 <IconPlus className="size-4" />

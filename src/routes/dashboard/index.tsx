@@ -63,7 +63,7 @@ function DashboardPage() {
       <div className="grid gap-10">
         <section className="grid gap-6">
           <div className="flex flex-wrap items-center gap-2">
-            <Link to={Routes.Create} className={buttonVariants()}>
+            <Link to={Routes.DashboardActivityNew} className={buttonVariants()}>
               <IconPlus className="size-4" />
               {dashboardOverviewPageCopy.heroPrimaryAction}
             </Link>

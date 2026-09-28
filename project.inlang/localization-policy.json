@@ -996,7 +996,10 @@
     "activity-edit-entry": [
       "activity_edit_access_ready_action",
       "activity_edit_access_ready_title",
-      "activity_edit_page_back_to_library"
+      "activity_edit_page_back_to_library",
+      "activity_form_other_content_summary",
+      "activity_new_page_description",
+      "activity_new_page_title"
     ]
   },
   "englishOnlyKeys": [

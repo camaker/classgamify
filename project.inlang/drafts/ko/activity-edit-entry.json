@@ -1,5 +1,8 @@
 {
   "activity_edit_access_ready_action": "활동 편집",
   "activity_edit_access_ready_title": "재사용 가능한 활동 편집",
-  "activity_edit_page_back_to_library": "라이브러리로 돌아가기"
+  "activity_edit_page_back_to_library": "라이브러리로 돌아가기",
+  "activity_form_other_content_summary": "다른 게임용 내용 (선택)",
+  "activity_new_page_description": "게임을 고르고 내용을 입력해 라이브러리에 저장하세요.",
+  "activity_new_page_title": "새 활동"
 }
