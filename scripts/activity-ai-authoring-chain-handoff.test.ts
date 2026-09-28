@@ -12,44 +12,17 @@ import {
   ACTIVITY_AI_FALLBACK_SOURCE_TERM_PLAN_ITEM_IDS,
   ACTIVITY_DRAFT_REVIEW_STATE,
 } from '@/activities/ai-draft';
-import { ACTIVITY_AI_DRAFT_BOUNDARY_HANDOFF_ITEM_IDS } from '@/activities/ai-draft-boundary';
 import { ACTIVITY_AI_FALLBACK_HANDOFF_ITEM_IDS } from '@/activities/ai-draft-fallback-handoff';
 import { ACTIVITY_AI_FALLBACK_DRAFT_CHAIN_HANDOFF_ITEM_IDS } from '@/activities/ai-fallback-draft-chain';
-import { ACTIVITY_AI_REMIX_ASSIST_HANDOFF_ITEM_IDS } from '@/activities/ai-remix-assist';
-import { ACTIVITY_DRAFT_META_HANDOFF_ITEM_IDS } from '@/activities/draft-meta';
-import {
-  ACTIVITY_EDITOR_AI_DRAFT_SOURCE_HANDOFF_ITEM_IDS,
-  ACTIVITY_EDITOR_TEMPLATE_HANDOFF_ITEM_IDS,
-  ACTIVITY_EDITOR_WORKFLOW_HANDOFF_ITEM_IDS,
-} from '@/activities/editor';
-import { QUESTION_CHOICE_GENERATION_HANDOFF_ITEM_IDS } from '@/activities/distractors';
-import {
-  ACTIVITY_SOURCE_MATERIAL_PICKER_HANDOFF_ITEM_IDS,
-  ACTIVITY_SOURCE_MATERIAL_READINESS_CAPABILITIES,
-} from '@/activities/material-summary';
+import { ACTIVITY_SOURCE_MATERIAL_READINESS_CAPABILITIES } from '@/activities/material-summary';
 import { ACTIVITY_TEMPLATE_SCAFFOLD_QUALITY_HANDOFF_ITEM_IDS } from '@/activities/scaffolds';
-import { ACTIVITY_SOURCE_EXTRACTION_ASSIST_HANDOFF_ITEM_IDS } from '@/activities/source-extraction-assist';
 import { SOURCE_MATERIAL_PRIVACY_CHAIN_HANDOFF_ITEM_IDS } from '@/activities/source-material-privacy-chain';
-import { ACTIVITY_TEMPLATE_REMIX_HANDOFF_ITEM_IDS } from '@/activities/template-remix';
 
 const PRODUCT_SOURCE = readFileSync('docs/product.md', 'utf8');
 const ACTIVITY_AI_API_SOURCE = readFileSync('src/api/activity-ai.ts', 'utf8');
 const AI_DRAFT_SOURCE = readFileSync('src/activities/ai-draft.ts', 'utf8');
-const AI_DRAFT_BOUNDARY_SOURCE = readFileSync(
-  'src/activities/ai-draft-boundary.ts',
-  'utf8'
-);
-const AI_REMIX_ASSIST_SOURCE = readFileSync(
-  'src/activities/ai-remix-assist.ts',
-  'utf8'
-);
-const DRAFT_META_SOURCE = readFileSync('src/activities/draft-meta.ts', 'utf8');
 const DRAFT_SOURCE_SOURCE = readFileSync(
   'src/activities/draft-source.ts',
-  'utf8'
-);
-const DISTRACTORS_SOURCE = readFileSync(
-  'src/activities/distractors.ts',
   'utf8'
 );
 const EDITOR_SOURCE = readFileSync('src/activities/editor.ts', 'utf8');
@@ -158,23 +131,13 @@ test('activity AI authoring chain stays backed by focused gates', () => {
 
   assert.deepEqual(
     [
-      ACTIVITY_EDITOR_AI_DRAFT_SOURCE_HANDOFF_ITEM_IDS.length,
-      ACTIVITY_EDITOR_TEMPLATE_HANDOFF_ITEM_IDS.length,
-      ACTIVITY_EDITOR_WORKFLOW_HANDOFF_ITEM_IDS.length,
-      ACTIVITY_AI_DRAFT_BOUNDARY_HANDOFF_ITEM_IDS.length,
       ACTIVITY_AI_FALLBACK_HANDOFF_ITEM_IDS.length,
       ACTIVITY_AI_FALLBACK_DRAFT_CHAIN_HANDOFF_ITEM_IDS.length,
       ACTIVITY_AI_FALLBACK_SOURCE_TERM_PLAN_ITEM_IDS.length,
-      ACTIVITY_DRAFT_META_HANDOFF_ITEM_IDS.length,
-      ACTIVITY_TEMPLATE_REMIX_HANDOFF_ITEM_IDS.length,
-      ACTIVITY_AI_REMIX_ASSIST_HANDOFF_ITEM_IDS.length,
-      QUESTION_CHOICE_GENERATION_HANDOFF_ITEM_IDS.length,
-      ACTIVITY_SOURCE_MATERIAL_PICKER_HANDOFF_ITEM_IDS.length,
-      ACTIVITY_SOURCE_EXTRACTION_ASSIST_HANDOFF_ITEM_IDS.length,
       SOURCE_MATERIAL_PRIVACY_CHAIN_HANDOFF_ITEM_IDS.length,
       ACTIVITY_TEMPLATE_SCAFFOLD_QUALITY_HANDOFF_ITEM_IDS.length,
     ],
-    Array.from({ length: 15 }, () => 30)
+    Array.from({ length: 5 }, () => 30)
   );
   assert.deepEqual(ACTIVITY_DRAFT_REVIEW_STATE, {
     applicationMode: 'editor-review',
@@ -231,26 +194,6 @@ test('activity AI authoring privacy contracts stay explicit across surfaces', ()
     DRAFT_SOURCE_SOURCE,
     /sanitizeActivityDraftSourceTextForAi\(sourceText: string\)[\s\S]*removeActivitySourceMaterialDraftNotes\(sourceText\)[\s\S]*normalizeActivityDraftSourceText/,
     'Draft source sanitization should remove source-material note blocks before AI prompt text is used.'
-  );
-  assert.match(
-    AI_DRAFT_BOUNDARY_SOURCE,
-    /ActivityAiDraftBoundaryHandoffPrivacyContract[\s\S]*exposesActivityDraftText: false[\s\S]*exposesRawProviderResponse: false[\s\S]*exposesSourceText: false[\s\S]*persistsActivity: false[\s\S]*publishesAssignment: false[\s\S]*requiresTeacherReview: true/,
-    'AI draft boundary handoff should keep draft text, raw provider output, direct persistence, and publish paths private.'
-  );
-  assert.match(
-    DRAFT_META_SOURCE,
-    /ActivityDraftMetaHandoffPrivacyContract[\s\S]*exposesRawDraftJson: false[\s\S]*exposesRawSourceText: false[\s\S]*persistsContentDirectly: false[\s\S]*usesCreateActivityInputContract: true[\s\S]*usesDeterministicFallbackContract: true[\s\S]*usesTemplateReadinessDomain: true/,
-    'Draft metadata should keep raw draft/source text private while using CreateActivityInput, fallback, and readiness contracts.'
-  );
-  assert.match(
-    AI_REMIX_ASSIST_SOURCE,
-    /ActivityAiRemixAssistHandoffPrivacyContract[\s\S]*appliesBeforeActivitySave: true[\s\S]*modifiesOriginalActivity: false[\s\S]*modifiesPublishedAssignmentSnapshots: false[\s\S]*requiresEditorReview: true[\s\S]*savesActivityWithoutTeacherAction: false/,
-    'AI remix assist should remain a before-save, teacher-reviewed completion boundary.'
-  );
-  assert.match(
-    DISTRACTORS_SOURCE,
-    /QuestionChoiceGenerationHandoffPrivacyContract[\s\S]*exposesRawAiOutput: false[\s\S]*requiresTeacherReview: true[\s\S]*writeTarget: 'ActivityQuestion\.options'/,
-    'Quiz distractor generation should target ActivityQuestion.options without exposing raw AI output.'
   );
   assert.match(
     EDITOR_SOURCE,

@@ -54,7 +54,7 @@ export const ACTIVITY_AUTHORING_LIBRARY_CHAIN_SOURCE_FILES = [
   'src/activities/lifecycle.ts',
   'src/activities/duplicate.ts',
   'src/activities/template-remix.ts',
-  'src/activities/ai-remix-assist.ts',
+  'src/components/activities/activity-library-compatibility-panel.tsx',
   'src/activities/material-summary.ts',
   'src/activities/material-references.ts',
   'src/components/activities/activity-create-form.tsx',
@@ -360,8 +360,8 @@ function getActivityAuthoringLibraryChainHandoffItem(
     case 'editor-workflow-handoff-boundary':
       return item(
         id,
-        'Editor workflow handoff boundary',
-        '30 editor workflow slices',
+        'Editor workflow',
+        'Visible 5-step workflow',
         'Workflow source and order, create/edit surfaces, template and scaffold state, AI draft source, structured content, source materials, review readiness, save controls, auth, publish boundaries, and privacy guards stay aligned.'
       );
   }

@@ -4,10 +4,7 @@ import { authClient } from '@/auth/client';
 import Container from '@/components/layout/container';
 import { Badge } from '@/components/ui/badge';
 import { buttonVariants } from '@/components/ui/button';
-import {
-  type ActivityEditorWorkflowHandoffView,
-  buildActivityCreatePageEditorViewModel,
-} from '@/activities/editor';
+import { buildActivityCreatePageEditorViewModel } from '@/activities/editor';
 import {
   parseCreateActivityTemplateSearch,
   parseCreateActivityTemplateSourceSearch,
@@ -98,10 +95,6 @@ function CreatePage() {
               ) : null}
             </div>
           </div>
-
-          <ActivityEditorWorkflowHandoff
-            handoffView={pageView.workflow.handoffView}
-          />
         </section>
 
         <div className="mt-8 grid gap-6 xl:grid-cols-[minmax(0,1fr)_25rem] 2xl:grid-cols-[minmax(0,1fr)_26rem]">
@@ -122,59 +115,5 @@ function CreatePage() {
         </div>
       </div>
     </Container>
-  );
-}
-
-function ActivityEditorWorkflowHandoff({
-  handoffView,
-}: {
-  handoffView: ActivityEditorWorkflowHandoffView;
-}) {
-  const titleId = 'activity-editor-workflow-handoff-title';
-  const descriptionId = 'activity-editor-workflow-handoff-description';
-
-  return (
-    <section
-      aria-describedby={descriptionId}
-      aria-labelledby={titleId}
-      className="sr-only"
-      data-handoff="activity-editor-workflow"
-      data-handoff-scope={handoffView.privacy.scope}
-    >
-      <h2 id={titleId}>{handoffView.title}</h2>
-      <p id={descriptionId}>{handoffView.description}</p>
-      <dl>
-        {handoffView.itemViews.map((item) => (
-          <ActivityEditorWorkflowHandoffItem item={item} key={item.id} />
-        ))}
-      </dl>
-    </section>
-  );
-}
-
-function ActivityEditorWorkflowHandoffItem({
-  item,
-}: {
-  item: ActivityEditorWorkflowHandoffView['itemViews'][number];
-}) {
-  const labelId = `activity-editor-workflow-handoff-${item.id}-label`;
-  const valueId = `activity-editor-workflow-handoff-${item.id}-value`;
-  const descriptionId = `activity-editor-workflow-handoff-${item.id}-description`;
-
-  return (
-    <div data-handoff-item={item.id}>
-      <dt id={labelId}>{item.label}</dt>
-      <dd>
-        <output
-          aria-describedby={descriptionId}
-          aria-label={item.ariaLabel}
-          aria-labelledby={`${labelId} ${valueId}`}
-          id={valueId}
-        >
-          {item.value}
-        </output>
-        <span id={descriptionId}>{item.description}</span>
-      </dd>
-    </div>
   );
 }

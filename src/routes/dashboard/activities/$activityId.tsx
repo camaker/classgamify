@@ -1,8 +1,4 @@
-import {
-  buildActivityEditRouteHandoffView,
-  buildActivityEditRouteState,
-  type ActivityEditRouteHandoffView,
-} from '@/activities/editor';
+import { buildActivityEditRouteState } from '@/activities/editor';
 import { ActivityCreateForm } from '@/components/activities/activity-create-form';
 import { DashboardLayout } from '@/components/layout/dashboard-layout';
 import { Button, buttonVariants } from '@/components/ui/button';
@@ -29,14 +25,6 @@ function ActivityEditPage() {
       }),
     [activity, isError, isLoading]
   );
-  const handoffView = useMemo(
-    () =>
-      buildActivityEditRouteHandoffView({
-        activity,
-        routeStatus: routeState.status,
-      }),
-    [activity, routeState.status]
-  );
   const pageView = routeState.pageView;
 
   return (
@@ -56,8 +44,6 @@ function ActivityEditPage() {
           <IconArrowLeft className="size-4" />
           {pageView.backAction.label}
         </Link>
-
-        <ActivityEditRouteHandoff handoffView={handoffView} />
 
         {routeState.status === 'loading' ? (
           <Card className="min-h-96 rounded-lg" />
@@ -95,59 +81,5 @@ function ActivityEditPage() {
         )}
       </div>
     </DashboardLayout>
-  );
-}
-
-function ActivityEditRouteHandoff({
-  handoffView,
-}: {
-  handoffView: ActivityEditRouteHandoffView;
-}) {
-  const titleId = 'activity-edit-route-handoff-title';
-  const descriptionId = 'activity-edit-route-handoff-description';
-
-  return (
-    <section
-      aria-describedby={descriptionId}
-      aria-labelledby={titleId}
-      className="sr-only"
-      data-handoff="activity-edit-route"
-      data-handoff-scope={handoffView.privacy.scope}
-    >
-      <h2 id={titleId}>{handoffView.title}</h2>
-      <p id={descriptionId}>{handoffView.description}</p>
-      <dl>
-        {handoffView.itemViews.map((item) => (
-          <ActivityEditRouteHandoffItem item={item} key={item.id} />
-        ))}
-      </dl>
-    </section>
-  );
-}
-
-function ActivityEditRouteHandoffItem({
-  item,
-}: {
-  item: ActivityEditRouteHandoffView['itemViews'][number];
-}) {
-  const labelId = `activity-edit-route-handoff-${item.id}-label`;
-  const valueId = `activity-edit-route-handoff-${item.id}-value`;
-  const descriptionId = `activity-edit-route-handoff-${item.id}-description`;
-
-  return (
-    <div data-handoff-item={item.id}>
-      <dt id={labelId}>{item.label}</dt>
-      <dd>
-        <output
-          aria-describedby={descriptionId}
-          aria-label={item.ariaLabel}
-          aria-labelledby={`${labelId} ${valueId}`}
-          id={valueId}
-        >
-          {item.value}
-        </output>
-        <span id={descriptionId}>{item.description}</span>
-      </dd>
-    </div>
   );
 }

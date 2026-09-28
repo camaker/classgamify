@@ -13,17 +13,12 @@ import {
   type ActivityAiEnhancementRoadmapChainHandoffItemId,
   type ActivityAiEnhancementRoadmapChainHandoffView,
 } from '@/activities/ai-enhancement-roadmap-chain';
-import { ACTIVITY_AI_REMIX_ASSIST_HANDOFF_ITEM_IDS } from '@/activities/ai-remix-assist';
-import { ACTIVITY_DRAFT_META_HANDOFF_ITEM_IDS } from '@/activities/draft-meta';
-import { ACTIVITY_SOURCE_EXTRACTION_ASSIST_HANDOFF_ITEM_IDS } from '@/activities/source-extraction-assist';
 import { SOURCE_EXTRACTION_LIFECYCLE_CHAIN_HANDOFF_ITEM_IDS } from '@/activities/source-extraction-lifecycle-chain';
 import { SOURCE_MATERIAL_PRIVACY_CHAIN_HANDOFF_ITEM_IDS } from '@/activities/source-material-privacy-chain';
-import { ACTIVITY_TEMPLATE_REMIX_HANDOFF_ITEM_IDS } from '@/activities/template-remix';
 import {
   TEMPLATE_ROADMAP_CAPABILITY_CHAIN_HANDOFF_ITEM_IDS,
   TEMPLATE_ROADMAP_CAPABILITY_CHAIN_SOURCE_FILES,
 } from '@/activities/template-roadmap-capability-chain';
-import { QUESTION_CHOICE_GENERATION_HANDOFF_ITEM_IDS } from '@/activities/distractors';
 import { WORKSHEET_MODE_DELIVERY_CHAIN_HANDOFF_ITEM_IDS } from '@/assignments/worksheet-mode-delivery-chain';
 
 const PRODUCT_SOURCE = readFileSync('docs/product.md', 'utf8');
@@ -33,21 +28,8 @@ const AI_AUTHORING_SOURCE = readFileSync(
   'src/activities/ai-authoring-chain.ts',
   'utf8'
 );
-const AI_REMIX_ASSIST_SOURCE = readFileSync(
-  'src/activities/ai-remix-assist.ts',
-  'utf8'
-);
-const DISTRACTORS_SOURCE = readFileSync(
-  'src/activities/distractors.ts',
-  'utf8'
-);
-const DRAFT_META_SOURCE = readFileSync('src/activities/draft-meta.ts', 'utf8');
 const DRAFT_SOURCE_SOURCE = readFileSync(
   'src/activities/draft-source.ts',
-  'utf8'
-);
-const SOURCE_EXTRACTION_SOURCE = readFileSync(
-  'src/activities/source-extraction-assist.ts',
   'utf8'
 );
 const SOURCE_EXTRACTION_CHAIN_SOURCE = readFileSync(
@@ -187,17 +169,12 @@ test('activity AI enhancement roadmap chain is backed by focused product gates',
     [
       ACTIVITY_AI_AUTHORING_CHAIN_HANDOFF_ITEM_IDS.length,
       ACTIVITY_AI_ENHANCEMENT_LIFECYCLE_CHAIN_ITEM_IDS.length,
-      ACTIVITY_AI_REMIX_ASSIST_HANDOFF_ITEM_IDS.length,
-      ACTIVITY_DRAFT_META_HANDOFF_ITEM_IDS.length,
-      ACTIVITY_TEMPLATE_REMIX_HANDOFF_ITEM_IDS.length,
-      QUESTION_CHOICE_GENERATION_HANDOFF_ITEM_IDS.length,
-      ACTIVITY_SOURCE_EXTRACTION_ASSIST_HANDOFF_ITEM_IDS.length,
       SOURCE_EXTRACTION_LIFECYCLE_CHAIN_HANDOFF_ITEM_IDS.length,
       SOURCE_MATERIAL_PRIVACY_CHAIN_HANDOFF_ITEM_IDS.length,
       TEMPLATE_ROADMAP_CAPABILITY_CHAIN_HANDOFF_ITEM_IDS.length,
       WORKSHEET_MODE_DELIVERY_CHAIN_HANDOFF_ITEM_IDS.length,
     ],
-    Array.from({ length: 11 }, () => 30)
+    Array.from({ length: 6 }, () => 30)
   );
 });
 
@@ -239,26 +216,6 @@ test('activity AI enhancement roadmap sources preserve output targets and privac
     AI_AUTHORING_SOURCE,
     /distractor-write-target[\s\S]*Future AI distractors must write into the existing question option structure/,
     'AI authoring chain should keep future distractors on the existing option target.'
-  );
-  assert.match(
-    AI_REMIX_ASSIST_SOURCE,
-    /ActivityAiRemixAssistHandoffPrivacyContract[\s\S]*appliesBeforeActivitySave: true[\s\S]*modifiesOriginalActivity: false[\s\S]*modifiesPublishedAssignmentSnapshots: false[\s\S]*requiresEditorReview: true[\s\S]*savesActivityWithoutTeacherAction: false/,
-    'AI remix assist should stay before-save and teacher-reviewed.'
-  );
-  assert.match(
-    DISTRACTORS_SOURCE,
-    /QuestionChoiceGenerationHandoffPrivacyContract[\s\S]*exposesRawAiOutput: false[\s\S]*requiresTeacherReview: true[\s\S]*writeTarget: 'ActivityQuestion\.options'/,
-    'Question choice generation should keep raw AI output private and target ActivityQuestion.options.'
-  );
-  assert.match(
-    DRAFT_META_SOURCE,
-    /usesCreateActivityInputContract: true[\s\S]*usesTemplateReadinessDomain: true/,
-    'Draft metadata should keep CreateActivityInput and template-readiness domains aligned.'
-  );
-  assert.match(
-    SOURCE_EXTRACTION_SOURCE,
-    /audio-draft-path[\s\S]*worksheet-extraction-path[\s\S]*spreadsheet-import-path[\s\S]*targetModel: 'ActivityContent'/,
-    'Source extraction assist should route future extraction paths to ActivityContent.'
   );
   assert.match(
     SOURCE_EXTRACTION_CHAIN_SOURCE,

@@ -5,7 +5,6 @@ import {
   ACTIVITY_AUTHORING_LIBRARY_CHAIN_HANDOFF_ITEM_IDS,
   ACTIVITY_AUTHORING_LIBRARY_CHAIN_SOURCE_FILES,
 } from '@/activities/authoring-library-chain';
-import { ACTIVITY_DUPLICATE_HANDOFF_ITEM_IDS } from '@/activities/duplicate';
 import {
   ACTIVITY_LIFECYCLE_GOVERNANCE_CHAIN_HANDOFF_ITEM_IDS,
   ACTIVITY_LIFECYCLE_GOVERNANCE_CHAIN_SOURCE_FILES,
@@ -14,7 +13,6 @@ import {
   type ActivityLifecycleGovernanceChainHandoffView,
 } from '@/activities/activity-lifecycle-governance-chain';
 import {
-  ACTIVITY_LIFECYCLE_HANDOFF_ITEM_IDS,
   ACTIVITY_RESTORED_VISIBILITY,
   assertActivityCanArchive,
   assertActivityCanDeriveWork,
@@ -23,8 +21,6 @@ import {
   buildActivityDerivativeActionExecutionPlan,
   buildActivityVisibilityActionExecutionPlan,
 } from '@/activities/lifecycle';
-import { ACTIVITY_LIBRARY_PAGE_HANDOFF_ITEM_IDS } from '@/activities/library-view';
-import { ACTIVITY_TEMPLATE_REMIX_HANDOFF_ITEM_IDS } from '@/activities/template-remix';
 
 const PRODUCT_SOURCE = readFileSync('docs/product.md', 'utf8');
 const ACTIVITIES_API_SOURCE = readFileSync('src/api/activities.ts', 'utf8');
@@ -190,14 +186,10 @@ test('activity lifecycle governance chain is backed by focused lifecycle gates',
 
   assert.deepEqual(
     [
-      ACTIVITY_LIFECYCLE_HANDOFF_ITEM_IDS.length,
-      ACTIVITY_LIBRARY_PAGE_HANDOFF_ITEM_IDS.length,
-      ACTIVITY_DUPLICATE_HANDOFF_ITEM_IDS.length,
-      ACTIVITY_TEMPLATE_REMIX_HANDOFF_ITEM_IDS.length,
       ACTIVITY_AUTHORING_LIBRARY_CHAIN_HANDOFF_ITEM_IDS.length,
       ACTIVITY_AUTHORING_LIBRARY_CHAIN_SOURCE_FILES.length,
     ],
-    Array.from({ length: 6 }, () => 30)
+    Array.from({ length: 2 }, () => 30)
   );
 });
 
@@ -299,7 +291,7 @@ test('activity lifecycle sources keep library scopes and UI gates aligned', () =
   );
   assert.match(
     ACTIVITY_LIBRARY_CARD_SOURCE,
-    /buildActivityDerivativeActionExecutionPlan[\s\S]*buildActivityVisibilityActionExecutionPlan[\s\S]*openPublishDialog\(\)[\s\S]*buildAssignmentPublishDialogAccessView\(activity\.status\)[\s\S]*ActivityLibraryLifecycleHandoff/,
+    /buildActivityDerivativeActionExecutionPlan[\s\S]*buildActivityVisibilityActionExecutionPlan[\s\S]*openPublishDialog\(\)[\s\S]*buildAssignmentPublishDialogAccessView\(activity\.status\)/,
     'Activity cards should use shared lifecycle plans for archive, restore, duplicate, remix, and publish access.'
   );
 });

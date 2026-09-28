@@ -2,11 +2,8 @@ import assert from 'node:assert/strict';
 import { existsSync, readFileSync } from 'node:fs';
 import test from 'node:test';
 import { ACTIVITY_AI_AUTHORING_CHAIN_HANDOFF_ITEM_IDS } from '@/activities/ai-authoring-chain';
-import { ACTIVITY_AI_REMIX_ASSIST_HANDOFF_ITEM_IDS } from '@/activities/ai-remix-assist';
 import { ACTIVITY_AUTHORING_LIBRARY_CHAIN_HANDOFF_ITEM_IDS } from '@/activities/authoring-library-chain';
 import { ACTIVITY_TEMPLATE_SCAFFOLD_QUALITY_HANDOFF_ITEM_IDS } from '@/activities/scaffolds';
-import { ACTIVITY_SOURCE_EXTRACTION_ASSIST_HANDOFF_ITEM_IDS } from '@/activities/source-extraction-assist';
-import { ACTIVITY_TEMPLATE_REMIX_HANDOFF_ITEM_IDS } from '@/activities/template-remix';
 import {
   TEMPLATE_ROADMAP_CAPABILITY_CHAIN_HANDOFF_ITEM_IDS,
   TEMPLATE_ROADMAP_CAPABILITY_CHAIN_SOURCE_FILES,
@@ -16,10 +13,7 @@ import {
 } from '@/activities/template-roadmap-capability-chain';
 import { ACTIVITY_TEMPLATE_TYPES } from '@/activities/types';
 import { WORKSHEET_MODE_TEMPLATES } from '@/activities/worksheet-modes';
-import {
-  DEFAULT_QUESTION_CHOICE_COUNT,
-  QUESTION_CHOICE_GENERATION_HANDOFF_ITEM_IDS,
-} from '@/activities/distractors';
+import { DEFAULT_QUESTION_CHOICE_COUNT } from '@/activities/distractors';
 import { PUBLIC_TEMPLATE_ENTRY_HANDOFF_ITEM_IDS } from '@/activities/entry-page-view';
 import { STUDENT_RUNNER_PLAY_CHAIN_HANDOFF_ITEM_IDS } from '@/assignments/student-runner-play-chain';
 import { WORKSHEET_MODE_DELIVERY_CHAIN_HANDOFF_ITEM_IDS } from '@/assignments/worksheet-mode-delivery-chain';
@@ -37,10 +31,6 @@ const TEMPLATE_ENTRY_SOURCE = readFileSync(
 );
 const ENTRY_PAGE_SOURCE = readFileSync(
   'src/activities/entry-page-view.ts',
-  'utf8'
-);
-const SOURCE_EXTRACTION_SOURCE = readFileSync(
-  'src/activities/source-extraction-assist.ts',
   'utf8'
 );
 const AI_AUTHORING_CHAIN_SOURCE = readFileSync(
@@ -191,15 +181,11 @@ test('template roadmap capability chain is backed by focused gates', () => {
       PUBLIC_TEMPLATE_ENTRY_HANDOFF_ITEM_IDS.length,
       ACTIVITY_AUTHORING_LIBRARY_CHAIN_HANDOFF_ITEM_IDS.length,
       ACTIVITY_TEMPLATE_SCAFFOLD_QUALITY_HANDOFF_ITEM_IDS.length,
-      ACTIVITY_TEMPLATE_REMIX_HANDOFF_ITEM_IDS.length,
-      QUESTION_CHOICE_GENERATION_HANDOFF_ITEM_IDS.length,
       ACTIVITY_AI_AUTHORING_CHAIN_HANDOFF_ITEM_IDS.length,
-      ACTIVITY_AI_REMIX_ASSIST_HANDOFF_ITEM_IDS.length,
-      ACTIVITY_SOURCE_EXTRACTION_ASSIST_HANDOFF_ITEM_IDS.length,
       WORKSHEET_MODE_DELIVERY_CHAIN_HANDOFF_ITEM_IDS.length,
       STUDENT_RUNNER_PLAY_CHAIN_HANDOFF_ITEM_IDS.length,
     ],
-    Array.from({ length: 11 }, () => 30)
+    Array.from({ length: 7 }, () => 30)
   );
 });
 
@@ -262,11 +248,6 @@ test('template roadmap capability sources align entries, status, and review gate
     /buildWorksheetsPageViewModel[\s\S]*surface: 'worksheets'[\s\S]*modeCards: worksheetModeDefinitions\.map/,
     'Worksheet page view model should use shared template-entry handoff and mode cards.'
   );
-  assert.match(
-    SOURCE_EXTRACTION_SOURCE,
-    /audio-draft-path[\s\S]*worksheet-extraction-path[\s\S]*spreadsheet-import-path[\s\S]*targetModel: 'ActivityContent'/,
-    'Source extraction assist should keep audio, worksheet, and spreadsheet paths targeting ActivityContent.'
-  );
 });
 
 test('template roadmap capability sources preserve privacy model boundaries', () => {
@@ -274,11 +255,6 @@ test('template roadmap capability sources preserve privacy model boundaries', ()
     AI_AUTHORING_CHAIN_SOURCE,
     /createsAssignmentLinks: false[\s\S]*exposesFileBytesToAi: false[\s\S]*exposesRawProviderResponse: false[\s\S]*persistsActivityWithoutTeacherAction: false[\s\S]*requiresTeacherReview: true/,
     'AI authoring chain should require teacher review and avoid file bytes, raw provider output, and direct persistence.'
-  );
-  assert.match(
-    SOURCE_EXTRACTION_SOURCE,
-    /createsParallelWorksheetModel: false[\s\S]*exposesFileBytes: false[\s\S]*persistsActivityWithoutTeacherAction: false[\s\S]*readsSourceMaterialBytes: false[\s\S]*requiresEditorReview: true/,
-    'Source extraction assist should not read bytes or persist without editor review.'
   );
   assert.match(
     WORKSHEET_CHAIN_SOURCE,

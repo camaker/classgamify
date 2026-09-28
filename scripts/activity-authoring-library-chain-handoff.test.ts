@@ -8,19 +8,9 @@ import {
   type ActivityAuthoringLibraryChainHandoffItemId,
   type ActivityAuthoringLibraryChainHandoffView,
 } from '@/activities/authoring-library-chain';
-import {
-  ACTIVITY_EDIT_ROUTE_HANDOFF_ITEM_IDS,
-  ACTIVITY_EDITOR_TEMPLATE_HANDOFF_ITEM_IDS,
-  ACTIVITY_EDITOR_WORKFLOW_HANDOFF_ITEM_IDS,
-} from '@/activities/editor';
 import { PUBLIC_TEMPLATE_ENTRY_HANDOFF_ITEM_IDS } from '@/activities/entry-page-view';
-import { ACTIVITY_DUPLICATE_HANDOFF_ITEM_IDS } from '@/activities/duplicate';
-import { ACTIVITY_LIFECYCLE_HANDOFF_ITEM_IDS } from '@/activities/lifecycle';
-import { ACTIVITY_LIBRARY_PAGE_HANDOFF_ITEM_IDS } from '@/activities/library-view';
-import { ACTIVITY_SOURCE_MATERIAL_PICKER_HANDOFF_ITEM_IDS } from '@/activities/material-summary';
 import { ACTIVITY_SOURCE_MATERIAL_REFERENCE_ITEM_IDS } from '@/activities/material-references';
 import { ACTIVITY_TEMPLATE_SCAFFOLD_QUALITY_HANDOFF_ITEM_IDS } from '@/activities/scaffolds';
-import { ACTIVITY_TEMPLATE_REMIX_HANDOFF_ITEM_IDS } from '@/activities/template-remix';
 
 const PRODUCT_SOURCE = readFileSync('docs/product.md', 'utf8');
 const ACTIVITIES_API_SOURCE = readFileSync('src/api/activities.ts', 'utf8');
@@ -145,7 +135,7 @@ test('activity authoring/library chain summarizes authoring to library flow', ()
       ['restore-lifecycle-gate', 'Restore before derive'],
       ['publish-access-boundary', 'Publish dialog only'],
       ['snapshot-protection', 'AssignmentSnapshot'],
-      ['editor-workflow-handoff-boundary', '30 editor workflow slices'],
+      ['editor-workflow-handoff-boundary', 'Visible 5-step workflow'],
     ]
   );
   assert.equal(
@@ -170,18 +160,10 @@ test('activity authoring/library chain is backed by focused gates', () => {
   assert.deepEqual(
     [
       PUBLIC_TEMPLATE_ENTRY_HANDOFF_ITEM_IDS.length,
-      ACTIVITY_EDITOR_WORKFLOW_HANDOFF_ITEM_IDS.length,
-      ACTIVITY_EDITOR_TEMPLATE_HANDOFF_ITEM_IDS.length,
       ACTIVITY_TEMPLATE_SCAFFOLD_QUALITY_HANDOFF_ITEM_IDS.length,
-      ACTIVITY_SOURCE_MATERIAL_PICKER_HANDOFF_ITEM_IDS.length,
       ACTIVITY_SOURCE_MATERIAL_REFERENCE_ITEM_IDS.length,
-      ACTIVITY_EDIT_ROUTE_HANDOFF_ITEM_IDS.length,
-      ACTIVITY_LIBRARY_PAGE_HANDOFF_ITEM_IDS.length,
-      ACTIVITY_DUPLICATE_HANDOFF_ITEM_IDS.length,
-      ACTIVITY_TEMPLATE_REMIX_HANDOFF_ITEM_IDS.length,
-      ACTIVITY_LIFECYCLE_HANDOFF_ITEM_IDS.length,
     ],
-    Array.from({ length: 11 }, () => 30)
+    Array.from({ length: 3 }, () => 30)
   );
 });
 
@@ -304,7 +286,7 @@ test('activity authoring/library chain focused gate is documented', () => {
   );
   assert.match(
     normalizedCatalog,
-    /public template and worksheet entries[\s\S]*shared editor save[\s\S]*30-slice editor workflow handoff boundary[\s\S]*edit hydration[\s\S]*owner-scoped library management[\s\S]*derivative drafts[\s\S]*lifecycle gates[\s\S]*publish snapshot boundaries/,
+    /public template and worksheet entries[\s\S]*shared editor save[\s\S]*editor workflow[\s\S]*edit hydration[\s\S]*owner-scoped library management[\s\S]*derivative drafts[\s\S]*lifecycle gates[\s\S]*publish snapshot boundaries/,
     'TEST-CATALOG should document the public-entry to library-management chain scope.'
   );
 });

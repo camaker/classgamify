@@ -35,14 +35,14 @@ export const SOURCE_EXTRACTION_LIFECYCLE_CHAIN_HANDOFF_ITEM_IDS = [
 
 export const SOURCE_EXTRACTION_LIFECYCLE_CHAIN_SOURCE_FILES = [
   'docs/product.md',
-  'src/activities/source-extraction-assist.ts',
+  'tests/e2e/specs/storage-source-materials.spec.ts',
   'src/activities/material-summary.ts',
   'src/activities/material-references.ts',
   'src/activities/types.ts',
   'src/activities/validation.ts',
   'src/activities/editor.ts',
   'src/activities/draft-source.ts',
-  'src/activities/ai-draft-boundary.ts',
+  'src/api/activities.ts',
   'src/activities/ai-draft.ts',
   'src/activities/source-material-privacy-chain.ts',
   'src/activities/ai-authoring-chain.ts',
@@ -61,7 +61,7 @@ export const SOURCE_EXTRACTION_LIFECYCLE_CHAIN_SOURCE_FILES = [
   'src/assignments/student-runtime-item-list.ts',
   'src/assignments/worksheet-mode-delivery-chain.ts',
   'src/assignments/printable-worksheet-view.ts',
-  'scripts/activity-source-extraction-assist-handoff-semantic-views.test.ts',
+  'scripts/activity-lifecycle.test.ts',
   'scripts/source-material-privacy-chain-handoff.test.ts',
   'tests/e2e/TEST-CATALOG.md',
 ] as const;

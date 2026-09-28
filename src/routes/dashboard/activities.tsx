@@ -11,8 +11,6 @@ import {
 } from '@/activities/library-filters';
 import {
   activityLibraryPageCopy,
-  type ActivityLibraryPageHandoffItemView,
-  type ActivityLibraryPageHandoffView,
   buildActivityLibraryCardViewModel,
   buildActivityLibraryRouteState,
   buildStarterActivityLibraryCardViewModel,
@@ -35,7 +33,7 @@ import {
   useMatchRoute,
   useNavigate,
 } from '@tanstack/react-router';
-import { useEffect, useId, useMemo } from 'react';
+import { useEffect, useMemo } from 'react';
 
 export const Route = createFileRoute('/dashboard/activities')({
   validateSearch: buildActivityLibraryValidatedSearch,
@@ -170,8 +168,6 @@ function DashboardActivitiesPage() {
       description={activePageView.description}
     >
       <div className="grid gap-6">
-        <ActivityLibraryPageHandoff handoffView={activePageView.handoffView} />
-
         <div className="flex flex-wrap items-center gap-2">
           <Link to={Routes.Create} className={buttonVariants()}>
             <IconPlus className="size-4" />
@@ -309,59 +305,5 @@ function DashboardActivitiesPage() {
         ) : null}
       </div>
     </DashboardLayout>
-  );
-}
-
-function ActivityLibraryPageHandoff({
-  handoffView,
-}: {
-  handoffView: ActivityLibraryPageHandoffView;
-}) {
-  const titleId = useId();
-  const descriptionId = useId();
-
-  return (
-    <section
-      aria-describedby={descriptionId}
-      aria-labelledby={titleId}
-      className="sr-only"
-      data-handoff="activity-library"
-      data-handoff-scope={handoffView.privacy.scope}
-    >
-      <h2 id={titleId}>{handoffView.title}</h2>
-      <p id={descriptionId}>{handoffView.description}</p>
-      <dl>
-        {handoffView.itemViews.map((item) => (
-          <ActivityLibraryPageHandoffItem item={item} key={item.id} />
-        ))}
-      </dl>
-    </section>
-  );
-}
-
-function ActivityLibraryPageHandoffItem({
-  item,
-}: {
-  item: ActivityLibraryPageHandoffItemView;
-}) {
-  const labelId = `activity-library-handoff-${item.id}-label`;
-  const valueId = `activity-library-handoff-${item.id}-value`;
-  const descriptionId = `activity-library-handoff-${item.id}-description`;
-
-  return (
-    <div data-handoff-item={item.id}>
-      <dt id={labelId}>{item.label}</dt>
-      <dd>
-        <output
-          aria-describedby={descriptionId}
-          aria-label={item.ariaLabel}
-          aria-labelledby={`${labelId} ${valueId}`}
-          id={valueId}
-        >
-          {item.value}
-        </output>
-        <span id={descriptionId}>{item.description}</span>
-      </dd>
-    </div>
   );
 }

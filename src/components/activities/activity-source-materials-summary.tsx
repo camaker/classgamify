@@ -1,20 +1,12 @@
 import type {
-  ActivitySourceMaterialCardHandoffItemView,
-  ActivitySourceMaterialCardHandoffView,
   ActivitySourceMaterialExtractionActionView,
   ActivitySourceMaterialKindBadgeView,
   ActivitySourceMaterialSummaryView,
 } from '@/activities/material-summary';
-import { buildActivitySourceMaterialCardHandoffView } from '@/activities/material-summary';
-import {
-  buildActivitySourceExtractionAssistHandoffView,
-  type ActivitySourceExtractionAssistHandoffItemView,
-  type ActivitySourceExtractionAssistHandoffView,
-} from '@/activities/source-extraction-assist';
 import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
 import { IconPaperclip, IconSparkles } from '@tabler/icons-react';
-import { useId, type ReactNode } from 'react';
+import type { ReactNode } from 'react';
 
 type ActivitySourceMaterialsSummaryProps = {
   actionSlot?: ReactNode;
@@ -30,17 +22,6 @@ export function ActivitySourceMaterialsSummary({
   summary,
 }: ActivitySourceMaterialsSummaryProps) {
   if (!summary.hasMaterials) return null;
-
-  const extractionAssistHandoff =
-    buildActivitySourceExtractionAssistHandoffView({
-      extractableMaterialCount: summary.readiness.extractableCount,
-      extractionActions: summary.extractionActions,
-      sourceKindCounts: summary.kindBadges,
-    });
-  const cardSummaryHandoff = buildActivitySourceMaterialCardHandoffView({
-    hasEditAction: Boolean(actionSlot),
-    summary,
-  });
 
   return (
     <section
@@ -78,10 +59,6 @@ export function ActivitySourceMaterialsSummary({
       {summary.extractionActions.length ? (
         <ActivitySourceMaterialExtractionSummary summary={summary} />
       ) : null}
-      <ActivitySourceExtractionAssistHandoff
-        handoff={extractionAssistHandoff}
-      />
-      <ActivitySourceMaterialCardHandoff handoff={cardSummaryHandoff} />
     </section>
   );
 }
@@ -141,117 +118,6 @@ function ActivitySourceMaterialExtractionBadge({
       <p className="mt-0.5 text-muted-foreground text-xs leading-5">
         {action.nextStep.description}
       </p>
-    </div>
-  );
-}
-
-function ActivitySourceExtractionAssistHandoff({
-  handoff,
-}: {
-  handoff: ActivitySourceExtractionAssistHandoffView;
-}) {
-  const titleId = useId();
-  const descriptionId = useId();
-
-  return (
-    <section
-      aria-describedby={descriptionId}
-      aria-labelledby={titleId}
-      className="sr-only"
-      data-handoff="activity-source-extraction-assist"
-      data-handoff-scope={handoff.privacy.scope}
-    >
-      <h3 id={titleId}>{handoff.title}</h3>
-      <p id={descriptionId}>{handoff.description}</p>
-      <dl>
-        {handoff.itemViews.map((item) => (
-          <ActivitySourceExtractionAssistHandoffItem
-            item={item}
-            key={item.id}
-          />
-        ))}
-      </dl>
-    </section>
-  );
-}
-
-function ActivitySourceExtractionAssistHandoffItem({
-  item,
-}: {
-  item: ActivitySourceExtractionAssistHandoffItemView;
-}) {
-  const labelId = `activity-source-extraction-assist-${item.id}-label`;
-  const valueId = `activity-source-extraction-assist-${item.id}-value`;
-  const descriptionId = `activity-source-extraction-assist-${item.id}-description`;
-
-  return (
-    <div data-handoff-item={item.id}>
-      <dt id={labelId}>{item.label}</dt>
-      <dd>
-        <output
-          aria-describedby={descriptionId}
-          aria-label={item.ariaLabel}
-          aria-labelledby={`${labelId} ${valueId}`}
-          id={valueId}
-        >
-          {item.value}
-        </output>
-      </dd>
-      <dd id={descriptionId}>{item.description}</dd>
-    </div>
-  );
-}
-
-function ActivitySourceMaterialCardHandoff({
-  handoff,
-}: {
-  handoff: ActivitySourceMaterialCardHandoffView;
-}) {
-  const titleId = useId();
-  const descriptionId = useId();
-
-  return (
-    <section
-      aria-describedby={descriptionId}
-      aria-labelledby={titleId}
-      className="sr-only"
-      data-handoff="activity-source-material-card-summary"
-      data-handoff-scope={handoff.privacy.scope}
-    >
-      <h3 id={titleId}>{handoff.title}</h3>
-      <p id={descriptionId}>{handoff.description}</p>
-      <dl>
-        {handoff.itemViews.map((item) => (
-          <ActivitySourceMaterialCardHandoffItem item={item} key={item.id} />
-        ))}
-      </dl>
-    </section>
-  );
-}
-
-function ActivitySourceMaterialCardHandoffItem({
-  item,
-}: {
-  item: ActivitySourceMaterialCardHandoffItemView;
-}) {
-  const labelId = `activity-source-material-card-summary-${item.id}-label`;
-  const valueId = `activity-source-material-card-summary-${item.id}-value`;
-  const descriptionId = `activity-source-material-card-summary-${item.id}-description`;
-
-  return (
-    <div data-handoff-item={item.id}>
-      <dt id={labelId}>{item.label}</dt>
-      <dd>
-        <output
-          aria-describedby={descriptionId}
-          aria-label={item.ariaLabel}
-          aria-labelledby={`${labelId} ${valueId}`}
-          id={valueId}
-        >
-          {item.value}
-        </output>
-      </dd>
-      <dd id={descriptionId}>{item.description}</dd>
     </div>
   );
 }

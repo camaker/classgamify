@@ -216,7 +216,6 @@ import {
 } from '@/activities/library-query';
 import {
   ACTIVITY_LIBRARY_COMPATIBILITY_LIMITS,
-  ACTIVITY_LIBRARY_PAGE_HANDOFF_ITEM_IDS,
   activityLibraryCardCopy,
   activityLibraryHeroCopy,
   activityLibraryPageCopy,
@@ -229,7 +228,6 @@ import {
   buildActivityLibraryCardViewModel,
   buildActivityLibraryCompatibilityView,
   buildCreatedActivityPanelContext,
-  ACTIVITY_LIBRARY_FILTER_HANDOFF_ITEM_IDS,
   buildActivityLibraryEmptyStateView,
   buildActivityLibraryPageScopeView,
   buildActivityLibrarySourceScopeBoundary,
@@ -370,13 +368,7 @@ import {
   buildActivityAiDraftFocusOptions,
   buildActivityAiDraftFocusPromptLine,
 } from '@/activities/ai-draft-focus';
-import { ACTIVITY_AI_DRAFT_BOUNDARY_HANDOFF_ITEM_IDS } from '@/activities/ai-draft-boundary';
 import { ACTIVITY_AI_FALLBACK_HANDOFF_ITEM_IDS } from '@/activities/ai-draft-fallback-handoff';
-import {
-  ACTIVITY_AI_REMIX_ASSIST_HANDOFF_ITEM_IDS,
-  buildActivityAiRemixAssistHandoffView,
-  buildActivityAiRemixAssistPlan,
-} from '@/activities/ai-remix-assist';
 import {
   formatEditorGroupRow,
   formatEditorGroupRows,
@@ -393,8 +385,6 @@ import {
   getTemplateByType,
 } from '@/activities/catalog';
 import {
-  ACTIVITY_DUPLICATE_HANDOFF_ITEM_IDS,
-  buildActivityDuplicateHandoffView,
   buildDuplicatedActivityTitle,
   buildRemixedActivityTitle,
   cloneActivityContentForDerivative,
@@ -430,23 +420,17 @@ import {
   buildDefaultActivityPreviewPanel,
 } from '@/activities/preview-view';
 import {
-  ACTIVITY_DRAFT_META_HANDOFF_ITEM_IDS,
   buildActivityDraftMeta,
   buildActivityDraftMetaSummaryView,
   buildActivityTemplateReadinessPanelSummary,
   getActivityTemplateQuizChoiceReadinessItemPosition,
   normalizeActivityDraftMetaCount,
   type ActivityDraftMeta,
-  type ActivityDraftMetaHandoffItemId,
-  type ActivityDraftMetaHandoffItemView,
-  type ActivityDraftMetaHandoffView,
   type ActivityDraftMetaReviewGateMetricView,
   type ActivityDraftReviewChecklistItem,
 } from '@/activities/draft-meta';
 import {
   ACTIVITY_SOURCE_MATERIAL_EXTRACTION_ACTIONS,
-  ACTIVITY_SOURCE_MATERIAL_CARD_HANDOFF_ITEM_IDS,
-  ACTIVITY_SOURCE_MATERIAL_PICKER_HANDOFF_ITEM_IDS,
   ACTIVITY_SOURCE_MATERIAL_READINESS_CAPABILITIES,
   addActivitySourceMaterialPickerItem,
   buildActivitySourceMaterialCapabilityCountsFromActions,
@@ -466,10 +450,6 @@ import {
   removeActivitySourceMaterialPickerItem,
   summarizeActivitySourceMaterials,
 } from '@/activities/material-summary';
-import {
-  ACTIVITY_SOURCE_EXTRACTION_ASSIST_HANDOFF_ITEM_IDS,
-  buildActivitySourceExtractionAssistHandoffView,
-} from '@/activities/source-extraction-assist';
 import {
   SOURCE_EXTRACTION_LIFECYCLE_CHAIN_HANDOFF_ITEM_IDS,
   SOURCE_EXTRACTION_LIFECYCLE_CHAIN_SOURCE_FILES,
@@ -491,7 +471,6 @@ import {
   buildSourceMaterialPrivacyChainHandoffView,
 } from '@/activities/source-material-privacy-chain';
 import {
-  ACTIVITY_LIFECYCLE_HANDOFF_ITEM_IDS,
   ACTIVITY_RESTORED_VISIBILITY,
   activityEditPageCopy,
   assertActivityCanArchive,
@@ -501,7 +480,6 @@ import {
   buildActivityDerivativeActionExecutionPlan,
   buildActivityDerivativeActionGate,
   buildActivityEditAccessView,
-  buildActivityLifecycleHandoffView,
   buildActivityLifecycleActionView,
   buildActivityVisibilityActionExecutionPlan,
   canArchiveActivity,
@@ -532,10 +510,8 @@ import {
   normalizeListeningSpeechLanguage,
 } from '@/activities/listening-speech';
 import {
-  ACTIVITY_TEMPLATE_REMIX_HANDOFF_ITEM_IDS,
-  ACTIVITY_TEMPLATE_REMIX_HANDOFF_VISIBLE_ACTION_LIMIT,
+  ACTIVITY_TEMPLATE_REMIX_VISIBLE_ACTION_LIMIT,
   assertTemplateRemixOptionReady,
-  buildActivityTemplateRemixHandoffView,
   getActivityTemplateDraftGuidance,
   buildTemplateRemixSummary,
   formatTemplateRequirementList,
@@ -584,12 +560,9 @@ import {
   buildActivityEditPageViewModel,
   buildActivityEditRouteState,
   activityContentToEditorInput,
-  ACTIVITY_EDIT_ROUTE_HANDOFF_ITEM_IDS,
   ACTIVITY_EDITOR_AI_DRAFT_SOURCE_CONTROL_IDS,
-  ACTIVITY_EDITOR_AI_DRAFT_SOURCE_HANDOFF_ITEM_IDS,
   ACTIVITY_EDITOR_SECTION_IDS,
   ACTIVITY_EDITOR_READINESS_PANEL_LIMITS,
-  ACTIVITY_EDITOR_WORKFLOW_HANDOFF_ITEM_IDS,
   ACTIVITY_EDITOR_WORKFLOW_STEP_IDS,
   buildActivityEditorAiDraftPanelView,
   buildActivityEditorDraftGenerationExecutionPlan,
@@ -612,20 +585,14 @@ import {
   buildActivityEditorTemplateReadiness,
   buildActivityEditorTemplateView,
   buildActivityEditorWorkflowView,
-  ACTIVITY_EDITOR_TEMPLATE_HANDOFF_ITEM_IDS,
   formatActivityEditorDifficulty,
   formatActivityEditorVisibility,
   getActivityEditorWorkflowStepView,
 } from '@/activities/editor';
 import {
   buildQuestionChoiceReadinessSummary,
-  buildQuestionChoiceGenerationHandoffView,
   buildQuestionChoices,
   DEFAULT_QUESTION_CHOICE_COUNT,
-  QUESTION_CHOICE_GENERATION_HANDOFF_ITEM_IDS,
-  type QuestionChoiceGenerationHandoffItemId,
-  type QuestionChoiceGenerationHandoffItemView,
-  type QuestionChoiceGenerationHandoffView,
 } from '@/activities/distractors';
 import { buildQuestionOptionTexts } from '@/activities/question-options';
 import {
@@ -1538,103 +1505,6 @@ function findActivityDraftReviewGateMetric<
   return metric;
 }
 
-function findActivityDraftMetaHandoffItem<
-  T extends Pick<ActivityDraftMetaHandoffItemView, 'id'>,
->({
-  id,
-  itemViews,
-}: {
-  id: ActivityDraftMetaHandoffItemId;
-  itemViews: readonly T[];
-}): T {
-  const itemView = itemViews.find((candidate) => candidate.id === id);
-
-  assert.ok(itemView, `Expected AI draft handoff item "${id}".`);
-
-  return itemView;
-}
-
-function expectActivityDraftMetaHandoffPrivacy(
-  view: ActivityDraftMetaHandoffView
-) {
-  const itemIds = view.itemViews.map((itemView) => itemView.id);
-
-  assert.deepEqual(itemIds, [...ACTIVITY_DRAFT_META_HANDOFF_ITEM_IDS]);
-  assert.equal(new Set(itemIds).size, 30);
-  assert.deepEqual(view.privacy, {
-    appliesToEditorBeforeSave: true,
-    createsAssignmentLinks: false,
-    exposesAnswerText: false,
-    exposesExplanationText: false,
-    exposesOptionText: false,
-    exposesQuestionPromptText: false,
-    exposesRawDraftJson: false,
-    exposesRawSourceText: false,
-    exposesSourceMaterialFileIds: false,
-    exposesSourceMaterialStorageKeys: false,
-    exposesTeacherNotesText: false,
-    fillsEditorOnly: true,
-    itemIds,
-    mutatesActivityLibraryBeforeSave: false,
-    persistsContentDirectly: false,
-    publishesAssignmentWithoutTeacherAction: false,
-    readsSourceMaterialFileBytes: false,
-    requiresTeacherReview: true,
-    savesActivityWithoutTeacherAction: false,
-    scope: 'teacher-reviewed-ai-draft',
-    usesCreateActivityInputContract: true,
-    usesDeterministicFallbackContract: true,
-    usesSafeSourceMaterialProvenance: true,
-    usesStructuredReviewChecklist: true,
-    usesTemplateReadinessDomain: true,
-  });
-}
-
-function findQuestionChoiceGenerationHandoffItem<
-  T extends Pick<QuestionChoiceGenerationHandoffItemView, 'id'>,
->({
-  id,
-  itemViews,
-}: {
-  id: QuestionChoiceGenerationHandoffItemId;
-  itemViews: readonly T[];
-}): T {
-  const itemView = itemViews.find((candidate) => candidate.id === id);
-
-  assert.ok(
-    itemView,
-    `Expected question choice generation handoff item "${id}".`
-  );
-
-  return itemView;
-}
-
-function expectQuestionChoiceGenerationHandoffPrivacy(
-  view: QuestionChoiceGenerationHandoffView
-) {
-  const itemIds = view.itemViews.map((itemView) => itemView.id);
-
-  assert.deepEqual(itemIds, [...QUESTION_CHOICE_GENERATION_HANDOFF_ITEM_IDS]);
-  assert.equal(new Set(itemIds).size, 30);
-  assert.deepEqual(view.privacy, {
-    appliesBeforeActivitySave: true,
-    exposesAnswerText: false,
-    exposesCandidateText: false,
-    exposesOptionText: false,
-    exposesQuestionPromptText: false,
-    exposesRawAiOutput: false,
-    exposesStableChoiceSeed: false,
-    exposesVocabularyText: false,
-    itemIds,
-    persistsActivityWithoutTeacherAction: false,
-    publishesAssignmentWithoutTeacherAction: false,
-    requiresTeacherReview: true,
-    scope: 'teacher-reviewed-quiz-choice-generation',
-    usesQuestionOptionStructure: true,
-    writeTarget: 'ActivityQuestion.options',
-  });
-}
-
 const activityEditorDefaultInput = getActivityEditorDefaultInput();
 
 const submissionRuntimeItems = [
@@ -2037,11 +1907,6 @@ assert.match(
   activityEditRouteSource,
   /buildActivityEditRouteState/,
   'The activity edit route should consume the activity-domain route state helper.'
-);
-assert.match(
-  activityEditRouteSource,
-  /ActivityEditRouteHandoffView[\s\S]*function ActivityEditRouteHandoff[\s\S]*const titleId = 'activity-edit-route-handoff-title'[\s\S]*const descriptionId = 'activity-edit-route-handoff-description'[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*aria-labelledby=\{titleId\}[\s\S]*className="sr-only"[\s\S]*data-handoff="activity-edit-route"[\s\S]*data-handoff-scope=\{handoffView\.privacy\.scope\}[\s\S]*id=\{titleId\}[\s\S]*id=\{descriptionId\}[\s\S]*handoffView\.itemViews\.map[\s\S]*ActivityEditRouteHandoffItem[\s\S]*function ActivityEditRouteHandoffItem[\s\S]*item: ActivityEditRouteHandoffView\['itemViews'\]\[number\][\s\S]*const labelId = `activity-edit-route-handoff-\$\{item\.id\}-label`[\s\S]*const valueId = `activity-edit-route-handoff-\$\{item\.id\}-value`[\s\S]*const descriptionId = `activity-edit-route-handoff-\$\{item\.id\}-description`[\s\S]*data-handoff-item=\{item\.id\}[\s\S]*id=\{labelId\}[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*aria-label=\{item\.ariaLabel\}[\s\S]*aria-labelledby=\{`\$\{labelId\} \$\{valueId\}`\}[\s\S]*id=\{valueId\}[\s\S]*id=\{descriptionId\}/,
-  'The activity edit route should render its hidden 30-slice handoff with privacy scope and stable label, value, and description relationships.'
 );
 assert.match(
   activityEditRouteSource,
@@ -3091,10 +2956,6 @@ const activityTemplateRemixSource = readFileSync(
   'src/activities/template-remix.ts',
   'utf8'
 );
-const activityAiRemixAssistSource = readFileSync(
-  'src/activities/ai-remix-assist.ts',
-  'utf8'
-);
 assert.match(
   activityRuntimeSource,
   /normalizeRuntimeDisplayText\(answer\.answer\)/,
@@ -3152,43 +3013,13 @@ assert.match(
 );
 assert.match(
   activityTemplateRemixSource,
-  /export const ACTIVITY_TEMPLATE_REMIX_HANDOFF_ITEM_IDS = \[(?=[\s\S]*'current-template')(?=[\s\S]*'current-readiness')(?=[\s\S]*'ready-template-count')(?=[\s\S]*'suggested-remix-count')(?=[\s\S]*'suggested-remix-actions')(?=[\s\S]*'locked-template-count')(?=[\s\S]*'locked-diagnostics')(?=[\s\S]*'missing-requirements')(?=[\s\S]*'owner-scope')(?=[\s\S]*'source-status')(?=[\s\S]*'lifecycle-gate')(?=[\s\S]*'ready-target-only')(?=[\s\S]*'current-template-excluded')(?=[\s\S]*'visible-action-limit')(?=[\s\S]*'draft-output')(?=[\s\S]*'title-strategy')(?=[\s\S]*'title-limit')(?=[\s\S]*'template-switch')(?=[\s\S]*'content-clone')(?=[\s\S]*'questions')(?=[\s\S]*'pairs')(?=[\s\S]*'groups')(?=[\s\S]*'vocabulary')(?=[\s\S]*'teacher-notes')(?=[\s\S]*'source-materials')(?=[\s\S]*'source-material-kinds')(?=[\s\S]*'source-material-privacy')(?=[\s\S]*'assignment-snapshot-protection')(?=[\s\S]*'original-activity-protection')(?=[\s\S]*'privacy-guard')[\s\S]*type ActivityTemplateRemixHandoffPrivacyContract = \{[\s\S]*clonesSourceMaterialReferences: true;[\s\S]*excludesCurrentTemplate: true;[\s\S]*exposesActivityContentText: false;[\s\S]*exposesAnswerText: false;[\s\S]*exposesQuestionPromptText: false;[\s\S]*exposesSourceMaterialFilenames: false;[\s\S]*exposesSourceMaterialFileIds: false;[\s\S]*exposesSourceMaterialStorageKeys: false;[\s\S]*exposesSourceSummaryText: false;[\s\S]*exposesTeacherNotesText: false;[\s\S]*modifiesOriginalActivity: false;[\s\S]*modifiesPublishedAssignmentSnapshots: false;[\s\S]*outputVisibility: 'draft';[\s\S]*requiresOwnerScopedSource: true;[\s\S]*scope: 'deterministic-template-remix';[\s\S]*targetTemplatesAreReadyOnly: true;/,
-  'Template remix handoff should expose 30 stable slice ids for the deterministic draft-copy contract.'
-);
-assert.match(
-  activityTemplateRemixSource,
-  /export const ACTIVITY_TEMPLATE_REMIX_HANDOFF_VISIBLE_ACTION_LIMIT = 3/,
+  /export const ACTIVITY_TEMPLATE_REMIX_VISIBLE_ACTION_LIMIT = 3/,
   'Template remix handoff should keep visible Copy as action evidence aligned to the library action limit.'
-);
-assert.match(
-  activityTemplateRemixSource,
-  /type ActivityTemplateRemixHandoffPrivacyContract = \{[\s\S]*clonesSourceMaterialReferences: true;[\s\S]*excludesCurrentTemplate: true;[\s\S]*exposesActivityContentText: false;[\s\S]*exposesAnswerText: false;[\s\S]*exposesQuestionPromptText: false;[\s\S]*exposesSourceMaterialFilenames: false;[\s\S]*exposesSourceMaterialFileIds: false;[\s\S]*exposesSourceMaterialStorageKeys: false;[\s\S]*exposesSourceSummaryText: false;[\s\S]*exposesTeacherNotesText: false;[\s\S]*modifiesOriginalActivity: false;[\s\S]*modifiesPublishedAssignmentSnapshots: false;[\s\S]*outputVisibility: 'draft';[\s\S]*requiresOwnerScopedSource: true;[\s\S]*scope: 'deterministic-template-remix';[\s\S]*targetTemplatesAreReadyOnly: true;/,
-  'Template remix handoff should publish an explicit privacy and draft-output contract.'
-);
-assert.match(
-  activityTemplateRemixSource,
-  /buildActivityTemplateRemixHandoffView[\s\S]*getTemplateRemixPlan\(\{[\s\S]*currentTemplateType: source\.currentTemplateType[\s\S]*buildActivityTemplateRemixHandoffSummary[\s\S]*buildTemplateRemixSummary\(remixPlan\)[\s\S]*buildRemixedActivityTitle\(\{[\s\S]*targetShortName[\s\S]*titleLimit: ACTIVITY_TITLE_LENGTH\.max/,
-  'Template remix handoff should derive readiness, draft title, and title limits from shared activity-domain helpers.'
 );
 assert.doesNotMatch(
   activityTemplateRemixSource,
   /\.trim\(\)/,
   'Template remix readiness should not use ad hoc trim-only content checks.'
-);
-assert.match(
-  activityAiRemixAssistSource,
-  /export const ACTIVITY_AI_REMIX_ASSIST_HANDOFF_ITEM_IDS = \[(?=[\s\S]*'source-template')(?=[\s\S]*'target-template')(?=[\s\S]*'target-readiness')(?=[\s\S]*'missing-requirement-count')(?=[\s\S]*'missing-requirement-list')(?=[\s\S]*'deterministic-remix-path')(?=[\s\S]*'ai-completion-path')(?=[\s\S]*'editor-review-gate')(?=[\s\S]*'draft-output')(?=[\s\S]*'persistence-boundary')(?=[\s\S]*'publish-boundary')(?=[\s\S]*'source-lifecycle-gate')(?=[\s\S]*'owner-scope')(?=[\s\S]*'prompt-source')(?=[\s\S]*'source-material-provenance')(?=[\s\S]*'source-file-byte-guard')(?=[\s\S]*'storage-key-guard')(?=[\s\S]*'question-count')(?=[\s\S]*'pair-count')(?=[\s\S]*'group-count')(?=[\s\S]*'vocabulary-count')(?=[\s\S]*'teacher-note-count')(?=[\s\S]*'suggested-ready-count')(?=[\s\S]*'locked-target-count')(?=[\s\S]*'review-checklist')(?=[\s\S]*'title-strategy')(?=[\s\S]*'template-switch')(?=[\s\S]*'assignment-snapshot-protection')(?=[\s\S]*'original-activity-protection')(?=[\s\S]*'privacy-guard')[\s\S]*export type ActivityAiRemixAssistHandoffPrivacyContract = \{[\s\S]*aiCanFillMissingStructuredFields: true;[\s\S]*appliesBeforeActivitySave: true;[\s\S]*exposesActivityContentText: false;[\s\S]*exposesAnswerText: false;[\s\S]*exposesPromptText: false;[\s\S]*exposesSourceMaterialFileIds: false;[\s\S]*exposesSourceMaterialFilenames: false;[\s\S]*exposesSourceMaterialStorageKeys: false;[\s\S]*exposesTeacherNotesText: false;[\s\S]*modifiesOriginalActivity: false;[\s\S]*modifiesPublishedAssignmentSnapshots: false;[\s\S]*publishesAssignmentWithoutTeacherAction: false;[\s\S]*readsSourceMaterialBytes: false;[\s\S]*requiresEditorReview: true;[\s\S]*savesActivityWithoutTeacherAction: false;[\s\S]*scope: 'teacher-reviewed-ai-remix-assist';/,
-  'AI remix assist handoff should expose 30 stable teacher-reviewed assist slices with explicit privacy flags.'
-);
-assert.match(
-  activityAiRemixAssistSource,
-  /getTemplateRemixPlan\(\{ content, currentTemplateType \}\)[\s\S]*buildTemplateRemixSummary\(remixPlan\)[\s\S]*selectActivityAiRemixAssistTarget[\s\S]*normalizeActivityMaterialReferences[\s\S]*buildRemixedActivityTitle/,
-  'AI remix assist should derive target readiness, missing structure, material counts, and draft titles from shared activity-domain helpers.'
-);
-assert.doesNotMatch(
-  activityAiRemixAssistSource,
-  /material\.originalName|material\.fileId|source\.content\.sourceSummary|source\.content\.teacherNotes\.join|source\.content\.questions\.map|source\.content\.pairs\.map|source\.content\.groups\.map/,
-  'AI remix assist handoff should not serialize private activity text, filenames, or file ids.'
 );
 const copyAssignmentShareLinkButtonSource = readFileSync(
   'src/components/assignments/copy-assignment-share-link-button.tsx',
@@ -6167,7 +5998,7 @@ const activityLibraryViewSource = readFileSync(
 );
 assert.match(
   activityLibraryViewSource,
-  /ACTIVITY_LIBRARY_COMPATIBILITY_LIMITS[\s\S]*lockedTemplateDiagnostics: 2[\s\S]*remixActionOptions: ACTIVITY_TEMPLATE_REMIX_HANDOFF_VISIBLE_ACTION_LIMIT/,
+  /ACTIVITY_LIBRARY_COMPATIBILITY_LIMITS[\s\S]*lockedTemplateDiagnostics: 2[\s\S]*remixActionOptions: ACTIVITY_TEMPLATE_REMIX_VISIBLE_ACTION_LIMIT/,
   'Activity library compatibility view should expose named display limits shared with the template-remix handoff.'
 );
 assert.match(
@@ -6184,11 +6015,6 @@ assert.match(
   activityLibraryViewSource,
   /lockedTemplateDiagnostics: summary\.lockedTemplateOptions[\s\S]*id: option\.template/,
   'Activity library compatibility view should derive locked-template diagnostic ids from template types.'
-);
-assert.match(
-  activityLibraryViewSource,
-  /aiRemixAssistHandoffView: ActivityAiRemixAssistHandoffView[\s\S]*buildActivityAiRemixAssistHandoffView\(\{[\s\S]*content,[\s\S]*currentTemplateType,[\s\S]*sourceTitle,[\s\S]*visibility/,
-  'Activity library compatibility view should attach the AI remix assist handoff from the same content, template, title, and lifecycle context.'
 );
 assert.doesNotMatch(
   activityLibraryViewSource,
@@ -6235,10 +6061,6 @@ const activitySourceMaterialsFieldSource = readFileSync(
 );
 const activitySourceMaterialsSummarySource = readFileSync(
   'src/components/activities/activity-source-materials-summary.tsx',
-  'utf8'
-);
-const activitySourceExtractionAssistSource = readFileSync(
-  'src/activities/source-extraction-assist.ts',
   'utf8'
 );
 const activityPreviewViewSource = readFileSync(
@@ -6456,11 +6278,6 @@ assert.match(
 );
 assert.match(
   activitySourceMaterialsFieldSource,
-  /ActivitySourceMaterialPickerHandoff[\s\S]*data-handoff="activity-source-material-picker"[\s\S]*data-handoff-scope=\{handoffView\.privacy\.scope\}[\s\S]*handoffView\.itemViews\.map[\s\S]*ActivitySourceMaterialPickerHandoffItem[\s\S]*const labelId = `activity-source-material-picker-handoff-\$\{itemView\.id\}-label`[\s\S]*const valueId = `activity-source-material-picker-handoff-\$\{itemView\.id\}-value`[\s\S]*const descriptionId =[\s\S]*`activity-source-material-picker-handoff-\$\{itemView\.id\}-description`[\s\S]*data-handoff-item=\{itemView\.id\}[\s\S]*id=\{labelId\}[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*aria-label=\{itemView\.ariaLabel\}[\s\S]*aria-labelledby=\{`\$\{labelId\} \$\{valueId\}`\}[\s\S]*id=\{valueId\}[\s\S]*id=\{descriptionId\}/,
-  'Activity source-material picker handoff should render stable label/value/description output relationships.'
-);
-assert.match(
-  activitySourceMaterialsFieldSource,
   /function MaterialReferenceRow[\s\S]*itemView\.material\.originalName[\s\S]*itemView\.meta/,
   'Activity source-material picker rows should render prepared material names and metadata from item views.'
 );
@@ -6564,169 +6381,9 @@ assert.doesNotMatch(
   /Listening draft input|Worksheet extraction input|Structured import input|activity_source_material_next_step_/,
   'Activity source-material summary component should not hard-code or fetch extraction next-step copy locally.'
 );
-assert.deepEqual([...ACTIVITY_SOURCE_EXTRACTION_ASSIST_HANDOFF_ITEM_IDS], [
-  'source-material-count',
-  'extractable-material-count',
-  'audio-source-count',
-  'worksheet-source-count',
-  'spreadsheet-source-count',
-  'reference-only-count',
-  'capability-count',
-  'audio-draft-path',
-  'worksheet-extraction-path',
-  'spreadsheet-import-path',
-  'activity-content-target',
-  'question-target',
-  'pair-target',
-  'group-target',
-  'vocabulary-target',
-  'teacher-note-target',
-  'accepted-answer-target',
-  'template-readiness-target',
-  'assignment-snapshot-boundary',
-  'editor-review-gate',
-  'draft-output',
-  'persistence-boundary',
-  'publish-boundary',
-  'owner-scope',
-  'file-byte-guard',
-  'filename-guard',
-  'file-id-guard',
-  'storage-key-guard',
-  'parallel-model-guard',
-  'privacy-guard',
-]);
-assert.equal(ACTIVITY_SOURCE_MATERIAL_CARD_HANDOFF_ITEM_IDS.length, 30);
-assert.equal(
-  new Set(ACTIVITY_SOURCE_MATERIAL_CARD_HANDOFF_ITEM_IDS).size,
-  30
-);
-assert.equal(
-  new Set(ACTIVITY_SOURCE_EXTRACTION_ASSIST_HANDOFF_ITEM_IDS).size,
-  30
-);
-const sourceExtractionAssistHandoffView =
-  buildActivitySourceExtractionAssistHandoffView({
-    extractableMaterialCount: 3,
-    sourceKindCounts: [
-      { count: 1, kind: 'audio' },
-      { count: 1, kind: 'worksheet-document' },
-      { count: 1, kind: 'worksheet-image' },
-      { count: 1, kind: 'spreadsheet' },
-      { count: 2, kind: 'file' },
-    ],
-  });
-const sourceExtractionAssistHandoffValues = new Map(
-  sourceExtractionAssistHandoffView.itemViews.map((item) => [
-    item.id,
-    item.value,
-  ])
-);
-assert.equal(sourceExtractionAssistHandoffView.itemViews.length, 30);
-assert.deepEqual(
-  sourceExtractionAssistHandoffView.itemViews.map((item) => item.id),
-  [...ACTIVITY_SOURCE_EXTRACTION_ASSIST_HANDOFF_ITEM_IDS]
-);
-assert.ok(
-  sourceExtractionAssistHandoffView.itemViews.every(
-    (item) => item.ariaLabel && item.description && item.label && item.value
-  )
-);
-assert.deepEqual(sourceExtractionAssistHandoffView.privacy, {
-  appliesBeforeActivitySave: true,
-  createsParallelWorksheetModel: false,
-  exposesActivityContentText: false,
-  exposesAcceptedAnswerText: false,
-  exposesFileBytes: false,
-  exposesSourceMaterialFileIds: false,
-  exposesSourceMaterialFilenames: false,
-  exposesSourceMaterialStorageKeys: false,
-  itemIds: [...ACTIVITY_SOURCE_EXTRACTION_ASSIST_HANDOFF_ITEM_IDS],
-  modifiesPublishedAssignmentSnapshots: false,
-  persistsActivityWithoutTeacherAction: false,
-  publishesAssignmentWithoutTeacherAction: false,
-  readsSourceMaterialBytes: false,
-  requiresEditorReview: true,
-  scope: 'teacher-reviewed-source-extraction-assist',
-  targetModel: 'ActivityContent',
-});
-assert.deepEqual(Object.fromEntries(sourceExtractionAssistHandoffValues), {
-  'accepted-answer-target': 'Accepted answers',
-  'activity-content-target': 'ActivityContent',
-  'assignment-snapshot-boundary': 'Snapshots unchanged',
-  'audio-draft-path': 'Listening draft ready',
-  'audio-source-count': '1',
-  'capability-count': '3',
-  'draft-output': 'Editor draft',
-  'editor-review-gate': 'Teacher review required',
-  'extractable-material-count': '3',
-  'file-byte-guard': 'Bytes not read',
-  'file-id-guard': 'File ids hidden',
-  'filename-guard': 'Filenames hidden',
-  'group-target': 'Groups',
-  'owner-scope': 'Current teacher',
-  'pair-target': 'Pairs',
-  'parallel-model-guard': 'No parallel worksheet model',
-  'persistence-boundary': 'Not auto-saved',
-  'privacy-guard': 'Private data hidden',
-  'publish-boundary': 'Save before publish',
-  'question-target': 'Questions',
-  'reference-only-count': '3',
-  'source-material-count': '6',
-  'spreadsheet-import-path': 'Structured import ready',
-  'spreadsheet-source-count': '1',
-  'storage-key-guard': 'Storage hidden',
-  'teacher-note-target': 'Teacher notes',
-  'template-readiness-target': 'Template readiness',
-  'vocabulary-target': 'Vocabulary',
-  'worksheet-extraction-path': 'Worksheet extraction ready',
-  'worksheet-source-count': '2',
-});
-const sourceExtractionAssistSensitiveHandoffView =
-  buildActivitySourceExtractionAssistHandoffView({
-    sourceMaterials: [
-      {
-        fileId: 'file-audio-id',
-        kind: 'audio',
-        originalName: 'private-listening.mp3',
-        storageKey: 'source-material/private/storage-key.mp3',
-      },
-      {
-        fileId: 'file-worksheet-id',
-        kind: 'worksheet-document',
-        originalName: 'teacher-answer-key.pdf',
-        storageKey: 'source-material/private/answer-key.pdf',
-      },
-    ],
-  });
-assert.doesNotMatch(
-  JSON.stringify(sourceExtractionAssistSensitiveHandoffView),
-  /file-audio-id|file-worksheet-id|private-listening|teacher-answer-key|source-material\/private|storage-key\.mp3|answer-key\.pdf/,
-  'Source extraction assist handoff should not leak filenames, file ids, storage keys, or answer-key hints.'
-);
-assert.match(
-  activitySourceExtractionAssistSource,
-  /export type ActivitySourceExtractionAssistHandoffPrivacyContract = \{[\s\S]*exposesActivityContentText: false;[\s\S]*exposesAcceptedAnswerText: false;[\s\S]*exposesFileBytes: false;[\s\S]*exposesSourceMaterialFileIds: false;[\s\S]*exposesSourceMaterialFilenames: false;[\s\S]*exposesSourceMaterialStorageKeys: false;[\s\S]*readsSourceMaterialBytes: false;[\s\S]*scope: 'teacher-reviewed-source-extraction-assist';[\s\S]*targetModel: 'ActivityContent';/,
-  'Source extraction assist should declare an ActivityContent privacy contract without file-byte or source-material identifier exposure.'
-);
-assert.match(
-  activitySourceMaterialsSummarySource,
-  /buildActivitySourceExtractionAssistHandoffView\(\{[\s\S]*extractableMaterialCount: summary\.readiness\.extractableCount,[\s\S]*extractionActions: summary\.extractionActions,[\s\S]*sourceKindCounts: summary\.kindBadges/,
-  'Activity source-material summary should build the extraction assist handoff from the prepared summary view.'
-);
-assert.match(
-  activitySourceMaterialsSummarySource,
-  /data-handoff="activity-source-extraction-assist"[\s\S]*data-handoff-scope=\{handoff\.privacy\.scope\}[\s\S]*handoff\.itemViews\.map\(\(item\) =>[\s\S]*ActivitySourceExtractionAssistHandoffItem[\s\S]*const labelId = `activity-source-extraction-assist-\$\{item\.id\}-label`[\s\S]*const valueId = `activity-source-extraction-assist-\$\{item\.id\}-value`[\s\S]*const descriptionId =[\s\S]*`activity-source-extraction-assist-\$\{item\.id\}-description`[\s\S]*data-handoff-item=\{item\.id\}[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*aria-label=\{item\.ariaLabel\}[\s\S]*aria-labelledby=\{`\$\{labelId\} \$\{valueId\}`\}[\s\S]*id=\{valueId\}[\s\S]*id=\{descriptionId\}/,
-  'Activity source extraction assist handoff should expose stable scope and label/value/description relationships for every item.'
-);
 const activitySourceExtractionAssistTestCatalogSource = readFileSync(
   'tests/e2e/TEST-CATALOG.md',
   'utf8'
-);
-assert.match(
-  activitySourceExtractionAssistTestCatalogSource,
-  /\|\s*7\s*\|(?=[\s\S]*source-extraction-assist handoff covers source-material count)(?=[\s\S]*worksheet extraction)(?=[\s\S]*storage-key)(?=[\s\S]*privacy guards)/,
-  'E2E catalog should cover the source-extraction-assist handoff acceptance journey.'
 );
 const sourceExtractionLifecycleChainView =
   buildSourceExtractionLifecycleChainHandoffView();
@@ -6780,15 +6437,13 @@ assert.deepEqual(sourceExtractionLifecycleChainView.privacy, {
 });
 assert.deepEqual(
   [
-    ACTIVITY_SOURCE_EXTRACTION_ASSIST_HANDOFF_ITEM_IDS.length,
     ACTIVITY_SOURCE_MATERIAL_REFERENCE_ITEM_IDS.length,
-    ACTIVITY_SOURCE_MATERIAL_PICKER_HANDOFF_ITEM_IDS.length,
     SOURCE_MATERIAL_PRIVACY_CHAIN_HANDOFF_ITEM_IDS.length,
     ACTIVITY_AI_AUTHORING_CHAIN_HANDOFF_ITEM_IDS.length,
     TEMPLATE_ROADMAP_CAPABILITY_CHAIN_HANDOFF_ITEM_IDS.length,
     ACTIVITY_AUTHORING_LIBRARY_CHAIN_HANDOFF_ITEM_IDS.length,
   ],
-  Array.from({ length: 7 }, () => 30),
+  Array.from({ length: 5 }, () => 30),
   'Source extraction lifecycle chain should stay backed by source-material, AI, roadmap, and authoring gates.'
 );
 assert.deepEqual(Object.fromEntries(sourceExtractionLifecycleChainValues), {
@@ -6880,23 +6535,13 @@ assert.deepEqual(activityAiAuthoringChainView.privacy, {
 });
 assert.deepEqual(
   [
-    ACTIVITY_EDITOR_AI_DRAFT_SOURCE_HANDOFF_ITEM_IDS.length,
-    ACTIVITY_EDITOR_TEMPLATE_HANDOFF_ITEM_IDS.length,
-    ACTIVITY_EDITOR_WORKFLOW_HANDOFF_ITEM_IDS.length,
-    ACTIVITY_AI_DRAFT_BOUNDARY_HANDOFF_ITEM_IDS.length,
     ACTIVITY_AI_FALLBACK_HANDOFF_ITEM_IDS.length,
     ACTIVITY_AI_FALLBACK_DRAFT_CHAIN_HANDOFF_ITEM_IDS.length,
     ACTIVITY_AI_FALLBACK_SOURCE_TERM_PLAN_ITEM_IDS.length,
-    ACTIVITY_DRAFT_META_HANDOFF_ITEM_IDS.length,
-    ACTIVITY_TEMPLATE_REMIX_HANDOFF_ITEM_IDS.length,
-    ACTIVITY_AI_REMIX_ASSIST_HANDOFF_ITEM_IDS.length,
-    QUESTION_CHOICE_GENERATION_HANDOFF_ITEM_IDS.length,
-    ACTIVITY_SOURCE_MATERIAL_PICKER_HANDOFF_ITEM_IDS.length,
-    ACTIVITY_SOURCE_EXTRACTION_ASSIST_HANDOFF_ITEM_IDS.length,
     SOURCE_MATERIAL_PRIVACY_CHAIN_HANDOFF_ITEM_IDS.length,
     ACTIVITY_TEMPLATE_SCAFFOLD_QUALITY_HANDOFF_ITEM_IDS.length,
   ],
-  Array.from({ length: 15 }, () => 30),
+  Array.from({ length: 5 }, () => 30),
   'Activity AI authoring chain should stay backed by focused authoring gates.'
 );
 assert.deepEqual(Object.fromEntries(activityAiAuthoringChainValues), {
@@ -6998,14 +6643,6 @@ assert.deepEqual(
   [
     ACTIVITY_AI_FALLBACK_HANDOFF_ITEM_IDS.length,
     ACTIVITY_AI_FALLBACK_SOURCE_TERM_PLAN_ITEM_IDS.length,
-    ACTIVITY_AI_DRAFT_BOUNDARY_HANDOFF_ITEM_IDS.length,
-    ACTIVITY_DRAFT_META_HANDOFF_ITEM_IDS.length,
-    ACTIVITY_TEMPLATE_REMIX_HANDOFF_ITEM_IDS.length,
-    QUESTION_CHOICE_GENERATION_HANDOFF_ITEM_IDS.length,
-    ACTIVITY_EDITOR_AI_DRAFT_SOURCE_HANDOFF_ITEM_IDS.length,
-    ACTIVITY_EDITOR_WORKFLOW_HANDOFF_ITEM_IDS.length,
-    ACTIVITY_SOURCE_MATERIAL_PICKER_HANDOFF_ITEM_IDS.length,
-    ACTIVITY_SOURCE_EXTRACTION_ASSIST_HANDOFF_ITEM_IDS.length,
     SOURCE_EXTRACTION_LIFECYCLE_CHAIN_HANDOFF_ITEM_IDS.length,
     SOURCE_MATERIAL_PRIVACY_CHAIN_HANDOFF_ITEM_IDS.length,
     ACTIVITY_AI_AUTHORING_CHAIN_HANDOFF_ITEM_IDS.length,
@@ -7013,7 +6650,7 @@ assert.deepEqual(
     ACTIVITY_AI_ENHANCEMENT_EXECUTION_ITEM_IDS.length,
     ACTIVITY_AUTHORING_LIBRARY_CHAIN_HANDOFF_ITEM_IDS.length,
   ],
-  Array.from({ length: 16 }, () => 30),
+  Array.from({ length: 8 }, () => 30),
   'Activity AI fallback draft chain should stay backed by fallback, source-term, draft boundary, metadata, template, question-choice, editor, source-material, extraction, authoring, and execution gates.'
 );
 assert.deepEqual(Object.fromEntries(activityAiFallbackDraftChainValues), {
@@ -7110,11 +6747,6 @@ assert.deepEqual(activityAiEnhancementRoadmapChainView.privacy, {
 assert.deepEqual(
   [
     ACTIVITY_AI_AUTHORING_CHAIN_HANDOFF_ITEM_IDS.length,
-    ACTIVITY_AI_REMIX_ASSIST_HANDOFF_ITEM_IDS.length,
-    ACTIVITY_DRAFT_META_HANDOFF_ITEM_IDS.length,
-    ACTIVITY_TEMPLATE_REMIX_HANDOFF_ITEM_IDS.length,
-    QUESTION_CHOICE_GENERATION_HANDOFF_ITEM_IDS.length,
-    ACTIVITY_SOURCE_EXTRACTION_ASSIST_HANDOFF_ITEM_IDS.length,
     SOURCE_EXTRACTION_LIFECYCLE_CHAIN_HANDOFF_ITEM_IDS.length,
     SOURCE_MATERIAL_PRIVACY_CHAIN_HANDOFF_ITEM_IDS.length,
     ACTIVITY_AI_ENHANCEMENT_POLICY_ITEM_IDS.length,
@@ -7128,7 +6760,7 @@ assert.deepEqual(
     TEMPLATE_ROADMAP_CAPABILITY_CHAIN_HANDOFF_ITEM_IDS.length,
     WORKSHEET_MODE_DELIVERY_CHAIN_HANDOFF_ITEM_IDS.length,
   ],
-  Array.from({ length: 18 }, () => 30),
+  Array.from({ length: 13 }, () => 30),
   'Activity AI enhancement roadmap chain should stay backed by authoring, remix, extraction, policy, execution, draft output, draft application, editor review, save boundary, publish boundary, lifecycle, roadmap, worksheet, and result-export gates.'
 );
 assert.deepEqual(
@@ -8462,23 +8094,15 @@ assert.deepEqual(activityAuthoringLibraryChainView.privacy, {
 assert.deepEqual(
   [
     PUBLIC_TEMPLATE_ENTRY_HANDOFF_ITEM_IDS.length,
-    ACTIVITY_EDITOR_WORKFLOW_HANDOFF_ITEM_IDS.length,
-    ACTIVITY_EDITOR_TEMPLATE_HANDOFF_ITEM_IDS.length,
     ACTIVITY_TEMPLATE_SCAFFOLD_QUALITY_HANDOFF_ITEM_IDS.length,
-    ACTIVITY_SOURCE_MATERIAL_PICKER_HANDOFF_ITEM_IDS.length,
     ACTIVITY_SOURCE_MATERIAL_REFERENCE_ITEM_IDS.length,
-    ACTIVITY_EDIT_ROUTE_HANDOFF_ITEM_IDS.length,
-    ACTIVITY_LIBRARY_PAGE_HANDOFF_ITEM_IDS.length,
-    ACTIVITY_DUPLICATE_HANDOFF_ITEM_IDS.length,
-    ACTIVITY_TEMPLATE_REMIX_HANDOFF_ITEM_IDS.length,
-    ACTIVITY_LIFECYCLE_HANDOFF_ITEM_IDS.length,
   ],
-  Array.from({ length: 11 }, () => 30),
+  Array.from({ length: 3 }, () => 30),
   'Activity authoring/library chain should stay backed by focused public-entry, editor, library, derivative, lifecycle, and publish gates.'
 );
 assert.deepEqual(Object.fromEntries(activityAuthoringLibraryChainValues), {
   'activity-persistence': 'Create/update helpers',
-  'editor-workflow-handoff-boundary': '30 editor workflow slices',
+  'editor-workflow-handoff-boundary': 'Visible 5-step workflow',
   'archive-lifecycle-gate': 'Archive blocks derive',
   'card-readiness-summary': 'Ready/locked modes',
   'card-source-materials': 'Kind/count badges',
@@ -8612,13 +8236,10 @@ assert.deepEqual(
     STORAGE_FILE_ACCESS_ITEM_IDS.length,
     ACTIVITY_SOURCE_MATERIAL_REFERENCE_ITEM_IDS.length,
     SETTINGS_FILES_SOURCE_MATERIAL_HANDOFF_ITEM_IDS.length,
-    ACTIVITY_SOURCE_MATERIAL_PICKER_HANDOFF_ITEM_IDS.length,
-    ACTIVITY_AI_DRAFT_BOUNDARY_HANDOFF_ITEM_IDS.length,
-    ACTIVITY_SOURCE_EXTRACTION_ASSIST_HANDOFF_ITEM_IDS.length,
     PUBLIC_ASSIGNMENT_ACCESS_HANDOFF_ITEM_IDS.length,
     PUBLIC_ASSIGNMENT_UNAVAILABLE_ACCESS_HANDOFF_ITEM_IDS.length,
   ],
-  [20, 30, 30, 30, 30, 30, 30, 30, 30],
+  [20, 30, 30, 30, 30, 30],
   'Source-material privacy chain should stay backed by the focused gates it links together.'
 );
 assert.deepEqual(STORAGE_FILE_ACCESS_PRIVACY_CONTRACT, {
@@ -8804,7 +8425,7 @@ const activityLifecycleSource = readFileSync(
   'utf8'
 );
 const activityLifecycleHandoffSemanticTestSource = readFileSync(
-  'scripts/activity-lifecycle-handoff-semantic-views.test.ts',
+  'scripts/activity-lifecycle.test.ts',
   'utf8'
 );
 const activityScaffoldsSource = readFileSync(
@@ -8812,10 +8433,6 @@ const activityScaffoldsSource = readFileSync(
   'utf8'
 );
 const activityEditorSource = readFileSync('src/activities/editor.ts', 'utf8');
-const activityAiDraftBoundarySource = readFileSync(
-  'src/activities/ai-draft-boundary.ts',
-  'utf8'
-);
 assert.match(
   activityLifecycleSource,
   /export type ActivityLifecycleActionCopy = \{[\s\S]*failureMessage: string;[\s\S]*successMessage: string;[\s\S]*export type ActivityDerivativeBlockedReason =[\s\S]*'activity-archived'[\s\S]*'same-template'[\s\S]*export type ActivityDerivativeActionGate =[\s\S]*reason: Extract<ActivityDerivativeBlockedReason, 'activity-archived'>;[\s\S]*export type ActivityLifecycleActionView = ActivityLifecycleActionCopy & \{[\s\S]*gate: ActivityDerivativeActionGate;/,
@@ -8828,7 +8445,7 @@ assert.match(
 );
 assert.match(
   activityLibraryViewSource,
-  /export type ActivityLibraryActionStatusView = \{[\s\S]*ariaLabel: string;[\s\S]*description: string;[\s\S]*tone: ActivityLibraryActionStatusTone;[\s\S]*export type ActivityLibraryCardActionButtonView =[\s\S]*ariaLabel: string;[\s\S]*label: string;[\s\S]*statusView: ActivityLibraryActionStatusView;[\s\S]*export type ActivityLibraryCardDerivativeActionView =[\s\S]*ariaLabel: string;[\s\S]*duplicateHandoffView\?: ActivityDuplicateHandoffView;[\s\S]*label: string;[\s\S]*statusView: ActivityLibraryActionStatusView;[\s\S]*export type ActivityLibraryCardRestoreActionView =[\s\S]*requiredMessage: string;[\s\S]*export type ActivityLibraryCardRemixActionView =[\s\S]*statusView: ActivityLibraryActionStatusView;[\s\S]*export type ActivityLibraryCardActionView = \{[\s\S]*archive: ActivityLibraryCardActionButtonView;[\s\S]*duplicate: ActivityLibraryCardDerivativeActionView;[\s\S]*publish: ActivityLibraryCardDerivativeActionView;[\s\S]*remix: ActivityLibraryCardRemixActionView;[\s\S]*restore: ActivityLibraryCardRestoreActionView;/,
+  /export type ActivityLibraryActionStatusView = \{[\s\S]*ariaLabel: string;[\s\S]*description: string;[\s\S]*tone: ActivityLibraryActionStatusTone;[\s\S]*export type ActivityLibraryCardActionButtonView =[\s\S]*ariaLabel: string;[\s\S]*label: string;[\s\S]*statusView: ActivityLibraryActionStatusView;[\s\S]*export type ActivityLibraryCardDerivativeActionView =[\s\S]*ariaLabel: string;[\s\S]*label: string;[\s\S]*statusView: ActivityLibraryActionStatusView;[\s\S]*export type ActivityLibraryCardRestoreActionView =[\s\S]*requiredMessage: string;[\s\S]*export type ActivityLibraryCardRemixActionView =[\s\S]*statusView: ActivityLibraryActionStatusView;[\s\S]*export type ActivityLibraryCardActionView = \{[\s\S]*archive: ActivityLibraryCardActionButtonView;[\s\S]*duplicate: ActivityLibraryCardDerivativeActionView;[\s\S]*publish: ActivityLibraryCardDerivativeActionView;[\s\S]*remix: ActivityLibraryCardRemixActionView;[\s\S]*restore: ActivityLibraryCardRestoreActionView;/,
   'Activity library card actions should compose explicit lifecycle action view contracts with prepared labels, status views, aria labels, duplicate handoff, and restore guidance.'
 );
 assert.match(
@@ -8840,11 +8457,6 @@ assert.match(
   activityLifecycleHandoffSemanticTestSource,
   /buildActivityLibraryCardDisplayView[\s\S]*buildAssignmentPublishDialogAccessView[\s\S]*buildActivityDerivativeActionExecutionPlan[\s\S]*buildActivityVisibilityActionExecutionPlan/,
   'Activity lifecycle semantic coverage should exercise archived card display, publish access, derivative plans, and visibility plans together.'
-);
-assert.match(
-  activityLifecycleHandoffSemanticTestSource,
-  /assignment-snapshot-protection[\s\S]*Snapshots unchanged[\s\S]*public-assignment-continuity[\s\S]*Existing links unchanged[\s\S]*showPublishAction: false[\s\S]*showRestoreAction: true[\s\S]*buildAssignmentPublishDialogAccessView\('archived'\)[\s\S]*ACTIVITY_RESTORED_VISIBILITY/,
-  'Activity lifecycle semantic coverage should prove archived activities preserve assignment snapshots, keep existing links available, hide publish actions, show restore, and restore into draft readiness.'
 );
 assert.match(
   activityLibraryViewSource,
@@ -8966,26 +8578,6 @@ assert.match(
   /export type ActivityEditorTemplateSetupView[\s\S]*requirementBadges: ActivityEditorTemplateRequirementBadgeView\[\];[\s\S]*reviewChecklistItems: ActivityEditorTemplateScaffoldReviewItemView\[\];[\s\S]*reviewChecklistLabel: string;[\s\S]*export type ActivityEditorTemplateScaffoldReviewItemId =[\s\S]*'check-ready-modes'[\s\S]*'edit-before-save'[\s\S]*'review-fields';[\s\S]*export type ActivityEditorTemplateScaffoldReviewItemView = \{[\s\S]*actionHref: ActivityEditorSectionHref;[\s\S]*actionLabel: string;[\s\S]*ariaLabel: string;[\s\S]*export type ActivityEditorTemplateRequirementBadgeView =\s*TemplateRequirementView;[\s\S]*export type ActivityEditorTemplateScaffoldSummaryView =\s*ActivityTemplateScaffoldReadinessSummary;[\s\S]*export type ActivityEditorTemplateScaffoldCoverageMetricView =\s*ActivityTemplateScaffoldCoverageMetricView;[\s\S]*export type ActivityEditorTemplateScaffoldReadyOptionView =\s*ActivityTemplateScaffoldReadyOptionView;/,
   'Activity editor domain should expose explicit template scaffold view contracts.'
 );
-assert.match(
-  activityEditorSource,
-  /export const ACTIVITY_EDITOR_TEMPLATE_HANDOFF_ITEM_IDS = \[(?=[\s\S]*'selected-template')(?=[\s\S]*'template-short-name')(?=[\s\S]*'current-template-readiness')(?=[\s\S]*'suggested-remix-options')(?=[\s\S]*'locked-template-options')(?=[\s\S]*'question-choice-readiness')(?=[\s\S]*'scaffold-reusable-coverage')(?=[\s\S]*'scaffold-teacher-notes')(?=[\s\S]*'shared-editor-contract')(?=[\s\S]*'parsed-content-status')(?=[\s\S]*'current-question-count')(?=[\s\S]*'current-pair-count')(?=[\s\S]*'current-group-count')(?=[\s\S]*'current-vocabulary-count')(?=[\s\S]*'current-teacher-note-count')(?=[\s\S]*'scaffold-review-steps')(?=[\s\S]*'save-before-publish-boundary')(?=[\s\S]*'privacy-guard')[\s\S]*export type ActivityEditorTemplateHandoffPrivacyContract = \{[\s\S]*exposesAnswerText: false;[\s\S]*exposesCurrentFieldText: false;[\s\S]*exposesQuestionPromptText: false;[\s\S]*exposesRawEditorInput: false;[\s\S]*exposesRawScaffoldContent: false;[\s\S]*exposesSourceMaterialFileIds: false;[\s\S]*exposesSourceMaterialStorageKeys: false;[\s\S]*exposesTeacherNotesText: false;[\s\S]*itemIds: ActivityEditorTemplateHandoffItemId\[\];[\s\S]*scope: 'activity-editor-template-readiness';/,
-  'Activity editor template handoff should expose a typed 30-slice contract with explicit privacy flags and scope.'
-);
-assert.match(
-  activityEditorSource,
-  /handoffView: ActivityEditorTemplateHandoffView;[\s\S]*handoffView: buildActivityEditorTemplateHandoffView\(\{[\s\S]*readinessSummary,[\s\S]*remixPlan: templateReadiness,[\s\S]*setupView,[\s\S]*template,[\s\S]*\}\)/,
-  'Activity editor template view should compose its handoff from prepared readiness, scaffold, and selected-template state.'
-);
-assert.match(
-  activityEditorSource,
-  /function buildActivityEditorTemplateHandoffView(?=[\s\S]*currentContent: ActivityContent \| null)(?=[\s\S]*readinessSummary: ActivityTemplateReadinessPanelSummary)(?=[\s\S]*setupView: ActivityEditorTemplateSetupView)(?=[\s\S]*template: ActivityTemplateDefinition)[\s\S]*id: 'selected-template'[\s\S]*id: 'current-template-readiness'[\s\S]*id: 'ready-template-options'[\s\S]*id: 'suggested-remix-options'[\s\S]*id: 'locked-template-options'[\s\S]*id: 'question-choice-readiness'[\s\S]*id: 'scaffold-reusable-coverage'[\s\S]*id: 'scaffold-teacher-notes'[\s\S]*id: 'shared-editor-contract'[\s\S]*id: 'parsed-content-status'[\s\S]*id: 'current-question-count'[\s\S]*id: 'save-before-publish-boundary'[\s\S]*id: 'privacy-guard'[\s\S]*privacy: buildActivityEditorTemplateHandoffPrivacyContract/,
-  'Activity editor template handoff should collect selected template, readiness, remix, scaffold, current parsed fields, review, and privacy slices.'
-);
-assert.match(
-  activityEditorFormSource,
-  /ActivityEditorTemplateHandoff[\s\S]*data-handoff="activity-editor-template"[\s\S]*data-handoff-scope=\{handoffView\.privacy\.scope\}[\s\S]*handoffView\.itemViews\.map[\s\S]*ActivityEditorTemplateHandoffItem[\s\S]*const labelId = `activity-editor-template-handoff-\$\{item\.id\}-label`[\s\S]*const valueId = `activity-editor-template-handoff-\$\{item\.id\}-value`[\s\S]*const descriptionId = `activity-editor-template-handoff-\$\{item\.id\}-description`[\s\S]*data-handoff-item=\{item\.id\}[\s\S]*id=\{labelId\}[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*aria-label=\{item\.ariaLabel\}[\s\S]*aria-labelledby=\{`\$\{labelId\} \$\{valueId\}`\}[\s\S]*id=\{valueId\}[\s\S]*id=\{descriptionId\}/,
-  'Activity editor form should render the template handoff privacy scope in the real create/edit surface.'
-);
 assert.doesNotMatch(
   activityEditorSource,
   /ActivityEditorTemplateView\['handoffView'\]|ReturnType<\s*typeof buildActivityEditorTemplateHandoffView>/,
@@ -8998,28 +8590,8 @@ assert.match(
 );
 assert.match(
   activityEditorSource,
-  /export const ACTIVITY_EDITOR_WORKFLOW_STEP_IDS = \[(?=[\s\S]*'frame')(?=[\s\S]*'ai-draft')(?=[\s\S]*'content')(?=[\s\S]*'source-materials')(?=[\s\S]*'review')[\s\S]*export type ActivityEditorWorkflowStepView = \{[\s\S]*href: ActivityEditorSectionHref;[\s\S]*icon: ActivityEditorWorkflowStepIcon;[\s\S]*sectionId: ActivityEditorSectionId;[\s\S]*export const ACTIVITY_EDITOR_WORKFLOW_HANDOFF_ITEM_IDS = \[(?=[\s\S]*'workflow-source')(?=[\s\S]*'step-count')(?=[\s\S]*'workflow-order')(?=[\s\S]*'create-page-surface')(?=[\s\S]*'edit-page-surface')(?=[\s\S]*'nav-surface')(?=[\s\S]*'form-section-surface')(?=[\s\S]*'side-preview-surface')(?=[\s\S]*'frame-section')(?=[\s\S]*'primary-fields')(?=[\s\S]*'template-handoff')(?=[\s\S]*'scaffold-panel')(?=[\s\S]*'ai-draft-section')(?=[\s\S]*'ai-source-state')(?=[\s\S]*'ai-sync-action')(?=[\s\S]*'content-section')(?=[\s\S]*'details-fields')(?=[\s\S]*'structured-content-fields')(?=[\s\S]*'source-materials-section')(?=[\s\S]*'material-picker')(?=[\s\S]*'review-section')(?=[\s\S]*'readiness-panel')(?=[\s\S]*'save-footer')(?=[\s\S]*'auth-gate')(?=[\s\S]*'input-contract')(?=[\s\S]*'template-readiness-contract')(?=[\s\S]*'ai-editor-boundary')(?=[\s\S]*'source-privacy-boundary')(?=[\s\S]*'publish-boundary')(?=[\s\S]*'privacy-guard')/,
-  'Activity editor workflow should expose stable step and 30-slice handoff id contracts from the editor domain.'
-);
-assert.match(
-  activityEditorSource,
-  /export type ActivityEditorWorkflowHandoffPrivacyContract = \{[\s\S]*createsAssignmentLinks: false;[\s\S]*exposesAnswerText: false;[\s\S]*exposesPromptText: false;[\s\S]*exposesRawEditorInput: false;[\s\S]*exposesSourceMaterialFileIds: false;[\s\S]*exposesSourceMaterialStorageKeys: false;[\s\S]*exposesTeacherNotesText: false;[\s\S]*mutatesActivity: false;[\s\S]*persistsActivityWithoutTeacherSave: false;[\s\S]*publishesAssignment: false;[\s\S]*usesCreateActivityInputContract: true;/,
-  'Activity editor workflow handoff should expose explicit privacy, mutation, save, publish, and input-contract boundaries.'
-);
-assert.match(
-  activityEditorSource,
-  /export function buildActivityEditorWorkflowView\(\)[\s\S]*ACTIVITY_EDITOR_WORKFLOW_STEP_IDS\.map[\s\S]*buildActivityEditorWorkflowStepView[\s\S]*handoffView: buildActivityEditorWorkflowHandoffView\(steps\)[\s\S]*export function getActivityEditorWorkflowStepView/,
-  'Activity editor workflow view should build route/form steps and handoff from the stable domain-owned order.'
-);
-assert.match(
-  activityEditorSource,
   /previewPanel: ActivityEditorPreviewPanel;[\s\S]*workflow: ActivityEditorWorkflowView;[\s\S]*workflow: buildActivityEditorWorkflowView\(\)/,
   'Activity create page editor view-model should include the prepared workflow view for the create route.'
-);
-assert.match(
-  createRouteSource,
-  /<ActivityEditorWorkflowHandoff[\s\S]*handoffView=\{pageView\.workflow\.handoffView\}[\s\S]*data-handoff="activity-editor-workflow"[\s\S]*data-handoff-scope=\{handoffView\.privacy\.scope\}[\s\S]*handoffView\.itemViews\.map[\s\S]*ActivityEditorWorkflowHandoffItem/,
-  'Create route should render the hidden workflow handoff from the prepared page view.'
 );
 // The form sections carry the step titles; a separate step bar repeated them.
 assert.doesNotMatch(
@@ -9089,59 +8661,13 @@ assert.match(
 );
 assert.match(
   activityEditorSource,
-  /export type ActivityEditorAiDraftSourceCapabilityView[\s\S]*export type ActivityEditorSourceMaterialDraftNoteView[\s\S]*export type ActivityEditorAiDraftSourceReadinessView[\s\S]*export type ActivityEditorAiDraftSourceMaterialSafetyMetricView[\s\S]*export type ActivityEditorAiDraftSourceMaterialSafetyView[\s\S]*export const ACTIVITY_EDITOR_AI_DRAFT_SOURCE_CONTROL_IDS[\s\S]*export type ActivityEditorAiDraftSourceControlBoundaryView = \{[\s\S]*scope: 'activity-ai-draft-source-controls';[\s\S]*textareaDescribedByIds: string\[\];[\s\S]*usesPreparedControlIds: true;[\s\S]*export const ACTIVITY_EDITOR_AI_DRAFT_SOURCE_HANDOFF_ITEM_IDS/,
+  /export type ActivityEditorAiDraftSourceCapabilityView[\s\S]*export type ActivityEditorSourceMaterialDraftNoteView[\s\S]*export type ActivityEditorAiDraftSourceReadinessView[\s\S]*export type ActivityEditorAiDraftSourceMaterialSafetyMetricView[\s\S]*export type ActivityEditorAiDraftSourceMaterialSafetyView[\s\S]*export const ACTIVITY_EDITOR_AI_DRAFT_SOURCE_CONTROL_IDS[\s\S]*export type ActivityEditorAiDraftSourceControlBoundaryView = \{[\s\S]*scope: 'activity-ai-draft-source-controls';[\s\S]*textareaDescribedByIds: string\[\];[\s\S]*usesPreparedControlIds: true;/,
   'Activity editor domain should expose explicit AI draft panel view contracts.'
 );
 assert.match(
   activityEditorSource,
   /function buildActivityEditorAiDraftSourceControlBoundary[\s\S]*const controlIds = ACTIVITY_EDITOR_AI_DRAFT_SOURCE_CONTROL_IDS[\s\S]*generateButtonDescribedByIds:[\s\S]*controlIds\.sourceReadinessDescription[\s\S]*controlIds\.generationDisabledReason[\s\S]*syncButtonDescribedByIds: \[controlIds\.syncMaterialsHelp\][\s\S]*textareaDescribedByIds:[\s\S]*controlIds\.safeSourceDescription[\s\S]*controlIds\.sourceReadinessDescription[\s\S]*controlIds\.sourceMaterialSafetyDescription[\s\S]*controlIds\.sourceCapabilityTitle[\s\S]*controlIds\.sourceMaterialNotesLabel/,
   'Activity editor AI source control boundary should derive textarea, sync, and generate aria descriptions from prepared control ids.'
-);
-assert.match(
-  activityEditorSource,
-  /export const ACTIVITY_EDITOR_AI_DRAFT_SOURCE_HANDOFF_ITEM_IDS = \[[\s\S]*'safe-source'[\s\S]*'source-textarea'[\s\S]*'source-readiness'[\s\S]*'source-length'[\s\S]*'source-warning'[\s\S]*'source-sanitization'[\s\S]*'teacher-review'[\s\S]*'item-count'[\s\S]*'focus'[\s\S]*'sync-action'[\s\S]*'generate-action'[\s\S]*'generation-gate'[\s\S]*'auth-boundary'[\s\S]*'input-schema'[\s\S]*'attached-materials'[\s\S]*'material-safety'[\s\S]*'safe-material-notes'[\s\S]*'omitted-material-notes'[\s\S]*'synced-material-provenance'[\s\S]*'capability-audio-extraction'[\s\S]*'capability-worksheet-extraction'[\s\S]*'capability-spreadsheet-import'[\s\S]*'create-input-contract'[\s\S]*'editor-application-boundary'[\s\S]*'persistence-boundary'[\s\S]*'save-boundary'[\s\S]*'publish-boundary'[\s\S]*'file-byte-guard'[\s\S]*'storage-key-guard'[\s\S]*'prompt-privacy'[\s\S]*\] as const;[\s\S]*export type ActivityEditorAiDraftSourceHandoffItemId =\s*\n\s*\(typeof ACTIVITY_EDITOR_AI_DRAFT_SOURCE_HANDOFF_ITEM_IDS\)\[number\];/,
-  'Activity editor AI draft source handoff should expose stable exported 30-slice ids and derive its item id type from them.'
-);
-assert.deepEqual(
-  [...ACTIVITY_EDITOR_AI_DRAFT_SOURCE_HANDOFF_ITEM_IDS],
-  [
-    'safe-source',
-    'source-textarea',
-    'source-readiness',
-    'source-length',
-    'source-warning',
-    'source-sanitization',
-    'teacher-review',
-    'item-count',
-    'focus',
-    'sync-action',
-    'generate-action',
-    'generation-gate',
-    'auth-boundary',
-    'input-schema',
-    'attached-materials',
-    'material-safety',
-    'safe-material-notes',
-    'omitted-material-notes',
-    'synced-material-provenance',
-    'capability-audio-extraction',
-    'capability-worksheet-extraction',
-    'capability-spreadsheet-import',
-    'create-input-contract',
-    'editor-application-boundary',
-    'persistence-boundary',
-    'save-boundary',
-    'publish-boundary',
-    'file-byte-guard',
-    'storage-key-guard',
-    'prompt-privacy',
-  ],
-  'Activity editor AI draft source handoff should expose exactly 30 stable slice ids.'
-);
-assert.match(
-  activityEditorSource,
-  /function buildActivityEditorAiDraftSourceHandoffView[\s\S]*const candidateItemViews: ActivityEditorAiDraftSourceHandoffItemView\[\] = \[[\s\S]*id: 'source-sanitization'[\s\S]*id: 'auth-boundary'[\s\S]*id: 'input-schema'[\s\S]*id: 'create-input-contract'[\s\S]*id: 'editor-application-boundary'[\s\S]*id: 'persistence-boundary'[\s\S]*id: 'save-boundary'[\s\S]*id: 'publish-boundary'[\s\S]*id: 'file-byte-guard'[\s\S]*id: 'storage-key-guard'[\s\S]*const itemViewById = new Map\([\s\S]*candidateItemViews\.map\(\(itemView\) => \[itemView\.id, itemView\] as const\)[\s\S]*const itemViews = ACTIVITY_EDITOR_AI_DRAFT_SOURCE_HANDOFF_ITEM_IDS\.map[\s\S]*Missing activity AI draft source handoff item:[\s\S]*privacy: buildActivityEditorAiDraftSourcePrivacyContract\(itemViews\)/,
-  'Activity editor AI draft source handoff should order prepared slices through the stable id contract and fail loudly if a slice is missing.'
 );
 assert.match(
   activityEditorSource,
@@ -9202,16 +8728,6 @@ assert.doesNotMatch(
   activityAiDraftPanelSource,
   /ReturnType<typeof buildActivityEditorAiDraftPanelView>|buildActivityEditorAiDraftPanelView/,
   'Activity AI draft panel should not infer props from the AI draft panel builder.'
-);
-assert.match(
-  activityAiDraftPanelSource,
-  /ActivityAiDraftBoundaryHandoffItemView[\s\S]*ActivityAiDraftBoundaryHandoffView[\s\S]*data-handoff="activity-ai-draft-boundary"[\s\S]*data-handoff-scope=\{view\.privacy\.scope\}[\s\S]*view\.itemViews\.map[\s\S]*ActivityAiDraftBoundaryHandoffItem[\s\S]*function ActivityAiDraftBoundaryHandoffItem[\s\S]*const labelId = `activity-ai-draft-boundary-handoff-\$\{itemView\.id\}-label`[\s\S]*const valueId = `activity-ai-draft-boundary-handoff-\$\{itemView\.id\}-value`[\s\S]*const descriptionId = `activity-ai-draft-boundary-handoff-\$\{itemView\.id\}-description`[\s\S]*data-handoff-item=\{itemView\.id\}[\s\S]*id=\{labelId\}[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*aria-label=\{itemView\.ariaLabel\}[\s\S]*aria-labelledby=\{`\$\{labelId\} \$\{valueId\}`\}[\s\S]*id=\{valueId\}[\s\S]*id=\{descriptionId\}/,
-  'Activity AI draft boundary handoff should render privacy scope plus stable label, value, and description relationships.'
-);
-assert.match(
-  activityAiDraftBoundarySource,
-  /export const ACTIVITY_AI_DRAFT_BOUNDARY_HANDOFF_ITEM_IDS = \[(?=[\s\S]*'source-panel')(?=[\s\S]*'generation-gate')(?=[\s\S]*'server-function')(?=[\s\S]*'input-schema')(?=[\s\S]*'safe-material-provenance')(?=[\s\S]*'file-byte-guard')(?=[\s\S]*'storage-key-guard')(?=[\s\S]*'create-input-contract')(?=[\s\S]*'editor-review-gate')(?=[\s\S]*'persistence-boundary')(?=[\s\S]*'save-boundary')(?=[\s\S]*'publish-boundary')(?=[\s\S]*'coverage-summary')(?=[\s\S]*'template-readiness')(?=[\s\S]*'privacy-guard')[\s\S]*export type ActivityAiDraftBoundaryHandoffPrivacyContract = \{[\s\S]*exposesActivityDraftText: false;[\s\S]*exposesAnswerText: false;[\s\S]*exposesFileBytes: false;[\s\S]*exposesFileIds: false;[\s\S]*exposesOmittedNotePayloads: false;[\s\S]*exposesRawProviderResponse: false;[\s\S]*exposesSourceText: false;[\s\S]*exposesStorageKeys: false;[\s\S]*persistsActivity: false;[\s\S]*publishesAssignment: false;[\s\S]*requiresTeacherReview: true;[\s\S]*scope: 'teacher-reviewed-ai-draft-boundary';/,
-  'Activity AI draft boundary should expose a typed 30-slice teacher-reviewed privacy scope.'
 );
 assert.match(
   activityAiDraftPanelSource,
@@ -9635,31 +9151,6 @@ assert.match(
 );
 assert.match(
   activityDraftMetaSource,
-  /export const ACTIVITY_DRAFT_META_HANDOFF_ITEM_IDS = \[(?=[\s\S]*'draft-provider')(?=[\s\S]*'draft-model')(?=[\s\S]*'generation-notice')(?=[\s\S]*'fallback-stability-boundary')(?=[\s\S]*'teacher-review-gate')(?=[\s\S]*'editor-fill-boundary')(?=[\s\S]*'create-input-contract')(?=[\s\S]*'review-gate-status')(?=[\s\S]*'review-checklist-source')(?=[\s\S]*'action-needed-count')(?=[\s\S]*'review-required-count')(?=[\s\S]*'ready-check-count')(?=[\s\S]*'template-readiness-source')(?=[\s\S]*'ready-template-count')(?=[\s\S]*'locked-template-count')(?=[\s\S]*'suggested-remix-count')(?=[\s\S]*'coverage-field-count')(?=[\s\S]*'question-count')(?=[\s\S]*'pair-count')(?=[\s\S]*'group-count')(?=[\s\S]*'vocabulary-count')(?=[\s\S]*'teacher-note-count')(?=[\s\S]*'quiz-choice-readiness')(?=[\s\S]*'source-provenance-boundary')(?=[\s\S]*'safe-source-count')(?=[\s\S]*'omitted-source-count')(?=[\s\S]*'no-file-byte-read')(?=[\s\S]*'no-direct-persist')(?=[\s\S]*'no-assignment-publish')(?=[\s\S]*'save-boundary')/,
-  'AI draft meta domain should expose 30 stable save handoff item ids.'
-);
-assert.match(
-  activityDraftMetaSource,
-  /export type ActivityDraftMetaHandoffItemView = \{[\s\S]*ariaLabel: string;[\s\S]*description: string;[\s\S]*id: ActivityDraftMetaHandoffItemId;[\s\S]*label: string;[\s\S]*value: string;[\s\S]*export type ActivityDraftMetaHandoffPrivacyContract = \{[\s\S]*appliesToEditorBeforeSave: true;[\s\S]*createsAssignmentLinks: false;[\s\S]*exposesAnswerText: false;[\s\S]*exposesExplanationText: false;[\s\S]*exposesOptionText: false;[\s\S]*exposesQuestionPromptText: false;[\s\S]*exposesRawDraftJson: false;[\s\S]*exposesRawSourceText: false;[\s\S]*exposesSourceMaterialFileIds: false;[\s\S]*exposesSourceMaterialStorageKeys: false;[\s\S]*exposesTeacherNotesText: false;[\s\S]*fillsEditorOnly: true;[\s\S]*mutatesActivityLibraryBeforeSave: false;[\s\S]*persistsContentDirectly: false;[\s\S]*publishesAssignmentWithoutTeacherAction: false;[\s\S]*readsSourceMaterialFileBytes: false;[\s\S]*requiresTeacherReview: true;[\s\S]*savesActivityWithoutTeacherAction: false;[\s\S]*scope: 'teacher-reviewed-ai-draft';[\s\S]*usesCreateActivityInputContract: true;[\s\S]*usesDeterministicFallbackContract: true;[\s\S]*usesSafeSourceMaterialProvenance: true;[\s\S]*usesStructuredReviewChecklist: true;[\s\S]*usesTemplateReadinessDomain: true;[\s\S]*export type ActivityDraftMetaHandoffView = \{[\s\S]*itemViews: ActivityDraftMetaHandoffItemView\[\];[\s\S]*privacy: ActivityDraftMetaHandoffPrivacyContract;/,
-  'AI draft meta domain should expose an explicit safe handoff privacy contract.'
-);
-assert.match(
-  activityDraftMetaSource,
-  /export type ActivityDraftMetaSummaryView = \{[\s\S]*handoffView: ActivityDraftMetaHandoffView;/,
-  'AI draft summary view should include a prepared handoff view.'
-);
-assert.match(
-  activityDraftMetaSource,
-  /const handoffView = buildActivityDraftMetaHandoffView\(\{[\s\S]*coverageStats[\s\S]*modelName[\s\S]*notice: normalizedNotice[\s\S]*providerDescription[\s\S]*providerLabel[\s\S]*questionChoiceReadiness[\s\S]*reviewGateView[\s\S]*sourceMaterialSafetyView[\s\S]*suggestedTemplateCount/,
-  'AI draft summary builder should construct the save handoff from prepared domain views.'
-);
-assert.match(
-  activityDraftMetaSource,
-  /buildActivityDraftMetaHandoffItem[\s\S]*activity_draft_meta_handoff_fallback_stability_boundary_description[\s\S]*activity_draft_meta_handoff_editor_fill_boundary_description[\s\S]*activity_draft_meta_handoff_create_input_contract_description[\s\S]*activity_draft_meta_handoff_review_checklist_source_description[\s\S]*activity_draft_meta_handoff_template_readiness_source_description[\s\S]*activity_draft_meta_handoff_source_provenance_boundary_description[\s\S]*activity_draft_meta_handoff_no_file_byte_read_description[\s\S]*activity_draft_meta_handoff_no_direct_persist_description[\s\S]*activity_draft_meta_handoff_no_assignment_publish_description/,
-  'AI draft meta handoff should prepare localized editor-fill, input-contract, checklist, source, and no-mutation boundaries.'
-);
-assert.match(
-  activityDraftMetaSource,
   /export type ActivityDraftMetaSummaryCoverageStatId =[\s\S]*'groups'[\s\S]*'pairs'[\s\S]*'questions'[\s\S]*'teacher-notes'[\s\S]*'vocabulary'[\s\S]*export type ActivityDraftMetaSummaryCoverageStatView = \{[\s\S]*ariaLabel: string;[\s\S]*description: string;[\s\S]*id: ActivityDraftMetaSummaryCoverageStatId;[\s\S]*label: string;[\s\S]*value: number;/,
   'AI draft coverage stats should expose stable ids, aria labels, and descriptions separately from localized labels.'
 );
@@ -9707,11 +9198,6 @@ assert.match(
   activityDraftMetaSummarySource,
   /ActivityDraftMetaReviewGateMetricView[\s\S]*ActivityDraftMetaReviewGateView/,
   'AI draft summary component should import explicit review-gate child view contracts.'
-);
-assert.match(
-  activityDraftMetaSummarySource,
-  /ActivityDraftMetaHandoffItemView[\s\S]*ActivityDraftMetaHandoffView/,
-  'AI draft summary component should import explicit handoff child view contracts.'
 );
 assert.doesNotMatch(
   activityDraftMetaSummarySource,
@@ -9800,11 +9286,6 @@ assert.match(
 );
 assert.match(
   activityDraftMetaSummarySource,
-  /ActivityDraftMetaHandoff[\s\S]*handoffView=\{summaryView\.handoffView\}/,
-  'AI draft summary component should delegate save handoff rendering to a prepared view.'
-);
-assert.match(
-  activityDraftMetaSummarySource,
   /function ActivityDraftReviewGate[\s\S]*reviewGateView\.ariaLabel[\s\S]*reviewGateView\.title[\s\S]*reviewGateView\.description[\s\S]*reviewGateView\.badgeLabel[\s\S]*reviewGateView\.metricViews\.map[\s\S]*ActivityDraftReviewGateMetric/,
   'AI draft review-gate component should render prepared title, description, badge, and metric views.'
 );
@@ -9817,16 +9298,6 @@ assert.doesNotMatch(
   activityDraftMetaSummarySource,
   /Save review gate|Action needed before save|Teacher review required|Ready to save|保存前检查门槛|保存前需要处理|需要老师检查|可以保存/,
   'AI draft summary component should not hard-code visible save review-gate copy.'
-);
-assert.match(
-  activityDraftMetaSummarySource,
-  /function ActivityDraftMetaHandoff[\s\S]*const titleId = 'activity-draft-meta-handoff-title'[\s\S]*const descriptionId = 'activity-draft-meta-handoff-description'[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*aria-labelledby=\{titleId\}[\s\S]*data-handoff="activity-draft-meta"[\s\S]*data-handoff-scope=\{handoffView\.privacy\.scope\}[\s\S]*id=\{titleId\}[\s\S]*handoffView\.title[\s\S]*id=\{descriptionId\}[\s\S]*handoffView\.description[\s\S]*handoffView\.itemViews\.map[\s\S]*ActivityDraftMetaHandoffItem[\s\S]*key=\{item\.id\}/,
-  'AI draft handoff component should render prepared title, description, and item views with stable section relationships.'
-);
-assert.match(
-  activityDraftMetaSummarySource,
-  /function ActivityDraftMetaHandoffItem[\s\S]*const labelId = `activity-draft-meta-handoff-\$\{item\.id\}-label`[\s\S]*const valueId = `activity-draft-meta-handoff-\$\{item\.id\}-value`[\s\S]*const descriptionId = `activity-draft-meta-handoff-\$\{item\.id\}-description`[\s\S]*data-handoff-item=\{item\.id\}[\s\S]*id=\{labelId\}[\s\S]*item\.label[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*aria-label=\{item\.ariaLabel\}[\s\S]*aria-labelledby=\{`\$\{labelId\} \$\{valueId\}`\}[\s\S]*id=\{valueId\}[\s\S]*item\.value[\s\S]*id=\{descriptionId\}[\s\S]*item\.description/,
-  'AI draft handoff items should render stable label, value, and description relationships.'
 );
 assert.doesNotMatch(
   activityDraftMetaSummarySource,
@@ -10057,11 +9528,6 @@ assert.match(
   /ActivityTemplateReadinessPanelSummary[\s\S]*ActivityTemplateReadinessPanelOption[\s\S]*ActivityTemplateReadinessPanelLockedOption[\s\S]*ActivityTemplateQuizChoiceReadinessView[\s\S]*ActivityTemplateQuizChoiceReadinessItemView/,
   'Template-readiness panel should import explicit summary, option, locked-option, and quiz-choice child contracts.'
 );
-assert.match(
-  activityTemplateReadinessPanelSource,
-  /QuestionChoiceGenerationHandoffItemView[\s\S]*QuestionChoiceGenerationHandoffView/,
-  'Template-readiness panel should import explicit question choice generation handoff contracts.'
-);
 assert.doesNotMatch(
   activityTemplateReadinessPanelSource,
   /ActivityTemplateReadinessPanelSummary\['readyOptions'\]\[number\]|NonNullable<\s*ActivityTemplateReadinessPanelSummary\['questionChoiceReadiness'\]|ActivityTemplateQuizChoiceReadiness\['itemViews'\]\[number\]|ActivityTemplateQuizChoiceReadinessView\['generationHandoffView'\]/,
@@ -10091,21 +9557,6 @@ assert.match(
   activityTemplateReadinessPanelSource,
   /questionChoiceReadiness[\s\S]*summaryLabel[\s\S]*itemViews[\s\S]*statusLabel[\s\S]*sourceLabel/,
   'Activity template readiness panel should render prepared quiz choice diagnostics from the view model.'
-);
-assert.match(
-  activityTemplateReadinessPanelSource,
-  /ActivityTemplateQuizChoiceGenerationHandoff[\s\S]*handoffView=\{readiness\.generationHandoffView\}/,
-  'Activity template readiness panel should delegate quiz choice generation handoff rendering.'
-);
-assert.match(
-  activityTemplateReadinessPanelSource,
-  /function ActivityTemplateQuizChoiceGenerationHandoff[\s\S]*const titleId = 'question-choice-generation-handoff-title'[\s\S]*const descriptionId = 'question-choice-generation-handoff-description'[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*aria-labelledby=\{titleId\}[\s\S]*data-handoff="question-choice-generation"[\s\S]*data-handoff-scope=\{handoffView\.privacy\.scope\}[\s\S]*id=\{titleId\}[\s\S]*id=\{descriptionId\}[\s\S]*handoffView\.itemViews\.map[\s\S]*ActivityTemplateQuizChoiceGenerationHandoffItem[\s\S]*key=\{item\.id\}/,
-  'Activity template readiness panel should render prepared quiz choice generation handoff views as labelled sections.'
-);
-assert.match(
-  activityTemplateReadinessPanelSource,
-  /function ActivityTemplateQuizChoiceGenerationHandoffItem[\s\S]*const labelId = `question-choice-generation-handoff-\$\{item\.id\}-label`[\s\S]*const valueId = `question-choice-generation-handoff-\$\{item\.id\}-value`[\s\S]*const descriptionId = `question-choice-generation-handoff-\$\{item\.id\}-description`[\s\S]*data-handoff-item=\{item\.id\}[\s\S]*id=\{labelId\}[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*aria-label=\{item\.ariaLabel\}[\s\S]*aria-labelledby=\{`\$\{labelId\} \$\{valueId\}`\}[\s\S]*id=\{valueId\}[\s\S]*id=\{descriptionId\}/,
-  'Activity template readiness panel should render quiz choice generation handoff items with stable label, value, and description relationships.'
 );
 assert.doesNotMatch(
   activityTemplateReadinessPanelSource,
@@ -16473,7 +15924,6 @@ assert.deepEqual(
     TEACHER_WORKSPACE_OPERATIONS_CHAIN_SOURCE_FILES.length,
     CLASSROOM_DATA_LIFECYCLE_CHAIN_HANDOFF_ITEM_IDS.length,
     CLASSROOM_DATA_LIFECYCLE_CHAIN_SOURCE_FILES.length,
-    ACTIVITY_LIBRARY_PAGE_HANDOFF_ITEM_IDS.length,
     ACTIVITY_AUTHORING_LIBRARY_CHAIN_HANDOFF_ITEM_IDS.length,
     ACTIVITY_AUTHORING_LIBRARY_CHAIN_SOURCE_FILES.length,
     ACTIVITY_LIFECYCLE_GOVERNANCE_CHAIN_HANDOFF_ITEM_IDS.length,
@@ -16524,13 +15974,13 @@ assert.deepEqual(
     PUBLIC_DISCOVERY_INDEXING_CHAIN_SOURCE_FILES.length,
     CLASSROOM_TRUST_COMMUNICATION_CHAIN_HANDOFF_ITEM_IDS.length,
   ],
-  Array.from({ length: 56 }, () => 30),
+  Array.from({ length: 55 }, () => 30),
   'Classroom product loop chain should stay backed by adjacent public entry, public discovery/indexing, workspace, data, authoring, source extraction, lifecycle governance, template roadmap, AI enhancement lifecycle, delivery, runner, result continuity, export, print, and trust gates.'
 );
 assert.deepEqual(Object.fromEntries(classroomProductLoopChainValues), {
   'activity-authoring-library-boundary': '30 authoring slices',
   'classroom-data-lifecycle-boundary': '30 data slices',
-  'activity-library-page-boundary': '30 library slices',
+  'activity-library-page-boundary': 'Visible library page',
   'activity-lifecycle-governance-boundary': '30 lifecycle slices',
   'assignment-source-activity-context-boundary': '30 source context slices',
   'assignment-lifecycle-governance-boundary':
@@ -16887,7 +16337,6 @@ assert.deepEqual(teacherWorkspaceOperationsChainView.privacy, {
 assert.deepEqual(
   [
     DASHBOARD_OVERVIEW_HANDOFF_ITEM_IDS.length,
-    ACTIVITY_LIBRARY_PAGE_HANDOFF_ITEM_IDS.length,
     ACCOUNT_GOVERNANCE_LIFECYCLE_CHAIN_HANDOFF_ITEM_IDS.length,
     ACTIVE_SURFACE_PRODUCT_BOUNDARY_ITEM_IDS.length,
     PAYMENT_STATUS_HANDOFF_ITEM_IDS.length,
@@ -16898,7 +16347,7 @@ assert.deepEqual(
     SETTINGS_BILLING_WORKSPACE_HANDOFF_ITEM_IDS.length,
     SETTINGS_NOTIFICATION_UPDATE_HANDOFF_ITEM_IDS.length,
   ],
-  Array.from({ length: 11 }, () => 30),
+  Array.from({ length: 10 }, () => 30),
   'Teacher workspace operations chain should stay backed by focused dashboard, list, account governance, active surface, payment callback, and settings gates.'
 );
 assert.deepEqual(Object.fromEntries(teacherWorkspaceOperationsChainValues), {
@@ -21001,21 +20450,6 @@ assert.match(
   activityDistractorsSource,
   /siblingAnswerCandidateCount[\s\S]*vocabularyCandidateCount/,
   'Question choice diagnostics should preserve candidate source counts for teacher-facing explanations.'
-);
-assert.match(
-  activityDistractorsSource,
-  /export const QUESTION_CHOICE_GENERATION_HANDOFF_ITEM_IDS = \[[\s\S]*'generation-scope'[\s\S]*'target-choice-count'[\s\S]*'question-count'[\s\S]*'ready-question-count'[\s\S]*'explicit-ready-count'[\s\S]*'completed-locally-count'[\s\S]*'needs-candidates-count'[\s\S]*'explicit-choice-count'[\s\S]*'deterministic-choice-count'[\s\S]*'missing-choice-count'[\s\S]*'sibling-answer-candidates'[\s\S]*'vocabulary-candidates'[\s\S]*'candidate-source-count'[\s\S]*'answer-coverage-count'[\s\S]*'missing-answer-count'[\s\S]*'option-structure'[\s\S]*'generation-mode'[\s\S]*'write-target'[\s\S]*'teacher-review'[\s\S]*'publish-boundary'[\s\S]*'completed-choice-count'[\s\S]*'explicit-answer-coverage-count'[\s\S]*'local-candidate-question-count'[\s\S]*'candidate-deduplication'[\s\S]*'candidate-normalization'[\s\S]*'stable-choice-order'[\s\S]*'runtime-choice-source'[\s\S]*'answer-inclusion-guard'[\s\S]*'empty-content-guard'[\s\S]*'privacy-guard'/,
-  'Question choice generation should expose 30 stable handoff item ids.'
-);
-assert.match(
-  activityDistractorsSource,
-  /export type QuestionChoiceGenerationHandoffPrivacyContract = \{[\s\S]*appliesBeforeActivitySave: true;[\s\S]*exposesAnswerText: false;[\s\S]*exposesCandidateText: false;[\s\S]*exposesOptionText: false;[\s\S]*exposesQuestionPromptText: false;[\s\S]*exposesRawAiOutput: false;[\s\S]*exposesStableChoiceSeed: false;[\s\S]*exposesVocabularyText: false;[\s\S]*persistsActivityWithoutTeacherAction: false;[\s\S]*publishesAssignmentWithoutTeacherAction: false;[\s\S]*requiresTeacherReview: true;[\s\S]*scope: 'teacher-reviewed-quiz-choice-generation';[\s\S]*usesQuestionOptionStructure: true;[\s\S]*writeTarget: 'ActivityQuestion.options';/,
-  'Question choice generation handoff should keep AI distractor privacy and write-target constraints explicit.'
-);
-assert.match(
-  activityDistractorsSource,
-  /buildQuestionChoiceGenerationHandoffView[\s\S]*buildQuestionChoiceReadinessSummary[\s\S]*buildQuestionChoiceGenerationHandoffSummary[\s\S]*QUESTION_CHOICE_GENERATION_HANDOFF_ITEM_IDS\.map/,
-  'Question choice generation handoff should derive semantic slices from the shared readiness summary.'
 );
 
 assert.equal(isStudentAnswerFilled(undefined), false);
@@ -29502,7 +28936,7 @@ assert.deepEqual(Object.fromEntries(scoredAttemptResultChainValues), {
   'runtime-scoring-evaluation': 'evaluateRuntimeAnswers',
   'score-field-mapping': 'earned/max points',
   'scored-insert-builder': 'buildScoredAttemptInsert',
-  'attempt-review-card-handoff-boundary': '30 review card slices',
+  'attempt-review-card-handoff-boundary': 'Visible review cards',
   'source-material-guard': 'Storage keys hidden',
   'submit-api-identity-gate': 'Name or browser token',
   'submit-api-lifecycle-gate': 'Open assignment only',
@@ -36016,8 +35450,6 @@ assert.deepEqual(ACTIVITY_SOURCE_MATERIAL_FILTERS, [
   'spreadsheet',
   'worksheet',
 ]);
-assert.equal(ACTIVITY_LIBRARY_FILTER_HANDOFF_ITEM_IDS.length, 30);
-assert.equal(new Set(ACTIVITY_LIBRARY_FILTER_HANDOFF_ITEM_IDS).size, 30);
 assert.equal(getActivityLibraryTotalPages({ pageSize: 12, total: 31 }), 3);
 assert.equal(getActivityLibraryTotalPages({ pageSize: 0, total: 31 }), 3);
 assert.equal(getActivityLibraryTotalPages({ pageSize: 12, total: 0 }), 1);
@@ -36831,14 +36263,10 @@ assert.deepEqual(activityLifecycleGovernanceChainView.privacy, {
 });
 assert.deepEqual(
   [
-    ACTIVITY_LIFECYCLE_HANDOFF_ITEM_IDS.length,
-    ACTIVITY_LIBRARY_PAGE_HANDOFF_ITEM_IDS.length,
-    ACTIVITY_DUPLICATE_HANDOFF_ITEM_IDS.length,
-    ACTIVITY_TEMPLATE_REMIX_HANDOFF_ITEM_IDS.length,
     ACTIVITY_AUTHORING_LIBRARY_CHAIN_HANDOFF_ITEM_IDS.length,
     ACTIVITY_AUTHORING_LIBRARY_CHAIN_SOURCE_FILES.length,
   ],
-  Array.from({ length: 6 }, () => 30),
+  Array.from({ length: 2 }, () => 30),
   'Activity lifecycle governance chain should stay backed by lifecycle, library, duplicate, remix, authoring, and publish gates.'
 );
 assert.deepEqual(Object.fromEntries(activityLifecycleGovernanceChainValues), {
@@ -36923,7 +36351,7 @@ const activityLifecycleGovernanceCreatedPanelSource = readFileSync(
 );
 assert.match(
   activityLifecycleGovernanceCardSource,
-  /buildActivityDerivativeActionExecutionPlan[\s\S]*buildActivityVisibilityActionExecutionPlan[\s\S]*openPublishDialog\(\)[\s\S]*buildAssignmentPublishDialogAccessView\(activity\.status\)[\s\S]*ActivityLibraryLifecycleHandoff/,
+  /buildActivityDerivativeActionExecutionPlan[\s\S]*buildActivityVisibilityActionExecutionPlan[\s\S]*openPublishDialog\(\)[\s\S]*buildAssignmentPublishDialogAccessView\(activity\.status\)/,
   'Activity cards should use shared lifecycle plans for archive, restore, duplicate, remix, and publish access.'
 );
 assert.match(
@@ -37053,66 +36481,15 @@ assert.doesNotMatch(
   getSourceSlice(
     activityLibraryViewSource,
     'const summaryMetrics = buildActivityLibrarySummaryMetrics',
-    'const searchPanelView = buildActivityLibrarySearchPanelView'
+    'const sourceScopeBoundary = buildActivityLibrarySourceScopeBoundary'
   ),
   /starterPreview|getStarterActivities|getStarterActivity/,
   'Activity library summary metrics should not count starter-preview activities.'
 );
 assert.match(
   activityLibraryViewSource,
-  /export const ACTIVITY_LIBRARY_PAGE_HANDOFF_ITEM_IDS = \[[\s\S]*'owner-scope'[\s\S]*'summary-total'[\s\S]*'scope-range'[\s\S]*'source-capability-audio-extraction'[\s\S]*'status-active'[\s\S]*'visible-page-items'[\s\S]*'pagination'[\s\S]*'starter-preview'[\s\S]*\] as const;[\s\S]*export type ActivityLibraryPageHandoffItemId =[\s\S]*typeof ACTIVITY_LIBRARY_PAGE_HANDOFF_ITEM_IDS[\s\S]*export type ActivityLibraryPageHandoffPrivacyView = \{[\s\S]*broadensBeyondOwner: false;[\s\S]*countsStarterPreviewAsOwned: false;[\s\S]*exposesPrivateActivityContent: false;[\s\S]*exposesSourceMaterialFileIds: false;[\s\S]*exposesSourceMaterialStorageKeys: false;[\s\S]*scope: 'owner-activity-library-source-scope';/,
-  'Activity library page handoff should derive its typed owner-scoped library contract from a stable 30-slice id list with explicit privacy flags.'
-);
-assert.match(
-  activityLibraryViewSource,
   /export type ActivityLibrarySourceScopeBoundary = \{[\s\S]*fullFilteredActivityCount: number;[\s\S]*keepsVisiblePageCountsSeparate: true;[\s\S]*overviewActivityCount: number;[\s\S]*scope: 'owner-activity-library-source-scope';[\s\S]*usesFullFilteredSummaryForOverview: true;[\s\S]*visiblePageActivityCount: number;/,
   'Activity library page should expose a source-scope boundary that separates full filtered overview counts from visible page counts.'
-);
-assert.match(
-  activityLibraryViewSource,
-  /exposesSourceMaterialFilenames: false;[\s\S]*keepsVisiblePageCountsSeparate: true;[\s\S]*scope: 'owner-activity-library-source-scope';[\s\S]*usesFullFilteredSummaryForOverview: true;[\s\S]*usesOwnerScopedSourceFilters: true;/,
-  'Activity library handoff privacy should name source-material filename, owner-scoped source-filter, and visible-page separation guards.'
-);
-assert.deepEqual(
-  [...ACTIVITY_LIBRARY_PAGE_HANDOFF_ITEM_IDS],
-  [
-    'owner-scope',
-    'summary-total',
-    'summary-template-coverage',
-    'summary-remix-ready',
-    'summary-source-extraction',
-    'scope-range',
-    'scope-page',
-    'scope-status',
-    'scope-template',
-    'scope-source',
-    'scope-search',
-    'source-capability-audio-extraction',
-    'source-capability-worksheet-extraction',
-    'source-capability-spreadsheet-import',
-    'status-active',
-    'status-archived',
-    'filter-summary',
-    'visible-page-items',
-    'visible-publish-ready',
-    'visible-publish-blocked',
-    'visible-duplicate-ready',
-    'visible-duplicate-blocked',
-    'visible-remix-ready',
-    'visible-remix-blocked',
-    'visible-archive-ready',
-    'visible-restore-ready',
-    'visible-source-material-activities',
-    'visible-extractable-source-activities',
-    'pagination',
-    'starter-preview',
-  ],
-  'Activity library handoff should expose exactly 30 stable slice ids.'
-);
-assert.match(
-  activityLibraryViewSource,
-  /const candidateItemViews: ActivityLibraryPageHandoffItemView\[\] = \[[\s\S]*const itemViewById = new Map[\s\S]*ACTIVITY_LIBRARY_PAGE_HANDOFF_ITEM_IDS\.map\(\(id\) =>[\s\S]*Missing activity library handoff item/,
-  'Activity library handoff should order runtime item views through the stable id list and fail on missing slices.'
 );
 assert.match(
   dashboardActivitiesRouteSource,
@@ -37144,16 +36521,6 @@ assert.doesNotMatch(
   dashboardActivitiesRouteSource,
   /<ActivityLibraryScopePanel\b/,
   'The activity library no longer renders a "Current view" recap panel.'
-);
-assert.match(
-  dashboardActivitiesRouteSource,
-  /<ActivityLibraryPageHandoff[\s\S]*handoffView=\{activePageView\.handoffView\}[\s\S]*\/>/,
-  'Activity dashboard route should render the prepared activity-library page handoff from the page view-model.'
-);
-assert.match(
-  dashboardActivitiesRouteSource,
-  /function ActivityLibraryPageHandoff[\s\S]*data-handoff="activity-library"[\s\S]*data-handoff-scope=\{handoffView\.privacy\.scope\}[\s\S]*handoffView\.itemViews\.map\(\(item\) =>[\s\S]*ActivityLibraryPageHandoffItem[\s\S]*function ActivityLibraryPageHandoffItem[\s\S]*const labelId = `activity-library-handoff-\$\{item\.id\}-label`[\s\S]*const valueId = `activity-library-handoff-\$\{item\.id\}-value`[\s\S]*const descriptionId = `activity-library-handoff-\$\{item\.id\}-description`[\s\S]*data-handoff-item=\{item\.id\}[\s\S]*id=\{labelId\}[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*aria-label=\{item\.ariaLabel\}[\s\S]*aria-labelledby=\{`\$\{labelId\} \$\{valueId\}`\}[\s\S]*id=\{valueId\}[\s\S]*id=\{descriptionId\}/,
-  'Activity dashboard route should expose the page handoff marker and stable activity-library item outputs.'
 );
 assert.match(
   dashboardActivitiesRouteSource,
@@ -37228,7 +36595,7 @@ assert.match(
 );
 assert.match(
   activityLibraryViewSource,
-  /export type ActivityLibraryCardStat[\s\S]*export type ActivityLibraryReadyTemplateOptionView[\s\S]*isCurrent: boolean;[\s\S]*export type ActivityLibraryRemixActionOptionView[\s\S]*actionLabel: string;[\s\S]*export type ActivityLibraryCompatibilityView[\s\S]*readyTemplateOptions: ActivityLibraryReadyTemplateOptionView\[\];[\s\S]*remixHandoffView: ActivityTemplateRemixHandoffView;[\s\S]*remixStatusView: ActivityLibraryActionStatusView;[\s\S]*remixActionOptions: ActivityLibraryRemixActionOptionView\[\];[\s\S]*export type ActivityLibraryCardActionState[\s\S]*export type ActivityLibraryCardViewModel[\s\S]*export type ActivityLibraryCardDisplayView[\s\S]*export type ActivityLibraryCardTemplateType = ActivityTemplateType;[\s\S]*export type ActivityLibraryCardActionView[\s\S]*export type ActivityLibraryEditorActionView/,
+  /export type ActivityLibraryCardStat[\s\S]*export type ActivityLibraryReadyTemplateOptionView[\s\S]*isCurrent: boolean;[\s\S]*export type ActivityLibraryRemixActionOptionView[\s\S]*actionLabel: string;[\s\S]*export type ActivityLibraryCompatibilityView[\s\S]*readyTemplateOptions: ActivityLibraryReadyTemplateOptionView\[\];[\s\S]*remixStatusView: ActivityLibraryActionStatusView;[\s\S]*remixActionOptions: ActivityLibraryRemixActionOptionView\[\];[\s\S]*export type ActivityLibraryCardActionState[\s\S]*export type ActivityLibraryCardViewModel[\s\S]*export type ActivityLibraryCardDisplayView[\s\S]*export type ActivityLibraryCardTemplateType = ActivityTemplateType;[\s\S]*export type ActivityLibraryCardActionView[\s\S]*export type ActivityLibraryEditorActionView/,
   'Activity library domain should expose explicit card, compatibility, action, and stat view contracts.'
 );
 assert.match(
@@ -37278,12 +36645,12 @@ assert.match(
 );
 assert.match(
   activityLibraryViewSource,
-  /export type ActivityLibraryCompatibilityView = \{[\s\S]*remixHandoffView: ActivityTemplateRemixHandoffView;[\s\S]*remixStatusView: ActivityLibraryActionStatusView;[\s\S]*restoreRequiredMessage\?: string;[\s\S]*buildActivityLibraryCompatibilityView\(\{[\s\S]*content,[\s\S]*currentTemplateType,[\s\S]*sourceTitle,[\s\S]*visibility = 'draft'[\s\S]*buildActivityDerivativeActionGate\(\{[\s\S]*action: 'remix'[\s\S]*visibility,[\s\S]*remixHandoffView: buildActivityTemplateRemixHandoffView\(\{[\s\S]*content,[\s\S]*currentTemplateType,[\s\S]*sourceTitle,[\s\S]*visibility,[\s\S]*remixStatusView[\s\S]*restoreRequiredMessage/,
+  /export type ActivityLibraryCompatibilityView = \{[\s\S]*remixStatusView: ActivityLibraryActionStatusView;[\s\S]*buildActivityLibraryCompatibilityView\(\{[\s\S]*currentTemplateType,[\s\S]*visibility = 'draft'[\s\S]*buildActivityDerivativeActionGate\(\{[\s\S]*action: 'remix'/,
   'Activity library compatibility view should expose remix status, handoff evidence, and restore guidance from the remix lifecycle gate.'
 );
 assert.match(
   activityLibraryViewSource,
-  /buildActivityLibraryCardDisplayView[\s\S]*buildActivityLibraryCompatibilityView\(\{[\s\S]*content: activity\.content,[\s\S]*currentTemplateType: activity\.templateType,[\s\S]*sourceTitle: activity\.title,[\s\S]*summary,[\s\S]*visibility: activity\.status/,
+  /buildActivityLibraryCardDisplayView[\s\S]*buildActivityLibraryCompatibilityView\(\{[\s\S]*currentTemplateType: activity\.templateType,[\s\S]*summary,[\s\S]*visibility: activity\.status/,
   'Activity library card display view should pass activity content, title, and visibility into compatibility rendering.'
 );
 assert.doesNotMatch(
@@ -37396,11 +36763,6 @@ assert.doesNotMatch(
   activityLibraryCardComponentSource,
   /ActivityLibraryCardStatusSummary\b/,
   'Activity cards no longer render four status blocks; status and template badges sit in the card header.'
-);
-assert.match(
-  activityLibraryCardComponentSource,
-  /ActivityLifecycleHandoffItemView[\s\S]*ActivityLifecycleHandoffView[\s\S]*ActivityLibraryLifecycleHandoff[\s\S]*handoff=\{cardDisplayView\.lifecycleHandoffView\}[\s\S]*function ActivityLibraryLifecycleHandoff\([\s\S]*data-handoff="activity-lifecycle"[\s\S]*data-handoff-scope=\{handoff\.privacy\.scope\}[\s\S]*handoff\.title[\s\S]*handoff\.description[\s\S]*handoff\.itemViews\.map[\s\S]*ActivityLibraryLifecycleHandoffItem[\s\S]*function ActivityLibraryLifecycleHandoffItem[\s\S]*const labelId = `activity-lifecycle-handoff-\$\{item\.id\}-label`[\s\S]*const valueId = `activity-lifecycle-handoff-\$\{item\.id\}-value`[\s\S]*const descriptionId = `activity-lifecycle-handoff-\$\{item\.id\}-description`[\s\S]*data-handoff-item=\{item\.id\}[\s\S]*id=\{labelId\}[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*aria-label=\{item\.ariaLabel\}[\s\S]*aria-labelledby=\{`\$\{labelId\} \$\{valueId\}`\}[\s\S]*id=\{valueId\}[\s\S]*id=\{descriptionId\}/,
-  'Activity library card component should render the prepared activity lifecycle handoff as stable hidden label, value, and description relationships.'
 );
 assert.doesNotMatch(
   activityLibraryCardComponentSource,
@@ -37534,16 +36896,6 @@ assert.match(
 );
 assert.match(
   activityLibraryCompatibilityPanelSource,
-  /ActivityTemplateRemixHandoffItemView[\s\S]*ActivityTemplateRemixHandoffView/,
-  'Activity library compatibility panel should import explicit template-remix handoff contracts.'
-);
-assert.match(
-  activityLibraryCompatibilityPanelSource,
-  /ActivityAiRemixAssistHandoffItemView[\s\S]*ActivityAiRemixAssistHandoffView/,
-  'Activity library compatibility panel should import explicit AI remix assist handoff contracts.'
-);
-assert.match(
-  activityLibraryCompatibilityPanelSource,
   /label: string;[\s\S]*const remixStatusDescriptionId = useId\(\)[\s\S]*<section aria-label=\{label\}[\s\S]*ActivityLibraryActionStatusBadge[\s\S]*view=\{compatibility\.remixStatusView\}/,
   'Activity library compatibility panel should expose the prepared compatibility label and remix status on its section.'
 );
@@ -37571,26 +36923,6 @@ assert.match(
   activityLibraryCompatibilityPanelSource,
   /actionState\.showRestoreRequiredMessage[\s\S]*compatibility\.restoreRequiredMessage[\s\S]*\{compatibility\.restoreRequiredMessage\}/,
   'Activity library compatibility panel should render prepared restore guidance for archived remix actions.'
-);
-assert.match(
-  activityLibraryCompatibilityPanelSource,
-  /<ActivityLibraryTemplateRemixHandoff[\s\S]*handoff=\{compatibility\.remixHandoffView\}[\s\S]*function ActivityLibraryTemplateRemixHandoff[\s\S]*handoff: ActivityTemplateRemixHandoffView[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*aria-labelledby=\{titleId\}[\s\S]*data-handoff="activity-template-remix"[\s\S]*data-handoff-scope=\{handoff\.privacy\.scope\}[\s\S]*\{handoff\.title\}[\s\S]*\{handoff\.description\}[\s\S]*handoff\.itemViews\.map\(\(item\) => \([\s\S]*ActivityLibraryTemplateRemixHandoffItem[\s\S]*item=\{item\}/,
-  'Activity library compatibility panel should render the prepared template-remix handoff title, description, and item views.'
-);
-assert.match(
-  activityLibraryCompatibilityPanelSource,
-  /function ActivityLibraryTemplateRemixHandoffItem[\s\S]*item: ActivityTemplateRemixHandoffItemView[\s\S]*data-handoff-item=\{item\.id\}[\s\S]*\{item\.ariaLabel\}[\s\S]*\{item\.label\}[\s\S]*\{item\.value\}[\s\S]*\{item\.description\}/,
-  'Activity library template-remix handoff items should render prepared aria labels, labels, values, and descriptions.'
-);
-assert.match(
-  activityLibraryCompatibilityPanelSource,
-  /<ActivityLibraryAiRemixAssistHandoff[\s\S]*handoff=\{compatibility\.aiRemixAssistHandoffView\}[\s\S]*function ActivityLibraryAiRemixAssistHandoff[\s\S]*handoff: ActivityAiRemixAssistHandoffView[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*aria-labelledby=\{titleId\}[\s\S]*data-handoff="activity-ai-remix-assist"[\s\S]*data-handoff-scope=\{handoff\.privacy\.scope\}[\s\S]*handoff\.itemViews\.map\(\(item\) => \([\s\S]*ActivityLibraryAiRemixAssistHandoffItem[\s\S]*item=\{item\}/,
-  'Activity library compatibility panel should render the prepared AI remix assist handoff as a stable semantic region.'
-);
-assert.match(
-  activityLibraryCompatibilityPanelSource,
-  /function ActivityLibraryAiRemixAssistHandoffItem[\s\S]*item: ActivityAiRemixAssistHandoffItemView[\s\S]*data-handoff-item=\{item\.id\}[\s\S]*aria-label=\{item\.ariaLabel\}[\s\S]*\{item\.value\}[\s\S]*\{item\.description\}/,
-  'Activity library AI remix assist items should render prepared aria labels, values, and descriptions.'
 );
 assert.match(
   activityLibraryCompatibilityPanelSource,
@@ -40674,11 +40006,6 @@ assert.doesNotMatch(
   /classroom-control-semantics|ClassroomControlSemanticsHandoffMount/,
   'Public marketing, template, worksheet, and pricing routes should not render classroom control semantics directly.'
 );
-assert.match(
-  e2eTestCatalogText,
-  /Core classroom controls expose accessible descriptions[\s\S]*hidden localized 30-slice classroom-control-semantics handoff[\s\S]*AI source textarea[\s\S]*printable answer-key toggle[\s\S]*student identity input[\s\S]*privacy guard/,
-  'E2E catalog should cover the mounted classroom control semantics route contract.'
-);
 const activityTemplates = getActivityTemplates();
 const activityTypesSource = readFileSync('src/activities/types.ts', 'utf8');
 const activityCatalogSource = readFileSync('src/activities/catalog.ts', 'utf8');
@@ -42545,7 +41872,6 @@ assert.deepEqual(
   [
     PUBLIC_TEMPLATE_ENTRY_HANDOFF_ITEM_IDS.length,
     ACTIVITY_TEMPLATE_SCAFFOLD_QUALITY_HANDOFF_ITEM_IDS.length,
-    ACTIVITY_SOURCE_EXTRACTION_ASSIST_HANDOFF_ITEM_IDS.length,
     ASSIGNMENT_DELIVERY_POLICY_HANDOFF_ITEM_IDS.length,
     PUBLIC_ASSIGNMENT_ACCESS_HANDOFF_ITEM_IDS.length,
     ASSIGNMENT_ITEM_ORDER_HANDOFF_ITEM_IDS.length,
@@ -42553,7 +41879,7 @@ assert.deepEqual(
     ASSIGNMENT_ATTEMPT_DURATION_HANDOFF_ITEM_IDS.length,
     ASSIGNMENT_ANSWER_FEEDBACK_HANDOFF_ITEM_IDS.length,
   ],
-  Array.from({ length: 9 }, () => 30),
+  Array.from({ length: 8 }, () => 30),
   'Worksheet-mode delivery chain should stay backed by focused worksheet, runtime, print, and export gates.'
 );
 assert.deepEqual(Object.fromEntries(worksheetModeDeliveryChainValues), {
@@ -42648,18 +41974,14 @@ assert.deepEqual(
     PUBLIC_TEMPLATE_ENTRY_HANDOFF_ITEM_IDS.length,
     ACTIVITY_AUTHORING_LIBRARY_CHAIN_HANDOFF_ITEM_IDS.length,
     ACTIVITY_TEMPLATE_SCAFFOLD_QUALITY_HANDOFF_ITEM_IDS.length,
-    ACTIVITY_TEMPLATE_REMIX_HANDOFF_ITEM_IDS.length,
-    QUESTION_CHOICE_GENERATION_HANDOFF_ITEM_IDS.length,
     ACTIVITY_AI_AUTHORING_CHAIN_HANDOFF_ITEM_IDS.length,
     ACTIVITY_AI_ENHANCEMENT_ROADMAP_CHAIN_HANDOFF_ITEM_IDS.length,
     ACTIVITY_AI_ENHANCEMENT_POLICY_ITEM_IDS.length,
     ACTIVITY_AI_ENHANCEMENT_EXECUTION_ITEM_IDS.length,
-    ACTIVITY_AI_REMIX_ASSIST_HANDOFF_ITEM_IDS.length,
-    ACTIVITY_SOURCE_EXTRACTION_ASSIST_HANDOFF_ITEM_IDS.length,
     WORKSHEET_MODE_DELIVERY_CHAIN_HANDOFF_ITEM_IDS.length,
     STUDENT_RUNNER_PLAY_CHAIN_HANDOFF_ITEM_IDS.length,
   ],
-  Array.from({ length: 14 }, () => 30),
+  Array.from({ length: 10 }, () => 30),
   'Template roadmap capability chain should stay backed by focused roadmap, template, AI, worksheet, runtime, print, and export gates.'
 );
 assert.deepEqual(Object.fromEntries(templateRoadmapCapabilityChainValues), {
@@ -44440,100 +43762,6 @@ assert.deepEqual(
     type: 'blocked',
   }
 );
-const activeActivityLifecycleHandoffView = buildActivityLifecycleHandoffView({
-  surface: 'active-library',
-  visibility: 'private',
-});
-assert.deepEqual(
-  activeActivityLifecycleHandoffView.itemViews.map((item) => item.id),
-  [...ACTIVITY_LIFECYCLE_HANDOFF_ITEM_IDS]
-);
-assert.equal(activeActivityLifecycleHandoffView.itemViews.length, 30);
-assert.deepEqual(activeActivityLifecycleHandoffView.privacy, {
-  exposesActivityContentText: false,
-  exposesAssignmentSnapshotContent: false,
-  exposesInternalActivityIds: false,
-  exposesSourceMaterialFileIds: false,
-  exposesSourceMaterialStorageKeys: false,
-  exposesTeacherNotesText: false,
-  itemIds: [...ACTIVITY_LIFECYCLE_HANDOFF_ITEM_IDS],
-  mutatesAssignmentSnapshots: false,
-  scope: 'owner-activity-lifecycle',
-});
-assert.deepEqual(
-  new Map(
-    activeActivityLifecycleHandoffView.itemViews.map((item) => [
-      item.id,
-      item.value,
-    ])
-  ),
-  new Map([
-    ['source-status', 'Private'],
-    ['lifecycle-surface', 'Active library'],
-    ['owner-scope', 'Owner scoped'],
-    ['persisted-source', 'Saved source'],
-    ['default-library-scope', 'Active workspace'],
-    ['archived-library-scope', 'Restore workspace'],
-    ['active-library-visibility', 'Visible'],
-    ['archived-library-visibility', 'Hidden'],
-    ['edit-action', 'Ready'],
-    ['publish-action', 'Ready'],
-    ['duplicate-action', 'Ready'],
-    ['remix-action', 'Ready'],
-    ['archive-action', 'Ready'],
-    ['restore-action', 'Not available'],
-    ['derivative-gate', 'Derivative allowed'],
-    ['restore-before-derive', 'Not required'],
-    ['archive-transition', 'To archived'],
-    ['restore-transition', 'Blocked'],
-    ['restored-visibility', 'Draft'],
-    ['content-retention', 'Content retained'],
-    ['source-material-retention', 'References retained'],
-    ['assignment-snapshot-protection', 'Snapshots unchanged'],
-    ['public-assignment-continuity', 'Existing links unchanged'],
-    ['status-filter-alignment', 'Active filter'],
-    ['server-archive-guard', 'Validated'],
-    ['server-restore-guard', 'Validated'],
-    ['server-derivative-guard', 'Validated'],
-    ['execution-plan', 'archive-or-derive'],
-    ['teacher-next-step', 'Ready for library actions'],
-    ['privacy-guard', 'Private data omitted'],
-  ])
-);
-const archivedActivityLifecycleHandoffValues = new Map(
-  buildActivityLifecycleHandoffView({
-    surface: 'archived-library',
-    visibility: 'archived',
-  }).itemViews.map((item) => [item.id, item.value])
-);
-assert.deepEqual(
-  [
-    archivedActivityLifecycleHandoffValues.get('source-status'),
-    archivedActivityLifecycleHandoffValues.get('active-library-visibility'),
-    archivedActivityLifecycleHandoffValues.get('archived-library-visibility'),
-    archivedActivityLifecycleHandoffValues.get('edit-action'),
-    archivedActivityLifecycleHandoffValues.get('publish-action'),
-    archivedActivityLifecycleHandoffValues.get('duplicate-action'),
-    archivedActivityLifecycleHandoffValues.get('remix-action'),
-    archivedActivityLifecycleHandoffValues.get('archive-action'),
-    archivedActivityLifecycleHandoffValues.get('restore-action'),
-    archivedActivityLifecycleHandoffValues.get('execution-plan'),
-    archivedActivityLifecycleHandoffValues.get('teacher-next-step'),
-  ],
-  [
-    'Archived',
-    'Hidden',
-    'Visible',
-    'Restore required',
-    'Restore required',
-    'Restore required',
-    'Restore required',
-    'Already archived',
-    'Ready',
-    'restore',
-    'Restore before editing',
-  ]
-);
 assert.deepEqual(buildActivityEditAccessView('draft'), {
   actionLabel: 'Edit activity',
   canEdit: true,
@@ -44668,10 +43896,7 @@ assert.deepEqual(
     'open-box',
   ]
 );
-const {
-  filterHandoffView: activityLibraryFilterHandoffView,
-  ...activityLibrarySearchPanelView
-} = buildActivityLibrarySearchPanelView({
+const activityLibrarySearchPanelView = buildActivityLibrarySearchPanelView({
     isLoading: false,
     search: '  food  ',
     source: 'worksheet',
@@ -44738,23 +43963,7 @@ assert.deepEqual(
     templateOptions: buildActivityLibraryTemplateFilterOptions(),
   }
 );
-assert.deepEqual(
-  activityLibraryFilterHandoffView.itemViews.map((item) => item.id),
-  [...ACTIVITY_LIBRARY_FILTER_HANDOFF_ITEM_IDS]
-);
-assert.equal(activityLibraryFilterHandoffView.itemViews.length, 30);
-assert.equal(
-  activityLibraryFilterHandoffView.privacy.scope,
-  'owner-activity-library-filter-state'
-);
-assert.equal(
-  activityLibraryFilterHandoffView.privacy.usesDomainSearchNormalization,
-  true
-);
-const {
-  filterHandoffView: sourceFilteredLibraryFilterHandoffView,
-  ...sourceFilteredLibrarySearchPanelView
-} = buildActivityLibrarySearchPanelView({
+const sourceFilteredLibrarySearchPanelView = buildActivityLibrarySearchPanelView({
     isLoading: false,
     search: '',
     source: 'extractable',
@@ -44852,14 +44061,6 @@ assert.deepEqual(
       'Limit the activity library to one exact template family, or show every template.',
     templateOptions: buildActivityLibraryTemplateFilterOptions(),
   }
-);
-assert.deepEqual(
-  sourceFilteredLibraryFilterHandoffView.itemViews.map((item) => item.id),
-  [...ACTIVITY_LIBRARY_FILTER_HANDOFF_ITEM_IDS]
-);
-assert.equal(
-  sourceFilteredLibraryFilterHandoffView.privacy.sharesRulesWithListApi,
-  true
 );
 assert.deepEqual(
   buildActivityLibrarySearchPanelView({
@@ -45301,73 +44502,6 @@ assert.deepEqual(
     tone: 'ready',
     value: '1 extraction-ready file',
   }
-);
-assert.ok(sourceReadyActivityDisplayView.actionView.duplicate.duplicateHandoffView);
-assert.deepEqual(
-  sourceReadyActivityDisplayView.actionView.duplicate.duplicateHandoffView.privacy,
-  {
-    clonesAnswerExplanations: true,
-    clonesQuestionOptions: true,
-    clonesSourceMaterialReferences: true,
-    exposesAnswerExplanationText: false,
-    exposesActivityContentText: false,
-    exposesAnswerText: false,
-    exposesQuestionOptionText: false,
-    exposesQuestionPromptText: false,
-    exposesSourceMaterialFilenames: false,
-    exposesSourceMaterialFileIds: false,
-    exposesSourceMaterialStorageKeys: false,
-    exposesSourceSummaryText: false,
-    exposesTeacherNotesText: false,
-    itemIds: [...ACTIVITY_DUPLICATE_HANDOFF_ITEM_IDS],
-    modifiesOriginalActivity: false,
-    modifiesPublishedAssignmentSnapshots: false,
-    outputVisibility: 'draft',
-    preservesTemplateType: true,
-    requiresOwnerScopedSource: true,
-    requiresPersistedSourceForAction: true,
-    resetsVisibilityToDraft: true,
-    scope: 'owner-activity-duplicate',
-  }
-);
-assert.deepEqual(
-  new Map(
-    sourceReadyActivityDisplayView.actionView.duplicate.duplicateHandoffView.itemViews.map(
-      (item) => [item.id, item.value]
-    )
-  ),
-  new Map([
-    ['source-activity', 'Food words quick check'],
-    ['owner-scope', 'Current teacher'],
-    ['persisted-source', 'Preview source'],
-    ['source-status', 'Preview'],
-    ['action-availability', 'Preview only'],
-    ['lifecycle-gate', 'Save required'],
-    ['derivative-scope', 'Owner draft'],
-    ['draft-output', 'Draft copy'],
-    ['visibility-reset', 'Draft visibility'],
-    ['title-strategy', 'Copy of Food words quick check'],
-    ['title-normalization', 'Whitespace normalized'],
-    ['title-limit', '120 chars'],
-    ['template-preserved', 'Quiz'],
-    ['template-transform', 'No transform'],
-    ['description-preserved', 'Description copied'],
-    ['content-clone', 'Structured copy'],
-    ['reference-isolation', 'Independent copy'],
-    ['questions', '3'],
-    ['question-options', '9'],
-    ['answer-explanations', '3'],
-    ['pairs', '4'],
-    ['groups', '2'],
-    ['vocabulary', '6'],
-    ['teacher-notes', '2'],
-    ['source-summary-privacy', 'Summary hidden'],
-    ['source-materials', '1'],
-    ['source-material-kinds', '1'],
-    ['source-material-privacy', 'File ids hidden'],
-    ['assignment-snapshot-protection', 'Snapshots unchanged'],
-    ['original-activity-protection', 'Unchanged'],
-  ])
 );
 assert.equal(formatActivityLibraryStatusLabel('archived'), 'Archived');
 assert.equal(formatActivityLibraryStatusLabel('private'), 'Private');
@@ -48090,73 +47224,6 @@ assert.deepEqual(choiceCompletionReadiness.items[0], {
   targetCount: 4,
   vocabularyCandidateCount: 2,
 });
-const choiceGenerationHandoff = buildQuestionChoiceGenerationHandoffView({
-  summary: choiceCompletionReadiness,
-});
-expectQuestionChoiceGenerationHandoffPrivacy(choiceGenerationHandoff);
-assert.equal(
-  findQuestionChoiceGenerationHandoffItem({
-    id: 'generation-scope',
-    itemViews: choiceGenerationHandoff.itemViews,
-  }).value,
-  'Editor before save'
-);
-assert.equal(
-  findQuestionChoiceGenerationHandoffItem({
-    id: 'target-choice-count',
-    itemViews: choiceGenerationHandoff.itemViews,
-  }).value,
-  '4'
-);
-assert.equal(
-  findQuestionChoiceGenerationHandoffItem({
-    id: 'question-count',
-    itemViews: choiceGenerationHandoff.itemViews,
-  }).value,
-  '3'
-);
-assert.equal(
-  findQuestionChoiceGenerationHandoffItem({
-    id: 'ready-question-count',
-    itemViews: choiceGenerationHandoff.itemViews,
-  }).value,
-  '3'
-);
-assert.equal(
-  findQuestionChoiceGenerationHandoffItem({
-    id: 'completed-locally-count',
-    itemViews: choiceGenerationHandoff.itemViews,
-  }).value,
-  '3'
-);
-assert.equal(
-  findQuestionChoiceGenerationHandoffItem({
-    id: 'option-structure',
-    itemViews: choiceGenerationHandoff.itemViews,
-  }).value,
-  'ActivityQuestionOption[]'
-);
-assert.equal(
-  findQuestionChoiceGenerationHandoffItem({
-    id: 'write-target',
-    itemViews: choiceGenerationHandoff.itemViews,
-  }).value,
-  'Question options'
-);
-assert.equal(
-  findQuestionChoiceGenerationHandoffItem({
-    id: 'teacher-review',
-    itemViews: choiceGenerationHandoff.itemViews,
-  }).value,
-  'Review before save'
-);
-assert.equal(
-  findQuestionChoiceGenerationHandoffItem({
-    id: 'publish-boundary',
-    itemViews: choiceGenerationHandoff.itemViews,
-  }).value,
-  'Save before publish'
-);
 const explicitChoiceReadinessContent = buildActivityContent({
   description: 'Explicit quiz choices',
   difficulty: 'starter',
@@ -48219,31 +47286,6 @@ assert.deepEqual(sparseChoiceReadiness.items[0], {
   targetCount: 4,
   vocabularyCandidateCount: 0,
 });
-const sparseChoiceGenerationHandoff = buildQuestionChoiceGenerationHandoffView({
-  summary: sparseChoiceReadiness,
-});
-expectQuestionChoiceGenerationHandoffPrivacy(sparseChoiceGenerationHandoff);
-assert.equal(
-  findQuestionChoiceGenerationHandoffItem({
-    id: 'ready-question-count',
-    itemViews: sparseChoiceGenerationHandoff.itemViews,
-  }).value,
-  '0'
-);
-assert.equal(
-  findQuestionChoiceGenerationHandoffItem({
-    id: 'needs-candidates-count',
-    itemViews: sparseChoiceGenerationHandoff.itemViews,
-  }).value,
-  '1'
-);
-assert.equal(
-  findQuestionChoiceGenerationHandoffItem({
-    id: 'missing-choice-count',
-    itemViews: sparseChoiceGenerationHandoff.itemViews,
-  }).value,
-  '3'
-);
 const normalizedChoiceReadinessContent = buildActivityContent({
   description: 'Normalized quiz choices',
   difficulty: 'starter',
@@ -48936,38 +47978,6 @@ assert.deepEqual(ACTIVITY_EDITOR_WORKFLOW_STEP_IDS, [
   'source-materials',
   'review',
 ]);
-assert.deepEqual(ACTIVITY_EDITOR_WORKFLOW_HANDOFF_ITEM_IDS, [
-  'workflow-source',
-  'step-count',
-  'workflow-order',
-  'create-page-surface',
-  'edit-page-surface',
-  'nav-surface',
-  'form-section-surface',
-  'side-preview-surface',
-  'frame-section',
-  'primary-fields',
-  'template-handoff',
-  'scaffold-panel',
-  'ai-draft-section',
-  'ai-source-state',
-  'ai-sync-action',
-  'content-section',
-  'details-fields',
-  'structured-content-fields',
-  'source-materials-section',
-  'material-picker',
-  'review-section',
-  'readiness-panel',
-  'save-footer',
-  'auth-gate',
-  'input-contract',
-  'template-readiness-contract',
-  'ai-editor-boundary',
-  'source-privacy-boundary',
-  'publish-boundary',
-  'privacy-guard',
-]);
 assert.deepEqual(
   activityEditorWorkflowView.steps.map((step) => [
     step.id,
@@ -49017,62 +48027,6 @@ assert.deepEqual(
 assert.equal(
   getActivityEditorWorkflowStepView(activityEditorWorkflowView, 'review').href,
   '#activity-template-readiness'
-);
-assert.deepEqual(activityEditorWorkflowView.handoffView.privacy, {
-  createsAssignmentLinks: false,
-  exposesAnswerText: false,
-  exposesPromptText: false,
-  exposesRawEditorInput: false,
-  exposesSourceMaterialFileIds: false,
-  exposesSourceMaterialStorageKeys: false,
-  exposesTeacherNotesText: false,
-  itemIds: [...ACTIVITY_EDITOR_WORKFLOW_HANDOFF_ITEM_IDS],
-  mutatesActivity: false,
-  persistsActivityWithoutTeacherSave: false,
-  publishesAssignment: false,
-  scope: 'activity-editor-workflow',
-  usesCreateActivityInputContract: true,
-});
-assert.deepEqual(
-  activityEditorWorkflowView.handoffView.itemViews.map((item) => [
-    item.id,
-    item.value,
-  ]),
-  [
-    ['workflow-source', 'editor.ts'],
-    ['step-count', '5 steps'],
-    [
-      'workflow-order',
-      'frame -> ai-draft -> content -> source-materials -> review',
-    ],
-    ['create-page-surface', 'Create page'],
-    ['edit-page-surface', 'Create/edit form'],
-    ['nav-surface', 'Shared step nav'],
-    ['form-section-surface', 'ActivityCreateForm'],
-    ['side-preview-surface', 'Template + preview aside'],
-    ['frame-section', 'Set the activity frame'],
-    ['primary-fields', 'ActivityEditorPrimaryFields'],
-    ['template-handoff', 'ActivityEditorTemplateHandoffView'],
-    ['scaffold-panel', 'Template scaffold'],
-    ['ai-draft-section', 'Draft from material'],
-    ['ai-source-state', 'ActivityEditorAiDraftPanelView'],
-    ['ai-sync-action', 'Source material sync'],
-    ['content-section', 'Edit reusable content'],
-    ['details-fields', 'ActivityEditorDetailsFields'],
-    ['structured-content-fields', 'ActivityEditorStructuredContentFields'],
-    ['source-materials-section', 'Attach source materials'],
-    ['material-picker', 'Source material picker'],
-    ['review-section', 'Review before saving'],
-    ['readiness-panel', 'Template readiness'],
-    ['save-footer', 'Save action footer'],
-    ['auth-gate', 'Teacher sign-in required'],
-    ['input-contract', 'CreateActivityInput'],
-    ['template-readiness-contract', 'TemplateRemixPlan'],
-    ['ai-editor-boundary', 'Draft fills editor only'],
-    ['source-privacy-boundary', 'Private materials hidden'],
-    ['publish-boundary', 'Save before publish'],
-    ['privacy-guard', 'Private classroom text hidden'],
-  ]
 );
 assert.deepEqual(buildActivityEditorModeView('create'), {
   footerHint:
@@ -49168,34 +48122,6 @@ const safeMaterialAiDraftPanelView = buildActivityEditorAiDraftPanelView({
     sourceMaterials: [],
   }),
 });
-const safeMaterialAiDraftSourceHandoffItemIds =
-  safeMaterialAiDraftPanelView.sourceHandoffView.itemViews.map(
-    (item) => item.id
-  );
-const safeMaterialAiDraftSourceHandoffValues = new Map(
-  safeMaterialAiDraftPanelView.sourceHandoffView.itemViews.map((item) => [
-    item.id,
-    item.value,
-  ])
-);
-assert.deepEqual(safeMaterialAiDraftSourceHandoffItemIds, [
-  ...ACTIVITY_EDITOR_AI_DRAFT_SOURCE_HANDOFF_ITEM_IDS,
-]);
-assert.equal(
-  safeMaterialAiDraftPanelView.sourceHandoffView.itemViews.length,
-  30
-);
-assert.deepEqual(safeMaterialAiDraftPanelView.sourceHandoffView.privacy, {
-  exposesFileBytes: false,
-  exposesFileIds: false,
-  exposesOmittedNotePayloads: false,
-  exposesPathSegments: false,
-  exposesPermissionMetadata: false,
-  exposesQueryTokens: false,
-  exposesStorageKeys: false,
-  exposesUrls: false,
-  itemIds: [...ACTIVITY_EDITOR_AI_DRAFT_SOURCE_HANDOFF_ITEM_IDS],
-});
 assert.deepEqual(safeMaterialAiDraftPanelView.sourceControlBoundary, {
   attachedSourceMaterialCount: 0,
   canGenerateDraft: true,
@@ -49232,58 +48158,6 @@ assert.deepEqual(safeMaterialAiDraftPanelView.sourceControlBoundary, {
   ],
   usesPreparedControlIds: true,
 });
-assert.equal(
-  safeMaterialAiDraftSourceHandoffValues.get('source-sanitization'),
-  'Sanitized source'
-);
-assert.equal(
-  safeMaterialAiDraftSourceHandoffValues.get('auth-boundary'),
-  'Authenticated action'
-);
-assert.equal(
-  safeMaterialAiDraftSourceHandoffValues.get('input-schema'),
-  'generateActivityDraftInputSchema'
-);
-assert.equal(
-  safeMaterialAiDraftSourceHandoffValues.get('create-input-contract'),
-  'CreateActivityInput'
-);
-assert.equal(
-  safeMaterialAiDraftSourceHandoffValues.get('editor-application-boundary'),
-  'editor-review'
-);
-assert.equal(
-  safeMaterialAiDraftSourceHandoffValues.get('persistence-boundary'),
-  'not-persisted'
-);
-assert.equal(
-  safeMaterialAiDraftSourceHandoffValues.get('save-boundary'),
-  'Teacher saves later'
-);
-assert.equal(
-  safeMaterialAiDraftSourceHandoffValues.get('publish-boundary'),
-  'Publish later'
-);
-assert.equal(
-  safeMaterialAiDraftSourceHandoffValues.get('file-byte-guard'),
-  'Bytes omitted'
-);
-assert.equal(
-  safeMaterialAiDraftSourceHandoffValues.get('storage-key-guard'),
-  'Storage hidden'
-);
-for (const privateAiSourceHandoffValue of [
-  'storageKey',
-  'classroom/private/worksheet.pdf',
-]) {
-  assert.equal(
-    JSON.stringify(safeMaterialAiDraftPanelView.sourceHandoffView).includes(
-      privateAiSourceHandoffValue
-    ),
-    false,
-    `AI source handoff leaked unsafe source text: ${privateAiSourceHandoffValue}`
-  );
-}
 assert.deepEqual(
   omitActivityEditorAiDraftSourceHandoffView(safeMaterialAiDraftPanelView),
   {
@@ -49984,7 +48858,6 @@ function omitActivityEditorAiDraftSourceHandoffView(
 ) {
   const {
     sourceControlBoundary: _sourceControlBoundary,
-    sourceHandoffView: _sourceHandoffView,
     ...viewWithoutHandoff
   } = view;
   return viewWithoutHandoff;
@@ -50046,65 +48919,6 @@ assert.deepEqual(
     ['groups', '3 groups', 3],
     ['vocabulary', '8 words', 8],
     ['teacherNotes', '2 notes', 2],
-  ]
-);
-const editorTemplateHandoffItemIds =
-  editorTemplateView.handoffView.itemViews.map((item) => item.id);
-assert.deepEqual(editorTemplateHandoffItemIds, [
-  ...ACTIVITY_EDITOR_TEMPLATE_HANDOFF_ITEM_IDS,
-]);
-assert.equal(editorTemplateView.handoffView.itemViews.length, 30);
-assert.deepEqual(editorTemplateView.handoffView.privacy, {
-  exposesAnswerText: false,
-  exposesCurrentFieldText: false,
-  exposesQuestionPromptText: false,
-  exposesRawEditorInput: false,
-  exposesRawScaffoldContent: false,
-  exposesSourceMaterialFileIds: false,
-  exposesSourceMaterialStorageKeys: false,
-  exposesTeacherNotesText: false,
-  itemIds: editorTemplateHandoffItemIds,
-  scope: 'activity-editor-template-readiness',
-});
-assert.deepEqual(
-  editorTemplateView.handoffView.itemViews.map((item) => [
-    item.id,
-    item.value,
-  ]),
-  [
-    ['selected-template', 'Quiz'],
-    ['template-short-name', 'Quiz'],
-    ['classroom-mode', 'Individual'],
-    ['required-content', 'questions'],
-    ['current-template-readiness', 'Quiz is selected and ready.'],
-    ['ready-template-count', '4 ready'],
-    ['ready-template-options', 'Quiz, Fill, Listen, and Box'],
-    ['suggested-remix-options', 'Fill, Listen, and Box'],
-    ['locked-template-count', '4 locked'],
-    [
-      'locked-template-options',
-      'Add match pairs to unlock Match., Add match pairs to unlock Lines., Add groups to unlock Sort., and Add match pairs to unlock Pairs.',
-    ],
-    ['question-choice-readiness', '1/1 question ready'],
-    ['scaffold-action', 'Quiz example loaded.'],
-    ['scaffold-runtime-items', '4 playable items'],
-    ['scaffold-ready-modes', '8 modes ready'],
-    ['scaffold-reusable-coverage', 'Ready'],
-    ['scaffold-questions', '4 questions'],
-    ['scaffold-pairs', '8 pairs'],
-    ['scaffold-groups', '3 groups'],
-    ['scaffold-vocabulary', '8 words'],
-    ['scaffold-teacher-notes', '2 notes'],
-    ['shared-editor-contract', 'Shared structured input'],
-    ['parsed-content-status', 'Structured fields parsed'],
-    ['current-question-count', '1 questions'],
-    ['current-pair-count', '0 pairs'],
-    ['current-group-count', '0 groups'],
-    ['current-vocabulary-count', '6 words'],
-    ['current-teacher-note-count', '2 notes'],
-    ['scaffold-review-steps', '3 review steps'],
-    ['save-before-publish-boundary', 'Save before publish'],
-    ['privacy-guard', 'Private editor text hidden'],
   ]
 );
 assert.ok(
@@ -50478,273 +49292,9 @@ assert.deepEqual(questionOnlyRemixSummary, {
     { shortName: 'Box', template: 'open-box' },
   ],
 });
-assert.deepEqual([...ACTIVITY_TEMPLATE_REMIX_HANDOFF_ITEM_IDS], [
-  'current-template',
-  'current-readiness',
-  'ready-template-count',
-  'suggested-remix-count',
-  'suggested-remix-actions',
-  'locked-template-count',
-  'locked-diagnostics',
-  'missing-requirements',
-  'owner-scope',
-  'source-status',
-  'lifecycle-gate',
-  'ready-target-only',
-  'current-template-excluded',
-  'visible-action-limit',
-  'draft-output',
-  'title-strategy',
-  'title-limit',
-  'template-switch',
-  'content-clone',
-  'questions',
-  'pairs',
-  'groups',
-  'vocabulary',
-  'teacher-notes',
-  'source-materials',
-  'source-material-kinds',
-  'source-material-privacy',
-  'assignment-snapshot-protection',
-  'original-activity-protection',
-  'privacy-guard',
-]);
-assert.equal(new Set(ACTIVITY_TEMPLATE_REMIX_HANDOFF_ITEM_IDS).size, 30);
 assert.equal(
-  ACTIVITY_TEMPLATE_REMIX_HANDOFF_VISIBLE_ACTION_LIMIT,
+  ACTIVITY_TEMPLATE_REMIX_VISIBLE_ACTION_LIMIT,
   ACTIVITY_LIBRARY_COMPATIBILITY_LIMITS.remixActionOptions
-);
-const questionOnlyDraftRemixHandoffView =
-  buildActivityTemplateRemixHandoffView({
-    content: questionOnlyContent,
-    currentTemplateType: 'quiz',
-    sourceTitle: 'Question review',
-    visibility: 'draft',
-  });
-const questionOnlyDraftRemixHandoffItems = new Map(
-  questionOnlyDraftRemixHandoffView.itemViews.map((item) => [
-    item.id,
-    item.value,
-  ])
-);
-assert.deepEqual(
-  questionOnlyDraftRemixHandoffView.itemViews.map((item) => item.id),
-  [...ACTIVITY_TEMPLATE_REMIX_HANDOFF_ITEM_IDS]
-);
-assert.ok(
-  questionOnlyDraftRemixHandoffView.itemViews.every(
-    (item) => item.ariaLabel && item.description && item.label && item.value
-  )
-);
-assert.deepEqual(questionOnlyDraftRemixHandoffView.privacy, {
-  clonesSourceMaterialReferences: true,
-  excludesCurrentTemplate: true,
-  exposesActivityContentText: false,
-  exposesAnswerText: false,
-  exposesQuestionPromptText: false,
-  exposesSourceMaterialFilenames: false,
-  exposesSourceMaterialFileIds: false,
-  exposesSourceMaterialStorageKeys: false,
-  exposesSourceSummaryText: false,
-  exposesTeacherNotesText: false,
-  itemIds: [...ACTIVITY_TEMPLATE_REMIX_HANDOFF_ITEM_IDS],
-  modifiesOriginalActivity: false,
-  modifiesPublishedAssignmentSnapshots: false,
-  outputVisibility: 'draft',
-  requiresOwnerScopedSource: true,
-  scope: 'deterministic-template-remix',
-  targetTemplatesAreReadyOnly: true,
-});
-assert.deepEqual(
-  Object.fromEntries(questionOnlyDraftRemixHandoffItems),
-  {
-    'assignment-snapshot-protection': 'Snapshots unchanged',
-    'content-clone': 'Same structured content',
-    'current-readiness': 'Ready',
-    'current-template': 'Quiz',
-    'current-template-excluded': 'Current excluded',
-    'draft-output': 'Draft copy',
-    groups: '0',
-    'lifecycle-gate': 'Ready to remix',
-    'locked-diagnostics': '4',
-    'locked-template-count': '4',
-    'missing-requirements': '2',
-    'original-activity-protection': 'Source unchanged',
-    'owner-scope': 'Current teacher',
-    pairs: '0',
-    'privacy-guard': 'Content hidden',
-    questions: '2',
-    'ready-target-only': 'Ready targets',
-    'ready-template-count': '4',
-    'source-material-kinds': '0',
-    'source-material-privacy': 'File ids hidden',
-    'source-materials': '0',
-    'source-status': 'Draft',
-    'suggested-remix-actions': 'Fill, Listen, and Box',
-    'suggested-remix-count': '3',
-    'teacher-notes': '0',
-    'template-switch': 'Fill',
-    'title-limit': '120 chars',
-    'title-strategy': 'Question review (Fill)',
-    vocabulary: '0',
-    'visible-action-limit': '3 actions',
-  }
-);
-assert.doesNotMatch(
-  JSON.stringify(questionOnlyDraftRemixHandoffView),
-  /Capital of France|Paris|2 \+ 2|Quick review/,
-  'Template remix handoff should not leak source prompts, answers, or source summaries.'
-);
-const questionOnlyArchivedRemixHandoffView =
-  buildActivityTemplateRemixHandoffView({
-    content: questionOnlyContent,
-    currentTemplateType: 'quiz',
-    sourceTitle: 'Question review',
-    visibility: 'archived',
-  });
-assert.equal(
-  questionOnlyArchivedRemixHandoffView.itemViews.find(
-    (item) => item.id === 'lifecycle-gate'
-  )?.value,
-  'Restore required'
-);
-assert.deepEqual([...ACTIVITY_AI_REMIX_ASSIST_HANDOFF_ITEM_IDS], [
-  'source-template',
-  'target-template',
-  'target-readiness',
-  'missing-requirement-count',
-  'missing-requirement-list',
-  'deterministic-remix-path',
-  'ai-completion-path',
-  'editor-review-gate',
-  'draft-output',
-  'persistence-boundary',
-  'publish-boundary',
-  'source-lifecycle-gate',
-  'owner-scope',
-  'prompt-source',
-  'source-material-provenance',
-  'source-file-byte-guard',
-  'storage-key-guard',
-  'question-count',
-  'pair-count',
-  'group-count',
-  'vocabulary-count',
-  'teacher-note-count',
-  'suggested-ready-count',
-  'locked-target-count',
-  'review-checklist',
-  'title-strategy',
-  'template-switch',
-  'assignment-snapshot-protection',
-  'original-activity-protection',
-  'privacy-guard',
-]);
-assert.equal(new Set(ACTIVITY_AI_REMIX_ASSIST_HANDOFF_ITEM_IDS).size, 30);
-const questionOnlyAiRemixAssistHandoffView =
-  buildActivityAiRemixAssistHandoffView({
-    content: questionOnlyContent,
-    currentTemplateType: 'quiz',
-    sourceTitle: 'Question review',
-    visibility: 'draft',
-  });
-const questionOnlyAiRemixAssistHandoffItems = new Map(
-  questionOnlyAiRemixAssistHandoffView.itemViews.map((item) => [
-    item.id,
-    item.value,
-  ])
-);
-assert.deepEqual(
-  questionOnlyAiRemixAssistHandoffView.itemViews.map((item) => item.id),
-  [...ACTIVITY_AI_REMIX_ASSIST_HANDOFF_ITEM_IDS]
-);
-assert.ok(
-  questionOnlyAiRemixAssistHandoffView.itemViews.every(
-    (item) => item.ariaLabel && item.description && item.label && item.value
-  )
-);
-assert.deepEqual(questionOnlyAiRemixAssistHandoffView.privacy, {
-  aiCanFillMissingStructuredFields: true,
-  appliesBeforeActivitySave: true,
-  exposesActivityContentText: false,
-  exposesAnswerText: false,
-  exposesPromptText: false,
-  exposesSourceMaterialFileIds: false,
-  exposesSourceMaterialFilenames: false,
-  exposesSourceMaterialStorageKeys: false,
-  exposesTeacherNotesText: false,
-  itemIds: [...ACTIVITY_AI_REMIX_ASSIST_HANDOFF_ITEM_IDS],
-  modifiesOriginalActivity: false,
-  modifiesPublishedAssignmentSnapshots: false,
-  publishesAssignmentWithoutTeacherAction: false,
-  readsSourceMaterialBytes: false,
-  requiresEditorReview: true,
-  savesActivityWithoutTeacherAction: false,
-  scope: 'teacher-reviewed-ai-remix-assist',
-});
-assert.deepEqual(
-  Object.fromEntries(questionOnlyAiRemixAssistHandoffItems),
-  {
-    'ai-completion-path': 'Draft assist ready',
-    'assignment-snapshot-protection': 'Snapshots unchanged',
-    'deterministic-remix-path': 'Needs structure',
-    'draft-output': 'Editor draft',
-    'editor-review-gate': 'Teacher review required',
-    'group-count': '0',
-    'locked-target-count': '4',
-    'missing-requirement-count': '1',
-    'missing-requirement-list': 'match pairs',
-    'original-activity-protection': 'Source unchanged',
-    'owner-scope': 'Current teacher',
-    'pair-count': '0',
-    'persistence-boundary': 'Not auto-saved',
-    'privacy-guard': 'Private text hidden',
-    'prompt-source': 'Structured editor context',
-    'publish-boundary': 'Save before publish',
-    'question-count': '2',
-    'review-checklist': '5 checks',
-    'source-file-byte-guard': 'Bytes not read',
-    'source-lifecycle-gate': 'Ready',
-    'source-material-provenance': '0 materials, 0 kinds',
-    'source-template': 'Quiz',
-    'storage-key-guard': 'Storage hidden',
-    'suggested-ready-count': '3',
-    'target-readiness': 'Needs AI completion',
-    'target-template': 'Match',
-    'teacher-note-count': '0',
-    'template-switch': 'Match',
-    'title-strategy': 'Question review (Match)',
-    'vocabulary-count': '0',
-  }
-);
-assert.equal(
-  buildActivityAiRemixAssistPlan({
-    content: questionOnlyContent,
-    currentTemplateType: 'quiz',
-    sourceTitle: 'Question review',
-    targetTemplateType: 'fill-blank',
-    visibility: 'draft',
-  }).targetStatus,
-  'deterministic-ready'
-);
-assert.doesNotMatch(
-  JSON.stringify(questionOnlyAiRemixAssistHandoffView),
-  /Capital of France|Paris|2 \+ 2|Quick review/,
-  'AI remix assist handoff should not leak source prompts, answers, or source summaries.'
-);
-const questionOnlyArchivedAiRemixAssistHandoffView =
-  buildActivityAiRemixAssistHandoffView({
-    content: questionOnlyContent,
-    currentTemplateType: 'quiz',
-    sourceTitle: 'Question review',
-    visibility: 'archived',
-  });
-assert.equal(
-  questionOnlyArchivedAiRemixAssistHandoffView.itemViews.find(
-    (item) => item.id === 'source-lifecycle-gate'
-  )?.value,
-  'Restore first'
 );
 assert.deepEqual(
   questionOnlyRemixPlan.options.find(
@@ -50777,9 +49327,6 @@ assert.deepEqual(
       description:
         'Each quiz question should have 4 playable choices. Missing distractors can be completed from sibling answers and vocabulary before AI distractor generation is connected.',
       emptyText: 'Add quiz questions to inspect choice readiness.',
-      generationHandoffView: buildQuestionChoiceGenerationHandoffView({
-        content: questionOnlyContent,
-      }),
       itemViews: [
         {
           detail:
@@ -50835,18 +49382,6 @@ assert.equal(
   'Needs candidates'
 );
 assert.ok(questionOnlyEditorReadinessSummary.questionChoiceReadiness);
-expectQuestionChoiceGenerationHandoffPrivacy(
-  questionOnlyEditorReadinessSummary.questionChoiceReadiness.generationHandoffView
-);
-assert.equal(
-  findQuestionChoiceGenerationHandoffItem({
-    id: 'needs-candidates-count',
-    itemViews:
-      questionOnlyEditorReadinessSummary.questionChoiceReadiness
-        .generationHandoffView.itemViews,
-  }).value,
-  '2'
-);
 assert.equal(getActivityTemplateQuizChoiceReadinessItemPosition(0), 1);
 assert.equal(getActivityTemplateQuizChoiceReadinessItemPosition(2.9), 3);
 assert.equal(getActivityTemplateQuizChoiceReadinessItemPosition(-3), 1);
@@ -50897,7 +49432,6 @@ assert.deepEqual(
     summary: questionOnlyCardSummary,
   }),
   {
-    aiRemixAssistHandoffView: questionOnlyAiRemixAssistHandoffView,
     lockedTemplateDiagnostics: [
       {
         diagnosis: 'Add match pairs to unlock Match.',
@@ -50931,7 +49465,6 @@ assert.deepEqual(
         template: 'open-box',
       },
     ],
-    remixHandoffView: questionOnlyDraftRemixHandoffView,
     remixHint: 'Ready to remix into Fill, Listen, Box.',
     remixStatusView: remixActivityReadyStatus,
   }
@@ -50945,7 +49478,6 @@ assert.deepEqual(
     visibility: 'archived',
   }),
   {
-    aiRemixAssistHandoffView: questionOnlyArchivedAiRemixAssistHandoffView,
     lockedTemplateDiagnostics: [
       {
         diagnosis: 'Add match pairs to unlock Match.',
@@ -50979,7 +49511,6 @@ assert.deepEqual(
         template: 'open-box',
       },
     ],
-    remixHandoffView: questionOnlyArchivedRemixHandoffView,
     restoreRequiredMessage:
       'Ready template modes are preserved, but remix actions unlock only after restore.',
     remixHint: 'Ready to remix into Fill, Listen, Box.',
@@ -52315,145 +50846,6 @@ assert.deepEqual(
     totalPages: 3,
   }
 );
-const filteredActivityLibraryHandoffValues = new Map(
-  filteredActivityLibraryPageView.handoffView.itemViews.map((item) => [
-    item.id,
-    item.value,
-  ])
-);
-assert.deepEqual(
-  filteredActivityLibraryPageView.handoffView.itemViews.map((item) => item.id),
-  [...ACTIVITY_LIBRARY_PAGE_HANDOFF_ITEM_IDS],
-  'Activity library page view-model should expose the stable 30-slice handoff order.'
-);
-assert.deepEqual(filteredActivityLibraryPageView.handoffView.privacy, {
-  broadensBeyondOwner: false,
-  countsStarterPreviewAsOwned: false,
-  exposesDerivativeDraftPayloads: false,
-  exposesPrivateActivityContent: false,
-  exposesSourceMaterialFilenames: false,
-  exposesSourceMaterialFileIds: false,
-  exposesSourceMaterialStorageKeys: false,
-  itemIds: [...ACTIVITY_LIBRARY_PAGE_HANDOFF_ITEM_IDS],
-  keepsVisiblePageCountsSeparate: true,
-  scope: 'owner-activity-library-source-scope',
-  usesFullFilteredSummaryForOverview: true,
-  usesOwnerScopedSourceFilters: true,
-});
-assert.equal(filteredActivityLibraryHandoffValues.get('summary-total'), '2');
-assert.equal(
-  filteredActivityLibraryHandoffValues.get('summary-template-coverage'),
-  `2/${ACTIVITY_TEMPLATE_TYPES.length}`
-);
-assert.equal(
-  filteredActivityLibraryHandoffValues.get('summary-remix-ready'),
-  '2'
-);
-assert.equal(
-  filteredActivityLibraryHandoffValues.get('summary-source-extraction'),
-  String(librarySummary.totalExtractableSourceMaterials)
-);
-assert.equal(
-  filteredActivityLibraryHandoffValues.get('scope-range'),
-  '25-25 of 31'
-);
-assert.equal(
-  filteredActivityLibraryHandoffValues.get('scope-page'),
-  'Page 3 of 3'
-);
-assert.equal(
-  filteredActivityLibraryHandoffValues.get('scope-status'),
-  'Archived'
-);
-assert.equal(filteredActivityLibraryHandoffValues.get('scope-template'), 'Quiz');
-assert.equal(
-  filteredActivityLibraryHandoffValues.get('scope-source'),
-  'Worksheet'
-);
-assert.equal(
-  filteredActivityLibraryHandoffValues.get('scope-search'),
-  'Food words'
-);
-assert.equal(
-  filteredActivityLibraryHandoffValues.get(
-    'source-capability-audio-extraction'
-  ),
-  '1'
-);
-assert.equal(
-  filteredActivityLibraryHandoffValues.get(
-    'source-capability-worksheet-extraction'
-  ),
-  '1'
-);
-assert.equal(
-  filteredActivityLibraryHandoffValues.get(
-    'source-capability-spreadsheet-import'
-  ),
-  '1'
-);
-assert.equal(filteredActivityLibraryHandoffValues.get('status-active'), '1');
-assert.equal(filteredActivityLibraryHandoffValues.get('status-archived'), '1');
-assert.equal(
-  filteredActivityLibraryHandoffValues.get('filter-summary'),
-  '31 matches'
-);
-assert.equal(
-  filteredActivityLibraryHandoffValues.get('visible-page-items'),
-  '1 visible activities'
-);
-assert.equal(
-  filteredActivityLibraryHandoffValues.get('visible-publish-ready'),
-  '0 visible activities'
-);
-assert.equal(
-  filteredActivityLibraryHandoffValues.get('visible-publish-blocked'),
-  '0 visible activities'
-);
-assert.equal(
-  filteredActivityLibraryHandoffValues.get('visible-duplicate-ready'),
-  '0 visible activities'
-);
-assert.equal(
-  filteredActivityLibraryHandoffValues.get('visible-duplicate-blocked'),
-  '0 visible activities'
-);
-assert.equal(
-  filteredActivityLibraryHandoffValues.get('visible-remix-ready'),
-  '0 visible activities'
-);
-assert.equal(
-  filteredActivityLibraryHandoffValues.get('visible-remix-blocked'),
-  '0 visible activities'
-);
-assert.equal(
-  filteredActivityLibraryHandoffValues.get('visible-archive-ready'),
-  '0 visible activities'
-);
-assert.equal(
-  filteredActivityLibraryHandoffValues.get('visible-restore-ready'),
-  '0 visible activities'
-);
-assert.equal(
-  filteredActivityLibraryHandoffValues.get(
-    'visible-source-material-activities'
-  ),
-  '0 visible activities'
-);
-assert.equal(
-  filteredActivityLibraryHandoffValues.get(
-    'visible-extractable-source-activities'
-  ),
-  '0 visible activities'
-);
-assert.equal(
-  filteredActivityLibraryHandoffValues.get('pagination'),
-  'Page 3 of 3; 31 owned activities'
-);
-assert.equal(
-  filteredActivityLibraryHandoffValues.get('starter-preview'),
-  '0 starter previews'
-);
 assert.deepEqual(
   buildActivityLibrarySourceScopeBoundary({
     sourceFilter: 'audio',
@@ -52476,22 +50868,6 @@ assert.deepEqual(
     visiblePageActivityCount: 0,
   }
 );
-for (const privateActivityLibraryValue of [
-  'persisted-activity-1',
-  'file-worksheet-library',
-  'file-spreadsheet-library',
-  'library worksheet.pdf',
-  'library words.xlsx',
-  'Answer: rain',
-]) {
-  assert.equal(
-    JSON.stringify(filteredActivityLibraryPageView.handoffView).includes(
-      privateActivityLibraryValue
-    ),
-    false,
-    `Activity library handoff leaked private text: ${privateActivityLibraryValue}`
-  );
-}
 assert.equal(
   buildActivityLibraryPageViewModel({
     data: {
@@ -52891,62 +51267,6 @@ assert.doesNotMatch(
   /const MAX_ACTIVITY_TITLE_LENGTH = 120/,
   'Activity duplicate helpers should not maintain a local title length.'
 );
-assert.match(
-  activityDuplicateSource,
-  /export const ACTIVITY_DUPLICATE_HANDOFF_ITEM_IDS = \[(?=[\s\S]*'source-activity')(?=[\s\S]*'owner-scope')(?=[\s\S]*'persisted-source')(?=[\s\S]*'source-status')(?=[\s\S]*'action-availability')(?=[\s\S]*'lifecycle-gate')(?=[\s\S]*'derivative-scope')(?=[\s\S]*'draft-output')(?=[\s\S]*'visibility-reset')(?=[\s\S]*'title-strategy')(?=[\s\S]*'title-normalization')(?=[\s\S]*'template-preserved')(?=[\s\S]*'template-transform')(?=[\s\S]*'description-preserved')(?=[\s\S]*'content-clone')(?=[\s\S]*'reference-isolation')(?=[\s\S]*'question-options')(?=[\s\S]*'answer-explanations')(?=[\s\S]*'source-summary-privacy')(?=[\s\S]*'source-material-privacy')(?=[\s\S]*'assignment-snapshot-protection')(?=[\s\S]*'original-activity-protection')[\s\S]*export type ActivityDuplicateHandoffPrivacyContract = \{[\s\S]*clonesAnswerExplanations: true;[\s\S]*clonesQuestionOptions: true;[\s\S]*clonesSourceMaterialReferences: true;[\s\S]*exposesAnswerExplanationText: false;[\s\S]*exposesActivityContentText: false;[\s\S]*exposesAnswerText: false;[\s\S]*exposesQuestionOptionText: false;[\s\S]*exposesQuestionPromptText: false;[\s\S]*exposesSourceMaterialFilenames: false;[\s\S]*exposesSourceMaterialFileIds: false;[\s\S]*exposesSourceMaterialStorageKeys: false;[\s\S]*exposesSourceSummaryText: false;[\s\S]*exposesTeacherNotesText: false;[\s\S]*modifiesOriginalActivity: false;[\s\S]*modifiesPublishedAssignmentSnapshots: false;[\s\S]*outputVisibility: 'draft';[\s\S]*preservesTemplateType: true;[\s\S]*requiresOwnerScopedSource: true;[\s\S]*requiresPersistedSourceForAction: true;[\s\S]*resetsVisibilityToDraft: true;[\s\S]*scope: 'owner-activity-duplicate';/,
-  'Activity duplicate handoff should expose a typed 30-slice safe draft-copy contract with explicit privacy flags.'
-);
-assert.deepEqual(
-  [...ACTIVITY_DUPLICATE_HANDOFF_ITEM_IDS],
-  [
-    'source-activity',
-    'owner-scope',
-    'persisted-source',
-    'source-status',
-    'action-availability',
-    'lifecycle-gate',
-    'derivative-scope',
-    'draft-output',
-    'visibility-reset',
-    'title-strategy',
-    'title-normalization',
-    'title-limit',
-    'template-preserved',
-    'template-transform',
-    'description-preserved',
-    'content-clone',
-    'reference-isolation',
-    'questions',
-    'question-options',
-    'answer-explanations',
-    'pairs',
-    'groups',
-    'vocabulary',
-    'teacher-notes',
-    'source-summary-privacy',
-    'source-materials',
-    'source-material-kinds',
-    'source-material-privacy',
-    'assignment-snapshot-protection',
-    'original-activity-protection',
-  ],
-  'Activity duplicate handoff should expose exactly 30 stable slice ids.'
-);
-assert.match(
-  activityDuplicateSource,
-  /export function buildActivityDuplicateHandoffView[\s\S]*ACTIVITY_DUPLICATE_HANDOFF_ITEM_IDS\.map[\s\S]*buildActivityDuplicateHandoffItem[\s\S]*privacy: buildActivityDuplicateHandoffPrivacyContract/,
-  'Activity duplicate handoff should build stable item views and privacy from the duplicate domain.'
-);
-assert.match(
-  activityLibraryCardComponentSource,
-  /ActivityDuplicateHandoffItemView[\s\S]*ActivityDuplicateHandoffView[\s\S]*function ActivityLibraryDuplicateHandoff[\s\S]*const titleId = useId\(\)[\s\S]*const descriptionId = useId\(\)[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*aria-labelledby=\{titleId\}[\s\S]*className="sr-only"[\s\S]*data-handoff="activity-duplicate"[\s\S]*data-handoff-scope=\{handoff\.privacy\.scope\}[\s\S]*id=\{titleId\}[\s\S]*id=\{descriptionId\}[\s\S]*handoff\.itemViews\.map[\s\S]*ActivityLibraryDuplicateHandoffItem[\s\S]*function ActivityLibraryDuplicateHandoffItem[\s\S]*const labelId = `activity-duplicate-handoff-\$\{item\.id\}-label`[\s\S]*const valueId = `activity-duplicate-handoff-\$\{item\.id\}-value`[\s\S]*const descriptionId = `activity-duplicate-handoff-\$\{item\.id\}-description`[\s\S]*data-handoff-item=\{item\.id\}[\s\S]*id=\{labelId\}[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*aria-label=\{item\.ariaLabel\}[\s\S]*aria-labelledby=\{`\$\{labelId\} \$\{valueId\}`\}[\s\S]*id=\{valueId\}[\s\S]*id=\{descriptionId\}/,
-  'Activity duplicate handoff should render privacy scope plus stable label, value, and description relationships.'
-);
-assert.match(
-  activityDuplicateSource,
-  /function buildActivityDuplicateHandoffSummary[\s\S]*normalizeActivityMaterialReferences\([\s\S]*content\.sourceMaterials[\s\S]*buildDuplicatedActivityTitle\(title\)[\s\S]*getTemplateByType\(templateType\)\.name[\s\S]*ACTIVITY_TITLE_LENGTH\.max/,
-  'Activity duplicate handoff summary should derive title, content counts, template label, material references, and title limits from existing activity-domain helpers.'
-);
 assert.equal(buildDuplicatedActivityTitle('   '), 'Copy of Untitled activity');
 assert.equal(
   buildDuplicatedActivityTitle('A'.repeat(200)).length,
@@ -53033,77 +51353,6 @@ const derivativeSourceContent = buildActivityContent({
 });
 const derivativeClonedContent = cloneActivityContentForDerivative(
   derivativeSourceContent
-);
-const duplicateHandoffView = buildActivityDuplicateHandoffView({
-  content: derivativeSourceContent,
-  persisted: true,
-  status: 'private',
-  templateType: 'group-sort',
-  title: '  Food words quick check  ',
-});
-assert.deepEqual(duplicateHandoffView.privacy, {
-  clonesAnswerExplanations: true,
-  clonesQuestionOptions: true,
-  clonesSourceMaterialReferences: true,
-  exposesAnswerExplanationText: false,
-  exposesActivityContentText: false,
-  exposesAnswerText: false,
-  exposesQuestionOptionText: false,
-  exposesQuestionPromptText: false,
-  exposesSourceMaterialFilenames: false,
-  exposesSourceMaterialFileIds: false,
-  exposesSourceMaterialStorageKeys: false,
-  exposesSourceSummaryText: false,
-  exposesTeacherNotesText: false,
-  itemIds: [...ACTIVITY_DUPLICATE_HANDOFF_ITEM_IDS],
-  modifiesOriginalActivity: false,
-  modifiesPublishedAssignmentSnapshots: false,
-  outputVisibility: 'draft',
-  preservesTemplateType: true,
-  requiresOwnerScopedSource: true,
-  requiresPersistedSourceForAction: true,
-  resetsVisibilityToDraft: true,
-  scope: 'owner-activity-duplicate',
-});
-assert.deepEqual(
-  new Map(duplicateHandoffView.itemViews.map((item) => [item.id, item.value])),
-  new Map([
-    ['source-activity', 'Food words quick check'],
-    ['owner-scope', 'Current teacher'],
-    ['persisted-source', 'Saved source'],
-    ['source-status', 'Private'],
-    ['action-availability', 'Ready'],
-    ['lifecycle-gate', 'Derivative allowed'],
-    ['derivative-scope', 'Owner draft'],
-    ['draft-output', 'Draft copy'],
-    ['visibility-reset', 'Draft visibility'],
-    ['title-strategy', 'Copy of Food words quick check'],
-    ['title-normalization', 'Whitespace normalized'],
-    ['title-limit', '120 chars'],
-    ['template-preserved', 'Group sort'],
-    ['template-transform', 'No transform'],
-    ['description-preserved', 'No description'],
-    ['content-clone', 'Structured copy'],
-    ['reference-isolation', 'Independent copy'],
-    ['questions', '1'],
-    ['question-options', '2'],
-    ['answer-explanations', '1'],
-    ['pairs', '1'],
-    ['groups', '1'],
-    ['vocabulary', '2'],
-    ['teacher-notes', '1'],
-    ['source-summary-privacy', 'Summary hidden'],
-    ['source-materials', '2'],
-    ['source-material-kinds', '2'],
-    ['source-material-privacy', 'File ids hidden'],
-    ['assignment-snapshot-protection', 'Snapshots unchanged'],
-    ['original-activity-protection', 'Unchanged'],
-  ])
-);
-assert.doesNotMatch(
-  JSON.stringify(duplicateHandoffView),
-  /Favorite food\?|apple, bread|Choose the food|file-listening-1|file-worksheet-derivative|worksheet derivative\.pdf|userfiles\/teacher\/private\.pdf|Use after vocabulary warmup/,
-  'Activity duplicate handoff should omit classroom content, answers, notes, source-material filenames, file ids, and storage keys.'
 );
 const activityInsertNow = new Date('2026-01-15T08:00:00.000Z');
 const baseActivityCreateInput = {
@@ -55552,170 +53801,6 @@ assert.equal(
   1
 );
 assert.equal(actionNeededDraftGateSummary.sourceMaterialNoteViews.length, 1);
-assert.deepEqual(ACTIVITY_DRAFT_META_HANDOFF_ITEM_IDS, [
-  'draft-provider',
-  'draft-model',
-  'generation-notice',
-  'fallback-stability-boundary',
-  'teacher-review-gate',
-  'editor-fill-boundary',
-  'create-input-contract',
-  'review-gate-status',
-  'review-checklist-source',
-  'action-needed-count',
-  'review-required-count',
-  'ready-check-count',
-  'template-readiness-source',
-  'ready-template-count',
-  'locked-template-count',
-  'suggested-remix-count',
-  'coverage-field-count',
-  'question-count',
-  'pair-count',
-  'group-count',
-  'vocabulary-count',
-  'teacher-note-count',
-  'quiz-choice-readiness',
-  'source-provenance-boundary',
-  'safe-source-count',
-  'omitted-source-count',
-  'no-file-byte-read',
-  'no-direct-persist',
-  'no-assignment-publish',
-  'save-boundary',
-]);
-expectActivityDraftMetaHandoffPrivacy(
-  actionNeededDraftGateSummary.handoffView
-);
-assert.equal(
-  findActivityDraftMetaHandoffItem({
-    id: 'draft-provider',
-    itemViews: actionNeededDraftGateSummary.handoffView.itemViews,
-  }).value,
-  'Fallback'
-);
-assert.equal(
-  findActivityDraftMetaHandoffItem({
-    id: 'fallback-stability-boundary',
-    itemViews: actionNeededDraftGateSummary.handoffView.itemViews,
-  }).value,
-  'Deterministic fallback'
-);
-assert.equal(
-  findActivityDraftMetaHandoffItem({
-    id: 'editor-fill-boundary',
-    itemViews: actionNeededDraftGateSummary.handoffView.itemViews,
-  }).value,
-  'Editor fill only'
-);
-assert.equal(
-  findActivityDraftMetaHandoffItem({
-    id: 'create-input-contract',
-    itemViews: actionNeededDraftGateSummary.handoffView.itemViews,
-  }).value,
-  'CreateActivityInput'
-);
-assert.equal(
-  findActivityDraftMetaHandoffItem({
-    id: 'review-gate-status',
-    itemViews: actionNeededDraftGateSummary.handoffView.itemViews,
-  }).value,
-  'Action needed before save'
-);
-assert.equal(
-  findActivityDraftMetaHandoffItem({
-    id: 'review-checklist-source',
-    itemViews: actionNeededDraftGateSummary.handoffView.itemViews,
-  }).value,
-  'Structured checklist'
-);
-assert.equal(
-  findActivityDraftMetaHandoffItem({
-    id: 'template-readiness-source',
-    itemViews: actionNeededDraftGateSummary.handoffView.itemViews,
-  }).value,
-  'Template remix plan'
-);
-assert.equal(
-  findActivityDraftMetaHandoffItem({
-    id: 'ready-template-count',
-    itemViews: actionNeededDraftGateSummary.handoffView.itemViews,
-  }).value,
-  String(
-    findActivityDraftReviewGateMetric({
-      id: 'ready-templates',
-      metrics: actionNeededDraftGateSummary.reviewGateView.metricViews,
-    }).value
-  )
-);
-assert.equal(
-  findActivityDraftMetaHandoffItem({
-    id: 'locked-template-count',
-    itemViews: actionNeededDraftGateSummary.handoffView.itemViews,
-  }).value,
-  String(
-    findActivityDraftReviewGateMetric({
-      id: 'locked-templates',
-      metrics: actionNeededDraftGateSummary.reviewGateView.metricViews,
-    }).value
-  )
-);
-assert.equal(
-  findActivityDraftMetaHandoffItem({
-    id: 'coverage-field-count',
-    itemViews: actionNeededDraftGateSummary.handoffView.itemViews,
-  }).value,
-  '5 coverage fields'
-);
-assert.equal(
-  findActivityDraftMetaHandoffItem({
-    id: 'safe-source-count',
-    itemViews: actionNeededDraftGateSummary.handoffView.itemViews,
-  }).value,
-  '1 safe source'
-);
-assert.equal(
-  findActivityDraftMetaHandoffItem({
-    id: 'omitted-source-count',
-    itemViews: actionNeededDraftGateSummary.handoffView.itemViews,
-  }).value,
-  '1 omitted source'
-);
-assert.equal(
-  findActivityDraftMetaHandoffItem({
-    id: 'source-provenance-boundary',
-    itemViews: actionNeededDraftGateSummary.handoffView.itemViews,
-  }).value,
-  'Safe material provenance'
-);
-assert.equal(
-  findActivityDraftMetaHandoffItem({
-    id: 'no-file-byte-read',
-    itemViews: actionNeededDraftGateSummary.handoffView.itemViews,
-  }).value,
-  'No file bytes'
-);
-assert.equal(
-  findActivityDraftMetaHandoffItem({
-    id: 'no-direct-persist',
-    itemViews: actionNeededDraftGateSummary.handoffView.itemViews,
-  }).value,
-  'No direct save'
-);
-assert.equal(
-  findActivityDraftMetaHandoffItem({
-    id: 'no-assignment-publish',
-    itemViews: actionNeededDraftGateSummary.handoffView.itemViews,
-  }).value,
-  'No assignment publish'
-);
-assert.equal(
-  findActivityDraftMetaHandoffItem({
-    id: 'save-boundary',
-    itemViews: actionNeededDraftGateSummary.handoffView.itemViews,
-  }).value,
-  'Teacher saves first'
-);
 const readyTemplateReadiness = questionOnlyDraftMeta.templateReadiness.find(
   (option) => option.isReady
 );
@@ -55795,28 +53880,6 @@ assert.equal(
     metrics: readyToSaveDraftGateSummary.reviewGateView.metricViews,
   }).value,
   0
-);
-expectActivityDraftMetaHandoffPrivacy(readyToSaveDraftGateSummary.handoffView);
-assert.equal(
-  findActivityDraftMetaHandoffItem({
-    id: 'review-gate-status',
-    itemViews: readyToSaveDraftGateSummary.handoffView.itemViews,
-  }).value,
-  'Ready to save'
-);
-assert.equal(
-  findActivityDraftMetaHandoffItem({
-    id: 'ready-template-count',
-    itemViews: readyToSaveDraftGateSummary.handoffView.itemViews,
-  }).value,
-  '1'
-);
-assert.equal(
-  findActivityDraftMetaHandoffItem({
-    id: 'locked-template-count',
-    itemViews: readyToSaveDraftGateSummary.handoffView.itemViews,
-  }).value,
-  '0'
 );
 const fallbackFillBlankDraft = createFallbackActivityDraft({
   difficulty: 'starter',

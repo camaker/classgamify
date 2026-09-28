@@ -53,7 +53,7 @@ export const ACTIVITY_AI_REVIEW_PUBLISH_CONTINUITY_CHAIN_SOURCE_FILES = [
   'src/activities/ai-enhancement-draft-output.ts',
   'src/activities/ai-enhancement-draft-application.ts',
   'src/activities/ai-draft.ts',
-  'src/activities/ai-draft-boundary.ts',
+  'scripts/activity-lifecycle.test.ts',
   'src/activities/draft-source.ts',
   'src/activities/draft-meta.ts',
   'src/activities/editor.ts',

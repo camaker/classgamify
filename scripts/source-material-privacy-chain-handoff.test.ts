@@ -8,9 +8,6 @@ import {
   type SourceMaterialPrivacyChainHandoffItemId,
   type SourceMaterialPrivacyChainHandoffView,
 } from '@/activities/source-material-privacy-chain';
-import { ACTIVITY_AI_DRAFT_BOUNDARY_HANDOFF_ITEM_IDS } from '@/activities/ai-draft-boundary';
-import { ACTIVITY_SOURCE_EXTRACTION_ASSIST_HANDOFF_ITEM_IDS } from '@/activities/source-extraction-assist';
-import { ACTIVITY_SOURCE_MATERIAL_PICKER_HANDOFF_ITEM_IDS } from '@/activities/material-summary';
 import {
   ACTIVITY_SOURCE_MATERIAL_REFERENCE_ITEM_IDS,
   ACTIVITY_SOURCE_MATERIAL_REFERENCE_PRIVACY_CONTRACT,
@@ -200,13 +197,10 @@ test('source-material privacy chain ties together existing focused contracts', (
   assert.deepEqual(
     [
       SETTINGS_FILES_SOURCE_MATERIAL_HANDOFF_ITEM_IDS.length,
-      ACTIVITY_SOURCE_MATERIAL_PICKER_HANDOFF_ITEM_IDS.length,
-      ACTIVITY_AI_DRAFT_BOUNDARY_HANDOFF_ITEM_IDS.length,
-      ACTIVITY_SOURCE_EXTRACTION_ASSIST_HANDOFF_ITEM_IDS.length,
       PUBLIC_ASSIGNMENT_ACCESS_HANDOFF_ITEM_IDS.length,
       PUBLIC_ASSIGNMENT_UNAVAILABLE_ACCESS_HANDOFF_ITEM_IDS.length,
     ],
-    [30, 30, 30, 30, 30, 30]
+    [30, 30, 30]
   );
 });
 

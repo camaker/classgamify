@@ -140,7 +140,7 @@ test('scored attempt result chain summarizes each post-submit boundary', () => {
       ['accepted-alternatives-consistency', 'Shared formatting'],
       ['anonymous-token-guard', 'Raw token hidden'],
       ['source-material-guard', 'Storage keys hidden'],
-      ['attempt-review-card-handoff-boundary', '30 review card slices'],
+      ['attempt-review-card-handoff-boundary', 'Visible review cards'],
     ]
   );
   assert.equal(

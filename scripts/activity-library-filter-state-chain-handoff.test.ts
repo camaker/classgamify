@@ -20,11 +20,6 @@ import {
   buildActivityLibraryValidatedSearch,
   normalizeActivityLibrarySearch,
 } from '@/activities/library-filters';
-import {
-  ACTIVITY_LIBRARY_FILTER_HANDOFF_ITEM_IDS,
-  ACTIVITY_LIBRARY_PAGE_HANDOFF_ITEM_IDS,
-  buildActivityLibrarySearchPanelView,
-} from '@/activities/library-view';
 
 const PRODUCT_SOURCE = readFileSync('docs/product.md', 'utf8');
 const TEST_CATALOG_SOURCE = readFileSync('tests/e2e/TEST-CATALOG.md', 'utf8');
@@ -57,7 +52,6 @@ test('activity library filter-state chain exposes 30 safe slices', () => {
   assert.deepEqual(itemIds, [
     ...ACTIVITY_LIBRARY_FILTER_STATE_CHAIN_HANDOFF_ITEM_IDS,
   ]);
-  assert.deepEqual(itemIds, [...ACTIVITY_LIBRARY_FILTER_HANDOFF_ITEM_IDS]);
   assert.equal(handoffView.title, 'Activity library filter-state chain');
   assert.match(
     handoffView.description,
@@ -159,12 +153,8 @@ test('activity library filter-state chain is backed by adjacent gates', () => {
   }
 
   assert.deepEqual(
-    [
-      ACTIVITY_LIBRARY_FILTER_HANDOFF_ITEM_IDS.length,
-      ACTIVITY_LIBRARY_PAGE_HANDOFF_ITEM_IDS.length,
-      ACTIVITY_SOURCE_MATERIAL_SUMMARY_CHAIN_HANDOFF_ITEM_IDS.length,
-    ],
-    [30, 30, 30]
+    [ACTIVITY_SOURCE_MATERIAL_SUMMARY_CHAIN_HANDOFF_ITEM_IDS.length],
+    [30]
   );
 });
 
@@ -280,10 +270,10 @@ test('activity library route component and API share filter state', () => {
     /validateSearch: buildActivityLibraryValidatedSearch[\s\S]*buildActivityLibraryFilterRouteSearch[\s\S]*buildActivityLibraryPageRouteSearch[\s\S]*buildActivityLibraryRouteSearch/,
     'The dashboard route should validate and build activity-library filter route state through shared helpers.'
   );
-  assert.match(
+  assert.doesNotMatch(
     COMPONENT_SOURCE,
-    /data-handoff="activity-library-filter-state"[\s\S]*data-handoff-scope=\{handoffView\.privacy\.scope\}[\s\S]*handoffView\.itemViews\.map/,
-    'The activity library search component should render the hidden filter-state handoff.'
+    /data-handoff/,
+    'The activity library search should render no hidden audit output.'
   );
   assert.match(
     FILTER_SOURCE,
@@ -299,36 +289,6 @@ test('activity library route component and API share filter state', () => {
     LIBRARY_QUERY_SOURCE,
     /const filters: SQL\[\] = \[eq\(activity\.ownerId, userId\)\][\s\S]*sqlLikeContains\(activity\.title, normalizedSearch\)[\s\S]*sqlLikeContains\(activity\.description, normalizedSearch\)[\s\S]*sqlLikeContains\(activity\.templateType, normalizedSearch\)/,
     'Activity library queries should keep search fields behind owner scope.'
-  );
-});
-
-test('activity library filter-state chain matches the visible handoff privacy', () => {
-  const filterHandoffView = buildActivityLibrarySearchPanelView({
-    isLoading: false,
-    search: '  Ｕｎｉｔ   １  ',
-    source: 'worksheet',
-    status: 'archived',
-    template: 'quiz',
-    total: 7,
-  }).filterHandoffView;
-
-  assert.deepEqual(
-    filterHandoffView.itemViews.map((item) => item.id),
-    [...ACTIVITY_LIBRARY_FILTER_STATE_CHAIN_HANDOFF_ITEM_IDS]
-  );
-  assert.equal(filterHandoffView.privacy.exposesActivityIds, false);
-  assert.equal(filterHandoffView.privacy.exposesAnswerText, false);
-  assert.equal(filterHandoffView.privacy.exposesPrivateActivityContent, false);
-  assert.equal(filterHandoffView.privacy.exposesSourceMaterialFileIds, false);
-  assert.equal(
-    filterHandoffView.privacy.exposesSourceMaterialStorageKeys,
-    false
-  );
-  assert.equal(filterHandoffView.privacy.exposesStudentData, false);
-  assert.equal(filterHandoffView.privacy.routesThroughValidatedSearch, true);
-  assert.equal(filterHandoffView.privacy.sharesRulesWithListApi, true);
-  assertNoPrivateActivityLibraryFilterStateText(
-    JSON.stringify(filterHandoffView)
   );
 });
 

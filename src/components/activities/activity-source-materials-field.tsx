@@ -1,9 +1,7 @@
 import {
   addActivitySourceMaterialPickerItem,
-  buildActivitySourceMaterialPickerHandoffView,
   buildActivitySourceMaterialPickerView,
   removeActivitySourceMaterialPickerItem,
-  type ActivitySourceMaterialPickerHandoffView,
   type ActivitySourceMaterialPickerItemView,
   type ActivitySourceMaterialPickerStatus,
   type ActivitySourceMaterialPickerView,
@@ -68,10 +66,6 @@ export function ActivitySourceMaterialsField({
       }),
     [canLoadFiles, data?.items, isError, isLoading, selectedMaterials]
   );
-  const handoffView = useMemo(
-    () => buildActivitySourceMaterialPickerHandoffView(pickerView),
-    [pickerView]
-  );
 
   function addMaterial(itemView: ActivitySourceMaterialPickerItemView) {
     onChange(
@@ -109,7 +103,6 @@ export function ActivitySourceMaterialsField({
       </div>
 
       <div className="mt-4 grid gap-4">
-        <ActivitySourceMaterialPickerHandoff handoffView={handoffView} />
         <ActivitySourceMaterialAttachedSection
           actionSlot={attachedSummaryActionSlot}
           pickerView={pickerView}
@@ -120,63 +113,6 @@ export function ActivitySourceMaterialsField({
           onAdd={addMaterial}
         />
       </div>
-    </div>
-  );
-}
-
-function ActivitySourceMaterialPickerHandoff({
-  handoffView,
-}: {
-  handoffView: ActivitySourceMaterialPickerHandoffView;
-}) {
-  const titleId = 'activity-source-material-picker-handoff-title';
-  const descriptionId = 'activity-source-material-picker-handoff-description';
-
-  return (
-    <section
-      aria-describedby={descriptionId}
-      aria-labelledby={titleId}
-      className="sr-only"
-      data-handoff="activity-source-material-picker"
-      data-handoff-scope={handoffView.privacy.scope}
-    >
-      <h4 id={titleId}>{handoffView.title}</h4>
-      <p id={descriptionId}>{handoffView.description}</p>
-      <dl>
-        {handoffView.itemViews.map((itemView) => (
-          <ActivitySourceMaterialPickerHandoffItem
-            itemView={itemView}
-            key={itemView.id}
-          />
-        ))}
-      </dl>
-    </section>
-  );
-}
-
-function ActivitySourceMaterialPickerHandoffItem({
-  itemView,
-}: {
-  itemView: ActivitySourceMaterialPickerHandoffView['itemViews'][number];
-}) {
-  const labelId = `activity-source-material-picker-handoff-${itemView.id}-label`;
-  const valueId = `activity-source-material-picker-handoff-${itemView.id}-value`;
-  const descriptionId = `activity-source-material-picker-handoff-${itemView.id}-description`;
-
-  return (
-    <div data-handoff-item={itemView.id}>
-      <dt id={labelId}>{itemView.label}</dt>
-      <dd>
-        <output
-          aria-describedby={descriptionId}
-          aria-label={itemView.ariaLabel}
-          aria-labelledby={`${labelId} ${valueId}`}
-          id={valueId}
-        >
-          {itemView.value}
-        </output>
-        <span id={descriptionId}>{itemView.description}</span>
-      </dd>
     </div>
   );
 }

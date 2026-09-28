@@ -359,8 +359,8 @@ function getScoredAttemptResultChainHandoffItem(
     case 'attempt-review-card-handoff-boundary':
       return item(
         id,
-        'Attempt review card handoff boundary',
-        '30 review card slices',
+        'Answer review cards',
+        'Visible review cards',
         'Student display, submission time, score and answer summaries, snapshot-ordered answer cards, statuses, accepted alternatives, explanations, review filters, copy/export scope, and privacy guards stay aligned.'
       );
   }

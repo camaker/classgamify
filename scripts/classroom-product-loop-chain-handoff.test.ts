@@ -13,7 +13,6 @@ import {
   ACTIVITY_AUTHORING_LIBRARY_CHAIN_HANDOFF_ITEM_IDS,
   ACTIVITY_AUTHORING_LIBRARY_CHAIN_SOURCE_FILES,
 } from '@/activities/authoring-library-chain';
-import { ACTIVITY_LIBRARY_PAGE_HANDOFF_ITEM_IDS } from '@/activities/library-view';
 import {
   ACTIVITY_LIFECYCLE_GOVERNANCE_CHAIN_HANDOFF_ITEM_IDS,
   ACTIVITY_LIFECYCLE_GOVERNANCE_CHAIN_SOURCE_FILES,
@@ -438,7 +437,7 @@ test('classroom product loop chain summarizes activity to results flow', () => {
         '30 source context slices',
       ],
       ['classroom-data-lifecycle-boundary', '30 data slices'],
-      ['activity-library-page-boundary', '30 library slices'],
+      ['activity-library-page-boundary', 'Visible library page'],
       ['activity-authoring-library-boundary', '30 authoring slices'],
       ['template-roadmap-capability-boundary', '30 roadmap slices'],
       ['ai-enhancement-lifecycle-boundary', 'Policy-to-publish review'],
@@ -490,7 +489,6 @@ test('classroom product loop chain is backed by adjacent focused gates', () => {
       TEACHER_WORKSPACE_OPERATIONS_CHAIN_SOURCE_FILES.length,
       CLASSROOM_DATA_LIFECYCLE_CHAIN_HANDOFF_ITEM_IDS.length,
       CLASSROOM_DATA_LIFECYCLE_CHAIN_SOURCE_FILES.length,
-      ACTIVITY_LIBRARY_PAGE_HANDOFF_ITEM_IDS.length,
       ACTIVITY_AUTHORING_LIBRARY_CHAIN_HANDOFF_ITEM_IDS.length,
       ACTIVITY_AUTHORING_LIBRARY_CHAIN_SOURCE_FILES.length,
       ACTIVITY_LIFECYCLE_GOVERNANCE_CHAIN_HANDOFF_ITEM_IDS.length,
@@ -541,7 +539,7 @@ test('classroom product loop chain is backed by adjacent focused gates', () => {
       PUBLIC_DISCOVERY_INDEXING_CHAIN_SOURCE_FILES.length,
       CLASSROOM_TRUST_COMMUNICATION_CHAIN_HANDOFF_ITEM_IDS.length,
     ],
-    Array.from({ length: 56 }, () => 30)
+    Array.from({ length: 55 }, () => 30)
   );
 });
 
