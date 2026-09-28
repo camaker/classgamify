@@ -11,13 +11,7 @@ import {
 import { AUTH_ERROR_RECOVERY_STEP_IDS } from '@/auth/error-recovery';
 import { AUTH_WORKSPACE_HANDOFF_ITEM_IDS } from '@/auth/workspace-boundary';
 import { Routes } from '@/lib/routes';
-import { PAYMENT_STATUS_HANDOFF_ITEM_IDS } from '@/payment/payment-status-view';
 import { ADMIN_USERS_HANDOFF_ITEM_IDS } from '@/admin/users-view';
-import { SETTINGS_ACCOUNT_WORKSPACE_HANDOFF_ITEM_IDS } from '@/settings/account-handoff';
-import { SETTINGS_BILLING_WORKSPACE_HANDOFF_ITEM_IDS } from '@/settings/billing-view';
-import { SETTINGS_FILES_SOURCE_MATERIAL_HANDOFF_ITEM_IDS } from '@/settings/files-view';
-import { SETTINGS_NOTIFICATION_UPDATE_HANDOFF_ITEM_IDS } from '@/settings/notifications-view';
-import { SETTINGS_SECURITY_WORKSPACE_HANDOFF_ITEM_IDS } from '@/settings/security-handoff';
 import { STORAGE_FILE_ACCESS_ITEM_IDS } from '@/storage/file-access';
 
 const PRODUCT_SOURCE = readFileSync('docs/product.md', 'utf8');
@@ -43,14 +37,6 @@ const ADMIN_MIDDLEWARE_SOURCE = readFileSync(
   'src/middlewares/admin-middleware.ts',
   'utf8'
 );
-const SETTINGS_ACCOUNT_SOURCE = readFileSync(
-  'src/settings/account-handoff.ts',
-  'utf8'
-);
-const SETTINGS_SECURITY_SOURCE = readFileSync(
-  'src/settings/security-handoff.ts',
-  'utf8'
-);
 const PROFILE_ROUTE_SOURCE = readFileSync(
   'src/routes/settings/profile.tsx',
   'utf8'
@@ -73,18 +59,8 @@ const ADMIN_USERS_ROUTE_SOURCE = readFileSync(
   'src/routes/admin/users.tsx',
   'utf8'
 );
-const BILLING_SOURCE = readFileSync('src/settings/billing-view.ts', 'utf8');
-const NOTIFICATION_SOURCE = readFileSync(
-  'src/settings/notifications-view.ts',
-  'utf8'
-);
-const FILES_SOURCE = readFileSync('src/settings/files-view.ts', 'utf8');
 const STORAGE_FILE_ACCESS_SOURCE = readFileSync(
   'src/storage/file-access.ts',
-  'utf8'
-);
-const PAYMENT_STATUS_SOURCE = readFileSync(
-  'src/payment/payment-status-view.ts',
   'utf8'
 );
 const WEBSITE_CONFIG_SOURCE = readFileSync('src/config/website.ts', 'utf8');
@@ -225,16 +201,10 @@ test('account governance lifecycle chain is backed by focused governance gates',
   assert.deepEqual(
     [
       AUTH_WORKSPACE_HANDOFF_ITEM_IDS.length,
-      SETTINGS_ACCOUNT_WORKSPACE_HANDOFF_ITEM_IDS.length,
-      SETTINGS_SECURITY_WORKSPACE_HANDOFF_ITEM_IDS.length,
       ADMIN_USERS_HANDOFF_ITEM_IDS.length,
-      SETTINGS_BILLING_WORKSPACE_HANDOFF_ITEM_IDS.length,
-      PAYMENT_STATUS_HANDOFF_ITEM_IDS.length,
-      SETTINGS_NOTIFICATION_UPDATE_HANDOFF_ITEM_IDS.length,
-      SETTINGS_FILES_SOURCE_MATERIAL_HANDOFF_ITEM_IDS.length,
       STORAGE_FILE_ACCESS_ITEM_IDS.length,
     ],
-    Array.from({ length: 9 }, () => 30)
+    Array.from({ length: 3 }, () => 30)
   );
   assert.ok(
     AUTH_ERROR_RECOVERY_STEP_IDS.length >= 3,
@@ -327,16 +297,6 @@ test('account governance lifecycle sources preserve auth and account settings bo
     'Auth middleware should require session and verified teacher email.'
   );
   assert.match(
-    SETTINGS_ACCOUNT_SOURCE,
-    /deletesWorkspaceDataWithoutExplicitAction: false[\s\S]*changesActivityContent: false[\s\S]*changesPublicAssignmentLinks: false[\s\S]*exposesTeacherEmail: false/,
-    'Account settings should avoid silent data deletion and classroom mutation.'
-  );
-  assert.match(
-    SETTINGS_SECURITY_SOURCE,
-    /deletesWorkspaceDataWithoutExplicitAction: false[\s\S]*exposesPasswordValues: false[\s\S]*requiresAuthenticatedTeacher: true/,
-    'Security settings should protect password values and require an authenticated teacher.'
-  );
-  assert.match(
     PROFILE_ROUTE_SOURCE,
     /ProfileWorkspaceSummary[\s\S]*UpdateNameCard[\s\S]*UpdateAvatarCard/,
     'Profile route should expose only teacher identity update cards.'
@@ -380,31 +340,6 @@ test('account governance lifecycle sources preserve admin, storage, and provider
     'Admin users route should render the governed user page view model.'
   );
   assert.match(
-    BILLING_SOURCE,
-    /changesActivityContent: false[\s\S]*changesAssignmentLinks: false[\s\S]*exposesPaymentProviderSecrets: false[\s\S]*hostedBillingOnly: true/,
-    'Billing should preserve hosted provider boundaries without classroom data mutation.'
-  );
-  assert.match(
-    PAYMENT_STATUS_SOURCE,
-    /PAYMENT_STATUS_HANDOFF_ITEM_IDS[\s\S]*'hosted-checkout'[\s\S]*'completion-check'[\s\S]*'current-plan-cache'[\s\S]*'callback-normalization'[\s\S]*'provider-secret-boundary'[\s\S]*'raw-session-boundary'/,
-    'Payment callback handoff should preserve hosted checkout status and provider-session privacy boundaries.'
-  );
-  assert.match(
-    PAYMENT_STATUS_SOURCE,
-    /hostedCheckoutStatusOnly: true[\s\S]*refreshesPlanCacheOnlyAfterSuccess: true[\s\S]*scope: 'teacher-payment-callback'/,
-    'Payment callback privacy contract should stay scoped to teacher payment callbacks.'
-  );
-  assert.match(
-    NOTIFICATION_SOURCE,
-    /updatesTeacherProductEmailOnly: true[\s\S]*notifiesLearners: false[\s\S]*sendsStudentAssignmentReminders: false/,
-    'Notification settings should remain teacher product-email preferences.'
-  );
-  assert.match(
-    FILES_SOURCE,
-    /(?=[\s\S]*tracksOwnerScopedUserFiles: true)(?=[\s\S]*storageKeysStayServerSide: true)(?=[\s\S]*publicPayloadIncludesFileList: false)/,
-    'Files settings should keep source-material user files owner scoped.'
-  );
-  assert.match(
     STORAGE_FILE_ACCESS_SOURCE,
     /(?=[\s\S]*requiresOwnerForPrivateUserFiles: true)(?=[\s\S]*exposesStorageKeysToStudentPayloads: false)(?=[\s\S]*returnsNoStoreForPrivateFiles: true)/,
     'Storage file access should require owner checks and keep private files no-store.'
@@ -424,8 +359,8 @@ test('account governance lifecycle sources preserve admin, storage, and provider
 test('account governance lifecycle chain focused gate is documented', () => {
   assert.match(
     PRODUCT_SOURCE,
-    /account governance lifecycle[\s\S]*security workspace's 30[\s\S]*credential controls[\s\S]*explicit account deletion[\s\S]*must not expose passwords[\s\S]*must not silently mutate or delete classroom records/,
-    'docs/product.md should describe the security workspace handoff and classroom-record boundary.'
+    /account governance lifecycle[\s\S]*security workspace[\s\S]*credential controls[\s\S]*explicit account deletion[\s\S]*must not expose passwords[\s\S]*must not silently mutate or delete classroom records/,
+    'docs/product.md should describe the security workspace and classroom-record boundary.'
   );
   assert.match(
     TEST_CATALOG_SOURCE,
@@ -434,7 +369,7 @@ test('account governance lifecycle chain focused gate is documented', () => {
   );
   assert.match(
     TEST_CATALOG_SOURCE.replace(/\s+/g, ' '),
-    /auth session and email verification[\s\S]*profile and security settings[\s\S]*30-slice security workspace handoff boundary[\s\S]*explicit account deletion[\s\S]*admin user governance[\s\S]*billing\/payment callback\/notification\/files boundaries[\s\S]*storage owner checks[\s\S]*provider-secret and student-data guards/,
+    /auth session and email verification[\s\S]*profile and security settings[\s\S]*security workspace summary[\s\S]*explicit account deletion[\s\S]*admin user governance[\s\S]*billing\/payment callback\/notification\/files boundaries[\s\S]*storage owner checks[\s\S]*provider-secret and student-data guards/,
     'TEST-CATALOG should describe the full account governance lifecycle chain scope.'
   );
 });

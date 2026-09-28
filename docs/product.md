@@ -111,15 +111,15 @@ status, polling, safe callback normalization, plan-cache refresh, provider
 session privacy, and retry/timeout recovery should stay inside the teacher
 workspace boundary without mutating activities, assignment links, snapshots,
 attempts, results, or source-material records.
-The account governance lifecycle should also carry the security workspace's 30
-slices for authenticated access, credential controls, linked providers and
-sessions, explicit account deletion, activity/source-material/assignment/result
-protections, billing access, owner scope, secret guards, legacy-copy guards, and
-privacy. Security handoffs must not expose passwords, teacher email, auth
-secrets, provider errors, raw anonymous tokens, student identifiers, or storage
-keys, and must not silently mutate or delete classroom records.
-The active surface product boundary should absorb both the account governance
-lifecycle and payment callback handoff contracts so current account, contact,
+The account governance lifecycle should also cover the security workspace:
+authenticated access, credential controls, linked providers and sessions,
+explicit account deletion, activity/source-material/assignment/result
+protections, billing access, and owner scope. Security settings
+must not expose passwords, teacher email, auth secrets, provider errors, raw
+anonymous tokens, student identifiers, or storage keys, and
+must not silently mutate or delete classroom records.
+The active surface product boundary should absorb the account governance
+lifecycle and the payment callback flow so current account, contact,
 billing, mail, notification, and developer configuration surfaces stay aligned
 with the same ClassGamify teacher-workspace model.
 Transactional email surfaces follow the same lifecycle boundary: verification,
@@ -134,10 +134,10 @@ Registration must still render the real verification template and complete the
 real verification/automatic-sign-in link, while password recovery must render
 the real reset template. The outbox route is read/clear only, returns 404 in
 production or normal development, and must never replace configured providers.
-The transactional mail lifecycle should explicitly carry the 30-slice teacher
-notification update handoff across subscription status, pause controls,
-template and worksheet updates, assignment review context, provider visibility,
-and email-channel scope. It must not mutate activities, assignment snapshots,
+The transactional mail lifecycle should stay aligned with teacher notification
+updates across subscription status, pause controls, template and worksheet
+updates, assignment review context, provider visibility, and email-channel
+scope. It must not mutate activities, assignment snapshots,
 attempts, result exports, or public links, read source-material files, expose
 recipient or student data, or send learner assignment reminders.
 `src/config/classroom-trust-communication-chain.ts` absorbs that

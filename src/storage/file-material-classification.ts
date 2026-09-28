@@ -10,7 +10,7 @@ import {
   formatUserFileMaterialKind,
 } from '@/storage/file-material-labels';
 
-export type UserFileMaterialClassificationInput = {
+type UserFileMaterialClassificationInput = {
   contentType?: string | null;
   filename?: string | null;
   originalName?: string | null;

@@ -59,7 +59,8 @@ test.describe('settings profile', () => {
         getLocaleMessage(
           'en',
           'settings_profile_workspace_summary_assignments_label'
-        )
+        ),
+        { exact: true }
       )
     ).toBeVisible();
     await expect(
@@ -67,7 +68,8 @@ test.describe('settings profile', () => {
         getLocaleMessage(
           'en',
           'settings_profile_workspace_summary_results_label'
-        )
+        ),
+        { exact: true }
       )
     ).toBeVisible();
 
@@ -104,7 +106,8 @@ test.describe('settings profile', () => {
         getLocaleMessage(
           'zh',
           'settings_profile_workspace_summary_student_label'
-        )
+        ),
+        { exact: true }
       )
     ).toBeVisible();
     await expect(

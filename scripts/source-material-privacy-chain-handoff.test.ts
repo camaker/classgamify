@@ -14,7 +14,6 @@ import {
 } from '@/activities/material-references';
 import { PUBLIC_ASSIGNMENT_ACCESS_HANDOFF_ITEM_IDS } from '@/assignments/public';
 import { PUBLIC_ASSIGNMENT_UNAVAILABLE_ACCESS_HANDOFF_ITEM_IDS } from '@/assignments/unavailable-access';
-import { SETTINGS_FILES_SOURCE_MATERIAL_HANDOFF_ITEM_IDS } from '@/settings/files-view';
 import {
   STORAGE_FILE_ACCESS_ITEM_IDS,
   STORAGE_FILE_ACCESS_PRIVACY_CONTRACT,
@@ -38,10 +37,6 @@ const MATERIAL_REFERENCES_SOURCE = readFileSync(
   'utf8'
 );
 const VALIDATION_SOURCE = readFileSync('src/activities/validation.ts', 'utf8');
-const SETTINGS_FILES_SOURCE = readFileSync(
-  'src/settings/files-view.ts',
-  'utf8'
-);
 const STORAGE_UPLOAD_SOURCE = readFileSync(
   'src/storage/upload-readiness.ts',
   'utf8'
@@ -196,11 +191,10 @@ test('source-material privacy chain ties together existing focused contracts', (
   });
   assert.deepEqual(
     [
-      SETTINGS_FILES_SOURCE_MATERIAL_HANDOFF_ITEM_IDS.length,
       PUBLIC_ASSIGNMENT_ACCESS_HANDOFF_ITEM_IDS.length,
       PUBLIC_ASSIGNMENT_UNAVAILABLE_ACCESS_HANDOFF_ITEM_IDS.length,
     ],
-    [30, 30, 30]
+    [30, 30]
   );
 });
 
@@ -244,10 +238,6 @@ test('public, student-runtime, AI, and storage sources keep private material dat
   assert.match(
     VALIDATION_SOURCE,
     /sourceMaterials:\s*normalizeActivityMaterialReferences\(input\.sourceMaterials\)/
-  );
-  assert.match(
-    SETTINGS_FILES_SOURCE,
-    /publicPayloadIncludesFileList: false[\s\S]*storageKeysStayServerSide: true/
   );
   assert.match(
     STORAGE_UPLOAD_SOURCE,

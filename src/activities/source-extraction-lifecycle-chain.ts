@@ -55,7 +55,7 @@ export const SOURCE_EXTRACTION_LIFECYCLE_CHAIN_SOURCE_FILES = [
   'src/components/activities/activity-source-materials-summary.tsx',
   'src/components/activities/activity-source-materials-field.tsx',
   'src/components/activities/activity-ai-draft-panel.tsx',
-  'src/components/settings/files/files-source-material-handoff-panel.tsx',
+  'src/components/settings/files/files-table.tsx',
   'src/settings/files-view.ts',
   'src/assignments/public.ts',
   'src/assignments/student-runtime-item-list.ts',

@@ -37,11 +37,6 @@ const INTERNAL_PRODUCT_DOMAIN_HELPERS = [
   },
   {
     declaration: 'function',
-    filePath: 'src/dashboard/overview.ts',
-    name: 'buildDashboardOverviewHandoffView',
-  },
-  {
-    declaration: 'function',
     filePath: 'src/payment/billing-view.ts',
     name: 'resolveSettingsBillingPlan',
   },
@@ -445,8 +440,8 @@ const RESULT_VIEW_REEXPORT_BOUNDARIES = [
   },
 ] satisfies ReExportBoundary[];
 
-test('product-domain export surface keeps 65 helpers and types internal', () => {
-  assert.equal(INTERNAL_PRODUCT_DOMAIN_HELPERS.length, 65);
+test('product-domain export surface keeps 64 helpers and types internal', () => {
+  assert.equal(INTERNAL_PRODUCT_DOMAIN_HELPERS.length, 64);
 
   for (const helper of INTERNAL_PRODUCT_DOMAIN_HELPERS) {
     const source = readFileSync(helper.filePath, 'utf8');

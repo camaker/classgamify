@@ -621,7 +621,6 @@ import {
   buildDashboardOverviewStarterPreview,
   buildDashboardCoreLoopReadinessView,
   dashboardOverviewPageCopy,
-  DASHBOARD_OVERVIEW_HANDOFF_ITEM_IDS,
   formatDashboardMetricValue,
   formatDashboardTemplateCoverageValue,
   getDashboardOverviewActionCards,
@@ -656,38 +655,23 @@ import { LEGACY_PUBLIC_ROUTE_HANDOFF_ITEM_IDS } from '@/seo/legacy-public-route-
 import {
   buildPaymentStatusView,
   getInitialPaymentConfirmationStatus,
-  PAYMENT_STATUS_HANDOFF_ITEM_IDS,
 } from '@/payment/payment-status-view';
 import { buildSettingsBillingCardViewModel } from '@/payment/billing-view';
 import {
-  buildSettingsAccountWorkspaceHandoffView,
-  SETTINGS_ACCOUNT_WORKSPACE_HANDOFF_ITEM_IDS,
-} from '@/settings/account-handoff';
-import {
-  SETTINGS_BILLING_WORKSPACE_HANDOFF_ITEM_IDS,
   buildSettingsBillingPageViewModel,
-  buildSettingsBillingWorkspaceHandoffView,
   buildSettingsBillingWorkspaceSummaryView,
   buildSettingsPaymentPageViewModel,
   normalizeSettingsPaymentCallback,
 } from '@/settings/billing-view';
 import {
   buildSettingsFilesPageViewModel,
-  buildSettingsFilesSourceMaterialHandoffView,
   buildSettingsFilesWorkspaceSummaryView,
-  SETTINGS_FILES_SOURCE_MATERIAL_HANDOFF_ITEM_IDS,
 } from '@/settings/files-view';
-import {
-  SETTINGS_FILES_MATERIAL_CLASSIFICATION_HANDOFF_ITEM_IDS,
-} from '@/settings/files-material-classification-view';
 import {
   buildSettingsNotificationNewsletterCardView,
   buildSettingsNotificationPageViewModel,
-  buildSettingsNotificationUpdateHandoffView,
   buildSettingsNotificationWorkspaceSummaryView,
-  SETTINGS_NOTIFICATION_UPDATE_HANDOFF_ITEM_IDS,
 } from '@/settings/notifications-view';
-import { SETTINGS_SECURITY_WORKSPACE_HANDOFF_ITEM_IDS } from '@/settings/security-handoff';
 import type {
   PricePlan,
   Subscription,
@@ -2241,10 +2225,9 @@ assert.deepEqual(activeSurfaceProductBoundaryView.privacy, {
 assert.deepEqual(
   [
     ACCOUNT_GOVERNANCE_LIFECYCLE_CHAIN_HANDOFF_ITEM_IDS.length,
-    PAYMENT_STATUS_HANDOFF_ITEM_IDS.length,
   ],
-  [30, 30],
-  'Active surface product boundary should absorb account governance and payment callback handoff contracts.'
+  [30],
+  'Active surface product boundary should absorb account governance handoff contracts.'
 );
 assert.deepEqual(
   activeSurfaceProductBoundaryView.itemViews.map((item) => [
@@ -2417,45 +2400,9 @@ const settingsProfileViewSource = readFileSync(
   'src/settings/profile-view.ts',
   'utf8'
 );
-const settingsAccountHandoffSource = readFileSync(
-  'src/settings/account-handoff.ts',
-  'utf8'
-);
 const profileWorkspaceSummarySource = readFileSync(
   'src/components/settings/profile/profile-workspace-summary.tsx',
   'utf8'
-);
-assert.match(
-  settingsAccountHandoffSource,
-  /export const SETTINGS_ACCOUNT_WORKSPACE_HANDOFF_ITEM_IDS = \[(?=[\s\S]*'account-scope')(?=[\s\S]*'profile-page')(?=[\s\S]*'security-page')(?=[\s\S]*'account-access')(?=[\s\S]*'profile-display-name')(?=[\s\S]*'profile-avatar')(?=[\s\S]*'activity-author-identity')(?=[\s\S]*'assignment-handoff-identity')(?=[\s\S]*'student-recognition')(?=[\s\S]*'result-review-identity')(?=[\s\S]*'credential-login-gate')(?=[\s\S]*'password-card')(?=[\s\S]*'password-update-action')(?=[\s\S]*'password-reset-action')(?=[\s\S]*'account-deletion-gate')(?=[\s\S]*'account-delete-action')(?=[\s\S]*'delete-confirmation-boundary')(?=[\s\S]*'session-boundary')(?=[\s\S]*'owner-scope')(?=[\s\S]*'source-material-boundary')(?=[\s\S]*'assignment-link-boundary')(?=[\s\S]*'student-result-boundary')(?=[\s\S]*'public-runner-boundary')(?=[\s\S]*'auth-provider-boundary')(?=[\s\S]*'email-visibility')(?=[\s\S]*'raw-secret-guard')(?=[\s\S]*'student-token-guard')(?=[\s\S]*'storage-key-guard')(?=[\s\S]*'legacy-copy-guard')(?=[\s\S]*'privacy-guard')/,
-  'Account settings handoff should expose stable 30-slice teacher-account item ids.'
-);
-assert.match(
-  settingsAccountHandoffSource,
-  /export type SettingsAccountWorkspaceHandoffPrivacyContract = \{[\s\S]*changesActivityContent: false;[\s\S]*changesPublicAssignmentLinks: false;[\s\S]*deletesWorkspaceDataWithoutExplicitAction: false;[\s\S]*exposesAuthSecrets: false;[\s\S]*exposesRawAnonymousToken: false;[\s\S]*exposesSourceMaterialStorageKeys: false;[\s\S]*exposesStudentIdentifiers: false;[\s\S]*exposesTeacherEmail: false;[\s\S]*modifiesAssignmentSnapshots: false;[\s\S]*modifiesStudentAttempts: false;[\s\S]*scope: 'teacher-account-settings';/,
-  'Account settings handoff should publish explicit privacy and classroom account behavior flags.'
-);
-const accountSettingsHandoffView = buildSettingsAccountWorkspaceHandoffView({
-  credentialLoginEnabled: true,
-  deleteAccountEnabled: false,
-  page: 'security',
-});
-assert.deepEqual(
-  accountSettingsHandoffView.itemViews.map((item) => item.id),
-  [...SETTINGS_ACCOUNT_WORKSPACE_HANDOFF_ITEM_IDS],
-  'Account settings handoff should preserve the exported item order.'
-);
-assert.equal(
-  accountSettingsHandoffView.itemViews.length,
-  30,
-  'Account settings handoff should expose exactly 30 product/architecture slices.'
-);
-assert.equal(
-  JSON.stringify(accountSettingsHandoffView).includes(
-    'teacher-private@example.test'
-  ),
-  false,
-  'Account settings handoff should not expose teacher email values.'
 );
 assert.match(
   settingsProfileViewSource,
@@ -2471,11 +2418,6 @@ assert.match(
   settingsProfileViewSource,
   /settings_profile_workspace_summary_title[\s\S]*settings_profile_workspace_summary_description[\s\S]*settings_profile_workspace_summary_activities_description[\s\S]*settings_profile_workspace_summary_assignments_description[\s\S]*settings_profile_workspace_summary_student_description[\s\S]*settings_profile_workspace_summary_results_description/,
   'Profile settings view model should prepare localized teacher identity scope copy.'
-);
-assert.match(
-  settingsProfileViewSource,
-  /buildSettingsAccountWorkspaceHandoffView\(\{[\s\S]*page: 'profile'/,
-  'Profile settings view model should attach the account workspace handoff to the summary view.'
 );
 assert.match(
   settingsProfileRouteProductSource,
@@ -2496,11 +2438,6 @@ assert.match(
   profileWorkspaceSummarySource,
   /view\.itemViews\.map\(\(itemView\) =>[\s\S]*key=\{itemView\.id\}[\s\S]*itemView\.label[\s\S]*itemView\.description/,
   'Profile workspace summary component should render prepared summary items keyed by stable ids.'
-);
-assert.match(
-  profileWorkspaceSummarySource,
-  /SettingsAccountWorkspaceHandoffItemView[\s\S]*SettingsAccountWorkspaceHandoffView[\s\S]*<AccountWorkspaceHandoff handoffView=\{view\.handoffView\} \/>[\s\S]*function AccountWorkspaceHandoff[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*aria-labelledby=\{titleId\}[\s\S]*data-handoff="settings-account-workspace"[\s\S]*data-handoff-scope=\{handoffView\.privacy\.scope\}[\s\S]*id=\{titleId\}[\s\S]*handoffView\.title[\s\S]*id=\{descriptionId\}[\s\S]*handoffView\.description[\s\S]*handoffView\.itemViews\.map[\s\S]*function AccountWorkspaceHandoffItem[\s\S]*const labelId = `settings-account-workspace-handoff-\$\{itemView\.id\}-label`[\s\S]*const valueId = `settings-account-workspace-handoff-\$\{itemView\.id\}-value`[\s\S]*const descriptionId = `settings-account-workspace-handoff-\$\{itemView\.id\}-description`[\s\S]*data-handoff-item=\{itemView\.id\}[\s\S]*id=\{labelId\}[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*aria-label=\{itemView\.ariaLabel\}[\s\S]*aria-labelledby=\{`\$\{labelId\} \$\{valueId\}`\}[\s\S]*id=\{valueId\}[\s\S]*id=\{descriptionId\}/,
-  'Profile workspace summary component should render prepared account handoff marker, privacy scope, item ids, and stable label/value/description relationships.'
 );
 assert.doesNotMatch(
   profileWorkspaceSummarySource,
@@ -2571,11 +2508,6 @@ assert.match(
   'Security settings view model should prepare localized workspace boundary copy.'
 );
 assert.match(
-  settingsSecurityViewSource,
-  /buildSettingsAccountWorkspaceHandoffView\(\{[\s\S]*credentialLoginEnabled[\s\S]*deleteAccountEnabled[\s\S]*page: 'security'/,
-  'Security settings view model should attach the account workspace handoff with config-aware gates.'
-);
-assert.match(
   settingsSecurityRouteProductSource,
   /const pageView = buildSettingsSecurityPageViewModel\(\);[\s\S]*breadcrumbs=\{pageView\.breadcrumbs\}[\s\S]*title=\{pageView\.title\}[\s\S]*description=\{pageView\.description\}/,
   'Security settings route should consume the settings security page view model.'
@@ -2604,11 +2536,6 @@ assert.match(
   securityWorkspaceSummarySource,
   /view\.capabilityViews\.map\(\(capabilityView\) =>[\s\S]*key=\{capabilityView\.id\}[\s\S]*function SecurityCapabilityItem[\s\S]*capabilityView\.state[\s\S]*capabilityView\.value[\s\S]*capabilityView\.description/,
   'Security workspace summary component should render prepared capability views keyed by stable ids.'
-);
-assert.match(
-  securityWorkspaceSummarySource,
-  /SettingsAccountWorkspaceHandoffItemView[\s\S]*SettingsAccountWorkspaceHandoffView[\s\S]*<AccountWorkspaceHandoff handoffView=\{view\.handoffView\} \/>[\s\S]*function AccountWorkspaceHandoff[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*aria-labelledby=\{titleId\}[\s\S]*data-handoff="settings-account-workspace"[\s\S]*data-handoff-scope=\{handoffView\.privacy\.scope\}[\s\S]*id=\{titleId\}[\s\S]*handoffView\.title[\s\S]*id=\{descriptionId\}[\s\S]*handoffView\.description[\s\S]*handoffView\.itemViews\.map[\s\S]*function AccountWorkspaceHandoffItem[\s\S]*const labelId = `settings-account-workspace-handoff-\$\{itemView\.id\}-label`[\s\S]*const valueId = `settings-account-workspace-handoff-\$\{itemView\.id\}-value`[\s\S]*const descriptionId = `settings-account-workspace-handoff-\$\{itemView\.id\}-description`[\s\S]*data-handoff-item=\{itemView\.id\}[\s\S]*id=\{labelId\}[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*aria-label=\{itemView\.ariaLabel\}[\s\S]*aria-labelledby=\{`\$\{labelId\} \$\{valueId\}`\}[\s\S]*id=\{valueId\}[\s\S]*id=\{descriptionId\}/,
-  'Security workspace summary component should render prepared account handoff marker, privacy scope, item ids, and stable label/value/description relationships.'
 );
 assert.doesNotMatch(
   securityWorkspaceSummarySource,
@@ -8235,11 +8162,10 @@ assert.deepEqual(
     STORAGE_UPLOAD_READINESS_ITEM_IDS.length,
     STORAGE_FILE_ACCESS_ITEM_IDS.length,
     ACTIVITY_SOURCE_MATERIAL_REFERENCE_ITEM_IDS.length,
-    SETTINGS_FILES_SOURCE_MATERIAL_HANDOFF_ITEM_IDS.length,
     PUBLIC_ASSIGNMENT_ACCESS_HANDOFF_ITEM_IDS.length,
     PUBLIC_ASSIGNMENT_UNAVAILABLE_ACCESS_HANDOFF_ITEM_IDS.length,
   ],
-  [20, 30, 30, 30, 30, 30],
+  [20, 30, 30, 30, 30],
   'Source-material privacy chain should stay backed by the focused gates it links together.'
 );
 assert.deepEqual(STORAGE_FILE_ACCESS_PRIVACY_CONTRACT, {
@@ -8266,22 +8192,6 @@ assert.deepEqual(ACTIVITY_SOURCE_MATERIAL_REFERENCE_PRIVACY_CONTRACT, {
   rejectsUnsafeFileIds: true,
   scope: 'activity-source-material-reference-boundary',
 });
-assert.deepEqual(
-  buildSettingsFilesSourceMaterialHandoffView().privacy,
-  {
-    exposesActivityContent: false,
-    exposesFileBytes: false,
-    exposesPermissionMetadata: false,
-    exposesRawStudentIdentity: false,
-    exposesSourceMaterialStorageKeys: false,
-    exposesTeacherPrivateFilenames: false,
-    itemIds: [...SETTINGS_FILES_SOURCE_MATERIAL_HANDOFF_ITEM_IDS],
-    publicPayloadIncludesFileList: false,
-    scope: 'teacher-source-material-library',
-    storageKeysStayServerSide: true,
-    tracksOwnerScopedUserFiles: true,
-  }
-);
 const publicAssignmentPayloadTypeSource = getSourceSlice(
   publicAssignmentSource,
   'export type PublicAssignmentPayload = {',
@@ -8341,10 +8251,6 @@ assert.match(
 assert.match(
   sourcePrivacyActivityValidationSource,
   /sourceMaterials:\s*normalizeActivityMaterialReferences\(input\.sourceMaterials\)/
-);
-assert.match(
-  settingsFilesViewSource,
-  /publicPayloadIncludesFileList: false[\s\S]*storageKeysStayServerSide: true/
 );
 assert.match(
   storageUploadReadinessSource,
@@ -12532,16 +12438,6 @@ assert.match(
 );
 assert.match(
   settingsNotificationViewSource,
-  /export const SETTINGS_NOTIFICATION_UPDATE_HANDOFF_ITEM_IDS = \[(?=[\s\S]*'update-scope')(?=[\s\S]*'template-updates')(?=[\s\S]*'worksheet-workflows')(?=[\s\S]*'assignment-review')(?=[\s\S]*'teacher-control')(?=[\s\S]*'newsletter-card')(?=[\s\S]*'subscription-form')(?=[\s\S]*'subscription-switch')(?=[\s\S]*'email-requirement')(?=[\s\S]*'status-loading')(?=[\s\S]*'subscribe-action')(?=[\s\S]*'unsubscribe-action')(?=[\s\S]*'error-feedback')(?=[\s\S]*'scope-note')(?=[\s\S]*'provider-visibility')(?=[\s\S]*'email-channel')(?=[\s\S]*'subscription-status-source')(?=[\s\S]*'update-frequency')(?=[\s\S]*'activity-library-boundary')(?=[\s\S]*'activity-content-boundary')(?=[\s\S]*'assignment-snapshot-boundary')(?=[\s\S]*'attempt-record-boundary')(?=[\s\S]*'result-export-boundary')(?=[\s\S]*'source-material-read-boundary')(?=[\s\S]*'mutation-payload-guard')(?=[\s\S]*'student-reminder-boundary')(?=[\s\S]*'public-link-boundary')(?=[\s\S]*'learner-notification-boundary')(?=[\s\S]*'private-data-guard')(?=[\s\S]*'legacy-copy-guard')/,
-  'Notification settings handoff should expose stable 30-slice classroom update item ids.'
-);
-assert.match(
-  settingsNotificationViewSource,
-  /export type SettingsNotificationUpdateHandoffPrivacyContract = \{[\s\S]*changesActivityContent: false;[\s\S]*changesActivityLibrary: false;[\s\S]*changesAssignmentDeliveryRules: false;[\s\S]*changesAssignmentSnapshots: false;[\s\S]*changesAttemptRecords: false;[\s\S]*changesPublicAssignmentLinks: false;[\s\S]*changesResultExports: false;[\s\S]*exposesRawMutationPayload: false;[\s\S]*exposesRawProviderErrors: false;[\s\S]*exposesRecipientEmail: false;[\s\S]*exposesSourceMaterialStorageKeys: false;[\s\S]*exposesStudentIdentifiers: false;[\s\S]*notifiesLearners: false;[\s\S]*readsSourceMaterialFiles: false;[\s\S]*scope: 'teacher-classroom-update-settings';[\s\S]*sendsStudentAssignmentReminders: false;[\s\S]*teacherCanPauseUpdates: true;[\s\S]*updatesTeacherProductEmailOnly: true;/,
-  'Notification settings handoff should publish explicit privacy and classroom update behavior flags.'
-);
-assert.match(
-  settingsNotificationViewSource,
   /export function isSettingsNotificationsEnabled\(\)[\s\S]*websiteConfig\.newsletter\?\.enable === true/,
   'Notification settings feature visibility should be centralized in the settings notification view helper.'
 );
@@ -12552,18 +12448,8 @@ assert.match(
 );
 assert.match(
   settingsNotificationViewSource,
-  /buildSettingsNotificationWorkspaceSummaryView\(\)[\s\S]*handoffView: buildSettingsNotificationUpdateHandoffView\(\{[\s\S]*newsletterCardView: buildSettingsNotificationNewsletterCardView\(\)[\s\S]*workspaceSummaryView: summaryView/,
-  'Notification settings workspace summary should attach the shared classroom update handoff view.'
-);
-assert.match(
-  settingsNotificationViewSource,
   /settings_notification_workspace_summary_title[\s\S]*settings_notification_workspace_summary_description[\s\S]*buildSettingsNotificationWorkspaceSummaryItemView[\s\S]*settings_notification_workspace_summary_templates_description[\s\S]*settings_notification_workspace_summary_worksheets_description[\s\S]*settings_notification_workspace_summary_review_description[\s\S]*settings_notification_workspace_summary_control_description[\s\S]*settings_notification_workspace_summary_item_aria_label/,
   'Notification settings view model should prepare localized classroom update boundary copy and item semantics.'
-);
-assert.match(
-  settingsNotificationViewSource,
-  /buildSettingsNotificationUpdateHandoffView[\s\S]*settings_notification_handoff_description[\s\S]*buildSettingsNotificationUpdateHandoffPrivacyContract[\s\S]*settings_notification_handoff_title[\s\S]*settings_notification_handoff_item_aria_label/,
-  'Notification settings view model should prepare localized handoff title, description, item semantics, and privacy contract.'
 );
 assert.match(
   settingsNotificationViewSource,
@@ -12584,11 +12470,6 @@ assert.match(
   notificationWorkspaceSummarySource,
   /view\.itemViews\.map\(\(itemView\) =>[\s\S]*key=\{itemView\.id\}[\s\S]*function NotificationWorkspaceSummaryItem[\s\S]*aria-label=\{itemView\.ariaLabel\}[\s\S]*itemView\.label[\s\S]*itemView\.description/,
   'Notification workspace summary component should render prepared boundary views and item semantics keyed by stable ids.'
-);
-assert.match(
-  notificationWorkspaceSummarySource,
-  /SettingsNotificationUpdateHandoffItemView[\s\S]*SettingsNotificationUpdateHandoffView[\s\S]*<NotificationUpdateHandoff handoffView=\{view\.handoffView\} \/>[\s\S]*function NotificationUpdateHandoff[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*aria-labelledby=\{titleId\}[\s\S]*data-handoff="settings-notification-update"[\s\S]*data-handoff-scope=\{handoffView\.privacy\.scope\}[\s\S]*id=\{titleId\}[\s\S]*handoffView\.title[\s\S]*id=\{descriptionId\}[\s\S]*handoffView\.description[\s\S]*handoffView\.itemViews\.map[\s\S]*function NotificationUpdateHandoffItem[\s\S]*const labelId = `settings-notification-update-handoff-\$\{itemView\.id\}-label`[\s\S]*const valueId = `settings-notification-update-handoff-\$\{itemView\.id\}-value`[\s\S]*const descriptionId = `settings-notification-update-handoff-\$\{itemView\.id\}-description`[\s\S]*data-handoff-item=\{itemView\.id\}[\s\S]*id=\{labelId\}[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*aria-label=\{itemView\.ariaLabel\}[\s\S]*aria-labelledby=\{`\$\{labelId\} \$\{valueId\}`\}[\s\S]*id=\{valueId\}[\s\S]*id=\{descriptionId\}/,
-  'Notification workspace summary component should render prepared handoff marker, privacy scope, item ids, and stable label/value/description relationships.'
 );
 assert.doesNotMatch(
   notificationWorkspaceSummarySource,
@@ -12666,48 +12547,6 @@ assert.match(
   /export type SettingsBillingWorkspaceSummaryItemId =[\s\S]*'activity-library'[\s\S]*'assignment-workflow'[\s\S]*'plan-access'[\s\S]*'results-ai'/,
   'Settings billing view model should expose stable workspace billing boundary item ids.'
 );
-assert.deepEqual(SETTINGS_BILLING_WORKSPACE_HANDOFF_ITEM_IDS, [
-  'workspace-scope',
-  'route-gate',
-  'payment-feature-gate',
-  'plan-source',
-  'current-plan-card',
-  'plan-status-badge',
-  'plan-feature-section',
-  'plan-limit-section',
-  'free-plan-boundary',
-  'pro-plan-boundary',
-  'lifetime-plan-boundary',
-  'upgrade-action',
-  'portal-action',
-  'retry-action',
-  'hosted-checkout',
-  'customer-portal',
-  'payment-callback',
-  'activity-library-access',
-  'assignment-workflow-access',
-  'ai-draft-access',
-  'result-export-access',
-  'source-material-access',
-  'school-workspace-path',
-  'period-start',
-  'period-end',
-  'trial-end',
-  'cancel-at-period-end',
-  'provider-boundary',
-  'student-data-boundary',
-  'privacy-guard',
-]);
-assert.match(
-  settingsBillingViewSource,
-  /export const SETTINGS_BILLING_WORKSPACE_HANDOFF_ITEM_IDS = \[(?=[\s\S]*'workspace-scope')(?=[\s\S]*'route-gate')(?=[\s\S]*'payment-feature-gate')(?=[\s\S]*'plan-source')(?=[\s\S]*'current-plan-card')(?=[\s\S]*'plan-status-badge')(?=[\s\S]*'plan-feature-section')(?=[\s\S]*'plan-limit-section')(?=[\s\S]*'free-plan-boundary')(?=[\s\S]*'pro-plan-boundary')(?=[\s\S]*'lifetime-plan-boundary')(?=[\s\S]*'upgrade-action')(?=[\s\S]*'portal-action')(?=[\s\S]*'retry-action')(?=[\s\S]*'hosted-checkout')(?=[\s\S]*'customer-portal')(?=[\s\S]*'payment-callback')(?=[\s\S]*'activity-library-access')(?=[\s\S]*'assignment-workflow-access')(?=[\s\S]*'ai-draft-access')(?=[\s\S]*'result-export-access')(?=[\s\S]*'source-material-access')(?=[\s\S]*'school-workspace-path')(?=[\s\S]*'period-start')(?=[\s\S]*'period-end')(?=[\s\S]*'trial-end')(?=[\s\S]*'cancel-at-period-end')(?=[\s\S]*'provider-boundary')(?=[\s\S]*'student-data-boundary')(?=[\s\S]*'privacy-guard')/,
-  'Settings billing handoff should expose stable 30-slice workspace billing item ids.'
-);
-assert.match(
-  settingsBillingViewSource,
-  /export type SettingsBillingWorkspaceHandoffPrivacyContract = \{[\s\S]*changesActivityContent: false;[\s\S]*changesAssignmentLinks: false;[\s\S]*exposesActivityContent: false;[\s\S]*exposesPaymentProviderSecrets: false;[\s\S]*exposesRawCheckoutSession: false;[\s\S]*exposesSourceMaterialStorageKeys: false;[\s\S]*exposesStudentAnswers: false;[\s\S]*exposesStudentIdentifiers: false;[\s\S]*exposesTeacherEmail: false;[\s\S]*hostedBillingOnly: true;[\s\S]*modifiesAssignmentSnapshots: false;[\s\S]*planCapabilitiesAffectClassroomLoop: true;[\s\S]*scope: 'teacher-billing-workspace';/,
-  'Settings billing handoff should publish explicit hosted-billing privacy and classroom behavior flags.'
-);
 assert.match(
   settingsBillingViewSource,
   /export function isSettingsBillingEnabled\(\)[\s\S]*websiteConfig\.payment\?\.enable === true/,
@@ -12734,73 +12573,14 @@ assert.match(
   'Settings billing view model should prepare localized workspace billing boundary copy and item semantics.'
 );
 assert.match(
-  settingsBillingViewSource,
-  /handoffView: buildSettingsBillingWorkspaceHandoffView\(\)[\s\S]*buildSettingsBillingWorkspaceHandoffView[\s\S]*SETTINGS_BILLING_WORKSPACE_HANDOFF_ITEM_IDS\.map[\s\S]*settings_billing_handoff_description[\s\S]*settings_billing_handoff_title[\s\S]*settings_billing_handoff_item_aria_label/,
-  'Settings billing summary should attach the prepared localized 30-slice handoff view.'
-);
-assert.match(
   billingWorkspaceSummarySource,
   /view\.itemViews\.map\(\(itemView\) =>[\s\S]*key=\{itemView\.id\}[\s\S]*function BillingWorkspaceSummaryItem[\s\S]*aria-label=\{itemView\.ariaLabel\}[\s\S]*itemView\.label[\s\S]*itemView\.description/,
   'Billing workspace summary component should render prepared boundary views and item semantics keyed by stable ids.'
-);
-assert.match(
-  billingWorkspaceSummarySource,
-  /SettingsBillingWorkspaceHandoffItemView[\s\S]*SettingsBillingWorkspaceHandoffView[\s\S]*<BillingWorkspaceHandoff handoffView=\{view\.handoffView\} \/>[\s\S]*function BillingWorkspaceHandoff[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*aria-labelledby=\{titleId\}[\s\S]*data-handoff="settings-billing-workspace"[\s\S]*data-handoff-scope=\{handoffView\.privacy\.scope\}[\s\S]*id=\{titleId\}[\s\S]*handoffView\.title[\s\S]*id=\{descriptionId\}[\s\S]*handoffView\.description[\s\S]*handoffView\.itemViews\.map[\s\S]*function BillingWorkspaceHandoffItem[\s\S]*const labelId = `settings-billing-workspace-handoff-\$\{itemView\.id\}-label`[\s\S]*const valueId = `settings-billing-workspace-handoff-\$\{itemView\.id\}-value`[\s\S]*const descriptionId = `settings-billing-workspace-handoff-\$\{itemView\.id\}-description`[\s\S]*data-handoff-item=\{itemView\.id\}[\s\S]*id=\{labelId\}[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*aria-label=\{itemView\.ariaLabel\}[\s\S]*aria-labelledby=\{`\$\{labelId\} \$\{valueId\}`\}[\s\S]*id=\{valueId\}[\s\S]*id=\{descriptionId\}/,
-  'Billing workspace summary component should render prepared billing handoff marker, privacy scope, item ids, and stable label/value/description relationships.'
 );
 assert.doesNotMatch(
   billingWorkspaceSummarySource,
   /Workspace billing boundary|Billing workspace handoff|Plan access|Activity library|Assignment workflow|Results and AI|Teacher billing workspace|Hosted checkout|Provider secrets hidden|Student data unchanged|工作区账单边界|账单工作区交接|方案权限|活动库|作业工作流|结果和 AI|教师账单工作区|托管结账|已隐藏服务商密钥|学生数据不变/,
   'Billing workspace summary component should not hard-code visible billing boundary copy.'
-);
-const billingWorkspaceHandoffView = buildSettingsBillingWorkspaceHandoffView();
-const billingWorkspaceHandoffItemIds =
-  billingWorkspaceHandoffView.itemViews.map((item) => item.id);
-assert.deepEqual(billingWorkspaceHandoffItemIds, [
-  ...SETTINGS_BILLING_WORKSPACE_HANDOFF_ITEM_IDS,
-]);
-assert.deepEqual(billingWorkspaceHandoffView.privacy, {
-  changesActivityContent: false,
-  changesAssignmentLinks: false,
-  exposesActivityContent: false,
-  exposesPaymentProviderSecrets: false,
-  exposesRawCheckoutSession: false,
-  exposesSourceMaterialStorageKeys: false,
-  exposesStudentAnswers: false,
-  exposesStudentIdentifiers: false,
-  exposesTeacherEmail: false,
-  hostedBillingOnly: true,
-  itemIds: billingWorkspaceHandoffItemIds,
-  modifiesAssignmentSnapshots: false,
-  planCapabilitiesAffectClassroomLoop: true,
-  scope: 'teacher-billing-workspace',
-});
-assert.deepEqual(
-  billingWorkspaceHandoffView.itemViews
-    .filter((item) =>
-      [
-        'workspace-scope',
-        'hosted-checkout',
-        'assignment-workflow-access',
-        'provider-boundary',
-        'student-data-boundary',
-        'privacy-guard',
-      ].includes(item.id)
-    )
-    .map((item) => [item.id, item.value]),
-  [
-    ['workspace-scope', 'Teacher billing workspace'],
-    ['hosted-checkout', 'Hosted checkout'],
-    ['assignment-workflow-access', 'Assignment workflow'],
-    ['provider-boundary', 'Provider secrets hidden'],
-    ['student-data-boundary', 'Student data unchanged'],
-    ['privacy-guard', 'Private billing data omitted'],
-  ]
-);
-assert.doesNotMatch(
-  JSON.stringify(billingWorkspaceHandoffView),
-  /checkout-session-secret|sk_live_payment_provider_secret|teacher-private@example\.test|anonymous-browser-token|source-materials\/private\/key\.pdf|student wrote a private answer/,
-  'Billing workspace handoff should not serialize checkout sessions, provider secrets, teacher email, student data, or source-material keys.'
 );
 assert.match(
   paymentCardSource,
@@ -12813,13 +12593,8 @@ assert.match(
   'PaymentCard should render the prepared payment next-step view from the payment status helper.'
 );
 assert.match(
-  paymentCardSource,
-  /function PaymentStatusHandoff[\s\S]*const titleId = 'settings-payment-callback-handoff-title'[\s\S]*const descriptionId = 'settings-payment-callback-handoff-description'[\s\S]*data-handoff="settings-payment-callback"[\s\S]*data-handoff-scope=\{view\.privacy\.scope\}[\s\S]*id=\{titleId\}[\s\S]*id=\{descriptionId\}[\s\S]*view\.itemViews\.map[\s\S]*PaymentStatusHandoffItem[\s\S]*function PaymentStatusHandoffItem[\s\S]*const labelId = `settings-payment-callback-handoff-\$\{itemView\.id\}-label`[\s\S]*const valueId = `settings-payment-callback-handoff-\$\{itemView\.id\}-value`[\s\S]*const descriptionId = `settings-payment-callback-handoff-\$\{itemView\.id\}-description`[\s\S]*data-handoff-item=\{itemView\.id\}[\s\S]*id=\{labelId\}[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*aria-label=\{itemView\.ariaLabel\}[\s\S]*aria-labelledby=\{`\$\{labelId\} \$\{valueId\}`\}[\s\S]*id=\{valueId\}[\s\S]*id=\{descriptionId\}/,
-  'Payment status handoff should render stable label/value/description relationships for the settings payment callback.'
-);
-assert.match(
   readFileSync('tests/e2e/TEST-CATALOG.md', 'utf8'),
-  /Settings payment callback handoff has a fast script-level gate via[\s\S]*scripts\/settings-payment-callback-handoff-semantic-views\.test\.ts[\s\S]*hosted checkout confirmation[\s\S]*settings-payment-callback handoff/,
+  /Settings payment callback has a fast script-level gate via[\s\S]*scripts\/settings-payment-callback\.test\.ts[\s\S]*hosted checkout confirmation/,
   'TEST-CATALOG should document the dedicated settings payment callback focused gate.'
 );
 assert.match(
@@ -12937,124 +12712,6 @@ assert.deepEqual(
 const notificationWorkspaceSummaryView =
   buildSettingsNotificationWorkspaceSummaryView();
 assert.equal(notificationWorkspaceSummaryView.itemViews.length, 4);
-assert.deepEqual(
-  SETTINGS_NOTIFICATION_UPDATE_HANDOFF_ITEM_IDS,
-  [
-    'update-scope',
-    'template-updates',
-    'worksheet-workflows',
-    'assignment-review',
-    'teacher-control',
-    'newsletter-card',
-    'subscription-form',
-    'subscription-switch',
-    'email-requirement',
-    'status-loading',
-    'subscribe-action',
-    'unsubscribe-action',
-    'error-feedback',
-    'scope-note',
-    'provider-visibility',
-    'email-channel',
-    'subscription-status-source',
-    'update-frequency',
-    'activity-library-boundary',
-    'activity-content-boundary',
-    'assignment-snapshot-boundary',
-    'attempt-record-boundary',
-    'result-export-boundary',
-    'source-material-read-boundary',
-    'mutation-payload-guard',
-    'student-reminder-boundary',
-    'public-link-boundary',
-    'learner-notification-boundary',
-    'private-data-guard',
-    'legacy-copy-guard',
-  ]
-);
-const notificationUpdateHandoffView =
-  buildSettingsNotificationUpdateHandoffView();
-const notificationUpdateHandoffItemIds =
-  notificationUpdateHandoffView.itemViews.map((item) => item.id);
-assert.deepEqual(notificationUpdateHandoffItemIds, [
-  ...SETTINGS_NOTIFICATION_UPDATE_HANDOFF_ITEM_IDS,
-]);
-assert.deepEqual(
-  notificationPageView.workspaceSummaryView.handoffView.itemViews.map(
-    (item) => item.id
-  ),
-  [...SETTINGS_NOTIFICATION_UPDATE_HANDOFF_ITEM_IDS]
-);
-assert.deepEqual(notificationUpdateHandoffView.privacy, {
-  changesActivityContent: false,
-  changesActivityLibrary: false,
-  changesAssignmentDeliveryRules: false,
-  changesAssignmentSnapshots: false,
-  changesAttemptRecords: false,
-  changesPublicAssignmentLinks: false,
-  changesResultExports: false,
-  exposesRawMutationPayload: false,
-  exposesRawProviderErrors: false,
-  exposesRecipientEmail: false,
-  exposesSourceMaterialStorageKeys: false,
-  exposesStudentIdentifiers: false,
-  itemIds: notificationUpdateHandoffItemIds,
-  notifiesLearners: false,
-  readsSourceMaterialFiles: false,
-  scope: 'teacher-classroom-update-settings',
-  sendsStudentAssignmentReminders: false,
-  teacherCanPauseUpdates: true,
-  updatesTeacherProductEmailOnly: true,
-});
-assert.deepEqual(
-  notificationUpdateHandoffView.itemViews.map((item) => [
-    item.id,
-    item.value,
-  ]),
-  [
-    ['update-scope', 'Teacher product updates'],
-    ['template-updates', 'Template updates'],
-    ['worksheet-workflows', 'Worksheet workflows'],
-    ['assignment-review', 'Assignment review'],
-    ['teacher-control', 'Teacher control'],
-    ['newsletter-card', 'ClassGamify update emails'],
-    ['subscription-form', 'ClassGamify update emails subscription controls'],
-    ['subscription-switch', 'Receive ClassGamify updates'],
-    [
-      'email-requirement',
-      'Email is required to receive ClassGamify updates',
-    ],
-    ['status-loading', 'Disable while syncing'],
-    ['subscribe-action', 'ClassGamify updates enabled'],
-    ['unsubscribe-action', 'ClassGamify updates paused'],
-    [
-      'error-feedback',
-      'An error occurred while updating your subscription',
-    ],
-    ['scope-note', 'Update scope'],
-    ['provider-visibility', 'Configuration gate'],
-    ['email-channel', 'Teacher email only'],
-    ['subscription-status-source', 'Newsletter provider status'],
-    ['update-frequency', 'Occasional updates'],
-    ['activity-library-boundary', 'No library changes'],
-    ['activity-content-boundary', 'No content changes'],
-    ['assignment-snapshot-boundary', 'Snapshots unchanged'],
-    ['attempt-record-boundary', 'Attempts unchanged'],
-    ['result-export-boundary', 'Exports unchanged'],
-    ['source-material-read-boundary', 'No file reads'],
-    ['mutation-payload-guard', 'Payload hidden'],
-    ['student-reminder-boundary', 'No student reminders'],
-    ['public-link-boundary', 'No link changes'],
-    ['learner-notification-boundary', 'No learner notifications'],
-    ['private-data-guard', 'Private data omitted'],
-    ['legacy-copy-guard', 'ClassGamify only'],
-  ]
-);
-assert.doesNotMatch(
-  JSON.stringify(notificationUpdateHandoffView),
-  /teacher-private@example\.test|raw-student-token|source-material\/private\/storage-key|raw-provider-stack-trace|raw-newsletter-mutation-payload/,
-  'Notification update handoff should not serialize private teacher, student, source-material, provider, or mutation-payload text.'
-);
 const notificationNewsletterCardView =
   buildSettingsNotificationNewsletterCardView();
 assert.match(
@@ -13081,39 +12738,6 @@ try {
   assert.match(
     zhNotificationNewsletterCardView.scopeDescription,
     /不会发送学生作业提醒/
-  );
-  const zhNotificationUpdateHandoffView =
-    buildSettingsNotificationUpdateHandoffView();
-  assert.equal(zhNotificationUpdateHandoffView.title, '课堂更新交接');
-  assert.match(
-    zhNotificationUpdateHandoffView.description,
-    /不会改变活动、作业、作答/
-  );
-  assert.deepEqual(
-    zhNotificationUpdateHandoffView.itemViews
-      .filter((item) =>
-        [
-          'update-scope',
-          'email-channel',
-          'assignment-snapshot-boundary',
-          'source-material-read-boundary',
-          'student-reminder-boundary',
-          'public-link-boundary',
-          'learner-notification-boundary',
-          'private-data-guard',
-        ].includes(item.id)
-      )
-      .map((item) => [item.id, item.value]),
-    [
-      ['update-scope', '教师产品更新'],
-      ['email-channel', '仅教师邮箱'],
-      ['assignment-snapshot-boundary', '快照不变'],
-      ['source-material-read-boundary', '不读取文件'],
-      ['student-reminder-boundary', '不发送学生提醒'],
-      ['public-link-boundary', '不改链接'],
-      ['learner-notification-boundary', '不通知学习者'],
-      ['private-data-guard', '已省略私有数据'],
-    ]
   );
 } finally {
   overwriteGetLocale(() => 'en');
@@ -13462,9 +13086,7 @@ assert.match(
 );
 assert.equal(getInitialPaymentConfirmationStatus(undefined), 'failed');
 assert.equal(getInitialPaymentConfirmationStatus('cs_test'), 'processing');
-const processingPaymentStatusView = buildPaymentStatusView('processing', {
-  hasSessionId: true,
-});
+const processingPaymentStatusView = buildPaymentStatusView('processing');
 assert.equal(
   processingPaymentStatusView.description,
   'Please wait while we verify ClassGamify plan access for your teacher workspace, saved activities, assignments, and results.'
@@ -13479,11 +13101,6 @@ assert.deepEqual(processingPaymentStatusView.nextStep, {
 });
 assert.equal(processingPaymentStatusView.title, 'Confirming your payment');
 assert.equal(processingPaymentStatusView.tone, 'working');
-assert.equal(processingPaymentStatusView.handoffView.itemViews.length, 30);
-assert.equal(
-  processingPaymentStatusView.handoffView.privacy.scope,
-  'teacher-payment-callback'
-);
 assert.equal(buildPaymentStatusView('success').tone, 'success');
 assert.match(
   buildPaymentStatusView('success').description,
@@ -13565,14 +13182,6 @@ const filesTableSource = readFileSync(
   'src/components/settings/files/files-table.tsx',
   'utf8'
 );
-const filesSourceMaterialHandoffPanelSource = readFileSync(
-  'src/components/settings/files/files-source-material-handoff-panel.tsx',
-  'utf8'
-);
-const filesMaterialClassificationHandoffSource = readFileSync(
-  'src/components/settings/files/files-material-classification-handoff.tsx',
-  'utf8'
-);
 const userFilesHookSource = readFileSync('src/hooks/use-user-files.ts', 'utf8');
 assert.doesNotMatch(
   filesPageContentSource,
@@ -13593,26 +13202,6 @@ assert.match(
   filesTableSource,
   /summary \?\? buildUserFileMaterialSummary\(data\)/,
   'Settings files table should prefer API full-library summaries over visible page rows.'
-);
-assert.match(
-  filesTableSource,
-  /buildSettingsFilesSourceMaterialHandoffView\(\{[\s\S]*summary: materialSummary,[\s\S]*visibleItemCount: data\.length/,
-  'Settings files table should expose the source-material handoff from table state.'
-);
-assert.match(
-  filesSourceMaterialHandoffPanelSource,
-  /SettingsFilesSourceMaterialHandoffView[\s\S]*data-handoff="settings-files-source-material"[\s\S]*data-handoff-scope=\{view\.privacy\.scope\}[\s\S]*view\.itemViews\.map\(\(itemView\) =>[\s\S]*FilesSourceMaterialHandoffItem[\s\S]*function FilesSourceMaterialHandoffItem[\s\S]*const labelId = `settings-files-source-material-handoff-\$\{itemView\.id\}-label`[\s\S]*const valueId = `settings-files-source-material-handoff-\$\{itemView\.id\}-value`[\s\S]*const descriptionId = `settings-files-source-material-handoff-\$\{itemView\.id\}-description`[\s\S]*data-handoff-item=\{itemView\.id\}[\s\S]*id=\{labelId\}[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*aria-label=\{itemView\.ariaLabel\}[\s\S]*aria-labelledby=\{`\$\{labelId\} \$\{valueId\}`\}[\s\S]*id=\{valueId\}[\s\S]*id=\{descriptionId\}/,
-  'Settings files source-material handoff panel should render stable label, value, and description relationships.'
-);
-assert.match(
-  filesTableSource,
-  /buildSettingsFilesMaterialClassificationHandoffView\(\{[\s\S]*sampleFile: data\[0\],[\s\S]*summary: materialSummary,[\s\S]*visibleItemCount: data\.length/,
-  'Settings files table should expose the material-classification handoff from table state.'
-);
-assert.match(
-  filesMaterialClassificationHandoffSource,
-  /SettingsFilesMaterialClassificationHandoffView[\s\S]*data-handoff="settings-files-material-classification"[\s\S]*data-handoff-scope=\{view\.privacy\.scope\}[\s\S]*view\.itemViews\.map\(\(itemView\) =>[\s\S]*FilesMaterialClassificationHandoffItem[\s\S]*function FilesMaterialClassificationHandoffItem[\s\S]*const labelId = `settings-files-material-classification-handoff-\$\{itemView\.id\}-label`[\s\S]*const valueId = `settings-files-material-classification-handoff-\$\{itemView\.id\}-value`[\s\S]*const descriptionId = `settings-files-material-classification-handoff-\$\{itemView\.id\}-description`[\s\S]*data-handoff-item=\{itemView\.id\}[\s\S]*id=\{labelId\}[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*aria-label=\{itemView\.ariaLabel\}[\s\S]*aria-labelledby=\{`\$\{labelId\} \$\{valueId\}`\}[\s\S]*id=\{valueId\}[\s\S]*id=\{descriptionId\}/,
-  'Settings files material-classification handoff should render stable hidden label, value, and description relationships.'
 );
 assert.match(
   filesTableSource,
@@ -15919,7 +15508,6 @@ assert.deepEqual(classroomProductLoopChainView.privacy, {
 assert.deepEqual(
   [
     HOME_PAGE_PRODUCT_LOOP_HANDOFF_ITEM_IDS.length,
-    DASHBOARD_OVERVIEW_HANDOFF_ITEM_IDS.length,
     TEACHER_WORKSPACE_OPERATIONS_CHAIN_HANDOFF_ITEM_IDS.length,
     TEACHER_WORKSPACE_OPERATIONS_CHAIN_SOURCE_FILES.length,
     CLASSROOM_DATA_LIFECYCLE_CHAIN_HANDOFF_ITEM_IDS.length,
@@ -15974,7 +15562,7 @@ assert.deepEqual(
     PUBLIC_DISCOVERY_INDEXING_CHAIN_SOURCE_FILES.length,
     CLASSROOM_TRUST_COMMUNICATION_CHAIN_HANDOFF_ITEM_IDS.length,
   ],
-  Array.from({ length: 55 }, () => 30),
+  Array.from({ length: 54 }, () => 30),
   'Classroom product loop chain should stay backed by adjacent public entry, public discovery/indexing, workspace, data, authoring, source extraction, lifecycle governance, template roadmap, AI enhancement lifecycle, delivery, runner, result continuity, export, print, and trust gates.'
 );
 assert.deepEqual(Object.fromEntries(classroomProductLoopChainValues), {
@@ -16097,13 +15685,11 @@ assert.deepEqual(
     AUTH_WORKSPACE_HANDOFF_ITEM_IDS.length,
     TRANSACTIONAL_MAIL_LIFECYCLE_CHAIN_HANDOFF_ITEM_IDS.length,
     MAIL_TRANSACTIONAL_WORKSPACE_HANDOFF_ITEM_IDS.length,
-    SETTINGS_NOTIFICATION_UPDATE_HANDOFF_ITEM_IDS.length,
-    SETTINGS_BILLING_WORKSPACE_HANDOFF_ITEM_IDS.length,
     LEGAL_POLICY_HANDOFF_ITEM_IDS.length,
     DEVELOPER_CONFIGURATION_HANDOFF_ITEM_IDS.length,
     PUBLIC_DOM_HANDOFF_BOUNDARY_ITEM_IDS.length,
   ],
-  Array.from({ length: 9 }, () => 30),
+  Array.from({ length: 7 }, () => 30),
   'Classroom trust communication chain should stay backed by focused contact, auth, transactional mail lifecycle, mail workspace, notification, billing, legal, config, and public DOM gates.'
 );
 assert.equal(
@@ -16213,22 +15799,11 @@ assert.deepEqual(accountGovernanceLifecycleChainView.privacy, {
 assert.deepEqual(
   [
     AUTH_WORKSPACE_HANDOFF_ITEM_IDS.length,
-    SETTINGS_ACCOUNT_WORKSPACE_HANDOFF_ITEM_IDS.length,
-    SETTINGS_SECURITY_WORKSPACE_HANDOFF_ITEM_IDS.length,
     ADMIN_USERS_HANDOFF_ITEM_IDS.length,
-    SETTINGS_BILLING_WORKSPACE_HANDOFF_ITEM_IDS.length,
-    PAYMENT_STATUS_HANDOFF_ITEM_IDS.length,
-    SETTINGS_NOTIFICATION_UPDATE_HANDOFF_ITEM_IDS.length,
-    SETTINGS_FILES_SOURCE_MATERIAL_HANDOFF_ITEM_IDS.length,
     STORAGE_FILE_ACCESS_ITEM_IDS.length,
   ],
-  Array.from({ length: 9 }, () => 30),
+  Array.from({ length: 3 }, () => 30),
   'Account governance lifecycle chain should stay backed by focused auth, settings, admin, files, billing, payment callback, notification, and storage gates.'
-);
-assert.match(
-  paymentStatusViewSource,
-  /PAYMENT_STATUS_HANDOFF_ITEM_IDS[\s\S]*'hosted-checkout'[\s\S]*'completion-check'[\s\S]*'current-plan-cache'[\s\S]*'callback-normalization'[\s\S]*'provider-secret-boundary'[\s\S]*'raw-session-boundary'[\s\S]*hostedCheckoutStatusOnly: true[\s\S]*scope: 'teacher-payment-callback'/,
-  'Account governance lifecycle chain should absorb the settings payment callback handoff privacy boundary.'
 );
 assert.deepEqual(Object.fromEntries(accountGovernanceLifecycleChainValues), {
   'account-delete-feature-gate': 'Feature gated',
@@ -16336,18 +15911,10 @@ assert.deepEqual(teacherWorkspaceOperationsChainView.privacy, {
 });
 assert.deepEqual(
   [
-    DASHBOARD_OVERVIEW_HANDOFF_ITEM_IDS.length,
     ACCOUNT_GOVERNANCE_LIFECYCLE_CHAIN_HANDOFF_ITEM_IDS.length,
     ACTIVE_SURFACE_PRODUCT_BOUNDARY_ITEM_IDS.length,
-    PAYMENT_STATUS_HANDOFF_ITEM_IDS.length,
-    SETTINGS_ACCOUNT_WORKSPACE_HANDOFF_ITEM_IDS.length,
-    SETTINGS_SECURITY_WORKSPACE_HANDOFF_ITEM_IDS.length,
-    SETTINGS_FILES_SOURCE_MATERIAL_HANDOFF_ITEM_IDS.length,
-    SETTINGS_FILES_MATERIAL_CLASSIFICATION_HANDOFF_ITEM_IDS.length,
-    SETTINGS_BILLING_WORKSPACE_HANDOFF_ITEM_IDS.length,
-    SETTINGS_NOTIFICATION_UPDATE_HANDOFF_ITEM_IDS.length,
   ],
-  Array.from({ length: 10 }, () => 30),
+  Array.from({ length: 2 }, () => 30),
   'Teacher workspace operations chain should stay backed by focused dashboard, list, account governance, active surface, payment callback, and settings gates.'
 );
 assert.deepEqual(Object.fromEntries(teacherWorkspaceOperationsChainValues), {
@@ -16384,7 +15951,7 @@ assert.deepEqual(Object.fromEntries(teacherWorkspaceOperationsChainValues), {
 });
 assert.match(
   readFileSync('tests/e2e/TEST-CATALOG.md', 'utf8'),
-  /Teacher workspace operations chain has a fast script-level gate via[\s\S]*scripts\/teacher-workspace-operations-chain-handoff\.test\.ts[\s\S]*dashboard overview boundary/,
+  /Teacher workspace operations chain has a fast script-level gate via[\s\S]*scripts\/teacher-workspace-operations-chain-handoff\.test\.ts[\s\S]*dashboard overview/,
   'TEST-CATALOG should document the teacher workspace operations chain gate.'
 );
 assert.match(
@@ -16646,14 +16213,6 @@ assert.ok(
 );
 const settingsFilesRouteSource = readFileSync(
   'src/routes/settings/files.tsx',
-  'utf8'
-);
-const settingsProfileRouteSource = readFileSync(
-  'src/routes/settings/profile.tsx',
-  'utf8'
-);
-const settingsSecurityRouteSource = readFileSync(
-  'src/routes/settings/security.tsx',
   'utf8'
 );
 const settingsBillingRouteSource = readFileSync(
@@ -17284,10 +16843,9 @@ assert.deepEqual(
   [
     MAIL_TRANSACTIONAL_WORKSPACE_HANDOFF_ITEM_IDS.length,
     MAIL_TRANSACTIONAL_TEMPLATE_IDS.length,
-    SETTINGS_NOTIFICATION_UPDATE_HANDOFF_ITEM_IDS.length,
   ],
-  [30, 4, 30],
-  'Transactional mail lifecycle chain should stay backed by the workspace handoff, four current templates, and teacher notification updates.'
+  [30, 4],
+  'Transactional mail lifecycle chain should stay backed by the workspace handoff and four current templates.'
 );
 assert.match(
   productSource,
@@ -43230,10 +42788,6 @@ const dashboardOverviewLoopStatusPanelSource = readFileSync(
   'src/components/dashboard/dashboard-overview-loop-status-panel.tsx',
   'utf8'
 );
-const dashboardOverviewHandoffPanelSource = readFileSync(
-  'src/components/dashboard/dashboard-overview-handoff-panel.tsx',
-  'utf8'
-);
 assert.match(
   dashboardOverviewRouteSource,
   /useActivities\(\{[\s\S]*pageIndex: 0,[\s\S]*pageSize: 1,[\s\S]*status: 'active'/,
@@ -43306,11 +42860,6 @@ assert.doesNotMatch(
   /Create activity|Publish assignment|Share student link|Review results|Start here|Review submitted attempts/,
   'Dashboard overview loop-status component should not hardcode visible next-action or loop-status copy.'
 );
-assert.match(
-  dashboardOverviewHandoffPanelSource,
-  /DashboardOverviewHandoffView[\s\S]*data-handoff="dashboard-overview"[\s\S]*data-handoff-scope=\{view\.privacy\.scope\}[\s\S]*view\.itemViews\.map\(\(itemView\) =>[\s\S]*DashboardOverviewHandoffItem[\s\S]*function DashboardOverviewHandoffItem[\s\S]*const labelId = `dashboard-overview-handoff-\$\{itemView\.id\}-label`[\s\S]*const valueId = `dashboard-overview-handoff-\$\{itemView\.id\}-value`[\s\S]*const descriptionId = `dashboard-overview-handoff-\$\{itemView\.id\}-description`[\s\S]*data-handoff-item=\{itemView\.id\}[\s\S]*id=\{labelId\}[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*aria-label=\{itemView\.ariaLabel\}[\s\S]*aria-labelledby=\{`\$\{labelId\} \$\{valueId\}`\}[\s\S]*id=\{valueId\}[\s\S]*id=\{descriptionId\}/,
-  'Dashboard overview handoff panel should render marker, item ids, and stable label/value/description relationships.'
-);
 // A demo card showed "18 completions · 84% avg" next to real 0% results.
 assert.doesNotMatch(
   dashboardOverviewRouteSource,
@@ -43370,11 +42919,6 @@ assert.match(
   dashboardOverviewDomainSource,
   /buildDashboardOverviewQueryBoundary\(\{[\s\S]*activitiesResolved[\s\S]*assignmentsResolved[\s\S]*countsStarterPreviewAsOwnedMetrics: false[\s\S]*ownerActivityCount[\s\S]*ownerAssignmentCount/,
   'Dashboard query boundary should derive owner counts from resolved summaries without counting starter preview data.'
-);
-assert.match(
-  dashboardOverviewDomainSource,
-  /getDashboardOverviewLoadingIndependenceValue\(\s*context\.queryBoundary\.loadingState\s*\)/,
-  'Dashboard handoff loading-independence copy should read the prepared query boundary state.'
 );
 assert.match(
   dashboardOverviewReadinessSource,

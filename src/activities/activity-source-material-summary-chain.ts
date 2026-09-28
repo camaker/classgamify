@@ -54,7 +54,7 @@ export const ACTIVITY_SOURCE_MATERIAL_SUMMARY_CHAIN_SOURCE_FILES = [
   'src/storage/file-material-labels.ts',
   'src/storage/file-material-classification.ts',
   'src/settings/files-view.ts',
-  'src/components/settings/files/files-source-material-handoff-panel.tsx',
+  'src/components/settings/files/files-table.tsx',
   'src/assignments/public.ts',
   'src/assignments/student-runtime-item-list.ts',
   'scripts/activity-lifecycle.test.ts',
