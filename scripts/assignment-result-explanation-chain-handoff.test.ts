@@ -1,8 +1,6 @@
 import assert from 'node:assert/strict';
 import { existsSync, readFileSync } from 'node:fs';
 import test from 'node:test';
-import { ANSWER_FEEDBACK_LIFECYCLE_CHAIN_HANDOFF_ITEM_IDS } from '@/assignments/answer-feedback-lifecycle-chain';
-import { ASSIGNMENT_ANSWER_FEEDBACK_HANDOFF_ITEM_IDS } from '@/assignments/answer-feedback-handoff';
 import {
   buildAssignmentItemAnalysisCardView,
   buildAssignmentAttemptAnswerReviewView,
@@ -20,10 +18,6 @@ import {
 import { formatAssignmentResultValue } from '@/assignments/result-format';
 import { buildPublicAnswerFeedbackView } from '@/assignments/student-runner-view';
 import { buildPrintableWorksheetAnswerKeyItemView } from '@/assignments/printable-worksheet-view';
-import { PRINTABLE_WORKSHEET_REVIEW_LIFECYCLE_CHAIN_HANDOFF_ITEM_IDS } from '@/assignments/printable-worksheet-review-lifecycle-chain';
-import { SCORED_ATTEMPT_RESULT_CHAIN_HANDOFF_ITEM_IDS } from '@/assignments/scored-attempt-result-chain';
-import { TEACHER_RESULTS_REVIEW_CHAIN_HANDOFF_ITEM_IDS } from '@/assignments/teacher-results-review-chain';
-import { TEACHER_RESULT_COPY_LIFECYCLE_CHAIN_HANDOFF_ITEM_IDS } from '@/assignments/teacher-result-copy-lifecycle-chain';
 import { overwriteGetLocale } from '@/locale/paraglide/runtime';
 
 overwriteGetLocale(() => 'en');
@@ -175,18 +169,6 @@ test('assignment result explanation chain is backed by adjacent gates', () => {
   for (const filePath of ASSIGNMENT_RESULT_EXPLANATION_CHAIN_SOURCE_FILES) {
     assert.ok(existsSync(filePath), `Missing explanation chain ${filePath}`);
   }
-
-  assert.deepEqual(
-    [
-      ASSIGNMENT_ANSWER_FEEDBACK_HANDOFF_ITEM_IDS.length,
-      ANSWER_FEEDBACK_LIFECYCLE_CHAIN_HANDOFF_ITEM_IDS.length,
-      TEACHER_RESULTS_REVIEW_CHAIN_HANDOFF_ITEM_IDS.length,
-      TEACHER_RESULT_COPY_LIFECYCLE_CHAIN_HANDOFF_ITEM_IDS.length,
-      SCORED_ATTEMPT_RESULT_CHAIN_HANDOFF_ITEM_IDS.length,
-      PRINTABLE_WORKSHEET_REVIEW_LIFECYCLE_CHAIN_HANDOFF_ITEM_IDS.length,
-    ],
-    Array.from({ length: 6 }, () => 30)
-  );
 });
 
 test('explanation formatting keeps optional result text explicit', () => {

@@ -16,7 +16,7 @@ interface AssignmentAttemptStatsByAssignmentSource
   assignmentId: string;
 }
 
-export type AssignmentAttemptStats = {
+type AssignmentAttemptStats = {
   averageDurationSeconds: number;
   averagePoints: number;
   averageScore: number;

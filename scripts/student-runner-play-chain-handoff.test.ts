@@ -1,11 +1,6 @@
 import assert from 'node:assert/strict';
 import { existsSync, readFileSync } from 'node:fs';
 import test from 'node:test';
-import { ASSIGNMENT_ANSWER_FEEDBACK_HANDOFF_ITEM_IDS } from '@/assignments/answer-feedback-handoff';
-import { ASSIGNMENT_ATTEMPT_DURATION_HANDOFF_ITEM_IDS } from '@/assignments/attempt-duration-handoff';
-import { ASSIGNMENT_ATTEMPT_LIMIT_HANDOFF_ITEM_IDS } from '@/assignments/attempt-limit-handoff';
-import { ASSIGNMENT_ATTEMPT_PERSISTENCE_HANDOFF_ITEM_IDS } from '@/assignments/attempt-persistence-handoff';
-import { PUBLIC_ASSIGNMENT_ACCESS_HANDOFF_ITEM_IDS } from '@/assignments/public';
 import {
   STUDENT_RUNNER_PLAY_CHAIN_HANDOFF_ITEM_IDS,
   STUDENT_RUNNER_PLAY_CHAIN_SOURCE_FILES,
@@ -13,8 +8,6 @@ import {
   type StudentRunnerPlayChainHandoffItemId,
   type StudentRunnerPlayChainHandoffView,
 } from '@/assignments/student-runner-play-chain';
-import { ASSIGNMENT_SUBMISSION_VALIDATION_HANDOFF_ITEM_IDS } from '@/assignments/submission-validation-handoff';
-import { PUBLIC_ASSIGNMENT_UNAVAILABLE_ACCESS_HANDOFF_ITEM_IDS } from '@/assignments/unavailable-access';
 
 const PRODUCT_SOURCE = readFileSync('docs/product.md', 'utf8');
 const ASSIGNMENTS_API_SOURCE = readFileSync('src/api/assignments.ts', 'utf8');
@@ -138,19 +131,6 @@ test('student runner play chain stays backed by focused contracts', () => {
       `Missing student runner play chain file ${filePath}`
     );
   }
-
-  assert.deepEqual(
-    [
-      PUBLIC_ASSIGNMENT_ACCESS_HANDOFF_ITEM_IDS.length,
-      PUBLIC_ASSIGNMENT_UNAVAILABLE_ACCESS_HANDOFF_ITEM_IDS.length,
-      ASSIGNMENT_ATTEMPT_LIMIT_HANDOFF_ITEM_IDS.length,
-      ASSIGNMENT_ATTEMPT_DURATION_HANDOFF_ITEM_IDS.length,
-      ASSIGNMENT_ANSWER_FEEDBACK_HANDOFF_ITEM_IDS.length,
-      ASSIGNMENT_SUBMISSION_VALIDATION_HANDOFF_ITEM_IDS.length,
-      ASSIGNMENT_ATTEMPT_PERSISTENCE_HANDOFF_ITEM_IDS.length,
-    ],
-    Array.from({ length: 7 }, () => 30)
-  );
 });
 
 test('student runner sources preserve public payload and submit boundaries', () => {

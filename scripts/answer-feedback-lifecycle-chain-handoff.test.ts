@@ -8,7 +8,6 @@ import {
 } from '@/activities/answer-matching';
 import { evaluateRuntimeAnswers, getRuntimeItems } from '@/activities/runtime';
 import type { ActivityContent } from '@/activities/types';
-import { ASSIGNMENT_ANSWER_FEEDBACK_HANDOFF_ITEM_IDS } from '@/assignments/answer-feedback-handoff';
 import {
   ANSWER_FEEDBACK_LIFECYCLE_CHAIN_HANDOFF_ITEM_IDS,
   ANSWER_FEEDBACK_LIFECYCLE_CHAIN_SOURCE_FILES,
@@ -22,9 +21,7 @@ import {
 } from '@/assignments/public';
 import { buildAssignmentResultAttemptAnswerTextView } from '@/assignments/result-answer-view';
 import { analyzeAssignmentResults } from '@/assignments/results';
-import { STUDENT_RUNNER_PLAY_CHAIN_HANDOFF_ITEM_IDS } from '@/assignments/student-runner-play-chain';
 import { buildPublicAnswerFeedbackView } from '@/assignments/student-runner-view';
-import { TEACHER_RESULTS_REVIEW_CHAIN_HANDOFF_ITEM_IDS } from '@/assignments/teacher-results-review-chain';
 import { overwriteGetLocale } from '@/locale/paraglide/runtime';
 
 overwriteGetLocale(() => 'en');
@@ -204,15 +201,6 @@ test('answer feedback lifecycle chain is backed by adjacent gates', () => {
       `Missing answer feedback lifecycle source file ${filePath}`
     );
   }
-
-  assert.deepEqual(
-    [
-      ASSIGNMENT_ANSWER_FEEDBACK_HANDOFF_ITEM_IDS.length,
-      STUDENT_RUNNER_PLAY_CHAIN_HANDOFF_ITEM_IDS.length,
-      TEACHER_RESULTS_REVIEW_CHAIN_HANDOFF_ITEM_IDS.length,
-    ],
-    Array.from({ length: 3 }, () => 30)
-  );
 });
 
 test('product docs and answer matcher preserve accepted-answer policy', () => {
@@ -498,7 +486,7 @@ test('answer feedback lifecycle focused gate is documented', () => {
   );
   assert.match(
     normalizedCatalog,
-    /answer feedback handoff boundary/,
+    /answer feedback boundary/,
     'TEST-CATALOG should document the concrete answer feedback handoff boundary.'
   );
 });

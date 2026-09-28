@@ -1,8 +1,6 @@
 import assert from 'node:assert/strict';
 import { existsSync, readFileSync } from 'node:fs';
 import test from 'node:test';
-import { ASSIGNMENT_ATTEMPT_LIMIT_HANDOFF_ITEM_IDS } from '@/assignments/attempt-limit-handoff';
-import { ASSIGNMENT_ATTEMPT_PERSISTENCE_HANDOFF_ITEM_IDS } from '@/assignments/attempt-persistence-handoff';
 import {
   STUDENT_IDENTITY_LIFECYCLE_CHAIN_HANDOFF_ITEM_IDS,
   STUDENT_IDENTITY_LIFECYCLE_CHAIN_SOURCE_FILES,
@@ -10,11 +8,6 @@ import {
   type StudentIdentityLifecycleChainHandoffItemId,
   type StudentIdentityLifecycleChainHandoffView,
 } from '@/assignments/student-identity-lifecycle-chain';
-import {
-  STUDENT_RUNNER_PLAY_CHAIN_HANDOFF_ITEM_IDS,
-  STUDENT_RUNNER_PLAY_CHAIN_SOURCE_FILES,
-} from '@/assignments/student-runner-play-chain';
-import { TEACHER_RESULTS_REVIEW_CHAIN_HANDOFF_ITEM_IDS } from '@/assignments/teacher-results-review-chain';
 
 const PRODUCT_SOURCE = readFileSync('docs/product.md', 'utf8');
 const IDENTITY_SOURCE = readFileSync('src/assignments/identity.ts', 'utf8');
@@ -171,17 +164,6 @@ test('student identity lifecycle chain is backed by adjacent gates', () => {
       `Missing student identity lifecycle chain file ${filePath}`
     );
   }
-
-  assert.deepEqual(
-    [
-      ASSIGNMENT_ATTEMPT_LIMIT_HANDOFF_ITEM_IDS.length,
-      ASSIGNMENT_ATTEMPT_PERSISTENCE_HANDOFF_ITEM_IDS.length,
-      STUDENT_RUNNER_PLAY_CHAIN_HANDOFF_ITEM_IDS.length,
-      STUDENT_RUNNER_PLAY_CHAIN_SOURCE_FILES.length,
-      TEACHER_RESULTS_REVIEW_CHAIN_HANDOFF_ITEM_IDS.length,
-    ],
-    Array.from({ length: 5 }, () => 30)
-  );
 });
 
 test('student identity product docs and helpers preserve normalization', () => {

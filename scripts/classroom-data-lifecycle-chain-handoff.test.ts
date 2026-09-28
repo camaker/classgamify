@@ -2,24 +2,6 @@ import assert from 'node:assert/strict';
 import { existsSync, readFileSync } from 'node:fs';
 import test from 'node:test';
 import {
-  ACTIVITY_AUTHORING_LIBRARY_CHAIN_HANDOFF_ITEM_IDS,
-  ACTIVITY_AUTHORING_LIBRARY_CHAIN_SOURCE_FILES,
-} from '@/activities/authoring-library-chain';
-import { ASSIGNMENT_ATTEMPT_PERSISTENCE_HANDOFF_ITEM_IDS } from '@/assignments/attempt-persistence-handoff';
-import {
-  PUBLISHED_ASSIGNMENT_DELIVERY_CHAIN_HANDOFF_ITEM_IDS,
-  PUBLISHED_ASSIGNMENT_DELIVERY_CHAIN_SOURCE_FILES,
-} from '@/assignments/published-assignment-delivery-chain';
-import { PUBLIC_ASSIGNMENT_ACCESS_HANDOFF_ITEM_IDS } from '@/assignments/public';
-import {
-  STUDENT_RUNNER_PLAY_CHAIN_HANDOFF_ITEM_IDS,
-  STUDENT_RUNNER_PLAY_CHAIN_SOURCE_FILES,
-} from '@/assignments/student-runner-play-chain';
-import {
-  TEACHER_RESULTS_REVIEW_CHAIN_HANDOFF_ITEM_IDS,
-  TEACHER_RESULTS_REVIEW_CHAIN_SOURCE_FILES,
-} from '@/assignments/teacher-results-review-chain';
-import {
   CLASSROOM_DATA_LIFECYCLE_CHAIN_HANDOFF_ITEM_IDS,
   CLASSROOM_DATA_LIFECYCLE_CHAIN_SOURCE_FILES,
   buildClassroomDataLifecycleChainHandoffView,
@@ -214,22 +196,6 @@ test('classroom data lifecycle chain is backed by adjacent 30-item gates', () =>
       `Missing classroom data lifecycle chain file ${filePath}`
     );
   }
-
-  assert.deepEqual(
-    [
-      ACTIVITY_AUTHORING_LIBRARY_CHAIN_HANDOFF_ITEM_IDS.length,
-      ACTIVITY_AUTHORING_LIBRARY_CHAIN_SOURCE_FILES.length,
-      PUBLISHED_ASSIGNMENT_DELIVERY_CHAIN_HANDOFF_ITEM_IDS.length,
-      PUBLISHED_ASSIGNMENT_DELIVERY_CHAIN_SOURCE_FILES.length,
-      STUDENT_RUNNER_PLAY_CHAIN_HANDOFF_ITEM_IDS.length,
-      STUDENT_RUNNER_PLAY_CHAIN_SOURCE_FILES.length,
-      TEACHER_RESULTS_REVIEW_CHAIN_HANDOFF_ITEM_IDS.length,
-      TEACHER_RESULTS_REVIEW_CHAIN_SOURCE_FILES.length,
-      ASSIGNMENT_ATTEMPT_PERSISTENCE_HANDOFF_ITEM_IDS.length,
-      PUBLIC_ASSIGNMENT_ACCESS_HANDOFF_ITEM_IDS.length,
-    ],
-    Array.from({ length: 10 }, () => 30)
-  );
 });
 
 test('classroom data lifecycle docs and schema preserve the data skeleton', () => {
@@ -474,7 +440,7 @@ test('classroom data lifecycle chain focused gate is documented', () => {
   );
   assert.match(
     normalizedCatalog,
-    /attempt persistence handoff boundary/,
+    /attempt persistence boundary/,
     'TEST-CATALOG should document the concrete attempt persistence handoff boundary.'
   );
 });

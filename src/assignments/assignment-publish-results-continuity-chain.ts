@@ -1,5 +1,4 @@
 import { ASSIGNMENT_DISTRIBUTION_LIFECYCLE_CHAIN_HANDOFF_ITEM_IDS } from '@/assignments/assignment-distribution-lifecycle-chain';
-import { ASSIGNMENT_ATTEMPT_PERSISTENCE_CONTINUITY_CHAIN_HANDOFF_ITEM_IDS } from '@/assignments/attempt-persistence-continuity-chain';
 import { PUBLISHED_ASSIGNMENT_DELIVERY_CHAIN_HANDOFF_ITEM_IDS } from '@/assignments/published-assignment-delivery-chain';
 import { STUDENT_RUNNER_PLAY_CHAIN_HANDOFF_ITEM_IDS } from '@/assignments/student-runner-play-chain';
 import { STUDENT_RUNNER_SUBMISSION_CHAIN_HANDOFF_ITEM_IDS } from '@/assignments/student-runner-submission-chain';
@@ -45,7 +44,7 @@ export const ASSIGNMENT_PUBLISH_RESULTS_CONTINUITY_CHAIN_SOURCE_FILES = [
   'src/assignments/assignment-distribution-lifecycle-chain.ts',
   'src/assignments/student-runner-play-chain.ts',
   'src/assignments/student-runner-submission-chain.ts',
-  'src/assignments/attempt-persistence-continuity-chain.ts',
+  'scripts/assignment-attempt-persistence-continuity.test.ts',
   'src/assignments/teacher-results-review-chain.ts',
   'src/assignments/publish-input.ts',
   'src/assignments/snapshot.ts',
@@ -103,8 +102,6 @@ export function buildAssignmentPublishResultsContinuityChainView() {
       delivery: PUBLISHED_ASSIGNMENT_DELIVERY_CHAIN_HANDOFF_ITEM_IDS.length,
       distribution:
         ASSIGNMENT_DISTRIBUTION_LIFECYCLE_CHAIN_HANDOFF_ITEM_IDS.length,
-      persistence:
-        ASSIGNMENT_ATTEMPT_PERSISTENCE_CONTINUITY_CHAIN_HANDOFF_ITEM_IDS.length,
       play: STUDENT_RUNNER_PLAY_CHAIN_HANDOFF_ITEM_IDS.length,
       results: TEACHER_RESULTS_REVIEW_CHAIN_HANDOFF_ITEM_IDS.length,
       submission: STUDENT_RUNNER_SUBMISSION_CHAIN_HANDOFF_ITEM_IDS.length,

@@ -4,13 +4,6 @@ import test from 'node:test';
 import { STARTER_FOOD_ASSIGNMENT_SHARE_ID } from '@/activities/starter-ids';
 import type { AssignmentSeed } from '@/activities/types';
 import {
-  ASSIGNMENT_ATTEMPT_LIMIT_HANDOFF_ITEM_IDS,
-  buildAssignmentAttemptLimitHandoffEvidence,
-  buildAssignmentAttemptLimitHandoffView,
-  type AssignmentAttemptLimitHandoffItemId,
-  type AssignmentAttemptLimitHandoffView,
-} from '@/assignments/attempt-limit-handoff';
-import {
   buildAssignmentAttemptUsage,
   canUseAnotherAssignmentAttempt,
 } from '@/assignments/attempt-limits';
@@ -24,10 +17,6 @@ import {
   buildStudentRunnerStarterPreview,
   type StudentRunnerAttemptResult,
 } from '@/assignments/student-runner-state';
-import {
-  canStartAnotherStudentAttempt,
-  formatStudentAttemptUsageLabel,
-} from '@/assignments/student-submission';
 import { overwriteGetLocale } from '@/locale/paraglide/runtime';
 
 overwriteGetLocale(() => 'en');
@@ -71,117 +60,6 @@ const SUBMIT_CONTROLS_SOURCE = readFileSync(
   'utf8'
 );
 const TEST_CATALOG_SOURCE = readFileSync('tests/e2e/TEST-CATALOG.md', 'utf8');
-
-test('assignment attempt limit handoff exposes 30 safe limit slices', () => {
-  const evidence = buildAttemptLimitEvidence();
-  const handoffView = buildAssignmentAttemptLimitHandoffView(evidence);
-  const itemIds = handoffView.itemViews.map((item) => item.id);
-
-  assert.deepEqual(itemIds, [...ASSIGNMENT_ATTEMPT_LIMIT_HANDOFF_ITEM_IDS]);
-  assert.equal(new Set(itemIds).size, 30);
-  assert.equal(
-    handoffView.itemViews.every(
-      (item) =>
-        Boolean(item.ariaLabel) &&
-        Boolean(item.description) &&
-        Boolean(item.label) &&
-        Boolean(item.value)
-    ),
-    true
-  );
-  assert.deepEqual(handoffView.privacy, {
-    exposesAnonymousToken: false,
-    exposesAnswerText: false,
-    exposesRawIdentityKey: false,
-    exposesRawSubmissionPayload: false,
-    exposesStudentName: false,
-    exposesTeacherOnlyAnswers: false,
-    itemIds,
-    mutatesAttempts: false,
-    readsBrowserStorage: false,
-    scope: 'assignment-attempt-limit-boundary',
-    usesSharedAttemptLimitHelpers: true,
-  });
-  assertNoPrivateAttemptLimitText(JSON.stringify(handoffView));
-});
-
-test('assignment attempt limit handoff summarizes normalized retry state', () => {
-  const handoffView = buildAssignmentAttemptLimitHandoffView(
-    buildAttemptLimitEvidence()
-  );
-
-  assert.deepEqual(
-    handoffView.itemViews.map((item) => [item.id, item.value]),
-    [
-      ['attempt-scope', 'Per-student attempt limit'],
-      ['max-attempt-normalization', '3 max'],
-      ['previous-count-normalization', '1 previous'],
-      ['used-attempts', '2 used'],
-      ['remaining-attempts', '1 attempt left'],
-      ['unlimited-attempts', '3 max'],
-      ['limit-reached', 'Blocked'],
-      ['retry-availability', 'Available'],
-      ['result-usage-label', '1 attempt left'],
-      ['student-name-identity', 'Normalized name'],
-      ['anonymous-token-identity', 'Normalized token'],
-      ['identity-mode', 'Student name'],
-      ['attempt-counter-source', 'Previous count'],
-      ['max-attempt-parser', 'Ready'],
-      ['api-previous-count-query', 'Ready'],
-      ['server-enforcement', 'Ready'],
-      ['scored-attempt-write-gate', 'Ready'],
-      ['runner-result-boundary', 'Ready'],
-      ['retry-button-boundary', 'Available'],
-      ['submission-gate-boundary', 'Ready'],
-      ['delivery-summary-boundary', 'Ready'],
-      ['public-rule-boundary', 'Ready'],
-      ['result-page-boundary', 'Ready'],
-      ['result-export-boundary', 'Ready'],
-      ['negative-count-guard', '0'],
-      ['fractional-count-guard', '2'],
-      ['nonfinite-max-guard', 'Unlimited'],
-      ['zero-max-guard', 'Unlimited'],
-      ['raw-token-guard', 'Raw token hidden'],
-      ['privacy-guard', 'Private data hidden'],
-    ]
-  );
-  assertNoPrivateAttemptLimitText(JSON.stringify(handoffView));
-});
-
-test('assignment attempt limit handoff localizes unlimited Chinese state', () => {
-  overwriteGetLocale(() => 'zh');
-  try {
-    const evidence = buildAssignmentAttemptLimitHandoffEvidence({
-      identityMode: 'anonymous',
-      maxAttempts: null,
-      retryAvailable: true,
-      submittedAttemptCount: 0,
-    });
-    const handoffView = buildAssignmentAttemptLimitHandoffView(evidence);
-
-    assert.equal(handoffView.title, '作答次数限制交接');
-    assert.match(handoffView.description, /30 个安全切片/);
-    assert.equal(
-      getHandoffValue(handoffView, 'max-attempt-normalization'),
-      '不限次数'
-    );
-    assert.equal(
-      getHandoffValue(handoffView, 'remaining-attempts'),
-      '仍可继续作答'
-    );
-    assert.equal(
-      getHandoffValue(handoffView, 'nonfinite-max-guard'),
-      '不限次数'
-    );
-    assert.equal(
-      getHandoffValue(handoffView, 'privacy-guard'),
-      '私密数据已隐藏'
-    );
-    assertNoPrivateAttemptLimitText(JSON.stringify(handoffView));
-  } finally {
-    overwriteGetLocale(() => 'en');
-  }
-});
 
 test('assignment attempt limit helpers preserve finite and unlimited retries', () => {
   const firstFiniteAttempt = buildAssignmentAttemptUsage({
@@ -233,32 +111,6 @@ test('assignment attempt limit helpers preserve finite and unlimited retries', (
     }),
     true
   );
-
-  const handoffView = buildAssignmentAttemptLimitHandoffView(
-    buildAssignmentAttemptLimitHandoffEvidence({
-      attemptUsage: unlimitedAttempt,
-      attemptUsageLabel: formatStudentAttemptUsageLabel(unlimitedAttempt),
-      identityMode: 'anonymous',
-      retryAvailable: true,
-      submittedAttemptCount: unlimitedAttempt.usedAttempts,
-    })
-  );
-
-  assert.equal(
-    getHandoffValue(handoffView, 'max-attempt-normalization'),
-    'Open'
-  );
-  assert.equal(
-    getHandoffValue(handoffView, 'remaining-attempts'),
-    'Additional attempts allowed'
-  );
-  assert.equal(getHandoffValue(handoffView, 'unlimited-attempts'), 'Unlimited');
-  assert.equal(
-    getHandoffValue(handoffView, 'result-usage-label'),
-    'Additional attempts allowed'
-  );
-  assert.equal(getHandoffValue(handoffView, 'retry-availability'), 'Available');
-  assertNoPrivateAttemptLimitText(JSON.stringify(handoffView));
 });
 
 test('student runner hides retry once the attempt limit is used', () => {
@@ -305,7 +157,7 @@ test('student runner hides retry once the attempt limit is used', () => {
   );
 });
 
-test('assignment attempt limit handoff is wired to shared source boundaries', () => {
+test('assignment attempt limit is wired to shared source boundaries', () => {
   assert.match(
     ATTEMPT_LIMIT_SOURCE,
     /export function normalizeAssignmentMaxAttempts[\s\S]*Math\.trunc\(value\)[\s\S]*normalized >= 1/,
@@ -387,7 +239,7 @@ test('assignment attempt limit handoff is wired to shared source boundaries', ()
 test('assignment attempt limit focused gate is documented', () => {
   assert.match(
     TEST_CATALOG_SOURCE,
-    /pnpm exec tsx --test scripts\/assignment-attempt-limit-handoff-semantic-views\.test\.ts/,
+    /pnpm exec tsx --test scripts\/assignment-attempt-limit\.test\.ts/,
     'E2E catalog should point attempt-limit work at the focused script gate.'
   );
   assert.match(
@@ -396,72 +248,6 @@ test('assignment attempt limit focused gate is documented', () => {
     'E2E catalog should say which attempt-limit product boundaries need the focused gate.'
   );
 });
-
-function buildAttemptLimitEvidence() {
-  const attemptUsage = buildAssignmentAttemptUsage({
-    maxAttempts: 3.8,
-    previousAttemptCount: 1.9,
-  });
-  const retryAvailable = canStartAnotherStudentAttempt({
-    canSubmit: true,
-    hasResult: true,
-    maxAttempts: attemptUsage.maxAttempts,
-    submittedAttemptCount: attemptUsage.usedAttempts,
-  });
-
-  return buildAssignmentAttemptLimitHandoffEvidence({
-    attemptUsage,
-    attemptUsageLabel: formatStudentAttemptUsageLabel(attemptUsage),
-    apiPreviousCountUsesIdentityQuery: /countPreviousIdentityAttempts/.test(
-      API_ASSIGNMENTS_SOURCE
-    ),
-    attemptCounterUsesPreviousCount: /previousAttemptCount/.test(
-      API_ASSIGNMENTS_SOURCE
-    ),
-    deliverySummaryUsesAttemptLimit: /hasAttemptLimit[\s\S]*maxAttempts/.test(
-      DELIVERY_SUMMARY_SOURCE
-    ),
-    identityMode: 'student-name',
-    maxAttemptParserUsesSharedHelper: /normalizeAssignmentMaxAttempts/.test(
-      ATTEMPT_LIMIT_SOURCE
-    ),
-    publicRulesUseAttemptLimit:
-      /case 'attempt-limit':[\s\S]*assignment_delivery_label_attempts/.test(
-        PUBLIC_ASSIGNMENT_SOURCE
-      ),
-    resultExportUsesAttemptLimit: /deliveryView\.maxAttempts/.test(
-      RESULT_EXPORT_SOURCE
-    ),
-    resultPageUsesAttemptLimit:
-      /settingsSummaryView: buildAssignmentSettingsSummaryView\(\{[\s\S]*settings: assignment\.settingsJson/.test(
-        RESULT_VIEW_SOURCE
-      ),
-    retryAvailable,
-    retryButtonUsesLimitDecision:
-      /showStartAnotherAttempt = canStartAnotherStudentAttempt/.test(
-        RUNNER_STATE_SOURCE
-      ),
-    runnerResultUsesAttemptUsage:
-      /formatStudentAttemptUsageLabel\(result\.attemptUsage\)/.test(
-        RUNNER_STATE_SOURCE
-      ),
-    serverEnforcesLimit:
-      /persistAttemptWithinIdentityLimit\(\{[\s\S]*maxAttempts: settings\.maxAttempts[\s\S]*persistence\.type === 'limit-reached'/.test(
-        API_ASSIGNMENTS_SOURCE
-      ),
-    scoredAttemptWriteGatedByLimit:
-      /persistAttemptWithinIdentityLimit\(\{[\s\S]*insertAttempt:[\s\S]*await db\.insert\(attempt\)[\s\S]*identitySlot,[\s\S]*persistence\.type === 'limit-reached'[\s\S]*throw new Error\(m\.assignment_api_error_attempt_limit_reached\(\)\)/.test(
-        API_ASSIGNMENTS_SOURCE
-      ),
-    studentNameIdentityUsesNameStrategy:
-      /resolveAttemptSubmissionIdentity/.test(API_ASSIGNMENTS_SOURCE),
-    submittedAttemptCount: attemptUsage.usedAttempts,
-    submissionGateUsesLimitHelper:
-      /canStartAnotherStudentAttempt[\s\S]*canUseAnotherAssignmentAttempt/.test(
-        STUDENT_SUBMISSION_SOURCE
-      ),
-  });
-}
 
 function withAssignmentSettings(
   assignment: AssignmentSeed,
@@ -522,15 +308,6 @@ function buildAttemptResult({
   };
 }
 
-function getHandoffValue(
-  view: AssignmentAttemptLimitHandoffView,
-  id: AssignmentAttemptLimitHandoffItemId
-) {
-  const item = view.itemViews.find((candidate) => candidate.id === id);
-  assert.ok(item, `Missing attempt-limit handoff item ${id}`);
-  return item.value;
-}
-
 function assertNoPrivateAttemptLimitText(serialized: string) {
   for (const privateValue of [
     SECRET_ANSWER_TEXT,
@@ -544,3 +321,51 @@ function assertNoPrivateAttemptLimitText(serialized: string) {
     );
   }
 }
+
+test('assignment attempt limit source boundaries stay wired to shared helpers', () => {
+  assert.match(
+    API_ASSIGNMENTS_SOURCE,
+    /countPreviousIdentityAttempts/,
+    'apiPreviousCountUsesIdentityQuery'
+  );
+  assert.match(
+    API_ASSIGNMENTS_SOURCE,
+    /previousAttemptCount/,
+    'attemptCounterUsesPreviousCount'
+  );
+  assert.match(
+    ATTEMPT_LIMIT_SOURCE,
+    /normalizeAssignmentMaxAttempts/,
+    'maxAttemptParserUsesSharedHelper'
+  );
+  assert.match(
+    RUNNER_STATE_SOURCE,
+    /showStartAnotherAttempt = canStartAnotherStudentAttempt/,
+    'retryButtonUsesLimitDecision'
+  );
+  assert.match(
+    RUNNER_STATE_SOURCE,
+    /formatStudentAttemptUsageLabel\(result\.attemptUsage\)/,
+    'runnerResultUsesAttemptUsage'
+  );
+  assert.match(
+    API_ASSIGNMENTS_SOURCE,
+    /persistAttemptWithinIdentityLimit\(\{[\s\S]*maxAttempts: settings\.maxAttempts[\s\S]*persistence\.type === 'limit-reached'/,
+    'serverEnforcesLimit'
+  );
+  assert.match(
+    API_ASSIGNMENTS_SOURCE,
+    /persistAttemptWithinIdentityLimit\(\{[\s\S]*insertAttempt:[\s\S]*await db\.insert\(attempt\)[\s\S]*identitySlot,[\s\S]*persistence\.type === 'limit-reached'[\s\S]*throw new Error\(m\.assignment_api_error_attempt_limit_reached\(\)\)/,
+    'scoredAttemptWriteGatedByLimit'
+  );
+  assert.match(
+    API_ASSIGNMENTS_SOURCE,
+    /resolveAttemptSubmissionIdentity/,
+    'studentNameIdentityUsesNameStrategy'
+  );
+  assert.match(
+    STUDENT_SUBMISSION_SOURCE,
+    /canStartAnotherStudentAttempt[\s\S]*canUseAnotherAssignmentAttempt/,
+    'submissionGateUsesLimitHelper'
+  );
+});

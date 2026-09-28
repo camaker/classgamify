@@ -30,9 +30,6 @@ import {
   ANSWER_FEEDBACK_LIFECYCLE_CHAIN_HANDOFF_ITEM_IDS,
   ANSWER_FEEDBACK_LIFECYCLE_CHAIN_SOURCE_FILES,
 } from '@/assignments/answer-feedback-lifecycle-chain';
-import { ASSIGNMENT_ATTEMPT_PERSISTENCE_HANDOFF_ITEM_IDS } from '@/assignments/attempt-persistence-handoff';
-import { ASSIGNMENT_ATTEMPT_DURATION_HANDOFF_ITEM_IDS } from '@/assignments/attempt-duration-handoff';
-import { ASSIGNMENT_ATTEMPT_STATS_HANDOFF_ITEM_IDS } from '@/assignments/attempt-stats-handoff';
 import {
   ASSIGNMENT_DISTRIBUTION_LIFECYCLE_CHAIN_HANDOFF_ITEM_IDS,
   ASSIGNMENT_DISTRIBUTION_LIFECYCLE_CHAIN_SOURCE_FILES,
@@ -41,7 +38,6 @@ import {
   ASSIGNMENT_LIFECYCLE_GOVERNANCE_CHAIN_HANDOFF_ITEM_IDS,
   ASSIGNMENT_LIFECYCLE_GOVERNANCE_CHAIN_SOURCE_FILES,
 } from '@/assignments/assignment-lifecycle-governance-chain';
-import { ASSIGNMENT_SUBMISSION_VALIDATION_HANDOFF_ITEM_IDS } from '@/assignments/submission-validation-handoff';
 import { ASSIGNMENT_SOURCE_ACTIVITY_CONTEXT_CHAIN_HANDOFF_ITEM_IDS } from '@/assignments/source-activity-context-chain';
 import {
   PRINTABLE_WORKSHEET_REVIEW_LIFECYCLE_CHAIN_HANDOFF_ITEM_IDS,
@@ -511,10 +507,6 @@ test('classroom product loop chain is backed by adjacent focused gates', () => {
       STUDENT_RUNNER_PLAY_CHAIN_SOURCE_FILES.length,
       STUDENT_IDENTITY_LIFECYCLE_CHAIN_HANDOFF_ITEM_IDS.length,
       STUDENT_IDENTITY_LIFECYCLE_CHAIN_SOURCE_FILES.length,
-      ASSIGNMENT_SUBMISSION_VALIDATION_HANDOFF_ITEM_IDS.length,
-      ASSIGNMENT_ATTEMPT_PERSISTENCE_HANDOFF_ITEM_IDS.length,
-      ASSIGNMENT_ATTEMPT_DURATION_HANDOFF_ITEM_IDS.length,
-      ASSIGNMENT_ATTEMPT_STATS_HANDOFF_ITEM_IDS.length,
       ANSWER_FEEDBACK_LIFECYCLE_CHAIN_HANDOFF_ITEM_IDS.length,
       ANSWER_FEEDBACK_LIFECYCLE_CHAIN_SOURCE_FILES.length,
       SCORED_ATTEMPT_RESULT_CHAIN_HANDOFF_ITEM_IDS.length,
@@ -537,7 +529,7 @@ test('classroom product loop chain is backed by adjacent focused gates', () => {
       PUBLIC_DISCOVERY_INDEXING_CHAIN_SOURCE_FILES.length,
       CLASSROOM_TRUST_COMMUNICATION_CHAIN_HANDOFF_ITEM_IDS.length,
     ],
-    Array.from({ length: 54 }, () => 30)
+    Array.from({ length: 50 }, () => 30)
   );
 });
 

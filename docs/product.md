@@ -14,7 +14,7 @@ Activity -> Assignment -> Attempt -> Results
 `src/config/classroom-product-loop-chain.ts` owns the cross-surface
 product-loop handoff that keeps teacher-owned activities, reusable content,
 assignment source activity context boundary, classroom data lifecycle and its
-attempt persistence handoff boundary,
+attempt persistence boundary,
 activity library page boundary,
 activity authoring/library workflow,
 source extraction lifecycle boundaries, activity lifecycle governance,
@@ -622,15 +622,13 @@ limits or aggregating results. Whitespace and case differences in a typed
 student name should not create a new attempt identity, while anonymous browser
 tokens should remain separate students in teacher summaries without exposing the
 raw token.
-The attempt identity continuity chain should carry the existing identity
-handoff as a 30-slice source-level contract across name normalization,
-assignment-scoped anonymous browser tokens, storage reuse, safe browser labels,
-submission strategies, previous-attempt counting, concurrent identity slots,
-scored persistence, teacher result grouping and ordering, and privacy. Its
-aggregate summary must not expose student names, raw anonymous tokens, browser
-storage keys, grouping keys, or result student keys.
-`src/assignments/attempt-identity-continuity-chain.ts` owns this source contract
-without reading browser storage or mutating attempts while building its summary.
+The attempt identity continuity gate
+(`scripts/assignment-attempt-identity-continuity.test.ts`) keeps source-level
+guards across name normalization, assignment-scoped anonymous browser tokens,
+storage reuse, safe browser labels, submission strategies, previous-attempt
+counting, concurrent identity slots, scored persistence, teacher result grouping
+and ordering, and privacy, so each step keeps using the shared assignment-domain
+helpers.
 The student identity lifecycle should also keep runtime item identity
 consistent across template/runtime scope: normalized and unique runtime ids,
 collision and blank-id guards, submission validation, browser answers, scoring
@@ -668,16 +666,13 @@ The submission contract remains template-neutral: every renderer stores
 submission still allows partial attempts, but the server rejects answers for
 unknown item ids, duplicate item ids, or answer lists longer than the frozen
 runtime item count.
-The submission validation continuity chain should carry the existing validation
-handoff as a 30-slice source-level contract across frozen runtime ids, partial
-browser payloads, empty-answer omission, shared API limits, Unicode id
-normalization, blank/unknown/duplicate/too-many rejection,
-validate-before-scoring order, scored persistence, safe public failures,
-teacher results, and privacy. Its aggregate summary must not expose runtime ids,
-raw payload rows, student names, anonymous tokens, answer text, teacher answers,
-ActivityContent JSON, settings JSON, or source-material metadata.
-`src/assignments/submission-validation-continuity-chain.ts` owns this source
-contract without rendering validation audit markers in the public runner.
+The submission validation continuity gate
+(`scripts/assignment-submission-validation-continuity.test.ts`) keeps
+source-level guards across frozen runtime ids, partial browser payloads,
+empty-answer omission, shared API limits, Unicode id normalization,
+blank/unknown/duplicate/too-many rejection, validate-before-scoring order,
+scored persistence, safe public failures, teacher results, and privacy, so each
+step keeps using the shared assignment-domain helpers.
 Each real browser submission should also carry a submission idempotency contract:
 the runner creates one opaque key only after submission gates pass, reuses it for
 a network retry, and clears it when the assignment changes or the student starts
@@ -707,16 +702,13 @@ receive the normal attempt-limit error. Unlimited assignments keep identity and
 attempt-number slots nullable so they do not create artificial write contention.
 Identity keys and attempt numbers are private persistence metadata and do not
 change public feedback, teacher result labels, or exports.
-The attempt limit continuity chain should carry the existing attempt-limit
-handoff as a 30-slice source-level contract across normalized student identity,
-previous scored-attempt counts, idempotent replay priority, concurrent identity
-slots, D1 uniqueness, server enforcement, student retry state, public delivery
-rules, teacher result policy, exports, and privacy. Its aggregate summary must
-not expose identity keys, attempt numbers, submission keys, student names, raw
-anonymous tokens, submission payloads, answer text, teacher answers, or CSV data
-URLs. `src/assignments/attempt-limit-continuity-chain.ts` owns this source
-contract without replacing the localized handoff or the independent SQLite
-concurrency gate.
+The attempt limit continuity gate
+(`scripts/assignment-attempt-limit-continuity.test.ts`) keeps source-level
+guards across normalized student identity, previous scored-attempt counts,
+idempotent replay priority, concurrent identity slots, D1 uniqueness, server
+enforcement, student retry state, public delivery rules, teacher result policy,
+exports, and privacy, so each step keeps using the shared assignment-domain
+helpers.
 New attempt writes should also keep a submission lifecycle write guard. The API
 checks lifecycle before validation and scoring, while D1 checks assignment
 status and expiry again in a `BEFORE INSERT` boundary so a teacher closing a
@@ -748,16 +740,12 @@ links. Answer review cards show student display, submitted time, score and
 answer summaries, snapshot-ordered answers, statuses, accepted alternatives, and
 explanations without exposing answer text or teacher-only answers in the
 scored-result chain summary.
-The attempt persistence continuity chain should carry the existing persistence
-handoff as a 30-slice source-level contract across submission gates, normalized
-identity, frozen runtime validation, scoring, assignment/attempt/time fields,
-immutable answer and result JSON, sanitized public feedback, teacher analysis,
-statistics, CSV export, and privacy. Its aggregate summary must not expose
-attempt ids, student names, anonymous tokens, runtime ids, answer text, teacher
-answers, raw submission payloads, source-material metadata, or CSV data URLs.
-`src/assignments/attempt-persistence-continuity-chain.ts` owns this source
-contract while `buildScoredAttemptInsert` remains the sole attempt-row shape
-builder.
+The attempt persistence continuity gate
+(`scripts/assignment-attempt-persistence-continuity.test.ts`) keeps source-level
+guards across submission gates, normalized identity, frozen runtime validation,
+scoring, assignment/attempt/time fields, immutable answer and result JSON,
+sanitized public feedback, teacher analysis, statistics, CSV export, and
+privacy, so each step keeps using the shared assignment-domain helpers.
 `src/assignments/attempt-review-card-chain.ts` owns the
 attempt-review-card chain as a 30-slice source-level contract from
 scored-attempt persistence and answer review summaries through prepared card
@@ -791,16 +779,12 @@ duration at the assignment timer so teacher averages and CSV exports are not
 distorted by abnormal client clocks. Student timer badges, submitted attempt
 times, result-page averages, and per-attempt rows should format durations
 through assignment-domain helpers so time displays stay consistent.
-The attempt duration continuity chain should carry the existing duration
-handoff as a 30-slice source-level contract across playable runner readiness,
-clock start and tick plans, browser elapsed time, server normalization, timer
-caps, scored-attempt persistence, student result feedback, teacher result rows,
-aggregate statistics, and CSV export. Its aggregate summary must not expose
-clock-origin timestamps, student labels, anonymous tokens, prompts, runtime item
-ids, answer text, teacher answer keys, or CSV data URLs.
-`src/assignments/attempt-duration-continuity-chain.ts` owns this source
-contract without replacing the localized duration handoff or the shared
-`src/attempts/duration.ts` core.
+The attempt duration continuity gate
+(`scripts/assignment-attempt-duration-continuity.test.ts`) keeps source-level
+guards across playable runner readiness, clock start and tick plans, browser
+elapsed time, server normalization, timer caps, scored-attempt persistence,
+student result feedback, teacher result rows, aggregate statistics, and CSV
+export, so each step keeps using the shared assignment-domain helpers.
 Answer scoring is centralized and tolerant of case, spacing, and common
 punctuation differences. Teachers can use `/` or `;` inside an answer field to
 define acceptable alternatives without changing the student submission
@@ -852,15 +836,12 @@ Assignment attempt metrics such as completions, average accuracy, average
 points, and average duration should be computed through shared assignment-domain
 stats helpers before they reach assignment lists, result pages, classroom
 briefs, or CSV exports.
-The attempt statistics continuity chain should carry the existing attempt-stats
-handoff as a 30-slice source-level contract across completed scored attempts,
-timer-aware duration normalization, score and earned-points fallbacks, numeric
-guards, assignment lists, result pages, classroom briefs, copy artifacts, CSV
-exports, and privacy. Its aggregate summary must not expose student labels,
-anonymous tokens, prompts, runtime item ids, answer text, accepted answers,
-teacher answer keys, share slugs, copy artifact text, or CSV data URLs.
-`src/assignments/attempt-stats-continuity-chain.ts` owns this source contract
-without replacing the localized hidden semantic attempt-stats handoff.
+The attempt statistics continuity gate
+(`scripts/assignment-attempt-stats-continuity.test.ts`) keeps source-level
+guards across completed scored attempts, timer-aware duration normalization,
+score and earned-points fallbacks, numeric guards, assignment lists, result
+pages, classroom briefs, copy artifacts, CSV exports, and privacy, so each step
+keeps using the shared assignment-domain helpers.
 Result metric cards, current review-status summaries, review-scope summaries,
 classroom-brief coverage, and copy-scope previews should expose the same
 prepared result-domain labels, values, descriptions, and accessible labels as

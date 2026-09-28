@@ -45,7 +45,7 @@ export const TEACHER_RESULTS_REVIEW_CHAIN_SOURCE_FILES = [
   'src/assignments/result-display.ts',
   'src/assignments/result-summary-format.ts',
   'src/assignments/attempt-stats.ts',
-  'src/assignments/attempt-stats-handoff.ts',
+  'scripts/assignment-attempt-stats.test.ts',
   'src/assignments/review-priority.ts',
   'src/assignments/student-follow-up-summary.ts',
   'src/assignments/student-follow-up-priority.ts',
@@ -59,7 +59,7 @@ export const TEACHER_RESULTS_REVIEW_CHAIN_SOURCE_FILES = [
   'src/components/assignments/assignment-results-item-performance-sort-control.tsx',
   'src/components/assignments/assignment-results-student-summary-table.tsx',
   'src/assignments/attempt-duration.ts',
-  'src/assignments/answer-feedback-handoff.ts',
+  'src/activities/answer-matching.ts',
   'src/components/assignments/assignment-results-follow-up-panel.tsx',
   'scripts/assignment-result-review-helpers.test.ts',
 ] as const;

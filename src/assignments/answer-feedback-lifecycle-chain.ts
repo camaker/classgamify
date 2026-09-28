@@ -47,7 +47,7 @@ export const ANSWER_FEEDBACK_LIFECYCLE_CHAIN_SOURCE_FILES = [
   'src/components/activities/matching-pairs-board.tsx',
   'src/components/activities/listening-runner.tsx',
   'src/components/activities/open-box-runner.tsx',
-  'src/assignments/answer-feedback-handoff.ts',
+  'scripts/assignment-answer-feedback.test.ts',
   'src/assignments/result-answer-view.ts',
   'src/assignments/result-format.ts',
   'src/assignments/results.ts',

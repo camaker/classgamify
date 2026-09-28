@@ -1,8 +1,6 @@
 import assert from 'node:assert/strict';
 import { existsSync, readFileSync } from 'node:fs';
 import test from 'node:test';
-import { ANSWER_FEEDBACK_LIFECYCLE_CHAIN_HANDOFF_ITEM_IDS } from '@/assignments/answer-feedback-lifecycle-chain';
-import { ASSIGNMENT_ANSWER_FEEDBACK_HANDOFF_ITEM_IDS } from '@/assignments/answer-feedback-handoff';
 import { buildAssignmentResultsCsv } from '@/assignments/results-export';
 import {
   ASSIGNMENT_RESULT_ACCEPTED_ANSWER_CHAIN_HANDOFF_ITEM_IDS,
@@ -20,8 +18,6 @@ import {
   buildAssignmentResultAcceptedAnswerView,
   buildAssignmentResultAttemptAnswerTextView,
 } from '@/assignments/result-answer-view';
-import { SCORED_ATTEMPT_RESULT_CHAIN_HANDOFF_ITEM_IDS } from '@/assignments/scored-attempt-result-chain';
-import { TEACHER_RESULTS_REVIEW_CHAIN_HANDOFF_ITEM_IDS } from '@/assignments/teacher-results-review-chain';
 import { overwriteGetLocale } from '@/locale/paraglide/runtime';
 
 overwriteGetLocale(() => 'en');
@@ -162,16 +158,6 @@ test('assignment result accepted-answer chain is backed by adjacent gates', () =
       `Missing accepted-answer chain file ${filePath}`
     );
   }
-
-  assert.deepEqual(
-    [
-      ASSIGNMENT_ANSWER_FEEDBACK_HANDOFF_ITEM_IDS.length,
-      ANSWER_FEEDBACK_LIFECYCLE_CHAIN_HANDOFF_ITEM_IDS.length,
-      SCORED_ATTEMPT_RESULT_CHAIN_HANDOFF_ITEM_IDS.length,
-      TEACHER_RESULTS_REVIEW_CHAIN_HANDOFF_ITEM_IDS.length,
-    ],
-    Array.from({ length: 4 }, () => 30)
-  );
 });
 
 test('accepted-answer formatters keep primary and alternatives explicit', () => {

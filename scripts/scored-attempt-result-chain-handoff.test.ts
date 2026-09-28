@@ -1,11 +1,6 @@
 import assert from 'node:assert/strict';
 import { existsSync, readFileSync } from 'node:fs';
 import test from 'node:test';
-import { ASSIGNMENT_ANSWER_FEEDBACK_HANDOFF_ITEM_IDS } from '@/assignments/answer-feedback-handoff';
-import { ANSWER_FEEDBACK_LIFECYCLE_CHAIN_HANDOFF_ITEM_IDS } from '@/assignments/answer-feedback-lifecycle-chain';
-import { ASSIGNMENT_ATTEMPT_DURATION_HANDOFF_ITEM_IDS } from '@/assignments/attempt-duration-handoff';
-import { ASSIGNMENT_ATTEMPT_PERSISTENCE_HANDOFF_ITEM_IDS } from '@/assignments/attempt-persistence-handoff';
-import { ASSIGNMENT_ATTEMPT_STATS_HANDOFF_ITEM_IDS } from '@/assignments/attempt-stats-handoff';
 import {
   SCORED_ATTEMPT_RESULT_CHAIN_HANDOFF_ITEM_IDS,
   SCORED_ATTEMPT_RESULT_CHAIN_SOURCE_FILES,
@@ -13,9 +8,6 @@ import {
   type ScoredAttemptResultChainHandoffItemId,
   type ScoredAttemptResultChainHandoffView,
 } from '@/assignments/scored-attempt-result-chain';
-import { STUDENT_RUNNER_PLAY_CHAIN_HANDOFF_ITEM_IDS } from '@/assignments/student-runner-play-chain';
-import { TEACHER_RESULT_COPY_LIFECYCLE_CHAIN_HANDOFF_ITEM_IDS } from '@/assignments/teacher-result-copy-lifecycle-chain';
-import { TEACHER_RESULTS_REVIEW_CHAIN_HANDOFF_ITEM_IDS } from '@/assignments/teacher-results-review-chain';
 
 const PRODUCT_SOURCE = readFileSync('docs/product.md', 'utf8');
 const API_SOURCE = readFileSync('src/api/assignments.ts', 'utf8');
@@ -157,20 +149,6 @@ test('scored attempt result chain is backed by adjacent result gates', () => {
       `Missing scored attempt result chain file ${filePath}`
     );
   }
-
-  assert.deepEqual(
-    [
-      ASSIGNMENT_ATTEMPT_PERSISTENCE_HANDOFF_ITEM_IDS.length,
-      ASSIGNMENT_ATTEMPT_DURATION_HANDOFF_ITEM_IDS.length,
-      STUDENT_RUNNER_PLAY_CHAIN_HANDOFF_ITEM_IDS.length,
-      ASSIGNMENT_ANSWER_FEEDBACK_HANDOFF_ITEM_IDS.length,
-      ANSWER_FEEDBACK_LIFECYCLE_CHAIN_HANDOFF_ITEM_IDS.length,
-      ASSIGNMENT_ATTEMPT_STATS_HANDOFF_ITEM_IDS.length,
-      TEACHER_RESULTS_REVIEW_CHAIN_HANDOFF_ITEM_IDS.length,
-      TEACHER_RESULT_COPY_LIFECYCLE_CHAIN_HANDOFF_ITEM_IDS.length,
-    ],
-    Array.from({ length: 8 }, () => 30)
-  );
 });
 
 test('scored attempt result sources preserve submit, score, and persistence boundaries', () => {

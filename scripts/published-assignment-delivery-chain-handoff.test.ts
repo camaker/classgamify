@@ -8,17 +8,6 @@ import {
   type PublishedAssignmentDeliveryChainHandoffItemId,
   type PublishedAssignmentDeliveryChainHandoffView,
 } from '@/assignments/published-assignment-delivery-chain';
-import { ASSIGNMENT_PUBLISH_CONTROL_BOUNDARY_ITEM_IDS } from '@/assignments/publish-input';
-import { ASSIGNMENT_DELIVERY_POLICY_HANDOFF_ITEM_IDS } from '@/assignments/delivery-summary';
-import { PUBLIC_ASSIGNMENT_ACCESS_HANDOFF_ITEM_IDS } from '@/assignments/public';
-import { PUBLIC_ASSIGNMENT_UNAVAILABLE_ACCESS_HANDOFF_ITEM_IDS } from '@/assignments/unavailable-access';
-import { ASSIGNMENT_ITEM_ORDER_HANDOFF_ITEM_IDS } from '@/assignments/item-order-handoff';
-import { ASSIGNMENT_ATTEMPT_LIMIT_HANDOFF_ITEM_IDS } from '@/assignments/attempt-limit-handoff';
-import { ASSIGNMENT_SUBMISSION_VALIDATION_HANDOFF_ITEM_IDS } from '@/assignments/submission-validation-handoff';
-import { ASSIGNMENT_ATTEMPT_PERSISTENCE_HANDOFF_ITEM_IDS } from '@/assignments/attempt-persistence-handoff';
-import { ASSIGNMENT_ATTEMPT_DURATION_HANDOFF_ITEM_IDS } from '@/assignments/attempt-duration-handoff';
-import { ASSIGNMENT_ANSWER_FEEDBACK_HANDOFF_ITEM_IDS } from '@/assignments/answer-feedback-handoff';
-import { ASSIGNMENT_ATTEMPT_STATS_HANDOFF_ITEM_IDS } from '@/assignments/attempt-stats-handoff';
 
 const ASSIGNMENTS_API_SOURCE = readFileSync('src/api/assignments.ts', 'utf8');
 const DELIVERY_SUMMARY_SOURCE = readFileSync(
@@ -28,10 +17,6 @@ const DELIVERY_SUMMARY_SOURCE = readFileSync(
 const SHARE_LINK_SOURCE = readFileSync('src/assignments/share-link.ts', 'utf8');
 const PUBLIC_ASSIGNMENT_SOURCE = readFileSync(
   'src/assignments/public.ts',
-  'utf8'
-);
-const SUBMISSION_VALIDATION_SOURCE = readFileSync(
-  'src/assignments/submission-validation-handoff.ts',
   'utf8'
 );
 const STUDENT_RUNNER_SOURCE = readFileSync(
@@ -148,23 +133,6 @@ test('published assignment delivery chain stays backed by focused contracts', ()
       `Missing published assignment delivery file ${filePath}`
     );
   }
-
-  assert.deepEqual(
-    [
-      ASSIGNMENT_DELIVERY_POLICY_HANDOFF_ITEM_IDS.length,
-      PUBLIC_ASSIGNMENT_ACCESS_HANDOFF_ITEM_IDS.length,
-      PUBLIC_ASSIGNMENT_UNAVAILABLE_ACCESS_HANDOFF_ITEM_IDS.length,
-      ASSIGNMENT_ITEM_ORDER_HANDOFF_ITEM_IDS.length,
-      ASSIGNMENT_ATTEMPT_LIMIT_HANDOFF_ITEM_IDS.length,
-      ASSIGNMENT_SUBMISSION_VALIDATION_HANDOFF_ITEM_IDS.length,
-      ASSIGNMENT_ATTEMPT_PERSISTENCE_HANDOFF_ITEM_IDS.length,
-      ASSIGNMENT_ATTEMPT_DURATION_HANDOFF_ITEM_IDS.length,
-      ASSIGNMENT_ANSWER_FEEDBACK_HANDOFF_ITEM_IDS.length,
-      ASSIGNMENT_ATTEMPT_STATS_HANDOFF_ITEM_IDS.length,
-      ASSIGNMENT_PUBLISH_CONTROL_BOUNDARY_ITEM_IDS.length,
-    ],
-    Array.from({ length: 11 }, () => 30)
-  );
 });
 
 test('published assignment delivery sources preserve sanitized public and submission boundaries', () => {
@@ -194,10 +162,6 @@ test('published assignment delivery sources preserve sanitized public and submis
   assert.match(
     ASSIGNMENTS_API_SOURCE,
     /resolveAssignmentRuntimeSource\(row\)[\s\S]*orderAssignmentRuntimeItems\(\{[\s\S]*items: resolvedSource\.runtimeItems,[\s\S]*normalizeSubmittedAttemptAnswers\(data\.answers\)[\s\S]*assertSubmittedAnswersMatchRuntimeItems\(\{[\s\S]*answers: submittedAnswers,[\s\S]*runtimeItems: orderedRuntimeItems[\s\S]*buildScoredAttemptInsert\(\{/
-  );
-  assert.match(
-    SUBMISSION_VALIDATION_SOURCE,
-    /assertSubmittedAnswersMatchRuntimeItems\(\{ answers, runtimeItems \}\)/
   );
   assert.match(
     STUDENT_RUNNER_SOURCE,
