@@ -303,7 +303,6 @@
   body[data-print-mode="worksheet"] footer,
   body[data-print-mode="worksheet"] [data-print-hidden],
   body[data-print-mode="worksheet"] [data-sonner-toaster],
-  body[data-print-mode="worksheet"] [data-tanstack-router-devtools],
   body[data-print-mode="worksheet"] #crisp-chatbox,
   body[data-print-mode="worksheet"] [id^="crisp-"],
   body[data-print-mode="worksheet"] .crisp-client {
