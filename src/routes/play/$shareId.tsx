@@ -56,6 +56,7 @@ function PlayPage() {
   const submitAttemptMutation = useSubmitAttempt();
   const [answers, setAnswers] = useState<Record<string, string>>({});
   const [studentName, setStudentName] = useState('');
+  const [studentNameError, setStudentNameError] = useState<string>();
   const [attemptClock, setAttemptClock] = useState<StudentRunnerAttemptClock>();
   const [result, setResult] = useState<StudentRunnerAttemptResult>();
   const [submittedAttemptCount, setSubmittedAttemptCount] = useState(0);
@@ -211,6 +212,14 @@ function PlayPage() {
 
     if (executionPlan.type === 'message') {
       setConfirmIncompleteSubmit(executionPlan.nextConfirmIncompleteSubmit);
+      if (executionPlan.reason === 'missing-student-name') {
+        // Show the problem next to the field and take the student there.
+        setStudentNameError(executionPlan.message);
+        const nameInput = document.getElementById('student-name');
+        nameInput?.scrollIntoView({ block: 'center' });
+        nameInput?.focus({ preventScroll: true });
+        return;
+      }
       // The submit bar already shows the unanswered-item confirmation inline.
       if (!executionPlan.nextConfirmIncompleteSubmit) {
         toast[executionPlan.messageTone](executionPlan.message);
@@ -234,7 +243,14 @@ function PlayPage() {
       setResult(successState.result);
       setConfirmIncompleteSubmit(successState.confirmIncompleteSubmit);
       setSubmittedAttemptCount(successState.submittedAttemptCount);
-      toast.success(successState.successMessage);
+      // The score card is the confirmation; bring it into view.
+      requestAnimationFrame(() => {
+        const resultPanel = document.getElementById(
+          'student-runner-result-panel'
+        );
+        resultPanel?.scrollIntoView({ block: 'start' });
+        resultPanel?.focus({ preventScroll: true });
+      });
     } catch (error) {
       toast.error(resolveStudentAttemptSubmissionFailureMessage(error));
     }
@@ -304,9 +320,13 @@ function PlayPage() {
         controlView={controlView}
         identityView={runnerRouteState.identityView}
         onStartAnotherAttempt={startAnotherAttempt}
-        onStudentNameChange={setStudentName}
+        onStudentNameChange={(nextStudentName: string) => {
+          setStudentName(nextStudentName);
+          setStudentNameError(undefined);
+        }}
         resultPanelView={resultPanelView}
         studentName={studentName}
+        studentNameError={studentNameError}
       >
         <StudentRuntimeItemList
           answers={answers}
