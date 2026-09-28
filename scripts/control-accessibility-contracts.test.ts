@@ -99,15 +99,15 @@ test('teacher controls keep their prepared accessible descriptions', () => {
   );
   assert.match(
     ASSIGNMENT_RESULTS_STUDENT_SEARCH_SOURCE,
-    /aria-describedby=\{sortDescriptionIds\}/
+    /htmlFor=\{view\.sortIds\.select\}[\s\S]*id=\{view\.sortIds\.select\}[\s\S]*aria-label=\{view\.sortAriaLabel\}/
   );
   assert.match(
     ASSIGNMENT_RESULTS_ITEM_SORT_SOURCE,
-    /aria-describedby=\{descriptionIds\}/
+    /htmlFor=\{view\.ids\.select\}[\s\S]*id=\{view\.ids\.select\}[\s\S]*aria-label=\{view\.ariaLabel\}/
   );
   assert.match(
     ASSIGNMENT_RESULTS_REVIEW_FILTER_SOURCE,
-    /aria-describedby=\{descriptionIds\}/
+    /htmlFor=\{view\.ids\.select\}[\s\S]*id=\{view\.ids\.select\}[\s\S]*aria-label=\{view\.ariaLabel\}/
   );
 
   assert.match(

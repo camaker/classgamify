@@ -42,13 +42,10 @@ function AssignmentResultsItemPerformanceRow({
   return (
     <TableRow aria-label={rowView.ariaLabel}>
       <TableCell className="max-w-80">{rowView.promptLabel}</TableCell>
-      <TableCell>{rowView.kindLabel}</TableCell>
       <TableCell>{rowView.correctRateLabel}</TableCell>
       <TableCell>{rowView.submittedLabel}</TableCell>
       <TableCell>{rowView.unansweredLabel}</TableCell>
       <TableCell>{rowView.expectedAnswerText}</TableCell>
-      <TableCell>{rowView.acceptedAnswersText}</TableCell>
-      <TableCell className="max-w-72">{rowView.explanationText}</TableCell>
     </TableRow>
   );
 }

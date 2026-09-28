@@ -98,12 +98,7 @@ function AssignmentResultsHeaderSharePreviewLink({
 
   if (!shareAction.isAvailable) {
     return (
-      <Button
-        type="button"
-        className="w-full sm:w-auto"
-        disabled
-        aria-describedby={describedBy}
-      >
+      <Button type="button" disabled aria-describedby={describedBy}>
         <IconPlayerPlay aria-hidden="true" className="size-4" />
         {shareAction.label}
       </Button>
@@ -116,7 +111,7 @@ function AssignmentResultsHeaderSharePreviewLink({
       params={{
         shareId: shareAction.shareSlug,
       }}
-      className={cn(buttonVariants(), 'w-full sm:w-auto')}
+      className={cn(buttonVariants())}
       aria-describedby={sharePathDescriptionId}
     >
       <IconPlayerPlay aria-hidden="true" className="size-4" />
@@ -195,7 +190,7 @@ function AssignmentResultsHeaderCopyShareAction({
       label={shareAction.copyLabel}
       shareSlug={shareAction.shareSlug}
       shareUrl={shareAction.shareUrl}
-      className="w-full bg-background sm:w-auto"
+      className="bg-background"
     />
   );
 }
@@ -210,10 +205,7 @@ function AssignmentResultsHeaderPrintActionLink({
       to={printAction.to}
       params={{ assignmentId: printAction.assignmentId }}
       search={printAction.search}
-      className={cn(
-        buttonVariants({ variant: 'outline' }),
-        'w-full bg-background sm:w-auto'
-      )}
+      className={cn(buttonVariants({ variant: 'outline' }), 'bg-background')}
     >
       <IconPrinter aria-hidden="true" className="size-4" />
       {printAction.label}

@@ -181,7 +181,7 @@ test.describe('activity authoring', () => {
     });
     await exportMenu.click();
     for (const description of [
-      'Copy a compact class snapshot with metrics, reteach focus, and students who need follow-up.',
+      'Copy a short class summary: scores, what to reteach, and who needs follow-up.',
       'Copy a lesson-ready script for the weakest items and priority students.',
       'Copy prompt-level performance with expected answers, alternatives, and notes.',
       'Copy a student-by-student support list sorted by review need.',
@@ -205,20 +205,22 @@ test.describe('activity authoring', () => {
     await expect(
       page.getByRole('heading', { name: 'Student follow-up', exact: true })
     ).toBeVisible();
+    // Detailed tables live in tabs below the first screen.
+    await page.getByRole('tab', { name: 'By question' }).click();
     await expect(
       page.getByRole('heading', { name: 'Item performance', exact: true })
     ).toBeVisible();
+    await page.getByRole('tab', { name: 'By student' }).click();
     await expect(
       page.getByRole('heading', { name: 'Student summary', exact: true })
     ).toBeVisible();
-    await expect(
-      page.getByRole('heading', { name: 'Student attempts', exact: true })
-    ).toBeVisible();
+    await page.getByRole('tab', { name: /^Submissions \(\d+\)$/ }).click();
     await expect(
       page.getByRole('heading', { name: 'Answer review', exact: true })
     ).toBeVisible();
     await expectNoBrowserErrors(monitor, 'teacher result page load');
 
+    await page.getByRole('tab', { name: 'By student' }).click();
     await page
       .getByRole('textbox', { name: /^Find student:/ })
       .fill('E2E Student');
@@ -227,26 +229,24 @@ test.describe('activity authoring', () => {
       .getByRole('combobox', { name: /^Sort students:/ })
       .selectOption('name');
     await expect(page).toHaveURL(/sort=name/);
+    await page.getByRole('tab', { name: 'By question' }).click();
     await page
       .getByRole('combobox', { name: /^Sort items:/ })
       .selectOption('accuracy');
     await expect(page).toHaveURL(/itemSort=accuracy/);
+    await page.getByRole('tab', { name: /^Submissions \(\d+\)$/ }).click();
     const reviewViewControl = page.getByRole('combobox', {
       name: /^Review view:/,
     });
     await reviewViewControl.selectOption('needs-review');
     await expect(page).toHaveURL(/review=needs-review/);
-    // Search, both sorts, and the review filter each show a visible
-    // Adjusted badge once they leave their defaults.
-    await expect(
-      page.getByRole('status', { name: /^Scope status: Adjusted\./ })
-    ).toHaveCount(4);
     await expectNoBrowserErrors(monitor, 'teacher result filters');
 
-    await page.getByRole('button', { name: 'Clear student search' }).click();
-    await expect(page).not.toHaveURL(/student=/);
     await reviewViewControl.selectOption('all');
     await expect(page).not.toHaveURL(/review=/);
+    await page.getByRole('tab', { name: 'By student' }).click();
+    await page.getByRole('button', { name: 'Clear student search' }).click();
+    await expect(page).not.toHaveURL(/student=/);
     await expectNoBrowserErrors(monitor, 'teacher result filter reset');
 
     await page

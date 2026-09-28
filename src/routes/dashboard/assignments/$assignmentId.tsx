@@ -11,7 +11,6 @@ import {
 } from '@/assignments/result-filters';
 import { AssignmentResultsAttemptReviewCard } from '@/components/assignments/assignment-results-attempt-review-card';
 import { AssignmentResultsAttemptReviewFilterControl } from '@/components/assignments/assignment-results-attempt-review-filter-control';
-import { AssignmentResultsAttemptsTable } from '@/components/assignments/assignment-results-attempts-table';
 import { AssignmentResultsFollowUpPanel } from '@/components/assignments/assignment-results-follow-up-panel';
 import { AssignmentResultsEmptyState } from '@/components/assignments/assignment-results-empty-state';
 import { AssignmentResultsHeaderActions } from '@/components/assignments/assignment-results-header-actions';
@@ -24,7 +23,9 @@ import { AssignmentResultsStudentSearch } from '@/components/assignments/assignm
 import { AssignmentResultsStudentSummaryTable } from '@/components/assignments/assignment-results-student-summary-table';
 import { DashboardLayout } from '@/components/layout/dashboard-layout';
 import { Card } from '@/components/ui/card';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useAssignmentResults } from '@/hooks/use-assignments';
+import { m } from '@/locale/paraglide/messages';
 import { copyTextToClipboard } from '@/lib/clipboard';
 import { downloadFile } from '@/lib/download';
 import { createFileRoute, useNavigate } from '@tanstack/react-router';
@@ -188,107 +189,108 @@ function LoadedAssignmentResultsPage({
             ) : null}
           </div>
 
-          {sectionViews.itemPerformance.isVisible ? (
-            <ResultSection
-              title={sectionViews.itemPerformance.title}
-              description={sectionViews.itemPerformance.description}
-              actions={
-                <AssignmentResultsItemPerformanceSortControl
+          <Tabs defaultValue="questions" className="gap-6">
+            <TabsList>
+              <TabsTrigger value="questions">
+                {m.assignment_results_tab_questions()}
+              </TabsTrigger>
+              <TabsTrigger value="students">
+                {m.assignment_results_tab_students()}
+              </TabsTrigger>
+              <TabsTrigger value="submissions">
+                {m.assignment_results_tab_submissions({
+                  count: pageView.attemptReviewCardViews.length,
+                })}
+              </TabsTrigger>
+            </TabsList>
+
+            <TabsContent value="questions">
+              <ResultSection
+                title={sectionViews.itemPerformance.title}
+                description={sectionViews.itemPerformance.description}
+                actions={
+                  <AssignmentResultsItemPerformanceSortControl
+                    onSortChange={(value) =>
+                      onControlChange({
+                        control: 'item-performance-sort',
+                        value,
+                      })
+                    }
+                    view={pageView.controlViews.itemPerformanceSort}
+                  />
+                }
+              >
+                <AssignmentResultsItemPerformanceTable
+                  tableView={pageView.itemPerformanceTableView}
+                />
+              </ResultSection>
+            </TabsContent>
+
+            <TabsContent value="students">
+              <ResultSection
+                title={sectionViews.studentSummary.title}
+                description={sectionViews.studentSummary.description}
+              >
+                <AssignmentResultsStudentSearch
+                  onClear={() =>
+                    onControlChange({ control: 'student-search', value: '' })
+                  }
+                  onSearch={(value) =>
+                    onControlChange({ control: 'student-search', value })
+                  }
                   onSortChange={(value) =>
-                    onControlChange({
-                      control: 'item-performance-sort',
-                      value,
-                    })
+                    onControlChange({ control: 'student-sort', value })
                   }
-                  view={pageView.controlViews.itemPerformanceSort}
+                  view={pageView.controlViews.studentSearch}
                 />
-              }
-            >
-              <AssignmentResultsItemPerformanceTable
-                tableView={pageView.itemPerformanceTableView}
-              />
-            </ResultSection>
-          ) : null}
+                {pageView.contentState.hasStudentSummaryRows ? (
+                  <AssignmentResultsStudentSummaryTable
+                    tableView={pageView.studentSummaryTableView}
+                  />
+                ) : (
+                  <AssignmentResultsEmptyState
+                    state={sectionViews.studentSummary.emptyState}
+                  />
+                )}
+              </ResultSection>
+            </TabsContent>
 
-          {sectionViews.studentSummary.isVisible ? (
-            <ResultSection
-              title={sectionViews.studentSummary.title}
-              description={sectionViews.studentSummary.description}
-            >
-              <AssignmentResultsStudentSearch
-                onClear={() =>
-                  onControlChange({ control: 'student-search', value: '' })
+            <TabsContent value="submissions">
+              <ResultSection
+                title={sectionViews.answerReview.title}
+                description={
+                  sectionViews.answerReview.submissionSummary ??
+                  sectionViews.answerReview.description
                 }
-                onSearch={(value) =>
-                  onControlChange({ control: 'student-search', value })
+                actions={
+                  <AssignmentResultsAttemptReviewFilterControl
+                    onFilterChange={(value) =>
+                      onControlChange({
+                        control: 'attempt-review-filter',
+                        value,
+                      })
+                    }
+                    view={pageView.controlViews.attemptReviewFilter}
+                  />
                 }
-                onSortChange={(value) =>
-                  onControlChange({ control: 'student-sort', value })
-                }
-                view={pageView.controlViews.studentSearch}
-              />
-              {pageView.contentState.hasStudentSummaryRows ? (
-                <AssignmentResultsStudentSummaryTable
-                  tableView={pageView.studentSummaryTableView}
-                />
-              ) : (
-                <AssignmentResultsEmptyState
-                  state={sectionViews.studentSummary.emptyState}
-                />
-              )}
-            </ResultSection>
-          ) : null}
-
-          <ResultSection
-            title={sectionViews.studentAttempts.title}
-            description={sectionViews.studentAttempts.description}
-          >
-            {pageView.contentState.hasAttemptRows ? (
-              <AssignmentResultsAttemptsTable
-                tableView={pageView.attemptTableView}
-              />
-            ) : (
-              <AssignmentResultsEmptyState
-                state={sectionViews.studentAttempts.emptyState}
-              />
-            )}
-          </ResultSection>
-
-          {sectionViews.answerReview.isVisible ? (
-            <ResultSection
-              title={sectionViews.answerReview.title}
-              description={
-                sectionViews.answerReview.submissionSummary ??
-                sectionViews.answerReview.description
-              }
-              actions={
-                <AssignmentResultsAttemptReviewFilterControl
-                  onFilterChange={(value) =>
-                    onControlChange({
-                      control: 'attempt-review-filter',
-                      value,
-                    })
-                  }
-                  view={pageView.controlViews.attemptReviewFilter}
-                />
-              }
-            >
-              {pageView.contentState.hasAttemptReviewCards ? (
-                <div className="grid gap-3">
-                  {pageView.attemptReviewCardViews.map((attemptView) => (
-                    <AssignmentResultsAttemptReviewCard
-                      key={attemptView.id}
-                      attemptView={attemptView}
-                    />
-                  ))}
-                </div>
-              ) : (
-                <AssignmentResultsEmptyState
-                  state={sectionViews.answerReview.emptyState}
-                />
-              )}
-            </ResultSection>
-          ) : null}
+              >
+                {pageView.contentState.hasAttemptReviewCards ? (
+                  <div className="grid gap-2">
+                    {pageView.attemptReviewCardViews.map((attemptView) => (
+                      <AssignmentResultsAttemptReviewCard
+                        key={attemptView.id}
+                        attemptView={attemptView}
+                      />
+                    ))}
+                  </div>
+                ) : (
+                  <AssignmentResultsEmptyState
+                    state={sectionViews.answerReview.emptyState}
+                  />
+                )}
+              </ResultSection>
+            </TabsContent>
+          </Tabs>
         </>
       ) : (
         <AssignmentResultsEmptyState

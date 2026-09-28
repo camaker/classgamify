@@ -112,9 +112,8 @@ test('assignment source activity context uses frozen snapshots across surfaces',
     ),
     {
       ariaLabel:
-        'Activity description: Frozen source context description.. Printed context copied from the frozen assignment snapshot.',
-      description:
-        'Printed context copied from the frozen assignment snapshot.',
+        'Activity description: Frozen source context description.. Text printed from the assignment.',
+      description: 'Text printed from the assignment.',
       id: 'activity-description',
       kind: 'text',
       label: 'Activity description',
