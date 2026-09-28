@@ -2,7 +2,6 @@ import { getAuthErrorMessages } from '@/lib/locale';
 import { m } from '@/locale/paraglide/messages';
 import { AuthCard } from '@/components/auth/auth-card';
 import { buildAuthErrorRecoveryView } from '@/auth/error-recovery';
-import { buildAuthWorkspaceBoundaryView } from '@/auth/workspace-boundary';
 import { Routes } from '@/lib/routes';
 import { getSafeCallbackPath } from '@/lib/urls';
 import { IconAlertTriangle, IconCircleCheck } from '@tabler/icons-react';
@@ -43,7 +42,6 @@ export function ErrorCard({
     <AuthCard
       headerLabel={recoveryView.title}
       description={recoveryView.description}
-      workspaceBoundary={buildAuthWorkspaceBoundaryView()}
       bottomButtonHref={Routes.Login}
       bottomButtonLabel={m.auth_error_back_to_login()}
       bottomButtonSearch={authSwitchSearch}

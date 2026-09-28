@@ -1,5 +1,3 @@
-import { buildAdminUsersHandoffView } from '@/admin/users-view';
-import { AdminUsersHandoffPanel } from '@/components/admin/users/admin-users-handoff-panel';
 import { UsersTable } from '@/components/admin/users/users-table';
 import { useUsers } from '@/hooks/use-users';
 import type { ColumnFiltersState, SortingState } from '@tanstack/react-table';
@@ -64,30 +62,6 @@ export function AdminUsersContent() {
     effectiveSort,
     clientFilters
   );
-  const handoffView = useMemo(
-    () =>
-      buildAdminUsersHandoffView({
-        filters: clientFilters,
-        loading: isLoading,
-        pageIndex: page,
-        pageSize: size,
-        search,
-        sorting: effectiveSort,
-        total: data?.total ?? 0,
-        visibleCount: data?.items.length ?? 0,
-      }),
-    [
-      clientFilters,
-      data?.items.length,
-      data?.total,
-      effectiveSort,
-      isLoading,
-      page,
-      search,
-      size,
-    ]
-  );
-
   const handleFilterChange = (filters: ColumnFiltersState) => {
     const getValue = (id: string) => {
       const f = filters.find((x) => x.id === id);
@@ -112,7 +86,6 @@ export function AdminUsersContent() {
 
   return (
     <div className="grid gap-4">
-      <AdminUsersHandoffPanel handoffView={handoffView} />
       <UsersTable
         data={data?.items ?? []}
         total={data?.total ?? 0}

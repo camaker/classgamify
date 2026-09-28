@@ -1,20 +1,12 @@
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import test from 'node:test';
-import {
-  buildSettingsFilesPageViewModel,
-  buildSettingsFilesWorkspaceSummaryView,
-} from '@/settings/files-view';
 import { overwriteGetLocale } from '@/locale/paraglide/runtime';
 
 overwriteGetLocale(() => 'en');
 
 const FILES_ROUTE_SOURCE = readFileSync(
   'src/routes/settings/files.tsx',
-  'utf8'
-);
-const FILES_WORKSPACE_SUMMARY_SOURCE = readFileSync(
-  'src/components/settings/files/files-workspace-summary.tsx',
   'utf8'
 );
 const FILES_PAGE_CONTENT_SOURCE = readFileSync(
@@ -32,28 +24,6 @@ const USER_FILES_HOOK_SOURCE = readFileSync(
 const USER_FILES_API_SOURCE = readFileSync('src/api/user-files.ts', 'utf8');
 
 test('settings files route puts the material boundary before the file table', () => {
-  const pageView = buildSettingsFilesPageViewModel();
-  const workspaceView = buildSettingsFilesWorkspaceSummaryView();
-
-  assert.equal(pageView.workspaceSummaryView.title, workspaceView.title);
-  assert.deepEqual(
-    workspaceView.itemViews.map((item) => item.id),
-    [
-      'source-library',
-      'activity-attachments',
-      'ai-provenance',
-      'student-privacy',
-    ]
-  );
-  assert.equal(
-    workspaceView.itemViews.every(
-      (item) =>
-        item.ariaLabel.includes(item.label) &&
-        item.ariaLabel.includes(item.description)
-    ),
-    true
-  );
-
   assert.match(
     FILES_ROUTE_SOURCE,
     /beforeLoad:[\s\S]*isSettingsFilesEnabled\(\)[\s\S]*throw notFound\(\{ routeId: rootRouteId \}\)/,
@@ -61,13 +31,8 @@ test('settings files route puts the material boundary before the file table', ()
   );
   assert.match(
     FILES_ROUTE_SOURCE,
-    /const pageView = buildSettingsFilesPageViewModel\(\);[\s\S]*FilesWorkspaceSummary[\s\S]*view=\{pageView\.workspaceSummaryView\}[\s\S]*FilesPageContent/,
-    'Files settings route should render the material boundary before the table.'
-  );
-  assert.match(
-    FILES_WORKSPACE_SUMMARY_SOURCE,
-    /view\.itemViews\.map\(\(itemView\) =>[\s\S]*key=\{itemView\.id\}[\s\S]*aria-label=\{itemView\.ariaLabel\}[\s\S]*itemView\.label[\s\S]*itemView\.description/,
-    'Workspace summary should render prepared item labels and descriptions.'
+    /const pageView = buildSettingsFilesPageViewModel\(\);[\s\S]*FilesPageContent/,
+    'Files settings route should render the file library directly.'
   );
   assert.doesNotMatch(
     FILES_ROUTE_SOURCE,

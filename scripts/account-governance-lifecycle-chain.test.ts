@@ -39,7 +39,6 @@ const ADMIN_USERS_QUERY_SOURCE = readFileSync(
   'src/admin/users-query.ts',
   'utf8'
 );
-const ADMIN_USERS_VIEW_SOURCE = readFileSync('src/admin/users-view.ts', 'utf8');
 const ADMIN_USERS_ROUTE_SOURCE = readFileSync(
   'src/routes/admin/users.tsx',
   'utf8'
@@ -140,7 +139,7 @@ test('account governance lifecycle sources preserve auth and account settings bo
   );
   assert.match(
     PROFILE_ROUTE_SOURCE,
-    /ProfileWorkspaceSummary[\s\S]*UpdateNameCard[\s\S]*UpdateAvatarCard/,
+    /UpdateNameCard[\s\S]*UpdateAvatarCard/,
     'Profile route should expose only teacher identity update cards.'
   );
   assert.match(
@@ -170,11 +169,6 @@ test('account governance lifecycle sources preserve admin, storage, and provider
     ADMIN_USERS_QUERY_SOURCE,
     /(?=[\s\S]*ADMIN_USER_LIST_INPUT_LIMITS)(?=[\s\S]*pageSizeMax: 100)(?=[\s\S]*buildAdminUserListWhere)(?=[\s\S]*buildSqlLikeContainsPattern)(?=[\s\S]*buildAdminUserListOrderBy)(?=[\s\S]*getAdminUserListOffset)/,
     'Admin user query helpers should normalize search, role/status, sorting, and bounded paging.'
-  );
-  assert.match(
-    ADMIN_USERS_VIEW_SOURCE,
-    /changesActivityContent: false[\s\S]*changesAssignmentLinks: false[\s\S]*exposesSearchText: false[\s\S]*exposesUserEmails: false/,
-    'Admin users handoff should avoid exposing search text, emails, or classroom data.'
   );
   assert.match(
     ADMIN_USERS_ROUTE_SOURCE,
@@ -211,7 +205,7 @@ test('account governance lifecycle chain focused gate is documented', () => {
   );
   assert.match(
     TEST_CATALOG_SOURCE.replace(/\s+/g, ' '),
-    /auth session and email verification[\s\S]*profile and security settings[\s\S]*security workspace summary[\s\S]*explicit account deletion[\s\S]*admin user governance[\s\S]*billing\/payment callback\/notification\/files boundaries[\s\S]*storage owner checks[\s\S]*provider-secret and student-data guards/,
+    /auth session and email verification[\s\S]*profile and security settings[\s\S]*explicit account deletion[\s\S]*admin user governance[\s\S]*billing\/payment callback\/notification\/files boundaries[\s\S]*storage owner checks[\s\S]*provider-secret and student-data guards/,
     'TEST-CATALOG should describe the full account governance lifecycle chain scope.'
   );
 });

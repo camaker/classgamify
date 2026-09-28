@@ -15,7 +15,6 @@ import {
 import { Input } from '@/components/ui/input';
 import { websiteConfig } from '@/config/website';
 import { authClient } from '@/auth/client';
-import { buildAuthWorkspaceBoundaryView } from '@/auth/workspace-boundary';
 import { DEFAULT_LOGIN_REDIRECT, Routes } from '@/lib/routes';
 import { getPathWithLocale, getSafeCallbackPath } from '@/lib/urls';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -86,21 +85,6 @@ export function RegisterForm({
   return (
     <AuthCard
       headerLabel={m.auth_register_create_account()}
-      benefits={[
-        {
-          id: 'progress',
-          text: m.auth_register_benefit_progress(),
-        },
-        {
-          id: 'worksheets',
-          text: m.auth_register_benefit_worksheets(),
-        },
-        {
-          id: 'review',
-          text: m.auth_register_benefit_review(),
-        },
-      ]}
-      workspaceBoundary={buildAuthWorkspaceBoundaryView()}
       bottomButtonLabel={m.auth_register_sign_in_hint()}
       bottomButtonHref={Routes.Login}
       bottomButtonSearch={authSwitchSearch}

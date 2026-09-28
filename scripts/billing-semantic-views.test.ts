@@ -2,37 +2,22 @@ import assert from 'node:assert/strict';
 import test from 'node:test';
 import { buildSettingsBillingCardViewModel } from '@/payment/billing-view';
 import type { PricePlan, Subscription } from '@/payment/types';
-import {
-  buildSettingsBillingPageViewModel,
-  buildSettingsBillingWorkspaceSummaryView,
-} from '@/settings/billing-view';
+import { buildSettingsBillingPageViewModel } from '@/settings/billing-view';
 import { overwriteGetLocale } from '@/locale/paraglide/runtime';
 
 overwriteGetLocale(() => 'en');
 
 test('billing page exposes ClassGamify workspace billing semantics', () => {
   const pageView = buildSettingsBillingPageViewModel();
-  const workspaceSummaryView = buildSettingsBillingWorkspaceSummaryView();
 
   assert.equal(pageView.breadcrumbs.at(-1)?.id, 'billing');
   assert.equal(
     pageView.contentAriaLabel,
-    'Billing: Review your ClassGamify workspace access, hosted checkout status, assignment workflow limits, and plan management options'
+    'Billing: Your current plan and billing.'
   );
   assert.equal(
     pageView.planSectionAriaLabel,
     'Current ClassGamify plan and hosted billing controls'
-  );
-  assert.deepEqual(
-    pageView.workspaceSummaryView.itemViews.map((item) => item.id),
-    ['plan-access', 'activity-library', 'assignment-workflow', 'results-ai']
-  );
-  assert.equal(workspaceSummaryView.itemViews.length, 4);
-  assert.equal(
-    pageView.workspaceSummaryView.itemViews.every((item) =>
-      Boolean(item.ariaLabel)
-    ),
-    true
   );
 });
 
@@ -104,10 +89,6 @@ test('billing card exposes plan, action, status, and period semantics', () => {
   assert.deepEqual(collectBillingSemanticSliceIds(), [
     'page-content',
     'plan-section',
-    'workspace-plan-access',
-    'workspace-activity-library',
-    'workspace-assignment-workflow',
-    'workspace-results-ai',
     'card-current-plan',
     'card-state-ready',
     'card-action-upgrade',
@@ -180,7 +161,6 @@ const trialBillingSubscription: Subscription = {
 };
 
 function collectBillingSemanticSliceIds() {
-  const pageView = buildSettingsBillingPageViewModel();
   const freeBillingView = buildSettingsBillingCardViewModel({
     canManageBilling: true,
     currentPlan: freeBillingPlan,
@@ -203,9 +183,6 @@ function collectBillingSemanticSliceIds() {
   return [
     'page-content',
     'plan-section',
-    ...pageView.workspaceSummaryView.itemViews.map(
-      (item) => `workspace-${item.id}`
-    ),
     'card-current-plan',
     `card-state-${freeBillingView.state}`,
     `card-action-${freeBillingView.action?.kind}`,

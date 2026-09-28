@@ -1,6 +1,5 @@
 import { DashboardLayout } from '@/components/layout/dashboard-layout';
 import { FilesPageContent } from '@/components/settings/files/files-page-content';
-import { FilesWorkspaceSummary } from '@/components/settings/files/files-workspace-summary';
 import {
   buildSettingsFilesPageViewModel,
   isSettingsFilesEnabled,
@@ -26,7 +25,6 @@ function FilesPage() {
       description={pageView.description}
     >
       <div className="flex flex-col gap-8">
-        <FilesWorkspaceSummary view={pageView.workspaceSummaryView} />
         <FilesPageContent />
       </div>
     </DashboardLayout>

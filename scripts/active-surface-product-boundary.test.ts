@@ -18,7 +18,7 @@ const ACTIVE_SURFACE_SOURCE_FILES = [
   'wrangler.jsonc',
   'src/config/website.ts',
   'src/env/server.ts',
-  'src/auth/workspace-boundary.ts',
+  'src/components/auth/auth-card.tsx',
   'src/contact/inquiry-view.ts',
   'src/api/contact.ts',
   'src/components/contact/contact-form-card.tsx',

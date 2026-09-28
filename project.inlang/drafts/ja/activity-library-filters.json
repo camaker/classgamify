@@ -5,7 +5,7 @@
   "activity_library_filter_clear_search": "アクティビティ検索を消去",
   "activity_library_filter_label": "アクティビティを検索",
   "activity_library_filter_placeholder": "タイトル、説明、テンプレートで検索",
-  "activity_library_filter_search_description": "自分のアクティビティライブラリだけを、タイトル、説明、テンプレート名で検索します。検索範囲がほかの教師のデータに広がることはありません。",
+  "activity_library_filter_search_description": "タイトル、説明、テンプレートで検索します。",
   "activity_library_filter_status_description": "自分のライブラリ内で、使用中とアーカイブ済みのアクティビティを切り替えます。",
   "activity_library_filter_status_label": "アクティビティの状態",
   "activity_library_filter_status_selected_description": "{status}：{description}",

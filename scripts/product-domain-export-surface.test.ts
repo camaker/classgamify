@@ -282,16 +282,6 @@ const INTERNAL_PRODUCT_DOMAIN_HELPERS = [
   },
   {
     declaration: 'type',
-    filePath: 'src/settings/profile-view.ts',
-    name: 'SettingsProfileWorkspaceSummaryItemId',
-  },
-  {
-    declaration: 'function',
-    filePath: 'src/settings/profile-view.ts',
-    name: 'buildSettingsProfileWorkspaceSummaryView',
-  },
-  {
-    declaration: 'type',
     filePath: 'src/storage/upload-readiness.ts',
     name: 'StorageUploadObjectPlan',
   },
@@ -410,8 +400,8 @@ const RESULT_VIEW_REEXPORT_BOUNDARIES = [
   },
 ] satisfies ReExportBoundary[];
 
-test('product-domain export surface keeps 58 helpers and types internal', () => {
-  assert.equal(INTERNAL_PRODUCT_DOMAIN_HELPERS.length, 58);
+test('product-domain export surface keeps 56 helpers and types internal', () => {
+  assert.equal(INTERNAL_PRODUCT_DOMAIN_HELPERS.length, 56);
 
   for (const helper of INTERNAL_PRODUCT_DOMAIN_HELPERS) {
     const source = readFileSync(helper.filePath, 'utf8');

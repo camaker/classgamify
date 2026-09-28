@@ -6,6 +6,6 @@
   "assignment_list_empty_status_filtered_description": "ステータスが{status}の課題はまだありません。絞り込みを解除するか、別のステータスに切り替えてください。",
   "assignment_list_page_breadcrumb_current": "課題",
   "assignment_list_page_breadcrumb_dashboard": "ダッシュボード",
-  "assignment_list_page_description": "共有リンク、クラス設定、結果指標を備えた公開済みアクティビティです。",
+  "assignment_list_page_description": "公開した生徒用リンクと、提出数・スコアです。",
   "assignment_list_page_title": "課題"
 }

@@ -136,10 +136,16 @@ mode stays available through the switcher and must remain legible.
   labels only, never for sentences a user must read to act.
 - Screen-reader-only (`sr-only`) text describes the visible UI. It must not add
   audit or implementation detail that sighted users never see.
+- No explanation panels. A page opens with the thing the user came to do: the
+  sign-in form, the setting to change, the list to act on. Do not stack
+  "boundary", "scope", or "what this page protects" cards above it; if one
+  sentence of context is needed, it goes in the page description.
 
 **Copy:** Write what the user does and sees, not how the system is built.
 Words such as snapshot, runtime, payload, handoff, frozen, contract, surface,
-and scope do not belong in teacher or student UI.
+scope, boundary, provenance, sanitized, owner-scoped, instance, and storage key
+do not belong in teacher or student UI. Product and competitor names such as
+Wordwall or Liveworksheets do not belong in UI copy either.
 
 ### Page Standards
 
