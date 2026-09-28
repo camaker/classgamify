@@ -100,8 +100,8 @@ test('teacher workspace operations sources preserve owner scope and preview boun
   );
   assert.match(
     ASSIGNMENT_LIST_SOURCE,
-    /broadensBeyondOwner: false[\s\S]*countsStarterPreviewAsOwned: false[\s\S]*keepsDistributionStepsPrepared: true/,
-    'Assignment list privacy boundary should keep owner scope and distribution readiness.'
+    /broadensBeyondOwner: false[\s\S]*countsStarterPreviewAsOwned: false/,
+    'Assignment list privacy boundary should keep owner scope.'
   );
   assert.match(
     ASSIGNMENT_LIST_SOURCE,

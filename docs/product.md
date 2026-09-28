@@ -483,7 +483,7 @@ losing search or status filter state. Assignment list overview cards summarize
 the full current filter result, not only the visible page, so teachers can trust
 open-link counts, total completions, and average accuracy while paging through a
 large class archive. Assignment overview cards, current-view scope items, card
-stats, and distribution steps should expose prepared assignment-domain labels,
+stats, and the share-link row should expose prepared assignment-domain labels,
 values, and descriptions through stable semantic outputs so teachers can verify
 list state, delivery readiness, and result activity without relying on visual
 card layout alone.

@@ -61,7 +61,7 @@ export type DashboardOverviewLoopStatus =
   | 'collecting-results'
   | 'reviewing';
 
-export type DashboardOverviewNextActionId =
+type DashboardOverviewNextActionId =
   | 'create-activity'
   | 'publish-assignment'
   | 'share-assignment'
@@ -438,9 +438,10 @@ export function buildDashboardOverviewMetrics({
           }),
       id: 'results',
       label: m.dashboard_overview_metric_results_label(),
-      value: resolvedAssignmentsLoading
-        ? '-'
-        : formatAssignmentResultPercent(assignmentSummary?.averageScore ?? 0),
+      value:
+        resolvedAssignmentsLoading || completions === 0
+          ? '-'
+          : formatAssignmentResultPercent(assignmentSummary?.averageScore ?? 0),
     }),
   ];
 }

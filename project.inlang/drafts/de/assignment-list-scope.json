@@ -16,9 +16,9 @@
   "assignment_list_scope_search_all_description": "Kein Suchtext schränkt die Aufgabenliste ein.",
   "assignment_list_scope_search_all_value": "Alle Aufgabenlinks",
   "assignment_list_scope_search_filtered_description": "Nur Links, die diesem Suchtext entsprechen, sind enthalten.",
-  "assignment_list_scope_search_label": "Suchbereich",
+  "assignment_list_scope_search_label": "Suche",
   "assignment_list_scope_status_all_description": "Alle Aufgabenstatus sind enthalten.",
-  "assignment_list_scope_status_label": "Statusbereich",
+  "assignment_list_scope_status_label": "Statusfilter",
   "assignment_list_scope_summary": "{firstItem}-{lastItem} von {total} Aufgaben auf Seite {currentPage} von {totalPages}.",
   "assignment_list_scope_summary_empty": "In der aktuellen Listenansicht sind keine Aufgaben sichtbar.",
   "assignment_list_scope_summary_out_of_range": "Seite {currentPage} liegt hinter den verfügbaren {totalPages} Seiten."

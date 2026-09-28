@@ -11,7 +11,7 @@
   "assignment_list_status_filter_closed": "Fermés",
   "assignment_list_status_filter_closed_description": "Afficher les liens fermés par l’enseignant tout en conservant l’accès aux résultats.",
   "assignment_list_status_filter_draft": "Brouillons",
-  "assignment_list_status_filter_draft_description": "Afficher les activités qui n’ont pas encore été publiées avec un instantané.",
+  "assignment_list_status_filter_draft_description": "Afficher les devoirs pas encore publiés.",
   "assignment_list_status_filter_expired": "Expirés",
   "assignment_list_status_filter_expired_description": "Afficher les liens dont la période de remise est terminée et qui n’acceptent plus de réponses.",
   "assignment_list_status_filter_published": "Ouverts",

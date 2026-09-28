@@ -16,9 +16,9 @@
   "assignment_list_scope_search_all_description": "검색어로 과제 목록을 제한하지 않았습니다.",
   "assignment_list_scope_search_all_value": "모든 과제 링크",
   "assignment_list_scope_search_filtered_description": "검색어와 일치하는 과제 링크만 포함됩니다.",
-  "assignment_list_scope_search_label": "검색 범위",
+  "assignment_list_scope_search_label": "검색",
   "assignment_list_scope_status_all_description": "모든 과제 상태가 포함됩니다.",
-  "assignment_list_scope_status_label": "상태 범위",
+  "assignment_list_scope_status_label": "상태",
   "assignment_list_scope_summary": "전체 {total}건 중 {firstItem}-{lastItem}건, {totalPages}페이지 중 {currentPage}페이지를 표시합니다.",
   "assignment_list_scope_summary_empty": "현재 목록 보기에 표시할 과제가 없습니다.",
   "assignment_list_scope_summary_out_of_range": "{currentPage}페이지는 사용 가능한 {totalPages}페이지를 벗어났습니다."

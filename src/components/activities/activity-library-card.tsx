@@ -4,7 +4,6 @@ import { buildAssignmentListRouteSearch } from '@/assignments/list-filters';
 import { buildActivityLibraryRouteSearch } from '@/activities/library-filters';
 import {
   buildActivityLibraryCardDisplayView,
-  type ActivityLibraryCardActionButtonView,
   type ActivityLibraryCardActionView,
   type ActivityLibraryCardDerivativeActionView,
   type ActivityLibraryCardActionState,
@@ -32,6 +31,12 @@ import {
   CardTitle,
 } from '@/components/ui/card';
 import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
+import {
   useArchiveActivity,
   useDuplicateActivity,
   useRemixActivityTemplate,
@@ -39,10 +44,12 @@ import {
 } from '@/hooks/use-activities';
 import { Routes } from '@/lib/routes';
 import { cn } from '@/lib/utils';
+import { m } from '@/locale/paraglide/messages';
 import {
   IconChevronDown,
   IconCopy,
   IconDeviceGamepad2,
+  IconDots,
   IconEdit,
   IconFolderOff,
   IconPlus,
@@ -225,10 +232,27 @@ export function ActivityLibraryCard({
             />
           ) : null}
         </section>
+        <ActivityLibraryCardActions
+          actionState={cardDisplayView.actionState}
+          actionView={cardDisplayView.actionView}
+          label={cardDisplayView.actionsLabel}
+          restoreRequiredLabel={cardDisplayView.restoreRequiredLabel}
+          editAction={cardDisplayView.editAction}
+          isArchiving={archiveMutation.isPending}
+          isDuplicating={duplicateMutation.isPending}
+          isRestoring={restoreMutation.isPending}
+          onArchive={archiveActivity}
+          onDuplicate={duplicateActivity}
+          onPublish={openPublishDialog}
+          onRestore={restoreActivity}
+        />
         {/* Other game formats are an occasional task; keep them one click away. */}
         <details className="group rounded-lg border">
-          <summary className="flex cursor-pointer list-none items-center justify-between gap-2 px-3 py-2 font-medium text-sm [&::-webkit-details-marker]:hidden">
-            {cardDisplayView.compatibilityLabel}
+          <summary
+            aria-label={cardDisplayView.compatibilityLabel}
+            className="flex cursor-pointer list-none items-center justify-between gap-2 px-3 py-2 font-medium text-sm [&::-webkit-details-marker]:hidden"
+          >
+            {m.activity_library_card_other_games_summary()}
             <IconChevronDown
               aria-hidden="true"
               className="size-4 text-muted-foreground transition-transform group-open:rotate-180"
@@ -244,20 +268,6 @@ export function ActivityLibraryCard({
             />
           </div>
         </details>
-        <ActivityLibraryCardActions
-          actionState={cardDisplayView.actionState}
-          actionView={cardDisplayView.actionView}
-          label={cardDisplayView.actionsLabel}
-          restoreRequiredLabel={cardDisplayView.restoreRequiredLabel}
-          editAction={cardDisplayView.editAction}
-          isArchiving={archiveMutation.isPending}
-          isDuplicating={duplicateMutation.isPending}
-          isRestoring={restoreMutation.isPending}
-          onArchive={archiveActivity}
-          onDuplicate={duplicateActivity}
-          onPublish={openPublishDialog}
-          onRestore={restoreActivity}
-        />
       </CardContent>
       <ActivityPublishDialog
         activity={{
@@ -328,30 +338,54 @@ function ActivityLibraryCardActions({
 }) {
   if (!actionState.showPersistedActions) return null;
 
+  const showMoreMenu =
+    actionState.showDerivativeActions || actionState.showArchiveAction;
+
   return (
     <section aria-label={label} className="flex flex-wrap gap-2">
-      {actionState.showEditAction ? (
-        <ActivityLibraryEditActionLink action={editAction} />
-      ) : null}
-      {actionState.showDerivativeActions ? (
-        <ActivityLibraryDuplicateActionButton
-          action={actionView.duplicate}
-          disabled={isDuplicating}
-          onClick={onDuplicate}
-        />
-      ) : null}
-      {actionState.showArchiveAction ? (
-        <ActivityLibraryArchiveActionButton
-          action={actionView.archive}
-          disabled={isArchiving}
-          onClick={onArchive}
-        />
-      ) : null}
       {actionState.showPublishAction ? (
         <ActivityLibraryPublishActionButton
           action={actionView.publish}
           onClick={onPublish}
         />
+      ) : null}
+      {actionState.showEditAction ? (
+        <ActivityLibraryEditActionLink action={editAction} />
+      ) : null}
+      {showMoreMenu ? (
+        <DropdownMenu>
+          <DropdownMenuTrigger
+            className={cn(
+              buttonVariants({ variant: 'outline', size: 'sm' }),
+              'bg-background'
+            )}
+          >
+            <IconDots aria-hidden="true" className="size-4" />
+            {m.common_more()}
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="start">
+            {actionState.showDerivativeActions ? (
+              <DropdownMenuItem
+                aria-label={actionView.duplicate.ariaLabel}
+                disabled={isDuplicating}
+                onClick={onDuplicate}
+              >
+                <IconCopy aria-hidden="true" className="size-4" />
+                {actionView.duplicate.label}
+              </DropdownMenuItem>
+            ) : null}
+            {actionState.showArchiveAction ? (
+              <DropdownMenuItem
+                aria-label={actionView.archive.ariaLabel}
+                disabled={isArchiving}
+                onClick={onArchive}
+              >
+                <IconFolderOff aria-hidden="true" className="size-4" />
+                {actionView.archive.label}
+              </DropdownMenuItem>
+            ) : null}
+          </DropdownMenuContent>
+        </DropdownMenu>
       ) : null}
       {actionState.showRestoreAction ||
       actionState.showRestoreRequiredMessage ? (
@@ -377,61 +411,13 @@ function ActivityLibraryEditActionLink({
       to={action.to}
       params={{ activityId: action.activityId }}
       className={cn(
-        buttonVariants({ variant: 'outline' }),
-        'w-full bg-background sm:w-fit'
+        buttonVariants({ variant: 'outline', size: 'sm' }),
+        'bg-background'
       )}
     >
       <IconEdit aria-hidden="true" className="size-4" />
       {action.label}
     </Link>
-  );
-}
-
-function ActivityLibraryDuplicateActionButton({
-  action,
-  disabled,
-  onClick,
-}: {
-  action: ActivityLibraryCardDerivativeActionView;
-  disabled: boolean;
-  onClick: () => void;
-}) {
-  return (
-    <Button
-      type="button"
-      variant="outline"
-      className="w-full bg-background sm:w-fit"
-      aria-label={action.ariaLabel}
-      disabled={disabled}
-      onClick={onClick}
-    >
-      <IconCopy aria-hidden="true" className="size-4" />
-      {action.label}
-    </Button>
-  );
-}
-
-function ActivityLibraryArchiveActionButton({
-  action,
-  disabled,
-  onClick,
-}: {
-  action: ActivityLibraryCardActionButtonView;
-  disabled: boolean;
-  onClick: () => void;
-}) {
-  return (
-    <Button
-      type="button"
-      variant="outline"
-      className="w-full bg-background sm:w-fit"
-      aria-label={action.ariaLabel}
-      disabled={disabled}
-      onClick={onClick}
-    >
-      <IconFolderOff aria-hidden="true" className="size-4" />
-      {action.label}
-    </Button>
   );
 }
 
@@ -445,7 +431,7 @@ function ActivityLibraryPublishActionButton({
   return (
     <Button
       type="button"
-      className="w-full sm:w-fit"
+      size="sm"
       aria-label={action.ariaLabel}
       onClick={onClick}
     >

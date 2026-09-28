@@ -29,7 +29,7 @@ export function DashboardOverviewMetricCard({
       >
         {metric.value}
       </output>
-      <p className="sr-only">{metric.description}</p>
+      <p className="text-muted-foreground text-xs">{metric.description}</p>
     </article>
   );
 }

@@ -1,6 +1,6 @@
 {
   "assignment_list_summary_assignments": "Tareas",
-  "assignment_list_summary_assignments_description": "Total de enlaces de tareas en el ámbito actual de la lista.",
+  "assignment_list_summary_assignments_description": "Enlaces para estudiantes que coinciden con tus filtros.",
   "assignment_list_summary_average": "Promedio",
   "assignment_list_summary_average_empty": "Aún no hay intentos calificados.",
   "assignment_list_summary_average_with_attempts": "Calculado a partir de los intentos calificados de los estudiantes.",

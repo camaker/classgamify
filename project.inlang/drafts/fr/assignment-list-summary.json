@@ -1,6 +1,6 @@
 {
   "assignment_list_summary_assignments": "Activités",
-  "assignment_list_summary_assignments_description": "Nombre total de liens d’activités dans le périmètre actuel.",
+  "assignment_list_summary_assignments_description": "Liens élèves correspondant à vos filtres.",
   "assignment_list_summary_average": "Moyenne",
   "assignment_list_summary_average_empty": "Aucune tentative notée pour le moment.",
   "assignment_list_summary_average_with_attempts": "Calculée à partir des tentatives notées des élèves.",

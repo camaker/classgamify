@@ -11,12 +11,12 @@
   "activity_library_scope_search_all_description": "Ningún texto de búsqueda limita la biblioteca.",
   "activity_library_scope_search_all_value": "Todas las actividades guardadas",
   "activity_library_scope_search_filtered_description": "Solo se incluyen las actividades que coinciden con esta búsqueda.",
-  "activity_library_scope_search_label": "Ámbito de búsqueda",
-  "activity_library_scope_status_label": "Ámbito del estado",
+  "activity_library_scope_search_label": "Búsqueda",
+  "activity_library_scope_status_label": "Estado",
   "activity_library_scope_summary": "Actividades {firstItem}–{lastItem} de {total}, página {currentPage} de {totalPages}.",
   "activity_library_scope_summary_empty": "No hay actividades visibles en la vista actual.",
   "activity_library_scope_summary_out_of_range": "La página {currentPage} supera las {totalPages} páginas disponibles.",
   "activity_library_scope_template_all_description": "Se incluyen todas las familias de plantillas.",
   "activity_library_scope_template_filtered_description": "Solo se incluyen las actividades que usan exactamente esta familia de plantillas.",
-  "activity_library_scope_template_label": "Ámbito de plantillas"
+  "activity_library_scope_template_label": "Juego"
 }

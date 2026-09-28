@@ -1,6 +1,6 @@
 {
   "assignment_list_summary_assignments": "과제",
-  "assignment_list_summary_assignments_description": "현재 목록 범위의 전체 과제 링크 수입니다.",
+  "assignment_list_summary_assignments_description": "필터와 일치하는 학생 링크입니다.",
   "assignment_list_summary_average": "평균",
   "assignment_list_summary_average_empty": "아직 채점된 응답이 없습니다.",
   "assignment_list_summary_average_with_attempts": "채점된 학생 응답을 기준으로 계산했습니다.",

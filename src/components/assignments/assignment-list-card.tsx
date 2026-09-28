@@ -1,9 +1,6 @@
 import type {
   AssignmentListCardActionView,
   AssignmentListCardViewModel,
-  AssignmentListDistributionStepId,
-  AssignmentListDistributionStepView,
-  AssignmentListDistributionView,
   AssignmentListPrintAction,
   AssignmentListResultAction,
   AssignmentListShareAction,
@@ -28,7 +25,6 @@ import { cn } from '@/lib/utils';
 import {
   IconChartBar,
   IconChevronDown,
-  IconClipboardText,
   IconListCheck,
   IconLock,
   IconLockOpen,
@@ -70,12 +66,16 @@ export function AssignmentListCard({ assignment }: AssignmentListCardProps) {
       aria-label={assignment.ariaLabel}
       className="rounded-lg"
     >
-      <AssignmentListCardHeader assignment={assignment} />
-      <CardContent className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-end">
-        <AssignmentListCardSummary
-          assignment={assignment}
-          idPrefix={cardElementId}
-        />
+      <AssignmentListCardHeader
+        assignment={assignment}
+        idPrefix={cardElementId}
+      />
+      <CardContent className="grid min-w-0 gap-3">
+        {assignment.actionView.shareAction ? (
+          <AssignmentListShareActions
+            action={assignment.actionView.shareAction}
+          />
+        ) : null}
         <AssignmentListCardActions
           assignmentId={assignment.id}
           label={assignment.actionsLabel}
@@ -83,6 +83,21 @@ export function AssignmentListCard({ assignment }: AssignmentListCardProps) {
           statusPending={updateStatusMutation.isPending}
           onUpdateStatus={updateStatus}
         />
+        <details
+          aria-label={assignment.summaryLabel}
+          className="group rounded-lg border"
+        >
+          <summary className="flex cursor-pointer list-none items-center justify-between gap-2 px-3 py-2 font-medium text-sm [&::-webkit-details-marker]:hidden">
+            {m.assignment_results_settings_toggle()}
+            <IconChevronDown
+              aria-hidden="true"
+              className="size-4 text-muted-foreground transition-transform group-open:rotate-180"
+            />
+          </summary>
+          <div className="border-t p-3">
+            <AssignmentSettingsSummary view={assignment.settingsSummaryView} />
+          </div>
+        </details>
       </CardContent>
     </Card>
   );
@@ -90,177 +105,38 @@ export function AssignmentListCard({ assignment }: AssignmentListCardProps) {
 
 function AssignmentListCardHeader({
   assignment,
-}: {
-  assignment: AssignmentListCardViewModel;
-}) {
-  return (
-    <CardHeader>
-      <div className="flex flex-wrap items-center gap-2">
-        <Badge variant="secondary" className="rounded-md">
-          {assignment.statusLabel}
-        </Badge>
-        <Badge variant="outline" className="rounded-md">
-          <IconListCheck className="size-3.5" />
-          {assignment.templateLabel}
-        </Badge>
-      </div>
-      <CardTitle>
-        <h2 className="text-lg font-semibold">{assignment.title}</h2>
-      </CardTitle>
-      <CardDescription>
-        <p>{assignment.activityDescription}</p>
-      </CardDescription>
-    </CardHeader>
-  );
-}
-
-function AssignmentListCardSummary({
-  assignment,
   idPrefix,
 }: {
   assignment: AssignmentListCardViewModel;
   idPrefix: string;
 }) {
   return (
-    <section aria-label={assignment.summaryLabel} className="grid gap-4">
-      <AssignmentListDistribution
-        idPrefix={idPrefix}
-        view={assignment.distributionView}
-      />
-      <details className="group rounded-lg border">
-        <summary className="flex cursor-pointer list-none items-center justify-between gap-2 px-3 py-2 font-medium text-sm [&::-webkit-details-marker]:hidden">
-          {m.assignment_results_settings_toggle()}
-          <IconChevronDown
-            aria-hidden="true"
-            className="size-4 text-muted-foreground transition-transform group-open:rotate-180"
-          />
-        </summary>
-        <div className="border-t p-3">
-          <AssignmentSettingsSummary view={assignment.settingsSummaryView} />
+    <CardHeader className="flex flex-wrap items-start justify-between gap-x-6 gap-y-3">
+      <div className="grid min-w-0 flex-1 basis-64 gap-1.5">
+        <div className="flex flex-wrap items-center gap-2">
+          <Badge variant="secondary" className="rounded-md">
+            {assignment.statusLabel}
+          </Badge>
+          <Badge variant="outline" className="rounded-md">
+            <IconListCheck className="size-3.5" />
+            {assignment.templateLabel}
+          </Badge>
         </div>
-      </details>
+        <CardTitle>
+          <h2 className="text-lg font-semibold">{assignment.title}</h2>
+        </CardTitle>
+        <CardDescription>
+          <p>{assignment.activityDescription}</p>
+        </CardDescription>
+      </div>
       <AssignmentListStats
         idPrefix={idPrefix}
         label={assignment.statsLabel}
         statItems={assignment.statItems}
       />
-    </section>
+    </CardHeader>
   );
 }
-
-function AssignmentListDistribution({
-  idPrefix,
-  view,
-}: {
-  idPrefix: string;
-  view: AssignmentListDistributionView;
-}) {
-  const titleId = `${idPrefix}-distribution-title`;
-  const descriptionId = `${idPrefix}-distribution-description`;
-  const statusId = `${idPrefix}-distribution-status`;
-
-  return (
-    <section
-      aria-label={view.ariaLabel}
-      aria-describedby={`${descriptionId} ${statusId}`}
-      className="grid gap-3"
-    >
-      <div className="flex flex-wrap items-center justify-between gap-2">
-        <div>
-          <h3 id={titleId} className="font-medium text-sm">
-            {view.title}
-          </h3>
-          <p
-            id={descriptionId}
-            className="mt-1 text-muted-foreground text-xs leading-5"
-          >
-            {view.description}
-          </p>
-        </div>
-        <Badge
-          id={statusId}
-          aria-describedby={descriptionId}
-          variant={view.status === 'ready-to-share' ? 'secondary' : 'outline'}
-          className={cn(
-            'rounded-md',
-            view.status === 'blocked' &&
-              'border-warning/40 bg-warning/15 text-warning-text',
-            view.status === 'collecting-results' &&
-              'border-info/40 bg-info/15 text-info-text'
-          )}
-        >
-          {view.statusLabel}
-        </Badge>
-      </div>
-      <dl className="grid gap-2 sm:grid-cols-2 xl:grid-cols-4">
-        {view.stepViews.map((stepView) => (
-          <AssignmentListDistributionStep
-            idPrefix={idPrefix}
-            key={stepView.id}
-            stepView={stepView}
-          />
-        ))}
-      </dl>
-    </section>
-  );
-}
-
-function AssignmentListDistributionStep({
-  idPrefix,
-  stepView,
-}: {
-  idPrefix: string;
-  stepView: AssignmentListDistributionStepView;
-}) {
-  const Icon = assignmentListDistributionStepIcons[stepView.id];
-  const labelId = `${idPrefix}-distribution-${stepView.id}-label`;
-  const statusId = `${idPrefix}-distribution-${stepView.id}-status`;
-  const descriptionId = `${idPrefix}-distribution-${stepView.id}-description`;
-
-  return (
-    <div
-      className="rounded-lg border bg-muted/20 p-3"
-      data-status={stepView.status}
-    >
-      <div className="flex items-start justify-between gap-2">
-        <dt
-          id={labelId}
-          className="flex items-center gap-2 font-medium text-xs leading-5"
-        >
-          <Icon aria-hidden="true" className="size-4 text-primary" />
-          {stepView.label}
-        </dt>
-        <dd>
-          <Badge
-            id={statusId}
-            aria-labelledby={`${labelId} ${statusId}`}
-            aria-describedby={descriptionId}
-            variant={stepView.status === 'ready' ? 'secondary' : 'outline'}
-            className="rounded-md"
-          >
-            {stepView.statusLabel}
-          </Badge>
-        </dd>
-      </div>
-      <dd className="mt-2 text-muted-foreground text-xs leading-5">
-        <output
-          id={descriptionId}
-          aria-label={stepView.ariaLabel}
-          aria-labelledby={`${labelId} ${descriptionId}`}
-        >
-          {stepView.description}
-        </output>
-      </dd>
-    </div>
-  );
-}
-
-const assignmentListDistributionStepIcons = {
-  'copy-link': IconClipboardText,
-  'preview-link': IconPlayerPlay,
-  'print-worksheet': IconPrinter,
-  'review-results': IconChartBar,
-} satisfies Record<AssignmentListDistributionStepId, typeof IconChartBar>;
 
 function AssignmentListCardActions({
   assignmentId,
@@ -276,10 +152,7 @@ function AssignmentListCardActions({
   statusPending: boolean;
 }) {
   return (
-    <section
-      aria-label={label}
-      className="flex flex-col gap-2 sm:flex-row lg:flex-col"
-    >
+    <section aria-label={label} className="flex flex-wrap gap-2">
       {actionView.resultAction ? (
         <AssignmentListResultActionLink action={actionView.resultAction} />
       ) : null}
@@ -293,9 +166,6 @@ function AssignmentListCardActions({
           statusAction={actionView.statusAction}
           onUpdateStatus={onUpdateStatus}
         />
-      ) : null}
-      {actionView.shareAction ? (
-        <AssignmentListShareActions action={actionView.shareAction} />
       ) : null}
     </section>
   );
@@ -311,8 +181,8 @@ function AssignmentListResultActionLink({
       to={action.to}
       params={{ assignmentId: action.assignmentId }}
       className={cn(
-        buttonVariants({ variant: 'outline' }),
-        'w-full bg-background lg:w-auto'
+        buttonVariants({ variant: 'outline', size: 'sm' }),
+        'bg-background'
       )}
     >
       <IconChartBar aria-hidden="true" className="size-4" />
@@ -332,8 +202,8 @@ function AssignmentListPrintActionLink({
       params={{ assignmentId: action.assignmentId }}
       search={action.search}
       className={cn(
-        buttonVariants({ variant: 'outline' }),
-        'w-full bg-background lg:w-auto'
+        buttonVariants({ variant: 'outline', size: 'sm' }),
+        'bg-background'
       )}
     >
       <IconPrinter aria-hidden="true" className="size-4" />
@@ -376,11 +246,12 @@ function AssignmentListStatusActionButton({
   );
 
   return (
-    <div className="grid gap-1">
+    <div>
       <Button
         type="button"
         variant="outline"
-        className="w-full bg-background lg:w-auto"
+        size="sm"
+        className="bg-background"
         disabled={isPending}
         aria-label={statusAction.ariaLabel}
         aria-describedby={describedBy}
@@ -442,27 +313,30 @@ function AssignmentListShareActions({
     getAssignmentListSharePathDescriptionId(action);
 
   return (
-    <div className="grid gap-2">
-      <AssignmentListSharePath
-        action={action}
-        descriptionId={sharePathDescriptionId}
-      />
-      <AssignmentListSharePreviewAction
-        action={action}
-        disabledReasonId={disabledReasonId}
-        sharePathDescriptionId={sharePathDescriptionId}
-      />
-      <CopyAssignmentShareLinkButton
-        disabled={!action.isAvailable}
-        disabledReasonCode={action.disabledReasonCode}
-        disabledMessage={action.disabledReason}
-        disabledReasonId={disabledReasonId}
-        descriptionId={sharePathDescriptionId}
-        label={action.copyLabel}
-        shareSlug={action.shareSlug}
-        shareUrl={action.shareUrl}
-        className="w-full bg-background lg:w-auto"
-      />
+    <div className="grid min-w-0 gap-1.5">
+      <div className="flex min-w-0 flex-wrap items-center gap-2 rounded-lg border bg-muted/30 p-1.5 pl-3">
+        <AssignmentListSharePath
+          action={action}
+          descriptionId={sharePathDescriptionId}
+        />
+        <CopyAssignmentShareLinkButton
+          disabled={!action.isAvailable}
+          disabledReasonCode={action.disabledReasonCode}
+          disabledMessage={action.disabledReason}
+          disabledReasonId={disabledReasonId}
+          descriptionId={sharePathDescriptionId}
+          label={action.copyLabel}
+          shareSlug={action.shareSlug}
+          shareUrl={action.shareUrl}
+          size="sm"
+          variant="default"
+        />
+        <AssignmentListSharePreviewAction
+          action={action}
+          disabledReasonId={disabledReasonId}
+          sharePathDescriptionId={sharePathDescriptionId}
+        />
+      </div>
       <AssignmentListShareDisabledReason
         action={action}
         disabledReasonId={disabledReasonId}
@@ -499,18 +373,21 @@ function AssignmentListSharePath({
     <section
       aria-labelledby={shareUrlLabelId}
       aria-describedby={descriptionId}
-      className="max-w-64 rounded-lg border bg-muted/30 px-3 py-2 text-muted-foreground text-xs leading-5"
+      className="min-w-0 flex-1 basis-48"
     >
-      <span id={shareUrlLabelId} className="font-medium">
+      <span id={shareUrlLabelId} className="sr-only">
         {action.shareUrlLabel}
       </span>
-      <span id={shareUrlValueId} className="mt-1 block break-all font-mono">
+      <span
+        id={shareUrlValueId}
+        className="block truncate font-mono text-muted-foreground text-xs"
+      >
         {action.shareUrl}
       </span>
-      <span id={sharePathLabelId} className="mt-1 block font-medium">
+      <span id={sharePathLabelId} className="sr-only">
         {action.sharePathLabel}
       </span>
-      <span id={sharePathValueId} className="mt-1 block truncate font-mono">
+      <span id={sharePathValueId} className="sr-only">
         {action.sharePath}
       </span>
       <span id={descriptionId} className="sr-only">
@@ -539,7 +416,9 @@ function AssignmentListSharePreviewAction({
     return (
       <Button
         type="button"
-        className="w-full lg:w-auto"
+        variant="outline"
+        size="sm"
+        className="bg-background"
         disabled
         aria-describedby={describedBy}
       >
@@ -553,7 +432,10 @@ function AssignmentListSharePreviewAction({
     <Link
       to={action.to}
       params={{ shareId: action.shareSlug }}
-      className={cn(buttonVariants(), 'w-full lg:w-auto')}
+      className={cn(
+        buttonVariants({ variant: 'outline', size: 'sm' }),
+        'bg-background'
+      )}
       aria-describedby={sharePathDescriptionId}
     >
       <IconPlayerPlay aria-hidden="true" className="size-4" />
@@ -574,7 +456,7 @@ function AssignmentListShareDisabledReason({
   return (
     <p
       id={disabledReasonId}
-      className="max-w-56 text-muted-foreground text-xs leading-5"
+      className="text-muted-foreground text-xs leading-5"
     >
       {action.disabledReason}
     </p>

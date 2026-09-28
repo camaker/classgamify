@@ -16,9 +16,9 @@
   "assignment_list_scope_search_all_description": "Ningún texto de búsqueda limita la lista.",
   "assignment_list_scope_search_all_value": "Todos los enlaces de tareas",
   "assignment_list_scope_search_filtered_description": "Solo se incluyen los enlaces que coinciden con esta búsqueda.",
-  "assignment_list_scope_search_label": "Ámbito de búsqueda",
+  "assignment_list_scope_search_label": "Búsqueda",
   "assignment_list_scope_status_all_description": "Se incluyen todos los estados de las tareas.",
-  "assignment_list_scope_status_label": "Ámbito de estados",
+  "assignment_list_scope_status_label": "Estado",
   "assignment_list_scope_summary": "Mostrando {firstItem}-{lastItem} de {total} tareas en la página {currentPage} de {totalPages}.",
   "assignment_list_scope_summary_empty": "No hay tareas visibles en la lista actual.",
   "assignment_list_scope_summary_out_of_range": "La página {currentPage} supera las {totalPages} páginas disponibles."

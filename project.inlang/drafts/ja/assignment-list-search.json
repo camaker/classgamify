@@ -11,7 +11,7 @@
   "assignment_list_status_filter_closed": "終了",
   "assignment_list_status_filter_closed_description": "教師が終了したリンクを、結果を保持したまま表示します。",
   "assignment_list_status_filter_draft": "下書き",
-  "assignment_list_status_filter_draft_description": "まだ公開およびスナップショット作成を行っていない課題を表示します。",
+  "assignment_list_status_filter_draft_description": "まだ公開していない課題を表示します。",
   "assignment_list_status_filter_expired": "期限切れ",
   "assignment_list_status_filter_expired_description": "提出期限を過ぎ、生徒の回答を受け付けていないリンクを表示します。",
   "assignment_list_status_filter_published": "公開中",

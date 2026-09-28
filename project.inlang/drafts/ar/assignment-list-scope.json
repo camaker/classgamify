@@ -16,9 +16,9 @@
   "assignment_list_scope_search_all_description": "لا يوجد نص بحث يضيّق قائمة التكليفات.",
   "assignment_list_scope_search_all_value": "جميع روابط التكليفات",
   "assignment_list_scope_search_filtered_description": "تُدرج فقط الروابط المطابقة لنص البحث.",
-  "assignment_list_scope_search_label": "نطاق البحث",
+  "assignment_list_scope_search_label": "البحث",
   "assignment_list_scope_status_all_description": "تُدرج جميع حالات التكليفات.",
-  "assignment_list_scope_status_label": "نطاق الحالة",
+  "assignment_list_scope_status_label": "الحالة",
   "assignment_list_scope_summary": "عرض {firstItem}-{lastItem} من {total} تكليفًا في الصفحة {currentPage} من {totalPages}.",
   "assignment_list_scope_summary_empty": "لا توجد تكليفات ظاهرة في عرض القائمة الحالي.",
   "assignment_list_scope_summary_out_of_range": "تتجاوز الصفحة {currentPage} عدد الصفحات المتاحة وهو {totalPages}."

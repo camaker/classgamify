@@ -16,9 +16,9 @@
   "assignment_list_scope_search_all_description": "Aucun texte de recherche ne limite la liste.",
   "assignment_list_scope_search_all_value": "Tous les liens d’activités",
   "assignment_list_scope_search_filtered_description": "Seuls les liens correspondant à cette recherche sont inclus.",
-  "assignment_list_scope_search_label": "Périmètre de recherche",
+  "assignment_list_scope_search_label": "Recherche",
   "assignment_list_scope_status_all_description": "Tous les états du cycle de vie sont inclus.",
-  "assignment_list_scope_status_label": "Périmètre des statuts",
+  "assignment_list_scope_status_label": "Statut",
   "assignment_list_scope_summary": "Affichage de {firstItem} à {lastItem} sur {total} activités, page {currentPage} sur {totalPages}.",
   "assignment_list_scope_summary_empty": "Aucune activité n’est visible dans la liste actuelle.",
   "assignment_list_scope_summary_out_of_range": "La page {currentPage} dépasse les {totalPages} pages disponibles."

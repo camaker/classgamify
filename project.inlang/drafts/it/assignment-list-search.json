@@ -11,7 +11,7 @@
   "assignment_list_status_filter_closed": "Chiusi",
   "assignment_list_status_filter_closed_description": "Mostra i link chiusi dall’insegnante mantenendo disponibili i risultati.",
   "assignment_list_status_filter_draft": "Bozze",
-  "assignment_list_status_filter_draft_description": "Mostra le attività non ancora pubblicate e fissate in uno snapshot.",
+  "assignment_list_status_filter_draft_description": "Mostra i compiti non ancora pubblicati.",
   "assignment_list_status_filter_expired": "Scaduti",
   "assignment_list_status_filter_expired_description": "Mostra i link oltre la scadenza che non accettano più consegne.",
   "assignment_list_status_filter_published": "Aperti",
