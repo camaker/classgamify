@@ -15,7 +15,7 @@ export const ASSIGNMENT_STATUS_TRANSITION_CONTINUITY_CHAIN_SOURCE_FILES = [
   'src/assignments/submission-lifecycle-continuity-chain.ts',
   'src/assignments/published-assignment-delivery-chain.ts',
   'src/assignments/public.ts',
-  'src/assignments/unavailable-access.ts',
+  'src/routes/play/$shareId.tsx',
   'src/assignments/list-filters.ts',
   'src/assignments/list-query.ts',
   'src/assignments/list-summary.ts',

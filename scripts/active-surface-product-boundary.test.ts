@@ -9,11 +9,6 @@ import {
   type ActiveSurfaceProductBoundaryItemId,
   type ActiveSurfaceProductBoundaryView,
 } from '@/config/active-surface-product-boundary';
-import { ACCOUNT_GOVERNANCE_LIFECYCLE_CHAIN_HANDOFF_ITEM_IDS } from '@/auth/account-governance-lifecycle-chain';
-import { AUTH_WORKSPACE_HANDOFF_ITEM_IDS } from '@/auth/workspace-boundary';
-import { CONTACT_CLASSROOM_INTAKE_HANDOFF_ITEM_IDS } from '@/contact/inquiry-view';
-import { DEVELOPER_CONFIGURATION_HANDOFF_ITEM_IDS } from '@/config/developer-configuration-handoff';
-import { MAIL_TRANSACTIONAL_WORKSPACE_HANDOFF_ITEM_IDS } from '@/mail/workspace-boundary';
 
 const TEST_CATALOG_SOURCE = readFileSync('tests/e2e/TEST-CATALOG.md', 'utf8');
 const SECRET_CHECKOUT_SESSION = 'checkout-session-secret';
@@ -122,19 +117,6 @@ test('active surface product boundary summarizes current account and configurati
 });
 
 test('active surface source inventory stays tied to existing 30-slice focused contracts', () => {
-  const focusedContractLengths = new Map<string, number>([
-    [
-      'account-governance',
-      ACCOUNT_GOVERNANCE_LIFECYCLE_CHAIN_HANDOFF_ITEM_IDS.length,
-    ],
-    ['auth', AUTH_WORKSPACE_HANDOFF_ITEM_IDS.length],
-    ['contact', CONTACT_CLASSROOM_INTAKE_HANDOFF_ITEM_IDS.length],
-    ['developer-config', DEVELOPER_CONFIGURATION_HANDOFF_ITEM_IDS.length],
-    ['mail', MAIL_TRANSACTIONAL_WORKSPACE_HANDOFF_ITEM_IDS.length],
-  ]);
-
-  assert.deepEqual([...focusedContractLengths.values()], [30, 30, 30, 30, 30]);
-
   for (const filePath of ACTIVE_SURFACE_PRODUCT_BOUNDARY_SOURCE_FILES) {
     assert.ok(existsSync(filePath), `Missing active surface file ${filePath}`);
   }

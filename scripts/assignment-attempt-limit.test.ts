@@ -34,10 +34,6 @@ const DELIVERY_SUMMARY_SOURCE = readFileSync(
   'src/assignments/delivery-summary.ts',
   'utf8'
 );
-const PUBLIC_ASSIGNMENT_SOURCE = readFileSync(
-  'src/assignments/public.ts',
-  'utf8'
-);
 const RESULT_EXPORT_SOURCE = readFileSync(
   'src/assignments/results-export.ts',
   'utf8'
@@ -220,8 +216,8 @@ test('assignment attempt limit is wired to shared source boundaries', () => {
     'Delivery summaries should derive attempt-limit status from normalized assignment settings.'
   );
   assert.match(
-    PUBLIC_ASSIGNMENT_SOURCE,
-    /case 'attempt-limit':[\s\S]*assignment_delivery_label_attempts/,
+    DELIVERY_SUMMARY_SOURCE,
+    /assignment_delivery_label_attempts/,
     'Public assignment rule summaries should expose the attempt-limit delivery policy.'
   );
   assert.match(

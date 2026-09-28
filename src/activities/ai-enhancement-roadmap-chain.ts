@@ -39,7 +39,7 @@ export const ACTIVITY_AI_ENHANCEMENT_ROADMAP_CHAIN_SOURCE_FILES = [
   'src/activities/ai-draft.ts',
   'src/activities/ai-draft-focus.ts',
   'src/components/activities/activity-ai-draft-panel.tsx',
-  'src/activities/ai-draft-fallback-handoff.ts',
+  'src/activities/ai-enhancement-draft-output.ts',
   'src/activities/ai-authoring-chain.ts',
   'src/components/activities/activity-library-compatibility-panel.tsx',
   'src/activities/template-roadmap-capability-chain.ts',

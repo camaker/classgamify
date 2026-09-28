@@ -160,7 +160,6 @@ real UI locally when available, and run the relevant Playwright specs.
   exists.
 - `pnpm cf-typegen` keeps Worker binding types aligned with `wrangler.jsonc`.
 - E2E helpers stay local-first and guarded by the documented test mode.
-- `src/config/developer-configuration-handoff.ts` exposes the 30-slice
-  developer configuration boundary used by fast tests to keep examples,
-  verification gates, secrets, bindings, and provider copy aligned with the
-  classroom product loop.
+- `scripts/developer-configuration.test.ts` keeps examples, verification
+  gates, secrets, bindings, and provider copy aligned with the classroom
+  product loop.

@@ -27,7 +27,7 @@ test('handoff inventory discovers product-loop contracts', () => {
     inventoryEntries.map((entry) => entry.constName)
   );
 
-  for (const requiredName of ['PUBLIC_TEMPLATE_ENTRY_HANDOFF_ITEM_IDS']) {
+  for (const requiredName of ['ADMIN_USERS_HANDOFF_ITEM_IDS']) {
     assert.ok(
       discoveredNames.has(requiredName),
       `Missing expected handoff inventory entry ${requiredName}.`
@@ -37,7 +37,7 @@ test('handoff inventory discovers product-loop contracts', () => {
   assert.ok(
     // The rendered handoff sections are being retired surface by surface, so
     // this floor tracks the remaining source-level contracts.
-    inventoryEntries.length >= 56,
+    inventoryEntries.length >= 37,
     'Handoff inventory should cover the remaining source-level contracts.'
   );
 });

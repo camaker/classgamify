@@ -9,10 +9,7 @@ import {
   type AccountGovernanceLifecycleChainHandoffView,
 } from '@/auth/account-governance-lifecycle-chain';
 import { AUTH_ERROR_RECOVERY_STEP_IDS } from '@/auth/error-recovery';
-import { AUTH_WORKSPACE_HANDOFF_ITEM_IDS } from '@/auth/workspace-boundary';
 import { Routes } from '@/lib/routes';
-import { ADMIN_USERS_HANDOFF_ITEM_IDS } from '@/admin/users-view';
-import { STORAGE_FILE_ACCESS_ITEM_IDS } from '@/storage/file-access';
 
 const PRODUCT_SOURCE = readFileSync('docs/product.md', 'utf8');
 const AUTH_DOC_SOURCE = readFileSync('docs/auth.md', 'utf8');
@@ -21,10 +18,6 @@ const AUTH_SERVER_SOURCE = readFileSync('src/auth/auth.ts', 'utf8');
 const AUTH_CLIENT_SOURCE = readFileSync('src/auth/client.ts', 'utf8');
 const PROVIDER_STATUS_SOURCE = readFileSync(
   'src/auth/provider-status.ts',
-  'utf8'
-);
-const AUTH_WORKSPACE_SOURCE = readFileSync(
-  'src/auth/workspace-boundary.ts',
   'utf8'
 );
 const AUTH_ERROR_SOURCE = readFileSync('src/auth/error-recovery.ts', 'utf8');
@@ -197,15 +190,6 @@ test('account governance lifecycle chain is backed by focused governance gates',
       `Missing account governance lifecycle chain file ${filePath}`
     );
   }
-
-  assert.deepEqual(
-    [
-      AUTH_WORKSPACE_HANDOFF_ITEM_IDS.length,
-      ADMIN_USERS_HANDOFF_ITEM_IDS.length,
-      STORAGE_FILE_ACCESS_ITEM_IDS.length,
-    ],
-    Array.from({ length: 3 }, () => 30)
-  );
   assert.ok(
     AUTH_ERROR_RECOVERY_STEP_IDS.length >= 3,
     'Auth error recovery should keep multiple safe recovery steps.'
@@ -275,11 +259,6 @@ test('account governance lifecycle sources preserve auth and account settings bo
     PROVIDER_STATUS_SOURCE,
     /enableGoogleLogin[\s\S]*GOOGLE_CLIENT_ID[\s\S]*GOOGLE_CLIENT_SECRET[\s\S]*googleOneTapClientId/,
     'Provider status should expose One Tap client id only after runtime Google availability checks.'
-  );
-  assert.match(
-    AUTH_WORKSPACE_SOURCE,
-    /createsAssignmentLinks: false[\s\S]*exposesAuthSecrets: false[\s\S]*exposesPassword: false[\s\S]*modifiesActivityContent: false[\s\S]*requiresTeacherSessionForWorkspace: true/,
-    'Auth workspace handoff should protect account entry without mutating classroom data.'
   );
   assert.match(
     AUTH_ERROR_SOURCE,

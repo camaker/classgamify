@@ -12,8 +12,6 @@ import {
   ACTIVITY_SOURCE_MATERIAL_REFERENCE_ITEM_IDS,
   ACTIVITY_SOURCE_MATERIAL_REFERENCE_PRIVACY_CONTRACT,
 } from '@/activities/material-references';
-import { PUBLIC_ASSIGNMENT_ACCESS_HANDOFF_ITEM_IDS } from '@/assignments/public';
-import { PUBLIC_ASSIGNMENT_UNAVAILABLE_ACCESS_HANDOFF_ITEM_IDS } from '@/assignments/unavailable-access';
 import {
   STORAGE_FILE_ACCESS_ITEM_IDS,
   STORAGE_FILE_ACCESS_PRIVACY_CONTRACT,
@@ -189,13 +187,6 @@ test('source-material privacy chain ties together existing focused contracts', (
     rejectsUnsafeFileIds: true,
     scope: 'activity-source-material-reference-boundary',
   });
-  assert.deepEqual(
-    [
-      PUBLIC_ASSIGNMENT_ACCESS_HANDOFF_ITEM_IDS.length,
-      PUBLIC_ASSIGNMENT_UNAVAILABLE_ACCESS_HANDOFF_ITEM_IDS.length,
-    ],
-    [30, 30]
-  );
 });
 
 test('public, student-runtime, AI, and storage sources keep private material data out', () => {
@@ -209,10 +200,6 @@ test('public, student-runtime, AI, and storage sources keep private material dat
     publicAssignmentPayloadType,
     /\b(sourceMaterials|r2Key|storageKey|fileId|originalName|permission|bytes|fileList)\b/,
     'PublicAssignmentPayload should not expose teacher file lists, file ids, filenames, storage keys, permissions, or bytes.'
-  );
-  assert.match(
-    PUBLIC_ASSIGNMENT_SOURCE,
-    /exposesTeacherSourceMaterials: false/
   );
   assert.doesNotMatch(
     STUDENT_RUNTIME_SOURCE,

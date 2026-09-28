@@ -1,7 +1,7 @@
 import { Routes } from '@/lib/routes';
 import { baseLocale, locales, type Locale } from '@/locale/paraglide/runtime';
 
-export type PublicIndexableRouteId =
+type PublicIndexableRouteId =
   | 'blog'
   | 'about'
   | 'classroom-quiz-game'

@@ -8,9 +8,6 @@ import {
   type ActivityAuthoringLibraryChainHandoffItemId,
   type ActivityAuthoringLibraryChainHandoffView,
 } from '@/activities/authoring-library-chain';
-import { PUBLIC_TEMPLATE_ENTRY_HANDOFF_ITEM_IDS } from '@/activities/entry-page-view';
-import { ACTIVITY_SOURCE_MATERIAL_REFERENCE_ITEM_IDS } from '@/activities/material-references';
-import { ACTIVITY_TEMPLATE_SCAFFOLD_QUALITY_HANDOFF_ITEM_IDS } from '@/activities/scaffolds';
 
 const PRODUCT_SOURCE = readFileSync('docs/product.md', 'utf8');
 const ACTIVITIES_API_SOURCE = readFileSync('src/api/activities.ts', 'utf8');
@@ -156,15 +153,6 @@ test('activity authoring/library chain is backed by focused gates', () => {
       `Missing activity authoring/library chain file ${filePath}`
     );
   }
-
-  assert.deepEqual(
-    [
-      PUBLIC_TEMPLATE_ENTRY_HANDOFF_ITEM_IDS.length,
-      ACTIVITY_TEMPLATE_SCAFFOLD_QUALITY_HANDOFF_ITEM_IDS.length,
-      ACTIVITY_SOURCE_MATERIAL_REFERENCE_ITEM_IDS.length,
-    ],
-    Array.from({ length: 3 }, () => 30)
-  );
 });
 
 test('activity authoring/library sources preserve product boundaries', () => {

@@ -45,7 +45,7 @@ export const ACTIVE_SURFACE_PRODUCT_BOUNDARY_SOURCE_FILES = [
   'package.json',
   'wrangler.jsonc',
   'src/config/website.ts',
-  'src/config/developer-configuration-handoff.ts',
+  'src/env/server.ts',
   'src/auth/workspace-boundary.ts',
   'src/contact/inquiry-view.ts',
   'src/api/contact.ts',

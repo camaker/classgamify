@@ -8,7 +8,6 @@ import {
   type AssignmentLifecycleGovernanceChainHandoffItemId,
   type AssignmentLifecycleGovernanceChainHandoffView,
 } from '@/assignments/assignment-lifecycle-governance-chain';
-import { PUBLIC_ASSIGNMENT_UNAVAILABLE_ACCESS_HANDOFF_ITEM_IDS } from '@/assignments/unavailable-access';
 
 const PRODUCT_SOURCE = readFileSync('docs/product.md', 'utf8');
 const LIFECYCLE_SOURCE = readFileSync('src/assignments/lifecycle.ts', 'utf8');
@@ -29,10 +28,6 @@ const LIST_VIEW_SOURCE = readFileSync('src/assignments/list-view.ts', 'utf8');
 const SHARE_LINK_SOURCE = readFileSync('src/assignments/share-link.ts', 'utf8');
 const PUBLIC_ASSIGNMENT_SOURCE = readFileSync(
   'src/assignments/public.ts',
-  'utf8'
-);
-const UNAVAILABLE_ACCESS_SOURCE = readFileSync(
-  'src/assignments/unavailable-access.ts',
   'utf8'
 );
 const PERSISTENCE_SOURCE = readFileSync(
@@ -184,17 +179,13 @@ test('assignment lifecycle governance chain summarizes each state boundary', () 
       ['lifecycle-privacy-guard', 'Private data hidden'],
       [
         'public-unavailable-access-handoff-boundary',
-        '30 unavailable access slices',
+        'Closed, expired, draft, and missing',
       ],
     ]
   );
   assert.equal(
     getHandoffValue(handoffView, 'expired-reopen-block'),
     'Expired blocked'
-  );
-  assert.equal(
-    getHandoffValue(handoffView, 'public-unavailable-access-handoff-boundary'),
-    `${PUBLIC_ASSIGNMENT_UNAVAILABLE_ACCESS_HANDOFF_ITEM_IDS.length} unavailable access slices`
   );
 });
 
@@ -359,16 +350,6 @@ test('share links, public lookups, and unavailable states preserve lifecycle gat
     PUBLIC_ASSIGNMENT_SOURCE,
     /resolveAssignmentRuntimeSource[\s\S]*orderAssignmentRuntimeItems[\s\S]*runtimeItems: stripRuntimeAnswers\(orderedRuntimeItems\)/,
     'Available public payloads should use sanitized runtime items.'
-  );
-  assert.match(
-    UNAVAILABLE_ACCESS_SOURCE,
-    /PUBLIC_ASSIGNMENT_UNAVAILABLE_ACCESS_HANDOFF_ITEM_IDS[\s\S]*'results-retention'[\s\S]*'reopen-guidance'[\s\S]*PublicAssignmentUnavailableAccessHandoffPrivacyView/,
-    'Unavailable access handoff should cover result retention, reopen guidance, and privacy.'
-  );
-  assert.match(
-    UNAVAILABLE_ACCESS_SOURCE,
-    /runtime-content-policy[\s\S]*context\.unavailable\.contentPolicy\.runtimeItemsHidden[\s\S]*raw-token-policy[\s\S]*context\.unavailable\.identityPolicy\.rawAnonymousTokenHidden[\s\S]*submission-policy[\s\S]*context\.unavailable\.submissionPolicy\.submissionsBlocked/,
-    'Unavailable access values should read the policy-only payload.'
   );
 });
 

@@ -2,7 +2,6 @@ import assert from 'node:assert/strict';
 import { existsSync, readFileSync } from 'node:fs';
 import test from 'node:test';
 import type { RuntimeItem } from '@/activities/runtime';
-import { ASSIGNMENT_DELIVERY_POLICY_HANDOFF_ITEM_IDS } from '@/assignments/delivery-summary';
 import { buildPrintableWorksheetPageViewModel } from '@/assignments/printable-worksheet-view';
 import {
   buildPrintableAssignmentSearch,
@@ -17,7 +16,6 @@ import {
   type PrintableWorksheetReviewLifecycleChainHandoffItemId,
   type PrintableWorksheetReviewLifecycleChainHandoffView,
 } from '@/assignments/printable-worksheet-review-lifecycle-chain';
-import { WORKSHEET_MODE_DELIVERY_CHAIN_HANDOFF_ITEM_IDS } from '@/assignments/worksheet-mode-delivery-chain';
 import { overwriteGetLocale } from '@/locale/paraglide/runtime';
 
 overwriteGetLocale(() => 'en');
@@ -181,14 +179,6 @@ test('printable worksheet review lifecycle is backed by adjacent gates', () => {
       `Missing printable worksheet review lifecycle file ${filePath}`
     );
   }
-
-  assert.deepEqual(
-    [
-      WORKSHEET_MODE_DELIVERY_CHAIN_HANDOFF_ITEM_IDS.length,
-      ASSIGNMENT_DELIVERY_POLICY_HANDOFF_ITEM_IDS.length,
-    ],
-    Array.from({ length: 2 }, () => 30)
-  );
 });
 
 test('printable worksheet view keeps answer-key lifecycle states explicit', () => {

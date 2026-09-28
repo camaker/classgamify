@@ -1,7 +1,6 @@
 import assert from 'node:assert/strict';
 import { existsSync, readFileSync } from 'node:fs';
 import test from 'node:test';
-import { AUTH_WORKSPACE_HANDOFF_ITEM_IDS } from '@/auth/workspace-boundary';
 import {
   CLASSROOM_TRUST_COMMUNICATION_CHAIN_HANDOFF_ITEM_IDS,
   CLASSROOM_TRUST_COMMUNICATION_CHAIN_SOURCE_FILES,
@@ -9,16 +8,8 @@ import {
   type ClassroomTrustCommunicationChainHandoffItemId,
   type ClassroomTrustCommunicationChainHandoffView,
 } from '@/config/classroom-trust-communication-chain';
-import { DEVELOPER_CONFIGURATION_HANDOFF_ITEM_IDS } from '@/config/developer-configuration-handoff';
-import { CONTACT_CLASSROOM_INTAKE_HANDOFF_ITEM_IDS } from '@/contact/inquiry-view';
 import { Routes } from '@/lib/routes';
-import { MAIL_TRANSACTIONAL_WORKSPACE_HANDOFF_ITEM_IDS } from '@/mail/workspace-boundary';
-import {
-  TRANSACTIONAL_MAIL_LIFECYCLE_CHAIN_HANDOFF_ITEM_IDS,
-  TRANSACTIONAL_MAIL_LIFECYCLE_CHAIN_SOURCE_FILES,
-} from '@/mail/transactional-mail-lifecycle-chain';
-import { LEGAL_POLICY_HANDOFF_ITEM_IDS } from '@/pages/legal-policy-view';
-import { PUBLIC_DOM_HANDOFF_BOUNDARY_ITEM_IDS } from '@/seo/public-dom-handoff-boundary';
+import { TRANSACTIONAL_MAIL_LIFECYCLE_CHAIN_SOURCE_FILES } from '@/mail/transactional-mail-lifecycle-chain';
 
 const PRODUCT_SOURCE = readFileSync('docs/product.md', 'utf8');
 const CONFIGURATION_DOC_SOURCE = readFileSync('docs/configuration.md', 'utf8');
@@ -26,32 +17,8 @@ const AUTH_DOC_SOURCE = readFileSync('docs/auth.md', 'utf8');
 const MAIL_DOC_SOURCE = readFileSync('docs/mail.md', 'utf8');
 const PAYMENT_DOC_SOURCE = readFileSync('docs/payment.md', 'utf8');
 const STORAGE_DOC_SOURCE = readFileSync('docs/storage.md', 'utf8');
-const CONTACT_INTAKE_SOURCE = readFileSync(
-  'src/contact/inquiry-view.ts',
-  'utf8'
-);
-const AUTH_WORKSPACE_SOURCE = readFileSync(
-  'src/auth/workspace-boundary.ts',
-  'utf8'
-);
-const MAIL_WORKSPACE_SOURCE = readFileSync(
-  'src/mail/workspace-boundary.ts',
-  'utf8'
-);
 const TRANSACTIONAL_MAIL_LIFECYCLE_SOURCE = readFileSync(
   'src/mail/transactional-mail-lifecycle-chain.ts',
-  'utf8'
-);
-const LEGAL_POLICY_SOURCE = readFileSync(
-  'src/pages/legal-policy-view.ts',
-  'utf8'
-);
-const DEVELOPER_CONFIG_SOURCE = readFileSync(
-  'src/config/developer-configuration-handoff.ts',
-  'utf8'
-);
-const PUBLIC_DOM_BOUNDARY_SOURCE = readFileSync(
-  'src/seo/public-dom-handoff-boundary.ts',
   'utf8'
 );
 const TEST_CATALOG_SOURCE = readFileSync('tests/e2e/TEST-CATALOG.md', 'utf8');
@@ -201,19 +168,6 @@ test('classroom trust communication chain is backed by focused trust gates', () 
       `Missing classroom trust communication chain file ${filePath}`
     );
   }
-
-  assert.deepEqual(
-    [
-      CONTACT_CLASSROOM_INTAKE_HANDOFF_ITEM_IDS.length,
-      AUTH_WORKSPACE_HANDOFF_ITEM_IDS.length,
-      TRANSACTIONAL_MAIL_LIFECYCLE_CHAIN_HANDOFF_ITEM_IDS.length,
-      MAIL_TRANSACTIONAL_WORKSPACE_HANDOFF_ITEM_IDS.length,
-      LEGAL_POLICY_HANDOFF_ITEM_IDS.length,
-      DEVELOPER_CONFIGURATION_HANDOFF_ITEM_IDS.length,
-      PUBLIC_DOM_HANDOFF_BOUNDARY_ITEM_IDS.length,
-    ],
-    Array.from({ length: 7 }, () => 30)
-  );
   assert.equal(TRANSACTIONAL_MAIL_LIFECYCLE_CHAIN_SOURCE_FILES.length, 30);
 });
 
@@ -245,41 +199,11 @@ test('classroom trust communication chain preserves product-doc trust boundaries
   );
 });
 
-test('classroom trust communication sources preserve privacy and mutation boundaries', () => {
-  assert.match(
-    CONTACT_INTAKE_SOURCE,
-    /createsActivities: false[\s\S]*createsAssignmentLinks: false[\s\S]*createsStudentRecords: false[\s\S]*mutatesTeacherWorkspace: false[\s\S]*notifiesLearners: false/,
-    'Contact intake should collect classroom context without mutating workspace or notifying learners.'
-  );
-  assert.match(
-    AUTH_WORKSPACE_SOURCE,
-    /createsAssignmentLinks: false[\s\S]*exposesAuthSecrets: false[\s\S]*exposesCallbackUrl: false[\s\S]*exposesOAuthClientSecret: false[\s\S]*requiresTeacherSessionForWorkspace: true[\s\S]*usesSafeCallbackPaths: true/,
-    'Auth workspace handoff should protect auth secrets and callback safety.'
-  );
-  assert.match(
-    MAIL_WORKSPACE_SOURCE,
-    /exposesActionUrls: false[\s\S]*exposesContactMessageText: false[\s\S]*exposesProviderApiTokens: false[\s\S]*normalizesUnsupportedLocales: true[\s\S]*rendersBeforeProviderSend: true[\s\S]*sendsLearnerNotifications: false/,
-    'Transactional mail handoff should render safe localized boundaries before provider send.'
-  );
+test('classroom trust communication chain absorbs the transactional mail lifecycle', () => {
   assert.match(
     TRANSACTIONAL_MAIL_LIFECYCLE_SOURCE,
     /TRANSACTIONAL_MAIL_LIFECYCLE_CHAIN_HANDOFF_ITEM_IDS[\s\S]*'template-set-registry'[\s\S]*'render-before-send'[\s\S]*'provider-registry'[\s\S]*'no-workspace-mutation'[\s\S]*'learner-notification-guard'/,
     'Classroom trust chain should absorb the full transactional mail lifecycle contract.'
-  );
-  assert.match(
-    LEGAL_POLICY_SOURCE,
-    /describesAiDraftDataModel: true[\s\S]*describesPublicAssignmentLinks: true[\s\S]*describesStudentAttempts: true[\s\S]*describesTeacherActivities: true[\s\S]*keepsLegacyCopyOut: true/,
-    'Legal policy handoff should describe the ClassGamify classroom data model.'
-  );
-  assert.match(
-    DEVELOPER_CONFIG_SOURCE,
-    /documentsCloudflareDeployOwnership: true[\s\S]*documentsRuntimeSecrets: true[\s\S]*exposesProviderApiTokens: false[\s\S]*keepsE2eHelpersLocal: true[\s\S]*usesWorkerBindingsForData: true/,
-    'Developer configuration handoff should keep deploy ownership and secret boundaries explicit.'
-  );
-  assert.match(
-    PUBLIC_DOM_BOUNDARY_SOURCE,
-    /public marketing, editorial, legal, contact, and auth route DOM/i,
-    'Public DOM boundary should cover public contact, auth, legal, and marketing trust routes.'
   );
 });
 

@@ -60,7 +60,7 @@ export const TRANSACTIONAL_MAIL_LIFECYCLE_CHAIN_SOURCE_FILES = [
   'src/routes/(pages)/contact.tsx',
   'src/contact/inquiry.ts',
   'src/contact/inquiry-view.ts',
-  'scripts/mail-transactional-workspace-handoff-semantic-views.test.ts',
+  'scripts/mail-transactional-workspace.test.ts',
   'tests/e2e/TEST-CATALOG.md',
 ] as const;
 

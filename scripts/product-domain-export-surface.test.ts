@@ -42,26 +42,6 @@ const INTERNAL_PRODUCT_DOMAIN_HELPERS = [
   },
   {
     declaration: 'function',
-    filePath: 'src/pages/public-page-view.ts',
-    name: 'buildHomePageProductLoopHandoffView',
-  },
-  {
-    declaration: 'function',
-    filePath: 'src/pages/public-page-view.ts',
-    name: 'buildRoadmapPublicHandoffView',
-  },
-  {
-    declaration: 'function',
-    filePath: 'src/pages/public-page-view.ts',
-    name: 'buildTeachersPageHandoffView',
-  },
-  {
-    declaration: 'function',
-    filePath: 'src/pages/public-page-view.ts',
-    name: 'buildPricingPageHandoffView',
-  },
-  {
-    declaration: 'function',
     filePath: 'src/assignments/reteach-plan.ts',
     name: 'buildAssignmentReteachPlanItemViews',
   },
@@ -302,16 +282,6 @@ const INTERNAL_PRODUCT_DOMAIN_HELPERS = [
   },
   {
     declaration: 'type',
-    filePath: 'src/pages/legal-policy-view.ts',
-    name: 'LegalPolicyHandoffPrivacyContract',
-  },
-  {
-    declaration: 'function',
-    filePath: 'src/pages/legal-policy-view.ts',
-    name: 'buildLegalPolicyHandoffView',
-  },
-  {
-    declaration: 'type',
     filePath: 'src/settings/profile-view.ts',
     name: 'SettingsProfileWorkspaceSummaryItemId',
   },
@@ -440,8 +410,8 @@ const RESULT_VIEW_REEXPORT_BOUNDARIES = [
   },
 ] satisfies ReExportBoundary[];
 
-test('product-domain export surface keeps 64 helpers and types internal', () => {
-  assert.equal(INTERNAL_PRODUCT_DOMAIN_HELPERS.length, 64);
+test('product-domain export surface keeps 58 helpers and types internal', () => {
+  assert.equal(INTERNAL_PRODUCT_DOMAIN_HELPERS.length, 58);
 
   for (const helper of INTERNAL_PRODUCT_DOMAIN_HELPERS) {
     const source = readFileSync(helper.filePath, 'utf8');

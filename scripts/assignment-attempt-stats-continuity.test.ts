@@ -57,6 +57,6 @@ test('product and e2e catalogs register the attempt stats source chain', () => {
   );
   assert.match(
     read('tests/e2e/TEST-CATALOG.md'),
-    /assignment-attempt-stats-continuity\.test\.ts[\s\S]*30-slice source-level contract/i
+    /assignment-attempt-stats-continuity\.test\.ts[\s\S]*source guards/i
   );
 });

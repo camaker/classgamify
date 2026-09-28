@@ -1,9 +1,5 @@
 import { m } from '@/locale/paraglide/messages';
 import { Routes } from '@/lib/routes';
-import {
-  buildPublicEditorialHandoffView,
-  type PublicEditorialHandoffView,
-} from '@/pages/public-editorial-content-view';
 
 export type BlogCtaActionIcon = 'create' | 'preview' | 'templates';
 
@@ -22,7 +18,6 @@ export type BlogListPageViewModel = {
   ctaActions: BlogCtaAction[];
   description: string;
   eyebrow: string;
-  handoffView: PublicEditorialHandoffView;
   seoDescription: string;
   seoTitle: string;
   title: string;
@@ -39,7 +34,6 @@ export function buildBlogListPageViewModel(): BlogListPageViewModel {
     ctaActions: getBlogCtaActions(),
     description: m.blog_page_description(),
     eyebrow: m.blog_page_eyebrow(),
-    handoffView: buildPublicEditorialHandoffView(),
     seoDescription: m.blog_page_seo_description(),
     seoTitle: m.blog_page_seo_title(),
     title: m.blog_page_title(),

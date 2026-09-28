@@ -10,10 +10,6 @@ import {
 } from '@/assignments/published-assignment-delivery-chain';
 
 const ASSIGNMENTS_API_SOURCE = readFileSync('src/api/assignments.ts', 'utf8');
-const DELIVERY_SUMMARY_SOURCE = readFileSync(
-  'src/assignments/delivery-summary.ts',
-  'utf8'
-);
 const SHARE_LINK_SOURCE = readFileSync('src/assignments/share-link.ts', 'utf8');
 const PUBLIC_ASSIGNMENT_SOURCE = readFileSync(
   'src/assignments/public.ts',
@@ -170,10 +166,6 @@ test('published assignment delivery sources preserve sanitized public and submis
 });
 
 test('published assignment delivery privacy contracts stay explicit across surfaces', () => {
-  assert.match(
-    DELIVERY_SUMMARY_SOURCE,
-    /AssignmentDeliveryPolicyHandoffPrivacyContract[\s\S]*deliveryRuleCount: number;[\s\S]*exposesAnswerKeys: false[\s\S]*exposesRawSettingsJson: false[\s\S]*scope: 'assignment-delivery-policy-summary'/
-  );
   assert.doesNotMatch(
     SHARE_LINK_SOURCE,
     /anonymousToken|storageKey/,

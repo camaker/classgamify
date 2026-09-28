@@ -99,7 +99,6 @@ import {
   TEACHER_WORKSPACE_OPERATIONS_CHAIN_HANDOFF_ITEM_IDS,
   TEACHER_WORKSPACE_OPERATIONS_CHAIN_SOURCE_FILES,
 } from '@/dashboard/teacher-workspace-operations-chain';
-import { HOME_PAGE_PRODUCT_LOOP_HANDOFF_ITEM_IDS } from '@/pages/public-page-view';
 import {
   PUBLIC_DISCOVERY_INDEXING_CHAIN_HANDOFF_ITEM_IDS,
   PUBLIC_DISCOVERY_INDEXING_CHAIN_SOURCE_FILES,
@@ -478,7 +477,6 @@ test('classroom product loop chain is backed by adjacent focused gates', () => {
 
   assert.deepEqual(
     [
-      HOME_PAGE_PRODUCT_LOOP_HANDOFF_ITEM_IDS.length,
       TEACHER_WORKSPACE_OPERATIONS_CHAIN_HANDOFF_ITEM_IDS.length,
       TEACHER_WORKSPACE_OPERATIONS_CHAIN_SOURCE_FILES.length,
       CLASSROOM_DATA_LIFECYCLE_CHAIN_HANDOFF_ITEM_IDS.length,
@@ -529,7 +527,7 @@ test('classroom product loop chain is backed by adjacent focused gates', () => {
       PUBLIC_DISCOVERY_INDEXING_CHAIN_SOURCE_FILES.length,
       CLASSROOM_TRUST_COMMUNICATION_CHAIN_HANDOFF_ITEM_IDS.length,
     ],
-    Array.from({ length: 50 }, () => 30)
+    Array.from({ length: 49 }, () => 30)
   );
 });
 

@@ -14,24 +14,11 @@ import {
   getRobotsDisallowPaths,
   getSitemapUrls,
 } from '@/seo/public-indexing';
-import {
-  buildLegacyPublicRouteHandoffView,
-  LEGACY_PUBLIC_ROUTE_HANDOFF_ITEM_IDS,
-  type LegacyPublicRouteHandoffEvidence,
-  type LegacyPublicRouteHandoffItemId,
-  type LegacyPublicRouteHandoffView,
-} from '@/seo/legacy-public-route-handoff';
 import { RETIRED_LEGACY_PUBLIC_PATHS } from '@/seo/public-routes';
 
 overwriteGetLocale(() => 'en');
 
 const BASE_URL = 'https://classgamify.example';
-const SECRET_ANSWER_KEY = 'SECRET_TEACHER_ANSWER_KEY';
-const SECRET_ATTEMPT_RECORD = 'SECRET_STUDENT_ATTEMPT_RECORD';
-const SECRET_FILE_BYTES = 'raw-private-worksheet-bytes';
-const SECRET_SOURCE_STORAGE_KEY = 'source-materials/private/key.pdf';
-const SECRET_STUDENT_TOKEN = 'raw-anonymous-student-token';
-const SECRET_TEACHER_CONTENT = 'SECRET_TEACHER_ACTIVITY_CONTENT';
 
 type RetiredLegacyPath = (typeof RETIRED_LEGACY_PUBLIC_PATHS)[number];
 
@@ -70,116 +57,6 @@ test('leaked route-group URLs redirect only to their canonical public pages', ()
   );
 });
 
-test('legacy public route handoff exposes 30 safe retirement slices', () => {
-  const handoffView = buildLegacyPublicRouteHandoffView(EVIDENCE);
-  const itemIds = handoffView.itemViews.map((item) => item.id);
-
-  assert.deepEqual(itemIds, [...LEGACY_PUBLIC_ROUTE_HANDOFF_ITEM_IDS]);
-  assert.equal(new Set(itemIds).size, 30);
-  assert.equal(
-    handoffView.itemViews.every(
-      (item) =>
-        Boolean(item.ariaLabel) &&
-        Boolean(item.description) &&
-        Boolean(item.label) &&
-        Boolean(item.value)
-    ),
-    true
-  );
-  assert.deepEqual(handoffView.privacy, {
-    createsAssignmentLinks: false,
-    exposesAnswerKeys: false,
-    exposesRawAnonymousToken: false,
-    exposesSourceMaterialStorageKeys: false,
-    exposesStudentAttemptRecords: false,
-    exposesTeacherPrivateActivityContent: false,
-    itemIds,
-    keepsLegacyNavigationOut: true,
-    keepsRetiredLegacyOutOfIndex: true,
-    migrationEntrypointsOnlyWhenMounted: true,
-    readsSourceMaterialFileBytes: false,
-    requiresNoindexWhenMounted: true,
-    routeActionsUseSharedConstants: true,
-    scope: 'legacy-public-route-retirement-boundary',
-  });
-  assertNoPrivateLegacyRouteText(JSON.stringify(handoffView));
-});
-
-test('legacy public route handoff summarizes current retired-route state', () => {
-  const handoffView = buildLegacyPublicRouteHandoffView(EVIDENCE);
-
-  assert.deepEqual(
-    handoffView.itemViews.map((item) => [item.id, item.value]),
-    [
-      ['retired-inventory-count', '7 paths'],
-      [
-        'retired-path-list',
-        '/ai, /changelog, /hanzi, /hsk, /learn, /settings/credits, /waitlist',
-      ],
-      ['mounted-route-count', '0 mounted'],
-      ['route-tree-boundary', 'No generated routes'],
-      ['migration-entrypoint-boundary', 'Not required'],
-      ['noindex-metadata-boundary', 'Noindex ready'],
-      ['sitemap-exclusion', 'Excluded'],
-      ['localized-sitemap-exclusion', 'Excluded'],
-      ['route-constant-exclusion', 'Excluded'],
-      ['navbar-exclusion', 'ClassGamify navigation'],
-      ['footer-exclusion', 'ClassGamify footer'],
-      ['sidebar-exclusion', 'ClassGamify sidebar'],
-      ['robots-protected-boundary', 'Protected surfaces blocked'],
-      ['homepage-entrypoint-boundary', 'ClassGamify entrypoints'],
-      ['template-entrypoint-boundary', Routes.Templates],
-      ['create-entrypoint-boundary', Routes.Create],
-      ['worksheet-entrypoint-boundary', Routes.Worksheets],
-      ['student-preview-boundary', Routes.StudentPreview],
-      ['about-path', 'Unmounted'],
-      ['ai-path', 'Unmounted'],
-      ['changelog-path', 'Unmounted'],
-      ['hanzi-path', 'Unmounted'],
-      ['hsk-path', 'Unmounted'],
-      ['learn-path', 'Unmounted'],
-      ['settings-credits-path', 'Unmounted'],
-      ['waitlist-path', 'Unmounted'],
-      ['route-module-cleanup', 'No route modules'],
-      ['migration-copy-boundary', 'Not required'],
-      ['product-loop-redirect-boundary', 'ClassGamify routes only'],
-      ['privacy-guard', 'Private data hidden'],
-    ]
-  );
-  assertNoPrivateLegacyRouteText(JSON.stringify(handoffView));
-});
-
-test('legacy public route handoff localizes Chinese retirement boundaries', () => {
-  overwriteGetLocale(() => 'zh');
-  try {
-    const handoffView = buildLegacyPublicRouteHandoffView(EVIDENCE);
-
-    assert.equal(handoffView.title, '旧公开路径退役交接');
-    assert.match(handoffView.description, /30 切片旧公开路径退役契约/);
-    assert.equal(
-      getHandoffValue(handoffView, 'retired-inventory-count'),
-      '7 个路径'
-    );
-    assert.equal(
-      getHandoffValue(handoffView, 'mounted-route-count'),
-      '0 个挂载'
-    );
-    assert.equal(
-      getHandoffValue(handoffView, 'route-tree-boundary'),
-      '无生成路由'
-    );
-    assert.equal(getHandoffValue(handoffView, 'hanzi-path'), '未挂载');
-    assert.equal(
-      getHandoffValue(handoffView, 'homepage-entrypoint-boundary'),
-      'ClassGamify 入口'
-    );
-    assert.equal(getHandoffValue(handoffView, 'privacy-guard'), '私密数据隐藏');
-    assertNoPrivateLegacyRouteText(JSON.stringify(handoffView));
-  } finally {
-    overwriteGetLocale(() => 'en');
-  }
-});
-
 test('retired legacy route evidence comes from generated routes and public helpers', () => {
   assert.deepEqual(EVIDENCE.mountedRetiredPaths, []);
   assert.deepEqual(EVIDENCE.routeTreeRetiredPaths, []);
@@ -211,12 +88,12 @@ test('retired legacy route evidence comes from generated routes and public helpe
 test('legacy public route focused gate is documented', () => {
   assert.match(
     TEST_CATALOG_SOURCE,
-    /Legacy public route retirement has a fast script-level gate via[\s\S]*scripts\/legacy-public-route-handoff-semantic-views\.test\.ts[\s\S]*retired copied-learning routes[\s\S]*route-tree cleanup[\s\S]*noindex migration entrypoints[\s\S]*sitemap exclusion[\s\S]*localized sitemap exclusion[\s\S]*navigation exclusion[\s\S]*robots protected-surface rules[\s\S]*legacy-copy guards[\s\S]*legacy-public-route handoff/,
+    /Legacy public route retirement has a fast script-level gate via[\s\S]*scripts\/legacy-public-routes\.test\.ts[\s\S]*retired copied-learning routes[\s\S]*route-tree cleanup[\s\S]*noindex migration entrypoints[\s\S]*sitemap exclusion[\s\S]*localized sitemap exclusion[\s\S]*navigation exclusion[\s\S]*robots protected-surface rules[\s\S]*legacy-copy guards[\s\S]*legacy-public-route handoff/,
     'E2E catalog should point retired legacy route work at the focused script gate.'
   );
 });
 
-function buildLegacyPublicRouteEvidence(): LegacyPublicRouteHandoffEvidence {
+function buildLegacyPublicRouteEvidence() {
   const mountedRetiredPaths = getMountedRetiredPathsFromRouteTree();
   const routeModuleSources = getRetiredRouteModuleSources();
   const sitemapPaths = getSitemapUrls().map((url) => url.path);
@@ -321,32 +198,6 @@ function getRetiredHrefs(paths: string[]) {
   return paths.filter((path) =>
     RETIRED_LEGACY_PUBLIC_PATHS.includes(path as RetiredLegacyPath)
   );
-}
-
-function getHandoffValue(
-  view: LegacyPublicRouteHandoffView,
-  id: LegacyPublicRouteHandoffItemId
-) {
-  const item = view.itemViews.find((candidate) => candidate.id === id);
-  assert.ok(item, `Missing legacy public route handoff item ${id}`);
-  return item.value;
-}
-
-function assertNoPrivateLegacyRouteText(serializedView: string) {
-  for (const privateValue of [
-    SECRET_ANSWER_KEY,
-    SECRET_ATTEMPT_RECORD,
-    SECRET_FILE_BYTES,
-    SECRET_SOURCE_STORAGE_KEY,
-    SECRET_STUDENT_TOKEN,
-    SECRET_TEACHER_CONTENT,
-  ]) {
-    assert.equal(
-      serializedView.includes(privateValue),
-      false,
-      `Legacy public route handoff leaked private text: ${privateValue}`
-    );
-  }
 }
 
 function escapeRegExp(value: string) {
