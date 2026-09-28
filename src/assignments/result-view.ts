@@ -232,7 +232,7 @@ export type AssignmentResultMetricItem = AssignmentResultMetricDescriptor & {
   value: string;
 };
 
-export type AssignmentResultAttemptRowMetricLabels = {
+type AssignmentResultAttemptRowMetricLabels = {
   accuracyLabel: string;
   answeredLabel: string;
   scoreLabel: string;
@@ -387,7 +387,7 @@ export type AssignmentResultStudentSearchControlIds = {
   summary: string;
 };
 
-export type AssignmentResultControlStatusTone = 'custom' | 'default';
+type AssignmentResultControlStatusTone = 'custom' | 'default';
 
 export type AssignmentResultControlStatusView = {
   ariaLabel: string;
@@ -884,10 +884,6 @@ export const assignmentResultTableHeaders = {
         m.assignment_result_table_header_item()
       ),
       buildAssignmentResultTableHeaderView(
-        'type',
-        m.assignment_result_table_header_type()
-      ),
-      buildAssignmentResultTableHeaderView(
         'correct-rate',
         m.assignment_result_table_header_correct_rate()
       ),
@@ -902,14 +898,6 @@ export const assignmentResultTableHeaders = {
       buildAssignmentResultTableHeaderView(
         'expected',
         m.assignment_result_table_header_expected()
-      ),
-      buildAssignmentResultTableHeaderView(
-        'accepted',
-        m.assignment_result_table_header_accepted()
-      ),
-      buildAssignmentResultTableHeaderView(
-        'explanation',
-        m.assignment_result_table_header_explanation()
       ),
     ];
   },

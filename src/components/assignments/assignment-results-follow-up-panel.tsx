@@ -48,7 +48,9 @@ function AssignmentResultsFollowUpStudent({
             ? ` · ${studentView.submittedContextLabel}`
             : ''}
         </p>
-        <p className="text-sm">{studentView.followUpRecommendation}</p>
+        <p className="text-sm first-letter:uppercase">
+          {studentView.followUpRecommendation}
+        </p>
       </div>
       <Badge
         variant="outline"

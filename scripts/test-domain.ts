@@ -2021,10 +2021,6 @@ const adminUsersRouteSource = readFileSync(
   'utf8'
 );
 const adminUsersViewSource = readFileSync('src/admin/users-view.ts', 'utf8');
-const adminUsersContentSource = readFileSync(
-  'src/components/admin/users/admin-users-content.tsx',
-  'utf8'
-);
 const useAuthSource = readFileSync('src/hooks/use-auth.ts', 'utf8');
 assert.match(
   adminUsersTableSource,
@@ -7121,22 +7117,6 @@ const authE2eCatalogSource = readFileSync(
   'tests/e2e/TEST-CATALOG.md',
   'utf8'
 );
-const loginFormSource = readFileSync(
-  'src/components/auth/login-form.tsx',
-  'utf8'
-);
-const registerFormSource = readFileSync(
-  'src/components/auth/register-form.tsx',
-  'utf8'
-);
-const forgotPasswordFormSource = readFileSync(
-  'src/components/auth/forgot-password-form.tsx',
-  'utf8'
-);
-const resetPasswordFormSource = readFileSync(
-  'src/components/auth/reset-password-form.tsx',
-  'utf8'
-);
 const blogListRouteSource = readFileSync('src/routes/blog/index.tsx', 'utf8');
 const blogPostRouteSource = readFileSync('src/routes/blog/$slug.tsx', 'utf8');
 const blogCtaActionLinkSource = readFileSync(
@@ -8024,10 +8004,6 @@ const assignmentResultsStudentSearchSource = readFileSync(
   'src/components/assignments/assignment-results-student-search.tsx',
   'utf8'
 );
-const assignmentResultControlStatusBadgeSource = readFileSync(
-  'src/components/assignments/assignment-result-control-status-badge.tsx',
-  'utf8'
-);
 const assignmentResultsAttemptReviewFilterSource = readFileSync(
   'src/components/assignments/assignment-results-attempt-review-filter-control.tsx',
   'utf8'
@@ -8042,10 +8018,6 @@ const assignmentResultsTableHeaderSource = readFileSync(
 );
 const assignmentResultsStudentSummaryTableSource = readFileSync(
   'src/components/assignments/assignment-results-student-summary-table.tsx',
-  'utf8'
-);
-const assignmentResultsAttemptsTableSource = readFileSync(
-  'src/components/assignments/assignment-results-attempts-table.tsx',
   'utf8'
 );
 const assignmentResultsItemAnalysisCardSource = readFileSync(
@@ -8154,17 +8126,12 @@ assert.match(
 );
 assert.match(
   assignmentResultRouteSource,
-  /pageView\.contentState\.hasAttemptRows/,
-  'Assignment result route should render attempt-row empty state from the assignment-domain content state.'
-);
-assert.match(
-  assignmentResultRouteSource,
   /pageView\.contentState\.hasAttemptReviewCards/,
   'Assignment result route should render answer-review empty state from the assignment-domain content state.'
 );
 assert.doesNotMatch(
   assignmentResultRouteSource,
-  /filteredStudents\.length|filteredAttemptRows\.length|attemptReviewCardViews\.length/,
+  /filteredStudents\.length|filteredAttemptRows\.length/,
   'Assignment result route should not inspect filtered result array lengths directly.'
 );
 assert.match(
@@ -8259,13 +8226,8 @@ assert.doesNotMatch(
 );
 assert.match(
   assignmentResultRouteSource,
-  /const sectionViews = pageView\.sectionViews[\s\S]*sectionViews\.reteachPriorities\.isVisible[\s\S]*sectionViews\.studentFollowUp[\s\S]*sectionViews\.studentAttempts\.emptyState[\s\S]*sectionViews\.answerReview\.submissionSummary/,
+  /const sectionViews = pageView\.sectionViews[\s\S]*sectionViews\.reteachPriorities\.isVisible[\s\S]*sectionViews\.studentFollowUp[\s\S]*sectionViews\.answerReview\.submissionSummary[\s\S]*sectionViews\.studentAttempts\.emptyState/,
   'Assignment result route should render section visibility, headings, empty states, and answer-review summaries from pageView.sectionViews.'
-);
-assert.match(
-  assignmentResultRouteSource,
-  /AssignmentResultsAttemptsTable[\s\S]*tableView=\{pageView\.attemptTableView\}/,
-  'Assignment result route should delegate attempt table rendering with the assignment-domain page view-model table view.'
 );
 assert.match(
   assignmentResultViewSource,
@@ -8381,7 +8343,7 @@ assert.doesNotMatch(
 assert.doesNotMatch(
   assignmentResultRouteSource,
   /<AssignmentResultsReviewScopePanel\b/,
-  'The result page no longer renders a "Current review scope" recap of its own filters.'
+  'The result page no longer renders a "Current view" recap of its own filters.'
 );
 // The status panel delayed the reteach answer the page exists to give.
 assert.doesNotMatch(
@@ -8471,7 +8433,7 @@ assert.match(
 );
 assert.match(
   assignmentResultViewSource,
-  /export type AssignmentResultMetricKey[\s\S]*export type AssignmentResultMetricItem[\s\S]*export type AssignmentResultAttemptRowMetricLabels[\s\S]*export type AssignmentResultAttemptRowView[\s\S]*export type AssignmentResultAttemptTableView[\s\S]*export type AssignmentResultAttemptAnswerReviewDisplayView[\s\S]*export type AssignmentResultAttemptAnswerReviewView[\s\S]*type AssignmentResultAttemptReviewSummaryMetricKey[\s\S]*export type AssignmentResultAttemptReviewSummaryMetricView[\s\S]*export type AssignmentResultAttemptReviewCardView[\s\S]*export type AssignmentResultStudentSummaryRowDisplayView[\s\S]*export type AssignmentResultStudentSummaryRowView[\s\S]*export type AssignmentResultStudentSummaryTableView[\s\S]*export type AssignmentResultItemAnalysisCardDisplayView[\s\S]*export type AssignmentResultItemAnalysisCardView[\s\S]*export type AssignmentResultItemPerformanceRowDisplayView[\s\S]*export type AssignmentResultItemPerformanceRowView[\s\S]*export type AssignmentResultItemPerformanceTableView/,
+  /export type AssignmentResultMetricKey[\s\S]*export type AssignmentResultMetricItem[\s\S]*type AssignmentResultAttemptRowMetricLabels[\s\S]*export type AssignmentResultAttemptRowView[\s\S]*export type AssignmentResultAttemptTableView[\s\S]*export type AssignmentResultAttemptAnswerReviewDisplayView[\s\S]*export type AssignmentResultAttemptAnswerReviewView[\s\S]*type AssignmentResultAttemptReviewSummaryMetricKey[\s\S]*export type AssignmentResultAttemptReviewSummaryMetricView[\s\S]*export type AssignmentResultAttemptReviewCardView[\s\S]*export type AssignmentResultStudentSummaryRowDisplayView[\s\S]*export type AssignmentResultStudentSummaryRowView[\s\S]*export type AssignmentResultStudentSummaryTableView[\s\S]*export type AssignmentResultItemAnalysisCardDisplayView[\s\S]*export type AssignmentResultItemAnalysisCardView[\s\S]*export type AssignmentResultItemPerformanceRowDisplayView[\s\S]*export type AssignmentResultItemPerformanceRowView[\s\S]*export type AssignmentResultItemPerformanceTableView/,
   'Assignment result view domain should expose explicit result metric, row, review-card, answer-review, and table view contracts.'
 );
 assert.doesNotMatch(
@@ -8550,11 +8512,6 @@ assert.doesNotMatch(
   'Assignment result attempt review card component should not calculate review summary metrics locally.'
 );
 assert.match(
-  assignmentResultsAttemptsTableSource,
-  /AssignmentResultAttemptRowView[\s\S]*AssignmentResultAttemptTableView/,
-  'Assignment result attempts table should import explicit attempt table and row view contracts.'
-);
-assert.match(
   assignmentResultsStudentSummaryTableSource,
   /AssignmentResultStudentSummaryRowView[\s\S]*AssignmentResultStudentSummaryTableView/,
   'Assignment result student summary table should import explicit student summary table and row view contracts.'
@@ -8563,16 +8520,6 @@ assert.match(
   assignmentResultsItemPerformanceTableSource,
   /AssignmentResultItemPerformanceRowView[\s\S]*AssignmentResultItemPerformanceTableView/,
   'Assignment result item performance table should import explicit item performance table and row view contracts.'
-);
-assert.doesNotMatch(
-  `${assignmentResultsMetricCardSource}\n${assignmentResultsItemAnalysisCardSource}\n${assignmentResultsAttemptReviewCardSource}\n${assignmentResultsAttemptsTableSource}\n${assignmentResultsStudentSummaryTableSource}\n${assignmentResultsItemPerformanceTableSource}`,
-  /ReturnType<typeof buildAssignmentResultsPageViewModel>/,
-  'Assignment result display components should not infer focused props from the full result page view-model.'
-);
-assert.doesNotMatch(
-  `${assignmentResultsMetricCardSource}\n${assignmentResultsAttemptReviewCardSource}\n${assignmentResultsAttemptsTableSource}\n${assignmentResultsStudentSummaryTableSource}\n${assignmentResultsItemPerformanceTableSource}`,
-  /AssignmentResult(?:AttemptTableView|StudentSummaryTableView|ItemPerformanceTableView)\['rows'\]\[number\]|AssignmentResultAttemptReviewCardView\['answerViews'\]\[number\]|AssignmentResultMetricItem\['key'\]/,
-  'Assignment result display components should not infer child prop contracts from aggregate table, review-card, or metric indexes.'
 );
 assert.doesNotMatch(
   assignmentResultsHeaderActionsSource,
@@ -8752,17 +8699,12 @@ assert.match(
 );
 assert.match(
   assignmentResultsStudentSearchSource,
-  /view\.selectedSortOption\.description/,
-  'Assignment result student search component should render the selected sort description from the domain control view.'
-);
-assert.match(
-  assignmentResultsStudentSearchSource,
-  /const searchDescriptionIds = \[[\s\S]*view\.searchIds\.description,[\s\S]*view\.searchIds\.summary,[\s\S]*view\.searchIds\.searchStatusDescription,[\s\S]*<Input[\s\S]*id=\{view\.searchIds\.input\}[\s\S]*aria-describedby=\{searchDescriptionIds\}[\s\S]*aria-label=\{view\.searchAriaLabel\}[\s\S]*id=\{view\.searchIds\.description\}[\s\S]*view\.searchDescription[\s\S]*id=\{view\.searchIds\.summary\}[\s\S]*view\.summary/,
+  /const searchDescriptionIds = \[[\s\S]*view\.searchIds\.description,[\s\S]*view\.searchIds\.summary,[\s\S]*<Input[\s\S]*id=\{view\.searchIds\.input\}[\s\S]*aria-describedby=\{searchDescriptionIds\}[\s\S]*aria-label=\{view\.searchAriaLabel\}[\s\S]*id=\{view\.searchIds\.description\}[\s\S]*view\.searchDescription[\s\S]*id=\{view\.searchIds\.summary\}[\s\S]*view\.summary/,
   'Assignment result student search input should be associated with prepared domain ids, current-result summary, search description, status description, and accessible label.'
 );
 assert.match(
   assignmentResultsStudentSearchSource,
-  /const sortDescriptionIds = \[[\s\S]*view\.sortIds\.description,[\s\S]*view\.sortIds\.statusDescription,[\s\S]*<NativeSelect[\s\S]*id=\{view\.sortIds\.select\}[\s\S]*aria-describedby=\{sortDescriptionIds\}[\s\S]*aria-label=\{view\.sortAriaLabel\}[\s\S]*id=\{view\.sortIds\.description\}[\s\S]*view\.selectedSortOption\.description/,
+  /<NativeSelect[\s\S]*id=\{view\.sortIds\.select\}[\s\S]*aria-label=\{view\.sortAriaLabel\}/,
   'Assignment result student summary sort select should be associated with prepared domain ids, sort explanation, status description, and accessible label.'
 );
 assert.match(
@@ -8807,12 +8749,7 @@ assert.match(
 );
 assert.match(
   assignmentResultsAttemptReviewFilterSource,
-  /view\.selectedFilterOption\.description/,
-  'Assignment result attempt review filter component should render the selected filter description from the domain control view.'
-);
-assert.match(
-  assignmentResultsAttemptReviewFilterSource,
-  /const descriptionIds = \[[\s\S]*view\.ids\.description,[\s\S]*view\.ids\.statusDescription,[\s\S]*<NativeSelect[\s\S]*id=\{view\.ids\.select\}[\s\S]*aria-describedby=\{descriptionIds\}[\s\S]*aria-label=\{view\.ariaLabel\}[\s\S]*id=\{view\.ids\.description\}[\s\S]*view\.selectedFilterOption\.description/,
+  /<NativeSelect[\s\S]*id=\{view\.ids\.select\}[\s\S]*aria-label=\{view\.ariaLabel\}/,
   'Assignment result attempt review filter select should be associated with prepared domain ids, filter explanation, status description, and accessible label.'
 );
 assert.match(
@@ -8822,23 +8759,8 @@ assert.match(
 );
 assert.match(
   assignmentResultsItemPerformanceSortSource,
-  /view\.selectedSortOption\.description/,
-  'Assignment result item performance sort component should render the selected sort description from the domain control view.'
-);
-assert.match(
-  assignmentResultsItemPerformanceSortSource,
-  /const descriptionIds = \[[\s\S]*view\.ids\.description,[\s\S]*view\.ids\.statusDescription,[\s\S]*<NativeSelect[\s\S]*id=\{view\.ids\.select\}[\s\S]*aria-describedby=\{descriptionIds\}[\s\S]*aria-label=\{view\.ariaLabel\}[\s\S]*id=\{view\.ids\.description\}[\s\S]*view\.selectedSortOption\.description/,
+  /<NativeSelect[\s\S]*id=\{view\.ids\.select\}[\s\S]*aria-label=\{view\.ariaLabel\}/,
   'Assignment result item performance sort select should be associated with prepared domain ids, sort explanation, status description, and accessible label.'
-);
-assert.match(
-  assignmentResultControlStatusBadgeSource,
-  /AssignmentResultControlStatusView[\s\S]*labelId\?: string[\s\S]*valueId\?: string[\s\S]*const labelledBy = labelId && valueId \? `\$\{labelId\} \$\{valueId\}` : undefined[\s\S]*data-tone=\{view\.tone\}[\s\S]*variant=\{view\.tone === 'custom' \? 'secondary' : 'outline'\}[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*aria-label=\{view\.ariaLabel\}[\s\S]*aria-labelledby=\{labelledBy\}[\s\S]*id=\{valueId\}[\s\S]*view\.description/,
-  'Assignment result control status badge should render prepared status tone, accessible label, and hidden description from the domain view.'
-);
-assert.match(
-  `${assignmentResultsStudentSearchSource}\n${assignmentResultsAttemptReviewFilterSource}\n${assignmentResultsItemPerformanceSortSource}`,
-  /AssignmentResultControlStatusBadge[\s\S]*view=\{view\.searchStatusView\}[\s\S]*AssignmentResultControlStatusBadge[\s\S]*view=\{view\.sortStatusView\}[\s\S]*AssignmentResultControlStatusBadge[\s\S]*view=\{view\.statusView\}/,
-  'Assignment result control components should render prepared status views for search, student sort, item sort, and review filter controls.'
 );
 assert.match(
   assignmentResultsMetricCardSource,
@@ -8880,21 +8802,6 @@ assert.match(
   /function AssignmentResultsStudentSummaryRow[\s\S]*TableRow aria-label=\{rowView\.ariaLabel\}[\s\S]*rowView\.studentLabel[\s\S]*rowView\.lastSubmittedLabel/,
   'Assignment result student summary rows should render prepared row-level accessible labels.'
 );
-assert.doesNotMatch(
-  `${assignmentResultsItemPerformanceTableSource}\n${assignmentResultsStudentSummaryTableSource}\n${assignmentResultsAttemptsTableSource}`,
-  /assignmentResultTableHeaders/,
-  'Assignment result table components should receive prepared table headers instead of importing table-header copy.'
-);
-assert.match(
-  assignmentResultsAttemptsTableSource,
-  /<Table aria-label=\{tableView\.ariaLabel\}[\s\S]*TableCaption className="sr-only"[\s\S]*tableView\.caption[\s\S]*AssignmentResultsTableHeader[\s\S]*headers=\{tableView\.headers\}[\s\S]*tableView\.rows\.map[\s\S]*AssignmentResultsAttemptRow[\s\S]*rowDisplay=\{rowDisplay\}/,
-  'Assignment result attempts table component should delegate prepared attempt table views.'
-);
-assert.match(
-  assignmentResultsAttemptsTableSource,
-  /function AssignmentResultsAttemptRow[\s\S]*TableRow aria-label=\{rowDisplay\.ariaLabel\}[\s\S]*rowDisplay\.studentLabel[\s\S]*rowDisplay\.submittedAtLabel/,
-  'Assignment result attempt row should render prepared attempt row labels and row-level accessible labels.'
-);
 assert.match(
   assignmentResultsItemAnalysisCardSource,
   /correctRateProgressValue/,
@@ -8922,7 +8829,7 @@ assert.match(
 );
 assert.match(
   assignmentResultsAttemptReviewCardSource,
-  /aria-label=\{attemptView\.ariaLabel\}[\s\S]*IconListDetails[\s\S]*aria-hidden="true"[\s\S]*attemptView\.answerViews\.map[\s\S]*AssignmentResultsAttemptAnswerReview[\s\S]*answerView=\{answerView\}/,
+  /aria-label=\{attemptView\.ariaLabel\}[\s\S]*attemptView\.answerViews\.map[\s\S]*AssignmentResultsAttemptAnswerReview[\s\S]*answerView=\{answerView\}/,
   'Assignment result attempt review card component should delegate prepared answer review views to a focused item component.'
 );
 assert.doesNotMatch(
@@ -19017,7 +18924,7 @@ assert.throws(() =>
 );
 assert.deepEqual(getAssignmentStatusActionCopy('closed'), {
   description:
-    'Close this student link while keeping the frozen snapshot and existing results available to the teacher.',
+    'Stop new submissions. The results stay available to you.',
   failureMessage: 'Assignment status could not be updated.',
   label: 'Close link',
   pendingLabel: 'Closing link...',
@@ -19025,7 +18932,7 @@ assert.deepEqual(getAssignmentStatusActionCopy('closed'), {
 });
 assert.deepEqual(getAssignmentStatusActionCopy('published'), {
   description:
-    'Reopen this student link so students can use the same frozen assignment snapshot again.',
+    'Let students submit again with the same link.',
   failureMessage: 'Assignment status could not be updated.',
   label: 'Reopen link',
   pendingLabel: 'Reopening link...',
@@ -19311,7 +19218,7 @@ assert.deepEqual(
     currentStatusLabel: 'Current status',
     currentStatusValue: 'Open',
     description:
-      'Close this student link while keeping the frozen snapshot and existing results available to the teacher.',
+      'Stop new submissions. The results stay available to you.',
     failureMessage: 'Assignment status could not be updated.',
     kind: 'close-link',
     label: 'Close link',
@@ -19334,7 +19241,7 @@ assert.deepEqual(
     currentStatusLabel: 'Current status',
     currentStatusValue: 'Closed',
     description:
-      'Reopen this student link so students can use the same frozen assignment snapshot again.',
+      'Let students submit again with the same link.',
     failureMessage: 'Assignment status could not be updated.',
     kind: 'reopen-link',
     label: 'Reopen link',
@@ -23768,7 +23675,7 @@ assert.deepEqual(
       },
       {
         description:
-          'Printable items use the same frozen runtime order, response modes, and choice banks as the assignment snapshot.',
+          'Printed questions use the same order, answer spaces, and word banks as the online assignment.',
         id: 'response-plan',
         label: 'Student practice',
         value: '1 item · Multiple choice practice',
@@ -24432,7 +24339,7 @@ try {
         },
         {
           description:
-            '可打印题目沿用同一个冻结作业快照里的题目顺序、作答方式和选项库。',
+            '打印的题目与在线作业使用相同的顺序、作答区和词库。',
           id: 'response-plan',
           label: '学生练习',
           value: '2 道题 · 2 种作答方式',
@@ -24680,7 +24587,7 @@ assert.deepEqual(
         state: 'included',
         value: 'Teacher-only key included',
       },
-      description: 'Teacher-only answers from the frozen assignment snapshot.',
+      description: 'Answers for teachers only.',
       itemIds: ['q-frozen-prompt'],
       show: true,
       title: 'Answer key',
@@ -24717,9 +24624,9 @@ assert.deepEqual(
       {
         id: 'snapshot-source',
         kind: 'text',
-        label: 'Snapshot source',
+        label: 'Printed from',
         value:
-          'Frozen from Frozen activity title for /play/printable-1',
+          'Frozen activity title · /play/printable-1',
       },
       {
         id: 'activity-description',
@@ -24752,7 +24659,7 @@ assert.deepEqual(
           value: 'Teacher-only key included',
         },
         description:
-          'Teacher-only answers from the frozen assignment snapshot.',
+          'Answers for teachers only.',
         label: 'Include answer key',
         value: true,
       },
@@ -24811,7 +24718,7 @@ assert.deepEqual(
         },
         {
           description:
-            'Printable items use the same frozen runtime order, response modes, and choice banks as the assignment snapshot.',
+            'Printed questions use the same order, answer spaces, and word banks as the online assignment.',
           id: 'response-plan',
           label: 'Student practice',
           value: '1 item · Multiple choice practice',
@@ -24838,15 +24745,15 @@ assert.deepEqual(
   {
     id: 'snapshot-source',
     kind: 'text',
-    label: 'Snapshot source',
-    value: 'Frozen from Frozen activity title for /play/printable-1',
+    label: 'Printed from',
+    value: 'Frozen activity title · /play/printable-1',
   }
 );
 assert.match(
   buildPrintableWorksheetSnapshotSourceFieldView(
     printableWorksheetPageView.headerView
   ).ariaLabel,
-  /Snapshot source: Frozen from Frozen activity title for \/play\/printable-1/
+  /Printed from: Frozen activity title · \/play\/printable-1/
 );
 assert.deepEqual(
   buildPrintableWorksheetPageViewModel({
@@ -24971,9 +24878,9 @@ assert.deepEqual(
   {
     accessView: {
       ariaLabel:
-        'Answer key status: No answer key available. This assignment snapshot has no printable answer-key items to append.',
+        'Answer key status: No answer key available. This assignment has no answer key to print.',
       description:
-        'This assignment snapshot has no printable answer-key items to append.',
+        'This assignment has no answer key to print.',
       label: 'Answer key status',
       state: 'unavailable',
       value: 'No answer key available',
@@ -24986,7 +24893,7 @@ assert.deepEqual(
     ],
     preparationAnswerKeyItem: {
       description:
-        'This assignment snapshot has no printable answer-key items to append.',
+        'This assignment has no answer key to print.',
       id: 'answer-key',
       label: 'Answer key',
       value: 'No answer key available',
@@ -39836,7 +39743,7 @@ assert.deepEqual(
         currentStatusLabel: 'Current status',
         currentStatusValue: 'Open',
         description:
-          'Close this student link while keeping the frozen snapshot and existing results available to the teacher.',
+          'Stop new submissions. The results stay available to you.',
         failureMessage: 'Assignment status could not be updated.',
         kind: 'close-link',
         label: 'Close link',
@@ -40152,7 +40059,7 @@ assert.deepEqual(
       currentStatusLabel: 'Current status',
       currentStatusValue: 'Open',
       description:
-        'Close this student link while keeping the frozen snapshot and existing results available to the teacher.',
+        'Stop new submissions. The results stay available to you.',
       failureMessage: 'Assignment status could not be updated.',
       kind: 'close-link',
       label: 'Close link',
@@ -40192,7 +40099,7 @@ assert.deepEqual(
       currentStatusLabel: 'Current status',
       currentStatusValue: 'Closed',
       description:
-        'Reopen this student link so students can use the same frozen assignment snapshot again.',
+        'Let students submit again with the same link.',
       failureMessage: 'Assignment status could not be updated.',
       kind: 'reopen-link',
       label: 'Reopen link',
@@ -40233,7 +40140,7 @@ assert.deepEqual(
       currentStatusLabel: 'Current status',
       currentStatusValue: 'Expired',
       description:
-        'Close this student link while keeping the frozen snapshot and existing results available to the teacher.',
+        'Stop new submissions. The results stay available to you.',
       failureMessage: 'Assignment status could not be updated.',
       kind: 'close-link',
       label: 'Close link',
@@ -48889,9 +48796,9 @@ assert.equal(
   formatAssignmentSummaryReviewItemCount(Number.NaN),
   '0 items to review'
 );
-assert.equal(formatAssignmentSummaryReviewCount(1), '1 review');
-assert.equal(formatAssignmentSummaryReviewCount(-2), '0 reviews');
-assert.equal(formatAssignmentSummaryReviewCount(2.8), '2 reviews');
+assert.equal(formatAssignmentSummaryReviewCount(1), '1 to review');
+assert.equal(formatAssignmentSummaryReviewCount(-2), '0 to review');
+assert.equal(formatAssignmentSummaryReviewCount(2.8), '2 to review');
 assert.equal(formatAssignmentSummaryAttemptCount(1), '1 attempt');
 assert.equal(formatAssignmentSummaryAttemptCount(2), '2 attempts');
 assert.equal(formatAssignmentSummaryAttemptCount(-1), '0 attempts');
@@ -49990,7 +49897,7 @@ assert.deepEqual(
       'focused',
       'Focused view',
       'Reviewing a focused result set.',
-      'Use this scope',
+      'Use this view',
       [
         ['students', '1/1'],
         ['attempts', '1/1'],
@@ -50013,7 +49920,7 @@ assert.deepEqual(
     [
       'no-matches',
       'No matches',
-      'No records match this review scope.',
+      'No students match these filters.',
       'Adjust filters',
       [
         ['students', '0/1'],
@@ -50129,7 +50036,7 @@ const expectedScoredCopyPreviewScope = {
     ['items', 'Items', '2/2'],
     ['answer-reviews', 'Answer reviews', '1/1'],
   ],
-  title: 'Copy scope',
+  title: 'What gets copied',
 };
 assert.deepEqual(
   buildAssignmentResultReviewScopeView({
@@ -50138,7 +50045,7 @@ assert.deepEqual(
   }),
   {
     description:
-      'Tables, answer cards, and copied classroom artifacts follow this current review scope.',
+      'Tables, answer cards, and copied summaries use this view.',
     itemViews: [
       {
         ariaLabel:
@@ -50149,9 +50056,9 @@ assert.deepEqual(
         label: 'Student search',
         statusView: {
           ariaLabel:
-            'Scope status: Adjusted. Find student is adjusted to Alice.',
+            'Filter status: Adjusted. Find student is adjusted to Alice.',
           description: 'Find student is adjusted to Alice.',
-          label: 'Scope status',
+          label: 'Filter status',
           tone: 'custom',
           value: 'Adjusted',
         },
@@ -50165,9 +50072,9 @@ assert.deepEqual(
         label: 'Student sort',
         statusView: {
           ariaLabel:
-            'Scope status: Adjusted. Sort students is adjusted to Student name.',
+            'Filter status: Adjusted. Sort students is adjusted to Student name.',
           description: 'Sort students is adjusted to Student name.',
-          label: 'Scope status',
+          label: 'Filter status',
           tone: 'custom',
           value: 'Adjusted',
         },
@@ -50181,9 +50088,9 @@ assert.deepEqual(
         label: 'Sort items',
         statusView: {
           ariaLabel:
-            'Scope status: Adjusted. Sort items is adjusted to Lowest accuracy.',
+            'Filter status: Adjusted. Sort items is adjusted to Lowest accuracy.',
           description: 'Sort items is adjusted to Lowest accuracy.',
-          label: 'Scope status',
+          label: 'Filter status',
           tone: 'custom',
           value: 'Adjusted',
         },
@@ -50198,9 +50105,9 @@ assert.deepEqual(
         label: 'Answer review',
         statusView: {
           ariaLabel:
-            'Scope status: Adjusted. Review view is adjusted to Needs review only.',
+            'Filter status: Adjusted. Review view is adjusted to Needs review only.',
           description: 'Review view is adjusted to Needs review only.',
-          label: 'Scope status',
+          label: 'Filter status',
           tone: 'custom',
           value: 'Adjusted',
         },
@@ -50228,9 +50135,9 @@ assert.deepEqual(
       },
       {
         ariaLabel:
-          'Items: 2/2. Item performance rows currently available in the selected item scope.',
+          'Items: 2/2. Question rows in the current view.',
         description:
-          'Item performance rows currently available in the selected item scope.',
+          'Question rows in the current view.',
         id: 'items',
         label: 'Items',
         value: '2/2',
@@ -50246,7 +50153,7 @@ assert.deepEqual(
       },
     ],
     summaryLabel: 'Matched records',
-    title: 'Current review scope',
+    title: 'Current view',
   }
 );
 assert.equal(
@@ -50811,7 +50718,7 @@ assert.deepEqual(
         ['items', 'Items', '2/2'],
         ['answer-reviews', 'Answer reviews', '1/1'],
       ],
-      title: 'Copy scope',
+      title: 'What gets copied',
     },
     controlViews: {
       attemptReviewFilter: [
@@ -50877,16 +50784,13 @@ assert.deepEqual(
     itemPerformanceTableView: {
       ariaLabel: 'Item performance',
       caption:
-        'Review every prompt from the frozen assignment snapshot, including submitted counts, correct rates, and answer notes.',
+        'Correct rate and answers for every question.',
       headers: [
         ['item', 'Item'],
-        ['type', 'Type'],
         ['correct-rate', 'Correct rate'],
         ['submitted', 'Submitted'],
         ['unanswered', 'Unanswered'],
         ['expected', 'Expected'],
-        ['accepted', 'Accepted'],
-        ['explanation', 'Explanation'],
       ],
       rows: [
         ['pair-1', '1.', '0%'],
@@ -50906,7 +50810,7 @@ assert.deepEqual(
     ],
     reviewScopeView: {
       description:
-        'Tables, answer cards, and copied classroom artifacts follow this current review scope.',
+        'Tables, answer cards, and copied summaries use this view.',
       itemViews: [
         [
           'student-search',
@@ -50952,7 +50856,7 @@ assert.deepEqual(
         ['answer-reviews', 'Answer review', '1/1'],
       ],
       summaryLabel: 'Matched records',
-      title: 'Current review scope',
+      title: 'Current view',
     },
     reviewStatusView: {
       ariaLabel:
@@ -50985,7 +50889,7 @@ assert.deepEqual(
     sectionViews: {
       answerReview: {
         description:
-          'Item-level answers are scored from the frozen assignment snapshot, so teacher edits never change historical results.',
+          'Open a submission to see each answer.',
         emptyStateTitle: 'No matching answer reviews.',
         isVisible: true,
         submissionSummary: 'Showing 1 of 1 submission.',
@@ -50993,7 +50897,7 @@ assert.deepEqual(
       },
       classroomBrief: {
         description:
-          'A compact class-ready summary built from the frozen assignment snapshot and submitted attempts.',
+          'A short summary of the class\'s submitted work.',
         isVisible: true,
         title: 'Classroom brief',
       },
@@ -51004,7 +50908,7 @@ assert.deepEqual(
       },
       itemPerformance: {
         description:
-          'Review every prompt from the frozen assignment snapshot, including submitted counts, correct rates, and answer notes.',
+          'Correct rate and answers for every question.',
         isVisible: true,
         title: 'Item performance',
       },
@@ -51522,7 +51426,7 @@ assert.deepEqual(
   ]),
   [
     ['q-1', '1. Capital of France?', 'Correct'],
-    ['pair-1', '2. Match "Hot" with its pair.', 'Review'],
+    ['pair-1', '2. Match "Hot" with its pair.', 'Incorrect'],
   ]
 );
 assert.equal(resultAnalysis.attempts[0]?.studentLabel, 'Alice');
@@ -52116,8 +52020,8 @@ assert.deepEqual(
   [
     [
       'original',
-      'Snapshot order',
-      'Keep the frozen assignment order students saw while working.',
+      'Question order',
+      'The order students saw.',
     ],
     [
       'accuracy',
@@ -52132,7 +52036,7 @@ assert.deepEqual(
     [
       'type',
       'Item type',
-      'Group prompts by runtime item type for template-specific review.',
+      'Group questions by type.',
     ],
   ]
 );
@@ -52184,9 +52088,9 @@ assert.deepEqual(
       selectedFilterOption: attemptReviewFilterOptions[1],
       statusView: {
         ariaLabel:
-          'Scope status: Adjusted. Review view is adjusted to Needs review only.',
+          'Filter status: Adjusted. Review view is adjusted to Needs review only.',
         description: 'Review view is adjusted to Needs review only.',
-        label: 'Scope status',
+        label: 'Filter status',
         tone: 'custom',
         value: 'Adjusted',
       },
@@ -52205,9 +52109,9 @@ assert.deepEqual(
       sort: 'accuracy',
       statusView: {
         ariaLabel:
-          'Scope status: Adjusted. Sort items is adjusted to Lowest accuracy.',
+          'Filter status: Adjusted. Sort items is adjusted to Lowest accuracy.',
         description: 'Sort items is adjusted to Lowest accuracy.',
-        label: 'Scope status',
+        label: 'Filter status',
         tone: 'custom',
         value: 'Adjusted',
       },
@@ -52232,9 +52136,9 @@ assert.deepEqual(
         summary: 'assignment-result-search-summary',
       },
       searchStatusView: {
-        ariaLabel: 'Scope status: Adjusted. Find student is adjusted to alice.',
+        ariaLabel: 'Filter status: Adjusted. Find student is adjusted to alice.',
         description: 'Find student is adjusted to alice.',
-        label: 'Scope status',
+        label: 'Filter status',
         tone: 'custom',
         value: 'Adjusted',
       },
@@ -52250,9 +52154,9 @@ assert.deepEqual(
       sortLabel: 'Sort students',
       sortStatusView: {
         ariaLabel:
-          'Scope status: Adjusted. Sort students is adjusted to Best score.',
+          'Filter status: Adjusted. Sort students is adjusted to Best score.',
         description: 'Sort students is adjusted to Best score.',
-        label: 'Scope status',
+        label: 'Filter status',
         tone: 'custom',
         value: 'Adjusted',
       },
@@ -52270,9 +52174,9 @@ assert.deepEqual(
   }),
   {
     ariaLabel:
-      'Scope status: Default. Find student is using the default view: All students.',
+      'Filter status: Default. Find student is using the default view: All students.',
     description: 'Find student is using the default view: All students.',
-    label: 'Scope status',
+    label: 'Filter status',
     tone: 'default',
     value: 'Default',
   }
@@ -52358,9 +52262,9 @@ assert.deepEqual(
       },
       {
         ariaLabel:
-          'Items: 0/0. Item performance rows matched by the current item sort scope.',
+          'Items: 0/0. Question rows in the current sort.',
         description:
-          'Item performance rows matched by the current item sort scope.',
+          'Question rows in the current sort.',
         id: 'items',
         label: 'Items',
         value: '0/0',
@@ -52376,7 +52280,7 @@ assert.deepEqual(
       },
     ],
     summaryLabel: 'Matched records',
-    title: 'Copy scope',
+    title: 'What gets copied',
   }
 );
 assert.equal(
@@ -53069,13 +52973,10 @@ assert.deepEqual(assignmentResultTableHeaders.studentSummary, [
 ]);
 assert.deepEqual(assignmentResultTableHeaders.itemPerformance, [
   { id: 'item', label: 'Item' },
-  { id: 'type', label: 'Type' },
   { id: 'correct-rate', label: 'Correct rate' },
   { id: 'submitted', label: 'Submitted' },
   { id: 'unanswered', label: 'Unanswered' },
   { id: 'expected', label: 'Expected' },
-  { id: 'accepted', label: 'Accepted' },
-  { id: 'explanation', label: 'Explanation' },
 ]);
 assert.equal(assignmentResultReviewCopy.emptyValue, '-');
 const attemptRowCompletedAt = new Date('2026-01-01T00:00:00.000Z');
@@ -53426,7 +53327,7 @@ assert.deepEqual(
   getAssignmentAnswerReviewStatus({ correct: false, submitted: true }),
   {
     exportLabel: 'review',
-    label: 'Review',
+    label: 'Incorrect',
     tone: 'review',
   }
 );
@@ -53667,8 +53568,8 @@ assert.equal(formatAssignmentResultPercent(82.6), '83%');
 assert.equal(formatAssignmentResultPercent(Number.NaN), '-');
 assert.equal(formatAssignmentResultValue(''), '-');
 assert.equal(formatAssignmentResultValue('Paris'), 'Paris');
-assert.equal(formatAssignmentReviewCount(1), '1 review');
-assert.equal(formatAssignmentReviewCount(3), '3 reviews');
+assert.equal(formatAssignmentReviewCount(1), '1 to review');
+assert.equal(formatAssignmentReviewCount(3), '3 to review');
 assert.equal(getAssignmentResultCompletedAttemptCount(2), 2);
 assert.equal(getAssignmentResultCompletedAttemptCount(2.8), 2);
 assert.equal(getAssignmentResultCompletedAttemptCount(-1), 0);
@@ -53735,10 +53636,10 @@ function expectAssignmentResultActionScopeView(
       : 'Uses the full private result set for this assignment, independent of current filters.';
 
   return {
-    ariaLabel: `Data scope: ${value}. ${description}`,
+    ariaLabel: `Includes: ${value}. ${description}`,
     dataScope,
     description,
-    label: 'Data scope',
+    label: 'Includes',
     value,
   };
 }
@@ -53833,7 +53734,7 @@ assert.deepEqual(
       action: 'copy-brief',
       ariaLabel: expectAssignmentResultActionAriaLabel({
         description:
-          'Copy a compact class snapshot with metrics, reteach focus, and students who need follow-up.',
+          'Copy a short class summary: scores, what to reteach, and who needs follow-up.',
         label: 'Copy brief',
         scopeView: expectAssignmentResultActionScopeView('current-review'),
         statusView: expectAssignmentResultActionStatusView({
@@ -53844,7 +53745,7 @@ assert.deepEqual(
       }),
       dataScope: 'current-review',
       description:
-        'Copy a compact class snapshot with metrics, reteach focus, and students who need follow-up.',
+        'Copy a short class summary: scores, what to reteach, and who needs follow-up.',
       disabled: true,
       disabledReason: 'Submit at least one attempt before copying a brief.',
       failureMessage: 'Classroom brief could not be copied.',
@@ -54025,14 +53926,14 @@ assert.deepEqual(
       action: 'copy-brief',
       ariaLabel: expectAssignmentResultActionAriaLabel({
         description:
-          'Copy a compact class snapshot with metrics, reteach focus, and students who need follow-up.',
+          'Copy a short class summary: scores, what to reteach, and who needs follow-up.',
         label: 'Copy brief',
         scopeView: expectAssignmentResultActionScopeView('current-review'),
         statusView: expectAssignmentResultActionStatusView({ type: 'ready' }),
       }),
       dataScope: 'current-review',
       description:
-        'Copy a compact class snapshot with metrics, reteach focus, and students who need follow-up.',
+        'Copy a short class summary: scores, what to reteach, and who needs follow-up.',
       disabled: false,
       failureMessage: 'Classroom brief could not be copied.',
       gate: { type: 'ready' },
@@ -54323,7 +54224,7 @@ assert.deepEqual(
     },
     classroomBrief: {
       description:
-        'A compact class-ready summary built from the frozen assignment snapshot and submitted attempts.',
+        'A short summary of the class\'s submitted work.',
       isVisible: true,
       title: 'Classroom brief',
     },
@@ -54334,7 +54235,7 @@ assert.deepEqual(
     },
     itemPerformance: {
       description:
-        'Review every prompt from the frozen assignment snapshot, including submitted counts, correct rates, and answer notes.',
+        'Correct rate and answers for every question.',
       isVisible: true,
       title: 'Item performance',
     },
@@ -54693,7 +54594,7 @@ assert.deepEqual(
   ),
   {
     description:
-      'Every shown submission is currently correct for this assignment snapshot.',
+      'Every shown submission is fully correct.',
     title: 'No answers need review.',
   }
 );
@@ -55380,7 +55281,7 @@ assert.deepEqual(
 );
 assert.deepEqual(getAssignmentResultActionCopy('copy-brief'), {
   description:
-    'Copy a compact class snapshot with metrics, reteach focus, and students who need follow-up.',
+    'Copy a short class summary: scores, what to reteach, and who needs follow-up.',
   failureMessage: 'Classroom brief could not be copied.',
   label: 'Copy brief',
   successMessage: 'Classroom brief copied.',
@@ -56671,7 +56572,7 @@ assert.deepEqual(
     value: '2',
   },
   {
-    description: 'Submitted runtime items available for analysis.',
+    description: 'Submitted answers available to review.',
     id: 'total-items',
     label: 'Analyzed items',
     value: '2',
@@ -56699,13 +56600,13 @@ assert.deepEqual(classroomBrief.scopeViews, expectAssignmentClassroomBriefScopeV
     value: '2',
   },
   {
-    description: 'Submitted runtime items available for analysis.',
+    description: 'Submitted answers available to review.',
     id: 'total-items',
     label: 'Analyzed items',
     value: '2',
   },
 ]));
-assert.equal(classroomBrief.statSummaryLabel, 'Class snapshot');
+assert.equal(classroomBrief.statSummaryLabel, 'Class summary');
 assert.deepEqual(
   buildAssignmentClassroomBriefFocusItemView({
     index: 0,
@@ -56748,7 +56649,7 @@ assert.deepEqual(
     latestAccuracyLabel: '0%',
     latestAttemptCompletedAtLabel: null,
     latestAttemptSummaryLabel: null,
-    needsReviewLabel: '2 reviews',
+    needsReviewLabel: '2 to review',
     reviewItemCountLabel: '2 items to review',
     submittedContextLabel: anonymousStudentSubmittedContext,
     studentKey: 'anonymous:1',
@@ -56765,7 +56666,7 @@ assert.deepEqual(classroomBrief.followUpStudentViews[0], {
   latestAccuracyLabel: '0%',
   latestAttemptCompletedAtLabel: null,
   latestAttemptSummaryLabel: null,
-  needsReviewLabel: '2 reviews',
+  needsReviewLabel: '2 to review',
   reviewItemCountLabel: '2 items to review',
   submittedContextLabel: anonymousStudentSubmittedContext,
   studentKey: 'anonymous:1',
@@ -56781,7 +56682,7 @@ assert.deepEqual(classroomBriefWithAttempts.followUpStudentViews[0], {
   latestAccuracyLabel: '0%',
   latestAttemptCompletedAtLabel: anonymousLatestAttemptCompletedAtLabel,
   latestAttemptSummaryLabel: anonymousLatestAttemptSummary,
-  needsReviewLabel: '2 reviews',
+  needsReviewLabel: '2 to review',
   reviewItemCountLabel: '2 items to review',
   submittedContextLabel: anonymousStudentSubmittedContextWithLatestAttempt,
   studentKey: 'anonymous:1',
@@ -57586,7 +57487,7 @@ assert.deepEqual(
         'last-submitted-context',
         'Last submitted',
         '4',
-        'Students with a normalized latest submission time from the current review scope.',
+        'Students with a recorded latest submission.',
       ],
     ],
     studentKeys: [
@@ -57680,7 +57581,7 @@ try {
         'last-submitted-context',
         '最近提交',
         '2',
-        '当前复盘范围内带有规范化最近提交时间的学生数。',
+        '有最近提交记录的学生。',
       ],
     ]
   );
@@ -57823,7 +57724,7 @@ assert.deepEqual(
     ],
     copyActionDataItemIds: ['pair-1'],
     copyActionDataAttemptIds: ['attempt-3'],
-    copyActionDataScopeTitle: 'Copy scope',
+    copyActionDataScopeTitle: 'What gets copied',
     copyActionDataStudentKeys: ['name:alpha-review'],
     dataSetCopyAttemptIds: ['attempt-3'],
     dataSetCopyItemIds: ['pair-1'],
@@ -57862,8 +57763,8 @@ assert.deepEqual(
     reteach: reteachPlan.text,
   }
 );
-assert.doesNotMatch(resultCopyArtifacts.classroomBrief.text, /Copy scope:/);
-assert.match(scopedResultCopyArtifacts.classroomBrief.text, /Copy scope:/);
+assert.doesNotMatch(resultCopyArtifacts.classroomBrief.text, /Includes:/);
+assert.match(scopedResultCopyArtifacts.classroomBrief.text, /Includes:/);
 assert.match(
   scopedResultCopyArtifacts.classroomBrief.text,
   /- Students: 1 student · 2 attempts\. Scan strongest performances before opening individual attempts\./
@@ -57884,11 +57785,11 @@ assert.match(
   scopedResultCopyArtifacts.classroomBrief.text,
   /- Answer reviews: 2\/3/
 );
-assert.match(scopedResultCopyArtifacts.reteachPlan.text, /Copy scope:/);
-assert.match(scopedResultCopyArtifacts.itemReviewSummary.text, /Copy scope:/);
+assert.match(scopedResultCopyArtifacts.reteachPlan.text, /Includes:/);
+assert.match(scopedResultCopyArtifacts.itemReviewSummary.text, /Includes:/);
 assert.match(
   scopedResultCopyArtifacts.studentFollowUpSummary.text,
-  /Copy scope:/
+  /Includes:/
 );
 assert.match(
   scopedResultCopyArtifacts.classroomBrief.text,
@@ -57971,7 +57872,7 @@ assert.deepEqual(
       'current-review',
       'preview:copy-brief',
       'Copy brief',
-      'Copy a compact class snapshot with metrics, reteach focus, and students who need follow-up.',
+      'Copy a short class summary: scores, what to reteach, and who needs follow-up.',
       'Focus items: 1 · Follow-up students: 1',
       [
         ['focus-items', 'Focus items', '1'],
@@ -58162,14 +58063,14 @@ const readyCopyBriefActionButton = {
   action: 'copy-brief',
   ariaLabel: expectAssignmentResultActionAriaLabel({
     description:
-      'Copy a compact class snapshot with metrics, reteach focus, and students who need follow-up.',
+      'Copy a short class summary: scores, what to reteach, and who needs follow-up.',
     label: 'Copy brief',
     scopeView: expectAssignmentResultActionScopeView('current-review'),
     statusView: expectAssignmentResultActionStatusView({ type: 'ready' }),
   }),
   dataScope: 'current-review',
   description:
-    'Copy a compact class snapshot with metrics, reteach focus, and students who need follow-up.',
+    'Copy a short class summary: scores, what to reteach, and who needs follow-up.',
   disabled: false,
   failureMessage: 'Classroom brief could not be copied.',
   gate: { type: 'ready' },
@@ -58304,7 +58205,7 @@ assert.throws(
         action: 'copy-brief',
         ariaLabel: expectAssignmentResultActionAriaLabel({
           description:
-            'Copy a compact class snapshot with metrics, reteach focus, and students who need follow-up.',
+            'Copy a short class summary: scores, what to reteach, and who needs follow-up.',
           label: 'Copy brief',
           scopeView: expectAssignmentResultActionScopeView('current-review'),
           statusView: expectAssignmentResultActionStatusView({
@@ -58315,7 +58216,7 @@ assert.throws(
         }),
         dataScope: 'current-review',
         description:
-          'Copy a compact class snapshot with metrics, reteach focus, and students who need follow-up.',
+          'Copy a short class summary: scores, what to reteach, and who needs follow-up.',
         disabled: true,
         failureMessage: 'Classroom brief could not be copied.',
         gate: {
@@ -58484,14 +58385,14 @@ assert.deepEqual(
       action: 'copy-brief',
       ariaLabel: expectAssignmentResultActionAriaLabel({
         description:
-          'Copy a compact class snapshot with metrics, reteach focus, and students who need follow-up.',
+          'Copy a short class summary: scores, what to reteach, and who needs follow-up.',
         label: 'Copy brief',
         scopeView: expectAssignmentResultActionScopeView('current-review'),
         statusView: expectAssignmentResultActionStatusView({ type: 'ready' }),
       }),
       dataScope: 'current-review',
       description:
-        'Copy a compact class snapshot with metrics, reteach focus, and students who need follow-up.',
+        'Copy a short class summary: scores, what to reteach, and who needs follow-up.',
       disabled: false,
       failureMessage: 'Classroom brief could not be copied.',
       gate: { type: 'ready' },

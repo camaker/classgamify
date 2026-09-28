@@ -68,7 +68,7 @@ test('attempt review summary and answer helpers keep card counts shared', () => 
   });
   assert.deepEqual(buildAssignmentResultAnswerStatusView(answers[1]), {
     exportLabel: 'review',
-    label: 'Review',
+    label: 'Incorrect',
     tone: 'review',
   });
   assert.deepEqual(buildAssignmentResultAnswerStatusView(answers[2]), {

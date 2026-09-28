@@ -214,8 +214,8 @@ test('accepted-answer consumers render through prepared view fields', () => {
   );
   assert.match(
     PERFORMANCE_TABLE_SOURCE,
-    /rowView\.expectedAnswerText[\s\S]*rowView\.acceptedAnswersText/,
-    'Item performance tables should render prepared expected and accepted-answer columns.'
+    /rowView\.expectedAnswerText/,
+    'Item performance tables should render the prepared expected-answer column; accepted alternatives live on the reteach cards.'
   );
   assert.match(
     ATTEMPT_REVIEW_CARD_SOURCE,

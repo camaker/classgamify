@@ -45,13 +45,13 @@ test('local persisted browser journey spec covers save through return', () => {
   );
   assert.match(
     ACTIVITY_AUTHORING_SPEC_SOURCE,
-    /Copy & export[\s\S]*locator\('\[data-handoff\]'\)\)\.toHaveCount\(0\)[\s\S]*Scope status: Adjusted[\s\S]*Copy brief/,
-    'The journey should verify the results page renders no hidden audit sections, shows visible scope badges, then copies through the Copy & export menu.'
+    /Copy & export[\s\S]*locator\('\[data-handoff\]'\)\)\.toHaveCount\(0\)[\s\S]*getByRole\('tab', \{ name: \/\^Submissions[\s\S]*Copy brief/,
+    'The journey should verify the results page renders no hidden audit sections, walks the result tabs, then copies through the Copy & export menu.'
   );
   assert.match(
     ACTIVITY_AUTHORING_SPEC_SOURCE,
-    /Find student[\s\S]*Sort students[\s\S]*Sort items[\s\S]*Review view[\s\S]*Scope status: Adjusted[\s\S]*toHaveCount\(4\)/,
-    'The journey should verify result filter URL state and the visible Adjusted scope badges.'
+    /Find student[\s\S]*sort=name[\s\S]*Sort items[\s\S]*itemSort=accuracy[\s\S]*Review view[\s\S]*review=needs-review/,
+    'The journey should verify each result filter keeps its state in the URL.'
   );
   assert.match(
     ACTIVITY_AUTHORING_SPEC_SOURCE,

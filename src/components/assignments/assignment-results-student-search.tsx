@@ -2,7 +2,6 @@ import type {
   AssignmentResultStudentSearchControlView,
   StudentSummarySort,
 } from '@/assignments/result-view';
-import { AssignmentResultControlStatusBadge } from '@/components/assignments/assignment-result-control-status-badge';
 import { Input } from '@/components/ui/input';
 import {
   NativeSelect,
@@ -26,16 +25,11 @@ export function AssignmentResultsStudentSearch({
   const searchDescriptionIds = [
     view.searchIds.description,
     view.searchIds.summary,
-    view.searchIds.searchStatusDescription,
-  ].join(' ');
-  const sortDescriptionIds = [
-    view.sortIds.description,
-    view.sortIds.statusDescription,
   ].join(' ');
 
   return (
     <>
-      <section className="grid gap-3 rounded-lg border bg-card p-4 md:grid-cols-[minmax(0,1fr)_12rem_auto] md:items-start">
+      <section className="grid gap-3 md:grid-cols-[minmax(0,1fr)_12rem_auto] md:items-end">
         <div className="grid gap-2">
           <div className="flex min-w-0 items-center justify-between gap-2">
             <label
@@ -44,10 +38,6 @@ export function AssignmentResultsStudentSearch({
             >
               {view.label}
             </label>
-            <AssignmentResultControlStatusBadge
-              descriptionId={view.searchIds.searchStatusDescription}
-              view={view.searchStatusView}
-            />
           </div>
           <div className="relative max-w-xl">
             <IconSearch
@@ -88,15 +78,10 @@ export function AssignmentResultsStudentSearch({
             >
               {view.sortLabel}
             </label>
-            <AssignmentResultControlStatusBadge
-              descriptionId={view.sortIds.statusDescription}
-              view={view.sortStatusView}
-            />
           </div>
           <NativeSelect
             id={view.sortIds.select}
             value={view.sort}
-            aria-describedby={sortDescriptionIds}
             aria-label={view.sortAriaLabel}
             onChange={(event) =>
               onSortChange(event.currentTarget.value as StudentSummarySort)
@@ -108,17 +93,11 @@ export function AssignmentResultsStudentSearch({
               </NativeSelectOption>
             ))}
           </NativeSelect>
-          <p
-            id={view.sortIds.description}
-            className="text-xs leading-relaxed text-muted-foreground"
-          >
-            {view.selectedSortOption.description}
-          </p>
         </div>
 
         <p
           id={view.searchIds.summary}
-          className="text-sm text-muted-foreground md:pt-7 md:text-right"
+          className="text-sm text-muted-foreground md:text-right"
         >
           {view.summary}
         </p>

@@ -66,9 +66,8 @@ test('printable worksheet builder preserves snapshot, delivery, and answer-key c
     ),
     {
       ariaLabel:
-        'Activity description: Frozen snapshot copy.. Printed context copied from the frozen assignment snapshot.',
-      description:
-        'Printed context copied from the frozen assignment snapshot.',
+        'Activity description: Frozen snapshot copy.. Text printed from the assignment.',
+      description: 'Text printed from the assignment.',
       id: 'activity-description',
       kind: 'text',
       label: 'Activity description',
