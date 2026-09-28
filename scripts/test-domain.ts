@@ -15363,9 +15363,9 @@ function buildExpectedAnonymousAttemptSummaryItems(label: string) {
     },
     {
       ariaLabel:
-        'Result privacy: Token hidden. Teachers see an anonymous student label in results, not the raw browser token.',
+        'Result privacy: Token hidden. Your teacher sees an anonymous label for you in results.',
       description:
-        'Teachers see an anonymous student label in results, not the raw browser token.',
+        'Your teacher sees an anonymous label for you in results.',
       id: 'token-privacy',
       label: 'Result privacy',
       value: 'Token hidden',
@@ -15455,9 +15455,9 @@ try {
       },
       {
         ariaLabel:
-          '结果隐私：令牌已隐藏。老师结果里会看到匿名学生标签，不会看到原始浏览器令牌。',
+          '结果隐私：令牌已隐藏。老师在结果里只会看到你的匿名标签。',
         description:
-          '老师结果里会看到匿名学生标签，不会看到原始浏览器令牌。',
+          '老师在结果里只会看到你的匿名标签。',
         id: 'token-privacy',
         label: '结果隐私',
         value: '令牌已隐藏',
@@ -15563,7 +15563,7 @@ assert.deepEqual(
     'This link may have been unpublished, closed, or typed incorrectly.',
   missingAssignmentTitle: 'Assignment not found',
   publicAssignmentDescription:
-    "This public assignment loads from the teacher share link, collects answers, and scores against the teacher's frozen assignment snapshot.",
+    "Answer the questions and submit to send your work to your teacher.",
   publicRouteBadgeLabel: 'Student play route',
   readOnlyPreviewMessage:
     'Preview assignments are read-only until a teacher publishes a share link.',
@@ -15582,10 +15582,10 @@ assert.deepEqual(
   reviewSummaryHiddenDescription:
     'Your teacher will review the submitted answers. Correct answers are not shown on this link.',
   reviewSummaryItemCountLabel: 'Items',
-  reviewSummaryNeedsReviewLabel: 'Needs review',
+  reviewSummaryNeedsReviewLabel: 'Not correct',
   reviewSummaryReviewHiddenValue: 'Teacher review',
   reviewSummaryReviewVisibilityLabel: 'Answer review',
-  reviewSummarySubmittedLabel: 'Submitted',
+  reviewSummarySubmittedLabel: 'Answered',
   reviewSummaryTitle: 'Submission review',
   reviewSummaryUnansweredLabel: 'Unanswered',
   reviewSummaryVisibleDescription:
@@ -15596,7 +15596,7 @@ assert.deepEqual(
   startAnotherAttemptAriaLabel:
     'Start another attempt with the same student identity',
   startAnotherAttemptDescription:
-    'Current answers will be cleared for the next try, while the saved student name or anonymous browser label stays grouped with this assignment link.',
+    'Your answers are cleared for the next try; your name stays the same.',
   startAnotherAttemptLabel: 'Start another attempt',
   missingStudentNameMessage: 'Type your name before submitting.',
   studentNameDescription: 'Type the name your teacher should see in results.',
@@ -15784,7 +15784,7 @@ assert.deepEqual(stripMissingScopeAriaLabels(buildStudentRunnerMissingView('not-
     },
     {
       description:
-        'Unavailable links do not show the anonymous browser label or raw browser token.',
+        'This link isn\'t available, so nothing about you is shown.',
       id: 'browser-identity',
       label: 'Browser identity',
       value: 'Private',
@@ -15826,7 +15826,7 @@ assert.deepEqual(stripMissingScopeAriaLabels(buildStudentRunnerMissingView('clos
     },
     {
       description:
-        'Unavailable links do not show the anonymous browser label or raw browser token.',
+        'This link isn\'t available, so nothing about you is shown.',
       id: 'browser-identity',
       label: 'Browser identity',
       value: 'Private',
@@ -15869,7 +15869,7 @@ assert.deepEqual(stripMissingScopeAriaLabels(buildStudentRunnerMissingView('expi
     },
     {
       description:
-        'Unavailable links do not show the anonymous browser label or raw browser token.',
+        'This link isn\'t available, so nothing about you is shown.',
       id: 'browser-identity',
       label: 'Browser identity',
       value: 'Private',
@@ -15911,7 +15911,7 @@ assert.deepEqual(stripMissingScopeAriaLabels(buildStudentRunnerMissingView('draf
     },
     {
       description:
-        'Unavailable links do not show the anonymous browser label or raw browser token.',
+        'This link isn\'t available, so nothing about you is shown.',
       id: 'browser-identity',
       label: 'Browser identity',
       value: 'Private',
@@ -15953,7 +15953,7 @@ try {
       },
       {
         description:
-          '链接不可用时，不会显示匿名浏览器标签或原始浏览器令牌。',
+          '此链接不可用，因此不会显示你的任何信息。',
         id: 'browser-identity',
         label: '浏览器身份',
         value: '已保护',
@@ -16963,7 +16963,7 @@ assert.deepEqual(
   {
     acceptedAnswersLabel: 'Accepted answers',
     acceptedAnswersText: 'Accepted answers: Paris, France',
-    ariaLabel: 'Answer feedback: Needs review',
+    ariaLabel: 'Answer feedback: Not correct',
     correctAnswer: 'Paris',
     correctAnswerLabel: 'Correct match',
     correctAnswerText: 'Correct match: Paris',
@@ -17003,8 +17003,8 @@ assert.deepEqual(
     explanationLabel: 'Why',
     explanationText: 'Why: Paris is the capital of France.',
     status: 'needs-review',
-    statusAriaLabel: 'Feedback status: Needs review',
-    statusLabel: 'Needs review',
+    statusAriaLabel: 'Feedback status: Not correct',
+    statusLabel: 'Not correct',
     submittedAnswer: 'Lyon',
     submittedAnswerLabel: 'Your answer',
     submittedAnswerText: 'Your answer: Lyon',
@@ -17077,11 +17077,11 @@ try {
   );
   assert.equal(
     zhPublicAnswerFeedbackView?.ariaLabel,
-    '答案反馈：需复盘'
+    '答案反馈：未答对'
   );
   assert.equal(
     zhPublicAnswerFeedbackView?.statusAriaLabel,
-    '反馈状态：需复盘'
+    '反馈状态：未答对'
   );
   assert.equal(
     zhPublicAnswerFeedbackView?.description,
@@ -17132,7 +17132,7 @@ assert.deepEqual(
     correctAnswerLabel: 'Correct answer',
     correctAnswerText: 'Correct answer: Mitochondria',
     description:
-      'This response matched the expected answer for the frozen assignment item.',
+      'Your answer is correct.',
     detailLines: [
       {
         ariaLabel: 'Your answer: Mitochondria',
@@ -18218,10 +18218,10 @@ assert.deepEqual(
     metricsLabel: 'Submission review counts',
     metrics: [
       {
-        ariaLabel: 'Submitted: 3. Items submitted in this saved attempt.',
-        description: 'Items submitted in this saved attempt.',
+        ariaLabel: 'Answered: 3. Questions you answered.',
+        description: 'Questions you answered.',
         key: 'submitted',
-        label: 'Submitted',
+        label: 'Answered',
         value: '3',
       },
       {
@@ -18233,16 +18233,16 @@ assert.deepEqual(
       },
       {
         ariaLabel:
-          'Needs review: 2. Items to review against the expected answer, accepted alternatives, or teacher explanation.',
+          'Not correct: 2. Questions that were wrong or left blank.',
         description:
-          'Items to review against the expected answer, accepted alternatives, or teacher explanation.',
+          'Questions that were wrong or left blank.',
         key: 'needs-review',
-        label: 'Needs review',
+        label: 'Not correct',
         value: '2',
       },
       {
-        ariaLabel: 'Unanswered: 2. Items left blank in this saved attempt.',
-        description: 'Items left blank in this saved attempt.',
+        ariaLabel: 'Unanswered: 2. Questions you left blank.',
+        description: 'Questions you left blank.',
         key: 'unanswered',
         label: 'Unanswered',
         value: '2',
@@ -18272,15 +18272,15 @@ assert.deepEqual(
     metricsLabel: 'Submission review counts',
     metrics: [
       {
-        ariaLabel: 'Submitted: 3. Items submitted in this saved attempt.',
-        description: 'Items submitted in this saved attempt.',
+        ariaLabel: 'Answered: 3. Questions you answered.',
+        description: 'Questions you answered.',
         key: 'submitted',
-        label: 'Submitted',
+        label: 'Answered',
         value: '3',
       },
       {
-        ariaLabel: 'Unanswered: 3. Items left blank in this saved attempt.',
-        description: 'Items left blank in this saved attempt.',
+        ariaLabel: 'Unanswered: 3. Questions you left blank.',
+        description: 'Questions you left blank.',
         key: 'unanswered',
         label: 'Unanswered',
         value: '3',
@@ -18378,10 +18378,10 @@ assert.deepEqual(
         value: '2',
       },
       {
-        ariaLabel: 'Needs review: 2. Items that may need another look.',
+        ariaLabel: 'Not correct: 2. Items that may need another look.',
         description: 'Items that may need another look.',
         key: 'needs-review',
-        label: 'Needs review',
+        label: 'Not correct',
         value: '2',
       },
       {
@@ -18463,10 +18463,10 @@ assert.deepEqual(
         value: '0',
       },
       {
-        ariaLabel: 'Needs review: 0. Items that may need another look.',
+        ariaLabel: 'Not correct: 0. Items that may need another look.',
         description: 'Items that may need another look.',
         key: 'needs-review',
-        label: 'Needs review',
+        label: 'Not correct',
         value: '0',
       },
       {
@@ -22583,7 +22583,7 @@ const studentRunnerHeaderView = buildStudentRunnerHeaderView({
 });
 assert.deepEqual(studentRunnerHeaderView, {
   description:
-    "This public assignment loads from the teacher share link, collects answers, and scores against the teacher's frozen assignment snapshot.",
+    "Answer the questions and submit to send your work to your teacher.",
   instructions: {
     label: 'Student instructions',
     value: 'Read each prompt carefully.',
@@ -23277,7 +23277,7 @@ assert.deepEqual(
     items: [
       {
         description:
-          'Runtime prompts and playable items are not returned for this link state.',
+          'Questions aren\'t shown while this link is unavailable.',
         id: 'activity-content',
         label: 'Activity content',
         value: 'Hidden',
@@ -23291,7 +23291,7 @@ assert.deepEqual(
       },
       {
         description:
-          'Browser labels and raw anonymous tokens are not shown for unavailable links.',
+          'Nothing about you is shown while this link is unavailable.',
         id: 'browser-identity',
         label: 'Browser identity',
         value: 'Private',
@@ -23317,7 +23317,7 @@ assert.deepEqual(
 assert.equal(
   buildStudentRunnerUnavailableSafetyView(publicAssignmentUnavailableClosedPayload)
     .items[0]?.ariaLabel,
-  'Activity content: Hidden. Runtime prompts and playable items are not returned for this link state.'
+  'Activity content: Hidden. Questions aren\'t shown while this link is unavailable.'
 );
 assert.equal(normalizeRuntimeDisplayText('  Ｎｅｗ   York  '), 'New York');
 assert.equal(
@@ -25752,7 +25752,7 @@ assert.deepEqual(
     },
     controlView: {
       attemptRegionDescription:
-        'Answer the activity items, review progress, and submit this attempt from this area.',
+        'Answer the questions and submit your work here.',
       attemptRegionLabel: 'Student attempt workspace',
       payloadSummaryView: buildExpectedStudentRunnerPayloadSummaryView({
         answerCount: 1,
@@ -25864,10 +25864,10 @@ assert.deepEqual(
         metricsLabel: 'Submission review counts',
         metrics: [
           {
-            ariaLabel: 'Submitted: 1. Items submitted in this saved attempt.',
-            description: 'Items submitted in this saved attempt.',
+            ariaLabel: 'Answered: 1. Questions you answered.',
+            description: 'Questions you answered.',
             key: 'submitted',
-            label: 'Submitted',
+            label: 'Answered',
             value: '1',
           },
           {
@@ -25879,16 +25879,16 @@ assert.deepEqual(
           },
           {
             ariaLabel:
-              'Needs review: 0. Items to review against the expected answer, accepted alternatives, or teacher explanation.',
+              'Not correct: 0. Questions that were wrong or left blank.',
             description:
-              'Items to review against the expected answer, accepted alternatives, or teacher explanation.',
+              'Questions that were wrong or left blank.',
             key: 'needs-review',
-            label: 'Needs review',
+            label: 'Not correct',
             value: '0',
           },
           {
-            ariaLabel: 'Unanswered: 0. Items left blank in this saved attempt.',
-            description: 'Items left blank in this saved attempt.',
+            ariaLabel: 'Unanswered: 0. Questions you left blank.',
+            description: 'Questions you left blank.',
             key: 'unanswered',
             label: 'Unanswered',
             value: '0',
@@ -25903,7 +25903,7 @@ assert.deepEqual(
       startAnotherAttemptAriaLabel:
         'Start another attempt with the same student identity',
       startAnotherAttemptDescription:
-        'Current answers will be cleared for the next try, while the saved student name or anonymous browser label stays grouped with this assignment link.',
+        'Your answers are cleared for the next try; your name stays the same.',
       startAnotherAttemptLabel: 'Start another attempt',
       statusLabel: 'Score submitted',
     },
@@ -26165,11 +26165,11 @@ function buildExpectedStudentAttemptFeedbackScopeView({
       },
       {
         ariaLabel:
-          `Needs review: ${needsReviewItemCount}. ` +
+          `Not correct: ${needsReviewItemCount}. ` +
           'Items that may need another look.',
         description: 'Items that may need another look.',
         key: 'needs-review',
-        label: 'Needs review',
+        label: 'Not correct',
         value: String(needsReviewItemCount),
       },
       {
@@ -26219,7 +26219,7 @@ function buildExpectedStudentRunnerSubmitReadinessView({
   const items = [
     buildExpectedStudentRunnerSubmitReadinessItemView({
       description: normalizedShareSlug
-        ? `This attempt will submit to the frozen link ${normalizedShareSlug}.`
+        ? 'Your work will be sent to your teacher.'
         : 'This browser does not have a valid assignment share link for submission.',
       id: 'share-link',
       label: 'Assignment link',
@@ -26228,10 +26228,10 @@ function buildExpectedStudentRunnerSubmitReadinessView({
     buildExpectedStudentRunnerSubmitReadinessItemView({
       description:
         itemCount > 0
-          ? `${itemCount} runtime items loaded from the teacher assignment snapshot.`
-          : 'No playable runtime items are available for this submission.',
+          ? `Questions loaded: ${itemCount}`
+          : 'There are no questions to answer on this link.',
       id: 'runtime-items',
-      label: 'Frozen runtime items',
+      label: 'Questions',
       status: itemStatus,
     }),
     buildExpectedStudentRunnerSubmitReadinessItemView({
@@ -26272,7 +26272,7 @@ function buildExpectedStudentRunnerSubmitReadinessView({
   return {
     ariaLabel: 'Submit readiness checks',
     description:
-      'Check the frozen link, loaded items, completion, and submit state before sending this attempt.',
+      'Check your progress before you submit.',
     items,
     status,
     statusLabel: getExpectedStudentRunnerSubmitReadinessStatusLabel(status),
@@ -26859,7 +26859,7 @@ assert.deepEqual(
     },
     {
       description:
-        'Unavailable links do not show the anonymous browser label or raw browser token.',
+        'This link isn\'t available, so nothing about you is shown.',
       id: 'browser-identity',
       label: 'Browser identity',
       value: 'Private',
@@ -26880,7 +26880,7 @@ assert.deepEqual(
     items: [
       {
         description:
-          'Runtime prompts and playable items are not returned for this link state.',
+          'Questions aren\'t shown while this link is unavailable.',
         id: 'activity-content',
         label: 'Activity content',
         value: 'Hidden',
@@ -26894,7 +26894,7 @@ assert.deepEqual(
       },
       {
         description:
-          'Browser labels and raw anonymous tokens are not shown for unavailable links.',
+          'Nothing about you is shown while this link is unavailable.',
         id: 'browser-identity',
         label: 'Browser identity',
         value: 'Private',

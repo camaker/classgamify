@@ -17,6 +17,7 @@ type StudentRunnerAttemptShellProps = {
   onStudentNameChange: (studentName: string) => void;
   resultPanelView: StudentRunnerResultPanelView;
   studentName: string;
+  studentNameError?: string;
 };
 
 export function StudentRunnerAttemptShell({
@@ -27,6 +28,7 @@ export function StudentRunnerAttemptShell({
   onStudentNameChange,
   resultPanelView,
   studentName,
+  studentNameError,
 }: StudentRunnerAttemptShellProps) {
   return (
     <section
@@ -47,6 +49,7 @@ export function StudentRunnerAttemptShell({
         identityView={identityView}
         onStudentNameChange={onStudentNameChange}
         studentName={studentName}
+        studentNameError={studentNameError}
       />
 
       <StudentRunnerTimeExpiredNotice controlView={controlView} />
@@ -78,13 +81,16 @@ function StudentRunnerIdentityPanel({
   identityView,
   onStudentNameChange,
   studentName,
+  studentNameError,
 }: {
   identityView: StudentRunnerIdentityView;
   onStudentNameChange: (studentName: string) => void;
   studentName: string;
+  studentNameError?: string;
 }) {
   if (identityView.mode === 'student-name') {
     const studentNameDescriptionId = 'student-name-description';
+    const studentNameErrorId = 'student-name-error';
 
     return (
       <section
@@ -99,12 +105,26 @@ function StudentRunnerIdentityPanel({
           id="student-name"
           value={studentName}
           disabled={identityView.disabled}
-          aria-describedby={studentNameDescriptionId}
+          aria-describedby={
+            studentNameError
+              ? `${studentNameErrorId} ${studentNameDescriptionId}`
+              : studentNameDescriptionId
+          }
+          aria-invalid={studentNameError ? true : undefined}
           onChange={(event) => onStudentNameChange(event.target.value)}
           placeholder={identityView.placeholder}
           autoComplete="name"
-          className="h-12 bg-background text-base md:text-base"
+          className="h-12 scroll-mt-24 bg-background text-base md:text-base"
         />
+        {studentNameError ? (
+          <p
+            id={studentNameErrorId}
+            role="alert"
+            className="font-medium text-error-text text-sm"
+          >
+            {studentNameError}
+          </p>
+        ) : null}
         <p
           id={studentNameDescriptionId}
           className="text-muted-foreground text-sm"
@@ -169,7 +189,9 @@ function StudentRunnerResultPanel({
       }
       aria-label={view.ariaLabel}
       aria-labelledby={resultStatusId}
-      className="grid gap-5 rounded-2xl border-2 border-success/50 bg-background p-6 shadow-sm md:p-8"
+      id="student-runner-result-panel"
+      tabIndex={-1}
+      className="grid scroll-mt-6 gap-5 rounded-2xl outline-none border-2 border-success/50 bg-background p-6 shadow-sm md:p-8"
     >
       <div className="grid gap-2">
         <div

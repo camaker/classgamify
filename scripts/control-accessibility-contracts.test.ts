@@ -123,7 +123,7 @@ test('teacher controls keep their prepared accessible descriptions', () => {
 test('student controls keep their prepared accessible descriptions', () => {
   assert.match(
     STUDENT_RUNNER_ATTEMPT_SHELL_SOURCE,
-    /id="student-name"[\s\S]*aria-describedby=\{studentNameDescriptionId\}/
+    /id="student-name"[\s\S]*aria-describedby=\{[\s\S]*studentNameDescriptionId[\s\S]*\}[\s\S]*aria-invalid=/
   );
   assert.match(
     STUDENT_RUNNER_SUBMIT_CONTROLS_SOURCE,
