@@ -12,10 +12,17 @@ async function expectClassGamifyDashboard(page: Page) {
     page.getByRole('heading', { name: 'Teacher dashboard' })
   ).toBeVisible();
   await expect(
-    page.getByText('Activity content is now the center of the product.')
+    page.getByRole('link', { name: /^create activity$/i })
   ).toBeVisible();
   await expect(
-    page.getByRole('link', { name: /^create activity$/i })
+    page.getByRole('link', { name: /^open activity library$/i })
+  ).toBeVisible();
+  // A freshly registered teacher owns no activities yet, so the classroom
+  // loop panel points at the first step.
+  await expect(
+    page.getByRole('heading', {
+      name: 'Start by creating a reusable activity.',
+    })
   ).toBeVisible();
 }
 
@@ -59,7 +66,10 @@ test.describe('authentication and protected routes', () => {
     await page.getByRole('button', { name: /^sign up$|^注册$/i }).click();
 
     await expect(
-      page.getByText(/check your email to verify your account|请检查您的邮箱/i)
+      page.getByRole('status').filter({
+        hasText:
+          /check your email to verify your teacher workspace|请检查邮箱以验证你的教师工作区/i,
+      })
     ).toBeVisible();
 
     await updateE2EUser(request, {
