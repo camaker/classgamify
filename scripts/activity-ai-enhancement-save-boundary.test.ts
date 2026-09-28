@@ -206,7 +206,7 @@ test('activity AI enhancement save boundary gate is wired into docs and coverage
   );
   assert.match(
     PRODUCT_SOURCE,
-    /src\/activities\/ai-enhancement-save-boundary\.ts` owns the manual save boundary[\s\S]*30-slice teacher editor-review handoff/,
+    /src\/activities\/ai-enhancement-save-boundary\.ts` owns the manual save boundary[\s\S]*30-item teacher editor-review list/,
     'docs/product.md should document the AI enhancement save boundary owner.'
   );
   assert.match(
@@ -216,7 +216,7 @@ test('activity AI enhancement save boundary gate is wired into docs and coverage
   );
   assert.match(
     TEST_CATALOG_SOURCE,
-    /30-slice\s+editor-review\s+handoff/,
+    /30-item\s+editor-review\s+list/,
     'TEST-CATALOG should document the editor-review handoff.'
   );
 });

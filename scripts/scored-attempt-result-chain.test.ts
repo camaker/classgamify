@@ -114,7 +114,7 @@ test('scored attempt result focused gate is documented', () => {
   );
   assert.match(
     TEST_CATALOG_SOURCE,
-    /post-submit scored-result boundary[\s\S]*public\s+feedback[\s\S]*attempt\s+stats[\s\S]*teacher\s+result\s+review[\s\S]*30-slice attempt review card[\s\S]*copy\s+artifacts[\s\S]*CSV\s+export[\s\S]*printable\s+review\s+return/,
+    /post-submit scored-result boundary[\s\S]*public\s+feedback[\s\S]*attempt\s+stats[\s\S]*teacher\s+result\s+review[\s\S]*attempt review card[\s\S]*copy\s+artifacts[\s\S]*CSV\s+export[\s\S]*printable\s+review\s+return/,
     'TEST-CATALOG should describe the scored attempt result lifecycle scope.'
   );
 });

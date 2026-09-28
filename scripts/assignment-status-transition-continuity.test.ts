@@ -45,7 +45,7 @@ test('close and reopen retain snapshots attempts and teacher results', () => {
 test('product and catalog register status transition continuity', () => {
   assert.match(
     read('docs/product.md'),
-    /status transition continuity chain[\s\S]*30[\s\S]*owner[\s\S]*updatedAt[\s\S]*RETURNING[\s\S]*privacy/i
+    /status transition continuity gate[\s\S]*owner[\s\S]*updatedAt[\s\S]*RETURNING[\s\S]*privacy/i
   );
   assert.match(
     read('tests/e2e/TEST-CATALOG.md'),

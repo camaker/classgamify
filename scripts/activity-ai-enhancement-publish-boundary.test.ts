@@ -211,7 +211,7 @@ test('activity AI enhancement publish boundary gate is wired into docs and cover
   );
   assert.match(
     PRODUCT_SOURCE,
-    /src\/activities\/ai-enhancement-publish-boundary\.ts` owns the assignment publish boundary[\s\S]*30-slice manual-save handoff/,
+    /src\/activities\/ai-enhancement-publish-boundary\.ts` owns the assignment publish boundary[\s\S]*30-item manual-save list/,
     'docs/product.md should document the AI enhancement publish boundary owner.'
   );
   assert.match(
@@ -221,7 +221,7 @@ test('activity AI enhancement publish boundary gate is wired into docs and cover
   );
   assert.match(
     TEST_CATALOG_SOURCE,
-    /30-slice\s+manual-save\s+handoff/,
+    /30-item\s+manual-save\s+list/,
     'TEST-CATALOG should document the manual-save handoff.'
   );
 });

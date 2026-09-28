@@ -142,7 +142,7 @@ test('assignment list filter helpers normalize URL state predictably', () => {
 test('assignment list filter state is documented', () => {
   assert.match(
     PRODUCT_SOURCE,
-    /assignment-list filter-state chain[\s\S]*30-slice contract[\s\S]*URL validation[\s\S]*published-share context[\s\S]*search normalization[\s\S]*status parsing[\s\S]*list\s+API[\s\S]*privacy guards/,
+    /assignment-list filter-state gate[\s\S]*URL validation[\s\S]*published-share context[\s\S]*search normalization[\s\S]*status parsing[\s\S]*list\s+API[\s\S]*privacy guards/,
     'docs/product.md should document the assignment-list filter-state chain.'
   );
   assert.match(

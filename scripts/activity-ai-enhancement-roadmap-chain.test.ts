@@ -64,7 +64,7 @@ test('activity AI enhancement roadmap focused gate is documented', () => {
   );
   assert.match(
     TEST_CATALOG_SOURCE,
-    /template\s+transforms[\s\S]*distractor write\s+targets[\s\S]*leveled variants[\s\S]*answer\s+explanations[\s\S]*listening\s+scripts[\s\S]*worksheet\/audio\/spreadsheet\s+extraction[\s\S]*source-material privacy[\s\S]*editor-review\/save\/publish boundaries[\s\S]*snapshot\s+protection[\s\S]*result-export continuity/,
+    /template\s+transforms[\s\S]*distractor\s+write\s+targets[\s\S]*leveled\s+variants[\s\S]*answer\s+explanations[\s\S]*listening\s+scripts[\s\S]*worksheet\/audio\/spreadsheet\s+extraction[\s\S]*source-material\s+privacy[\s\S]*editor-review\/save\/publish\s+boundaries[\s\S]*snapshot\s+protection[\s\S]*result-export\s+continuity/,
     'TEST-CATALOG should describe the future AI enhancement execution scope.'
   );
 });

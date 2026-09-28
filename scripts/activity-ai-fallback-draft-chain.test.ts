@@ -96,7 +96,7 @@ test('activity AI fallback draft sources preserve sanitized draft creation', () 
 test('activity AI fallback draft chain is documented in product and catalog', () => {
   assert.match(
     TEST_CATALOG_SOURCE,
-    /Activity AI fallback draft chain has a fast script-level gate via[\s\S]*scripts\/activity-ai-fallback-draft-chain\.test\.ts[\s\S]*missing Workers AI credentials[\s\S]*invalid provider JSON[\s\S]*deterministic local draft[\s\S]*source-term planning[\s\S]*CreateActivityInput[\s\S]*teacher review[\s\S]*save\/publish boundaries/,
+    /Activity\s+AI\s+fallback\s+draft\s+chain\s+has\s+a\s+fast\s+script-level\s+gate\s+via[\s\S]*scripts\/activity-ai-fallback-draft-chain\.test\.ts[\s\S]*missing\s+Workers\s+AI\s+credentials[\s\S]*invalid\s+provider\s+JSON[\s\S]*deterministic\s+local\s+draft[\s\S]*source-term\s+planning[\s\S]*CreateActivityInput[\s\S]*teacher\s+review[\s\S]*save\/publish\s+boundaries/,
     'TEST-CATALOG should document the activity AI fallback draft chain gate.'
   );
 });

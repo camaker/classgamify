@@ -59,7 +59,7 @@ test('empty requests bypass queries and missing rows block writes', () => {
 test('product and catalog register source material write continuity', () => {
   assert.match(
     read('docs/product.md'),
-    /source-material write continuity chain[\s\S]*30[\s\S]*owner[\s\S]*authoritative[\s\S]*all-or-nothing[\s\S]*privacy/i
+    /source-material write continuity gate[\s\S]*owner[\s\S]*authoritative[\s\S]*all-or-nothing[\s\S]*privacy/i
   );
   assert.match(
     read('tests/e2e/TEST-CATALOG.md'),

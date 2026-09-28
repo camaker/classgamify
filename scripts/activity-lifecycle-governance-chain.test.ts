@@ -240,7 +240,7 @@ test('activity lifecycle persistence preserves content, source references, and s
 test('activity lifecycle governance focused gate is documented', () => {
   assert.match(
     TEST_CATALOG_SOURCE,
-    /Activity lifecycle governance chain has a fast script-level gate via[\s\S]*scripts\/activity-lifecycle-governance-chain\.test\.ts[\s\S]*30-slice assignment publish boundary/,
+    /Activity lifecycle governance chain has a fast script-level gate via[\s\S]*scripts\/activity-lifecycle-governance-chain\.test\.ts[\s\S]*assignment publish boundary that returns restored/,
     'TEST-CATALOG should document the activity lifecycle governance chain gate.'
   );
   assert.match(

@@ -157,7 +157,7 @@ test('activity AI enhancement editor review gate is wired into docs and coverage
   );
   assert.match(
     PRODUCT_SOURCE,
-    /src\/activities\/ai-enhancement-editor-review\.ts` owns the teacher review gate[\s\S]*30-slice editor-only draft-application handoff/,
+    /src\/activities\/ai-enhancement-editor-review\.ts` owns the teacher review gate[\s\S]*30-item editor-only draft-application list/,
     'docs/product.md should document the AI enhancement editor review owner.'
   );
   assert.match(
@@ -167,7 +167,7 @@ test('activity AI enhancement editor review gate is wired into docs and coverage
   );
   assert.match(
     TEST_CATALOG_SOURCE,
-    /30-slice\s+draft-application\s+handoff/,
+    /30-item\s+draft-application\s+list/,
     'TEST-CATALOG should document the draft-application handoff.'
   );
 });

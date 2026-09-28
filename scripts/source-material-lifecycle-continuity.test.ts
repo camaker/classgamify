@@ -65,7 +65,7 @@ test('public payload and aggregate lifecycle hide private material data', () => 
 test('product and catalog register source material lifecycle continuity', () => {
   assert.match(
     read('docs/product.md'),
-    /source-material lifecycle continuity chain[\s\S]*30[\s\S]*upload[\s\S]*snapshot[\s\S]*deletion[\s\S]*privacy/i
+    /source-material\s+lifecycle\s+continuity\s+gate[\s\S]*upload[\s\S]*snapshot[\s\S]*deletion[\s\S]*privacy/i
   );
   assert.match(
     read('tests/e2e/TEST-CATALOG.md'),

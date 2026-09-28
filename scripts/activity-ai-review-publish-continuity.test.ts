@@ -31,7 +31,7 @@ test('save and publish boundaries require separate teacher actions', () => {
 test('product and catalog register AI review publish continuity', () => {
   assert.match(
     read('docs/product.md'),
-    /AI review-to-publish continuity chain[\s\S]*30[\s\S]*editor[\s\S]*save[\s\S]*snapshot[\s\S]*privacy/i
+    /AI review-to-publish continuity gate[\s\S]*editor[\s\S]*save[\s\S]*snapshot[\s\S]*privacy/i
   );
   assert.match(
     read('tests/e2e/TEST-CATALOG.md'),

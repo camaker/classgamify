@@ -29,7 +29,7 @@ const COMPONENT_SOURCE = readFileSync(
 test('activity library filter-state chain preserves product docs', () => {
   assert.match(
     PRODUCT_SOURCE,
-    /activity-library filter-state chain[\s\S]*30 slices[\s\S]*URL validation[\s\S]*NFKC search normalization[\s\S]*source-material filter parsing[\s\S]*page reset[\s\S]*dashboard control options[\s\S]*list API owner scope[\s\S]*privacy guards/i,
+    /activity-library filter-state gate[\s\S]*URL validation[\s\S]*NFKC search normalization[\s\S]*source-material filter parsing[\s\S]*page reset[\s\S]*dashboard control options[\s\S]*list API owner scope[\s\S]*privacy guards/i,
     'docs/product.md should preserve the activity-library filter-state chain scope.'
   );
 });

@@ -17,7 +17,7 @@ test('local persisted browser journey preserves the product requirement', () => 
   );
   assert.match(
     PRODUCT_SOURCE,
-    /result-material,[\s\S]*result-review,[\s\S]*copy-artifact,[\s\S]*printable-worksheet 30-slice handoffs/i,
+    /result-material,[\s\S]*result-review,[\s\S]*copy-artifact,[\s\S]*printable-worksheet surfaces/i,
     'docs/product.md should keep the rendered DOM handoffs tied to the journey.'
   );
 });

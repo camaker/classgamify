@@ -48,7 +48,7 @@ test('mutations preserve downstream snapshots and derivative gates', () => {
 test('product and catalog register activity mutation continuity', () => {
   assert.match(
     read('docs/product.md'),
-    /activity mutation continuity chain[\s\S]*30[\s\S]*owner[\s\S]*updatedAt[\s\S]*RETURNING[\s\S]*privacy/i
+    /activity mutation continuity gate[\s\S]*owner[\s\S]*updatedAt[\s\S]*RETURNING[\s\S]*privacy/i
   );
   assert.match(
     read('tests/e2e/TEST-CATALOG.md'),

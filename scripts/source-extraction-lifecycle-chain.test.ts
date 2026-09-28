@@ -46,7 +46,7 @@ test('source extraction lifecycle follows docs product policy', () => {
   );
   assert.match(
     PRODUCT_SOURCE,
-    /source\s+extraction\s+lifecycle[\s\S]*30-slice\s+activity\s+authoring\/library\s+chain[\s\S]*shared\s+create\s+and\s+edit\s+contracts[\s\S]*owner-scoped\s+library[\s\S]*assignment\s+snapshot\s+protection/,
+    /source\s+extraction\s+lifecycle\s+gate[\s\S]*shared\s+create\s+and\s+edit\s+contracts[\s\S]*owner-scoped\s+library[\s\S]*assignment\s+snapshot\s+protection/,
     'docs/product.md should return source extraction output to the shared authoring and library lifecycle.'
   );
 });

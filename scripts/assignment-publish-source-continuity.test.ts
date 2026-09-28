@@ -63,7 +63,7 @@ test('existing assignments snapshots and results stay independent', () => {
 test('product and catalog register publish source continuity', () => {
   assert.match(
     read('docs/product.md'),
-    /publish source continuity chain[\s\S]*30[\s\S]*owner[\s\S]*BEFORE INSERT[\s\S]*snapshot[\s\S]*privacy/i
+    /publish source continuity gate[\s\S]*owner[\s\S]*BEFORE INSERT[\s\S]*snapshot[\s\S]*privacy/i
   );
   assert.match(
     read('tests/e2e/TEST-CATALOG.md'),

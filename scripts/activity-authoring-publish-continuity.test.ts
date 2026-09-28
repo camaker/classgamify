@@ -47,7 +47,7 @@ test('published snapshots remain isolated from later activity writes', () => {
 test('product and catalog register activity authoring publish continuity', () => {
   assert.match(
     read('docs/product.md'),
-    /activity authoring-to-publish continuity chain[\s\S]*30[\s\S]*library[\s\S]*archive[\s\S]*snapshot[\s\S]*privacy/i
+    /activity authoring-to-publish continuity gate[\s\S]*library[\s\S]*archive[\s\S]*snapshot[\s\S]*privacy/i
   );
   assert.match(
     read('tests/e2e/TEST-CATALOG.md'),

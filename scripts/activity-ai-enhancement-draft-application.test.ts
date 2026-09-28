@@ -217,7 +217,7 @@ test('activity AI enhancement draft application gate is wired into docs and cove
   );
   assert.match(
     PRODUCT_SOURCE,
-    /src\/activities\/ai-enhancement-draft-application\.ts` owns the editor-only draft application\s+contract[\s\S]*30-slice parsed draft-output handoff/,
+    /src\/activities\/ai-enhancement-draft-application\.ts` owns the editor-only draft application\s+contract[\s\S]*30-item parsed draft-output list/,
     'docs/product.md should document the AI enhancement draft application owner.'
   );
   assert.match(
@@ -227,7 +227,7 @@ test('activity AI enhancement draft application gate is wired into docs and cove
   );
   assert.match(
     TEST_CATALOG_SOURCE,
-    /30-slice draft-output\s+handoff/,
+    /30-item draft-output\s+list/,
     'TEST-CATALOG should document the parsed draft-output handoff.'
   );
 });

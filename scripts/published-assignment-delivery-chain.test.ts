@@ -75,7 +75,7 @@ test('published assignment delivery chain focused gate is documented', () => {
 
   assert.match(
     PRODUCT_SOURCE,
-    /published-assignment delivery chain[\s\S]*publish dialog's 30[\s\S]*review checklist[\s\S]*opaque[\s\S]*omit generated control ids[\s\S]*raw settings[\s\S]*source-material storage keys/,
+    /published-assignment\s+delivery\s+chain[\s\S]*publish\s+dialog's\s+30[\s\S]*review\s+checklist[\s\S]*opaque[\s\S]*omits\s+generated\s+control\s+ids[\s\S]*raw\s+settings[\s\S]*source-material\s+storage\s+keys/,
     'docs/product.md should describe the publish-control handoff and opaque-id privacy boundary.'
   );
   assert.match(
@@ -85,7 +85,7 @@ test('published assignment delivery chain focused gate is documented', () => {
   );
   assert.match(
     normalizedCatalog,
-    /publish preflight[\s\S]*30-slice publish control handoff boundary[\s\S]*frozen snapshots[\s\S]*share links[\s\S]*public student rules[\s\S]*validated submissions[\s\S]*results export/,
+    /publish preflight[\s\S]*30-item publish control boundary[\s\S]*frozen snapshots[\s\S]*share links[\s\S]*public student rules[\s\S]*validated submissions[\s\S]*results export/,
     'TEST-CATALOG should document the cross-module assignment delivery chain scope.'
   );
 });
