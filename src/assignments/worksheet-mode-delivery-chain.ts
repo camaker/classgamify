@@ -42,7 +42,7 @@ export const WORKSHEET_MODE_DELIVERY_CHAIN_SOURCE_FILES = [
   'src/activities/types.ts',
   'src/activities/validation.ts',
   'src/activities/material-summary.ts',
-  'src/activities/source-extraction-assist.ts',
+  'src/components/activities/activity-source-materials-summary.tsx',
   'src/assignments/publish-input.ts',
   'src/assignments/snapshot.ts',
   'src/assignments/delivery-summary.ts',

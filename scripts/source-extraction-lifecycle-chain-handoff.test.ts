@@ -3,12 +3,7 @@ import { existsSync, readFileSync } from 'node:fs';
 import test from 'node:test';
 import { ACTIVITY_AI_AUTHORING_CHAIN_HANDOFF_ITEM_IDS } from '@/activities/ai-authoring-chain';
 import { ACTIVITY_AUTHORING_LIBRARY_CHAIN_HANDOFF_ITEM_IDS } from '@/activities/authoring-library-chain';
-import { ACTIVITY_SOURCE_MATERIAL_PICKER_HANDOFF_ITEM_IDS } from '@/activities/material-summary';
 import { ACTIVITY_SOURCE_MATERIAL_REFERENCE_ITEM_IDS } from '@/activities/material-references';
-import {
-  ACTIVITY_SOURCE_EXTRACTION_ASSIST_HANDOFF_ITEM_IDS,
-  buildActivitySourceExtractionAssistHandoffView,
-} from '@/activities/source-extraction-assist';
 import {
   SOURCE_EXTRACTION_LIFECYCLE_CHAIN_HANDOFF_ITEM_IDS,
   SOURCE_EXTRACTION_LIFECYCLE_CHAIN_SOURCE_FILES,
@@ -18,7 +13,6 @@ import {
 } from '@/activities/source-extraction-lifecycle-chain';
 import { SOURCE_MATERIAL_PRIVACY_CHAIN_HANDOFF_ITEM_IDS } from '@/activities/source-material-privacy-chain';
 import { TEMPLATE_ROADMAP_CAPABILITY_CHAIN_HANDOFF_ITEM_IDS } from '@/activities/template-roadmap-capability-chain';
-import type { ActivityMaterialReference } from '@/activities/types';
 import { overwriteGetLocale } from '@/locale/paraglide/runtime';
 
 overwriteGetLocale(() => 'en');
@@ -53,54 +47,6 @@ const SECRET_FILE_ID = 'secret-source-extraction-file-id';
 const SECRET_FILENAME = 'secret source extraction worksheet.pdf';
 const SECRET_PERMISSION = 'owner-only-source-extraction-permission';
 const SECRET_STORAGE_KEY = 'source-materials/private/extraction-key.pdf';
-
-const mixedSourceMaterials: Array<
-  ActivityMaterialReference & {
-    bytes?: string;
-    permission?: string;
-    storageKey?: string;
-  }
-> = [
-  {
-    contentType: 'audio/mpeg',
-    fileId: `${SECRET_FILE_ID}-audio`,
-    kind: 'audio',
-    originalName: 'class listening.mp3',
-    size: 1024,
-  },
-  {
-    contentType: 'application/pdf',
-    fileId: SECRET_FILE_ID,
-    kind: 'worksheet-document',
-    originalName: SECRET_FILENAME,
-    permission: SECRET_PERMISSION,
-    size: 2048,
-    storageKey: SECRET_STORAGE_KEY,
-  },
-  {
-    contentType: 'image/png',
-    fileId: `${SECRET_FILE_ID}-image`,
-    kind: 'worksheet-image',
-    originalName: 'worksheet scan.png',
-    size: 3072,
-  },
-  {
-    contentType:
-      'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-    fileId: `${SECRET_FILE_ID}-sheet`,
-    kind: 'spreadsheet',
-    originalName: 'vocabulary.xlsx',
-    size: 4096,
-  },
-  {
-    bytes: SECRET_FILE_BYTES,
-    contentType: 'video/mp4',
-    fileId: `${SECRET_FILE_ID}-video`,
-    kind: 'video',
-    originalName: 'reference video.mp4',
-    size: 5120,
-  },
-];
 
 test('source extraction lifecycle chain exposes 30 safe slices', () => {
   const handoffView = buildSourceExtractionLifecycleChainHandoffView();
@@ -206,15 +152,13 @@ test('source extraction lifecycle chain is backed by adjacent gates', () => {
 
   assert.deepEqual(
     [
-      ACTIVITY_SOURCE_EXTRACTION_ASSIST_HANDOFF_ITEM_IDS.length,
       ACTIVITY_SOURCE_MATERIAL_REFERENCE_ITEM_IDS.length,
-      ACTIVITY_SOURCE_MATERIAL_PICKER_HANDOFF_ITEM_IDS.length,
       SOURCE_MATERIAL_PRIVACY_CHAIN_HANDOFF_ITEM_IDS.length,
       ACTIVITY_AI_AUTHORING_CHAIN_HANDOFF_ITEM_IDS.length,
       TEMPLATE_ROADMAP_CAPABILITY_CHAIN_HANDOFF_ITEM_IDS.length,
       ACTIVITY_AUTHORING_LIBRARY_CHAIN_HANDOFF_ITEM_IDS.length,
     ],
-    Array.from({ length: 7 }, () => 30)
+    Array.from({ length: 5 }, () => 30)
   );
 });
 
@@ -239,57 +183,6 @@ test('source extraction lifecycle follows docs product policy', () => {
     /source\s+extraction\s+lifecycle[\s\S]*30-slice\s+activity\s+authoring\/library\s+chain[\s\S]*shared\s+create\s+and\s+edit\s+contracts[\s\S]*owner-scoped\s+library[\s\S]*assignment\s+snapshot\s+protection/,
     'docs/product.md should return source extraction output to the shared authoring and library lifecycle.'
   );
-});
-
-test('source extraction assist keeps readiness counts and privacy stable', () => {
-  const handoffView = buildActivitySourceExtractionAssistHandoffView({
-    sourceMaterials: mixedSourceMaterials,
-  });
-  const values = getExtractionAssistHandoffValues(handoffView);
-
-  assert.deepEqual(
-    handoffView.itemViews.map((item) => item.id),
-    [...ACTIVITY_SOURCE_EXTRACTION_ASSIST_HANDOFF_ITEM_IDS]
-  );
-  assert.deepEqual(
-    {
-      'audio-source-count': values['audio-source-count'],
-      'capability-count': values['capability-count'],
-      'extractable-material-count': values['extractable-material-count'],
-      'reference-only-count': values['reference-only-count'],
-      'source-material-count': values['source-material-count'],
-      'spreadsheet-source-count': values['spreadsheet-source-count'],
-      'worksheet-source-count': values['worksheet-source-count'],
-    },
-    {
-      'audio-source-count': '1',
-      'capability-count': '3',
-      'extractable-material-count': '4',
-      'reference-only-count': '1',
-      'source-material-count': '5',
-      'spreadsheet-source-count': '1',
-      'worksheet-source-count': '2',
-    }
-  );
-  assert.deepEqual(handoffView.privacy, {
-    appliesBeforeActivitySave: true,
-    createsParallelWorksheetModel: false,
-    exposesAcceptedAnswerText: false,
-    exposesActivityContentText: false,
-    exposesFileBytes: false,
-    exposesSourceMaterialFileIds: false,
-    exposesSourceMaterialFilenames: false,
-    exposesSourceMaterialStorageKeys: false,
-    itemIds: [...ACTIVITY_SOURCE_EXTRACTION_ASSIST_HANDOFF_ITEM_IDS],
-    modifiesPublishedAssignmentSnapshots: false,
-    persistsActivityWithoutTeacherAction: false,
-    publishesAssignmentWithoutTeacherAction: false,
-    readsSourceMaterialBytes: false,
-    requiresEditorReview: true,
-    scope: 'teacher-reviewed-source-extraction-assist',
-    targetModel: 'ActivityContent',
-  });
-  assertNoPrivateLifecycleText(JSON.stringify(handoffView));
 });
 
 test('material summary and reference sources preserve extraction boundaries', () => {
@@ -330,10 +223,10 @@ test('material summary and reference sources preserve extraction boundaries', ()
 });
 
 test('DOM handoff and public payloads do not expose source material secrets', () => {
-  assert.match(
+  assert.doesNotMatch(
     SOURCE_MATERIALS_SUMMARY_SOURCE,
-    /className="sr-only"[\s\S]*data-handoff="activity-source-extraction-assist"[\s\S]*data-handoff-scope=\{handoff\.privacy\.scope\}[\s\S]*<dl>[\s\S]*data-handoff-item=\{item\.id\}/,
-    'Activity source-material summary should expose extraction readiness through a hidden semantic dl handoff.'
+    /data-handoff/,
+    'Source-material summaries should render no hidden extraction audit output.'
   );
 
   const publicAssignmentPayloadType = getSourceSlice(
@@ -377,14 +270,6 @@ function getHandoffValue(
   const item = view.itemViews.find((itemView) => itemView.id === id);
   assert.ok(item, `Missing source extraction lifecycle item ${id}`);
   return item.value;
-}
-
-function getExtractionAssistHandoffValues(
-  view: ReturnType<typeof buildActivitySourceExtractionAssistHandoffView>
-) {
-  return Object.fromEntries(
-    view.itemViews.map((item) => [item.id, item.value])
-  );
 }
 
 function getSourceSlice(

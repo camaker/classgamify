@@ -678,7 +678,7 @@ function getClassroomProductLoopChainHandoffItem(
       return item(
         id,
         'Activity library page boundary',
-        '30 library slices',
+        'Visible library page',
         'Owner scope, full filtered summaries, visible-page counts, search, status, template and source filters, lifecycle actions, pagination, starter previews, and source-material privacy guards stay aligned.'
       );
     case 'activity-authoring-library-boundary':

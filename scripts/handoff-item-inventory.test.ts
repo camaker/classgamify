@@ -27,10 +27,7 @@ test('handoff inventory discovers product-loop contracts', () => {
     inventoryEntries.map((entry) => entry.constName)
   );
 
-  for (const requiredName of [
-    'ACTIVITY_LIBRARY_PAGE_HANDOFF_ITEM_IDS',
-    'PUBLIC_TEMPLATE_ENTRY_HANDOFF_ITEM_IDS',
-  ]) {
+  for (const requiredName of ['PUBLIC_TEMPLATE_ENTRY_HANDOFF_ITEM_IDS']) {
     assert.ok(
       discoveredNames.has(requiredName),
       `Missing expected handoff inventory entry ${requiredName}.`

@@ -1,8 +1,4 @@
 import type {
-  ActivityAiRemixAssistHandoffItemView,
-  ActivityAiRemixAssistHandoffView,
-} from '@/activities/ai-remix-assist';
-import type {
   ActivityLibraryCardActionState,
   ActivityLibraryCardTemplateType,
   ActivityLibraryCompatibilityView,
@@ -11,18 +7,10 @@ import type {
   ActivityLibraryRemixActionOptionView,
 } from '@/activities/library-view';
 import { activityLibraryCardCopy } from '@/activities/library-view';
-import type {
-  ActivityTemplateRemixHandoffItemView,
-  ActivityTemplateRemixHandoffView,
-} from '@/activities/template-remix';
 import { ActivityLibraryActionStatusBadge } from '@/components/activities/activity-library-action-status-badge';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import {
-  IconLayoutGrid,
-  IconShieldCheck,
-  IconSwitchHorizontal,
-} from '@tabler/icons-react';
+import { IconLayoutGrid, IconSwitchHorizontal } from '@tabler/icons-react';
 import { useId } from 'react';
 
 type ActivityLibraryCompatibilityPanelProps = {
@@ -73,12 +61,6 @@ export function ActivityLibraryCompatibilityPanel({
           {compatibility.restoreRequiredMessage}
         </p>
       ) : null}
-      <ActivityLibraryTemplateRemixHandoff
-        handoff={compatibility.remixHandoffView}
-      />
-      <ActivityLibraryAiRemixAssistHandoff
-        handoff={compatibility.aiRemixAssistHandoffView}
-      />
       {actionState.showRemixActions ? (
         <div className="mt-3 flex flex-wrap gap-2">
           {compatibility.remixActionOptions.map((option) => (
@@ -102,132 +84,6 @@ export function ActivityLibraryCompatibilityPanel({
         </div>
       ) : null}
     </section>
-  );
-}
-
-function ActivityLibraryTemplateRemixHandoff({
-  handoff,
-}: {
-  handoff: ActivityTemplateRemixHandoffView;
-}) {
-  const titleId = useId();
-  const descriptionId = useId();
-
-  return (
-    <section
-      aria-describedby={descriptionId}
-      aria-labelledby={titleId}
-      className="sr-only"
-      data-handoff="activity-template-remix"
-      data-handoff-scope={handoff.privacy.scope}
-    >
-      <div className="flex min-w-0 items-center gap-2 text-xs font-medium">
-        <IconShieldCheck aria-hidden="true" className="size-4 text-primary" />
-        <span id={titleId}>{handoff.title}</span>
-      </div>
-      <p
-        id={descriptionId}
-        className="mt-1 text-xs leading-5 text-muted-foreground"
-      >
-        {handoff.description}
-      </p>
-      <dl className="mt-3 grid gap-2 sm:grid-cols-2">
-        {handoff.itemViews.map((item) => (
-          <ActivityLibraryTemplateRemixHandoffItem item={item} key={item.id} />
-        ))}
-      </dl>
-    </section>
-  );
-}
-
-function ActivityLibraryTemplateRemixHandoffItem({
-  item,
-}: {
-  item: ActivityTemplateRemixHandoffItemView;
-}) {
-  const labelId = `activity-template-remix-handoff-${item.id}-label`;
-  const valueId = `activity-template-remix-handoff-${item.id}-value`;
-  const descriptionId = `activity-template-remix-handoff-${item.id}-description`;
-
-  return (
-    <div className="min-w-0" data-handoff-item={item.id}>
-      <dt
-        className="text-[0.68rem] font-medium uppercase tracking-normal text-muted-foreground"
-        id={labelId}
-      >
-        {item.label}
-      </dt>
-      <dd className="break-words text-xs font-medium text-foreground">
-        <output
-          aria-describedby={descriptionId}
-          aria-label={item.ariaLabel}
-          aria-labelledby={`${labelId} ${valueId}`}
-          id={valueId}
-        >
-          {item.value}
-        </output>
-      </dd>
-      <p
-        className="mt-0.5 text-[0.68rem] leading-4 text-muted-foreground"
-        id={descriptionId}
-      >
-        {item.description}
-      </p>
-    </div>
-  );
-}
-
-function ActivityLibraryAiRemixAssistHandoff({
-  handoff,
-}: {
-  handoff: ActivityAiRemixAssistHandoffView;
-}) {
-  const titleId = useId();
-  const descriptionId = useId();
-
-  return (
-    <section
-      aria-describedby={descriptionId}
-      aria-labelledby={titleId}
-      className="sr-only"
-      data-handoff="activity-ai-remix-assist"
-      data-handoff-scope={handoff.privacy.scope}
-    >
-      <h3 id={titleId}>{handoff.title}</h3>
-      <p id={descriptionId}>{handoff.description}</p>
-      <dl>
-        {handoff.itemViews.map((item) => (
-          <ActivityLibraryAiRemixAssistHandoffItem item={item} key={item.id} />
-        ))}
-      </dl>
-    </section>
-  );
-}
-
-function ActivityLibraryAiRemixAssistHandoffItem({
-  item,
-}: {
-  item: ActivityAiRemixAssistHandoffItemView;
-}) {
-  const labelId = `activity-ai-remix-assist-handoff-${item.id}-label`;
-  const valueId = `activity-ai-remix-assist-handoff-${item.id}-value`;
-  const descriptionId = `activity-ai-remix-assist-handoff-${item.id}-description`;
-
-  return (
-    <div data-handoff-item={item.id}>
-      <dt id={labelId}>{item.label}</dt>
-      <dd>
-        <output
-          aria-describedby={descriptionId}
-          aria-label={item.ariaLabel}
-          aria-labelledby={`${labelId} ${valueId}`}
-          id={valueId}
-        >
-          {item.value}
-        </output>
-        <span id={descriptionId}>{item.description}</span>
-      </dd>
-    </div>
   );
 }
 

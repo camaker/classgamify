@@ -2,14 +2,7 @@ import assert from 'node:assert/strict';
 import { existsSync, readFileSync } from 'node:fs';
 import test from 'node:test';
 import {
-  ACTIVITY_LIBRARY_FILTER_HANDOFF_ITEM_IDS,
-  ACTIVITY_LIBRARY_PAGE_HANDOFF_ITEM_IDS,
-} from '@/activities/library-view';
-import {
-  ACTIVITY_SOURCE_MATERIAL_CARD_HANDOFF_ITEM_IDS,
   ACTIVITY_SOURCE_MATERIAL_EXTRACTION_ACTIONS,
-  ACTIVITY_SOURCE_MATERIAL_PICKER_HANDOFF_ITEM_IDS,
-  buildActivitySourceMaterialCardHandoffView,
   buildActivitySourceMaterialSummaryView,
 } from '@/activities/material-summary';
 import {
@@ -23,7 +16,6 @@ import {
   type ActivitySourceMaterialSummaryChainHandoffItemId,
   type ActivitySourceMaterialSummaryChainHandoffView,
 } from '@/activities/activity-source-material-summary-chain';
-import { ACTIVITY_SOURCE_EXTRACTION_ASSIST_HANDOFF_ITEM_IDS } from '@/activities/source-extraction-assist';
 import { SOURCE_EXTRACTION_LIFECYCLE_CHAIN_HANDOFF_ITEM_IDS } from '@/activities/source-extraction-lifecycle-chain';
 import { SOURCE_MATERIAL_PRIVACY_CHAIN_HANDOFF_ITEM_IDS } from '@/activities/source-material-privacy-chain';
 import type { ActivityMaterialReference } from '@/activities/types';
@@ -221,16 +213,11 @@ test('activity source-material summary chain is backed by adjacent gates', () =>
 
   assert.deepEqual(
     [
-      ACTIVITY_SOURCE_MATERIAL_CARD_HANDOFF_ITEM_IDS.length,
-      ACTIVITY_SOURCE_MATERIAL_PICKER_HANDOFF_ITEM_IDS.length,
       ACTIVITY_SOURCE_MATERIAL_REFERENCE_ITEM_IDS.length,
-      ACTIVITY_LIBRARY_PAGE_HANDOFF_ITEM_IDS.length,
-      ACTIVITY_LIBRARY_FILTER_HANDOFF_ITEM_IDS.length,
-      ACTIVITY_SOURCE_EXTRACTION_ASSIST_HANDOFF_ITEM_IDS.length,
       SOURCE_EXTRACTION_LIFECYCLE_CHAIN_HANDOFF_ITEM_IDS.length,
       SOURCE_MATERIAL_PRIVACY_CHAIN_HANDOFF_ITEM_IDS.length,
     ],
-    Array.from({ length: 8 }, () => 30)
+    Array.from({ length: 3 }, () => 30)
   );
 });
 
@@ -274,36 +261,19 @@ test('activity source-material summary uses the shared domain summary', () => {
     /ActivitySourceMaterialsSummary[\s\S]*actionSlot=\{[\s\S]*cardDisplayView\.actionState\.showEditAction[\s\S]*summary=\{cardDisplayView\.sourceMaterials\}/,
     'Activity library cards should render the prepared source-material summary and edit action slot.'
   );
-  assert.match(
+  assert.doesNotMatch(
     SOURCE_MATERIALS_SUMMARY_SOURCE,
-    /data-handoff="activity-source-material-card-summary"[\s\S]*data-handoff-scope=\{handoff\.privacy\.scope\}[\s\S]*handoff\.itemViews\.map/,
-    'Activity source-material summaries should render the hidden card-summary handoff from the prepared view.'
+    /data-handoff/,
+    'Source-material summaries should render no hidden audit output.'
   );
 });
 
 test('activity source-material summary keeps private file data out', () => {
   const summary = buildActivitySourceMaterialSummaryView(sourceMaterials);
-  const handoffView = buildActivitySourceMaterialCardHandoffView({
-    hasEditAction: true,
-    summary,
-  });
 
   assert.equal(summary.countLabel, '5 files');
   assert.equal(summary.readiness.extractableCount, 4);
   assert.equal(summary.extractionActions.length, 3);
-  assert.deepEqual(handoffView.privacy, {
-    exposesContentTypes: false,
-    exposesFileBytes: false,
-    exposesOriginalFilenames: false,
-    exposesPermissionMetadata: false,
-    exposesSourceMaterialFileIds: false,
-    exposesSourceMaterialStorageKeys: false,
-    exposesStudentPayloadFileReferences: false,
-    itemIds: [...ACTIVITY_SOURCE_MATERIAL_CARD_HANDOFF_ITEM_IDS],
-    scope: 'activity-card-source-material-summary',
-    summarizesByMaterialKind: true,
-    usesActivityContentSourceMaterials: true,
-  });
   assert.equal(
     ACTIVITY_SOURCE_MATERIAL_REFERENCE_PRIVACY_CONTRACT.exposesFileBytes,
     false
@@ -324,7 +294,7 @@ test('activity source-material summary keeps private file data out', () => {
     ACTIVITY_SOURCE_MATERIAL_REFERENCE_PRIVACY_CONTRACT.itemIds.length,
     30
   );
-  assertNoPrivateActivitySourceMaterialSummaryText(JSON.stringify(handoffView));
+  assertNoPrivateActivitySourceMaterialSummaryText(JSON.stringify(summary));
 
   const publicAssignmentPayloadType = getSourceSlice(
     PUBLIC_ASSIGNMENT_SOURCE,

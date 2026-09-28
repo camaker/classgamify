@@ -59,7 +59,7 @@ export const ACTIVITY_LIFECYCLE_GOVERNANCE_CHAIN_SOURCE_FILES = [
   'src/components/activities/activity-publish-dialog.tsx',
   'src/components/activities/created-activity-panel.tsx',
   'src/components/activities/activity-create-form.tsx',
-  'scripts/activity-lifecycle-handoff-semantic-views.test.ts',
+  'scripts/activity-lifecycle.test.ts',
   'scripts/activity-authoring-library-chain-handoff.test.ts',
   'tests/e2e/TEST-CATALOG.md',
 ] as const;

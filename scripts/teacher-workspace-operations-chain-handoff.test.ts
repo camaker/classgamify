@@ -1,7 +1,6 @@
 import assert from 'node:assert/strict';
 import { existsSync, readFileSync } from 'node:fs';
 import test from 'node:test';
-import { ACTIVITY_LIBRARY_PAGE_HANDOFF_ITEM_IDS } from '@/activities/library-view';
 import { ACCOUNT_GOVERNANCE_LIFECYCLE_CHAIN_HANDOFF_ITEM_IDS } from '@/auth/account-governance-lifecycle-chain';
 import { ACTIVE_SURFACE_PRODUCT_BOUNDARY_ITEM_IDS } from '@/config/active-surface-product-boundary';
 import {
@@ -221,7 +220,6 @@ test('teacher workspace operations chain is backed by focused workspace gates', 
   assert.deepEqual(
     [
       DASHBOARD_OVERVIEW_HANDOFF_ITEM_IDS.length,
-      ACTIVITY_LIBRARY_PAGE_HANDOFF_ITEM_IDS.length,
       ACCOUNT_GOVERNANCE_LIFECYCLE_CHAIN_HANDOFF_ITEM_IDS.length,
       ACTIVE_SURFACE_PRODUCT_BOUNDARY_ITEM_IDS.length,
       PAYMENT_STATUS_HANDOFF_ITEM_IDS.length,
@@ -232,7 +230,7 @@ test('teacher workspace operations chain is backed by focused workspace gates', 
       SETTINGS_BILLING_WORKSPACE_HANDOFF_ITEM_IDS.length,
       SETTINGS_NOTIFICATION_UPDATE_HANDOFF_ITEM_IDS.length,
     ],
-    Array.from({ length: 11 }, () => 30)
+    Array.from({ length: 10 }, () => 30)
   );
 });
 

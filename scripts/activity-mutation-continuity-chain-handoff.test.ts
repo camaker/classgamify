@@ -74,8 +74,11 @@ test('mutations preserve downstream snapshots and derivative gates', () => {
     /snapshot-protection/
   );
   assert.match(read('src/assignments/snapshot.ts'), /snapshot/i);
-  assert.match(read('src/activities/duplicate.ts'), /visibility/);
-  assert.match(read('src/activities/template-remix.ts'), /visibility/);
+  assert.match(
+    read('src/api/activities.ts'),
+    /assertActivityCanDeriveWork\(sourceActivity\.visibility\)/,
+    'Duplicate and remix requests should refuse archived sources on the server.'
+  );
 });
 
 test('activity mutation continuity hides private workspace details', () => {

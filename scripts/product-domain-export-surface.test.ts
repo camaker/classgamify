@@ -111,11 +111,6 @@ const INTERNAL_PRODUCT_DOMAIN_HELPERS = [
     name: 'ACTIVITY_FILTERABLE_SOURCE_MATERIALS',
   },
   {
-    declaration: 'function',
-    filePath: 'src/activities/editor.ts',
-    name: 'buildActivityEditorTemplateHandoffView',
-  },
-  {
     declaration: 'const',
     filePath: 'src/activities/library-view.ts',
     name: 'activityLibraryActionCopy',
@@ -244,31 +239,6 @@ const INTERNAL_PRODUCT_DOMAIN_HELPERS = [
     declaration: 'type',
     filePath: 'src/activities/template-remix.ts',
     name: 'TemplateRemixSummary',
-  },
-  {
-    declaration: 'type',
-    filePath: 'src/activities/template-remix.ts',
-    name: 'ActivityTemplateRemixHandoffItemId',
-  },
-  {
-    declaration: 'type',
-    filePath: 'src/activities/template-remix.ts',
-    name: 'ActivityTemplateRemixHandoffItemView',
-  },
-  {
-    declaration: 'type',
-    filePath: 'src/activities/template-remix.ts',
-    name: 'ActivityTemplateRemixHandoffPrivacyContract',
-  },
-  {
-    declaration: 'type',
-    filePath: 'src/activities/template-remix.ts',
-    name: 'ActivityTemplateRemixHandoffView',
-  },
-  {
-    declaration: 'type',
-    filePath: 'src/activities/template-remix.ts',
-    name: 'ActivityTemplateRemixHandoffSource',
   },
   {
     declaration: 'type',
@@ -475,8 +445,8 @@ const RESULT_VIEW_REEXPORT_BOUNDARIES = [
   },
 ] satisfies ReExportBoundary[];
 
-test('product-domain export surface keeps 71 helpers and types internal', () => {
-  assert.equal(INTERNAL_PRODUCT_DOMAIN_HELPERS.length, 71);
+test('product-domain export surface keeps 65 helpers and types internal', () => {
+  assert.equal(INTERNAL_PRODUCT_DOMAIN_HELPERS.length, 65);
 
   for (const helper of INTERNAL_PRODUCT_DOMAIN_HELPERS) {
     const source = readFileSync(helper.filePath, 'utf8');

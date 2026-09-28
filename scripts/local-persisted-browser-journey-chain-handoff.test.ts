@@ -1,8 +1,6 @@
 import assert from 'node:assert/strict';
 import { existsSync, readFileSync } from 'node:fs';
 import test from 'node:test';
-import { ACTIVITY_EDITOR_WORKFLOW_HANDOFF_ITEM_IDS } from '@/activities/editor';
-import { ACTIVITY_LIBRARY_PAGE_HANDOFF_ITEM_IDS } from '@/activities/library-view';
 import {
   LOCAL_PERSISTED_BROWSER_JOURNEY_CHAIN_HANDOFF_ITEM_IDS,
   LOCAL_PERSISTED_BROWSER_JOURNEY_CHAIN_SOURCE_FILES,
@@ -158,14 +156,6 @@ test('local persisted browser journey is backed by adjacent gates', () => {
       `Missing local persisted browser journey file ${filePath}`
     );
   }
-
-  assert.deepEqual(
-    [
-      ACTIVITY_EDITOR_WORKFLOW_HANDOFF_ITEM_IDS.length,
-      ACTIVITY_LIBRARY_PAGE_HANDOFF_ITEM_IDS.length,
-    ],
-    Array.from({ length: 2 }, () => 30)
-  );
 });
 
 test('local persisted browser journey preserves the product requirement', () => {

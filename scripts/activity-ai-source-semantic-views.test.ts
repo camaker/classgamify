@@ -2,7 +2,6 @@ import assert from 'node:assert/strict';
 import test from 'node:test';
 import {
   ACTIVITY_EDITOR_AI_DRAFT_SOURCE_CONTROL_IDS,
-  ACTIVITY_EDITOR_AI_DRAFT_SOURCE_HANDOFF_ITEM_IDS,
   buildActivityEditorAiDraftPanelView,
   buildActivityEditorDraftSourceState,
 } from '@/activities/editor';
@@ -15,7 +14,7 @@ const SECRET_STORAGE_KEY = 'classroom/private/SECRET_STORAGE_KEY.pdf';
 const SECRET_QUERY_TOKEN = 'secret_query_token_should_not_leak';
 const SECRET_URL = `https://example.test/private?token=${SECRET_QUERY_TOKEN}`;
 
-test('AI source panel exposes a complete safe handoff contract', () => {
+test('AI source panel wires control ids and readiness descriptions', () => {
   const draftSourceText = [
     `Weather lesson notes. ${SECRET_URL}`,
     'Attached classroom source materials:',
@@ -56,34 +55,6 @@ test('AI source panel exposes a complete safe handoff contract', () => {
       sourceMaterials,
     }),
   });
-  const handoffView = panelView.sourceHandoffView;
-  const itemIds = handoffView.itemViews.map((item) => item.id);
-
-  assert.deepEqual(itemIds, [
-    ...ACTIVITY_EDITOR_AI_DRAFT_SOURCE_HANDOFF_ITEM_IDS,
-  ]);
-  assert.equal(new Set(itemIds).size, 30);
-  assert.equal(
-    handoffView.itemViews.every(
-      (item) =>
-        Boolean(item.ariaLabel) &&
-        Boolean(item.description) &&
-        Boolean(item.label) &&
-        Boolean(item.value)
-    ),
-    true
-  );
-  assert.deepEqual(handoffView.privacy, {
-    exposesFileBytes: false,
-    exposesFileIds: false,
-    exposesOmittedNotePayloads: false,
-    exposesPathSegments: false,
-    exposesPermissionMetadata: false,
-    exposesQueryTokens: false,
-    exposesStorageKeys: false,
-    exposesUrls: false,
-    itemIds: [...ACTIVITY_EDITOR_AI_DRAFT_SOURCE_HANDOFF_ITEM_IDS],
-  });
   assert.deepEqual(panelView.sourceControlBoundary, {
     attachedSourceMaterialCount: 4,
     canGenerateDraft: true,
@@ -121,88 +92,9 @@ test('AI source panel exposes a complete safe handoff contract', () => {
     ],
     usesPreparedControlIds: true,
   });
-
-  assert.equal(
-    getHandoffItemValue(handoffView.itemViews, 'safe-material-notes'),
-    '3 safe sources'
-  );
-  assert.equal(
-    getHandoffItemValue(handoffView.itemViews, 'omitted-material-notes'),
-    '1 omitted source'
-  );
-  assert.equal(
-    getHandoffItemValue(handoffView.itemViews, 'synced-material-provenance'),
-    [
-      'Worksheet document · Weather worksheet.pdf',
-      'Audio · Listening track.mp3',
-      'Spreadsheet · vocabulary.csv',
-    ].join(', ')
-  );
-  assert.equal(
-    getHandoffItemValue(handoffView.itemViews, 'capability-audio-extraction'),
-    '1'
-  );
-  assert.equal(
-    getHandoffItemValue(
-      handoffView.itemViews,
-      'capability-worksheet-extraction'
-    ),
-    '2'
-  );
-  assert.equal(
-    getHandoffItemValue(handoffView.itemViews, 'capability-spreadsheet-import'),
-    '1'
-  );
-  assert.equal(
-    getHandoffItemValue(handoffView.itemViews, 'generate-action'),
-    'Ready'
-  );
-  assert.equal(
-    getHandoffItemValue(handoffView.itemViews, 'source-sanitization'),
-    'Sanitized source'
-  );
-  assert.equal(
-    getHandoffItemValue(handoffView.itemViews, 'auth-boundary'),
-    'Authenticated action'
-  );
-  assert.equal(
-    getHandoffItemValue(handoffView.itemViews, 'input-schema'),
-    'generateActivityDraftInputSchema'
-  );
-  assert.equal(
-    getHandoffItemValue(handoffView.itemViews, 'create-input-contract'),
-    'CreateActivityInput'
-  );
-  assert.equal(
-    getHandoffItemValue(handoffView.itemViews, 'editor-application-boundary'),
-    'editor-review'
-  );
-  assert.equal(
-    getHandoffItemValue(handoffView.itemViews, 'persistence-boundary'),
-    'not-persisted'
-  );
-  assert.equal(
-    getHandoffItemValue(handoffView.itemViews, 'save-boundary'),
-    'Teacher saves later'
-  );
-  assert.equal(
-    getHandoffItemValue(handoffView.itemViews, 'publish-boundary'),
-    'Publish later'
-  );
-  assert.equal(
-    getHandoffItemValue(handoffView.itemViews, 'file-byte-guard'),
-    'Bytes omitted'
-  );
-  assert.equal(
-    getHandoffItemValue(handoffView.itemViews, 'storage-key-guard'),
-    'Storage hidden'
-  );
-
-  const serializedHandoffView = JSON.stringify(handoffView);
-  assertNoUnsafeSourceText(serializedHandoffView);
 });
 
-test('AI source handoff exposes zero-count extraction readiness', () => {
+test('AI source panel keeps zero-material readiness explicit', () => {
   const panelView = buildActivityEditorAiDraftPanelView({
     draftSourceText: 'Teacher topic notes.',
     hasUser: false,
@@ -212,28 +104,6 @@ test('AI source handoff exposes zero-count extraction readiness', () => {
       sourceMaterials: [],
     }),
   });
-
-  assert.deepEqual(
-    panelView.sourceHandoffView.itemViews
-      .filter((item) => item.id.startsWith('capability-'))
-      .map((item) => [item.id, item.value]),
-    [
-      ['capability-audio-extraction', '0'],
-      ['capability-worksheet-extraction', '0'],
-      ['capability-spreadsheet-import', '0'],
-    ]
-  );
-  assert.equal(
-    getHandoffItemValue(panelView.sourceHandoffView.itemViews, 'sync-action'),
-    'Disabled'
-  );
-  assert.equal(
-    getHandoffItemValue(
-      panelView.sourceHandoffView.itemViews,
-      'generation-gate'
-    ),
-    'Sign in to generate an AI draft.'
-  );
   assert.deepEqual(panelView.sourceControlBoundary, {
     attachedSourceMaterialCount: 0,
     canGenerateDraft: false,
@@ -272,28 +142,3 @@ test('AI source handoff exposes zero-count extraction readiness', () => {
     usesPreparedControlIds: true,
   });
 });
-
-function getHandoffItemValue(
-  itemViews: Array<{ id: string; value: string }>,
-  id: string
-) {
-  const item = itemViews.find((view) => view.id === id);
-  assert.ok(item, `Expected handoff item ${id}`);
-  return item.value;
-}
-
-function assertNoUnsafeSourceText(value: string) {
-  for (const unsafeValue of [
-    SECRET_FILE_ID,
-    SECRET_STORAGE_KEY,
-    SECRET_QUERY_TOKEN,
-    SECRET_URL,
-    'storageKey',
-  ]) {
-    assert.equal(
-      value.includes(unsafeValue),
-      false,
-      `Handoff view leaked unsafe source text: ${unsafeValue}`
-    );
-  }
-}

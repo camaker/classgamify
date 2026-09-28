@@ -4,9 +4,7 @@ import {
   getTemplateByType,
 } from '@/activities/catalog';
 import {
-  ACTIVITY_LIBRARY_STATUSES,
   ACTIVITY_LIBRARY_PAGE_SIZE,
-  ACTIVITY_SOURCE_MATERIAL_FILTERS,
   type ActivityLibraryCreatedSource,
   type ActivityLibraryStatus,
   type ActivitySourceMaterialFilter,
@@ -14,23 +12,16 @@ import {
   getActivityLibraryTotalPages,
   normalizeActivityLibrarySearch,
 } from '@/activities/library-filters';
-import {
-  buildActivityDuplicateHandoffView,
-  type ActivityDuplicateHandoffSource,
-  type ActivityDuplicateHandoffView,
-} from '@/activities/duplicate';
+import type { ActivityDuplicateSource } from '@/activities/duplicate';
 import {
   canArchiveActivity,
   canEditActivity,
   canDeriveActivityWork,
   canRestoreActivity,
   type ActivityDerivativeAction,
-  type ActivityLifecycleHandoffSurface,
-  type ActivityLifecycleHandoffView,
   type ActivityLifecycleAction,
   buildActivityLifecycleActionView,
   buildActivityDerivativeActionGate,
-  buildActivityLifecycleHandoffView,
   type ActivityLifecycleActionCopy,
   type ActivityLifecycleActionView,
   getActivityLifecycleActionCopy,
@@ -56,15 +47,7 @@ import {
   type ActivitySourceMaterialSummaryView,
 } from '@/activities/material-summary';
 import { normalizeRuntimeDisplayText } from '@/activities/runtime-display';
-import {
-  ACTIVITY_TEMPLATE_REMIX_HANDOFF_VISIBLE_ACTION_LIMIT,
-  buildActivityTemplateRemixHandoffView,
-  type ActivityTemplateRemixHandoffView,
-} from '@/activities/template-remix';
-import {
-  buildActivityAiRemixAssistHandoffView,
-  type ActivityAiRemixAssistHandoffView,
-} from '@/activities/ai-remix-assist';
+import { ACTIVITY_TEMPLATE_REMIX_VISIBLE_ACTION_LIMIT } from '@/activities/template-remix';
 import type {
   ActivityContent,
   ActivitySeed,
@@ -132,10 +115,8 @@ export type ActivityLibraryLockedTemplateDiagnosticView = {
 };
 
 export type ActivityLibraryCompatibilityView = {
-  aiRemixAssistHandoffView: ActivityAiRemixAssistHandoffView;
   lockedTemplateDiagnostics: ActivityLibraryLockedTemplateDiagnosticView[];
   readyTemplateOptions: ActivityLibraryReadyTemplateOptionView[];
-  remixHandoffView: ActivityTemplateRemixHandoffView;
   remixStatusView: ActivityLibraryActionStatusView;
   remixActionOptions: ActivityLibraryRemixActionOptionView[];
   restoreRequiredMessage?: string;
@@ -144,7 +125,7 @@ export type ActivityLibraryCompatibilityView = {
 
 export const ACTIVITY_LIBRARY_COMPATIBILITY_LIMITS = {
   lockedTemplateDiagnostics: 2,
-  remixActionOptions: ACTIVITY_TEMPLATE_REMIX_HANDOFF_VISIBLE_ACTION_LIMIT,
+  remixActionOptions: ACTIVITY_TEMPLATE_REMIX_VISIBLE_ACTION_LIMIT,
 } as const;
 
 export type ActivityLibraryCardActionState = {
@@ -217,7 +198,6 @@ export type ActivityLibraryCardDisplayView = {
   detailsLabel: string;
   displayDescription: string;
   displayTitle: string;
-  lifecycleHandoffView: ActivityLifecycleHandoffView;
   restoreRequiredLabel: string;
   sourceMaterials: ActivitySourceMaterialSummaryView;
   sourceMaterialsLabel: string;
@@ -303,7 +283,6 @@ type ActivityLibraryPageResolvedSearch = {
 
 type ActivityLibrarySearchPanelView = {
   filterSummary: ActivityLibraryFilterSummary;
-  filterHandoffView: ActivityLibraryFilterHandoffView;
   hasSearchValue: boolean;
   searchDescription: string;
   sourceCapabilityMetrics: ActivityLibrarySourceCapabilityMetric[];
@@ -354,156 +333,6 @@ export type ActivityLibrarySourceScopeBoundary = {
   visiblePageActivityCount: number;
 };
 
-export const ACTIVITY_LIBRARY_FILTER_HANDOFF_ITEM_IDS = [
-  'route-validate-search',
-  'route-default-elision',
-  'search-normalized-query',
-  'search-width-normalization',
-  'search-whitespace-collapse',
-  'search-empty-default',
-  'search-owner-fields',
-  'status-parser',
-  'status-active-default',
-  'status-archived-filter',
-  'template-parser',
-  'template-all-default',
-  'template-exact-family',
-  'source-parser',
-  'source-all-default',
-  'source-audio-filter',
-  'source-extractable-filter',
-  'source-spreadsheet-filter',
-  'source-worksheet-filter',
-  'page-parser',
-  'page-size-boundary',
-  'filter-change-page-reset',
-  'page-change-filter-preservation',
-  'created-activity-context',
-  'clear-search-control',
-  'clear-filter-control',
-  'dashboard-control-options',
-  'list-api-owner-scope',
-  'list-api-source-post-filter',
-  'privacy-guard',
-] as const;
-
-export type ActivityLibraryFilterHandoffItemId =
-  (typeof ACTIVITY_LIBRARY_FILTER_HANDOFF_ITEM_IDS)[number];
-
-export type ActivityLibraryFilterHandoffItemView = {
-  ariaLabel: string;
-  description: string;
-  id: ActivityLibraryFilterHandoffItemId;
-  label: string;
-  value: string;
-};
-
-export type ActivityLibraryFilterHandoffPrivacyView = {
-  exposesActivityIds: false;
-  exposesAnswerText: false;
-  exposesPrivateActivityContent: false;
-  exposesSourceMaterialFileIds: false;
-  exposesSourceMaterialFilenames: false;
-  exposesSourceMaterialStorageKeys: false;
-  exposesStudentData: false;
-  itemIds: ActivityLibraryFilterHandoffItemId[];
-  resetsPageOnFilterChange: true;
-  routesThroughValidatedSearch: true;
-  scope: 'owner-activity-library-filter-state';
-  sharesRulesWithDashboardControls: true;
-  sharesRulesWithListApi: true;
-  statusFilters: ActivityLibraryStatus[];
-  sourceFilters: ActivitySourceMaterialFilter[];
-  templateFilter: ActivityTemplateFilter;
-  usesDomainSearchNormalization: true;
-};
-
-export type ActivityLibraryFilterHandoffView = {
-  description: string;
-  itemViews: ActivityLibraryFilterHandoffItemView[];
-  privacy: ActivityLibraryFilterHandoffPrivacyView;
-  title: string;
-};
-
-export const ACTIVITY_LIBRARY_PAGE_HANDOFF_ITEM_IDS = [
-  'owner-scope',
-  'summary-total',
-  'summary-template-coverage',
-  'summary-remix-ready',
-  'summary-source-extraction',
-  'scope-range',
-  'scope-page',
-  'scope-status',
-  'scope-template',
-  'scope-source',
-  'scope-search',
-  'source-capability-audio-extraction',
-  'source-capability-worksheet-extraction',
-  'source-capability-spreadsheet-import',
-  'status-active',
-  'status-archived',
-  'filter-summary',
-  'visible-page-items',
-  'visible-publish-ready',
-  'visible-publish-blocked',
-  'visible-duplicate-ready',
-  'visible-duplicate-blocked',
-  'visible-remix-ready',
-  'visible-remix-blocked',
-  'visible-archive-ready',
-  'visible-restore-ready',
-  'visible-source-material-activities',
-  'visible-extractable-source-activities',
-  'pagination',
-  'starter-preview',
-] as const;
-
-export type ActivityLibraryPageHandoffItemId =
-  (typeof ACTIVITY_LIBRARY_PAGE_HANDOFF_ITEM_IDS)[number];
-
-export type ActivityLibraryPageHandoffItemView = {
-  ariaLabel: string;
-  description: string;
-  id: ActivityLibraryPageHandoffItemId;
-  label: string;
-  value: string;
-};
-
-export type ActivityLibraryPageHandoffPrivacyView = {
-  broadensBeyondOwner: false;
-  countsStarterPreviewAsOwned: false;
-  exposesDerivativeDraftPayloads: false;
-  exposesPrivateActivityContent: false;
-  exposesSourceMaterialFilenames: false;
-  exposesSourceMaterialFileIds: false;
-  exposesSourceMaterialStorageKeys: false;
-  itemIds: ActivityLibraryPageHandoffItemId[];
-  keepsVisiblePageCountsSeparate: true;
-  scope: 'owner-activity-library-source-scope';
-  usesFullFilteredSummaryForOverview: true;
-  usesOwnerScopedSourceFilters: true;
-};
-
-export type ActivityLibraryPageHandoffView = {
-  description: string;
-  itemViews: ActivityLibraryPageHandoffItemView[];
-  privacy: ActivityLibraryPageHandoffPrivacyView;
-  title: string;
-};
-
-type ActivityLibraryVisibleCardHandoffSummary = {
-  archiveReady: number;
-  duplicateBlocked: number;
-  duplicateReady: number;
-  extractableSourceActivities: number;
-  publishBlocked: number;
-  publishReady: number;
-  remixBlocked: number;
-  remixReady: number;
-  restoreReady: number;
-  sourceMaterialActivities: number;
-};
-
 export type ActivityLibraryCardActionButtonView =
   ActivityLifecycleActionCopy & {
     ariaLabel: string;
@@ -514,7 +343,6 @@ export type ActivityLibraryCardActionButtonView =
 export type ActivityLibraryCardDerivativeActionView =
   ActivityLifecycleActionView & {
     ariaLabel: string;
-    duplicateHandoffView?: ActivityDuplicateHandoffView;
     label: string;
     statusView: ActivityLibraryActionStatusView;
   };
@@ -563,7 +391,6 @@ type ActivityLibraryPageViewModel<TItem extends ActivityLibraryPageItem> = {
   createdPanelContext?: CreatedActivityPanelContext;
   description: string;
   emptyState: ActivityLibraryEmptyStateView;
-  handoffView: ActivityLibraryPageHandoffView;
   hasActivities: boolean;
   hero: typeof activityLibraryHeroCopy;
   loadErrorMessage: string;
@@ -900,16 +727,6 @@ export function buildActivityLibraryPageViewModel<
     summary: data?.summary,
     totalActivities,
   });
-  const searchPanelView = buildActivityLibrarySearchPanelView({
-    isLoading,
-    search: resolvedSearch.searchQuery,
-    source: resolvedSearch.sourceFilter,
-    status: resolvedSearch.libraryStatus,
-    summary: data?.summary,
-    statusSummary: data?.statusSummary,
-    template: resolvedSearch.templateFilter,
-    total: totalActivities,
-  });
   const sourceScopeBoundary = buildActivityLibrarySourceScopeBoundary({
     normalizedSearchQuery: resolvedSearch.normalizedSearchQuery,
     sourceFilter: resolvedSearch.sourceFilter,
@@ -937,19 +754,6 @@ export function buildActivityLibraryPageViewModel<
     createdPanelContext,
     description: activityLibraryPageCopy.description,
     emptyState,
-    handoffView: buildActivityLibraryPageHandoffView({
-      activities,
-      emptyState,
-      libraryStatus: resolvedSearch.libraryStatus,
-      resolvedSearch,
-      scopeView,
-      searchPanelView,
-      starterPreview: resolvedStarterPreview,
-      summaryMetrics,
-      totalActivities,
-      totalPages,
-      visibleCount: activities.length,
-    }),
     hasActivities: activities.length > 0,
     hero: activityLibraryHeroCopy,
     loadErrorMessage: activityLibraryPageCopy.loadErrorMessage,
@@ -1120,7 +924,6 @@ export function buildActivityLibrarySearchPanelView({
   const normalizedSearch = normalizeActivityLibrarySearch(search);
   const sourceFilterView = buildActivityLibrarySourceFilterView(source);
   const statusFilterView = buildActivityLibraryStatusFilterView(status);
-  const templateFilterView = buildActivityLibraryTemplateScopeView(template);
   const filterSummary = buildActivityLibraryFilterSummary({
     isLoading,
     search: normalizedSearch,
@@ -1132,15 +935,6 @@ export function buildActivityLibrarySearchPanelView({
 
   return {
     filterSummary,
-    filterHandoffView: buildActivityLibraryFilterHandoffView({
-      filterSummary,
-      normalizedSearch,
-      source,
-      sourceFilterView,
-      statusFilterView,
-      template,
-      templateFilterView,
-    }),
     hasSearchValue: Boolean(normalizedSearch),
     searchDescription: activityLibrarySearchCopy.searchDescription,
     sourceCapabilityMetrics:
@@ -1161,359 +955,6 @@ export function buildActivityLibrarySearchPanelView({
     statusOptions: activityLibrarySearchCopy.statusOptions,
     templateDescription: activityLibrarySearchCopy.templateDescription,
     templateOptions: buildActivityLibraryTemplateFilterOptions(),
-  };
-}
-
-export function buildActivityLibraryFilterHandoffView({
-  filterSummary,
-  normalizedSearch,
-  source,
-  sourceFilterView,
-  statusFilterView,
-  template,
-  templateFilterView,
-}: {
-  filterSummary: ActivityLibraryFilterSummary;
-  normalizedSearch?: string;
-  source: ActivitySourceMaterialFilter;
-  sourceFilterView: ReturnType<typeof buildActivityLibrarySourceFilterView>;
-  statusFilterView: ReturnType<typeof buildActivityLibraryStatusFilterView>;
-  template: ActivityTemplateFilter;
-  templateFilterView: ReturnType<typeof buildActivityLibraryTemplateScopeView>;
-}): ActivityLibraryFilterHandoffView {
-  const itemViews = ACTIVITY_LIBRARY_FILTER_HANDOFF_ITEM_IDS.map((id) =>
-    buildActivityLibraryFilterHandoffItem({
-      filterSummary,
-      id,
-      normalizedSearch,
-      source,
-      sourceFilterView,
-      statusFilterView,
-      templateFilterView,
-    })
-  );
-
-  return {
-    description: m.activity_library_filter_handoff_description(),
-    itemViews,
-    privacy: {
-      exposesActivityIds: false,
-      exposesAnswerText: false,
-      exposesPrivateActivityContent: false,
-      exposesSourceMaterialFileIds: false,
-      exposesSourceMaterialFilenames: false,
-      exposesSourceMaterialStorageKeys: false,
-      exposesStudentData: false,
-      itemIds: [...ACTIVITY_LIBRARY_FILTER_HANDOFF_ITEM_IDS],
-      resetsPageOnFilterChange: true,
-      routesThroughValidatedSearch: true,
-      scope: 'owner-activity-library-filter-state',
-      sharesRulesWithDashboardControls: true,
-      sharesRulesWithListApi: true,
-      statusFilters: [...ACTIVITY_LIBRARY_STATUSES],
-      sourceFilters: [...ACTIVITY_SOURCE_MATERIAL_FILTERS],
-      templateFilter: template,
-      usesDomainSearchNormalization: true,
-    },
-    title: m.activity_library_filter_handoff_title(),
-  };
-}
-
-function buildActivityLibraryFilterHandoffItem({
-  filterSummary,
-  id,
-  normalizedSearch,
-  source,
-  sourceFilterView,
-  statusFilterView,
-  templateFilterView,
-}: {
-  filterSummary: ActivityLibraryFilterSummary;
-  id: ActivityLibraryFilterHandoffItemId;
-  normalizedSearch?: string;
-  source: ActivitySourceMaterialFilter;
-  sourceFilterView: ReturnType<typeof buildActivityLibrarySourceFilterView>;
-  statusFilterView: ReturnType<typeof buildActivityLibraryStatusFilterView>;
-  templateFilterView: ReturnType<typeof buildActivityLibraryTemplateScopeView>;
-}): ActivityLibraryFilterHandoffItemView {
-  const item = getActivityLibraryFilterHandoffItem({
-    filterSummary,
-    id,
-    normalizedSearch,
-    source,
-    sourceFilterView,
-    statusFilterView,
-    templateFilterView,
-  });
-
-  return {
-    ...item,
-    ariaLabel: m.activity_library_filter_handoff_item_aria({
-      description: item.description,
-      label: item.label,
-      value: item.value,
-    }),
-  };
-}
-
-function getActivityLibraryFilterHandoffItem({
-  filterSummary,
-  id,
-  normalizedSearch,
-  source,
-  sourceFilterView,
-  statusFilterView,
-  templateFilterView,
-}: {
-  filterSummary: ActivityLibraryFilterSummary;
-  id: ActivityLibraryFilterHandoffItemId;
-  normalizedSearch?: string;
-  source: ActivitySourceMaterialFilter;
-  sourceFilterView: ReturnType<typeof buildActivityLibrarySourceFilterView>;
-  statusFilterView: ReturnType<typeof buildActivityLibraryStatusFilterView>;
-  templateFilterView: ReturnType<typeof buildActivityLibraryTemplateScopeView>;
-}): Omit<ActivityLibraryFilterHandoffItemView, 'ariaLabel' | 'id'> & {
-  id: ActivityLibraryFilterHandoffItemId;
-} {
-  switch (id) {
-    case 'route-validate-search':
-      return filterItem(
-        id,
-        m.activity_library_filter_handoff_route_validate_search_label(),
-        m.activity_library_filter_handoff_route_validate_search_value(),
-        m.activity_library_filter_handoff_route_validate_search_description()
-      );
-    case 'route-default-elision':
-      return filterItem(
-        id,
-        m.activity_library_filter_handoff_route_default_elision_label(),
-        m.activity_library_filter_handoff_route_default_elision_value(),
-        m.activity_library_filter_handoff_route_default_elision_description()
-      );
-    case 'search-normalized-query':
-      return filterItem(
-        id,
-        m.activity_library_filter_handoff_search_normalized_query_label(),
-        normalizedSearch ?? m.activity_library_scope_search_all_value(),
-        m.activity_library_filter_handoff_search_normalized_query_description()
-      );
-    case 'search-width-normalization':
-      return filterItem(
-        id,
-        m.activity_library_filter_handoff_search_width_normalization_label(),
-        m.activity_library_filter_handoff_search_width_normalization_value(),
-        m.activity_library_filter_handoff_search_width_normalization_description()
-      );
-    case 'search-whitespace-collapse':
-      return filterItem(
-        id,
-        m.activity_library_filter_handoff_search_whitespace_collapse_label(),
-        m.activity_library_filter_handoff_search_whitespace_collapse_value(),
-        m.activity_library_filter_handoff_search_whitespace_collapse_description()
-      );
-    case 'search-empty-default':
-      return filterItem(
-        id,
-        m.activity_library_filter_handoff_search_empty_default_label(),
-        normalizedSearch
-          ? m.activity_library_filter_handoff_search_filtered_value()
-          : m.activity_library_scope_search_all_value(),
-        m.activity_library_filter_handoff_search_empty_default_description()
-      );
-    case 'search-owner-fields':
-      return filterItem(
-        id,
-        m.activity_library_filter_handoff_search_owner_fields_label(),
-        m.activity_library_filter_handoff_search_owner_fields_value(),
-        m.activity_library_filter_handoff_search_owner_fields_description()
-      );
-    case 'status-parser':
-      return filterItem(
-        id,
-        m.activity_library_filter_handoff_status_parser_label(),
-        m.activity_library_filter_handoff_status_parser_value(),
-        m.activity_library_filter_handoff_status_parser_description()
-      );
-    case 'status-active-default':
-      return filterItem(
-        id,
-        m.activity_library_filter_handoff_status_active_default_label(),
-        activityLibrarySearchCopy.statusOptions[0].label,
-        m.activity_library_filter_handoff_status_active_default_description()
-      );
-    case 'status-archived-filter':
-      return filterItem(
-        id,
-        m.activity_library_filter_handoff_status_archived_filter_label(),
-        statusFilterView.label,
-        m.activity_library_filter_handoff_status_archived_filter_description()
-      );
-    case 'template-parser':
-      return filterItem(
-        id,
-        m.activity_library_filter_handoff_template_parser_label(),
-        m.activity_library_filter_handoff_template_parser_value({
-          count: String(getActivityTemplates().length),
-        }),
-        m.activity_library_filter_handoff_template_parser_description()
-      );
-    case 'template-all-default':
-      return filterItem(
-        id,
-        m.activity_library_filter_handoff_template_all_default_label(),
-        activityLibrarySearchCopy.templatePlaceholder,
-        m.activity_library_filter_handoff_template_all_default_description()
-      );
-    case 'template-exact-family':
-      return filterItem(
-        id,
-        m.activity_library_filter_handoff_template_exact_family_label(),
-        templateFilterView.label,
-        m.activity_library_filter_handoff_template_exact_family_description()
-      );
-    case 'source-parser':
-      return filterItem(
-        id,
-        m.activity_library_filter_handoff_source_parser_label(),
-        m.activity_library_filter_handoff_source_parser_value(),
-        m.activity_library_filter_handoff_source_parser_description()
-      );
-    case 'source-all-default':
-      return filterItem(
-        id,
-        m.activity_library_filter_handoff_source_all_default_label(),
-        activityLibrarySearchCopy.sourceOptions[0].label,
-        m.activity_library_filter_handoff_source_all_default_description()
-      );
-    case 'source-audio-filter':
-      return filterItem(
-        id,
-        m.activity_library_filter_handoff_source_audio_filter_label(),
-        source === 'audio'
-          ? sourceFilterView.label
-          : m.activity_library_filter_source_audio(),
-        m.activity_library_filter_handoff_source_audio_filter_description()
-      );
-    case 'source-extractable-filter':
-      return filterItem(
-        id,
-        m.activity_library_filter_handoff_source_extractable_filter_label(),
-        source === 'extractable'
-          ? sourceFilterView.label
-          : m.activity_library_filter_source_extractable(),
-        m.activity_library_filter_handoff_source_extractable_filter_description()
-      );
-    case 'source-spreadsheet-filter':
-      return filterItem(
-        id,
-        m.activity_library_filter_handoff_source_spreadsheet_filter_label(),
-        source === 'spreadsheet'
-          ? sourceFilterView.label
-          : m.activity_library_filter_source_spreadsheet(),
-        m.activity_library_filter_handoff_source_spreadsheet_filter_description()
-      );
-    case 'source-worksheet-filter':
-      return filterItem(
-        id,
-        m.activity_library_filter_handoff_source_worksheet_filter_label(),
-        source === 'worksheet'
-          ? sourceFilterView.label
-          : m.activity_library_filter_source_worksheet(),
-        m.activity_library_filter_handoff_source_worksheet_filter_description()
-      );
-    case 'page-parser':
-      return filterItem(
-        id,
-        m.activity_library_filter_handoff_page_parser_label(),
-        m.activity_library_filter_handoff_page_parser_value(),
-        m.activity_library_filter_handoff_page_parser_description()
-      );
-    case 'page-size-boundary':
-      return filterItem(
-        id,
-        m.activity_library_filter_handoff_page_size_boundary_label(),
-        m.activity_library_filter_handoff_page_size_boundary_value({
-          count: String(ACTIVITY_LIBRARY_PAGE_SIZE),
-        }),
-        m.activity_library_filter_handoff_page_size_boundary_description()
-      );
-    case 'filter-change-page-reset':
-      return filterItem(
-        id,
-        m.activity_library_filter_handoff_filter_change_page_reset_label(),
-        m.activity_library_filter_handoff_filter_change_page_reset_value(),
-        m.activity_library_filter_handoff_filter_change_page_reset_description()
-      );
-    case 'page-change-filter-preservation':
-      return filterItem(
-        id,
-        m.activity_library_filter_handoff_page_change_filter_preservation_label(),
-        m.activity_library_filter_handoff_page_change_filter_preservation_value(),
-        m.activity_library_filter_handoff_page_change_filter_preservation_description()
-      );
-    case 'created-activity-context':
-      return filterItem(
-        id,
-        m.activity_library_filter_handoff_created_activity_context_label(),
-        m.activity_library_filter_handoff_created_activity_context_value(),
-        m.activity_library_filter_handoff_created_activity_context_description()
-      );
-    case 'clear-search-control':
-      return filterItem(
-        id,
-        m.activity_library_filter_handoff_clear_search_control_label(),
-        m.activity_library_filter_handoff_clear_search_control_value(),
-        m.activity_library_filter_handoff_clear_search_control_description()
-      );
-    case 'clear-filter-control':
-      return filterItem(
-        id,
-        m.activity_library_filter_handoff_clear_filter_control_label(),
-        m.activity_library_filter_handoff_clear_filter_control_value(),
-        m.activity_library_filter_handoff_clear_filter_control_description()
-      );
-    case 'dashboard-control-options':
-      return filterItem(
-        id,
-        m.activity_library_filter_handoff_dashboard_control_options_label(),
-        m.activity_library_filter_handoff_dashboard_control_options_value(),
-        m.activity_library_filter_handoff_dashboard_control_options_description()
-      );
-    case 'list-api-owner-scope':
-      return filterItem(
-        id,
-        m.activity_library_filter_handoff_list_api_owner_scope_label(),
-        m.activity_library_filter_handoff_list_api_owner_scope_value(),
-        m.activity_library_filter_handoff_list_api_owner_scope_description()
-      );
-    case 'list-api-source-post-filter':
-      return filterItem(
-        id,
-        m.activity_library_filter_handoff_list_api_source_post_filter_label(),
-        filterSummary.text,
-        m.activity_library_filter_handoff_list_api_source_post_filter_description()
-      );
-    case 'privacy-guard':
-      return filterItem(
-        id,
-        m.activity_library_filter_handoff_privacy_guard_label(),
-        m.activity_library_filter_handoff_privacy_guard_value(),
-        m.activity_library_filter_handoff_privacy_guard_description()
-      );
-  }
-}
-
-function filterItem(
-  id: ActivityLibraryFilterHandoffItemId,
-  label: string,
-  value: string,
-  description: string
-): Omit<ActivityLibraryFilterHandoffItemView, 'ariaLabel'> {
-  return {
-    description,
-    id,
-    label,
-    value,
   };
 }
 
@@ -1761,391 +1202,6 @@ function normalizeActivityLibraryScopePageSize(value: number) {
   return Number.isInteger(value) && value > 0
     ? value
     : ACTIVITY_LIBRARY_PAGE_SIZE;
-}
-
-function buildActivityLibraryPageHandoffView({
-  activities,
-  emptyState,
-  libraryStatus,
-  resolvedSearch,
-  scopeView,
-  searchPanelView,
-  starterPreview,
-  summaryMetrics,
-  totalActivities,
-  totalPages,
-  visibleCount,
-}: {
-  activities: ActivityLibraryPageItem[];
-  emptyState: ActivityLibraryEmptyStateView;
-  libraryStatus: ActivityLibraryStatus;
-  resolvedSearch: ActivityLibraryPageResolvedSearch;
-  scopeView: ActivityLibraryPageScopeView;
-  searchPanelView: ActivityLibrarySearchPanelView;
-  starterPreview: ActivityLibraryStarterPreview;
-  summaryMetrics: ActivityLibrarySummaryMetric[];
-  totalActivities: number;
-  totalPages: number;
-  visibleCount: number;
-}): ActivityLibraryPageHandoffView {
-  const visibleCardSummary = summarizeActivityLibraryVisibleCards({
-    activities,
-    libraryStatus,
-  });
-  const candidateItemViews: ActivityLibraryPageHandoffItemView[] = [
-    buildActivityLibraryPageHandoffItem({
-      description: m.activity_library_handoff_owner_scope_description(),
-      id: 'owner-scope',
-      label: m.activity_library_handoff_owner_scope_label(),
-      value: m.activity_library_handoff_owner_scope_value(),
-    }),
-    ...summaryMetrics.map((metric) =>
-      buildActivityLibraryPageHandoffItem({
-        description: metric.description,
-        id: toActivityLibrarySummaryHandoffItemId(metric.id),
-        label: metric.label,
-        value: metric.value,
-      })
-    ),
-    ...scopeView.items.map((item) =>
-      buildActivityLibraryPageHandoffItem({
-        description: item.description,
-        id: toActivityLibraryScopeHandoffItemId(item.id),
-        label: item.label,
-        value: item.value,
-      })
-    ),
-    ...searchPanelView.sourceCapabilityMetrics.map((metric) =>
-      buildActivityLibraryPageHandoffItem({
-        description: searchPanelView.sourceFilterDescription,
-        id: toActivityLibrarySourceCapabilityHandoffItemId(metric.capability),
-        label: metric.label,
-        value: metric.value,
-      })
-    ),
-    ...searchPanelView.statusMetrics.map((metric) =>
-      buildActivityLibraryPageHandoffItem({
-        description: searchPanelView.statusDescription,
-        id: toActivityLibraryStatusHandoffItemId(metric.status),
-        label: metric.label,
-        value: metric.value,
-      })
-    ),
-    buildActivityLibraryPageHandoffItem({
-      description: searchPanelView.searchDescription,
-      id: 'filter-summary',
-      label: activityLibrarySearchCopy.label,
-      value: searchPanelView.filterSummary.text,
-    }),
-    buildActivityLibraryPageHandoffItem({
-      description: m.activity_library_handoff_visible_items_description(),
-      id: 'visible-page-items',
-      label: m.activity_library_handoff_visible_items_label(),
-      value: m.activity_library_handoff_visible_items_value({
-        count: normalizeActivityLibraryListCount(visibleCount),
-      }),
-    }),
-    ...buildActivityLibraryVisibleCardHandoffItems(visibleCardSummary),
-    buildActivityLibraryPageHandoffItem({
-      description: m.activity_library_handoff_pagination_description(),
-      id: 'pagination',
-      label: m.activity_library_handoff_pagination_label(),
-      value: m.activity_library_handoff_pagination_value({
-        currentPage: formatActivityLibraryScopeNumber(
-          resolvedSearch.currentPage,
-          { min: 1 }
-        ),
-        totalActivities: formatActivityLibraryScopeNumber(totalActivities),
-        totalPages: formatActivityLibraryScopeNumber(totalPages, { min: 1 }),
-      }),
-    }),
-    buildActivityLibraryPageHandoffItem({
-      description: m.activity_library_handoff_starter_preview_description({
-        emptyState: emptyState.title,
-      }),
-      id: 'starter-preview',
-      label: m.activity_library_handoff_starter_preview_label(),
-      value: m.activity_library_handoff_starter_preview_value({
-        count: normalizeActivityLibraryListCount(
-          starterPreview.activities.length
-        ),
-      }),
-    }),
-  ];
-
-  const itemViewById = new Map(
-    candidateItemViews.map((itemView) => [itemView.id, itemView])
-  );
-  const itemViews = ACTIVITY_LIBRARY_PAGE_HANDOFF_ITEM_IDS.map((id) => {
-    const itemView = itemViewById.get(id);
-
-    if (!itemView) {
-      throw new Error(`Missing activity library handoff item: ${id}`);
-    }
-
-    return itemView;
-  });
-
-  return {
-    description: m.activity_library_handoff_description(),
-    itemViews,
-    privacy: buildActivityLibraryPageHandoffPrivacyView(itemViews),
-    title: m.activity_library_handoff_title(),
-  };
-}
-
-function toActivityLibrarySummaryHandoffItemId(
-  id: ActivityLibrarySummaryMetric['id']
-): ActivityLibraryPageHandoffItemId {
-  switch (id) {
-    case 'coverage':
-      return 'summary-template-coverage';
-    case 'remix':
-      return 'summary-remix-ready';
-    case 'sourceExtraction':
-      return 'summary-source-extraction';
-    case 'total':
-      return 'summary-total';
-  }
-}
-
-function toActivityLibraryScopeHandoffItemId(
-  id: ActivityLibraryPageScopeItemId
-): ActivityLibraryPageHandoffItemId {
-  switch (id) {
-    case 'page':
-      return 'scope-page';
-    case 'range':
-      return 'scope-range';
-    case 'search':
-      return 'scope-search';
-    case 'source':
-      return 'scope-source';
-    case 'status':
-      return 'scope-status';
-    case 'template':
-      return 'scope-template';
-  }
-}
-
-function toActivityLibrarySourceCapabilityHandoffItemId(
-  capability: ActivityLibrarySourceCapabilityMetric['capability']
-): ActivityLibraryPageHandoffItemId {
-  switch (capability) {
-    case 'audio-extraction':
-      return 'source-capability-audio-extraction';
-    case 'spreadsheet-import':
-      return 'source-capability-spreadsheet-import';
-    case 'worksheet-extraction':
-      return 'source-capability-worksheet-extraction';
-  }
-}
-
-function toActivityLibraryStatusHandoffItemId(
-  status: ActivityLibraryStatus
-): ActivityLibraryPageHandoffItemId {
-  return status === 'archived' ? 'status-archived' : 'status-active';
-}
-
-function buildActivityLibraryPageHandoffPrivacyView(
-  itemViews: ActivityLibraryPageHandoffItemView[]
-): ActivityLibraryPageHandoffPrivacyView {
-  return {
-    broadensBeyondOwner: false,
-    countsStarterPreviewAsOwned: false,
-    exposesDerivativeDraftPayloads: false,
-    exposesPrivateActivityContent: false,
-    exposesSourceMaterialFilenames: false,
-    exposesSourceMaterialFileIds: false,
-    exposesSourceMaterialStorageKeys: false,
-    itemIds: itemViews.map((item) => item.id),
-    keepsVisiblePageCountsSeparate: true,
-    scope: 'owner-activity-library-source-scope',
-    usesFullFilteredSummaryForOverview: true,
-    usesOwnerScopedSourceFilters: true,
-  };
-}
-
-function buildActivityLibraryVisibleCardHandoffItems(
-  summary: ActivityLibraryVisibleCardHandoffSummary
-): ActivityLibraryPageHandoffItemView[] {
-  return [
-    buildActivityLibraryVisibleCardCountHandoffItem({
-      count: summary.publishReady,
-      description:
-        m.activity_library_handoff_visible_publish_ready_description(),
-      id: 'visible-publish-ready',
-      label: m.activity_library_handoff_visible_publish_ready_label(),
-    }),
-    buildActivityLibraryVisibleCardCountHandoffItem({
-      count: summary.publishBlocked,
-      description:
-        m.activity_library_handoff_visible_publish_blocked_description(),
-      id: 'visible-publish-blocked',
-      label: m.activity_library_handoff_visible_publish_blocked_label(),
-    }),
-    buildActivityLibraryVisibleCardCountHandoffItem({
-      count: summary.duplicateReady,
-      description:
-        m.activity_library_handoff_visible_duplicate_ready_description(),
-      id: 'visible-duplicate-ready',
-      label: m.activity_library_handoff_visible_duplicate_ready_label(),
-    }),
-    buildActivityLibraryVisibleCardCountHandoffItem({
-      count: summary.duplicateBlocked,
-      description:
-        m.activity_library_handoff_visible_duplicate_blocked_description(),
-      id: 'visible-duplicate-blocked',
-      label: m.activity_library_handoff_visible_duplicate_blocked_label(),
-    }),
-    buildActivityLibraryVisibleCardCountHandoffItem({
-      count: summary.remixReady,
-      description: m.activity_library_handoff_visible_remix_ready_description(),
-      id: 'visible-remix-ready',
-      label: m.activity_library_handoff_visible_remix_ready_label(),
-    }),
-    buildActivityLibraryVisibleCardCountHandoffItem({
-      count: summary.remixBlocked,
-      description:
-        m.activity_library_handoff_visible_remix_blocked_description(),
-      id: 'visible-remix-blocked',
-      label: m.activity_library_handoff_visible_remix_blocked_label(),
-    }),
-    buildActivityLibraryVisibleCardCountHandoffItem({
-      count: summary.archiveReady,
-      description:
-        m.activity_library_handoff_visible_archive_ready_description(),
-      id: 'visible-archive-ready',
-      label: m.activity_library_handoff_visible_archive_ready_label(),
-    }),
-    buildActivityLibraryVisibleCardCountHandoffItem({
-      count: summary.restoreReady,
-      description:
-        m.activity_library_handoff_visible_restore_ready_description(),
-      id: 'visible-restore-ready',
-      label: m.activity_library_handoff_visible_restore_ready_label(),
-    }),
-    buildActivityLibraryVisibleCardCountHandoffItem({
-      count: summary.sourceMaterialActivities,
-      description:
-        m.activity_library_handoff_visible_source_materials_description(),
-      id: 'visible-source-material-activities',
-      label: m.activity_library_handoff_visible_source_materials_label(),
-    }),
-    buildActivityLibraryVisibleCardCountHandoffItem({
-      count: summary.extractableSourceActivities,
-      description:
-        m.activity_library_handoff_visible_extractable_source_description(),
-      id: 'visible-extractable-source-activities',
-      label: m.activity_library_handoff_visible_extractable_source_label(),
-    }),
-  ];
-}
-
-function buildActivityLibraryVisibleCardCountHandoffItem({
-  count,
-  description,
-  id,
-  label,
-}: {
-  count: number;
-  description: string;
-  id: ActivityLibraryPageHandoffItemId;
-  label: string;
-}) {
-  return buildActivityLibraryPageHandoffItem({
-    description,
-    id,
-    label,
-    value: m.activity_library_handoff_visible_activity_count_value({
-      count: normalizeActivityLibraryListCount(count),
-    }),
-  });
-}
-
-function summarizeActivityLibraryVisibleCards({
-  activities,
-  libraryStatus,
-}: {
-  activities: ActivityLibraryPageItem[];
-  libraryStatus: ActivityLibraryStatus;
-}): ActivityLibraryVisibleCardHandoffSummary {
-  const summary: ActivityLibraryVisibleCardHandoffSummary = {
-    archiveReady: 0,
-    duplicateBlocked: 0,
-    duplicateReady: 0,
-    extractableSourceActivities: 0,
-    publishBlocked: 0,
-    publishReady: 0,
-    remixBlocked: 0,
-    remixReady: 0,
-    restoreReady: 0,
-    sourceMaterialActivities: 0,
-  };
-
-  for (const activity of activities) {
-    const cardView = buildActivityLibraryCardDisplayView({
-      activity: buildActivityLibraryCardViewModel(activity),
-      libraryStatus,
-    });
-
-    if (cardView.actionState.showPublishAction) {
-      summary.publishReady += 1;
-    } else if (cardView.actionView.publish.statusView.tone === 'blocked') {
-      summary.publishBlocked += 1;
-    }
-
-    if (cardView.actionState.showDerivativeActions) {
-      summary.duplicateReady += 1;
-    } else if (cardView.actionView.duplicate.statusView.tone === 'blocked') {
-      summary.duplicateBlocked += 1;
-    }
-
-    if (cardView.actionState.showRemixActions) {
-      summary.remixReady += 1;
-    } else if (cardView.compatibility.remixStatusView.tone === 'blocked') {
-      summary.remixBlocked += 1;
-    }
-
-    if (cardView.actionState.showArchiveAction) {
-      summary.archiveReady += 1;
-    }
-    if (cardView.actionState.showRestoreAction) {
-      summary.restoreReady += 1;
-    }
-    if (cardView.sourceMaterials.hasMaterials) {
-      summary.sourceMaterialActivities += 1;
-    }
-    if (cardView.sourceMaterials.readiness.extractableCount > 0) {
-      summary.extractableSourceActivities += 1;
-    }
-  }
-
-  return summary;
-}
-
-function buildActivityLibraryPageHandoffItem({
-  description,
-  id,
-  label,
-  value,
-}: {
-  description: string;
-  id: ActivityLibraryPageHandoffItemId;
-  label: string;
-  value: string;
-}): ActivityLibraryPageHandoffItemView {
-  return {
-    ariaLabel: m.activity_library_summary_aria_label({
-      description,
-      label,
-      value,
-    }),
-    description,
-    id,
-    label,
-    value,
-  };
 }
 
 function formatActivityLibraryScopeNumber(
@@ -2404,9 +1460,7 @@ export function buildActivityLibraryCardDisplayView({
     activity
   );
   const compatibility = buildActivityLibraryCompatibilityView({
-    content: activity.content,
     currentTemplateType: activity.templateType,
-    sourceTitle: activity.title,
     summary,
     visibility: activity.status,
   });
@@ -2441,11 +1495,6 @@ export function buildActivityLibraryCardDisplayView({
       activityId: activity.id,
       label: activityLibraryCardCopy.actionLabels.edit,
     }),
-    lifecycleHandoffView: buildActivityLifecycleHandoffView({
-      persisted: activity.persisted,
-      surface: getActivityLifecycleHandoffSurface(libraryStatus),
-      visibility: activity.status,
-    }),
     restoreRequiredLabel: m.activity_library_card_restore_required_label({
       title: displayTitle,
     }),
@@ -2474,12 +1523,6 @@ export function buildActivityLibraryCardDisplayView({
     templateName: template.name,
     templateType: template.type,
   };
-}
-
-function getActivityLifecycleHandoffSurface(
-  libraryStatus: ActivityLibraryStatus
-): ActivityLifecycleHandoffSurface {
-  return libraryStatus === 'archived' ? 'archived-library' : 'active-library';
 }
 
 function buildActivityLibraryCardStatusSummaryView({
@@ -2631,7 +1674,7 @@ function buildActivityLibraryEditorAction({
 
 export function buildActivityLibraryCardActionView(
   visibility: ActivityVisibility,
-  activity?: ActivityDuplicateHandoffSource
+  activity?: ActivityDuplicateSource
 ): ActivityLibraryCardActionView {
   return {
     archive: buildActivityLibraryCardActionButtonView({
@@ -2688,7 +1731,7 @@ function buildActivityLibraryCardDerivativeActionView({
   visibility,
 }: {
   action: Exclude<ActivityDerivativeAction, 'remix'>;
-  activity?: ActivityDuplicateHandoffSource;
+  activity?: ActivityDuplicateSource;
   visibility: ActivityVisibility;
 }): ActivityLibraryCardDerivativeActionView {
   const actionView = buildActivityLifecycleActionView({
@@ -2705,9 +1748,7 @@ function buildActivityLibraryCardDerivativeActionView({
   return {
     ...actionView,
     ariaLabel: buildActivityLibraryActionAriaLabel({ label, statusView }),
-    ...(action === 'duplicate' && activity
-      ? { duplicateHandoffView: buildActivityDuplicateHandoffView(activity) }
-      : {}),
+    ...(action === 'duplicate' && activity ? {} : {}),
     label,
     statusView,
   };
@@ -2863,15 +1904,11 @@ export function buildActivityLibraryRemixActionLabel(shortName: string) {
 }
 
 export function buildActivityLibraryCompatibilityView({
-  content,
   currentTemplateType,
-  sourceTitle,
   summary,
   visibility = 'draft',
 }: {
-  content: ActivityContent;
   currentTemplateType: ActivityTemplateType;
-  sourceTitle: string;
   summary: ActivityLibraryCardSummary;
   visibility?: ActivityVisibility;
 }): ActivityLibraryCompatibilityView {
@@ -2886,12 +1923,6 @@ export function buildActivityLibraryCompatibilityView({
   });
 
   return {
-    aiRemixAssistHandoffView: buildActivityAiRemixAssistHandoffView({
-      content,
-      currentTemplateType,
-      sourceTitle,
-      visibility,
-    }),
     lockedTemplateDiagnostics: summary.lockedTemplateOptions
       .slice(0, ACTIVITY_LIBRARY_COMPATIBILITY_LIMITS.lockedTemplateDiagnostics)
       .map((option) => ({
@@ -2902,12 +1933,6 @@ export function buildActivityLibraryCompatibilityView({
       ...option,
       isCurrent: option.template === currentTemplateType,
     })),
-    remixHandoffView: buildActivityTemplateRemixHandoffView({
-      content,
-      currentTemplateType,
-      sourceTitle,
-      visibility,
-    }),
     remixStatusView,
     remixActionOptions: summary.suggestedTemplateOptions
       .slice(0, ACTIVITY_LIBRARY_COMPATIBILITY_LIMITS.remixActionOptions)

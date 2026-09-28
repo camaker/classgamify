@@ -5,10 +5,6 @@ import type {
   ActivityTemplateReadinessPanelOption,
   ActivityTemplateReadinessPanelSummary,
 } from '@/activities/draft-meta';
-import type {
-  QuestionChoiceGenerationHandoffItemView,
-  QuestionChoiceGenerationHandoffView,
-} from '@/activities/distractors';
 import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
 import { IconLayoutGrid, IconSparkles } from '@tabler/icons-react';
@@ -130,83 +126,6 @@ function ActivityTemplateQuizChoiceReadinessPanel({
           {readiness.emptyText}
         </p>
       )}
-      <ActivityTemplateQuizChoiceGenerationHandoff
-        handoffView={readiness.generationHandoffView}
-      />
-    </div>
-  );
-}
-
-function ActivityTemplateQuizChoiceGenerationHandoff({
-  handoffView,
-}: {
-  handoffView: QuestionChoiceGenerationHandoffView;
-}) {
-  const titleId = 'question-choice-generation-handoff-title';
-  const descriptionId = 'question-choice-generation-handoff-description';
-
-  return (
-    <section
-      aria-describedby={descriptionId}
-      aria-labelledby={titleId}
-      className="sr-only"
-      data-handoff="question-choice-generation"
-      data-handoff-scope={handoffView.privacy.scope}
-    >
-      <h5 className="font-medium text-xs leading-5" id={titleId}>
-        {handoffView.title}
-      </h5>
-      <p
-        className="mt-1 text-muted-foreground text-xs leading-5"
-        id={descriptionId}
-      >
-        {handoffView.description}
-      </p>
-      <dl className="mt-3 grid gap-2 sm:grid-cols-2 lg:grid-cols-5">
-        {handoffView.itemViews.map((item) => (
-          <ActivityTemplateQuizChoiceGenerationHandoffItem
-            item={item}
-            key={item.id}
-          />
-        ))}
-      </dl>
-    </section>
-  );
-}
-
-function ActivityTemplateQuizChoiceGenerationHandoffItem({
-  item,
-}: {
-  item: QuestionChoiceGenerationHandoffItemView;
-}) {
-  const labelId = `question-choice-generation-handoff-${item.id}-label`;
-  const valueId = `question-choice-generation-handoff-${item.id}-value`;
-  const descriptionId = `question-choice-generation-handoff-${item.id}-description`;
-
-  return (
-    <div
-      className="rounded-md border bg-muted/20 p-2.5"
-      data-handoff-item={item.id}
-    >
-      <dt className="text-muted-foreground text-xs leading-5" id={labelId}>
-        {item.label}
-      </dt>
-      <dd className="mt-1 break-words font-medium text-xs leading-5">
-        <output
-          aria-describedby={descriptionId}
-          aria-label={item.ariaLabel}
-          aria-labelledby={`${labelId} ${valueId}`}
-          id={valueId}
-        >
-          {item.value}
-        </output>
-      </dd>
-      <dd
-        className="mt-1 text-muted-foreground text-xs leading-5"
-        id={descriptionId}
-      >
-        {item.description}
-      </dd>
     </div>
   );
 }

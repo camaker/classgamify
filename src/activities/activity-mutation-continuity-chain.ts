@@ -31,7 +31,7 @@ export const ACTIVITY_MUTATION_CONTINUITY_CHAIN_SOURCE_FILES = [
   'src/db/app.schema.ts',
   'scripts/activity-mutation-concurrency-contract.test.ts',
   'scripts/activity-lifecycle-governance-chain-handoff.test.ts',
-  'scripts/activity-edit-route-handoff-semantic-views.test.ts',
+  'scripts/activity-lifecycle.test.ts',
   'tests/e2e/specs/activity-authoring.spec.ts',
   'tests/e2e/TEST-CATALOG.md',
 ] as const;

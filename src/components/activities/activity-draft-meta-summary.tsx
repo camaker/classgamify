@@ -2,8 +2,6 @@ import type { ActivityDraftResult } from '@/activities/ai-draft';
 import type { ActivitySourceMaterialDraftNoteView } from '@/activities/draft-source';
 import {
   buildActivityDraftMetaSummaryView,
-  type ActivityDraftMetaHandoffItemView,
-  type ActivityDraftMetaHandoffView,
   type ActivityDraftMetaReviewGateMetricView,
   type ActivityDraftMetaReviewGateView,
   type ActivityDraftMetaSummaryCoverageStatView,
@@ -61,7 +59,6 @@ export function ActivityDraftMetaSummary({
       </div>
       <ActivityDraftTrustPanel trustView={summaryView.trustView} />
       <ActivityDraftReviewGate reviewGateView={summaryView.reviewGateView} />
-      <ActivityDraftMetaHandoff handoffView={summaryView.handoffView} />
       <div className="mt-3 rounded-lg border bg-background p-3 text-xs leading-5 text-muted-foreground">
         <p className="font-medium">{summaryView.draftFocusLineText}</p>
         <p className="mt-1">{summaryView.draftFocusDescription}</p>
@@ -265,77 +262,6 @@ function ActivityDraftReviewGateMetric({
       </dd>
       <dd className="mt-1 text-muted-foreground text-xs leading-5">
         {metricView.description}
-      </dd>
-    </div>
-  );
-}
-
-function ActivityDraftMetaHandoff({
-  handoffView,
-}: {
-  handoffView: ActivityDraftMetaHandoffView;
-}) {
-  const titleId = 'activity-draft-meta-handoff-title';
-  const descriptionId = 'activity-draft-meta-handoff-description';
-
-  return (
-    <section
-      aria-describedby={descriptionId}
-      aria-labelledby={titleId}
-      className="sr-only"
-      data-handoff="activity-draft-meta"
-      data-handoff-scope={handoffView.privacy.scope}
-    >
-      <h4 className="font-medium text-sm" id={titleId}>
-        {handoffView.title}
-      </h4>
-      <p
-        className="mt-1 text-muted-foreground text-xs leading-5"
-        id={descriptionId}
-      >
-        {handoffView.description}
-      </p>
-      <dl className="mt-3 grid gap-2 sm:grid-cols-2 lg:grid-cols-5">
-        {handoffView.itemViews.map((item) => (
-          <ActivityDraftMetaHandoffItem item={item} key={item.id} />
-        ))}
-      </dl>
-    </section>
-  );
-}
-
-function ActivityDraftMetaHandoffItem({
-  item,
-}: {
-  item: ActivityDraftMetaHandoffItemView;
-}) {
-  const labelId = `activity-draft-meta-handoff-${item.id}-label`;
-  const valueId = `activity-draft-meta-handoff-${item.id}-value`;
-  const descriptionId = `activity-draft-meta-handoff-${item.id}-description`;
-
-  return (
-    <div
-      className="rounded-md border bg-muted/20 p-2.5"
-      data-handoff-item={item.id}
-    >
-      <dt className="text-muted-foreground text-xs leading-5" id={labelId}>
-        {item.label}
-      </dt>
-      <dd className="mt-1 break-words font-medium text-xs leading-5">
-        <output
-          aria-describedby={descriptionId}
-          aria-label={item.ariaLabel}
-          aria-labelledby={`${labelId} ${valueId}`}
-          id={valueId}
-        >
-          {item.value}
-        </output>
-      </dd>
-      <dd
-        className="mt-1 text-muted-foreground text-xs leading-5"
-        id={descriptionId}
-      >
-        {item.description}
       </dd>
     </div>
   );

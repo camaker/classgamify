@@ -2,10 +2,6 @@ import type { ActivityLibraryStatus } from '@/activities/library-filters';
 import { buildAssignmentPublishDialogAccessView } from '@/assignments/publish-input';
 import { buildAssignmentListRouteSearch } from '@/assignments/list-filters';
 import { buildActivityLibraryRouteSearch } from '@/activities/library-filters';
-import type {
-  ActivityDuplicateHandoffItemView,
-  ActivityDuplicateHandoffView,
-} from '@/activities/duplicate';
 import {
   buildActivityLibraryCardDisplayView,
   type ActivityLibraryCardActionButtonView,
@@ -20,8 +16,6 @@ import {
 import {
   buildActivityDerivativeActionExecutionPlan,
   buildActivityVisibilityActionExecutionPlan,
-  type ActivityLifecycleHandoffItemView,
-  type ActivityLifecycleHandoffView,
 } from '@/activities/lifecycle';
 import { ActivityLibraryActionStatusBadge } from '@/components/activities/activity-library-action-status-badge';
 import { ActivityLibraryCompatibilityPanel } from '@/components/activities/activity-library-compatibility-panel';
@@ -207,9 +201,6 @@ export function ActivityLibraryCard({
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
-        <ActivityLibraryLifecycleHandoff
-          handoff={cardDisplayView.lifecycleHandoffView}
-        />
         <section
           aria-label={cardDisplayView.detailsLabel}
           className="space-y-3"
@@ -308,60 +299,6 @@ function ActivityLibrarySourceMaterialEditAction({
   );
 }
 
-function ActivityLibraryLifecycleHandoff({
-  handoff,
-}: {
-  handoff: ActivityLifecycleHandoffView;
-}) {
-  const titleId = useId();
-  const descriptionId = useId();
-
-  return (
-    <section
-      aria-describedby={descriptionId}
-      aria-labelledby={titleId}
-      className="sr-only"
-      data-handoff="activity-lifecycle"
-      data-handoff-scope={handoff.privacy.scope}
-    >
-      <h3 id={titleId}>{handoff.title}</h3>
-      <p id={descriptionId}>{handoff.description}</p>
-      <dl>
-        {handoff.itemViews.map((item) => (
-          <ActivityLibraryLifecycleHandoffItem item={item} key={item.id} />
-        ))}
-      </dl>
-    </section>
-  );
-}
-
-function ActivityLibraryLifecycleHandoffItem({
-  item,
-}: {
-  item: ActivityLifecycleHandoffItemView;
-}) {
-  const labelId = `activity-lifecycle-handoff-${item.id}-label`;
-  const valueId = `activity-lifecycle-handoff-${item.id}-value`;
-  const descriptionId = `activity-lifecycle-handoff-${item.id}-description`;
-
-  return (
-    <div data-handoff-item={item.id}>
-      <dt id={labelId}>{item.label}</dt>
-      <dd>
-        <output
-          aria-describedby={descriptionId}
-          aria-label={item.ariaLabel}
-          aria-labelledby={`${labelId} ${valueId}`}
-          id={valueId}
-        >
-          {item.value}
-        </output>
-        <span id={descriptionId}>{item.description}</span>
-      </dd>
-    </div>
-  );
-}
-
 function ActivityLibraryCardActions({
   actionState,
   actionView,
@@ -393,11 +330,6 @@ function ActivityLibraryCardActions({
 
   return (
     <section aria-label={label} className="flex flex-wrap gap-2">
-      {actionView.duplicate.duplicateHandoffView ? (
-        <ActivityLibraryDuplicateHandoff
-          handoff={actionView.duplicate.duplicateHandoffView}
-        />
-      ) : null}
       {actionState.showEditAction ? (
         <ActivityLibraryEditActionLink action={editAction} />
       ) : null}
@@ -432,60 +364,6 @@ function ActivityLibraryCardActions({
         />
       ) : null}
     </section>
-  );
-}
-
-function ActivityLibraryDuplicateHandoff({
-  handoff,
-}: {
-  handoff: ActivityDuplicateHandoffView;
-}) {
-  const titleId = useId();
-  const descriptionId = useId();
-
-  return (
-    <section
-      aria-describedby={descriptionId}
-      aria-labelledby={titleId}
-      className="sr-only"
-      data-handoff="activity-duplicate"
-      data-handoff-scope={handoff.privacy.scope}
-    >
-      <h3 id={titleId}>{handoff.title}</h3>
-      <p id={descriptionId}>{handoff.description}</p>
-      <dl>
-        {handoff.itemViews.map((item) => (
-          <ActivityLibraryDuplicateHandoffItem item={item} key={item.id} />
-        ))}
-      </dl>
-    </section>
-  );
-}
-
-function ActivityLibraryDuplicateHandoffItem({
-  item,
-}: {
-  item: ActivityDuplicateHandoffItemView;
-}) {
-  const labelId = `activity-duplicate-handoff-${item.id}-label`;
-  const valueId = `activity-duplicate-handoff-${item.id}-value`;
-  const descriptionId = `activity-duplicate-handoff-${item.id}-description`;
-
-  return (
-    <div data-handoff-item={item.id}>
-      <dt id={labelId}>{item.label}</dt>
-      <dd>
-        <output
-          aria-describedby={descriptionId}
-          aria-label={item.ariaLabel}
-          aria-labelledby={`${labelId} ${valueId}`}
-          id={valueId}
-        >
-          {item.value}
-        </output>
-        <span id={descriptionId}>{item.description}</span>
-      </dd>
-    </div>
   );
 }
 

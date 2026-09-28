@@ -14,7 +14,6 @@ import {
   buildActivityEditorWorkflowView,
   getActivityEditorWorkflowStepView,
   getActivityEditorDefaultInput,
-  type ActivityEditorTemplateHandoffView,
   type ActivityEditorWorkflowStepView,
 } from '@/activities/editor';
 import {
@@ -255,10 +254,6 @@ export function ActivityCreateForm({
                 templateView={templateView}
               />
 
-              <ActivityEditorTemplateHandoff
-                handoffView={templateView.handoffView}
-              />
-
               <ActivityTemplateScaffoldPanel
                 setupView={templateView.setupView}
                 onApplyScaffold={applyTemplateScaffold}
@@ -280,7 +275,6 @@ export function ActivityCreateForm({
                 onGenerateDraft={onGenerateDraft}
                 onSyncSourceMaterials={syncAttachedMaterialsForDraft}
                 panelView={aiDraftPanelView}
-                templateType={selectedTemplate}
               />
             </ActivityEditorSection>
 
@@ -369,59 +363,5 @@ function ActivityEditorSection({
         <div className="min-w-0 space-y-4">{children}</div>
       </div>
     </section>
-  );
-}
-
-function ActivityEditorTemplateHandoff({
-  handoffView,
-}: {
-  handoffView: ActivityEditorTemplateHandoffView;
-}) {
-  const titleId = 'activity-editor-template-handoff-title';
-  const descriptionId = 'activity-editor-template-handoff-description';
-
-  return (
-    <section
-      aria-describedby={descriptionId}
-      aria-labelledby={titleId}
-      className="sr-only"
-      data-handoff="activity-editor-template"
-      data-handoff-scope={handoffView.privacy.scope}
-    >
-      <h2 id={titleId}>{handoffView.title}</h2>
-      <p id={descriptionId}>{handoffView.description}</p>
-      <dl>
-        {handoffView.itemViews.map((item) => (
-          <ActivityEditorTemplateHandoffItem item={item} key={item.id} />
-        ))}
-      </dl>
-    </section>
-  );
-}
-
-function ActivityEditorTemplateHandoffItem({
-  item,
-}: {
-  item: ActivityEditorTemplateHandoffView['itemViews'][number];
-}) {
-  const labelId = `activity-editor-template-handoff-${item.id}-label`;
-  const valueId = `activity-editor-template-handoff-${item.id}-value`;
-  const descriptionId = `activity-editor-template-handoff-${item.id}-description`;
-
-  return (
-    <div data-handoff-item={item.id}>
-      <dt id={labelId}>{item.label}</dt>
-      <dd>
-        <output
-          aria-describedby={descriptionId}
-          aria-label={item.ariaLabel}
-          aria-labelledby={`${labelId} ${valueId}`}
-          id={valueId}
-        >
-          {item.value}
-        </output>
-        <span id={descriptionId}>{item.description}</span>
-      </dd>
-    </div>
   );
 }
