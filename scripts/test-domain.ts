@@ -34332,7 +34332,7 @@ const pricingPageView = buildPricingPageViewModel();
 assert.deepEqual(pricingPageView.hero, {
   eyebrow: 'ClassGamify plans',
   subtitle:
-    'Start free. Paid plans with more activities, AI drafting, and deeper results are coming soon.',
+    'Start free, then upgrade for more activities, AI drafting, and deeper results.',
   title: 'ClassGamify Plans',
 });
 assert.deepEqual(pricingPageView.valueSection, {

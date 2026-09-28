@@ -79,7 +79,6 @@ export interface PricePlan {
   isLifetime: boolean;               // Whether this is a lifetime plan
   popular?: boolean;                 // Whether to mark this plan as popular in UI
   disabled?: boolean;                // Whether to disable this plan in UI
-  comingSoon?: boolean;              // Announced but not on sale yet; UI offers a waitlist
 }
 
 /**

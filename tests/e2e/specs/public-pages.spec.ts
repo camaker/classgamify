@@ -485,28 +485,19 @@ test.describe('public page smoke coverage', () => {
     });
   }
 
-  test('paid plans offer a waitlist instead of checkout', async ({ page }) => {
+  test('paid plans keep their checkout action', async ({ page }) => {
     await page.goto('/pricing');
-    await expect(
-      page.getByRole('link', {
-        name: getLocaleMessage('en', 'pricing_card_join_waitlist'),
-      })
-    ).toHaveCount(2);
-    await expect(
-      page.getByText(getLocaleMessage('en', 'pricing_card_coming_soon'), {
-        exact: true,
-      })
-    ).toHaveCount(2);
     await expect(
       page.getByRole('link', {
         name: getLocaleMessage('en', 'pricing_card_get_started_for_free'),
       })
-    ).toBeVisible();
+    ).toBeVisible({ timeout: 20_000 });
+    // Guests see the paid-plan action as a sign-in trigger for checkout.
     await expect(
       page.getByRole('button', {
         name: getLocaleMessage('en', 'pricing_card_get_started'),
       })
-    ).toHaveCount(0);
+    ).toHaveCount(2);
   });
 
   test('template cards have their own icons and no mode badge', async ({

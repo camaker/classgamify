@@ -2442,7 +2442,7 @@
   "pricing_school_description": "For multiple teachers, campuses, or long-running cohorts, contact us to plan teacher seats, student data handling, template needs, and rollout timing.",
   "pricing_school_eyebrow": "Schools and teams",
   "pricing_school_title": "Besoin d’un espace pour plusieurs enseignants ?",
-  "pricing_subtitle": "Commencez gratuitement. Des offres payantes avec plus d'activités, des brouillons IA et des résultats plus détaillés arrivent bientôt.",
+  "pricing_subtitle": "Commencez gratuitement, puis passez à l'offre supérieure pour plus d'activités, des brouillons IA et des résultats plus détaillés.",
   "pricing_title": "Offres ClassGamify",
   "pricing_trust_free_preview": "Student preview available",
   "pricing_value_ai_description": "Paid plans will expand around AI creation, remixing, more templates, and result reporting.",
@@ -3144,7 +3144,5 @@
   "activity_new_page_title": "Nouvelle activité",
   "activity_new_page_description": "Choisissez un jeu, ajoutez votre contenu et enregistrez-le dans votre bibliothèque.",
   "activity_library_card_other_games_summary": "Jouer dans un autre jeu",
-  "activity_runner_group_sort_place_prompt": "Placer « {item} » dans :",
-  "pricing_card_coming_soon": "Bientôt disponible",
-  "pricing_card_join_waitlist": "Rejoindre la liste d'attente"
+  "activity_runner_group_sort_place_prompt": "Placer « {item} » dans :"
 }
