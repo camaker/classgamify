@@ -13,6 +13,7 @@ import { getLocale } from '@/lib/locale';
 import { cn } from '@/lib/utils';
 import { getPathWithLocale } from '@/lib/urls';
 import { m } from '@/locale/paraglide/messages';
+import { TEMPLATE_GUIDE_PATHS } from '@/pages/template-guide-content';
 import {
   IconArrowRight,
   IconArrowsLeftRight,
@@ -36,7 +37,7 @@ type TemplateDirectoryCardProps = {
 export function TemplateDirectoryCard({
   template,
 }: TemplateDirectoryCardProps) {
-  const guide = getLocale() === 'en' ? templateGuides[template.template] : null;
+  const guide = getLocale() === 'en' ? getTemplateGuide(template) : null;
   const TemplateIcon = templateVisuals[template.template].icon;
 
   return (
@@ -98,7 +99,7 @@ export function TemplateDirectoryCard({
               href={guide.href}
               className="flex min-h-10 items-center justify-center gap-1 text-sm font-medium text-primary underline-offset-4 hover:underline"
             >
-              {guide.label()}
+              {guide.label}
               <IconArrowRight className="size-4" aria-hidden="true" />
             </a>
           ) : null}
@@ -147,21 +148,20 @@ const templateVisuals: Record<
   },
 };
 
-const templateGuides: Partial<
-  Record<
-    TemplatesPageCardView['template'],
-    { href: string; label: () => string }
-  >
+const templateGuideLabels: Partial<
+  Record<TemplatesPageCardView['template'], () => string>
 > = {
-  quiz: {
-    href: '/classroom-quiz-game',
-    label: m.templates_page_guide_quiz,
-  },
-  'matching-pairs': {
-    href: '/classroom-matching-game',
-    label: m.templates_page_guide_matching,
-  },
+  quiz: m.templates_page_guide_quiz,
+  'matching-pairs': m.templates_page_guide_matching,
 };
+
+function getTemplateGuide(template: TemplatesPageCardView) {
+  const label =
+    templateGuideLabels[template.template]?.() ??
+    m.templates_page_guide_template({ template: template.name });
+
+  return { href: TEMPLATE_GUIDE_PATHS[template.template], label };
+}
 
 function TemplateExamplePreview({
   template,

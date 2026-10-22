@@ -12,6 +12,10 @@ import { overwriteGetLocale } from '@/locale/paraglide/runtime';
 import { Route as BlogPostRoute } from '@/routes/blog/$slug';
 import { Route as BlogIndexRoute } from '@/routes/blog/index';
 import { buildSitemapUrlEntries } from '@/seo/public-indexing';
+import {
+  getBlogIndexLinkLocale,
+  PUBLIC_BLOG_LOCALES,
+} from '@/seo/public-routes';
 
 const BASE_URL = 'https://classgamify.example';
 const POST_SLUG = 'wordwall-style-activity-loop';
@@ -19,6 +23,9 @@ const POST_PATH = `/blog/${POST_SLUG}`;
 
 test('blog index and article locales reflect published content', () => {
   assert.deepEqual(getBlogLocalesWithPosts(), ['en', 'zh']);
+  assert.deepEqual([...PUBLIC_BLOG_LOCALES], getBlogLocalesWithPosts());
+  assert.equal(getBlogIndexLinkLocale('zh'), undefined);
+  assert.equal(getBlogIndexLinkLocale('fr'), 'en');
   assert.deepEqual(getPostLocales(POST_SLUG), ['en', 'zh']);
 
   for (const post of getSortedPosts('en')) {

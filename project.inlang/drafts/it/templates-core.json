@@ -1,6 +1,14 @@
 {
   "templates_page_bottom_description": "Apri l’editor, carica un esempio nel formato di gioco scelto e pubblicalo come link del compito da condividere con gli studenti.",
   "templates_page_bottom_title": "Vuoi creare un’attività?",
+  "templates_page_choose_description": "Tutti i modelli leggono lo stesso contenuto dell’attività: lo scrivi una volta e cambi formato dopo il salvataggio.",
+  "templates_page_choose_groups_description": "Categorie e gli elementi che appartengono a ciascuna: {templates}.",
+  "templates_page_choose_groups_title": "Gruppi",
+  "templates_page_choose_pairs_description": "Termini con significato, traduzione o esempio: {templates}.",
+  "templates_page_choose_pairs_title": "Coppie",
+  "templates_page_choose_questions_description": "Consegne con una risposta o con opzioni di risposta: {templates}.",
+  "templates_page_choose_questions_title": "Domande e risposte",
+  "templates_page_choose_title": "Scegli un modello in base ai contenuti che hai",
   "templates_page_create_activity": "Crea attività",
   "templates_page_create_from_template": "Crea dal modello",
   "templates_page_description": "I modelli ClassGamify presentano le stesse domande, coppie, categorie e parole come verifiche rapide, giochi di abbinamento, schede didattiche, ascolti o attività a caselle per tutta la classe.",
@@ -9,10 +17,11 @@
   "templates_page_footer_create_action_aria_label": "Crea un’attività vuota e riutilizzabile nell’editor condiviso.",
   "templates_page_guide_matching": "Scopri il gioco di abbinamento",
   "templates_page_guide_quiz": "Scopri il quiz per la classe",
+  "templates_page_guide_template": "Come funziona {template}",
   "templates_page_hero_create_action_aria_label": "Crea dalla prima scheda modello e carica il relativo esempio nell’editor condiviso.",
   "templates_page_open_student_preview": "Apri anteprima studente",
-  "templates_page_seo_description": "Scopri i primi modelli di attività ClassGamify per quiz, abbinamenti, collegamenti, classificazioni, completamenti, ascolti, coppie e caselle da scoprire.",
-  "templates_page_seo_title": "Modelli di attività",
+  "templates_page_seo_description": "Modelli di giochi per la classe gratuiti e modificabili: quiz, abbina, collega con le linee, ordina in gruppi, completa la frase, ascolto, coppie da trovare e apri la scatola. Aggiungi i tuoi contenuti e condividi un link.",
+  "templates_page_seo_title": "Modelli di giochi per la classe",
   "templates_page_student_preview_action_aria_label": "Apri l’anteprima dimostrativa del compito per lo studente.",
-  "templates_page_title": "Scegli un formato di gioco per gli stessi contenuti didattici."
+  "templates_page_title": "Modelli di giochi per la classe modificabili"
 }

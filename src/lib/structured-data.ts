@@ -98,6 +98,71 @@ export function articleJsonLd({
   };
 }
 
+export function breadcrumbJsonLd(
+  items: Array<{ name: string; path: string }>
+): JsonLdNode {
+  return {
+    '@type': 'BreadcrumbList',
+    itemListElement: items.map((item, index) => ({
+      '@type': 'ListItem',
+      position: index + 1,
+      name: item.name,
+      item: getCanonicalUrl(item.path),
+    })),
+  };
+}
+
+export function faqPageJsonLd({
+  faqs,
+  path,
+}: {
+  faqs: Array<{ answer: string; question: string }>;
+  path: string;
+}): JsonLdNode {
+  return {
+    '@type': 'FAQPage',
+    '@id': `${getCanonicalUrl(path)}#faq`,
+    mainEntity: faqs.map((faq) => ({
+      '@type': 'Question',
+      name: faq.question,
+      acceptedAnswer: { '@type': 'Answer', text: faq.answer },
+    })),
+  };
+}
+
+/**
+ * Describes the web app itself. Only the free plan is listed as an offer so
+ * the markup never advertises prices that differ from the live pricing page.
+ */
+export function softwareApplicationJsonLd({
+  description,
+  inLanguage,
+}: {
+  description: string;
+  inLanguage: string;
+}): JsonLdNode {
+  const baseUrl = getBaseUrl().replace(/\/$/, '');
+
+  return {
+    '@type': 'SoftwareApplication',
+    '@id': `${baseUrl}/#app`,
+    name: websiteConfig.metadata?.name ?? 'ClassGamify',
+    description,
+    url: `${baseUrl}/`,
+    applicationCategory: 'EducationalApplication',
+    operatingSystem: 'Web browser',
+    inLanguage,
+    audience: { '@type': 'EducationalAudience', educationalRole: 'teacher' },
+    offers: {
+      '@type': 'Offer',
+      price: '0',
+      priceCurrency: 'USD',
+      category: 'free',
+    },
+    publisher: { '@id': `${baseUrl}/#organization` },
+  };
+}
+
 export function graphJsonLd(nodes: JsonLdNode[]): JsonLdNode {
   return {
     '@context': 'https://schema.org',

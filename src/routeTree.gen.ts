@@ -51,6 +51,7 @@ import { Route as SettingsNotificationsRouteImport } from './routes/settings/not
 import { Route as SettingsPaymentRouteImport } from './routes/settings/payment'
 import { Route as SettingsProfileRouteImport } from './routes/settings/profile'
 import { Route as SettingsSecurityRouteImport } from './routes/settings/security'
+import { Route as TemplatesTemplateRouteImport } from './routes/templates_.$template'
 import { Route as ApiAuthSplatRouteImport } from './routes/api/auth/$'
 import { Route as ApiAuthProviderStatusRouteImport } from './routes/api/auth/provider-status'
 import { Route as ApiE2eAssignmentsRouteImport } from './routes/api/e2e/assignments'
@@ -274,6 +275,11 @@ const SettingsSecurityRoute = SettingsSecurityRouteImport.update({
   path: '/security',
   getParentRoute: () => SettingsRoute,
 } as any)
+const TemplatesTemplateRoute = TemplatesTemplateRouteImport.update({
+  id: '/templates_/$template',
+  path: '/templates/$template',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiAuthSplatRoute = ApiAuthSplatRouteImport.update({
   id: '/api/auth/$',
   path: '/api/auth/$',
@@ -377,6 +383,7 @@ export interface FileRoutesByFullPath {
   '/settings/payment': typeof SettingsPaymentRoute
   '/settings/profile': typeof SettingsProfileRoute
   '/settings/security': typeof SettingsSecurityRoute
+  '/templates/$template': typeof TemplatesTemplateRoute
   '/admin/': typeof AdminIndexRoute
   '/blog/': typeof BlogIndexRoute
   '/dashboard/': typeof DashboardIndexRoute
@@ -430,6 +437,7 @@ export interface FileRoutesByTo {
   '/settings/payment': typeof SettingsPaymentRoute
   '/settings/profile': typeof SettingsProfileRoute
   '/settings/security': typeof SettingsSecurityRoute
+  '/templates/$template': typeof TemplatesTemplateRoute
   '/admin': typeof AdminIndexRoute
   '/blog': typeof BlogIndexRoute
   '/dashboard': typeof DashboardIndexRoute
@@ -487,6 +495,7 @@ export interface FileRoutesById {
   '/settings/payment': typeof SettingsPaymentRoute
   '/settings/profile': typeof SettingsProfileRoute
   '/settings/security': typeof SettingsSecurityRoute
+  '/templates_/$template': typeof TemplatesTemplateRoute
   '/admin/': typeof AdminIndexRoute
   '/blog/': typeof BlogIndexRoute
   '/dashboard/': typeof DashboardIndexRoute
@@ -545,6 +554,7 @@ export interface FileRouteTypes {
     | '/settings/payment'
     | '/settings/profile'
     | '/settings/security'
+    | '/templates/$template'
     | '/admin/'
     | '/blog/'
     | '/dashboard/'
@@ -598,6 +608,7 @@ export interface FileRouteTypes {
     | '/settings/payment'
     | '/settings/profile'
     | '/settings/security'
+    | '/templates/$template'
     | '/admin'
     | '/blog'
     | '/dashboard'
@@ -654,6 +665,7 @@ export interface FileRouteTypes {
     | '/settings/payment'
     | '/settings/profile'
     | '/settings/security'
+    | '/templates_/$template'
     | '/admin/'
     | '/blog/'
     | '/dashboard/'
@@ -697,6 +709,7 @@ export interface RootRouteChildren {
   ApiPingRoute: typeof ApiPingRoute
   BlogSlugRoute: typeof BlogSlugRoute
   PlayShareIdRoute: typeof PlayShareIdRoute
+  TemplatesTemplateRoute: typeof TemplatesTemplateRoute
   BlogIndexRoute: typeof BlogIndexRoute
   ApiAuthSplatRoute: typeof ApiAuthSplatRoute
   ApiAuthProviderStatusRoute: typeof ApiAuthProviderStatusRoute
@@ -1005,6 +1018,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SettingsSecurityRouteImport
       parentRoute: typeof SettingsRoute
     }
+    '/templates_/$template': {
+      id: '/templates_/$template'
+      path: '/templates/$template'
+      fullPath: '/templates/$template'
+      preLoaderRoute: typeof TemplatesTemplateRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/auth/$': {
       id: '/api/auth/$'
       path: '/api/auth/$'
@@ -1211,6 +1231,7 @@ const rootRouteChildren: RootRouteChildren = {
   ApiPingRoute: ApiPingRoute,
   BlogSlugRoute: BlogSlugRoute,
   PlayShareIdRoute: PlayShareIdRoute,
+  TemplatesTemplateRoute: TemplatesTemplateRoute,
   BlogIndexRoute: BlogIndexRoute,
   ApiAuthSplatRoute: ApiAuthSplatRoute,
   ApiAuthProviderStatusRoute: ApiAuthProviderStatusRoute,

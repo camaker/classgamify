@@ -2,7 +2,13 @@ import { createRouter } from '@tanstack/react-router';
 import { setupRouterSsrQueryIntegration } from '@tanstack/react-router-ssr-query';
 import { NuqsAdapter } from 'nuqs/adapters/tanstack-router';
 import * as TanstackQuery from './integrations/tanstack-query/root-provider';
-import { deLocalizeUrl, localizeUrl } from '@/locale/paraglide/runtime';
+import {
+  deLocalizeUrl,
+  getLocale,
+  localizeUrl,
+} from '@/locale/paraglide/runtime';
+import { Routes } from '@/lib/routes';
+import { getBlogIndexLinkLocale } from '@/seo/public-routes';
 import { routeTree } from './routeTree.gen';
 
 /**
@@ -20,7 +26,13 @@ export const getRouter = () => {
     // URL Localization via Router Rewrite
     rewrite: {
       input: ({ url }) => deLocalizeUrl(url),
-      output: ({ url }) => localizeUrl(url),
+      output: ({ url }) => {
+        const blogLocale =
+          url.pathname === Routes.Blog
+            ? getBlogIndexLinkLocale(getLocale())
+            : undefined;
+        return localizeUrl(url, blogLocale ? { locale: blogLocale } : {});
+      },
     },
     defaultPreload: 'intent',
     scrollRestoration: true,
