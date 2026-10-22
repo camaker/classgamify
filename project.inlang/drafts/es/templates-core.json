@@ -1,7 +1,7 @@
 {
   "templates_page_bottom_description": "Abre el editor, carga un ejemplo con el formato de juego elegido y publícalo como enlace de tarea para compartir con el alumnado.",
   "templates_page_bottom_title": "¿Listo para crear una actividad?",
-  "templates_page_choose_description": "Cada plantilla usa un tipo de contenido: preguntas, parejas o grupos. Lo escribes una vez y, después de guardar, puedes jugarlo en cualquier otra plantilla que use el mismo tipo.",
+  "templates_page_choose_description": "Cada plantilla usa un tipo de contenido: preguntas, parejas o grupos. Después de guardar, puedes copiar una actividad en otra plantilla que use el mismo tipo.",
   "templates_page_choose_groups_description": "Categorías y los elementos que pertenecen a cada una: {templates}.",
   "templates_page_choose_groups_title": "Grupos",
   "templates_page_choose_pairs_description": "Términos con su significado, traducción o ejemplo: {templates}.",

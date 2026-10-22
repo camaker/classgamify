@@ -1,3 +1,4 @@
+import { linkChangesLocale } from '@/seo/public-routes';
 import { ACTIVITY_TEMPLATE_TYPES } from '@/activities/types';
 import { m } from '@/locale/paraglide/messages';
 import Container from '@/components/layout/container';
@@ -202,7 +203,12 @@ function FooterLink({
   }
 
   return (
-    <Link to={item.href} data-active={active} className={className}>
+    <Link
+      to={item.href}
+      reloadDocument={linkChangesLocale(item.href)}
+      data-active={active}
+      className={className}
+    >
       {content}
       {active ? (
         <span className="mt-1 inline-flex items-center gap-1 text-xs font-medium text-primary">

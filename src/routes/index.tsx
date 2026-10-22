@@ -1,3 +1,4 @@
+import { linkChangesLocale } from '@/seo/public-routes';
 import Container from '@/components/layout/container';
 import { HomeHeroGame } from '@/components/page/home-hero-game';
 import { Badge } from '@/components/ui/badge';
@@ -17,7 +18,6 @@ import {
   graphJsonLd,
   jsonLdScript,
   organizationJsonLd,
-  softwareApplicationJsonLd,
   websiteJsonLd,
 } from '@/lib/structured-data';
 import {
@@ -55,7 +55,6 @@ export const Route = createFileRoute('/')({
           graphJsonLd([
             organizationJsonLd(),
             websiteJsonLd({ description, inLanguage, name, path: '/' }),
-            softwareApplicationJsonLd({ description, inLanguage }),
             faqPageJsonLd({ faqs: guide.faq.items, path: '/' }),
           ])
         ),
@@ -312,6 +311,7 @@ function HomePage() {
                   <li key={link.to}>
                     <Link
                       to={link.to}
+                      reloadDocument={linkChangesLocale(link.to)}
                       className="text-primary underline-offset-4 hover:underline"
                     >
                       {link.label} →

@@ -1,7 +1,7 @@
 {
   "templates_page_bottom_description": "편집기를 열고 선택한 게임 형식의 예시를 불러온 뒤 학생에게 공유할 수 있는 과제 링크로 게시하세요.",
   "templates_page_bottom_title": "활동 초안을 만들어 볼까요?",
-  "templates_page_choose_description": "템플릿마다 문제, 짝, 그룹 중 한 가지 내용을 사용합니다. 한 번 작성해 저장하면 같은 종류의 내용을 쓰는 다른 템플릿으로도 플레이할 수 있습니다.",
+  "templates_page_choose_description": "템플릿마다 문제, 짝, 그룹 중 한 가지 내용을 사용합니다. 저장한 뒤에는 같은 종류의 내용을 쓰는 다른 템플릿으로 활동을 복사할 수 있습니다.",
   "templates_page_choose_groups_description": "범주와 각 범주에 속하는 항목: {templates}.",
   "templates_page_choose_groups_title": "그룹",
   "templates_page_choose_pairs_description": "용어와 뜻, 번역 또는 예시: {templates}.",

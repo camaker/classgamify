@@ -125,7 +125,7 @@ const templateGuides = [
     path: '/templates/open-box',
     template: 'open-box',
     heading: 'Open the box template for prompts and review rounds',
-    example: 'Name one fruit you like.',
+    example: 'Which fruit do people say keeps the doctor away?',
   },
 ] as const;
 
@@ -186,6 +186,14 @@ test('template guide aliases, unknown templates, and other locales', async ({
   expect(pairs.status()).toBe(308);
   expect(pairs.headers().location).toMatch(/\/classroom-matching-game$/);
 
+  const tracked = await request.get('/templates/quiz?utm_source=newsletter', {
+    maxRedirects: 0,
+  });
+  expect(tracked.status()).toBe(308);
+  expect(tracked.headers().location).toMatch(
+    /\/classroom-quiz-game\?utm_source=newsletter$/
+  );
+
   expect((await request.get('/templates/not-a-template')).status()).toBe(404);
   expect((await request.get('/es/templates/match-up')).status()).toBe(404);
 
@@ -231,7 +239,10 @@ test('homepage explains the workflow, links examples, and answers FAQs', async (
   const response = await page.goto('/');
   const html = (await response?.text()) ?? '';
   expect(html).toContain('"@type":"FAQPage"');
-  expect(html).toContain('"@type":"SoftwareApplication"');
+  // No SoftwareApplication node: without real ratings or reviews Google
+  // treats it as invalid, and the page must never advertise a paid offer.
+  expect(html).not.toContain('"@type":"SoftwareApplication"');
+  expect(html).not.toMatch(/"@type":"Offer"/);
 
   await expect(
     page.getByRole('heading', {
@@ -258,5 +269,11 @@ test('homepage explains the workflow, links examples, and answers FAQs', async (
   await expect(
     page.getByRole('main').locator('a[href^="/templates/"]')
   ).toHaveCount(0);
+  // All eight example cards plus "See all templates" stay on /fr/templates.
+  await expect(
+    page.locator(
+      'section[aria-labelledby="home-examples-heading"] a[href="/fr/templates"]'
+    )
+  ).toHaveCount(9);
   await expect(page.locator('a[href="/fr/blog"]')).toHaveCount(0);
 });

@@ -1,3 +1,4 @@
+import { linkChangesLocale } from '@/seo/public-routes';
 import { m } from '@/locale/paraglide/messages';
 import { getNavbarLinks } from '@/config/navbar-config';
 import { useScroll } from '@/hooks/use-scroll';
@@ -110,6 +111,7 @@ export function Navbar({ scroll = true }: NavbarProps) {
                                 render={
                                   <Link
                                     to={sub.href ?? '#'}
+                                    reloadDocument={linkChangesLocale(sub.href)}
                                     target={sub.external ? '_blank' : undefined}
                                     rel={
                                       sub.external
@@ -144,7 +146,12 @@ export function Navbar({ scroll = true }: NavbarProps) {
                   ) : (
                     <NavigationMenuItem key={item.id}>
                       <NavigationMenuLink
-                        render={<Link to={item.href ?? '#'} />}
+                        render={
+                          <Link
+                            to={item.href ?? '#'}
+                            reloadDocument={linkChangesLocale(item.href)}
+                          />
+                        }
                         className={cn(
                           navigationMenuTriggerStyle(),
                           'bg-transparent',

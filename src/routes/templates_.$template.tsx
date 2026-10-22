@@ -16,9 +16,9 @@ import {
 import { cn } from '@/lib/utils';
 import {
   getTemplateDetailGuide,
-  TEMPLATE_GUIDE_PATHS,
   type TemplateDetailGuide,
 } from '@/pages/template-guide-content';
+import { TEMPLATE_GUIDE_PATHS } from '@/pages/template-guide-paths';
 import {
   IconArrowRight,
   IconBulb,
@@ -30,13 +30,14 @@ import { createFileRoute, notFound, redirect } from '@tanstack/react-router';
 const TEMPLATES_BREADCRUMB_LABEL = 'Classroom game templates';
 
 export const Route = createFileRoute('/templates_/$template')({
-  loader: ({ params }) => {
+  loader: ({ location, params }) => {
     if (getLocale() !== 'en') throw notFound();
 
-    // Quiz and matching pairs keep their dedicated guide URLs.
+    // Quiz and matching pairs keep their dedicated guide URLs. Carry the
+    // query string over so campaign and tracking parameters survive.
     if (params.template === 'quiz' || params.template === 'matching-pairs') {
       throw redirect({
-        href: TEMPLATE_GUIDE_PATHS[params.template],
+        href: `${TEMPLATE_GUIDE_PATHS[params.template]}${location.searchStr}`,
         statusCode: 308,
       });
     }

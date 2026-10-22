@@ -130,39 +130,6 @@ export function faqPageJsonLd({
   };
 }
 
-/**
- * Describes the web app itself. Only the free plan is listed as an offer so
- * the markup never advertises prices that differ from the live pricing page.
- */
-export function softwareApplicationJsonLd({
-  description,
-  inLanguage,
-}: {
-  description: string;
-  inLanguage: string;
-}): JsonLdNode {
-  const baseUrl = getBaseUrl().replace(/\/$/, '');
-
-  return {
-    '@type': 'SoftwareApplication',
-    '@id': `${baseUrl}/#app`,
-    name: websiteConfig.metadata?.name ?? 'ClassGamify',
-    description,
-    url: `${baseUrl}/`,
-    applicationCategory: 'EducationalApplication',
-    operatingSystem: 'Web browser',
-    inLanguage,
-    audience: { '@type': 'EducationalAudience', educationalRole: 'teacher' },
-    offers: {
-      '@type': 'Offer',
-      price: '0',
-      priceCurrency: 'USD',
-      category: 'free',
-    },
-    publisher: { '@id': `${baseUrl}/#organization` },
-  };
-}
-
 export function graphJsonLd(nodes: JsonLdNode[]): JsonLdNode {
   return {
     '@context': 'https://schema.org',

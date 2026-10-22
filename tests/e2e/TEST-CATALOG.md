@@ -42,10 +42,12 @@ product-gate scripts, or renaming focused script-level checks.
 Public SEO and content gates also include
 `pnpm exec tsx --test scripts/blog-locale-indexing.test.ts`,
 `pnpm exec tsx --test scripts/static-locale-indexing.test.ts`,
-`pnpm exec tsx --test scripts/legacy-public-redirects.test.ts`, and
+`pnpm exec tsx --test scripts/legacy-public-redirects.test.ts`,
+`pnpm exec tsx --test scripts/template-guide-paths.test.ts`, and
 `pnpm exec tsx --test scripts/markdown-ssr.test.ts`; run the matching gate
 when changing blog translation coverage, static route locale eligibility,
-historical public redirects, or Markdown rendering.
+historical public redirects, template guide URLs and sitemap slugs, or
+Markdown rendering.
 Product-domain export surface has a source-level gate via
 `pnpm exec tsx --test scripts/product-domain-export-surface.test.ts`; run it
 when changing product-domain helper exports, public indexing helpers, dashboard
@@ -886,7 +888,7 @@ Legacy crawl paths `/(pages)/about`, `/(pages)/contact/contact`, the literal
 and `/blog` respectively instead of serving 404 pages.
 | 5 | English classroom game guides lead to real templates | Open `/classroom-quiz-game` and `/classroom-matching-game` in English. Verify distinct H1s and useful, server-rendered classroom examples; confirm each page describes the actual teacher create, publish, student attempt, and results path. Follow each create CTA and verify the editor receives `source=templates` with the correct `quiz` or `matching-pairs` template. Verify the quiz guide links to the public food quiz demo, the matching guide does not present the quiz demo as a matching demo, and both guides have self canonicals without fabricated non-English hreflang links. Visit `/zh/` and `/es/` variants of each guide and verify they return 404 rather than serving indexable English content. |
 | 5a | English template guides are indexable and lead to their editors | **File:** `specs/classroom-game-guides.spec.ts`. Open `/templates/match-up`, `/templates/line-match`, `/templates/group-sort`, `/templates/fill-blank`, `/templates/listening`, and `/templates/open-box`. Verify each returns 200 with a distinct H1, the template's real starter example in server-rendered HTML, visible FAQs, FAQPage and BreadcrumbList JSON-LD, no robots meta, a self canonical, no hreflang links, and links to the other template guides. Follow the create CTA and verify `/create` receives the matching `template`. Verify `/templates/quiz` and `/templates/matching-pairs` 308-redirect to the dedicated guides, unknown templates and `/es/templates/match-up` return 404, and the sitemap lists all six guide URLs. On English `/templates`, verify every card links to its guide and the "Pick a template by the content you have" section is visible; on `/es/templates`, verify no card links to an English-only guide. |
-| 5b | Homepage explains the workflow and answers teacher FAQs | **File:** `specs/classroom-game-guides.spec.ts`. Open `/` and verify the three-step how-it-works section, the eight-template example grid linking to each English guide, the visible FAQ (including whether students need an account), the "More for teachers" links, and FAQPage plus SoftwareApplication JSON-LD whose only offer is the free plan. Open `/fr/` and verify the FAQ is localized, example links stay on the localized template directory, and no link points at the redirecting `/fr/blog` (locales without posts link to `/blog`). |
+| 5b | Homepage explains the workflow and answers teacher FAQs | **File:** `specs/classroom-game-guides.spec.ts`. Open `/` and verify the three-step how-it-works section, the eight-template example grid linking to each English guide, the visible FAQ (including whether students need an account), the "More for teachers" links, and FAQPage JSON-LD with no SoftwareApplication node and no Offer (no ratings exist, and no price is advertised). Open `/fr/` and verify the FAQ is localized, all eight example links plus "See all templates" point at `/fr/templates`, and no link points at the redirecting `/fr/blog` (locales without posts link to `/blog`). |
 
 ## 2. Authentication And Protected Routes
 

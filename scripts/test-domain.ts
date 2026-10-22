@@ -35128,7 +35128,7 @@ assert.deepEqual(worksheetsPageView, {
     },
     {
       ariaLabel:
-        'Create sort. Opens Drag sorting in the shared activity editor with the worksheet scaffold selected.',
+        'Create sort. Opens Group sorting in the shared activity editor with the worksheet scaffold selected.',
       isPrimary: false,
       label: 'Create sort',
       search: { source: 'worksheets', template: 'group-sort' },
@@ -35194,20 +35194,20 @@ assert.deepEqual(worksheetsPageView, {
     {
       action: {
         ariaLabel:
-          'Create sort. Opens Drag sorting in the shared activity editor with the worksheet scaffold selected.',
+          'Create sort. Opens Group sorting in the shared activity editor with the worksheet scaffold selected.',
         label: 'Create sort',
         search: { source: 'worksheets', template: 'group-sort' },
         to: Routes.Create,
       },
       ariaLabel:
-        'Drag sorting: Ask learners to classify words, examples, or concepts into teacher-defined groups before seeing the answer pattern.',
+        'Group sorting: Ask learners to classify words, examples, or concepts into teacher-defined groups before seeing the answer pattern.',
       contentRequirements: [{ id: 'groups', label: 'groups' }],
       description:
         'Ask learners to classify words, examples, or concepts into teacher-defined groups before seeing the answer pattern.',
       signalLabel: 'Same activity, same link',
       signalViews: expectedWorksheetModeSignalViews,
       template: 'group-sort',
-      title: 'Drag sorting',
+      title: 'Group sorting',
     },
   ],
   printable: {
@@ -35270,7 +35270,7 @@ assert.deepEqual(buildWorksheetHeroActions(getWorksheetModeDefinitions()), [
   },
   {
     ariaLabel:
-      'Create sort. Opens Drag sorting in the shared activity editor with the worksheet scaffold selected.',
+      'Create sort. Opens Group sorting in the shared activity editor with the worksheet scaffold selected.',
     isPrimary: false,
     label: 'Create sort',
     search: { source: 'worksheets', template: 'group-sort' },
@@ -40971,7 +40971,7 @@ assert.deepEqual(lineMatchPreviewPanel.actions, [
 assert.deepEqual(buildActivityEditorTemplateSetupView('group-sort'), {
   actionLabel: 'Load example',
   description:
-    'Students drag items into teacher-defined groups and compare patterns.',
+    'Students tap each item, then the group it belongs to, and compare patterns.',
   requirementBadges: [{ id: 'groups', label: 'Requires groups' }],
   reviewChecklistItems: [
     {
@@ -45280,7 +45280,7 @@ assert.match(getActivityTemplateDraftGuidance('open-box'), /reveal-card/);
 assert.match(getActivityTemplateDraftGuidance('line-match'), /line matching/);
 assert.match(
   getActivityTemplateDraftGuidance('matching-pairs'),
-  /memory-style cards/
+  /two-column cards/
 );
 const fallbackDraftResult = createFallbackActivityDraftResult({
   input: {

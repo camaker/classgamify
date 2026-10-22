@@ -9,6 +9,7 @@ import type {
   AssignmentSettings,
 } from '@/activities/types';
 import { formatAssignmentDisplayTitle } from '@/assignments/assignment-display';
+import { m } from '@/locale/paraglide/messages';
 import {
   buildAssignmentDeliverySummary,
   formatAssignmentDeliveryInstructions,
@@ -357,6 +358,13 @@ function toPrintableWorksheetItem({
   templateType: ActivityTemplateType;
 }): PrintableWorksheetItem {
   const responsePolicy = getPrintableWorksheetResponsePolicy(templateType);
+  const sequenceNumber = getPrintableWorksheetSequenceNumber(index);
+  // The listening sentence is the answer's context: printing it would let
+  // students read instead of listen. It stays in the teacher answer key.
+  const prompt =
+    getActivityTemplateRunnerKind(templateType) === 'listening'
+      ? m.assignment_printable_listening_prompt({ number: sequenceNumber })
+      : normalizeRuntimeDisplayText(item.prompt);
 
   return {
     answerSpaceLines: responsePolicy.answerSpaceLines,
@@ -368,9 +376,9 @@ function toPrintableWorksheetItem({
     id: item.id,
     kind: item.kind,
     layout: responsePolicy.itemLayout,
-    prompt: normalizeRuntimeDisplayText(item.prompt),
+    prompt,
     responseMode: responsePolicy.responseMode,
-    sequenceNumber: getPrintableWorksheetSequenceNumber(index),
+    sequenceNumber,
   };
 }
 

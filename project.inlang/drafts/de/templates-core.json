@@ -1,7 +1,7 @@
 {
   "templates_page_bottom_description": "Öffne den Editor, lade ein Beispiel für das gewählte Spielformat und veröffentliche es anschließend als teilbaren Aufgabenlink für Lernende.",
   "templates_page_bottom_title": "Bereit für deine erste Aktivität?",
-  "templates_page_choose_description": "Jede Vorlage nutzt eine Art von Inhalt: Fragen, Paare oder Gruppen. Du schreibst ihn einmal und kannst ihn nach dem Speichern in jeder anderen Vorlage mit derselben Inhaltsart spielen.",
+  "templates_page_choose_description": "Jede Vorlage nutzt eine Art von Inhalt: Fragen, Paare oder Gruppen. Nach dem Speichern kannst du eine Aktivität in eine andere Vorlage mit derselben Inhaltsart kopieren.",
   "templates_page_choose_groups_description": "Kategorien und die Elemente, die dazugehören: {templates}.",
   "templates_page_choose_groups_title": "Gruppen",
   "templates_page_choose_pairs_description": "Begriffe mit Bedeutung, Übersetzung oder Beispiel: {templates}.",

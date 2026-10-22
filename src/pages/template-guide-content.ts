@@ -1,23 +1,11 @@
 import type { ActivityTemplateType } from '@/activities/types';
 
 /**
- * English-only teacher guides for individual game templates.
- *
- * Quiz and matching pairs have hand-built guide routes; every other template
- * renders through `/templates/$template` from the content below. Guide copy
- * must describe what the real student runner and teacher workspace do today.
+ * English-only teacher guides for individual game templates, rendered by
+ * `/templates/$template`. Guide copy must describe what the real student
+ * runner and teacher workspace do today. URLs live in template-guide-paths.ts
+ * so pages that only link to guides do not bundle this copy.
  */
-export const TEMPLATE_GUIDE_PATHS = {
-  quiz: '/classroom-quiz-game',
-  'matching-pairs': '/classroom-matching-game',
-  'match-up': '/templates/match-up',
-  'line-match': '/templates/line-match',
-  'group-sort': '/templates/group-sort',
-  'fill-blank': '/templates/fill-blank',
-  listening: '/templates/listening',
-  'open-box': '/templates/open-box',
-} as const satisfies Record<ActivityTemplateType, string>;
-
 export type TemplateDetailGuideType = Exclude<
   ActivityTemplateType,
   'quiz' | 'matching-pairs'
@@ -88,7 +76,7 @@ const TEMPLATE_DETAIL_GUIDES: Record<
     teacherTips: [
       'Keep every answer distinct. Two answers that both fit make the item unfair.',
       'Six to ten pairs is enough for a five-minute check.',
-      'After saving, the same pairs can also play as line match or matching pairs.',
+      'After saving, you can copy the same pairs into a line match or matching pairs activity.',
     ],
     faqs: [
       {
@@ -156,7 +144,7 @@ const TEMPLATE_DETAIL_GUIDES: Record<
       {
         question: 'Can I reuse my pairs in another game?',
         answer:
-          'Yes. Line match uses the same pair list as match up and matching pairs, so you can play the content in another format after saving.',
+          'Yes. Line match uses the same pair list as match up and matching pairs, so after saving you can copy the pairs into either of those formats.',
       },
     ],
     createLabel: 'Create a line matching worksheet',
@@ -327,7 +315,7 @@ const TEMPLATE_DETAIL_GUIDES: Record<
       'An editable open the box template: students open one box at a time to reveal a prompt and type an answer. Good for speaking practice and whole-class review.',
     h1: 'Open the box template for prompts and review rounds',
     intro:
-      'Open the box hides each prompt behind a numbered box. Students open one box at a time, answer the prompt, and move on. It suits whole-class review, speaking warm-ups, and exit tickets where you want short, open answers instead of multiple choice.',
+      'Open the box puts each prompt behind a numbered box. Students open the boxes in any order and answer one prompt at a time. It suits whole-class review, speaking warm-ups, and exit tickets where you want short typed answers instead of multiple choice.',
     exampleShape: 'questions',
     exampleCaption: 'Example prompts with a model answer',
     studentSteps: [
@@ -355,7 +343,7 @@ const TEMPLATE_DETAIL_GUIDES: Record<
     teacherTips: [
       'Write prompts that have a short answer you can recognize, and add a model answer.',
       'Accept close variants when you review answers together.',
-      'Strong prompts can be reused later as fill in the blank sentences.',
+      'Strong prompts can be copied into a fill in the blank activity later.',
     ],
     faqs: [
       {

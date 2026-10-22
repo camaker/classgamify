@@ -1,5 +1,10 @@
 import { Routes } from '@/lib/routes';
-import { baseLocale, locales, type Locale } from '@/locale/paraglide/runtime';
+import {
+  baseLocale,
+  getLocale,
+  locales,
+  type Locale,
+} from '@/locale/paraglide/runtime';
 
 type PublicIndexableRouteId =
   | 'blog'
@@ -78,7 +83,7 @@ export const PUBLIC_INDEXABLE_STATIC_ROUTES = [
     priority: '0.8',
   },
   // English template guides rendered by `/templates/$template`; keep in sync
-  // with TEMPLATE_GUIDE_PATHS in src/pages/template-guide-content.ts.
+  // with TEMPLATE_GUIDE_PATHS in src/pages/template-guide-paths.ts.
   ...(
     [
       'match-up',
@@ -201,6 +206,19 @@ export function getBlogIndexLinkLocale(locale: Locale): Locale | undefined {
   return (PUBLIC_BLOG_LOCALES as readonly Locale[]).includes(locale)
     ? undefined
     : baseLocale;
+}
+
+/**
+ * True when a link to `path` leaves the current locale (the blog index links
+ * to the base locale where no posts exist). Such links must load a new
+ * document so `<html lang>`, the locale cookie, and messages all switch
+ * together instead of a client-side navigation keeping the old locale.
+ */
+export function linkChangesLocale(path: string | undefined) {
+  return (
+    path === PUBLIC_INDEXED_BLOG_BASE_PATH &&
+    getBlogIndexLinkLocale(getLocale()) !== undefined
+  );
 }
 
 export const PUBLIC_LOCALIZED_PATHS = PUBLIC_INDEXABLE_STATIC_ROUTES.filter(

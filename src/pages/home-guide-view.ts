@@ -6,7 +6,7 @@ import type {
 import { getLocale } from '@/lib/locale';
 import { Routes } from '@/lib/routes';
 import { m } from '@/locale/paraglide/messages';
-import { TEMPLATE_GUIDE_PATHS } from '@/pages/template-guide-content';
+import { TEMPLATE_GUIDE_PATHS } from '@/pages/template-guide-paths';
 
 export type HomeGuideStepId = 'publish' | 'results' | 'template';
 

@@ -1,7 +1,7 @@
 {
   "templates_page_bottom_description": "Apri l’editor, carica un esempio nel formato di gioco scelto e pubblicalo come link del compito da condividere con gli studenti.",
   "templates_page_bottom_title": "Vuoi creare un’attività?",
-  "templates_page_choose_description": "Ogni modello usa un tipo di contenuto: domande, coppie o gruppi. Lo scrivi una volta e, dopo il salvataggio, puoi giocarlo in qualsiasi altro modello che usa lo stesso tipo.",
+  "templates_page_choose_description": "Ogni modello usa un tipo di contenuto: domande, coppie o gruppi. Dopo il salvataggio puoi copiare un’attività in un altro modello che usa lo stesso tipo.",
   "templates_page_choose_groups_description": "Categorie e gli elementi che appartengono a ciascuna: {templates}.",
   "templates_page_choose_groups_title": "Gruppi",
   "templates_page_choose_pairs_description": "Termini con significato, traduzione o esempio: {templates}.",

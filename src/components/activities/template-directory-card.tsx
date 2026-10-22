@@ -13,7 +13,7 @@ import { getLocale } from '@/lib/locale';
 import { cn } from '@/lib/utils';
 import { getPathWithLocale } from '@/lib/urls';
 import { m } from '@/locale/paraglide/messages';
-import { TEMPLATE_GUIDE_PATHS } from '@/pages/template-guide-content';
+import { TEMPLATE_GUIDE_PATHS } from '@/pages/template-guide-paths';
 import {
   IconArrowRight,
   IconArrowsLeftRight,
