@@ -3,14 +3,14 @@ import type {
   ActivityTemplateContentRequirement,
   ActivityTemplateType,
 } from '@/activities/types';
-import { getLocale, localeConfig } from '@/lib/locale';
+import { getLocale } from '@/lib/locale';
 import { Routes } from '@/lib/routes';
 import { m } from '@/locale/paraglide/messages';
 import { TEMPLATE_GUIDE_PATHS } from '@/pages/template-guide-content';
 
 export type HomeGuideStepId = 'publish' | 'results' | 'template';
 
-export type HomeGuideTemplateLink = {
+type HomeGuideTemplateLink = {
   description: string;
   /** English template guide; other locales link to the template directory. */
   guideHref: string | null;
@@ -18,7 +18,7 @@ export type HomeGuideTemplateLink = {
   type: ActivityTemplateType;
 };
 
-export type HomeGuideFaq = {
+type HomeGuideFaq = {
   answer: string;
   question: string;
 };
@@ -32,7 +32,7 @@ type HomeGuideMoreLink = {
     | typeof Routes.Worksheets;
 };
 
-export type HomeGuideView = {
+type HomeGuideView = {
   examples: {
     allLabel: string;
     description: string;
@@ -56,23 +56,22 @@ export type HomeGuideView = {
   };
 };
 
-/** Joins localized names with the locale's own list conjunction. */
-export function formatLocalizedList(items: string[]) {
-  const locale = localeConfig[getLocale()].hreflang;
-  try {
-    return new Intl.ListFormat(locale, {
-      style: 'long',
-      type: 'conjunction',
-    }).format(items);
-  } catch {
-    return items.join(', ');
-  }
+/**
+ * Joins localized template names with the locale's own list separator.
+ *
+ * Deliberately avoids `Intl.ListFormat`: the server (workerd) and the browser
+ * ship different ICU data, so its output can differ between SSR and hydration.
+ * A message-catalog separator renders the same string everywhere, and the
+ * same string feeds both the visible FAQ and its JSON-LD.
+ */
+function joinTemplateNames(names: string[]) {
+  return names.join(m.activity_library_template_list_separator());
 }
 
 export function getTemplateNamesByRequirement(
   requirement: ActivityTemplateContentRequirement
 ) {
-  return formatLocalizedList(
+  return joinTemplateNames(
     getActivityTemplates()
       .filter((template) => template.contentRequirements.includes(requirement))
       .map((template) => template.name)
@@ -132,7 +131,7 @@ export function buildHomeGuideView(): HomeGuideView {
         {
           question: m.home_guide_faq_3_question(),
           answer: m.home_guide_faq_3_answer({
-            templates: formatLocalizedList(
+            templates: joinTemplateNames(
               templates.map((template) => template.name)
             ),
           }),

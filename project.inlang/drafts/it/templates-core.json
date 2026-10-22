@@ -1,7 +1,7 @@
 {
   "templates_page_bottom_description": "Apri l’editor, carica un esempio nel formato di gioco scelto e pubblicalo come link del compito da condividere con gli studenti.",
   "templates_page_bottom_title": "Vuoi creare un’attività?",
-  "templates_page_choose_description": "Tutti i modelli leggono lo stesso contenuto dell’attività: lo scrivi una volta e cambi formato dopo il salvataggio.",
+  "templates_page_choose_description": "Ogni modello usa un tipo di contenuto: domande, coppie o gruppi. Lo scrivi una volta e, dopo il salvataggio, puoi giocarlo in qualsiasi altro modello che usa lo stesso tipo.",
   "templates_page_choose_groups_description": "Categorie e gli elementi che appartengono a ciascuna: {templates}.",
   "templates_page_choose_groups_title": "Gruppi",
   "templates_page_choose_pairs_description": "Termini con significato, traduzione o esempio: {templates}.",
@@ -23,5 +23,5 @@
   "templates_page_seo_description": "Modelli di giochi per la classe gratuiti e modificabili: quiz, abbina, collega con le linee, ordina in gruppi, completa la frase, ascolto, coppie da trovare e apri la scatola. Aggiungi i tuoi contenuti e condividi un link.",
   "templates_page_seo_title": "Modelli di giochi per la classe",
   "templates_page_student_preview_action_aria_label": "Apri l’anteprima dimostrativa del compito per lo studente.",
-  "templates_page_title": "Modelli di giochi per la classe modificabili"
+  "templates_page_title": "Modelli di giochi modificabili per la classe"
 }

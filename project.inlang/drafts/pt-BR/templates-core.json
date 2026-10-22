@@ -1,7 +1,7 @@
 {
   "templates_page_bottom_description": "Abra o editor, carregue um exemplo no formato de jogo escolhido e publique como link de tarefa para compartilhar com os alunos.",
   "templates_page_bottom_title": "Que tal criar uma atividade?",
-  "templates_page_choose_description": "Todos os modelos leem o mesmo conteúdo da atividade: você escreve uma vez e troca de formato depois de salvar.",
+  "templates_page_choose_description": "Cada modelo usa um tipo de conteúdo: perguntas, pares ou grupos. Você escreve uma vez e, depois de salvar, pode jogar em qualquer outro modelo que use o mesmo tipo.",
   "templates_page_choose_groups_description": "Categorias e os itens que pertencem a cada uma: {templates}.",
   "templates_page_choose_groups_title": "Grupos",
   "templates_page_choose_pairs_description": "Termos com significado, tradução ou exemplo: {templates}.",

@@ -48,7 +48,7 @@ export type TemplateDetailGuide = {
   useCases: { detail: string; title: string }[];
 };
 
-export const TEMPLATE_DETAIL_GUIDES: Record<
+const TEMPLATE_DETAIL_GUIDES: Record<
   TemplateDetailGuideType,
   TemplateDetailGuide
 > = {
@@ -64,9 +64,9 @@ export const TEMPLATE_DETAIL_GUIDES: Record<
     exampleShape: 'pairs',
     exampleCaption: 'Example match up pairs from the food-words starter',
     studentSteps: [
-      'Students open your assignment link in a browser and type their name.',
+      'Students open your assignment link in a browser and type their name if you collect names.',
       'For each term, they choose the matching answer from the choices built from your pair list.',
-      'They submit once every term has an answer, and the attempt appears in your results.',
+      'They submit when they finish. If any term is still unanswered, they are asked to confirm first. The attempt then appears in your results.',
     ],
     useCases: [
       {
@@ -121,9 +121,9 @@ export const TEMPLATE_DETAIL_GUIDES: Record<
     exampleShape: 'pairs',
     exampleCaption: 'Example line match prompts and answers',
     studentSteps: [
-      'Students open the assignment link and type their name.',
+      'Students open the assignment link and type their name if you collect names.',
       'They select a prompt on the left, then select its match on the right.',
-      'When every prompt is connected, they submit and you see the attempt in your results.',
+      'They submit when they finish, and you see the attempt in your results. Prompts left unconnected count as unanswered.',
     ],
     useCases: [
       {
@@ -173,9 +173,9 @@ export const TEMPLATE_DETAIL_GUIDES: Record<
     exampleShape: 'groups',
     exampleCaption: 'Example groups and items from the food-words starter',
     studentSteps: [
-      'Students open the assignment link and type their name.',
+      'Students open the assignment link and type their name if you collect names.',
       'They tap an item, then tap the group it belongs to.',
-      'After every item is placed they submit, and you can review which items landed in the wrong group.',
+      'They submit when they finish, and you can review which items landed in the wrong group.',
     ],
     useCases: [
       {
@@ -225,7 +225,7 @@ export const TEMPLATE_DETAIL_GUIDES: Record<
     exampleShape: 'questions',
     exampleCaption: 'Example sentences with the expected answer',
     studentSteps: [
-      'Students open the assignment link and type their name.',
+      'Students open the assignment link and type their name if you collect names.',
       'They read each sentence and type the missing word, using the word bank if you included one.',
       'They submit, and you see each typed answer in the results.',
     ],
@@ -247,7 +247,7 @@ export const TEMPLATE_DETAIL_GUIDES: Record<
       },
     ],
     teacherTips: [
-      'Make sure only one word fits each blank, or note the answers you will accept.',
+      'Make sure only one word fits each blank, or list every answer you accept, separated by a slash.',
       'Keep a word bank for starter groups and remove it for a harder version.',
       'Ask students to read each completed sentence aloud before you review scores.',
     ],
@@ -260,7 +260,7 @@ export const TEMPLATE_DETAIL_GUIDES: Record<
       {
         question: 'What happens with spelling mistakes?',
         answer:
-          'Typed answers are compared with the answer you set. The results show each typed answer so you can spot near misses and decide what to reteach.',
+          'Typed answers are checked against the answer you set, ignoring capital letters and punctuation, so a misspelled word is marked wrong. You can list more than one accepted answer, separated by a slash. The results show each typed answer so you can spot near misses and decide what to reteach.',
       },
     ],
     createLabel: 'Create a fill in the blank activity',
@@ -273,15 +273,15 @@ export const TEMPLATE_DETAIL_GUIDES: Record<
       'Make a listening quiz: students play a sentence read aloud by the browser voice and pick or type the key word. Edit a real example and share it as a student link.',
     h1: 'Listening quiz template for language practice',
     intro:
-      'The listening template reads each sentence aloud with the browser’s speech voice. Students listen, then tap the key word they heard, or type it when you leave out answer choices. The transcript stays hidden until review, so the activity checks listening rather than reading.',
+      'The listening template reads each sentence aloud with the browser’s speech voice. Students listen, then tap the key word they heard, or type it when you leave out answer choices. The sentence is never shown while students answer, so the activity checks listening rather than reading.',
     exampleShape: 'questions',
     exampleColumnLabels: ['Sentence read aloud', 'Key word'],
     exampleCaption:
       'Example spoken sentences and the key word students listen for',
     studentSteps: [
-      'Students open the assignment link and type their name.',
+      'Students open the assignment link and type their name if you collect names.',
       'They press play to hear each sentence, then choose or type the word they heard.',
-      'After they submit, the transcript becomes visible in review so they can check what was said.',
+      'After they submit, the sentence appears in their review so they can check what was said, unless you turned off showing answers after submission.',
     ],
     useCases: [
       {
@@ -314,7 +314,7 @@ export const TEMPLATE_DETAIL_GUIDES: Record<
       {
         question: 'What if a student’s browser cannot play the audio?',
         answer:
-          'The activity tells the student that the browser cannot play the track and to ask you for another way to listen. Try the link on a class device before you assign it.',
+          'The play button is turned off and the activity shows that speech is not available in that browser. Try the link on a class device before you assign it.',
       },
     ],
     createLabel: 'Create a listening quiz',
@@ -331,9 +331,9 @@ export const TEMPLATE_DETAIL_GUIDES: Record<
     exampleShape: 'questions',
     exampleCaption: 'Example prompts with a model answer',
     studentSteps: [
-      'Students open the assignment link and type their name.',
-      'They tap a box to reveal its prompt, then type an answer.',
-      'They submit after the boxes are answered, and you see each response in the results.',
+      'Students open the assignment link and type their name if you collect names.',
+      'They tap a box to open its prompt, then type an answer.',
+      'They submit when they finish, and you see each response in the results.',
     ],
     useCases: [
       {
@@ -366,16 +366,12 @@ export const TEMPLATE_DETAIL_GUIDES: Record<
       {
         question: 'Do answers have to match exactly?',
         answer:
-          'Each prompt has a model answer for scoring. Because answers are open, review the typed responses in the results and accept close variants with your class.',
+          'Each prompt has a model answer for scoring. Capital letters and punctuation are ignored, but other differences are marked wrong, so add accepted alternatives separated by a slash. Review the typed responses in the results and talk through close variants with your class.',
       },
     ],
     createLabel: 'Create an open the box activity',
   },
 };
-
-export const TEMPLATE_DETAIL_GUIDE_TYPES = Object.keys(
-  TEMPLATE_DETAIL_GUIDES
-) as TemplateDetailGuideType[];
 
 export function getTemplateDetailGuide(
   type: string

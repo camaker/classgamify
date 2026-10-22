@@ -1,7 +1,7 @@
 {
   "templates_page_bottom_description": "エディターを開き、選んだゲーム形式のサンプルを読み込んで、生徒に共有できる課題リンクとして公開します。",
   "templates_page_bottom_title": "アクティビティを作ってみませんか？",
-  "templates_page_choose_description": "どのテンプレートも同じアクティビティ内容を読み込みます。一度書けば、保存後に別の形式へ切り替えられます。",
+  "templates_page_choose_description": "各テンプレートが使う内容は、問題、ペア、グループのいずれか1種類です。一度書けば、保存後に同じ種類の内容を使う別のテンプレートでも遊べます。",
   "templates_page_choose_groups_description": "カテゴリーとそこに入る項目：{templates}。",
   "templates_page_choose_groups_title": "グループ",
   "templates_page_choose_pairs_description": "用語と意味・訳・例のペア：{templates}。",
