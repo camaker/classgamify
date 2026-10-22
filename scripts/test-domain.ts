@@ -12780,9 +12780,9 @@ const pricePlans = getPricePlans();
 assert.deepEqual(Object.keys(pricePlans), ['free', 'pro', 'lifetime']);
 assert.ok(
   pricePlans.free?.features?.some((feature) =>
-    feature.toLowerCase().includes('intro classroom templates')
+    feature.toLowerCase().includes('all eight classroom game templates')
   ),
-  'The free plan should describe intro classroom templates instead of copied starter templates.'
+  'The free plan should describe the full template catalog it actually unlocks.'
 );
 assert.ok(
   pricePlans.free?.features?.every(
@@ -12794,7 +12794,7 @@ assert.ok(
   pricePlans.free?.features?.some((feature) =>
     feature.toLowerCase().includes('assignment link')
   ),
-  'The free plan should describe a real sample assignment-link workflow.'
+  'The free plan should describe a real assignment-link workflow.'
 );
 assert.ok(
   pricePlans.pro?.features?.some((feature) =>
@@ -34332,7 +34332,7 @@ const pricingPageView = buildPricingPageViewModel();
 assert.deepEqual(pricingPageView.hero, {
   eyebrow: 'ClassGamify plans',
   subtitle:
-    'Start free, then upgrade for more activities, AI drafting, and deeper results.',
+    'Start free, no credit card needed. Compare what each plan includes below.',
   title: 'ClassGamify Plans',
 });
 assert.deepEqual(pricingPageView.valueSection, {
@@ -34395,9 +34395,9 @@ assert.deepEqual(
 assert.deepEqual(buildPricingFaqItems(), [
   {
     answer:
-      'The free plan lets you browse templates, create a few activities, preview them as a student, and see whether ClassGamify fits your class.',
+      'The free plan lets you create activities with any of the eight templates, publish student assignment links, and review results, with no credit card needed.',
     ariaLabel:
-      'What is the free plan for?: The free plan lets you browse templates, create a few activities, preview them as a student, and see whether ClassGamify fits your class.',
+      'What is the free plan for?: The free plan lets you create activities with any of the eight templates, publish student assignment links, and review results, with no credit card needed.',
     id: 'free',
     question: 'What is the free plan for?',
   },
