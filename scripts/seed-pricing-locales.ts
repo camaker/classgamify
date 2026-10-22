@@ -1,4 +1,13 @@
-import { mkdir, writeFile } from 'node:fs/promises';
+/**
+ * One-off bootstrap for `project.inlang/drafts/<locale>/pricing-core.json`.
+ *
+ * The translations below are the original seed and are older than the
+ * reviewed drafts. To stay safe, this script never overwrites a key that a
+ * draft already has: it only adds keys that are missing, and leaves every
+ * existing value untouched. Edit the draft JSON files directly to change
+ * pricing copy; do not edit the strings here expecting them to win.
+ */
+import { mkdir, readFile, writeFile } from 'node:fs/promises';
 
 const translations: Record<string, Record<string, string>> = {
   fr: {
@@ -99,13 +108,26 @@ const translations: Record<string, Record<string, string>> = {
     pricing_school_title: 'هل تحتاج إلى مساحة عمل لعدة معلمين؟',
   },
 };
+let addedKeyCount = 0;
 for (const [locale, messages] of Object.entries(translations)) {
+  const path = `project.inlang/drafts/${locale}/pricing-core.json`;
   await mkdir(`project.inlang/drafts/${locale}`, { recursive: true });
+  const existing = await readFile(path, 'utf8')
+    .then((raw) => JSON.parse(raw) as Record<string, string>)
+    .catch((error: NodeJS.ErrnoException) => {
+      if (error.code === 'ENOENT') return {};
+      throw error;
+    });
+  const missing = Object.fromEntries(
+    Object.entries(messages).filter(([key]) => !(key in existing))
+  );
+  addedKeyCount += Object.keys(missing).length;
+  if (!Object.keys(missing).length) continue;
   await writeFile(
-    `project.inlang/drafts/${locale}/pricing-core.json`,
-    `${JSON.stringify(messages, null, 2)}\n`
+    path,
+    `${JSON.stringify({ ...existing, ...missing }, null, 2)}\n`
   );
 }
 console.log(
-  `Seeded pricing core for ${Object.keys(translations).length} locales`
+  `Added ${addedKeyCount} missing pricing core keys; existing draft values were left unchanged`
 );

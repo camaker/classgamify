@@ -14,6 +14,7 @@ type HomeGuideTemplateLink = {
   description: string;
   /** English template guide; other locales link to the template directory. */
   guideHref: string | null;
+  directoryTo: typeof Routes.Templates;
   name: string;
   type: ActivityTemplateType;
 };
@@ -34,7 +35,7 @@ type HomeGuideMoreLink = {
 
 type HomeGuideView = {
   examples: {
-    allLabel: string;
+    allAction: { label: string; to: typeof Routes.Templates };
     description: string;
     eyebrow: string;
     templates: HomeGuideTemplateLink[];
@@ -108,10 +109,14 @@ export function buildHomeGuideView(): HomeGuideView {
       eyebrow: m.home_guide_examples_eyebrow(),
       title: m.home_guide_examples_title(),
       description: m.home_guide_examples_description(),
-      allLabel: m.home_guide_examples_all(),
+      allAction: {
+        label: m.home_guide_examples_all(),
+        to: Routes.Templates,
+      },
       templates: templates.map((template) => ({
         description: template.description,
         guideHref: isEnglish ? TEMPLATE_GUIDE_PATHS[template.type] : null,
+        directoryTo: Routes.Templates,
         name: template.name,
         type: template.type,
       })),

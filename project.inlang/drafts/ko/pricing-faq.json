@@ -1,0 +1,14 @@
+{
+  "pricing_faq_title": "자주 묻는 질문",
+  "pricing_faq_description": "템플릿, 과제 링크, 학생 결과, 학교 사용에 관한 질문입니다.",
+  "pricing_faq_free_question": "무료 요금제에는 무엇이 포함되나요?",
+  "pricing_faq_free_answer": "무료 요금제로 8가지 템플릿 모두를 사용해 활동을 만들고, 학생용 과제 링크를 게시하고, 결과를 확인할 수 있습니다. 신용카드는 필요 없습니다.",
+  "pricing_faq_pro_question": "Teacher Pro에는 무엇이 포함되나요?",
+  "pricing_faq_pro_answer": "Teacher Pro에는 무료 요금제의 모든 기능이 포함되며 월간 또는 연간으로 결제합니다. 얼리 서포터는 같은 이용 범위를 한 번의 결제로 제공합니다.",
+  "pricing_faq_templates_question": "왜 템플릿이 8가지로 시작하나요?",
+  "pricing_faq_templates_answer": "만들기, 게시, 플레이, 결과 확인이 안정적으로 작동하도록 자주 쓰는 수업용 템플릿 8가지로 먼저 시작하고, 그다음에 템플릿을 늘립니다.",
+  "pricing_faq_student_accounts_question": "학생에게 계정이 필요한가요?",
+  "pricing_faq_student_accounts_answer": "아니요. 학생은 공개 과제 링크를 열기만 하면 됩니다. 이름을 입력하게 할지 익명으로 둘지는 선생님이 정합니다. 만들기, 게시, 결과 확인에는 선생님 계정만 필요합니다.",
+  "pricing_faq_schools_question": "학교나 학원 팀에서도 사용할 수 있나요?",
+  "pricing_faq_schools_answer": "현재는 선생님마다 각자의 계정을 사용하며, 학교에서 함께 쓰는 워크스페이스는 아직 없습니다. 규모가 큰 도입 전에 연락 주시면 교사 좌석, 학생 데이터 규칙, 권한을 함께 논의하겠습니다."
+}

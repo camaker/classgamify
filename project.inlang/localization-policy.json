@@ -103,6 +103,30 @@
       "pricing_title",
       "pricing_yearly"
     ],
+    "pricing-faq": [
+      "pricing_faq_description",
+      "pricing_faq_free_answer",
+      "pricing_faq_free_question",
+      "pricing_faq_pro_answer",
+      "pricing_faq_pro_question",
+      "pricing_faq_schools_answer",
+      "pricing_faq_schools_question",
+      "pricing_faq_student_accounts_answer",
+      "pricing_faq_student_accounts_question",
+      "pricing_faq_templates_answer",
+      "pricing_faq_templates_question",
+      "pricing_faq_title"
+    ],
+    "pricing-plans": [
+      "pricing_plans_free_description",
+      "pricing_plans_free_features",
+      "pricing_plans_lifetime_description",
+      "pricing_plans_lifetime_features",
+      "pricing_plans_pro_description",
+      "pricing_plans_pro_features",
+      "pricing_plans_pro_limits",
+      "pricing_value_ai_description"
+    ],
     "home-stats-brand": [
       "home_logo_cloud_title",
       "home_stats_items_item_1_title",
@@ -1517,10 +1541,6 @@
     "auth_reset_password_reset",
     "auth_reset_password_show_password",
     "auth_reset_password_title",
-    "home_faqs_items_item_2_answer",
-    "home_faqs_items_item_2_question",
-    "home_faqs_items_item_4_answer",
-    "home_faqs_items_item_4_question",
     "worksheets_page_delivery_loop_aria_label",
     "worksheets_page_delivery_loop_description",
     "worksheets_page_delivery_loop_title",
@@ -1612,7 +1632,6 @@
     "^assignment_list_handoff_",
     "^create_page_template_entry_source_",
     "^teachers_page_handoff_",
-    "^home_faqs_",
     "^contact_"
   ],
   "legalMarkdown": ["cookie.md", "privacy.md", "terms.md"]

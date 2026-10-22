@@ -10018,7 +10018,7 @@ assert.equal(
 );
 assert.match(
   noPlanBillingView.nextStep?.description ?? '',
-  /student previews/
+  /free plan includes every template/
 );
 const freeBillingView = buildSettingsBillingCardViewModel({
   canManageBilling: true,
@@ -10041,7 +10041,10 @@ assert.equal(
   freeBillingView.action?.ariaLabel,
   'View ClassGamify plans. Billing action for the current ClassGamify teacher workspace.'
 );
-assert.match(freeBillingView.plan?.message ?? '', /starter activities and student previews/);
+assert.match(
+  freeBillingView.plan?.message ?? '',
+  /all eight templates, student assignment links, and results with CSV export/
+);
 assert.deepEqual(
   freeBillingView.plan?.featureSections.map((section) => [
     section.id,
@@ -10067,7 +10070,7 @@ assert.match(
 );
 assert.match(
   freeBillingView.plan?.nextStep.description ?? '',
-  /publish assignments every week/
+  /Paid plans include the same tools/
 );
 assert.doesNotMatch(
   freeBillingView.plan?.message ?? '',
@@ -12798,21 +12801,28 @@ assert.ok(
 );
 assert.ok(
   pricePlans.pro?.features?.some((feature) =>
-    feature.toLowerCase().includes('student completion')
+    feature.toLowerCase().includes('everything in the free plan')
   ),
-  'The Pro plan should include student completion and score tracking.'
+  'The Pro plan should state that it includes the free plan.'
 );
 assert.ok(
-  pricePlans.pro?.features?.some((feature) =>
-    feature.toLowerCase().includes('ai-assisted')
+  pricePlans.pro?.features?.every(
+    (feature) =>
+      !/larger activity library|more published assignments/i.test(feature)
   ),
-  'The Pro plan should include AI-assisted activity drafting.'
+  'The Pro plan should not claim limits that no code enforces.'
 );
 assert.ok(
   pricePlans.lifetime?.features?.some((feature) =>
-    feature.toLowerCase().includes('new templates')
+    feature.toLowerCase().includes('one-time payment')
   ),
-  'The lifetime plan should preserve early access to new ClassGamify templates.'
+  'The lifetime plan should describe its one-time payment.'
+);
+assert.ok(
+  pricePlans.lifetime?.features?.every(
+    (feature) => !feature.toLowerCase().includes('early access')
+  ),
+  'The lifetime plan should not promise early access that no code gates.'
 );
 assert.equal(
   existsSync('src/routes/settings/apikeys.tsx'),
@@ -12906,6 +12916,12 @@ assert.deepEqual(
     'templates',
     'classroom-quiz-game',
     'classroom-matching-game',
+    'template-match-up',
+    'template-line-match',
+    'template-group-sort',
+    'template-fill-blank',
+    'template-listening',
+    'template-open-box',
     'worksheets',
     'create',
     'pricing',
@@ -34047,7 +34063,7 @@ assert.deepEqual(homePageVisibleView, {
       to: Routes.Templates,
     },
     description:
-      'Start with a quiz or matching game, share a link students can open, and review their responses after they play.',
+      "For teachers: turn your lesson content into a quiz or matching game, share one link students open without an account, and see each student's score after they play.",
     primaryAction: {
       ariaLabel:
         'Create a reusable ClassGamify activity in the shared editor.',
@@ -34361,9 +34377,9 @@ assert.deepEqual(pricingPageView.valueCards, [
   },
   {
     ariaLabel:
-      'AI creation speed: Paid plans will expand around AI creation, remixing, more templates, and result reporting.',
+      'AI creation speed: AI drafts and template remixing help turn lesson notes into activities you can review and publish.',
     description:
-      'Paid plans will expand around AI creation, remixing, more templates, and result reporting.',
+      'AI drafts and template remixing help turn lesson notes into activities you can review and publish.',
     id: 'ai',
     title: 'AI creation speed',
   },
@@ -34385,9 +34401,9 @@ assert.deepEqual(pricingPageView.schoolCta, {
 assert.deepEqual(
   buildPricingFaqItems().map((item) => [item.id, item.question]),
   [
-    ['free', 'What is the free plan for?'],
-    ['pro', 'What will Pro unlock?'],
-    ['templates', 'Why are there only a few templates first?'],
+    ['free', 'What does the free plan include?'],
+    ['pro', 'What does Teacher Pro include?'],
+    ['templates', 'Why does the catalog start with eight templates?'],
     ['student-accounts', 'Do students need accounts?'],
     ['schools', 'Can schools or tutoring teams use it?'],
   ]
@@ -34397,39 +34413,39 @@ assert.deepEqual(buildPricingFaqItems(), [
     answer:
       'The free plan lets you create activities with any of the eight templates, publish student assignment links, and review results, with no credit card needed.',
     ariaLabel:
-      'What is the free plan for?: The free plan lets you create activities with any of the eight templates, publish student assignment links, and review results, with no credit card needed.',
+      'What does the free plan include?: The free plan lets you create activities with any of the eight templates, publish student assignment links, and review results, with no credit card needed.',
     id: 'free',
-    question: 'What is the free plan for?',
+    question: 'What does the free plan include?',
   },
   {
     answer:
-      'Pro will expand around higher activity and assignment limits, result tracking, AI generation, and faster template remixing.',
+      'Teacher Pro includes everything in the free plan and is billed monthly or yearly. Early Supporter is a one-time payment for the same access.',
     ariaLabel:
-      'What will Pro unlock?: Pro will expand around higher activity and assignment limits, result tracking, AI generation, and faster template remixing.',
+      'What does Teacher Pro include?: Teacher Pro includes everything in the free plan and is billed monthly or yearly. Early Supporter is a one-time payment for the same access.',
     id: 'pro',
-    question: 'What will Pro unlock?',
+    question: 'What does Teacher Pro include?',
   },
   {
     answer:
-      'The first version intentionally starts with a focused set of high-frequency classroom templates so creation, publishing, student play, and results become reliable before the catalog grows.',
+      'The catalog starts with eight high-use classroom templates so that creating, publishing, playing, and reviewing results stay reliable before more are added.',
     ariaLabel:
-      'Why are there only a few templates first?: The first version intentionally starts with a focused set of high-frequency classroom templates so creation, publishing, student play, and results become reliable before the catalog grows.',
+      'Why does the catalog start with eight templates?: The catalog starts with eight high-use classroom templates so that creating, publishing, playing, and reviewing results stay reliable before more are added.',
     id: 'templates',
-    question: 'Why are there only a few templates first?',
+    question: 'Why does the catalog start with eight templates?',
   },
   {
     answer:
-      'The v1 direction is public assignment links with a lightweight student name or anonymous token. Teacher accounts own creation, publishing, and results.',
+      'No. Students open a public assignment link. You choose whether they type a name or stay anonymous. Only teachers need an account to create, publish, and review results.',
     ariaLabel:
-      'Do students need accounts?: The v1 direction is public assignment links with a lightweight student name or anonymous token. Teacher accounts own creation, publishing, and results.',
+      'Do students need accounts?: No. Students open a public assignment link. You choose whether they type a name or stay anonymous. Only teachers need an account to create, publish, and review results.',
     id: 'student-accounts',
     question: 'Do students need accounts?',
   },
   {
     answer:
-      'That is part of the classroom direction. School use needs teacher seats, student data rules, permissions, and rollout details, so contact us before a larger deployment.',
+      'Each teacher works in their own account today, and there is no shared school workspace yet. Contact us before a larger rollout to talk through teacher seats, student data rules, and permissions.',
     ariaLabel:
-      'Can schools or tutoring teams use it?: That is part of the classroom direction. School use needs teacher seats, student data rules, permissions, and rollout details, so contact us before a larger deployment.',
+      'Can schools or tutoring teams use it?: Each teacher works in their own account today, and there is no shared school workspace yet. Contact us before a larger rollout to talk through teacher seats, student data rules, and permissions.',
     id: 'schools',
     question: 'Can schools or tutoring teams use it?',
   },
@@ -34539,7 +34555,7 @@ assert.deepEqual(buildTemplatesPageViewModel(), {
       label: 'Open student preview',
       to: Routes.StudentPreview,
     },
-    title: 'Choose a classroom game to make',
+    title: 'Editable classroom game templates',
   },
 });
 assert.deepEqual(

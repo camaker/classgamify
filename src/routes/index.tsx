@@ -248,13 +248,13 @@ function HomePage() {
               </p>
             </div>
             <Link
-              to={Routes.Templates}
+              to={guide.examples.allAction.to}
               className={cn(
                 buttonVariants({ variant: 'outline' }),
                 'w-fit rounded-lg bg-background'
               )}
             >
-              {guide.examples.allLabel}
+              {guide.examples.allAction.label}
               <IconArrowRight className="size-4" aria-hidden="true" />
             </Link>
           </div>
@@ -280,7 +280,7 @@ function HomePage() {
                       {content}
                     </a>
                   ) : (
-                    <Link to={Routes.Templates} className={className}>
+                    <Link to={template.directoryTo} className={className}>
                       {content}
                     </Link>
                   )}

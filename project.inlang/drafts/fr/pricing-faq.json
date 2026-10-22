@@ -1,0 +1,14 @@
+{
+  "pricing_faq_title": "Questions fréquentes",
+  "pricing_faq_description": "Questions sur les modèles, les liens de devoir, les résultats des élèves et l’usage en établissement.",
+  "pricing_faq_free_question": "Que comprend l’offre gratuite ?",
+  "pricing_faq_free_answer": "L’offre gratuite permet de créer des activités avec les huit modèles, de publier des liens de devoir pour les élèves et de consulter les résultats, sans carte bancaire.",
+  "pricing_faq_pro_question": "Que comprend Teacher Pro ?",
+  "pricing_faq_pro_answer": "Teacher Pro comprend tout ce que propose l’offre gratuite, avec une facturation mensuelle ou annuelle. Membre fondateur est un paiement unique pour le même accès.",
+  "pricing_faq_templates_question": "Pourquoi le catalogue commence-t-il avec huit modèles ?",
+  "pricing_faq_templates_answer": "Le catalogue commence avec huit modèles très utilisés en classe pour que la création, la publication, le jeu et la consultation des résultats restent fiables avant d’en ajouter d’autres.",
+  "pricing_faq_student_accounts_question": "Les élèves ont-ils besoin d’un compte ?",
+  "pricing_faq_student_accounts_answer": "Non. Les élèves ouvrent un lien de devoir public. Vous choisissez s’ils saisissent un nom ou restent anonymes. Seuls les enseignants ont besoin d’un compte pour créer, publier et consulter les résultats.",
+  "pricing_faq_schools_question": "Les établissements ou les équipes de soutien scolaire peuvent-ils l’utiliser ?",
+  "pricing_faq_schools_answer": "Pour l’instant, chaque enseignant travaille dans son propre compte et il n’existe pas encore d’espace partagé pour un établissement. Contactez-nous avant un déploiement plus large pour parler des postes enseignants, des règles sur les données des élèves et des autorisations."
+}

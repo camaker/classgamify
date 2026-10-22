@@ -1,0 +1,10 @@
+{
+  "pricing_plans_free_description": "クレジットカード不要で、アクティビティを作成し生徒用リンクを共有できます。",
+  "pricing_plans_free_features": "[\"8種類すべての授業用ゲームテンプレート\",\"自分のアクティビティの作成と編集\",\"生徒用の課題リンクの公開\",\"結果の確認とCSVダウンロード\"]",
+  "pricing_plans_pro_description": "無料プランのすべてを、月払いまたは年払いのサブスクリプションで。",
+  "pricing_plans_pro_features": "[\"無料プランのすべて\",\"月払いまたは年払い\",\"請求ポータルで管理・解約\"]",
+  "pricing_plans_pro_limits": "[\"学校ワークスペースの席\"]",
+  "pricing_plans_lifetime_description": "Teacher Pro のすべてを、一度の支払いで。",
+  "pricing_plans_lifetime_features": "[\"Teacher Pro のすべて\",\"一度の支払いでサブスクリプションなし\",\"創設者向け価格\"]",
+  "pricing_value_ai_description": "AI 下書きとテンプレートのリミックスで、授業メモを確認・公開できるアクティビティにすばやく変えられます。"
+}

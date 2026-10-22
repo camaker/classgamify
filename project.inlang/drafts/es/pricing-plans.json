@@ -1,0 +1,10 @@
+{
+  "pricing_plans_free_description": "Crea actividades y comparte enlaces con estudiantes, sin tarjeta de crédito.",
+  "pricing_plans_free_features": "[\"Las ocho plantillas de juegos para clase\",\"Crea y edita tus propias actividades\",\"Publica enlaces de tareas para el alumnado\",\"Revisa los resultados y descárgalos en CSV\"]",
+  "pricing_plans_pro_description": "Todo lo del plan gratuito con una suscripción mensual o anual.",
+  "pricing_plans_pro_features": "[\"Todo lo del plan gratuito\",\"Facturación mensual o anual\",\"Gestión o cancelación en el portal de facturación\"]",
+  "pricing_plans_pro_limits": "[\"Plazas para un espacio de centro\"]",
+  "pricing_plans_lifetime_description": "Todo lo de Teacher Pro con un único pago.",
+  "pricing_plans_lifetime_features": "[\"Todo lo de Teacher Pro\",\"Pago único, sin suscripción\",\"Precio de fundador\"]",
+  "pricing_value_ai_description": "Los borradores con IA y el remix de plantillas te ayudan a convertir tus notas de clase en actividades para revisar y publicar."
+}

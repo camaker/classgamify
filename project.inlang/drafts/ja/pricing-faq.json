@@ -1,0 +1,14 @@
+{
+  "pricing_faq_title": "よくある質問",
+  "pricing_faq_description": "テンプレート、課題リンク、生徒の結果、学校での利用についての質問です。",
+  "pricing_faq_free_question": "無料プランには何が含まれますか？",
+  "pricing_faq_free_answer": "無料プランでは、8種類すべてのテンプレートでアクティビティを作成し、生徒用の課題リンクを公開して結果を確認できます。クレジットカードは不要です。",
+  "pricing_faq_pro_question": "Teacher Pro には何が含まれますか？",
+  "pricing_faq_pro_answer": "Teacher Pro には無料プランのすべてが含まれ、月払いまたは年払いです。早期サポーターは、同じ内容を一度の支払いで利用できるプランです。",
+  "pricing_faq_templates_question": "なぜテンプレートは8種類から始まっているのですか？",
+  "pricing_faq_templates_answer": "作成、公開、プレイ、結果の確認が安定して動くように、まずはよく使われる8種類の授業用テンプレートから始めています。その後、種類を増やしていきます。",
+  "pricing_faq_student_accounts_question": "生徒にアカウントは必要ですか？",
+  "pricing_faq_student_accounts_answer": "いいえ。生徒は公開された課題リンクを開くだけです。名前を入力させるか匿名にするかは先生が選べます。作成、公開、結果の確認にアカウントが必要なのは先生だけです。",
+  "pricing_faq_schools_question": "学校や塾のチームでも使えますか？",
+  "pricing_faq_schools_answer": "現在は先生ごとに自分のアカウントで利用する形で、学校で共有するワークスペースはまだありません。大規模に導入する前に、先生の席数、生徒データの扱い、権限についてご相談ください。"
+}
