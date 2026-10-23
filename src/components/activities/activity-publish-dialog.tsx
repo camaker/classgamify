@@ -21,6 +21,10 @@ import { usePublishAssignment } from '@/hooks/use-assignments';
 import { IconPlus } from '@tabler/icons-react';
 import { useEffect, useId, useMemo, useState } from 'react';
 import { toast } from 'sonner';
+import { toastPlanLimitOrError } from '@/components/payment/plan-limit-toast';
+import { PlanLimitNotice } from '@/components/payment/plan-limit-notice';
+import { usePlanUsage } from '@/hooks/use-plan-usage';
+import { buildPlanLimitReachedMessage } from '@/payment/plan-usage-view';
 
 type ActivityPublishDialogActivity = {
   id: string;
@@ -69,6 +73,17 @@ export function ActivityPublishDialog({
     setPublishDraft(publishDraftDefaults);
   }, [publishDraftDefaults]);
 
+  const { data: planUsage } = usePlanUsage(open);
+  const openLinkMeter = planUsage?.meters.openAssignments;
+  const openLinkLimitMessage =
+    planUsage && openLinkMeter?.reached && openLinkMeter.limit !== null
+      ? buildPlanLimitReachedMessage({
+          kind: 'openAssignments',
+          limit: openLinkMeter.limit,
+          planId: planUsage.planId,
+        })
+      : undefined;
+
   function updatePublishDraft<TKey extends keyof AssignmentPublishDraftValues>(
     key: TKey,
     value: AssignmentPublishDraftValues[TKey]
@@ -94,8 +109,8 @@ export function ActivityPublishDialog({
       toast.success(executionPlan.successMessage);
       onOpenChange(false);
       onPublished?.(result);
-    } catch {
-      toast.error(executionPlan.failureMessage);
+    } catch (error) {
+      toastPlanLimitOrError(error, executionPlan.failureMessage);
     }
   }
 
@@ -154,6 +169,9 @@ export function ActivityPublishDialog({
           onDraftChange={updatePublishDraft}
           view={publishView}
         />
+        {openLinkLimitMessage ? (
+          <PlanLimitNotice message={openLinkLimitMessage} />
+        ) : null}
         <DialogFooter>
           <Button
             type="button"
@@ -164,7 +182,10 @@ export function ActivityPublishDialog({
           </Button>
           <Button
             type="button"
-            disabled={publishView.dialogState.publishDisabled}
+            disabled={
+              publishView.dialogState.publishDisabled ||
+              Boolean(openLinkLimitMessage)
+            }
             onClick={publishActivity}
           >
             <IconPlus className="size-4" />

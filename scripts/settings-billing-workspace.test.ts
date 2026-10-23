@@ -70,10 +70,16 @@ test('billing card view model separates classroom plan states and hosted actions
   assert.equal(errorView.action?.kind, 'retry');
   assert.equal(noPlanView.state, 'no-plan');
   assert.equal(noPlanView.action?.kind, 'upgrade');
-  assert.match(noPlanView.nextStep?.description ?? '', /free workflow/);
+  assert.match(
+    noPlanView.nextStep?.description ?? '',
+    /Results and CSV export are never limited/
+  );
   assert.equal(freeView.plan?.id, 'free');
   assert.equal(freeView.action?.kind, 'upgrade');
-  assert.match(freeView.plan?.message ?? '', /starter activities/);
+  assert.match(
+    freeView.plan?.message ?? '',
+    /up to 15 activities \(archived ones don't count\), up to 3 open assignment links/
+  );
   assert.equal(proView.plan?.name, 'Teacher Pro');
   assert.equal(proView.action?.kind, 'manage-subscription');
   assert.equal(proView.statusBadge?.tone, 'active');

@@ -83,3 +83,27 @@ Stripe provides a built-in **Customer Portal** for managing subscriptions (upgra
 - Creem is a **merchant of record** — it handles tax, VAT, and payouts on your behalf.
 - Creem provides a **customer portal** for subscription management, similar to Stripe's Customer Portal.
 - Debug/sandbox mode is toggled via the `CREEM_DEBUG` env var.
+
+## Plan entitlements
+
+What each plan allows is enforced on the server, not only shown on the
+pricing page. See [Plan value design](./plan-value-design.md) for the
+packaging, rationale, and migration policy.
+
+- Limits: `PLAN_LIMITS` in `src/payment/plan-entitlements.ts` (free: 15 activities
+  that aren't archived, 3 open assignment links, 10 AI drafts a month; paid: unlimited
+  activities and links, 300 AI drafts a month). Pricing, FAQ, billing, and
+  usage copy read the numbers from this constant.
+- Plan resolution: `resolveEntitlementPlan` reads the `payment` table
+  (lifetime, active or trialing, cancel at period end, past due with a
+  7-day grace, canceled until period end).
+- Enforcement: `assertPlanAllows` in `src/payment/plan-entitlements-server.ts`
+  runs inside the activity, assignment, and AI draft server functions before
+  a write. Student submissions, results, exports, and printing are never
+  checked.
+- AI draft usage is stored in `ai_draft_usage` (migration `0016`); a row is
+  reserved atomically before the provider runs and released for offline
+  fallback drafts or errors. Apply the migration to remote D1 before
+  deploying.
+- Settings → Billing resolves the plan with the same resolver
+  (`src/payment/current-plan.ts`).

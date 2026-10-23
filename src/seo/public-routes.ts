@@ -1,5 +1,10 @@
 import { Routes } from '@/lib/routes';
-import { baseLocale, locales, type Locale } from '@/locale/paraglide/runtime';
+import {
+  baseLocale,
+  getLocale,
+  locales,
+  type Locale,
+} from '@/locale/paraglide/runtime';
 
 type PublicIndexableRouteId =
   | 'blog'
@@ -15,6 +20,12 @@ type PublicIndexableRouteId =
   | 'roadmap'
   | 'teachers'
   | 'templates'
+  | 'template-fill-blank'
+  | 'template-group-sort'
+  | 'template-line-match'
+  | 'template-listening'
+  | 'template-match-up'
+  | 'template-open-box'
   | 'terms'
   | 'worksheets';
 
@@ -71,6 +82,24 @@ export const PUBLIC_INDEXABLE_STATIC_ROUTES = [
     localized: false,
     priority: '0.8',
   },
+  // English template guides rendered by `/templates/$template`; keep in sync
+  // with TEMPLATE_GUIDE_PATHS in src/pages/template-guide-paths.ts.
+  ...(
+    [
+      'match-up',
+      'line-match',
+      'group-sort',
+      'fill-blank',
+      'listening',
+      'open-box',
+    ] as const
+  ).map((template) => ({
+    id: `template-${template}` as const,
+    path: `${Routes.Templates}/${template}` as const,
+    changefreq: 'monthly' as const,
+    localized: false as const,
+    priority: '0.7',
+  })),
   {
     id: 'worksheets',
     path: Routes.Worksheets,
@@ -157,6 +186,40 @@ export function getIndexableLocalesForStaticPath(
 }
 
 export const PUBLIC_INDEXED_BLOG_BASE_PATH = Routes.Blog;
+
+/**
+ * Locales with published blog posts. Kept static so client-side link
+ * rewriting does not pull blog content into the main bundle; the blog locale
+ * unit test asserts it matches `getBlogLocalesWithPosts()`.
+ */
+export const PUBLIC_BLOG_LOCALES = [
+  'en',
+  'zh',
+] as const satisfies readonly Locale[];
+
+/**
+ * The blog index redirects locales without posts to a published locale, so
+ * internal links should point straight at the base-locale index instead of
+ * linking to a redirect.
+ */
+export function getBlogIndexLinkLocale(locale: Locale): Locale | undefined {
+  return (PUBLIC_BLOG_LOCALES as readonly Locale[]).includes(locale)
+    ? undefined
+    : baseLocale;
+}
+
+/**
+ * True when a link to `path` leaves the current locale (the blog index links
+ * to the base locale where no posts exist). Such links must load a new
+ * document so `<html lang>`, the locale cookie, and messages all switch
+ * together instead of a client-side navigation keeping the old locale.
+ */
+export function linkChangesLocale(path: string | undefined) {
+  return (
+    path === PUBLIC_INDEXED_BLOG_BASE_PATH &&
+    getBlogIndexLinkLocale(getLocale()) !== undefined
+  );
+}
 
 export const PUBLIC_LOCALIZED_PATHS = PUBLIC_INDEXABLE_STATIC_ROUTES.filter(
   (route) => !('localized' in route) || route.localized !== false

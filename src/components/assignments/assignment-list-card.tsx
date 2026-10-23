@@ -33,6 +33,7 @@ import {
 } from '@tabler/icons-react';
 import { Link } from '@tanstack/react-router';
 import { toast } from 'sonner';
+import { toastPlanLimitOrError } from '@/components/payment/plan-limit-toast';
 
 type AssignmentListCardProps = {
   assignment: AssignmentListCardViewModel;
@@ -55,8 +56,8 @@ export function AssignmentListCard({ assignment }: AssignmentListCardProps) {
     try {
       await updateStatusMutation.mutateAsync(plan.input);
       toast.success(plan.successMessage);
-    } catch {
-      toast.error(plan.failureMessage);
+    } catch (error) {
+      toastPlanLimitOrError(error, plan.failureMessage);
     }
   }
 

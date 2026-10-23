@@ -58,6 +58,7 @@ import {
 import { Link, useNavigate } from '@tanstack/react-router';
 import { useId, useState } from 'react';
 import { toast } from 'sonner';
+import { toastPlanLimitOrError } from '@/components/payment/plan-limit-toast';
 
 type ActivityLibraryCardProps = {
   activity: ActivityLibraryCardViewModel;
@@ -106,8 +107,8 @@ export function ActivityLibraryCard({
           createdFrom: 'remix',
         }),
       });
-    } catch {
-      toast.error(executionPlan.failureMessage);
+    } catch (error) {
+      toastPlanLimitOrError(error, executionPlan.failureMessage);
     }
   }
 
@@ -131,8 +132,8 @@ export function ActivityLibraryCard({
           createdFrom: 'duplicate',
         }),
       });
-    } catch {
-      toast.error(executionPlan.failureMessage);
+    } catch (error) {
+      toastPlanLimitOrError(error, executionPlan.failureMessage);
     }
   }
 
@@ -167,8 +168,8 @@ export function ActivityLibraryCard({
     try {
       await restoreMutation.mutateAsync(executionPlan.input);
       toast.success(executionPlan.successMessage);
-    } catch {
-      toast.error(executionPlan.failureMessage);
+    } catch (error) {
+      toastPlanLimitOrError(error, executionPlan.failureMessage);
     }
   }
 

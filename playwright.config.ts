@@ -5,6 +5,8 @@ const baseURL = process.env.PLAYWRIGHT_BASE_URL ?? `http://localhost:${port}`;
 
 export default defineConfig({
   testDir: './tests/e2e/specs',
+  // Compile heavy routes once before the first journey (see global-setup.ts).
+  globalSetup: './tests/e2e/global-setup.ts',
   fullyParallel: false,
   workers: 1,
   retries: process.env.CI ? 2 : 0,

@@ -51,10 +51,12 @@ import { Route as SettingsNotificationsRouteImport } from './routes/settings/not
 import { Route as SettingsPaymentRouteImport } from './routes/settings/payment'
 import { Route as SettingsProfileRouteImport } from './routes/settings/profile'
 import { Route as SettingsSecurityRouteImport } from './routes/settings/security'
+import { Route as TemplatesTemplateRouteImport } from './routes/templates_.$template'
 import { Route as ApiAuthSplatRouteImport } from './routes/api/auth/$'
 import { Route as ApiAuthProviderStatusRouteImport } from './routes/api/auth/provider-status'
 import { Route as ApiE2eAssignmentsRouteImport } from './routes/api/e2e/assignments'
 import { Route as ApiE2eMailRouteImport } from './routes/api/e2e/mail'
+import { Route as ApiE2ePlanRouteImport } from './routes/api/e2e/plan'
 import { Route as ApiE2eUsersRouteImport } from './routes/api/e2e/users'
 import { Route as ApiStorageFileRouteImport } from './routes/api/storage/file'
 import { Route as ApiWebhooksCreemRouteImport } from './routes/api/webhooks/creem'
@@ -274,6 +276,11 @@ const SettingsSecurityRoute = SettingsSecurityRouteImport.update({
   path: '/security',
   getParentRoute: () => SettingsRoute,
 } as any)
+const TemplatesTemplateRoute = TemplatesTemplateRouteImport.update({
+  id: '/templates_/$template',
+  path: '/templates/$template',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiAuthSplatRoute = ApiAuthSplatRouteImport.update({
   id: '/api/auth/$',
   path: '/api/auth/$',
@@ -292,6 +299,11 @@ const ApiE2eAssignmentsRoute = ApiE2eAssignmentsRouteImport.update({
 const ApiE2eMailRoute = ApiE2eMailRouteImport.update({
   id: '/api/e2e/mail',
   path: '/api/e2e/mail',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiE2ePlanRoute = ApiE2ePlanRouteImport.update({
+  id: '/api/e2e/plan',
+  path: '/api/e2e/plan',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ApiE2eUsersRoute = ApiE2eUsersRouteImport.update({
@@ -377,6 +389,7 @@ export interface FileRoutesByFullPath {
   '/settings/payment': typeof SettingsPaymentRoute
   '/settings/profile': typeof SettingsProfileRoute
   '/settings/security': typeof SettingsSecurityRoute
+  '/templates/$template': typeof TemplatesTemplateRoute
   '/admin/': typeof AdminIndexRoute
   '/blog/': typeof BlogIndexRoute
   '/dashboard/': typeof DashboardIndexRoute
@@ -385,6 +398,7 @@ export interface FileRoutesByFullPath {
   '/api/auth/provider-status': typeof ApiAuthProviderStatusRoute
   '/api/e2e/assignments': typeof ApiE2eAssignmentsRoute
   '/api/e2e/mail': typeof ApiE2eMailRoute
+  '/api/e2e/plan': typeof ApiE2ePlanRoute
   '/api/e2e/users': typeof ApiE2eUsersRoute
   '/api/storage/file': typeof ApiStorageFileRoute
   '/api/webhooks/creem': typeof ApiWebhooksCreemRoute
@@ -430,6 +444,7 @@ export interface FileRoutesByTo {
   '/settings/payment': typeof SettingsPaymentRoute
   '/settings/profile': typeof SettingsProfileRoute
   '/settings/security': typeof SettingsSecurityRoute
+  '/templates/$template': typeof TemplatesTemplateRoute
   '/admin': typeof AdminIndexRoute
   '/blog': typeof BlogIndexRoute
   '/dashboard': typeof DashboardIndexRoute
@@ -438,6 +453,7 @@ export interface FileRoutesByTo {
   '/api/auth/provider-status': typeof ApiAuthProviderStatusRoute
   '/api/e2e/assignments': typeof ApiE2eAssignmentsRoute
   '/api/e2e/mail': typeof ApiE2eMailRoute
+  '/api/e2e/plan': typeof ApiE2ePlanRoute
   '/api/e2e/users': typeof ApiE2eUsersRoute
   '/api/storage/file': typeof ApiStorageFileRoute
   '/api/webhooks/creem': typeof ApiWebhooksCreemRoute
@@ -487,6 +503,7 @@ export interface FileRoutesById {
   '/settings/payment': typeof SettingsPaymentRoute
   '/settings/profile': typeof SettingsProfileRoute
   '/settings/security': typeof SettingsSecurityRoute
+  '/templates_/$template': typeof TemplatesTemplateRoute
   '/admin/': typeof AdminIndexRoute
   '/blog/': typeof BlogIndexRoute
   '/dashboard/': typeof DashboardIndexRoute
@@ -495,6 +512,7 @@ export interface FileRoutesById {
   '/api/auth/provider-status': typeof ApiAuthProviderStatusRoute
   '/api/e2e/assignments': typeof ApiE2eAssignmentsRoute
   '/api/e2e/mail': typeof ApiE2eMailRoute
+  '/api/e2e/plan': typeof ApiE2ePlanRoute
   '/api/e2e/users': typeof ApiE2eUsersRoute
   '/api/storage/file': typeof ApiStorageFileRoute
   '/api/webhooks/creem': typeof ApiWebhooksCreemRoute
@@ -545,6 +563,7 @@ export interface FileRouteTypes {
     | '/settings/payment'
     | '/settings/profile'
     | '/settings/security'
+    | '/templates/$template'
     | '/admin/'
     | '/blog/'
     | '/dashboard/'
@@ -553,6 +572,7 @@ export interface FileRouteTypes {
     | '/api/auth/provider-status'
     | '/api/e2e/assignments'
     | '/api/e2e/mail'
+    | '/api/e2e/plan'
     | '/api/e2e/users'
     | '/api/storage/file'
     | '/api/webhooks/creem'
@@ -598,6 +618,7 @@ export interface FileRouteTypes {
     | '/settings/payment'
     | '/settings/profile'
     | '/settings/security'
+    | '/templates/$template'
     | '/admin'
     | '/blog'
     | '/dashboard'
@@ -606,6 +627,7 @@ export interface FileRouteTypes {
     | '/api/auth/provider-status'
     | '/api/e2e/assignments'
     | '/api/e2e/mail'
+    | '/api/e2e/plan'
     | '/api/e2e/users'
     | '/api/storage/file'
     | '/api/webhooks/creem'
@@ -654,6 +676,7 @@ export interface FileRouteTypes {
     | '/settings/payment'
     | '/settings/profile'
     | '/settings/security'
+    | '/templates_/$template'
     | '/admin/'
     | '/blog/'
     | '/dashboard/'
@@ -662,6 +685,7 @@ export interface FileRouteTypes {
     | '/api/auth/provider-status'
     | '/api/e2e/assignments'
     | '/api/e2e/mail'
+    | '/api/e2e/plan'
     | '/api/e2e/users'
     | '/api/storage/file'
     | '/api/webhooks/creem'
@@ -697,11 +721,13 @@ export interface RootRouteChildren {
   ApiPingRoute: typeof ApiPingRoute
   BlogSlugRoute: typeof BlogSlugRoute
   PlayShareIdRoute: typeof PlayShareIdRoute
+  TemplatesTemplateRoute: typeof TemplatesTemplateRoute
   BlogIndexRoute: typeof BlogIndexRoute
   ApiAuthSplatRoute: typeof ApiAuthSplatRoute
   ApiAuthProviderStatusRoute: typeof ApiAuthProviderStatusRoute
   ApiE2eAssignmentsRoute: typeof ApiE2eAssignmentsRoute
   ApiE2eMailRoute: typeof ApiE2eMailRoute
+  ApiE2ePlanRoute: typeof ApiE2ePlanRoute
   ApiE2eUsersRoute: typeof ApiE2eUsersRoute
   ApiStorageFileRoute: typeof ApiStorageFileRoute
   ApiWebhooksCreemRoute: typeof ApiWebhooksCreemRoute
@@ -1005,6 +1031,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SettingsSecurityRouteImport
       parentRoute: typeof SettingsRoute
     }
+    '/templates_/$template': {
+      id: '/templates_/$template'
+      path: '/templates/$template'
+      fullPath: '/templates/$template'
+      preLoaderRoute: typeof TemplatesTemplateRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/auth/$': {
       id: '/api/auth/$'
       path: '/api/auth/$'
@@ -1031,6 +1064,13 @@ declare module '@tanstack/react-router' {
       path: '/api/e2e/mail'
       fullPath: '/api/e2e/mail'
       preLoaderRoute: typeof ApiE2eMailRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/e2e/plan': {
+      id: '/api/e2e/plan'
+      path: '/api/e2e/plan'
+      fullPath: '/api/e2e/plan'
+      preLoaderRoute: typeof ApiE2ePlanRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/api/e2e/users': {
@@ -1211,11 +1251,13 @@ const rootRouteChildren: RootRouteChildren = {
   ApiPingRoute: ApiPingRoute,
   BlogSlugRoute: BlogSlugRoute,
   PlayShareIdRoute: PlayShareIdRoute,
+  TemplatesTemplateRoute: TemplatesTemplateRoute,
   BlogIndexRoute: BlogIndexRoute,
   ApiAuthSplatRoute: ApiAuthSplatRoute,
   ApiAuthProviderStatusRoute: ApiAuthProviderStatusRoute,
   ApiE2eAssignmentsRoute: ApiE2eAssignmentsRoute,
   ApiE2eMailRoute: ApiE2eMailRoute,
+  ApiE2ePlanRoute: ApiE2ePlanRoute,
   ApiE2eUsersRoute: ApiE2eUsersRoute,
   ApiStorageFileRoute: ApiStorageFileRoute,
   ApiWebhooksCreemRoute: ApiWebhooksCreemRoute,

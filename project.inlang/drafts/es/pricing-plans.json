@@ -1,0 +1,9 @@
+{
+  "pricing_plans_free_description": "Todas las plantillas para clases reales, con hasta {openAssignments} enlaces de tareas abiertos a la vez y sin tarjeta de crédito.",
+  "pricing_plans_free_features": "[\"Las ocho plantillas de juegos para clase\",\"Hasta {activities} actividades (las archivadas no cuentan)\",\"Hasta {openAssignments} enlaces de tareas abiertos a la vez\",\"{aiDrafts} borradores con IA al mes\",\"Intentos, resultados y exportación CSV ilimitados\"]",
+  "pricing_plans_pro_description": "Sin límites de actividades ni de enlaces de tareas abiertos, y {paidAiDrafts} borradores con IA al mes.",
+  "pricing_plans_pro_features": "[\"Todo lo del plan gratuito\",\"Actividades ilimitadas\",\"Enlaces de tareas abiertos ilimitados\",\"{paidAiDrafts} borradores con IA al mes\",\"Facturación mensual o anual\"]",
+  "pricing_plans_lifetime_description": "Todo lo de Teacher Pro con un único pago.",
+  "pricing_plans_lifetime_features": "[\"Todo lo de Teacher Pro\",\"Pago único, sin suscripción\",\"Precio de fundador\"]",
+  "pricing_value_ai_description": "Los borradores con IA y el remix de plantillas te ayudan a convertir tus notas de clase en actividades para revisar y publicar."
+}

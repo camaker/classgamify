@@ -1,3 +1,4 @@
+import { linkChangesLocale } from '@/seo/public-routes';
 import { m } from '@/locale/paraglide/messages';
 import { getNavbarLinks } from '@/config/navbar-config';
 import { authClient } from '@/auth/client';
@@ -143,6 +144,7 @@ export function NavbarMobile({ className, ...props }: NavbarMobileProps) {
                               <li key={sub.id}>
                                 <Link
                                   to={sub.href ?? '#'}
+                                  reloadDocument={linkChangesLocale(sub.href)}
                                   target={sub.external ? '_blank' : undefined}
                                   rel={
                                     sub.external
@@ -169,6 +171,7 @@ export function NavbarMobile({ className, ...props }: NavbarMobileProps) {
                     ) : (
                       <Link
                         to={item.href ?? '#'}
+                        reloadDocument={linkChangesLocale(item.href)}
                         target={item.external ? '_blank' : undefined}
                         rel={item.external ? 'noopener noreferrer' : undefined}
                         onClick={() => setOpen(false)}

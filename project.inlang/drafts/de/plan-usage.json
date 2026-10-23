@@ -1,0 +1,23 @@
+{
+  "plan_limit_activities_reached": "Du hast {limit} nicht archivierte Aktivitäten, das Maximum im kostenlosen Tarif. Archiviere eine Aktivität oder wechsle zu Teacher Pro, um weitere hinzuzufügen. Alles, was du erstellt hast, bleibt verfügbar.",
+  "plan_limit_ai_drafts_reached": "Du hast alle {limit} KI-Entwürfe für diesen Monat genutzt. Neue stehen am 1. des nächsten Monats (UTC) bereit, und du kannst Aktivitäten weiterhin von Hand erstellen.",
+  "plan_limit_open_assignments_reached": "Du hast {limit} offene Aufgabenlinks, das Maximum, das der kostenlose Tarif gleichzeitig erlaubt. Schließe einen Link oder wechsle zu Teacher Pro, um weitere zu veröffentlichen. Lernende können offene Links weiterhin abschließen.",
+  "plan_limit_upgrade_hint": "Teacher Pro enthält jeden Monat mehr KI-Entwürfe.",
+  "plan_limit_view_plans": "Tarife ansehen",
+  "plan_usage_activities_label": "Aktivitäten (ohne archivierte)",
+  "plan_usage_ai_drafts_label": "KI-Entwürfe in diesem Monat (UTC)",
+  "plan_usage_compare_plans": "Tarife vergleichen",
+  "plan_usage_current_plan": "Aktueller Tarif: {plan}",
+  "plan_usage_manage_plan": "Abrechnung verwalten",
+  "plan_usage_meter_aria": "{label}: {value}",
+  "plan_usage_note_cancel_scheduled": "Teacher Pro endet mit deinem aktuellen Abrechnungszeitraum. Danach wird nichts gelöscht, und die Limits des kostenlosen Tarifs gelten nur für neue Inhalte.",
+  "plan_usage_note_free": "Archivierte Aktivitäten, geschlossene Links, Ergebnisse der Lernenden und CSV-Exporte zählen nie mit. Lernende können bereits veröffentlichte Links immer abschließen.",
+  "plan_usage_note_paid": "Dein Tarif begrenzt weder Aktivitäten noch offene Aufgabenlinks.",
+  "plan_usage_note_past_due": "Deine letzte Zahlung ist nicht durchgegangen. Teacher Pro bleibt noch einige Tage aktiv, während sie erneut versucht wird. Bitte prüfe deine Zahlungsdaten.",
+  "plan_usage_open_assignments_label": "Offene Aufgabenlinks",
+  "plan_usage_status_near": "Fast voll",
+  "plan_usage_status_reached": "Limit erreicht",
+  "plan_usage_title": "Tarifnutzung",
+  "plan_usage_value_limited": "{used} von {limit}",
+  "plan_usage_value_unlimited": "{used}, ohne Limit"
+}

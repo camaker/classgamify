@@ -1,3 +1,4 @@
+import { PLAN_LIMITS } from '@/payment/plan-entitlements';
 import assert from 'node:assert/strict';
 import {
   existsSync,
@@ -2268,7 +2269,7 @@ assert.doesNotMatch(
 );
 assert.match(
   copyAssignmentShareLinkButtonSource,
-  /executionPlan\.type === 'blocked'[\s\S]*toast\.error\(executionPlan\.message\)[\s\S]*copyTextToClipboard\(executionPlan\.url\)[\s\S]*toast\.success\(executionPlan\.successMessage\)[\s\S]*toast\.error\(executionPlan\.failureMessage\)/,
+  /executionPlan\.type === 'blocked'[\s\S]*toast\.error\(executionPlan\.message\)[\s\S]*copyTextToClipboard\(executionPlan\.url\)[\s\S]*toast\.success\(executionPlan\.successMessage\)[\s\S]*(?:toast\.error\(|toastPlanLimitOrError\(error, )executionPlan\.failureMessage\)/,
   'Share-link copy button should execute prepared blocked and copy-link plans.'
 );
 assert.match(
@@ -2350,7 +2351,7 @@ assert.doesNotMatch(
 );
 assert.match(
   assignmentResultsRouteSource,
-  /toast\.error\(executionPlan\.failureMessage\)/,
+  /(?:toast\.error\(|toastPlanLimitOrError\(error, )executionPlan\.failureMessage\)/,
   'Result copy/download failures should use the localized action failure copy.'
 );
 assert.match(
@@ -6037,7 +6038,7 @@ assert.match(
 );
 assert.match(
   activityEditorFormSource,
-  /executionPlan\.type === 'blocked'[\s\S]*toast\.error\(executionPlan\.message\)[\s\S]*draftMutation\.mutateAsync\(executionPlan\.input\)[\s\S]*toast\.error\(executionPlan\.failureMessage\)/,
+  /executionPlan\.type === 'blocked'[\s\S]*toast\.error\(executionPlan\.message\)[\s\S]*draftMutation\.mutateAsync\(executionPlan\.input\)[\s\S]*(?:toast\.error\(|toastPlanLimitOrError\(error, )executionPlan\.failureMessage\)/,
   'Activity editor form should execute prepared blocked and generate AI draft plans.'
 );
 assert.doesNotMatch(
@@ -6097,7 +6098,7 @@ assert.match(
 );
 assert.match(
   activityEditorFormSource,
-  /executionPlan\.type === 'blocked'[\s\S]*toast\.error\(executionPlan\.message\)[\s\S]*if \(executionPlan\.type === 'edit'\)[\s\S]*updateMutation\.mutateAsync\(executionPlan\.input\)[\s\S]*createMutation\.mutateAsync\(executionPlan\.input\)[\s\S]*toast\.error\(executionPlan\.failureMessage\)/,
+  /executionPlan\.type === 'blocked'[\s\S]*toast\.error\(executionPlan\.message\)[\s\S]*if \(executionPlan\.type === 'edit'\)[\s\S]*updateMutation\.mutateAsync\(executionPlan\.input\)[\s\S]*createMutation\.mutateAsync\(executionPlan\.input\)[\s\S]*(?:toast\.error\(|toastPlanLimitOrError\(error, )executionPlan\.failureMessage\)/,
   'Activity editor form should execute prepared blocked, edit, and create save plans.'
 );
 assert.doesNotMatch(
@@ -6985,7 +6986,7 @@ assert.doesNotMatch(
 );
 assert.match(
   activityDashboardCardSource,
-  /toast\.error\(executionPlan\.failureMessage\)/,
+  /(?:toast\.error\(|toastPlanLimitOrError\(error, )executionPlan\.failureMessage\)/,
   'Activity dashboard action failures should use localized action execution-plan failure copy.'
 );
 const assignmentDashboardRouteSource = readFileSync(
@@ -7008,7 +7009,7 @@ assert.doesNotMatch(
 );
 assert.match(
   assignmentDashboardCardSource,
-  /toast\.error\(plan\.failureMessage\)/,
+  /(?:toast\.error\(|toastPlanLimitOrError\(error, )plan\.failureMessage\)/,
   'Assignment close and reopen failures should use localized status action failure copy.'
 );
 const activityPublishDialogSource = readFileSync(
@@ -7139,7 +7140,7 @@ assert.doesNotMatch(
 );
 assert.match(
   activityPublishDialogSource,
-  /toast\.error\(executionPlan\.failureMessage\)/,
+  /(?:toast\.error\(|toastPlanLimitOrError\(error, )executionPlan\.failureMessage\)/,
   'Assignment publish failures should use localized publish failure copy from the execution plan.'
 );
 assert.match(
@@ -9315,7 +9316,7 @@ assert.doesNotMatch(
 );
 assert.match(
   activityCreateFormSource,
-  /toast\.error\(executionPlan\.failureMessage\)/,
+  /(?:toast\.error\(|toastPlanLimitOrError\(error, )executionPlan\.failureMessage\)/,
   'Activity draft generation and save failures should use localized execution-plan failure messages.'
 );
 assert.match(
@@ -10018,7 +10019,7 @@ assert.equal(
 );
 assert.match(
   noPlanBillingView.nextStep?.description ?? '',
-  /student previews/
+  /Results and CSV export are never limited/
 );
 const freeBillingView = buildSettingsBillingCardViewModel({
   canManageBilling: true,
@@ -10041,7 +10042,10 @@ assert.equal(
   freeBillingView.action?.ariaLabel,
   'View ClassGamify plans. Billing action for the current ClassGamify teacher workspace.'
 );
-assert.match(freeBillingView.plan?.message ?? '', /starter activities and student previews/);
+assert.match(
+  freeBillingView.plan?.message ?? '',
+  /up to 15 activities \(archived ones don't count\), up to 3 open assignment links, and 10 AI drafts a month\. Results and CSV export are never limited/
+);
 assert.deepEqual(
   freeBillingView.plan?.featureSections.map((section) => [
     section.id,
@@ -10067,7 +10071,7 @@ assert.match(
 );
 assert.match(
   freeBillingView.plan?.nextStep.description ?? '',
-  /publish assignments every week/
+  /more than 15 activities that aren't archived, more than 3 open assignment links/
 );
 assert.doesNotMatch(
   freeBillingView.plan?.message ?? '',
@@ -12780,9 +12784,9 @@ const pricePlans = getPricePlans();
 assert.deepEqual(Object.keys(pricePlans), ['free', 'pro', 'lifetime']);
 assert.ok(
   pricePlans.free?.features?.some((feature) =>
-    feature.toLowerCase().includes('intro classroom templates')
+    feature.toLowerCase().includes('all eight classroom game templates')
   ),
-  'The free plan should describe intro classroom templates instead of copied starter templates.'
+  'The free plan should describe the full template catalog it actually unlocks.'
 );
 assert.ok(
   pricePlans.free?.features?.every(
@@ -12794,25 +12798,52 @@ assert.ok(
   pricePlans.free?.features?.some((feature) =>
     feature.toLowerCase().includes('assignment link')
   ),
-  'The free plan should describe a real sample assignment-link workflow.'
+  'The free plan should describe a real assignment-link workflow.'
 );
 assert.ok(
   pricePlans.pro?.features?.some((feature) =>
-    feature.toLowerCase().includes('student completion')
+    feature.toLowerCase().includes('everything in the free plan')
   ),
-  'The Pro plan should include student completion and score tracking.'
+  'The Pro plan should state that it includes the free plan.'
 );
 assert.ok(
-  pricePlans.pro?.features?.some((feature) =>
-    feature.toLowerCase().includes('ai-assisted')
+  pricePlans.pro?.features?.every(
+    (feature) =>
+      !/larger activity library|more published assignments/i.test(feature)
   ),
-  'The Pro plan should include AI-assisted activity drafting.'
+  'The Pro plan should not use vague comparative claims.'
 );
+assert.deepEqual(
+  pricePlans.free?.features?.slice(1, 4),
+  [
+    `Up to ${PLAN_LIMITS.free.activities} activities (archived ones don't count)`,
+    `Up to ${PLAN_LIMITS.free.openAssignments} open assignment links at a time`,
+    `${PLAN_LIMITS.free.aiDrafts} AI drafts a month`,
+  ],
+  'The free plan card should quote the limits the server enforces.'
+);
+assert.deepEqual(
+  pricePlans.pro?.features?.slice(1, 4),
+  [
+    'Unlimited activities',
+    'Unlimited open assignment links',
+    `${PLAN_LIMITS.pro.aiDrafts} AI drafts a month`,
+  ],
+  'The Teacher Pro card should quote the limits the server enforces.'
+);
+assert.equal(PLAN_LIMITS.pro.activities, null);
+assert.equal(PLAN_LIMITS.pro.openAssignments, null);
 assert.ok(
   pricePlans.lifetime?.features?.some((feature) =>
-    feature.toLowerCase().includes('new templates')
+    feature.toLowerCase().includes('one-time payment')
   ),
-  'The lifetime plan should preserve early access to new ClassGamify templates.'
+  'The lifetime plan should describe its one-time payment.'
+);
+assert.ok(
+  pricePlans.lifetime?.features?.every(
+    (feature) => !feature.toLowerCase().includes('early access')
+  ),
+  'The lifetime plan should not promise early access that no code gates.'
 );
 assert.equal(
   existsSync('src/routes/settings/apikeys.tsx'),
@@ -12906,6 +12937,12 @@ assert.deepEqual(
     'templates',
     'classroom-quiz-game',
     'classroom-matching-game',
+    'template-match-up',
+    'template-line-match',
+    'template-group-sort',
+    'template-fill-blank',
+    'template-listening',
+    'template-open-box',
     'worksheets',
     'create',
     'pricing',
@@ -30734,7 +30771,7 @@ assert.match(
 );
 assert.match(
   activityLibraryCardComponentSource,
-  /executionPlan\.type === 'blocked'[\s\S]*toast\.error\(executionPlan\.message\)[\s\S]*mutateAsync\(executionPlan\.input\)[\s\S]*toast\.success\(executionPlan\.successMessage\)[\s\S]*toast\.error\(executionPlan\.failureMessage\)/,
+  /executionPlan\.type === 'blocked'[\s\S]*toast\.error\(executionPlan\.message\)[\s\S]*mutateAsync\(executionPlan\.input\)[\s\S]*toast\.success\(executionPlan\.successMessage\)[\s\S]*(?:toast\.error\(|toastPlanLimitOrError\(error, )executionPlan\.failureMessage\)/,
   'Activity library card component should execute prepared blocked and mutation plans.'
 );
 assert.match(
@@ -32642,7 +32679,7 @@ assert.match(
 );
 assert.match(
   activityCreateFormSource,
-  /canApplyActivityDraftResultToEditor[\s\S]*const result = await draftMutation\.mutateAsync\(executionPlan\.input\)[\s\S]*if \(!canApplyActivityDraftResultToEditor\(result\)\)[\s\S]*toast\.error\(executionPlan\.failureMessage\)[\s\S]*form\.reset/,
+  /canApplyActivityDraftResultToEditor[\s\S]*const result = await draftMutation\.mutateAsync\(executionPlan\.input\)[\s\S]*if \(!canApplyActivityDraftResultToEditor\(result\)\)[\s\S]*(?:toast\.error\(|toastPlanLimitOrError\(error, )executionPlan\.failureMessage\)[\s\S]*form\.reset/,
   'Activity editor form should verify the AI draft review-state contract before applying generated fields.'
 );
 assert.match(
@@ -34047,7 +34084,7 @@ assert.deepEqual(homePageVisibleView, {
       to: Routes.Templates,
     },
     description:
-      'Start with a quiz or matching game, share a link students can open, and review their responses after they play.',
+      "For teachers: turn your lesson content into a quiz or matching game, share one link students open without an account, and see each student's score after they play.",
     primaryAction: {
       ariaLabel:
         'Create a reusable ClassGamify activity in the shared editor.',
@@ -34332,7 +34369,7 @@ const pricingPageView = buildPricingPageViewModel();
 assert.deepEqual(pricingPageView.hero, {
   eyebrow: 'ClassGamify plans',
   subtitle:
-    'Start free, then upgrade for more activities, AI drafting, and deeper results.',
+    'Start free, no credit card needed. Compare what each plan includes below.',
   title: 'ClassGamify Plans',
 });
 assert.deepEqual(pricingPageView.valueSection, {
@@ -34361,9 +34398,9 @@ assert.deepEqual(pricingPageView.valueCards, [
   },
   {
     ariaLabel:
-      'AI creation speed: Paid plans will expand around AI creation, remixing, more templates, and result reporting.',
+      'AI creation speed: AI drafts and template remixing help turn lesson notes into activities you can review and publish.',
     description:
-      'Paid plans will expand around AI creation, remixing, more templates, and result reporting.',
+      'AI drafts and template remixing help turn lesson notes into activities you can review and publish.',
     id: 'ai',
     title: 'AI creation speed',
   },
@@ -34385,9 +34422,9 @@ assert.deepEqual(pricingPageView.schoolCta, {
 assert.deepEqual(
   buildPricingFaqItems().map((item) => [item.id, item.question]),
   [
-    ['free', 'What is the free plan for?'],
-    ['pro', 'What will Pro unlock?'],
-    ['templates', 'Why are there only a few templates first?'],
+    ['free', 'What does the free plan include?'],
+    ['pro', 'What does Teacher Pro include?'],
+    ['templates', 'Why does the catalog start with eight templates?'],
     ['student-accounts', 'Do students need accounts?'],
     ['schools', 'Can schools or tutoring teams use it?'],
   ]
@@ -34395,41 +34432,41 @@ assert.deepEqual(
 assert.deepEqual(buildPricingFaqItems(), [
   {
     answer:
-      'The free plan lets you browse templates, create a few activities, preview them as a student, and see whether ClassGamify fits your class.',
+      "Every template, up to 15 activities (archived ones don't count), up to 3 open assignment links at a time, and 10 AI drafts a month. Student attempts, results, CSV export, and printing are never limited, and no credit card is needed.",
     ariaLabel:
-      'What is the free plan for?: The free plan lets you browse templates, create a few activities, preview them as a student, and see whether ClassGamify fits your class.',
+      "What does the free plan include?: Every template, up to 15 activities (archived ones don't count), up to 3 open assignment links at a time, and 10 AI drafts a month. Student attempts, results, CSV export, and printing are never limited, and no credit card is needed.",
     id: 'free',
-    question: 'What is the free plan for?',
+    question: 'What does the free plan include?',
   },
   {
     answer:
-      'Pro will expand around higher activity and assignment limits, result tracking, AI generation, and faster template remixing.',
+      'Teacher Pro removes the limits on activities and open assignment links and includes 300 AI drafts a month, billed monthly or yearly. Early Supporter is a one-time payment for the same access. If a paid plan ends, nothing is deleted, and the free limits apply only to new work.',
     ariaLabel:
-      'What will Pro unlock?: Pro will expand around higher activity and assignment limits, result tracking, AI generation, and faster template remixing.',
+      'What does Teacher Pro include?: Teacher Pro removes the limits on activities and open assignment links and includes 300 AI drafts a month, billed monthly or yearly. Early Supporter is a one-time payment for the same access. If a paid plan ends, nothing is deleted, and the free limits apply only to new work.',
     id: 'pro',
-    question: 'What will Pro unlock?',
+    question: 'What does Teacher Pro include?',
   },
   {
     answer:
-      'The first version intentionally starts with a focused set of high-frequency classroom templates so creation, publishing, student play, and results become reliable before the catalog grows.',
+      'The catalog starts with eight high-use classroom templates so that creating, publishing, playing, and reviewing results stay reliable before more are added.',
     ariaLabel:
-      'Why are there only a few templates first?: The first version intentionally starts with a focused set of high-frequency classroom templates so creation, publishing, student play, and results become reliable before the catalog grows.',
+      'Why does the catalog start with eight templates?: The catalog starts with eight high-use classroom templates so that creating, publishing, playing, and reviewing results stay reliable before more are added.',
     id: 'templates',
-    question: 'Why are there only a few templates first?',
+    question: 'Why does the catalog start with eight templates?',
   },
   {
     answer:
-      'The v1 direction is public assignment links with a lightweight student name or anonymous token. Teacher accounts own creation, publishing, and results.',
+      'No. Students open a public assignment link. You choose whether they type a name or stay anonymous. Only teachers need an account to create, publish, and review results.',
     ariaLabel:
-      'Do students need accounts?: The v1 direction is public assignment links with a lightweight student name or anonymous token. Teacher accounts own creation, publishing, and results.',
+      'Do students need accounts?: No. Students open a public assignment link. You choose whether they type a name or stay anonymous. Only teachers need an account to create, publish, and review results.',
     id: 'student-accounts',
     question: 'Do students need accounts?',
   },
   {
     answer:
-      'That is part of the classroom direction. School use needs teacher seats, student data rules, permissions, and rollout details, so contact us before a larger deployment.',
+      'Each teacher works in their own account today, and there is no shared school workspace yet. Contact us before a larger rollout to talk through teacher seats, student data rules, and permissions.',
     ariaLabel:
-      'Can schools or tutoring teams use it?: That is part of the classroom direction. School use needs teacher seats, student data rules, permissions, and rollout details, so contact us before a larger deployment.',
+      'Can schools or tutoring teams use it?: Each teacher works in their own account today, and there is no shared school workspace yet. Contact us before a larger rollout to talk through teacher seats, student data rules, and permissions.',
     id: 'schools',
     question: 'Can schools or tutoring teams use it?',
   },
@@ -34539,7 +34576,7 @@ assert.deepEqual(buildTemplatesPageViewModel(), {
       label: 'Open student preview',
       to: Routes.StudentPreview,
     },
-    title: 'Choose a classroom game to make',
+    title: 'Editable classroom game templates',
   },
 });
 assert.deepEqual(
@@ -35112,7 +35149,7 @@ assert.deepEqual(worksheetsPageView, {
     },
     {
       ariaLabel:
-        'Create sort. Opens Drag sorting in the shared activity editor with the worksheet scaffold selected.',
+        'Create sort. Opens Group sorting in the shared activity editor with the worksheet scaffold selected.',
       isPrimary: false,
       label: 'Create sort',
       search: { source: 'worksheets', template: 'group-sort' },
@@ -35178,20 +35215,20 @@ assert.deepEqual(worksheetsPageView, {
     {
       action: {
         ariaLabel:
-          'Create sort. Opens Drag sorting in the shared activity editor with the worksheet scaffold selected.',
+          'Create sort. Opens Group sorting in the shared activity editor with the worksheet scaffold selected.',
         label: 'Create sort',
         search: { source: 'worksheets', template: 'group-sort' },
         to: Routes.Create,
       },
       ariaLabel:
-        'Drag sorting: Ask learners to classify words, examples, or concepts into teacher-defined groups before seeing the answer pattern.',
+        'Group sorting: Ask learners to classify words, examples, or concepts into teacher-defined groups before seeing the answer pattern.',
       contentRequirements: [{ id: 'groups', label: 'groups' }],
       description:
         'Ask learners to classify words, examples, or concepts into teacher-defined groups before seeing the answer pattern.',
       signalLabel: 'Same activity, same link',
       signalViews: expectedWorksheetModeSignalViews,
       template: 'group-sort',
-      title: 'Drag sorting',
+      title: 'Group sorting',
     },
   ],
   printable: {
@@ -35254,7 +35291,7 @@ assert.deepEqual(buildWorksheetHeroActions(getWorksheetModeDefinitions()), [
   },
   {
     ariaLabel:
-      'Create sort. Opens Drag sorting in the shared activity editor with the worksheet scaffold selected.',
+      'Create sort. Opens Group sorting in the shared activity editor with the worksheet scaffold selected.',
     isPrimary: false,
     label: 'Create sort',
     search: { source: 'worksheets', template: 'group-sort' },
@@ -40955,7 +40992,7 @@ assert.deepEqual(lineMatchPreviewPanel.actions, [
 assert.deepEqual(buildActivityEditorTemplateSetupView('group-sort'), {
   actionLabel: 'Load example',
   description:
-    'Students drag items into teacher-defined groups and compare patterns.',
+    'Students tap each item, then the group it belongs to, and compare patterns.',
   requirementBadges: [{ id: 'groups', label: 'Requires groups' }],
   reviewChecklistItems: [
     {
@@ -45264,7 +45301,7 @@ assert.match(getActivityTemplateDraftGuidance('open-box'), /reveal-card/);
 assert.match(getActivityTemplateDraftGuidance('line-match'), /line matching/);
 assert.match(
   getActivityTemplateDraftGuidance('matching-pairs'),
-  /memory-style cards/
+  /two-column cards/
 );
 const fallbackDraftResult = createFallbackActivityDraftResult({
   input: {

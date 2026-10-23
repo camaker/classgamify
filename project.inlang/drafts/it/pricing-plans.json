@@ -1,0 +1,9 @@
+{
+  "pricing_plans_free_description": "Tutti i modelli per lezioni reali, con fino a {openAssignments} link dei compiti aperti insieme e senza carta di credito.",
+  "pricing_plans_free_features": "[\"Tutti gli otto modelli di giochi per la classe\",\"Fino a {activities} attività (le archiviate non contano)\",\"Fino a {openAssignments} link dei compiti aperti insieme\",\"{aiDrafts} bozze con IA al mese\",\"Tentativi, risultati ed esportazione CSV illimitati\"]",
+  "pricing_plans_pro_description": "Nessun limite su attività e link dei compiti aperti, e {paidAiDrafts} bozze con IA al mese.",
+  "pricing_plans_pro_features": "[\"Tutto ciò che offre il piano gratuito\",\"Attività illimitate\",\"Link dei compiti aperti illimitati\",\"{paidAiDrafts} bozze con IA al mese\",\"Fatturazione mensile o annuale\"]",
+  "pricing_plans_lifetime_description": "Tutto ciò che offre Teacher Pro con un unico pagamento.",
+  "pricing_plans_lifetime_features": "[\"Tutto ciò che offre Teacher Pro\",\"Pagamento unico, senza abbonamento\",\"Prezzo da fondatore\"]",
+  "pricing_value_ai_description": "Le bozze con IA e il remix dei modelli ti aiutano a trasformare gli appunti della lezione in attività da rivedere e pubblicare."
+}

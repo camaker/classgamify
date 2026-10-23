@@ -19,6 +19,11 @@ Spec -> Code -> Verify -> Test -> Green
 5. Green: run the related spec locally; run full E2E before releases or large
    refactors.
 
+Before the first journey, `tests/e2e/global-setup.ts` loads the heavy routes
+(home, templates, pricing, student runner, dashboard, activity library, workspace
+editor, billing) in a real signed-in browser so the lazily compiling dev server
+is warm and timing-based assertions measure the app, not the first compile.
+
 E2E tests are intentionally local-first. CI should continue to prefer fast
 checks such as `pnpm check` and `pnpm build` unless a separate E2E environment is
 explicitly provisioned.
@@ -42,10 +47,12 @@ product-gate scripts, or renaming focused script-level checks.
 Public SEO and content gates also include
 `pnpm exec tsx --test scripts/blog-locale-indexing.test.ts`,
 `pnpm exec tsx --test scripts/static-locale-indexing.test.ts`,
-`pnpm exec tsx --test scripts/legacy-public-redirects.test.ts`, and
+`pnpm exec tsx --test scripts/legacy-public-redirects.test.ts`,
+`pnpm exec tsx --test scripts/template-guide-paths.test.ts`, and
 `pnpm exec tsx --test scripts/markdown-ssr.test.ts`; run the matching gate
 when changing blog translation coverage, static route locale eligibility,
-historical public redirects, or Markdown rendering.
+historical public redirects, template guide URLs and sitemap slugs, or
+Markdown rendering.
 Product-domain export surface has a source-level gate via
 `pnpm exec tsx --test scripts/product-domain-export-surface.test.ts`; run it
 when changing product-domain helper exports, public indexing helpers, dashboard
@@ -885,6 +892,8 @@ Legacy crawl paths `/(pages)/about`, `/(pages)/contact/contact`, the literal
 `/blog/$slug`, and `/blog/%24slug` should redirect to `/about`, `/contact`,
 and `/blog` respectively instead of serving 404 pages.
 | 5 | English classroom game guides lead to real templates | Open `/classroom-quiz-game` and `/classroom-matching-game` in English. Verify distinct H1s and useful, server-rendered classroom examples; confirm each page describes the actual teacher create, publish, student attempt, and results path. Follow each create CTA and verify the editor receives `source=templates` with the correct `quiz` or `matching-pairs` template. Verify the quiz guide links to the public food quiz demo, the matching guide does not present the quiz demo as a matching demo, and both guides have self canonicals without fabricated non-English hreflang links. Visit `/zh/` and `/es/` variants of each guide and verify they return 404 rather than serving indexable English content. |
+| 5a | English template guides are indexable and lead to their editors | **File:** `specs/classroom-game-guides.spec.ts`. Open `/templates/match-up`, `/templates/line-match`, `/templates/group-sort`, `/templates/fill-blank`, `/templates/listening`, and `/templates/open-box`. Verify each returns 200 with a distinct H1, the template's real starter example in server-rendered HTML, visible FAQs, FAQPage and BreadcrumbList JSON-LD, no robots meta, a self canonical, no hreflang links, and links to the other template guides. Follow the create CTA and verify `/create` receives the matching `template`. Verify `/templates/quiz` and `/templates/matching-pairs` 308-redirect to the dedicated guides, unknown templates and `/es/templates/match-up` return 404, and the sitemap lists all six guide URLs. On English `/templates`, verify every card links to its guide and the "Pick a template by the content you have" section is visible; on `/es/templates`, verify no card links to an English-only guide. |
+| 5b | Homepage explains the workflow and answers teacher FAQs | **File:** `specs/classroom-game-guides.spec.ts`. Open `/` and verify the three-step how-it-works section, the eight-template example grid linking to each English guide, the visible FAQ (including whether students need an account), the "More for teachers" links, and FAQPage JSON-LD with no SoftwareApplication node and no Offer (no ratings exist, and no price is advertised). Open `/fr/` and verify the FAQ is localized, all eight example links plus "See all templates" point at `/fr/templates`, and no link points at the redirecting `/fr/blog` (locales without posts link to `/blog`). |
 
 ## 2. Authentication And Protected Routes
 
@@ -1033,6 +1042,27 @@ Workers AI credentials are unavailable, without claiming provider quality.
 | # | Test name | Flow |
 |---|---|---|
 | 1 | Teacher generates, reviews, and explicitly saves a local fallback draft | Register and sign in as a verified teacher, replace the starter source notes with classroom content, choose the draft item count and question focus, invoke the production AI-draft server function, verify the deterministic fallback fills reviewable title and structured-question fields, exposes fallback provenance and the missing-credentials notice, and remains on the create page without persisting. Click the real save action, verify redirect to the activity library, and verify the generated title is persisted without browser console or page errors. |
+
+## 11. Plan Limits and Upgrade Path
+
+**File:** `specs/plan-limits.spec.ts` | **Priority:** P0
+
+Verifies the server-enforced plan limits from `docs/plan-value-design.md`:
+free teachers can run the full loop with capped creation, limits never block
+students or hide results, and paid states use the paid limits. Plan and usage
+state is seeded through the secret-gated local `/api/e2e/plan` fixture; no
+payment provider is called.
+
+| # | Test name | Flow |
+|---|---|---|
+| 1 | Free teacher at the activity limit sees usage, a notice, and the plans page | Seed 15 active activities, sign in, verify the dashboard plan-usage card shows "Current plan: Free", "15 of 15", a text "Limit reached" status, and an accessible meter. Open `/dashboard/activities/new`, verify the limit notice explains the cap, save anyway and verify the server rejects it with the friendly limit message while staying on the editor, then follow "View plans" to `/pricing` and verify the free and Teacher Pro cards quote the enforced limits. |
+| 2 | Open links at the cap block publishing but never block students | Seed three open assignment links, verify a student can still open one with an enabled submit control, sign in, verify "3 of 3" open links, open the publish dialog from the library and verify the limit notice says students can still finish open links and the Publish button is disabled. |
+| 3 | AI draft allowance shows a friendly limit with a plans action | Seed 10 AI draft uses this month, verify "10 of 10", request a draft on `/create`, and verify the toast explains the monthly allowance with a "View plans" action. |
+| 4 | Paid, past-due, and lifetime teachers get the paid limits | Seed an active Teacher Pro subscription with 20 activities and verify "20, no limit", no upgrade link, and no create notice. Seed a past-due subscription inside the grace window and verify the payment-retry note with "Manage billing". Seed a lifetime payment and verify "Current plan: Early Supporter". |
+
+Plan entitlement logic also has a fast gate via
+`pnpm exec tsx --test scripts/plan-entitlements.test.ts`; run it when changing
+plan limits, subscription state handling, or where limits are enforced.
 
 ## Deferred Coverage
 

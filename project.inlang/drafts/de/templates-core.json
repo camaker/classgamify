@@ -1,6 +1,14 @@
 {
   "templates_page_bottom_description": "Öffne den Editor, lade ein Beispiel für das gewählte Spielformat und veröffentliche es anschließend als teilbaren Aufgabenlink für Lernende.",
   "templates_page_bottom_title": "Bereit für deine erste Aktivität?",
+  "templates_page_choose_description": "Jede Vorlage nutzt eine Art von Inhalt: Fragen, Paare oder Gruppen. Nach dem Speichern kannst du eine Aktivität in eine andere Vorlage mit derselben Inhaltsart kopieren.",
+  "templates_page_choose_groups_description": "Kategorien und die Elemente, die dazugehören: {templates}.",
+  "templates_page_choose_groups_title": "Gruppen",
+  "templates_page_choose_pairs_description": "Begriffe mit Bedeutung, Übersetzung oder Beispiel: {templates}.",
+  "templates_page_choose_pairs_title": "Paare",
+  "templates_page_choose_questions_description": "Fragen mit einer Antwort oder Antwortoptionen: {templates}.",
+  "templates_page_choose_questions_title": "Fragen und Antworten",
+  "templates_page_choose_title": "Wähle eine Vorlage passend zu deinen Inhalten",
   "templates_page_create_activity": "Aktivität erstellen",
   "templates_page_create_from_template": "Aus Vorlage erstellen",
   "templates_page_description": "ClassGamify-Vorlagen zeigen dieselben Fragen, Zuordnungen, Gruppen und Vokabeln als Schnellcheck, Zuordnungsspiel, Arbeitsblattübung, Hörimpuls oder Aufdeckrunde für die ganze Klasse.",
@@ -9,10 +17,11 @@
   "templates_page_footer_create_action_aria_label": "Eine leere, wiederverwendbare Aktivität im gemeinsamen Editor erstellen.",
   "templates_page_guide_matching": "Zu den Zuordnungsspielen",
   "templates_page_guide_quiz": "Zum Klassenquiz",
+  "templates_page_guide_template": "So funktioniert {template}",
   "templates_page_hero_create_action_aria_label": "Aus der ersten Vorlagenkarte erstellen und ihr Beispielgerüst im gemeinsamen Editor laden.",
   "templates_page_open_student_preview": "Lernendenansicht öffnen",
-  "templates_page_seo_description": "Entdecke die ersten ClassGamify-Aktivitätsvorlagen für Quiz, Zuordnung, Linienzuordnung, Gruppensortierung, Lückentext, Hören, Paarsuche und Aufdeckspiele.",
-  "templates_page_seo_title": "Aktivitätsvorlagen",
+  "templates_page_seo_description": "Kostenlose, bearbeitbare Spielvorlagen für den Unterricht: Quiz, Zuordnen, Linien zuordnen, Gruppen sortieren, Lückentext, Hörübung, Paare finden und Box öffnen. Inhalte eintragen und Link teilen.",
+  "templates_page_seo_title": "Spielvorlagen für den Unterricht",
   "templates_page_student_preview_action_aria_label": "Die Demoansicht der Aufgabe für Lernende öffnen.",
-  "templates_page_title": "Wähle ein Spielformat für dieselben Unterrichtsinhalte."
+  "templates_page_title": "Bearbeitbare Spielvorlagen für den Unterricht"
 }

@@ -8,6 +8,7 @@ import { m } from '@/locale/paraglide/messages';
 import { seo } from '@/lib/seo';
 import { buttonVariants } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
+import { getTemplateNamesByRequirement } from '@/pages/home-guide-view';
 import { IconLayoutGrid, IconPlayerPlay, IconPlus } from '@tabler/icons-react';
 import { Link, createFileRoute } from '@tanstack/react-router';
 
@@ -70,6 +71,33 @@ function TemplatesPage() {
           ))}
         </div>
 
+        <section
+          aria-labelledby="templates-choose-heading"
+          className="space-y-5 border-t pt-10"
+        >
+          <div className="max-w-3xl space-y-2">
+            <h2
+              id="templates-choose-heading"
+              className="text-2xl font-semibold"
+            >
+              {m.templates_page_choose_title()}
+            </h2>
+            <p className="text-sm leading-6 text-muted-foreground">
+              {m.templates_page_choose_description()}
+            </p>
+          </div>
+          <dl className="grid gap-4 md:grid-cols-3">
+            {chooseByContent().map((item) => (
+              <div key={item.id} className="rounded-lg border bg-card p-5">
+                <dt className="font-semibold">{item.title}</dt>
+                <dd className="mt-2 text-sm leading-6 text-muted-foreground">
+                  {item.description}
+                </dd>
+              </div>
+            ))}
+          </dl>
+        </section>
+
         <div className="rounded-lg border bg-card p-5">
           <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
             <div>
@@ -91,4 +119,30 @@ function TemplatesPage() {
       </div>
     </Container>
   );
+}
+
+function chooseByContent() {
+  return [
+    {
+      id: 'questions',
+      title: m.templates_page_choose_questions_title(),
+      description: m.templates_page_choose_questions_description({
+        templates: getTemplateNamesByRequirement('questions'),
+      }),
+    },
+    {
+      id: 'pairs',
+      title: m.templates_page_choose_pairs_title(),
+      description: m.templates_page_choose_pairs_description({
+        templates: getTemplateNamesByRequirement('pairs'),
+      }),
+    },
+    {
+      id: 'groups',
+      title: m.templates_page_choose_groups_title(),
+      description: m.templates_page_choose_groups_description({
+        templates: getTemplateNamesByRequirement('groups'),
+      }),
+    },
+  ];
 }

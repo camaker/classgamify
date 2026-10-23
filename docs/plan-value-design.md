@@ -1,0 +1,153 @@
+# Plan value design
+
+Status: implemented on `seo/gsc-audit-2026-10`. Limits live in
+`src/payment/plan-entitlements.ts` (`PLAN_LIMITS`); every number in pricing,
+FAQ, billing, and usage copy is filled from that constant.
+
+## Problem
+
+Before this change every signed-in teacher could do everything, whatever
+their plan. Teacher Pro and Early Supporter charged money for nothing that the
+code enforced, and the public copy had to be rewritten to say so.
+
+## Who pays and why
+
+Teachers (individual classroom teachers and tutors) arrive with one job:
+turn this week's lesson content into a game, send one link, and see who
+struggled. Jobs to be done, in order of frequency:
+
+1. Try a template with real content before committing (first session).
+2. Run a handful of activities for one or two classes each week.
+3. Build a reusable library across units, classes, and terms.
+4. Draft activities quickly from lesson notes (AI drafts).
+
+Free must do jobs 1 and 2 well. Jobs 3 and 4 scale with how much the teacher
+relies on ClassGamify, which is what is worth paying for.
+
+## Principles
+
+- **The full loop is free.** Every template, publishing, student play,
+  results, item analysis, CSV export, and printing work on the free plan.
+- **Never hold student data hostage.** Results, attempts, exports, and
+  printing are never limited and never depend on the plan.
+- **Never block students.** Limits only apply when a teacher creates new
+  work. Submitting to an assignment that is already open always works.
+- **Never delete on downgrade.** When a paid plan ends, everything stays:
+  activities, open links, results. The free limits apply only to new
+  creation beyond the cap.
+- **Gate what already exists and is cheap to count.** No invented features.
+  Each limit is a single owner-scoped count that the server checks before
+  writing.
+
+## Packaging
+
+| | Free | Teacher Pro | Early Supporter |
+|---|---|---|---|
+| Templates, results, CSV export, printing | All | All | All |
+| Activities (not archived) | 15 | Unlimited | Unlimited |
+| Open assignment links at a time | 3 | Unlimited | Unlimited |
+| AI drafts per calendar month (resets 00:00 UTC on the 1st) | 10 | 300 (fair use) | 300 (fair use) |
+| Billing | Free | Monthly or yearly | One-time payment |
+
+Prices and Creem/Stripe products are unchanged.
+
+### Why these numbers
+
+- **15 activities (archived ones excluded)** cover a few weeks of real classes and the whole
+  template catalog twice, so a teacher can judge the product honestly.
+  Archiving frees a slot, so the limit rewards tidy libraries rather than
+  forcing deletion.
+- **3 open links** lets a teacher run one assignment per class for up to three
+  classes at once. Closing a link (or letting it expire) frees a slot, and
+  closed links keep their results.
+- **10 AI drafts a month** is enough to feel the speed-up, while AI is the
+  only feature with a real per-use cost. Paid plans get 300 a month as a
+  fair-use ceiling that protects the Workers AI budget.
+
+### What counts
+
+- Activities: rows owned by the teacher whose visibility is not `archived`.
+  Creating, duplicating, remixing, and restoring from the archive each add
+  one and are checked. Editing never is.
+- Open assignment links: assignments with status `published` whose close
+  time is empty or in the future. Publishing and reopening are checked.
+  Closing, expiry, and student submissions are never checked.
+- AI drafts: one row in `ai_draft_usage` per draft the AI provider actually
+  produced (Workers AI), counted since 00:00 UTC on the 1st of the current
+  month. The offline template fallback costs nothing and does not count.
+
+Checks run on the server inside the server functions
+(`src/api/activities.ts`, `src/api/assignments.ts`, `src/api/activity-ai.ts`)
+before any write.
+
+- AI drafts are reserved atomically before the provider is called: a single
+  conditional `INSERT … SELECT … WHERE (monthly count) < limit` either takes
+  a slot or fails, so parallel requests can never overrun the allowance. The
+  reservation is released if generation throws or falls back to the offline
+  template; a failed release is logged and never hides the draft.
+- Activity and open-link caps are checked with a count before the insert.
+  Two simultaneous creations can exceed those caps by one; that is accepted
+  as a soft limit rather than adding locking to every activity write.
+
+## Subscription states
+
+Resolved from the existing `payment` table (`resolveEntitlementPlan`):
+
+| Payment record | Plan |
+|---|---|
+| Completed one-time lifetime payment | Early Supporter (never expires) |
+| Subscription `active` or `trialing` | Teacher Pro |
+| `active` or `trialing` with cancel at period end | Teacher Pro until the period end (a period end in the past means a missed webhook, so free) |
+| Subscription `past_due` | Teacher Pro for 7 days from the earlier of the period end and when the failed payment was recorded (`updatedAt`), then free |
+| Subscription `canceled` scheduled for period end | Teacher Pro until the period end |
+| Subscription `canceled` immediately (refund or `canceledAt`), or expired | Free |
+| Anything else, or no payment | Free |
+
+The 7-day past-due grace assumes the payment provider retries a failed
+renewal within about a week (Creem and Stripe both retry over several days
+before marking the subscription unpaid or canceled). If the provider's retry
+window changes, adjust `PAST_DUE_GRACE_DAYS` to match.
+
+A paid subscription whose price id is not in the current config still counts
+as Teacher Pro, so a price rotation can never silently downgrade a payer.
+
+Settings → Billing uses the same resolver (`src/payment/current-plan.ts`), so
+it always shows the plan that is enforced, and the hosted billing portal is
+offered to anyone with a customer id or payment history, even on the free
+plan.
+
+## Migration policy (grandfathering)
+
+- No data changes. Existing activities, assignments, attempts, and exports
+  stay readable, editable, closable, and exportable on every plan.
+- A free teacher who is already above a cap keeps everything; only new
+  creation of that kind is blocked until usage drops below the cap.
+- A teacher whose subscription ends keeps every open link open. They cannot
+  publish or reopen more until they are under 3 open links.
+- The only schema change is the new `ai_draft_usage` table (migration
+  `0016`), which must be applied to the remote D1 database before deploy.
+
+## UI and copy principles
+
+- Show usage before the wall: the dashboard and activity library show
+  "used of limit" for each counted resource on the free plan.
+- When a limit is reached, say what happened, what still works, and the two
+  ways forward (free up a slot, or upgrade), with a "View plans" action.
+- Sentence case, no urgency tricks, no countdowns, all 10 locales.
+- Pricing, plan cards, pricing FAQ (visible and JSON-LD), home FAQ, and
+  billing settings describe exactly the enforced limits, using the same
+  numbers from `PLAN_LIMITS`.
+
+## Plan names
+
+The free plan is shown as "Free" in every locale (plan cards, usage card,
+billing settings). Internal ids stay `free`, `pro`, and `lifetime`, so no
+payment or billing mapping changes.
+
+## Owner sign-off needed
+
+- Apply migration `0016_ai_draft_usage` to remote D1 before deploying.
+- Update the Teacher Pro and Early Supporter product descriptions in the
+  Creem dashboard to match the new plan cards (no price or product id change).
+- Confirm the numbers (15 / 3 / 10, and 300 for paid AI drafts). Confirmed by
+  the owner, together with the 7-day past-due grace.

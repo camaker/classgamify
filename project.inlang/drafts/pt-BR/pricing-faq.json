@@ -1,0 +1,14 @@
+{
+  "pricing_faq_title": "Perguntas frequentes",
+  "pricing_faq_description": "Perguntas sobre modelos, links de tarefas, resultados dos alunos e uso em escolas.",
+  "pricing_faq_free_question": "O que o plano gratuito inclui?",
+  "pricing_faq_free_answer": "Todos os modelos, até {activities} atividades (as arquivadas não contam), até {openAssignments} links de tarefas abertos ao mesmo tempo e {aiDrafts} rascunhos com IA por mês. Tentativas dos alunos, resultados, exportação em CSV e impressão nunca têm limite, e não é preciso cartão de crédito.",
+  "pricing_faq_pro_question": "O que o Teacher Pro inclui?",
+  "pricing_faq_pro_answer": "O Teacher Pro remove os limites de atividades e de links de tarefas abertos e inclui {paidAiDrafts} rascunhos com IA por mês, com cobrança mensal ou anual. Apoiador inicial é um pagamento único pelo mesmo acesso. Se um plano pago terminar, nada é excluído, e os limites gratuitos valem só para o que você criar de novo.",
+  "pricing_faq_templates_question": "Por que o catálogo começa com oito modelos?",
+  "pricing_faq_templates_answer": "O catálogo começa com oito modelos muito usados em sala de aula para que criar, publicar, jogar e ver resultados funcione de forma confiável antes de adicionar outros.",
+  "pricing_faq_student_accounts_question": "Os alunos precisam de conta?",
+  "pricing_faq_student_accounts_answer": "Não. Os alunos abrem um link público da tarefa. Você escolhe se eles digitam um nome ou ficam anônimos. Só os professores precisam de conta para criar, publicar e ver resultados.",
+  "pricing_faq_schools_question": "Escolas ou equipes de reforço podem usar?",
+  "pricing_faq_schools_answer": "Por enquanto, cada professor usa a própria conta e ainda não existe um espaço compartilhado para escolas. Fale com a gente antes de uma implantação maior para conversar sobre vagas de professores, regras para dados dos alunos e permissões."
+}

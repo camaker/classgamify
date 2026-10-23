@@ -22,6 +22,7 @@ import {
   useQuery,
   useQueryClient,
 } from '@tanstack/react-query';
+import { PLAN_USAGE_QUERY_KEY } from '@/hooks/use-plan-usage';
 
 const activitiesKeys = {
   all: ['activities'] as const,
@@ -97,15 +98,21 @@ export function useCreateActivity() {
     mutationFn: (input: CreateActivityInput) => createActivity({ data: input }),
     onSuccess: (activity) => {
       queryClient.invalidateQueries({ queryKey: activitiesKeys.lists() });
+      queryClient.invalidateQueries({ queryKey: PLAN_USAGE_QUERY_KEY });
       queryClient.setQueryData(activitiesKeys.detail(activity.id), activity);
     },
   });
 }
 
 export function useGenerateActivityDraft() {
+  const queryClient = useQueryClient();
+
   return useMutation({
     mutationFn: (input: GenerateActivityDraftInput) =>
       generateActivityDraft({ data: input }),
+    onSettled: () => {
+      queryClient.invalidateQueries({ queryKey: PLAN_USAGE_QUERY_KEY });
+    },
   });
 }
 
@@ -117,6 +124,7 @@ export function useDuplicateActivity() {
       duplicateActivity({ data: input }),
     onSuccess: (activity) => {
       queryClient.invalidateQueries({ queryKey: activitiesKeys.lists() });
+      queryClient.invalidateQueries({ queryKey: PLAN_USAGE_QUERY_KEY });
       queryClient.setQueryData(activitiesKeys.detail(activity.id), activity);
     },
   });
@@ -130,6 +138,7 @@ export function useArchiveActivity() {
       archiveActivity({ data: input }),
     onSuccess: (activity) => {
       queryClient.invalidateQueries({ queryKey: activitiesKeys.lists() });
+      queryClient.invalidateQueries({ queryKey: PLAN_USAGE_QUERY_KEY });
       queryClient.setQueryData(activitiesKeys.detail(activity.id), activity);
     },
   });
@@ -143,6 +152,7 @@ export function useRestoreActivity() {
       restoreActivity({ data: input }),
     onSuccess: (activity) => {
       queryClient.invalidateQueries({ queryKey: activitiesKeys.lists() });
+      queryClient.invalidateQueries({ queryKey: PLAN_USAGE_QUERY_KEY });
       queryClient.setQueryData(activitiesKeys.detail(activity.id), activity);
     },
   });
@@ -158,6 +168,7 @@ export function useRemixActivityTemplate() {
     }) => remixActivityTemplate({ data: input }),
     onSuccess: (activity) => {
       queryClient.invalidateQueries({ queryKey: activitiesKeys.lists() });
+      queryClient.invalidateQueries({ queryKey: PLAN_USAGE_QUERY_KEY });
       queryClient.setQueryData(activitiesKeys.detail(activity.id), activity);
     },
   });
@@ -171,6 +182,7 @@ export function useUpdateActivity() {
       updateActivity({ data: input }),
     onSuccess: (activity) => {
       queryClient.invalidateQueries({ queryKey: activitiesKeys.lists() });
+      queryClient.invalidateQueries({ queryKey: PLAN_USAGE_QUERY_KEY });
       queryClient.setQueryData(activitiesKeys.detail(activity.id), activity);
     },
   });

@@ -26,18 +26,6 @@ export function findPlanByPlanId(planId: string): PricePlan | undefined {
 }
 
 /**
- * Find plan by price ID
- */
-export function findPlanByPriceId(priceId: string): PricePlan | undefined {
-  const plans = getAllPricePlans();
-  for (const plan of plans) {
-    const matchingPrice = plan.prices.find((p) => p.priceId === priceId);
-    if (matchingPrice) return plan;
-  }
-  return undefined;
-}
-
-/**
  * Find price by price ID and plan ID
  */
 export function findPriceInPlan(

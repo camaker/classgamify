@@ -1,5 +1,6 @@
 import type { PricePlan, Subscription } from '@/payment/types';
 import { m } from '@/locale/paraglide/messages';
+import { getPlanLimitCopyParams } from '@/payment/plan-entitlements';
 
 type SettingsBillingCardState = 'error' | 'loading' | 'no-plan' | 'ready';
 
@@ -82,6 +83,8 @@ type SettingsBillingCardPlanView = {
 
 type SettingsBillingCardViewModel = {
   action?: SettingsBillingCardAction;
+  /** Hosted billing portal for teachers with any billing history. */
+  secondaryAction?: SettingsBillingCardAction;
   ariaLabel: string;
   header: SettingsBillingCardHeader;
   message?: string;
@@ -96,6 +99,7 @@ type BuildSettingsBillingCardViewModelInput = {
   canManageBilling: boolean;
   currentPlan?: PricePlan | null;
   formatDate: (date: Date) => string;
+  hasBillingAccount?: boolean;
   hasLoadError: boolean;
   isLoading: boolean;
   plans: PricePlan[];
@@ -115,11 +119,19 @@ export function buildSettingsBillingCardViewModel({
   canManageBilling,
   currentPlan,
   formatDate,
+  hasBillingAccount = false,
   hasLoadError,
   isLoading,
   plans,
   subscription,
 }: BuildSettingsBillingCardViewModelInput): SettingsBillingCardViewModel {
+  const portalAction =
+    canManageBilling && hasBillingAccount
+      ? buildSettingsBillingCardActionView({
+          kind: 'manage-billing',
+          label: m.settings_billing_card_manage_billing(),
+        })
+      : undefined;
   if (isLoading) {
     return buildSettingsBillingCardBaseView('loading');
   }
@@ -147,8 +159,9 @@ export function buildSettingsBillingCardViewModel({
         kind: 'upgrade',
         label: m.settings_billing_card_upgrade_plan(),
       }),
-      message: m.settings_billing_card_no_plan(),
+      message: m.settings_billing_card_no_plan(getPlanLimitCopyParams()),
       nextStep: buildSettingsBillingNoPlanNextStepView(),
+      secondaryAction: portalAction,
     };
   }
 
@@ -166,6 +179,7 @@ export function buildSettingsBillingCardViewModel({
       subscription,
     }),
     plan,
+    secondaryAction: plan.isFree ? portalAction : undefined,
     statusBadge: buildSettingsBillingCardStatusBadge(subscription),
   };
 }
@@ -212,7 +226,8 @@ function buildSettingsBillingCardPlanView(
 }
 
 function buildSettingsBillingPlanMessage(plan: PricePlan) {
-  if (plan.isFree) return m.settings_billing_card_free_plan_message();
+  if (plan.isFree)
+    return m.settings_billing_card_free_plan_message(getPlanLimitCopyParams());
   if (plan.isLifetime) return m.settings_billing_card_lifetime_message();
 
   return undefined;
@@ -288,7 +303,9 @@ function buildSettingsBillingPlanNextStepView(
 ): SettingsBillingCardNextStepView {
   if (plan.isFree) {
     return buildSettingsBillingNextStepView({
-      description: m.settings_billing_card_next_step_free_description(),
+      description: m.settings_billing_card_next_step_free_description(
+        getPlanLimitCopyParams()
+      ),
       label: m.settings_billing_card_next_step_free_label(),
     });
   }

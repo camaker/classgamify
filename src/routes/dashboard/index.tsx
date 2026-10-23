@@ -22,6 +22,7 @@ import {
   IconPlus,
 } from '@tabler/icons-react';
 import { Link, createFileRoute } from '@tanstack/react-router';
+import { PlanUsageCard } from '@/components/payment/plan-usage-card';
 
 export const Route = createFileRoute('/dashboard/')({
   component: DashboardPage,
@@ -86,6 +87,8 @@ function DashboardPage() {
         </section>
 
         <DashboardOverviewLoopStatusPanel view={pageView.loopStatus} />
+
+        <PlanUsageCard />
 
         {recentAssignments.length > 0 ? (
           <section className="grid gap-3">

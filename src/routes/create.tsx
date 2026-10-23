@@ -53,6 +53,16 @@ function CreatePage() {
       });
     }
   }, [navigate, session?.user, source, template]);
+  // Keep the chosen template through sign-up or login. The value is a
+  // same-origin path; login/register re-check it with getSafeCallbackPath.
+  const authCallbackUrl = useMemo(() => {
+    const params = new URLSearchParams();
+    if (template) params.set('template', template);
+    if (source) params.set('source', source);
+    const query = params.toString();
+    const path = getPathWithLocale(Routes.Create);
+    return query ? `${path}?${query}` : path;
+  }, [source, template]);
   const pageView = useMemo(
     () =>
       buildActivityCreatePageEditorViewModel({
@@ -91,7 +101,7 @@ function CreatePage() {
                   <div className="mt-3 flex flex-wrap items-center gap-3">
                     <Link
                       to={Routes.Register}
-                      search={{ callbackUrl: getPathWithLocale(Routes.Create) }}
+                      search={{ callbackUrl: authCallbackUrl }}
                       className={cn(
                         buttonVariants({ size: 'sm' }),
                         'rounded-md'
@@ -101,7 +111,7 @@ function CreatePage() {
                     </Link>
                     <Link
                       to={Routes.Login}
-                      search={{ callbackUrl: getPathWithLocale(Routes.Create) }}
+                      search={{ callbackUrl: authCallbackUrl }}
                       className="text-sm font-medium text-primary underline-offset-4 hover:underline"
                     >
                       {m.create_guest_login_action()}

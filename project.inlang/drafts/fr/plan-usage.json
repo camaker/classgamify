@@ -1,0 +1,23 @@
+{
+  "plan_limit_activities_reached": "Vous avez {limit} activités non archivées, le maximum de l’offre gratuite. Archivez une activité ou passez à Teacher Pro pour en ajouter d’autres. Tout ce que vous avez créé reste disponible.",
+  "plan_limit_ai_drafts_reached": "Vous avez utilisé les {limit} brouillons IA de ce mois. De nouveaux brouillons seront disponibles le 1er du mois prochain (UTC), et vous pouvez continuer à créer des activités à la main.",
+  "plan_limit_open_assignments_reached": "Vous avez {limit} liens de devoir ouverts, le maximum simultané de l’offre gratuite. Fermez un lien ou passez à Teacher Pro pour en publier d’autres. Les élèves peuvent toujours terminer les liens ouverts.",
+  "plan_limit_upgrade_hint": "Teacher Pro comprend davantage de brouillons IA chaque mois.",
+  "plan_limit_view_plans": "Voir les offres",
+  "plan_usage_activities_label": "Activités (hors archives)",
+  "plan_usage_ai_drafts_label": "Brouillons IA ce mois-ci (UTC)",
+  "plan_usage_compare_plans": "Comparer les offres",
+  "plan_usage_current_plan": "Offre actuelle : {plan}",
+  "plan_usage_manage_plan": "Gérer la facturation",
+  "plan_usage_meter_aria": "{label} : {value}",
+  "plan_usage_note_cancel_scheduled": "Teacher Pro prend fin avec votre période de facturation en cours. Rien n’est supprimé ensuite, et les limites de l’offre gratuite ne s’appliquent qu’aux nouveaux contenus.",
+  "plan_usage_note_free": "Les activités archivées, les liens fermés, les résultats des élèves et les exports CSV ne comptent jamais. Les élèves peuvent toujours terminer les liens déjà publiés.",
+  "plan_usage_note_paid": "Votre offre ne limite ni les activités ni les liens de devoir ouverts.",
+  "plan_usage_note_past_due": "Votre dernier paiement n’a pas abouti. Teacher Pro reste actif quelques jours pendant une nouvelle tentative : vérifiez vos informations de paiement.",
+  "plan_usage_open_assignments_label": "Liens de devoir ouverts",
+  "plan_usage_status_near": "Presque plein",
+  "plan_usage_status_reached": "Limite atteinte",
+  "plan_usage_title": "Utilisation de l’offre",
+  "plan_usage_value_limited": "{used} sur {limit}",
+  "plan_usage_value_unlimited": "{used}, sans limite"
+}

@@ -7,6 +7,7 @@ import {
   DEFAULT_MAX_FILE_SIZE,
   DEFAULT_USER_FILES_FOLDER,
 } from '@/storage/constants';
+import { getPlanLimitCopyParams } from '@/payment/plan-entitlements';
 
 const CREEM_LIVE_PRODUCTS = {
   proMonthly: 'prod_6itBGJhc4fAUZVZHTZvPRi',
@@ -111,10 +112,14 @@ export const websiteConfig: WebsiteConfig = {
             return m.pricing_plans_free_name();
           },
           get description() {
-            return m.pricing_plans_free_description();
+            return m.pricing_plans_free_description(getPlanLimitCopyParams());
           },
           get features() {
-            return [...getMessageList(m.pricing_plans_free_features())];
+            return [
+              ...getMessageList(
+                m.pricing_plans_free_features(getPlanLimitCopyParams())
+              ),
+            ];
           },
           get limits() {
             return [...getMessageList(m.pricing_plans_free_limits())];
@@ -145,10 +150,14 @@ export const websiteConfig: WebsiteConfig = {
             return m.pricing_plans_pro_name();
           },
           get description() {
-            return m.pricing_plans_pro_description();
+            return m.pricing_plans_pro_description(getPlanLimitCopyParams());
           },
           get features() {
-            return [...getMessageList(m.pricing_plans_pro_features())];
+            return [
+              ...getMessageList(
+                m.pricing_plans_pro_features(getPlanLimitCopyParams())
+              ),
+            ];
           },
           get limits() {
             return [...getMessageList(m.pricing_plans_pro_limits())];

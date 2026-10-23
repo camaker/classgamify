@@ -1,3 +1,4 @@
+import { linkChangesLocale } from '@/seo/public-routes';
 import Container from '@/components/layout/container';
 import { HomeHeroGame } from '@/components/page/home-hero-game';
 import { Badge } from '@/components/ui/badge';
@@ -13,15 +14,23 @@ import {
 } from '@/pages/public-page-view';
 import * as m from '@/locale/paraglide/messages';
 import {
+  faqPageJsonLd,
   graphJsonLd,
   jsonLdScript,
   organizationJsonLd,
   websiteJsonLd,
 } from '@/lib/structured-data';
+import {
+  buildHomeGuideView,
+  type HomeGuideStepId,
+} from '@/pages/home-guide-view';
 import { cn } from '@/lib/utils';
 import {
+  IconArrowRight,
   IconChartBar,
   IconDeviceGamepad2,
+  IconLayoutGrid,
+  IconLink,
   IconPlayerPlay,
   IconPlus,
   IconSparkles,
@@ -37,6 +46,7 @@ export const Route = createFileRoute('/')({
     const title = `${name} | ${m.home_page_seo_title()}`;
     const description = m.home_page_seo_description();
     const metadata = seo('/', { title, description });
+    const guide = buildHomeGuideView();
 
     return {
       ...metadata,
@@ -45,6 +55,7 @@ export const Route = createFileRoute('/')({
           graphJsonLd([
             organizationJsonLd(),
             websiteJsonLd({ description, inLanguage, name, path: '/' }),
+            faqPageJsonLd({ faqs: guide.faq.items, path: '/' }),
           ])
         ),
       ],
@@ -55,6 +66,7 @@ export const Route = createFileRoute('/')({
 
 function HomePage() {
   const pageView = buildHomePageViewModel();
+  const guide = buildHomeGuideView();
 
   return (
     <Container className="px-4 pt-7 pb-16 md:pt-10">
@@ -181,6 +193,145 @@ function HomePage() {
             })}
           </div>
         </section>
+
+        <section aria-labelledby="home-steps-heading" className="space-y-6">
+          <div className="max-w-3xl">
+            <p className="text-sm font-medium text-primary">
+              {guide.steps.eyebrow}
+            </p>
+            <h2
+              id="home-steps-heading"
+              className="mt-2 text-2xl font-semibold tracking-normal md:text-3xl"
+            >
+              {guide.steps.title}
+            </h2>
+          </div>
+          <ol className="grid gap-4 md:grid-cols-3">
+            {guide.steps.items.map((step, index) => {
+              const Icon = homeStepIcons[step.id];
+
+              return (
+                <li key={step.id} className="rounded-lg border bg-card p-5">
+                  <div className="flex items-center gap-3">
+                    <span className="flex size-9 items-center justify-center rounded-lg border bg-background text-primary">
+                      <Icon className="size-4" aria-hidden="true" />
+                    </span>
+                    <span className="text-sm font-semibold text-primary">
+                      {String(index + 1).padStart(2, '0')}
+                    </span>
+                  </div>
+                  <h3 className="mt-4 font-semibold">{step.title}</h3>
+                  <p className="mt-2 text-sm leading-6 text-muted-foreground">
+                    {step.description}
+                  </p>
+                </li>
+              );
+            })}
+          </ol>
+        </section>
+
+        <section aria-labelledby="home-examples-heading" className="space-y-6">
+          <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
+            <div className="max-w-3xl">
+              <p className="text-sm font-medium text-primary">
+                {guide.examples.eyebrow}
+              </p>
+              <h2
+                id="home-examples-heading"
+                className="mt-2 text-2xl font-semibold tracking-normal md:text-3xl"
+              >
+                {guide.examples.title}
+              </h2>
+              <p className="mt-2 text-sm leading-6 text-muted-foreground">
+                {guide.examples.description}
+              </p>
+            </div>
+            <Link
+              to={guide.examples.allAction.to}
+              className={cn(
+                buttonVariants({ variant: 'outline' }),
+                'w-fit rounded-lg bg-background'
+              )}
+            >
+              {guide.examples.allAction.label}
+              <IconArrowRight className="size-4" aria-hidden="true" />
+            </Link>
+          </div>
+          <ul className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+            {guide.examples.templates.map((template) => {
+              const content = (
+                <>
+                  <span className="font-semibold text-foreground">
+                    {template.name}
+                  </span>
+                  <span className="mt-1 block text-sm leading-6 text-muted-foreground">
+                    {template.description}
+                  </span>
+                </>
+              );
+              const className =
+                'block h-full rounded-lg border bg-card p-4 transition-colors hover:border-primary/50 focus-visible:outline-2 focus-visible:outline-primary';
+
+              return (
+                <li key={template.type}>
+                  {template.guideHref ? (
+                    <a href={template.guideHref} className={className}>
+                      {content}
+                    </a>
+                  ) : (
+                    <Link to={template.directoryTo} className={className}>
+                      {content}
+                    </Link>
+                  )}
+                </li>
+              );
+            })}
+          </ul>
+        </section>
+
+        <section
+          id="faqs"
+          aria-labelledby="home-faq-heading"
+          className="grid gap-8 border-t pt-12 lg:grid-cols-[minmax(0,0.6fr)_minmax(0,1.4fr)]"
+        >
+          <div>
+            <p className="text-sm font-medium text-primary">
+              {guide.faq.eyebrow}
+            </p>
+            <h2
+              id="home-faq-heading"
+              className="mt-2 text-2xl font-semibold tracking-normal md:text-3xl"
+            >
+              {guide.faq.title}
+            </h2>
+            <nav aria-label={guide.more.title} className="mt-6">
+              <h3 className="text-sm font-semibold">{guide.more.title}</h3>
+              <ul className="mt-3 space-y-2 text-sm">
+                {guide.more.links.map((link) => (
+                  <li key={link.to}>
+                    <Link
+                      to={link.to}
+                      reloadDocument={linkChangesLocale(link.to)}
+                      className="text-primary underline-offset-4 hover:underline"
+                    >
+                      {link.label} →
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </nav>
+          </div>
+          <dl className="divide-y rounded-lg border bg-card">
+            {guide.faq.items.map((item) => (
+              <div key={item.question} className="p-5">
+                <dt className="font-semibold">{item.question}</dt>
+                <dd className="mt-2 text-sm leading-6 text-muted-foreground">
+                  {item.answer}
+                </dd>
+              </div>
+            ))}
+          </dl>
+        </section>
       </div>
     </Container>
   );
@@ -218,6 +369,12 @@ const homeFeatureIcons = {
   results: IconChartBar,
   'teacher-workflows': IconSparkles,
 } satisfies Record<HomePageFeatureId, TablerIcon>;
+
+const homeStepIcons = {
+  publish: IconLink,
+  results: IconChartBar,
+  template: IconLayoutGrid,
+} satisfies Record<HomeGuideStepId, TablerIcon>;
 
 const homeSignalIcons = {
   delivery: IconUsers,

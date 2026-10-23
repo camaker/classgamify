@@ -1,6 +1,14 @@
 {
   "templates_page_bottom_description": "افتح المحرر وحمّل مثالًا بتنسيق اللعبة المحدد، ثم انشره كرابط واجب يمكن مشاركته مع الطلاب.",
   "templates_page_bottom_title": "هل أنت مستعد لإنشاء نشاط؟",
+  "templates_page_choose_description": "يستخدم كل قالب نوعًا واحدًا من المحتوى: أسئلة أو أزواجًا أو مجموعات. وبعد الحفظ يمكنك نسخ النشاط إلى قالب آخر يستخدم النوع نفسه.",
+  "templates_page_choose_groups_description": "فئات والعناصر التي تنتمي إلى كل منها: {templates}.",
+  "templates_page_choose_groups_title": "مجموعات",
+  "templates_page_choose_pairs_description": "مصطلحات مع معناها أو ترجمتها أو مثال عليها: {templates}.",
+  "templates_page_choose_pairs_title": "أزواج",
+  "templates_page_choose_questions_description": "أسئلة لها إجابة أو خيارات إجابة: {templates}.",
+  "templates_page_choose_questions_title": "أسئلة وإجابات",
+  "templates_page_choose_title": "اختر القالب حسب المحتوى المتوفر لديك",
   "templates_page_create_activity": "إنشاء نشاط",
   "templates_page_create_from_template": "إنشاء من القالب",
   "templates_page_description": "تعرض قوالب ClassGamify الأسئلة والأزواج والمجموعات والمفردات نفسها كاختبارات سريعة أو ألعاب مطابقة أو أوراق عمل أو تدريبات استماع أو جولات كشف جماعية.",
@@ -9,10 +17,11 @@
   "templates_page_footer_create_action_aria_label": "أنشئ نشاطًا فارغًا قابلًا لإعادة الاستخدام في المحرر المشترك.",
   "templates_page_guide_matching": "استكشف لعبة المطابقة",
   "templates_page_guide_quiz": "استكشف اختبار الصف",
+  "templates_page_guide_template": "كيف يعمل قالب {template}",
   "templates_page_hero_create_action_aria_label": "أنشئ نشاطًا من بطاقة القالب الأولى وحمّل مثاله في المحرر المشترك.",
   "templates_page_open_student_preview": "فتح معاينة الطالب",
-  "templates_page_seo_description": "استعرض أول قوالب أنشطة ClassGamify للاختبارات والمطابقة والتوصيل بالخطوط وتصنيف المجموعات وملء الفراغات والاستماع ومطابقة الأزواج وصناديق الكشف.",
-  "templates_page_seo_title": "قوالب الأنشطة",
+  "templates_page_seo_description": "قوالب ألعاب صفية مجانية وقابلة للتعديل: اختبار قصير، والمطابقة، والتوصيل بالخطوط، والتصنيف في مجموعات، وإكمال الجملة، والاستماع، والعثور على الأزواج، وفتح الصندوق. أضف محتواك وشارك رابط الطالب.",
+  "templates_page_seo_title": "قوالب ألعاب صفية",
   "templates_page_student_preview_action_aria_label": "افتح معاينة تجريبية للواجب كما يراه الطالب.",
-  "templates_page_title": "اختر تنسيق لعبة يناسب محتوى الدرس نفسه."
+  "templates_page_title": "قوالب ألعاب صفية قابلة للتعديل"
 }

@@ -11,6 +11,7 @@ import type {
   ActivityTemplateType,
   AssignmentSeed,
 } from '@/activities/types';
+import { getPlanLimitCopyParams } from '@/payment/plan-entitlements';
 
 type PublicPageRouteAction = {
   ariaLabel: string;
@@ -973,12 +974,12 @@ export function buildPricingPageViewModel(): PricingPageViewModel {
 export function buildPricingFaqItems(): PricingFaqItemView[] {
   return [
     buildPricingFaqItemView({
-      answer: m.pricing_faq_free_answer(),
+      answer: m.pricing_faq_free_answer(getPlanLimitCopyParams()),
       id: 'free',
       question: m.pricing_faq_free_question(),
     }),
     buildPricingFaqItemView({
-      answer: m.pricing_faq_pro_answer(),
+      answer: m.pricing_faq_pro_answer(getPlanLimitCopyParams()),
       id: 'pro',
       question: m.pricing_faq_pro_question(),
     }),

@@ -22,6 +22,7 @@ export { default as IconBook2 } from '@tabler/icons-react/dist/esm/icons/IconBoo
 export { default as IconBox } from '@tabler/icons-react/dist/esm/icons/IconBox.mjs';
 export { default as IconBrandGoogleFilled } from '@tabler/icons-react/dist/esm/icons/IconBrandGoogleFilled.mjs';
 export { default as IconBug } from '@tabler/icons-react/dist/esm/icons/IconBug.mjs';
+export { default as IconBulb } from '@tabler/icons-react/dist/esm/icons/IconBulb.mjs';
 export { default as IconCalendar } from '@tabler/icons-react/dist/esm/icons/IconCalendar.mjs';
 export { default as IconCalendarDue } from '@tabler/icons-react/dist/esm/icons/IconCalendarDue.mjs';
 export { default as IconCalendarTime } from '@tabler/icons-react/dist/esm/icons/IconCalendarTime.mjs';
@@ -81,6 +82,7 @@ export { default as IconLink } from '@tabler/icons-react/dist/esm/icons/IconLink
 export { default as IconLinkOff } from '@tabler/icons-react/dist/esm/icons/IconLinkOff.mjs';
 export { default as IconListCheck } from '@tabler/icons-react/dist/esm/icons/IconListCheck.mjs';
 export { default as IconListDetails } from '@tabler/icons-react/dist/esm/icons/IconListDetails.mjs';
+export { default as IconListNumbers } from '@tabler/icons-react/dist/esm/icons/IconListNumbers.mjs';
 export { default as IconLoader } from '@tabler/icons-react/dist/esm/icons/IconLoader.mjs';
 export { default as IconLoader2 } from '@tabler/icons-react/dist/esm/icons/IconLoader2.mjs';
 export { default as IconLock } from '@tabler/icons-react/dist/esm/icons/IconLock.mjs';

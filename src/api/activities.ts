@@ -58,6 +58,7 @@ import { activity, userFiles } from '@/db/app.schema';
 import { APP_ENTITY_ID_LENGTH } from '@/lib/entity-id';
 import { m } from '@/locale/paraglide/messages';
 import { authApiMiddleware } from '@/middlewares/auth-middleware';
+import { assertPlanAllows } from '@/payment/plan-entitlements-server';
 import {
   buildUserFileMaterialReferenceSelect,
   buildUserFileMaterialsOwnerWhere,
@@ -189,6 +190,7 @@ export const createActivity = createServerFn({ method: 'POST' })
       input: data,
       userId,
     });
+    await assertPlanAllows('activities', userId, { db });
     const now = new Date();
     const id = nanoid(APP_ENTITY_ID_LENGTH.generated);
 
@@ -235,6 +237,7 @@ export const duplicateActivity = createServerFn({ method: 'POST' })
       throw new Error(m.activity_api_error_activity_not_found());
     }
     assertActivityCanDeriveWork(sourceActivity.visibility);
+    await assertPlanAllows('activities', userId, { db });
 
     const now = new Date();
     const id = nanoid(APP_ENTITY_ID_LENGTH.generated);
@@ -303,6 +306,7 @@ export const remixActivityTemplate = createServerFn({ method: 'POST' })
       template: targetTemplate,
     });
     assertTemplateRemixOptionReady(remixOption);
+    await assertPlanAllows('activities', userId, { db });
 
     const now = new Date();
     const id = nanoid(APP_ENTITY_ID_LENGTH.generated);
@@ -441,6 +445,7 @@ async function updateActivityVisibility({
     assertActivityCanArchive(row.visibility);
   } else {
     assertActivityCanRestore(row.visibility);
+    await assertPlanAllows('activities', ownerId, { db });
   }
 
   const updatedAt = resolveActivityMutationUpdatedAt({

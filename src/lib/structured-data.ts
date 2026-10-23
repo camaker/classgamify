@@ -98,6 +98,38 @@ export function articleJsonLd({
   };
 }
 
+export function breadcrumbJsonLd(
+  items: Array<{ name: string; path: string }>
+): JsonLdNode {
+  return {
+    '@type': 'BreadcrumbList',
+    itemListElement: items.map((item, index) => ({
+      '@type': 'ListItem',
+      position: index + 1,
+      name: item.name,
+      item: getCanonicalUrl(item.path),
+    })),
+  };
+}
+
+export function faqPageJsonLd({
+  faqs,
+  path,
+}: {
+  faqs: Array<{ answer: string; question: string }>;
+  path: string;
+}): JsonLdNode {
+  return {
+    '@type': 'FAQPage',
+    '@id': `${getCanonicalUrl(path)}#faq`,
+    mainEntity: faqs.map((faq) => ({
+      '@type': 'Question',
+      name: faq.question,
+      acceptedAnswer: { '@type': 'Answer', text: faq.answer },
+    })),
+  };
+}
+
 export function graphJsonLd(nodes: JsonLdNode[]): JsonLdNode {
   return {
     '@context': 'https://schema.org',

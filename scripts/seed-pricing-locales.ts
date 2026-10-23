@@ -1,4 +1,13 @@
-import { mkdir, writeFile } from 'node:fs/promises';
+/**
+ * One-off bootstrap for `project.inlang/drafts/<locale>/pricing-core.json`.
+ *
+ * The translations below are the original seed and are older than the
+ * reviewed drafts. To stay safe, this script never overwrites a key that a
+ * draft already has: it only adds keys that are missing, and leaves every
+ * existing value untouched. Edit the draft JSON files directly to change
+ * pricing copy; do not edit the strings here expecting them to win.
+ */
+import { mkdir, readFile, writeFile } from 'node:fs/promises';
 
 const translations: Record<string, Record<string, string>> = {
   fr: {
@@ -8,7 +17,7 @@ const translations: Record<string, Record<string, string>> = {
     pricing_eyebrow: 'Offres ClassGamify',
     pricing_monthly: 'Mensuel',
     pricing_yearly: 'Annuel',
-    pricing_plans_free_name: 'Départ',
+    pricing_plans_free_name: 'Gratuit',
     pricing_plans_pro_name: 'Teacher Pro',
     pricing_plans_lifetime_name: 'Membre fondateur',
     pricing_school_title: 'Besoin d’un espace pour plusieurs enseignants ?',
@@ -20,7 +29,7 @@ const translations: Record<string, Record<string, string>> = {
     pricing_eyebrow: 'ClassGamify-Tarife',
     pricing_monthly: 'Monatlich',
     pricing_yearly: 'Jährlich',
-    pricing_plans_free_name: 'Start',
+    pricing_plans_free_name: 'Kostenlos',
     pricing_plans_pro_name: 'Teacher Pro',
     pricing_plans_lifetime_name: 'Frühe Unterstützer',
     pricing_school_title:
@@ -33,7 +42,7 @@ const translations: Record<string, Record<string, string>> = {
     pricing_eyebrow: 'ClassGamifyのプラン',
     pricing_monthly: '月払い',
     pricing_yearly: '年払い',
-    pricing_plans_free_name: 'スターター',
+    pricing_plans_free_name: '無料',
     pricing_plans_pro_name: 'Teacher Pro',
     pricing_plans_lifetime_name: '早期サポーター',
     pricing_school_title: '複数の先生で使うワークスペースが必要ですか？',
@@ -45,7 +54,7 @@ const translations: Record<string, Record<string, string>> = {
     pricing_eyebrow: 'ClassGamify 요금제',
     pricing_monthly: '월간',
     pricing_yearly: '연간',
-    pricing_plans_free_name: '스타터',
+    pricing_plans_free_name: '무료',
     pricing_plans_pro_name: 'Teacher Pro',
     pricing_plans_lifetime_name: '얼리 서포터',
     pricing_school_title: '여러 교사를 위한 워크스페이스가 필요하신가요?',
@@ -57,7 +66,7 @@ const translations: Record<string, Record<string, string>> = {
     pricing_eyebrow: 'Piani ClassGamify',
     pricing_monthly: 'Mensile',
     pricing_yearly: 'Annuale',
-    pricing_plans_free_name: 'Starter',
+    pricing_plans_free_name: 'Gratuito',
     pricing_plans_pro_name: 'Teacher Pro',
     pricing_plans_lifetime_name: 'Sostenitore iniziale',
     pricing_school_title: 'Ti serve uno spazio per più insegnanti?',
@@ -69,7 +78,7 @@ const translations: Record<string, Record<string, string>> = {
     pricing_eyebrow: 'Planes de ClassGamify',
     pricing_monthly: 'Mensual',
     pricing_yearly: 'Anual',
-    pricing_plans_free_name: 'Inicial',
+    pricing_plans_free_name: 'Gratis',
     pricing_plans_pro_name: 'Teacher Pro',
     pricing_plans_lifetime_name: 'Colaborador inicial',
     pricing_school_title: '¿Necesitas un espacio para varios docentes?',
@@ -81,7 +90,7 @@ const translations: Record<string, Record<string, string>> = {
     pricing_eyebrow: 'Planos do ClassGamify',
     pricing_monthly: 'Mensal',
     pricing_yearly: 'Anual',
-    pricing_plans_free_name: 'Inicial',
+    pricing_plans_free_name: 'Grátis',
     pricing_plans_pro_name: 'Teacher Pro',
     pricing_plans_lifetime_name: 'Apoiador inicial',
     pricing_school_title: 'Precisa de um espaço para vários professores?',
@@ -93,19 +102,32 @@ const translations: Record<string, Record<string, string>> = {
     pricing_eyebrow: 'خطط ClassGamify',
     pricing_monthly: 'شهري',
     pricing_yearly: 'سنوي',
-    pricing_plans_free_name: 'البداية',
+    pricing_plans_free_name: 'مجاني',
     pricing_plans_pro_name: 'Teacher Pro',
     pricing_plans_lifetime_name: 'داعم مبكر',
     pricing_school_title: 'هل تحتاج إلى مساحة عمل لعدة معلمين؟',
   },
 };
+let addedKeyCount = 0;
 for (const [locale, messages] of Object.entries(translations)) {
+  const path = `project.inlang/drafts/${locale}/pricing-core.json`;
   await mkdir(`project.inlang/drafts/${locale}`, { recursive: true });
+  const existing = await readFile(path, 'utf8')
+    .then((raw) => JSON.parse(raw) as Record<string, string>)
+    .catch((error: NodeJS.ErrnoException) => {
+      if (error.code === 'ENOENT') return {};
+      throw error;
+    });
+  const missing = Object.fromEntries(
+    Object.entries(messages).filter(([key]) => !(key in existing))
+  );
+  addedKeyCount += Object.keys(missing).length;
+  if (!Object.keys(missing).length) continue;
   await writeFile(
-    `project.inlang/drafts/${locale}/pricing-core.json`,
-    `${JSON.stringify(messages, null, 2)}\n`
+    path,
+    `${JSON.stringify({ ...existing, ...missing }, null, 2)}\n`
   );
 }
 console.log(
-  `Seeded pricing core for ${Object.keys(translations).length} locales`
+  `Added ${addedKeyCount} missing pricing core keys; existing draft values were left unchanged`
 );
