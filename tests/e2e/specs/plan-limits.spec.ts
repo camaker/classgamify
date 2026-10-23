@@ -49,7 +49,7 @@ test.describe('plan limits and upgrade path', () => {
 
     const usage = page.getByTestId('plan-usage-card');
     await expect(usage).toBeVisible({ timeout: 20_000 });
-    await expect(usage).toContainText('Current plan: Starter');
+    await expect(usage).toContainText('Current plan: Free');
     await expect(usage).toContainText('15 of 15');
     await expect(usage).toContainText('Limit reached');
     await expect(

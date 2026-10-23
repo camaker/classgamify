@@ -2496,7 +2496,7 @@
   "pricing_plans_free_description": "Every template for real classes, with up to {openAssignments} open assignment links at a time and no credit card.",
   "pricing_plans_free_features": "[\"All eight classroom game templates\",\"Up to {activities} active activities\",\"Up to {openAssignments} open assignment links at a time\",\"{aiDrafts} AI drafts a month\",\"Unlimited student attempts, results, and CSV export\"]",
   "pricing_plans_free_limits": "[]",
-  "pricing_plans_free_name": "Starter",
+  "pricing_plans_free_name": "Free",
   "pricing_plans_lifetime_description": "Everything in Teacher Pro for a single one-time payment.",
   "pricing_plans_lifetime_features": "[\"Everything in Teacher Pro\",\"One-time payment, no subscription\",\"Founder pricing\"]",
   "pricing_plans_lifetime_limits": "[]",

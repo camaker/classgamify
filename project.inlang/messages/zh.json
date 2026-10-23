@@ -2496,7 +2496,7 @@
   "pricing_plans_free_description": "全部模板都可用于真实课堂，最多同时开放 {openAssignments} 个作业链接，无需信用卡。",
   "pricing_plans_free_features": "[\"全部八种课堂游戏模板\",\"最多 {activities} 个启用中的活动\",\"最多同时开放 {openAssignments} 个作业链接\",\"每月 {aiDrafts} 次 AI 草稿\",\"学生作答、结果和 CSV 导出不限\"]",
   "pricing_plans_free_limits": "[]",
-  "pricing_plans_free_name": "入门版",
+  "pricing_plans_free_name": "免费版",
   "pricing_plans_lifetime_description": "一次性付费，获得 Teacher Pro 的全部功能。",
   "pricing_plans_lifetime_features": "[\"Teacher Pro 的全部功能\",\"一次性付费，无需订阅\",\"创始价格\"]",
   "pricing_plans_lifetime_limits": "[]",

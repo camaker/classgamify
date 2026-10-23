@@ -93,6 +93,11 @@ Resolved from the existing `payment` table (`resolveEntitlementPlan`):
 | Subscription `canceled` with a future period end | Teacher Pro until the period end |
 | Anything else, or no payment | Free |
 
+The 7-day past-due grace assumes the payment provider retries a failed
+renewal within about a week (Creem and Stripe both retry over several days
+before marking the subscription unpaid or canceled). If the provider's retry
+window changes, adjust `PAST_DUE_GRACE_DAYS` to match.
+
 A paid subscription whose price id is not in the current config still counts
 as Teacher Pro, so a price rotation can never silently downgrade a payer.
 
@@ -118,9 +123,16 @@ as Teacher Pro, so a price rotation can never silently downgrade a payer.
   billing settings describe exactly the enforced limits, using the same
   numbers from `PLAN_LIMITS`.
 
+## Plan names
+
+The free plan is shown as "Free" in every locale (plan cards, usage card,
+billing settings). Internal ids stay `free`, `pro`, and `lifetime`, so no
+payment or billing mapping changes.
+
 ## Owner sign-off needed
 
 - Apply migration `0016_ai_draft_usage` to remote D1 before deploying.
 - Update the Teacher Pro and Early Supporter product descriptions in the
   Creem dashboard to match the new plan cards (no price or product id change).
-- Confirm the numbers (15 / 3 / 10, and 300 for paid AI drafts).
+- Confirm the numbers (15 / 3 / 10, and 300 for paid AI drafts). Confirmed by
+  the owner, together with the 7-day past-due grace.
