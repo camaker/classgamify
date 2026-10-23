@@ -123,6 +123,7 @@ import {
 import { APP_ENTITY_ID_LENGTH } from '@/lib/entity-id';
 import { m } from '@/locale/paraglide/messages';
 import { authApiMiddleware } from '@/middlewares/auth-middleware';
+import { assertPlanAllows } from '@/payment/plan-entitlements-server';
 import { createServerFn } from '@tanstack/react-start';
 import { nanoid } from 'nanoid';
 import { z } from 'zod';
@@ -296,6 +297,7 @@ export const publishAssignment = createServerFn({ method: 'POST' })
     }
     const expiresAt = closeAfter.expiresAt;
     const settings = resolveAssignmentSettings(data.settings);
+    await assertPlanAllows('openAssignments', userId, { db, now });
 
     await db
       .batch([
@@ -362,6 +364,11 @@ export const updateAssignmentStatus = createServerFn({ method: 'POST' })
       nextStatus: data.status,
       now,
     });
+    // Reopening a closed link counts toward the open-link limit; closing
+    // never does.
+    if (data.status === 'published') {
+      await assertPlanAllows('openAssignments', userId, { db, now });
+    }
 
     const updatedAt = resolveAssignmentStatusTransitionUpdatedAt({
       currentUpdatedAt: existingAssignment.updatedAt,

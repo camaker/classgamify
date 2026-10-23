@@ -77,6 +77,24 @@ export const paymentRelations = relations(payment, ({ one }) => ({
 }));
 
 /**
+ * AI draft usage: one row per successful AI draft request, used to enforce the
+ * monthly AI draft allowance per plan (docs/plan-value-design.md).
+ */
+export const aiDraftUsage = sqliteTable(
+  'ai_draft_usage',
+  {
+    id: text('id').primaryKey(),
+    userId: text('user_id')
+      .notNull()
+      .references(() => user.id, { onDelete: 'cascade' }),
+    createdAt: integer('created_at', { mode: 'timestamp_ms' }).notNull(),
+  },
+  (table) => [
+    index('ai_draft_usage_user_created_idx').on(table.userId, table.createdAt),
+  ]
+);
+
+/**
  * User files
  * metadata for files uploaded to R2 (path userfiles/{userId}/xxx);
  * filename = stored name on R2 (e.g. uuid.ext);

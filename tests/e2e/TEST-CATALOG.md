@@ -1038,6 +1038,27 @@ Workers AI credentials are unavailable, without claiming provider quality.
 |---|---|---|
 | 1 | Teacher generates, reviews, and explicitly saves a local fallback draft | Register and sign in as a verified teacher, replace the starter source notes with classroom content, choose the draft item count and question focus, invoke the production AI-draft server function, verify the deterministic fallback fills reviewable title and structured-question fields, exposes fallback provenance and the missing-credentials notice, and remains on the create page without persisting. Click the real save action, verify redirect to the activity library, and verify the generated title is persisted without browser console or page errors. |
 
+## 11. Plan Limits and Upgrade Path
+
+**File:** `specs/plan-limits.spec.ts` | **Priority:** P0
+
+Verifies the server-enforced plan limits from `docs/plan-value-design.md`:
+free teachers can run the full loop with capped creation, limits never block
+students or hide results, and paid states use the paid limits. Plan and usage
+state is seeded through the secret-gated local `/api/e2e/plan` fixture; no
+payment provider is called.
+
+| # | Test name | Flow |
+|---|---|---|
+| 1 | Free teacher at the activity limit sees usage, a notice, and the plans page | Seed 15 active activities, sign in, verify the dashboard plan-usage card shows "Current plan: Starter", "15 of 15", a text "Limit reached" status, and an accessible meter. Open `/dashboard/activities/new`, verify the limit notice explains the cap, save anyway and verify the server rejects it with the friendly limit message while staying on the editor, then follow "View plans" to `/pricing` and verify the free and Teacher Pro cards quote the enforced limits. |
+| 2 | Open links at the cap block publishing but never block students | Seed three open assignment links, verify a student can still open one with an enabled submit control, sign in, verify "3 of 3" open links, open the publish dialog from the library and verify the limit notice says students can still finish open links and the Publish button is disabled. |
+| 3 | AI draft allowance shows a friendly limit with a plans action | Seed 10 AI draft uses this month, verify "10 of 10", request a draft on `/create`, and verify the toast explains the monthly allowance with a "View plans" action. |
+| 4 | Paid, past-due, and lifetime teachers get the paid limits | Seed an active Teacher Pro subscription with 20 activities and verify "20, no limit", no upgrade link, and no create notice. Seed a past-due subscription inside the grace window and verify the payment-retry note with "Manage billing". Seed a lifetime payment and verify "Current plan: Early Supporter". |
+
+Plan entitlement logic also has a fast gate via
+`pnpm exec tsx --test scripts/plan-entitlements.test.ts`; run it when changing
+plan limits, subscription state handling, or where limits are enforced.
+
 ## Deferred Coverage
 
 These flows should be added after their dependencies are made deterministic:

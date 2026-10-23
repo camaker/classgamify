@@ -72,13 +72,13 @@ test('billing card view model separates classroom plan states and hosted actions
   assert.equal(noPlanView.action?.kind, 'upgrade');
   assert.match(
     noPlanView.nextStep?.description ?? '',
-    /free plan includes every template/
+    /Results and CSV export are never limited/
   );
   assert.equal(freeView.plan?.id, 'free');
   assert.equal(freeView.action?.kind, 'upgrade');
   assert.match(
     freeView.plan?.message ?? '',
-    /all eight templates, student assignment links/
+    /up to 15 active activities, up to 3 open assignment links/
   );
   assert.equal(proView.plan?.name, 'Teacher Pro');
   assert.equal(proView.action?.kind, 'manage-subscription');

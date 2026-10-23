@@ -56,6 +56,7 @@ import { Route as ApiAuthSplatRouteImport } from './routes/api/auth/$'
 import { Route as ApiAuthProviderStatusRouteImport } from './routes/api/auth/provider-status'
 import { Route as ApiE2eAssignmentsRouteImport } from './routes/api/e2e/assignments'
 import { Route as ApiE2eMailRouteImport } from './routes/api/e2e/mail'
+import { Route as ApiE2ePlanRouteImport } from './routes/api/e2e/plan'
 import { Route as ApiE2eUsersRouteImport } from './routes/api/e2e/users'
 import { Route as ApiStorageFileRouteImport } from './routes/api/storage/file'
 import { Route as ApiWebhooksCreemRouteImport } from './routes/api/webhooks/creem'
@@ -300,6 +301,11 @@ const ApiE2eMailRoute = ApiE2eMailRouteImport.update({
   path: '/api/e2e/mail',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiE2ePlanRoute = ApiE2ePlanRouteImport.update({
+  id: '/api/e2e/plan',
+  path: '/api/e2e/plan',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiE2eUsersRoute = ApiE2eUsersRouteImport.update({
   id: '/api/e2e/users',
   path: '/api/e2e/users',
@@ -392,6 +398,7 @@ export interface FileRoutesByFullPath {
   '/api/auth/provider-status': typeof ApiAuthProviderStatusRoute
   '/api/e2e/assignments': typeof ApiE2eAssignmentsRoute
   '/api/e2e/mail': typeof ApiE2eMailRoute
+  '/api/e2e/plan': typeof ApiE2ePlanRoute
   '/api/e2e/users': typeof ApiE2eUsersRoute
   '/api/storage/file': typeof ApiStorageFileRoute
   '/api/webhooks/creem': typeof ApiWebhooksCreemRoute
@@ -446,6 +453,7 @@ export interface FileRoutesByTo {
   '/api/auth/provider-status': typeof ApiAuthProviderStatusRoute
   '/api/e2e/assignments': typeof ApiE2eAssignmentsRoute
   '/api/e2e/mail': typeof ApiE2eMailRoute
+  '/api/e2e/plan': typeof ApiE2ePlanRoute
   '/api/e2e/users': typeof ApiE2eUsersRoute
   '/api/storage/file': typeof ApiStorageFileRoute
   '/api/webhooks/creem': typeof ApiWebhooksCreemRoute
@@ -504,6 +512,7 @@ export interface FileRoutesById {
   '/api/auth/provider-status': typeof ApiAuthProviderStatusRoute
   '/api/e2e/assignments': typeof ApiE2eAssignmentsRoute
   '/api/e2e/mail': typeof ApiE2eMailRoute
+  '/api/e2e/plan': typeof ApiE2ePlanRoute
   '/api/e2e/users': typeof ApiE2eUsersRoute
   '/api/storage/file': typeof ApiStorageFileRoute
   '/api/webhooks/creem': typeof ApiWebhooksCreemRoute
@@ -563,6 +572,7 @@ export interface FileRouteTypes {
     | '/api/auth/provider-status'
     | '/api/e2e/assignments'
     | '/api/e2e/mail'
+    | '/api/e2e/plan'
     | '/api/e2e/users'
     | '/api/storage/file'
     | '/api/webhooks/creem'
@@ -617,6 +627,7 @@ export interface FileRouteTypes {
     | '/api/auth/provider-status'
     | '/api/e2e/assignments'
     | '/api/e2e/mail'
+    | '/api/e2e/plan'
     | '/api/e2e/users'
     | '/api/storage/file'
     | '/api/webhooks/creem'
@@ -674,6 +685,7 @@ export interface FileRouteTypes {
     | '/api/auth/provider-status'
     | '/api/e2e/assignments'
     | '/api/e2e/mail'
+    | '/api/e2e/plan'
     | '/api/e2e/users'
     | '/api/storage/file'
     | '/api/webhooks/creem'
@@ -715,6 +727,7 @@ export interface RootRouteChildren {
   ApiAuthProviderStatusRoute: typeof ApiAuthProviderStatusRoute
   ApiE2eAssignmentsRoute: typeof ApiE2eAssignmentsRoute
   ApiE2eMailRoute: typeof ApiE2eMailRoute
+  ApiE2ePlanRoute: typeof ApiE2ePlanRoute
   ApiE2eUsersRoute: typeof ApiE2eUsersRoute
   ApiStorageFileRoute: typeof ApiStorageFileRoute
   ApiWebhooksCreemRoute: typeof ApiWebhooksCreemRoute
@@ -1053,6 +1066,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiE2eMailRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/e2e/plan': {
+      id: '/api/e2e/plan'
+      path: '/api/e2e/plan'
+      fullPath: '/api/e2e/plan'
+      preLoaderRoute: typeof ApiE2ePlanRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/e2e/users': {
       id: '/api/e2e/users'
       path: '/api/e2e/users'
@@ -1237,6 +1257,7 @@ const rootRouteChildren: RootRouteChildren = {
   ApiAuthProviderStatusRoute: ApiAuthProviderStatusRoute,
   ApiE2eAssignmentsRoute: ApiE2eAssignmentsRoute,
   ApiE2eMailRoute: ApiE2eMailRoute,
+  ApiE2ePlanRoute: ApiE2ePlanRoute,
   ApiE2eUsersRoute: ApiE2eUsersRoute,
   ApiStorageFileRoute: ApiStorageFileRoute,
   ApiWebhooksCreemRoute: ApiWebhooksCreemRoute,

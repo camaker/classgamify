@@ -1,5 +1,6 @@
 import type { PricePlan, Subscription } from '@/payment/types';
 import { m } from '@/locale/paraglide/messages';
+import { getPlanLimitCopyParams } from '@/payment/plan-entitlements';
 
 type SettingsBillingCardState = 'error' | 'loading' | 'no-plan' | 'ready';
 
@@ -147,7 +148,7 @@ export function buildSettingsBillingCardViewModel({
         kind: 'upgrade',
         label: m.settings_billing_card_upgrade_plan(),
       }),
-      message: m.settings_billing_card_no_plan(),
+      message: m.settings_billing_card_no_plan(getPlanLimitCopyParams()),
       nextStep: buildSettingsBillingNoPlanNextStepView(),
     };
   }
@@ -212,7 +213,8 @@ function buildSettingsBillingCardPlanView(
 }
 
 function buildSettingsBillingPlanMessage(plan: PricePlan) {
-  if (plan.isFree) return m.settings_billing_card_free_plan_message();
+  if (plan.isFree)
+    return m.settings_billing_card_free_plan_message(getPlanLimitCopyParams());
   if (plan.isLifetime) return m.settings_billing_card_lifetime_message();
 
   return undefined;
@@ -288,7 +290,9 @@ function buildSettingsBillingPlanNextStepView(
 ): SettingsBillingCardNextStepView {
   if (plan.isFree) {
     return buildSettingsBillingNextStepView({
-      description: m.settings_billing_card_next_step_free_description(),
+      description: m.settings_billing_card_next_step_free_description(
+        getPlanLimitCopyParams()
+      ),
       label: m.settings_billing_card_next_step_free_label(),
     });
   }

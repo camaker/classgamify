@@ -7,6 +7,7 @@ import { getLocale } from '@/lib/locale';
 import { Routes } from '@/lib/routes';
 import { m } from '@/locale/paraglide/messages';
 import { TEMPLATE_GUIDE_PATHS } from '@/pages/template-guide-paths';
+import { getPlanLimitCopyParams } from '@/payment/plan-entitlements';
 
 export type HomeGuideStepId = 'publish' | 'results' | 'template';
 
@@ -127,7 +128,7 @@ export function buildHomeGuideView(): HomeGuideView {
       items: [
         {
           question: m.home_guide_faq_1_question(),
-          answer: m.home_guide_faq_1_answer(),
+          answer: m.home_guide_faq_1_answer(getPlanLimitCopyParams()),
         },
         {
           question: m.home_guide_faq_2_question(),

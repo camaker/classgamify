@@ -34,6 +34,7 @@ import {
   useNavigate,
 } from '@tanstack/react-router';
 import { useEffect, useMemo } from 'react';
+import { PlanUsageCard } from '@/components/payment/plan-usage-card';
 
 export const Route = createFileRoute('/dashboard/activities')({
   validateSearch: buildActivityLibraryValidatedSearch,
@@ -174,6 +175,8 @@ function DashboardActivitiesPage() {
             {activityLibraryPageCopy.createActivityLabel}
           </Link>
         </div>
+
+        <PlanUsageCard />
 
         {created ? (
           <CreatedActivityPanel

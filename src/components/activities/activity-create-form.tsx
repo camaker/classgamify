@@ -61,6 +61,10 @@ import { useNavigate } from '@tanstack/react-router';
 import { type ReactNode, useEffect, useMemo, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
+import { toastPlanLimitOrError } from '@/components/payment/plan-limit-toast';
+import { PlanLimitNotice } from '@/components/payment/plan-limit-notice';
+import { usePlanUsage } from '@/hooks/use-plan-usage';
+import { buildPlanLimitReachedMessage } from '@/payment/plan-usage-view';
 
 type ActivityCreateFormProps = {
   activityId?: string;
@@ -101,6 +105,19 @@ export function ActivityCreateForm({
   const watchedValues = form.watch();
   const isGeneratingDraft = draftMutation.isPending;
   const hasUser = isMounted && Boolean(session?.user);
+  const { data: planUsage } = usePlanUsage(hasUser && mode === 'create');
+  const activityMeter = planUsage?.meters.activities;
+  const activityLimitMessage =
+    mode === 'create' &&
+    planUsage &&
+    activityMeter?.reached &&
+    activityMeter.limit !== null
+      ? buildPlanLimitReachedMessage({
+          kind: 'activities',
+          limit: activityMeter.limit,
+          planId: planUsage.planId,
+        })
+      : undefined;
   const draftSourceState = buildActivityEditorDraftSourceState({
     draftSourceText,
     sourceMaterials: watchedValues.sourceMaterials,
@@ -176,8 +193,8 @@ export function ActivityCreateForm({
       toast.success(
         buildActivityEditorDraftSuccessMessage({ notice: result.notice })
       );
-    } catch {
-      toast.error(executionPlan.failureMessage);
+    } catch (error) {
+      toastPlanLimitOrError(error, executionPlan.failureMessage);
     }
   }
 
@@ -232,8 +249,8 @@ export function ActivityCreateForm({
           createdFrom: 'create',
         }),
       });
-    } catch {
-      toast.error(executionPlan.failureMessage);
+    } catch (error) {
+      toastPlanLimitOrError(error, executionPlan.failureMessage);
     }
   }
 
@@ -243,6 +260,11 @@ export function ActivityCreateForm({
         modeView={modeView}
         template={templateView.template}
       />
+      {activityLimitMessage ? (
+        <div className="px-6 pb-2">
+          <PlanLimitNotice message={activityLimitMessage} />
+        </div>
+      ) : null}
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)}>
           <CardContent id={ACTIVITY_EDITOR_SECTION_IDS.editor} className="p-0">

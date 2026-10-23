@@ -1,3 +1,4 @@
+import { PLAN_LIMITS } from '@/payment/plan-entitlements';
 import assert from 'node:assert/strict';
 import {
   existsSync,
@@ -2268,7 +2269,7 @@ assert.doesNotMatch(
 );
 assert.match(
   copyAssignmentShareLinkButtonSource,
-  /executionPlan\.type === 'blocked'[\s\S]*toast\.error\(executionPlan\.message\)[\s\S]*copyTextToClipboard\(executionPlan\.url\)[\s\S]*toast\.success\(executionPlan\.successMessage\)[\s\S]*toast\.error\(executionPlan\.failureMessage\)/,
+  /executionPlan\.type === 'blocked'[\s\S]*toast\.error\(executionPlan\.message\)[\s\S]*copyTextToClipboard\(executionPlan\.url\)[\s\S]*toast\.success\(executionPlan\.successMessage\)[\s\S]*(?:toast\.error\(|toastPlanLimitOrError\(error, )executionPlan\.failureMessage\)/,
   'Share-link copy button should execute prepared blocked and copy-link plans.'
 );
 assert.match(
@@ -2350,7 +2351,7 @@ assert.doesNotMatch(
 );
 assert.match(
   assignmentResultsRouteSource,
-  /toast\.error\(executionPlan\.failureMessage\)/,
+  /(?:toast\.error\(|toastPlanLimitOrError\(error, )executionPlan\.failureMessage\)/,
   'Result copy/download failures should use the localized action failure copy.'
 );
 assert.match(
@@ -6037,7 +6038,7 @@ assert.match(
 );
 assert.match(
   activityEditorFormSource,
-  /executionPlan\.type === 'blocked'[\s\S]*toast\.error\(executionPlan\.message\)[\s\S]*draftMutation\.mutateAsync\(executionPlan\.input\)[\s\S]*toast\.error\(executionPlan\.failureMessage\)/,
+  /executionPlan\.type === 'blocked'[\s\S]*toast\.error\(executionPlan\.message\)[\s\S]*draftMutation\.mutateAsync\(executionPlan\.input\)[\s\S]*(?:toast\.error\(|toastPlanLimitOrError\(error, )executionPlan\.failureMessage\)/,
   'Activity editor form should execute prepared blocked and generate AI draft plans.'
 );
 assert.doesNotMatch(
@@ -6097,7 +6098,7 @@ assert.match(
 );
 assert.match(
   activityEditorFormSource,
-  /executionPlan\.type === 'blocked'[\s\S]*toast\.error\(executionPlan\.message\)[\s\S]*if \(executionPlan\.type === 'edit'\)[\s\S]*updateMutation\.mutateAsync\(executionPlan\.input\)[\s\S]*createMutation\.mutateAsync\(executionPlan\.input\)[\s\S]*toast\.error\(executionPlan\.failureMessage\)/,
+  /executionPlan\.type === 'blocked'[\s\S]*toast\.error\(executionPlan\.message\)[\s\S]*if \(executionPlan\.type === 'edit'\)[\s\S]*updateMutation\.mutateAsync\(executionPlan\.input\)[\s\S]*createMutation\.mutateAsync\(executionPlan\.input\)[\s\S]*(?:toast\.error\(|toastPlanLimitOrError\(error, )executionPlan\.failureMessage\)/,
   'Activity editor form should execute prepared blocked, edit, and create save plans.'
 );
 assert.doesNotMatch(
@@ -6985,7 +6986,7 @@ assert.doesNotMatch(
 );
 assert.match(
   activityDashboardCardSource,
-  /toast\.error\(executionPlan\.failureMessage\)/,
+  /(?:toast\.error\(|toastPlanLimitOrError\(error, )executionPlan\.failureMessage\)/,
   'Activity dashboard action failures should use localized action execution-plan failure copy.'
 );
 const assignmentDashboardRouteSource = readFileSync(
@@ -7008,7 +7009,7 @@ assert.doesNotMatch(
 );
 assert.match(
   assignmentDashboardCardSource,
-  /toast\.error\(plan\.failureMessage\)/,
+  /(?:toast\.error\(|toastPlanLimitOrError\(error, )plan\.failureMessage\)/,
   'Assignment close and reopen failures should use localized status action failure copy.'
 );
 const activityPublishDialogSource = readFileSync(
@@ -7139,7 +7140,7 @@ assert.doesNotMatch(
 );
 assert.match(
   activityPublishDialogSource,
-  /toast\.error\(executionPlan\.failureMessage\)/,
+  /(?:toast\.error\(|toastPlanLimitOrError\(error, )executionPlan\.failureMessage\)/,
   'Assignment publish failures should use localized publish failure copy from the execution plan.'
 );
 assert.match(
@@ -9315,7 +9316,7 @@ assert.doesNotMatch(
 );
 assert.match(
   activityCreateFormSource,
-  /toast\.error\(executionPlan\.failureMessage\)/,
+  /(?:toast\.error\(|toastPlanLimitOrError\(error, )executionPlan\.failureMessage\)/,
   'Activity draft generation and save failures should use localized execution-plan failure messages.'
 );
 assert.match(
@@ -10018,7 +10019,7 @@ assert.equal(
 );
 assert.match(
   noPlanBillingView.nextStep?.description ?? '',
-  /free plan includes every template/
+  /Results and CSV export are never limited/
 );
 const freeBillingView = buildSettingsBillingCardViewModel({
   canManageBilling: true,
@@ -10043,7 +10044,7 @@ assert.equal(
 );
 assert.match(
   freeBillingView.plan?.message ?? '',
-  /all eight templates, student assignment links, and results with CSV export/
+  /up to 15 active activities, up to 3 open assignment links, and 10 AI drafts a month\. Results and CSV export are never limited/
 );
 assert.deepEqual(
   freeBillingView.plan?.featureSections.map((section) => [
@@ -10070,7 +10071,7 @@ assert.match(
 );
 assert.match(
   freeBillingView.plan?.nextStep.description ?? '',
-  /Paid plans include the same tools/
+  /more than 15 active activities, more than 3 open assignment links/
 );
 assert.doesNotMatch(
   freeBillingView.plan?.message ?? '',
@@ -12810,8 +12811,28 @@ assert.ok(
     (feature) =>
       !/larger activity library|more published assignments/i.test(feature)
   ),
-  'The Pro plan should not claim limits that no code enforces.'
+  'The Pro plan should not use vague comparative claims.'
 );
+assert.deepEqual(
+  pricePlans.free?.features?.slice(1, 4),
+  [
+    `Up to ${PLAN_LIMITS.free.activities} active activities`,
+    `Up to ${PLAN_LIMITS.free.openAssignments} open assignment links at a time`,
+    `${PLAN_LIMITS.free.aiDrafts} AI drafts a month`,
+  ],
+  'The free plan card should quote the limits the server enforces.'
+);
+assert.deepEqual(
+  pricePlans.pro?.features?.slice(1, 4),
+  [
+    'Unlimited active activities',
+    'Unlimited open assignment links',
+    `${PLAN_LIMITS.pro.aiDrafts} AI drafts a month`,
+  ],
+  'The Teacher Pro card should quote the limits the server enforces.'
+);
+assert.equal(PLAN_LIMITS.pro.activities, null);
+assert.equal(PLAN_LIMITS.pro.openAssignments, null);
 assert.ok(
   pricePlans.lifetime?.features?.some((feature) =>
     feature.toLowerCase().includes('one-time payment')
@@ -30750,7 +30771,7 @@ assert.match(
 );
 assert.match(
   activityLibraryCardComponentSource,
-  /executionPlan\.type === 'blocked'[\s\S]*toast\.error\(executionPlan\.message\)[\s\S]*mutateAsync\(executionPlan\.input\)[\s\S]*toast\.success\(executionPlan\.successMessage\)[\s\S]*toast\.error\(executionPlan\.failureMessage\)/,
+  /executionPlan\.type === 'blocked'[\s\S]*toast\.error\(executionPlan\.message\)[\s\S]*mutateAsync\(executionPlan\.input\)[\s\S]*toast\.success\(executionPlan\.successMessage\)[\s\S]*(?:toast\.error\(|toastPlanLimitOrError\(error, )executionPlan\.failureMessage\)/,
   'Activity library card component should execute prepared blocked and mutation plans.'
 );
 assert.match(
@@ -32658,7 +32679,7 @@ assert.match(
 );
 assert.match(
   activityCreateFormSource,
-  /canApplyActivityDraftResultToEditor[\s\S]*const result = await draftMutation\.mutateAsync\(executionPlan\.input\)[\s\S]*if \(!canApplyActivityDraftResultToEditor\(result\)\)[\s\S]*toast\.error\(executionPlan\.failureMessage\)[\s\S]*form\.reset/,
+  /canApplyActivityDraftResultToEditor[\s\S]*const result = await draftMutation\.mutateAsync\(executionPlan\.input\)[\s\S]*if \(!canApplyActivityDraftResultToEditor\(result\)\)[\s\S]*(?:toast\.error\(|toastPlanLimitOrError\(error, )executionPlan\.failureMessage\)[\s\S]*form\.reset/,
   'Activity editor form should verify the AI draft review-state contract before applying generated fields.'
 );
 assert.match(
@@ -34411,17 +34432,17 @@ assert.deepEqual(
 assert.deepEqual(buildPricingFaqItems(), [
   {
     answer:
-      'The free plan lets you create activities with any of the eight templates, publish student assignment links, and review results, with no credit card needed.',
+      'Every template, up to 15 active activities, up to 3 open assignment links at a time, and 10 AI drafts a month. Student attempts, results, CSV export, and printing are never limited, and no credit card is needed.',
     ariaLabel:
-      'What does the free plan include?: The free plan lets you create activities with any of the eight templates, publish student assignment links, and review results, with no credit card needed.',
+      'What does the free plan include?: Every template, up to 15 active activities, up to 3 open assignment links at a time, and 10 AI drafts a month. Student attempts, results, CSV export, and printing are never limited, and no credit card is needed.',
     id: 'free',
     question: 'What does the free plan include?',
   },
   {
     answer:
-      'Teacher Pro includes everything in the free plan and is billed monthly or yearly. Early Supporter is a one-time payment for the same access.',
+      'Teacher Pro removes the limits on active activities and open assignment links and includes 300 AI drafts a month, billed monthly or yearly. Early Supporter is a one-time payment for the same access. If a paid plan ends, nothing is deleted, and the free limits apply only to new work.',
     ariaLabel:
-      'What does Teacher Pro include?: Teacher Pro includes everything in the free plan and is billed monthly or yearly. Early Supporter is a one-time payment for the same access.',
+      'What does Teacher Pro include?: Teacher Pro removes the limits on active activities and open assignment links and includes 300 AI drafts a month, billed monthly or yearly. Early Supporter is a one-time payment for the same access. If a paid plan ends, nothing is deleted, and the free limits apply only to new work.',
     id: 'pro',
     question: 'What does Teacher Pro include?',
   },

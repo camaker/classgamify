@@ -71,7 +71,7 @@ test('billing card exposes plan, action, status, and period semantics', () => {
     true
   );
   assert.equal(
-    noPlanBillingView.nextStep?.ariaLabel.includes('every template'),
+    noPlanBillingView.nextStep?.ariaLabel.includes('never limited'),
     true
   );
   assert.equal(trialBillingView.statusBadge?.ariaLabel, 'Plan status: Trial');

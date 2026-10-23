@@ -1,0 +1,23 @@
+{
+  "plan_limit_activities_reached": "Você tem {limit} atividades ativas, o máximo do plano gratuito. Arquive uma atividade ou mude para o Teacher Pro para adicionar mais. Tudo o que você criou continua disponível.",
+  "plan_limit_ai_drafts_reached": "Você usou todos os {limit} rascunhos com IA deste mês. Novos ficam disponíveis no primeiro dia do próximo mês, e você pode continuar criando atividades à mão.",
+  "plan_limit_open_assignments_reached": "Você tem {limit} links de tarefas abertos, o máximo que o plano gratuito permite ao mesmo tempo. Feche um link ou mude para o Teacher Pro para publicar mais. Os alunos ainda podem concluir os links abertos.",
+  "plan_limit_upgrade_hint": "O Teacher Pro inclui mais rascunhos com IA por mês.",
+  "plan_limit_view_plans": "Ver planos",
+  "plan_usage_activities_label": "Atividades ativas",
+  "plan_usage_ai_drafts_label": "Rascunhos com IA neste mês",
+  "plan_usage_compare_plans": "Comparar planos",
+  "plan_usage_current_plan": "Plano atual: {plan}",
+  "plan_usage_manage_plan": "Gerenciar cobrança",
+  "plan_usage_meter_aria": "{label}: {value}",
+  "plan_usage_note_cancel_scheduled": "O Teacher Pro termina com o período de cobrança atual. Depois disso nada é excluído, e os limites do plano gratuito valem só para o que você criar de novo.",
+  "plan_usage_note_free": "Atividades arquivadas, links fechados, resultados dos alunos e exportações em CSV nunca contam. Os alunos sempre podem concluir links já publicados.",
+  "plan_usage_note_paid": "Seu plano não limita atividades nem links de tarefas abertos.",
+  "plan_usage_note_past_due": "Seu último pagamento não foi concluído. O Teacher Pro continua ativo por mais alguns dias enquanto ele é tentado de novo, então confira seus dados de pagamento.",
+  "plan_usage_open_assignments_label": "Links de tarefas abertos",
+  "plan_usage_status_near": "Quase cheio",
+  "plan_usage_status_reached": "Limite atingido",
+  "plan_usage_title": "Uso do plano",
+  "plan_usage_value_limited": "{used} de {limit}",
+  "plan_usage_value_unlimited": "{used}, sem limite"
+}

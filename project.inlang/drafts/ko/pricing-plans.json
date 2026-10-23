@@ -1,8 +1,8 @@
 {
-  "pricing_plans_free_description": "신용카드 없이 활동을 만들고 학생 링크를 공유하세요.",
-  "pricing_plans_free_features": "[\"8가지 수업용 게임 템플릿 전체\",\"내 활동 만들기와 편집\",\"학생용 과제 링크 게시\",\"결과 확인 및 CSV 다운로드\"]",
-  "pricing_plans_pro_description": "무료 요금제의 모든 기능을 월간 또는 연간 구독으로 이용하세요.",
-  "pricing_plans_pro_features": "[\"무료 요금제의 모든 기능\",\"월간 또는 연간 결제\",\"결제 포털에서 관리 또는 해지\"]",
+  "pricing_plans_free_description": "모든 템플릿을 실제 수업에 쓰고, 과제 링크를 동시에 {openAssignments}개까지 열 수 있습니다. 신용카드는 필요 없습니다.",
+  "pricing_plans_free_features": "[\"8가지 수업용 게임 템플릿 전체\",\"활성 활동 최대 {activities}개\",\"과제 링크 동시에 최대 {openAssignments}개\",\"매달 AI 초안 {aiDrafts}회\",\"학생 시도, 결과, CSV 내보내기 무제한\"]",
+  "pricing_plans_pro_description": "활동과 열린 과제 링크에 제한이 없고, 매달 AI 초안 {paidAiDrafts}회를 사용할 수 있습니다.",
+  "pricing_plans_pro_features": "[\"무료 요금제의 모든 기능\",\"활성 활동 무제한\",\"열린 과제 링크 무제한\",\"매달 AI 초안 {paidAiDrafts}회\",\"월간 또는 연간 결제\"]",
   "pricing_plans_lifetime_description": "Teacher Pro의 모든 기능을 한 번의 결제로 이용하세요.",
   "pricing_plans_lifetime_features": "[\"Teacher Pro의 모든 기능\",\"한 번 결제, 구독 없음\",\"창립 회원 가격\"]",
   "pricing_value_ai_description": "AI 초안과 템플릿 리믹스로 수업 메모를 검토하고 게시할 수 있는 활동으로 바꿀 수 있습니다."

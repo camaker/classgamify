@@ -23,6 +23,7 @@ import {
   useQuery,
   useQueryClient,
 } from '@tanstack/react-query';
+import { PLAN_USAGE_QUERY_KEY } from '@/hooks/use-plan-usage';
 
 const assignmentsKeys = {
   all: ['assignments'] as const,
@@ -108,6 +109,7 @@ export function usePublishAssignment() {
       publishAssignment({ data: input }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: assignmentsKeys.lists() });
+      queryClient.invalidateQueries({ queryKey: PLAN_USAGE_QUERY_KEY });
       queryClient.invalidateQueries({ queryKey: assignmentsKeys.details() });
     },
   });
@@ -121,6 +123,7 @@ export function useUpdateAssignmentStatus() {
       updateAssignmentStatus({ data: input }),
     onSuccess: (row, input) => {
       queryClient.invalidateQueries({ queryKey: assignmentsKeys.lists() });
+      queryClient.invalidateQueries({ queryKey: PLAN_USAGE_QUERY_KEY });
       queryClient.invalidateQueries({
         queryKey: assignmentsKeys.detail(input.assignmentId),
       });

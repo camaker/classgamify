@@ -1,8 +1,8 @@
 {
-  "pricing_plans_free_description": "クレジットカード不要で、アクティビティを作成し生徒用リンクを共有できます。",
-  "pricing_plans_free_features": "[\"8種類すべての授業用ゲームテンプレート\",\"自分のアクティビティの作成と編集\",\"生徒用の課題リンクの公開\",\"結果の確認とCSVダウンロード\"]",
-  "pricing_plans_pro_description": "無料プランのすべてを、月払いまたは年払いのサブスクリプションで。",
-  "pricing_plans_pro_features": "[\"無料プランのすべて\",\"月払いまたは年払い\",\"請求ポータルで管理・解約\"]",
+  "pricing_plans_free_description": "すべてのテンプレートを実際の授業で使えます。課題リンクは同時に {openAssignments} 件まで公開でき、クレジットカードは不要です。",
+  "pricing_plans_free_features": "[\"8種類すべての授業用ゲームテンプレート\",\"有効なアクティビティ {activities} 件まで\",\"課題リンクを同時に {openAssignments} 件まで公開\",\"AI 下書き 月 {aiDrafts} 回\",\"生徒の取り組み、結果、CSV エクスポートは無制限\"]",
+  "pricing_plans_pro_description": "アクティビティと公開中の課題リンクに上限がなく、AI 下書きは月 {paidAiDrafts} 回まで使えます。",
+  "pricing_plans_pro_features": "[\"無料プランのすべて\",\"有効なアクティビティ無制限\",\"公開中の課題リンク無制限\",\"AI 下書き 月 {paidAiDrafts} 回\",\"月払いまたは年払い\"]",
   "pricing_plans_lifetime_description": "Teacher Pro のすべてを、一度の支払いで。",
   "pricing_plans_lifetime_features": "[\"Teacher Pro のすべて\",\"一度の支払いでサブスクリプションなし\",\"創設者向け価格\"]",
   "pricing_value_ai_description": "AI 下書きとテンプレートのリミックスで、授業メモを、確認して公開できるアクティビティに変えられます。"
