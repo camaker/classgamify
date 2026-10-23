@@ -13,7 +13,7 @@ import {
   wouldExceedPlanLimit,
 } from '@/payment/plan-entitlements';
 import { buildPlanLimitReachedMessage } from '@/payment/plan-usage-view';
-import { and, count, eq, gt, gte, isNull, ne, or } from 'drizzle-orm';
+import { and, count, eq, gt, gte, isNull, ne, or, sql } from 'drizzle-orm';
 import { nanoid } from 'nanoid';
 
 /**
@@ -43,6 +43,7 @@ async function getEntitlementPlan(
       scene: payment.scene,
       status: payment.status,
       type: payment.type,
+      updatedAt: payment.updatedAt,
     })
     .from(payment)
     .where(and(eq(payment.userId, userId), eq(payment.paid, true)));
@@ -151,13 +152,59 @@ export async function assertPlanAllows(
   return plan;
 }
 
-export async function recordAiDraftUsage(
+/**
+ * Atomically reserves one AI draft from this month's allowance before the
+ * provider is called. The insert only happens while the monthly count is
+ * below the limit, in a single statement, so parallel requests cannot
+ * overrun the cap. Returns the reservation id; call `releaseAiDraftReservation`
+ * when the draft did not use the provider.
+ */
+export async function reserveAiDraft(
   userId: string,
   { db, now = new Date() }: { db: Db; now?: Date }
+): Promise<string> {
+  const plan = await getEntitlementPlan(userId, { db, now });
+  const limit = getPlanLimits(plan.planId).aiDrafts;
+  const id = nanoid(APP_ENTITY_ID_LENGTH.generated);
+
+  if (limit === null) {
+    await db.insert(aiDraftUsage).values({ createdAt: now, id, userId });
+    return id;
+  }
+
+  const windowStart = getAiDraftWindowStart(now).getTime();
+  await db.run(sql`
+    insert into ${aiDraftUsage} (id, user_id, created_at)
+    select ${id}, ${userId}, ${now.getTime()}
+    where (
+      select count(*) from ${aiDraftUsage}
+      where user_id = ${userId} and created_at >= ${windowStart}
+    ) < ${limit}
+  `);
+  const [reserved] = await db
+    .select({ id: aiDraftUsage.id })
+    .from(aiDraftUsage)
+    .where(eq(aiDraftUsage.id, id))
+    .limit(1);
+
+  if (!reserved) {
+    throw new Error(
+      formatPlanLimitErrorMessage(
+        'aiDrafts',
+        buildPlanLimitReachedMessage({
+          kind: 'aiDrafts',
+          limit,
+          planId: plan.planId,
+        })
+      )
+    );
+  }
+  return id;
+}
+
+export async function releaseAiDraftReservation(
+  reservationId: string,
+  { db }: { db: Db }
 ) {
-  await db.insert(aiDraftUsage).values({
-    createdAt: now,
-    id: nanoid(APP_ENTITY_ID_LENGTH.generated),
-    userId,
-  });
+  await db.delete(aiDraftUsage).where(eq(aiDraftUsage.id, reservationId));
 }

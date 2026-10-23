@@ -83,6 +83,8 @@ type SettingsBillingCardPlanView = {
 
 type SettingsBillingCardViewModel = {
   action?: SettingsBillingCardAction;
+  /** Hosted billing portal for teachers with any billing history. */
+  secondaryAction?: SettingsBillingCardAction;
   ariaLabel: string;
   header: SettingsBillingCardHeader;
   message?: string;
@@ -97,6 +99,7 @@ type BuildSettingsBillingCardViewModelInput = {
   canManageBilling: boolean;
   currentPlan?: PricePlan | null;
   formatDate: (date: Date) => string;
+  hasBillingAccount?: boolean;
   hasLoadError: boolean;
   isLoading: boolean;
   plans: PricePlan[];
@@ -116,11 +119,19 @@ export function buildSettingsBillingCardViewModel({
   canManageBilling,
   currentPlan,
   formatDate,
+  hasBillingAccount = false,
   hasLoadError,
   isLoading,
   plans,
   subscription,
 }: BuildSettingsBillingCardViewModelInput): SettingsBillingCardViewModel {
+  const portalAction =
+    canManageBilling && hasBillingAccount
+      ? buildSettingsBillingCardActionView({
+          kind: 'manage-billing',
+          label: m.settings_billing_card_manage_billing(),
+        })
+      : undefined;
   if (isLoading) {
     return buildSettingsBillingCardBaseView('loading');
   }
@@ -150,6 +161,7 @@ export function buildSettingsBillingCardViewModel({
       }),
       message: m.settings_billing_card_no_plan(getPlanLimitCopyParams()),
       nextStep: buildSettingsBillingNoPlanNextStepView(),
+      secondaryAction: portalAction,
     };
   }
 
@@ -167,6 +179,7 @@ export function buildSettingsBillingCardViewModel({
       subscription,
     }),
     plan,
+    secondaryAction: plan.isFree ? portalAction : undefined,
     statusBadge: buildSettingsBillingCardStatusBadge(subscription),
   };
 }

@@ -10044,7 +10044,7 @@ assert.equal(
 );
 assert.match(
   freeBillingView.plan?.message ?? '',
-  /up to 15 active activities, up to 3 open assignment links, and 10 AI drafts a month\. Results and CSV export are never limited/
+  /up to 15 activities \(archived ones don't count\), up to 3 open assignment links, and 10 AI drafts a month\. Results and CSV export are never limited/
 );
 assert.deepEqual(
   freeBillingView.plan?.featureSections.map((section) => [
@@ -10071,7 +10071,7 @@ assert.match(
 );
 assert.match(
   freeBillingView.plan?.nextStep.description ?? '',
-  /more than 15 active activities, more than 3 open assignment links/
+  /more than 15 activities that aren't archived, more than 3 open assignment links/
 );
 assert.doesNotMatch(
   freeBillingView.plan?.message ?? '',
@@ -12816,7 +12816,7 @@ assert.ok(
 assert.deepEqual(
   pricePlans.free?.features?.slice(1, 4),
   [
-    `Up to ${PLAN_LIMITS.free.activities} active activities`,
+    `Up to ${PLAN_LIMITS.free.activities} activities (archived ones don't count)`,
     `Up to ${PLAN_LIMITS.free.openAssignments} open assignment links at a time`,
     `${PLAN_LIMITS.free.aiDrafts} AI drafts a month`,
   ],
@@ -12825,7 +12825,7 @@ assert.deepEqual(
 assert.deepEqual(
   pricePlans.pro?.features?.slice(1, 4),
   [
-    'Unlimited active activities',
+    'Unlimited activities',
     'Unlimited open assignment links',
     `${PLAN_LIMITS.pro.aiDrafts} AI drafts a month`,
   ],
@@ -34432,17 +34432,17 @@ assert.deepEqual(
 assert.deepEqual(buildPricingFaqItems(), [
   {
     answer:
-      'Every template, up to 15 active activities, up to 3 open assignment links at a time, and 10 AI drafts a month. Student attempts, results, CSV export, and printing are never limited, and no credit card is needed.',
+      "Every template, up to 15 activities (archived ones don't count), up to 3 open assignment links at a time, and 10 AI drafts a month. Student attempts, results, CSV export, and printing are never limited, and no credit card is needed.",
     ariaLabel:
-      'What does the free plan include?: Every template, up to 15 active activities, up to 3 open assignment links at a time, and 10 AI drafts a month. Student attempts, results, CSV export, and printing are never limited, and no credit card is needed.',
+      "What does the free plan include?: Every template, up to 15 activities (archived ones don't count), up to 3 open assignment links at a time, and 10 AI drafts a month. Student attempts, results, CSV export, and printing are never limited, and no credit card is needed.",
     id: 'free',
     question: 'What does the free plan include?',
   },
   {
     answer:
-      'Teacher Pro removes the limits on active activities and open assignment links and includes 300 AI drafts a month, billed monthly or yearly. Early Supporter is a one-time payment for the same access. If a paid plan ends, nothing is deleted, and the free limits apply only to new work.',
+      'Teacher Pro removes the limits on activities and open assignment links and includes 300 AI drafts a month, billed monthly or yearly. Early Supporter is a one-time payment for the same access. If a paid plan ends, nothing is deleted, and the free limits apply only to new work.',
     ariaLabel:
-      'What does Teacher Pro include?: Teacher Pro removes the limits on active activities and open assignment links and includes 300 AI drafts a month, billed monthly or yearly. Early Supporter is a one-time payment for the same access. If a paid plan ends, nothing is deleted, and the free limits apply only to new work.',
+      'What does Teacher Pro include?: Teacher Pro removes the limits on activities and open assignment links and includes 300 AI drafts a month, billed monthly or yearly. Early Supporter is a one-time payment for the same access. If a paid plan ends, nothing is deleted, and the free limits apply only to new work.',
     id: 'pro',
     question: 'What does Teacher Pro include?',
   },

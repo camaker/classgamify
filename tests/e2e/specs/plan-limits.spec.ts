@@ -53,14 +53,16 @@ test.describe('plan limits and upgrade path', () => {
     await expect(usage).toContainText('15 of 15');
     await expect(usage).toContainText('Limit reached');
     await expect(
-      usage.getByRole('meter', { name: /Active activities: 15 of 15/ })
+      usage.getByRole('meter', {
+        name: /Activities \(not archived\): 15 of 15/,
+      })
     ).toBeVisible();
 
     await page.goto('/dashboard/activities/new');
     const notice = page.getByTestId('plan-limit-notice');
     await expect(notice).toBeVisible({ timeout: 20_000 });
     await expect(notice).toContainText(
-      'You have 15 active activities, the most the free plan allows.'
+      "You have 15 activities that aren't archived, the most the free plan allows."
     );
 
     // The server enforces the limit even if the teacher saves anyway.
@@ -75,7 +77,9 @@ test.describe('plan limits and upgrade path', () => {
 
     await notice.getByRole('link', { name: 'View plans' }).click();
     await expect(page).toHaveURL(/\/pricing\/?$/);
-    await expect(page.getByText('Up to 15 active activities')).toBeVisible();
+    await expect(
+      page.getByText("Up to 15 activities (archived ones don't count)")
+    ).toBeVisible();
     await expect(
       page.getByText('Unlimited open assignment links')
     ).toBeVisible();

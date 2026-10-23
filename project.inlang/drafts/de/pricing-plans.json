@@ -1,8 +1,8 @@
 {
   "pricing_plans_free_description": "Alle Vorlagen für echten Unterricht, mit bis zu {openAssignments} offenen Aufgabenlinks gleichzeitig und ohne Kreditkarte.",
-  "pricing_plans_free_features": "[\"Alle acht Spielvorlagen für den Unterricht\",\"Bis zu {activities} aktive Aktivitäten\",\"Bis zu {openAssignments} offene Aufgabenlinks gleichzeitig\",\"{aiDrafts} KI-Entwürfe pro Monat\",\"Unbegrenzte Versuche, Ergebnisse und CSV-Export\"]",
+  "pricing_plans_free_features": "[\"Alle acht Spielvorlagen für den Unterricht\",\"Bis zu {activities} Aktivitäten (archivierte zählen nicht)\",\"Bis zu {openAssignments} offene Aufgabenlinks gleichzeitig\",\"{aiDrafts} KI-Entwürfe pro Monat\",\"Unbegrenzte Versuche, Ergebnisse und CSV-Export\"]",
   "pricing_plans_pro_description": "Keine Limits für Aktivitäten oder offene Aufgabenlinks und {paidAiDrafts} KI-Entwürfe pro Monat.",
-  "pricing_plans_pro_features": "[\"Alles aus dem kostenlosen Tarif\",\"Unbegrenzt aktive Aktivitäten\",\"Unbegrenzt offene Aufgabenlinks\",\"{paidAiDrafts} KI-Entwürfe pro Monat\",\"Monatliche oder jährliche Abrechnung\"]",
+  "pricing_plans_pro_features": "[\"Alles aus dem kostenlosen Tarif\",\"Unbegrenzt viele Aktivitäten\",\"Unbegrenzt viele offene Aufgabenlinks\",\"{paidAiDrafts} KI-Entwürfe pro Monat\",\"Monatliche oder jährliche Abrechnung\"]",
   "pricing_plans_lifetime_description": "Alles aus Teacher Pro für eine einmalige Zahlung.",
   "pricing_plans_lifetime_features": "[\"Alles aus Teacher Pro\",\"Einmalzahlung, kein Abo\",\"Gründerpreis\"]",
   "pricing_value_ai_description": "KI-Entwürfe und das Remixen von Vorlagen helfen dir, aus Unterrichtsnotizen Aktivitäten zu machen, die du prüfst und veröffentlichst."

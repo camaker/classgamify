@@ -1,8 +1,8 @@
 {
   "pricing_plans_free_description": "Todos os modelos para aulas reais, com até {openAssignments} links de tarefas abertos ao mesmo tempo e sem cartão de crédito.",
-  "pricing_plans_free_features": "[\"Todos os oito modelos de jogos para a sala de aula\",\"Até {activities} atividades ativas\",\"Até {openAssignments} links de tarefas abertos ao mesmo tempo\",\"{aiDrafts} rascunhos com IA por mês\",\"Tentativas, resultados e exportação em CSV ilimitados\"]",
+  "pricing_plans_free_features": "[\"Todos os oito modelos de jogos para a sala de aula\",\"Até {activities} atividades (as arquivadas não contam)\",\"Até {openAssignments} links de tarefas abertos ao mesmo tempo\",\"{aiDrafts} rascunhos com IA por mês\",\"Tentativas, resultados e exportação em CSV ilimitados\"]",
   "pricing_plans_pro_description": "Sem limites de atividades ou links de tarefas abertos, e {paidAiDrafts} rascunhos com IA por mês.",
-  "pricing_plans_pro_features": "[\"Tudo do plano gratuito\",\"Atividades ativas ilimitadas\",\"Links de tarefas abertos ilimitados\",\"{paidAiDrafts} rascunhos com IA por mês\",\"Cobrança mensal ou anual\"]",
+  "pricing_plans_pro_features": "[\"Tudo do plano gratuito\",\"Atividades ilimitadas\",\"Links de tarefas abertos ilimitados\",\"{paidAiDrafts} rascunhos com IA por mês\",\"Cobrança mensal ou anual\"]",
   "pricing_plans_lifetime_description": "Tudo do Teacher Pro com um único pagamento.",
   "pricing_plans_lifetime_features": "[\"Tudo do Teacher Pro\",\"Pagamento único, sem assinatura\",\"Preço de fundador\"]",
   "pricing_value_ai_description": "Rascunhos com IA e o remix de modelos ajudam a transformar anotações de aula em atividades para revisar e publicar."

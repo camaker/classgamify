@@ -20,19 +20,31 @@ import {
 import {
   assertPlanAllows,
   getPlanUsageSnapshot,
-  recordAiDraftUsage,
+  releaseAiDraftReservation,
+  reserveAiDraft,
 } from '@/payment/plan-entitlements-server';
 import {
   buildPlanLimitReachedMessage,
   buildPlanUsageCardView,
   getPlanUsageMeterStatus,
 } from '@/payment/plan-usage-view';
+import { resolveCurrentBillingPlan } from '@/payment/current-plan';
+import type { PricePlan } from '@/payment/types';
 import { drizzle } from 'drizzle-orm/sqlite-proxy';
 
 overwriteGetLocale(() => 'en');
 
 const NOW = new Date('2026-10-15T12:00:00.000Z');
 const DAY = 24 * 60 * 60 * 1000;
+
+/** Plan resolution without the source record, for compact assertions. */
+function plan(
+  records: EntitlementPaymentRecord[],
+  now: Date = NOW
+): Omit<ReturnType<typeof resolveEntitlementPlan>, 'record'> {
+  const { record: _record, ...rest } = resolveEntitlementPlan(records, now);
+  return rest;
+}
 
 function subscription(
   overrides: Partial<EntitlementPaymentRecord> = {}
@@ -50,7 +62,7 @@ function subscription(
 }
 
 test('no payments, unpaid rows, and dead statuses resolve to the free plan', () => {
-  assert.deepEqual(resolveEntitlementPlan([], NOW), {
+  assert.deepEqual(plan([]), {
     planId: 'free',
     state: 'free',
   });
@@ -74,7 +86,7 @@ test('no payments, unpaid rows, and dead statuses resolve to the free plan', () 
 });
 
 test('active and trialing subscriptions grant Teacher Pro, even for unknown price ids', () => {
-  assert.deepEqual(resolveEntitlementPlan([subscription()], NOW), {
+  assert.deepEqual(plan([subscription()]), {
     planId: 'pro',
     state: 'subscribed',
   });
@@ -94,29 +106,53 @@ test('active and trialing subscriptions grant Teacher Pro, even for unknown pric
 test('cancel at period end keeps Teacher Pro until the period ends', () => {
   const periodEnd = new Date(NOW.getTime() + 3 * DAY);
   assert.deepEqual(
-    resolveEntitlementPlan(
-      [subscription({ cancelAtPeriodEnd: true, periodEnd })],
-      NOW
-    ),
-    { accessEndsAt: periodEnd, planId: 'pro', state: 'cancel-scheduled' }
+    plan([subscription({ cancelAtPeriodEnd: true, periodEnd })]),
+    {
+      accessEndsAt: periodEnd,
+      planId: 'pro',
+      state: 'cancel-scheduled',
+    }
   );
   assert.equal(
-    resolveEntitlementPlan(
-      [subscription({ periodEnd, status: 'canceled' })],
-      NOW
-    ).planId,
+    plan([
+      subscription({ cancelAtPeriodEnd: true, periodEnd, status: 'canceled' }),
+    ]).planId,
     'pro'
   );
   assert.equal(
-    resolveEntitlementPlan(
-      [
-        subscription({
-          periodEnd: new Date(NOW.getTime() - DAY),
-          status: 'canceled',
-        }),
-      ],
-      NOW
-    ).planId,
+    plan([
+      subscription({
+        cancelAtPeriodEnd: true,
+        periodEnd: new Date(NOW.getTime() - DAY),
+        status: 'canceled',
+      }),
+    ]).planId,
+    'free'
+  );
+});
+
+test('a scheduled cancellation whose period already ended is free (missed webhook)', () => {
+  assert.equal(
+    plan([
+      subscription({
+        cancelAtPeriodEnd: true,
+        periodEnd: new Date(NOW.getTime() - DAY),
+        status: 'active',
+      }),
+    ]).planId,
+    'free'
+  );
+});
+
+test('an immediate cancellation or refund ends access now', () => {
+  assert.equal(
+    plan([
+      subscription({
+        cancelAtPeriodEnd: false,
+        periodEnd: new Date(NOW.getTime() + 20 * DAY),
+        status: 'canceled',
+      }),
+    ]).planId,
     'free'
   );
 });
@@ -154,6 +190,32 @@ test('past due subscriptions keep Teacher Pro only during the grace window', () 
   );
 });
 
+test('past due grace starts when the failure was recorded, even if periodEnd moves', () => {
+  const movedPeriodEnd = new Date(NOW.getTime() + 25 * DAY);
+  assert.equal(
+    plan([
+      subscription({
+        periodEnd: movedPeriodEnd,
+        status: 'past_due',
+        updatedAt: new Date(NOW.getTime() - (PAST_DUE_GRACE_DAYS + 1) * DAY),
+      }),
+    ]).planId,
+    'free'
+  );
+  const recent = plan([
+    subscription({
+      periodEnd: movedPeriodEnd,
+      status: 'past_due',
+      updatedAt: new Date(NOW.getTime() - 2 * DAY),
+    }),
+  ]);
+  assert.equal(recent.planId, 'pro');
+  assert.equal(
+    recent.accessEndsAt?.getTime(),
+    NOW.getTime() - 2 * DAY + PAST_DUE_GRACE_DAYS * DAY
+  );
+});
+
 test('a completed lifetime payment wins and never expires', () => {
   const lifetime: EntitlementPaymentRecord = {
     paid: true,
@@ -162,13 +224,10 @@ test('a completed lifetime payment wins and never expires', () => {
     status: 'completed',
     type: 'one_time',
   };
-  assert.deepEqual(
-    resolveEntitlementPlan(
-      [subscription({ status: 'past_due' }), lifetime],
-      NOW
-    ),
-    { planId: 'lifetime', state: 'lifetime' }
-  );
+  assert.deepEqual(plan([subscription({ status: 'past_due' }), lifetime]), {
+    planId: 'lifetime',
+    state: 'lifetime',
+  });
   assert.equal(
     resolveEntitlementPlan([{ ...lifetime, status: 'processing' }], NOW).planId,
     'free'
@@ -466,13 +525,13 @@ test('AI drafts reset monthly and paid plans lift creation caps', async () => {
     userId: 'drafter',
   });
   for (let index = 0; index < 10; index += 1) {
-    await recordAiDraftUsage('drafter', { db, now: NOW });
+    await reserveAiDraft('drafter', { db, now: NOW });
   }
   await assert.rejects(
-    assertPlanAllows('aiDrafts', 'drafter', { db, now: NOW }),
+    reserveAiDraft('drafter', { db, now: NOW }),
     (error: Error) => /all 10 AI drafts/.test(error.message)
   );
-  await assertPlanAllows('aiDrafts', 'drafter', {
+  await reserveAiDraft('drafter', {
     db,
     now: new Date('2026-11-01T00:00:01.000Z'),
   });
@@ -490,12 +549,32 @@ test('AI drafts reset monthly and paid plans lift creation caps', async () => {
     updatedAt: NOW,
     userId: 'drafter',
   });
-  const plan = await assertPlanAllows('activities', 'drafter', {
+  const proPlan = await assertPlanAllows('activities', 'drafter', {
     db,
     now: NOW,
   });
-  assert.equal(plan.planId, 'pro');
-  await assertPlanAllows('aiDrafts', 'drafter', { db, now: NOW });
+  assert.equal(proPlan.planId, 'pro');
+  await reserveAiDraft('drafter', { db, now: NOW });
+});
+
+test('parallel AI draft requests cannot overrun the monthly allowance', async () => {
+  const db = createMigratedDb();
+  await seedTeacher(db, 'racer');
+  const results = await Promise.allSettled(
+    Array.from({ length: 15 }, () => reserveAiDraft('racer', { db, now: NOW }))
+  );
+  const reserved = results.filter((result) => result.status === 'fulfilled');
+  assert.equal(reserved.length, 10);
+  assert.equal(results.length - reserved.length, 5);
+  const snapshot = await getPlanUsageSnapshot('racer', { db, now: NOW });
+  assert.equal(snapshot.meters.aiDrafts.used, 10);
+
+  // Releasing a reservation (offline fallback or provider error) frees it.
+  const first = reserved[0];
+  assert.ok(first && first.status === 'fulfilled');
+  await releaseAiDraftReservation(first.value, { db });
+  await reserveAiDraft('racer', { db, now: NOW });
+  await assert.rejects(reserveAiDraft('racer', { db, now: NOW }));
 });
 
 test('enforcement runs in the server functions, never on student submission', () => {
@@ -518,6 +597,86 @@ test('enforcement runs in the server functions, never on student submission', ()
   assert.doesNotMatch(submitHandler, /assertPlanAllows/);
   assert.match(
     aiApi,
-    /assertPlanAllowsForUser\('aiDrafts'[\s\S]*generateActivityDraftFromAi[\s\S]*recordAiDraftUsageForUser/
+    /reserveAiDraftForUser\(context\.userId\)[\s\S]*generateActivityDraftFromAi[\s\S]*catch[\s\S]*releaseAiDraftReservationSafely[\s\S]*result\.provider !== 'workers-ai'[\s\S]*releaseAiDraftReservationSafely/
+  );
+});
+
+const BILLING_PLANS = [
+  { id: 'free', isFree: true, isLifetime: false, prices: [] },
+  { id: 'pro', isFree: false, isLifetime: false, prices: [] },
+  { id: 'lifetime', isFree: false, isLifetime: true, prices: [] },
+] as unknown as PricePlan[];
+
+function billingRecord(overrides: Partial<EntitlementPaymentRecord> = {}) {
+  return {
+    ...subscription(overrides),
+    createdAt: NOW,
+    customerId: 'cus_billing',
+    id: 'pay_billing',
+    subscriptionId: 'sub_billing',
+  };
+}
+
+test('billing settings show the same plan enforcement uses, in every state', () => {
+  const cases: Array<[string, EntitlementPaymentRecord, string]> = [
+    ['active', subscription(), 'pro'],
+    [
+      'past due in grace',
+      subscription({
+        periodEnd: new Date(NOW.getTime() - DAY),
+        status: 'past_due',
+      }),
+      'pro',
+    ],
+    [
+      'cancel scheduled',
+      subscription({ cancelAtPeriodEnd: true, status: 'active' }),
+      'pro',
+    ],
+    [
+      'canceled with future period end',
+      subscription({ cancelAtPeriodEnd: true, status: 'canceled' }),
+      'pro',
+    ],
+    ['unknown price id', subscription({ priceId: 'price_retired' }), 'pro'],
+    ['expired', subscription({ paid: false, status: 'canceled' }), 'free'],
+  ];
+  for (const [label, record, expected] of cases) {
+    const result = resolveCurrentBillingPlan({
+      now: NOW,
+      plans: BILLING_PLANS,
+      records: [billingRecord(record)],
+    });
+    assert.equal(result.currentPlan?.id, expected, label);
+    assert.equal(
+      Boolean(result.subscription),
+      expected === 'pro',
+      `${label} subscription`
+    );
+    assert.equal(result.hasBillingAccount, true, `${label} portal`);
+  }
+
+  const scheduled = resolveCurrentBillingPlan({
+    now: NOW,
+    plans: BILLING_PLANS,
+    records: [billingRecord({ cancelAtPeriodEnd: true, status: 'canceled' })],
+  });
+  assert.equal(scheduled.subscription?.cancelAtPeriodEnd, true);
+
+  const none = resolveCurrentBillingPlan({
+    now: NOW,
+    plans: BILLING_PLANS,
+    records: [],
+  });
+  assert.equal(none.currentPlan?.id, 'free');
+  assert.equal(none.hasBillingAccount, false);
+  assert.equal(
+    resolveCurrentBillingPlan({
+      customerId: 'cus_only',
+      now: NOW,
+      plans: BILLING_PLANS,
+      records: [],
+    }).hasBillingAccount,
+    true
   );
 });

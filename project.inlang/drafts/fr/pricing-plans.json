@@ -1,8 +1,8 @@
 {
   "pricing_plans_free_description": "Tous les modèles pour de vraies classes, jusqu’à {openAssignments} liens de devoir ouverts à la fois, sans carte bancaire.",
-  "pricing_plans_free_features": "[\"Les huit modèles de jeux pour la classe\",\"Jusqu’à {activities} activités actives\",\"Jusqu’à {openAssignments} liens de devoir ouverts à la fois\",\"{aiDrafts} brouillons IA par mois\",\"Tentatives des élèves, résultats et export CSV illimités\"]",
+  "pricing_plans_free_features": "[\"Les huit modèles de jeux pour la classe\",\"Jusqu’à {activities} activités (les archivées ne comptent pas)\",\"Jusqu’à {openAssignments} liens de devoir ouverts à la fois\",\"{aiDrafts} brouillons IA par mois\",\"Tentatives des élèves, résultats et export CSV illimités\"]",
   "pricing_plans_pro_description": "Aucune limite sur les activités ni sur les liens de devoir ouverts, et {paidAiDrafts} brouillons IA par mois.",
-  "pricing_plans_pro_features": "[\"Tout ce que propose l’offre gratuite\",\"Activités actives illimitées\",\"Liens de devoir ouverts illimités\",\"{paidAiDrafts} brouillons IA par mois\",\"Facturation mensuelle ou annuelle\"]",
+  "pricing_plans_pro_features": "[\"Tout ce que propose l’offre gratuite\",\"Activités illimitées\",\"Liens de devoir ouverts illimités\",\"{paidAiDrafts} brouillons IA par mois\",\"Facturation mensuelle ou annuelle\"]",
   "pricing_plans_lifetime_description": "Tout ce que propose Teacher Pro, pour un paiement unique.",
   "pricing_plans_lifetime_features": "[\"Tout ce que propose Teacher Pro\",\"Paiement unique, sans abonnement\",\"Tarif fondateur\"]",
   "pricing_value_ai_description": "Les brouillons IA et le remix de modèles aident à transformer vos notes de cours en activités à relire et à publier."

@@ -36,7 +36,7 @@ import { useCallback } from 'react';
 const cardClass = cn('w-full overflow-hidden pt-6 pb-0 flex flex-col');
 /** Footer: right-aligned primary action, muted background */
 const footerClass = cn(
-  'mt-2 px-6 py-4 flex justify-end items-center bg-muted rounded-none'
+  'mt-2 px-6 py-4 flex flex-wrap justify-end items-center gap-2 bg-muted rounded-none'
 );
 /**
  * Billing card: current plan and subscription status
@@ -53,6 +53,7 @@ export function BillingCard() {
   } = useCurrentPlan(!!currentUser?.id);
   const currentPlan = paymentData?.currentPlan ?? null;
   const subscription = paymentData?.subscription ?? null;
+  const hasBillingAccount = paymentData?.hasBillingAccount ?? false;
   const plansRecord = getPricePlans();
   const plans = Object.values(plansRecord);
   const handleRetry = useCallback(() => refetchPayment(), [refetchPayment]);
@@ -60,6 +61,7 @@ export function BillingCard() {
     canManageBilling: Boolean(currentUser),
     currentPlan,
     formatDate,
+    hasBillingAccount,
     hasLoadError: Boolean(loadPaymentError),
     isLoading: isLoadingPayment || isLoadingSession,
     plans,
@@ -135,6 +137,10 @@ export function BillingCard() {
         </CardContent>
         <CardFooter className={footerClass}>
           <BillingCardAction action={view.action} onRetry={handleRetry} />
+          <BillingCardAction
+            action={view.secondaryAction}
+            onRetry={handleRetry}
+          />
         </CardFooter>
       </Card>
     );
@@ -184,6 +190,10 @@ export function BillingCard() {
       </CardContent>
       <CardFooter className={footerClass}>
         <BillingCardAction action={view.action} onRetry={handleRetry} />
+        <BillingCardAction
+          action={view.secondaryAction}
+          onRetry={handleRetry}
+        />
       </CardFooter>
     </Card>
   );

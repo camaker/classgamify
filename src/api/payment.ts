@@ -2,22 +2,16 @@ import { getDb } from '@/db';
 import { payment } from '@/db/app.schema';
 import { user } from '@/db/auth.schema';
 import { getLocale } from '@/lib/locale';
-import { findPlanByPriceId, getAllPricePlans } from '@/lib/price-plan';
+import { getAllPricePlans } from '@/lib/price-plan';
 import { Routes } from '@/lib/routes';
 import { getCanonicalUrl } from '@/lib/urls';
 import { m } from '@/locale/paraglide/messages';
 import { authApiMiddleware } from '@/middlewares/auth-middleware';
+import { resolveCurrentBillingPlan } from '@/payment/current-plan';
 import { createCheckout, createCustomerPortal } from '@/payment';
-import type {
-  PaymentStatus,
-  PlanInterval,
-  PricePlan,
-  Subscription,
-} from '@/payment/types';
-import { PaymentScenes, PaymentTypes } from '@/payment/types';
 import { websiteConfig } from '@/config/website';
 import { createServerFn } from '@tanstack/react-start';
-import { and, desc, eq, or } from 'drizzle-orm';
+import { and, desc, eq } from 'drizzle-orm';
 import { z } from 'zod';
 
 const checkoutSchema = z.object({
@@ -97,14 +91,25 @@ export const createCustomerPortalSession = createServerFn({ method: 'POST' })
       .from(user)
       .where(eq(user.id, userId))
       .limit(1);
-    if (!row?.customerId) {
+    // Fall back to the customer on the latest payment so the portal stays
+    // reachable even if the user row never stored a customer id.
+    const [latestPayment] = row?.customerId
+      ? []
+      : await db
+          .select({ customerId: payment.customerId })
+          .from(payment)
+          .where(eq(payment.userId, userId))
+          .orderBy(desc(payment.createdAt))
+          .limit(1);
+    const customerId = row?.customerId ?? latestPayment?.customerId;
+    if (!customerId) {
       throw new Error(m.payment_api_error_customer_not_found());
     }
     const locale = getLocale();
     const returnUrl = data.returnUrl ?? getCanonicalUrl(Routes.SettingsBilling);
     try {
       const result = await createCustomerPortal({
-        customerId: row.customerId,
+        customerId,
         returnUrl,
         locale: data.locale ?? locale,
       });
@@ -120,98 +125,41 @@ export const getCurrentPlan = createServerFn({ method: 'GET' })
   .handler(async ({ context }) => {
     const { userId } = context;
     const db = getDb();
-    const plans = getAllPricePlans();
-    const freePlan = plans.find((p) => p.isFree && !p.disabled) ?? null;
-    const lifetimePlanIds = plans.filter((p) => p.isLifetime).map((p) => p.id);
+    const [records, [userRow]] = await Promise.all([
+      db
+        .select({
+          cancelAtPeriodEnd: payment.cancelAtPeriodEnd,
+          createdAt: payment.createdAt,
+          customerId: payment.customerId,
+          id: payment.id,
+          interval: payment.interval,
+          paid: payment.paid,
+          periodEnd: payment.periodEnd,
+          periodStart: payment.periodStart,
+          priceId: payment.priceId,
+          scene: payment.scene,
+          status: payment.status,
+          subscriptionId: payment.subscriptionId,
+          trialEnd: payment.trialEnd,
+          trialStart: payment.trialStart,
+          type: payment.type,
+          updatedAt: payment.updatedAt,
+        })
+        .from(payment)
+        .where(and(eq(payment.paid, true), eq(payment.userId, userId)))
+        .orderBy(desc(payment.createdAt)),
+      db
+        .select({ customerId: user.customerId })
+        .from(user)
+        .where(eq(user.id, userId))
+        .limit(1),
+    ]);
 
-    const payments = await db
-      .select({
-        id: payment.id,
-        priceId: payment.priceId,
-        customerId: payment.customerId,
-        type: payment.type,
-        status: payment.status,
-        scene: payment.scene,
-        interval: payment.interval,
-        periodStart: payment.periodStart,
-        periodEnd: payment.periodEnd,
-        cancelAtPeriodEnd: payment.cancelAtPeriodEnd,
-        trialStart: payment.trialStart,
-        trialEnd: payment.trialEnd,
-        createdAt: payment.createdAt,
-      })
-      .from(payment)
-      .where(
-        and(
-          eq(payment.paid, true),
-          eq(payment.userId, userId),
-          or(
-            and(
-              eq(payment.type, PaymentTypes.ONE_TIME),
-              eq(payment.scene, PaymentScenes.LIFETIME),
-              eq(payment.status, 'completed')
-            ),
-            and(
-              eq(payment.type, PaymentTypes.SUBSCRIPTION),
-              or(eq(payment.status, 'active'), eq(payment.status, 'trialing'))
-            )
-          )
-        )
-      )
-      .orderBy(desc(payment.createdAt));
-
-    let userLifetimePlan: PricePlan | null = null;
-    let activeSubscription: Subscription | null = null;
-
-    for (const rec of payments) {
-      if (
-        rec.type === PaymentTypes.ONE_TIME &&
-        rec.scene === PaymentScenes.LIFETIME &&
-        rec.status === 'completed' &&
-        !userLifetimePlan
-      ) {
-        const plan = findPlanByPriceId(rec.priceId);
-        if (plan && lifetimePlanIds.includes(plan.id)) {
-          userLifetimePlan = plan as PricePlan;
-        }
-      }
-      if (
-        !userLifetimePlan &&
-        rec.type === PaymentTypes.SUBSCRIPTION &&
-        (rec.status === 'active' || rec.status === 'trialing') &&
-        !activeSubscription
-      ) {
-        activeSubscription = {
-          id: rec.id,
-          priceId: rec.priceId,
-          customerId: rec.customerId,
-          status: rec.status as PaymentStatus,
-          type: rec.type as 'subscription',
-          interval: rec.interval as PlanInterval | undefined,
-          currentPeriodStart: rec.periodStart ?? undefined,
-          currentPeriodEnd: rec.periodEnd ?? undefined,
-          cancelAtPeriodEnd: rec.cancelAtPeriodEnd ?? false,
-          trialStartDate: rec.trialStart ?? undefined,
-          trialEndDate: rec.trialEnd ?? undefined,
-          createdAt: rec.createdAt,
-        };
-      }
-    }
-
-    if (userLifetimePlan) {
-      return { currentPlan: userLifetimePlan, subscription: null };
-    }
-    if (activeSubscription) {
-      const subscriptionPlan =
-        plans.find((p) =>
-          p.prices.some((pr) => pr.priceId === activeSubscription!.priceId)
-        ) ?? null;
-      return {
-        currentPlan: subscriptionPlan as PricePlan | null,
-        subscription: activeSubscription,
-      };
-    }
-    return { currentPlan: freePlan as PricePlan | null, subscription: null };
+    return resolveCurrentBillingPlan({
+      customerId: userRow?.customerId,
+      plans: getAllPricePlans(),
+      records,
+    });
   });
 
 const checkCompletionSchema = z.object({ sessionId: z.string().min(1) });

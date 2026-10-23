@@ -6,7 +6,7 @@ import {
   buildPlanUsageCardView,
   type PlanUsageMeterView,
 } from '@/payment/plan-usage-view';
-import { IconAlertTriangle, IconCircleCheck } from '@tabler/icons-react';
+import { IconAlertTriangle, IconInfoCircle } from '@tabler/icons-react';
 import { Link } from '@tanstack/react-router';
 
 /**
@@ -93,14 +93,14 @@ function PlanUsageMeter({ meter }: { meter: PlanUsageMeterView }) {
           className={cn(
             'mt-1 flex items-center gap-1 text-xs font-medium',
             meter.status === 'reached'
-              ? 'text-destructive'
-              : 'text-amber-700 dark:text-amber-400'
+              ? 'text-red-800 dark:text-red-200'
+              : 'text-amber-900 dark:text-amber-200'
           )}
         >
           {meter.status === 'reached' ? (
             <IconAlertTriangle aria-hidden="true" className="size-3.5" />
           ) : (
-            <IconCircleCheck aria-hidden="true" className="size-3.5" />
+            <IconInfoCircle aria-hidden="true" className="size-3.5" />
           )}
           {meter.statusLabel}
         </p>

@@ -44,16 +44,16 @@ relies on ClassGamify, which is what is worth paying for.
 | | Free | Teacher Pro | Early Supporter |
 |---|---|---|---|
 | Templates, results, CSV export, printing | All | All | All |
-| Active activities (not archived) | 15 | Unlimited | Unlimited |
+| Activities (not archived) | 15 | Unlimited | Unlimited |
 | Open assignment links at a time | 3 | Unlimited | Unlimited |
-| AI drafts per calendar month (UTC) | 10 | 300 (fair use) | 300 (fair use) |
+| AI drafts per calendar month (resets 00:00 UTC on the 1st) | 10 | 300 (fair use) | 300 (fair use) |
 | Billing | Free | Monthly or yearly | One-time payment |
 
 Prices and Creem/Stripe products are unchanged.
 
 ### Why these numbers
 
-- **15 active activities** covers a few weeks of real classes and the whole
+- **15 activities (archived ones excluded)** cover a few weeks of real classes and the whole
   template catalog twice, so a teacher can judge the product honestly.
   Archiving frees a slot, so the limit rewards tidy libraries rather than
   forcing deletion.
@@ -72,14 +72,22 @@ Prices and Creem/Stripe products are unchanged.
 - Open assignment links: assignments with status `published` whose close
   time is empty or in the future. Publishing and reopening are checked.
   Closing, expiry, and student submissions are never checked.
-- AI drafts: one row in `ai_draft_usage` per successful draft request
-  (including the offline fallback draft), counted since the start of the
-  current UTC month.
+- AI drafts: one row in `ai_draft_usage` per draft the AI provider actually
+  produced (Workers AI), counted since 00:00 UTC on the 1st of the current
+  month. The offline template fallback costs nothing and does not count.
 
 Checks run on the server inside the server functions
 (`src/api/activities.ts`, `src/api/assignments.ts`, `src/api/activity-ai.ts`)
-before any write. Two simultaneous requests can exceed a cap by one; that is
-accepted as a soft limit rather than adding locking to every write.
+before any write.
+
+- AI drafts are reserved atomically before the provider is called: a single
+  conditional `INSERT … SELECT … WHERE (monthly count) < limit` either takes
+  a slot or fails, so parallel requests can never overrun the allowance. The
+  reservation is released if generation throws or falls back to the offline
+  template; a failed release is logged and never hides the draft.
+- Activity and open-link caps are checked with a count before the insert.
+  Two simultaneous creations can exceed those caps by one; that is accepted
+  as a soft limit rather than adding locking to every activity write.
 
 ## Subscription states
 
@@ -88,9 +96,11 @@ Resolved from the existing `payment` table (`resolveEntitlementPlan`):
 | Payment record | Plan |
 |---|---|
 | Completed one-time lifetime payment | Early Supporter (never expires) |
-| Subscription `active` or `trialing` (including cancel at period end) | Teacher Pro |
-| Subscription `past_due` | Teacher Pro until 7 days after the period end, then free |
-| Subscription `canceled` with a future period end | Teacher Pro until the period end |
+| Subscription `active` or `trialing` | Teacher Pro |
+| `active` or `trialing` with cancel at period end | Teacher Pro until the period end (a period end in the past means a missed webhook, so free) |
+| Subscription `past_due` | Teacher Pro for 7 days from the earlier of the period end and when the failed payment was recorded (`updatedAt`), then free |
+| Subscription `canceled` scheduled for period end | Teacher Pro until the period end |
+| Subscription `canceled` immediately (refund or `canceledAt`), or expired | Free |
 | Anything else, or no payment | Free |
 
 The 7-day past-due grace assumes the payment provider retries a failed
@@ -100,6 +110,11 @@ window changes, adjust `PAST_DUE_GRACE_DAYS` to match.
 
 A paid subscription whose price id is not in the current config still counts
 as Teacher Pro, so a price rotation can never silently downgrade a payer.
+
+Settings → Billing uses the same resolver (`src/payment/current-plan.ts`), so
+it always shows the plan that is enforced, and the hosted billing portal is
+offered to anyone with a customer id or payment history, even on the free
+plan.
 
 ## Migration policy (grandfathering)
 

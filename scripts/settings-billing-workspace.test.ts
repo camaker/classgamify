@@ -78,7 +78,7 @@ test('billing card view model separates classroom plan states and hosted actions
   assert.equal(freeView.action?.kind, 'upgrade');
   assert.match(
     freeView.plan?.message ?? '',
-    /up to 15 active activities, up to 3 open assignment links/
+    /up to 15 activities \(archived ones don't count\), up to 3 open assignment links/
   );
   assert.equal(proView.plan?.name, 'Teacher Pro');
   assert.equal(proView.action?.kind, 'manage-subscription');

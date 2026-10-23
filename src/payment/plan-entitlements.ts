@@ -45,6 +45,12 @@ export type EntitlementPaymentRecord = {
   scene?: string | null;
   status: PaymentStatus | string;
   type: string;
+  /**
+   * Last webhook write for the record. For a past-due subscription this is
+   * when the failed payment was recorded, which anchors the grace window
+   * even if the provider later moves `periodEnd`.
+   */
+  updatedAt?: Date | null;
 };
 
 export type EntitlementPlanState =
@@ -54,10 +60,14 @@ export type EntitlementPlanState =
   | 'past-due'
   | 'subscribed';
 
-export type ResolvedEntitlementPlan = {
+export type ResolvedEntitlementPlan<
+  TRecord extends EntitlementPaymentRecord = EntitlementPaymentRecord,
+> = {
   /** When paid access ends, if it is known to end. */
   accessEndsAt?: Date;
   planId: EntitlementPlanId;
+  /** The payment record that grants the plan, when one does. */
+  record?: TRecord;
   state: EntitlementPlanState;
 };
 
@@ -65,26 +75,27 @@ export type ResolvedEntitlementPlan = {
  * Picks the best plan the payment history grants right now. Lifetime wins
  * over a subscription; any paid subscription grants Teacher Pro even if its
  * price id is no longer configured, so a price rotation never downgrades a
- * payer.
+ * payer. Billing settings and plan enforcement both use this resolver.
  */
-export function resolveEntitlementPlan(
-  records: EntitlementPaymentRecord[],
+export function resolveEntitlementPlan<
+  TRecord extends EntitlementPaymentRecord,
+>(
+  records: TRecord[],
   now: Date = new Date()
-): ResolvedEntitlementPlan {
+): ResolvedEntitlementPlan<TRecord> {
   const paidRecords = records.filter((record) => record.paid);
 
-  if (
-    paidRecords.some(
-      (record) =>
-        record.type === PaymentTypes.ONE_TIME &&
-        record.scene === PaymentScenes.LIFETIME &&
-        record.status === 'completed'
-    )
-  ) {
-    return { planId: 'lifetime', state: 'lifetime' };
+  const lifetime = paidRecords.find(
+    (record) =>
+      record.type === PaymentTypes.ONE_TIME &&
+      record.scene === PaymentScenes.LIFETIME &&
+      record.status === 'completed'
+  );
+  if (lifetime) {
+    return { planId: 'lifetime', record: lifetime, state: 'lifetime' };
   }
 
-  let best: ResolvedEntitlementPlan | undefined;
+  let best: ResolvedEntitlementPlan<TRecord> | undefined;
   for (const record of paidRecords) {
     if (record.type !== PaymentTypes.SUBSCRIPTION) continue;
     const candidate = resolveSubscriptionRecord(record, now);
@@ -95,41 +106,74 @@ export function resolveEntitlementPlan(
   return best ?? { planId: 'free', state: 'free' };
 }
 
-function resolveSubscriptionRecord(
-  record: EntitlementPaymentRecord,
+function resolveSubscriptionRecord<TRecord extends EntitlementPaymentRecord>(
+  record: TRecord,
   now: Date
-): ResolvedEntitlementPlan | undefined {
+): ResolvedEntitlementPlan<TRecord> | undefined {
   const periodEnd = record.periodEnd ?? undefined;
   const nowMs = now.getTime();
 
   switch (record.status) {
     case 'active':
     case 'trialing':
-      return record.cancelAtPeriodEnd && periodEnd
-        ? { accessEndsAt: periodEnd, planId: 'pro', state: 'cancel-scheduled' }
-        : { planId: 'pro', state: 'subscribed' };
+      if (!record.cancelAtPeriodEnd) {
+        return { planId: 'pro', record, state: 'subscribed' };
+      }
+      // A scheduled cancellation whose period already ended means a missed
+      // webhook; do not keep granting Teacher Pro.
+      return periodEnd && nowMs < periodEnd.getTime()
+        ? {
+            accessEndsAt: periodEnd,
+            planId: 'pro',
+            record,
+            state: 'cancel-scheduled',
+          }
+        : undefined;
     case 'past_due': {
-      if (!periodEnd) return undefined;
+      const graceStart = getPastDueGraceStart(record);
+      if (!graceStart) return undefined;
       const graceEnd = new Date(
-        periodEnd.getTime() + PAST_DUE_GRACE_DAYS * DAY_MS
+        graceStart.getTime() + PAST_DUE_GRACE_DAYS * DAY_MS
       );
       return nowMs < graceEnd.getTime()
-        ? { accessEndsAt: graceEnd, planId: 'pro', state: 'past-due' }
+        ? { accessEndsAt: graceEnd, planId: 'pro', record, state: 'past-due' }
         : undefined;
     }
     case 'canceled':
-      return periodEnd && nowMs < periodEnd.getTime()
-        ? { accessEndsAt: periodEnd, planId: 'pro', state: 'cancel-scheduled' }
+      // Only a cancellation scheduled for period end keeps access; an
+      // immediate cancellation or refund ends it now.
+      return record.cancelAtPeriodEnd &&
+        periodEnd &&
+        nowMs < periodEnd.getTime()
+        ? {
+            accessEndsAt: periodEnd,
+            planId: 'pro',
+            record,
+            state: 'cancel-scheduled',
+          }
         : undefined;
     default:
       return undefined;
   }
 }
 
+/**
+ * The grace window starts at the earlier of the period end and the moment
+ * the failed payment was recorded, so a provider that pushes `periodEnd`
+ * forward during retries cannot stretch the grace window.
+ */
+function getPastDueGraceStart(record: EntitlementPaymentRecord) {
+  const candidates = [record.periodEnd, record.updatedAt].filter(
+    (value): value is Date => value instanceof Date
+  );
+  if (candidates.length === 0) return undefined;
+  return new Date(Math.min(...candidates.map((value) => value.getTime())));
+}
+
 /** Open-ended access beats access with an end date; later ends beat earlier. */
 function compareAccess(
-  left: ResolvedEntitlementPlan,
-  right: ResolvedEntitlementPlan
+  left: { accessEndsAt?: Date },
+  right: { accessEndsAt?: Date }
 ) {
   if (!left.accessEndsAt && right.accessEndsAt) return 1;
   if (left.accessEndsAt && !right.accessEndsAt) return -1;

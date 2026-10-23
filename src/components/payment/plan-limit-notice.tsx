@@ -13,7 +13,7 @@ export function PlanLimitNotice({ message }: { message: string }) {
     >
       <IconAlertTriangle
         aria-hidden="true"
-        className="mt-0.5 size-4 shrink-0 text-amber-700 dark:text-amber-400"
+        className="mt-0.5 size-4 shrink-0 text-amber-900 dark:text-amber-200"
       />
       <div className="min-w-0">
         <p className="leading-6">{message}</p>
