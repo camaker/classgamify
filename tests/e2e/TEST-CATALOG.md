@@ -19,6 +19,11 @@ Spec -> Code -> Verify -> Test -> Green
 5. Green: run the related spec locally; run full E2E before releases or large
    refactors.
 
+Before the first journey, `tests/e2e/global-setup.ts` loads the heavy routes
+(home, templates, pricing, student runner, dashboard, activity library, workspace
+editor, billing) in a real signed-in browser so the lazily compiling dev server
+is warm and timing-based assertions measure the app, not the first compile.
+
 E2E tests are intentionally local-first. CI should continue to prefer fast
 checks such as `pnpm check` and `pnpm build` unless a separate E2E environment is
 explicitly provisioned.
