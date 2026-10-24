@@ -17,6 +17,7 @@ import {
 } from '@/activities/ai-draft';
 import { getActivityTemplates, getTemplateByType } from '@/activities/catalog';
 import {
+  ACTIVITY_RESTORED_VISIBILITY,
   activityEditPageCopy,
   buildActivityEditAccessView,
   type ActivityEditAccessView,
@@ -38,6 +39,7 @@ import {
 } from '@/activities/draft-source';
 import {
   buildActivityAiDraftFocusOptions,
+  type ActivityAiDraftFocus,
   type ActivityAiDraftFocusOption,
 } from '@/activities/ai-draft-focus';
 import {
@@ -1653,7 +1655,7 @@ export function buildActivityEditorPreviewSeed(
 
   return {
     content,
-    description: input.description,
+    description: input.description ?? '',
     estimatedMinutes: 6,
     id: 'activity-editor-preview',
     status: input.visibility,
@@ -1845,7 +1847,10 @@ export function activityContentToEditorInput(
     teacherNotesText: formatEditorLineList(source.content.teacherNotes),
     templateType: source.templateType,
     title: source.title,
-    visibility: source.visibility,
+    visibility:
+      source.visibility === 'archived'
+        ? ACTIVITY_RESTORED_VISIBILITY
+        : source.visibility,
     vocabularyText: formatEditorInlineList(source.content.vocabulary),
   };
 }

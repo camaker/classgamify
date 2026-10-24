@@ -17,7 +17,7 @@ const SECRET_PROMPT = 'SECRET_LIBRARY_PROMPT';
 
 const worksheetContent = buildActivityContentFixture({
   fileId: SECRET_FILE_ID,
-  kind: 'worksheet',
+  kind: 'worksheet-document',
   originalName: SECRET_FILENAME,
 });
 
@@ -32,7 +32,7 @@ test('activity library keeps full filtered overview separate from visible page c
     buildActivityFixture({
       contentJson: buildActivityContentFixture({
         fileId: 'worksheet-file-2',
-        kind: 'worksheet',
+        kind: 'worksheet-document',
         originalName: 'worksheet-2.pdf',
       }),
       id: 'hidden-page-activity-1',
@@ -42,7 +42,7 @@ test('activity library keeps full filtered overview separate from visible page c
     buildActivityFixture({
       contentJson: buildActivityContentFixture({
         fileId: 'worksheet-file-3',
-        kind: 'worksheet',
+        kind: 'worksheet-document',
         originalName: 'worksheet-3.pdf',
       }),
       id: 'hidden-page-activity-2',
@@ -157,7 +157,7 @@ function buildActivityContentFixture({
   originalName,
 }: {
   fileId: string;
-  kind: 'worksheet';
+  kind: 'worksheet-document';
   originalName: string;
 }): ActivityContent {
   return {

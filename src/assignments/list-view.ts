@@ -189,6 +189,7 @@ export type AssignmentListCardViewModel = {
 };
 
 export type AssignmentListCardActivitySource = {
+  title: string;
   description: string | null;
   templateType: ActivityTemplateType;
 };
@@ -203,6 +204,7 @@ export type AssignmentListCardAssignmentSource = {
 };
 
 export type AssignmentListCardSnapshotSource = {
+  activityTitle: string;
   activityDescription: string | null;
   templateType: ActivityTemplateType;
 };

@@ -44,8 +44,10 @@ export function buildAttemptAssignmentJoin() {
   return eq(attempt.assignmentId, assignment.id);
 }
 
-export function buildScoredAttemptWhere(...filters: SQL[]) {
-  return and(...filters, isNotNull(attempt.resultJson));
+export function buildScoredAttemptWhere(...filters: Array<SQL | undefined>) {
+  const where = and(...filters, isNotNull(attempt.resultJson));
+  if (!where) throw new Error('Scored attempts require a result filter');
+  return where;
 }
 
 function buildAssignmentAttemptWhere({

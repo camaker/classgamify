@@ -119,12 +119,15 @@ test.describe('protected page smoke coverage', () => {
             localizedPath(protectedPage.path, locale),
             { theme }
           );
-          const firstContentKey = {
+          const contentKeys: Partial<
+            Record<(typeof protectedPages)[number]['path'], string>
+          > = {
             '/settings/security': 'settings_security_update_password_title',
             '/settings/files': 'settings_files_upload_button',
             '/settings/billing': 'settings_billing_card_current_plan',
             '/settings/payment': 'settings_payment_failed_title',
-          }[protectedPage.path];
+          };
+          const firstContentKey = contentKeys[protectedPage.path];
           if (firstContentKey) {
             // Settings pages open with the control itself, not an
             // explanation panel.

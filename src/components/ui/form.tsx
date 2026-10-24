@@ -137,7 +137,11 @@ function FormControl({
     .filter(Boolean)
     .join(' ')
 
-  const child = React.Children.only(children) as React.ReactElement
+  const child = React.Children.only(children) as React.ReactElement<{
+    id?: string
+    'aria-describedby'?: string
+    'aria-invalid'?: boolean
+  }>
   return React.cloneElement(child, {
     id: formItemId,
     'aria-describedby': describedBy || undefined,

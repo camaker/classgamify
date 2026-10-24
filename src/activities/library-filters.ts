@@ -1,6 +1,5 @@
 import {
   isActivityTemplateType,
-  type ActivityContent,
   type ActivityTemplateType,
 } from '@/activities/types';
 import { summarizeActivitySourceMaterials } from '@/activities/material-summary';
@@ -264,7 +263,7 @@ export function matchesActivitySourceMaterialFilter({
   content,
   source = 'all',
 }: {
-  content: ActivityContent;
+  content: { sourceMaterials?: unknown };
   source?: ActivitySourceMaterialFilter;
 }) {
   if (source === 'all') return true;

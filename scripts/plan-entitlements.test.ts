@@ -1,3 +1,5 @@
+import { schema } from '@/db/schema';
+import { sqliteTestBinding } from './sqlite-test-query';
 import assert from 'node:assert/strict';
 import { readdirSync, readFileSync } from 'node:fs';
 import { DatabaseSync } from 'node:sqlite';
@@ -397,24 +399,31 @@ function createMigratedDb() {
       sqlite.exec(statement);
     }
   }
-  const db = drizzle(async (sql, params, method) => {
-    const statement = sqlite.prepare(sql);
-    statement.setReturnArrays(true);
-    const values = params as never[];
-    if (method === 'run') {
-      statement.run(...values);
-      return { rows: [] };
-    }
-    if (method === 'get') {
-      const row = statement.get(...values);
-      return { rows: (row ?? undefined) as never };
-    }
-    return { rows: statement.all(...values) as never };
-  });
-  return db as never;
+  const db = drizzle(
+    async (sql, params, method) => {
+      const statement = sqlite.prepare(sql);
+      statement.setReturnArrays(true);
+      const values = params.map(sqliteTestBinding);
+      if (method === 'run') {
+        statement.run(...values);
+        return { rows: [] };
+      }
+      if (method === 'get') {
+        const row = statement.get(...values);
+        assert.ok(row === undefined || Array.isArray(row));
+        return { rows: row ?? [] };
+      }
+      return { rows: statement.all(...values) };
+    },
+    { schema }
+  );
+  return db;
 }
 
-async function seedTeacher(db: ReturnType<typeof drizzle>, id: string) {
+async function seedTeacher(
+  db: ReturnType<typeof createMigratedDb>,
+  id: string
+) {
   await db.insert(user).values({
     createdAt: NOW,
     email: `${id}@example.test`,
@@ -428,7 +437,7 @@ async function seedTeacher(db: ReturnType<typeof drizzle>, id: string) {
 let seededActivityCount = 0;
 
 async function seedActivities(
-  db: ReturnType<typeof drizzle>,
+  db: ReturnType<typeof createMigratedDb>,
   ownerId: string,
   count: number,
   visibility: 'archived' | 'draft' = 'draft'

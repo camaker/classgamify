@@ -76,6 +76,7 @@ export type ActivityAiEnhancementPolicyStatus =
 export type ActivityAiEnhancementPolicyTargetField =
   | 'acceptedAnswers'
   | 'answerExplanations'
+  | 'gradeBand'
   | 'groups'
   | 'learningGoal'
   | 'pairs'

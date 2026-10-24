@@ -137,7 +137,7 @@ export function getCanonicalPathname(pathname: string) {
  * in sitemap / SEO metadata. Keep this list limited to pages that are
  * intentionally public.
  */
-export const LOCALIZED_PATHS = new Set(PUBLIC_LOCALIZED_PATHS);
+export const LOCALIZED_PATHS = new Set<string>(PUBLIC_LOCALIZED_PATHS);
 
 /**
  * True for any user-visible path that exists in every locale and therefore

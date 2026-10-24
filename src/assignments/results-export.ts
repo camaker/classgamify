@@ -55,10 +55,10 @@ type ExportAttempt = {
   id: string;
   maxScore: number | null;
   resultJson: {
-    accuracy: number;
-    completedItemCount: number;
+    accuracy?: number;
+    completedItemCount?: number;
     durationSeconds?: number;
-    totalPoints: number;
+    totalPoints?: number;
   } | null;
   score: number | null;
 };
@@ -585,7 +585,7 @@ function prefixCsvFormulaText(text: string) {
 
 function slugifyFilename(
   value: string,
-  maxLength = ASSIGNMENT_RESULTS_EXPORT_FILENAME_LIMITS.titleMaxLength
+  maxLength: number = ASSIGNMENT_RESULTS_EXPORT_FILENAME_LIMITS.titleMaxLength
 ) {
   const slug = value
     .normalize('NFKC')

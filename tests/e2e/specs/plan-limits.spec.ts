@@ -5,6 +5,7 @@ import {
   registerE2EUser,
   seedE2EAssignment,
 } from '../fixtures/auth';
+import { installPageHealthMonitor } from '../fixtures/page-health';
 import { E2E_TEST_SECRET } from '../fixtures/test-data';
 
 async function seedPlanState(
@@ -201,5 +202,48 @@ test.describe('plan limits and upgrade path', () => {
       'Current plan: Early Supporter',
       { timeout: 20_000 }
     );
+  });
+
+  test('invalid usage responses keep the editor usable without a render failure', async ({
+    page,
+    request,
+  }) => {
+    const user = await registerE2EUser(request);
+    const monitor = installPageHealthMonitor(page);
+    const usageResponse = page.waitForResponse(async (response) => {
+      if (response.request().resourceType() !== 'fetch' || !response.ok())
+        return false;
+      const body = await response.text();
+      return body.includes('"meters"') && body.includes('"aiDrafts"');
+    });
+    await loginByForm(page, user);
+    const response = await usageResponse;
+    await expect(page.getByTestId('plan-usage-card')).toBeVisible();
+    const usageUrl = new URL(response.url());
+    let rejectedResponseCount = 0;
+    await page.route(
+      `${usageUrl.origin}${usageUrl.pathname}**`,
+      async (route) => {
+        rejectedResponseCount += 1;
+        await route.fulfill({
+          status: 200,
+          contentType: 'application/json',
+          // TanStack marks middleware Response objects as raw, bypassing its
+          // normal { result, error } envelope. Do not cache that Response as usage.
+          headers: { 'x-tss-raw': 'true' },
+          body: JSON.stringify({ error: 'Unauthorized' }),
+        });
+      }
+    );
+    await page.goto('/dashboard/activities/new');
+    await expect.poll(() => rejectedResponseCount).toBeGreaterThan(0);
+    await page.waitForLoadState('networkidle');
+    await expect(
+      page.getByRole('textbox', { name: 'Title', exact: true })
+    ).toBeVisible();
+    await expect(
+      page.getByRole('button', { name: /^save activity$/i })
+    ).toBeVisible();
+    monitor.expectNoErrors('invalid plan usage response');
   });
 });

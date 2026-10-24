@@ -21,7 +21,12 @@ import { createFileRoute, Link, useNavigate } from '@tanstack/react-router';
 import { useEffect, useMemo, useState } from 'react';
 
 export const Route = createFileRoute('/create')({
-  validateSearch: (search: Record<string, unknown>) => ({
+  validateSearch: (
+    search: Record<string, unknown>
+  ): {
+    source?: ReturnType<typeof parseCreateActivityTemplateSourceSearch>;
+    template?: ReturnType<typeof parseCreateActivityTemplateSearch>;
+  } => ({
     source: parseCreateActivityTemplateSourceSearch(search.source),
     template: parseCreateActivityTemplateSearch(search.template),
   }),

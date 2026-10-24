@@ -125,7 +125,9 @@ test('translated static pages retain self canonical and only available alternate
           localizeHref(path, { locale })
         );
         assert.deepEqual(
-          head.links.slice(1).map((link) => link.hrefLang),
+          head.links
+            .slice(1)
+            .map((link) => ('hrefLang' in link ? link.hrefLang : undefined)),
           [
             ...availableLocales.map(
               (availableLocale) => localeConfig[availableLocale].hreflang

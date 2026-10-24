@@ -50,7 +50,7 @@ export function ListeningRunner({
   reviewItems,
 }: ListeningRunnerProps) {
   const copy = getActivityRunnerKindCopy('listening');
-  const [activeItemId, setActiveItemId] = useState(() =>
+  const [activeItemId, setActiveItemId] = useState<string | undefined>(() =>
     getInitialSequentialStudentRunnerActiveItemId(items)
   );
   const [speechSupported, setSpeechSupported] = useState(false);

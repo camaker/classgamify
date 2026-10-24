@@ -1,3 +1,4 @@
+import { compileSqliteTestQuery } from './sqlite-test-query';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { DatabaseSync } from 'node:sqlite';
@@ -280,7 +281,8 @@ type MutationInput = {
 };
 
 function compileMutationWhere(input: MutationInput = {}) {
-  return DIALECT.sqlToQuery(
+  return compileSqliteTestQuery(
+    DIALECT,
     buildActivityMutationWhere({
       activityId: input.activityId ?? 'activity-cas',
       currentUpdatedAt: input.currentUpdatedAt ?? new Date(1_000),

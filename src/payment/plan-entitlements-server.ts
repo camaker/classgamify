@@ -1,4 +1,5 @@
-import type { getDb } from '@/db';
+import type { schema } from '@/db/schema';
+import type { BaseSQLiteDatabase } from 'drizzle-orm/sqlite-core';
 import { activity, aiDraftUsage, assignment, payment } from '@/db/app.schema';
 import { APP_ENTITY_ID_LENGTH } from '@/lib/entity-id';
 import {
@@ -23,7 +24,7 @@ import { nanoid } from 'nanoid';
  * never gated (docs/plan-value-design.md).
  */
 
-type Db = ReturnType<typeof getDb>;
+type Db = BaseSQLiteDatabase<'async', unknown, typeof schema>;
 
 type PlanUsageSnapshot = {
   meters: Record<PlanUsageKind, PlanUsageMeter>;

@@ -219,7 +219,7 @@ test('transactional mail templates render workspace boundary output', async () =
       );
     }
 
-    if (renderCase.actionLabel) {
+    if ('actionLabel' in renderCase && renderCase.actionLabel) {
       const boundaryTitle =
         renderCase.locale === 'zh' ? '工作区边界' : 'Workspace boundary';
       const boundaryIndex = renderedTemplate.text.indexOf(boundaryTitle);

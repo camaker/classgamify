@@ -182,8 +182,8 @@ function buildAttemptDurationEvidence() {
     runtimeItems: [
       {
         id: SECRET_RUNTIME_ITEM_ID,
-        kind: 'question',
-        prompt: SECRET_TEACHER_ANSWER,
+        ...{ kind: 'question' },
+        ...{ prompt: SECRET_TEACHER_ANSWER },
       },
     ],
     shareSlug: 'duration-class-link',

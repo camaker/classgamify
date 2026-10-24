@@ -253,7 +253,7 @@ export const uploadUserFile = createServerFn({ method: 'POST' })
     if (!publicFolder) {
       const metadata = result.metadata;
       if (!userId || !metadata) {
-        await throwUserFileUploadPersistenceFailure(result.key);
+        return await throwUserFileUploadPersistenceFailure(result.key);
       }
       const db = getDb();
       const now = metadata.uploadedAt;

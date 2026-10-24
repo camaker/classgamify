@@ -22,7 +22,12 @@ export const Route = createFileRoute('/dashboard/activities_/new')({
   head: () => ({
     meta: [{ title: `${m.activity_new_page_title()} | ClassGamify` }],
   }),
-  validateSearch: (search: Record<string, unknown>) => ({
+  validateSearch: (
+    search: Record<string, unknown>
+  ): {
+    source?: ReturnType<typeof parseCreateActivityTemplateSourceSearch>;
+    template?: ReturnType<typeof parseCreateActivityTemplateSearch>;
+  } => ({
     source: parseCreateActivityTemplateSourceSearch(search.source),
     template: parseCreateActivityTemplateSearch(search.template),
   }),

@@ -10,7 +10,6 @@ import {
 } from '@/activities/entry-page-view';
 import { websiteConfig } from '@/config/website';
 import { m } from '@/locale/paraglide/messages';
-import { Routes } from '@/lib/routes';
 import { getPathWithLocale } from '@/lib/urls';
 import { seo } from '@/lib/seo';
 import { cn } from '@/lib/utils';

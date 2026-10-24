@@ -1171,6 +1171,8 @@ const githubIssueTemplateConfigSource = readFileSync(
   'utf8'
 );
 const viteConfigSource = readFileSync('vite.config.ts', 'utf8');
+// Bound the module control-flow graph without deferring assertions; see the helper below.
+verifyDomainAssertions(() => {
 assert.match(
   githubIssueTemplateConfigSource,
   /ClassGamify Product Direction[\s\S]*docs\/product\.md[\s\S]*ClassGamify Classroom Feedback/,
@@ -1191,6 +1193,7 @@ assert.match(
   /allowedHosts:\s*\[\s*['"]\.trycloudflare\.com['"]\s*\]/,
   'Vite dev server config should only allow the current tunnel host needed for local ClassGamify previews.'
 );
+});
 const secretScanFileExtensions = ['.json', '.md', '.ts', '.tsx', '.txt'];
 
 function collectTextFiles(directoryPath: string): string[] {
@@ -1422,6 +1425,7 @@ const blogPostVisualSource = readFileSync(
   'utf8'
 );
 const createRouteSource = readFileSync('src/routes/create.tsx', 'utf8');
+verifyDomainAssertions(() => {
 assert.match(
   createRouteSource,
   /buildActivityCreatePageEditorViewModel/,
@@ -1464,10 +1468,12 @@ assert.doesNotMatch(
   /m\.create_page_(?:eyebrow|title|description|input_shape|preview_label|template_entry)|from '@\/activities\/library-filters'/,
   'The create route should render localized create-page copy from buildActivityCreatePageEditorViewModel and avoid library-filter search parsing.'
 );
+});
 const pricingRouteSource = readFileSync(
   'src/routes/(pages)/pricing.tsx',
   'utf8'
 );
+verifyDomainAssertions(() => {
 assert.match(
   pricingRouteSource,
   /pageView\.faq\.items\.map[\s\S]*<AccordionItem[\s\S]*key=\{item\.id\}[\s\S]*value=\{item\.id\}[\s\S]*item\.question[\s\S]*item\.answer/,
@@ -1508,10 +1514,12 @@ assert.doesNotMatch(
   /<AccordionItem key=\{item\.question\} value=\{item\.question\}>/,
   'The pricing route should not key FAQ accordion rows by localized question copy.'
 );
+});
 const activityEditRouteSource = readFileSync(
   'src/routes/dashboard/activities/$activityId.tsx',
   'utf8'
 );
+verifyDomainAssertions(() => {
 assert.match(
   activityEditRouteSource,
   /buildActivityEditRouteState/,
@@ -1532,6 +1540,7 @@ assert.doesNotMatch(
   /activityContentToEditorInput|buildActivityEditAccessView|activityEditPageCopy/,
   'The activity edit route should not rebuild editor initial values, access state, or page copy directly.'
 );
+});
 const legalPolicyPageProductSurfaceRequirements = [
   {
     filePath: 'content/pages/terms.md',
@@ -1709,6 +1718,7 @@ const productionEnvTemplateSource = readFileSync(
   '.env.production.example',
   'utf8'
 );
+verifyDomainAssertions(() => {
 assert.match(
   productionEnvTemplateSource,
   /Cloudflare Git integration owns production builds and deploys/,
@@ -1719,6 +1729,7 @@ assert.doesNotMatch(
   /GitHub Actions deployment needs|repository secrets/i,
   'Production env example should not reintroduce a GitHub Actions deploy path.'
 );
+});
 const configurationDocumentationSource = readFileSync(
   'docs/configuration.md',
   'utf8'
@@ -1741,6 +1752,7 @@ for (const filePath of [
     `${filePath} should link to the shared configuration boundary.`
   );
 }
+verifyDomainAssertions(() => {
 assert.doesNotMatch(
   configurationDocumentationSource,
   copiedTemplateMarkerPattern,
@@ -1751,6 +1763,7 @@ assert.doesNotMatch(
   /requires GitHub repository secrets|GitHub repository secrets are required/i,
   'Configuration docs should preserve Cloudflare deploy ownership.'
 );
+});
 for (const pattern of [
   /Activity -> Assignment -> Attempt -> Results/,
   /Cloudflare Git integration owns production builds and deploys/,
@@ -1782,6 +1795,7 @@ for (const pattern of [
   );
 }
 const mailDocumentationSource = readFileSync('docs/mail.md', 'utf8');
+verifyDomainAssertions(() => {
 assert.doesNotMatch(
   mailDocumentationSource,
   /MyApp <support@example\.com>|Contact Message from Website/,
@@ -1837,17 +1851,20 @@ assert.doesNotMatch(
   /key=\{`\$\{metric\}-\$\{index\}`\}|copy\.metrics\.map\(\(metric, index\)/,
   'Blog visual metric chips should not key by localized metric text or array position.'
 );
+});
 const activeLocaleMessageText = [
   'project.inlang/messages/en.json',
   'project.inlang/messages/zh.json',
 ]
   .map((filePath) => readFileSync(filePath, 'utf8'))
   .join('\n');
+verifyDomainAssertions(() => {
 assert.doesNotMatch(activeLocaleMessageText, /"waitlist_/);
 assert.doesNotMatch(activeLocaleMessageText, /"about_/);
 assert.doesNotMatch(activeLocaleMessageText, /"ai_page_/);
 assert.doesNotMatch(activeLocaleMessageText, /"legacy_/);
 assert.doesNotMatch(activeLocaleMessageText, /"dashboard_sidebar_api_keys"/);
+});
 const storageTypesSource = readFileSync('src/storage/types.ts', 'utf8');
 assert.doesNotMatch(
   storageTypesSource,
@@ -1858,6 +1875,7 @@ const updateAvatarCardSource = readFileSync(
   'src/components/settings/profile/update-avatar-card.tsx',
   'utf8'
 );
+verifyDomainAssertions(() => {
 assert.doesNotMatch(
   updateAvatarCardSource,
   /File size exceeds the server limit/,
@@ -1888,10 +1906,12 @@ assert.match(
   /const message = m\.settings_profile_avatar_fail\(\);/,
   'Avatar update failures should use the localized profile avatar failure message.'
 );
+});
 const updateNameCardSource = readFileSync(
   'src/components/settings/profile/update-name-card.tsx',
   'utf8'
 );
+verifyDomainAssertions(() => {
 assert.doesNotMatch(
   updateNameCardSource,
   /ctx\.error|err\.message|error\.message|err instanceof Error|error instanceof Error/,
@@ -1902,6 +1922,7 @@ assert.match(
   /const message = m\.settings_profile_name_fail\(\);/,
   'Profile name update failures should use the localized name failure message.'
 );
+});
 const settingsProfileRouteProductSource = readFileSync(
   'src/routes/settings/profile.tsx',
   'utf8'
@@ -1910,6 +1931,7 @@ const settingsProfileViewSource = readFileSync(
   'src/settings/profile-view.ts',
   'utf8'
 );
+verifyDomainAssertions(() => {
 assert.match(
   settingsProfileViewSource,
   /export function buildSettingsProfilePageViewModel\(\)[\s\S]*breadcrumbs:[\s\S]*id: 'settings'[\s\S]*id: 'profile'/,
@@ -1925,6 +1947,7 @@ assert.doesNotMatch(
   /m\.settings_profile_title|m\.settings_profile_description|m\.common_settings/,
   'Profile settings route should not rebuild localized page copy directly.'
 );
+});
 const updatePasswordCardSource = readFileSync(
   'src/components/settings/security/update-password-card.tsx',
   'utf8'
@@ -1945,6 +1968,7 @@ const settingsFilesViewSource = readFileSync(
   'src/settings/files-view.ts',
   'utf8'
 );
+verifyDomainAssertions(() => {
 assert.doesNotMatch(
   updatePasswordCardSource,
   /ctx\.error|err\.message|error\.message|err instanceof Error|error instanceof Error/,
@@ -1995,10 +2019,12 @@ assert.doesNotMatch(
   /m\.settings_files_|m\.common_settings|websiteConfig\.storage/,
   'Files settings route should not rebuild localized files page copy or feature visibility directly.'
 );
+});
 const deleteAccountCardSource = readFileSync(
   'src/components/settings/security/delete-account-card.tsx',
   'utf8'
 );
+verifyDomainAssertions(() => {
 assert.doesNotMatch(
   deleteAccountCardSource,
   /ctx\.error|err\.message|error\.message|err instanceof Error|error instanceof Error/,
@@ -2009,6 +2035,7 @@ assert.match(
   /const message = m\.settings_security_delete_account_fail\(\);/,
   'Account deletion failures should use the localized delete-account failure message.'
 );
+});
 const adminUserDetailViewerSource = readFileSync(
   'src/components/admin/users/user-detail-viewer.tsx',
   'utf8'
@@ -2023,6 +2050,7 @@ const adminUsersRouteSource = readFileSync(
 );
 const adminUsersViewSource = readFileSync('src/admin/users-view.ts', 'utf8');
 const useAuthSource = readFileSync('src/hooks/use-auth.ts', 'utf8');
+verifyDomainAssertions(() => {
 assert.match(
   adminUsersTableSource,
   /banReason \?\? m\.common_empty_value\(\)/,
@@ -2098,6 +2126,7 @@ assert.match(
   /settings_security_user_accounts_fetch_error/,
   'Client auth hook account fetch errors should use localized security copy.'
 );
+});
 const adminUsersApiSource = readFileSync('src/api/users.ts', 'utf8');
 const apiServerFunctionSources = readdirSync('src/api')
   .filter((fileName) => fileName.endsWith('.ts'))
@@ -2114,6 +2143,7 @@ for (const [filePath, fileText] of apiServerFunctionSources) {
   );
 }
 const adminUsersQuerySource = readFileSync('src/admin/users-query.ts', 'utf8');
+verifyDomainAssertions(() => {
 assert.deepEqual(ADMIN_USER_LIST_INPUT_LIMITS, {
   pageSizeMax: 100,
   pageSizeMin: 1,
@@ -2155,11 +2185,13 @@ assert.match(
   /buildSqlLikeContainsPattern/,
   'Admin users search filtering should reuse the shared SQL LIKE escaping helper.'
 );
+});
 const activityRuntimeSource = readFileSync('src/activities/runtime.ts', 'utf8');
 const activityTemplateRemixSource = readFileSync(
   'src/activities/template-remix.ts',
   'utf8'
 );
+verifyDomainAssertions(() => {
 assert.match(
   activityRuntimeSource,
   /normalizeRuntimeDisplayText\(answer\.answer\)/,
@@ -2225,6 +2257,7 @@ assert.doesNotMatch(
   /\.trim\(\)/,
   'Template remix readiness should not use ad hoc trim-only content checks.'
 );
+});
 const copyAssignmentShareLinkButtonSource = readFileSync(
   'src/components/assignments/copy-assignment-share-link-button.tsx',
   'utf8'
@@ -2233,6 +2266,7 @@ const assignmentShareLinkSource = readFileSync(
   'src/assignments/share-link.ts',
   'utf8'
 );
+verifyDomainAssertions(() => {
 assert.doesNotMatch(
   copyAssignmentShareLinkButtonSource,
   /error\.message|error instanceof Error/,
@@ -2333,6 +2367,7 @@ assert.doesNotMatch(
   /const normalized = baseUrl\.trim\(\)/,
   'Share-link base URL normalization should not use trim-only cleanup.'
 );
+});
 const assignmentResultsRouteSource = readFileSync(
   'src/routes/dashboard/assignments/$assignmentId.tsx',
   'utf8'
@@ -2345,6 +2380,7 @@ const assignmentResultActionsSource = readFileSync(
   'src/assignments/result-actions.ts',
   'utf8'
 );
+verifyDomainAssertions(() => {
 assert.doesNotMatch(
   assignmentResultsRouteSource,
   /error\.message|error instanceof Error/,
@@ -2690,6 +2726,7 @@ assert.doesNotMatch(
   /isAssignmentOpen\(|isAssignmentExpired\(|normalizeAssignmentShareSlug\(|buildAssignmentSharePath\(/,
   'Assignment result page view-model should not rebuild share-link lifecycle or path state locally.'
 );
+});
 const assignmentClassroomBriefSource = readFileSync(
   'src/assignments/classroom-brief.ts',
   'utf8'
@@ -2698,6 +2735,7 @@ const assignmentResultCopyFormatSource = readFileSync(
   'src/assignments/result-copy-format.ts',
   'utf8'
 );
+verifyDomainAssertions(() => {
 assert.match(
   assignmentResultCopyFormatSource,
   /ASSIGNMENT_RESULT_COPY_TEXT_FORMAT[\s\S]*lineBreak: '\\n'/,
@@ -2858,10 +2896,12 @@ assert.doesNotMatch(
   /lines\.join\('\\n'\)|index \+ 1|student: student\.studentLabel|Attempts reviewed|Follow-up students|Brief coverage|已复盘作答|简报覆盖范围/,
   'Classroom brief should not hand-compose copy line breaks, ordinals, raw student labels, or scope copy.'
 );
+});
 const assignmentReteachPlanSource = readFileSync(
   'src/assignments/reteach-plan.ts',
   'utf8'
 );
+verifyDomainAssertions(() => {
 assert.match(
   assignmentReteachPlanSource,
   /ASSIGNMENT_RETEACH_PLAN_LIMITS[\s\S]*reviewItems: 5[\s\S]*reviewStudents: 8/,
@@ -2947,6 +2987,7 @@ assert.doesNotMatch(
   /lines\.join\('\\n'\)|student: student\.studentLabel/,
   'Reteach plan should not hand-compose copy line breaks or raw student labels.'
 );
+});
 const assignmentResultsSource = readFileSync(
   'src/assignments/results.ts',
   'utf8'
@@ -2995,6 +3036,7 @@ const assignmentListViewStatsSource = readFileSync(
   'src/assignments/list-view.ts',
   'utf8'
 );
+verifyDomainAssertions(() => {
 assert.match(
   assignmentAttemptStatsSource,
   /export function normalizeAssignmentAttemptStats/,
@@ -3210,6 +3252,7 @@ assert.match(
   /export function compareAssignmentStudentsByDisplayLabel[\s\S]*compareRuntimeDisplaySearchText/,
   'Assignment student follow-up ordering should expose a stable display-label comparator.'
 );
+});
 const studentFollowUpPriorityFixture = [
   {
     attempts: 1,
@@ -3242,6 +3285,7 @@ const studentFollowUpPriorityFixture = [
     studentLabel: 'Student C',
   },
 ];
+verifyDomainAssertions(() => {
 assert.deepEqual(
   sortAssignmentStudentsByFollowUpPriority(
     studentFollowUpPriorityFixture
@@ -3322,7 +3366,7 @@ assert.match(
 );
 assert.match(
   assignmentResultsSource,
-  /hasRuntimeDisplayText\(answer\?\.answer\)/,
+  /answer && hasRuntimeDisplayText\(answer\.answer\)/,
   'Assignment item analysis should count submitted answers through the shared runtime display-text helper.'
 );
 assert.match(
@@ -3395,6 +3439,7 @@ assert.doesNotMatch(
   /type AssignmentAttemptReviewAnswer = AssignmentAttemptReview\['answers'\]\[number\]/,
   'Assignment result analysis should not derive attempt review answer contracts from aggregate review indexes.'
 );
+});
 const assignmentResultsExportSource = readFileSync(
   'src/assignments/results-export.ts',
   'utf8'
@@ -3403,6 +3448,7 @@ const assignmentResultReviewSummarySource = readFileSync(
   'src/assignments/result-review-summary.ts',
   'utf8'
 );
+verifyDomainAssertions(() => {
 assert.match(
   assignmentResultsExportSource,
   /AssignmentAttemptReview[\s\S]*AssignmentAttemptReviewAnswer[\s\S]*AssignmentItemAnalysis[\s\S]*AssignmentStudentSummary[\s\S]*type AssignmentResultsExportAttemptReview = AssignmentAttemptReview;[\s\S]*type AssignmentResultsExportAttemptAnswer = AssignmentAttemptReviewAnswer;[\s\S]*type AssignmentResultsExportItemAnalysis = AssignmentItemAnalysis;[\s\S]*type AssignmentResultsExportStudentSummary = AssignmentStudentSummary;/,
@@ -3570,7 +3616,7 @@ assert.match(
 );
 assert.match(
   assignmentResultsExportSource,
-  /maxLength = ASSIGNMENT_RESULTS_EXPORT_FILENAME_LIMITS\.titleMaxLength[\s\S]*slice\(0, maxLength\)/,
+  /maxLength: number = ASSIGNMENT_RESULTS_EXPORT_FILENAME_LIMITS\.titleMaxLength[\s\S]*slice\(0, maxLength\)/,
   'Assignment results export filename truncation should reuse named limits through the shared slug helper.'
 );
 assert.match(
@@ -3583,6 +3629,7 @@ assert.doesNotMatch(
   /ASSIGNMENT_RESULTS_EXPORT_TITLE_MAX_LENGTH|slice\(0, 80\)/,
   'Assignment results export filenames should not keep local title length limits.'
 );
+});
 const assignmentPublishSource = readFileSync(
   'src/assignments/publish-input.ts',
   'utf8'
@@ -3591,6 +3638,7 @@ const assignmentPublishScheduleSource = readFileSync(
   'src/assignments/publish-schedule.ts',
   'utf8'
 );
+verifyDomainAssertions(() => {
 assert.match(
   assignmentPublishScheduleSource,
   /ASSIGNMENT_PUBLISH_CLOSE_AFTER_UNITS[\s\S]*minLeadMinutes: 1[\s\S]*millisecondsPerSecond: 1000[\s\S]*secondsPerMinute: 60/,
@@ -3651,10 +3699,12 @@ assert.doesNotMatch(
   /AssignmentPublishDialogViewModel\['handoffView'\]|ReturnType<\s*typeof buildAssignmentPublishHandoffView>/,
   'Assignment publish handoff contracts should not derive from aggregate view indexes or builder return types.'
 );
+});
 const publicAssignmentSource = readFileSync(
   'src/assignments/public.ts',
   'utf8'
 );
+verifyDomainAssertions(() => {
 assert.match(
   readFileSync('tests/e2e/TEST-CATALOG.md', 'utf8'),
   /Published assignment delivery chain has a fast script-level gate via[\s\S]*scripts\/published-assignment-delivery-chain\.test\.ts/,
@@ -3912,6 +3962,7 @@ assert.match(
   /PUBLIC_ASSIGNMENT_ESTIMATED_MINUTES[\s\S]*max: 20[\s\S]*min: 5[\s\S]*perItem: 2/,
   'Public assignment estimated minutes should expose named domain limits.'
 );
+});
 const publicAssignmentAccessPrivatePrompt = 'PRIVATE_ACCESS_PROMPT';
 const publicAssignmentAccessPrivateAnswer = 'PRIVATE_ACCESS_ANSWER';
 const publicAssignmentAccessPrivateChoice = 'PRIVATE_ACCESS_CHOICE';
@@ -3951,6 +4002,7 @@ publicAssignmentAccessContent.sourceMaterials = [
     originalName: publicAssignmentAccessPrivateSource,
   },
 ];
+verifyDomainAssertions(() => {
 assert.match(
   publicAssignmentSource,
   /export type PublicAssignmentUnavailablePayload = \{[\s\S]*contentPolicy: PublicAssignmentUnavailableContentPolicy;[\s\S]*identityPolicy: PublicAssignmentUnavailableIdentityPolicy;[\s\S]*reason: PublicAssignmentUnavailableReason;[\s\S]*submissionPolicy: PublicAssignmentUnavailableSubmissionPolicy;/,
@@ -4013,7 +4065,7 @@ assert.match(
 );
 assert.match(
   publicAssignmentSource,
-  /function buildPublicAttemptReviewItem[\s\S]*const acceptedAnswers = getRuntimeDisplayAcceptedAnswers\(item\.answer\)[\s\S]*const submittedAnswer = normalizeOptionalRuntimeDisplayText\(answer\?\.answer\)[\s\S]*acceptedAnswers,[\s\S]*correct: Boolean\(answer\?\.correct\),[\s\S]*correctAnswer: normalizeRuntimeDisplayText\([\s\S]*explanation: normalizeOptionalRuntimeDisplayText\(item\.explanation\),[\s\S]*itemId: item\.id,[\s\S]*submitted: hasRuntimeDisplayText\(submittedAnswer\),[\s\S]*submittedAnswer: submittedAnswer \?\? ''/,
+  /function buildPublicAttemptReviewItem[\s\S]*const acceptedAnswers = getRuntimeDisplayAcceptedAnswers\(item\.answer\)[\s\S]*const submittedAnswer = normalizeOptionalRuntimeDisplayText\(answer\?\.answer\)[\s\S]*acceptedAnswers,[\s\S]*correct: Boolean\(answer\?\.correct\),[\s\S]*correctAnswer: normalizeRuntimeDisplayText\([\s\S]*explanation: normalizeOptionalRuntimeDisplayText\(\s*'explanation' in item \? item\.explanation : undefined\s*\),[\s\S]*itemId: item\.id,[\s\S]*submitted: hasRuntimeDisplayText\(submittedAnswer\),[\s\S]*submittedAnswer: submittedAnswer \?\? ''/,
   'Public attempt review items should explicitly pick the only fields allowed in post-submit student review payloads.'
 );
 assert.match(
@@ -4140,10 +4192,12 @@ assert.doesNotMatch(
   /answer\?\.answer\.trim\(\)/,
   'Public attempt review items should not use ad hoc trim-only submitted-answer checks.'
 );
+});
 const activityLibraryViewSource = readFileSync(
   'src/activities/library-view.ts',
   'utf8'
 );
+verifyDomainAssertions(() => {
 assert.match(
   activityLibraryViewSource,
   /ACTIVITY_LIBRARY_COMPATIBILITY_LIMITS[\s\S]*lockedTemplateDiagnostics: 2[\s\S]*remixActionOptions: ACTIVITY_TEMPLATE_REMIX_VISIBLE_ACTION_LIMIT/,
@@ -4199,6 +4253,7 @@ assert.doesNotMatch(
   /shortName\.trim\(\)/,
   'Activity library remix labels should not fall back to trim-only template short-name cleanup.'
 );
+});
 const activityPreviewSource = readFileSync(
   'src/components/activities/activity-preview.tsx',
   'utf8'
@@ -4314,6 +4369,7 @@ try {
 } finally {
   overwriteGetLocale(() => 'en');
 }
+verifyDomainAssertions(() => {
 assert.deepEqual(
   buildDefaultActivityPreviewPanel().actions?.map((action) => action.to),
   [Routes.Create, Routes.StudentPreview]
@@ -4337,6 +4393,7 @@ assert.doesNotMatch(
   /ActivitySeed\['content'\]\['(?:groups|pairs|questions)'\]/,
   'Activity preview item views should not infer child contracts from ActivitySeed content indexes.'
 );
+});
 for (const key of ['questions', 'pairs', 'groups']) {
   assert.match(
     activityPreviewViewSource,
@@ -4344,6 +4401,7 @@ for (const key of ['questions', 'pairs', 'groups']) {
     `Activity preview should reuse the named ${key} display limit.`
   );
 }
+verifyDomainAssertions(() => {
 assert.doesNotMatch(
   activityPreviewViewSource,
   /slice\(0, 3\)|slice\(0, 4\)/,
@@ -4529,10 +4587,12 @@ assert.doesNotMatch(
   /Listening draft input|Worksheet extraction input|Structured import input|activity_source_material_next_step_/,
   'Activity source-material summary component should not hard-code or fetch extraction next-step copy locally.'
 );
+});
 const activitySourceExtractionAssistTestCatalogSource = readFileSync(
   'tests/e2e/TEST-CATALOG.md',
   'utf8'
 );
+verifyDomainAssertions(() => {
 assert.match(
   readFileSync('tests/e2e/TEST-CATALOG.md', 'utf8'),
   /Source\s+extraction\s+lifecycle\s+chain\s+has\s+a\s+fast\s+script-level\s+gate\s+via[\s\S]*scripts\/source-extraction-lifecycle-chain\.test\.ts[\s\S]*authoring\/library\s+boundary\s+that\s+returns\s+extraction\s+output/,
@@ -4558,6 +4618,7 @@ assert.match(
   /Activity\s+AI\s+enhancement\s+roadmap\s+chain\s+has\s+a\s+fast\s+script-level\s+gate\s+via[\s\S]*scripts\/activity-ai-enhancement-roadmap-chain\.test\.ts[\s\S]*template\s+transforms[\s\S]*distractor\s+write\s+targets[\s\S]*leveled\s+variants[\s\S]*answer\s+explanations[\s\S]*listening\s+scripts[\s\S]*worksheet\/audio\/spreadsheet\s+extraction[\s\S]*source-material\s+privacy[\s\S]*editor-review\/save\/publish\s+boundaries[\s\S]*snapshot\s+protection[\s\S]*result-export\s+continuity/,
   'TEST-CATALOG should document the activity AI enhancement roadmap chain gate.'
 );
+});
 const activityAiEnhancementPolicyContent = {
   difficulty: 'starter',
   gradeBand: 'Grade 5',
@@ -4627,6 +4688,7 @@ const activityAiEnhancementPolicyValues = new Map(
     item.value,
   ])
 );
+verifyDomainAssertions(() => {
 assert.deepEqual(
   ACTIVITY_AI_ENHANCEMENT_KINDS,
   [
@@ -4704,6 +4766,7 @@ assert.equal(
   false,
   'Activity AI enhancement policy view should not leak source material file ids.'
 );
+});
 const archivedActivityAiEnhancementPolicyDecision =
   buildActivityAiEnhancementPolicyDecision({
     content: activityAiEnhancementPolicyContent,
@@ -4712,6 +4775,7 @@ const archivedActivityAiEnhancementPolicyDecision =
     providerConfigured: true,
     visibility: 'archived',
   });
+verifyDomainAssertions(() => {
 assert.equal(
   archivedActivityAiEnhancementPolicyDecision.status,
   'restore-source-first'
@@ -4724,6 +4788,7 @@ assert.equal(
   archivedActivityAiEnhancementPolicyDecision.canCallExternalProvider,
   false
 );
+});
 const sparseActivityAiEnhancementPolicyContent = {
   ...activityAiEnhancementPolicyContent,
   groups: [],
@@ -4744,6 +4809,7 @@ const distractorActivityAiEnhancementPolicyDecision =
     currentTemplateType: 'quiz',
     enhancementKind: 'distractor-generation',
   });
+verifyDomainAssertions(() => {
 assert.equal(
   distractorActivityAiEnhancementPolicyDecision.questionChoiceNeedsCandidateCount,
   1
@@ -4754,6 +4820,7 @@ assert.deepEqual(
   }),
   ['questionOptions']
 );
+});
 const remixActivityAiEnhancementPolicyDecision =
   buildActivityAiEnhancementPolicyDecision({
     content: sparseActivityAiEnhancementPolicyContent,
@@ -4761,6 +4828,7 @@ const remixActivityAiEnhancementPolicyDecision =
     enhancementKind: 'ai-remix-completion',
     targetTemplateType: 'group-sort',
   });
+verifyDomainAssertions(() => {
 assert.equal(remixActivityAiEnhancementPolicyDecision.targetTemplateType, 'group-sort');
 assert.ok(
   buildActivityAiEnhancementPolicyTargetFields({
@@ -4784,6 +4852,7 @@ assert.match(
   /Activity AI enhancement policy has a fast script-level gate via[\s\S]*scripts\/activity-ai-enhancement-policy\.test\.ts[\s\S]*teacher-auth gates[\s\S]*deterministic readiness[\s\S]*structured\s+draft targets[\s\S]*source-material capability counts[\s\S]*editor-review\/save\/publish boundaries[\s\S]*result-export continuity/,
   'TEST-CATALOG should document the activity AI enhancement policy gate.'
 );
+});
 const activityAiEnhancementExecutionView =
   buildActivityAiEnhancementExecutionView({
     content: activityAiEnhancementPolicyContent,
@@ -4798,6 +4867,7 @@ const activityAiEnhancementExecutionValues = new Map(
     item.value,
   ])
 );
+verifyDomainAssertions(() => {
 assert.deepEqual(
   activityAiEnhancementExecutionView.itemViews.map((item) => item.id),
   [...ACTIVITY_AI_ENHANCEMENT_EXECUTION_ITEM_IDS],
@@ -4913,6 +4983,7 @@ assert.match(
   /30-item\s+policy\s+list/,
   'TEST-CATALOG should document the activity AI enhancement policy handoff.'
 );
+});
 const activityAiEnhancementDraftOutputDraft = {
   description: 'Reviewable water cycle draft.',
   difficulty: 'starter',
@@ -4953,6 +5024,7 @@ const activityAiEnhancementDraftOutputValues = new Map(
     item.value,
   ])
 );
+verifyDomainAssertions(() => {
 assert.deepEqual(
   activityAiEnhancementDraftOutputView.itemViews.map((item) => item.id),
   [...ACTIVITY_AI_ENHANCEMENT_DRAFT_OUTPUT_ITEM_IDS],
@@ -5044,6 +5116,7 @@ assert.match(
   /Activity AI enhancement draft output has a fast script-level gate via[\s\S]*scripts\/activity-ai-enhancement-draft-output\.test\.ts[\s\S]*provider\/fallback\/deterministic output[\s\S]*CreateActivityInput parsing[\s\S]*normalized output counts[\s\S]*editor-application boundaries[\s\S]*privacy guards/,
   'TEST-CATALOG should document the activity AI enhancement draft output gate.'
 );
+});
 const activityAiEnhancementDraftApplicationDraft =
   activityAiEnhancementDraftOutputDraft;
 const activityAiEnhancementDraftApplicationView =
@@ -5061,6 +5134,7 @@ const activityAiEnhancementDraftApplicationValues = new Map(
     item.value,
   ])
 );
+verifyDomainAssertions(() => {
 assert.deepEqual(
   activityAiEnhancementDraftApplicationView.itemViews.map((item) => item.id),
   [...ACTIVITY_AI_ENHANCEMENT_DRAFT_APPLICATION_ITEM_IDS],
@@ -5174,6 +5248,7 @@ assert.match(
   /30-item draft-output\s+list/,
   'TEST-CATALOG should document the activity AI enhancement draft-output handoff.'
 );
+});
 const activityAiEnhancementEditorReviewView =
   buildActivityAiEnhancementEditorReviewView({
     content: activityAiEnhancementPolicyContent,
@@ -5190,6 +5265,7 @@ const activityAiEnhancementEditorReviewValues = new Map(
     item.value,
   ])
 );
+verifyDomainAssertions(() => {
 assert.deepEqual(
   activityAiEnhancementEditorReviewView.itemViews.map((item) => item.id),
   [...ACTIVITY_AI_ENHANCEMENT_EDITOR_REVIEW_ITEM_IDS],
@@ -5289,6 +5365,7 @@ assert.match(
   /30-item\s+draft-application\s+list/,
   'TEST-CATALOG should document the activity AI enhancement draft-application handoff.'
 );
+});
 const activityAiEnhancementSaveBoundaryView =
   buildActivityAiEnhancementSaveBoundaryView({
     content: activityAiEnhancementPolicyContent,
@@ -5307,6 +5384,7 @@ const activityAiEnhancementSaveBoundaryValues = new Map(
     item.value,
   ])
 );
+verifyDomainAssertions(() => {
 assert.deepEqual(
   activityAiEnhancementSaveBoundaryView.itemViews.map((item) => item.id),
   [...ACTIVITY_AI_ENHANCEMENT_SAVE_BOUNDARY_ITEM_IDS],
@@ -5432,6 +5510,7 @@ assert.match(
   /30-item\s+editor-review\s+list/,
   'TEST-CATALOG should document the activity AI enhancement editor-review handoff.'
 );
+});
 const activityAiEnhancementPublishBoundaryView =
   buildActivityAiEnhancementPublishBoundaryView({
     activityPersisted: true,
@@ -5458,6 +5537,7 @@ const activityAiEnhancementPublishBoundaryValues = new Map(
     item.value,
   ])
 );
+verifyDomainAssertions(() => {
 assert.deepEqual(
   activityAiEnhancementPublishBoundaryView.itemViews.map((item) => item.id),
   [...ACTIVITY_AI_ENHANCEMENT_PUBLISH_BOUNDARY_ITEM_IDS],
@@ -5638,6 +5718,7 @@ assert.match(
   /Activity authoring\/library chain has a fast script-level gate via[\s\S]*scripts\/activity-authoring-library-chain\.test\.ts/,
   'TEST-CATALOG should document the activity authoring/library chain gate.'
 );
+});
 const sourceMaterialPrivacyUploadPlan = buildStorageUploadReadinessPlan({
   contentType: 'application/pdf',
   file: new Blob(['safe source material fixture'], {
@@ -5646,6 +5727,7 @@ const sourceMaterialPrivacyUploadPlan = buildStorageUploadReadinessPlan({
   filename: 'unit worksheet.pdf',
   userId: 'teacher-1',
 });
+verifyDomainAssertions(() => {
 assert.deepEqual(sourceMaterialPrivacyUploadPlan.privacy, {
   exposesFileBytes: false,
   exposesOriginalFilename: false,
@@ -5679,6 +5761,7 @@ assert.deepEqual(ACTIVITY_SOURCE_MATERIAL_REFERENCE_PRIVACY_CONTRACT, {
   normalizesSafeFilenameBasenames: true,
   rejectsUnsafeFileIds: true,
   scope: 'activity-source-material-reference-boundary',
+});
 });
 const publicAssignmentPayloadTypeSource = getSourceSlice(
   publicAssignmentSource,
@@ -5714,6 +5797,7 @@ const storageFileAccessPrivacySource = readFileSync(
   'src/storage/file-access.ts',
   'utf8'
 );
+verifyDomainAssertions(() => {
 assert.doesNotMatch(
   studentRuntimePrivacySource,
   /\b(sourceMaterials|storageKey|fileId|originalName|permission|bytes|fileList)\b/,
@@ -5761,10 +5845,12 @@ assert.doesNotMatch(
   /syncAttachedMaterialsForDraft|syncMaterialsLabel|activity_form_use_attached_materials|activity_form_toast_source_materials_synced/,
   'Activity source-material picker should not own AI draft source sync behavior or copy.'
 );
+});
 const sourceMaterialsUserFilesApiSource = readFileSync(
   'src/api/user-files.ts',
   'utf8'
 );
+verifyDomainAssertions(() => {
 assert.match(
   sourceMaterialsUserFilesApiSource,
   /export const listUserFileMaterials[\s\S]*return \{[\s\S]*items,[\s\S]*total: totalRow\?\.count \?\? 0,[\s\S]*\}/,
@@ -5785,6 +5871,7 @@ assert.doesNotMatch(
   /SOURCE_MATERIAL_PICKER_PAGE_SIZE|pageSize:\s*100|,\s*100,\s*\{\s*enabled:\s*canLoadFiles/,
   'Activity source-material picker should not keep local page-size rules.'
 );
+});
 const activityEditorFormSource = readFileSync(
   'src/components/activities/activity-create-form.tsx',
   'utf8'
@@ -5826,6 +5913,7 @@ const activityScaffoldsSource = readFileSync(
   'utf8'
 );
 const activityEditorSource = readFileSync('src/activities/editor.ts', 'utf8');
+verifyDomainAssertions(() => {
 assert.match(
   activityLifecycleSource,
   /export type ActivityLifecycleActionCopy = \{[\s\S]*failureMessage: string;[\s\S]*successMessage: string;[\s\S]*export type ActivityDerivativeBlockedReason =[\s\S]*'activity-archived'[\s\S]*'same-template'[\s\S]*export type ActivityDerivativeActionGate =[\s\S]*reason: Extract<ActivityDerivativeBlockedReason, 'activity-archived'>;[\s\S]*export type ActivityLifecycleActionView = ActivityLifecycleActionCopy & \{[\s\S]*gate: ActivityDerivativeActionGate;/,
@@ -6523,10 +6611,12 @@ assert.match(
   /ActivityDraftResult/,
   'AI draft summary component should accept the server draft result contract.'
 );
+});
 const activityDraftMetaSource = readFileSync(
   'src/activities/draft-meta.ts',
   'utf8'
 );
+verifyDomainAssertions(() => {
 assert.match(
   activityDraftMetaSource,
   /export type ActivityDraftMetaSummaryCoverageStatView[\s\S]*export type ActivityDraftMetaSummaryReadinessOption[\s\S]*type ActivityDraftMetaSummarySourceMaterialNoteView[\s\S]*export type ActivityDraftMetaSummarySourceMaterialCapabilityView[\s\S]*export type ActivityDraftMetaSummarySourceMaterialSafetyView[\s\S]*type ActivityDraftMetaSummaryView[\s\S]*export type ActivityDraftReviewChecklistItemView[\s\S]*type ActivityDraftReviewChecklistStatusView[\s\S]*export type ActivityDraftMetaSummaryQuestionChoiceReadinessView[\s\S]*export type ActivityDraftMetaSummaryQuestionChoiceReadinessItemView/,
@@ -6787,10 +6877,12 @@ assert.doesNotMatch(
   /Quiz choice review|Needs distractors|Completed locally|Explicit choices|测验选项检查|需要干扰项|本地可补齐|显式选项充足/,
   'AI draft summary component should not hard-code visible quiz choice readiness labels.'
 );
+});
 const activityDraftSourceViewSource = readFileSync(
   'src/activities/draft-source.ts',
   'utf8'
 );
+verifyDomainAssertions(() => {
 assert.match(
   activityDraftMetaSource,
   /formatActivityDraftTemplateList[\s\S]*activity_draft_meta_template_list_separator/,
@@ -6961,6 +7053,7 @@ assert.doesNotMatch(
   /const draftItemCountOptions = \[3, 5, 8, 10\]|useState\(5\)/,
   'Activity editor should not keep local AI draft item-count options or defaults.'
 );
+});
 const entityIdSource = readFileSync('src/lib/entity-id.ts', 'utf8');
 assert.match(
   entityIdSource,
@@ -6975,6 +7068,7 @@ const activityDashboardCardSource = readFileSync(
   'src/components/activities/activity-library-card.tsx',
   'utf8'
 );
+verifyDomainAssertions(() => {
 assert.doesNotMatch(
   activityDashboardRouteSource,
   /error\.message|error instanceof Error/,
@@ -6990,6 +7084,7 @@ assert.match(
   /(?:toast\.error\(|toastPlanLimitOrError\(error, )executionPlan\.failureMessage\)/,
   'Activity dashboard action failures should use localized action execution-plan failure copy.'
 );
+});
 const assignmentDashboardRouteSource = readFileSync(
   'src/routes/dashboard/assignments.tsx',
   'utf8'
@@ -6998,6 +7093,7 @@ const assignmentDashboardCardSource = readFileSync(
   'src/components/assignments/assignment-list-card.tsx',
   'utf8'
 );
+verifyDomainAssertions(() => {
 assert.doesNotMatch(
   assignmentDashboardRouteSource,
   /error\.message|error instanceof Error/,
@@ -7013,6 +7109,7 @@ assert.match(
   /(?:toast\.error\(|toastPlanLimitOrError\(error, )plan\.failureMessage\)/,
   'Assignment close and reopen failures should use localized status action failure copy.'
 );
+});
 const activityPublishDialogSource = readFileSync(
   'src/components/activities/activity-publish-dialog.tsx',
   'utf8'
@@ -7052,6 +7149,7 @@ const publicPageViewSource = readFileSync(
   'src/pages/public-page-view.ts',
   'utf8'
 );
+verifyDomainAssertions(() => {
 assert.match(
   publicPageViewSource,
   /type PricingPageViewModel[\s\S]*valueSection: PricingPageSectionView;[\s\S]*valueCards: PricingValueCardView\[\];[\s\S]*type PricingFaqItemView = \{[\s\S]*ariaLabel: string;[\s\S]*type PricingValueCardView = \{[\s\S]*ariaLabel: string;/,
@@ -7072,6 +7170,7 @@ assert.doesNotMatch(
   /TeachersPageHandoffPanel|data-handoff="teachers-page-product-loop"|data-handoff-item|pageView\.handoffView/,
   'Teachers route should keep internal teacher handoff markup out of the public page.'
 );
+});
 const menuItemConfigSource = readFileSync('src/types/index.d.ts', 'utf8');
 const navbarSource = readFileSync('src/components/layout/navbar.tsx', 'utf8');
 const navbarMobileSource = readFileSync(
@@ -7134,6 +7233,7 @@ const worksheetModeCardSource = readFileSync(
   'src/components/activities/worksheet-mode-card.tsx',
   'utf8'
 );
+verifyDomainAssertions(() => {
 assert.doesNotMatch(
   activityPublishDialogSource,
   /error\.message|error instanceof Error/,
@@ -7859,19 +7959,25 @@ assert.match(
   /error_description:[\s\S]*component: AuthErrorPage[\s\S]*head: \(\) => \(\{[\s\S]*auth_error_workspace_title[\s\S]*auth_error_workspace_description[\s\S]*const \{ callbackUrl, error \} = Route\.useSearch\(\)[\s\S]*<ErrorCard callbackUrl=\{callbackUrl\} errorCode=\{error\} \/>/,
   'Auth error route should parse external descriptions without passing them into the UI.'
 );
+});
 overwriteGetLocale(() => 'en');
+verifyDomainAssertions(() => {
 assert.match(
   getAuthBannedUserMessage(),
   /ClassGamify teacher workspace[\s\S]*classroom activities[\s\S]*assignment links[\s\S]*student result records/
 );
 assert.equal(getAuthDefaultBanReason(), 'Spamming');
+});
 overwriteGetLocale(() => 'zh');
+verifyDomainAssertions(() => {
 assert.match(
   getAuthBannedUserMessage(),
   /ClassGamify 教师工作区[\s\S]*课堂活动[\s\S]*作业链接[\s\S]*学生结果记录/
 );
 assert.equal(getAuthDefaultBanReason(), '垃圾信息');
+});
 overwriteGetLocale(() => 'en');
+verifyDomainAssertions(() => {
 assert.match(
   authPluginCopySource,
   /auth_banned_user_message[\s\S]*admin_users_ban_default_reason/,
@@ -7962,10 +8068,12 @@ assert.doesNotMatch(
   /function WorksheetModeCard|const worksheetModeIcons|WorksheetModeTemplate|type TablerIcon|IconClipboardText|IconCategory2|IconLayoutColumns|IconHeadphones|contentRequirements\.map|m\.worksheets_page_printable_title|m\.worksheets_page_printable_description/,
   'Worksheets route should not rebuild worksheet card icons or printable copy locally.'
 );
+});
 const publicPlayRouteSource = readFileSync(
   'src/routes/play/$shareId.tsx',
   'utf8'
 );
+verifyDomainAssertions(() => {
 assert.doesNotMatch(
   publicPlayRouteSource,
   /error\.message|error instanceof Error/,
@@ -7976,6 +8084,7 @@ assert.match(
   /toast\.error\(resolveStudentAttemptSubmissionFailureMessage\(error\)\)/,
   'Student attempt submission failures should resolve through the safe localized failure helper.'
 );
+});
 const assignmentResultRouteSource = readFileSync(
   'src/routes/dashboard/assignments/$assignmentId.tsx',
   'utf8'
@@ -8040,6 +8149,7 @@ const assignmentResultAnswerViewSource = readFileSync(
   'src/assignments/result-answer-view.ts',
   'utf8'
 );
+verifyDomainAssertions(() => {
 assert.doesNotMatch(
   assignmentResultRouteSource,
   /attemptCount:\s*data\?\.attempts\.length/,
@@ -8377,6 +8487,7 @@ assert.match(
   /resolveAssignmentResultReviewStatus[\s\S]*summary\.attemptRows\.total[\s\S]*statusView\.tone === 'custom'[\s\S]*viewState\.attemptReviewFilter === 'needs-review'[\s\S]*return 'waiting-for-attempts'[\s\S]*return 'no-matches'[\s\S]*return 'needs-review'[\s\S]*return 'focused'[\s\S]*return 'class-ready'/,
   'Assignment result review-status resolver should distinguish waiting, no-match, needs-review, focused, and full-class review states from shared scope evidence.'
 );
+});
 for (const reviewStatusMessageKey of [
   'assignment_result_review_status_class_ready_',
   'assignment_result_review_status_focused_',
@@ -8392,6 +8503,7 @@ for (const reviewStatusMessageKey of [
     'Assignment result review-status copy should come from localized assignment result messages for every status.'
   );
 }
+verifyDomainAssertions(() => {
 assert.match(
   assignmentResultViewSource,
   /function buildAssignmentResultReviewScopeItemView\([\s\S]*statusView: AssignmentResultControlStatusView[\s\S]*ariaLabel: m\.assignment_result_review_scope_item_aria_label\(\{[\s\S]*status: statusView\.value[\s\S]*statusView,/,
@@ -8843,7 +8955,9 @@ assert.match(
   /AssignmentResultEmptyState/,
   'Assignment result empty-state component should consume the assignment-domain empty-state view.'
 );
+});
 overwriteGetLocale(() => 'en');
+verifyDomainAssertions(() => {
 assert.match(
   assignmentResultViewSource,
   /getAssignmentResultCompletedAttemptCount\(\s*data\?\.stats\.completions\s*\)/,
@@ -8992,6 +9106,7 @@ assert.match(
   /filterAssignmentResultCompletedAttemptRows/,
   'Assignment attempt rows should be filtered to completed result reviews before display.'
 );
+});
 const directRunnerFeedbackSources = [
   'src/components/activities/fill-blank-worksheet.tsx',
   'src/components/activities/line-match-board.tsx',
@@ -9010,6 +9125,7 @@ const publicAnswerFeedbackSource = readFileSync(
   'src/components/activities/public-answer-feedback.tsx',
   'utf8'
 );
+verifyDomainAssertions(() => {
 assert.doesNotMatch(
   publicAnswerFeedbackSource,
   /@\/locale\/paraglide\/messages/,
@@ -9045,10 +9161,12 @@ assert.doesNotMatch(
   /reviewItem\.itemId/,
   'Public answer feedback DOM relationships should not derive ids from raw runtime item ids.'
 );
+});
 const earlyStudentRunnerViewSource = readFileSync(
   'src/assignments/student-runner-view.ts',
   'utf8'
 );
+verifyDomainAssertions(() => {
 assert.match(
   earlyStudentRunnerViewSource,
   /export type PublicAnswerFeedbackDetailLine = \{[\s\S]*ariaLabel: string;[\s\S]*id: PublicAnswerFeedbackDetailLineId;[\s\S]*label: string;[\s\S]*text: string;[\s\S]*value: string;[\s\S]*export type PublicAnswerFeedbackView = \{[\s\S]*ariaLabel: string;[\s\S]*description: string;[\s\S]*statusAriaLabel: string;/,
@@ -9059,6 +9177,7 @@ assert.match(
   /function buildPublicAnswerFeedbackDetailLine[\s\S]*student_runner_feedback_detail_aria[\s\S]*function getPublicAnswerFeedbackDescription[\s\S]*student_runner_feedback_description_correct[\s\S]*student_runner_feedback_description_unanswered[\s\S]*student_runner_feedback_description_needs_review/,
   'Student answer feedback detail labels and descriptions should be prepared from localized domain messages.'
 );
+});
 const groupSortBoardSource = readFileSync(
   'src/components/activities/group-sort-board.tsx',
   'utf8'
@@ -9071,6 +9190,7 @@ const fillBlankWorksheetSource = readFileSync(
   'src/components/activities/fill-blank-worksheet.tsx',
   'utf8'
 );
+verifyDomainAssertions(() => {
 assert.match(
   fillBlankWorksheetSource,
   /buildFillBlankWorksheetView/,
@@ -9158,6 +9278,7 @@ assert.doesNotMatch(
   /buildStudentRunnerView|isSameRuntimeChoice|itemViews\.filter|selectedItemId === item\.id|onAnswerChange\(selectedItemId|getStudentRunnerReviewStatusClassName/,
   'Group-sort runner should not rebuild selected, unplaced, grouped, placement action, or review class rules in the component.'
 );
+});
 for (const filePath of [
   'src/components/activities/listening-runner.tsx',
   'src/components/activities/open-box-runner.tsx',
@@ -9204,6 +9325,7 @@ const listeningRunnerSource = readFileSync(
   'src/components/activities/listening-runner.tsx',
   'utf8'
 );
+verifyDomainAssertions(() => {
 assert.match(
   listeningRunnerSource,
   /runnerView\.activeChoiceViews/,
@@ -9268,10 +9390,12 @@ assert.doesNotMatch(
   /normalizeListeningSpeechLanguage|isSameRuntimeChoice|activeItem\.choices|answers\[activeItem\.id\]|revealAnswer \?[\s\S]*activeItem\.prompt/,
   'Listening runner should not rebuild speech language, transcript visibility, active choice, or input value state directly.'
 );
+});
 const openBoxRunnerSource = readFileSync(
   'src/components/activities/open-box-runner.tsx',
   'utf8'
 );
+verifyDomainAssertions(() => {
 assert.match(
   openBoxRunnerSource,
   /navigationView\.previousAction[\s\S]*navigationView\.nextAction/,
@@ -9289,6 +9413,7 @@ assert.doesNotMatch(
   /data-handoff=/,
   'Open-box runner should not render hidden audit handoff output.'
 );
+});
 for (const filePath of [
   'src/components/activities/line-match-board.tsx',
   'src/components/activities/matching-pairs-board.tsx',
@@ -9310,6 +9435,7 @@ const activityCreateFormSource = readFileSync(
   'src/components/activities/activity-create-form.tsx',
   'utf8'
 );
+verifyDomainAssertions(() => {
 assert.doesNotMatch(
   activityCreateFormSource,
   /error\.message|error instanceof Error/,
@@ -9325,6 +9451,7 @@ assert.match(
   /buildActivityLibraryRouteSearch\(\{[\s\S]*created: activity\.id,[\s\S]*createdFrom: 'create'[\s\S]*\}\)/,
   'Activity create form should route saved activities through the activity-domain created-panel search helper.'
 );
+});
 const productSource = readFileSync('docs/product.md', 'utf8');
 const mailDocsSource = readFileSync('docs/mail.md', 'utf8');
 const contactFormCardSource = readFileSync(
@@ -9388,6 +9515,7 @@ const transactionalMailTemplateComponentSourceText = [
   verifyEmailTemplateSource,
   subscribeNewsletterEmailTemplateSource,
 ].join('\n');
+verifyDomainAssertions(() => {
 assert.match(
   mailLocaleSource,
   /baseLocale[\s\S]*isLocale[\s\S]*export type MailLocale = Locale[\s\S]*normalizeMailLocale\(value: unknown\)[\s\S]*isLocale\(value\) \? value : baseLocale/,
@@ -9443,9 +9571,11 @@ assert.match(
   getEmailSubject({ template: 'contactMessage', locale: 'en' }),
   /ClassGamify classroom and product inquiry/
 );
+});
 const zhMailWorkspaceBoundaryView = buildMailWorkspaceBoundaryView({
   locale: 'zh',
 });
+verifyDomainAssertions(() => {
 assert.match(zhMailWorkspaceBoundaryView.title, /工作区边界/);
 assert.match(
   zhMailWorkspaceBoundaryView.items.map((item) => item.line).join('\n'),
@@ -9577,6 +9707,7 @@ assert.match(
   /EmailWorkspaceBoundary[\s\S]*mail_contact_message_message[\s\S]*<EmailWorkspaceBoundary locale=\{localeOptions\.locale\} \/>/,
   'Contact email template should render the shared workspace boundary after the inquiry body.'
 );
+});
 const newsletterFormCardSource = readFileSync(
   'src/components/settings/notification/newsletter-form-card.tsx',
   'utf8'
@@ -9590,6 +9721,7 @@ const settingsNotificationViewSource = readFileSync(
   'utf8'
 );
 const newsletterHookSource = readFileSync('src/hooks/use-newsletter.ts', 'utf8');
+verifyDomainAssertions(() => {
 assert.doesNotMatch(
   newsletterFormCardSource,
   /err\.message|error\.message|statusError\?\.message|subscribeMutation\.error\?\.message|unsubscribeMutation\.error\?\.message|err instanceof Error|error instanceof Error/,
@@ -9670,6 +9802,7 @@ assert.doesNotMatch(
   /m\.settings_notification_|m\.common_settings|websiteConfig\.newsletter/,
   'Notification settings route should not rebuild localized update page copy or feature visibility directly.'
 );
+});
 const billingCardSource = readFileSync(
   'src/components/settings/billing/billing-card.tsx',
   'utf8'
@@ -9687,6 +9820,7 @@ const paymentStatusViewSource = readFileSync(
   'src/payment/payment-status-view.ts',
   'utf8'
 );
+verifyDomainAssertions(() => {
 assert.doesNotMatch(
   billingCardSource,
   /loadPaymentError\?\.message|loadPaymentError\.message|err\.message|error\.message|err instanceof Error|error instanceof Error/,
@@ -9782,11 +9916,15 @@ assert.match(
   /settings_payment_processing_description[\s\S]*settings_payment_processing_next_step_description[\s\S]*settings_payment_success_description[\s\S]*settings_payment_success_next_step_description[\s\S]*settings_payment_failed_description[\s\S]*settings_payment_failed_next_step_description[\s\S]*settings_payment_timeout_description[\s\S]*settings_payment_timeout_next_step_description/,
   'Payment status and next-step copy should stay centralized in the payment status view helper.'
 );
+});
 overwriteGetLocale(() => 'en');
 const filesPageView = buildSettingsFilesPageViewModel();
+verifyDomainAssertions(() => {
 assert.equal(filesPageView.breadcrumbs.at(-1)?.id, 'files');
 assert.equal(filesPageView.title, 'Files');
+});
 const notificationPageView = buildSettingsNotificationPageViewModel();
+verifyDomainAssertions(() => {
 assert.equal(notificationPageView.breadcrumbs.at(-1)?.id, 'notifications');
 assert.equal(notificationPageView.title, 'Updates');
 assert.equal(
@@ -9830,6 +9968,7 @@ assert.deepEqual(
       'Receive ClassGamify updates: Turns update emails on or off for template changes, worksheet workflows, and result-review improvements only.',
   }
 );
+});
 const notificationNewsletterCardView =
   buildSettingsNotificationNewsletterCardView();
 assert.match(
@@ -9861,6 +10000,7 @@ try {
   overwriteGetLocale(() => 'en');
 }
 const billingPageView = buildSettingsBillingPageViewModel();
+verifyDomainAssertions(() => {
 assert.equal(billingPageView.breadcrumbs.at(-1)?.id, 'billing');
 assert.equal(billingPageView.title, 'Billing');
 assert.equal(
@@ -9871,9 +10011,11 @@ assert.equal(
   billingPageView.planSectionAriaLabel,
   'Current ClassGamify plan and hosted billing controls'
 );
+});
 const paymentPageView = buildSettingsPaymentPageViewModel({
   callback: '/dashboard/assignments',
 });
+verifyDomainAssertions(() => {
 assert.equal(paymentPageView.breadcrumbs.at(-1)?.id, 'payment');
 assert.equal(paymentPageView.callback, '/dashboard/assignments');
 assert.equal(
@@ -9888,6 +10030,7 @@ assert.equal(
   normalizeSettingsPaymentCallback('dashboard/assignments#results'),
   '/dashboard/assignments#results'
 );
+});
 for (const unsafePaymentCallback of [
   '',
   'https://evil.example/payments',
@@ -9899,6 +10042,7 @@ for (const unsafePaymentCallback of [
     '/settings/billing'
   );
 }
+verifyDomainAssertions(() => {
 assert.equal(
   buildSettingsPaymentPageViewModel({
     callback: 'https://evil.example/payments',
@@ -9906,6 +10050,7 @@ assert.equal(
   '/settings/billing'
 );
 assert.match(paymentPageView.description, /hosted checkout status/);
+});
 const formatBillingTestDate = (date: Date) =>
   `date:${date.toISOString().slice(0, 10)}`;
 const freeBillingPlan: PricePlan = {
@@ -9981,12 +10126,14 @@ const loadingBillingView = buildSettingsBillingCardViewModel({
   plans: [],
   subscription: null,
 });
+verifyDomainAssertions(() => {
 assert.equal(loadingBillingView.state, 'loading');
 assert.equal(
   loadingBillingView.ariaLabel,
   'Current plan: Your plan and what it includes.'
 );
 assert.equal(loadingBillingView.action, undefined);
+});
 const errorBillingView = buildSettingsBillingCardViewModel({
   canManageBilling: false,
   currentPlan: null,
@@ -9996,6 +10143,7 @@ const errorBillingView = buildSettingsBillingCardViewModel({
   plans: [],
   subscription: null,
 });
+verifyDomainAssertions(() => {
 assert.equal(errorBillingView.state, 'error');
 assert.equal(errorBillingView.action?.kind, 'retry');
 assert.equal(
@@ -10003,6 +10151,7 @@ assert.equal(
   'Retry. Billing action for the current ClassGamify teacher workspace.'
 );
 assert.equal(errorBillingView.message, 'Failed to load billing info');
+});
 const noPlanBillingView = buildSettingsBillingCardViewModel({
   canManageBilling: false,
   currentPlan: null,
@@ -10012,6 +10161,7 @@ const noPlanBillingView = buildSettingsBillingCardViewModel({
   plans: [],
   subscription: null,
 });
+verifyDomainAssertions(() => {
 assert.equal(noPlanBillingView.state, 'no-plan');
 assert.equal(noPlanBillingView.action?.kind, 'upgrade');
 assert.equal(
@@ -10022,6 +10172,7 @@ assert.match(
   noPlanBillingView.nextStep?.description ?? '',
   /Results and CSV export are never limited/
 );
+});
 const freeBillingView = buildSettingsBillingCardViewModel({
   canManageBilling: true,
   currentPlan: freeBillingPlan,
@@ -10031,6 +10182,7 @@ const freeBillingView = buildSettingsBillingCardViewModel({
   plans: [configuredFreeBillingPlan, proBillingPlan],
   subscription: null,
 });
+verifyDomainAssertions(() => {
 assert.equal(freeBillingView.state, 'ready');
 assert.equal(freeBillingView.plan?.name, 'Configured Free');
 assert.equal(freeBillingView.plan?.isFree, true);
@@ -10079,6 +10231,7 @@ assert.doesNotMatch(
   /starter activity workflow/i,
   'Billing free-plan copy should avoid copied-starter wording.'
 );
+});
 const trialBillingView = buildSettingsBillingCardViewModel({
   canManageBilling: true,
   currentPlan: proBillingPlan,
@@ -10091,6 +10244,7 @@ const trialBillingView = buildSettingsBillingCardViewModel({
     cancelAtPeriodEnd: true,
   },
 });
+verifyDomainAssertions(() => {
 assert.equal(trialBillingView.statusBadge?.tone, 'trial');
 assert.equal(trialBillingView.statusBadge?.icon, 'clock');
 assert.equal(trialBillingView.statusBadge?.ariaLabel, 'Plan status: Trial');
@@ -10144,6 +10298,7 @@ assert.deepEqual(
     ],
   ]
 );
+});
 const lifetimeBillingView = buildSettingsBillingCardViewModel({
   canManageBilling: true,
   currentPlan: lifetimeBillingPlan,
@@ -10153,6 +10308,7 @@ const lifetimeBillingView = buildSettingsBillingCardViewModel({
   plans: [lifetimeBillingPlan],
   subscription: null,
 });
+verifyDomainAssertions(() => {
 assert.equal(lifetimeBillingView.action?.kind, 'manage-billing');
 assert.equal(
   lifetimeBillingView.action?.ariaLabel,
@@ -10169,7 +10325,9 @@ assert.match(
 );
 assert.equal(getInitialPaymentConfirmationStatus(undefined), 'failed');
 assert.equal(getInitialPaymentConfirmationStatus('cs_test'), 'processing');
+});
 const processingPaymentStatusView = buildPaymentStatusView('processing');
+verifyDomainAssertions(() => {
 assert.equal(
   processingPaymentStatusView.description,
   'Please wait while we verify ClassGamify plan access for your teacher workspace, saved activities, assignments, and results.'
@@ -10204,7 +10362,9 @@ assert.match(
   buildPaymentStatusView('timeout').nextStep.description,
   /source of truth/
 );
+});
 const newsletterApiSource = readFileSync('src/api/newsletter.ts', 'utf8');
+verifyDomainAssertions(() => {
 assert.doesNotMatch(
   newsletterApiSource,
   /error instanceof Error \? error\.message|throw new Error\(\s*error\.message/,
@@ -10230,7 +10390,9 @@ assert.match(
   /throw new Error\(m\.newsletter_error_unsubscribe\(\)\);/,
   'Newsletter unsubscribe failures should use the localized unsubscribe failure message.'
 );
+});
 const paymentApiSource = readFileSync('src/api/payment.ts', 'utf8');
+verifyDomainAssertions(() => {
 assert.doesNotMatch(
   paymentApiSource,
   /error instanceof Error \? error\.message|throw new Error\(\s*error\.message/,
@@ -10246,7 +10408,9 @@ assert.match(
   /catch \(error\) {[\s\S]*?Payment customer portal creation failed:[\s\S]*?throw new Error\(m\.pricing_customer_portal_failed\(\)\);/,
   'Customer portal failures should use the localized portal failure message.'
 );
+});
 const clipboardSource = readFileSync('src/lib/clipboard.ts', 'utf8');
+verifyDomainAssertions(() => {
 assert.match(
   clipboardSource,
   /let copied = false;[\s\S]*copied = document\.execCommand\('copy'\);/,
@@ -10257,6 +10421,7 @@ assert.match(
   /if \(!copied\) {[\s\S]*throw new ClipboardCopyError\(\);[\s\S]*}/,
   'Clipboard textarea fallback should fail instead of reporting a silent copy success.'
 );
+});
 const filesPageContentSource = readFileSync(
   'src/components/settings/files/files-page-content.tsx',
   'utf8'
@@ -10266,6 +10431,7 @@ const filesTableSource = readFileSync(
   'utf8'
 );
 const userFilesHookSource = readFileSync('src/hooks/use-user-files.ts', 'utf8');
+verifyDomainAssertions(() => {
 assert.doesNotMatch(
   filesPageContentSource,
   /err\.message|error\.message|err instanceof Error|error instanceof Error/,
@@ -10336,12 +10502,14 @@ assert.match(
   /form\.append\('file', params\.file\)[\s\S]*uploadUserFile\(\{ data: form \}\)[\s\S]*invalidateQueries\(\{ queryKey: userFilesKeys\.all \}\)/,
   'User file upload mutation should use FormData and refresh the file library.'
 );
+});
 const userFilesApiSource = readFileSync('src/api/user-files.ts', 'utf8');
 const userFileMaterialsApiSource = userFilesApiSource.slice(
   userFilesApiSource.indexOf('export const listUserFileMaterials'),
   userFilesApiSource.indexOf('const deleteSchema')
 );
 const userFileQuerySource = readFileSync('src/storage/file-query.ts', 'utf8');
+verifyDomainAssertions(() => {
 assert.deepEqual(USER_FILE_LIST_INPUT_LIMITS, {
   pageSizeMax: 100,
   pageSizeMin: 1,
@@ -10445,6 +10613,7 @@ assert.doesNotMatch(
   /Buffer\.from|arrayBuffer\(\)/,
   'User file upload API should pass the FormData File to storage without Node Buffer conversion.'
 );
+});
 const storageIndexSource = readFileSync('src/storage/index.ts', 'utf8');
 const r2ProviderSource = readFileSync('src/storage/provider/r2.ts', 'utf8');
 for (const [filePath, fileText] of [
@@ -10459,6 +10628,7 @@ for (const [filePath, fileText] of [
   );
 }
 overwriteGetLocale(() => 'en');
+verifyDomainAssertions(() => {
 assert.equal(
   formatUserFileUploadError(
     new UploadError(STORAGE_ERROR_CODES.FILE_TOO_LARGE, {
@@ -10475,6 +10645,7 @@ assert.equal(
   ),
   'This file type is not supported. Supported types: .pdf, .mp3.'
 );
+});
 overwriteGetLocale(() => 'zh');
 assert.equal(
   formatUserFileUploadError(
@@ -10485,6 +10656,7 @@ assert.equal(
   '出于课堂安全考虑，这类文件不能上传。'
 );
 overwriteGetLocale(() => 'en');
+verifyDomainAssertions(() => {
 assert.equal(
   resolveUserFileMaterialKind({
     contentType: 'audio/mpeg',
@@ -10544,6 +10716,7 @@ assert.equal(
   formatUserFileMaterialKind('worksheet-document'),
   'Worksheet document'
 );
+});
 const userFileMaterialSummary = buildUserFileMaterialSummary([
   {
     contentType: 'audio/mpeg',
@@ -10570,6 +10743,7 @@ const userFileMaterialSummary = buildUserFileMaterialSummary([
     size: 256,
   },
 ]);
+verifyDomainAssertions(() => {
 assert.equal(userFileMaterialSummary.totalFiles, 4);
 assert.equal(userFileMaterialSummary.totalBytes, 3_840);
 assert.equal(userFileMaterialSummary.publicFiles, 1);
@@ -10599,6 +10773,7 @@ assert.deepEqual(buildUserFileMaterialSummaryItems(userFileMaterialSummary), [
     value: '1',
   },
 ]);
+});
 const abnormalUserFileMaterialSummary = buildUserFileMaterialSummary([
   {
     contentType: 'application/pdf; charset=utf-8',
@@ -10619,12 +10794,14 @@ const abnormalUserFileMaterialSummary = buildUserFileMaterialSummary([
     size: -4,
   },
 ]);
+verifyDomainAssertions(() => {
 assert.equal(abnormalUserFileMaterialSummary.totalFiles, 3);
 assert.equal(abnormalUserFileMaterialSummary.totalBytes, 128);
 assert.equal(abnormalUserFileMaterialSummary.publicFiles, 1);
 assert.equal(abnormalUserFileMaterialSummary.privateFiles, 2);
 assert.equal(abnormalUserFileMaterialSummary.audioFiles, 1);
 assert.equal(abnormalUserFileMaterialSummary.worksheetFiles, 2);
+});
 const activityMaterialReferencesSource = readFileSync(
   'src/activities/material-references.ts',
   'utf8'
@@ -10633,6 +10810,7 @@ const activityMaterialSummarySource = readFileSync(
   'src/activities/material-summary.ts',
   'utf8'
 );
+verifyDomainAssertions(() => {
 assert.match(
   activityMaterialSummarySource,
   /export type ActivitySourceMaterialPickerItemView = \{[\s\S]*ariaLabel: string;[\s\S]*attachDescription: string;[\s\S]*description: string;[\s\S]*removeDescription: string;/,
@@ -10810,12 +10988,15 @@ assert.doesNotMatch(
   /function toActivitySourceMaterialExtractionActionView[\s\S]*summaryText:\s*formatActivitySourceMaterialMetric|join\(', '\)|part\?\.trim\(\)|return 'Audio extraction'|return 'Worksheet extraction'|return 'Spreadsheet import'/,
   'Activity source-material extraction summaries should not only show raw source counts or hard-code list separators.'
 );
+});
 const listeningMaterialReference = buildActivityMaterialReferenceFromUserFile({
   contentType: 'audio/mpeg',
   id: 'file-listening-1',
   originalName: ' 三年级听力.mp3 ',
   size: 2_048.7,
 });
+assert.ok(listeningMaterialReference);
+verifyDomainAssertions(() => {
 assert.deepEqual(listeningMaterialReference, {
   contentType: 'audio/mpeg',
   fileId: 'file-listening-1',
@@ -10839,6 +11020,7 @@ assert.equal(
   ),
   'Audio, 2 KB, audio / mpeg'
 );
+});
 overwriteGetLocale(() => 'zh');
 try {
   assert.equal(
@@ -10890,6 +11072,7 @@ const sourceMaterialPickerView = buildActivitySourceMaterialPickerView({
     },
   ],
 });
+verifyDomainAssertions(() => {
 assert.equal(sourceMaterialPickerView.status, 'available');
 assert.equal(sourceMaterialPickerView.statusMessage, undefined);
 assert.equal(sourceMaterialPickerView.countLabel, '1 attached');
@@ -10965,6 +11148,7 @@ assert.equal(
   sourceMaterialPickerView.availableItems[1]?.ariaLabel,
   'Worksheet Scan.pdf: Worksheet document, 2.0 KB, application/pdf. Private teacher source material for activity editing and future AI extraction; student assignments do not expose file references or storage keys.'
 );
+});
 const normalizedSelectedSourceMaterialPickerView =
   buildActivitySourceMaterialPickerView({
     availableFiles: [
@@ -10986,6 +11170,7 @@ const normalizedSelectedSourceMaterialPickerView =
       },
     ],
   });
+verifyDomainAssertions(() => {
 assert.equal(
   normalizedSelectedSourceMaterialPickerView.availableItems[0]?.selected,
   true
@@ -10994,6 +11179,7 @@ assert.equal(
   normalizedSelectedSourceMaterialPickerView.availableItems[0]?.disabled,
   true
 );
+});
 overwriteGetLocale(() => 'zh');
 try {
   const zhSourceMaterialPickerView = buildActivitySourceMaterialPickerView({
@@ -11022,6 +11208,7 @@ try {
 } finally {
   overwriteGetLocale(() => 'en');
 }
+verifyDomainAssertions(() => {
 assert.equal(
   buildActivitySourceMaterialPickerView({
     availableFiles: [],
@@ -11062,6 +11249,7 @@ assert.equal(
   }).statusMessage,
   'No uploaded classroom files are available yet.'
 );
+});
 const overflowSourceMaterialPickerView = buildActivitySourceMaterialPickerView({
   availableFiles: [
     {
@@ -11079,6 +11267,7 @@ const overflowSourceMaterialPickerView = buildActivitySourceMaterialPickerView({
     originalName: `Material ${index}`,
   })),
 });
+verifyDomainAssertions(() => {
 assert.equal(overflowSourceMaterialPickerView.availableItems[0]?.disabled, true);
 assert.equal(
   overflowSourceMaterialPickerView.availableItems[0]?.attachDescription,
@@ -11185,6 +11374,7 @@ assert.deepEqual(
     },
   ]
 );
+});
 const sourceMaterialSummary = summarizeActivitySourceMaterials([
   listeningMaterialReference,
   {
@@ -11202,6 +11392,7 @@ const sourceMaterialSummary = summarizeActivitySourceMaterials([
     size: 256,
   },
 ]);
+verifyDomainAssertions(() => {
 assert.equal(sourceMaterialSummary.total, 3);
 assert.equal(sourceMaterialSummary.byKind.audio, 1);
 assert.equal(sourceMaterialSummary.byKind['worksheet-document'], 2);
@@ -11230,6 +11421,7 @@ assert.deepEqual(sourceMaterialSummary.kindSummaries, [
   { count: 1, kind: 'audio' },
   { count: 2, kind: 'worksheet-document' },
 ]);
+});
 const mixedSourceMaterialSummary = summarizeActivitySourceMaterials([
   {
     fileId: 'file-archive',
@@ -11252,6 +11444,7 @@ const mixedSourceMaterialSummary = summarizeActivitySourceMaterials([
     originalName: 'lesson.mp4',
   },
 ]);
+verifyDomainAssertions(() => {
 assert.deepEqual(mixedSourceMaterialSummary.readiness, {
   capabilities: ['worksheet-extraction', 'spreadsheet-import'],
   extractableCount: 2,
@@ -11273,6 +11466,7 @@ assert.deepEqual(mixedSourceMaterialSummary.extractionActions, [
     sourceKindCounts: [{ count: 1, kind: 'spreadsheet' }],
   },
 ]);
+});
 const normalizedSourceMaterialSummary = summarizeActivitySourceMaterials([
   {
     contentType: ' audio / mpeg ',
@@ -11300,6 +11494,7 @@ const normalizedSourceMaterialSummary = summarizeActivitySourceMaterials([
     originalName: 'words.csv',
   },
 ]);
+verifyDomainAssertions(() => {
 assert.equal(normalizedSourceMaterialSummary.total, 3);
 assert.deepEqual(normalizedSourceMaterialSummary.kindSummaries, [
   { count: 1, kind: 'audio' },
@@ -11729,6 +11924,7 @@ assert.deepEqual(
     label: 'Structured import input',
   }
 );
+});
 overwriteGetLocale(() => 'zh');
 try {
   assert.deepEqual(
@@ -11808,6 +12004,7 @@ try {
 } finally {
   overwriteGetLocale(() => 'en');
 }
+verifyDomainAssertions(() => {
 assert.deepEqual(buildActivitySourceMaterialSummaryView([]), {
   ariaLabel: 'Source materials, 0 files',
   compactSummaryText: '0 files',
@@ -11847,6 +12044,7 @@ assert.equal(
   ).length,
   ACTIVITY_SOURCE_MATERIALS_MAX_COUNT
 );
+});
 const whitespaceMaterialReference = buildActivityMaterialReferenceFromUserFile({
   contentType: ' application/pdf ',
   id: ' file\tmessy\nid ',
@@ -11865,6 +12063,7 @@ const clippedMaterialReference = buildActivityMaterialReferenceFromUserFile({
   id: 'f'.repeat(ACTIVITY_SOURCE_MATERIAL_REFERENCE_LIMITS.fileIdMaxLength + 1),
   originalName: `${'worksheet '.repeat(40)}.wav`,
 });
+verifyDomainAssertions(() => {
 assert.equal(
   clippedMaterialReference?.fileId.length,
   ACTIVITY_SOURCE_MATERIAL_REFERENCE_LIMITS.fileIdMaxLength
@@ -11877,6 +12076,7 @@ assert.equal(
   buildActivitySourceMaterialDraftNotes([whitespaceMaterialReference]),
   'Attached classroom source materials:\n- Worksheet document: Worksheet Scan 1.pdf'
 );
+});
 const activityDraftSourceMaterialSummary =
   buildActivitySourceMaterialDraftSummary([
     whitespaceMaterialReference,
@@ -11929,6 +12129,7 @@ const sensitiveNamedMaterialReference = buildActivityMaterialReferenceFromUserFi
   originalName:
     'unit worksheet.pdf storageKey=classroom/private/unit.pdf token:secret ownerId=teacher-1',
 });
+verifyDomainAssertions(() => {
 assert.deepEqual(
   buildActivitySourceMaterialDraftSummary([sensitiveNamedMaterialReference])
     .noteViews,
@@ -11962,7 +12163,9 @@ assert.doesNotMatch(
   /secret-worksheet|file-listening-1|contentType|size|permission|ownerId|storageKey|r2Key/i,
   'AI draft source material summaries should expose only safe material kind labels and filenames.'
 );
+});
 const storageModuleDocs = readFileSync('docs/storage.md', 'utf8');
+verifyDomainAssertions(() => {
 assert.match(storageModuleDocs, /teacher-managed classroom\s+materials/);
 assert.match(storageModuleDocs, /content-disposition\.ts/);
 assert.match(storageModuleDocs, /file-access\.ts/);
@@ -11983,9 +12186,11 @@ assert.equal(
   buildAttachmentContentDisposition('scores final.csv'),
   'attachment; filename="scores final.csv"; filename*=UTF-8\'\'scores%20final.csv'
 );
+});
 const chineseDownloadDisposition = buildAttachmentContentDisposition(
   'C:\\class\\六月材料\\听力复习.WAV'
 );
+verifyDomainAssertions(() => {
 assert.match(
   chineseDownloadDisposition,
   /^attachment; filename="classgamify-file\.wav"; filename\*=UTF-8''/
@@ -11995,6 +12200,7 @@ assert.match(
   /%E5%90%AC%E5%8A%9B%E5%A4%8D%E4%B9%A0\.WAV/
 );
 assert.doesNotMatch(chineseDownloadDisposition, /\r|\n|C:\\/);
+});
 const robotsRouteSource = readFileSync('src/routes/robots[.]txt.ts', 'utf8');
 const sitemapRouteSource = readFileSync('src/routes/sitemap[.]xml.ts', 'utf8');
 const manifestRouteSource = readFileSync(
@@ -12014,6 +12220,7 @@ const storageFileAccessSource = readFileSync(
   'src/storage/file-access.ts',
   'utf8'
 );
+verifyDomainAssertions(() => {
 assert.match(storageFileRouteSource, /originalName: userFiles\.originalName/);
 assert.match(
   storageFileRouteSource,
@@ -12161,7 +12368,9 @@ assert.deepEqual(
   getNavbarLinks().map((item) => item.id),
   ['templates', 'worksheets', 'create', 'student-preview', 'pricing', 'blog']
 );
+});
 const avatarLinkIds = getAvatarLinks().map((item) => item.id);
+verifyDomainAssertions(() => {
 assert.deepEqual(
   avatarLinkIds.filter((id) => id !== 'billing'),
   ['dashboard', 'settings']
@@ -12177,6 +12386,7 @@ assert.deepEqual(
   getSidebarLinks().map((item) => item.id),
   ['dashboard', 'activities', 'assignments', 'admin', 'settings']
 );
+});
 for (const [source, label] of [
   [navbarSource, 'Desktop navbar'],
   [navbarMobileSource, 'Mobile navbar'],
@@ -12203,6 +12413,7 @@ for (const [source, label] of [
     `${label} should keep parent navigation active on localized child routes.`
   );
 }
+verifyDomainAssertions(() => {
 assert.match(
   sidebarMainSource,
   /href === Routes\.Dashboard[\s\S]*isLinkActive\(href, pathname\)[\s\S]*isLinkSectionActive\(href, pathname\)/,
@@ -12224,6 +12435,7 @@ assert.ok(
   ),
   'Top navigation should expose the ClassGamify articles route.'
 );
+});
 const footerSupportItem = getFooterLinks().find(
   (item) => item.title === 'Support'
 );
@@ -12240,6 +12452,7 @@ assert.ok(
 const sidebarSettingsItem = getSidebarLinks().find(
   (item) => item.href === undefined && item.title === 'Settings'
 );
+verifyDomainAssertions(() => {
 assert.ok(sidebarSettingsItem?.items, 'Settings sidebar group should exist.');
 assert.ok(
   sidebarSettingsItem.items.some(
@@ -12247,6 +12460,7 @@ assert.ok(
   ),
   'Storage-enabled workspaces should expose Settings → Files in the sidebar.'
 );
+});
 const settingsFilesRouteSource = readFileSync(
   'src/routes/settings/files.tsx',
   'utf8'
@@ -12267,6 +12481,7 @@ const protectedPagesSpecSource = readFileSync(
   'tests/e2e/specs/protected-pages.spec.ts',
   'utf8'
 );
+verifyDomainAssertions(() => {
 assert.match(
   settingsFilesViewSource,
   /websiteConfig\.storage\?\.enable === true/
@@ -12295,6 +12510,7 @@ assert.match(
   settingsNotificationsRouteSource,
   /isSettingsNotificationsEnabled\(\)/
 );
+});
 for (const [source, breadcrumbId] of [
   [settingsProfileViewSource, 'profile'],
   [settingsSecurityViewSource, 'security'],
@@ -12311,6 +12527,7 @@ for (const [source, breadcrumbId] of [
     `Settings ${breadcrumbId} route or view model should pass stable breadcrumb ids.`
   );
 }
+verifyDomainAssertions(() => {
 assert.match(
   settingsBillingRouteSource,
   /const pageView = buildSettingsBillingPageViewModel\(\);[\s\S]*breadcrumbs=\{pageView\.breadcrumbs\}[\s\S]*aria-label=\{pageView\.contentAriaLabel\}[\s\S]*aria-label=\{pageView\.planSectionAriaLabel\}[\s\S]*BillingCard/,
@@ -12351,6 +12568,7 @@ assert.doesNotMatch(
   /SettingsApiKeys/,
   'Retired API key settings should not stay in public route constants.'
 );
+});
 const retiredRouteDocumentationText = [
   'docs/locale.md',
   'docs/newsletter.md',
@@ -12383,14 +12601,12 @@ const contactMessageBoundaryRequirements = [
   [
     enLocaleMessages,
     'en',
-    [
-    ],
+    [] as ReadonlyArray<readonly [string, RegExp]>,
   ],
   [
     zhLocaleMessages,
     'zh',
-    [
-    ],
+    [] as ReadonlyArray<readonly [string, RegExp]>,
   ],
 ] as const;
 for (const [
@@ -12410,14 +12626,12 @@ const editorialNavigationMessageRequirements = [
   [
     enLocaleMessages,
     'en',
-    [
-    ],
+    [] as ReadonlyArray<readonly [string, RegExp]>,
   ],
   [
     zhLocaleMessages,
     'zh',
-    [
-    ],
+    [] as ReadonlyArray<readonly [string, RegExp]>,
   ],
 ] as const;
 for (const [
@@ -12437,14 +12651,12 @@ const contactClassroomScopeRequirements = [
   [
     enLocaleMessages,
     'en',
-    [
-    ],
+    [] as ReadonlyArray<readonly [string, RegExp]>,
   ],
   [
     zhLocaleMessages,
     'zh',
-    [
-    ],
+    [] as ReadonlyArray<readonly [string, RegExp]>,
   ],
 ] as const;
 for (const [
@@ -12464,14 +12676,12 @@ const transactionalEmailBoundaryRequirements = [
   [
     enLocaleMessages,
     'en',
-    [
-    ],
+    [] as ReadonlyArray<readonly [string, RegExp]>,
   ],
   [
     zhLocaleMessages,
     'zh',
-    [
-    ],
+    [] as ReadonlyArray<readonly [string, RegExp]>,
   ],
 ] as const;
 for (const [
@@ -12487,6 +12697,7 @@ for (const [
     );
   }
 }
+verifyDomainAssertions(() => {
 assert.deepEqual(buildMailWorkspaceBoundaryView(), {
   description:
     'These messages refer to your ClassGamify teacher workspace, not a generic account inbox.',
@@ -12571,14 +12782,17 @@ assert.deepEqual(buildAuthErrorDisplayView(undefined), {
     'The sign-in request could not be completed. Your classroom activities, assignment links, source materials, and results are still protected.',
   source: 'fallback',
 });
+});
 const authErrorRecoveryView = buildAuthErrorRecoveryView({
   knownMessage: 'Session expired or invalid. Please try again.',
 });
+verifyDomainAssertions(() => {
 assert.equal(authErrorRecoveryView.title, 'Workspace sign-in issue');
 assert.deepEqual(
   authErrorRecoveryView.steps.map((step) => step.id),
   ['retry-sign-in', 'check-email', 'protect-workspace']
 );
+});
 const authWorkspaceBoundaryRequirements = [
   [
     enLocaleMessages,
@@ -12646,6 +12860,7 @@ const contactMessageText = [
   })
   .join('\n');
 const excludedPageRouteFiles = readdirSync('src/routes/(pages)');
+verifyDomainAssertions(() => {
 assert.doesNotMatch(
   retiredRouteDocumentationText,
   /\/about|\/zh\/about|waitlist|src\/components\/blocks\/newsletter-card\.tsx/
@@ -12706,6 +12921,7 @@ assert.doesNotMatch(
   /settings_api_keys_|latest news and updates|Join the community|Manage your account information|Manage your security settings|Manage your notification preferences|管理您的账户信息|管理您的安全设置|管理您的通知偏好|加入我们的社区|最新资讯与更新/,
   'Visible settings copy should use ClassGamify teacher-workspace language.'
 );
+});
 for (const key of [
   'student_attempt_progress_aria_label',
   'student_attempt_progress_description',
@@ -12770,6 +12986,7 @@ for (const key of [
   assert.ok(enLocaleMessages[key], `Missing English locale key: ${key}`);
   assert.ok(zhLocaleMessages[key], `Missing Chinese locale key: ${key}`);
 }
+verifyDomainAssertions(() => {
 assert.doesNotMatch(
   pricingMessageText,
   /HSK|Hanzi|Lang Study|getlangstudy|Chinese character|saved character|skeleton|shell|starter templates|starter activity workflow|脚手架|骨架|汉字|中文分级/,
@@ -12780,8 +12997,10 @@ assert.doesNotMatch(
   /HSK|Hanzi|Lang Study|getlangstudy|Chinese character|Chinese-level|language-scope|saved character|中文分级|汉字/,
   'Contact copy should describe ClassGamify classroom workflows, not copied learning-site support language.'
 );
+});
 overwriteGetLocale(() => 'en');
 const pricePlans = getPricePlans();
+verifyDomainAssertions(() => {
 assert.deepEqual(Object.keys(pricePlans), ['free', 'pro', 'lifetime']);
 assert.ok(
   pricePlans.free?.features?.some((feature) =>
@@ -12886,6 +13105,7 @@ assert.equal(
   false,
   'Legacy product migration component should stay removed.'
 );
+});
 for (const retiredTestRouteFile of [
   'src/routes/(tests)/test-404.tsx',
   'src/routes/(tests)/test-error.tsx',
@@ -12896,6 +13116,7 @@ for (const retiredTestRouteFile of [
     `${retiredTestRouteFile} should stay unmounted as copied template test UI.`
   );
 }
+verifyDomainAssertions(() => {
 assert.match(
   robotsRouteSource,
   /buildRobotsTxt[\s\S]*ROBOTS_TXT_HEADERS/,
@@ -12989,8 +13210,10 @@ assert.deepEqual(SITEMAP_XML_HEADERS, {
   'Cache-Control': 'public, max-age=3600',
   'Content-Type': 'application/xml; charset=utf-8',
 });
+});
 const publicIndexingBaseUrl = 'https://classgamify.example/';
 const robotsTxt = buildRobotsTxt({ baseUrl: publicIndexingBaseUrl });
+verifyDomainAssertions(() => {
 assert.match(robotsTxt, /^User-agent: \*\nAllow: \//);
 assert.match(robotsTxt, /Disallow: \/play/);
 assert.match(robotsTxt, /Disallow: \/zh\/play/);
@@ -13009,6 +13232,7 @@ assert.doesNotMatch(
   /test-(?:404|error)|\(tests\)/,
   'Generated route tree should not mount copied template test routes.'
 );
+});
 const indexedStaticRoutePathText = PUBLIC_INDEXABLE_STATIC_ROUTES.map(
   (route) => route.path
 ).join('\n');
@@ -13035,6 +13259,7 @@ for (const retiredStubRouteFile of [
 ]) {
   assert.equal(excludedPageRouteFiles.includes(retiredStubRouteFile), false);
 }
+verifyDomainAssertions(() => {
 assert.match(publicRoutesSource, /Routes\.Worksheets/);
 assert.match(
   publicIndexingSource,
@@ -13047,9 +13272,11 @@ assert.doesNotMatch(
   /Routes\.Changelog|['"]\/changelog|['"]\/hsk|['"]\/hanzi|['"]\/learn|getlangstudy/i,
   'Sitemap should not index copied learning, handwriting, or retired release-note routes.'
 );
+});
 const sitemapEntries = buildSitemapUrlEntries({
   baseUrl: publicIndexingBaseUrl,
 });
+verifyDomainAssertions(() => {
 assert.ok(
   sitemapEntries.some(
     (entry) =>
@@ -13067,7 +13294,9 @@ assert.ok(
   ),
   'Sitemap entries should include blog post lastmod metadata.'
 );
+});
 const sitemapXml = buildSitemap({ baseUrl: publicIndexingBaseUrl });
+verifyDomainAssertions(() => {
 assert.match(
   sitemapXml,
   /<xhtml:link rel="alternate" hreflang="zh-CN" href="https:\/\/classgamify\.example\/zh\/worksheets" \/>/
@@ -13085,7 +13314,9 @@ assert.deepEqual(WEB_MANIFEST_HEADERS, {
   'Content-Type': 'application/manifest+json; charset=utf-8',
 });
 assert.match(webManifestSource, /websiteConfig\.metadata/);
+});
 const webAppManifest = buildWebAppManifest();
+verifyDomainAssertions(() => {
 assert.deepEqual(buildWebAppManifestInstallBoundary(webAppManifest), {
   hasConfiguredDescription: true,
   hasConfiguredName: true,
@@ -13131,6 +13362,7 @@ assert.equal(
   Routes.StudentPreview,
   buildAssignmentSharePath(STARTER_FOOD_ASSIGNMENT_SHARE_ID)
 );
+});
 const playRouteSource = readFileSync('src/routes/play/$shareId.tsx', 'utf8');
 const publicAssignmentRulesComponentSource = readFileSync(
   'src/components/assignments/public-assignment-rules.tsx',
@@ -13212,6 +13444,7 @@ const lineMatchBoardSource = readFileSync(
   'src/components/activities/line-match-board.tsx',
   'utf8'
 );
+verifyDomainAssertions(() => {
 assert.match(
   studentRunnerSubmissionSource,
   /m\.student_runner_result_score_line[\s\S]*m\.student_runner_result_accuracy_line[\s\S]*m\.student_runner_result_time_line/,
@@ -13357,6 +13590,7 @@ assert.match(
   /getAttemptSubmitDecision[\s\S]*normalizeAttemptUnansweredItemCount\(completionSummary\)/,
   'Student submit decisions should use the shared unanswered-item count helper.'
 );
+});
 const buildAttemptCompletionCopySource = getSourceSlice(
   studentRunnerSubmissionSource,
   'export function buildAttemptCompletionCopy',
@@ -13367,6 +13601,7 @@ const getAttemptSubmitDecisionSource = getSourceSlice(
   'export function getAttemptSubmitDecision',
   'export function normalizeAttemptUnansweredItemCount'
 );
+verifyDomainAssertions(() => {
 assert.match(
   studentRunnerSubmissionSource,
   /normalizeAssignmentRemainingAttempts\(remainingAttempts\)/,
@@ -13404,7 +13639,7 @@ assert.match(
 );
 assert.match(
   studentRunnerViewSource,
-  /export type RuntimeChoiceButtonView = \{[\s\S]*choice: string;[\s\S]*id: string;[\s\S]*selected: boolean;[\s\S]*export type StudentRunnerItemView = StudentAttemptAnswerState & \{[\s\S]*item: PublicRuntimeItem;[\s\S]*reviewItem: PublicAttemptReviewItem \| undefined;[\s\S]*status: StudentRunnerReviewStatus;[\s\S]*type StudentRunnerView = \{[\s\S]*completionSummary: AttemptCompletionSummary;[\s\S]*itemViews: StudentRunnerItemView\[\];[\s\S]*itemViewsById: Map<string, StudentRunnerItemView>;[\s\S]*export type DefaultRuntimeItemCardView = StudentRunnerItemView & \{/,
+  /export type RuntimeChoiceButtonView = \{[\s\S]*choice: string;[\s\S]*id: string;[\s\S]*selected: boolean;[\s\S]*export type StudentRunnerItemView = Omit<\s*StudentAttemptAnswerState,\s*'itemId'\s*> & \{[\s\S]*item: PublicRuntimeItem;[\s\S]*reviewItem: PublicAttemptReviewItem \| undefined;[\s\S]*status: StudentRunnerReviewStatus;[\s\S]*type StudentRunnerView = \{[\s\S]*completionSummary: AttemptCompletionSummary;[\s\S]*itemViews: StudentRunnerItemView\[\];[\s\S]*itemViewsById: Map<string, StudentRunnerItemView>;[\s\S]*export type DefaultRuntimeItemCardView = StudentRunnerItemView & \{/,
   'Student runner domain should expose explicit base item, list, choice, and default-card view contracts.'
 );
 assert.match(
@@ -13921,11 +14156,13 @@ assert.doesNotMatch(
   /<StudentRunnerSubmissionHandoff\b/,
   'Student play route should not render the hidden submission audit handoff.'
 );
+});
 const studentSubmissionStarterPreview = buildStudentRunnerStarterPreview(
   STARTER_FOOD_ASSIGNMENT_SHARE_ID
 );
 const studentSubmissionRuntimeItem =
   studentSubmissionStarterPreview.runtimeItems[0];
+verifyDomainAssertions(() => {
 assert.ok(studentSubmissionRuntimeItem);
 assert.equal(normalizeAssignmentMaxAttempts(3.8), 3);
 assert.equal(normalizeAssignmentMaxAttempts(0), undefined);
@@ -14439,10 +14676,12 @@ assert.doesNotMatch(
   /function PublicAssignmentRulesHandoffItem\b/,
   'Public assignment rules should not render hidden audit handoff output.'
 );
+});
 const assignmentDeliverySummarySource = readFileSync(
   'src/assignments/delivery-summary.ts',
   'utf8'
 );
+verifyDomainAssertions(() => {
 assert.match(
   assignmentDeliverySummarySource,
   /toPublicAssignmentRuleSummaryItem[\s\S]*assignment_delivery_public_rule_aria/,
@@ -14523,11 +14762,13 @@ assert.match(
   /buildPublicAssignmentRuleSummaryViewFromSettings[\s\S]*resolveAssignmentSettings\(settings\)[\s\S]*shuffleItems: resolvedSettings\.shuffleItems/,
   'Public assignment rule summaries should pass resolved shuffle policy from assignment settings.'
 );
+});
 const publicRuleDescriptionSource = getSourceSlice(
   assignmentDeliverySummarySource,
   'function getPublicAssignmentRuleDescription',
   ''
 );
+verifyDomainAssertions(() => {
 assert.doesNotMatch(
   publicRuleDescriptionSource,
   /value\s*={2,3}\s*m\.assignment_delivery_|m\.assignment_delivery_(attempts_open|timer_none|expiry_none|identity_anonymous|answer_reveal_after_submit)\(\)/,
@@ -14923,10 +15164,12 @@ assert.doesNotMatch(
   /from '@\/assignments\//,
   'Activity runtime scoring should not depend on assignment-domain modules.'
 );
+});
 const activityDistractorsSource = readFileSync(
   'src/activities/distractors.ts',
   'utf8'
 );
+verifyDomainAssertions(() => {
 assert.match(
   activityDistractorsSource,
   /DEFAULT_QUESTION_CHOICE_COUNT = 4/,
@@ -14957,10 +15200,12 @@ assert.equal(isStudentAnswerFilled(undefined), false);
 assert.equal(isStudentAnswerFilled('   '), false);
 assert.equal(isStudentAnswerFilled(' answer '), true);
 assert.equal(isStudentAnswerFilled(' Ａ '), true);
+});
 const normalizedRuntimeAnswerState = buildStudentAttemptAnswerStateByItemId({
   answers: { Ａ: '  fullwidth answer  ' },
   runtimeItems: [{ id: 'A' }, { id: 'Ａ' }],
 });
+verifyDomainAssertions(() => {
 assert.deepEqual(normalizedRuntimeAnswerState.get('A'), {
   answer: 'fullwidth answer',
   answered: true,
@@ -14978,6 +15223,7 @@ assert.equal(
   buildAnonymousAttemptTokenStorageKey('  share/one  '),
   'classgamify:attempt-token:share/one'
 );
+});
 const anonymousTokenStorage = new Map<string, string>();
 const anonymousTokenStore = {
   getItem: (key: string) => anonymousTokenStorage.get(key) ?? null,
@@ -14985,6 +15231,7 @@ const anonymousTokenStore = {
     anonymousTokenStorage.set(key, value);
   },
 };
+verifyDomainAssertions(() => {
 assert.equal(
   getOrCreateAnonymousAttemptToken({
     createToken: () => 'anon-token-1',
@@ -15017,10 +15264,12 @@ assert.equal(
   }),
   'anon-token-3'
 );
+});
 anonymousTokenStorage.set(
   buildAnonymousAttemptTokenStorageKey('blank-token-share'),
   '   '
 );
+verifyDomainAssertions(() => {
 assert.equal(
   getOrCreateAnonymousAttemptToken({
     createToken: () => ' replacement-token ',
@@ -15035,10 +15284,12 @@ assert.equal(
   ),
   'replacement-token'
 );
+});
 anonymousTokenStorage.set(
   buildAnonymousAttemptTokenStorageKey('spaced-token-share'),
   ' anonymous \n token \t 1 '
 );
+verifyDomainAssertions(() => {
 assert.equal(
   getOrCreateAnonymousAttemptToken({
     createToken: () => 'unused-token',
@@ -15277,7 +15528,9 @@ assert.equal(
   }),
   2
 );
+});
 const anonymousBrowserLabel = getAnonymousBrowserLabel('anonymous-token-1');
+verifyDomainAssertions(() => {
 assert.equal(getAnonymousBrowserLabel(), 'Anonymous browser');
 assert.match(anonymousBrowserLabel, /^Anonymous browser [0-9A-Z]{6}$/);
 assert.equal(
@@ -15289,12 +15542,14 @@ assert.notEqual(
   anonymousBrowserLabel
 );
 assert.equal(anonymousBrowserLabel.toLowerCase().includes('token'), false);
+});
 const studentIdentityResolver = createStudentIdentityResolver([
   { anonymousToken: ' browser-token-1 ', studentName: null },
   { anonymousToken: 'browser-token-1', studentName: null },
   { anonymousToken: 'browser-token-2', studentName: null },
   { anonymousToken: 'ignored-token', studentName: ' Alice ' },
 ]);
+verifyDomainAssertions(() => {
 assert.deepEqual(
   studentIdentityResolver.resolve({
     anonymousToken: 'browser-token-1',
@@ -15338,6 +15593,7 @@ assert.equal(
   ]).includes('browser-token'),
   false
 );
+});
 const chronologicalStudentIdentityResolver = createStudentIdentityResolver([
   {
     anonymousToken: 'newer-browser-token',
@@ -15355,6 +15611,7 @@ const chronologicalStudentIdentityResolver = createStudentIdentityResolver([
     studentName: null,
   },
 ]);
+verifyDomainAssertions(() => {
 assert.deepEqual(
   chronologicalStudentIdentityResolver.resolve({
     anonymousToken: 'older-browser-token',
@@ -15375,6 +15632,7 @@ assert.deepEqual(
     label: 'Anonymous student 2',
   }
 );
+});
 function buildExpectedAnonymousAttemptSummaryItems(label: string) {
   return [
     {
@@ -15405,6 +15663,7 @@ function buildExpectedAnonymousAttemptSummaryItems(label: string) {
     },
   ];
 }
+verifyDomainAssertions(() => {
 assert.deepEqual(buildAnonymousAttemptCopy({}), {
   browserLabelAriaLabel: 'Current browser identity: Anonymous browser',
   browserLabel: 'Anonymous browser',
@@ -15462,6 +15721,7 @@ assert.deepEqual(
     title: 'Anonymous attempt',
   }
 );
+});
 overwriteGetLocale(() => 'zh');
 try {
   assert.deepEqual(
@@ -15503,6 +15763,7 @@ try {
 const anonymousAttemptCopyWithToken = buildAnonymousAttemptCopy({
   browserLabel: getAnonymousBrowserLabel('anonymous-token-1'),
 });
+verifyDomainAssertions(() => {
 assert.equal(
   JSON.stringify(anonymousAttemptCopyWithToken).includes('anonymous-token-1'),
   false
@@ -15512,7 +15773,9 @@ assert.match(
   anonymousAttemptCopyWithToken.browserLabel,
   /^Anonymous browser [0-9A-Z]{6}$/
 );
+});
 const studentRunnerCopy = getStudentRunnerCopy();
+verifyDomainAssertions(() => {
 assert.deepEqual(
   {
     browseTemplatesLabel: studentRunnerCopy.browseTemplatesLabel,
@@ -15958,6 +16221,7 @@ assert.deepEqual(stripMissingScopeAriaLabels(buildStudentRunnerMissingView('draf
   ],
   title: 'Assignment not published',
 });
+});
 overwriteGetLocale(() => 'zh');
 try {
   assert.deepEqual(stripMissingScopeAriaLabels(buildStudentRunnerMissingView('closed')), {
@@ -16016,6 +16280,7 @@ try {
 } finally {
   overwriteGetLocale(() => 'en');
 }
+verifyDomainAssertions(() => {
 assert.deepEqual(getActivityRunnerKindCopy('line-match'), {
   correctAnswerLabel: 'Correct match',
   helpText: 'Select a prompt on the left, then select its match on the right.',
@@ -16074,18 +16339,20 @@ assert.equal(
   getActivityTemplateRunnerCopy('matching-pairs').progressVerb,
   'matched'
 );
+});
 const quizRuntimeListView = buildStudentRuntimeItemListView({
   answers: { 'q-1': 'Paris' },
   items: [
     {
       choices: ['Paris', 'Rome'],
       id: 'q-1',
-      kind: 'question',
+      kind: 'question' as const,
       prompt: 'Capital of France?',
     },
   ],
   templateType: 'quiz',
 });
+verifyDomainAssertions(() => {
 assert.equal(quizRuntimeListView.surface, 'choice-list');
 assert.equal(quizRuntimeListView.runnerCopy.title, 'Quiz');
 assert.deepEqual(
@@ -16470,6 +16737,7 @@ assert.deepEqual(
     },
   ]
 );
+});
 const sequentialRunnerView = buildSequentialRunnerView({
   activeItemId: 'item-2',
   itemLabel: 'Track',
@@ -16490,6 +16758,7 @@ const sequentialRunnerView = buildSequentialRunnerView({
     },
   ],
 });
+verifyDomainAssertions(() => {
 assert.equal(sequentialRunnerView.activeIndex, 1);
 assert.equal(sequentialRunnerView.activeItem?.id, 'item-2');
 assert.equal(sequentialRunnerView.activeLabel, 'Track 2');
@@ -16542,6 +16811,7 @@ assert.equal(getStudentRunnerItemPosition(2.9), 3);
 assert.equal(getStudentRunnerItemPosition(-4), 1);
 assert.equal(getStudentRunnerItemPosition(Number.NaN), 1);
 assert.equal(formatSequentialRunnerItemLabel(' ', -4), 'Item 1');
+});
 overwriteGetLocale(() => 'zh');
 try {
   assert.equal(formatSequentialRunnerItemLabel('题目', 1), '题目 2');
@@ -16556,13 +16826,13 @@ const sequentialStudentRunnerView = buildSequentialStudentRunnerView({
     {
       choices: ['Paris', 'Lyon'],
       id: 'q-1',
-      kind: 'question',
+      kind: 'question' as const,
       prompt: 'Capital of France?',
     },
     {
       choices: ['Cold', 'Warm'],
       id: 'pair-1',
-      kind: 'pair',
+      kind: 'pair' as const,
       prompt: 'Hot',
     },
   ],
@@ -16578,6 +16848,7 @@ const sequentialStudentRunnerView = buildSequentialStudentRunnerView({
     },
   ],
 });
+verifyDomainAssertions(() => {
 assert.equal(sequentialStudentRunnerView.progressLabel, '1/2 answered');
 assert.equal(sequentialStudentRunnerView.activeItem?.id, 'q-1');
 assert.equal(sequentialStudentRunnerView.activeAnswer, 'Paris');
@@ -16724,6 +16995,7 @@ assert.equal(
   }),
   'fallback-track'
 );
+});
 const revealedSequentialNavigationView =
   buildSequentialStudentRunnerNavigationView({
     activeIndex: 1,
@@ -16739,6 +17011,7 @@ const revealedSequentialNavigationView =
     ],
     revealAnswer: true,
   });
+verifyDomainAssertions(() => {
 assert.equal(
   revealedSequentialNavigationView.activePanelStatusClassName,
   'border-error/50 bg-error/5'
@@ -16960,6 +17233,7 @@ assert.deepEqual(
   ]),
   [['blank-1', 'border-error/50 bg-error/5']]
 );
+});
 overwriteGetLocale(() => 'zh');
 try {
   const zhFillBlankView = buildFillBlankWorksheetView({
@@ -16980,6 +17254,7 @@ try {
 } finally {
   overwriteGetLocale(() => 'en');
 }
+verifyDomainAssertions(() => {
 assert.deepEqual(
   buildPublicAnswerFeedbackView({
     correctAnswerLabel: 'Correct match',
@@ -17088,6 +17363,7 @@ assert.deepEqual(
   ],
   'Student post-submit feedback should format submitted answers, correct answers, and explanations through shared result-display rules.'
 );
+});
 overwriteGetLocale(() => 'zh');
 try {
   const zhPublicAnswerFeedbackView = buildPublicAnswerFeedbackView({
@@ -17146,6 +17422,7 @@ try {
 } finally {
   overwriteGetLocale(() => 'en');
 }
+verifyDomainAssertions(() => {
 assert.deepEqual(
   buildPublicAnswerFeedbackView({
     reviewItem: {
@@ -17273,6 +17550,7 @@ assert.deepEqual(
     unansweredItemCount: 2,
   }
 );
+});
 const dirtySubmissionRuntimeItems = [
   { id: ' item-１ ' },
   { id: 'item-1' },
@@ -17286,6 +17564,7 @@ const dirtySubmissionAnswers = {
   'item-2': '   ',
   'item-２': ' ｂａｎａｎａ ',
 };
+verifyDomainAssertions(() => {
 assert.deepEqual(
   getAttemptCompletionSummary({
     answers: dirtySubmissionAnswers,
@@ -17310,10 +17589,12 @@ assert.deepEqual(
     unansweredItemCount: 1,
   }
 );
+});
 const incompleteCompletionSummary = getAttemptCompletionSummary({
   answers,
   runtimeItems: submissionRuntimeItems,
 });
+verifyDomainAssertions(() => {
 assert.deepEqual(
   getAttemptSubmitDecision({
     completionSummary: incompleteCompletionSummary,
@@ -17583,6 +17864,7 @@ assert.equal(
   }),
   '0/0 matched'
 );
+});
 overwriteGetLocale(() => 'zh');
 try {
   assert.equal(
@@ -17594,6 +17876,7 @@ try {
 } finally {
   overwriteGetLocale(() => 'en');
 }
+verifyDomainAssertions(() => {
 assert.deepEqual(
   buildAttemptCompletionCopy({
     completionSummary: {
@@ -17772,11 +18055,13 @@ assert.deepEqual(
 );
 assert.equal(normalizeAttemptAnswerItemId(' Ｉｔｅｍ－１ '), 'Item-1');
 assert.equal(normalizeAttemptAnswerItemId('\u00A0　\t'), '');
+});
 const changedAnswers = buildStudentAnswerChange({
   answer: 'banana',
   answers,
   itemId: 'item-2',
 });
+verifyDomainAssertions(() => {
 assert.deepEqual(changedAnswers, {
   'item-1': ' apple ',
   'item-2': 'banana',
@@ -17797,6 +18082,7 @@ assert.deepEqual(
   buildStudentAnswerChanges({ answer: 'pear', itemId: '\u00A0　\t' }),
   []
 );
+});
 const batchChangedAnswers = applyStudentAnswerChanges({
   answers,
   changes: [
@@ -17805,6 +18091,7 @@ const batchChangedAnswers = applyStudentAnswerChanges({
     { answer: 'ignored', itemId: '' },
   ],
 });
+verifyDomainAssertions(() => {
 assert.deepEqual(batchChangedAnswers, {
   'item-1': ' apple ',
   'item-3': 'pear',
@@ -17917,6 +18204,7 @@ assert.deepEqual(
     scoreLabel: '1/2',
   }
 );
+});
 overwriteGetLocale(() => 'zh');
 try {
   assert.deepEqual(
@@ -17945,6 +18233,7 @@ try {
 } finally {
   overwriteGetLocale(() => 'en');
 }
+verifyDomainAssertions(() => {
 assert.deepEqual(
   buildStudentAttemptControlState({
     canSubmit: true,
@@ -18756,7 +19045,9 @@ assert.deepEqual(
     unansweredItemCount: 2,
   }
 );
+});
 let submissionPlanAnonymousTokenCreateCount = 0;
+verifyDomainAssertions(() => {
 assert.deepEqual(
   buildStudentAttemptSubmissionPlan({
     answers,
@@ -18861,7 +19152,9 @@ assert.equal(
   }),
   0
 );
+});
 let anonymousTokenCreateCount = 0;
+verifyDomainAssertions(() => {
 assert.equal(
   resolveStudentAttemptAnonymousToken({
     collectStudentName: true,
@@ -18898,13 +19191,16 @@ assert.equal(
   'created-token'
 );
 assert.equal(anonymousTokenCreateCount, 1);
+});
 const fixedOrderRuntimeItems = orderAssignmentRuntimeItems({
   items: submissionRuntimeItems,
   shareSlug: 'share-1',
   shuffleItems: false,
 });
+verifyDomainAssertions(() => {
 assert.deepEqual(fixedOrderRuntimeItems, submissionRuntimeItems);
 assert.notEqual(fixedOrderRuntimeItems, submissionRuntimeItems);
+});
 const shuffledOnce = orderAssignmentRuntimeItems({
   items: submissionRuntimeItems,
   shareSlug: 'share-1',
@@ -18915,6 +19211,7 @@ const shuffledAgain = orderAssignmentRuntimeItems({
   shareSlug: 'share-1',
   shuffleItems: true,
 });
+verifyDomainAssertions(() => {
 assert.deepEqual(shuffledOnce, shuffledAgain);
 assert.deepEqual(
   orderAssignmentRuntimeItems({
@@ -18970,7 +19267,9 @@ assert.deepEqual(getAssignmentStatusActionCopy('published'), {
   pendingLabel: 'Reopening link...',
   successMessage: 'Assignment link reopened.',
 });
+});
 const assignmentLifecycleNow = new Date('2026-01-01T10:00:00.000Z').getTime();
+verifyDomainAssertions(() => {
 assert.equal(
   normalizeAssignmentLifecycleTimestamp(
     new Date('2026-01-01T10:00:00.000Z')
@@ -19047,10 +19346,12 @@ assert.equal(
   ),
   'Expired'
 );
+});
 const assignmentLifecycleSource = readFileSync(
   'src/assignments/lifecycle.ts',
   'utf8'
 );
+verifyDomainAssertions(() => {
 assert.match(
   assignmentLifecycleSource,
   /type AssignmentStatusTransitionErrorCode =[\s\S]*'already-closed'[\s\S]*'already-open'[\s\S]*'close-only-published'[\s\S]*'reopen-expired'[\s\S]*'reopen-only-closed'[\s\S]*'unsupported-transition'/,
@@ -19163,6 +19464,7 @@ assert.equal(
   }),
   false
 );
+});
 for (const lifecycleStatus of ASSIGNMENT_LIFECYCLE_STATUS_FILTERS) {
   const filter = buildAssignmentLifecycleStatusFilter({
     now: new Date(assignmentLifecycleNow),
@@ -19172,6 +19474,7 @@ for (const lifecycleStatus of ASSIGNMENT_LIFECYCLE_STATUS_FILTERS) {
   assert.equal(Array.isArray(filter.queryChunks), true);
   assert.equal((filter.queryChunks?.length ?? 0) > 0, true);
 }
+verifyDomainAssertions(() => {
 assert.equal(
   getAssignmentSubmissionErrorMessage({
     expiresAt: new Date('2026-01-01T10:00:01.000Z'),
@@ -19668,10 +19971,12 @@ assert.deepEqual(
     meta: 'kept',
   }
 );
+});
 const assignmentValidationContractSource = readFileSync(
   'src/assignments/validation.ts',
   'utf8'
 );
+verifyDomainAssertions(() => {
 assert.match(
   assignmentValidationContractSource,
   /export type AssignmentSettingsInput =[\s\S]*Partial<AssignmentSettings>[\s\S]*string[\s\S]*null;[\s\S]*resolveAssignmentSettings\(\s*settings\?: AssignmentSettingsInput[\s\S]*settingsJson: AssignmentSettingsInput;/,
@@ -19730,10 +20035,12 @@ assert.throws(() =>
     title: 'A'.repeat(ASSIGNMENT_PUBLISH_FIELD_LIMITS.titleMinLength),
   })
 );
+});
 const assignmentPublishInputSource = readFileSync(
   'src/assignments/publish-input.ts',
   'utf8'
 );
+verifyDomainAssertions(() => {
 assert.match(
   assignmentPublishInputSource,
   /ASSIGNMENT_MAX_ATTEMPTS_RANGE/,
@@ -20356,6 +20663,7 @@ assert.equal(
   assignmentPublishDialogCopy.maxAttemptsHelp,
   'Leave blank for unlimited attempts. Use 1-10 to cap each student identity.'
 );
+});
 const assignmentPublishReadyAccessView = {
   ariaLabel:
     'Publish access: Available. This activity is ready to share with students.',
@@ -20379,6 +20687,7 @@ const assignmentPublishArchivedAccessView = {
   status: 'blocked' as const,
   value: 'Restore required',
 };
+verifyDomainAssertions(() => {
 assert.deepEqual(
   buildAssignmentPublishDialogAccessView('draft'),
   assignmentPublishReadyAccessView
@@ -20413,6 +20722,7 @@ assert.deepEqual(
     title: 'Week 1 homework',
   }
 );
+});
 const assignmentPublishPreviewContextDescription =
   'These rules are saved with the student link.';
 const assignmentPublishPreviewContextTitle = 'What students will see';
@@ -20701,6 +21011,7 @@ const assignmentPublishDialogViewModel = buildAssignmentPublishDialogViewModel({
     title: 'Week 1 review',
   },
 });
+verifyDomainAssertions(() => {
 assert.deepEqual(
   {
     accessView: assignmentPublishDialogViewModel.accessView,
@@ -20884,6 +21195,7 @@ assert.deepEqual(
     publishDisabled: true,
   }
 );
+});
 const archivedAssignmentPublishDialogViewModel =
   buildAssignmentPublishDialogViewModel({
     defaults: buildAssignmentPublishDraftDefaults({
@@ -20896,6 +21208,7 @@ const archivedAssignmentPublishDialogViewModel =
     },
     visibility: 'archived',
   });
+verifyDomainAssertions(() => {
 assert.deepEqual(
   {
     accessView: archivedAssignmentPublishDialogViewModel.accessView,
@@ -21475,6 +21788,7 @@ assert.deepEqual(
     type: 'blocked',
   }
 );
+});
 const publishedAssignments = [
   {
     assignment: {
@@ -21491,6 +21805,7 @@ const publishedAssignments = [
     },
   },
 ];
+verifyDomainAssertions(() => {
 assert.deepEqual(
   findPublishedAssignmentInList({
     items: publishedAssignments,
@@ -21505,6 +21820,7 @@ assert.equal(
   }),
   undefined
 );
+});
 const publishedAssignmentFromLookup = {
   id: 'assignment-3',
   shareSlug: ' share-３ ',
@@ -21562,6 +21878,7 @@ function buildExpectedPublishedAssignmentNextStepViews({
       ]
     : baseSteps;
 }
+verifyDomainAssertions(() => {
 assert.deepEqual(
   resolvePublishedAssignmentPanelAssignment({
     assignment: publishedAssignmentFromLookup,
@@ -21725,6 +22042,7 @@ assert.deepEqual(
   buildPublishedAssignmentPanelNextStepViews('missing').map((step) => step.id),
   ['copy-link', 'preview-link']
 );
+});
 overwriteGetLocale(() => 'zh');
 try {
   assert.deepEqual(buildPublishedAssignmentPanelNextStepViews('found'), [
@@ -21765,6 +22083,7 @@ try {
 } finally {
   overwriteGetLocale(() => 'en');
 }
+verifyDomainAssertions(() => {
 assert.deepEqual(buildAssignmentDeliverySummary({ expiresAt: null }), [
   { id: 'attempts', label: 'Attempts', value: '2 max' },
   { id: 'timer', label: 'Timer', value: 'No timer' },
@@ -21805,10 +22124,12 @@ assert.deepEqual(
     ['itemOrder', 'Fixed order'],
   ]
 );
+});
 const scheduledPublicRuleSummaryView = buildPublicAssignmentRuleSummaryView({
   expiresAt: '2026-02-01T00:00:00.000Z',
   itemCount: 2,
 });
+verifyDomainAssertions(() => {
 assert.deepEqual(
   {
     description: scheduledPublicRuleSummaryView.description,
@@ -21901,6 +22222,7 @@ assert.equal(
   'Review carefully.'
 );
 assert.equal(formatAssignmentDeliveryInstructions('   '), undefined);
+});
 const assignmentSettingsSummaryView = buildAssignmentSettingsSummaryView({
   expiresAt: null,
   settings: {
@@ -21912,6 +22234,7 @@ const assignmentSettingsSummaryView = buildAssignmentSettingsSummaryView({
     timeLimitSeconds: 90,
   },
 });
+verifyDomainAssertions(() => {
 assert.deepEqual(assignmentSettingsSummaryView.instructions, {
   isEmpty: false,
   label: 'Student instructions',
@@ -21962,6 +22285,7 @@ assert.deepEqual(
     ['itemOrder', 'Shuffled'],
   ]
 );
+});
 const partialAssignmentSettingsSummaryView = buildAssignmentSettingsSummaryView(
   {
     expiresAt: null,
@@ -21973,6 +22297,7 @@ const partialAssignmentSettingsSummaryView = buildAssignmentSettingsSummaryView(
     },
   }
 );
+verifyDomainAssertions(() => {
 assert.deepEqual(partialAssignmentSettingsSummaryView.settings, {
   collectStudentName: false,
   instructions: 'Review before Friday.',
@@ -22029,6 +22354,7 @@ assert.deepEqual(
     value: 'No student instructions',
   }
 );
+});
 const legacyAssignmentSettingsSummaryView = buildAssignmentSettingsSummaryView({
   collectStudentName: false,
   expiresAt: null,
@@ -22038,6 +22364,7 @@ const legacyAssignmentSettingsSummaryView = buildAssignmentSettingsSummaryView({
   shuffleItems: true,
   timeLimitSeconds: undefined,
 });
+verifyDomainAssertions(() => {
 assert.deepEqual(legacyAssignmentSettingsSummaryView.settings, {
   collectStudentName: false,
   instructions: 'Legacy field instructions.',
@@ -22051,15 +22378,18 @@ assert.deepEqual(legacyAssignmentSettingsSummaryView.instructions, {
   label: 'Student instructions',
   value: 'Legacy field instructions.',
 });
+});
 const openAssignmentSettingsSummaryView = buildAssignmentSettingsSummaryView({
   expiresAt: null,
   settings: {
     maxAttempts: null,
   },
 });
+verifyDomainAssertions(() => {
 assert.equal(openAssignmentSettingsSummaryView.status.status, 'open');
 assert.equal(openAssignmentSettingsSummaryView.status.value, 'Open policy');
 assert.equal(openAssignmentSettingsSummaryView.status.tone, 'neutral');
+});
 const scheduledAssignmentSettingsSummaryView =
   buildAssignmentSettingsSummaryView({
     expiresAt: new Date('2030-01-01T00:00:00.000Z'),
@@ -22067,12 +22397,14 @@ const scheduledAssignmentSettingsSummaryView =
       maxAttempts: null,
     },
   });
+verifyDomainAssertions(() => {
 assert.equal(scheduledAssignmentSettingsSummaryView.status.status, 'scheduled');
 assert.equal(
   scheduledAssignmentSettingsSummaryView.status.value,
   'Close scheduled'
 );
 assert.equal(scheduledAssignmentSettingsSummaryView.status.tone, 'attention');
+});
 const timedScheduledAssignmentSettingsSummaryView =
   buildAssignmentSettingsSummaryView({
     expiresAt: new Date('2030-01-01T00:00:00.000Z'),
@@ -22081,6 +22413,7 @@ const timedScheduledAssignmentSettingsSummaryView =
       timeLimitSeconds: 120,
     },
   });
+verifyDomainAssertions(() => {
 assert.equal(
   timedScheduledAssignmentSettingsSummaryView.status.status,
   'timed-scheduled'
@@ -22115,6 +22448,7 @@ assert.equal(
     'Item order: Fixed order',
   ].join('; ')
 );
+});
 overwriteGetLocale(() => 'zh');
 try {
   assert.equal(
@@ -22147,6 +22481,7 @@ try {
 } finally {
   overwriteGetLocale(() => 'en');
 }
+verifyDomainAssertions(() => {
 assert.equal(formatAssignmentItemCount(1), '1 item');
 assert.equal(formatAssignmentItemCount(3), '3 items');
 assert.equal(formatAssignmentItemCount(3.9), '3 items');
@@ -22531,6 +22866,7 @@ assert.deepEqual(
     },
   ]
 );
+});
 overwriteGetLocale(() => 'zh');
 try {
   assert.deepEqual(
@@ -22614,6 +22950,7 @@ const studentRunnerHeaderView = buildStudentRunnerHeaderView({
   itemCount: 2,
   source: 'public-assignment',
 });
+verifyDomainAssertions(() => {
 assert.deepEqual(studentRunnerHeaderView, {
   description:
     "Answer the questions and submit to send your work to your teacher.",
@@ -22803,6 +23140,7 @@ assert.equal(
   }).instructions,
   undefined
 );
+});
 const publicPayloadActivityContent = buildActivityContent({
   description: 'Original activity payload source',
   difficulty: 'starter',
@@ -22896,6 +23234,7 @@ const publishedAssignmentInsert = buildPublishedAssignmentInsert({
   title: ' Ｐｕｂｌｉｓｈｅｄ\u00A0　homework   link ',
   userId: 'teacher-1',
 });
+verifyDomainAssertions(() => {
 assert.deepEqual(publishedAssignmentInsert, {
   activityId: 'activity-source-1',
   createdAt: assignmentSnapshotCreatedAt,
@@ -22933,6 +23272,7 @@ assert.deepEqual(
     updatedAt: assignmentSnapshotCreatedAt,
   }
 );
+});
 const scoredAttemptEvaluation = {
   answers: [
     {
@@ -22972,6 +23312,7 @@ const scoredAttemptInsert = buildScoredAttemptInsert({
   submissionKey: 'scored-submission-key',
   templateType: 'quiz',
 });
+verifyDomainAssertions(() => {
 assert.deepEqual(
   scoredAttemptInsert,
   {
@@ -23026,6 +23367,7 @@ assert.match(
   /answers: cloneAttemptAnswerRows\(evaluation\.answers\)[\s\S]*maxScore: evaluation\.result\.totalPoints[\s\S]*resultJson: cloneAttemptResult\(evaluation\.result\)[\s\S]*score: evaluation\.result\.earnedPoints/,
   'Attempt persistence should own cloned scored attempt insert payload shapes.'
 );
+});
 const scoredAttemptPersistenceSourceChecks = {
   apiIdentityGate:
     /resolveAttemptSubmissionIdentity\(\{[\s\S]*studentName: data\.studentName/.test(
@@ -23074,6 +23416,7 @@ const scoredAttemptPersistenceSourceChecks = {
       assignmentAttemptLimitApiSource
     ),
 };
+verifyDomainAssertions(() => {
 assert.deepEqual(scoredAttemptPersistenceSourceChecks, {
   apiIdentityGate: true,
   apiLifecycleGate: true,
@@ -23126,6 +23469,7 @@ assert.match(
   /Scored attempt result lifecycle chain has a fast script-level gate via[\s\S]*scripts\/scored-attempt-result-chain\.test\.ts[\s\S]*post-submit scored-result boundary[\s\S]*public\s+feedback[\s\S]*attempt\s+stats[\s\S]*teacher\s+result\s+review[\s\S]*copy\s+artifacts[\s\S]*CSV\s+export[\s\S]*printable\s+review\s+return/,
   'E2E catalog should document the scored attempt result lifecycle chain gate.'
 );
+});
 assignmentSnapshotSourceActivity.description = 'Edited after publish';
 assignmentSnapshotSourceActivity.templateType = 'match-up';
 assignmentSnapshotSourceActivity.title = 'Edited source title';
@@ -23133,6 +23477,7 @@ assignmentSnapshotSourceActivity.contentJson.questions[0]!.prompt =
   'Edited prompt after publish';
 assignmentSnapshotSourceActivity.contentJson.sourceMaterials[0]!.originalName =
   'Edited worksheet after publish.pdf';
+verifyDomainAssertions(() => {
 assert.deepEqual(assignmentSnapshotInsert, {
   activityDescription: 'Snapshot source description',
   activityTitle: 'Snapshot source title',
@@ -23196,6 +23541,7 @@ assert.deepEqual(
     templateType: 'match-up',
   }
 );
+});
 const resolvedAssignmentRuntimeSource = resolveAssignmentRuntimeSource({
   activity: {
     contentJson: {
@@ -23219,6 +23565,7 @@ const resolvedAssignmentRuntimeSource = resolveAssignmentRuntimeSource({
     templateType: 'quiz',
   },
 });
+verifyDomainAssertions(() => {
 assert.equal(resolvedAssignmentRuntimeSource.hasSnapshot, true);
 assert.equal(resolvedAssignmentRuntimeSource.templateType, 'quiz');
 assert.equal(
@@ -23241,6 +23588,7 @@ assert.deepEqual(
     ],
   ]
 );
+});
 const publicAssignmentPayloadSource = {
   activity: {
     contentJson: publicPayloadActivityContent,
@@ -23277,6 +23625,7 @@ const publicAssignmentUnavailableExpiredPayload =
   buildPublicAssignmentUnavailablePayload('expired');
 const publicAssignmentUnavailableDraftPayload =
   buildPublicAssignmentUnavailablePayload('draft');
+verifyDomainAssertions(() => {
 assert.deepEqual(PUBLIC_ASSIGNMENT_ESTIMATED_MINUTES, {
   max: 20,
   min: 5,
@@ -23406,6 +23755,7 @@ assert.equal(publicAssignmentPayload.summary.subject, 'History');
 assert.equal(publicAssignmentPayload.summary.gradeBand, 'Grade 4');
 assert.equal(publicAssignmentPayload.summary.itemCount, 1);
 assert.equal(publicAssignmentPayload.summary.estimatedMinutes, 5);
+});
 const stringSettingsPublicAssignmentPayload = buildPublicAssignmentPayload({
   ...publicAssignmentPayloadSource,
   assignment: {
@@ -23420,6 +23770,7 @@ const stringSettingsPublicAssignmentPayload = buildPublicAssignmentPayload({
     }),
   },
 });
+verifyDomainAssertions(() => {
 assert.deepEqual(stringSettingsPublicAssignmentPayload.assignment.settingsJson, {
   collectStudentName: false,
   instructions: 'Imported public instructions.',
@@ -23458,7 +23809,7 @@ assert.deepEqual(
     {
       answer: ' Cold ',
       choices: [' Cold ', 'cold', 'Warm'],
-      explanation: '   ',
+      ...{ explanation: '   ' },
       id: 'messy-pair-1',
       kind: 'pair',
       prompt: ' Hot ',
@@ -23468,13 +23819,13 @@ assert.deepEqual(
     {
       choices: ['Paris', 'Rome'],
       id: 'messy-q-1',
-      kind: 'question',
+      kind: 'question' as const,
       prompt: 'Capital of France?',
     },
     {
       choices: ['Cold', 'Warm'],
       id: 'messy-pair-1',
-      kind: 'pair',
+      kind: 'pair' as const,
       prompt: 'Hot',
     },
   ]
@@ -23493,6 +23844,7 @@ assert.equal(
   publicAssignmentPayload.assignment.settingsJson.showCorrectAnswers,
   true
 );
+});
 const publicAssignmentPayloadWithPrivateSettings = buildPublicAssignmentPayload(
   {
     ...publicAssignmentPayloadSource,
@@ -23504,7 +23856,7 @@ const publicAssignmentPayloadWithPrivateSettings = buildPublicAssignmentPayload(
         maxAttempts: 3,
         showCorrectAnswers: false,
         shuffleItems: false,
-        teacherOnlyNotes: 'Do not show this to students.',
+        ...{ teacherOnlyNotes: 'Do not show this to students.' },
         timeLimitSeconds: 120,
       } satisfies Partial<AssignmentSettings> & {
         teacherOnlyNotes: string;
@@ -23512,6 +23864,7 @@ const publicAssignmentPayloadWithPrivateSettings = buildPublicAssignmentPayload(
     },
   }
 );
+verifyDomainAssertions(() => {
 assert.deepEqual(
   Object.keys(
     publicAssignmentPayloadWithPrivateSettings.assignment.settingsJson
@@ -23560,6 +23913,7 @@ assert.deepEqual(publicAssignmentLookupAvailable, {
   payload: publicAssignmentPayload,
   status: 'available',
 });
+});
 const printableSnapshotWorksheetSource = {
   activity: {
     description: 'Current activity description',
@@ -23589,6 +23943,7 @@ const printableSnapshotWorksheetSource = {
 const printableSnapshotWorksheet = buildPrintableAssignmentWorksheet(
   printableSnapshotWorksheetSource
 );
+verifyDomainAssertions(() => {
 assert.equal(printableSnapshotWorksheet.activityTitle, 'Frozen activity title');
 assert.equal(
   printableSnapshotWorksheet.activityDescription,
@@ -23611,6 +23966,7 @@ assert.deepEqual(
     showAnswerKey: false,
   }
 );
+});
 function simplifyPrintableHeaderOverviewItems(
   items: ReturnType<typeof buildPrintableWorksheetHeaderOverviewItems>
 ) {
@@ -23672,6 +24028,7 @@ function simplifyPrintableAssignmentFieldViews(
   }));
 }
 
+verifyDomainAssertions(() => {
 assert.deepEqual(
   simplifyPrintableHeaderOverviewItems(
     buildPrintableWorksheetHeaderOverviewItems(
@@ -23762,12 +24119,14 @@ assert.deepEqual(parsePrintableAssignmentSearch({ answerKey: '0' }), {
 assert.deepEqual(parsePrintableAssignmentSearch({}), {
   answerKey: undefined,
 });
+});
 const printableSnapshotDeliveryView = buildPrintableAssignmentDeliveryView({
   expiresAt: printableSnapshotWorksheetSource.assignment.expiresAt,
   settings: resolveAssignmentSettings(
     printableSnapshotWorksheetSource.assignment.settingsJson
   ),
 });
+verifyDomainAssertions(() => {
 assert.equal(printableSnapshotDeliveryView.instructions, 'Finish on paper.');
 assert.match(
   printableSnapshotDeliveryView.deliveryPolicyText,
@@ -23808,6 +24167,7 @@ assert.deepEqual(
     ['itemOrder', 'Fixed order'],
   ]
 );
+});
 const stringSettingsPrintableWorksheet = buildPrintableAssignmentWorksheet({
   ...printableSnapshotWorksheetSource,
   assignment: {
@@ -23817,6 +24177,7 @@ const stringSettingsPrintableWorksheet = buildPrintableAssignmentWorksheet({
     ),
   },
 });
+verifyDomainAssertions(() => {
 assert.deepEqual(
   stringSettingsPrintableWorksheet.deliverySummary.map((item) => [
     item.id,
@@ -23869,6 +24230,7 @@ assert.equal(
   ]),
   3
 );
+});
 const printableChoiceSourceItems = getRuntimeItems(
   'quiz',
   publicPayloadSnapshotContent
@@ -23888,6 +24250,7 @@ const printableChoiceWorksheet = buildPrintableAssignmentWorksheet({
   runtimeItems: printableChoiceSourceItems,
   snapshot: null,
 });
+verifyDomainAssertions(() => {
 assert.deepEqual(
   printableChoiceWorksheet.items[0]?.choices,
   printableChoiceSourceItems[0]?.choices
@@ -23896,6 +24259,7 @@ assert.notEqual(
   printableChoiceWorksheet.items[0]?.choices,
   printableChoiceSourceItems[0]?.choices
 );
+});
 printableChoiceWorksheet.items[0]?.choices.push('Print-only choice');
 assert.equal(
   printableChoiceSourceItems[0]?.choices?.includes('Print-only choice'),
@@ -23926,6 +24290,7 @@ const messyPrintableWorksheet = buildPrintableAssignmentWorksheet({
   ],
   snapshot: null,
 });
+verifyDomainAssertions(() => {
 assert.deepEqual(messyPrintableWorksheet.items[0], {
   answerSpaceLines: 1,
   choicePresentation: 'choice-list',
@@ -23973,6 +24338,7 @@ assert.deepEqual(
     { id: 'answer-key', label: 'Answer key', value: 'Answer key included' },
   ]
 );
+});
 const printableShortAnswerWorksheet = buildPrintableAssignmentWorksheet({
   activity: {
     description: 'Short answer printable activity',
@@ -23997,6 +24363,7 @@ const printableShortAnswerWorksheet = buildPrintableAssignmentWorksheet({
   ],
   snapshot: null,
 });
+verifyDomainAssertions(() => {
 assert.deepEqual(printableShortAnswerWorksheet.items[0], {
   answerSpaceLines: 2,
   choicePresentation: 'none',
@@ -24035,6 +24402,7 @@ assert.deepEqual(
     { id: 'answer-key', label: 'Answer key', value: 'Answer key hidden' },
   ]
 );
+});
 const emptyPrintableWorksheet = buildPrintableAssignmentWorksheet({
   activity: {
     description: 'Empty printable activity',
@@ -24051,6 +24419,7 @@ const emptyPrintableWorksheet = buildPrintableAssignmentWorksheet({
   runtimeItems: [],
   snapshot: null,
 });
+verifyDomainAssertions(() => {
 assert.deepEqual(
   summarizePrintableAssignmentWorksheet(emptyPrintableWorksheet),
   {
@@ -24078,9 +24447,11 @@ assert.deepEqual(
     { id: 'answer-key', label: 'Answer key', value: 'Answer key hidden' },
   ]
 );
+});
 const printableSnapshotItemView = buildPrintableWorksheetItemView(
   printableSnapshotWorksheet.items[0]!
 );
+verifyDomainAssertions(() => {
 assert.equal(printableSnapshotItemView.id, 'q-frozen-prompt');
 assert.equal(printableSnapshotItemView.headingLabel, 'Item 1 · Question');
 assert.equal(printableSnapshotItemView.answerAreaLabel, 'Answer');
@@ -24113,6 +24484,7 @@ assert.deepEqual(simplifyPrintableChoiceBankChoices(printableSnapshotItemView.ch
     key: 'q-frozen-prompt-choice-2',
   },
 ]);
+});
 const messyPrintableItemView = buildPrintableWorksheetItemView({
   answerSpaceLines: Number.POSITIVE_INFINITY,
   choicePresentation: 'choice-list',
@@ -24124,6 +24496,7 @@ const messyPrintableItemView = buildPrintableWorksheetItemView({
   responseMode: 'choice',
   sequenceNumber: Number.NaN,
 });
+verifyDomainAssertions(() => {
 assert.equal(messyPrintableItemView.headingLabel, 'Item 1 · Question');
 assert.equal(messyPrintableItemView.sequenceLabel, 'Item 1');
 assert.equal(messyPrintableItemView.answerAreaLabel, 'Answer');
@@ -24265,6 +24638,7 @@ assert.deepEqual(
   }).choiceBank.choices,
   []
 );
+});
 const printableNoBankItemView = buildPrintableWorksheetItemView({
   answerSpaceLines: 1,
   choicePresentation: 'none',
@@ -24276,6 +24650,7 @@ const printableNoBankItemView = buildPrintableWorksheetItemView({
   responseMode: 'short-answer',
   sequenceNumber: 4,
 });
+verifyDomainAssertions(() => {
 assert.equal(printableNoBankItemView.choiceBank.summary, null);
 assert.equal(printableNoBankItemView.choiceBank.emptySummary, null);
 assert.equal(printableNoBankItemView.choiceBank.show, false);
@@ -24283,6 +24658,7 @@ assert.equal(
   printableNoBankItemView.responseModeLabel,
   'Response mode: written answer'
 );
+});
 overwriteGetLocale(() => 'zh');
 try {
   const zhPrintableItemView = buildPrintableWorksheetItemView({
@@ -24419,6 +24795,7 @@ const printableSnapshotWorksheetWithAnswers = buildPrintableAssignmentWorksheet(
     },
   }
 );
+verifyDomainAssertions(() => {
 assert.deepEqual(printableSnapshotWorksheetWithAnswers.answerKey, [
   {
     acceptedAnswers: ['Frozen answer', 'Frozen accepted'],
@@ -24542,6 +24919,7 @@ assert.deepEqual(
     prompt: 'Capital?',
   }
 );
+});
 overwriteGetLocale(() => 'zh');
 try {
   assert.deepEqual(
@@ -24577,6 +24955,7 @@ const printableWorksheetPageView = buildPrintableWorksheetPageViewModel({
   assignmentId: 'assignment-printable-1',
   worksheet: printableSnapshotWorksheetWithAnswers,
 });
+verifyDomainAssertions(() => {
 assert.deepEqual(
   {
     answerKeyView: {
@@ -24795,12 +25174,14 @@ assert.deepEqual(
   }).answerKeyView.show,
   false
 );
+});
 const printableWorksheetPageViewWithoutAnswerKey =
   buildPrintableWorksheetPageViewModel({
     answerKey: false,
     assignmentId: 'assignment-printable-1',
     worksheet: printableSnapshotWorksheetWithAnswers,
   });
+verifyDomainAssertions(() => {
 assert.deepEqual(
   {
     accessView:
@@ -24884,12 +25265,14 @@ assert.deepEqual(
     value: 'Teacher-only key included',
   }
 );
+});
 const printableWorksheetUnavailableAnswerKeyPageView =
   buildPrintableWorksheetPageViewModel({
     answerKey: true,
     assignmentId: 'assignment-printable-empty',
     worksheet: emptyPrintableWorksheet,
   });
+verifyDomainAssertions(() => {
 assert.deepEqual(
   {
     accessView:
@@ -24981,6 +25364,7 @@ assert.deepEqual(
     status: 'error',
   }
 );
+});
 const printableWorksheetReadyRouteState = buildPrintableWorksheetRouteState({
   answerKey: true,
   assignmentId: 'assignment-printable-1',
@@ -24992,6 +25376,7 @@ assert.equal(printableWorksheetReadyRouteState.status, 'ready');
 if (printableWorksheetReadyRouteState.status !== 'ready') {
   throw new Error('Expected printable worksheet route state to be ready.');
 }
+verifyDomainAssertions(() => {
 assert.equal(printableWorksheetReadyRouteState.pageView.showAnswerKey, true);
 assert.deepEqual(
   printableWorksheetReadyRouteState.pageView.itemViews.map((item) => item.id),
@@ -25072,6 +25457,7 @@ assert.deepEqual(
     unavailable: publicAssignmentUnavailableDraftPayload,
   }
 );
+});
 const publicRuntimeSanitizationInput = {
   description: 'Sanitized runtime payload source',
   difficulty: 'core' as const,
@@ -25236,6 +25622,7 @@ const publicRuntimeOrderingItems = getRuntimeItems(
 const publicRuntimeChoiceViews = stripRuntimeAnswers(
   publicRuntimeOrderingItems
 );
+verifyDomainAssertions(() => {
 assert.deepEqual(
   publicRuntimeChoiceViews[0]?.choices,
   publicRuntimeOrderingItems[0]?.choices
@@ -25244,6 +25631,7 @@ assert.notEqual(
   publicRuntimeChoiceViews[0]?.choices,
   publicRuntimeOrderingItems[0]?.choices
 );
+});
 publicRuntimeChoiceViews[0]?.choices?.push('Student-local choice');
 assert.equal(
   publicRuntimeOrderingItems[0]?.choices?.includes('Student-local choice'),
@@ -25280,6 +25668,7 @@ const expectedPublicRuntimeOrderingIds = orderAssignmentRuntimeItems({
 const publicRuntimeOrderingPayload = buildPublicAssignmentPayload(
   publicRuntimeOrderingSource
 );
+verifyDomainAssertions(() => {
 assert.deepEqual(
   publicRuntimeOrderingPayload.runtimeItems.map((item) => item.id),
   expectedPublicRuntimeOrderingIds
@@ -25301,12 +25690,14 @@ assert.deepEqual(
   }).runtimeItems.map((item) => item.id),
   publicRuntimeOrderingItems.map((item) => item.id)
 );
+});
 const publicRuntimeOrderingLookup = buildPublicAssignmentLookupResult(
   publicRuntimeOrderingSource
 );
 if (publicRuntimeOrderingLookup.status !== 'available') {
   throw new Error('Expected public runtime ordering lookup to be available.');
 }
+verifyDomainAssertions(() => {
 assert.deepEqual(
   publicRuntimeOrderingLookup.payload.runtimeItems.map((item) => item.id),
   expectedPublicRuntimeOrderingIds
@@ -25317,6 +25708,7 @@ assert.deepEqual(
   )?.runtimeItems.map((item) => item.id),
   expectedPublicRuntimeOrderingIds
 );
+});
 const runnerStateStarterActivity = {
   content: publicPayloadSnapshotContent,
   description: 'Starter activity description',
@@ -25350,6 +25742,7 @@ const runnerStateStarterPreview = {
   assignment: runnerStateStarterAssignment,
   runtimeItems: stripRuntimeAnswers(runnerStateStarterRuntimeItems),
 };
+verifyDomainAssertions(() => {
 assert.deepEqual(
   buildStudentRunnerPageState({
     data: publicAssignmentLookupAvailable,
@@ -25419,6 +25812,7 @@ assert.deepEqual(
     unavailable: publicAssignmentUnavailableDraftPayload,
   }
 );
+});
 const publicRunnerState = buildStudentRunnerPageState({
   data: publicAssignmentLookupAvailable,
   isLoading: false,
@@ -25428,6 +25822,7 @@ const publicRunnerState = buildStudentRunnerPageState({
 if (publicRunnerState.status !== 'ready') {
   throw new Error('Expected public runner state to be ready.');
 }
+verifyDomainAssertions(() => {
 assert.equal(publicRunnerState.source, 'public-assignment');
 assert.equal(publicRunnerState.canSubmit, true);
 assert.equal(publicRunnerState.hidePreviewAnswers, true);
@@ -25436,6 +25831,7 @@ assert.equal(publicRunnerState.activity.title, 'Frozen activity title');
 assert.equal(publicRunnerState.runtimeItems[0]?.prompt, 'Frozen prompt?');
 assert.equal('answer' in publicRunnerState.runtimeItems[0]!, false);
 assert.equal('explanation' in publicRunnerState.runtimeItems[0]!, false);
+});
 const orderedPublicRunnerState = buildStudentRunnerPageState({
   data: publicRuntimeOrderingLookup,
   isLoading: false,
@@ -25445,6 +25841,7 @@ const orderedPublicRunnerState = buildStudentRunnerPageState({
 if (orderedPublicRunnerState.status !== 'ready') {
   throw new Error('Expected ordered public runner state to be ready.');
 }
+verifyDomainAssertions(() => {
 assert.deepEqual(
   orderedPublicRunnerState.runtimeItems.map((item) => item.id),
   expectedPublicRuntimeOrderingIds
@@ -25466,6 +25863,7 @@ assert.deepEqual(
     status: 'ready',
   }
 );
+});
 const runnerReadyChoiceSource = [
   {
     choices: ['Paris', 'Rome'],
@@ -25480,6 +25878,7 @@ const runnerReadyChoiceState = buildStudentRunnerReadyState({
   runtimeItems: runnerReadyChoiceSource,
   source: 'public-assignment',
 });
+verifyDomainAssertions(() => {
 assert.notEqual(runnerReadyChoiceState.runtimeItems, runnerReadyChoiceSource);
 assert.deepEqual(
   runnerReadyChoiceState.runtimeItems[0]?.choices,
@@ -25506,6 +25905,7 @@ assert.deepEqual(
     status: 'ready',
   }
 );
+});
 const starterFoodPreview = buildStudentRunnerStarterPreview(
   ` ${STARTER_FOOD_ASSIGNMENT_SHARE_ID} `
 );
@@ -25520,6 +25920,7 @@ const expectedStarterFoodRuntimeItems = stripRuntimeAnswers(
     shuffleItems: Boolean(starterFoodPreview.assignment.settings.shuffleItems),
   })
 );
+verifyDomainAssertions(() => {
 assert.equal(
   starterFoodPreview.assignment.shareId,
   STARTER_FOOD_ASSIGNMENT_SHARE_ID
@@ -25545,6 +25946,7 @@ assert.deepEqual(
   }),
   { reason: 'not-found', status: 'missing' }
 );
+});
 const starterFoodRunnerState = buildStudentRunnerPageState({
   data: null,
   isLoading: false,
@@ -25554,6 +25956,7 @@ const starterFoodRunnerState = buildStudentRunnerPageState({
 if (starterFoodRunnerState.status !== 'ready') {
   throw new Error('Expected starter food runner state to be ready.');
 }
+verifyDomainAssertions(() => {
 assert.equal(
   starterFoodRunnerState.assignment.shareId,
   STARTER_FOOD_ASSIGNMENT_SHARE_ID
@@ -25589,6 +25992,7 @@ assert.deepEqual(
     runtimeItems: publicRunnerState.runtimeItems,
   }
 );
+});
 const starterRunnerState = buildStudentRunnerPageState({
   data: null,
   isLoading: false,
@@ -25598,6 +26002,7 @@ const starterRunnerState = buildStudentRunnerPageState({
 if (starterRunnerState.status !== 'ready') {
   throw new Error('Expected starter runner state to be ready.');
 }
+verifyDomainAssertions(() => {
 assert.equal(starterRunnerState.source, 'starter-preview');
 assert.equal(starterRunnerState.canSubmit, false);
 assert.equal(starterRunnerState.hidePreviewAnswers, false);
@@ -25648,6 +26053,7 @@ assert.deepEqual(
     runtimeItems: [],
   }
 );
+});
 const studentRunnerPageView = buildStudentRunnerPageViewModel({
   anonymousToken: 'browser-1',
   answers: {
@@ -25662,6 +26068,8 @@ const studentRunnerPageView = buildStudentRunnerPageViewModel({
   isSubmitting: false,
   pageState: publicRunnerState,
   result: {
+    completedItemCount: 1,
+    correctItemCount: 1,
     accuracy: 50,
     attemptUsage: {
       maxAttempts: 2,
@@ -25721,6 +26129,7 @@ const studentRunnerAnonymousAttemptCopy = {
   ),
   title: 'Anonymous attempt',
 };
+verifyDomainAssertions(() => {
 assert.equal(
   JSON.stringify(studentRunnerAnonymousAttemptCopy).includes('browser-1'),
   false
@@ -25983,6 +26392,7 @@ assert.deepEqual(
     status: 'ready',
   }
 );
+});
 const expiredTimedStudentRunnerPageView = buildStudentRunnerPageViewModel({
   anonymousToken: 'browser-1',
   answers: {
@@ -26077,7 +26487,7 @@ function buildExpectedStudentRunnerPayloadSummaryView({
   itemCount: number;
   shareSlug: string;
   unansweredItemCount: number;
-}) {
+}): import('@/assignments/student-runner-state').StudentRunnerSubmissionPayloadSummaryView {
   return {
     ariaLabel: 'Submission check before sending',
     description: 'Check the assignment link and answer counts before you submit.',
@@ -26385,6 +26795,7 @@ function getExpectedStudentRunnerSubmitReadinessSubmissionDescription({
 
   return 'Submission is available for this loaded assignment.';
 }
+verifyDomainAssertions(() => {
 assert.deepEqual(
   buildStudentRunnerSubmissionPlan({
     anonymousToken: ' browser-token-1 ',
@@ -26490,6 +26901,7 @@ assert.deepEqual(
     type: 'message',
   }
 );
+});
 const pendingSubmitStudentRunnerPageView = buildStudentRunnerPageViewModel({
   anonymousToken: ' browser-token-1 ',
   answers: {
@@ -26506,6 +26918,7 @@ const pendingSubmitStudentRunnerPageView = buildStudentRunnerPageViewModel({
   shareId: ' share-public ',
   submittedAttemptCount: 0,
 });
+verifyDomainAssertions(() => {
 assert.equal(
   pendingSubmitStudentRunnerPageView.attemptControlState.submitDisabled,
   true
@@ -26583,6 +26996,7 @@ assert.deepEqual(
     type: 'message',
   }
 );
+});
 const confirmIncompleteStudentRunnerPageView = buildStudentRunnerPageViewModel({
   anonymousToken: ' browser-token-1 ',
   answers: {
@@ -26738,6 +27152,7 @@ const namedAnsweredStudentRunnerPageView = buildStudentRunnerPageViewModel({
   shareId: ' share-public ',
   submittedAttemptCount: 0,
 });
+verifyDomainAssertions(() => {
 assert.deepEqual(
   buildStudentRunnerSubmissionExecutionPlan({
     answers: {
@@ -26790,6 +27205,7 @@ assert.deepEqual(
     type: 'resolve',
   }
 );
+});
 const loadingStudentRunnerRouteState = buildStudentRunnerRouteState(
   buildStudentRunnerPageViewModel({
     answers: {},
@@ -26802,6 +27218,7 @@ const loadingStudentRunnerRouteState = buildStudentRunnerRouteState(
     submittedAttemptCount: 0,
   })
 );
+verifyDomainAssertions(() => {
 assert.deepEqual(
   {
     loadingMessage: loadingStudentRunnerRouteState.pageView.loadingView.message,
@@ -26832,6 +27249,7 @@ assert.deepEqual(
     unansweredLabel: undefined,
   }
 );
+});
 const missingStudentRunnerPageView = buildStudentRunnerPageViewModel({
   answers: {},
   attemptClock: undefined,
@@ -26846,6 +27264,7 @@ const missingStudentRunnerPageView = buildStudentRunnerPageViewModel({
   shareId: 'missing-share',
   submittedAttemptCount: 0,
 });
+verifyDomainAssertions(() => {
 assert.deepEqual(
   {
     message: missingStudentRunnerPageView.loadingView.message,
@@ -26855,12 +27274,14 @@ assert.deepEqual(
   }
 );
 assert.equal(missingStudentRunnerPageView.missingReason, 'closed');
+});
 const missingStudentRunnerRouteState = buildStudentRunnerRouteState(
   missingStudentRunnerPageView
 );
 if (missingStudentRunnerRouteState.status !== 'missing') {
   throw new Error('Expected student runner route state to be missing.');
 }
+verifyDomainAssertions(() => {
 assert.deepEqual(
   stripMissingPageAriaLabels(missingStudentRunnerPageView.missingView!),
   {
@@ -26967,6 +27388,7 @@ assert.deepEqual(
     status: 'missing',
   }
 );
+});
 const namedStudentRunnerPageView = buildStudentRunnerPageViewModel({
   answers: {},
   attemptClock: undefined,
@@ -27073,6 +27495,7 @@ const invalidAttemptUsageStudentRunnerPageView =
     shareId: 'demo-runner',
     submittedAttemptCount: 0,
   });
+verifyDomainAssertions(() => {
 assert.equal(
   invalidAttemptUsageStudentRunnerPageView.identityView?.mode ===
     'student-name'
@@ -27091,6 +27514,7 @@ assert.equal(
     : undefined,
   false
 );
+});
 const previousNamedStudentRunnerPageView = buildStudentRunnerPageViewModel({
   answers: {},
   attemptClock: undefined,
@@ -27117,6 +27541,7 @@ const submittingNamedStudentRunnerPageView = buildStudentRunnerPageViewModel({
   shareId: 'demo-runner',
   submittedAttemptCount: 0,
 });
+verifyDomainAssertions(() => {
 assert.equal(
   submittingNamedStudentRunnerPageView.identityView?.mode === 'student-name'
     ? submittingNamedStudentRunnerPageView.identityView.disabled
@@ -27393,6 +27818,7 @@ assert.deepEqual(buildStudentRunnerAttemptRestartPlan({ now: 98_765 }), {
   startedAt: 98_765,
   submissionKey: undefined,
 });
+});
 const studentRunnerSubmissionResponse = {
   attemptUsage: {
     maxAttempts: 3,
@@ -27431,6 +27857,7 @@ const studentRunnerSubmissionResponse = {
 } satisfies Parameters<
   typeof buildStudentRunnerSubmissionResultState
 >[0]['response'];
+verifyDomainAssertions(() => {
 assert.deepEqual(
   buildStudentRunnerSubmissionResultState({
     response: studentRunnerSubmissionResponse,
@@ -27538,6 +27965,7 @@ assert.deepEqual(
     executionPlan: {
       anonymousToken: 'browser-token-1',
       input: {
+        submissionKey: 'domain-fixture-submission',
         anonymousToken: 'browser-token-1',
         answers: [
           {
@@ -27583,6 +28011,7 @@ assert.equal(
     executionPlan: {
       anonymousToken: undefined,
       input: {
+        submissionKey: 'domain-fixture-submission',
         answers: [],
         durationSeconds: 25,
         shareSlug: 'share-public',
@@ -27618,6 +28047,7 @@ assert.equal(
     executionPlan: {
       anonymousToken: undefined,
       input: {
+        submissionKey: 'domain-fixture-submission',
         answers: [],
         durationSeconds: 25,
         shareSlug: 'share-public',
@@ -27653,6 +28083,7 @@ assert.equal(
     executionPlan: {
       anonymousToken: undefined,
       input: {
+        submissionKey: 'domain-fixture-submission',
         answers: [],
         durationSeconds: 25,
         shareSlug: 'share-public',
@@ -27985,6 +28416,7 @@ assert.deepEqual(
     title: 'Public assignment',
   }
 );
+});
 const publicReviewMap = buildPublicAttemptReviewItemMap([
   {
     acceptedAnswers: ['Paris', 'Paris, France'],
@@ -28004,23 +28436,26 @@ const publicReviewMap = buildPublicAttemptReviewItemMap([
     submittedAnswer: 'Warm',
   },
 ]);
+verifyDomainAssertions(() => {
 assert.equal(publicReviewMap.get('q-1')?.correctAnswer, 'Paris');
 assert.equal(publicReviewMap.get('pair-1')?.correct, false);
 assert.equal(publicReviewMap.get('missing'), undefined);
 assert.equal(buildPublicAttemptReviewItemMap(undefined).size, 0);
+});
 const publicAttemptResultWithPrivateFields = buildPublicAttemptResult({
   accuracy: 50,
   completedItemCount: 1,
   correctItemCount: 1,
   durationSeconds: 80,
   earnedPoints: 1,
-  rawAnswers: [{ answer: 'Paris', itemId: 'q-1' }],
-  scorerTraceId: 'teacher-only-trace',
+  ...{ rawAnswers: [{ answer: 'Paris', itemId: 'q-1' }] },
+  ...{ scorerTraceId: 'teacher-only-trace' },
   totalPoints: 2,
 } satisfies AttemptResult & {
   rawAnswers: Array<{ answer: string; itemId: string }>;
   scorerTraceId: string;
 });
+verifyDomainAssertions(() => {
 assert.deepEqual(Object.keys(publicAttemptResultWithPrivateFields).sort(), [
   'accuracy',
   'completedItemCount',
@@ -28108,19 +28543,20 @@ assert.equal(
   }).durationSeconds,
   undefined
 );
+});
 const studentRunnerView = buildStudentRunnerView({
   answers: { 'pair-1': 'Cold', 'q-1': 'Paris' },
   items: [
     {
       choices: ['Paris', 'Lyon'],
       id: 'q-1',
-      kind: 'question',
+      kind: 'question' as const,
       prompt: 'Capital of France?',
     },
     {
       choices: ['Cold', 'Warm'],
       id: 'pair-1',
-      kind: 'pair',
+      kind: 'pair' as const,
       prompt: 'Hot',
     },
     {
@@ -28133,6 +28569,7 @@ const studentRunnerView = buildStudentRunnerView({
   progressVerb: 'matched',
   reviewItems: [...publicReviewMap.values()],
 });
+verifyDomainAssertions(() => {
 assert.equal(studentRunnerView.progressLabel, '2/3 matched');
 assert.deepEqual(studentRunnerView.choices, [
   'Paris',
@@ -28164,6 +28601,7 @@ assert.equal(
 );
 assert.equal(studentRunnerView.itemViewsById.get('pair-1')?.kindLabel, 'Pair');
 assert.equal(studentRunnerView.itemViewsById.get('pair-2')?.answered, false);
+});
 const normalizedPublicReviewMap = buildPublicAttemptReviewItemMap([
   {
     acceptedAnswers: ['Paris'],
@@ -28174,6 +28612,7 @@ const normalizedPublicReviewMap = buildPublicAttemptReviewItemMap([
     submittedAnswer: 'Paris',
   },
 ]);
+verifyDomainAssertions(() => {
 assert.equal(
   normalizedPublicReviewMap.get('messy-q-1')?.correctAnswer,
   'Paris'
@@ -28201,6 +28640,7 @@ assert.deepEqual(
     },
   ]
 );
+});
 const runtimeScopedStudentRunnerView = buildStudentRunnerView({
   answers: {
     'legacy-item': 'Paris',
@@ -28209,11 +28649,13 @@ const runtimeScopedStudentRunnerView = buildStudentRunnerView({
   items: studentRunnerView.itemViews.map((itemView) => itemView.item),
   progressVerb: 'matched',
 });
+verifyDomainAssertions(() => {
 assert.equal(runtimeScopedStudentRunnerView.progressLabel, '0/3 matched');
 assert.deepEqual(runtimeScopedStudentRunnerView.normalizedAnswers, {
   'pair-1': '',
   'pair-2': '',
   'q-1': '',
+});
 });
 const choicePairingRunnerView = buildChoicePairingRunnerView({
   answers: { 'pair-1': 'Cold', 'q-1': 'Paris' },
@@ -28223,6 +28665,7 @@ const choicePairingRunnerView = buildChoicePairingRunnerView({
   reviewItems: [...publicReviewMap.values()],
   selectedItemId: 'pair-2',
 });
+verifyDomainAssertions(() => {
 assert.equal(choicePairingRunnerView.progressLabel, '2/3 matched');
 assert.deepEqual(
   choicePairingRunnerView.promptItemViews.map((itemView) => [
@@ -28321,6 +28764,7 @@ assert.equal(
     ?.usedByItemId,
   undefined
 );
+});
 const groupSortRunnerView = buildStudentRunnerView({
   answers: {
     'group-drink-water': 'drink',
@@ -28330,7 +28774,7 @@ const groupSortRunnerView = buildStudentRunnerView({
     {
       choices: ['Fruit', 'Drink'],
       id: 'group-fruit-apple',
-      kind: 'group-item',
+      kind: 'group-item' as const,
       prompt: 'Apple',
     },
     {
@@ -28348,6 +28792,7 @@ const groupSortRunnerView = buildStudentRunnerView({
   ],
   progressVerb: 'sorted',
 });
+verifyDomainAssertions(() => {
 assert.equal(groupSortRunnerView.progressLabel, '2/3 sorted');
 assert.deepEqual(groupSortRunnerView.choices, ['Fruit', 'Drink']);
 assert.deepEqual(
@@ -28362,6 +28807,7 @@ assert.deepEqual(
     .map((itemView) => itemView.item.id),
   ['group-drink-water']
 );
+});
 const groupSortBoardView = buildGroupSortRunnerView({
   answers: {
     'group-drink-water': 'drink',
@@ -28371,6 +28817,7 @@ const groupSortBoardView = buildGroupSortRunnerView({
   progressVerb: 'sorted',
   selectedItemId: 'group-fruit-pear',
 });
+verifyDomainAssertions(() => {
 assert.equal(groupSortBoardView.selectedItem?.id, 'group-fruit-pear');
 assert.deepEqual(groupSortBoardView.selectedClearAction, {
   type: 'clear-selected',
@@ -28653,6 +29100,7 @@ assert.equal(
   }),
   undefined
 );
+});
 const reviewedGroupSortBoardView = buildGroupSortRunnerView({
   answers: {
     'group-drink-water': 'drink',
@@ -28680,6 +29128,7 @@ const reviewedGroupSortBoardView = buildGroupSortRunnerView({
   ],
   selectedItemId: 'group-fruit-pear',
 });
+verifyDomainAssertions(() => {
 assert.deepEqual(
   reviewedGroupSortBoardView.groupViews.map(({ group, placedItemViews }) => [
     group,
@@ -28869,6 +29318,7 @@ assert.deepEqual(
     },
   ]
 );
+});
 const partialPublicReviewItems = buildPublicAttemptReviewItems({
   answers: [{ answer: 'Paris', correct: true, itemId: 'q-1' }],
   runtimeItems: [
@@ -28876,19 +29326,20 @@ const partialPublicReviewItems = buildPublicAttemptReviewItems({
       answer: 'Paris / Paris, France',
       explanation: 'Paris is the capital of France.',
       id: 'q-1',
-      kind: 'question',
+      kind: 'question' as const,
       prompt: 'Capital of France?',
     },
     {
       answer: 'Cold',
       choices: ['Cold', 'Warm'],
       id: 'pair-1',
-      kind: 'pair',
+      kind: 'pair' as const,
       prompt: 'Hot',
     },
   ],
   showCorrectAnswers: true,
 });
+verifyDomainAssertions(() => {
 assert.deepEqual(
   buildPublicAttemptReviewSummaryView({
     answers: [{ answer: 'Paris', correct: true, itemId: 'q-1' }],
@@ -28941,14 +29392,15 @@ assert.deepEqual(partialPublicReviewItems, [
     submittedAnswer: '',
   },
 ]);
+});
 const publicReviewItemsWithPrivateFields = buildPublicAttemptReviewItems({
   answers: [
     {
       answer: 'Paris',
       correct: true,
       itemId: 'q-private-review',
-      reviewerNotes: 'teacher-only note',
-      storageKey: 'teacher-only/answer',
+      ...{ reviewerNotes: 'teacher-only note' },
+      ...{ storageKey: 'teacher-only/answer' },
     } satisfies AttemptAnswer & {
       reviewerNotes: string;
       storageKey: string;
@@ -28956,14 +29408,14 @@ const publicReviewItemsWithPrivateFields = buildPublicAttemptReviewItems({
   ],
   runtimeItems: [
     {
-      acceptedAnswers: ['Paris', 'Paris, France'],
+      ...{ acceptedAnswers: ['Paris', 'Paris, France'] },
       answer: 'Paris / Paris, France',
       explanation: 'Paris is the capital of France.',
       id: 'q-private-review',
-      kind: 'question',
+      kind: 'question' as const,
       prompt: 'Capital of France?',
-      sourceMaterials: [listeningMaterialReference],
-      storageKey: 'teacher-only/runtime',
+      ...{ sourceMaterials: [listeningMaterialReference] },
+      ...{ storageKey: 'teacher-only/runtime' },
     } satisfies RuntimeItem & {
       acceptedAnswers: string[];
       sourceMaterials: unknown[];
@@ -28972,6 +29424,7 @@ const publicReviewItemsWithPrivateFields = buildPublicAttemptReviewItems({
   ],
   showCorrectAnswers: true,
 });
+verifyDomainAssertions(() => {
 assert.deepEqual(Object.keys(publicReviewItemsWithPrivateFields[0]!).sort(), [
   'acceptedAnswers',
   'correct',
@@ -29040,6 +29493,7 @@ assert.equal(
   }).itemViewsById.get('pair-1')?.reviewItem?.submitted,
   false
 );
+});
 const publicRuntimeItem = stripRuntimeAnswer({
   answer: 'Paris',
   choices: ['Paris', 'Rome'],
@@ -29048,6 +29502,7 @@ const publicRuntimeItem = stripRuntimeAnswer({
   kind: 'question',
   prompt: 'Capital of France?',
 });
+verifyDomainAssertions(() => {
 assert.deepEqual(publicRuntimeItem, {
   choices: ['Paris', 'Rome'],
   id: 'q-1',
@@ -29056,21 +29511,23 @@ assert.deepEqual(publicRuntimeItem, {
 });
 assert.equal('answer' in publicRuntimeItem, false);
 assert.equal('explanation' in publicRuntimeItem, false);
+});
 const publicRuntimeItemWithPrivateFields = stripRuntimeAnswer({
-  acceptedAnswers: ['Paris', 'Paris, France'],
+  ...{ acceptedAnswers: ['Paris', 'Paris, France'] },
   answer: 'Paris',
   choices: ['Paris', 'Rome'],
   explanation: 'Paris is the capital of France.',
   id: 'q-private',
   kind: 'question',
   prompt: 'Capital of France?',
-  sourceMaterials: [listeningMaterialReference],
-  storageKey: 'teacher-only/key',
+  ...{ sourceMaterials: [listeningMaterialReference] },
+  ...{ storageKey: 'teacher-only/key' },
 } satisfies RuntimeItem & {
   acceptedAnswers: string[];
   sourceMaterials: unknown[];
   storageKey: string;
 });
+verifyDomainAssertions(() => {
 assert.deepEqual(Object.keys(publicRuntimeItemWithPrivateFields).sort(), [
   'choices',
   'id',
@@ -29080,6 +29537,7 @@ assert.deepEqual(Object.keys(publicRuntimeItemWithPrivateFields).sort(), [
 assert.equal('acceptedAnswers' in publicRuntimeItemWithPrivateFields, false);
 assert.equal('sourceMaterials' in publicRuntimeItemWithPrivateFields, false);
 assert.equal('storageKey' in publicRuntimeItemWithPrivateFields, false);
+});
 const runtimeChoiceSource = ['Paris', 'Rome'];
 const clonedPublicRuntimeItem = stripRuntimeAnswer({
   answer: 'Paris',
@@ -29090,6 +29548,7 @@ const clonedPublicRuntimeItem = stripRuntimeAnswer({
 });
 assert.notStrictEqual(clonedPublicRuntimeItem.choices, runtimeChoiceSource);
 runtimeChoiceSource.push('Lyon');
+verifyDomainAssertions(() => {
 assert.deepEqual(clonedPublicRuntimeItem.choices, ['Paris', 'Rome']);
 assert.deepEqual(
   stripRuntimeAnswers([
@@ -29097,7 +29556,7 @@ assert.deepEqual(
       answer: 'Paris',
       explanation: 'Paris is the capital of France.',
       id: 'q-1',
-      kind: 'question',
+      kind: 'question' as const,
       prompt: 'Capital of France?',
     },
   ]),
@@ -29105,11 +29564,12 @@ assert.deepEqual(
     {
       choices: undefined,
       id: 'q-1',
-      kind: 'question',
+      kind: 'question' as const,
       prompt: 'Capital of France?',
     },
   ]
 );
+});
 const createdActivities = [
   {
     id: 'activity-1',
@@ -29124,6 +29584,7 @@ const createdActivities = [
     visibility: 'private',
   },
 ] as const;
+verifyDomainAssertions(() => {
 assert.deepEqual(
   findCreatedActivityInList({
     activityId: 'activity-2',
@@ -29138,6 +29599,7 @@ assert.equal(
   }),
   undefined
 );
+});
 const createdActivityFromLookup = {
   id: 'activity-3',
   templateType: 'line-match',
@@ -29180,6 +29642,7 @@ const restoreActivityReadyStatus =
   buildExpectedActivityLibraryReadyActionStatus('Restore');
 const remixActivityReadyStatus =
   buildExpectedActivityLibraryReadyActionStatus('Remix');
+verifyDomainAssertions(() => {
 assert.deepEqual(
   resolveCreatedActivityPanelActivity({
     activity: createdActivityFromLookup,
@@ -29685,11 +30148,13 @@ assert.equal(getActivityLibraryTotalPages({ pageSize: 0, total: 31 }), 3);
 assert.equal(getActivityLibraryTotalPages({ pageSize: 12, total: 0 }), 1);
 assert.equal(getActivityLibraryTotalPages({ pageSize: 12, total: -3 }), 1);
 assert.equal(getActivityLibraryTotalPages({ pageSize: 12, total: 12.9 }), 1);
+});
 const activityLibraryPageItems = [
   { id: 'oldest', updatedAt: new Date('2026-01-01T00:00:00.000Z') },
   { id: 'newest', updatedAt: new Date('2026-01-03T00:00:00.000Z') },
   { id: 'middle', updatedAt: new Date('2026-01-02T00:00:00.000Z') },
 ];
+verifyDomainAssertions(() => {
 assert.deepEqual(
   getActivityLibraryPageItems({
     items: activityLibraryPageItems,
@@ -29731,6 +30196,7 @@ assert.deepEqual(
   activityLibraryPageItems.map((item) => item.id),
   ['oldest', 'newest', 'middle']
 );
+});
 const sourceMaterialFilterBaseContent = buildActivityContent({
   description: 'Source filter fixture',
   difficulty: 'starter',
@@ -29764,6 +30230,7 @@ const sourceMaterialFilterContent = {
     },
   ],
 };
+verifyDomainAssertions(() => {
 assert.equal(
   matchesActivitySourceMaterialFilter({
     content: sourceMaterialFilterContent,
@@ -29813,10 +30280,12 @@ assert.equal(
   }),
   false
 );
+});
 const activityLibrarySourceItems = [
   { contentJson: sourceMaterialFilterContent, id: 'with-sources' },
   { contentJson: sourceMaterialFilterBaseContent, id: 'without-sources' },
 ];
+verifyDomainAssertions(() => {
 assert.deepEqual(
   filterActivityLibrarySourceItems({
     items: activityLibrarySourceItems,
@@ -29845,10 +30314,12 @@ assert.throws(
   () => assertActivityCanRestore('draft'),
   /Only archived activities can be restored\./
 );
+});
 const activityValidationSource = readFileSync(
   'src/activities/validation.ts',
   'utf8'
 );
+verifyDomainAssertions(() => {
 assert.match(
   activityValidationSource,
   /activityDifficultySchema = z\.enum\(ACTIVITY_DIFFICULTIES\)/,
@@ -29929,10 +30400,12 @@ assert.doesNotMatch(
   /throw new Error\(remixOption\.diagnosis\)/,
   'Activity validation should not throw raw template remix diagnostic strings.'
 );
+});
 const activityStableIdSource = readFileSync(
   'src/activities/stable-id.ts',
   'utf8'
 );
+verifyDomainAssertions(() => {
 assert.match(
   activityStableIdSource,
   /ACTIVITY_STABLE_ID_LENGTH[\s\S]*max: 40/,
@@ -29958,6 +30431,7 @@ assert.doesNotMatch(
   /slice\(0, 40\)/,
   'Activity stable id generation should not keep a local maximum length.'
 );
+});
 const activitiesApiSource = readFileSync('src/api/activities.ts', 'utf8');
 const getActivityApiSource = getSourceSlice(
   activitiesApiSource,
@@ -30001,6 +30475,7 @@ const activityPersistenceSource = readFileSync(
   'src/activities/persistence.ts',
   'utf8'
 );
+verifyDomainAssertions(() => {
 assert.match(
   activityLibraryQuerySource,
   /sqlLikeContains\(activity\.title, normalizedSearch\)/,
@@ -30132,10 +30607,12 @@ assert.doesNotMatch(
   /status: data\.status/,
   'Activity status-summary query should omit the current status filter so the status switch can show both active and archived matching counts.'
 );
+});
 const activityLibrarySummaryDomainSource = readFileSync(
   'src/activities/library-summary.ts',
   'utf8'
 );
+verifyDomainAssertions(() => {
 assert.match(
   activityLibrarySummaryDomainSource,
   /buildEmptyActivityLibrarySummary\(totalActivities\)/,
@@ -30484,6 +30961,7 @@ assert.match(
   /buildActivityVisibilityUpdateSet[\s\S]*updatedAt,[\s\S]*visibility: nextVisibility[\s\S]*buildDuplicatedActivityInsert[\s\S]*contentJson: cloneActivityContentForDerivative\(sourceActivity\.contentJson\)[\s\S]*visibility: 'draft'[\s\S]*buildRemixedActivityInsert[\s\S]*contentJson: cloneActivityContentForDerivative\(sourceActivity\.contentJson\)[\s\S]*visibility: 'draft'/,
   'Lifecycle visibility updates should avoid content mutation while derivative inserts clone content into drafts.'
 );
+});
 const activityLifecycleGovernanceCardSource = readFileSync(
   'src/components/activities/activity-library-card.tsx',
   'utf8'
@@ -30492,6 +30970,7 @@ const activityLifecycleGovernanceCreatedPanelSource = readFileSync(
   'src/components/activities/created-activity-panel.tsx',
   'utf8'
 );
+verifyDomainAssertions(() => {
 assert.match(
   activityLifecycleGovernanceCardSource,
   /buildActivityDerivativeActionExecutionPlan[\s\S]*buildActivityVisibilityActionExecutionPlan[\s\S]*openPublishDialog\(\)[\s\S]*buildAssignmentPublishDialogAccessView\(activity\.status\)/,
@@ -30507,7 +30986,9 @@ assert.match(
   /Activity lifecycle governance chain has a fast script-level gate via[\s\S]*scripts\/activity-lifecycle-governance-chain\.test\.ts[\s\S]*owner-scoped archive and restore[\s\S]*edit, publish, duplicate, and remix gates[\s\S]*server lifecycle enforcement[\s\S]*content and source-material retention[\s\S]*assignment snapshot protection[\s\S]*public assignment continuity/,
   'E2E catalog should document the activity lifecycle governance chain gate.'
 );
+});
 const useActivitiesSource = readFileSync('src/hooks/use-activities.ts', 'utf8');
+verifyDomainAssertions(() => {
 assert.match(
   useActivitiesSource,
   /pageSize = ACTIVITY_LIBRARY_PAGE_SIZE/,
@@ -30523,6 +31004,7 @@ assert.match(
   /queryKey: activitiesKeys\.list\({[\s\S]*source,[\s\S]*}\)/,
   'useActivities query key should include the source-material filter.'
 );
+});
 const dashboardActivitiesRouteSource = readFileSync(
   'src/routes/dashboard/activities.tsx',
   'utf8'
@@ -30555,6 +31037,7 @@ const createdActivityPanelComponentSource = readFileSync(
   'src/components/activities/created-activity-panel.tsx',
   'utf8'
 );
+verifyDomainAssertions(() => {
 assert.match(
   dashboardActivitiesRouteSource,
   /const \{ created, createdFrom, page, q, source, status, template \} =\s*Route\.useSearch\(\)/,
@@ -31247,6 +31730,7 @@ assert.doesNotMatch(
   /const ACTIVITY_LIBRARY_PAGE_SIZE = 12/,
   'Activity dashboard route should not maintain a local page-size constant.'
 );
+});
 const assignmentsApiSource = readFileSync('src/api/assignments.ts', 'utf8');
 const attemptAnswersSource = readFileSync(
   'src/assignments/attempt-answers.ts',
@@ -31309,6 +31793,7 @@ const assignmentListApiSource = getSourceSlice(
   'export const listAssignments',
   'export const publishAssignment'
 );
+verifyDomainAssertions(() => {
 assert.match(
   assignmentsApiSource,
   /default\(ASSIGNMENT_LIST_PAGE_SIZE\)/,
@@ -31449,10 +31934,12 @@ assert.match(
   /const itemAttempts =[\s\S]*\.select\(buildAssignmentAttemptStatsByAssignmentSelect\(\)\)[\s\S]*\.innerJoin\(assignment, buildAttemptAssignmentJoin\(\)\)[\s\S]*buildScoredAttemptWhere\([\s\S]*buildAssignmentAttemptsInWhere\(\{[\s\S]*assignmentIds: itemAssignmentIds/,
   'Assignment list card stats should only read completed attempts with scored results.'
 );
+});
 const assignmentLifecycleQuerySource = readFileSync(
   'src/assignments/lifecycle-query.ts',
   'utf8'
 );
+verifyDomainAssertions(() => {
 assert.match(
   assignmentListQuerySource,
   /buildAssignmentLifecycleStatusFilter\(\{[\s\S]*now,[\s\S]*status,[\s\S]*\}\)/,
@@ -31683,10 +32170,12 @@ assert.doesNotMatch(
   /\.max\(24 \* 60 \* 60\)/,
   'Submit attempt API should not keep a local duration upper bound.'
 );
+});
 const useAssignmentsSource = readFileSync(
   'src/hooks/use-assignments.ts',
   'utf8'
 );
+verifyDomainAssertions(() => {
 assert.match(
   useAssignmentsSource,
   /pageSize = ASSIGNMENT_LIST_PAGE_SIZE/,
@@ -32469,10 +32958,12 @@ assert.match(
   /export const getPrintableAssignmentWorksheet[\s\S]*includeAnswerKey: data\.includeAnswerKey/,
   'Printable worksheet API should pass the explicit answer-key choice into the worksheet builder.'
 );
+});
 const assignmentsPublicSource = readFileSync(
   'src/assignments/public.ts',
   'utf8'
 );
+verifyDomainAssertions(() => {
 assert.match(
   assignmentsPublicSource,
   /buildPublicAssignmentPayload[\s\S]*resolveAssignmentRuntimeSource\(\{[\s\S]*runtimeItems = resolvedSource\.runtimeItems/,
@@ -32517,7 +33008,9 @@ assert.doesNotMatch(
   /isNotNull\(attempt\.resultJson\)|desc\(assignment\.updatedAt\)|desc\(attempt\.completedAt\)|inArray\(attempt\.assignmentId, itemAssignmentIds\)|settingsJson: assignment\.settingsJson|answersJson: attempt\.answersJson|resultJson: attempt\.resultJson|eq\(attempt\.assignmentId, assignment\.id\)/,
   'Assignment API should not hand-write scored-attempt filters, ordering, stats/results selects, or attempt assignment joins.'
 );
+});
 const activityAiApiSource = readFileSync('src/api/activity-ai.ts', 'utf8');
+verifyDomainAssertions(() => {
 assert.match(
   activityAiApiSource,
   /generateActivityDraftFromAi\(data\)/,
@@ -32528,10 +33021,12 @@ assert.doesNotMatch(
   /getDb|db\.|insert\(activity\)|from\(activity\)|@\/db/,
   'AI draft server function should not write directly to the activity database.'
 );
+});
 const activityDraftSourceSource = readFileSync(
   'src/activities/draft-source.ts',
   'utf8'
 );
+verifyDomainAssertions(() => {
 assert.match(
   activityDraftSourceSource,
   /type ActivitySourceMaterialDraftKindCounts = Partial<[\s\S]*Record<ActivityMaterialReference\['kind'\], number>[\s\S]*export type ActivitySourceMaterialDraftSafetySummary = \{[\s\S]*inputCount: number;[\s\S]*omittedCount: number;[\s\S]*safeCount: number;[\s\S]*type ActivitySourceMaterialDraftSummary[\s\S]*kindCounts: ActivitySourceMaterialDraftKindCounts[\s\S]*noteViews[\s\S]*notesText[\s\S]*safety: ActivitySourceMaterialDraftSafetySummary[\s\S]*totalCount/,
@@ -32667,10 +33162,12 @@ assert.doesNotMatch(
   /toLocaleLowerCase\(/,
   'AI draft meta source material dedupe should not depend on locale-sensitive lower-casing.'
 );
+});
 const assignmentValidationSource = readFileSync(
   'src/assignments/validation.ts',
   'utf8'
 );
+verifyDomainAssertions(() => {
 assert.match(
   assignmentValidationSource,
   /status: z\.enum\(ASSIGNMENT_MANAGED_STATUSES\)/,
@@ -32716,6 +33213,7 @@ assert.doesNotMatch(
   /\.max\(500\)|\.min\(3\)\.max\(120\)/,
   'Assignment publish validation should not keep local title or instructions limits.'
 );
+});
 const activityAiDraftSource = readFileSync(
   'src/activities/ai-draft.ts',
   'utf8'
@@ -32724,6 +33222,7 @@ const activityAiDraftFocusSource = readFileSync(
   'src/activities/ai-draft-focus.ts',
   'utf8'
 );
+verifyDomainAssertions(() => {
 assert.match(
   activityAiDraftSource,
   /function createActivityDraftResult[\s\S]*activity,[\s\S]*meta: buildActivityDraftMeta\(\{[\s\S]*currentTemplateType: input\.templateType/,
@@ -32731,7 +33230,7 @@ assert.match(
 );
 assert.match(
   activityAiDraftSource,
-  /type ActivityDraftResult = \{[\s\S]*activity: CreateActivityInput;[\s\S]*draftFocus: ActivityAiDraftFocus;[\s\S]*meta: ActivityDraftMeta;[\s\S]*provider: 'fallback' \| 'workers-ai';/,
+  /type ActivityDraftResult = \{[\s\S]*activity: DraftActivity;[\s\S]*draftFocus: ActivityAiDraftFocus;[\s\S]*meta: ActivityDraftMeta;[\s\S]*provider: 'fallback' \| 'workers-ai';/,
   'AI draft result contract should expose editor input, draft focus, meta, provider, and model provenance.'
 );
 assert.match(
@@ -32796,7 +33295,7 @@ assert.match(
 );
 assert.match(
   activityAiDraftSource,
-  /toEditorQuestionInput\(question: AiActivityDraftQuestion\)[\s\S]*fallback: AiActivityDraftGroupList;[\s\S]*primary: AiActivityDraftGroupList \| undefined;[\s\S]*const groups: AiActivityDraftGroupList = \[\];[\s\S]*addGroup = \(group: AiActivityDraftGroup\)[\s\S]*countAiDraftGroupItems\(groups: AiActivityDraftGroupList\)[\s\S]*limitAiDraftGroupsToItemCount\(\s*groups: AiActivityDraftGroupList,/,
+  /toEditorQuestionInput\(question: EditorDraftQuestion\)[\s\S]*fallback: AiActivityDraftGroupList;[\s\S]*primary: AiActivityDraftGroupList \| undefined;[\s\S]*const groups: AiActivityDraftGroupList = \[\];[\s\S]*addGroup = \(group: AiActivityDraftGroup\)[\s\S]*countAiDraftGroupItems\(groups: AiActivityDraftGroupList\)[\s\S]*limitAiDraftGroupsToItemCount\(\s*groups: AiActivityDraftGroupList,/,
   'AI draft editor shaping, group completion, counting, and template limiting should compose explicit child contracts.'
 );
 assert.match(
@@ -32806,7 +33305,7 @@ assert.match(
 );
 assert.match(
   activityAiDraftSource,
-  /toEditorQuestionInput\(question: AiActivityDraftQuestion\)[\s\S]*buildAiDraftQuestionOptionViews[\s\S]*buildAiDraftQuestionOptions[\s\S]*buildFallbackQuestions/,
+  /toEditorQuestionInput\(question: EditorDraftQuestion\)[\s\S]*buildAiDraftQuestionOptionViews[\s\S]*buildAiDraftQuestionOptions[\s\S]*buildFallbackQuestions/,
   'AI draft editor and fallback question options should use the shared stable option-id helper.'
 );
 assert.doesNotMatch(
@@ -32981,6 +33480,7 @@ assert.doesNotMatch(
   /async function countPreviousIdentityAttempts|resolveAttemptIdentityCountStrategy|countMatchingStudentIdentityAttempts/,
   'Assignment API should not keep local attempt identity count strategy or matching rules.'
 );
+});
 const useAssignmentsHookSource = readFileSync(
   'src/hooks/use-assignments.ts',
   'utf8'
@@ -32991,6 +33491,7 @@ const printableAssignmentWorksheetHookSource = useAssignmentsHookSource.slice(
   ),
   useAssignmentsHookSource.indexOf('export function usePublishAssignment')
 );
+verifyDomainAssertions(() => {
 assert.match(
   useAssignmentsHookSource,
   /export function usePrintableAssignmentWorksheet/,
@@ -33001,6 +33502,7 @@ assert.match(
   /queryFn: \(\) =>[\s\S]*getPrintableAssignmentWorksheet\(\{[\s\S]*data: \{ assignmentId, includeAnswerKey \}/,
   'Printable worksheet hook should call the owner-scoped printable worksheet server function.'
 );
+});
 const printableWorksheetQueryKeyIndex =
   printableAssignmentWorksheetHookSource.indexOf('queryKey: [');
 const printableWorksheetDetailKeyIndex =
@@ -33033,6 +33535,7 @@ const printableWorksheetSource = readFileSync(
   'src/assignments/printable-worksheet.ts',
   'utf8'
 );
+verifyDomainAssertions(() => {
 assert.match(
   printableWorksheetSource,
   /PRINTABLE_WORKSHEET_RESPONSE_POLICIES[\s\S]*satisfies Record<[\s\S]*ActivityTemplateRunnerKind,[\s\S]*PrintableWorksheetResponsePolicy/,
@@ -33483,6 +33986,7 @@ assert.match(
   /buildPrintableWorksheetChoiceBankChoiceView[\s\S]*PrintableWorksheetChoiceBankChoiceView[\s\S]*buildPrintableWorksheetSemanticAriaLabel[\s\S]*description,[\s\S]*label: choiceLabel,[\s\S]*value: choice/,
   'Printable worksheet choice-bank choices should carry prepared semantic aria labels from the domain view.'
 );
+});
 const printableAssignmentRouteSource = readFileSync(
   'src/routes/print/assignments/$assignmentId.tsx',
   'utf8'
@@ -33515,6 +34019,7 @@ const printableWorksheetPreparationSummarySource = readFileSync(
   'src/components/assignments/printable-worksheet-preparation-summary.tsx',
   'utf8'
 );
+verifyDomainAssertions(() => {
 assert.match(
   printableWorksheetAnswerKeySource,
   /itemView\.headingLabel/,
@@ -33960,7 +34465,9 @@ assert.match(
   /to=\{printAction\.to\}[\s\S]*assignmentId: printAction\.assignmentId/,
   'Assignment results header actions should expose the prepared printable worksheet teacher action.'
 );
+});
 const rootRouteSource = readFileSync('src/routes/__root.tsx', 'utf8');
+verifyDomainAssertions(() => {
 assert.match(
   rootRouteSource,
   /canonicalPathname\.startsWith\('\/print'\)/,
@@ -34011,9 +34518,11 @@ assert.doesNotMatch(
   /classroom-control-semantics|ClassroomControlSemanticsHandoffMount/,
   'Public marketing, template, worksheet, and pricing routes should not render classroom control semantics directly.'
 );
+});
 const activityTemplates = getActivityTemplates();
 const activityTypesSource = readFileSync('src/activities/types.ts', 'utf8');
 const activityCatalogSource = readFileSync('src/activities/catalog.ts', 'utf8');
+verifyDomainAssertions(() => {
 assert.deepEqual(
   activityTemplates.map((template) => template.type),
   ACTIVITY_TEMPLATE_TYPES
@@ -34049,13 +34558,16 @@ assert.deepEqual(
 assert.equal(formatActivityTemplateClassroomMode('individual'), 'Individual');
 assert.equal(formatActivityTemplateClassroomMode('small-group'), 'Small group');
 assert.equal(formatActivityTemplateClassroomMode('whole-class'), 'Whole class');
+});
 const starterActivities = getStarterActivities();
 const starterAssignments = getStarterAssignments();
+verifyDomainAssertions(() => {
 assert.equal(starterActivities[0]?.title, 'Food words quick check');
 assert.equal(starterAssignments[0]?.title, 'Food words homework');
 assert.equal(starterAssignments[0]?.shareId, STARTER_FOOD_ASSIGNMENT_SHARE_ID);
 assert.equal(getStarterActivities()[0]?.title, 'Food words quick check');
 assert.equal(getStarterAssignments()[0]?.title, 'Food words homework');
+});
 overwriteGetLocale(() => 'zh');
 try {
   const localizedStarterActivities = getStarterActivities();
@@ -34084,6 +34596,7 @@ try {
 } finally {
   overwriteGetLocale(() => 'en');
 }
+verifyDomainAssertions(() => {
 assert.deepEqual(buildTemplateCreateSearch('line-match'), {
   template: 'line-match',
 });
@@ -34096,6 +34609,7 @@ assert.deepEqual(
     to: Routes.Create,
   }))
 );
+});
 const homePageStarterPreview = buildHomePageStarterPreview();
 assert.deepEqual(
   {
@@ -34115,6 +34629,7 @@ const homePageView = buildHomePageViewModel({
   preview: homePageStarterPreview,
 });
 const homePageVisibleView = homePageView;
+verifyDomainAssertions(() => {
 assert.deepEqual(homePageVisibleView, {
   features: [
     {
@@ -34224,8 +34739,10 @@ assert.deepEqual(homePageVisibleView, {
   ],
 });
 assert.equal(buildHomePageViewModel().preview.source, 'starter-preview');
+});
 const contactPageView = buildContactPageViewModel();
 const classroomContactPageView = buildContactPageViewModel('classroom');
+verifyDomainAssertions(() => {
 assert.deepEqual(
   contactPageView.topics.map((topic) => [
     topic.id,
@@ -34389,9 +34906,11 @@ assert.deepEqual(
     { id: 'routine', value: 'Two lessons per week' },
   ]
 );
+});
 const longClassroomNeed = 'x'.repeat(
   CONTACT_CLASSROOM_INQUIRY_FIELD_LIMITS.need + 10
 );
+verifyDomainAssertions(() => {
 assert.equal(
   buildContactClassroomInquiryPayload({ need: longClassroomNeed }).fields[0]
     ?.value.length,
@@ -34446,12 +34965,14 @@ assert.match(
   buildContactClassroomInquiryScopeView().privacyBoundary.description,
   /storage keys, private file URLs, raw student identifiers/
 );
+});
 overwriteGetLocale(() => 'zh');
 try {
 } finally {
   overwriteGetLocale(() => 'en');
 }
 const pricingPageView = buildPricingPageViewModel();
+verifyDomainAssertions(() => {
 assert.deepEqual(pricingPageView.hero, {
   eyebrow: 'ClassGamify plans',
   subtitle:
@@ -34587,7 +35108,9 @@ assert.deepEqual(getBlogCtaActions(), [
     variant: 'outline',
   },
 ]);
+});
 const blogListPageView = buildBlogListPageViewModel();
+verifyDomainAssertions(() => {
 assert.equal(blogListPageView.eyebrow, 'Classroom activities');
 assert.equal(blogListPageView.seoTitle, 'Classroom Activity Resources');
 assert.match(
@@ -34598,12 +35121,15 @@ assert.deepEqual(
   blogListPageView.ctaActions.map((action) => action.id),
   ['create', 'templates', 'preview']
 );
+});
 const blogPostCtaView = buildBlogPostCtaViewModel();
+verifyDomainAssertions(() => {
 assert.match(blogPostCtaView.title, /next activity/);
 assert.deepEqual(
   blogPostCtaView.actions.map((action) => action.id),
   ['create', 'templates', 'preview']
 );
+});
 overwriteGetLocale(() => 'zh');
 try {
   const zhBlogListPageView = buildBlogListPageViewModel();
@@ -34614,6 +35140,7 @@ try {
 } finally {
   overwriteGetLocale(() => 'en');
 }
+verifyDomainAssertions(() => {
 assert.deepEqual(buildTemplatesPageViewModel(), {
   cards: activityTemplates.map((template) => ({
     action: {
@@ -34675,6 +35202,7 @@ assert.deepEqual(
     to: Routes.Create,
   }
 );
+});
 const roadmapPageViewModel = buildRoadmapPageViewModel();
 assert.deepEqual(roadmapPageViewModel, {
   columns: [
@@ -35007,6 +35535,7 @@ for (const templateType of ACTIVITY_TEMPLATE_TYPES) {
 }
 const worksheetModeDefinitions = getWorksheetModeDefinitions();
 const worksheetsPageView = buildWorksheetsPageViewModel();
+verifyDomainAssertions(() => {
 assert.deepEqual(WORKSHEET_MODE_TEMPLATES, [
   'fill-blank',
   'line-match',
@@ -35035,12 +35564,14 @@ assert.deepEqual(
     (templateType) => getTemplateByType(templateType).type
   )
 );
+});
 for (const templateType of WORKSHEET_MODE_TEMPLATES) {
   const scaffold = getActivityTemplateScaffold(templateType);
 
   assert.ok(scaffold.title.length > 0);
-  assert.ok(scaffold.description.length > 0);
+  assert.ok((scaffold.description ?? '').length > 0);
 }
+verifyDomainAssertions(() => {
 assert.deepEqual(
   worksheetsPageView.heroActions.map((action) => action.template),
   [...WORKSHEET_MODE_TEMPLATES]
@@ -35064,6 +35595,7 @@ assert.deepEqual(
     ['group-sort', [['groups', 'groups']]],
   ]
 );
+});
 const expectedWorksheetModeSignalViews = [
   {
     ariaLabel:
@@ -35169,6 +35701,7 @@ const expectedWorksheetWorkflowSteps = [
     positionLabel: '4',
   },
 ];
+verifyDomainAssertions(() => {
 assert.deepEqual(
   worksheetsPageView.modeCards.map((card) => [
     card.template,
@@ -35400,11 +35933,13 @@ assert.deepEqual(
     to: Routes.Create,
   }
 );
+});
 const worksheetsPageWithoutLineMatch = buildWorksheetsPageViewModel({
   worksheetModeDefinitions: worksheetModeDefinitions.filter(
     (mode) => mode.template !== 'line-match'
   ),
 });
+verifyDomainAssertions(() => {
 assert.deepEqual(
   worksheetsPageWithoutLineMatch.heroActions.map((action) => action.template),
   [...WORKSHEET_MODE_TEMPLATES]
@@ -35445,6 +35980,7 @@ assert.match(
   /roadmap template promises[\s\S]*Wordwall-style templates[\s\S]*Liveworksheets-style modes[\s\S]*AI enhancements[\s\S]*worksheet delivery[\s\S]*print follow-up[\s\S]*result\s+export\s+continuity/,
   'TEST-CATALOG should describe the full template roadmap capability chain scope.'
 );
+});
 const templateEntrySource = readFileSync(
   'src/activities/template-entry.ts',
   'utf8'
@@ -35453,6 +35989,7 @@ const entryPageViewSource = readFileSync(
   'src/activities/entry-page-view.ts',
   'utf8'
 );
+verifyDomainAssertions(() => {
 assert.match(
   entryPageViewSource,
   /export type EntryAction = TemplateEntryAction;[\s\S]*type LinkAction = TemplateEntryLinkAction;[\s\S]*type CreateLinkAction = TemplateEntryCreateLinkAction;[\s\S]*export type WorksheetsPageHeroActionView = EntryAction & \{/,
@@ -35508,6 +36045,7 @@ assert.doesNotMatch(
   /resultSignals: string\[\]|workflowSteps: string\[\]/,
   'Worksheets page view-model should not expose workflow steps or result signals as bare localized strings.'
 );
+});
 const publicCopyMessages = {
   en: JSON.parse(
     readFileSync('project.inlang/messages/en.json', 'utf8')
@@ -35530,6 +36068,7 @@ for (const [locale, messages] of Object.entries(publicCopyMessages) as [
     );
   }
 }
+verifyDomainAssertions(() => {
 assert.match(
   templateEntrySource,
   /getTemplateByType\(template\)[\s\S]*fallbackTemplate\.shortName/,
@@ -35575,6 +36114,7 @@ assert.doesNotMatch(
   /template\.contentRequirements\.map\(\(requirement\) =>[\s\S]*formatTemplateRequirement\(requirement\)/,
   'Template entry page view-model should not map requirement labels locally.'
 );
+});
 overwriteGetLocale(() => 'zh');
 try {
   assert.deepEqual(
@@ -35595,6 +36135,7 @@ try {
 } finally {
   overwriteGetLocale(() => 'en');
 }
+verifyDomainAssertions(() => {
 assert.equal(formatDashboardMetricValue(undefined), '-');
 assert.equal(formatDashboardMetricValue(0), '0');
 assert.equal(formatDashboardMetricValue(Number.NaN), '-');
@@ -35737,6 +36278,7 @@ assert.equal(
   })[3]?.value,
   '-'
 );
+});
 const dashboardOverviewPageView = buildDashboardOverviewPageViewModel({
   activitySummary: {
     draftActivities: 2,
@@ -35817,6 +36359,7 @@ const dashboardStarterPreviewOnlyPageView = buildDashboardOverviewPageViewModel(
     preview: dashboardOverviewStarterPreview,
   }
 );
+verifyDomainAssertions(() => {
 assert.deepEqual(
   {
     activityId: dashboardOverviewStarterPreview.activity.id,
@@ -36627,6 +37170,7 @@ assert.deepEqual(dashboardOverviewPageCopy, {
   readinessTitle: 'Getting started',
   title: 'Teacher dashboard',
 });
+});
 const dashboardOverviewRouteSource = readFileSync(
   'src/routes/dashboard/index.tsx',
   'utf8'
@@ -36639,6 +37183,7 @@ const dashboardOverviewLoopStatusPanelSource = readFileSync(
   'src/components/dashboard/dashboard-overview-loop-status-panel.tsx',
   'utf8'
 );
+verifyDomainAssertions(() => {
 assert.match(
   dashboardOverviewRouteSource,
   /useActivities\(\{[\s\S]*pageIndex: 0,[\s\S]*pageSize: 1,[\s\S]*status: 'active'/,
@@ -36717,6 +37262,7 @@ assert.doesNotMatch(
   /<ActivityPreview\b/,
   "The dashboard no longer shows a demo activity card whose sample results sat next to the teacher's real numbers."
 );
+});
 const dashboardOverviewDomainSource = readFileSync(
   'src/dashboard/overview.ts',
   'utf8'
@@ -36741,6 +37287,7 @@ const dashboardOverviewLoopStatusSource = getSourceSlice(
   'export function buildDashboardOverviewLoopStatus',
   'export function formatDashboardMetricValue'
 );
+verifyDomainAssertions(() => {
 assert.match(
   dashboardOverviewDomainSource,
   /type DashboardOverviewOwnerActivitySummary[\s\S]*type DashboardOverviewOwnerAssignmentSummary/,
@@ -36855,6 +37402,7 @@ assert.deepEqual(
     summary: 'Showing 1-4 of 4 assignments',
   }
 );
+});
 overwriteGetLocale(() => 'zh');
 try {
   assert.deepEqual(
@@ -36876,6 +37424,7 @@ try {
 } finally {
   overwriteGetLocale(() => 'en');
 }
+verifyDomainAssertions(() => {
 assert.equal(isActivityArchived('archived'), true);
 assert.equal(isActivityArchived('draft'), false);
 assert.equal(ACTIVITY_RESTORED_VISIBILITY, 'draft');
@@ -36885,6 +37434,7 @@ assert.equal(canDeriveActivityWork('archived'), false);
 assert.equal(canEditActivity('draft'), true);
 assert.equal(canEditActivity('public'), true);
 assert.equal(canEditActivity('archived'), false);
+});
 const archivedActivityDerivationError = getArchivedActivityDerivationError();
 const expectedActivityLibraryBlockedActionStatus = {
   ariaLabel: `Action status: Restore required. ${archivedActivityDerivationError}`,
@@ -36893,6 +37443,7 @@ const expectedActivityLibraryBlockedActionStatus = {
   tone: 'blocked' as const,
   value: 'Restore required',
 };
+verifyDomainAssertions(() => {
 assert.deepEqual(
   buildActivityLibraryActionStatusView({ actionLabel: 'Duplicate' }),
   duplicateActivityReadyStatus
@@ -37215,6 +37766,7 @@ assert.deepEqual(buildActivityEditPageViewModel(undefined), {
     'Activity could not be loaded. Refresh the page or return to the activity library.',
   title: 'Edit activity',
 });
+});
 const activityEditLoadingRouteState = buildActivityEditRouteState({
   activity: undefined,
   isError: false,
@@ -37237,6 +37789,7 @@ const activityEditErrorRouteState = buildActivityEditRouteState({
   isError: true,
   isLoading: false,
 });
+verifyDomainAssertions(() => {
 assert.deepEqual(
   {
     message: activityEditErrorRouteState.pageView.loadErrorMessage,
@@ -37291,6 +37844,7 @@ assert.deepEqual(
     'open-box',
   ]
 );
+});
 const activityLibrarySearchPanelView = buildActivityLibrarySearchPanelView({
     isLoading: false,
     search: '  food  ',
@@ -37398,6 +37952,7 @@ const sourceFilteredLibrarySearchPanelView = buildActivityLibrarySearchPanelView
     template: 'all',
     total: 2,
   });
+verifyDomainAssertions(() => {
 assert.deepEqual(
   sourceFilteredLibrarySearchPanelView,
   {
@@ -37588,6 +38143,7 @@ assert.deepEqual(
     title: 'No matching activities.',
   }
 );
+});
 overwriteGetLocale(() => 'zh');
 try {
   assert.equal(
@@ -37606,6 +38162,7 @@ try {
 } finally {
   overwriteGetLocale(() => 'en');
 }
+verifyDomainAssertions(() => {
 assert.deepEqual(activityLibraryCardCopy.actionLabels, {
   archive: 'Archive',
   duplicate: 'Duplicate',
@@ -37659,9 +38216,11 @@ assert.deepEqual(
     },
   ]
 );
+});
 const starterActivityCardView = buildStarterActivityLibraryCardViewModel(
   starterActivities[0]
 );
+verifyDomainAssertions(() => {
 assert.deepEqual(
   buildActivityLibraryCardViewModel({
     contentJson: starterActivities[0].content,
@@ -37690,6 +38249,7 @@ assert.deepEqual(starterActivityCardView, {
   templateType: starterActivities[0].templateType,
   title: starterActivities[0].title,
 });
+});
 const starterActivityDisplayView = buildActivityLibraryCardDisplayView({
   activity: starterActivityCardView,
   libraryStatus: 'active',
@@ -37703,6 +38263,7 @@ const normalizedTitleActivityDisplayView = buildActivityLibraryCardDisplayView({
   },
   libraryStatus: 'active',
 });
+verifyDomainAssertions(() => {
 assert.equal(starterActivityDisplayView.templateName, 'Quiz');
 assert.equal(starterActivityDisplayView.templateType, 'quiz');
 assert.equal(starterActivityDisplayView.statusLabel, 'Preview');
@@ -37873,6 +38434,7 @@ assert.deepEqual(
     title: 'Source materials',
   }
 );
+});
 const sourceReadyActivityDisplayView = buildActivityLibraryCardDisplayView({
   activity: {
     ...starterActivityCardView,
@@ -37883,6 +38445,7 @@ const sourceReadyActivityDisplayView = buildActivityLibraryCardDisplayView({
   },
   libraryStatus: 'active',
 });
+verifyDomainAssertions(() => {
 assert.deepEqual(
   sourceReadyActivityDisplayView.statusSummary.items.find(
     (item) => item.id === 'source-materials'
@@ -37994,6 +38557,7 @@ assert.equal(
   ]),
   'Match up, Fill blank'
 );
+});
 overwriteGetLocale(() => 'zh');
 try {
   assert.equal(
@@ -38007,6 +38571,7 @@ try {
 } finally {
   overwriteGetLocale(() => 'en');
 }
+verifyDomainAssertions(() => {
 assert.equal(buildActivityLibraryRemixHint([]), undefined);
 assert.equal(buildActivityLibraryRemixActionLabel('Fill'), 'Copy as Fill');
 assert.equal(
@@ -38349,6 +38914,7 @@ assert.deepEqual(
   }),
   { hasFilters: true, text: '0 matches' }
 );
+});
 const assignmentListSearchPanelView = buildAssignmentListSearchPanelView({
   isLoading: false,
   search: ' week ',
@@ -38413,6 +38979,7 @@ const defaultAssignmentListSearchPanelView = buildAssignmentListSearchPanelView(
   status: 'all',
   total: 0,
 });
+verifyDomainAssertions(() => {
 assert.deepEqual(
   defaultAssignmentListSearchPanelView,
   {
@@ -38468,6 +39035,7 @@ assert.equal(
   }).hasSearchValue,
   false
 );
+});
 overwriteGetLocale(() => 'zh');
 try {
   assert.equal(
@@ -38494,6 +39062,7 @@ try {
 } finally {
   overwriteGetLocale(() => 'en');
 }
+verifyDomainAssertions(() => {
 assert.deepEqual(
   buildAssignmentListPageScopeView({
     currentPage: 2,
@@ -39020,6 +39589,7 @@ assert.deepEqual(buildAssignmentListEmptyStateView({ hasFilters: true }), {
   showStarterAssignments: false,
   title: 'No matching assignments.',
 });
+});
 overwriteGetLocale(() => 'zh');
 try {
   assert.equal(
@@ -39044,6 +39614,7 @@ const emptyAssignmentListPageView = buildAssignmentListPageViewModel({
   search: {},
 });
 const assignmentListStarterPreview = buildAssignmentListStarterPreview();
+verifyDomainAssertions(() => {
 assert.deepEqual(
   {
     assignmentIds: assignmentListStarterPreview.assignments.map(
@@ -39196,10 +39767,12 @@ assert.equal(
   }).resolvedSearch.currentPage,
   1
 );
+});
 const filteredAssignmentListPageData = {
   items: [
     {
       activity: {
+        title: 'Source activity',
         description: 'Current activity description',
         templateType: 'quiz',
       },
@@ -39358,6 +39931,7 @@ const staleReadyAssignmentListRouteState = buildAssignmentListRouteState({
   isLoading: false,
   search: filteredAssignmentListSearch,
 });
+verifyDomainAssertions(() => {
 assert.deepEqual(
   {
     assignmentIds: readyAssignmentListRouteState.pageView.assignments.map(
@@ -39717,6 +40291,7 @@ assert.deepEqual(
 assert.deepEqual(
   buildAssignmentListCardViewModel({
     activity: {
+      title: 'Source activity',
       description: 'Current activity description',
       templateType: 'quiz',
     },
@@ -39736,6 +40311,7 @@ assert.deepEqual(
       title: ' Ｐｅｒｓｉｓｔｅｄ\u00A0　assignment ',
     },
     snapshot: {
+      activityTitle: 'Frozen source activity',
       activityDescription: 'Frozen activity description',
       templateType: 'line-match',
     },
@@ -39838,6 +40414,7 @@ assert.deepEqual(
 assert.deepEqual(
   buildAssignmentListCardViewModel({
     activity: {
+      title: 'Source activity',
       description: null,
       templateType: 'quiz',
     },
@@ -40195,6 +40772,7 @@ assert.deepEqual(
 assert.equal(
   buildAssignmentListCardViewModel({
     activity: {
+      title: 'Source activity',
       description: 'Current activity description',
       templateType: 'quiz',
     },
@@ -40251,6 +40829,7 @@ assert.equal(activityDifficultySchema.parse('core'), 'core');
 assert.equal(activityVisibilitySchema.parse('private'), 'private');
 assert.equal(activityPersistedVisibilitySchema.parse('archived'), 'archived');
 assert.throws(() => activityVisibilitySchema.parse('archived'));
+});
 const questionOnlyContent = buildActivityContent({
   description: 'Question only activity',
   difficulty: 'starter',
@@ -40268,6 +40847,7 @@ const questionOnlyContent = buildActivityContent({
   visibility: 'draft',
   vocabularyText: '',
 });
+verifyDomainAssertions(() => {
 assert.deepEqual(
   buildQuestionOptionTexts({
     answer: 'Paris',
@@ -40329,6 +40909,7 @@ assert.equal(
   }),
   'Which word is an animal? | Ｃａｔ | Cat, tree | A cat is an animal.'
 );
+});
 const optionRoundTripContent = buildActivityContent({
   description: 'Question option normalization',
   difficulty: 'starter',
@@ -40348,7 +40929,7 @@ const optionRoundTripContent = buildActivityContent({
   sourceMaterials: [listeningMaterialReference],
 });
 assert.deepEqual(
-  optionRoundTripContent.questions[0]?.options.map((option) => option.text),
+  optionRoundTripContent.questions[0]?.options?.map((option) => option.text),
   ['Paris', 'Rome', 'Berlin']
 );
 const optionRoundTripEditorInput = activityContentToEditorInput({
@@ -40358,6 +40939,7 @@ const optionRoundTripEditorInput = activityContentToEditorInput({
   title: 'Option normalization',
   visibility: 'draft',
 });
+verifyDomainAssertions(() => {
 assert.equal(
   optionRoundTripEditorInput.questionsText,
   'Capital of France? | Paris | Paris, Rome, Berlin'
@@ -40377,6 +40959,7 @@ assert.deepEqual(
   [listeningMaterialReference]
 );
 assert.equal(DEFAULT_QUESTION_CHOICE_COUNT, 4);
+});
 const choiceCompletionContent = buildActivityContent({
   description: 'Choice completion activity',
   difficulty: 'starter',
@@ -40402,6 +40985,7 @@ const completedQuestionChoices = buildQuestionChoices({
   content: choiceCompletionContent,
   question: choiceCompletionContent.questions[0]!,
 });
+verifyDomainAssertions(() => {
 assert.deepEqual(
   completedQuestionChoices.length,
   DEFAULT_QUESTION_CHOICE_COUNT
@@ -40435,9 +41019,11 @@ assert.equal(
   new Set(completedQuestionChoices.map((choice) => choice.toLowerCase())).size,
   completedQuestionChoices.length
 );
+});
 const choiceCompletionReadiness = buildQuestionChoiceReadinessSummary({
   content: choiceCompletionContent,
 });
+verifyDomainAssertions(() => {
 assert.equal(choiceCompletionReadiness.targetCount, 4);
 assert.equal(choiceCompletionReadiness.itemCount, 3);
 assert.equal(choiceCompletionReadiness.completedLocallyCount, 3);
@@ -40457,6 +41043,7 @@ assert.deepEqual(choiceCompletionReadiness.items[0], {
   status: 'completed-locally',
   targetCount: 4,
   vocabularyCandidateCount: 2,
+});
 });
 const explicitChoiceReadinessContent = buildActivityContent({
   description: 'Explicit quiz choices',
@@ -40478,11 +41065,13 @@ const explicitChoiceReadinessContent = buildActivityContent({
 const explicitChoiceReadiness = buildQuestionChoiceReadinessSummary({
   content: explicitChoiceReadinessContent,
 });
+verifyDomainAssertions(() => {
 assert.equal(explicitChoiceReadiness.explicitReadyCount, 1);
 assert.equal(explicitChoiceReadiness.readyCount, 1);
 assert.equal(explicitChoiceReadiness.items[0]?.status, 'explicit-ready');
 assert.equal(explicitChoiceReadiness.items[0]?.deterministicChoiceCount, 0);
 assert.equal(explicitChoiceReadiness.items[0]?.candidateChoiceCount, 1);
+});
 const sparseChoiceReadinessContent = buildActivityContent({
   description: 'Sparse quiz choices',
   difficulty: 'starter',
@@ -40503,6 +41092,7 @@ const sparseChoiceReadinessContent = buildActivityContent({
 const sparseChoiceReadiness = buildQuestionChoiceReadinessSummary({
   content: sparseChoiceReadinessContent,
 });
+verifyDomainAssertions(() => {
 assert.equal(sparseChoiceReadiness.readyCount, 0);
 assert.equal(sparseChoiceReadiness.needsCandidateCount, 1);
 assert.deepEqual(sparseChoiceReadiness.items[0], {
@@ -40519,6 +41109,7 @@ assert.deepEqual(sparseChoiceReadiness.items[0], {
   status: 'needs-candidates',
   targetCount: 4,
   vocabularyCandidateCount: 0,
+});
 });
 const normalizedChoiceReadinessContent = buildActivityContent({
   description: 'Normalized quiz choices',
@@ -40543,6 +41134,7 @@ const normalizedChoiceReadinessContent = buildActivityContent({
 const normalizedChoiceReadiness = buildQuestionChoiceReadinessSummary({
   content: normalizedChoiceReadinessContent,
 });
+verifyDomainAssertions(() => {
 assert.deepEqual(
   buildQuestionChoices({
     content: normalizedChoiceReadinessContent,
@@ -40565,6 +41157,7 @@ assert.deepEqual(normalizedChoiceReadiness.items[0], {
   targetCount: 4,
   vocabularyCandidateCount: 1,
 });
+});
 const tabSeparatedQuestionContent = buildActivityContent({
   description: 'Spreadsheet-pasted question rows',
   difficulty: 'starter',
@@ -40582,9 +41175,10 @@ const tabSeparatedQuestionContent = buildActivityContent({
   visibility: 'draft',
   vocabularyText: '',
 });
+verifyDomainAssertions(() => {
 assert.equal(tabSeparatedQuestionContent.questions[0]?.answer, '北京');
 assert.deepEqual(
-  tabSeparatedQuestionContent.questions[0]?.options.map(
+  tabSeparatedQuestionContent.questions[0]?.options?.map(
     (option) => option.text
   ),
   ['北京', '上海', '广州']
@@ -40593,6 +41187,7 @@ assert.equal(
   tabSeparatedQuestionContent.questions[0]?.explanation,
   '中国首都题'
 );
+});
 const fullwidthColonPairContent = buildActivityContent({
   description: 'Fullwidth colon pair rows',
   difficulty: 'starter',
@@ -40661,9 +41256,10 @@ const fullwidthAnswerContent = buildActivityContent({
   visibility: 'draft',
   vocabularyText: '',
 });
+verifyDomainAssertions(() => {
 assert.equal(fullwidthAnswerContent.questions[0]?.answer, 'Cat');
 assert.deepEqual(
-  fullwidthAnswerContent.questions[0]?.options.map((option) => [
+  fullwidthAnswerContent.questions[0]?.options?.map((option) => [
     option.text,
     option.isCorrect,
   ]),
@@ -40709,6 +41305,7 @@ assert.deepEqual(
     normalizedSubmittedAnswer: 'ice cream',
   }
 );
+});
 const defaultSourceSummaryContent = buildActivityContent({
   description: 'Default source summary',
   difficulty: 'starter',
@@ -40750,6 +41347,7 @@ const editableActivityRouteState = buildActivityEditRouteState({
   isError: false,
   isLoading: false,
 });
+verifyDomainAssertions(() => {
 assert.deepEqual(
   {
     accessTitle: editableActivityPageView.editAccessView?.title,
@@ -40789,6 +41387,7 @@ assert.deepEqual(
     status: 'ready',
   }
 );
+});
 const archivedActivityPageView = buildActivityEditPageViewModel({
   contentJson: defaultSourceSummaryContent,
   description: 'Archived source summary',
@@ -40809,6 +41408,7 @@ const archivedActivityRouteState = buildActivityEditRouteState({
   isError: false,
   isLoading: false,
 });
+verifyDomainAssertions(() => {
 assert.deepEqual(
   {
     actionLabel: archivedActivityPageView.editAccessView?.actionLabel,
@@ -40848,6 +41448,7 @@ assert.doesNotThrow(() =>
     createActivityInputSchema.parse(activityEditorDefaultInput)
   )
 );
+});
 const invalidStructuredInputBase = createActivityInputSchema.parse({
   description: 'Invalid structured row messages',
   difficulty: 'starter',
@@ -40865,6 +41466,7 @@ const invalidStructuredInputBase = createActivityInputSchema.parse({
   visibility: 'draft',
   vocabularyText: '',
 });
+verifyDomainAssertions(() => {
 assert.throws(
   () =>
     buildActivityContent({
@@ -40961,6 +41563,7 @@ assert.deepEqual(buildActivityEditorInitialValues('group-sort'), {
   templateType: 'group-sort',
   visibility: 'draft',
 });
+});
 const lineMatchCreatePageView =
   buildActivityCreatePageEditorViewModel('line-match');
 assert.deepEqual(
@@ -41056,14 +41659,17 @@ assert.deepEqual(
 const lineMatchPreviewSeed = buildActivityEditorPreviewSeed(
   buildActivityEditorInitialValues('line-match')
 );
+verifyDomainAssertions(() => {
 assert.equal(lineMatchPreviewSeed.id, 'activity-editor-preview');
 assert.equal(lineMatchPreviewSeed.status, 'draft');
 assert.equal(lineMatchPreviewSeed.templateType, 'line-match');
 assert.equal(lineMatchPreviewSeed.title, 'Draw lines for food words');
 assert.equal(lineMatchPreviewSeed.content.pairs.length, 8);
+});
 const lineMatchPreviewPanel = buildActivityEditorPreviewPanel(
   buildActivityEditorInitialValues('line-match')
 );
+verifyDomainAssertions(() => {
 assert.equal(lineMatchPreviewPanel.editorSectionId, 'activity-editor');
 assert.equal(lineMatchPreviewPanel.title, 'Line match example preview');
 assert.match(lineMatchPreviewPanel.description, /still a draft/);
@@ -41169,6 +41775,7 @@ assert.deepEqual(buildActivityEditorTemplateSetupView('group-sort'), {
   successMessage: 'Group sort example loaded.',
   title: 'Group sort setup',
 });
+});
 const editorQuestionReadiness = buildActivityEditorTemplateReadiness({
   description: 'Editor readiness helper',
   difficulty: 'starter',
@@ -41186,6 +41793,7 @@ const editorQuestionReadiness = buildActivityEditorTemplateReadiness({
   visibility: 'draft',
   vocabularyText: '',
 });
+verifyDomainAssertions(() => {
 assert.equal(editorQuestionReadiness?.currentTemplateType, 'quiz');
 assert.equal(
   editorQuestionReadiness?.options.find(
@@ -41204,7 +41812,9 @@ assert.deepEqual(ACTIVITY_EDITOR_SECTION_IDS, {
   sourceMaterials: 'activity-editor-source-materials',
   templateReadiness: 'activity-template-readiness',
 });
+});
 const activityEditorWorkflowView = buildActivityEditorWorkflowView();
+verifyDomainAssertions(() => {
 assert.deepEqual(ACTIVITY_EDITOR_WORKFLOW_STEP_IDS, [
   'frame',
   'ai-draft',
@@ -41335,6 +41945,7 @@ assert.deepEqual(
   },
   'AI draft generation should normalize source notes before sending them to the draft service.'
 );
+});
 const safeMaterialAiDraftPanelView = buildActivityEditorAiDraftPanelView({
   draftSourceText: [
     'weather source notes',
@@ -41356,6 +41967,7 @@ const safeMaterialAiDraftPanelView = buildActivityEditorAiDraftPanelView({
     sourceMaterials: [],
   }),
 });
+verifyDomainAssertions(() => {
 assert.deepEqual(safeMaterialAiDraftPanelView.sourceControlBoundary, {
   attachedSourceMaterialCount: 0,
   canGenerateDraft: true,
@@ -41493,6 +42105,7 @@ assert.deepEqual(
   }).generationDisabledReason,
   'Draft generation is already running.'
 );
+});
 const overlongAiDraftPanelView = buildActivityEditorAiDraftPanelView({
   draftSourceText: 'A'.repeat(ACTIVITY_DRAFT_SOURCE_MAX_LENGTH + 1),
   hasUser: true,
@@ -41502,6 +42115,7 @@ const overlongAiDraftPanelView = buildActivityEditorAiDraftPanelView({
     sourceMaterials: [],
   }),
 });
+verifyDomainAssertions(() => {
 assert.equal(overlongAiDraftPanelView.canGenerateDraft, false);
 assert.equal(
   overlongAiDraftPanelView.generationDisabledReason,
@@ -41625,6 +42239,7 @@ assert.deepEqual(
     mode: 'edit',
   }
 );
+});
 const editorSavePlanValues = {
   description: 'Saved description',
   difficulty: 'core' as const,
@@ -41643,6 +42258,7 @@ const editorSavePlanValues = {
   visibility: 'draft' as const,
   vocabularyText: 'apple',
 };
+verifyDomainAssertions(() => {
 assert.deepEqual(
   buildActivityEditorSaveExecutionPlan({
     hasUser: false,
@@ -41770,6 +42386,7 @@ assert.deepEqual(
     sourceLength: 36,
   }
 );
+});
 overwriteGetLocale(() => 'zh');
 try {
   assert.equal(
@@ -41799,6 +42416,7 @@ const syncedEditorDraftSource = buildActivityEditorSyncedDraftSourceText({
   ],
   sourceText: 'Classroom source notes.',
 });
+verifyDomainAssertions(() => {
 assert.match(syncedEditorDraftSource, /Classroom source notes\./);
 assert.match(syncedEditorDraftSource, /unit-notes\.pdf/);
 assert.deepEqual(
@@ -41824,6 +42442,7 @@ assert.deepEqual(
     sourceLength: syncedEditorDraftSource.length,
   }
 );
+});
 const disabledAiDraftPanelView = buildActivityEditorAiDraftPanelView({
   hasUser: false,
   isGeneratingDraft: false,
@@ -41934,6 +42553,7 @@ const syncAvailableAiDraftPanelView = buildActivityEditorAiDraftPanelView({
     ],
   }),
 });
+verifyDomainAssertions(() => {
 assert.deepEqual(
   omitActivityEditorAiDraftSourceHandoffView(syncAvailableAiDraftPanelView),
   {
@@ -42087,6 +42707,7 @@ assert.deepEqual(
     title: 'Source material safety',
   }
 );
+});
 function omitActivityEditorAiDraftSourceHandoffView(
   view: ReturnType<typeof buildActivityEditorAiDraftPanelView>
 ) {
@@ -42098,6 +42719,7 @@ function omitActivityEditorAiDraftSourceHandoffView(
 }
 
 const editorSelectOptions = buildActivityEditorSelectOptions();
+verifyDomainAssertions(() => {
 assert.deepEqual(
   editorSelectOptions.difficultyOptions.map((option) => option.label),
   ['Starter', 'Core', 'Challenge']
@@ -42109,6 +42731,7 @@ assert.deepEqual(
 assert.equal(editorSelectOptions.templateOptions.length, 8);
 assert.equal(formatActivityEditorDifficulty('challenge'), 'Challenge');
 assert.equal(formatActivityEditorVisibility('unlisted'), 'Unlisted');
+});
 const editorTemplateView = buildActivityEditorTemplateView({
   input: {
     ...activityEditorDefaultInput,
@@ -42119,6 +42742,7 @@ const editorTemplateView = buildActivityEditorTemplateView({
   },
   templateType: 'quiz',
 });
+verifyDomainAssertions(() => {
 assert.equal(editorTemplateView.template.name, 'Quiz');
 assert.equal(editorTemplateView.setupView.title, 'Quiz setup');
 assert.equal(editorTemplateView.templateOptions.length, 8);
@@ -42173,6 +42797,7 @@ assert.deepEqual(
   ).lockedOptions.map((option) => option.template),
   ['match-up', 'line-match', 'group-sort', 'matching-pairs']
 );
+});
 const groupSortScaffoldApplication =
   buildActivityEditorTemplateScaffoldApplication({
     current: {
@@ -42182,6 +42807,7 @@ const groupSortScaffoldApplication =
     },
     templateType: 'group-sort',
   });
+verifyDomainAssertions(() => {
 assert.equal(groupSortScaffoldApplication.values.templateType, 'group-sort');
 assert.equal(groupSortScaffoldApplication.values.visibility, 'private');
 assert.equal(
@@ -42262,6 +42888,7 @@ assert.deepEqual(
     title: 'Example coverage',
   }
 );
+});
 for (const templateType of ACTIVITY_TEMPLATE_TYPES) {
   const scaffoldSummary = buildActivityTemplateScaffoldReadinessSummary({
     current: activityEditorDefaultInput,
@@ -42306,6 +42933,7 @@ for (const templateType of ACTIVITY_TEMPLATE_TYPES) {
     )
   );
 }
+verifyDomainAssertions(() => {
 assert.equal(
   buildActivityEditorTemplateReadiness({
     ...createActivityInputSchema.parse({
@@ -42370,6 +42998,7 @@ assert.throws(
     }),
   /Add match pairs to unlock Match\./
 );
+});
 const questionOnlyRemixPlan = getTemplateRemixPlan({
   content: questionOnlyContent,
   currentTemplateType: 'quiz',
@@ -42411,6 +43040,7 @@ const blankStructuredRemixPlan = getTemplateRemixPlan({
   },
   currentTemplateType: 'quiz',
 });
+verifyDomainAssertions(() => {
 assert.deepEqual(
   blankStructuredRemixPlan.options
     .filter((option) =>
@@ -42437,9 +43067,11 @@ assert.equal(
   }).options.find((option) => option.template.type === 'group-sort')?.isReady,
   true
 );
+});
 const questionOnlyRemixSummary = buildTemplateRemixSummary(
   questionOnlyRemixPlan
 );
+verifyDomainAssertions(() => {
 assert.ok(questionOnlyRemixPlan.readyOptions.length > 0);
 assert.equal(
   questionOnlyRemixPlan.options.find(
@@ -42597,11 +43229,13 @@ assert.deepEqual(
     title: 'Template readiness',
   }
 );
+});
 const questionOnlyEditorReadinessSummary =
   buildActivityEditorReadinessPanelSummary(
     questionOnlyRemixPlan,
     questionOnlyContent
   );
+verifyDomainAssertions(() => {
 assert.equal(
   questionOnlyEditorReadinessSummary.lockedOptions.length,
   ACTIVITY_EDITOR_READINESS_PANEL_LIMITS.lockedOptions
@@ -42630,10 +43264,12 @@ assert.deepEqual(buildActivityTemplateReadinessPanelSummary(null), {
   readyOptions: [],
   title: 'Template readiness',
 });
+});
 const questionOnlyCardSummary = buildActivityLibraryCardSummary({
   content: questionOnlyContent,
   templateType: 'quiz',
 });
+verifyDomainAssertions(() => {
 assert.deepEqual(questionOnlyCardSummary.contentCounts, {
   groups: 0,
   pairs: 0,
@@ -42660,9 +43296,9 @@ assert.deepEqual(questionOnlyCardSummary.lockedTemplateOptions.slice(0, 2), [
 ]);
 assert.deepEqual(
   buildActivityLibraryCompatibilityView({
-    content: questionOnlyContent,
+    ...{ content: questionOnlyContent },
     currentTemplateType: 'quiz',
-    sourceTitle: 'Question review',
+    ...{ sourceTitle: 'Question review' },
     summary: questionOnlyCardSummary,
   }),
   {
@@ -42705,9 +43341,9 @@ assert.deepEqual(
 );
 assert.deepEqual(
   buildActivityLibraryCompatibilityView({
-    content: questionOnlyContent,
+    ...{ content: questionOnlyContent },
     currentTemplateType: 'quiz',
-    sourceTitle: 'Question review',
+    ...{ sourceTitle: 'Question review' },
     summary: questionOnlyCardSummary,
     visibility: 'archived',
   }),
@@ -42751,12 +43387,14 @@ assert.deepEqual(
     remixStatusView: expectedActivityLibraryBlockedActionStatus,
   }
 );
+});
 const questionOnlyCompatibilityView = buildActivityLibraryCompatibilityView({
-  content: questionOnlyContent,
+  ...{ content: questionOnlyContent },
   currentTemplateType: 'quiz',
-  sourceTitle: 'Question review',
+  ...{ sourceTitle: 'Question review' },
   summary: questionOnlyCardSummary,
 });
+verifyDomainAssertions(() => {
 assert.equal(
   questionOnlyCompatibilityView.lockedTemplateDiagnostics.length,
   ACTIVITY_LIBRARY_COMPATIBILITY_LIMITS.lockedTemplateDiagnostics
@@ -42813,6 +43451,7 @@ assert.equal(
   formatTemplateRequirementList(['questions', 'match pairs', 'groups']),
   'questions, match pairs, and groups'
 );
+});
 const completeScaffoldContent = buildActivityContent({
   ...getActivityTemplateScaffold('group-sort'),
   difficulty: 'starter',
@@ -42854,6 +43493,7 @@ const librarySummary = summarizeActivityLibrary([
     visibility: 'archived',
   },
 ]);
+verifyDomainAssertions(() => {
 assert.equal(librarySummary.totalActivities, 2);
 assert.equal(librarySummary.draftActivities, 1);
 assert.equal(librarySummary.archivedActivities, 1);
@@ -43493,12 +44133,14 @@ assert.deepEqual(
     summary: 'No activities are visible in the current library view.',
   }
 );
+});
 const emptyActivityLibraryPageView = buildActivityLibraryPageViewModel({
   data: null,
   isLoading: false,
   search: {},
 });
 const activityLibraryStarterPreview = buildActivityLibraryStarterPreview();
+verifyDomainAssertions(() => {
 assert.deepEqual(
   {
     activityIds: activityLibraryStarterPreview.activities.map(
@@ -43705,6 +44347,7 @@ assert.deepEqual(
     totalPages: 3,
   }
 );
+});
 const filteredActivityLibraryPageData = {
   createdActivity: {
     id: 'persisted-activity-1',
@@ -43874,6 +44517,7 @@ const staleReadyActivityLibraryRouteState = buildActivityLibraryRouteState({
   isLoading: false,
   search: filteredActivityLibrarySearch,
 });
+verifyDomainAssertions(() => {
 assert.deepEqual(
   {
     activityIds: readyActivityLibraryRouteState.pageView.activities.map(
@@ -44126,6 +44770,7 @@ assert.equal(
   }).createdPanelContext?.status,
   'missing'
 );
+});
 for (const templateType of ACTIVITY_TEMPLATE_TYPES) {
   const scaffold = getActivityTemplateScaffold(templateType);
   const input = createActivityInputSchema.parse({
@@ -44173,6 +44818,7 @@ try {
 } finally {
   overwriteGetLocale(() => 'en');
 }
+verifyDomainAssertions(() => {
 assert.deepEqual(
   ACTIVITY_TEMPLATE_TYPES.map((templateType) => [
     templateType,
@@ -44292,21 +44938,21 @@ assert.deepEqual(
     {
       answer: 'Paris',
       id: 'q-1',
-      kind: 'question',
+      kind: 'question' as const,
       prompt: 'Capital of France?',
     },
     {
       answer: 'Cold',
       choices: ['Cold', 'Warm'],
       id: 'p-1',
-      kind: 'pair',
+      kind: 'pair' as const,
       prompt: 'Hot',
     },
     {
       answer: 'Fruit',
       choices: ['Fruit', 'Drink'],
       id: 'g-1-apple',
-      kind: 'group-item',
+      kind: 'group-item' as const,
       prompt: 'Apple',
     },
   ].map((item) => [
@@ -44319,6 +44965,7 @@ assert.deepEqual(
     ['Choose the group for "Apple".', 'Group item'],
   ]
 );
+});
 const dirtyRuntimeContent = {
   ...questionOnlyContent,
   groups: [
@@ -44337,6 +44984,7 @@ const dirtyRuntimeContent = {
     { answer: 'Paris', id: 'q-valid', prompt: 'Capital of France?' },
   ],
 };
+verifyDomainAssertions(() => {
 assert.deepEqual(
   getRuntimeItems('quiz', dirtyRuntimeContent).map((item) => item.id),
   ['q-valid']
@@ -44482,10 +45130,12 @@ assert.equal(
   buildDuplicatedActivityTitle('  Food words quick check  '),
   'Copy of Food words quick check'
 );
+});
 const activityDuplicateSource = readFileSync(
   'src/activities/duplicate.ts',
   'utf8'
 );
+verifyDomainAssertions(() => {
 assert.match(
   activityDuplicateSource,
   /ACTIVITY_TITLE_LENGTH\.max - formatDuplicatedTitle\(''\)\.length/,
@@ -44552,6 +45202,7 @@ assert.equal(
   }),
   `${'A'.repeat(109)}... (Match)`
 );
+});
 const derivativeSourceContent = buildActivityContent({
   description: 'Derivative source content',
   difficulty: 'core',
@@ -44614,6 +45265,7 @@ const activityCreateInsert = buildActivityCreateInsert({
   now: activityInsertNow,
   userId: 'teacher-1',
 });
+verifyDomainAssertions(() => {
 assert.equal(activityCreateInsert.id, 'activity-create-1');
 assert.equal(activityCreateInsert.ownerId, 'teacher-1');
 assert.equal(activityCreateInsert.description, 'A quick food review.');
@@ -44639,6 +45291,7 @@ assert.equal(
   }).description,
   null
 );
+});
 const activityUpdateSet = buildActivityUpdateSet({
   input: {
     ...baseActivityCreateInput,
@@ -44648,6 +45301,7 @@ const activityUpdateSet = buildActivityUpdateSet({
   },
   now: activityInsertNow,
 });
+verifyDomainAssertions(() => {
 assert.equal(activityUpdateSet.description, 'Updated description.');
 assert.equal(activityUpdateSet.templateType, 'group-sort');
 assert.equal(activityUpdateSet.title, 'Updated food review');
@@ -44675,6 +45329,7 @@ assert.deepEqual(
     visibility: 'archived',
   }
 );
+});
 const duplicatedActivityInsert = buildDuplicatedActivityInsert({
   id: 'activity-duplicate-1',
   now: activityInsertNow,
@@ -44688,6 +45343,7 @@ const duplicatedActivityInsert = buildDuplicatedActivityInsert({
   },
   userId: 'teacher-1',
 });
+verifyDomainAssertions(() => {
 assert.equal(duplicatedActivityInsert.id, 'activity-duplicate-1');
 assert.equal(duplicatedActivityInsert.ownerId, 'teacher-1');
 assert.equal(duplicatedActivityInsert.description, 'Source description');
@@ -44706,6 +45362,7 @@ assert.equal(
 );
 assert.deepEqual(duplicatedActivityInsert.contentJson, derivativeClonedContent);
 assert.notEqual(duplicatedActivityInsert.contentJson, derivativeSourceContent);
+});
 const remixedActivityInsert = buildRemixedActivityInsert({
   id: 'activity-remix-1',
   now: activityInsertNow,
@@ -44723,6 +45380,7 @@ const remixedActivityInsert = buildRemixedActivityInsert({
   },
   userId: 'teacher-1',
 });
+verifyDomainAssertions(() => {
 assert.equal(remixedActivityInsert.id, 'activity-remix-1');
 assert.equal(remixedActivityInsert.ownerId, 'teacher-1');
 assert.equal(remixedActivityInsert.description, null);
@@ -44773,10 +45431,12 @@ assert.notEqual(
   derivativeClonedContent.sourceMaterials[0],
   derivativeSourceContent.sourceMaterials[0]
 );
+});
 derivativeClonedContent.questions[0]!.prompt = 'Edited cloned prompt';
 derivativeClonedContent.questions[0]!.options![0]!.text = 'Edited option';
 derivativeClonedContent.groups[0]!.items[0] = 'edited item';
 derivativeClonedContent.sourceMaterials[0]!.originalName = 'Edited audio.mp3';
+verifyDomainAssertions(() => {
 assert.equal(derivativeSourceContent.questions[0]?.prompt, 'Favorite food?');
 assert.equal(derivativeSourceContent.questions[0]?.options?.[0]?.text, 'apple');
 assert.equal(derivativeSourceContent.groups[0]?.items[0], 'apple');
@@ -45007,12 +45667,14 @@ assert.throws(() =>
     sourceText: 'A'.repeat(ACTIVITY_AI_DRAFT_FIELD_LIMITS.sourceText.max + 1),
   })
 );
+});
 const sourceMaterialDraftNotesText = [
   'weather, sunny, rainy, cloudy',
   'Attached classroom source materials:',
   '- Worksheet document: Weather worksheet.pdf',
   '- Audio: Weather listening.mp3',
 ].join('\n');
+verifyDomainAssertions(() => {
 assert.deepEqual(
   buildActivitySourceMaterialDraftNoteViewsFromSourceText(
     sourceMaterialDraftNotesText
@@ -45106,6 +45768,7 @@ assert.equal(
   ),
   false
 );
+});
 const sourceMaterialFallbackInput = {
   difficulty: 'starter',
   draftFocus: ACTIVITY_AI_DRAFT_DEFAULT_FOCUS,
@@ -45126,6 +45789,7 @@ const sourceMaterialFallbackPlanViews = new Map(
     itemView.value,
   ])
 );
+verifyDomainAssertions(() => {
 assert.deepEqual(sourceMaterialFallbackPlan.terms, [
   'weather',
   'sunny',
@@ -45163,6 +45827,7 @@ assert.equal(
   sourceMaterialFallbackPlanViews.get('privacy-material-identifiers'),
   'Hidden'
 );
+});
 const serializedSourceMaterialFallbackPlanView = JSON.stringify({
   itemViews: sourceMaterialFallbackPlan.itemViews,
   privacy: sourceMaterialFallbackPlan.privacy,
@@ -45181,6 +45846,7 @@ for (const privateSourceTermPlanText of [
     `AI fallback source-term plan leaked ${privateSourceTermPlanText}`
   );
 }
+verifyDomainAssertions(() => {
 assert.deepEqual(
   buildFallbackActivityDraftTerms({
     input: sourceMaterialFallbackInput,
@@ -45199,13 +45865,16 @@ assert.deepEqual(
   }).slice(0, 3),
   ['Science', 'key word', 'example']
 );
+});
 const minimalFallbackDraft = createFallbackActivityDraft({
   sourceText: 'food, apple, bread, milk',
 });
+verifyDomainAssertions(() => {
 assert.equal(minimalFallbackDraft.difficulty, 'starter');
 assert.equal(minimalFallbackDraft.subject, 'English');
 assert.equal(minimalFallbackDraft.templateType, 'quiz');
-assert.match(minimalFallbackDraft.description, /Balanced activity/);
+assert.match(minimalFallbackDraft.description ?? '', /Balanced activity/);
+});
 const fallbackDraft = createFallbackActivityDraft({
   difficulty: 'starter',
   draftFocus: 'listening-script',
@@ -45227,12 +45896,14 @@ const fillBlankDraftPrompt = buildActivityDraftPrompt({
   subject: 'Science',
   templateType: 'fill-blank',
 });
+verifyDomainAssertions(() => {
 assert.match(fillBlankDraftPrompt, /Template requirements: questions/);
 assert.match(
   fillBlankDraftPrompt,
   /Draft focus: Worksheet practice\. Favor worksheet-style prompts/
 );
 assert.match(fillBlankDraftPrompt, /worksheet sentence with ___/);
+});
 const fillBlankPromptJsonExample = fillBlankDraftPrompt.match(
   /Return exactly this JSON object shape:\n([\s\S]*?)\n\nRules:/
 )?.[1];
@@ -45241,11 +45912,13 @@ const fillBlankPromptJsonShape = JSON.parse(fillBlankPromptJsonExample) as {
   questions?: Array<{ prompt?: string }>;
   title?: string;
 };
+verifyDomainAssertions(() => {
 assert.equal(fillBlankPromptJsonShape.title, 'short teacher-facing title');
 assert.equal(
   fillBlankPromptJsonShape.questions?.[0]?.prompt,
   'question or fill-in prompt'
 );
+});
 const groupSortDraftPrompt = buildActivityDraftPrompt({
   difficulty: 'starter',
   draftFocus: 'remix-ready',
@@ -45256,13 +45929,16 @@ const groupSortDraftPrompt = buildActivityDraftPrompt({
   subject: 'Science',
   templateType: 'group-sort',
 });
+verifyDomainAssertions(() => {
 assert.match(groupSortDraftPrompt, /Template requirements: groups/);
 assert.match(
   groupSortDraftPrompt,
   /Draft focus: Remix ready\. Include extra reusable questions/
 );
 assert.match(groupSortDraftPrompt, /Make groups the primary structure/);
+});
 const aiDraftSource = readFileSync('src/activities/ai-draft.ts', 'utf8');
+verifyDomainAssertions(() => {
 assert.match(aiDraftSource, /m\.activity_ai_prompt_intro\(\)/);
 assert.match(aiDraftSource, /content: m\.activity_ai_prompt_system\(\)/);
 assert.doesNotMatch(
@@ -45321,6 +45997,7 @@ assert.doesNotMatch(
   aiDraftSource,
   /Create a reusable ClassGamify classroom activity draft\./
 );
+});
 const draftPromptInput = {
   difficulty: 'starter',
   draftFocus: ACTIVITY_AI_DRAFT_DEFAULT_FOCUS,
@@ -45382,6 +46059,7 @@ try {
 } finally {
   overwriteGetLocale(() => 'en');
 }
+verifyDomainAssertions(() => {
 assert.match(getActivityTemplateDraftGuidance('listening'), /spoken aloud/);
 assert.match(getActivityTemplateDraftGuidance('open-box'), /reveal-card/);
 assert.match(getActivityTemplateDraftGuidance('line-match'), /line matching/);
@@ -45389,6 +46067,7 @@ assert.match(
   getActivityTemplateDraftGuidance('matching-pairs'),
   /two-column cards/
 );
+});
 const fallbackDraftResult = createFallbackActivityDraftResult({
   input: {
     difficulty: 'starter',
@@ -45413,8 +46092,9 @@ const fallbackDraftMeta = buildActivityDraftMeta({
   activity: fallbackDraft,
   currentTemplateType: fallbackDraft.templateType,
 });
+verifyDomainAssertions(() => {
 assert.equal(fallbackDraft.templateType, 'listening');
-assert.match(fallbackDraft.description, /Listening script/);
+assert.match(fallbackDraft.description ?? '', /Listening script/);
 assert.equal(fallbackDraftResult.provider, 'fallback');
 assert.equal(fallbackDraftResult.draftFocus, 'listening-script');
 assert.equal(fallbackDraftResult.model, 'test-model');
@@ -45526,16 +46206,19 @@ assert.ok(
       option.readinessLabel === 'Ready'
   )
 );
+});
 const fallbackReadyRemixChecklistItem = findActivityDraftChecklistItem({
   id: 'ready-remix',
   items: fallbackDraftMeta.reviewChecklistItems,
 });
+verifyDomainAssertions(() => {
 assert.equal(fallbackReadyRemixChecklistItem.status, 'ready');
 assert.equal(fallbackReadyRemixChecklistItem.priority, 'normal');
 assert.match(
   fallbackReadyRemixChecklistItem.label,
   /^Ready to remix after saving: .+\.$/
 );
+});
 const fallbackDraftMetaSummary = buildActivityDraftMetaSummaryView({
   draftFocus: fallbackDraftResult.draftFocus,
   meta: fallbackDraftMeta,
@@ -45561,6 +46244,7 @@ const fallbackDraftMetaSummary = buildActivityDraftMetaSummaryView({
     },
   ],
 });
+verifyDomainAssertions(() => {
 assert.deepEqual(
   fallbackDraftMetaSummary.coverageStats.map((stat) => ({
     ariaLabel: stat.ariaLabel,
@@ -45874,6 +46558,7 @@ assert.doesNotMatch(
   }),
   /https?:|files\.example|private|token|signature|storageKey|teacher\\/i
 );
+});
 const allMaterialCapabilityDraftMetaSummary =
   buildActivityDraftMetaSummaryView({
     meta: fallbackDraftMeta,
@@ -45917,6 +46602,7 @@ const dedupedMaterialDraftMetaSummary = buildActivityDraftMetaSummaryView({
     },
   ],
 });
+verifyDomainAssertions(() => {
 assert.deepEqual(dedupedMaterialDraftMetaSummary.sourceMaterialNoteViews, [
   {
     ariaLabel: 'Safe source material: Worksheet document · Unit 1.pdf',
@@ -46036,6 +46722,7 @@ assert.deepEqual(
     template: 'listening',
   }
 );
+});
 const questionOnlyDraftMetaSummary = buildActivityDraftMetaSummaryView({
   draftFocus: 'remix-ready',
   meta: buildActivityDraftMeta({
@@ -46052,6 +46739,7 @@ const questionOnlyDraftMetaSummary = buildActivityDraftMetaSummaryView({
   model: 'test-model',
   provider: 'workers-ai',
 });
+verifyDomainAssertions(() => {
 assert.equal(
   questionOnlyDraftMetaSummary.questionChoiceReadiness?.summaryLabel,
   '0/1 question ready'
@@ -46172,6 +46860,7 @@ assert.equal(
   }).draftFocusLineText,
   'Focus: Balanced activity'
 );
+});
 const malformedDraftMetaSummary = buildActivityDraftMetaSummaryView({
   meta: {
     ...fallbackDraftMeta,
@@ -46187,6 +46876,7 @@ const malformedDraftMetaSummary = buildActivityDraftMetaSummaryView({
   model: 'test-model',
   provider: 'workers-ai',
 });
+verifyDomainAssertions(() => {
 assert.equal(normalizeActivityDraftMetaCount(Number.NaN), 0);
 assert.equal(normalizeActivityDraftMetaCount(Number.POSITIVE_INFINITY), 0);
 assert.equal(normalizeActivityDraftMetaCount(-1.8), 0);
@@ -46225,12 +46915,14 @@ assert.equal(
   }).modelName,
   'Unknown model'
 );
+});
 const normalizedDraftMetaSummary = buildActivityDraftMetaSummaryView({
   meta: fallbackDraftMeta,
   model: '  Ｗｏｒｋｅｒｓ　ＡＩ  ',
   notice: '  Ｌｏｃａｌ　completion　used.  ',
   provider: 'workers-ai',
 });
+verifyDomainAssertions(() => {
 assert.equal(normalizedDraftMetaSummary.modelName, 'Workers AI');
 assert.equal(normalizedDraftMetaSummary.modelLineText, 'Model: Workers AI');
 assert.equal(normalizedDraftMetaSummary.notice, 'Local completion used.');
@@ -46254,12 +46946,14 @@ assert.equal(
   )?.value,
   'Local completion used.'
 );
+});
 const blankNoticeDraftMetaSummary = buildActivityDraftMetaSummaryView({
   meta: fallbackDraftMeta,
   model: 'test-model',
   notice: '   ',
   provider: 'workers-ai',
 });
+verifyDomainAssertions(() => {
 assert.equal(blankNoticeDraftMetaSummary.notice, undefined);
 assert.equal(blankNoticeDraftMetaSummary.noticeLineText, undefined);
 assert.equal(
@@ -46272,6 +46966,7 @@ assert.equal(
   )?.value,
   'No generation notice'
 );
+});
 try {
   overwriteGetLocale(() => 'zh');
   const zhFallbackDraftMeta = buildActivityDraftMeta({
@@ -46544,22 +47239,24 @@ const normalizedSpacedDraft = createActivityInputFromAiDraft({
     templateType: 'quiz',
   },
 });
+verifyDomainAssertions(() => {
 assert.equal(normalizedSpacedDraft.title, 'Nature sort');
 assert.equal(
   normalizedSpacedDraft.description,
   'Spaced AI draft for schema normalization.'
 );
 assert.equal(
-  normalizedSpacedDraft.questionsText.split('\n')[0],
+  (normalizedSpacedDraft.questionsText ?? '').split('\n')[0],
   'Which word is an animal? | cat | cat, tree, rain | A cat is an animal.'
 );
-assert.equal(normalizedSpacedDraft.pairsText.split('\n')[0], 'cat | animal');
+assert.equal((normalizedSpacedDraft.pairsText ?? '').split('\n')[0], 'cat | animal');
 assert.equal(
-  normalizedSpacedDraft.groupsText.split('\n')[0],
+  (normalizedSpacedDraft.groupsText ?? '').split('\n')[0],
   'Animals | cat, dog'
 );
 assert.equal(normalizedSpacedDraft.vocabularyText, 'cat, tree, rain');
 assert.equal(normalizedSpacedDraft.teacherNotesText, 'Check all answer keys.');
+});
 const completedMissingNotesDraft = normalizeAiActivityDraft({
   draft: {
     ...spacedAiDraft,
@@ -46570,12 +47267,14 @@ const completedMissingNotesDraft = normalizeAiActivityDraft({
     templateType: 'quiz',
   },
 });
+verifyDomainAssertions(() => {
 assert.equal(completedMissingNotesDraft.usedLocalCompletion, true);
 assert.equal(
   completedMissingNotesDraft.draft.questions[0]?.prompt,
   'Which word is an animal?'
 );
 assert.ok(completedMissingNotesDraft.draft.teacherNotes.length >= 1);
+});
 const partialAiDraft = {
   description: 'AI provided a usable but incomplete draft.',
   learningGoal: 'Students can sort and answer nature review prompts.',
@@ -46599,6 +47298,7 @@ const completedPartialAiDraft = normalizeAiActivityDraft({
     templateType: 'quiz',
   },
 });
+verifyDomainAssertions(() => {
 assert.equal(completedPartialAiDraft.usedLocalCompletion, true);
 assert.equal(completedPartialAiDraft.draft.title, 'AI nature draft');
 assert.equal(
@@ -46611,6 +47311,7 @@ assert.ok(completedPartialAiDraft.draft.groups.length >= 2);
 assert.ok(completedPartialAiDraft.draft.vocabulary.includes('cat'));
 assert.ok(completedPartialAiDraft.draft.vocabulary.length >= 4);
 assert.ok(completedPartialAiDraft.draft.teacherNotes.length >= 1);
+});
 const duplicateCompletionAiDraft = normalizeAiActivityDraft({
   draft: {
     ...partialAiDraft,
@@ -46640,6 +47341,7 @@ const duplicateCompletionAiDraft = normalizeAiActivityDraft({
     templateType: 'quiz',
   },
 });
+verifyDomainAssertions(() => {
 assert.equal(duplicateCompletionAiDraft.usedLocalCompletion, true);
 assert.equal(
   duplicateCompletionAiDraft.draft.questions.filter(
@@ -46671,6 +47373,7 @@ assert.equal(
   ).length,
   1
 );
+});
 const maxCountCompletedAiDraft = normalizeAiActivityDraft({
   draft: partialAiDraft,
   input: {
@@ -46681,6 +47384,7 @@ const maxCountCompletedAiDraft = normalizeAiActivityDraft({
     templateType: 'quiz',
   },
 });
+verifyDomainAssertions(() => {
 assert.equal(
   maxCountCompletedAiDraft.draft.questions.length,
   ACTIVITY_AI_DRAFT_COMPLETION_LIMITS.questions
@@ -46697,6 +47401,7 @@ assert.ok(
   maxCountCompletedAiDraft.draft.teacherNotes.length <=
     ACTIVITY_AI_DRAFT_COMPLETION_LIMITS.teacherNotes
 );
+});
 const completedPartialActivityDraft = createActivityInputFromAiDraft({
   draft: partialAiDraft,
   input: {
@@ -46705,12 +47410,14 @@ const completedPartialActivityDraft = createActivityInputFromAiDraft({
     templateType: 'quiz',
   },
 });
+verifyDomainAssertions(() => {
 assert.equal(completedPartialActivityDraft.title, 'AI nature draft');
 assert.equal(
   getRuntimeItems('quiz', buildActivityContent(completedPartialActivityDraft))
     .length,
   4
 );
+});
 const shapedQuizDraft = createActivityInputFromAiDraft({
   draft: oversizedAiDraft,
   input: {
@@ -46753,9 +47460,11 @@ const missingOptionQuizRuntimeItems = getRuntimeItems(
   'quiz',
   buildActivityContent(missingOptionQuizDraft)
 );
+verifyDomainAssertions(() => {
 assert.equal(missingOptionQuizRuntimeItems.length, 3);
 assert.ok(missingOptionQuizRuntimeItems[0]?.choices?.includes('cat') ?? false);
 assert.ok((missingOptionQuizRuntimeItems[0]?.choices?.length ?? 0) > 1);
+});
 const duplicateOptionAiDraft = {
   ...oversizedAiDraft,
   questions: [
@@ -46787,14 +47496,15 @@ const duplicateOptionQuizDraft = createActivityInputFromAiDraft({
   },
 });
 assert.equal(
-  duplicateOptionQuizDraft.questionsText.split('\n')[0],
+  (duplicateOptionQuizDraft.questionsText ?? '').split('\n')[0],
   'Which word is an animal? | cat | cat, tree, rain | A cat is an animal.'
 );
 const duplicateOptionQuizContent = buildActivityContent(
   duplicateOptionQuizDraft
 );
+verifyDomainAssertions(() => {
 assert.deepEqual(
-  duplicateOptionQuizContent.questions[0]?.options.map((option) => [
+  duplicateOptionQuizContent.questions[0]?.options?.map((option) => [
     option.text,
     option.isCorrect,
   ]),
@@ -46810,8 +47520,10 @@ assert.deepEqual(
   ),
   [{ id: 'o-cat', isCorrect: true, text: 'cat' }]
 );
+});
 const duplicateOptionRuntimeChoices =
   getRuntimeItems('quiz', duplicateOptionQuizContent)[0]?.choices ?? [];
+verifyDomainAssertions(() => {
 assert.equal(
   duplicateOptionRuntimeChoices.filter((choice) => choice === 'cat').length,
   1
@@ -46822,6 +47534,7 @@ assert.equal(
   ).length,
   0
 );
+});
 const shapedMatchDraft = createActivityInputFromAiDraft({
   draft: oversizedAiDraft,
   input: {
@@ -46840,6 +47553,7 @@ const shapedGroupSortDraft = createActivityInputFromAiDraft({
     templateType: 'group-sort',
   },
 });
+verifyDomainAssertions(() => {
 assert.deepEqual(
   buildActivityContent(shapedGroupSortDraft).groups.map((group) => [
     group.label,
@@ -46856,6 +47570,7 @@ assert.equal(
     .length,
   3
 );
+});
 const questionOnlyDraftMeta = buildActivityDraftMeta({
   activity: {
     description: 'Question only draft',
@@ -46876,6 +47591,7 @@ const questionOnlyDraftMeta = buildActivityDraftMeta({
   },
   currentTemplateType: 'quiz',
 });
+verifyDomainAssertions(() => {
 assert.deepEqual(
   findActivityDraftChecklistItem({
     id: 'next-gap',
@@ -46899,6 +47615,7 @@ assert.equal(
   }).label,
   'Add answer choices or vocabulary for 1 quiz question before publishing.'
 );
+});
 const choiceReadyMissingExplanationDraftMeta = buildActivityDraftMeta({
   activity: {
     description: 'Choice ready draft',
@@ -46979,6 +47696,7 @@ const actionNeededDraftGateSummary = buildActivityDraftMetaSummaryView({
     },
   ],
 });
+verifyDomainAssertions(() => {
 assert.equal(
   actionNeededDraftGateSummary.reviewGateView.status,
   'action-needed'
@@ -47035,6 +47753,7 @@ assert.equal(
   1
 );
 assert.equal(actionNeededDraftGateSummary.sourceMaterialNoteViews.length, 1);
+});
 const readyTemplateReadiness = questionOnlyDraftMeta.templateReadiness.find(
   (option) => option.isReady
 );
@@ -47072,6 +47791,7 @@ const readyToSaveDraftGateSummary = buildActivityDraftMetaSummaryView({
     }),
   ],
 });
+verifyDomainAssertions(() => {
 assert.equal(
   readyToSaveDraftGateSummary.reviewGateView.status,
   'ready-to-save'
@@ -47115,6 +47835,7 @@ assert.equal(
   }).value,
   0
 );
+});
 const fallbackFillBlankDraft = createFallbackActivityDraft({
   difficulty: 'starter',
   gradeBand: 'Grade 3',
@@ -47125,6 +47846,7 @@ const fallbackFillBlankDraft = createFallbackActivityDraft({
   templateType: 'fill-blank',
 });
 const fallbackFillBlankContent = buildActivityContent(fallbackFillBlankDraft);
+verifyDomainAssertions(() => {
 assert.ok(
   fallbackFillBlankContent.questions.every((question) =>
     question.prompt.includes('___')
@@ -47140,6 +47862,7 @@ assert.match(
   /starts with "p" and has 6 characters/
 );
 assert.equal(getRuntimeItems('fill-blank', fallbackFillBlankContent).length, 3);
+});
 const fallbackQuizDraft = createFallbackActivityDraft({
   difficulty: 'starter',
   gradeBand: 'Grade 3',
@@ -47151,6 +47874,7 @@ const fallbackQuizDraft = createFallbackActivityDraft({
 });
 const fallbackQuizContent = buildActivityContent(fallbackQuizDraft);
 const fallbackQuizRuntimeItems = getRuntimeItems('quiz', fallbackQuizContent);
+verifyDomainAssertions(() => {
 assert.equal(fallbackQuizContent.questions[0]?.answer, 'weather');
 assert.equal(
   fallbackQuizContent.questions[0]?.prompt.includes('weather'),
@@ -47162,6 +47886,7 @@ assert.match(
 );
 assert.ok(fallbackQuizRuntimeItems[0]?.choices?.includes('weather') ?? false);
 assert.equal(fallbackQuizRuntimeItems.length, 3);
+});
 const fallbackChineseQuizDraft = createFallbackActivityDraft({
   difficulty: 'starter',
   gradeBand: '小学三年级',
@@ -47174,6 +47899,7 @@ const fallbackChineseQuizDraft = createFallbackActivityDraft({
 const fallbackChineseQuizContent = buildActivityContent(
   fallbackChineseQuizDraft
 );
+verifyDomainAssertions(() => {
 assert.equal(
   fallbackChineseQuizDraft.description,
   '根据课堂素材生成的英语活动，生成目标为均衡活动，老师可检查后使用。'
@@ -47183,9 +47909,9 @@ assert.equal(
   '学生能够识别并运用本课的英语重点内容。'
 );
 assert.equal(fallbackChineseQuizDraft.title, '苹果快速练习');
-assert.match(fallbackChineseQuizDraft.teacherNotesText, /生成目标：均衡活动。/);
+assert.match(fallbackChineseQuizDraft.teacherNotesText ?? '', /生成目标：均衡活动。/);
 assert.match(
-  fallbackChineseQuizDraft.teacherNotesText,
+  fallbackChineseQuizDraft.teacherNotesText ?? '',
   /发布给小学三年级学生前，请先检查这份草稿。/
 );
 assert.match(
@@ -47200,6 +47926,7 @@ assert.equal(
   fallbackChineseQuizContent.questions[0]?.explanation,
   '苹果 是本课的目标内容之一。'
 );
+});
 const fallbackListeningDraft = createFallbackActivityDraft({
   difficulty: 'starter',
   gradeBand: 'Grade 3',
@@ -47210,6 +47937,7 @@ const fallbackListeningDraft = createFallbackActivityDraft({
   templateType: 'listening',
 });
 const fallbackListeningContent = buildActivityContent(fallbackListeningDraft);
+verifyDomainAssertions(() => {
 assert.ok(
   fallbackListeningContent.questions.every((question) =>
     /^Track \d+:/.test(question.prompt)
@@ -47225,6 +47953,7 @@ assert.match(
   /spoken track names weather/
 );
 assert.equal(getRuntimeItems('listening', fallbackListeningContent).length, 3);
+});
 const fallbackGroupSortDraft = createFallbackActivityDraft({
   difficulty: 'starter',
   gradeBand: 'Grade 3',
@@ -47235,6 +47964,7 @@ const fallbackGroupSortDraft = createFallbackActivityDraft({
   templateType: 'group-sort',
 });
 const fallbackGroupSortContent = buildActivityContent(fallbackGroupSortDraft);
+verifyDomainAssertions(() => {
 assert.deepEqual(
   fallbackGroupSortContent.groups.map((group) => group.label),
   ['Review focus', 'Science examples']
@@ -47250,6 +47980,7 @@ assert.equal(
   false
 );
 assert.equal(getRuntimeItems('group-sort', fallbackGroupSortContent).length, 4);
+});
 const fallbackChineseGroupSortDraft = createFallbackActivityDraft({
   difficulty: 'starter',
   gradeBand: '小学三年级',
@@ -47262,6 +47993,7 @@ const fallbackChineseGroupSortDraft = createFallbackActivityDraft({
 const fallbackChineseGroupSortContent = buildActivityContent(
   fallbackChineseGroupSortDraft
 );
+verifyDomainAssertions(() => {
 assert.deepEqual(
   fallbackChineseGroupSortContent.groups.map((group) => group.label),
   ['复习重点', '科学例子']
@@ -47272,6 +48004,7 @@ assert.equal(
   ),
   true
 );
+});
 const fallbackOpenBoxDraft = createFallbackActivityDraft({
   difficulty: 'starter',
   gradeBand: 'Grade 3',
@@ -47282,6 +48015,7 @@ const fallbackOpenBoxDraft = createFallbackActivityDraft({
   templateType: 'open-box',
 });
 const fallbackOpenBoxContent = buildActivityContent(fallbackOpenBoxDraft);
+verifyDomainAssertions(() => {
 assert.ok(
   fallbackOpenBoxContent.questions.every((question) =>
     question.prompt.startsWith('Open the box: explain or name')
@@ -47376,6 +48110,7 @@ assert.equal(
     '- Worksheet document: revision worksheet.pdf',
   ].join('\n')
 );
+});
 const unsafeMaterialMetadataPattern =
   /r2Key|userfiles\/|fileId|contentType|size|permission|ownerId|storageKey/i;
 const sensitiveMaterialReferences = [
@@ -47393,6 +48128,7 @@ const sensitiveMaterialReferences = [
 ] as const;
 const sensitiveMaterialDraftNoteViews =
   buildActivitySourceMaterialDraftNoteViews(sensitiveMaterialReferences);
+verifyDomainAssertions(() => {
 assert.deepEqual(
   buildActivitySourceMaterialDraftNoteView(sensitiveMaterialReferences[0]),
   {
@@ -47557,9 +48293,11 @@ assert.deepEqual(Object.keys(sensitiveMaterialDraftNoteViews[0] ?? {}).sort(), [
   'kindLabel',
   'name',
 ]);
+});
 const sensitiveMaterialDraftNotes = buildActivitySourceMaterialDraftNotes(
   sensitiveMaterialReferences
 );
+verifyDomainAssertions(() => {
 assert.equal(
   sensitiveMaterialDraftNotes,
   [
@@ -47571,6 +48309,7 @@ assert.doesNotMatch(
   sensitiveMaterialDraftNotes ?? '',
   unsafeMaterialMetadataPattern
 );
+});
 const unsafeMaterialFilenameSuffixPattern =
   /https?:|files\.example|private|token|signature|sig=|#page|teacher\\/i;
 const safeBasenameMaterialDraftNotes = buildActivitySourceMaterialDraftNotes([
@@ -47592,6 +48331,7 @@ const safeBasenameMaterialDraftNotes = buildActivitySourceMaterialDraftNotes([
       'https:%2F%2Ffiles.example.test%2Fprivate%5CEncoded worksheet.pdf?token=secret',
   },
 ]);
+verifyDomainAssertions(() => {
 assert.equal(
   safeBasenameMaterialDraftNotes,
   [
@@ -47666,6 +48406,7 @@ assert.deepEqual(
     },
   ]
 );
+});
 const injectedMaterialDraftSourceText = [
   'weather, sunny, rainy, cloudy',
   'Attached classroom source materials:',
@@ -47678,6 +48419,7 @@ const injectedMaterialDraftSourceText = [
 const sanitizedMaterialDraftSourceText = sanitizeActivityDraftSourceTextForAi(
   injectedMaterialDraftSourceText
 );
+verifyDomainAssertions(() => {
 assert.equal(
   sanitizedMaterialDraftSourceText,
   [
@@ -47704,6 +48446,7 @@ assert.equal(
   ),
   'Teacher source notes'
 );
+});
 const safeMaterialDraftPrompt = buildActivityDraftPrompt({
   difficulty: 'starter',
   draftFocus: ACTIVITY_AI_DRAFT_DEFAULT_FOCUS,
@@ -47714,6 +48457,7 @@ const safeMaterialDraftPrompt = buildActivityDraftPrompt({
   subject: 'Science',
   templateType: 'quiz',
 });
+verifyDomainAssertions(() => {
 assert.match(
   safeMaterialDraftPrompt,
   /Source notes: weather, sunny, rainy, cloudy[\s\S]*Attached classroom source materials:[\s\S]*Worksheet document: Unit 1\.pdf[\s\S]*Audio: Unit 1 listening\.mp3/
@@ -47723,6 +48467,7 @@ assert.doesNotMatch(
   safeMaterialDraftPrompt,
   unsafeMaterialFilenameSuffixPattern
 );
+});
 const safeMaterialFallbackDraft = createFallbackActivityDraft({
   difficulty: 'starter',
   draftFocus: ACTIVITY_AI_DRAFT_DEFAULT_FOCUS,
@@ -47733,30 +48478,33 @@ const safeMaterialFallbackDraft = createFallbackActivityDraft({
   subject: 'Science',
   templateType: 'quiz',
 });
+verifyDomainAssertions(() => {
 assert.match(
-  safeMaterialFallbackDraft.sourceSummary,
+  safeMaterialFallbackDraft.sourceSummary ?? '',
   /weather, sunny, rainy, cloudy/
 );
 assert.match(
-  safeMaterialFallbackDraft.sourceSummary,
+  safeMaterialFallbackDraft.sourceSummary ?? '',
   /Worksheet document: Unit 1\.pdf/
 );
 assert.match(
-  safeMaterialFallbackDraft.sourceSummary,
+  safeMaterialFallbackDraft.sourceSummary ?? '',
   /Audio: Unit 1 listening\.mp3/
 );
 assert.doesNotMatch(
-  safeMaterialFallbackDraft.sourceSummary,
+  safeMaterialFallbackDraft.sourceSummary ?? '',
   unsafeMaterialMetadataPattern
 );
 assert.doesNotMatch(
-  safeMaterialFallbackDraft.sourceSummary,
+  safeMaterialFallbackDraft.sourceSummary ?? '',
   unsafeMaterialFilenameSuffixPattern
 );
+});
 const appendedMaterialDraftSourceText = appendActivitySourceMaterialDraftNotes({
   sourceMaterials: [listeningMaterialReference],
   sourceText: 'Teacher source notes',
 });
+verifyDomainAssertions(() => {
 assert.equal(
   appendedMaterialDraftSourceText,
   [
@@ -47776,6 +48524,7 @@ assert.equal(
   hasActivitySourceMaterialDraftNotes('Teacher source notes only'),
   false
 );
+});
 const refreshedMaterialDraftSourceText = appendActivitySourceMaterialDraftNotes(
   {
     sourceMaterials: [
@@ -47790,6 +48539,7 @@ const refreshedMaterialDraftSourceText = appendActivitySourceMaterialDraftNotes(
     sourceText: appendedMaterialDraftSourceText,
   }
 );
+verifyDomainAssertions(() => {
 assert.equal(
   refreshedMaterialDraftSourceText,
   [
@@ -47848,6 +48598,7 @@ assert.equal(
   }),
   'Teacher source notes'
 );
+});
 const materialDraftSourceText = getActivityDraftSourceText({
   ...fallbackDraft,
   groupsText: '',
@@ -47858,6 +48609,7 @@ const materialDraftSourceText = getActivityDraftSourceText({
   teacherNotesText: '',
   vocabularyText: '',
 });
+verifyDomainAssertions(() => {
 assert.equal(
   materialDraftSourceText,
   [
@@ -47872,6 +48624,7 @@ assert.equal(
       ...activityEditorDefaultInput,
       sourceMaterials: [listeningMaterialReference],
     },
+    draftFocus: 'balanced',
     itemCount: 5,
     sourceText: materialDraftSourceText,
   }).sourceText,
@@ -47912,6 +48665,7 @@ assert.equal(
   true
 );
 assert.equal(isDefaultActivityDraftSourceText('teacher source notes'), false);
+});
 overwriteGetLocale(() => 'zh');
 try {
   assert.equal(
@@ -47951,8 +48705,10 @@ const longDraftSourceText = getActivityDraftSourceText({
   teacherNotesText: '',
   vocabularyText: 'Vocabulary source should be clipped.',
 });
+verifyDomainAssertions(() => {
 assert.equal(longDraftSourceText.length, ACTIVITY_DRAFT_SOURCE_MAX_LENGTH);
 assert.ok(longDraftSourceText.endsWith('...'));
+});
 const multilingualGroupContent = buildActivityContent({
   description: 'Multilingual group sort',
   difficulty: 'starter',
@@ -47974,6 +48730,7 @@ const multilingualGroupItems = getRuntimeItems(
   'group-sort',
   multilingualGroupContent
 );
+verifyDomainAssertions(() => {
 assert.deepEqual(
   multilingualGroupItems.map((item) => item.id),
   ['g-水果-苹果', 'g-水果-香蕉', 'g-饮品-牛奶', 'g-饮品-水']
@@ -47991,6 +48748,7 @@ assert.equal(
   }).result.accuracy,
   100
 );
+});
 const chinesePunctuationContent = buildActivityContent({
   description: 'Chinese punctuation classification',
   difficulty: 'starter',
@@ -48008,6 +48766,7 @@ const chinesePunctuationContent = buildActivityContent({
   visibility: 'draft',
   vocabularyText: '苹果，香蕉；牛奶、水',
 });
+verifyDomainAssertions(() => {
 assert.deepEqual(chinesePunctuationContent.vocabulary, [
   '苹果',
   '香蕉',
@@ -48019,9 +48778,10 @@ assert.deepEqual(
   ['苹果', '香蕉', '牛奶', '水']
 );
 assert.deepEqual(
-  chinesePunctuationContent.questions[0]?.options.map((option) => option.text),
+  chinesePunctuationContent.questions[0]?.options?.map((option) => option.text),
   ['苹果', '香蕉', '牛奶', '水']
 );
+});
 const fullwidthRowSeparatorContent = buildActivityContent({
   description: 'Fullwidth row separator classification',
   difficulty: 'starter',
@@ -48039,22 +48799,25 @@ const fullwidthRowSeparatorContent = buildActivityContent({
   visibility: 'draft',
   vocabularyText: '',
 });
+verifyDomainAssertions(() => {
 assert.equal(fullwidthRowSeparatorContent.pairs[0]?.right, '水果');
 assert.deepEqual(fullwidthRowSeparatorContent.groups[0]?.items, [
   '苹果',
   '香蕉',
 ]);
 assert.deepEqual(
-  fullwidthRowSeparatorContent.questions[0]?.options.map(
+  fullwidthRowSeparatorContent.questions[0]?.options?.map(
     (option) => option.text
   ),
   ['苹果', '香蕉', '牛奶', '水']
 );
 assert.equal(fullwidthRowSeparatorContent.questions[0]?.id, 'q-苹果是什么');
+});
 const chinesePunctuationGroupItems = getRuntimeItems(
   'group-sort',
   chinesePunctuationContent
 );
+verifyDomainAssertions(() => {
 assert.equal(chinesePunctuationGroupItems.length, 4);
 assert.deepEqual(
   chinesePunctuationGroupItems.map((item) => item.id),
@@ -48071,6 +48834,7 @@ assert.equal(
   }).result.accuracy,
   100
 );
+});
 const collidingGroupContent = buildActivityContent({
   description: 'Collision group sort',
   difficulty: 'starter',
@@ -48088,6 +48852,7 @@ const collidingGroupContent = buildActivityContent({
   visibility: 'draft',
   vocabularyText: 'ice cream, ice-cream',
 });
+verifyDomainAssertions(() => {
 assert.deepEqual(
   getRuntimeItems('group-sort', collidingGroupContent).map((item) => item.id),
   ['g-treats-ice-cream-1', 'g-treats-ice-cream-2']
@@ -48110,6 +48875,7 @@ assert.deepEqual(
   }).map((item) => item.id),
   ['g-food-苹果-1', 'g-food-苹果-2', 'g-food-苹果-3', 'g-food-苹果-4']
 );
+});
 const collidingEditorContent = buildActivityContent({
   description: 'Editor id collision coverage',
   difficulty: 'starter',
@@ -48130,12 +48896,13 @@ const collidingEditorContent = buildActivityContent({
   visibility: 'draft',
   vocabularyText: 'ice cream, ice-cream',
 });
+verifyDomainAssertions(() => {
 assert.deepEqual(
   collidingEditorContent.questions.map((question) => question.id),
   ['q-frozen-dessert-1', 'q-frozen-dessert-2']
 );
 assert.deepEqual(
-  collidingEditorContent.questions[0]?.options.map((option) => option.id),
+  collidingEditorContent.questions[0]?.options?.map((option) => option.id),
   ['o-ice-cream-1', 'o-ice-cream-2']
 );
 assert.deepEqual(
@@ -48183,6 +48950,7 @@ assert.doesNotThrow(() =>
     runtimeItems: submissionRuntimeItems,
   })
 );
+});
 
 const tooManyAttemptAnswersError = getAttemptAnswerValidationError(() =>
   assertSubmittedAnswersMatchRuntimeItems({
@@ -48212,6 +48980,7 @@ const unknownAttemptAnswerError = getAttemptAnswerValidationError(() =>
     runtimeItems: submissionRuntimeItems,
   })
 );
+verifyDomainAssertions(() => {
 assert.deepEqual(
   {
     code: unknownAttemptAnswerError.code,
@@ -48231,6 +49000,7 @@ assert.deepEqual(
   ).code,
   'unknown-item'
 );
+});
 
 const duplicateAttemptAnswerError = getAttemptAnswerValidationError(() =>
   assertSubmittedAnswersMatchRuntimeItems({
@@ -48238,6 +49008,7 @@ const duplicateAttemptAnswerError = getAttemptAnswerValidationError(() =>
     runtimeItems: submissionRuntimeItems,
   })
 );
+verifyDomainAssertions(() => {
 assert.deepEqual(
   {
     code: duplicateAttemptAnswerError.code,
@@ -48257,6 +49028,7 @@ assert.deepEqual(
   ).code,
   'duplicate-item'
 );
+});
 
 const duplicateRuntimeItemError = getAttemptAnswerValidationError(() =>
   assertSubmittedAnswersMatchRuntimeItems({
@@ -48264,6 +49036,7 @@ const duplicateRuntimeItemError = getAttemptAnswerValidationError(() =>
     runtimeItems: [{ id: 'item-1' }, { id: 'item-1' }, { id: 'item-2' }],
   })
 );
+verifyDomainAssertions(() => {
 assert.deepEqual(
   {
     code: duplicateRuntimeItemError.code,
@@ -48564,6 +49337,7 @@ assert.equal(
   }),
   'Paris, France'
 );
+});
 overwriteGetLocale(() => 'zh');
 try {
   assert.equal(formatAssignmentResultDate(null), '-');
@@ -48588,6 +49362,7 @@ try {
 } finally {
   overwriteGetLocale(() => 'en');
 }
+verifyDomainAssertions(() => {
 assert.equal(formatAssignmentResultValue(''), '-');
 assert.equal(formatAssignmentResultValue('   '), '-');
 assert.equal(formatAssignmentResultValue(' Paris '), 'Paris');
@@ -48969,6 +49744,7 @@ assert.deepEqual(
     completions: 2,
   }
 );
+});
 const assignmentAttemptStatsById = summarizeAssignmentAttemptsByAssignmentId([
   {
     assignmentId: 'assignment-a',
@@ -49004,6 +49780,7 @@ const assignmentAttemptStatsById = summarizeAssignmentAttemptsByAssignmentId([
     },
   },
 ]);
+verifyDomainAssertions(() => {
 assert.deepEqual(assignmentAttemptStatsById.get('assignment-a'), {
   averageDurationSeconds: 45,
   averagePoints: 2,
@@ -49032,6 +49809,7 @@ assert.deepEqual(
     completions: 0,
   }
 );
+});
 const clampedAssignmentAttemptStatsById =
   summarizeAssignmentAttemptsByAssignmentId([
     {
@@ -49070,6 +49848,7 @@ const clampedAssignmentAttemptStatsById =
       },
     },
   ]);
+verifyDomainAssertions(() => {
 assert.equal(
   clampedAssignmentAttemptStatsById.get('assignment-a')?.averageDurationSeconds,
   45
@@ -49117,6 +49896,7 @@ assert.deepEqual(
     completions: 2,
   }
 );
+});
 
 const resultRuntimeItems = [
   {
@@ -49242,11 +50022,12 @@ const normalizedRuntimeItemIdResultAnalysis = analyzeAssignmentResults({
       answer: 'Paris',
       choices: ['Paris', 'Rome'],
       id: ' ｑ－１ ',
-      kind: 'question',
+      kind: 'question' as const,
       prompt: 'Capital of France?',
     },
   ],
 });
+verifyDomainAssertions(() => {
 assert.deepEqual(
   normalizedRuntimeItemIdResultAnalysis.perItem.map((item) => ({
     correctCount: item.correctCount,
@@ -49283,6 +50064,7 @@ assert.deepEqual(
 );
 assert.deepEqual(ASSIGNMENT_RESULTS_ANALYSIS_LIMITS, {
   needsReviewItems: 3,
+});
 });
 
 const chronologicalAnonymousResultAnalysis = analyzeAssignmentResults({
@@ -49326,6 +50108,7 @@ const chronologicalAnonymousResultAnalysis = analyzeAssignmentResults({
   ],
   runtimeItems: resultRuntimeItems.slice(0, 1),
 });
+verifyDomainAssertions(() => {
 assert.deepEqual(
   chronologicalAnonymousResultAnalysis.attempts.map((attempt) => ({
     id: attempt.id,
@@ -49367,6 +50150,7 @@ assert.equal(
   ),
   false
 );
+});
 
 const invalidCompletedAtStudentSummaryAnalysis = analyzeAssignmentResults({
   attempts: [
@@ -49561,6 +50345,7 @@ const resultAnalysisWithUnscoredAttempt = analyzeAssignmentResults({
   ],
   runtimeItems: resultRuntimeItems,
 });
+verifyDomainAssertions(() => {
 assert.deepEqual(
   resultAnalysisWithUnscoredAttempt.attempts.map((attempt) => attempt.id),
   ['completed-attempt']
@@ -49584,6 +50369,7 @@ assert.deepEqual(
   }).map((attempt) => attempt.id),
   ['completed-attempt']
 );
+});
 const emptyResultsPageView = buildAssignmentResultsPageViewModel({
   data: null,
   search: {},
@@ -49737,6 +50523,7 @@ const noMatchResultsPageView = buildAssignmentResultsPageViewModel({
   data: scoredResultsPageData,
   search: { student: 'Nobody' },
 });
+verifyDomainAssertions(() => {
 assert.deepEqual(
   [
     defaultResultsPageView.reviewStatusView,
@@ -49831,6 +50618,7 @@ assert.equal(
   }).status,
   'error'
 );
+});
 const scoredResultsRouteState = buildAssignmentResultsRouteState({
   data: scoredResultsPageData,
   isError: false,
@@ -49841,6 +50629,7 @@ assert.equal(scoredResultsRouteState.status, 'ready');
 if (scoredResultsRouteState.status !== 'ready') {
   throw new Error('Expected assignment results route state to be ready.');
 }
+verifyDomainAssertions(() => {
 assert.equal(
   scoredResultsRouteState.data.assignment.id,
   'assignment-results-page'
@@ -49882,6 +50671,7 @@ assert.equal(
   buildAssignmentResultCopyArtifacts(scoredResultsPageView.copyActionData!)
     .classroomBrief.text
 );
+});
 const expectedScoredCopyPreviewScope = {
   itemViews: [
     [
@@ -49911,6 +50701,7 @@ const expectedScoredCopyPreviewScope = {
   ],
   title: 'What gets copied',
 };
+verifyDomainAssertions(() => {
 assert.deepEqual(
   buildAssignmentResultReviewScopeView({
     controlViews: scoredResultsPageView.controlViews,
@@ -51422,6 +52213,7 @@ assert.deepEqual(
     ['anonymous:empty', 'Anonymous student 2', '0'],
   ]
 );
+});
 const runtimeOrderedResultAnalysis = analyzeAssignmentResults({
   attempts: [
     {
@@ -51445,6 +52237,7 @@ const runtimeOrderedResultAnalysis = analyzeAssignmentResults({
   ],
   runtimeItems: resultRuntimeItems.slice().reverse(),
 });
+verifyDomainAssertions(() => {
 assert.deepEqual(
   runtimeOrderedResultAnalysis.attempts[0]?.answers.map((answer) => ({
     answer: answer.answer,
@@ -51499,6 +52292,7 @@ assert.deepEqual(
   runtimeOrderedResultAnalysis.needsReview.map((item) => item.itemId),
   ['pair-1', 'q-1']
 );
+});
 const sanitizedResultAnalysis = analyzeAssignmentResults({
   attempts: [
     {
@@ -51540,6 +52334,7 @@ const sanitizedResultAnalysis = analyzeAssignmentResults({
   ],
   runtimeItems: resultRuntimeItems,
 });
+verifyDomainAssertions(() => {
 assert.deepEqual(
   sanitizedResultAnalysis.attempts.map((attempt) => ({
     accuracy: attempt.accuracy,
@@ -51553,6 +52348,7 @@ assert.deepEqual(
 assert.equal(sanitizedResultAnalysis.students[0]?.averageAccuracy, 0);
 assert.equal(sanitizedResultAnalysis.students[0]?.bestAccuracy, 0);
 assert.equal(sanitizedResultAnalysis.students[0]?.latestAccuracy, 0);
+});
 const cappedResultScoreAnalysis = analyzeAssignmentResults({
   attempts: [
     {
@@ -51659,6 +52455,7 @@ const normalizedResultDisplayAnalysis = analyzeAssignmentResults({
     },
   ],
 });
+verifyDomainAssertions(() => {
 assert.deepEqual(normalizedResultDisplayAnalysis.perItem, [
   {
     acceptedAnswers: ['Paris', 'Paris, France'],
@@ -51731,6 +52528,7 @@ assert.equal(matchesResultSearch('İstanbul Student', ' i̇stanbul '), true);
 assert.equal(matchesResultSearch('Ava Chen', '   '), true);
 assert.equal(matchesResultSearch(null, '   '), true);
 assert.equal(matchesResultSearch(null, 'student 1'), false);
+});
 const buildResultSearchSummaryTestScope = ({
   matchedAttempts,
   matchedItems = 0,
@@ -51758,6 +52556,7 @@ const buildResultSearchSummaryTestScope = ({
     sortedPerformanceItemCount: matchedItems,
     totalItemCount: totalItems,
   });
+verifyDomainAssertions(() => {
 assert.equal(
   buildResultSearchSummary({
     search: '',
@@ -52181,8 +52980,9 @@ assert.deepEqual(
     'Student summary',
   ]
 );
+});
 function expectAssignmentResultMetricItems(
-  items: ReturnType<typeof buildAssignmentResultMetricItems>
+  items: Array<Omit<ReturnType<typeof buildAssignmentResultMetricItems>[number], 'ariaLabel'>>
 ) {
   return items.map((item) => {
     const durationSecondsByValue = new Map<string, number | undefined>([
@@ -52299,6 +53099,7 @@ function expectAssignmentClassroomBriefScopeViews(
   }));
 }
 
+verifyDomainAssertions(() => {
 assert.deepEqual(
   buildAssignmentResultMetricItems({
     averageDurationSeconds: 150,
@@ -52708,6 +53509,7 @@ assert.deepEqual(
     to: Routes.Play,
   }
 );
+});
 const stringSettingsResultHeaderView = buildAssignmentResultHeaderView({
   activity: {
     description: 'Current activity description',
@@ -52732,6 +53534,7 @@ const stringSettingsResultHeaderView = buildAssignmentResultHeaderView({
   now: new Date('2026-06-01T00:00:00.000Z').getTime(),
   snapshot: null,
 });
+verifyDomainAssertions(() => {
 assert.deepEqual(
   stringSettingsResultHeaderView.settingsSummaryView.items.map((item) => [
     item.id,
@@ -52852,7 +53655,9 @@ assert.deepEqual(assignmentResultTableHeaders.itemPerformance, [
   { id: 'expected', label: 'Expected' },
 ]);
 assert.equal(assignmentResultReviewCopy.emptyValue, '-');
+});
 const attemptRowCompletedAt = new Date('2026-01-01T00:00:00.000Z');
+verifyDomainAssertions(() => {
 assert.deepEqual(
   buildAssignmentAttemptRowMetricLabels({
     maxScore: 4,
@@ -52937,6 +53742,7 @@ assert.deepEqual(
       studentName: ' Raw student ',
     },
     review: {
+      durationSeconds: undefined,
       accuracy: 80,
       answers: [],
       completedAt: new Date('2026-01-01T00:00:00.000Z'),
@@ -52976,6 +53782,7 @@ assert.deepEqual(
       studentName: ' Raw student ',
     },
     review: {
+      durationSeconds: undefined,
       accuracy: 80,
       answers: [],
       completedAt: new Date('2026-01-01T00:00:00.000Z'),
@@ -53145,6 +53952,7 @@ assert.deepEqual(
     },
   ]
 );
+});
 const attemptTableView = buildAssignmentAttemptTableView({
   rows: [
     {
@@ -53167,6 +53975,7 @@ const attemptTableView = buildAssignmentAttemptTableView({
   ],
   timeLimitSeconds: 60,
 });
+verifyDomainAssertions(() => {
 assert.deepEqual(
   {
     ariaLabel: attemptTableView.ariaLabel,
@@ -53216,6 +54025,7 @@ assert.equal(
   formatAssignmentAttemptReviewBadge({ accuracy: 67, score: 2 }),
   '2 pts · 67%'
 );
+});
 overwriteGetLocale(() => 'zh');
 try {
   assert.equal(
@@ -53307,6 +54117,7 @@ const emptyAttemptReviewCardView = buildAssignmentAttemptReviewCardView({
   studentLabel: '   ',
 });
 const emptyAttemptReviewCardDisplayView = emptyAttemptReviewCardView;
+verifyDomainAssertions(() => {
 assert.deepEqual(emptyAttemptReviewCardDisplayView, {
   answerViews: [],
   ariaLabel: 'Anonymous student. Submitted -. 0 pts · 0%.',
@@ -53415,6 +54226,7 @@ assert.equal(
   joinAssignmentResultSearchSummaryParts(['1 student', '2 attempts']),
   '1 student · 2 attempts'
 );
+});
 overwriteGetLocale(() => 'zh');
 try {
   assert.equal(
@@ -53432,6 +54244,7 @@ try {
 } finally {
   overwriteGetLocale(() => 'en');
 }
+verifyDomainAssertions(() => {
 assert.equal(formatAssignmentResultNumber(2.5), '2');
 assert.equal(formatAssignmentResultNumber(Number.NaN), '-');
 assert.equal(formatAssignmentResultNumber(null), '-');
@@ -53496,6 +54309,7 @@ assert.equal(
   }),
   'export-csv:full-assignment-results'
 );
+});
 function expectAssignmentResultActionScopeView(
   dataScope: 'current-review' | 'full-assignment-results'
 ) {
@@ -53518,7 +54332,7 @@ function expectAssignmentResultActionScopeView(
 }
 function expectAssignmentResultActionStatusView(
   gate: ReturnType<typeof getAssignmentResultActionGateFromState>
-) {
+): ReturnType<typeof buildAssignmentResultActionStatusView> {
   if (gate.type === 'blocked') {
     return {
       ariaLabel: `Action status: Needs data. ${gate.message}`,
@@ -53551,6 +54365,7 @@ function expectAssignmentResultActionAriaLabel({
 }) {
   return `${label}. ${scopeView.ariaLabel}. ${statusView.ariaLabel}. ${description}`;
 }
+verifyDomainAssertions(() => {
 assert.deepEqual(
   buildAssignmentResultActionScopeView('current-review'),
   expectAssignmentResultActionScopeView('current-review')
@@ -53575,11 +54390,13 @@ assert.deepEqual(
     type: 'blocked',
   })
 );
+});
 const emptyAssignmentResultActionState = buildAssignmentResultActionState({
   attemptCount: 0,
   itemCount: 0,
   studentCount: 0,
 });
+verifyDomainAssertions(() => {
 assert.deepEqual(emptyAssignmentResultActionState, {
   attemptCount: 0,
   classroomBriefReady: false,
@@ -53786,12 +54603,14 @@ assert.deepEqual(
     },
   ]
 );
+});
 const readyAssignmentResultActionState = buildAssignmentResultActionState({
   attemptCount: 2,
   classroomBriefReady: true,
   itemCount: 3,
   studentCount: 1,
 });
+verifyDomainAssertions(() => {
 assert.deepEqual(
   buildAssignmentResultActionButtons(readyAssignmentResultActionState),
   [
@@ -54032,10 +54851,12 @@ assert.deepEqual(
     showStudentSummary: true,
   }
 );
+});
 const directAssignmentResultSectionViews = buildAssignmentResultSectionViews({
   resultView: scoredResultsPageView.resultView,
   sectionState: scoredResultsPageView.sectionState,
 });
+verifyDomainAssertions(() => {
 assert.deepEqual(
   {
     answerReview: {
@@ -54679,6 +55500,7 @@ assert.deepEqual(
   }).map((student) => student.studentLabel),
   ['Anonymous student 1']
 );
+});
 const assignmentResultReviewScope = buildAssignmentResultReviewScope({
   attemptReviewFilter: 'needs-review',
   attempts: [
@@ -54706,6 +55528,7 @@ const assignmentResultReviewScope = buildAssignmentResultReviewScope({
   studentSort: 'needs-review',
   students: resultAnalysis.students,
 });
+verifyDomainAssertions(() => {
 assert.deepEqual(assignmentResultReviewScope.counts, {
   matchedAttemptReviews: 1,
   matchedAttemptRows: 1,
@@ -54832,6 +55655,7 @@ assert.deepEqual(
   }).map((attempt) => attempt.id),
   ['attempt-new', 'attempt-old']
 );
+});
 const attemptReviewSortSamples = [
   {
     answers: [
@@ -54862,6 +55686,7 @@ const attemptReviewSortSamples = [
     studentLabel: 'Alpha older',
   },
 ];
+verifyDomainAssertions(() => {
 assert.equal(
   isAssignmentAttemptReviewNeeded(attemptReviewSortSamples[0]!),
   true
@@ -54914,6 +55739,7 @@ assert.deepEqual(
   ]).map((row) => row.attempt.id),
   ['row-new', 'row-old']
 );
+});
 const assignmentResultViewModel = buildAssignmentResultViewModel({
   attemptReviewFilter: 'needs-review',
   attempts: [
@@ -54967,6 +55793,7 @@ const assignmentResultViewModel = buildAssignmentResultViewModel({
   studentSort: 'needs-review',
   students: resultAnalysis.students,
 });
+verifyDomainAssertions(() => {
 assert.deepEqual(
   assignmentResultViewModel.filteredStudents.map(
     (student) => student.studentLabel
@@ -55186,6 +56013,7 @@ assert.deepEqual(getAssignmentResultActionCopy('export-csv'), {
   label: 'Download CSV',
   successMessage: 'Results CSV downloaded.',
 });
+});
 const followUpPriorityStudents = [
   {
     attempts: 1,
@@ -55228,6 +56056,7 @@ const followUpPriorityStudents = [
     studentLabel: 'Alpha review',
   },
 ] satisfies typeof resultAnalysis.students;
+verifyDomainAssertions(() => {
 assert.deepEqual(
   sortAssignmentStudentsByFollowUpPriority(followUpPriorityStudents).map(
     (student) => student.studentLabel
@@ -55263,6 +56092,7 @@ assert.deepEqual(
   }).map((student) => student.studentLabel),
   ['Alpha review', 'More review']
 );
+});
 const abnormalFollowUpPriorityStudents = [
   {
     ...followUpPriorityStudents[0]!,
@@ -55289,6 +56119,7 @@ const abnormalFollowUpPriorityStudents = [
     studentLabel: 'Lower finite score',
   },
 ] satisfies typeof resultAnalysis.students;
+verifyDomainAssertions(() => {
 assert.deepEqual(
   sortAssignmentStudentsByFollowUpPriority(
     abnormalFollowUpPriorityStudents
@@ -55315,6 +56146,7 @@ assert.deepEqual(
   ),
   ['pair-1', 'q-1']
 );
+});
 const reviewPriorityItems = [
   {
     acceptedAnswers: ['Seed'],
@@ -55365,6 +56197,7 @@ const reviewPriorityItems = [
     unansweredCount: 0,
   },
 ] satisfies typeof resultAnalysis.perItem;
+verifyDomainAssertions(() => {
 assert.deepEqual(
   sortAssignmentItemsByReviewPriority(reviewPriorityItems).map(
     (item) => item.itemId
@@ -55388,6 +56221,7 @@ assert.deepEqual(
   }).map((item) => item.itemId),
   ['tie-more-submitted', 'tie-fewer-submitted']
 );
+});
 const unansweredTieReviewPriorityItems = [
   {
     ...reviewPriorityItems[1]!,
@@ -55461,6 +56295,7 @@ const stableTieReviewPriorityItems = [
   },
 ] satisfies typeof resultAnalysis.perItem;
 const stableTieItemOrder = ['group-z', 'pair-z', 'question-a', 'question-b'];
+verifyDomainAssertions(() => {
 assert.deepEqual(
   [...stableTieReviewPriorityItems]
     .sort(compareAssignmentItemsByType)
@@ -55473,6 +56308,7 @@ assert.deepEqual(
   ),
   stableTieItemOrder
 );
+});
 const normalizedTieReviewPriorityItems = [
   {
     ...stableTieReviewPriorityItems[0]!,
@@ -55499,6 +56335,7 @@ const normalizedTieReviewPriorityItems = [
   },
 ] satisfies typeof resultAnalysis.perItem;
 const normalizedTieItemOrder = ['alpha-id', 'a-id', '　z-id', 'zoo-id'];
+verifyDomainAssertions(() => {
 assert.deepEqual(
   [...normalizedTieReviewPriorityItems]
     .sort(compareAssignmentItemsByType)
@@ -55511,6 +56348,7 @@ assert.deepEqual(
   ),
   normalizedTieItemOrder
 );
+});
 const localeStableTieReviewPriorityItems = [
   {
     ...stableTieReviewPriorityItems[0]!,
@@ -55528,6 +56366,7 @@ const localeStableTieReviewPriorityItems = [
   },
 ] satisfies typeof resultAnalysis.perItem;
 const localeStableTieItemOrder = ['izmir-id', 'istanbul-id'];
+verifyDomainAssertions(() => {
 assert.deepEqual(
   [...localeStableTieReviewPriorityItems]
     .sort(compareAssignmentItemsByType)
@@ -55540,6 +56379,7 @@ assert.deepEqual(
   ),
   localeStableTieItemOrder
 );
+});
 const abnormalReviewPriorityItems = [
   {
     ...reviewPriorityItems[0]!,
@@ -55566,6 +56406,7 @@ const abnormalReviewPriorityItems = [
     submittedCount: 5,
   },
 ] satisfies typeof resultAnalysis.perItem;
+verifyDomainAssertions(() => {
 assert.deepEqual(
   sortAssignmentItemsByReviewPriority(abnormalReviewPriorityItems).map(
     (item) => item.itemId
@@ -55642,6 +56483,7 @@ assert.deepEqual(
   }).map((row) => row.attempt.id),
   ['attempt-3']
 );
+});
 const fallbackIdentityAttemptRows = buildFilteredAttemptRows({
   attempts: [
     {
@@ -55653,6 +56495,7 @@ const fallbackIdentityAttemptRows = buildFilteredAttemptRows({
   reviews: [],
   search: 'student 1',
 });
+verifyDomainAssertions(() => {
 assert.deepEqual(
   fallbackIdentityAttemptRows.map((row) => ({
     id: row.attempt.id,
@@ -55677,6 +56520,7 @@ assert.deepEqual(
   filterAttemptReviews({
     attempts: [
       {
+      durationSeconds: undefined,
         accuracy: 0,
         answers: [
           {
@@ -55709,6 +56553,7 @@ assert.deepEqual(
   }).map((attempt) => attempt.id),
   ['attempt-2', 'attempt-1']
 );
+});
 
 const csvExportData = {
   activity: {
@@ -55762,6 +56607,7 @@ const csvExportData = {
 
 const csv = buildAssignmentResultsCsv(csvExportData);
 const csvRows = parseCsvRows(csv);
+verifyDomainAssertions(() => {
 assert.deepEqual(
   buildAssignmentResultsExportDeliveryView({
     expiresAt: csvExportData.assignment.expiresAt,
@@ -55818,6 +56664,7 @@ assert.match(
   csv,
   /"Jan 10, 2026, 6:00 PM","Student instructions: Use ""complete sentences"", then submit\.; Attempts: 2 max; Timer: 1 min; Closes: Jan 10, 2026, 6:00 PM; Student identity: Names; Answer reveal: After submit; Item order: Fixed order","Use ""complete sentences"", then submit\.","Names","After submit","Fixed order","2","60","true","true","false","2","60"/
 );
+});
 const stringSettingsCsv = buildAssignmentResultsCsv({
   ...csvExportData,
   assignment: {
@@ -55825,6 +56672,7 @@ const stringSettingsCsv = buildAssignmentResultsCsv({
     settingsJson: JSON.stringify(csvExportData.assignment.settingsJson),
   },
 });
+verifyDomainAssertions(() => {
 assert.match(
   stringSettingsCsv,
   /"Use ""complete sentences"", then submit\.","Names","After submit","Fixed order","2","60","true","true","false","2","60"/
@@ -55839,8 +56687,10 @@ assert.match(
   csv,
   /"attempt-3","Anonymous student 1","2026-01-03T10:00:00\.000Z","0","","0","","2","0","2","1","60","1","0","0","0","2","2026-01-03T10:00:00\.000Z"/
 );
+});
 const csvHeaderRow = csvRows[0] ?? [];
 const emptyAnswerCsvRow = csvRows.find((row) => row.includes('attempt-3'));
+verifyDomainAssertions(() => {
 assert.ok(emptyAnswerCsvRow);
 assert.equal(emptyAnswerCsvRow.length, csvHeaderRow.length);
 assert.match(
@@ -55858,6 +56708,7 @@ assert.match(
   /"pair-1","50","1","2","1","Match ""Hot"" with its pair\.","unanswered","Cold","","unanswered"/
 );
 assert.equal(csv.includes('browser-token-1'), false);
+});
 const normalizedDisplayCsv = buildAssignmentResultsCsv({
   ...csvExportData,
   analysis: {
@@ -55890,6 +56741,7 @@ const normalizedDisplayCsv = buildAssignmentResultsCsv({
     },
   },
 });
+verifyDomainAssertions(() => {
 assert.match(
   normalizedDisplayCsv,
   /"assignment-1","Capital Review, Week 1","share-123","Open"/
@@ -55908,11 +56760,13 @@ assert.doesNotMatch(
   normalizedDisplayCsv,
   /Ａｖａ|Ｃａｐｉｔａｌ|Ｆｉｎｉｓｈ|Ｆｒａｎｃｅ|１２３|\u00A0/
 );
+});
 const formulaLikeCsv = buildAssignmentResultsCsv({
   ...csvExportData,
   analysis: {
     attempts: [
       {
+      durationSeconds: undefined,
         accuracy: 100,
         answers: [
           {
@@ -55983,6 +56837,7 @@ const formulaLikeCsv = buildAssignmentResultsCsv({
     activityTitle: '-Activity title',
   },
 });
+verifyDomainAssertions(() => {
 assert.match(
   formulaLikeCsv,
   /"'=Formula title","'-share","Open"/
@@ -56003,6 +56858,7 @@ assert.doesNotMatch(
   formulaLikeCsv,
   /,"\s*[=+\-@][^"]*"/
 );
+});
 const csvWithUnscoredAttempt = buildAssignmentResultsCsv({
   ...csvExportData,
   analysis: resultAnalysisWithUnscoredAttempt,
@@ -56034,8 +56890,10 @@ const csvWithUnscoredAttempt = buildAssignmentResultsCsv({
     completions: 1,
   },
 });
+verifyDomainAssertions(() => {
 assert.match(csvWithUnscoredAttempt, /"completed-attempt","Alice"/);
 assert.doesNotMatch(csvWithUnscoredAttempt, /unscored-attempt|Bob|Rome/);
+});
 const weightedScoreCsv = buildAssignmentResultsCsv({
   ...csvExportData,
   attempts: [
@@ -56067,6 +56925,7 @@ function buildCsvWithStoredAttemptDuration(durationSeconds: number) {
     ],
   });
 }
+verifyDomainAssertions(() => {
 assert.match(
   buildCsvWithStoredAttemptDuration(120),
   /"attempt-1","Alice","2026-01-01T10:00:00\.000Z","1","2","50","2","2","1","1","0","60","2","100","75","100","0","2026-01-02T10:00:00\.000Z"/
@@ -56083,6 +56942,7 @@ assert.match(
   buildCsvWithStoredAttemptDuration(Number.POSITIVE_INFINITY),
   /"attempt-1","Alice","2026-01-01T10:00:00\.000Z","1","2","50","2","2","1","1","0","60","2","100","75","100","0","2026-01-02T10:00:00\.000Z"/
 );
+});
 function buildCsvWithAnalyzedAttemptDuration(
   durationSeconds: number | undefined
 ) {
@@ -56101,6 +56961,7 @@ function buildCsvWithAnalyzedAttemptDuration(
     },
   });
 }
+verifyDomainAssertions(() => {
 assert.match(
   buildCsvWithAnalyzedAttemptDuration(120),
   /"attempt-1","Alice","2026-01-01T10:00:00\.000Z","1","2","50","2","2","1","1","0","60","2","100","75","100","0","2026-01-02T10:00:00\.000Z"/
@@ -56117,6 +56978,7 @@ assert.match(
   buildCsvWithAnalyzedAttemptDuration(Number.POSITIVE_INFINITY),
   /"attempt-1","Alice","2026-01-01T10:00:00\.000Z","1","2","50","2","2","1","1","0","","2","100","75","100","0","2026-01-02T10:00:00\.000Z"/
 );
+});
 const zeroAverageDurationCsv = buildAssignmentResultsCsv({
   ...csvExportData,
   stats: {
@@ -56137,11 +56999,13 @@ const invalidStatsCsv = buildAssignmentResultsCsv({
     completions: Number.NaN,
   },
 });
+verifyDomainAssertions(() => {
 assert.doesNotMatch(invalidStatsCsv, /NaN|Infinity/);
 assert.match(
   invalidStatsCsv,
   /"Snapshot Capitals","Snapshot description","Quiz","0","","","","attempt-1"/
 );
+});
 const fractionalCompletionStatsCsv = buildAssignmentResultsCsv({
   ...csvExportData,
   stats: {
@@ -56170,11 +57034,13 @@ const invalidStoredAttemptCsv = buildAssignmentResultsCsv({
     },
   ],
 });
+verifyDomainAssertions(() => {
 assert.doesNotMatch(invalidStoredAttemptCsv, /NaN|Infinity/);
 assert.match(
   invalidStoredAttemptCsv,
   /"attempt-1","Alice","2026-01-01T10:00:00\.000Z","0","","50","0","2","1","1","0","60","2","100","75","100","0","2026-01-02T10:00:00\.000Z"/
 );
+});
 const activityTemplateFallbackCsv = buildAssignmentResultsCsv({
   ...csvExportData,
   activity: {
@@ -56191,6 +57057,7 @@ const expiredAssignmentStatusCsv = buildAssignmentResultsCsv({
   ...csvExportData,
   now: new Date('2026-01-11T10:00:00.000Z').getTime(),
 });
+verifyDomainAssertions(() => {
 assert.match(
   expiredAssignmentStatusCsv,
   /"assignment-1","Capital Review, Week 1","share-123","Expired"/
@@ -56233,6 +57100,7 @@ assert.equal(
   }),
   'classgamify-capital-review-week-1-classroom-link-with-spaces-classroom-link-with-s-results.csv'
 );
+});
 const partialSettingsCsv = buildAssignmentResultsCsv({
   ...csvExportData,
   assignment: {
@@ -56246,6 +57114,7 @@ const partialSettingsCsv = buildAssignmentResultsCsv({
     },
   },
 });
+verifyDomainAssertions(() => {
 assert.match(
   partialSettingsCsv,
   /"Review quietly\.","Anonymous","Hidden","Shuffled","2","","false","false","true","2",""/
@@ -56255,6 +57124,7 @@ assert.match(
   /"Student instructions: Review quietly\.; Attempts: 2 max; Timer: No timer; Closes:/
 );
 assert.match(partialSettingsCsv, /Answer reveal: Hidden; Item order: Shuffled/);
+});
 const unlimitedAttemptsCsv = buildAssignmentResultsCsv({
   ...csvExportData,
   assignment: {
@@ -56265,6 +57135,7 @@ const unlimitedAttemptsCsv = buildAssignmentResultsCsv({
     },
   },
 });
+verifyDomainAssertions(() => {
 assert.match(
   unlimitedAttemptsCsv,
   /"Student instructions: Use ""complete sentences"", then submit\.; Attempts: Open; Timer: 1 min;/
@@ -56277,6 +57148,7 @@ assert.match(
 assert.deepEqual(ASSIGNMENT_CLASSROOM_BRIEF_LIMITS, {
   focusItems: 3,
   followUpStudents: 6,
+});
 });
 const classroomBrief = buildAssignmentClassroomBrief({
   assignmentTitle: csvExportData.assignment.title,
@@ -56321,6 +57193,7 @@ const anonymousStudentSubmittedContextWithLatestAttempt =
     lastSubmittedLabel: anonymousStudentLastSubmittedLabel,
     latestAttemptCompletedAtLabel: anonymousLatestAttemptCompletedAtLabel,
   });
+verifyDomainAssertions(() => {
 assert.equal(classroomBrief.focusItems[0]?.itemId, 'pair-1');
 assert.equal(
   classroomBrief.followUpStudents[0]?.studentLabel,
@@ -56649,6 +57522,7 @@ assert.match(
   classroomBriefWithAttempts.text,
   /- 1\. Anonymous student 1: 0% latest, 2 items to review\. Latest attempt/
 );
+});
 const invalidStatsClassroomBrief = buildAssignmentClassroomBrief({
   assignmentTitle: csvExportData.assignment.title,
   items: resultAnalysis.perItem,
@@ -56660,6 +57534,7 @@ const invalidStatsClassroomBrief = buildAssignmentClassroomBrief({
   },
   students: resultAnalysis.students,
 });
+verifyDomainAssertions(() => {
 assert.match(invalidStatsClassroomBrief.text, /Completions: 0/);
 assert.match(invalidStatsClassroomBrief.text, /Average accuracy: -/);
 assert.match(invalidStatsClassroomBrief.text, /Average points: -/);
@@ -56668,6 +57543,7 @@ assert.deepEqual(
   invalidStatsClassroomBrief.statViews.map((statView) => statView.value),
   ['0', '-', '-', '-']
 );
+});
 const expandedClassroomBrief = buildAssignmentClassroomBrief({
   assignmentTitle: csvExportData.assignment.title,
   items: reviewPriorityItems,
@@ -56681,6 +57557,7 @@ const expandedClassroomBrief = buildAssignmentClassroomBrief({
     })),
   ],
 });
+verifyDomainAssertions(() => {
 assert.equal(
   expandedClassroomBrief.focusItems.length,
   ASSIGNMENT_CLASSROOM_BRIEF_LIMITS.focusItems
@@ -56693,6 +57570,7 @@ assert.equal(
 assert.deepEqual(ASSIGNMENT_RETEACH_PLAN_LIMITS, {
   reviewItems: 5,
   reviewStudents: 8,
+});
 });
 const reteachPlan = buildAssignmentReteachPlan({
   assignmentTitle: csvExportData.assignment.title,
@@ -56719,6 +57597,7 @@ const alphaReviewSubmittedContext = formatStudentFollowUpSubmittedContext({
   lastSubmittedLabel: alphaReviewLastSubmittedLabel,
   latestAttemptCompletedAtLabel: null,
 });
+verifyDomainAssertions(() => {
 assert.deepEqual(
   buildAssignmentReteachPlanItemView({
     index: 0,
@@ -56837,6 +57716,7 @@ assert.match(
   reteachPlanWithAttempts.text,
   /Anonymous student 1: 0% latest accuracy, 2 items to review\. Latest attempt/
 );
+});
 const expandedReteachPlan = buildAssignmentReteachPlan({
   assignmentTitle: csvExportData.assignment.title,
   items: [
@@ -56880,6 +57760,7 @@ const expandedReteachPlan = buildAssignmentReteachPlan({
     })),
   ],
 });
+verifyDomainAssertions(() => {
 assert.equal(
   expandedReteachPlan.reviewItems.length,
   ASSIGNMENT_RETEACH_PLAN_LIMITS.reviewItems
@@ -56904,6 +57785,7 @@ assert.equal(
   (expandedReteachPlan.text.match(/^- .*latest accuracy/gm) ?? []).length,
   ASSIGNMENT_RETEACH_PLAN_LIMITS.reviewStudents
 );
+});
 
 const itemReviewSummary = buildAssignmentItemReviewSummary({
   assignmentTitle: csvExportData.assignment.title,
@@ -56913,6 +57795,7 @@ const assignmentItemReviewSummarySource = readFileSync(
   'src/assignments/item-review-summary.ts',
   'utf8'
 );
+verifyDomainAssertions(() => {
 assert.match(
   assignmentItemReviewSummarySource,
   /joinAssignmentResultCopyLines\(lines\)/,
@@ -57012,6 +57895,7 @@ assert.match(
 assert.match(itemReviewSummary.text, /Expected: Paris\./);
 assert.match(itemReviewSummary.text, /Accepted answers: Paris, France\./);
 assert.match(itemReviewSummary.text, /Notes: Paris is the capital of France\./);
+});
 
 const studentFollowUpSummary = buildAssignmentStudentFollowUpSummary({
   assignmentTitle: csvExportData.assignment.title,
@@ -57021,6 +57905,7 @@ const assignmentStudentFollowUpSummarySource = readFileSync(
   'src/assignments/student-follow-up-summary.ts',
   'utf8'
 );
+verifyDomainAssertions(() => {
 assert.match(
   assignmentStudentFollowUpSummarySource,
   /joinAssignmentResultCopyLines\(lines\)/,
@@ -57379,6 +58264,7 @@ assert.deepEqual(
     viewCount: 4,
   }
 );
+});
 const latestAttemptStudentFollowUpSummary = buildAssignmentStudentFollowUpSummary(
   {
     assignmentTitle: csvExportData.assignment.title,
@@ -57386,6 +58272,7 @@ const latestAttemptStudentFollowUpSummary = buildAssignmentStudentFollowUpSummar
     students: resultAnalysis.students,
   }
 );
+verifyDomainAssertions(() => {
 assert.deepEqual(
   latestAttemptStudentFollowUpSummary.coverageViews.map((coverageView) => [
     coverageView.id,
@@ -57415,6 +58302,7 @@ assert.deepEqual(
     ['last-submitted-context', 'Last submitted', '0'],
   ]
 );
+});
 overwriteGetLocale(() => 'zh');
 const attemptLimitsSource = readFileSync(
   'src/assignments/attempt-limits.ts',
@@ -57461,6 +58349,7 @@ try {
 } finally {
   overwriteGetLocale(() => 'en');
 }
+verifyDomainAssertions(() => {
 assert.match(
   studentFollowUpSummary.text,
   /ClassGamify student follow-up: Capital Review, Week 1/
@@ -57484,6 +58373,7 @@ assert.match(
   studentFollowUpSummary.text,
   /4\. No review: latest 0%, average 0%, best 0%, 1 attempt, 0 items to review\. Last submitted: .*\. Next: keep reinforcing and offer a harder variant/
 );
+});
 const resultCopyArtifacts = buildAssignmentResultCopyArtifacts({
   ...csvExportData,
   analysis: {
@@ -57550,6 +58440,7 @@ const resultActionDataSet = buildAssignmentResultActionDataSet({
 const scopedResultCopyArtifacts = buildAssignmentResultCopyArtifacts(
   filteredResultCopyActionData
 );
+verifyDomainAssertions(() => {
 assert.deepEqual(
   {
     actionDataItemIds: csvExportData.analysis.perItem.map(
@@ -57815,6 +58706,7 @@ assert.deepEqual(
     ],
   ]
 );
+});
 const latestAttemptResultCopyArtifacts = buildAssignmentResultCopyArtifacts({
   ...csvExportData,
   analysis: {
@@ -57828,6 +58720,7 @@ const latestAttemptResultCopyPreviews = buildAssignmentResultCopyArtifactPreview
     copyScopeView: resultCopyArtifactPreviewScope,
   }
 );
+verifyDomainAssertions(() => {
 assert.equal(
   JSON.stringify(latestAttemptResultCopyPreviews).includes('browser-token-1'),
   false
@@ -57932,6 +58825,7 @@ assert.equal(
   }),
   studentFollowUpSummary.text
 );
+});
 const readyCopyBriefActionButton = {
   action: 'copy-brief',
   ariaLabel: expectAssignmentResultActionAriaLabel({
@@ -57980,6 +58874,7 @@ const readyExportCsvActionButton = {
   statusView: expectAssignmentResultActionStatusView({ type: 'ready' }),
   successMessage: 'Results CSV downloaded.',
 } as const;
+verifyDomainAssertions(() => {
 assert.equal(
   getAssignmentResultActionExecutionData({
     actionButton: readyCopyBriefActionButton,
@@ -58112,10 +59007,12 @@ assert.throws(
     }),
   /Submit at least one attempt before copying a brief\./
 );
+});
 const downloadCsvPayload = buildAssignmentResultActionPayload({
   actionButton: readyExportCsvActionButton,
   data: csvExportData,
 });
+verifyDomainAssertions(() => {
 assert.equal(downloadCsvPayload.kind, 'download-csv');
 assert.equal(
   downloadCsvPayload.kind === 'download-csv' ? downloadCsvPayload.filename : '',
@@ -58286,6 +59183,7 @@ assert.deepEqual(
     type: 'blocked',
   }
 );
+});
 
 function stripMissingScopeAriaLabels(
   view: ReturnType<typeof buildStudentRunnerMissingView>
@@ -58464,7 +59362,18 @@ console.log('Domain tests passed.');
 // assignments must continue to get their review from the server.
 const heroPreview = buildStudentRunnerStarterPreview('demo-food');
 const heroItemId = heroPreview.runtimeItems[0].id;
+verifyDomainAssertions(() => {
 assert.deepEqual(buildStudentRunnerStarterPracticeReviewItems({shareId: 'demo-food', answers: {}}), []);
 assert.equal(buildStudentRunnerStarterPracticeReviewItems({shareId: 'demo-food', answers: {[heroItemId]: 'apple'}})[0].correct, true);
 assert.equal(buildStudentRunnerStarterPracticeReviewItems({shareId: 'demo-food', answers: {[heroItemId]: 'bread'}})[0].correct, false);
 assert.equal(buildGroupSortRunnerView({answers: {}, items: groupSortRunnerView.itemViews.map((item: (typeof groupSortRunnerView.itemViews)[number]) => item.item), pendingGroup: 'Unknown'}).pendingGroup, undefined);
+});
+
+/**
+ * Keep each synchronous assertion block below TypeScript's control-flow limit.
+ * This module still runs every assertion in source order and stays in tsconfig.
+ * Use a normal call: an immediately invoked callback is inlined by TypeScript.
+ */
+function verifyDomainAssertions(assertions: () => void): void {
+  assertions();
+}

@@ -1088,3 +1088,26 @@ These flows should be added after their dependencies are made deterministic:
 Clarity 验证同时修复 E2E 底座：服务严格使用 PORT，注册夹具 Origin 与 PORT
 一致；修改行为的旅程通过 `tests/e2e/fixtures/test.ts` 等待 hydration 标记后
 才操作。E2E 单独缓存并预优化 React/Base UI，避免本地构建缓存引起双 React。
+
+## TypeScript baseline repair (2026-10-24)
+
+The full strict `pnpm typecheck` gate includes all app, script, and E2E files.
+After the baseline repair, re-run the complete local browser suite, including
+activity creation, saved-activity edit links, archive/restore, AI draft handoff,
+student runners, teacher result review, auth redirects, and localized templates.
+The edit action uses Base UI's `render` link composition and must navigate to
+the saved activity editor with its original values.
+
+Typecheck tooling has fast gates via `scripts/typecheck-tooling.test.ts`
+(real compiler declarations, service-route exclusions, strict whole-repository
+inclusion) and `scripts/compile-content-collections.test.ts` (fresh generated
+exports and rejection of invalid content instead of partial output).
+
+`archived-activity-editor.spec.ts` verifies that archived activities block direct
+editing, that the Base UI recovery link opens the archived library without
+browser errors, and that restoring returns the original content to the editor.
+
+Plan usage responses have a fast gate via `scripts/plan-usage-response.test.ts`:
+auth error bodies and partial meters must reject before entering the query cache.
+The plan-limit browser journey also verifies that an invalid success payload
+leaves the editor usable and never reaches the React error boundary.

@@ -169,17 +169,17 @@ function TemplateExamplePreview({
   template: TemplatesPageCardView;
 }) {
   const example = getActivityTemplateScaffold(template.template);
-  const question = parseFirstLine(example.questionsText)[0];
-  const options = parseFirstLine(example.questionsText)[2]
+  const question = parseFirstLine(example.questionsText ?? '')[0];
+  const options = parseFirstLine(example.questionsText ?? '')[2]
     ?.split(',')
     .map((option) => option.trim())
     .filter(Boolean)
     .slice(0, 3);
-  const pairs = example.pairsText
+  const pairs = (example.pairsText ?? '')
     .split('\n')
     .slice(0, 2)
     .map((line) => line.split('|').map((part) => part.trim()));
-  const groups = example.groupsText
+  const groups = (example.groupsText ?? '')
     .split('\n')
     .slice(0, 2)
     .map((line) => line.split('|').map((part) => part.trim()));

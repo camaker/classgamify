@@ -8,7 +8,10 @@ import { DEFAULT_LOGIN_REDIRECT, Routes } from '@/lib/routes';
 import { getPathWithLocale, getSafeCallbackPath } from '@/lib/urls';
 
 export const Route = createFileRoute('/auth/login')({
-  validateSearch: (search: Record<string, unknown>) => ({
+  validateSearch: (
+    search: Record<string, unknown>
+  ): { callbackUrl?: string; error?: string } => ({
+    error: typeof search.error === 'string' ? search.error : undefined,
     callbackUrl:
       typeof search.callbackUrl === 'string' ? search.callbackUrl : undefined,
   }),

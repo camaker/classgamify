@@ -6,19 +6,9 @@ import tailwindcss from '@tailwindcss/vite';
 import { cloudflare } from '@cloudflare/vite-plugin';
 import contentCollections from '@content-collections/vite';
 import { compile, paraglideVitePlugin } from '@inlang/paraglide-js';
+import { getParaglideCompilerOptions } from './scripts/paraglide-compiler-options.ts';
 
-const PARAGLIDE_OPTIONS = {
-  project: './project.inlang',
-  outdir: './src/locale/paraglide',
-  strategy: ['url', 'cookie', 'baseLocale'],
-  routeStrategies: [
-    { match: '/api/:path(.*)?', exclude: true },
-    { match: '/robots.txt', exclude: true },
-    { match: '/sitemap.xml', exclude: true },
-    { match: '/manifest.json', exclude: true },
-  ],
-  emitTsDeclarations: false,
-} satisfies Parameters<typeof paraglideVitePlugin>[0];
+const PARAGLIDE_OPTIONS = getParaglideCompilerOptions();
 
 /**
  * Vite configuration

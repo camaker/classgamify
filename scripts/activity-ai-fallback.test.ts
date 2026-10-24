@@ -44,8 +44,10 @@ test('AI fallback handoff exposes 30 deterministic draft slices', () => {
 
 test('AI fallback handoff proves material notes do not become source terms', () => {
   const sourceTerms = extractActivityDraftSourceTerms({
-    sourceText: removeActivitySourceMaterialDraftNotes(englishInput.sourceText),
-    subject: englishInput.subject,
+    sourceText: removeActivitySourceMaterialDraftNotes(
+      englishInput.sourceText ?? ''
+    ),
+    subject: englishInput.subject ?? '',
   });
 
   assert.equal(

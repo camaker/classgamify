@@ -45,6 +45,7 @@ function collectTablerImports(source: string) {
   for (const node of sourceFile.statements) {
     if (
       !ts.isImportDeclaration(node) ||
+      !node.moduleSpecifier ||
       !ts.isStringLiteral(node.moduleSpecifier) ||
       node.moduleSpecifier.text !== TABLER_IMPORT
     ) {
@@ -90,6 +91,7 @@ function collectProxyExports(source: string) {
 
     if (
       !ts.isExportDeclaration(node) ||
+      !node.moduleSpecifier ||
       !ts.isStringLiteral(node.moduleSpecifier) ||
       !node.moduleSpecifier.text.startsWith(
         '@tabler/icons-react/dist/esm/icons/'

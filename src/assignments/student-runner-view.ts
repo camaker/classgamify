@@ -64,7 +64,10 @@ type RuntimeChoiceView = {
   usedByItemId: string | undefined;
 };
 
-export type StudentRunnerItemView = StudentAttemptAnswerState & {
+export type StudentRunnerItemView = Omit<
+  StudentAttemptAnswerState,
+  'itemId'
+> & {
   item: PublicRuntimeItem;
   kindLabel: string;
   positionLabel: string;
@@ -337,7 +340,7 @@ type StudentRunnerPrepareStepView = {
 };
 
 type StudentRunnerHeaderAssignment = {
-  expiresAt: AssignmentDate;
+  expiresAt?: AssignmentDate;
   id: string;
   settings: AssignmentSettings;
   title: string;
@@ -540,7 +543,13 @@ export function buildSequentialRunnerView<
   activeItemId?: string;
   itemLabel: string;
   itemViews: TItemView[];
-}) {
+}): {
+  activeIndex: number;
+  activeItem: TItemView['item'] | undefined;
+  activeItemView: (TItemView & { sequenceLabel: string }) | undefined;
+  activeLabel: string;
+  itemViews: Array<TItemView & { sequenceLabel: string }>;
+} {
   const sequencedItemViews = itemViews.map((itemView, index) => ({
     ...itemView,
     sequenceLabel: formatSequentialRunnerItemLabel(itemLabel, index),

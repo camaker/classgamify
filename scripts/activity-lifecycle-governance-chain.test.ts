@@ -232,7 +232,7 @@ test('activity lifecycle persistence preserves content, source references, and s
   );
   assert.match(
     EDIT_ROUTE_SOURCE,
-    /buildActivityEditRouteState\(\{[\s\S]*activity,[\s\S]*<ActivityCreateForm[\s\S]*mode=\{pageView\.editor\.mode\}/,
+    /buildActivityEditRouteState\(\{[\s\S]*activity,[\s\S]*<ActivityCreateForm[\s\S]*mode=\{routeState\.pageView\.editor\.mode\}/,
     'Edit route should delegate archived edit access to the activity-domain route state.'
   );
 });

@@ -1,3 +1,4 @@
+import { compileSqliteTestQuery } from './sqlite-test-query';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { DatabaseSync } from 'node:sqlite';
@@ -349,7 +350,8 @@ type TransitionInput = {
 };
 
 function compileTransitionWhere(input: TransitionInput) {
-  return DIALECT.sqlToQuery(
+  return compileSqliteTestQuery(
+    DIALECT,
     buildAssignmentStatusTransitionWhere({
       assignmentId: input.assignmentId ?? 'assignment-cas',
       currentStatus: input.currentStatus,

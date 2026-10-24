@@ -371,6 +371,7 @@ function buildAssignmentSource(
 ): AssignmentListCardSource {
   return {
     activity: {
+      title: 'Source activity',
       description: 'Classroom distribution activity.',
       templateType: 'quiz',
     },
@@ -391,6 +392,7 @@ function buildAssignmentSource(
     },
     now: NOW,
     snapshot: {
+      activityTitle: 'Frozen source activity',
       activityDescription: 'Frozen distribution snapshot.',
       templateType: 'quiz',
     },

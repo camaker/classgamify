@@ -58,25 +58,29 @@ function ActivityEditPage() {
         ) : routeState.status === 'blocked' ? (
           <div className="rounded-lg border border-dashed bg-muted/20 p-6">
             <h2 className="text-lg font-semibold">
-              {pageView.editAccessView.title}
+              {routeState.pageView.editAccessView.title}
             </h2>
             <p className="mt-2 max-w-2xl text-sm leading-6 text-muted-foreground">
-              {pageView.editAccessView.description}
+              {routeState.pageView.editAccessView.description}
             </p>
-            <Button asChild className="mt-4">
-              <Link
-                to={pageView.archivedActivitiesAction.href}
-                search={pageView.archivedActivitiesAction.search}
-              >
-                {pageView.editAccessView.actionLabel}
-              </Link>
+            <Button
+              className="mt-4"
+              nativeButton={false}
+              render={
+                <Link
+                  to={pageView.archivedActivitiesAction.href}
+                  search={pageView.archivedActivitiesAction.search}
+                />
+              }
+            >
+              {routeState.pageView.editAccessView.actionLabel}
             </Button>
           </div>
         ) : routeState.status === 'ready' ? (
           <ActivityCreateForm
-            activityId={pageView.editor.activityId}
-            initialValues={pageView.editor.initialValues}
-            mode={pageView.editor.mode}
+            activityId={routeState.pageView.editor.activityId}
+            initialValues={routeState.pageView.editor.initialValues}
+            mode={routeState.pageView.editor.mode}
           />
         ) : (
           <div className="rounded-lg border border-destructive/30 bg-destructive/5 p-4 text-sm text-destructive">
