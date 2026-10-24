@@ -23796,6 +23796,14 @@ assert.equal(
   }).summary.estimatedMinutes,
   PUBLIC_ASSIGNMENT_ESTIMATED_MINUTES.max
 );
+const messyPairWithPrivateExplanation = {
+  answer: ' Cold ',
+  choices: [' Cold ', 'cold', 'Warm'],
+  explanation: '   ',
+  id: 'messy-pair-1',
+  kind: 'pair',
+  prompt: ' Hot ',
+} satisfies Extract<RuntimeItem, { kind: 'pair' }> & { explanation: string };
 assert.deepEqual(
   stripRuntimeAnswers([
     {
@@ -23806,14 +23814,7 @@ assert.deepEqual(
       kind: 'question',
       prompt: '  Capital   of   France?  ',
     },
-    {
-      answer: ' Cold ',
-      choices: [' Cold ', 'cold', 'Warm'],
-      ...{ explanation: '   ' },
-      id: 'messy-pair-1',
-      kind: 'pair',
-      prompt: ' Hot ',
-    },
+    messyPairWithPrivateExplanation,
   ]),
   [
     {
@@ -23845,22 +23846,24 @@ assert.equal(
   true
 );
 });
+// Explicit extra fields exercise the untrusted-data sanitization boundary.
+const privateAssignmentSettingsFixture = {
+  collectStudentName: false,
+  instructions: ' Ｆｉｎｉｓｈ\u00A0　quietly. ',
+  maxAttempts: 3,
+  showCorrectAnswers: false,
+  shuffleItems: false,
+  teacherOnlyNotes: 'Do not show this to students.',
+  timeLimitSeconds: 120,
+} satisfies Partial<AssignmentSettings> & {
+  teacherOnlyNotes: string;
+};
 const publicAssignmentPayloadWithPrivateSettings = buildPublicAssignmentPayload(
   {
     ...publicAssignmentPayloadSource,
     assignment: {
       ...publicAssignmentPayloadSource.assignment,
-      settingsJson: {
-        collectStudentName: false,
-        instructions: ' Ｆｉｎｉｓｈ\u00A0　quietly. ',
-        maxAttempts: 3,
-        showCorrectAnswers: false,
-        shuffleItems: false,
-        ...{ teacherOnlyNotes: 'Do not show this to students.' },
-        timeLimitSeconds: 120,
-      } satisfies Partial<AssignmentSettings> & {
-        teacherOnlyNotes: string;
-      },
+      settingsJson: privateAssignmentSettingsFixture,
     },
   }
 );
@@ -28442,19 +28445,23 @@ assert.equal(publicReviewMap.get('pair-1')?.correct, false);
 assert.equal(publicReviewMap.get('missing'), undefined);
 assert.equal(buildPublicAttemptReviewItemMap(undefined).size, 0);
 });
-const publicAttemptResultWithPrivateFields = buildPublicAttemptResult({
+// Explicit extra fields exercise the untrusted-data sanitization boundary.
+const privateAttemptResultFixture = {
   accuracy: 50,
   completedItemCount: 1,
   correctItemCount: 1,
   durationSeconds: 80,
   earnedPoints: 1,
-  ...{ rawAnswers: [{ answer: 'Paris', itemId: 'q-1' }] },
-  ...{ scorerTraceId: 'teacher-only-trace' },
+  rawAnswers: [{ answer: 'Paris', itemId: 'q-1' }],
+  scorerTraceId: 'teacher-only-trace',
   totalPoints: 2,
 } satisfies AttemptResult & {
   rawAnswers: Array<{ answer: string; itemId: string }>;
   scorerTraceId: string;
-});
+};
+const publicAttemptResultWithPrivateFields = buildPublicAttemptResult(
+  privateAttemptResultFixture
+);
 verifyDomainAssertions(() => {
 assert.deepEqual(Object.keys(publicAttemptResultWithPrivateFields).sort(), [
   'accuracy',
@@ -29393,34 +29400,38 @@ assert.deepEqual(partialPublicReviewItems, [
   },
 ]);
 });
+// Explicit extra fields exercise the untrusted-data sanitization boundary.
+const privateReviewAnswerFixture = {
+  answer: 'Paris',
+  correct: true,
+  itemId: 'q-private-review',
+  reviewerNotes: 'teacher-only note',
+  storageKey: 'teacher-only/answer',
+} satisfies AttemptAnswer & {
+  reviewerNotes: string;
+  storageKey: string;
+};
+// Explicit extra fields exercise the untrusted-data sanitization boundary.
+const privateReviewRuntimeFixture = {
+  acceptedAnswers: ['Paris', 'Paris, France'],
+  answer: 'Paris / Paris, France',
+  explanation: 'Paris is the capital of France.',
+  id: 'q-private-review',
+  kind: 'question' as const,
+  prompt: 'Capital of France?',
+  sourceMaterials: [listeningMaterialReference],
+  storageKey: 'teacher-only/runtime',
+} satisfies RuntimeItem & {
+  acceptedAnswers: string[];
+  sourceMaterials: unknown[];
+  storageKey: string;
+};
 const publicReviewItemsWithPrivateFields = buildPublicAttemptReviewItems({
   answers: [
-    {
-      answer: 'Paris',
-      correct: true,
-      itemId: 'q-private-review',
-      ...{ reviewerNotes: 'teacher-only note' },
-      ...{ storageKey: 'teacher-only/answer' },
-    } satisfies AttemptAnswer & {
-      reviewerNotes: string;
-      storageKey: string;
-    },
+    privateReviewAnswerFixture,
   ],
   runtimeItems: [
-    {
-      ...{ acceptedAnswers: ['Paris', 'Paris, France'] },
-      answer: 'Paris / Paris, France',
-      explanation: 'Paris is the capital of France.',
-      id: 'q-private-review',
-      kind: 'question' as const,
-      prompt: 'Capital of France?',
-      ...{ sourceMaterials: [listeningMaterialReference] },
-      ...{ storageKey: 'teacher-only/runtime' },
-    } satisfies RuntimeItem & {
-      acceptedAnswers: string[];
-      sourceMaterials: unknown[];
-      storageKey: string;
-    },
+    privateReviewRuntimeFixture,
   ],
   showCorrectAnswers: true,
 });
@@ -29512,21 +29523,25 @@ assert.deepEqual(publicRuntimeItem, {
 assert.equal('answer' in publicRuntimeItem, false);
 assert.equal('explanation' in publicRuntimeItem, false);
 });
-const publicRuntimeItemWithPrivateFields = stripRuntimeAnswer({
-  ...{ acceptedAnswers: ['Paris', 'Paris, France'] },
+// Explicit extra fields exercise the untrusted-data sanitization boundary.
+const privateRuntimeAnswerFixture = {
+  acceptedAnswers: ['Paris', 'Paris, France'],
   answer: 'Paris',
   choices: ['Paris', 'Rome'],
   explanation: 'Paris is the capital of France.',
   id: 'q-private',
   kind: 'question',
   prompt: 'Capital of France?',
-  ...{ sourceMaterials: [listeningMaterialReference] },
-  ...{ storageKey: 'teacher-only/key' },
+  sourceMaterials: [listeningMaterialReference],
+  storageKey: 'teacher-only/key',
 } satisfies RuntimeItem & {
   acceptedAnswers: string[];
   sourceMaterials: unknown[];
   storageKey: string;
-});
+};
+const publicRuntimeItemWithPrivateFields = stripRuntimeAnswer(
+  privateRuntimeAnswerFixture
+);
 verifyDomainAssertions(() => {
 assert.deepEqual(Object.keys(publicRuntimeItemWithPrivateFields).sort(), [
   'choices',
@@ -43296,9 +43311,7 @@ assert.deepEqual(questionOnlyCardSummary.lockedTemplateOptions.slice(0, 2), [
 ]);
 assert.deepEqual(
   buildActivityLibraryCompatibilityView({
-    ...{ content: questionOnlyContent },
     currentTemplateType: 'quiz',
-    ...{ sourceTitle: 'Question review' },
     summary: questionOnlyCardSummary,
   }),
   {
@@ -43341,9 +43354,7 @@ assert.deepEqual(
 );
 assert.deepEqual(
   buildActivityLibraryCompatibilityView({
-    ...{ content: questionOnlyContent },
     currentTemplateType: 'quiz',
-    ...{ sourceTitle: 'Question review' },
     summary: questionOnlyCardSummary,
     visibility: 'archived',
   }),
@@ -43389,9 +43400,7 @@ assert.deepEqual(
 );
 });
 const questionOnlyCompatibilityView = buildActivityLibraryCompatibilityView({
-  ...{ content: questionOnlyContent },
   currentTemplateType: 'quiz',
-  ...{ sourceTitle: 'Question review' },
   summary: questionOnlyCardSummary,
 });
 verifyDomainAssertions(() => {

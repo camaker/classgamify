@@ -1111,3 +1111,10 @@ Plan usage responses have a fast gate via `scripts/plan-usage-response.test.ts`:
 auth error bodies and partial meters must reject before entering the query cache.
 The plan-limit browser journey also verifies that an invalid success payload
 leaves the editor usable and never reaches the React error boundary.
+
+Deep-review fast gates: `scripts/activity-editor-lifecycle.test.ts` checks that
+editor conversion preserves every active visibility and rejects archived input
+until explicit restore; `scripts/catch-boundary-message.test.ts` preserves
+string messages on serialized errors and foreign prototypes, with a localized
+fallback for non-string messages. Keep the archive/restore browser journey above
+as the end-to-end acceptance path for this boundary.

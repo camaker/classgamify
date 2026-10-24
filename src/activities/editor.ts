@@ -17,7 +17,7 @@ import {
 } from '@/activities/ai-draft';
 import { getActivityTemplates, getTemplateByType } from '@/activities/catalog';
 import {
-  ACTIVITY_RESTORED_VISIBILITY,
+  assertActivityCanEdit,
   activityEditPageCopy,
   buildActivityEditAccessView,
   type ActivityEditAccessView,
@@ -1830,6 +1830,7 @@ export function buildActivityEditorTemplateScaffoldApplication({
 export function activityContentToEditorInput(
   source: ActivityEditorSource
 ): CreateActivityInput {
+  assertActivityCanEdit(source.visibility);
   return {
     description: source.description ?? '',
     difficulty: source.content.difficulty,
@@ -1847,10 +1848,7 @@ export function activityContentToEditorInput(
     teacherNotesText: formatEditorLineList(source.content.teacherNotes),
     templateType: source.templateType,
     title: source.title,
-    visibility:
-      source.visibility === 'archived'
-        ? ACTIVITY_RESTORED_VISIBILITY
-        : source.visibility,
+    visibility: source.visibility,
     vocabularyText: formatEditorInlineList(source.content.vocabulary),
   };
 }

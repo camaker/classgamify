@@ -4,13 +4,16 @@ import type { ErrorComponentProps } from '@tanstack/react-router';
 import { Logo } from '@/components/shared/logo';
 import { buttonVariants } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
+import { getCatchBoundaryMessage } from '@/lib/catch-boundary-message';
 /**
  * Default catch boundary for TanStack Router.
  * Layout and styling aligned with NotFound for consistency.
  */
 export function DefaultCatchBoundary({ error }: ErrorComponentProps) {
-  const message =
-    error instanceof Error ? error.message : m.catch_boundary_description();
+  const message = getCatchBoundaryMessage(
+    error,
+    m.catch_boundary_description()
+  );
   return (
     <div className="flex min-h-[60vh] flex-col items-center justify-center gap-8 px-4">
       <Logo className="size-12" />
