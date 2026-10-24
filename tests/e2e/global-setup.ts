@@ -31,6 +31,11 @@ async function visit(page: Page, path: string) {
   await page.goto(path, { timeout: WARM_TIMEOUT_MS, waitUntil: 'load' });
   // Wait until client modules for the route finish loading and hydrating.
   await page.waitForLoadState('networkidle', { timeout: WARM_TIMEOUT_MS });
+  await page.waitForFunction(
+    () => document.documentElement.dataset.hydrated === 'true',
+    null,
+    { timeout: WARM_TIMEOUT_MS }
+  );
 }
 
 export default async function globalSetup(config: FullConfig) {

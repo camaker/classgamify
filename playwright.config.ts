@@ -16,7 +16,7 @@ export default defineConfig({
     trace: 'on-first-retry',
   },
   webServer: {
-    command: 'pnpm db:migrate:local && pnpm dev --mode e2e',
+    command: `pnpm db:migrate:local && pnpm exec vite dev --mode e2e --port ${port} --strictPort`,
     env: {
       BETTER_AUTH_SECRET: 'e2e-better-auth-secret',
       VITE_BASE_URL: baseURL,

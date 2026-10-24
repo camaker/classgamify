@@ -1072,3 +1072,19 @@ These flows should be added after their dependencies are made deterministic:
 |---|---|
 | Payment checkout and portal | Requires Stripe or Creem test fixtures, webhook simulation, and provider-specific env. |
 | AI provider quality checks | Requires provider mocks or stable fake responses to avoid cost and flake. |
+
+
+## Clarity 行为修复（2026-10-24）
+
+`scripts/analytics-host.test.ts` 验证仅生产域名可收集分析数据，Clarity 录屏
+保持关闭，避免学生使用场景进入不适用的第三方录屏产品。
+
+`tests/e2e/specs/clarity-regressions.spec.ts` 验证英中首页样例答题反馈、
+上一题/下一题、四个功能卡片链接、手机先选分类再选词语、点击姓名说明聚焦
+输入框；`student-submit-feedback.spec.ts` 保留原有先选词语后选分类流程。
+工作区标题复用各页面的已本地化文案，避免全部显示 ClassGamify。
+
+
+Clarity 验证同时修复 E2E 底座：服务严格使用 PORT，注册夹具 Origin 与 PORT
+一致；修改行为的旅程通过 `tests/e2e/fixtures/test.ts` 等待 hydration 标记后
+才操作。E2E 单独缓存并预优化 React/Base UI，避免本地构建缓存引起双 React。

@@ -176,10 +176,11 @@ function HomePage() {
               const Icon = homeFeatureIcons[item.id];
 
               return (
-                <article
+                <Link
+                  to={item.to}
                   aria-label={item.ariaLabel}
                   key={item.id}
-                  className="rounded-lg border bg-card p-5"
+                  className="block rounded-lg border bg-card p-5 transition-colors hover:border-primary/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
                 >
                   <div className="mb-4 flex size-9 items-center justify-center rounded-lg border bg-background text-primary">
                     <Icon className="size-4" />
@@ -188,7 +189,7 @@ function HomePage() {
                   <p className="mt-2 text-sm leading-6 text-muted-foreground">
                     {item.description}
                   </p>
-                </article>
+                </Link>
               );
             })}
           </div>

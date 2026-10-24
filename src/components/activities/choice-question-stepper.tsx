@@ -21,6 +21,7 @@ const ANSWER_TILE_LETTERS = 'ABCDEFGHIJKL';
 const AUTO_ADVANCE_DELAY_MS = 450;
 
 type ChoiceQuestionStepperProps = {
+  autoAdvance?: boolean;
   cardViews: DefaultRuntimeItemCardView[];
   disabled: boolean;
   onAnswerChange: (itemId: string, answer: string) => void;
@@ -34,6 +35,7 @@ type ChoiceQuestionStepperProps = {
  * question is listed so students can review their answers.
  */
 export function ChoiceQuestionStepper({
+  autoAdvance = true,
   cardViews,
   disabled,
   onAnswerChange,
@@ -87,7 +89,7 @@ export function ChoiceQuestionStepper({
 
   function handleAnswer(answer: string) {
     onAnswerChange(cardView.item.id, answer);
-    if (!cardView.showChoices || current >= total - 1) return;
+    if (!autoAdvance || !cardView.showChoices || current >= total - 1) return;
 
     window.clearTimeout(advanceTimerRef.current);
     advanceTimerRef.current = window.setTimeout(() => {

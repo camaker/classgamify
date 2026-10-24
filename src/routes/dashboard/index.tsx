@@ -25,6 +25,9 @@ import { Link, createFileRoute } from '@tanstack/react-router';
 import { PlanUsageCard } from '@/components/payment/plan-usage-card';
 
 export const Route = createFileRoute('/dashboard/')({
+  head: () => ({
+    meta: [{ title: `${m.dashboard_overview_title()} | ClassGamify` }],
+  }),
   component: DashboardPage,
 });
 

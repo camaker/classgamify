@@ -155,3 +155,13 @@ Notes:
   `Miniflare.dispatchFetch`, no workerd process left running, and a new
   `workerd-*.ips` crash report. Confirm the installed runtime with
   `ls node_modules/.pnpm | grep workerd-darwin`.
+
+
+## 2026-10-24 分析与学生隐私边界
+
+分析脚本只允许在 classgamify.com / www.classgamify.com 的生产构建中加载，
+本地、workers.dev、E2E 和自动化浏览器均不发送分析数据。Clarity 录屏
+组件始终返回 null：本产品同时直接服务未成年学生，而 Microsoft 官方 FAQ
+说明不适用于面向 18 岁以下用户的网站。不要通过遮罩或无 Cookie 模式绕开
+该适用边界。此代码修改仅本地提交，不改变线上 Clarity 项目或设置。
+https://learn.microsoft.com/en-us/clarity/faq#are-there-any-restrictions-on-using-clarity

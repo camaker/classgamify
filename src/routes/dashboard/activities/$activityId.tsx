@@ -1,3 +1,4 @@
+import { m } from '@/locale/paraglide/messages';
 import { buildActivityEditRouteState } from '@/activities/editor';
 import { ActivityCreateForm } from '@/components/activities/activity-create-form';
 import { DashboardLayout } from '@/components/layout/dashboard-layout';
@@ -10,6 +11,9 @@ import { Link, createFileRoute } from '@tanstack/react-router';
 import { useMemo } from 'react';
 
 export const Route = createFileRoute('/dashboard/activities/$activityId')({
+  head: () => ({
+    meta: [{ title: `${m.activity_edit_access_ready_title()} | ClassGamify` }],
+  }),
   component: ActivityEditPage,
 });
 

@@ -7,6 +7,7 @@ import {
   useRouterState,
 } from '@tanstack/react-router';
 import { Analytics } from '@/components/analytics/analytics';
+import { HydrationMarker } from '@/components/shared/hydration-marker';
 import { CrispChat } from '@/components/chatbox/crisp-chat';
 import { GoogleOneTapPrompt } from '@/components/auth/google-one-tap-prompt';
 import { ThemeProvider } from '@/components/theme/theme-provider';
@@ -186,6 +187,7 @@ function RootDocument({ children }: { children: React.ReactNode }) {
         <ThemeProvider>
           <TooltipProvider>
             {children}
+            <HydrationMarker />
             <GoogleOneTapPrompt />
             <Toaster richColors position="top-right" offset={64} />
           </TooltipProvider>

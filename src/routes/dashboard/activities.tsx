@@ -1,3 +1,4 @@
+import { m } from '@/locale/paraglide/messages';
 import {
   ACTIVITY_LIBRARY_PAGE_SIZE,
   type ActivityLibraryStatus,
@@ -37,6 +38,9 @@ import { useEffect, useMemo } from 'react';
 import { PlanUsageCard } from '@/components/payment/plan-usage-card';
 
 export const Route = createFileRoute('/dashboard/activities')({
+  head: () => ({
+    meta: [{ title: `${m.activity_library_page_title()} | ClassGamify` }],
+  }),
   validateSearch: buildActivityLibraryValidatedSearch,
   component: DashboardActivitiesRoute,
 });

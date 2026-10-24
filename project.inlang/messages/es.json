@@ -594,6 +594,7 @@
   "activity_runner_correct_pair": "Correct pair",
   "activity_runner_fill_blanks_title": "Fill blanks",
   "activity_runner_group_sort_items_label": "Items",
+  "activity_runner_group_sort_pending_prompt": "Ahora toca el elemento que va en «{group}».",
   "activity_runner_group_sort_title": "Group sort",
   "activity_runner_inline_blank_placeholder": "answer",
   "activity_runner_line_match_help": "Select a prompt on the left, then select its match on the right.",

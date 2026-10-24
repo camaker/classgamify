@@ -37,6 +37,11 @@ type AssignmentResultControlUpdate = Parameters<
 >[0]['update'];
 
 export const Route = createFileRoute('/dashboard/assignments/$assignmentId')({
+  head: () => ({
+    meta: [
+      { title: `${m.assignment_result_page_default_title()} | ClassGamify` },
+    ],
+  }),
   validateSearch: buildAssignmentResultRouteSearch,
   component: AssignmentResultsPage,
 });

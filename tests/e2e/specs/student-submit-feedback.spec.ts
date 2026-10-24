@@ -1,4 +1,4 @@
-import { expect, test } from '@playwright/test';
+import { expect, test } from '../fixtures/test';
 import {
   cleanupE2EUsers,
   registerE2EUser,
@@ -88,12 +88,9 @@ test.describe('student submit feedback', () => {
     ).toBeVisible({ timeout: 20_000 });
 
     await page.getByRole('button', { name: /^egg$/i }).first().click();
-    const placeBar = page.getByText('Put “egg” in:');
+    const placeBar = page.getByTestId('group-sort-place-bar');
     await expect(placeBar).toBeInViewport();
-    await placeBar
-      .locator('..')
-      .getByRole('button', { name: /^food$/i })
-      .click();
+    await placeBar.getByRole('button', { name: /^food$/i }).click();
     await expect(placeBar).toHaveCount(0);
     await expect(page.getByText('1/6 sorted')).toBeVisible();
   });

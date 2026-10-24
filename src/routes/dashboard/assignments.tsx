@@ -1,3 +1,4 @@
+import { m } from '@/locale/paraglide/messages';
 import {
   ASSIGNMENT_LIST_PAGE_SIZE,
   type AssignmentStatusFilter,
@@ -35,6 +36,9 @@ import {
 import { useEffect, useMemo } from 'react';
 
 export const Route = createFileRoute('/dashboard/assignments')({
+  head: () => ({
+    meta: [{ title: `${m.assignment_list_page_title()} | ClassGamify` }],
+  }),
   validateSearch: buildAssignmentListValidatedSearch,
   component: DashboardAssignmentsRoute,
 });

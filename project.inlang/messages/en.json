@@ -617,6 +617,7 @@
   "activity_runner_fill_blanks_title": "Fill blanks",
   "activity_runner_group_sort_help": "Tap an item, then tap the group it belongs to.",
   "activity_runner_group_sort_items_label": "Items",
+  "activity_runner_group_sort_pending_prompt": "Now tap the item that belongs in “{group}”.",
   "activity_runner_group_sort_place_prompt": "Put “{item}” in:",
   "activity_runner_group_sort_title": "Group sort",
   "activity_runner_inline_blank_placeholder": "answer",

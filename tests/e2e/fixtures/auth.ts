@@ -19,7 +19,9 @@ export async function registerE2EUser(
   overrides: Partial<E2EUser> = {}
 ) {
   const user = createE2EUser(overrides);
-  const origin = process.env.PLAYWRIGHT_BASE_URL ?? 'http://localhost:3000';
+  const origin =
+    process.env.PLAYWRIGHT_BASE_URL ??
+    `http://localhost:${process.env.PORT ?? 3000}`;
   const response = await request.post('/api/auth/sign-up/email', {
     headers: {
       Origin: origin,

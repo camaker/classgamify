@@ -103,6 +103,7 @@ type ChoicePairingPromptItemView = StudentRunnerItemView & {
 
 type GroupSortRunnerView = StudentRunnerView & {
   groupViews: GroupSortGroupView[];
+  pendingGroup?: string;
   selectedClearAction: GroupSortRunnerAction | undefined;
   selectedItem?: PublicRuntimeItem;
   unplacedItemViews: GroupSortItemView[];
@@ -112,6 +113,8 @@ type GroupSortGroupView = {
   action: GroupSortRunnerAction;
   group: string;
   id: string;
+  /** The student tapped this group first and still has to pick an item. */
+  pending: boolean;
   placedItemViews: GroupSortItemView[];
 };
 
@@ -165,6 +168,11 @@ type GroupSortRunnerActionResult =
   | {
       selectedItemId: string | undefined;
       type: 'select';
+    }
+  | {
+      pendingGroup: string | undefined;
+      selectedItemId: undefined;
+      type: 'pending-group';
     };
 
 export type InlineBlankPromptView =
@@ -936,6 +944,7 @@ export function buildChoicePairingRunnerView({
 export function buildGroupSortRunnerView({
   answers,
   items,
+  pendingGroup,
   progressVerb,
   revealAnswer = false,
   reviewItems,
@@ -943,6 +952,7 @@ export function buildGroupSortRunnerView({
 }: {
   answers: StudentAnswerMap;
   items: PublicRuntimeItem[];
+  pendingGroup?: string;
   progressVerb?: string;
   revealAnswer?: boolean;
   reviewItems?: PublicAttemptReviewItem[];
@@ -963,16 +973,25 @@ export function buildGroupSortRunnerView({
     selected: selectedItemId === itemView.item.id,
   }));
 
+  const validPendingGroup = selectedItemId
+    ? undefined
+    : runnerView.choices.find(
+        (group) =>
+          pendingGroup !== undefined && isSameRuntimeChoice(pendingGroup, group)
+      );
+
   return {
     ...runnerView,
     groupViews: runnerView.choices.map((group) => ({
       action: buildGroupSortPlaceAction(group),
       group,
       id: buildGroupSortGroupViewId(group),
+      pending: !selectedItemId && validPendingGroup === group,
       placedItemViews: itemViews.filter((itemView) =>
         isSameRuntimeChoice(itemView.answer, group)
       ),
     })),
+    pendingGroup: validPendingGroup,
     selectedClearAction: selectedItemId
       ? buildGroupSortClearAction()
       : undefined,
@@ -1079,13 +1098,19 @@ export function resolveChoicePairingSelectedItemId({
     : undefined;
 }
 
+/**
+ * Students can sort in either order: tap an item then its group, or tap a
+ * group first (it waits as the pending group) and then the item to put there.
+ */
 export function resolveGroupSortRunnerAction({
   action,
   disabled = false,
+  pendingGroup,
   selectedItemId,
 }: {
   action: GroupSortRunnerAction;
   disabled?: boolean;
+  pendingGroup?: string;
   selectedItemId?: string;
 }): GroupSortRunnerActionResult {
   if (disabled) {
@@ -1096,6 +1121,15 @@ export function resolveGroupSortRunnerAction({
   }
 
   if (action.type === 'select-item') {
+    if (pendingGroup !== undefined && !selectedItemId) {
+      return {
+        answer: pendingGroup,
+        itemId: action.itemId,
+        selectedItemId: undefined,
+        type: 'answer',
+      };
+    }
+
     return {
       selectedItemId:
         selectedItemId === action.itemId ? undefined : action.itemId,
@@ -1104,6 +1138,18 @@ export function resolveGroupSortRunnerAction({
   }
 
   if (!selectedItemId) {
+    if (action.type === 'place-selected') {
+      return {
+        pendingGroup:
+          pendingGroup !== undefined &&
+          isSameRuntimeChoice(pendingGroup, action.group)
+            ? undefined
+            : action.group,
+        selectedItemId: undefined,
+        type: 'pending-group',
+      };
+    }
+
     return {
       selectedItemId,
       type: 'select',

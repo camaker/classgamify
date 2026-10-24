@@ -920,6 +920,7 @@ import {
   buildStudentRunnerRouteState,
   buildStudentRunnerSeoView,
   buildStudentRunnerStarterPreview,
+  buildStudentRunnerStarterPracticeReviewItems,
   buildStudentRunnerSubmissionExecutionPlan,
   buildStudentRunnerSubmissionPlan,
   buildStudentRunnerSubmissionResultState,
@@ -7445,7 +7446,7 @@ assert.match(
 );
 assert.match(
   homeRouteSource,
-  /aria-label=\{pageView\.featureSection\.ariaLabel\}[\s\S]*pageView\.featureSection\.eyebrowLabel[\s\S]*pageView\.featureSection\.title[\s\S]*pageView\.featureSection\.description[\s\S]*<article[\s\S]*aria-label=\{item\.ariaLabel\}/,
+  /aria-label=\{pageView\.featureSection\.ariaLabel\}[\s\S]*pageView\.featureSection\.eyebrowLabel[\s\S]*pageView\.featureSection\.title[\s\S]*pageView\.featureSection\.description[\s\S]*<Link[\s\S]*to=\{item\.to\}[\s\S]*aria-label=\{item\.ariaLabel\}/,
   'Home route should render the prepared feature section and card aria labels.'
 );
 assert.match(
@@ -9144,7 +9145,7 @@ assert.doesNotMatch(
 );
 assert.match(
   groupSortBoardSource,
-  /groupViews\.map\(\s*\(\{[\s\S]*id,[\s\S]*\}\) =>[\s\S]*key=\{id\}/,
+  /groupViews\.map\(\s*\(\{[\s\S]*id,[\s\S]*\}(?:\s*:[^=]+)?\) =>[\s\S]*key=\{id\}/,
   'Group-sort runner should render group columns with stable domain group-view ids.'
 );
 assert.doesNotMatch(
@@ -28532,9 +28533,90 @@ assert.deepEqual(
     selectedItemId: undefined,
   }),
   {
+    pendingGroup: 'Fruit',
+    selectedItemId: undefined,
+    type: 'pending-group',
+  },
+  'Tapping a group before an item should mark it as the pending group instead of doing nothing.'
+);
+assert.deepEqual(
+  resolveGroupSortRunnerAction({
+    action: {
+      group: ' fruit ',
+      type: 'place-selected',
+    },
+    pendingGroup: 'Fruit',
+  }),
+  {
+    pendingGroup: undefined,
+    selectedItemId: undefined,
+    type: 'pending-group',
+  },
+  'Tapping the pending group again should cancel it.'
+);
+assert.deepEqual(
+  resolveGroupSortRunnerAction({
+    action: {
+      group: 'Drink',
+      type: 'place-selected',
+    },
+    pendingGroup: 'Fruit',
+  }),
+  {
+    pendingGroup: 'Drink',
+    selectedItemId: undefined,
+    type: 'pending-group',
+  },
+  'Tapping another group should move the pending group.'
+);
+assert.deepEqual(
+  resolveGroupSortRunnerAction({
+    action: {
+      itemId: 'group-fruit-pear',
+      type: 'select-item',
+    },
+    pendingGroup: 'Fruit',
+  }),
+  {
+    answer: 'Fruit',
+    itemId: 'group-fruit-pear',
+    selectedItemId: undefined,
+    type: 'answer',
+  },
+  'Tapping an item after a group should place it in the pending group.'
+);
+assert.deepEqual(
+  resolveGroupSortRunnerAction({
+    action: {
+      type: 'clear-selected',
+    },
+    pendingGroup: 'Fruit',
+  }),
+  {
     selectedItemId: undefined,
     type: 'select',
   }
+);
+assert.deepEqual(
+  buildGroupSortRunnerView({
+    answers: {},
+    items: groupSortRunnerView.itemViews.map((itemView) => itemView.item),
+    pendingGroup: 'fruit',
+  }).groupViews.map(({ group, pending }) => [group, pending]),
+  [
+    ['Fruit', true],
+    ['Drink', false],
+  ]
+);
+assert.equal(
+  buildGroupSortRunnerView({
+    answers: {},
+    items: groupSortRunnerView.itemViews.map((itemView) => itemView.item),
+    pendingGroup: 'Fruit',
+    selectedItemId: 'group-fruit-pear',
+  }).pendingGroup,
+  undefined,
+  'A selected item takes precedence over a pending group.'
 );
 assert.deepEqual(
   resolveGroupSortRunnerAction({
@@ -34041,6 +34123,7 @@ assert.deepEqual(homePageVisibleView, {
       description:
         'Build reusable questions, pairs, groups, vocabulary, learning goals, and teacher notes in one structured editor.',
       id: 'teacher-workflows',
+      to: Routes.Create,
       title: 'Structured activities',
     },
     {
@@ -34049,6 +34132,7 @@ assert.deepEqual(homePageVisibleView, {
       description:
         'Render the same content as quiz, matching games, line matching, group sorting, fill-in, listening, pair matching, or box reveals.',
       id: 'activity-templates',
+      to: Routes.Templates,
       title: 'Template switching',
     },
     {
@@ -34057,6 +34141,7 @@ assert.deepEqual(homePageVisibleView, {
       description:
         'Publish student links with attempt limits, timers, answer reveal, shuffle, and close-time settings.',
       id: 'assignment-links',
+      to: Routes.StudentPreview,
       title: 'Assignment links',
     },
     {
@@ -34065,6 +34150,7 @@ assert.deepEqual(homePageVisibleView, {
       description:
         'Review scores, item performance, accepted answers, reteach priorities, and student follow-up summaries.',
       id: 'results',
+      to: Routes.Teachers,
       title: 'Teacher results',
     },
   ],
@@ -58372,3 +58458,13 @@ function parseCsvRows(csvText: string) {
 }
 
 console.log('Domain tests passed.');
+
+
+// The public homepage uses only the bundled starter answer key; custom teacher
+// assignments must continue to get their review from the server.
+const heroPreview = buildStudentRunnerStarterPreview('demo-food');
+const heroItemId = heroPreview.runtimeItems[0].id;
+assert.deepEqual(buildStudentRunnerStarterPracticeReviewItems({shareId: 'demo-food', answers: {}}), []);
+assert.equal(buildStudentRunnerStarterPracticeReviewItems({shareId: 'demo-food', answers: {[heroItemId]: 'apple'}})[0].correct, true);
+assert.equal(buildStudentRunnerStarterPracticeReviewItems({shareId: 'demo-food', answers: {[heroItemId]: 'bread'}})[0].correct, false);
+assert.equal(buildGroupSortRunnerView({answers: {}, items: groupSortRunnerView.itemViews.map((item: (typeof groupSortRunnerView.itemViews)[number]) => item.item), pendingGroup: 'Unknown'}).pendingGroup, undefined);

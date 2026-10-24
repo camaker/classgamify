@@ -617,6 +617,7 @@
   "activity_runner_fill_blanks_title": "填空",
   "activity_runner_group_sort_help": "先点一个词条，再点它所属的分组。",
   "activity_runner_group_sort_items_label": "项目",
+  "activity_runner_group_sort_pending_prompt": "现在点一个属于“{group}”的词条。",
   "activity_runner_group_sort_place_prompt": "把“{item}”放进：",
   "activity_runner_group_sort_title": "分组排序",
   "activity_runner_inline_blank_placeholder": "答案",

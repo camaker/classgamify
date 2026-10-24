@@ -1,4 +1,4 @@
-import { defineConfig } from 'vite';
+import { defineConfig, type Plugin } from 'vite';
 import { tanstackStart } from '@tanstack/react-start/plugin/vite';
 import viteReact from '@vitejs/plugin-react';
 import { fileURLToPath, URL } from 'url';
@@ -39,10 +39,13 @@ const config = defineConfig(async ({ command, mode }) => {
   }
 
   return {
+    cacheDir: isE2e ? 'node_modules/.vite-e2e' : undefined,
     server: {
       allowedHosts: ['.trycloudflare.com'],
+      hmr: isE2e ? false : undefined,
     },
     resolve: {
+      dedupe: ['react', 'react-dom'],
       tsconfigPaths: true,
       alias: [
         {
@@ -58,6 +61,33 @@ const config = defineConfig(async ({ command, mode }) => {
       ],
     },
     plugins: [
+      isE2e &&
+        ({
+          name: 'classgamify:e2e-single-react-runtime',
+          configEnvironment: {
+            order: 'post',
+            handler(name, environment) {
+              if (name !== 'ssr') return;
+              environment.optimizeDeps ??= {};
+              environment.optimizeDeps.include = [
+                ...new Set([
+                  ...(environment.optimizeDeps.include ?? []),
+                  'react',
+                  'react-dom',
+                  'react-dom/server',
+                  'react/jsx-runtime',
+                  'react/jsx-dev-runtime',
+                  '@base-ui/react/tooltip',
+                  '@base-ui/react/button',
+                  '@base-ui/react/input',
+                  '@base-ui/react/dialog',
+                  '@base-ui/react/select',
+                  '@base-ui/react/menu',
+                ]),
+              ];
+            },
+          },
+        } satisfies Plugin),
       tailwindcss(),
       contentCollections(),
       !isE2e &&
