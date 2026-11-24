@@ -137,6 +137,22 @@ test('public route registry and indexing helpers keep crawlable routes aligned',
     'every sitemap url should carry a real lastmod date'
   );
 
+  const lastmodByLoc = new Map(
+    buildSitemapUrlEntries({ baseUrl: 'https://example.test' }).map((entry) => [
+      entry.loc,
+      entry.lastmod,
+    ])
+  );
+  assert.ok(
+    new Set(lastmodByLoc.values()).size > 1,
+    'sitemap lastmod should differ between changed and untouched pages'
+  );
+  assert.ok(
+    (lastmodByLoc.get('https://example.test/spelling-game-generator') ?? '') >
+      (lastmodByLoc.get('https://example.test/fr/') ?? ''),
+    'recently changed guides should have a later lastmod than untouched translations'
+  );
+
   const llms = buildLlmsTxt({ baseUrl: 'https://example.test' });
   assert.match(llms, /^# ClassGamify/);
   assert.match(llms, /\(https:\/\/example\.test\/templates\)/);

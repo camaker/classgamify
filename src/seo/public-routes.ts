@@ -48,6 +48,11 @@ type PublicIndexableStaticRoute = {
    * only when the page copy changes, never on every build.
    */
   lastmod: string;
+  /**
+   * Per-locale override for pages whose copy changed in only some locales.
+   * Untouched translations keep `lastmod` so the date stays honest.
+   */
+  localeLastmod?: Partial<Record<Locale, string>>;
   localized?: boolean;
   path: string;
 };
@@ -58,30 +63,35 @@ type PublicRobotsDisallowRule = {
 };
 
 export const PUBLIC_INDEXABLE_STATIC_ROUTES = [
-  { id: 'home', path: Routes.Root, lastmod: '2026-11-23' },
-  { id: 'templates', path: Routes.Templates, lastmod: '2026-11-23' },
+  {
+    id: 'home',
+    path: Routes.Root,
+    lastmod: '2026-10-24',
+    localeLastmod: { en: '2026-11-23', zh: '2026-11-23' },
+  },
+  { id: 'templates', path: Routes.Templates, lastmod: '2026-10-22' },
   {
     id: 'classroom-quiz-game',
     path: '/classroom-quiz-game',
-    lastmod: '2026-11-23',
+    lastmod: '2026-11-24',
     localized: false,
   },
   {
     id: 'classroom-matching-game',
     path: '/classroom-matching-game',
-    lastmod: '2026-11-23',
+    lastmod: '2026-11-24',
     localized: false,
   },
   {
     id: 'review-game-for-classroom',
     path: '/review-game-for-classroom',
-    lastmod: '2026-11-23',
+    lastmod: '2026-11-24',
     localized: false,
   },
   {
     id: 'spelling-game-generator',
     path: '/spelling-game-generator',
-    lastmod: '2026-11-23',
+    lastmod: '2026-11-24',
     localized: false,
   },
   // English template guides rendered by `/templates/$template`; keep in sync
@@ -98,14 +108,14 @@ export const PUBLIC_INDEXABLE_STATIC_ROUTES = [
   ).map((template) => ({
     id: `template-${template}` as const,
     path: `${Routes.Templates}/${template}` as const,
-    lastmod: '2026-11-23',
+    lastmod: '2026-11-24',
     localized: false as const,
   })),
   {
     id: 'worksheets',
     path: Routes.Worksheets,
     indexableLocales: ['en', 'zh'],
-    lastmod: '2026-11-23',
+    lastmod: '2026-11-24',
   },
   {
     id: 'create',

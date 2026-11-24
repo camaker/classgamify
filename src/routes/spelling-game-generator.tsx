@@ -7,7 +7,6 @@ import {
 import { SpellingPractice } from '@/components/page/spelling-practice';
 import { Badge } from '@/components/ui/badge';
 import { buttonVariants } from '@/components/ui/button';
-import { websiteConfig } from '@/config/website';
 import { getLocale } from '@/lib/locale';
 import { Routes } from '@/lib/routes';
 import { seo } from '@/lib/seo';
@@ -23,7 +22,7 @@ import { IconAbc, IconArrowRight } from '@tabler/icons-react';
 import { createFileRoute, notFound } from '@tanstack/react-router';
 
 const path = '/spelling-game-generator';
-const title = `Spelling Game Generator: Paste Words, Practice Now | ${websiteConfig.metadata?.name}`;
+const title = 'Spelling Game Generator: Paste Words, Practice Now';
 const description =
   'Free spelling game generator for teachers. Paste a word list and practice spelling in your browser right away, then save it as a student link with scores.';
 
@@ -153,6 +152,27 @@ function SpellingGameGeneratorPage() {
               href="/templates/fill-blank"
             >
               fill blank template
+            </a>
+            . For multiple-choice checks use the{' '}
+            <a
+              className="font-medium text-primary underline-offset-4 hover:underline"
+              href="/classroom-quiz-game"
+            >
+              classroom quiz game
+            </a>
+            , for a printable version try the{' '}
+            <a
+              className="font-medium text-primary underline-offset-4 hover:underline"
+              href="/worksheets"
+            >
+              worksheet generator
+            </a>
+            , or{' '}
+            <a
+              className="font-medium text-primary underline-offset-4 hover:underline"
+              href="/templates"
+            >
+              browse all classroom game templates
             </a>
             .
           </p>
