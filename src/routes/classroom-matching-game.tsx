@@ -1,11 +1,20 @@
 import { getStarterActivities } from '@/activities/catalog';
 import type { ActivityPair } from '@/activities/types';
 import Container from '@/components/layout/container';
+import { GuideFaqSection } from '@/components/page/guide-sections';
 import { Badge } from '@/components/ui/badge';
 import { buttonVariants } from '@/components/ui/button';
 import { websiteConfig } from '@/config/website';
 import { getLocale } from '@/lib/locale';
+import { Routes } from '@/lib/routes';
 import { seo } from '@/lib/seo';
+import {
+  breadcrumbJsonLd,
+  faqPageJsonLd,
+  graphJsonLd,
+  jsonLdScript,
+} from '@/lib/structured-data';
+import { MATCHING_GUIDE_FAQS } from '@/pages/guide-faq-content';
 import { cn } from '@/lib/utils';
 import {
   IconArrowRight,
@@ -16,9 +25,9 @@ import {
 import { createFileRoute, notFound } from '@tanstack/react-router';
 
 const path = '/classroom-matching-game';
-const title = `Classroom Matching Game for Teachers | ${websiteConfig.metadata?.name}`;
+const title = `Matching Game Maker for Teachers | ${websiteConfig.metadata?.name}`;
 const description =
-  'Make a classroom matching game from words and their meanings, categories, or definitions. See a real pair set and open an editable matching-pairs template.';
+  'Matching game maker for teachers: turn words and meanings, terms and definitions, or categories into a game. See a real pair set, then edit it and share a link.';
 
 export const Route = createFileRoute('/classroom-matching-game')({
   loader: () => {
@@ -31,14 +40,26 @@ export const Route = createFileRoute('/classroom-matching-game')({
 
     return { pairs: activity.content.pairs.slice(0, 4) };
   },
-  head: () =>
-    seo(path, {
+  head: () => ({
+    ...seo(path, {
       title,
       description,
       alternateLocales: ['en'],
       canonicalLocale: 'en',
       robots: getLocale() === 'en' ? undefined : 'noindex,follow',
     }),
+    scripts: [
+      jsonLdScript(
+        graphJsonLd([
+          breadcrumbJsonLd([
+            { name: 'Classroom game templates', path: Routes.Templates },
+            { name: 'Matching game maker', path },
+          ]),
+          faqPageJsonLd({ faqs: MATCHING_GUIDE_FAQS, path }),
+        ])
+      ),
+    ],
+  }),
   component: ClassroomMatchingGamePage,
 });
 
@@ -69,7 +90,7 @@ function ClassroomMatchingGamePage() {
             </Badge>
             <div className="space-y-4">
               <h1 className="max-w-3xl text-balance text-4xl font-bold tracking-tight md:text-5xl">
-                Make a classroom matching game from pairs students should know
+                Matching game maker: turn pairs students should know into a game
               </h1>
               <p className="max-w-2xl text-lg leading-8 text-muted-foreground">
                 Match a word to a category, a term to a definition, or a concept
@@ -224,13 +245,22 @@ function ClassroomMatchingGamePage() {
                   className="font-medium text-primary underline-offset-4 hover:underline"
                   href="/classroom-quiz-game"
                 >
-                  Explore the classroom quiz
+                  Explore the classroom quiz game
+                </a>
+                . Preparing for a test? See the{' '}
+                <a
+                  className="font-medium text-primary underline-offset-4 hover:underline"
+                  href="/review-game-for-classroom"
+                >
+                  review game for the classroom
                 </a>
                 .
               </p>
             </div>
           </div>
         </section>
+
+        <GuideFaqSection faqs={MATCHING_GUIDE_FAQS} headingId="matching-faq" />
       </div>
     </Container>
   );

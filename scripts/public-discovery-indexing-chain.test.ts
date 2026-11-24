@@ -3,6 +3,7 @@ import { readFileSync } from 'node:fs';
 import test from 'node:test';
 import { Routes } from '@/lib/routes';
 import {
+  buildLlmsTxt,
   buildRobotsTxt,
   buildSitemap,
   buildSitemapUrlEntries,
@@ -67,6 +68,8 @@ test('public route registry and indexing helpers keep crawlable routes aligned',
       ['templates', Routes.Templates],
       ['classroom-quiz-game', '/classroom-quiz-game'],
       ['classroom-matching-game', '/classroom-matching-game'],
+      ['review-game-for-classroom', '/review-game-for-classroom'],
+      ['spelling-game-generator', '/spelling-game-generator'],
       ['template-match-up', '/templates/match-up'],
       ['template-line-match', '/templates/line-match'],
       ['template-group-sort', '/templates/group-sort'],
@@ -125,6 +128,23 @@ test('public route registry and indexing helpers keep crawlable routes aligned',
   assert.match(buildRobotsTxt(), /Disallow: \/print/);
   assert.match(buildRobotsTxt(), /Disallow: \/auth/);
   assert.match(buildRobotsTxt(), /Sitemap: .*\/sitemap\.xml/);
+
+  const sitemap = buildSitemap();
+  assert.doesNotMatch(sitemap, /<changefreq>|<priority>/);
+  assert.equal(
+    (sitemap.match(/<url>/g) ?? []).length,
+    (sitemap.match(/<lastmod>\d{4}-\d{2}-\d{2}/g) ?? []).length,
+    'every sitemap url should carry a real lastmod date'
+  );
+
+  const llms = buildLlmsTxt({ baseUrl: 'https://example.test' });
+  assert.match(llms, /^# ClassGamify/);
+  assert.match(llms, /\(https:\/\/example\.test\/templates\)/);
+  assert.match(llms, /\(https:\/\/example\.test\/spelling-game-generator\)/);
+  assert.doesNotMatch(
+    llms,
+    /\]\(https:\/\/example\.test\/(play|print|dashboard|settings|auth|admin)/
+  );
 });
 
 test('public indexing route handlers delegate to shared helpers', () => {

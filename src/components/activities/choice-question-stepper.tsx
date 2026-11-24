@@ -25,6 +25,12 @@ type ChoiceQuestionStepperProps = {
   cardViews: DefaultRuntimeItemCardView[];
   disabled: boolean;
   onAnswerChange: (itemId: string, answer: string) => void;
+  /**
+   * Render the question prompt as a paragraph instead of an `h2`. Embedded
+   * demos (the home hero) use this so sample questions never become page
+   * headings; the student runner keeps the default `h2`.
+   */
+  promptAsParagraph?: boolean;
   revealAnswer: boolean;
   reviewMode: boolean;
 };
@@ -39,6 +45,7 @@ export function ChoiceQuestionStepper({
   cardViews,
   disabled,
   onAnswerChange,
+  promptAsParagraph = false,
   revealAnswer,
   reviewMode,
 }: ChoiceQuestionStepperProps) {
@@ -70,6 +77,7 @@ export function ChoiceQuestionStepper({
             disabled={disabled}
             key={cardView.item.id}
             position={cardIndex + 1}
+            promptAsParagraph={promptAsParagraph}
             revealAnswer={revealAnswer}
             reviewMode
             total={total}
@@ -104,6 +112,7 @@ export function ChoiceQuestionStepper({
         disabled={disabled}
         key={cardView.item.id}
         position={current + 1}
+        promptAsParagraph={promptAsParagraph}
         revealAnswer={revealAnswer}
         total={total}
         onAnswer={handleAnswer}
@@ -166,6 +175,7 @@ function ChoiceQuestionCard({
   disabled,
   onAnswer,
   position,
+  promptAsParagraph,
   revealAnswer,
   reviewMode = false,
   total,
@@ -174,10 +184,12 @@ function ChoiceQuestionCard({
   disabled: boolean;
   onAnswer: (answer: string) => void;
   position: number;
+  promptAsParagraph: boolean;
   revealAnswer: boolean;
   reviewMode?: boolean;
   total: number;
 }) {
+  const PromptTag = promptAsParagraph ? 'p' : 'h2';
   // In review, only the student's own answer keeps its color.
   const dimUnselected =
     reviewMode ||
@@ -192,9 +204,9 @@ function ChoiceQuestionCard({
         <p className="font-semibold text-muted-foreground text-sm">
           {m.student_play_question_position({ current: position, total })}
         </p>
-        <h2 className="text-balance font-bold text-2xl leading-snug md:text-3xl">
+        <PromptTag className="text-balance font-bold text-2xl leading-snug md:text-3xl">
           {cardView.prompt}
-        </h2>
+        </PromptTag>
       </div>
 
       {cardView.showChoices ? (

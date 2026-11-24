@@ -5,6 +5,7 @@ export type {
   TablerIcon,
 } from '@tabler/icons-react';
 
+export { default as IconAbc } from '@tabler/icons-react/dist/esm/icons/IconAbc.mjs';
 export { default as IconAlarm } from '@tabler/icons-react/dist/esm/icons/IconAlarm.mjs';
 export { default as IconAlertCircle } from '@tabler/icons-react/dist/esm/icons/IconAlertCircle.mjs';
 export { default as IconAlertOctagon } from '@tabler/icons-react/dist/esm/icons/IconAlertOctagon.mjs';

@@ -1,11 +1,19 @@
 import { getStarterActivities } from '@/activities/catalog';
 import Container from '@/components/layout/container';
+import { GuideFaqSection } from '@/components/page/guide-sections';
 import { Badge } from '@/components/ui/badge';
 import { buttonVariants } from '@/components/ui/button';
 import { websiteConfig } from '@/config/website';
 import { getLocale } from '@/lib/locale';
 import { Routes } from '@/lib/routes';
 import { seo } from '@/lib/seo';
+import {
+  breadcrumbJsonLd,
+  faqPageJsonLd,
+  graphJsonLd,
+  jsonLdScript,
+} from '@/lib/structured-data';
+import { QUIZ_GUIDE_FAQS } from '@/pages/guide-faq-content';
 import { cn } from '@/lib/utils';
 import {
   IconArrowRight,
@@ -37,14 +45,26 @@ export const Route = createFileRoute('/classroom-quiz-game')({
       prompt: question.prompt,
     };
   },
-  head: () =>
-    seo(path, {
+  head: () => ({
+    ...seo(path, {
       title,
       description,
       alternateLocales: ['en'],
       canonicalLocale: 'en',
       robots: getLocale() === 'en' ? undefined : 'noindex,follow',
     }),
+    scripts: [
+      jsonLdScript(
+        graphJsonLd([
+          breadcrumbJsonLd([
+            { name: 'Classroom game templates', path: Routes.Templates },
+            { name: 'Classroom quiz game', path },
+          ]),
+          faqPageJsonLd({ faqs: QUIZ_GUIDE_FAQS, path }),
+        ])
+      ),
+    ],
+  }),
   component: ClassroomQuizGamePage,
 });
 
@@ -214,6 +234,70 @@ function ClassroomQuizGamePage() {
             </p>
           </div>
         </section>
+
+        <section aria-labelledby="quiz-subjects-heading" className="space-y-7">
+          <div className="max-w-3xl space-y-3">
+            <h2 id="quiz-subjects-heading" className="text-3xl font-semibold">
+              Classroom quiz game ideas for different subjects
+            </h2>
+            <p className="leading-7 text-muted-foreground">
+              The quiz template works for any subject where a question has one
+              clear answer. Replace the starter questions with the ones below or
+              with your own.
+            </p>
+          </div>
+          <div className="grid gap-4 md:grid-cols-3">
+            <GuideStep
+              number="Vocabulary"
+              title="Words in context"
+              detail="Ask which word fits a short description, then offer three words of the same topic as choices so students have to tell them apart."
+            />
+            <GuideStep
+              number="Grammar"
+              title="One rule per quiz"
+              detail="Focus on a single point, such as past tense forms, and use the explanation field to say why the right choice is right."
+            />
+            <GuideStep
+              number="Science"
+              title="Concept checks"
+              detail="Check whether students can name a process, pick the correct unit, or spot the odd one out before you move to the next topic."
+            />
+          </div>
+        </section>
+
+        <section className="grid gap-4 rounded-xl border bg-card p-6 md:p-8">
+          <h2 className="text-2xl font-semibold">
+            When to use a quiz and when to use matching
+          </h2>
+          <p className="max-w-3xl leading-7 text-muted-foreground">
+            Use a quiz when every question has its own answer choices, such as
+            facts, definitions, or grammar choices. Use a{' '}
+            <a
+              className="font-medium text-primary underline-offset-4 hover:underline"
+              href="/classroom-matching-game"
+            >
+              matching game maker
+            </a>{' '}
+            when you have a list of terms and partners. To prepare for a test,
+            the{' '}
+            <a
+              className="font-medium text-primary underline-offset-4 hover:underline"
+              href="/review-game-for-classroom"
+            >
+              review game for the classroom
+            </a>{' '}
+            guide shows how to choose a format, and the{' '}
+            <a
+              className="font-medium text-primary underline-offset-4 hover:underline"
+              href="/spelling-game-generator"
+            >
+              spelling game generator
+            </a>{' '}
+            covers word lists.
+          </p>
+        </section>
+
+        <GuideFaqSection faqs={QUIZ_GUIDE_FAQS} headingId="quiz-faq" />
       </div>
     </Container>
   );

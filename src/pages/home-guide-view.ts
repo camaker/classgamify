@@ -34,6 +34,11 @@ type HomeGuideMoreLink = {
     | typeof Routes.Worksheets;
 };
 
+type HomeGuideEnglishLink = {
+  href: string;
+  label: string;
+};
+
 type HomeGuideView = {
   examples: {
     allAction: { label: string; to: typeof Routes.Templates };
@@ -48,6 +53,8 @@ type HomeGuideView = {
     title: string;
   };
   more: {
+    /** English-only guide pages; empty in other locales. */
+    guides: HomeGuideEnglishLink[];
     links: HomeGuideMoreLink[];
     title: string;
   };
@@ -69,6 +76,16 @@ type HomeGuideView = {
 function joinTemplateNames(names: string[]) {
   return names.join(m.activity_library_template_list_separator());
 }
+
+const HOME_ENGLISH_GUIDE_LINKS: HomeGuideEnglishLink[] = [
+  { href: '/classroom-quiz-game', label: 'Classroom quiz game' },
+  { href: '/classroom-matching-game', label: 'Matching game maker' },
+  {
+    href: '/review-game-for-classroom',
+    label: 'Review game for the classroom',
+  },
+  { href: '/spelling-game-generator', label: 'Spelling game generator' },
+];
 
 export function getTemplateNamesByRequirement(
   requirement: ActivityTemplateContentRequirement
@@ -158,6 +175,9 @@ export function buildHomeGuideView(): HomeGuideView {
     },
     more: {
       title: m.home_guide_more_title(),
+      // Each guide gets its own anchor text so the home page does not repeat
+      // one phrase for several targets.
+      guides: isEnglish ? HOME_ENGLISH_GUIDE_LINKS : [],
       links: [
         { label: m.home_guide_more_teachers(), to: Routes.Teachers },
         { label: m.home_guide_more_worksheets(), to: Routes.Worksheets },

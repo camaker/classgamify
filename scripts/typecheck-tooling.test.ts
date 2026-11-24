@@ -36,6 +36,7 @@ test('locale compiler emits declarations and preserves excluded service routes',
       '/api/:path(.*)?',
       '/robots.txt',
       '/sitemap.xml',
+      '/llms.txt',
       '/manifest.json',
     ]) {
       assert.ok(runtime.includes(path), path);

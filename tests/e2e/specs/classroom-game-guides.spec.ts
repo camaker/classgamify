@@ -15,7 +15,7 @@ const guides = [
   },
   {
     path: '/classroom-matching-game',
-    heading: 'Make a classroom matching game from pairs students should know',
+    heading: 'Matching game maker: turn pairs students should know into a game',
     example: 'Food words and categories',
     action: 'Create a matching game',
     template: 'matching-pairs',
@@ -94,7 +94,8 @@ const templateGuides = [
   {
     path: '/templates/match-up',
     template: 'match-up',
-    heading: 'Match up template for terms, meanings, and translations',
+    heading:
+      'Word matching game template for terms, meanings, and translations',
     example: 'bakery food',
   },
   {
@@ -112,7 +113,7 @@ const templateGuides = [
   {
     path: '/templates/fill-blank',
     template: 'fill-blank',
-    heading: 'Fill in the blank worksheet template',
+    heading: 'Fill in the blank worksheet maker students complete online',
     example: 'I drink ___ in the morning.',
   },
   {
@@ -276,4 +277,87 @@ test('homepage explains the workflow, links examples, and answers FAQs', async (
     )
   ).toHaveCount(9);
   await expect(page.locator('a[href="/fr/blog"]')).toHaveCount(0);
+});
+
+const landingGuides = [
+  {
+    path: '/review-game-for-classroom',
+    heading:
+      'Review game for the classroom: turn a unit into something students play',
+  },
+  {
+    path: '/spelling-game-generator',
+    heading: 'Spelling game generator for your word list',
+  },
+] as const;
+
+for (const guide of landingGuides) {
+  test(`${guide.path} is indexable with FAQ markup`, async ({
+    page,
+    request,
+  }: {
+    page: Page;
+    request: APIRequestContext;
+  }) => {
+    const response = await page.goto(guide.path);
+    expect(response?.status()).toBe(200);
+    await expect(page.getByRole('heading', { level: 1 })).toHaveText(
+      guide.heading
+    );
+    await expect(page.locator('meta[name="robots"]')).toHaveCount(0);
+    await expect(page.locator('link[rel="canonical"]')).toHaveAttribute(
+      'href',
+      new URL(guide.path, page.url()).toString()
+    );
+    await expect(page.locator('link[rel="alternate"][hreflang]')).toHaveCount(
+      0
+    );
+    const html = (await response?.text()) ?? '';
+    expect(html).toContain('FAQPage');
+    expect(html).toContain('BreadcrumbList');
+
+    const zh = await request.get(`/zh${guide.path}`);
+    expect(zh.status()).toBe(404);
+  });
+}
+
+test('spelling generator checks typed answers in the browser', async ({
+  page,
+}: {
+  page: Page;
+}) => {
+  await page.goto('/spelling-game-generator');
+  // Typing before hydration finishes is dropped, so retry the whole flow
+  // until the controlled inputs are wired up.
+  await expect(async () => {
+    await page.getByLabel(/Your word list/).fill('apple\nbread');
+    await page.getByRole('button', { name: 'Make spelling practice' }).click();
+    await page.getByLabel('Spell word 1').fill('apple');
+    await page.getByLabel('Spell word 2').fill('brad');
+    await page.getByRole('button', { name: 'Check answers' }).click();
+    await expect(page.getByText('1 of 2 correct')).toBeVisible({
+      timeout: 1000,
+    });
+  }).toPass({ timeout: 15_000 });
+  await expect(page.getByText('Answer: bread')).toBeVisible();
+});
+
+test('sitemap carries lastmod and llms.txt lists the guides', async ({
+  request,
+}: {
+  request: APIRequestContext;
+}) => {
+  const sitemap = await (await request.get('/sitemap.xml')).text();
+  expect(sitemap).not.toMatch(/<changefreq>|<priority>/);
+  expect(sitemap).toContain('/review-game-for-classroom');
+  expect(sitemap).toContain('/spelling-game-generator');
+  expect((sitemap.match(/<url>/g) ?? []).length).toBe(
+    (sitemap.match(/<lastmod>\d{4}-\d{2}-\d{2}/g) ?? []).length
+  );
+
+  const llms = await request.get('/llms.txt');
+  expect(llms.status()).toBe(200);
+  const text = await llms.text();
+  expect(text.startsWith('# ClassGamify')).toBe(true);
+  expect(text).toContain('/spelling-game-generator');
 });

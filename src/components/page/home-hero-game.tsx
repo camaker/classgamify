@@ -46,6 +46,7 @@ export function HomeHeroGame() {
         autoAdvance={false}
         cardViews={cardViews}
         disabled={false}
+        promptAsParagraph
         revealAnswer
         reviewMode={false}
         onAnswerChange={(itemId, answer) =>

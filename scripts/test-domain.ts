@@ -13159,6 +13159,8 @@ assert.deepEqual(
     'templates',
     'classroom-quiz-game',
     'classroom-matching-game',
+    'review-game-for-classroom',
+    'spelling-game-generator',
     'template-match-up',
     'template-line-match',
     'template-group-sort',
@@ -34700,7 +34702,7 @@ assert.deepEqual(homePageVisibleView, {
       to: Routes.Templates,
     },
     description:
-      "For teachers: turn your lesson content into a quiz or matching game, share one link students open without an account, and see each student's score after they play.",
+      "For teachers: turn your lesson content into a quiz, matching, spelling, or worksheet activity, share one link students open without an account, and see each student's score after they play.",
     primaryAction: {
       ariaLabel:
         'Create a reusable ClassGamify activity in the shared editor.',
@@ -34713,7 +34715,7 @@ assert.deepEqual(homePageVisibleView, {
       label: 'Explore interactive worksheets',
       to: Routes.Worksheets,
     },
-    title: 'Turn lesson content into a classroom game',
+    title: 'Classroom game generators for teachers',
   },
   preview: homePageStarterPreview,
   signalPanel: {
@@ -35614,30 +35616,30 @@ assert.deepEqual(
 const expectedWorksheetModeSignalViews = [
   {
     ariaLabel:
-      'Editor: Shared activity. Loads the selected scaffold in /create using the normal structured activity input.',
+      'Make it: Edit the example. Opens an editable example. Replace it with your own word pairs, sentences, or groups.',
     description:
-      'Loads the selected scaffold in /create using the normal structured activity input.',
+      'Opens an editable example. Replace it with your own word pairs, sentences, or groups.',
     id: 'editor-scaffold',
-    label: 'Editor',
-    value: 'Shared activity',
+    label: 'Make it',
+    value: 'Edit the example',
   },
   {
     ariaLabel:
-      'Assignment: Student link. Publishes as a normal student link, not a separate worksheet product.',
+      'Share it: One student link. Students open the link in a browser without an account, or you print the worksheet for paper.',
     description:
-      'Publishes as a normal student link, not a separate worksheet product.',
+      'Students open the link in a browser without an account, or you print the worksheet for paper.',
     id: 'assignment-link',
-    label: 'Assignment',
-    value: 'Student link',
+    label: 'Share it',
+    value: 'One student link',
   },
   {
     ariaLabel:
-      'Results: Export-ready. Attempts, accepted alternatives, reteach priorities, and CSV exports stay on the assignment results model.',
+      "See the scores: Scores and CSV. See each student's score and the items they missed, and download the results as a CSV file.",
     description:
-      'Attempts, accepted alternatives, reteach priorities, and CSV exports stay on the assignment results model.',
+      "See each student's score and the items they missed, and download the results as a CSV file.",
     id: 'results-export',
-    label: 'Results',
-    value: 'Export-ready',
+    label: 'See the scores',
+    value: 'Scores and CSV',
   },
 ];
 const expectedWorksheetResultSignalViews = [
@@ -35730,7 +35732,7 @@ assert.deepEqual(
   ]),
   WORKSHEET_MODE_TEMPLATES.map((template) => [
     template,
-    'Same activity, same link',
+    'What you get',
     expectedWorksheetModeSignalViews.map((signalView) => [
       signalView.id,
       signalView.label,
@@ -35742,16 +35744,16 @@ assert.deepEqual(
 assert.deepEqual(worksheetsPageView, {
   deliveryLoop: {
     ariaLabel:
-      'How worksheets reach students: Every worksheet mode stays in the same flow: create reusable activity content, publish a student link, collect attempts, then review results.',
+      'How a worksheet reaches students: Make the worksheet once, share it as a student link or print it, then review the scores.',
     description:
-      'Every worksheet mode stays in the same flow: create reusable activity content, publish a student link, collect attempts, then review results.',
-    title: 'How worksheets reach students',
+      'Make the worksheet once, share it as a student link or print it, then review the scores.',
+    title: 'How a worksheet reaches students',
   },
   hero: {
-    badgeLabel: 'Worksheet modes',
+    badgeLabel: 'Worksheet generator',
     description:
-      'ClassGamify treats fill-in practice, line matching, listening, and classification as playable assignment templates. Teachers create reusable content once, publish a student link, and review results without exposing answer keys before submission.',
-    title: 'Worksheet modes for the same activity content.',
+      'Make a matching worksheet from your own word pairs. Students complete it online on any device, or you print it for paper, and you see every score. Fill-in-the-blank, sorting, and listening worksheets work the same way.',
+    title: 'Matching Worksheet Generator for Teachers',
   },
   heroActions: [
     {
@@ -35805,7 +35807,7 @@ assert.deepEqual(worksheetsPageView, {
       contentRequirements: [{ id: 'questions', label: 'questions' }],
       description:
         'Place short answers directly into sentence gaps for grammar, spelling, vocabulary, or reading checks.',
-      signalLabel: 'Same activity, same link',
+      signalLabel: 'What you get',
       signalViews: expectedWorksheetModeSignalViews,
       template: 'fill-blank',
       title: 'Fill blanks',
@@ -35823,7 +35825,7 @@ assert.deepEqual(worksheetsPageView, {
       contentRequirements: [{ id: 'pairs', label: 'match pairs' }],
       description:
         'Turn terms and definitions into a two-column connection board that feels familiar to worksheet users.',
-      signalLabel: 'Same activity, same link',
+      signalLabel: 'What you get',
       signalViews: expectedWorksheetModeSignalViews,
       template: 'line-match',
       title: 'Line matching',
@@ -35841,7 +35843,7 @@ assert.deepEqual(worksheetsPageView, {
       contentRequirements: [{ id: 'questions', label: 'questions' }],
       description:
         'Use spoken tracks for dictation, comprehension, or pronunciation follow-up while hiding transcripts before review.',
-      signalLabel: 'Same activity, same link',
+      signalLabel: 'What you get',
       signalViews: expectedWorksheetModeSignalViews,
       template: 'listening',
       title: 'Listening prompts',
@@ -35859,7 +35861,7 @@ assert.deepEqual(worksheetsPageView, {
       contentRequirements: [{ id: 'groups', label: 'groups' }],
       description:
         'Ask learners to classify words, examples, or concepts into teacher-defined groups before seeing the answer pattern.',
-      signalLabel: 'Same activity, same link',
+      signalLabel: 'What you get',
       signalViews: expectedWorksheetModeSignalViews,
       template: 'group-sort',
       title: 'Group sorting',
@@ -35867,8 +35869,8 @@ assert.deepEqual(worksheetsPageView, {
   ],
   printable: {
     description:
-      'Interactive worksheets come first, with scoring, attempts, accepted answers, and result exports. Printable practice and uploaded worksheets will use the same activities and results.',
-    title: 'Printable follow-up can build on the same assignment record.',
+      'Students can complete the worksheet online with automatic scoring, or you can print the same assignment for students who work on paper. Attempts, accepted answers, and CSV exports stay with the assignment.',
+    title: 'Online or on paper',
   },
   resultSignals: expectedWorksheetResultSignalViews,
   templatesCta: {

@@ -308,6 +308,16 @@ function HomePage() {
             <nav aria-label={guide.more.title} className="mt-6">
               <h3 className="text-sm font-semibold">{guide.more.title}</h3>
               <ul className="mt-3 space-y-2 text-sm">
+                {guide.more.guides.map((guideLink) => (
+                  <li key={guideLink.href}>
+                    <a
+                      href={guideLink.href}
+                      className="text-primary underline-offset-4 hover:underline"
+                    >
+                      {guideLink.label} →
+                    </a>
+                  </li>
+                ))}
                 {guide.more.links.map((link) => (
                   <li key={link.to}>
                     <Link

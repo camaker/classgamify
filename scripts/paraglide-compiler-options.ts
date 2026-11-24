@@ -10,6 +10,7 @@ export function getParaglideCompilerOptions(): CompilerOptions {
       { match: '/api/:path(.*)?', exclude: true },
       { match: '/robots.txt', exclude: true },
       { match: '/sitemap.xml', exclude: true },
+      { match: '/llms.txt', exclude: true },
       { match: '/manifest.json', exclude: true },
     ],
     emitTsDeclarations: true,
