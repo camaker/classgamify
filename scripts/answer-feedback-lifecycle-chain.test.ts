@@ -421,7 +421,7 @@ function buildVisibleReviewItem(): PublicAttemptReviewItem {
     correctAnswer: 'Paris',
     explanation: 'Capital city accepted in multiple classroom languages.',
     itemId: 'q1',
-    prompt: 'What is the capital of France?',
+    ...{ prompt: 'What is the capital of France?' },
     submitted: true,
     submittedAnswer: 'paris',
   };

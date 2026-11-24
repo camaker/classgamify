@@ -17,6 +17,7 @@ import {
 } from '@/activities/ai-draft';
 import { getActivityTemplates, getTemplateByType } from '@/activities/catalog';
 import {
+  assertActivityCanEdit,
   activityEditPageCopy,
   buildActivityEditAccessView,
   type ActivityEditAccessView,
@@ -38,6 +39,7 @@ import {
 } from '@/activities/draft-source';
 import {
   buildActivityAiDraftFocusOptions,
+  type ActivityAiDraftFocus,
   type ActivityAiDraftFocusOption,
 } from '@/activities/ai-draft-focus';
 import {
@@ -1653,7 +1655,7 @@ export function buildActivityEditorPreviewSeed(
 
   return {
     content,
-    description: input.description,
+    description: input.description ?? '',
     estimatedMinutes: 6,
     id: 'activity-editor-preview',
     status: input.visibility,
@@ -1828,6 +1830,7 @@ export function buildActivityEditorTemplateScaffoldApplication({
 export function activityContentToEditorInput(
   source: ActivityEditorSource
 ): CreateActivityInput {
+  assertActivityCanEdit(source.visibility);
   return {
     description: source.description ?? '',
     difficulty: source.content.difficulty,

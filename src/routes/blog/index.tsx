@@ -29,7 +29,7 @@ export const Route = createFileRoute('/blog/')({
       });
     }
   },
-  validateSearch: (search: Record<string, unknown>) => ({
+  validateSearch: (search: Record<string, unknown>): { page?: number } => ({
     page: parseBlogPageSearch(search.page),
   }),
   loaderDeps: ({ search }) => ({ page: search.page ?? 1 }),

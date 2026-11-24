@@ -1,5 +1,8 @@
 import { getActivityRunnerKindCopy } from '@/activities/runner-copy';
-import { buildStudentRunnerStarterPreview } from '@/assignments/student-runner-state';
+import {
+  buildStudentRunnerStarterPreview,
+  buildStudentRunnerStarterPracticeReviewItems,
+} from '@/assignments/student-runner-state';
 import { buildDefaultRuntimeItemCardViews } from '@/assignments/student-runner-view';
 import { ChoiceQuestionStepper } from '@/components/activities/choice-question-stepper';
 import { useMemo, useState } from 'react';
@@ -22,6 +25,10 @@ export function HomeHeroGame() {
     inputPlaceholder: copy.inputPlaceholder,
     items: preview.runtimeItems,
     progressVerb: copy.progressVerb,
+    reviewItems: buildStudentRunnerStarterPracticeReviewItems({
+      answers,
+      shareId: 'demo-food',
+    }),
   });
   const answeredCount = cardViews.filter(
     (cardView) => cardView.answered
@@ -36,9 +43,11 @@ export function HomeHeroGame() {
         </span>
       </div>
       <ChoiceQuestionStepper
+        autoAdvance={false}
         cardViews={cardViews}
         disabled={false}
-        revealAnswer={false}
+        promptAsParagraph
+        revealAnswer
         reviewMode={false}
         onAnswerChange={(itemId, answer) =>
           setAnswers((current) => ({ ...current, [itemId]: answer }))

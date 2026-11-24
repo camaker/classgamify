@@ -40,6 +40,7 @@ export type HomePageFeatureId =
   | 'teacher-workflows';
 
 type HomePageFeature = {
+  to: string;
   ariaLabel: string;
   description: string;
   id: HomePageFeatureId;
@@ -359,21 +360,25 @@ export function buildHomePageViewModel({
     buildHomePageFeatureView({
       description: m.home_features_items_item_1_description(),
       id: 'teacher-workflows',
+      to: Routes.Create,
       title: m.home_features_items_item_1_title(),
     }),
     buildHomePageFeatureView({
       description: m.home_features_items_item_2_description(),
       id: 'activity-templates',
+      to: Routes.Templates,
       title: m.home_features_items_item_2_title(),
     }),
     buildHomePageFeatureView({
       description: m.home_features_items_item_3_description(),
       id: 'assignment-links',
+      to: Routes.StudentPreview,
       title: m.home_features_items_item_3_title(),
     }),
     buildHomePageFeatureView({
       description: m.home_features_items_item_4_description(),
       id: 'results',
+      to: Routes.Teachers,
       title: m.home_features_items_item_4_title(),
     }),
   ];
@@ -446,15 +451,18 @@ export function buildHomePageViewModel({
 }
 
 function buildHomePageFeatureView({
+  to,
   description,
   id,
   title,
 }: {
+  to: string;
   description: string;
   id: HomePageFeatureId;
   title: string;
 }): HomePageFeature {
   return {
+    to,
     ariaLabel: m.home_feature_aria_label({ description, title }),
     description,
     id,

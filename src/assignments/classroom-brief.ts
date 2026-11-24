@@ -216,7 +216,9 @@ export function buildAssignmentClassroomBriefScopeSummary({
 export function buildAssignmentClassroomBriefScopeViews(
   summary: AssignmentClassroomBriefScopeSummary
 ): AssignmentClassroomBriefScopeView[] {
-  const scopeViews = [
+  const scopeViews: Array<
+    Omit<AssignmentClassroomBriefScopeView, 'ariaLabel'>
+  > = [
     {
       description: m.assignment_classroom_brief_scope_attempts_description(),
       id: 'attempts',

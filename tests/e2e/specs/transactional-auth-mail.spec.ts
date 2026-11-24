@@ -90,7 +90,9 @@ test.describe('transactional auth mail', () => {
     request,
   }) => {
     const user = createE2EUser();
-    const origin = process.env.PLAYWRIGHT_BASE_URL ?? 'http://localhost:3000';
+    const origin =
+      process.env.PLAYWRIGHT_BASE_URL ??
+      `http://localhost:${process.env.PORT ?? 3000}`;
     const signup = await request.post('/api/auth/sign-up/email', {
       headers: { Origin: origin, Referer: `${origin}/auth/register` },
       data: {

@@ -1,5 +1,6 @@
 import Container from '@/components/layout/container';
 import { WorksheetModeCard } from '@/components/activities/worksheet-mode-card';
+import { GuideFaqSection } from '@/components/page/guide-sections';
 import { Badge } from '@/components/ui/badge';
 import { buttonVariants } from '@/components/ui/button';
 import {
@@ -10,9 +11,15 @@ import {
 } from '@/activities/entry-page-view';
 import { websiteConfig } from '@/config/website';
 import { m } from '@/locale/paraglide/messages';
-import { Routes } from '@/lib/routes';
+import { getLocale } from '@/lib/locale';
 import { getPathWithLocale } from '@/lib/urls';
 import { seo } from '@/lib/seo';
+import {
+  faqPageJsonLd,
+  graphJsonLd,
+  jsonLdScript,
+} from '@/lib/structured-data';
+import { WORKSHEETS_GUIDE_FAQS } from '@/pages/guide-faq-content';
 import { cn } from '@/lib/utils';
 import {
   IconArrowRight,
@@ -23,11 +30,26 @@ import {
 import { Link, createFileRoute } from '@tanstack/react-router';
 
 export const Route = createFileRoute('/worksheets')({
-  head: () =>
-    seo('/worksheets', {
+  head: () => ({
+    ...seo('/worksheets', {
       title: `${m.worksheets_page_seo_title()} | ${websiteConfig.metadata?.name}`,
       description: m.worksheets_page_seo_description(),
     }),
+    // The FAQ copy is English-only, so other locales render no FAQ markup.
+    scripts:
+      getLocale() === 'en'
+        ? [
+            jsonLdScript(
+              graphJsonLd([
+                faqPageJsonLd({
+                  faqs: WORKSHEETS_GUIDE_FAQS,
+                  path: '/worksheets',
+                }),
+              ])
+            ),
+          ]
+        : [],
+  }),
   component: WorksheetsPage,
 });
 
@@ -126,6 +148,62 @@ function WorksheetsPage() {
             <IconArrowRight className="size-4" />
           </Link>
         </section>
+
+        {getLocale() === 'en' ? (
+          <>
+            <section
+              aria-labelledby="worksheets-how-heading"
+              className="grid gap-4 rounded-lg border bg-card p-5"
+            >
+              <h2 id="worksheets-how-heading" className="text-xl font-semibold">
+                How to make a matching worksheet
+              </h2>
+              <ol className="list-inside list-decimal space-y-2 text-sm leading-7 text-muted-foreground">
+                <li>
+                  Open the line match template and replace the example with your
+                  own terms and partners.
+                </li>
+                <li>
+                  Save the activity and publish a student link, or print the
+                  assignment for paper.
+                </li>
+                <li>
+                  Read the scores and missed items, then reteach what the class
+                  mixed up.
+                </li>
+              </ol>
+              <Link
+                to={getPathWithLocale('/create')}
+                search={{ source: 'worksheets', template: 'line-match' }}
+                className={cn(buttonVariants(), 'w-fit rounded-lg')}
+              >
+                Make a matching worksheet
+                <IconArrowRight className="size-4" />
+              </Link>
+              <p className="text-sm leading-6 text-muted-foreground">
+                Want a game instead of a worksheet? Try the{' '}
+                <a
+                  className="font-medium text-primary underline-offset-4 hover:underline"
+                  href="/classroom-matching-game"
+                >
+                  matching game maker
+                </a>{' '}
+                or the{' '}
+                <a
+                  className="font-medium text-primary underline-offset-4 hover:underline"
+                  href="/spelling-game-generator"
+                >
+                  spelling game generator
+                </a>
+                .
+              </p>
+            </section>
+            <GuideFaqSection
+              faqs={WORKSHEETS_GUIDE_FAQS}
+              headingId="worksheets-faq"
+            />
+          </>
+        ) : null}
       </div>
     </Container>
   );

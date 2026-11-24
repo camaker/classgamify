@@ -561,7 +561,7 @@ function formatAssignmentTimeLimit(seconds?: number | null) {
   return m.assignment_delivery_timer_minutes({ minutes });
 }
 
-function isPositiveWholeNumber(value?: number | null) {
+function isPositiveWholeNumber(value?: number | null): value is number {
   return (
     typeof value === 'number' &&
     Number.isFinite(value) &&

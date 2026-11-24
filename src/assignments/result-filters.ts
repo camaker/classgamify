@@ -1,5 +1,6 @@
 import type {
   AssignmentAttemptReview,
+  AssignmentAttemptReviewAnswerStatus,
   AssignmentItemAnalysis,
   AssignmentStudentSummary,
 } from '@/assignments/results';
@@ -242,13 +243,8 @@ export function buildAssignmentResultReviewScopeSummary({
 
 export function filterAssignmentResultCompletedAttemptRows<
   TAttempt extends AssignmentAttemptRowInput,
->({
-  attempts,
-  reviews,
-}: {
-  attempts: TAttempt[];
-  reviews: AssignmentAttemptReview[];
-}) {
+  TReview extends Pick<AssignmentAttemptReview, 'id'>,
+>({ attempts, reviews }: { attempts: TAttempt[]; reviews: TReview[] }) {
   const completedAttemptIds = new Set(reviews.map((review) => review.id));
 
   return sortAssignmentResultAttemptRowsByCompletedAt(
@@ -310,12 +306,21 @@ export function buildFilteredAttemptRows<
   );
 }
 
-export function filterAttemptReviews({
+type AttemptReviewFilterInput = {
+  answers: AssignmentAttemptReviewAnswerStatus[];
+  completedAt?: Date | string | null;
+  id: string;
+  studentLabel: string;
+};
+
+export function filterAttemptReviews<
+  TAttempt extends AttemptReviewFilterInput,
+>({
   attempts,
   filter,
   search,
 }: {
-  attempts: AssignmentAttemptReview[];
+  attempts: TAttempt[];
   filter: AttemptReviewFilter;
   search: string;
 }) {
@@ -351,27 +356,27 @@ export function sortAssignmentResultAttemptRowsByCompletedAt<
   return [...attempts].sort(compareAssignmentResultAttemptRowsByCompletedAt);
 }
 
-export function sortAssignmentAttemptReviewsByCompletedAt(
-  attempts: AssignmentAttemptReview[]
-) {
+export function sortAssignmentAttemptReviewsByCompletedAt<
+  TAttempt extends Pick<AttemptReviewFilterInput, 'completedAt' | 'id'>,
+>(attempts: TAttempt[]) {
   return [...attempts].sort(compareAssignmentAttemptReviewsByCompletedAt);
 }
 
 export function isAssignmentAttemptReviewNeeded(
-  attempt: AssignmentAttemptReview
+  attempt: Pick<AttemptReviewFilterInput, 'answers'>
 ) {
   return attempt.answers.some(isAssignmentAttemptAnswerNeedsReview);
 }
 
 export function countAssignmentAttemptReviewNeededAnswers(
-  attempt: AssignmentAttemptReview
+  attempt: Pick<AttemptReviewFilterInput, 'answers'>
 ) {
   return attempt.answers.filter(isAssignmentAttemptAnswerNeedsReview).length;
 }
 
 export function compareAssignmentAttemptReviewsByCompletedAt(
-  left: AssignmentAttemptReview,
-  right: AssignmentAttemptReview
+  left: Pick<AttemptReviewFilterInput, 'completedAt' | 'id'>,
+  right: Pick<AttemptReviewFilterInput, 'completedAt' | 'id'>
 ) {
   const completedAtCompare = compareAssignmentResultCompletedAt(
     left.completedAt,
@@ -421,10 +426,11 @@ function compareAssignmentResultCompletedAt(
   return 0;
 }
 
-export function sortStudentSummaries(
-  students: AssignmentStudentSummary[],
-  sort: StudentSummarySort
-) {
+export function sortStudentSummaries<
+  TStudent extends Omit<AssignmentStudentSummary, 'lastCompletedAt'> & {
+    lastCompletedAt?: Date | string | null;
+  },
+>(students: TStudent[], sort: StudentSummarySort) {
   return [...students].sort((left, right) => {
     if (sort === 'best') {
       return compareStudentsDescending(
@@ -727,8 +733,8 @@ function resolveAssignmentResultSearchOption<TValue extends string>({
 function compareStudentsDescending(
   leftValue: number,
   rightValue: number,
-  leftStudent: AssignmentStudentSummary,
-  rightStudent: AssignmentStudentSummary
+  leftStudent: Pick<AssignmentStudentSummary, 'studentLabel'>,
+  rightStudent: Pick<AssignmentStudentSummary, 'studentLabel'>
 ) {
   const normalizedLeftValue = normalizeStudentSummarySortNumber(leftValue);
   const normalizedRightValue = normalizeStudentSummarySortNumber(rightValue);

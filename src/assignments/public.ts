@@ -413,7 +413,9 @@ function buildPublicAttemptReviewItem({
     correctAnswer: normalizeRuntimeDisplayText(
       acceptedAnswers[0] ?? item.answer
     ),
-    explanation: normalizeOptionalRuntimeDisplayText(item.explanation),
+    explanation: normalizeOptionalRuntimeDisplayText(
+      'explanation' in item ? item.explanation : undefined
+    ),
     itemId: item.id,
     submitted: hasRuntimeDisplayText(submittedAnswer),
     submittedAnswer: submittedAnswer ?? '',

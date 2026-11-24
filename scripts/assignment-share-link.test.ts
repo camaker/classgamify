@@ -29,6 +29,7 @@ test('publish panel, assignment list, and result page share one link contract', 
       items: [
         {
           activity: {
+            title: 'Source activity',
             description: SECRET_ACTIVITY_CONTENT,
             templateType: 'quiz',
           },
@@ -45,6 +46,7 @@ test('publish panel, assignment list, and result page share one link contract', 
             title: 'Shared class',
           },
           snapshot: {
+            activityTitle: 'Frozen source activity',
             activityDescription: SECRET_ACTIVITY_CONTENT,
             templateType: 'quiz',
           },
@@ -55,7 +57,7 @@ test('publish panel, assignment list, and result page share one link contract', 
         },
       ],
       summary: {
-        averageScore: null,
+        averageScore: 0,
         closedAssignments: 0,
         completions: 0,
         draftAssignments: 0,

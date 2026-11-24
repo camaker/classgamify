@@ -376,7 +376,9 @@ export function assertActivityCanDeriveWork(visibility: ActivityVisibility) {
   }
 }
 
-export function assertActivityCanEdit(visibility: ActivityVisibility) {
+export function assertActivityCanEdit(
+  visibility: ActivityVisibility
+): asserts visibility is Exclude<ActivityVisibility, 'archived'> {
   if (!canEditActivity(visibility)) {
     throw new Error(activityEditAccessCopy.archived.description);
   }

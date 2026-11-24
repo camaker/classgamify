@@ -411,7 +411,9 @@ function toPrintableWorksheetAnswerKeyItem(
   return {
     acceptedAnswers,
     answer: normalizeRuntimeDisplayText(acceptedAnswers[0] ?? item.answer),
-    explanation: normalizeOptionalRuntimeDisplayText(item.explanation),
+    explanation: normalizeOptionalRuntimeDisplayText(
+      'explanation' in item ? item.explanation : undefined
+    ),
     id: item.id,
     kind: item.kind,
     prompt: normalizeRuntimeDisplayText(item.prompt),

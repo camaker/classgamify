@@ -14,6 +14,7 @@ import {
   type AttemptDurationDisplayView,
 } from '@/assignments/attempt-duration';
 import {
+  type AssignmentSettingsSummaryView,
   buildAssignmentSettingsSummaryView,
   formatAssignmentExpiry,
 } from '@/assignments/delivery-summary';
@@ -58,7 +59,6 @@ import {
   filterAssignmentResultCompletedAttemptRows,
   normalizeResultSearch,
   resolveAssignmentResultViewState,
-  sortItemPerformance,
   type AssignmentAttemptReviewRow,
   type AssignmentAttemptRowInput,
   type AssignmentResultReviewScope,
@@ -1574,7 +1574,6 @@ export function buildAssignmentAttemptRowViews<
   timeLimitSeconds?: number | null;
 }): AssignmentResultAttemptRowView[] {
   return rows.map(({ attempt, review, studentLabel }) => ({
-    id: attempt.id,
     ...buildAssignmentAttemptRowDisplay({
       attempt,
       review,
@@ -1670,7 +1669,9 @@ export function buildAssignmentAttemptReviewSummaryMetricViews(
 ): AssignmentResultAttemptReviewSummaryMetricView[] {
   const summary = buildAssignmentAttemptReviewSummary(attempt);
 
-  return [
+  const metrics: Array<
+    Omit<AssignmentResultAttemptReviewSummaryMetricView, 'ariaLabel'>
+  > = [
     {
       key: 'submitted',
       label: assignmentResultReviewCopy.reviewSummarySubmittedLabel,
@@ -1700,7 +1701,9 @@ export function buildAssignmentAttemptReviewSummaryMetricViews(
         min: 0,
       }),
     },
-  ].map((metricView) => ({
+  ];
+
+  return metrics.map((metricView) => ({
     ...metricView,
     ariaLabel: m.assignment_result_attempt_review_metric_aria_label({
       label: metricView.label,
@@ -2896,7 +2899,9 @@ function buildAssignmentResultReviewScopeItemView({
 function buildAssignmentResultCopyScopeSummaryItems(
   summary: AssignmentResultReviewScopeSummary
 ): AssignmentResultCopyScopeSummaryItemView[] {
-  const items = [
+  const items: Array<
+    Omit<AssignmentResultCopyScopeSummaryItemView, 'ariaLabel'>
+  > = [
     {
       description:
         m.assignment_result_copy_scope_summary_students_description(),
@@ -2943,7 +2948,9 @@ function buildAssignmentResultCopyScopeSummaryItems(
 function buildAssignmentResultReviewScopeSummaryItems(
   summary: AssignmentResultReviewScopeSummary
 ): AssignmentResultReviewScopeSummaryItemView[] {
-  const items = [
+  const items: Array<
+    Omit<AssignmentResultReviewScopeSummaryItemView, 'ariaLabel'>
+  > = [
     {
       description:
         m.assignment_result_review_scope_summary_students_description(),

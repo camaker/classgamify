@@ -60,7 +60,7 @@ export function UpdateAvatarCard({ className }: UpdateAvatarCardProps) {
           { image: result.url },
           {
             onSuccess: () => {
-              setAvatarUrl(result.url);
+              setAvatarUrl(result.url ?? '');
               URL.revokeObjectURL(tempUrl);
               toast.success(m.settings_profile_avatar_success());
               refetch();

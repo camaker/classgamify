@@ -135,7 +135,7 @@ test('question choice generation keeps runtime and draft option contracts aligne
   );
   assert.match(
     ACTIVITY_AI_DRAFT_SOURCE,
-    /toEditorQuestionInput\(question: AiActivityDraftQuestion\)[\s\S]*buildAiDraftQuestionOptionViews\(\s*buildQuestionOptionTexts\(\{[\s\S]*answer,[\s\S]*options: question\.options \?\? \[\],[\s\S]*\}\)\s*\)/,
+    /toEditorQuestionInput\(question: EditorDraftQuestion\)[\s\S]*buildAiDraftQuestionOptionViews\(\s*buildQuestionOptionTexts\(\{[\s\S]*answer,[\s\S]*options: question\.options \?\? \[\],[\s\S]*\}\)\s*\)/,
     'AI draft editor application should normalize generated choices through the shared option-text helper.'
   );
   assert.match(

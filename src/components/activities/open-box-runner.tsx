@@ -45,7 +45,7 @@ export function OpenBoxRunner({
   reviewItems,
 }: OpenBoxRunnerProps) {
   const copy = getActivityRunnerKindCopy('open-box');
-  const [activeItemId, setActiveItemId] = useState(() =>
+  const [activeItemId, setActiveItemId] = useState<string | undefined>(() =>
     getInitialSequentialStudentRunnerActiveItemId(items)
   );
   useEffect(() => {

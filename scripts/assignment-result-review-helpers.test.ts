@@ -138,7 +138,7 @@ function buildResultReviewPageData(): AssignmentResultsPageData<AssignmentAttemp
         buildItemAnalysis({
           correctRate: 0,
           itemId: 'item-listening',
-          kind: 'listening',
+          kind: 'question',
           kindLabel: 'Listening',
           prompt: `${SECRET_PROMPT} listening item`,
           submittedCount: 2,
@@ -185,7 +185,7 @@ function buildResultReviewPageData(): AssignmentResultsPageData<AssignmentAttemp
         buildItemAnalysis({
           correctRate: 0,
           itemId: 'item-listening',
-          kind: 'listening',
+          kind: 'question',
           kindLabel: 'Listening',
           prompt: `${SECRET_PROMPT} listening item`,
           submittedCount: 2,
@@ -379,7 +379,7 @@ function buildItemAnalysis({
 }: {
   correctRate: number;
   itemId: string;
-  kind: 'listening' | 'question';
+  kind: 'question';
   kindLabel: string;
   prompt: string;
   submittedCount: number;

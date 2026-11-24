@@ -124,7 +124,7 @@ test('activity authoring/library sources preserve publish and snapshot boundary'
   );
   assert.match(
     EDIT_ROUTE_SOURCE,
-    /buildActivityEditRouteState\(\{[\s\S]*activity,[\s\S]*isError,[\s\S]*isLoading,[\s\S]*<ActivityCreateForm[\s\S]*activityId=\{pageView\.editor\.activityId\}[\s\S]*initialValues=\{pageView\.editor\.initialValues\}[\s\S]*mode=\{pageView\.editor\.mode\}/,
+    /buildActivityEditRouteState\(\{[\s\S]*activity,[\s\S]*isError,[\s\S]*isLoading,[\s\S]*<ActivityCreateForm[\s\S]*activityId=\{routeState\.pageView\.editor\.activityId\}[\s\S]*initialValues=\{routeState\.pageView\.editor\.initialValues\}[\s\S]*mode=\{routeState\.pageView\.editor\.mode\}/,
     'The edit route should hydrate the shared activity form in edit mode.'
   );
   assert.match(

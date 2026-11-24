@@ -2,8 +2,14 @@ import type { AssignmentStudentSummary } from '@/assignments/results';
 import { compareRuntimeDisplaySearchText } from '@/assignments/runtime-display';
 
 export function compareAssignmentStudentsByFollowUpPriority(
-  left: AssignmentStudentSummary,
-  right: AssignmentStudentSummary
+  left: Pick<
+    AssignmentStudentSummary,
+    'needsReviewCount' | 'latestAccuracy' | 'studentLabel'
+  >,
+  right: Pick<
+    AssignmentStudentSummary,
+    'needsReviewCount' | 'latestAccuracy' | 'studentLabel'
+  >
 ) {
   const leftNeedsReviewCount = normalizeFollowUpPriorityCount(
     left.needsReviewCount

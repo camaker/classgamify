@@ -150,7 +150,9 @@ test('translated articles keep their own canonical and only real hreflang peers'
     });
     assert.equal(head.links[0]?.href, `${getBaseUrl()}/zh${POST_PATH}`);
     assert.deepEqual(
-      head.links.slice(1).map((link) => link.hrefLang),
+      head.links
+        .slice(1)
+        .map((link) => ('hrefLang' in link ? link.hrefLang : undefined)),
       ['en', 'zh-CN', 'x-default']
     );
     assert.ok(head.meta.every((tag) => tag.name !== 'robots'));

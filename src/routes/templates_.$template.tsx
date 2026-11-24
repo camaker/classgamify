@@ -99,7 +99,7 @@ function buildGuideExample(guide: TemplateDetailGuide): GuideExample {
   if (guide.exampleShape === 'pairs') {
     return {
       title: scaffold.title,
-      rows: scaffold.pairsText
+      rows: (scaffold.pairsText ?? '')
         .split('\n')
         .map(splitLine)
         .filter(([left, right]) => left && right)
@@ -115,7 +115,7 @@ function buildGuideExample(guide: TemplateDetailGuide): GuideExample {
   if (guide.exampleShape === 'groups') {
     return {
       title: scaffold.title,
-      rows: scaffold.groupsText
+      rows: (scaffold.groupsText ?? '')
         .split('\n')
         .map(splitLine)
         .filter(([group, items]) => group && items)
@@ -132,7 +132,7 @@ function buildGuideExample(guide: TemplateDetailGuide): GuideExample {
 
   return {
     title: scaffold.title,
-    rows: scaffold.questionsText
+    rows: (scaffold.questionsText ?? '')
       .split('\n')
       .map(splitLine)
       .filter(([prompt, answer]) => prompt && answer)

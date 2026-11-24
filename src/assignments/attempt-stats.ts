@@ -175,7 +175,10 @@ export function summarizeAssignmentAttemptsByAssignmentId(
 }
 
 export function normalizeAssignmentAttemptStats(
-  stats: Partial<AssignmentAttemptStats> | null | undefined
+  stats:
+    | Partial<Record<keyof AssignmentAttemptStats, number | null>>
+    | null
+    | undefined
 ): AssignmentAttemptStats {
   return {
     averageDurationSeconds: normalizeStatsNumber(
@@ -197,7 +200,10 @@ export function normalizeAssignmentAttemptStats(
 }
 
 export function buildAssignmentAttemptStatsView(
-  stats: Partial<AssignmentAttemptStats> | null | undefined
+  stats:
+    | Partial<Record<keyof AssignmentAttemptStats, number | null>>
+    | null
+    | undefined
 ): AssignmentAttemptStatsView {
   const completions = normalizeStatsViewCount(stats?.completions, {
     floor: true,

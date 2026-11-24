@@ -192,7 +192,7 @@ test('printable worksheet source contract keeps print route teacher-scoped and s
   );
   assert.match(
     PRINTABLE_WORKSHEET_SOURCE,
-    /function toPrintableWorksheetAnswerKeyItem[\s\S]*getRuntimeDisplayAcceptedAnswers\(item\.answer\)[\s\S]*normalizeOptionalRuntimeDisplayText\(item\.explanation\)[\s\S]*getPrintableWorksheetSequenceNumber\(index\)/,
+    /function toPrintableWorksheetAnswerKeyItem[\s\S]*getRuntimeDisplayAcceptedAnswers\(item\.answer\)[\s\S]*normalizeOptionalRuntimeDisplayText\(\s*'explanation' in item \? item\.explanation : undefined\s*\)[\s\S]*getPrintableWorksheetSequenceNumber\(index\)/,
     'Printable answer keys should reuse accepted-answer parsing, explanation normalization, and shared sequence numbering.'
   );
   assert.match(

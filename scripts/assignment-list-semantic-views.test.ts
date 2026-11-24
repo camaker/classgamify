@@ -161,6 +161,7 @@ function buildAssignmentListItem({
 }) {
   return {
     activity: {
+      title: 'Source activity',
       description: activityDescription,
       templateType: 'quiz' as const,
     },
@@ -177,6 +178,7 @@ function buildAssignmentListItem({
       title,
     },
     snapshot: {
+      activityTitle: 'Frozen source activity',
       activityDescription,
       templateType: 'quiz' as const,
     },

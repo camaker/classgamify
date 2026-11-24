@@ -20,7 +20,7 @@ This repository intentionally does not contain a GitHub Actions deploy workflow,
 and production configuration should not require GitHub repository secrets.
 
 Run `pnpm predeploy` locally before release pushes. That gate covers locale
-checks, Biome checks, and the production build. Use `pnpm deploy` only for a
+checks, Biome checks, full-repository TypeScript checks, and the production build. Use `pnpm deploy` only for a
 manual Cloudflare Workers deployment when the project owner explicitly chooses
 that path.
 
@@ -153,7 +153,7 @@ real UI locally when available, and run the relevant Playwright specs.
 - `.env.example` and `.env.production.example` use ClassGamify placeholders.
 - `wrangler.jsonc` owns D1 and R2 bindings for the Worker.
 - `pnpm predeploy` remains the local release gate:
-  `pnpm locale:check`, `pnpm check`, then `pnpm build`.
+  `pnpm locale:check`, `pnpm check`, `pnpm typecheck`, then `pnpm build`.
 - `pnpm deploy` remains the explicit manual Cloudflare Workers deploy command.
 - Health checks use the configured ClassGamify `VITE_BASE_URL`.
 - `pnpm sync-worker-secrets` is local-only manual secret setup after the Worker
@@ -163,3 +163,9 @@ real UI locally when available, and run the relevant Playwright specs.
 - `scripts/developer-configuration.test.ts` keeps examples, verification
   gates, secrets, bindings, and provider copy aligned with the classroom
   product loop.
+
+Full-repository type verification uses `pnpm typecheck`. It compiles Paraglide
+JavaScript declarations and Content Collections first, then checks application,
+scripts, configuration, and E2E TypeScript with the unchanged strict tsconfig.
+Both Vite and the standalone locale compiler use
+`scripts/paraglide-compiler-options.ts`; keep `emitTsDeclarations` enabled.

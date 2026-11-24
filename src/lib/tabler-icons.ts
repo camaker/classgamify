@@ -5,6 +5,7 @@ export type {
   TablerIcon,
 } from '@tabler/icons-react';
 
+export { default as IconAbc } from '@tabler/icons-react/dist/esm/icons/IconAbc.mjs';
 export { default as IconAlarm } from '@tabler/icons-react/dist/esm/icons/IconAlarm.mjs';
 export { default as IconAlertCircle } from '@tabler/icons-react/dist/esm/icons/IconAlertCircle.mjs';
 export { default as IconAlertOctagon } from '@tabler/icons-react/dist/esm/icons/IconAlertOctagon.mjs';
@@ -67,6 +68,7 @@ export { default as IconFilter } from '@tabler/icons-react/dist/esm/icons/IconFi
 export { default as IconFolder } from '@tabler/icons-react/dist/esm/icons/IconFolder.mjs';
 export { default as IconFolderOff } from '@tabler/icons-react/dist/esm/icons/IconFolderOff.mjs';
 export { default as IconForms } from '@tabler/icons-react/dist/esm/icons/IconForms.mjs';
+export { default as IconHandFinger } from '@tabler/icons-react/dist/esm/icons/IconHandFinger.mjs';
 export { default as IconHeadphones } from '@tabler/icons-react/dist/esm/icons/IconHeadphones.mjs';
 export { default as IconInfoCircle } from '@tabler/icons-react/dist/esm/icons/IconInfoCircle.mjs';
 export { default as IconKey } from '@tabler/icons-react/dist/esm/icons/IconKey.mjs';

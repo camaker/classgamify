@@ -1,3 +1,4 @@
+import { compileSqliteTestQuery } from './sqlite-test-query';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { DatabaseSync } from 'node:sqlite';
@@ -153,7 +154,8 @@ test('invalid authoritative metadata also blocks rather than trusting input', ()
 });
 
 test('compiled material query requires owner and all requested ids', () => {
-  const query = DIALECT.sqlToQuery(
+  const query = compileSqliteTestQuery(
+    DIALECT,
     buildUserFileMaterialsOwnerWhere({
       fileIds: ['file-a', 'file-b'],
       userId: 'teacher-1',

@@ -102,7 +102,7 @@ export class StorageError extends Error {
 
 export class ConfigurationError extends StorageError {
   constructor(
-    message = STORAGE_ERROR_CODES.R2_STORAGE_NOT_CONFIGURED,
+    message: string = STORAGE_ERROR_CODES.R2_STORAGE_NOT_CONFIGURED,
     code: StorageErrorCode = STORAGE_ERROR_CODES.R2_STORAGE_NOT_CONFIGURED,
     details?: StorageErrorDetails
   ) {

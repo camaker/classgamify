@@ -1,3 +1,4 @@
+import { compileSqliteTestQuery } from './sqlite-test-query';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { DatabaseSync } from 'node:sqlite';
@@ -224,7 +225,8 @@ test('source-material deletion guard is documented across product and storage', 
 });
 
 function compileActivityReferenceWhere() {
-  return DIALECT.sqlToQuery(
+  return compileSqliteTestQuery(
+    DIALECT,
     buildActivitySourceMaterialFileReferenceWhere({
       fileId: 'file-target',
       userId: 'teacher-1',
@@ -233,7 +235,8 @@ function compileActivityReferenceWhere() {
 }
 
 function compileSnapshotReferenceWhere() {
-  return DIALECT.sqlToQuery(
+  return compileSqliteTestQuery(
+    DIALECT,
     buildAssignmentSnapshotSourceMaterialFileReferenceWhere({
       fileId: 'file-target',
       userId: 'teacher-1',

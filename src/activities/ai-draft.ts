@@ -51,6 +51,7 @@ import { WORKERS_AI_MODELS } from '@/config/ai-models';
 import { m } from '@/locale/paraglide/messages';
 import type { Locale } from '@/locale/paraglide/runtime';
 import { z } from 'zod';
+import { normalizeActivityMaterialReferences } from '@/activities/material-references';
 
 export const ACTIVITY_AI_DRAFT_ITEM_COUNT_RANGE = {
   default: 5,
@@ -301,8 +302,12 @@ export function buildGenerateActivityDraftInputFromEditor({
   });
 }
 
+type DraftActivity = Omit<CreateActivityInput, 'sourceMaterials'> & {
+  sourceMaterials?: ReturnType<typeof normalizeActivityMaterialReferences>;
+};
+
 export type ActivityDraftResult = {
-  activity: CreateActivityInput;
+  activity: DraftActivity;
   draftFocus: ActivityAiDraftFocus;
   meta: ActivityDraftMeta;
   model: string;
@@ -738,7 +743,11 @@ export function createActivityInputFromAiDraft({
   return createActivityInputSchema.parse(activity);
 }
 
-function toEditorQuestionInput(question: AiActivityDraftQuestion) {
+type EditorDraftQuestion = Omit<AiActivityDraftQuestion, 'options'> & {
+  options?: string[];
+};
+
+function toEditorQuestionInput(question: EditorDraftQuestion) {
   const answer = normalizeQuestionOptionDisplayText(question.answer);
 
   return {
@@ -1111,8 +1120,15 @@ function createActivityDraftResult({
   activity: CreateActivityInput;
   input: NormalizedGenerateActivityDraftInput;
 }) {
+  const { sourceMaterials, ...fields } = activity;
+  const normalizedActivity = sourceMaterials
+    ? {
+        ...fields,
+        sourceMaterials: normalizeActivityMaterialReferences(sourceMaterials),
+      }
+    : fields;
   return {
-    activity,
+    activity: normalizedActivity,
     meta: buildActivityDraftMeta({
       activity,
       currentTemplateType: input.templateType,

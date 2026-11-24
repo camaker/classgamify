@@ -374,14 +374,14 @@ type ActivityLibraryPageItem = PersistedActivityLibraryCardSource & {
 
 type ActivityLibraryPageData<TItem extends ActivityLibraryPageItem> = {
   createdActivity?: CreatedActivityListItem | null;
-  items: TItem[];
+  items: readonly TItem[];
   summary?: ActivityLibrarySummary;
   statusSummary?: ActivityLibrarySummary;
   total: number;
 };
 
 type ActivityLibraryPageViewModel<TItem extends ActivityLibraryPageItem> = {
-  activities: TItem[];
+  activities: readonly TItem[];
   breadcrumbs: ActivityLibraryPageBreadcrumb[];
   createdPanelContext?: CreatedActivityPanelContext;
   description: string;
@@ -495,7 +495,7 @@ export const activityLibrarySearchCopy = {
   get searchDescription() {
     return m.activity_library_filter_search_description();
   },
-  get statusOptions() {
+  get statusOptions(): ActivityLibraryStatusOption[] {
     return [
       { label: m.activity_library_filter_active(), value: 'active' },
       { label: m.activity_library_filter_archived(), value: 'archived' },
@@ -510,7 +510,7 @@ export const activityLibrarySearchCopy = {
   get statusDescription() {
     return m.activity_library_filter_status_description();
   },
-  get sourceOptions() {
+  get sourceOptions(): ActivitySourceMaterialFilterOption[] {
     return [
       { label: m.activity_library_filter_source_all(), value: 'all' },
       {
@@ -551,7 +551,7 @@ export const activityLibrarySearchCopy = {
   templateLabel: string;
   templatePlaceholder: string;
   statusLabel: string;
-} as const;
+};
 
 export const activityLibraryCardCopy = {
   get actionLabels() {
@@ -885,7 +885,7 @@ function resolveActivityLibraryStarterPreview<TItem>({
   isLoading,
   starterPreview,
 }: {
-  activities: TItem[];
+  activities: readonly TItem[];
   emptyState: ActivityLibraryEmptyStateView;
   isLoading: boolean;
   starterPreview?: ActivityLibraryStarterPreview;
@@ -1213,7 +1213,7 @@ function formatActivityLibraryScopeNumber(
 
 export function findCreatedActivityInList<
   TItem extends CreatedActivityListItem,
->({ activityId, items }: { activityId?: string; items: TItem[] }) {
+>({ activityId, items }: { activityId?: string; items: readonly TItem[] }) {
   if (!activityId) return undefined;
 
   return items.find((item) => item.id === activityId);
@@ -1228,7 +1228,7 @@ export function resolveCreatedActivityPanelActivity<
 }: {
   activity?: CreatedActivityListItem | null;
   activityId?: string;
-  items: TItem[];
+  items: readonly TItem[];
 }) {
   if (!activityId) return undefined;
   if (activity?.id === activityId) return activity;

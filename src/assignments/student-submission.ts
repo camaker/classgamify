@@ -575,7 +575,7 @@ export function resolveStudentAttemptSubmissionFailureMessage(error: unknown) {
   const fallbackMessage = STUDENT_RUNNER_COPY.submissionFailureMessage;
   const failureCode = resolveStudentAttemptSubmissionFailureCode(error);
 
-  return failureCode
+  return failureCode && failureCode !== 'duplicate-runtime-item'
     ? getSafeStudentAttemptSubmissionFailureMessage(failureCode)
     : fallbackMessage;
 }

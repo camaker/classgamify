@@ -77,7 +77,7 @@ does not include a GitHub Actions deploy workflow so GitHub does not run a
 second install/build/deploy path.
 
 Run `pnpm predeploy` locally before pushing release-ready changes. It covers
-locale checks, Biome checks, and the production build.
+locale checks, Biome checks, full-repository TypeScript checks, and the production build.
 
 Create ClassGamify Cloudflare resources before production deployment, then
 update `wrangler.jsonc` with the real D1 database ID and any final custom

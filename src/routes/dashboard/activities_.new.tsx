@@ -19,7 +19,15 @@ import { useMemo } from 'react';
  * breadcrumbs, and the editor, without the public marketing hero.
  */
 export const Route = createFileRoute('/dashboard/activities_/new')({
-  validateSearch: (search: Record<string, unknown>) => ({
+  head: () => ({
+    meta: [{ title: `${m.activity_new_page_title()} | ClassGamify` }],
+  }),
+  validateSearch: (
+    search: Record<string, unknown>
+  ): {
+    source?: ReturnType<typeof parseCreateActivityTemplateSourceSearch>;
+    template?: ReturnType<typeof parseCreateActivityTemplateSearch>;
+  } => ({
     source: parseCreateActivityTemplateSourceSearch(search.source),
     template: parseCreateActivityTemplateSearch(search.template),
   }),

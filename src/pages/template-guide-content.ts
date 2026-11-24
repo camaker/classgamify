@@ -43,10 +43,10 @@ const TEMPLATE_DETAIL_GUIDES: Record<
   'match-up': {
     type: 'match-up',
     breadcrumbLabel: 'Match up',
-    seoTitle: 'Match Up Game Template for Vocabulary and Definitions',
+    seoTitle: 'Word Matching Game Template for Vocabulary',
     description:
-      'An editable match up template for teachers: students pick the right meaning, category, or translation for each term. See a real example and share it as a student link.',
-    h1: 'Match up template for terms, meanings, and translations',
+      'An editable word matching game template for teachers: students pick the right meaning, category, or translation for each term. See a real example and share it as a student link.',
+    h1: 'Word matching game template for terms, meanings, and translations',
     intro:
       'Match up turns a list of pairs into a quick matching quiz. Each term appears with the answers from your whole pair list, and students choose the one that belongs to it. Use it after a vocabulary lesson, as homework, or as a warm-up before a test.',
     exampleShape: 'pairs',
@@ -204,10 +204,10 @@ const TEMPLATE_DETAIL_GUIDES: Record<
   'fill-blank': {
     type: 'fill-blank',
     breadcrumbLabel: 'Complete the sentence',
-    seoTitle: 'Fill in the Blank Worksheet Template for Teachers',
+    seoTitle: 'Fill in the Blank Worksheet Maker for Teachers',
     description:
       'Make an online fill-in-the-blank worksheet: students type the missing word in each sentence, with an optional word bank. Edit a real example and share it.',
-    h1: 'Fill in the blank worksheet template',
+    h1: 'Fill in the blank worksheet maker students complete online',
     intro:
       'Complete the sentence gives students short sentences with one missing word. They type the answer, so it checks spelling and real recall rather than recognition. Add a word bank for younger or newer learners and remove it when you want more challenge.',
     exampleShape: 'questions',

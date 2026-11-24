@@ -3,7 +3,6 @@ import { eq } from 'drizzle-orm';
 import { nanoid } from 'nanoid';
 import { getStarterActivity } from '@/activities/catalog';
 import {
-  type ActivityTemplateType,
   type AssignmentSettings,
   isActivityTemplateType,
 } from '@/activities/types';

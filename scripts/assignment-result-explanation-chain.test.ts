@@ -346,7 +346,7 @@ test('explanation sources preserve result, feedback, export, and print boundarie
   );
   assert.match(
     RESULTS_SOURCE,
-    /(?=[\s\S]*explanation: normalizeOptionalRuntimeDisplayText\(item\.explanation\))(?=[\s\S]*buildAttemptReviewAnswers[\s\S]*explanation: normalizeOptionalRuntimeDisplayText\(item\.explanation\))/,
+    /(?=[\s\S]*explanation: normalizeOptionalRuntimeDisplayText\(\s*'explanation' in item \? item\.explanation : undefined\s*\))(?=[\s\S]*buildAttemptReviewAnswers[\s\S]*explanation: normalizeOptionalRuntimeDisplayText\(\s*'explanation' in item \? item\.explanation : undefined\s*\))/,
     'Result analysis should carry normalized explanations for item analysis and attempt review answers.'
   );
   assert.match(

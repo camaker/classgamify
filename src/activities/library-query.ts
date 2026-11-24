@@ -6,13 +6,12 @@ import {
   matchesActivitySourceMaterialFilter,
   normalizeActivityLibrarySearch,
 } from '@/activities/library-filters';
-import type { ActivityContent } from '@/activities/types';
 import { activity } from '@/db/app.schema';
 import { sqlLikeContains } from '@/lib/sql-like';
 import { and, eq, ne, or, type SQL } from 'drizzle-orm';
 
 type ActivityLibrarySourceItem = {
-  contentJson: ActivityContent;
+  contentJson: { sourceMaterials?: unknown };
 };
 
 type ActivityLibraryPagedItem = {

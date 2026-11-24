@@ -71,6 +71,10 @@ run it when changing public metadata, public entry
 routes, navigation, template/worksheet entries, public page copy,
 sitemap/robots/manifest helpers, legacy route retirement, public DOM
 boundaries, or privacy/indexing guards.
+Spelling practice helpers have a fast script-level gate via
+`pnpm exec tsx --test scripts/spelling-practice.test.ts`; run it when changing
+the word-list parsing, hint, answer-check, or shuffle helpers behind
+`/spelling-game-generator`.
 Classroom trust communication chain has a fast script-level gate via
 `pnpm exec tsx --test scripts/classroom-trust-communication-chain.test.ts`;
 run it when changing the transactional mail workspace boundary, public classroom
@@ -894,6 +898,8 @@ and `/blog` respectively instead of serving 404 pages.
 | 5 | English classroom game guides lead to real templates | Open `/classroom-quiz-game` and `/classroom-matching-game` in English. Verify distinct H1s and useful, server-rendered classroom examples; confirm each page describes the actual teacher create, publish, student attempt, and results path. Follow each create CTA and verify the editor receives `source=templates` with the correct `quiz` or `matching-pairs` template. Verify the quiz guide links to the public food quiz demo, the matching guide does not present the quiz demo as a matching demo, and both guides have self canonicals without fabricated non-English hreflang links. Visit `/zh/` and `/es/` variants of each guide and verify they return 404 rather than serving indexable English content. |
 | 5a | English template guides are indexable and lead to their editors | **File:** `specs/classroom-game-guides.spec.ts`. Open `/templates/match-up`, `/templates/line-match`, `/templates/group-sort`, `/templates/fill-blank`, `/templates/listening`, and `/templates/open-box`. Verify each returns 200 with a distinct H1, the template's real starter example in server-rendered HTML, visible FAQs, FAQPage and BreadcrumbList JSON-LD, no robots meta, a self canonical, no hreflang links, and links to the other template guides. Follow the create CTA and verify `/create` receives the matching `template`. Verify `/templates/quiz` and `/templates/matching-pairs` 308-redirect to the dedicated guides, unknown templates and `/es/templates/match-up` return 404, and the sitemap lists all six guide URLs. On English `/templates`, verify every card links to its guide and the "Pick a template by the content you have" section is visible; on `/es/templates`, verify no card links to an English-only guide. |
 | 5b | Homepage explains the workflow and answers teacher FAQs | **File:** `specs/classroom-game-guides.spec.ts`. Open `/` and verify the three-step how-it-works section, the eight-template example grid linking to each English guide, the visible FAQ (including whether students need an account), the "More for teachers" links, and FAQPage JSON-LD with no SoftwareApplication node and no Offer (no ratings exist, and no price is advertised). Open `/fr/` and verify the FAQ is localized, all eight example links plus "See all templates" point at `/fr/templates`, and no link points at the redirecting `/fr/blog` (locales without posts link to `/blog`). |
+| 5c | English landing guides for review games and spelling are indexable and usable | **File:** `specs/classroom-game-guides.spec.ts`. Open `/review-game-for-classroom` and `/spelling-game-generator`. Verify each returns 200 with one H1, visible FAQs, FAQPage and BreadcrumbList JSON-LD, a self canonical, no robots meta, and no hreflang links; `/zh/...` versions return 404. On the spelling page, replace the word list, press "Make spelling practice", type each word, press "Check answers", and verify the score line. The review page links to the quiz guide. |
+| 5d | Sitemap and llms.txt follow the discovery contract | **File:** `specs/classroom-game-guides.spec.ts`. `/sitemap.xml` has a `lastmod` on every url, no `changefreq` or `priority`, and lists both new guides. `/llms.txt` returns plain text starting with `# ClassGamify` and links the guides. |
 
 ## 2. Authentication And Protected Routes
 
@@ -1072,3 +1078,49 @@ These flows should be added after their dependencies are made deterministic:
 |---|---|
 | Payment checkout and portal | Requires Stripe or Creem test fixtures, webhook simulation, and provider-specific env. |
 | AI provider quality checks | Requires provider mocks or stable fake responses to avoid cost and flake. |
+
+
+## Clarity 行为修复（2026-10-24）
+
+`scripts/analytics-host.test.ts` 验证仅生产域名可收集分析数据，Clarity 录屏
+保持关闭，避免学生使用场景进入不适用的第三方录屏产品。
+
+`tests/e2e/specs/clarity-regressions.spec.ts` 验证英中首页样例答题反馈、
+上一题/下一题、四个功能卡片链接、手机先选分类再选词语、点击姓名说明聚焦
+输入框；`student-submit-feedback.spec.ts` 保留原有先选词语后选分类流程。
+工作区标题复用各页面的已本地化文案，避免全部显示 ClassGamify。
+
+
+Clarity 验证同时修复 E2E 底座：服务严格使用 PORT，注册夹具 Origin 与 PORT
+一致；修改行为的旅程通过 `tests/e2e/fixtures/test.ts` 等待 hydration 标记后
+才操作。E2E 单独缓存并预优化 React/Base UI，避免本地构建缓存引起双 React。
+
+## TypeScript baseline repair (2026-10-24)
+
+The full strict `pnpm typecheck` gate includes all app, script, and E2E files.
+After the baseline repair, re-run the complete local browser suite, including
+activity creation, saved-activity edit links, archive/restore, AI draft handoff,
+student runners, teacher result review, auth redirects, and localized templates.
+The edit action uses Base UI's `render` link composition and must navigate to
+the saved activity editor with its original values.
+
+Typecheck tooling has fast gates via `scripts/typecheck-tooling.test.ts`
+(real compiler declarations, service-route exclusions, strict whole-repository
+inclusion) and `scripts/compile-content-collections.test.ts` (fresh generated
+exports and rejection of invalid content instead of partial output).
+
+`archived-activity-editor.spec.ts` verifies that archived activities block direct
+editing, that the Base UI recovery link opens the archived library without
+browser errors, and that restoring returns the original content to the editor.
+
+Plan usage responses have a fast gate via `scripts/plan-usage-response.test.ts`:
+auth error bodies and partial meters must reject before entering the query cache.
+The plan-limit browser journey also verifies that an invalid success payload
+leaves the editor usable and never reaches the React error boundary.
+
+Deep-review fast gates: `scripts/activity-editor-lifecycle.test.ts` checks that
+editor conversion preserves every active visibility and rejects archived input
+until explicit restore; `scripts/catch-boundary-message.test.ts` preserves
+string messages on serialized errors and foreign prototypes, with a localized
+fallback for non-string messages. Keep the archive/restore browser journey above
+as the end-to-end acceptance path for this boundary.

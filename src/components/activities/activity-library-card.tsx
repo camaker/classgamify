@@ -98,6 +98,7 @@ export function ActivityLibraryCard({
       return;
     }
     try {
+      if (executionPlan.type !== 'remix') return;
       const result = await remixMutation.mutateAsync(executionPlan.input);
       toast.success(executionPlan.successMessage);
       navigate({

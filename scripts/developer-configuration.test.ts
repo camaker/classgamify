@@ -136,7 +136,7 @@ function buildDeveloperConfigurationEvidence() {
         SOURCES.payment
       ),
     predeployGateIncludesBuild:
-      /"predeploy":\s*"pnpm locale:check && pnpm check && pnpm build"/.test(
+      /"predeploy":\s*"pnpm locale:check && pnpm check && pnpm typecheck && pnpm build"/.test(
         SOURCES.packageJson
       ) &&
       /Run `pnpm predeploy` locally before release pushes/.test(

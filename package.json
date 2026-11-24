@@ -17,8 +17,8 @@
     "format": "biome format --write .",
     "locale:sort": "tsx scripts/sort-locale-keys.ts",
     "locale:check": "tsx scripts/check-locale-keys.ts",
-    "locale:compile": "paraglide-js compile --project ./project.inlang --outdir ./src/locale/paraglide --strategy url cookie baseLocale --no-emit-ts-declarations --no-emit-readme --output-structure message-modules",
-    "predeploy": "pnpm locale:check && pnpm check && pnpm build",
+    "locale:compile": "tsx scripts/compile-locales.ts",
+    "predeploy": "pnpm locale:check && pnpm check && pnpm typecheck && pnpm build",
     "deploy": "pnpm run build && wrangler deploy --config dist/server/wrangler.json --keep-vars --var CREEM_DEBUG:false",
     "postinstall": "pnpm run cf-typegen",
     "email:dev": "pnpm run locale:compile && email dev --dir src/mail/templates --port 3333",
@@ -30,7 +30,9 @@
     "db:studio:local": "drizzle-kit studio --config drizzle.config.local.ts",
     "db:studio:remote": "drizzle-kit studio --config drizzle.config.ts",
     "db:migrate:local": "tsx scripts/migrate-d1.ts local",
-    "db:migrate:remote": "tsx scripts/migrate-d1.ts remote"
+    "db:migrate:remote": "tsx scripts/migrate-d1.ts remote",
+    "typecheck": "pnpm locale:compile && pnpm content:compile && tsc --noEmit --pretty false",
+    "content:compile": "tsx scripts/compile-content-collections.ts"
   },
   "dependencies": {
     "@base-ui/react": "^1.8.0",

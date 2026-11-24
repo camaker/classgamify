@@ -21,7 +21,12 @@ import {
 import { buttonVariants } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { m } from '@/locale/paraglide/messages';
-import { IconCheck, IconCircle, IconLayoutColumns } from '@tabler/icons-react';
+import {
+  IconCheck,
+  IconCircle,
+  IconHandFinger,
+  IconLayoutColumns,
+} from '@tabler/icons-react';
 import { useEffect, useMemo, useState } from 'react';
 
 type GroupSortBoardProps = {
@@ -43,6 +48,7 @@ export function GroupSortBoard({
 }: GroupSortBoardProps) {
   const copy = getActivityRunnerKindCopy('group-sort');
   const [selectedItemId, setSelectedItemId] = useState<string>();
+  const [pendingGroup, setPendingGroup] = useState<string>();
   useEffect(() => {
     setSelectedItemId((current) =>
       resolveGroupSortSelectedItemId({
@@ -56,6 +62,7 @@ export function GroupSortBoard({
       buildGroupSortRunnerView({
         answers,
         items,
+        pendingGroup,
         progressVerb: copy.progressVerb,
         revealAnswer,
         reviewItems,
@@ -65,6 +72,7 @@ export function GroupSortBoard({
       answers,
       copy.progressVerb,
       items,
+      pendingGroup,
       revealAnswer,
       reviewItems,
       selectedItemId,
@@ -75,29 +83,49 @@ export function GroupSortBoard({
     const result = resolveGroupSortRunnerAction({
       action,
       disabled,
+      pendingGroup: runnerView.pendingGroup,
       selectedItemId,
     });
 
     setSelectedItemId(result.selectedItemId);
+    setPendingGroup(
+      result.type === 'pending-group' ? result.pendingGroup : undefined
+    );
     if (result.type === 'answer') {
       onAnswerChange(result.itemId, result.answer);
     }
   }
+
+  const pendingPrompt =
+    runnerView.pendingGroup && !disabled
+      ? m.activity_runner_group_sort_pending_prompt({
+          group: runnerView.pendingGroup,
+        })
+      : undefined;
+  const placePrompt =
+    runnerView.selectedItem && !disabled
+      ? m.activity_runner_group_sort_place_prompt({
+          item: runnerView.selectedItem.prompt,
+        })
+      : undefined;
 
   return (
     <div className={RUNNER_BOARD_FRAME}>
       {copy.helpText ? (
         <p className={RUNNER_BOARD_HELP}>{copy.helpText}</p>
       ) : null}
+      {/* Always mounted so screen readers hear each new sorting step. */}
+      <p aria-live="polite" className="sr-only">
+        {pendingPrompt ?? placePrompt ?? ''}
+      </p>
 
       <div>
-        {runnerView.selectedItem && !disabled ? (
-          <div className="sticky top-2 z-20 mb-4 grid gap-2 rounded-xl border bg-background/95 p-3 shadow-md backdrop-blur lg:hidden">
-            <p className="font-medium text-sm">
-              {m.activity_runner_group_sort_place_prompt({
-                item: runnerView.selectedItem.prompt,
-              })}
-            </p>
+        {placePrompt && runnerView.selectedItem ? (
+          <div
+            data-testid="group-sort-place-bar"
+            className="sticky top-2 z-20 mb-4 grid gap-2 rounded-xl border bg-background/95 p-3 shadow-md backdrop-blur lg:hidden"
+          >
+            <p className="font-medium text-sm">{placePrompt}</p>
             <div className="flex flex-wrap gap-2">
               {runnerView.groupViews.map(({ action, group, id }) => (
                 <button
@@ -115,8 +143,35 @@ export function GroupSortBoard({
             </div>
           </div>
         ) : null}
+        {pendingPrompt ? (
+          <div className="sticky top-2 z-20 mb-4 flex items-center justify-between gap-3 rounded-xl border border-primary/60 bg-background/95 p-3 shadow-md backdrop-blur">
+            <p className="flex items-center gap-2 font-medium text-sm">
+              <IconHandFinger
+                aria-hidden="true"
+                className="size-5 shrink-0 text-primary"
+              />
+              {pendingPrompt}
+            </p>
+            <button
+              type="button"
+              className={cn(
+                buttonVariants({ variant: 'ghost', size: 'sm' }),
+                'shrink-0'
+              )}
+              onClick={() => setPendingGroup(undefined)}
+            >
+              {copy.clearSelectionLabel}
+            </button>
+          </div>
+        ) : null}
         <div className="grid gap-5 lg:grid-cols-[minmax(14rem,18rem)_minmax(0,1fr)]">
-          <div className="grid content-start gap-3">
+          <div
+            className={cn(
+              'grid content-start gap-3 rounded-xl transition-shadow',
+              pendingPrompt &&
+                'ring-2 ring-primary/50 ring-offset-4 ring-offset-background'
+            )}
+          >
             <div className="flex min-h-9 items-center justify-between gap-2">
               <div
                 className={cn(RUNNER_BOARD_LABEL, 'flex items-center gap-2')}
@@ -175,15 +230,27 @@ export function GroupSortBoard({
 
           <div className="grid content-start gap-4 md:grid-cols-2 xl:grid-cols-3">
             {runnerView.groupViews.map(
-              ({ action, group, id, placedItemViews }) => (
+              ({
+                action,
+                group,
+                id,
+                pending,
+                placedItemViews,
+              }: ReturnType<
+                typeof buildGroupSortRunnerView
+              >['groupViews'][number]) => (
                 <div key={id} className="grid content-start gap-2">
+                  {/* The whole group, empty drop area included, is one target:
+                      tapping it first marks it as the pending group. */}
                   <button
                     type="button"
-                    disabled={!selectedItemId || disabled}
+                    disabled={disabled}
+                    aria-pressed={pending}
                     className={cn(
                       RUNNER_TILE,
-                      'bg-muted/50',
-                      selectedItemId && !disabled && RUNNER_TARGET_READY
+                      'grid gap-2 bg-muted/50',
+                      selectedItemId && !disabled && RUNNER_TARGET_READY,
+                      pending && RUNNER_TILE_SELECTED
                     )}
                     onClick={() => handleRunnerAction(action)}
                   >
@@ -193,6 +260,12 @@ export function GroupSortBoard({
                         {placedItemViews.length}
                       </span>
                     </div>
+                    {!placedItemViews.length ? (
+                      <span
+                        aria-hidden="true"
+                        className="block min-h-10 rounded-lg border-2 border-dashed border-border/80"
+                      />
+                    ) : null}
                   </button>
 
                   {placedItemViews.map(
@@ -218,12 +291,6 @@ export function GroupSortBoard({
                       />
                     )
                   )}
-                  {!placedItemViews.length ? (
-                    <div
-                      aria-hidden="true"
-                      className="min-h-14 rounded-xl border-2 border-dashed"
-                    />
-                  ) : null}
                 </div>
               )
             )}

@@ -30,7 +30,7 @@ pnpm lint                   # Biome lint + format with auto-fix
 pnpm check                  # Biome lint (read-only, no auto-fix)
 pnpm format                 # Biome format only
 pnpm knip                   # Find unused exports/dependencies
-pnpm predeploy              # Locale, Biome, and production build gate
+pnpm predeploy              # Locale, Biome, full TypeScript, and production build gate
 
 pnpm db:generate            # Generate Drizzle migrations from schema
 pnpm db:migrate:local       # Apply migrations to local D1

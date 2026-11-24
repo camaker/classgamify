@@ -3,7 +3,7 @@ import type {
   ActivityTemplateType,
   AssignmentSeed,
 } from '@/activities/types';
-import { getRuntimeItems } from '@/activities/runtime';
+import { evaluateRuntimeAnswers, getRuntimeItems } from '@/activities/runtime';
 import { getStarterActivity, getStarterAssignment } from '@/activities/catalog';
 import { getActivityTemplateRunnerCopy } from '@/activities/runner-copy';
 import {
@@ -59,6 +59,7 @@ import {
 import {
   buildPublicAssignmentPreviewActivity,
   buildPublicAssignmentPreviewAssignment,
+  buildPublicAttemptReviewItems,
   summarizePublicAttemptReviewItemsForTotal,
   stripRuntimeAnswers,
   type PublicAssignmentUnavailablePayload,
@@ -594,6 +595,41 @@ export function buildStudentRunnerStarterPreview(
       assignment: starterAssignment,
     }),
   };
+}
+
+/**
+ * Instant feedback for the public starter preview (home hero): scores the
+ * answers locally against the starter activity. Only answered items get a
+ * review item, so unanswered questions show no feedback yet.
+ */
+export function buildStudentRunnerStarterPracticeReviewItems({
+  answers,
+  shareId,
+}: {
+  answers: Record<string, string>;
+  shareId: string;
+}): PublicAttemptReviewItem[] {
+  const starterAssignment = getStarterAssignment(
+    normalizeAssignmentShareSlug(shareId)
+  );
+  const starterActivity = getStarterActivity(starterAssignment.activityId);
+  const evaluation = evaluateRuntimeAnswers({
+    answers: Object.entries(answers).map(([itemId, answer]) => ({
+      answer,
+      itemId,
+    })),
+    content: starterActivity.content,
+    templateType: starterActivity.templateType,
+  });
+
+  return buildPublicAttemptReviewItems({
+    answers: evaluation.answers,
+    runtimeItems: getRuntimeItems(
+      starterActivity.templateType,
+      starterActivity.content
+    ),
+    showCorrectAnswers: true,
+  }).filter((reviewItem) => reviewItem.submitted);
 }
 
 export function buildStudentRunnerReadyState({

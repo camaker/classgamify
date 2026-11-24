@@ -114,7 +114,7 @@ export function analyzeAssignmentResults({
     const submittedAnswers = completedAttemptAnswerMaps.flatMap((answerMap) => {
       const answer = getAttemptAnswerByRuntimeItemId(answerMap, item.id);
 
-      return hasRuntimeDisplayText(answer?.answer) ? [answer] : [];
+      return answer && hasRuntimeDisplayText(answer.answer) ? [answer] : [];
     });
     const correctCount = submittedAnswers.filter(
       (answer) => answer.correct
@@ -131,7 +131,9 @@ export function analyzeAssignmentResults({
           : 0
       ),
       expectedAnswer: normalizeRuntimeDisplayText(item.answer),
-      explanation: normalizeOptionalRuntimeDisplayText(item.explanation),
+      explanation: normalizeOptionalRuntimeDisplayText(
+        'explanation' in item ? item.explanation : undefined
+      ),
       itemId: item.id,
       kind: item.kind,
       kindLabel: formatRuntimeItemKindLabel(item),
@@ -197,7 +199,9 @@ function buildAttemptReviewAnswers({
       answer: normalizeRuntimeDisplayText(submittedAnswer?.answer),
       correct: Boolean(submittedAnswer?.correct),
       expectedAnswer: normalizeRuntimeDisplayText(item.answer),
-      explanation: normalizeOptionalRuntimeDisplayText(item.explanation),
+      explanation: normalizeOptionalRuntimeDisplayText(
+        'explanation' in item ? item.explanation : undefined
+      ),
       itemId: item.id,
       prompt: normalizeRuntimeDisplayText(formatRuntimeItemPrompt(item)),
       submitted: hasRuntimeDisplayText(submittedAnswer?.answer),

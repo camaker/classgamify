@@ -11,6 +11,8 @@ type PublicIndexableRouteId =
   | 'about'
   | 'classroom-quiz-game'
   | 'classroom-matching-game'
+  | 'review-game-for-classroom'
+  | 'spelling-game-generator'
   | 'contact'
   | 'cookie'
   | 'create'
@@ -37,22 +39,17 @@ type PublicRobotsDisallowRuleId =
   | 'print'
   | 'settings';
 
-export type SitemapChangeFrequency =
-  | 'always'
-  | 'daily'
-  | 'hourly'
-  | 'monthly'
-  | 'never'
-  | 'weekly'
-  | 'yearly';
-
 type PublicIndexableStaticRoute = {
-  changefreq?: SitemapChangeFrequency;
   id: PublicIndexableRouteId;
   indexableLocales?: readonly Locale[];
+  /**
+   * Date (YYYY-MM-DD) the page content last changed in a meaningful way.
+   * Search engines use `<lastmod>` to decide when to re-crawl, so bump it
+   * only when the page copy changes, never on every build.
+   */
+  lastmod: string;
   localized?: boolean;
   path: string;
-  priority?: string;
 };
 
 type PublicRobotsDisallowRule = {
@@ -61,26 +58,31 @@ type PublicRobotsDisallowRule = {
 };
 
 export const PUBLIC_INDEXABLE_STATIC_ROUTES = [
-  { id: 'home', path: Routes.Root, changefreq: 'daily', priority: '1.0' },
-  {
-    id: 'templates',
-    path: Routes.Templates,
-    changefreq: 'weekly',
-    priority: '0.9',
-  },
+  { id: 'home', path: Routes.Root, lastmod: '2026-11-23' },
+  { id: 'templates', path: Routes.Templates, lastmod: '2026-11-23' },
   {
     id: 'classroom-quiz-game',
     path: '/classroom-quiz-game',
-    changefreq: 'weekly',
+    lastmod: '2026-11-23',
     localized: false,
-    priority: '0.8',
   },
   {
     id: 'classroom-matching-game',
     path: '/classroom-matching-game',
-    changefreq: 'weekly',
+    lastmod: '2026-11-23',
     localized: false,
-    priority: '0.8',
+  },
+  {
+    id: 'review-game-for-classroom',
+    path: '/review-game-for-classroom',
+    lastmod: '2026-11-23',
+    localized: false,
+  },
+  {
+    id: 'spelling-game-generator',
+    path: '/spelling-game-generator',
+    lastmod: '2026-11-23',
+    localized: false,
   },
   // English template guides rendered by `/templates/$template`; keep in sync
   // with TEMPLATE_GUIDE_PATHS in src/pages/template-guide-paths.ts.
@@ -96,80 +98,59 @@ export const PUBLIC_INDEXABLE_STATIC_ROUTES = [
   ).map((template) => ({
     id: `template-${template}` as const,
     path: `${Routes.Templates}/${template}` as const,
-    changefreq: 'monthly' as const,
+    lastmod: '2026-11-23',
     localized: false as const,
-    priority: '0.7',
   })),
   {
     id: 'worksheets',
     path: Routes.Worksheets,
-    changefreq: 'weekly',
     indexableLocales: ['en', 'zh'],
-    priority: '0.85',
+    lastmod: '2026-11-23',
   },
   {
     id: 'create',
     path: Routes.Create,
-    changefreq: 'weekly',
     indexableLocales: ['en', 'zh'],
-    priority: '0.8',
+    lastmod: '2026-10-24',
   },
   {
     id: 'pricing',
     path: Routes.Pricing,
-    changefreq: 'weekly',
     indexableLocales: ['en', 'zh'],
-    priority: '0.7',
+    lastmod: '2026-09-28',
   },
-  {
-    id: 'about',
-    path: Routes.About,
-    changefreq: 'monthly',
-    priority: '0.6',
-  },
-  {
-    id: 'teachers',
-    path: Routes.Teachers,
-    changefreq: 'monthly',
-    priority: '0.6',
-  },
+  { id: 'about', path: Routes.About, lastmod: '2026-08-06' },
+  { id: 'teachers', path: Routes.Teachers, lastmod: '2026-07-07' },
   {
     id: 'contact',
     path: Routes.Contact,
-    changefreq: 'monthly',
     indexableLocales: ['en', 'zh'],
-    priority: '0.4',
+    lastmod: '2026-07-03',
   },
-  {
-    id: 'blog',
-    path: Routes.Blog,
-    changefreq: 'weekly',
-    priority: '0.5',
-  },
+  { id: 'blog', path: Routes.Blog, lastmod: '2026-10-24' },
   {
     id: 'roadmap',
     path: Routes.Roadmap,
-    changefreq: 'monthly',
     indexableLocales: ['en', 'zh'],
-    priority: '0.5',
+    lastmod: '2026-07-07',
   },
   {
     id: 'cookie',
     path: Routes.CookiePolicy,
-    changefreq: 'monthly',
     indexableLocales: ['en'],
+    lastmod: '2026-07-07',
   },
   {
     id: 'terms',
     path: Routes.TermsOfService,
-    changefreq: 'monthly',
     indexableLocales: ['en'],
+    lastmod: '2026-07-07',
   },
   {
     id: 'privacy',
     path: Routes.PrivacyPolicy,
-    changefreq: 'monthly',
     indexableLocales: ['en'],
+    lastmod: '2026-07-07',
   },
 ] as const satisfies readonly PublicIndexableStaticRoute[];
 

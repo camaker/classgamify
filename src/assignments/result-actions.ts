@@ -22,6 +22,7 @@ import {
   type AssignmentResultsExportData,
 } from '@/assignments/results-export';
 import type {
+  AssignmentAttemptReview,
   AssignmentItemAnalysis,
   AssignmentResultsAnalysis,
   AssignmentStudentSummary,
@@ -631,10 +632,8 @@ export function getAssignmentResultActionExecutionDataScope({
   dataSet: AssignmentResultActionDataSet | null | undefined;
 }): AssignmentResultActionDataScope {
   if (!dataSet) {
-    return (
-      actionButton.dataScope ??
-      getAssignmentResultActionDataScope(actionButton.action)
-    );
+    const action = actionButton.action;
+    return actionButton.dataScope ?? getAssignmentResultActionDataScope(action);
   }
 
   return actionButton.kind === 'copy-text'

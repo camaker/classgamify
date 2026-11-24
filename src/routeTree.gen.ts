@@ -16,10 +16,13 @@ import { Route as ClassroomMatchingGameRouteImport } from './routes/classroom-ma
 import { Route as ClassroomQuizGameRouteImport } from './routes/classroom-quiz-game'
 import { Route as CreateRouteImport } from './routes/create'
 import { Route as DashboardRouteImport } from './routes/dashboard'
+import { Route as LlmsDottxtRouteImport } from './routes/llms[.]txt'
 import { Route as ManifestDotjsonRouteImport } from './routes/manifest[.]json'
+import { Route as ReviewGameForClassroomRouteImport } from './routes/review-game-for-classroom'
 import { Route as RobotsDottxtRouteImport } from './routes/robots[.]txt'
 import { Route as SettingsRouteImport } from './routes/settings'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
+import { Route as SpellingGameGeneratorRouteImport } from './routes/spelling-game-generator'
 import { Route as TemplatesRouteImport } from './routes/templates'
 import { Route as WorksheetsRouteImport } from './routes/worksheets'
 import { Route as legalsCookieRouteImport } from './routes/(legals)/cookie'
@@ -101,9 +104,19 @@ const DashboardRoute = DashboardRouteImport.update({
   path: '/dashboard',
   getParentRoute: () => rootRouteImport,
 } as any)
+const LlmsDottxtRoute = LlmsDottxtRouteImport.update({
+  id: '/llms.txt',
+  path: '/llms.txt',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ManifestDotjsonRoute = ManifestDotjsonRouteImport.update({
   id: '/manifest.json',
   path: '/manifest.json',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ReviewGameForClassroomRoute = ReviewGameForClassroomRouteImport.update({
+  id: '/review-game-for-classroom',
+  path: '/review-game-for-classroom',
   getParentRoute: () => rootRouteImport,
 } as any)
 const RobotsDottxtRoute = RobotsDottxtRouteImport.update({
@@ -119,6 +132,11 @@ const SettingsRoute = SettingsRouteImport.update({
 const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
   id: '/sitemap.xml',
   path: '/sitemap.xml',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SpellingGameGeneratorRoute = SpellingGameGeneratorRouteImport.update({
+  id: '/spelling-game-generator',
+  path: '/spelling-game-generator',
   getParentRoute: () => rootRouteImport,
 } as any)
 const TemplatesRoute = TemplatesRouteImport.update({
@@ -358,10 +376,13 @@ export interface FileRoutesByFullPath {
   '/classroom-quiz-game': typeof ClassroomQuizGameRoute
   '/create': typeof CreateRoute
   '/dashboard': typeof DashboardRouteWithChildren
+  '/llms.txt': typeof LlmsDottxtRoute
   '/manifest.json': typeof ManifestDotjsonRoute
+  '/review-game-for-classroom': typeof ReviewGameForClassroomRoute
   '/robots.txt': typeof RobotsDottxtRoute
   '/settings': typeof SettingsRouteWithChildren
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/spelling-game-generator': typeof SpellingGameGeneratorRoute
   '/templates': typeof TemplatesRoute
   '/worksheets': typeof WorksheetsRoute
   '/cookie': typeof legalsCookieRoute
@@ -414,9 +435,12 @@ export interface FileRoutesByTo {
   '/classroom-matching-game': typeof ClassroomMatchingGameRoute
   '/classroom-quiz-game': typeof ClassroomQuizGameRoute
   '/create': typeof CreateRoute
+  '/llms.txt': typeof LlmsDottxtRoute
   '/manifest.json': typeof ManifestDotjsonRoute
+  '/review-game-for-classroom': typeof ReviewGameForClassroomRoute
   '/robots.txt': typeof RobotsDottxtRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/spelling-game-generator': typeof SpellingGameGeneratorRoute
   '/templates': typeof TemplatesRoute
   '/worksheets': typeof WorksheetsRoute
   '/cookie': typeof legalsCookieRoute
@@ -472,10 +496,13 @@ export interface FileRoutesById {
   '/classroom-quiz-game': typeof ClassroomQuizGameRoute
   '/create': typeof CreateRoute
   '/dashboard': typeof DashboardRouteWithChildren
+  '/llms.txt': typeof LlmsDottxtRoute
   '/manifest.json': typeof ManifestDotjsonRoute
+  '/review-game-for-classroom': typeof ReviewGameForClassroomRoute
   '/robots.txt': typeof RobotsDottxtRoute
   '/settings': typeof SettingsRouteWithChildren
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/spelling-game-generator': typeof SpellingGameGeneratorRoute
   '/templates': typeof TemplatesRoute
   '/worksheets': typeof WorksheetsRoute
   '/(legals)/cookie': typeof legalsCookieRoute
@@ -532,10 +559,13 @@ export interface FileRouteTypes {
     | '/classroom-quiz-game'
     | '/create'
     | '/dashboard'
+    | '/llms.txt'
     | '/manifest.json'
+    | '/review-game-for-classroom'
     | '/robots.txt'
     | '/settings'
     | '/sitemap.xml'
+    | '/spelling-game-generator'
     | '/templates'
     | '/worksheets'
     | '/cookie'
@@ -588,9 +618,12 @@ export interface FileRouteTypes {
     | '/classroom-matching-game'
     | '/classroom-quiz-game'
     | '/create'
+    | '/llms.txt'
     | '/manifest.json'
+    | '/review-game-for-classroom'
     | '/robots.txt'
     | '/sitemap.xml'
+    | '/spelling-game-generator'
     | '/templates'
     | '/worksheets'
     | '/cookie'
@@ -645,10 +678,13 @@ export interface FileRouteTypes {
     | '/classroom-quiz-game'
     | '/create'
     | '/dashboard'
+    | '/llms.txt'
     | '/manifest.json'
+    | '/review-game-for-classroom'
     | '/robots.txt'
     | '/settings'
     | '/sitemap.xml'
+    | '/spelling-game-generator'
     | '/templates'
     | '/worksheets'
     | '/(legals)/cookie'
@@ -704,10 +740,13 @@ export interface RootRouteChildren {
   ClassroomQuizGameRoute: typeof ClassroomQuizGameRoute
   CreateRoute: typeof CreateRoute
   DashboardRoute: typeof DashboardRouteWithChildren
+  LlmsDottxtRoute: typeof LlmsDottxtRoute
   ManifestDotjsonRoute: typeof ManifestDotjsonRoute
+  ReviewGameForClassroomRoute: typeof ReviewGameForClassroomRoute
   RobotsDottxtRoute: typeof RobotsDottxtRoute
   SettingsRoute: typeof SettingsRouteWithChildren
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
+  SpellingGameGeneratorRoute: typeof SpellingGameGeneratorRoute
   TemplatesRoute: typeof TemplatesRoute
   WorksheetsRoute: typeof WorksheetsRoute
   legalsCookieRoute: typeof legalsCookieRoute
@@ -786,11 +825,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DashboardRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/llms.txt': {
+      id: '/llms.txt'
+      path: '/llms.txt'
+      fullPath: '/llms.txt'
+      preLoaderRoute: typeof LlmsDottxtRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/manifest.json': {
       id: '/manifest.json'
       path: '/manifest.json'
       fullPath: '/manifest.json'
       preLoaderRoute: typeof ManifestDotjsonRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/review-game-for-classroom': {
+      id: '/review-game-for-classroom'
+      path: '/review-game-for-classroom'
+      fullPath: '/review-game-for-classroom'
+      preLoaderRoute: typeof ReviewGameForClassroomRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/robots.txt': {
@@ -812,6 +865,13 @@ declare module '@tanstack/react-router' {
       path: '/sitemap.xml'
       fullPath: '/sitemap.xml'
       preLoaderRoute: typeof SitemapDotxmlRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/spelling-game-generator': {
+      id: '/spelling-game-generator'
+      path: '/spelling-game-generator'
+      fullPath: '/spelling-game-generator'
+      preLoaderRoute: typeof SpellingGameGeneratorRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/templates': {
@@ -1234,10 +1294,13 @@ const rootRouteChildren: RootRouteChildren = {
   ClassroomQuizGameRoute: ClassroomQuizGameRoute,
   CreateRoute: CreateRoute,
   DashboardRoute: DashboardRouteWithChildren,
+  LlmsDottxtRoute: LlmsDottxtRoute,
   ManifestDotjsonRoute: ManifestDotjsonRoute,
+  ReviewGameForClassroomRoute: ReviewGameForClassroomRoute,
   RobotsDottxtRoute: RobotsDottxtRoute,
   SettingsRoute: SettingsRouteWithChildren,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
+  SpellingGameGeneratorRoute: SpellingGameGeneratorRoute,
   TemplatesRoute: TemplatesRoute,
   WorksheetsRoute: WorksheetsRoute,
   legalsCookieRoute: legalsCookieRoute,

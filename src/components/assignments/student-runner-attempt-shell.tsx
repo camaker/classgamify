@@ -91,6 +91,7 @@ function StudentRunnerIdentityPanel({
   if (identityView.mode === 'student-name') {
     const studentNameDescriptionId = 'student-name-description';
     const studentNameErrorId = 'student-name-error';
+    const studentNameLabelId = 'student-name-label';
 
     return (
       <section
@@ -98,11 +99,16 @@ function StudentRunnerIdentityPanel({
         aria-label={identityView.ariaLabel}
         className="grid max-w-md gap-2"
       >
-        <label htmlFor="student-name" className="font-semibold text-base">
+        <label
+          htmlFor="student-name"
+          id={studentNameLabelId}
+          className="font-semibold text-base"
+        >
           {identityView.label}
         </label>
         <Input
           id="student-name"
+          aria-labelledby={studentNameLabelId}
           value={studentName}
           disabled={identityView.disabled}
           aria-describedby={
@@ -125,12 +131,15 @@ function StudentRunnerIdentityPanel({
             {studentNameError}
           </p>
         ) : null}
-        <p
+        {/* A second label so tapping the hint focuses the field; the
+            accessible name stays the first label via aria-labelledby. */}
+        <label
+          htmlFor="student-name"
           id={studentNameDescriptionId}
           className="text-muted-foreground text-sm"
         >
           {identityView.description}
-        </p>
+        </label>
       </section>
     );
   }

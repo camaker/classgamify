@@ -236,14 +236,14 @@ function buildActivityAiEnhancementSaveExecution({
   review: ActivityAiEnhancementEditorReviewPlan;
   source: ActivityAiEnhancementSaveBoundarySource;
   teacherSubmittedSave: boolean;
-}) {
+}): ActivityAiEnhancementSaveExecutionSummary | null {
   if (!review.canReachManualSave) return null;
   if (!teacherSubmittedSave) return null;
   if (!source.proposedDraft) return null;
 
   const saveExecution = buildActivityEditorSaveExecutionPlan({
     activityId: source.activityId,
-    hasUser: source.hasAuthenticatedTeacher,
+    hasUser: source.hasAuthenticatedTeacher === true,
     mode,
     values: source.proposedDraft,
   });

@@ -89,7 +89,7 @@ export function ActivityCreateForm({
   const [draftSourceText, setDraftSourceText] = useState(
     buildActivityEditorDraftSourceText(defaultValues)
   );
-  const [draftItemCount, setDraftItemCount] = useState(
+  const [draftItemCount, setDraftItemCount] = useState<number>(
     ACTIVITY_AI_DRAFT_ITEM_COUNT_RANGE.default
   );
   const [draftFocus, setDraftFocus] = useState<ActivityAiDraftFocus>(
@@ -99,7 +99,8 @@ export function ActivityCreateForm({
   const [isMounted, setIsMounted] = useState(false);
   const form = useForm<CreateActivityInput>({
     defaultValues,
-    resolver: zodResolver(createActivityInputSchema),
+    resolver: (values, context, options) =>
+      zodResolver(createActivityInputSchema)(values, context, { ...options }),
   });
   const selectedTemplate = form.watch('templateType');
   const watchedValues = form.watch();
