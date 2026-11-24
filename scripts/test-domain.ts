@@ -35753,7 +35753,7 @@ assert.deepEqual(worksheetsPageView, {
     badgeLabel: 'Worksheet generator',
     description:
       'Make a matching worksheet from your own word pairs. Students complete it online on any device, or you print it for paper, and you see every score. Fill-in-the-blank, sorting, and listening worksheets work the same way.',
-    title: 'Matching Worksheet Generator for Teachers',
+    title: 'Matching worksheet generator: one pair list, online or on paper',
   },
   heroActions: [
     {

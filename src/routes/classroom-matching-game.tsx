@@ -4,7 +4,6 @@ import Container from '@/components/layout/container';
 import { GuideFaqSection } from '@/components/page/guide-sections';
 import { Badge } from '@/components/ui/badge';
 import { buttonVariants } from '@/components/ui/button';
-import { websiteConfig } from '@/config/website';
 import { getLocale } from '@/lib/locale';
 import { Routes } from '@/lib/routes';
 import { seo } from '@/lib/seo';
@@ -25,7 +24,7 @@ import {
 import { createFileRoute, notFound } from '@tanstack/react-router';
 
 const path = '/classroom-matching-game';
-const title = `Matching Game Maker for Teachers | ${websiteConfig.metadata?.name}`;
+const title = 'Matching Game Maker for Teachers';
 const description =
   'Matching game maker for teachers: turn words and meanings, terms and definitions, or categories into a game. See a real pair set, then edit it and share a link.';
 

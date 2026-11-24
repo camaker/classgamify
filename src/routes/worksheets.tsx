@@ -9,7 +9,6 @@ import {
   type WorksheetsPageResultSignalView,
   type WorksheetsPageWorkflowStepView,
 } from '@/activities/entry-page-view';
-import { websiteConfig } from '@/config/website';
 import { m } from '@/locale/paraglide/messages';
 import { getLocale } from '@/lib/locale';
 import { getPathWithLocale } from '@/lib/urls';
@@ -32,7 +31,7 @@ import { Link, createFileRoute } from '@tanstack/react-router';
 export const Route = createFileRoute('/worksheets')({
   head: () => ({
     ...seo('/worksheets', {
-      title: `${m.worksheets_page_seo_title()} | ${websiteConfig.metadata?.name}`,
+      title: m.worksheets_page_seo_title(),
       description: m.worksheets_page_seo_description(),
     }),
     // The FAQ copy is English-only, so other locales render no FAQ markup.

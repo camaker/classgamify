@@ -6,7 +6,6 @@ import {
 } from '@/components/page/guide-sections';
 import { Badge } from '@/components/ui/badge';
 import { buttonVariants } from '@/components/ui/button';
-import { websiteConfig } from '@/config/website';
 import { getLocale } from '@/lib/locale';
 import { Routes } from '@/lib/routes';
 import { seo } from '@/lib/seo';
@@ -26,7 +25,7 @@ import {
 import { createFileRoute, notFound } from '@tanstack/react-router';
 
 const path = '/review-game-for-classroom';
-const title = `Review Game for Classroom: Make One in Minutes | ${websiteConfig.metadata?.name}`;
+const title = 'Review Game for Classroom: Make One in Minutes';
 const description =
   'Turn a unit review into a review game for the classroom. Pick a format, add your own questions, share one student link, and see what the class still mixes up.';
 
@@ -222,7 +221,22 @@ function ReviewGameForClassroomPage() {
             five minutes. While they play, nobody waits for the slowest student.
             Afterwards open the results, pick the two items most students
             missed, and spend the next ten minutes on those. The students who
-            finish early can try a matching review of the same terms.
+            finish early can try a matching review of the same terms. For
+            vocabulary lists, the{' '}
+            <a
+              className="font-medium text-primary underline-offset-4 hover:underline"
+              href="/spelling-game-generator"
+            >
+              spelling game generator
+            </a>{' '}
+            gives students quick practice, and the{' '}
+            <a
+              className="font-medium text-primary underline-offset-4 hover:underline"
+              href="/worksheets"
+            >
+              matching worksheet generator
+            </a>{' '}
+            makes a paper version of the same review.
           </p>
         </section>
 
@@ -244,6 +258,11 @@ function ReviewGameForClassroomPage() {
               href: '/spelling-game-generator',
               label: 'Spelling game generator',
               detail: 'Practice a word list in the browser.',
+            },
+            {
+              href: '/worksheets',
+              label: 'Matching worksheet generator',
+              detail: 'Print the same review or finish it online.',
             },
           ]}
         />

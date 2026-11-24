@@ -36,6 +36,7 @@ export const LLMS_TXT_HEADERS = {
 
 type SitemapUrl = {
   lastmod: string;
+  localeLastmod?: Partial<Record<Locale, string>>;
   path: string;
 };
 
@@ -218,6 +219,7 @@ function buildSitemapUrlEntry({
 
   return {
     ...url,
+    lastmod: url.localeLastmod?.[locale] ?? url.lastmod,
     alternates: buildSitemapAlternateLinks({
       availableLocales,
       baseUrl: base,

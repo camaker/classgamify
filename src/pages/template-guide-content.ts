@@ -31,6 +31,8 @@ export type TemplateDetailGuide = {
   intro: string;
   seoTitle: string;
   studentSteps: string[];
+  /** Optional pointer to a page that carries the ranking weight for this topic. */
+  supportLink?: { href: string; label: string; lead: string };
   teacherTips: string[];
   type: TemplateDetailGuideType;
   useCases: { detail: string; title: string }[];
@@ -147,6 +149,11 @@ const TEMPLATE_DETAIL_GUIDES: Record<
           'Yes. Line match uses the same pair list as match up and matching pairs, so after saving you can copy the pairs into either of those formats.',
       },
     ],
+    supportLink: {
+      href: '/worksheets',
+      label: 'matching worksheet generator',
+      lead: 'Need the full workflow, from word pairs to a printable or online worksheet? See the',
+    },
     createLabel: 'Create a line matching worksheet',
   },
   'group-sort': {

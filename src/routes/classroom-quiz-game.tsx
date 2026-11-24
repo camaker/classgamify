@@ -3,7 +3,6 @@ import Container from '@/components/layout/container';
 import { GuideFaqSection } from '@/components/page/guide-sections';
 import { Badge } from '@/components/ui/badge';
 import { buttonVariants } from '@/components/ui/button';
-import { websiteConfig } from '@/config/website';
 import { getLocale } from '@/lib/locale';
 import { Routes } from '@/lib/routes';
 import { seo } from '@/lib/seo';
@@ -24,7 +23,7 @@ import {
 import { createFileRoute, notFound } from '@tanstack/react-router';
 
 const path = '/classroom-quiz-game';
-const title = `Classroom Quiz Game for Teachers | ${websiteConfig.metadata?.name}`;
+const title = 'Classroom Quiz Game for Teachers';
 const description =
   'Build a classroom quiz game from your own review questions. See a real food-words example, try the student quiz, then create, assign, and review your activity.';
 

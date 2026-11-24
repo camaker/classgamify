@@ -3,7 +3,6 @@ import { getActivityTemplateScaffold } from '@/activities/scaffolds';
 import Container from '@/components/layout/container';
 import { Badge } from '@/components/ui/badge';
 import { buttonVariants } from '@/components/ui/button';
-import { websiteConfig } from '@/config/website';
 import { getLocale } from '@/lib/locale';
 import { Routes } from '@/lib/routes';
 import { seo } from '@/lib/seo';
@@ -65,7 +64,7 @@ export const Route = createFileRoute('/templates_/$template')({
 
     return {
       ...seo(path, {
-        title: `${guide.seoTitle} | ${websiteConfig.metadata?.name}`,
+        title: guide.seoTitle,
         description: guide.description,
         alternateLocales: ['en'],
         canonicalLocale: 'en',
@@ -186,6 +185,18 @@ function TemplateGuidePage() {
               <p className="max-w-2xl text-lg leading-8 text-muted-foreground">
                 {guide.intro}
               </p>
+              {guide.supportLink ? (
+                <p className="max-w-2xl text-sm leading-6 text-muted-foreground">
+                  {guide.supportLink.lead}{' '}
+                  <a
+                    className="font-medium text-primary underline-offset-4 hover:underline"
+                    href={guide.supportLink.href}
+                  >
+                    {guide.supportLink.label}
+                  </a>
+                  .
+                </p>
+              ) : null}
             </div>
             <div className="flex flex-col gap-3 sm:flex-row">
               <a
