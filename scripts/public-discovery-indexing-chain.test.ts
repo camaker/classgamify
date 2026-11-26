@@ -70,6 +70,7 @@ test('public route registry and indexing helpers keep crawlable routes aligned',
       ['classroom-matching-game', '/classroom-matching-game'],
       ['review-game-for-classroom', '/review-game-for-classroom'],
       ['spelling-game-generator', '/spelling-game-generator'],
+      ['juegos-para-clase', '/juegos-para-clase'],
       ['template-match-up', '/templates/match-up'],
       ['template-line-match', '/templates/line-match'],
       ['template-group-sort', '/templates/group-sort'],
@@ -77,7 +78,6 @@ test('public route registry and indexing helpers keep crawlable routes aligned',
       ['template-listening', '/templates/listening'],
       ['template-open-box', '/templates/open-box'],
       ['worksheets', Routes.Worksheets],
-      ['create', Routes.Create],
       ['pricing', Routes.Pricing],
       ['about', Routes.About],
       ['teachers', Routes.Teachers],
@@ -149,8 +149,8 @@ test('public route registry and indexing helpers keep crawlable routes aligned',
   );
   assert.ok(
     (lastmodByLoc.get('https://example.test/spelling-game-generator') ?? '') >
-      (lastmodByLoc.get('https://example.test/fr/') ?? ''),
-    'recently changed guides should have a later lastmod than untouched translations'
+      (lastmodByLoc.get('https://example.test/contact') ?? ''),
+    'recently changed guides should have a later lastmod than untouched pages'
   );
 
   const llms = buildLlmsTxt({ baseUrl: 'https://example.test' });
@@ -166,7 +166,7 @@ test('public route registry and indexing helpers keep crawlable routes aligned',
 test('public indexing route handlers delegate to shared helpers', () => {
   assert.match(
     PUBLIC_ROUTES_SOURCE,
-    /PUBLIC_INDEXABLE_STATIC_ROUTES[\s\S]*Routes\.Templates[\s\S]*Routes\.Worksheets[\s\S]*Routes\.Create/
+    /PUBLIC_INDEXABLE_STATIC_ROUTES[\s\S]*Routes\.Templates[\s\S]*Routes\.Worksheets[\s\S]*Routes\.Pricing/
   );
   assert.match(
     PUBLIC_ROUTES_SOURCE,

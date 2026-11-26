@@ -9,24 +9,14 @@ import { buildSitemapUrlEntries } from '@/seo/public-indexing';
 import { getIndexableLocalesForStaticPath } from '@/seo/public-routes';
 
 const BASE_URL = 'https://classgamify.example';
-const EN_ZH_PATHS = [
-  Routes.Worksheets,
-  Routes.Create,
-  Routes.Pricing,
-  Routes.Contact,
-  Routes.Roadmap,
-];
+const EN_ZH_PATHS = [Routes.Pricing, Routes.Contact, Routes.Roadmap];
 const EN_ONLY_PATHS = [
+  Routes.About,
   Routes.PrivacyPolicy,
   Routes.TermsOfService,
   Routes.CookiePolicy,
 ];
-const ALL_LOCALE_PATHS = [
-  Routes.Root,
-  Routes.Templates,
-  Routes.About,
-  Routes.Teachers,
-];
+const ALL_LOCALE_PATHS = [Routes.Root, Routes.Templates, Routes.Teachers];
 
 test('static route indexing locales reflect translated public content', () => {
   for (const path of EN_ZH_PATHS) {
@@ -113,7 +103,7 @@ test('untranslated static pages stay reachable but use noindex and English canon
 
 test('translated static pages retain self canonical and only available alternates', () => {
   for (const [path, availableLocales] of [
-    [Routes.Worksheets, ['en', 'zh']],
+    [Routes.Worksheets, ['en', 'zh', 'es']],
     [Routes.PrivacyPolicy, ['en']],
     [Routes.Templates, locales],
   ] as const) {
@@ -149,3 +139,21 @@ function withLocale(locale: Locale, callback: () => void) {
     overwriteGetLocale(() => 'en');
   }
 }
+
+test('worksheets and the Spanish class games page are indexable in their own locales', () => {
+  assert.deepEqual(getIndexableLocalesForStaticPath(Routes.Worksheets), [
+    'en',
+    'zh',
+    'es',
+  ]);
+  assert.deepEqual(getIndexableLocalesForStaticPath('/juegos-para-clase'), [
+    'es',
+  ]);
+  const spanish = buildSitemapUrlEntries({ baseUrl: BASE_URL }).filter(
+    (entry) => entry.path === '/juegos-para-clase'
+  );
+  assert.deepEqual(
+    spanish.map((entry) => entry.loc),
+    [`${BASE_URL}/es/juegos-para-clase`]
+  );
+});

@@ -361,3 +361,46 @@ test('sitemap carries lastmod and llms.txt lists the guides', async ({
   expect(text.startsWith('# ClassGamify')).toBe(true);
   expect(text).toContain('/spelling-game-generator');
 });
+
+test('template guides are playable without an account', async ({
+  page,
+}: {
+  page: Page;
+}) => {
+  await page.goto('/templates/match-up');
+  await page.getByRole('link', { name: 'Try a live example' }).click();
+  // Clicks before hydration are dropped, so retry until the score shows.
+  await expect(async () => {
+    await page.getByRole('button', { name: 'Check answers' }).click({
+      timeout: 1000,
+    });
+    await expect(page.getByText(/\d+ of \d+ correct/)).toBeVisible({
+      timeout: 1000,
+    });
+  }).toPass({ timeout: 20_000 });
+  expect(new URL(page.url()).pathname).toBe('/templates/match-up');
+});
+
+test('Spanish class games page and spelling save actions', async ({
+  page,
+  request,
+}: {
+  page: Page;
+  request: APIRequestContext;
+}) => {
+  const response = await page.goto('/es/juegos-para-clase');
+  expect(response?.status()).toBe(200);
+  await expect(page.getByRole('heading', { level: 1 })).toContainText(
+    'Juegos para clase'
+  );
+  expect((await response?.text()) ?? '').toContain('FAQPage');
+  expect((await request.get('/juegos-para-clase')).status()).toBe(404);
+
+  await page.goto('/spelling-game-generator');
+  await expect(
+    page.getByRole('link', { name: 'Save as a dictation activity' })
+  ).toHaveAttribute('href', /template=listening/);
+  await expect(
+    page.getByRole('link', { name: 'Save as fill in the blank' })
+  ).toHaveAttribute('href', /template=fill-blank/);
+});

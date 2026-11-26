@@ -49,7 +49,7 @@ export const Route = createFileRoute('/(pages)/pricing')({
 
     return {
       ...seo(Routes.Pricing, {
-        title: `${m.pricing_title()} | ${websiteConfig.metadata?.name}`,
+        title: `${m.nav_pricing()} | ${websiteConfig.metadata?.name}`,
         description: m.pricing_description(),
       }),
       scripts: [jsonLdScript(faqJsonLd)],

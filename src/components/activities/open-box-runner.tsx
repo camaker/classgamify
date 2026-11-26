@@ -32,6 +32,8 @@ type OpenBoxRunnerProps = {
   disabled: boolean;
   items: PublicRuntimeItem[];
   onAnswerChange: (itemId: string, answer: string) => void;
+  /** Embedded demos pass this so sample questions are not page headings. */
+  promptAsParagraph?: boolean;
   revealAnswer: boolean;
   reviewItems?: PublicAttemptReviewItem[];
 };
@@ -41,9 +43,11 @@ export function OpenBoxRunner({
   disabled,
   items,
   onAnswerChange,
+  promptAsParagraph = false,
   revealAnswer,
   reviewItems,
 }: OpenBoxRunnerProps) {
+  const PromptTag = promptAsParagraph ? 'p' : 'h2';
   const copy = getActivityRunnerKindCopy('open-box');
   const [activeItemId, setActiveItemId] = useState<string | undefined>(() =>
     getInitialSequentialStudentRunnerActiveItemId(items)
@@ -180,9 +184,9 @@ export function OpenBoxRunner({
             </div>
           </div>
 
-          <h2 className="text-balance font-bold text-2xl leading-snug">
+          <PromptTag className="text-balance font-bold text-2xl leading-snug">
             {activeItem.prompt}
-          </h2>
+          </PromptTag>
 
           <Input
             value={runnerView.activeAnswer}

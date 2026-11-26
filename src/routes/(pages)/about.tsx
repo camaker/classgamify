@@ -13,15 +13,44 @@ import { getLocale, localeConfig } from '@/lib/locale';
 import { cn } from '@/lib/utils';
 import { Link, createFileRoute } from '@tanstack/react-router';
 
+const ABOUT_EN_DESCRIPTION =
+  'What ClassGamify is, who it is for, how student data and AI drafts are handled, and how to contact us about schools and learning centers.';
+
+/** English-only trust copy; facts mirror the privacy policy and product docs. */
+const ABOUT_EN_SECTIONS = [
+  {
+    title: 'What ClassGamify is',
+    body: 'ClassGamify is a classroom activity platform for teachers. You write an activity once, using questions, word pairs, groups, or sentences, then choose a game or worksheet template, publish one student link, and read the results afterwards. The same content can be played as a quiz, a matching game, line matching, a sorting task, fill in the blank, a listening activity, or open the box.',
+  },
+  {
+    title: 'Who it is for',
+    body: 'Teachers, tutors, and learning centers who want short, repeatable practice activities. Students do not need an account. They open the link in a browser, type a name if the teacher collects names, and play.',
+  },
+  {
+    title: 'How student data is handled',
+    body: 'When a student plays an assignment, ClassGamify may process the student name, only if the teacher chooses to collect it, an anonymous browser token used for attempt limits, the submitted answers, the score, and the completion time. Teachers see this as results and CSV exports. Teachers decide whether to collect names and who receives the link, and should not ask students for sensitive personal information.',
+    link: { href: '/privacy', label: 'Read the privacy policy' },
+  },
+  {
+    title: 'How AI drafts work',
+    body: 'AI drafting is optional. When you ask for a draft from your lesson material, it opens in the editor for you to review and change. Nothing reaches students until you publish an assignment.',
+  },
+] as const;
+
 export const Route = createFileRoute('/(pages)/about')({
   head: () => {
     const title = m.nav_about_title();
-    const description = m.teachers_page_seo_description();
+    // /about is indexed in English only. Its description must differ from
+    // /teachers, which reuses the shared teachers_page_seo_description.
+    const description =
+      getLocale() === 'en'
+        ? ABOUT_EN_DESCRIPTION
+        : m.teachers_page_seo_description();
     const url = getCanonicalUrl(Routes.About);
     const baseUrl = getBaseUrl().replace(/\/$/, '');
     return {
       ...seo(Routes.About, {
-        title: `${title} | ${m.site_name()}`,
+        title,
         description,
       }),
       scripts: [
@@ -61,23 +90,26 @@ function AboutPage() {
           </p>
         </header>
 
-        <section className="space-y-3">
-          <h2 className="text-2xl font-semibold tracking-normal">
-            {m.teachers_page_workflow_section_title()}
-          </h2>
-          <p className="text-base leading-8 text-muted-foreground">
-            {m.teachers_page_workflow_section_description()}
-          </p>
-        </section>
-
-        <section className="space-y-3">
-          <h2 className="text-2xl font-semibold tracking-normal">
-            {m.teachers_page_use_case_section_title()}
-          </h2>
-          <p className="text-base leading-8 text-muted-foreground">
-            {m.teachers_page_use_case_section_description()}
-          </p>
-        </section>
+        {getLocale() === 'en'
+          ? ABOUT_EN_SECTIONS.map((section) => (
+              <section className="space-y-3" key={section.title}>
+                <h2 className="text-2xl font-semibold tracking-normal">
+                  {section.title}
+                </h2>
+                <p className="text-base leading-8 text-muted-foreground">
+                  {section.body}
+                </p>
+                {'link' in section ? (
+                  <Link
+                    to={section.link.href}
+                    className="font-medium text-primary text-sm underline-offset-4 hover:underline"
+                  >
+                    {section.link.label}
+                  </Link>
+                ) : null}
+              </section>
+            ))
+          : null}
 
         <section className="rounded-lg border bg-card p-5">
           <h2 className="text-xl font-semibold">

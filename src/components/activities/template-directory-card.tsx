@@ -65,13 +65,6 @@ export function TemplateDirectoryCard({
       <CardContent className="flex flex-1 flex-col gap-4">
         <TemplateExamplePreview template={template} />
 
-        <p className="text-sm leading-6 text-muted-foreground">
-          <span className="font-medium text-foreground">
-            {template.bestForLabel}:
-          </span>{' '}
-          {template.bestFor}
-        </p>
-
         <div className="flex flex-wrap gap-1.5">
           {template.contentRequirements.map((requirement) => (
             <Badge

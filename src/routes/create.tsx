@@ -34,6 +34,9 @@ export const Route = createFileRoute('/create')({
     seo('/create', {
       title: `${m.create_page_seo_title()} | ${websiteConfig.metadata?.name}`,
       description: m.create_page_seo_description(),
+      // The editor is a sign-in tool with no copy for searchers. The indexable
+      // entry points are the template guides and the worksheets page.
+      robots: 'noindex,follow',
     }),
   server: {
     middleware: [createRouteWorkspaceMiddleware],

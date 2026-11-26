@@ -12291,7 +12291,7 @@ assert.match(
 );
 assert.match(
   publicRoutesSource,
-  /PUBLIC_INDEXABLE_STATIC_ROUTES = \[[\s\S]*Routes\.Templates[\s\S]*Routes\.Worksheets[\s\S]*Routes\.Create[\s\S]*Routes\.Blog[\s\S]*Routes\.Roadmap[\s\S]*PUBLIC_ROBOTS_DISALLOW_RULES = \[[\s\S]*Routes\.Dashboard[\s\S]*\/print[\s\S]*\/play/,
+  /PUBLIC_INDEXABLE_STATIC_ROUTES = \[[\s\S]*Routes\.Templates[\s\S]*Routes\.Worksheets[\s\S]*Routes\.Pricing[\s\S]*Routes\.Blog[\s\S]*Routes\.Roadmap[\s\S]*PUBLIC_ROBOTS_DISALLOW_RULES = \[[\s\S]*Routes\.Dashboard[\s\S]*\/print[\s\S]*\/play/,
   'Public route registry should keep product entrypoints indexed while dashboard, print, and student runner paths remain crawler-blocked.'
 );
 assert.match(
@@ -13161,6 +13161,7 @@ assert.deepEqual(
     'classroom-matching-game',
     'review-game-for-classroom',
     'spelling-game-generator',
+    'juegos-para-clase',
     'template-match-up',
     'template-line-match',
     'template-group-sort',
@@ -13168,7 +13169,6 @@ assert.deepEqual(
     'template-listening',
     'template-open-box',
     'worksheets',
-    'create',
     'pricing',
     'about',
     'teachers',

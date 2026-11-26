@@ -212,3 +212,79 @@ export const WORKSHEETS_GUIDE_FAQS: GuideFaq[] = [
       'The assignment results list every attempt with the score and item-level answers, and you can download them as a CSV file.',
   },
 ];
+
+export const WORKSHEETS_GUIDE_FAQS_ES: GuideFaq[] = [
+  {
+    question: '¿Qué es un generador de fichas de emparejar?',
+    answer:
+      'Un generador de fichas de emparejar convierte parejas de términos y significados en una ficha. En ClassGamify escribes las parejas una vez y el alumnado completa la ficha en línea o en papel, mientras tú ves las puntuaciones.',
+  },
+  {
+    question: '¿Puedo crear una ficha de emparejar gratis?',
+    answer:
+      'Sí. El plan gratuito incluye todas las plantillas, con límites en las actividades guardadas y en los enlaces de tarea abiertos. La página de precios muestra los límites actuales.',
+  },
+  {
+    question: '¿Cómo creo una ficha de emparejar para mi clase?',
+    answer:
+      'Abre la plantilla de unión con líneas, sustituye el ejemplo por tus propias parejas, guárdala y publica un enlace para el alumnado. También puedes imprimir la misma tarea como ficha en papel.',
+  },
+  {
+    question: '¿El alumnado necesita una cuenta?',
+    answer:
+      'No. El alumnado abre el enlace en el navegador y escribe su nombre si tú lo pides. Solo el docente necesita una cuenta para guardar actividades y ver resultados.',
+  },
+  {
+    question: '¿Puedo imprimir la ficha?',
+    answer:
+      'Sí. Cada tarea se puede imprimir como ficha para quienes trabajan en papel.',
+  },
+  {
+    question: '¿Qué otras fichas puedo crear?',
+    answer:
+      'Completar huecos para gramática y ortografía, clasificar en grupos para categorías y audios para dictado. Todas usan el mismo editor y el mismo enlace para el alumnado.',
+  },
+  {
+    question: '¿Cómo veo cómo les fue al alumnado?',
+    answer:
+      'Los resultados de la tarea muestran cada intento con su puntuación y las respuestas por elemento, y puedes descargarlos como archivo CSV.',
+  },
+];
+
+export const JUEGOS_PARA_CLASE_FAQS: GuideFaq[] = [
+  {
+    question: '¿Qué son los juegos para clase?',
+    answer:
+      'Son actividades que el alumnado juega en lugar de resolver una prueba aburrida. Con ClassGamify escribes el contenido una vez, lo conviertes en cuestionario, parejas, clasificación u otros formatos y ves los resultados después.',
+  },
+  {
+    question: '¿Cómo creo un juego para mi clase?',
+    answer:
+      'Elige una plantilla, sustituye el ejemplo por tus propias preguntas, parejas o palabras, guarda la actividad y publica un enlace para el alumnado. El alumnado lo abre en el navegador y juega.',
+  },
+  {
+    question: '¿El alumnado necesita una cuenta?',
+    answer:
+      'No. El alumnado abre el enlace y escribe su nombre si tú lo pides. Solo el docente necesita una cuenta para guardar actividades y ver los resultados.',
+  },
+  {
+    question: '¿Es gratis?',
+    answer:
+      'Sí. El plan gratuito incluye todas las plantillas, con límites en las actividades guardadas y en los enlaces de tarea abiertos. La página de precios muestra los límites actuales.',
+  },
+  {
+    question: '¿Qué formatos de juego hay?',
+    answer:
+      'Hay ocho plantillas: cuestionario, encontrar parejas, relacionar, relacionar con líneas, clasificar en grupos, completar la frase, comprensión auditiva y abrir la caja. Algunas usan preguntas, otras parejas de palabras o grupos.',
+  },
+  {
+    question: '¿Puedo ver qué le costó más a la clase?',
+    answer:
+      'Sí. Los resultados de cada tarea muestran todos los intentos con la puntuación y las respuestas por elemento, y puedes descargarlos como archivo CSV.',
+  },
+  {
+    question: '¿Puedo imprimirlo para quienes no tienen dispositivo?',
+    answer:
+      'Sí. Cada tarea se puede imprimir como ficha para el alumnado que trabaja en papel.',
+  },
+];

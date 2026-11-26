@@ -16,6 +16,7 @@ import { Route as ClassroomMatchingGameRouteImport } from './routes/classroom-ma
 import { Route as ClassroomQuizGameRouteImport } from './routes/classroom-quiz-game'
 import { Route as CreateRouteImport } from './routes/create'
 import { Route as DashboardRouteImport } from './routes/dashboard'
+import { Route as JuegosParaClaseRouteImport } from './routes/juegos-para-clase'
 import { Route as LlmsDottxtRouteImport } from './routes/llms[.]txt'
 import { Route as ManifestDotjsonRouteImport } from './routes/manifest[.]json'
 import { Route as ReviewGameForClassroomRouteImport } from './routes/review-game-for-classroom'
@@ -102,6 +103,11 @@ const CreateRoute = CreateRouteImport.update({
 const DashboardRoute = DashboardRouteImport.update({
   id: '/dashboard',
   path: '/dashboard',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const JuegosParaClaseRoute = JuegosParaClaseRouteImport.update({
+  id: '/juegos-para-clase',
+  path: '/juegos-para-clase',
   getParentRoute: () => rootRouteImport,
 } as any)
 const LlmsDottxtRoute = LlmsDottxtRouteImport.update({
@@ -376,6 +382,7 @@ export interface FileRoutesByFullPath {
   '/classroom-quiz-game': typeof ClassroomQuizGameRoute
   '/create': typeof CreateRoute
   '/dashboard': typeof DashboardRouteWithChildren
+  '/juegos-para-clase': typeof JuegosParaClaseRoute
   '/llms.txt': typeof LlmsDottxtRoute
   '/manifest.json': typeof ManifestDotjsonRoute
   '/review-game-for-classroom': typeof ReviewGameForClassroomRoute
@@ -435,6 +442,7 @@ export interface FileRoutesByTo {
   '/classroom-matching-game': typeof ClassroomMatchingGameRoute
   '/classroom-quiz-game': typeof ClassroomQuizGameRoute
   '/create': typeof CreateRoute
+  '/juegos-para-clase': typeof JuegosParaClaseRoute
   '/llms.txt': typeof LlmsDottxtRoute
   '/manifest.json': typeof ManifestDotjsonRoute
   '/review-game-for-classroom': typeof ReviewGameForClassroomRoute
@@ -496,6 +504,7 @@ export interface FileRoutesById {
   '/classroom-quiz-game': typeof ClassroomQuizGameRoute
   '/create': typeof CreateRoute
   '/dashboard': typeof DashboardRouteWithChildren
+  '/juegos-para-clase': typeof JuegosParaClaseRoute
   '/llms.txt': typeof LlmsDottxtRoute
   '/manifest.json': typeof ManifestDotjsonRoute
   '/review-game-for-classroom': typeof ReviewGameForClassroomRoute
@@ -559,6 +568,7 @@ export interface FileRouteTypes {
     | '/classroom-quiz-game'
     | '/create'
     | '/dashboard'
+    | '/juegos-para-clase'
     | '/llms.txt'
     | '/manifest.json'
     | '/review-game-for-classroom'
@@ -618,6 +628,7 @@ export interface FileRouteTypes {
     | '/classroom-matching-game'
     | '/classroom-quiz-game'
     | '/create'
+    | '/juegos-para-clase'
     | '/llms.txt'
     | '/manifest.json'
     | '/review-game-for-classroom'
@@ -678,6 +689,7 @@ export interface FileRouteTypes {
     | '/classroom-quiz-game'
     | '/create'
     | '/dashboard'
+    | '/juegos-para-clase'
     | '/llms.txt'
     | '/manifest.json'
     | '/review-game-for-classroom'
@@ -740,6 +752,7 @@ export interface RootRouteChildren {
   ClassroomQuizGameRoute: typeof ClassroomQuizGameRoute
   CreateRoute: typeof CreateRoute
   DashboardRoute: typeof DashboardRouteWithChildren
+  JuegosParaClaseRoute: typeof JuegosParaClaseRoute
   LlmsDottxtRoute: typeof LlmsDottxtRoute
   ManifestDotjsonRoute: typeof ManifestDotjsonRoute
   ReviewGameForClassroomRoute: typeof ReviewGameForClassroomRoute
@@ -823,6 +836,13 @@ declare module '@tanstack/react-router' {
       path: '/dashboard'
       fullPath: '/dashboard'
       preLoaderRoute: typeof DashboardRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/juegos-para-clase': {
+      id: '/juegos-para-clase'
+      path: '/juegos-para-clase'
+      fullPath: '/juegos-para-clase'
+      preLoaderRoute: typeof JuegosParaClaseRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/llms.txt': {
@@ -1294,6 +1314,7 @@ const rootRouteChildren: RootRouteChildren = {
   ClassroomQuizGameRoute: ClassroomQuizGameRoute,
   CreateRoute: CreateRoute,
   DashboardRoute: DashboardRouteWithChildren,
+  JuegosParaClaseRoute: JuegosParaClaseRoute,
   LlmsDottxtRoute: LlmsDottxtRoute,
   ManifestDotjsonRoute: ManifestDotjsonRoute,
   ReviewGameForClassroomRoute: ReviewGameForClassroomRoute,
