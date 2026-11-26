@@ -75,6 +75,10 @@ Spelling practice helpers have a fast script-level gate via
 `pnpm exec tsx --test scripts/spelling-practice.test.ts`; run it when changing
 the word-list parsing, hint, answer-check, or shuffle helpers behind
 `/spelling-game-generator`.
+Template guide live examples have a fast script-level gate via
+`pnpm exec tsx --test scripts/template-live-demo.test.ts`; run it when changing
+starter scaffold copy in any locale or the playable examples on
+`/templates/$template`.
 Classroom trust communication chain has a fast script-level gate via
 `pnpm exec tsx --test scripts/classroom-trust-communication-chain.test.ts`;
 run it when changing the transactional mail workspace boundary, public classroom
@@ -900,6 +904,8 @@ and `/blog` respectively instead of serving 404 pages.
 | 5b | Homepage explains the workflow and answers teacher FAQs | **File:** `specs/classroom-game-guides.spec.ts`. Open `/` and verify the three-step how-it-works section, the eight-template example grid linking to each English guide, the visible FAQ (including whether students need an account), the "More for teachers" links, and FAQPage JSON-LD with no SoftwareApplication node and no Offer (no ratings exist, and no price is advertised). Open `/fr/` and verify the FAQ is localized, all eight example links plus "See all templates" point at `/fr/templates`, and no link points at the redirecting `/fr/blog` (locales without posts link to `/blog`). |
 | 5c | English landing guides for review games and spelling are indexable and usable | **File:** `specs/classroom-game-guides.spec.ts`. Open `/review-game-for-classroom` and `/spelling-game-generator`. Verify each returns 200 with one H1, visible FAQs, FAQPage and BreadcrumbList JSON-LD, a self canonical, no robots meta, and no hreflang links; `/zh/...` versions return 404. On the spelling page, replace the word list, press "Make spelling practice", type each word, press "Check answers", and verify the score line. The review page links to the quiz guide. |
 | 5d | Sitemap and llms.txt follow the discovery contract | **File:** `specs/classroom-game-guides.spec.ts`. `/sitemap.xml` has a `lastmod` on every url, no `changefreq` or `priority`, and lists both new guides. `/llms.txt` returns plain text starting with `# ClassGamify` and links the guides. |
+| 5e | Template guides are playable without an account | **File:** `specs/classroom-game-guides.spec.ts`. On `/templates/match-up`, follow "Try a live example", answer one item in the embedded activity, press "Check answers", and verify a score line appears and the page URL stays on the guide. |
+| 5f | Spanish class games page and spelling save actions | **File:** `specs/classroom-game-guides.spec.ts`. `/es/juegos-para-clase` returns 200 with a Spanish H1 and FAQPage markup, `/juegos-para-clase` returns 404, and `/spelling-game-generator` offers both a listening and a fill-in-the-blank save action. |
 
 ## 2. Authentication And Protected Routes
 

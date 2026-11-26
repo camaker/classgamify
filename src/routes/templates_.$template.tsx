@@ -1,6 +1,7 @@
 import { getActivityTemplates } from '@/activities/catalog';
 import { getActivityTemplateScaffold } from '@/activities/scaffolds';
 import Container from '@/components/layout/container';
+import { TemplateLiveDemo } from '@/components/page/template-live-demo';
 import { Badge } from '@/components/ui/badge';
 import { buttonVariants } from '@/components/ui/button';
 import { getLocale } from '@/lib/locale';
@@ -214,15 +215,24 @@ function TemplateGuidePage() {
                   buttonVariants({ size: 'lg', variant: 'outline' }),
                   'w-fit rounded-lg bg-background'
                 )}
+                href="#try-it"
+              >
+                Try a live example
+              </a>
+              <a
+                className={cn(
+                  buttonVariants({ size: 'lg', variant: 'ghost' }),
+                  'w-fit rounded-lg'
+                )}
                 href={Routes.Templates}
               >
                 Browse all templates
               </a>
             </div>
             <p className="text-sm leading-6 text-muted-foreground">
-              The editor opens with the example below already filled in. A free
-              teacher account is needed to save the activity and publish a
-              student link.
+              You can try the example on this page without signing up. The
+              editor opens with it already filled in; a free teacher account is
+              needed to save the activity and publish a student link.
             </p>
           </div>
 
@@ -257,6 +267,23 @@ function TemplateGuidePage() {
               Replace it with content from your own lesson in the editor.
             </p>
           </aside>
+        </section>
+
+        <section
+          aria-labelledby="try-it-heading"
+          className="scroll-mt-24 space-y-5"
+          id="try-it"
+        >
+          <div className="max-w-3xl space-y-2">
+            <h2 id="try-it-heading" className="text-3xl font-semibold">
+              Try the {guide.breadcrumbLabel.toLowerCase()} activity now
+            </h2>
+            <p className="leading-7 text-muted-foreground">
+              Edit the rows, play the activity, and check your answers. Nothing
+              is saved or sent, and no account is needed.
+            </p>
+          </div>
+          <TemplateLiveDemo key={guide.type} templateType={guide.type} />
         </section>
 
         <section aria-labelledby="template-uses-heading" className="space-y-7">

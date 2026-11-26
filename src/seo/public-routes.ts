@@ -13,9 +13,9 @@ type PublicIndexableRouteId =
   | 'classroom-matching-game'
   | 'review-game-for-classroom'
   | 'spelling-game-generator'
+  | 'juegos-para-clase'
   | 'contact'
   | 'cookie'
-  | 'create'
   | 'home'
   | 'pricing'
   | 'privacy'
@@ -66,10 +66,10 @@ export const PUBLIC_INDEXABLE_STATIC_ROUTES = [
   {
     id: 'home',
     path: Routes.Root,
-    lastmod: '2026-10-24',
+    lastmod: '2026-11-26',
     localeLastmod: { en: '2026-11-23', zh: '2026-11-23' },
   },
-  { id: 'templates', path: Routes.Templates, lastmod: '2026-10-22' },
+  { id: 'templates', path: Routes.Templates, lastmod: '2026-11-26' },
   {
     id: 'classroom-quiz-game',
     path: '/classroom-quiz-game',
@@ -91,8 +91,14 @@ export const PUBLIC_INDEXABLE_STATIC_ROUTES = [
   {
     id: 'spelling-game-generator',
     path: '/spelling-game-generator',
-    lastmod: '2026-11-24',
+    lastmod: '2026-11-26',
     localized: false,
+  },
+  {
+    id: 'juegos-para-clase',
+    path: '/juegos-para-clase',
+    indexableLocales: ['es'],
+    lastmod: '2026-11-26',
   },
   // English template guides rendered by `/templates/$template`; keep in sync
   // with TEMPLATE_GUIDE_PATHS in src/pages/template-guide-paths.ts.
@@ -108,29 +114,34 @@ export const PUBLIC_INDEXABLE_STATIC_ROUTES = [
   ).map((template) => ({
     id: `template-${template}` as const,
     path: `${Routes.Templates}/${template}` as const,
-    lastmod: '2026-11-24',
+    lastmod: '2026-11-26',
     localized: false as const,
   })),
   {
     id: 'worksheets',
     path: Routes.Worksheets,
-    indexableLocales: ['en', 'zh'],
+    indexableLocales: ['en', 'zh', 'es'],
     lastmod: '2026-11-24',
-  },
-  {
-    id: 'create',
-    path: Routes.Create,
-    indexableLocales: ['en', 'zh'],
-    lastmod: '2026-10-24',
+    localeLastmod: { es: '2026-11-26' },
   },
   {
     id: 'pricing',
     path: Routes.Pricing,
     indexableLocales: ['en', 'zh'],
-    lastmod: '2026-09-28',
+    lastmod: '2026-11-26',
   },
-  { id: 'about', path: Routes.About, lastmod: '2026-08-06' },
-  { id: 'teachers', path: Routes.Teachers, lastmod: '2026-07-07' },
+  {
+    id: 'about',
+    path: Routes.About,
+    indexableLocales: ['en'],
+    lastmod: '2026-11-26',
+  },
+  {
+    id: 'teachers',
+    path: Routes.Teachers,
+    lastmod: '2026-07-07',
+    localeLastmod: { en: '2026-11-26' },
+  },
   {
     id: 'contact',
     path: Routes.Contact,

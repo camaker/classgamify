@@ -18,7 +18,10 @@ import {
   graphJsonLd,
   jsonLdScript,
 } from '@/lib/structured-data';
-import { WORKSHEETS_GUIDE_FAQS } from '@/pages/guide-faq-content';
+import {
+  WORKSHEETS_GUIDE_FAQS,
+  WORKSHEETS_GUIDE_FAQS_ES,
+} from '@/pages/guide-faq-content';
 import { cn } from '@/lib/utils';
 import {
   IconArrowRight,
@@ -34,23 +37,29 @@ export const Route = createFileRoute('/worksheets')({
       title: m.worksheets_page_seo_title(),
       description: m.worksheets_page_seo_description(),
     }),
-    // The FAQ copy is English-only, so other locales render no FAQ markup.
-    scripts:
-      getLocale() === 'en'
-        ? [
-            jsonLdScript(
-              graphJsonLd([
-                faqPageJsonLd({
-                  faqs: WORKSHEETS_GUIDE_FAQS,
-                  path: '/worksheets',
-                }),
-              ])
-            ),
-          ]
-        : [],
+    // FAQ copy exists in English and Spanish; other locales render none.
+    scripts: worksheetsFaqs()
+      ? [
+          jsonLdScript(
+            graphJsonLd([
+              faqPageJsonLd({
+                faqs: worksheetsFaqs() ?? [],
+                path: '/worksheets',
+              }),
+            ])
+          ),
+        ]
+      : [],
   }),
   component: WorksheetsPage,
 });
+
+function worksheetsFaqs() {
+  const locale = getLocale();
+  if (locale === 'en') return WORKSHEETS_GUIDE_FAQS;
+  if (locale === 'es') return WORKSHEETS_GUIDE_FAQS_ES;
+  return undefined;
+}
 
 function WorksheetsPage() {
   const pageView = buildWorksheetsPageViewModel();
@@ -200,6 +209,46 @@ function WorksheetsPage() {
             <GuideFaqSection
               faqs={WORKSHEETS_GUIDE_FAQS}
               headingId="worksheets-faq"
+            />
+          </>
+        ) : null}
+
+        {getLocale() === 'es' ? (
+          <>
+            <section
+              aria-labelledby="worksheets-how-heading"
+              className="grid gap-4 rounded-lg border bg-card p-5"
+            >
+              <h2 id="worksheets-how-heading" className="text-xl font-semibold">
+                Cómo crear una ficha de emparejar
+              </h2>
+              <ol className="list-inside list-decimal space-y-2 text-sm leading-7 text-muted-foreground">
+                <li>
+                  Abre la plantilla de unión con líneas y sustituye el ejemplo
+                  por tus propios términos y parejas.
+                </li>
+                <li>
+                  Guarda la actividad y publica un enlace para el alumnado, o
+                  imprime la tarea para trabajar en papel.
+                </li>
+                <li>
+                  Revisa las puntuaciones y lo que falló el grupo, y repasa lo
+                  que más se confundió.
+                </li>
+              </ol>
+              <Link
+                to={getPathWithLocale('/create')}
+                search={{ source: 'worksheets', template: 'line-match' }}
+                className={cn(buttonVariants(), 'w-fit rounded-lg')}
+              >
+                Crear una ficha de emparejar
+                <IconArrowRight className="size-4" />
+              </Link>
+            </section>
+            <GuideFaqSection
+              faqs={WORKSHEETS_GUIDE_FAQS_ES}
+              headingId="worksheets-faq"
+              title="Preguntas frecuentes"
             />
           </>
         ) : null}

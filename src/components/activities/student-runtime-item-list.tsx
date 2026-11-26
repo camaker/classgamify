@@ -24,6 +24,8 @@ type StudentRuntimeItemListProps = {
   items: PublicRuntimeItem[];
   language?: string;
   onAnswerChanges: (changes: StudentAnswerChange[]) => void;
+  /** Embedded demos pass this so sample questions are not page headings. */
+  promptAsParagraph?: boolean;
   revealAnswer: boolean;
   reviewItems?: PublicAttemptReviewItem[];
   templateType: ActivityTemplateType;
@@ -35,6 +37,7 @@ export function StudentRuntimeItemList({
   items,
   language,
   onAnswerChanges,
+  promptAsParagraph = false,
   revealAnswer,
   reviewItems,
   templateType,
@@ -128,6 +131,7 @@ export function StudentRuntimeItemList({
       <StudentRuntimeInteractionRegion listView={listView}>
         <div className="mt-4">
           <OpenBoxRunner
+            promptAsParagraph={promptAsParagraph}
             answers={answers}
             disabled={disabled}
             items={items}
@@ -164,6 +168,7 @@ export function StudentRuntimeItemList({
         <ChoiceQuestionStepper
           cardViews={listView.defaultItemCardViews}
           disabled={disabled}
+          promptAsParagraph={promptAsParagraph}
           revealAnswer={revealAnswer}
           reviewMode={Boolean(reviewItems?.length)}
           onAnswerChange={handleSingleAnswerChange}

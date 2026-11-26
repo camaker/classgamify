@@ -96,6 +96,21 @@ const TEMPLATE_DETAIL_GUIDES: Record<
         answer:
           'Yes. The assignment results show each submitted attempt with item-level answers, so you can see which pairs the class mixed up.',
       },
+      {
+        question: 'Do students need an account?',
+        answer:
+          'No. Students open the assignment link in a browser and type their name if you collect names. Only the teacher needs an account to save activities and read results.',
+      },
+      {
+        question: 'Can I use my own content?',
+        answer:
+          'Yes. Every template opens with an editable example. Replace it with your own words, questions, pairs, or groups for any subject or grade.',
+      },
+      {
+        question: 'How do I see how students did?',
+        answer:
+          'The assignment results list every attempt with the score and item-level answers, so you can see what the class missed. You can also download the results as a CSV file.',
+      },
     ],
     createLabel: 'Create a match up activity',
   },
@@ -147,6 +162,26 @@ const TEMPLATE_DETAIL_GUIDES: Record<
         question: 'Can I reuse my pairs in another game?',
         answer:
           'Yes. Line match uses the same pair list as match up and matching pairs, so after saving you can copy the pairs into either of those formats.',
+      },
+      {
+        question: 'Is the line match template free to use?',
+        answer:
+          'Yes. The free plan includes every template, with limits on saved activities and open assignment links. Open the editable example, replace it with your own content, and publish a student link.',
+      },
+      {
+        question: 'Do students need an account?',
+        answer:
+          'No. Students open the assignment link in a browser and type their name if you collect names. Only the teacher needs an account to save activities and read results.',
+      },
+      {
+        question: 'How do I see how students did?',
+        answer:
+          'The assignment results list every attempt with the score and item-level answers, so you can see what the class missed. You can also download the results as a CSV file.',
+      },
+      {
+        question: 'Can I print it for students without devices?',
+        answer:
+          'Yes. Each assignment can be printed as a worksheet for students who work on paper.',
       },
     ],
     supportLink: {
@@ -205,6 +240,26 @@ const TEMPLATE_DETAIL_GUIDES: Record<
         answer:
           'Students tap or click an item and then the group it belongs to, which also works on touch screens.',
       },
+      {
+        question: 'Is the group sort template free to use?',
+        answer:
+          'Yes. The free plan includes every template, with limits on saved activities and open assignment links. Open the editable example, replace it with your own content, and publish a student link.',
+      },
+      {
+        question: 'Do students need an account?',
+        answer:
+          'No. Students open the assignment link in a browser and type their name if you collect names. Only the teacher needs an account to save activities and read results.',
+      },
+      {
+        question: 'Can I use my own content?',
+        answer:
+          'Yes. Every template opens with an editable example. Replace it with your own words, questions, pairs, or groups for any subject or grade.',
+      },
+      {
+        question: 'How do I see how students did?',
+        answer:
+          'The assignment results list every attempt with the score and item-level answers, so you can see what the class missed. You can also download the results as a CSV file.',
+      },
     ],
     createLabel: 'Create a group sort activity',
   },
@@ -256,6 +311,26 @@ const TEMPLATE_DETAIL_GUIDES: Record<
         question: 'What happens with spelling mistakes?',
         answer:
           'Typed answers are checked against the answer you set, ignoring capital letters and punctuation, so a misspelled word is marked wrong. You can list more than one accepted answer, separated by a slash. The results show each typed answer so you can spot near misses and decide what to reteach.',
+      },
+      {
+        question: 'Is the fill in the blank template free to use?',
+        answer:
+          'Yes. The free plan includes every template, with limits on saved activities and open assignment links. Open the editable example, replace it with your own content, and publish a student link.',
+      },
+      {
+        question: 'Do students need an account?',
+        answer:
+          'No. Students open the assignment link in a browser and type their name if you collect names. Only the teacher needs an account to save activities and read results.',
+      },
+      {
+        question: 'How do I see how students did?',
+        answer:
+          'The assignment results list every attempt with the score and item-level answers, so you can see what the class missed. You can also download the results as a CSV file.',
+      },
+      {
+        question: 'Can I print it for students without devices?',
+        answer:
+          'Yes. Each assignment can be printed as a worksheet for students who work on paper.',
       },
     ],
     createLabel: 'Create a fill in the blank activity',
@@ -311,6 +386,26 @@ const TEMPLATE_DETAIL_GUIDES: Record<
         answer:
           'The play button is turned off and the activity shows that speech is not available in that browser. Try the link on a class device before you assign it.',
       },
+      {
+        question: 'Is the listening template free to use?',
+        answer:
+          'Yes. The free plan includes every template, with limits on saved activities and open assignment links. Open the editable example, replace it with your own content, and publish a student link.',
+      },
+      {
+        question: 'Do students need an account?',
+        answer:
+          'No. Students open the assignment link in a browser and type their name if you collect names. Only the teacher needs an account to save activities and read results.',
+      },
+      {
+        question: 'Can I use my own content?',
+        answer:
+          'Yes. Every template opens with an editable example. Replace it with your own words, questions, pairs, or groups for any subject or grade.',
+      },
+      {
+        question: 'How do I see how students did?',
+        answer:
+          'The assignment results list every attempt with the score and item-level answers, so you can see what the class missed. You can also download the results as a CSV file.',
+      },
     ],
     createLabel: 'Create a listening quiz',
   },
@@ -362,6 +457,26 @@ const TEMPLATE_DETAIL_GUIDES: Record<
         question: 'Do answers have to match exactly?',
         answer:
           'Each prompt has a model answer for scoring. Capital letters and punctuation are ignored, but other differences are marked wrong, so add accepted alternatives separated by a slash. Review the typed responses in the results and talk through close variants with your class.',
+      },
+      {
+        question: 'Is the open the box template free to use?',
+        answer:
+          'Yes. The free plan includes every template, with limits on saved activities and open assignment links. Open the editable example, replace it with your own content, and publish a student link.',
+      },
+      {
+        question: 'Do students need an account?',
+        answer:
+          'No. Students open the assignment link in a browser and type their name if you collect names. Only the teacher needs an account to save activities and read results.',
+      },
+      {
+        question: 'Can I use my own content?',
+        answer:
+          'Yes. Every template opens with an editable example. Replace it with your own words, questions, pairs, or groups for any subject or grade.',
+      },
+      {
+        question: 'How do I see how students did?',
+        answer:
+          'The assignment results list every attempt with the score and item-level answers, so you can see what the class missed. You can also download the results as a CSV file.',
       },
     ],
     createLabel: 'Create an open the box activity',

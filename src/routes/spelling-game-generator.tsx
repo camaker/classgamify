@@ -90,10 +90,19 @@ function SpellingGameGeneratorPage() {
           <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
             <a
               className={cn(buttonVariants({ size: 'lg' }), 'w-fit rounded-lg')}
+              href="/create?source=templates&template=listening"
+            >
+              Save as a dictation activity
+              <IconArrowRight className="size-4" />
+            </a>
+            <a
+              className={cn(
+                buttonVariants({ size: 'lg', variant: 'outline' }),
+                'w-fit rounded-lg bg-background'
+              )}
               href="/create?source=templates&template=fill-blank"
             >
-              Save as a student assignment
-              <IconArrowRight className="size-4" />
+              Save as fill in the blank
             </a>
             <p className="text-sm leading-6 text-muted-foreground">
               A teacher account saves your list, gives students one link, and
@@ -121,7 +130,7 @@ function SpellingGameGeneratorPage() {
             <GuideStepCard
               number="02"
               title="Save it as an activity"
-              detail="Open the fill blank or listening template, replace the example with your words or sentences, and save it in your teacher workspace."
+              detail="Open the listening template for dictation or the fill in the blank template for words in sentences, replace the example, and save it in your teacher workspace."
             />
             <GuideStepCard
               number="03"

@@ -3,14 +3,16 @@ import type { GuideFaq } from '@/pages/guide-faq-content';
 export function GuideFaqSection({
   faqs,
   headingId,
+  title = 'Frequently asked questions',
 }: {
   faqs: GuideFaq[];
   headingId: string;
+  title?: string;
 }) {
   return (
     <section aria-labelledby={headingId} className="space-y-6">
       <h2 id={headingId} className="text-3xl font-semibold">
-        Frequently asked questions
+        {title}
       </h2>
       <dl className="grid gap-3 md:grid-cols-2">
         {faqs.map((faq) => (

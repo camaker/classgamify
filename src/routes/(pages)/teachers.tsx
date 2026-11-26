@@ -1,8 +1,10 @@
+import { getActivityTemplates } from '@/activities/catalog';
 import Container from '@/components/layout/container';
 import { Badge } from '@/components/ui/badge';
 import { buttonVariants } from '@/components/ui/button';
 import { websiteConfig } from '@/config/website';
 import { m } from '@/locale/paraglide/messages';
+import { getLocale } from '@/lib/locale';
 import { Routes } from '@/lib/routes';
 import { seo } from '@/lib/seo';
 import { jsonLdScript } from '@/lib/structured-data';
@@ -12,6 +14,7 @@ import {
   type TeachersPageWorkflowId,
 } from '@/pages/public-page-view';
 import { cn } from '@/lib/utils';
+import { TEMPLATE_GUIDE_PATHS } from '@/pages/template-guide-paths';
 import {
   IconArrowRight,
   IconChartBar,
@@ -193,8 +196,104 @@ function TeachersPage() {
             ))}
           </div>
         </section>
+
+        {getLocale() === 'en' ? <TemplateChooser /> : null}
       </div>
     </Container>
+  );
+}
+
+const TEACHER_GUIDE_LINKS = [
+  { href: '/classroom-quiz-game', label: 'Classroom quiz game' },
+  { href: '/classroom-matching-game', label: 'Matching game maker' },
+  { href: '/worksheets', label: 'Matching worksheet generator' },
+  {
+    href: '/review-game-for-classroom',
+    label: 'Review game for the classroom',
+  },
+  { href: '/spelling-game-generator', label: 'Spelling game generator' },
+] as const;
+
+/** English-only chooser: which template fits which content and class format. */
+function TemplateChooser() {
+  const templates = getActivityTemplates();
+
+  return (
+    <section aria-labelledby="teachers-chooser-heading" className="space-y-4">
+      <div>
+        <h2
+          id="teachers-chooser-heading"
+          className="text-2xl font-semibold tracking-normal"
+        >
+          Pick a game by what you are teaching
+        </h2>
+        <p className="mt-2 max-w-2xl text-sm leading-6 text-muted-foreground">
+          Every template starts from an editable example. Choose by the kind of
+          content you have and how the class will play.
+        </p>
+      </div>
+      <div className="overflow-x-auto rounded-lg border">
+        <table className="w-full text-left text-sm">
+          <caption className="sr-only">
+            Classroom game templates by content and class format
+          </caption>
+          <thead className="bg-muted/50">
+            <tr>
+              <th className="px-4 py-3 font-semibold" scope="col">
+                Template
+              </th>
+              <th className="px-4 py-3 font-semibold" scope="col">
+                Best for
+              </th>
+              <th className="px-4 py-3 font-semibold" scope="col">
+                Class format
+              </th>
+            </tr>
+          </thead>
+          <tbody className="divide-y">
+            {templates.map((template) => (
+              <tr key={template.type}>
+                <th className="px-4 py-3 font-medium" scope="row">
+                  <a
+                    className="text-primary underline-offset-4 hover:underline"
+                    href={TEMPLATE_GUIDE_PATHS[template.type]}
+                  >
+                    {template.name}
+                  </a>
+                </th>
+                <td className="px-4 py-3 text-muted-foreground">
+                  {template.bestFor}
+                </td>
+                <td className="px-4 py-3 text-muted-foreground">
+                  {template.classroomMode === 'small-group'
+                    ? 'Small group'
+                    : 'Individual'}
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+      <p className="text-sm leading-6 text-muted-foreground">
+        Looking for a specific activity? See the{' '}
+        {TEACHER_GUIDE_LINKS.map((link, index) => (
+          <span key={link.href}>
+            {index > 0
+              ? index === TEACHER_GUIDE_LINKS.length - 1
+                ? ', or '
+                : ', '
+              : ''}
+            <a
+              className="font-medium text-primary underline-offset-4 hover:underline"
+              href={link.href}
+            >
+              {link.label.toLowerCase()}
+            </a>
+          </span>
+        ))}
+        .
+      </p>
+    </section>
   );
 }
 
